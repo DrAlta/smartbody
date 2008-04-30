@@ -1,0 +1,6 @@
+fakegesture  https://svn.ict.usc.edu/svn_saso/saso/trunk/core/fakegesture
+logger  https://svn.ict.usc.edu/svn_saso/saso/trunk/core/logger
+loggercs  https://svn.ict.usc.edu/svn_saso/saso/trunk/core/loggercs
+replayercs  https://svn.ict.usc.edu/svn_saso/saso/trunk/core/replayercs
+replaylog  https://svn.ict.usc.edu/svn_saso/saso/trunk/core/replaylog
+smartbody  https://svn.ict.usc.edu/svn_saso/saso/trunk/core/smartbody
