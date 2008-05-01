@@ -1,11 +1,11 @@
-activemq  https://svn.ict.usc.edu/svn_saso/saso/trunk/lib/activemq
+activemq  -r4 https://svn.ict.usc.edu/svn_vh_public/trunk/lib/activemq
 boost  https://svn.ict.usc.edu/svn_saso/saso/trunk/lib/boost
 commapi  https://svn.ict.usc.edu/svn_saso/saso/trunk/lib/commapi
 elsender  https://svn.ict.usc.edu/svn_saso/saso/trunk/lib/elsender
-pthreads  https://svn.ict.usc.edu/svn_saso/saso/trunk/lib/pthreads
+pthreads  -r4 https://svn.ict.usc.edu/svn_vh_public/trunk/lib/pthreads
 sdl  https://svn.ict.usc.edu/svn_saso/saso/trunk/lib/sdl
-vhmsg  https://svn.ict.usc.edu/svn_saso/saso/trunk/lib/vhmsg
+vhmsg  -r4 https://svn.ict.usc.edu/svn_vh_public/trunk/lib/vhmsg
 wsp  https://svn.ict.usc.edu/svn_saso/saso/trunk/lib/wsp
-xerces-c  https://svn.ict.usc.edu/svn_saso/saso/trunk/lib/xerces-c
+xerces-c  -r4 https://svn.ict.usc.edu/svn_vh_public/trunk/lib/xerces-c
 OgreSDK  https://svn.ict.usc.edu/svn_saso/saso/trunk/lib/OgreSDK
 playsound  https://svn.ict.usc.edu/svn_saso/saso/trunk/lib/playsound
