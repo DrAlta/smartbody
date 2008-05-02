@@ -1,5 +1,5 @@
 activemq  -r5 https://svn.ict.usc.edu/svn_vh_public/trunk/lib/activemq
-boost     -r5 https://svn.ict.usc.edu/svn_vh_public/trunk/lib/xerces-c
+boost     -r5 https://svn.ict.usc.edu/svn_vh_public/trunk/lib/boost
 COLLADA       https://svn.ict.usc.edu/svn_saso/saso/trunk/lib/COLLADA
 commapi       https://svn.ict.usc.edu/svn_vh/trunk/lib/commapi
 elsender      https://svn.ict.usc.edu/svn_vh/trunk/lib/elsender
