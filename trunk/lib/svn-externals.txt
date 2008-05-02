@@ -1,11 +1,11 @@
 activemq  -r5 https://svn.ict.usc.edu/svn_vh_public/trunk/lib/activemq
 boost     -r5 https://svn.ict.usc.edu/svn_vh_public/trunk/lib/xerces-c
-commapi       https://svn.ict.usc.edu/svn_saso/saso/trunk/lib/commapi
-elsender      https://svn.ict.usc.edu/svn_saso/saso/trunk/lib/elsender
+COLLADA       https://svn.ict.usc.edu/svn_saso/saso/trunk/lib/COLLADA
+commapi       https://svn.ict.usc.edu/svn_vh/trunk/lib/commapi
+elsender      https://svn.ict.usc.edu/svn_vh/trunk/lib/elsender
 pthreads  -r5 https://svn.ict.usc.edu/svn_vh_public/trunk/lib/pthreads
-sdl           https://svn.ict.usc.edu/svn_saso/saso/trunk/lib/sdl
+sdl           https://svn.ict.usc.edu/svn_vh/trunk/lib/sdl
 vhmsg     -r5 https://svn.ict.usc.edu/svn_vh_public/trunk/lib/vhmsg
 wsp           https://svn.ict.usc.edu/svn_saso/saso/trunk/lib/wsp
 xerces-c  -r5 https://svn.ict.usc.edu/svn_vh_public/trunk/lib/xerces-c
 OgreSDK       https://svn.ict.usc.edu/svn_saso/saso/trunk/lib/OgreSDK
-playsound     https://svn.ict.usc.edu/svn_saso/saso/trunk/lib/playsound
