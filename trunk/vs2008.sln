@@ -10,16 +10,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "elbenchcs", "lib\vhmsg\samp
 		{DE4240A9-DBBA-410F-888F-462384A5B280} = {DE4240A9-DBBA-410F-888F-462384A5B280}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "loggercs", "core\loggercs\loggercs.csproj", "{B503A944-622C-48BE-BB31-3FED69399DF5}"
-	ProjectSection(ProjectDependencies) = postProject
-		{DE4240A9-DBBA-410F-888F-462384A5B280} = {DE4240A9-DBBA-410F-888F-462384A5B280}
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "replayercs", "core\replayercs\replayercs.csproj", "{A927EDAE-1286-45B0-ACB8-CA7D286E1323}"
-	ProjectSection(ProjectDependencies) = postProject
-		{DE4240A9-DBBA-410F-888F-462384A5B280} = {DE4240A9-DBBA-410F-888F-462384A5B280}
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "elsender", "lib\elsender\elsender.csproj", "{80CEEA0D-69DF-4DAD-9E1E-3C3F6FF4AEEF}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DE4240A9-DBBA-410F-888F-462384A5B280} = {DE4240A9-DBBA-410F-888F-462384A5B280}
@@ -53,6 +43,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vs2008-nms", "lib\activemq\activemq-dotnet\vs2008-nms.csproj", "{300C1716-0674-4D01-8F5D-151E59A504FE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wsp", "lib\wsp\wsp\visualc7\wsp.vcproj", "{3939E85D-F2B0-465A-8EF4-A33812D76AA0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{60346261-F69A-4A6C-9980-827AF83F47E9} = {60346261-F69A-4A6C-9980-827AF83F47E9}
+		{3E671F7F-DE68-49A6-825E-AEC14E338A57} = {3E671F7F-DE68-49A6-825E-AEC14E338A57}
+		{DE4240A9-DBBA-410F-888F-462384A5B280} = {DE4240A9-DBBA-410F-888F-462384A5B280}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "elqueue", "lib\vhmsg\vhmsg-c\elqueue.vcproj", "{49840C67-5A25-4D7A-AF21-5976735F7D7D}"
 EndProject
@@ -71,8 +66,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "elutil", "lib\vhmsg\vhmsg-java\elutil.vcproj", "{3E671F7F-DE68-49A6-825E-AEC14E338A57}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JavaTestGUI", "tools\JavaTestGUI\javatestgui.vcproj", "{EB8AA04B-21D7-4A53-AF58-401200D9CF64}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3E671F7F-DE68-49A6-825E-AEC14E338A57} = {3E671F7F-DE68-49A6-825E-AEC14E338A57}
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "commapi", "lib\commapi\commapi.vcproj", "{BFC6E348-DBEA-4118-94E6-BB7FCD8EC7F6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bonebus", "lib\bonebus\bonebus.vcproj", "{BFC6E348-DBEA-4118-94E6-BB7FCD8EC7F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -123,38 +121,6 @@ Global
 		{1532040E-331E-41E4-989D-87EC4C8E57D3}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{1532040E-331E-41E4-989D-87EC4C8E57D3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{1532040E-331E-41E4-989D-87EC4C8E57D3}.Release|Win32.ActiveCfg = Release|Any CPU
-		{B503A944-622C-48BE-BB31-3FED69399DF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B503A944-622C-48BE-BB31-3FED69399DF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B503A944-622C-48BE-BB31-3FED69399DF5}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{B503A944-622C-48BE-BB31-3FED69399DF5}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{B503A944-622C-48BE-BB31-3FED69399DF5}.Java|Any CPU.ActiveCfg = Release|Any CPU
-		{B503A944-622C-48BE-BB31-3FED69399DF5}.Java|Any CPU.Build.0 = Release|Any CPU
-		{B503A944-622C-48BE-BB31-3FED69399DF5}.Java|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{B503A944-622C-48BE-BB31-3FED69399DF5}.Java|Win32.ActiveCfg = Release|Any CPU
-		{B503A944-622C-48BE-BB31-3FED69399DF5}.Profile|Any CPU.ActiveCfg = Release|Any CPU
-		{B503A944-622C-48BE-BB31-3FED69399DF5}.Profile|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{B503A944-622C-48BE-BB31-3FED69399DF5}.Profile|Win32.ActiveCfg = Release|Any CPU
-		{B503A944-622C-48BE-BB31-3FED69399DF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B503A944-622C-48BE-BB31-3FED69399DF5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B503A944-622C-48BE-BB31-3FED69399DF5}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{B503A944-622C-48BE-BB31-3FED69399DF5}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{B503A944-622C-48BE-BB31-3FED69399DF5}.Release|Win32.ActiveCfg = Release|Any CPU
-		{A927EDAE-1286-45B0-ACB8-CA7D286E1323}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A927EDAE-1286-45B0-ACB8-CA7D286E1323}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A927EDAE-1286-45B0-ACB8-CA7D286E1323}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{A927EDAE-1286-45B0-ACB8-CA7D286E1323}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{A927EDAE-1286-45B0-ACB8-CA7D286E1323}.Java|Any CPU.ActiveCfg = Release|Any CPU
-		{A927EDAE-1286-45B0-ACB8-CA7D286E1323}.Java|Any CPU.Build.0 = Release|Any CPU
-		{A927EDAE-1286-45B0-ACB8-CA7D286E1323}.Java|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{A927EDAE-1286-45B0-ACB8-CA7D286E1323}.Java|Win32.ActiveCfg = Release|Any CPU
-		{A927EDAE-1286-45B0-ACB8-CA7D286E1323}.Profile|Any CPU.ActiveCfg = Release|Any CPU
-		{A927EDAE-1286-45B0-ACB8-CA7D286E1323}.Profile|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{A927EDAE-1286-45B0-ACB8-CA7D286E1323}.Profile|Win32.ActiveCfg = Release|Any CPU
-		{A927EDAE-1286-45B0-ACB8-CA7D286E1323}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A927EDAE-1286-45B0-ACB8-CA7D286E1323}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A927EDAE-1286-45B0-ACB8-CA7D286E1323}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{A927EDAE-1286-45B0-ACB8-CA7D286E1323}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{A927EDAE-1286-45B0-ACB8-CA7D286E1323}.Release|Win32.ActiveCfg = Release|Any CPU
 		{80CEEA0D-69DF-4DAD-9E1E-3C3F6FF4AEEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{80CEEA0D-69DF-4DAD-9E1E-3C3F6FF4AEEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80CEEA0D-69DF-4DAD-9E1E-3C3F6FF4AEEF}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -408,10 +374,12 @@ Global
 		{BFC6E348-DBEA-4118-94E6-BB7FCD8EC7F6}.Debug|Win32.Build.0 = Debug|Win32
 		{BFC6E348-DBEA-4118-94E6-BB7FCD8EC7F6}.Java|Any CPU.ActiveCfg = Release|Win32
 		{BFC6E348-DBEA-4118-94E6-BB7FCD8EC7F6}.Java|Mixed Platforms.ActiveCfg = Release|Win32
+		{BFC6E348-DBEA-4118-94E6-BB7FCD8EC7F6}.Java|Mixed Platforms.Build.0 = Release|Win32
 		{BFC6E348-DBEA-4118-94E6-BB7FCD8EC7F6}.Java|Win32.ActiveCfg = Release|Win32
 		{BFC6E348-DBEA-4118-94E6-BB7FCD8EC7F6}.Java|Win32.Build.0 = Release|Win32
 		{BFC6E348-DBEA-4118-94E6-BB7FCD8EC7F6}.Profile|Any CPU.ActiveCfg = Release|Win32
 		{BFC6E348-DBEA-4118-94E6-BB7FCD8EC7F6}.Profile|Mixed Platforms.ActiveCfg = Release|Win32
+		{BFC6E348-DBEA-4118-94E6-BB7FCD8EC7F6}.Profile|Mixed Platforms.Build.0 = Release|Win32
 		{BFC6E348-DBEA-4118-94E6-BB7FCD8EC7F6}.Profile|Win32.ActiveCfg = Release|Win32
 		{BFC6E348-DBEA-4118-94E6-BB7FCD8EC7F6}.Profile|Win32.Build.0 = Release|Win32
 		{BFC6E348-DBEA-4118-94E6-BB7FCD8EC7F6}.Release|Any CPU.ActiveCfg = Release|Win32
