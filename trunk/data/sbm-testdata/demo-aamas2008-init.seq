@@ -1,0 +1,39 @@
+0 echo |---------------------------------------------|
+0 echo |  data/sbm-testdata/demo-aamas2008-init.seq  |
+0 echo |---------------------------------------------|
+
+###  Assumes current directory is: core/smartbody/sbm/bin
+0	path ME ../../../../data/sbm-testdata/doctor
+
+0	echo >>> Loading motions and poses...
+0	load motions ../../../../data/sbm-testdata/doctor/motion
+0	load poses ../../../../data/sbm-testdata/doctor/pose
+#0	seq default-face
+
+
+###  Using USC-ICT Unreal Character Classes
+###    Characters and above assets are standing 102 units
+###    below origin for better lighting in Unreal.
+###    Using remote rVoice speech synthesis
+0	char doctor init doctor.sk SasoBase.SasoDoctorPerez
+0	set character doctor voice remote M021
+
+0	char elder init doctor.sk SasoBase.Mayor
+0	set character elder voice remote M009
+
+0	set test character doctor
+0	set test recipient elder
+
+
+0	pawn left init
+
+###  Uncomment if using Unreal
+#0	pawn camera init
+#
+#1	sbm uscriptexec ghost
+#1	seq demo-aamas2008-reset-unreal
+
+###  Uncomment if using internal viewer
+0	seq default-viewer
+1	seq demo-aamas2008-reset
+

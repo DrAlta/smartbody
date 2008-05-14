@@ -1,0 +1,7 @@
+string $buffer[];
+string $delimiter = ":";
+if( `about -windows` )
+	$delimiter = ";";
+tokenize `getenv "MAYA_SCRIPT_PATH"` $delimiter $buffer;  // Windows specific?
+for( $path in $buffer )
+	print ( $path + "\n" );
