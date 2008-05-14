@@ -1,6 +1,0 @@
-fakegesture -r? https://svn.ict.usc.edu/svn_vh_public/trunk/core/fakegesture
-logger      -r? https://svn.ict.usc.edu/svn_vh_public/trunk/core/logger
-loggercs    -r? https://svn.ict.usc.edu/svn_vh_public/trunk/core/loggercs
-replayercs  -r? https://svn.ict.usc.edu/svn_vh_public/trunk/core/replayercs
-replaylog   -r? https://svn.ict.usc.edu/svn_vh_public/trunk/core/replaylog
-smartbody       https://svn.ict.usc.edu/svn_saso/saso/trunk/core/smartbody
