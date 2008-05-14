@@ -1,1 +1,0 @@
-sbm https://svn.ict.usc.edu/svn_saso/saso/trunk/data/saso/sbm
