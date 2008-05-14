@@ -1,0 +1,378 @@
+// OC3 Entertainment - Lipsynch Tweak File
+// These files are ONLY to be used with the retail version of Unreal Tournament 2004.
+
+LTF
+
+// Version
+1.0
+
+// Phoneme Timing Data
+// ===================
+
+// Num. Phonemes
+7
+
+// Phoneme Timing List
+
+40 0 0.368
+31 0.368 0.448
+11 0.448 0.816
+19 0.816 0.912
+0 0.912 0.96
+20 0.96 1.024
+40 1.024 1.6
+
+// Function Curve Data
+// ===================
+
+// Num. Curves (should always be equal to the number of targets)
+26
+
+// Function Curve List
+
+// Curve 0
+
+{
+	// Name
+	Eat
+
+	// Num. Keys
+	3
+
+	// Keys
+	784 0 880 0.106481 898 0 
+}
+
+// Curve 1
+
+{
+	// Name
+	Earth
+
+	// Num. Keys
+	0
+
+	// Keys
+	
+}
+
+// Curve 2
+
+{
+	// Name
+	If
+
+	// Num. Keys
+	6
+
+	// Keys
+	-332 0 -32 0.2 336 0 884 0 989 0.118952 1568 0 
+}
+
+// Curve 3
+
+{
+	// Name
+	Ox
+
+	// Num. Keys
+	0
+
+	// Keys
+	
+}
+
+// Curve 4
+
+{
+	// Name
+	Oat
+
+	// Num. Keys
+	3
+
+	// Keys
+	-32 0 336 0.85 784 0 
+}
+
+// Curve 5
+
+{
+	// Name
+	Wet
+
+	// Num. Keys
+	0
+
+	// Keys
+	
+}
+
+// Curve 6
+
+{
+	// Name
+	Size
+
+	// Num. Keys
+	0
+
+	// Keys
+	
+}
+
+// Curve 7
+
+{
+	// Name
+	Church
+
+	// Num. Keys
+	3
+
+	// Keys
+	336 0 784 0.85 886 0 
+}
+
+// Curve 8
+
+{
+	// Name
+	Fave
+
+	// Num. Keys
+	3
+
+	// Keys
+	796 0 889 0.664714 1108 0 
+}
+
+// Curve 9
+
+{
+	// Name
+	Though
+
+	// Num. Keys
+	0
+
+	// Keys
+	
+}
+
+// Curve 10
+
+{
+	// Name
+	Told
+
+	// Num. Keys
+	0
+
+	// Keys
+	
+}
+
+// Curve 11
+
+{
+	// Name
+	Bump
+
+	// Num. Keys
+	0
+
+	// Keys
+	
+}
+
+// Curve 12
+
+{
+	// Name
+	New
+
+	// Num. Keys
+	0
+
+	// Keys
+	
+}
+
+// Curve 13
+
+{
+	// Name
+	Roar
+
+	// Num. Keys
+	0
+
+	// Keys
+	
+}
+
+// Curve 14
+
+{
+	// Name
+	Cage
+
+	// Num. Keys
+	0
+
+	// Keys
+	
+}
+
+// Curve 15
+
+{
+	// Name
+	Eyebrow Raise Left
+
+	// Num. Keys
+	0
+
+	// Keys
+	
+}
+
+// Curve 16
+
+{
+	// Name
+	Eyebrow Raise Right
+
+	// Num. Keys
+	0
+
+	// Keys
+	
+}
+
+// Curve 17
+
+{
+	// Name
+	Blink Left
+
+	// Num. Keys
+	3
+
+	// Keys
+	343 0 448 1 599 0 
+}
+
+// Curve 18
+
+{
+	// Name
+	Blink Right
+
+	// Num. Keys
+	3
+
+	// Keys
+	343 0 448 1 599 0 
+}
+
+// Curve 19
+
+{
+	// Name
+	Head Bend
+
+	// Num. Keys
+	3
+
+	// Keys
+	0 0 448 4.78029 1480 0 
+}
+
+// Curve 20
+
+{
+	// Name
+	Head Side Side
+
+	// Num. Keys
+	0
+
+	// Keys
+	
+}
+
+// Curve 21
+
+{
+	// Name
+	Head Twist
+
+	// Num. Keys
+	0
+
+	// Keys
+	
+}
+
+// Curve 22
+
+{
+	// Name
+	Eye Side Side Left
+
+	// Num. Keys
+	0
+
+	// Keys
+	
+}
+
+// Curve 23
+
+{
+	// Name
+	Eye Side Side Right
+
+	// Num. Keys
+	0
+
+	// Keys
+	
+}
+
+// Curve 24
+
+{
+	// Name
+	Eye Up Down Left
+
+	// Num. Keys
+	3
+
+	// Keys
+	0 0 448 -4.78029 1480 0 
+}
+
+// Curve 25
+
+{
+	// Name
+	Eye Up Down Right
+
+	// Num. Keys
+	3
+
+	// Keys
+	0 0 448 -4.78029 1480 0 
+}
+
+// Expressions Curve Data
+// ======================
+
+// Num. Expression Curves
+0
+
+// Expression Curve List
+
