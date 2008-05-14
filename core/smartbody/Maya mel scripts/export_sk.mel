@@ -1,0 +1,248 @@
+//  export_sk.mel - part of SmartBody Project
+//  Copyright (C) 2005-2008  University of Southern California
+//
+//  SmartBody is free software: you can redistribute it and/or
+//  modify it under the terms of the Lesser GNU General Public License
+//  as published by the Free Software Foundation, version 3 of the
+//  license.
+//
+//  SmartBody is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  Lesser GNU General Public License for more details.
+//
+//  You should have received a copy of the Lesser GNU General Public
+//  License along with SmartBody.  If not, see:
+//      http://www.gnu.org/licenses/lgpl-3.0.txt
+//
+//  CONTRIBUTORS:
+//      Marcelo Kallmann, USC (currently at UC Merced)
+//      Ashok Basawapatna, USC (no longer)
+//      Andrew n marshall, USC
+
+
+
+////////////////////////////////////////////////////////////////
+//  Exports animation skeleton in .sk format for SmartBody
+//  Requires SkViewer to bind the .objs to the .sk skeleton
+//
+
+
+proc float skRound ( float $value )
+ {
+   int $precision = 5;
+   $power = `pow 10 $precision`;
+   $value = $value * $power;
+   $value = int ( $value+($value<0?-0.5:0.5) );
+   $value = $value / $power;
+   return $value;
+ }
+
+proc int skMargin ( int $fileid, int $depth )
+ {
+   for ( $k=0; $k<$depth; $k++ ) fprint $fileid ("  ");
+   return 1;
+ }
+
+proc int skWriteSk ( string $jname, int $fileid, int $depth )
+ {
+   //=== Get Children ===
+   string $children[];
+   $children = `listRelatives $jname`;
+   int $nchildren = `size $children`;
+
+   //=== Check Type ===
+   string $type = nodeType ( $jname );
+  
+   if ( $type=="mesh" )
+    { skMargin ( $fileid, $depth-1 );
+      fprint $fileid ("visgeo \"" + $jname + ".obj\"\n" );
+      skMargin ( $fileid, $depth-1 );
+      fprint $fileid ("colgeo \"" + $jname + ".obj\"\n" );
+    }
+   else if ( $type!="joint" )
+    { print ( "Skipping " + $jname + ": " + $type + "\n" );
+    }
+
+   if ( $type!="joint" )
+    { for ( $i=0; $i<$nchildren; $i++ )
+	   { skWriteSk ( $children[$i], $fileid, $depth+1 );
+	   }
+      return 1;
+    }
+   
+   //=== Export Joint ===
+   print ( "Exporting joint " + $jname + "\n" );
+
+   skMargin ( $fileid, $depth );
+   
+   if ($depth == 0)
+    fprint $fileid ("root ");
+   else
+	fprint $fileid ("joint ");
+
+   fprint $fileid ( $jname + "\n" );
+
+   //=== Offset ===
+   skMargin ( $fileid, $depth );
+   
+   fprint $fileid ("{ offset ");
+
+   float $offset[3];
+   string $s = $jname + ".translateX";
+   $offset[0] = `getAttr $s`;
+   string $s = $jname + ".translateY";
+   $offset[1] = `getAttr $s`;
+   string $s = $jname + ".translateZ";
+   $offset[2] = `getAttr $s`;
+
+   if ( $depth==0 )
+    fprint $fileid ("0 0 0\n") ;
+   else
+	fprint $fileid ( skRound($offset[0]) + " " + skRound($offset[1]) + " " + skRound($offset[2]) + "\n");
+    
+   
+   int $mntmn[]=(`transformLimits -query -etx $jname`);
+   float $xTransLimitValues[]= (`transformLimits -query -tx $jname`);
+   float $yTransLimitValues[]= (`transformLimits -query -ty $jname`);
+   float $zTransLimitValues[]= (`transformLimits -query -tz $jname`);
+   if ($mntmn[0] && $mntmn[1])
+	{
+	  if(!($xTransLimitValues[0]==$xTransLimitValues[1]))
+	  {
+		skMargin ( $fileid, $depth-1 );
+		fprint $fileid ("    channel XPos 0" + " lim "+$xTransLimitValues[0]+" "+$xTransLimitValues[1]+"\n");
+	  }
+	  if(!($yTransLimitValues[0]==$yTransLimitValues[1]))
+	  {
+		skMargin ( $fileid, $depth-1 );
+		fprint $fileid ("    channel YPos 0" + " lim "+$yTransLimitValues[0]+" "+$yTransLimitValues[1]+"\n");
+	  }
+	  if(!($zTransLimitValues[0]==$zTransLimitValues[1]))
+	  {
+		skMargin ( $fileid, $depth-1 );
+		fprint $fileid ("    channel ZPos 0" + " lim "+$zTransLimitValues[0]+" "+$zTransLimitValues[1]+"\n");
+	  }
+    }
+	else{
+	 // skMargin ( $fileid, $depth-1 );
+	 // fprint $fileid ("    channel XPos 0 free\n");
+	 // skMargin ( $fileid, $depth-1 );
+     // fprint $fileid ("    channel YPos 0 free\n");
+	 // skMargin ( $fileid, $depth-1 );
+     // fprint $fileid ("    channel ZPos 0 free\n");
+	}
+
+
+  //=== Translation Channels only for Root ===
+  // if ( $depth==0 )
+  //  { fprint $fileid ("  channel XPos 0 free\n");
+  //    fprint $fileid ("  channel YPos 0 free\n");
+  //    fprint $fileid ("  channel ZPos 0 free\n");
+  //  }
+    
+   //=== Rotation ===
+   skMargin ( $fileid, $depth+1 );
+   fprint $fileid ("channel Quat\n");
+
+   //=== Line Space ===
+   fprint $fileid ("\n");
+   
+   //=== Recurse ===
+   for ( $i=0; $i<$nchildren; $i++ )
+	{ skWriteSk ( $children[$i], $fileid, $depth+1 );
+	}
+
+   //=== End ===
+   skMargin ( $fileid, $depth );
+   fprint $fileid ("}\n");
+
+   return 1;
+}
+
+global proc int skExportToFile ( string $fname, string $skname, string $version )
+ { 
+   int $fileid = `fopen $fname "w"`;
+   
+   if ( $fileid==0 )
+    { error ("Could not open file: "+$fname);
+      return 0;
+    }
+
+   $selectionList = `ls -sl`;
+   if ( size($selectionList)<=0 )
+    { fclose $fileid;
+      error "Nothing selected!\n";
+    }
+ 
+   int $selectionListSize = `size $selectionList`;
+   int $depth=0;
+
+   for ( $j=0; $j<$selectionListSize; $j++ )
+    {
+      fprint $fileid ("# SK Skeleton Definition - M. Kallmann 2004\n");
+      fprint $fileid ("# File generated with export_sk_v"+$version+".mel\n\n");
+      fprint $fileid ("set_name "+$skname+"\n\n");
+      fprint $fileid ("skeleton\n");
+        
+      skWriteSk ( $selectionList[$j], $fileid, $depth );
+	
+      fprint $fileid ("\n\n");
+      fprint $fileid ("end\n\n");
+    }
+
+   fclose($fileid);
+   print ("Export done.\n");
+   return 1;
+}
+
+global proc int skFileCb( string $filename, string $fileType )
+{
+  textFieldGrp -e -text $filename skOutputFile;
+  return 1;
+}
+
+global proc skExportWin()
+{
+  global string $version = "0.2";
+
+  if ( (`window -exists skMainWin`)==true ) deleteUI skMainWin;
+  string $winTitle = "SK Exporter v"+$version+" - kallmann@ict.usc.edu";
+  window -title $winTitle -wh 400 180 skMainWin;
+  columnLayout -adjustableColumn true;
+  textFieldGrp -label "Skeleton Root Joint:" -text "base" skRootField;
+  textFieldGrp -label "Output Character Name:" -text "doctor" skOutputName;
+  textFieldGrp -label "Output File:" -text "C:/doctor.sk" skOutputFile;
+  button -l "Browse Output File" -command "fileBrowserDialog -m 1 -fc \"skFileCb\" -an \"Select\" -om \"SaveAs\"";
+  button -l "Export" -command "skExport";
+  setParent..;
+  showWindow skMainWin; 
+}
+
+global proc skExport ()
+{
+  global string $version;
+  string $root = `textFieldGrp -q -text skRootField`;
+  select -r $root;
+  string $file = `textFieldGrp -q -text skOutputFile`;
+  string $name = `textFieldGrp -q -text skOutputName`;
+  currentUnit -linear "cm";
+  skExportToFile ( $file, $name, $version );
+}
+
+skExportWin;
+
+//
+// - Three steps are required in order to export a new skeleton/character from Maya:
+//   1. Use this mel script to export a .sk skeleton definition file
+//   2. Use the obj exporter mel script to export the used rigid models.
+//      Make sure the objs are saved to the same directory of the sk file.
+//   3. Finally, load the sk file in the metool.exe (the character will appear
+//      with the models in strange places), and select the menu option 
+//      Tools->convert skeleton. A new correct skeleton (with srm geometries) will be created.
+// - All joints are exported with quaternion rotation channel
+// - Only base joint is exported with translation channels
+// - Maya should be set to cms
+// - If "Mirror Joint" is used to create the skeleton in Maya, be sure to use the
+//   "orientation" option (not "behavior")
+//

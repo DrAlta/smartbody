@@ -1,0 +1,253 @@
+/*
+ *  sk_motion.h - part of Motion Engine and SmartBody-lib
+ *  Copyright (C) 2008  University of Southern California
+ *
+ *  SmartBody-lib is free software: you can redistribute it and/or
+ *  modify it under the terms of the Lesser GNU General Public License
+ *  as published by the Free Software Foundation, version 3 of the
+ *  license.
+ *
+ *  SmartBody-lib is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  Lesser GNU General Public License for more details.
+ *
+ *  You should have received a copy of the Lesser GNU General Public
+ *  License along with SmartBody-lib.  If not, see:
+ *      http://www.gnu.org/licenses/lgpl-3.0.txt
+ *
+ *  CONTRIBUTORS:
+ *      Marcelo Kallmann, USC (currently at UC Merced)
+ *      Andrew n marshall, USC
+ *      Ashok Basawapatna, USC (no longer)
+ *      Marcus Thiebaux, USC
+ */
+
+# ifndef SK_MOTION_H
+# define SK_MOTION_H
+
+# include <SR/sr_input.h>
+# include <SR/sr_shared_class.h>
+
+# include <SK/sk_channel_array.h>
+
+class SkPosture;
+class SkSkeleton;
+
+/*! Maintains a motion defined as a sequence of keyframes, each
+with a time stamp */
+class SkMotion : public SrSharedClass {
+protected :
+
+	struct Frame { 
+			float keytime; 
+			float* posture; 
+	};
+
+	int _postsize;            // size of each posture
+	SkSkeleton* _skeleton;    // the connected skeleton
+	float* _floatbuffer;      // or the connected buffer
+	char* _name;              // motion name
+	char* _filename;          // file name (optional)
+	SrArray<Frame> _frames;   // frame data
+	SkChannelArray _channels; // channels
+	int _last_apply_frame;    // used to speed up playing with monotone time
+
+	// Timing Metadata:
+	// Unset times are given a value of -1
+	float _time_ready;
+	float _time_stroke_start;
+	float _time_stroke_emphasis;
+	float _time_stroke_end;
+	float _time_relax;
+
+public :
+	/*! Constructor */
+	SkMotion();
+
+	/*! Destructor is public but pay attention to the use of ref()/unref() */
+	virtual ~SkMotion();
+
+	/*! Set a name to be associated with the motion */
+	void name ( const char* n ) { sr_string_set(_name,n); }
+
+	/*! Get the name associated with the motion */
+	const char* name () const { return _name? _name:""; }
+
+	/*! Set a file name to be associated with the motion.
+	This information is not saved in the motion file and is 
+	not used by SkMotion. It is here just as a convenient 
+	place to store the information */
+	void filename ( const char* n ) { sr_string_set(_filename,n); }
+
+	/*! Get the file name associated with the motion */
+	const char* filename () const { return _filename? _filename:""; }
+
+	/*! Clears all data, creating an empty motion */
+	void init ();
+
+	/*! Creates an empty motion with the given channels */
+	void init ( const SkChannelArray& ca );
+
+	/*! Compress internal arrays */
+	void compress ();
+
+	/*! Loads a motion file and returns true if no errors.
+	Both .skm and .bvh formats are read here */
+	bool load ( SrInput& in );
+
+	/*! Save the motion to a file and returns true if no errors */
+	bool save ( SrOutput& out );
+
+	/*! Creates a motion by setting frames as given keypostures and
+	at the given keytimes. Only the channels with a varying value,
+	in relation to the first keyposture, are stored in the motion.
+	Arrays keypostures and keytimes must have the same size.
+	True is returned if the motion could be created, false otherwise. */
+	bool create_from_postures ( const SrArray<SkPosture*>& keypostures, const SrArray<float>& keytimes );
+
+	/*! Inserts one channel at position i, with the given name, type and value.
+	This implies inserting new position(s) in all frames. Returns true if
+	all parameters are ok. Note that the channel will only take effect when
+	reconnecting the motion to a skeleton. */
+	bool insert_channel ( int pos, const char* name, SkChannel::Type type, float* values );
+
+	/*! Inserts a new frame at position pos, with key time kt. True returned if success. */
+	bool insert_frame ( int pos, float kt );
+
+	/*! Returns the internal channel array, which should not be modified */
+	SkChannelArray& channels () { return _channels; }
+
+	/*! Number of frames in the current motion */
+	int frames () const { return _frames.size(); }
+
+	/*! The size of the float array representing one posture. */
+	int posture_size () const { return _postsize; }
+
+	/*! Returns a float array of size posture_size(), containing the
+	posture at frame f. It is the user responsibility to
+	ensure that 0<=f and f<frames() */
+	float* posture ( int f ) { return _frames[f].posture; }
+
+	/*! Returns the keytime of frame f. It is the user
+	responsibility to ensure that 0<=f and f<frames() */
+	float keytime ( int f ) const { return _frames[f].keytime; }
+
+	/*! Returns the keytime of the last frame */
+	float last_keytime () const { return _frames[frames()-1].keytime; }
+
+	/*! Returns the final keytime of the motion minus the first one.
+	This method requires the motion to not be empty. */
+	float duration () { return _frames.top().keytime-_frames[0].keytime; }
+
+	/*! Matches the joint names defined in SkMotion and in SkSkeleton,
+	stablishing a direct link between each channel in the motion
+	to the corresponding channels in the skeleton's joints.
+	The number of channels matched is returned. A null
+	parameter will disconnect the motion and set to null all joints
+	pointers in the associated channel array. The motion must be
+	disconnected in case the skeleton changes or is deleted. */
+	int connect ( SkSkeleton* s );
+
+	/*! Connects to the given buffer. The apply methods will then put
+	values in the given buffer, which size must match with the
+	result of channels().count_floats(). A null parameter will
+	disconnect the motion (but will not touch the channel array).
+	This call simply saves the pointer (thus is very efficient) */
+	void connect ( float* buffer );
+
+	/*! disconnect the motion by calling connect((SkSkeleton*)0) */
+	void disconnect () { connect((SkSkeleton*)0); }
+
+	/*! Returns the current connected skeleton (can be a null pointer)*/
+	SkSkeleton* connected_skeleton () const { return _skeleton; }
+
+	/*! Returns the current connected buffer (can be a null pointer)*/
+	float* connected_buffer () const { return _floatbuffer; }
+
+	/*! Apply frame f to the attached skeleton or connected ChannelArray.
+	Only sucessfully matched channels are used. Parameter f can
+	be out of range to specify extreme postures. */
+	void apply_frame ( int f );
+
+	/*! Apply frame f to the attached skeleton. Will only work if an
+	skeleton was connected to the motion with method connect.
+	Only sucessfully matched channels are used. Parameter f can
+	be out of range to specify extreme postures. */
+	void apply_frame ( int f, float* buffer, SrBuffer<int>* map_p );
+
+	/*! Interpolation type used by apply */
+	enum InterpType { Linear, CubicSpline };
+
+	/*! Evaluates and apply the motion at time t to the connected skeleton or buffer.
+	The search for the 2 keyframes to be interpolated (adjacent to t) is done linearly,
+	however as 99% of the cases the evaluation is monotone, the last frame applied
+	serves as a starting point for the search, resulting in maximum efficiency.
+	To optimize evaluations from several controllers sharing a same motion file,
+	parameter lastframe can be used and will store the last frame used per controller. */
+	void apply ( float t, InterpType=Linear, int* lastframe=NULL );
+
+	/*! Evaluates and apply the motion at time t to any float* buffer (or channel joints if NULL).
+	Unless map_p is specified, the buffer is assumed to be in motion's channel order with all channels present.
+	The search for the 2 keyframes to be interpolated (adjacent to t) is done linearly,
+	however as 99% of the cases the evaluation is monotone, the last frame applied
+	serves as a starting point for the search, resulting in maximum efficiency.
+	To optimize evaluations from several controllers sharing a same motion file,
+	parameter lastframe can be used and will store the last frame used per controller. */
+	void apply ( float t, float* buffer, SrBuffer<int>* map_p, InterpType=Linear, int* lastframe=NULL );
+
+	/*! Returns a string describing the interpolation type */
+	static const char* interp_type_name ( InterpType type );
+
+	/*! Returns the type relative to the string description */
+	static InterpType interp_type_name ( const char* type );
+
+	/*! Copy operator. Copies all motion data and connection status from m */
+	void operator = ( const SkMotion& m );
+
+	/*! Move all keytimes so that the first keytime starts at the given time */
+	void move_keytimes ( float startkt );
+
+	/*! Change the angle values of all channels in euler angles type by
+	adding +-2PI, in order to have the smallest distance between frames,
+	e.g., to obtain interpolation from 0 to -60, instead of 0 to 300.
+	Note that this might not work depending on the joint limits defined */
+	void correct_euler_angles ();
+
+	/*! Change the values of the given channel index, from all frames from f1 to f2, according to
+	the given multiplication factor and offset. First the actual channel value is multiplied
+	by factor, and then added with offset. If mfactor is 0, offset becomes the new value of
+	the channel. For the Swing and Quat types of channels, mfactor acts as a multiplication
+	of the current rotational angle encoded in the rotation. Offset will contain up to
+	4 valid positions, according to the channel type */
+	void change_channel_values ( int f1, int f2, int channel, float mfactor, const float* offset );
+
+
+	float time_ready()
+	{	return _time_ready; }
+	float time_stroke_start()
+	{	return _time_stroke_start; }
+	float time_stroke_emphasis()
+	{	return _time_stroke_emphasis; }
+	float time_stroke_end()
+	{	return _time_stroke_end; }
+	float time_relax()
+	{	return _time_relax; }
+
+	void time_ready( float time_ready )
+	{	_time_ready = time_ready;}
+	void time_stroke_start_time( float time_stroke_start )
+	{	_time_stroke_start = time_stroke_start; }
+	void time_stroke_emphasis( float time_stroke_emphasis )
+	{	_time_stroke_emphasis = time_stroke_emphasis; }
+	void time_stroke_end( float time_stroke_end )
+	{	_time_stroke_end = time_stroke_end; }
+	void time_relax(float time_relax )
+	{	_time_relax = time_relax; }
+private : 
+	bool _load_bvh ( SrInput& in );
+};
+
+//================================ End of File =================================================
+
+# endif  // SK_MOTION_H

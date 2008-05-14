@@ -1,0 +1,134 @@
+/*
+ *  sk_joint_quat.cpp - part of Motion Engine and SmartBody-lib
+ *  Copyright (C) 2008  University of Southern California
+ *
+ *  SmartBody-lib is free software: you can redistribute it and/or
+ *  modify it under the terms of the Lesser GNU General Public License
+ *  as published by the Free Software Foundation, version 3 of the
+ *  license.
+ *
+ *  SmartBody-lib is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  Lesser GNU General Public License for more details.
+ *
+ *  You should have received a copy of the Lesser GNU General Public
+ *  License along with SmartBody-lib.  If not, see:
+ *      http://www.gnu.org/licenses/lgpl-3.0.txt
+ *
+ *  CONTRIBUTORS:
+ *      Marcelo Kallmann, USC (currently at UC Merced)
+ */
+
+# include <math.h>
+
+# include <SK/sk_joint_quat.h>
+# include <SK/sk_joint.h>
+
+//============================= SrSkQuat ============================
+
+SkJointQuat::SkJointQuat ( SkJoint* j )
+ {
+   _joint = j;
+   _jntsync = 0;
+   _dersync = 0;
+   _active = 0;
+   _asknew = 0;
+   _prepost = 0;
+ }
+
+SkJointQuat::~SkJointQuat()
+ {
+   delete _prepost; // C++ handles null pointer case
+ }
+
+void SkJointQuat::value ( const SrQuat& q )
+ {
+   if ( !_active ) return;
+   _jntsync = 0;
+   _dersync = 0;
+   _quat = q;
+   _joint->set_lmat_changed(); // let joint and skeleton know there was a change
+ }
+
+void SkJointQuat::value ( const float* f )
+ {
+   if ( !_active ) return;
+   _jntsync = 0;
+   _dersync = 0;
+   _quat.set ( f );
+   _joint->set_lmat_changed(); // let joint and skeleton know there was a change
+ }
+
+const SrQuat& SkJointQuat::value ()
+ {
+   if ( _asknew )
+    { get_quat ( _quat );
+      if ( _prepost ) { _quat = _prepost->pre * _quat * _prepost->post; }
+      _asknew = 0;
+    }
+
+   return _quat;
+ }
+
+void SkJointQuat::prerot ( const SrQuat& q )
+ {
+   if ( !_prepost ) _prepost = new PrePost;
+   _prepost->pre = q;
+   ask_new ();
+ }
+ 
+void SkJointQuat::postrot ( const SrQuat& q )
+ {
+   if ( !_prepost ) _prepost = new PrePost;
+   _prepost->post = q;
+   ask_new ();
+ }
+
+void SkJointQuat::align ( AlignType t, const SrVec& v )
+ {
+   if ( _joint->num_children()<1 ) return;
+   SkJointQuat* c = _joint->child(0)->quat();
+   if ( !_prepost ) _prepost = new PrePost;
+
+
+   if ( t==AlignPostInv )
+    { 
+      SrQuat q ( v, c->_joint->offset()*_prepost->post );
+      _prepost->pre = q * _prepost->pre;
+      _prepost->post = q.inverse() * _prepost->post;
+    }
+   else if ( t==AlignPreInv )
+    {
+      SrQuat q ( v*_prepost->pre, _joint->offset() );
+      _prepost->pre = q * _prepost->pre;
+      _prepost->post = q.inverse() * _prepost->post;
+    }
+   if ( t==AlignPre || t==AlignPrePost )
+    {
+      SrQuat q ( v*_prepost->pre, _joint->offset() );
+      _prepost->pre = q * _prepost->pre;
+    }
+
+   if ( t==AlignPost || t==AlignPrePost )
+    {
+      SrQuat q ( v, c->_joint->offset()*_prepost->post );
+      _prepost->post = q.inverse() * _prepost->post;
+    }
+
+   ask_new ();
+ }
+
+void SkJointQuat::ask_new ()
+ {
+   _asknew = 1;
+   _jntsync = 0;
+   _dersync = 1;
+   _joint->set_lmat_changed(); // let joint and skeleton know there was a change
+ }
+
+void SkJointQuat::get_quat ( SrQuat& q ) const
+ {
+ }
+ 
+//============================ End of File ============================
