@@ -30,12 +30,6 @@
 #include "sbm_constants.h"
 
 
-// EDF - Brute force method of ignoring quotes.  This problem stems from the vhmsg wrappers used in TCL
-//       This switch should stay turned off, unless you know what you're doing.
-//       It's an awful hack and I'm not sure it functions 100% as it should.
-#define RAPPORT_IGNORE_QUOTES  0
-
-
 //////////////////////////////////////////////////////////////////
 
 srArgBuffer::srArgBuffer( const char *arg )	{
@@ -96,19 +90,11 @@ char* srArgBuffer::read_token( void )	{
 	char *peek_buff = peek_string();
 	size_t spaces = strspn( peek_buff, WHITE_SPACE );
 	peek_buff += spaces;
-#if RAPPORT_IGNORE_QUOTES
-	if( peek_buff[ 0 ] == '"' )	{
-    	token = strtok( peek_buff, " \t\n\r\"" );  // read 'til next quote or end of string
-    } else {
-    	token = strtok( peek_buff, " \t\n\r\"" );
-    }
-#else
 	if( peek_buff[ 0 ] == '"' )	{
     	token = strtok( peek_buff, "\"" );  // read 'til next quote or end of string
     } else {
     	token = strtok( peek_buff, WHITE_SPACE );
     }
-#endif
 	if( token == NULL )	{
 		token = EMPTY_STRING;
 	}
