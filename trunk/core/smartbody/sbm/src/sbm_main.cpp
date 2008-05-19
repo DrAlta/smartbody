@@ -164,7 +164,7 @@ int sbm_main_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	return CMD_SUCCESS;
 }
 
-void sbm_vhmsg_callback( char *op, char *args ) {
+void sbm_vhmsg_callback( char *op, char *args, void * user_data ) {
 
 	switch( mcuCBHandle::singleton().execute( op, args ) ) {
         case CMD_NOT_FOUND:
