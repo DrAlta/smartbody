@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\src;..\..\fltk;..\..\..\..\lib\wsp\wsp\include;..\..\..\..\lib\bonebus\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-tt\include&quot;;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost"
+				AdditionalIncludeDirectories="..\src;..\..\fltk;..\..\..\..\lib\vhcl\include;..\..\..\..\lib\wsp\wsp\include;..\..\..\..\lib\bonebus\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-tt\include&quot;;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -122,7 +122,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
-				AdditionalIncludeDirectories="..\src;..\include;..\..\fltk;..\..\..\..\lib\wsp\wsp\include;..\..\..\..\lib\bonebus\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-tt\include&quot;;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost"
+				AdditionalIncludeDirectories="..\src;..\include;..\..\fltk;..\..\..\..\lib\vhcl\include;..\..\..\..\lib\wsp\wsp\include;..\..\..\..\lib\bonebus\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-tt\include&quot;;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB"
 				RuntimeLibrary="2"
 				TreatWChar_tAsBuiltInType="false"
