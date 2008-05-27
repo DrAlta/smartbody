@@ -199,6 +199,33 @@
 				CommandLine="copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\activemq-cpp-2.1\vs2008-build\ReleaseDLL\activemq-cpp.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\xerces-c\bin\xerces-c_2_7.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\sdl\sdl\lib\sdl.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\sdl\sdl_mixer\lib\sdl_mixer.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\boost\stage\lib\boost_filesystem-vc90-mt-1_35.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\boost\stage\lib\boost_system-vc90-mt-1_35.dll ..\bin&#x0D;&#x0A;"
 			/>
 		</Configuration>
+		<Configuration
+			Name="Lint|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="10"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TypeLibraryName=".\obj\sbm_release/sbm.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="if exist ..\..\..\..\tools\lint\lint-post-build.bat call ..\..\..\..\tools\lint\lint-post-build.bat ..\..\..\..\tools\lint $(ProjectFileName)"
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
