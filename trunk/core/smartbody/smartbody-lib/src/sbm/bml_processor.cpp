@@ -260,11 +260,11 @@ void BML::Processor::vrSpeak( BodyPlannerMsg& bpMsg, mcuCBHandle *mcu ) {
 	}
 
 	if( bmlElem ) {
-		request = new BmlRequest( bpMsg.agent, bpMsg.requestId, string(bpMsg.recipientId), string(bpMsg.msgId), 1 );
-		parseBML( bmlElem, request->triggers[0], mcu );
+		request = new BmlRequest( bpMsg.agent, bpMsg.requestId, string(bpMsg.recipientId), string(bpMsg.msgId) );
+		parseBML( bmlElem, request, mcu );
 		requests.insert( bpMsg.requestId.c_str(), request );
 
-		if( request->speech ) {
+		if( request->speech_request ) {
 			// request speech through Speech API
 			SmartBody::SpeechInterface* speech = bpMsg.agent->get_speech_impl();
 			if( !speech ) {
@@ -274,9 +274,9 @@ void BML::Processor::vrSpeak( BodyPlannerMsg& bpMsg, mcuCBHandle *mcu ) {
 			}
 
 			// Found speech implementation.  Making request.
-			SmartBody::RequestId reqId = speech->requestSpeechAudio( bpMsg.agentId, request->speech->getXML(), "bp speech_ready " );
+			SmartBody::RequestId reqId = speech->requestSpeechAudio( bpMsg.agentId, request->speech_request->getXML(), "bp speech_ready " );
 			string speechKey = buildSpeechKey( bpMsg.agent, reqId );
-			int hash_result = speeches.insert( speechKey.c_str(), request->speech );  // store for later reply
+			int hash_result = speeches.insert( speechKey.c_str(), request->speech_request );  // store for later reply
 			if( hash_result != CMD_SUCCESS ) {
 				cerr << "ERROR: BML::Processor.vrSpeak(..): srHashMap already contains an entry for speechKey \"" << speechKey << "\".  Cannot process speech behavior.  Failing BML request.  (This error should not occur. Let Andrew know immeidately.)"  << endl;
 				// TODO: Send vrSpeakFailed
@@ -290,9 +290,7 @@ void BML::Processor::vrSpeak( BodyPlannerMsg& bpMsg, mcuCBHandle *mcu ) {
 		// TODO: Send vrSpeakFailed
 	}
 }
-void BML::Processor::parseBML( DOMElement *bmlElem, TriggerEvent *trigger, mcuCBHandle *mcu ) {
-	BmlRequest* request = trigger->request;
-
+void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequest* request, mcuCBHandle *mcu ) {
 	// look for BML animation command tags
 	DOMElement* child = xml_utils::getFirstChildElement( bmlElem );
 	const XMLCh*   speechId;
@@ -301,7 +299,9 @@ void BML::Processor::parseBML( DOMElement *bmlElem, TriggerEvent *trigger, mcuCB
 	// TEMPORARY: <speech> can only be the first behavior
 	if( child && XMLString::compareString( child->getTagName(), TAG_SPEECH )==0 ) {
 		speechId = child->getAttribute( ATTR_ID );
-		speech = new SpeechRequest( child, speechId, trigger );
+
+		request->speech_trigger = request->createTrigger( "SPEECH_SYNTH" ); // TODO: use message id and behavior id
+		speech = new SpeechRequest( child, speechId, request->speech_trigger );
 		child = xml_utils::getNextElement( child );
 	}
 
@@ -311,7 +311,7 @@ void BML::Processor::parseBML( DOMElement *bmlElem, TriggerEvent *trigger, mcuCB
 
 		// Load SynchPoint references
 		SynchPoints tms;
-		tms.parseSynchPoints( child, trigger );
+		tms.parseSynchPoints( child, request );
 
 		// Simplify references to synch points.
 		SynchPoint* start  = tms.start;
@@ -402,17 +402,18 @@ void BML::Processor::parseBML( DOMElement *bmlElem, TriggerEvent *trigger, mcuCB
 	}
 
 	if( LOG_TIME_MARKERS ) {
-		cout << "TIDs:";
-		SynchPoint* sp = trigger->start;
-		while( sp != NULL ) {
-			const XMLCh *name = sp->name;
-			if( name )
-				wcout << " " << name;
-			sp = sp->next;
-		}
-		cout<<endl;
+		cout << "LOG_TIME_MARKERS is broken.  Please fix!!";
+		//cout << "TIDs:";
+		//SynchPoint* sp = trigger->start;
+		//while( sp != NULL ) {
+		//	const XMLCh *name = sp->name;
+		//	if( name )
+		//		wcout << " " << name;
+		//	sp = sp->next;
+		//}
+		//cout<<endl;
 
-		//cout << "BMLs:";
+		//cout << "Behaviors:";
 		//int numGestures = request->behaviors.size();
 		//for( int i=0; i<numGestures; ++i )
 		//	wcout << "  " << request->behaviors[i]->toString() << endl;
@@ -861,8 +862,8 @@ void BML::Processor::realizeRequest( BmlRequest* request, BodyPlannerMsg& bpMsg,
 				}
 			}
 	    }
-	} else if( request->speech ) {
-		cerr << "WARNING: BodyPlannerImpl::realizeRequest(..): request->speech but no viseme data."<<endl;
+	} else if( request->speech_request ) {
+		cerr << "WARNING: BodyPlannerImpl::realizeRequest(..): request->spespeech_requestech but no viseme data."<<endl;
 	}
 	
     // Schedule audio

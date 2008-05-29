@@ -131,46 +131,55 @@ bool BML::isValidTmId( const XMLCh* id ) {
 
 ///////////////////////////////////////////////////////////////////////////
 //  Class Member Definitions
-BmlRequest::BmlRequest( const SbmCharacter* agent, const string & requestId, const string & recipientId, const string & msgId, unsigned int numTriggers )
+BmlRequest::BmlRequest( const SbmCharacter* agent, const string & requestId, const string & recipientId, const string & msgId )
 :	agent(agent),
 	requestId( requestId ),
 	recipientId( recipientId ),
 	msgId( msgId ),
-	triggers(numTriggers),
     synch_points(),
-	speech( NULL ),
+	speech_trigger( NULL ),
+	speech_request( NULL ),
 	audioPlay( NULL ),
 	audioStop( NULL )
 {
-	if( numTriggers > 0 ) {
-		// First trigger has no prev
-		triggers[0] = new TriggerEvent( this, NULL );
+	start_trigger = createTrigger( "bml:start", NULL );
+	bml_start = new SynchPoint( L"bml:start", start_trigger, NULL );
+	synch_points.insert( make_pair( L"bml:start", bml_start) );
 
-		// rest of the triggers
-		unsigned int i = 1;
-		for(; i<numTriggers; i++ ) {
-			triggers[i] = new TriggerEvent( this, triggers[numTriggers-1] );
-		}
-		first = new SynchPoint( L"act:start", triggers[0], NULL );
-		first->next = triggers[0]->start;
-		triggers[0]->start = first;
-		first->time = 0.0001;
-		last  = new SynchPoint( L"act:end", triggers[i-1], triggers[i-1]->end );
-		triggers[i-1]->end = last;
-		synch_points.insert(make_pair(L"act:start", first));
-		synch_points.insert(make_pair(L"act:end", last));
-		/*first = triggers[0]->start;
-		last  = triggers[i-1]->end;*/
-	} else {
-		//
-		cout << "setting first and last!" << endl;
-		first = new SynchPoint( L"act:start", NULL, NULL );
-		first->time = 0.0001;
-		last  = new SynchPoint( L"act:end", NULL, first );
-		first->next = last;
-		synch_points.insert(make_pair(L"act:start", first));
-		synch_points.insert(make_pair(L"act:end", last));
-	}
+	//// bml:end SynchPoint removed until it can be better evaluated
+	//bml_start = new SynchPoint( L"bml:end", NULL, NULL );
+	//synch_points.insert(make_pair(L"act:end", last));
+
+
+	//////////////////////////////////////////////////////////////////
+	//  OLD CODE
+	//if( numTriggers > 0 ) {
+	//	// First trigger has no prev
+	//	triggers[0] = new TriggerEvent( this, NULL );
+    //
+	//	// rest of the triggers
+	//	unsigned int i = 1;
+	//	for(; i<numTriggers; i++ ) {
+	//		triggers[i] = new TriggerEvent( this, triggers[numTriggers-1] );
+	//	}
+	//	first = new SynchPoint( L"act:start", triggers[0], NULL );
+	//	first->next = triggers[0]->start;
+	//	triggers[0]->start = first;
+	//	first->time = 0.0001;
+	//	last  = new SynchPoint( L"act:end", triggers[i-1], triggers[i-1]->end );
+	//	triggers[i-1]->end = last;
+	//	/*first = triggers[0]->start;
+	//	last  = triggers[i-1]->end;*/
+	//} else {
+	//	//
+	//	cout << "setting first and last!" << endl;
+	//	first = new SynchPoint( L"act:start", NULL, NULL );
+	//	first->time = 0.0001;
+	//	last  = new SynchPoint( L"act:end", NULL, first );
+	//	first->next = last;
+	//	synch_points.insert(make_pair(L"act:start", first));
+	//	synch_points.insert(make_pair(L"act:end", last));
+	//}
 }
 
 BmlRequest::~BmlRequest() {
@@ -180,15 +189,25 @@ BmlRequest::~BmlRequest() {
 	if( audioStop )
 		delete [] audioStop;
 
-	// delete triggers
-	int count = triggers.size();
-	if( count > 0 ) {
-		for( int i=0; i<count; i++ )
-			delete triggers[i];
-	} else {
-		delete first;
-		delete last;
+	// delete BehaviorRequests
+	size_t count = behaviors.size();
+	for( int i=0; i<count; ++i ) {
+		delete behaviors[i];
 	}
+	if( speech_request != NULL ) {
+		delete speech_request;
+		speech_request = NULL;
+	}
+
+	// delete triggers
+	count = triggers.size();
+	for( int i=0; i<count; i++ )
+		delete triggers[i];
+	// The following were deleted in the above loop
+	start_trigger = NULL;
+	bml_start = NULL;
+	//bml_end = NULL;  // TODO
+	speech_trigger = NULL;
 
 	// delete visemes
 	count = visemes.size();
@@ -202,11 +221,24 @@ BmlRequest::~BmlRequest() {
 	//		delete [] *i;
 	//	visemes.clear();
 	//}
+}
 
-	// delete BehaviorRequests
-	count = behaviors.size();
-	for( int i=0; i<count; ++i )
-		delete behaviors[i];
+TriggerEvent* BmlRequest::createTrigger( const string& name, TriggerEvent* prev ) {
+	if(    ( prev != NULL )
+		&& ( prev->request != this ) )
+	{
+		return NULL;  // assert error? as this is completely invalid
+	}
+
+	TriggerEvent* trigger = new TriggerEvent( name, this, prev );
+	triggers.push_back( trigger );
+	return trigger;
+}
+
+TriggerEvent* BmlRequest::createTrigger( const string& name ) {
+	TriggerEvent* trigger = new TriggerEvent( name, this, start_trigger );
+	triggers.push_back( trigger );
+	return trigger;
 }
 
 void BmlRequest::addBehavior( BehaviorRequest* behavior ) {
@@ -256,20 +288,10 @@ SynchPoint* BmlRequest::getSynchPoint( const XMLCh * name ) {
 				return NULL;
 			}
 		}
-	}else if( XMLString::compareNString( name, L"act:", 4 )==0 ) {
-		if( XMLString::compareString( name+4, L"start" )==0 )
-			return first;
-		if( XMLString::compareString( name+4, L"end" )==0 )
-			return last;
-	} else if( XMLString::compareNString( name, L"utt_", 4 )==0 ) {
-		if( XMLString::compareString( name+4, L"start" )==0 )
-			return first;
-		if( XMLString::compareString( name+4, L"end" )==0 )
-			return last;
-	}else if (XMLString::indexOf(name, ':') == -1){
-		char* temp = XMLString::transcode(name);
-		float time =( float(atof(temp)));
-		mySearchIter = synch_points.find(L"act:start");
+	} else if( XMLString::indexOf(name, ':') == -1 ) {  // TODO: fix numeric reference
+		char* temp = XMLString::transcode( name );
+		float time = (float)( atof( temp ) );
+		mySearchIter = synch_points.find(L"bml:start");
         SynchPoint* newSynchPoint = new SynchPoint(name, triggers.at(triggers.size()-1), (*mySearchIter).second, (*mySearchIter).second, 0);
 		newSynchPoint->time = time;
 		synch_points.insert( make_pair( name,  newSynchPoint ) );
@@ -280,8 +302,9 @@ SynchPoint* BmlRequest::getSynchPoint( const XMLCh * name ) {
 }
 
 
-TriggerEvent::TriggerEvent( BmlRequest *request, TriggerEvent *prev )
-	: request(request)
+TriggerEvent::TriggerEvent( const string& name, BmlRequest *request, TriggerEvent *prev )
+:	name( name ),
+	request( request )
 {
 	start = new SynchPoint( NULL, this, (prev==NULL)? NULL: prev->end );
 	end   = new SynchPoint( NULL, this, start );
@@ -307,15 +330,9 @@ SynchPoint* TriggerEvent::addSynchPoint( const XMLCh* name ) {
 	return sp;
 }
 
-SynchPoint* TriggerEvent::getSynchPoint( const XMLCh* name ) {
-	if( XMLString::compareNString( name, L"clause_", 7 )==0 ) {
-		if( XMLString::compareString( name+7, L"start" )==0 )
-			return start;
-		if( XMLString::compareString( name+7, L"end" )==0 )
-			return end;
-	}
-	return request->getSynchPoint( name );
-}
+//SynchPoint* TriggerEvent::getSynchPoint( const XMLCh* name ) {
+//	return request->getSynchPoint( name );
+//}
 
 SynchPoint::SynchPoint( const XMLCh* name, const TriggerEvent* trigger, SynchPoint* after )
 	: name(name? new XMLCh[XMLString::stringLen(name)+1]: NULL ),
@@ -377,15 +394,15 @@ SynchPoints::SynchPoints()
 // It is almost completely untested, and thus off by default.
 // This hack does not address the other half of the issue:
 //   what to do with these unscheduled synch points at the behavior request level
-void MissingSyncPoint_HACK( SynchPoint* &sp, const XMLCh* id, const TriggerEvent* trigger, SynchPoint* const prev ) {
+void MissingSyncPoint_HACK( SynchPoint* &sp, const XMLCh* id, const BmlRequest* request, SynchPoint* const prev ) {
 #if ENABLE_MissingSyncPoint_HACK  // Hack enabled if 1
 	if( sp==NULL ) {
-		sp = new SynchPoint( id, trigger, prev );
+		sp = new SynchPoint( id, request, prev );
 	}
 #endif
 }
 
-void SynchPoints::parseSynchPoints( DOMElement* elem, TriggerEvent* trigger ) {
+void SynchPoints::parseSynchPoints( DOMElement* elem, BmlRequest* request ) {
 	const XMLCh* tag = elem->getTagName();
 	const XMLCh* id  = elem->getAttribute( ATTR_ID );
 
@@ -394,65 +411,65 @@ void SynchPoints::parseSynchPoints( DOMElement* elem, TriggerEvent* trigger ) {
 	start = NULL;
 	const XMLCh* str = elem->getAttribute( TM_START );
 	if( str && XMLString::stringLen( str ) ) {
-		start = trigger->getSynchPoint( str );
+		start = request->getSynchPoint( str );
 		if( start==NULL )
 			wcerr<<"WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag refers to unknown "<<TM_START<<" point \""<<str<<"\".  Ignoring..."<<endl;
 	}
-	MissingSyncPoint_HACK( start, TM_START, trigger, NULL );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
+	MissingSyncPoint_HACK( start, TM_START, request, NULL );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
 
 	ready = NULL;
 	str = elem->getAttribute( TM_READY );
 	if( str && XMLString::stringLen( str ) ) {
-		ready = trigger->getSynchPoint( str );
+		ready = request->getSynchPoint( str );
 		if( !ready )
 			wcerr<<"WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag refers to unknown "<<TM_READY<<" point \""<<str<<"\".  Ignoring..."<<endl;
 	}
-	MissingSyncPoint_HACK( ready, TM_READY, trigger, start );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
+	MissingSyncPoint_HACK( ready, TM_READY, request, start );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
 
 	strokeStart = NULL;
 	str = elem->getAttribute( TM_STROKE_START );
 	if( str && XMLString::stringLen( str ) ) {
-		strokeStart= trigger->getSynchPoint( str );
+		strokeStart= request->getSynchPoint( str );
 		if( !strokeStart )
 			wcerr<<"WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag refers to unknown "<<TM_STROKE_START<<" point \""<<str<<"\".  Ignoring..."<<endl;
 	}
-	MissingSyncPoint_HACK( strokeStart, TM_STROKE_START, trigger, ready );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
+	MissingSyncPoint_HACK( strokeStart, TM_STROKE_START, request, ready );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
 
 	stroke = NULL;
 	str = elem->getAttribute( TM_STROKE );
 	if( str && XMLString::stringLen( str ) ) {
-		stroke = trigger->getSynchPoint( str );
+		stroke = request->getSynchPoint( str );
 		if( !stroke )
 			wcerr<<"WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag refers to unknown "<<TM_STROKE<<" point \""<<str<<"\".  Ignoring..."<<endl;
 	}
-	MissingSyncPoint_HACK( stroke, TM_STROKE, trigger, strokeStart );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
+	MissingSyncPoint_HACK( stroke, TM_STROKE, request, strokeStart );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
 
 	strokeEnd = NULL;
 	str = elem->getAttribute( TM_STROKE_END );
 	if( str && XMLString::stringLen( str ) ) {
-		strokeEnd = trigger->getSynchPoint( str );
+		strokeEnd = request->getSynchPoint( str );
 		if( !strokeEnd )
 			wcerr<<"WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag refers to unknown "<<TM_STROKE_END<<" point \""<<str<<"\".  Ignoring..."<<endl;
 	}
-	MissingSyncPoint_HACK( strokeEnd, TM_STROKE_END, trigger, stroke );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
+	MissingSyncPoint_HACK( strokeEnd, TM_STROKE_END, request, stroke );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
 
 	relax = NULL;
 	str = elem->getAttribute( TM_RELAX );
 	if( str && XMLString::stringLen( str ) ) {
-		relax = trigger->getSynchPoint( str );
+		relax = request->getSynchPoint( str );
 		if( !relax )
 			wcerr<<"WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag refers to unknown "<<TM_RELAX<<" point \""<<str<<"\".  Ignoring..."<<endl;
 	}
-	MissingSyncPoint_HACK( relax, TM_RELAX, trigger, strokeEnd );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
+	MissingSyncPoint_HACK( relax, TM_RELAX, request, strokeEnd );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
 
 	end = NULL;
 	str = elem->getAttribute( TM_END );
 	if( str && XMLString::stringLen( str ) ) {
-		end = trigger->getSynchPoint( str );
+		end = request->getSynchPoint( str );
 		if( !end )
 			wcerr<<"WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag refers to unknown "<<TM_END<<" point \""<<str<<"\".  Ignoring..."<<endl;
 	}
-	MissingSyncPoint_HACK( end, TM_END, trigger, relax );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
+	MissingSyncPoint_HACK( end, TM_END, request, relax );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
 }
 
 SbmCommand::SbmCommand( std::string & command, float time )
@@ -1263,7 +1280,7 @@ SpeechRequest::SpeechRequest( DOMElement* xml, const XMLCh* id, TriggerEvent* tr
 		}
 	}
 	if( trigger ) {
-		trigger->request->speech = this;
+		trigger->request->speech_request = this;
 	}
 }
 

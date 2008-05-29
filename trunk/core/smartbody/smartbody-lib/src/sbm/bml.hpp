@@ -105,19 +105,34 @@ namespace BML {
 		const std::string    msgId;
 
 		VecOfTriggerEvent    triggers;
-		SynchPoint*          first;
-		SynchPoint*          last;
+		TriggerEvent*        start_trigger;
+		SynchPoint*          bml_start;
+		// SynchPoint*          bml_end;  // bml:end SynchPoint removed until it can be better evaluated
 		VecOfVisemeData      visemes;
 		VecOfBehaviorRequest behaviors;
 		SynchPointMap        synch_points;
-		SpeechRequest*       speech;
+
+		TriggerEvent*        speech_trigger;
+		SpeechRequest*       speech_request;
 		//  TODO: Move these into SpeechRequest
 		char*                audioPlay;
 		char*                audioStop;
 
-		BmlRequest( const SbmCharacter* agent, const std::string & requestId, const std::string & recipientId, const std::string & msgId, unsigned int numTriggers );
+		BmlRequest( const SbmCharacter* agent, const std::string & requestId, const std::string & recipientId, const std::string & msgId );
 
 		virtual ~BmlRequest();
+
+		/**
+		 *  Creates a new TriggerEvent for this BmlRequest.
+		 *
+		 *  returns NULL is prev is not a TriggerEvent of this BmlRequest.
+		 */
+		TriggerEvent* createTrigger( const std::string &name, TriggerEvent* prev );
+
+		/**
+		 *  Creates a new TriggerEvent following this BmlRequest's start_trigger.
+		 */
+		TriggerEvent* createTrigger( const std::string &name );
 
 		void addBehavior( BehaviorRequest* behavior );
 
@@ -126,21 +141,22 @@ namespace BML {
 
 	class TriggerEvent {
 	public:
+		std::string name;     // for logging / debugging
 		BmlRequest* request;
-		SynchPoint*    start;
-		SynchPoint*    end;
+		SynchPoint* start;
+		SynchPoint* end;
 
 		//std::vector<const XMLCh*> tids;  // Time IDs;
 
-		TriggerEvent( BmlRequest *request, TriggerEvent *prev );
+		TriggerEvent( const std::string& name, BmlRequest *request, TriggerEvent *prev );
 
 		virtual ~TriggerEvent();
 
 		// TODO: move this method to BmlRequest
 		SynchPoint* addSynchPoint( const XMLCh* name );  // adds SynchPoint before end of trigger
 
-		// TODO: use BmlRequest variant
-		SynchPoint* getSynchPoint( const XMLCh* name );  // Lookup a SynchPoint
+//		// TODO: use BmlRequest variant
+//		SynchPoint* getSynchPoint( const XMLCh* name );  // Lookup a SynchPoint
 	};
 
 	class SynchPoint {
@@ -173,7 +189,7 @@ namespace BML {
 		SynchPoints();
 
 		//  TODO: Replace trigger with BmlRequest
-		void parseSynchPoints( DOMElement* elem, TriggerEvent* trigger );
+		void parseSynchPoints( DOMElement* elem, BmlRequest* request );
 
 		//  TODO: list for ordering and non-standard controllers.
 	};
