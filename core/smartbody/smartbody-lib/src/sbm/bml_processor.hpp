@@ -107,7 +107,7 @@ namespace BML {
 		/**
 		*  Parses <BML> elements
 		*/
-		void parseBML( DOMElement *el, BML::TriggerEvent *trigger, mcuCBHandle *mcu );
+		void parseBML( DOMElement *el, BML::BmlRequest* request, mcuCBHandle *mcu );
 
 		/**
 		*/
