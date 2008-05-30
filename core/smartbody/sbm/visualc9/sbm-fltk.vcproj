@@ -74,6 +74,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
 				AdditionalDependencies="Smartbodyd.lib wspd.lib bonebus_d.lib fltkd.lib tt_utils_d.lib elqueue_d.lib pthreadVSE2.lib xerces-c_2D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_35.lib boost_system-vc90-mt-gd-1_35.lib opengl32.lib winmm.lib comctl32.lib ws2_32.lib rpcrt4.lib"
 				OutputFile="..\bin\sbm-fltkd.exe"
 				LinkIncremental="2"
@@ -165,6 +166,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
 				AdditionalDependencies="Smartbody.lib wsp.lib fltk.lib bonebus.lib tt_utils.lib elqueue.lib pthreadVSE2.lib activemq-cpp.lib xerces-c_2.lib boost_filesystem-vc90-mt-1_35.lib boost_system-vc90-mt-1_35.lib opengl32.lib winmm.lib comctl32.lib ws2_32.lib rpcrt4.lib"
 				OutputFile="..\bin\sbm-fltk.exe"
 				LinkIncremental="1"
