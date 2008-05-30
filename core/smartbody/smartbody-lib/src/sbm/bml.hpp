@@ -31,6 +31,9 @@
 #include <limits>
 
 
+#include "bml_types.hpp"
+
+
 //#include "mcontrol_util.h"
 #include "sbm_character.hpp"
 #include "sbm_speech.hpp"
@@ -67,32 +70,16 @@ namespace BML {
 	const XMLCh TM_END[]          = L"end";
 
 
-    typedef double time_sec;  // An attempt to generalize the floating point format
-	enum GestureType { BML_MOTION };
-	enum HeadBehaviorType { HEAD_NOD, HEAD_SHAKE, HEAD_TOSS, HEAD_ORIENT };
-
-    const time_sec TIME_UNSET = std::numeric_limits<time_sec>::infinity();
-
 	//  Helper Function
 	const XMLCh* buildBmlId( const XMLCh* behaviorId, const XMLCh* synchId );
 	bool isValidBmlId( const XMLCh* id );
 	bool isValidTmId( const XMLCh* id );
 
 
-	//  Class Declarations
-	struct SbmCommand;
-	class TriggerEvent;
-	class SynchPoint;
-	class BehaviorRequest;
-	class SpeechRequest;
-	typedef std::map< const XMLCh*, SynchPoint*, xml_utils::XMLStringCmp > SynchPointMap;	
+	// Enumerations
+//	enum GestureType { BML_MOTION };
+	enum HeadBehaviorType { HEAD_NOD, HEAD_SHAKE, HEAD_TOSS, HEAD_ORIENT };
 
-
-	// Typedefs
-	typedef std::vector<TriggerEvent*>           VecOfTriggerEvent;
-	typedef std::vector<SmartBody::VisemeData*>  VecOfVisemeData;
-	typedef std::vector<SbmCommand*>             VecOfSbmCommand;
-	typedef std::vector<BehaviorRequest*>        VecOfBehaviorRequest;
 
 
 	// Class Definitions
@@ -105,91 +92,122 @@ namespace BML {
 		const std::string    msgId;
 
 		VecOfTriggerEvent    triggers;
-		TriggerEvent*        start_trigger;
-		SynchPoint*          bml_start;
-		// SynchPoint*          bml_end;  // bml:end SynchPoint removed until it can be better evaluated
+		TriggerEventPtr      start_trigger;
+		SynchPointPtr        bml_start;
+		// SynchPointPtr        bml_end;  // bml:end SynchPoint removed until it can be better evaluated
 		VecOfVisemeData      visemes;
 		VecOfBehaviorRequest behaviors;
-		SynchPointMap        synch_points;
+		MapOfSynchPoint      synch_points;
 
-		TriggerEvent*        speech_trigger;
-		SpeechRequest*       speech_request;
+		TriggerEventPtr      speech_trigger;
+		SpeechRequestPtr     speech_request;
+
 		//  TODO: Move these into SpeechRequest
 		char*                audioPlay;
 		char*                audioStop;
 
-		BmlRequest( const SbmCharacter* agent, const std::string & requestId, const std::string & recipientId, const std::string & msgId );
+	private:
+		BmlRequestWeakPtr    weak_ptr;  // weak reference to the reference count struct
 
+
+	protected:
+		BmlRequest( const SbmCharacter* agent, const std::string & requestId, const std::string & recipientId, const std::string & msgId );
+		void init( BmlRequestPtr self );
+
+	public:
 		virtual ~BmlRequest();
 
 		/**
 		 *  Creates a new TriggerEvent for this BmlRequest.
+		 *  DO NOT CALL BEFORE CONSTRUCTOR RETURNS.
 		 *
 		 *  returns NULL is prev is not a TriggerEvent of this BmlRequest.
 		 */
-		TriggerEvent* createTrigger( const std::string &name, TriggerEvent* prev );
+		TriggerEventPtr createTrigger( const std::string &name, TriggerEventPtr prev );
 
 		/**
 		 *  Creates a new TriggerEvent following this BmlRequest's start_trigger.
+		 *  DO NOT CALL BEFORE CONSTRUCTOR RETURNS.
 		 */
-		TriggerEvent* createTrigger( const std::string &name );
+		TriggerEventPtr createTrigger( const std::string &name );
 
 		void addBehavior( BehaviorRequest* behavior );
 
-		SynchPoint* getSynchPoint( const XMLCh* name );  // Lookup a SynchPoint
+		SynchPointPtr getSynchPoint( const XMLCh* name );  // Lookup a SynchPoint
+
+
+		friend class Processor;
 	};
 
 	class TriggerEvent {
 	public:
-		std::string name;     // for logging / debugging
-		BmlRequest* request;
-		SynchPoint* start;
-		SynchPoint* end;
+		std::string         name;     // for logging / debugging
+		BmlRequestWeakPtr   request;
+		SynchPointPtr       start;
+		SynchPointPtr       end;
 
 		//std::vector<const XMLCh*> tids;  // Time IDs;
 
-		TriggerEvent( const std::string& name, BmlRequest *request, TriggerEvent *prev );
+	private:
+		TriggerEventWeakPtr weak_ptr;  // weak reference to the reference count struct
 
+	protected:
+		TriggerEvent( const std::string& name, BmlRequestPtr request );
+		bool init( TriggerEventPtr self, TriggerEventPtr prev );
+
+	public:
 		virtual ~TriggerEvent();
 
-		// TODO: move this method to BmlRequest
-		SynchPoint* addSynchPoint( const XMLCh* name );  // adds SynchPoint before end of trigger
+		SynchPointPtr addSynchPoint( const XMLCh* name );  // adds SynchPoint before end of trigger
+		SynchPointPtr addSynchPoint( const XMLCh* name, SynchPointPtr prev );
+		SynchPointPtr addSynchPoint( const XMLCh* name, SynchPointPtr prev, SynchPointPtr par, float off );
 
 //		// TODO: use BmlRequest variant
 //		SynchPoint* getSynchPoint( const XMLCh* name );  // Lookup a SynchPoint
+
+		friend class BmlRequest;
 	};
 
 	class SynchPoint {
 	public:
-		const XMLCh *const  name;
-		const TriggerEvent* trigger;
-		SynchPoint*         prev;
-		SynchPoint*         next;
-		time_sec            time;  // TIME_UNSET implies it has not been set
-		SynchPoint*		    parent;
-		float			    offset;	
+		const XMLCh *const        name;
+		const TriggerEventWeakPtr trigger;
+		SynchPointPtr             prev;
+		SynchPointPtr             next;
+		time_sec                  time;  // TIME_UNSET implies it has not been set
+		SynchPointPtr             parent;
+		float			          offset;	
 
-		SynchPoint( const XMLCh* name, const TriggerEvent *trigger, SynchPoint *after );
-		SynchPoint( const XMLCh* name, const TriggerEvent *trigger, SynchPoint *after, SynchPoint *par, float off );
+	private:
+		SynchPointWeakPtr         weak_ptr;  // weak reference to the reference count struct
 
+	protected:
+		SynchPoint( const XMLCh* name, const TriggerEventPtr trigger );
+		SynchPoint( const XMLCh* name, const TriggerEventPtr trigger, SynchPointPtr par, float off );
+		void init( SynchPointPtr self, SynchPointPtr prev );
+
+	public:
 		virtual ~SynchPoint();
+
+
+		friend class BmlRequest;
+		friend class TriggerEvent;
 	};
 
 	// Ordered list of synch points, with references to standard synch_points.
 	class SynchPoints {
 	public:
-		SynchPoint* start;
-		SynchPoint* ready;
-		SynchPoint* strokeStart;
-		SynchPoint* stroke;
-		SynchPoint* strokeEnd;
-		SynchPoint* relax;
-		SynchPoint* end;
+		SynchPointPtr start;
+		SynchPointPtr ready;
+		SynchPointPtr strokeStart;
+		SynchPointPtr stroke;
+		SynchPointPtr strokeEnd;
+		SynchPointPtr relax;
+		SynchPointPtr end;
 
-		SynchPoints();
+		//SynchPoints();  // Unnecessary with shared_ptr
 
-		//  TODO: Replace trigger with BmlRequest
-		void parseSynchPoints( DOMElement* elem, BmlRequest* request );
+		void parseSynchPoints( DOMElement* elem, BmlRequestPtr request );
 
 		//  TODO: list for ordering and non-standard controllers.
 	};
@@ -216,11 +234,11 @@ namespace BML {
 		//const void*       data;
 
 		//  SynchPoints in BML request time
-		const SynchPoint* start;
-		const SynchPoint* ready;
-		const SynchPoint* stroke;
-		const SynchPoint* relax;
-		const SynchPoint* end;
+		const SynchPointPtr start;
+		const SynchPointPtr ready;
+		const SynchPointPtr stroke;
+		const SynchPointPtr relax;
+		const SynchPointPtr end;
 
         // controller local time references
         time_sec startTime;
@@ -237,7 +255,7 @@ namespace BML {
     //  Methods
 	public:
 		BehaviorRequest( //const GestureType type, const void* data,
-			            const SynchPoint* start, const SynchPoint* ready, const SynchPoint* stroke, const SynchPoint* relax, const SynchPoint* end,
+			            const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end,
 						time_sec startTime, time_sec readyTime, time_sec strokeTime, time_sec relaxTime, time_sec endTime,
 						float speed );
 		virtual ~BehaviorRequest();
@@ -249,7 +267,7 @@ namespace BML {
 		 *   Simplified behavior scheduling method, only offers start time (assumes default duration
 		 *   params:
 		 *     SbmCharacter* actor: access to character state
-		 *     MeCtSchedulerClass* scheduler: new schedule for speech act being built
+		 *     MeCtSchedulerClass* scheduler: new schedule for BML request
 		 *     float startAt: time to start behavior
 		 */
 		virtual void schedule( const mcuCBHandle* mcu, const SbmCharacter* actor, MeCtSchedulerClass* scheduler,
@@ -261,7 +279,7 @@ namespace BML {
 		 *   Behavior scheduling method, only offers start time
 		 *   params:
 		 *     SbmCharacter* actor: access to character state
-		 *     MeCtSchedulerClass* scheduler: new schedule for speech act being built
+		 *     MeCtSchedulerClass* scheduler: new schedule for BML request
 		 *     float startAt/readyAt/strokeAt/relaxAt/endAt: behavior transition times
 		 */
         virtual void schedule( const mcuCBHandle* mcu, const SbmCharacter* actor, MeCtSchedulerClass* scheduler,
@@ -279,7 +297,7 @@ namespace BML {
 
 	public: ///// Methods
 		MeControllerRequest( TrackType trackType, MeController *controller, 
-			                 const SynchPoint* start, const SynchPoint* ready, const SynchPoint* stroke, const SynchPoint* relax, const SynchPoint* end );
+			                 const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end );
 		virtual ~MeControllerRequest();
 
         virtual void schedule( const mcuCBHandle* mcu, const SbmCharacter* actor, MeCtSchedulerClass* scheduler,
@@ -291,7 +309,7 @@ namespace BML {
 	class MotionRequest : public MeControllerRequest {
 	public:
 		MotionRequest( MeCtMotion* motion,
-			           const SynchPoint* start, const SynchPoint* ready, const SynchPoint* stroke, const SynchPoint* relax, const SynchPoint* end );
+			           const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end );
 	};
 
 	class NodRequest : public MeControllerRequest {
@@ -307,7 +325,7 @@ namespace BML {
 
 	public: ///// Methods
 		NodRequest( NodType type, float repeats, float frequency, float extent, const SbmCharacter* actor,
-			        const SynchPoint* start, const SynchPoint* ready, const SynchPoint* stroke, const SynchPoint* relax, const SynchPoint* end );
+			        const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end );
 	};
 
 	class TiltRequest : public MeControllerRequest {
@@ -317,7 +335,7 @@ namespace BML {
 
 	public: ///// Methods
 		TiltRequest( MeCtSimpleTilt* tilt, time_sec transitionDuration,
-			         const SynchPoint* start, const SynchPoint* ready, const SynchPoint* stroke, const SynchPoint* relax, const SynchPoint* end );
+			         const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end );
 	};
 
 	class PostureRequest : public MeControllerRequest {
@@ -327,7 +345,7 @@ namespace BML {
         time_sec transitionDuration;
 
 		PostureRequest( MeController* pose, time_sec transitionDuration,
-			            const SynchPoint* start, const SynchPoint* ready, const SynchPoint* stroke, const SynchPoint* relax, const SynchPoint* end );
+			            const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end );
 	};
 
 	class VisemeRequest : public BehaviorRequest {
@@ -340,10 +358,10 @@ namespace BML {
 
 	public:
 		VisemeRequest( const char *viseme, float weight, time_sec duration,
-			           const SynchPoint* start, const SynchPoint* ready, const SynchPoint* stroke, const SynchPoint* relax, const SynchPoint* end);
+			           const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end);
 
 		VisemeRequest( const char *viseme, float weight, time_sec duration,
-			           const SynchPoint* start, const SynchPoint* ready, const SynchPoint* stroke, const SynchPoint* relax, const SynchPoint* end , float rampup, float rampdown);
+			           const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end , float rampup, float rampdown);
 
         void setVisemeName( const char* viseme );
 
@@ -359,7 +377,7 @@ namespace BML {
 	
 	public:
 		EventRequest( const char* message,
-			          const SynchPoint* start, const SynchPoint* ready, const SynchPoint* stroke, const SynchPoint* relax, const SynchPoint* end);
+			          const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end);
 	
 		void schedule( const mcuCBHandle* mcu, const SbmCharacter* actor, MeCtSchedulerClass* scheduler,
 		               VecOfVisemeData& visemes,
@@ -375,18 +393,17 @@ namespace BML {
 
 	public:
 		// Overrides (but equivalent to) BehaviorRequest fields  (Needed early reference)
-		SynchPoint*  start;
-		SynchPoint*  ready;
-		SynchPoint*  relax;
-		SynchPoint*  end;
-
-		TriggerEvent*  trigger;
+		TriggerEventPtr trigger;
+		SynchPointPtr   start;
+		SynchPointPtr   ready;
+		SynchPointPtr   relax;
+		SynchPointPtr   end;
 
 
 
 		///////////////////////////////////////////////////////////////
 		// Methods
-		SpeechRequest( DOMElement*, const XMLCh* id, TriggerEvent* trigger );
+		SpeechRequest( DOMElement*, const XMLCh* id, BmlRequestPtr request );
 		virtual ~SpeechRequest();
 
 		const DOMElement* getXML() { return xml; }
@@ -396,14 +413,14 @@ namespace BML {
 		///**
 		// *  Adds wordbreak mark after STROKE or last mark, and before RELAX
 		// */
-		//SynchPoint* addMark( const XMLCh* id );
+		//SynchPointPtr addMark( const XMLCh* id );
 
 
 		/**
 		 *  Retrieves previously added mark.
 		 *  Takes both 'behavior:mark' and just 'mark'.
 		 */
-		SynchPoint* getMark( const XMLCh* id );
+		SynchPointPtr getMark( const XMLCh* id );
 	};
 }
 
