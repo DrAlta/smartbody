@@ -137,22 +137,32 @@ BmlRequest::BmlRequest( const SbmCharacter* agent, const string & requestId, con
 	recipientId( recipientId ),
 	msgId( msgId ),
     synch_points(),
-	speech_trigger( NULL ),
-	speech_request( NULL ),
 	audioPlay( NULL ),
 	audioStop( NULL )
-{
-	start_trigger = createTrigger( "bml:start", NULL );
-	bml_start = new SynchPoint( L"bml:start", start_trigger, NULL );
-	synch_points.insert( make_pair( L"bml:start", bml_start) );
+{}
+
+void BmlRequest::init( BmlRequestPtr self ) {
+	// TODO: Assert self.get() == this
+	weak_ptr = self;
+
+	start_trigger = createTrigger( "bml:start", TriggerEventPtr() );
+
+	const XMLCh* start_id = L"bml:start";
+	const XMLCh* end_id   = L"bml:end";
+	bml_start = start_trigger->addSynchPoint( start_id );
+	bml_start->init( bml_start, SynchPointPtr() );
+
+	synch_points.insert( make_pair( start_id, bml_start ) );
 
 	//// bml:end SynchPoint removed until it can be better evaluated
-	//bml_start = new SynchPoint( L"bml:end", NULL, NULL );
-	//synch_points.insert(make_pair(L"act:end", last));
+	//bml_end.reset( start_trigger->addSynchPoint( end_id ) );
+	//bml_end->init( bml_start );
+	//
+	//synch_points.insert( make_pair( end_id, bml_end ) );
 
 
 	//////////////////////////////////////////////////////////////////
-	//  OLD CODE
+	//  OLD CODE for reference
 	//if( numTriggers > 0 ) {
 	//	// First trigger has no prev
 	//	triggers[0] = new TriggerEvent( this, NULL );
@@ -191,27 +201,28 @@ BmlRequest::~BmlRequest() {
 
 	// delete BehaviorRequests
 	size_t count = behaviors.size();
-	for( int i=0; i<count; ++i ) {
+	for( size_t i=0; i<count; ++i ) {
 		delete behaviors[i];
 	}
 	if( speech_request != NULL ) {
-		delete speech_request;
-		speech_request = NULL;
+		speech_request.reset();
 	}
 
 	// delete triggers
+	//  TODO: circular ref to clean up.
 	count = triggers.size();
-	for( int i=0; i<count; i++ )
-		delete triggers[i];
+	for( size_t i=0; i<count; i++ ) {
+		triggers[ i ]->request.reset();  // remove ref
+	}
 	// The following were deleted in the above loop
-	start_trigger = NULL;
-	bml_start = NULL;
-	//bml_end = NULL;  // TODO
-	speech_trigger = NULL;
+	start_trigger.reset();
+	bml_start.reset();
+	//bml_end.reset;  // TODO: Temporarily removed
+	speech_trigger.reset();
 
 	// delete visemes
 	count = visemes.size();
-	for( int i=0; i<count; ++i )
+	for( size_t i=0; i<count; ++i )
 		delete visemes[i];
 	//{	typedef VecOfVisemeData::iterator i_type;
 	//	i_type i = visemes.begin();
@@ -223,30 +234,32 @@ BmlRequest::~BmlRequest() {
 	//}
 }
 
-TriggerEvent* BmlRequest::createTrigger( const string& name, TriggerEvent* prev ) {
-	if(    ( prev != NULL )
-		&& ( prev->request != this ) )
-	{
-		return NULL;  // assert error? as this is completely invalid
+TriggerEventPtr BmlRequest::createTrigger( const string& name, TriggerEventPtr prev ) {
+	if( prev ) {
+		BmlRequestPtr other( prev->request.lock() );
+		if( !other )
+			throw BML::Processor::BodyPlannerException( "BML::BmlRequest::createTrigger() prev from missing BmlRequest" );
+		if( other.get() != this )
+			throw BML::Processor::BodyPlannerException( "BML::BmlRequest::createTrigger() prev from other BmlRequest" );
 	}
 
-	TriggerEvent* trigger = new TriggerEvent( name, this, prev );
+	TriggerEventPtr trigger( new TriggerEvent( name, weak_ptr.lock() ) );
+	trigger->init( trigger, prev );
+
 	triggers.push_back( trigger );
 	return trigger;
 }
 
-TriggerEvent* BmlRequest::createTrigger( const string& name ) {
-	TriggerEvent* trigger = new TriggerEvent( name, this, start_trigger );
-	triggers.push_back( trigger );
-	return trigger;
+TriggerEventPtr BmlRequest::createTrigger( const string& name ) {
+	return createTrigger( name, TriggerEventPtr() );
 }
 
 void BmlRequest::addBehavior( BehaviorRequest* behavior ) {
 	behaviors.push_back( behavior );
 }
 
-SynchPoint* BmlRequest::getSynchPoint( const XMLCh * name ) {
-	SynchPointMap::iterator mySearchIter = synch_points.find(name);
+SynchPointPtr BmlRequest::getSynchPoint( const XMLCh * name ) {
+	MapOfSynchPoint::iterator mySearchIter = synch_points.find(name);
 	if ( mySearchIter != synch_points.end()){
 		return (*mySearchIter).second;
 	}
@@ -274,127 +287,147 @@ SynchPoint* BmlRequest::getSynchPoint( const XMLCh * name ) {
 		if( mySearchIter == synch_points.end() ) {
 			wcerr<<"WARNING: BmlRequest::getSynchPoint: BML offset refers to unknown "<<key<<" point.  Ignoring..."<<endl;
 		} else {
-			SynchPoint* parent = mySearchIter->second;
+			SynchPointPtr parent = mySearchIter->second;
 			if( parent ) {
-				SynchPoint* newSynchPoint = new SynchPoint(name, triggers.at(triggers.size()-1), parent, parent, offset);
-				//std::pair<XMLCh*,SynchPoint *> foo = make_pair(const_cast<XMLCh *>(name), newSynchPoint);
+				SynchPointPtr sync( new SynchPoint(name, triggers.at(triggers.size()-1), parent, offset) );
+				sync->init( sync, parent );
+
+				//std::pair<XMLCh*,SynchPoint *> foo = make_pair(const_cast<XMLCh *>(name), sync);
 				//synch_points.insert(foo);
-				synch_points.insert( make_pair( name,  newSynchPoint ) );
+				synch_points.insert( make_pair( name, sync ) );
 				wcout << "insering new synch_point [" << name << "]" << endl;
 				if( parent && parent->time != TIME_UNSET )
-					newSynchPoint->time = parent->time + offset; 
-				return newSynchPoint;
+					sync->time = parent->time + offset; 
+				return sync;
 			} else {
-				return NULL;
+				return SynchPointPtr();  // NULL
 			}
 		}
 	} else if( XMLString::indexOf(name, ':') == -1 ) {  // TODO: fix numeric reference
 		char* temp = XMLString::transcode( name );
 		float time = (float)( atof( temp ) );
-		mySearchIter = synch_points.find(L"bml:start");
-        SynchPoint* newSynchPoint = new SynchPoint(name, triggers.at(triggers.size()-1), (*mySearchIter).second, (*mySearchIter).second, 0);
-		newSynchPoint->time = time;
-		synch_points.insert( make_pair( name,  newSynchPoint ) );
+
+        SynchPointPtr sync = start_trigger->addSynchPoint( name, bml_start, bml_start, time );
+		sync->init( sync, (*mySearchIter).second );
+
+		synch_points.insert( make_pair( name, sync ) );
 		wcout << "insering new synch_point [" << name << "] (offset \""<< time <<"\" relative to starttime of the action)" << endl;
-		return newSynchPoint;
+		return sync;
 	}
-	return NULL;
+	return SynchPointPtr();  // NULL
 }
 
 
-TriggerEvent::TriggerEvent( const string& name, BmlRequest *request, TriggerEvent *prev )
+TriggerEvent::TriggerEvent( const string& name, BmlRequestPtr request )
 :	name( name ),
 	request( request )
 {
-	start = new SynchPoint( NULL, this, (prev==NULL)? NULL: prev->end );
-	end   = new SynchPoint( NULL, this, start );
-	start->next = end;
+	int answer = 42;  //break here
+}
+
+bool TriggerEvent::init( TriggerEventPtr self, TriggerEventPtr prev ) {
+	// TODO: Assert self.get() == this
+	weak_ptr = self;
+
+	start = addSynchPoint( NULL );
+	end = addSynchPoint( NULL, start );
+
+	return true;
 }
 
 TriggerEvent::~TriggerEvent() {
-	SynchPoint* sp = start;
+	SynchPointPtr sp( start );
 	while( sp != end ) {
-		SynchPoint *next = sp->next;
-		delete sp;
+		SynchPointPtr next( sp->next );
+		sp.reset();
 		sp = next;
 	}
-	delete end;
+	end.reset();
 }
 
-SynchPoint* TriggerEvent::addSynchPoint( const XMLCh* name ) {
-	if( name && request->synch_points[name] )
+SynchPointPtr TriggerEvent::addSynchPoint( const XMLCh* name ) {
+	return addSynchPoint( name, SynchPointPtr(), SynchPointPtr(), 0 );
+}
+
+SynchPointPtr TriggerEvent::addSynchPoint( const XMLCh* name, SynchPointPtr prev ) {
+	return addSynchPoint( name, prev, SynchPointPtr(), 0 );
+}
+
+SynchPointPtr TriggerEvent::addSynchPoint( const XMLCh* name, SynchPointPtr prev, SynchPointPtr par, float off ) {
+	// TODO: Delay addition of synch point until behavior is added to BmlRequest,
+	//       allowing for failure without artifacts.
+	BmlRequestPtr request( this->request.lock() );
+	if( name && request && request->synch_points[name] )
 		throw BML::Processor::BodyPlannerException( "BML Request SynchPoint naming collision" );
-	SynchPoint* sp = new SynchPoint( name, this, end->prev );
-	if( name )
-		request->synch_points[name] = sp;
-	return sp;
+
+	SynchPointPtr sync( new SynchPoint( name, weak_ptr.lock(), par, off ) );
+	sync->init( sync, prev );
+
+	if( name && request ) {
+		request->synch_points[name] = sync;
+	}
+
+	return sync;
 }
 
 //SynchPoint* TriggerEvent::getSynchPoint( const XMLCh* name ) {
 //	return request->getSynchPoint( name );
 //}
 
-SynchPoint::SynchPoint( const XMLCh* name, const TriggerEvent* trigger, SynchPoint* after )
+SynchPoint::SynchPoint( const XMLCh* name, const TriggerEventPtr trigger)
 	: name(name? new XMLCh[XMLString::stringLen(name)+1]: NULL ),
 	  trigger(trigger),
-	  prev(after),
       time(TIME_UNSET),
-	  parent( NULL ),
 	  offset( 0 )  // not used if parent is NULL
 {
 	if( name ) 
 		XMLString::copyString( (XMLCh *const)(this->name), name );
-
-	if( after!=NULL ) {
-		next = after->next;
-		after->next = this;
-		if( next )
-			next->prev = this;
-	} else {
-		next = NULL;
-	}
 }
 
-SynchPoint::SynchPoint( const XMLCh* name, const TriggerEvent *trigger, SynchPoint *prev, SynchPoint *par, float off )
+SynchPoint::SynchPoint( const XMLCh* name, const TriggerEventPtr trigger, SynchPointPtr par, float off )
 	: name(name? new XMLCh[XMLString::stringLen(name)+1]: NULL ),
 	  trigger(trigger),
-	  prev(prev),
       time(TIME_UNSET),
 	  parent( par ),
 	  offset( off )
 {
 	if( name ) 
 		XMLString::copyString( (XMLCh *const)(this->name), name );
+}
 
-	if( prev!=NULL ) {
+void SynchPoint::init( SynchPointPtr self, SynchPointPtr prev_ptr ) {
+	// TODO: Assert self.get() == this
+	weak_ptr = self;
+
+	this->prev = prev_ptr;
+
+	if( prev ) {
 		next = prev->next;
-		prev->next = this;
+		prev->next = self;
 		if( next )
-			next->prev = this;
-	} else {
-		next = NULL;
-	}
+			next->prev = self;
+	} // else prev & next remains unset
 }
 
 SynchPoint::~SynchPoint() {
    delete name;
 }
 
-SynchPoints::SynchPoints()
-:	start( NULL ),
-	ready( NULL ),
-	strokeStart( NULL ),
-	stroke( NULL ),
-	strokeEnd( NULL ),
-	relax( NULL ),
-	end( NULL )
-{}
+//SynchPoints::SynchPoints()
+//:	start( NULL ),
+//	ready( NULL ),
+//	strokeStart( NULL ),
+//	stroke( NULL ),
+//	strokeEnd( NULL ),
+//	relax( NULL ),
+//	end( NULL )
+//{}
 
 // The following code is used to insert sync points if they did not exist by prior references.
 // It is almost completely untested, and thus off by default.
 // This hack does not address the other half of the issue:
 //   what to do with these unscheduled synch points at the behavior request level
-void MissingSyncPoint_HACK( SynchPoint* &sp, const XMLCh* id, const BmlRequest* request, SynchPoint* const prev ) {
+void MissingSyncPoint_HACK( SynchPointPtr &sp, const XMLCh* id, const BmlRequestPtr request, SynchPointPtr prev ) {
 #if ENABLE_MissingSyncPoint_HACK  // Hack enabled if 1
 	if( sp==NULL ) {
 		sp = new SynchPoint( id, request, prev );
@@ -402,22 +435,22 @@ void MissingSyncPoint_HACK( SynchPoint* &sp, const XMLCh* id, const BmlRequest* 
 #endif
 }
 
-void SynchPoints::parseSynchPoints( DOMElement* elem, BmlRequest* request ) {
+void SynchPoints::parseSynchPoints( DOMElement* elem, BmlRequestPtr request ) {
 	const XMLCh* tag = elem->getTagName();
 	const XMLCh* id  = elem->getAttribute( ATTR_ID );
 
 
 	// Load SynchPoint references
-	start = NULL;
+	start.reset();
 	const XMLCh* str = elem->getAttribute( TM_START );
 	if( str && XMLString::stringLen( str ) ) {
 		start = request->getSynchPoint( str );
 		if( start==NULL )
 			wcerr<<"WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag refers to unknown "<<TM_START<<" point \""<<str<<"\".  Ignoring..."<<endl;
 	}
-	MissingSyncPoint_HACK( start, TM_START, request, NULL );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
+	MissingSyncPoint_HACK( start, TM_START, request, SynchPointPtr() );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
 
-	ready = NULL;
+	ready.reset();
 	str = elem->getAttribute( TM_READY );
 	if( str && XMLString::stringLen( str ) ) {
 		ready = request->getSynchPoint( str );
@@ -426,7 +459,7 @@ void SynchPoints::parseSynchPoints( DOMElement* elem, BmlRequest* request ) {
 	}
 	MissingSyncPoint_HACK( ready, TM_READY, request, start );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
 
-	strokeStart = NULL;
+	strokeStart.reset();
 	str = elem->getAttribute( TM_STROKE_START );
 	if( str && XMLString::stringLen( str ) ) {
 		strokeStart= request->getSynchPoint( str );
@@ -435,7 +468,7 @@ void SynchPoints::parseSynchPoints( DOMElement* elem, BmlRequest* request ) {
 	}
 	MissingSyncPoint_HACK( strokeStart, TM_STROKE_START, request, ready );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
 
-	stroke = NULL;
+	stroke.reset();
 	str = elem->getAttribute( TM_STROKE );
 	if( str && XMLString::stringLen( str ) ) {
 		stroke = request->getSynchPoint( str );
@@ -444,7 +477,7 @@ void SynchPoints::parseSynchPoints( DOMElement* elem, BmlRequest* request ) {
 	}
 	MissingSyncPoint_HACK( stroke, TM_STROKE, request, strokeStart );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
 
-	strokeEnd = NULL;
+	strokeEnd.reset();
 	str = elem->getAttribute( TM_STROKE_END );
 	if( str && XMLString::stringLen( str ) ) {
 		strokeEnd = request->getSynchPoint( str );
@@ -453,7 +486,7 @@ void SynchPoints::parseSynchPoints( DOMElement* elem, BmlRequest* request ) {
 	}
 	MissingSyncPoint_HACK( strokeEnd, TM_STROKE_END, request, stroke );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
 
-	relax = NULL;
+	relax.reset();
 	str = elem->getAttribute( TM_RELAX );
 	if( str && XMLString::stringLen( str ) ) {
 		relax = request->getSynchPoint( str );
@@ -462,7 +495,7 @@ void SynchPoints::parseSynchPoints( DOMElement* elem, BmlRequest* request ) {
 	}
 	MissingSyncPoint_HACK( relax, TM_RELAX, request, strokeEnd );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
 
-	end = NULL;
+	end.reset();
 	str = elem->getAttribute( TM_END );
 	if( str && XMLString::stringLen( str ) ) {
 		end = request->getSynchPoint( str );
@@ -497,7 +530,7 @@ SbmCommand& SbmCommand::operator= (const SbmCommand& other ) {
 
 // methods
 BehaviorRequest::BehaviorRequest( //const BehaviorType type, const void* data,
-							    const SynchPoint* start, const SynchPoint* ready, const SynchPoint* stroke, const SynchPoint* relax, const SynchPoint* end,
+							    const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end,
 								time_sec startTime, time_sec readyTime, time_sec strokeTime, time_sec relaxTime, time_sec endTime, float speed )
   : //type(type), data(data),
     start(start), ready(ready), stroke(stroke), relax(relax), end(end), audioOffset(TIME_UNSET),
@@ -979,7 +1012,7 @@ void BehaviorRequest::schedule( const mcuCBHandle* mcu, const SbmCharacter* acto
 
 //  MeControllerRequest
 MeControllerRequest::MeControllerRequest( TrackType trackType, MeController *controller,
-                                          const SynchPoint* start, const SynchPoint* ready, const SynchPoint* stroke, const SynchPoint* relax, const SynchPoint* end )
+                                          const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end )
   : BehaviorRequest( start, ready, stroke, relax, end,
                     /* startTime  */ 0, 
 					/* readyTime  */ time_sec( controller->indt() ), 
@@ -1045,7 +1078,7 @@ void MeControllerRequest::schedule( const mcuCBHandle* mcu, const SbmCharacter* 
 
 //  MotionRequest
 MotionRequest::MotionRequest( MeCtMotion* motion,
-						      const SynchPoint* start, const SynchPoint* ready, const SynchPoint* stroke, const SynchPoint* relax, const SynchPoint* end )
+						      const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end )
   : MeControllerRequest( MeControllerRequest::UTTERANCE, motion,
                          start, ready, stroke, relax, end )
 {
@@ -1057,7 +1090,7 @@ MotionRequest::MotionRequest( MeCtMotion* motion,
 
 //  NodRequest
 NodRequest::NodRequest( NodType type, float repeats, float frequency, float extent, const SbmCharacter* actor,
-			            const SynchPoint* start, const SynchPoint* ready, const SynchPoint* stroke, const SynchPoint* relax, const SynchPoint* end )
+			            const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end )
   : MeControllerRequest( MeControllerRequest::UTTERANCE, new MeCtSimpleNod(),
                          start, ready, stroke, relax, end ),
     type(type), repeats(repeats), frequency(frequency), extent(extent)
@@ -1104,7 +1137,7 @@ NodRequest::NodRequest( NodType type, float repeats, float frequency, float exte
 
 //  TiltRequest
 TiltRequest::TiltRequest( MeCtSimpleTilt* tilt, time_sec transitionDuration,
-						  const SynchPoint* start, const SynchPoint* ready, const SynchPoint* stroke, const SynchPoint* relax, const SynchPoint* end )
+						  const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end )
   : MeControllerRequest( MeControllerRequest::UTTERANCE, tilt, start, ready, stroke, relax, end ),
     duration(numeric_limits<time_sec>::infinity())/*hack*/, transitionDuration(transitionDuration)
 {
@@ -1114,7 +1147,7 @@ TiltRequest::TiltRequest( MeCtSimpleTilt* tilt, time_sec transitionDuration,
 
 //  PostureRequest
 PostureRequest::PostureRequest( MeController* pose, time_sec transitionDuration,
-						        const SynchPoint* start, const SynchPoint* ready, const SynchPoint* stroke, const SynchPoint* relax, const SynchPoint* end )
+						        const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end )
   : MeControllerRequest( MeControllerRequest::POSTURE, pose, start, ready, stroke, relax, end ),
     duration(numeric_limits<time_sec>::infinity())/*hack*/, transitionDuration(transitionDuration)
 {
@@ -1125,7 +1158,7 @@ PostureRequest::PostureRequest( MeController* pose, time_sec transitionDuration,
 //  VisemeRequest
 //    (no transition/blend yet)
 VisemeRequest::VisemeRequest( const char *viseme, float weight, time_sec duration,
-                              const SynchPoint* start, const SynchPoint* ready, const SynchPoint* stroke, const SynchPoint* relax, const SynchPoint* end )
+                              const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end )
   : BehaviorRequest( start, ready, stroke, relax, end,
                     /* start, stroke, and ready time */ 0, 0, 0,
 					/* relax and end time */ duration, duration,
@@ -1134,7 +1167,7 @@ VisemeRequest::VisemeRequest( const char *viseme, float weight, time_sec duratio
 {}
 
 VisemeRequest::VisemeRequest( const char *viseme, float weight, time_sec duration,
-                              const SynchPoint* start, const SynchPoint* ready, const SynchPoint* stroke, const SynchPoint* relax, const SynchPoint* end, float rampup, float rampdown )
+                              const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end, float rampup, float rampdown )
   : BehaviorRequest( start, ready, stroke, relax, end,
                     /* start, stroke, and ready time */ 0, 0, 0,
 					/* relax and end time */ duration, duration,
@@ -1169,7 +1202,7 @@ void VisemeRequest::schedule( const mcuCBHandle* mcu, const SbmCharacter* actor,
 
 //  EventRequest
 EventRequest::EventRequest( const char* message,
-                            const SynchPoint* start, const SynchPoint* ready, const SynchPoint* stroke, const SynchPoint* relax, const SynchPoint* end )
+                            const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end )
   : BehaviorRequest( start, ready, stroke, relax, end,
                     /* start, stroke, and ready time */ 0, 0, 0,
 					/* relax and end time */ 0, 0,
@@ -1191,17 +1224,18 @@ void EventRequest::schedule( const mcuCBHandle* mcu, const SbmCharacter* actor, 
 
 //  SpeechRequest
 //    (no transition/blend yet)
-SpeechRequest::SpeechRequest( DOMElement* xml, const XMLCh* id, TriggerEvent* trigger )
+SpeechRequest::SpeechRequest( DOMElement* xml, const XMLCh* id, BmlRequestPtr request )
 :	xml( xml ),
-	id( id? new XMLCh[ XMLString::stringLen(id)+1 ] : NULL ),
-	start( new SynchPoint( buildBmlId( id, TM_START ), trigger, trigger->start ) ),
-	ready( new SynchPoint( buildBmlId( id, TM_READY ), trigger, start ) ),
-	relax( new SynchPoint( buildBmlId( id, TM_RELAX ), trigger, ready ) ),
-	end( new SynchPoint( buildBmlId( id, TM_END ), trigger, relax ) ),
-	trigger( trigger )
+	id( id? new XMLCh[ XMLString::stringLen(id)+1 ] : NULL )
 {
-	BmlRequest* request = trigger->request;
+	trigger = request->createTrigger("SPEECH");  // TODO: Use 
+
 	if( id ) {
+		start = trigger->addSynchPoint( buildBmlId( id, TM_START ), trigger->start );
+		ready = trigger->addSynchPoint( buildBmlId( id, TM_READY ), start );
+		relax = trigger->addSynchPoint( buildBmlId( id, TM_RELAX ), ready );
+		end = trigger->addSynchPoint( buildBmlId( id, TM_END ), relax );
+
 		XMLString::copyString( const_cast<XMLCh*>(this->id), id );
 
 		// Register synch points
@@ -1211,7 +1245,7 @@ SpeechRequest::SpeechRequest( DOMElement* xml, const XMLCh* id, TriggerEvent* tr
 		request->synch_points.insert( make_pair( buildBmlId( id, TM_RELAX ),  relax ) );
 		request->synch_points.insert( make_pair( buildBmlId( id, TM_END ),    end ) );
 
-		SynchPoint* lastSp = ready;
+		SynchPointPtr lastSp( ready );
 
 		if( XMLString::stringLen( id ) ) {  // if id not empty string
 			// Parse <speech> for synch points
@@ -1234,7 +1268,7 @@ SpeechRequest::SpeechRequest( DOMElement* xml, const XMLCh* id, TriggerEvent* tr
 									tmId = BML::buildBmlId( id, tmId );
 									child->setAttribute( ATTR_ID, tmId );
 									// Create a SynchPoint
-									lastSp = new SynchPoint( tmId, trigger, lastSp );
+									lastSp = trigger->addSynchPoint( tmId, lastSp );
 									request->synch_points.insert( make_pair( tmId, lastSp ) );
 								} else {
 									wcerr << "ERROR: Invalid <tm> id=\"" << tmId << "\"" << endl;
@@ -1260,7 +1294,7 @@ SpeechRequest::SpeechRequest( DOMElement* xml, const XMLCh* id, TriggerEvent* tr
 									tmId = BML::buildBmlId( id, tmId );
 									child->setAttribute( ATTR_NAME, tmId );
 									// Create a SynchPoint
-									lastSp = new SynchPoint( tmId, trigger, lastSp );
+									lastSp = trigger->addSynchPoint( tmId, lastSp );
 									request->synch_points.insert( make_pair( tmId, lastSp ) );
 								} else {
 									wcerr << "ERROR: Invalid <mark> name=\"" << tmId << "\"" << endl;
@@ -1279,9 +1313,10 @@ SpeechRequest::SpeechRequest( DOMElement* xml, const XMLCh* id, TriggerEvent* tr
 			cout << "WARNING: SpeechRequest::SpeechRequest(..): <speech> with no id"<<endl;
 		}
 	}
-	if( trigger ) {
-		trigger->request->speech_request = this;
-	}
+	////  Moved outside the constructor
+	//if( trigger ) {
+	//	request->speech_request.reset( this );
+	//}
 }
 
 SpeechRequest::~SpeechRequest() {
@@ -1308,9 +1343,17 @@ SynchPoint* SpeechRequest::addMark( const XMLCh* markId ) {
 }
 */
 
-SynchPoint* SpeechRequest::getMark( const XMLCh* markId ) {
-	map< const XMLCh*, SynchPoint*, xml_utils::XMLStringCmp >& synch_points = trigger->request->synch_points;
-	map< const XMLCh*, SynchPoint*, xml_utils::XMLStringCmp >::iterator i;
+SynchPointPtr SpeechRequest::getMark( const XMLCh* markId ) {
+	// TODO: overhaul this method.
+	//       SpeechRequest should have its own map of this behavior's synch points
+
+	BmlRequestPtr request( trigger->request.lock() );
+	if( !request )  // Is BmlRequest still valid?
+		return SynchPointPtr(); // NULL
+
+
+	MapOfSynchPoint&          synch_points = request->synch_points;
+	MapOfSynchPoint::iterator i;
 
 	if( XMLString::indexOf( markId, ':' )==-1 ) {
 		// no delimiter, not fully qualified id
@@ -1324,7 +1367,7 @@ SynchPoint* SpeechRequest::getMark( const XMLCh* markId ) {
 	}
 
 	if( i == synch_points.end() )
-		return NULL;
+		return SynchPointPtr(); // NULL
 	else
 		return (*i).second;
 }

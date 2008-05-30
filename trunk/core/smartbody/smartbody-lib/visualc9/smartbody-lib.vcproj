@@ -1128,6 +1128,10 @@
 					RelativePath="..\src\sbm\bml_processor.hpp"
 					>
 				</File>
+				<File
+					RelativePath="..\src\sbm\bml_types.hpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 	</Files>

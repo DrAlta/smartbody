@@ -33,7 +33,7 @@ namespace BML {
 	const XMLCh TAG_SBM_ANIMATION[] = L"sbm:animation";
 	const XMLCh ATTR_SPEED[]        = L"ME:twarp";  // MotionEngine:time warp
 
-	BML::BehaviorRequest* parse_bml_animation( DOMElement* elem, BML::SynchPoints& tms, BML::BmlRequest* request, mcuCBHandle *mcu );
+	BML::BehaviorRequest* parse_bml_animation( DOMElement* elem, BML::SynchPoints& tms, BML::BmlRequestPtr request, mcuCBHandle *mcu );
 };
 
 

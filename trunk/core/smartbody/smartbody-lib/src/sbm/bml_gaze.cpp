@@ -337,7 +337,7 @@ bool BML::Gaze::parse_children( DOMElement* elem, Gaze::KeyData* key_data[] ) {
 
 
 
-BehaviorRequest* BML::parse_bml_gaze( DOMElement* elem, SynchPoints& tms, BmlRequest* request, mcuCBHandle *mcu ) {
+BehaviorRequest* BML::parse_bml_gaze( DOMElement* elem, SynchPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
 	////////////////////////////////////////////////////////////////
 	//  GAZE BEHAVIORS

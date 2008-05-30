@@ -216,12 +216,22 @@ BML::Processor::~Processor()
 
 
 void BML::Processor::reset() {
-	requests.removeAll();
+	requests.clear();
 }
 
 
 
+BmlRequestPtr BML::Processor::createBmlRequest(
+	const SbmCharacter* agent,
+	const std::string & requestId,
+	const std::string & recipientId,
+	const std::string & msgId )
+{
+	BmlRequestPtr request( new BmlRequest( agent, requestId, recipientId, msgId ) );
+	request->init( request );
 
+	return request;
+}
 
 
 
@@ -235,9 +245,10 @@ void BML::Processor::reset() {
 void BML::Processor::vrSpeak( BodyPlannerMsg& bpMsg, mcuCBHandle *mcu ) {
     if(LOG_METHODS) cout<<"BodyPlannerImpl::vrSpeak(..)"<<endl;
 
-	BmlRequest *request = requests.lookup( bpMsg.requestId.c_str() );
-    if( request != NULL ) {
-        cerr<<"Duplicate BML Request Message ID: "<<bpMsg.msgId<<endl;
+	//BmlRequest *request = requests.lookup( bpMsg.requestId.c_str() );  // srHashMap
+	MapOfBmlRequest::iterator result = requests.find( bpMsg.requestId );
+    if( result != requests.end() ) {
+        cerr << "Duplicate BML Request Message ID: "<<bpMsg.msgId<<endl;
 		//  TODO: call vrSpeakFailed
         return;
     }
@@ -260,24 +271,24 @@ void BML::Processor::vrSpeak( BodyPlannerMsg& bpMsg, mcuCBHandle *mcu ) {
 	}
 
 	if( bmlElem ) {
-		request = new BmlRequest( bpMsg.agent, bpMsg.requestId, string(bpMsg.recipientId), string(bpMsg.msgId) );
+		BmlRequestPtr request( createBmlRequest( bpMsg.agent, bpMsg.requestId, string(bpMsg.recipientId), string(bpMsg.msgId) ) );
+
 		parseBML( bmlElem, request, mcu );
-		requests.insert( bpMsg.requestId.c_str(), request );
+		requests.insert( make_pair( bpMsg.requestId, request ) );
 
 		if( request->speech_request ) {
 			// request speech through Speech API
 			SmartBody::SpeechInterface* speech = bpMsg.agent->get_speech_impl();
 			if( !speech ) {
-				cerr << "ERROR: Character \"" << bpMsg.agent->name << "\" does not have a voice defined.  Cannot perform speech." << endl;
-				// TODO: Send vrSpeakFailed
+				vrSpeakFailed( bpMsg.agent->name, bpMsg.requestId.c_str(), bpMsg.msgId, "No voice defined.  Cannot perform speech." );
 				return;
 			}
 
 			// Found speech implementation.  Making request.
 			SmartBody::RequestId reqId = speech->requestSpeechAudio( bpMsg.agentId, request->speech_request->getXML(), "bp speech_ready " );
 			string speechKey = buildSpeechKey( bpMsg.agent, reqId );
-			int hash_result = speeches.insert( speechKey.c_str(), request->speech_request );  // store for later reply
-			if( hash_result != CMD_SUCCESS ) {
+			bool insert_success = speeches.insert( make_pair( speechKey, request->speech_request ) ).second;  // store for later reply
+			if( !insert_success ) {
 				cerr << "ERROR: BML::Processor.vrSpeak(..): srHashMap already contains an entry for speechKey \"" << speechKey << "\".  Cannot process speech behavior.  Failing BML request.  (This error should not occur. Let Andrew know immeidately.)"  << endl;
 				// TODO: Send vrSpeakFailed
 			}
@@ -290,18 +301,18 @@ void BML::Processor::vrSpeak( BodyPlannerMsg& bpMsg, mcuCBHandle *mcu ) {
 		// TODO: Send vrSpeakFailed
 	}
 }
-void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequest* request, mcuCBHandle *mcu ) {
+void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCBHandle *mcu ) {
 	// look for BML animation command tags
-	DOMElement* child = xml_utils::getFirstChildElement( bmlElem );
-	const XMLCh*   speechId;
-	SpeechRequest* speech = NULL;
+	DOMElement*      child = xml_utils::getFirstChildElement( bmlElem );
+	const XMLCh*     speechId;
+	//SpeechRequestPtr speech;
 
 	// TEMPORARY: <speech> can only be the first behavior
 	if( child && XMLString::compareString( child->getTagName(), TAG_SPEECH )==0 ) {
 		speechId = child->getAttribute( ATTR_ID );
 
-		request->speech_trigger = request->createTrigger( "SPEECH_SYNTH" ); // TODO: use message id and behavior id
-		speech = new SpeechRequest( child, speechId, request->speech_trigger );
+		//speech.reset( new SpeechRequest( child, speechId, request ) );
+		request->speech_request.reset( new SpeechRequest( child, speechId, request ) );
 		child = xml_utils::getNextElement( child );
 	}
 
@@ -314,11 +325,11 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequest* request, mcuCBHa
 		tms.parseSynchPoints( child, request );
 
 		// Simplify references to synch points.
-		SynchPoint* start  = tms.start;
-		SynchPoint* ready  = tms.ready;
-		SynchPoint* stroke = tms.stroke;
-		SynchPoint* relax  = tms.ready;
-		SynchPoint* end    = tms.end;
+		SynchPointPtr start( tms.start );
+		SynchPointPtr ready( tms.ready );
+		SynchPointPtr stroke( tms.stroke );
+		SynchPointPtr relax( tms.ready );
+		SynchPointPtr end( tms.end );
 
 		BehaviorRequest* behavior = NULL;
 
@@ -381,9 +392,9 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequest* request, mcuCBHa
 				request->synch_points.insert( make_pair( buildBmlId( id, TM_END ),    end ) );
 
 				if( LOG_REQUEST_MARKERS ) {
-					SynchPointMap& synch_points = request->synch_points;
-					SynchPointMap::iterator i = synch_points.begin();
-					SynchPointMap::iterator end = synch_points.end();
+					MapOfSynchPoint& synch_points = request->synch_points;
+					MapOfSynchPoint::iterator i = synch_points.begin();
+					MapOfSynchPoint::iterator end = synch_points.end();
 
 					wcout << "request->synch_points after <"<<tag<<" id=\""<<id<<"\" .. />" << endl;
 					for( ; i!=end; ++i ) {
@@ -420,7 +431,7 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequest* request, mcuCBHa
 	}
 }
 
-BehaviorRequest* BML::Processor::parse_bml_body( DOMElement* elem, SynchPoints& tms, BmlRequest* request, mcuCBHandle *mcu ) {
+BehaviorRequest* BML::Processor::parse_bml_body( DOMElement* elem, SynchPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu ) {
 	const XMLCh* postureName = elem->getAttribute( ATTR_POSTURE );
 	if( postureName && XMLString::stringLen( postureName ) ) {
 		// Look up pose
@@ -455,7 +466,7 @@ BehaviorRequest* BML::Processor::parse_bml_body( DOMElement* elem, SynchPoints& 
 	}
 }
 
-BehaviorRequest* BML::Processor::parse_bml_event( DOMElement* elem, SynchPoints& tms, BmlRequest* request, mcuCBHandle *mcu ) {
+BehaviorRequest* BML::Processor::parse_bml_event( DOMElement* elem, SynchPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
     const XMLCh* attrMesg = elem->getAttribute( ATTR_MESSAGE );
 
@@ -468,7 +479,7 @@ BehaviorRequest* BML::Processor::parse_bml_event( DOMElement* elem, SynchPoints&
 	}
 }
 
-BehaviorRequest* BML::Processor::parse_bml_head( DOMElement* elem, SynchPoints& tms, BmlRequest* request, mcuCBHandle *mcu ) {
+BehaviorRequest* BML::Processor::parse_bml_head( DOMElement* elem, SynchPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
 	const XMLCh* attrType = elem->getAttribute( ATTR_TYPE );
 	if( attrType && XMLString::stringLen( attrType ) ) {
@@ -573,133 +584,140 @@ BehaviorRequest* BML::Processor::parse_bml_head( DOMElement* elem, SynchPoints& 
 
 void BML::Processor::speechReply( SbmCharacter* character, SmartBody::RequestId requestId, const char* errorMsg, mcuCBHandle *mcu ) {
 	string speechKey = buildSpeechKey( character, requestId );
-	SpeechRequest* speechReq = speeches.lookup( speechKey.c_str() );
+	MapOfSpeechRequest::iterator find_result = speeches.find( speechKey );
 
-	if( speechReq ) {
+	if( find_result != speeches.end() ) {
+		SpeechRequestPtr speechReq( find_result->second );
+
 		// Clear the lookup table (shouldn't be referenced twice)
-		speeches.remove( speechKey.c_str() );
+		speeches.erase( speechKey );
 
-		TriggerEvent*    trigger = speechReq->trigger;
-		BmlRequest* request    = trigger->request;
+		TriggerEventPtr trigger( speechReq->trigger );
+		BmlRequestPtr   request( trigger->request.lock() );
 
-		// request speech through Speech API
-		SmartBody::SpeechInterface* speech = request->agent->get_speech_impl();
-		if( !speech ) {
-			cerr << "ERROR: Character \"" << request->agent->name << "\" does not have a voice defined.  Cannot perform speech." << endl;
-			// TODO: Send vrSpeakFailed
-			return;
-		}
-
-		// Found speech implementation.  Making request.
-		if( !errorMsg ) {
-			if( LOG_SPEECH_REQUEST_ID )
-				clog << "LOG: BodyPlannerImpl::speechReply(..): speech found for RequestId " << requestId << endl;
-			request->audioPlay = speech->getSpeechPlayCommand( requestId );
-			if( LOG_AUDIO )
-				cout << "DEBUG: BodyPlannerImpl::speechReply: request->audioPlay = " << request->audioPlay << endl;
-
-			SynchPoint* ready = speechReq->ready;
-			SynchPoint* relax = speechReq->relax;
-			SynchPoint* end = speechReq->end;
-
-			// save timing;
-			float firstOpen = -1; // unset
-			float lastOpen  = 0;
-			float lastAny   = 0;
-
-			// Process Visemes
-			const vector<VisemeData*>* visemes = speech->getVisemes( requestId );
-			if( visemes ) {
-				request->visemes = *visemes;  // Copy contents
-				vector<VisemeData*>::const_iterator cur = visemes->begin();
-				vector<VisemeData*>::const_iterator end = visemes->end();
-
-				if( LOG_SPEECH && cur==end )
-					cerr << "ERROR: BodyPlannerImpl::speechReply(): speech.getVisemes( " << requestId << " ) is empty." << endl;
-
-				for( ; cur!=end; ++cur ) {
-					VisemeData* v = (*cur);
-					if( LOG_SPEECH ) {
-						//cout << "   " << (*v) << endl;  // Not linking
-						cout << "   VisemeData: " << v->id() << " (" << v->weight() << ") @ " << v->time() << endl;
-					}
-					if( strcmp( v->id(), VISEME_NEUTRAL )!=0 ) {
-						if( firstOpen==-1 )
-							firstOpen = v->time();
-						lastOpen = v->time();
-					}
-					lastAny = v->time();
-				}
-			} else {
-				if( LOG_SPEECH )
-					cerr << "ERROR: BodyPlannerImpl::speechReply(): speech.getVisemes( " << requestId << " ) returned NULL." << endl;
+		if( request ) {  // Is BmlRequest still alive?
+			// request speech through Speech API
+			SmartBody::SpeechInterface* speech = request->agent->get_speech_impl();
+			if( !speech ) {
+				cerr << "ERROR: Character \"" << request->agent->name << "\" does not have a voice defined.  Cannot perform speech." << endl;
+				// TODO: Send vrSpeakFailed
+				return;
 			}
-			//  Set core synch_point times
-			if( firstOpen==-1 ) {
-				ready->time = 0;
-				relax->time = lastAny;
-			} else {
-				ready->time = firstOpen;
-				relax->time = lastOpen;
-			}
-			end->time = lastAny;
 
+			// Found speech implementation.  Making request.
+			if( !errorMsg ) {
+				if( LOG_SPEECH_REQUEST_ID )
+					clog << "LOG: BodyPlannerImpl::speechReply(..): speech found for RequestId " << requestId << endl;
+				request->audioPlay = speech->getSpeechPlayCommand( requestId );
+				if( LOG_AUDIO )
+					cout << "DEBUG: BodyPlannerImpl::speechReply: request->audioPlay = " << request->audioPlay << endl;
 
-			// Process Markers
-			if( ready->next!=relax ) {
-				SynchPoint* cur = ready->next;
-				for(; cur != relax; cur = cur->next ) {
-					if( cur->parent == NULL ) {
-						float audioTime = speech->getMarkTime( requestId, cur->name );
-						if( audioTime >= 0 ) {
-							if( LOG_TIME_MARKERS ) wcout << "   SynchPoint \"" << cur->name << "\" @ " << audioTime << endl;
-							cur->time = audioTime;
-						} else {
-							wcerr << "ERROR: BodyPlannerImpl::speechReply(): No audioTime for SynchPoint \"" << cur->name << "\"" << endl;
+				SynchPointPtr ready( speechReq->ready );
+				SynchPointPtr relax( speechReq->relax );
+				SynchPointPtr end( speechReq->end );
+
+				// save timing;
+				float firstOpen = -1; // unset
+				float lastOpen  = 0;
+				float lastAny   = 0;
+
+				// Process Visemes
+				const vector<VisemeData*>* visemes = speech->getVisemes( requestId );
+				if( visemes ) {
+					request->visemes = *visemes;  // Copy contents
+					vector<VisemeData*>::const_iterator cur = visemes->begin();
+					vector<VisemeData*>::const_iterator end = visemes->end();
+
+					if( LOG_SPEECH && cur==end )
+						cerr << "ERROR: BodyPlannerImpl::speechReply(): speech.getVisemes( " << requestId << " ) is empty." << endl;
+
+					for( ; cur!=end; ++cur ) {
+						VisemeData* v = (*cur);
+						if( LOG_SPEECH ) {
+							//cout << "   " << (*v) << endl;  // Not linking
+							cout << "   VisemeData: " << v->id() << " (" << v->weight() << ") @ " << v->time() << endl;
 						}
-					} else {  // cur is an offset sync point relative to some parent
-						if( cur->parent->time != TIME_UNSET ) {
-							cur->time = cur->parent->time + cur->offset;
-							//wcout << "   SynchPoint \"" << cur->name << "\" @ " << cur->time << endl;
-						} else {
-							wcerr << "ERROR: BodyPlannerImpl::speechReply(): No time for parent SynchPoint \"" << cur->parent->name << "\" of relative SynchPoint \"" << cur->name << "\" (offset "<<cur->offset<<")" << endl;
+						if( strcmp( v->id(), VISEME_NEUTRAL )!=0 ) {
+							if( firstOpen==-1 )
+								firstOpen = v->time();
+							lastOpen = v->time();
+						}
+						lastAny = v->time();
+					}
+				} else {
+					if( LOG_SPEECH )
+						cerr << "ERROR: BodyPlannerImpl::speechReply(): speech.getVisemes( " << requestId << " ) returned NULL." << endl;
+				}
+				//  Set core synch_point times
+				if( firstOpen==-1 ) {
+					ready->time = 0;
+					relax->time = lastAny;
+				} else {
+					ready->time = firstOpen;
+					relax->time = lastOpen;
+				}
+				end->time = lastAny;
+
+
+				// Process Markers
+				if( ready->next!=relax ) {
+					SynchPointPtr cur( ready->next );
+					for(; cur != relax; cur = cur->next ) {
+						if( cur->parent == NULL ) {
+							float audioTime = speech->getMarkTime( requestId, cur->name );
+							if( audioTime >= 0 ) {
+								if( LOG_TIME_MARKERS ) wcout << "   SynchPoint \"" << cur->name << "\" @ " << audioTime << endl;
+								cur->time = audioTime;
+							} else {
+								wcerr << "ERROR: BodyPlannerImpl::speechReply(): No audioTime for SynchPoint \"" << cur->name << "\"" << endl;
+							}
+						} else {  // cur is an offset sync point relative to some parent
+							if( cur->parent->time != TIME_UNSET ) {
+								cur->time = cur->parent->time + cur->offset;
+								//wcout << "   SynchPoint \"" << cur->name << "\" @ " << cur->time << endl;
+							} else {
+								wcerr << "ERROR: BodyPlannerImpl::speechReply(): No time for parent SynchPoint \"" << cur->parent->name << "\" of relative SynchPoint \"" << cur->name << "\" (offset "<<cur->offset<<")" << endl;
+							}
 						}
 					}
+				} else {
+					if( LOG_TIME_MARKERS )
+						cout << "   BodyPlannerImpl::speechReply(..): No speech bookmarks" << endl;
 				}
-			} else {
-				if( LOG_TIME_MARKERS )
-					cout << "   BodyPlannerImpl::speechReply(..): No speech bookmarks" << endl;
-			}
-			
-			BodyPlannerMsg msg( request->agent->name, request->recipientId.c_str(), request->msgId.c_str(), request->agent, NULL );
-			
-			// check for negative times and change all times if needed
-			/*SynchPoint * temp = request->first;
-			while(temp != NULL){
-				if(temp->time < 0){
-					SynchPoint * temp2 = request->first->next;
-					while(temp2 != NULL){
-						temp2->time = temp2->time - temp->time;
-						wcout << "changed TimeMaker : " << temp2->name << " into : " << temp2->time << endl;					
-						temp2 = temp2->next;
+				
+				BodyPlannerMsg msg( request->agent->name, request->recipientId.c_str(), request->msgId.c_str(), request->agent, NULL );
+				
+				// check for negative times and change all times if needed
+				/*SynchPoint * temp = request->first;
+				while(temp != NULL){
+					if(temp->time < 0){
+						SynchPoint * temp2 = request->first->next;
+						while(temp2 != NULL){
+							temp2->time = temp2->time - temp->time;
+							wcout << "changed TimeMaker : " << temp2->name << " into : " << temp2->time << endl;					
+							temp2 = temp2->next;
+						}
 					}
-				}
-				temp = temp->next;
-			}*/
+					temp = temp->next;
+				}*/
 
-			realizeRequest( request, msg, mcu );
-		} else {
-			cerr << "ERROR: BodyPlannerImpl::speechReply(..): Error during speech RequestId " << requestId << ": " << errorMsg << endl;
+				realizeRequest( request, msg, mcu );
+			} else {
+				cerr << "ERROR: BodyPlannerImpl::speechReply(..): Error during speech RequestId " << requestId << ": " << errorMsg << endl;
+				// NO ERROR MESSAGE!  Missing BmlRequest means vrSpeakFailed fields are lost.
+			}
+			speech->requestComplete( requestId );
+		} else if( LOG_SPEECH ) {
+			cerr << "ERROR: BodyPlannerImpl::speechReply(..): SpeechRequest found for \"" << requestId << "\", but BmlRequest is missing" << endl;
 			vrSpeakFailed( request->agent->name, request->recipientId.c_str(), request->msgId.c_str(), errorMsg );
-		}
-		speech->requestComplete( requestId );
+		}   // else ignore... not a part of this BodyPlanner or expired
 	} else if( LOG_SPEECH ) {
 		cerr << "ERROR: BodyPlannerImpl::speechReply(..): No speech found for \"" << requestId << "\"" << endl;
 	}   // else ignore... not a part of this BodyPlanner or expired
 }
 
 
-void BML::Processor::realizeRequest( BmlRequest* request, BodyPlannerMsg& bpMsg, mcuCBHandle *mcu ) {
+void BML::Processor::realizeRequest( BmlRequestPtr request, BodyPlannerMsg& bpMsg, mcuCBHandle *mcu ) {
 	// Find earliest event
 	time_sec audioOffset = 0;
 	VecOfBehaviorRequest::iterator gest_end = request->behaviors.end();
@@ -896,11 +914,11 @@ void BML::Processor::realizeRequest( BmlRequest* request, BodyPlannerMsg& bpMsg,
 		oss << "echo ===\tAgent: " << bpMsg.agentId << "\tMsgId: " << bpMsg.msgId << "\tSynchPoint: ";
 		string command_prefix = oss.str();
 
-		BML::SynchPointMap::iterator i = request->synch_points.begin();
-		BML::SynchPointMap::iterator synch_points_end = request->synch_points.end();
+		BML::MapOfSynchPoint::iterator i = request->synch_points.begin();
+		BML::MapOfSynchPoint::iterator synch_points_end = request->synch_points.end();
 
 		for(; i!=synch_points_end; ++i ) {
-			SynchPoint* sp = i->second;
+			SynchPointPtr sp( i->second );
 			string name = XMLString::transcode( sp->name );
 			BML::time_sec time = sp->time;
 			if( time != BML::TIME_UNSET ) {
@@ -956,13 +974,15 @@ void BML::Processor::realizeRequest( BmlRequest* request, BodyPlannerMsg& bpMsg,
 // Cleanup Callback
 int BML::Processor::vrSpoke( BodyPlannerMsg& bpMsg, mcuCBHandle *mcu ) {
 	const char* requestId = bpMsg.requestId.c_str();
-	BmlRequest* request = requests.lookup( requestId );
-	if( !request ) {
+	MapOfBmlRequest::iterator find_result = requests.find( requestId );
+	if( find_result == requests.end() ) {
 		cerr << "ERROR: BodyPlannerImpl::vrSpoke(..): " << bpMsg.agentId << ": Unknown msgId=" << bpMsg.msgId << endl;
 		return CMD_FAILURE;
 	}
-	requests.remove( requestId );
-	delete request;
+
+	// else ...
+	// TODO: Clean-up circular references
+	requests.erase( requestId );
 
 	return CMD_SUCCESS;
 }

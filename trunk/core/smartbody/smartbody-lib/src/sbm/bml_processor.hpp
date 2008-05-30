@@ -29,7 +29,9 @@
 #include "bml.hpp"
 #include "sr_hash_map.h"
 
+// Use Boost Smart Point Impl until TR1 is finalized
 #include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 
 
 // Forward Declaration
@@ -68,9 +70,9 @@ namespace BML {
 		// Private Constants
 
 		// Private Data
-		HandlerBase * xmlErrorHandler;
-		srHashMap<BML::BmlRequest> requests;     // indexed by msgId
-		srHashMap<BML::SpeechRequest> speeches; // indexed by RequestId
+		HandlerBase* xmlErrorHandler;
+		MapOfBmlRequest requests;    // indexed by buildRequestId(..) string
+		MapOfSpeechRequest speeches; // indexed by buildSpeechKey(..) string
 
 		bool auto_print_controllers;
 		bool auto_print_sequence;
@@ -107,7 +109,7 @@ namespace BML {
 		/**
 		*  Parses <BML> elements
 		*/
-		void parseBML( DOMElement *el, BML::BmlRequest* request, mcuCBHandle *mcu );
+		void parseBML( DOMElement *el, BML::BmlRequestPtr request, mcuCBHandle *mcu );
 
 		/**
 		*/
@@ -116,7 +118,7 @@ namespace BML {
 		/**
 		*  Completes final timing calculations and triggers schedule
 		*/
-		void realizeRequest( BML::BmlRequest* request, BodyPlannerMsg& bpMsg, mcuCBHandle *mcu );
+		void realizeRequest( BML::BmlRequestPtr request, BodyPlannerMsg& bpMsg, mcuCBHandle *mcu );
 
 		/**
 		*  Handles vrSpoke messages from agent, cleans up old BmlRequest obj.
@@ -168,10 +170,12 @@ namespace BML {
 	protected:
 		//////////////////////////////////////////////////////////////////////////
 		// Protected Methods
-		BehaviorRequest* parse_bml_body( DOMElement* elem, SynchPoints& tms, BmlRequest* request, mcuCBHandle *mcu );
-		BehaviorRequest* parse_bml_event( DOMElement* elem, SynchPoints& tms, BmlRequest* request, mcuCBHandle *mcu );
-		BehaviorRequest* parse_bml_head( DOMElement* elem, SynchPoints& tms, BmlRequest* request, mcuCBHandle *mcu );
-	}; // namespace BodyPlanner
+		BmlRequestPtr createBmlRequest( const SbmCharacter* agent, const std::string & requestId, const std::string & recipientId, const std::string & msgId );
+
+		BehaviorRequest* parse_bml_body( DOMElement* elem, SynchPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu );
+		BehaviorRequest* parse_bml_event( DOMElement* elem, SynchPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu );
+		BehaviorRequest* parse_bml_head( DOMElement* elem, SynchPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu );
+	}; // class Processor
 };  // end namespace BML
 
 
