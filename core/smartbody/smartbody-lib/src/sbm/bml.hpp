@@ -149,13 +149,7 @@ namespace BML {
 
 	public:
 		SynchPointPtr addSynchPoint( const XMLCh* name );  // adds SynchPoint before end of trigger
-#if SYNC_LINKED_LIST
-		SynchPointPtr addSynchPoint( const XMLCh* name, SynchPointPtr prev );
-		SynchPointPtr addSynchPoint( const XMLCh* name, SynchPointPtr prev, SynchPointPtr par, float off );
-#else
 		SynchPointPtr addSynchPoint( const XMLCh* name, SynchPointPtr par, float off );
-#endif // SYNC_LINKED_LIST
-
 
 		friend class BmlRequest;
 	};
@@ -164,10 +158,6 @@ namespace BML {
 	public:
 		const XMLCh *const        name;
 		const TriggerEventWeakPtr trigger;
-#if SYNC_LINKED_LIST
-		SynchPointPtr             prev;
-		SynchPointPtr             next;
-#endif  // SYNC_LINKED_LIST
 		time_sec                  time;  // TIME_UNSET implies it has not been set
 		SynchPointPtr             parent;
 		float			          offset;	
@@ -178,11 +168,7 @@ namespace BML {
 	protected:
 		SynchPoint( const XMLCh* name, const TriggerEventPtr trigger );
 		SynchPoint( const XMLCh* name, const TriggerEventPtr trigger, SynchPointPtr par, float off );
-#if SYNC_LINKED_LIST
-		void init( SynchPointPtr self, SynchPointPtr prev );
-#else
 		void init( SynchPointPtr self );
-#endif  // SYNC_LINKED_LIST
 
 	public:
 		virtual ~SynchPoint();
@@ -394,11 +380,7 @@ namespace BML {
 		SynchPointPtr     relax;
 		SynchPointPtr     end;
 
-#if !SYNC_LINKED_LIST
 		VecOfSynchPoint   tms;  // <tm> Time Markers, or syntheis markup equiv
-#endif // !SYNC_LINKED_LIST
-
-
 
 		///////////////////////////////////////////////////////////////
 		// Methods

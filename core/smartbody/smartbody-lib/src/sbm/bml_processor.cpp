@@ -660,18 +660,12 @@ void BML::Processor::speechReply( SbmCharacter* character, SmartBody::RequestId 
 
 
 				// Process Speech Time Markers
-#if SYNC_LINKED_LIST
-				if( ready->next!=relax ) {
-					SynchPointPtr cur( ready->next );
-					for(; cur != relax; cur = cur->next ) {
-#else
 				if( !speechReq->tms.empty() ) {
 					VecOfSynchPoint::iterator it = speechReq->tms.begin();
 					VecOfSynchPoint::iterator end = speechReq->tms.end();
 
 					for(; it != end; ++it ) {
 						SynchPointPtr cur( *it );
-#endif // SYNC_LINKED_LIST
 						if( cur->parent == NULL ) {
 							float audioTime = speech->getMarkTime( requestId, cur->name );
 							if( audioTime >= 0 ) {
