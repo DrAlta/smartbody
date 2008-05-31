@@ -46,7 +46,7 @@
 
 
 // Transitionary Build Options
-#define SYNC_LINKED_LIST (1)
+#define SYNC_LINKED_LIST (0)
 
 
 
@@ -149,8 +149,13 @@ namespace BML {
 
 	public:
 		SynchPointPtr addSynchPoint( const XMLCh* name );  // adds SynchPoint before end of trigger
+#if SYNC_LINKED_LIST
 		SynchPointPtr addSynchPoint( const XMLCh* name, SynchPointPtr prev );
 		SynchPointPtr addSynchPoint( const XMLCh* name, SynchPointPtr prev, SynchPointPtr par, float off );
+#else
+		SynchPointPtr addSynchPoint( const XMLCh* name, SynchPointPtr par, float off );
+#endif // SYNC_LINKED_LIST
+
 
 		friend class BmlRequest;
 	};
@@ -383,11 +388,15 @@ namespace BML {
 
 	public:
 		// Overrides (but equivalent to) BehaviorRequest fields  (Needed early reference)
-		TriggerEventPtr trigger;
-		SynchPointPtr   start;
-		SynchPointPtr   ready;
-		SynchPointPtr   relax;
-		SynchPointPtr   end;
+		TriggerEventPtr   trigger;
+		SynchPointPtr     start;
+		SynchPointPtr     ready;
+		SynchPointPtr     relax;
+		SynchPointPtr     end;
+
+#if !SYNC_LINKED_LIST
+		VecOfSynchPoint   tms;  // <tm> Time Markers, or syntheis markup equiv
+#endif // !SYNC_LINKED_LIST
 
 
 
