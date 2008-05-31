@@ -322,7 +322,7 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCB
 
 		// Load SynchPoint references
 		SynchPoints tms;
-		tms.parseSynchPoints( child, request );
+		tms.parseStandardSynchPoints( child, request );
 
 		// Simplify references to synch points.
 		SynchPointPtr start( tms.start );

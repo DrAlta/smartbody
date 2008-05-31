@@ -1129,6 +1129,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\sbm\bml_schedule.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\sbm\bml_types.hpp"
 					>
 				</File>
