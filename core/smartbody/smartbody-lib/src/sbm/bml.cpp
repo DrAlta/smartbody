@@ -145,12 +145,16 @@ void BmlRequest::init( BmlRequestPtr self ) {
 	// TODO: Assert self.get() == this
 	weak_ptr = self;
 
-	start_trigger = createTrigger( "bml:start", TriggerEventPtr() );
+	start_trigger = createTrigger( "bml:start" );
 
 	const XMLCh* start_id = L"bml:start";
 	const XMLCh* end_id   = L"bml:end";
 	bml_start = start_trigger->addSynchPoint( start_id );
+#if SYNC_LINKED_LIST
 	bml_start->init( bml_start, SynchPointPtr() );
+#else
+	bml_start->init( bml_start );
+#endif // SYNC_LINKED_LIST
 
 	synch_points.insert( make_pair( start_id, bml_start ) );
 
@@ -234,24 +238,12 @@ BmlRequest::~BmlRequest() {
 	//}
 }
 
-TriggerEventPtr BmlRequest::createTrigger( const string& name, TriggerEventPtr prev ) {
-	if( prev ) {
-		BmlRequestPtr other( prev->request.lock() );
-		if( !other )
-			throw BML::Processor::BodyPlannerException( "BML::BmlRequest::createTrigger() prev from missing BmlRequest" );
-		if( other.get() != this )
-			throw BML::Processor::BodyPlannerException( "BML::BmlRequest::createTrigger() prev from other BmlRequest" );
-	}
-
+TriggerEventPtr BmlRequest::createTrigger( const string& name ) {
 	TriggerEventPtr trigger( new TriggerEvent( name, weak_ptr.lock() ) );
-	trigger->init( trigger, prev );
+	trigger->init( trigger );
 
 	triggers.push_back( trigger );
 	return trigger;
-}
-
-TriggerEventPtr BmlRequest::createTrigger( const string& name ) {
-	return createTrigger( name, TriggerEventPtr() );
 }
 
 void BmlRequest::addBehavior( BehaviorRequest* behavior ) {
@@ -290,7 +282,11 @@ SynchPointPtr BmlRequest::getSynchPoint( const XMLCh * name ) {
 			SynchPointPtr parent = mySearchIter->second;
 			if( parent ) {
 				SynchPointPtr sync( new SynchPoint(name, triggers.at(triggers.size()-1), parent, offset) );
+#if SYNC_LINKED_LIST
 				sync->init( sync, parent );
+#else
+				sync->init( sync );
+#endif // SYNC_LINKED_LIST
 
 				//std::pair<XMLCh*,SynchPoint *> foo = make_pair(const_cast<XMLCh *>(name), sync);
 				//synch_points.insert(foo);
@@ -308,7 +304,11 @@ SynchPointPtr BmlRequest::getSynchPoint( const XMLCh * name ) {
 		float time = (float)( atof( temp ) );
 
         SynchPointPtr sync = start_trigger->addSynchPoint( name, bml_start, bml_start, time );
+#if SYNC_LINKED_LIST
 		sync->init( sync, (*mySearchIter).second );
+#else
+		sync->init( sync );
+#endif // SYNC_LINKED_LIST
 
 		synch_points.insert( make_pair( name, sync ) );
 		wcout << "insering new synch_point [" << name << "] (offset \""<< time <<"\" relative to starttime of the action)" << endl;
@@ -325,7 +325,7 @@ TriggerEvent::TriggerEvent( const string& name, BmlRequestPtr request )
 	int answer = 42;  //break here
 }
 
-bool TriggerEvent::init( TriggerEventPtr self, TriggerEventPtr prev ) {
+bool TriggerEvent::init( TriggerEventPtr self ) {
 	// TODO: Assert self.get() == this
 	weak_ptr = self;
 
@@ -361,7 +361,11 @@ SynchPointPtr TriggerEvent::addSynchPoint( const XMLCh* name, SynchPointPtr prev
 		throw BML::Processor::BodyPlannerException( "BML Request SynchPoint naming collision" );
 
 	SynchPointPtr sync( new SynchPoint( name, weak_ptr.lock(), par, off ) );
+#if SYNC_LINKED_LIST
 	sync->init( sync, prev );
+#else
+	sync->init( sync );
+#endif // SYNC_LINKED_LIST
 
 	if( name && request ) {
 		request->synch_points[name] = sync;
@@ -395,6 +399,7 @@ SynchPoint::SynchPoint( const XMLCh* name, const TriggerEventPtr trigger, SynchP
 		XMLString::copyString( (XMLCh *const)(this->name), name );
 }
 
+#if SYNC_LINKED_LIST
 void SynchPoint::init( SynchPointPtr self, SynchPointPtr prev_ptr ) {
 	// TODO: Assert self.get() == this
 	weak_ptr = self;
@@ -408,6 +413,12 @@ void SynchPoint::init( SynchPointPtr self, SynchPointPtr prev_ptr ) {
 			next->prev = self;
 	} // else prev & next remains unset
 }
+#else
+void SynchPoint::init( SynchPointPtr self ) {
+	// TODO: Assert self.get() == this
+	weak_ptr = self;
+}
+#endif // SYNC_LINKED_LIST
 
 SynchPoint::~SynchPoint() {
    delete name;

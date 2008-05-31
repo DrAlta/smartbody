@@ -45,6 +45,11 @@
 #include "me_ct_examples.h"
 
 
+// Transitionary Build Options
+#define TRIGGER_START_END (1)
+#define SYNC_LINKED_LIST (1)
+
+
 
 namespace BML {
 	//  Common XML Identifiers
@@ -118,14 +123,6 @@ namespace BML {
 		virtual ~BmlRequest();
 
 		/**
-		 *  Creates a new TriggerEvent for this BmlRequest.
-		 *  DO NOT CALL BEFORE CONSTRUCTOR RETURNS.
-		 *
-		 *  returns NULL is prev is not a TriggerEvent of this BmlRequest.
-		 */
-		TriggerEventPtr createTrigger( const std::string &name, TriggerEventPtr prev );
-
-		/**
 		 *  Creates a new TriggerEvent following this BmlRequest's start_trigger.
 		 *  DO NOT CALL BEFORE CONSTRUCTOR RETURNS.
 		 */
@@ -143,17 +140,19 @@ namespace BML {
 	public:
 		std::string         name;     // for logging / debugging
 		BmlRequestWeakPtr   request;
+#if TRIGGER_START_END
 		SynchPointPtr       start;
 		SynchPointPtr       end;
 
 		//std::vector<const XMLCh*> tids;  // Time IDs;
+#endif // TRIGGER_START_END
 
 	private:
 		TriggerEventWeakPtr weak_ptr;  // weak reference to the reference count struct
 
 	protected:
 		TriggerEvent( const std::string& name, BmlRequestPtr request );
-		bool init( TriggerEventPtr self, TriggerEventPtr prev );
+		bool init( TriggerEventPtr self );
 
 	public:
 		virtual ~TriggerEvent();
@@ -172,8 +171,10 @@ namespace BML {
 	public:
 		const XMLCh *const        name;
 		const TriggerEventWeakPtr trigger;
+#if SYNC_LINKED_LIST
 		SynchPointPtr             prev;
 		SynchPointPtr             next;
+#endif  // SYNC_LINKED_LIST
 		time_sec                  time;  // TIME_UNSET implies it has not been set
 		SynchPointPtr             parent;
 		float			          offset;	
@@ -184,7 +185,11 @@ namespace BML {
 	protected:
 		SynchPoint( const XMLCh* name, const TriggerEventPtr trigger );
 		SynchPoint( const XMLCh* name, const TriggerEventPtr trigger, SynchPointPtr par, float off );
+#if SYNC_LINKED_LIST
 		void init( SynchPointPtr self, SynchPointPtr prev );
+#else
+		void init( SynchPointPtr self );
+#endif  // SYNC_LINKED_LIST
 
 	public:
 		virtual ~SynchPoint();
