@@ -46,7 +46,6 @@
 
 
 // Transitionary Build Options
-#define TRIGGER_START_END (1)
 #define SYNC_LINKED_LIST (1)
 
 
@@ -140,29 +139,18 @@ namespace BML {
 	public:
 		std::string         name;     // for logging / debugging
 		BmlRequestWeakPtr   request;
-#if TRIGGER_START_END
-		SynchPointPtr       start;
-		SynchPointPtr       end;
-
-		//std::vector<const XMLCh*> tids;  // Time IDs;
-#endif // TRIGGER_START_END
 
 	private:
 		TriggerEventWeakPtr weak_ptr;  // weak reference to the reference count struct
 
 	protected:
 		TriggerEvent( const std::string& name, BmlRequestPtr request );
-		bool init( TriggerEventPtr self );
+		void init( TriggerEventPtr self );
 
 	public:
-		virtual ~TriggerEvent();
-
 		SynchPointPtr addSynchPoint( const XMLCh* name );  // adds SynchPoint before end of trigger
 		SynchPointPtr addSynchPoint( const XMLCh* name, SynchPointPtr prev );
 		SynchPointPtr addSynchPoint( const XMLCh* name, SynchPointPtr prev, SynchPointPtr par, float off );
-
-//		// TODO: use BmlRequest variant
-//		SynchPoint* getSynchPoint( const XMLCh* name );  // Lookup a SynchPoint
 
 		friend class BmlRequest;
 	};

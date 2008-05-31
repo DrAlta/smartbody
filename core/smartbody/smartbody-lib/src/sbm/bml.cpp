@@ -325,24 +325,9 @@ TriggerEvent::TriggerEvent( const string& name, BmlRequestPtr request )
 	int answer = 42;  //break here
 }
 
-bool TriggerEvent::init( TriggerEventPtr self ) {
+void TriggerEvent::init( TriggerEventPtr self ) {
 	// TODO: Assert self.get() == this
 	weak_ptr = self;
-
-	start = addSynchPoint( NULL );
-	end = addSynchPoint( NULL, start );
-
-	return true;
-}
-
-TriggerEvent::~TriggerEvent() {
-	SynchPointPtr sp( start );
-	while( sp != end ) {
-		SynchPointPtr next( sp->next );
-		sp.reset();
-		sp = next;
-	}
-	end.reset();
 }
 
 SynchPointPtr TriggerEvent::addSynchPoint( const XMLCh* name ) {
@@ -1239,10 +1224,10 @@ SpeechRequest::SpeechRequest( DOMElement* xml, const XMLCh* id, BmlRequestPtr re
 :	xml( xml ),
 	id( id? new XMLCh[ XMLString::stringLen(id)+1 ] : NULL )
 {
-	trigger = request->createTrigger("SPEECH");  // TODO: Use 
+	trigger = request->createTrigger("SPEECH");  // TODO: Use trigger to signal speech timing is available
 
 	if( id ) {
-		start = trigger->addSynchPoint( buildBmlId( id, TM_START ), trigger->start );
+		start = trigger->addSynchPoint( buildBmlId( id, TM_START ), SynchPointPtr() );
 		ready = trigger->addSynchPoint( buildBmlId( id, TM_READY ), start );
 		relax = trigger->addSynchPoint( buildBmlId( id, TM_RELAX ), ready );
 		end = trigger->addSynchPoint( buildBmlId( id, TM_END ), relax );
