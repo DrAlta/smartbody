@@ -150,11 +150,7 @@ void BmlRequest::init( BmlRequestPtr self ) {
 	const XMLCh* start_id = L"bml:start";
 	const XMLCh* end_id   = L"bml:end";
 	bml_start = start_trigger->addSynchPoint( start_id );
-#if SYNC_LINKED_LIST
-	bml_start->init( bml_start, SynchPointPtr() );
-#else
 	bml_start->init( bml_start );
-#endif // SYNC_LINKED_LIST
 
 	synch_points.insert( make_pair( start_id, bml_start ) );
 
@@ -282,16 +278,11 @@ SynchPointPtr BmlRequest::getSynchPoint( const XMLCh * name ) {
 			SynchPointPtr parent = mySearchIter->second;
 			if( parent ) {
 				SynchPointPtr sync( new SynchPoint(name, triggers.at(triggers.size()-1), parent, offset) );
-#if SYNC_LINKED_LIST
-				sync->init( sync, parent );
-#else
 				sync->init( sync );
-#endif // SYNC_LINKED_LIST
-
-				//std::pair<XMLCh*,SynchPoint *> foo = make_pair(const_cast<XMLCh *>(name), sync);
-				//synch_points.insert(foo);
 				synch_points.insert( make_pair( name, sync ) );
+
 				wcout << "insering new synch_point [" << name << "]" << endl;
+
 				if( parent && parent->time != TIME_UNSET )
 					sync->time = parent->time + offset; 
 				return sync;
@@ -303,13 +294,8 @@ SynchPointPtr BmlRequest::getSynchPoint( const XMLCh * name ) {
 		char* temp = XMLString::transcode( name );
 		float time = (float)( atof( temp ) );
 
-#if SYNC_LINKED_LIST
-        SynchPointPtr sync = start_trigger->addSynchPoint( name, bml_start, bml_start, time );
-		sync->init( sync, (*mySearchIter).second );
-#else
         SynchPointPtr sync = start_trigger->addSynchPoint( name, bml_start, time );
 		sync->init( sync );
-#endif // SYNC_LINKED_LIST
 
 		synch_points.insert( make_pair( name, sync ) );
 		wcout << "insering new synch_point [" << name << "] (offset \""<< time <<"\" relative to starttime of the action)" << endl;
@@ -332,22 +318,10 @@ void TriggerEvent::init( TriggerEventPtr self ) {
 }
 
 SynchPointPtr TriggerEvent::addSynchPoint( const XMLCh* name ) {
-#if SYNC_LINKED_LIST
-	return addSynchPoint( name, SynchPointPtr(), SynchPointPtr(), 0 );
-#else
 	return addSynchPoint( name, SynchPointPtr(), 0 );
-#endif // SYNC_LINKED_LIST
 }
 
-#if SYNC_LINKED_LIST
-SynchPointPtr TriggerEvent::addSynchPoint( const XMLCh* name, SynchPointPtr prev ) {
-	return addSynchPoint( name, prev, SynchPointPtr(), 0 );
-}
-
-SynchPointPtr TriggerEvent::addSynchPoint( const XMLCh* name, SynchPointPtr prev, SynchPointPtr par, float off ) {
-#else
 SynchPointPtr TriggerEvent::addSynchPoint( const XMLCh* name, SynchPointPtr par, float off ) {
-#endif // SYNC_LINKED_LIST
 	// TODO: Delay addition of synch point until behavior is added to BmlRequest,
 	//       allowing for failure without artifacts.
 	BmlRequestPtr request( this->request.lock() );
@@ -355,11 +329,7 @@ SynchPointPtr TriggerEvent::addSynchPoint( const XMLCh* name, SynchPointPtr par,
 		throw BML::Processor::BodyPlannerException( "BML Request SynchPoint naming collision" );
 
 	SynchPointPtr sync( new SynchPoint( name, weak_ptr.lock(), par, off ) );
-#if SYNC_LINKED_LIST
-	sync->init( sync, prev );
-#else
 	sync->init( sync );
-#endif // SYNC_LINKED_LIST
 
 	if( name && request ) {
 		request->synch_points[name] = sync;
@@ -393,26 +363,10 @@ SynchPoint::SynchPoint( const XMLCh* name, const TriggerEventPtr trigger, SynchP
 		XMLString::copyString( (XMLCh *const)(this->name), name );
 }
 
-#if SYNC_LINKED_LIST
-void SynchPoint::init( SynchPointPtr self, SynchPointPtr prev_ptr ) {
-	// TODO: Assert self.get() == this
-	weak_ptr = self;
-
-	this->prev = prev_ptr;
-
-	if( prev ) {
-		next = prev->next;
-		prev->next = self;
-		if( next )
-			next->prev = self;
-	} // else prev & next remains unset
-}
-#else
 void SynchPoint::init( SynchPointPtr self ) {
 	// TODO: Assert self.get() == this
 	weak_ptr = self;
 }
-#endif // SYNC_LINKED_LIST
 
 SynchPoint::~SynchPoint() {
    delete name;
@@ -1124,7 +1078,6 @@ NodRequest::NodRequest( NodType type, float repeats, float frequency, float exte
         extent = -1;
     
     MeCtSimpleNod* nod = (MeCtSimpleNod*)controller;
-//    nod->init( actor->skeleton_p );
     nod->init();
     //  TODO: Set a controller name
     switch( type ) {
@@ -1236,17 +1189,10 @@ SpeechRequest::SpeechRequest( DOMElement* xml, const XMLCh* id, BmlRequestPtr re
 	trigger = request->createTrigger("SPEECH");  // TODO: Use trigger to signal speech timing is available
 
 	if( id ) {
-#if SYNC_LINKED_LIST
-		start = trigger->addSynchPoint( buildBmlId( id, TM_START ), SynchPointPtr() );
-		ready = trigger->addSynchPoint( buildBmlId( id, TM_READY ), start );
-		relax = trigger->addSynchPoint( buildBmlId( id, TM_RELAX ), ready );
-		end = trigger->addSynchPoint( buildBmlId( id, TM_END ), relax );
-#else
 		start = trigger->addSynchPoint( buildBmlId( id, TM_START ) );
 		ready = trigger->addSynchPoint( buildBmlId( id, TM_READY ) );
 		relax = trigger->addSynchPoint( buildBmlId( id, TM_RELAX ) );
 		end = trigger->addSynchPoint( buildBmlId( id, TM_END ) );
-#endif // SYNC_LINKED_LIST
 
 		XMLString::copyString( const_cast<XMLCh*>(this->id), id );
 
@@ -1256,10 +1202,6 @@ SpeechRequest::SpeechRequest( DOMElement* xml, const XMLCh* id, BmlRequestPtr re
 		request->synch_points.insert( make_pair( buildBmlId( id, TM_STROKE ), ready ) );
 		request->synch_points.insert( make_pair( buildBmlId( id, TM_RELAX ),  relax ) );
 		request->synch_points.insert( make_pair( buildBmlId( id, TM_END ),    end ) );
-
-#if SYNC_LINKED_LIST
-		SynchPointPtr lastSp( ready );
-#endif // SYNC_LINKED_LIST
 
 		if( XMLString::stringLen( id ) ) {  // if id not empty string
 			// Parse <speech> for synch points
@@ -1281,14 +1223,10 @@ SpeechRequest::SpeechRequest( DOMElement* xml, const XMLCh* id, BmlRequestPtr re
 									// Make fully qualified id
 									tmId = BML::buildBmlId( id, tmId );
 									child->setAttribute( ATTR_ID, tmId );
+
 									// Create a SynchPoint
-#if SYNC_LINKED_LIST
-									lastSp = trigger->addSynchPoint( tmId, lastSp );
-									request->synch_points.insert( make_pair( tmId, lastSp ) );
-#else
 									SynchPointPtr sync( trigger->addSynchPoint( tmId ) );
 									tms.push_back( sync );
-#endif // SYNC_LINKED_LIST
 								} else {
 									wcerr << "ERROR: Invalid <tm> id=\"" << tmId << "\"" << endl;
 								}
@@ -1312,14 +1250,10 @@ SpeechRequest::SpeechRequest( DOMElement* xml, const XMLCh* id, BmlRequestPtr re
 									// Make fully qualified
 									tmId = BML::buildBmlId( id, tmId );
 									child->setAttribute( ATTR_NAME, tmId );
+
 									// Create a SynchPoint
-#if SYNC_LINKED_LIST
-									lastSp = trigger->addSynchPoint( tmId, lastSp );
-									request->synch_points.insert( make_pair( tmId, lastSp ) );
-#else
 									SynchPointPtr sync( trigger->addSynchPoint( tmId ) );
 									tms.push_back( sync );
-#endif // SYNC_LINKED_LIST
 								} else {
 									wcerr << "ERROR: Invalid <mark> name=\"" << tmId << "\"" << endl;
 								}
