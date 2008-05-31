@@ -207,9 +207,7 @@ namespace BML {
 
 		//SynchPoints();  // Unnecessary with shared_ptr
 
-		void parseSynchPoints( DOMElement* elem, BmlRequestPtr request );
-
-		//  TODO: list for ordering and non-standard controllers.
+		void parseStandardSynchPoints( DOMElement* elem, BmlRequestPtr request );
 	};
 
 	//  Structure to keep track of a scheduled SBM command
@@ -254,10 +252,9 @@ namespace BML {
     ///////////////////////////////////////////////////////////////////
     //  Methods
 	public:
-		BehaviorRequest( //const GestureType type, const void* data,
-			            const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end,
-						time_sec startTime, time_sec readyTime, time_sec strokeTime, time_sec relaxTime, time_sec endTime,
-						float speed );
+		BehaviorRequest( const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end,
+						 time_sec startTime, time_sec readyTime, time_sec strokeTime, time_sec relaxTime, time_sec endTime,
+						 float speed );
 		virtual ~BehaviorRequest();
 
 		virtual time_sec getAudioRelativeStart();

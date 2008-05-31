@@ -435,7 +435,7 @@ void MissingSyncPoint_HACK( SynchPointPtr &sp, const XMLCh* id, const BmlRequest
 #endif
 }
 
-void SynchPoints::parseSynchPoints( DOMElement* elem, BmlRequestPtr request ) {
+void SynchPoints::parseStandardSynchPoints( DOMElement* elem, BmlRequestPtr request ) {
 	const XMLCh* tag = elem->getTagName();
 	const XMLCh* id  = elem->getAttribute( ATTR_ID );
 
