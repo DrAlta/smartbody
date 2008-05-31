@@ -63,6 +63,7 @@ namespace BML {
 
 	typedef boost::shared_ptr<SynchPoint>             SynchPointPtr;
 	typedef boost::weak_ptr<SynchPoint>               SynchPointWeakPtr;
+	typedef std::vector< SynchPointPtr >              VecOfSynchPoint;
 	typedef std::map< std::wstring, SynchPointPtr >   MapOfSynchPoint;
 
 	typedef std::vector<SmartBody::VisemeData*>       VecOfVisemeData;

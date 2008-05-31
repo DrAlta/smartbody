@@ -303,10 +303,11 @@ SynchPointPtr BmlRequest::getSynchPoint( const XMLCh * name ) {
 		char* temp = XMLString::transcode( name );
 		float time = (float)( atof( temp ) );
 
-        SynchPointPtr sync = start_trigger->addSynchPoint( name, bml_start, bml_start, time );
 #if SYNC_LINKED_LIST
+        SynchPointPtr sync = start_trigger->addSynchPoint( name, bml_start, bml_start, time );
 		sync->init( sync, (*mySearchIter).second );
 #else
+        SynchPointPtr sync = start_trigger->addSynchPoint( name, bml_start, time );
 		sync->init( sync );
 #endif // SYNC_LINKED_LIST
 
@@ -331,14 +332,22 @@ void TriggerEvent::init( TriggerEventPtr self ) {
 }
 
 SynchPointPtr TriggerEvent::addSynchPoint( const XMLCh* name ) {
+#if SYNC_LINKED_LIST
 	return addSynchPoint( name, SynchPointPtr(), SynchPointPtr(), 0 );
+#else
+	return addSynchPoint( name, SynchPointPtr(), 0 );
+#endif // SYNC_LINKED_LIST
 }
 
+#if SYNC_LINKED_LIST
 SynchPointPtr TriggerEvent::addSynchPoint( const XMLCh* name, SynchPointPtr prev ) {
 	return addSynchPoint( name, prev, SynchPointPtr(), 0 );
 }
 
 SynchPointPtr TriggerEvent::addSynchPoint( const XMLCh* name, SynchPointPtr prev, SynchPointPtr par, float off ) {
+#else
+SynchPointPtr TriggerEvent::addSynchPoint( const XMLCh* name, SynchPointPtr par, float off ) {
+#endif // SYNC_LINKED_LIST
 	// TODO: Delay addition of synch point until behavior is added to BmlRequest,
 	//       allowing for failure without artifacts.
 	BmlRequestPtr request( this->request.lock() );
@@ -1227,10 +1236,17 @@ SpeechRequest::SpeechRequest( DOMElement* xml, const XMLCh* id, BmlRequestPtr re
 	trigger = request->createTrigger("SPEECH");  // TODO: Use trigger to signal speech timing is available
 
 	if( id ) {
+#if SYNC_LINKED_LIST
 		start = trigger->addSynchPoint( buildBmlId( id, TM_START ), SynchPointPtr() );
 		ready = trigger->addSynchPoint( buildBmlId( id, TM_READY ), start );
 		relax = trigger->addSynchPoint( buildBmlId( id, TM_RELAX ), ready );
 		end = trigger->addSynchPoint( buildBmlId( id, TM_END ), relax );
+#else
+		start = trigger->addSynchPoint( buildBmlId( id, TM_START ) );
+		ready = trigger->addSynchPoint( buildBmlId( id, TM_READY ) );
+		relax = trigger->addSynchPoint( buildBmlId( id, TM_RELAX ) );
+		end = trigger->addSynchPoint( buildBmlId( id, TM_END ) );
+#endif // SYNC_LINKED_LIST
 
 		XMLString::copyString( const_cast<XMLCh*>(this->id), id );
 
@@ -1241,7 +1257,9 @@ SpeechRequest::SpeechRequest( DOMElement* xml, const XMLCh* id, BmlRequestPtr re
 		request->synch_points.insert( make_pair( buildBmlId( id, TM_RELAX ),  relax ) );
 		request->synch_points.insert( make_pair( buildBmlId( id, TM_END ),    end ) );
 
+#if SYNC_LINKED_LIST
 		SynchPointPtr lastSp( ready );
+#endif // SYNC_LINKED_LIST
 
 		if( XMLString::stringLen( id ) ) {  // if id not empty string
 			// Parse <speech> for synch points
@@ -1264,8 +1282,13 @@ SpeechRequest::SpeechRequest( DOMElement* xml, const XMLCh* id, BmlRequestPtr re
 									tmId = BML::buildBmlId( id, tmId );
 									child->setAttribute( ATTR_ID, tmId );
 									// Create a SynchPoint
+#if SYNC_LINKED_LIST
 									lastSp = trigger->addSynchPoint( tmId, lastSp );
 									request->synch_points.insert( make_pair( tmId, lastSp ) );
+#else
+									SynchPointPtr sync( trigger->addSynchPoint( tmId ) );
+									tms.push_back( sync );
+#endif // SYNC_LINKED_LIST
 								} else {
 									wcerr << "ERROR: Invalid <tm> id=\"" << tmId << "\"" << endl;
 								}
@@ -1290,8 +1313,13 @@ SpeechRequest::SpeechRequest( DOMElement* xml, const XMLCh* id, BmlRequestPtr re
 									tmId = BML::buildBmlId( id, tmId );
 									child->setAttribute( ATTR_NAME, tmId );
 									// Create a SynchPoint
+#if SYNC_LINKED_LIST
 									lastSp = trigger->addSynchPoint( tmId, lastSp );
 									request->synch_points.insert( make_pair( tmId, lastSp ) );
+#else
+									SynchPointPtr sync( trigger->addSynchPoint( tmId ) );
+									tms.push_back( sync );
+#endif // SYNC_LINKED_LIST
 								} else {
 									wcerr << "ERROR: Invalid <mark> name=\"" << tmId << "\"" << endl;
 								}
