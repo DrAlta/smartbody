@@ -652,7 +652,7 @@ BehaviorRequest* BML::parse_bml_gaze( DOMElement* elem, SynchPoints& tms, BmlReq
 		gaze_ct->set_offset_polar( 0, 0, roll );
 	}
 
-	return new MeControllerRequest( MeControllerRequest::UTTERANCE, gaze_ct, tms.start, tms.ready, tms.stroke, tms.relax, tms.end );
+	return new MeControllerRequest( MeControllerRequest::GAZE, gaze_ct, tms.start, tms.ready, tms.stroke, tms.relax, tms.end );
 }
 
 

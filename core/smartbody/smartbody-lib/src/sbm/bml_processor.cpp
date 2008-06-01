@@ -733,33 +733,40 @@ void BML::Processor::realizeRequest( BmlRequestPtr request, BodyPlannerMsg& bpMs
 	if( auto_print_sequence )
 		cout << "BodyPlannerImpl::realizeRequest(..):  audioOffset = "<<audioOffset<<endl;
 
-	//  Schedule all behaviors relative to earliest
-	MeCtScheduler2* scheduler = new MeCtScheduler2();
-	scheduler->init();
-
-	string request_sched_name( bpMsg.agentId );
-	request_sched_name += "'s act ";
-	request_sched_name += bpMsg.msgId;
-	scheduler->name( request_sched_name.c_str() );
+////// OLD CODE: All behaviors lumped into a single schedule
+//
+//	//  Schedule all behaviors relative to earliest
+//	MeCtScheduler2* scheduler = new MeCtScheduler2();
+//	scheduler->init();
+//
+//	string request_sched_name( bpMsg.agentId );
+//	request_sched_name += "'s act ";
+//	request_sched_name += bpMsg.msgId;
+//	scheduler->name( request_sched_name.c_str() );
 
 	VecOfSbmCommand commands;
+	bool has_controllers = false;  // TODO: schedule prune by last synch point  
 	for( VecOfBehaviorRequest::iterator i = request->behaviors.begin(); i != gest_end;  ++i ) {
 		BehaviorRequest* behavior = *i;
 		time_sec startAt = audioOffset + ( behavior->getAudioRelativeStart() );
-		behavior->schedule( mcu, request->agent, scheduler, request->visemes, commands, startAt );
+		behavior->schedule( mcu, request->agent, request->visemes, commands, startAt );
+
+		has_controllers |= behavior->has_cts();
 	}
 
-	//  From scheduled behavior tracks, find the proper blend indt/oudt
-    time_sec indt = 0;
-    time_sec outdt = 0;
-    time_sec tin = 0;
-    time_sec tout = 0;
-    const int numTracks = scheduler->count_children();
-	if( scheduler->begin() != scheduler->end() ) {
-		// TODO: Find proper sub-schedule blend-in-out points
-
-		MeCtScheduler2::track_iterator track_i = request->agent->scheduler_p->schedule( scheduler, mcu->time, (float)indt, (float)outdt );
-	}
+////// OLD CODE: All behaviors lumped into a single schedule
+//
+//	//  From scheduled behavior tracks, find the proper blend indt/oudt
+//    time_sec indt = 0;
+//    time_sec outdt = 0;
+//    time_sec tin = 0;
+    time_sec tout = 0;     // TODO: Calculate the last synch point
+//    const int numTracks = scheduler->count_children();
+//	if( scheduler->begin() != scheduler->end() ) {
+//		// TODO: Find proper sub-schedule blend-in-out points
+//
+//		MeCtScheduler2::track_iterator track_i = request->agent->scheduler_p->schedule( scheduler, mcu->time, (float)indt, (float)outdt );
+//	}
 
 
 	////////////////////////////////////////////////////////////////////
@@ -828,7 +835,7 @@ void BML::Processor::realizeRequest( BmlRequestPtr request, BodyPlannerMsg& bpMs
 	//
 	/////////  End old code
 
-	if( numTracks > 0 ) {
+	if( has_controllers ) {
 		// Schedule a prune command to clear them out later.
 		string command( "char " );
 		command += request->agent->name;
@@ -998,22 +1005,22 @@ int BML::Processor::vrSpoke( BodyPlannerMsg& bpMsg, mcuCBHandle *mcu ) {
 int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 	Processor& bp = mcu->bml_processor;
 
-	const char   *agent_id     = args.read_token();
-	SbmCharacter *agent        = mcu->character_map.lookup( agent_id );
-	if( agent==NULL ) {
-		//  Agent is not managed by this SBM process
+	const char   *character_id     = args.read_token();
+	SbmCharacter *character        = mcu->character_map.lookup( character_id );
+	if( character == NULL ) {
+		//  Character is not managed by this SBM process
 		if( bp.warn_unknown_agents )
-			cerr << "WARNING: BmlProcessor: Unknown agent \"" << agent_id << "\"." << endl;
+			cerr << "WARNING: BmlProcessor: Unknown agent \"" << character_id << "\"." << endl;
 		// Ignore
 		return CMD_SUCCESS;
 	}
 	const char   *recipient_id = args.read_token();
 	const char   *message_id   = args.read_token();
 	const char   *command      = args.read_token();
-	//cout << "DEBUG: vrAgentBML " << agentId << " " << recipientId << " " << messageId << endl;
+	//cout << "DEBUG: vrAgentBML " << character_id << " " << recipientId << " " << messageId << endl;
 
-	if( agent->scheduler_p==NULL ) {
-		vrSpeakFailed( agent_id, recipient_id, message_id, "Uninitialized agent." );
+	if( !character->is_initialized() ) {
+		vrSpeakFailed( character_id, recipient_id, message_id, "Uninitialized SbmCharacter." );
 		return CMD_FAILURE;
 	}
 
@@ -1025,7 +1032,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 		char       *xml          = args.read_remainder_raw();
 
 		if( xml[0]=='\0' ) {
-			vrSpeakFailed( agent_id, recipient_id, message_id, "vrSpeak message incomplete (empty XML argument)." );
+			vrSpeakFailed( character_id, recipient_id, message_id, "vrSpeak message incomplete (empty XML argument)." );
 			return CMD_FAILURE;
 		}
 		if( xml[0] == '"' ) {
@@ -1037,28 +1044,28 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 		try {
 			DOMDocument *xmlDoc = xml_utils::parseMessageXml( bp.xmlParser.get(), xml );
 			if( xmlDoc == NULL ) {
-				vrSpeakFailed( agent_id, recipient_id, message_id, "XML parser returned NULL document." );
+				vrSpeakFailed( character_id, recipient_id, message_id, "XML parser returned NULL document." );
 				return CMD_FAILURE;
 			}
 
-			BodyPlannerMsg bpMsg( agent_id, recipient_id, message_id, agent, xmlDoc );
+			BodyPlannerMsg bpMsg( character_id, recipient_id, message_id, character, xmlDoc );
 			bp.vrSpeak( bpMsg, mcu );
 
 			return( CMD_SUCCESS );
 		} catch( BodyPlannerException& e ) {
 			ostringstream msg;
 			msg << "BodyPlannerException: "<<e.message;
-			vrSpeakFailed( agent_id, recipient_id, message_id, msg.str().c_str() );
+			vrSpeakFailed( character_id, recipient_id, message_id, msg.str().c_str() );
 			return CMD_FAILURE;
 		} catch( const std::exception& e ) {
 			ostringstream msg;
 			msg << "std::exception: "<<e.what();
-			vrSpeakFailed( agent_id, recipient_id, message_id, msg.str().c_str() );
+			vrSpeakFailed( character_id, recipient_id, message_id, msg.str().c_str() );
 			return CMD_FAILURE;
 		//} catch( ... ) {
 		//	ostringstream msg;
 		//	msg << "Unknown exception."<<e.message;
-		//	vrSpeakFailed( agent_id, recipient_id, message_id, msg.str().c_str() );
+		//	vrSpeakFailed( character_id, recipient_id, message_id, msg.str().c_str() );
 		//	return CMD_FAILURE;
 		}
 	} else if( _stricmp( command, "start" )==0 ) {
@@ -1066,7 +1073,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 		return CMD_SUCCESS;
 	} else if( _stricmp( command, "end" )==0 ) {
 		try {
-			return bp.vrSpoke( BodyPlannerMsg( agent_id, recipient_id, message_id, agent, NULL ), mcu );
+			return bp.vrSpoke( BodyPlannerMsg( character_id, recipient_id, message_id, character, NULL ), mcu );
 		} catch( BodyPlannerException& e ) {
 			cerr << "vrSpeak: BodyPlannerException: "<<e.message<<endl;
 			return CMD_FAILURE;
@@ -1083,7 +1090,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 		}
 	} else {
 		cerr << "ERROR: vrAgentBML: Unknown subcommand \"" << command << "\" in message:\n\t"
-		     << "vrAgentBML " << agent_id << " " << recipient_id << " " << message_id << " " << command << " " << args.read_remainder_raw() << endl;
+		     << "vrAgentBML " << character_id << " " << recipient_id << " " << message_id << " " << command << " " << args.read_remainder_raw() << endl;
 		return CMD_FAILURE;
 	}
 }
@@ -1130,7 +1137,7 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 			return CMD_SUCCESS;
 		}
 
-		if( agent->scheduler_p==NULL ) {
+		if( !agent->is_initialized() ) {
 			vrSpeakFailed( agent_id, recipient_id, message_id, "Uninitialized agent." );
 			return CMD_FAILURE;
 		}

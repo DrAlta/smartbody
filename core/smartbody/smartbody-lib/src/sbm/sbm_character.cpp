@@ -56,29 +56,32 @@ mcuCBHandle* mcuCBHandle::_singleton = NULL;
 /////////////////////////////////////////////////////////////
 //  Method Definitions
 
+MeCtSchedulerClass* CreateSchedulerCt( const char* character_name, const char* sched_type_name ) {
+	MeCtSchedulerClass* sched_p = new MeCtSchedulerClass();
+	sched_p->ref();
+	sched_p->active_when_empty( true );
+	string sched_name( character_name );
+	sched_name += "'s ";
+	sched_name += sched_type_name;
+	sched_name += " schedule";
+	sched_p->name( sched_name.c_str() );
+
+	return sched_p;
+}
+
 //  Constructor
-SbmCharacter::SbmCharacter( const char* char_name )
-:	SbmPawn( char_name ),
+SbmCharacter::SbmCharacter( const char* character_name )
+:	SbmPawn( character_name ),
 	speech_impl( NULL ),
-	scheduler_p( new MeCtScheduler2() ),
-	posture_sched_p( new MeCtScheduler2() ),
+	posture_sched_p( CreateSchedulerCt( character_name, "posture" ) ),
+	motion_sched_p( CreateSchedulerCt( character_name, "motion" ) ),
+	gaze_sched_p( CreateSchedulerCt( character_name, "gaze" ) ),
+	head_sched_p( CreateSchedulerCt( character_name, "head" ) ),
 	face_ct( new MeCtFace() ),
 	face_neutral( NULL )
 {
-	scheduler_p->ref();
-	scheduler_p->active_when_empty( true );
-	string sched_name( char_name );
-	sched_name += "'s root schedule";
-	scheduler_p->name( sched_name.c_str() );
-
-	posture_sched_p->ref();
-	posture_sched_p->active_when_empty( true );
-	string posture_sched_name( char_name );
-	posture_sched_name += "'s posture schedule";
-	posture_sched_p->name( posture_sched_name.c_str() );
-
 	face_ct->ref();
-	string face_ct_name( char_name );
+	string face_ct_name( character_name );
 	face_ct_name += "'s face_ct";
 	face_ct->name( face_ct_name.c_str() );
 
@@ -88,7 +91,9 @@ SbmCharacter::SbmCharacter( const char* char_name )
 //  Destructor
 SbmCharacter::~SbmCharacter( void )	{
 	posture_sched_p->unref();
-	scheduler_p->unref();
+	motion_sched_p->unref();
+	gaze_sched_p->unref();
+	head_sched_p->unref();
 	face_ct->unref();
 
     if ( bonebusCharacter )
@@ -126,26 +131,20 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		this->face_neutral      = NULL;
 	}
 
-
-	scheduler_p->init();
 	posture_sched_p->init();
+	motion_sched_p->init();
+	gaze_sched_p->init();
+	head_sched_p->init();
 
-	// Add Schedule Controller to the Controller Pipeline
-	pipeline_p->add_controller( scheduler_p );
+	// Add Prioritized Schedule Controllers to the Controller Pipeline
+	pipeline_p->add_controller( posture_sched_p );
+	pipeline_p->add_controller( motion_sched_p );
+	pipeline_p->add_controller( gaze_sched_p );
+	pipeline_p->add_controller( head_sched_p );
 	pipeline_p->name( std::string(name)+"'s pipeline" );
-
-	//// Schedule Posture Track
-	//MeCtBlend* blendingCt = new MeCtBlend( posture_sched_p );
-	//blendingCt->blend_curve().make_smooth( 0, 1, 0, 0, 0 );  // Always 100%
-	//scheduler_p->create_track( scheduler_p->begin(), blendingCt, NULL, posture_sched_p );  // first track, no time shifting
-
-	// Schedule Posture Track: no blending (always 100%), no time-shifting
-	scheduler_p->create_track( scheduler_p->begin(), NULL, NULL, posture_sched_p );
-
 
 	// Face controller
 	if( face_neutral ) {
-
 		pipeline_p->add_controller( face_ct );
 	}
 
@@ -460,8 +459,11 @@ int SbmCharacter::prune_controller_tree() {
 	MeCtMotion*    motion_ct = NULL;
 	MeCtPose*      pose_ct   = NULL;
 
-	// Traverse the controller tree from most recent to earliest
-	prune_schedule( scheduler_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
+	// Traverse the controller tree from highest priority down, most recent to earliest
+	prune_schedule( head_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
+	prune_schedule( gaze_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
+	prune_schedule( motion_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
+	prune_schedule( posture_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
 
 	delete[] gaze_key_cts;
 
@@ -816,29 +818,21 @@ int SbmCharacter::print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	} else if( attribute=="schedule" ) {
 		//  Command: print character <character id> schedule
 		//  Print out the current state of the character's schedule
-		cout << "character " << character_id << "'s schedule:" << endl;
-		character->scheduler_p->print_state( 0 );
+		cout << "Character " << character_id << "'s schedule:" << endl;
+		cout << "POSTURE Schedule:" << endl;
+		character->posture_sched_p->print_state( 0 );
+		cout << "MOTION Schedule:" << endl;
+		character->motion_sched_p->print_state( 0 );
+		cout << "GAZE Schedule:" << endl;
+		character->gaze_sched_p->print_state( 0 );
+		cout << "HEAD Schedule:" << endl;
+		character->head_sched_p->print_state( 0 );
+		// Print Face?
+
 		return CMD_SUCCESS;
 	} else {
 		return SbmPawn::print_attribute( character, attribute, args, mcu_p );
 	}
-}
-
-
-//  Command and function deprecated 2006June25
-int print_character_schedule_cmd( srArgBuffer& args, mcuCBHandle *mcu_p ) {
-	// Find the SbmCharacter
-    char* actorId = args.read_token();
-	SbmCharacter* character = mcu_p->character_map.lookup( actorId );
-	if( character ) {
-		printf( "WARNING: Command deprecated. Use: \"print character <character id> schedule\"\n" );
-        printf( "Printing actor \"%s\" schedule:\n", actorId );
-		character->scheduler_p->print_state( 0 );
-	} else {
-		printf( "ERROR: print_character_schedule_cmd(..): Character \"%s\" not found.\n", actorId );
-	}
-
-	return CMD_SUCCESS;  // Even if it errors, don't invoke a second error message
 }
 
 

@@ -75,6 +75,9 @@ public:
 	virtual ~SbmPawn();
 
 	virtual int init( SkSkeleton* skeleton_p );
+
+	bool is_initialized();
+
 	virtual int prune_controller_tree();  // removes unused or overwritten controllers
 	virtual void remove_from_scene();
 

@@ -201,6 +201,10 @@ void SbmPawn::init_world_offset_channels() {
 	}
 }
 
+bool SbmPawn::is_initialized() {
+	return skeleton_p != NULL;
+}
+
 int SbmPawn::prune_controller_tree() {
 	// Unimplemented...
 	//  TODO: walk the controller pipeline for excessive world offset raw writers
