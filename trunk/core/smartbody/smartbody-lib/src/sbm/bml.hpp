@@ -248,10 +248,9 @@ namespace BML {
 		 *   Simplified behavior scheduling method, only offers start time (assumes default duration
 		 *   params:
 		 *     SbmCharacter* actor: access to character state
-		 *     MeCtSchedulerClass* scheduler: new schedule for BML request
 		 *     float startAt: time to start behavior
 		 */
-		virtual void schedule( const mcuCBHandle* mcu, const SbmCharacter* actor, MeCtSchedulerClass* scheduler,
+		virtual void schedule( const mcuCBHandle* mcu, const SbmCharacter* actor,
 			                   VecOfVisemeData& visemes,
 		                       VecOfSbmCommand& commands,
                                time_sec startAt );
@@ -260,18 +259,23 @@ namespace BML {
 		 *   Behavior scheduling method, only offers start time
 		 *   params:
 		 *     SbmCharacter* actor: access to character state
-		 *     MeCtSchedulerClass* scheduler: new schedule for BML request
 		 *     float startAt/readyAt/strokeAt/relaxAt/endAt: behavior transition times
 		 */
-        virtual void schedule( const mcuCBHandle* mcu, const SbmCharacter* actor, MeCtSchedulerClass* scheduler,
+        virtual void schedule( const mcuCBHandle* mcu, const SbmCharacter* actor,
 			                   VecOfVisemeData& visemes,
 		                       VecOfSbmCommand& commands,
                                time_sec startAt, time_sec readyAt, time_sec strokeAt, time_sec relaxAt, time_sec endAt ) = 0;
+
+		/**
+		 *  returns true is behaviors involves controllers
+		 *  Temporary transition in pruning algorithm
+		 */
+		virtual bool has_cts() { return false; }
 	};
 
 	class MeControllerRequest : public BehaviorRequest {
 	public: ///// Constants
-		enum TrackType { UTTERANCE, POSTURE } ;
+		enum TrackType { POSTURE, MOTION, GAZE, HEAD } ;
 	protected: // Data
 		TrackType     trackType;
 		MeController *controller;
@@ -281,15 +285,21 @@ namespace BML {
 			                 const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end );
 		virtual ~MeControllerRequest();
 
-        virtual void schedule( const mcuCBHandle* mcu, const SbmCharacter* actor, MeCtSchedulerClass* scheduler,
+        virtual void schedule( const mcuCBHandle* mcu, const SbmCharacter* actor,
 		                       VecOfVisemeData& visemes,
 							   VecOfSbmCommand& commands,
                                time_sec startAt, time_sec readyAt, time_sec strokeAt, time_sec relaxAt, time_sec endAt );
+
+		/**
+		 *  returns true is behaviors involves controllers
+		 *  Temporary transition in pruning algorithm
+		 */
+		virtual bool has_cts() { return true; }
 	};
 
 	class MotionRequest : public MeControllerRequest {
 	public:
-		MotionRequest( MeCtMotion* motion,
+		MotionRequest( TrackType trackType, MeCtMotion* motion,
 			           const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end );
 	};
 
@@ -346,7 +356,7 @@ namespace BML {
 
         void setVisemeName( const char* viseme );
 
-		void schedule( const mcuCBHandle* mcu, const SbmCharacter* actor, MeCtSchedulerClass* scheduler,
+		void schedule( const mcuCBHandle* mcu, const SbmCharacter* actor,
 		               VecOfVisemeData& visemes,
 		               VecOfSbmCommand& commands,
 			           double startAt, double readyAt, double strokeAt, double relaxAt, double endAt );
@@ -360,7 +370,7 @@ namespace BML {
 		EventRequest( const char* message,
 			          const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end);
 	
-		void schedule( const mcuCBHandle* mcu, const SbmCharacter* actor, MeCtSchedulerClass* scheduler,
+		void schedule( const mcuCBHandle* mcu, const SbmCharacter* actor,
 		               VecOfVisemeData& visemes,
 		               VecOfSbmCommand& commands,
 			           double startAt, double readyAt, double strokeAt, double relaxAt, double endAt );
@@ -373,7 +383,7 @@ namespace BML {
 		const XMLCh*      id;
 
 	public:
-		// Overrides (but equivalent to) BehaviorRequest fields  (Needed early reference)
+		// Equivalent to BehaviorRequest fields
 		TriggerEventPtr   trigger;
 		SynchPointPtr     start;
 		SynchPointPtr     ready;

@@ -61,5 +61,13 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu );
 int test_fml_func( srArgBuffer& args, mcuCBHandle *mcu );
 
 
+/**
+ *  This function is used to test the face, but can be used to test 
+ *  any joints with position parameterizion, to use at the SBM command
+ *  line put:
+ *    test bone_pos <joint name> <x pos> <y pos> <z pos>
+ */
+int test_bone_pos_func( srArgBuffer& args, mcuCBHandle* mcu_p );
+
 
 #endif // SBM_TEST_CMDS_HPP

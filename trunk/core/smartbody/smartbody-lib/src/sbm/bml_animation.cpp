@@ -70,7 +70,7 @@ BehaviorRequest* BML::parse_bml_animation( DOMElement* elem, SynchPoints& tms, B
 			}
 			delete [] speedStr;
 
-			return new MotionRequest( motionCt, tms.start, tms.ready, tms.stroke, tms.relax, tms.end );
+			return new MotionRequest( MeControllerRequest::MOTION, motionCt, tms.start, tms.ready, tms.stroke, tms.relax, tms.end );
 		} else {
 			// TODO: exception?
 			wcerr<<"WARNING: BodyPlannerImpl::parseBML(): <animation>: name=\""<<animName<<"\" not loaded; ignoring <animation>."<<endl;

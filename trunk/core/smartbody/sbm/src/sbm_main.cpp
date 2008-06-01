@@ -290,16 +290,15 @@ void mcu_register_callbacks( void ) {
 	mcu.insert_set_cmd( "joint_logger",   joint_logger::set_func );
 	mcu.insert_set_cmd( "J_L",            joint_logger::set_func );  // shorthand
 	mcu.insert_set_cmd( "test",           sbm_set_test_func );
-	mcu.insert( "test_face",              test_face_func);
 
 	mcu.insert_print_cmd( "bp",           BML_PROCESSOR::print_func );
 	mcu.insert_print_cmd( "pawn",         SbmPawn::print_cmd_func );
 	mcu.insert_print_cmd( "character",    SbmCharacter::print_cmd_func );
 	mcu.insert_print_cmd( "char",         SbmCharacter::print_cmd_func );
-	mcu.insert_print_cmd( "schedule",     print_character_schedule_cmd );
-	mcu.insert_print_cmd( "joint_logger", joint_logger::print_func );
 	mcu.insert_print_cmd( "face",         mcu_print_face_func );
+	mcu.insert_print_cmd( "joint_logger", joint_logger::print_func );
 	mcu.insert_print_cmd( "J_L",          joint_logger::print_func );  // shorthand
+	mcu.insert_print_cmd( "mcu",          mcu_divulge_content_func );
 	mcu.insert_print_cmd( "test",         sbm_print_test_func );
 
 	mcu.insert_test_cmd( "args", test_args_func );
@@ -307,6 +306,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert_test_cmd( "fml",  test_fml_func );
 	mcu.insert_test_cmd( "rhet", remote_speech_test);
 	mcu.insert_test_cmd( "initAudio", init_audio_func);
+	mcu.insert_test_cmd( "bone_pos", test_bone_pos_func );
 	
 
 	mcu.insert( "net",	mcu_net_func );

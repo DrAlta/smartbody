@@ -685,3 +685,40 @@ int test_fml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 		return CMD_FAILURE;
 	}
 }
+
+
+int test_bone_pos_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
+	string& character_id = mcu_p->test_character_default;
+	if( character_id.empty() ) {
+		cerr << "ERROR: No test character defined" << endl;
+		return CMD_FAILURE;
+	}
+
+	SbmCharacter* character = mcu_p->character_map.lookup( character_id.c_str() );
+	if( character == NULL ) {
+		cerr << "ERROR: Unknown test character \"" << character_id << "\"" << endl;
+		return CMD_FAILURE;
+	}
+
+	int err=0;
+	SkChannelArray _channels;
+	if ( err == 0 ){
+		char* channel_id = args.read_token();
+		_channels.add( channel_id, SkChannel::YPos );
+		_channels.add( channel_id, SkChannel::XPos);
+		_channels.add( channel_id, SkChannel::ZPos);
+	}
+
+	
+	MeCtRawWriter* boneWriter= new MeCtRawWriter();
+	boneWriter->init(_channels, true);
+	//quat_t q = euler_t(50,50,50);
+	float data[3] = { (float)args.read_double(), (float)args.read_double(), (float)args.read_double() };
+	//cout<<endl<<"here's the data "<<endl<<data[0]<<" "<<data[1]<<" "<<data[2]<<endl;
+	boneWriter->set_data( data );
+
+	MeCtScheduler2::track_iterator end = character->posture_sched_p->end();
+	character->posture_sched_p->create_track( end, 0, 0, boneWriter );
+
+	return (CMD_SUCCESS);
+}

@@ -956,7 +956,7 @@ time_sec BehaviorRequest::calcAudioRelativeStart() {
 */
 }
 
-void BehaviorRequest::schedule( const mcuCBHandle* mcu, const SbmCharacter* actor, MeCtSchedulerClass* scheduler,
+void BehaviorRequest::schedule( const mcuCBHandle* mcu, const SbmCharacter* actor,
                                VecOfVisemeData& visemes,
                                VecOfSbmCommand& commands,
 							   time_sec startAt ) {
@@ -965,7 +965,7 @@ void BehaviorRequest::schedule( const mcuCBHandle* mcu, const SbmCharacter* acto
     time_sec strokeAt = startAt + (strokeTime-startTime)*speed;
     time_sec relaxAt = startAt + (relaxTime-startTime)*speed;
     time_sec endAt = startAt + (endTime-startTime)*speed;
-	schedule( mcu, actor, scheduler, visemes, commands, startAt, readyAt, strokeAt, relaxAt, endAt );
+	schedule( mcu, actor, visemes, commands, startAt, readyAt, strokeAt, relaxAt, endAt );
 }
 
 
@@ -992,32 +992,36 @@ MeControllerRequest::~MeControllerRequest() {
 	controller->unref();
 }
 
-void MeControllerRequest::schedule( const mcuCBHandle* mcu, const SbmCharacter* actor, MeCtSchedulerClass* scheduler,
+void MeControllerRequest::schedule( const mcuCBHandle* mcu, const SbmCharacter* character,
                                     VecOfVisemeData& visemes,
                                     VecOfSbmCommand& commands,
 								    time_sec startAt, time_sec readyAt, time_sec strokeAt, time_sec relaxAt, time_sec endAt ) {
 	if(LOG_METHODS) cout << "MeControllerRequest::schedule( startAt="<<startAt<<",  readyAt="<<readyAt<<",  strokeAt="<<strokeAt<<",  relaxAt="<<relaxAt<<",  endAt="<<endAt<<" )"<<endl;
 
+    //  Controllers are relative to the start of execution
+    double time = mcu->time;
+	startAt  += time;
+    readyAt  += time;
+    strokeAt += time;
+    relaxAt  += time;
+    endAt    += time;
+
+	MeCtSchedulerClass* scheduler = NULL;
 	switch( trackType ) {
-        case UTTERANCE: {
-			// input args designed for this case
+        case POSTURE:
+			scheduler = character->posture_sched_p;
 			break;
-        }
-        case POSTURE: {
-			// select posture track and adjust times accordingly
-			scheduler = actor->posture_sched_p;
-            //  Posture commands are relative to the start of execution
-            double time = mcu->time;
-			startAt  += time;
-            readyAt  += time;
-            strokeAt += time;
-            relaxAt  += time;
-            endAt    += time;
+        case MOTION:
+			scheduler = character->motion_sched_p;
 			break;
-        }
-		default: {
+        case GAZE:
+			scheduler = character->gaze_sched_p;
+			break;
+        case HEAD:
+			scheduler = character->head_sched_p;
+			break;
+		default:
 			throw BML::Processor::BodyPlannerException( "MeControllerRequest::schedule(..): Invalid trackType" );
-		}
 	}
 
 	time_sec indt  = readyAt-startAt;
@@ -1036,9 +1040,9 @@ void MeControllerRequest::schedule( const mcuCBHandle* mcu, const SbmCharacter* 
 
 
 //  MotionRequest
-MotionRequest::MotionRequest( MeCtMotion* motion,
+MotionRequest::MotionRequest( TrackType track_type, MeCtMotion* motion,
 						      const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end )
-  : MeControllerRequest( MeControllerRequest::UTTERANCE, motion,
+  : MeControllerRequest( track_type, motion,
                          start, ready, stroke, relax, end )
 {
     readyTime  = motion->indt();
@@ -1050,7 +1054,7 @@ MotionRequest::MotionRequest( MeCtMotion* motion,
 //  NodRequest
 NodRequest::NodRequest( NodType type, float repeats, float frequency, float extent, const SbmCharacter* actor,
 			            const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end )
-  : MeControllerRequest( MeControllerRequest::UTTERANCE, new MeCtSimpleNod(),
+  : MeControllerRequest( MeControllerRequest::HEAD, new MeCtSimpleNod(),
                          start, ready, stroke, relax, end ),
     type(type), repeats(repeats), frequency(frequency), extent(extent)
 {
@@ -1096,7 +1100,7 @@ NodRequest::NodRequest( NodType type, float repeats, float frequency, float exte
 //  TiltRequest
 TiltRequest::TiltRequest( MeCtSimpleTilt* tilt, time_sec transitionDuration,
 						  const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end )
-  : MeControllerRequest( MeControllerRequest::UTTERANCE, tilt, start, ready, stroke, relax, end ),
+  : MeControllerRequest( MeControllerRequest::HEAD, tilt, start, ready, stroke, relax, end ),
     duration(numeric_limits<time_sec>::infinity())/*hack*/, transitionDuration(transitionDuration)
 {
     readyTime = strokeTime = transitionDuration;
@@ -1138,7 +1142,7 @@ void VisemeRequest::setVisemeName( const char* viseme ) {
     this->viseme = viseme;
 }
 
-void VisemeRequest::schedule( const mcuCBHandle* mcu, const SbmCharacter* actor, MeCtSchedulerClass* scheduler,
+void VisemeRequest::schedule( const mcuCBHandle* mcu, const SbmCharacter* actor,
                               VecOfVisemeData& visemes,
                               VecOfSbmCommand& commands,
 							  double startAt, double readyAt, double strokeAt, double relaxAt, double endAt )
@@ -1168,7 +1172,7 @@ EventRequest::EventRequest( const char* message,
 	message( message )
 {}
 
-void EventRequest::schedule( const mcuCBHandle* mcu, const SbmCharacter* actor, MeCtSchedulerClass* scheduler,
+void EventRequest::schedule( const mcuCBHandle* mcu, const SbmCharacter* actor,
                              VecOfVisemeData& visemes,
                              VecOfSbmCommand& commands,
 							 double startAt, double readyAt, double strokeAt, double relaxAt, double endAt )

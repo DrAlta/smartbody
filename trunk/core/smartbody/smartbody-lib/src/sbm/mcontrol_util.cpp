@@ -526,8 +526,14 @@ MeController* mcuCBHandle::lookup_ctrl( const string& ctrl_name, const char* pri
 		}
 		const string ctrl_subname( ctrl_name, index );
 
-		if( ctrl_subname == "schedule" ) {
-			ctrl_p = char_p->scheduler_p;
+		if( ctrl_subname == "posture_sched" ) {
+			ctrl_p = char_p->posture_sched_p;
+		} else if( ctrl_subname == "motion_sched" ) {
+			ctrl_p = char_p->motion_sched_p;
+		} else if( ctrl_subname == "gaze_sched" ) {
+			ctrl_p = char_p->gaze_sched_p;
+		} else if( ctrl_subname == "head_sched" ) {
+			ctrl_p = char_p->head_sched_p;
 		} else {
 			// TODO: Character specific hash map?
 
@@ -1095,8 +1101,8 @@ int begin_controller(
 	if( char_p )	{
 		MeController *ctrl_p = mcu_p->controller_map.lookup( ctrl_name );
 		if( ctrl_p )	{
-
-			char_p->scheduler_p->schedule( 
+			//char_p->scheduler_p->schedule( 
+			char_p->motion_sched_p->schedule( // Regardless of type, controllers created via ctrl commands are treated as motions
 				ctrl_p, 
 				mcu_p->time, 
 				ctrl_p->indt(), 
@@ -1123,7 +1129,8 @@ int begin_controller(
 	if( char_p )	{
 		MeController *ctrl_p = mcu_p->controller_map.lookup( ctrl_name );
 		if( ctrl_p )	{
-			char_p->scheduler_p->schedule( 
+			//char_p->scheduler_p->schedule( 
+			char_p->motion_sched_p->schedule( // Regardless of type, controllers created via ctrl commands are treated as motions
 				ctrl_p, 
 				mcu_p->time, 
 				ease_in, 
@@ -1875,7 +1882,7 @@ int init_lilt_controller(
 		printf( "init_lilt_controller ERR: SbmCharacter '%s' NOT FOUND\n", char_name );
 		return( CMD_FAILURE );
 	}
-	if ( !char_p->scheduler_p ) {
+	if ( !char_p->motion_sched_p ) {
 		printf( "init_lilt_controller ERR: SbmCharacter '%s' UNINITIALIZED\n", char_name );
 		return( CMD_FAILURE );
 	}
@@ -2898,33 +2905,6 @@ int mcu_vrAllCall_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 }
 
 
-/*This function is used to test the face, can be used to test 
-any joints with position parameterizion, to use at the SBM command
-line put >test_face <joint name> <x pos> <y pos> <z pos>*/
-
-int test_face_func(srArgBuffer& args, mcuCBHandle* mcu_p)
-{
-	int err=0;
-	//SkSkeleton* skeleton_p;
-	SkChannelArray _channels;
-		if ( err == 0 ){
-			char* hello= args.read_token();
-			_channels.add( hello, SkChannel::YPos );
-			_channels.add(hello, SkChannel::XPos);
-			_channels.add(hello, SkChannel::ZPos);
-		}
-	//}
-
-	
-	MeCtRawWriter* faceWriter= new MeCtRawWriter();
-	faceWriter->init(_channels, true);
-	//quat_t q = euler_t(50,50,50);
-	float data[3] = { (float)args.read_double(), (float)args.read_double(), (float)args.read_double() };
-	//cout<<endl<<"here's the data "<<endl<<data[0]<<" "<<data[1]<<" "<<data[2]<<endl;
-	faceWriter->set_data( data );
-	mcu_p->character_map.lookup("doctor")->scheduler_p->create_track(mcu_p->character_map.lookup("doctor")->scheduler_p->end(),0,0,faceWriter);
-	return (CMD_SUCCESS);
-}
 
 /////////////////////////////////////////////////////////////
 

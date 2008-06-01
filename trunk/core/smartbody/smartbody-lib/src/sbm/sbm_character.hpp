@@ -114,8 +114,14 @@ public:
 	 */
 	const std::string& get_voice_code() const; //returns voice if exists or NULL if not
 
-	MeCtSchedulerClass*	scheduler_p;
-	MeCtSchedulerClass*	posture_sched_p;
+	// Prioritized Schedules for behaviors (known as "blocking" in manual animation)
+	// TODO: Rename by body part, rather than controller type
+	MeCtSchedulerClass*	posture_sched_p; // legs / stance / posture
+	MeCtSchedulerClass*	motion_sched_p;  // full body motions
+	MeCtSchedulerClass*	gaze_sched_p;    // back / chest / spine
+	// TODO: Arms
+	// TODO: Hands
+	MeCtSchedulerClass*	head_sched_p; // neck / head orientation
 
 	BoneBusCharacter * bonebusCharacter;
 	
@@ -178,9 +184,6 @@ protected:
 	 */
 	void add_face_channel( const std::string& name, const int wo_index );
 };
-
-//  Command and function deprecated 2006June25
-int print_character_schedule_cmd( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 /////////////////////////////////////////////////////////////
 #endif // SBM_CHARACTER_HPP
