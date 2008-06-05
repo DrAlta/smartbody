@@ -341,6 +341,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\sbm\me_ct_quick_draw.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\me_ct_quick_draw.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\me\me_ct_raw_writer.cpp"
 					>
 				</File>

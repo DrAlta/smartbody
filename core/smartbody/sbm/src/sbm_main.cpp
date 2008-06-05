@@ -413,6 +413,7 @@ int main( int argc, char **argv )	{
 	mcu_register_callbacks();
 
 	mcu.desired_max_fps = 100.0;
+//	mcu.desired_max_fps = 10.0;
 
 	// EDF - taken from tre_main.cpp, a fancier command line parser can be put here if desired.
 	//	check	command line parameters:
@@ -627,7 +628,6 @@ int main( int argc, char **argv )	{
 		}
 
 		mcu.theWSP->broadcast_update();
-
 		mcu.update();
 		mcu.render();
 	}
