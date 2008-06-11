@@ -18,7 +18,7 @@ set SBM_PATH=..\core\smartbody\sbm\bin
 set SBM_EXE=sbm-fltkd.exe
 set SBM_DATA=..\..\..\..\data\sbm-testdata
 set SBM_SEQ=demo-aamas2008-init.seq
-set SBM_ARGS=-seqpath %SBM_DATA% -seq %SBM_SEQ% SBM_ARGS=-host=localhost -audio -fps=60
+set SBM_ARGS=-seqpath %SBM_DATA% -seq %SBM_SEQ% -host=localhost -audio -fps=60
 
 pushd %SBM_PATH%
 echo %SBM_EXE% %SBM_ARGS%
