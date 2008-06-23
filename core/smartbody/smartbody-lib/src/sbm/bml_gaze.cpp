@@ -288,7 +288,7 @@ bool BML::Gaze::parse_children( DOMElement* elem, Gaze::KeyData* key_data[] ) {
 				if( key_data[key] == NULL ) {
 					key_data[key] = new Gaze::KeyData();
 				} else {
-					wcerr << "WARNING: BML::Gaze::parse_descriptions_elements(..): Gaze joint element \""<<child_tag<<"\" overwriting existing KeyData." << endl;
+					wcerr << "WARNING: BML::Gaze::parse_children(..): Gaze joint element \""<<child_tag<<"\" overwriting existing KeyData." << endl;
 				}
 
 				parse_gaze_key_element( child, key_data[key] );
@@ -318,7 +318,7 @@ bool BML::Gaze::parse_children( DOMElement* elem, Gaze::KeyData* key_data[] ) {
 				if( key_data[key] == NULL ) {
 					key_data[key] = new Gaze::KeyData();
 				} else {
-					wcerr << "WARNING: BML::Gaze::parse_descriptions_elements(..): Gaze description \""<<child_tag<<"\" overwriting existing KeyData." << endl;
+					wcerr << "WARNING: BML::Gaze::parse_children(..): Gaze description \""<<child_tag<<"\" overwriting existing KeyData." << endl;
 				}
 
 				parse_gaze_key_element( child, key_data[key] );
@@ -342,7 +342,7 @@ BehaviorRequest* BML::parse_bml_gaze( DOMElement* elem, SynchPoints& tms, BmlReq
 
 	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
 	if( !attrTarget || !XMLString::stringLen( attrTarget ) ) {
-        wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag missing "<<ATTR_TARGET<<"= attribute." << endl;
+        wcerr << "WARNING: BML::parse_bml_gaze(): <"<<tag<<"> BML tag missing "<<ATTR_TARGET<<"= attribute." << endl;
 		return NULL;
     }
 
@@ -592,7 +592,7 @@ BehaviorRequest* BML::parse_bml_gaze( DOMElement* elem, SynchPoints& tms, BmlReq
 	const XMLCh* attrRoll = elem->getAttribute( ATTR_SBM_ROLL );
 	if( attrRoll && XMLString::stringLen(attrRoll)>0 ) {
 		if( !( wistringstream( attrRoll ) >> roll ) ) {
-			wcerr << "WARNING: BodyPlannerImpl::parseBML(): Expected float for "<<ATTR_SBM_ROLL<<" attribute \"" << attrRoll << "\"." << endl;
+			wcerr << "WARNING: BML::parse_bml_gaze(): Expected float for "<<ATTR_SBM_ROLL<<" attribute \"" << attrRoll << "\"." << endl;
 		}
 	}
 
@@ -607,17 +607,17 @@ BehaviorRequest* BML::parse_bml_gaze( DOMElement* elem, SynchPoints& tms, BmlReq
 			const XMLCh* attrAngle = elem->getAttribute( ATTR_ANGLE );
 			if( attrAngle && XMLString::stringLen(attrAngle)>0 ) {
 				if( !( wistringstream( attrAngle ) >> angle ) ) {
-					wcerr << "WARNING: BodyPlannerImpl::parseBML(): Expected float for angle attribute \"" << attrAngle << "\"." << endl;
+					wcerr << "WARNING: BML::parse_bml_gaze(): Expected float for angle attribute \"" << attrAngle << "\"." << endl;
 				}
 			} else {
-				cerr << "WARNING: BodyPlannerImpl::parseBML(): Found direction attribute, but no angle attribute.  Assuming angle " << angle << "\"." << endl;
+				cerr << "WARNING: BML::parse_bml_gaze(): Found direction attribute, but no angle attribute.  Assuming angle " << angle << "\"." << endl;
 			}
 
 			float dir_angle;
 			bool parse_gaze_direction = true;  // future function name and success value
 			if( token.compare( 0, XMLString::stringLen(DIR_POLAR), DIR_POLAR )==0 ) {
 				if( !( dir_in >> dir_angle ) ) {
-					wcerr << "WARNING: BodyPlannerImpl::parseBML(): Expected float for \"POLAR direction attribute \"" << attrAngle << "\"." << endl;
+					wcerr << "WARNING: BML::parse_bml_gaze(): Expected float for \"POLAR direction attribute \"" << attrAngle << "\"." << endl;
 				}
 			} else if( token==DIR_UP ) {
 				dir_angle = 0;
@@ -636,7 +636,7 @@ BehaviorRequest* BML::parse_bml_gaze( DOMElement* elem, SynchPoints& tms, BmlReq
 			} else if( token==DIR_UPLEFT ) {
 				dir_angle = 315;
 			} else {
-				wcerr << "WARNING: BodyPlannerImpl::parseBML(): Unrecognized gaze direction \""<<attrDirection<<"\".  Direction ignored."<< endl;
+				wcerr << "WARNING: BML::parse_bml_gaze(): Unrecognized gaze direction \""<<attrDirection<<"\".  Direction ignored."<< endl;
 				parse_gaze_direction = false;
 			}
 
@@ -644,7 +644,7 @@ BehaviorRequest* BML::parse_bml_gaze( DOMElement* elem, SynchPoints& tms, BmlReq
 				gaze_ct->set_offset_polar( dir_angle, angle, roll );
 			}
 		} else {
-			wcerr << "WARNING: BodyPlannerImpl::parseBML(): Failed to parse direction attribute " << attrDirection << "\"." << endl;
+			wcerr << "WARNING: BML::parse_bml_gaze(): Failed to parse direction attribute " << attrDirection << "\"." << endl;
 		}
 	} else if( roll != 0 ) {
 		gaze_ct->set_offset_polar( 0, 0, roll );
