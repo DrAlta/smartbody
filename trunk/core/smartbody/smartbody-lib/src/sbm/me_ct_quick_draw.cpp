@@ -26,7 +26,7 @@
 
 //////////////////////////////////////////////////////////////////////////////////
 
-const char* MeCtQuickDraw::type_name = "StepTurn";
+const char* MeCtQuickDraw::type_name = "QuickDraw";
 
 MeCtQuickDraw::MeCtQuickDraw( void )	{
 
@@ -129,6 +129,12 @@ void MeCtQuickDraw::init( SkMotion* mot_p ) {
 		_context->child_channels_updated( this );
 	}
 }
+
+void MeCtQuickDraw::set_target_joint( float x, float y, float z, SkJoint* ref_joint_p ) {
+	// TODO (added by Andrew)
+	printf( "WARNING: MeCtQuickDraw::set_target_joint(..) not implemented.\n" );
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////
 

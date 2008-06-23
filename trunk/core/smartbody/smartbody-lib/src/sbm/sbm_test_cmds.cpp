@@ -573,7 +573,7 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 			<< "\t</bml>\n"
 			<< "</act>";
 		return send_vrX( "vrSpeak", char_id, recip_id, seq_id, echo, send, bml.str() );
-	} else if( arg=="interrupt") { // posture <posture name>
+	} else if( arg=="interrupt") {
 		string act = args.read_token();
 		if( act.length()==0 ) {
 			cerr << "ERROR: test bml " << arg << ": Missing BML performance id." << endl;
@@ -587,6 +587,41 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 			<< "\t\t<sbm:interrupt act=\"" << act << "\"/>\n"
 			<< "\t</bml>\n"
 			<< "</act>";
+		return send_vrX( "vrSpeak", char_id, recip_id, seq_id, echo, send, bml.str() );
+	} else if( arg=="qdraw" || arg=="quickdraw" ) {  // Shhh! Its a secret!
+		string target = args.read_token();
+		if( target.length()==0 ) {
+			cerr << "ERROR: test bml " << arg << ": Missing target id." << endl;
+			return CMD_FAILURE;
+		}
+
+
+		string roll;
+		string anim;
+		string param = args.read_token();
+		while( !param.empty() ) {
+			// TODO: case insensitive comparison
+			if( param == "roll" ) {
+				roll = args.read_token();
+			} else if( param == "anim" || param == "aniation" ) {
+				anim = args.read_token();
+			}
+			param = args.read_token();
+		}
+
+		ostringstream bml;
+		bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			<< "<act>\n"
+			<< "\t<bml>\n"
+			<< "\t\t<sbm:quickdraw target=\"" << target << "\"";
+		if( !roll.empty() )
+			bml << " roll=\"" << roll << "\"";
+		if( !anim.empty() )
+			bml << " anim=\"" << anim << "\"";
+		bml << "/>\n"
+			<< "\t</bml>\n"
+			<< "</act>";
+
 		return send_vrX( "vrSpeak", char_id, recip_id, seq_id, echo, send, bml.str() );
 	} else {
 		cerr << "ERROR: test bml: Unrecognized \"test bml\" subscommand \""<<arg<<"\"."<< endl;
