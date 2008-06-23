@@ -40,6 +40,7 @@
 #include "bml_animation.hpp"
 #include "bml_face.hpp"
 #include "bml_gaze.hpp"
+#include "bml_quickdraw.hpp"
 
 #include "me_ct_examples.h"
 #include "me_ct_gaze.h"
@@ -374,6 +375,10 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCB
 				request->addBehavior( behavior );
 		} else if( XMLString::compareString( tag, TAG_SBM_EVENT )==0 ) {
 			behavior = parse_bml_event( child, tms, request, mcu );
+			if( behavior != NULL )
+				request->addBehavior( behavior );
+		} else if( XMLString::compareString( tag, TAG_QUICKDRAW )==0 ) {
+			behavior = parse_bml_quickdraw( child, tms, request, mcu );
 			if( behavior != NULL )
 				request->addBehavior( behavior );
 		} else if( XMLString::compareString( tag, TAG_SPEECH )==0 ) {

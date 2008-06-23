@@ -142,6 +142,9 @@ class MeCtQuickDraw : public MeController	{
     		MeController::init() is automatically called. */
 		void init( SkMotion* mot_p );
 
+		// Target API (copied from MeCtGaze)
+		void set_target_joint( float x, float y, float z, SkJoint* ref_joint_p = NULL );
+
 		void set_time( float sec );
 		void set_speed( float dps );
 		

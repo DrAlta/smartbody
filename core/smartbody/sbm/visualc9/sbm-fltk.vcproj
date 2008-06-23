@@ -233,7 +233,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="testdata"
+			Name="default sequences"
 			>
 			<File
 				RelativePath="..\..\..\..\data\sbm-testdata\default-init-face.seq"
@@ -247,6 +247,10 @@
 				RelativePath="..\..\..\..\data\sbm-testdata\default-viewer.seq"
 				>
 			</File>
+			<File
+				RelativePath="..\bin\default.seq"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="doctor"
@@ -256,10 +260,6 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath="..\bin\default.seq"
-			>
-		</File>
 		<File
 			RelativePath="..\src\sbm_main.cpp"
 			>
