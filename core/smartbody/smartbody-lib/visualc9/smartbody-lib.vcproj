@@ -1141,6 +1141,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\sbm\bml_target.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\bml_target.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\sbm\bml_types.hpp"
 					>
 				</File>

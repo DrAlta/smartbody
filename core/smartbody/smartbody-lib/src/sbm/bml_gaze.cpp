@@ -30,6 +30,7 @@
 #include "mcontrol_util.h"
 #include "bml_gaze.hpp"
 #include "me_ct_gaze.h"
+#include "bml_target.hpp"
 #include "xercesc_utils.hpp"
 
 
@@ -49,7 +50,6 @@ const XMLCh DTYPE_SBM[]  = L"ISI.SBM";
 
 
 ////// XML ATTRIBUTES
-const XMLCh ATTR_TARGET[]       = L"target";
 const XMLCh ATTR_ANGLE[]        = L"angle";
 const XMLCh ATTR_DIRECTION[]    = L"direction";
 const XMLCh ATTR_SBM_ROLL[]     = L"sbm:roll";
@@ -125,8 +125,6 @@ namespace BML {
 		void parse_gaze_key_element( DOMElement* elem, Gaze::KeyData* key_data );
 
 		bool parse_children( DOMElement* elem, Gaze::KeyData* key_data[] );
-
-		const SkJoint* parse_target( const XMLCh* tagname, const XMLCh* attrTarget, mcuCBHandle *mcu );
 	};
 };
 
@@ -348,8 +346,8 @@ BehaviorRequest* BML::parse_bml_gaze( DOMElement* elem, SynchPoints& tms, BmlReq
 		return NULL;
     }
 
-	const SkJoint* joint = Gaze::parse_target( tag, attrTarget, mcu );
-	if( joint == NULL ) {  // invalid target (parse_target should have printed something)
+	const SkJoint* joint = parse_target( tag, attrTarget, mcu );
+	if( joint == NULL ) {  // Invalid target.  Assume parse_target(..) printed error.
 		return NULL;
 	}
 
@@ -654,86 +652,3 @@ BehaviorRequest* BML::parse_bml_gaze( DOMElement* elem, SynchPoints& tms, BmlReq
 
 	return new MeControllerRequest( MeControllerRequest::GAZE, gaze_ct, tms.start, tms.ready, tms.stroke, tms.relax, tms.end );
 }
-
-
-
-/**
- *  Parse joint attribute string into a valid SkJoint*.
- *
- *  Eventually this parsing system will need to support events for lookup query delays.
- */
-const SkJoint* BML::Gaze::parse_target( const XMLCh* tagname, const XMLCh* attrTarget, mcuCBHandle *mcu ) {
-	// TODO: If the first non-whitespace character is 0..9.-+, then assume it is a coordinate
-	XMLStringTokenizer tokenizer( attrTarget );
-	switch( tokenizer.countTokens() ) {
-		case 1: {
-			// One token is an object id
-			const char * ascii_object_id = xml_utils::asciiString(tokenizer.nextToken());
-			string object_id = ascii_object_id;
-			delete [] ascii_object_id;
-			string bone_id;
-			SbmPawn* target;
-
-
-			// TODO: Revisit the target syntax.
-			// Currently, we use "object_id:bone_id", but this is probably not sufficient
-			string::size_type colon_index = object_id.find( ':' );
-			if( colon_index == string::npos ) {
-				// Missing ':' object/bone delimiter, so guess...
-				target = mcu->character_map.lookup( object_id.c_str() );
-				if( target ) {
-					// Target is a character, look at eyeball
-					bone_id = "eyeball_left";
-					if( DEBUG_BML_GAZE )
-						cerr << "DEBUG: BodyPlannerImpl::parseBML(): Gaze: Found target character \"" << object_id << "\". Assuming joint \""<<bone_id<<"\"."<< endl;
-				} else {
-					// Target is a pawn, look at world offset
-					target = mcu->pawn_map.lookup( object_id.c_str() );
-					if( target ) {
-						bone_id = SbmPawn::WORLD_OFFSET_JOINT_NAME;
-						if( DEBUG_BML_GAZE )
-							cerr << "DEBUG: BodyPlannerImpl::parseBML(): Gaze: Found target pawn \"" << object_id << "\". Assuming joint \""<<bone_id<<"\"."<< endl;
-					} else {
-						// TODO: Query World State Protocol (requires event delay)
-						cerr << "WARNING: BodyPlannerImpl::parseBML(): Gaze: Unknown target \""<<object_id<<"\". (TODO: Query WSP.) Behavior ignored."<< endl;
-						return NULL;
-					}
-				}
-			} else {
-				// Found ':' object/bone delimiter
-				bone_id = object_id.substr( colon_index+1 );
-				object_id.erase( colon_index );
-				if( DEBUG_BML_GAZE )
-					cout << "DEBUG: BodyPlannerImpl::parseBML(): Gaze:\tobject_id \""<<object_id<<"\",\tbone_id \""<<bone_id<<"\"." <<endl;
-				target = mcu->pawn_map.lookup( object_id.c_str() );
-				if( target==NULL ) {
-					// TODO: Query WSP
-					cerr << "WARNING: BodyPlannerImpl::parseBML(): Gaze: Unknown object id \""<<object_id<<"\". (TODO: Query WSP.) Behavior ignored."<< endl;
-					return NULL;
-				}
-			}
-
-			// Look up the joint
-			const SkJoint* joint = target->get_joint( bone_id.c_str() );
-			if( joint == NULL ) {
-				cerr << "WARNING: BodyPlannerImpl::parseBML(): Gaze: Target \""<<object_id<<"\" does not have joint \""<<bone_id<<"\". Behavior ignored."<< endl;
-				return NULL;
-			}
-
-			return joint;
-		}
-		case 3: {
-			// Three tokens is a global position
-			XMLCh* token = tokenizer.nextToken();
-
-			// TODO
-		    wcerr << "WARNING: BodyPlannerImpl::parseBML(): Unimplented <"<<tagname<<" "<<ATTR_TARGET<<"=\"x, y, z\" ... />.  Behavior ignored."<< endl;
-			return NULL;
-		}
-		default: {
-		    wcerr << "WARNING: BodyPlannerImpl::parseBML(): Invalid token count in <"<<tagname<<" "<<ATTR_TARGET<<"=\"x, y, z\" ... />.  Behavior ignored."<< endl;
-			return NULL;
-		}
-	}  // end switch( tokenizer.countTokens() )
-}
-
