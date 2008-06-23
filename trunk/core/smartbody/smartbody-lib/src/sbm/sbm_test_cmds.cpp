@@ -324,6 +324,7 @@ void print_test_bml_help() {
 //		 << "\thead orient target <target> [<direction> <amount>]     // orients the head toward an object" << endl
 	     << "\tspeech [text] <sentence>         // performs plain text speech" << endl
 	     << "\tspeech ssml <sentence>           // performs ssml speech" << endl
+	     << "\tinterrupt <performance id>       // interrupt prior performane" << endl
 	     << "\tfile <filename>                  // calls vrSpeak on a BML file" << endl
 	     << "\t<?xml ...                        // sends inline XML as BML" << endl
 	     << "\t<act>...</act>                   // sends inline <act> XML" << endl
@@ -572,8 +573,23 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 			<< "\t</bml>\n"
 			<< "</act>";
 		return send_vrX( "vrSpeak", char_id, recip_id, seq_id, echo, send, bml.str() );
+	} else if( arg=="interrupt") { // posture <posture name>
+		string act = args.read_token();
+		if( act.length()==0 ) {
+			cerr << "ERROR: test bml " << arg << ": Missing BML performance id." << endl;
+			return CMD_FAILURE;
+		}
+
+		ostringstream bml;
+		bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			<< "<act>\n"
+			<< "\t<bml>\n"
+			<< "\t\t<sbm:interrupt act=\"" << act << "\"/>\n"
+			<< "\t</bml>\n"
+			<< "</act>";
+		return send_vrX( "vrSpeak", char_id, recip_id, seq_id, echo, send, bml.str() );
 	} else {
-		cerr << "ERROR: test bml: Unrecognized \"test bml\" command \""<<arg<<"\"."<< endl;
+		cerr << "ERROR: test bml: Unrecognized \"test bml\" subscommand \""<<arg<<"\"."<< endl;
 		print_test_bml_help();
 		return CMD_FAILURE;
 	}
