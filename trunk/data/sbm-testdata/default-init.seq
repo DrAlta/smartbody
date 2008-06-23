@@ -12,6 +12,7 @@
 
 ### Test motions
 #0	load motions ../../../../data/sbm-testdata/doctor/test
+#0	load motions ../../../../data/sbm-testdata/doctor/qdraw
 
 
 ###  Using USC-ICT Unreal Character Classes
