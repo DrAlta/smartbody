@@ -64,17 +64,17 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 					// Target is a character, look at eyeball
 					bone_id = "eyeball_left";
 					if( DEBUG_BML_TARGET )
-						cerr << "DEBUG: BodyPlannerImpl::parseBML(): Gaze: Found target character \"" << object_id << "\". Assuming joint \""<<bone_id<<"\"."<< endl;
+						cerr << "DEBUG: BML::parse_target(): Gaze: Found target character \"" << object_id << "\". Assuming joint \""<<bone_id<<"\"."<< endl;
 				} else {
 					// Target is a pawn, look at world offset
 					target = mcu->pawn_map.lookup( object_id.c_str() );
 					if( target ) {
 						bone_id = SbmPawn::WORLD_OFFSET_JOINT_NAME;
 						if( DEBUG_BML_TARGET )
-							cerr << "DEBUG: BodyPlannerImpl::parseBML(): Gaze: Found target pawn \"" << object_id << "\". Assuming joint \""<<bone_id<<"\"."<< endl;
+							cerr << "DEBUG: BML::parse_target(): Gaze: Found target pawn \"" << object_id << "\". Assuming joint \""<<bone_id<<"\"."<< endl;
 					} else {
 						// TODO: Query World State Protocol (requires event delay)
-						cerr << "WARNING: BodyPlannerImpl::parseBML(): Gaze: Unknown target \""<<object_id<<"\". (TODO: Query WSP.) Behavior ignored."<< endl;
+						cerr << "WARNING: BML::parse_target(): Gaze: Unknown target \""<<object_id<<"\". (TODO: Query WSP.) Behavior ignored."<< endl;
 						return NULL;
 					}
 				}
@@ -83,11 +83,11 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 				bone_id = object_id.substr( colon_index+1 );
 				object_id.erase( colon_index );
 				if( DEBUG_BML_TARGET )
-					cout << "DEBUG: BodyPlannerImpl::parseBML(): Gaze:\tobject_id \""<<object_id<<"\",\tbone_id \""<<bone_id<<"\"." <<endl;
+					cout << "DEBUG: BML::parse_target(): Gaze:\tobject_id \""<<object_id<<"\",\tbone_id \""<<bone_id<<"\"." <<endl;
 				target = mcu->pawn_map.lookup( object_id.c_str() );
 				if( target==NULL ) {
 					// TODO: Query WSP
-					cerr << "WARNING: BodyPlannerImpl::parseBML(): Gaze: Unknown object id \""<<object_id<<"\". (TODO: Query WSP.) Behavior ignored."<< endl;
+					cerr << "WARNING: BML::parse_target(): Gaze: Unknown object id \""<<object_id<<"\". (TODO: Query WSP.) Behavior ignored."<< endl;
 					return NULL;
 				}
 			}
@@ -95,7 +95,7 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 			// Look up the joint
 			const SkJoint* joint = target->get_joint( bone_id.c_str() );
 			if( joint == NULL ) {
-				cerr << "WARNING: BodyPlannerImpl::parseBML(): Gaze: Target \""<<object_id<<"\" does not have joint \""<<bone_id<<"\". Behavior ignored."<< endl;
+				cerr << "WARNING: BML::parse_target(): Gaze: Target \""<<object_id<<"\" does not have joint \""<<bone_id<<"\". Behavior ignored."<< endl;
 				return NULL;
 			}
 
@@ -106,11 +106,11 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 			XMLCh* token = tokenizer.nextToken();
 
 			// TODO
-		    wcerr << "WARNING: BodyPlannerImpl::parseBML(): Unimplented <"<<tagname<<" "<<ATTR_TARGET<<"=\"x, y, z\" ... />.  Behavior ignored."<< endl;
+		    wcerr << "WARNING: BML::parse_target(): Unimplented <"<<tagname<<" "<<ATTR_TARGET<<"=\"x, y, z\" ... />.  Behavior ignored."<< endl;
 			return NULL;
 		}
 		default: {
-		    wcerr << "WARNING: BodyPlannerImpl::parseBML(): Invalid token count in <"<<tagname<<" "<<ATTR_TARGET<<"=\"x, y, z\" ... />.  Behavior ignored."<< endl;
+		    wcerr << "WARNING: BML::parse_target(): Invalid token count in <"<<tagname<<" "<<ATTR_TARGET<<"=\"x, y, z\" ... />.  Behavior ignored."<< endl;
 			return NULL;
 		}
 	}  // end switch( tokenizer.countTokens() )
