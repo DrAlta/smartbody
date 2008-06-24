@@ -44,7 +44,7 @@ srCmdSeq::srCmdSeq( void )	{
 srCmdSeq::~srCmdSeq( void )	{
 
 	if( event_count > 0 )	{
-		printf( "srCmdSeq::~srCmdSeq NOTE: deleting %d events\n", event_count );
+		//printf( "srCmdSeq::~srCmdSeq NOTE: deleting %d events\n", event_count );
 		char *cmd;
 		reset();
 		while( cmd = pull() )	{

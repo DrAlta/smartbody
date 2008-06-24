@@ -393,18 +393,43 @@ void mcuCBHandle::update( void )	{
 	} // end of loop
 }
 
-int mcuCBHandle::execute_later( const char* command, float seconds ) {
-	srCmdSeq *temp_seq = new srCmdSeq(); 
-	temp_seq->offset( (float)time );
-	temp_seq->insert( seconds , command );
+int mcuCBHandle::execute_seq( srCmdSeq* seq ) {
+	ostringstream seq_id;
+	seq_id << "execute_seq-" << (++queued_cmds);
 
-	ostringstream seqName;
-	seqName << "execute_later-" << (++queued_cmds);
-	if( active_seq_map.insert( seqName.str().c_str(), temp_seq ) != CMD_SUCCESS ) {
-		printf( "mcuCBHandle::execute_later ERR: insert temp_seq into active_seq_map FAILED, msgId=%s\n", seqName );
+	return execute_seq( seq, seq_id.str().c_str() );
+}
+
+int mcuCBHandle::execute_seq( srCmdSeq* seq, const char* seq_id ) {
+	if ( active_seq_map.insert( seq_id, seq ) != CMD_SUCCESS ) {
+		printf( "ERROR: mcuCBHandle::execute_later(..): Failed to insert srCmdSeq \"%s\" into active_seq_map.\n", seq_id );
 		return CMD_FAILURE;
 	}
 	return CMD_SUCCESS;
+}
+
+int mcuCBHandle::execute_later( const char* command, float seconds ) {
+	srCmdSeq *temp_seq = new srCmdSeq();
+	temp_seq->offset( (float)time+seconds );
+	temp_seq->insert( seconds , 0 );
+
+	ostringstream seqName;
+	seqName << "execute_later-" << (++queued_cmds);
+
+	return execute_seq( temp_seq, seqName.str().c_str() );;
+}
+
+int mcuCBHandle::abort_seq( const char* seq_name ) {
+	srCmdSeq *seq_p = pending_seq_map.remove( seq_name );
+	if( seq_p == NULL )	{
+		seq_p = active_seq_map.remove( seq_name );
+		if( seq_p == NULL )	{
+			return CMD_FAILURE;  // Not Found
+		}
+	}
+	delete seq_p;
+
+	return CMD_SUCCESS;  // Aborted successfully
 }
 
 void mcuCBHandle::set_net_host( const char * net_host )
@@ -798,22 +823,10 @@ int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		}
 		else
 		if( strcmp( seq_cmd, "abort" ) == 0 )	{
-		
-			srCmdSeq *seq_p = mcu_p->pending_seq_map.remove( seq_name );
-			if( seq_p == NULL )	{
-				seq_p = mcu_p->active_seq_map.remove( seq_name );
-				if( seq_p == NULL )	{
-					printf( "mcu_sequence_func ERR: abort: '%s' NOT FOUND\n", seq_name ); 
-					return( CMD_FAILURE );
-				}
+			if( mcu_p->abort_seq( seq_name ) != CMD_SUCCESS )	{
+				printf( "mcu_sequence_func ERR: print: '%s' NOT FOUND\n", seq_name ); 
+				return( CMD_FAILURE );
 			}
-			
-			char *cmd;
-			seq_p->reset();
-			while( cmd = seq_p->pull() )	{
-				delete [] cmd;
-			}
-			delete seq_p;
 		}
 		else
 		if( ( strcmp( seq_cmd, "begin" ) == 0 )||( strcmp( seq_cmd, EMPTY_STRING ) == 0 ) )	{

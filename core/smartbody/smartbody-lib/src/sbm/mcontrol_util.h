@@ -199,27 +199,6 @@ class mcuCBHandle	{
 			return( cmd_map.insert( key, fp ) );
 		}
 
-		int execute( const char *key, srArgBuffer& args ) { 
-			return( cmd_map.execute( key, args, this ) ); 
-		}
-
-		int execute( const char *key, char* strArgs ) { 
-            srArgBuffer args( strArgs );
-			return( cmd_map.execute( key, args, this ) ); 
-		}
-
-		int execute( char *cmd ) { 
-			return( cmd_map.execute( cmd, this ) ); 
-		}
-
-		//  Schedule command in some seconds
-		int execute_later( const char* command, float seconds );
-
-		//  Queue command for next frame
-		int execute_later( const char* command ) { 
-			return( execute_later( command, 0 ) ); 
-		}
-
 		int insert_set_cmd( char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp )	{
 			return( set_cmd_map.insert( key, fp ) );
 		}
@@ -241,6 +220,32 @@ class mcuCBHandle	{
 
 		int load_motions( const char* pathname, bool recursive );
 		int load_poses( const char* pathname, bool recursive );
+
+		int execute( const char *key, srArgBuffer& args ) { 
+			return( cmd_map.execute( key, args, this ) ); 
+		}
+
+		int execute( const char *key, char* strArgs ) { 
+            srArgBuffer args( strArgs );
+			return( cmd_map.execute( key, args, this ) ); 
+		}
+
+		int execute( char *cmd ) { 
+			return( cmd_map.execute( cmd, this ) ); 
+		}
+
+		int execute_seq( srCmdSeq *seq );
+		int execute_seq( srCmdSeq *seq, const char* seq_name );
+
+		//  Schedule command in some seconds
+		int execute_later( const char* command, float seconds );
+
+		//  Queue command for next frame
+		int execute_later( const char* command ) { 
+			return( execute_later( command, 0 ) ); 
+		}
+
+		int abort_seq( const char* command );
 
 		MeController* lookup_ctrl( const std::string& ctrl_name, const char* print_error_prefix=NULL );
 

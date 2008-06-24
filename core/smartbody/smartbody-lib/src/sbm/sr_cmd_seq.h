@@ -52,8 +52,13 @@ class srCmdSeq	{
 		int		read_file( char *seq_file, int report_open_fail = TRUE );
 
 		int		insert( float time, const char *cmd_ref );			/* copy (with new[]), sort by time */
-		void	offset( float t ) { event_offset = t; }			/* set pop by event.time + offset */
-		char	*pop( float time );								/* remove first event passed */
+		
+		/** Query sequence offset */
+		float	offset() { return event_offset; }				
+		/** Set pop by event.time + offset */
+		void	offset( float t ) { event_offset = t; }			
+		/** remove first event passed */
+		char	*pop( float time );
 
 		void	reset(void) { iterator = handle; }
 		char	*next( float *t = NULL );	// return pointer, time
