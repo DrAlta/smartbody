@@ -272,6 +272,7 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_character_init( const char* char_name, const char *skel_file, const char *unreal_class, mcuCBHandle *mcu_p );
 int mcu_character_ctrl_cmd( const char* char_name, srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_character_bone_cmd( const char* char_name, srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_character_bone_position_cmd( const char* char_name, srArgBuffer& args, mcuCBHandle *mcu_p );
 //  The following have been replace by SbmCharacter::remove_from_scene( const char* )
 //int mcu_character_remove( const char * char_name, mcuCBHandle * mcu_p );
 //int mcu_removeallcharacters_func( srArgBuffer& args, mcuCBHandle *mcu_p );
