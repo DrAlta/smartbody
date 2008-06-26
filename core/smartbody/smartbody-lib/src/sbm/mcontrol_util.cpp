@@ -353,7 +353,11 @@ void mcuCBHandle::update( void )	{
 
 		//char_p->scheduler_p->evaluate( time );
 		pawn_p->pipeline_p->evaluate( time );
-		pawn_p->pipeline_p->applyBufferToAllSkeletons();
+
+		if ( net_bone_updates )
+		{
+			pawn_p->pipeline_p->applyBufferToAllSkeletons();
+		}
 
 		char_p = character_map.lookup( pawn_p->name );
 		if( char_p != NULL ) {
@@ -1301,7 +1305,7 @@ int mcu_character_bone_cmd(
 			{
 				//j->quat()->value().set( 1, 1, 0, 0 );
 				//j->quat()->value()
-				//j->quat()->value( SrQuat( w, x, y, z ) );
+				j->quat()->value( SrQuat( w, x, y, z ) );
 
 				//SrMat m;
 				//SrQuat q = j->quat()->value();
@@ -1370,6 +1374,76 @@ int mcu_character_bone_cmd(
 
 	return CMD_SUCCESS;
 }
+
+
+// "sbm char doctor bonep base x y z"
+int mcu_character_bone_position_cmd(
+   const char* char_name,
+   srArgBuffer& args,
+   mcuCBHandle *mcu_p 
+) {
+   char * bone = args.read_token();
+   float  x    = args.read_float();
+   float  y    = args.read_float();
+   float  z    = args.read_float();
+   int i;
+
+   SbmCharacter * actor = mcu_p->character_map.lookup( char_name );
+   if ( !actor || !actor->skeleton_p )
+   {
+      return CMD_FAILURE;  // this should really be an ignore/out-of-domain result
+   }
+   else
+   {
+      actor->bonebusCharacter->StartSendBonePositions();
+
+      for ( i = 0; i < actor->skeleton_p->joints().size(); i++ )
+      {
+         SkJoint * j	= actor->skeleton_p->joints()[ i ];
+
+         if ( _stricmp( j->name(), bone ) == 0 )
+         {
+            float posx, posy, posz;
+
+            /*
+            if ( j->_ed == SrVec( 0, 0, 0 ) )
+            {
+               j->_ed = j->offset();
+            }
+
+            posx = j->_ed.x + x;
+            posy = j->_ed.y + y;
+            posz = j->_ed.z + z;
+            */
+
+            j->pos()->value( 0, x );
+            j->pos()->value( 1, y );
+            j->pos()->value( 2, z );
+
+            //j->offset( SrVec( posx, posy, posz ) );
+
+            posx = x;
+            posy = y;
+            posz = z;
+
+            if ( _stricmp( j->name(), "base" ) == 0 )
+            {
+               actor->bonebusCharacter->AddBonePosition( j->name(), posx, -posy, posz );
+            }
+            else
+            {
+               //actor->bonebusCharacter->AddBonePosition( j->name(), -posz, -posy, posx );
+               actor->bonebusCharacter->AddBonePosition( j->name(), posx, -posy, posz );
+            }
+         }
+      }
+
+      actor->bonebusCharacter->EndSendBonePositions();
+   }
+
+   return CMD_SUCCESS; 
+}
+
 
 /////////////////////////////////////////////////////////////
 
