@@ -87,7 +87,7 @@ namespace WSP
 
 
 
-
+// Motion Controller Utility Callback Handle (Yes, seriously.)
 class mcuCBHandle	{
 	protected:
 		// Data

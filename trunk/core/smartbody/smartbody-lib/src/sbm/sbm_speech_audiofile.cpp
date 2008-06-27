@@ -381,7 +381,7 @@ char* AudioFileSpeech::getSpeechStopCommand( RequestId requestId ) {
 	}
 	
 	string soundFile= *(audioSoundLookUp.lookup(stopStream.str().c_str()));
-	soundFile= "send vrStopSound "+ soundFile + " 3"; //The 3 denotes the channel in the VR theatre that the sound corresponds to
+	soundFile= "send StopSound "+ soundFile + " 3"; //The 3 denotes the channel in the VR theatre that the sound corresponds to
 	char* retSoundFile= new char[soundFile.length() + 1];
 	strcpy(retSoundFile, soundFile.c_str());
 	return (retSoundFile);

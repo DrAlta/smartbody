@@ -287,7 +287,7 @@ char* remote_speech::getSpeechPlayCommand( RequestId requestId ){
 
 char* remote_speech::getSpeechStopCommand( RequestId requestId ){
 	    /**
-        *  Returns the sbm command used to stop the speech audio. The command is of form: send vrStopSound <audio path>
+        *  Returns the sbm command used to stop the speech audio. The command is of form: send StopSound <audio path>
         */
 ostringstream stopStream; //creates an ostringstream object
 	stopStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
@@ -296,7 +296,7 @@ ostringstream stopStream; //creates an ostringstream object
 		return(NULL);
 	}
 	string soundFile= *(soundLookUp.lookup(stopStream.str().c_str()));
-	soundFile= "send vrStopSound "+ soundFile + " 3"; //The 3 denotes the channel in the VR theatre that the sound corresponds to
+	soundFile= "send StopSound "+ soundFile + " 3"; //The 3 denotes the channel in the VR theatre that the sound corresponds to
 	char* retSoundFile= new char[soundFile.length() + 1];
 	strcpy(retSoundFile, soundFile.c_str());
 	return (retSoundFile);

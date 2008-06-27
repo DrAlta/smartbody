@@ -414,8 +414,7 @@ int mcuCBHandle::execute_seq( srCmdSeq* seq, const char* seq_id ) {
 
 int mcuCBHandle::execute_later( const char* command, float seconds ) {
 	srCmdSeq *temp_seq = new srCmdSeq();
-	temp_seq->offset( (float)time+seconds );
-	temp_seq->insert( seconds , 0 );
+	temp_seq->insert( (float)time+seconds, command );
 
 	ostringstream seqName;
 	seqName << "execute_later-" << (++queued_cmds);
