@@ -406,7 +406,7 @@ int mcuCBHandle::execute_seq( srCmdSeq* seq ) {
 
 int mcuCBHandle::execute_seq( srCmdSeq* seq, const char* seq_id ) {
 	if ( active_seq_map.insert( seq_id, seq ) != CMD_SUCCESS ) {
-		printf( "ERROR: mcuCBHandle::execute_later(..): Failed to insert srCmdSeq \"%s\" into active_seq_map.\n", seq_id );
+		printf( "ERROR: mcuCBHandle::execute_seq(..): Failed to insert srCmdSeq \"%s\" into active_seq_map.\n", seq_id );
 		return CMD_FAILURE;
 	}
 	return CMD_SUCCESS;
