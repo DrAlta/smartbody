@@ -1,6 +1,6 @@
 # SK Skeleton Definition - M. Kallmann 2004
 
-set_name doctor
+set_name common
 
 skeleton
 root base
