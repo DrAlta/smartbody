@@ -236,15 +236,15 @@
 			Name="default sequences"
 			>
 			<File
-				RelativePath="..\..\..\..\data\sbm-testdata\default-init-face.seq"
+				RelativePath="..\..\..\..\data\sbm-test\scripts\default-init-face.seq"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\data\sbm-testdata\default-init.seq"
+				RelativePath="..\..\..\..\data\sbm-test\scripts\default-init.seq"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\data\sbm-testdata\default-viewer.seq"
+				RelativePath="..\..\..\..\data\sbm-test\scripts\default-viewer.seq"
 				>
 			</File>
 			<File
@@ -253,10 +253,10 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="doctor"
+			Name="common_sk"
 			>
 			<File
-				RelativePath="..\..\..\..\data\sbm-testdata\doctor\doctor.sk"
+				RelativePath="..\..\..\..\data\sbm-common\common-sk\common.sk"
 				>
 			</File>
 		</Filter>
