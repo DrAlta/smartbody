@@ -1,5 +1,5 @@
 ###  SBM Viewer Initialization file
-###  * Assumes doctor scaled character standing at origin
+###  * Assumes doctor scaled character standing near the origin, as is about 200 units tall
 
 0	viewer open   400 600  400 50
 0	camera eye    0 166 185

@@ -233,33 +233,41 @@
 	</References>
 	<Files>
 		<Filter
-			Name="default sequences"
-			>
-			<File
-				RelativePath="..\..\..\..\data\sbm-test\scripts\default-init-face.seq"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\data\sbm-test\scripts\default-init.seq"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\data\sbm-test\scripts\default-viewer.seq"
-				>
-			</File>
-			<File
-				RelativePath="..\bin\default.seq"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="common_sk"
+			Name="sbm-common"
 			>
 			<File
 				RelativePath="..\..\..\..\data\sbm-common\common-sk\common.sk"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\..\data\sbm-common\common-sk\common-test.sk"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\data\sbm-common\scripts\default-init.seq"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\data\sbm-common\scripts\default-viewer.seq"
+				>
+			</File>
 		</Filter>
+		<Filter
+			Name="sbm-test"
+			>
+			<File
+				RelativePath="..\..\..\..\data\sbm-test\scripts\default-init.seq"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\data\sbm-test\scripts\default-init-face.seq"
+				>
+			</File>
+		</Filter>
+		<File
+			RelativePath="..\bin\default.seq"
+			>
+		</File>
 		<File
 			RelativePath="..\src\sbm_main.cpp"
 			>

@@ -1,2 +1,5 @@
-0   path seq ../../../../data/sbm-test/scripts
+0   path seq ../../../../data/sbm-common/scripts
+# Or...
+#0   path seq ../../../../data/sbm-test/scripts
+
 0   seq default-init
