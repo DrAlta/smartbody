@@ -1,21 +1,11 @@
-0 echo |------------------------------------------|
-0 echo |  data/sbm-test/scripts/default-init.seq  |
-0 echo |------------------------------------------|
-###    Replaces sbm-common's default-init
-###    if sbm-test/scripts/ is first in the seq path.
-
+0 echo |--------------------------------------------|
+0 echo |  data/sbm-common/scripts/default-init.seq  |
+0 echo |--------------------------------------------|
 
 ### Load data/sbm-common assets
 ### Assumes current directory is: core/smartbody/sbm/bin
 0	path seq ../../../../data/sbm-common/scripts
 0	seq common-init
-
-0	echo >>> Loading data/sbm-test assets...
-0	seq default-init-face
-0	load motions ../../../../data/sbm-test/common-sk/motion
-0	load motions ../../../../data/sbm-test/common-sk/step
-0	load motions ../../../../data/sbm-test/common-sk/qdraw
-
 
 ###  Using USC-ICT Unreal Character Classes
 ###    Characters and above assets are standing 102 units
