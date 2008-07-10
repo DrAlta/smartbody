@@ -558,7 +558,7 @@ int main( int argc, char **argv )	{
 	}
 
 	if( seq_paths.empty() ) {
-		printf( "No sequence paths specified. Adding current working directory to seq path\n", DEFAULT_SEQUENCE_FILE );
+		printf( "No sequence paths specified. Adding current working directory to seq path\n" );
 		seq_paths.push_back( "." );
 	}
 	for( it = seq_paths.begin();
