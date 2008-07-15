@@ -236,11 +236,15 @@
 			Name="sbm-common"
 			>
 			<File
-				RelativePath="..\..\..\..\data\sbm-common\common-sk\common.sk"
+				RelativePath="..\..\..\..\data\sbm-common\scripts\common-init.seq"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\..\data\sbm-common\common-sk\common-test.sk"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\data\sbm-common\common-sk\common.sk"
 				>
 			</File>
 			<File
@@ -256,11 +260,11 @@
 			Name="sbm-test"
 			>
 			<File
-				RelativePath="..\..\..\..\data\sbm-test\scripts\default-init.seq"
+				RelativePath="..\..\..\..\data\sbm-test\scripts\default-init-face.seq"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\data\sbm-test\scripts\default-init-face.seq"
+				RelativePath="..\..\..\..\data\sbm-test\scripts\default-init.seq"
 				>
 			</File>
 		</Filter>
