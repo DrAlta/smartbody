@@ -263,6 +263,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "ctrl",			mcu_controller_func );
 	mcu.insert( "sched",		mcu_sched_controller_func );
 	mcu.insert( "stepturn",		mcu_stepturn_controller_func );
+	mcu.insert( "quickdraw",	mcu_quickdraw_controller_func );
 	mcu.insert( "gaze",			mcu_gaze_controller_func );
 	mcu.insert( "snod",			mcu_snod_controller_func );
 	mcu.insert( "lilt",			mcu_lilt_controller_func );

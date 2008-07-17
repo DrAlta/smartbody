@@ -41,7 +41,7 @@ MeCtQuickDraw::MeCtQuickDraw( void )	{
    skeleton_ref_p = NULL;
    interim_pose_buff_p = NULL;
    
-   timing_mode = TASK_TIME;
+//   timing_mode = TASK_TIME;
    heading_mode = HEADING_LOCAL;
    dirty_action_bit = 0;
 }
@@ -92,7 +92,8 @@ void MeCtQuickDraw::init( SkMotion* mot_p ) {
 	_motion = _left_motion;
 
 	set_time( raw_time );
-	set_heading_local( raw_angle );
+//	set_heading_local( raw_angle );
+						set_aim_local( 0.0, raw_angle, 0.0 );
 	
 	SkChannelArray& mchan_arr = mot_p->channels();
 
@@ -138,8 +139,8 @@ void MeCtQuickDraw::set_target_joint( float x, float y, float z, SkJoint* ref_jo
 
 ///////////////////////////////////////////////////////////////////////////////////
 
-#define NUM_STEPTURN_JOINTS 			11
-#define MAX_STEPTURN_JOINT_LABEL_LEN	32
+#define NUM_QUICKDRAW_JOINTS 			8
+#define MAX_JOINT_LABEL_LEN				64
 
 /*
 	Build mirrored motion:
@@ -148,15 +149,13 @@ void MeCtQuickDraw::set_target_joint( float x, float y, float z, SkJoint* ref_jo
 */
 
 SkMotion* MeCtQuickDraw::build_mirror_motion( SkMotion* ref_motion_p )	{
-	static char ref_labels[ NUM_STEPTURN_JOINTS ][ MAX_STEPTURN_JOINT_LABEL_LEN ] = {
-		"base",
-		"l_hip", "l_knee", "l_ankle", "l_forefoot", "l_toe",
-		"r_hip", "r_knee", "r_ankle", "r_forefoot", "r_toe"
+	static char ref_labels[ NUM_QUICKDRAW_JOINTS ][ MAX_JOINT_LABEL_LEN ] = {
+		"l_shoulder", "l_elbow", "l_forearm", "l_wrist",
+		"r_shoulder", "r_elbow", "r_forearm", "r_wrist"
 	};
-	static char new_labels[ NUM_STEPTURN_JOINTS ][ MAX_STEPTURN_JOINT_LABEL_LEN ] = {
-		"base",
-		"r_hip", "r_knee", "r_ankle", "r_forefoot", "r_toe",
-		"l_hip", "l_knee", "l_ankle", "l_forefoot", "l_toe"
+	static char new_labels[ NUM_QUICKDRAW_JOINTS ][ MAX_JOINT_LABEL_LEN ] = {
+		"r_shoulder", "r_elbow", "r_forearm", "r_wrist",
+		"l_shoulder", "l_elbow", "l_forearm", "l_wrist"
 	};
 	int i, j;
 	
@@ -172,14 +171,8 @@ SkMotion* MeCtQuickDraw::build_mirror_motion( SkMotion* ref_motion_p )	{
 		float *new_p = mirror_p->posture( i );
 		int ref_i, new_i;
 
-		ref_i = mchan_arr.float_position( mchan_arr.search( SkJointName( "base" ), SkChannel::XPos ) );
-		new_p[ ref_i ] = -ref_p[ ref_i ];
-		ref_i = mchan_arr.float_position( mchan_arr.search( SkJointName( "base" ), SkChannel::YPos ) );
-		new_p[ ref_i ] = ref_p[ ref_i ];
-		ref_i = mchan_arr.float_position( mchan_arr.search( SkJointName( "base" ), SkChannel::ZPos ) );
-		new_p[ ref_i ] = ref_p[ ref_i ];
-
-		for( j=0; j<NUM_STEPTURN_JOINTS; j++ )	{
+//		for( j=1; j<NUM_STEPTURN_JOINTS; j++ )	{ !!!
+		for( j=0; j<NUM_QUICKDRAW_JOINTS; j++ )	{
 			ref_i = mchan_arr.float_position( mchan_arr.search( SkJointName( ref_labels[ j ] ), SkChannel::Quat ) );
 			new_i = mchan_arr.float_position( mchan_arr.search( SkJointName( new_labels[ j ] ), SkChannel::Quat ) );
 			euler_t ref_e = quat_t( ref_p[ ref_i ], ref_p[ ref_i + 1 ], ref_p[ ref_i + 2 ], ref_p[ ref_i + 3 ] );
@@ -269,9 +262,9 @@ void MeCtQuickDraw::update_action_params( void )	{
 		_motion = _left_motion;
 	}
 
-	if( timing_mode == TASK_SPEED )	{
-		turn_time = fabs( raw_angle / turn_speed );
-	}
+//	if( timing_mode == TASK_SPEED )	{
+//		turn_time = fabs( raw_angle / turn_speed );
+//	}
 
 	turn_angle_scale = fabs( turn_angle / raw_angle );
 	turn_time_scale = raw_time / turn_time;
@@ -282,26 +275,28 @@ void MeCtQuickDraw::update_action_params( void )	{
 
 void MeCtQuickDraw::set_time( float sec )	{
 	
-	timing_mode = TASK_TIME;
+//	timing_mode = TASK_TIME;
 	turn_time = sec;
 	dirty_action_bit = 1;
 }
 
+/*
 void MeCtQuickDraw::set_speed( float dps ) {
 
 	timing_mode = TASK_SPEED;
 	turn_speed = dps;
 	dirty_action_bit = 1;
 }
+*/
 
-void MeCtQuickDraw::set_heading_local( float h )	{
+void MeCtQuickDraw::set_aim_local( float p, float h, float r )    {
 
 	heading_mode = HEADING_LOCAL;
 	turn_angle = h;
 	dirty_action_bit = 1;
 }
 
-void MeCtQuickDraw::set_heading_world( float h )	{
+void MeCtQuickDraw::set_aim_world( float p, float h, float r )    {
 	
 	heading_mode = HEADING_WORLD;
 	world_turn_angle = h;
@@ -385,7 +380,7 @@ bool MeCtQuickDraw::controller_evaluate( double t, MeFrameData& frame ) {
 		return( continuing );
 	}
 
-#if 0 // RAW STEPPING
+#if 1 // RAW STEPPING
 	_motion->apply( 
 		float( t * turn_time_scale ),
 		&( frame.buffer()[0] ),  // pointer to buffer's float array

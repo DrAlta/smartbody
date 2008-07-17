@@ -1,0 +1,4 @@
+## initialize to test quickdraw controller functions:
+0 echo EXEC: data/sbm-test/scripts/test-qdraw-init.seq
+
+0 ctrl Q quickdraw AdultM_FastDraw001
