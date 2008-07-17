@@ -37,7 +37,8 @@
 TODO: SBM commands:
 
         ctrl <> quickdraw <qdraw-motion-name>
-        quickdraw <> L|R dur|time|speed <sec|dps> local|world <pitch-deg> <heading-deg> <roll-deg>
+        quickdraw <> <dur-sec> local|world <pitch-deg> <heading-deg> <roll-deg>
+#        quickdraw <> L|R <sec|dps> local|world <pitch-deg> <heading-deg> <roll-deg>
 
  * The input drawing motion can be any direction, any reasonable magnitude.
  * Tokens 'dur' and 'time' are synonymous.
@@ -46,9 +47,8 @@ TODO: Class API members:
 
         void init( SkMotion* mot_p );
         void set_time( float sec );
-        void set_speed( float dps );
-        void set_heading_local( float h );
-        void set_heading_world( float h );
+        void set_aim_local( float h );
+        void set_aim_world( float h );
 
 Step motion:
 
@@ -56,16 +56,17 @@ Step motion:
 
 TODO: Example sequence:
 
-        0.0 load motions ../../testdata/doctor/qdraw
-        0.0 ctrl QD quickdraw AdultM_FastDraw001
-        0.0 quickdraw QD dur 0.9 local 0.0 45.0
-        0.0 char doctor ctrl QD begin
+        0.0 load motions ../../../../data/sbm-test/common-sk/qdraw
+        0.0 ctrl Q quickdraw AdultM_FastDraw001
+        0.0 quickdraw Q 0.9 local 0.0 45.0 0.0
+        0.0 char doctor ctrl Q begin
 
  * This will induce the doctor to shoot 45 degrees to his left.
 
 TODO: Testing sequence:
 
-        seq sbm-quickdraw-init
+        seq sbm-qdraw-init
+        seq sbm-qdraw
 
  * This runs the doctor through a few hoops.
 */
@@ -73,10 +74,10 @@ TODO: Testing sequence:
 class MeCtQuickDraw : public MeController	{ 
 
 	private:
-		enum timing_mode_enum_set	{
-			TASK_SPEED,
-			TASK_TIME
-		};
+//		enum timing_mode_enum_set	{
+//			TASK_SPEED,
+//			TASK_TIME
+//		};
 		enum coord_coord_enum_set	{
 			HEADING_LOCAL,
 			HEADING_WORLD
@@ -146,10 +147,10 @@ class MeCtQuickDraw : public MeController	{
 		void set_target_joint( float x, float y, float z, SkJoint* ref_joint_p = NULL );
 
 		void set_time( float sec );
-		void set_speed( float dps );
+//		void set_speed( float dps );
 		
-		void set_heading_local( float h );
-		void set_heading_world( float h );
+		void set_aim_local( float p, float h, float r );
+		void set_aim_world( float p, float h, float r );
 
 		/*! Returns a pointer to the current motion of this controller */
 		SkMotion* motion () { return _motion; }

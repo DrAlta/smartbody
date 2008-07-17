@@ -190,7 +190,13 @@ void mcuCBHandle::clear( void )	{
 	while( stepturn_ctrl_p = stepturn_ctrl_map.pull() )	{
 		stepturn_ctrl_p->unref();
 	}
-	
+
+	MeCtQuickDraw* qdraw_ctrl_p;
+	quickdraw_ctrl_map.reset();
+	while( qdraw_ctrl_p = quickdraw_ctrl_map.pull() )	{
+		qdraw_ctrl_p->unref();
+	}
+		
 	MeCtGaze* gaze_ctrl_p;
 	gaze_ctrl_map.reset();
 	while( gaze_ctrl_p = gaze_ctrl_map.pull() )	{
@@ -1889,6 +1895,40 @@ int init_stepturn_controller(
 	return( CMD_SUCCESS );
 }
 
+int init_quickdraw_controller( 
+	char *ctrl_name, 
+	char *mot_name, 
+	mcuCBHandle *mcu_p
+)	{
+	int err = CMD_SUCCESS;
+
+	SkMotion *mot_p = mcu_p->motion_map.lookup( mot_name );
+	if( mot_p == NULL ) {
+		printf( "init_quickdraw_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_name ); 
+		return( CMD_FAILURE );
+	}
+
+	MeCtQuickDraw* ctrl_p = new MeCtQuickDraw;
+	err = mcu_p->quickdraw_ctrl_map.insert( ctrl_name, ctrl_p );
+	if( err == CMD_FAILURE )	{
+		printf( "init_quickdraw_controller ERR: MeCtQuickDraw '%s' EXISTS\n", ctrl_name ); 
+		delete ctrl_p;
+		return( CMD_FAILURE );
+	}
+	ctrl_p->ref();
+
+	err = mcu_p->controller_map.insert( ctrl_name, ctrl_p );
+	if( err == CMD_FAILURE )	{
+		printf( "init_quickdraw_controller ERR: MeController '%s' EXISTS\n", ctrl_name ); 
+		return( CMD_FAILURE );
+	}
+	ctrl_p->ref();
+	
+	ctrl_p->name( ctrl_name );
+	ctrl_p->init( mot_p );
+	return( CMD_SUCCESS );
+}
+
 int init_gaze_controller(
 	char *ctrl_name, 
 	char *key_fr,
@@ -2189,6 +2229,13 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			);
 		}
 		else
+		if( strcmp( ctrl_cmd, "quickdraw" ) == 0 )	{
+			char *mot_name = args.read_token();
+			return(
+				init_quickdraw_controller( ctrl_name, mot_name, mcu_p )
+			);
+		}
+		else
 		if( strcmp( ctrl_cmd, "gaze" ) == 0 )	{
 			char *key_fr = args.read_token();
 			char *key_to = args.read_token();
@@ -2278,12 +2325,12 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	stepturn <> dur|time|speed <sec|dps> local|world <heading-deg>
 */
 
-int mcu_stepturn_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p) {
+int mcu_stepturn_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 	if( mcu_p ) {
 		char *ctrl_name = args.read_token();
 		char *time_type = args.read_token(); // dur or speed
-		float time = args.read_float();
+		float timing = args.read_float();
 		char *coord_type = args.read_token(); // local or world
 		float deg = args.read_float();
 		MeCtStepTurn *step_p= mcu_p->stepturn_ctrl_map.lookup( ctrl_name );
@@ -2292,16 +2339,44 @@ int mcu_stepturn_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p) {
 				( time_type[ 0 ] == 'd' )||( time_type[ 0 ] == 'D' )||
 				( time_type[ 0 ] == 't' )||( time_type[ 0 ] == 'T' ) 
 			)	{
-				step_p->set_time( time );
+				step_p->set_time( timing );
 			}
 			else	{
-				step_p->set_speed( time );
+				step_p->set_speed( timing );
 			}
 			if( ( coord_type[ 0 ] == 'l' )||( coord_type[ 0 ] == 'L' ) )	{
 				step_p->set_heading_local( deg );
 			}
 			else	{
 				step_p->set_heading_world( deg );
+			}
+			return( CMD_SUCCESS );
+		}
+	}
+	return( CMD_FAILURE );
+}
+
+/*
+	quickdraw <> <dur-sec> local|world <p h r: deg>
+*/
+
+int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
+
+	if( mcu_p ) {
+		char *ctrl_name = args.read_token();
+		float dur = args.read_float();
+		char *coord_type = args.read_token(); // local or world
+		float pitch_deg = args.read_float();
+		float heading_deg = args.read_float();
+		float roll_deg = args.read_float();
+		MeCtQuickDraw *qdraw_p= mcu_p->quickdraw_ctrl_map.lookup( ctrl_name );
+		if( qdraw_p ) {
+			qdraw_p->set_time( dur );
+			if( ( coord_type[ 0 ] == 'l' )||( coord_type[ 0 ] == 'L' ) )	{
+				qdraw_p->set_aim_local( pitch_deg, heading_deg, roll_deg );
+			}
+			else	{
+				qdraw_p->set_aim_world( pitch_deg, heading_deg, roll_deg );
 			}
 			return( CMD_SUCCESS );
 		}

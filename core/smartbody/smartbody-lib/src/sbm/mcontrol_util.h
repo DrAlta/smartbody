@@ -51,6 +51,7 @@ class mcuCBHandle;
 #include <ME/me_ct_motion.h>
 #include <ME/me_ct_lifecycle_test.hpp>
 #include "me_ct_step_turn.h"
+#include "me_ct_quick_draw.h"
 #include "me_ct_gaze.h"
 
 #include "sbm_constants.h"
@@ -143,6 +144,7 @@ class mcuCBHandle	{
 		srHashMap <MeCtPose>		pose_ctrl_map;
 		srHashMap <MeCtMotion>		motion_ctrl_map;
 		srHashMap <MeCtStepTurn>	stepturn_ctrl_map;
+		srHashMap <MeCtQuickDraw>	quickdraw_ctrl_map;
 		srHashMap <MeCtGaze>		gaze_ctrl_map;
 		srHashMap <MeCtSimpleNod>	snod_ctrl_map;
 		srHashMap <MeCtAnkleLilt>	lilt_ctrl_map;
@@ -286,7 +288,8 @@ int mcu_print_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_sched_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_stepturn_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p);
+int mcu_stepturn_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_snod_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_lilt_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
