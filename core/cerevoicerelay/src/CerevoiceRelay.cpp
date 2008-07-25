@@ -157,7 +157,32 @@ void process_message( const char * message )
    if ( postfix_pos != std::string::npos )
       utterance = utterance.substr( 0, postfix_pos + 9 );
 
-   std::string xml = tts->tts( utterance.c_str() );
+
+   //parse out just the sound file name and give it a .wav file type
+   int pos = file_name.find( ".aiff" );
+   int pos2 = file_name.find( "utt" );
+   file_name = file_name.substr( pos2, pos - pos2 ) + ".wav";
+
+   //get the saso root
+   char * saso_root = getenv( "SASO_ROOT" );
+   std::string directory = "";
+
+   if ( saso_root != NULL )
+   {
+      std::string saso_root_string = saso_root;
+      directory = saso_root_string + "\\dimr\\tmpaudio\\";
+   }
+   else
+   {
+      //if the saso_root is not set, output the audio to the c drive
+      directory = "..\\..\\..\\dimr\\tmpaudio\\";
+   }
+
+   //set the full file name
+   file_name = directory + file_name;
+
+
+   std::string xml = tts->tts( utterance.c_str(), file_name.c_str() );
 
    std::string reply = agent_name;
    reply += " ";

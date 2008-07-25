@@ -26,6 +26,7 @@
 #include "cerevoice_tts.h"
 
 #include <map>
+#include <sstream>
 
 #include <xercesc/util/XMLUTF8Transcoder.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
@@ -64,6 +65,42 @@ char * licfile;
 CPRC_voice * voice;
 std::map<std::string, std::string> phonemeToViseme;
 static char * EMPTY_STRING = "";
+
+
+std::string removeXMLTags( const std::string & txt )
+{
+   //  removes XML tags from a string - used to take out
+   //  time markings before processing text, otherwise
+   //  silence is put in place of them
+
+   std::stringstream txtstream;
+
+   //for the entire input string
+   for ( unsigned int i = 0; i < txt.length(); i++ )
+   {
+      //if the character is an opening bracket
+      if ( txt.at( i ) == '<' )
+      {
+         //loop until hitting the ending bracket
+         //so that this text is not input into
+         //the stringstream
+         while ( i < txt.length() && txt.at( i ) != '>' )
+         {
+            i++;
+         }
+
+         //to skip over the ending bracket
+         i++;
+      }
+
+      //add the character to the stringstream
+      if ( i < txt.length() )
+         txtstream << txt.at( i );
+   }
+
+   //return the string in the stringstream
+   return txtstream.str();
+}
 
 
 // class is taken from somewhere, unsure of it's origins.  Here is one of many examples of use across the net:
@@ -197,12 +234,13 @@ void cerevoice_tts::init()
 {
    lic_text = EMPTY_STRING;
    signature = EMPTY_STRING;
-   licfile = "cerevoice_2.0.0_katherine_00009.lic";
+   //licfile = "C:\\cerevoice_sdk_2.0.0_windows_i686_academic\\cerevoice_2.0.0_katherine_00009.lic";
+   licfile = "..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_katherine_00009.lic";
 //   licfile = "cerevoice_2.0.0_heather_00009.lic";
 
    _read_licence( licfile, &lic_text, &signature );
 
-   voice = CPRC_load_voice( "cerevoice_2.0.0_katherine_22k.voice", lic_text, static_cast<int>( strlen( lic_text ) ), signature, static_cast<int>( strlen( signature ) ) );
+   voice = CPRC_load_voice( "..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_katherine_22k.voice", lic_text, static_cast<int>( strlen( lic_text ) ), signature, static_cast<int>( strlen( signature ) ) );
 
    // free license strings (aalocated in read_license)
    free( lic_text );
@@ -215,6 +253,7 @@ void cerevoice_tts::init()
    phonemeToViseme[ "ah" ]  = "Ih"; // AH
    phonemeToViseme[ "ao" ]  = "Ao"; // AO
    phonemeToViseme[ "ax" ]  = "Ih"; // AX
+   phonemeToViseme[ "@" ]  = "Ih"; // Shouldn't happen!
    phonemeToViseme[ "aw" ]  = "Ih"; // AW
    phonemeToViseme[ "ay" ]  = "Ih"; // AY
    phonemeToViseme[ "b" ]   = "BMP";//  B
@@ -252,7 +291,9 @@ void cerevoice_tts::init()
    phonemeToViseme[ "y" ]   = "OO"; //  Y
    phonemeToViseme[ "z" ]   = "Z";  //  Z
    phonemeToViseme[ "zh" ]  = "J";  // ZH
-
+   //phonemeToViseme[ "i" ]  = "";  // 
+   //phonemeToViseme[ "j" ]  = "";  // 
+   //need phonemeToViseme entries for "i" and "j"?
 
    // Initialize the XML4C2 system.
    try
@@ -268,11 +309,18 @@ void cerevoice_tts::init()
 }
 
 
-std::string cerevoice_tts::tts( const char * text )
+std::string cerevoice_tts::tts( const char * text, const char * file_name )
 {
    char * result = "";
 
    //printf( "INDEX: %d\n", std::string(text).find( "ref", 0 ) );
+
+
+   char * abbfile       = "../../data/cereproc/cerevoice/abb.txt";
+   char * pbreakfile    = "../../data/cereproc/cerevoice/pbreak.txt";
+   char * homographfile = "../../data/cereproc/cerevoice/homographsrules.dat";
+   char * reductionfile = "../../data/cereproc/cerevoice/reductionrules.dat";
+   char * rulesfile     = "../../data/cereproc/cerevoice/normrules.py";
 
    /*
       Create a text normalisation parser
@@ -287,6 +335,11 @@ std::string cerevoice_tts::tts( const char * text )
 
    // Create a reference to the normaliser, which needs to be passed in to all normaliser functions
    int norm_id = Normaliser_create( elNEWID );
+   Normaliser_set_abbreviations( norm_id, abbfile );
+   Normaliser_set_pbreaks( norm_id, pbreakfile );
+   Normaliser_set_rules( norm_id, rulesfile );
+   Normaliser_set_homographs( norm_id, homographfile );
+   Normaliser_set_reductions( norm_id, reductionfile );
 
    // file to record database coverage data
    //char * logfile = EMPTY_STRING;
@@ -313,7 +366,7 @@ std::string cerevoice_tts::tts( const char * text )
    CPRC_lexicon_search * lxsrch = CPRC_lexicon_search_new();
 
    /* Feed in input text, further data is to come */
-   Normaliser_parse( norm_id, const_cast<char*>( text ), 0 );
+   Normaliser_parse( norm_id, const_cast<char*>( removeXMLTags( text ).c_str() ), 0 );
    Normaliser_parse( norm_id, "", 1 );
 
    int numspts = Normaliser_get_num_spurts( norm_id );
@@ -342,8 +395,8 @@ std::string cerevoice_tts::tts( const char * text )
    */
 
    // make the output file name from the input file less the extension, and the output dir
-   std::string fpathout( "sample.wav" );
-   CPRC_riff_save( abuf, fpathout.c_str() );
+   //std::string fpathout( "sample.wav" );
+   CPRC_riff_save( abuf, file_name );
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -360,7 +413,7 @@ std::string cerevoice_tts::tts( const char * text )
             //XMLCh * end = XMLString::transcode( "end" );
             //XMLCh * start = XMLString::transcode( "start" );
             XMLCh * name = XMLString::transcode( "name" );
-            XMLCh * file_path = XMLString::transcode( fpathout.c_str() );
+            XMLCh * file_path = XMLString::transcode( file_name );
 
             xercesc_2_7::DOMDocument* doc = impl->createDocument(
                0,                    // root element namespace URI.
@@ -382,6 +435,12 @@ std::string cerevoice_tts::tts( const char * text )
                if ( abuf->trans[ i ].type == CPRC_ABUF_TRANS_PHONE )
                {
                   std::map<std::string, std::string>::iterator iter = phonemeToViseme.find( abuf->trans[ i ].name );
+
+                  //std::cout<<abuf->trans[i].name<<std::endl;
+
+                  //check added to avoid crashing on entries which are not defined
+                  if ( iter != phonemeToViseme.end() )
+                  {
 
                   XMLCh * start = XMLString::transcode( "start" );
                   XMLCh * end = XMLString::transcode( "end" );
@@ -426,6 +485,12 @@ std::string cerevoice_tts::tts( const char * text )
                         //float word_start = abuf->trans[ i + 1 ].start;
                         num_words++;
                      }
+                  }
+
+                  }
+                  else
+                  {
+                     printf( "COULDN'T FIND MATCH FOR: %s\n", abuf->trans[ i ].name );
                   }
                }
             }

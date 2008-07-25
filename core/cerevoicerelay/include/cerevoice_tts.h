@@ -31,7 +31,7 @@ class cerevoice_tts
 {
    public:
       void init();
-      std::string tts( const char * text );
+      std::string tts( const char * text, const char * file_name );
 };
 
 
