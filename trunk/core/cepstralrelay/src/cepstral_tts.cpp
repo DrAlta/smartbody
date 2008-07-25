@@ -102,7 +102,7 @@ class XStr
 
 void cepstral_tts::init()
 {
-   fpathout = ".\\sample.wav";
+   //fpathout = "";
 
 
    phonemeToViseme[ "pau" ] = "_";  // SIL
@@ -149,6 +149,9 @@ void cepstral_tts::init()
    phonemeToViseme[ "y" ]   = "OO"; //  Y
    phonemeToViseme[ "z" ]   = "Z";  //  Z
    phonemeToViseme[ "zh" ]  = "J";  // ZH
+   //phonemeToViseme[ "i" ]  = "";  // 
+   //phonemeToViseme[ "j" ]  = "";  // 
+   //need phonemeToViseme entries for "i" and "j"?
 
 
    // Open the Swift TTS Engine
@@ -206,7 +209,7 @@ all_done:
 }
 
 
-void create_xml_document()
+void create_xml_document( const char * file_name )
 {
    impl =  DOMImplementationRegistry::getDOMImplementation( X( "Core" ) );
 
@@ -219,7 +222,7 @@ void create_xml_document()
          //XMLCh * end = XMLString::transcode( "end" );
          //XMLCh * start = XMLString::transcode( "start" );
          XMLCh * name = XMLString::transcode( "name" );
-         XMLCh * file_path = XMLString::transcode( fpathout.c_str() );
+         XMLCh * file_path = XMLString::transcode( file_name );
 
          doc = impl->createDocument(
             0,              // root element namespace URI.
@@ -258,12 +261,12 @@ void create_xml_document()
 }
 
 
-std::string cepstral_tts::tts( const char * text )
+std::string cepstral_tts::tts( const char * text, const char * file_name )
 {
    unsigned int event_mask = (unsigned int)SWIFT_EVENT_ALL;
    swift_waveform * wave = swift_waveform_new();
 
-   create_xml_document();
+   create_xml_document( file_name );
 
    // Set audio_callback as a callback, with the output file as its param 
    swift_port_set_callback( port, &audio_callback, event_mask, wave );
@@ -285,7 +288,7 @@ std::string cepstral_tts::tts( const char * text )
    // * swift_waveform_convert(wave, "ulaw");   <-- convert to uLaw  
 
    // save the wave to a file
-   swift_waveform_save( wave, fpathout.c_str(), "riff" );
+   swift_waveform_save( wave, file_name, "riff" );
 
 
 all_done:
