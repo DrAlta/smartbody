@@ -67,12 +67,12 @@ std::map<std::string, std::string> phonemeToViseme;
 static char * EMPTY_STRING = "";
 
 
-std::string removeXMLTags( const std::string & txt )
+//  removes XML tags and new lines from a string - used to take out
+//  time markings before processing text, otherwise
+//  silence is put in place of them
+// the opening speech tag will remain, and a new line must be put at the end
+std::string removeXMLTagsAndNewLines( const std::string & txt )
 {
-   //  removes XML tags from a string - used to take out
-   //  time markings before processing text, otherwise
-   //  silence is put in place of them
-
    std::stringstream txtstream;
 
    //for the entire input string
@@ -94,11 +94,12 @@ std::string removeXMLTags( const std::string & txt )
       }
 
       //add the character to the stringstream
-      if ( i < txt.length() )
+      if ( i < txt.length() && txt.at( i ) != '\n' )
          txtstream << txt.at( i );
    }
 
-   //return the string in the stringstream
+   txtstream << "\n";
+
    return txtstream.str();
 }
 
@@ -366,7 +367,7 @@ std::string cerevoice_tts::tts( const char * text, const char * file_name )
    CPRC_lexicon_search * lxsrch = CPRC_lexicon_search_new();
 
    /* Feed in input text, further data is to come */
-   Normaliser_parse( norm_id, const_cast<char*>( removeXMLTags( text ).c_str() ), 0 );
+   Normaliser_parse( norm_id, const_cast<char*>( removeXMLTagsAndNewLines( text ).c_str() ), 0 );
    Normaliser_parse( norm_id, "", 1 );
 
    int numspts = Normaliser_get_num_spurts( norm_id );
