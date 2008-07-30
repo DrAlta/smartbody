@@ -30,6 +30,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "tt_utils.h"
 #include "cerevoice_tts.h"
@@ -171,11 +172,13 @@ void process_message( const char * message )
    {
       std::string saso_root_string = saso_root;
       directory = saso_root_string + "\\dimr\\tmpaudio\\";
+      std::cout<<"Audio files will be saved to: "<<directory<<"\n";
    }
    else
    {
       //if the saso_root is not set, output the audio to the c drive
       directory = "..\\..\\..\\dimr\\tmpaudio\\";
+      std::cout<<"SASO_ROOT not set, audio files will be saved to: "<<directory<<"\n";
    }
 
    //set the full file name
