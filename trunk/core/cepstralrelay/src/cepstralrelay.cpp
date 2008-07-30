@@ -30,6 +30,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "tt_utils.h"
 #include "cepstral_tts.h"
@@ -67,11 +68,24 @@ void process_message( const char * message )
    file_name = file_name.substr( pos2, pos - pos2 ) + ".wav";
 
    //get the saso root
-   std::string saso_root;
-   saso_root = getenv( "SASO_ROOT" );
+   char * saso_root = getenv( "SASO_ROOT" );
+   std::string directory = "";
+
+   if ( saso_root != NULL )
+   {
+      std::string saso_root_string = saso_root;
+      directory = saso_root_string + "\\dimr\\tmpaudio\\";
+      std::cout << "Audio files will be saved to: " << directory << "\n";
+   }
+   else
+   {
+      //if the saso_root is not set, output the audio to the c drive
+      directory = "..\\..\\..\\dimr\\tmpaudio\\";
+      std::cout << "SASO_ROOT not set, audio files will be saved to: " << directory << "\n";
+   }
 
    //set the full file name
-   file_name = saso_root + "\\dimr\\tmpaudio\\" + file_name;
+   file_name = directory + file_name;
 
    std::string xml = tts->tts( utterance.c_str(), file_name.c_str() );
 
