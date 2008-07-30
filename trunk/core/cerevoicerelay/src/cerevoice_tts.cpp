@@ -27,6 +27,9 @@
 
 #include <map>
 #include <sstream>
+#include <fstream>
+#include <conio.h>
+#include <io.h>
 
 #include <xercesc/util/XMLUTF8Transcoder.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
@@ -66,6 +69,13 @@ CPRC_voice * voice;
 std::map<std::string, std::string> phonemeToViseme;
 static char * EMPTY_STRING = "";
 
+//normalization file names
+char * abbfile;
+char * pbreakfile;
+char * homographfile;
+char * reductionfile;
+char * rulesfile;
+
 
 //  removes XML tags and new lines from a string - used to take out
 //  time markings before processing text, otherwise
@@ -101,6 +111,13 @@ std::string removeXMLTagsAndNewLines( const std::string & txt )
    txtstream << "\n";
 
    return txtstream.str();
+}
+
+
+//returns true if file exists, else false
+bool fileExists( const char * fileName )
+{
+   return _access( fileName, 0 ) == 0;
 }
 
 
@@ -235,13 +252,29 @@ void cerevoice_tts::init()
 {
    lic_text = EMPTY_STRING;
    signature = EMPTY_STRING;
-   //licfile = "C:\\cerevoice_sdk_2.0.0_windows_i686_academic\\cerevoice_2.0.0_katherine_00009.lic";
-   licfile = "..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_katherine_00009.lic";
-//   licfile = "cerevoice_2.0.0_heather_00009.lic";
 
+   licfile = "..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_katherine_00009.lic";
+
+   //make sure license file exists
+   if ( !fileExists( licfile ) )
+   {
+      std::cout<<"Error: license file not found! See README files for setup information. Press any key to exit.\n";
+      _getch();
+      exit(1);
+   }
    _read_licence( licfile, &lic_text, &signature );
 
-   voice = CPRC_load_voice( "..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_katherine_22k.voice", lic_text, static_cast<int>( strlen( lic_text ) ), signature, static_cast<int>( strlen( signature ) ) );
+   char * voiceFile = "..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_katherine_22k.voice";
+
+   //make sure voice file exists
+   if(!fileExists(voiceFile))
+   {
+      std::cout<<"Error: voice file not found! See README files for setup information. Press any key to exit.\n";
+      _getch();
+      exit(1);
+   }
+
+   voice = CPRC_load_voice( voiceFile, lic_text, static_cast<int>( strlen( lic_text ) ), signature, static_cast<int>( strlen( signature ) ) );
 
    // free license strings (aalocated in read_license)
    free( lic_text );
@@ -294,7 +327,49 @@ void cerevoice_tts::init()
    phonemeToViseme[ "zh" ]  = "J";  // ZH
    //phonemeToViseme[ "i" ]  = "";  // 
    //phonemeToViseme[ "j" ]  = "";  // 
-   //need phonemeToViseme entries for "i" and "j"?
+   //possibly need phonemeToViseme entries for "i" and "j"?
+
+
+   abbfile       = "../../lib/cerevoice/veng_db/en/norm/abb.txt";
+   pbreakfile    = "../../lib/cerevoice/veng_db/en/norm/pbreak.txt";
+   homographfile = "../../lib/cerevoice/veng_db/en/homographs/rules.dat";
+   reductionfile = "../../lib/cerevoice/veng_db/en/reduction/rules.dat";
+   rulesfile     = "../../lib/cerevoice/veng_db/en/gb/norm/rules.py";
+
+   if ( !fileExists( abbfile ) )
+   {
+      std::cout<<"Error: normalization file abb.txt not found! See README files for setup information. Press any key to exit.\n";
+      _getch();
+      exit(1);
+   }
+
+   if ( !fileExists( pbreakfile ) )
+   {
+      std::cout<<"Error: normalization file pbreak.txt not found! See README files for setup information. Press any key to exit.\n";
+      _getch();
+      exit(1);
+   }
+
+   if ( !fileExists( homographfile ) )
+   {
+      std::cout<<"Error: normalization file homographsrules.dat not found! See README files for setup information. Press any key to exit.\n";
+      _getch();
+      exit(1);
+   }
+
+   if ( !fileExists( reductionfile ) )
+   {
+      std::cout<<"Error: normalization file reductionrules.dat not found! See README files for setup information. Press any key to exit.\n";
+      _getch();
+      exit(1);
+   }
+
+   if ( !fileExists( rulesfile ) )
+   {
+      std::cout<<"Error: normalization file normrules.py not found! See README files for setup information. Press any key to exit.\n";
+      _getch();
+      exit(1);
+   }
 
    // Initialize the XML4C2 system.
    try
@@ -313,15 +388,6 @@ void cerevoice_tts::init()
 std::string cerevoice_tts::tts( const char * text, const char * file_name )
 {
    char * result = "";
-
-   //printf( "INDEX: %d\n", std::string(text).find( "ref", 0 ) );
-
-
-   char * abbfile       = "../../data/cereproc/cerevoice/abb.txt";
-   char * pbreakfile    = "../../data/cereproc/cerevoice/pbreak.txt";
-   char * homographfile = "../../data/cereproc/cerevoice/homographsrules.dat";
-   char * reductionfile = "../../data/cereproc/cerevoice/reductionrules.dat";
-   char * rulesfile     = "../../data/cereproc/cerevoice/normrules.py";
 
    /*
       Create a text normalisation parser
@@ -399,128 +465,123 @@ std::string cerevoice_tts::tts( const char * text, const char * file_name )
    //std::string fpathout( "sample.wav" );
    CPRC_riff_save( abuf, file_name );
 
-//////////////////////////////////////////////////////////////////////////////////////////
-
    // Watch for special case help request
    int errorCode = 0;
 
+
+   DOMImplementation * impl =  DOMImplementationRegistry::getDOMImplementation( X( "Core" ) );
+
+   if ( impl != NULL )
    {
-      DOMImplementation * impl =  DOMImplementationRegistry::getDOMImplementation( X( "Core" ) );
-
-      if ( impl != NULL )
+      try
       {
-         try
+         //XMLCh * end = XMLString::transcode( "end" );
+         //XMLCh * start = XMLString::transcode( "start" );
+         XMLCh * name = XMLString::transcode( "name" );
+         XMLCh * file_path = XMLString::transcode( file_name );
+
+         xercesc_2_7::DOMDocument* doc = impl->createDocument(
+            0,                    // root element namespace URI.
+            X( "speak" ),         // root element name
+            0 );                  // document type object (DTD).
+
+         DOMElement * rootElem = doc->getDocumentElement();
+
+         DOMElement * soundFileElement = doc->createElement( X( "soundFile" ) );
+         soundFileElement->setAttribute( name, file_path );
+         rootElem->appendChild( soundFileElement );
+
+         DOMElement * wordElement = doc->createElement( X( "word" ) );
+
+         int num_words = 0;
+
+         for ( int i = 0; i < abuf->trans_sz; i++ )
          {
-            //XMLCh * end = XMLString::transcode( "end" );
-            //XMLCh * start = XMLString::transcode( "start" );
-            XMLCh * name = XMLString::transcode( "name" );
-            XMLCh * file_path = XMLString::transcode( file_name );
-
-            xercesc_2_7::DOMDocument* doc = impl->createDocument(
-               0,                    // root element namespace URI.
-               X( "speak" ),         // root element name
-               0 );                  // document type object (DTD).
-
-            DOMElement * rootElem = doc->getDocumentElement();
-
-            DOMElement * soundFileElement = doc->createElement( X( "soundFile" ) );
-            soundFileElement->setAttribute( name, file_path );
-            rootElem->appendChild( soundFileElement );
-
-            DOMElement * wordElement = doc->createElement( X( "word" ) );
-
-            int num_words = 0;
-
-            for ( int i = 0; i < abuf->trans_sz; i++ )
+            if ( abuf->trans[ i ].type == CPRC_ABUF_TRANS_PHONE )
             {
-               if ( abuf->trans[ i ].type == CPRC_ABUF_TRANS_PHONE )
-               {
-                  std::map<std::string, std::string>::iterator iter = phonemeToViseme.find( abuf->trans[ i ].name );
+              std::map<std::string, std::string>::iterator iter = phonemeToViseme.find( abuf->trans[ i ].name );
 
-                  //std::cout<<abuf->trans[i].name<<std::endl;
+              //check added to avoid crashing on entries which are not defined
+              if ( iter != phonemeToViseme.end() )
+              {
 
-                  //check added to avoid crashing on entries which are not defined
-                  if ( iter != phonemeToViseme.end() )
-                  {
+                 XMLCh * start = XMLString::transcode( "start" );
+                 XMLCh * end = XMLString::transcode( "end" );
+                 XMLCh * type = XMLString::transcode( "type" );
+                 XMLCh * phone_type = XMLString::transcode( iter->second.c_str() );
 
-                  XMLCh * start = XMLString::transcode( "start" );
-                  XMLCh * end = XMLString::transcode( "end" );
-                  XMLCh * type = XMLString::transcode( "type" );
-                  XMLCh * phone_type = XMLString::transcode( iter->second.c_str() );
+                 std::string end_f = vhcl::Format( "%0.6f", abuf->trans[i].end );
+                 XMLCh * end_time = XMLString::transcode( end_f.c_str() );
 
-                  std::string end_f = vhcl::Format( "%0.6f", abuf->trans[i].end );
-                  XMLCh * end_time = XMLString::transcode( end_f.c_str() );
+                 std::string start_f = vhcl::Format( "%0.6f", abuf->trans[i].start );
+                 XMLCh * start_time = XMLString::transcode( start_f.c_str() );
 
-                  std::string start_f = vhcl::Format( "%0.6f", abuf->trans[i].start );
-                  XMLCh * start_time = XMLString::transcode( start_f.c_str() );
+                 DOMElement * visemeElement = doc->createElement( X( "viseme" ) );
+                 visemeElement->setAttribute( start, start_time );
+                 visemeElement->setAttribute( type, phone_type );
 
-                  DOMElement * visemeElement = doc->createElement( X( "viseme" ) );
-                  visemeElement->setAttribute( start, start_time );
-                  visemeElement->setAttribute( type, phone_type );
+                 if ( strcmp( abuf->trans[ i ].name, "sil" ) == 0 )
+                 {
+                   rootElem->appendChild( visemeElement );
+                 }
+                 else
+                 {
+                   wordElement->appendChild( visemeElement );
+                 }
 
-                  if ( strcmp( abuf->trans[ i ].name, "sil" ) == 0 )
-                  {
-                     rootElem->appendChild( visemeElement );
-                  }
-                  else
-                  {
-                     wordElement->appendChild( visemeElement );
-                  }
+                 if ( i < ( abuf->trans_sz - 1 ) )
+                 {
+                   if ( ( abuf->trans[ i + 1 ].type == CPRC_ABUF_TRANS_WORD ) || ( abuf->trans[ i + 1 ].type == CPRC_ABUF_TRANS_MARK ) //) {
+                     || ( strcmp( abuf->trans[ i + 1 ].name, "sil" ) == 0 ) )
+                   {
+                     wordElement->setAttribute( end, end_time );
 
-                  if ( i < ( abuf->trans_sz - 1 ) )
-                  {
-                     if ( ( abuf->trans[ i + 1 ].type == CPRC_ABUF_TRANS_WORD ) || ( abuf->trans[ i + 1 ].type == CPRC_ABUF_TRANS_MARK ) //) {
-                        || ( strcmp( abuf->trans[ i + 1 ].name, "sil" ) == 0 ) )
-                     {
-                        wordElement->setAttribute( end, end_time );
+                     if ( wordElement->hasChildNodes() )
+                        rootElem->appendChild( wordElement );
 
-                        if ( wordElement->hasChildNodes() )
-                           rootElem->appendChild( wordElement );
+                     wordElement = doc->createElement( X( "word" ) );
 
-                        wordElement = doc->createElement( X( "word" ) );
+                     std::string word_start_f = vhcl::Format( "%0.6f", abuf->trans[ i + 1 ].start );
+                     XMLCh * word_start_time = XMLString::transcode( word_start_f.c_str() );
+                     wordElement->setAttribute( start, word_start_time );
 
-                        std::string word_start_f = vhcl::Format( "%0.6f", abuf->trans[ i + 1 ].start );
-                        XMLCh * word_start_time = XMLString::transcode( word_start_f.c_str() );
-                        wordElement->setAttribute( start, word_start_time );
+                     //float word_start = abuf->trans[ i + 1 ].start;
+                     num_words++;
+                   }
+                 }
 
-                        //float word_start = abuf->trans[ i + 1 ].start;
-                        num_words++;
-                     }
-                  }
-
-                  }
-                  else
-                  {
-                     printf( "COULDN'T FIND MATCH FOR: %s\n", abuf->trans[ i ].name );
-                  }
-               }
+              }
+              else
+              {
+                printf( "COULDN'T FIND MATCH FOR: %s\n", abuf->trans[ i ].name );
+              }
             }
+         }
 
-            DOMWriter * theSerializer = ((DOMImplementationLS *)impl)->createDOMWriter();
-            XMLCh * xml_result = theSerializer->writeToString( *rootElem );
-            result = XMLString::transcode( xml_result );
-            theSerializer->release();
-         }
-         catch ( const OutOfMemoryException & )
-         {
-            XERCES_STD_QUALIFIER cerr << "OutOfMemoryException" << XERCES_STD_QUALIFIER endl;
-            errorCode = 5; 
-         }
-         catch ( const DOMException & e )
-         {
-            XERCES_STD_QUALIFIER cerr << "DOMException code is:  " << e.code << XERCES_STD_QUALIFIER endl;
-            errorCode = 2;
-         }
-         catch ( const XMLException & toCatch )
-         {
-            printf( "XMLException occurred: %s", toCatch.getCode() );
-            errorCode = 4;
-         }
-         catch (...)
-         {
-            XERCES_STD_QUALIFIER cerr << "An error occurred creating the document" << XERCES_STD_QUALIFIER endl;
-            errorCode = 3;
-         }
+         DOMWriter * theSerializer = ((DOMImplementationLS *)impl)->createDOMWriter();
+         XMLCh * xml_result = theSerializer->writeToString( *rootElem );
+         result = XMLString::transcode( xml_result );
+         theSerializer->release();
+      }
+      catch ( const OutOfMemoryException & )
+      {
+         XERCES_STD_QUALIFIER cerr << "OutOfMemoryException" << XERCES_STD_QUALIFIER endl;
+         errorCode = 5; 
+      }
+      catch ( const DOMException & e )
+      {
+         XERCES_STD_QUALIFIER cerr << "DOMException code is:  " << e.code << XERCES_STD_QUALIFIER endl;
+         errorCode = 2;
+      }
+      catch ( const XMLException & toCatch )
+      {
+         printf( "XMLException occurred: %s", toCatch.getCode() );
+         errorCode = 4;
+      }
+      catch (...)
+      {
+         XERCES_STD_QUALIFIER cerr << "An error occurred creating the document" << XERCES_STD_QUALIFIER endl;
+         errorCode = 3;
       }
    }
 
