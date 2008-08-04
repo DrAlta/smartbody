@@ -38,6 +38,8 @@
 
 cepstral_tts * tts = NULL;
 
+std::string directory = "";
+
 
 void process_message( const char * message )
 {
@@ -66,23 +68,6 @@ void process_message( const char * message )
    int pos = file_name.find( ".aiff" );
    int pos2 = file_name.find( "utt" );
    file_name = file_name.substr( pos2, pos - pos2 ) + ".wav";
-
-   //get the saso root
-   char * saso_root = getenv( "SASO_ROOT" );
-   std::string directory = "";
-
-   if ( saso_root != NULL )
-   {
-      std::string saso_root_string = saso_root;
-      directory = saso_root_string + "\\dimr\\tmpaudio\\";
-      std::cout << "Audio files will be saved to: " << directory << "\n";
-   }
-   else
-   {
-      //if the saso_root is not set, output the audio to the c drive
-      directory = "..\\..\\..\\dimr\\tmpaudio\\";
-      std::cout << "SASO_ROOT not set, audio files will be saved to: " << directory << "\n";
-   }
 
    //set the full file name
    file_name = directory + file_name;
@@ -125,6 +110,22 @@ int main( int argc, char * argv[] )
    if ( elvish_scope == NULL )
    {
       elvish_scope = strcat( getenv( "COMPUTERNAME" ), "_SCOPE" );
+   }
+
+   //get the saso root
+   char * saso_root = getenv( "SASO_ROOT" );
+
+   if ( saso_root != NULL )
+   {
+      std::string saso_root_string = saso_root;
+      directory = saso_root_string + "\\dimr\\tmpaudio\\";
+      std::cout << "Audio files will be saved to: " << directory << "\n";
+   }
+   else
+   {
+      //if the saso_root is not set, output the audio to the c drive
+      directory = "..\\..\\..\\dimr\\tmpaudio\\";
+      std::cout << "SASO_ROOT not set, audio files will be saved to: " << directory << "\n";
    }
 
    ttu_set_client_callback( elvin_callback );
