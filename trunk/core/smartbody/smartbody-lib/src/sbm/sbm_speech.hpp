@@ -114,12 +114,14 @@ namespace SmartBody {
          *  If node is an attribute, use the attribute value as a string.
          *  Returns a unique request identifier.
          */
+		// TODO: Define error return value as a constant somewhere (or new exception type).
         virtual RequestId requestSpeechAudio( const char* agentName, const DOMNode* node, const char* callbackCmd ) = 0;
 
         /**
          *  Requests audio for a speech char[] text by agentName.
          *  Returns a unique request identifier.
          */
+		// TODO: Define error return value as a constant somewhere (or new exception type).
         virtual RequestId requestSpeechAudio( const char* agentName, const char* text, const char* callbackCmd ) = 0;
 
         /**

@@ -144,7 +144,12 @@ The timestamp is 20051121_150427 (that is, YYYYMMDD_HHMMSS ), so we can check ol
 	string soundFile= "../../../dimr/tmpaudio/utt_" +date+ "_"+ time+ "_"+ string(agentName)+"_"+ myStream.str()+".aiff"; //gives sound file correct name to Remote speech process (and thus relative to Remote speech process)
 	string* soundFilePtr= new string(soundFile);
 	//mcu.character_map.lookup(agentName)->getVoice()-- gets the voice name from the character in meCharacter (it's a string pointer so the * dereferences it)
-	string command= "speak " + string(agentName) +" "+ myStream.str() + " "+ mcuCBHandle::singleton().character_map.lookup(agentName)->get_voice_code()+ " "+ soundFile +" "+ textOfUtt;// text; //concatenates the whole command to be sent to Remote speech process
+	SbmCharacter* agent = mcuCBHandle::singleton().character_map.lookup(agentName);
+	if( agent == NULL ) {
+		// TODO: Log: Unknown Agent
+		return -1;  // TODO: Define error return value as a constant somewhere (or new exception type).
+	}
+	string command= "speak " + string(agentName) +" "+ myStream.str() + " "+ agent->get_voice_code()+ " "+ soundFile +" "+ textOfUtt;// text; //concatenates the whole command to be sent to Remote speech process
 	//IF REMOTE SPEECH PROCESS SENDS BACK A "SPEECH" tag in the UTTERANCE THIS FILENAME WILL BE CHANGED!!! Go to Recieving Function to see where the Sounfile name might be reset
 	soundLookUp.insert(myStream.str().c_str(),soundFilePtr); //the sound name has to be stored in a globally accessable table in order to be found later  
 	string* agentNamePtr= new string (agentName);
@@ -270,15 +275,17 @@ std::vector<VisemeData*>* remote_speech::getVisemes( RequestId requestId ){
 char* remote_speech::getSpeechPlayCommand( RequestId requestId ){
 		
 	/**
-        *  Returns the sbm command used to play the speech audio. The command is now of form:  send PlaySound <audio path>- this sends the sound directly to Unreal
-        */
-	ostringstream newStream; //creates an ostringstream object
-	newStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
-	if(!soundLookUp.does_key_exist(newStream.str().c_str()))
-	{
-		return(NULL);
+     *  Returns the sbm command used to play the speech audio. The command is now of form:  send PlaySound <audio path>- this sends the sound directly to Unreal
+     */
+	ostringstream requestIdStream; //creates an ostringstream object
+	requestIdStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
+	string requestIdStr( requestIdStream.str() );
+	string* lookup_result = soundLookUp.lookup( requestIdStr.c_str() );
+	if( lookup_result == NULL ) {
+		// Error: no known sound file
+		return NULL;
 	}
-	string soundFile= *(soundLookUp.lookup(newStream.str().c_str()));
+	string soundFile= *lookup_result;
 	soundFile= "send PlaySound "+ soundFile; //concatenates audio path with playsound command
 	char* retSoundFile= new char[soundFile.length() + 1];
 	strcpy(retSoundFile, soundFile.c_str());
@@ -289,13 +296,15 @@ char* remote_speech::getSpeechStopCommand( RequestId requestId ){
 	    /**
         *  Returns the sbm command used to stop the speech audio. The command is of form: send StopSound <audio path>
         */
-ostringstream stopStream; //creates an ostringstream object
-	stopStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
-	if(!soundLookUp.does_key_exist(stopStream.str().c_str()))
-	{
-		return(NULL);
+	ostringstream requestIdStream; //creates an ostringstream object
+	requestIdStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
+	string requestIdStr( requestIdStream.str() );
+	string* lookup_result = soundLookUp.lookup( requestIdStr.c_str() );
+	if( lookup_result == NULL ) {
+		// Error: no known sound file
+		return NULL;
 	}
-	string soundFile= *(soundLookUp.lookup(stopStream.str().c_str()));
+	string soundFile= *lookup_result;
 	soundFile= "send StopSound "+ soundFile + " 3"; //The 3 denotes the channel in the VR theatre that the sound corresponds to
 	char* retSoundFile= new char[soundFile.length() + 1];
 	strcpy(retSoundFile, soundFile.c_str());
@@ -304,9 +313,15 @@ ostringstream stopStream; //creates an ostringstream object
 
 float remote_speech::getMarkTime( RequestId requestId, const XMLCh* markId ){
 	if(XMLString::indexOf(markId, '+') > -1 || XMLString::indexOf(markId, '-') > -1 ) return -1;
-	ostringstream markStream; //creates an ostringstream object
-	markStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
-	DOMDocument* XMLDoc= uttLookUp.lookup(markStream.str().c_str())->getOwnerDocument(); //gets the dom document
+	ostringstream requestIdStream; //creates an ostringstream object
+	requestIdStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
+	string requestIdStr( requestIdStream.str() );
+	DOMNode* node = uttLookUp.lookup(requestIdStr.c_str());
+	if( node == NULL ) {
+		// Unknown DOM Node for requestId
+		return -1;
+	}
+	DOMDocument* XMLDoc= node->getOwnerDocument(); //gets the dom document
 	XMLCh* markTag= L"mark"; //the tag for any mark 
 	DOMNodeList* marks= XMLDoc->getElementsByTagName(markTag); //looks through the DOMDocument and extracts every mark tag and puts it in a list
 
@@ -336,14 +351,15 @@ float remote_speech::getMarkTime( RequestId requestId, const XMLCh* markId ){
 char*  remote_speech::getSpeechAudioFilename( RequestId requestId ){
 	//returns the .aiff audio filename for given request ID
 
-	ostringstream nameStream; //creates an ostringstream object
-	nameStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
-	
-	if(!soundLookUp.does_key_exist(nameStream.str().c_str()))
-	{
-		return(NULL);
+	ostringstream requestIdStream; //creates an ostringstream object
+	requestIdStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
+	string requestIdStr( requestIdStream.str() );
+	string* lookup_result = soundLookUp.lookup( requestIdStr.c_str() );
+	if( lookup_result == NULL ) {
+		// Error: no known sound file
+		return NULL;
 	}
-	string soundFile= *(soundLookUp.lookup(nameStream.str().c_str()));
+	string soundFile= *lookup_result;
 	char* retSoundFile= new char[soundFile.length() + 1];
 	strcpy(retSoundFile, soundFile.c_str());
 	char* justName= new char[soundFile.length()-22];

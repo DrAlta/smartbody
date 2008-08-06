@@ -121,19 +121,20 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char* agentName, const char
 			//cout<<"Text of Utt "<<textOfUtt.substr(keyWordIndex,keyWordIndexEnd-keyWordIndex);
 			
 			//if agent is not spawned in the level the character will not exist
-			if(mcu.character_map.lookup(agentName) == NULL)
+			SbmCharacter* agent = mcu.character_map.lookup(agentName);
+			if( agent == NULL)
 			{
 				printf( "AudioFileSpeech::requestSpeechAudio ERR: insert AudioFile voice code lookup FAILED, msgId=%s\n", agentName ); 
 				return (NULL);
 			}
 			
 			//the audio path is the .wav; the viseme file is .ltf (created by impersonator
-			string audioPath="";
-			audioPath += mcu.character_map.lookup(agentName)->get_voice_code()+"/"+textOfUtt.substr(keyWordIndex,keyWordIndexEnd-keyWordIndex)+".wav";
+			string audioPath;
+			audioPath += agent->get_voice_code()+"/"+textOfUtt.substr(keyWordIndex,keyWordIndexEnd-keyWordIndex)+".wav";
 cout << "audioPath = \""<<audioPath<<"\""<<endl;
 			string theKey= textOfUtt.substr(keyWordIndex,keyWordIndexEnd-keyWordIndex);
-			string visemePath="";
-			visemePath += "../../../../../"+mcu.character_map.lookup(agentName)->get_voice_code()+"/"+textOfUtt.substr(keyWordIndex,keyWordIndexEnd-keyWordIndex)+".ltf";
+			string visemePath;
+			visemePath += "../../../../../"+agent->get_voice_code()+"/"+textOfUtt.substr(keyWordIndex,keyWordIndexEnd-keyWordIndex)+".ltf";
 cout << "visemePath = \""<<visemePath<<"\""<<endl;
 			string* audioPathPtr= new string(audioPath);
 			string* visemePathPtr= new string(visemePath);
@@ -220,12 +221,18 @@ const std::vector<VisemeData *>* AudioFileSpeech::getVisemes( RequestId requestI
 	string phon2Vis[]= {"EE","Er","Ih","Ao","oh","OO","Z","j","F","Th","D","BMP","NG","R","KG"};
 	ostringstream newStream; //creates an ostringstream object
 	newStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
+	string requestIdStr( newStream.str() );
 	
 	vector<VisemeData *> *visemeVector= new vector<VisemeData *>;
 
 	ifstream visemeMap_inStream;
 	ifstream utteranceVisemes_inStream;
-	string utteranceVisemesPath=*(audioVisemeLookUp.lookup(newStream.str().c_str()));
+	string* lookup_result = audioVisemeLookUp.lookup(requestIdStr.c_str());
+	if( lookup_result == NULL ) {
+		// unknown requestId in viseme table
+		return NULL;
+	}
+	string utteranceVisemesPath=*lookup_result;
 	utteranceVisemes_inStream.open(utteranceVisemesPath.c_str());
 	
 	//if the viseem file can't be opened
@@ -491,7 +498,12 @@ float AudioFileSpeech::getMarkTime( RequestId requestId, const XMLCh* markId )
 		endIndex=tempString.rfind("\"");
 
 		tempString=tempString.substr(startIndex+1,endIndex-12);*/
-		tempString= textOfUtterance.lookup(id.str().c_str())->c_str();
+		string* lookup_result = textOfUtterance.lookup(id.str().c_str());
+		if( lookup_result==NULL ) {
+			// Unknown markId
+			return -1;
+		}
+		tempString = *lookup_result;
 		//cout<<endl<<"********tempString "<<tempString<<endl;
 		string testString=tempString;
 		bool noWords=false;
