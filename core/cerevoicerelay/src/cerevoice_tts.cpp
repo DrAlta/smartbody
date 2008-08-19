@@ -253,7 +253,9 @@ void cerevoice_tts::init()
    lic_text = EMPTY_STRING;
    signature = EMPTY_STRING;
 
-   licfile = "..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_katherine_00009.lic";
+//   licfile = "..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_katherine_00009.lic";
+//   licfile = "..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_heather_00009.lic";
+   licfile = "..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_star_00009.lic";
 
    //make sure license file exists
    if ( !fileExists( licfile ) )
@@ -264,7 +266,9 @@ void cerevoice_tts::init()
    }
    _read_licence( licfile, &lic_text, &signature );
 
-   char * voiceFile = "..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_katherine_22k.voice";
+//   char * voiceFile = "..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_katherine_22k.voice";
+//   char * voiceFile = "..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_heather_22k.voice";
+   char * voiceFile = "..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_star_16k.voice";
 
    //make sure voice file exists
    if(!fileExists(voiceFile))
@@ -428,7 +432,8 @@ std::string cerevoice_tts::tts( const char * text, const char * file_name )
    /* set up a spurt, an audio buffer for data, and a lexicon search structure */
 
    CPRC_spurt * spurt = CPRC_spurt_new( voice );
-   CPRC_abuf * abuf = CPRC_abuf_new( 22050 );
+//   CPRC_abuf * abuf = CPRC_abuf_new( 22050 );
+   CPRC_abuf * abuf = CPRC_abuf_new( 16000 );
    CPRC_lts_search * ltssrch = CPRC_lts_search_new( 0 );
    CPRC_lexicon_search * lxsrch = CPRC_lexicon_search_new();
 
