@@ -33,6 +33,9 @@
 
 #include "gwiz_math.h"
 
+// ASSUME: right handed quick-draw motion only
+// DETERMINE: if handedness can be extracted from raw motion
+
 /*
 TODO: SBM commands:
 
@@ -74,57 +77,30 @@ TODO: Testing sequence:
 class MeCtQuickDraw : public MeController	{ 
 
 	private:
-//		enum timing_mode_enum_set	{
-//			TASK_SPEED,
-//			TASK_TIME
-//		};
-		enum coord_coord_enum_set	{
-			HEADING_LOCAL,
-			HEADING_WORLD
+		enum aim_coord_enum_set	{
+			AIM_LOCAL,
+			AIM_WORLD
 		};
 
-		struct joint_param_index_t {
-			int x, y, z, q;
-		};
-
-		SkMotion*            _left_motion; 
-		SkMotion*            _right_motion; 
 		SkMotion*            _motion; 
 		SkMotion::InterpType _play_mode; // its play mode
 		double               _duration;  // the time-warped duration
 		int                  _last_apply_frame; // to optimize shared motion evaluation
-		SrBuffer<int>        _mChan_to_buff; // motion's channels to context's buffer index
-		SkChannelArray		_channels; // override motion channels, to include world_offset
+		SrBuffer<int>        _motion_chan_to_buff; // motion's channels to context's buffer index
+		SrBuffer<int>        _arm_chan_indices; // arm channels in raw motion
 
 		SkSkeleton* 	skeleton_ref_p;
 		float * interim_pose_buff_p;
 		
 		vector_t world_offset_pos; // joint state at controller-start
 		quat_t   world_offset_rot;
-		
-		joint_param_index_t world_offset_chan;
-		joint_param_index_t world_offset_idx;
-		joint_param_index_t base_joint_chan;
-		joint_param_index_t base_joint_idx;
-		
-		int timing_mode;
-		int heading_mode;
-		int dirty_action_bit;
-		
-		float raw_angle;
-		float world_turn_angle;
-		float turn_angle;
-		float turn_angle_scale;
 
+		int aim_mode;
 		float raw_time;
-		float turn_speed;
-		float turn_time;
-		float turn_time_scale;
-		
-		SkMotion* build_mirror_motion( SkMotion* ref_motion_p );
-		void capture_world_offset_state( void );
-		float calc_raw_turn_angle( SkMotion* mot_p, char *joint_name );
-		void update_action_params( void );
+		float play_time;
+		float play_time_scale;
+
+//		void capture_world_offset_state( void );
 
 	public:
 		static const char* type_name;
@@ -143,25 +119,17 @@ class MeCtQuickDraw : public MeController	{
     		MeController::init() is automatically called. */
 		void init( SkMotion* mot_p );
 
-		// Target API (copied from MeCtGaze)
+		// Target API
 		void set_target_joint( float x, float y, float z, SkJoint* ref_joint_p = NULL );
-
-		void set_time( float sec );
-//		void set_speed( float dps );
-		
 		void set_aim_local( float p, float h, float r );
 		void set_aim_world( float p, float h, float r );
-
-		/*! Returns a pointer to the current motion of this controller */
-		SkMotion* motion () { return _motion; }
+		void set_time( float sec );
 
 		/*! Set the play mode, default is linear */
 		void play_mode ( SkMotion::InterpType it ) { _play_mode=it; }
 
 		/*! Returns the current play mode */
 		SkMotion::InterpType play_mode () const { return _play_mode; }
-
-		virtual double controller_duration ();
 
 	private:
 
@@ -171,6 +139,7 @@ class MeCtQuickDraw : public MeController	{
 		virtual void controller_map_updated();
 		virtual bool controller_evaluate ( double t, MeFrameData& frame );
 		virtual SkChannelArray& controller_channels ();
+		virtual double controller_duration ();
 		virtual const char* controller_type ();
 		virtual void print_state( int tabCount );
 };
