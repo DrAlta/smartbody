@@ -127,14 +127,22 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char* agentName, const char
 				printf( "AudioFileSpeech::requestSpeechAudio ERR: insert AudioFile voice code lookup FAILED, msgId=%s\n", agentName ); 
 				return (NULL);
 			}
-			
+
 			//the audio path is the .wav; the viseme file is .ltf (created by impersonator
+			char fullAudioPath[ _MAX_PATH ];
+			string relativeAudioPath = (string)"../../../../" + agent->get_voice_code();
+			if ( _fullpath( fullAudioPath, relativeAudioPath.c_str(), _MAX_PATH ) == NULL )
+			{
+				printf( "AudioFileSpeech::requestSpeechAudio ERR: _fullpath() returned NULL" );
+				return NULL;
+			}
+
 			string audioPath;
-			audioPath += agent->get_voice_code()+"/"+textOfUtt.substr(keyWordIndex,keyWordIndexEnd-keyWordIndex)+".wav";
+			audioPath += (string)fullAudioPath+"/"+textOfUtt.substr(keyWordIndex,keyWordIndexEnd-keyWordIndex)+".wav";
 cout << "audioPath = \""<<audioPath<<"\""<<endl;
 			string theKey= textOfUtt.substr(keyWordIndex,keyWordIndexEnd-keyWordIndex);
 			string visemePath;
-			visemePath += "../../../../../"+agent->get_voice_code()+"/"+textOfUtt.substr(keyWordIndex,keyWordIndexEnd-keyWordIndex)+".ltf";
+			visemePath += "../../../../"+agent->get_voice_code()+"/"+textOfUtt.substr(keyWordIndex,keyWordIndexEnd-keyWordIndex)+".ltf";
 cout << "visemePath = \""<<visemePath<<"\""<<endl;
 			string* audioPathPtr= new string(audioPath);
 			string* visemePathPtr= new string(visemePath);
