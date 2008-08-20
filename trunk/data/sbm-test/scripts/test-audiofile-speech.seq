@@ -12,7 +12,7 @@
 ###  Set the voice type to audiofile
 ###  and choose a directory for audio and .ltf files.
 ###  Note: the directory assumes trunk is named smartbody
-0	set character doctor voice audiofile trunk/data/sbm-test/speech_audio/boy
+0	set character doctor voice audiofile data/sbm-test/speech_audio/boy
 
 
 ###  Audiofile speech uses BML's ref= attribute
