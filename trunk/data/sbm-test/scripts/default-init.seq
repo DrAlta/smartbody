@@ -39,3 +39,5 @@
 
 1	set test character doctor
 1	set test recipient elder
+
+2   seq test-qdraw-init

@@ -21,8 +21,11 @@
  *      Andrew n marshall, USC
  */
 
-#include "sbm_pawn.hpp"
+//#include "sbm_pawn.hpp"
 #include "me_ct_quick_draw.h"
+
+#define TMP_NUM_ARM_JOINTS  	4
+#define MAX_JOINT_LABEL_LEN 	64
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -30,26 +33,18 @@ const char* MeCtQuickDraw::type_name = "QuickDraw";
 
 MeCtQuickDraw::MeCtQuickDraw( void )	{
 
-   _left_motion = NULL;
-   _right_motion = NULL;
    _motion = NULL;
-
    _play_mode = SkMotion::Linear;
    _duration = -1.0;
    _last_apply_frame = 0;
-   
+
    skeleton_ref_p = NULL;
    interim_pose_buff_p = NULL;
-   
-//   timing_mode = TASK_TIME;
-   heading_mode = HEADING_LOCAL;
-   dirty_action_bit = 0;
+
+	aim_mode = AIM_LOCAL;
 }
 
 MeCtQuickDraw::~MeCtQuickDraw( void )	{
-
-	if ( _left_motion ) _left_motion->unref();
-	if ( _right_motion ) _right_motion->unref();
 
 	if( interim_pose_buff_p )	{
 		delete [] interim_pose_buff_p;
@@ -58,6 +53,12 @@ MeCtQuickDraw::~MeCtQuickDraw( void )	{
 }
 
 void MeCtQuickDraw::init( SkMotion* mot_p ) {
+//	static char l_arm_labels[ TMP_NUM_ARM_JOINTS ][ MAX_JOINT_LABEL_LEN ] = {
+//		"l_shoulder", "l_elbow", "l_forearm", "l_wrist"
+//	};
+	static char r_arm_labels[ TMP_NUM_ARM_JOINTS ][ MAX_JOINT_LABEL_LEN ] = {
+		"r_shoulder", "r_elbow", "r_forearm", "r_wrist"
+	};
 
 	if( _motion ) {
 		if( mot_p == _motion ) {
@@ -66,62 +67,31 @@ void MeCtQuickDraw::init( SkMotion* mot_p ) {
 			MeController::init ();
 			return;
 		}
-		// else new motion
-		_left_motion->unref();
-		_right_motion->unref();
 	}
+
 	_last_apply_frame = 0;
 	
-	raw_time = mot_p->duration();
-	raw_angle = calc_raw_turn_angle( mot_p, "base" );
-
-	SkMotion* mirr_p = build_mirror_motion( mot_p );
-	if( raw_angle > 0.0 )	{
-		_left_motion = mot_p;
-		_right_motion = mirr_p;
-	}
-	else	{
-		_left_motion = mirr_p;
-		_right_motion = mot_p;
-	}
-
-	_left_motion->move_keytimes( 0 ); // make sure motion starts at 0
-	_left_motion->ref();
-	_right_motion->move_keytimes( 0 ); 
-	_right_motion->ref();
-	_motion = _left_motion;
+	_motion = mot_p;
+	_motion->move_keytimes( 0 ); 
+	raw_time = _motion->duration();
 
 	set_time( raw_time );
-//	set_heading_local( raw_angle );
-						set_aim_local( 0.0, raw_angle, 0.0 );
 	
-	SkChannelArray& mchan_arr = mot_p->channels();
+//	const int n_chan = _motion->channels().size();
+	const int n_float = _motion->channels().count_floats();
+
+	_arm_chan_indices.size( TMP_NUM_ARM_JOINTS );
+	for( int i = 0; i < TMP_NUM_ARM_JOINTS; i++ )	{
+
+		// ASSUME right handed draw
+		_arm_chan_indices[ i ] = 
+			_motion->channels().search( SkJointName( r_arm_labels[ i ] ), SkChannel::Quat );
+	}
 
 	if( interim_pose_buff_p )	{
 		delete [] interim_pose_buff_p;
 	}
-	interim_pose_buff_p = new float[ mchan_arr.count_floats() ];
-	
-#if 0
-// NOTE: creates erroneous playback:
-	_channels.add( SkJointName( "world_offset" ), SkChannel::XPos );
-	_channels.add( SkJointName( "world_offset" ), SkChannel::YPos );
-	_channels.add( SkJointName( "world_offset" ), SkChannel::ZPos );
-	_channels.add( SkJointName( "world_offset" ), SkChannel::Quat );
-#endif
-
-	int size = mchan_arr.size();
-	for( int i = 0; i < size; i++ )	{
-		_channels.add( mchan_arr.name(i), mchan_arr.type(i) );
-	}
-
-#if 1
-// NOTE: creates correct playback:
-	_channels.add( SkJointName( "world_offset" ), SkChannel::XPos );
-	_channels.add( SkJointName( "world_offset" ), SkChannel::YPos );
-	_channels.add( SkJointName( "world_offset" ), SkChannel::ZPos );
-	_channels.add( SkJointName( "world_offset" ), SkChannel::Quat );
-#endif
+	interim_pose_buff_p = new float[ n_float ];
 	
 	MeController::init();
 
@@ -131,81 +101,9 @@ void MeCtQuickDraw::init( SkMotion* mot_p ) {
 	}
 }
 
-void MeCtQuickDraw::set_target_joint( float x, float y, float z, SkJoint* ref_joint_p ) {
-	// TODO (added by Andrew)
-	printf( "WARNING: MeCtQuickDraw::set_target_joint(..) not implemented.\n" );
-}
-
-
 ///////////////////////////////////////////////////////////////////////////////////
 
-#define NUM_QUICKDRAW_JOINTS 			8
-#define MAX_JOINT_LABEL_LEN				64
-
-/*
-	Build mirrored motion:
-		flip X position
-		flip Y, Z rotation
-*/
-
-SkMotion* MeCtQuickDraw::build_mirror_motion( SkMotion* ref_motion_p )	{
-	static char ref_labels[ NUM_QUICKDRAW_JOINTS ][ MAX_JOINT_LABEL_LEN ] = {
-		"l_shoulder", "l_elbow", "l_forearm", "l_wrist",
-		"r_shoulder", "r_elbow", "r_forearm", "r_wrist"
-	};
-	static char new_labels[ NUM_QUICKDRAW_JOINTS ][ MAX_JOINT_LABEL_LEN ] = {
-		"r_shoulder", "r_elbow", "r_forearm", "r_wrist",
-		"l_shoulder", "l_elbow", "l_forearm", "l_wrist"
-	};
-	int i, j;
-	
-	SkChannelArray& mchan_arr = ref_motion_p->channels();
-	SkMotion *mirror_p = new SkMotion;
-	mirror_p->init( mchan_arr );
-
-	int num_f = ref_motion_p->frames();
-	for( i=0; i<num_f; i++ )	{
-		
-		mirror_p->insert_frame( i, ref_motion_p->keytime( i ) );
-		float *ref_p = ref_motion_p->posture( i );
-		float *new_p = mirror_p->posture( i );
-		int ref_i, new_i;
-
-//		for( j=1; j<NUM_STEPTURN_JOINTS; j++ )	{ !!!
-		for( j=0; j<NUM_QUICKDRAW_JOINTS; j++ )	{
-			ref_i = mchan_arr.float_position( mchan_arr.search( SkJointName( ref_labels[ j ] ), SkChannel::Quat ) );
-			new_i = mchan_arr.float_position( mchan_arr.search( SkJointName( new_labels[ j ] ), SkChannel::Quat ) );
-			euler_t ref_e = quat_t( ref_p[ ref_i ], ref_p[ ref_i + 1 ], ref_p[ ref_i + 2 ], ref_p[ ref_i + 3 ] );
-			quat_t new_q = euler_t( ref_e.x(), -ref_e.y(), -ref_e.z() );
-			new_p[ new_i + 0 ] = (float)new_q.w();
-			new_p[ new_i + 1 ] = (float)new_q.x();
-			new_p[ new_i + 2 ] = (float)new_q.y();
-			new_p[ new_i + 3 ] = (float)new_q.z();
-		}
-	}
-	
-	return( mirror_p );
-}
-
-float MeCtQuickDraw::calc_raw_turn_angle( SkMotion* mot_p, char *joint_name )	{
-	
-	if( mot_p && joint_name ) {
-	
-		float * first_p = mot_p->posture( 0 );
-		float * final_p = mot_p->posture( mot_p->frames() - 1 );
-
-		SkChannelArray& mchan_arr = mot_p->channels();
-		int i = mchan_arr.float_position( mchan_arr.search( SkJointName( joint_name ), SkChannel::Quat ) );
-
-		quat_t first_q( first_p[ i ], first_p[ i + 1 ], first_p[ i + 2 ], first_p[ i + 3 ] );
-		quat_t final_q( final_p[ i ], final_p[ i + 1 ], final_p[ i + 2 ], final_p[ i + 3 ] );
-
-		euler_t e = -first_q * final_q;
-		return( (float)e.y() );
-	}
-	return( 0.0 );
-}
-
+#if 0
 void MeCtQuickDraw::capture_world_offset_state( void )	{
 	
 	if( _context )	{
@@ -246,61 +144,30 @@ void MeCtQuickDraw::capture_world_offset_state( void )	{
 	}
 	printf( "MeCtQuickDraw::capture_world_offset_state ERR: context is NULL\n" );
 }
+#endif
 
-void MeCtQuickDraw::update_action_params( void )	{
-	
-	if( heading_mode == HEADING_WORLD )	{
-		euler_t w_e = world_offset_rot;
-		euler_t l_e = euler_t( 0.0, world_turn_angle, 0.0 ) * -euler_t( 0.0, w_e.y(), 0.0 );
-		turn_angle = (float)l_e.y();
-	}
-	
-	if( turn_angle < 0.0 )	{
-		_motion = _right_motion;
-	}
-	else	{
-		_motion = _left_motion;
-	}
+void MeCtQuickDraw::set_target_joint( float x, float y, float z, SkJoint* ref_joint_p ) {
 
-//	if( timing_mode == TASK_SPEED )	{
-//		turn_time = fabs( raw_angle / turn_speed );
-//	}
-
-	turn_angle_scale = fabs( turn_angle / raw_angle );
-	turn_time_scale = raw_time / turn_time;
-
-	_duration = turn_time;
-	dirty_action_bit = 0;
+	// TODO (added by Andrew)
+	printf( "WARNING: MeCtQuickDraw::set_target_joint(..) not implemented.\n" );
 }
-
-void MeCtQuickDraw::set_time( float sec )	{
-	
-//	timing_mode = TASK_TIME;
-	turn_time = sec;
-	dirty_action_bit = 1;
-}
-
-/*
-void MeCtQuickDraw::set_speed( float dps ) {
-
-	timing_mode = TASK_SPEED;
-	turn_speed = dps;
-	dirty_action_bit = 1;
-}
-*/
 
 void MeCtQuickDraw::set_aim_local( float p, float h, float r )    {
 
-	heading_mode = HEADING_LOCAL;
-	turn_angle = h;
-	dirty_action_bit = 1;
+	aim_mode = AIM_LOCAL;
+	// TODO
 }
 
 void MeCtQuickDraw::set_aim_world( float p, float h, float r )    {
 	
-	heading_mode = HEADING_WORLD;
-	world_turn_angle = h;
-	dirty_action_bit = 1;
+	aim_mode = AIM_WORLD;
+	// TODO
+}
+
+void MeCtQuickDraw::set_time( float sec )	{
+	
+	play_time = sec;
+	play_time_scale = raw_time / play_time;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -319,56 +186,32 @@ void MeCtQuickDraw::context_updated( void ) {
 	}
 #endif
 }
-	
+
 void MeCtQuickDraw::controller_map_updated( void ) {
 
-	// Map motion channel index to context float buffer index
-	SkChannelArray& mChannels = _motion->channels();
-	const int size = mChannels.size();
+	SkChannelArray& motion_channels = _motion->channels();
+	const int n_chan = motion_channels.size();
+	_motion_chan_to_buff.size( n_chan );
 
-	_mChan_to_buff.size( size );
 
 	if( _context ) {
 
-		SkChannelArray& cChannels = _context->channels();
-		for( int i=0; i<size; ++i ) {
-			int chanIndex = cChannels.search( mChannels.name(i), mChannels.type(i) );
-			_mChan_to_buff[ i ] = _context->toBufferIndex( chanIndex );
+		SkChannelArray& context_channels = _context->channels();
+		for( int i=0; i<n_chan; ++i ) {
+			int chan_index = context_channels.search( motion_channels.name( i ), motion_channels.type( i ) );
+			_motion_chan_to_buff[ i ] = _context->toBufferIndex( chan_index );
 		}
 
-		world_offset_chan.x = cChannels.search( SkJointName( "world_offset" ), SkChannel::XPos );
-		world_offset_chan.y = cChannels.search( SkJointName( "world_offset" ), SkChannel::YPos );
-		world_offset_chan.z = cChannels.search( SkJointName( "world_offset" ), SkChannel::ZPos );
-		world_offset_chan.q = cChannels.search( SkJointName( "world_offset" ), SkChannel::Quat );
-
-		world_offset_idx.x = _context->toBufferIndex( world_offset_chan.x );
-		world_offset_idx.y = _context->toBufferIndex( world_offset_chan.y );
-		world_offset_idx.z = _context->toBufferIndex( world_offset_chan.z );
-		world_offset_idx.q = _context->toBufferIndex( world_offset_chan.q );
-
-		base_joint_chan.x = cChannels.search( SkJointName( "base" ), SkChannel::XPos );
-		base_joint_chan.y = cChannels.search( SkJointName( "base" ), SkChannel::YPos );
-		base_joint_chan.z = cChannels.search( SkJointName( "base" ), SkChannel::ZPos );
-		base_joint_chan.q = cChannels.search( SkJointName( "base" ), SkChannel::Quat );
-
-		base_joint_idx.x = _context->toBufferIndex( base_joint_chan.x );
-		base_joint_idx.y = _context->toBufferIndex( base_joint_chan.y );
-		base_joint_idx.z = _context->toBufferIndex( base_joint_chan.z );
-		base_joint_idx.q = _context->toBufferIndex( base_joint_chan.q );
-#if 0
-		printf( "world_offset chan: %d index: %d\n", world_offset_chan.x, world_offset_idx.x );
-		printf( "base_joint   chan: %d index: %d\n", base_joint_chan.x, base_joint_idx.x );
-#endif
 	} 
 	else {
-		_mChan_to_buff.setall( -1 );
+		printf( "MeCtQuickDraw::controller_map_updated: context NOT found\n" );
+		_motion_chan_to_buff.setall( -1 );
 	}
 }
 
 void MeCtQuickDraw::controller_start( void )	{
 
-	capture_world_offset_state();
-	update_action_params();
+//	capture_world_offset_state();
 }
 
 bool MeCtQuickDraw::controller_evaluate( double t, MeFrameData& frame ) {
@@ -380,19 +223,19 @@ bool MeCtQuickDraw::controller_evaluate( double t, MeFrameData& frame ) {
 		return( continuing );
 	}
 
-#if 1 // RAW STEPPING
+#if 0 // RAW QUICKDRAW
 	_motion->apply( 
-		float( t * turn_time_scale ),
+		float( t * play_time_scale ),
 		&( frame.buffer()[0] ),  // pointer to buffer's float array
-		&_mChan_to_buff,
+		&_motion_chan_to_buff,
 		_play_mode, 
 		&_last_apply_frame 
 	);
 
-#else // SCALED STEPPING
+#else // ADAPTED QUICKDRAW
 
 	_motion->apply( 
-		float( t * turn_time_scale ),
+		float( t * play_time_scale ),
 		interim_pose_buff_p,
 		NULL, // same order in interim_buffer
 		_play_mode, 
@@ -400,126 +243,64 @@ bool MeCtQuickDraw::controller_evaluate( double t, MeFrameData& frame ) {
 	);
 
 	float *fbuffer = &( frame.buffer()[0] );
-	SkChannelArray& mChannels = _motion->channels();
-	int nchan = mChannels.size();
+	SkChannelArray& motion_channels = _motion->channels();
+	int n_chan = motion_channels.size();
 
-	vector_t world_offset_delta_pos;
-	quat_t world_offset_delta_rot;
-	
+
 	int index = 0;
-	for( int i=0; i<nchan; i++ )	{
+	for( int i=0; i<n_chan; i++ )	{
 
-		int ch_size = mChannels[ i ].size();
-		SkChannel::Type ch_type = mChannels[ i ].type;
+		int ch_size = motion_channels[ i ].size();
+		SkChannel::Type ch_type = motion_channels[ i ].type;
 		
 		float tmp_f[ 4 ];
 		for( int j=0; j<ch_size; j++ ) {
 			tmp_f[ j ] = interim_pose_buff_p[ index + j ];
 		}
 
-		if( 
-			( ch_type == SkChannel::XPos ) ||
-			( ch_type == SkChannel::YPos ) ||
-			( ch_type == SkChannel::ZPos )
-			)	{
-
-			// take difference between first and current frame, then scale
-			// TODO: the float-pos index of the first frame posture for each channel should be pre-stored
-
-			float * first_p = _motion->posture( 0 );
-			int f_pos = mChannels.float_position( mChannels.search( mChannels.name( i ), ch_type ) );
-
-			tmp_f[ 0 ] = first_p[ f_pos ] + ( tmp_f[ 0 ] - first_p[ f_pos ] )* turn_angle_scale - first_p[ f_pos ];
+		bool arm_chan = false;
+#if 0
+		for( int j = 0; j < TMP_NUM_ARM_JOINTS; j++ )	{
+			if( i == _arm_chan_indices[ j ] )	{
+				arm_chan = true;
+			}
 		}
-
-		if( ch_type == SkChannel::Quat )	{
+#endif
 		
-			quat_t curr_q = quat_t( tmp_f[ 0 ], tmp_f[ 1 ], tmp_f[ 2 ], tmp_f[ 3 ] );
-
-			// take difference between first and current frame, then scale
-			// TODO: the float-pos index of the first frame posture for each channel should be pre-stored
-			
-			float * first_p = _motion->posture( 0 );
-			int f_pos = mChannels.float_position( mChannels.search( mChannels.name( i ), SkChannel::Quat ) );
-			quat_t first_q( 
-				first_p[ f_pos ], 
-				first_p[ f_pos + 1 ], 
-				first_p[ f_pos + 2 ], 
-				first_p[ f_pos + 3 ] 
-			);
-
-			quat_t q = ( ( curr_q * -first_q ) * turn_angle_scale ) * first_q;
-			tmp_f[ 0 ] = (float)q.w();
-			tmp_f[ 1 ] = (float)q.x();
-			tmp_f[ 2 ] = (float)q.y();
-			tmp_f[ 3 ] = (float)q.z();
+		if( arm_chan == true )	{
+			int i_map = _motion_chan_to_buff[ i ];
+			fbuffer[ i_map + 0 ] = 1.0;
+			fbuffer[ i_map + 1 ] = 0.0;
+			fbuffer[ i_map + 2 ] = 0.0;
+			fbuffer[ i_map + 3 ] = 0.0;
 		}
-		
-		if( i == base_joint_chan.x )	{
-			world_offset_delta_pos.x( tmp_f[ 0 ] );
-			tmp_f[ 0 ] = 0.0;
-		}
-		else
-		if( i == base_joint_chan.y )	{
-			world_offset_delta_pos.y( tmp_f[ 0 ] );
-			tmp_f[ 0 ] = 0.0;
-		}
-		else
-		if( i == base_joint_chan.z )	{
-			world_offset_delta_pos.z( tmp_f[ 0 ] );
-			tmp_f[ 0 ] = 0.0;
-		}
-		else
-		if( i == base_joint_chan.q )	{
-			world_offset_delta_rot = quat_t( tmp_f[ 0 ], tmp_f[ 1 ], tmp_f[ 2], tmp_f[ 3 ] );
-			tmp_f[ 0 ] = 1.0;
-			tmp_f[ 1 ] = 0.0;
-			tmp_f[ 2 ] = 0.0;
-			tmp_f[ 3 ] = 0.0;
-		}
-
-		for( int j=0; j<ch_size; j++ ) {
-			fbuffer[ _mChan_to_buff[ i ] + j ] = tmp_f[ j ];
+		else	{
+			for( int j=0; j<ch_size; j++ ) {
+				fbuffer[ _motion_chan_to_buff[ i ] + j ] = tmp_f[ j ];
+			}
 		}
 		
 		index += ch_size;
 	}
-	
-	vector_t tmp_v = world_offset_pos + world_offset_delta_pos;
-	quat_t tmp_q = world_offset_rot * world_offset_delta_rot;
 
-	fbuffer[ world_offset_idx.x ] = (float)tmp_v.x();
-	fbuffer[ world_offset_idx.y ] = (float)tmp_v.y();
-	fbuffer[ world_offset_idx.z ] = (float)tmp_v.z();
-	fbuffer[ world_offset_idx.q + 0 ] = (float)tmp_q.w();
-	fbuffer[ world_offset_idx.q + 1 ] = (float)tmp_q.x();
-	fbuffer[ world_offset_idx.q + 2 ] = (float)tmp_q.y();
-	fbuffer[ world_offset_idx.q + 3 ] = (float)tmp_q.z();
-
-#endif // SCALED STEPPING
+#endif // ADAPTED QUICKDRAW
 
 	return continuing;
 }
 
 SkChannelArray& MeCtQuickDraw::controller_channels( void )	{
-	return _channels;
+
+	return( _motion->channels() );
 }
 
 double MeCtQuickDraw::controller_duration( void ) {
 
 // THIS IS CALLED PRIOR TO controller_start().
-#if 0
-	if( dirty_action_bit )	{
-		capture_world_offset_state(); // skeleton not available
-		update_action_params();
-	}
-	return _duration;
-#else
 	return( -1.0 );
-#endif
 }
 
 const char* MeCtQuickDraw::controller_type( void )	{
+
 	return type_name;
 }
 

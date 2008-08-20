@@ -1,5 +1,5 @@
 ## test quickdraw controller functions:
 0 echo EXEC: data/sbm-test/scripts/test-qdraw.seq
 
-0 quickdraw Q 0.5 local 0.0 0.0 0.0
+0 quickdraw Q 1.5 local 0.0 0.0 0.0
 0 char doctor ctrl Q begin
