@@ -177,7 +177,9 @@ void process_message( const char * message )
    else
    {
       //if the saso_root is not set, output the audio to the c drive
-      directory = "..\\..\\..\\dimr\\tmpaudio\\";
+//      directory = "..\\..\\..\\..\\..\\dimr\\tmpaudio\\";
+	   // Hard coded this as It is saving them, but not playing them.
+	   directory = "c:\\saso\\dimr\\tmpaudio\\";
       std::cout<<"SASO_ROOT not set, audio files will be saved to: "<<directory<<"\n";
    }
 

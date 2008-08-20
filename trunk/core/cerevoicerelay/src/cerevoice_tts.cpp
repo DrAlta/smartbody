@@ -255,7 +255,7 @@ void cerevoice_tts::init()
 
 //   licfile = "..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_katherine_00009.lic";
 //   licfile = "..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_heather_00009.lic";
-   licfile = "..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_star_00009.lic";
+   licfile = "..\\..\\..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_star_00009.lic";
 
    //make sure license file exists
    if ( !fileExists( licfile ) )
@@ -268,7 +268,7 @@ void cerevoice_tts::init()
 
 //   char * voiceFile = "..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_katherine_22k.voice";
 //   char * voiceFile = "..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_heather_22k.voice";
-   char * voiceFile = "..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_star_16k.voice";
+   char * voiceFile = "..\\..\\..\\..\\data\\cereproc\\voices\\cerevoice_2.0.0_star_22k.voice";
 
    //make sure voice file exists
    if(!fileExists(voiceFile))
@@ -334,11 +334,11 @@ void cerevoice_tts::init()
    //possibly need phonemeToViseme entries for "i" and "j"?
 
 
-   abbfile       = "../../lib/cerevoice/veng_db/en/norm/abb.txt";
-   pbreakfile    = "../../lib/cerevoice/veng_db/en/norm/pbreak.txt";
-   homographfile = "../../lib/cerevoice/veng_db/en/homographs/rules.dat";
-   reductionfile = "../../lib/cerevoice/veng_db/en/reduction/rules.dat";
-   rulesfile     = "../../lib/cerevoice/veng_db/en/gb/norm/rules.py";
+   abbfile       = "../../../../lib/cerevoice/veng_db/en/norm/abb.txt";
+   pbreakfile    = "../../../../lib/cerevoice/veng_db/en/norm/pbreak.txt";
+   homographfile = "../../../../lib/cerevoice/veng_db/en/homographs/rules.dat";
+   reductionfile = "../../../../lib/cerevoice/veng_db/en/reduction/rules.dat";
+   rulesfile     = "../../../../lib/cerevoice/veng_db/en/gb/norm/rules.py";
 
    if ( !fileExists( abbfile ) )
    {
@@ -432,8 +432,8 @@ std::string cerevoice_tts::tts( const char * text, const char * file_name )
    /* set up a spurt, an audio buffer for data, and a lexicon search structure */
 
    CPRC_spurt * spurt = CPRC_spurt_new( voice );
-//   CPRC_abuf * abuf = CPRC_abuf_new( 22050 );
-   CPRC_abuf * abuf = CPRC_abuf_new( 16000 );
+   CPRC_abuf * abuf = CPRC_abuf_new( 22050 );
+//   CPRC_abuf * abuf = CPRC_abuf_new( 16000 );
    CPRC_lts_search * ltssrch = CPRC_lts_search_new( 0 );
    CPRC_lexicon_search * lxsrch = CPRC_lexicon_search_new();
 
