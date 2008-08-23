@@ -24,8 +24,10 @@
 //#include "sbm_pawn.hpp"
 #include "me_ct_quick_draw.h"
 
-#define TMP_NUM_ARM_JOINTS  	4
+#define NUM_QD_ARM_JOINTS  		4
 #define MAX_JOINT_LABEL_LEN 	64
+
+gw_float_t gwiz_safe_acos( gw_float_t c );
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -33,15 +35,16 @@ const char* MeCtQuickDraw::type_name = "QuickDraw";
 
 MeCtQuickDraw::MeCtQuickDraw( void )	{
 
-   _motion = NULL;
-   _play_mode = SkMotion::Linear;
-   _duration = -1.0;
-   _last_apply_frame = 0;
+	_motion = NULL;
+	_play_mode = SkMotion::Linear;
+	_duration = -1.0;
+	_last_apply_frame = 0;
 
-   skeleton_ref_p = NULL;
-   interim_pose_buff_p = NULL;
+	skeleton_ref_p = NULL;
+	target_ref_joint_str = NULL;
+	target_ref_joint_p = NULL;
 
-	aim_mode = AIM_LOCAL;
+	interim_pose_buff_p = NULL;
 }
 
 MeCtQuickDraw::~MeCtQuickDraw( void )	{
@@ -53,10 +56,10 @@ MeCtQuickDraw::~MeCtQuickDraw( void )	{
 }
 
 void MeCtQuickDraw::init( SkMotion* mot_p ) {
-//	static char l_arm_labels[ TMP_NUM_ARM_JOINTS ][ MAX_JOINT_LABEL_LEN ] = {
+//	static char l_arm_labels[ NUM_QD_ARM_JOINTS ][ MAX_JOINT_LABEL_LEN ] = {
 //		"l_shoulder", "l_elbow", "l_forearm", "l_wrist"
 //	};
-	static char r_arm_labels[ TMP_NUM_ARM_JOINTS ][ MAX_JOINT_LABEL_LEN ] = {
+	static char r_arm_labels[ NUM_QD_ARM_JOINTS ][ MAX_JOINT_LABEL_LEN ] = {
 		"r_shoulder", "r_elbow", "r_forearm", "r_wrist"
 	};
 
@@ -80,8 +83,8 @@ void MeCtQuickDraw::init( SkMotion* mot_p ) {
 //	const int n_chan = _motion->channels().size();
 	const int n_float = _motion->channels().count_floats();
 
-	_arm_chan_indices.size( TMP_NUM_ARM_JOINTS );
-	for( int i = 0; i < TMP_NUM_ARM_JOINTS; i++ )	{
+	_arm_chan_indices.size( NUM_QD_ARM_JOINTS );
+	for( int i = 0; i < NUM_QD_ARM_JOINTS; i++ )	{
 
 		// ASSUME right handed draw
 		_arm_chan_indices[ i ] = 
@@ -146,22 +149,123 @@ void MeCtQuickDraw::capture_world_offset_state( void )	{
 }
 #endif
 
+MeCtQuickDraw::joint_state_t MeCtQuickDraw::capture_joint_state( SkJoint *joint_p ) {
+	SrMat sr_M;
+	matrix_t M;
+	int i, j;
+	joint_state_t state;
+
+	if( joint_p )	{
+
+		sr_M = joint_p->lmat();
+		for( i=0; i<4; i++ )	{
+			for( j=0; j<4; j++ )	{
+				M.set( i, j, sr_M.get( i, j ) );
+			}
+		}
+		state.local_pos = M.translation( GWIZ_M_TR );
+		state.local_rot = M.quat( GWIZ_M_TR );
+
+		sr_M = joint_p->gmat();
+		for( i=0; i<4; i++ )	{
+			for( j=0; j<4; j++ )	{
+				M.set( i, j, sr_M.get( i, j ) );
+			}
+		}
+		state.world_pos = M.translation( GWIZ_M_TR );
+		state.world_rot = M.quat( GWIZ_M_TR );
+
+		SkJoint* parent_p = joint_p->parent();
+		if( parent_p )	{
+
+			sr_M = parent_p->gmat();
+			for( i=0; i<4; i++ )	{
+				for( j=0; j<4; j++ )	{
+					M.set( i, j, sr_M.get( i, j ) );
+				}
+			}
+			state.parent_pos = M.translation( GWIZ_M_TR );
+			state.parent_rot = M.quat( GWIZ_M_TR );
+		}
+		else	{
+			const char *name = joint_p->name();
+			printf( "MeCtQuickDraw::capture_joint_state ERR: parent of joint '%s' not found\n", name );
+		}
+	}
+	return( state );
+}
+
+quat_t MeCtQuickDraw::rotation_to_target( vector_t target_pos, joint_state_t* state_p )	{
+
+	// parent coord
+	vector_t l_target_pos = ( -state_p->parent_rot ) * ( target_pos - state_p->parent_pos );
+	return( quat_t( euler_t( l_target_pos - state_p->local_pos, 0.0 ) ) );
+}
+
+SkJoint* MeCtQuickDraw::get_joint( char *joint_str, SkJoint **joint_pp )	{
+
+	if( joint_str )	{
+		if( *joint_pp == NULL )	{
+			if( skeleton_ref_p )	{
+				*joint_pp = skeleton_ref_p->search_joint( joint_str );
+				if( *joint_pp == NULL )	{
+					fprintf( stderr, "MeCtQuickDraw::get_joint ERR: joint '%s' NOT FOUND in skeleton\n", joint_str );
+					free( joint_str );
+					joint_str = NULL;
+				}
+			}
+			else	{
+				fprintf( stderr, "MeCtQuickDraw::get_joint ERR: skeleton NOT FOUND\n" );
+			}
+		}
+	}
+	return( *joint_pp );
+}
+
+SkJoint* MeCtQuickDraw::target_ref_joint( void ) {
+//	return( target_ref_joint_p = get_joint( target_ref_joint_str, target_ref_joint_p ) );
+	return( get_joint( target_ref_joint_str, &target_ref_joint_p ) );
+}
+
+
+vector_t MeCtQuickDraw::world_target_point( void )	{
+	
+	SkJoint* joint_p = target_ref_joint();
+	if( joint_p )	{
+		SrMat sr_M;
+		matrix_t M;
+		int i, j;
+		
+		joint_p->update_gmat_up();
+		sr_M = joint_p->gmat();
+		for( i=0; i<4; i++ )	{
+			for( j=0; j<4; j++ )	{
+				M.set( i, j, sr_M.get( i, j ) );
+			}
+		}
+		vector_t pos = M.translation( GWIZ_M_TR );
+		quat_t rot = M.quat( GWIZ_M_TR );
+		return( pos + rot * point_target_pos );
+	}
+	return( point_target_pos );
+}
+
+void MeCtQuickDraw::set_target_coord_joint( SkJoint* joint_p )	{
+
+	if( target_ref_joint_str ) free( target_ref_joint_str );
+	target_ref_joint_str = NULL;
+	target_ref_joint_p = joint_p;
+}
+
+void MeCtQuickDraw::set_target_point( float x, float y, float z )	{
+
+	point_target_pos = vector_t( x, y, z );
+}
+
 void MeCtQuickDraw::set_target_joint( float x, float y, float z, SkJoint* ref_joint_p ) {
 
-	// TODO (added by Andrew)
-	printf( "WARNING: MeCtQuickDraw::set_target_joint(..) not implemented.\n" );
-}
-
-void MeCtQuickDraw::set_aim_local( float p, float h, float r )    {
-
-	aim_mode = AIM_LOCAL;
-	// TODO
-}
-
-void MeCtQuickDraw::set_aim_world( float p, float h, float r )    {
-	
-	aim_mode = AIM_WORLD;
-	// TODO
+	set_target_point( x, y, z );
+	set_target_coord_joint( ref_joint_p );
 }
 
 void MeCtQuickDraw::set_time( float sec )	{
@@ -212,9 +316,31 @@ void MeCtQuickDraw::controller_map_updated( void ) {
 void MeCtQuickDraw::controller_start( void )	{
 
 //	capture_world_offset_state();
+
+	if( _context->channels().size() > 0 )	{
+		skeleton_ref_p = _context->channels().skeleton();
+	}
+
 }
 
 bool MeCtQuickDraw::controller_evaluate( double t, MeFrameData& frame ) {
+
+#if 1
+static float tmp_prev_t = 0.0;
+static float tmp_accum = 0.0;
+static int tmp_count = 0;
+int tmp_event = 0;
+tmp_accum += ( t - tmp_prev_t );
+tmp_prev_t = t;
+if( ( tmp_accum > 0.2 )&&( tmp_count < 10 ) )	{
+	tmp_accum = 0.0;
+	tmp_event = 1;
+	tmp_count++;
+}
+else	{
+	tmp_event = 0;
+}
+#endif
 
 	bool continuing = true;
 	continuing = t < _duration;
@@ -245,42 +371,171 @@ bool MeCtQuickDraw::controller_evaluate( double t, MeFrameData& frame ) {
 	float *fbuffer = &( frame.buffer()[0] );
 	SkChannelArray& motion_channels = _motion->channels();
 	int n_chan = motion_channels.size();
+	
+	int interim_arm_chan_indices[ NUM_QD_ARM_JOINTS ];
+	int i_interim = 0;
+	int c_interim = 0;
+	for( int i_chan=0; i_chan<n_chan; i_chan++ )	{
 
+		int ch_size = motion_channels[ i_chan ].size();
+//		SkChannel::Type ch_type = motion_channels[ i_chan ].type;
 
-	int index = 0;
-	for( int i=0; i<n_chan; i++ )	{
-
-		int ch_size = motion_channels[ i ].size();
-		SkChannel::Type ch_type = motion_channels[ i ].type;
-		
-		float tmp_f[ 4 ];
-		for( int j=0; j<ch_size; j++ ) {
-			tmp_f[ j ] = interim_pose_buff_p[ index + j ];
-		}
-
-		bool arm_chan = false;
-#if 0
-		for( int j = 0; j < TMP_NUM_ARM_JOINTS; j++ )	{
-			if( i == _arm_chan_indices[ j ] )	{
-				arm_chan = true;
+		bool is_arm_chan = false;
+		for( int j = 0; j < NUM_QD_ARM_JOINTS; j++ )	{
+			if( i_chan == _arm_chan_indices[ j ] )	{
+				is_arm_chan = true;
 			}
 		}
-#endif
 		
-		if( arm_chan == true )	{
-			int i_map = _motion_chan_to_buff[ i ];
-			fbuffer[ i_map + 0 ] = 1.0;
-			fbuffer[ i_map + 1 ] = 0.0;
-			fbuffer[ i_map + 2 ] = 0.0;
-			fbuffer[ i_map + 3 ] = 0.0;
+		if( is_arm_chan == true )	{
+			interim_arm_chan_indices[ c_interim ] = i_interim;
+			c_interim++;
 		}
 		else	{
 			for( int j=0; j<ch_size; j++ ) {
-				fbuffer[ _motion_chan_to_buff[ i ] + j ] = tmp_f[ j ];
+				fbuffer[ _motion_chan_to_buff[ i_chan ] + j ] = interim_pose_buff_p[ i_interim + j ];
 			}
 		}
 		
-		index += ch_size;
+		i_interim += ch_size;
+	}
+
+	if( skeleton_ref_p )	{
+		SkJoint* r_wrist_joint_p = skeleton_ref_p->search_joint( "r_wrist" );
+		r_wrist_joint_p->update_gmat_up();
+	}
+	else	{
+		fprintf( stderr, "MeCtQuickDraw::controller_evaluate ERR: skeleton NOT FOUND\n" );
+	}
+
+	vector_t w_point = world_target_point();
+	quat_t target_q[ NUM_QD_ARM_JOINTS ];
+
+//if( tmp_event ) printf( "==\n" );
+
+	for( int j = 0; j < NUM_QD_ARM_JOINTS; j++ )	{
+
+		int i_map = _motion_chan_to_buff[ _arm_chan_indices[ j ] ];
+		int i_interim = interim_arm_chan_indices[ j ];
+
+		SkJoint* joint_p = _context->channels().joint( _toContextCh[ _arm_chan_indices[ j ] ] );
+		if( joint_p == NULL ) printf( "joint is NULL\n" );
+		joint_state_t state = capture_joint_state( joint_p );
+
+		euler_t forward_rot = euler_t( 0.0, 0.0, 0.0 );
+		vector_t forward_ref( -1.0, 0.0, 0.0 );
+		vector_t forward_dir_n = forward_rot * forward_ref.normal();
+
+		vector_t l_target_dir_n = ( -state.parent_rot ) * ( w_point - state.world_pos ).normal();
+		gw_float_t angle = DEG( gwiz_safe_acos( forward_dir_n.dot( l_target_dir_n ) ) );
+
+		vector_t axis = forward_dir_n.cross( l_target_dir_n ).normal();
+		quat_t q( angle, axis );
+		euler_t e = q;
+
+		quat_t in_q(
+			interim_pose_buff_p[ i_interim + 0 ],
+			interim_pose_buff_p[ i_interim + 1 ],
+			interim_pose_buff_p[ i_interim + 2 ],
+			interim_pose_buff_p[ i_interim + 3 ]
+		);
+		euler_t in_e = in_q;
+
+//if( tmp_event )	in_e.print();
+
+		float s = t / play_time;
+		if( s > 1.0 ) s = 1.0;
+
+#if 1
+		if( j == 0 )	{ // shoulder
+//			set_q = in_q; 
+//			set_q = in_q.lerp( s, quat_t() ); // null rot
+//			set_q = in_q.lerp( s, euler_t( 0.0, 90.0, 0.0 ) );
+//			set_q = in_q.lerp( s, q );
+//			set_q = in_q.lerp( s * 0.33, q );
+//			target_q[ j ] = q;
+//			target_q[ j ] = euler_t( in_e.x(), 0.0, in_e.z() );
+//			target_q[ j ] = euler_t( in_e.x(), e.y(), in_e.z() );
+			target_q[ j ] = euler_t( in_e.x(), e.y(), e.z() );
+		}
+		else
+		if( j == 1 )	{ // elbow
+//			set_q = in_q; 
+//			set_q = in_q.lerp( s, quat_t() ); // null rot
+//			set_q = in_q.lerp( s, euler_t( 0.0, 90.0, 0.0 ) );
+//			set_q = in_q.lerp( s, q );
+//			target_q[ j ] = q;
+//			target_q[ j ] = euler_t( in_e.x(), 0.0, 0.0 );
+			target_q[ j ] = euler_t( in_e.x(), e.y(), e.z() );
+		}
+		else
+		if( j == 2 )	{ // forearm
+//			set_q = in_q; 
+//			set_q = in_q.lerp( s, quat_t() ); // null rot
+//			set_q = in_q.lerp( s, euler_t( -90.0, 0.0, 0.0 ) ); // null rot
+//			target_q[ j ] = q;
+//			target_q[ j ] = euler_t( -90.0, 0.0, 0.0 );
+//			target_q[ j ] = euler_t( 0.0, 0.0, 0.0 );
+			target_q[ j ] = euler_t( in_e.x(), 0.0, 0.0 );
+		}
+		else	{ // wrist
+//			set_q = in_q; 
+//			set_q = in_q.lerp( s, quat_t() ); // null rot
+//			target_q[ j ] = q;
+//			target_q[ j ] = euler_t( -90.0, 0.0, 0.0 );
+//			target_q[ j ] = euler_t( 0.0, 0.0, 0.0 );
+			target_q[ j ] = euler_t( in_e.x(), e.y(), e.z() );
+		}
+#else
+		target_q[ j ] = euler_t( in_e.x(), e.y(), e.z() );
+#endif
+	}
+
+	for( int j = 0; j < NUM_QD_ARM_JOINTS; j++ )	{
+
+		int i_map = _motion_chan_to_buff[ _arm_chan_indices[ j ] ];
+		int i_interim = interim_arm_chan_indices[ j ];
+		
+		quat_t in_q(
+			interim_pose_buff_p[ i_interim + 0 ],
+			interim_pose_buff_p[ i_interim + 1 ],
+			interim_pose_buff_p[ i_interim + 2 ],
+			interim_pose_buff_p[ i_interim + 3 ]
+		);
+
+		float s = t / play_time;
+		if( s > 1.0 ) s = 1.0;
+#if 1
+		if( s < 0.5 ) s = 0.0;
+		else s = ( s - 0.5 ) * 2.0;
+#elif 0
+		if( s < 0.667 ) s = 0.0;
+		else s = ( s - 0.667 ) * 3.0;
+#elif 0
+		if( s < 0.75 ) s = 0.0;
+		else s = ( s - 0.75 ) * 4.0;
+#endif
+//		quat_t blend_q = in_q.lerp( s, target_q[ j ] );
+		quat_t blend_q = in_q.lerp( s * s, target_q[ j ] );
+//		quat_t blend_q = in_q;
+//		quat_t blend_q = target_q[ j ];
+		
+#if 1
+		fbuffer[ i_map + 0 ] = blend_q.w();
+		fbuffer[ i_map + 1 ] = blend_q.x();
+		fbuffer[ i_map + 2 ] = blend_q.y();
+		fbuffer[ i_map + 3 ] = blend_q.z();
+#elif 0
+		fbuffer[ i_map + 0 ] = in_q.w();
+		fbuffer[ i_map + 1 ] = in_q.x();
+		fbuffer[ i_map + 2 ] = in_q.y();
+		fbuffer[ i_map + 3 ] = in_q.z();
+#else
+		fbuffer[ i_map + 0 ] = target_q[ j ].w();
+		fbuffer[ i_map + 1 ] = target_q[ j ].x();
+		fbuffer[ i_map + 2 ] = target_q[ j ].y();
+		fbuffer[ i_map + 3 ] = target_q[ j ].z();
+#endif
 	}
 
 #endif // ADAPTED QUICKDRAW

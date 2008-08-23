@@ -2357,27 +2357,35 @@ int mcu_stepturn_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 }
 
 /*
-	quickdraw <> <dur-sec> local|world <p h r: deg>
+X	quickdraw <> <dur-sec> local|world <p h r: deg>
+	quickdraw <> <dur-sec> point <x y z> [<joint>]
 */
 
 int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 	if( mcu_p ) {
 		char *ctrl_name = args.read_token();
-		float dur = args.read_float();
-		char *coord_type = args.read_token(); // local or world
-		float pitch_deg = args.read_float();
-		float heading_deg = args.read_float();
-		float roll_deg = args.read_float();
 		MeCtQuickDraw *qdraw_p= mcu_p->quickdraw_ctrl_map.lookup( ctrl_name );
 		if( qdraw_p ) {
+			float dur = args.read_float();
 			qdraw_p->set_time( dur );
+
+			char *target_type = args.read_token(); // local or world
+#if 0
 			if( ( coord_type[ 0 ] == 'l' )||( coord_type[ 0 ] == 'L' ) )	{
 				qdraw_p->set_aim_local( pitch_deg, heading_deg, roll_deg );
 			}
 			else	{
 				qdraw_p->set_aim_world( pitch_deg, heading_deg, roll_deg );
 			}
+#endif
+			if( ( target_type[ 0 ] == 'p' )||( target_type[ 0 ] == 'P' ) )	{
+				float x = args.read_float();
+				float y = args.read_float();
+				float z = args.read_float();
+				qdraw_p->set_target_point( x, y, z );
+			}
+
 			return( CMD_SUCCESS );
 		}
 	}

@@ -61,7 +61,7 @@ TODO: Example sequence:
 
         0.0 load motions ../../../../data/sbm-test/common-sk/qdraw
         0.0 ctrl Q quickdraw AdultM_FastDraw001
-        0.0 quickdraw Q 0.9 local 0.0 45.0 0.0
+        0.0 quickdraw Q 0.9 point 0.0 450.0 1000.0
         0.0 char doctor ctrl Q begin
 
  * This will induce the doctor to shoot 45 degrees to his left.
@@ -82,6 +82,15 @@ class MeCtQuickDraw : public MeController	{
 			AIM_WORLD
 		};
 
+		struct joint_state_t	{	
+			vector_t	parent_pos; // world coord of immediate parent joint
+			quat_t		parent_rot;
+			vector_t	local_pos;
+			quat_t		local_rot;
+			vector_t	world_pos;
+			quat_t		world_rot;
+		};
+
 		SkMotion*            _motion; 
 		SkMotion::InterpType _play_mode; // its play mode
 		double               _duration;  // the time-warped duration
@@ -90,18 +99,20 @@ class MeCtQuickDraw : public MeController	{
 		SrBuffer<int>        _arm_chan_indices; // arm channels in raw motion
 
 		SkSkeleton* 	skeleton_ref_p;
-		float * interim_pose_buff_p;
-		
-		vector_t world_offset_pos; // joint state at controller-start
-		quat_t   world_offset_rot;
+		vector_t		point_target_pos;
+		char*			target_ref_joint_str;
+		SkJoint*		target_ref_joint_p;
 
-		int aim_mode;
 		float raw_time;
 		float play_time;
 		float play_time_scale;
 
 //		void capture_world_offset_state( void );
+		vector_t world_offset_pos; // joint state at controller-start
+		quat_t   world_offset_rot;
 
+		float * interim_pose_buff_p;
+		
 	public:
 		static const char* type_name;
 
@@ -120,9 +131,11 @@ class MeCtQuickDraw : public MeController	{
 		void init( SkMotion* mot_p );
 
 		// Target API
+		void set_target_point( float x, float y, float z );
+		void set_target_coord_joint( SkJoint* joint_p );
+
 		void set_target_joint( float x, float y, float z, SkJoint* ref_joint_p = NULL );
-		void set_aim_local( float p, float h, float r );
-		void set_aim_world( float p, float h, float r );
+
 		void set_time( float sec );
 
 		/*! Set the play mode, default is linear */
@@ -132,6 +145,12 @@ class MeCtQuickDraw : public MeController	{
 		SkMotion::InterpType play_mode () const { return _play_mode; }
 
 	private:
+		joint_state_t capture_joint_state( SkJoint *joint_p );
+		quat_t rotation_to_target( vector_t target_pos, joint_state_t* state_p );
+
+		SkJoint*	get_joint( char *joint_str, SkJoint **joint_pp );
+		SkJoint*	target_ref_joint( void );
+		vector_t	world_target_point( void );
 
 		// callbacks for the base class
 		virtual void context_updated( void );
