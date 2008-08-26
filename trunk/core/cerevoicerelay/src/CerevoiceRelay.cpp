@@ -19,6 +19,7 @@
    CONTRIBUTORS:
       Edward Fast, USC
       Thomas Amundsen, USC
+      Arno Hartholt, USC
 */
 
 #include "vhcl.h"
@@ -148,7 +149,7 @@ void process_message( const char * message )
 
    std::string agent_name = tokens.at( 1 );
    std::string message_id = tokens.at( 2 );
-   std::string voice = tokens.at( 3 );
+   std::string voice_id = tokens.at( 3 );
    std::string file_name = tokens.at( 4 );
    size_t prefix_length = message_c.find( file_name, 0 ) + file_name.length() + 1;
    std::string utterance = message_c.substr( prefix_length );  // strip off the prefix, only using the xml
@@ -158,46 +159,30 @@ void process_message( const char * message )
    if ( postfix_pos != std::string::npos )
       utterance = utterance.substr( 0, postfix_pos + 9 );
 
-
    //parse out just the sound file name and give it a .wav file type
    int pos = file_name.find( ".aiff" );
    int pos2 = file_name.find( "utt" );
    file_name = file_name.substr( pos2, pos - pos2 ) + ".wav";
 
-   //get the saso root
-   char * saso_root = getenv( "SASO_ROOT" );
-   std::string directory = "";
+   // Create file name relative to cerevoice relay
+   std::string cereproc_file_name = tts->temp_audio_dir_cereproc + file_name;
+   std::string player_file_name = tts->temp_audio_dir_player + file_name;
 
-   if ( saso_root != NULL )
+   std::string xml = tts->tts( utterance.c_str(), cereproc_file_name.c_str(), player_file_name.c_str(), voice_id );
+
+   // Only send out a reply when result is not empty, ignore otherwise as a nother voice relay might pick up the request
+   if ( xml.compare("") != 0 )
    {
-      std::string saso_root_string = saso_root;
-      directory = saso_root_string + "\\dimr\\tmpaudio\\";
-      std::cout<<"Audio files will be saved to: "<<directory<<"\n";
+      std::string reply = agent_name;
+      reply += " ";
+      reply += message_id;
+      reply += " OK: <?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+      reply += xml;
+   
+      printf( "REPLY: %s\n", reply.c_str() );
+
+      ttu_notify2( "RemoteSpeechReply", reply.c_str() );
    }
-   else
-   {
-      //if the saso_root is not set, output the audio to the c drive
-//      directory = "..\\..\\..\\..\\..\\dimr\\tmpaudio\\";
-	   // Hard coded this as It is saving them, but not playing them.
-	   directory = "c:\\saso\\dimr\\tmpaudio\\";
-      std::cout<<"SASO_ROOT not set, audio files will be saved to: "<<directory<<"\n";
-   }
-
-   //set the full file name
-   file_name = directory + file_name;
-
-
-   std::string xml = tts->tts( utterance.c_str(), file_name.c_str() );
-
-   std::string reply = agent_name;
-   reply += " ";
-   reply += message_id;
-   reply += " OK: <?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-   reply += xml;
-
-   printf( "REPLY: %s\n", reply.c_str() );
-
-   ttu_notify2( "RemoteSpeechReply", reply.c_str() );
 }
 
 
@@ -249,18 +234,32 @@ void elvin_callback( char * op, char * args, void * userData )
             hit_actor = strtok( NULL, "," );
          }
       }
-      else
+	  else
       {
          process_message( args );
       }
    }
+   else if ( strcmp( op, "vrKillComponent" ) == 0 )
+   {
+      if ( strcmp( args, "all" ) == 0 || strcmp( args, "cerevoicerelay" ) == 0 )
+      {
+         printf( "Kill message received." );
+	  }
+   }
 }
 
+void register_messages ()
+{
+	ttu_register( "RemoteSpeechCmd" );
+	ttu_register( "vrKillComponent" );
+}
 
 int main( int argc, char * argv[] )
 {
-   bServerMode = false;
-
+   std::vector<char *> voices;
+   bServerMode = true;
+    
+   // Messaging set up
    char * elvish_session_host = getenv( "elvish_session_host" );
    char * elvish_scope = getenv( "elvish_scope" );
 
@@ -278,31 +277,68 @@ int main( int argc, char * argv[] )
    int err = ttu_open( elvish_session_host );
    if ( err != TTU_SUCCESS )
    {
-      printf( "unable to connect to message server, aborting\n" );
-      return -1;
+      printf( "Unable to connect to message server.\n\nPress any key to exit.\n");
+      _getch();
+      exit(1);
    }
 
-   ttu_register( "RemoteSpeechCmd" );
+   register_messages();
 
 
-   if ( argc == 2 )
+
+   for (int i = 1; i < argc; i += 2)
    {
-      bServerMode = true;
-      host_name = argv[ 1 ];
+      if ( argc <= i+1)
+      {
+         printf( "Missing argument for parameter %s.\n\nPress any key to exit.\n", argv[ i ] );
+         _getch();
+         exit(1);
+      } 
+      else if ( strcmp( argv[ i ], "-host" ) == 0 )
+      {
+         bServerMode = true;
+         host_name = argv[ i+1 ];
+         printf( "Host parameter found. The server / client mode has currently not been implemented. " 
+            "Please restart without host parameter to run as stand-alone application.\n\n" 
+            "Press any key to exit.\n");
+         _getch();
+         exit(1);
+      } 
+      else if ( strcmp( argv[ i ], "-voice" ) == 0 )
+      {
+         printf( "Voice paramater: %s\n", argv[ i+1 ] );
+         bServerMode = false;     
+         voices.push_back( argv[ i+1 ] );
+      } 
+      else 
+      {
+         printf( "Unknown argument '%s'. \n\n"
+            "Known arguments:\n"
+            "-host <server_name>, for running CereVoiceRelay in client mode,\n   connecting to <server_name>\n"
+            "-voice <voice_id>, for loading voice <voice_id>;\n   multiple '-voice <voice_id>' pairs can be given.\n\n"
+            "Press any key to exit.\n", argv[ i ] );
+         _getch();
+         exit(1);
+      }
    }
-   else if ( argc == 1 )
+
+   // Check if we have any voices defined
+   if ( voices.size() < 1 )
    {
-      bServerMode = false;
+      printf( "No voices have been defined. Please specify one or more voices \n"
+         "using one or more '-voice <voice_id>' parameters.\n\nPress any key to exit.\n" );
+      _getch();
+      exit(1);
+   }
+
+   // Initialize cerevoice if running as stand-alone application
+   if ( !bServerMode )
+   {
       tts = new cerevoice_tts();
-      tts->init();
-   }
-   else
-   {
-      printf( "WRONG NUMBER OF ARGUMENTS\n" );
-      return -1;
+      tts->init( voices );
    }
 
-
+   // Main loop
    for ( ;; )
    {
       if ( _kbhit() )
@@ -318,3 +354,4 @@ int main( int argc, char * argv[] )
       Sleep( 10 );
    }
 }
+
