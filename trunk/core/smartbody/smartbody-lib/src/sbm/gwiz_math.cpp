@@ -425,6 +425,21 @@ inline quat_t interpolateQuat( gw_float_t t, const quat_t& q0, const quat_t& q_t
 #endif
 }
 
+////////
+
+inline matrix_t matrixFromZY( const vector_t& z_axis, const vector_t& y_axis_approx )	{
+
+	vector_t z_axis_n = z_axis.normal();
+	vector_t y_axis_approx_n = y_axis_approx.normal();
+	if( abs( z_axis_n.dot( y_axis_approx_n ) ) > 0.999 ) { // degenerate
+		return( euler_t( z_axis_n, 0.0 ) );
+	}
+	vector_t x_axis_n = y_axis_approx_n.cross( z_axis_n );
+	vector_t y_axis_n = z_axis_n.cross( x_axis_n );
+
+	return( matrix_t( x_axis_n, y_axis_n, z_axis_n ) );
+}
+
 ////////////////////////////////
 // MATRIX DECOMPOSITION UTILS
 
@@ -728,6 +743,11 @@ quat_t::quat_t( gw_float_t swing_x, gw_float_t swing_y, gw_float_t twist, int us
 	*this = swing * quat_t( twist, vector_t( 0.0, 0.0, 1.0 ), use_radians );	
 }
 
+quat_t::quat_t( const vector_t& z_axis, const vector_t& y_axis_approx )	{
+
+	*this = matrixFromZY( z_axis, y_axis_approx ).quat( GWIZ_M_TR );
+}
+
 quat_t::quat_t( const euler_t& e ) {
 
 	*this = 
@@ -834,6 +854,11 @@ euler_t::euler_t( const vector_t& z_axis, gw_float_t roll_deg )	{
 			Y = roll_deg;
 			Z = 0.0;
 		}
+}
+
+euler_t::euler_t( const vector_t& z_axis, const vector_t& y_axis_approx )	{
+
+	*this = matrixFromZY( z_axis, y_axis_approx ).euler( GWIZ_M_TR );
 }
 
 euler_t::euler_t( const quat_t& q )	{ 

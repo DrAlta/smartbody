@@ -207,6 +207,7 @@ class quat_t {
 		
 		quat_t( gw_float_t angle, const vector_t& v, int use_radians = 0 );
 		quat_t( gw_float_t swing_x, gw_float_t swing_y, gw_float_t twist, int use_radians = 0 );
+        quat_t( const vector_t& z_axis, const vector_t& y_axis_approx );
 
 	// CONVERT CONSTRUCT
 		quat_t( const euler_t& e );
@@ -358,6 +359,7 @@ class euler_t {
         inline euler_t( gw_float_t x_in, gw_float_t y_in, gw_float_t z_in )
             { X = x_in; Y = y_in; Z = z_in; }
         euler_t( const vector_t& z_axis, gw_float_t roll_deg ); // NOTE: flipped lookat
+        euler_t( const vector_t& z_axis, const vector_t& y_axis_approx ); // NOTE: flipped lookat
 
 	// CONVERT CONSTRUCT
 		euler_t( const quat_t& q );
@@ -372,7 +374,9 @@ class euler_t {
 		inline void r( gw_float_t r_in ) { Z = r_in; }
 		
 		inline euler_t& lookat( const vector_t& dir, gw_float_t roll_deg )
-			{ return( (*this) = euler_t( -dir, roll_deg ) ); } // NOTE: flipped axis
+			{ return( (*this) = euler_t( -dir, roll_deg ) ); } // NOTE: flipped z-axis
+		inline euler_t& lookat( const vector_t& dir, const vector_t& up_dir_approx )
+			{ return( (*this) = euler_t( -dir, up_dir_approx ) ); } // NOTE: flipped z-axis
 
 	// READ
 		inline gw_float_t x( void ) const { return( X ); }
@@ -457,6 +461,10 @@ class matrix_t {
 	// WRITE
 		inline matrix_t& set( int c, int r, gw_float_t f ) 
 			{ M[ c ][ r ] = f; return( *this ); }
+		inline matrix_t& col( int i, gw_float_t a, gw_float_t b, gw_float_t c, gw_float_t d ) 
+			{ M[i][0] = a; M[i][1] = b; M[i][2] = c; M[i][3] = d; return( *this ); }
+		inline matrix_t& row( int i, gw_float_t a, gw_float_t b, gw_float_t c, gw_float_t d ) 
+			{ M[0][i] = a; M[1][i] = b; M[2][i] = c; M[3][i] = d; return( *this ); }
 		inline matrix_t& col( int i, const vector_t& v, gw_float_t f ) 
 			{ M[i][0] = v.x(); M[i][1] = v.y(); M[i][2] = v.z(); M[i][3] = f; return( *this ); }
 		inline matrix_t& row( int i, const vector_t& v, gw_float_t f ) 
