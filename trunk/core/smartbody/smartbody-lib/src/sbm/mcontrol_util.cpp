@@ -2720,16 +2720,17 @@ int mcu_net_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 /*
 
-   PlaySound <sound_file>  // if sound_file starts with '<drive>:' - uses absolute path
-                           // if not - uses relative path, prepends absolute path of top-level saso directory to string
-
+   PlaySound <sound_file> <character_id>  // if sound_file starts with '<drive>:' - uses absolute path
+                                          // if not - uses relative path, prepends absolute path of top-level saso directory to string
+                                          // character_id can be used to position the sound where a character is in the world
 */
 
 int mcu_play_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
    if ( mcu_p )
    {
-      char * command = args.read_remainder_raw();
+      char * command = args.read_token();
+
 
       if ( strlen( command ) > 0 )
       {
@@ -2756,6 +2757,7 @@ int mcu_play_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
             }
          }
 
+         int charId = args.read_int();
 
          if ( mcu_p->play_internal_audio )
          {
@@ -2763,8 +2765,7 @@ int mcu_play_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
          }
          else
          {
-            //SendPlaySound( path.c_str() );
-            mcu_p->bonebus.SendPlaySound( path.c_str() );
+            mcu_p->bonebus.SendPlaySound( path.c_str(), charId );
          }
 
          return CMD_SUCCESS;

@@ -366,18 +366,21 @@ const std::vector<VisemeData *>* AudioFileSpeech::getVisemes( RequestId requestI
 /**
  *  Returns the sbm command used to play the speech audio.
  */
-char* AudioFileSpeech::getSpeechPlayCommand( RequestId requestId ) 
+char* AudioFileSpeech::getSpeechPlayCommand( RequestId requestId, const int characterId )
 {
 	ostringstream newStream; //creates an ostringstream object
 	newStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
 
+	ostringstream characterIdStream; //creates an ostringstream object
+	characterIdStream << characterId << flush; //outputs the number into the string stream and then flushes the buffer
+	string characterIdStr( characterIdStream.str() );
 
 	if(!audioSoundLookUp.does_key_exist(newStream.str().c_str()))
 	{
 		return(NULL);
 	}
 	string soundFile= *(audioSoundLookUp.lookup(newStream.str().c_str()));
-	soundFile= "send PlaySound "+ soundFile; //concatenates audio path with playsound command
+	soundFile= "send PlaySound "+ soundFile + " " + characterIdStr; //concatenates audio path with playsound command
 	char* retSoundFile= new char[soundFile.length() + 1];
 	strcpy(retSoundFile, soundFile.c_str());
 	return (retSoundFile);
