@@ -82,7 +82,7 @@ class MeCtQuickDraw : public MeController	{
 			AIM_WORLD
 		};
 
-		struct joint_state_t	{	
+		struct joint_state_t	{
 			vector_t	parent_pos; // world coord of immediate parent joint
 			quat_t		parent_rot;
 			vector_t	local_pos;
@@ -107,7 +107,6 @@ class MeCtQuickDraw : public MeController	{
 		float play_time;
 		float play_time_scale;
 
-//		void capture_world_offset_state( void );
 		vector_t world_offset_pos; // joint state at controller-start
 		quat_t   world_offset_rot;
 
@@ -146,9 +145,9 @@ class MeCtQuickDraw : public MeController	{
 
 	private:
 		joint_state_t capture_joint_state( SkJoint *joint_p );
-		quat_t rotation_to_target( vector_t target_pos, joint_state_t* state_p );
+		quat_t rotation_to_target( vector_t l_forward_dir, vector_t w_target_pos, joint_state_t* state_p );
 
-		SkJoint*	get_joint( char *joint_str, SkJoint **joint_pp );
+		SkJoint*	find_joint( char *joint_str, SkJoint **joint_pp );
 		SkJoint*	target_ref_joint( void );
 		vector_t	world_target_point( void );
 

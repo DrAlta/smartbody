@@ -56,9 +56,11 @@ MeCtQuickDraw::~MeCtQuickDraw( void )	{
 }
 
 void MeCtQuickDraw::init( SkMotion* mot_p ) {
-//	static char l_arm_labels[ NUM_QD_ARM_JOINTS ][ MAX_JOINT_LABEL_LEN ] = {
-//		"l_shoulder", "l_elbow", "l_forearm", "l_wrist"
-//	};
+#if 0
+	static char l_arm_labels[ NUM_QD_ARM_JOINTS ][ MAX_JOINT_LABEL_LEN ] = {
+		"l_shoulder", "l_elbow", "l_forearm", "l_wrist"
+	};
+#endif
 	static char r_arm_labels[ NUM_QD_ARM_JOINTS ][ MAX_JOINT_LABEL_LEN ] = {
 		"r_shoulder", "r_elbow", "r_forearm", "r_wrist"
 	};
@@ -106,49 +108,6 @@ void MeCtQuickDraw::init( SkMotion* mot_p ) {
 
 ///////////////////////////////////////////////////////////////////////////////////
 
-#if 0
-void MeCtQuickDraw::capture_world_offset_state( void )	{
-	
-	if( _context )	{
-		if( _context->channels().size() > 0 )	{
-
-			if( skeleton_ref_p == NULL )	{
-				skeleton_ref_p = _context->channels().skeleton(); // WHY HERE?
-			}
-			if( skeleton_ref_p )	{
-				
-				SkJoint* joint_p = skeleton_ref_p->search_joint( SbmPawn::WORLD_OFFSET_JOINT_NAME );
-				if( joint_p )	{
-					joint_p->update_gmat_up();
-
-					SrMat sr_M;
-					matrix_t M;
-					int i, j;
-
-					sr_M = joint_p->gmat();
-					for( i=0; i<4; i++ )	{
-						for( j=0; j<4; j++ )	{
-							M.set( i, j, sr_M.get( i, j ) );
-						}
-					}
-					
-					world_offset_pos = M.translation( GWIZ_M_TR );
-					world_offset_rot = M.quat( GWIZ_M_TR );
-					return;
-				}
-				printf( "MeCtQuickDraw::capture_world_offset_state ERR: '%s' joint is NULL\n", SbmPawn::WORLD_OFFSET_JOINT_NAME );
-				return;
-			}
-			printf( "MeCtQuickDraw::capture_world_offset_state ERR: skeleton reference is still NULL\n" );
-			return;
-		}
-		printf( "MeCtQuickDraw::capture_world_offset_state ERR: context channels have no size\n" );
-		return;
-	}
-	printf( "MeCtQuickDraw::capture_world_offset_state ERR: context is NULL\n" );
-}
-#endif
-
 MeCtQuickDraw::joint_state_t MeCtQuickDraw::capture_joint_state( SkJoint *joint_p ) {
 	SrMat sr_M;
 	matrix_t M;
@@ -195,27 +154,37 @@ MeCtQuickDraw::joint_state_t MeCtQuickDraw::capture_joint_state( SkJoint *joint_
 	return( state );
 }
 
-quat_t MeCtQuickDraw::rotation_to_target( vector_t target_pos, joint_state_t* state_p )	{
+quat_t MeCtQuickDraw::rotation_to_target( vector_t l_forward_dir, vector_t w_target_pos, joint_state_t* state_p )	{
 
+#if 0
 	// parent coord
-	vector_t l_target_pos = ( -state_p->parent_rot ) * ( target_pos - state_p->parent_pos );
+	vector_t l_target_pos = ( -state_p->parent_rot ) * ( w_target_pos - state_p->parent_pos );
 	return( quat_t( euler_t( l_target_pos - state_p->local_pos, 0.0 ) ) );
+#else
+
+		vector_t l_target_dir_n = ( -state_p->parent_rot ) * ( w_target_pos - state_p->world_pos ).normal();
+		
+		gw_float_t angle = DEG( gwiz_safe_acos( l_forward_dir.dot( l_target_dir_n ) ) );
+		vector_t axis = l_forward_dir.cross( l_target_dir_n ).normal();
+		
+		return( quat_t( angle, axis ) );
+#endif
 }
 
-SkJoint* MeCtQuickDraw::get_joint( char *joint_str, SkJoint **joint_pp )	{
+SkJoint* MeCtQuickDraw::find_joint( char *joint_str, SkJoint **joint_pp )	{
 
 	if( joint_str )	{
 		if( *joint_pp == NULL )	{
 			if( skeleton_ref_p )	{
 				*joint_pp = skeleton_ref_p->search_joint( joint_str );
 				if( *joint_pp == NULL )	{
-					fprintf( stderr, "MeCtQuickDraw::get_joint ERR: joint '%s' NOT FOUND in skeleton\n", joint_str );
+					fprintf( stderr, "MeCtQuickDraw::find_joint ERR: joint '%s' NOT FOUND in skeleton\n", joint_str );
 					free( joint_str );
 					joint_str = NULL;
 				}
 			}
 			else	{
-				fprintf( stderr, "MeCtQuickDraw::get_joint ERR: skeleton NOT FOUND\n" );
+				fprintf( stderr, "MeCtQuickDraw::find_joint ERR: skeleton NOT FOUND\n" );
 			}
 		}
 	}
@@ -223,8 +192,8 @@ SkJoint* MeCtQuickDraw::get_joint( char *joint_str, SkJoint **joint_pp )	{
 }
 
 SkJoint* MeCtQuickDraw::target_ref_joint( void ) {
-//	return( target_ref_joint_p = get_joint( target_ref_joint_str, target_ref_joint_p ) );
-	return( get_joint( target_ref_joint_str, &target_ref_joint_p ) );
+//	return( target_ref_joint_p = find_joint( target_ref_joint_str, target_ref_joint_p ) );
+	return( find_joint( target_ref_joint_str, &target_ref_joint_p ) );
 }
 
 
@@ -313,19 +282,139 @@ void MeCtQuickDraw::controller_map_updated( void ) {
 	}
 }
 
+void test_alternate_euler_reference_frames( 
+	gw_float_t H, 
+	gw_float_t P, 
+	gw_float_t R,
+	vector_t lookat_dir_v,
+	vector_t lookat_up_approx_v
+)	{
+	
+printf( "----------O\n" );
+	
+	// T = h * p * r
+	// conventional X-Y-Z: P-H-R
+	// alternative  X-Y-Z: R-H-P  // Gamebryo default camera assumption
+
+	euler_t e_in( P, H, R ); // euler_t: conventional X-Y-Z: P-H-R
+	e_in.print();
+	
+	vector_t axis_X( 1.0, 0.0, 0.0 );
+	vector_t axis_Y( 0.0, 1.0, 0.0 );
+	vector_t axis_Z( 0.0, 0.0, 1.0 );
+	vector_t fwd_v = -axis_Z; // STD OGL default camera assumption
+	vector_t right_v = axis_X; // STD OGL default camera assumption
+
+
+	// Construct conventional transformation
+
+	euler_t e_out;
+	vector_t v_out;
+
+	quat_t q_out;
+	q_out = 
+		quat_t( H, axis_Y ) *
+		quat_t( P, axis_X ) *
+		quat_t( R, axis_Z );
+
+	e_out = q_out;
+	e_out.print();
+
+	q_out = 
+		quat_t( e_in.y(), axis_Y ) *
+		quat_t( e_in.x(), axis_X ) *
+		quat_t( e_in.z(), axis_Z );
+
+	e_out = q_out;
+	e_out.print();
+
+	// Apply T to forward vector: conventional
+
+	v_out = q_out * fwd_v;
+	v_out.print();
+
+	v_out = q_out * right_v;
+	v_out.print();
+
+
+printf( "----------a\n" );
+
+	// Construct alternate reference frame
+
+	euler_t alt_frame_e;
+	alt_frame_e.lookat( lookat_dir_v, lookat_up_approx_v );
+	quat_t alt_frame_q = alt_frame_e;
+
+	vector_t alt_fwd_v = alt_frame_q * fwd_v;
+	vector_t alt_right_v = alt_frame_q * right_v;
+
+	euler_t( alt_frame_q ).print();
+	alt_fwd_v.print();
+
+printf( "----------b\n" );
+
+	// Apply e_in spec in alternate reference frame
+
+	quat_t q_alt;
+	q_alt = 
+		quat_t( H, alt_frame_q * axis_Y ) *
+		quat_t( P, alt_frame_q * axis_X ) *
+		quat_t( R, alt_frame_q * axis_Z );
+	euler_t( q_alt ).print();
+
+	q_alt = 
+		quat_t( e_in.y(), alt_frame_q * axis_Y ) *
+		quat_t( e_in.x(), alt_frame_q * axis_X ) *
+		quat_t( e_in.z(), alt_frame_q * axis_Z );
+	euler_t( q_alt ).print();
+
+	q_alt = alt_frame_q * quat_t( e_in ) * -alt_frame_q;
+	euler_t( q_alt ).print();
+
+	// Compute result in terms of alternate frame
+	//
+	// alt_frame_q * e_out * -alt_frame_q = q_alt;
+	//               e_out * -alt_frame_q = -alt_frame_q * q_alt;
+	//                              e_out = -alt_frame_q * q_alt * alt_frame_q;
+
+	e_out = -alt_frame_q * q_alt * alt_frame_q;
+	e_out.print();
+
+printf( "----------c\n" );
+
+	// Apply T to forward vector
+	v_out = q_alt * alt_fwd_v;
+	v_out.print();
+
+	// interpret relative to alternate frame
+	v_out = -alt_frame_q * q_alt * alt_fwd_v;
+	v_out.print();
+
+	// compare STD to interpreted alternate frame
+	v_out = e_out * fwd_v;
+	v_out.print();
+ 
+printf( "----------O\n" );
+}
+
+
 void MeCtQuickDraw::controller_start( void )	{
+
+#if 0
+	test_alternate_euler_reference_frames( 0.0, 30.0, 20.0, vector_t( 1.0, 0.0, 0.0 ), vector_t( 0.0, 1.0, 0.0 ) );
+	test_alternate_euler_reference_frames( -156.0, 70.0, -122.0, vector_t( 1.0, -3.0, 7.0 ), vector_t( -5.0, 1.0, 2.0 ) );
+#endif
 
 //	capture_world_offset_state();
 
 	if( _context->channels().size() > 0 )	{
 		skeleton_ref_p = _context->channels().skeleton();
 	}
-
 }
 
 bool MeCtQuickDraw::controller_evaluate( double t, MeFrameData& frame ) {
 
-#if 1
+#if 0
 static float tmp_prev_t = 0.0;
 static float tmp_accum = 0.0;
 static int tmp_count = 0;
@@ -413,24 +502,24 @@ else	{
 
 //if( tmp_event ) printf( "==\n" );
 
+	euler_t forward_rot = euler_t( 0.0, 0.0, 0.0 );
+	vector_t forward_ref( -1.0, 0.0, 0.0 );
+	vector_t forward_dir_n = forward_rot * forward_ref.normal();
+
 	for( int j = 0; j < NUM_QD_ARM_JOINTS; j++ )	{
 
 		int i_map = _motion_chan_to_buff[ _arm_chan_indices[ j ] ];
 		int i_interim = interim_arm_chan_indices[ j ];
 
 		SkJoint* joint_p = _context->channels().joint( _toContextCh[ _arm_chan_indices[ j ] ] );
-		if( joint_p == NULL ) printf( "joint is NULL\n" );
+		if( joint_p == NULL ) 
+			printf( "MeCtQuickDraw::controller_evaluate: joint is NULL\n" );
 		joint_state_t state = capture_joint_state( joint_p );
 
-		euler_t forward_rot = euler_t( 0.0, 0.0, 0.0 );
-		vector_t forward_ref( -1.0, 0.0, 0.0 );
-		vector_t forward_dir_n = forward_rot * forward_ref.normal();
-
-		vector_t l_target_dir_n = ( -state.parent_rot ) * ( w_point - state.world_pos ).normal();
-		gw_float_t angle = DEG( gwiz_safe_acos( forward_dir_n.dot( l_target_dir_n ) ) );
-
-		vector_t axis = forward_dir_n.cross( l_target_dir_n ).normal();
-		quat_t q( angle, axis );
+//		vector_t l_target_dir_n = ( -state.parent_rot ) * ( w_point - state.world_pos ).normal();
+//		gw_float_t angle = DEG( gwiz_safe_acos( forward_dir_n.dot( l_target_dir_n ) ) );
+//		vector_t axis = forward_dir_n.cross( l_target_dir_n ).normal();
+		quat_t q = rotation_to_target( forward_dir_n, w_point, & state );
 		euler_t e = q;
 
 		quat_t in_q(
@@ -443,8 +532,8 @@ else	{
 
 //if( tmp_event )	in_e.print();
 
-		float s = t / play_time;
-		if( s > 1.0 ) s = 1.0;
+//		float s = t / play_time;
+//		if( s > 1.0 ) s = 1.0;
 
 #if 1
 		if( j == 0 )	{ // shoulder
@@ -503,7 +592,7 @@ else	{
 			interim_pose_buff_p[ i_interim + 3 ]
 		);
 
-		float s = t / play_time;
+		gw_float_t s = t / play_time;
 		if( s > 1.0 ) s = 1.0;
 #if 1
 		if( s < 0.5 ) s = 0.0;
@@ -521,20 +610,20 @@ else	{
 //		quat_t blend_q = target_q[ j ];
 		
 #if 1
-		fbuffer[ i_map + 0 ] = blend_q.w();
-		fbuffer[ i_map + 1 ] = blend_q.x();
-		fbuffer[ i_map + 2 ] = blend_q.y();
-		fbuffer[ i_map + 3 ] = blend_q.z();
+		fbuffer[ i_map + 0 ] = (float)blend_q.w();
+		fbuffer[ i_map + 1 ] = (float)blend_q.x();
+		fbuffer[ i_map + 2 ] = (float)blend_q.y();
+		fbuffer[ i_map + 3 ] = (float)blend_q.z();
 #elif 0
-		fbuffer[ i_map + 0 ] = in_q.w();
-		fbuffer[ i_map + 1 ] = in_q.x();
-		fbuffer[ i_map + 2 ] = in_q.y();
-		fbuffer[ i_map + 3 ] = in_q.z();
+		fbuffer[ i_map + 0 ] = (float)in_q.w();
+		fbuffer[ i_map + 1 ] = (float)in_q.x();
+		fbuffer[ i_map + 2 ] = (float)in_q.y();
+		fbuffer[ i_map + 3 ] = (float)in_q.z();
 #else
-		fbuffer[ i_map + 0 ] = target_q[ j ].w();
-		fbuffer[ i_map + 1 ] = target_q[ j ].x();
-		fbuffer[ i_map + 2 ] = target_q[ j ].y();
-		fbuffer[ i_map + 3 ] = target_q[ j ].z();
+		fbuffer[ i_map + 0 ] = (float)target_q[ j ].w();
+		fbuffer[ i_map + 1 ] = (float)target_q[ j ].x();
+		fbuffer[ i_map + 2 ] = (float)target_q[ j ].y();
+		fbuffer[ i_map + 3 ] = (float)target_q[ j ].z();
 #endif
 	}
 
@@ -550,7 +639,7 @@ SkChannelArray& MeCtQuickDraw::controller_channels( void )	{
 
 double MeCtQuickDraw::controller_duration( void ) {
 
-// THIS IS CALLED PRIOR TO controller_start().
+// THIS GETS CALLED PRIOR TO controller_start().
 	return( -1.0 );
 }
 
