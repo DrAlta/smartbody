@@ -613,7 +613,7 @@ void BML::Processor::speechReply( SbmCharacter* character, SmartBody::RequestId 
 			if( !errorMsg ) {
 				if( LOG_SPEECH_REQUEST_ID )
 					clog << "LOG: BodyPlannerImpl::speechReply(..): speech found for RequestId " << requestId << endl;
-				request->audioPlay = speech->getSpeechPlayCommand( requestId );
+				request->audioPlay = speech->getSpeechPlayCommand( requestId, character->bonebusCharacter->m_charId );
 				if( LOG_AUDIO )
 					cout << "DEBUG: BodyPlannerImpl::speechReply: request->audioPlay = " << request->audioPlay << endl;
 

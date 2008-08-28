@@ -139,7 +139,7 @@ namespace SmartBody {
         /**
          *  Returns the sbm command used to play the speech audio.
          */
-        virtual char* getSpeechPlayCommand( RequestId requestId ) = 0;
+        virtual char* getSpeechPlayCommand( RequestId requestId, const int characterId = 0 ) = 0;
 
         /**
          *  Returns the sbm command used to stop the speech audio.

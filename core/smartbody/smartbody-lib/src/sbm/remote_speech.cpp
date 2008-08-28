@@ -271,8 +271,8 @@ std::vector<VisemeData*>* remote_speech::getVisemes( RequestId requestId ){
 	}
 }
 
-	
-char* remote_speech::getSpeechPlayCommand( RequestId requestId ){
+
+char* remote_speech::getSpeechPlayCommand( RequestId requestId, const int characterId ){
 		
 	/**
      *  Returns the sbm command used to play the speech audio. The command is now of form:  send PlaySound <audio path>- this sends the sound directly to Unreal
@@ -286,7 +286,10 @@ char* remote_speech::getSpeechPlayCommand( RequestId requestId ){
 		return NULL;
 	}
 	string soundFile= *lookup_result;
-	soundFile= "send PlaySound "+ soundFile; //concatenates audio path with playsound command
+	ostringstream characterIdStream; //creates an ostringstream object
+	characterIdStream << characterId << flush; //outputs the number into the string stream and then flushes the buffer
+	string characterIdStr( characterIdStream.str() );
+	soundFile= "send PlaySound "+ soundFile + " " + characterIdStr; //concatenates audio path with playsound command
 	char* retSoundFile= new char[soundFile.length() + 1];
 	strcpy(retSoundFile, soundFile.c_str());
 	return (retSoundFile);
