@@ -375,8 +375,8 @@ class euler_t {
 		
 		inline euler_t& lookat( const vector_t& dir, gw_float_t roll_deg )
 			{ return( (*this) = euler_t( -dir, roll_deg ) ); } // NOTE: flipped z-axis
-		inline euler_t& lookat( const vector_t& dir, const vector_t& up_dir_approx )
-			{ return( (*this) = euler_t( -dir, up_dir_approx ) ); } // NOTE: flipped z-axis
+		inline euler_t& lookat( const vector_t& dir, const vector_t& up_approx )
+			{ return( (*this) = euler_t( -dir, up_approx ) ); } // NOTE: flipped z-axis
 
 	// READ
 		inline gw_float_t x( void ) const { return( X ); }
