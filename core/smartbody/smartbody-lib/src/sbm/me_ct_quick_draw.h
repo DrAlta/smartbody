@@ -53,9 +53,9 @@ TODO: Class API members:
         void set_aim_local( float h );
         void set_aim_world( float h );
 
-Step motion:
+QuickDraw motion:
 
-        sf-smartbody/data/sbm-testdata/doctor/qdraw/AdultM_FastDraw001.skm
+        sf-smartbody/data/sbm-test/common-sk/qdraw/AdultM_FastDraw001.skm
 
 TODO: Example sequence:
 
