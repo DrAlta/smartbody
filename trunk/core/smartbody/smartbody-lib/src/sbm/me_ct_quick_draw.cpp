@@ -414,7 +414,7 @@ void MeCtQuickDraw::controller_start( void )	{
 
 bool MeCtQuickDraw::controller_evaluate( double t, MeFrameData& frame ) {
 
-#if 0
+#if 1
 static float tmp_prev_t = 0.0;
 static float tmp_accum = 0.0;
 static int tmp_count = 0;
@@ -463,31 +463,34 @@ else	{
 	
 	int interim_arm_chan_indices[ NUM_QD_ARM_JOINTS ];
 	int i_interim = 0;
-	int c_interim = 0;
+
 	for( int i_chan=0; i_chan<n_chan; i_chan++ )	{
 
 		int ch_size = motion_channels[ i_chan ].size();
-//		SkChannel::Type ch_type = motion_channels[ i_chan ].type;
 
 		bool is_arm_chan = false;
+		int which_arm_chan = -1;
 		for( int j = 0; j < NUM_QD_ARM_JOINTS; j++ )	{
 			if( i_chan == _arm_chan_indices[ j ] )	{
 				is_arm_chan = true;
+				which_arm_chan = j;
 			}
 		}
 		
 		if( is_arm_chan == true )	{
-			interim_arm_chan_indices[ c_interim ] = i_interim;
-			c_interim++;
+			interim_arm_chan_indices[ which_arm_chan ] = i_interim;
 		}
 		else	{
-			for( int j=0; j<ch_size; j++ ) {
-				fbuffer[ _motion_chan_to_buff[ i_chan ] + j ] = interim_pose_buff_p[ i_interim + j ];
+			for( int k=0; k<ch_size; k++ ) {
+				fbuffer[ _motion_chan_to_buff[ i_chan ] + k ] = interim_pose_buff_p[ i_interim + k ];
 			}
 		}
 		
 		i_interim += ch_size;
 	}
+
+
+//if( tmp_event ) printf( "==\n" );
 
 	if( skeleton_ref_p )	{
 		SkJoint* r_wrist_joint_p = skeleton_ref_p->search_joint( "r_wrist" );
@@ -498,29 +501,28 @@ else	{
 	}
 
 	vector_t w_point = world_target_point();
-	quat_t target_q[ NUM_QD_ARM_JOINTS ];
 
-//if( tmp_event ) printf( "==\n" );
+	vector_t joint_forward_v( -1.0, 0.0, 0.0 );
+	vector_t joint_upward_v( 0.0, 1.0, 0.0 );
+	vector_t alt_joint_forward_v( 0.0, -1.0, 0.0 );
+	vector_t alt_joint_upward_v( -1.0, 0.0, 0.0 );
+	
+	euler_t joint_frame_e;
+	joint_frame_e.lookat( alt_joint_forward_v, alt_joint_upward_v );
+	quat_t joint_frame_q = joint_frame_e;
 
-	euler_t forward_rot = euler_t( 0.0, 0.0, 0.0 );
-	vector_t forward_ref( -1.0, 0.0, 0.0 );
-	vector_t forward_dir_n = forward_rot * forward_ref.normal();
-
+	// COMPUTE TARGET CONFIG
 	for( int j = 0; j < NUM_QD_ARM_JOINTS; j++ )	{
 
-		int i_map = _motion_chan_to_buff[ _arm_chan_indices[ j ] ];
-		int i_interim = interim_arm_chan_indices[ j ];
+		i_interim = interim_arm_chan_indices[ j ];
 
 		SkJoint* joint_p = _context->channels().joint( _toContextCh[ _arm_chan_indices[ j ] ] );
 		if( joint_p == NULL ) 
 			printf( "MeCtQuickDraw::controller_evaluate: joint is NULL\n" );
 		joint_state_t state = capture_joint_state( joint_p );
 
-//		vector_t l_target_dir_n = ( -state.parent_rot ) * ( w_point - state.world_pos ).normal();
-//		gw_float_t angle = DEG( gwiz_safe_acos( forward_dir_n.dot( l_target_dir_n ) ) );
-//		vector_t axis = forward_dir_n.cross( l_target_dir_n ).normal();
-		quat_t q = rotation_to_target( forward_dir_n, w_point, & state );
-		euler_t e = q;
+		quat_t point_q = rotation_to_target( joint_forward_v, w_point, & state );
+		euler_t point_e = point_q;
 
 		quat_t in_q(
 			interim_pose_buff_p[ i_interim + 0 ],
@@ -530,71 +532,64 @@ else	{
 		);
 		euler_t in_e = in_q;
 
-//if( tmp_event )	in_e.print();
+		euler_t alt_in_e = -joint_frame_q * in_q * joint_frame_q;
+		euler_t alt_pt_e = -joint_frame_q * point_q * joint_frame_q;
+		euler_t alt_out_e = euler_t( alt_pt_e.x(), alt_in_e.y(), alt_in_e.z() );
+		euler_t out_e = joint_frame_q * quat_t( alt_out_e ) * -joint_frame_q;
 
-//		float s = t / play_time;
-//		if( s > 1.0 ) s = 1.0;
+#if 0
+if( j == 0 )	{ // shoulder
+//	if( tmp_event )	printf( "In h:%.1f p:%.1f r:%.1f\n", in_e.x(), in_e.y(), in_e.z() );
+//	if( tmp_event )	printf( "Fr h:%.1f p:%.1f r:%.1f\n", alt_in_e.y(), alt_in_e.x(), alt_in_e.z() );
+//	if( tmp_event )	printf( "Pt h:%.1f p:%.1f r:%.1f\n", point_e.x(), point_e.y(), point_e.z() );
+	if( tmp_event )	printf( "Fr h:%.1f p:%.1f r:%.1f\n", alt_pt_e.y(), alt_pt_e.x(), alt_pt_e.z() );
+}
+#endif
 
+		quat_t out_q;
+		
+		// NOTE: in_e.x() is INPUT ROLL
 #if 1
 		if( j == 0 )	{ // shoulder
-//			set_q = in_q; 
-//			set_q = in_q.lerp( s, quat_t() ); // null rot
-//			set_q = in_q.lerp( s, euler_t( 0.0, 90.0, 0.0 ) );
-//			set_q = in_q.lerp( s, q );
-//			set_q = in_q.lerp( s * 0.33, q );
-//			target_q[ j ] = q;
-//			target_q[ j ] = euler_t( in_e.x(), 0.0, in_e.z() );
-//			target_q[ j ] = euler_t( in_e.x(), e.y(), in_e.z() );
-			target_q[ j ] = euler_t( in_e.x(), e.y(), e.z() );
+//			out_q = euler_t( in_e.x(), point_e.y(), point_e.z() );
+//			out_q = euler_t( in_e.x(), point_e.y(), in_e.z() );
+//			out_q = euler_t( in_e.x(), in_e.y(), in_e.z() );
+			out_q = euler_t( in_e.x(), point_e.y(), point_e.z() );
 		}
 		else
 		if( j == 1 )	{ // elbow
-//			set_q = in_q; 
-//			set_q = in_q.lerp( s, quat_t() ); // null rot
-//			set_q = in_q.lerp( s, euler_t( 0.0, 90.0, 0.0 ) );
-//			set_q = in_q.lerp( s, q );
-//			target_q[ j ] = q;
-//			target_q[ j ] = euler_t( in_e.x(), 0.0, 0.0 );
-			target_q[ j ] = euler_t( in_e.x(), e.y(), e.z() );
+			out_q = euler_t( in_e.x(), point_e.y(), point_e.z() );
+//			out_q = euler_t( point_e.x(), point_e.y(), in_e.z() );
 		}
 		else
 		if( j == 2 )	{ // forearm
-//			set_q = in_q; 
-//			set_q = in_q.lerp( s, quat_t() ); // null rot
-//			set_q = in_q.lerp( s, euler_t( -90.0, 0.0, 0.0 ) ); // null rot
-//			target_q[ j ] = q;
-//			target_q[ j ] = euler_t( -90.0, 0.0, 0.0 );
-//			target_q[ j ] = euler_t( 0.0, 0.0, 0.0 );
-			target_q[ j ] = euler_t( in_e.x(), 0.0, 0.0 );
+			out_q = euler_t( in_e.x(), 0.0, 0.0 );
+//			out_q = euler_t( point_e.x(), 0.0, 0.0 );
 		}
 		else	{ // wrist
-//			set_q = in_q; 
-//			set_q = in_q.lerp( s, quat_t() ); // null rot
-//			target_q[ j ] = q;
-//			target_q[ j ] = euler_t( -90.0, 0.0, 0.0 );
-//			target_q[ j ] = euler_t( 0.0, 0.0, 0.0 );
-			target_q[ j ] = euler_t( in_e.x(), e.y(), e.z() );
+			out_q = euler_t( in_e.x(), point_e.y(), point_e.z() );
+//			out_q = euler_t( point_e.x(), point_e.y(), in_e.z() );
 		}
+
+#elif 1
+
+		if( j == 0 )	{ // shoulder
+//			out_q = euler_t( point_e.x(), point_e.y(), point_e.z() );
+//			out_q = euler_t( in_e.x(), in_e.y(), in_e.z() );
+			out_q = out_e;
+		}
+		else	{
+			out_q = quat_t();
+		}
+
 #else
-		target_q[ j ] = euler_t( in_e.x(), e.y(), e.z() );
+		out_q = euler_t( in_e.x(), point_e.y(), point_e.z() );
 #endif
-	}
 
-	for( int j = 0; j < NUM_QD_ARM_JOINTS; j++ )	{
-
-		int i_map = _motion_chan_to_buff[ _arm_chan_indices[ j ] ];
-		int i_interim = interim_arm_chan_indices[ j ];
-		
-		quat_t in_q(
-			interim_pose_buff_p[ i_interim + 0 ],
-			interim_pose_buff_p[ i_interim + 1 ],
-			interim_pose_buff_p[ i_interim + 2 ],
-			interim_pose_buff_p[ i_interim + 3 ]
-		);
 
 		gw_float_t s = t / play_time;
 		if( s > 1.0 ) s = 1.0;
-#if 1
+#if 0
 		if( s < 0.5 ) s = 0.0;
 		else s = ( s - 0.5 ) * 2.0;
 #elif 0
@@ -604,26 +599,24 @@ else	{
 		if( s < 0.75 ) s = 0.0;
 		else s = ( s - 0.75 ) * 4.0;
 #endif
-//		quat_t blend_q = in_q.lerp( s, target_q[ j ] );
-		quat_t blend_q = in_q.lerp( s * s, target_q[ j ] );
-//		quat_t blend_q = in_q;
-//		quat_t blend_q = target_q[ j ];
 		
-#if 1
-		fbuffer[ i_map + 0 ] = (float)blend_q.w();
-		fbuffer[ i_map + 1 ] = (float)blend_q.x();
-		fbuffer[ i_map + 2 ] = (float)blend_q.y();
-		fbuffer[ i_map + 3 ] = (float)blend_q.z();
-#elif 0
+		int i_map = _motion_chan_to_buff[ _arm_chan_indices[ j ] ];
+#if 0
 		fbuffer[ i_map + 0 ] = (float)in_q.w();
 		fbuffer[ i_map + 1 ] = (float)in_q.x();
 		fbuffer[ i_map + 2 ] = (float)in_q.y();
 		fbuffer[ i_map + 3 ] = (float)in_q.z();
+#elif 1
+		quat_t blend_q = in_q.lerp( pow( s, 2.0 ), out_q );
+		fbuffer[ i_map + 0 ] = (float)blend_q.w();
+		fbuffer[ i_map + 1 ] = (float)blend_q.x();
+		fbuffer[ i_map + 2 ] = (float)blend_q.y();
+		fbuffer[ i_map + 3 ] = (float)blend_q.z();
 #else
-		fbuffer[ i_map + 0 ] = (float)target_q[ j ].w();
-		fbuffer[ i_map + 1 ] = (float)target_q[ j ].x();
-		fbuffer[ i_map + 2 ] = (float)target_q[ j ].y();
-		fbuffer[ i_map + 3 ] = (float)target_q[ j ].z();
+		fbuffer[ i_map + 0 ] = (float)out_q.w();
+		fbuffer[ i_map + 1 ] = (float)out_q.x();
+		fbuffer[ i_map + 2 ] = (float)out_q.y();
+		fbuffer[ i_map + 3 ] = (float)out_q.z();
 #endif
 	}
 
