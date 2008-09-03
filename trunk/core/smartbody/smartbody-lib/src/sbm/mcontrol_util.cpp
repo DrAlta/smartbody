@@ -31,7 +31,6 @@
 #include <iostream>
 #include <string>
 
-#include "sbm_eyeblink.h"
 #include "sbm_audio.h"
 
 #include "mcontrol_util.h"
@@ -398,7 +397,7 @@ void mcuCBHandle::update( void )	{
 				}
 			}
 
-			SBM_eyeblink_update( char_p->bonebusCharacter, this->time );
+			char_p->eye_blink_update( this->time );
 		}  // end of char_p processing
 	} // end of loop
 }
