@@ -86,6 +86,10 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	face_ct->name( face_ct_name.c_str() );
 
 	bonebusCharacter = NULL;
+
+	eye_blink_closed = false;
+	eye_blink_last_time = 0;
+	eye_blink_repeat_time = 0;
 }
 
 //  Destructor
@@ -521,6 +525,42 @@ void SbmCharacter::set_viseme( char* viseme,
 	{
 		bonebusCharacter->SetViseme( viseme, weight, rampin_duration );
 	}
+}
+
+
+void SbmCharacter::eye_blink_update( const double frame_time )
+{
+   // automatic blinking routine
+   static const double blink_down_time = 0.04;       // how long the eyes should stay closed. ~1 frame
+   static const double min_blink_repeat_time = 4.0;  // how long to wait until the next blink
+   static const double max_blink_repeat_time = 8.0;  // will pick a random number between these min/max
+   
+   if ( !eye_blink_closed )
+   {
+      if ( frame_time - eye_blink_last_time > eye_blink_repeat_time )
+      {
+         // close the eyes
+         bonebusCharacter->SetViseme( "blink", 0.9f, 0.001f );
+
+         eye_blink_last_time = frame_time;
+         eye_blink_closed = true;
+      }
+   }
+   else
+   {
+      if ( frame_time - eye_blink_last_time > blink_down_time )
+      {
+         // open the eyes
+         bonebusCharacter->SetViseme( "blink", 0, 0.001f );
+
+         eye_blink_last_time = frame_time;
+         eye_blink_closed = false;
+
+         // compute when to close them again
+         double fraction = (double)rand() / (double)RAND_MAX;
+         eye_blink_repeat_time = ( fraction * ( max_blink_repeat_time - min_blink_repeat_time ) ) + min_blink_repeat_time;
+      }
+   }
 }
 
 ///////////////////////////////////////////////////////////////////////////

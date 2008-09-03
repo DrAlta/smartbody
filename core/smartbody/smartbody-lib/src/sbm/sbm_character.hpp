@@ -127,6 +127,12 @@ public:
 	
 	void set_viseme( char* viseme, float weight , float rampin_duration );
 
+	bool   eye_blink_closed;
+	double eye_blink_last_time;
+	double eye_blink_repeat_time;
+
+	void eye_blink_update( const double frame_time );
+
 public:
 
 	void inspect_skeleton( SkJoint* joint_p, int depth = 0 );
