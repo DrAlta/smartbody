@@ -530,6 +530,11 @@ void SbmCharacter::set_viseme( char* viseme,
 
 void SbmCharacter::eye_blink_update( const double frame_time )
 {
+   if ( bonebusCharacter == NULL )
+   {
+      return;
+   }
+
    // automatic blinking routine
    static const double blink_down_time = 0.04;       // how long the eyes should stay closed. ~1 frame
    static const double min_blink_repeat_time = 4.0;  // how long to wait until the next blink
