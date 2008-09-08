@@ -30,6 +30,7 @@
 #include <fstream>
 #include <conio.h>
 #include <io.h>
+#include <direct.h>
 
 #include <xercesc/util/XMLUTF8Transcoder.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
@@ -316,7 +317,25 @@ void cerevoice_tts::init( std::vector<char *> vctVoices )
       XERCES_STD_QUALIFIER cerr << "Error during Xerces-c Initialization.\n" << "  Exception message:" << pMsg;
       XMLString::release( &pMsg );
    }
+
+   // Make sure the audio temp directory exists and create if not
+   // CPRC_riff_save will not create the directory if non-existent
+   if( !fileExists( temp_audio_dir_cereproc ) )
+   {
+      std::string temp = "";
+      std::vector< std::string > tokens;
+      const std::string delimiters = "\\\\";
+      vhcl::Tokenize( temp_audio_dir_cereproc, tokens, delimiters );
+
+      printf( "Warning, audio temp directory, %s, does not exist. Creating directory...\n", temp_audio_dir_cereproc );
+      for (unsigned int i = 0; i < tokens.size(); i++)
+      {
+         temp += tokens.at( i ) + "\\";
+         _mkdir( temp.c_str() );
+      }
+   }
 }
+
 
 static int _read_license( char * licfile, char ** text, char ** signature )
 {
@@ -394,7 +413,7 @@ void cerevoice_tts::load_voice( char * voice_id )
    strcat( voice_file, voice_file_extension );
    
    // Make sure voice file exists
-   if(!fileExists(voice_file))
+   if( !fileExists( voice_file ) )
    {
       std::cout<<"Error: voice file not found! See README files for setup information. Press any key to exit.\n";
       _getch();
@@ -444,7 +463,6 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
    }
    else
    {
-      
       // Set up a spurt, an audio buffer for data, and a lexicon search structure
       CPRC_spurt * spurt = CPRC_spurt_new( voices[ voice_id ] );
       CPRC_abuf * abuf = CPRC_abuf_new( 22050 );
@@ -481,7 +499,6 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
       */
 
       // make the output file name from the input file less the extension, and the output dir
-      //std::string fpathout( "sample.wav" );
       CPRC_riff_save( abuf, cereproc_file_name );
 
       // Watch for special case help request
