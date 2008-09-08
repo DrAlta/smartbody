@@ -186,6 +186,24 @@ void process_message( const char * message )
 }
 
 
+std::string remove_spaces_and_double_quotes ( char * c )
+{
+   std::string s = c;
+
+   while(s.find(" ") != std::string::npos)
+   {
+      s.replace(s.find(" "), 1, "");
+   }
+  
+   while(s.find("\"") != std::string::npos)
+   {
+      s.replace(s.find("\""), 1, "");
+   }
+
+   return s;
+}
+
+
 void elvin_callback( char * op, char * args, void * userData )
 {
    printf( "received -- op: %s args: %s\n", op, args );
@@ -239,20 +257,31 @@ void elvin_callback( char * op, char * args, void * userData )
          process_message( args );
       }
    }
+   else if ( strcmp( op, "vrAllCall" ) == 0 )
+   {
+      ttu_notify2( "vrComponent", "rvoice cerevoicerelay" );
+   }
    else if ( strcmp( op, "vrKillComponent" ) == 0 )
    {
-      if ( strcmp( args, "all" ) == 0 || strcmp( args, "cerevoicerelay" ) == 0 )
+      std::string strArgs = remove_spaces_and_double_quotes(args);
+      
+      if ( _stricmp( strArgs.c_str(), "rvoice" ) == 0 || _stricmp( strArgs.c_str(), "all" ) == 0 )
       {
          printf( "Kill message received." );
+         ttu_notify2( "vrProcEnd", "rvoice cerevoicerelay" );
+         exit(0);
 	  }
    }
 }
+
 
 void register_messages ()
 {
 	ttu_register( "RemoteSpeechCmd" );
 	ttu_register( "vrKillComponent" );
+   ttu_register( "vrAllCall" );
 }
+
 
 int main( int argc, char * argv[] )
 {
@@ -284,8 +313,7 @@ int main( int argc, char * argv[] )
 
    register_messages();
 
-
-
+   // Parse parameters
    for (int i = 1; i < argc; i += 2)
    {
       if ( argc <= i+1)
@@ -336,6 +364,9 @@ int main( int argc, char * argv[] )
    {
       tts = new cerevoice_tts();
       tts->init( voices );
+
+      // Notify that we're online
+      ttu_notify2( "vrComponent", "rvoice cerevoicerelay" );
    }
 
    // Main loop
