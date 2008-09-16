@@ -514,6 +514,8 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
             //XMLCh * end = XMLString::transcode( "end" );
             //XMLCh * start = XMLString::transcode( "start" );
             XMLCh * name = XMLString::transcode( "name" );
+            XMLCh * time = XMLString::transcode( "time" );
+           // XMLCh * id = XMLString::transcode( "id" );
             XMLCh * file_path = XMLString::transcode( player_file_name );
 
             xercesc_2_7::DOMDocument* doc = impl->createDocument(
@@ -591,6 +593,18 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
                  {
                    printf( "COULDN'T FIND MATCH FOR: %s\n", abuf->trans[ i ].name );
                  }
+               }
+               else if  ( abuf->trans[ i ].type == CPRC_ABUF_TRANS_MARK )
+               {
+                    DOMElement * markElement = doc->createElement( X( "mark" ) );
+                    XMLCh * mark_name = XMLString::transcode( abuf->trans[ i ]..name );
+                    markElement->setAttribute( name, mark_name ) ;
+
+                    std::string word_start_f = vhcl::Format( "%0.6f", abuf->trans[ i ].start );
+                    XMLCh * word_start_time = XMLString::transcode( word_start_f.c_str() );
+                    markElement->setAttribute( time, word_start_time );
+
+                    rootElem->appendChild( markElement );
                }
             }
 
