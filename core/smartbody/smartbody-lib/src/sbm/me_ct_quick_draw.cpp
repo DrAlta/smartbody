@@ -419,8 +419,8 @@ static float tmp_prev_t = 0.0;
 static float tmp_accum = 0.0;
 static int tmp_count = 0;
 int tmp_event = 0;
-tmp_accum += ( t - tmp_prev_t );
-tmp_prev_t = t;
+tmp_accum += (float)( t - tmp_prev_t );
+tmp_prev_t = (float)t;
 if( ( tmp_accum > 0.2 )&&( tmp_count < 10 ) )	{
 	tmp_accum = 0.0;
 	tmp_event = 1;
