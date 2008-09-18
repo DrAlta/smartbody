@@ -597,7 +597,7 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
                else if  ( abuf->trans[ i ].type == CPRC_ABUF_TRANS_MARK )
                {
                     DOMElement * markElement = doc->createElement( X( "mark" ) );
-                    XMLCh * mark_name = XMLString::transcode( abuf->trans[ i ]..name );
+                    XMLCh * mark_name = XMLString::transcode( abuf->trans[ i ].name );
                     markElement->setAttribute( name, mark_name ) ;
 
                     std::string word_start_f = vhcl::Format( "%0.6f", abuf->trans[ i ].start );
