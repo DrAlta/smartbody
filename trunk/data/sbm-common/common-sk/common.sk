@@ -531,6 +531,12 @@ root base
                     colgeo "geom/doctor_r_wrist_col.srm"
                     channel Quat
 
+                    joint r_wrist_axis_joint
+                    { offset 0.0 0.0 0.0
+                      visgeo "geom/doctor_r_handaxes_vis.srm"
+                      colgeo "geom/doctor_r_handaxes_col.srm"
+                    }
+                    
                     joint r_pinky1
                     { offset -6.580630 -0.692200 -3.343900
                       visgeo "geom/doctor_r_pinky1_vis.srm"

@@ -81,6 +81,13 @@ class MeCtQuickDraw : public MeController	{
 			AIM_LOCAL,
 			AIM_WORLD
 		};
+		enum arm_joint_enum_set	{
+			ARM_JOINT_SHOULDER,
+			ARM_JOINT_ELBOW,
+			ARM_JOINT_FOREARM,
+			ARM_JOINT_WRIST,
+			NUM_ARM_JOINTS
+		};
 
 		struct joint_state_t	{
 			vector_t	parent_pos; // world coord of immediate parent joint
@@ -107,8 +114,11 @@ class MeCtQuickDraw : public MeController	{
 		float play_time;
 		float play_time_scale;
 
-		vector_t world_offset_pos; // joint state at controller-start
-		quat_t   world_offset_rot;
+//		vector_t world_offset_pos; // joint state at controller-start
+//		quat_t   world_offset_rot;
+		quat_t   l_final_shoulder_rot;
+		quat_t   l_final_arm_rot[ NUM_ARM_JOINTS ];
+		quat_t   l_final_hand_in_body_rot;
 
 		float * interim_pose_buff_p;
 		
@@ -144,6 +154,7 @@ class MeCtQuickDraw : public MeController	{
 		SkMotion::InterpType play_mode () const { return _play_mode; }
 
 	private:
+		quat_t get_final_joint_rot( SkMotion* mot_p, char *joint_name );
 		joint_state_t capture_joint_state( SkJoint *joint_p );
 		quat_t rotation_to_target( vector_t l_forward_dir, vector_t w_target_pos, joint_state_t* state_p );
 
