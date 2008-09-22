@@ -569,32 +569,55 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
 
                     if ( i < ( abuf->trans_sz - 1 ) )
                     {
-                      if ( ( abuf->trans[ i + 1 ].type == CPRC_ABUF_TRANS_WORD ) || ( abuf->trans[ i + 1 ].type == CPRC_ABUF_TRANS_MARK ) //) {
-                        || ( strcmp( abuf->trans[ i + 1 ].name, "sil" ) == 0 ) )
-                      {
-                        wordElement->setAttribute( end, end_time );
+                        if ( ( abuf->trans[ i + 1 ].type == CPRC_ABUF_TRANS_WORD ) || ( abuf->trans[ i + 1 ].type == CPRC_ABUF_TRANS_MARK ) //) {
+                           || ( strcmp( abuf->trans[ i + 1 ].name, "sil" ) == 0 ) )
+                        {
+                           wordElement->setAttribute( end, end_time );
 
-                        if ( wordElement->hasChildNodes() )
-                           rootElem->appendChild( wordElement );
+                           if ( wordElement->hasChildNodes() )
+                              rootElem->appendChild( wordElement );
+   
+                           wordElement = doc->createElement( X( "word" ) );
 
-                        wordElement = doc->createElement( X( "word" ) );
+                           std::string word_start_f = vhcl::Format( "%0.6f", abuf->trans[ i + 1 ].start );
+                           XMLCh * word_start_time = XMLString::transcode( word_start_f.c_str() );
+                           wordElement->setAttribute( start, word_start_time );
 
-                        std::string word_start_f = vhcl::Format( "%0.6f", abuf->trans[ i + 1 ].start );
-                        XMLCh * word_start_time = XMLString::transcode( word_start_f.c_str() );
-                        wordElement->setAttribute( start, word_start_time );
+                           // Add marker information back
+                           // Should come from initial XML message, 
+                           // but for now is constructed following the known NVBG protocol (markers around words)
+                           std::ostringstream ostr;
+                           int i = num_words * 2;
+                           ostr << i;
+                           std::string s = "sp1:T" + ostr.str();
 
-                        //float word_start = abuf->trans[ i + 1 ].start;
-                        num_words++;
-                      }
+                           DOMElement * markElement = doc->createElement( X( "mark" ) );
+                           XMLCh * mark_name = XMLString::transcode( s.c_str() );
+                           markElement->setAttribute( name, mark_name ) ;
+                           markElement->setAttribute( time, word_start_time );
+                           rootElem->appendChild( markElement );
+
+                           std::ostringstream ostr2;
+                           i = num_words * 2 + 1;
+                           ostr2 << i;
+                           s = "sp1:T" + ostr2.str();
+                           DOMElement * markElement2 = doc->createElement( X( "mark" ) );
+                           XMLCh * mark_name2 = XMLString::transcode( s.c_str() );
+                           markElement2->setAttribute( name, mark_name2 ) ;
+                           markElement2->setAttribute( time, end_time );
+                           rootElem->appendChild( markElement2 );
+
+                           //float word_start = abuf->trans[ i + 1 ].start;
+                           num_words++;
+                       }
                     }
-
                  }
                  else
                  {
                    printf( "COULDN'T FIND MATCH FOR: %s\n", abuf->trans[ i ].name );
                  }
                }
-               else if  ( abuf->trans[ i ].type == CPRC_ABUF_TRANS_MARK )
+               /*else if  ( abuf->trans[ i ].type == CPRC_ABUF_TRANS_MARK )
                {
                     DOMElement * markElement = doc->createElement( X( "mark" ) );
                     XMLCh * mark_name = XMLString::transcode( abuf->trans[ i ].name );
@@ -605,7 +628,7 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
                     markElement->setAttribute( time, word_start_time );
 
                     rootElem->appendChild( markElement );
-               }
+               }*/
             }
 
             DOMWriter * theSerializer = ((DOMImplementationLS *)impl)->createDOMWriter();
