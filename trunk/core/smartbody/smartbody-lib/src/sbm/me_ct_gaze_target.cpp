@@ -71,7 +71,7 @@ void MeCtGaze::set_target_coord_world( void )	{
 void MeCtGaze::set_target_coord_joint( char *joint_name )	{
 	
 	if( target_ref_joint_str ) free( target_ref_joint_str );
-	target_ref_joint_str = strdup( joint_name );
+	target_ref_joint_str = _strdup( joint_name );
 	target_ref_joint_p = NULL;
 }
 
@@ -123,7 +123,7 @@ void MeCtGaze::set_offset_coord_world( void )	{
 void MeCtGaze::set_offset_coord_joint( char *joint_name )	{
 
 	if( offset_ref_joint_str ) free( offset_ref_joint_str );
-	offset_ref_joint_str = strdup( joint_name );
+	offset_ref_joint_str = _strdup( joint_name );
 	offset_ref_joint_p = NULL;
 	offset_coord = OFFSET_JOINT_LOCAL;
 }
