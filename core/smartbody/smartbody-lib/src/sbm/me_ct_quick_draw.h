@@ -37,7 +37,7 @@
 // DETERMINE: if handedness can be extracted from raw motion
 
 /*
-TODO: SBM commands:
+SBM test commands:
 
         ctrl <> quickdraw <qdraw-motion-name>
         quickdraw <> <dur-sec> local|world <pitch-deg> <heading-deg> <roll-deg>
@@ -46,32 +46,23 @@ TODO: SBM commands:
  * The input drawing motion can be any direction, any reasonable magnitude.
  * Tokens 'dur' and 'time' are synonymous.
 
-TODO: Class API members:
-
-        void init( SkMotion* mot_p );
-        void set_time( float sec );
-        void set_aim_local( float h );
-        void set_aim_world( float h );
-
 QuickDraw motion:
 
         sf-smartbody/data/sbm-test/common-sk/qdraw/AdultM_FastDraw001.skm
 
-TODO: Example sequence:
+Example sequence:
 
         0.0 load motions ../../../../data/sbm-test/common-sk/qdraw
         0.0 ctrl Q quickdraw AdultM_FastDraw001
-        0.0 quickdraw Q 0.9 point 0.0 450.0 1000.0
+        0.0 quickdraw Q 0.9 point 1000.0 200.0 1000.0
         0.0 char doctor ctrl Q begin
 
  * This will induce the doctor to shoot 45 degrees to his left.
 
-TODO: Testing sequence:
+Testing sequence:
 
         seq sbm-qdraw-init
         seq sbm-qdraw
-
- * This runs the doctor through a few hoops.
 */
 
 class MeCtQuickDraw : public MeController	{ 
@@ -114,13 +105,10 @@ class MeCtQuickDraw : public MeController	{
 		float play_time;
 		float play_time_scale;
 
-		// TODO: include pos/rot offset from wrist
+		// TODO: include rot offset from wrist
 
-//		vector_t world_offset_pos; // joint state at controller-start
-//		quat_t   world_offset_rot;
-		quat_t   l_final_shoulder_rot;
-		quat_t   l_final_arm_rot[ NUM_ARM_JOINTS ];
 		quat_t   l_final_hand_in_body_rot;
+		quat_t   l_wrist_offset_rot;
 
 		float * interim_pose_buff_p;
 		
@@ -141,13 +129,13 @@ class MeCtQuickDraw : public MeController	{
     		MeController::init() is automatically called. */
 		void init( SkMotion* mot_p );
 
+		void set_time( float sec );
+		void set_aim_offset( float p, float h, float r );
+
 		// Target API
 		void set_target_point( float x, float y, float z );
 		void set_target_coord_joint( SkJoint* joint_p );
-
 		void set_target_joint( float x, float y, float z, SkJoint* ref_joint_p = NULL );
-
-		void set_time( float sec );
 
 		/*! Set the play mode, default is linear */
 		void play_mode ( SkMotion::InterpType it ) { _play_mode=it; }
