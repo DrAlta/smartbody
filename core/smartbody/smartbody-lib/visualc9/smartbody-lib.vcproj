@@ -378,6 +378,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\sbm\me_ct_tether.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\me_ct_tether.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\me\me_ct_time_shift_warp.cpp"
 					>
 				</File>

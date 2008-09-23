@@ -53,6 +53,7 @@ class mcuCBHandle;
 #include "me_ct_step_turn.h"
 #include "me_ct_quick_draw.h"
 #include "me_ct_gaze.h"
+#include "me_ct_tether.h"
 
 #include "sbm_constants.h"
 

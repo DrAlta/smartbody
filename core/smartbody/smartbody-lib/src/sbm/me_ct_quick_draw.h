@@ -114,6 +114,8 @@ class MeCtQuickDraw : public MeController	{
 		float play_time;
 		float play_time_scale;
 
+		// TODO: include pos/rot offset from wrist
+
 //		vector_t world_offset_pos; // joint state at controller-start
 //		quat_t   world_offset_rot;
 		quat_t   l_final_shoulder_rot;
