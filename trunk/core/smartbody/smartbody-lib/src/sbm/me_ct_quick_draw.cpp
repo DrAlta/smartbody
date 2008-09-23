@@ -21,7 +21,6 @@
  *      Andrew n marshall, USC
  */
 
-//#include "sbm_pawn.hpp"
 #include "me_ct_quick_draw.h"
 
 #define MAX_JOINT_LABEL_LEN 	64
@@ -85,6 +84,7 @@ void MeCtQuickDraw::init( SkMotion* mot_p ) {
 	const int n_float = _motion->channels().count_floats();
 	
 	l_final_hand_in_body_rot = quat_t();
+	l_wrist_offset_rot = quat_t();
 	
 	_arm_chan_indices.size( NUM_ARM_JOINTS );
 	for( int i = 0; i < NUM_ARM_JOINTS; i++ )	{
@@ -93,11 +93,9 @@ void MeCtQuickDraw::init( SkMotion* mot_p ) {
 		_arm_chan_indices[ i ] = 
 			_motion->channels().search( SkJointName( r_arm_labels[ i ] ), SkChannel::Quat );
 		
-		l_final_arm_rot[ i ] = get_final_joint_rot( _motion, r_arm_labels[ i ] );
-		l_final_hand_in_body_rot = l_final_hand_in_body_rot * l_final_arm_rot[ i ];
+		quat_t joint_rot = get_final_joint_rot( _motion, r_arm_labels[ i ] );
+		l_final_hand_in_body_rot = l_final_hand_in_body_rot * joint_rot;
 	}
-
-l_final_shoulder_rot = get_final_joint_rot( _motion, r_arm_labels[ ARM_JOINT_SHOULDER ] );
 
 	if( interim_pose_buff_p )	{
 		delete [] interim_pose_buff_p;
@@ -110,6 +108,37 @@ l_final_shoulder_rot = get_final_joint_rot( _motion, r_arm_labels[ ARM_JOINT_SHO
 		// Notify _context of channel change.
 		_context->child_channels_updated( this );
 	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+
+void MeCtQuickDraw::set_time( float sec )	{
+	
+	play_time = sec;
+	play_time_scale = raw_time / play_time;
+}
+
+void MeCtQuickDraw::set_aim_offset( float p, float h, float r ) {
+	
+	l_wrist_offset_rot = euler_t( p, h, r );
+}
+
+void MeCtQuickDraw::set_target_coord_joint( SkJoint* joint_p )	{
+
+	if( target_ref_joint_str ) free( target_ref_joint_str );
+	target_ref_joint_str = NULL;
+	target_ref_joint_p = joint_p;
+}
+
+void MeCtQuickDraw::set_target_point( float x, float y, float z )	{
+
+	point_target_pos = vector_t( x, y, z );
+}
+
+void MeCtQuickDraw::set_target_joint( float x, float y, float z, SkJoint* ref_joint_p ) {
+
+	set_target_point( x, y, z );
+	set_target_coord_joint( ref_joint_p );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -176,18 +205,12 @@ MeCtQuickDraw::joint_state_t MeCtQuickDraw::capture_joint_state( SkJoint *joint_
 
 quat_t MeCtQuickDraw::rotation_to_target( vector_t l_forward_dir, vector_t w_target_pos, joint_state_t* state_p )	{
 
-#if 0
-	// parent coord
-	vector_t l_target_pos = ( -state_p->parent_rot ) * ( w_target_pos - state_p->parent_pos );
-	return( quat_t( euler_t( l_target_pos - state_p->local_pos, 0.0 ) ) );
-#else
-		vector_t l_target_dir_n = ( -state_p->parent_rot ) * ( w_target_pos - state_p->world_pos ).normal();
-		
-		gw_float_t angle = DEG( gwiz_safe_acos( l_forward_dir.dot( l_target_dir_n ) ) );
-		vector_t axis = l_forward_dir.cross( l_target_dir_n ).normal();
+	vector_t l_target_dir_n = ( -state_p->parent_rot ) * ( w_target_pos - state_p->world_pos ).normal();
 
-		return( quat_t( angle, axis ) );
-#endif
+	gw_float_t angle = DEG( gwiz_safe_acos( l_forward_dir.dot( l_target_dir_n ) ) );
+	vector_t axis = l_forward_dir.cross( l_target_dir_n ).normal();
+
+	return( quat_t( angle, axis ) );
 }
 
 SkJoint* MeCtQuickDraw::find_joint( char *joint_str, SkJoint **joint_pp )	{
@@ -236,30 +259,6 @@ vector_t MeCtQuickDraw::world_target_point( void )	{
 		return( pos + rot * point_target_pos );
 	}
 	return( point_target_pos );
-}
-
-void MeCtQuickDraw::set_target_coord_joint( SkJoint* joint_p )	{
-
-	if( target_ref_joint_str ) free( target_ref_joint_str );
-	target_ref_joint_str = NULL;
-	target_ref_joint_p = joint_p;
-}
-
-void MeCtQuickDraw::set_target_point( float x, float y, float z )	{
-
-	point_target_pos = vector_t( x, y, z );
-}
-
-void MeCtQuickDraw::set_target_joint( float x, float y, float z, SkJoint* ref_joint_p ) {
-
-	set_target_point( x, y, z );
-	set_target_coord_joint( ref_joint_p );
-}
-
-void MeCtQuickDraw::set_time( float sec )	{
-	
-	play_time = sec;
-	play_time_scale = raw_time / play_time;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -407,11 +406,14 @@ else	{
 
 	vector_t w_point = world_target_point();
 
+
 	vector_t joint_forward_v( -1.0, 0.0, 0.0 );
 	vector_t joint_upward_v( 0.0, 1.0, 0.0 );
 	euler_t joint_frame_e;
 	joint_frame_e.lookat( joint_forward_v, joint_upward_v );
 	quat_t joint_frame_q = joint_frame_e;
+
+	vector_t wrist_aim_v = l_wrist_offset_rot * joint_forward_v;
 
 	// COMPUTE TARGET CONFIG
 	for( int j = 0; j < NUM_ARM_JOINTS; j++ )	{
@@ -433,7 +435,8 @@ else	{
 		quat_t out_q;
 		if( j == ARM_JOINT_SHOULDER )	{
 
-			vector_t w_gesture_fwd_v = joint_state.parent_rot * l_final_hand_in_body_rot * joint_forward_v;
+//			vector_t w_gesture_fwd_v = joint_state.parent_rot * l_final_hand_in_body_rot * joint_forward_v;
+			vector_t w_gesture_fwd_v = joint_state.parent_rot * l_final_hand_in_body_rot * wrist_aim_v;
 			quat_t adjust_q = rotation_to_target( w_gesture_fwd_v, w_point, & joint_state );
 			out_q = adjust_q * in_q;
 
@@ -444,9 +447,10 @@ else	{
 		else
 		if( j == ARM_JOINT_WRIST )	{
 			
-			quat_t point_q = rotation_to_target( joint_forward_v, w_point, & joint_state );
-			euler_t alt_in_e = GWIZ_to_frame( in_q, joint_frame_q );
+//			quat_t point_q = rotation_to_target( joint_forward_v, w_point, & joint_state );
+			quat_t point_q = rotation_to_target( wrist_aim_v, w_point, & joint_state );
 			euler_t alt_point_e = GWIZ_to_frame( point_q, joint_frame_q );
+			euler_t alt_in_e = GWIZ_to_frame( in_q, joint_frame_q );
 			quat_t alt_out_q = euler_t( alt_point_e.p(), alt_point_e.h(), alt_in_e.r() );
 			out_q = GWIZ_from_frame( alt_out_q, joint_frame_q );
 		}

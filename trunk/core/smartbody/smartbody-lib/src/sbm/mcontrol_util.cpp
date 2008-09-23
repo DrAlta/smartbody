@@ -2356,8 +2356,8 @@ int mcu_stepturn_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 }
 
 /*
-X	quickdraw <> <dur-sec> local|world <p h r: deg>
-	quickdraw <> <dur-sec> point <x y z> [<joint>]
+	quickdraw <> <dur-sec> point <x y z>
+#	quickdraw <> <dur-sec> point <x y z> [<joint>]
 */
 
 int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
@@ -2370,14 +2370,6 @@ int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			qdraw_p->set_time( dur );
 
 			char *target_type = args.read_token(); // local or world
-#if 0
-			if( ( coord_type[ 0 ] == 'l' )||( coord_type[ 0 ] == 'L' ) )	{
-				qdraw_p->set_aim_local( pitch_deg, heading_deg, roll_deg );
-			}
-			else	{
-				qdraw_p->set_aim_world( pitch_deg, heading_deg, roll_deg );
-			}
-#endif
 			if( ( target_type[ 0 ] == 'p' )||( target_type[ 0 ] == 'P' ) )	{
 				float x = args.read_float();
 				float y = args.read_float();
