@@ -2386,9 +2386,11 @@ int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 /*
 	gaze <> target point <x y z>
 	gaze <> target euler <p h r>
+	gaze <> offset euler <p h r>
 	gaze <> smooth <basis>
 	gaze <> speed <deg-per-sec>
 	gaze <> bias <key> <p h r>
+	gaze <> priority <key>
 */
 
 int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
@@ -2456,6 +2458,12 @@ int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				float h = args.read_float();
 				float r = args.read_float();
 				gaze_p->set_bias( MeCtGaze::key_index( key_label ), p, h, r );
+				return( CMD_SUCCESS );
+			}
+			if( strcmp( gaze_cmd, "priority" ) == 0 )	{
+
+				char *key_label = args.read_token();
+				gaze_p->set_task_priority( MeCtGaze::key_index( key_label ) );
 				return( CMD_SUCCESS );
 			}
 			printf( "mcu_gaze_controller_func ERR: command '%s' NOT RECOGNIZED\n", gaze_cmd );
