@@ -26,7 +26,7 @@
 
 #define MAX_JOINT_LABEL_LEN	32
 
-#define DFL_GAZE_HEAD_SPEED 180.0
+#define DFL_GAZE_HEAD_SPEED 360.0
 #define DFL_GAZE_EYE_SPEED  1000.0
 
 int G_debug_c = 0;
@@ -161,8 +161,10 @@ MeCtGaze::MeCtGaze( void )	{
 	
 	joint_key_count = 0;
 	joint_key_map = NULL;
+	joint_key_top_map = NULL;
 	joint_key_arr = NULL;
 	key_bias_dirty = 0;
+	key_limit_dirty = 0;
 	key_blend_dirty = 0;
 	
 	joint_count = 0;
@@ -174,6 +176,10 @@ MeCtGaze::~MeCtGaze( void )	{
 	if( joint_key_map )	{
 		delete [] joint_key_map;
 		joint_key_map = NULL;
+	}
+	if( joint_key_top_map )	{
+		delete [] joint_key_top_map;
+		joint_key_top_map = NULL;
 	}
 	if( joint_key_arr )	{
 		delete [] joint_key_arr;
@@ -201,17 +207,31 @@ void MeCtGaze::init( int key_fr, int key_to )	{
 	int i;
 	
 	joint_key_count = NUM_GAZE_KEYS;
+
 	joint_key_map = new int[ joint_key_count ];
-	joint_key_arr = new MeCtGazeKey[ joint_key_count ];
-
-	joint_count = NUM_GAZE_JOINTS;
-	joint_arr = new MeCtGazeJoint[ joint_count ];
-
 	joint_key_map[ GAZE_KEY_LUMBAR ] = GAZE_JOINT_SPINE1;
 	joint_key_map[ GAZE_KEY_THORAX ] = GAZE_JOINT_SPINE3;
 	joint_key_map[ GAZE_KEY_CERVICAL ] = GAZE_JOINT_SPINE4;
 	joint_key_map[ GAZE_KEY_HEAD ] = GAZE_JOINT_SKULL;
 	joint_key_map[ GAZE_KEY_EYES ] = GAZE_JOINT_EYE_L;
+
+	joint_key_top_map = new int[ joint_key_count ];
+	joint_key_top_map[ GAZE_KEY_LUMBAR ] = GAZE_JOINT_SPINE2;
+	joint_key_top_map[ GAZE_KEY_THORAX ] = GAZE_JOINT_SPINE3;
+	joint_key_top_map[ GAZE_KEY_CERVICAL ] = GAZE_JOINT_SPINE5;
+	joint_key_top_map[ GAZE_KEY_HEAD ] = GAZE_JOINT_SKULL;
+	joint_key_top_map[ GAZE_KEY_EYES ] = GAZE_JOINT_EYE_L;
+
+	joint_key_arr = new MeCtGazeKey[ joint_key_count ];
+	for( i = 0; i < NUM_GAZE_KEYS; i++ )	{
+		joint_key_arr[ i ].id = i;
+	}
+
+	joint_count = NUM_GAZE_JOINTS;
+	joint_arr = new MeCtGazeJoint[ joint_count ];
+	for( i = 0; i < NUM_GAZE_JOINTS; i++ )	{
+		joint_arr[ i ].id = i;
+	}
 	
 	// Sort key range:
 	if( key_fr < 0 )	{
@@ -245,11 +265,21 @@ void MeCtGaze::init( int key_fr, int key_to )	{
 		_channels.add( SkJointName( joint_label( i ) ), SkChannel::Quat );
 	}
 	
-	if( priority_joint > joint_to ) {
-		priority_joint = joint_to;
-	}
-	
+	set_task_priority( key_max );
 	set_speed( DFL_GAZE_HEAD_SPEED, DFL_GAZE_EYE_SPEED ); // initializes timing_mode = TASK_SPEED;
+	set_smooth( 0.3f, 0.1f, 0.0f );
+
+	set_limit( GAZE_KEY_LUMBAR,   15.0, 30.0, 10.0 );
+	set_limit( GAZE_KEY_THORAX,   6.0,  15.0, 5.0 );
+	set_limit( GAZE_KEY_CERVICAL, 25.0, 60.0, 20.0 );
+	set_limit( GAZE_KEY_HEAD,     20.0, 45.0, 15.0 );
+	set_limit( GAZE_KEY_EYES,     50.0, 75.0, 0.0 );
+
+	for( i = 0; i < NUM_GAZE_KEYS; i++ )	{
+		set_bias( i, 0.0f, 0.0f, 0.0f );
+		set_blend( i, 1.0f );
+	}
+
 	MeController::init();
 
 #if TEST_SENSOR
@@ -266,7 +296,8 @@ void MeCtGaze::init( int key_fr, int key_to )	{
 
 void MeCtGaze::set_task_priority( int key )	{
 
-	priority_joint = joint_key_map[ key ];
+//	priority_joint = joint_key_map[ key ];
+	priority_joint = joint_key_top_map[ key ];
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -419,28 +450,10 @@ void MeCtGaze::set_smooth( float smooth_basis ) {
 
 void MeCtGaze::set_speed( float head_dps, float eyes_dps )	{
 
-//printf( "MeCtGaze::set_speed: %f\n", head_dps );
-
-#if 0
-printf( "MeCtGaze::set_speed: BEFORE %f ( %f %f )\n", 
-	head_speed,
-	joint_arr[ GAZE_JOINT_EYE_L ].speed,
-	joint_arr[ GAZE_JOINT_EYE_R ].speed
-);
-#endif
-
 	timing_mode = TASK_SPEED;
 	head_speed = head_dps;
 	joint_arr[ GAZE_JOINT_EYE_L ].speed = eyes_dps;
 	joint_arr[ GAZE_JOINT_EYE_R ].speed = eyes_dps;
-
-#if 0
-printf( "MeCtGaze::set_speed: AFTER %f ( %f %f )\n", 
-	head_speed,
-	joint_arr[ GAZE_JOINT_EYE_L ].speed,
-	joint_arr[ GAZE_JOINT_EYE_R ].speed
-);
-#endif
 }
 
 void MeCtGaze::set_time_hint( float head_sec )	{
@@ -737,10 +750,6 @@ void MeCtGaze::controller_start( void )	{
 	// ensure skeleton global tansforms are up to date
 	update_skeleton_gmat();
 	
-	// map key values to joints if set
-	apply_bias_keys();
-	apply_blend_keys();
-	
 	for( i=0; i<joint_count; i++ )	{
 
 		float local_contrib;
@@ -752,20 +761,6 @@ void MeCtGaze::controller_start( void )	{
 		}
 		joint_arr[ i ].task_weight = local_contrib;
 		
-		float local_limit = 75.0f;
-		if( i < GAZE_JOINT_SPINE4 ) {
-			local_limit = 15.0f;
-		}
-		else
-		if( i < GAZE_JOINT_SKULL )	{
-			local_limit = 30.0f;
-		}
-		else
-		if( i < GAZE_JOINT_EYE_L )	{
-			local_limit = 45.0f;
-		}
-		joint_arr[ i ].limit = local_limit;
-
 		int context_index = _toContextCh[ i ];
 		if( context_index < 0 ) {
 			fprintf( stderr, "MeCtGaze::controller_start ERR: joint idx:%d NOT FOUND in skeleton\n", i );
@@ -780,14 +775,10 @@ void MeCtGaze::controller_start( void )	{
 				joint_arr[ i ].start();
 			}
 		}
-
 #if 0
 		printf( "start: [%d]", i );
 		printf( " wgt: %.4f",
 			joint_arr[ i ].task_weight 
-		);
-		printf( " lim: %.4f\n", 
-			joint_arr[ i ].limit 
 		);
 #endif
 	}
@@ -841,7 +832,6 @@ void MeCtGaze::controller_start( void )	{
 	for( i=0; i<=GAZE_JOINT_SKULL; i++ )	{
 		joint_arr[ i ].speed_ratio = joint_arr[ i ].task_weight / total_w;
 		joint_arr[ i ].speed = joint_arr[ i ].speed_ratio * head_speed;
-//printf( "MeCtGaze::controller_start speed: [%d] r:%f s:%f\n", i, joint_arr[ i ].speed_ratio, joint_arr[ i ].speed );
 	}
 
 #if TEST_SENSOR
@@ -904,6 +894,11 @@ bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 //printf( "C: 0x%x 0x%x\n", this, skeleton_ref_p );
 	update_skeleton_gmat();
 //printf( "D: 0x%x 0x%x\n", this, skeleton_ref_p );
+	
+	// map key values to joints if set
+	apply_bias_keys();
+	apply_limit_keys();
+	apply_blend_keys();
 	
 #if 0
 	if( timing_mode == TASK_TIME_HINT )	{
@@ -993,7 +988,8 @@ bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 			else	{
 				Q_eval = joint_arr[ i ].evaluate( dt, w_orient, offset_rot, 1.0 );
 			}
-			
+
+//printf( "%d: %f\n", i, joint_arr[ i ].blend_weight );
 			quat_t Q_out = Q_in.lerp( joint_arr[ i ].blend_weight, Q_eval );
 				
 #define SPINE_LOCK_HEAD_TEST 0
