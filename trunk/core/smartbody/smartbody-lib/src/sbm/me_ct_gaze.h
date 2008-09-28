@@ -46,14 +46,18 @@ extern int G_hack_target_circle;
 
 class MeCtGazeKey	{
 	public:
+	
 		MeCtGazeKey() {
+			id = -1;
 //			task_weight = 1.0;
 			blend_weight = 1.0;
 		}
 		virtual ~MeCtGazeKey() {}
 		
+		int id;
+		
 		euler_t	bias_rot;
-//		euler_t	limit_rot;
+		euler_t	limit_rot;
 //		float	task_weight;
 		float	blend_weight;
 };
@@ -94,9 +98,6 @@ class MeCtGaze : public MeController	{
 			NUM_GAZE_JOINTS
 		};
 
-		static int joint_index( const char *label );
-		static char * joint_label( const int key );
-
 #if TEST_SENSOR
 		MeCtGazeSensor* sensor_p;
 #endif
@@ -116,10 +117,13 @@ class MeCtGaze : public MeController	{
 			GAZE_KEY_EYES = GAZE_KEY_OPTICAL
 		};
 
+		static int joint_index( const char *label );
+		static char * joint_label( const int key );
+
 		static int key_index( const char *label );
 		static char * key_label( const int key );
 
-		static int valid_key( int key ) { return( ( key > 0 )&&( key < NUM_GAZE_KEYS ) ); }
+		static int valid_key( int key ) { return( ( key >= 0 )&&( key < NUM_GAZE_KEYS ) ); }
 		static const char* type_name;
 
 		MeCtGaze();
@@ -204,10 +208,9 @@ class MeCtGaze : public MeController	{
 		void set_blend( int key, float w );
 		void set_blend( int key1, int key2, float w1, float w2 );
 
-#if 0
 		// LIMIT: key-group rotation limit
 		void set_limit( int key, float p, float h, float r );
-
+#if 0
 		void set_limit_pitch( int key, float l );
 		void set_limit_heading( int key, float l );
 		void set_limit_roll( int key, float l );
@@ -281,10 +284,13 @@ class MeCtGaze : public MeController	{
 
 		int 			joint_key_count;
 		int*			joint_key_map;
+		int*			joint_key_top_map;
 		MeCtGazeKey*	joint_key_arr;
 		int 			key_bias_dirty;
+		int 			key_limit_dirty;
 		int 			key_blend_dirty;
 		void			apply_bias_keys( void );
+		void			apply_limit_keys( void );
 		void 			apply_blend_keys( void );
 
 		int 			joint_count;

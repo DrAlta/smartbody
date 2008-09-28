@@ -37,6 +37,12 @@
 	SKULL:		HEAD
 	EYE_L:		EYES
 	EYE_R:		EYES
+
+	back:  lumbar:   { spine1, spine2 }
+	chest: thorax:   { spine3 }
+	neck:  cervical: { spine4, spine5 }
+	head:  cranial:  { skullbase }
+	eyes:  optical:  { eyeball_left, eyeball_right }
 */
 
 ///////////////////////////////////////////////////////////////////////////
@@ -191,6 +197,45 @@ void MeCtGaze::apply_bias_keys( void ) {
 
 /////////////////////////////////////////////////////////////////////////////
 
+void MeCtGaze::set_limit( int key, float p, float h, float r )	{
+
+	if( ! valid_key( key ) ) return;
+	joint_key_arr[ key ].limit_rot = euler_t( p, h, r );
+	key_limit_dirty = 1;
+}
+
+void MeCtGaze::apply_limit_keys( void )	{
+	
+	if( key_limit_dirty )	{
+
+		joint_arr[ GAZE_JOINT_SPINE1 ].limit_rot = 
+			joint_key_arr[ GAZE_KEY_LUMBAR ].limit_rot * 0.5f;
+
+		joint_arr[ GAZE_JOINT_SPINE2 ].limit_rot = 
+			joint_key_arr[ GAZE_KEY_LUMBAR ].limit_rot * 0.5f;
+
+		joint_arr[ GAZE_JOINT_SPINE3 ].limit_rot = 
+			joint_key_arr[ GAZE_KEY_THORAX ].limit_rot;
+
+		joint_arr[ GAZE_JOINT_SPINE4 ].limit_rot = 
+			joint_key_arr[ GAZE_KEY_CERVICAL ].limit_rot * 0.5f;
+
+		joint_arr[ GAZE_JOINT_SPINE5 ].limit_rot = 
+			joint_key_arr[ GAZE_KEY_CERVICAL ].limit_rot * 0.5f;
+
+		joint_arr[ GAZE_JOINT_SKULL ].limit_rot = 
+			joint_key_arr[ GAZE_KEY_HEAD ].limit_rot;
+
+		joint_arr[ GAZE_JOINT_EYE_L ].limit_rot = 
+			joint_arr[ GAZE_JOINT_EYE_R ].limit_rot = 
+				joint_key_arr[ GAZE_KEY_EYES ].limit_rot;
+
+		key_limit_dirty = 0;
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////
+
 void MeCtGaze::set_blend( int key, float w )	{
 
 	if( ! valid_key( key ) ) return;
@@ -259,26 +304,3 @@ void MeCtGaze::apply_blend_keys( void )	{
 }
 
 /////////////////////////////////////////////////////////////////////////////
-
-/*
-	// LIMIT: key-group rotation limit
-	void set_limit( int key, float p, float h, float r );
-
-	void set_limit_pitch( int key, float l );
-	void set_limit_heading( int key, float l );
-	void set_limit_roll( int key, float l );
-
-	void set_limit_pitch( float e_l, float h_l, float c_l, float t_l, float l_l );
-	void set_limit_heading( float e_l, float h_l, float c_l, float t_l, float l_l );
-	void set_limit_roll( float e_l, float h_l, float c_l, float t_l, float l_l );
-
-	void set_limit_pitch( int key1, int key2, float l1, float l2 );
-	void set_limit_heading( int key1, int key2, float l1, float l2 );
-	void set_limit_roll( int key1, int key2, float l1, float l2 );
-
-	// WEIGHT: task weight distribution
-	void set_weight( float e_w, float h_w, float c_w, float t_w, float l_w );
-	void set_weight( int key, float w );
-	void set_weight( int key1, int key2, float w1, float w2 );
-*/
-

@@ -34,3 +34,4 @@
 #1	set test character doctor
 
 2   seq test-qdraw-init
+2   seq test-gaze-init

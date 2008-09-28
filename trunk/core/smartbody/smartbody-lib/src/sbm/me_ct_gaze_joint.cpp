@@ -31,8 +31,9 @@
 
 MeCtGazeJoint::MeCtGazeJoint( void )	{
 	
+	id = -1;
 	active = 0;
-	limit = 180.0;
+	limit_rot = euler_t( 90.0, 180.0, 180.0 );
 	task_weight = 1.0;
 	blend_weight = 1.0;
 	speed = 1.0;
@@ -309,9 +310,9 @@ quat_t MeCtGazeJoint::rotation_to_target( quat_t target_rot )	{
 
 quat_t MeCtGazeJoint::constrain_box( quat_t task_rot )	{
 
-	float lim_x = limit * 0.4f;
-	float lim_y = limit;
-	float lim_z = limit * 0.3f;
+	float lim_x = (float)limit_rot.x();
+	float lim_y = (float)limit_rot.y();
+	float lim_z = (float)limit_rot.z();
 
 	euler_t e = task_rot;
 	float e_x = (float)e.x();
@@ -330,9 +331,9 @@ quat_t MeCtGazeJoint::constrain_box( quat_t task_rot )	{
 
 quat_t MeCtGazeJoint::constrain_swing( quat_t task_rot )	{
 
-	float lim_x = limit * 0.4f;
-	float lim_y = limit;
-	float lim_z = limit * 0.3f;
+	float lim_x = (float)limit_rot.x();
+	float lim_y = (float)limit_rot.y();
+	float lim_z = (float)limit_rot.z();
 
 	vector_t st = task_rot.swingtwist();
 	float sw_x = (float)st.x();
@@ -351,17 +352,18 @@ quat_t MeCtGazeJoint::constrain_swing( quat_t task_rot )	{
 
 quat_t MeCtGazeJoint::constrain_quat( quat_t task_rot )	{
 
-	if( task_rot.degrees() > limit )	{
-		task_rot = quat_t( limit, task_rot.axis() );
+	float mag = (float)quat_t( limit_rot ).degrees();
+	if( task_rot.degrees() > mag )    {
+		task_rot = quat_t( mag, task_rot.axis() );
 	}
 	return( task_rot );
 }
 
 quat_t MeCtGazeJoint::constrain_ellipse( quat_t task_rot )	{
 	
-	float lim_x = limit * 0.4f;
-	float lim_y = limit;
-	float lim_z = limit * 0.3f;
+	float lim_x = (float)limit_rot.x();
+	float lim_y = (float)limit_rot.y();
+	float lim_z = (float)limit_rot.z();
 	
 	vector_t st = task_rot.swingtwist();
 	float sw_x = (float)st.x();

@@ -42,10 +42,10 @@ class MeCtGazeJoint	{
 		MeCtGazeJoint();
 		virtual ~MeCtGazeJoint() {}
 		
+		int id;
 		int active;
 		
-		float limit;
-//		float limit_x, limit_y, limit_z;
+		euler_t limit_rot;
 		float task_weight;
 		float blend_weight;
 		float speed_ratio;
