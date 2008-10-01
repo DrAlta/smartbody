@@ -30,6 +30,7 @@
 #1	test bml character doctor noecho posture LHandOnHip_Motex
 
 1	seq default-viewer
+#1   time fps 10
 
 #1	set test character doctor
 

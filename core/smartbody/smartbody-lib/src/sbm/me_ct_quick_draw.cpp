@@ -388,9 +388,12 @@ else	{
 			interim_arm_chan_indices[ which_arm_chan ] = i_interim;
 		}
 		else	{
+#define ENABLE_NON_ARM_MOTION 1
+#if ENABLE_NON_ARM_MOTION
 			for( int k=0; k<ch_size; k++ ) {
 				fbuffer[ _motion_chan_to_buff[ i_chan ] + k ] = interim_pose_buff_p[ i_interim + k ];
 			}
+#endif
 		}
 		i_interim += ch_size;
 	}
@@ -406,14 +409,13 @@ else	{
 
 	vector_t w_point = world_target_point();
 
-
 	vector_t joint_forward_v( -1.0, 0.0, 0.0 );
 	vector_t joint_upward_v( 0.0, 1.0, 0.0 );
 	euler_t joint_frame_e;
 	joint_frame_e.lookat( joint_forward_v, joint_upward_v );
 	quat_t joint_frame_q = joint_frame_e;
 
-	vector_t wrist_aim_v = l_wrist_offset_rot * joint_forward_v;
+	vector_t l_wrist_aim_v = l_wrist_offset_rot * joint_forward_v;
 
 	// COMPUTE TARGET CONFIG
 	for( int j = 0; j < NUM_ARM_JOINTS; j++ )	{
@@ -436,9 +438,17 @@ else	{
 		if( j == ARM_JOINT_SHOULDER )	{
 
 //			vector_t w_gesture_fwd_v = joint_state.parent_rot * l_final_hand_in_body_rot * joint_forward_v;
-			vector_t w_gesture_fwd_v = joint_state.parent_rot * l_final_hand_in_body_rot * wrist_aim_v;
-			quat_t adjust_q = rotation_to_target( w_gesture_fwd_v, w_point, & joint_state );
+//			vector_t w_gesture_fwd_v = joint_state.parent_rot * l_final_hand_in_body_rot * l_wrist_aim_v;
+//			quat_t adjust_q = rotation_to_target( w_gesture_fwd_v, w_point, & joint_state );
+			vector_t l_gesture_fwd_v = l_final_hand_in_body_rot * l_wrist_aim_v;
+			quat_t adjust_q = rotation_to_target( l_gesture_fwd_v, w_point, & joint_state );
 			out_q = adjust_q * in_q;
+
+//w_point.print();
+//euler_t( joint_state.parent_rot ).print();
+//l_wrist_aim_v.print();
+//l_final_hand_in_body_rot.print();
+//w_gesture_fwd_v.print();
 
 //			euler_t e = GWIZ_to_frame( in_q, joint_frame_q );
 //			quat_t q = euler_t( e.p(), e.h(), e.r() );
@@ -448,7 +458,7 @@ else	{
 		if( j == ARM_JOINT_WRIST )	{
 			
 //			quat_t point_q = rotation_to_target( joint_forward_v, w_point, & joint_state );
-			quat_t point_q = rotation_to_target( wrist_aim_v, w_point, & joint_state );
+			quat_t point_q = rotation_to_target( l_wrist_aim_v, w_point, & joint_state );
 			euler_t alt_point_e = GWIZ_to_frame( point_q, joint_frame_q );
 			euler_t alt_in_e = GWIZ_to_frame( in_q, joint_frame_q );
 			quat_t alt_out_q = euler_t( alt_point_e.p(), alt_point_e.h(), alt_in_e.r() );

@@ -59,12 +59,15 @@ void MeCtGazeJoint::start( void )	{
 
 	capture_joint_state();
 	prev_local_rot = local_rot;
+	prev_world_rot = world_rot;
+	t_elapse = 0.0;
 }
 
 #define ENABLE_CONSTRAIN	1
 
 quat_t MeCtGazeJoint::evaluate( float dt, vector_t target_pos, quat_t off_rot, float scale_factor )	{
 	
+	prev_world_rot = world_rot;
 	capture_joint_state();
 	quat_t Q_task = ( rotation_to_target( target_pos ) * off_rot ) * scale_factor;
 #if ENABLE_CONSTRAIN
@@ -78,6 +81,7 @@ quat_t MeCtGazeJoint::evaluate( float dt, vector_t target_pos, quat_t off_rot, f
 
 quat_t MeCtGazeJoint::evaluate( float dt, quat_t target_rot, quat_t off_rot, float scale_factor )	{
 	
+	prev_world_rot = world_rot;
 	capture_joint_state();
 	quat_t Q_task = ( rotation_to_target( target_rot ) * off_rot ) * scale_factor;
 #if ENABLE_CONSTRAIN
@@ -389,7 +393,7 @@ quat_t MeCtGazeJoint::constrain_quat_speed( float dt, quat_t task_rot )    {
 	float deg = (float)( Q_dif.degrees() );
 	vector_t axis = Q_dif.axis();
 
-	float dps = (float)( deg / dt );
+	float dps = deg / dt;
 	if( dps < speed )	{
 		Q_ret = task_rot;
 	}
@@ -397,6 +401,15 @@ quat_t MeCtGazeJoint::constrain_quat_speed( float dt, quat_t task_rot )    {
 		Q_delta = quat_t( speed * dt, axis );
 		Q_ret = prev_local_rot * Q_delta;
 	}
+
+#if 0
+if( id == 5 )	{ // MeCtGaze::GAZE_JOINT_SKULL
+ t_elapse += dt;
+ Q_dif = ( world_rot * ( -prev_world_rot ) ).shortest();
+ dps = (float)( Q_dif.degrees() ) / dt;
+ if( dps > 0.1 ) printf( "MeCtGazeJoint world-speed: %f  at %f\n", dps, t_elapse );
+}
+#endif
 
 	return( Q_ret );
 }
