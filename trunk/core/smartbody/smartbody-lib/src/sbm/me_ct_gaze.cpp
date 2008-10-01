@@ -26,7 +26,7 @@
 
 #define MAX_JOINT_LABEL_LEN	32
 
-#define DFL_GAZE_HEAD_SPEED 360.0
+#define DFL_GAZE_HEAD_SPEED 180.0
 #define DFL_GAZE_EYE_SPEED  1000.0
 
 int G_debug_c = 0;
@@ -832,6 +832,7 @@ void MeCtGaze::controller_start( void )	{
 	for( i=0; i<=GAZE_JOINT_SKULL; i++ )	{
 		joint_arr[ i ].speed_ratio = joint_arr[ i ].task_weight / total_w;
 		joint_arr[ i ].speed = joint_arr[ i ].speed_ratio * head_speed;
+//		joint_arr[ i ].speed = head_speed / ( priority_joint + 1 );
 	}
 
 #if TEST_SENSOR

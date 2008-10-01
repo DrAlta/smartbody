@@ -2,6 +2,7 @@
 0 echo EXEC: data/sbm-test/scripts/test-qdraw.seq
 
 0 gaze G1 priority head
+0 gaze G1 smooth 0.0
 #0 gaze G1 bias chest 0 0 0
 0 gaze G1 target point 1000 200 0
 
