@@ -2391,6 +2391,7 @@ int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	gaze <> speed <deg-per-sec>
 	gaze <> bias <key> <p h r>
 	gaze <> limit <key> <p h r>
+	gaze <> limit <key> <p-up p-dn h r>
 	gaze <> blend <key> <weight>
 	gaze <> priority <key>
 */
@@ -2465,10 +2466,20 @@ int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			if( strcmp( gaze_cmd, "limit" ) == 0 )	{
 
 				char *key_label = args.read_token();
-				float p = args.read_float();
-				float h = args.read_float();
-				float r = args.read_float();
-				gaze_p->set_limit( MeCtGaze::key_index( key_label ), p, h, r );
+				int n = args.calc_num_tokens();
+				if( n > 3 ) {
+					float p_up = args.read_float();
+					float p_dn = args.read_float();
+					float h = args.read_float();
+					float r = args.read_float();
+					gaze_p->set_limit( MeCtGaze::key_index( key_label ), p_up, p_dn, h, r );
+				}
+				else	{
+					float p = args.read_float();
+					float h = args.read_float();
+					float r = args.read_float();
+					gaze_p->set_limit( MeCtGaze::key_index( key_label ), p, h, r );
+				}
 				return( CMD_SUCCESS );
 			}
 			if( strcmp( gaze_cmd, "blend" ) == 0 )	{

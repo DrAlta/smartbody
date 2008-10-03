@@ -296,8 +296,8 @@ void MeCtGaze::init( int key_fr, int key_to )	{
 
 void MeCtGaze::set_task_priority( int key )	{
 
-//	priority_joint = joint_key_map[ key ];
-	priority_joint = joint_key_top_map[ key ];
+	priority_joint = joint_key_map[ key ];
+//	priority_joint = joint_key_top_map[ key ];
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1019,6 +1019,13 @@ bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 				
 #endif
 G_debug = 0;
+
+#if 1
+//euler_t e = Q_out; if( i == 6 ) e.print();
+SkJointName n = _channels.name( i );
+euler_t e = Q_out;
+printf( "%d %s %f %f %f\n", i, n.get_string(), e.x(), e.y(), e.z() );
+#endif
 
 			// Mark channel changed
 			frame.channelUpdated( i );

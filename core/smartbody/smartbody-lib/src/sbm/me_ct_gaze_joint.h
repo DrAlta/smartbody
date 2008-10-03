@@ -46,13 +46,13 @@ class MeCtGazeJoint	{
 		int id;
 		int active;
 		
-		euler_t limit_rot;
-		float task_weight;
-		float blend_weight;
-		float speed_ratio;
-		float speed;
-		float duration;
-		float smooth;
+		float 	limit_p_up, limit_p_dn, limit_h, limit_r;
+		float 	task_weight;
+		float 	blend_weight;
+		float 	speed_ratio;
+		float 	speed;
+		float 	duration;
+		float 	smooth;
 		
 		void init( SkJoint* j_p );
 		void start( void );
@@ -81,9 +81,9 @@ class MeCtGazeJoint	{
 		quat_t	rotation_to_target( vector_t target_pos );
 		quat_t	rotation_to_target( quat_t target_rot );
 		
-		quat_t	constrain_box( quat_t task_rot );
-		quat_t	constrain_swing( quat_t task_rot );
-		quat_t	constrain_quat( quat_t task_rot );
+//		quat_t	constrain_box( quat_t task_rot );
+//		quat_t	constrain_swing( quat_t task_rot );
+//		quat_t	constrain_quat( quat_t task_rot );
 		quat_t	constrain_ellipse( quat_t task_rot );
 		
 		quat_t	constrain_quat_speed( float dt, quat_t task_rot );

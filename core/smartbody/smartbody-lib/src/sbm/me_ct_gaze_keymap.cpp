@@ -199,37 +199,45 @@ void MeCtGaze::apply_bias_keys( void ) {
 
 void MeCtGaze::set_limit( int key, float p, float h, float r )	{
 
+	set_limit( key, p, p, h, r );
+}
+
+void MeCtGaze::set_limit( int key, float p_up, float p_dn, float h, float r )	{
+
 	if( ! valid_key( key ) ) return;
-	joint_key_arr[ key ].limit_rot = euler_t( p, h, r );
+	joint_key_arr[ key ].limit_p_up = p_up;
+	joint_key_arr[ key ].limit_p_dn = p_dn;
+	joint_key_arr[ key ].limit_h = h;
+	joint_key_arr[ key ].limit_r = r;
 	key_limit_dirty = 1;
+}
+
+void MeCtGaze::apply_limit_key( int J, int K, float weight )	{
+	
+	joint_arr[ J ].limit_p_up = 
+		joint_key_arr[ K ].limit_p_up * weight;
+
+	joint_arr[ J ].limit_p_dn = 
+		joint_key_arr[ K ].limit_p_dn * weight;
+
+	joint_arr[ J ].limit_h = 
+		joint_key_arr[ K ].limit_h * weight;
+
+	joint_arr[ J ].limit_r = 
+		joint_key_arr[ K ].limit_r * weight;
 }
 
 void MeCtGaze::apply_limit_keys( void )	{
 	
 	if( key_limit_dirty )	{
-
-		joint_arr[ GAZE_JOINT_SPINE1 ].limit_rot = 
-			joint_key_arr[ GAZE_KEY_LUMBAR ].limit_rot * 0.5f;
-
-		joint_arr[ GAZE_JOINT_SPINE2 ].limit_rot = 
-			joint_key_arr[ GAZE_KEY_LUMBAR ].limit_rot * 0.5f;
-
-		joint_arr[ GAZE_JOINT_SPINE3 ].limit_rot = 
-			joint_key_arr[ GAZE_KEY_THORAX ].limit_rot;
-
-		joint_arr[ GAZE_JOINT_SPINE4 ].limit_rot = 
-			joint_key_arr[ GAZE_KEY_CERVICAL ].limit_rot * 0.5f;
-
-		joint_arr[ GAZE_JOINT_SPINE5 ].limit_rot = 
-			joint_key_arr[ GAZE_KEY_CERVICAL ].limit_rot * 0.5f;
-
-		joint_arr[ GAZE_JOINT_SKULL ].limit_rot = 
-			joint_key_arr[ GAZE_KEY_HEAD ].limit_rot;
-
-		joint_arr[ GAZE_JOINT_EYE_L ].limit_rot = 
-			joint_arr[ GAZE_JOINT_EYE_R ].limit_rot = 
-				joint_key_arr[ GAZE_KEY_EYES ].limit_rot;
-
+		apply_limit_key( GAZE_JOINT_SPINE1, GAZE_KEY_LUMBAR, 0.5f );
+		apply_limit_key( GAZE_JOINT_SPINE2, GAZE_KEY_LUMBAR, 0.5f );
+		apply_limit_key( GAZE_JOINT_SPINE3, GAZE_KEY_THORAX, 1.0f );
+		apply_limit_key( GAZE_JOINT_SPINE4, GAZE_KEY_CERVICAL, 0.5f );
+		apply_limit_key( GAZE_JOINT_SPINE5, GAZE_KEY_CERVICAL, 0.5f );
+		apply_limit_key( GAZE_JOINT_SKULL, GAZE_KEY_HEAD, 1.0f );
+		apply_limit_key( GAZE_JOINT_EYE_L, GAZE_KEY_EYES, 1.0f );
+		apply_limit_key( GAZE_JOINT_EYE_R, GAZE_KEY_EYES, 1.0f );
 		key_limit_dirty = 0;
 	}
 }

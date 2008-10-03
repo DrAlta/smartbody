@@ -50,6 +50,10 @@ class MeCtGazeKey	{
 		MeCtGazeKey() {
 			id = -1;
 //			task_weight = 1.0;
+			limit_p_up = 90.0;
+			limit_p_dn = 90.0;
+			limit_h = 180.0;
+			limit_r = 180.0;
 			blend_weight = 1.0;
 		}
 		virtual ~MeCtGazeKey() {}
@@ -57,7 +61,7 @@ class MeCtGazeKey	{
 		int id;
 		
 		euler_t	bias_rot;
-		euler_t	limit_rot;
+		float	limit_p_up, limit_p_dn, limit_h, limit_r;
 //		float	task_weight;
 		float	blend_weight;
 };
@@ -210,6 +214,7 @@ class MeCtGaze : public MeController	{
 
 		// LIMIT: key-group rotation limit
 		void set_limit( int key, float p, float h, float r );
+		void set_limit( int key, float p_up, float p_dn, float h, float r );
 #if 0
 		void set_limit_pitch( int key, float l );
 		void set_limit_heading( int key, float l );
@@ -290,6 +295,7 @@ class MeCtGaze : public MeController	{
 		int 			key_limit_dirty;
 		int 			key_blend_dirty;
 		void			apply_bias_keys( void );
+		void			apply_limit_key( int J, int K, float weight );
 		void			apply_limit_keys( void );
 		void 			apply_blend_keys( void );
 
