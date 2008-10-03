@@ -33,7 +33,11 @@ MeCtGazeJoint::MeCtGazeJoint( void )	{
 	
 	id = -1;
 	active = 0;
-	limit_rot = euler_t( 90.0, 180.0, 180.0 );
+//	limit_rot = euler_t( 90.0, 180.0, 180.0 );
+	limit_p_up = 90.0;
+	limit_p_dn = 90.0;
+	limit_h = 180.0;
+	limit_r = 180.0;
 	task_weight = 1.0;
 	blend_weight = 1.0;
 	speed = 1.0;
@@ -312,6 +316,7 @@ quat_t MeCtGazeJoint::rotation_to_target( quat_t target_rot )	{
 #endif
 }
 
+#if 0
 quat_t MeCtGazeJoint::constrain_box( quat_t task_rot )	{
 
 	float lim_x = (float)limit_rot.x();
@@ -362,7 +367,9 @@ quat_t MeCtGazeJoint::constrain_quat( quat_t task_rot )	{
 	}
 	return( task_rot );
 }
+#endif
 
+#if 0
 quat_t MeCtGazeJoint::constrain_ellipse( quat_t task_rot )	{
 	
 	float lim_x = (float)limit_rot.x();
@@ -381,6 +388,35 @@ quat_t MeCtGazeJoint::constrain_ellipse( quat_t task_rot )	{
 	float tw = (float)st.z();
 	if( tw > lim_z ) tw = lim_z;
 	if( tw < -lim_z ) tw = -lim_z;
+	
+	return( quat_t( sw_x, sw_y, tw ) );
+}
+#endif
+
+quat_t MeCtGazeJoint::constrain_ellipse( quat_t task_rot )	{
+	
+	vector_t st = task_rot.swingtwist();
+	float sw_x = (float)st.x();
+	float sw_y = (float)st.y();
+
+//if( id == 6 ) printf( "%f %f %f %f\n", limit_p_up, limit_p_dn, limit_h, limit_r );
+//euler_t e = task_rot; if( id == 6 ) e.print();
+
+	// Marcelo's exact ellipse solution:
+	if( sw_x > 0.0 )	{ // positive pitch is down...
+		if( sr_in_ellipse( sw_x, sw_y, limit_p_dn, limit_h ) > 0.0 )	{
+			sr_get_closest_on_ellipse( limit_p_dn, limit_h, sw_x, sw_y );
+		}
+	}
+	else	{
+		if( sr_in_ellipse( sw_x, sw_y, limit_p_up, limit_h ) > 0.0 )	{
+			sr_get_closest_on_ellipse( limit_p_up, limit_h, sw_x, sw_y );
+		}
+	}
+
+	float tw = (float)st.z();
+	if( tw > limit_r ) tw = limit_r;
+	if( tw < -limit_r ) tw = -limit_r;
 	
 	return( quat_t( sw_x, sw_y, tw ) );
 }
@@ -475,6 +511,7 @@ quat_t MeCtGazeJoint::constrain( float dt, quat_t task_rot )	{
 		);
 #endif
 
+//euler_t e = Q_sm; if( id == 6 ) e.print();
 	return( Q_sm );
 }
 
