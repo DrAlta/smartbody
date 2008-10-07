@@ -34,51 +34,48 @@
 
 
 namespace SmartBody {
-    // typedef
-    typedef int RequestId;
+	// typedef
+	typedef int RequestId;
 
 
-    /**
-     *  interface for viseme data.
-     */
-    class VisemeData {
+	/**
+	*  interface for viseme data.
+	*/
+	class VisemeData {
 	private:
-		char* _id;
-		const float _weight;
-		const float _time;
+		std::string _id;
+		float _weight;
+		float _time;
 		float _duration;
 
-    public:
-		VisemeData( const char* id, float weight, float time )
-		: _id(new char[strlen(id)+1]),_weight(weight),_time(time)
+	public:
+		VisemeData( const char * id, float weight, float time )
+			: _id( id ), _weight( weight ), _time( time ), _duration( 0 )
 		{
-			strcpy(_id,id);
-			_duration = 0;
 		}
 		
-		VisemeData( const char* id, float weight, float time, float duration )
-		: _id(new char[strlen(id)+1]),_weight(weight),_time(time),_duration(duration)
+		VisemeData( const char * id, float weight, float time, float duration )
+			: _id( id ), _weight( weight ), _time( time ), _duration( duration )
 		{
-			strcpy(_id,id);
 		}
 
-		virtual ~VisemeData() {
-			delete [] _id;
+		virtual ~VisemeData()
+		{
 		}
 
 
-        /** Return the viseme identifier/name.  */
-		const char* id() const { return _id; }
+		/** Return the viseme identifier/name.  */
+		const char * id() const { return _id.c_str(); }
 
-        /** Return the weight of the viseme. */
+		/** Return the weight of the viseme. */
 		float weight() const { return _weight; }
 
-        /** Return the audio relative time to trigger this viseme. */
+		/** Return the audio relative time to trigger this viseme. */
 		float time() const { return _time; }
 		
 		/** Return the blend-in duration of the viseme. */
 		float duration() const { return _duration; }
-    };
+	};
 
 	/**
 	 *  Write VisemeData to Stream
