@@ -52,7 +52,7 @@ namespace xml_utils {
 	DOMElement* getNextElement( const DOMNode* node );
 
 	//  parse a c-string as XML
-	int parseCString( char* data, AbstractDOMParser* parser );
+	int parseCString( const char* data, AbstractDOMParser* parser );
 
 	//  Convert XMLCh string to ascii c-string.
 	//  chars > 127 are represented as 127 (an unused character in both ascii and Unicode)
@@ -77,7 +77,7 @@ namespace xml_utils {
     //  and parses the file contents as XML (again, returning the DOMDocument).
     //
     //  Returns NULL if there was an error during parsing.
-	DOMDocument* parseMessageXml( XercesDOMParser* xmlParser, char *str );
+	DOMDocument* parseMessageXml( XercesDOMParser* xmlParser, const char *str );
 
 	//  STL Comparason operator for XMLCh* using XMLString::compareString(..)
 	class XMLStringCmp {
