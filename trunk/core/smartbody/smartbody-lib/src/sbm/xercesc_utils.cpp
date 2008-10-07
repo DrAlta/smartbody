@@ -72,7 +72,7 @@ DOMElement* xml_utils::getNextElement( const DOMNode* node ) {
  *
  *   Potentially throws OutOfMemoryException, XMLException
  */
-int xml_utils::parseCString( char *str, AbstractDOMParser* parser ) {
+int xml_utils::parseCString( const char *str, AbstractDOMParser* parser ) {
 	//if( str[0]=='<' && str[1]=='?' && str[2]=='x' && str[3]=='m' && str[4]=='l' ) {
 	//	//  Xerces doesn't seem to like the XML prolog in C strings
 	//	char *orig = str;
@@ -172,7 +172,7 @@ void xml_utils::xmlToString( const DOMNode* node, string& converted ){ //recursi
 }
 
 
-DOMDocument* xml_utils::parseMessageXml( XercesDOMParser* xmlParser, char *str ) {
+DOMDocument* xml_utils::parseMessageXml( XercesDOMParser* xmlParser, const char *str ) {
 	try {
 		// xml in a file?
 		if( str[0]=='<' ) {
