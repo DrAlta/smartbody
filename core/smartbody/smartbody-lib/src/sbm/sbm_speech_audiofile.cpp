@@ -21,724 +21,417 @@
  *      Ashok Basawapatna, USC (no longer)
  */
 
+#include "vhcl.h"
+
 #include "sbm_speech_audiofile.hpp"
-#include "xercesc_utils.hpp"
-#include "sr_hash_map.h"
-#include "sr_arg_buff.h"
-#include <string>
-#include <stdlib.h>
-#include <iostream>
-#include <vector>
-#include <sys/types.h>
-#include <sys/timeb.h>
-#include <sstream>
-#include <float.h>
-#include "time.h" 
-#include <fstream>
 
-#include "xercesc_utils.hpp"
+#include "mcontrol_util.h"
 
 
-const char* VISEME_MAP = "../audiofile_viseme.map";  // TODO make this a configurable variable
-
-
-using namespace std;
+using std::string;
+using std::vector;
+using stdext::hash_map;
 using namespace SmartBody;
 
-//static variables
-//  TODO: No need to be static.  Include these in AudioFileSpeech class
-srHashMap<std::string> AudioFileSpeech::audioSoundLookUp;
-srHashMap<std::string> AudioFileSpeech::audioVisemeLookUp;
-srHashMap<std::string> AudioFileSpeech::textOfUtterance;
-int                    AudioFileSpeech::audioMsgNumber;
 
-// Constructor / Destructor
-AudioFileSpeech::AudioFileSpeech() {
-	// TODO when fields are added
-}
-
-AudioFileSpeech::~AudioFileSpeech() {
-	// TODO when fields are added
-}
-
-
-//  Override SpeechInterface methods (see sbm_speech.hpp)
-
-/**
- *  Requests audio for a speech by agentName as specified in XML node.
- *  If node is a DOMElement, use the child nodes.
- *  If node is a text node, is the value a string.
- *  If node is an attribute, use the attribute value as a string.
- *  Returns a unique request identifier.
- */
-RequestId AudioFileSpeech::requestSpeechAudio( const char* agentName, const DOMNode* node, const char* callbackCmd ) {
-	// TODO
-	//TODO: Test this function with a variety of XML documents
-	string encoding= XMLString::transcode(node->getOwnerDocument()->getEncoding()); //XMLStringconverts XML to cString; encoding
-	string version= XMLString::transcode(node->getOwnerDocument()->getVersion ()); //the xml version number
-	string xmlConverted="<?xml version=\"" + version.substr(0,6)+ "\" "; 
-	xmlConverted= xmlConverted+ "encoding=\"" + encoding.substr(0,7) + "\"?>";
-	xml_utils::xmlToString(node, xmlConverted); //Xml to string recursively searches DOM tree and returns a string of the xml document
-	
-/*	if(xmlConverted=="BADSTRING"){ 
-		printf( "remote_speech::RvoiceXmlCmd ERR: Invalid DOMNode type encountered"); 
-		return(CMD_FAILURE);
-	}*/
-	//converts string to char*
-	char* text= new char[xmlConverted.length()+1];
-	strcpy(text, xmlConverted.c_str()); 
-	RequestId ret= requestSpeechAudio(agentName, text, callbackCmd );
-	//delete [] text; text=0;
-	return (ret); //string is converted to char* and sent to other request audio fcn
-}
-
-
-/**
- *  Requests audio for a speech char[] text by agentName.
- *  Returns a unique request identifier.
- */
-RequestId AudioFileSpeech::requestSpeechAudio( const char* agentName, const char* text, const char* callbackCmd ) {
-	
-	
-	//cout<<"the Text: "<<endl<<text<<endl;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	audioMsgNumber++; //to make the message number unique it must not belong to any single object instantiation and thus resides in "lookup" along with other items that must be globally accessable among all AudioFileSpeech objects
-	ostringstream myStream; //creates an ostringstream object
-	myStream << audioMsgNumber << flush; //outputs the number into the string stream and then flushes the buffer
-	//THis code is meant to replace the <tm id's> of generic BML type "text/plain" with "marks" that can be understood by remote speech process
-	string textOfUtt = text;
-	int keyWordIndex=0; int keyWordIndexEnd=0;
-	keyWordIndex= textOfUtt.find("ref="); //should make this the element number of first element ie the '<'
-	keyWordIndex+=5;
-	
-
-
-	string result;
-	
-	if(keyWordIndex!= string::npos)
-		{
-			keyWordIndexEnd=textOfUtt.find("\"",keyWordIndex);
-			//cout<<"Text of Utt "<<textOfUtt.substr(keyWordIndex,keyWordIndexEnd-keyWordIndex);
-			
-			//if agent is not spawned in the level the character will not exist
-			SbmCharacter* agent = mcu.character_map.lookup(agentName);
-			if( agent == NULL)
-			{
-				printf( "AudioFileSpeech::requestSpeechAudio ERR: insert AudioFile voice code lookup FAILED, msgId=%s\n", agentName ); 
-				return (NULL);
-			}
-
-			//the audio path is the .wav; the viseme file is .ltf (created by impersonator
-			char fullAudioPath[ _MAX_PATH ];
-			string relativeAudioPath = (string)"../../../../" + agent->get_voice_code();
-			if ( _fullpath( fullAudioPath, relativeAudioPath.c_str(), _MAX_PATH ) == NULL )
-			{
-				printf( "AudioFileSpeech::requestSpeechAudio ERR: _fullpath() returned NULL" );
-				return NULL;
-			}
-
-			string audioPath;
-			audioPath += (string)fullAudioPath+"/"+textOfUtt.substr(keyWordIndex,keyWordIndexEnd-keyWordIndex)+".wav";
-cout << "audioPath = \""<<audioPath<<"\""<<endl;
-			string theKey= textOfUtt.substr(keyWordIndex,keyWordIndexEnd-keyWordIndex);
-			string visemePath;
-			visemePath += "../../../../"+agent->get_voice_code()+"/"+textOfUtt.substr(keyWordIndex,keyWordIndexEnd-keyWordIndex)+".ltf";
-cout << "visemePath = \""<<visemePath<<"\""<<endl;
-			string* audioPathPtr= new string(audioPath);
-			string* visemePathPtr= new string(visemePath);
-			audioSoundLookUp.insert(myStream.str().c_str(), audioPathPtr);
-			audioVisemeLookUp.insert(myStream.str().c_str(), visemePathPtr);
-			ifstream checkVis;
-			checkVis.open(visemePath.c_str());
-			if(!checkVis.is_open())
-			{
-				result= "ERROR from AudioFileSpeech::requestSpeechAudio: File: " +visemePath+ " DOES NOT EXIST";
-				cout<< "ERROR from AudioFileSpeech::requestSpeechAudio: File: "+visemePath+ " DOES NOT EXIST";
-			}
-			else
-			{
-				result = "SUCCESS";
-			}
-		}
-		else
-		{
-			result = "ERROR from AudioFileSpeech::requestSpeechAudio: ref= attribute could not be found in speech behavior";
-		}
-	
-	ostringstream msg;
-	msg << callbackCmd << " " << agentName << " " << myStream.str() << " " << result;
-	mcu.execute_later( msg.str().c_str() );
-	return audioMsgNumber; // increment per request
-}
-
-string AudioFileSpeech::justTheText(string toConvert)
+AudioFileSpeech::AudioFileSpeech()
 {
-	//cout<<endl<<"In To convert"<<endl;
-	int runOutOfText=0;
-	int markNumber=0;
-	int endIndex=toConvert.rfind("</speech>");
-	string finalSentence="";
-	string intermediate="";
+   m_xmlParser = new XercesDOMParser();
+   m_xmlParser->setErrorHandler( new HandlerBase() );
 
-	while(runOutOfText!=-1)
-	{
-		ostringstream num;
-		ostringstream numPlusOne;
-		//cout<<endl<<"the Mark Number "<<markNumber<<endl;
-		num<<markNumber<<flush;
-		numPlusOne<<(markNumber+1)<<flush;
-		string toFind="";
-		toFind+="T"+num.str()+"\"></mark>";
-		string toFindPlusOne="";
-		toFindPlusOne+="T"+numPlusOne.str()+"\"></mark>";
-		//cout<<endl<<"the mark number and the next one: "<<toFind<<" "<<toFindPlusOne<<endl;
-		int indexMarker= toConvert.find(toFind); //gives us the start of the T stuff
-		runOutOfText= toConvert.find(toFindPlusOne,indexMarker);
-		if(runOutOfText!=-1)
-		{
-			//cout<<endl<<"here is the if "<<toConvert.substr(indexMarker+toFind.length(), runOutOfText-(indexMarker+toFind.length()-1)-19)+" "<<endl;
-			finalSentence+=toConvert.substr(indexMarker+toFind.length(), runOutOfText-(indexMarker+toFind.length()-1)-19)+" ";
-		}
-		markNumber+=2;
-	}
-	//cout<<endl<<"THIS IS TO CONVERT: "<<finalSentence<<endl;
-	
-return finalSentence;
+   m_requestIdCounter = 1;  // start with 1, in case 0 is a special case
 }
 
 
-/**
- *  If the request has been processed, returns the time ordered vector 
- *  of VisemeData for the requestId.  Otherwise return NULL.
- *
- *  Visemes in this list are actually morph targets, and multiple
- *  visemes with different weights can be added together.  Because of
- *  this, the returned viseme list should include zero weighted
- *  VisemeData instances of when to cancel previous visemes (change
- *  of viseme, and end of words).
- */
-const std::vector<VisemeData *>* AudioFileSpeech::getVisemes( RequestId requestId ) {
-	
-	/**
-	*Basically the viseme data needs 2 files to work-- The .ltf file and the Impersonator "doctor.map" file
-	*The LTF file gives you the Phonemes; Then you use the doctor.map file for that Phoneme to figure out which Viseme
-	*(see phon2Vis below) the phoneme  maps to
-	*/
-	
-	//phoneme-viseme map Impersonator
-	string phon2Vis[]= {"EE","Er","Ih","Ao","oh","OO","Z","j","F","Th","D","BMP","NG","R","KG"};
-	ostringstream newStream; //creates an ostringstream object
-	newStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
-	string requestIdStr( newStream.str() );
-	
-	vector<VisemeData *> *visemeVector= new vector<VisemeData *>;
-
-	ifstream visemeMap_inStream;
-	ifstream utteranceVisemes_inStream;
-	string* lookup_result = audioVisemeLookUp.lookup(requestIdStr.c_str());
-	if( lookup_result == NULL ) {
-		// unknown requestId in viseme table
-		return NULL;
-	}
-	string utteranceVisemesPath=*lookup_result;
-	utteranceVisemes_inStream.open(utteranceVisemesPath.c_str());
-	
-	//if the viseem file can't be opened
-	if(!utteranceVisemes_inStream.is_open())
-	{
-		cout<<endl<<"AudioFileSpeech::getVisemes ERR: speech Request# "<<newStream.str().c_str()<<" "<<utteranceVisemesPath<<" could not be open"<<endl;
-		utteranceVisemes_inStream.close();
-		return NULL;
-	}
-	
-	string readIn;
-	//reads each viseme line; assumes it's less than 100 characters (this is the case for impersonator files)
-	char* charReadIn= new char[100];
-	bool visemeEncountered=false;
-	for(int u=0; u<100; u++)
-	{
-		charReadIn[u]=0;
-	}
-	utteranceVisemes_inStream.getline(charReadIn,100,'\n');
-	readIn= charReadIn;
-	while(readIn.find("Curve Data")==-1)
-	{
-
-		if(visemeEncountered && readIn.length()!=0)
-		{
-			visemeMap_inStream.open(VISEME_MAP);
-			if(!visemeMap_inStream.is_open())
-			{
-				cout<<endl<<"AudioFileSpeech::getVisemes ERR: speech Request# "<<newStream.str().c_str()<<VISEME_MAP<<" could not be open"<<endl;
-				return NULL;
-			}
-
-			//it's a viseme!!
-			int index1=0; int index2=0;
-			index1=readIn.find(" ");
-			index2=readIn.rfind(" ");
-			VisemeData *singleViseme=NULL;
-
-			//reads in start time, end time and the viseme number to map
-			int visemeCount = atoi(readIn.substr(0,index1).c_str()); 
-			float startTime = (float)atof(readIn.substr(index1+1,index2-1).c_str());
-			float endTime   = (float)atof(readIn.substr(index2+1, readIn.length()-1).c_str());
-
-			
-			char* dummy= new char[100];
-
-			//looks at the map file and tries to figure out which viseme is the 
-			for(int k=0; k<visemeCount+8;k++)
-			{
-				visemeMap_inStream.getline(dummy,100);
-				
-			}
-			delete[] dummy;
-			char* visemeLineChar=new char[100];
-			for(int t=0; t<100; t++)
-			{
-				visemeLineChar[t]=0;
-			}
-
-			visemeMap_inStream.getline(visemeLineChar,100);
-		
-			string visemeLine=""; 
-			visemeLine+=visemeLineChar;
-			
-			int visemeIndex= visemeLine.find("=");
-		
-			string visemeString= visemeLine.substr(visemeIndex+1, visemeLine.length()-1);
-			string tempString=visemeString;
-			int visemeIndexCount=-1;
-			int nextViseme=0;
-			string compareString="";
-			for (int w=0; w<15; w++)
-			{
-				compareString= tempString.substr(w*6, 4);
-				if(nextViseme<atof(compareString.c_str()))
-				{
-					nextViseme = atoi(tempString.c_str());
-					visemeIndexCount=w;
-				}
-			}
-
-			string visemeId;
-
-			//if all the visemes are zero it's the closed mouth viseme, otherwise it's one of the above visemes
-			if(visemeIndexCount!=-1)
-			{
-			//	cout<<endl<<"PHON2VIS "<<phon2Vis[visemeIndexCount].c_str();
-				visemeId= phon2Vis[visemeIndexCount];
-			}
-			else
-			{
-				visemeId="_";
-			}
-			//strcpy(visemeId, visemeString.c_str());
-			//cout<<"VISEME ID: "<<visemeId<<" Start Time: "<<startTime<<endl;
-			visemeLine="";
-			singleViseme= new VisemeData(visemeId.c_str(), 1.0, startTime);
-			visemeVector->push_back(singleViseme);
-			VisemeData* resetViseme= new VisemeData(visemeId.c_str(),0.0,endTime);
-			visemeVector->push_back(resetViseme);
-			
-			delete [] visemeLineChar;
-			
-			visemeMap_inStream.close();
-
-		}
-		if(readIn.find("// Phoneme Timing List")!=-1)
-		{
-			visemeEncountered=true;
-		}
-			for(int p=0; p<100; p++)
-		{
-			charReadIn[p]=0;
-		}
-		utteranceVisemes_inStream.getline(charReadIn,100,'\n');
-		readIn= charReadIn;
-		
-	}
-	
-	utteranceVisemes_inStream.close();
-	return visemeVector;
-}
-/**
- *  Returns the sbm command used to play the speech audio.
- */
-char* AudioFileSpeech::getSpeechPlayCommand( RequestId requestId, const SbmCharacter* character )
+AudioFileSpeech::~AudioFileSpeech()
 {
-	// TODO: Wrap up this SASO/PlaySound specific audio command string generation
-	// into a class that can abstracted and shared between speech implementations.
-	// The SpeechInterface should only need to provide the audio filename.
-
-	ostringstream newStream; //creates an ostringstream object
-	newStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
-	if(!audioSoundLookUp.does_key_exist(newStream.str().c_str()))
-	{
-		return(NULL);
-	}
-
-	// Get bonebus character id for spatialization
-	ostringstream characterIdStream; //creates an ostringstream object
-	if( character && character->bonebusCharacter )
-	{
-		//outputs the number into the string stream and then flushes the buffer
-		characterIdStream << character->bonebusCharacter->m_charId << flush;
-	}
-	else 
-	{
-		// Use 0 as a default;
-		characterIdStream << '0' << flush;
-	}
-	string characterIdStr( characterIdStream.str() );
-
-	string soundFile= *(audioSoundLookUp.lookup(newStream.str().c_str()));
-	soundFile= "send PlaySound "+ soundFile + " " + characterIdStr; //concatenates audio path with playsound command
-	char* retSoundFile= new char[soundFile.length() + 1];
-	strcpy(retSoundFile, soundFile.c_str());
-	return (retSoundFile);
+   delete m_xmlParser;  m_xmlParser = NULL;
 }
 
-/**
- *  Returns the sbm command used to stop the speech audio.
- */
-char* AudioFileSpeech::getSpeechStopCommand( RequestId requestId, const SbmCharacter* character ) {
-	// TODO: Wrap up this SASO/PlaySound specific audio command string generation
-	// into a class that can abstracted and shared between speech implementations.
-	// The SpeechInterface should only need to provide the audio filename.
 
-	ostringstream newStream; //creates an ostringstream object
-	newStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
-	if(!audioSoundLookUp.does_key_exist(newStream.str().c_str()))
-	{
-		return(NULL);
-	}
-
-	// Get bonebus character id for spatialization
-	ostringstream characterIdStream; //creates an ostringstream object
-	if( character && character->bonebusCharacter )
-	{
-		//outputs the number into the string stream and then flushes the buffer
-		characterIdStream << character->bonebusCharacter->m_charId << flush;
-	}
-	else 
-	{
-		// Use 0 as a default;
-		characterIdStream << '0' << flush;
-	}
-	string characterIdStr( characterIdStream.str() );
-	
-	string soundFile= *(audioSoundLookUp.lookup(newStream.str().c_str()));
-	soundFile= "send StopSound "+ soundFile + " "+characterIdStr;
-	char* retSoundFile= new char[soundFile.length() + 1];
-	strcpy(retSoundFile, soundFile.c_str());
-	return (retSoundFile);
-}
-
-/**
- *  Returns the filename of the audio.
- */
-char* AudioFileSpeech::getSpeechAudioFilename( RequestId requestId ) {
-	
-	ostringstream newStream; //creates an ostringstream object
-	
-	newStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
-	
-	if(!audioSoundLookUp.does_key_exist(newStream.str().c_str()))
-	{
-		return(NULL);
-	}
-	string soundFile    = *(audioSoundLookUp.lookup(newStream.str().c_str()));
-	string::size_type nameIndex = soundFile.rfind("/");
-	char* returnName= new char[soundFile.length()-nameIndex];
-	for(string::size_type l=0; l<soundFile.length()-nameIndex;l++)
-	{
-		returnName[l]=0;
-	}
-	for (string::size_type i=0; i<soundFile.length()-nameIndex; i++)
-	{
-		returnName[i]=soundFile[i+nameIndex+1];
-	}
-	return (returnName);
-}
-
-/**
- *  Returns the timing for a synthesis bookmark,
- *  or -1 if the markId is not recognized.
- */
-//Only need the request ID for this. It assumes a file called "Utterance Map" which hasthe following form
-
-//<utterance="I hope your Arabic is just very poor, otherwise that insult is almost too much to bear"
-//audio  src="arabic_poor_insult.wav" />
-
-//THE NEW LINE between utterance and Audio Is important/ Part of the yet to be written specification for the utterance.xml file
-float AudioFileSpeech::getMarkTime( RequestId requestId, const XMLCh* markId ) 
+RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const DOMNode * node, const char * callbackCmd )
 {
-	/**
-	* This estimates the visemes for each word in an utterance using the utterance.map file and audioFileSpeech::wordscore function.
-	* This estimation is used to create a proportion of the total visemes for each word (ie: word number 1 will get
-	* 2% if the total visemes etc.) Then the synch points for wordbreaks are figured out by the time of the final viseme.
-	*  The Wordscore is the estimation of the # visemes a given word has. Each word's viseme over the total wordscore across every word, multiplied by the total actual
-	* number of Visemes in the sentence yeilds the number of Visemes for that word.
-	* --->EXAMPLE:::If you need to find <T6> you need to know the time of the last viseme
-	*	for word #3. so you add up the visemes for the first word, the second word, and the third word; and then find that numbered viseme,
-	*	take it's time information, and return it
-	*/
-	ostringstream id; //creates an ostringstream object
-	//cout<<"THE MARK ID "<<XMLString::transcode(markId)<<endl;
-	
-	id << requestId << flush; //outputs the number into the string stream and then flushes the buffer
-	//ifstream utteranceMap;
-	ifstream numberOfVisemes;
-	string visemePath= audioVisemeLookUp.lookup(id.str().c_str())->c_str();
-	//int split= visemePath.rfind("/");
-	//string splitPath;
-	//splitPath= visemePath.substr(0,split);
-	//splitPath+="/utteranceMap.xml";
-	//utteranceMap.open(splitPath.c_str());
-	numberOfVisemes.open(visemePath.c_str());
-	string findString="";
-	int visemeCount=0;
-	if(numberOfVisemes.is_open())
-	{
-		bool foundNumber=false;
-		while(!foundNumber)
-		{
-			getline(numberOfVisemes,findString);
-			if(findString.find("Num. Phonemes")!=-1)
-			{
-				foundNumber=true;
-			}
-		}
-		
-		getline(numberOfVisemes,findString);
-		visemeCount= atoi(findString.c_str());
-		
-		bool foundLine=false;
-		
-		string soundName=audioSoundLookUp.lookup(id.str().c_str())->c_str();
-		string tempString;
-		int split= soundName.rfind("/");
-		soundName=soundName.substr(split+1,soundName.length()-1);
-		
-		/*while(!foundLine)
-		{
-			tempString=findString;
-			getline(utteranceMap,findString);
-			if(findString.find(soundName) != -1)
-			{
-				foundLine=true;
-			}
-		
-		}
-		
-		int startIndex=0;
-		int endIndex=0;
+   // TODO: Test this function with a variety of XML documents
 
-		startIndex=tempString.find("\"");
-		endIndex=tempString.rfind("\"");
+   // TODO: transcode() leaks here
+   string encoding = XMLString::transcode( node->getOwnerDocument()->getEncoding() );  // XMLStringconverts XML to cString; encoding
+   string version = XMLString::transcode( node->getOwnerDocument()->getVersion () ); //the xml version number
 
-		tempString=tempString.substr(startIndex+1,endIndex-12);*/
-		string* lookup_result = textOfUtterance.lookup(id.str().c_str());
-		if( lookup_result==NULL ) {
-			// Unknown markId
-			return -1;
-		}
-		tempString = *lookup_result;
-		//cout<<endl<<"********tempString "<<tempString<<endl;
-		string testString=tempString;
-		bool noWords=false;
-		int numWords=0;
-		int indexWords=0;
-		while(!noWords)
-		{
-			indexWords= testString.find(" ");
-			if(indexWords != -1)
-			{
-				numWords++;
-				testString=testString.substr(indexWords+1);
-			}
-			else
-			{
-				noWords=true;
-			}
+   string xmlConverted = "<?xml version=\"" + version.substr( 0, 6 )+ "\" ";
+   xmlConverted += "encoding=\"" + encoding.substr( 0, 7 ) + "\"?>";
 
-		}
-		numWords++;
-		
-		indexWords=0;
-		testString=tempString;
-		int oldIndex=0;
-		int* wordScores;
-		wordScores=new int [numWords];
-		string theWord;
+   xml_utils::xmlToString( node, xmlConverted ); //Xml to string recursively searches DOM tree and returns a string of the xml document
 
-		if(numWords==1)
-		{
-			wordScores[0]=1;
-		}
-		else
-		{
-			testString+=" ";
-			for(int u=0; u<numWords; u++)
-			{
-				oldIndex=indexWords;
-				wordScores[u]=0;
-				if(testString.find(" ") !=-1)
-				{
-					indexWords+= testString.find(" ");
-				
-				//enumerates the word scores for each workd
-				
-
-					//theWord=testString.substr(oldIndex,indexWords-oldIndex);
-					theWord=testString.substr(0,indexWords-oldIndex);
-					
-					wordScores[u]=wordScore(theWord);
-					testString=tempString.substr(indexWords+u+1,tempString.length()+ 500);
-					//cout<<endl<<"word scores "<<wordScores[u]<<endl;
-				}
-			}
-		}
-	
-		string markName=XMLString::transcode(markId);
-		//cout<<endl<<endl<<"markName "<<markName<<endl<<endl<<endl;
-		markName=markName.substr(5,markName.length());
-		int markWord= atoi(markName.c_str());
-		markWord= ((markWord+1)/2);
-		
-		int total=0;
-		//calculates the total word score over every word
-		for(int q=0; q<numWords; q++)
-		{
-			//cout<<"WORD SCORES "<<q<<" "<<wordScores[q]<<endl;
-			total+=wordScores[q];
-		}
-
-		float visemeAllotment=0;
-		
-		//figures out the proportion of visemes each word should get, multiplies this by the actual # of visemes to get the actual visemes each word should get
-		//this added up to the current word's synch point we want so we can go to that viseme in the list and get it's time
-		for(int e=0; e<=markWord;e++)
-		{
-			visemeAllotment+=float(float(visemeCount)*float((float(wordScores[e])/float(total))));
-		}
-		//cout<<"visemeAllotment "<<visemeAllotment<<" Mark Name "<<markWord<<endl;
-		
-		visemeAllotment= ceil(visemeAllotment);
-		//cout<<"visemeAllotmentCeil "<<visemeAllotment<<" Mark Name "<<markWord<<endl<<endl<<endl;
-		
-		//of we divy out more visemes than we have we just make it equal to the total number of visemes
-		if(visemeAllotment>visemeCount || -visemeAllotment>visemeCount)
-		{
-			visemeAllotment=(float)visemeCount;
-		}
-		//cout<<"visemeAllotmentCeil "<<visemeAllotment<<" Mark Name "<<markWord<<endl<<endl<<endl;
-		
-		//WARNING-- CHANGE THIS-- It assumes that the firest viseme starts on line 17 always (for the most part in these
-		//Impersonator files it does and this is an impersonator implementation
-		string endTime="";
-		
-		for(int a=0; a<visemeAllotment+3; a++)
-		{
-			getline(numberOfVisemes,endTime);
-		}
-		//cout<<endl<<"Original end string "<<endTime<<endl;
-		int endingIndex=endTime.rfind(" ");
-		//cout<<endl<<"endingIndex "<<endingIndex<<"length "<<endTime.length();
-		endTime=endTime.substr(endingIndex+1,endTime.length()-endingIndex-1);
-		//cout<<endl<<"Mark Time: "<<markName<<" Word Number: "<<markWord<<" END TIME: "<<endTime<<endl;
-		if(atof(endTime.c_str())<0)
-		{
-			return 0.001f;
-		}
-		return (float)atof(endTime.c_str());
-	}
-	else
-	{
-		cout<<endl<<"AudioFileSpeech::getMarkTime ERR: could not Open .lst file-- speech Request# "<<requestId<<endl;
-		return -1.0;
-	}
-	return -1.0;
+   return requestSpeechAudio( agentName, xmlConverted.c_str(), callbackCmd );
 }
 
-int AudioFileSpeech::wordScore(string word)
+
+RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const char * text, const char * callbackCmd )
 {
-	//calculates viseme score for word
-	//1 pt for any combination of 2 letters EXCEPT- the same letter or an e at the end
-	int scoreBoard=0;
-	if(word.length()<=0)
-	{
-		return 0;
-	}
-	for(string::size_type x=0; x<word.length()-1;x++)
-	{
-		if(x+1<word.length())
-		{
-		if(word.at(x)!= word.at(x+1) && (x+1)<word.length())
-		{
-			scoreBoard++;
-		}
-		if(word.at(x)!= word.at(x+1) && (x+1)==word.length())
-		{
-			if(word.at(x+1)!='e')
-			{
-				scoreBoard++;
-			}
-		}
-		}
-	}
-	if(scoreBoard==0){scoreBoard++;}
-	return scoreBoard;
+   // TODO:  Does return 0 signify error code?
+   // TODO:  Handle xerces exceptions?
+
+   // sample input
+   // +		text	0x01c5a318 "<?xml version="1.0" encoding="UTF-8"?><speech ref="off-top-dont-know" type="text/plain">I don't know the answer to that question</speech>"	const char *
+   /*
+    +		text	0x04883548 "<?xml version="1.0" encoding="UTF-8"?><speech id="sp1" ref="rio-i_like_shootin_things" type="application/ssml+xml">
+         <mark name="sp1:T0" />And
+         <mark name="sp1:T1" />
+         <mark name="sp1:T2" />I
+         <mark name="sp1:T3" />
+         <mark name="sp1:T4" />like
+         <mark name="sp1:T5" />
+         <mark name="sp1:T6" />shooting
+         <mark name="sp1:T7" />
+         <mark name="sp1:T8" />things,
+         <mark name="sp1:T9" />
+         <mark n	const char *
+   */
+
+   // parse text to get the name of the audio file
+   // parse .ltf file to get viseme timings
+   // parse .bml file to get mark timings
+
+
+   DOMDocument * doc = xml_utils::parseMessageXml( m_xmlParser, text );
+
+   DOMElement * speech = doc->getDocumentElement();
+
+   // TODO: make sure it's "speech"
+
+
+   char * xmlRef = XMLString::transcode( speech->getAttribute( L"ref" ) );
+   string ref = xmlRef;
+   XMLString::release( &xmlRef );
+
+   char * xmlSpeechId = XMLString::transcode( speech->getAttribute( L"id" ) );
+   string speechId = xmlSpeechId;
+   XMLString::release( &xmlSpeechId );
+
+
+   m_speechRequestInfo[ m_requestIdCounter ].id = speechId;
+
+
+   mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+   SbmCharacter * agent = mcu.character_map.lookup( agentName );
+   if ( agent == NULL )
+   {
+      printf( "AudioFileSpeech::requestSpeechAudio ERR: insert AudioFile voice code lookup FAILED, msgId=%s\n", agentName ); 
+      return 0;
+   }
+
+
+   char fullAudioPath[ _MAX_PATH ];
+   string relativeAudioPath = (string)"../../../../" + agent->get_voice_code();
+   if ( _fullpath( fullAudioPath, relativeAudioPath.c_str(), _MAX_PATH ) == NULL )
+   {
+      printf( "AudioFileSpeech::requestSpeechAudio ERR: _fullpath() returned NULL\n" );
+      return 0;
+   }
+
+   m_speechRequestInfo[ m_requestIdCounter ].audioFilename = (string)fullAudioPath + "\\" + ref + ".wav";
+
+
+   string ltfFilename = "../../../../" + agent->get_voice_code() + "/" + ref + ".ltf";
+
+   ReadVisemeDataLTF( ltfFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData );
+   if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
+   {
+      printf( "AudioFileSpeech::requestSpeechAudio ERR: could not read LTF file: %s\n", ltfFilename.c_str() );
+      return 0;
+   }
+
+
+   // TODO: Should we fail if the .bml file isn't present?
+
+   string bmlFilename = "../../../../" + agent->get_voice_code() + "/" + ref + ".bml";
+
+   ReadSpeechTiming( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers );
+   if ( m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.size() == 0 )
+   {
+      printf( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlFilename.c_str() );
+      //return 0;
+   }
+
+
+   mcu.execute_later( vhcl::Format( "%s %s %d %s", callbackCmd, agentName, m_requestIdCounter, "SUCCESS" ).c_str() );
+
+
+   return m_requestIdCounter++;
 }
 
-/**
- *  Signals that requestId processing is complete and its data can be 
- *  discarded.
- */
-void AudioFileSpeech::requestComplete( RequestId requestId ) {
-	// TODO
-}
 
-
-
-//MISSNAMED-- this is actually just a test function to see if everything is working
-//not so much an init function-- but it is under the test commands so it's all good
-int init_audio_func(srArgBuffer& args, mcuCBHandle* mcu_p)
+const vector<VisemeData *> * AudioFileSpeech::getVisemes( RequestId requestId )
 {
-	/*
-		Initializes minor character sounds
-	*/
-	
-	try{
-		//if( LOG_RHETORIC_SPEECH ) printf("\n \n *************The AudioFileSpeech_test***************** \n \n");
-		char* x= "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?><act><participant id=\"doctor\" role=\"actor\"/><bml><speech id=\"sp1\" ref=\"off-top-ask-else\" type=\"application/ssml+xml\"> Something <mark name=\"hello\"/></speech></bml></act>";
-		//cout<<endl<<x<<endl;
-		//char* x= "<?xml version=\"1.0\" encoding=\"UTF-8\"?><speak> Something <mark name=\"hello\"/> to <mark name=\"mark\"/> say <mark name= \"wtf\"/>  </speak>";
-		XercesDOMParser *xmlParser;
-		xmlParser = new XercesDOMParser();
-		xmlParser->setErrorHandler( new HandlerBase() );
-		DOMDocument *xmlDoc = xml_utils::parseMessageXml( xmlParser, x);
-		DOMNode *funNode= xmlDoc->getDocumentElement();
-		AudioFileSpeech anchor;
-		char *tre= "doctor";
-		char *command= "AudioProcessFinished";
-		int id= anchor.requestSpeechAudio(tre, funNode, command);
-		//cout<<endl<<"The Play Command "<<anchor.getSpeechPlayCommand(id)<<endl;
-		//cout<<endl<<"The FileName "<<anchor.getSpeechAudioFilename(id)<<endl;
-		anchor.getVisemes(id);
-		const XMLCh* rock= L"T2";
-		anchor.getMarkTime(id, rock);
-
-	
-		return(CMD_SUCCESS);
-	
-	} catch( const exception& e ) {
-		cerr << "AudioFileSpeech: std::exception: "<<e.what()<< endl;
-		return CMD_FAILURE;
-	}
+   // TODO: Change the return type data structure, so that I can simply do this:
+   //return m_speechRequestInfo[ requestId ].visemeData
 
 
-	
+   hash_map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
+   if ( it != m_speechRequestInfo.end() )
+   {
+      vector< VisemeData * > * visemeCopy = new vector< VisemeData * >;
+      for ( size_t i = 0; i < it->second.visemeData.size(); i++ )
+      {
+         VisemeData & v = it->second.visemeData[ i ];
+         visemeCopy->push_back( new VisemeData( v.id(), v.weight(), v.time() ) );
+      }
+
+      return visemeCopy;
+   }
+
+   return NULL;
+}
+
+
+char * AudioFileSpeech::getSpeechPlayCommand( RequestId requestId, const SbmCharacter * character )
+{
+   // TODO: Wrap up this SASO/PlaySound specific audio command string generation
+   // into a class that can abstracted and shared between speech implementations.
+   // The SpeechInterface should only need to provide the audio filename.
+
+   // TODO: fix return type
+
+   hash_map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
+   if ( it != m_speechRequestInfo.end() )
+   {
+      int characterId = 0;
+      if ( character && character->bonebusCharacter )
+      {
+         characterId = character->bonebusCharacter->m_charId;
+      }
+
+      it->second.playCommand = vhcl::Format( "send PlaySound %s %d", it->second.audioFilename.c_str(), characterId );
+      return (char *)it->second.playCommand.c_str();
+   }
+
+   return NULL;
+}
+
+
+char * AudioFileSpeech::getSpeechStopCommand( RequestId requestId, const SbmCharacter * character )
+{
+   // TODO: Wrap up this SASO/PlaySound specific audio command string generation
+   // into a class that can abstracted and shared between speech implementations.
+   // The SpeechInterface should only need to provide the audio filename.
+
+   // TODO: fix return type
+
+   hash_map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
+   if ( it != m_speechRequestInfo.end() )
+   {
+      int characterId = 0;
+      if ( character && character->bonebusCharacter )
+      {
+         characterId = character->bonebusCharacter->m_charId;
+      }
+
+      it->second.stopCommand = vhcl::Format( "send StopSound %s %d", it->second.audioFilename.c_str(), characterId );
+      return (char *)it->second.stopCommand.c_str();
+   }
+
+   return NULL;
+}
+
+
+char * AudioFileSpeech::getSpeechAudioFilename( RequestId requestId )
+{
+   // TODO: fix return type
+
+   hash_map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
+   if ( it != m_speechRequestInfo.end() )
+   {
+      return (char *)it->second.audioFilename.c_str();
+   }
+
+   return NULL;
+}
+
+
+float AudioFileSpeech::getMarkTime( RequestId requestId, const XMLCh * markId )
+{
+   hash_map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
+   if ( it != m_speechRequestInfo.end() )
+   {
+      char * xmlMarkId = XMLString::transcode( markId );
+      string strMarkId = xmlMarkId;
+      XMLString::release( &xmlMarkId );
+
+      hash_map< string, float >::iterator markIt = it->second.timeMarkers.find( strMarkId );
+      if ( markIt != it->second.timeMarkers.end() )
+      {
+         return markIt->second;
+      }
+   }
+
+   return 0;
+}
+
+
+void AudioFileSpeech::requestComplete( RequestId requestId )
+{
+   m_speechRequestInfo.erase( requestId );
+}
+
+
+void AudioFileSpeech::ReadVisemeDataLTF( const char * filename, std::vector< VisemeData > & visemeData )
+{
+   // phonemeIndex isn't needed unless you want to use the strings for debugging purposes
+   // the 0-40 number indices are used in the .ltf file  (eg, index 10 equals phoneme "Oy", which is mapped to Viseme "oh")
+   // phonemeToViseme was created by hand, using the chart below (taken from doctor.map).  Phonemes are along the side, Visemes are at the top.  Eat, Earth, etc are the Impersonator names, EE, Er, Ih are the names used by the Bonebus
+/*
+   //phoneme-viseme map Impersonator
+   //                          Eat   Earth If    Ox    Oat   Wet   Size Church Fave Though Told Bump   New   Roar Cage
+   const string phon2Vis[] = { "EE", "Er", "Ih", "Ao", "oh", "OO", "Z", "j",   "F", "Th",  "D", "BMP", "NG", "R", "KG" };
+
+                           Iy=0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Ih=0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Eh=0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Ey=0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Ae=0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Aa=0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Aw=0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Ay=0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Ah=0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Ao=0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Oy=0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Ow=0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Uh=0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Uw=0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Er=0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Ax=0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           S =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Sh=0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Z =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Zh=0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           F =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.70, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Th=0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00
+                           V =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.70, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Dh=0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00
+                           M =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00
+                           N =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00
+                           Ng=0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00
+                           L =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00
+                           R =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00
+                           W =0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Y =0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Hh=0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           B =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00
+                           D =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00
+                           Jh=0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           G =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.20
+                           P =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00
+                           T =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00
+                           K =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.20
+                           Ch=0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+
+                           Sil=0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           ShortSil=0.00, 0.00, 0.20, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Flap=0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.50, 0.00, 0.00, 0.00, 0.00
+*/
+
+   //                                  0                             5                             10                            15                          20                           25                          30                            35                            40
+// const char * phonemeIndex[]    = { "Iy", "Ih", "Eh", "Ey", "Ae", "Aa", "Aw", "Ay", "Ah", "Ao", "Oy", "Ow", "Uh", "Uw", "Er", "Ax", "S", "Sh", "Z", "Zh", "F", "Th", "V", "Dh", "M",   "N",  "Ng", "L", "R", "W",  "Y",  "Hh", "B",   "D", "Jh", "G",  "P",   "T", "K",  "Ch", "Sil", "ShortSil", "Flap" };
+   const char * phonemeToViseme[] = { "EE", "Ih", "Ih", "Ih", "Ih", "Ao", "Ih", "Ih", "Ih", "Ao", "oh", "oh", "oh", "oh", "Er", "Ih", "Z", "j",  "Z", "j",  "F", "Th", "F", "Th", "BMP", "NG", "NG", "D", "R", "OO", "OO", "Ih", "BMP", "D", "j",  "KG", "BMP", "D", "KG", "j",  "_",   "_",        "_" };
+
+
+   visemeData.clear();
+
+   FILE * f = fopen( filename, "r" );
+   if ( f == NULL )
+   {
+      return;
+   }
+
+
+   // search for the "phoneme list" section in the file
+
+   char line[ 512 ];
+   while ( fgets( line, 512, f ) != NULL )
+   {
+      string strLine = line;
+      if ( strLine.find( "// Phoneme Timing List" ) != strLine.npos )
+      {
+         break;
+      }
+   }
+
+   while ( fgets( line, 512, f ) != NULL )
+   {
+      string strLine = line;
+
+      if ( strLine.find( "// Function Curve Data" ) != strLine.npos )
+      {
+         // we've reached the end of the section, we're done
+         break;
+      }
+
+      if ( strLine.length() < 0 )
+      {
+         continue;
+      }
+
+      // we're looking for a line in the following format:
+      //   <phoneme index> <start time> <end time>
+      //   eg: 40 0 0.123
+
+      vector<string> tokens;
+      vhcl::Tokenize( strLine, tokens );
+
+      if ( tokens.size() < 3 )
+      {
+         // line is in the wrong format
+         continue;
+      }
+
+      string strPhonemeIndex = tokens[ 0 ];
+      string strStartTime = tokens[ 1 ];
+      string strEndTime = tokens[ 2 ];
+
+      string strVisemeIndex = phonemeToViseme[ atoi( strPhonemeIndex.c_str() ) ];
+
+      visemeData.push_back( VisemeData( strVisemeIndex.c_str(), 1.0f, (float)atof( strStartTime.c_str() ) ) );
+      visemeData.push_back( VisemeData( strVisemeIndex.c_str(), 0.0f, (float)atof( strEndTime.c_str() ) ) );
+   }
+
+   fclose( f );
+}
+
+
+void AudioFileSpeech::ReadSpeechTiming( const char * filename, stdext::hash_map< std::string, float > & timeMarkers )
+{
+   timeMarkers.clear();
+
+
+   DOMDocument * doc = xml_utils::parseMessageXml( m_xmlParser, filename );
+   if ( doc == NULL )
+   {
+      return;
+   }
+
+   DOMElement * bml = doc->getDocumentElement();
+
+   // TODO: make sure it's "bml"
+
+   DOMNodeList * syncList = bml->getElementsByTagName( L"sync" );
+   for ( XMLSize_t i = 0; i < syncList->getLength(); i++ )
+   {
+      DOMElement * e = (DOMElement *)syncList->item( i );
+
+      char * xmlId = XMLString::transcode( e->getAttribute( L"id" ) );
+      string id = xmlId;
+      XMLString::release( &xmlId );
+
+      char * xmlTime = XMLString::transcode( e->getAttribute( L"time" ) );
+      string time = xmlTime;
+      XMLString::release( &xmlTime );
+
+
+      // prefix the id with the speech id so that it matches the ids that come in from NVB
+      id = m_speechRequestInfo[ m_requestIdCounter ].id + ":" + id;
+
+
+      timeMarkers[ id ] = (float)atof( time.c_str() );
+   }
 }

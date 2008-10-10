@@ -306,7 +306,6 @@ void mcu_register_callbacks( void ) {
 	mcu.insert_test_cmd( "bml",  test_bml_func );
 	mcu.insert_test_cmd( "fml",  test_fml_func );
 	mcu.insert_test_cmd( "rhet", remote_speech_test);
-	mcu.insert_test_cmd( "initAudio", init_audio_func);
 	mcu.insert_test_cmd( "bone_pos", test_bone_pos_func );
 	
 
