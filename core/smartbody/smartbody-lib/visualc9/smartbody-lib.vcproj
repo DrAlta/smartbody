@@ -50,7 +50,6 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				TreatWChar_tAsBuiltInType="false"
-				RuntimeTypeInfo="false"
 				PrecompiledHeaderFile=".\obj\sbm_debug/sbm.pch"
 				AssemblerListingLocation=".\obj\sbm_debug/"
 				ObjectFile=".\obj\sbm_debug/"
