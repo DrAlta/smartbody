@@ -33,6 +33,10 @@
 # include "xercesc_utils.hpp"
 
 
+// Forward declarations
+class SbmCharacter;
+
+
 namespace SmartBody {
 	// typedef
 	typedef int RequestId;
@@ -136,12 +140,12 @@ namespace SmartBody {
         /**
          *  Returns the sbm command used to play the speech audio.
          */
-        virtual char* getSpeechPlayCommand( RequestId requestId, const int characterId = 0 ) = 0;
+        virtual char* getSpeechPlayCommand( RequestId requestId, const SbmCharacter* character = NULL ) = 0;
 
         /**
          *  Returns the sbm command used to stop the speech audio.
          */
-        virtual char* getSpeechStopCommand( RequestId requestId ) = 0;
+        virtual char* getSpeechStopCommand( RequestId requestId, const SbmCharacter* character = NULL ) = 0;
 
         /**
          *  Returns the filename of the audio.

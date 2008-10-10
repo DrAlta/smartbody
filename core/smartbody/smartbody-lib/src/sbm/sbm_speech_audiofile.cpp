@@ -366,19 +366,33 @@ const std::vector<VisemeData *>* AudioFileSpeech::getVisemes( RequestId requestI
 /**
  *  Returns the sbm command used to play the speech audio.
  */
-char* AudioFileSpeech::getSpeechPlayCommand( RequestId requestId, const int characterId )
+char* AudioFileSpeech::getSpeechPlayCommand( RequestId requestId, const SbmCharacter* character )
 {
+	// TODO: Wrap up this SASO/PlaySound specific audio command string generation
+	// into a class that can abstracted and shared between speech implementations.
+	// The SpeechInterface should only need to provide the audio filename.
+
 	ostringstream newStream; //creates an ostringstream object
 	newStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
-
-	ostringstream characterIdStream; //creates an ostringstream object
-	characterIdStream << characterId << flush; //outputs the number into the string stream and then flushes the buffer
-	string characterIdStr( characterIdStream.str() );
-
 	if(!audioSoundLookUp.does_key_exist(newStream.str().c_str()))
 	{
 		return(NULL);
 	}
+
+	// Get bonebus character id for spatialization
+	ostringstream characterIdStream; //creates an ostringstream object
+	if( character && character->bonebusCharacter )
+	{
+		//outputs the number into the string stream and then flushes the buffer
+		characterIdStream << character->bonebusCharacter->m_charId << flush;
+	}
+	else 
+	{
+		// Use 0 as a default;
+		characterIdStream << '0' << flush;
+	}
+	string characterIdStr( characterIdStream.str() );
+
 	string soundFile= *(audioSoundLookUp.lookup(newStream.str().c_str()));
 	soundFile= "send PlaySound "+ soundFile + " " + characterIdStr; //concatenates audio path with playsound command
 	char* retSoundFile= new char[soundFile.length() + 1];
@@ -389,17 +403,34 @@ char* AudioFileSpeech::getSpeechPlayCommand( RequestId requestId, const int char
 /**
  *  Returns the sbm command used to stop the speech audio.
  */
-char* AudioFileSpeech::getSpeechStopCommand( RequestId requestId ) {
-	ostringstream stopStream; //creates an ostringstream object
-	stopStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
-	
-	if(!audioSoundLookUp.does_key_exist(stopStream.str().c_str()))
+char* AudioFileSpeech::getSpeechStopCommand( RequestId requestId, const SbmCharacter* character ) {
+	// TODO: Wrap up this SASO/PlaySound specific audio command string generation
+	// into a class that can abstracted and shared between speech implementations.
+	// The SpeechInterface should only need to provide the audio filename.
+
+	ostringstream newStream; //creates an ostringstream object
+	newStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
+	if(!audioSoundLookUp.does_key_exist(newStream.str().c_str()))
 	{
 		return(NULL);
 	}
+
+	// Get bonebus character id for spatialization
+	ostringstream characterIdStream; //creates an ostringstream object
+	if( character && character->bonebusCharacter )
+	{
+		//outputs the number into the string stream and then flushes the buffer
+		characterIdStream << character->bonebusCharacter->m_charId << flush;
+	}
+	else 
+	{
+		// Use 0 as a default;
+		characterIdStream << '0' << flush;
+	}
+	string characterIdStr( characterIdStream.str() );
 	
-	string soundFile= *(audioSoundLookUp.lookup(stopStream.str().c_str()));
-	soundFile= "send StopSound "+ soundFile + " 3"; //The 3 denotes the channel in the VR theatre that the sound corresponds to
+	string soundFile= *(audioSoundLookUp.lookup(newStream.str().c_str()));
+	soundFile= "send StopSound "+ soundFile + " "+characterIdStr;
 	char* retSoundFile= new char[soundFile.length() + 1];
 	strcpy(retSoundFile, soundFile.c_str());
 	return (retSoundFile);

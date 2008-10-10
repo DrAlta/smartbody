@@ -106,10 +106,6 @@ namespace BML {
 		TriggerEventPtr      speech_trigger;
 		SpeechRequestPtr     speech_request;
 
-		//  TODO: Move these into SpeechRequest
-		char*                audioPlay;
-		char*                audioStop;
-
 	private:
 		BmlRequestWeakPtr    weak_ptr;  // weak reference to the reference count struct
 
@@ -391,6 +387,9 @@ namespace BML {
 		SynchPointPtr     end;
 
 		VecOfSynchPoint   tms;  // <tm> Time Markers, or syntheis markup equiv
+
+		std::string audioPlay;
+		std::string audioStop;
 
 		///////////////////////////////////////////////////////////////
 		// Methods
