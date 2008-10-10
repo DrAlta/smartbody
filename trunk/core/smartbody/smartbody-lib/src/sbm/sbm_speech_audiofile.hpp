@@ -24,45 +24,52 @@
 #ifndef SBM_SPEECH_AUDIOFILE_HPP
 #define SBM_SPEECH_AUDIOFILE_HPP
 
+#include <hash_map>
+
 #include "sbm_speech.hpp"
-#include "xercesc_utils.hpp"
-#include "sr_hash_map.h"
 
 
+namespace SmartBody
+{
 
-namespace SmartBody {
-	class AudioFileSpeech : public SpeechInterface {
-	public:
-		// Constructor / Destructor
-		AudioFileSpeech();
-		virtual ~AudioFileSpeech();
+class AudioFileSpeech : public SpeechInterface
+{
+   private:
+      struct SpeechRequestInfo
+      {
+         std::vector< VisemeData > visemeData;
+         stdext::hash_map< std::string, float > timeMarkers;
+         std::string id;
+         std::string audioFilename;
+         std::string playCommand;
+         std::string stopCommand;
+      };
 
-		//  Override SpeechInterface methods (see sbm_speech.hpp)
-        virtual RequestId requestSpeechAudio( const char* agentName, const DOMNode* node, const char* callbackCmd );
-        virtual RequestId requestSpeechAudio( const char* agentName, const char* text, const char* callbackCmd );
-        virtual const std::vector<VisemeData *>* getVisemes( RequestId requestId );
-        virtual char* getSpeechPlayCommand( RequestId requestId, const SbmCharacter* character = NULL );
-        virtual char* getSpeechStopCommand( RequestId requestId, const SbmCharacter* character = NULL );
-        virtual char* getSpeechAudioFilename( RequestId requestId );
-        virtual float getMarkTime( RequestId requestId, const XMLCh* markId );
-        virtual void requestComplete( RequestId requestId );
-		static  srHashMap<std::string> AudioFileSpeech::audioSoundLookUp;
-		static  srHashMap<std::string> AudioFileSpeech::audioVisemeLookUp;
-		static  srHashMap<std::string> AudioFileSpeech::textOfUtterance;
-		
-	private:
-		static int	audioMsgNumber;
-		//std::string agentName;
-		int wordScore(std::string word);
-		std::string justTheText(std::string toConvert);
-	};
+   private:
+      XercesDOMParser * m_xmlParser;
+      int m_requestIdCounter;
+
+      stdext::hash_map< RequestId, SpeechRequestInfo > m_speechRequestInfo;
+
+   public:
+      AudioFileSpeech();
+      virtual ~AudioFileSpeech();
+
+      virtual RequestId requestSpeechAudio( const char * agentName, const DOMNode * node, const char * callbackCmd );
+      virtual RequestId requestSpeechAudio( const char * agentName, const char * text, const char * callbackCmd );
+      virtual const std::vector<VisemeData *> * getVisemes( RequestId requestId );
+      virtual char * getSpeechPlayCommand( RequestId requestId, const SbmCharacter * character = NULL );
+      virtual char * getSpeechStopCommand( RequestId requestId, const SbmCharacter * character = NULL );
+      virtual char * getSpeechAudioFilename( RequestId requestId );
+      virtual float getMarkTime( RequestId requestId, const XMLCh * markId );
+      virtual void requestComplete( RequestId requestId );
+
+   protected:
+      virtual void ReadVisemeDataLTF( const char * filename, std::vector< VisemeData > & visemeData );
+      virtual void ReadSpeechTiming( const char * filename, stdext::hash_map< std::string, float > & timeMarkers );
 };
 
+};
 
-
-
-// included after class definition b/c dependency
-#include "mcontrol_util.h"
-int init_audio_func(srArgBuffer& args, mcuCBHandle* mcu_p);
 
 #endif // SBM_SPEECH_AUDIOFILE_HPP
