@@ -136,9 +136,7 @@ BmlRequest::BmlRequest( const SbmCharacter* agent, const string & requestId, con
 	requestId( requestId ),
 	recipientId( recipientId ),
 	msgId( msgId ),
-    synch_points(),
-	audioPlay( NULL ),
-	audioStop( NULL )
+    synch_points()
 {}
 
 void BmlRequest::init( BmlRequestPtr self ) {
@@ -193,12 +191,6 @@ void BmlRequest::init( BmlRequestPtr self ) {
 }
 
 BmlRequest::~BmlRequest() {
-	// delete audio commands
-	if( audioPlay )
-		delete [] audioPlay;
-	if( audioStop )
-		delete [] audioStop;
-
 	// delete BehaviorRequests
 	size_t count = behaviors.size();
 	for( size_t i=0; i<count; ++i ) {

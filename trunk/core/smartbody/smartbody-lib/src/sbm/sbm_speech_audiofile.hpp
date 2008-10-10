@@ -41,8 +41,8 @@ namespace SmartBody {
         virtual RequestId requestSpeechAudio( const char* agentName, const DOMNode* node, const char* callbackCmd );
         virtual RequestId requestSpeechAudio( const char* agentName, const char* text, const char* callbackCmd );
         virtual const std::vector<VisemeData *>* getVisemes( RequestId requestId );
-        virtual char* getSpeechPlayCommand( RequestId requestId, const int characterId = 0 );
-        virtual char* getSpeechStopCommand( RequestId requestId );
+        virtual char* getSpeechPlayCommand( RequestId requestId, const SbmCharacter* character = NULL );
+        virtual char* getSpeechStopCommand( RequestId requestId, const SbmCharacter* character = NULL );
         virtual char* getSpeechAudioFilename( RequestId requestId );
         virtual float getMarkTime( RequestId requestId, const XMLCh* markId );
         virtual void requestComplete( RequestId requestId );

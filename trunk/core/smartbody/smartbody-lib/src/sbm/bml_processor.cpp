@@ -598,14 +598,26 @@ void BML::Processor::speechReply( SbmCharacter* character, SmartBody::RequestId 
 		speeches.erase( speechKey );
 
 		TriggerEventPtr trigger( speechReq->trigger );
+		//  Can trigger ever be NULL?
 		BmlRequestPtr   request( trigger->request.lock() );
 
 		if( request ) {  // Is BmlRequest still alive?
 			// request speech through Speech API
+			SpeechRequestPtr speech_request = request->speech_request;
+			if( !speech_request ) {
+				ostringstream error_msg;
+				error_msg << "BmlRequest <" << request->agent->name << ","<<request->msgId<<"> does not have a SpeechRequest.  Invalid speechReply(..) call.";
+				cerr << "ERROR: " << error_msg.str() << endl;
+				vrSpeakFailed( request->requestId.c_str(), request->recipientId.c_str(), request->msgId.c_str(), error_msg.str().c_str() );
+				return;
+			}
+
 			SmartBody::SpeechInterface* speech = request->agent->get_speech_impl();
 			if( !speech ) {
-				cerr << "ERROR: Character \"" << request->agent->name << "\" does not have a voice defined.  Cannot perform speech." << endl;
-				// TODO: Send vrSpeakFailed
+				ostringstream error_msg;
+				error_msg << "Character \"" << request->agent->name << "\" does not have a voice defined.  Cannot perform speech.";
+				cerr << "ERROR: " << error_msg.str() << endl;
+				vrSpeakFailed( request->requestId.c_str(), request->recipientId.c_str(), request->msgId.c_str(), error_msg.str().c_str() );
 				return;
 			}
 
@@ -613,12 +625,11 @@ void BML::Processor::speechReply( SbmCharacter* character, SmartBody::RequestId 
 			if( !errorMsg ) {
 				if( LOG_SPEECH_REQUEST_ID )
 					clog << "LOG: BodyPlannerImpl::speechReply(..): speech found for RequestId " << requestId << endl;
-				if ( character->bonebusCharacter )
-					request->audioPlay = speech->getSpeechPlayCommand( requestId, character->bonebusCharacter->m_charId );
-				else
-					request->audioPlay = speech->getSpeechPlayCommand( requestId, 0 );
+
+				speech_request->audioPlay = speech->getSpeechPlayCommand( requestId, character );
+				speech_request->audioStop = speech->getSpeechStopCommand( requestId, character );
 				if( LOG_AUDIO )
-					cout << "DEBUG: BodyPlannerImpl::speechReply: request->audioPlay = " << request->audioPlay << endl;
+					cout << "DEBUG: BodyPlannerImpl::speechReply: speech_request->audioPlay = " << speech_request->audioPlay << endl;
 
 				SynchPointPtr ready( speechReq->ready );
 				SynchPointPtr relax( speechReq->relax );
@@ -715,12 +726,13 @@ void BML::Processor::speechReply( SbmCharacter* character, SmartBody::RequestId 
 				realizeRequest( request, msg, mcu );
 			} else {
 				cerr << "ERROR: BodyPlannerImpl::speechReply(..): Error during speech RequestId " << requestId << ": " << errorMsg << endl;
-				// NO ERROR MESSAGE!  Missing BmlRequest means vrSpeakFailed fields are lost.
+				vrSpeakFailed( request->agent->name, request->recipientId.c_str(), request->msgId.c_str(), errorMsg );
 			}
 			speech->requestComplete( requestId );
-		} else if( LOG_SPEECH ) {
-			cerr << "ERROR: BodyPlannerImpl::speechReply(..): SpeechRequest found for \"" << requestId << "\", but BmlRequest is missing" << endl;
-			vrSpeakFailed( request->agent->name, request->recipientId.c_str(), request->msgId.c_str(), errorMsg );
+		} else {
+			if( LOG_SPEECH )
+				cerr << "ERROR: BodyPlannerImpl::speechReply(..): SpeechRequest found for \"" << requestId << "\", but BmlRequest is missing" << endl;
+			// NO ERROR MESSAGE!  Missing BmlRequest means vrSpeakFailed fields are lost.
 		}   // else ignore... not a part of this BodyPlanner or expired
 	} else if( LOG_SPEECH ) {
 		cerr << "ERROR: BodyPlannerImpl::speechReply(..): No speech found for \"" << requestId << "\"" << endl;
@@ -865,51 +877,55 @@ void BML::Processor::realizeRequest( BmlRequestPtr request, BodyPlannerMsg& bpMs
 		}
 	}
 	
-	// Schedule visemes
-	//   visemes are stored in request->visemes as VisemeData objects (defined in bml.hpp)
-	// add audioOffset to each viseme time,
-    if( request->visemes.size() > 0 ) {
-		//// Replaced by addition in next loop
-	    //for( int i=0; i<(int)request->visemes.size(); i++ ) {
-		//	request->visemes.at(i)->time+= audioOffset;
-	    //}
+	if( request->speech_request ) {
+		SpeechRequestPtr speech_request = request->speech_request;
 
-        ostringstream command;
-	    for (int i=0; i<(int)request->visemes.size(); i++) { //adds visemes for audio into sequence file
-			VisemeData* v = request->visemes.at(i);
-			float time = float( v->time() + audioOffset );
+		// Schedule visemes
+		//   visemes are stored in request->visemes as VisemeData objects (defined in bml.hpp)
+		// add audioOffset to each viseme time,
+		if( request->visemes.size() > 0 ) {
+			//// Replaced by addition in next loop
+			//for( int i=0; i<(int)request->visemes.size(); i++ ) {
+			//	request->visemes.at(i)->time+= audioOffset;
+			//}
 
-            command.str( "" );
-            command << "char " << bpMsg.agentId << " viseme " << v->id() << ' ' << v->weight() << ' ' << v->duration();
-			
-            if( LOG_BML_VISEMES ) cout << "command (complete): " << command.str() << endl;
-            //visemes get set a specified time
-            if( seq->insert( time, (char*)(command.str().c_str()) )!=CMD_SUCCESS ) {
-                cerr << "WARNING: BodyPlannerImpl::realizeRequest(..): msgId=\""<<bpMsg.msgId<<"\": "<<
-                    "Failed to insert viseme \""<<v->id()<<"\" @ "<<time<<endl;
-            }
-			if( LOG_BML_VISEMES ) {
-		        ostringstream echo;
-				echo.str( "echo LOG_BML_VISEMES: t" );
-				echo << time << ":\t" << command.str();
-				if( seq->insert( time, (char*)(echo.str().c_str()) )!=CMD_SUCCESS ) {
+			ostringstream command;
+			for (int i=0; i<(int)request->visemes.size(); i++) { //adds visemes for audio into sequence file
+				VisemeData* v = request->visemes.at(i);
+				float time = float( v->time() + audioOffset );
+
+				command.str( "" );
+				command << "char " << bpMsg.agentId << " viseme " << v->id() << ' ' << v->weight() << ' ' << v->duration();
+				
+				if( LOG_BML_VISEMES ) cout << "command (complete): " << command.str() << endl;
+				//visemes get set a specified time
+				if( seq->insert( time, (char*)(command.str().c_str()) )!=CMD_SUCCESS ) {
 					cerr << "WARNING: BodyPlannerImpl::realizeRequest(..): msgId=\""<<bpMsg.msgId<<"\": "<<
-						"Failed to insert viseme echo \""<<v->id()<<"\" @ "<<time<<endl;
+						"Failed to insert viseme \""<<v->id()<<"\" @ "<<time<<endl;
+				}
+				if( LOG_BML_VISEMES ) {
+					ostringstream echo;
+					echo.str( "echo LOG_BML_VISEMES: t" );
+					echo << time << ":\t" << command.str();
+					if( seq->insert( time, (char*)(echo.str().c_str()) )!=CMD_SUCCESS ) {
+						cerr << "WARNING: BodyPlannerImpl::realizeRequest(..): msgId=\""<<bpMsg.msgId<<"\": "<<
+							"Failed to insert viseme echo \""<<v->id()<<"\" @ "<<time<<endl;
+					}
 				}
 			}
-	    }
-	} else if( request->speech_request ) {
-		cerr << "WARNING: BodyPlannerImpl::realizeRequest(..): request->spespeech_requestech but no viseme data."<<endl;
-	}
+		} else {
+			cerr << "WARNING: BodyPlannerImpl::realizeRequest(..): request->speech_request but no viseme data."<<endl;
+		}
 	
-    // Schedule audio
-	if( request->audioPlay ) {
-		if( LOG_AUDIO || LOG_BML_VISEMES )
-			cout << "DEBUG: BodyPlannerImpl::realizeRequest(..): scheduling request->audioPlay: " << request->audioPlay << endl;
-        // schedule for later
-        if( seq->insert( (float)(audioOffset<0? 0: audioOffset), request->audioPlay ) != CMD_SUCCESS ) {
-			printf( "ERROR: BodyPlannerImpl::realizeRequest: insert audio trigger into seq FAILED, msgId=%s\n", bpMsg.msgId ); 
-	    }
+		// Schedule audio
+		if( speech_request->audioPlay.length() ) {
+			if( LOG_AUDIO || LOG_BML_VISEMES )
+				cout << "DEBUG: BodyPlannerImpl::realizeRequest(..): scheduling speech_request->audioPlay: " << speech_request->audioPlay << endl;
+			// schedule for later
+			if( seq->insert( (float)(audioOffset<0? 0: audioOffset), speech_request->audioPlay.c_str() ) != CMD_SUCCESS ) {
+				printf( "ERROR: BodyPlannerImpl::realizeRequest: insert audio trigger into seq FAILED, msgId=%s\n", bpMsg.msgId ); 
+			}
+		}
 	}
 
 	//  Schedule vrAgentBML end

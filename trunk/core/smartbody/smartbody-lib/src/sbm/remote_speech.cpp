@@ -272,45 +272,83 @@ std::vector<VisemeData*>* remote_speech::getVisemes( RequestId requestId ){
 }
 
 
-char* remote_speech::getSpeechPlayCommand( RequestId requestId, const int characterId ){
+/**
+ *  Returns the sbm command used to play the speech audio. The command is now of form:  send PlaySound <audio path>- this sends the sound directly to Unreal
+ */
+char* remote_speech::getSpeechPlayCommand( RequestId requestId, const SbmCharacter* character ){
+	// TODO: Wrap up this SASO/PlaySound specific audio command string generation
+	// into a class that can abstracted and shared between speech implementations.
+	// The SpeechInterface should only need to provide the audio filename.
 		
-	/**
-     *  Returns the sbm command used to play the speech audio. The command is now of form:  send PlaySound <audio path>- this sends the sound directly to Unreal
-     */
 	ostringstream requestIdStream; //creates an ostringstream object
 	requestIdStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
 	string requestIdStr( requestIdStream.str() );
-	string* lookup_result = soundLookUp.lookup( requestIdStr.c_str() );
-	if( lookup_result == NULL ) {
+	string* lookupResult = soundLookUp.lookup( requestIdStr.c_str() );
+	if( lookupResult == NULL ) {
 		// Error: no known sound file
 		return NULL;
 	}
-	string soundFile= *lookup_result;
+	string& soundFile = *lookupResult;
+
+	// Get bonebus character id for spatialization
 	ostringstream characterIdStream; //creates an ostringstream object
-	characterIdStream << characterId << flush; //outputs the number into the string stream and then flushes the buffer
+	if( character && character->bonebusCharacter )
+	{
+		//outputs the number into the string stream and then flushes the buffer
+		characterIdStream << (character->bonebusCharacter->m_charId) << flush;
+	}
+	else 
+	{
+		// Use 0 as a default;
+		characterIdStream << '0' << flush;
+	}
 	string characterIdStr( characterIdStream.str() );
-	soundFile= "send PlaySound "+ soundFile + " " + characterIdStr; //concatenates audio path with playsound command
-	char* retSoundFile= new char[soundFile.length() + 1];
-	strcpy(retSoundFile, soundFile.c_str());
+
+	ostringstream cmdStream;
+	cmdStream << "send PlaySound "<< soundFile << ' ' << characterIdStr; //concatenates audio path with playsound command
+	string cmd( cmdStream.str() );
+	char* retSoundFile= new char[ cmd.length() + 1];
+	strcpy(retSoundFile, cmd.c_str());
 	return (retSoundFile);
 }
 
-char* remote_speech::getSpeechStopCommand( RequestId requestId ){
-	    /**
-        *  Returns the sbm command used to stop the speech audio. The command is of form: send StopSound <audio path>
-        */
+/**
+ *  Returns the sbm command used to stop the speech audio. The command is of form: send StopSound <audio path>
+ */
+char* remote_speech::getSpeechStopCommand( RequestId requestId, const SbmCharacter* character ){
+	// TODO: Wrap up this SASO/PlaySound specific audio command string generation
+	// into a class that can abstracted and shared between speech implementations.
+	// The SpeechInterface should only need to provide the audio filename.
+
 	ostringstream requestIdStream; //creates an ostringstream object
 	requestIdStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
 	string requestIdStr( requestIdStream.str() );
-	string* lookup_result = soundLookUp.lookup( requestIdStr.c_str() );
-	if( lookup_result == NULL ) {
+	string* lookupResult = soundLookUp.lookup( requestIdStr.c_str() );
+	if( lookupResult == NULL ) {
 		// Error: no known sound file
 		return NULL;
 	}
-	string soundFile= *lookup_result;
-	soundFile= "send StopSound "+ soundFile + " 3"; //The 3 denotes the channel in the VR theatre that the sound corresponds to
-	char* retSoundFile= new char[soundFile.length() + 1];
-	strcpy(retSoundFile, soundFile.c_str());
+	string& soundFile = *lookupResult;
+
+	// Get bonebus character id for spatialization
+	ostringstream characterIdStream; //creates an ostringstream object
+	if( character && character->bonebusCharacter )
+	{
+		//outputs the number into the string stream and then flushes the buffer
+		characterIdStream << (character->bonebusCharacter->m_charId) << flush;
+	}
+	else 
+	{
+		// Use 0 as a default;
+		characterIdStream << '0' << flush;
+	}
+	string characterIdStr( characterIdStream.str() );
+
+	ostringstream cmdStream;
+	cmdStream << "send StopSound "<< soundFile << ' ' << characterIdStr; //concatenates audio path with playsound command
+	string cmd( cmdStream.str() );
+	char* retSoundFile= new char[cmd.length() + 1];
+	strcpy(retSoundFile, cmd.c_str());
 	return (retSoundFile);
 }
 
