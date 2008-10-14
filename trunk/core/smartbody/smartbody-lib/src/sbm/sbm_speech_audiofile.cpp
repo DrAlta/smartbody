@@ -54,8 +54,8 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const DOM
    // TODO: Test this function with a variety of XML documents
 
    // TODO: transcode() leaks here
-   string encoding = XMLString::transcode( node->getOwnerDocument()->getEncoding() );  // XMLStringconverts XML to cString; encoding
-   string version = XMLString::transcode( node->getOwnerDocument()->getVersion () ); //the xml version number
+   string encoding = XMLString::transcode( node->getOwnerDocument()->getXmlEncoding() );  // XMLStringconverts XML to cString; encoding
+   string version = XMLString::transcode( node->getOwnerDocument()->getXmlVersion () ); //the xml version number
 
    string xmlConverted = "<?xml version=\"" + version.substr( 0, 6 )+ "\" ";
    xmlConverted += "encoding=\"" + encoding.substr( 0, 7 ) + "\"?>";

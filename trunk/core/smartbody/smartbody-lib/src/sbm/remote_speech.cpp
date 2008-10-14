@@ -69,8 +69,8 @@ RequestId remote_speech::requestSpeechAudio( const char* agentName, const DOMNod
 	//TODO: Test this function with a variety of XML documents
 
 	
-	string encoding= XMLString::transcode(node->getOwnerDocument()->getEncoding()); //XMLStringconverts XML to cString; encoding
-	string version= XMLString::transcode(node->getOwnerDocument()->getVersion ()); //the xml version number
+	string encoding= XMLString::transcode(node->getOwnerDocument()->getXmlEncoding()); //XMLStringconverts XML to cString; encoding
+	string version= XMLString::transcode(node->getOwnerDocument()->getXmlVersion ()); //the xml version number
 	string xmlConverted="<?xml version=\"" + version.substr(0,6)+ "\" "; 
 	xmlConverted= xmlConverted+ "encoding=\"" + encoding.substr(0,7) + "\"?>";
 	xml_utils::xmlToString( node, xmlConverted ); //Xml to string recursively searches DOM tree and returns a string of the xml document
