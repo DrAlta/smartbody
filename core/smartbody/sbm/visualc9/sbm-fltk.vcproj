@@ -48,7 +48,6 @@
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				TreatWChar_tAsBuiltInType="false"
 				UsePrecompiledHeader="0"
 				AssemblerListingLocation=".\obj\sbm-fltk_debug/"
 				ObjectFile=".\obj\sbm-fltk_debug/"
@@ -73,7 +72,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="Smartbodyd.lib vhcl_d.lib wspd.lib bonebus_d.lib fltkd.lib tt_utils_d.lib elqueue_d.lib pthreadVSE2.lib xerces-c_2D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_36.lib boost_system-vc90-mt-gd-1_36.lib opengl32.lib winmm.lib comctl32.lib ws2_32.lib rpcrt4.lib"
+				AdditionalDependencies="Smartbodyd.lib vhcl_d.lib wspd.lib bonebus_d.lib fltkd.lib tt_utils_d.lib elqueue_d.lib pthreadVSE2.lib xerces-c_3D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_36.lib boost_system-vc90-mt-gd-1_36.lib opengl32.lib winmm.lib comctl32.lib ws2_32.lib rpcrt4.lib"
 				OutputFile="..\bin\sbm-fltkd.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -104,7 +103,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\activemq-cpp-2.1\vs2008-build\DebugDLL\activemq-cppd.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\xerces-c\bin\xerces-c_2_7D.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\sdl\sdl\lib\sdl.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\sdl\sdl_mixer\lib\sdl_mixer.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-gd-1_36.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc90-mt-gd-1_36.dll ..\bin&#x0D;&#x0A;copy /Y &quot;$(VSInstallDir)\VC\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\*.*&quot; ..\bin&#x0D;&#x0A;copy /Y ..\bin\default.seq .\&#x0D;&#x0A;"
+				CommandLine="copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\activemq-cpp-2.1\vs2008-build\DebugDLL\activemq-cppd.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\xerces-c\bin\xerces-c_3_0D.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\sdl\sdl\lib\sdl.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\sdl\sdl_mixer\lib\sdl_mixer.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-gd-1_36.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc90-mt-gd-1_36.dll ..\bin&#x0D;&#x0A;copy /Y &quot;$(VSInstallDir)\VC\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT\*.*&quot; ..\bin&#x0D;&#x0A;copy /Y ..\bin\default.seq .\&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -140,7 +139,6 @@
 				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;..\..\fltk;..\..\..\..\lib\vhcl\include;..\..\..\..\lib\wsp\wsp\include;..\..\..\..\lib\bonebus\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-tt\include&quot;;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB"
 				RuntimeLibrary="2"
-				TreatWChar_tAsBuiltInType="false"
 				PrecompiledHeaderFile=".\obj\sbm_release/sbm.pch"
 				AssemblerListingLocation=".\obj\sbm-fltk_release/"
 				ObjectFile=".\obj\sbm-fltk_release/"
@@ -164,7 +162,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="Smartbody.lib vhcl.lib wsp.lib fltk.lib bonebus.lib tt_utils.lib elqueue.lib pthreadVSE2.lib activemq-cpp.lib xerces-c_2.lib boost_filesystem-vc90-mt-1_36.lib boost_system-vc90-mt-1_36.lib opengl32.lib winmm.lib comctl32.lib ws2_32.lib rpcrt4.lib"
+				AdditionalDependencies="Smartbody.lib vhcl.lib wsp.lib fltk.lib bonebus.lib tt_utils.lib elqueue.lib pthreadVSE2.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_36.lib boost_system-vc90-mt-1_36.lib opengl32.lib winmm.lib comctl32.lib ws2_32.lib rpcrt4.lib"
 				OutputFile="..\bin\sbm-fltk.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -195,7 +193,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\activemq-cpp-2.1\vs2008-build\ReleaseDLL\activemq-cpp.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\xerces-c\bin\xerces-c_2_7.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\sdl\sdl\lib\sdl.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\sdl\sdl_mixer\lib\sdl_mixer.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-1_36.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc90-mt-1_36.dll ..\bin&#x0D;&#x0A;"
+				CommandLine="copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\activemq\activemq-cpp-2.1\vs2008-build\ReleaseDLL\activemq-cpp.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\xerces-c\bin\xerces-c_3_0.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\sdl\sdl\lib\sdl.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\sdl\sdl_mixer\lib\sdl_mixer.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-1_36.dll ..\bin&#x0D;&#x0A;copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc90-mt-1_36.dll ..\bin&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration

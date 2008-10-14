@@ -27,7 +27,6 @@
 #include "xercesc_utils.hpp"
 
 #include <xercesc/framework/MemBufInputSource.hpp>
-#include <xercesc/framework/Wrapper4DOMInputSource.hpp>
 
 
 #define LOG (0)
