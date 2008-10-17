@@ -43,6 +43,11 @@ MeCtQuickDraw::MeCtQuickDraw( void )	{
 	target_ref_joint_p = NULL;
 
 	interim_pose_buff_p = NULL;
+	
+	smooth = 0.0;
+	start = 0;
+	prev_time = 0.0;
+	draw_mode = DRAW_DISABLED;
 }
 
 MeCtQuickDraw::~MeCtQuickDraw( void )	{
@@ -76,9 +81,13 @@ void MeCtQuickDraw::init( SkMotion* mot_p ) {
 	
 	_motion = mot_p;
 	_motion->move_keytimes( 0 ); 
-	raw_time = _motion->duration();
+	raw_motion_dur = _motion->duration();
 
-	set_time( raw_time );
+	set_motion_duration( raw_motion_dur );
+
+	start = 0;
+	prev_time = 0.0;
+	draw_mode = DRAW_DISABLED;
 	
 //	const int n_chan = _motion->channels().size();
 	const int n_float = _motion->channels().count_floats();
@@ -112,10 +121,10 @@ void MeCtQuickDraw::init( SkMotion* mot_p ) {
 
 ///////////////////////////////////////////////////////////////////////////////////
 
-void MeCtQuickDraw::set_time( float sec )	{
+void MeCtQuickDraw::set_motion_duration( float sec )	{
 	
-	play_time = sec;
-	play_time_scale = raw_time / play_time;
+	play_dur = sec;
+	raw_motion_scale = raw_motion_dur / play_dur;
 }
 
 void MeCtQuickDraw::set_aim_offset( float p, float h, float r ) {
@@ -305,6 +314,12 @@ void MeCtQuickDraw::controller_start( void )	{
 	if( _context->channels().size() > 0 )	{
 		skeleton_ref_p = _context->channels().skeleton();
 	}
+
+	start = 1;
+	draw_mode = DRAW_READY;
+	
+//inoutdt( 1.0, 1.0 );
+//smooth = 0.0;
 }
 
 /*
@@ -339,15 +354,78 @@ else	{
 #endif
 
 	bool continuing = true;
-	continuing = t < _duration;
-
+	continuing = t < _duration; // ERR: -1.0
 	if( t < 0.0 )	{
 		return( continuing );
 	}
+	
+	float dt;
+	if( start ) {
+		start = 0;
+		dt = 0.001f;
+	}
+	else	{
+		dt = (float)(t - prev_time);
+	}
+	prev_time = t;
+
+	// increment draw_mode, and set motion_time:
+	float motion_time = 0.0;
+	if( draw_mode == DRAW_READY )	{
+		if( t > indt() )	{
+			draw_mode = DRAW_AIMING;
+		}
+	}
+	if( draw_mode == DRAW_AIMING )	{
+		float mode_time = (float)t - indt();
+		if( mode_time < play_dur )	{
+			motion_time = mode_time;
+		}
+		else	{
+			// draw_mode = DRAW_TRACKING; 
+			// return automatically, until reholster command available:
+			draw_mode = DRAW_RETURN; 
+		}
+	}
+	if( draw_mode == DRAW_TRACKING )	{
+		motion_time = play_dur;
+	}
+	if( draw_mode == DRAW_RETURN )	{
+		float mode_time = (float)t - play_dur - indt();
+		if( mode_time < play_dur )	{
+			motion_time = play_dur - mode_time;
+		}
+		else	{
+			draw_mode = DRAW_COMPLETE; 
+		}
+	}
+	if( draw_mode == DRAW_COMPLETE )	{
+		float mode_time = (float)t - 2 * play_dur - indt();
+		if( mode_time > outdt() )	{
+			draw_mode = DRAW_DISABLED; 
+		}
+	}
+	if( draw_mode == DRAW_DISABLED )	{
+		return( 0 );
+	}
+	
+	// calc lerp blend between raw motion and modified aim
+	gw_float_t raw_lerp = motion_time / play_dur;
+	if( raw_lerp > 1.0 ) raw_lerp = 1.0;
+#if 1
+	if( raw_lerp < 0.25 ) raw_lerp = 0.0;
+	else raw_lerp = ( raw_lerp - 0.25 ) * 1.3333;
+#elif 1
+	if( raw_lerp < 0.5 ) raw_lerp = 0.0;
+	else raw_lerp = ( raw_lerp - 0.5 ) * 2.0;
+#endif
+	gw_float_t lerp_power = 2.0;
+	gw_float_t lerp_value = pow( raw_lerp, lerp_power );
+
 
 #if 0 // RAW QUICKDRAW
 	_motion->apply( 
-		float( t * play_time_scale ),
+		float( motion_time * raw_motion_scale ),
 		&( frame.buffer()[0] ),  // pointer to buffer's float array
 		&_motion_chan_to_buff,
 		_play_mode, 
@@ -357,7 +435,7 @@ else	{
 #else // ADAPTED QUICKDRAW
 
 	_motion->apply( 
-		float( t * play_time_scale ),
+		float( motion_time * raw_motion_scale ),
 		interim_pose_buff_p,
 		NULL, // same order in interim_buffer
 		_play_mode, 
@@ -469,35 +547,37 @@ else	{
 //			out_q = quat_t();
 		}
 
-		gw_float_t lerp_power = 2.0;
-		gw_float_t s = t / play_time;
-		if( s > 1.0 ) s = 1.0;
-#if 1
-		if( s < 0.25 ) s = 0.0;
-		else s = ( s - 0.25 ) * 1.3333;
-#elif 1
-		if( s < 0.5 ) s = 0.0;
-		else s = ( s - 0.5 ) * 2.0;
-#endif
-
-		int i_map = _motion_chan_to_buff[ _arm_chan_indices[ j ] ];
+		gw_float_t w, x, y, z;
 #if 0
-		fbuffer[ i_map + 0 ] = (float)in_q.w();
-		fbuffer[ i_map + 1 ] = (float)in_q.x();
-		fbuffer[ i_map + 2 ] = (float)in_q.y();
-		fbuffer[ i_map + 3 ] = (float)in_q.z();
+		w = in_q.w();
+		x = in_q.x();
+		y = in_q.y();
+		z = in_q.z();
 #elif 1
-		quat_t blend_q = in_q.lerp( pow( s, lerp_power ), out_q );
-		fbuffer[ i_map + 0 ] = (float)blend_q.w();
-		fbuffer[ i_map + 1 ] = (float)blend_q.x();
-		fbuffer[ i_map + 2 ] = (float)blend_q.y();
-		fbuffer[ i_map + 3 ] = (float)blend_q.z();
+		quat_t blend_q = in_q.lerp( lerp_value, out_q );
+		w = blend_q.w();
+		x = blend_q.x();
+		y = blend_q.y();
+		z = blend_q.z();
 #else
-		fbuffer[ i_map + 0 ] = (float)out_q.w();
-		fbuffer[ i_map + 1 ] = (float)out_q.x();
-		fbuffer[ i_map + 2 ] = (float)out_q.y();
-		fbuffer[ i_map + 3 ] = (float)out_q.z();
+		w = out_q.w();
+		x = out_q.x();
+		y = out_q.y();
+		z = out_q.z();
 #endif
+		
+		int i_map = _motion_chan_to_buff[ _arm_chan_indices[ j ] ];
+		quat_t src_q( fbuffer[ i_map + 0 ], fbuffer[ i_map + 1 ], fbuffer[ i_map + 2 ], fbuffer[ i_map + 3 ] );
+
+		quat_t hard_q( w, x, y, z );
+#define SMOOTH_RATE_REF (30.0f)
+		float s = (float)(0.01 + ( 1.0 - powf( smooth, dt * SMOOTH_RATE_REF ) ) * 0.99 );
+		quat_t smooth_q = src_q.lerp( s, hard_q );
+		
+		fbuffer[ i_map + 0 ] = (float)smooth_q.w();
+		fbuffer[ i_map + 1 ] = (float)smooth_q.x();
+		fbuffer[ i_map + 2 ] = (float)smooth_q.y();
+		fbuffer[ i_map + 3 ] = (float)smooth_q.z();
 	}
 
 #endif // ADAPTED QUICKDRAW

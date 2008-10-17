@@ -91,7 +91,8 @@ void MeCtStepTurn::init( SkMotion* mot_p ) {
 	_right_motion->ref();
 	_motion = _left_motion;
 
-	set_time( raw_time );
+//	set_time( raw_time );
+	set_duration( raw_time );
 	set_heading_local( raw_angle );
 	
 	SkChannelArray& mchan_arr = mot_p->channels();
@@ -275,6 +276,16 @@ void MeCtStepTurn::update_action_params( void )	{
 }
 
 void MeCtStepTurn::set_time( float sec )	{
+	
+	static int once = 1;
+	if( once )	{
+		once = 0;
+		printf( "MeCtStepTurn::set_time NOTE: CALL DEPRECATED: use set_duration()\n" );
+	}
+	set_duration( sec );
+}
+
+void MeCtStepTurn::set_duration( float sec )	{
 	
 	timing_mode = TASK_TIME;
 	turn_time = sec;

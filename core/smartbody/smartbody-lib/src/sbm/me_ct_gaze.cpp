@@ -1020,7 +1020,7 @@ bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 #endif
 G_debug = 0;
 
-#if 1
+#if 0
 //euler_t e = Q_out; if( i == 6 ) e.print();
 SkJointName n = _channels.name( i );
 euler_t e = Q_out;
