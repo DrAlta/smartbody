@@ -68,9 +68,17 @@ Testing sequence:
 class MeCtQuickDraw : public MeController	{ 
 
 	private:
-		enum aim_coord_enum_set	{
-			AIM_LOCAL,
-			AIM_WORLD
+//		enum aim_coord_enum_set	{
+//			AIM_LOCAL,
+//			AIM_WORLD
+//		};
+		enum draw_mode_enum_set	{
+			DRAW_DISABLED,
+			DRAW_READY,
+			DRAW_AIMING,
+			DRAW_TRACKING,
+			DRAW_RETURN,
+			DRAW_COMPLETE
 		};
 		enum arm_joint_enum_set	{
 			ARM_JOINT_SHOULDER,
@@ -101,11 +109,13 @@ class MeCtQuickDraw : public MeController	{
 		char*			target_ref_joint_str;
 		SkJoint*		target_ref_joint_p;
 
-		float raw_time;
-		float play_time;
-		float play_time_scale;
-
-		// TODO: include rot offset from wrist
+		float smooth;
+		int start;
+		double prev_time;
+		float raw_motion_dur;
+		float raw_motion_scale;
+		float play_dur;
+		int draw_mode;
 
 		quat_t   l_final_hand_in_body_rot;
 		quat_t   l_wrist_offset_rot;
@@ -129,7 +139,8 @@ class MeCtQuickDraw : public MeController	{
     		MeController::init() is automatically called. */
 		void init( SkMotion* mot_p );
 
-		void set_time( float sec );
+		void set_motion_duration( float sec );
+		void set_smooth( float sm ) { smooth = sm; }
 		void set_aim_offset( float p, float h, float r );
 
 		// Target API

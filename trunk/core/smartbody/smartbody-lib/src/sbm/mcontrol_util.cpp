@@ -2338,7 +2338,7 @@ int mcu_stepturn_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				( time_type[ 0 ] == 'd' )||( time_type[ 0 ] == 'D' )||
 				( time_type[ 0 ] == 't' )||( time_type[ 0 ] == 'T' ) 
 			)	{
-				step_p->set_time( timing );
+				step_p->set_duration( timing );
 			}
 			else	{
 				step_p->set_speed( timing );
@@ -2367,7 +2367,7 @@ int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		MeCtQuickDraw *qdraw_p= mcu_p->quickdraw_ctrl_map.lookup( ctrl_name );
 		if( qdraw_p ) {
 			float dur = args.read_float();
-			qdraw_p->set_time( dur );
+			qdraw_p->set_motion_duration( dur );
 
 			char *target_type = args.read_token(); // local or world
 			if( ( target_type[ 0 ] == 'p' )||( target_type[ 0 ] == 'P' ) )	{

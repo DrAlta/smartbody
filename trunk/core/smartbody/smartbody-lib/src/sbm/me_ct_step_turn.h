@@ -144,6 +144,7 @@ class MeCtStepTurn : public MeController	{
 		void init( SkMotion* mot_p );
 
 		void set_time( float sec );
+		void set_duration( float sec );
 		void set_speed( float dps );
 		
 		void set_heading_local( float h );
