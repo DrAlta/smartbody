@@ -47,6 +47,10 @@ MeCtQuickDraw::MeCtQuickDraw( void )	{
 	smooth = 0.0;
 	start = 0;
 	prev_time = 0.0;
+	raw_motion_dur = 0.0;
+	raw_motion_scale = 0.0;
+	play_dur = 0.0;
+	track_dur = 0.0;
 	draw_mode = DRAW_DISABLED;
 }
 
@@ -149,6 +153,10 @@ void MeCtQuickDraw::set_target_joint( float x, float y, float z, SkJoint* ref_jo
 	set_target_point( x, y, z );
 	set_target_coord_joint( ref_joint_p );
 }
+
+//void MeCtQuickDraw::set_track_duration( float dur ) { 
+//	track_dur = dur; 
+//}
 
 ///////////////////////////////////////////////////////////////////////////////////
 
@@ -382,16 +390,24 @@ else	{
 			motion_time = mode_time;
 		}
 		else	{
-			// draw_mode = DRAW_TRACKING; 
+			draw_mode = DRAW_TRACKING; 
 			// return automatically, until reholster command available:
-			draw_mode = DRAW_RETURN; 
+			//draw_mode = DRAW_RETURN; 
 		}
 	}
 	if( draw_mode == DRAW_TRACKING )	{
 		motion_time = play_dur;
+		if( track_dur >= 0.0 )	{
+			float mode_time = (float)t - play_dur - indt();
+			if( mode_time > track_dur ) {
+				reholster_time = (float)t;
+				draw_mode = DRAW_RETURN; 
+			}
+		}
 	}
 	if( draw_mode == DRAW_RETURN )	{
-		float mode_time = (float)t - play_dur - indt();
+//		float mode_time = (float)t - play_dur - indt();
+		float mode_time = (float)t - reholster_time;
 		if( mode_time < play_dur )	{
 			motion_time = play_dur - mode_time;
 		}
@@ -400,7 +416,8 @@ else	{
 		}
 	}
 	if( draw_mode == DRAW_COMPLETE )	{
-		float mode_time = (float)t - 2 * play_dur - indt();
+//		float mode_time = (float)t - 2 * play_dur - indt();
+		float mode_time = (float)t - reholster_time - play_dur;
 		if( mode_time > outdt() )	{
 			draw_mode = DRAW_DISABLED; 
 		}

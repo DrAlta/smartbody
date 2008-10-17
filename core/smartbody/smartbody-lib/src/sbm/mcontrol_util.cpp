@@ -2366,6 +2366,7 @@ int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		char *ctrl_name = args.read_token();
 		MeCtQuickDraw *qdraw_p= mcu_p->quickdraw_ctrl_map.lookup( ctrl_name );
 		if( qdraw_p ) {
+#if 0
 			float dur = args.read_float();
 			qdraw_p->set_motion_duration( dur );
 
@@ -2376,8 +2377,61 @@ int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				float z = args.read_float();
 				qdraw_p->set_target_point( x, y, z );
 			}
-
-			return( CMD_SUCCESS );
+#endif
+			char *qdraw_cmd = args.read_token();
+			if( strcmp( qdraw_cmd, "target" ) == 0 )	{
+			
+				char *target_type = args.read_token();
+				if( strcmp( target_type, "point" ) == 0 )	{
+					float x = args.read_float();
+					float y = args.read_float();
+					float z = args.read_float();
+					qdraw_p->set_target_point( x, y, z );
+					return( CMD_SUCCESS );
+				}
+#if 0
+				if( strcmp( target_type, "joint" ) == 0 )	{
+					float x = args.read_float();
+					float y = args.read_float();
+					float z = args.read_float();
+					char* joint_name = args.read_token();
+					qdraw_p->set_target_joint( x, y, z, joint_name );
+					return( CMD_SUCCESS );
+				}
+#endif
+			}
+			if( strcmp( qdraw_cmd, "aimoff" ) == 0 )	{
+				float p = args.read_float();
+				float h = args.read_float();
+				float r = args.read_float();
+				qdraw_p->set_aim_offset( p, h, r );
+				return( CMD_SUCCESS );
+			}
+			if( strcmp( qdraw_cmd, "dur" ) == 0 )	{
+				float dur = args.read_float();
+				qdraw_p->set_motion_duration( dur );
+				return( CMD_SUCCESS );
+			}
+			if( strcmp( qdraw_cmd, "smooth" ) == 0 )	{
+				float sm = args.read_float();
+				qdraw_p->set_smooth( sm );
+				return( CMD_SUCCESS );
+			}
+			if( strcmp( qdraw_cmd, "track" ) == 0 )	{
+				float dur = args.read_float();
+				qdraw_p->set_track_duration( dur );
+				return( CMD_SUCCESS );
+			}
+			if( strcmp( qdraw_cmd, "persist" ) == 0 )	{
+				qdraw_p->set_track_duration( -1.0 );
+				return( CMD_SUCCESS );
+			}
+			if( strcmp( qdraw_cmd, "reholster" ) == 0 )	{
+				qdraw_p->set_track_duration( 0.0 );
+				return( CMD_SUCCESS );
+			}
+			printf( "mcu_quickdraw_controller_func ERR: command '%s' NOT RECOGNIZED\n", qdraw_cmd );
+			return( CMD_NOT_FOUND );
 		}
 	}
 	return( CMD_FAILURE );

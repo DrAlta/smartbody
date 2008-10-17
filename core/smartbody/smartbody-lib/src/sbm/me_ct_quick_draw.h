@@ -43,6 +43,7 @@ SBM test commands:
         quickdraw <> <dur-sec> local|world <pitch-deg> <heading-deg> <roll-deg>
 #        quickdraw <> L|R <sec|dps> local|world <pitch-deg> <heading-deg> <roll-deg>
 
+
  * The input drawing motion can be any direction, any reasonable magnitude.
  * Tokens 'dur' and 'time' are synonymous.
 
@@ -115,6 +116,8 @@ class MeCtQuickDraw : public MeController	{
 		float raw_motion_dur;
 		float raw_motion_scale;
 		float play_dur;
+		float track_dur;
+		float reholster_time;
 		int draw_mode;
 
 		quat_t   l_final_hand_in_body_rot;
@@ -147,7 +150,11 @@ class MeCtQuickDraw : public MeController	{
 		void set_target_point( float x, float y, float z );
 		void set_target_coord_joint( SkJoint* joint_p );
 		void set_target_joint( float x, float y, float z, SkJoint* ref_joint_p = NULL );
-
+		
+		// Track-dur: if less than 0.0, track indefinitely
+		void set_track_duration( float dur ) { track_dur = dur; }
+		void set_reholster( void ) { set_track_duration( 0.0 ); }
+		
 		/*! Set the play mode, default is linear */
 		void play_mode ( SkMotion::InterpType it ) { _play_mode=it; }
 
