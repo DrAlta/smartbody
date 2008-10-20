@@ -255,7 +255,7 @@ void prune_schedule( MeCtScheduler2* sched,
 					 //////  Higher priority controllers....
 					 MeCtGaze**      &gaze_key_cts,
 					 MeCtSimpleNod*  &nod_ct,
-					 MeCtMotion*     &motion_ct,
+					 MeController*   &motion_ct,
 					 MeCtPose*       &pose_ct
 ) {
 	if( LOG_CONTROLLER_TREE_PRUNING ) cout << "DEBUG: sbm_character.cpp prune_schedule(..): Pruning schedule \""<<sched->name()<<"\" from time "<<time<<endl;
@@ -353,7 +353,7 @@ void prune_schedule( MeCtScheduler2* sched,
 							gaze_key2_cts[key] = NULL;
 
 						MeCtSimpleNod* nod2_ct = NULL;
-						MeCtMotion*    motion2_ct = NULL;
+						MeController*  motion2_ct = NULL;
 						MeCtPose*      pose2_ct = NULL;
 						prune_schedule( sched_ct, time_offset, posture_sched_p, gaze_key2_cts, nod2_ct, motion2_ct, pose2_ct );
 
@@ -404,12 +404,12 @@ void prune_schedule( MeCtScheduler2* sched,
 					}
 					if( LOG_CONTROLLER_TREE_PRUNING ) cout << ( in_use? "Not Pruned." : "Pruned!" ) << endl;
 
-				} else if( anim_ct_type == MeCtMotion::type_name ) {
-					if( LOG_CONTROLLER_TREE_PRUNING ) cout << "DEBUG: testing MeCtMotion for pruning... ";
+				} else if( anim_ct_type == MeCtMotion::type_name || anim_ct_type == MeCtQuickDraw::type_name ) {
+					if( LOG_CONTROLLER_TREE_PRUNING ) cout << "DEBUG: testing "<<anim_ct_type<<" for pruning... ";
 					if( motion_ct || pose_ct ) {
 						in_use = false;
 					} else {
-						motion_ct = (MeCtMotion*)anim_source;
+						motion_ct = anim_source;
 					}
 					if( LOG_CONTROLLER_TREE_PRUNING ) cout << ( in_use? "Not Pruned." : "Pruned!" ) << endl;
 
@@ -460,7 +460,7 @@ int SbmCharacter::prune_controller_tree() {
 	for( int key=0; key<MeCtGaze::NUM_GAZE_KEYS; ++key )
 		gaze_key_cts[key] = NULL;
 	MeCtSimpleNod* nod_ct    = NULL;
-	MeCtMotion*    motion_ct = NULL;
+	MeController*  motion_ct = NULL;  // also covers quickdraw
 	MeCtPose*      pose_ct   = NULL;
 
 	// Traverse the controller tree from highest priority down, most recent to earliest

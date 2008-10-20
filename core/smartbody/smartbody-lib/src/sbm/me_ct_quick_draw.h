@@ -161,6 +161,18 @@ class MeCtQuickDraw : public MeController	{
 		/*! Returns the current play mode */
 		SkMotion::InterpType play_mode () const { return _play_mode; }
 
+		/**
+		 *  Return initial blend time, when body can blend to the source animation's first frame.
+		 *  Defaults to 1/3rd of a second.
+		 */
+		float indt() { return 0.3f; }
+
+		/**
+		 *  Return final blend time, when body can blend from the source animation's first frame.
+		 *  Defaults to 1/3rd of a second.
+		 */
+		float outdt() { return 0.3f; }
+
 	private:
 		quat_t get_final_joint_rot( SkMotion* mot_p, char *joint_name );
 		joint_state_t capture_joint_state( SkJoint *joint_p );
