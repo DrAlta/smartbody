@@ -43,6 +43,7 @@
 ////// XML ATTRIBUTES
 const XMLCh ATTR_ROLL[]         = L"roll";
 const XMLCh ATTR_ANIM[]         = L"anim";
+const XMLCh ATTR_TRACK_DUR[]    = L"track-duration";
 
 
 char* DEFAULT_QUICKDRAW_ANIM	= "AdultM_FastDraw001";
@@ -88,9 +89,22 @@ BehaviorRequest* BML::parse_bml_quickdraw( DOMElement* elem, SynchPoints& tms, B
 		return NULL;
 	}
 
+	float track_duration = -1;  // indefinite tracking by default
+	const XMLCh* attrTrackDur = elem->getAttribute( ATTR_TRACK_DUR );
+	if( attrTrackDur && XMLString::stringLen( attrTrackDur )>0 ) {
+		char* temp_ascii = XMLString::transcode( attrTrackDur );
+		string parse_buffer( temp_ascii );
+		istringstream parser( parse_buffer );
+		if( !( parser >> track_duration ) ) {
+			wcerr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<<ATTR_TRACK_DUR<<"=\""<<attrTrackDur<<"\" is not a valid number." << endl;
+		}
+		XMLString::release( &temp_ascii );
+	}
+
 	MeCtQuickDraw* qdraw_ct = new MeCtQuickDraw();
 	qdraw_ct->init( anim );
 	qdraw_ct->set_target_joint( 0, 0, 0, const_cast<SkJoint*>(joint) );
+	qdraw_ct->set_track_duration( track_duration );
 
 	// Store reference to controller to later return gun to holster
 	MeController* ct = mcu->controller_map.lookup( STORED_CONTROLLER_KEY );
