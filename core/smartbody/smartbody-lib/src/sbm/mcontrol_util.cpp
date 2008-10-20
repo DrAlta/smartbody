@@ -2356,8 +2356,16 @@ int mcu_stepturn_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 }
 
 /*
-	quickdraw <> <dur-sec> point <x y z>
-#	quickdraw <> <dur-sec> point <x y z> [<joint>]
+X	quickdraw <> <dur-sec> point <x y z>
+X	quickdraw <> <dur-sec> point <x y z> [<joint>]
+
+	quickdraw <> target point <x y z>
+	quickdraw <> aimoff <p h r>
+	quickdraw <> dur <draw-dur>
+#	quickdraw <> dur <draw-dur> [<withdraw-dur>]
+	quickdraw <> smooth <basis>
+	quickdraw <> track <tracking-dur>
+	quickdraw <> persist | reholster
 */
 
 int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {

@@ -115,7 +115,7 @@ class MeCtQuickDraw : public MeController	{
 		double prev_time;
 		float raw_motion_dur;
 		float raw_motion_scale;
-		float play_dur;
+		float play_motion_dur;
 		float track_dur;
 		float reholster_time;
 		int draw_mode;
