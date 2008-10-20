@@ -49,7 +49,7 @@ MeCtQuickDraw::MeCtQuickDraw( void )	{
 	prev_time = 0.0;
 	raw_motion_dur = 0.0;
 	raw_motion_scale = 0.0;
-	play_dur = 0.0;
+	play_motion_dur = 0.0;
 	track_dur = 0.0;
 	draw_mode = DRAW_DISABLED;
 }
@@ -127,8 +127,8 @@ void MeCtQuickDraw::init( SkMotion* mot_p ) {
 
 void MeCtQuickDraw::set_motion_duration( float sec )	{
 	
-	play_dur = sec;
-	raw_motion_scale = raw_motion_dur / play_dur;
+	play_motion_dur = sec;
+	raw_motion_scale = raw_motion_dur / play_motion_dur;
 }
 
 void MeCtQuickDraw::set_aim_offset( float p, float h, float r ) {
@@ -386,7 +386,7 @@ else	{
 	}
 	if( draw_mode == DRAW_AIMING )	{
 		float mode_time = (float)t - indt();
-		if( mode_time < play_dur )	{
+		if( mode_time < play_motion_dur )	{
 			motion_time = mode_time;
 		}
 		else	{
@@ -396,9 +396,9 @@ else	{
 		}
 	}
 	if( draw_mode == DRAW_TRACKING )	{
-		motion_time = play_dur;
+		motion_time = play_motion_dur;
 		if( track_dur >= 0.0 )	{
-			float mode_time = (float)t - play_dur - indt();
+			float mode_time = (float)t - play_motion_dur - indt();
 			if( mode_time > track_dur ) {
 				reholster_time = (float)t;
 				draw_mode = DRAW_RETURN; 
@@ -406,18 +406,18 @@ else	{
 		}
 	}
 	if( draw_mode == DRAW_RETURN )	{
-//		float mode_time = (float)t - play_dur - indt();
+//		float mode_time = (float)t - play_motion_dur - indt();
 		float mode_time = (float)t - reholster_time;
-		if( mode_time < play_dur )	{
-			motion_time = play_dur - mode_time;
+		if( mode_time < play_motion_dur )	{
+			motion_time = play_motion_dur - mode_time;
 		}
 		else	{
 			draw_mode = DRAW_COMPLETE; 
 		}
 	}
 	if( draw_mode == DRAW_COMPLETE )	{
-//		float mode_time = (float)t - 2 * play_dur - indt();
-		float mode_time = (float)t - reholster_time - play_dur;
+//		float mode_time = (float)t - 2 * play_motion_dur - indt();
+		float mode_time = (float)t - reholster_time - play_motion_dur;
 		if( mode_time > outdt() )	{
 			draw_mode = DRAW_DISABLED; 
 		}
@@ -427,7 +427,7 @@ else	{
 	}
 	
 	// calc lerp blend between raw motion and modified aim
-	gw_float_t raw_lerp = motion_time / play_dur;
+	gw_float_t raw_lerp = motion_time / play_motion_dur;
 	if( raw_lerp > 1.0 ) raw_lerp = 1.0;
 #if 1
 	if( raw_lerp < 0.25 ) raw_lerp = 0.0;
@@ -610,6 +610,9 @@ SkChannelArray& MeCtQuickDraw::controller_channels( void )	{
 double MeCtQuickDraw::controller_duration( void ) {
 
 // THIS GETS CALLED PRIOR TO controller_start().
+	if( ( play_motion_dur > 0.0 ) && ( track_dur >= 0.0 ) )	{
+		return( indt() + 2.0 * play_motion_dur + track_dur + outdt() );
+	}
 	return( -1.0 );
 }
 
