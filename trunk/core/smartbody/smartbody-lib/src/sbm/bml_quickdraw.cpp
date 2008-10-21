@@ -54,9 +54,6 @@ using namespace BML;
 using namespace xml_utils;
 
 
-const char* const STORED_CONTROLLER_KEY = "STORED_CONTROLLER_KEY";
-
-
 BehaviorRequest* BML::parse_bml_quickdraw( DOMElement* elem, SynchPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
 
@@ -105,17 +102,6 @@ BehaviorRequest* BML::parse_bml_quickdraw( DOMElement* elem, SynchPoints& tms, B
 	qdraw_ct->init( anim );
 	qdraw_ct->set_target_joint( 0, 0, 0, const_cast<SkJoint*>(joint) );
 	qdraw_ct->set_track_duration( track_duration );
-
-	// Store reference to controller to later return gun to holster
-	MeController* ct = mcu->controller_map.lookup( STORED_CONTROLLER_KEY );
-	if( ct ) {
-		// Remove previous first
-		mcu->controller_map.remove( STORED_CONTROLLER_KEY );
-		ct->unref();
-		ct = NULL;
-	}
-	mcu->controller_map.insert( STORED_CONTROLLER_KEY, qdraw_ct );
-	qdraw_ct->ref();
 
 	return new MeControllerRequest( MeControllerRequest::MOTION, qdraw_ct, tms.start, tms.ready, tms.stroke, tms.relax, tms.end );
 }

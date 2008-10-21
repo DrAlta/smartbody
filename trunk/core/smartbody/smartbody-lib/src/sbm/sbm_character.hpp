@@ -139,6 +139,8 @@ public:
 	void inspect_skeleton_local_transform( SkJoint* joint_p, int depth = 0 );
 	void inspect_skeleton_world_transform( SkJoint* joint_p, int depth = 0 );
 
+	int reholster_quickdraw( mcuCBHandle *mcu_p );  // HACK to initiate reholster on all QuickDraw controllers
+
 	//////////////////////////////////////////
 	// Static command handlers
 
