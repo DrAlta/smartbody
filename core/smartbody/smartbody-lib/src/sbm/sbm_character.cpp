@@ -463,10 +463,19 @@ int SbmCharacter::prune_controller_tree() {
 	MeController*  motion_ct = NULL;  // also covers quickdraw
 	MeCtPose*      pose_ct   = NULL;
 
+	
+
 	// Traverse the controller tree from highest priority down, most recent to earliest
 	prune_schedule( head_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
 	prune_schedule( gaze_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
 	prune_schedule( motion_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
+
+	// For the posture track, ignore prior controllers, as they should never be used to mark a posture as unused
+	for( int key=0; key<MeCtGaze::NUM_GAZE_KEYS; ++key )
+		gaze_key_cts[key] = NULL;
+	nod_ct    = NULL;
+	motion_ct = NULL;  // also covers quickdraw
+	pose_ct   = NULL;
 	prune_schedule( posture_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
 
 	delete[] gaze_key_cts;
@@ -645,6 +654,67 @@ void SbmCharacter::inspect_skeleton_world_transform( SkJoint* joint_p, int depth
 	}
 }
 
+// HACK to initiate reholster on all QuickDraw controllers
+int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
+	const double now = mcu_p->time;
+	double max_blend_dur = -1;
+
+	MeCtScheduler2::track_iterator it = motion_sched_p->begin();
+	MeCtScheduler2::track_iterator end = motion_sched_p->end();
+
+	while( it != end ) {
+		MeController* anim_ct = it->animation_ct();
+		if( anim_ct ) {
+			string anim_ct_type( anim_ct->controller_type() );
+			if( anim_ct_type==MeCtQuickDraw::type_name ) {
+				MeCtQuickDraw* qdraw_ct = (MeCtQuickDraw*)anim_ct;
+
+				// Initiate reholster
+				qdraw_ct->set_reholster();
+
+				// Attempt to schedule blend out
+				MeCtUnary* blending_ct = it->blending_ct();
+				if(    blending_ct
+					&& strcmp(blending_ct->controller_type(), MeCtBlend::CONTROLLER_TYPE ) )
+				{
+					// TODO: account for time scaling of motion_duration
+					double blend_out_start = now + qdraw_ct->get_motion_duration();
+					float  blend_out_dur   = qdraw_ct->outdt();
+					double blend_out_end   = blend_out_start + blend_out_dur;
+					float  blend_spline_tanget = -1/blend_out_dur;
+
+					MeCtBlend* blend_ct = (MeCtBlend*)blending_ct;
+					MeSpline1D& spline = blend_ct->blend_curve();
+					// TODO: Don't assume we're starting at 1, may already be less than and already blending out.
+					spline.make_cusp( blend_out_start,1,  0,1, blend_spline_tanget,1 );
+					MeSpline1D::Knot* knot = spline.make_cusp( blend_out_end,  0,  blend_spline_tanget,1, 0,1 );
+
+					// TODO: delete following knots
+
+					if( blend_out_dur > max_blend_dur )
+						max_blend_dur = blend_out_end;
+				}
+			}
+		}
+
+		++it;
+	}
+
+////  Won't compile, and I'm tired:
+////  Error	1	error C2296: '<<' : illegal, left operand has type 'std::ostringstream (__cdecl *)(void)'
+//	if( max_blend_dur >= 0 ) {
+//		// schedule prune
+//		max_blend_dur += 1;  // small buffer period
+//
+//		ostringstream out();
+//		out << "char " << name << " prune";
+//		mcu_p->execute_later( out.str().c_str(), max_blend_dur );
+//	}
+
+	return CMD_SUCCESS;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////
 
 int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
@@ -743,6 +813,8 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return mcu_character_bone_position_cmd( char_name.c_str(), args, mcu_p );
 	} else if( char_cmd=="remove" ) {
 		return SbmCharacter::remove_from_scene( char_name.c_str() );
+	} else if( char_cmd=="reholster" ) {
+		return character->reholster_quickdraw( mcu_p );
 	} else {
 		return CMD_NOT_FOUND;
 	}

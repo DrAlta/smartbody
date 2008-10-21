@@ -35,5 +35,4 @@ namespace BML {
 	BML::BehaviorRequest* parse_bml_quickdraw( DOMElement* elem, BML::SynchPoints& tms, BML::BmlRequestPtr request, mcuCBHandle *mcu );
 };
 
-
 #endif // BML_QUICKDRAW_HPP

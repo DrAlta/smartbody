@@ -143,6 +143,8 @@ class MeCtQuickDraw : public MeController	{
 		void init( SkMotion* mot_p );
 
 		void set_motion_duration( float sec );
+		float get_motion_duration() { return play_motion_dur; };
+
 		void set_smooth( float sm ) { smooth = sm; }
 		void set_aim_offset( float p, float h, float r );
 
