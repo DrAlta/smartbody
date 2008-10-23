@@ -578,14 +578,29 @@ void MeCtGaze::inspect_skeleton_world_transform( SkJoint* joint_p, int depth )	{
 void MeCtGaze::update_skeleton_gmat( void )	{
 
 	if( skeleton_ref_p )	{
-		SkJoint* skull_joint_p = skeleton_ref_p->search_joint( "skullbase" );
-		skull_joint_p->update_gmat_up();
+		SkJoint* joint_p = skeleton_ref_p->search_joint( "skullbase" );
+		if( joint_p ) {
+			joint_p->update_gmat_up();
+		}
+		else	{
+			fprintf( stderr, "MeCtGaze::update_skeleton_gmat ERR: joint 'skullbase' NOT FOUND in skeleton\n" );
+		}
 
-		SkJoint* eye_joint_p = skeleton_ref_p->search_joint( "eyeball_left" );
-		eye_joint_p->update_gmat_up( skull_joint_p );
+		joint_p = skeleton_ref_p->search_joint( "eyeball_left" );
+		if( joint_p ) {
+			joint_p->update_gmat_up();
+		}
+		else	{
+			fprintf( stderr, "MeCtGaze::update_skeleton_gmat ERR: joint 'eyeball_left' NOT FOUND in skeleton\n" );
+		}
 
-		eye_joint_p = skeleton_ref_p->search_joint( "eyeball_right" );
-		eye_joint_p->update_gmat_up( skull_joint_p );
+		joint_p = skeleton_ref_p->search_joint( "eyeball_right" );
+		if( joint_p ) {
+			joint_p->update_gmat_up();
+		}
+		else	{
+			fprintf( stderr, "MeCtGaze::update_skeleton_gmat ERR: joint 'eyeball_right' NOT FOUND in skeleton\n" );
+		}
 	}
 	else	{
 		fprintf( stderr, "MeCtGaze::update_skeleton_gmat ERR: skeleton NOT FOUND\n" );
