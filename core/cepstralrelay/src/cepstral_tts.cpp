@@ -51,7 +51,7 @@ std::string fpathout;
 DOMElement * rootElem;
 DOMElement * wordElement;
 DOMImplementation * impl;
-xercesc_2_7::DOMDocument * doc;
+DOMDocument * doc;
 std::map<std::string, std::string> phonemeToViseme;
 float word_end = 0;
 
@@ -292,8 +292,8 @@ std::string cepstral_tts::tts( const char * text, const char * file_name )
 
 
 all_done:
-   DOMWriter * theSerializer = ((DOMImplementationLS *)impl)->createDOMWriter();
-   XMLCh * xml_result = theSerializer->writeToString( *rootElem );
+   DOMLSSerializer* theSerializer = DOMImplementation::getImplementation()->createLSSerializer();
+   XMLCh * xml_result = theSerializer->writeToString( rootElem );
    char * result = XMLString::transcode( xml_result );
    theSerializer->release();
 
