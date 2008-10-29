@@ -44,7 +44,6 @@
 				AdditionalIncludeDirectories="include;..\..\lib\vhcl\include;&quot;..\..\lib\vhmsg\vhmsg-tt\include&quot;;&quot;..\..\lib\xerces-c\include&quot;;..\..\lib\cepstral\sdk\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="3"
-				TreatWChar_tAsBuiltInType="false"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
 				DebugInformationFormat="4"
@@ -61,7 +60,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="vhcl_d.lib tt_utils_d.lib elqueue_d.lib pthreadVSE2.lib activemq-cppd.lib xerces-c_2D.lib swift.lib winmm.lib rpcrt4.lib ws2_32.lib"
+				AdditionalDependencies="vhcl_d.lib tt_utils_d.lib elqueue_d.lib pthreadVSE2.lib activemq-cppd.lib xerces-c_3D.lib swift.lib winmm.lib rpcrt4.lib ws2_32.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.exe"
 				AdditionalLibraryDirectories="..\..\lib\vhcl\lib;&quot;..\..\lib\vhmsg\vhmsg-tt\lib&quot;;&quot;..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\lib\pthreads\lib;&quot;..\..\lib\activemq\activemq-cpp-2.1\vs2008-build\DebugDLL&quot;;&quot;..\..\lib\xerces-c\lib&quot;;..\..\lib\cepstral\sdk\lib\windows"
 				GenerateDebugInformation="true"
@@ -91,7 +90,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y &quot;$(TargetPath)&quot; .&#x0D;&#x0A;copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp-2.1\vs2008-build\DebugDLL\activemq-cppd.dll .&#x0D;&#x0A;copy /Y ..\..\lib\xerces-c\bin\xerces-c_2_7D.dll .&#x0D;&#x0A;copy /Y ..\..\lib\cepstral\bin\swift.dll .&#x0D;&#x0A;copy /Y ..\..\lib\cepstral\bin\ceplang_en.dll .&#x0D;&#x0A;copy /Y ..\..\lib\cepstral\bin\ceplex_us.dll .&#x0D;&#x0A;"
+				CommandLine="copy /Y &quot;$(TargetPath)&quot; .&#x0D;&#x0A;copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp-2.1\vs2008-build\DebugDLL\activemq-cppd.dll .&#x0D;&#x0A;copy /Y ..\..\lib\xerces-c\bin\xerces-c_3_0D.dll .&#x0D;&#x0A;copy /Y ..\..\lib\cepstral\bin\swift.dll .&#x0D;&#x0A;copy /Y ..\..\lib\cepstral\bin\ceplang_en.dll .&#x0D;&#x0A;copy /Y ..\..\lib\cepstral\bin\ceplex_us.dll .&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -125,7 +124,6 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				EnableEnhancedInstructionSet="2"
-				TreatWChar_tAsBuiltInType="false"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
 				DebugInformationFormat="0"
@@ -142,7 +140,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="vhcl.lib tt_utils.lib elqueue.lib pthreadVSE2.lib activemq-cpp.lib xerces-c_2.lib swift.lib winmm.lib rpcrt4.lib ws2_32.lib"
+				AdditionalDependencies="vhcl.lib tt_utils.lib elqueue.lib pthreadVSE2.lib activemq-cpp.lib xerces-c_3.lib swift.lib winmm.lib rpcrt4.lib ws2_32.lib"
 				AdditionalLibraryDirectories="..\..\lib\vhcl\lib;&quot;..\..\lib\vhmsg\vhmsg-tt\lib&quot;;&quot;..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\lib\pthreads\lib;&quot;..\..\lib\activemq\activemq-cpp-2.1\vs2008-build\ReleaseDLL&quot;;&quot;..\..\lib\xerces-c\lib&quot;;..\..\lib\cepstral\sdk\lib\windows"
 				GenerateDebugInformation="false"
 				SubSystem="1"
@@ -172,7 +170,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y &quot;$(TargetPath)&quot; .&#x0D;&#x0A;copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp-2.1\vs2008-build\ReleaseDLL\activemq-cpp.dll .&#x0D;&#x0A;copy /Y ..\..\lib\xerces-c\bin\xerces-c_2_7.dll .&#x0D;&#x0A;copy /Y ..\..\lib\cepstral\bin\swift.dll .&#x0D;&#x0A;copy /Y ..\..\lib\cepstral\bin\ceplang_en.dll .&#x0D;&#x0A;copy /Y ..\..\lib\cepstral\bin\ceplex_us.dll .&#x0D;&#x0A;"
+				CommandLine="copy /Y &quot;$(TargetPath)&quot; .&#x0D;&#x0A;copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp-2.1\vs2008-build\ReleaseDLL\activemq-cpp.dll .&#x0D;&#x0A;copy /Y ..\..\lib\xerces-c\bin\xerces-c_3_0.dll .&#x0D;&#x0A;copy /Y ..\..\lib\cepstral\bin\swift.dll .&#x0D;&#x0A;copy /Y ..\..\lib\cepstral\bin\ceplang_en.dll .&#x0D;&#x0A;copy /Y ..\..\lib\cepstral\bin\ceplex_us.dll .&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
