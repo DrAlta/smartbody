@@ -518,7 +518,7 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
            // XMLCh * id = XMLString::transcode( "id" );
             XMLCh * file_path = XMLString::transcode( player_file_name );
 
-            xercesc_2_7::DOMDocument* doc = impl->createDocument(
+            DOMDocument* doc = impl->createDocument(
                0,                    // root element namespace URI.
                X( "speak" ),         // root element name
                0 );                  // document type object (DTD).
@@ -631,8 +631,8 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
                }*/
             }
 
-            DOMWriter * theSerializer = ((DOMImplementationLS *)impl)->createDOMWriter();
-            XMLCh * xml_result = theSerializer->writeToString( *rootElem );
+            DOMLSSerializer* theSerializer = DOMImplementation::getImplementation()->createLSSerializer();
+            XMLCh * xml_result = theSerializer->writeToString( rootElem );
             result = XMLString::transcode( xml_result );
             theSerializer->release();
          }
