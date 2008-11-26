@@ -255,7 +255,7 @@ class mcuCBHandle	{
 		remote_speech* speech_rvoice() { return &_speech_rvoice; }
 		SmartBody::AudioFileSpeech* speech_audiofile() { return &_speech_audiofile; }
 
-		static void NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton * skeleton );
+		void NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton * skeleton );
 };
 
 /*! Executes a variable setting sub-command.   See mcuCBHandle::insert_set_cmd(..). */

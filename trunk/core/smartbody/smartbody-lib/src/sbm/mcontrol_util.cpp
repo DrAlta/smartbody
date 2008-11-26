@@ -392,8 +392,8 @@ void mcuCBHandle::update( void )	{
 					// yet another wacky mapping between sbm coordinate system and unreal
 					//NetworkSetPosition( char_p->net_handle, z, -x, y );
 					//NetworkSetRotation( char_p->net_handle, (float)q.w, (float)q.z, -(float)q.x, (float)q.y );
-					char_p->bonebusCharacter->SetPosition( z, -x, y );
-					char_p->bonebusCharacter->SetRotation( (float)q.w, (float)q.z, -(float)q.x, (float)q.y );
+					char_p->bonebusCharacter->SetPosition( z, -x, y, time );
+					char_p->bonebusCharacter->SetRotation( (float)q.w, (float)q.z, -(float)q.x, (float)q.y, time );
 				}
 			}
 
@@ -620,7 +620,7 @@ void mcuCBHandle::NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton 
 		if ( _stricmp( j->name(), "base" ) == 0 )
 		{
          //NetworkAddBulkRotation( handle, j->name(), q.w, q.x, -q.y, q.z );
-         character->AddBoneRotation( j->name(), q.w, q.x, -q.y, q.z );
+         character->AddBoneRotation( j->name(), q.w, q.x, -q.y, q.z, time );
 			//SendMEBonePosition( char_name,j->name(), posx, -posy, posz );
 
 			//printf( "%s %f %f %f\n", (const char *)j->name(),     posx, -posy, posz );
@@ -628,7 +628,7 @@ void mcuCBHandle::NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton 
 		else
 		{
          //NetworkAddBulkRotation( handle, j->name(), q.w, -q.x, q.y, -q.z );
-         character->AddBoneRotation( j->name(), q.w, -q.x, q.y, -q.z );
+         character->AddBoneRotation( j->name(), q.w, -q.x, q.y, -q.z, time );
 		}
 	}
 
@@ -656,7 +656,7 @@ void mcuCBHandle::NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton 
 		if ( _stricmp( j->name(), "base" ) == 0 )
 		{
          //NetworkAddBulkPosition( handle, j->name(), posx, -posy, posz );
-         character->AddBonePosition( j->name(), posx, -posy, posz );
+         character->AddBonePosition( j->name(), posx, -posy, posz, time );
       }
         else
       {
@@ -666,7 +666,7 @@ void mcuCBHandle::NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton 
 		  //itself further in the x position.
 		  //NetworkAddBulkPosition( handle, j->name(), -posz, -posy, posx );
 		  //NetworkAddBulkPosition( handle, j->name(), posx, -posy, posz );
-         character->AddBonePosition( j->name(), posx, -posy, posz );
+         character->AddBonePosition( j->name(), posx, -posy, posz, time );
 	  }
    }
 
@@ -1332,13 +1332,13 @@ int mcu_character_bone_cmd(
 					//printf( "%s %f %f %f\n", (const char *)j->name(),     posx, -posy, posz );
 
                //NetworkAddBulkRotation( actor->net_handle, j->name(), w, x, -y, z );
-               actor->bonebusCharacter->AddBoneRotation( j->name(), w, x, -y, z );
+               actor->bonebusCharacter->AddBoneRotation( j->name(), w, x, -y, z, mcu_p->time );
 				}
 				else
 				{
 					//SendMEBoneRotation( j->skeleton()->name(),j->name(), w, -x, y, -z );
                //NetworkAddBulkRotation( actor->net_handle, j->name(), w, -x, y, -z );
-               actor->bonebusCharacter->AddBoneRotation( j->name(), w, -x, y, -z );
+               actor->bonebusCharacter->AddBoneRotation( j->name(), w, -x, y, -z, mcu_p->time );
 				}
 			}
       }
@@ -1364,7 +1364,7 @@ int mcu_character_bone_cmd(
 		      if ( _stricmp( j->name(), "base" ) == 0 )
 		      {
                //NetworkAddBulkPosition( actor->net_handle, j->name(), posx, -posy, posz );
-               actor->bonebusCharacter->AddBonePosition( j->name(), posx, -posy, posz );
+               actor->bonebusCharacter->AddBonePosition( j->name(), posx, -posy, posz, mcu_p->time );
             }
             else
             {
@@ -1432,12 +1432,12 @@ int mcu_character_bone_position_cmd(
 
             if ( _stricmp( j->name(), "base" ) == 0 )
             {
-               actor->bonebusCharacter->AddBonePosition( j->name(), posx, -posy, posz );
+               actor->bonebusCharacter->AddBonePosition( j->name(), posx, -posy, posz, mcu_p->time );
             }
             else
             {
                //actor->bonebusCharacter->AddBonePosition( j->name(), -posz, -posy, posx );
-               actor->bonebusCharacter->AddBonePosition( j->name(), posx, -posy, posz );
+               actor->bonebusCharacter->AddBonePosition( j->name(), posx, -posy, posz, mcu_p->time );
             }
          }
       }
@@ -3026,7 +3026,7 @@ int mcu_commapi_func( srArgBuffer& args, mcuCBHandle *mcu_p )
          BoneBusCharacter * character = mcu_p->bonebus.FindCharacter( unique_id );
          if ( character )
          {
-            character->SetPosition( x, y, z );
+            character->SetPosition( x, y, z, mcu_p->time );
          }
 
          return CMD_SUCCESS;
@@ -3041,7 +3041,7 @@ int mcu_commapi_func( srArgBuffer& args, mcuCBHandle *mcu_p )
          BoneBusCharacter * character = mcu_p->bonebus.FindCharacterByName( name );
          if ( character )
          {
-            character->SetPosition( x, y, z );
+            character->SetPosition( x, y, z, mcu_p->time );
          }
 
          return CMD_SUCCESS;
@@ -3058,7 +3058,7 @@ int mcu_commapi_func( srArgBuffer& args, mcuCBHandle *mcu_p )
          BoneBusCharacter * character = mcu_p->bonebus.FindCharacter( unique_id );
          if ( character )
          {
-            character->SetRotation( (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z() );
+            character->SetRotation( (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z(), mcu_p->time );
          }
 
          return CMD_SUCCESS;
@@ -3075,7 +3075,7 @@ int mcu_commapi_func( srArgBuffer& args, mcuCBHandle *mcu_p )
          BoneBusCharacter * character = mcu_p->bonebus.FindCharacterByName( name );
          if ( character )
          {
-            character->SetRotation( (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z() );
+            character->SetRotation( (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z(), mcu_p->time );
          }
 
          return CMD_SUCCESS;
