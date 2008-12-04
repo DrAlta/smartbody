@@ -463,7 +463,7 @@ void elvin_loop( void * ignore )
 {
    while ( m_reply_received == false )
    {
-      ttu_wait();
+      ttu_wait( 0.5 );
    }
 
    _endthread();
