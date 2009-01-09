@@ -34,6 +34,9 @@
 #include <boost/weak_ptr.hpp>
 
 
+#define BMLR_BML2ANIM  0
+
+
 // Forward Declaration
 class mcuCBHandle;
 
@@ -78,6 +81,9 @@ namespace BML {
 		bool auto_print_sequence;
 		bool log_synchpoints;
 		bool warn_unknown_agents;
+#if BMLR_BML2ANIM
+		std::string bml2animText; // [BMLR] Stores the bml 2 animation mapping file
+#endif
 
 		boost::shared_ptr<XercesDOMParser> xmlParser;
 
@@ -175,6 +181,9 @@ namespace BML {
 		BehaviorRequest* parse_bml_body( DOMElement* elem, SynchPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu );
 		BehaviorRequest* parse_bml_event( DOMElement* elem, SynchPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu );
 		BehaviorRequest* parse_bml_head( DOMElement* elem, SynchPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu );
+#if BMLR_BML2ANIM
+		BehaviorRequest* parse_bml_to_anim( DOMElement* elem, SynchPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu ); // [BMLR]
+#endif
 	}; // class Processor
 };  // end namespace BML
 

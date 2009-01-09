@@ -25,6 +25,7 @@
 
 #include <stdlib.h>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -73,6 +74,9 @@ const char* VISEME_NEUTRAL = "_";
 const XMLCh TAG_ACT[]		= L"act";
 const XMLCh TAG_BML[]       = L"bml";
 const XMLCh TAG_BODY[]      = L"body";
+#if BMLR_BML2ANIM
+const XMLCh TAG_POSTURE[]   = L"posture"; // [BMLR] For bml2anim postures
+#endif
 const XMLCh TAG_SBM_EVENT[] = L"sbm:event";
 const XMLCh TAG_HEAD[]      = L"head";
 const XMLCh TAG_SPEECH[]    = L"speech";
@@ -383,9 +387,25 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCB
 				request->addBehavior( behavior );
 		} else if( XMLString::compareString( tag, TAG_SPEECH )==0 ) {
 			cerr<<"ERROR: BodyPlannerImpl: <speech> BML tag must be first behavior (TEMPORARY HACK)." <<endl;
+
+#if BMLR_BML2ANIM
+		// [BMLR]  Note that this brace closes out the if statement above
+		}
+
+		// [BMLR]
+		if (behavior == NULL) {
+			// [BMLR] support for bml to animations
+			behavior = parse_bml_to_anim(child, tms, request, mcu);
+			if( behavior != NULL )
+				request->addBehavior( behavior );
+			else
+				wcerr<<"WARNING: BodyPlannerImpl: <"<<tag<<"> BML tag unrecognized or unsupported."<<endl;
+		}
+#else
 		} else {
 			wcerr<<"WARNING: BodyPlannerImpl: <"<<tag<<"> BML tag unrecognized or unsupported."<<endl;
 		}
+#endif
 
 		if( behavior != NULL ) {
 			// Gesture success... Register sync points
@@ -586,6 +606,106 @@ BehaviorRequest* BML::Processor::parse_bml_head( DOMElement* elem, SynchPoints& 
 		return NULL;
     }
 }
+
+
+#if BMLR_BML2ANIM
+// [BMLR] Reads the bml2anim.xml file placed in the mepath directory and maps bml elements that are not supported 
+// by motion controllers to animations
+// for example: 
+// <gesture type="beat"/>
+// is not handled by a motion controller and therefore this code is run..
+// It then reads the file and finds this line:
+// <gesture type="beat">CrossedArms_RArm_LowBeat</gesture>
+// and plays the CrossedArms_RArm_LowBeat.skm animation
+BehaviorRequest* BML::Processor::parse_bml_to_anim( DOMElement* elem, SynchPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu ) {
+
+	if (bml2animText.empty())
+	{			
+		char* dir;
+
+		while (dir = mcu->me_paths.next_path())
+		{
+			std::string filename = "";
+			filename.append(dir);
+			filename.append("/bml2anim.xml");
+		
+			std::ifstream thefile;
+			thefile.open(filename.c_str());
+
+			if (thefile)
+			{
+				while (!thefile.eof())
+				{
+					string line;
+					getline(thefile, line);
+					bml2animText += line;
+				}
+
+				thefile.close();
+			}
+			else
+				printf("Unable to open bml2anim.xml in mepath");			
+		}
+		mcu->me_paths.reset();
+	}
+
+	if (bml2animText.length() > 0) {
+		// setup xml parser
+		XercesDOMParser *Prser;
+		Prser = new XercesDOMParser();
+		Prser->setErrorHandler( new HandlerBase() );
+
+		// find the correct animation
+		DOMDocument* textXml = xml_utils::parseMessageXml( Prser, (char*)bml2animText.c_str() );
+		DOMNode* animNode = textXml->getFirstChild()->getFirstChild();
+		bool sameAttrs = true;
+		std::string userValue;
+		std::string configValue;
+		while (animNode != NULL)
+		{
+			// same tag name
+			if (XMLString::equals(animNode->getNodeName(), elem->getNodeName())) {
+				// same attributes
+				sameAttrs = true;
+				DOMNamedNodeMap* attrs = animNode->getAttributes();
+				XMLSize_t aSize = attrs->getLength();
+				for( XMLSize_t i=0; i < aSize; i++ ) {
+					DOMAttr* attr = (DOMAttr*) (attrs->item(i));
+					userValue = string(XMLString::transcode(elem->getAttribute(attr->getName())));
+					if (userValue.empty()) {
+						sameAttrs = false;
+						continue;
+					}
+
+					configValue = string(XMLString::transcode(attr->getValue()));
+					std::transform(userValue.begin(), userValue.end(), userValue.begin(), tolower);
+					std::transform(configValue.begin(), configValue.end(), configValue.begin(), tolower);
+
+					if (strcmp(userValue.c_str(), configValue.c_str()) != 0)
+						sameAttrs = false;
+					
+				}
+				if (sameAttrs)
+				{			
+					if( XMLString::compareString( elem->getTagName(), TAG_POSTURE )==0 || XMLString::compareString( elem->getTagName(), TAG_BODY)==0 ) {
+						string posture = "<body posture=\"" + string(XMLString::transcode(animNode->getTextContent())) + "\" />";
+						DOMElement* e = xml_utils::parseMessageXml(Prser, (char*)posture.c_str())->getDocumentElement();
+						return parse_bml_body(e, tms, request, mcu);
+					}
+					else {
+						string animation = "<animation name=\"" + string(XMLString::transcode(animNode->getTextContent())) + "\" />";
+						DOMElement* e = xml_utils::parseMessageXml(Prser, (char*)animation.c_str())->getDocumentElement();
+						return parse_bml_animation(e, tms, request, mcu);
+					}
+				}
+			}
+			animNode = animNode->getNextSibling();
+		}
+	}
+	return NULL;
+}
+#endif  // BMLR_BML2ANIM
+
 
 void BML::Processor::speechReply( SbmCharacter* character, SmartBody::RequestId requestId, const char* errorMsg, mcuCBHandle *mcu ) {
 	string speechKey = buildSpeechKey( character, requestId );
