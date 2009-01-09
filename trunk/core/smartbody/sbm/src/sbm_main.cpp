@@ -48,6 +48,7 @@
 #include <sbm/joint_logger.hpp>
 #include <sbm/sbm_audio.h>
 #include <sbm/sbm_speech_audiofile.hpp>
+#include <sbm/text_speech.h> // [BMLR]
 
 #define WIN32_LEAN_AND_MEAN
 #include <sbm/sr_cmd_line.h>
@@ -321,6 +322,8 @@ void mcu_register_callbacks( void ) {
 
 	mcu.insert( "vrKillComponent", mcu_vrKillComponent_func );
 	mcu.insert( "vrAllCall", mcu_vrAllCall_func );
+
+	mcu.insert( "text_speech", text_speech::text_speech_func ); // [BMLR]
 }
 
 void exit_callback( void )	{
@@ -606,6 +609,12 @@ int main( int argc, char **argv )	{
 			}
 		}
 #endif
+
+		// [BMLR] Added to support receiving commands from renderer
+		vector<string> commands = mcu.bonebus.GetCommand();
+		for ( size_t i = 0; i < commands.size(); i++ ) {
+			mcu.execute( (char *)commands[i].c_str() );
+		}
 
 		if( cmdl.pending_cmd() )	{
 			char *cmd = cmdl.read_cmd();

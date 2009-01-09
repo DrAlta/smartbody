@@ -422,6 +422,12 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			return err;
 		}
 
+
+		// [BMLR] Send notification to the renderer that a pawn was created.
+		// NOTE: This is sent both for characters AND pawns
+		mcu_p->bonebus.SendCreatePawn( pawn_name.c_str(), loc[ 0 ], loc[ 1 ], loc[ 2 ] );
+
+
 		return CMD_SUCCESS;
 	} else if( pawn_cmd=="prune" ) {  // Prunes the controller trees of unused/overwritten controllers
 		int result = CMD_SUCCESS;

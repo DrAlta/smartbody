@@ -903,6 +903,16 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle 
 		string voice_path_str= "";
 		voice_path_str+=voice_path;
 		character->set_voice_code( voice_path_str );
+	} else if( _strcmpi( impl_id, "text" )==0 ) {
+		const char* voice_path = args.read_token();
+		if( strlen( voice_path )==0 ) {
+			cerr << "ERROR: Expected id." << endl;
+			return CMD_FAILURE;
+		}
+		character->set_speech_impl( mcu_p->speech_text() );
+		string voice_path_str= "";
+		voice_path_str+=voice_path;
+		character->set_voice_code( voice_path_str );
 	} else {
 		cerr << "ERROR: Unknown speech implementation \"" << impl_id << "\"." << endl;
 		return CMD_FAILURE;
