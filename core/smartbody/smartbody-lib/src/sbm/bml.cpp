@@ -57,6 +57,9 @@ const XMLCh VALUE_SSML[]       = L"application/ssml+xml";
 
 #define ENABLE_MissingSyncPoint_HACK 0
 
+#define ENABLE_BMLR_SYNCPOINT_CODE       0
+#define ENABLE_BMLR_SPEECH_REQUEST_CODE  0
+
 
 ///////////////////////////////////////////////////////////////////////////
 //  Helper Functions
@@ -399,7 +402,11 @@ void SynchPoints::parseStandardSynchPoints( DOMElement* elem, BmlRequestPtr requ
 		if( start==NULL )
 			wcerr<<"WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag refers to unknown "<<TM_START<<" point \""<<str<<"\".  Ignoring..."<<endl;
 	}
+#if ENABLE_BMLR_SYNCPOINT_CODE
+	if ( start==NULL ) start = new SynchPoint(TM_START, request, NULL); // [BMLR] HACK
+#else
 	MissingSyncPoint_HACK( start, TM_START, request, SynchPointPtr() );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
+#endif
 
 	ready.reset();
 	str = elem->getAttribute( TM_READY );
@@ -408,7 +415,11 @@ void SynchPoints::parseStandardSynchPoints( DOMElement* elem, BmlRequestPtr requ
 		if( !ready )
 			wcerr<<"WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag refers to unknown "<<TM_READY<<" point \""<<str<<"\".  Ignoring..."<<endl;
 	}
+#if ENABLE_BMLR_SYNCPOINT_CODE
+	if ( ready==NULL ) ready = new SynchPoint(TM_READY, request, start); // [BMLR] HACK
+#else
 	MissingSyncPoint_HACK( ready, TM_READY, request, start );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
+#endif
 
 	strokeStart.reset();
 	str = elem->getAttribute( TM_STROKE_START );
@@ -417,7 +428,11 @@ void SynchPoints::parseStandardSynchPoints( DOMElement* elem, BmlRequestPtr requ
 		if( !strokeStart )
 			wcerr<<"WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag refers to unknown "<<TM_STROKE_START<<" point \""<<str<<"\".  Ignoring..."<<endl;
 	}
+#if ENABLE_BMLR_SYNCPOINT_CODE
+	if ( strokeStart==NULL ) strokeStart = new SynchPoint(TM_STROKE_START, request, ready); // [BMLR] HACK
+#else
 	MissingSyncPoint_HACK( strokeStart, TM_STROKE_START, request, ready );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
+#endif
 
 	stroke.reset();
 	str = elem->getAttribute( TM_STROKE );
@@ -426,7 +441,11 @@ void SynchPoints::parseStandardSynchPoints( DOMElement* elem, BmlRequestPtr requ
 		if( !stroke )
 			wcerr<<"WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag refers to unknown "<<TM_STROKE<<" point \""<<str<<"\".  Ignoring..."<<endl;
 	}
+#if ENABLE_BMLR_SYNCPOINT_CODE
+	if ( stroke==NULL ) stroke = new SynchPoint(TM_STROKE, request, strokeStart); // [BMLR] HACK
+#else
 	MissingSyncPoint_HACK( stroke, TM_STROKE, request, strokeStart );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
+#endif
 
 	strokeEnd.reset();
 	str = elem->getAttribute( TM_STROKE_END );
@@ -435,7 +454,11 @@ void SynchPoints::parseStandardSynchPoints( DOMElement* elem, BmlRequestPtr requ
 		if( !strokeEnd )
 			wcerr<<"WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag refers to unknown "<<TM_STROKE_END<<" point \""<<str<<"\".  Ignoring..."<<endl;
 	}
+#if ENABLE_BMLR_SYNCPOINT_CODE
+	if ( strokeEnd==NULL ) strokeEnd = new SynchPoint(TM_STROKE_END, request, stroke); // [BMLR] HACK
+#else
 	MissingSyncPoint_HACK( strokeEnd, TM_STROKE_END, request, stroke );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
+#endif
 
 	relax.reset();
 	str = elem->getAttribute( TM_RELAX );
@@ -444,7 +467,11 @@ void SynchPoints::parseStandardSynchPoints( DOMElement* elem, BmlRequestPtr requ
 		if( !relax )
 			wcerr<<"WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag refers to unknown "<<TM_RELAX<<" point \""<<str<<"\".  Ignoring..."<<endl;
 	}
+#if ENABLE_BMLR_SYNCPOINT_CODE
+	if ( relax==NULL ) relax = new SynchPoint(TM_RELAX, request, strokeEnd); // [BMLR] HACK
+#else
 	MissingSyncPoint_HACK( relax, TM_RELAX, request, strokeEnd );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
+#endif
 
 	end.reset();
 	str = elem->getAttribute( TM_END );
@@ -453,7 +480,11 @@ void SynchPoints::parseStandardSynchPoints( DOMElement* elem, BmlRequestPtr requ
 		if( !end )
 			wcerr<<"WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag refers to unknown "<<TM_END<<" point \""<<str<<"\".  Ignoring..."<<endl;
 	}
+#if ENABLE_BMLR_SYNCPOINT_CODE
+	if ( end==NULL ) end = new SynchPoint(TM_END, request, relax); // [BMLR] HACK
+#else
 	MissingSyncPoint_HACK( end, TM_END, request, relax );  //  TODO: Replace hack appropriately: if( start==NULL ) ...?
+#endif
 }
 
 SbmCommand::SbmCommand( std::string & command, float time )
@@ -1203,28 +1234,59 @@ SpeechRequest::SpeechRequest( DOMElement* xml, const XMLCh* id, BmlRequestPtr re
 			// Parse <speech> for synch points
 			const XMLCh* type = xml->getAttribute( ATTR_TYPE );
 			if( type ) {
+
+#if ENABLE_BMLR_SPEECH_REQUEST_CODE
+				// [BMLR] text/plain as default type
+				if( XMLString::stringLen( type) == 0 ) {
+					type = VALUE_TEXT_PLAIN;
+				}
+#endif
+
 				if( XMLString::compareString( type, VALUE_TEXT_PLAIN )==0 ) {
 					if(LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): <speech type=\"" << VALUE_TEXT_PLAIN << "\">" << endl;
 					// Search for <tm> synch_points
 					DOMElement* child = xml_utils::getFirstChildElement( xml );
 					while( child!=NULL ) {
 						const XMLCh* tag = child->getTagName();
+
+#if ENABLE_BMLR_SPEECH_REQUEST_CODE
+						 // [BMLR] Changed <tm> to <mark> and id="" to name=""
+						if( tag && XMLString::compareString( tag, TAG_MARK )==0 ) {
+							if(LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): Found <mark>" << endl;
+#else
 						if( tag && XMLString::compareString( tag, TAG_TM )==0 ) {
 							if(LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): Found <tm>" << endl;
+#endif
 
+#if ENABLE_BMLR_SPEECH_REQUEST_CODE
+							const XMLCh* tmId = child->getAttribute( ATTR_NAME );
+#else
 							const XMLCh* tmId = child->getAttribute( ATTR_ID );
+#endif
+
 							// test validity?
 							if( XMLString::stringLen( tmId ) ) {
 								if( isValidTmId( tmId ) ) {
 									// Make fully qualified id
 									tmId = BML::buildBmlId( id, tmId );
+
+#if ENABLE_BMLR_SPEECH_REQUEST_CODE
+									child->setAttribute( ATTR_NAME, tmId );
+#else
 									child->setAttribute( ATTR_ID, tmId );
+#endif
 
 									// Create a SynchPoint
 									SynchPointPtr sync( trigger->addSynchPoint( tmId ) );
 									tms.push_back( sync );
 								} else {
+
+#if ENABLE_BMLR_SPEECH_REQUEST_CODE
+									wcerr << "ERROR: Invalid <mark> name=\"" << tmId << "\"" << endl;
+#else
 									wcerr << "ERROR: Invalid <tm> id=\"" << tmId << "\"" << endl;
+#endif
+
 								}
 							}
 						}
