@@ -65,7 +65,8 @@ class Init(DirectObject):
 		
 		self.George = CharacterPawn(self.BMLR, "George", "CADIA.George")
 		self.George.setPos(0, 0, 102)
-		self.George.BML('<body posture="HoldWrist_Motex_FrontLow" />')
+		#self.George.BML('<body posture="HoldWrist_Motex_FrontLow" />')
+		self.George.BML('<body posture="HandsAtSide_Motex" />')
 		self.George.BML('<speech id="sid">Thanks <mark time="0.3"/>for <mark time="0.6"/>trying <mark name="markbeat" time="1"/>BML Realizer!</speech>'
 						+ '<head type="nod" id="n1" relax="0" />'
 						+ '<gesture type="dismiss" start="n1:relax" />'
