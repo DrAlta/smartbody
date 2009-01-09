@@ -1076,6 +1076,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\text_speech.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\text_speech.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\viseme_map.hpp"
 				>
 			</File>
