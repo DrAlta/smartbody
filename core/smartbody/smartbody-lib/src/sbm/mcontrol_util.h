@@ -66,6 +66,7 @@ class mcuCBHandle;
 #include "sbm_pawn.hpp"
 #include "sbm_character.hpp"
 #include "remote_speech.h"
+#include "text_speech.h" // [BMLR]
 #include "sbm_speech_audiofile.hpp"
 #include "me_ct_examples.h"
 #include "me_ct_lilt_try.h"
@@ -95,6 +96,7 @@ class mcuCBHandle	{
 		// Data
 		remote_speech				_speech_rvoice;
 		SmartBody::AudioFileSpeech	_speech_audiofile;
+		text_speech					_speech_text; // [BMLR]
 		unsigned int				queued_cmds;
 
 	public:
@@ -254,6 +256,7 @@ class mcuCBHandle	{
 
 		remote_speech* speech_rvoice() { return &_speech_rvoice; }
 		SmartBody::AudioFileSpeech* speech_audiofile() { return &_speech_audiofile; }
+		text_speech* speech_text() { return &_speech_text; } // [BMLR]
 
 		void NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton * skeleton );
 };
