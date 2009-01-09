@@ -262,7 +262,8 @@ class CharacterPawn(Pawn):
 			return
 		
 		if (not self.IsRegistered()):
-			self.Scene.SendSbmCommand("char " + self.GetName() + " init doctor.sk " + self.GetCharClass())
+			self.Scene.SendSbmCommand("char " + self.GetName() + " init common.sk " + self.GetCharClass())
+			self.Scene.SendSbmCommand("set character " + self.GetName() + " voice text " + self.GetName())
 			self.SetRegistered(True)
 			self.RegisterPosHpr()
 			

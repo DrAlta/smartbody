@@ -103,11 +103,13 @@ class Init(DirectObject):
 		
 		self.SuperHumanoid = CharacterPawn(self.BMLR, "SuperHumanoid", "CADIA.MayaHumanoid.Silver")
 		self.SuperHumanoid.setPosHpr(35, -10, 99, -6, 0, 0)
-		self.SuperHumanoid.BML('<body posture="CrossedArms_Motex" /><gaze target="CameraPawn"/>')		
+		#self.SuperHumanoid.BML('<body posture="CrossedArms_Motex" /><gaze target="CameraPawn"/>')		
+		self.SuperHumanoid.BML('<body posture="LHandOnHip_Motex" /><gaze target="CameraPawn"/>')		
 		
 		self.Kelly = CharacterPawn(self.BMLR, "Kelly", "CADIA.Kelly")
 		self.Kelly.setPosHpr(89, 10, 99, 23, 0, 0)
-		self.Kelly.BML('<body posture="HoldWrist_Motex_FrontLow" /><gaze target="CameraPawn"/>')
+		#self.Kelly.BML('<body posture="HoldWrist_Motex_FrontLow" /><gaze target="CameraPawn"/>')
+		self.Kelly.BML('<body posture="HandsAtSide_Motex" /><gaze target="CameraPawn"/>')
 		
 		self.Sam = CharacterPawn(self.BMLR, "Sam", "CADIA.Sam")
 		self.Sam.setPosHpr(-18, 12, 99, -5, 0, 0)
