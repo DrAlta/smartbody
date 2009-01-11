@@ -42,5 +42,6 @@
 1	set test character doctor
 #1	set test recipient elder
 
+1 seq test-motion-init
 1 seq test-qdraw-init
 1 seq test-gaze-init
