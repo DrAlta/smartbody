@@ -1,15 +1,16 @@
 ## initialize to test motion controller functions:
 0 echo EXEC: data/sbm-test/scripts/test-motion-init.seq
 
-0 load motions ../../../../../gunslinger/data/sbm-gunslinger/ChrRio/motion
+#0 load motions ../../../../../gunslinger/data/sbm-gunslinger/ChrRio/motion
 
-1 ctrl M motion ChrRio_Draw001
-1 motion M dur 4
+#0 ctrl M motion ChrRio_Draw001
+0 ctrl M motion fltk_crash
+0 motion M dur 4
 
-#1 ctrl M motion ChrRio_ShootIdle001
+#0 ctrl M motion ChrRio_ShootIdle001
 
-1 ctrl M2 motion ChrRio_Holster001
-1 motion M2 dur 4
+#0 ctrl M2 motion ChrRio_Holster001
+#0 motion M2 dur 4
 
 #1 ctrl M motion ChrRio_Draw002
 #1 ctrl M motion ChrRio_GunIdle002
