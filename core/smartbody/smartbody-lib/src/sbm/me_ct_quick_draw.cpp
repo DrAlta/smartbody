@@ -263,7 +263,7 @@ vector_t MeCtQuickDraw::world_target_point( void )	{
 		SrMat sr_M;
 		matrix_t M;
 		int i, j;
-		
+
 		joint_p->update_gmat_up();
 		sr_M = joint_p->gmat();
 		for( i=0; i<4; i++ )	{

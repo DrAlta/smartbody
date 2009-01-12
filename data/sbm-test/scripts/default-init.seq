@@ -16,7 +16,7 @@
 0	load motions ../../../../data/sbm-test/common-sk/motion
 0	load motions ../../../../data/sbm-test/common-sk/step
 0	load motions ../../../../data/sbm-test/common-sk/qdraw
-
+0   load motions ../../../../../gunslinger/data/sbm-gunslinger/ChrRio/motion
 
 ###  Using USC-ICT Unreal Character Classes
 ###    Characters and above assets are standing 102 units
