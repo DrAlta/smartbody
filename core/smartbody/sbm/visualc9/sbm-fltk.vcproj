@@ -261,6 +261,30 @@
 				RelativePath="..\..\..\..\data\sbm-test\scripts\default-init.seq"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\..\data\sbm-test\scripts\test-gaze-init.seq"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\data\sbm-test\scripts\test-gaze.seq"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\data\sbm-test\scripts\test-motion-init.seq"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\data\sbm-test\scripts\test-motion.seq"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\data\sbm-test\scripts\test-qdraw-init.seq"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\data\sbm-test\scripts\test-qdraw.seq"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath="..\bin\default.seq"

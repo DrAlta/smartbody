@@ -2321,6 +2321,34 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 /////////////////////////////////////////////////////////////
 
 /*
+	motion <> speed <factor>
+	motion <> dur <sec>
+*/
+
+int mcu_motion_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
+
+	if( mcu_p ) {
+		char *ctrl_name = args.read_token();
+		char *warp_type = args.read_token(); // dur or speed
+		float timing = args.read_float();
+		MeCtMotion *mot_p= mcu_p->motion_ctrl_map.lookup( ctrl_name );
+		if( mot_p ) {
+			if( 
+				( warp_type[ 0 ] == 'd' )||( warp_type[ 0 ] == 'D' )||
+				( warp_type[ 0 ] == 't' )||( warp_type[ 0 ] == 'T' ) 
+			)	{
+				float out_dur = timing;
+				timing = (float)( mot_p->phase_duration() ) / out_dur;
+			}
+			mot_p->warp_limits( timing, timing );
+			mot_p->twarp( timing );
+			return( CMD_SUCCESS );
+		}
+	}
+	return( CMD_FAILURE );
+}
+
+/*
 	stepturn <> dur|time|speed <sec|dps> local|world <heading-deg>
 */
 

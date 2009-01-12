@@ -292,6 +292,7 @@ int mcu_print_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_sched_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_motion_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_stepturn_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
