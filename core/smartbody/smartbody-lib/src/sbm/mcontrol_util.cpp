@@ -1107,6 +1107,12 @@ int mcu_character_init(
 			printf( "init_character ERR: add_scene '%s' FAILED\n", char_name ); 
 			return( err );
 		}
+
+		err = mcu_p->theWSP->register_vector_3d_source( char_name, "coordinates", SbmPawn::wsp_coordinate_accessor, char_p );
+		if( err != CMD_SUCCESS )	{
+			printf( "init_character ERR: WSP register_vector_3d_source '%s' FAILED\n", char_name ); 
+			return( err );
+		}
 	}
 
 	return( err );
