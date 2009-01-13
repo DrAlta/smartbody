@@ -30,6 +30,8 @@
 
 #include <ME/me_controller_pipeline.hpp>
 #include <ME/me_ct_raw_writer.hpp>
+#include "wsp.h"
+
 
 #include "sbm_constants.h"
 
@@ -161,6 +163,11 @@ public:
 	 *  Prints the given attribute of the pawn.
 	 */
 	static int print_attribute( SbmPawn* pawn, std::string& attribute, srArgBuffer& args, mcuCBHandle *mcu_p );
+
+	/**
+	 *  Accesses the world_offset of the SbmPawn pointed to by data.
+	 */
+	static WSP::WSP_ERROR wsp_coordinate_accessor( const std::string id, const std::string attribute_name, wsp_vector& value, void* data );
 };
 
 #endif // SBM_PAWN_HPP

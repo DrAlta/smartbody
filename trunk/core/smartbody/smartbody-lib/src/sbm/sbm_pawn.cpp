@@ -52,7 +52,8 @@ WSP::WSP_ERROR remote_pawn_position_update( std::string id, std::string attribut
 
 	if ( pawn_p != NULL ) {
 
-		pawn_p->set_world_offset( ( (float)vector_3d.y * -1 ), ( (float)vector_3d.z ), ( (float)vector_3d.x ), 0, 0, 0 );
+		//pawn_p->set_world_offset( ( (float)vector_3d.y * -1 ), ( (float)vector_3d.z ), ( (float)vector_3d.x ), 0, 0, 0 );  // Unreal Coordinates
+		pawn_p->set_world_offset( ( (float)vector_3d.x ), ( (float)vector_3d.y ), ( (float)vector_3d.z ), 0, 0, 0 );  // SBM Native Coordinates
 	} else {
 
 		cerr << "ERROR: SbmPawn::remote_pawn_position_update: SbmPawn '" << id << "' is NULL, cannot set_world_offset" << endl; 
@@ -794,6 +795,21 @@ int SbmPawn::remove_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return CMD_FAILURE;
 	}
 }
+
+WSP_ERROR SbmPawn::wsp_coordinate_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data ) {
+	SbmPawn* pawn_p = (SbmPawn*)data;
+	const SkJoint* wo_joint = pawn_p->get_world_offset_joint();
+	if( wo_joint != NULL ) {
+		value.x = wo_joint->const_pos()->value(0);
+		value.y = wo_joint->const_pos()->value(1);
+		value.z = wo_joint->const_pos()->value(2);
+
+		return WSP::no_error();
+	} else {
+		WSP::not_found_error( "no world_offset joint" );
+	}
+}
+
 
 ///////////////////////////////////////////////////////////////////////////
 //  Private sbm_pawn functions
