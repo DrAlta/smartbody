@@ -469,26 +469,29 @@ else	{
 	for( int i_chan=0; i_chan<n_chan; i_chan++ )	{
 
 		int ch_size = motion_channels[ i_chan ].size();
-
-		bool is_arm_chan = false;
-		int which_arm_chan = -1;
-		for( int j = 0; j < NUM_ARM_JOINTS; j++ )	{
-			if( i_chan == _arm_chan_indices[ j ] )	{
-				is_arm_chan = true;
-				which_arm_chan = j;
-			}
-		}
+		int fbuffer_offset = _motion_chan_to_buff[ i_chan ];
+		if( fbuffer_offset >= 0 )	{
 		
-		if( is_arm_chan == true )	{
-			interim_arm_chan_indices[ which_arm_chan ] = i_interim;
-		}
-		else	{
+			bool is_arm_chan = false;
+			int which_arm_chan = -1;
+			for( int j = 0; j < NUM_ARM_JOINTS; j++ )	{
+				if( i_chan == _arm_chan_indices[ j ] )	{
+					is_arm_chan = true;
+					which_arm_chan = j;
+				}
+			}
+
+			if( is_arm_chan == true )	{
+				interim_arm_chan_indices[ which_arm_chan ] = i_interim;
+			}
+			else	{
 #define ENABLE_NON_ARM_MOTION 1
 #if ENABLE_NON_ARM_MOTION
-			for( int k=0; k<ch_size; k++ ) {
-				fbuffer[ _motion_chan_to_buff[ i_chan ] + k ] = interim_pose_buff_p[ i_interim + k ];
-			}
+				for( int k=0; k<ch_size; k++ ) {
+					fbuffer[ fbuffer_offset + k ] = interim_pose_buff_p[ i_interim + k ];
+				}
 #endif
+			}
 		}
 		i_interim += ch_size;
 	}
