@@ -62,10 +62,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="bonebus_d.lib OIS_d.lib OgreMain_d.lib wsock32.lib"
+				AdditionalDependencies="bonebus_d.lib vhcl_d.lib OIS_d.lib OgreMain_d.lib wsock32.lib"
 				OutputFile="$(OutDir)/OgreTest.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib\bonebus\lib;..\..\..\lib\OgreSDK\lib"
+				AdditionalLibraryDirectories="..\..\..\lib\bonebus\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\OgreSDK\lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/OgreTest.pdb"
 				SubSystem="2"
@@ -141,10 +141,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="bonebus.lib OIS.lib OgreMain.lib wsock32.lib"
+				AdditionalDependencies="bonebus.lib vhcl.lib OIS.lib OgreMain.lib wsock32.lib"
 				OutputFile="$(OutDir)/OgreTest.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\lib\bonebus\lib;..\..\..\lib\OgreSDK\lib"
+				AdditionalLibraryDirectories="..\..\..\lib\bonebus\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\OgreSDK\lib"
 				GenerateDebugInformation="false"
 				SubSystem="2"
 				OptimizeReferences="2"
