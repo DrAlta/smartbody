@@ -1903,6 +1903,7 @@ int init_stepturn_controller(
 int init_quickdraw_controller( 
 	char *ctrl_name, 
 	char *mot_name, 
+	char *alt_mot_name, 
 	mcuCBHandle *mcu_p
 )	{
 	int err = CMD_SUCCESS;
@@ -1911,6 +1912,15 @@ int init_quickdraw_controller(
 	if( mot_p == NULL ) {
 		printf( "init_quickdraw_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_name ); 
 		return( CMD_FAILURE );
+	}
+	
+	SkMotion *alt_mot_p = NULL;
+	if( alt_mot_name )	{
+		alt_mot_p = mcu_p->motion_map.lookup( alt_mot_name );
+		if( alt_mot_p == NULL ) {
+			printf( "init_quickdraw_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", alt_mot_name ); 
+			return( CMD_FAILURE );
+		}
 	}
 
 	MeCtQuickDraw* ctrl_p = new MeCtQuickDraw;
@@ -1930,7 +1940,7 @@ int init_quickdraw_controller(
 	ctrl_p->ref();
 	
 	ctrl_p->name( ctrl_name );
-	ctrl_p->init( mot_p );
+	ctrl_p->init( mot_p, alt_mot_p );
 	return( CMD_SUCCESS );
 }
 
@@ -2200,6 +2210,8 @@ int query_controller(
 	ctrl <> motion <motion-file>
 	ctrl <> snod <char-name>
 
+	ctrl <> quickdraw <quickdraw-motion-name> [<reholster-motion>]
+
 	ctrl <> lifecycle <child-controller-name>
 
 #	ctrl <> sched <char-name> [<skel-subset>]
@@ -2236,8 +2248,14 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		else
 		if( strcmp( ctrl_cmd, "quickdraw" ) == 0 )	{
 			char *mot_name = args.read_token();
+			if( args.calc_num_tokens() > 0 )	{
+				char *alt_mot_name = args.read_token();
+				return(
+					init_quickdraw_controller( ctrl_name, mot_name, alt_mot_name, mcu_p )
+				);
+			}
 			return(
-				init_quickdraw_controller( ctrl_name, mot_name, mcu_p )
+				init_quickdraw_controller( ctrl_name, mot_name, NULL, mcu_p )
 			);
 		}
 		else
@@ -2432,6 +2450,7 @@ int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 					return( CMD_SUCCESS );
 				}
 #if 0
+				else
 				if( strcmp( target_type, "joint" ) == 0 )	{
 					float x = args.read_float();
 					float y = args.read_float();

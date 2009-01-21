@@ -99,6 +99,7 @@ class MeCtQuickDraw : public MeController	{
 		};
 
 		SkMotion*            _motion; 
+		SkMotion*            _alt_motion; 
 		SkMotion::InterpType _play_mode; // its play mode
 		double               _duration;  // the time-warped duration
 		int                  _last_apply_frame; // to optimize shared motion evaluation
@@ -115,6 +116,8 @@ class MeCtQuickDraw : public MeController	{
 		double prev_time;
 		float raw_motion_dur;
 		float raw_motion_scale;
+		float alt_raw_motion_dur;
+		float alt_raw_motion_scale;
 		float play_motion_dur;
 		float track_dur;
 		float reholster_time;
@@ -140,7 +143,7 @@ class MeCtQuickDraw : public MeController	{
     		(SkMotion derives SrSharedClass and has ref/unref methods)
     		The keytimes of m are translated to ensure start from zero. 
     		MeController::init() is automatically called. */
-		void init( SkMotion* mot_p );
+		void init( SkMotion* mot_p, SkMotion* alt_mot_p = NULL );
 
 		void set_motion_duration( float sec );
 		float get_motion_duration() { return play_motion_dur; };
