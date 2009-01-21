@@ -34,6 +34,7 @@ const char* MeCtQuickDraw::type_name = "QuickDraw";
 MeCtQuickDraw::MeCtQuickDraw( void )	{
 
 	_motion = NULL;
+	_alt_motion = NULL;
 	_play_mode = SkMotion::Linear;
 	_duration = -1.0;
 	_last_apply_frame = 0;
@@ -49,6 +50,8 @@ MeCtQuickDraw::MeCtQuickDraw( void )	{
 	prev_time = 0.0;
 	raw_motion_dur = 0.0;
 	raw_motion_scale = 0.0;
+	alt_raw_motion_dur = 0.0;
+	alt_raw_motion_scale = 0.0;
 	play_motion_dur = 0.0;
 	track_dur = 0.0;
 	draw_mode = DRAW_DISABLED;
@@ -62,7 +65,7 @@ MeCtQuickDraw::~MeCtQuickDraw( void )	{
 	}
 }
 
-void MeCtQuickDraw::init( SkMotion* mot_p ) {
+void MeCtQuickDraw::init( SkMotion* mot_p, SkMotion* alt_mot_p ) {
 #if 0
 	static char l_arm_labels[ NUM_ARM_JOINTS ][ MAX_JOINT_LABEL_LEN ] = {
 		"l_shoulder", "l_elbow", "l_forearm", "l_wrist"
@@ -86,6 +89,21 @@ void MeCtQuickDraw::init( SkMotion* mot_p ) {
 	_motion = mot_p;
 	_motion->move_keytimes( 0 ); 
 	raw_motion_dur = _motion->duration();
+
+	_alt_motion = NULL;
+	if( alt_mot_p ) {
+		if( 
+			( _motion->channels().size() == alt_mot_p->channels().size() )&&
+			( _motion->channels().count_floats() == alt_mot_p->channels().count_floats() )
+		)	{
+			_alt_motion = alt_mot_p;
+			_alt_motion->move_keytimes( 0 ); 
+			alt_raw_motion_dur = _alt_motion->duration();
+		}
+		else	{
+			printf( "MeCtQuickDraw::init ERR: unmatched channels in alt motion '%s'\n", alt_mot_p->filename() );
+		}
+	}
 
 	set_motion_duration( raw_motion_dur );
 
@@ -129,6 +147,7 @@ void MeCtQuickDraw::set_motion_duration( float sec )	{
 	
 	play_motion_dur = sec;
 	raw_motion_scale = raw_motion_dur / play_motion_dur;
+	alt_raw_motion_scale = alt_raw_motion_dur / play_motion_dur;
 }
 
 void MeCtQuickDraw::set_aim_offset( float p, float h, float r ) {
@@ -438,8 +457,7 @@ else	{
 #endif
 	gw_float_t lerp_power = 2.0;
 	gw_float_t lerp_value = pow( raw_lerp, lerp_power );
-
-
+	
 #if 0 // RAW QUICKDRAW
 	_motion->apply( 
 		float( motion_time * raw_motion_scale ),

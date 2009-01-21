@@ -5,6 +5,6 @@
 
 #0 ctrl Q quickdraw fltk_crash
 
-#0 ctrl Q quickdraw ChrRio_Draw001
-0 ctrl Q quickdraw ChrRio_Draw002
+0 ctrl Q quickdraw ChrRio_Draw001 ChrRio_Holster001
+#0 ctrl Q quickdraw ChrRio_Draw002 ChrRio_Holster002
 
