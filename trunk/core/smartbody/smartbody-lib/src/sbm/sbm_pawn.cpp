@@ -806,7 +806,7 @@ WSP_ERROR SbmPawn::wsp_coordinate_accessor( const std::string id, const std::str
 
 		return WSP::no_error();
 	} else {
-		WSP::not_found_error( "no world_offset joint" );
+		return WSP::not_found_error( "no world_offset joint" );
 	}
 }
 
