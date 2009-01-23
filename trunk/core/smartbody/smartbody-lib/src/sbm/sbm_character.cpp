@@ -678,7 +678,7 @@ int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 					&& strcmp(blending_ct->controller_type(), MeCtBlend::CONTROLLER_TYPE ) )
 				{
 					// TODO: account for time scaling of motion_duration
-					double blend_out_start = now + qdraw_ct->get_motion_duration();
+					double blend_out_start = now + qdraw_ct->get_holster_duration();
 					float  blend_out_dur   = qdraw_ct->outdt();
 					double blend_out_end   = blend_out_start + blend_out_dur;
 					float  blend_spline_tanget = -1/blend_out_dur;
