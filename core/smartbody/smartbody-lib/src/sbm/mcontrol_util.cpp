@@ -2510,7 +2510,13 @@ int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			}
 			if( strcmp( qdraw_cmd, "dur" ) == 0 )	{
 				float dur = args.read_float();
-				qdraw_p->set_motion_duration( dur );
+				if( args.calc_num_tokens() > 0 )	{
+					float dur2 = args.read_float();
+					qdraw_p->set_motion_duration( dur, dur2 );
+				}
+				else	{
+					qdraw_p->set_motion_duration( dur );
+				}
 				return( CMD_SUCCESS );
 			}
 			if( strcmp( qdraw_cmd, "smooth" ) == 0 )	{

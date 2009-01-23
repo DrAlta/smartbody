@@ -7,7 +7,7 @@
 #0 quickdraw Q 1.5 point -1000.0 1000.0 1000.0
 
 0 quickdraw Q target point 0.0 200.0 2000.0
-0 quickdraw Q dur 4.0 
+0 quickdraw Q dur 4.0 8.0
 0 quickdraw Q track 2.0
 #0 quickdraw Q persist
 

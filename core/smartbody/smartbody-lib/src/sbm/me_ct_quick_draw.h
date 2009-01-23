@@ -98,8 +98,10 @@ class MeCtQuickDraw : public MeController	{
 			quat_t		world_rot;
 		};
 
-		SkMotion*            _motion; 
-		SkMotion*            _alt_motion; 
+		SkMotion*            _gundraw_motion; 
+		SkMotion*            _holster_motion; 
+		SkMotion*            _curr_motion_p; 
+
 		SkMotion::InterpType _play_mode; // its play mode
 		double               _duration;  // the time-warped duration
 		int                  _last_apply_frame; // to optimize shared motion evaluation
@@ -114,13 +116,24 @@ class MeCtQuickDraw : public MeController	{
 		float smooth;
 		int start;
 		double prev_time;
-		float raw_motion_dur;
-		float raw_motion_scale;
-		float alt_raw_motion_dur;
-		float alt_raw_motion_scale;
-		float play_motion_dur;
+
+		float curr_motion_dur;
+		float curr_motion_scale;
+		float curr_play_dur;
+
+		float raw_gundraw_dur;
+		float raw_gundraw_scale;
+		float play_gundraw_dur;
+		int has_gundraw_leadup;
+		
+		float raw_holster_dur;
+		float raw_holster_scale;
+		float play_holster_dur;
+		int has_holster_leadaway;
+		
 		float track_dur;
 		float reholster_time;
+
 		int draw_mode;
 
 		quat_t   l_final_hand_in_body_rot;
@@ -143,10 +156,16 @@ class MeCtQuickDraw : public MeController	{
     		(SkMotion derives SrSharedClass and has ref/unref methods)
     		The keytimes of m are translated to ensure start from zero. 
     		MeController::init() is automatically called. */
-		void init( SkMotion* mot_p, SkMotion* alt_mot_p = NULL );
+		void init( SkMotion* mot_p, SkMotion* mot2_p = NULL );
 
+		void set_gundraw_duration( float sec );
+		void set_holster_duration( float sec );
+		void set_motion_duration( float gundraw_sec, float holster_sec );
 		void set_motion_duration( float sec );
-		float get_motion_duration() { return play_motion_dur; };
+
+//	float get_motion_duration() { return play_holster_dur; }; // in sbm-character.cpp
+		float get_gundraw_duration() { return play_gundraw_dur; }; // NOTE: must subtract lead-up/away
+		float get_holster_duration() { return play_holster_dur; }; // ''
 
 		void set_smooth( float sm ) { smooth = sm; }
 		void set_aim_offset( float p, float h, float r );

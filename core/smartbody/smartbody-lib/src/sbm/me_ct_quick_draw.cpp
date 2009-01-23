@@ -33,8 +33,10 @@ const char* MeCtQuickDraw::type_name = "QuickDraw";
 
 MeCtQuickDraw::MeCtQuickDraw( void )	{
 
-	_motion = NULL;
-	_alt_motion = NULL;
+	_gundraw_motion = NULL;
+	_holster_motion = NULL;
+	_curr_motion_p = NULL;
+	
 	_play_mode = SkMotion::Linear;
 	_duration = -1.0;
 	_last_apply_frame = 0;
@@ -48,11 +50,14 @@ MeCtQuickDraw::MeCtQuickDraw( void )	{
 	smooth = 0.0;
 	start = 0;
 	prev_time = 0.0;
-	raw_motion_dur = 0.0;
-	raw_motion_scale = 0.0;
-	alt_raw_motion_dur = 0.0;
-	alt_raw_motion_scale = 0.0;
-	play_motion_dur = 0.0;
+
+	raw_gundraw_dur = 0.0;
+	raw_gundraw_scale = 1.0;
+	play_gundraw_dur = 0.0;
+	raw_holster_dur = 0.0;
+	raw_holster_scale = 1.0;
+	play_holster_dur = 0.0;
+
 	track_dur = 0.0;
 	draw_mode = DRAW_DISABLED;
 }
@@ -65,18 +70,19 @@ MeCtQuickDraw::~MeCtQuickDraw( void )	{
 	}
 }
 
-void MeCtQuickDraw::init( SkMotion* mot_p, SkMotion* alt_mot_p ) {
+void MeCtQuickDraw::init( SkMotion* mot_p, SkMotion* mot2_p ) {
 #if 0
 	static char l_arm_labels[ NUM_ARM_JOINTS ][ MAX_JOINT_LABEL_LEN ] = {
 		"l_shoulder", "l_elbow", "l_forearm", "l_wrist"
 	};
-#endif
+#else
 	static char r_arm_labels[ NUM_ARM_JOINTS ][ MAX_JOINT_LABEL_LEN ] = {
 		"r_shoulder", "r_elbow", "r_forearm", "r_wrist"
 	};
+#endif
 
-	if( _motion ) {
-		if( mot_p == _motion ) {
+	if( _gundraw_motion ) {
+		if( mot_p == _gundraw_motion ) {
 			// Minimal init()
 			_last_apply_frame = 0;
 			MeController::init ();
@@ -86,33 +92,33 @@ void MeCtQuickDraw::init( SkMotion* mot_p, SkMotion* alt_mot_p ) {
 
 	_last_apply_frame = 0;
 	
-	_motion = mot_p;
-	_motion->move_keytimes( 0 ); 
-	raw_motion_dur = _motion->duration();
+	_gundraw_motion = mot_p;
+	_gundraw_motion->move_keytimes( 0 ); 
+	raw_gundraw_dur = _gundraw_motion->duration();
+	set_gundraw_duration( raw_gundraw_dur );
 
-	_alt_motion = NULL;
-	if( alt_mot_p ) {
+	_holster_motion = NULL;
+	if( mot2_p ) {
 		if( 
-			( _motion->channels().size() == alt_mot_p->channels().size() )&&
-			( _motion->channels().count_floats() == alt_mot_p->channels().count_floats() )
+			( _gundraw_motion->channels().size() == mot2_p->channels().size() )&&
+			( _gundraw_motion->channels().count_floats() == mot2_p->channels().count_floats() )
 		)	{
-			_alt_motion = alt_mot_p;
-			_alt_motion->move_keytimes( 0 ); 
-			alt_raw_motion_dur = _alt_motion->duration();
+			_holster_motion = mot2_p;
+			_holster_motion->move_keytimes( 0 ); 
+			raw_holster_dur = _holster_motion->duration();
+			set_holster_duration( raw_holster_dur );
 		}
 		else	{
-			printf( "MeCtQuickDraw::init ERR: unmatched channels in alt motion '%s'\n", alt_mot_p->filename() );
+			printf( "MeCtQuickDraw::init ERR: unmatched channels in reholster motion '%s', IGNORED\n", mot2_p->filename() );
 		}
 	}
-
-	set_motion_duration( raw_motion_dur );
 
 	start = 0;
 	prev_time = 0.0;
 	draw_mode = DRAW_DISABLED;
 	
-//	const int n_chan = _motion->channels().size();
-	const int n_float = _motion->channels().count_floats();
+//	const int n_chan = _gundraw_motion->channels().size();
+	const int n_float = _gundraw_motion->channels().count_floats();
 	
 	l_final_hand_in_body_rot = quat_t();
 	l_wrist_offset_rot = quat_t();
@@ -122,9 +128,9 @@ void MeCtQuickDraw::init( SkMotion* mot_p, SkMotion* alt_mot_p ) {
 
 		// ASSUME right handed draw
 		_arm_chan_indices[ i ] = 
-			_motion->channels().search( SkJointName( r_arm_labels[ i ] ), SkChannel::Quat );
+			_gundraw_motion->channels().search( SkJointName( r_arm_labels[ i ] ), SkChannel::Quat );
 		
-		quat_t joint_rot = get_final_joint_rot( _motion, r_arm_labels[ i ] );
+		quat_t joint_rot = get_final_joint_rot( _gundraw_motion, r_arm_labels[ i ] );
 		l_final_hand_in_body_rot = l_final_hand_in_body_rot * joint_rot;
 	}
 
@@ -143,11 +149,28 @@ void MeCtQuickDraw::init( SkMotion* mot_p, SkMotion* alt_mot_p ) {
 
 ///////////////////////////////////////////////////////////////////////////////////
 
+void MeCtQuickDraw::set_gundraw_duration( float sec )	{
+	
+	play_gundraw_dur = sec;
+	raw_gundraw_scale = raw_gundraw_dur / play_gundraw_dur;
+}
+
+void MeCtQuickDraw::set_holster_duration( float sec )	{
+	
+	play_holster_dur = sec;
+	raw_holster_scale = raw_holster_dur / play_holster_dur;
+}
+
+void MeCtQuickDraw::set_motion_duration( float gundraw_sec, float holster_sec )	{
+	
+	set_gundraw_duration( gundraw_sec );
+	set_holster_duration( holster_sec );
+}
+
 void MeCtQuickDraw::set_motion_duration( float sec )	{
 	
-	play_motion_dur = sec;
-	raw_motion_scale = raw_motion_dur / play_motion_dur;
-	alt_raw_motion_scale = alt_raw_motion_dur / play_motion_dur;
+	set_gundraw_duration( sec );
+	set_holster_duration( sec );
 }
 
 void MeCtQuickDraw::set_aim_offset( float p, float h, float r ) {
@@ -172,10 +195,6 @@ void MeCtQuickDraw::set_target_joint( float x, float y, float z, SkJoint* ref_jo
 	set_target_point( x, y, z );
 	set_target_coord_joint( ref_joint_p );
 }
-
-//void MeCtQuickDraw::set_track_duration( float dur ) { 
-//	track_dur = dur; 
-//}
 
 ///////////////////////////////////////////////////////////////////////////////////
 
@@ -316,7 +335,7 @@ void MeCtQuickDraw::context_updated( void ) {
 
 void MeCtQuickDraw::controller_map_updated( void ) {
 
-	SkChannelArray& motion_channels = _motion->channels();
+	SkChannelArray& motion_channels = _gundraw_motion->channels();
 	const int n_chan = motion_channels.size();
 	_motion_chan_to_buff.size( n_chan );
 
@@ -396,28 +415,34 @@ else	{
 	}
 	prev_time = t;
 
-	// increment draw_mode, and set motion_time:
+	// increment draw_mode, select motion, and set motion_time:
 	float motion_time = 0.0;
+	gw_float_t raw_lerp = 0.0;
+	
 	if( draw_mode == DRAW_READY )	{
+		_curr_motion_p = _gundraw_motion;
+		curr_motion_dur = raw_gundraw_dur;
+		curr_motion_scale = raw_gundraw_scale;
+		curr_play_dur = play_gundraw_dur;
 		if( t > indt() )	{
 			draw_mode = DRAW_AIMING;
 		}
 	}
 	if( draw_mode == DRAW_AIMING )	{
 		float mode_time = (float)t - indt();
-		if( mode_time < play_motion_dur )	{
+		if( mode_time < play_gundraw_dur )	{
 			motion_time = mode_time;
+			raw_lerp = motion_time / play_gundraw_dur;
 		}
 		else	{
 			draw_mode = DRAW_TRACKING; 
-			// return automatically, until reholster command available:
-			//draw_mode = DRAW_RETURN; 
 		}
 	}
 	if( draw_mode == DRAW_TRACKING )	{
-		motion_time = play_motion_dur;
+		motion_time = play_gundraw_dur;
+		raw_lerp = 1.0;
 		if( track_dur >= 0.0 )	{
-			float mode_time = (float)t - play_motion_dur - indt();
+			float mode_time = (float)t - play_gundraw_dur - indt();
 			if( mode_time > track_dur ) {
 				reholster_time = (float)t;
 				draw_mode = DRAW_RETURN; 
@@ -425,18 +450,31 @@ else	{
 		}
 	}
 	if( draw_mode == DRAW_RETURN )	{
-//		float mode_time = (float)t - play_motion_dur - indt();
 		float mode_time = (float)t - reholster_time;
-		if( mode_time < play_motion_dur )	{
-			motion_time = play_motion_dur - mode_time;
+		if( _holster_motion )	{
+			_curr_motion_p = _holster_motion;
+			curr_motion_dur = raw_holster_dur;
+			curr_motion_scale = raw_holster_scale;
+			curr_play_dur = play_holster_dur;
+			motion_time = mode_time; // increasing
 		}
 		else	{
+			motion_time = play_gundraw_dur - mode_time; // decreasing
+		}
+		raw_lerp = 1.0 - mode_time / curr_play_dur;
+		if( mode_time > curr_play_dur )	{
 			draw_mode = DRAW_COMPLETE; 
 		}
 	}
 	if( draw_mode == DRAW_COMPLETE )	{
-//		float mode_time = (float)t - 2 * play_motion_dur - indt();
-		float mode_time = (float)t - reholster_time - play_motion_dur;
+		if( _holster_motion )	{
+			motion_time = play_gundraw_dur;
+		}
+		else	{
+			motion_time = 0.0;
+		}
+		float mode_time = (float)t - reholster_time - curr_play_dur;
+		raw_lerp = 0.0;
 		if( mode_time > outdt() )	{
 			draw_mode = DRAW_DISABLED; 
 		}
@@ -446,7 +484,6 @@ else	{
 	}
 	
 	// calc lerp blend between raw motion and modified aim
-	gw_float_t raw_lerp = motion_time / play_motion_dur;
 	if( raw_lerp > 1.0 ) raw_lerp = 1.0;
 #if 1
 	if( raw_lerp < 0.25 ) raw_lerp = 0.0;
@@ -458,9 +495,11 @@ else	{
 	gw_float_t lerp_power = 2.0;
 	gw_float_t lerp_value = pow( raw_lerp, lerp_power );
 	
+//	printf( "mot: %f dur: %f lerp: %f\n", motion_time, curr_play_dur, raw_lerp );
+
 #if 0 // RAW QUICKDRAW
-	_motion->apply( 
-		float( motion_time * raw_motion_scale ),
+	_curr_motion_p->apply( 
+		float( motion_time * curr_motion_scale ),
 		&( frame.buffer()[0] ),  // pointer to buffer's float array
 		&_motion_chan_to_buff,
 		_play_mode, 
@@ -469,8 +508,8 @@ else	{
 
 #else // ADAPTED QUICKDRAW
 
-	_motion->apply( 
-		float( motion_time * raw_motion_scale ),
+	_curr_motion_p->apply( 
+		float( motion_time * curr_motion_scale ),
 		interim_pose_buff_p,
 		NULL, // same order in interim_buffer
 		_play_mode, 
@@ -478,7 +517,7 @@ else	{
 	);
 
 	float *fbuffer = &( frame.buffer()[0] );
-	SkChannelArray& motion_channels = _motion->channels();
+	SkChannelArray& motion_channels = _curr_motion_p->channels();
 	int n_chan = motion_channels.size();
 	
 	int interim_arm_chan_indices[ NUM_ARM_JOINTS ];
@@ -625,14 +664,14 @@ else	{
 
 SkChannelArray& MeCtQuickDraw::controller_channels( void )	{
 
-	return( _motion->channels() );
+	return( _gundraw_motion->channels() );
 }
 
 double MeCtQuickDraw::controller_duration( void ) {
 
 // THIS GETS CALLED PRIOR TO controller_start().
-	if( ( play_motion_dur > 0.0 ) && ( track_dur >= 0.0 ) )	{
-		return( indt() + 2.0 * play_motion_dur + track_dur + outdt() );
+	if( ( play_gundraw_dur > 0.0 ) && ( track_dur >= 0.0 ) )	{
+		return( indt() + play_gundraw_dur + play_holster_dur + track_dur + outdt() );
 	}
 	return( -1.0 );
 }
@@ -651,15 +690,27 @@ void MeCtQuickDraw::print_state( int tabCount ) {
 		fprintf( stdout, " \"%s\"", str );
 
 	fprintf( stdout, ", motion" );
-	if( _motion ) {
+	if( _gundraw_motion ) {
 
 		// motion name
-		str = _motion->name();
+		str = _gundraw_motion->name();
 		if( str )
 			fprintf( stdout, " \"%s\"", str );
 
 		// motion filename
-		str = _motion->filename();
+		str = _gundraw_motion->filename();
+		if( str )
+			fprintf( stdout, " file \"%s\"", str );
+	} 
+	if( _holster_motion ) {
+
+		// motion name
+		str = _holster_motion->name();
+		if( str )
+			fprintf( stdout, " \"%s\"", str );
+
+		// motion filename
+		str = _holster_motion->filename();
 		if( str )
 			fprintf( stdout, " file \"%s\"", str );
 	} 
