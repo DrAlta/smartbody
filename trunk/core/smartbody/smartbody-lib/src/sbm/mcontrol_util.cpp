@@ -27,13 +27,16 @@
  *      
  */
 
+#include "vhcl.h"
+
+#include "mcontrol_util.h"
+
 #include <stdlib.h>
 #include <iostream>
 #include <string>
 
 #include "sbm_audio.h"
 
-#include "mcontrol_util.h"
 #include "me_utilities.hpp"
 #include "wsp.h"
 
@@ -1108,10 +1111,47 @@ int mcu_character_init(
 			return( err );
 		}
 
-		err = mcu_p->theWSP->register_vector_3d_source( char_name, "coordinates", SbmPawn::wsp_coordinate_accessor, char_p );
+
+		// register wsp data
+		// first register world_offset position/rotation
+		string wsp_world_offset = vhcl::Format( "%s:world_offset", char_name );
+
+		err = mcu_p->theWSP->register_vector_3d_source( wsp_world_offset, "position", SbmPawn::wsp_world_position_accessor, char_p );
 		if( err != CMD_SUCCESS )	{
 			printf( "init_character ERR: WSP register_vector_3d_source '%s' FAILED\n", char_name ); 
 			return( err );
+		}
+
+		err = mcu_p->theWSP->register_vector_4d_source( wsp_world_offset, "rotation", SbmPawn::wsp_world_rotation_accessor, char_p );
+		if( err != CMD_SUCCESS )	{
+			printf( "init_character ERR: WSP register_vector_4d_source '%s' FAILED\n", char_name ); 
+			return( err );
+		}
+
+
+		// now register all joints.  wsp data isn't sent out until a request for it is received
+		const SrArray<SkJoint *> & joints  = char_p->skeleton_p->joints();
+
+		int i;
+		for ( i = 0; i < joints.size(); i++ )
+		{
+			SkJoint * j = joints[ i ];
+
+			string wsp_joint_name = vhcl::Format( "%s:%s", char_name, (const char *)j->name() );
+
+			err = mcu_p->theWSP->register_vector_3d_source( wsp_joint_name, "position", SbmPawn::wsp_position_accessor, char_p );
+			if ( err != CMD_SUCCESS )
+			{
+				printf( "init_character ERR: WSP register_vector_3d_source '%s' FAILED\n", char_name ); 
+				return( err );
+			}
+
+			err = mcu_p->theWSP->register_vector_4d_source( wsp_joint_name, "rotation", SbmPawn::wsp_rotation_accessor, char_p );
+			if ( err != CMD_SUCCESS )
+			{
+				printf( "init_character ERR: WSP register_vector_4d_source '%s' FAILED\n", char_name ); 
+				return( err );
+			}
 		}
 	}
 

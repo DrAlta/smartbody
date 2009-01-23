@@ -119,11 +119,6 @@ public:
 	static int create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 	/**
-	 *  Creates a pawn that can be updated by another SBM process
-	 */
-	static int create_remote_sbm_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-
-	/**
 	 *  Removes a remote pawn that was being manipulated by the WSP library
 	 */
 	static int remove_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p );
@@ -165,9 +160,12 @@ public:
 	static int print_attribute( SbmPawn* pawn, std::string& attribute, srArgBuffer& args, mcuCBHandle *mcu_p );
 
 	/**
-	 *  Accesses the world_offset of the SbmPawn pointed to by data.
+	 *  WSP access functions.
 	 */
-	static WSP::WSP_ERROR wsp_coordinate_accessor( const std::string id, const std::string attribute_name, wsp_vector& value, void* data );
+	static WSP::WSP_ERROR wsp_world_position_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data );
+	static WSP::WSP_ERROR wsp_world_rotation_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data );
+	static WSP::WSP_ERROR wsp_position_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data );
+	static WSP::WSP_ERROR wsp_rotation_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data );
 };
 
 #endif // SBM_PAWN_HPP

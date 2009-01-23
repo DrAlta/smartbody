@@ -86,9 +86,20 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 					cout << "DEBUG: BML::parse_target(): Gaze:\tobject_id \""<<object_id<<"\",\tbone_id \""<<bone_id<<"\"." <<endl;
 				target = mcu->pawn_map.lookup( object_id.c_str() );
 				if( target==NULL ) {
-					// TODO: Query WSP
-					cerr << "WARNING: BML::parse_target(): Gaze: Unknown object id \""<<object_id<<"\". (TODO: Query WSP.) Behavior ignored."<< endl;
-					return NULL;
+
+					// we've failed to find object:bone locally, now query wsp
+					target = mcu->pawn_map.lookup( object_id + ":" + bone_id );
+					if( target )
+					{
+						bone_id = SbmPawn::WORLD_OFFSET_JOINT_NAME;
+						if( DEBUG_BML_TARGET )
+							cerr << "DEBUG: BML::parse_target(): Gaze: Found target pawn \"" << object_id << "\". Assuming joint \""<<bone_id<<"\"."<< endl;
+					}
+					else
+					{
+						cerr << "WARNING: BML::parse_target(): Gaze: Unknown object id \""<<object_id<<"\". (TODO: Query WSP.) Behavior ignored."<< endl;
+						return NULL;
+					}
 				}
 			}
 
