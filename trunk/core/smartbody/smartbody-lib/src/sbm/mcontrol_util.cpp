@@ -589,7 +589,7 @@ MeController* mcuCBHandle::lookup_ctrl( const string& ctrl_name, const char* pri
 void mcuCBHandle::NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton * skeleton )
 {
 	// Send the bone rotation for each joint in the skeleton (To be optimized soon)
-   SrArray<SkJoint*> joints  = skeleton->joints();
+   const SrArray<SkJoint*> & joints  = skeleton->joints();
 
 
    if ( character )
