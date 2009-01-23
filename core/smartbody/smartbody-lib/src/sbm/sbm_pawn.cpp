@@ -22,12 +22,15 @@
  *      Thomas Amundsen, USC
  */
 
+#include "vhcl.h"
+
+#include "sbm_pawn.hpp"
+
 #include <string.h>
 #include <iostream>
 
 #include "wsp.h"
 
-#include "sbm_pawn.hpp"
 #include "mcontrol_util.h"
 #include "me_utilities.hpp"
 
@@ -42,70 +45,50 @@ inline bool parse_float_or_error( float& var, const char* str, const string& var
 /////////////////////////////////////////////////////////////
 //  WSP Callbacks
 
-WSP::WSP_ERROR remote_pawn_position_update( std::string id, std::string attribute_name, wsp_vector& vector_3d, void* data, const std::string& data_provider ) {
+WSP::WSP_ERROR remote_pawn_position_update( std::string id, std::string attribute_name, wsp_vector & vector_3d, void * data, const std::string & data_provider )
+{
+	mcuCBHandle * mcu_p = static_cast< mcuCBHandle * >( data );
 
-	SbmPawn* pawn_p = NULL;
-	
-	mcuCBHandle *mcu_p = static_cast< mcuCBHandle* >( data );
+	SbmPawn * pawn_p = mcu_p->pawn_map.lookup( id );
+	if ( pawn_p != NULL )
+	{
+		float x, y, z, h, p, r;
+		pawn_p->get_world_offset( x, y, z, h, p, r );
 
-	pawn_p = mcu_p->pawn_map.lookup( id );
-
-	if ( pawn_p != NULL ) {
-
-		//pawn_p->set_world_offset( ( (float)vector_3d.y * -1 ), ( (float)vector_3d.z ), ( (float)vector_3d.x ), 0, 0, 0 );  // Unreal Coordinates
-		pawn_p->set_world_offset( ( (float)vector_3d.x ), ( (float)vector_3d.y ), ( (float)vector_3d.z ), 0, 0, 0 );  // SBM Native Coordinates
-	} else {
-
-		cerr << "ERROR: SbmPawn::remote_pawn_position_update: SbmPawn '" << id << "' is NULL, cannot set_world_offset" << endl; 
+		pawn_p->set_world_offset( (float)vector_3d.x, (float)vector_3d.y, (float)vector_3d.z, h, p, r );
+	}
+	else
+	{
+		cerr << "ERROR: SbmPawn::remote_pawn_position_update: SbmPawn '" << id << "' is NULL, cannot set_world_offset" << endl;
 		return not_found_error( "SbmPawn is NULL" );
 	}
 
 	return no_error();
 }
 
-WSP::WSP_ERROR remote_sbm_joint_update( std::string id, std::string attribute_name, wsp_vector& vector_3d, void* data ) {
+WSP::WSP_ERROR remote_pawn_rotation_update( std::string id, std::string attribute_name, wsp_vector & vector_4d, void * data, const std::string & data_provider )
+{
+	mcuCBHandle * mcu_p = static_cast< mcuCBHandle * >( data );
 
-	SbmPawn* pawn_p = NULL;
-	
-	mcuCBHandle *mcu_p = static_cast< mcuCBHandle* >( data );
+	SbmPawn * pawn_p = mcu_p->pawn_map.lookup( id );
 
-	pawn_p = mcu_p->pawn_map.lookup( id );
+	if ( pawn_p != NULL )
+	{
+		float x, y, z, h, p, r;
+		pawn_p->get_world_offset( x, y, z, h, p, r );
 
-	if ( pawn_p != NULL ) {
-
-		SkSkeleton* skeleton_p = pawn_p->skeleton_p;
-
-		if ( skeleton_p != NULL ) {
-		
-			SkJoint* joint_p = skeleton_p->search_joint( attribute_name.c_str() );
-
-			if ( joint_p != NULL ) {
-
-				SrQuat q = joint_p->quat()->value();
-
-				q.set( static_cast<float>( vector_3d.q ), static_cast<float>( vector_3d.x ), static_cast<float>( vector_3d.y ), 
-					static_cast<float>( vector_3d.z ) );
-			} else {
-
-				printf( "SkJoint(%s) is NULL\n", attribute_name.c_str() );
-
-				return not_found_error( "SkJoint is NULL" );
-			}
-		} else {
-
-			printf( "SkSkeleton(%s) is NULL\n", id.c_str() );
-
-			return not_found_error( "SkSkeleton is NULL" );
-		}
-	} else {
-
-		printf( "SbmPawn(%s) is NULL\n", id.c_str() );
-
+		euler_t e = quat_t( vector_4d.q, vector_4d.x, vector_4d.y, vector_4d.z );
+		pawn_p->set_world_offset( x, y, z, (float)e.h(), (float)e.p(), (float)e.r() );
+	}
+	else
+	{
+		cerr << "ERROR: SbmPawn::remote_pawn_rotation_update: SbmPawn '" << id << "' is NULL, cannot set_world_offset" << endl;
 		return not_found_error( "SbmPawn is NULL" );
 	}
 
 	return no_error();
 }
+
 void handle_wsp_error( std::string id, std::string attribute_name, int error, std::string reason, void* data ) {
 
 	printf( "error getting id: %s attribute_name: %s. error_code: %d reason: %s\n", id.c_str(), attribute_name.c_str(), error, reason.c_str() );
@@ -639,10 +622,10 @@ int SbmPawn::print_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& arg
 
 int SbmPawn::create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	
-	std::string pawn_name = args.read_token();
-	char* skel_file = args.read_token();
+	std::string pawn_and_attribute = args.read_token();
+	int interval = args.read_int();
 
-	if( pawn_name.length()==0 ) {
+	if( pawn_and_attribute.length()==0 ) {
 	
 		std::cerr << "ERROR: Expected pawn name." << std::endl;
 		return CMD_FAILURE;
@@ -650,19 +633,19 @@ int SbmPawn::create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 	SbmPawn* pawn_p = NULL;
 
-	pawn_p = mcu_p->pawn_map.lookup( pawn_name.c_str() );
+	pawn_p = mcu_p->pawn_map.lookup( pawn_and_attribute.c_str() );
 
 	if( pawn_p != NULL ) {
 
-		std::cerr << "ERROR: Pawn \"" << pawn_name << "\" already exists." << std::endl;
+		std::cerr << "ERROR: Pawn \"" << pawn_and_attribute << "\" already exists." << std::endl;
 		return CMD_FAILURE;
 	}
 
-	pawn_p = new SbmPawn( pawn_name.c_str() );
+	pawn_p = new SbmPawn( pawn_and_attribute.c_str() );
 
 	SkSkeleton* skeleton = new SkSkeleton();
 	skeleton->ref();
-	std::string skel_name = pawn_name+"-skel";
+	std::string skel_name = pawn_and_attribute+"-skel";
 	skeleton->name( skel_name.c_str() );
 	// Init channels
 	skeleton->make_active_channels();	
@@ -671,17 +654,17 @@ int SbmPawn::create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 	if( err != CMD_SUCCESS ) {
 
-		std::cerr << "ERROR: Unable to initialize SbmPawn \"" << pawn_name << "\"." << std::endl;
+		std::cerr << "ERROR: Unable to initialize SbmPawn \"" << pawn_and_attribute << "\"." << std::endl;
 		delete pawn_p;
 		skeleton->unref();
 		return err;
 	}
 
-	err = mcu_p->pawn_map.insert( pawn_name.c_str(), pawn_p );
+	err = mcu_p->pawn_map.insert( pawn_and_attribute.c_str(), pawn_p );
 
 	if( err != CMD_SUCCESS )	{
 
-		std::cerr << "ERROR: SbmPawn pawn_map.insert(..) \"" << pawn_name << "\" FAILED" << std::endl; 
+		std::cerr << "ERROR: SbmPawn pawn_map.insert(..) \"" << pawn_and_attribute << "\" FAILED" << std::endl; 
 		delete pawn_p;
 		skeleton->unref();
 		return err;
@@ -691,79 +674,15 @@ int SbmPawn::create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 	if( err != CMD_SUCCESS )	{
 
-		std::cerr << "ERROR: SbmPawn pawn_map.insert(..) \"" << pawn_name << "\" FAILED" << std::endl; 
-		delete pawn_p;
-		skeleton->unref();
-		return err;
-	}
-	
-
-	mcu_p->theWSP->subscribe_vector_3d_interval( pawn_name, "coordinates", 10, handle_wsp_error, remote_pawn_position_update, mcu_p );
-
-	return( CMD_SUCCESS );
-}
-
-int SbmPawn::create_remote_sbm_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
-	
-	std::string pawn_name = args.read_token();
-
-	if( pawn_name.length()==0 ) {
-	
-		std::cerr << "ERROR: Expected pawn name." << std::endl;
-		return CMD_FAILURE;
-	}
-
-	SbmPawn* pawn_p = NULL;
-
-	pawn_p = mcu_p->pawn_map.lookup( pawn_name.c_str() );
-
-	if( pawn_p != NULL ) {
-
-		std::cerr << "ERROR: Pawn \"" << pawn_name << "\" already exists." << std::endl;
-		return CMD_FAILURE;
-	}
-
-	pawn_p = new SbmPawn( pawn_name.c_str() );
-
-	SkSkeleton* skeleton = new SkSkeleton();
-	skeleton->ref();
-	std::string skel_name = pawn_name+"-skel";
-	skeleton->name( skel_name.c_str() );
-	// Init channels
-	skeleton->make_active_channels();
-
-	int err = pawn_p->init( skeleton );
-
-	if( err != CMD_SUCCESS ) {
-
-		std::cerr << "ERROR: Unable to initialize SbmPawn \"" << pawn_name << "\"." << std::endl;
+		std::cerr << "ERROR: SbmPawn pawn_map.insert(..) \"" << pawn_and_attribute << "\" FAILED" << std::endl; 
 		delete pawn_p;
 		skeleton->unref();
 		return err;
 	}
 
-	err = mcu_p->pawn_map.insert( pawn_name.c_str(), pawn_p );
 
-	if( err != CMD_SUCCESS )	{
-
-		std::cerr << "ERROR: SbmPawn pawn_map.insert(..) \"" << pawn_name << "\" FAILED" << std::endl; 
-		delete pawn_p;
-		skeleton->unref();
-		return err;
-	}
-
-	err = mcu_p->add_scene( pawn_p->scene_p );
-
-	if( err != CMD_SUCCESS )	{
-
-		std::cerr << "ERROR: SbmPawn pawn_map.insert(..) \"" << pawn_name << "\" FAILED" << std::endl; 
-		delete pawn_p;
-		skeleton->unref();
-		return err;
-	}
-	
-	mcu_p->theWSP->subscribe_vector_3d_interval( pawn_name, "world_offset", 10, handle_wsp_error, remote_pawn_position_update, mcu_p );
-//	mcu_p->theWSP->subscribe_vector_4d_interval( pawn_name, "skullbase", 1, handle_wsp_error, remote_sbm_joint_update, mcu_p );
+	mcu_p->theWSP->subscribe_vector_3d_interval( pawn_and_attribute, "position", interval, handle_wsp_error, remote_pawn_position_update, mcu_p );
+	mcu_p->theWSP->subscribe_vector_4d_interval( pawn_and_attribute, "rotation", interval, handle_wsp_error, remote_pawn_rotation_update, mcu_p );
 
 	return( CMD_SUCCESS );
 }
@@ -784,7 +703,7 @@ int SbmPawn::remove_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 	if( pawn_p != NULL ) {
 
-		mcu_p->theWSP->unsubscribe( pawn_name, "coordinates", 1 );
+		mcu_p->theWSP->unsubscribe( pawn_name, "position", 1 );
 		pawn_p->remove_from_scene();
 
 		return CMD_SUCCESS;
@@ -796,17 +715,123 @@ int SbmPawn::remove_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	}
 }
 
-WSP_ERROR SbmPawn::wsp_coordinate_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data ) {
-	SbmPawn* pawn_p = (SbmPawn*)data;
-	const SkJoint* wo_joint = pawn_p->get_world_offset_joint();
-	if( wo_joint != NULL ) {
+WSP_ERROR SbmPawn::wsp_world_position_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data )
+{
+	SbmPawn * pawn_p = (SbmPawn *)data;
+
+	const SkJoint * wo_joint = pawn_p->get_world_offset_joint();
+	if ( wo_joint != NULL )
+	{
 		value.x = wo_joint->const_pos()->value(0);
 		value.y = wo_joint->const_pos()->value(1);
 		value.z = wo_joint->const_pos()->value(2);
+		value.num_dimensions = 3;
 
 		return WSP::no_error();
-	} else {
+	}
+	else
+	{
 		return WSP::not_found_error( "no world_offset joint" );
+	}
+}
+
+WSP_ERROR SbmPawn::wsp_world_rotation_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data )
+{
+	SbmPawn * pawn_p = (SbmPawn *)data;
+
+	const SkJoint * wo_joint = pawn_p->get_world_offset_joint();
+	if ( wo_joint != NULL )
+	{
+		value.x = ((SkJoint *)wo_joint)->quat()->value().x;
+		value.y = ((SkJoint *)wo_joint)->quat()->value().y;
+		value.z = ((SkJoint *)wo_joint)->quat()->value().z;
+		value.q = ((SkJoint *)wo_joint)->quat()->value().w;
+		value.num_dimensions = 4;
+
+		return WSP::no_error();
+	}
+	else
+	{
+		return WSP::not_found_error( "no world_offset joint" );
+	}
+}
+
+WSP_ERROR SbmPawn::wsp_position_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data )
+{
+	SbmPawn * pawn_p = (SbmPawn *)data;
+
+	vector< string > tokens;
+	vhcl::Tokenize( id, tokens, ":" );
+	string & char_name = tokens[ 0 ];
+	string & joint_name = tokens[ 1 ];
+
+	SkJoint * joint = pawn_p->skeleton_p->search_joint( joint_name.c_str() );
+	if ( joint != NULL )
+	{
+		joint->update_gmat();
+		const SrMat & sr_m = joint->gmat();
+
+		matrix_t m;
+		for ( int i=0; i<4; i++ )
+		{
+			for ( int j=0; j<4; j++ )
+			{
+				m.set( i, j, sr_m.get( i, j ) );
+			}
+		}
+
+		vector_t pos = m.translation( GWIZ_M_TR );
+
+		value.x = pos.x();
+		value.y = pos.y();
+		value.z = pos.z();
+		value.num_dimensions = 3;
+
+		return WSP::no_error();
+	}
+	else
+	{
+		return WSP::not_found_error( "no joint" );
+	}
+}
+
+WSP_ERROR SbmPawn::wsp_rotation_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data )
+{
+	SbmPawn * pawn_p = (SbmPawn *)data;
+
+	vector< string > tokens;
+	vhcl::Tokenize( id, tokens, ":" );
+	string & char_name = tokens[ 0 ];
+	string & joint_name = tokens[ 1 ];
+
+	SkJoint * joint = pawn_p->skeleton_p->search_joint( joint_name.c_str() );
+	if ( joint != NULL )
+	{
+		joint->update_gmat();
+		const SrMat & sr_m = joint->gmat();
+
+		matrix_t m;
+		for( int i=0; i<4; i++ )
+		{
+			for( int j=0; j<4; j++ )
+			{
+				m.set( i, j, sr_m.get( i, j ) );
+			}
+		}
+
+		quat_t quat = m.quat( GWIZ_M_TR );
+
+		value.x = quat.x();
+		value.y = quat.y();
+		value.z = quat.z();
+		value.q = quat.w();
+		value.num_dimensions = 4;
+
+		return WSP::no_error();
+	}
+	else
+	{
+		return WSP::not_found_error( "no joint" );
 	}
 }
 
