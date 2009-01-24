@@ -3,14 +3,19 @@
 
 #0 load motions ../../../../../gunslinger/data/sbm-gunslinger/ChrRio/motion
 
-0 ctrl M motion ChrRio_Draw001
-#0 ctrl M motion fltk_crash
-0 motion M dur 4
+#0 ctrl M motion ChrRio_Draw001_A
+#0 motion M dur 5.33
 
 #0 ctrl M motion ChrRio_ShootIdle001
 
-0 ctrl M2 motion ChrRio_Holster001
-0 motion M2 dur 4
+#0 ctrl M motion ChrRio_Holster001_A
+#0 motion M dur 29
+
+#0 ctrl M motion ChrRio_Draw002_A
+#0 motion M dur 5.33
+
+0 ctrl M motion ChrRio_Holster002_A
+0 motion M dur 29.7
 
 #1 ctrl M motion ChrRio_Draw002
 #1 ctrl M motion ChrRio_GunIdle002
