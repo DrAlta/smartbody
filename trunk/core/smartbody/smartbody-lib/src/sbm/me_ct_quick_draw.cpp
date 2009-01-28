@@ -770,7 +770,7 @@ else	{
 		quat_t src_q( fbuffer[ i_map + 0 ], fbuffer[ i_map + 1 ], fbuffer[ i_map + 2 ], fbuffer[ i_map + 3 ] );
 
 		quat_t hard_q( w, x, y, z );
-#if 0
+#if 1
 #define SMOOTH_RATE_REF (30.0f)
 		float s = (float)(0.01 + ( 1.0 - powf( smooth, dt * SMOOTH_RATE_REF ) ) * 0.99 );
 		quat_t smooth_q = src_q.lerp( s, hard_q );
