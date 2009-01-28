@@ -120,19 +120,26 @@ class MeCtQuickDraw : public MeController	{
 		float curr_motion_dur;
 		float curr_motion_scale;
 		float curr_play_dur;
+		float curr_hard_dur;
+
+		float blend_in;
+		float blend_out;
 
 		float raw_gundraw_dur;
 		float raw_gundraw_scale;
 		float play_gundraw_dur;
+		float hard_gundraw_dur; // without embedded leadup
 		int has_gundraw_leadup;
 		
 		float raw_holster_dur;
 		float raw_holster_scale;
 		float play_holster_dur;
+		float hard_holster_dur; // without embedded leadaway
 		int has_holster_leadaway;
 		
 		float track_dur;
 		float reholster_time;
+		float complete_time;
 
 		int draw_mode;
 
@@ -162,8 +169,6 @@ class MeCtQuickDraw : public MeController	{
 		void set_holster_duration( float sec );
 		void set_motion_duration( float gundraw_sec, float holster_sec );
 		void set_motion_duration( float sec );
-
-//	float get_motion_duration() { return play_holster_dur; }; // in sbm-character.cpp
 		float get_gundraw_duration() { return play_gundraw_dur; }; // NOTE: must subtract lead-up/away
 		float get_holster_duration() { return play_holster_dur; }; // ''
 
@@ -185,6 +190,7 @@ class MeCtQuickDraw : public MeController	{
 		/*! Returns the current play mode */
 		SkMotion::InterpType play_mode () const { return _play_mode; }
 
+#if 0
 		/**
 		 *  Return initial blend time, when body can blend to the source animation's first frame.
 		 *  Defaults to 1/3rd of a second.
@@ -196,6 +202,7 @@ class MeCtQuickDraw : public MeController	{
 		 *  Defaults to 1/3rd of a second.
 		 */
 		float outdt() { return 0.3f; }
+#endif
 
 	private:
 		quat_t get_final_joint_rot( SkMotion* mot_p, char *joint_name );
@@ -205,7 +212,9 @@ class MeCtQuickDraw : public MeController	{
 		SkJoint*	find_joint( char *joint_str, SkJoint **joint_pp );
 		SkJoint*	target_ref_joint( void );
 		vector_t	world_target_point( void );
-
+		
+		void reset_blend( void );
+		
 		// callbacks for the base class
 		virtual void context_updated( void );
 		virtual void controller_start();
