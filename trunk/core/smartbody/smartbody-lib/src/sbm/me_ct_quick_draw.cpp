@@ -23,7 +23,9 @@
 
 #include "me_ct_quick_draw.h"
 
-#define MAX_JOINT_LABEL_LEN 	64
+#define MAX_JOINT_LABEL_LEN 	( 64 )
+#define DFL_CTRL_TIME_INDT		( 0.3f )
+#define DFL_CTRL_TIME_OUTDT		( 0.3f )
 
 gw_float_t gwiz_safe_acos( gw_float_t c );
 
@@ -51,12 +53,18 @@ MeCtQuickDraw::MeCtQuickDraw( void )	{
 	start = 0;
 	prev_time = 0.0;
 
+	blend_in = 0.0;
+	blend_out = 0.0;
 	raw_gundraw_dur = 0.0;
 	raw_gundraw_scale = 1.0;
 	play_gundraw_dur = 0.0;
+	hard_gundraw_dur = 0.0;
+	has_gundraw_leadup = false;
 	raw_holster_dur = 0.0;
 	raw_holster_scale = 1.0;
 	play_holster_dur = 0.0;
+	hard_holster_dur = 0.0;
+	has_holster_leadaway = false;
 
 	track_dur = 0.0;
 	draw_mode = DRAW_DISABLED;
@@ -67,6 +75,19 @@ MeCtQuickDraw::~MeCtQuickDraw( void )	{
 	if( interim_pose_buff_p )	{
 		delete [] interim_pose_buff_p;
 		interim_pose_buff_p = NULL;
+	}
+}
+
+void print_motion( SkMotion* mot_p )	{
+
+	if( mot_p ) {
+		printf( "motion:'%s'\n", mot_p->name() );
+		printf( "file:'%s'\n", mot_p->filename() );
+		printf( " ready:     %f\n", mot_p->time_ready() );
+		printf( " str-start: %f \n", mot_p->time_stroke_start() );
+		printf( " str-emph:  %f \n", mot_p->time_stroke_emphasis() );
+		printf( " str-end:   %f \n", mot_p->time_stroke_end() );
+		printf( " relax:     %f \n", mot_p->time_relax() );
 	}
 }
 
@@ -89,6 +110,11 @@ void MeCtQuickDraw::init( SkMotion* mot_p, SkMotion* mot2_p ) {
 			return;
 		}
 	}
+	
+#if 0
+	print_motion( mot_p );
+	print_motion( mot2_p );
+#endif
 
 	_last_apply_frame = 0;
 	
@@ -111,6 +137,10 @@ void MeCtQuickDraw::init( SkMotion* mot_p, SkMotion* mot2_p ) {
 		else	{
 			printf( "MeCtQuickDraw::init ERR: unmatched channels in reholster motion '%s', IGNORED\n", mot2_p->filename() );
 		}
+	}
+	else	{
+		raw_holster_dur = raw_gundraw_dur;
+		set_holster_duration( raw_holster_dur );
 	}
 
 	start = 0;
@@ -139,6 +169,8 @@ void MeCtQuickDraw::init( SkMotion* mot_p, SkMotion* mot2_p ) {
 	}
 	interim_pose_buff_p = new float[ n_float ];
 	
+	reset_blend();
+	
 	MeController::init();
 
 	if( _context ) {
@@ -149,16 +181,54 @@ void MeCtQuickDraw::init( SkMotion* mot_p, SkMotion* mot2_p ) {
 
 ///////////////////////////////////////////////////////////////////////////////////
 
+void MeCtQuickDraw::reset_blend( void ) {
+
+/*
+	NOTE:
+		-assumes critical motion start time is at time_ready()
+		-assumes critical motion end time is at time_relax()
+		-could also be set at time_stroke_start() and time_stroke_end()
+*/
+	if( _gundraw_motion->time_ready() > 0.0 )	{
+		has_gundraw_leadup = true;
+		blend_in = _gundraw_motion->time_ready() / raw_gundraw_scale;
+	}
+	else	{
+		has_gundraw_leadup = false;
+		blend_in = DFL_CTRL_TIME_INDT;
+	}
+
+	if( _holster_motion )	{
+		float relax_interval = _holster_motion->duration() - _holster_motion->time_relax();
+		if( relax_interval > 0.001 )   {
+			has_holster_leadaway = true;
+			blend_out = relax_interval / raw_holster_scale;
+		}
+		else	{
+			has_holster_leadaway = false;
+			blend_out = DFL_CTRL_TIME_OUTDT;
+		}
+	}
+	else	{
+		has_holster_leadaway = has_gundraw_leadup;
+		blend_out = blend_in;
+	}
+
+	inoutdt( blend_in, blend_out );
+}
+
 void MeCtQuickDraw::set_gundraw_duration( float sec )	{
 	
 	play_gundraw_dur = sec;
 	raw_gundraw_scale = raw_gundraw_dur / play_gundraw_dur;
+	reset_blend();
 }
 
 void MeCtQuickDraw::set_holster_duration( float sec )	{
 	
 	play_holster_dur = sec;
 	raw_holster_scale = raw_holster_dur / play_holster_dur;
+	reset_blend();
 }
 
 void MeCtQuickDraw::set_motion_duration( float gundraw_sec, float holster_sec )	{
@@ -360,12 +430,26 @@ void MeCtQuickDraw::controller_start( void )	{
 	if( _context->channels().size() > 0 )	{
 		skeleton_ref_p = _context->channels().skeleton();
 	}
+	
+#if 0
+	if( has_gundraw_leadup )
+		printf( "animated indt: %f\n", indt() );
+	else
+		printf( "static indt: %f\n", indt() );
+	if( has_holster_leadaway )
+		printf( "animated outdt: %f\n", outdt() );
+	else
+		printf( "static outdt: %f\n", outdt() );
+#endif
+
+	hard_gundraw_dur = play_gundraw_dur - ( has_gundraw_leadup ? indt() : 0.0f );
+	hard_holster_dur = play_holster_dur - ( has_holster_leadaway ? outdt() : 0.0f );
+
+//printf( "drawgun: play:%f hard:%f\n", play_gundraw_dur, hard_gundraw_dur );
+//printf( "holster: play:%f hard:%f\n", play_holster_dur, hard_holster_dur );
 
 	start = 1;
 	draw_mode = DRAW_READY;
-	
-//inoutdt( 1.0, 1.0 );
-//smooth = 0.0;
 }
 
 /*
@@ -419,24 +503,37 @@ else	{
 	float motion_time = 0.0;
 	gw_float_t raw_lerp = 0.0;
 	
+
 	if( draw_mode == DRAW_READY )	{
 		_curr_motion_p = _gundraw_motion;
 		curr_motion_dur = raw_gundraw_dur;
 		curr_motion_scale = raw_gundraw_scale;
 		curr_play_dur = play_gundraw_dur;
+		curr_hard_dur = hard_gundraw_dur;
+		if( has_gundraw_leadup )	{
+			motion_time = (float)t;
+		}
 		if( t > indt() )	{
 			draw_mode = DRAW_AIMING;
 		}
+//printf( "READY: play:%.2f hard:%.2f motT:%.2f lerp:%.3f\n", play_gundraw_dur, hard_gundraw_dur, motion_time, raw_lerp );
 	}
 	if( draw_mode == DRAW_AIMING )	{
 		float mode_time = (float)t - indt();
-		if( mode_time < play_gundraw_dur )	{
-			motion_time = mode_time;
-			raw_lerp = motion_time / play_gundraw_dur;
+		if( mode_time < hard_gundraw_dur )	{
+			if( has_gundraw_leadup )	{
+				motion_time = (float)t;
+				raw_lerp = mode_time / hard_gundraw_dur;
+			}
+			else	{
+				motion_time = mode_time;
+				raw_lerp = motion_time / hard_gundraw_dur;
+			}
 		}
 		else	{
 			draw_mode = DRAW_TRACKING; 
 		}
+//printf( "AIM: play:%.2f hard:%.2f motT:%.2f lerp:%.3f\n", play_gundraw_dur, hard_gundraw_dur, motion_time, raw_lerp );
 	}
 	if( draw_mode == DRAW_TRACKING )	{
 		motion_time = play_gundraw_dur;
@@ -448,41 +545,67 @@ else	{
 				draw_mode = DRAW_RETURN; 
 			}
 		}
+//printf( "TRACK: play:%.2f hard:%.2f motT:%.2f lerp:%.3f\n", play_gundraw_dur, hard_gundraw_dur, motion_time, raw_lerp );
 	}
 	if( draw_mode == DRAW_RETURN )	{
-		float mode_time = (float)t - reholster_time;
 		if( _holster_motion )	{
 			_curr_motion_p = _holster_motion;
 			curr_motion_dur = raw_holster_dur;
 			curr_motion_scale = raw_holster_scale;
 			curr_play_dur = play_holster_dur;
-			motion_time = mode_time; // increasing
+			curr_hard_dur = hard_holster_dur;
+		}
+		float mode_time = (float)t - reholster_time;
+		if( mode_time < curr_hard_dur )	{
+			if( _holster_motion )	{
+				motion_time = mode_time; // increasing
+			}
+			else	{
+				motion_time = play_gundraw_dur - mode_time; // decreasing
+			}
+			if( has_holster_leadaway )	{
+				raw_lerp = 1.0 - mode_time / curr_hard_dur;
+			}
+			else	{
+				raw_lerp = 1.0 - mode_time / curr_hard_dur;
+			}
+//printf( "RET: play:%.2f hard:%.2f motT:%.2f lerp:%.3f\n", curr_play_dur, curr_hard_dur, motion_time, raw_lerp );
 		}
 		else	{
-			motion_time = play_gundraw_dur - mode_time; // decreasing
-		}
-		raw_lerp = 1.0 - mode_time / curr_play_dur;
-		if( mode_time > curr_play_dur )	{
+			complete_time = (float)t;
 			draw_mode = DRAW_COMPLETE; 
 		}
 	}
 	if( draw_mode == DRAW_COMPLETE )	{
-		if( _holster_motion )	{
-			motion_time = play_gundraw_dur;
+		float mode_time = (float)t - complete_time;
+		if( mode_time < outdt() )	{
+			if( _holster_motion )	{
+				if( has_holster_leadaway )	{
+					motion_time = curr_hard_dur + mode_time;
+				}
+				else	{
+					motion_time = curr_hard_dur;
+				}
+			}
+			else	{
+				if( has_holster_leadaway )	{
+					motion_time = outdt() - mode_time;
+				}
+				else	{
+					motion_time = 0.0;
+				}
+			}
+			raw_lerp = 0.0;
+//printf( "COMPL: play:%.2f hard:%.2f motT:%.2f lerp:%.3f\n", curr_play_dur, curr_hard_dur, motion_time, raw_lerp );
 		}
 		else	{
-			motion_time = 0.0;
-		}
-		float mode_time = (float)t - reholster_time - curr_play_dur;
-		raw_lerp = 0.0;
-		if( mode_time > outdt() )	{
 			draw_mode = DRAW_DISABLED; 
 		}
 	}
 	if( draw_mode == DRAW_DISABLED )	{
 		return( 0 );
 	}
-	
+
 	// calc lerp blend between raw motion and modified aim
 	if( raw_lerp > 1.0 ) raw_lerp = 1.0;
 #if 1
@@ -647,6 +770,7 @@ else	{
 		quat_t src_q( fbuffer[ i_map + 0 ], fbuffer[ i_map + 1 ], fbuffer[ i_map + 2 ], fbuffer[ i_map + 3 ] );
 
 		quat_t hard_q( w, x, y, z );
+#if 0
 #define SMOOTH_RATE_REF (30.0f)
 		float s = (float)(0.01 + ( 1.0 - powf( smooth, dt * SMOOTH_RATE_REF ) ) * 0.99 );
 		quat_t smooth_q = src_q.lerp( s, hard_q );
@@ -655,6 +779,12 @@ else	{
 		fbuffer[ i_map + 1 ] = (float)smooth_q.x();
 		fbuffer[ i_map + 2 ] = (float)smooth_q.y();
 		fbuffer[ i_map + 3 ] = (float)smooth_q.z();
+#else
+		fbuffer[ i_map + 0 ] = (float)hard_q.w();
+		fbuffer[ i_map + 1 ] = (float)hard_q.x();
+		fbuffer[ i_map + 2 ] = (float)hard_q.y();
+		fbuffer[ i_map + 3 ] = (float)hard_q.z();
+#endif
 	}
 
 #endif // ADAPTED QUICKDRAW
@@ -670,9 +800,12 @@ SkChannelArray& MeCtQuickDraw::controller_channels( void )	{
 double MeCtQuickDraw::controller_duration( void ) {
 
 // THIS GETS CALLED PRIOR TO controller_start().
+#if 0
+	// screws up inoutdt() call, which calls this function
 	if( ( play_gundraw_dur > 0.0 ) && ( track_dur >= 0.0 ) )	{
 		return( indt() + play_gundraw_dur + play_holster_dur + track_dur + outdt() );
 	}
+#endif
 	return( -1.0 );
 }
 

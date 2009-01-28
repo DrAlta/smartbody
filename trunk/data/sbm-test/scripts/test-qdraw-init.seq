@@ -6,5 +6,5 @@
 #0 ctrl Q quickdraw ChrRio_Draw001_A
 0 ctrl Q quickdraw ChrRio_Draw001_A ChrRio_Holster001_A
 
-#0 ctrl Q quickdraw ChrRio_Draw002 ChrRio_Holster002
+#0 ctrl Q quickdraw ChrRio_Draw002_A ChrRio_Holster002_A
 
