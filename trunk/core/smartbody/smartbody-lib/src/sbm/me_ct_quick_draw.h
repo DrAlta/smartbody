@@ -116,7 +116,8 @@ class MeCtQuickDraw : public MeController	{
 		float smooth;
 		int start;
 		double prev_time;
-
+		vector_t prev_w_point;
+		
 		float curr_motion_dur;
 		float curr_motion_scale;
 		float curr_play_dur;
