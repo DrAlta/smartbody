@@ -49,7 +49,7 @@ MeCtQuickDraw::MeCtQuickDraw( void )	{
 
 	interim_pose_buff_p = NULL;
 	
-	smooth = 0.0;
+	smooth = 0.75;
 	start = 0;
 	prev_time = 0.0;
 
@@ -452,6 +452,8 @@ void MeCtQuickDraw::controller_start( void )	{
 	draw_mode = DRAW_READY;
 }
 
+///////////////////////////////////////////////////////////////////////////////////
+
 /*
 	Redefine H-P-R, without moving the axes:
 		frame: orientation of H-P-R def relative to standard X-Y-Z
@@ -463,6 +465,7 @@ quat_t GWIZ_from_frame( quat_t q, quat_t frame_q )	{
 	return( frame_q * q * -frame_q );
 }
 
+#define SMOOTH_RATE_REF (30.0f)
 
 bool MeCtQuickDraw::controller_evaluate( double t, MeFrameData& frame ) {
 
@@ -538,14 +541,16 @@ else	{
 	if( draw_mode == DRAW_TRACKING )	{
 		motion_time = play_gundraw_dur;
 		raw_lerp = 1.0;
+		float mode_time;
 		if( track_dur >= 0.0 )	{
-			float mode_time = (float)t - play_gundraw_dur - indt();
+			mode_time = (float)t - curr_hard_dur - indt();
 			if( mode_time > track_dur ) {
 				reholster_time = (float)t;
 				draw_mode = DRAW_RETURN; 
 			}
 		}
 //printf( "TRACK: play:%.2f hard:%.2f motT:%.2f lerp:%.3f\n", play_gundraw_dur, hard_gundraw_dur, motion_time, raw_lerp );
+//printf( "TRACK:%.2f time:%.2f modeT:%.2f motT:%.2f lerp:%.3f\n", track_dur, t, mode_time, motion_time, raw_lerp );
 	}
 	if( draw_mode == DRAW_RETURN )	{
 		if( _holster_motion )	{
@@ -685,8 +690,12 @@ else	{
 		fprintf( stderr, "MeCtQuickDraw::controller_evaluate ERR: skeleton NOT FOUND\n" );
 	}
 
-	vector_t w_point = world_target_point();
-
+	// apply smoothing to world target
+	vector_t hard_w_point = world_target_point();
+	float s = (float)(0.01 + ( 1.0 - powf( smooth, dt * SMOOTH_RATE_REF ) ) * 0.99 );
+	vector_t w_point = prev_w_point.lerp( s, hard_w_point );
+	prev_w_point = w_point;
+	
 	vector_t joint_forward_v( -1.0, 0.0, 0.0 );
 	vector_t joint_upward_v( 0.0, 1.0, 0.0 );
 	euler_t joint_frame_e;
@@ -767,11 +776,9 @@ else	{
 #endif
 		
 		int i_map = _motion_chan_to_buff[ _arm_chan_indices[ j ] ];
+#if 0
 		quat_t src_q( fbuffer[ i_map + 0 ], fbuffer[ i_map + 1 ], fbuffer[ i_map + 2 ], fbuffer[ i_map + 3 ] );
-
 		quat_t hard_q( w, x, y, z );
-#if 1
-#define SMOOTH_RATE_REF (30.0f)
 		float s = (float)(0.01 + ( 1.0 - powf( smooth, dt * SMOOTH_RATE_REF ) ) * 0.99 );
 		quat_t smooth_q = src_q.lerp( s, hard_q );
 		
@@ -780,10 +787,10 @@ else	{
 		fbuffer[ i_map + 2 ] = (float)smooth_q.y();
 		fbuffer[ i_map + 3 ] = (float)smooth_q.z();
 #else
-		fbuffer[ i_map + 0 ] = (float)hard_q.w();
-		fbuffer[ i_map + 1 ] = (float)hard_q.x();
-		fbuffer[ i_map + 2 ] = (float)hard_q.y();
-		fbuffer[ i_map + 3 ] = (float)hard_q.z();
+		fbuffer[ i_map + 0 ] = (float)w;
+		fbuffer[ i_map + 1 ] = (float)x;
+		fbuffer[ i_map + 2 ] = (float)y;
+		fbuffer[ i_map + 3 ] = (float)z;
 #endif
 	}
 
