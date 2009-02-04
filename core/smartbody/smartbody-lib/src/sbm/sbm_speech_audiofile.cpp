@@ -89,7 +89,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const cha
    */
 
    // parse text to get the name of the audio file
-   // parse .ltf file to get viseme timings
+   // parse .bml file to get viseme timings
    // parse .bml file to get mark timings
 
 
@@ -133,19 +133,16 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const cha
    m_speechRequestInfo[ m_requestIdCounter ].audioFilename = (string)fullAudioPath + "\\" + ref + ".wav";
 
 
-   string ltfFilename = "../../../../" + agent->get_voice_code() + "/" + ref + ".ltf";
-
-   ReadVisemeDataLTF( ltfFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData );
-   if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
-   {
-      printf( "AudioFileSpeech::requestSpeechAudio ERR: could not read LTF file: %s\n", ltfFilename.c_str() );
-      return 0;
-   }
-
-
    // TODO: Should we fail if the .bml file isn't present?
 
    string bmlFilename = "../../../../" + agent->get_voice_code() + "/" + ref + ".bml";
+
+   ReadVisemeDataBML( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData );
+   if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
+   {
+      printf( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlFilename.c_str() );
+      //return 0;
+   }
 
    ReadSpeechTiming( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers );
    if ( m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.size() == 0 )
@@ -399,6 +396,59 @@ void AudioFileSpeech::ReadVisemeDataLTF( const char * filename, std::vector< Vis
 }
 
 
+void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< VisemeData > & visemeData )
+{
+   visemeData.clear();
+
+
+   DOMDocument * doc = xml_utils::parseMessageXml( m_xmlParser, filename );
+   if ( doc == NULL )
+   {
+      return;
+   }
+
+   DOMElement * bml = doc->getDocumentElement();
+
+   // TODO: make sure it's "bml"
+
+   // <lips viseme="Ih" articulation="1.0" start="0.17" ready="0.17" relax="0.31" end="0.31" />
+
+   DOMNodeList * syncList = bml->getElementsByTagName( L"lips" );
+   for ( XMLSize_t i = 0; i < syncList->getLength(); i++ )
+   {
+      DOMElement * e = (DOMElement *)syncList->item( i );
+
+      char * xmlViseme = XMLString::transcode( e->getAttribute( L"viseme" ) );
+      string viseme = xmlViseme;
+      XMLString::release( &xmlViseme );
+
+      char * xmlArticulation = XMLString::transcode( e->getAttribute( L"articulation" ) );
+      string articulation = xmlArticulation;
+      XMLString::release( &xmlArticulation );
+
+      char * xmlStart = XMLString::transcode( e->getAttribute( L"start" ) );
+      string start = xmlStart;
+      XMLString::release( &xmlStart );
+
+      char * xmlReady = XMLString::transcode( e->getAttribute( L"ready" ) );
+      string ready = xmlReady;
+      XMLString::release( &xmlReady );
+
+      char * xmlRelax = XMLString::transcode( e->getAttribute( L"relax" ) );
+      string relax = xmlRelax;
+      XMLString::release( &xmlRelax );
+
+      char * xmlEnd = XMLString::transcode( e->getAttribute( L"end" ) );
+      string end = xmlEnd;
+      XMLString::release( &xmlEnd );
+
+
+      visemeData.push_back( VisemeData( viseme.c_str(), (float)atof( articulation.c_str() ), (float)atof( start.c_str() ) ) );
+      visemeData.push_back( VisemeData( viseme.c_str(), 0.0f,                                (float)atof( end.c_str() ) ) );
+   }
+}
+
+
 void AudioFileSpeech::ReadSpeechTiming( const char * filename, stdext::hash_map< std::string, float > & timeMarkers )
 {
    timeMarkers.clear();
@@ -413,6 +463,9 @@ void AudioFileSpeech::ReadSpeechTiming( const char * filename, stdext::hash_map<
    DOMElement * bml = doc->getDocumentElement();
 
    // TODO: make sure it's "bml"
+
+   // <sync id="T0" time="0.17" />If
+   // <sync id="T1" time="0.36" />
 
    DOMNodeList * syncList = bml->getElementsByTagName( L"sync" );
    for ( XMLSize_t i = 0; i < syncList->getLength(); i++ )

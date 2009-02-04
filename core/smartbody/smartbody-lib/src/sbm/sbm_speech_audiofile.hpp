@@ -66,6 +66,7 @@ class AudioFileSpeech : public SpeechInterface
 
    protected:
       virtual void ReadVisemeDataLTF( const char * filename, std::vector< VisemeData > & visemeData );
+      virtual void ReadVisemeDataBML( const char * filename, std::vector< VisemeData > & visemeData );
       virtual void ReadSpeechTiming( const char * filename, stdext::hash_map< std::string, float > & timeMarkers );
 };
 
