@@ -30,6 +30,21 @@
 ###  message id into sequence file.
 1	test bml character doctor noecho posture HandsAtSide
 
+# Pawns to look at, etc.
+1	echo Creating FORWARD pawn
+1	pawn FORWARD init
+1	set pawn FORWARD world_offset x 0 y 166 z 185
+
+1	echo Creating LEFT pawn
+1	pawn LEFT init
+1	set pawn LEFT world_offset x 50 y 166 z 50
+
+1	echo Creating RIGHT pawn
+1	pawn RIGHT init
+1	set pawn RIGHT world_offset x 50 y 166 z 50
+
+
+
 1	seq default-viewer
 
 1	set test character doctor
