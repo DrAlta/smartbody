@@ -105,6 +105,14 @@ struct Word   // Currently not used; markers are placed following protocol, see 
    Marker second_marker;
 };
 
+struct Viseme
+{
+   string viseme;
+   string start;
+   string end;
+
+   Viseme( const string & _viseme, const string & _start, const string & _end ) { viseme = _viseme; start = _start; end = _end; }
+};
 
 struct Utterance
 {
@@ -116,6 +124,7 @@ struct Utterance
    vector<string> words;         // All the individual words in the utterance
    map<string, string> markers;  // Mapping of ID (T0, T1, etc.) to time. All the markers wrap around words. 
                                  // Assumed protocol: <marker T0/>word_0<marker T1/><marker T2/>word_1<marker T3/>
+   vector< Viseme > visemes;     // Viseme info parsed from the .ltf file
 };
 
 
@@ -132,18 +141,20 @@ string m_speech_id_prefix = "sp";
 string m_marker_id_prefix = "T";
 
 
-string remove_double_quotes( string s )
+string remove_double_quotes( const string & s )
 {
-   while(s.find("\"") != string::npos)
+   string c = s;
+
+   while ( c.find( "\"" ) != string::npos )
    {
-      s.replace(s.find("\""), 1, "");
+      c.replace( c.find( "\"" ), 1, "" );
    }
 
-   return s;
+   return c;
 }
 
 
-string int_to_string( int i )
+string int_to_string( const int i )
 {
    std::ostringstream ostr;
    ostr << i;
@@ -151,7 +162,7 @@ string int_to_string( int i )
 }
 
 
-void write_string_to_file( string name, string text )
+void write_string_to_file( const string & name, const string & text )
 {
    string file_name = name + ".bml";
    string path = output_dir + "/";
@@ -164,14 +175,14 @@ void write_string_to_file( string name, string text )
    }
    else 
    {
-      printf( "\n\nError when trying to write to file '%s.wbb'.\n\nPress any key to exit.", file_name );
+      printf( "\n\nError when trying to write to file '%s.bml'.\n\nPress any key to exit.", file_name.c_str() );
       _getch();
       exit(1);
    }
 }
 
 
-string create_bml( Utterance * ut )
+string create_bml( Utterance & ut )
 {
    string result = "";
    int errorCode = 0;
@@ -191,11 +202,11 @@ string create_bml( Utterance * ut )
          XMLCh * level = XMLString::transcode( "level" );
          XMLCh * type = XMLString::transcode( "type" );
          //XMLCh * ref = XMLString::transcode( "ref" );
-         //XMLCh * viseme = XMLString::transcode( "viseme" );
-         //XMLCh * articulation = XMLString::transcode( "articulation" );
+         XMLCh * viseme = XMLString::transcode( "viseme" );
+         XMLCh * articulation = XMLString::transcode( "articulation" );
 
          string first_marker_id = m_marker_id_prefix + int_to_string( 0 );
-         string file_name = ut->utterance_id + ".wav";
+         string file_name = ut.utterance_id + ".wav";
          //XMLCh * id_value = XMLString::transcode( file_name.c_str() );
 
          DOMDocument* doc = impl->createDocument(
@@ -209,9 +220,18 @@ string create_bml( Utterance * ut )
          DOMElement * rootElement = doc->getDocumentElement();
 
          DOMElement * speechElement = doc->createElement( X( "speech" ) );
-         speechElement->setAttribute( id, X( ut->speech_id.c_str() ) );
-         speechElement->setAttribute( start, X( "0.0" ) );
-         speechElement->setAttribute( ready, X( ut->markers[ first_marker_id ].c_str() ) );                                
+         speechElement->setAttribute( id, X( ut.speech_id.c_str() ) );
+         speechElement->setAttribute( start, X( "0" ) );
+
+         if ( ut.markers.size() > 0 )
+         {
+            speechElement->setAttribute( ready, X( ut.markers[ first_marker_id ].c_str() ) );
+         }
+         else
+         {
+            speechElement->setAttribute( ready, X( "0" ) );
+         }
+
          speechElement->setAttribute( stroke, X( "0" ) );                              // <----- TODO: How to get this??
          speechElement->setAttribute( relax, X( "0" ) );                               // <----- TODO: How to get this??
          speechElement->setAttribute( end, X( "0" ) );                                 // <----- TODO: How to get this??
@@ -230,22 +250,35 @@ string create_bml( Utterance * ut )
          descriptionElement->appendChild( fileElement );
 
          // Add synch points (markers)
-         for (unsigned int i = 0; i < ut->markers.size(); i++)
+         for (unsigned int i = 0; i < ut.markers.size(); i++)
          {
             string key = m_marker_id_prefix + int_to_string( i );
             DOMElement * synchElement = doc->createElement( X( "sync" ) );
             synchElement->setAttribute( id, X( key.c_str() ) );
-            synchElement->setAttribute( time, X( ut->markers[ key ].c_str() ) );
+            synchElement->setAttribute( time, X( ut.markers[ key ].c_str() ) );
             textElement->appendChild( synchElement );
             
             // Add word
             if (i % 2 == 0)
             {
-               DOMText * word = doc->createTextNode( X( ut->words.at( i / 2 ).c_str() ) );
+               DOMText * word = doc->createTextNode( X( ut.words.at( i / 2 ).c_str() ) );
                textElement->appendChild( word );
             }
          }
 
+
+         // add viseme info  (if exists)
+         for ( size_t i = 0; i < ut.visemes.size(); i++ )
+         {
+            DOMElement * lipsElement = doc->createElement( X( "lips" ) );
+            lipsElement->setAttribute( viseme, X( ut.visemes[ i ].viseme.c_str() ) );
+            lipsElement->setAttribute( articulation, X( "1.0" ) );
+            lipsElement->setAttribute( start, X( ut.visemes[ i ].start.c_str() ) );
+            lipsElement->setAttribute( ready, X( ut.visemes[ i ].start.c_str() ) );
+            lipsElement->setAttribute( relax, X( ut.visemes[ i ].end.c_str() ) );
+            lipsElement->setAttribute( end,   X( ut.visemes[ i ].end.c_str() ) );
+            rootElement->appendChild( lipsElement );
+         }
 
 
          DOMLSSerializer * theSerializer = DOMImplementation::getImplementation()->createLSSerializer();
@@ -254,9 +287,6 @@ string create_bml( Utterance * ut )
          result = XMLString::transcode( xml_result );
          printf( "XML Result: '%s'", result.c_str() );
          theSerializer->release();
-
-
-
       }
       catch ( const OutOfMemoryException & )
       {
@@ -434,8 +464,6 @@ void tt_client_callback( char * op, char * args, void * user_data )
                   }
                }
             }
-            // Write to file
-            write_string_to_file( utterance_id, create_bml( ut ) );
          }
 
       }
@@ -526,7 +554,7 @@ void init_XML()
 //	 <mark name="sp1:T8" />town
 //	 <mark name="sp1:T9" />
 //	 </speech>
-string create_tts_request( string utterance_id )
+string create_tts_request( const string & utterance_id )
 {
    Utterance * ut = &m_utterances[ utterance_id ];
 
@@ -535,8 +563,6 @@ string create_tts_request( string utterance_id )
    string mark_id = "T";
    string mark_begin = "<mark name=\"";
    string mark_end = "\"/>";
-
-   std::vector<Marker> markers; 
 
    for (unsigned int i = 0; i < ut->words.size(); i++ )
    {
@@ -558,36 +584,168 @@ string create_tts_request( string utterance_id )
 }
 
 
+void parse_ltf_file( const string & ltf_file_name, Utterance & utterance )
+{
+   // phonemeIndex isn't needed unless you want to use the strings for debugging purposes
+   // the 0-40 number indices are used in the .ltf file  (eg, index 10 equals phoneme "Oy", which is mapped to Viseme "oh")
+   // phonemeToViseme was created by hand, using the chart below (taken from doctor.map).  Phonemes are along the side, Visemes are at the top.  Eat, Earth, etc are the Impersonator names, EE, Er, Ih are the names used by the Bonebus
+/*
+   //phoneme-viseme map Impersonator
+   //                          Eat   Earth If    Ox    Oat   Wet   Size Church Fave Though Told Bump   New   Roar Cage
+   const string phon2Vis[] = { "EE", "Er", "Ih", "Ao", "oh", "OO", "Z", "j",   "F", "Th",  "D", "BMP", "NG", "R", "KG" };
+
+                           Iy=0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Ih=0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Eh=0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Ey=0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Ae=0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Aa=0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Aw=0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Ay=0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Ah=0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Ao=0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Oy=0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Ow=0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Uh=0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Uw=0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Er=0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Ax=0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           S =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Sh=0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Z =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Zh=0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           F =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.70, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Th=0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00
+                           V =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.70, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Dh=0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00
+                           M =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00
+                           N =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00
+                           Ng=0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00
+                           L =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00
+                           R =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00
+                           W =0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Y =0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Hh=0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           B =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00
+                           D =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00
+                           Jh=0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           G =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.20
+                           P =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00
+                           T =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00
+                           K =0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.20
+                           Ch=0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.85, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+
+                           Sil=0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           ShortSil=0.00, 0.00, 0.20, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+                           Flap=0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.50, 0.00, 0.00, 0.00, 0.00
+*/
+
+   //                                  0                             5                             10                            15                          20                           25                          30                            35                            40
+// const char * phonemeIndex[]    = { "Iy", "Ih", "Eh", "Ey", "Ae", "Aa", "Aw", "Ay", "Ah", "Ao", "Oy", "Ow", "Uh", "Uw", "Er", "Ax", "S", "Sh", "Z", "Zh", "F", "Th", "V", "Dh", "M",   "N",  "Ng", "L", "R", "W",  "Y",  "Hh", "B",   "D", "Jh", "G",  "P",   "T", "K",  "Ch", "Sil", "ShortSil", "Flap" };
+   const char * phonemeToViseme[] = { "EE", "Ih", "Ih", "Ih", "Ih", "Ao", "Ih", "Ih", "Ih", "Ao", "oh", "oh", "oh", "oh", "Er", "Ih", "Z", "j",  "Z", "j",  "F", "Th", "F", "Th", "BMP", "NG", "NG", "D", "R", "OO", "OO", "Ih", "BMP", "D", "j",  "KG", "BMP", "D", "KG", "j",  "_",   "_",        "_" };
+
+
+   utterance.visemes.clear();
+
+   FILE * f = fopen( ltf_file_name.c_str(), "r" );
+   if ( f == NULL )
+   {
+      printf( "ERROR: Couldn't load .ltf file:  %s\n", ltf_file_name.c_str() );
+      return;
+   }
+
+
+   // search for the "phoneme list" section in the file
+
+   char line[ 512 ];
+   while ( fgets( line, 512, f ) != NULL )
+   {
+      string strLine = line;
+      if ( strLine.find( "// Phoneme Timing List" ) != strLine.npos )
+      {
+         break;
+      }
+   }
+
+   while ( fgets( line, 512, f ) != NULL )
+   {
+      string strLine = line;
+
+      if ( strLine.find( "// Function Curve Data" ) != strLine.npos )
+      {
+         // we've reached the end of the section, we're done
+         break;
+      }
+
+      if ( strLine.length() < 0 )
+      {
+         continue;
+      }
+
+      // we're looking for a line in the following format:
+      //   <phoneme index> <start time> <end time>
+      //   eg: 40 0 0.123
+
+      vector<string> tokens;
+      vhcl::Tokenize( strLine, tokens, " \r\n" );
+
+      if ( tokens.size() < 3 )
+      {
+         // line is in the wrong format
+         continue;
+      }
+
+      string strPhonemeIndex = tokens[ 0 ];
+      string strStartTime = tokens[ 1 ];
+      string strEndTime = tokens[ 2 ];
+
+      string strVisemeIndex = phonemeToViseme[ atoi( strPhonemeIndex.c_str() ) ];
+
+      utterance.visemes.push_back( Viseme( strVisemeIndex, strStartTime, strEndTime ) );
+   }
+
+   fclose( f );
+}
+
+
 int main( int argc, char * argv[] )
 {
-   char * input_file = NULL;
-   std::vector<string> error_utterances;
+   string input_file = "";
+   string ltf_dir = "";
+   vector<string> error_utterances;
    //bool quit = false;
 
    // Parse command line parameters
-   for (int i = 1; i < argc; i += 2)
+   for ( int i = 1; i < argc; i += 2 )
    {
-      if ( argc <= i+1)
+      if ( argc <= i + 1 )
       {
          printf( "Missing argument for parameter %s.\n\nPress any key to exit.\n", argv[ i ] );
          _getch();
          exit(1);
-      } 
+      }
       else if ( strcmp( argv[ i ], "-input" ) == 0 )
       {
          printf( "Input file: %s\n", argv[ i + 1 ] );
          input_file = argv[ i + 1 ];
-      } 
+      }
+      else if ( strcmp( argv[ i ], "-ltf" ) == 0 )
+      {
+         printf( "Using LTF files for saving phoneme->viseme info\n" );
+         printf( "LTF Directory: %s\n", argv[ i + 1 ] );
+         ltf_dir = argv[ i + 1 ];
+      }
       else if ( strcmp( argv[ i ], "-output" ) == 0 )
       {
          printf( "Output directory: %s\n", argv[ i + 1 ] );
          output_dir = argv[ i + 1 ];
       } 
-      else 
+      else
       {
          printf( "Unknown argument '%s'. \n\n"
             "Known arguments:\n"
             "-input <input_file_name>, file with utterances text and ID tuples.\n"
+            "-ltf <ltf_directory_name>, optionally parse Impersonator .ltf files to use for phoneme info.\n"
             "-output <output_directory_name>, location where word break boundary timing files will be saved.\n\n"
             "Press any key to exit.\n", argv[ i ] );
          _getch();
@@ -602,7 +760,7 @@ int main( int argc, char * argv[] )
    init_XML();
 
    // Read input file
-   std::ifstream in( input_file );
+   std::ifstream in( input_file.c_str() );
    string s;
    int counter = 1;
    if ( in )
@@ -614,25 +772,30 @@ int main( int argc, char * argv[] )
          s = remove_double_quotes( s );
 
          // Split up line in key and text 
-         std::vector< string > main_tokens;
+         vector< string > main_tokens;
          const string tab_delimiter = "\t";
          vhcl::Tokenize( s, main_tokens, tab_delimiter );
 
+         // catch the case where there's no text after the id
+         string text = "";
+         if ( main_tokens.size() > 1 )
+         {
+            text = main_tokens[ 1 ];
+         }
+
          // Split up text in words
-         std::vector< string > word_tokens;
+         vector< string > word_tokens;
          const string space_delimiter = " ";
-         vhcl::Tokenize( main_tokens.at( 1 ), word_tokens, space_delimiter );
+         vhcl::Tokenize( text, word_tokens, space_delimiter );
 
          // Create Utterance struct
          struct Utterance ut;
-         ut.utterance_id = main_tokens.at( 0 );
+         ut.utterance_id = main_tokens[ 0 ];
          ut.speech_id = "sp" + int_to_string( counter );
-         ut.text = main_tokens.at( 1 );
+         ut.text = text;
          ut.addressee = "all";
          ut.speaker = "uknown";
          ut.words = word_tokens;
-         map<string, string> markers;
-         ut.markers = markers;
 
          // Add struct to map
          m_utterances[ ut.utterance_id ] = ut;
@@ -640,11 +803,19 @@ int main( int argc, char * argv[] )
          counter++;
       }
 
+
+
       // TTS interaction
       string xml_request = "";
       // For each utterance
-      for(utteranceType::const_iterator it = m_utterances.begin(); it != m_utterances.end(); ++it)
+      for ( utteranceType::iterator it = m_utterances.begin(); it != m_utterances.end(); ++it )
       {
+         // no TTS interaction required
+         if ( it->second.text == "" )
+         {
+            continue;
+         }
+
          printf( "Key (ID): '%s'\n", it->first.c_str() );
          printf( "Text '%s'\n\n", it->second.text.c_str() );
 
@@ -655,25 +826,50 @@ int main( int argc, char * argv[] )
          ttu_notify2( m_request_message, xml_request.c_str() );
 
          // Wait for response
+         m_reply_received = false;
          _beginthread( elvin_loop, 0, NULL );
          int timer = 0;
          while ( !m_reply_received )
          {
             Sleep( 100 );
             timer += 100;
-            if ( timer > 3000 ) {
+            if ( timer > 3000 )
+            {
+               it->second.markers.clear();
+
                error_utterances.push_back( it->second.utterance_id );
-               m_reply_received = true;
+               m_reply_received = true;  // force thread to exit
+               Sleep( 1000 );    // give thread time to exit
             }
          }
-
-         m_reply_received = false;
-
+         Sleep( 100 );  // give thread time to exit
       }
-   }  
+
+
+      // LTF processing
+      if ( ltf_dir != "" )
+      {
+         for ( utteranceType::iterator it = m_utterances.begin(); it != m_utterances.end(); ++it )
+         {
+            string utterance_id = it->first;
+            string ltf_file_name = ltf_dir + "\\" + utterance_id + ".ltf";
+
+            parse_ltf_file( ltf_file_name, it->second );
+         }
+      }
+
+
+      // generate bml and write out the file
+      for ( utteranceType::iterator it = m_utterances.begin(); it != m_utterances.end(); ++it )
+      {
+         // Write to file
+         write_string_to_file( it->first, create_bml( it->second ) );
+      }
+
+   }
    else
    {
-      printf( "\nFile '%s' could not be opened. Please check if file exists. \n\nPress any key to exit.\n", input_file );
+      printf( "\nFile '%s' could not be opened. Please check if file exists. \n\nPress any key to exit.\n", input_file.c_str() );
       _getch();
       exit(1);
    }
