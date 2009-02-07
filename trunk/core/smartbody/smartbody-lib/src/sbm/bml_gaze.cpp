@@ -62,6 +62,10 @@ const XMLCh ATTR_ROLL[]         = L"roll";
 const XMLCh ATTR_BLEND[]        = L"blend";
 const XMLCh ATTR_INTERPOLATE_BIAS[] = L"interpolate-bias";
 
+const XMLCh ATTR_PRIORITY_JOINT[] = L"sbm:priority-joint";
+const XMLCh ATTR_PITCH_MIN[] = L"pitch-min";
+const XMLCh ATTR_PITCH_MAX[] = L"pitch-max";
+
 ////// XML Direction constants
 // Angular (gaze) and orienting (head)
 const XMLCh DIR_RIGHT[]        = L"RIGHT";
@@ -80,21 +84,23 @@ const XMLCh DIR_POLAR[]        = L"POLAR";
 
 namespace BML {
 	namespace Gaze {
-		// 
-		const float DEFAULT_SPEED_LUMBAR    = (float)1000;
-		const float DEFAULT_SPEED_CERVICAL  = (float)1500;
-		const float DEFAULT_SPEED_EYEBALL   = (float)2000;
-		const float DEFAULT_SMOOTH_LUMBAR   = (float)0.8;
-		const float DEFAULT_SMOOTH_CERVICAL = (float)0.8;
-		const float DEFAULT_SMOOTH_EYEBALL  = (float)0.1;
+		//  Old Hard-Coded Defaults 
+		//const float DEFAULT_SPEED_LUMBAR    = (float)1000;
+		//const float DEFAULT_SPEED_CERVICAL  = (float)1500;
+		//const float DEFAULT_SPEED_EYEBALL   = (float)2000;
+		//const float DEFAULT_SMOOTH_LUMBAR   = (float)0.8;
+		//const float DEFAULT_SMOOTH_CERVICAL = (float)0.8;
+		//const float DEFAULT_SMOOTH_EYEBALL  = (float)0.1;
 
 		// Declare and initialize variable runtime defaults
-		float speed_lumbar    = DEFAULT_SPEED_LUMBAR;
-		float speed_cervical  = DEFAULT_SPEED_CERVICAL;
-		float speed_eyeball   = DEFAULT_SPEED_EYEBALL;
-		float smooth_lumbar   = DEFAULT_SMOOTH_LUMBAR;
-		float smooth_cervical = DEFAULT_SMOOTH_CERVICAL;
-		float smooth_eyeball  = DEFAULT_SMOOTH_EYEBALL;
+		// New Defaults imported from storage in me_ct_gaze.h
+
+		float speed_lumbar    = (float)(MeCtGaze::gaze_defaults->speed_head / 2.0);  // See void MeCtGaze::set_speed( float back_dps, float neck_dps, float eyes_dps ) in me_ct_gaze.cpp
+		float speed_cervical  = (float)(MeCtGaze::gaze_defaults->speed_head / 2.0);  // As of 10/2008 speed is defined with two values:  head & eyes
+		float speed_eyeball   = MeCtGaze::gaze_defaults->speed_eyes;
+		float smooth_lumbar   = MeCtGaze::gaze_defaults->smooth_back;
+		float smooth_cervical = MeCtGaze::gaze_defaults->smooth_neck;
+		float smooth_eyeball  = MeCtGaze::gaze_defaults->smooth_eyes;
 
 
 		/**
@@ -104,6 +110,9 @@ namespace BML {
 			SkJoint* target;
 
 			float bias_pitch;
+			float pitch_min;
+			float pitch_max;
+
 			float bias_heading;
 			float bias_roll;
 
@@ -117,7 +126,9 @@ namespace BML {
 				bias_roll( 0.0 ),
 				interpolate_bias( true ),
 
-				blend_weight( 1.0 )
+				blend_weight( 1.0 ),
+				pitch_min( -1.0 ),
+				pitch_max( -1.0 )  //used as flags to indicate non-initialization.
 			{}
 		};
 
@@ -227,6 +238,24 @@ void BML::Gaze::parse_gaze_key_element( DOMElement* elem, Gaze::KeyData* key_dat
 	if( value!=NULL && value[0]!='\0' ) {
 		if( !( wistringstream( value ) >> key_data->blend_weight ) ) {
 			cerr << "WARNING: Failed to parse blend attribute \""<<XMLString::transcode(value)<<"\" of <"<<XMLString::transcode( elem->getTagName() )<<" .../> element." << endl;
+		}
+	}
+
+	value = elem->getAttribute( ATTR_PITCH_MIN );
+	if(value != NULL && value[0] != '\0') 
+	{
+		if( !( wistringstream( value ) >> key_data->pitch_min ) )
+		{
+			cerr << "WARNING: Failed to parse minimum pitch attribute \""<< XMLString::transcode(value) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
+		}
+	}
+
+	value = elem->getAttribute( ATTR_PITCH_MAX );
+	if(value != NULL && value[0] != '\0') 
+	{
+		if( !( wistringstream( value ) >> key_data->pitch_max ) )
+		{
+			cerr << "WARNING: Failed to parse maximum pitch attribute \""<< XMLString::transcode(value) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
 		}
 	}
 
@@ -421,12 +450,32 @@ BehaviorRequest* BML::parse_bml_gaze( DOMElement* elem, SynchPoints& tms, BmlReq
 			<< "high_key_index = "<<high_key_index<<endl;
 	}
 	
+	/////////////////////////////////////////////////////////////
+	//  Parse sbm:priority-joint attribute
+	int priority_key_index = high_key_index;
 
+	const XMLCh* attrPriority = elem->getAttribute( ATTR_PRIORITY_JOINT );
+	if( attrPriority && XMLString::stringLen(attrPriority) > 0 ) 
+	{
+		const char* priority_key_name = asciiString(attrPriority);
+		priority_key_index = MeCtGaze::key_index(priority_key_name);
+		if(priority_key_index < low_key_index)
+		{
+			priority_key_index = low_key_index;
+			cerr << "WARNING: BML::parse_bml_gaze(..): Invalid priority key attribute\"" << priority_key_name << "\"." << endl;
+		}
+		if(priority_key_index > high_key_index)
+		{
+			priority_key_index = high_key_index;
+			cerr << "WARNING: BML::parse_bml_gaze(..): Invalid priority key attribute\"" << priority_key_name << "\"." << endl;
+		}
+	}
 
 	/////////////////////////////////////////////////////////////
 	//  Parse attributes sbm:joint-speed and sbm:speed-smoothing
 
 	// default gaze values...
+	
 	float gaze_speed_lumbar   = BML::Gaze::speed_lumbar;
 	float gaze_speed_cervical = BML::Gaze::speed_cervical;
 	float gaze_speed_eyeball  = BML::Gaze::speed_eyeball;
@@ -434,6 +483,7 @@ BehaviorRequest* BML::parse_bml_gaze( DOMElement* elem, SynchPoints& tms, BmlReq
 	float gaze_smooth_cervical = BML::Gaze::smooth_cervical;
 	float gaze_smooth_eyeball  = BML::Gaze::smooth_eyeball;
 	
+
 	// parse sbm:joint-speed
 	const XMLCh* attrSpeed = elem->getAttribute( ATTR_JOINT_SPEED );
 	if( attrSpeed && XMLString::stringLen( attrSpeed ) ) {
@@ -525,45 +575,54 @@ BehaviorRequest* BML::parse_bml_gaze( DOMElement* elem, SynchPoints& tms, BmlReq
 	MeCtGaze* gaze_ct = new MeCtGaze();
 	gaze_ct->init( low_key_index, high_key_index );
 	gaze_ct->set_target_joint( 0, 0, 0, const_cast<SkJoint*>(joint) );
-	gaze_ct->set_task_priority( high_key_index );
+	gaze_ct->set_task_priority( priority_key_index );
 	gaze_ct->set_speed( gaze_speed_lumbar, gaze_speed_cervical, gaze_speed_eyeball );
 	gaze_ct->set_smooth( gaze_smooth_lumbar, gaze_smooth_cervical, gaze_smooth_eyeball );
+	float pitch_minimum, pitch_maximum;
 
-	if( has_key_data ) {
-		if( key_data[ low_key_index ]==NULL ) {
-			key_data[ low_key_index ] = new Gaze::KeyData();  // Use defaults
+	if( has_key_data ) {    //if there is key data
+		if( key_data[ low_key_index ]==NULL ) {  
+			key_data[ low_key_index ] = new Gaze::KeyData();  
 		}
-		if( key_data[ high_key_index ]==NULL ) {
-			key_data[ high_key_index ] = new Gaze::KeyData(); // Use defaults
-		} else if( high_key_index == MeCtGaze::GAZE_KEY_EYES ) {
-			key_data[ MeCtGaze::GAZE_KEY_EYES ]->bias_roll = 0;  // don't rotate eyeballs axially
+		if( key_data[ high_key_index ]==NULL ) { 
+			key_data[ high_key_index ] = new Gaze::KeyData(); 
+		} else if( high_key_index == MeCtGaze::GAZE_KEY_EYES ) {  
+			key_data[ MeCtGaze::GAZE_KEY_EYES ]->bias_roll = 0;  
 		}
 
-		int key = low_key_index;
+		int key = low_key_index;   //start at the low key index
 		Gaze::KeyData* data = key_data[key];
-		if( low_key_index < high_key_index ) {
-			int next_key = ++key;
-			Gaze::KeyData* next_data;
-			while( next_key<high_key_index ) {
-				if( key_data[next_key] != NULL ) {
+		if( low_key_index < high_key_index ) 
+		{  
+			int next_key = key + 1;  
+			Gaze::KeyData* next_data; 
+			while( next_key < high_key_index ) 
+			{  
+				if( key_data[next_key] != NULL ) 
+				{  
 					next_data = key_data[next_key];
 
-					if( data->interpolate_bias && next_data->interpolate_bias ) {
+					if( data->interpolate_bias && next_data->interpolate_bias ) 
+					{
 						gaze_ct->set_bias_pitch(   key, next_key, data->bias_pitch,   next_data->bias_pitch );
 						gaze_ct->set_bias_heading( key, next_key, data->bias_heading, next_data->bias_heading );
 						gaze_ct->set_bias_roll(    key, next_key, data->bias_roll,    next_data->bias_roll );
-					} else {
+					} else { 
 						gaze_ct->set_bias( key, data->bias_pitch,
 												data->bias_heading,
 							  					data->bias_roll );
 					}
 					gaze_ct->set_blend( key, data->blend_weight );
 
+					pitch_minimum = (data->pitch_min < 0) ? gaze_ct->gaze_defaults->pitch_dn[key] : data->pitch_min;
+					pitch_maximum = (data->pitch_max < 0) ? gaze_ct->gaze_defaults->pitch_up[key] : data->pitch_max;
+					gaze_ct->set_limit( key, pitch_maximum, pitch_minimum, gaze_ct->gaze_defaults->heading[key], gaze_ct->gaze_defaults->roll[key]);
+
 					key  = next_key;
 					data = next_data;
-				}
+				} // if( key_data[next_key] != NULL )
 				++next_key;
-			}
+			} // while( next_key < high_key_index ) 
 
 			next_data = key_data[next_key];  // last key
 			if( data->interpolate_bias && next_data->interpolate_bias ) {
@@ -578,13 +637,29 @@ BehaviorRequest* BML::parse_bml_gaze( DOMElement* elem, SynchPoints& tms, BmlReq
 										     next_data->bias_heading,
 										     next_data->bias_roll );
 			}
+			gaze_ct->set_blend( key, data->blend_weight );
 			gaze_ct->set_blend( next_key, next_data->blend_weight );
-		} else {
+
+			pitch_minimum = (data->pitch_min < 0) ? gaze_ct->gaze_defaults->pitch_dn[key] : data->pitch_min;
+			pitch_maximum = (data->pitch_max < 0) ? gaze_ct->gaze_defaults->pitch_up[key] : data->pitch_max;
+			gaze_ct->set_limit( key, pitch_maximum, pitch_minimum, gaze_ct->gaze_defaults->heading[key], gaze_ct->gaze_defaults->roll[key]);
+
+			pitch_minimum = (next_data->pitch_min < 0) ? gaze_ct->gaze_defaults->pitch_dn[key] : next_data->pitch_min;
+			pitch_maximum = (next_data->pitch_max < 0) ? gaze_ct->gaze_defaults->pitch_up[key] : next_data->pitch_max;
+			gaze_ct->set_limit( next_key, pitch_maximum, pitch_minimum, gaze_ct->gaze_defaults->heading[key], gaze_ct->gaze_defaults->roll[key]);
+
+		} else { // if( low_key_index < high_key_index )
 			// Only one gaze key
 			gaze_ct->set_bias( key, data->bias_pitch,
 									data->bias_heading,
 									data->bias_roll );
 			gaze_ct->set_blend( key, data->blend_weight );
+
+			pitch_minimum = (data->pitch_min < 0) ? gaze_ct->gaze_defaults->pitch_dn[key] : data->pitch_min;
+			pitch_maximum = (data->pitch_max < 0) ? gaze_ct->gaze_defaults->pitch_up[key] : data->pitch_max;
+			gaze_ct->set_limit( key, pitch_maximum, pitch_minimum, gaze_ct->gaze_defaults->heading[key], gaze_ct->gaze_defaults->roll[key]);
+
+
 		}
 	}
 
