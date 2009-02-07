@@ -26,8 +26,10 @@
 
 #define MAX_JOINT_LABEL_LEN	32
 
-#define DFL_GAZE_HEAD_SPEED 180.0
-#define DFL_GAZE_EYE_SPEED  1000.0
+//#define DFL_GAZE_HEAD_SPEED 180.0
+//#define DFL_GAZE_EYE_SPEED  1000.0
+
+const MeCtGaze::gd* MeCtGaze::gaze_defaults = new MeCtGaze::gd();
 
 int G_debug_c = 0;
 int G_debug = 0;
@@ -266,14 +268,33 @@ void MeCtGaze::init( int key_fr, int key_to )	{
 	}
 	
 	set_task_priority( key_max );
-	set_speed( DFL_GAZE_HEAD_SPEED, DFL_GAZE_EYE_SPEED ); // initializes timing_mode = TASK_SPEED;
-	set_smooth( 0.3f, 0.1f, 0.0f );
+	//set_speed( DFL_GAZE_HEAD_SPEED, DFL_GAZE_EYE_SPEED ); // initializes timing_mode = TASK_SPEED;
+	set_speed( gaze_defaults->speed_head, gaze_defaults->speed_eyes );
 
+	//set_smooth( 0.3f, 0.1f, 0.0f );
+	set_smooth( gaze_defaults->smooth_back, gaze_defaults->smooth_neck, gaze_defaults->smooth_eyes );
+	/*
 	set_limit( GAZE_KEY_LUMBAR,   15.0, 30.0, 10.0 );
 	set_limit( GAZE_KEY_THORAX,   6.0,  15.0, 5.0 );
 	set_limit( GAZE_KEY_CERVICAL, 25.0, 60.0, 20.0 );
 	set_limit( GAZE_KEY_HEAD,     20.0, 45.0, 15.0 );
 	set_limit( GAZE_KEY_EYES,     50.0, 75.0, 0.0 );
+	*/
+
+	set_limit( GAZE_KEY_LUMBAR,   gaze_defaults->pitch_up[GAZE_KEY_LUMBAR], gaze_defaults->pitch_dn[GAZE_KEY_LUMBAR], 
+								  gaze_defaults->heading[GAZE_KEY_LUMBAR], gaze_defaults->roll[GAZE_KEY_LUMBAR]);
+
+	set_limit( GAZE_KEY_THORAX,   gaze_defaults->pitch_up[GAZE_KEY_THORAX], gaze_defaults->pitch_dn[GAZE_KEY_THORAX], 
+								  gaze_defaults->heading[GAZE_KEY_THORAX], gaze_defaults->roll[GAZE_KEY_THORAX]);
+
+	set_limit( GAZE_KEY_CERVICAL, gaze_defaults->pitch_up[GAZE_KEY_CERVICAL], gaze_defaults->pitch_dn[GAZE_KEY_CERVICAL], 
+								  gaze_defaults->heading[GAZE_KEY_CERVICAL], gaze_defaults->roll[GAZE_KEY_CERVICAL]);
+
+	set_limit( GAZE_KEY_CRANIAL,  gaze_defaults->pitch_up[GAZE_KEY_CRANIAL], gaze_defaults->pitch_dn[GAZE_KEY_CRANIAL], 
+								  gaze_defaults->heading[GAZE_KEY_CRANIAL], gaze_defaults->roll[GAZE_KEY_CRANIAL]);
+
+	set_limit( GAZE_KEY_OPTICAL,  gaze_defaults->pitch_up[GAZE_KEY_OPTICAL], gaze_defaults->pitch_dn[GAZE_KEY_OPTICAL], 
+								  gaze_defaults->heading[GAZE_KEY_OPTICAL], gaze_defaults->roll[GAZE_KEY_OPTICAL]);
 
 	for( i = 0; i < NUM_GAZE_KEYS; i++ )	{
 		set_bias( i, 0.0f, 0.0f, 0.0f );
