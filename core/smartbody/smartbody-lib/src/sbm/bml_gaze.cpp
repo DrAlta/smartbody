@@ -364,7 +364,7 @@ bool BML::Gaze::parse_children( DOMElement* elem, Gaze::KeyData* key_data[] ) {
 
 
 
-BehaviorRequest* BML::parse_bml_gaze( DOMElement* elem, SynchPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& unique_id, SyncPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
 	////////////////////////////////////////////////////////////////
 	//  GAZE BEHAVIORS
@@ -372,12 +372,12 @@ BehaviorRequest* BML::parse_bml_gaze( DOMElement* elem, SynchPoints& tms, BmlReq
 	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
 	if( !attrTarget || !XMLString::stringLen( attrTarget ) ) {
         wcerr << "WARNING: BML::parse_bml_gaze(): <"<<tag<<"> BML tag missing "<<ATTR_TARGET<<"= attribute." << endl;
-		return NULL;
+		return BehaviorRequestPtr();  // a.k.a., NULL
     }
 
 	const SkJoint* joint = parse_target( tag, attrTarget, mcu );
 	if( joint == NULL ) {  // Invalid target.  Assume parse_target(..) printed error.
-		return NULL;
+		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 
 
@@ -725,5 +725,5 @@ BehaviorRequest* BML::parse_bml_gaze( DOMElement* elem, SynchPoints& tms, BmlReq
 		gaze_ct->set_offset_polar( 0, 0, roll );
 	}
 
-	return new MeControllerRequest( MeControllerRequest::GAZE, gaze_ct, tms.start, tms.ready, tms.stroke, tms.relax, tms.end );
+	return BehaviorRequestPtr( new MeControllerRequest( unique_id, gaze_ct, request->actor->gaze_sched_p, true, tms ) );
 }

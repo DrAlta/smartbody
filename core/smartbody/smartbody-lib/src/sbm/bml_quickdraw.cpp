@@ -33,10 +33,6 @@
 #include "xercesc_utils.hpp"
 
 
-#define LOG_GAZE_PARAMS				(0)
-#define DEBUG_BML_GAZE				(0)
-#define DEBUG_JOINT_RANGE			(0)
-#define DEBUG_GAZE_KEYS				(0)
 #define DEBUG_DESCRIPTION_LEVELS	(0)
 
 
@@ -54,18 +50,23 @@ using namespace BML;
 using namespace xml_utils;
 
 
-BehaviorRequest* BML::parse_bml_quickdraw( DOMElement* elem, SynchPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
+											 std::string& unique_id,
+											 SyncPoints& tms,
+											 BmlRequestPtr request,
+											 mcuCBHandle *mcu )
+{
     const XMLCh* tag      = elem->getTagName();
 
 	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
 	if( !attrTarget || !XMLString::stringLen( attrTarget ) ) {
         wcerr << "WARNING: BML::parse_bml_quickdraw(): <"<<tag<<"> BML tag missing "<<ATTR_TARGET<<"= attribute." << endl;
-		return NULL;
+		return BehaviorRequestPtr();  // a.k.a., NULL
     }
 
 	const SkJoint* joint = parse_target( tag, attrTarget, mcu );
 	if( joint == NULL ) {  // invalid target (parse_target should have printed something)
-		return NULL;
+		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 
 	const XMLCh* attrRoll = elem->getAttribute( ATTR_ROLL );
@@ -83,7 +84,7 @@ BehaviorRequest* BML::parse_bml_quickdraw( DOMElement* elem, SynchPoints& tms, B
 	SkMotion* anim = mcu->motion_map.lookup( anim_name.c_str() );
 	if( !anim ) {
         cerr << "WARNING: BML::parse_bml_quickdraw(): Unknown source animation \"" << anim_name << "\"." << endl;
-		return NULL;
+		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 
 	float track_duration = -1;  // indefinite tracking by default
@@ -103,5 +104,5 @@ BehaviorRequest* BML::parse_bml_quickdraw( DOMElement* elem, SynchPoints& tms, B
 	qdraw_ct->set_target_joint( 0, 0, 0, const_cast<SkJoint*>(joint) );
 	qdraw_ct->set_track_duration( track_duration );
 
-	return new MeControllerRequest( MeControllerRequest::MOTION, qdraw_ct, tms.start, tms.ready, tms.stroke, tms.relax, tms.end );
+	return BehaviorRequestPtr( new MeControllerRequest( unique_id, qdraw_ct, request->actor->motion_sched_p, true, tms ) );
 }

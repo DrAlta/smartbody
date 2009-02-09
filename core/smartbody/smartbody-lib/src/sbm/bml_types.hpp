@@ -25,8 +25,10 @@
 #ifndef BML_TYPES_HPP
 #define BML_TYPES_HPP
 
+#include <limits>
 #include <vector>
 #include <map>
+#include <set>
 
 // Use Boost Smart Point Impl until TR1 is finalized
 #include <boost/shared_ptr.hpp>
@@ -38,17 +40,25 @@
 
 namespace BML {
     typedef double time_sec;  // An attempt to generalize the floating point format
-    const time_sec TIME_UNSET = std::numeric_limits<time_sec>::infinity();
+	typedef std::pair<time_sec,time_sec> time_range;
+	const time_sec TIME_UNSET = std::numeric_limits<time_sec>::quiet_NaN();
+
+	
+	inline bool isTimeSet( time_sec value ) {
+		return ( value == value );  // is NaN? See discussion http://bytes.com/forum/thread588254.html
+	}
+
 
 	//  Class Pre-Declarations
 	class Processor;
 	class BmlRequest;
 	struct SbmCommand;
 	class TriggerEvent;
-	class SynchPoint;
+	class SyncPoint;
+	class SyncPoints;
 	class BehaviorRequest;
 	class SpeechRequest;
-	//typedef std::map< const XMLCh*, SynchPoint*, xml_utils::XMLStringCmp > SynchPointMap;	  // pre-shared_ptr typedef
+	//typedef std::map< const XMLCh*, SyncPoint*, xml_utils::XMLStringCmp > SyncPointMap;	  // pre-shared_ptr typedef
 
 
 	// Smart Pointer Typedefs
@@ -61,17 +71,22 @@ namespace BML {
 	typedef boost::weak_ptr<TriggerEvent>             TriggerEventWeakPtr;
 	typedef std::vector<TriggerEventPtr>              VecOfTriggerEvent;
 
-	typedef boost::shared_ptr<SynchPoint>             SynchPointPtr;
-	typedef boost::weak_ptr<SynchPoint>               SynchPointWeakPtr;
-	typedef std::vector< SynchPointPtr >              VecOfSynchPoint;
-	typedef std::map< std::wstring, SynchPointPtr >   MapOfSynchPoint;
+	typedef boost::shared_ptr<SyncPoint>              SyncPointPtr;
+	typedef boost::weak_ptr<SyncPoint>                SyncPointWeakPtr;
+	typedef std::vector< SyncPointPtr >               VecOfSyncPoint;
+	typedef std::map< std::wstring, SyncPointPtr >    MapOfSyncPoint;
 
 	typedef std::vector<SmartBody::VisemeData*>       VecOfVisemeData;
 	typedef std::vector<SbmCommand*>                  VecOfSbmCommand;
-	typedef std::vector<BehaviorRequest*>             VecOfBehaviorRequest;
+
+	typedef boost::shared_ptr<BehaviorRequest>        BehaviorRequestPtr;
+	typedef std::vector<BehaviorRequestPtr>           VecOfBehaviorRequest;
+	typedef std::map<std::wstring,BehaviorRequestPtr> MapOfBehaviorRequest;
 
 	typedef boost::shared_ptr<SpeechRequest>          SpeechRequestPtr;
 	typedef std::map< std::string, SpeechRequestPtr > MapOfSpeechRequest;
+
+	typedef std::set< std::wstring >                  SetOfWstring;
 } // namespace BML
 
 #endif // BML_TYPES_HPP

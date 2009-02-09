@@ -58,6 +58,7 @@ mcuCBHandle::mcuCBHandle()
 	net_world_offset_updates( true ),
 	net_face_bones( false ),
 	net_host( NULL ),
+	process_id( NULL ),
 	play_internal_audio( false ),
 	viewer_p( NULL ),
 	camera_p( NULL ),
@@ -361,11 +362,7 @@ void mcuCBHandle::update( void )	{
 
 		//char_p->scheduler_p->evaluate( time );
 		pawn_p->pipeline_p->evaluate( time );
-
-		if ( net_bone_updates )
-		{
-			pawn_p->pipeline_p->applyBufferToAllSkeletons();
-		}
+		pawn_p->pipeline_p->applyBufferToAllSkeletons();
 
 		char_p = character_map.lookup( pawn_p->name );
 		if( char_p != NULL ) {
@@ -414,7 +411,7 @@ int mcuCBHandle::execute_seq( srCmdSeq* seq ) {
 
 int mcuCBHandle::execute_seq( srCmdSeq* seq, const char* seq_id ) {
 	if ( active_seq_map.insert( seq_id, seq ) != CMD_SUCCESS ) {
-		printf( "ERROR: mcuCBHandle::execute_seq(..): Failed to insert srCmdSeq \"%s\" into active_seq_map.\n", seq_id );
+		printf( "ERROR: mcuCBHandle::execute_later(..): Failed to insert srCmdSeq \"%s\" into active_seq_map.\n", seq_id );
 		return CMD_FAILURE;
 	}
 	return CMD_SUCCESS;
@@ -453,8 +450,6 @@ void mcuCBHandle::set_net_host( const char * net_host )
 
 void mcuCBHandle::set_process_id( const char * process_id )
 {
-	// EDF
-	// Sets up the network connection for sending bone rotations over to Unreal
 	this->process_id = process_id;
 }
 
@@ -1355,7 +1350,7 @@ int mcu_character_bone_cmd(
 			{
 				//j->quat()->value().set( 1, 1, 0, 0 );
 				//j->quat()->value()
-				j->quat()->value( SrQuat( w, x, y, z ) );
+				//j->quat()->value( SrQuat( w, x, y, z ) );
 
 				//SrMat m;
 				//SrQuat q = j->quat()->value();

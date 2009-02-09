@@ -32,22 +32,33 @@
 
 
 #include "bml_types.hpp"
+#include "behavior_span.hpp"
 
-
-//#include "mcontrol_util.h"
+#include "mcontrol_util.h"
 #include "sbm_character.hpp"
-#include "sbm_speech.hpp"
 
 #include "xercesc_utils.hpp"
 
-// Controllers...
+// Motion Engine & Controllers...
 #include <ME/me_ct_motion.h>
 #include "me_ct_examples.h"
+#include <ME/me_prune_policy.hpp>
 
+const bool LOG_BML_VISEMES	= false;
+const bool LOG_AUDIO		= false;
 
-// Transitionary Build Options
-#define SYNC_LINKED_LIST (0)
+/**
+ *  Enables a argument-level compatibility mode of vrAgentBML.
+ *  When enabled, vrAgentBML requires a recipient token after the agent name,
+ *  just like the original vrSpeak.
+ */
+#define VRAGENTBML_USES_RECIPIENT (0)
 
+/**
+ *  Transitional mode for calculating the behavior schedules by
+ *  durations instead of a fictious local timeline.
+ */
+#define BEHAVIOR_TIMING_BY_DURATION (0)
 
 
 namespace BML {
@@ -59,60 +70,132 @@ namespace BML {
 
 	const XMLCh ATTR_START[]        = L"start";
 	const XMLCh ATTR_READY[]        = L"ready";
-	const XMLCh ATTR_STROKE_START[] = L"stroke-start";
+	const XMLCh ATTR_STROKE_START[] = L"stroke_start";
 	const XMLCh ATTR_STROKE[]       = L"stroke";
-	const XMLCh ATTR_STROKE_END[]   = L"stroke-end";
+	const XMLCh ATTR_STROKE_END[]   = L"stroke_end";
 	const XMLCh ATTR_RELAX[]        = L"relax";
 	const XMLCh ATTR_END[]          = L"end";
 
 	const XMLCh TM_START[]        = L"start";
 	const XMLCh TM_READY[]        = L"ready";
-	const XMLCh TM_STROKE_START[] = L"stroke-start";
+	const XMLCh TM_STROKE_START[] = L"stroke_start";
 	const XMLCh TM_STROKE[]       = L"stroke";
-	const XMLCh TM_STROKE_END[]   = L"stroke-end";
+	const XMLCh TM_STROKE_END[]   = L"stroke_end";
 	const XMLCh TM_RELAX[]        = L"relax";
 	const XMLCh TM_END[]          = L"end";
 
 
 	//  Helper Function
-	const XMLCh* buildBmlId( const XMLCh* behaviorId, const XMLCh* synchId );
-	bool isValidBmlId( const XMLCh* id );
-	bool isValidTmId( const XMLCh* id );
+	std::wstring buildBmlId( const std::wstring& behavior_id, const std::wstring& sync_id );
+	bool isValidBmlId( const std::wstring& id );
+	bool isValidTmId( const std::wstring& id );
 
 
 	// Enumerations
-//	enum GestureType { BML_MOTION };
 	enum HeadBehaviorType { HEAD_NOD, HEAD_SHAKE, HEAD_TOSS, HEAD_ORIENT };
 
 
 
 	// Class Definitions
+	/** Base class for all BML exceptions. */
+	class BmlException : public std::exception {
+	public:
+		BmlException( const char *const& what_string )
+		:	std::exception( what_string )
+		{}
+
+
+		virtual const char* type()
+		{	return "BmlException"; }
+	};
+
+	/** Exception of errors that occur during parsing. */
+	class ParsingException : public BmlException {
+	public:
+		ParsingException( const char *const& what_string )
+		:	BmlException( what_string )
+		{}
+
+		virtual const char* type()
+		{	return "ParsingException"; }
+	};
+	/** Exception of errors that occur during scheduling. */
+	class SchedulingException : public BmlException {
+	public:
+		SchedulingException( const char *const& what_string )
+		:	BmlException( what_string )
+		{}
+
+		virtual const char* type()
+		{	return "SchedulingException"; }
+	};
+	/** Exception of errors that occur during realizing. */
+	class RealizingException : public BmlException {
+	public:
+		RealizingException( const char *const& what_string )
+		:	BmlException( what_string )
+		{}
+
+		virtual const char* type()
+		{	return "RealizingException"; }
+	};
+
 	class BmlRequest {
 	public:
-		const SbmCharacter   *agent;
+		const SbmCharacter   *actor;
+		const std::string    actorId;  // in case referenced via an alias
 
 		const std::string    requestId;
+#if VRAGENTBML_USES_RECIPIENT
 		const std::string    recipientId;
+#endif
 		const std::string    msgId;
 
 		VecOfTriggerEvent    triggers;
 		TriggerEventPtr      start_trigger;
-		SynchPointPtr        bml_start;
-		// SynchPointPtr        bml_end;  // bml:end SynchPoint removed until it can be better evaluated
-		VecOfVisemeData      visemes;
+		SyncPointPtr         bml_start;
+		// SyncPointPtr        bml_end;  // bml:end SyncPoint removed until it can be better evaluated
+
 		VecOfBehaviorRequest behaviors;
-		MapOfSynchPoint      synch_points;
+		MapOfBehaviorRequest idToBehavior;
+
+		MapOfSyncPoint       idToSync;
 
 		TriggerEventPtr      speech_trigger;
 		SpeechRequestPtr     speech_request;
 
 	private:
+		std::string			 start_seq_name;
+		std::string			 cleanup_seq_name;
+
 		BmlRequestWeakPtr    weak_ptr;  // weak reference to the reference count struct
+		BehaviorSpan         span;
 
 
 	protected:
-		BmlRequest( const SbmCharacter* agent, const std::string & requestId, const std::string & recipientId, const std::string & msgId );
+#if VRAGENTBML_USES_RECIPIENT
+		BmlRequest( const SbmCharacter* agent, const std::string& actorId, const std::string& requestId, const std::string& recipientId, const std::string & msgId );
+#else
+		BmlRequest( const SbmCharacter* agent, const std::string& actorId, const std::string& requestId, const std::string & msgId );
+#endif
 		void init( BmlRequestPtr self );
+
+		std::string buildUniqueBehaviorId( const XMLCh* tag, const XMLCh* id, size_t ordinal );
+
+		bool hasExistingBehaviorId( const std::wstring& id );
+		void importNamedSyncPoints( SyncPoints& syncs, const std::wstring& id, const std::wstring& logging_label );
+
+		BehaviorSpan getBehaviorSpan();
+
+		/**
+		 *  Schedules and realizes teh behaviors of the BmlRequest.
+		 *  May throw BML::RealizationException if error occurs or request is unschedulable.
+		 */
+		void realize( Processor* bp, mcuCBHandle *mcu );
+
+		void unschedule( mcuCBHandle* mcu, time_sec transition_duration );
+
+		void cleanup( mcuCBHandle* mcu );
 
 	public:
 		virtual ~BmlRequest();
@@ -121,73 +204,132 @@ namespace BML {
 		 *  Creates a new TriggerEvent following this BmlRequest's start_trigger.
 		 *  DO NOT CALL BEFORE CONSTRUCTOR RETURNS.
 		 */
-		TriggerEventPtr createTrigger( const std::string &name );
+		TriggerEventPtr createTrigger( const std::wstring &name );
 
-		void addBehavior( BehaviorRequest* behavior );
+		bool registerBehavior( const std::wstring& id, BehaviorRequestPtr behavior );
+//		bool registerBehavior( const std::wstring& id, SpeechRequestPtr behavior );
 
-		SynchPointPtr getSynchPoint( const XMLCh* name );  // Lookup a SynchPoint
+		/**
+		 *  Gets the TimeRange for all scheduled SyncPoints in all BehaviorRequests.
+		 */
+		SyncPointPtr getSyncPoint( const std::wstring& notation );  // Lookup a SyncPoint
+		
+		bool isPersistent() { return getBehaviorSpan().persistent; }
 
-
+	protected:
 		friend class Processor;
 	};
 
 	class TriggerEvent {
 	public:
-		std::string         name;     // for logging / debugging
+		std::wstring        name;     // for logging / debugging
 		BmlRequestWeakPtr   request;
 
 	private:
 		TriggerEventWeakPtr weak_ptr;  // weak reference to the reference count struct
 
 	protected:
-		TriggerEvent( const std::string& name, BmlRequestPtr request );
+		TriggerEvent( const std::wstring& name, BmlRequestPtr request );
 		void init( TriggerEventPtr self );
 
 	public:
-		SynchPointPtr addSynchPoint( const XMLCh* name );  // adds SynchPoint before end of trigger
-		SynchPointPtr addSynchPoint( const XMLCh* name, SynchPointPtr par, float off );
+		SyncPointPtr addSyncPoint();  // adds SyncPoint before end of trigger
+		SyncPointPtr addSyncPoint( SyncPointPtr par, float off );
 
 		friend class BmlRequest;
 	};
 
-	class SynchPoint {
+	class SyncPoint {
 	public:
-		const XMLCh *const        name;
 		const TriggerEventWeakPtr trigger;
 		time_sec                  time;  // TIME_UNSET implies it has not been set
-		SynchPointPtr             parent;
+		SyncPointPtr              parent;
 		float			          offset;	
 
+		bool isSet() { return isTimeSet( time ); }
+
 	private:
-		SynchPointWeakPtr         weak_ptr;  // weak reference to the reference count struct
+		SyncPointWeakPtr         weak_ptr;  // weak reference to the reference count struct
 
 	protected:
-		SynchPoint( const XMLCh* name, const TriggerEventPtr trigger );
-		SynchPoint( const XMLCh* name, const TriggerEventPtr trigger, SynchPointPtr par, float off );
-		void init( SynchPointPtr self );
+		SyncPoint( const TriggerEventPtr trigger );
+		SyncPoint( const TriggerEventPtr trigger, SyncPointPtr par, float off );
+		void init( SyncPointPtr self );
 
 	public:
-		virtual ~SynchPoint();
-
-
 		friend class BmlRequest;
 		friend class TriggerEvent;
 	};
 
-	// Ordered list of synch points, with references to standard synch_points.
-	class SynchPoints {
+	// Ordered list of sync points, with references to standard sync_points.
+	class SyncPoints {
 	public:
-		SynchPointPtr start;
-		SynchPointPtr ready;
-		SynchPointPtr strokeStart;
-		SynchPointPtr stroke;
-		SynchPointPtr strokeEnd;
-		SynchPointPtr relax;
-		SynchPointPtr end;
+		typedef VecOfSyncPoint::iterator iterator;
 
-		//SynchPoints();  // Unnecessary with shared_ptr
+	protected:
+		VecOfSyncPoint  syncs;    // Short enough to avoid more complicated structures?
+		MapOfSyncPoint  idToSync;
 
-		void parseStandardSynchPoints( DOMElement* elem, BmlRequestPtr request );
+	public:
+		SyncPointPtr sp_start;
+		SyncPointPtr sp_ready;
+		SyncPointPtr sp_stroke_start;
+		SyncPointPtr sp_stroke;
+		SyncPointPtr sp_stroke_end;
+		SyncPointPtr sp_relax;
+		SyncPointPtr sp_end;
+
+		/**
+		 * Default constructor.  Does not initialize standard SyncPoint fields.
+		 */
+		SyncPoints();
+
+		/**
+		 * Copy constructor.
+		 */
+		SyncPoints( const SyncPoints& other );
+
+		/**
+		 *  Returns the position of the first SyncPointPtr, or end() if empty.
+		 */
+		SyncPoints::iterator begin()
+		{	return syncs.begin(); }
+
+		/**
+		 *  Returns the position after the last SyncPointPtr.
+		 */
+		SyncPoints::iterator end()
+		{	return syncs.end(); }
+
+		SyncPoints::iterator insert( const std::wstring& id, SyncPointPtr sync, SyncPoints::iterator pos ); 
+
+		SetOfWstring get_sync_names();
+
+		SyncPointPtr sync_for_name( const std::wstring& name );
+
+		SyncPoints::iterator pos_of( SyncPointPtr sync );
+
+		void parseStandardSyncPoints( DOMElement* elem, BmlRequestPtr request );
+
+		/**
+		 *  Gets the BehaviorSpan for all scheduled SyncPoints.
+		 */
+		BehaviorSpan getBehaviorSpan( time_sec persistent_threshold );
+
+		/** For each SyncPoint, if parent is set, applies the parent time and offset. */
+		void applyParentTimes();
+
+		std::wstring idForSyncPoint( SyncPointPtr sync );
+
+		/** Prints SyncPoint ids in order, separated by commas. */
+		void printSyncIds();
+
+		/** Prints SyncPoints in order, one per line, prefixed with a tab. */
+		void printSyncTimes();
+
+	protected:
+		SyncPointPtr SyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request );
+		SyncPointPtr SyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, iterator pos );
 	};
 
 	//  Structure to keep track of a scheduled SBM command
@@ -195,9 +337,9 @@ namespace BML {
 	//  and these commands might need to be shifted slightly.
 	struct SbmCommand {
 		std::string command;
-		float       time;
+		time_sec    time;
 
-		SbmCommand( std::string & command, float time );
+		SbmCommand( std::string & command, time_sec time );
 
 		//  Copy constructor and assignment operator
 		SbmCommand( SbmCommand& other );
@@ -206,24 +348,31 @@ namespace BML {
 
 	class BehaviorRequest {
     ///////////////////////////////////////////////////////////////////
+    //  Constants
+	public:
+		static const time_sec PERSISTENCE_THRESHOLD;
+
+	///////////////////////////////////////////////////////////////////
     //  Data
+	public:
+		const std::string	unique_id;
+		SyncPoints			syncs;
+
 	protected:
-		//const GestureType type;
-		//const void*       data;
-
-		//  SynchPoints in BML request time
-		const SynchPointPtr start;
-		const SynchPointPtr ready;
-		const SynchPointPtr stroke;
-		const SynchPointPtr relax;
-		const SynchPointPtr end;
-
+#if BEHAVIOR_TIMING_BY_DURATION
+        time_sec startReadyDur;
+        time_sec readyStrokeDur;
+        time_sec strokeRelaxDur;
+        time_sec relaxEndDur;
+#else
         // controller local time references
         time_sec startTime;
         time_sec readyTime;
         time_sec strokeTime;
         time_sec relaxTime;
         time_sec endTime;
+#endif // BEHAVIOR_TIMING_BY_DURATION
+
         time_sec speed;  
 
 	private:
@@ -232,13 +381,22 @@ namespace BML {
     ///////////////////////////////////////////////////////////////////
     //  Methods
 	public:
-		BehaviorRequest( const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end,
+#if BEHAVIOR_TIMING_BY_DURATION
+		BehaviorRequest( const std::string& unique_id, const SyncPoints& syncs,
+						 time_sec startReadyDur, time_sec readyStrokeDur, time_sec strokeRelaxDur, time_sec relaxEndDur,
+						 float speed );
+#else
+		BehaviorRequest( const std::string& unique_id, const SyncPoints& syncs,
 						 time_sec startTime, time_sec readyTime, time_sec strokeTime, time_sec relaxTime, time_sec endTime,
 						 float speed );
+#endif // BEHAVIOR_TIMING_BY_DURATION
 		virtual ~BehaviorRequest();
 
-		virtual time_sec getAudioRelativeStart();
-		virtual time_sec calcAudioRelativeStart();
+		/**
+		 *  Schedules the behavior's SyncPoints, returning the earliest time (usually the start time).
+		 *  May throw RealizationException.
+		 */
+		virtual void schedule( time_sec now );
 
 		/**
 		 *   Simplified behavior scheduling method, only offers start time (assumes default duration
@@ -246,57 +404,123 @@ namespace BML {
 		 *     SbmCharacter* actor: access to character state
 		 *     float startAt: time to start behavior
 		 */
-		virtual void schedule( const mcuCBHandle* mcu, const SbmCharacter* actor,
-			                   VecOfVisemeData& visemes,
-		                       VecOfSbmCommand& commands,
-                               time_sec startAt );
+		virtual void realize( BmlRequestPtr request, mcuCBHandle* mcu );
 
 		/**
-		 *   Behavior scheduling method, only offers start time
-		 *   params:
-		 *     SbmCharacter* actor: access to character state
-		 *     float startAt/readyAt/strokeAt/relaxAt/endAt: behavior transition times
+		 *   Behavior scheduling method.
+		 *   Reads scheduled times from SyncPoints.
 		 */
-        virtual void schedule( const mcuCBHandle* mcu, const SbmCharacter* actor,
-			                   VecOfVisemeData& visemes,
-		                       VecOfSbmCommand& commands,
-                               time_sec startAt, time_sec readyAt, time_sec strokeAt, time_sec relaxAt, time_sec endAt ) = 0;
+        virtual void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu ) = 0;
 
 		/**
 		 *  returns true is behaviors involves controllers
 		 *  Temporary transition in pruning algorithm
 		 */
 		virtual bool has_cts() { return false; }
+
+		/**
+		 *  Registers the give prune policy with all controllers of this behavior.
+		 *  Does nothing by default.
+		 **/
+		virtual void registerControllerPrunePolicy( MePrunePolicy* prune_policy ) {};
+
+		/**
+		 *  Returns true if the continues to influence the actor beyond
+		 *  the end of the BehaviorSpan.  Usually, such influence is part
+		 *  of a maintainence tasks such as a posture or gaze/pointing
+		 *  target tracking.
+		 *
+		 *  Default heuristic looks for far future sync points.
+		 *  It's highly recommended to override with a simple boolean
+		 *  value if you know it ahead of time.
+		 */
+		virtual bool isPersistent();
+
+		/**
+		 *  Gets the BehaviorSpan for all scheduled SyncPoints.
+		 *
+		 *  Default algorithm attempts to detect sync points in the
+		 *  far future.
+		 */
+		virtual BehaviorSpan getBehaviorSpan();
+
+		/**
+		 *  Schedules a cancelation / interruption of the behavior
+		 *  at specified time and duration.
+		 */
+		virtual void unschedule( mcuCBHandle* mcu,
+		                         BmlRequestPtr request,
+			                     time_sec duration ) = 0;
+
+		/**
+		 *  Abstract method point for implementing the specific clean-up algorithm.
+		 *  May be called without calling unschedule, or called multiple times.
+		 */
+		virtual void cleanup( mcuCBHandle* mcu, BmlRequestPtr request ) {};
 	};
 
 	class MeControllerRequest : public BehaviorRequest {
-	public: ///// Constants
-		enum TrackType { POSTURE, MOTION, GAZE, HEAD } ;
 	protected: // Data
-		TrackType     trackType;
-		MeController *controller;
+		/** Controller holding the source of the animation (not necessarily a motion or animation). */
+		MeController*                  anim_ct;
+		/** The schedule controller the animation was added to. */
+		MeCtScheduler2*                schedule_ct;
+		/** The track of the scheduler containing th animation. */
+		MeCtScheduler2::track_iterator track;
+
+		bool                           is_persistent;
 
 	public: ///// Methods
-		MeControllerRequest( TrackType trackType, MeController *controller, 
-			                 const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end );
+		MeControllerRequest( const std::string& unique_id,
+		                     MeController *anim_ct, MeCtSchedulerClass* schedule_ct, bool is_persistent,
+			                 const SyncPoints& syncs );
 		virtual ~MeControllerRequest();
-
-        virtual void schedule( const mcuCBHandle* mcu, const SbmCharacter* actor,
-		                       VecOfVisemeData& visemes,
-							   VecOfSbmCommand& commands,
-                               time_sec startAt, time_sec readyAt, time_sec strokeAt, time_sec relaxAt, time_sec endAt );
 
 		/**
 		 *  returns true is behaviors involves controllers
 		 *  Temporary transition in pruning algorithm
 		 */
-		virtual bool has_cts() { return true; }
+		virtual bool has_cts()
+		{	return true; }
+
+		/**
+		 *  Returns true if the continues to influence the actor beyond
+		 *  the end of the BehaviorSpan.  Usually, such influence is part
+		 *  of a maintainence tasks such as a posture or gaze/pointing
+		 *  target tracking.
+		 *
+		 *  Default heuristic looks for far future sync points.
+		 *  It's highly recommended to override with a simple boolean
+		 *  value if you know it ahead of time.
+		 */
+		virtual bool isPersistent()
+		{	return is_persistent; }
+
+		/**
+		 *  Registers the give prune policy with all controllers of this behavior.
+		 **/
+		virtual void registerControllerPrunePolicy( MePrunePolicy* prune_policy );
+
+		virtual void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu );
+
+		/**
+		 *  Implemtents BehaviorRequest::unschedule(..),
+		 *  ramping down the blend curve of the MeController.
+		 */
+		virtual void unschedule( mcuCBHandle* mcu, BmlRequestPtr request,
+			                     time_sec duration );
+
+		/**
+		 *  Implemtents BehaviorRequest::cleanup(..),
+		 *  removing the MeController from its parent.
+		 */
+		virtual void cleanup( mcuCBHandle* mcu, BmlRequestPtr request );
 	};
 
 	class MotionRequest : public MeControllerRequest {
 	public:
-		MotionRequest( TrackType trackType, MeCtMotion* motion,
-			           const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end );
+		MotionRequest( const std::string& unique_id, MeCtMotion* motion_ct, MeCtSchedulerClass* schedule_ct,
+			           const SyncPoints& syncs );
 	};
 
 	class NodRequest : public MeControllerRequest {
@@ -311,8 +535,8 @@ namespace BML {
         const float extent;    // % of full extension
 
 	public: ///// Methods
-		NodRequest( NodType type, float repeats, float frequency, float extent, const SbmCharacter* actor,
-			        const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end );
+		NodRequest( const std::string& unique_id, NodType type, float repeats, float frequency, float extent, const SbmCharacter* actor,
+			        const SyncPoints& syncs );
 	};
 
 	class TiltRequest : public MeControllerRequest {
@@ -321,21 +545,51 @@ namespace BML {
         time_sec transitionDuration;
 
 	public: ///// Methods
-		TiltRequest( MeCtSimpleTilt* tilt, time_sec transitionDuration,
-			         const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end );
+		TiltRequest( const std::string& unique_id, MeCtSimpleTilt* tilt, time_sec transitionDuration, const SbmCharacter* actor,
+			         const SyncPoints& syncs );
 	};
 
 	class PostureRequest : public MeControllerRequest {
 	public:
-		//MeCtPose* pose;
         time_sec duration;
         time_sec transitionDuration;
 
-		PostureRequest( MeController* pose, time_sec transitionDuration,
-			            const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end );
+		PostureRequest( const std::string& unique_id, MeController* pose, time_sec transitionDuration, const SbmCharacter* actor,
+			            const SyncPoints& syncs );
 	};
 
-	class VisemeRequest : public BehaviorRequest {
+	class SequenceRequest : public BehaviorRequest {
+	protected:
+		SequenceRequest( const std::string& unique_id, const SyncPoints& syncs,
+						 time_sec startTime, time_sec readyTime, time_sec strokeTime, time_sec relaxTime, time_sec endTime );
+
+	public:
+		/**
+		 *  Implemtents BehaviorRequest::unschedule(..),
+		 *  cancelling remaining sequence.
+		 */
+		virtual void unschedule( mcuCBHandle* mcu, BmlRequestPtr request,
+			                     time_sec duration );
+
+		/**
+		 *  Implemtents BehaviorRequest::cleanup(..),
+		 *  removing the sequence.
+		 */
+		virtual void cleanup( mcuCBHandle* mcu, BmlRequestPtr request );
+
+	protected:
+		/**
+		 *  Builds and activates a sequence from commands list.
+		 */
+		bool realize_sequence( VecOfSbmCommand& commands, mcuCBHandle* mcu );
+
+		/**
+		 *  Aborts the prior sequence.
+		 */
+		bool unschedule_sequence( mcuCBHandle* mcu );
+	};
+
+	class VisemeRequest : public SequenceRequest {
 	protected:
         const char* viseme;
         float       weight;
@@ -344,74 +598,39 @@ namespace BML {
 		float		rampdown;
 
 	public:
-		VisemeRequest( const char *viseme, float weight, time_sec duration,
-			           const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end);
+		VisemeRequest( const std::string& unique_id, const char *viseme, float weight, time_sec duration,
+			           const SyncPoints& syncs );
 
-		VisemeRequest( const char *viseme, float weight, time_sec duration,
-			           const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end , float rampup, float rampdown);
+		VisemeRequest( const std::string& unique_id, const char *viseme, float weight, time_sec duration,
+			           const SyncPoints& syncs, float rampup, float rampdown);
 
         void setVisemeName( const char* viseme );
 
-		void schedule( const mcuCBHandle* mcu, const SbmCharacter* actor,
-		               VecOfVisemeData& visemes,
-		               VecOfSbmCommand& commands,
-			           double startAt, double readyAt, double strokeAt, double relaxAt, double endAt );
+		void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu );
 	};
-
-	class EventRequest : public BehaviorRequest {
-	protected:
-		const std::string message;
-	
-	public:
-		EventRequest( const char* message,
-			          const SynchPointPtr start, const SynchPointPtr ready, const SynchPointPtr stroke, const SynchPointPtr relax, const SynchPointPtr end);
-	
-		void schedule( const mcuCBHandle* mcu, const SbmCharacter* actor,
-		               VecOfVisemeData& visemes,
-		               VecOfSbmCommand& commands,
-			           double startAt, double readyAt, double strokeAt, double relaxAt, double endAt );
-	};
-
-	class SpeechRequest {  // not a standard behavior
-		///////////////////////////////////////////////////////////////
-		// Data
-		const DOMElement* xml;
-		const XMLCh*      id;
-
-	public:
-		// Equivalent to BehaviorRequest fields
-		TriggerEventPtr   trigger;
-		SynchPointPtr     start;
-		SynchPointPtr     ready;
-		SynchPointPtr     relax;
-		SynchPointPtr     end;
-
-		VecOfSynchPoint   tms;  // <tm> Time Markers, or syntheis markup equiv
-
-		std::string audioPlay;
-		std::string audioStop;
-
-		///////////////////////////////////////////////////////////////
-		// Methods
-		SpeechRequest( DOMElement*, const XMLCh* id, BmlRequestPtr request );
-		virtual ~SpeechRequest();
-
-		const DOMElement* getXML() { return xml; }
+} // namespace BML
 
 
-		//
-		///**
-		// *  Adds wordbreak mark after STROKE or last mark, and before RELAX
-		// */
-		//SynchPointPtr addMark( const XMLCh* id );
 
+//  Output Operators
+template < typename charT, typename traits >
+inline
+std::basic_ostream<charT,traits>& 
+operator << ( std::basic_ostream<charT,traits>& out, const BML::SyncPointPtr& sync ) {
+	out << *(sync.get());
+	return out;
+}
 
-		/**
-		 *  Retrieves previously added mark.
-		 *  Takes both 'behavior:mark' and just 'mark'.
-		 */
-		SynchPointPtr getMark( const XMLCh* id );
-	};
+template < typename charT, typename traits >
+inline
+std::basic_ostream<charT,traits>& 
+operator << ( std::basic_ostream<charT,traits>& out, const BML::SyncPoint& sync ) {
+	if( sync.parent ) {
+		out << "time=" << sync.time << "; parent="<< sync.parent.get() << "; offset="<<sync.offset;
+	} else {
+		out << "time="<<sync.time;
+	}
+	return out;
 }
 
 #endif  // BML_HPP

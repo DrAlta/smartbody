@@ -36,7 +36,7 @@ srArgBuffer::srArgBuffer( const char *arg )	{
 	if( arg == NULL )	{
 		arg_len = 0;
 		tok_buff = new char;
-		sprintf( tok_buff, EMPTY_STRING );
+		tok_buff[0] = '\0';  // Empty string
 	}
 	else	{
 		arg_len = strlen( arg );

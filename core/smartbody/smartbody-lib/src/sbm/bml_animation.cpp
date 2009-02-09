@@ -35,7 +35,7 @@ using namespace xml_utils;
 
 
 
-BehaviorRequest* BML::parse_bml_animation( DOMElement* elem, SynchPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string& unique_id, SyncPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu ) {
 	//type = BML_MOTION;
 
 	const XMLCh* animName = elem->getAttribute( ATTR_NAME );
@@ -70,15 +70,15 @@ BehaviorRequest* BML::parse_bml_animation( DOMElement* elem, SynchPoints& tms, B
 			}
 			delete [] speedStr;
 
-			return new MotionRequest( MeControllerRequest::MOTION, motionCt, tms.start, tms.ready, tms.stroke, tms.relax, tms.end );
+			return BehaviorRequestPtr( new MotionRequest( unique_id, motionCt, request->actor->motion_sched_p, tms ) );
 		} else {
 			// TODO: exception?
 			wcerr<<"WARNING: BodyPlannerImpl::parseBML(): <animation>: name=\""<<animName<<"\" not loaded; ignoring <animation>."<<endl;
-			return NULL;
+			return BehaviorRequestPtr();  // a.k.a., NULL
 		}
 	} else {
 		// TODO: exception?
 		wcerr<<"WARNING: BodyPlannerImpl::parseBML(): <animation> missing name= attribute; ignoring <animation>."<<endl;
-		return NULL;
+		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 }

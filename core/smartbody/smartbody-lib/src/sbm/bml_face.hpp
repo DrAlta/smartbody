@@ -26,16 +26,13 @@
 #include "bml.hpp"
 
 
-#define LOG_BML_VISEMES	(0)
-
-
 // Forward Declaration
 class mcuCBHandle;
 
 namespace BML {
 	const XMLCh TAG_FACE[] = L"face";
 
-	BML::BehaviorRequest* parse_bml_face( DOMElement* elem, BML::SynchPoints& tms, BML::BmlRequestPtr request, mcuCBHandle *mcu );
+	BML::BehaviorRequestPtr parse_bml_face( DOMElement* elem, const std::string& unique_id, BML::SyncPoints& tms, BML::BmlRequestPtr request, mcuCBHandle *mcu );
 };
 
 

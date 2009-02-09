@@ -28,6 +28,8 @@
 
 #include <ME/me_controller.h>
 #include <SR/sr_quat.h>
+#include <ME/me_prune_policy.hpp>
+
 
 using namespace std;
 
@@ -40,13 +42,14 @@ using namespace std;
 int MeController::instance_count = 0;
 
 MeController::MeController () 
-:  _active( false ),
-   _indt( 0.0f ),
-   _outdt( 0.0f ),
-   _name( NULL ),
-   _emphasist( -1.0f ),
-   _lastEval( -1 ),  // effectively unset.. should really be a less likely value like NaN
-   _context( NULL ),
+:	_active( false ),
+	_indt( 0.0f ),
+	_outdt( 0.0f ),
+	_name( NULL ),
+	_emphasist( -1.0f ),
+	_lastEval( -1 ),  // effectively unset.. should really be a less likely value like NaN
+	_prune_policy( new MeDefaultPrunePolicy() ),
+	_context( NULL ),
  	_record_output( NULL ), // for recording poses and motions of immediate local results
 	_record_motion( NULL ),
 	_record_pose( NULL )
@@ -55,6 +58,8 @@ MeController::MeController ()
 	instance_count ++;
 	_invocation_count = -1;
 
+	_prune_policy->ref();
+
 	_record_mode = RECORD_NULL;
 	_recording = false;
 	_record_num_frames = 0;
@@ -62,8 +67,14 @@ MeController::MeController ()
 }
 
 MeController::~MeController () {
-	//assert( _context==NULL );  // Controller should not be deleted if still referenced by controller
+	//assert( _context==NULL );  // Controller should not be deleted if still referenced by context
 	stop_record();
+
+	if( _prune_policy ) {
+		_prune_policy->unref();
+		_prune_policy = NULL;
+	}
+
     delete[] _name;
 }
 
@@ -122,6 +133,24 @@ void MeController::init () {
 	if( _context )
 		_context->child_channels_updated( this );
 }
+
+MePrunePolicy* MeController::prune_policy () {
+	return _prune_policy;
+}
+
+void MeController::prune_policy( MePrunePolicy* prune_policy ) {
+	if( _prune_policy != prune_policy ) {
+		if( _prune_policy != NULL ) {
+			_prune_policy->unref();
+			_prune_policy = NULL;
+		}
+		_prune_policy = prune_policy;
+		if( _prune_policy != NULL ) {
+			_prune_policy->ref();
+		}
+	}
+}
+
 
 void MeController::start () {
 

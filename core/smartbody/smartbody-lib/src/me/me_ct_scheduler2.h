@@ -128,6 +128,8 @@ public:
         /*! returns the source animation controller for this Track */
 		MeController* animation_ct() { return _animation_ct; }
 
+		MeController* animation_parent_ct();
+
 		MeController* root() { return _root; }
 
 		bool evaluate( double time, MeFrameData& frame );
