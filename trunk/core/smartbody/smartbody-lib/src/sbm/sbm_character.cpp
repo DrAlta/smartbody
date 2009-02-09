@@ -36,6 +36,7 @@
 #include <ME/me_spline_1d.hpp>
 
 
+const bool LOG_PRUNE_CMD_TIME          = false;
 const bool LOG_CONTROLLER_TREE_PRUNING = false;
 
 
@@ -248,8 +249,27 @@ int SbmCharacter::init_skeleton() {
 	return CMD_SUCCESS;
 }
 
+bool test_ct_for_pruning( MeCtScheduler2::Track& track ) {
+	bool prune_ok = true;
+
+	MeController* ct = track.animation_ct();
+	if( ct != NULL ) {
+		MePrunePolicy* prune_policy = ct->prune_policy();
+		if( prune_policy != NULL ) {
+			prune_ok = prune_policy->shouldPrune( ct, track.animation_parent_ct() );
+
+			if( LOG_CONTROLLER_TREE_PRUNING && !prune_ok )
+				cout << "DEBUG: "<<ct->controller_type()<<" \""<<ct->name()<<"\" withheld from pruning by MePrunePolicy."<<endl;
+		}
+	}
+
+	return prune_ok;
+}
+
 // Recursive portion of SbmCharacter::prune_controller_tree
-void prune_schedule( MeCtScheduler2* sched,
+void prune_schedule( SbmCharacter*   actor,
+					 MeCtScheduler2* sched,
+					 mcuCBHandle*    mcu_p,
 					 double          time,
 					 MeCtScheduler2* posture_sched_p,
 					 //////  Higher priority controllers....
@@ -259,10 +279,14 @@ void prune_schedule( MeCtScheduler2* sched,
 					 MeCtPose*       &pose_ct
 ) {
 	if( LOG_CONTROLLER_TREE_PRUNING ) cout << "DEBUG: sbm_character.cpp prune_schedule(..): Pruning schedule \""<<sched->name()<<"\" from time "<<time<<endl;
-	MeCtScheduler2::track_iterator first = sched->begin();
-	MeCtScheduler2::track_iterator it = sched->end();
 
-	vector< MeCtScheduler2::track_iterator > tracks_to_remove;  // don't remove during iteration
+	typedef MeCtScheduler2::track_iterator           track_iterator;  // Don't understand why 'using' directives didn't work here
+	typedef vector< MeCtScheduler2::track_iterator > vec_tracks;
+
+	track_iterator first = sched->begin();
+	track_iterator it = sched->end();
+
+	vec_tracks tracks_to_remove;  // don't remove during iteration
 
 	while( it != first ) {
 		// Decrement track iterator (remember, we started at end)
@@ -355,7 +379,7 @@ void prune_schedule( MeCtScheduler2* sched,
 						MeCtSimpleNod* nod2_ct = NULL;
 						MeController*  motion2_ct = NULL;
 						MeCtPose*      pose2_ct = NULL;
-						prune_schedule( sched_ct, time_offset, posture_sched_p, gaze_key2_cts, nod2_ct, motion2_ct, pose2_ct );
+						prune_schedule( actor, sched_ct, mcu_p, time_offset, posture_sched_p, gaze_key2_cts, nod2_ct, motion2_ct, pose2_ct );
 
 						delete[] gaze_key2_cts;
 						//if( sched_ct->count_children()==0 ) {
@@ -364,7 +388,7 @@ void prune_schedule( MeCtScheduler2* sched,
 
 						in_use = true;
 					} else {
-						prune_schedule( sched_ct, time_offset, posture_sched_p, gaze_key_cts, nod_ct, motion_ct, pose_ct );
+						prune_schedule( actor, sched_ct, mcu_p, time_offset, posture_sched_p, gaze_key_cts, nod_ct, motion_ct, pose_ct );
 						in_use = sched_ct->count_children()>0;
 					}
 				} else if( anim_ct_type == MeCtSimpleNod::_type_name ) {
@@ -432,7 +456,7 @@ void prune_schedule( MeCtScheduler2* sched,
 			in_use = false;
 		}
 
-		if( !in_use ) {
+		if( !in_use && test_ct_for_pruning( *it ) ) {
 			// insert at front, because we are iterating end->begin
 			// and we prefer the final list order matches order within schedule
 			tracks_to_remove.insert( tracks_to_remove.begin(), it );
@@ -440,6 +464,18 @@ void prune_schedule( MeCtScheduler2* sched,
 	}
 
 	if( !tracks_to_remove.empty() ) {
+#if SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK
+		vec_tracks::iterator it = tracks_to_remove.begin();
+		vec_tracks::iterator end = tracks_to_remove.begin();
+		for( ; it != end; ++it ) {
+			MeController* anim_ct = (*it)->animation_ct();
+			if( anim_ct != NULL ) {
+				// Inform character about the to-be-removed controller
+				actor->exec_controller_cleanup( anim_ct, mcu_p );
+			}
+		}
+#endif // SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK
+
 		sched->remove_tracks( tracks_to_remove );
 	}
 }
@@ -452,8 +488,8 @@ void prune_schedule( MeCtScheduler2* sched,
  *
  *  What a glorious hack before I leave for China...  - Anm
  */
-int SbmCharacter::prune_controller_tree() {
-	double time = mcuCBHandle::singleton().time;  // current time
+int SbmCharacter::prune_controller_tree( mcuCBHandle* mcu_p ) {
+	double time = mcu_p->time;  // current time
 
 	// Pointers to the most active controllers of each type.
 	MeCtGaze**     gaze_key_cts = new MeCtGaze*[ MeCtGaze::NUM_GAZE_KEYS ];
@@ -466,9 +502,9 @@ int SbmCharacter::prune_controller_tree() {
 	
 
 	// Traverse the controller tree from highest priority down, most recent to earliest
-	prune_schedule( head_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
-	prune_schedule( gaze_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
-	prune_schedule( motion_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
+	prune_schedule( this, head_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
+	prune_schedule( this, gaze_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
+	prune_schedule( this, motion_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
 
 	// For the posture track, ignore prior controllers, as they should never be used to mark a posture as unused
 	for( int key=0; key<MeCtGaze::NUM_GAZE_KEYS; ++key )
@@ -476,7 +512,10 @@ int SbmCharacter::prune_controller_tree() {
 	nod_ct    = NULL;
 	motion_ct = NULL;  // also covers quickdraw
 	pose_ct   = NULL;
-	prune_schedule( posture_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
+	prune_schedule( this, posture_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
+
+	if( LOG_CONTROLLER_TREE_PRUNING )
+		print_controller_schedules();
 
 	delete[] gaze_key_cts;
 
@@ -654,6 +693,24 @@ void SbmCharacter::inspect_skeleton_world_transform( SkJoint* joint_p, int depth
 	}
 }
 
+int SbmCharacter::print_controller_schedules() {
+		//  Command: print character <character id> schedule
+		//  Print out the current state of the character's schedule
+		cout << "Character " << name << "'s schedule:" << endl;
+		cout << "POSTURE Schedule:" << endl;
+		posture_sched_p->print_state( 0 );
+		cout << "MOTION Schedule:" << endl;
+		motion_sched_p->print_state( 0 );
+		cout << "GAZE Schedule:" << endl;
+		gaze_sched_p->print_state( 0 );
+		cout << "HEAD Schedule:" << endl;
+		head_sched_p->print_state( 0 );
+		// Print Face?
+
+		return CMD_SUCCESS;
+}
+
+
 // HACK to initiate reholster on all QuickDraw controllers
 int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 	const double now = mcu_p->time;
@@ -766,17 +823,19 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	}
 	else
 	if( char_cmd=="prune" ) {
+		if( LOG_PRUNE_CMD_TIME )
+			cout << "char "<<char_name<<" prune"<<" (time "<<mcu_p->time<<')'<<endl;
 		int result = CMD_SUCCESS;
 		if( all_characters ) {
 			mcu_p->character_map.reset();
 			while( character = mcu_p->character_map.next() ) {
-				if( character->prune_controller_tree() != CMD_SUCCESS ) {
+				if( character->prune_controller_tree( mcu_p ) != CMD_SUCCESS ) {
 					cerr << "ERROR: Failed to prune controller tree of character \""<<character->name<<"\"."<<endl;
 					result = CMD_FAILURE;
 				}
 			}
 		} else if( character ) {
-			int result = character->prune_controller_tree();
+			int result = character->prune_controller_tree( mcu_p );
 			if( result != CMD_SUCCESS ) {
 				cerr << "ERROR: Failed to prune controller tree of character \""<<char_name<<"\"."<<endl;
 			}
@@ -801,7 +860,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		} else {
 			if ( !character ) {
 				cerr << "ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"" << char_name << "\"." << endl;
-				return CMD_FAILURE;  // this should really be an ignore/out-of-domain result
+				return CMD_FAILURE;  // ignore/out-of-domain? But it's not a standard network message.
 			} else {
 				character->set_viseme( viseme, weight, rampin_duration );
 				return CMD_SUCCESS;
@@ -809,8 +868,6 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		}
 	} else if( char_cmd=="bone" ) {
 		return mcu_character_bone_cmd( char_name.c_str(), args, mcu_p );
-	} else if( char_cmd=="bonep" ) {
-		return mcu_character_bone_position_cmd( char_name.c_str(), args, mcu_p );
 	} else if( char_cmd=="remove" ) {
 		return SbmCharacter::remove_from_scene( char_name.c_str() );
 	} else if( char_cmd=="reholster" ) {
@@ -945,20 +1002,7 @@ int SbmCharacter::print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		cout << "character " << character_id << "'s voice_code: " << character->get_voice_code() << endl;
 		return CMD_SUCCESS;
 	} else if( attribute=="schedule" ) {
-		//  Command: print character <character id> schedule
-		//  Print out the current state of the character's schedule
-		cout << "Character " << character_id << "'s schedule:" << endl;
-		cout << "POSTURE Schedule:" << endl;
-		character->posture_sched_p->print_state( 0 );
-		cout << "MOTION Schedule:" << endl;
-		character->motion_sched_p->print_state( 0 );
-		cout << "GAZE Schedule:" << endl;
-		character->gaze_sched_p->print_state( 0 );
-		cout << "HEAD Schedule:" << endl;
-		character->head_sched_p->print_state( 0 );
-		// Print Face?
-
-		return CMD_SUCCESS;
+		return character->print_controller_schedules();
 	} else {
 		return SbmPawn::print_attribute( character, attribute, args, mcu_p );
 	}

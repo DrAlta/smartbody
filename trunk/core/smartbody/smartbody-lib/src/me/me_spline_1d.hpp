@@ -222,7 +222,10 @@ public:
 protected:
 	///////////////////////////////////////////////////////////////////////
 	//  Private Data
-	std::map< domain, Knot* > knots;
+
+	typedef std::map< domain, Knot* > MapOfKnots;
+	typedef MapOfKnots::iterator knots_iterator;
+	MapOfKnots knots;
 
 public:
 	///////////////////////////////////////////////////////////////////////
@@ -239,6 +242,18 @@ public:
 	Knot* make_smooth( domain x, range y, range tan, range l_control, range r_control );
 	Knot* make_cusp( domain x, range y, range l_tan, range l_control, range r_tan, range r_control );
 	Knot* make_disjoint( domain x, range y, range left_y, range l_tan, range l_control, range r_tan, range r_control );
+
+	/** Removes all knots */
+	void clear();
+
+	/** Removes all knots in range, inclusively */
+	void erase( domain x1, domain x2 );
+
+	/** Removes all knots after x, inclusively. */
+	void erase_before( domain x );
+
+	/** Removes all knots before x, inclusively. */
+	void erase_after( domain x );
 
 	range operator() ( domain x )
 		{ return eval( x ); }
@@ -264,6 +279,8 @@ protected:
 	Knot* make_knot( domain x, range y, update_knot_algo& update_knot );
 
 	void update_all_knots();
+
+	void erase( knots_iterator range1, knots_iterator range2 );
 };
 
 

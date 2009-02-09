@@ -28,6 +28,8 @@
 
 
 #include "sbm_test_cmds.hpp"
+#include "bml.hpp"  // for #define USE_RECIPIENT
+
 
 using namespace std;
 
@@ -251,11 +253,11 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 		if( echo ) {
 			msg << "echo // Running sequence \"" << seq_id << "\"...";
 			if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
-				cerr << "WARNING: send_vrSpeak(..): Failed to insert echo header command for character \"" << char_id << "\"." <<endl;
+				cerr << "WARNING: send_vrX(..): Failed to insert echo header command for character \"" << char_id << "\"." <<endl;
 			}
 			build_vrX( msg, cmd, char_id, recip_id, bml, false );
 			if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
-				cerr << "WARNING: send_vrSpeak(..): Failed to insert echoed command for character \"" << char_id << "\"." <<endl;
+				cerr << "WARNING: send_vrX(..): Failed to insert echoed command for character \"" << char_id << "\"." <<endl;
 			}
 		}
 
@@ -273,7 +275,7 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 				//}
 
 				if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
-					cerr << "WARNING: send_vrSpeak(..): Failed to insert vrSpeak command for character \"" << char_id << "\"." <<endl;
+					cerr << "WARNING: send_vrX(..): Failed to insert vrSpeak command for character \"" << char_id << "\"." <<endl;
 				}
 			}
 		} else {
@@ -286,20 +288,20 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 			//}
 
 			if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
-				cerr << "WARNING: send_vrSpeak(..): Failed to insert vrSpeak command for character \"" << char_id << "\"." <<endl;
+				cerr << "WARNING: send_vrX(..): Failed to insert vrSpeak command for character \"" << char_id << "\"." <<endl;
 			}
 		}
 
 		if( send ) {
 			mcu.active_seq_map.remove( seq_id.c_str() );  // remove old sequence by this name
 			if( mcu.active_seq_map.insert( seq_id.c_str(), seq ) != CMD_SUCCESS ) {
-				cerr << "ERROR: send_vrSpeak(..): Failed to insert seq into active_seq_map." << endl; 
+				cerr << "ERROR: send_vrX(..): Failed to insert seq into active_seq_map." << endl; 
 				return CMD_FAILURE;
 			}
 		} else {
 			mcu.pending_seq_map.remove( seq_id.c_str() );  // remove old sequence by this name
 			if( mcu.pending_seq_map.insert( seq_id.c_str(), seq ) != CMD_SUCCESS ) {
-				cerr << "ERROR: send_vrSpeak(..): Failed to insert seq into active_seq_map." << endl; 
+				cerr << "ERROR: send_vrX(..): Failed to insert seq into active_seq_map." << endl; 
 				return CMD_FAILURE;
 			}
 		}

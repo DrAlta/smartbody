@@ -41,7 +41,7 @@ using namespace xml_utils;
 
 
 
-BehaviorRequest* BML::parse_bml_face( DOMElement* elem, SynchPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& unique_id, SyncPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
 
 	// Viseme transition hack until timing can support multiple sync points
@@ -79,9 +79,11 @@ BehaviorRequest* BML::parse_bml_face( DOMElement* elem, SynchPoints& tms, BmlReq
                             wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<" "<<ATTR_AMOUNT<<"=\""<<attrAmount<<"\" />: Illegal attribute value."<<endl;
                     }
                     if(LOG_BML_VISEMES) printf( "LOG: BodyPlannerImpl::parseBML(): Viseme weight: %f\n", weight );
-                    VisemeRequest* viseme;
-					if (rampup != -1 && rampdown != -1) viseme = new VisemeRequest( "_", weight, 1, tms.start, tms.ready, tms.stroke, tms.relax, tms.end, rampup, rampdown );
-					else viseme = new VisemeRequest( "_", weight, 1, tms.start, tms.ready, tms.stroke, tms.relax, tms.end );
+					boost::shared_ptr<VisemeRequest> viseme;
+					if( rampup != -1 && rampdown != -1)
+						viseme.reset( new VisemeRequest( unique_id, "_", weight, 1, tms, rampup, rampdown ) );
+					else
+						viseme.reset( new VisemeRequest( unique_id, "_", weight, 1, tms ) );
 
                     switch( au ) {
                         case 1:
@@ -138,33 +140,32 @@ BehaviorRequest* BML::parse_bml_face( DOMElement* elem, SynchPoints& tms, BmlReq
 
                         default:
                             wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<" "<<ATTR_AU<<".. />: Unknown action unit #"<<au<<"."<<endl;
-                            delete viseme;
-                            viseme = NULL;
+                            viseme.reset();
                     }
 					return viseme;
                 } else {
                     wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<" "<<ATTR_AU<<"=\""<<attrAu<<"\" />: Illegal attribute value."<<endl;
-					return NULL;
+					return BehaviorRequestPtr();  // a.k.a., NULL
                 }
             } else {
                 wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag missing "<<ATTR_AU<<"= attribute." << endl;
-				return NULL;
+				return BehaviorRequestPtr();  // a.k.a., NULL
             }
         } else if( XMLString::compareIString( attrType, L"eyebrows" )==0 ) {
             wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unimplemented type." << endl;
-			return NULL;
+			return BehaviorRequestPtr();  // a.k.a., NULL
         } else if( XMLString::compareIString( attrType, L"eyelids" )==0 ) {
             wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unimplemented type." << endl;
-			return NULL;
+			return BehaviorRequestPtr();  // a.k.a., NULL
         } else if( XMLString::compareIString( attrType, L"mouth" )==0 ) {
             wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unimplemented type." << endl;
-			return NULL;
+			return BehaviorRequestPtr();  // a.k.a., NULL
         } else {
             wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unknown type value, ignore command" << endl;
-			return NULL;
+			return BehaviorRequestPtr();  // a.k.a., NULL
         }
     } else {
         wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag missing "<<ATTR_TYPE<<"= attribute." << endl;
-		return NULL;
+		return BehaviorRequestPtr();  // a.k.a., NULL
     }
 }

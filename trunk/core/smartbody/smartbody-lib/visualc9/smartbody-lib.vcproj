@@ -399,7 +399,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\me\me_default_prune_policy.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\me\me_default_prune_policy.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\me\me_evaluation_logger.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\me\me_prune_policy.hpp"
 					>
 				</File>
 				<File
@@ -1099,6 +1111,14 @@
 				Name="BML"
 				>
 				<File
+					RelativePath="..\src\sbm\behavior_span.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\behavior_span.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\sbm\bml.cpp"
 					>
 				</File>
@@ -1115,6 +1135,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\sbm\bml_event.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\bml_event.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\sbm\bml_face.cpp"
 					>
 				</File>
@@ -1128,6 +1156,14 @@
 				</File>
 				<File
 					RelativePath="..\src\sbm\bml_gaze.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\bml_interrupt.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\bml_interrupt.hpp"
 					>
 				</File>
 				<File
@@ -1148,6 +1184,14 @@
 				</File>
 				<File
 					RelativePath="..\src\sbm\bml_schedule.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\bml_speech.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\bml_speech.hpp"
 					>
 				</File>
 				<File

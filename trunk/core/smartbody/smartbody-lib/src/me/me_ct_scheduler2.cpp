@@ -192,6 +192,15 @@ MeCtScheduler2::Track& MeCtScheduler2::Track::operator=( const MeCtScheduler2::T
     return *this;
 }
 
+MeController* MeCtScheduler2::Track::animation_parent_ct() {
+	MeController* parent = &_schedule;
+	if( _blending_ct != NULL )
+		parent = _blending_ct;
+	if( _timing_ct != NULL )
+		parent = _timing_ct;
+	return parent;
+}
+
 bool MeCtScheduler2::Track::evaluate( double time, MeFrameData& frame ) {
 	_root->evaluate( time, frame );
 	return _root->active();
@@ -563,7 +572,16 @@ bool MeCtScheduler2::controller_evaluate( double time, MeFrameData& frame ) {
 		bool result = track.evaluate( time, frame );
 		
 		if( _automatically_remove_tracks && !result ) {
-			to_remove.push_back( i );
+			// TODO: unify prune policy of grouping controllers like blend/timing with DefaultContainerPrunePolicy
+			MeController* anim_ct = i->animation_ct();
+			MePrunePolicy* prune_policy = NULL;
+			if( anim_ct != NULL )
+				prune_policy = anim_ct->prune_policy();
+			if(    prune_policy == NULL
+			    || prune_policy->shouldPrune( anim_ct, i->animation_parent_ct() ) )
+			{
+				to_remove.push_back( i );
+			}
 		}
 	}
 

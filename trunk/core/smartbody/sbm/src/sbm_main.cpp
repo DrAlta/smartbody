@@ -414,6 +414,8 @@ int main( int argc, char **argv )	{
 	XMLPlatformUtils::Initialize();  // Initialize Xerces before creating MCU
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	// Build the floor for the viewer
 	mcu.add_scene( build_checkerboard_floor( 200.0 ) );
 	
 	mcu_register_callbacks();
@@ -537,7 +539,13 @@ int main( int argc, char **argv )	{
 	// Sets up the network connection for sending bone rotations over to Unreal
 	if( net_host != "" )
 		mcu.set_net_host( net_host );
-	mcu.set_process_id( ( proc_id != "" )? ((const char*)proc_id) : NULL );
+	if( proc_id != "" ) {
+		mcu.set_process_id( (const char*)proc_id );
+
+		// Using a process id is a sign that we're running in a multiple SBM environment.
+		// So.. ignore BML requests with unknown agents by default
+		mcu.bml_processor.set_warn_unknown_agents( false );
+	}
 
 	if ( mcu.play_internal_audio )
 	{

@@ -19,23 +19,26 @@
  *  CONTRIBUTORS:
  *      Marcelo Kallmann, USC (currently at UC Merced)
  *      Andrew n marshall, USC
+ *      Marcus Thiebaux, USC
  */
 
-# ifndef ME_CONTROLLER_H
-# define ME_CONTROLLER_H
+#ifndef ME_CONTROLLER_H
+#define ME_CONTROLLER_H
 
 #include <string>
 
-# include <SR/sr_buffer.h>
-# include <SR/sr_shared_class.h>
-# include <SK/sk_channel_array.h>
-# include <SK/sk_motion.h>
-# include <SK/sk_posture.h>
+#include <SR/sr_buffer.h>
+#include <SR/sr_shared_class.h>
+#include <SK/sk_channel_array.h>
+#include <SK/sk_motion.h>
+#include <SK/sk_posture.h>
+
 
 // Predeclare class because of circular reference:
 class MeController;
 
-# include <ME/me_controller_context.hpp>
+#include <ME/me_controller_context.hpp>
+#include <ME/me_default_prune_policy.hpp>
 
 
 #define VALIDATE_BLEND_CHANNEL_REMAP (0)  // See MeCtBlend::controller_evaluate(..)
@@ -60,6 +63,7 @@ class MeController
 #endif
 private :
 	static int instance_count;
+
 	int _instance_id;
 	int _invocation_count;
 
@@ -69,6 +73,8 @@ private :
     float _emphasist;         // time point of "main importance" in the controller
     bool _active;             // if the controller is still active
     double _lastEval;         // time at which the controller was evaluated last
+
+	MePrunePolicy* _prune_policy;  // controller tree pruning policy for this controller
 
 protected :
     // Fields for new evaluation model
@@ -196,6 +202,12 @@ public :
         The convention is that, if there is another init method in the derived
         class, the derived class will be responsible for calling MeController::init() */
     void init ();
+
+	/*! Returns the controller's prune policy, if set.  Otherwise, NULL. */
+	MePrunePolicy* prune_policy();
+
+	/*! Sets the controller's prune policy.  If set to NULL, previous policy is removed. */
+	void prune_policy( MePrunePolicy* prune_policy );
 
     /*! This method is to be called before starting to evaluate the controller. */
     void start ();

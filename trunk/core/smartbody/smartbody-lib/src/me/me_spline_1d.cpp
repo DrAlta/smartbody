@@ -30,7 +30,6 @@ typedef MeSpline1D::domain domain;
 typedef MeSpline1D::range  range;
 typedef MeSpline1D::Knot   Knot;
 
-typedef std::map< domain, Knot* >::iterator knots_iterator;
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -322,3 +321,66 @@ void MeSpline1D::update_all_knots() {
 	}
 }
 
+void MeSpline1D::clear() {
+	knots_iterator it = knots.begin();
+	knots_iterator end = knots.end();
+	for( ; it != end; ++it ) {
+		delete ( it->second );
+		it->second = NULL;
+	}
+	knots.clear();
+}
+
+void MeSpline1D::erase( domain x1, domain x2 ) {
+	erase( knots.lower_bound( x1 ), knots.upper_bound( x2 ) );
+}
+
+void MeSpline1D::erase_before( domain x ) {
+	erase( knots.begin(), knots.upper_bound( x ) );
+}
+
+void MeSpline1D::erase_after( domain x ) {
+	erase( knots.lower_bound( x ), knots.end() );
+}
+
+void MeSpline1D::erase( knots_iterator range1, knots_iterator range2 ) {
+	knots_iterator end = knots.end();
+
+	if( range1 == end ) {
+		//assert( range2 == end );
+		// Nothing to do
+		return;
+	}
+	Knot* prev = range1->second->prev;
+
+	knots_iterator it = range1;
+	for( ; it != range2 && it != end; ++it ) {
+		delete ( it->second );
+		it->second = NULL;
+	}
+
+	if( it == end ) {
+		if( prev )
+			prev->next = NULL;
+		knots.erase( range1, end );
+	} else {
+		Knot* next = range2->second->next;
+		if( next ) {
+			if( prev ) {
+				// has both
+				prev->next = next;
+				next->prev = prev;
+			} else {
+				// has only next
+				next->prev = NULL;
+			}
+		} else {
+			if( prev ) {
+				// has only prev
+				prev->next = NULL;
+			}  // else has neither
+		}
+
+		knots.erase( range1, ++range2 );
+	}
+}

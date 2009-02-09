@@ -36,8 +36,8 @@ namespace BML {
 	};
 
 	struct ScheduleConstraint {
-		SynchPointPtr a;
-		SynchPointPtr b;
+		SyncPointPtr a;
+		SyncPointPtr b;
 
 		ConstraintType type;
 	};

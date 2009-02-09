@@ -89,7 +89,7 @@ public:
 	}
 
 	//* Overrides SbmPawn::prune_controller_tree()
-	virtual int prune_controller_tree();
+	virtual int prune_controller_tree( mcuCBHandle *mcu_p );
 
 	//* Overrides SbmPawn::remove_from_scene()
 	virtual void remove_from_scene();
@@ -140,6 +140,9 @@ public:
 	void inspect_skeleton_world_transform( SkJoint* joint_p, int depth = 0 );
 
 	int reholster_quickdraw( mcuCBHandle *mcu_p );  // HACK to initiate reholster on all QuickDraw controllers
+
+
+	int print_controller_schedules();
 
 	//////////////////////////////////////////
 	// Static command handlers
