@@ -57,6 +57,8 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const DOM
    string encoding = XMLString::transcode( node->getOwnerDocument()->getXmlEncoding() );  // XMLStringconverts XML to cString; encoding
    string version = XMLString::transcode( node->getOwnerDocument()->getXmlVersion () ); //the xml version number
 
+   encoding = "UTF-8";  // getXmlEncoding() doesn't work on  'test bml char doctor <speech ref="hey"/>'
+
    string xmlConverted = "<?xml version=\"" + version.substr( 0, 6 )+ "\" ";
    xmlConverted += "encoding=\"" + encoding.substr( 0, 7 ) + "\"?>";
 
