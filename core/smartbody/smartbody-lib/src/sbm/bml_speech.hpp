@@ -1,0 +1,146 @@
+/*
+ *  bml_speech.hpp - part of SmartBody-lib
+ *  Copyright (C) 2009  University of Southern California
+ *
+ *  SmartBody-lib is free software: you can redistribute it and/or
+ *  modify it under the terms of the Lesser GNU General Public License
+ *  as published by the Free Software Foundation, version 3 of the
+ *  license.
+ *
+ *  SmartBody-lib is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  Lesser GNU General Public License for more details.
+ *
+ *  You should have received a copy of the Lesser GNU General Public
+ *  License along with SmartBody-lib.  If not, see:
+ *      http://www.gnu.org/licenses/lgpl-3.0.txt
+ *
+ *  CONTRIBUTORS:
+ *      Andrew n marshall, USC
+ */
+
+#ifndef BML_SPEECH_HPP
+#define BML_SPEECH_HPP
+
+#include <exception>
+
+#include "bml.hpp"
+#include "sbm_speech.hpp"
+
+
+// Forward Declaration
+class mcuCBHandle;
+
+namespace BML {
+	const XMLCh TAG_SPEECH[]     = L"speech";     // Original tag, here for backward compatibility
+	const XMLCh TAG_SBM_SPEECH[] = L"sbm:speech";
+
+	///////////////////////////////////////////////////////////////
+	// Types
+	/** A named bookmark into a speech behavior.
+	 *  Often represented in XML as <mark name=".."/>
+	 * (or <tm id=".."/> for backward compatibility).
+	 */
+	struct SpeechMark {
+		std::wstring id;
+		time_sec     time;
+
+		SpeechMark( std::wstring& id, time_sec time )
+		:	id( id ), time( time )
+		{}
+
+		SpeechMark( const SpeechMark& other )
+		:	id( other.id ), time( other.time )
+		{}
+	};
+
+	/** <sbm:speech> BehaviorRequest */
+	class SpeechRequest : public SequenceRequest {
+		///////////////////////////////////////////////////////////////
+		// Data
+		SmartBody::SpeechInterface* speech_impl; // Dangerous.  Not yet reference counted
+		SmartBody::RequestId        speech_request_id;
+		std::string                 speech_error_msg;
+
+		std::string			   audioPlay;
+		std::string			   audioStop;
+
+		VecOfVisemeData		   visemes;
+	    VecOfSbmCommand		   sbm_commands;
+
+		// Equivalent to BehaviorRequest fields
+		TriggerEventPtr        trigger;
+
+		// wordbreak id to SyncPoint
+		MapOfSyncPoint         wbToSync;  //  TODO: Replace use of wbToSync with BehaviorRequest::syncs::idToSync
+
+	public:
+		///////////////////////////////////////////////////////////////
+		// Methods
+		SpeechRequest(
+			const std::string& unique_id,
+			BML::SyncPoints& syncs,
+			SmartBody::SpeechInterface* speech_impl,
+			SmartBody::RequestId speech_request_id,
+			const std::vector<SpeechMark>& marks,
+			BmlRequestPtr request
+		);
+		virtual ~SpeechRequest();
+
+		SetOfWstring get_sync_names()
+		{	return syncs.get_sync_names(); }
+
+		SyncPointPtr sync_for_name( const std::wstring& name )
+		{	return syncs.sync_for_name( name ); }
+
+		///**
+		// *  Adds wordbreak mark after STROKE or last mark, and before RELAX
+		// */
+		//SyncPointPtr addWordBreakSync( const std::wstring& wbId );
+
+		/**
+		 *  Retrieves previously added word break sync point.
+		 *  Takes both 'behavior_id:sync_id' and just 'sync_id'.
+		 */
+		SyncPointPtr getWordBreakSync( const std::wstring& id );
+
+		/**
+		 *  Processes the speech reply.
+		 *  Throws std::exception if processing fails.
+		 */
+		void speech_response( srArgBuffer& response_args );
+
+		/**
+		 *  Overrides default behavior scheduling to assign timing retrieved from SpeechInterface.
+		 */
+		virtual void schedule( time_sec now );
+
+		/**
+		 *  Schedule speech visemes and audio at time startAt.
+		 */
+        virtual void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu );
+
+		/**
+		 *  Cancel speech visemes and audio at specified time.
+		 */
+		virtual void unschedule( mcuCBHandle* mcu, BmlRequestPtr request, time_sec duration );
+
+		/**
+		 *  Clean-up remaining objects.
+		 */
+		virtual void cleanup( mcuCBHandle* mcu, BmlRequestPtr request );
+
+
+	protected:
+		void createStandardSyncPoint( const std::wstring& attr, SyncPointPtr& sync );
+
+
+		friend BML::Processor;  //temporary
+	};
+
+	BML::SpeechRequestPtr parse_bml_speech( DOMElement* xml, const std::string& unique_id, BML::SyncPoints& syncs, BML::BmlRequestPtr request, mcuCBHandle *mcu );
+};
+
+
+#endif // BML_SPEECH_HPP
