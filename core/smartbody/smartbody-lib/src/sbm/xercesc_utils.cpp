@@ -98,7 +98,7 @@ const char* xml_utils::asciiString( const XMLCh* wstr ) {
 		if( c<128 )
 			str[i] = (unsigned char)c;
 		else
-			str[i] = 127;
+			str[i] = 127; // unrepresented character
 		c = wstr[++i];
 	}
 	str[i] = 0;
