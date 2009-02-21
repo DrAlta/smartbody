@@ -59,7 +59,6 @@ const bool LOG_METHODS				= false;
 const bool BML_LOG_INTERRUPT        = false;
 
 
-const double TIME_DELTA = 0.01;  // hundredths of a sec should be less than one animation frame
 const double SQROOT_2 = 1.4142135623730950488016887242097;
 
 

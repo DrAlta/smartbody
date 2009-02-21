@@ -305,6 +305,10 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 			BehaviorRequestPtr behavior = *i;
 			try {
 				behavior->schedule( now );
+#if VALIDATE_BEHAVIOR_SYNCS
+				behavior->syncs.validate();
+#endif // VALIDATE_BEHAVIOR_SYNCS
+
 				min_time = min( min_time, behavior->syncs.sp_start->time );
 
 				if( LOG_BML_BEHAVIOR_SCHEDULE ) {
@@ -325,7 +329,7 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 		}
 
 		// ...and offset everything to be positive (assumes times are only relative to each other, not wall time, etc.)
-		if( min_time < now ) {
+		if( min_time < now - TIME_DELTA ) {
 			time_sec offset = now - min_time;
 			for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i ) {
 				BehaviorRequestPtr behavior = *i;
@@ -889,6 +893,88 @@ void SyncPoints::applyParentTimes() {
 		}
 	}
 }
+
+#if VALIDATE_BEHAVIOR_SYNCS
+
+string SyncPoints::debug_label( SyncPointPtr& sync ) {
+	ostringstream out;
+
+	wstring id = idForSyncPoint( sync );
+
+	int count = 0;
+	iterator it  = syncs.begin();
+	iterator end = syncs.end();
+	while( it!=end && (*it)!=sync ) {
+		++it;
+		++count;
+	}
+
+	if( it==end ) {
+		out << "Invalid SyncPoint";
+	} else {
+		out << "SyncPoint #" << count;
+	}
+	if( !id.empty() ) {
+		const char* ascii = xml_utils::asciiString( id.c_str() );
+		out << " \"" << ascii << "\"";
+		delete[] ascii;
+	}
+
+	return out.str();
+}
+
+void SyncPoints::validate() {
+	ostringstream out;
+	out << "SyncPoints validation errors:";
+
+	bool valid = true;
+
+	iterator it  = syncs.begin();
+	iterator end = syncs.end();
+	if( it != end ) {
+		SyncPointPtr sync = (*it);
+
+		if( sync != sp_start ) {
+			out << endl << "\t" << debug_label(sync) << " is not sp_start";
+				valid = false;
+		}
+		if( !isTimeSet( sync->time ) ) {
+			out << endl << "\t" << debug_label(sync) <<" time is not set";
+
+			// Find first set time
+			do {
+				++it;
+			} while( it!=end && !isTimeSet( (*it)->time ) );
+
+			if( it == end ) {
+				out << endl << "\tAll SyncPoint::time are unset";
+				valid = false;
+			}
+		}
+
+		SyncPointPtr prev( sync );
+		for( ++it; it != end; ++it ) {
+			sync = (*it);
+
+			if( isTimeSet( sync->time ) ) {
+				if( sync->time < prev->time ) {
+					out << endl << "\t" << debug_label( sync ) << " time " << sync->time << " less than prev->time " << prev->time;
+				}
+
+				prev = sync;
+			}
+		}
+	} else {
+		out << endl << "\tNo SyncPoints";
+		valid = false;
+	}
+
+	if( !valid ) {
+		throw SchedulingException( out.str().c_str() );
+	}
+}
+
+#endif // INCOMPLETE_SYNCS_VALIDATION
 
 std::wstring SyncPoints::idForSyncPoint( SyncPointPtr sync ) {
 	MapOfSyncPoint::iterator map_it  = idToSync.begin();
@@ -1669,7 +1755,7 @@ bool SequenceRequest::realize_sequence( VecOfSbmCommand& commands, mcuCBHandle* 
 		return false;
 	}
 
-	srCmdSeq *seq = new srCmdSeq(); //sequence that holds the audio and visemes
+	srCmdSeq *seq = new srCmdSeq(); //sequence that holds the commands
 
 	bool success = true;
 
