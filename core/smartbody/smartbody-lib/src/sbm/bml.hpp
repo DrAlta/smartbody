@@ -47,6 +47,8 @@
 const bool LOG_BML_VISEMES	= false;
 const bool LOG_AUDIO		= false;
 
+#define VALIDATE_BEHAVIOR_SYNCS (1)
+
 /**
  *  Enables a argument-level compatibility mode of vrAgentBML.
  *  When enabled, vrAgentBML requires a recipient token after the agent name,
@@ -318,6 +320,13 @@ namespace BML {
 
 		/** For each SyncPoint, if parent is set, applies the parent time and offset. */
 		void applyParentTimes();
+
+#if VALIDATE_BEHAVIOR_SYNCS
+		std::string debug_label( SyncPointPtr& sync );
+
+		/** Validates the SyncPoint scheduled times are in order, if set.  Throws SchedulingException if out of order.  */
+		void validate();
+#endif // INCOMPLETE_SYNCS_VALIDATION
 
 		std::wstring idForSyncPoint( SyncPointPtr sync );
 

@@ -42,6 +42,7 @@ namespace BML {
     typedef double time_sec;  // An attempt to generalize the floating point format
 	typedef std::pair<time_sec,time_sec> time_range;
 	const time_sec TIME_UNSET = std::numeric_limits<time_sec>::quiet_NaN();
+	const time_sec TIME_DELTA = 0.01;  // hundredths of a sec should be less than one animation frame
 
 	
 	inline bool isTimeSet( time_sec value ) {
