@@ -1,8 +1,8 @@
 0	echo # test-seqs-abort-external-early
-0	seq A at 0 echo A at 0
 
 ##########################
 #	Build Sequences
+0	seq A at 0 echo A at 0
 0	seq B at 0 echo B at 0
 0	seq B at 1 echo B at 1
 0	seq	C at 1 echo C at 1
