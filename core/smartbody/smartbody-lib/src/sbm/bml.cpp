@@ -1564,7 +1564,15 @@ void MeControllerRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu 
 	time_sec indt  = readyAt-startAt;
 	time_sec outdt = endAt-relaxAt;
 
-	if(LOG_CONTROLLER_SCHEDULE) cout << "MeControllerRequest::schedule(..): \""<<(anim_ct->name())<<"\" startAt="<<startAt<<",  indt="<<indt<<",  outdt="<<outdt<<endl;
+	// Name unnamed controllers
+	const char* name = anim_ct->name();
+	if( name==NULL || name[0]=='\0' ) {
+		anim_ct->name( name = unique_id.c_str() );
+	}
+
+	if(LOG_CONTROLLER_SCHEDULE) {
+		cout << "MeControllerRequest::schedule(..): \""<<(anim_ct->name())<<"\" startAt="<<startAt<<",  indt="<<indt<<",  outdt="<<outdt<<endl;
+	}
 	track = schedule_ct->schedule( anim_ct, (double)startAt, (float)indt, (float)outdt );
 	// TODO: Adapt speed and end time
 
