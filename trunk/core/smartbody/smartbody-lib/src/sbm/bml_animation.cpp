@@ -48,7 +48,11 @@ BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string
 		if( motion ) {
 			MeCtMotion* motionCt = new MeCtMotion();
 			motionCt->init( motion );
-			motionCt->name( motion->name() );  // TODO: include BML act and behavior ids
+
+			// Name controller with behavior unique_id
+			ostringstream name;
+			name << unique_id << ' ' << motion->name();
+			motionCt->name( name.str().c_str() );  // TODO: include BML act and behavior ids
 
 			// Copy motion metadata
 			{	float duration = motion->duration();
