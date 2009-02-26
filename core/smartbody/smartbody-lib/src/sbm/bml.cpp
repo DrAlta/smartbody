@@ -296,8 +296,10 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 	VecOfBehaviorRequest::iterator behav_end = behaviors.end();
 	time_sec now = mcu->time;
 
-	if( LOG_BML_BEHAVIOR_SCHEDULE )
+	if( LOG_BML_BEHAVIOR_SCHEDULE ) {
 		cout << "DEBUG: BmlRequest::realize(): time = "<< (mcu->time) <<endl;
+	}
+
 	// Find earliest BehaviorRequest start time schedule before speech
 	{
 		time_sec min_time = numeric_limits<time_sec>::max();
@@ -325,12 +327,17 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 		}
 
 		if( LOG_BML_BEHAVIOR_SCHEDULE ) {
-			cout << "DEBUG: BmlRequest::realize(): min_time:"<<min_time<<endl;
+			cout << "DEBUG: BmlRequest::realize(): min_time: "<<min_time<<endl;
 		}
 
 		// ...and offset everything to be positive (assumes times are only relative to each other, not wall time, etc.)
+		// ignore differences less than TIME_DELTA
 		if( min_time < now - TIME_DELTA ) {
 			time_sec offset = now - min_time;
+			if( LOG_BML_BEHAVIOR_SCHEDULE ) {
+				cout << "DEBUG: BmlRequest::realize(): offset: "<<offset<<endl;
+			}
+
 			for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i ) {
 				BehaviorRequestPtr behavior = *i;
 				
@@ -1559,7 +1566,9 @@ void MeControllerRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu 
 	time_sec relaxAt  = syncs.sp_relax->time;
 	time_sec endAt    = syncs.sp_end->time;
 
-	if(LOG_METHODS) cout << "MeControllerRequest::schedule(): startAt="<<startAt<<",  readyAt="<<readyAt<<",  strokeAt="<<strokeAt<<",  relaxAt="<<relaxAt<<",  endAt="<<endAt<<endl;
+	if( LOG_METHODS || LOG_CONTROLLER_SCHEDULE ) {
+		cout << "DEBUG: MeControllerRequest::schedule(): startAt="<<startAt<<",  readyAt="<<readyAt<<",  strokeAt="<<strokeAt<<",  relaxAt="<<relaxAt<<",  endAt="<<endAt<<endl;
+	}
 
 	time_sec indt  = readyAt-startAt;
 	time_sec outdt = endAt-relaxAt;
