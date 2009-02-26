@@ -404,16 +404,17 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 
 	const string& actor_id = request->actor->name;
 
-	{	// Offset prior syncpoint times by startAt
-		SyncPoints::iterator it = syncs.begin();
-		SyncPoints::iterator end = syncs.end();
-		for( ; it != end ; ++it ) {
-			SyncPointPtr sync = (*it);
-			if( isTimeSet( sync->time ) ) {
-				sync->time += startAt;
-			}
-		}
-	}
+//// SyncPoints should already be set from viseme processing
+//	{	// Offset prior syncpoint times by startAt
+//		SyncPoints::iterator it = syncs.begin();
+//		SyncPoints::iterator end = syncs.end();
+//		for( ; it != end ; ++it ) {
+//			SyncPointPtr sync = (*it);
+//			if( isTimeSet( sync->time ) ) {
+//				sync->time += startAt;
+//			}
+//		}
+//	}
 
 	// Schedule visemes
 	//   visemes are stored in request->visemes as VisemeData objects (defined in bml.hpp)

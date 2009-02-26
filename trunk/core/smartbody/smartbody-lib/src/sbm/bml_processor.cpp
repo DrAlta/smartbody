@@ -445,7 +445,7 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCB
 	}
 
 	if( LOG_SYNC_POINTS ) {
-		cout << "LOG_SYNC_POINTS is broken.  Please fix!!";
+		cout << "WARNING: LOG_SYNC_POINTS is broken.  Please fix!!" << endl;
 		//cout << "TIDs:";
 		//SyncPoint* sp = trigger->start;
 		//while( sp != NULL ) {

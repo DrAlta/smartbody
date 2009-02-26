@@ -465,7 +465,8 @@ int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgI
 					}
 				}
 
-		
+
+					// ERROR: The following does not check for duplicates which may come from multiple RemoteSpeech servers running
 					remote_speech::uttLookUp.insert(msgID, replyDoc->getDocumentElement()); //adds the document to accessable lookup table
 				
 			/*this section of code changes the sound file name if Remote speech process sends a new sound file name; by default it will send the global path of the initial file name sent
