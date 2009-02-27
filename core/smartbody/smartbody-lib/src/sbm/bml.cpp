@@ -657,18 +657,19 @@ SyncPointPtr BmlRequest::getSyncPoint( const std::wstring& notation ) {
 		if( offset_reader >> offset ) {
 			sync = start_trigger->addSyncPoint( bml_start, offset );
 		} else {
-			wcerr << "ERROR: Invalid numeric notation \""<<notation<<"\"." << endl;
+			wcerr << "ERROR: Invalid SyncPoint numeric notation \""<<notation<<"\"." << endl;
 		}
 	} else {
 		MapOfSyncPoint::iterator mySearchIter = idToSync.find(notation);
 		if ( mySearchIter != idToSync.end()){
-			sync = (*mySearchIter).second;
+			SyncPointPtr parent = (*mySearchIter).second;
+			sync.reset( new SyncPoint( parent->trigger.lock(), parent, 0 ) );
 		} else {
 			wcerr << "WARNING: Unknown sync for notation \"" << notation << "\"" << endl;
 		}
 	}
 
-	return sync;  // NULL
+	return sync;  // May be NULL
 }
 
 
@@ -793,7 +794,7 @@ BehaviorSpan SyncPoints::getBehaviorSpan( time_sec persistent_threshold ) {
 	return BehaviorSpan( start_time, end_time, persistent );
 }
 
-void SyncPoints::parseStandardSyncPoints( DOMElement* elem, BmlRequestPtr request ) {
+void SyncPoints::parseStandardSyncPoints( DOMElement* elem, BmlRequestPtr request, const string& behavior_id ) {
 	// DOM functions never return NULL
 	const wstring tag = elem->getTagName();
 	const wstring id  = elem->getAttribute( ATTR_ID );
@@ -821,26 +822,34 @@ void SyncPoints::parseStandardSyncPoints( DOMElement* elem, BmlRequestPtr reques
 	//}
 
 	// Load SyncPoint references
-	sp_start        = parseSyncPointAttr( elem, id, ATTR_START,        request );
-	sp_ready        = parseSyncPointAttr( elem, id, ATTR_READY,        request );
-	sp_stroke_start = parseSyncPointAttr( elem, id, ATTR_STROKE_START, request );
-	sp_stroke       = parseSyncPointAttr( elem, id, ATTR_STROKE,       request );
-	sp_stroke_end   = parseSyncPointAttr( elem, id, ATTR_STROKE_END,   request );
-	sp_relax        = parseSyncPointAttr( elem, id, ATTR_RELAX,        request );
-	sp_end          = parseSyncPointAttr( elem, id, ATTR_END,          request );
+	sp_start        = parseSyncPointAttr( elem, id, ATTR_START,        request, behavior_id );
+	sp_ready        = parseSyncPointAttr( elem, id, ATTR_READY,        request, behavior_id );
+	sp_stroke_start = parseSyncPointAttr( elem, id, ATTR_STROKE_START, request, behavior_id );
+	sp_stroke       = parseSyncPointAttr( elem, id, ATTR_STROKE,       request, behavior_id );
+	sp_stroke_end   = parseSyncPointAttr( elem, id, ATTR_STROKE_END,   request, behavior_id );
+	sp_relax        = parseSyncPointAttr( elem, id, ATTR_RELAX,        request, behavior_id );
+	sp_end          = parseSyncPointAttr( elem, id, ATTR_END,          request, behavior_id );
 }
 
 
-SyncPointPtr SyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request ) {
-	return parseSyncPointAttr( elem, elem_id, sync_attr, request, end() );
+SyncPointPtr SyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const string& behavior_id ) {
+	return parseSyncPointAttr( elem, elem_id, sync_attr, request, behavior_id, end() );
 }
 
-SyncPointPtr SyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, iterator pos ) {
+SyncPointPtr SyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const string& behavior_id, iterator pos ) {
 	SyncPointPtr sync;
+
+	wstring behavior_wid;
+	{
+		XMLCh* temp = XMLString::transcode( behavior_id.c_str() );
+		behavior_wid = temp;
+		XMLString::release( &temp );
+	}
 
 	MapOfSyncPoint::iterator map_it = idToSync.find( sync_attr );
 	if( map_it != idToSync.end() ) {
-		wcerr << "ERROR: SyncPoints contains SyncPoint with id \"" << sync_attr << "\".  Ignoring attribute in <"<<elem->getTagName();
+		// TODO: Throw BML ParsingException
+		wcerr << "ERROR: Behavior \""<<behavior_wid<<"\": SyncPoints contains SyncPoint with id \"" << sync_attr << "\".  Ignoring attribute in <"<<elem->getTagName();
 		if( !elem_id.empty() )
 			wcerr<<"> id=\""<<elem_id<<"\"";
 		else
@@ -857,7 +866,7 @@ SyncPointPtr SyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstrin
 
 	if( !sync ) {
 		if( has_sync_ref ) {
-			wcerr<<"WARNING: SyncPoints::parseSyncPointAttr(..): <"<<(elem->getTagName())<<"> BML tag refers to unknown SyncPoint "<<sync_attr<<"=\""<<sync_ref<<"\".  Creating placeholder..."<<endl;
+			wcerr<<"WARNING: Behavior \""<<behavior_wid<<"\": SyncPoints::parseSyncPointAttr(..): <"<<(elem->getTagName())<<"> BML tag refers to unknown SyncPoint "<<sync_attr<<"=\""<<sync_ref<<"\".  Creating placeholder..."<<endl;
 		}
 
 		TriggerEventPtr trigger;
@@ -878,27 +887,6 @@ SyncPointPtr SyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstrin
 	}
 
 	return sync;
-}
-
-void SyncPoints::applyParentTimes() {
-	MapOfSyncPoint::iterator it  = idToSync.begin();
-	MapOfSyncPoint::iterator end = idToSync.end();
-
-	for( ; it!=end; ++it ) {
-		const wstring& sync_id = it->first;
-		SyncPointPtr  sync    = it->second;
-		if( sync->parent ) {
-			SyncPointPtr parent = sync->parent;
-			if( isTimeSet( parent->time ) ) {
-				if( isTimeSet( sync->time ) )
-					wcerr << "WARNING: SyncPoint \""<<sync_id<<"\" time set before applyParentTimes()." << endl;
-				sync->time = parent->time + sync->offset;
-			} else {
-				// Parent not set!!
-				wcerr << "WARNING: SyncPoint \""<<sync_id<<"\" parent unset." << endl;
-			}
-		}
-	}
 }
 
 #if VALIDATE_BEHAVIOR_SYNCS
@@ -995,6 +983,34 @@ std::wstring SyncPoints::idForSyncPoint( SyncPointPtr sync ) {
 
 	// No match
 	return wstring();
+}
+
+void SyncPoints::applyParentTimes( std::wstring& warning_context ) {
+	MapOfSyncPoint::iterator it  = idToSync.begin();
+	MapOfSyncPoint::iterator end = idToSync.end();
+
+	for( ; it!=end; ++it ) {
+		const wstring& sync_id = it->first;
+		SyncPointPtr  sync    = it->second;
+		if( sync->parent ) {
+			SyncPointPtr parent = sync->parent;
+			if( isTimeSet( parent->time ) ) {
+				if( isTimeSet( sync->time ) ) {
+					wcerr << "WARNING: ";
+					if( !warning_context.empty() )
+						wcerr << warning_context << ": ";
+					wcerr << "SyncPoint \""<<sync_id<<"\" time set before applyParentTimes()." << endl;
+				}
+				sync->time = parent->time + sync->offset;
+			} else {
+				// Parent not set!!
+				wcerr << "WARNING: ";
+				if( !warning_context.empty() )
+					wcerr << warning_context << ": ";
+				wcerr << "SyncPoint \""<<sync_id<<"\" of parent unset." << endl;
+			}
+		}
+	}
 }
 
 void SyncPoints::printSyncIds() {
@@ -1126,7 +1142,14 @@ void BehaviorRequest::schedule( time_sec now ) {
 	SyncPointPtr relax        = syncs.sp_relax;
 	SyncPointPtr end          = syncs.sp_end;
 
-	syncs.applyParentTimes();
+	{
+		XMLCh* wide_id = XMLString::transcode( unique_id.c_str() );
+		wstringstream warning_context;
+		warning_context << "Behavior \"" << wide_id << "\"";
+		syncs.applyParentTimes( warning_context.str() );
+
+		XMLString::release( &wide_id );
+	}
 
 	/*  The following implements a search for the two most important SyncPoints, and then scales the time to meet both.
      *  Importance is ranked in this order: stroke, ready, relax, start, end
@@ -1508,7 +1531,6 @@ BehaviorSpan BehaviorRequest::getBehaviorSpan() {
 
 	return span;
 }
-
 
 
 //  MeControllerRequest
