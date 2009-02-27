@@ -41,9 +41,8 @@ BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string
 	const XMLCh* animName = elem->getAttribute( ATTR_NAME );
 	if( animName && XMLString::stringLen( animName ) ) {
 		// Look up motion
-		const char * asciiName = xml_utils::asciiString( animName );
-		SkMotion* motion = mcu->motion_map.lookup( asciiName );
-		delete [] asciiName;
+		string asciiName( xml_utils::asciiString( animName ) );
+		SkMotion* motion = mcu->motion_map.lookup( asciiName.c_str() );
 
 		if( motion ) {
 			MeCtMotion* motionCt = new MeCtMotion();
@@ -77,12 +76,12 @@ BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string
 			return BehaviorRequestPtr( new MotionRequest( unique_id, motionCt, request->actor->motion_sched_p, tms ) );
 		} else {
 			// TODO: exception?
-			wcerr<<"WARNING: BodyPlannerImpl::parseBML(): <animation>: name=\""<<animName<<"\" not loaded; ignoring <animation>."<<endl;
+			cerr<<"WARNING: BML::parse_bml_animation(): behavior \""<<unique_id<<"\": name=\""<<asciiName<<"\" not loaded; ignoring behavior."<<endl;
 			return BehaviorRequestPtr();  // a.k.a., NULL
 		}
 	} else {
 		// TODO: exception?
-		wcerr<<"WARNING: BodyPlannerImpl::parseBML(): <animation> missing name= attribute; ignoring <animation>."<<endl;
+		cerr<<"WARNING: BML::parse_bml_animation(): behavior \""<<unique_id<<"\": missing name= attribute; ignoring <animation>."<<endl;
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 }

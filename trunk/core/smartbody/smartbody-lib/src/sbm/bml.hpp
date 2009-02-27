@@ -311,15 +311,12 @@ namespace BML {
 
 		SyncPoints::iterator pos_of( SyncPointPtr sync );
 
-		void parseStandardSyncPoints( DOMElement* elem, BmlRequestPtr request );
+		void parseStandardSyncPoints( DOMElement* elem, BmlRequestPtr request, const std::string& behavior_id );
 
 		/**
 		 *  Gets the BehaviorSpan for all scheduled SyncPoints.
 		 */
 		BehaviorSpan getBehaviorSpan( time_sec persistent_threshold );
-
-		/** For each SyncPoint, if parent is set, applies the parent time and offset. */
-		void applyParentTimes();
 
 #if VALIDATE_BEHAVIOR_SYNCS
 		std::string debug_label( SyncPointPtr& sync );
@@ -330,6 +327,9 @@ namespace BML {
 
 		std::wstring idForSyncPoint( SyncPointPtr sync );
 
+		/** For each SyncPoint, if parent is set, applies the parent time and offset. */
+		void applyParentTimes( std::wstring& warning_context = std::wstring() );
+
 		/** Prints SyncPoint ids in order, separated by commas. */
 		void printSyncIds();
 
@@ -337,8 +337,8 @@ namespace BML {
 		void printSyncTimes();
 
 	protected:
-		SyncPointPtr SyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request );
-		SyncPointPtr SyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, iterator pos );
+		SyncPointPtr SyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const std::string& behavior_id );
+		SyncPointPtr SyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const std::string& behavior_id, iterator pos );
 	};
 
 	//  Structure to keep track of a scheduled SBM command

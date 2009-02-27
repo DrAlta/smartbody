@@ -339,7 +339,7 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCB
 	}
 
 	// TEMPORARY: <speech> can only be the first behavior
-	const XMLCh*	tag = child->getTagName();  // Grand Child (behavior) Tag
+	const XMLCh*	tag = child->getTagName();  // Child (behavior) Tag
 	const XMLCh*	id  = child->getAttribute( ATTR_ID );
 	size_t			behavior_ordinal	= 0;
 
@@ -357,7 +357,7 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCB
 		string unique_id = request->buildUniqueBehaviorId( tag, id, ++behavior_ordinal );
 
 		SyncPoints syncs;
-		syncs.parseStandardSyncPoints( child, request );
+		syncs.parseStandardSyncPoints( child, request, unique_id );
 
 		SpeechRequestPtr speech_request( parse_bml_speech( child, unique_id, syncs, request, mcu ) );
 		if( speech_request ) {
@@ -388,7 +388,7 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCB
 
 		// Load SyncPoint references
 		SyncPoints syncs;  // TODO: rename (previous this was a TimeMarkers class)
-		syncs.parseStandardSyncPoints( child, request );
+		syncs.parseStandardSyncPoints( child, request, unique_id );
 
 		BehaviorRequestPtr behavior;
 

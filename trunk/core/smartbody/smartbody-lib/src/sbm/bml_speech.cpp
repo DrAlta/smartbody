@@ -276,7 +276,14 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 	SyncPointPtr sp_relax( syncs.sp_relax );
 	SyncPointPtr sp_end( syncs.sp_end );
 
-	syncs.applyParentTimes();
+	{
+		XMLCh* wide_id = XMLString::transcode( unique_id.c_str() );
+		wstringstream warning_context;
+		warning_context << "Behavior \"" << wide_id << "\"";
+		syncs.applyParentTimes( warning_context.str() );
+
+		XMLString::release( &wide_id );
+	}
 
 	BmlRequestPtr       request  = trigger->request.lock();
 	const SbmCharacter* actor    = request->actor;
