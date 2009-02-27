@@ -84,23 +84,14 @@ const XMLCh DIR_POLAR[]        = L"POLAR";
 
 namespace BML {
 	namespace Gaze {
-		//  Old Hard-Coded Defaults 
-		//const float DEFAULT_SPEED_LUMBAR    = (float)1000;
-		//const float DEFAULT_SPEED_CERVICAL  = (float)1500;
-		//const float DEFAULT_SPEED_EYEBALL   = (float)2000;
-		//const float DEFAULT_SMOOTH_LUMBAR   = (float)0.8;
-		//const float DEFAULT_SMOOTH_CERVICAL = (float)0.8;
-		//const float DEFAULT_SMOOTH_EYEBALL  = (float)0.1;
-
 		// Declare and initialize variable runtime defaults
-		// New Defaults imported from storage in me_ct_gaze.h
-
-		float speed_lumbar    = (float)(MeCtGaze::gaze_defaults->speed_head / 2.0);  // See void MeCtGaze::set_speed( float back_dps, float neck_dps, float eyes_dps ) in me_ct_gaze.cpp
-		float speed_cervical  = (float)(MeCtGaze::gaze_defaults->speed_head / 2.0);  // As of 10/2008 speed is defined with two values:  head & eyes
-		float speed_eyeball   = MeCtGaze::gaze_defaults->speed_eyes;
-		float smooth_lumbar   = MeCtGaze::gaze_defaults->smooth_back;
-		float smooth_cervical = MeCtGaze::gaze_defaults->smooth_neck;
-		float smooth_eyeball  = MeCtGaze::gaze_defaults->smooth_eyes;
+		// Defaults imported from storage in me_ct_gaze.h
+		// TODO: Should gaze default be per-character?
+		float speed_head      = MeCtGaze::DEFAULT_SPEED_HEAD;  // As of 10/2008 speed is defined with two values:  head & eyes
+		float speed_eyeball   = MeCtGaze::DEFAULT_SPEED_EYES;
+		float smooth_lumbar   = MeCtGaze::DEFAULT_SMOOTHING_LUMBAR;
+		float smooth_cervical = MeCtGaze::DEFAULT_SMOOTHING_CERVICAL;
+		float smooth_eyeball  = MeCtGaze::DEFAULT_SMOOTHING_EYEBALL;
 
 
 		/**
@@ -153,8 +144,8 @@ ostream& operator<<( ostream& os, const Gaze::KeyData key_data ) {
 	return os;
 }
 
-int check_gaze_speed( float lumbar, float cervical, float eyeball ) {
-	if( lumbar <= 0 || cervical <= 0 || eyeball <= 0 ) {
+int check_gaze_speed( float head, float eyeball ) {
+	if( head <= 0 || eyeball <= 0 ) {
 		cerr << "ERROR: Gaze joint speed cannot be <= 0." << endl;
 		return false;
 	}
@@ -162,11 +153,10 @@ int check_gaze_speed( float lumbar, float cervical, float eyeball ) {
 	return true;
 }
 
-int BML::Gaze::set_gaze_speed( float lumbar, float cervical, float eyeball ) {
-	if( check_gaze_speed( lumbar, cervical, eyeball ) ) {
-		BML::Gaze::speed_lumbar   = lumbar;
-		BML::Gaze::speed_cervical = cervical;
-		BML::Gaze::speed_eyeball  = eyeball;
+int BML::Gaze::set_gaze_speed( float head, float eyeball ) {
+	if( check_gaze_speed( head, eyeball ) ) {
+		BML::Gaze::speed_head    = head;
+		BML::Gaze::speed_eyeball = eyeball;
 
 		return CMD_SUCCESS;
 	} else {
@@ -176,8 +166,7 @@ int BML::Gaze::set_gaze_speed( float lumbar, float cervical, float eyeball ) {
 
 void BML::Gaze::print_gaze_speed() {
 	cout << "BML Processor default gaze joint speed (degrees per second):" << endl
-		 << "\tlumbar = " << BML::Gaze::speed_lumbar << endl
-		 << "\tcervical = " << BML::Gaze::speed_cervical << endl
+		 << "\thead = " << BML::Gaze::speed_head << endl
 		 << "\teyeballs = " << BML::Gaze::speed_eyeball << endl;
 }
 
@@ -194,7 +183,7 @@ bool check_gaze_smoothing( float lumbar, float cervical, float eyeball ) {
 }
 
 int BML::Gaze::set_gaze_smoothing( float lumbar, float cervical, float eyeball ) {
-	if( check_gaze_speed( lumbar, cervical, eyeball ) ) {
+	if( check_gaze_smoothing( lumbar, cervical, eyeball ) ) {
 		BML::Gaze::smooth_lumbar   = lumbar;
 		BML::Gaze::smooth_cervical = cervical;
 		BML::Gaze::smooth_eyeball  = eyeball;
@@ -476,9 +465,8 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 
 	// default gaze values...
 	
-	float gaze_speed_lumbar   = BML::Gaze::speed_lumbar;
-	float gaze_speed_cervical = BML::Gaze::speed_cervical;
-	float gaze_speed_eyeball  = BML::Gaze::speed_eyeball;
+	float gaze_speed_head      = BML::Gaze::speed_head;
+	float gaze_speed_eyeball   = BML::Gaze::speed_eyeball;
 	float gaze_smooth_lumbar   = BML::Gaze::smooth_lumbar;
 	float gaze_smooth_cervical = BML::Gaze::smooth_cervical;
 	float gaze_smooth_eyeball  = BML::Gaze::smooth_eyeball;
@@ -497,6 +485,9 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 
 				int i=0;
 				XMLCh* token;
+				// Takes in up three values for backward compatibility
+				//   but first two values are summed to get total head speed
+				// TODO: support single value (head only) and two values (head and eyes)
 				for( ; valid && i<3; ++i ) {
 					token = tokenizer.nextToken();
 					in.clear();
@@ -505,10 +496,10 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 					valid = !( in >> values[i] ).fail();
 				}
 				if( valid ) {
-					if( check_gaze_speed( values[0], values[1], values[2] ) ) {
-						gaze_speed_lumbar   = values[0];
-						gaze_speed_cervical = values[1];
-						gaze_speed_eyeball  = values[2];
+					// 
+					if( check_gaze_speed( values[0]+values[1], values[2] ) ) {
+						gaze_speed_head    = values[0] + values[1];
+						gaze_speed_eyeball = values[2];
 					}
 				} else {
 					wcerr << "WARNING: Expected three numerical tokens in gaze behavior attribute " << ATTR_JOINT_SPEED << "=\"" << attrSpeed << "\"."
@@ -564,8 +555,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 
 	if( LOG_GAZE_PARAMS ) {
 		cout << "DEBUG: Gaze parameters:" << endl
-				<< "\tgaze_speed_lumbar = " << gaze_speed_lumbar << endl
-				<< "\tgaze_speed_cervical = " << gaze_speed_cervical << endl
+				<< "\tgaze_speed_head = " << gaze_speed_head << endl
 				<< "\tgaze_speed_eyeball = " << gaze_speed_eyeball << endl
 				<< "\tgaze_smooth_lumbar = " << gaze_smooth_lumbar << endl
 				<< "\tgaze_smooth_cervical = " << gaze_smooth_cervical << endl
@@ -576,7 +566,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	gaze_ct->init( low_key_index, high_key_index );
 	gaze_ct->set_target_joint( 0, 0, 0, const_cast<SkJoint*>(joint) );
 	gaze_ct->set_task_priority( priority_key_index );
-	gaze_ct->set_speed( gaze_speed_lumbar, gaze_speed_cervical, gaze_speed_eyeball );
+	gaze_ct->set_speed( gaze_speed_head, gaze_speed_eyeball );
 	gaze_ct->set_smooth( gaze_smooth_lumbar, gaze_smooth_cervical, gaze_smooth_eyeball );
 	float pitch_minimum, pitch_maximum;
 
@@ -614,9 +604,9 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 					}
 					gaze_ct->set_blend( key, data->blend_weight );
 
-					pitch_minimum = (data->pitch_min < 0) ? gaze_ct->gaze_defaults->pitch_dn[key] : data->pitch_min;
-					pitch_maximum = (data->pitch_max < 0) ? gaze_ct->gaze_defaults->pitch_up[key] : data->pitch_max;
-					gaze_ct->set_limit( key, pitch_maximum, pitch_minimum, gaze_ct->gaze_defaults->heading[key], gaze_ct->gaze_defaults->roll[key]);
+					pitch_minimum = (data->pitch_min < 0) ? MeCtGaze::DEFAULT_LIMIT_PITCH_DOWN[key] : data->pitch_min;
+					pitch_maximum = (data->pitch_max < 0) ? MeCtGaze::DEFAULT_LIMIT_PITCH_DOWN[key] : data->pitch_max;
+					gaze_ct->set_limit( key, pitch_maximum, pitch_minimum, MeCtGaze::DEFAULT_LIMIT_HEADING[key], MeCtGaze::DEFAULT_LIMIT_ROLL[key]);
 
 					key  = next_key;
 					data = next_data;
@@ -640,13 +630,13 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 			gaze_ct->set_blend( key, data->blend_weight );
 			gaze_ct->set_blend( next_key, next_data->blend_weight );
 
-			pitch_minimum = (data->pitch_min < 0) ? gaze_ct->gaze_defaults->pitch_dn[key] : data->pitch_min;
-			pitch_maximum = (data->pitch_max < 0) ? gaze_ct->gaze_defaults->pitch_up[key] : data->pitch_max;
-			gaze_ct->set_limit( key, pitch_maximum, pitch_minimum, gaze_ct->gaze_defaults->heading[key], gaze_ct->gaze_defaults->roll[key]);
+			pitch_minimum = (data->pitch_min < 0) ? MeCtGaze::DEFAULT_LIMIT_PITCH_DOWN[key] : data->pitch_min;
+			pitch_maximum = (data->pitch_max < 0) ? MeCtGaze::DEFAULT_LIMIT_PITCH_UP[key] : data->pitch_max;
+			gaze_ct->set_limit( key, pitch_maximum, pitch_minimum, MeCtGaze::DEFAULT_LIMIT_HEADING[key], MeCtGaze::DEFAULT_LIMIT_ROLL[key]);
 
-			pitch_minimum = (next_data->pitch_min < 0) ? gaze_ct->gaze_defaults->pitch_dn[key] : next_data->pitch_min;
-			pitch_maximum = (next_data->pitch_max < 0) ? gaze_ct->gaze_defaults->pitch_up[key] : next_data->pitch_max;
-			gaze_ct->set_limit( next_key, pitch_maximum, pitch_minimum, gaze_ct->gaze_defaults->heading[key], gaze_ct->gaze_defaults->roll[key]);
+			pitch_minimum = (next_data->pitch_min < 0) ? MeCtGaze::DEFAULT_LIMIT_PITCH_DOWN[key] : next_data->pitch_min;
+			pitch_maximum = (next_data->pitch_max < 0) ? MeCtGaze::DEFAULT_LIMIT_PITCH_UP[key] : next_data->pitch_max;
+			gaze_ct->set_limit( next_key, pitch_maximum, pitch_minimum, MeCtGaze::DEFAULT_LIMIT_HEADING[key], MeCtGaze::DEFAULT_LIMIT_ROLL[key]);
 
 		} else { // if( low_key_index < high_key_index )
 			// Only one gaze key
@@ -655,9 +645,9 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 									data->bias_roll );
 			gaze_ct->set_blend( key, data->blend_weight );
 
-			pitch_minimum = (data->pitch_min < 0) ? gaze_ct->gaze_defaults->pitch_dn[key] : data->pitch_min;
-			pitch_maximum = (data->pitch_max < 0) ? gaze_ct->gaze_defaults->pitch_up[key] : data->pitch_max;
-			gaze_ct->set_limit( key, pitch_maximum, pitch_minimum, gaze_ct->gaze_defaults->heading[key], gaze_ct->gaze_defaults->roll[key]);
+			pitch_minimum = (data->pitch_min < 0) ? MeCtGaze::DEFAULT_LIMIT_PITCH_DOWN[key] : data->pitch_min;
+			pitch_maximum = (data->pitch_max < 0) ? MeCtGaze::DEFAULT_LIMIT_PITCH_UP[key] : data->pitch_max;
+			gaze_ct->set_limit( key, pitch_maximum, pitch_minimum, MeCtGaze::DEFAULT_LIMIT_HEADING[key], MeCtGaze::DEFAULT_LIMIT_ROLL[key]);
 
 
 		}

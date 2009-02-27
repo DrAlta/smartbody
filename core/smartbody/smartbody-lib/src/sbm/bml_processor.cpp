@@ -1158,11 +1158,14 @@ int BML::Processor::set_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 	} else if( attribute == "gaze" ) {
 		attribute = args.read_token();
 		if( attribute == "speed" ) {
+			//  Currently takes three values for backward compatibility,
+			//    add the first two as the total head speed.
+			//  TODO: Support one value (head only) and two values (head and eye speed)
 			float lumbar   = args.read_float();
 			float cervical = args.read_float();
 			float eyeball  = args.read_float();
 
-			return BML::Gaze::set_gaze_speed( lumbar, cervical, eyeball );
+			return BML::Gaze::set_gaze_speed( lumbar+cervical, eyeball );
 		} else if( attribute == "smoothing" ) {
 			float lumbar   = args.read_float();
 			float cervical = args.read_float();
