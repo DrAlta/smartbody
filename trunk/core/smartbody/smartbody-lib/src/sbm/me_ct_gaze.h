@@ -126,6 +126,22 @@ class MeCtGaze : public MeController	{
 			GAZE_KEY_EYES = GAZE_KEY_OPTICAL
 		};
 
+		// Default Values by Gaze Key
+		static const float DEFAULT_LIMIT_PITCH_UP[];
+		static const float DEFAULT_LIMIT_PITCH_DOWN[];
+		static const float DEFAULT_LIMIT_HEADING[];
+		static const float DEFAULT_LIMIT_ROLL[];
+
+		// Defaults for the Old APIs
+		static const float DEFAULT_SPEED_HEAD;
+		static const float DEFAULT_SPEED_EYES;
+
+		static const float DEFAULT_SMOOTHING_LUMBAR; 
+		static const float DEFAULT_SMOOTHING_CERVICAL;
+		static const float DEFAULT_SMOOTHING_EYEBALL;
+
+
+
 		static int joint_index( const char *label );
 		static char * joint_label( const int key );
 
@@ -184,10 +200,9 @@ class MeCtGaze : public MeController	{
 	// TUNE AND SPEED:
 	
 		void set_smooth( float smooth_basis );
-		void set_speed( float head_dps, float eyes_dps = 10000.0 );
+		void set_speed( float head_dps, float eyes_dps = DEFAULT_SPEED_EYES );
 		void set_time_hint( float head_sec ); // derives approximate speed from task angle
 
-		void set_speed( float back_dps, float neck_dps, float eyes_dps );
 		void set_smooth( float back_sm, float neck_sm, float eyes_sm );
 
 #if 0
@@ -260,82 +275,6 @@ class MeCtGaze : public MeController	{
 		bool calc_real_angle_to_target( float& deg );
 		
 	private:
-
-//struct holding default values for joint limits, smoothing, and speed.
-//The point of this is to move magic number gaze defaults into me_ct_gaze.h, and use
-//the same set of magic number defaults in both me_ct_gaze and bml_gaze, instead of the 
-//two sets of magic number defaults currently implemented.
-//It is implemented as a static struct in order to avoid use of either global variables
-//or excessive #define statements
-//
-//taken from following code in me_ct_gaze.cpp:
-/*
-	set_limit( GAZE_KEY_LUMBAR,   15.0, 30.0, 10.0 );
-	set_limit( GAZE_KEY_THORAX,   6.0,  15.0, 5.0 );
-	set_limit( GAZE_KEY_CERVICAL, 25.0, 60.0, 20.0 );
-	set_limit( GAZE_KEY_HEAD,     20.0, 45.0, 15.0 );
-	set_limit( GAZE_KEY_EYES,     50.0, 75.0, 0.0 );
-
-	#define DFL_GAZE_HEAD_SPEED 180.0
-	#define DFL_GAZE_EYE_SPEED  1000.0
-
-	set_speed( DFL_GAZE_HEAD_SPEED, DFL_GAZE_EYE_SPEED ); // initializes timing_mode = TASK_SPEED;
-	set_smooth( 0.3f, 0.1f, 0.0f );
-
-*/
-class gd  {
-
-public:
-
-	float pitch_up[NUM_GAZE_KEYS];
-	float pitch_dn[NUM_GAZE_KEYS];
-	float heading[NUM_GAZE_KEYS];
-	float roll[NUM_GAZE_KEYS];
-
-	float smooth_back, smooth_neck, smooth_eyes;
-	float speed_head, speed_eyes;
-
-	gd() 
-	{
-		pitch_up[GAZE_KEY_LUMBAR] = 15.0;
-		pitch_dn[GAZE_KEY_LUMBAR] = -15.0;
-		heading[GAZE_KEY_LUMBAR] = 30.0;
-		roll[GAZE_KEY_LUMBAR] = 10.0;
-
-		pitch_up[GAZE_KEY_THORAX] = 6.0;
-		pitch_dn[GAZE_KEY_THORAX] = -6.0;
-		heading[GAZE_KEY_THORAX] = 15.0;
-		roll[GAZE_KEY_THORAX] = 5.0;
-
-		pitch_up[GAZE_KEY_CERVICAL] = 25.0;
-		pitch_dn[GAZE_KEY_CERVICAL] = -25.0;
-		heading[GAZE_KEY_CERVICAL] = 60.0;
-		roll[GAZE_KEY_CERVICAL] = 20.0;
-
-		pitch_up[GAZE_KEY_CRANIAL] = 20.0;
-		pitch_dn[GAZE_KEY_CRANIAL] = -20.0;
-		heading[GAZE_KEY_CRANIAL] = 45.0;
-		roll[GAZE_KEY_CRANIAL] = 15.0;
-
-		pitch_up[GAZE_KEY_OPTICAL] = 50.0;
-		pitch_dn[GAZE_KEY_OPTICAL] = -50.0;
-		heading[GAZE_KEY_OPTICAL] = 75.0;
-		roll[GAZE_KEY_OPTICAL] = 0.0;
-		
-		smooth_back = 0.3f;
-		smooth_neck = 0.1f;
-		smooth_eyes = 0.0f;
-
-		speed_head = 180.0;
-		speed_eyes = 1000.0;
-	}
-};
-
-public:
-	static const gd *gaze_defaults;
-
-private:
-
 		double	prev_time;
 		int 	start;	// to initialize prev_time, dt
 		int 	started;

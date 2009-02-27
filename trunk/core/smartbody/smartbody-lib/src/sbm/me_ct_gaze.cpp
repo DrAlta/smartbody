@@ -29,7 +29,37 @@
 //#define DFL_GAZE_HEAD_SPEED 180.0
 //#define DFL_GAZE_EYE_SPEED  1000.0
 
-const MeCtGaze::gd* MeCtGaze::gaze_defaults = new MeCtGaze::gd();
+// Default Values per Gaze Key:                      LUMBAR,   THORAX, CERVICAL, CRANIAL,  OPTICAL
+const float MeCtGaze::DEFAULT_LIMIT_PITCH_UP[]   = { 15.0,     6.0,    25.0,     20.0,     50.0    };
+const float MeCtGaze::DEFAULT_LIMIT_PITCH_DOWN[] = { -15.0,    -6.0,   -25.0,    -20.0,    -50.0   };
+const float MeCtGaze::DEFAULT_LIMIT_HEADING[]    = { 30.0,     15.0,   60.0,     45.0,     75.0    };
+const float MeCtGaze::DEFAULT_LIMIT_ROLL[]       = { 10.0,     5.0,    20.0,     15.0,     0.0     };
+
+// Defaults for the Old APIs
+// History of Values:
+//   Original Marcus Implementation:
+//     Speed     (back, neck, eyes): 1000, 1500, 2000
+//     Smoothing (back, neck, eyes): 0.8, 0.8, 0.1
+//   Original BML Defaults:
+//     Speed     (back, neck, eyes): 1000, 1500, 2000
+//     Smoothing (back, neck, eyes): 0.8, 0.8, 0.1
+//   Gaze Key Revision (June2007):
+//     Speed     (head, eyes, eye arg default): 180, 1000, 10000
+//     Smoothing (back, neck, eyes): 0.3, 0.1, 0.0
+//   Brent's Edits / Gaze Paper Update (Oct2008):
+//     Speed     (head, eyes, default eyes arg): 180, 1000, 10000
+//     Smoothing (back, neck, eyes): 0.3, 0.1, 0.0
+//   Andrew's Updates (Feb2009):
+//     Speed     (head, eyes, default eyes arg): 180, 1000, 10000
+//     Smoothing (back, neck, eyes): 0.3, 0.1, 0.0
+const float MeCtGaze::DEFAULT_SPEED_HEAD         = 180;
+const float MeCtGaze::DEFAULT_SPEED_EYES         = 1000.0;
+
+const float MeCtGaze::DEFAULT_SMOOTHING_LUMBAR   = 0.3f; 
+const float MeCtGaze::DEFAULT_SMOOTHING_CERVICAL = 0.1f;
+const float MeCtGaze::DEFAULT_SMOOTHING_EYEBALL  = 0.0f;
+
+
 
 int G_debug_c = 0;
 int G_debug = 0;
@@ -269,10 +299,10 @@ void MeCtGaze::init( int key_fr, int key_to )	{
 	
 	set_task_priority( key_max );
 	//set_speed( DFL_GAZE_HEAD_SPEED, DFL_GAZE_EYE_SPEED ); // initializes timing_mode = TASK_SPEED;
-	set_speed( gaze_defaults->speed_head, gaze_defaults->speed_eyes );
+	set_speed( DEFAULT_SPEED_HEAD, DEFAULT_SPEED_EYES );
 
 	//set_smooth( 0.3f, 0.1f, 0.0f );
-	set_smooth( gaze_defaults->smooth_back, gaze_defaults->smooth_neck, gaze_defaults->smooth_eyes );
+	set_smooth( DEFAULT_SMOOTHING_LUMBAR, DEFAULT_SMOOTHING_CERVICAL, DEFAULT_SMOOTHING_EYEBALL );
 	/*
 	set_limit( GAZE_KEY_LUMBAR,   15.0, 30.0, 10.0 );
 	set_limit( GAZE_KEY_THORAX,   6.0,  15.0, 5.0 );
@@ -281,20 +311,30 @@ void MeCtGaze::init( int key_fr, int key_to )	{
 	set_limit( GAZE_KEY_EYES,     50.0, 75.0, 0.0 );
 	*/
 
-	set_limit( GAZE_KEY_LUMBAR,   gaze_defaults->pitch_up[GAZE_KEY_LUMBAR], gaze_defaults->pitch_dn[GAZE_KEY_LUMBAR], 
-								  gaze_defaults->heading[GAZE_KEY_LUMBAR], gaze_defaults->roll[GAZE_KEY_LUMBAR]);
+	set_limit( GAZE_KEY_LUMBAR,   DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_LUMBAR],
+								  DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_LUMBAR],
+								  DEFAULT_LIMIT_HEADING[GAZE_KEY_LUMBAR],
+								  DEFAULT_LIMIT_ROLL[GAZE_KEY_LUMBAR]);
 
-	set_limit( GAZE_KEY_THORAX,   gaze_defaults->pitch_up[GAZE_KEY_THORAX], gaze_defaults->pitch_dn[GAZE_KEY_THORAX], 
-								  gaze_defaults->heading[GAZE_KEY_THORAX], gaze_defaults->roll[GAZE_KEY_THORAX]);
+	set_limit( GAZE_KEY_THORAX,   DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_THORAX],
+								  DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_THORAX],
+								  DEFAULT_LIMIT_HEADING[GAZE_KEY_THORAX],
+								  DEFAULT_LIMIT_ROLL[GAZE_KEY_THORAX]);
 
-	set_limit( GAZE_KEY_CERVICAL, gaze_defaults->pitch_up[GAZE_KEY_CERVICAL], gaze_defaults->pitch_dn[GAZE_KEY_CERVICAL], 
-								  gaze_defaults->heading[GAZE_KEY_CERVICAL], gaze_defaults->roll[GAZE_KEY_CERVICAL]);
+	set_limit( GAZE_KEY_CERVICAL, DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_CERVICAL],
+								  DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_CERVICAL],
+								  DEFAULT_LIMIT_HEADING[GAZE_KEY_CERVICAL],
+								  DEFAULT_LIMIT_ROLL[GAZE_KEY_CERVICAL]);
 
-	set_limit( GAZE_KEY_CRANIAL,  gaze_defaults->pitch_up[GAZE_KEY_CRANIAL], gaze_defaults->pitch_dn[GAZE_KEY_CRANIAL], 
-								  gaze_defaults->heading[GAZE_KEY_CRANIAL], gaze_defaults->roll[GAZE_KEY_CRANIAL]);
+	set_limit( GAZE_KEY_CRANIAL,  DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_CRANIAL],
+								  DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_CRANIAL],
+								  DEFAULT_LIMIT_HEADING[GAZE_KEY_CRANIAL],
+								  DEFAULT_LIMIT_ROLL[GAZE_KEY_CRANIAL]);
 
-	set_limit( GAZE_KEY_OPTICAL,  gaze_defaults->pitch_up[GAZE_KEY_OPTICAL], gaze_defaults->pitch_dn[GAZE_KEY_OPTICAL], 
-								  gaze_defaults->heading[GAZE_KEY_OPTICAL], gaze_defaults->roll[GAZE_KEY_OPTICAL]);
+	set_limit( GAZE_KEY_OPTICAL,  DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_OPTICAL],
+								  DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_OPTICAL],
+								  DEFAULT_LIMIT_HEADING[GAZE_KEY_OPTICAL],
+								  DEFAULT_LIMIT_ROLL[GAZE_KEY_OPTICAL]);
 
 	for( i = 0; i < NUM_GAZE_KEYS; i++ )	{
 		set_bias( i, 0.0f, 0.0f, 0.0f );
@@ -470,7 +510,6 @@ void MeCtGaze::set_smooth( float smooth_basis ) {
 }
 
 void MeCtGaze::set_speed( float head_dps, float eyes_dps )	{
-
 	timing_mode = TASK_SPEED;
 	head_speed = head_dps;
 	joint_arr[ GAZE_JOINT_EYE_L ].speed = eyes_dps;
@@ -481,21 +520,6 @@ void MeCtGaze::set_time_hint( float head_sec )	{
 	
 	timing_mode = TASK_TIME_HINT;
 	head_time = head_sec;
-}
-
-void MeCtGaze::set_speed( float back_dps, float neck_dps, float eyes_dps )	{
-
-#if 1
-static int once = 1;
-if( once )	{
-	once = 0; printf( "MeCtGaze::set_speed( f, f, f ) NOTICE: call deprecated\n" );
-}
-#endif
-
-	timing_mode = TASK_SPEED;
-	head_speed = back_dps + neck_dps;
-	joint_arr[ GAZE_JOINT_EYE_L ].speed = eyes_dps;
-	joint_arr[ GAZE_JOINT_EYE_R ].speed = eyes_dps;
 }
 
 void MeCtGaze::set_smooth( float back_sm, float neck_sm, float eyes_sm )	{
