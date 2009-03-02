@@ -386,41 +386,25 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 		}
 	}
 
-	// Execute behaviors
-	bool has_controllers = false;  // TODO: schedule prune by last sync point  
-
+	// Realize behaviors
 #if USE_CUSTOM_PRUNE_POLICY
 	MePrunePolicy* prune_policy = new BmlProcPrunPolicy(); // TODO
 #endif
 	for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i ) {
 		BehaviorRequestPtr behavior = *i;
+
 		behavior->realize( request, mcu );
 
-		if( behavior->has_cts() ) {
-			has_controllers = true;
 #if USE_CUSTOM_PRUNE_POLICY
+		if( behavior->has_cts() ) {
 			behavior->registerControllerPrunePolicy( prune_policy );
-#endif
 		}
+#endif
 	}
 
 	//  Schedule cleanup sequence, including vrAgentBML end
 	// (Separate sequence to ensure it occurs after all behavior sequence events)
 	srCmdSeq *cleanup_seq = new srCmdSeq(); //sequence that holds the feedback and cleanup commands
-
-	if( has_controllers ) {
-		// Schedule a prune command to clear them out later.
-		string command( "char " );
-		command += actorId;
-		command += " prune";
-
-		time_sec prune_time = end_time+1;
-		//commands.push_back( new SbmCommand( command, time ) );
-		if( cleanup_seq->insert( (float)prune_time, command.c_str() ) != CMD_SUCCESS ) {
-			cerr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
-				"Failed to insert SbmCommand \""<<command<<"\" at time "<< prune_time <<endl;
-		}
-	}
 
 	//  Schedule vrAgentBML end
 	{
@@ -521,6 +505,10 @@ void BmlRequest::unschedule( mcuCBHandle* mcu,
 		behavior->unschedule( mcu, request, duration );
 	}
 
+	// Cancel the normal "vrAgentBML ... end complete"
+	mcu->abort_seq( cleanup_seq_name.c_str() ); // don't clean-up self
+
+	// Replace it with  "vrAgentBML ... end interrupted"
 	ostringstream buff;
 #if USE_RECIPIENT
 	buff << request->actorId << " " << request->recipientId << " " << request->msgId << " end interrupted";
@@ -539,15 +527,26 @@ void BmlRequest::cleanup( mcuCBHandle* mcu )
 		speech_request->cleanup( mcu, request );
 	}
 
+	bool has_controllers = false;
 	VecOfBehaviorRequest::iterator it = behaviors.begin();
 	VecOfBehaviorRequest::iterator end = behaviors.end();
 	for( ; it != end; ++it ) {
 		BehaviorRequestPtr behavior = *it;
+
+		has_controllers = behavior->has_cts();
 		behavior->cleanup( mcu, request );
 	}
+	if( has_controllers ) {
+		// Schedule a prune command to clear them out later.
+		string command( "char " );
+		command += actorId;
+		command += " prune";
 
-	mcu->abort_seq( start_seq_name.c_str() );
-	mcu->abort_seq( cleanup_seq_name.c_str() );
+		if( mcu->execute_later( command.c_str(), 1 ) != CMD_SUCCESS ) {
+			cerr << "WARNING: BML::BmlRequest::cleanup(..): msgId=\""<<msgId<<"\": "<<
+				"Failed to execute_later \""<<command<<"\"." << endl;
+		}
+	}
 }
 
 
