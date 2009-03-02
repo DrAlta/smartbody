@@ -295,6 +295,7 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 
 	VecOfBehaviorRequest::iterator behav_end = behaviors.end();
 	time_sec now = mcu->time;
+	this->bml_start->time = now;
 
 	if( LOG_BML_BEHAVIOR_SCHEDULE ) {
 		cout << "DEBUG: BmlRequest::realize(): time = "<< (mcu->time) <<endl;
@@ -1006,7 +1007,7 @@ void SyncPoints::applyParentTimes( std::wstring& warning_context ) {
 				wcerr << "WARNING: ";
 				if( !warning_context.empty() )
 					wcerr << warning_context << ": ";
-				wcerr << "SyncPoint \""<<sync_id<<"\" of parent unset." << endl;
+				wcerr << "SyncPoint \""<<sync_id<<"\" parent unset." << endl;
 			}
 		}
 	}

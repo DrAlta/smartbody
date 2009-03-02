@@ -41,6 +41,8 @@ using namespace xml_utils;
 
 
 namespace BML {
+	const bool ECHO_BP_INTERRUPT_COMMAND = false;
+
 	// Handle interrupt as a sequence, in case it is interrupted
 	class InterruptBehavior : public SequenceRequest {
 	protected:
@@ -69,10 +71,11 @@ namespace BML {
 			out << "bp interrupt " << request->actorId << ' ' << performance_id << ' ' << duration;
 			commands.push_back( new SbmCommand( out.str(), (float)strokeAt ) );
 
-			// TODO: Remove after testing
-			ostringstream out2;
-			out2 << "echo " << out.str();
-			commands.push_back( new SbmCommand( out2.str(), (float)strokeAt ) );
+			if( ECHO_BP_INTERRUPT_COMMAND ) {
+				ostringstream out2;
+				out2 << "echo " << out.str();
+				commands.push_back( new SbmCommand( out2.str(), (float)strokeAt ) );
+			}
 
 			realize_sequence( commands, mcu );
 		}
