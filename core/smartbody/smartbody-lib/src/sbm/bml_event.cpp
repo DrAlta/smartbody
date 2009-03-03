@@ -29,6 +29,8 @@
 using namespace std;
 using namespace BML;
 
+const bool LOG_EVENT_COMMAND = false;
+
 
 namespace BML {
 	class EventRequest : public SequenceRequest {
@@ -49,9 +51,18 @@ namespace BML {
 
 			VecOfSbmCommand commands;
 
-			ostringstream out;
-			out << "send " << message;
-			commands.push_back( new SbmCommand( out.str(), (float)strokeAt ) );
+			ostringstream cmd;
+			cmd << "send " << message;
+
+			if( LOG_EVENT_COMMAND ) {
+				cout << "DEBUG: EventRequest::realize_impl(): Scheduling \"" << unique_id << "\" command: " << endl << "\t" << cmd.str() << endl;
+
+				ostringstream echo;
+				echo << "echo DEBUG: EventRequest::realize_impl(): Sending \"" << unique_id << "\" command: " << endl << "\t" << cmd.str();
+				commands.push_back( new SbmCommand( echo.str(), (float)strokeAt ) );
+			}
+
+			commands.push_back( new SbmCommand( cmd.str(), (float)strokeAt ) );
 
 			realize_sequence( commands, mcu );
 		}
