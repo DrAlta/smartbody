@@ -49,11 +49,11 @@ const float MeCtGaze::DEFAULT_LIMIT_ROLL[]       = { 10.0,     5.0,    20.0,    
 //   Brent's Edits / Gaze Paper Update (Oct2008):
 //     Speed     (head, eyes, default eyes arg): 180, 1000, 10000
 //     Smoothing (back, neck, eyes): 0.3, 0.1, 0.0
-//   Andrew's Updates (Feb2009):
-//     Speed     (head, eyes, default eyes arg): 360, 1000, 10000
+//   Andrew's Updates, equiv to old BML defaults (Feb2009):
+//     Speed     (head, eyes, default eyes arg): 360, 10000, 10000
 //     Smoothing (back, neck, eyes): 0.8, 0.8, 0.1
-const float MeCtGaze::DEFAULT_SPEED_HEAD         = 360;
-const float MeCtGaze::DEFAULT_SPEED_EYES         = 1000.0;
+const float MeCtGaze::DEFAULT_SPEED_HEAD         = 2500;
+const float MeCtGaze::DEFAULT_SPEED_EYES         = 10000.0;
 
 const float MeCtGaze::DEFAULT_SMOOTHING_LUMBAR   = 0.8f; 
 const float MeCtGaze::DEFAULT_SMOOTHING_CERVICAL = 0.8f;
