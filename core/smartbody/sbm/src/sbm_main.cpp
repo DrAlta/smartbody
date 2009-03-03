@@ -28,6 +28,7 @@
 
 
 #define SBM_REPORT_MEMORY_LEAKS  0
+#define SBM_EMAIL_CRASH_REPORTS  1
 
 #include <iostream>
 #include <stdio.h>
@@ -64,6 +65,11 @@
 #include <crtdbg.h>
 #endif
 #endif
+
+#if SBM_EMAIL_CRASH_REPORTS
+#include <vhcl_crash.h>
+#endif
+
 
 #define ENABLE_DEFAULT_BOOTSTRAP	(1)
 #define DEFAULT_SEQUENCE_FILE		("default.seq")
@@ -402,6 +408,11 @@ int main( int argc, char **argv )	{
 	_CrtMemState  state;
 	_CrtMemCheckpoint( &state );
 	_CrtMemDumpStatistics( &state );
+#endif
+
+#if SBM_EMAIL_CRASH_REPORTS
+	// Log crashes, with a dialog option to report via email
+	vhcl::Crash::EnableExceptionHandling( true );
 #endif
 
 	int err;
