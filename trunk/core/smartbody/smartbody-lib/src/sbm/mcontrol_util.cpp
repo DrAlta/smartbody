@@ -46,6 +46,10 @@ using namespace WSP;
 
 
 
+
+const bool LOG_ABORTED_SEQ = false;
+
+
 /////////////////////////////////////////////////////////////
 
 mcuCBHandle::mcuCBHandle()
@@ -435,6 +439,24 @@ int mcuCBHandle::abort_seq( const char* seq_name ) {
 			return CMD_FAILURE;  // Not Found
 		}
 	}
+
+	if( LOG_ABORTED_SEQ ) {
+		cout << "DEBUG: mcuCBHandle::abort_seq(..): Aborting seq \"" << seq_name << "\" @ " << time << endl;
+		if( seq_p->get_count() > 0 ) {
+			cout << "\tRemaining commands:" << endl;
+
+			const float offset = seq_p->offset();
+			float time = 0;
+
+			const char* cmd = seq_p->pull( &time );
+			while( cmd != NULL ) {
+				// print offseted time, so the values are comparable to the MCU abort time
+				cout << "\ttime " << (time+offset) << ":\t"<< cmd << endl;
+				cmd = seq_p->pull( &time );
+			}
+		}
+	}
+
 	delete seq_p;
 
 	return CMD_SUCCESS;  // Aborted successfully
