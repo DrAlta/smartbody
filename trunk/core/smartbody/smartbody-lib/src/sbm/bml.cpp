@@ -1604,7 +1604,7 @@ void MeControllerRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu 
 	if(LOG_CONTROLLER_SCHEDULE) {
 		cout << "MeControllerRequest::schedule(..): \""<<(anim_ct->name())<<"\" startAt="<<startAt<<",  indt="<<indt<<",  outdt="<<outdt<<endl;
 	}
-	track = schedule_ct->schedule( anim_ct, (double)startAt, (float)indt, (float)outdt );
+	schedule_ct->schedule( anim_ct, (double)startAt, (float)indt, (float)outdt );
 	// TODO: Adapt speed and end time
 
 	////  Old-style MeCtScheduler2 API calls
@@ -1624,32 +1624,29 @@ void MeControllerRequest::unschedule( mcuCBHandle* mcu,
                                       BmlRequestPtr request,
                                       time_sec duration )
 {
-	if( anim_ct && schedule_ct ) {
-		MeCtScheduler2::track_iterator it = schedule_ct->track_for_anim_ct( anim_ct );
-		if( it != schedule_ct->end() ) {
-			MeCtScheduler2::Track& track = *it;
+	MeCtScheduler2::TrackPtr track = schedule_ct->track_for_anim_ct( anim_ct );
+	if( track ) {
+		MeCtUnary* unary_blend_ct = track->blending_ct();
+		if( unary_blend_ct &&
+			unary_blend_ct->controller_type() == MeCtBlend::CONTROLLER_TYPE )
+		{
+			MeCtBlend* blend = static_cast<MeCtBlend*>(unary_blend_ct);
+			MeSpline1D& spline = blend->blend_curve();
+			
+			MeSpline1D::domain time = mcu->time;
+			MeSpline1D::range  y = spline.eval( time );
+			MeSpline1D::range  slope = -y / duration;
 
-			MeCtUnary* unary_blend_ct = track.blending_ct();
-			if( unary_blend_ct &&
-				unary_blend_ct->controller_type() == MeCtBlend::CONTROLLER_TYPE )
-			{
-				MeCtBlend* blend = static_cast<MeCtBlend*>(unary_blend_ct);
-				MeSpline1D& spline = blend->blend_curve();
-				
-				MeSpline1D::domain time = mcu->time;
-				MeSpline1D::range  y = spline.eval( time );
-				MeSpline1D::range  slope = -y / duration;
-
-				spline.erase_after( time );
-				if( duration > 0 ) {
-					spline.make_smooth( time, y, slope, 1, 1 );
-					spline.make_smooth( time, 0, slope, 1, 1 );
-				} else {
-					spline.make_disjoint( time, 0, y, 0, 1, 0, 1 );
-				}
+			spline.erase_after( time );
+			if( duration > 0 ) {
+				spline.make_smooth( time, y, slope, 1, 1 );
+				spline.make_smooth( time, 0, slope, 1, 1 );
+			} else {
+				spline.make_disjoint( time, 0, y, 0, 1, 0, 1 );
 			}
 		}
 	}
+
 	is_persistent = false;
 }
 
@@ -1661,8 +1658,8 @@ void MeControllerRequest::cleanup( mcuCBHandle* mcu, BmlRequestPtr request )
 {
 	if( schedule_ct ) {
 		if( !is_persistent ) {
-			// TODO: is track valid?
-			schedule_ct->remove_track( track );
+			// TODO: If track is no longer valid, the NULL TrackPtr will be ignored by remove_track
+			schedule_ct->remove_track( schedule_ct->track_for_anim_ct( anim_ct ) );
 		}
 		schedule_ct->unref();
 		schedule_ct = NULL;

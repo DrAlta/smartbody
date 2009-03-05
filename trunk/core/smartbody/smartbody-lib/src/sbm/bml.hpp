@@ -471,13 +471,11 @@ namespace BML {
 	class MeControllerRequest : public BehaviorRequest {
 	protected: // Data
 		/** Controller holding the source of the animation (not necessarily a motion or animation). */
-		MeController*                  anim_ct;
+		MeController*            anim_ct;
 		/** The schedule controller the animation was added to. */
-		MeCtScheduler2*                schedule_ct;
-		/** The track of the scheduler containing th animation. */
-		MeCtScheduler2::track_iterator track;
+		MeCtScheduler2*          schedule_ct;
 
-		bool                           is_persistent;
+		bool                     is_persistent;
 
 	public: ///// Methods
 		MeControllerRequest( const std::string& unique_id,

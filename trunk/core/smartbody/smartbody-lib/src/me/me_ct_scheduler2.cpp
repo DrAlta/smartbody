@@ -25,6 +25,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 
 #include <SK/sk_skeleton.h>
 
@@ -35,14 +36,26 @@
 
 using namespace std;
 
-typedef MeCtScheduler2::track_iterator  track_iterator;
-
 
 #define DEBUG_INSPECT_CHANNELS       (0)  // Enable the runtime debugger inspection of channel name/types
 #define DEBUG_LOGGED_CHANNEL_MAPPING (0)
 
 
 const float MeCtScheduler2::MAX_TRACK_DURATION = 4194303.0;
+
+
+
+// Copied from http://www.boost.org/doc/libs/1_38_0/libs/smart_ptr/sp_techniques.html#static
+// for http://www.boost.org/doc/libs/1_38_0/libs/smart_ptr/sp_techniques.html#weak_without_shared
+// used by MeCtScheduler2::_self
+struct null_deleter
+{
+    void operator()(void const *) const
+    {
+    }
+};
+
+
 
 
 //===== MeCtScheduler2::Context ==============================
@@ -97,12 +110,10 @@ void MeCtScheduler2::Context::remove_controller( MeController* child ) {
 //======= MeCtScheduler2::Track ==============================
 
 // Constructor
-MeCtScheduler2::Track::Track( MeCtScheduler2* schedule,
-							  MeCtUnary* blending_ct,
+MeCtScheduler2::Track::Track( MeCtUnary* blending_ct,
 							  MeCtUnary* timing_ct,
 							  MeController* animation_ct )
-:   _schedule( *schedule ),
-	_blending_ct( blending_ct ),
+:	_blending_ct( blending_ct ),
 	_timing_ct( timing_ct ),
 	_animation_ct( animation_ct ),
 	_root( animation_ct )
@@ -122,24 +133,24 @@ MeCtScheduler2::Track::Track( MeCtScheduler2* schedule,
 }
 
 
-// Copy Constructor
-MeCtScheduler2::Track::Track( const MeCtScheduler2::Track& other )
-:   _schedule( other._schedule ),
-	_blending_ct(  other._blending_ct ),
-	_timing_ct(    other._timing_ct ),
-	_animation_ct( other._animation_ct ),
-	_root(         other._root )
-#if TRACK_UNREF_CONTROLLERS
-	, did_unref_controllers( false )
-#endif // TRACK_UNREF_CONTROLLERS
-{
-	// Assume proper initialization from other controller
-	_animation_ct->ref();
-	if( _timing_ct )
-		_timing_ct->ref();
-	if( _blending_ct )
-		_blending_ct->ref();
-}
+//// No Copy Constructor (Copy TrackPtrs instead)
+//MeCtScheduler2::Track::Track( const MeCtScheduler2::Track& other )
+//:   _schedule_weak( other._schedule ),
+//	_blending_ct(  other._blending_ct ),
+//	_timing_ct(    other._timing_ct ),
+//	_animation_ct( other._animation_ct ),
+//	_root(         other._root )
+//#if TRACK_UNREF_CONTROLLERS
+//	, did_unref_controllers( false )
+//#endif // TRACK_UNREF_CONTROLLERS
+//{
+//	// Assume proper initialization from other controller
+//	_animation_ct->ref();
+//	if( _timing_ct )
+//		_timing_ct->ref();
+//	if( _blending_ct )
+//		_blending_ct->ref();
+//}
 
 // Destructor
 MeCtScheduler2::Track::~Track() {
@@ -193,11 +204,17 @@ MeCtScheduler2::Track& MeCtScheduler2::Track::operator=( const MeCtScheduler2::T
 }
 
 MeController* MeCtScheduler2::Track::animation_parent_ct() {
-	MeController* parent = &_schedule;
-	if( _blending_ct != NULL )
-		parent = _blending_ct;
-	if( _timing_ct != NULL )
-		parent = _timing_ct;
+	MeCtScheduler2Ptr schedule = _schedule_weak.lock();
+
+	MeController* parent = NULL;
+	if( schedule ) {
+		parent = schedule.get();
+		if( _blending_ct != NULL )
+			parent = _blending_ct;
+		if( _timing_ct != NULL )
+			parent = _timing_ct;
+	}
+
 	return parent;
 }
 
@@ -206,12 +223,13 @@ bool MeCtScheduler2::Track::evaluate( double time, MeFrameData& frame ) {
 	return _root->active();
 }
 
-bool MeCtScheduler2::Track::operator==( const MeCtScheduler2::Track& other ) const {
-	return ( &_schedule==&(other._schedule) )
-		&& _blending_ct==other._blending_ct
-		&& _timing_ct==other._timing_ct
-		&& _animation_ct==other._animation_ct;
-}
+//// No longer needed (Compare TrackPtrs instead)
+//bool MeCtScheduler2::Track::operator==( const MeCtScheduler2::Track& other ) const {
+//	return ( &_schedule_weak==&(other._schedule_weak) )
+//		&& _blending_ct==other._blending_ct
+//		&& _timing_ct==other._timing_ct
+//		&& _animation_ct==other._animation_ct;
+//}
 
 void MeCtScheduler2::Track::remap() {
 	if( _root ) {
@@ -220,47 +238,48 @@ void MeCtScheduler2::Track::remap() {
 	}
 }
 
-void MeCtScheduler2::Track::unref_controllers() {
-	if( _root ) {
-		_schedule._sub_sched_context->remove_controller( _root );
-
-		MeController* ct = _animation_ct;
-		_animation_ct = NULL;
-		if( _timing_ct ) {
-			if( ct ) {
-				_timing_ct->init( NULL );  // remove child
-				ct->unref();
-			}
-			ct = _timing_ct;
-			_timing_ct = NULL;
-		}
-		if( _blending_ct ) {
-			if( ct ) {
-				_blending_ct->init( NULL ); // remove child
-				ct->unref();
-			}
-			ct = _blending_ct;
-			_blending_ct = NULL;
-		}
-		if( ct ) {
-			ct->unref();
-			ct = NULL;
-		}
-
-		_root = NULL;
-
-#if TRACK_UNREF_CONTROLLERS
-		did_unref_controllers = true;
-#endif
-	}
-}
+//void MeCtScheduler2::Track::unref_controllers() {
+//	if( _root ) {
+//		_schedule._sub_sched_context->remove_controller( _root );
+//
+//		MeController* ct = _animation_ct;
+//		_animation_ct = NULL;
+//		if( _timing_ct ) {
+//			if( ct ) {
+//				_timing_ct->init( NULL );  // remove child
+//				ct->unref();
+//			}
+//			ct = _timing_ct;
+//			_timing_ct = NULL;
+//		}
+//		if( _blending_ct ) {
+//			if( ct ) {
+//				_blending_ct->init( NULL ); // remove child
+//				ct->unref();
+//			}
+//			ct = _blending_ct;
+//			_blending_ct = NULL;
+//		}
+//		if( ct ) {
+//			ct->unref();
+//			ct = NULL;
+//		}
+//
+//		_root = NULL;
+//
+//#if TRACK_UNREF_CONTROLLERS
+//		did_unref_controllers = true;
+//#endif
+//	}
+//}
 
 //=================================== MeCtScheduler2 =====================================
 
 const char* MeCtScheduler2::type_name = "MeCtScheduler2";
 
 MeCtScheduler2::MeCtScheduler2 ()
-:	MeCtContainer( new MeCtScheduler2::Context( this ) ),   // Ignore Warning: No writes, just passing a reference
+:	_self( this, null_deleter() ), // See: http://www.boost.org/doc/libs/1_38_0/libs/smart_ptr/sp_techniques.html#weak_without_shared
+	MeCtContainer( new MeCtScheduler2::Context( this ) ),   // Ignore Warning: No writes, just passing a reference
 	_sub_sched_context( static_cast<MeCtScheduler2::Context*>( _sub_context) )
 {
    _sub_sched_context->ref();
@@ -272,38 +291,48 @@ MeCtScheduler2::~MeCtScheduler2 () {
 }
 
 MeController* MeCtScheduler2::child( unsigned int n ) {
-	if( n >= _tracks.size() )
+	if( n >= 0 && n < _tracks.size() )
+		return _tracks[ n ]->_root;
+	else
 		return NULL;
-
-	track_iterator it = _tracks.begin();
-	for( unsigned int i=0; i<n; ++i )
-		++it;
-	return it->_root;
 }
 
 void MeCtScheduler2::context_updated() {
 	_sub_sched_context->context( _context );
 }
 
-track_iterator MeCtScheduler2::create_track( track_iterator pos,
-											 MeCtUnary* blending,
-											 MeCtUnary* timing,
-											 MeController* animation )
+MeCtScheduler2::TrackPtr MeCtScheduler2::create_track( MeCtUnary* blending,
+                                                       MeCtUnary* timing,
+                                                       MeController* animation,
+                                                       MeCtScheduler2::TrackPtr before_track )
 {
-	pos = _tracks.insert( pos, Track( this, blending, timing, animation ) );
-	Track& track = *(pos);  // refer to instance in the list
-	MeController* root = track._root;
+	VecOfTrack::iterator pos;
+	if( before_track ) {
+		pos = pos_of_track( before_track );
+		if( pos == _tracks.end() )
+			return TrackPtr();
+	} else {
+		pos = _tracks.end();
+	}
 
-	_child_to_track.insert( make_pair( root, pos ) );
-	_anim_to_track.insert( make_pair( track._animation_ct, pos ) );
+	TrackPtr track( new Track( blending, timing, animation ) );
+	track->_schedule_weak = MeCtScheduler2WeakPtr( _self );
+
+	pos = _tracks.insert( pos, track );
+
+	MeController* root = track->_root;
+
+	_child_to_track.insert( make_pair( root, track ) );
+	if( animation )
+		_anim_to_track.insert( make_pair( track->_animation_ct, track ) );
 
 	_sub_sched_context->add_controller( root );
 	_sub_sched_context->child_channels_updated( root );
 
-	return pos;
+	return track;
 }
 
-track_iterator MeCtScheduler2::schedule ( MeController* ct, double tin, float indt, float outdt )
+MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin, float indt, float outdt )
 {
 	double dur = ct->controller_duration();
 	bool dur_defined = (dur >= 0);
@@ -371,7 +400,7 @@ track_iterator MeCtScheduler2::schedule ( MeController* ct, double tin, float in
 	}
 
 
-	return create_track( end(), blendingCt, timingCt, ct );
+	return create_track( blendingCt, timingCt, ct );
 }
 
 bool MeCtScheduler2::remove_child( MeController *child ) {
@@ -382,7 +411,7 @@ bool MeCtScheduler2::remove_child( MeController *child ) {
 	return result;
 }
 
-bool MeCtScheduler2::remove_track( MeCtScheduler2::track_iterator & track ) {
+bool MeCtScheduler2::remove_track( MeCtScheduler2::TrackPtr track ) {
 	bool result = remove_track_impl( track );
 	if( result )
 		recalc_channels_requested();
@@ -390,9 +419,9 @@ bool MeCtScheduler2::remove_track( MeCtScheduler2::track_iterator & track ) {
 	return result;
 }
 
-void MeCtScheduler2::remove_tracks( vector< MeCtScheduler2::track_iterator > & tracks ) {
-	vector< MeCtScheduler2::track_iterator >::iterator it = tracks.begin();
-	vector< MeCtScheduler2::track_iterator >::iterator end = tracks.end();
+void MeCtScheduler2::remove_tracks( vector< MeCtScheduler2::TrackPtr >& tracks ) {
+	VecOfTrack::iterator it = tracks.begin();
+	VecOfTrack::iterator end = tracks.end();
 
 	bool did_remove = false;
 
@@ -405,25 +434,52 @@ void MeCtScheduler2::remove_tracks( vector< MeCtScheduler2::track_iterator > & t
 }
 
 // protected
-bool MeCtScheduler2::remove_child_impl( MeController *child ) {
-	track_map::iterator pos = _child_to_track.find( child );
-	bool result = (pos != _child_to_track.end());
-	if( result ) {
-		track_iterator i = pos->second;
-		Track& track = *i;
+MeCtScheduler2::VecOfTrack::iterator MeCtScheduler2::pos_of_track( TrackPtr track ) {
+	return find( _tracks.begin(), _tracks.end(), track );
+}
 
-		_anim_to_track.erase( track._animation_ct );
+bool MeCtScheduler2::remove_child_impl( MeController *child ) {
+	MapOfCtToTrack::iterator map_it = _child_to_track.find( child );
+	bool result = (map_it != _child_to_track.end());
+	if( result ) {
+		TrackPtr track( map_it->second );
+		
+		VecOfTrack::iterator pos = pos_of_track( track );
+		if( pos != _tracks.end() )
+			_tracks.erase( pos );
+
 		_child_to_track.erase( child );
-		_tracks.erase( i );
+		_anim_to_track.erase( track->_animation_ct );
+
+		// Call this last, because it may recurse via the MeControllerContext
+		_sub_sched_context->remove_controller( track->_root );
 	}
 
 	return result;
 }
 
-bool MeCtScheduler2::remove_track_impl( track_iterator & track ) {
-	bool result = remove_child_impl( track->_root );
-	if( result )
-		track = end();
+bool MeCtScheduler2::remove_track_impl( TrackPtr track ) {
+	bool result = false;
+
+	if( track ) {
+		VecOfTrack::iterator pos = pos_of_track( track );
+		if( pos != _tracks.end() ) {
+			result = true;
+			_tracks.erase( pos );
+
+			if( track->_root != NULL ) {
+				_child_to_track.erase( track->_root );
+				_anim_to_track.erase( track->_animation_ct );
+
+				// Call this last, because it may recurse via the MeControllerContext
+				_sub_sched_context->remove_controller( track->_root );
+			}
+
+			// Clear the back reference to the scheduler
+			track->_schedule_weak.reset();
+		}
+	}
+
 	return result;
 }
 
@@ -438,34 +494,47 @@ void MeCtScheduler2::recalc_channels_requested() {
 
 
 void MeCtScheduler2::clear () {
-	track_iterator it = _tracks.begin();
-	track_iterator end = _tracks.end();
+	VecOfTrack::iterator it = _tracks.begin();
+	VecOfTrack::iterator end = _tracks.end();
 
 	for( ; it != end; ++it ) {
-		it->unref_controllers();
+		TrackPtr track( *it );
+
+		if( track->_root != NULL )
+			remove_child( track->_root );
+
+		track->_schedule_weak.reset();
 	}
 
 	_tracks.clear();
+	_child_to_track.clear();
+	_anim_to_track.clear();
+
 	recalc_channels_requested();
 }
 
-track_iterator MeCtScheduler2::track_for_child( MeController* ct )
+MeCtScheduler2::TrackPtr MeCtScheduler2::track_for_child( MeController* ct )
 {
-	track_map::iterator i = _child_to_track.find(ct);
+	MapOfCtToTrack::iterator i = _child_to_track.find(ct);
 	if( i==_child_to_track.end() )
-		return _tracks.end();
+		return TrackPtr();
 	else
 		return i->second;
 }
 
-track_iterator MeCtScheduler2::track_for_anim_ct( MeController* ct )
+MeCtScheduler2::TrackPtr MeCtScheduler2::track_for_anim_ct( MeController* ct )
 {
-	track_map::iterator i = _anim_to_track.find(ct);
+	MapOfCtToTrack::iterator i = _anim_to_track.find(ct);
 	if( i==_anim_to_track.end() )
-		return _tracks.end();
+		return TrackPtr();
 	else
 		return i->second;
 }
+
+MeCtScheduler2::VecOfTrack MeCtScheduler2::tracks() {
+	return VecOfTrack( _tracks );
+}
+
 
 //----- virtuals -----
 
@@ -530,9 +599,11 @@ void MeCtScheduler2::controller_map_updated() {
 	}
 
 	// remap children
-	for( track_iterator i=_tracks.begin();
-	     i!=_tracks.end(); ++i ) {
-		MeController* ct = i->_root;
+	VecOfTrack::iterator end = _tracks.end();
+	for( VecOfTrack::iterator i=_tracks.begin(); i!=end; ++i ) {
+		TrackPtr track = *i;
+		// TrackPtr in _tracks should not be null
+		MeController* ct = track->_root;
 		if( ct )
 			ct->remap();
 	}
@@ -564,23 +635,23 @@ void MeCtScheduler2::controller_map_updated() {
 
 
 bool MeCtScheduler2::controller_evaluate( double time, MeFrameData& frame ) {
-	vector< track_iterator > to_remove( 0 );  // zero size because it is rarely used (don't allocate for array until needed)
+	vector< TrackPtr > to_remove( 0 );  // zero size because it is rarely used (don't allocate for array until needed)
 
-	track_iterator end = _tracks.end();
-	for( track_iterator i = _tracks.begin(); i != end; ++i ) {
-		Track& track = *i;
-		bool result = track.evaluate( time, frame );
+	VecOfTrack::iterator end = _tracks.end();
+	for( VecOfTrack::iterator i = _tracks.begin(); i != end; ++i ) {
+		TrackPtr track = *i;
+		bool result = track->evaluate( time, frame );
 		
 		if( _automatically_remove_tracks && !result ) {
 			// TODO: unify prune policy of grouping controllers like blend/timing with DefaultContainerPrunePolicy
-			MeController* anim_ct = i->animation_ct();
+			MeController* anim_ct = track->animation_ct();
 			MePrunePolicy* prune_policy = NULL;
 			if( anim_ct != NULL )
 				prune_policy = anim_ct->prune_policy();
 			if(    prune_policy == NULL
-			    || prune_policy->shouldPrune( anim_ct, i->animation_parent_ct() ) )
+			    || prune_policy->shouldPrune( anim_ct, track->animation_parent_ct() ) )
 			{
-				to_remove.push_back( i );
+				to_remove.push_back( track );
 			}
 		}
 	}
@@ -725,17 +796,22 @@ SkChannelArray& MeCtScheduler2::controller_channels ()
 }
 
 double MeCtScheduler2::controller_duration () {
-	track_iterator cur = this->begin();
-	track_iterator end = this->end();
-	double dur=0;
-	while( cur != end ) {
-		double ct_dur = cur->_root->controller_duration();
-		if ( ct_dur<0 ) return -1;
-		if ( ct_dur>dur ) dur=ct_dur;
+	double total_dur=0;
 
-		++cur;
+	VecOfTrack::iterator end = _tracks.end();
+	for( VecOfTrack::iterator it = _tracks.begin(); it != end; ++it ) {
+		TrackPtr track = (*it);
+
+		double ct_dur = track->_root->controller_duration();
+		if ( ct_dur<0 ) {
+			total_dur = -1;
+
+			break;
+		} else {
+			total_dur = max( ct_dur, total_dur );
+		}
 	}
-	return dur;
+	return total_dur;
 }
 
 const char* MeCtScheduler2::controller_type ()
@@ -759,12 +835,14 @@ void MeCtScheduler2::print_state( int tab_count ) {
 		cout << endl;
 		
 		int count = 0;
-		for( track_iterator i = _tracks.begin();
-		     i != _tracks.end(); ++i )
+		VecOfTrack::iterator end = _tracks.end();
+		for( VecOfTrack::iterator it = _tracks.begin(); it != end; ++it )
 		{
+			TrackPtr track = (*it);
+
 			cout << indent << "Track #" << (++count) << ": ";
 
-			MeController* ct = i->_root;
+			MeController* ct = track->_root;
 			if( ct )
 				ct->print_state( tab_count );
 			else
