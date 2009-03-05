@@ -249,14 +249,14 @@ int SbmCharacter::init_skeleton() {
 	return CMD_SUCCESS;
 }
 
-bool test_ct_for_pruning( MeCtScheduler2::Track& track ) {
+bool test_ct_for_pruning( MeCtScheduler2::TrackPtr track ) {
 	bool prune_ok = true;
 
-	MeController* ct = track.animation_ct();
+	MeController* ct = track->animation_ct();
 	if( ct != NULL ) {
 		MePrunePolicy* prune_policy = ct->prune_policy();
 		if( prune_policy != NULL ) {
-			prune_ok = prune_policy->shouldPrune( ct, track.animation_parent_ct() );
+			prune_ok = prune_policy->shouldPrune( ct, track->animation_parent_ct() );
 
 			if( LOG_CONTROLLER_TREE_PRUNING && !prune_ok )
 				cout << "DEBUG: "<<ct->controller_type()<<" \""<<ct->name()<<"\" withheld from pruning by MePrunePolicy."<<endl;
@@ -280,35 +280,41 @@ void prune_schedule( SbmCharacter*   actor,
 ) {
 	if( LOG_CONTROLLER_TREE_PRUNING ) cout << "DEBUG: sbm_character.cpp prune_schedule(..): Pruning schedule \""<<sched->name()<<"\" from time "<<time<<endl;
 
-	typedef MeCtScheduler2::track_iterator           track_iterator;  // Don't understand why 'using' directives didn't work here
-	typedef vector< MeCtScheduler2::track_iterator > vec_tracks;
+	typedef MeCtScheduler2::TrackPtr   TrackPtr;
+	typedef MeCtScheduler2::VecOfTrack VecOfTrack;
 
-	track_iterator first = sched->begin();
-	track_iterator it = sched->end();
+	
 
-	vec_tracks tracks_to_remove;  // don't remove during iteration
+	VecOfTrack tracks = sched->tracks();  // copy of tracks
+	VecOfTrack tracks_to_remove;  // don't remove during iteration
+
+	VecOfTrack::iterator first = tracks.begin();
+	VecOfTrack::iterator it    = tracks.end();
+
 
 	while( it != first ) {
 		// Decrement track iterator (remember, we started at end)
 		--it;
 
+		TrackPtr track = (*it);
+
 		// Start with the assumption the controller is in use
 		bool in_use     = true;
 		bool flat_blend_curve = true;  // No blend controller means the blend is always 1, thus flat
 
-		MeController* anim_source = it->animation_ct();
+		MeController* anim_source = track->animation_ct();
 		if( anim_source ) {
 #if 0 // DYNAMIC_CASTS_ACTUALLY_WORK?
 			// These don't seem to work, even with Runtime Type Inspection enabled
-			MeCtBlend*         blend_ct = dynamic_cast<MeCtBlend*>( it->blending_ct() );
-			MeCtTimeShiftWarp* timing_ct = dynamic_cast<MeCtTimeShiftWarp*>( it->timing_ct() );
+			MeCtBlend*         blend_ct = dynamic_cast<MeCtBlend*>( track->blending_ct() );
+			MeCtTimeShiftWarp* timing_ct = dynamic_cast<MeCtTimeShiftWarp*>( track->timing_ct() );
 #else // Trying using manual runtime typing
-			MeCtUnary* unary_blend_ct = it->blending_ct();
+			MeCtUnary* unary_blend_ct = track->blending_ct();
 			MeCtBlend* blend_ct = NULL;
 			if( unary_blend_ct && unary_blend_ct->controller_type() == MeCtBlend::CONTROLLER_TYPE )
 				blend_ct = (MeCtBlend*)unary_blend_ct;
 
-			MeCtUnary*         unary_timing_ct = it->timing_ct();
+			MeCtUnary*         unary_timing_ct = track->timing_ct();
 			MeCtTimeShiftWarp* timing_ct = NULL;
 			if( unary_timing_ct && unary_timing_ct->controller_type() == MeCtTimeShiftWarp::CONTROLLER_TYPE )
 				timing_ct = (MeCtTimeShiftWarp*)unary_timing_ct;
@@ -456,10 +462,10 @@ void prune_schedule( SbmCharacter*   actor,
 			in_use = false;
 		}
 
-		if( !in_use && test_ct_for_pruning( *it ) ) {
+		if( !in_use && test_ct_for_pruning( track ) ) {
 			// insert at front, because we are iterating end->begin
 			// and we prefer the final list order matches order within schedule
-			tracks_to_remove.insert( tracks_to_remove.begin(), it );
+			tracks_to_remove.insert( tracks_to_remove.begin(), track );
 		}
 	}
 
@@ -716,11 +722,19 @@ int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 	const double now = mcu_p->time;
 	double max_blend_dur = -1;
 
-	MeCtScheduler2::track_iterator it = motion_sched_p->begin();
-	MeCtScheduler2::track_iterator end = motion_sched_p->end();
+	// Local convience typedefs
+	typedef MeCtScheduler2::TrackPtr   TrackPtr;
+	typedef MeCtScheduler2::VecOfTrack VecOfTrack;
+
+	VecOfTrack tracks = motion_sched_p->tracks();
+
+	VecOfTrack::iterator it = tracks.begin();
+	VecOfTrack::iterator end = tracks.end();
 
 	while( it != end ) {
-		MeController* anim_ct = it->animation_ct();
+		TrackPtr track = (*it);
+
+		MeController* anim_ct = track->animation_ct();
 		if( anim_ct ) {
 			string anim_ct_type( anim_ct->controller_type() );
 			if( anim_ct_type==MeCtQuickDraw::type_name ) {
@@ -730,7 +744,7 @@ int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 				qdraw_ct->set_reholster();
 
 				// Attempt to schedule blend out
-				MeCtUnary* blending_ct = it->blending_ct();
+				MeCtUnary* blending_ct = track->blending_ct();
 				if(    blending_ct
 					&& strcmp(blending_ct->controller_type(), MeCtBlend::CONTROLLER_TYPE ) )
 				{

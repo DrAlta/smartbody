@@ -26,7 +26,6 @@
 
 //=================================== MeCtScheduler2 =====================================
 
-#include <list>
 #include <map>
 #include <vector>
 
@@ -34,9 +33,18 @@
 #include <ME/me_ct_container.hpp>
 #include <ME/me_ct_unary.hpp>
 
+// Use Boost Smart Point Impl until TR1 is finalized
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
+
+
 
 /*! The scheduler maps each controller to its internal channel array, so that
     after evaluation, the values are copied and blended into the scheduler buffer */
+class MeCtScheduler2;
+typedef boost::shared_ptr<MeCtScheduler2> MeCtScheduler2Ptr;
+typedef boost::weak_ptr<MeCtScheduler2>   MeCtScheduler2WeakPtr;
+
 class MeCtScheduler2 : public MeCtContainer {
 public:
 	///////////////////////////////////////////////////////////////////////
@@ -96,11 +104,12 @@ public:
 		friend MeCtScheduler2;
 		friend MeCtScheduler2::Context;
 
-	protected:
-		///////////////////////////////////////////////////////////////
-		//  Private Data
-		MeCtScheduler2& _schedule;     // Schedule which this track is a part of.
+	///////////////////////////////////////////////////////////////
+	//  Private Data
+	private:
+		boost::weak_ptr<MeCtScheduler2> _schedule_weak;     // Schedule which this track is a part of.
 
+	protected:
 		MeCtUnary*      _blending_ct;  // blending controller (usually MeCtBlend)
 		MeCtUnary*      _timing_ct;    // timing controller (usually MeCtTimeShiftWarp)
         MeController*   _animation_ct; // source animation controller
@@ -111,8 +120,7 @@ public:
 		//  Public Methods
 
 		// default constructor
-		Track( MeCtScheduler2* schedule,
-		       MeCtUnary* blending,
+		Track( MeCtUnary* blending,
 			   MeCtUnary* timing,
 			   MeController* animation );
         Track( const Track& );  // copy constructor
@@ -142,16 +150,28 @@ public:
 		/**  Remaps Track context and child controller.  */
 		void remap();
 
-		void unref_controllers();
+//		void unref_controllers();
     };
-	typedef std::list<Track>::iterator track_iterator;
+	typedef boost::shared_ptr<Track> TrackPtr;
+	typedef std::vector<TrackPtr>            VecOfTrack;
 
 protected:
 	///////////////////////////////////////////////////////////////////////
+	//  Private Data Types
+	typedef std::map<MeController*,TrackPtr> MapOfCtToTrack;
+
 	//  Private Data
-	typedef std::map<MeController*,track_iterator> track_map;
-	track_map _child_to_track;
-	track_map _anim_to_track;
+
+	/**
+	 * Reference to self, used to create weak_ptr references for Tracks.
+	 *
+	 * See: http://www.boost.org/doc/libs/1_38_0/libs/smart_ptr/sp_techniques.html#weak_without_shared
+	 * Absolutely not thread safe.
+	 */
+	MeCtScheduler2Ptr _self;
+
+	MapOfCtToTrack _child_to_track;
+	MapOfCtToTrack _anim_to_track;
 
 	/**
 	 *  Local context for children.
@@ -169,7 +189,7 @@ protected:
 	 *  Chose list so that iterators remain consistent while adding and 
 	 *  removing surrounding tracks.
 	 */
-    std::list<Track> _tracks;
+    VecOfTrack _tracks;
 
 	/**
 	 *  Union of channels for all tracks.
@@ -242,24 +262,30 @@ public:
      */
 	MeController* child( size_t n );
 
-	/** Iterator for the first Track, or end() if there are no tracks. */
-	inline track_iterator begin() { return _tracks.begin(); }
-
-	/** Iterator for the position after the last Track */
-	inline track_iterator end() { return _tracks.end(); }
+////  Bad design to share iterators to an encapsulated collection
+//	/** Iterator for the first Track, or end() if there are no tracks. */
+//	inline track_iterator begin() { return _tracks.begin(); }
+//
+//	/** Iterator for the position after the last Track */
+//	inline track_iterator end() { return _tracks.end(); }
 
 	/**
 	 *  Returns the track_iterator for track with the given child controller.
 	 *  Returns end() if no matching track is found.
 	 */
-	track_iterator track_for_child( MeController* ct );
+	TrackPtr track_for_child( MeController* ct );
 
 	/**
 	 *  Returns the track_iterator for track with the given controller
 	 *  as the animation source.
 	 *  Returns end() if no matching track is found.
 	 */
-	track_iterator track_for_anim_ct( MeController* ct );
+	TrackPtr track_for_anim_ct( MeController* ct );
+
+	/**
+	 *  Returns a current copy of the tracks.
+	 */
+	VecOfTrack tracks();
 
 
 	///** Returns a reference to the track index i (0 is at the bottom). Use with care. */
@@ -275,9 +301,20 @@ public:
 	void context_updated();
 
 	/**
+	 *  Schedules a new track at before Track before_pos.
+	 *
+	 *  If before_pos is NULL, created track will be appended after all existing tracks.
+	 *
+	 *  If before_pos is not NULL and not an active track of this schedule,
+	 *  create_track(..) will return a NULL TrackPtr.
+	 */
+	TrackPtr create_track( MeCtUnary* blending, MeCtUnary* timing, MeController* ct, TrackPtr before_pos );
+
+	/**
 	 *  Schedules a new track at position pos.
 	 */
-	track_iterator create_track( track_iterator pos, MeCtUnary* blending, MeCtUnary* Timing, MeController* c );
+	TrackPtr create_track( MeCtUnary* blending, MeCtUnary* timing, MeController* ct )
+	{	return create_track( blending, timing, ct, TrackPtr() ); }
 
     /** Backwards compatible schedule function: (sans Static/Once track type)
 	 *
@@ -288,7 +325,7 @@ public:
      *  outdt - ease-out duration for blending with the next controller in the stack.
      *  type - Once will automatically remove c after completion, Static will not remove.
 	 */
-	track_iterator schedule( MeController* c, double tin, float indt, float outdt );
+	TrackPtr schedule( MeController* c, double tin, float indt, float outdt );
 
 	/**
 	 *  Removes the given track from schedule.
@@ -296,7 +333,7 @@ public:
 	 *  the track_iterator is set to end() and the set of requested channels
 	 *  is recalculated from remaining children.
 	 */
-	bool remove_track( MeCtScheduler2::track_iterator &track );
+	bool remove_track( MeCtScheduler2::TrackPtr track );
 
 	/**
 	 *  Removes the given tracks from schedule.
@@ -307,7 +344,7 @@ public:
 	 *  it minimizes the number of changes to the channels request, which can propogate
 	 *  to other controllers of the controller tree.
 	 */
-	void remove_tracks( std::vector< MeCtScheduler2::track_iterator > & tracks );
+	void remove_tracks( std::vector< MeCtScheduler2::TrackPtr >& tracks );
 
     /*! Removes all tracks and make the scheduler empty */
     void clear();
@@ -322,8 +359,10 @@ public:
 protected:
 	///////////////////////////////////////////////////////////////////////
 	//  Private Methods
+	VecOfTrack::iterator pos_of_track( TrackPtr track );
+
 	bool remove_child_impl( MeController *child );
-	bool remove_track_impl( MeCtScheduler2::track_iterator & track );
+	bool remove_track_impl( MeCtScheduler2::TrackPtr track );
 
 	void recalc_channels_requested();
 

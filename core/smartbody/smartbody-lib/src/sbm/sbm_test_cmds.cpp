@@ -770,8 +770,7 @@ int test_bone_pos_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
 	//cout<<endl<<"here's the data "<<endl<<data[0]<<" "<<data[1]<<" "<<data[2]<<endl;
 	boneWriter->set_data( data );
 
-	MeCtScheduler2::track_iterator end = character->posture_sched_p->end();
-	character->posture_sched_p->create_track( end, 0, 0, boneWriter );
+	character->posture_sched_p->create_track( 0, 0, boneWriter );
 
 	return (CMD_SUCCESS);
 }
