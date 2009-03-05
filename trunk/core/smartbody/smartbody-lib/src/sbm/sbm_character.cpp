@@ -36,8 +36,9 @@
 #include <ME/me_spline_1d.hpp>
 
 
-const bool LOG_PRUNE_CMD_TIME          = false;
-const bool LOG_CONTROLLER_TREE_PRUNING = false;
+const bool LOG_PRUNE_CMD_TIME                        = false;
+const bool LOG_CONTROLLER_TREE_PRUNING               = false;
+const bool LOG_PRUNE_TRACK_WITHOUT_BLEND_SPLIE_KNOTS = true;
 
 
 using namespace std;
@@ -326,34 +327,44 @@ void prune_schedule( SbmCharacter*   actor,
 
 				MeSpline1D& spline = blend_ct->blend_curve();
 				MeSpline1D::Knot* knot = spline.knot_last();
-				MeSpline1D::domain x = knot->get_x();
-				MeSpline1D::range  y = knot->get_y();
-				if( LOG_CONTROLLER_TREE_PRUNING )
-					cout << "\tblend_Ct \""<<blend_ct->name()<<"\": blend curve last knot: x = "<<x<<", y = "<< y <<endl;
-				if( x < time ) {
-					flat_blend_curve = true;
-					if( y == 0 ) {
-						in_use = false;
-					}
-				} else {
-					if( y == knot->get_left_y() ) {
-						MeSpline1D::Knot* prev_knot = knot;
-						knot = prev_knot->get_prev();
-						if( knot->get_x() < time ) {
-							// span between covers now and all future activity.
-							if( knot->get_right_control() != y ) {
-								flat_blend_curve = false;
-								if( y==0 )
-									in_use = false;
-							}
-						} else {
-							flat_blend_curve = false;  // assume more blend curve knots means more activity
+				if( knot != NULL ) {
+					MeSpline1D::domain x = knot->get_x();
+					MeSpline1D::range  y = knot->get_y();
+					if( LOG_CONTROLLER_TREE_PRUNING )
+						cout << "\tblend_Ct \""<<blend_ct->name()<<"\": blend curve last knot: x = "<<x<<", y = "<< y <<endl;
+					if( x < time ) {
+						flat_blend_curve = true;
+						if( y == 0 ) {
+							in_use = false;
 						}
 					} else {
-						static const double TIME_EPSILON = MeCtScheduler2::MAX_TRACK_DURATION * 0.999;
-						if( x < TIME_EPSILON )
-							flat_blend_curve = false;  // activity at the blend curve knot
+						if( y == knot->get_left_y() ) {
+							MeSpline1D::Knot* prev_knot = knot;
+							knot = prev_knot->get_prev();
+							if( knot->get_x() < time ) {
+								// span between covers now and all future activity.
+								if( knot->get_right_control() != y ) {
+									flat_blend_curve = false;
+									if( y==0 )
+										in_use = false;
+								}
+							} else {
+								flat_blend_curve = false;  // assume more blend curve knots means more activity
+							}
+						} else {
+							static const double TIME_EPSILON = MeCtScheduler2::MAX_TRACK_DURATION * 0.999;
+							if( x < TIME_EPSILON )
+								flat_blend_curve = false;  // activity at the blend curve knot
+						}
 					}
+				} else {
+					if( LOG_PRUNE_TRACK_WITHOUT_BLEND_SPLIE_KNOTS ) {
+						cout << "DEBUG: prune_schedule(..): sched \""<<sched->name()<<"\", anim_source \""<<anim_source->name()<<"\": blend_ct without spline knots." <<endl;
+						blend_ct->print_state(1);  // Prints controller type, name, and blend curve
+					}
+
+					// A spline with no knots evaluates to 0
+					in_use = false;
 				}
 			}
 			if( LOG_CONTROLLER_TREE_PRUNING && anim_source ) {
