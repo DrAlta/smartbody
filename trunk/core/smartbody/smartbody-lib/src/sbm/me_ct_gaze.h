@@ -149,7 +149,7 @@ class MeCtGaze : public MeController	{
 		static char * key_label( const int key );
 
 		static int valid_key( int key ) { return( ( key >= 0 )&&( key < NUM_GAZE_KEYS ) ); }
-		static const char* type_name;
+		static const char* CONTROLLER_TYPE;
 
 		MeCtGaze();
 		virtual ~MeCtGaze();
@@ -340,7 +340,7 @@ class MeCtGaze : public MeController	{
 		virtual bool controller_evaluate( double t, MeFrameData& frame );
 		virtual SkChannelArray& controller_channels()	{ return( _channels ); }
 		virtual double controller_duration()			{ return( (double)_duration ); }
-		virtual const char* controller_type()			{ return( type_name ); }
+		virtual const char* controller_type()			{ return( CONTROLLER_TYPE ); }
 		virtual void print_state( int tabs );
 };
 
