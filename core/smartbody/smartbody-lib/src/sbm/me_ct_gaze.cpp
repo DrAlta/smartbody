@@ -106,7 +106,7 @@ float G_hack_target_heading = 0.0;
 		eyeball: 70.6		5.9
 */
 
-const char* MeCtGaze::type_name = "Gaze";
+const char* MeCtGaze::CONTROLLER_TYPE = "Gaze";
 
 int MeCtGaze::joint_index( const char *label )	{
 	if( label )	{

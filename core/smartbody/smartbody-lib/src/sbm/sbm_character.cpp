@@ -421,7 +421,7 @@ void prune_schedule( SbmCharacter*   actor,
 					if( LOG_CONTROLLER_TREE_PRUNING ) cout << ( in_use? "Not Pruned." : "Pruned!" ) << endl;
 
 
-				} else if( anim_ct_type == MeCtGaze::type_name ) {
+				} else if( anim_ct_type == MeCtGaze::CONTROLLER_TYPE ) {
 					if( LOG_CONTROLLER_TREE_PRUNING ) cout << "DEBUG: testing MeCtGaze for pruning... ";
 					if( motion_ct || pose_ct ) {
 						in_use = false;

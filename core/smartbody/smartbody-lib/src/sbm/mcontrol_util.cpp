@@ -1185,8 +1185,14 @@ int begin_controller(
 	if( char_p )	{
 		MeController *ctrl_p = mcu_p->controller_map.lookup( ctrl_name );
 		if( ctrl_p )	{
-			//char_p->scheduler_p->schedule( 
-			char_p->motion_sched_p->schedule( // Regardless of type, controllers created via ctrl commands are treated as motions
+			// Use motion schedule by default
+			MeCtScheduler2* sched_p = char_p->motion_sched_p;
+
+			if( strcmp( ctrl_p->controller_type(), MeCtGaze::CONTROLLER_TYPE )==0 ) {
+				sched_p = char_p->gaze_sched_p;
+			}
+
+			sched_p->schedule(
 				ctrl_p, 
 				mcu_p->time, 
 				ctrl_p->indt(), 
