@@ -1,19 +1,34 @@
 ## test quickdraw controller functions:
-0 echo EXEC: data/sbm-test/scripts/test-qdraw.seq
+0 echo EXEC: data/sbm-test/scripts/test-gaze.seq
 
 #0 gaze G1 priority eyes
-0 gaze G1 smooth 0.0
 #0 gaze G1 bias chest 0 0 0
-0 gaze G1 target point 1000 200 0
-#0 gaze G1 target point 0 2000 100
+#0 gaze G1 speed 360.0
+#0 gaze G1 smooth 0.3
+#0 gaze G1 target point 1000 180 0
+#0 gaze G1 target point -30 180 1000
+0 gaze G1 target point 0 180 30
+
+#0 gaze G2 speed 360.0
+#0 gaze G2 smooth 0.3
+#0 gaze G2 target point 0 180 200
+0 gaze G2 target point 3000 180 50
+
+#0 gaze G3 speed 360.0
+#0 gaze G3 smooth 0.3
+#0 gaze G3 target point 0 180 200
 
 0 char doctor ctrl G1 begin
+4 char doctor ctrl G2 begin
+#5 char doctor ctrl G3 begin
+
+#0 char elder ctrl G1 begin
+#4 char elder ctrl G2 begin
+#5 char elder ctrl G3 begin
+
 
 #2 gaze G1 target point 0 -2000 100
-2 gaze G1 target point -1000 200 0
-
-4 gaze G1 target point 1000 200 -1000
-
-6 gaze G1 target point -1000 200 -1000
-
-8 gaze G1 target point 0 200 100
+#2 gaze G1 target point -1000 200 0
+#4 gaze G1 target point 1000 200 -1000
+#6 gaze G1 target point -1000 200 -1000
+#8 gaze G1 target point 0 200 100
