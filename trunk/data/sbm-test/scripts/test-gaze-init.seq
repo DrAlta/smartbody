@@ -2,5 +2,5 @@
 0 echo EXEC: data/sbm-test/scripts/test-gaze-init.seq
 
 0 ctrl G1 gaze
-#0 ctrl G2 gaze
-#0 ctrl G3 gaze
+0 ctrl G2 gaze neck eyes
+0 ctrl G3 gaze back eyes

@@ -143,7 +143,7 @@ class MeCtGaze : public MeController	{
 
 
 		static int joint_index( const char *label );
-		static char * joint_label( const int key );
+		static char * joint_label( const int index );
 
 		static int key_index( const char *label );
 		static char * key_label( const int key );
