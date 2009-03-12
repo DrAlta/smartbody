@@ -1,6 +1,6 @@
 ###  sbm-testdata/test-audiofile-speech.seq
 ###
-###  This sequence demonstrates hoe to use audiofile
+###  This sequence demonstrates how to use audiofile
 ###  speech with lip syncing.  You'll need to use a
 ###  renderer that support visemes and an audio
 ###  playback module (such as SBM's -audio option).
