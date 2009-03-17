@@ -37,7 +37,7 @@ class MeCtEyeLid : public MeController	{
 		SkSkeleton* 	    _skeleton_ref_p;
 		
 //		SrBuffer<int>        LL_lid_indices; // lid channels in raw motion
-		int        UL_lid_quat_index;
+//		int        UL_lid_quat_index;
 
 /*
 		struct joint_state_t	{
