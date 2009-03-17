@@ -256,6 +256,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\sbm\me_ct_eyelid.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\me_ct_eyelid.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\sbm\me_ct_face.cpp"
 					>
 				</File>
