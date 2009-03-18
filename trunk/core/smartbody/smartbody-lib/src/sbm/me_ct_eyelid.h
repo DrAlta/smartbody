@@ -33,6 +33,10 @@ class MeCtEyeLid : public MeController	{
 
 	private:
 
+		SkMotion*            _neutral_pose_p;
+		SkMotion*            _blink_pose_p;
+		SkMotion*            _wide_eye_pose_p;
+
 		SkChannelArray		_channels; // override motion channels, to include world_offset
 		SkSkeleton* 	    _skeleton_ref_p;
 		
@@ -61,7 +65,8 @@ class MeCtEyeLid : public MeController	{
 		
 		void clear( void );
 
-		void init( void );
+//		void init( void );
+		void init( SkMotion* neutral_p, SkMotion* blink_p, SkMotion* wide_p );
 		
 	private:
 
@@ -69,6 +74,8 @@ class MeCtEyeLid : public MeController	{
 		SkJoint*		source_ref_joint( void );
 //		joint_state_t	capture_joint_state( SkJoint *joint_p );
 //		joint_state_t	calc_channel_state( MeCtEyeLid::joint_state_t source );
+
+		void	print_motion_channel( SkMotion* mot_p, const char *name );
 
 		char*		source_ref_joint_str;
 		SkJoint*	source_ref_joint_p;

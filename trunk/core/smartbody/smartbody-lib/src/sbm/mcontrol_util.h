@@ -54,6 +54,7 @@ class mcuCBHandle;
 #include "me_ct_quick_draw.h"
 #include "me_ct_gaze.h"
 #include "me_ct_tether.h"
+#include "me_ct_eyelid.h"
 
 #include "sbm_constants.h"
 
@@ -151,6 +152,7 @@ class mcuCBHandle	{
 		srHashMap <MeCtGaze>		gaze_ctrl_map;
 		srHashMap <MeCtSimpleNod>	snod_ctrl_map;
 		srHashMap <MeCtAnkleLilt>	lilt_ctrl_map;
+		srHashMap <MeCtEyeLid>		eyelid_ctrl_map;
 		srHashMap <MeCtScheduler2>	sched_ctrl_map;
 		srHashMap <MeController>	controller_map;
 
