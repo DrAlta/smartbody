@@ -189,12 +189,25 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 		}
 		pose_var_index += ch_size;
 	}
-	
+
+#define ENABLE_DBG 1
+#if ENABLE_DBG
+	char dbg_au_label[] = "brow03_left";
+	int dbg_ch_idx = _context->channels().search( dbg_au_label, SkChannel::YPos );
+	bool dbg_ch_found = false;
+	bool dbg_mo_found = false;
+#endif
+
 	int c = 0;
 	SkMotion* key_pose_p;
 	_key_pose_map.reset();
 	while( key_pose_p = _key_pose_map.next() )	{
-		
+
+#if ENABLE_DBG
+	if( strcmp( key_pose_p->name(), dbg_au_label ) == 0 ) dbg_mo_found = true;
+	else dbg_mo_found = false;
+#endif
+
 		int weight_index = _kChan_to_buff[ c++ ];
 		if( weight_index >= 0 )	{
 		
@@ -205,6 +218,10 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 				pose_var_index = 0;
 				for( int i=0; i<nchan; i++ )	{
 
+#if ENABLE_DBG
+	if( dbg_mo_found && ( i == dbg_ch_idx ) ) dbg_ch_found = true;
+	else dbg_ch_found = false;
+#endif
 					int ch_size = base_channels[ i ].size();
 					SkChannel::Type ch_type = base_channels[ i ].type;
 					
