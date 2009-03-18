@@ -25,13 +25,21 @@
 #include "me_ct_eyelid.h"
 
 /*
+	JOINTS:
+	
 		eyeball_left
+		eyeball_right
+
 		lower_eyelid_left
 		upper_eyelid_left
 		
-		eyeball_right
 		lower_eyelid_right
 		upper_eyelid_right
+		
+	REF MOTIONS:
+		face_neutral.skm			: eyes open
+		fac_45_blink.skm			: eyes closed
+		fac_5_upper_lid_raiser.skm	: eyes wide open
 */
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -53,9 +61,70 @@ void MeCtEyeLid::clear( void )	{
    _skeleton_ref_p = NULL;
 }
 
-void MeCtEyeLid::init( void ) {
+void MeCtEyeLid::print_motion_channel( SkMotion* mot_p, const char *chan_name ) {
+	
+	SkChannelArray& channels = mot_p->channels();
+	float *f_arr = mot_p->posture( 0 );
+	int f_index;
+	
+	float x, y, z;
+
+	f_index = channels.float_position( channels.search( chan_name, SkChannel::XPos ) );
+	x = f_arr[ f_index ];
+
+	f_index = channels.float_position( channels.search( chan_name, SkChannel::YPos ) );
+	y = f_arr[ f_index ];
+
+	f_index = channels.float_position( channels.search( chan_name, SkChannel::ZPos ) );
+	z = f_arr[ f_index ];
+
+	f_index = channels.float_position( channels.search( chan_name, SkChannel::Quat ) );
+	euler_t e = quat_t( 
+		f_arr[ f_index ], 
+		f_arr[ f_index + 1 ], 
+		f_arr[ f_index + 2 ], 
+		f_arr[ f_index + 3 ] 
+	);
+	
+	printf( "MeCtEyeLid:: '%s'::'%s'\n",
+		mot_p->name(), chan_name
+	);
+	printf( " euler-HPR = %.2f %.2f %.2f\n",
+		e.h(), e.p(), e.r()
+	);
+	printf( " pos-XYZ = %.3f %.3f %.3f\n",
+		x, y, z
+	);
+}
+
+void MeCtEyeLid::init( SkMotion* neutral_p, SkMotion* blink_p, SkMotion* wide_p ) {
 	
 	clear();
+	
+	_neutral_pose_p = neutral_p;
+	_blink_pose_p = blink_p;
+	_wide_eye_pose_p = wide_p;
+	
+	_neutral_pose_p->ref();
+	_blink_pose_p->ref();
+	_wide_eye_pose_p->ref();
+	
+	_neutral_pose_p->move_keytimes( 0 );
+	_blink_pose_p->move_keytimes( 0 );
+	_wide_eye_pose_p->move_keytimes( 0 );
+
+//	SkChannelArray& mChannels = _neutral_pose_p->channels();
+//	float *f_arr = _neutral_pose_p->posture( 0 );
+//	int f_pos = mChannels.float_position( mChannels.search( "lower_eyelid_left", SkChannel::YPos ) );
+	print_motion_channel( _neutral_pose_p, "lower_eyelid_left" ); 
+	print_motion_channel( _neutral_pose_p, "upper_eyelid_left" ); 
+
+	print_motion_channel( _blink_pose_p, "lower_eyelid_left" ); 
+	print_motion_channel( _blink_pose_p, "upper_eyelid_left" ); 
+
+	print_motion_channel( _wide_eye_pose_p, "lower_eyelid_left" ); 
+	print_motion_channel( _wide_eye_pose_p, "upper_eyelid_left" ); 
+
 
 	_channels.add( "eyeball_left", SkChannel::Quat );
 	_channels.add( "eyeball_right", SkChannel::Quat );
@@ -188,15 +257,10 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 // _channels.name( i )
 // _channels.type( i )
 
-	int UL_lid_quat_chan_index = _channels.search( SkJointName( "upper_eyelid_left" ), SkChannel::Quat );
+	int UL_lid_quat_chan_index = _channels.search( SkJointName( "upper_eyelid_left" ), SkChannel::YPos );
 	int i_map = _context->toBufferIndex( UL_lid_quat_chan_index );
 
-	gw_float_t w, x, y, z;
-	w = fbuffer[ i_map + 0 ];
-	x = fbuffer[ i_map + 1 ];
-	y = fbuffer[ i_map + 2 ];
-	z = fbuffer[ i_map + 3 ];
-	euler_t e = quat_t( w, x, y, z );
+	float Y = fbuffer[ i_map ];
 
 #if 0
 	SkJoint* joint_p = source_ref_joint();
