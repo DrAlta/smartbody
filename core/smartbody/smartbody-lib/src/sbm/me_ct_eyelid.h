@@ -35,24 +35,17 @@ class MeCtEyeLid : public MeController	{
 
 		SkMotion*            _neutral_pose_p;
 		SkMotion*            _blink_pose_p;
-		SkMotion*            _wide_eye_pose_p;
+//		SkMotion*            _raise_pose_p;
 
 		SkChannelArray		_channels; // override motion channels, to include world_offset
 		SkSkeleton* 	    _skeleton_ref_p;
 		
+		float neut_lid_deg;
+		float blink_lid_deg;
+//		float raise_lid_deg;
+
 //		SrBuffer<int>        LL_lid_indices; // lid channels in raw motion
 //		int        UL_lid_quat_index;
-
-/*
-		struct joint_state_t	{
-//			vector_t	parent_pos; // world coord of immediate parent joint
-//			quat_t		parent_rot;
-			vector_t	local_pos;
-			quat_t		local_rot;
-			vector_t	world_pos;
-			quat_t		world_rot;
-		};
-*/
 
 	public:
 		static const char* type_name;
@@ -65,21 +58,18 @@ class MeCtEyeLid : public MeController	{
 		
 		void clear( void );
 
-//		void init( void );
-		void init( SkMotion* neutral_p, SkMotion* blink_p, SkMotion* wide_p );
+//		void init( SkMotion* neutral_p, SkMotion* blink_p, SkMotion* raise_p );
+		void init( SkMotion* neutral_p, SkMotion* blink_p );
 		
 	private:
 
 		SkJoint*		get_joint( char *joint_str, SkJoint *joint_p );
 		SkJoint*		source_ref_joint( void );
-//		joint_state_t	capture_joint_state( SkJoint *joint_p );
-//		joint_state_t	calc_channel_state( MeCtEyeLid::joint_state_t source );
 
-		void	print_motion_channel( SkMotion* mot_p, const char *name );
-
-		char*		source_ref_joint_str;
-		SkJoint*	source_ref_joint_p;
-
+		void	print_motion_channel( SkMotion* mot_p, const char *chan_name );
+		float	get_motion_joint_pitch( SkMotion* mot_p, const char *chan_name );
+		float	calculate_upper_correction( float in_lid, float in_eye );
+			
 		// callbacks for the base class
 		virtual void context_updated( void );
 		virtual void controller_map_updated();
