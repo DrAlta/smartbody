@@ -2118,7 +2118,7 @@ int init_eyelid_controller(
 	char *ctrl_name,
 	char *mot_A_name,
 	char *mot_B_name,
-	char *mot_C_name,
+//	char *mot_C_name,
 	mcuCBHandle *mcu_p
 )	{
 	int err = CMD_SUCCESS;
@@ -2133,11 +2133,11 @@ int init_eyelid_controller(
 		printf( "init_eyelid_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_B_name ); 
 		return( CMD_FAILURE );
 	}
-	SkMotion *mot_C_p = mcu_p->motion_map.lookup( mot_C_name );
-	if( mot_C_p == NULL ) {
-		printf( "init_eyelid_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_C_name ); 
-		return( CMD_FAILURE );
-	}
+//	SkMotion *mot_C_p = mcu_p->motion_map.lookup( mot_C_name );
+//	if( mot_C_p == NULL ) {
+//		printf( "init_eyelid_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_C_name ); 
+//		return( CMD_FAILURE );
+//	}
 
 	MeCtEyeLid* ctrl_p = new MeCtEyeLid;
 	err = mcu_p->eyelid_ctrl_map.insert( ctrl_name, ctrl_p );
@@ -2156,7 +2156,8 @@ int init_eyelid_controller(
 	ctrl_p->ref();
 	
 	ctrl_p->name( ctrl_name );
-	ctrl_p->init( mot_A_p, mot_B_p, mot_C_p );
+//	ctrl_p->init( mot_A_p, mot_B_p, mot_C_p );
+	ctrl_p->init( mot_A_p, mot_B_p );
 	return( CMD_SUCCESS );
 }
 
@@ -2399,9 +2400,10 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		if( strcmp( ctrl_cmd, "eyelid" )== 0) {
 			char *mot_A_name= args.read_token();
 			char *mot_B_name= args.read_token();
-			char *mot_C_name= args.read_token();
+//			char *mot_C_name= args.read_token();
 			return(
-				init_eyelid_controller( ctrl_name, mot_A_name, mot_B_name, mot_C_name, mcu_p )
+//				init_eyelid_controller( ctrl_name, mot_A_name, mot_B_name, mot_C_name, mcu_p )
+				init_eyelid_controller( ctrl_name, mot_A_name, mot_B_name, mcu_p )
 			);
 		}
 		else
