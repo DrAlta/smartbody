@@ -190,38 +190,21 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 		pose_var_index += ch_size;
 	}
 
-#define ENABLE_DBG 1
-#if ENABLE_DBG
-	char dbg_au_label[] = "brow03_left";
-	int dbg_ch_idx = _context->channels().search( dbg_au_label, SkChannel::YPos );
-	bool dbg_ch_found = false;
-	bool dbg_mo_found = false;
-#endif
-
 	int c = 0;
 	SkMotion* key_pose_p;
 	_key_pose_map.reset();
 	while( key_pose_p = _key_pose_map.next() )	{
 
-#if ENABLE_DBG
-	if( strcmp( key_pose_p->name(), dbg_au_label ) == 0 ) dbg_mo_found = true;
-	else dbg_mo_found = false;
-#endif
-
 		int weight_index = _kChan_to_buff[ c++ ];
 		if( weight_index >= 0 )	{
 		
 			float key_weight = fbuffer[ weight_index ];
-			if( key_weight > 0.0 )	{
+			if( fabs( key_weight ) > 0.0 )	{
 				float* key_pose_buff_p = key_pose_p->posture( 0 );
 
 				pose_var_index = 0;
 				for( int i=0; i<nchan; i++ )	{
 
-#if ENABLE_DBG
-	if( dbg_mo_found && ( i == dbg_ch_idx ) ) dbg_ch_found = true;
-	else dbg_ch_found = false;
-#endif
 					int ch_size = base_channels[ i ].size();
 					SkChannel::Type ch_type = base_channels[ i ].type;
 					
@@ -232,18 +215,14 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 							( ch_type == SkChannel::YPos ) ||
 							( ch_type == SkChannel::ZPos )
 						)	{
-							fbuffer[ base_ch_index ] += 
-								( key_pose_buff_p[ pose_var_index ] - base_pose_buff_p[ pose_var_index ] ) * key_weight;
+							float key_diff = key_pose_buff_p[ pose_var_index ] - base_pose_buff_p[ pose_var_index ];
+							if( fabs( key_diff ) > 0.0 )	{
+								fbuffer[ base_ch_index ] += key_diff * key_weight;
+							}
 						}
 						else
 						if( ch_type == SkChannel::Quat )	{
 
-							quat_t accum_q(
-								fbuffer[ base_ch_index ],
-								fbuffer[ base_ch_index + 1 ],
-								fbuffer[ base_ch_index + 2 ],
-								fbuffer[ base_ch_index + 3 ]
-							);
 							quat_t base_q( 
 								base_pose_buff_p[ pose_var_index ], 
 								base_pose_buff_p[ pose_var_index + 1 ], 
@@ -256,13 +235,20 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 								key_pose_buff_p[ pose_var_index + 2 ], 
 								key_pose_buff_p[ pose_var_index + 3 ] 
 							);
-
-							quat_t result_q = ( ( key_q * -base_q ) * key_weight ) * accum_q;
-
-							fbuffer[ base_ch_index ] = (float)result_q.w();
-							fbuffer[ base_ch_index + 1 ] = (float)result_q.x();
-							fbuffer[ base_ch_index + 2 ] = (float)result_q.y();
-							fbuffer[ base_ch_index + 3 ] = (float)result_q.z();
+							quat_t key_diff_q = key_q * -base_q;
+							if( key_diff_q.non_identity() ) {
+								quat_t accum_q(
+									fbuffer[ base_ch_index ],
+									fbuffer[ base_ch_index + 1 ],
+									fbuffer[ base_ch_index + 2 ],
+									fbuffer[ base_ch_index + 3 ]
+								);
+								quat_t result_q = ( ( key_q * -base_q ) * key_weight ) * accum_q;
+								fbuffer[ base_ch_index ] = (float)result_q.w();
+								fbuffer[ base_ch_index + 1 ] = (float)result_q.x();
+								fbuffer[ base_ch_index + 2 ] = (float)result_q.y();
+								fbuffer[ base_ch_index + 3 ] = (float)result_q.z();
+							}
 						}
 					}
 					pose_var_index += ch_size;

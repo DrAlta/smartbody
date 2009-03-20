@@ -65,14 +65,30 @@ inline double RAD( double d ) { return( d * 0.017453292519943295 ); }
 inline double DEG( double r ) { return( r * 57.295779513082323 ); }
 
 ////////////////////////////////
+
 #if 0
+
+#define SAFE_ARC_TRIG_THRESHHOLD  0.999999999
+
 class gwiz_util {
 	
-	safe_asin( float ) {}
-	safe_acos( float ) {}
-	safe_atan( float ) {}
+	public:
+		safe_asin( float ) {
+			if( c >= SAFE_ARC_TRIG_THRESHHOLD ) c = SAFE_ARC_TRIG_THRESHHOLD;
+			else
+			if( c <= -SAFE_ARC_TRIG_THRESHHOLD ) c = -SAFE_ARC_TRIG_THRESHHOLD;
+			return( asin( c ) );
+		}
+		safe_acos( float ) {
+			if( c >= SAFE_ARC_TRIG_THRESHHOLD ) c = SAFE_ARC_TRIG_THRESHHOLD;
+			else
+			if( c <= -SAFE_ARC_TRIG_THRESHHOLD ) c = -SAFE_ARC_TRIG_THRESHHOLD;
+			return( acos( c ) );
+		}
+//		safe_atan( float ) {}
 };
 #endif
+
 ////////////////////////////////
 
 class vector_t {
@@ -222,10 +238,13 @@ class quat_t {
         inline gw_float_t y( void ) const { return( Y ); }
         inline gw_float_t z( void ) const { return( Z ); }
 
+		inline bool non_identity( void ) const 
+			{ return( W < 0.999999999 ); }
 		inline vector_t axisangle( void ) const // Axis-Angle: Same as Exponential Map
 			{ return( axis() * radians() ); }
 		inline gw_float_t radians( void ) const // NOTE: vulnerable to badly normalized W
-			{ return( 2.0 * acos( W ) ); }
+//			{ return( 2.0 * acos( W ) ); }
+			{ return( 2.0 * acos( W * 0.999999999 ) ); }
 		inline gw_float_t degrees( void ) const 
 			{ return( DEG( radians() ) ); }
 		inline vector_t axis( void ) const 
