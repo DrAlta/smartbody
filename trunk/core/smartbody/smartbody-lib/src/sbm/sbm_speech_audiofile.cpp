@@ -482,11 +482,6 @@ void AudioFileSpeech::ReadSpeechTiming( const char * filename, stdext::hash_map<
       string time = xmlTime;
       XMLString::release( &xmlTime );
 
-
-      // prefix the id with the speech id so that it matches the ids that come in from NVB
-      id = m_speechRequestInfo[ m_requestIdCounter ].id + ":" + id;
-
-
       timeMarkers[ id ] = (float)atof( time.c_str() );
    }
 }
