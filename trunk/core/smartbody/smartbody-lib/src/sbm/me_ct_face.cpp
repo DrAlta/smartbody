@@ -222,21 +222,27 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 						}
 						else
 						if( ch_type == SkChannel::Quat )	{
+							
+							if( 
+								( fabs( base_pose_buff_p[ pose_var_index ] - key_pose_buff_p[ pose_var_index ] ) > 0.0 )||
+								( fabs( base_pose_buff_p[ pose_var_index + 1 ] - key_pose_buff_p[ pose_var_index + 1 ] ) > 0.0 )||
+								( fabs( base_pose_buff_p[ pose_var_index + 2 ] - key_pose_buff_p[ pose_var_index ] + 2 ) > 0.0 )||
+								( fabs( base_pose_buff_p[ pose_var_index + 3 ] - key_pose_buff_p[ pose_var_index ] + 3 ) > 0.0 )
+								)	{
 
-							quat_t base_q( 
-								base_pose_buff_p[ pose_var_index ], 
-								base_pose_buff_p[ pose_var_index + 1 ], 
-								base_pose_buff_p[ pose_var_index + 2 ], 
-								base_pose_buff_p[ pose_var_index + 3 ] 
-							);
-							quat_t key_q( 
-								key_pose_buff_p[ pose_var_index ], 
-								key_pose_buff_p[ pose_var_index + 1 ], 
-								key_pose_buff_p[ pose_var_index + 2 ], 
-								key_pose_buff_p[ pose_var_index + 3 ] 
-							);
-							quat_t key_diff_q = key_q * -base_q;
-							if( key_diff_q.non_identity() ) {
+								quat_t base_q( 
+									base_pose_buff_p[ pose_var_index ], 
+									base_pose_buff_p[ pose_var_index + 1 ], 
+									base_pose_buff_p[ pose_var_index + 2 ], 
+									base_pose_buff_p[ pose_var_index + 3 ] 
+								);
+								quat_t key_q( 
+									key_pose_buff_p[ pose_var_index ], 
+									key_pose_buff_p[ pose_var_index + 1 ], 
+									key_pose_buff_p[ pose_var_index + 2 ], 
+									key_pose_buff_p[ pose_var_index + 3 ] 
+								);
+#if 1
 								quat_t accum_q(
 									fbuffer[ base_ch_index ],
 									fbuffer[ base_ch_index + 1 ],
@@ -248,6 +254,22 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 								fbuffer[ base_ch_index + 1 ] = (float)result_q.x();
 								fbuffer[ base_ch_index + 2 ] = (float)result_q.y();
 								fbuffer[ base_ch_index + 3 ] = (float)result_q.z();
+#else
+								quat_t key_diff_q = key_q * -base_q;
+								if( key_diff_q.non_identity() ) {
+									quat_t accum_q(
+										fbuffer[ base_ch_index ],
+										fbuffer[ base_ch_index + 1 ],
+										fbuffer[ base_ch_index + 2 ],
+										fbuffer[ base_ch_index + 3 ]
+									);
+									quat_t result_q = ( key_diff_q * key_weight ) * accum_q;
+									fbuffer[ base_ch_index ] = (float)result_q.w();
+									fbuffer[ base_ch_index + 1 ] = (float)result_q.x();
+									fbuffer[ base_ch_index + 2 ] = (float)result_q.y();
+									fbuffer[ base_ch_index + 3 ] = (float)result_q.z();
+								}
+#endif
 							}
 						}
 					}
