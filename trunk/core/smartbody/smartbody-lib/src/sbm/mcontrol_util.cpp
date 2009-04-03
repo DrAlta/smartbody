@@ -2215,16 +2215,6 @@ int init_scheduler_controller(
 	return( CMD_FAILURE );
 }
 
-int record_controller_motion( 
-	MeController* ctrl_p, 
-	char *full_prefix, 
-	int num_frames
-)	{
-	ctrl_p->record_motion( full_prefix, num_frames );
-	return( CMD_SUCCESS );
-}
-
-
 int set_controller_timing(
 	MeController* ctrl_p, 
 	float indt, 
@@ -2434,9 +2424,20 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				char *full_prefix = args.read_token();
 				if( strcmp( record_type, "motion" ) == 0 )	{
 					int num_frames = args.read_int();
-					return(
-						record_controller_motion( ctrl_p, full_prefix, num_frames )
-					);
+					ctrl_p->record_motion( full_prefix, num_frames );
+					return( CMD_SUCCESS );
+				}
+				if( strcmp( record_type, "bvh" ) == 0 )	{
+				
+					if( mcu_p->lock_dt )	{
+						int num_frames = args.read_int();
+						ctrl_p->record_bvh( full_prefix, num_frames, 1.0/mcu_p->desired_max_fps );
+						return( CMD_SUCCESS );
+					}
+					else	{
+						printf( "mcu_controller_func ERR: BVH recording requires lockdt set\n" );
+						return( CMD_FAILURE );
+					}
 				}
 			}
 			else

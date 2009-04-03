@@ -50,9 +50,7 @@ MeController::MeController ()
 	_lastEval( -1 ),  // effectively unset.. should really be a less likely value like NaN
 	_prune_policy( new MeDefaultPrunePolicy() ),
 	_context( NULL ),
- 	_record_output( NULL ), // for recording poses and motions of immediate local results
-	_record_motion( NULL ),
-	_record_pose( NULL )
+ 	_record_output( NULL ) // for recording poses and motions of immediate local results
 {
 	_instance_id = instance_count;
 	instance_count ++;
@@ -243,7 +241,15 @@ void MeController::evaluate ( double time, MeFrameData& frame ) {
 		logger->controller_post_evaluate( time, *_context, *this, frame );
 }
 
+/*
+void MeController::record_pose( const char *full_prefix ) { 
+	_record_mode = RECORD_POSE; 
+	_record_full_prefix = std::string( full_prefix ); 
+}
+*/
+
 void MeController::record_motion( const char *full_prefix, int num_frames ) { 
+
 	if( _recording )	{
 		stop_record();
 	}
@@ -252,12 +258,135 @@ void MeController::record_motion( const char *full_prefix, int num_frames ) {
 	_record_full_prefix = std::string( full_prefix ); 
 }
 
-/*
-void MeController::record_pose( const char *full_prefix ) { 
-	_record_mode = RECORD_POSE; 
+void MeController::record_bvh( const char *full_prefix, int num_frames, double dt )	{
+
+	if( _recording )	{
+		stop_record();
+	}
+	_record_mode = RECORD_BVH_MOTION; 
+	_record_num_frames = num_frames;
 	_record_full_prefix = std::string( full_prefix ); 
+	_record_dt = dt;
 }
+
+void MeController::print_tabs( int depth )	{
+
+	for( int i=0; i<depth; i++ ) { *_record_output << "\t"; }
+}
+
+bool MeController::print_bvh_hierarchy( SkJoint* joint_p, int depth )	{
+	int i;
+	
+	if( joint_p == NULL )	{
+		cout << "MeController::print_bvh_hierarchy ERR: NULL joint_p" << endl;
+		return( false );
+	}
+	
+	print_tabs( depth );
+	if( depth == 0 )	{
+		*_record_output << "ROOT " << joint_p->name() << "\n";
+	}
+	else	{
+		*_record_output << "JOINT " << joint_p->name() << "\n";
+	}
+
+	print_tabs( depth );
+	*_record_output << "{\n";
+	
+	print_tabs( depth + 1 );
+	*_record_output << "OFFSET ";
+
+	SrVec offset_v = joint_p->offset();
+	*_record_output << offset_v.x << " ";
+	*_record_output << offset_v.y << " ";
+	*_record_output << offset_v.z << " ";
+	*_record_output << "\n";
+	
+	// CHANNELS: 
+	// For now, assume pos + rot
+	// Optimize: check 
+	//   SkJointQuat::_active, and 
+	//   SkJointPos:SkVecLimits::frozen()
+	print_tabs( depth + 1 );
+	*_record_output << "CHANNELS 6 Xposition Yposition Zposition Zrotation Xrotation Yrotation\n";
+	
+	int num_child = joint_p->num_children();
+	if( num_child == 0 )	{
+	
+		print_tabs( depth + 1 );
+		*_record_output << "End Site\n";
+
+		print_tabs( depth + 1 );
+		*_record_output << "{\n";
+		
+		// End Site OFFSET not needed
+		// This is the geometric vector of the final bone segment
+		print_tabs( depth + 2 );
+		*_record_output << "OFFSET 0.0 0.0 0.0\n";
+		
+		print_tabs( depth + 1 );
+		*_record_output << "}\n";
+	}
+	else
+	for( i = 0; i < num_child; i++ )	{
+		SkJoint* child_p = joint_p->child( i );
+		print_bvh_hierarchy( child_p, depth + 1 );
+	}
+
+	print_tabs( depth );
+	*_record_output << "}\n";
+	
+	return( true );
+}
+
+bool MeController::print_bvh_motion( SkJoint* joint_p )	{
+	int i;
+
+	if( joint_p == NULL )	{
+		cout << "MeController::print_bvh_motion ERR: NULL joint_p" << endl;
+		return( false );
+	}
+	
+	SkJointPos pos( joint_p );
+	SkJointEuler eul( joint_p ); // default: TypeYXZ
+
+//	SkJointPos* pos_p = joint_p->pos();
+
+	
+/*
+	float z_roll;
+	if( strcmp( record_type, "bvh" ) == 0 ) {
+		z_roll = eul.zRot();
+	}
+	else
+	if( strcmp( record_type, "bvh" ) == 0 ) {
+		z_roll = eul.zRot();
+	}
+	else	{
+		z_roll = eul.zRot();
+	}
 */
+
+	*_record_output << " " << pos.value( 0 );
+	*_record_output << " " << pos.value( 1 );
+	*_record_output << " " << pos.value( 2 );
+
+//inline double RAD( double d ) { return( d * 0.017453292519943295 ); }
+//inline double DEG( double r ) { return( r * 57.295779513082323 ); }
+
+	*_record_output << " " << eul.zRot() * 57.295779513082323;
+//	*_record_output << " " << z_roll;
+	*_record_output << " " << eul.xRot() * 57.295779513082323;
+	*_record_output << " " << eul.yRot() * 57.295779513082323;
+
+	int num_child = joint_p->num_children();
+	for( i = 0; i < num_child; i++ )	{
+		SkJoint* child_p = joint_p->child( i );
+		print_bvh_motion( child_p );
+	}
+
+	return( true );
+}
 
 bool MeController::init_record( void )	{
 	string filename;
@@ -268,30 +397,55 @@ bool MeController::init_record( void )	{
 	}
 	record_id_oss << _instance_id << "." << _invocation_count << "_R";
 	string recordname = string( controller_type() ) + "_" + string( _name ) + "_" + record_id_oss.str();
+
+	if( _record_mode == RECORD_BVH_MOTION )	{
+		filename = _record_full_prefix + recordname + ".bvh";
+		_record_output = new SrOutput( filename.c_str(), "w" );
+
+		SkSkeleton* skeleton_p = NULL;
+		if( _context->channels().size() > 0 )	{
+			skeleton_p = _context->channels().skeleton();
+		}
+		if( skeleton_p == NULL )	{
+			cout << "MeController::init_record NOTICE: SkSkeleton not available" << endl;
+			_record_mode = RECORD_NULL;
+			return( false );
+		}
+		
+		*_record_output << "HIERARCHY\n";
+		print_bvh_hierarchy( skeleton_p->root(), 0 );
+
+		*_record_output << "MOTION\n";
+		*_record_output << "Frames: " << _record_num_frames << srnl;	
+		*_record_output << "Frame Time: " << _record_dt << srnl;	
+
+		cout << "MeController::init_record BVH: " << filename << endl;
+	}
+	else
 	if( _record_mode == RECORD_MOTION )	{
 		filename = _record_full_prefix + recordname + ".skm";
-		_record_motion = new SkMotion;
-		_record_motion->name( recordname.c_str() );	
+		_record_output = new SrOutput( filename.c_str(), "w" );
+
+		*_record_output << "# SKM Motion Definition - M. Kallmann 2004\n";
+		*_record_output << "# Maya exporter v0.6\n";
+		*_record_output << "# Recorded output from MeController\n\n";
+		*_record_output << "SkMotion\n\n";
+		*_record_output << "name \"" << recordname.c_str() << "\"\n\n";
+
+		SkChannelArray& channels = controller_channels();
+		*_record_output << channels << srnl;
+		*_record_output << "frames " << _record_num_frames << srnl;	
+
+		cout << "MeController::init_record SKM: " << filename << endl;
 	}
 	else	{
-		filename = _record_full_prefix + recordname + ".skp";
-		_record_pose = new SkPosture;
-		_record_pose->name( recordname.c_str() );
+		cout << "MeController::init_record NOTICE: POSE not implemented" << endl;
+		_record_mode = RECORD_NULL;
+		return( false );
+		//filename = _record_full_prefix + recordname + ".skp";
 	}
 
-	_record_output = new SrOutput( filename.c_str(), "w" );
-	*_record_output << "# SKM Motion Definition - M. Kallmann 2004\n";
-	*_record_output << "# Maya exporter v0.6\n";
-	*_record_output << "# Recorded output from MeController\n\n";
-	*_record_output << "SkMotion\n\n";
-	*_record_output << "name \"" << recordname.c_str() << "\"\n\n";
-
-	SkChannelArray& channels = controller_channels();
-	*_record_output << channels << srnl;
-	*_record_output << "frames " << _record_num_frames << srnl;
-	
 	_recording = true;
-	cout << "MeController::init_record: " << filename << endl;
 	return( true );
 }
 
@@ -301,39 +455,58 @@ void MeController::cont_record( double time, MeFrameData& frame )	{
 		stop_record();
 		return;
 	}
-	if ( time < 0.0001 ) time = 0.0;
+	if( time < 0.0001 ) time = 0.0;
 
-	ostringstream key_time_oss;
-	key_time_oss << "kt " << time << " fr ";
-	*_record_output << key_time_oss.str().c_str();
+	if( _record_mode == RECORD_BVH_MOTION )	{
 
-	SkChannelArray& channels = controller_channels();
-	int num_channels = channels.size();
-	SrBuffer<float>& buff = frame.buffer();
-
-	int i, j;
-	for( i=0; i<num_channels; i++ )	{
-		
-		int index = frame.toBufferIndex( _toContextCh[ i ] );
-		int channel_size = channels[ i ].size();
-		
-		// SKM format does not actually store a quat, it stores an 'axisangle'
-		if( channels[ i ].type == SkChannel::Quat )	{
-			SrQuat q ( buff[ index + 0 ], buff[ index + 1 ], buff[ index + 2 ], buff[ index + 3 ] );
-			SrVec axis = q.axis();
-			float ang = q.angle();
-			axis.len ( ang );		
-			*_record_output << axis.x << " ";
-			*_record_output << axis.y << " ";
-			*_record_output << axis.z << " ";
+		SkSkeleton* skeleton_p = NULL;
+		if( _context->channels().size() > 0 )	{
+			skeleton_p = _context->channels().skeleton();
 		}
-		else
-		for( j=0; j<channel_size; j++ )	{
-			*_record_output << buff[ index + j ] << " ";
+		if( skeleton_p == NULL )	{
+			cout << "MeController::cont_record NOTICE: SkSkeleton not available" << endl;
+			_record_mode = RECORD_NULL;
+			return;
 		}
+
+		print_bvh_motion( skeleton_p->root() );
+		*_record_output << srnl;
 	}
-	*_record_output << srnl;
-	
+	else
+	if( _record_mode == RECORD_MOTION )	{
+
+		ostringstream key_time_oss;
+		key_time_oss << "kt " << time << " fr ";
+		*_record_output << key_time_oss.str().c_str();
+
+		SkChannelArray& channels = controller_channels();
+		int num_channels = channels.size();
+		SrBuffer<float>& buff = frame.buffer();
+
+		int i, j;
+		for( i=0; i<num_channels; i++ )	{
+
+			int index = frame.toBufferIndex( _toContextCh[ i ] );
+			int channel_size = channels[ i ].size();
+
+			// SKM format does not actually store a quat, it stores an 'axisangle'
+			if( channels[ i ].type == SkChannel::Quat )	{
+				SrQuat q ( buff[ index + 0 ], buff[ index + 1 ], buff[ index + 2 ], buff[ index + 3 ] );
+				SrVec axis = q.axis();
+				float ang = q.angle();
+				axis.len ( ang );		
+				*_record_output << axis.x << " ";
+				*_record_output << axis.y << " ";
+				*_record_output << axis.z << " ";
+			}
+			else
+			for( j=0; j<channel_size; j++ )	{
+				*_record_output << buff[ index + j ] << " ";
+			}
+		}
+		*_record_output << srnl;
+	}
+
 	_record_frame_count++;
 }
 
@@ -345,14 +518,6 @@ void MeController::stop_record( void )	{
 	if( _record_output )	{
 		delete _record_output;
 		_record_output = NULL;
-	}
-	if( _record_motion )	{
-		delete _record_motion;
-		_record_motion = NULL;
-	}
-	if( _record_pose )	{
-		delete _record_pose;
-		_record_pose = NULL;
 	}
 }
 

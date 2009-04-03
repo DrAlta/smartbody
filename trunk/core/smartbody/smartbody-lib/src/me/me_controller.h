@@ -32,6 +32,7 @@
 #include <SK/sk_channel_array.h>
 #include <SK/sk_motion.h>
 #include <SK/sk_posture.h>
+#include <SK/sk_skeleton.h>
 
 
 // Predeclare class because of circular reference:
@@ -97,7 +98,8 @@ protected :
 	enum record_mode_enum_set {
 		RECORD_NULL,
 		RECORD_POSE,
-		RECORD_MOTION
+		RECORD_MOTION,
+		RECORD_BVH_MOTION
 	};
 
 	// motion recording state: output controller results to SkMotion file:
@@ -107,9 +109,8 @@ protected :
 	int			_record_num_frames;
 	int			_record_frame_count;
 	SrOutput	*_record_output; // for recording poses and motions of immediate local results
-	SkMotion	*_record_motion;
-	SkPosture	*_record_pose;
-
+	double		_record_dt;
+	
 protected :
     /*! Constructor */
     MeController ();
@@ -229,11 +230,16 @@ public :
     /*! Evaluates the controller at a local time t. */ 
     void evaluate ( double t, MeFrameData& frame );
 
-	void record_motion( const char *full_prefix, int num_frames );
 //	void record_pose( const char *full_prefix );
+	void record_motion( const char *full_prefix, int num_frames );
+	void record_bvh( const char *full_prefix, int num_frames, double dt );
 
    protected :
-   
+
+	void print_tabs( int depth );
+	bool print_bvh_hierarchy( SkJoint* joint_p, int depth );
+	bool print_bvh_motion( SkJoint* joint_p );
+
 	bool init_record( void );
 	void cont_record( double time, MeFrameData& frame );
 	void stop_record( void );

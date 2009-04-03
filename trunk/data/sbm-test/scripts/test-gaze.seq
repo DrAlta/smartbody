@@ -22,6 +22,9 @@
 4 char doctor ctrl G2 begin
 #5 char doctor ctrl G3 begin
 
+#4 ctrl G2 record motion ../../../../data/sbm-test/common-sk/record/ 10
+4 ctrl G2 record bvh ../../../../data/sbm-test/common-sk/record/ 10
+
 #0 char elder ctrl G1 begin
 #4 char elder ctrl G2 begin
 #5 char elder ctrl G3 begin
