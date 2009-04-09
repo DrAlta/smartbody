@@ -28,6 +28,7 @@
 
 #include <ME/me_controller.h>
 #include <SR/sr_quat.h>
+#include <SR/sr_euler.h>
 #include <ME/me_prune_policy.hpp>
 
 
@@ -66,8 +67,10 @@ MeController::MeController ()
 
 MeController::~MeController () {
 	//assert( _context==NULL );  // Controller should not be deleted if still referenced by context
-	stop_record();
-
+	if( _recording ) {
+		stop_record();
+	}
+	
 	if( _prune_policy ) {
 		_prune_policy->unref();
 		_prune_policy = NULL;
@@ -347,37 +350,32 @@ bool MeController::print_bvh_motion( SkJoint* joint_p )	{
 		return( false );
 	}
 	
-	SkJointPos pos( joint_p );
-	SkJointEuler eul( joint_p ); // default: TypeYXZ
-
-//	SkJointPos* pos_p = joint_p->pos();
-
+	SkJointPos* sk_jp_p = joint_p->pos();
 	
-/*
-	float z_roll;
-	if( strcmp( record_type, "bvh" ) == 0 ) {
-		z_roll = eul.zRot();
-	}
-	else
-	if( strcmp( record_type, "bvh" ) == 0 ) {
-		z_roll = eul.zRot();
-	}
-	else	{
-		z_roll = eul.zRot();
-	}
-*/
+//*_record_output << " " << joint_p->name() << " { ";
+	
+	*_record_output << " " << sk_jp_p->value( 0 );
+	*_record_output << " " << sk_jp_p->value( 1 );
+	*_record_output << " " << sk_jp_p->value( 2 );
 
-	*_record_output << " " << pos.value( 0 );
-	*_record_output << " " << pos.value( 1 );
-	*_record_output << " " << pos.value( 2 );
+//	SkJointQuat* sk_jq_p = joint_p->quat();
+//	SrQuat sr_q = sk_jq_p->value();
+
+	SrMat sr_m = joint_p->lmat();
+	float ex, ey, ez;
+	sr_euler_angles_yxz( sr_m, ex, ey, ez ); // see sk_joint_euler.h for order interpretation...
+//	sr_euler_angles_zxy( sr_m, ex, ey, ez );
+
+//*_record_output << " ," << joint_p->name();
 
 //inline double RAD( double d ) { return( d * 0.017453292519943295 ); }
 //inline double DEG( double r ) { return( r * 57.295779513082323 ); }
+	*_record_output << " " << ez * 57.295779513082323;
+	*_record_output << " " << ex * 57.295779513082323;
+	*_record_output << " " << ey * 57.295779513082323;
 
-	*_record_output << " " << eul.zRot() * 57.295779513082323;
-//	*_record_output << " " << z_roll;
-	*_record_output << " " << eul.xRot() * 57.295779513082323;
-	*_record_output << " " << eul.yRot() * 57.295779513082323;
+//*_record_output << " }";
+
 
 	int num_child = joint_p->num_children();
 	for( i = 0; i < num_child; i++ )	{
@@ -519,6 +517,9 @@ void MeController::stop_record( void )	{
 		delete _record_output;
 		_record_output = NULL;
 	}
+
+	string filename;
+	cout << "MeController::stop_record" << endl;
 }
 
 void MeController::output ( SrOutput& o )
