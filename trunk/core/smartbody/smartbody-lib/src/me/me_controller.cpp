@@ -272,6 +272,31 @@ void MeController::record_bvh( const char *full_prefix, int num_frames, double d
 	_record_dt = dt;
 }
 
+void MeController::load_bvh_joint_hmap( void )	{
+	
+/*
+	if( _context ) {
+		SkChannelArray& ctChannels = controller_channels(); // virtual ct reference
+		int nchan = ctChannels.size();
+		
+		for( int i=0; i<nchan; ++i ) {
+		
+			SkJointName jname = ctChannels.name( i );
+			const char* strname = jname.getstring();
+			
+//			bool b = _record_joint_hmap.insertstat( strname, 1 );
+			bool b = _record_joint_hmap.insert( jname, 1 );
+			if( b ) {
+				printf( "MeController::load_bvh_joint_hmap SUCCESS: '%s'\n", strname );
+			}
+			else	{
+				printf( "MeController::load_bvh_joint_hmap FAILURE: '%s'\n", strname );
+			}
+		}
+	}
+*/
+}
+
 void MeController::print_tabs( int depth )	{
 
 	for( int i=0; i<depth; i++ ) { *_record_output << "\t"; }
@@ -299,14 +324,28 @@ bool MeController::print_bvh_hierarchy( SkJoint* joint_p, int depth )	{
 	print_tabs( depth + 1 );
 	*_record_output << "OFFSET ";
 
-	SrVec offset_v = joint_p->offset();
-	*_record_output << offset_v.x << " ";
-	*_record_output << offset_v.y << " ";
-	*_record_output << offset_v.z << " ";
-	*_record_output << "\n";
+	// STUPID-POLYTRANS ignores ROOT OFFSET: added to CHANNEL motion
+	if( depth == 0 )	{
+		*_record_output << "0.0 0.0 0.0 \n";
+	}
+	else	{
+		SrVec offset_v = joint_p->offset();
+
+	// STUPID-POLYTRANS subtracts OFFSET instead of adds
+#define STUPID_POLYTRANS_FLIP_OFFSET 1
+#if STUPID_POLYTRANS_FLIP_OFFSET
+		*_record_output << -offset_v.x << " ";
+		*_record_output << -offset_v.y << " ";
+		*_record_output << -offset_v.z << " ";
+#else
+		*_record_output << offset_v.x << " ";
+		*_record_output << offset_v.y << " ";
+		*_record_output << offset_v.z << " ";
+#endif
+		*_record_output << "\n";
+	}
 	
 	// CHANNELS: 
-	// For now, assume pos + rot
 	// Optimize: check 
 	//   SkJointQuat::_active, and 
 	//   SkJointPos:SkVecLimits::frozen()
@@ -322,7 +361,7 @@ bool MeController::print_bvh_hierarchy( SkJoint* joint_p, int depth )	{
 		print_tabs( depth + 1 );
 		*_record_output << "{\n";
 		
-		// End Site OFFSET not needed
+		// End Site OFFSET not used
 		// This is the geometric vector of the final bone segment
 		print_tabs( depth + 2 );
 		*_record_output << "OFFSET 0.0 0.0 0.0\n";
@@ -342,7 +381,8 @@ bool MeController::print_bvh_hierarchy( SkJoint* joint_p, int depth )	{
 	return( true );
 }
 
-bool MeController::print_bvh_motion( SkJoint* joint_p )	{
+bool MeController::print_bvh_motion( SkJoint* joint_p, int depth )	{ 
+	// NOTE: depth only used to hack STUPID-POLYTRANS ROOT bug
 	int i;
 
 	if( joint_p == NULL )	{
@@ -354,10 +394,19 @@ bool MeController::print_bvh_motion( SkJoint* joint_p )	{
 	
 //*_record_output << " " << joint_p->name() << " { ";
 	
-	*_record_output << " " << sk_jp_p->value( 0 );
-	*_record_output << " " << sk_jp_p->value( 1 );
-	*_record_output << " " << sk_jp_p->value( 2 );
-
+	// STUPID-POLYTRANS ignores ROOT OFFSET: add to CHANNEL motion
+	if( depth == 0 )	{
+		SrVec offset_v = joint_p->offset();
+		*_record_output << " " << sk_jp_p->value( 0 ) + offset_v.x;
+		*_record_output << " " << sk_jp_p->value( 1 ) + offset_v.y;
+		*_record_output << " " << sk_jp_p->value( 2 ) + offset_v.z;
+	}
+	else	{
+		*_record_output << " " << sk_jp_p->value( 0 );
+		*_record_output << " " << sk_jp_p->value( 1 );
+		*_record_output << " " << sk_jp_p->value( 2 );
+	}
+	
 //	SkJointQuat* sk_jq_p = joint_p->quat();
 //	SrQuat sr_q = sk_jq_p->value();
 
@@ -380,7 +429,7 @@ bool MeController::print_bvh_motion( SkJoint* joint_p )	{
 	int num_child = joint_p->num_children();
 	for( i = 0; i < num_child; i++ )	{
 		SkJoint* child_p = joint_p->child( i );
-		print_bvh_motion( child_p );
+		print_bvh_motion( child_p, depth + 1 );
 	}
 
 	return( true );
@@ -416,6 +465,8 @@ bool MeController::init_record( void )	{
 		*_record_output << "MOTION\n";
 		*_record_output << "Frames: " << _record_num_frames << srnl;	
 		*_record_output << "Frame Time: " << _record_dt << srnl;	
+
+//		load_bvh_joint_hmap();
 
 		cout << "MeController::init_record BVH: " << filename << endl;
 	}
@@ -467,7 +518,8 @@ void MeController::cont_record( double time, MeFrameData& frame )	{
 			return;
 		}
 
-		print_bvh_motion( skeleton_p->root() );
+		// NOTE: depth only used to hack STUPID-POLYTRANS ROOT bug
+		print_bvh_motion( skeleton_p->root(), 0 );
 		*_record_output << srnl;
 	}
 	else
