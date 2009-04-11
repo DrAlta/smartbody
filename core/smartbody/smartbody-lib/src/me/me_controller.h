@@ -27,6 +27,7 @@
 
 #include <string>
 
+#include <SR/sr_hash_table.h>
 #include <SR/sr_buffer.h>
 #include <SR/sr_shared_class.h>
 #include <SK/sk_channel_array.h>
@@ -106,10 +107,14 @@ protected :
 	bool		_recording;
 	int			_record_mode;
 	std::string	_record_full_prefix;
+//	std::string	_record_bvh_root_name;
 	int			_record_num_frames;
 	int			_record_frame_count;
 	SrOutput	*_record_output; // for recording poses and motions of immediate local results
 	double		_record_dt;
+//	SrHashTable<const char*>(256) _record_joint_hmap;
+//	SrHashTable <SkJointName*>(256) _record_joint_hmap;
+//	int 		_record_tree_state; // tracking outside/inside/culled branches for bvh recording
 	
 protected :
     /*! Constructor */
@@ -233,12 +238,15 @@ public :
 //	void record_pose( const char *full_prefix );
 	void record_motion( const char *full_prefix, int num_frames );
 	void record_bvh( const char *full_prefix, int num_frames, double dt );
+//	void record_bvh( const char *full_prefix, const char* skel_root, int num_frames, double dt  );
 
    protected :
 
 	void print_tabs( int depth );
 	bool print_bvh_hierarchy( SkJoint* joint_p, int depth );
-	bool print_bvh_motion( SkJoint* joint_p );
+	// NOTE: depth only used to hack STUPID-POLYTRANS ROOT bug
+	bool print_bvh_motion( SkJoint* joint_p, int depth );
+	void load_bvh_joint_hmap( void );
 
 	bool init_record( void );
 	void cont_record( double time, MeFrameData& frame );
