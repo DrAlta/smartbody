@@ -800,12 +800,19 @@ Bone #112: r_toe
 
          SkeletalApplication * app = (SkeletalApplication *)userData;
 
-         char charIdStr[ 16 ];
-         _itoa( characterID, charIdStr, 10 );
-         Node * node = app->mSceneMgr->getRootSceneNode()->getChild( charIdStr );
+         if ( characterID == -1 )
+         {
+            // move the camera
+         }
+         else
+         {
+            char charIdStr[ 16 ];
+            _itoa( characterID, charIdStr, 10 );
+            Node * node = app->mSceneMgr->getRootSceneNode()->getChild( charIdStr );
 
-         //node->setPosition( x, y, z );
-         node->setPosition( -y, z, x );
+            //node->setPosition( x, y, z );
+            node->setPosition( -y, z, x );
+         }
       }
 
 
@@ -815,11 +822,18 @@ Bone #112: r_toe
 
          SkeletalApplication * app = (SkeletalApplication *)userData;
 
-         char charIdStr[ 16 ];
-         _itoa( characterID, charIdStr, 10 );
-         Node * node = app->mSceneMgr->getRootSceneNode()->getChild( charIdStr );
+         if ( characterID == -1 )
+         {
+            // move the camera
+         }
+         else
+         {
+            char charIdStr[ 16 ];
+            _itoa( characterID, charIdStr, 10 );
+            Node * node = app->mSceneMgr->getRootSceneNode()->getChild( charIdStr );
 
-         node->setOrientation( Quaternion( w, -y, z, x ) );
+            node->setOrientation( Quaternion( w, -y, z, x ) );
+         }
       }
 
 
