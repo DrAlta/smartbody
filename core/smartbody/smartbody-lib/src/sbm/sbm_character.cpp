@@ -742,6 +742,8 @@ int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 	VecOfTrack::iterator it = tracks.begin();
 	VecOfTrack::iterator end = tracks.end();
 
+	bool found_quickdraw = false;
+
 	while( it != end ) {
 		TrackPtr track = (*it);
 
@@ -749,6 +751,8 @@ int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 		if( anim_ct ) {
 			string anim_ct_type( anim_ct->controller_type() );
 			if( anim_ct_type==MeCtQuickDraw::type_name ) {
+				found_quickdraw = true;
+
 				MeCtQuickDraw* qdraw_ct = (MeCtQuickDraw*)anim_ct;
 
 				// Initiate reholster
@@ -782,6 +786,10 @@ int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 		++it;
 	}
 
+	if( !found_quickdraw ) {
+		cout << "WARNING: Character \""<<name<<"\" reholster(): No quickdraw controller found." << endl;
+	}
+
 ////  Won't compile, and I'm tired:
 ////  Error	1	error C2296: '<<' : illegal, left operand has type 'std::ostringstream (__cdecl *)(void)'
 //	if( max_blend_dur >= 0 ) {
@@ -792,6 +800,7 @@ int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 //		out << "char " << name << " prune";
 //		mcu_p->execute_later( out.str().c_str(), max_blend_dur );
 //	}
+
 
 	return CMD_SUCCESS;
 }
@@ -896,7 +905,20 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	} else if( char_cmd=="remove" ) {
 		return SbmCharacter::remove_from_scene( char_name.c_str() );
 	} else if( char_cmd=="reholster" ) {
-		return character->reholster_quickdraw( mcu_p );
+		if( all_characters ) {
+			mcu_p->character_map.reset();
+			while( character = mcu_p->character_map.next() ) {
+				character->reholster_quickdraw( mcu_p );
+			}
+			return CMD_SUCCESS;
+		} else {
+			if ( !character ) {
+				cerr << "ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"" << char_name << "\"." << endl;
+				return CMD_FAILURE;  // ignore/out-of-domain? But it's not a standard network message.
+			} else {
+				return character->reholster_quickdraw( mcu_p );
+			}
+		}
 	} else {
 		return CMD_NOT_FOUND;
 	}
