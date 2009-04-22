@@ -195,13 +195,13 @@ char * AudioFileSpeech::getSpeechPlayCommand( RequestId requestId, const SbmChar
    hash_map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
    if ( it != m_speechRequestInfo.end() )
    {
-      int characterId = 0;
+      string characterName;
       if ( character && character->bonebusCharacter )
       {
-         characterId = character->bonebusCharacter->m_charId;
+         characterName = character->bonebusCharacter->m_name;
       }
 
-      it->second.playCommand = vhcl::Format( "send PlaySound %s %d", it->second.audioFilename.c_str(), characterId );
+      it->second.playCommand = vhcl::Format( "send PlaySound %s %s", it->second.audioFilename.c_str(), characterName.c_str() );
       return (char *)it->second.playCommand.c_str();
    }
 
@@ -220,13 +220,13 @@ char * AudioFileSpeech::getSpeechStopCommand( RequestId requestId, const SbmChar
    hash_map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
    if ( it != m_speechRequestInfo.end() )
    {
-      int characterId = 0;
+      string characterName;
       if ( character && character->bonebusCharacter )
       {
-         characterId = character->bonebusCharacter->m_charId;
+         characterName = character->bonebusCharacter->m_name;
       }
 
-      it->second.stopCommand = vhcl::Format( "send StopSound %s %d", it->second.audioFilename.c_str(), characterId );
+      it->second.stopCommand = vhcl::Format( "send StopSound %s %s", it->second.audioFilename.c_str(), characterName.c_str() );
       return (char *)it->second.stopCommand.c_str();
    }
 

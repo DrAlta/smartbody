@@ -22,6 +22,10 @@
  *      Ed Fast, USC
  */
 
+#include "vhcl.h"
+
+#include "remote_speech.h"
+
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
@@ -33,8 +37,6 @@
 #include "time.h"
 
 #include "xercesc_utils.hpp"
-#include "remote_speech.h"
-
 
 
 using namespace std;
@@ -291,22 +293,14 @@ char* remote_speech::getSpeechPlayCommand( RequestId requestId, const SbmCharact
 	string& soundFile = *lookupResult;
 
 	// Get bonebus character id for spatialization
-	ostringstream characterIdStream; //creates an ostringstream object
-	if( character && character->bonebusCharacter )
+	string characterName;
+	if ( character && character->bonebusCharacter )
 	{
-		//outputs the number into the string stream and then flushes the buffer
-		characterIdStream << (character->bonebusCharacter->m_charId) << flush;
+		characterName = character->bonebusCharacter->m_name;
 	}
-	else 
-	{
-		// Use 0 as a default;
-		characterIdStream << '0' << flush;
-	}
-	string characterIdStr( characterIdStream.str() );
 
-	ostringstream cmdStream;
-	cmdStream << "send PlaySound "<< soundFile << ' ' << characterIdStr; //concatenates audio path with playsound command
-	string cmd( cmdStream.str() );
+	string cmd = vhcl::Format( "send PlaySound %s %s", soundFile.c_str(), characterName.c_str() );
+
 	char* retSoundFile= new char[ cmd.length() + 1];
 	strcpy(retSoundFile, cmd.c_str());
 	return (retSoundFile);
@@ -331,22 +325,14 @@ char* remote_speech::getSpeechStopCommand( RequestId requestId, const SbmCharact
 	string& soundFile = *lookupResult;
 
 	// Get bonebus character id for spatialization
-	ostringstream characterIdStream; //creates an ostringstream object
-	if( character && character->bonebusCharacter )
+	string characterName;
+	if ( character && character->bonebusCharacter )
 	{
-		//outputs the number into the string stream and then flushes the buffer
-		characterIdStream << (character->bonebusCharacter->m_charId) << flush;
+		characterName = character->bonebusCharacter->m_name;
 	}
-	else 
-	{
-		// Use 0 as a default;
-		characterIdStream << '0' << flush;
-	}
-	string characterIdStr( characterIdStream.str() );
 
-	ostringstream cmdStream;
-	cmdStream << "send StopSound "<< soundFile << ' ' << characterIdStr; //concatenates audio path with playsound command
-	string cmd( cmdStream.str() );
+	string cmd = vhcl::Format( "send StopSound %s %s", soundFile.c_str(), characterName.c_str() );
+
 	char* retSoundFile= new char[cmd.length() + 1];
 	strcpy(retSoundFile, cmd.c_str());
 	return (retSoundFile);
