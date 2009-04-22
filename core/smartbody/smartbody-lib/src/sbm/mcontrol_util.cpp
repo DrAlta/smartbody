@@ -3033,7 +3033,7 @@ int mcu_play_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
             }
          }
 
-         int charId = args.read_int();
+         char * charName = args.read_token();
 
          if ( mcu_p->play_internal_audio )
          {
@@ -3041,7 +3041,7 @@ int mcu_play_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
          }
          else
          {
-            mcu_p->bonebus.SendPlaySound( path.c_str(), charId );
+            mcu_p->bonebus.SendPlaySound( path.c_str(), charName );
          }
 
          return CMD_SUCCESS;
