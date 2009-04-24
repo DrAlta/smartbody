@@ -1485,22 +1485,22 @@ void BehaviorRequest::schedule( time_sec now ) {
 		start->time  = start_at;
 #if BEHAVIOR_TIMING_BY_DURATION
 	if( !ready->isSet() )
-		ready->time  = start->time  + startReadyDur*speed;
+		ready->time  = start->time  + startReadyDur/speed;
 	if( !stroke->isSet() )
-		stroke->time = ready->time  + readyStrokeDur*speed;
+		stroke->time = ready->time  + readyStrokeDur/speed;
 	if( !relax->isSet() )
-		relax->time  = stroke->time + strokeRelaxDur*speed;
+		relax->time  = stroke->time + strokeRelaxDur/speed;
 	if( !end->isSet() )
-		end->time    = relax->time  + relaxEndDur*speed;
+		end->time    = relax->time  + relaxEndDur/speed;
 #else
 	if( !ready->isSet() )
-		ready->time  = start_at + (readyTime-startTime)*speed;
+		ready->time  = start_at + (readyTime-startTime)/speed;
 	if( !stroke->isSet() )
-		stroke->time = start_at + (strokeTime-startTime)*speed;
+		stroke->time = start_at + (strokeTime-startTime)/speed;
 	if( !relax->isSet() )
-		relax->time  = start_at + (relaxTime-startTime)*speed;
+		relax->time  = start_at + (relaxTime-startTime)/speed;
 	if( !end->isSet() )
-		end->time    = start_at + (endTime-startTime)*speed;
+		end->time    = start_at + (endTime-startTime)/speed;
 #endif // BEHAVIOR_TIMING_BY_DURATION
 
 	// TODO: validate times are set and in order
