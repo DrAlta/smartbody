@@ -4,7 +4,7 @@
 #  - All joints have all channels
 #  - All channels are unlimited
 
-set_name common-test
+set_name common_test
 
 skeleton
 root base
