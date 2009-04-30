@@ -33,15 +33,17 @@ class MeCtEyeLid : public MeController	{
 
 	private:
 
-		SkMotion*            _neutral_pose_p;
-		SkMotion*            _blink_pose_p;
-//		SkMotion*            _raise_pose_p;
+//		SkMotion*            _neutral_pose_p;
+//		SkMotion*            _blink_pose_p;
+//		SkMotion*            _lookup_pose_p;
+//		SkMotion*            _lookdown_pose_p;
+//		SkMotion*            _flat_pose_p;
 
 		SkChannelArray		_channels; // override motion channels, to include world_offset
 		SkSkeleton* 	    _skeleton_ref_p;
 		
-		float neut_lid_deg;
-		float blink_lid_deg;
+//		float neut_lid_deg;
+//		float blink_lid_deg;
 //		float raise_lid_deg;
 
 //		SrBuffer<int>        LL_lid_indices; // lid channels in raw motion
@@ -58,8 +60,10 @@ class MeCtEyeLid : public MeController	{
 		
 		void clear( void );
 
+//		void init( SkMotion* neutral_p, SkMotion* blink_p, SkMotion* lkup_p, SkMotion* lkdn_p, SkMotion* flat_p );
 //		void init( SkMotion* neutral_p, SkMotion* blink_p, SkMotion* raise_p );
-		void init( SkMotion* neutral_p, SkMotion* blink_p );
+//		void init( SkMotion* neutral_p, SkMotion* blink_p );
+		void init( void );
 		
 	private:
 
@@ -68,7 +72,7 @@ class MeCtEyeLid : public MeController	{
 
 		void	print_motion_channel( SkMotion* mot_p, const char *chan_name );
 		float	get_motion_joint_pitch( SkMotion* mot_p, const char *chan_name );
-		float	calculate_upper_correction( float in_lid, float in_eye );
+//		float	calculate_upper_correction( float in_lid, float in_eye );
 			
 		// callbacks for the base class
 		virtual void context_updated( void );
