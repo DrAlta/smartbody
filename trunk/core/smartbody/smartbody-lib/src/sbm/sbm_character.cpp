@@ -80,12 +80,15 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	gaze_sched_p( CreateSchedulerCt( character_name, "gaze" ) ),
 	head_sched_p( CreateSchedulerCt( character_name, "head" ) ),
 	face_ct( new MeCtFace() ),
+	eyelid_ct( new MeCtEyeLid() ),
 	face_neutral( NULL )
 {
 	face_ct->ref();
 	string face_ct_name( character_name );
 	face_ct_name += "'s face_ct";
 	face_ct->name( face_ct_name.c_str() );
+
+	eyelid_ct->ref();
 
 	bonebusCharacter = NULL;
 
@@ -101,6 +104,7 @@ SbmCharacter::~SbmCharacter( void )	{
 	gaze_sched_p->unref();
 	head_sched_p->unref();
 	face_ct->unref();
+	eyelid_ct->unref();
 
     if ( bonebusCharacter )
     {
@@ -154,6 +158,10 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		pipeline_p->add_controller( face_ct );
 	}
 
+#define ADD_EYELID_CORRECTIVE_CT 0
+#if ADD_EYELID_CORRECTIVE_CT
+	pipeline_p->add_controller( eyelid_ct );
+#endif
 
 	bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( name, unreal_class, mcuCBHandle::singleton().net_face_bones );
 
@@ -243,6 +251,10 @@ int SbmCharacter::init_skeleton() {
 
 		face_ct->finish_adding();
 	}
+
+#if ADD_EYELID_CORRECTIVE_CT
+	eyelid_ct->init();
+#endif
 
 	// Rebuild the active channels to include new joints
 	skeleton_p->make_active_channels();

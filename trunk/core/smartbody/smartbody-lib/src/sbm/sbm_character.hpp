@@ -40,6 +40,7 @@
 
 #include <ME/me_ct_scheduler2.h>
 #include <sbm/me_ct_face.h>
+#include <sbm/me_ct_eyelid.h>
 #define MeCtSchedulerClass MeCtScheduler2
 
 #include "sr_path_list.h"
@@ -70,6 +71,7 @@ protected:
 	AUChannelMap      au_channel_map;
 	VisemeMotionMap   viseme_map;
 	MeCtFace*         face_ct;
+	MeCtEyeLid*       eyelid_ct;
 
 public:
 	//  Methods
