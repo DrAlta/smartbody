@@ -36,10 +36,37 @@
 		lower_eyelid_right
 		upper_eyelid_right
 		
-	REF MOTIONS:
+	DEPRECATED REF MOTIONS:
 		face_neutral.skm			: eyes open
 		fac_45_blink.skm			: eyes closed
 		fac_5_upper_lid_raiser.skm	: eyes wide open
+*/
+
+/*
+	upper_eyelid_left
+		offx = 3.15
+		offy = 3.038
+		offz = 11.75
+	
+	lookup
+		posy = 0.372
+		pitch = 0.0
+	
+	neutral
+		posy = 0.0
+		pitch = 0.0
+	
+	flat
+		posy = -0.538
+		pitch = 0.0
+
+	lookdown
+		posy = -0.788
+		pitch = 0.0
+	
+	blink
+		posy = -0.87
+		pitch = 12.8
 */
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -75,6 +102,7 @@ float MeCtEyeLid::get_motion_joint_pitch( SkMotion* mot_p, const char *chan_name
 	return( (float)( e.p() ) );
 }
 
+#if 0
 float MeCtEyeLid::calculate_upper_correction( 
 	float in_lid, 
 	float in_eye
@@ -101,6 +129,7 @@ float MeCtEyeLid::calculate_upper_correction(
 //	printf( " out_lid: %f\n\n", out_lid );
 	return( out_lid );
 }
+#endif
 
 void MeCtEyeLid::print_motion_channel( SkMotion* mot_p, const char *chan_name ) {
 		
@@ -138,39 +167,53 @@ void MeCtEyeLid::print_motion_channel( SkMotion* mot_p, const char *chan_name ) 
 	);
 }
 
+//void MeCtEyeLid::init( SkMotion* neutral_p, SkMotion* blink_p, SkMotion* lkup_p, SkMotion* lkdn_p, SkMotion* flat_p ) {
 //void MeCtEyeLid::init( SkMotion* neutral_p, SkMotion* blink_p, SkMotion* raise_p ) {
-void MeCtEyeLid::init( SkMotion* neutral_p, SkMotion* blink_p ) {
+//void MeCtEyeLid::init( SkMotion* neutral_p, SkMotion* blink_p ) {
+void MeCtEyeLid::init( void ) {
 	
 	clear();
 	
-	_neutral_pose_p = neutral_p;
-	_blink_pose_p = blink_p;
-//	_raise_pose_p = raise_p;
+//	_neutral_pose_p = neutral_p;
+//	_blink_pose_p = blink_p;
+//	_lookup_pose_p = lkup_p;
+//	_lookdown_pose_p = lkdn_p;
+//	_flat_pose_p = flat_p;
 	
-	_neutral_pose_p->ref();
-	_blink_pose_p->ref();
-//	_raise_pose_p->ref();
+//	_neutral_pose_p->ref();
+//	_blink_pose_p->ref();
+//	_lookup_pose_p->ref();
+//	_lookdown_pose_p->ref();
+//	_flat_pose_p->ref();
 	
-	_neutral_pose_p->move_keytimes( 0 );
-	_blink_pose_p->move_keytimes( 0 );
-//	_raise_pose_p->move_keytimes( 0 );
+//	_neutral_pose_p->move_keytimes( 0 );
+//	_blink_pose_p->move_keytimes( 0 );
+//	_lookup_pose_p->move_keytimes( 0 );
+//	_lookdown_pose_p->move_keytimes( 0 );
+//	_flat_pose_p->move_keytimes( 0 );
 
 //	SkChannelArray& mChannels = _neutral_pose_p->channels();
 //	float *f_arr = _neutral_pose_p->posture( 0 );
 //	int f_pos = mChannels.float_position( mChannels.search( "lower_eyelid_left", SkChannel::YPos ) );
 #if 0
-	print_motion_channel( _neutral_pose_p, "lower_eyelid_left" ); 
 	print_motion_channel( _neutral_pose_p, "upper_eyelid_left" ); 
+//	print_motion_channel( _neutral_pose_p, "lower_eyelid_left" ); 
 
-	print_motion_channel( _blink_pose_p, "lower_eyelid_left" ); 
 	print_motion_channel( _blink_pose_p, "upper_eyelid_left" ); 
+//	print_motion_channel( _blink_pose_p, "lower_eyelid_left" ); 
 
-	print_motion_channel( _raise_pose_p, "lower_eyelid_left" ); 
-	print_motion_channel( _raise_pose_p, "upper_eyelid_left" ); 
+//	print_motion_channel( _lookup_pose_p, "upper_eyelid_left" ); 
+//	print_motion_channel( _lookup_pose_p, "lower_eyelid_left" ); 
+
+//	print_motion_channel( _lookdown_pose_p, "upper_eyelid_left" ); 
+//	print_motion_channel( _lookdown_pose_p, "lower_eyelid_left" ); 
+
+//	print_motion_channel( _flat_pose_p, "upper_eyelid_left" ); 
+//	print_motion_channel( _flat_pose_p, "lower_eyelid_left" ); 
 #endif
 
-	neut_lid_deg = get_motion_joint_pitch( _neutral_pose_p, "upper_eyelid_left" ); // 0.0
-	blink_lid_deg = get_motion_joint_pitch( _blink_pose_p, "upper_eyelid_left" );  // 12.81
+//	neut_lid_deg = get_motion_joint_pitch( _neutral_pose_p, "upper_eyelid_left" ); // 0.0
+//	blink_lid_deg = get_motion_joint_pitch( _blink_pose_p, "upper_eyelid_left" );  // 12.81
 //	raise_lid_deg = get_motion_joint_pitch( _raise_pose_p, "upper_eyelid_left" );  // -1.84
 
 #if 0
@@ -217,7 +260,7 @@ printf( "blink:  %f\n", blink_lid_deg );
 //	_channels.add( "lower_eyelid_left", SkChannel::Quat );
 	
 //	_channels.add( "upper_eyelid_left", SkChannel::XPos );
-//	_channels.add( "upper_eyelid_left", SkChannel::YPos );
+	_channels.add( "upper_eyelid_left", SkChannel::YPos );
 //	_channels.add( "upper_eyelid_left", SkChannel::ZPos );
 	_channels.add( "upper_eyelid_left", SkChannel::Quat );
 	
@@ -227,7 +270,7 @@ printf( "blink:  %f\n", blink_lid_deg );
 //	_channels.add( "lower_eyelid_right", SkChannel::Quat );
 	
 //	_channels.add( "upper_eyelid_right", SkChannel::XPos );
-//	_channels.add( "upper_eyelid_right", SkChannel::YPos );
+	_channels.add( "upper_eyelid_right", SkChannel::YPos );
 //	_channels.add( "upper_eyelid_right", SkChannel::ZPos );
 	_channels.add( "upper_eyelid_right", SkChannel::Quat );
 	
@@ -276,6 +319,40 @@ void MeCtEyeLid::controller_start( void )	{
 
 bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 
+#if 0
+	static int once = 1;
+	if( once )	{
+		once = 0;
+		if( _context )	{
+			SkSkeleton* skeleton_p = NULL;
+			if( _context->channels().size() > 0 )	{
+				skeleton_p = _context->channels().skeleton();
+				if( skeleton_p )	{
+					SkJoint * joint_p = skeleton_p->search_joint( "upper_eyelid_left" );
+					if( joint_p )	{
+						SrVec offset_v = joint_p->offset();
+						printf( " off-XYZ = %.3f %.3f %.3f\n",
+							offset_v.x, offset_v.y, offset_v.z
+						);
+					}
+					else	{
+						printf( "MeCtEyeLid::init NOTICE: SkJoint not available\n" );
+					}
+				}
+				else	{
+					printf( "MeCtEyeLid::init NOTICE: SkSkeleton not available\n" );
+				}
+			}
+			else	{
+				printf( "MeCtEyeLid::init NOTICE: _context->channels().size() is ZERO\n" );
+			}
+		}
+		else	{
+			printf( "MeCtEyeLid::init NOTICE: _context not available\n" );
+		}
+	}
+#endif
+
 	if( t < 0.0 )	{
 		return( true );
 	}
@@ -287,12 +364,14 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 
 	int UL_eye_quat_chan_index = _channels.search( SkJointName( "eyeball_left" ), SkChannel::Quat );
 	int UR_eye_quat_chan_index = _channels.search( SkJointName( "eyeball_right" ), SkChannel::Quat );
+	int UL_lid_posy_chan_index = _channels.search( SkJointName( "upper_eyelid_left" ), SkChannel::YPos );
 	int UL_lid_quat_chan_index = _channels.search( SkJointName( "upper_eyelid_left" ), SkChannel::Quat );
+	int UR_lid_posy_chan_index = _channels.search( SkJointName( "upper_eyelid_right" ), SkChannel::YPos );
 	int UR_lid_quat_chan_index = _channels.search( SkJointName( "upper_eyelid_right" ), SkChannel::Quat );
 	int i_map;
 	
 	i_map = _context->toBufferIndex( UL_eye_quat_chan_index );
-	euler_t left_eye_e = quat_t(
+	euler_t L_eye_e = quat_t(
 		fbuffer[ i_map ],
 		fbuffer[ i_map + 1 ],
 		fbuffer[ i_map + 2 ],
@@ -300,49 +379,115 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 	);
 
 	i_map = _context->toBufferIndex( UR_eye_quat_chan_index );
-	euler_t right_eye_e = quat_t(
+	euler_t R_eye_e = quat_t(
 		fbuffer[ i_map ],
 		fbuffer[ i_map + 1 ],
 		fbuffer[ i_map + 2 ],
 		fbuffer[ i_map + 3 ]
 	);
 
-	int left_lid_map = _context->toBufferIndex( UL_lid_quat_chan_index );
-	euler_t left_lid_e = quat_t(
-		fbuffer[ left_lid_map ],
-		fbuffer[ left_lid_map + 1 ],
-		fbuffer[ left_lid_map + 2 ],
-		fbuffer[ left_lid_map + 3 ]
+	int UL_lid_y_map = _context->toBufferIndex( UL_lid_quat_chan_index );
+	float UL_lid_y = fbuffer[ UL_lid_y_map ];
+
+	int UL_lid_q_map = _context->toBufferIndex( UL_lid_quat_chan_index );
+	euler_t UL_lid_e = quat_t(
+		fbuffer[ UL_lid_q_map ],
+		fbuffer[ UL_lid_q_map + 1 ],
+		fbuffer[ UL_lid_q_map + 2 ],
+		fbuffer[ UL_lid_q_map + 3 ]
 	);
 
-	int right_lid_map = _context->toBufferIndex( UR_lid_quat_chan_index );
-	euler_t right_lid_e = quat_t(
-		fbuffer[ right_lid_map ],
-		fbuffer[ right_lid_map + 1 ],
-		fbuffer[ right_lid_map + 2 ],
-		fbuffer[ right_lid_map + 3 ]
-	);
+	int UR_lid_y_map = _context->toBufferIndex( UR_lid_quat_chan_index );
+	float UR_lid_y = fbuffer[ UR_lid_y_map ];
 	
+	int UR_lid_q_map = _context->toBufferIndex( UR_lid_quat_chan_index );
+	euler_t UR_lid_e = quat_t(
+		fbuffer[ UR_lid_q_map ],
+		fbuffer[ UR_lid_q_map + 1 ],
+		fbuffer[ UR_lid_q_map + 2 ],
+		fbuffer[ UR_lid_q_map + 3 ]
+	);
+
+/*
+	upper_eyelid_left
+		offx = 3.15
+		offy = 3.038
+		offz = 11.75
+	
+	lookup
+		posy = 0.372
+		pitch = 0.0
+	
+	neutral
+		posy = 0.0
+		pitch = 0.0
+	
+	flat
+		posy = -0.538
+		pitch = 0.0
+
+	lookdown
+		posy = -0.788
+		pitch = 0.0
+	
+	blink
+		posy = -0.87
+		pitch = 12.8
+*/
+
+#define EYEBALL_ROT_LIMIT_UP	-35.0
+#define EYEBALL_ROT_LIMIT_DN	30.0
+
+#define EYELID_Y_FLAT		-0.538
+
+#define EYELID_Y_LIMIT_UP	0.372
+#define EYELID_Y_LIMIT_DN	-0.788
+
+// NOTE: 4/29/09 hacked pipeline precludes proper eyelid control, ignore blinking problem
+	
+	float L_eye_pitch = (float)( L_eye_e.p() );
+	float UL_corrected_posy = 0.0;
+	if( L_eye_pitch < 0.0 ) { // looking up
+		float eye_norm = L_eye_pitch / EYEBALL_ROT_LIMIT_UP;
+		UL_corrected_posy = eye_norm * EYELID_Y_LIMIT_UP;
+	}
+	else
+	if( L_eye_pitch > 0.0 )	{ // looking down
+		float eye_norm = L_eye_pitch / EYEBALL_ROT_LIMIT_DN;
+		UL_corrected_posy = eye_norm * EYELID_Y_LIMIT_DN;
+	}
+	fbuffer[ UL_lid_y_map ] = UL_corrected_posy;
+	fbuffer[ UR_lid_y_map ] = UL_corrected_posy;
+	
+#if 0
+	static int once = 1;
+	if( once )	{
+		once = 0;
+		printf( "pitch:%f in:%f out:%f\n", L_eye_pitch, UL_lid_y, UL_corrected_posy );
+	}
+#endif
+		
+#if 0
 	float correct_pitch;
 	
-	correct_pitch = calculate_upper_correction( (float)left_lid_e.p(), (float)left_eye_e.p() );
-	left_lid_e.p( correct_pitch );
-	quat_t left_lid_q = left_lid_e;
+	correct_pitch = calculate_upper_correction( (float)UL_lid_e.p(), (float)L_eye_e.p() );
+	UL_lid_e.p( correct_pitch );
+	quat_t UL_lid_q = UL_lid_e;
 	
-	fbuffer[ left_lid_map ] = (float)left_lid_q.w();
-	fbuffer[ left_lid_map + 1 ] = (float)left_lid_q.x();
-	fbuffer[ left_lid_map + 2 ] = (float)left_lid_q.y();
-	fbuffer[ left_lid_map + 3 ] = (float)left_lid_q.z();
+	fbuffer[ UL_lid_q_map ] = (float)UL_lid_q.w();
+	fbuffer[ UL_lid_q_map + 1 ] = (float)UL_lid_q.x();
+	fbuffer[ UL_lid_q_map + 2 ] = (float)UL_lid_q.y();
+	fbuffer[ UL_lid_q_map + 3 ] = (float)UL_lid_q.z();
 
-	correct_pitch = calculate_upper_correction( (float)right_lid_e.p(), (float)right_eye_e.p() );
-	right_lid_e.p( correct_pitch );
-	quat_t right_lid_q = right_lid_e;
+	correct_pitch = calculate_upper_correction( (float)UR_lid_e.p(), (float)R_eye_e.p() );
+	UR_lid_e.p( correct_pitch );
+	quat_t UR_lid_q = UR_lid_e;
 
-	fbuffer[ right_lid_map ] = (float)right_lid_q.w();
-	fbuffer[ right_lid_map + 1 ] = (float)right_lid_q.x();
-	fbuffer[ right_lid_map + 2 ] = (float)right_lid_q.y();
-	fbuffer[ right_lid_map + 3 ] = (float)right_lid_q.z();
-
+	fbuffer[ UR_lid_q_map ] = (float)UR_lid_q.w();
+	fbuffer[ UR_lid_q_map + 1 ] = (float)UR_lid_q.x();
+	fbuffer[ UR_lid_q_map + 2 ] = (float)UR_lid_q.y();
+	fbuffer[ UR_lid_q_map + 3 ] = (float)UR_lid_q.z();
+#endif
 	
 #if 0
 	SkJoint* joint_p = source_ref_joint();
