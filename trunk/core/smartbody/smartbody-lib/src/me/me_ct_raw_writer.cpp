@@ -39,8 +39,7 @@ const char* MeCtRawWriter::controller_type() {
 	return MeCtRawWriter::TYPE;
 }
 
-void MeCtRawWriter::init( SkChannelArray& channels,
-							 bool continuous )
+void MeCtRawWriter::init( SkChannelArray& channels, bool continuous )
 {
 	_channels.init();
 	_channels.merge( channels );
@@ -119,4 +118,18 @@ bool MeCtRawWriter::controller_evaluate( double time, MeFrameData& frame ) {
 	}
 
 	return true;
+}
+
+
+void MeCtRawWriter::print_state( int tab_count ) {
+	using namespace std;
+	string indent( tab_count, '\t' );
+
+	const char* name = this->name();
+	SkChannelArray& channels = controller_channels();
+
+	cout << controller_type();
+	if( name!=NULL && name[0]!='\0' )
+		cout << " \"" << name << "\"";
+	cout << " @0x" << this << endl;
 }

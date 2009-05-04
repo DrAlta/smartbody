@@ -27,6 +27,8 @@
 
 #include <iostream>
 #include <string>
+#include <cstring>
+
 
 #include <SK/sk_skeleton.h>
 #include <ME/me_ct_blend.hpp>
@@ -46,8 +48,6 @@ using namespace std;
 // Predeclare private functions defined below
 static int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle *mcu_p );
 static inline bool parse_float_or_error( float& var, const char* str, const string& var_name );
-
-
 
 
 /////////////////////////////////////////////////////////////
@@ -164,6 +164,82 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 #endif
 
 	bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( name, unreal_class, mcuCBHandle::singleton().net_face_bones );
+	
+	visememapping1.insert(pair<char*, char*>("au_1_left","unit1_left_inner_brow_raiser"));
+	visememapping1.insert(pair<char*, char*>("au_1_right","unit1_right_inner_brow_raiser"));
+	visememapping1.insert(pair<char*, char*>("au_2_left","unit2_left_outer_brow_raiser"));
+	visememapping1.insert(pair<char*, char*>("au_2_right","unit2_right_outer_brow_raiser"));
+	visememapping1.insert(pair<char*, char*>("au_4_left","unit4_left_brow_raiser"));
+	visememapping1.insert(pair<char*, char*>("au_4_right","unit4_right_brow_raiser"));
+	visememapping1.insert(pair<char*, char*>("au_5","unit5_upper_lid_raiser"));
+	visememapping1.insert(pair<char*, char*>("au_6","unit6_eye_squint"));
+	visememapping1.insert(pair<char*, char*>("au_7","unit7_lid_tightener"));
+	visememapping1.insert(pair<char*, char*>("au_9","unit9_nose_wrinkle"));
+	visememapping1.insert(pair<char*, char*>("au_10","unit10_upper_lip_raiser"));
+	visememapping1.insert(pair<char*, char*>("au_12","unit12_smile_mouth"));
+	visememapping1.insert(pair<char*, char*>("au_15","unit15_lip_corner_depressor"));
+	visememapping1.insert(pair<char*, char*>("au_20","unit20_lip_stretcher"));
+	visememapping1.insert(pair<char*, char*>("au_23","unit23_lip_tightener"));
+	visememapping1.insert(pair<char*, char*>("au_25","unit25_lip_parser"));
+	visememapping1.insert(pair<char*, char*>("au_26","unit26_jaw_drop"));
+	visememapping1.insert(pair<char*, char*>("au_27","unit27_jaw_stretch_open"));
+	visememapping1.insert(pair<char*, char*>("au_45_left","unit45_left_blink"));
+	visememapping1.insert(pair<char*, char*>("au_45_right","unit45_right_blink"));
+	visememapping1.insert(pair<char*, char*>("au_38","unit38_nostril_dilator"));
+	visememapping1.insert(pair<char*, char*>("au_39","unit39_nostril_compressor"));
+
+	visememapping1.insert(pair<char*, char*>("viseme_ao","Ao"));
+	visememapping1.insert(pair<char*, char*>("viseme_d","D"));
+	visememapping1.insert(pair<char*, char*>("viseme_ee","EE"));
+	visememapping1.insert(pair<char*, char*>("viseme_er","Er"));
+	visememapping1.insert(pair<char*, char*>("viseme_f","f"));
+	visememapping1.insert(pair<char*, char*>("viseme_kg","KG"));
+	visememapping1.insert(pair<char*, char*>("viseme_lh","lh"));
+	visememapping1.insert(pair<char*, char*>("viseme_ng","NG"));
+	visememapping1.insert(pair<char*, char*>("viseme_oh","oh"));
+	visememapping1.insert(pair<char*, char*>("viseme_oo","OO"));
+	visememapping1.insert(pair<char*, char*>("viseme_r","R"));
+	visememapping1.insert(pair<char*, char*>("viseme_th","Th"));
+	visememapping1.insert(pair<char*, char*>("viseme_z","Z"));
+	
+
+	visememapping2.insert(pair<char*, char*>("unit1_left_inner_brow_raiser","au_1_left"));
+	visememapping2.insert(pair<char*, char*>("unit1_right_inner_brow_raiser","au_1_right"));
+	visememapping2.insert(pair<char*, char*>("unit2_left_outer_brow_raiser","au_2_left"));
+	visememapping2.insert(pair<char*, char*>("unit2_right_outer_brow_raiser","au_2_right"));
+	visememapping2.insert(pair<char*, char*>("unit4_left_brow_raiser","au_4_left"));
+	visememapping2.insert(pair<char*, char*>("unit4_right_brow_raiser","au_4_right"));
+	visememapping2.insert(pair<char*, char*>("unit5_upper_lid_raiser","au_5"));
+	visememapping2.insert(pair<char*, char*>("unit6_eye_squint","au_6"));
+	visememapping2.insert(pair<char*, char*>("unit7_lid_tightener","au_7"));
+	visememapping2.insert(pair<char*, char*>("unit9_nose_wrinkle","au_9"));
+	visememapping2.insert(pair<char*, char*>("unit10_upper_lip_raiser","au_10"));
+	visememapping2.insert(pair<char*, char*>("unit12_smile_mouth","au_12"));
+	visememapping2.insert(pair<char*, char*>("unit15_lip_corner_depressor","au_15"));
+	visememapping2.insert(pair<char*, char*>("unit20_lip_stretcher","au_20"));
+	visememapping2.insert(pair<char*, char*>("unit23_lip_tightener","au_23"));
+	visememapping1.insert(pair<char*, char*>("unit25_lip_parser","au_25"));
+	visememapping1.insert(pair<char*, char*>("unit26_jaw_drop","au_26"));
+	visememapping1.insert(pair<char*, char*>("unit27_jaw_stretch_open","au_27"));
+	visememapping1.insert(pair<char*, char*>("unit45_left_blink","au_45_left"));
+	visememapping1.insert(pair<char*, char*>("unit45_right_blink","au_45_right"));
+	visememapping1.insert(pair<char*, char*>("unit38_nostril_dilator","au_38"));
+	visememapping1.insert(pair<char*, char*>("unit39_nostril_compressor","au_39"));
+
+	visememapping2.insert(pair<char*, char*>("ao","viseme_ao"));
+	visememapping2.insert(pair<char*, char*>("d","viseme_d"));
+	visememapping2.insert(pair<char*, char*>("ee","viseme_ee"));
+	visememapping2.insert(pair<char*, char*>("er","viseme_er"));
+	visememapping2.insert(pair<char*, char*>("f","viseme_f"));
+	visememapping2.insert(pair<char*, char*>("kg","viseme_kg"));
+	visememapping2.insert(pair<char*, char*>("lh","viseme_lh"));
+	visememapping2.insert(pair<char*, char*>("ng","viseme_ng"));
+	visememapping2.insert(pair<char*, char*>("oh","viseme_oh"));
+	visememapping2.insert(pair<char*, char*>("oo","viseme_oo"));
+	visememapping2.insert(pair<char*, char*>("r","viseme_r"));
+	visememapping2.insert(pair<char*, char*>("th","viseme_th"));
+	visememapping2.insert(pair<char*, char*>("z","viseme_z"));
+
 
 	return( CMD_SUCCESS ); 
 }
@@ -197,54 +273,81 @@ int SbmCharacter::init_skeleton() {
 
 	if( face_neutral ) {
 		face_ct->init( face_neutral );
+	
 
 		{	AUMotionMap::const_iterator i   = au_motion_map->begin();
 			AUMotionMap::const_iterator end = au_motion_map->end();
 			
 			for(; i != end; ++i ) {
-				const int   id = i->first;
+				//const int   id = i->first;
+				stringstream id;
+				id << i->first;
 				AUMotionPtr au( i->second );
 
 				if( au->is_bilateral() ) {
 					if( au->left ) {
 						string name = "au_";
-						name += id;
+						//name += id;
+						name += id.str();
 						name += "_left";
 
+						// Create the AU control channel
 						add_face_channel( name, wo_index );
-						// TODO: Add to au_channel_map
-						//       & register with face_ct
+						
+						// TODO: Add to au_channel_map (?)
+
+						// Register control channel with face controller
+						face_ct->add_key( name.c_str(), au->left.get() );
 					}
 					if( au->right ) {
 						string name = "au_";
-						name += id;
+						//name += id;
+						name += id.str();
 						name += "_right";
+
+						// Create the AU control channel
 						add_face_channel( name, wo_index );
+						
 						// TODO: Add to au_channel_map
-						//       & register with face_ct
+
+						// Register control channel with face controller
+						face_ct->add_key( name.c_str(), au->right.get() );
 					}
 				} else {
 					if( au->left ) {
 						string name = "au_";
-						name += id;
+						//name += id;
+						name += id.str();
+
+						// Create the AU control channel
 						add_face_channel( name, wo_index );
+						
 						// TODO: Add to au_channel_map
-						//       & register with face_ct
+
+						// Register control channel with face controller
+						face_ct->add_key( name.c_str(), au->left.get() );
 					}
 				}
 			}
-			//face_ct->init( face_neutral );
-		}
-		{	VisemeMotionMap::const_iterator i   = viseme_map.begin();
-			VisemeMotionMap::const_iterator end = viseme_map.end();
-			for(; i != end; ++i ) {
-				const string&    id     = i->first;
-				const SkMotion* motion = i->second;
+		//}
+		//{	
+			VisemeMotionMap::const_iterator vi   = viseme_motion_map->begin();
+			VisemeMotionMap::const_iterator vend = viseme_motion_map->end();
+			for(; vi != vend; ++vi ) {
+				const string&    id     = vi->first;
+				SkMotion* motion = vi->second;
 
 				if( motion ) {
 					string name = "viseme_";
 					name += id;
+
+					// Create the Viseme control channel
 					add_face_channel( name, wo_index );
+					
+					// TODO: Add to au_channel_map
+
+					// Register control channel with face controller
+					face_ct->add_key( name.c_str(), motion );
 				}
 			}
 		}
@@ -590,6 +693,7 @@ const std::string& SbmCharacter::get_voice_code() const
 
 void SbmCharacter::set_viseme( char* viseme,
 							   float weight,
+							   double start_time,
 							   float rampin_duration )
 {
     //fprintf( stdout, "Recieved: SbmCharacter(\"%s\")::set_viseme( \"%s\", %f, %f )\n", name, viseme, weight, rampin_duration );
@@ -598,10 +702,83 @@ void SbmCharacter::set_viseme( char* viseme,
 
 	// I think this is the corrected code (untested as of 20060719)
 	//NetworkSetViseme( net_handle, viseme, weight, rampin_duration );
+	char* joint_id = NULL;	
+	int viseme_len = 0;
+	map<char*,char*>::const_iterator i, end;
+
+	while(viseme[viseme_len] != '\0') viseme_len++;
+
+	char* non_cap_viseme = new char[viseme_len+1];
+	for (int j=0;j<=viseme_len;j++){
+		if(viseme[j] >= 'A' && viseme[j] <= 'Z' && j < viseme_len){
+            non_cap_viseme[j] = 32+viseme[j];
+		}else{
+			non_cap_viseme[j] = viseme[j];
+		}
+	}
+
 	if ( bonebusCharacter )
 	{
-		bonebusCharacter->SetViseme( viseme, weight, rampin_duration );
+		i   = visememapping2.begin();
+		end = visememapping2.end();
+		
+		for(; i != end; ++i ) {
+			if (strcmp(i->first, non_cap_viseme)==0){
+				joint_id = viseme;
+				break;
+			}
+		}
+		
+		if (joint_id == NULL){
+			i   = visememapping1.begin();
+			end = visememapping1.end();
+				
+			for(; i != end; ++i ) {
+				if (strcmp(i->first, non_cap_viseme)==0){
+					joint_id = i->second;
+				}
+			}
+		}
+		
+		if (joint_id == NULL) joint_id = viseme;
+		bonebusCharacter->SetViseme(joint_id, weight, rampin_duration );
+		return;
 	}
+
+
+	
+	i   = visememapping1.begin();
+	end = visememapping1.end();
+	
+	for(; i != end; ++i ) {
+		if (strcmp(i->first, viseme)==0){
+			joint_id = viseme;
+			break;
+		}
+	}
+	
+	if (joint_id == NULL){
+		i   = visememapping2.begin();
+		end = visememapping2.end();
+			
+		for(; i != end; ++i ) {
+			if (strcmp(i->first, non_cap_viseme)==0){
+				joint_id = i->second;
+			}
+		}
+	}
+	SkChannelArray channels;
+	channels.add( SkJointName(joint_id ), SkChannel::XPos );
+
+	MeCtRawWriter* ct = new MeCtRawWriter();
+	ct->name( viseme );
+	ct->init( channels, true );
+	SrBuffer<float> value;
+	value.size(1);
+	value[0] = (float)weight;
+	ct->set_data(value);
+	head_sched_p->schedule( ct, start_time, rampin_duration, 0 );
+	
 }
 
 
@@ -900,7 +1077,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		if( all_characters ) {
 			mcu_p->character_map.reset();
 			while( character = mcu_p->character_map.next() ) {
-				character->set_viseme( viseme, weight, rampin_duration );
+				character->set_viseme( viseme, weight, mcu_p->time, rampin_duration );
 			}
 			return CMD_SUCCESS;
 		} else {
@@ -908,7 +1085,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				cerr << "ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"" << char_name << "\"." << endl;
 				return CMD_FAILURE;  // ignore/out-of-domain? But it's not a standard network message.
 			} else {
-				character->set_viseme( viseme, weight, rampin_duration );
+				character->set_viseme( viseme, weight, mcu_p->time, rampin_duration );
 				return CMD_SUCCESS;
 			}
 		}
