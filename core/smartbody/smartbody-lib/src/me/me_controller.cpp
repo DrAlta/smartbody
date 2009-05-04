@@ -600,7 +600,12 @@ void MeController::input ( SrInput& i )
 void MeController::print_state( int tab_count ) {
 	using namespace std;
 
-	cout << controller_type() << "@0x" << this << endl;
+	const char* name = this->name();
+
+	cout << controller_type();
+	if( name!=NULL && name[0]!='\0' )
+		cout << " \"" << name << "\"";
+	cout << " @0x" << this << endl;
 
 	print_children( tab_count );
 }

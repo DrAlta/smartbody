@@ -81,11 +81,14 @@ typedef ActionUnit< boost::intrusive_ptr< SkMotion > >	AUMotion;
 typedef boost::intrusive_ptr< AUMotion >				AUMotionPtr;
 typedef std::map< int, AUMotionPtr >					AUMotionMap;
 
+
 /**
  *  An action unit with SkChannel components.
  *
  *  Use in the SbmCharacter.
  */
+
+// TODO: Extend to support left/right variants
 typedef ActionUnit< boost::shared_ptr< SkChannel > >	AUChannel;
 typedef boost::intrusive_ptr< AUChannel >				AUChannelPtr;
 typedef std::map< int, AUChannelPtr >					AUChannelMap;

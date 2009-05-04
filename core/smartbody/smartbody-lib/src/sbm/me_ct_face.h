@@ -76,7 +76,7 @@ class MeCtFace : public MeController	{
 		void clear( void );
 
 		void init( SkMotion* base_ref_p );
-		void add_key( char *weight_key, SkMotion* key_pose_p );
+		void add_key( const char *weight_key, SkMotion* key_pose_p );
 		void finish_adding( void );
 
 		virtual double controller_duration ();

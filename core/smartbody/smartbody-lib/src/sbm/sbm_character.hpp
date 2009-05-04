@@ -73,6 +73,12 @@ protected:
 	MeCtFace*         face_ct;
 	MeCtEyeLid*       eyelid_ct;
 
+	// mapping between new and old ways of referring AUs and visemes
+	// au_4_left -> unit4_left_brow_raiser
+	std::map<char*,char*>visememapping1;
+	// unit4_left_brow_raiser -> au_4_left 
+	std::map<char*,char*>visememapping2;
+
 public:
 	//  Methods
 	SbmCharacter( const char * char_name );
@@ -127,7 +133,7 @@ public:
 
 	BoneBusCharacter * bonebusCharacter;
 	
-	void set_viseme( char* viseme, float weight , float rampin_duration );
+	void set_viseme( char* viseme, float weight , double start_time, float rampin_duration );
 
 	bool   eye_blink_closed;
 	double eye_blink_last_time;
