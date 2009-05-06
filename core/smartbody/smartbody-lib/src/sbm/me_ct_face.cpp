@@ -71,7 +71,12 @@ void MeCtFace::init( SkMotion* base_ref_p ) {
 	for( int i = 0; i < size; i++ )	{
 		_channels.add( mchan_arr.name( i ), mchan_arr.type( i ) );
 	}
-	
+
+#define HACK_EYELID_CORRECTION 0
+#if HACK_EYELID_CORRECTION
+	_channels.add( "eyeball_left", SkChannel::Quat );
+#endif
+
 	MeController::init();
 }
 
@@ -170,6 +175,17 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 	//	printf( "MeCtFace: au_4_left value: %f\n", fbuffer[ au4_buffer_index ] );  // what is the value?
 	//}
 
+#if HACK_EYELID_CORRECTION
+	int L_eye_quat_chan_index = _channels.search( SkJointName( "eyeball_left" ), SkChannel::Quat );
+	int i_map = _context->toBufferIndex( L_eye_quat_chan_index );
+	euler_t L_eye_e = quat_t(
+		fbuffer[ i_map ],
+		fbuffer[ i_map + 1 ],
+		fbuffer[ i_map + 2 ],
+		fbuffer[ i_map + 3 ]
+	);
+	printf( "MeCtFace eye %d %d pitch:%f h:%f r:%f\n", L_eye_quat_chan_index, i_map, L_eye_e.p(), L_eye_e.h(), L_eye_e.r() );
+#endif
 
 	int pose_var_index = 0;
 	for( int i=0; i<nchan; i++ )	{
