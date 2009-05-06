@@ -362,15 +362,36 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 // _channels.name( i )
 // _channels.type( i )
 
-	int UL_eye_quat_chan_index = _channels.search( SkJointName( "eyeball_left" ), SkChannel::Quat );
-	int UR_eye_quat_chan_index = _channels.search( SkJointName( "eyeball_right" ), SkChannel::Quat );
-	int UL_lid_posy_chan_index = _channels.search( SkJointName( "upper_eyelid_left" ), SkChannel::YPos );
-	int UL_lid_quat_chan_index = _channels.search( SkJointName( "upper_eyelid_left" ), SkChannel::Quat );
-	int UR_lid_posy_chan_index = _channels.search( SkJointName( "upper_eyelid_right" ), SkChannel::YPos );
-	int UR_lid_quat_chan_index = _channels.search( SkJointName( "upper_eyelid_right" ), SkChannel::Quat );
+//	int L_eye_quat_chan_index = _channels.search( SkJointName( "eyeball_left" ), SkChannel::Quat );
+	int L_eye_quat_chan_index = _context->channels().search( SkJointName( "eyeball_left" ), SkChannel::Quat );
+
+#if 0
+//	int i = _context->toBufferIndex( L_eye_quat_chan_index );
+	int i = frame.toBufferIndex( L_eye_quat_chan_index );
+	quat_t q = quat_t(
+		fbuffer[ i ],
+		fbuffer[ i + 1 ],
+		fbuffer[ i + 2 ],
+		fbuffer[ i + 3 ]
+	);
+	euler_t e = q;
+	printf( "MeCtEyelid eye %d %d pitch:%f h:%f r:%f\n", L_eye_quat_chan_index, i, e.p(), e.h(), e.r() );
+//	printf( "MeCtEyelid eye %d %d w:%f x:%f y:%f z:%f\n", L_eye_quat_chan_index, i, q.w(), q.x(), q.y(), q.z() );
+#endif
+
+//	int R_eye_quat_chan_index = _channels.search( SkJointName( "eyeball_right" ), SkChannel::Quat );
+//	int UL_lid_posy_chan_index = _channels.search( SkJointName( "upper_eyelid_left" ), SkChannel::YPos );
+//	int UL_lid_quat_chan_index = _channels.search( SkJointName( "upper_eyelid_left" ), SkChannel::Quat );
+//	int UR_lid_posy_chan_index = _channels.search( SkJointName( "upper_eyelid_right" ), SkChannel::YPos );
+//	int UR_lid_quat_chan_index = _channels.search( SkJointName( "upper_eyelid_right" ), SkChannel::Quat );
+	int R_eye_quat_chan_index =  _context->channels().search( SkJointName( "eyeball_right" ), SkChannel::Quat );
+	int UL_lid_posy_chan_index =  _context->channels().search( SkJointName( "upper_eyelid_left" ), SkChannel::YPos );
+	int UL_lid_quat_chan_index =  _context->channels().search( SkJointName( "upper_eyelid_left" ), SkChannel::Quat );
+	int UR_lid_posy_chan_index =  _context->channels().search( SkJointName( "upper_eyelid_right" ), SkChannel::YPos );
+	int UR_lid_quat_chan_index =  _context->channels().search( SkJointName( "upper_eyelid_right" ), SkChannel::Quat );
 	int i_map;
 	
-	i_map = _context->toBufferIndex( UL_eye_quat_chan_index );
+	i_map = _context->toBufferIndex( L_eye_quat_chan_index );
 	euler_t L_eye_e = quat_t(
 		fbuffer[ i_map ],
 		fbuffer[ i_map + 1 ],
@@ -378,7 +399,7 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 		fbuffer[ i_map + 3 ]
 	);
 
-	i_map = _context->toBufferIndex( UR_eye_quat_chan_index );
+	i_map = _context->toBufferIndex( R_eye_quat_chan_index );
 	euler_t R_eye_e = quat_t(
 		fbuffer[ i_map ],
 		fbuffer[ i_map + 1 ],
@@ -386,7 +407,7 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 		fbuffer[ i_map + 3 ]
 	);
 
-	int UL_lid_y_map = _context->toBufferIndex( UL_lid_quat_chan_index );
+	int UL_lid_y_map = _context->toBufferIndex( UL_lid_posy_chan_index );
 	float UL_lid_y = fbuffer[ UL_lid_y_map ];
 
 	int UL_lid_q_map = _context->toBufferIndex( UL_lid_quat_chan_index );
@@ -397,7 +418,7 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 		fbuffer[ UL_lid_q_map + 3 ]
 	);
 
-	int UR_lid_y_map = _context->toBufferIndex( UR_lid_quat_chan_index );
+	int UR_lid_y_map = _context->toBufferIndex( UR_lid_posy_chan_index );
 	float UR_lid_y = fbuffer[ UR_lid_y_map ];
 	
 	int UR_lid_q_map = _context->toBufferIndex( UR_lid_quat_chan_index );
@@ -462,8 +483,9 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 #if 0
 	static int once = 1;
 	if( once )	{
-		once = 0;
-		printf( "pitch:%f in:%f out:%f\n", L_eye_pitch, UL_lid_y, UL_corrected_posy );
+//		once = 0;
+//		printf( "pitch:%f in:%f out:%f\n", L_eye_pitch, UL_lid_y, UL_corrected_posy );
+		printf( "pitch:%f h:%f r:%f\n", L_eye_e.p(), L_eye_e.h(), L_eye_e.r() );
 	}
 #endif
 		
