@@ -201,8 +201,8 @@ void SrInput::getall ( SrString& buf )
    if ( ISFILE )
     { int s = size()-pos();
       buf.capacity ( s+2 ); // need +2 to cope with pc text files
-      fread ( (void*)(const char*)buf, sizeof(char), (size_t)s, _cur.f );
-      buf [ s+1 ] = 0;
+      size_t num_read = fread ( (void*)(const char*)buf, sizeof(char), (size_t)s, _cur.f );
+      buf [ num_read ] = 0;
     }
    else if ( ISSTRING )
     {
