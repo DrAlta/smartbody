@@ -456,13 +456,13 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 		pitch = 12.8
 */
 
-#define EYEBALL_ROT_LIMIT_UP	-35.0
-#define EYEBALL_ROT_LIMIT_DN	30.0
+#define EYEBALL_ROT_LIMIT_UP	-35.0f
+#define EYEBALL_ROT_LIMIT_DN	30.0f
 
-#define EYELID_Y_FLAT		-0.538
+#define EYELID_Y_FLAT		-0.538f
 
-#define EYELID_Y_LIMIT_UP	0.372
-#define EYELID_Y_LIMIT_DN	-0.788
+#define EYELID_Y_LIMIT_UP	0.372f
+#define EYELID_Y_LIMIT_DN	-0.788f
 
 // NOTE: 4/29/09 hacked pipeline precludes proper eyelid control, ignore blinking problem
 	
