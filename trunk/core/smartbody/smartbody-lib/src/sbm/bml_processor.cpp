@@ -45,6 +45,7 @@
 #include "bml_gaze.hpp"
 #include "bml_interrupt.hpp"
 #include "bml_speech.hpp"
+#include "bml_locomotion.hpp"
 #include "bml_quickdraw.hpp"
 
 #include "me_ct_examples.h"
@@ -416,6 +417,8 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCB
 			behavior = parse_bml_quickdraw( child, unique_id, syncs, request, mcu );
 		} else if( XMLString::compareString( tag, TAG_SPEECH )==0 ) {
 			cerr<<"ERROR: BML::Processor::parseBML(): <speech> BML tag must be first behavior (TEMPORARY HACK)." <<endl;
+		} else if( XMLString::compareString( tag, TAG_LOCOTMOTION )==0 ) {
+			behavior = parse_bml_locomotion( child, unique_id, syncs, request, mcu );
 		} else if( XMLString::compareString( tag, TAG_INTERRUPT )==0 ) {
 			behavior = parse_bml_interrupt( child, unique_id, syncs, request, mcu );
 #if BMLR_BML2ANIM

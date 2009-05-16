@@ -324,11 +324,27 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\sbm\me_ct_locomotion_simple.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\me_ct_locomotion_simple.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\me\me_ct_motion.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\src\me\me_ct_motion.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\me_ct_navigation_waypoint.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\me_ct_navigation_waypoint.hpp"
 					>
 				</File>
 				<File
@@ -1169,6 +1185,14 @@
 				</File>
 				<File
 					RelativePath="..\src\sbm\bml_interrupt.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\bml_locomotion.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\bml_locomotion.hpp"
 					>
 				</File>
 				<File

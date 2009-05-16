@@ -51,6 +51,11 @@ const bool LOG_ABORTED_SEQ = false;
 
 
 /////////////////////////////////////////////////////////////
+//  Singleton Instance
+mcuCBHandle* mcuCBHandle::_singleton = NULL;
+
+
+/////////////////////////////////////////////////////////////
 
 mcuCBHandle::mcuCBHandle()
 :	loop( true ),

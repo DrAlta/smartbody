@@ -54,6 +54,15 @@
 
 
 class SbmCharacter : public SbmPawn	{
+public:
+	// Static Constants
+
+	//! Channel name for immediate locomotion speed and trajectory, stored in the joint position channels
+	static const char* LOCOMOTION_VELOCITY;
+	
+	//! Channel name for the body orientation target, stored in the joint position channels
+	static const char* ORIENTATION_TARGET;
+
 protected:
 	// Private Data
 

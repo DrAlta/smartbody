@@ -51,8 +51,10 @@ static inline bool parse_float_or_error( float& var, const char* str, const stri
 
 
 /////////////////////////////////////////////////////////////
-//  Singleton Instance
-mcuCBHandle* mcuCBHandle::_singleton = NULL;
+//  Static Data
+const char* SbmCharacter::LOCOMOTION_VELOCITY = "locomotion_velocity";
+const char* SbmCharacter::ORIENTATION_TARGET  = "orientation_target";
+
 
 
 /////////////////////////////////////////////////////////////
@@ -271,7 +273,30 @@ int SbmCharacter::init_skeleton() {
 	const int wo_index = wo_joint_p->index();  // World offest joint index
 	
 
+	// Add channels for locomotion control...
+	{
+		const float max_speed = 1000000;   // TODO: set max speed value to some reasonable value for the current scale
+
+		// 3D vector for current speed and trajectory of the body
+		SkJoint* loc_vector_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
+		loc_vector_joint_p->name( SkJointName( LOCOMOTION_VELOCITY ) );
+		// Activate positional channels
+		loc_vector_joint_p->pos()->limits( 0, -max_speed, max_speed );
+		loc_vector_joint_p->pos()->limits( 1, -max_speed, max_speed );
+		loc_vector_joint_p->pos()->limits( 2, -max_speed, max_speed );
+
+		// 3D position for orientation target
+		SkJoint* orientation_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
+		orientation_joint_p->name( SkJointName( ORIENTATION_TARGET ) );
+		// Activate positional channels, unlimited
+		orientation_joint_p->pos()->limits( 0, false );
+		orientation_joint_p->pos()->limits( 1, false );
+		orientation_joint_p->pos()->limits( 2, false );
+	}
+
 	if( face_neutral ) {
+		// Face assets are defined, so initialize the face controller and related assets.
+
 		face_ct->init( face_neutral );
 	
 
@@ -329,8 +354,7 @@ int SbmCharacter::init_skeleton() {
 					}
 				}
 			}
-		//}
-		//{	
+
 			VisemeMotionMap::const_iterator vi   = viseme_motion_map->begin();
 			VisemeMotionMap::const_iterator vend = viseme_motion_map->end();
 			for(; vi != vend; ++vi ) {

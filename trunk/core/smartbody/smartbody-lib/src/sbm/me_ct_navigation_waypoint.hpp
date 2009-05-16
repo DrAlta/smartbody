@@ -1,6 +1,6 @@
 /*
- *  me_ct_raw_writer.hpp - part of SmartBody-lib's Motion Engine
- *  Copyright (C) 2008  University of Southern California
+ *  me_ct_navigation_waypoint.hpp - part of SmartBody-lib's Motion Engine
+ *  Copyright (C) 2009  University of Southern California
  *
  *  SmartBody-lib is free software: you can redistribute it and/or
  *  modify it under the terms of the Lesser GNU General Public License
@@ -20,22 +20,16 @@
  *      Andrew n marshall, USC
  */
 
-#ifndef ME_CT_RAW_WRITER_HPP
-#define ME_CT_RAW_WRITER_HPP
+#ifndef ME_CT_NAVIGATION_WAYPOINT_HPP
+#define ME_CT_NAVIGATION_WAYPOINT_HPP
 
 #include <ME/me_controller.h>
 
 
 /**
- *  Write the given data to the given channels.
- *
- *  If continuous writing is enabled, the data will be written every frame.
- *  If continuous writing is disabled, the data will only be written on the
- *  next frame.
- *
- *  This controller only works with the new controller API.
+ *  Controls the locomotion vector to approach a single waypoint at a given speed.
  */
-class MeCtRawWriter : public MeController {
+class MeCtNavigationWaypoint : public MeController {
 public:
 	// Public Constants
 	static const char* TYPE;
@@ -43,35 +37,17 @@ public:
 protected:
 	// Data
 	SkChannelArray  _channels;
-	SrBuffer<float> _data;
-	SrBuffer<int>   _local_ch_to_buffer;
-	bool            _continuous;
-	bool            _write_next;
 
 public:
 	/** Constructor */
-	MeCtRawWriter();
+	MeCtNavigationWaypoint();
 
 	const char* controller_type();
 
 	/**
 	 *  Initializes the controller with a set of channels to write.
 	 */
-	void init( SkChannelArray& channels, bool continuous );
-
-	/**
-	 *  Copies data into the current data buffer.
-	 *  Returns false if the data length does not match expected.
-	 *  Otherwise returns true if successful.
-	 */
-	bool set_data( SrBuffer<float> data );
-
-	/**
-	 *  Copies data into the current data buffer.
-	 *  It is up to the caller to make sure the length of data is
-	 *  at least this->controller_channels().floats().
-	 */
-	void set_data( float data[] );
+	void init();
 
 	/**
 	 *  Implements MeController::controller_channels().
@@ -95,7 +71,7 @@ public:
 		should be indented by tabCount number of tabs.  Child controller should 
 		be indented by an additional tab. All output should end with a new line.  */
 	virtual void print_state( int tab_count );
+
 };
 
-
-#endif // ME_CT_RAW_WRITER_HPP
+#endif // ME_CT_NAVIGATION_WAYPOINT_HPP
