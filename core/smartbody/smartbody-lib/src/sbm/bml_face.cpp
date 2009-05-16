@@ -76,9 +76,9 @@ BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& uni
                         if(LOG_BML_VISEMES) printf( "LOG: BML::parse_bml_face(): FAC has specified weight!\n" );
                         wistringstream inAmount( attrAmount );
                         if( !( inAmount >> weight ) )
-                            wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<" "<<ATTR_AMOUNT<<"=\""<<attrAmount<<"\" />: Illegal attribute value."<<endl;
+                            wcerr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_AMOUNT<<"=\""<<attrAmount<<"\" />: Illegal attribute value."<<endl;
                     }
-                    if(LOG_BML_VISEMES) printf( "LOG: BodyPlannerImpl::parseBML(): FAC weight: %f\n", weight );
+                    if(LOG_BML_VISEMES) printf( "LOG: BML::parse_bml_face(): FAC weight: %f\n", weight );
 					boost::shared_ptr<VisemeRequest> viseme;
 					if( rampup != -1 && rampdown != -1)
 						viseme.reset( new VisemeRequest( unique_id, "_", weight, 1, tms, rampup, rampdown ) );
@@ -139,33 +139,33 @@ BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& uni
                             break;
 
                         default:
-                            wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<" "<<ATTR_AU<<".. />: Unknown action unit #"<<au<<"."<<endl;
+                            wcerr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_AU<<".. />: Unknown action unit #"<<au<<"."<<endl;
                             viseme.reset();
                     }
 					return viseme;
                 } else {
-                    wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<" "<<ATTR_AU<<"=\""<<attrAu<<"\" />: Illegal attribute value."<<endl;
+                    wcerr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_AU<<"=\""<<attrAu<<"\" />: Illegal attribute value."<<endl;
 					return BehaviorRequestPtr();  // a.k.a., NULL
                 }
             } else {
-                wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag missing "<<ATTR_AU<<"= attribute." << endl;
+                wcerr << "WARNING: BML::parse_bml_face(): <"<<tag<<"> BML tag missing "<<ATTR_AU<<"= attribute." << endl;
 				return BehaviorRequestPtr();  // a.k.a., NULL
             }
         } else if( XMLString::compareIString( attrType, L"eyebrows" )==0 ) {
-            wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unimplemented type." << endl;
+            wcerr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unimplemented type." << endl;
 			return BehaviorRequestPtr();  // a.k.a., NULL
         } else if( XMLString::compareIString( attrType, L"eyelids" )==0 ) {
-            wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unimplemented type." << endl;
+            wcerr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unimplemented type." << endl;
 			return BehaviorRequestPtr();  // a.k.a., NULL
         } else if( XMLString::compareIString( attrType, L"mouth" )==0 ) {
-            wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unimplemented type." << endl;
+            wcerr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unimplemented type." << endl;
 			return BehaviorRequestPtr();  // a.k.a., NULL
         } else {
-            wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unknown type value, ignore command" << endl;
+            wcerr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unknown type value, ignore command" << endl;
 			return BehaviorRequestPtr();  // a.k.a., NULL
         }
     } else {
-        wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag missing "<<ATTR_TYPE<<"= attribute." << endl;
+        wcerr << "WARNING: BML::parse_bml_face(): <"<<tag<<"> BML tag missing "<<ATTR_TYPE<<"= attribute." << endl;
 		return BehaviorRequestPtr();  // a.k.a., NULL
     }
 }
