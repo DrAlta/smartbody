@@ -123,14 +123,14 @@ bool MeCtLocomotionSimple::controller_evaluate( double time, MeFrameData& frame 
 		quat_t orient_quat( euler_t( orient_vec, UP_VECTOR ) );
 
 		// Write Results
-		buffer[ bi_world_x ] = world_pos.x();
-		buffer[ bi_world_y ] = world_pos.y();
-		buffer[ bi_world_z ] = world_pos.z();
+		buffer[ bi_world_x ] = (float)world_pos.x();
+		buffer[ bi_world_y ] = (float)world_pos.y();
+		buffer[ bi_world_z ] = (float)world_pos.z();
 
-		buffer[ bi_world_rot+0 ] = orient_quat.w();
-		buffer[ bi_world_rot+1 ] = orient_quat.x();
-		buffer[ bi_world_rot+2 ] = orient_quat.y();
-		buffer[ bi_world_rot+3 ] = orient_quat.z();
+		buffer[ bi_world_rot+0 ] = (float)orient_quat.w();
+		buffer[ bi_world_rot+1 ] = (float)orient_quat.x();
+		buffer[ bi_world_rot+2 ] = (float)orient_quat.y();
+		buffer[ bi_world_rot+3 ] = (float)orient_quat.z();
 	}
 
 	return true;
