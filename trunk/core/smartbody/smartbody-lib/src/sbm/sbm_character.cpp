@@ -167,44 +167,45 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 	bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( name, unreal_class, mcuCBHandle::singleton().net_face_bones );
 	
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_1_left",   "unit1_left_inner_brow_raiser"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_1_right",  "unit1_right_inner_brow_raiser"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_2_left",   "unit2_left_outer_brow_raiser"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_2_right",  "unit2_right_outer_brow_raiser"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_4_left",   "unit4_left_brow_raiser"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_4_right",  "unit4_right_brow_raiser"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_5",        "unit5_upper_lid_raiser"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_6",        "unit6_eye_squint"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_7",        "unit7_lid_tightener"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_9",        "unit9_nose_wrinkle"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_10",       "unit10_upper_lip_raiser"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_12",       "unit12_smile_mouth"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_15",       "unit15_lip_corner_depressor"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_20",       "unit20_lip_stretcher"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_23",       "unit23_lip_tightener"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_25",       "unit25_lip_parser"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_26",       "unit26_jaw_drop"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_27",       "unit27_jaw_stretch_open"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_45_left",  "unit45_left_blink"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_45_right", "unit45_right_blink"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_38",       "unit38_nostril_dilator"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "au_39",       "unit39_nostril_compressor"));
+	init_viseme_simple( "au_1_left",   "unit1_left_inner_brow_raiser" );
+	init_viseme_simple( "au_1_right",  "unit1_right_inner_brow_raiser");
+	init_viseme_simple( "au_2_left",   "unit2_left_outer_brow_raiser");
+	init_viseme_simple( "au_2_right",  "unit2_right_outer_brow_raiser");
+	init_viseme_simple( "au_4_left",   "unit4_left_brow_raiser");
+	init_viseme_simple( "au_4_right",  "unit4_right_brow_raiser");
+	init_viseme_simple( "au_5",        "unit5_upper_lid_raiser");
+	init_viseme_simple( "au_6",        "unit6_eye_squint");
+	init_viseme_simple( "au_7",        "unit7_lid_tightener");
+	init_viseme_simple( "au_9",        "unit9_nose_wrinkle");
+	init_viseme_simple( "au_10",       "unit10_upper_lip_raiser");
+	init_viseme_simple( "au_12",       "unit12_smile_mouth");
+	init_viseme_simple( "au_15",       "unit15_lip_corner_depressor");
+	init_viseme_simple( "au_20",       "unit20_lip_stretcher");
+	init_viseme_simple( "au_23",       "unit23_lip_tightener");
+	init_viseme_simple( "au_25",       "unit25_lip_parser");
+	init_viseme_simple( "au_26",       "unit26_jaw_drop");
+	init_viseme_simple( "au_27",       "unit27_jaw_stretch_open");
+	init_viseme_simple( "au_45_left",  "unit45_left_blink");
+	init_viseme_simple( "au_45_right", "unit45_right_blink");
+	init_viseme_simple( "au_38",       "unit38_nostril_dilator");
+	init_viseme_simple( "au_39",       "unit39_nostril_compressor");
 
-	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_ao",   "Ao"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_d",    "D"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_ee",   "EE"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_er",   "Er"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_f",    "f"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_kg",   "KG"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_lh",   "lh"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_ng",   "NG"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_oh",   "oh"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_oo",   "OO"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_r",    "R"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_th",   "Th"));
-	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_z",    "Z"));
+	init_viseme_simple( "viseme_ao",   "Ao");
+	init_viseme_simple( "viseme_d",    "D");
+	init_viseme_simple( "viseme_ee",   "EE");
+	init_viseme_simple( "viseme_er",   "Er");
+	init_viseme_simple( "viseme_f",    "f");
+	init_viseme_simple( "viseme_ih",   "Ih");
+	init_viseme_simple( "viseme_j",    "j");
+	init_viseme_simple( "viseme_kg",   "KG");
+	init_viseme_simple( "viseme_oh",   "oh");
+	init_viseme_simple( "viseme_oo",   "OO");
+	init_viseme_simple( "viseme_ng",   "NG");
+	init_viseme_simple( "viseme_r",    "R");
+	init_viseme_simple( "viseme_th",   "Th");
+	init_viseme_simple( "viseme_z",    "Z");
 	
-
+/*
 	viseme_to_channel.insert(pair<const char*, const char*>("unit1_left_inner_brow_raiser","au_1_left"));
 	viseme_to_channel.insert(pair<const char*, const char*>("unit1_right_inner_brow_raiser","au_1_right"));
 	viseme_to_channel.insert(pair<const char*, const char*>("unit2_left_outer_brow_raiser","au_2_left"));
@@ -241,9 +242,34 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	viseme_to_channel.insert(pair<const char*, const char*>("R","viseme_r"));
 	viseme_to_channel.insert(pair<const char*, const char*>("Th","viseme_th"));
 	viseme_to_channel.insert(pair<const char*, const char*>("Z","viseme_z"));
-
+*/
 
 	return( CMD_SUCCESS ); 
+}
+
+SbmCharacter::VisemeImplDataPtr SbmCharacter::init_viseme_simple( const char* channel_name, const char* bonebus_name ) {
+	VisemeImplDataPtr data( new VisemeImplData() );
+	if( bonebus_name ) {
+		data->bonebus_names.push_back( bonebus_name );
+		viseme_impl_data.insert( make_pair( bonebus_name, data ) );
+	}
+	if( channel_name ) {
+		data->channel_names.push_back( channel_name );
+		viseme_impl_data.insert( make_pair( channel_name, data ) );
+	}
+
+	return data;
+}
+
+
+SbmCharacter::VisemeImplDataPtr SbmCharacter::composite_visemes( vector<SbmCharacter::VisemeImplDataPtr> visemes ) {
+	set<const char*> bonebus_names;
+	set<const char*> channel_names;
+
+	VisemeImplDataPtr data( new VisemeImplData() );
+	// TODO
+
+	return data;
 }
 
 
@@ -715,10 +741,10 @@ const std::string& SbmCharacter::get_voice_code() const
 }
 
 
-void SbmCharacter::set_viseme( char* viseme,
-							   float weight,
-							   double start_time,
-							   float rampin_duration )
+int SbmCharacter::set_viseme( char* viseme,
+							  float weight,
+							  double start_time,
+							  float rampin_duration )
 {
     //fprintf( stdout, "Recieved: SbmCharacter(\"%s\")::set_viseme( \"%s\", %f, %f )\n", name, viseme, weight, rampin_duration );
 
@@ -726,50 +752,54 @@ void SbmCharacter::set_viseme( char* viseme,
 
 	// I think this is the corrected code (untested as of 20060719)
 	//NetworkSetViseme( net_handle, viseme, weight, rampin_duration );
-	VisemeNameMap::const_iterator it;
+	VisemeToDataMap::const_iterator it;
 
 	// tolower(viseme) removed until BoneBone visemes are also lowercased
 
-	if ( bonebusCharacter )
-	{
-		const char* joint_id = NULL;
+	it = viseme_impl_data.find( viseme );
+	if( it != viseme_impl_data.end() ) {
+		VisemeImplDataPtr data( it->second );
 
-		it = viseme_to_bbname.find( viseme );
-		if( it != viseme_to_bbname.end() ) {
-			joint_id = it->second;
-		} else {
-			// let BoneBus attempt to find the reference
-			joint_id = viseme;
+		std::vector<const char*>::const_iterator it, end;
+
+		if ( bonebusCharacter ) {
+			// iterate over bonebus_names
+			it  = data->bonebus_names.begin();
+			end = data->bonebus_names.end();
+
+			for( ; it!= end; ++it )
+				bonebusCharacter->SetViseme( *it, weight, rampin_duration );
 		}
 
-		bonebusCharacter->SetViseme(joint_id, weight, rampin_duration );
-	}
+		if( face_ct != NULL ) {
+			// iterate over channel_names
+			it  = data->channel_names.begin();
+			end = data->channel_names.end();
 
-	if( face_ct != NULL ) {
-		// Add controllers to drive the face channels
-		const char* channel_id = NULL;
+			for( ; it!= end; ++it ) {
+				// Add controllers to drive the face channels
+				const char* channel = *it;
 
-		it = viseme_to_channel.find( viseme );
-		if( it != viseme_to_channel.end() ) {
-			channel_id = it->second;
+				ostringstream ct_name;
+				ct_name << "Viseme \"" << viseme << "\", Channel \"" << channel << "\"";
+
+				SkChannelArray channels;
+				channels.add( SkJointName(channel), SkChannel::XPos );
+
+				MeCtRawWriter* ct = new MeCtRawWriter();
+				ct->name( ct_name.str().c_str() );
+				ct->init( channels, true );
+				SrBuffer<float> value;
+				value.size(1);
+				value[0] = (float)weight;
+				ct->set_data(value);
+				head_sched_p->schedule( ct, start_time, rampin_duration, 0 );
+			}
 		}
-
-		if( channel_id != NULL ) {
-			ostringstream ct_name;
-			ct_name << "Viseme \"" << viseme << "\", Channel \"" << channel_id << "\"";
-
-			SkChannelArray channels;
-			channels.add( SkJointName(channel_id ), SkChannel::XPos );
-
-			MeCtRawWriter* ct = new MeCtRawWriter();
-			ct->name( ct_name.str().c_str() );
-			ct->init( channels, true );
-			SrBuffer<float> value;
-			value.size(1);
-			value[0] = (float)weight;
-			ct->set_data(value);
-			head_sched_p->schedule( ct, start_time, rampin_duration, 0 );
-		}
+		return CMD_SUCCESS;
+	} else {
+		cerr << "WARNING: Unknown viseme \"" << viseme << "\" for character \"" << name << "\"." << endl;
+		return CMD_FAILURE;
 	}
 }
 
@@ -1077,8 +1107,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				cerr << "ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"" << char_name << "\"." << endl;
 				return CMD_FAILURE;  // ignore/out-of-domain? But it's not a standard network message.
 			} else {
-				character->set_viseme( viseme, weight, mcu_p->time, rampin_duration );
-				return CMD_SUCCESS;
+				return character->set_viseme( viseme, weight, mcu_p->time, rampin_duration );
 			}
 		}
 	} else if( char_cmd=="bone" ) {

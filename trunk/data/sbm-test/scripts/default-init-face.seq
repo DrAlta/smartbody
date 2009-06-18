@@ -33,20 +33,20 @@
 # Test case: this one should warn of overwrite
 #0	set face au 45		fac_45_blink
 
-0	set face viseme ao	viseme_ao
-0	set face viseme d	viseme_d
-0	set face viseme ee	viseme_ee
-0	set face viseme er	viseme_er
+0	set face viseme Ao	viseme_ao
+0	set face viseme D	viseme_d
+0	set face viseme EE	viseme_ee
+0	set face viseme Er	viseme_er
 0	set face viseme f	viseme_f
-0	set face viseme i	viseme_i
-0	set face viseme kg	viseme_kg
-0	set face viseme lh	viseme_lh
-0	set face viseme ng	viseme_ng
+0	set face viseme j	viseme_j
+0	set face viseme KG	viseme_kg
+0	set face viseme Ih	viseme_ih
+0	set face viseme NG	viseme_ng
 0	set face viseme oh	viseme_oh
-0	set face viseme oo	viseme_oo
-0	set face viseme r	viseme_r
-0	set face viseme th	viseme_th
-0	set face viseme z	viseme_z
+0	set face viseme OO	viseme_oo
+0	set face viseme R	viseme_r
+0	set face viseme Th	viseme_th
+0	set face viseme Z	viseme_z
 
 
 #0	print fac *
