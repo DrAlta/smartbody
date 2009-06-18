@@ -83,10 +83,17 @@ protected:
 	MeCtEyeLid*       eyelid_ct;
 
 	// mapping between new and old ways of referring AUs and visemes
+	typedef struct {
+		// Names used by the BoneBus code
+		std::vector<const char*> bonebus_names;
+		// Channel names used by Motion Engine controllers
+		std::vector<const char*> channel_names;
+	} VisemeImplData;
+	typedef std::map<std::string,const char *> VisemeNameMap;
 	// au_4_left -> unit4_left_brow_raiser
-	std::map<char*,char*>visememapping1;
+	VisemeNameMap viseme_to_bbname;
 	// unit4_left_brow_raiser -> au_4_left 
-	std::map<char*,char*>visememapping2;
+	VisemeNameMap viseme_to_channel;
 
 public:
 	//  Methods

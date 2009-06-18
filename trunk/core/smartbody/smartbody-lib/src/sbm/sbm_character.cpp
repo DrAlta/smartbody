@@ -167,80 +167,80 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 	bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( name, unreal_class, mcuCBHandle::singleton().net_face_bones );
 	
-	visememapping1.insert(pair<char*, char*>("au_1_left","unit1_left_inner_brow_raiser"));
-	visememapping1.insert(pair<char*, char*>("au_1_right","unit1_right_inner_brow_raiser"));
-	visememapping1.insert(pair<char*, char*>("au_2_left","unit2_left_outer_brow_raiser"));
-	visememapping1.insert(pair<char*, char*>("au_2_right","unit2_right_outer_brow_raiser"));
-	visememapping1.insert(pair<char*, char*>("au_4_left","unit4_left_brow_raiser"));
-	visememapping1.insert(pair<char*, char*>("au_4_right","unit4_right_brow_raiser"));
-	visememapping1.insert(pair<char*, char*>("au_5","unit5_upper_lid_raiser"));
-	visememapping1.insert(pair<char*, char*>("au_6","unit6_eye_squint"));
-	visememapping1.insert(pair<char*, char*>("au_7","unit7_lid_tightener"));
-	visememapping1.insert(pair<char*, char*>("au_9","unit9_nose_wrinkle"));
-	visememapping1.insert(pair<char*, char*>("au_10","unit10_upper_lip_raiser"));
-	visememapping1.insert(pair<char*, char*>("au_12","unit12_smile_mouth"));
-	visememapping1.insert(pair<char*, char*>("au_15","unit15_lip_corner_depressor"));
-	visememapping1.insert(pair<char*, char*>("au_20","unit20_lip_stretcher"));
-	visememapping1.insert(pair<char*, char*>("au_23","unit23_lip_tightener"));
-	visememapping1.insert(pair<char*, char*>("au_25","unit25_lip_parser"));
-	visememapping1.insert(pair<char*, char*>("au_26","unit26_jaw_drop"));
-	visememapping1.insert(pair<char*, char*>("au_27","unit27_jaw_stretch_open"));
-	visememapping1.insert(pair<char*, char*>("au_45_left","unit45_left_blink"));
-	visememapping1.insert(pair<char*, char*>("au_45_right","unit45_right_blink"));
-	visememapping1.insert(pair<char*, char*>("au_38","unit38_nostril_dilator"));
-	visememapping1.insert(pair<char*, char*>("au_39","unit39_nostril_compressor"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_1_left",   "unit1_left_inner_brow_raiser"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_1_right",  "unit1_right_inner_brow_raiser"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_2_left",   "unit2_left_outer_brow_raiser"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_2_right",  "unit2_right_outer_brow_raiser"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_4_left",   "unit4_left_brow_raiser"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_4_right",  "unit4_right_brow_raiser"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_5",        "unit5_upper_lid_raiser"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_6",        "unit6_eye_squint"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_7",        "unit7_lid_tightener"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_9",        "unit9_nose_wrinkle"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_10",       "unit10_upper_lip_raiser"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_12",       "unit12_smile_mouth"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_15",       "unit15_lip_corner_depressor"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_20",       "unit20_lip_stretcher"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_23",       "unit23_lip_tightener"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_25",       "unit25_lip_parser"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_26",       "unit26_jaw_drop"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_27",       "unit27_jaw_stretch_open"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_45_left",  "unit45_left_blink"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_45_right", "unit45_right_blink"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_38",       "unit38_nostril_dilator"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "au_39",       "unit39_nostril_compressor"));
 
-	visememapping1.insert(pair<char*, char*>("viseme_ao","Ao"));
-	visememapping1.insert(pair<char*, char*>("viseme_d","D"));
-	visememapping1.insert(pair<char*, char*>("viseme_ee","EE"));
-	visememapping1.insert(pair<char*, char*>("viseme_er","Er"));
-	visememapping1.insert(pair<char*, char*>("viseme_f","f"));
-	visememapping1.insert(pair<char*, char*>("viseme_kg","KG"));
-	visememapping1.insert(pair<char*, char*>("viseme_lh","lh"));
-	visememapping1.insert(pair<char*, char*>("viseme_ng","NG"));
-	visememapping1.insert(pair<char*, char*>("viseme_oh","oh"));
-	visememapping1.insert(pair<char*, char*>("viseme_oo","OO"));
-	visememapping1.insert(pair<char*, char*>("viseme_r","R"));
-	visememapping1.insert(pair<char*, char*>("viseme_th","Th"));
-	visememapping1.insert(pair<char*, char*>("viseme_z","Z"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_ao",   "Ao"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_d",    "D"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_ee",   "EE"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_er",   "Er"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_f",    "f"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_kg",   "KG"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_lh",   "lh"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_ng",   "NG"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_oh",   "oh"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_oo",   "OO"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_r",    "R"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_th",   "Th"));
+	viseme_to_bbname.insert(pair<const char*, const char*>( "viseme_z",    "Z"));
 	
 
-	visememapping2.insert(pair<char*, char*>("unit1_left_inner_brow_raiser","au_1_left"));
-	visememapping2.insert(pair<char*, char*>("unit1_right_inner_brow_raiser","au_1_right"));
-	visememapping2.insert(pair<char*, char*>("unit2_left_outer_brow_raiser","au_2_left"));
-	visememapping2.insert(pair<char*, char*>("unit2_right_outer_brow_raiser","au_2_right"));
-	visememapping2.insert(pair<char*, char*>("unit4_left_brow_raiser","au_4_left"));
-	visememapping2.insert(pair<char*, char*>("unit4_right_brow_raiser","au_4_right"));
-	visememapping2.insert(pair<char*, char*>("unit5_upper_lid_raiser","au_5"));
-	visememapping2.insert(pair<char*, char*>("unit6_eye_squint","au_6"));
-	visememapping2.insert(pair<char*, char*>("unit7_lid_tightener","au_7"));
-	visememapping2.insert(pair<char*, char*>("unit9_nose_wrinkle","au_9"));
-	visememapping2.insert(pair<char*, char*>("unit10_upper_lip_raiser","au_10"));
-	visememapping2.insert(pair<char*, char*>("unit12_smile_mouth","au_12"));
-	visememapping2.insert(pair<char*, char*>("unit15_lip_corner_depressor","au_15"));
-	visememapping2.insert(pair<char*, char*>("unit20_lip_stretcher","au_20"));
-	visememapping2.insert(pair<char*, char*>("unit23_lip_tightener","au_23"));
-	visememapping1.insert(pair<char*, char*>("unit25_lip_parser","au_25"));
-	visememapping1.insert(pair<char*, char*>("unit26_jaw_drop","au_26"));
-	visememapping1.insert(pair<char*, char*>("unit27_jaw_stretch_open","au_27"));
-	visememapping1.insert(pair<char*, char*>("unit45_left_blink","au_45_left"));
-	visememapping1.insert(pair<char*, char*>("unit45_right_blink","au_45_right"));
-	visememapping1.insert(pair<char*, char*>("unit38_nostril_dilator","au_38"));
-	visememapping1.insert(pair<char*, char*>("unit39_nostril_compressor","au_39"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit1_left_inner_brow_raiser","au_1_left"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit1_right_inner_brow_raiser","au_1_right"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit2_left_outer_brow_raiser","au_2_left"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit2_right_outer_brow_raiser","au_2_right"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit4_left_brow_raiser","au_4_left"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit4_right_brow_raiser","au_4_right"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit5_upper_lid_raiser","au_5"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit6_eye_squint","au_6"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit7_lid_tightener","au_7"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit9_nose_wrinkle","au_9"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit10_upper_lip_raiser","au_10"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit12_smile_mouth","au_12"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit15_lip_corner_depressor","au_15"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit20_lip_stretcher","au_20"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit23_lip_tightener","au_23"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit25_lip_parser","au_25"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit26_jaw_drop","au_26"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit27_jaw_stretch_open","au_27"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit45_left_blink","au_45_left"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit45_right_blink","au_45_right"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit38_nostril_dilator","au_38"));
+	viseme_to_channel.insert(pair<const char*, const char*>("unit39_nostril_compressor","au_39"));
 
-	visememapping2.insert(pair<char*, char*>("ao","viseme_ao"));
-	visememapping2.insert(pair<char*, char*>("d","viseme_d"));
-	visememapping2.insert(pair<char*, char*>("ee","viseme_ee"));
-	visememapping2.insert(pair<char*, char*>("er","viseme_er"));
-	visememapping2.insert(pair<char*, char*>("f","viseme_f"));
-	visememapping2.insert(pair<char*, char*>("kg","viseme_kg"));
-	visememapping2.insert(pair<char*, char*>("lh","viseme_lh"));
-	visememapping2.insert(pair<char*, char*>("ng","viseme_ng"));
-	visememapping2.insert(pair<char*, char*>("oh","viseme_oh"));
-	visememapping2.insert(pair<char*, char*>("oo","viseme_oo"));
-	visememapping2.insert(pair<char*, char*>("r","viseme_r"));
-	visememapping2.insert(pair<char*, char*>("th","viseme_th"));
-	visememapping2.insert(pair<char*, char*>("z","viseme_z"));
+	viseme_to_channel.insert(pair<const char*, const char*>("Ao","viseme_ao"));
+	viseme_to_channel.insert(pair<const char*, const char*>("D","viseme_d"));
+	viseme_to_channel.insert(pair<const char*, const char*>("EE","viseme_ee"));
+	viseme_to_channel.insert(pair<const char*, const char*>("Er","viseme_er"));
+	viseme_to_channel.insert(pair<const char*, const char*>("f","viseme_f"));
+	viseme_to_channel.insert(pair<const char*, const char*>("kg","viseme_kg"));
+	viseme_to_channel.insert(pair<const char*, const char*>("Ih","viseme_ih"));
+	viseme_to_channel.insert(pair<const char*, const char*>("NG","viseme_ng"));
+	viseme_to_channel.insert(pair<const char*, const char*>("oh","viseme_oh"));
+	viseme_to_channel.insert(pair<const char*, const char*>("OO","viseme_oo"));
+	viseme_to_channel.insert(pair<const char*, const char*>("R","viseme_r"));
+	viseme_to_channel.insert(pair<const char*, const char*>("Th","viseme_th"));
+	viseme_to_channel.insert(pair<const char*, const char*>("Z","viseme_z"));
 
 
 	return( CMD_SUCCESS ); 
@@ -726,83 +726,51 @@ void SbmCharacter::set_viseme( char* viseme,
 
 	// I think this is the corrected code (untested as of 20060719)
 	//NetworkSetViseme( net_handle, viseme, weight, rampin_duration );
-	char* joint_id = NULL;	
-	int viseme_len = 0;
-	map<char*,char*>::const_iterator i, end;
+	VisemeNameMap::const_iterator it;
 
-	while(viseme[viseme_len] != '\0') viseme_len++;
-
-	char* non_cap_viseme = new char[viseme_len+1];
-	for (int j=0;j<=viseme_len;j++){
-		if(viseme[j] >= 'A' && viseme[j] <= 'Z' && j < viseme_len){
-            non_cap_viseme[j] = 32+viseme[j];
-		}else{
-			non_cap_viseme[j] = viseme[j];
-		}
-	}
+	// tolower(viseme) removed until BoneBone visemes are also lowercased
 
 	if ( bonebusCharacter )
 	{
-		i   = visememapping2.begin();
-		end = visememapping2.end();
-		
-		for(; i != end; ++i ) {
-			if (strcmp(i->first, non_cap_viseme)==0){
-				joint_id = viseme;
-				break;
-			}
-		}
-		
-		if (joint_id == NULL){
-			i   = visememapping1.begin();
-			end = visememapping1.end();
-				
-			for(; i != end; ++i ) {
-				if (strcmp(i->first, non_cap_viseme)==0){
-					joint_id = i->second;
-				}
-			}
-		}
-		
-		if (joint_id == NULL) joint_id = viseme;
-		bonebusCharacter->SetViseme(joint_id, weight, rampin_duration );
-		return;
-	}
+		const char* joint_id = NULL;
 
-
-	
-	i   = visememapping1.begin();
-	end = visememapping1.end();
-	
-	for(; i != end; ++i ) {
-		if (strcmp(i->first, viseme)==0){
+		it = viseme_to_bbname.find( viseme );
+		if( it != viseme_to_bbname.end() ) {
+			joint_id = it->second;
+		} else {
+			// let BoneBus attempt to find the reference
 			joint_id = viseme;
-			break;
 		}
-	}
-	
-	if (joint_id == NULL){
-		i   = visememapping2.begin();
-		end = visememapping2.end();
-			
-		for(; i != end; ++i ) {
-			if (strcmp(i->first, non_cap_viseme)==0){
-				joint_id = i->second;
-			}
-		}
-	}
-	SkChannelArray channels;
-	channels.add( SkJointName(joint_id ), SkChannel::XPos );
 
-	MeCtRawWriter* ct = new MeCtRawWriter();
-	ct->name( viseme );
-	ct->init( channels, true );
-	SrBuffer<float> value;
-	value.size(1);
-	value[0] = (float)weight;
-	ct->set_data(value);
-	head_sched_p->schedule( ct, start_time, rampin_duration, 0 );
-	
+		bonebusCharacter->SetViseme(joint_id, weight, rampin_duration );
+	}
+
+	if( face_ct != NULL ) {
+		// Add controllers to drive the face channels
+		const char* channel_id = NULL;
+
+		it = viseme_to_channel.find( viseme );
+		if( it != viseme_to_channel.end() ) {
+			channel_id = it->second;
+		}
+
+		if( channel_id != NULL ) {
+			ostringstream ct_name;
+			ct_name << "Viseme \"" << viseme << "\", Channel \"" << channel_id << "\"";
+
+			SkChannelArray channels;
+			channels.add( SkJointName(channel_id ), SkChannel::XPos );
+
+			MeCtRawWriter* ct = new MeCtRawWriter();
+			ct->name( ct_name.str().c_str() );
+			ct->init( channels, true );
+			SrBuffer<float> value;
+			value.size(1);
+			value[0] = (float)weight;
+			ct->set_data(value);
+			head_sched_p->schedule( ct, start_time, rampin_duration, 0 );
+		}
+	}
 }
 
 
