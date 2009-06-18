@@ -82,18 +82,21 @@ protected:
 	MeCtFace*         face_ct;
 	MeCtEyeLid*       eyelid_ct;
 
-	// mapping between new and old ways of referring AUs and visemes
-	typedef struct {
-		// Names used by the BoneBus code
-		std::vector<const char*> bonebus_names;
-		// Channel names used by Motion Engine controllers
+	// The term "viseme" in the following variables is a misnomer,
+	// and may also refer to an action unit or other face shape.
+	// They are all controlled by the "character .. viseme .." command.
+
+	// Strings used to control a viseme.
+	struct VisemeImplData {
+		// Channel names used by Motion Engine controllers (i.e., -facebone mode)
 		std::vector<const char*> channel_names;
-	} VisemeImplData;
-	typedef std::map<std::string,const char *> VisemeNameMap;
-	// au_4_left -> unit4_left_brow_raiser
-	VisemeNameMap viseme_to_bbname;
-	// unit4_left_brow_raiser -> au_4_left 
-	VisemeNameMap viseme_to_channel;
+		// Names used by the BoneBus code (renderer-side implementation)
+		std::vector<const char*> bonebus_names;
+	};
+	typedef boost::shared_ptr<VisemeImplData> VisemeImplDataPtr;
+	// Mapping of viseme name to its implementation data. 
+	typedef std::map<std::string,VisemeImplDataPtr> VisemeToDataMap;
+	VisemeToDataMap viseme_impl_data;
 
 public:
 	//  Methods
@@ -149,7 +152,7 @@ public:
 
 	BoneBusCharacter * bonebusCharacter;
 	
-	void set_viseme( char* viseme, float weight , double start_time, float rampin_duration );
+	int set_viseme( char* viseme, float weight , double start_time, float rampin_duration );
 
 	bool   eye_blink_closed;
 	double eye_blink_last_time;
@@ -210,6 +213,16 @@ protected:
 	 *   SbmPawn inserts world_offset joint above the existing root.
 	 */
 	virtual int init_skeleton();
+
+	/*!
+	 *   Initializes a viseme that is implemented by one channel and/or one bonebus command.
+	 *   Either parameter may be NULL.
+	 */
+	VisemeImplDataPtr init_viseme_simple( const char* channel_name, const char* bonebus_name );
+
+	/*!
+	 */
+	VisemeImplDataPtr composite_visemes( std::vector<VisemeImplDataPtr> visemes );
 
 	int set_world_offset_cmd( srArgBuffer& args );
 

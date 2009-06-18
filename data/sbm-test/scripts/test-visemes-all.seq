@@ -10,8 +10,8 @@
 2	char doctor viseme 		EE 	0	1
 4	char doctor viseme 		Er	1	1
 6	char doctor viseme 		Er	0	1
-8	char doctor viseme 		lh	1	1
-10	char doctor viseme 		lh	0	1
+8	char doctor viseme 		Ih	1	1
+10	char doctor viseme 		Ih	0	1
 12	char doctor viseme 		Ao	1	1
 14	char doctor viseme 		Ao	0	1
 16	char doctor viseme 		oh	1	1
