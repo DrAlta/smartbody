@@ -12,7 +12,7 @@
 0	seq common-init
 
 0	echo >>> Loading data/sbm-test assets...
-#0	seq default-init-face
+0	seq default-init-face
 0	load motions ../../../../data/sbm-test/common-sk/motion
 0	load motions ../../../../data/sbm-test/common-sk/step
 0	load motions ../../../../data/sbm-test/common-sk/qdraw
