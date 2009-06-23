@@ -88,13 +88,14 @@ protected:
 
 	// Strings used to control a viseme.
 	struct VisemeImplData {
-		// Channel names used by Motion Engine controllers (i.e., -facebone mode)
-		std::vector<const char*> channel_names;
 		// Names used by the BoneBus code (renderer-side implementation)
-		std::vector<const char*> bonebus_names;
+		std::vector<std::string> bonebus_names;
+		// Channel names used by Motion Engine controllers (i.e., -facebone mode)
+		std::vector<std::string> channel_names;
 	};
 	typedef boost::shared_ptr<VisemeImplData> VisemeImplDataPtr;
 	// Mapping of viseme name to its implementation data. 
+	typedef std::vector<VisemeImplDataPtr> VecVisemeImplData;
 	typedef std::map<std::string,VisemeImplDataPtr> VisemeToDataMap;
 	VisemeToDataMap viseme_impl_data;
 
