@@ -190,20 +190,23 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	init_viseme_simple( "au_38",       "unit38_nostril_dilator");
 	init_viseme_simple( "au_39",       "unit39_nostril_compressor");
 
-	init_viseme_simple( "viseme_ao",   "Ao");
-	init_viseme_simple( "viseme_d",    "D");
-	init_viseme_simple( "viseme_ee",   "EE");
-	init_viseme_simple( "viseme_er",   "Er");
-	init_viseme_simple( "viseme_f",    "f");
-	init_viseme_simple( "viseme_ih",   "Ih");
-	init_viseme_simple( "viseme_j",    "j");
-	init_viseme_simple( "viseme_kg",   "KG");
-	init_viseme_simple( "viseme_oh",   "oh");
-	init_viseme_simple( "viseme_oo",   "OO");
-	init_viseme_simple( "viseme_ng",   "NG");
-	init_viseme_simple( "viseme_r",    "R");
-	init_viseme_simple( "viseme_th",   "Th");
-	init_viseme_simple( "viseme_z",    "Z");
+	VecVisemeImplData visemes;
+	visemes.push_back( init_viseme_simple( "viseme_ao",   "Ao") );
+	visemes.push_back( init_viseme_simple( "viseme_d",    "D") );
+	visemes.push_back( init_viseme_simple( "viseme_ee",   "EE") );
+	visemes.push_back( init_viseme_simple( "viseme_er",   "Er") );
+	visemes.push_back( init_viseme_simple( "viseme_f",    "f") );
+	visemes.push_back( init_viseme_simple( "viseme_ih",   "Ih") );
+	visemes.push_back( init_viseme_simple( "viseme_j",    "j") );
+	visemes.push_back( init_viseme_simple( "viseme_kg",   "KG") );
+	visemes.push_back( init_viseme_simple( "viseme_oh",   "oh") );
+	visemes.push_back( init_viseme_simple( "viseme_oo",   "OO") );
+	visemes.push_back( init_viseme_simple( "viseme_ng",   "NG") );
+	visemes.push_back( init_viseme_simple( "viseme_r",    "R") );
+	visemes.push_back( init_viseme_simple( "viseme_th",   "Th") );
+	visemes.push_back( init_viseme_simple( "viseme_z",    "Z") );
+
+	viseme_impl_data.insert( make_pair( "ALL", composite_visemes( visemes ) ) );
 	
 /*
 	viseme_to_channel.insert(pair<const char*, const char*>("unit1_left_inner_brow_raiser","au_1_left"));
@@ -262,12 +265,31 @@ SbmCharacter::VisemeImplDataPtr SbmCharacter::init_viseme_simple( const char* ch
 }
 
 
-SbmCharacter::VisemeImplDataPtr SbmCharacter::composite_visemes( vector<SbmCharacter::VisemeImplDataPtr> visemes ) {
-	set<const char*> bonebus_names;
-	set<const char*> channel_names;
+SbmCharacter::VisemeImplDataPtr SbmCharacter::composite_visemes( VecVisemeImplData visemes ) {
+	// Temporarily store names in a set to prevent duplicates
+	set<string> bonebus_names, channel_names;
+
+	{
+		VecVisemeImplData::iterator it = visemes.begin();
+		VecVisemeImplData::iterator end = visemes.end();
+		for( ; it != end; ++it ) {
+			// Add all bonebus names
+			bonebus_names.insert( (*it)->bonebus_names.begin(), (*it)->bonebus_names.end() );
+			// Add all channel names
+			channel_names.insert( (*it)->channel_names.begin(), (*it)->channel_names.end() );
+		}
+	}
 
 	VisemeImplDataPtr data( new VisemeImplData() );
-	// TODO
+	// Add all bonebus and channel names in set into the new VisemeImplData
+	data->bonebus_names.insert(
+		data->bonebus_names.end(),
+		bonebus_names.begin(), bonebus_names.end()
+	);
+	data->channel_names.insert(
+		data->channel_names.end(),
+		channel_names.begin(), channel_names.end()
+	);
 
 	return data;
 }
@@ -760,7 +782,7 @@ int SbmCharacter::set_viseme( char* viseme,
 	if( it != viseme_impl_data.end() ) {
 		VisemeImplDataPtr data( it->second );
 
-		std::vector<const char*>::const_iterator it, end;
+		std::vector<string>::const_iterator it, end;
 
 		if ( bonebusCharacter ) {
 			// iterate over bonebus_names
@@ -768,7 +790,7 @@ int SbmCharacter::set_viseme( char* viseme,
 			end = data->bonebus_names.end();
 
 			for( ; it!= end; ++it )
-				bonebusCharacter->SetViseme( *it, weight, rampin_duration );
+				bonebusCharacter->SetViseme( it->c_str(), weight, rampin_duration );
 		}
 
 		if( face_ct != NULL ) {
@@ -778,7 +800,7 @@ int SbmCharacter::set_viseme( char* viseme,
 
 			for( ; it!= end; ++it ) {
 				// Add controllers to drive the face channels
-				const char* channel = *it;
+				const char* channel = it->c_str();
 
 				ostringstream ct_name;
 				ct_name << "Viseme \"" << viseme << "\", Channel \"" << channel << "\"";

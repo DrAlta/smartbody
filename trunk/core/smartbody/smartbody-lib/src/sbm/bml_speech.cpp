@@ -490,7 +490,11 @@ void BML::SpeechRequest::unschedule( mcuCBHandle* mcu,
 	                            time_sec duration )
 {
 	unschedule_sequence( mcu );
-	// TODO: Force mouth closed?  What about cometing viseme sequences?
+
+	// Clear visemes
+	ostringstream cmd;
+	cmd << "char " << request->actor->name << " viseme ALL 0 " << duration;
+	mcu->execute_later( cmd.str().c_str(), 0 );
 
 	if( !audioStop.empty() )
 		mcu->execute_later( audioStop.c_str() );
