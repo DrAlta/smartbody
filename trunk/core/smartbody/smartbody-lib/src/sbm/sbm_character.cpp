@@ -81,15 +81,10 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	motion_sched_p( CreateSchedulerCt( character_name, "motion" ) ),
 	gaze_sched_p( CreateSchedulerCt( character_name, "gaze" ) ),
 	head_sched_p( CreateSchedulerCt( character_name, "head" ) ),
-	face_ct( new MeCtFace() ),
+	face_ct( NULL ),
 	eyelid_ct( new MeCtEyeLid() ),
 	face_neutral( NULL )
 {
-	face_ct->ref();
-	string face_ct_name( character_name );
-	face_ct_name += "'s face_ct";
-	face_ct->name( face_ct_name.c_str() );
-
 	eyelid_ct->ref();
 
 	bonebusCharacter = NULL;
@@ -105,7 +100,8 @@ SbmCharacter::~SbmCharacter( void )	{
 	motion_sched_p->unref();
 	gaze_sched_p->unref();
 	head_sched_p->unref();
-	face_ct->unref();
+	if( face_ct )
+		face_ct->unref();
 	eyelid_ct->unref();
 
     if ( bonebusCharacter )
@@ -123,6 +119,14 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
                         const char* unreal_class )
 {
 	if( face_neutral ) {
+		// Assume the rest of the face channel data is also set
+		face_ct = new MeCtFace();
+		face_ct->ref();
+
+		string face_ct_name( name );
+		face_ct_name += "'s face_ct";
+		face_ct->name( face_ct_name.c_str() );
+
 		// Store pointers for access via init_skeleton()
 		this->face_neutral      = face_neutral;
 		face_neutral->ref();
@@ -195,11 +199,20 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	visemes.push_back( init_viseme_simple( "viseme_d",    "D") );
 	visemes.push_back( init_viseme_simple( "viseme_ee",   "EE") );
 	visemes.push_back( init_viseme_simple( "viseme_er",   "Er") );
-	visemes.push_back( init_viseme_simple( "viseme_f",    "f") );
+	{
+		VisemeImplDataPtr viseme_f = init_viseme_simple( "viseme_f", "f");
+		viseme_impl_data.insert( make_pair( "F", viseme_f ) );  // Compatibility patch...
+		visemes.push_back( viseme_f );
+	}
 	visemes.push_back( init_viseme_simple( "viseme_ih",   "Ih") );
 	visemes.push_back( init_viseme_simple( "viseme_j",    "j") );
 	visemes.push_back( init_viseme_simple( "viseme_kg",   "KG") );
 	visemes.push_back( init_viseme_simple( "viseme_oh",   "oh") );
+	{
+		VisemeImplDataPtr viseme_oh = init_viseme_simple( "viseme_oh", "oh");
+		viseme_impl_data.insert( make_pair( "Oh", viseme_oh ) );  // Compatibility patch...
+		visemes.push_back( viseme_oh );
+	}
 	visemes.push_back( init_viseme_simple( "viseme_oo",   "OO") );
 	visemes.push_back( init_viseme_simple( "viseme_ng",   "NG") );
 	visemes.push_back( init_viseme_simple( "viseme_r",    "R") );
@@ -207,6 +220,10 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	visemes.push_back( init_viseme_simple( "viseme_z",    "Z") );
 
 	viseme_impl_data.insert( make_pair( "ALL", composite_visemes( visemes ) ) );
+
+	VisemeImplDataPtr closed_mouth( new VisemeImplData() );  // Does nothing, but signals as recognized
+	viseme_impl_data.insert( make_pair( "_", closed_mouth ) );
+	viseme_impl_data.insert( make_pair( "BMP", closed_mouth ) );
 	
 /*
 	viseme_to_channel.insert(pair<const char*, const char*>("unit1_left_inner_brow_raiser","au_1_left"));

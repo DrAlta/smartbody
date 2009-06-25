@@ -1114,7 +1114,9 @@ int mcu_character_init(
 		return CMD_FAILURE;
 	}
 
-	err = char_p->init( skeleton_p, mcu_p->face_neutral_p, &mcu_p->au_motion_map, &mcu_p->viseme_map, unreal_class );
+	// Only initialize face_neutral if -facebone is enabled
+	SkMotion* face_neutral_p = mcu_p->net_face_bones? mcu_p->face_neutral_p : NULL;
+	err = char_p->init( skeleton_p, face_neutral_p, &mcu_p->au_motion_map, &mcu_p->viseme_map, unreal_class );
 	if( err == CMD_SUCCESS ) {
 		char_p->pipeline_p->set_evaluation_logger( mcu_p->logger_p );
 
