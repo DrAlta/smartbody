@@ -171,12 +171,10 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 	bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( name, unreal_class, mcuCBHandle::singleton().net_face_bones );
 	
-	init_viseme_simple( "au_1_left",   "unit1_left_inner_brow_raiser" );
-	init_viseme_simple( "au_1_right",  "unit1_right_inner_brow_raiser");
-	init_viseme_simple( "au_2_left",   "unit2_left_outer_brow_raiser");
-	init_viseme_simple( "au_2_right",  "unit2_right_outer_brow_raiser");
-	init_viseme_simple( "au_4_left",   "unit4_left_brow_raiser");
-	init_viseme_simple( "au_4_right",  "unit4_right_brow_raiser");
+	init_visemes_left_right_channels( "au_1", "unit1_inner_brow_raiser" );
+	init_visemes_left_right_channels( "au_2", "unit2_outer_brow_raiser" );
+	init_visemes_left_right_channels( "au_4", "unit4_inner_brow_lowerer" );
+
 	init_viseme_simple( "au_5",        "unit5_upper_lid_raiser");
 	init_viseme_simple( "au_6",        "unit6_eye_squint");
 	init_viseme_simple( "au_7",        "unit7_lid_tightener");
@@ -211,6 +209,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	{
 		VisemeImplDataPtr viseme_oh = init_viseme_simple( "viseme_oh", "oh");
 		viseme_impl_data.insert( make_pair( "Oh", viseme_oh ) );  // Compatibility patch...
+		viseme_impl_data.insert( make_pair( "OW", viseme_oh ) );  // Compatibility patch...  TODO: Fix in RVoiceRelay lines 164 & 214 (and others?)
 		visemes.push_back( viseme_oh );
 	}
 	visemes.push_back( init_viseme_simple( "viseme_oo",   "OO") );
@@ -281,6 +280,41 @@ SbmCharacter::VisemeImplDataPtr SbmCharacter::init_viseme_simple( const char* ch
 	return data;
 }
 
+/*!
+ *   Initializes a set of visemes for relate left and right components.
+ *   Bonebus does not implement independent left and right variants, but the face controller often does.
+ *   This method registers the independent channel implementations, as well as a unified viseme of both channels
+ *   and the single bonebus name.
+ */
+SbmCharacter::VisemeImplDataPtr SbmCharacter::init_visemes_left_right_channels( const char* channel_name, const char* bonebus_name ) {
+	VisemeImplDataPtr left_right;
+	if( channel_name ) {
+		int len = strlen( channel_name );
+		VecVisemeImplData vec;
+
+		string channel_left( channel_name );
+		channel_left.append( "_left" );
+		vec.push_back( init_viseme_simple( channel_left.c_str(), NULL ) );
+		
+		string channel_right( channel_name );
+		channel_right.append( "_right" );
+		vec.push_back( init_viseme_simple( channel_left.c_str(), NULL ) );
+
+		left_right = composite_visemes( vec );
+	} else {
+		left_right.reset( new VisemeImplData() );
+	}
+
+	if( bonebus_name ) {
+		left_right->bonebus_names.push_back( bonebus_name );
+		viseme_impl_data.insert( make_pair( bonebus_name, left_right ) );
+	}
+	if( channel_name ) {
+		viseme_impl_data.insert( make_pair( channel_name, left_right ) );
+	}
+
+	return left_right;
+}
 
 SbmCharacter::VisemeImplDataPtr SbmCharacter::composite_visemes( VecVisemeImplData visemes ) {
 	// Temporarily store names in a set to prevent duplicates
