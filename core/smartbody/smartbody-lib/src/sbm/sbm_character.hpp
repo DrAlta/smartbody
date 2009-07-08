@@ -222,6 +222,14 @@ protected:
 	VisemeImplDataPtr init_viseme_simple( const char* channel_name, const char* bonebus_name );
 
 	/*!
+	 *   Initializes a set of visemes for relate left and right components.
+	 *   Bonebus does not implement independent left and right variants, but the face controller often does.
+	 *   This method registers the independent channel implementations, as well as a unified viseme of both channels
+	 *   and the single bonebus name.
+	 */
+	VisemeImplDataPtr init_visemes_left_right_channels( const char* channel_name, const char* bonebus_name );
+
+	/*!
 	 */
 	VisemeImplDataPtr composite_visemes( std::vector<VisemeImplDataPtr> visemes );
 
