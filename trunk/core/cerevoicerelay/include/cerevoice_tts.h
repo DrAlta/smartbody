@@ -19,6 +19,8 @@
    CONTRIBUTORS:
       Edward Fast, USC
       Thomas Amundsen, USC
+      Arno Hartholt, USC
+	  Abhinav Golas, USC
 */
 
 #ifndef CEREVOICE_TTS_H

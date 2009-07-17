@@ -45,4 +45,12 @@ are critical for a production environment:
 
 4.) The code has little documentation.  :(
 
+Changelog:
 
+July 17, 2009
+1.) Code now uses bookmark(or mark) XML tags in SSML message instead of
+    generating ones at the end using sp1:T<> nomenclature. Arbitrary 
+    tags can now be used
+
+2.) Code now has some rudimentary documentation, which should make it a 
+    little easier to understand the inner workings
