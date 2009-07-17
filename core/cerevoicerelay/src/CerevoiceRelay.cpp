@@ -20,6 +20,7 @@
       Edward Fast, USC
       Thomas Amundsen, USC
       Arno Hartholt, USC
+	  Abhinav Golas, USC
 */
 
 #include "vhcl.h"
@@ -36,6 +37,20 @@
 #include "tt_utils.h"
 #include "cerevoice_tts.h"
 
+/// Debug support code - enable to get a dump of all incoming and outgoing messages from this code
+/// Enable this define to get dumps
+//#define _DUMP_COMM_TO_DISK
+
+#ifdef _DUMP_COMM_TO_DISK
+FILE *_infile = fopen("cere_incoming.txt","w");
+FILE *_outfile = fopen("cere_outgoing.txt","w");
+
+FILE *_inXML = fopen("cere_incoming_xml.txt","w");
+FILE *_outXML = fopen("cere_outgoing_xml.txt","w");
+int _dumpCounter = 0;
+#endif
+
+
 
 const int NETWORK_PORT_TCP = 1314;
 const char * host_name;
@@ -48,6 +63,7 @@ bool bServerMode;
 
 int InitWinsock( const char * network_host )
 {
+	fprintf(stderr, "Notify: Opening TCP/IP connection to network host: %s\n",network_host);
    WSADATA WSAData;
    INT Code = WSAStartup( MAKEWORD(2,2), &WSAData );
 
@@ -135,7 +151,7 @@ void CloseWinsock()
    WSACleanup();
 }
 
-
+/// Processes RemoteSpeechCmd messages to generate audio
 void process_message( const char * message )
 {
    std::string message_c = message;
@@ -145,6 +161,7 @@ void process_message( const char * message )
    const std::string delimiters = " ";
    vhcl::Tokenize( message_c, tokens, delimiters );
 
+   /// Get non-XML components of the message
    std::string command = tokens.at( 0 );
 
    std::string agent_name = tokens.at( 1 );
@@ -154,20 +171,29 @@ void process_message( const char * message )
    size_t prefix_length = message_c.find( file_name, 0 ) + file_name.length() + 1;
    std::string utterance = message_c.substr( prefix_length );  // strip off the prefix, only using the xml
 
+#ifdef _DUMP_COMM_TO_DISK
+   fprintf(_inXML,"%d: %s\n\n",_dumpCounter - 1, utterance.c_str());
+#endif
    // remove anything after </speech> tag
    size_t postfix_pos = utterance.rfind( "</speech>" );
    if ( postfix_pos != std::string::npos )
       utterance = utterance.substr( 0, postfix_pos + 9 );
 
-   //parse out just the sound file name and give it a .wav file type
+   // parse out just the sound file name and give it a .wav file type
    int pos = file_name.find( ".aiff" );
    int pos2 = file_name.find( "utt" );
    file_name = file_name.substr( pos2, pos - pos2 ) + ".wav";
 
    // Create file name relative to cerevoice relay
+   /**
+    * Clarification: 
+	*			cereproc_file_name refers to the path that cereproc needs to write to, relative to the path from where this program is running
+	*			player_file_name refers to the path that Unreal or some other renderer will play the file from, i.e. relative to the path where it is running
+	*/
    std::string cereproc_file_name = tts->temp_audio_dir_cereproc + file_name;
    std::string player_file_name = tts->temp_audio_dir_player + file_name;
 
+   /// Generate the audio
    std::string xml = tts->tts( utterance.c_str(), cereproc_file_name.c_str(), player_file_name.c_str(), voice_id );
 
    // Only send out a reply when result is not empty, ignore otherwise as a nother voice relay might pick up the request
@@ -181,6 +207,11 @@ void process_message( const char * message )
    
       printf( "REPLY: %s\n", reply.c_str() );
 
+#ifdef _DUMP_COMM_TO_DISK
+	  fprintf(_outfile, "%d: %s\n\n",_dumpCounter - 1,reply.c_str());
+	  std::string dumpXMLstring = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + xml;
+	  fprintf(_outXML, "%d: %s\n\n", _dumpCounter - 1, dumpXMLstring.c_str() );
+#endif
       ttu_notify2( "RemoteSpeechReply", reply.c_str() );
    }
 }
@@ -203,9 +234,12 @@ std::string remove_spaces_and_double_quotes ( char * c )
    return s;
 }
 
-
+/// Process all Vhmsg/Elvin messages
 void elvin_callback( char * op, char * args, void * userData )
 {
+#ifdef _DUMP_COMM_TO_DISK
+	fprintf(_infile,"%d: OP: %s :ARGS: %s \n\n",_dumpCounter++, op,args);
+#endif
    printf( "received -- op: %s args: %s\n", op, args );
 
    if ( strcmp( op, "RemoteSpeechCmd" ) == 0 )
@@ -269,6 +303,12 @@ void elvin_callback( char * op, char * args, void * userData )
       {
          printf( "Kill message received." );
          ttu_notify2( "vrProcEnd", "rvoice cerevoicerelay" );
+#ifdef _DUMP_COMM_TO_DISK
+		 fclose(_infile);
+		 fclose(_outfile);
+		 fclose(_inXML);
+		 fclose(_outXML);
+#endif
          exit(0);
 	  }
    }

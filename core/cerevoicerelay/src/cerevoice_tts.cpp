@@ -20,12 +20,14 @@
       Edward Fast, USC
       Thomas Amundsen, USC
       Arno Hartholt, USC
+	  Abhinav Golas, USC
 */
 
 #include "vhcl.h"
 #include "cerevoice_tts.h"
 
 #include <map>
+#include <algorithm>
 #include <sstream>
 #include <fstream>
 #include <conio.h>
@@ -44,6 +46,26 @@
 #include <iostream.h>
 #endif
 #include <xercesc/util/OutOfMemoryException.hpp>
+
+/// New Modifications to better use XML structure of input message
+
+#include <xercesc/parsers/XercesDOMParser.hpp>
+#include <xercesc/framework/MemBufInputSource.hpp>
+#include <xercesc/dom/DOMErrorHandler.hpp>
+#include <xercesc/util/XMLString.hpp>
+#include <vector>
+
+/// Structure to store XML speech request message metadata
+struct SpeechRequestMessageData {
+	/// List of timing tags, and the corresponding words in the XML message
+	/// eg. T0, T1, ... and hello, captain respectively
+	/// words don't have any specific usage yet, but may have in the future, if tags are trimmed from their current protocol of 2 per word
+	std::vector<std::string> tags, words;
+	/// Speech ID (usually sp1)
+	std::string speechIdentifier;
+};
+
+/// End new modifications
 
 extern "C"
 {
@@ -74,50 +96,31 @@ char * homographfile;
 char * reductionfile;
 char * rulesfile;
 
-
-//  removes XML tags and new lines from a string - used to take out
-//  time markings before processing text, otherwise
-//  silence is put in place of them
-// the opening speech tag will remain, and a new line must be put at the end
-std::string removeXMLTagsAndNewLines( const std::string & txt )
+/// Cleans up spurious whitespaces in string, and removes weird \n's
+void cleanString(std::string &message)
 {
-   std::stringstream txtstream;
+	/// Remove newlines and carriage-returns
+	message.erase( std::remove(message.begin(), message.end(), '\r'), message.end() );
+	message.erase( std::remove(message.begin(), message.end(), '\n'), message.end() );
+	/// If it's a space string, we want to leave the last whitespace
+	while ( message.find_last_of(" ") == message.length() - 1  && message.length() > 1)
+	{
+		fprintf(stderr,"Debug: Reducing length by 1 to remove whitespace at end\n");
+		message.resize( message.length() - 1 );
+	}
 
-   //for the entire input string
-   for ( unsigned int i = 0; i < txt.length(); i++ )
-   {
-      //if the character is an opening bracket
-      if ( txt.at( i ) == '<' )
-      {
-         //loop until hitting the ending bracket
-         //so that this text is not input into
-         //the stringstream
-         while ( i < txt.length() && txt.at( i ) != '>' )
-         {
-            i++;
-         }
+	while ( int pos = message.find("  ") != std::string::npos )
+	{
+		fprintf(stderr,"Debug: replacing 2 whitespaces at %d(%s) with 1 whitespace\n",pos, message.substr(pos,2));
+		message.replace( pos, 2, " " );
+	}
 
-         //to skip over the ending bracket
-         i++;
-      }
-
-      //add the character to the stringstream
-      if ( i < txt.length() && txt.at( i ) != '\n' )
-         txtstream << txt.at( i );
-   }
-
-   txtstream << "\n";
-
-   return txtstream.str();
+	while ( message.find_first_of(" ") == 0 )
+	{
+		fprintf(stderr,"Debug: Cleaning initial whitespace %s\n",message[0]);
+		message = message.substr(1);
+	}
 }
-
-
-//returns true if file exists, else false
-bool fileExists( const char * fileName )
-{
-   return _access( fileName, 0 ) == 0;
-}
-
 
 // class is taken from somewhere, unsure of it's origins.  Here is one of many examples of use across the net:
 //    http://mail-archives.apache.org/mod_mbox/xerces-c-dev/200210.mbox/%3C7C78B8615661D311B15500A0C9AB28C1915E40@earth.telestream.net%3E
@@ -160,6 +163,210 @@ class XStr
 
 #define X( str ) XStr( str ).unicodeForm()
 
+//  removes XML tags and new lines from a string - used to take out
+//  time markings before processing text, otherwise
+//  silence is put in place of them
+//  the opening speech tag will remain, and a new line must be put at the end
+std::string removeXMLTagsAndNewLines( const std::string & txt , SpeechRequestMessageData & xmlMetaData)
+{
+//#define _PARSER_DEBUG_MESSAGES_ON
+   std::stringstream txtstream;
+
+   /// Put in some defaults, and do basic cleanup just to be safe
+   xmlMetaData.speechIdentifier = "sp1";
+   xmlMetaData.tags.clear();
+   xmlMetaData.words.clear();
+   /// Start an XML parser to parse the message we have received
+
+   XMLPlatformUtils::Initialize();
+   XercesDOMParser *parser = new XercesDOMParser();
+
+   std::string truncatedTxt = txt.substr(txt.find_first_of(">")+1);
+   char * message = (char*)truncatedTxt.c_str();
+
+   std::string actualText = "";
+#ifdef _PARSER_DEBUG_MESSAGES_ON
+   fprintf(stderr, "Debug: Parsing message \"%s\"\n",message);
+#endif
+   /// Set up a parser for XML message in memory - code sourced from unknown online reference for Xerces XML library
+   MemBufInputSource memIS((const XMLByte*)message, strlen(message), "XMLBuffer");
+   parser->parse(memIS);
+   DOMDocument *doc = parser->getDocument();
+   if ( doc )
+   {
+	   DOMElement *root = doc->getDocumentElement();
+
+	   if ( root ) 
+	   {
+		   /// Get all nodes which have the "mark" tag, from these we can extract the timing tags, and speech text
+		   DOMNodeList *messageList = root->getElementsByTagName(XMLString::transcode("speech"));
+		   if ( messageList && messageList->getLength() > 0)
+		   {
+			   DOMElement *speechElement = dynamic_cast<DOMElement*>(messageList->item(0));
+			   char *speechID = XMLString::transcode(speechElement->getAttribute(XMLString::transcode("id")));
+			   xmlMetaData.speechIdentifier = std::string(speechID);
+			   actualText = "<speech id=\"" + std::string(speechID) + "\" ref=\"" + XMLString::transcode(speechElement->getAttribute(X("ref"))) + "\" type=\"" + XMLString::transcode(speechElement->getAttribute(X("type"))) + "\">";
+			   XMLString::release(&speechID);
+		   }
+		   else if ( !strcmp( XMLString::transcode( root->getNodeName() ), "speech") ) {
+			   /// Else, the message might contain only the speech tag, in which case the above code will fail, so we need a fallback
+			   DOMElement *speechElement = root;
+			   char *speechID = XMLString::transcode(speechElement->getAttribute(XMLString::transcode("id")));
+			   xmlMetaData.speechIdentifier = std::string(speechID);
+			   actualText = "<speech id=\"" + std::string(speechID) + "\" ref=\"" + XMLString::transcode(speechElement->getAttribute(X("ref"))) + "\" type=\"" + XMLString::transcode(speechElement->getAttribute(X("type"))) + "\">";
+			   XMLString::release(&speechID);
+		   }
+		   else
+		   {
+			   /// Oops, for some reason all of the above didn't work, default to the default speech id
+			   fprintf(stderr, "Warning: Could not find speech tag in message, creating message beginning by default\n");
+			   actualText = truncatedTxt.substr(0, truncatedTxt.find_first_of(">") + 1);
+		   }
+		   messageList = root->getElementsByTagName( X("mark"));
+
+		   /// Store all the book marks in the input message, so that they can be retrieved later
+		   if ( messageList ) 
+		   {
+			   XMLSize_t nLetters = messageList->getLength();
+
+			   for ( XMLSize_t i = 0; i < nLetters; i++ )
+			   {
+				   DOMNode* node = messageList->item(i);
+				   /// We only want to parse XML elements
+				   if (node->getNodeType() && node->getNodeType() == DOMNode::ELEMENT_NODE)
+				   {
+					   DOMElement *element = dynamic_cast<DOMElement*>( node );
+					   XMLCh *mark = (XMLCh*)element->getAttribute(XMLString::transcode("name"));
+					   XMLCh *speech = NULL;
+					   DOMNode *speechNode = element->getFirstChild();
+					   if ( speechNode == NULL ) 
+					   {
+						   speechNode = element->getNextSibling();
+					   }
+					   if ( speechNode->getNodeType() == DOMNode::TEXT_NODE )
+					   {
+#ifdef _PARSER_DEBUG_MESSAGES_ON
+						   fprintf(stderr, "Voila! found the text\n");
+#endif
+						   speech = (XMLCh*)speechNode->getNodeValue();
+					   }
+					   /// Get the timing tag as a string
+					   char * t1, *t2;
+					   std::string markString(t1 = XMLString::transcode(mark));
+					   std::string speechString(t2 = (speech)?XMLString::transcode(speech): " ");
+					   XMLString::release(&t1);
+					   XMLString::release(&t2);
+					   /// This code is still not watertight with regards to memory, needs some knowledge of Xerces memory management
+					   //if ( mark ) XMLString::release(&mark);
+					   //if ( speech ) XMLString::release(&speech);
+					   if( markString == "" || speechString == "" )
+					   {
+#ifdef _PARSER_DEBUG_MESSAGES_ON
+						   fprintf(stderr, "The mark or speech strings are null, mark: 0x%x, speech: 0x%x \n", markString, speechString);
+#endif
+						   /// Null strings tend to cause problems with later code sections
+						   if ( speechString == "" ) speechString = " ";
+					   }
+					   else
+					   {
+						   std::string temporaryText = speechString;
+						   cleanString(temporaryText);
+#ifdef _PARSER_DEBUG_MESSAGES_ON
+						   //fprintf(stderr, "Got timing tag: \"%s\" and text: \"%s\"\n", markString.c_str(), temporaryText.c_str());
+#endif
+						   /// Words can be used to match up which tags we need to see
+							/// Push tag and word into xmlMetaData
+							xmlMetaData.tags.push_back(markString);
+							xmlMetaData.words.push_back(temporaryText);
+
+							actualText += temporaryText;
+					   }
+					   /// As said before, needs proper memory management for Xerces
+					  // if(mark)
+							//XMLString::release(&mark);
+					  // if(speech)
+					  // {
+							//XMLString::release(&speech);
+							//XMLString::release(&speechString);
+					   //}
+					   //if ( markString )
+						  // XMLString::release(&markString);
+					   //if ( !_stricmp(" ", speechString) )
+						  // delete speechString;
+					   //else XMLString::release(&speechString);
+					  // if(speechString)
+							//XMLString::release(&markString);
+				   }
+			   }
+		   }
+		   else 
+		   {
+			   fprintf(stderr, "Error: Got no nodes with specified tag.\n");
+		   }
+
+	   }
+	   else
+	   {
+		   fprintf(stderr, "Error: Could not extract root element from XML DOM document\n");
+	   }
+   }
+   else
+   {
+	   fprintf(stderr, "Error: XML DOM document is null!\n");
+   }
+   doc->release();
+
+   actualText += "</speech>\n";
+   if ( actualText != "" ) {
+#ifdef _PARSER_DEBUG_MESSAGES_ON
+#undef _PARSER_DEBUG_MESSAGES_ON
+	   fprintf(stderr,"Got text: \"%s\"\n",actualText.c_str());
+#endif
+	   return actualText;
+   }
+   else {
+	   fprintf(stderr, "Error: Unable to instantiate DOM Xml parser, reverting to previous text-only parser\n");
+
+	   /// Old non-XML parser based cleanup code, will not store any tags etc. Intended as a fallback in case something goes wrong with the parser above, which should not happen
+	   //for the entire input string
+	   for ( unsigned int i = 0; i < txt.length(); i++ )
+	   {
+		  //if the character is an opening bracket
+		  if ( txt.at( i ) == '<' )
+		  {
+			 //loop until hitting the ending bracket
+			 //so that this text is not input into
+			 //the stringstream
+			 while ( i < txt.length() && txt.at( i ) != '>' )
+			 {
+				i++;
+			 }
+
+			 //to skip over the ending bracket
+			 i++;
+		  }
+
+		  //add the character to the stringstream
+		  if ( i < txt.length() && txt.at( i ) != '\n' )
+			 txtstream << txt.at( i );
+	   }
+
+	   txtstream << "\n";
+   }
+#ifdef _PARSER_DEBUG_MESSAGES_ON
+#undef _PARSER_DEBUG_MESSAGES_ON
+#endif
+   fprintf(stderr,"Got text: \"%s\"\n",txtstream.str().c_str());
+   return txtstream.str() + "</speech>";
+}
+
+
+//returns true if file exists, else false
+bool fileExists( const char * fileName )
+{
+   return _access( fileName, 0 ) == 0;
+}
+
 
 static void _make_xml( char * spurtxml, char * inputline, char breaktype )
 {
@@ -197,7 +404,7 @@ static void _make_xml( char * spurtxml, char * inputline, char breaktype )
    strcat( spurtxml, xmlfoot );
 }
 
-
+/// Phoneme to viseme mapping - Maps phonemes Cerevoice returns to visemes SmartBody can show
 void set_phonemes_to_visemes()
 {
    phonemeToViseme[ "sil" ] = "_";  // SIL
@@ -469,9 +676,11 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
       CPRC_lts_search * ltssrch = CPRC_lts_search_new( 0 );
       CPRC_lexicon_search * lxsrch = CPRC_lexicon_search_new();
 
+	  // Local variable to store message XML metadata
+	  SpeechRequestMessageData xmlMetaData;
       // Feed in input text, further data is to come
-      Normaliser_parse( norm_id, const_cast<char*>( removeXMLTagsAndNewLines( text ).c_str() ), 0 );
-      Normaliser_parse( norm_id, "", 1 );
+      Normaliser_parse( norm_id, const_cast<char*>( removeXMLTagsAndNewLines( text, xmlMetaData ).c_str() ), 1 );
+      //Normaliser_parse( norm_id, "", 1 );
 
       int numspts = Normaliser_get_num_spurts( norm_id );
 
@@ -488,7 +697,7 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
       /* Reset the parser.  This has to be done between input documents
       or the xml will be invalid and the parse will fail.
       */
-      Normaliser_reset_parser( norm_id );
+      //Normaliser_reset_parser( norm_id );
 
       /* synthesise */
 
@@ -586,10 +795,30 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
                            // Add marker information back
                            // Should come from initial XML message, 
                            // but for now is constructed following the known NVBG protocol (markers around words)
+						   // HACK AVOIDED: Fixed to use XML metadata as extracted during parse
                            std::ostringstream ostr;
                            int i = num_words * 2;
                            ostr << i;
-                           std::string s = "sp1:T" + ostr.str();
+						   std::string s = xmlMetaData.speechIdentifier + ":";
+                           //std::string s = "sp1:T" + ostr.str();
+						   //fprintf(stderr, "%d/%d ",num_words * 2, xmlMetaData.tags.size()-1);
+						   //std::string s = xmlMetaData.speechIdentifier + ":" + xmlMetaData.tags[num_words * 2];
+						   if ( num_words * 2 < (int)xmlMetaData.tags.size() ) {
+							   /// If we have an existing tag for this number, use it
+							   s += xmlMetaData.tags[num_words * 2];
+						   }
+						   else {
+							   /// Extract alphabetical part of the tags, in the hope that we're following a coherent naming pattern, and only numbers are changed
+							   std::string last_tag = xmlMetaData.tags[xmlMetaData.tags.size() - 1];
+							   int j;
+							   for ( j = 0; j < (int)last_tag.size(); j++ ) {
+								   if ( !isalpha(last_tag[j]) ) {
+									   break;
+								   }
+							   }
+							   s += last_tag.substr(0, j) + ostr.str();
+							   fprintf(stderr,"Warning: Reference to unspecified tag, constructing one on-the-fly to be: %s\n", s.c_str());
+						   }
 
                            DOMElement * markElement = doc->createElement( X( "mark" ) );
                            XMLCh * mark_name = XMLString::transcode( s.c_str() );
@@ -600,7 +829,28 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
                            std::ostringstream ostr2;
                            i = num_words * 2 + 1;
                            ostr2 << i;
-                           s = "sp1:T" + ostr2.str();
+						   s = xmlMetaData.speechIdentifier + ":";
+                           //s = "sp1:T" + ostr2.str();
+						   //fprintf(stderr, "%d/%d ",num_words * 2+1, xmlMetaData.tags.size()-1);
+						   //s = xmlMetaData.speechIdentifier + ":" + xmlMetaData.tags[num_words * 2 + 1];
+
+						   /// Modifications to use XML tags saved at previous step - use stored tags, or generate new ones if unseen tag referenced (reason for unseen tags being referenced is still not known)
+						   if ( num_words * 2 + 1 < (int)xmlMetaData.tags.size() ) {
+							   /// If we have an existing tag for this number, use it
+							   s += xmlMetaData.tags[num_words * 2 + 1];
+						   }
+						   else {
+							   /// Extract alphabetical part of the tags, in the hope that we're following a coherent naming pattern, and only numbers are changed
+							   std::string last_tag = xmlMetaData.tags[xmlMetaData.tags.size() - 1];
+							   int j;
+							   for ( j = 0; j < (int)last_tag.size(); j++ ) {
+								   if ( !isalpha(last_tag[j]) ) {
+									   break;
+								   }
+							   }
+							   s += last_tag.substr(0, j) + ostr2.str();
+							   fprintf(stderr,"Warning: Reference to unspecified tag, constructing one on-the-fly to be: %s\n", s.c_str());
+						   }
                            DOMElement * markElement2 = doc->createElement( X( "mark" ) );
                            XMLCh * mark_name2 = XMLString::transcode( s.c_str() );
                            markElement2->setAttribute( name, mark_name2 ) ;
