@@ -2,6 +2,7 @@
 #	2009 July 09th
 
 0	echo >>> Initializing Shaders
+0	shader add vh_wrinkles float
 0	shader add myColor float_array 3
 0	echo >>> End Initializing
 
