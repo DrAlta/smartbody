@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\lib\bonebus\include;..\..\..\lib\OgreSDK\include;..\..\..\lib\OgreSDK\samples\include"
+				AdditionalIncludeDirectories="..\..\lib\bonebus\include;..\..\lib\OgreSDK\include;..\..\lib\OgreSDK\samples\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -65,7 +65,7 @@
 				AdditionalDependencies="bonebus_d.lib vhcl_d.lib OIS_d.lib OgreMain_d.lib wsock32.lib"
 				OutputFile="$(OutDir)/OgreTest.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\lib\bonebus\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\OgreSDK\lib"
+				AdditionalLibraryDirectories="..\..\lib\bonebus\lib;..\..\lib\vhcl\lib;..\..\lib\OgreSDK\lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/OgreTest.pdb"
 				SubSystem="2"
@@ -93,7 +93,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y ..\..\..\lib\OgreSDK\bin\debug\cg.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\OgreSDK\bin\debug\OIS_d.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\OgreSDK\bin\debug\Plugin_*.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\OgreSDK\bin\debug\Plugins.cfg .&#x0D;&#x0A;copy /Y ..\..\..\lib\OgreSDK\bin\debug\RenderSystem_*.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\OgreSDK\bin\debug\OgreMain_d.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\OgreSDK\media\packs\OgreCore.zip .&#x0D;&#x0A;"
+				CommandLine="copy /Y ..\..\lib\OgreSDK\bin\debug\cg.dll .&#x0D;&#x0A;copy /Y ..\..\lib\OgreSDK\bin\debug\OIS_d.dll .&#x0D;&#x0A;copy /Y ..\..\lib\OgreSDK\bin\debug\Plugin_*.dll .&#x0D;&#x0A;copy /Y ..\..\lib\OgreSDK\bin\debug\Plugins.cfg .&#x0D;&#x0A;copy /Y ..\..\lib\OgreSDK\bin\debug\RenderSystem_*.dll .&#x0D;&#x0A;copy /Y ..\..\lib\OgreSDK\bin\debug\OgreMain_d.dll .&#x0D;&#x0A;copy /Y ..\..\lib\OgreSDK\media\packs\OgreCore.zip .&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -122,7 +122,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="3"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories="..\..\..\lib\bonebus\include;..\..\..\lib\OgreSDK\include;..\..\..\lib\OgreSDK\samples\include"
+				AdditionalIncludeDirectories="..\..\lib\bonebus\include;..\..\lib\OgreSDK\include;..\..\lib\OgreSDK\samples\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -144,7 +144,7 @@
 				AdditionalDependencies="bonebus.lib vhcl.lib OIS.lib OgreMain.lib wsock32.lib"
 				OutputFile="$(OutDir)/OgreTest.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\lib\bonebus\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\OgreSDK\lib"
+				AdditionalLibraryDirectories="..\..\lib\bonebus\lib;..\..\lib\vhcl\lib;..\..\lib\OgreSDK\lib"
 				GenerateDebugInformation="false"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -173,7 +173,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y ..\..\..\lib\OgreSDK\bin\release\cg.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\OgreSDK\bin\release\OIS.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\OgreSDK\bin\release\Plugin_*.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\OgreSDK\bin\release\Plugins.cfg .&#x0D;&#x0A;copy /Y ..\..\..\lib\OgreSDK\bin\release\RenderSystem_*.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\OgreSDK\bin\release\OgreMain.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\OgreSDK\media\packs\OgreCore.zip .&#x0D;&#x0A;"
+				CommandLine="copy /Y ..\..\lib\OgreSDK\bin\release\cg.dll .&#x0D;&#x0A;copy /Y ..\..\lib\OgreSDK\bin\release\OIS.dll .&#x0D;&#x0A;copy /Y ..\..\lib\OgreSDK\bin\release\Plugin_*.dll .&#x0D;&#x0A;copy /Y ..\..\lib\OgreSDK\bin\release\Plugins.cfg .&#x0D;&#x0A;copy /Y ..\..\lib\OgreSDK\bin\release\RenderSystem_*.dll .&#x0D;&#x0A;copy /Y ..\..\lib\OgreSDK\bin\release\OgreMain.dll .&#x0D;&#x0A;copy /Y ..\..\lib\OgreSDK\media\packs\OgreCore.zip .&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
