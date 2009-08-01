@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OgreTest", "OgreTest.vcproj", "{8C3800DB-85D8-490A-9E4B-14235F2A2711}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OgreViewer", "OgreViewer.vcproj", "{8C3800DB-85D8-490A-9E4B-14235F2A2711}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
