@@ -1148,14 +1148,12 @@ int mcu_character_init(
 
 		err = mcu_p->theWSP->register_vector_3d_source( wsp_world_offset, "position", SbmPawn::wsp_world_position_accessor, char_p );
 		if( err != CMD_SUCCESS )	{
-			printf( "init_character ERR: WSP register_vector_3d_source '%s' FAILED\n", char_name ); 
-			return( err );
+			printf( "WARNING: mcu_character_init \"%s\": Failed to register character position.\n", char_name ); 
 		}
 
 		err = mcu_p->theWSP->register_vector_4d_source( wsp_world_offset, "rotation", SbmPawn::wsp_world_rotation_accessor, char_p );
 		if( err != CMD_SUCCESS )	{
-			printf( "init_character ERR: WSP register_vector_4d_source '%s' FAILED\n", char_name ); 
-			return( err );
+			printf( "WARNING: mcu_character_init \"%s\": Failed to register character rotation.\n", char_name ); 
 		}
 
 
@@ -1172,15 +1170,13 @@ int mcu_character_init(
 			err = mcu_p->theWSP->register_vector_3d_source( wsp_joint_name, "position", SbmPawn::wsp_position_accessor, char_p );
 			if ( err != CMD_SUCCESS )
 			{
-				printf( "init_character ERR: WSP register_vector_3d_source '%s' FAILED\n", char_name ); 
-				return( err );
+				printf( "WARNING: mcu_character_init \"%s\": Failed to register joint \"%s\" position.\n", char_name, wsp_joint_name ); 
 			}
 
 			err = mcu_p->theWSP->register_vector_4d_source( wsp_joint_name, "rotation", SbmPawn::wsp_rotation_accessor, char_p );
 			if ( err != CMD_SUCCESS )
 			{
-				printf( "init_character ERR: WSP register_vector_4d_source '%s' FAILED\n", char_name ); 
-				return( err );
+				printf( "WARNING: mcu_character_init \"%s\": Failed to register joint \"%s\" rotation.\n", char_name, wsp_joint_name ); 
 			}
 		}
 	}
