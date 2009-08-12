@@ -1,10 +1,25 @@
 ===============================================================================
-  nightly.xml for Nightly Builds
+  Build Scripts for Apache Ant
 -------------------------------------------------------------------------------
+
+All of these build scripts rely on Java Developer Kit (JDK) 6 and Apache
+Ant 1.7.1.  Additionally, these tools need the following environment settings:
+  JAVA_HOME - Path to the JDK install location
+  ANT_HOME  - Path to the Ant install location
+  ANT_OPTS  - [Optional] JavaVM memory parameters for Ant
+You may also find it help to include the respective bin/ directories in the PATH.
+
+
+
+===============================================================================
+  checkout-build-tag.xml
+-------------------------------------------------------------------------------
+
+Intended for nightly or continuous integration style builds.
 
 Requires Java 1.6+ and Apache Ant 1.7.1
 
-1.) Download nightly.xml to an empty directory (via svn export, curl, wget, etc.)
+1.) Download checkout-build-tag.xml to an empty directory (via svn export, curl, wget, etc.)
         https://smartbody.svn.sourceforge.net/svnroot/smartbody/trunk/build/nightly.xml
 2.) Set Java VM memory parameters for Ant
         set ANT_OPTS=-xms512m -Xmx1g
@@ -16,7 +31,7 @@ Configurable Build Parameters
 -----------------------------
 
 svn.password
-    If set, and build is successful, the system will attempt tag the build in SVN repository,
+    If set, and build is successful, the system will attempt to tag the build in SVN repository,
     using the build report as the commit message.
 
 Issues
