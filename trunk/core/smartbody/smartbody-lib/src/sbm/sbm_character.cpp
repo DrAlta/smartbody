@@ -515,7 +515,8 @@ void prune_schedule( SbmCharacter*   actor,
 					 MeCtGaze**      &gaze_key_cts,
 					 MeCtSimpleNod*  &nod_ct,
 					 MeController*   &motion_ct,
-					 MeCtPose*       &pose_ct
+					 MeCtPose*       &pose_ct,
+					 SkChannelArray  &raw_channels
 ) {
 	if( LOG_CONTROLLER_TREE_PRUNING ) cout << "DEBUG: sbm_character.cpp prune_schedule(..): Pruning schedule \""<<sched->name()<<"\" from time "<<time<<endl;
 
@@ -634,7 +635,7 @@ void prune_schedule( SbmCharacter*   actor,
 						MeCtSimpleNod* nod2_ct = NULL;
 						MeController*  motion2_ct = NULL;
 						MeCtPose*      pose2_ct = NULL;
-						prune_schedule( actor, sched_ct, mcu_p, time_offset, posture_sched_p, gaze_key2_cts, nod2_ct, motion2_ct, pose2_ct );
+						prune_schedule( actor, sched_ct, mcu_p, time_offset, posture_sched_p, gaze_key2_cts, nod2_ct, motion2_ct, pose2_ct, raw_channels );
 
 						delete[] gaze_key2_cts;
 						//if( sched_ct->count_children()==0 ) {
@@ -643,7 +644,7 @@ void prune_schedule( SbmCharacter*   actor,
 
 						in_use = true;
 					} else {
-						prune_schedule( actor, sched_ct, mcu_p, time_offset, posture_sched_p, gaze_key_cts, nod_ct, motion_ct, pose_ct );
+						prune_schedule( actor, sched_ct, mcu_p, time_offset, posture_sched_p, gaze_key_cts, nod_ct, motion_ct, pose_ct, raw_channels );
 						in_use = sched_ct->count_children()>0;
 					}
 				} else if( anim_ct_type == MeCtSimpleNod::_type_name ) {
@@ -700,7 +701,29 @@ void prune_schedule( SbmCharacter*   actor,
 						pose_ct = (MeCtPose*)anim_source;
 					}
 					if( LOG_CONTROLLER_TREE_PRUNING ) cout << ( in_use? "Not Pruned." : "Pruned!" ) << endl;
+				} else if( anim_ct_type == MeCtRawWriter::TYPE ) {
+					if( LOG_CONTROLLER_TREE_PRUNING ) cout << "DEBUG: testing MeCtRawWriter for pruning... ";
 
+					const SkChannelArray& ct_channels = anim_source->controller_channels();
+					vector<int> new_channels;  // list of indices to channels in use
+					
+					const int total_channels = ct_channels.size();
+					for( int i=0; i<total_channels; ++i ) {
+						int index = raw_channels.search( ct_channels.name(i), ct_channels.type(i) );
+						if( index != -1 ) {
+							new_channels.push_back( index );
+						}
+					}
+
+					if( new_channels.empty() ) {
+						in_use = false;
+					} else {
+						for( vector<int>::iterator it = new_channels.begin(); it!=new_channels.end(); ++it ) {
+							raw_channels.add( ct_channels.name(*it), ct_channels.type(*it) );
+						}
+					}
+
+					if( LOG_CONTROLLER_TREE_PRUNING ) cout << ( in_use? "Not Pruned." : "Pruned!" ) << endl;
 				} else {
 					//  TODO: Throttle warnings....
 					cerr << "WARNING: Cannot prune unknown controller type \"" << anim_source->controller_type() << "\"" << endl;
@@ -753,13 +776,12 @@ int SbmCharacter::prune_controller_tree( mcuCBHandle* mcu_p ) {
 	MeCtSimpleNod* nod_ct    = NULL;
 	MeController*  motion_ct = NULL;  // also covers quickdraw
 	MeCtPose*      pose_ct   = NULL;
-
-	
+	SkChannelArray raw_channels;
 
 	// Traverse the controller tree from highest priority down, most recent to earliest
-	prune_schedule( this, head_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
-	prune_schedule( this, gaze_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
-	prune_schedule( this, motion_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
+	prune_schedule( this, head_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
+	prune_schedule( this, gaze_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
+	prune_schedule( this, motion_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
 
 	// For the posture track, ignore prior controllers, as they should never be used to mark a posture as unused
 	for( int key=0; key<MeCtGaze::NUM_GAZE_KEYS; ++key )
@@ -767,7 +789,8 @@ int SbmCharacter::prune_controller_tree( mcuCBHandle* mcu_p ) {
 	nod_ct    = NULL;
 	motion_ct = NULL;  // also covers quickdraw
 	pose_ct   = NULL;
-	prune_schedule( this, posture_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct );
+	raw_channels = SkChannelArray::empty_channel_array();
+	prune_schedule( this, posture_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
 
 	if( LOG_CONTROLLER_TREE_PRUNING )
 		print_controller_schedules();
