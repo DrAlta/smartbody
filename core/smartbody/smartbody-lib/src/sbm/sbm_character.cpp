@@ -38,8 +38,8 @@
 #include <ME/me_spline_1d.hpp>
 
 
-const bool LOG_PRUNE_CMD_TIME                        = true;
-const bool LOG_CONTROLLER_TREE_PRUNING               = true;
+const bool LOG_PRUNE_CMD_TIME                        = false;
+const bool LOG_CONTROLLER_TREE_PRUNING               = false;
 const bool LOG_PRUNE_TRACK_WITHOUT_BLEND_SPLIE_KNOTS = true;
 
 
