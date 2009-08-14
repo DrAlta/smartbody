@@ -577,24 +577,35 @@ void prune_schedule( SbmCharacter*   actor,
 							in_use = false;
 						}
 					} else {
-						if( y == knot->get_left_y() ) {
-							MeSpline1D::Knot* prev_knot = knot;
-							knot = prev_knot->get_prev();
-							if( knot->get_x() < time ) {
-								// span between covers now and all future activity.
-								if( knot->get_right_control() != y ) {
-									flat_blend_curve = false;
-									if( y==0 )
-										in_use = false;
-								}
-							} else {
-								flat_blend_curve = false;  // assume more blend curve knots means more activity
+						// Has knots beyond current time
+						static const double END_OF_TIME = MeCtScheduler2::MAX_TRACK_DURATION * 0.999;
+						bool at_end_of_time = x > ( MeCtScheduler2::MAX_TRACK_DURATION * 0.999 );
+						while( at_end_of_time ) {
+							// Last knots are far in the future, beyond reasonable values of time
+							MeSpline1D::Knot* prev_knot = knot->get_prev();
+							while( prev_knot!=NULL && prev_knot->get_x()>END_OF_TIME ) {
+								knot = prev_knot;
+								prev_knot = knot->get_prev();
 							}
-						} else {
-							static const double TIME_EPSILON = MeCtScheduler2::MAX_TRACK_DURATION * 0.999;
-							if( x < TIME_EPSILON )
-								flat_blend_curve = false;  // activity at the blend curve knot
+							// Only consider the most recent end-of-time knot and its left value
+							y = knot->get_left_y();
 						}
+
+						if( at_end_of_time || y == knot->get_left_y() ) {
+							// This knot is flat, time to check others...
+							flat_blend_curve = true;
+
+							MeSpline1D::Knot* prev_knot = knot->get_prev();
+							while( flat_blend_curve && prev_knot!=NULL && prev_knot->get_x() > time ) {
+								flat_blend_curve = prev_knot->get_y()==y && prev_knot->get_left_y()==y;
+								prev_knot = prev_knot->get_prev();
+							}
+							if( flat_blend_curve && prev_knot!=NULL ) {
+								// prev_knot is knot just before time
+								flat_blend_curve = prev_knot->get_y()==y;
+							}
+						}
+						in_use = flat_blend_curve ? ( y <=0 ) : true;
 					}
 				} else {
 					if( LOG_PRUNE_TRACK_WITHOUT_BLEND_SPLIE_KNOTS ) {
@@ -610,7 +621,10 @@ void prune_schedule( SbmCharacter*   actor,
 			const char* anim_ct_type = anim_source->controller_type();
 			if( LOG_CONTROLLER_TREE_PRUNING )
 				cout << '\t' << anim_ct_type << " \"" << anim_source->name() << "\": in_use = "<<in_use<<", flat_blend_curve = "<<flat_blend_curve<<endl;
-			if( in_use && flat_blend_curve ) {  // Ignore tracks with future blend activity or are already not in use
+			if( !in_use ) {
+				if( LOG_CONTROLLER_TREE_PRUNING )
+					cout << "\t- Pruned (not in use)!!" << endl;
+			} else if( flat_blend_curve ) {  // Ignore tracks with future blend activity or are already not in use
 				// Determine if the animation will be occluded by
 				// (previously visited) higher priority controllers
 				if( anim_ct_type == MeCtScheduler2::type_name ) {
@@ -713,14 +727,17 @@ void prune_schedule( SbmCharacter*   actor,
 					cerr << "WARNING: Cannot prune unknown controller type \"" << anim_source->controller_type() << "\"" << endl;
 				}
 				if( LOG_CONTROLLER_TREE_PRUNING )
-					cout << ( in_use? "\t- Not Pruned." : "\t- Pruned!" ) << endl;
+					cout << ( in_use? "\t- Not Pruned (primary ct of type)." : "\t- Pruned (occluded)!!" ) << endl;
 			} else {
 				if( LOG_CONTROLLER_TREE_PRUNING )
-					cout << "\t- Ignoring!!" << endl;
+					cout << "\t- Not Pruned (future activity)." << endl;
 			}
 		} else {
 			// No animation source
 			in_use = false;
+
+			if( LOG_CONTROLLER_TREE_PRUNING )
+				cout << "\t- Pruned (no anim ct)!!" << endl;
 		}
 
 		if( !in_use && test_ct_for_pruning( track ) ) {
