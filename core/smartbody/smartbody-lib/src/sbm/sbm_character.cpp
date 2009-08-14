@@ -38,8 +38,8 @@
 #include <ME/me_spline_1d.hpp>
 
 
-const bool LOG_PRUNE_CMD_TIME                        = false;
-const bool LOG_CONTROLLER_TREE_PRUNING               = false;
+const bool LOG_PRUNE_CMD_TIME                        = true;
+const bool LOG_CONTROLLER_TREE_PRUNING               = true;
 const bool LOG_PRUNE_TRACK_WITHOUT_BLEND_SPLIE_KNOTS = true;
 
 
@@ -518,7 +518,7 @@ void prune_schedule( SbmCharacter*   actor,
 					 MeCtPose*       &pose_ct,
 					 SkChannelArray  &raw_channels
 ) {
-	if( LOG_CONTROLLER_TREE_PRUNING ) cout << "DEBUG: sbm_character.cpp prune_schedule(..): Pruning schedule \""<<sched->name()<<"\" from time "<<time<<endl;
+	if( LOG_CONTROLLER_TREE_PRUNING ) cout << "DEBUG: sbm_character.cpp prune_schedule(..): Pruning schedule \""<<sched->name()<<"\":"<<endl;
 
 	typedef MeCtScheduler2::TrackPtr   TrackPtr;
 	typedef MeCtScheduler2::VecOfTrack VecOfTrack;
@@ -606,15 +606,15 @@ void prune_schedule( SbmCharacter*   actor,
 					in_use = false;
 				}
 			}
-			if( LOG_CONTROLLER_TREE_PRUNING && anim_source ) {
-				cout << '\t' << anim_source->controller_type() << " \"" << anim_source->name() << "\": in_use = "<<in_use<<", flat_blend_curve = "<<flat_blend_curve<<endl;
-			}
 
+			const char* anim_ct_type = anim_source->controller_type();
+			if( LOG_CONTROLLER_TREE_PRUNING )
+				cout << '\t' << anim_ct_type << " \"" << anim_source->name() << "\": in_use = "<<in_use<<", flat_blend_curve = "<<flat_blend_curve<<endl;
 			if( in_use && flat_blend_curve ) {  // Ignore tracks with future blend activity or are already not in use
 				// Determine if the animation will be occluded by
 				// (previously visited) higher priority controllers
-				const char* anim_ct_type = anim_source->controller_type();
 				if( anim_ct_type == MeCtScheduler2::type_name ) {
+
 					double time_offset = time;
 					if( timing_ct ) {
 						time_offset = timing_ct->time_func().eval( time );
@@ -648,7 +648,6 @@ void prune_schedule( SbmCharacter*   actor,
 						in_use = sched_ct->count_children()>0;
 					}
 				} else if( anim_ct_type == MeCtSimpleNod::_type_name ) {
-					if( LOG_CONTROLLER_TREE_PRUNING ) cout << "DEBUG: testing MeCtMotion for pruning... ";
 					if(    nod_ct
 						|| (    (gaze_key_cts[MeCtGaze::GAZE_KEY_HEAD]!=NULL)
 						     && (gaze_key_cts[MeCtGaze::GAZE_KEY_NECK]!=NULL) ) )
@@ -657,11 +656,7 @@ void prune_schedule( SbmCharacter*   actor,
 					} else {
 						nod_ct = (MeCtSimpleNod*)anim_source;
 					}
-					if( LOG_CONTROLLER_TREE_PRUNING ) cout << ( in_use? "Not Pruned." : "Pruned!" ) << endl;
-
-
 				} else if( anim_ct_type == MeCtGaze::CONTROLLER_TYPE ) {
-					if( LOG_CONTROLLER_TREE_PRUNING ) cout << "DEBUG: testing MeCtGaze for pruning... ";
 					if( motion_ct || pose_ct ) {
 						in_use = false;
 					} else {
@@ -682,28 +677,19 @@ void prune_schedule( SbmCharacter*   actor,
 						// If still ocluded (after testing each key) then it is not in use
 						in_use = !is_occluded;
 					}
-					if( LOG_CONTROLLER_TREE_PRUNING ) cout << ( in_use? "Not Pruned." : "Pruned!" ) << endl;
-
 				} else if( anim_ct_type == MeCtMotion::type_name || anim_ct_type == MeCtQuickDraw::type_name ) {
-					if( LOG_CONTROLLER_TREE_PRUNING ) cout << "DEBUG: testing "<<anim_ct_type<<" for pruning... ";
 					if( motion_ct || pose_ct ) {
 						in_use = false;
 					} else {
 						motion_ct = anim_source;
 					}
-					if( LOG_CONTROLLER_TREE_PRUNING ) cout << ( in_use? "Not Pruned." : "Pruned!" ) << endl;
-
 				} else if( anim_ct_type == MeCtPose::type_name ) {
-					if( LOG_CONTROLLER_TREE_PRUNING ) cout << "DEBUG: testing MeCtPose for pruning... ";
 					if( pose_ct ) {
 						in_use = false;
 					} else {
 						pose_ct = (MeCtPose*)anim_source;
 					}
-					if( LOG_CONTROLLER_TREE_PRUNING ) cout << ( in_use? "Not Pruned." : "Pruned!" ) << endl;
 				} else if( anim_ct_type == MeCtRawWriter::TYPE ) {
-					if( LOG_CONTROLLER_TREE_PRUNING ) cout << "DEBUG: testing MeCtRawWriter for pruning... ";
-
 					const SkChannelArray& ct_channels = anim_source->controller_channels();
 					vector<int> new_channels;  // list of indices to channels in use
 					
@@ -722,12 +708,15 @@ void prune_schedule( SbmCharacter*   actor,
 							raw_channels.add( ct_channels.name(*it), ct_channels.type(*it) );
 						}
 					}
-
-					if( LOG_CONTROLLER_TREE_PRUNING ) cout << ( in_use? "Not Pruned." : "Pruned!" ) << endl;
 				} else {
 					//  TODO: Throttle warnings....
 					cerr << "WARNING: Cannot prune unknown controller type \"" << anim_source->controller_type() << "\"" << endl;
 				}
+				if( LOG_CONTROLLER_TREE_PRUNING )
+					cout << ( in_use? "\t- Not Pruned." : "\t- Pruned!" ) << endl;
+			} else {
+				if( LOG_CONTROLLER_TREE_PRUNING )
+					cout << "\t- Ignoring!!" << endl;
 			}
 		} else {
 			// No animation source
@@ -769,6 +758,9 @@ void prune_schedule( SbmCharacter*   actor,
 int SbmCharacter::prune_controller_tree( mcuCBHandle* mcu_p ) {
 	double time = mcu_p->time;  // current time
 
+	if( LOG_PRUNE_CMD_TIME || LOG_CONTROLLER_TREE_PRUNING )
+		cout << "SbmCharacter \""<<name<<"\" prune_controller_tree(..) @ time "<<time<<endl;
+
 	// Pointers to the most active controllers of each type.
 	MeCtGaze**     gaze_key_cts = new MeCtGaze*[ MeCtGaze::NUM_GAZE_KEYS ];
 	for( int key=0; key<MeCtGaze::NUM_GAZE_KEYS; ++key )
@@ -792,8 +784,10 @@ int SbmCharacter::prune_controller_tree( mcuCBHandle* mcu_p ) {
 	raw_channels = SkChannelArray::empty_channel_array();
 	prune_schedule( this, posture_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
 
-	if( LOG_CONTROLLER_TREE_PRUNING )
+	if( LOG_CONTROLLER_TREE_PRUNING ) {
+		cout << endl;
 		print_controller_schedules();
+	}
 
 	delete[] gaze_key_cts;
 
@@ -1164,8 +1158,6 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	}
 	else
 	if( char_cmd=="prune" ) {
-		if( LOG_PRUNE_CMD_TIME )
-			cout << "char "<<char_name<<" prune"<<" (time "<<mcu_p->time<<')'<<endl;
 		int result = CMD_SUCCESS;
 		if( all_characters ) {
 			mcu_p->character_map.reset();
