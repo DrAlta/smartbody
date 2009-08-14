@@ -23,8 +23,8 @@
 
 #include <windows.h>
 
+#include <map>
 #include <string>
-#include <vector>
 
 #include "Ogre.h"
 #include "OgreTagPoint.h"
@@ -41,8 +41,6 @@ Entity * ent;
 SceneNode * mSceneNode;
 
 std::string skeleton[ 114 ];
-
-
 
 // Event handler to animate
 class SkeletalAnimationFrameListener : public ExampleFrameListener
@@ -164,6 +162,9 @@ public:
 class OgreViewerApplication : public ExampleApplication
 {
 protected:
+	//Map used to store each characters initial bone positions to be 
+	//used in 'OnBonePosition' function to add up with the deltas.
+	std::map<int,std::map<string,Ogre::Vector3>> characterInitBonePosMap;
 
 public:
 	OgreViewerApplication() {}
@@ -597,11 +598,44 @@ protected:
 
 		char charIdStr[ 16 ];
 		_itoa( characterID, charIdStr, 10 );
+		Entity * ent;
 
-		// TODO: Select character via characterType
-		//Entity * ent = app->mSceneMgr->createEntity( charIdStr, "OgreDoctor.mesh" );
-		Entity * ent = app->mSceneMgr->createEntity( charIdStr, "Brad.mesh" );
+		try
+		{
+			//Create character from character name
+			ent = app->mSceneMgr->createEntity( charIdStr, characterName + ".mesh" );
+		}
+		catch (Ogre::ItemIdentityException e)
+		{
+			//Default to existing Brad character
+			ent = app->mSceneMgr->createEntity( charIdStr, "Brad.mesh" );
+		}
 
+		if (ent == NULL)
+		{
+			printf( "Unable to create character %s", characterName);
+			return;
+		}
+
+		Ogre::Skeleton * skel = ent->getSkeleton();
+		
+		//Number of the skeleton's bones 
+		int count = skel->getNumBones(); 
+		Ogre::Bone * bone = NULL;
+
+		//Create a map of initial bone postions for the character
+		std::map<string,Ogre::Vector3> cachedInitialBonePositions;
+
+		//Iterate each bone in skeleton
+		for(int i = 0; i < count; i++) 
+		{ 
+			bone = skel->getBone(i);
+			//Store initial bone position against bone name
+			cachedInitialBonePositions[bone->getName().c_str()] = bone->getInitialPosition();
+		} 
+
+		//Store the map containing the initial bone position using charachter ID
+		app->characterInitBonePosMap[characterID] = cachedInitialBonePositions;
 
 		//ent->setMaterialName("Examples/Grass"); 
 		//ent->setVisible( false );
@@ -793,6 +827,8 @@ protected:
 		node->detachAllObjects();
 		app->mSceneMgr->destroyEntity( charIdStr );
 		app->mSceneMgr->getRootSceneNode()->removeAndDestroyChild( charIdStr );
+		//Remove initial bone positions for the character
+		app->characterInitBonePosMap.erase(characterID);
 	}
 
 
@@ -810,9 +846,8 @@ protected:
 		{
 			char charIdStr[ 16 ];
 			_itoa( characterID, charIdStr, 10 );
+			
 			Node * node = app->mSceneMgr->getRootSceneNode()->getChild( charIdStr );
-
-			//node->setPosition( x, y, z );
 			node->setPosition( -y, z, x );
 		}
 	}
@@ -832,8 +867,8 @@ protected:
 		{
 			char charIdStr[ 16 ];
 			_itoa( characterID, charIdStr, 10 );
-			Node * node = app->mSceneMgr->getRootSceneNode()->getChild( charIdStr );
 
+			Node * node = app->mSceneMgr->getRootSceneNode()->getChild( charIdStr );
 			node->setOrientation( Quaternion( w, -y, z, x ) );
 		}
 	}
@@ -962,10 +997,22 @@ protected:
 				bone->setManuallyControlled( true );
 
 				Quaternion q;
-				q.x = -bulkBoneRotations->bones[ i ].rot_x;
-				q.y =  bulkBoneRotations->bones[ i ].rot_y;
-				q.z = -bulkBoneRotations->bones[ i ].rot_z;
-				q.w =  bulkBoneRotations->bones[ i ].rot_w;
+
+				if ( boneName == "base" )
+				{
+					//Base bone needs to be manipulated as a special case
+					q.x = bulkBoneRotations->bones[ i ].rot_x;
+					q.y = -bulkBoneRotations->bones[ i ].rot_y;
+					q.z = bulkBoneRotations->bones[ i ].rot_z;
+					q.w =  bulkBoneRotations->bones[ i ].rot_w;
+				}
+				else
+				{
+					q.x = -bulkBoneRotations->bones[ i ].rot_x;
+					q.y = bulkBoneRotations->bones[ i ].rot_y;
+					q.z = -bulkBoneRotations->bones[ i ].rot_z;
+					q.w =  bulkBoneRotations->bones[ i ].rot_w;
+				}
 
 				bone->setOrientation( q );
 
@@ -982,10 +1029,6 @@ protected:
 
 
 		OgreViewerApplication * app = (OgreViewerApplication *)userData;
-
-
-		return;
-
 
 
 		char charIdStrBuff[ 36 ];
@@ -1009,7 +1052,9 @@ protected:
 		}
 
 		Ogre::Skeleton * skel = ent->getSkeleton();
-
+		//Get map of initial bone positions for the character
+		std::map<string,Ogre::Vector3> cachedInitialBonePositions =
+			app->characterInitBonePosMap[bulkBonePositions->charId];
 
 		int i;
 		for ( i = 0; i < bulkBonePositions->numBonePositions; i++ )
@@ -1019,9 +1064,6 @@ protected:
 			std::string & boneName = skeleton[ id ];
 
 			if ( boneName == "" )
-				continue;
-
-			if ( boneName == "base" )
 				continue;
 
 			//char blah[ 1024 ];
@@ -1040,11 +1082,24 @@ protected:
 			if ( bone )
 			{
 				bone->setManuallyControlled( true );
-
+				
+				//Get the initial bone position for the bone using bone name
+				Vector3 initialBonePosition = cachedInitialBonePositions[boneName];
 				Vector3 v;
-				v.x =  bulkBonePositions->bones[ i ].pos_z;
-				v.y = -bulkBonePositions->bones[ i ].pos_y;
-				v.z = -bulkBonePositions->bones[ i ].pos_x;
+
+				//if (cachedInitialBonePositions != NULL)
+				//{
+					//v.x = bulkBonePositions->bones[ i ].pos_x;
+					//v.y = -bulkBonePositions->bones[ i ].pos_y;
+					//v.z = bulkBonePositions->bones[ i ].pos_z;
+				//}
+				//else
+				//{
+					//Add initial bone position to delta
+					v.x = initialBonePosition.x + bulkBonePositions->bones[ i ].pos_x;
+					v.y = initialBonePosition.y + -bulkBonePositions->bones[ i ].pos_y;
+					v.z = initialBonePosition.z + bulkBonePositions->bones[ i ].pos_z;
+				//}
 
 				bone->setPosition( v );
 			}
