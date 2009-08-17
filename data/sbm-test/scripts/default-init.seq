@@ -12,10 +12,12 @@
 0	seq common-init
 
 0	echo >>> Loading data/sbm-test assets...
-#0	seq default-init-face
 0	load motions ../../../../data/sbm-test/common-sk/motion
 0	load motions ../../../../data/sbm-test/common-sk/step
 0	load motions ../../../../data/sbm-test/common-sk/qdraw
+0	load motions ../../../../data/sbm-test/common-sk/face
+
+0	seq default-init-face
 
 ###  Using USC-ICT Unreal Character Classes
 ###    Characters and above assets are standing 102 units
@@ -56,3 +58,15 @@
 1	seq default-viewer
 
 1	set test character doctor
+
+#1 time fps 10
+#1 time lockdt 1
+#1 seq test-gaze-init
+
+#2 ctrl E eyelid face_neutral fac_45_blink fac_5_upper_lid_raiser
+#2 ctrl E eyelid face_neutral fac_45_blink
+#2 ctrl E eyelid face_neutral fac_45_blink eyelid_extrema_lookup eyelid_extrema_lookdown eyelid_extrema_threshold
+#2 ctrl E eyelid
+#2 char doctor ctrl E begin
+
+#2	seq default-init-face
