@@ -68,14 +68,19 @@ void MeCtFace::init( SkMotion* base_ref_p ) {
 	
 	SkChannelArray& mchan_arr = _base_pose_p->channels();
 	int size = mchan_arr.size();
+	_include_chan_flag.size( size );
 	for( int i = 0; i < size; i++ )	{
+
+		if( ( mchan_arr.name( i ) == "eyeball_left" )||( mchan_arr.name( i ) == "eyeball_right" ) ) {
+//			printf( "MeCtFace::init: exclude[ %d ]: '%s': '%s'\n", i, mchan_arr.name( i ).get_string(), SkChannel::type_name( mchan_arr.type( i ) ) );
+			_include_chan_flag[ i ] = 0;
+		}
+		else	{
+			_include_chan_flag[ i ] = 1;
+		}
+
 		_channels.add( mchan_arr.name( i ), mchan_arr.type( i ) );
 	}
-
-#define HACK_EYELID_CORRECTION 0
-#if HACK_EYELID_CORRECTION
-	_channels.add( "eyeball_left", SkChannel::Quat );
-#endif
 
 	MeController::init();
 }
@@ -142,7 +147,6 @@ void MeCtFace::controller_map_updated( void ) {
 				// NOTE: check for -1 : report not found?
 				_kChan_to_buff[ c++ ] = _context->toBufferIndex( chan_index );
 			}
-
 		} 
 		else {
 			_bChan_to_buff.setall( -1 );
@@ -167,47 +171,29 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 	int nchan = base_channels.size();
 	float * base_pose_buff_p = _base_pose_p->posture( 0 );
 
-	//int au4_channel_index = _channels.search( SkJointName("au_4_left"),SkChannel::XPos );  // is it registered?
-	//printf( "MeCtFace: au_4_left channel index: %d\n", au4_channel_index );
-	//int au4_buffer_index = frame.toBufferIndex( au4_channel_index ); // Is the a position for the channel's value?
-	//printf( "MeCtFace: au_4_left buffer index: %d\n", au4_buffer_index );
-	//if( au4_buffer_index != -1 ) {
-	//	printf( "MeCtFace: au_4_left value: %f\n", fbuffer[ au4_buffer_index ] );  // what is the value?
-	//}
-
-#if HACK_EYELID_CORRECTION
-	int L_eye_quat_chan_index = _channels.search( SkJointName( "eyeball_left" ), SkChannel::Quat );
-	int i_map = _context->toBufferIndex( L_eye_quat_chan_index );
-	euler_t L_eye_e = quat_t(
-		fbuffer[ i_map ],
-		fbuffer[ i_map + 1 ],
-		fbuffer[ i_map + 2 ],
-		fbuffer[ i_map + 3 ]
-	);
-	printf( "MeCtFace eye %d %d pitch:%f h:%f r:%f\n", L_eye_quat_chan_index, i_map, L_eye_e.p(), L_eye_e.h(), L_eye_e.r() );
-#endif
-
 	int pose_var_index = 0;
 	for( int i=0; i<nchan; i++ )	{
 		
 		int ch_size = base_channels[ i ].size();
-		SkChannel::Type ch_type = base_channels[ i ].type;
+		if( _include_chan_flag[ i ] )	{
+			SkChannel::Type ch_type = base_channels[ i ].type;
 
-		int base_ch_index = _bChan_to_buff[ i ];
-		if( base_ch_index >= 0 )	{
-			if( 
-				( ch_type == SkChannel::XPos ) ||
-				( ch_type == SkChannel::YPos ) ||
-				( ch_type == SkChannel::ZPos )
-			)	{
-				fbuffer[ base_ch_index ] = base_pose_buff_p[ pose_var_index ];
-			}
-			else
-			if( ch_type == SkChannel::Quat )	{
-				fbuffer[ base_ch_index ] = base_pose_buff_p[ pose_var_index ];
-				fbuffer[ base_ch_index + 1 ] = base_pose_buff_p[ pose_var_index + 1 ];
-				fbuffer[ base_ch_index + 2 ] = base_pose_buff_p[ pose_var_index + 2 ];
-				fbuffer[ base_ch_index + 3 ] = base_pose_buff_p[ pose_var_index + 3 ];
+			int base_ch_index = _bChan_to_buff[ i ];
+			if( base_ch_index >= 0 )	{
+				if( 
+					( ch_type == SkChannel::XPos ) ||
+					( ch_type == SkChannel::YPos ) ||
+					( ch_type == SkChannel::ZPos )
+				)	{
+					fbuffer[ base_ch_index ] = base_pose_buff_p[ pose_var_index ];
+				}
+				else
+				if( ch_type == SkChannel::Quat )	{
+					fbuffer[ base_ch_index ] = base_pose_buff_p[ pose_var_index ];
+					fbuffer[ base_ch_index + 1 ] = base_pose_buff_p[ pose_var_index + 1 ];
+					fbuffer[ base_ch_index + 2 ] = base_pose_buff_p[ pose_var_index + 2 ];
+					fbuffer[ base_ch_index + 3 ] = base_pose_buff_p[ pose_var_index + 3 ];
+				}
 			}
 		}
 		pose_var_index += ch_size;
@@ -222,54 +208,62 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 		int weight_index = _kChan_to_buff[ c++ ];
 		if( weight_index >= 0 )	{
 			float key_weight = fbuffer[ weight_index ];
-//			if( key_weight > 0.0 )	{
 			if( fabs( key_weight ) > 0.0 )	{
+			
+//				printf( "Face: '%s'\n", key_pose_p->name() );
+			
 				float* key_pose_buff_p = key_pose_p->posture( 0 );
 
 				pose_var_index = 0;
 				for( int i=0; i<nchan; i++ )	{
 					int ch_size = base_channels[ i ].size();
-					SkChannel::Type ch_type = base_channels[ i ].type;
-					
-					int base_ch_index = _bChan_to_buff[ i ];
-					if( base_ch_index >= 0 )	{
-						if( 
-							( ch_type == SkChannel::XPos ) ||
-							( ch_type == SkChannel::YPos ) ||
-							( ch_type == SkChannel::ZPos )
-						)	{
-							fbuffer[ base_ch_index ] += 
-								( key_pose_buff_p[ pose_var_index ] - base_pose_buff_p[ pose_var_index ] ) * key_weight;
+
+					if( _include_chan_flag[ i ] )	{
+						SkChannel::Type ch_type = base_channels[ i ].type;
+
+						int base_ch_index = _bChan_to_buff[ i ];
+						if( base_ch_index >= 0 )	{
+							if( 
+								( ch_type == SkChannel::XPos ) ||
+								( ch_type == SkChannel::YPos ) ||
+								( ch_type == SkChannel::ZPos )
+							)	{
+								fbuffer[ base_ch_index ] += 
+									( key_pose_buff_p[ pose_var_index ] - base_pose_buff_p[ pose_var_index ] ) * key_weight;
+							}
+							else
+							if( ch_type == SkChannel::Quat )	{
+
+								quat_t accum_q(
+									fbuffer[ base_ch_index ],
+									fbuffer[ base_ch_index + 1 ],
+									fbuffer[ base_ch_index + 2 ],
+									fbuffer[ base_ch_index + 3 ]
+								);
+								quat_t base_q( 
+									base_pose_buff_p[ pose_var_index ], 
+									base_pose_buff_p[ pose_var_index + 1 ], 
+									base_pose_buff_p[ pose_var_index + 2 ], 
+									base_pose_buff_p[ pose_var_index + 3 ] 
+								);
+								quat_t key_q( 
+									key_pose_buff_p[ pose_var_index ], 
+									key_pose_buff_p[ pose_var_index + 1 ], 
+									key_pose_buff_p[ pose_var_index + 2 ], 
+									key_pose_buff_p[ pose_var_index + 3 ] 
+								);
+
+								quat_t result_q = ( ( key_q * -base_q ) * key_weight ) * accum_q;
+
+								fbuffer[ base_ch_index ] = (float)result_q.w();
+								fbuffer[ base_ch_index + 1 ] = (float)result_q.x();
+								fbuffer[ base_ch_index + 2 ] = (float)result_q.y();
+								fbuffer[ base_ch_index + 3 ] = (float)result_q.z();
+							}
 						}
-						else
-						if( ch_type == SkChannel::Quat )	{
-
-							quat_t accum_q(
-								fbuffer[ base_ch_index ],
-								fbuffer[ base_ch_index + 1 ],
-								fbuffer[ base_ch_index + 2 ],
-								fbuffer[ base_ch_index + 3 ]
-							);
-							quat_t base_q( 
-								base_pose_buff_p[ pose_var_index ], 
-								base_pose_buff_p[ pose_var_index + 1 ], 
-								base_pose_buff_p[ pose_var_index + 2 ], 
-								base_pose_buff_p[ pose_var_index + 3 ] 
-							);
-							quat_t key_q( 
-								key_pose_buff_p[ pose_var_index ], 
-								key_pose_buff_p[ pose_var_index + 1 ], 
-								key_pose_buff_p[ pose_var_index + 2 ], 
-								key_pose_buff_p[ pose_var_index + 3 ] 
-							);
-
-							quat_t result_q = ( ( key_q * -base_q ) * key_weight ) * accum_q;
-
-							fbuffer[ base_ch_index ] = (float)result_q.w();
-							fbuffer[ base_ch_index + 1 ] = (float)result_q.x();
-							fbuffer[ base_ch_index + 2 ] = (float)result_q.y();
-							fbuffer[ base_ch_index + 3 ] = (float)result_q.z();
-						}
+					}
+					else	{
+//						printf( "exclude: %d\n", i );
 					}
 					pose_var_index += ch_size;
 				}

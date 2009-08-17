@@ -1,7 +1,7 @@
 0   echo default-init-face: Loading face postures...
 
 
-0	load motions ../../../../data/sbm-test/common-sk/face
+#0	load motions ../../../../data/sbm-test/common-sk/face
 
 
 0   echo default-init-face: Initializing FAC and viseme channels...

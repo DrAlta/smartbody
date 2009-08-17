@@ -63,6 +63,8 @@ class MeCtFace : public MeController	{
 		srHashMap <SkMotion>	_key_pose_map;
 		
 		SkSkeleton* 	    _skeleton_ref_p;
+
+		SrBuffer<bool>			_include_chan_flag; // key channels to exclude from calculation
 		
 	public:
 		static const char* type_name;
@@ -74,7 +76,7 @@ class MeCtFace : public MeController	{
 		virtual ~MeCtFace( void );
 		
 		void clear( void );
-
+		
 		void init( SkMotion* base_ref_p );
 		void add_key( const char *weight_key, SkMotion* key_pose_p );
 		void finish_adding( void );
