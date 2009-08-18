@@ -78,6 +78,8 @@ class MeCtFace : public MeController	{
 		void clear( void );
 		
 		void init( SkMotion* base_ref_p );
+		void remove_joint( const char *joint_name );
+		void remove_channel( const char *joint_name, SkChannel::Type ch_type );
 		void add_key( const char *weight_key, SkMotion* key_pose_p );
 		void finish_adding( void );
 
