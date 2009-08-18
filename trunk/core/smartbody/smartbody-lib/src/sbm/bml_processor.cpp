@@ -59,7 +59,6 @@ using namespace SmartBody;
 const bool LOG_METHODS				= false;
 const bool BML_LOG_INTERRUPT        = false;
 
-
 const double SQROOT_2 = 1.4142135623730950488016887242097;
 
 
@@ -220,7 +219,9 @@ BML::Processor::Processor()
 :	auto_print_controllers( false ),
 	auto_print_sequence( false ),
 	log_syncpoints( false ),
-	warn_unknown_agents( true )
+	warn_unknown_agents( true ),
+	ct_speed_min( CONTROLLER_SPEED_MIN_DEFAULT ),
+	ct_speed_max( CONTROLLER_SPEED_MAX_DEFAULT )
 {
 	try {
 		xmlParser = boost::shared_ptr<XercesDOMParser>( new XercesDOMParser() );
@@ -1158,6 +1159,60 @@ int BML::Processor::set_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 			cerr << "ERROR: BML::Processor::set_func(): expected \"on\" or \"off\" for " << attribute <<".  Found \""<<value<<"\"."<< endl;
 			return CMD_FAILURE;
 		}
+	} else if( attribute == "controller_speed" ||
+	           attribute == "controller-speed" ) {
+		string sub_attribute = args.read_token();
+		if( sub_attribute.empty() ) {
+			cerr << "ERROR: Missing sub-attributes 'min <value>' or 'max <value>'." << endl;
+			return CMD_FAILURE;
+		}
+
+		float ct_speed_min = bp.ct_speed_min;
+		float ct_speed_max = bp.ct_speed_max;
+
+		while( !sub_attribute.empty() ) {
+			if( sub_attribute == "min" ) {
+				string value = args.read_token();
+				if( value == "default" ) {
+					ct_speed_min = BML::CONTROLLER_SPEED_MIN_DEFAULT;
+				} else if( value.empty() || !(istringstream( value ) >> ct_speed_min) ) {
+					cerr << "ERROR: Invalid " << attribute << ' ' << sub_attribute << " value string \"" << value << "\"." << endl;
+					return CMD_FAILURE;
+				}
+			} else if( sub_attribute == "max" ) {
+				string value = args.read_token();
+				if( value == "default" ) {
+					ct_speed_max = BML::CONTROLLER_SPEED_MAX_DEFAULT;
+				} else if( value.empty() || !(istringstream( value ) >> ct_speed_max) ) {
+					cerr << "ERROR: Invalid " << attribute << ' ' << sub_attribute << " value string \"" << value << "\"." << endl;
+					return CMD_FAILURE;
+				}
+			} else {
+				cerr << "ERROR: Unexpected sub_attribute \"" << sub_attribute << "\" for bp controller_speed." << endl;
+				return CMD_FAILURE;
+			}
+			sub_attribute = args.read_token();
+		}
+
+		bool valid = true;
+		if( ct_speed_min >= 1 ) {
+			cerr << "ERROR: controller_speed min must be less than 1." << endl;
+			valid = false;
+		} else if( ct_speed_min <= 0 ) {
+			cerr << "ERROR: controller_speed min must be greater than 0." << endl;
+			valid = false;
+		}
+		if(  ct_speed_max <= 1 ) {
+			cerr << "ERROR: controller_speed max must be greater than 1." << endl;
+			valid = false;
+		}
+		if( valid ) {
+			bp.ct_speed_min = ct_speed_min;
+			bp.ct_speed_max = ct_speed_max;
+			return CMD_SUCCESS;
+		} else {
+			return CMD_FAILURE;
+		}
 	} else if( attribute == "gaze" ) {
 		attribute = args.read_token();
 		if( attribute == "speed" ) {
@@ -1191,19 +1246,23 @@ int BML::Processor::print_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 	string attribute = args.read_token();
 	if( attribute == "auto_print_controllers" ||
 		attribute == "auto-print-controllers" ) {
-		cout << "BodyPlanner auto_print_controllers: "<<
+		cout << "BML Processor auto_print_controllers: "<<
 			(bp.auto_print_controllers? "on" : "off") << endl;
 		return CMD_SUCCESS;
 	} else if( attribute == "auto_print_sequence" ||
 	           attribute == "auto-print-sequence" ) {
-		cout << "BodyPlanner auto_print_sequence: "<<
+		cout << "BML Processor auto_print_sequence: "<<
 			(bp.auto_print_sequence? "on" : "off") << endl;
 		return CMD_SUCCESS;
 	} else if( attribute == "log_syncpoints" ||
 	           attribute == "log-syncpoints" ) {
-		cout << "BodyPlanner log_syncpoints: "<<
+		cout << "BML Processor log_syncpoints: "<<
 			(bp.log_syncpoints? "on" : "off") << endl;
 		return CMD_SUCCESS;
+	} else if( attribute == "controller_speed" ||
+	           attribute == "controller-speed" ) {
+	   cout << "BML Processor "<<attribute<<": min="<<bp.ct_speed_min<<", max="<<bp.ct_speed_max<< endl;
+	   return CMD_SUCCESS;
 	} else if( attribute == "gaze" ) {
 		attribute = args.read_token();
 		if( attribute == "joint-speed" ||

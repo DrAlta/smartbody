@@ -196,7 +196,7 @@ int BML::Gaze::set_gaze_smoothing( float lumbar, float cervical, float eyeball )
 
 void BML::Gaze::print_gaze_smoothing() {
 	cout << "BML Processor default gaze speed smoothing (0 to 1):" << endl
-		 << "\tlumbar = " << BML::Gaze::smooth_lumbar << endl
+		 << "\tlumbar   = " << BML::Gaze::smooth_lumbar << endl
 		 << "\tcervical = " << BML::Gaze::smooth_cervical << endl
 		 << "\teyeballs = " << BML::Gaze::smooth_eyeball << endl;
 }
