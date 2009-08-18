@@ -45,6 +45,9 @@ namespace BML {
 	const bool LOG_SYNC_POINTS = false;
 	const bool LOG_SPEECH      = false;
 
+	const float CONTROLLER_SPEED_MIN_DEFAULT = 0.25;
+	const float CONTROLLER_SPEED_MAX_DEFAULT = 4;
+
 
 	class Processor {
 		///////////////////////////////////////////////////////////////////////
@@ -104,6 +107,9 @@ namespace BML {
 #endif
 
 		boost::shared_ptr<XercesDOMParser> xmlParser;
+
+		float ct_speed_min;
+		float ct_speed_max;
 
 	public:
 		//////////////////////////////////////////////////////////////////////////
