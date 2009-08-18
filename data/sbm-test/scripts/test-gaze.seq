@@ -35,8 +35,8 @@
 #5 char elder ctrl G3 begin
 
 
-#2 gaze G1 target point 0 -2000 100
-#2 gaze G1 target point -1000 200 0
-#4 gaze G1 target point 1000 200 -1000
-#6 gaze G1 target point -1000 200 -1000
-#8 gaze G1 target point 0 200 100
+2 gaze G1 target point 0 -2000 100
+2 gaze G1 target point -1000 200 0
+4 gaze G1 target point 1000 200 -1000
+6 gaze G1 target point -1000 200 -1000
+8 gaze G1 target point 0 200 100

@@ -62,27 +62,86 @@ void MeCtFace::init( SkMotion* base_ref_p ) {
 	
 	clear();
 	
-	_base_pose_p = base_ref_p;
-	_base_pose_p->ref();
-	_base_pose_p->move_keytimes( 0.0 ); // make sure motion starts at 0
-	
-	SkChannelArray& mchan_arr = _base_pose_p->channels();
-	int size = mchan_arr.size();
-	_include_chan_flag.size( size );
-	for( int i = 0; i < size; i++ )	{
+	if( base_ref_p )	{
+		_base_pose_p = base_ref_p;
+		_base_pose_p->ref();
+		_base_pose_p->move_keytimes( 0.0 ); // make sure motion starts at 0
 
-		if( ( mchan_arr.name( i ) == "eyeball_left" )||( mchan_arr.name( i ) == "eyeball_right" ) ) {
-//			printf( "MeCtFace::init: exclude[ %d ]: '%s': '%s'\n", i, mchan_arr.name( i ).get_string(), SkChannel::type_name( mchan_arr.type( i ) ) );
-			_include_chan_flag[ i ] = 0;
+		SkChannelArray& mchan_arr = _base_pose_p->channels();
+		int size = mchan_arr.size();
+		_include_chan_flag.size( size );
+		for( int i = 0; i < size; i++ )	{
+			_include_chan_flag[ i ] = 1;
+			_channels.add( mchan_arr.name( i ), mchan_arr.type( i ) );
+		}
+		MeController::init();
+
+#define DEFAULT_REMOVE_EYEBALLS 1
+#if DEFAULT_REMOVE_EYEBALLS
+		remove_joint( "eyeball_left" );
+		remove_joint( "eyeball_right" );
+#endif
+
+	}
+	else	{
+		printf( "MeCtFace::init ERR: base_ref_p is NULL\n" );
+	}
+}
+
+void MeCtFace::remove_joint( const char *joint_name ) {
+	int found = 0;
+	
+	if( joint_name )	{
+		if( _base_pose_p )	{
+			SkChannelArray& mchan_arr = _base_pose_p->channels();
+			int size = mchan_arr.size();
+			for( int i = 0; i < size; i++ )	{
+				if( mchan_arr.name( i ) == joint_name ) {
+//					printf( "MeCtFace::remove_joint: exclude[ %d ]: '%s:%s'\n", 
+//						i, mchan_arr.name( i ).get_string(), SkChannel::type_name( mchan_arr.type( i ) ) );
+					_include_chan_flag[ i ] = 0;
+					found = 1;
+				}
+			}
+			if( !found )	{
+				printf( "MeCtFace::remove_joint ERR: joint '%s' NOT FOUND\n", joint_name );
+			}
 		}
 		else	{
-			_include_chan_flag[ i ] = 1;
+			printf( "MeCtFace::remove_joint ERR: _base_pose_p is NULL\n" );
 		}
-
-		_channels.add( mchan_arr.name( i ), mchan_arr.type( i ) );
 	}
+	else	{
+		printf( "MeCtFace::remove_joint ERR: joint_name is NULL\n" );
+	}
+}
 
-	MeController::init();
+void MeCtFace::remove_channel( const char *joint_name, SkChannel::Type ch_type ) {
+	int found = 0;
+	
+	if( joint_name )	{
+		if( _base_pose_p )	{
+			SkChannelArray& mchan_arr = _base_pose_p->channels();
+			int size = mchan_arr.size();
+			for( int i = 0; i < size; i++ )	{
+				if( ( mchan_arr.name( i ) == joint_name )&&( mchan_arr.type( i ) == ch_type ) ) {
+//					printf( "MeCtFace::remove_channel: exclude[ %d ]: '%s:%s'\n", 
+//						i, mchan_arr.name( i ).get_string(), SkChannel::type_name( mchan_arr.type( i ) ) );
+					_include_chan_flag[ i ] = 0;
+					found = 1;
+				}
+			}
+			if( !found )	{
+				printf( "MeCtFace::remove_channel ERR: channel '%s:%s' NOT FOUND\n", joint_name, SkChannel::type_name( ch_type ) );
+			}
+		}
+		else	{
+			printf( "MeCtFace::remove_channel ERR: _base_pose_p is NULL\n" );
+		}
+	}
+	else	{
+		printf( "MeCtFace::remove_channel ERR: joint_name is NULL\n" );
+	}
 }
 
 void MeCtFace::add_key( const char *weight_key, SkMotion* key_pose_p ) {
