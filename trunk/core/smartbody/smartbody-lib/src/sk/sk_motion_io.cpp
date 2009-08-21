@@ -285,7 +285,12 @@ bool SkMotion::load ( SrInput& in ) {
 				else
 					return false;
 			} else {
-				cout << "ERROR: SkMotion::load(): File \""<<in.filename()<<"\", line "<<in.curline()<<": Expected metadata name, but recieved \"" << token << "\"." << endl;
+				cout << "ERROR: SkMotion::load(): ";
+				if( in.filename() )
+					cout << "File \""<<in.filename()<<"\", line "<<in.curline();
+				else
+					cout << "Unknown file, line "<<in.curline();
+				cout <<": Expected metadata name, but recieved \"" << token << "\"." << endl;
 				return false;
 			}
 		} while( in.get_token() != SrInput::EndOfFile );
