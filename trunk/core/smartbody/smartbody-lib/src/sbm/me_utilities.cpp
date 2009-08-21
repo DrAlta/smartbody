@@ -149,6 +149,7 @@ int load_me_motions_impl( const path& pathname, srHashMap<SkMotion>& map, bool r
 		SrString fullin_string;
 		in.getall( fullin_string );
 		SrInput fullin( (const char *)fullin_string );
+		fullin.filename( pathname.string().c_str() ); // copy filename for error messages
 		if( motion->load( fullin ) ) {
 			string filebase = basename( pathname );
 			const char* name = motion->name();
