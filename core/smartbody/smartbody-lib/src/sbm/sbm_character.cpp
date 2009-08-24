@@ -855,10 +855,6 @@ int SbmCharacter::set_viseme( char* viseme,
 {
     //fprintf( stdout, "Recieved: SbmCharacter(\"%s\")::set_viseme( \"%s\", %f, %f )\n", name, viseme, weight, rampin_duration );
 
-	// SendWinsockSetViseme( viseme, weight );  // Old code...  
-
-	// I think this is the corrected code (untested as of 20060719)
-	//NetworkSetViseme( net_handle, viseme, weight, rampin_duration );
 	VisemeToDataMap::const_iterator it;
 
 	// tolower(viseme) removed until BoneBone visemes are also lowercased
@@ -1043,6 +1039,34 @@ int SbmCharacter::print_controller_schedules() {
 		// Print Face?
 
 		return CMD_SUCCESS;
+}
+
+bool SbmCharacter::is_face_controller_enabled() {
+	return (face_ct!=NULL && face_ct->context()!=NULL);
+}
+
+set<string> SbmCharacter::get_face_names() {
+	set<string> names;
+
+	bool using_facebone = is_face_controller_enabled();
+
+	VisemeToDataMap::const_iterator vid_it  = viseme_impl_data.begin();
+	VisemeToDataMap::const_iterator vid_end = viseme_impl_data.end();
+	for( ; vid_it!=vid_end; ++vid_it ) {
+		VisemeImplDataPtr data = vid_it->second;
+
+		if( using_facebone ) {
+			// Valid if at least one input channel exists 
+			if( !data->channel_names.empty() )
+				names.insert( vid_it->first );
+		} else {
+			// Valid if at least one bonebus name exists
+			if( !data->bonebus_names.empty() )
+				names.insert( vid_it->first );
+		}
+	}
+
+	return names;
 }
 
 
@@ -1365,6 +1389,29 @@ int SbmCharacter::print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return CMD_SUCCESS;
 	} else if( attribute=="schedule" ) {
 		return character->print_controller_schedules();
+	} else if( attribute=="face" ) {
+		string sub_attribute = args.read_token();
+		if( sub_attribute=="names" ) {
+			ostringstream output;
+			if( character->is_face_controller_enabled() ) {
+				output << "Using bone based face control:" << endl;
+			} else {
+				output << "Using renderer face control via BoneBus (implementation of the following will depend upon the render):" << endl;
+			}
+
+			set<string> names = character->get_face_names();
+
+			set<string>::iterator it = names.begin();
+			set<string>::iterator end = names.end();
+			for( ; it!=end; ++it )
+				output << '\t' << *it << endl;
+
+			cout << output.str();
+			return CMD_SUCCESS;
+		} else {
+			cerr << "ERROR: Expected viseme subattribute \"names\".  Found \""<<sub_attribute<<"\"." << endl;
+			return CMD_FAILURE;
+		}
 	} else {
 		return SbmPawn::print_attribute( character, attribute, args, mcu_p );
 	}
