@@ -30,6 +30,7 @@
 #include <float.h>
 #include <iostream>
 #include <string>
+#include <set>
 
 #include "bonebus.h"
 
@@ -172,6 +173,14 @@ public:
 
 	int print_controller_schedules();
 
+
+	/** Returns true if face controller is active on this character. */
+	bool is_face_controller_enabled();
+
+	/** Return a list of named faceposes implemented in this character. */
+	std::set<std::string> get_face_names();
+
+
 	//////////////////////////////////////////
 	// Static command handlers
 
@@ -205,7 +214,6 @@ public:
 	 *  Handles commands beginning with "print character <character id> ...".
 	 */
 	static int print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-
 
 protected:
 	/*!
