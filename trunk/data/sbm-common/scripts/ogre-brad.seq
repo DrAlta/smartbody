@@ -1,0 +1,58 @@
+0 echo |------------------------------------------|
+0 echo |  data/sbm-test/scripts/brad.seq  |
+0 echo |------------------------------------------|
+###    Replaces sbm-common's default-init
+###    if sbm-test/scripts/ is first in the seq path.
+
+
+### Load data/sbm-common assets
+### Assumes current directory is: core/smartbody/sbm/bin
+0	path seq ../../../../data/sbm-test/scripts
+0	path seq ../../../../data/sbm-common/scripts
+0	seq common-init
+
+0	echo >>> Loading data/sbm-test assets...
+0	seq default-init-face
+0	load motions ../../../../data/sbm-test/common-sk/motion
+0	load motions ../../../../data/sbm-test/common-sk/step
+0	load motions ../../../../data/sbm-test/common-sk/qdraw
+
+###  Using USC-ICT Unreal Character Classes
+###    Characters and above assets are standing 102 units
+###    below origin for better lighting in Unreal.
+###    Using remote rVoice speech synthesis
+###  NOTE: increment time to insure common-init is processed in order.
+1	char doctor init common.sk brad
+1	set character doctor world_offset x 0 y 102 h 0
+1	set character doctor voice remote M021
+
+###  Using "test bml" command to avoid hard-coding
+###  message id into sequence file.
+1	test bml character doctor noecho posture HandsAtSide
+
+# Pawns to look at, etc.
+1	echo Creating FORWARD pawn
+1	pawn FORWARD init
+1	set pawn FORWARD world_offset x 0 y 180 z 185
+
+1	echo Creating LEFT pawn
+1	pawn LEFT init
+1	set pawn LEFT world_offset x 200 y 180 z 200
+
+1	echo Creating RIGHT pawn
+1	pawn RIGHT init
+1	set pawn RIGHT world_offset x 200 y 180 z 200
+
+1	echo Creating FAR_LEFT pawn
+1	pawn FAR_LEFT init
+1	set pawn FAR_LEFT world_offset x 200 y 180 z 0
+
+1	echo Creating FAR_RIGHT pawn
+1	pawn FAR_RIGHT init
+1	set pawn FAR_RIGHT world_offset x 200 y 180 z 0
+
+
+
+1	seq default-viewer
+
+1	set test character doctor
