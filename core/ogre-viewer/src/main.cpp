@@ -602,8 +602,8 @@ protected:
 
 		try
 		{
-			//Create character from character name
-			ent = app->mSceneMgr->createEntity( charIdStr, characterName + ".mesh" );
+			//Create character from characterType
+			ent = app->mSceneMgr->createEntity( charIdStr, characterType + ".mesh" );
 		}
 		catch (Ogre::ItemIdentityException e)
 		{
