@@ -162,12 +162,8 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	// Face controller
 	if( face_neutral ) {
 		pipeline_p->add_controller( face_ct );
+		pipeline_p->add_controller( eyelid_ct );
 	}
-
-#define ADD_EYELID_CORRECTIVE_CT 0
-#if ADD_EYELID_CORRECTIVE_CT
-	pipeline_p->add_controller( eyelid_ct );
-#endif
 
 	bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( name, unreal_class, mcuCBHandle::singleton().net_face_bones );
 	
