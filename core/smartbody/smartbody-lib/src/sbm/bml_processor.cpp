@@ -332,57 +332,11 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
 		bml_error( bpMsg.actorId, bpMsg.msgId, message, mcu );
 	}
 }
-void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCBHandle *mcu ) {
-	// look for BML animation command tags
-	DOMElement*	child				= xml_utils::getFirstChildElement( bmlElem );
-	if( !child ) {
-		cout << " WARNING: BML \""<<request->msgId<<"\" does not contain any behaviors!" <<endl;
-		return;
-	}
 
-	// TEMPORARY: <speech> can only be the first behavior
-	const XMLCh*	tag = child->getTagName();  // Child (behavior) Tag
-	const XMLCh*	id  = child->getAttribute( ATTR_ID );
-	size_t			behavior_ordinal	= 0;
-
-	if( XMLString::compareString( tag, TAG_SBM_SPEECH )==0 || XMLString::compareString( tag, TAG_SPEECH )==0 ) {
-//// Old code
-//		const XMLCh*     speechId;
-//		speechId = child->getAttribute( ATTR_ID );
-//
-//		string unique_id = request->buildUniqueBehaviorId( tag, id, ++behavior_ordinal );
-//		SpeechRequestPtr speech( new SpeechRequest( unique_id, child, speechId, request ) );
-//		request->registerBehavior( speechId, speech );
-//
-//		child = xml_utils::getNextElement( child );
-
-		string unique_id = request->buildUniqueBehaviorId( tag, id, ++behavior_ordinal );
-
-		SyncPoints syncs;
-		syncs.parseStandardSyncPoints( child, request, unique_id );
-
-		SpeechRequestPtr speech_request( parse_bml_speech( child, unique_id, syncs, request, mcu ) );
-		if( speech_request ) {
-			request->registerBehavior( id, speech_request );
-
-			// Store reference to the speech behavior in the speeches map for later processing
-			// TODO: generalize this to TriggerEvent handling
-			string speechKey = buildSpeechKey( request->actor, speech_request->speech_request_id );
-			bool insert_success = speeches.insert( make_pair( speechKey, speech_request ) ).second;  // store for later reply
-			if( !insert_success ) {
-				cerr << "ERROR: BML::Processor.vrSpeak(..): BmlProcessor::speehces already contains an entry for speechKey \"" << speechKey << "\".  Cannot process speech behavior.  Failing BML request.  (This error should not occur. Let Andrew know immeidately.)"  << endl;
-				// TODO: Send vrSpeakFailed
-			}
-
-			request->speech_request = speech_request;
-		} else {
-			//  Speech is always treated as required
-			wcerr<<"ERROR: BML::Processor::parseBML(): Failed to parse <"<<tag<<"> tag."<<endl;
-		}
-
-		child = xml_utils::getNextElement( child );
-	}
-
+void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr request, mcuCBHandle* mcu,
+                                         size_t& behavior_ordinal, bool allow_required ) {
+	// look for BML behavior command tags
+	DOMElement*  child = xml_utils::getFirstChildElement( group );
 	while( child!=NULL ) {
 		const XMLCh *tag = child->getTagName();  // Grand Child (behavior) Tag
 		const XMLCh* id  = child->getAttribute( ATTR_ID );
@@ -396,7 +350,39 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCB
 
 		// Parse behavior specifics
 		//// TODO: tag name -> behavior factory map
-		if( XMLString::compareString( tag, TAG_ANIMATION )==0 ) {
+		if( XMLString::compareString( tag, TAG_SBM_SPEECH )==0 || XMLString::compareString( tag, TAG_SPEECH )==0 ) {
+			// TEMPORARY: <speech> can only be the first behavior
+			if( behavior_ordinal == 1 ) {
+				// This speech is the first
+				string unique_id = request->buildUniqueBehaviorId( tag, id, ++behavior_ordinal );
+
+				SyncPoints syncs;
+				syncs.parseStandardSyncPoints( child, request, unique_id );
+
+				SpeechRequestPtr speech_request( parse_bml_speech( child, unique_id, syncs, request, mcu ) );
+				if( speech_request ) {
+					request->registerBehavior( id, speech_request );
+
+					// Store reference to the speech behavior in the speeches map for later processing
+					// TODO: generalize this to TriggerEvent handling
+					string speechKey = buildSpeechKey( request->actor, speech_request->speech_request_id );
+					bool insert_success = speeches.insert( make_pair( speechKey, speech_request ) ).second;  // store for later reply
+					if( !insert_success ) {
+						cerr << "ERROR: BML::Processor.vrSpeak(..): BmlProcessor::speehces already contains an entry for speechKey \"" << speechKey << "\".  Cannot process speech behavior.  Failing BML request.  (This error should not occur. Let Andrew know immeidately.)"  << endl;
+						// TODO: Send vrSpeakFailed
+					}
+
+					request->speech_request = speech_request;
+				} else {
+					//  Speech is always treated as required
+					wcerr<<"ERROR: BML::Processor::parseBML(): Failed to parse <"<<tag<<"> tag."<<endl;
+				}
+			} else {
+				//  Speech is always treated as required
+				wcerr<<"ERROR: BML <"<<tag<<"> must be first behavior."<<endl;
+				cerr<<"\t(unique_id \""<<unique_id<<"\"."<<endl;  // unique id is not multibyte, and I'm lazily refusing to convert just to put it on the same line).
+			}
+		} else if( XMLString::compareString( tag, TAG_ANIMATION )==0 ) {
 			// DEPRECATED FORM
 			behavior = parse_bml_animation( child, unique_id, syncs, request, mcu );
 		} else if( XMLString::compareString( tag, TAG_SBM_ANIMATION )==0 ) {
@@ -447,6 +433,56 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCB
 
 		child = xml_utils::getNextElement( child );
 	}
+}
+
+void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCBHandle *mcu ) {
+	size_t behavior_ordinal	= 0;
+
+	parseBehaviorGroup( bmlElem, request, mcu, behavior_ordinal, true );
+
+	if( behavior_ordinal==0 ) { // No change
+		cout << " WARNING: BML \""<<request->msgId<<"\" does not contain any behaviors!" <<endl;
+		return;
+	}
+
+//	// TEMPORARY: <speech> can only be the first behavior
+//	if( XMLString::compareString( tag, TAG_SBM_SPEECH )==0 || XMLString::compareString( tag, TAG_SPEECH )==0 ) {
+////// Old code
+////		const XMLCh*     speechId;
+////		speechId = child->getAttribute( ATTR_ID );
+////
+////		string unique_id = request->buildUniqueBehaviorId( tag, id, ++behavior_ordinal );
+////		SpeechRequestPtr speech( new SpeechRequest( unique_id, child, speechId, request ) );
+////		request->registerBehavior( speechId, speech );
+////
+////		child = xml_utils::getNextElement( child );
+//
+//		string unique_id = request->buildUniqueBehaviorId( tag, id, ++behavior_ordinal );
+//
+//		SyncPoints syncs;
+//		syncs.parseStandardSyncPoints( child, request, unique_id );
+//
+//		SpeechRequestPtr speech_request( parse_bml_speech( child, unique_id, syncs, request, mcu ) );
+//		if( speech_request ) {
+//			request->registerBehavior( id, speech_request );
+//
+//			// Store reference to the speech behavior in the speeches map for later processing
+//			// TODO: generalize this to TriggerEvent handling
+//			string speechKey = buildSpeechKey( request->actor, speech_request->speech_request_id );
+//			bool insert_success = speeches.insert( make_pair( speechKey, speech_request ) ).second;  // store for later reply
+//			if( !insert_success ) {
+//				cerr << "ERROR: BML::Processor.vrSpeak(..): BmlProcessor::speehces already contains an entry for speechKey \"" << speechKey << "\".  Cannot process speech behavior.  Failing BML request.  (This error should not occur. Let Andrew know immeidately.)"  << endl;
+//				// TODO: Send vrSpeakFailed
+//			}
+//
+//			request->speech_request = speech_request;
+//		} else {
+//			//  Speech is always treated as required
+//			wcerr<<"ERROR: BML::Processor::parseBML(): Failed to parse <"<<tag<<"> tag."<<endl;
+//		}
+//
+//		child = xml_utils::getNextElement( child );
+//	}
 
 	if( LOG_SYNC_POINTS ) {
 		cout << "WARNING: LOG_SYNC_POINTS is broken.  Please fix!!" << endl;

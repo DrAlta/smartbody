@@ -223,6 +223,12 @@ namespace BML {
 		BmlRequestPtr createBmlRequest( const SbmCharacter* agent, const std::string & actorId, const std::string & requestId, const std::string & msgId );
 #endif
 
+		/**
+		 *  Parses a group of behavior tags, such as <bml> or <required>.
+		 *  The workhorse function of parseBML(..)
+		 */
+		void parseBehaviorGroup( DOMElement *el, BML::BmlRequestPtr request, mcuCBHandle *mcu, size_t&, bool );
+
 		BehaviorRequestPtr parse_bml_body( DOMElement* elem, std::string& unique_id, SyncPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu );
 		BehaviorRequestPtr parse_bml_head( DOMElement* elem, std::string& unique_id, SyncPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu );
 
