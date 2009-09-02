@@ -126,6 +126,36 @@ void mcuCBHandle::set_time( double real_time )	{
 	perf.update( real_time, time );
 }
 
+FILE* mcuCBHandle::open_sequence_file( char *seq_name ) {
+	FILE* file_p = NULL;
+
+	char buffer[ MAX_FILENAME_LEN ];
+	char label[ MAX_FILENAME_LEN ];
+	sprintf( label, "%s", seq_name );
+
+	seq_paths.reset();
+	char* filename = seq_paths.next_filename( buffer, label );
+	while( filename )	{
+		if( ( file_p = fopen( filename, "r" ) ) != NULL )
+			break;
+		filename = seq_paths.next_filename( buffer, label );
+	}
+	if( file_p == NULL ) {
+		sprintf( label, "%s.seq", seq_name );
+
+		seq_paths.reset();
+		filename = seq_paths.next_filename( buffer, label );
+		while( filename )	{
+			if( ( file_p = fopen( filename, "r" ) ) != NULL )
+				break;
+			filename = seq_paths.next_filename( buffer, label );
+		}
+	}
+
+	// return empty string if file not found
+	return file_p;
+}
+
 /**
  *  Clears the contents of the mcuCBHandle.
  *  Used by reset and destructor.
@@ -750,8 +780,10 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 /////////////////////////////////////////////////////////////
 
 int begin_sequence( char* seq_name, mcuCBHandle *mcu_p )	{
-	int err;
+	int err = CMD_FAILURE;
 	
+	// Remove previous activation of sequence.
+	// Equivalent to mcu_p->abort_seq( seq_name )?
 	srCmdSeq *seq_p = mcu_p->active_seq_map.remove( seq_name );
 	if( seq_p )	{
 		char *cmd;
@@ -763,60 +795,33 @@ int begin_sequence( char* seq_name, mcuCBHandle *mcu_p )	{
 	}
 
 	seq_p = mcu_p->pending_seq_map.remove( seq_name );
-	if( seq_p == NULL )	{
-		seq_p = new srCmdSeq;
-		char buffer[ MAX_FILENAME_LEN ];
-		char label[ MAX_FILENAME_LEN ];
-		sprintf( label, "%s", seq_name );
-		mcu_p->seq_paths.reset();
-		err = CMD_FAILURE;
-		int done = FALSE;
-		while( !done )	{
-			char *filename = mcu_p->seq_paths.next_filename( buffer, label );
-			if( filename )	{
-				err = seq_p->read_file( filename, FALSE );
-				if( err == CMD_SUCCESS )	{
-					done = TRUE;
-				}
-			}
-			else	{
-				done = TRUE;
-			}
-		}
-		if( err != CMD_SUCCESS )	{
-			// Try again, adding a .seq suffix
-			sprintf( label, "%s.seq", seq_name );
+	if( seq_p == NULL ) {
+		// Sequence not found.  Load new instance from file.
+		FILE* file_p = mcu_p->open_sequence_file( seq_name );
+		if( file_p ) {
+			seq_p = new srCmdSeq();
+			err = seq_p->read_file( file_p );
 
-			mcu_p->seq_paths.reset();
-			err = CMD_FAILURE;
-			int done = FALSE;
-			while( !done )	{
-				char *filename = mcu_p->seq_paths.next_filename( buffer, label );
-				if( filename )	{
-					err = seq_p->read_file( filename, FALSE );
-					if( err == CMD_SUCCESS )	{
-						done = TRUE;
-					}
-				}
-				else	{
-					done = TRUE;
-				}
-			}
+			if( err != CMD_SUCCESS ) {
+				fprintf( stderr, "begin_sequence ERR: begin: '%s' PARSE FAILED\n", seq_name ); 
 
-			if( err != CMD_SUCCESS )	{
-				printf( "begin_sequence ERR: begin: '%s' NOT FOUND\n", seq_name ); 
-				return( CMD_FAILURE );
+				delete seq_p;
+				seq_p = NULL;
 			}
+		} else {
+			fprintf( stderr, "begin_sequence ERR: begin: '%s' NOT FOUND\n", seq_name ); 
 		}
 	}
 	
-	seq_p->offset( (float)( mcu_p->time ) );
-	err = mcu_p->active_seq_map.insert( seq_name, seq_p );
-	if( err == CMD_FAILURE )	{
-		printf( "begin_sequence ERR: insert active: '%s' FAILED\n", seq_name ); 
-		return( err );
+	if( seq_p ) {
+		seq_p->offset( (float)( mcu_p->time ) );
+		err = mcu_p->active_seq_map.insert( seq_name, seq_p );
+		if( err == CMD_FAILURE )	{
+			printf( "begin_sequence ERR: insert active: '%s' FAILED\n", seq_name ); 
+		}
 	}
-	return( CMD_SUCCESS );
+
+	return( err );
 }
 
 /*
@@ -880,6 +885,15 @@ int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		return( CMD_SUCCESS );
 	}
 	return( CMD_FAILURE );
+}
+
+/*
+	seq-chain <seqname>*
+*/
+
+int mcu_sequence_chain_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
+	cerr << "ERROR: seq-chain Unimplemented." << endl;
+	return CMD_FAILURE;
 }
 
 
@@ -2931,7 +2945,7 @@ int mcu_load_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		char *load_cmd = args.read_token();
 		
 		if( strcmp( load_cmd, "motion" )==0 ||
-		           strcmp( load_cmd, "motions" )==0 )
+		    strcmp( load_cmd, "motions" )==0 )
 		{
 			const char* token = args.read_token();
 
