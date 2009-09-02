@@ -223,6 +223,10 @@
 			Name="sbm-common"
 			>
 			<File
+				RelativePath="..\..\..\..\data\sbm-common\scripts\common-init-face.seq"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\data\sbm-common\scripts\common-init.seq"
 				>
 			</File>
@@ -232,6 +236,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\data\sbm-common\common-sk\common.sk"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\data\sbm-common\scripts\default-init-characters.seq"
 				>
 			</File>
 			<File
@@ -246,10 +254,6 @@
 		<Filter
 			Name="sbm-test"
 			>
-			<File
-				RelativePath="..\..\..\..\data\sbm-test\scripts\default-init-face.seq"
-				>
-			</File>
 			<File
 				RelativePath="..\..\..\..\data\sbm-test\scripts\default-init.seq"
 				>

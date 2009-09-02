@@ -8,9 +8,9 @@
 0	seq common-init
 
 ###  Using USC-ICT Unreal Character Classes
-###    Characters and above assets are standing 102 units
-###    below origin for better lighting in Unreal.
-###    Using remote rVoice speech synthesis
+###    Characters and above assets are located via their pelvis,
+###    thus placed 102 units above the ground plane.
+###    Using remote rVoice TTS voice names for speech synthesis
 ###  NOTE: increment time to insure common-init is processed in order.
 1	char doctor init common.sk SasoBase.SasoDoctorPerez
 1	set character doctor world_offset x 35 y 102 h -17
