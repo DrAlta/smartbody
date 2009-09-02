@@ -126,7 +126,7 @@ void mcuCBHandle::set_time( double real_time )	{
 	perf.update( real_time, time );
 }
 
-FILE* mcuCBHandle::open_sequence_file( char *seq_name ) {
+FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
 	FILE* file_p = NULL;
 
 	char buffer[ MAX_FILENAME_LEN ];
@@ -811,12 +811,14 @@ int begin_sequence( char* seq_name, mcuCBHandle *mcu_p )	{
 		} else {
 			fprintf( stderr, "begin_sequence ERR: begin: '%s' NOT FOUND\n", seq_name ); 
 		}
+
+		fclose( file_p );
 	}
 	
 	if( seq_p ) {
 		seq_p->offset( (float)( mcu_p->time ) );
 		err = mcu_p->active_seq_map.insert( seq_name, seq_p );
-		if( err == CMD_FAILURE )	{
+		if( err != CMD_SUCCESS )	{
 			printf( "begin_sequence ERR: insert active: '%s' FAILED\n", seq_name ); 
 		}
 	}
@@ -891,9 +893,81 @@ int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	seq-chain <seqname>*
 */
 
-int mcu_sequence_chain_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
-	cerr << "ERROR: seq-chain Unimplemented." << endl;
-	return CMD_FAILURE;
+int mcu_sequence_chain_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
+	const char* first_seq_name = args.read_token();
+	if( first_seq_name[0] == '\0' ) {
+		cerr << "ERROR: seq-chain expected one or more .seq filenames." << endl;
+		return CMD_FAILURE;
+	}
+
+	FILE* first_file_p = mcu_p->open_sequence_file( first_seq_name );
+	if( first_file_p == NULL ) {
+		cerr << "ERROR: Cannot find sequence \"" << first_seq_name << "\". Aborting seq-chain." << endl;
+		return CMD_FAILURE;
+	}
+
+	srCmdSeq* seq_p = new srCmdSeq();
+	if( seq_p->read_file( first_file_p ) != CMD_SUCCESS ) {
+		cerr << "ERROR: Unable to parse sequence \"" << first_seq_name << "\"." << endl;
+
+		delete seq_p;
+		seq_p = NULL;
+
+		return CMD_FAILURE;
+	}
+
+
+	// Get all sequence names, testing they are valid files for early error.
+	vector<string> future_seq_names;
+	const char* next_seq = args.read_token();
+	while( next_seq[0] != '\0' ) {
+		FILE* file = mcu_p->open_sequence_file( next_seq );
+		if( file == NULL ) {
+			cerr << "ERROR: Cannot find sequence \"" << next_seq << "\". Aborting seq-chain." << endl;
+			return CMD_FAILURE;
+		} else {
+			fclose( file );
+			future_seq_names.push_back( string( next_seq ) );
+		}
+
+		next_seq = args.read_token();
+	}
+
+	if( !future_seq_names.empty() ) {
+		float time = seq_p->duration();
+
+		ostringstream oss;
+		oss << "seq-chain";
+		vector<string>::iterator it  = future_seq_names.begin();
+		vector<string>::iterator end = future_seq_names.end();
+		for( ; it != end; ++ it )
+			oss << ' ' << (*it);
+
+		int result = seq_p->insert( time, oss.str().c_str() );
+		if( result != CMD_SUCCESS ) {
+			cerr << "ERROR: Failed to insert seq-chain command at time "<<time<<endl;
+
+			delete seq_p;
+			seq_p = NULL;
+
+			return CMD_FAILURE;
+		}
+	}
+
+	if( seq_p ) {
+		seq_p->offset( (float)( mcu_p->time ) );
+		int result = mcu_p->active_seq_map.insert( first_seq_name, seq_p );
+		if( result != CMD_SUCCESS )	{
+			cerr << "ERROR: Failed to activate first sequence \"" << first_seq_name << "\"." << endl;
+
+			delete seq_p;
+			seq_p = NULL;
+
+			return CMD_FAILURE;
+		}
+	}
+
+	return CMD_SUCCESS;
 }
 
 

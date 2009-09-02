@@ -43,7 +43,7 @@ class srCmdSeq	{
 	public:
 		srCmdSeq(void);
 		virtual ~srCmdSeq(void);
-		
+
 		void	print( FILE *fp = stdout );						/* print events */
 		int		get_count(void)	{ return( event_count ); }
 		
@@ -52,7 +52,10 @@ class srCmdSeq	{
 		int		read_file( char *seq_file, int report_open_fail = TRUE );
 
 		int		insert( float time, const char *cmd_ref );			/* copy (with new[]), sort by time */
-		
+
+		/* Query duration of seq (i.e., time of last command) */
+		float   duration();
+
 		/** Query sequence offset */
 		float	offset() { return event_offset; }				
 		/** Set pop by event.time + offset */

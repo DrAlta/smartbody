@@ -185,6 +185,21 @@ char *srCmdSeq::pop( float time )	{
 
 //////////////////////////////////////////////////////////////////////////////////
 
+float srCmdSeq::duration() {
+	float last_time = 0;
+
+	sr_command_event_t *i = handle;
+	while( i != NULL ) {
+		if( i->time > last_time )
+			last_time = i->time;
+		i = i->next;
+	}
+
+	return last_time;
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+
 char *srCmdSeq::next( float *t )	{
 		
 	if( iterator )	{
