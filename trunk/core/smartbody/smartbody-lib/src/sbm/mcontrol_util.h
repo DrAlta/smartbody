@@ -195,7 +195,7 @@ class mcuCBHandle	{
 		void reset();
 		void set_time( double real_time );
 
-		FILE* open_sequence_file( char *seq_name );
+		FILE* open_sequence_file( const char *seq_name );
 
 		int open_viewer( int width, int height, int px, int py );
 		void close_viewer( void );

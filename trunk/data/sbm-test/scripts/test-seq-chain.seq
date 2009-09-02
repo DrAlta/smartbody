@@ -1,0 +1,5 @@
+0	echo Running test-seq-chain
+
+0	seq-chain chain1 chain2 chain3
+
+0	echo Sequence test-seq-chain complete
