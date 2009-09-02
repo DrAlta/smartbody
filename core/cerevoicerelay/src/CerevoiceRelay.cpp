@@ -293,16 +293,16 @@ void elvin_callback( char * op, char * args, void * userData )
    }
    else if ( strcmp( op, "vrAllCall" ) == 0 )
    {
-      ttu_notify2( "vrComponent", "rvoice cerevoicerelay" );
+      ttu_notify2( "vrComponent", "tts cerevoicerelay" );
    }
    else if ( strcmp( op, "vrKillComponent" ) == 0 )
    {
       std::string strArgs = remove_spaces_and_double_quotes(args);
       
-      if ( _stricmp( strArgs.c_str(), "rvoice" ) == 0 || _stricmp( strArgs.c_str(), "all" ) == 0 )
+      if ( _stricmp( strArgs.c_str(), "tts" ) == 0 || _stricmp( strArgs.c_str(), "all" ) == 0 )
       {
          printf( "Kill message received." );
-         ttu_notify2( "vrProcEnd", "rvoice cerevoicerelay" );
+         ttu_notify2( "vrProcEnd", "tts cerevoicerelay" );
 #ifdef _DUMP_COMM_TO_DISK
 		 fclose(_infile);
 		 fclose(_outfile);
@@ -406,7 +406,7 @@ int main( int argc, char * argv[] )
       tts->init( voices );
 
       // Notify that we're online
-      ttu_notify2( "vrComponent", "rvoice cerevoicerelay" );
+      ttu_notify2( "vrComponent", "tts cerevoicerelay" );
    }
 
    // Main loop
