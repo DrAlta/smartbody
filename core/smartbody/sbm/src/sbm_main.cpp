@@ -254,6 +254,7 @@ void mcu_register_callbacks( void ) {
 	
 	mcu.insert( "path",			mcu_filepath_func );
 	mcu.insert( "seq",			mcu_sequence_func );
+	mcu.insert( "seq-chain",	mcu_sequence_chain_func );
 	mcu.insert( "send",			sbm_vhmsg_send_func );
 
 	//  cmd prefixes "set" and "print"

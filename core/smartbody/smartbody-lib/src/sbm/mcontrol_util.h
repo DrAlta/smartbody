@@ -195,6 +195,8 @@ class mcuCBHandle	{
 		void reset();
 		void set_time( double real_time );
 
+		FILE* open_sequence_file( char *seq_name );
+
 		int open_viewer( int width, int height, int px, int py );
 		void close_viewer( void );
 		int add_scene( SrSnGroup *scene_p );
@@ -272,6 +274,7 @@ int mcu_test_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_sequence_chain_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_viewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p );
