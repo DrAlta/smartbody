@@ -808,11 +808,11 @@ int begin_sequence( char* seq_name, mcuCBHandle *mcu_p )	{
 				delete seq_p;
 				seq_p = NULL;
 			}
+
+			fclose( file_p );
 		} else {
 			fprintf( stderr, "begin_sequence ERR: begin: '%s' NOT FOUND\n", seq_name ); 
 		}
-
-		fclose( file_p );
 	}
 	
 	if( seq_p ) {
