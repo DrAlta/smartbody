@@ -223,10 +223,6 @@
 			Name="sbm-common"
 			>
 			<File
-				RelativePath="..\..\..\..\data\sbm-common\scripts\common-init-face.seq"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\data\sbm-common\scripts\common-init.seq"
 				>
 			</File>
@@ -248,6 +244,14 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\data\sbm-common\scripts\default-viewer.seq"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\data\sbm-common\scripts\init-common-assets.seq"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\data\sbm-common\scripts\init-common-face.seq"
 				>
 			</File>
 		</Filter>

@@ -1,5 +1,6 @@
 0 echo == Beginning: data/sbm-common/scripts/common-init.seq
 
+
 ###  Assumes current directory is: core/smartbody/sbm/bin
 0	path ME ../../../../data/sbm-common/common-sk
 
