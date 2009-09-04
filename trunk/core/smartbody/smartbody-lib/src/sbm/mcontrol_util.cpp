@@ -768,7 +768,6 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			mcu_p->bp_paths.insert( path );
 		}
 		else	{
-//			printf( "mcuCBHandle::mcu_filepath_func ERR: token '%s' NOT FOUND\n", path_tok );
 			printf( "mcu_filepath_func ERR: token '%s' NOT FOUND\n", path_tok );
 			return( CMD_FAILURE );
 		}
@@ -779,11 +778,12 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 /////////////////////////////////////////////////////////////
 
-int begin_sequence( char* seq_name, mcuCBHandle *mcu_p )	{
+srCmdSeq *find_and_extract_sequence( char* seq_name, mcuCBHandle *mcu_p )	{
 	int err = CMD_FAILURE;
 	
 	// Remove previous activation of sequence.
 	// Equivalent to mcu_p->abort_seq( seq_name )?
+	//   NO, abort will remove it from pending as well, and destroy it.
 	srCmdSeq *seq_p = mcu_p->active_seq_map.remove( seq_name );
 	if( seq_p )	{
 		char *cmd;
@@ -803,7 +803,7 @@ int begin_sequence( char* seq_name, mcuCBHandle *mcu_p )	{
 			err = seq_p->read_file( file_p );
 
 			if( err != CMD_SUCCESS ) {
-				fprintf( stderr, "begin_sequence ERR: begin: '%s' PARSE FAILED\n", seq_name ); 
+				fprintf( stderr, "find_and_extract_sequence ERR: begin: '%s' PARSE FAILED\n", seq_name ); 
 
 				delete seq_p;
 				seq_p = NULL;
@@ -811,13 +811,74 @@ int begin_sequence( char* seq_name, mcuCBHandle *mcu_p )	{
 
 			fclose( file_p );
 		} else {
-			fprintf( stderr, "begin_sequence ERR: begin: '%s' NOT FOUND\n", seq_name ); 
+			fprintf( stderr, "find_and_extract_sequence ERR: begin: '%s' NOT FOUND\n", seq_name ); 
 		}
 	}
 	
+	return( seq_p );
+}
+
+void flatten_inline_sequences( srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p, mcuCBHandle *mcu_p )	{
+	float t;
+	char *cmd;
+	
+	fr_seq_p->reset();
+	while( cmd = fr_seq_p->pull( & t ) )	{
+		srCmdSeq *inline_seq_p = NULL;
+
+		if( strncmp( cmd, "seq", 3 ) == 0 )	{
+			srArgBuffer args( cmd );
+			char *tok = args.read_token();
+			if( strcmp( tok, "seq" ) == 0 )	{
+				char *name = args.read_token();
+				tok = args.read_token();
+				if( strcmp( tok, "inline" ) == 0 )	{
+					inline_seq_p = find_and_extract_sequence( name, mcu_p );
+					if( inline_seq_p == NULL )	{
+						printf( "flatten_inline_sequences ERR: inline seq '%s' NOT FOUND\n", name );
+						return;
+					}
+				}
+			}
+		}
+		
+		float absolute_offset = fr_seq_p->offset() + t;
+		if( inline_seq_p )	{
+			delete [] cmd;
+			// iterate hierarchy
+			inline_seq_p->offset( absolute_offset );
+			flatten_inline_sequences( to_seq_p, inline_seq_p, mcu_p );
+		}
+		else	{
+			to_seq_p->insert_ref( absolute_offset, cmd );
+		}
+	}
+	delete fr_seq_p;
+}
+
+/*
+
+	seq <name> inline
+
+*/
+
+int begin_sequence( char* seq_name, mcuCBHandle *mcu_p )	{
+	int err = CMD_FAILURE;
+	
+	srCmdSeq *seq_p = find_and_extract_sequence( seq_name, mcu_p );
+	
 	if( seq_p ) {
+	
+		// EXPAND INLINE SEQs HERE
+#if 1
+		srCmdSeq *cp_seq_p = new srCmdSeq;
+		flatten_inline_sequences( cp_seq_p, seq_p, mcu_p );
+		cp_seq_p->offset( (float)( mcu_p->time ) );
+		err = mcu_p->active_seq_map.insert( seq_name, cp_seq_p );
+#else	
 		seq_p->offset( (float)( mcu_p->time ) );
 		err = mcu_p->active_seq_map.insert( seq_name, seq_p );
+#endif
 		if( err != CMD_SUCCESS )	{
 			printf( "begin_sequence ERR: insert active: '%s' FAILED\n", seq_name ); 
 		}

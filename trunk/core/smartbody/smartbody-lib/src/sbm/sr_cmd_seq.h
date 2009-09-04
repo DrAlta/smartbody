@@ -51,9 +51,10 @@ class srCmdSeq	{
 		int		read_file( FILE *seq_fp );
 		int		read_file( char *seq_file, int report_open_fail = TRUE );
 
-		int		insert( float time, const char *cmd_ref );			/* copy (with new[]), sort by time */
+		int		insert( float time, const char *cmd_ref );	/* copy (with new[]), sort by time */
+		int		insert_ref( float time, char *cmd_ref );	/* reference, sort by time */
 
-		/* Query duration of seq (i.e., time of last command) */
+		/* HACK: Query duration of seq (i.e., time of last command) */
 		float   duration();
 
 		/** Query sequence offset */
@@ -68,7 +69,7 @@ class srCmdSeq	{
 		char	*pull( float *t = NULL );	// return instance, time
 
 	protected:
-		int		insert( sr_command_event_t *event );			/* sort by event.time */
+		int		insert( sr_command_event_t *event );	/* sort by event.time, add after same time */
 		sr_command_event_t *remove( void );
 		
 	private:
