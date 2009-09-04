@@ -166,6 +166,16 @@ int srCmdSeq::insert( float time, const char *cmd_ref )	{
 	return( insert( event ) );
 }
 
+int srCmdSeq::insert_ref( float time, char *cmd_ref )	{
+	sr_command_event_t *event;
+
+	event = new sr_command_event_t;
+	event->next = NULL;
+	event->time = time;
+	event->cmd = cmd_ref;
+	return( insert( event ) );
+}
+
 char *srCmdSeq::pop( float time )	{
 	sr_command_event_t *event;
 	float offset_time = time - event_offset;
@@ -242,7 +252,7 @@ int srCmdSeq::insert( sr_command_event_t *event )	{
 	time = event->time;
 	
 	while( tmp != NULL )	{
-		if( time < tmp->time )	{
+		if( time < tmp->time )	{ // add after, if same time
 			prev->next = event;
 			event->next = tmp;
 			event_count++;
