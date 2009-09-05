@@ -254,6 +254,10 @@
 				RelativePath="..\..\..\..\data\sbm-common\scripts\init-common-face.seq"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\..\data\sbm-common\scripts\init-common-viewer.seq"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="sbm-test"
@@ -263,27 +267,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\data\sbm-test\scripts\test-gaze-init.seq"
+				RelativePath="..\..\..\..\data\sbm-test\scripts\init-test-assets.seq"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\data\sbm-test\scripts\test-gaze.seq"
+				RelativePath="..\..\..\..\data\sbm-test\scripts\init-test-characters.seq"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\data\sbm-test\scripts\test-motion-init.seq"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\data\sbm-test\scripts\test-motion.seq"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\data\sbm-test\scripts\test-qdraw-init.seq"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\data\sbm-test\scripts\test-qdraw.seq"
+				RelativePath="..\..\..\..\data\sbm-test\scripts\init-test-pawns.seq"
 				>
 			</File>
 		</Filter>
