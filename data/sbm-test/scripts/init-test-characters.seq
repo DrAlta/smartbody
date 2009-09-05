@@ -2,7 +2,7 @@
 
 ###  Common-sk assets are centered on the pelvis,
 ###  placed 102 units above the ground plane.
-###  Using Uneal class names for renderer assets
+###  Using Unia (Unreal-based) class names for renderer assets
 ###  Using remote rVoice speech synthesis
 0	char doctor init common.sk SasoBase.SasoDoctorPerez
 0	set character doctor world_offset x 0 y 102 h 0
