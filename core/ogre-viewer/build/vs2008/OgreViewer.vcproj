@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="OgreViewer"
-	ProjectGUID="{8C3800DB-85D8-490A-9E4B-14235F2A2711}"
+	ProjectGUID="{B19F5657-AA08-4D34-B3A3-58045074DBBB}"
 	RootNamespace="OgreViewer"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
