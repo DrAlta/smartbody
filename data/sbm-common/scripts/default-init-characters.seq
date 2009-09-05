@@ -1,10 +1,9 @@
 0 echo === Starting: data/sbm-common/scripts/default-init-characters.seq
 
-###  Using USC-ICT Unreal Character Classes
-###    Characters and above assets are located via their pelvis,
-###    thus placed 102 units above the ground plane.
-###    Using remote rVoice TTS voice names for speech synthesis
-###  NOTE: increment time to insure common-init is processed in order.
+###  Common-sk assets are centered on the pelvis,
+###  placed 102 units above the ground plane.
+###  Using Unia (Unreal-based) class names for renderer assets
+###  Using remote rVoice speech synthesis
 0	char doctor init common.sk SasoBase.SasoDoctorPerez
 0	set character doctor world_offset x 35 y 102 h -17
 0	set character doctor voice remote M021
