@@ -255,6 +255,7 @@ class mcuCBHandle	{
 		}
 
 		int abort_seq( const char* command );
+		int delete_seq( const char* command );
 
 		MeController* lookup_ctrl( const std::string& ctrl_name, const char* print_error_prefix=NULL );
 

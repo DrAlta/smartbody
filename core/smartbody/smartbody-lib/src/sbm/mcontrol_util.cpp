@@ -473,12 +473,9 @@ int mcuCBHandle::execute_later( const char* command, float seconds ) {
 }
 
 int mcuCBHandle::abort_seq( const char* seq_name ) {
-	srCmdSeq *seq_p = pending_seq_map.remove( seq_name );
+	srCmdSeq* seq_p = active_seq_map.remove( seq_name );
 	if( seq_p == NULL )	{
-		seq_p = active_seq_map.remove( seq_name );
-		if( seq_p == NULL )	{
-			return CMD_FAILURE;  // Not Found
-		}
+		return CMD_FAILURE;  // Not Found
 	}
 
 	if( LOG_ABORTED_SEQ ) {
@@ -498,9 +495,25 @@ int mcuCBHandle::abort_seq( const char* seq_name ) {
 		}
 	}
 
-	delete seq_p;
+	srCmdSeq* pending_p = pending_seq_map.lookup( seq_name );
+	if( pending_p != seq_p )	{
+		delete seq_p;
+	}
 
 	return CMD_SUCCESS;  // Aborted successfully
+}
+
+
+int mcuCBHandle::delete_seq( const char* seq_name ) {
+	int result = abort_seq( seq_name );
+
+	srCmdSeq* seq_p = pending_seq_map.remove( seq_name );
+	if( seq_p != NULL )	{
+		delete seq_p;
+		result = CMD_SUCCESS;
+	}
+
+	return result;
 }
 
 void mcuCBHandle::set_net_host( const char * net_host )
@@ -902,6 +915,12 @@ int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		char *seq_name = args.read_token();
 		char *seq_cmd = args.read_token();
 
+		if( ( strcmp( seq_cmd, "begin" ) == 0 )||( strcmp( seq_cmd, EMPTY_STRING ) == 0 ) )	{
+			return(
+				begin_sequence( seq_name, mcu_p )
+				);
+		}
+		else	{
 		if( strcmp( seq_cmd, "at" ) == 0 )	{
 		
 			srCmdSeq *seq_p = mcu_p->pending_seq_map.lookup( seq_name );
@@ -930,18 +949,21 @@ int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		}
 		else
 		if( strcmp( seq_cmd, "abort" ) == 0 )	{
-			if( mcu_p->abort_seq( seq_name ) != CMD_SUCCESS )	{
-				printf( "mcu_sequence_func ERR: print: '%s' NOT FOUND\n", seq_name ); 
-				return( CMD_FAILURE );
+			int result = mcu_p->abort_seq( seq_name );
+			if( result == CMD_NOT_FOUND )	{
+				printf( "mcu_sequence_func ERR: abort: '%s' NOT FOUND\n", seq_name ); 
 			}
+			return( result );
 		}
 		else
-		if( ( strcmp( seq_cmd, "begin" ) == 0 )||( strcmp( seq_cmd, EMPTY_STRING ) == 0 ) )	{
-			return(
-				begin_sequence( seq_name, mcu_p )
-			);
+		if( strcmp( seq_cmd, "delete" ) == 0 )	{
+			int result = mcu_p->abort_seq( seq_name );
+			if( result == CMD_NOT_FOUND )	{
+				printf( "mcu_sequence_func ERR: delete: '%s' NOT FOUND\n", seq_name ); 
+			}
+			return( result );
 		}
-		else	{
+		else
 			return( CMD_FAILURE );
 		}
 		
