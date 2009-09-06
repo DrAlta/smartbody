@@ -548,6 +548,8 @@ void BmlRequest::cleanup( mcuCBHandle* mcu )
 				"Failed to execute_later \""<<command<<"\"." << endl;
 		}
 	}
+	mcu->abort_seq( start_seq_name.c_str() );
+	mcu->abort_seq( cleanup_seq_name.c_str() );
 }
 
 

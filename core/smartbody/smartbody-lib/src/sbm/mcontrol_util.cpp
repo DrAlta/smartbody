@@ -400,6 +400,11 @@ void mcuCBHandle::update( void )	{
 			}
 			delete [] cmd;
 		}
+		// TODO: remove seq_p from active_seq_map if event_count()==0
+		// Issues:
+		//   * active_seq_map.remove(..) requires a char* key, but iteration provides a pointer
+		//   * remove(..) resets the shared iterator
+		//   * No mechanism to go from pointer to key
 	}
 
 	SbmPawn* pawn_p;
