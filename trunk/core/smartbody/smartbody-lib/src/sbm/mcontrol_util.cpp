@@ -463,6 +463,7 @@ srCmdSeq* mcuCBHandle::lookup_seq( const char* seq_name ) {
 		if( file_p ) {
 			seq_p = new srCmdSeq();
 			err = seq_p->read_file( file_p );
+			fclose( file_p );
 
 			if( err != CMD_SUCCESS ) {
 				fprintf( stderr, "ERROR: mcuCBHandle::lookup_seq(..): '%s' PARSE FAILED\n", seq_name ); 
@@ -470,8 +471,6 @@ srCmdSeq* mcuCBHandle::lookup_seq( const char* seq_name ) {
 				delete seq_p;
 				seq_p = NULL;
 			}
-
-			fclose( file_p );
 		} else {
 			fprintf( stderr, "ERROR: mcuCBHandle::lookup_seq(..): '%s' NOT FOUND\n", seq_name ); 
 		}
@@ -513,7 +512,9 @@ int mcuCBHandle::execute_seq_chain( const vector<string>& seq_names, const char*
 	}
 
 	srCmdSeq* seq_p = new srCmdSeq();
-	if( seq_p->read_file( first_file_p ) != CMD_SUCCESS ) {
+	int parse_result = seq_p->read_file( first_file_p );
+	fclose( first_file_p );
+	if( parse_result != CMD_SUCCESS ) {
 		if( error_prefix )
 			cerr << error_prefix << "Unable to parse sequence \"" << first_seq_name << "\"." << endl;
 
