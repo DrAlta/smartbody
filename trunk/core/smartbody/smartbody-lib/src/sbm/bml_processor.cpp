@@ -358,9 +358,6 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				// TEMPORARY: <speech> can only be the first behavior
 				if( behavior_ordinal == 1 ) {
 					// This speech is the first
-					SyncPoints syncs;
-					syncs.parseStandardSyncPoints( child, request, unique_id );
-
 					SpeechRequestPtr speech_request( parse_bml_speech( child, unique_id, syncs, request, mcu ) );
 					if( speech_request ) {
 						behavior = speech_request;
