@@ -195,8 +195,6 @@ class mcuCBHandle	{
 		void reset();
 		void set_time( double real_time );
 
-		FILE* open_sequence_file( const char *seq_name );
-
 		int open_viewer( int width, int height, int px, int py );
 		void close_viewer( void );
 		int add_scene( SrSnGroup *scene_p );
@@ -230,6 +228,11 @@ class mcuCBHandle	{
 		int load_motions( const char* pathname, bool recursive );
 		int load_poses( const char* pathname, bool recursive );
 
+
+		MeController* lookup_ctrl( const std::string& ctrl_name, const char* print_error_prefix=NULL );
+
+		srCmdSeq* lookup_seq( const char* );
+
 		int execute( const char *key, srArgBuffer& args ) { 
 			return( cmd_map.execute( key, args, this ) ); 
 		}
@@ -245,6 +248,7 @@ class mcuCBHandle	{
 
 		int execute_seq( srCmdSeq *seq );
 		int execute_seq( srCmdSeq *seq, const char* seq_name );
+		int execute_seq_chain( const std::vector<std::string>& seq_names, const char* error_prefix = NULL );
 
 		//  Schedule command in some seconds
 		int execute_later( const char* command, float seconds );
@@ -257,13 +261,14 @@ class mcuCBHandle	{
 		int abort_seq( const char* command );
 		int delete_seq( const char* command );
 
-		MeController* lookup_ctrl( const std::string& ctrl_name, const char* print_error_prefix=NULL );
-
 		remote_speech* speech_rvoice() { return &_speech_rvoice; }
 		SmartBody::AudioFileSpeech* speech_audiofile() { return &_speech_audiofile; }
 		text_speech* speech_text() { return &_speech_text; } // [BMLR]
 
 		void NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton * skeleton );
+
+	protected:
+		FILE* open_sequence_file( const char *seq_name );
 };
 
 /*! Executes a variable setting sub-command.   See mcuCBHandle::insert_set_cmd(..). */

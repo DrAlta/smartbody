@@ -135,12 +135,14 @@ FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
 
 	seq_paths.reset();
 	char* filename = seq_paths.next_filename( buffer, label );
-	while( filename )	{
-		if( ( file_p = fopen( filename, "r" ) ) != NULL )
+	while( filename != NULL )	{
+		file_p = fopen( filename, "r" );
+		if( file_p != NULL )
 			break;
 		filename = seq_paths.next_filename( buffer, label );
 	}
 	if( file_p == NULL ) {
+		// Could not find the file as named.  Perhap it excludes the extension
 		sprintf( label, "%s.seq", seq_name );
 
 		seq_paths.reset();
@@ -447,6 +449,37 @@ void mcuCBHandle::update( void )	{
 	} // end of loop
 }
 
+srCmdSeq* mcuCBHandle::lookup_seq( const char* seq_name ) {
+	int err = CMD_FAILURE;
+	
+	// Remove previous activation of sequence.
+	// Anm: Why?  Need clear distrinction (and efinition) between pending and active.
+	abort_seq( seq_name );
+
+	srCmdSeq* seq_p = pending_seq_map.remove( seq_name );
+	if( seq_p == NULL ) {
+		// Sequence not found.  Load new instance from file.
+		FILE* file_p = open_sequence_file( seq_name );
+		if( file_p ) {
+			seq_p = new srCmdSeq();
+			err = seq_p->read_file( file_p );
+
+			if( err != CMD_SUCCESS ) {
+				fprintf( stderr, "ERROR: mcuCBHandle::lookup_seq(..): '%s' PARSE FAILED\n", seq_name ); 
+
+				delete seq_p;
+				seq_p = NULL;
+			}
+
+			fclose( file_p );
+		} else {
+			fprintf( stderr, "ERROR: mcuCBHandle::lookup_seq(..): '%s' NOT FOUND\n", seq_name ); 
+		}
+	}
+	
+	return( seq_p );
+}
+
 int mcuCBHandle::execute_seq( srCmdSeq* seq ) {
 	ostringstream seq_id;
 	seq_id << "execute_seq-" << (++queued_cmds);
@@ -456,9 +489,83 @@ int mcuCBHandle::execute_seq( srCmdSeq* seq ) {
 
 int mcuCBHandle::execute_seq( srCmdSeq* seq, const char* seq_id ) {
 	if ( active_seq_map.insert( seq_id, seq ) != CMD_SUCCESS ) {
-		printf( "ERROR: mcuCBHandle::execute_later(..): Failed to insert srCmdSeq \"%s\" into active_seq_map.\n", seq_id );
+		cerr << "ERROR: mcuCBHandle::execute_seq(..): Failed to insert srCmdSeq \"" << seq_id << "\" into active_seq_map." << endl;
 		return CMD_FAILURE;
 	}
+	return CMD_SUCCESS;
+}
+
+int mcuCBHandle::execute_seq_chain( const vector<string>& seq_names, const char* error_prefix ) {
+	vector<string>::const_iterator it  = seq_names.begin();
+	vector<string>::const_iterator end = seq_names.end();
+
+	if( it == end ) {
+		// No sequences -> NOOP
+		return CMD_SUCCESS;
+	}
+
+	const string& first_seq_name = *it;  // convenience reference
+	FILE* first_file_p = open_sequence_file( first_seq_name.c_str() );
+	if( first_file_p == NULL ) {
+		if( error_prefix )
+			cerr << error_prefix << "Cannot find sequence \"" << first_seq_name << "\". Aborting seq-chain." << endl;
+		return CMD_FAILURE;
+	}
+
+	srCmdSeq* seq_p = new srCmdSeq();
+	if( seq_p->read_file( first_file_p ) != CMD_SUCCESS ) {
+		if( error_prefix )
+			cerr << error_prefix << "Unable to parse sequence \"" << first_seq_name << "\"." << endl;
+
+		delete seq_p;
+		seq_p = NULL;
+
+		return CMD_FAILURE;
+	}
+
+	// Test remaining sequence names, error early if invalid
+	vector<string>::const_iterator second = ++it;
+	for( ; it != end; ++it ) {
+		const string& next_seq = *it;  // convenience reference
+
+		FILE* file = open_sequence_file( next_seq.c_str() );
+		if( file == NULL ) {
+			if( error_prefix )
+				cerr << error_prefix << "Cannot find sequence \"" << next_seq << "\". Aborting seq-chain." << endl;
+			return CMD_FAILURE;
+		} else {
+			fclose( file );
+		}
+	}
+
+	if( second != end ) {  // has more than one seq_name
+		// Append new seq-chian command of remaining seq_names at end of seq_p
+		float time = seq_p->duration();
+
+		// Start from second
+		it = second;
+
+		// build command
+		ostringstream oss;
+		oss << "seq-chain";
+		for( ; it != end; ++it )
+			oss << ' ' << (*it);
+
+		// insert command or error with cleanup
+		int result = seq_p->insert( time, oss.str().c_str() );
+		if( result != CMD_SUCCESS ) {
+			if( error_prefix )
+				cerr << error_prefix << "Failed to insert seq-chain command at time "<<time<<endl;
+
+			delete seq_p;
+			seq_p = NULL;
+
+			return CMD_FAILURE;
+		}
+	}
+
+	execute_seq( seq_p, first_seq_name.c_str() );
+
 	return CMD_SUCCESS;
 }
 
@@ -791,46 +898,6 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 /////////////////////////////////////////////////////////////
 
-srCmdSeq *find_and_extract_sequence( char* seq_name, mcuCBHandle *mcu_p )	{
-	int err = CMD_FAILURE;
-	
-	// Remove previous activation of sequence.
-	// Equivalent to mcu_p->abort_seq( seq_name )?
-	//   NO, abort will remove it from pending as well, and destroy it.
-	srCmdSeq *seq_p = mcu_p->active_seq_map.remove( seq_name );
-	if( seq_p )	{
-		char *cmd;
-		seq_p->reset();
-		while( cmd = seq_p->pull() )	{
-			delete [] cmd;
-		}
-		delete seq_p;
-	}
-
-	seq_p = mcu_p->pending_seq_map.remove( seq_name );
-	if( seq_p == NULL ) {
-		// Sequence not found.  Load new instance from file.
-		FILE* file_p = mcu_p->open_sequence_file( seq_name );
-		if( file_p ) {
-			seq_p = new srCmdSeq();
-			err = seq_p->read_file( file_p );
-
-			if( err != CMD_SUCCESS ) {
-				fprintf( stderr, "find_and_extract_sequence ERR: begin: '%s' PARSE FAILED\n", seq_name ); 
-
-				delete seq_p;
-				seq_p = NULL;
-			}
-
-			fclose( file_p );
-		} else {
-			fprintf( stderr, "find_and_extract_sequence ERR: begin: '%s' NOT FOUND\n", seq_name ); 
-		}
-	}
-	
-	return( seq_p );
-}
-
 void flatten_inline_sequences( srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p, mcuCBHandle *mcu_p )	{
 	float t;
 	char *cmd;
@@ -846,7 +913,7 @@ void flatten_inline_sequences( srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p, mcuCBHand
 				char *name = args.read_token();
 				tok = args.read_token();
 				if( strcmp( tok, "inline" ) == 0 )	{
-					inline_seq_p = find_and_extract_sequence( name, mcu_p );
+					inline_seq_p = mcu_p->lookup_seq( name );
 					if( inline_seq_p == NULL )	{
 						printf( "flatten_inline_sequences ERR: inline seq '%s' NOT FOUND\n", name );
 						return;
@@ -878,7 +945,7 @@ void flatten_inline_sequences( srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p, mcuCBHand
 int begin_sequence( char* seq_name, mcuCBHandle *mcu_p )	{
 	int err = CMD_FAILURE;
 	
-	srCmdSeq *seq_p = find_and_extract_sequence( seq_name, mcu_p );
+	srCmdSeq *seq_p = mcu_p->lookup_seq( seq_name );
 	
 	if( seq_p ) {
 	
@@ -977,80 +1044,20 @@ int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 */
 
 int mcu_sequence_chain_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
-	const char* first_seq_name = args.read_token();
-	if( first_seq_name[0] == '\0' ) {
+	vector<string> seq_names;
+	const char* token = args.read_token();
+	while( token[0] != '\0' ) {
+		seq_names.push_back( token );
+
+		token = args.read_token();
+	}
+
+	if( seq_names.empty() ) {
 		cerr << "ERROR: seq-chain expected one or more .seq filenames." << endl;
 		return CMD_FAILURE;
 	}
 
-	FILE* first_file_p = mcu_p->open_sequence_file( first_seq_name );
-	if( first_file_p == NULL ) {
-		cerr << "ERROR: Cannot find sequence \"" << first_seq_name << "\". Aborting seq-chain." << endl;
-		return CMD_FAILURE;
-	}
-
-	srCmdSeq* seq_p = new srCmdSeq();
-	if( seq_p->read_file( first_file_p ) != CMD_SUCCESS ) {
-		cerr << "ERROR: Unable to parse sequence \"" << first_seq_name << "\"." << endl;
-
-		delete seq_p;
-		seq_p = NULL;
-
-		return CMD_FAILURE;
-	}
-
-
-	// Get all sequence names, testing they are valid files for early error.
-	vector<string> future_seq_names;
-	const char* next_seq = args.read_token();
-	while( next_seq[0] != '\0' ) {
-		FILE* file = mcu_p->open_sequence_file( next_seq );
-		if( file == NULL ) {
-			cerr << "ERROR: Cannot find sequence \"" << next_seq << "\". Aborting seq-chain." << endl;
-			return CMD_FAILURE;
-		} else {
-			fclose( file );
-			future_seq_names.push_back( string( next_seq ) );
-		}
-
-		next_seq = args.read_token();
-	}
-
-	if( !future_seq_names.empty() ) {
-		float time = seq_p->duration();
-
-		ostringstream oss;
-		oss << "seq-chain";
-		vector<string>::iterator it  = future_seq_names.begin();
-		vector<string>::iterator end = future_seq_names.end();
-		for( ; it != end; ++ it )
-			oss << ' ' << (*it);
-
-		int result = seq_p->insert( time, oss.str().c_str() );
-		if( result != CMD_SUCCESS ) {
-			cerr << "ERROR: Failed to insert seq-chain command at time "<<time<<endl;
-
-			delete seq_p;
-			seq_p = NULL;
-
-			return CMD_FAILURE;
-		}
-	}
-
-	if( seq_p ) {
-		seq_p->offset( (float)( mcu_p->time ) );
-		int result = mcu_p->active_seq_map.insert( first_seq_name, seq_p );
-		if( result != CMD_SUCCESS )	{
-			cerr << "ERROR: Failed to activate first sequence \"" << first_seq_name << "\"." << endl;
-
-			delete seq_p;
-			seq_p = NULL;
-
-			return CMD_FAILURE;
-		}
-	}
-
-	return CMD_SUCCESS;
+	return mcu_p->execute_seq_chain( seq_names, "ERROR: seq-chian: " );
 }
 
 
