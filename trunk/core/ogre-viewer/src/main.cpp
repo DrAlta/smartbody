@@ -251,8 +251,8 @@ protected:
 
 
 		// Position the camera
-		mCamera->setPosition( 0, 200, 230 );
-		mCamera->lookAt( 15, 205, 0 );
+		mCamera->setPosition( 0, 140, 225 );
+		mCamera->lookAt( 0, 92, 0 );
 
 
 		Plane plane;
@@ -263,7 +263,7 @@ protected:
 		//pPlaneEnt->setMaterialName( "Examples/Rockwall" );
 		pPlaneEnt->setMaterialName( "Rockwall" );
 		pPlaneEnt->setCastShadows( false );
-		mSceneMgr->getRootSceneNode()->createChildSceneNode( Vector3( 0, 135, 0 ) )->attachObject( pPlaneEnt );
+		mSceneMgr->getRootSceneNode()->createChildSceneNode( Vector3( 0, 0, 0 ) )->attachObject( pPlaneEnt );
 
 
 
