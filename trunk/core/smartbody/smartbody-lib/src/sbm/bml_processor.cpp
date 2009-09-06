@@ -69,6 +69,7 @@ const double SQROOT_2 = 1.4142135623730950488016887242097;
 const XMLCh TAG_ACT[]		= L"act";
 const XMLCh TAG_BML[]       = L"bml";
 const XMLCh TAG_BODY[]      = L"body";
+const XMLCh TAG_REQUIRED[]  = L"required";
 #if BMLR_BML2ANIM
 const XMLCh TAG_POSTURE[]   = L"posture"; // [BMLR] For bml2anim postures
 #endif
@@ -311,7 +312,7 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
 		BmlRequestPtr request( createBmlRequest( bpMsg.actor, bpMsg.actorId, bpMsg.requestId, string(bpMsg.msgId) ) );
 #endif
 		try {
-			parseBML( bmlElem, request, mcu );
+  			parseBML( bmlElem, request, mcu );
 			bml_requests.insert( make_pair( bpMsg.requestId, request ) );
 
 			if( !( request->speech_request ) ) {
@@ -334,101 +335,117 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
 }
 
 void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr request, mcuCBHandle* mcu,
-                                         size_t& behavior_ordinal, bool allow_required ) {
+                                         size_t& behavior_ordinal, bool required ) {
 	// look for BML behavior command tags
 	DOMElement*  child = xml_utils::getFirstChildElement( group );
 	while( child!=NULL ) {
 		const XMLCh *tag = child->getTagName();  // Grand Child (behavior) Tag
-		const XMLCh* id  = child->getAttribute( ATTR_ID );
-		string unique_id = request->buildUniqueBehaviorId( tag, id, ++behavior_ordinal );
-
-		// Load SyncPoint references
-		SyncPoints syncs;  // TODO: rename (previous this was a TimeMarkers class)
-		syncs.parseStandardSyncPoints( child, request, unique_id );
-
-		BehaviorRequestPtr behavior;
-
-		// Parse behavior specifics
-		//// TODO: tag name -> behavior factory map
-		if( XMLString::compareString( tag, TAG_SBM_SPEECH )==0 || XMLString::compareString( tag, TAG_SPEECH )==0 ) {
-			// TEMPORARY: <speech> can only be the first behavior
-			if( behavior_ordinal == 1 ) {
-				// This speech is the first
-				string unique_id = request->buildUniqueBehaviorId( tag, id, ++behavior_ordinal );
-
-				SyncPoints syncs;
-				syncs.parseStandardSyncPoints( child, request, unique_id );
-
-				SpeechRequestPtr speech_request( parse_bml_speech( child, unique_id, syncs, request, mcu ) );
-				if( speech_request ) {
-					request->registerBehavior( id, speech_request );
-
-					// Store reference to the speech behavior in the speeches map for later processing
-					// TODO: generalize this to TriggerEvent handling
-					string speechKey = buildSpeechKey( request->actor, speech_request->speech_request_id );
-					bool insert_success = speeches.insert( make_pair( speechKey, speech_request ) ).second;  // store for later reply
-					if( !insert_success ) {
-						cerr << "ERROR: BML::Processor.vrSpeak(..): BmlProcessor::speehces already contains an entry for speechKey \"" << speechKey << "\".  Cannot process speech behavior.  Failing BML request.  (This error should not occur. Let Andrew know immeidately.)"  << endl;
-						// TODO: Send vrSpeakFailed
-					}
-
-					request->speech_request = speech_request;
-				} else {
-					//  Speech is always treated as required
-					wcerr<<"ERROR: BML::Processor::parseBML(): Failed to parse <"<<tag<<"> tag."<<endl;
-				}
-			} else {
-				//  Speech is always treated as required
-				wcerr<<"ERROR: BML <"<<tag<<"> must be first behavior."<<endl;
-				cerr<<"\t(unique_id \""<<unique_id<<"\"."<<endl;  // unique id is not multibyte, and I'm lazily refusing to convert just to put it on the same line).
-			}
-		} else if( XMLString::compareString( tag, TAG_ANIMATION )==0 ) {
-			// DEPRECATED FORM
-			behavior = parse_bml_animation( child, unique_id, syncs, request, mcu );
-		} else if( XMLString::compareString( tag, TAG_SBM_ANIMATION )==0 ) {
-			behavior = parse_bml_animation( child, unique_id, syncs, request, mcu );
-		} else if( XMLString::compareString( tag, TAG_BODY )==0 ) {
-			behavior = parse_bml_body( child, unique_id, syncs, request, mcu );
-		} else if( XMLString::compareString( tag, TAG_HEAD )==0 ) {
-			behavior = parse_bml_head( child, unique_id, syncs, request, mcu );
-		} else if( XMLString::compareString( tag, TAG_FACE )==0 ) {
-			behavior = parse_bml_face( child, unique_id, syncs, request, mcu );
-		} else if( XMLString::compareString( tag, TAG_GAZE )==0 ) {
-			behavior = /*BML::*/parse_bml_gaze( child, unique_id, syncs, request, mcu );
-		} else if( XMLString::compareString( tag, TAG_EVENT )==0 ) {
-			// DEPRECATED FORM
-			behavior = parse_bml_event( child, unique_id, syncs, request, mcu );
-		} else if( XMLString::compareString( tag, TAG_SBM_EVENT )==0 ) {
-			behavior = parse_bml_event( child, unique_id, syncs, request, mcu );
-		} else if( XMLString::compareString( tag, TAG_QUICKDRAW )==0 ) {
-			behavior = parse_bml_quickdraw( child, unique_id, syncs, request, mcu );
-		} else if( XMLString::compareString( tag, TAG_SPEECH )==0 ) {
-			cerr<<"ERROR: BML::Processor::parseBML(): <speech> BML tag must be first behavior (TEMPORARY HACK)." <<endl;
-		} else if( XMLString::compareString( tag, TAG_LOCOTMOTION )==0 ) {
-			behavior = parse_bml_locomotion( child, unique_id, syncs, request, mcu );
-		} else if( XMLString::compareString( tag, TAG_INTERRUPT )==0 ) {
-			behavior = parse_bml_interrupt( child, unique_id, syncs, request, mcu );
-#if BMLR_BML2ANIM
-		// [BMLR]  Note that this brace closes out the if statement above
-		}
-
-		// [BMLR]
-		if (behavior == NULL) {
-			// [BMLR] support for bml to animations
-			behavior = parse_bml_to_anim(child, tms, request, mcu);
-			if( behavior != NULL )
-				request->addBehavior( behavior );
-			else
-				wcerr<<"WARNING: BodyPlannerImpl: <"<<tag<<"> BML tag unrecognized or unsupported."<<endl;
-		}
-#else
+		if( XMLString::compareString( tag, TAG_REQUIRED )==0 ) {
+			parseBehaviorGroup( child, request, mcu, behavior_ordinal, true );
 		} else {
-			wcerr<<"WARNING: BML::Processor::parseBML(): <"<<tag<<"> BML tag unrecognized or unsupported."<<endl;
-		}
+			const XMLCh* id  = child->getAttribute( ATTR_ID );
+			string unique_id = request->buildUniqueBehaviorId( tag, id, ++behavior_ordinal );
+
+			// Load SyncPoint references
+			SyncPoints syncs;  // TODO: rename (previous this was a TimeMarkers class)
+			syncs.parseStandardSyncPoints( child, request, unique_id );
+
+			BehaviorRequestPtr behavior;
+
+			// Parse behavior specifics
+			//// TODO: tag name -> behavior factory map
+			if( XMLString::compareString( tag, TAG_SBM_SPEECH )==0 || XMLString::compareString( tag, TAG_SPEECH )==0 ) {
+				// TEMPORARY: <speech> can only be the first behavior
+				if( behavior_ordinal == 1 ) {
+					// This speech is the first
+					SyncPoints syncs;
+					syncs.parseStandardSyncPoints( child, request, unique_id );
+
+					SpeechRequestPtr speech_request( parse_bml_speech( child, unique_id, syncs, request, mcu ) );
+					if( speech_request ) {
+						behavior = speech_request;
+
+						// Store reference to the speech behavior in the speeches map for later processing
+						// TODO: generalize this to TriggerEvent handling
+						string speechKey = buildSpeechKey( request->actor, speech_request->speech_request_id );
+						bool insert_success = speeches.insert( make_pair( speechKey, speech_request ) ).second;  // store for later reply
+						if( !insert_success ) {
+							cerr << "ERROR: BML::Processor.vrSpeak(..): BmlProcessor::speehces already contains an entry for speechKey \"" << speechKey << "\".  Cannot process speech behavior.  Failing BML request.  (This error should not occur. Let Andrew know immeidately.)"  << endl;
+							// TODO: Send vrSpeakFailed
+						}
+
+						request->speech_request = speech_request;
+					} else {
+						//  Speech is always treated as required
+						wcerr<<"ERROR: BML::Processor::parseBML(): Failed to parse <"<<tag<<"> tag."<<endl;
+					}
+				} else {
+					wcerr<<"ERROR: BML <"<<tag<<"> must be first behavior."<<endl;
+					cerr<<"\t(unique_id \""<<unique_id<<"\"."<<endl;  // unique id is not multibyte, and I'm lazily refusing to convert just to put it on the same line).
+				}
+			} else if( XMLString::compareString( tag, TAG_ANIMATION )==0 ) {
+				// DEPRECATED FORM
+				behavior = parse_bml_animation( child, unique_id, syncs, request, mcu );
+			} else if( XMLString::compareString( tag, TAG_SBM_ANIMATION )==0 ) {
+				behavior = parse_bml_animation( child, unique_id, syncs, request, mcu );
+			} else if( XMLString::compareString( tag, TAG_BODY )==0 ) {
+				behavior = parse_bml_body( child, unique_id, syncs, request, mcu );
+			} else if( XMLString::compareString( tag, TAG_HEAD )==0 ) {
+				behavior = parse_bml_head( child, unique_id, syncs, request, mcu );
+			} else if( XMLString::compareString( tag, TAG_FACE )==0 ) {
+				behavior = parse_bml_face( child, unique_id, syncs, request, mcu );
+			} else if( XMLString::compareString( tag, TAG_GAZE )==0 ) {
+				behavior = /*BML::*/parse_bml_gaze( child, unique_id, syncs, request, mcu );
+			} else if( XMLString::compareString( tag, TAG_EVENT )==0 ) {
+				// DEPRECATED FORM
+				behavior = parse_bml_event( child, unique_id, syncs, request, mcu );
+			} else if( XMLString::compareString( tag, TAG_SBM_EVENT )==0 ) {
+				behavior = parse_bml_event( child, unique_id, syncs, request, mcu );
+			} else if( XMLString::compareString( tag, TAG_QUICKDRAW )==0 ) {
+				behavior = parse_bml_quickdraw( child, unique_id, syncs, request, mcu );
+			} else if( XMLString::compareString( tag, TAG_SPEECH )==0 ) {
+				cerr<<"ERROR: BML::Processor::parseBML(): <speech> BML tag must be first behavior (TEMPORARY HACK)." <<endl;
+			} else if( XMLString::compareString( tag, TAG_LOCOTMOTION )==0 ) {
+				behavior = parse_bml_locomotion( child, unique_id, syncs, request, mcu );
+			} else if( XMLString::compareString( tag, TAG_INTERRUPT )==0 ) {
+				behavior = parse_bml_interrupt( child, unique_id, syncs, request, mcu );
+#if BMLR_BML2ANIM
+			// [BMLR]  Note that this brace closes out the if statement above
+			}
+
+			// [BMLR]
+			if (behavior == NULL) {
+				// [BMLR] support for bml to animations
+				behavior = parse_bml_to_anim(child, tms, request, mcu);
+				if( behavior != NULL )
+					request->addBehavior( behavior );
+				else
+					wcerr<<"WARNING: BodyPlannerImpl: <"<<tag<<"> BML tag unrecognized or unsupported."<<endl;
+			}
+#else
+			} else {
+				wcerr<<"WARNING: BML::Processor::parseBML(): <"<<tag<<"> BML tag unrecognized or unsupported."<<endl;
+			}
 #endif
 
-		if( behavior != NULL ) {
-			request->registerBehavior( id, behavior );
+			if( behavior != NULL ) {
+				request->registerBehavior( id, behavior );
+			} else if( required ) {
+				char* ascii_tag = XMLString::transcode( tag );
+
+				ostringstream err_msg;
+				err_msg << "Required behavior <" <<ascii_tag;
+				if( id && id[0]!='\0' ) {
+					char* ascii_id  = XMLString::transcode( id );
+					err_msg << " id=\""<<ascii_id<<"\"";
+					delete [] ascii_id;
+				}
+				err_msg << "> (behavior #"<<behavior_ordinal<<") failed to parse.";
+				
+				delete [] ascii_tag;
+
+				throw BMLProcessorException( err_msg.str().c_str() );
+			}
 		}
 
 		child = xml_utils::getNextElement( child );
@@ -438,7 +455,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCBHandle *mcu ) {
 	size_t behavior_ordinal	= 0;
 
-	parseBehaviorGroup( bmlElem, request, mcu, behavior_ordinal, true );
+	parseBehaviorGroup( bmlElem, request, mcu, behavior_ordinal, false );
 
 	if( behavior_ordinal==0 ) { // No change
 		cout << " WARNING: BML \""<<request->msgId<<"\" does not contain any behaviors!" <<endl;

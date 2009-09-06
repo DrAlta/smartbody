@@ -54,10 +54,10 @@ namespace BML {
 		//  Private Data Structures
 	public:
 		struct BMLProcessorException {
-			const char* message;
+			const std::string message;
 
 			BMLProcessorException( const char* message )
-				: message(message)
+			:	message( message==NULL? "": message )
 			{}
 		};
 
@@ -227,7 +227,7 @@ namespace BML {
 		 *  Parses a group of behavior tags, such as <bml> or <required>.
 		 *  The workhorse function of parseBML(..)
 		 */
-		void parseBehaviorGroup( DOMElement *el, BML::BmlRequestPtr request, mcuCBHandle *mcu, size_t&, bool );
+		void parseBehaviorGroup( DOMElement *el, BML::BmlRequestPtr request, mcuCBHandle *mcu, size_t& behavior_ordinal, bool required );
 
 		BehaviorRequestPtr parse_bml_body( DOMElement* elem, std::string& unique_id, SyncPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu );
 		BehaviorRequestPtr parse_bml_head( DOMElement* elem, std::string& unique_id, SyncPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu );
