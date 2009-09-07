@@ -1132,6 +1132,22 @@
 				Name="BML"
 				>
 				<File
+					RelativePath="..\src\sbm\behavior_scheduler.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\behavior_scheduler.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\behavior_scheduler_linear.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\behavior_scheduler_linear.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\sbm\behavior_span.cpp"
 					>
 				</File>
@@ -1213,6 +1229,10 @@
 				</File>
 				<File
 					RelativePath="..\src\sbm\bml_schedule.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\bml_scheduler.hpp"
 					>
 				</File>
 				<File

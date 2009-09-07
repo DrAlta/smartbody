@@ -175,5 +175,5 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 	if( set_aim_offset_param ) qdraw_ct->set_aim_offset( aim_offset_p, aim_offset_h, aim_offset_r );
 	if( set_smooth_param ) qdraw_ct->set_smooth( smooth_factor );
 
-	return BehaviorRequestPtr( new MeControllerRequest( unique_id, qdraw_ct, request->actor->motion_sched_p, true, tms ) );
+	return BehaviorRequestPtr( new MeControllerRequest( unique_id, qdraw_ct, request->actor->motion_sched_p, tms ) );
 }

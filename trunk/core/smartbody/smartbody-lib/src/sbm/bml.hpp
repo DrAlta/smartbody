@@ -33,6 +33,8 @@
 
 #include "bml_types.hpp"
 #include "behavior_span.hpp"
+#include "behavior_scheduler.hpp"
+#include "behavior_scheduler_linear.hpp" // temporary, for BEHAVIOR_TIMING_BY_DURATION macro
 
 #include "mcontrol_util.h"
 #include "sbm_character.hpp"
@@ -55,12 +57,6 @@ const bool LOG_AUDIO		= false;
  *  just like the original vrSpeak.
  */
 #define VRAGENTBML_USES_RECIPIENT (0)
-
-/**
- *  Transitional mode for calculating the behavior schedules by
- *  durations instead of a fictious local timeline.
- */
-#define BEHAVIOR_TIMING_BY_DURATION (0)
 
 
 namespace BML {
@@ -329,7 +325,7 @@ namespace BML {
 		std::wstring idForSyncPoint( SyncPointPtr sync );
 
 		/** For each SyncPoint, if parent is set, applies the parent time and offset. */
-		void applyParentTimes( std::wstring& warning_context = std::wstring() );
+		void applyParentTimes( std::string& warning_context = std::string() );
 
 		/** Prints SyncPoint ids in order, separated by commas. */
 		void printSyncIds();
@@ -365,26 +361,10 @@ namespace BML {
 	///////////////////////////////////////////////////////////////////
     //  Data
 	public:
-		const std::string	unique_id;
-		bool                required;
-		SyncPoints			syncs;
-
-	protected:
-#if BEHAVIOR_TIMING_BY_DURATION
-        time_sec startReadyDur;
-        time_sec readyStrokeDur;
-        time_sec strokeRelaxDur;
-        time_sec relaxEndDur;
-#else
-        // controller local time references
-        time_sec startTime;
-        time_sec readyTime;
-        time_sec strokeTime;
-        time_sec relaxTime;
-        time_sec endTime;
-#endif // BEHAVIOR_TIMING_BY_DURATION
-
-        time_sec speed;  
+		const std::string     unique_id;
+		bool                  required;
+		SyncPoints            syncs;
+		BehaviorSchedulerPtr  scheduler;
 
 	private:
         time_sec audioOffset;
@@ -392,16 +372,10 @@ namespace BML {
     ///////////////////////////////////////////////////////////////////
     //  Methods
 	public:
-#if BEHAVIOR_TIMING_BY_DURATION
-		BehaviorRequest( const std::string& unique_id, const SyncPoints& syncs,
-						 time_sec startReadyDur, time_sec readyStrokeDur, time_sec strokeRelaxDur, time_sec relaxEndDur,
-						 float speed );
-#else
-		BehaviorRequest( const std::string& unique_id, const SyncPoints& syncs,
-						 time_sec startTime, time_sec readyTime, time_sec strokeTime, time_sec relaxTime, time_sec endTime,
-						 float speed );
-#endif // BEHAVIOR_TIMING_BY_DURATION
+		BehaviorRequest( const std::string& unique_id, const SyncPoints& syncs );
 		virtual ~BehaviorRequest();
+
+		void set_scheduler( BehaviorSchedulerPtr scheduler );
 
 		/**
 		 *  Schedules the behavior's SyncPoints, returning the earliest time (usually the start time).
@@ -471,6 +445,9 @@ namespace BML {
 	};
 
 	class MeControllerRequest : public BehaviorRequest {
+	public:
+		enum SchduleType { LINEAR, MANUAL };
+
 	protected: // Data
 		/** Controller holding the source of the animation (not necessarily a motion or animation). */
 		MeController*            anim_ct;
@@ -481,8 +458,10 @@ namespace BML {
 
 	public: ///// Methods
 		MeControllerRequest( const std::string& unique_id,
-		                     MeController *anim_ct, MeCtSchedulerClass* schedule_ct, bool is_persistent,
-			                 const SyncPoints& syncs );
+		                     MeController *anim_ct,
+							 MeCtSchedulerClass* schedule_ct,
+			                 const SyncPoints& syncs,
+							 MeControllerRequest::SchduleType sched_type = LINEAR );
 		virtual ~MeControllerRequest();
 
 		/**
