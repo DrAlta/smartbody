@@ -50,17 +50,6 @@ namespace BML {
 
 
 	class Processor {
-		///////////////////////////////////////////////////////////////////////
-		//  Private Data Structures
-	public:
-		struct BMLProcessorException {
-			const std::string message;
-
-			BMLProcessorException( const char* message )
-			:	message( message==NULL? "": message )
-			{}
-		};
-
 	private:
 
 		struct BMLProcessorMsg {
@@ -229,8 +218,8 @@ namespace BML {
 		 */
 		void parseBehaviorGroup( DOMElement *el, BML::BmlRequestPtr request, mcuCBHandle *mcu, size_t& behavior_ordinal, bool required );
 
-		BehaviorRequestPtr parse_bml_body( DOMElement* elem, std::string& unique_id, SyncPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu );
-		BehaviorRequestPtr parse_bml_head( DOMElement* elem, std::string& unique_id, SyncPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu );
+		BehaviorRequestPtr parse_bml_body( DOMElement* elem, std::string& unique_id, SyncPoints& tms, bool required, BmlRequestPtr request, mcuCBHandle *mcu );
+		BehaviorRequestPtr parse_bml_head( DOMElement* elem, std::string& unique_id, SyncPoints& tms, bool required, BmlRequestPtr request, mcuCBHandle *mcu );
 
 
 ///  Is the following necessary anymore?

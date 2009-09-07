@@ -139,7 +139,7 @@ namespace BML {
 		friend BML::Processor;  //temporary
 	};
 
-	BML::SpeechRequestPtr parse_bml_speech( DOMElement* xml, const std::string& unique_id, BML::SyncPoints& syncs, BML::BmlRequestPtr request, mcuCBHandle *mcu );
+	BML::SpeechRequestPtr parse_bml_speech( DOMElement* xml, const std::string& unique_id, BML::SyncPoints& syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
 };
 
 

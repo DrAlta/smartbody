@@ -40,7 +40,7 @@ using namespace xml_utils;
 
 
 
-BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::string& unique_id, SyncPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::string& unique_id, SyncPoints& tms, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
 
 	// Viseme transition hack until timing can support multiple sync points

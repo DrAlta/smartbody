@@ -65,6 +65,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	DOMElement* xml,
 	const std::string& unique_id,
 	BML::SyncPoints& syncs,
+	bool required,
 	BML::BmlRequestPtr request,
 	mcuCBHandle *mcu )
 {
