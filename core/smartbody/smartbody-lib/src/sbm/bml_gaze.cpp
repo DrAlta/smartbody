@@ -715,5 +715,5 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		gaze_ct->set_offset_polar( 0, 0, roll );
 	}
 
-	return BehaviorRequestPtr( new MeControllerRequest( unique_id, gaze_ct, request->actor->gaze_sched_p, true, tms ) );
+	return BehaviorRequestPtr( new MeControllerRequest( unique_id, gaze_ct, request->actor->gaze_sched_p, tms ) );
 }
