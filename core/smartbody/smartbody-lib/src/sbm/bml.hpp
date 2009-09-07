@@ -106,9 +106,8 @@ namespace BML {
 		:	std::exception( what_string )
 		{}
 
-
 		virtual const char* type()
-		{	return "BmlException"; }
+		{	return "BML::BmlException"; }
 	};
 
 	/** Exception of errors that occur during parsing. */
@@ -119,7 +118,7 @@ namespace BML {
 		{}
 
 		virtual const char* type()
-		{	return "ParsingException"; }
+		{	return "BML::ParsingException"; }
 	};
 	/** Exception of errors that occur during scheduling. */
 	class SchedulingException : public BmlException {
@@ -129,7 +128,7 @@ namespace BML {
 		{}
 
 		virtual const char* type()
-		{	return "SchedulingException"; }
+		{	return "BML::SchedulingException"; }
 	};
 	/** Exception of errors that occur during realizing. */
 	class RealizingException : public BmlException {
@@ -139,7 +138,7 @@ namespace BML {
 		{}
 
 		virtual const char* type()
-		{	return "RealizingException"; }
+		{	return "BML::RealizingException"; }
 	};
 
 	class BmlRequest {
@@ -167,6 +166,8 @@ namespace BML {
 		SpeechRequestPtr     speech_request;
 
 	private:
+		bool                 required;
+
 		std::string			 start_seq_name;
 		std::string			 cleanup_seq_name;
 
@@ -365,6 +366,7 @@ namespace BML {
     //  Data
 	public:
 		const std::string	unique_id;
+		bool                required;
 		SyncPoints			syncs;
 
 	protected:

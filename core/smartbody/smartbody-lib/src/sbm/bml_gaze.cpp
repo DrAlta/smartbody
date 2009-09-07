@@ -353,7 +353,7 @@ bool BML::Gaze::parse_children( DOMElement* elem, Gaze::KeyData* key_data[] ) {
 
 
 
-BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& unique_id, SyncPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& unique_id, SyncPoints& tms, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
 	////////////////////////////////////////////////////////////////
 	//  GAZE BEHAVIORS

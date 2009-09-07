@@ -1086,11 +1086,13 @@ BehaviorRequest::BehaviorRequest( const std::string& unique_id, const SyncPoints
     readyStrokeDur( min(readyStrokeDur,0.001) ), 
     strokeRelaxDur( min(strokeRelaxDur,0.001) ),
     relaxEndDur( min(relaxEndDur,0.001) ),
-    speed(speed)
+    speed(speed),
+	required(false)
 {}
 #else
 BehaviorRequest::BehaviorRequest( const std::string& unique_id, const SyncPoints& syncs,
-                                  time_sec startTime, time_sec readyTime, time_sec strokeTime, time_sec relaxTime, time_sec endTime, float speed )
+                                  time_sec startTime, time_sec readyTime, time_sec strokeTime, time_sec relaxTime, time_sec endTime,
+                                  float speed )
 :	syncs( syncs ),
 	unique_id( unique_id ),
 	audioOffset(TIME_UNSET),
@@ -1099,7 +1101,8 @@ BehaviorRequest::BehaviorRequest( const std::string& unique_id, const SyncPoints
     strokeTime(strokeTime),
     relaxTime(relaxTime),
     endTime(endTime),
-    speed(speed)
+    speed(speed),
+	required(false)
 {}
 #endif // BEHAVIOR_TIMING_BY_DURATION
 

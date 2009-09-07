@@ -32,7 +32,7 @@ class mcuCBHandle;
 namespace BML {
 	const XMLCh TAG_FACE[] = L"face";
 
-	BML::BehaviorRequestPtr parse_bml_face( DOMElement* elem, const std::string& unique_id, BML::SyncPoints& tms, BML::BmlRequestPtr request, mcuCBHandle *mcu );
+	BML::BehaviorRequestPtr parse_bml_face( DOMElement* elem, const std::string& unique_id, BML::SyncPoints& tms, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
 };
 
 

@@ -358,7 +358,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				// TEMPORARY: <speech> can only be the first behavior
 				if( behavior_ordinal == 1 ) {
 					// This speech is the first
-					SpeechRequestPtr speech_request( parse_bml_speech( child, unique_id, syncs, request, mcu ) );
+					SpeechRequestPtr speech_request( parse_bml_speech( child, unique_id, syncs, required, request, mcu ) );
 					if( speech_request ) {
 						behavior = speech_request;
 
@@ -382,30 +382,30 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				}
 			} else if( XMLString::compareString( tag, TAG_ANIMATION )==0 ) {
 				// DEPRECATED FORM
-				behavior = parse_bml_animation( child, unique_id, syncs, request, mcu );
+				behavior = parse_bml_animation( child, unique_id, syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_SBM_ANIMATION )==0 ) {
-				behavior = parse_bml_animation( child, unique_id, syncs, request, mcu );
+				behavior = parse_bml_animation( child, unique_id, syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_BODY )==0 ) {
-				behavior = parse_bml_body( child, unique_id, syncs, request, mcu );
+				behavior = parse_bml_body( child, unique_id, syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_HEAD )==0 ) {
-				behavior = parse_bml_head( child, unique_id, syncs, request, mcu );
+				behavior = parse_bml_head( child, unique_id, syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_FACE )==0 ) {
-				behavior = parse_bml_face( child, unique_id, syncs, request, mcu );
+				behavior = parse_bml_face( child, unique_id, syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_GAZE )==0 ) {
-				behavior = /*BML::*/parse_bml_gaze( child, unique_id, syncs, request, mcu );
+				behavior = /*BML::*/parse_bml_gaze( child, unique_id, syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_EVENT )==0 ) {
 				// DEPRECATED FORM
-				behavior = parse_bml_event( child, unique_id, syncs, request, mcu );
+				behavior = parse_bml_event( child, unique_id, syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_SBM_EVENT )==0 ) {
-				behavior = parse_bml_event( child, unique_id, syncs, request, mcu );
+				behavior = parse_bml_event( child, unique_id, syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_QUICKDRAW )==0 ) {
-				behavior = parse_bml_quickdraw( child, unique_id, syncs, request, mcu );
+				behavior = parse_bml_quickdraw( child, unique_id, syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_SPEECH )==0 ) {
 				cerr<<"ERROR: BML::Processor::parseBML(): <speech> BML tag must be first behavior (TEMPORARY HACK)." <<endl;
 			} else if( XMLString::compareString( tag, TAG_LOCOTMOTION )==0 ) {
-				behavior = parse_bml_locomotion( child, unique_id, syncs, request, mcu );
+				behavior = parse_bml_locomotion( child, unique_id, syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_INTERRUPT )==0 ) {
-				behavior = parse_bml_interrupt( child, unique_id, syncs, request, mcu );
+				behavior = parse_bml_interrupt( child, unique_id, syncs, required, request, mcu );
 #if BMLR_BML2ANIM
 			// [BMLR]  Note that this brace closes out the if statement above
 			}
@@ -426,6 +426,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 #endif
 
 			if( behavior != NULL ) {
+				behavior->required = required;
 				request->registerBehavior( id, behavior );
 			} else if( required ) {
 				char* ascii_tag = XMLString::transcode( tag );
@@ -441,7 +442,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				
 				delete [] ascii_tag;
 
-				throw BMLProcessorException( err_msg.str().c_str() );
+				throw BML::BmlException( err_msg.str().c_str() );
 			}
 		}
 
@@ -517,7 +518,7 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCB
 	}
 }
 
-BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string& unique_id, SyncPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string& unique_id, SyncPoints& tms, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
 	const XMLCh* postureName = elem->getAttribute( ATTR_POSTURE );
 	if( postureName && XMLString::stringLen( postureName ) ) {
 		// Look up pose
@@ -552,7 +553,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 	}
 }
 
-BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string& unique_id, SyncPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string& unique_id, SyncPoints& tms, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
 	const XMLCh* attrType = elem->getAttribute( ATTR_TYPE );
 	if( attrType && XMLString::stringLen( attrType ) ) {
@@ -931,9 +932,9 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 			bp.bml_request( bpMsg, mcu );
 
 			return( CMD_SUCCESS );
-		} catch( BMLProcessorException& e ) {
+		} catch( BML::BmlException& e ) {
 			ostringstream msg;
-			msg << "BMLProcessorException: "<<e.message;
+			msg << e.type() << ": "<<e.what();
 			bml_error( character_id, message_id, msg.str().c_str(), mcu );
 			return CMD_FAILURE;
 		} catch( const std::exception& e ) {
@@ -957,8 +958,8 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 #else
 			return bp.bml_end( BMLProcessorMsg( character_id, message_id, character, NULL, args ), mcu );
 #endif
-		} catch( BMLProcessorException& e ) {
-			cerr << "vrAgentBML .. end: BMLProcessorException: "<<e.message<<endl;
+		} catch( BmlException& e ) {
+			cerr << "vrAgentBML .. end: " << e.type() << ": " << e.what() << endl;
 			return CMD_FAILURE;
 		//} catch( AssertException& e ) {
 		//	cerr << "vrSpeak: AssertionException: "<<e.getMessage()<< endl;
@@ -1044,9 +1045,9 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 		bp.bml_request( bpMsg, mcu );
 
 		return( CMD_SUCCESS );
-	} catch( BMLProcessorException& e ) {
+	} catch( BmlException& e ) {
 		ostringstream msg;
-		msg << "BMLProcessorException: "<<e.message;
+		msg << e.type() << ": "<<e.what();
 		bml_error( agent_id, message_id, msg.str().c_str(), mcu );
 		return CMD_FAILURE;
 	} catch( const std::exception& e ) {
@@ -1066,32 +1067,31 @@ int BML::Processor::vrSpoke_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 	Processor& bp = mcu->bml_processor;
 
 	//cout << "DEBUG: vrSpoke " << args.read_remainder_raw() << endl;
+	char *agent_id     = args.read_token();
+	char *recipient_id = args.read_token();
+	char *message_id   = args.read_token();
+	// Ignore rest
+
 	try {
-		char *agentId     = args.read_token();
-		char *recipientId = args.read_token();
-		char *messageId   = args.read_token();
-		// Ignore rest
+		//cout << "DEBUG: vrSpoke " << agent_id << " " << recipientId << " " << message_id << endl;
 
-		//cout << "DEBUG: vrSpoke " << agentId << " " << recipientId << " " << messageId << endl;
-
-		SbmCharacter *agent = mcu->character_map.lookup( agentId );
+		SbmCharacter *agent = mcu->character_map.lookup( agent_id );
 		if( agent==NULL ) {
 			// Ignore unknown agent.  Probably managed by other SBM process.
 			return CMD_SUCCESS;
 		}
 
 #if VRAGENTBML_USES_RECIPIENT
-		BMLProcessorMsg bpMsg( agentId, recipientId, messageId, agent, NULL, args );
+		BMLProcessorMsg bpMsg( agent_id, recipient_id, message_id, agent, NULL, args );
 #else
-		BMLProcessorMsg bpMsg( agentId, messageId, agent, NULL, args );
+		BMLProcessorMsg bpMsg( agent_id, message_id, agent, NULL, args );
 #endif
 		return bp.bml_end( bpMsg, mcu );
-	} catch( BMLProcessorException& e ) {
-		cerr << "vrSpoke: BMLProcessorException: "<<e.message<<endl;
+	} catch( BmlException& e ) {
+		ostringstream msg;
+		msg << e.type() << ": "<<e.what();
+		bml_error( agent_id, message_id, msg.str().c_str(), mcu );
 		return CMD_FAILURE;
-	//} catch( AssertException& e ) {
-	//	cerr << "vrSpeak: AssertionException: "<<e.getMessage()<< endl;
-	//	return CMD_FAILURE;
 	} catch( const exception& e ) {
 		cerr << "vrSpoke: std::exception: "<<e.what()<< endl;
 		return CMD_FAILURE;

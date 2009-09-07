@@ -35,7 +35,7 @@ using namespace xml_utils;
 
 
 
-BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string& unique_id, SyncPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string& unique_id, SyncPoints& tms, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
 	//type = BML_MOTION;
 
 	const XMLCh* animName = elem->getAttribute( ATTR_NAME );
