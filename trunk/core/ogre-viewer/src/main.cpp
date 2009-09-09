@@ -21,6 +21,8 @@
 *      Andrew n marshall, USC
 */
 
+#include "vhcl.h"
+
 #include <windows.h>
 
 #include <map>
@@ -31,6 +33,8 @@
 #include "ExampleApplication.h"
 
 #include "bonebus.h"
+
+#include "tt_utils.h"
 
 
 using std::string;
