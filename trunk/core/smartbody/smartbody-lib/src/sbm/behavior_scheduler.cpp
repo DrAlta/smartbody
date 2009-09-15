@@ -24,3 +24,7 @@
 
 using namespace std;
 using namespace BML;
+
+
+// EDF - workaround for LNK4221 warning.  Or just remove this .cpp file if no content is ever going put in it.
+namespace BML { int dummy_behavior_scheduler_lnk4221 = 0; }
