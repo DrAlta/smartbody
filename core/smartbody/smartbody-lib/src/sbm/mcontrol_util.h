@@ -39,7 +39,7 @@ class mcuCBHandle;
 
 
 #if LINK_VHMSG_CLIENT
-#include "tt_utils.h"
+#include "vhmsg-tt.h"
 #endif
 
 #include "bonebus.h"

@@ -647,8 +647,8 @@ int mcuCBHandle::vhmsg_send( const char *op, const char* message ) {
 	//std::cout<<"Sending :" << cmdName << ' ' << cmdArgs <<std::endl;
 
 	if( vhmsg_enabled ) {
-		int err = ttu_notify2( op, message );
-		if( err != TTU_SUCCESS )	{
+		int err = vhmsg::ttu_notify2( op, message );
+		if( err != vhmsg::TTU_SUCCESS )	{
 			std::cerr << "ERROR: mcuCBHandle::vhmsg_send(..): ttu_notify2 failed on message \"" << op << '  ' << message << "\"." << std::endl;
 		}
 	} else {
@@ -681,8 +681,8 @@ int mcuCBHandle::vhmsg_send( const char* message ) {
 	//std::cout<<"Sending :" << cmdName << ' ' << cmdArgs <<std::endl;
 
 	if( vhmsg_enabled ) {
-		int err = ttu_notify1( message );
-		if( err != TTU_SUCCESS )	{
+		int err = vhmsg::ttu_notify1( message );
+		if( err != vhmsg::TTU_SUCCESS )	{
 			std::cerr << "ERROR: mcuCBHandle::vhmsg_send(..): ttu_notify1 failed on message \"" << message << "\"." << std::endl;
 		}
 	} else {
