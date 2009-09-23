@@ -35,7 +35,7 @@
 
 #include "bonebus.h"
 
-#include "tt_utils.h"
+#include "vhmsg-tt.h"
 
 
 using std::string;
@@ -78,10 +78,10 @@ public:
 		if (mQuit)
 		{
 			// Send vrProcEnd message to ActiveMQ
-			ttu_notify2( "vrProcEnd", "renderer" );
+			vhmsg::ttu_notify2( "vrProcEnd", "renderer" );
 
 			// Close ActiveMQ
-			ttu_close();
+			vhmsg::ttu_close();
 
 			return false;
 		}
@@ -170,7 +170,7 @@ public:
 		headBone->setOrientation( rot );
 		*/
 
-		ttu_poll();
+		vhmsg::ttu_poll();
 
 		m_bonebus->Update();
 
@@ -288,21 +288,21 @@ class OgreViewerApplication : public ExampleApplication
 				elvish_session_host = "localhost";
 			}
 
-			ttu_set_client_callback( &OgreViewerApplication::tt_client_callback, this );
+			vhmsg::ttu_set_client_callback( &OgreViewerApplication::tt_client_callback, this );
 
-			int err = ttu_open( elvish_session_host );
+			int err = vhmsg::ttu_open( elvish_session_host );
 
-			if ( err != TTU_SUCCESS )
+			if ( err != vhmsg::TTU_SUCCESS )
 			{
 				printf("%s", "ttu_open failed!\n" );
 			}
 
 			// Register with ActiveMQ
-			ttu_register( "vrAllCall" );
-			ttu_register( "vrKillComponent" );
+			vhmsg::ttu_register( "vrAllCall" );
+			vhmsg::ttu_register( "vrKillComponent" );
 
 			// Send vrComponent message to ActiveMQ
-			ttu_notify2( "vrComponent", "renderer all" );
+			vhmsg::ttu_notify2( "vrComponent", "renderer all" );
 
 			Plane plane;
 			plane.normal = Vector3::UNIT_Y;
@@ -1156,7 +1156,7 @@ class OgreViewerApplication : public ExampleApplication
 		}
 
 
-		static void tt_client_callback( char * op, char * args, void * user_data )
+		static void tt_client_callback( const char * op, const char * args, void * user_data )
 		{
 		   OgreViewerApplication * app = (OgreViewerApplication *)user_data;
 
@@ -1169,7 +1169,7 @@ class OgreViewerApplication : public ExampleApplication
 
 		   if ( sOp == "vrAllCall" )
 		   {
-			  ttu_notify2( "vrComponent", "renderer all" );
+			  vhmsg::ttu_notify2( "vrComponent", "renderer all" );
 		   }
 		   else if ( sOp == "vrKillComponent" )
 		   {
