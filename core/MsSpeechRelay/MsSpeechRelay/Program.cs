@@ -46,7 +46,7 @@ namespace MsSpeechRelay
         /// <summary>
         /// Elvin message handling server
         /// </summary>
-        public Ict.ElvinUtility mesgServer;
+        public VHMsg.Client vhmsg;
         /// <summary>
         /// Identifies this program on the Elvin message system and to other components in the VH toolkit
         /// </summary>
@@ -283,7 +283,7 @@ namespace MsSpeechRelay
                 replyMessage += " ERROR: Unable to choose suggested voice: \"" + voice + "\" and strict mode used";
             }
 
-            mesgServer.SendMessage(replyMessage);
+            vhmsg.SendMessage(replyMessage);
             if (doDebugChecks)
             {
                 Console.WriteLine("Debug: Sending reply: \"" + replyMessage + "\"\n");
@@ -296,7 +296,7 @@ namespace MsSpeechRelay
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e">Variable containg the message params and the actual message</param>
-        private void MessageHandler(object sender, Ict.ElvinMessageArgs e)
+        private void MessageHandler(object sender, VHMsg.Message e)
         {
             if (!isInitialized)
             {
@@ -315,7 +315,7 @@ namespace MsSpeechRelay
             else if (splitargs[0] == "vrAllCall")
             {
                 /// Answer the roll call
-                mesgServer.SendMessage("vrComponent rvoice" + programName + " all");
+                vhmsg.SendMessage("vrComponent rvoice" + programName + " all");
             }
             else if (splitargs[0] == "vrKillComponent")
             {
@@ -323,7 +323,7 @@ namespace MsSpeechRelay
                 if (splitargs.Length > 2 && ( splitargs[2] == programName || splitargs[2] == "all" || splitargs[2] == "\"all\""))
                 {
                     Console.WriteLine("Kill message received, goodbye\n");
-                    mesgServer.SendMessage("vrProcEnd rvoice " + programName);
+                    vhmsg.SendMessage("vrProcEnd rvoice " + programName);
                     /// Not running anymore
                     /// 
                     isRunning = false;
@@ -501,21 +501,21 @@ namespace MsSpeechRelay
 
             /// Start Elvin message server
             /// 
-            using (mesgServer = new Ict.ElvinUtility())
+            using (vhmsg = new VHMsg.Client())
             {
-                mesgServer.GetConnection();
+                vhmsg.OpenConnection();
                 Console.WriteLine("ELVISH_SESSION_HOST: {0}", System.Environment.GetEnvironmentVariable("ELVISH_SESSION_HOST"));
                 Console.WriteLine("ELVISH_SCOPE: {0}", System.Environment.GetEnvironmentVariable("ELVISH_SCOPE"));
 
                 /// We only need Remote Speech commands
-                mesgServer.SubscribeMessage("RemoteSpeechCmd");
-                mesgServer.SubscribeMessage("vrKillComponent");
-                mesgServer.SubscribeMessage("vrAllCall");
-                //mesgServer.SubscribeMessage("*");
+                vhmsg.SubscribeMessage("RemoteSpeechCmd");
+                vhmsg.SubscribeMessage("vrKillComponent");
+                vhmsg.SubscribeMessage("vrAllCall");
+                //vhmsg.SubscribeMessage("*");
 
-                mesgServer.MessageEvent += new Ict.ElvinUtility.MessageEventHandler(MessageHandler);
+                vhmsg.MessageEvent += new VHMsg.Client.MessageEventHandler(MessageHandler);
 
-                mesgServer.SendMessage("vrComponent rvoice" + programName + " all");
+                vhmsg.SendMessage("vrComponent rvoice" + programName + " all");
                 isInitialized = true;
 
                 /// If temporary audio directory doesn't exist, create it
@@ -549,7 +549,7 @@ namespace MsSpeechRelay
                     string testMessage = parser.ReadToEnd();
                     ProcessSpeechMessage(testMessage);
                     isRunning = false;
-                    mesgServer.SendMessage("vrProcEnd rvoice " + programName);
+                    vhmsg.SendMessage("vrProcEnd rvoice " + programName);
                 }
 
                 /// Loop to process events
@@ -655,7 +655,7 @@ namespace MsSpeechRelay
         public void CleanUp()
         {
             //phonemeToViseme.Clear();
-            mesgServer.CloseConnection();
+            vhmsg.CloseConnection();
         }
 
         /// <summary>

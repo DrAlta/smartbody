@@ -93,7 +93,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\lib\vhmsg\vhmsg-net\elutil.net.csproj">
+    <ProjectReference Include="..\..\..\lib\vhmsg\vhmsg-net\vhmsg-net.csproj">
       <Project>{DE4240A9-DBBA-410F-888F-462384A5B280}</Project>
       <Name>elutil.net</Name>
     </ProjectReference>
