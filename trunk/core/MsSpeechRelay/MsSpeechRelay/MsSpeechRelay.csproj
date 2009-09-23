@@ -95,7 +95,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\lib\vhmsg\vhmsg-net\vhmsg-net.csproj">
       <Project>{DE4240A9-DBBA-410F-888F-462384A5B280}</Project>
-      <Name>elutil.net</Name>
+      <Name>vhmsg-net</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
