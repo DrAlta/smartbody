@@ -45,7 +45,7 @@
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/framework/MemBufInputSource.hpp>
 
-#include "tt_utils.h"
+#include "vhmsg-tt.h"
 
 
 XERCES_CPP_NAMESPACE_USE
@@ -316,7 +316,7 @@ string create_bml( Utterance & ut )
 }
 
 
-void tt_client_callback( char * op, char * args, void * user_data )
+void tt_client_callback( const char * op, const char * args, void * user_data )
 {
    // Parsers TTS reply message. Example message:
    // RemoteSpeechReply utah 1 OK: <?xml version="1.0" encoding="UTF-8"?><speak><soundFile name="C:\saso\saso\core\beavin\..\..\..\dimr\tmpaudio\utah-yer_new_to_town.wav"/>
@@ -491,7 +491,7 @@ void elvin_loop( void * ignore )
 {
    while ( m_reply_received == false )
    {
-      ttu_wait( 0.5 );
+      vhmsg::ttu_wait( 0.5 );
    }
 
    _endthread();
@@ -507,15 +507,15 @@ void init_messaging()
    }
 
    printf( "ELVISH_SESSION_HOST: %s\n", elvish_session_host );
-   printf( "ELVISH_SCOPE: %s\n", getenv( TTU_ENV_SCOPE ) );
+   printf( "ELVISH_SCOPE: %s\n", getenv( "ELVISH_SCOPE" ) );
 
-   ttu_set_client_callback( tt_client_callback );
-   int err = ttu_open( elvish_session_host );
-   if ( err == TTU_SUCCESS )
+   vhmsg::ttu_set_client_callback( tt_client_callback );
+   int err = vhmsg::ttu_open( elvish_session_host );
+   if ( err == vhmsg::TTU_SUCCESS )
    {
-      err = ttu_register( m_request_message );
-      err = ttu_register( m_reply_message );
-      err = ttu_register( "vrKillComponent" );
+      err = vhmsg::ttu_register( m_request_message );
+      err = vhmsg::ttu_register( m_reply_message );
+      err = vhmsg::ttu_register( "vrKillComponent" );
    }
    else
    {
@@ -823,7 +823,7 @@ int main( int argc, char * argv[] )
          xml_request = create_tts_request( it->second.utterance_id );
 
          // Send request to TTS
-         ttu_notify2( m_request_message, xml_request.c_str() );
+         vhmsg::ttu_notify2( m_request_message, xml_request.c_str() );
 
          // Wait for response
          m_reply_received = false;
@@ -882,7 +882,7 @@ int main( int argc, char * argv[] )
 
    printf(" \nPress any key to exit.\n ");
    _getch();
-   ttu_close();
+   vhmsg::ttu_close();
 
    return 0;
 }
