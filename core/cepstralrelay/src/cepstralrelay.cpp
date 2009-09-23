@@ -32,7 +32,7 @@
 #include <vector>
 #include <iostream>
 
-#include "tt_utils.h"
+#include "vhmsg-tt.h"
 #include "cepstral_tts.h"
 
 
@@ -82,11 +82,11 @@ void process_message( const char * message )
 
    printf( "REPLY: %s\n", reply.c_str() );
 
-   ttu_notify2( "RemoteSpeechReply", reply.c_str() );
+   vhmsg::ttu_notify2( "RemoteSpeechReply", reply.c_str() );
 }
 
 
-void elvin_callback( char * op, char * args, void * userData )
+void elvin_callback( const char * op, const char * args, void * userData )
 {
    printf( "received -- op: %s args: %s\n", op, args );
 
@@ -128,15 +128,15 @@ int main( int argc, char * argv[] )
       std::cout << "SASO_ROOT not set, audio files will be saved to: " << directory << "\n";
    }
 
-   ttu_set_client_callback( elvin_callback );
-   int err = ttu_open( elvish_session_host );
-   if ( err != TTU_SUCCESS )
+   vhmsg::ttu_set_client_callback( elvin_callback );
+   int err = vhmsg::ttu_open( elvish_session_host );
+   if ( err != vhmsg::TTU_SUCCESS )
    {
       printf( "unable to connect to message server, aborting\n" );
       return -1;
    }
 
-   ttu_register( "RemoteSpeechCmd" );
+   vhmsg::ttu_register( "RemoteSpeechCmd" );
 
    tts = new cepstral_tts();
 
@@ -153,7 +153,7 @@ int main( int argc, char * argv[] )
          }
       }
 
-      ttu_poll();
+      vhmsg::ttu_poll();
       Sleep( 10 );
    }
 }
