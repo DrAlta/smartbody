@@ -172,9 +172,9 @@ int sbm_main_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	return CMD_SUCCESS;
 }
 
-void sbm_vhmsg_callback( char *op, char *args, void * user_data ) {
+void sbm_vhmsg_callback( const char *op, const char *args, void * user_data ) {
 
-	switch( mcuCBHandle::singleton().execute( op, args ) ) {
+	switch( mcuCBHandle::singleton().execute( op, (char *)args ) ) {
         case CMD_NOT_FOUND:
             fprintf( stdout, "SBM ERR: command NOT FOUND: '%s' + '%s'\n> ", op, args );
             break;
@@ -355,7 +355,7 @@ void exit_callback( void )	{
 
 #if LINK_VHMSG_CLIENT
 		if( mcu.vhmsg_enabled )	{
-			ttu_close();
+			vhmsg::ttu_close();
 		}
 #endif
 	}
@@ -525,20 +525,20 @@ int main( int argc, char **argv )	{
 		printf( "SBM: ELVISH_SESSION_HOST='%s': DISABLED\n", elvish_session_host );
 	}
 	else	{
-		err = ttu_open( elvish_session_host );
-		if( err == TTU_SUCCESS ) {
-			ttu_set_client_callback( sbm_vhmsg_callback );
-			err = ttu_register( "sbm" );
-			err = ttu_register( "vrAgentBML" );
-			err = ttu_register( "vrSpeak" );
-			err = ttu_register( "RemoteSpeechReply" );
-			err = ttu_register( "PlaySound" );
-			err = ttu_register( "StopSound" );
-			err = ttu_register( "CommAPI" );
-			err = ttu_register( "object-data" );
-			err = ttu_register( "vrAllCall" );
-			err = ttu_register( "vrKillComponent" );
-			err = ttu_register( "wsp" );
+		err = vhmsg::ttu_open( elvish_session_host );
+		if( err == vhmsg::TTU_SUCCESS ) {
+			vhmsg::ttu_set_client_callback( sbm_vhmsg_callback );
+			err = vhmsg::ttu_register( "sbm" );
+			err = vhmsg::ttu_register( "vrAgentBML" );
+			err = vhmsg::ttu_register( "vrSpeak" );
+			err = vhmsg::ttu_register( "RemoteSpeechReply" );
+			err = vhmsg::ttu_register( "PlaySound" );
+			err = vhmsg::ttu_register( "StopSound" );
+			err = vhmsg::ttu_register( "CommAPI" );
+			err = vhmsg::ttu_register( "object-data" );
+			err = vhmsg::ttu_register( "vrAllCall" );
+			err = vhmsg::ttu_register( "vrKillComponent" );
+			err = vhmsg::ttu_register( "wsp" );
 
 			mcu.vhmsg_enabled = true;
 		} else {
@@ -625,8 +625,8 @@ int main( int argc, char **argv )	{
 	
 #if LINK_VHMSG_CLIENT
 		if( mcu.vhmsg_enabled )	{
-			err = ttu_poll();
-			if( err == TTU_ERROR )	{
+			err = vhmsg::ttu_poll();
+			if( err == vhmsg::TTU_ERROR )	{
 				fprintf( stderr, "ttu_poll ERROR\n" );
 			}
 		}
