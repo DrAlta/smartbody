@@ -34,7 +34,7 @@
 #include <vector>
 #include <iostream>
 
-#include "tt_utils.h"
+#include "vhmsg-tt.h"
 #include "cerevoice_tts.h"
 
 /// Debug support code - enable to get a dump of all incoming and outgoing messages from this code
@@ -212,12 +212,12 @@ void process_message( const char * message )
 	  std::string dumpXMLstring = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + xml;
 	  fprintf(_outXML, "%d: %s\n\n", _dumpCounter - 1, dumpXMLstring.c_str() );
 #endif
-      ttu_notify2( "RemoteSpeechReply", reply.c_str() );
+      vhmsg::ttu_notify2( "RemoteSpeechReply", reply.c_str() );
    }
 }
 
 
-std::string remove_spaces_and_double_quotes ( char * c )
+std::string remove_spaces_and_double_quotes ( const char * c )
 {
    std::string s = c;
 
@@ -235,7 +235,7 @@ std::string remove_spaces_and_double_quotes ( char * c )
 }
 
 /// Process all Vhmsg/Elvin messages
-void elvin_callback( char * op, char * args, void * userData )
+void elvin_callback( const char * op, const char * args, void * userData )
 {
 #ifdef _DUMP_COMM_TO_DISK
 	fprintf(_infile,"%d: OP: %s :ARGS: %s \n\n",_dumpCounter++, op,args);
@@ -293,7 +293,7 @@ void elvin_callback( char * op, char * args, void * userData )
    }
    else if ( strcmp( op, "vrAllCall" ) == 0 )
    {
-      ttu_notify2( "vrComponent", "tts cerevoicerelay" );
+      vhmsg::ttu_notify2( "vrComponent", "tts cerevoicerelay" );
    }
    else if ( strcmp( op, "vrKillComponent" ) == 0 )
    {
@@ -302,7 +302,7 @@ void elvin_callback( char * op, char * args, void * userData )
       if ( _stricmp( strArgs.c_str(), "tts" ) == 0 || _stricmp( strArgs.c_str(), "all" ) == 0 )
       {
          printf( "Kill message received." );
-         ttu_notify2( "vrProcEnd", "tts cerevoicerelay" );
+         vhmsg::ttu_notify2( "vrProcEnd", "tts cerevoicerelay" );
 #ifdef _DUMP_COMM_TO_DISK
 		 fclose(_infile);
 		 fclose(_outfile);
@@ -317,9 +317,9 @@ void elvin_callback( char * op, char * args, void * userData )
 
 void register_messages ()
 {
-	ttu_register( "RemoteSpeechCmd" );
-	ttu_register( "vrKillComponent" );
-   ttu_register( "vrAllCall" );
+	vhmsg::ttu_register( "RemoteSpeechCmd" );
+	vhmsg::ttu_register( "vrKillComponent" );
+   vhmsg::ttu_register( "vrAllCall" );
 }
 
 
@@ -342,9 +342,9 @@ int main( int argc, char * argv[] )
       elvish_scope = strcat( getenv( "COMPUTERNAME" ), "_SCOPE" );
    }
 
-   ttu_set_client_callback( elvin_callback );
-   int err = ttu_open( elvish_session_host );
-   if ( err != TTU_SUCCESS )
+   vhmsg::ttu_set_client_callback( elvin_callback );
+   int err = vhmsg::ttu_open( elvish_session_host );
+   if ( err != vhmsg::TTU_SUCCESS )
    {
       printf( "Unable to connect to message server.\n\nPress any key to exit.\n");
       _getch();
@@ -406,7 +406,7 @@ int main( int argc, char * argv[] )
       tts->init( voices );
 
       // Notify that we're online
-      ttu_notify2( "vrComponent", "tts cerevoicerelay" );
+      vhmsg::ttu_notify2( "vrComponent", "tts cerevoicerelay" );
    }
 
    // Main loop
@@ -421,7 +421,7 @@ int main( int argc, char * argv[] )
          }
       }
 
-      ttu_poll();
+      vhmsg::ttu_poll();
       Sleep( 10 );
    }
 }
