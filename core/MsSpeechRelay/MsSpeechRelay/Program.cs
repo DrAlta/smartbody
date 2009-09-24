@@ -320,7 +320,7 @@ namespace MsSpeechRelay
             else if (splitargs[0] == "vrKillComponent")
             {
                 /// Controls when the programs kills itself
-                if (splitargs.Length > 2 && ( splitargs[2] == programName || splitargs[2] == "all" || splitargs[2] == "\"all\""))
+                if (splitargs.Length > 1 && ( splitargs[1] == programName || splitargs[1] == "all" || splitargs[1] == "\"all\""))
                 {
                     Console.WriteLine("Kill message received, goodbye\n");
                     vhmsg.SendMessage("vrProcEnd rvoice " + programName);
