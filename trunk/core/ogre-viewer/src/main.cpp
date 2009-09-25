@@ -302,7 +302,7 @@ class OgreViewerApplication : public ExampleApplication
 			vhmsg::ttu_register( "vrKillComponent" );
 
 			// Send vrComponent message to ActiveMQ
-			vhmsg::ttu_notify2( "vrComponent", "renderer all" );
+			vhmsg::ttu_notify2( "vrComponent", "renderer Ogre" );
 
 			Plane plane;
 			plane.normal = Vector3::UNIT_Y;
@@ -1169,7 +1169,7 @@ class OgreViewerApplication : public ExampleApplication
 
 		   if ( sOp == "vrAllCall" )
 		   {
-			  vhmsg::ttu_notify2( "vrComponent", "renderer all" );
+			  vhmsg::ttu_notify2( "vrComponent", "renderer Ogre" );
 		   }
 		   else if ( sOp == "vrKillComponent" )
 		   {
