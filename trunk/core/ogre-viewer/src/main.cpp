@@ -890,6 +890,7 @@ class OgreViewerApplication : public ExampleApplication
 			if ( characterID == -1 )
 			{
 				// move the camera
+				app->mCamera->setPosition( -y, z, x );
 			}
 			else
 			{
@@ -911,6 +912,7 @@ class OgreViewerApplication : public ExampleApplication
 			if ( characterID == -1 )
 			{
 				// move the camera
+				app->mCamera->setOrientation( Quaternion( w, -y, z, x ) );
 			}
 			else
 			{
