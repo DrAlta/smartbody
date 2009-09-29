@@ -86,7 +86,7 @@ void process_message( const char * message )
 }
 
 
-void elvin_callback( const char * op, const char * args, void * userData )
+void vhmsg_callback( const char * op, const char * args, void * userData )
 {
    printf( "received -- op: %s args: %s\n", op, args );
 
@@ -128,7 +128,7 @@ int main( int argc, char * argv[] )
       std::cout << "SASO_ROOT not set, audio files will be saved to: " << directory << "\n";
    }
 
-   vhmsg::ttu_set_client_callback( elvin_callback );
+   vhmsg::ttu_set_client_callback( vhmsg_callback );
    int err = vhmsg::ttu_open( elvish_session_host );
    if ( err != vhmsg::TTU_SUCCESS )
    {
