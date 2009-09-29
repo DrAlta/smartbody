@@ -654,10 +654,20 @@ class OgreViewerApplication : public ExampleApplication
 				//Create character from characterType
 				ent = app->mSceneMgr->createEntity( charIdStr, characterType + ".mesh" );
 			}
-			catch (Ogre::ItemIdentityException e)
+			catch (Ogre::ItemIdentityException& e)
 			{
 				//Default to existing Brad character
 				ent = app->mSceneMgr->createEntity( charIdStr, "Brad.mesh" );
+			}
+			catch( Ogre::Exception& e )
+			{
+				if( e.getNumber() == Ogre::Exception::ERR_FILE_NOT_FOUND ) {
+					//Default to existing Brad character
+					ent = app->mSceneMgr->createEntity( charIdStr, "Brad.mesh" );
+				} else {
+					// Re-throw exception for outer catch block
+					throw;
+				}
 			}
 
 			if (ent == NULL)
