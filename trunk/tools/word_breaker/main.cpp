@@ -487,7 +487,7 @@ void tt_client_callback( const char * op, const char * args, void * user_data )
 }
 
 
-void elvin_loop( void * ignore )
+void vhmsg_loop( void * ignore )
 {
    while ( m_reply_received == false )
    {
@@ -827,7 +827,7 @@ int main( int argc, char * argv[] )
 
          // Wait for response
          m_reply_received = false;
-         _beginthread( elvin_loop, 0, NULL );
+         _beginthread( vhmsg_loop, 0, NULL );
          int timer = 0;
          while ( !m_reply_received )
          {
