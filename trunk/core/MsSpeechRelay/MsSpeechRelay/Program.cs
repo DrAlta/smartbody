@@ -44,11 +44,11 @@ namespace MsSpeechRelay
     class Program
     {
         /// <summary>
-        /// Elvin message handling server
+        /// Message handling server
         /// </summary>
         public VHMsg.Client vhmsg;
         /// <summary>
-        /// Identifies this program on the Elvin message system and to other components in the VH toolkit
+        /// Identifies this program on the message system and to other components in the VH toolkit
         /// </summary>
         public string programName;
         private bool isInitialized = false;
@@ -209,7 +209,7 @@ namespace MsSpeechRelay
         }
 
         /// <summary>
-        /// Process Elvin Speech Message and send reply
+        /// Process Speech Message and send reply
         /// </summary>
         /// <param name="message">The message</param>
         private void ProcessSpeechMessage(string message)
@@ -292,7 +292,7 @@ namespace MsSpeechRelay
 
         /// <summary>
         /// Message Handling Code:
-        /// Callback for every Elvin message, will direct program flow
+        /// Callback for every message, will direct program flow
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e">Variable containg the message params and the actual message</param>
@@ -341,7 +341,7 @@ namespace MsSpeechRelay
             }
             else
             {
-                /// This fallback command is there because it only registers for very specific Elvin messages, so if it receives uncalled for messages this will catch it
+                /// This fallback command is there because it only registers for very specific messages, so if it receives uncalled for messages this will catch it
                 Console.WriteLine("Received unknown command: " + e.s + "\n");
             }
         }
@@ -499,7 +499,7 @@ namespace MsSpeechRelay
             programName = "msspeechrelay";
             //programName = "cerevoicerelay";
 
-            /// Start Elvin message server
+            /// Start message server
             /// 
             using (vhmsg = new VHMsg.Client())
             {
@@ -537,8 +537,8 @@ namespace MsSpeechRelay
                 ttsServer.VisemeReached += new EventHandler<VisemeReachedEventArgs>(ttsServer_VisemeReached);
 
                 /// Debugging support
-                /// Parses in a test file containing the same commands as would be received via Elvin
-                /// NOTE: Only expects 1 Elvin commands per file
+                /// Parses in a test file containing the same commands as would be received via VHMsg
+                /// NOTE: Only expects 1 command per file
                 /// 
 
                 Console.WriteLine("MsSpeechRelay: Ready to receive messages");
