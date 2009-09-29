@@ -654,7 +654,7 @@ class OgreViewerApplication : public ExampleApplication
 				//Create character from characterType
 				ent = app->mSceneMgr->createEntity( charIdStr, characterType + ".mesh" );
 			}
-			catch (Ogre::ItemIdentityException& e)
+			catch( Ogre::ItemIdentityException& )
 			{
 				//Default to existing Brad character
 				ent = app->mSceneMgr->createEntity( charIdStr, "Brad.mesh" );
