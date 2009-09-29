@@ -315,15 +315,18 @@ namespace MsSpeechRelay
             else if (splitargs[0] == "vrAllCall")
             {
                 /// Answer the roll call
-                vhmsg.SendMessage("vrComponent rvoice" + programName + " all");
+                vhmsg.SendMessage("vrComponent tts " + programName);
             }
             else if (splitargs[0] == "vrKillComponent")
             {
                 /// Controls when the programs kills itself
-                if (splitargs.Length > 1 && ( splitargs[1] == programName || splitargs[1] == "all" || splitargs[1] == "\"all\""))
+                //if (splitargs.Length > 1 && ( splitargs[1] == programName || splitargs[1] == "all" || splitargs[1] == "\"all\""))
+                // Changed by Shridhar on 09/29/09..... Elvin name should be tts and program name should be MSSpeechRelay
+                // Updating to meet Elvin Message specifications on Wiki
+                if (splitargs.Length > 1 && (splitargs[1] == "tts" || splitargs[1] == "all" || splitargs[1] == "\"all\""))
                 {
                     Console.WriteLine("Kill message received, goodbye\n");
-                    vhmsg.SendMessage("vrProcEnd rvoice " + programName);
+                    vhmsg.SendMessage("vrProcEnd tts " + programName);
                     /// Not running anymore
                     /// 
                     isRunning = false;
@@ -515,7 +518,7 @@ namespace MsSpeechRelay
 
                 vhmsg.MessageEvent += new VHMsg.Client.MessageEventHandler(MessageHandler);
 
-                vhmsg.SendMessage("vrComponent rvoice" + programName + " all");
+                vhmsg.SendMessage("vrComponent tts" + programName );
                 isInitialized = true;
 
                 /// If temporary audio directory doesn't exist, create it
@@ -549,7 +552,7 @@ namespace MsSpeechRelay
                     string testMessage = parser.ReadToEnd();
                     ProcessSpeechMessage(testMessage);
                     isRunning = false;
-                    vhmsg.SendMessage("vrProcEnd rvoice " + programName);
+                    vhmsg.SendMessage("vrProcEnd tts " + programName);
                 }
 
                 /// Loop to process events
