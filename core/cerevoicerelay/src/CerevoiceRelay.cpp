@@ -234,8 +234,8 @@ std::string remove_spaces_and_double_quotes ( const char * c )
    return s;
 }
 
-/// Process all Vhmsg/Elvin messages
-void elvin_callback( const char * op, const char * args, void * userData )
+/// Process all VHMsg messages
+void vhmsg_callback( const char * op, const char * args, void * userData )
 {
 #ifdef _DUMP_COMM_TO_DISK
 	fprintf(_infile,"%d: OP: %s :ARGS: %s \n\n",_dumpCounter++, op,args);
@@ -342,7 +342,7 @@ int main( int argc, char * argv[] )
       elvish_scope = strcat( getenv( "COMPUTERNAME" ), "_SCOPE" );
    }
 
-   vhmsg::ttu_set_client_callback( elvin_callback );
+   vhmsg::ttu_set_client_callback( vhmsg_callback );
    int err = vhmsg::ttu_open( elvish_session_host );
    if ( err != vhmsg::TTU_SUCCESS )
    {
