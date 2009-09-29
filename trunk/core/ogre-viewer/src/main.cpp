@@ -277,8 +277,8 @@ class OgreViewerApplication : public ExampleApplication
 
 
 			// Position the camera
-			mCamera->setPosition( 0, 40, 225 );
-			mCamera->lookAt( 0, 10, 0 );
+			mCamera->setPosition( 0, 140, 225 );
+			mCamera->lookAt( 0, 92, 0 );
 
 			// Open ActiveMQ
 			char * elvish_session_host = getenv( "ELVISH_SESSION_HOST" );
