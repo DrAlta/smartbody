@@ -507,8 +507,8 @@ namespace MsSpeechRelay
             using (vhmsg = new VHMsg.Client())
             {
                 vhmsg.OpenConnection();
-                Console.WriteLine("ELVISH_SESSION_HOST: {0}", System.Environment.GetEnvironmentVariable("ELVISH_SESSION_HOST"));
-                Console.WriteLine("ELVISH_SCOPE: {0}", System.Environment.GetEnvironmentVariable("ELVISH_SCOPE"));
+                Console.WriteLine( "VHMSG_SERVER: {0}", vhmsg.Server );
+                Console.WriteLine( "VHMSG_SCOPE: {0}", vhmsg.Scope );
 
                 /// We only need Remote Speech commands
                 vhmsg.SubscribeMessage("RemoteSpeechCmd");
