@@ -327,23 +327,9 @@ int main( int argc, char * argv[] )
 {
    std::vector<char *> voices;
    bServerMode = true;
-    
-   // Messaging set up
-   char * elvish_session_host = getenv( "elvish_session_host" );
-   char * elvish_scope = getenv( "elvish_scope" );
-
-   if ( elvish_session_host == NULL )
-   {
-      elvish_session_host = getenv( "COMPUTERNAME" );
-   }
-
-   if ( elvish_scope == NULL )
-   {
-      elvish_scope = strcat( getenv( "COMPUTERNAME" ), "_SCOPE" );
-   }
 
    vhmsg::ttu_set_client_callback( vhmsg_callback );
-   int err = vhmsg::ttu_open( elvish_session_host );
+   int err = vhmsg::ttu_open();
    if ( err != vhmsg::TTU_SUCCESS )
    {
       printf( "Unable to connect to message server.\n\nPress any key to exit.\n");
