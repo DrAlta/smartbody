@@ -500,19 +500,13 @@ void vhmsg_loop( void * ignore )
 
 void init_messaging()
 {
-   char * elvish_session_host = getenv( "ELVISH_SESSION_HOST" );
-   if ( elvish_session_host == NULL )
-   {
-      elvish_session_host = "localhost";
-   }
-
-   printf( "ELVISH_SESSION_HOST: %s\n", elvish_session_host );
-   printf( "ELVISH_SCOPE: %s\n", getenv( "ELVISH_SCOPE" ) );
-
    vhmsg::ttu_set_client_callback( tt_client_callback );
-   int err = vhmsg::ttu_open( elvish_session_host );
+   int err = vhmsg::ttu_open();
    if ( err == vhmsg::TTU_SUCCESS )
    {
+      printf( "VHMSG_SERVER: %s\n", vhmsg::ttu_get_server() );
+      printf( "VHMSG_SCOPE: %s\n", vhmsg::ttu_get_scope() );
+
       err = vhmsg::ttu_register( m_request_message );
       err = vhmsg::ttu_register( m_reply_message );
       err = vhmsg::ttu_register( "vrKillComponent" );
