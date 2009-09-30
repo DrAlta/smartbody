@@ -516,16 +516,12 @@ int main( int argc, char **argv )	{
 	}
 
 #if LINK_VHMSG_CLIENT
-	char *elvish_session_host = getenv( "ELVISH_SESSION_HOST" );
-	if( elvish_session_host == NULL )	{
-		fprintf( stderr, "SBM: Environment variable \"ELVISH_SESSION_HOST\" not defined.  Assuming \"localhost\".\n" );
-		elvish_session_host = "localhost";
-	}
-	if( strcasecmp( elvish_session_host, "none" ) == 0 )	{
-		printf( "SBM: ELVISH_SESSION_HOST='%s': DISABLED\n", elvish_session_host );
+	char * vhmsg_server = getenv( "VHMSG_SERVER" );
+	if( vhmsg_server != NULL && strcasecmp( vhmsg_server, "none" ) == 0 )	{
+		printf( "SBM: VHMSG_SERVER='%s': DISABLED\n", vhmsg_server );
 	}
 	else	{
-		err = vhmsg::ttu_open( elvish_session_host );
+		err = vhmsg::ttu_open();
 		if( err == vhmsg::TTU_SUCCESS ) {
 			vhmsg::ttu_set_client_callback( sbm_vhmsg_callback );
 			err = vhmsg::ttu_register( "sbm" );
@@ -542,7 +538,7 @@ int main( int argc, char **argv )	{
 
 			mcu.vhmsg_enabled = true;
 		} else {
-			printf( "SBM ERR: ttu_open ELVISH_SESSION_HOST='%s' FAILED\n", elvish_session_host );
+			printf( "SBM ERR: ttu_open VHMSG_SERVER='%s' FAILED\n", vhmsg::ttu_get_server() );
 			mcu.vhmsg_enabled = false;
 		}
 	}
