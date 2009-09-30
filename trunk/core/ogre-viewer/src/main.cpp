@@ -281,17 +281,9 @@ class OgreViewerApplication : public ExampleApplication
 			mCamera->lookAt( 0, 92, 0 );
 
 			// Open ActiveMQ
-			char * elvish_session_host = getenv( "ELVISH_SESSION_HOST" );
-
-			if ( elvish_session_host == NULL )
-			{
-				elvish_session_host = "localhost";
-			}
-
 			vhmsg::ttu_set_client_callback( &OgreViewerApplication::tt_client_callback, this );
 
-			int err = vhmsg::ttu_open( elvish_session_host );
-
+			int err = vhmsg::ttu_open();
 			if ( err != vhmsg::TTU_SUCCESS )
 			{
 				printf("%s", "ttu_open failed!\n" );
