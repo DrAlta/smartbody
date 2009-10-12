@@ -463,8 +463,12 @@ void cerevoice_tts::init( std::vector<char *> vctVoices )
    voice_path = "..\\..\\data\\cereproc\\voices\\";
    voice_file_extension = ".voice";
    license_file_extension = ".lic";
-   temp_audio_dir_cereproc = "..\\..\\..\\dimr\\tmpaudio\\";
-   temp_audio_dir_player = "dimr\\tmpaudio\\";
+
+   // the below 2 paths are being set just as default values
+   // the actual paths are obtained from SBM through the RemoteSpeechCmd and set at run time
+   temp_audio_dir_cereproc = "..\\..\\data\\cache\\audio\\";
+   temp_audio_dir_player = "data\\cache\\audio\\";
+
    abbfile       = "../../lib/cerevoice/veng_db/en/norm/abb.txt";
    pbreakfile    = "../../lib/cerevoice/veng_db/en/norm/pbreak.txt";
    homographfile = "../../lib/cerevoice/veng_db/en/homographs/rules.dat";
@@ -525,22 +529,7 @@ void cerevoice_tts::init( std::vector<char *> vctVoices )
       XMLString::release( &pMsg );
    }
 
-   // Make sure the audio temp directory exists and create if not
-   // CPRC_riff_save will not create the directory if non-existent
-   if( !fileExists( temp_audio_dir_cereproc ) )
-   {
-      std::string temp = "";
-      std::vector< std::string > tokens;
-      const std::string delimiters = "\\\\";
-      vhcl::Tokenize( temp_audio_dir_cereproc, tokens, delimiters );
-
-      printf( "Warning, audio temp directory, %s, does not exist. Creating directory...\n", temp_audio_dir_cereproc );
-      for (unsigned int i = 0; i < tokens.size(); i++)
-      {
-         temp += tokens.at( i ) + "\\";
-         _mkdir( temp.c_str() );
-      }
-   }
+ 
 }
 
 
