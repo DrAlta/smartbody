@@ -142,8 +142,8 @@ utt_{3}_{0}_{2}_{1}.aiff
 don't have recipient id, so it is not included.
 The timestamp is 20051121_150427 (that is, YYYYMMDD_HHMMSS ), so we can check old sounds for errors.
 *****************************************/
-	forPlaysound= "dimr/tmpaudio/utt_" +date+ "_"+ time+ "_"+ string(agentName)+"_"+ myStream.str()+".aiff" ; //this is for the unreal playsound command (this is what's sent to unreal through VHMsg)
-	string soundFile= "../../../dimr/tmpaudio/utt_" +date+ "_"+ time+ "_"+ string(agentName)+"_"+ myStream.str()+".aiff"; //gives sound file correct name to Remote speech process (and thus relative to Remote speech process)
+	forPlaysound= "data/cache/audio/utt_" +date+ "_"+ time+ "_"+ string(agentName)+"_"+ myStream.str()+".aiff" ; //this is for the unreal playsound command (this is what's sent to unreal through VHMsg)
+	string soundFile= "../../data/cache/audio/utt_" +date+ "_"+ time+ "_"+ string(agentName)+"_"+ myStream.str()+".aiff"; //gives sound file correct name to Remote speech process (and thus relative to Remote speech process)
 	string* soundFilePtr= new string(soundFile);
 	//mcu.character_map.lookup(agentName)->getVoice()-- gets the voice name from the character in meCharacter (it's a string pointer so the * dereferences it)
 	SbmCharacter* agent = mcuCBHandle::singleton().character_map.lookup(agentName);
