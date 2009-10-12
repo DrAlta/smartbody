@@ -29,6 +29,8 @@
 #include <conio.h>
 #include <windows.h>
 #include <winsock.h>
+#include <direct.h>
+#include <io.h>
 
 #include <string>
 #include <vector>
@@ -182,7 +184,44 @@ void process_message( const char * message )
    // parse out just the sound file name and give it a .wav file type
    int pos = file_name.find( ".aiff" );
    int pos2 = file_name.find( "utt" );
+
+   // obtaining the directory path where the output sound file is to be written
+
+   char directory[_MAX_PATH];
+		
+   strcpy(directory,((std::string)file_name.substr(0, pos2)).c_str());
+   tts->temp_audio_dir_cereproc = directory;
+   // converting the directory path to an absolute path
+   char full[ _MAX_PATH ];
+   if ( _fullpath( full, tts->temp_audio_dir_cereproc, _MAX_PATH ) == NULL )
+   {
+		printf("/nError converting path sent from SBM to absolute path/n");
+   }
+	
+   char absolute_directory[_MAX_PATH];
+   strcpy(absolute_directory,full);
+   tts->temp_audio_dir_player = absolute_directory;
+
    file_name = file_name.substr( pos2, pos - pos2 ) + ".wav";
+
+
+   // Make sure the audio temp directory exists and create if not
+   // CPRC_riff_save will not create the directory if non-existent
+   if( !(_access( tts->temp_audio_dir_cereproc, 0 ) == 0 ) )
+   {
+      std::string temp = "";
+      std::vector< std::string > tokens;
+      const std::string delimiters = "\\\\";
+      vhcl::Tokenize( tts->temp_audio_dir_cereproc, tokens, delimiters );
+
+      printf( "Warning, audio temp directory, %s, does not exist. Creating directory...\n", tts->temp_audio_dir_cereproc );
+      for (unsigned int i = 0; i < tokens.size(); i++)
+      {
+         temp += tokens.at( i ) + "\\";
+         _mkdir( temp.c_str() );
+      }
+   }
+
 
    // Create file name relative to cerevoice relay
    /**
