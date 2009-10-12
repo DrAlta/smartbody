@@ -27,6 +27,8 @@
 #include <conio.h>
 #include <windows.h>
 #include <winsock.h>
+#include <direct.h>
+#include <io.h>
 
 #include <string>
 #include <vector>
@@ -67,6 +69,35 @@ void process_message( const char * message )
    //parse out just the sound file name and give it a .wav file type
    int pos = file_name.find( ".aiff" );
    int pos2 = file_name.find( "utt" );
+
+   // obtaining the directory path where the output sound file is to be written
+   directory = file_name.substr(0, pos2);
+   char full[ _MAX_PATH ];
+   if ( _fullpath( full, directory.c_str(), _MAX_PATH ) == NULL )
+   {
+		printf("/nError converting path sent from SBM to absolute path/n");
+   }
+   
+   directory = std::string(full);
+
+   // Make sure the audio temp directory exists and create if not
+   // CPRC_riff_save will not create the directory if non-existent
+   if( !(_access( directory.c_str(), 0 ) == 0 ) )
+   {
+      std::string temp = "";
+      std::vector< std::string > tokens;
+      const std::string delimiters = "\\\\";
+      vhcl::Tokenize( directory, tokens, delimiters );
+
+      printf( "Warning, audio temp directory, %s, does not exist. Creating directory...\n", directory );
+      for (unsigned int i = 0; i < tokens.size(); i++)
+      {
+         temp += tokens.at( i ) + "\\";
+         _mkdir( temp.c_str() );
+      }
+   }
+
+   // obtaining only the filename from the entire path
    file_name = file_name.substr( pos2, pos - pos2 ) + ".wav";
 
    //set the full file name
@@ -100,20 +131,29 @@ void vhmsg_callback( const char * op, const char * args, void * userData )
 int main( int argc, char * argv[] )
 {
    //get the saso root
-   char * saso_root = getenv( "SASO_ROOT" );
+   //char * saso_root = getenv( "SASO_ROOT" );
 
-   if ( saso_root != NULL )
-   {
-      std::string saso_root_string = saso_root;
-      directory = saso_root_string + "\\dimr\\tmpaudio\\";
-      std::cout << "Audio files will be saved to: " << directory << "\n";
-   }
-   else
-   {
-      //if the saso_root is not set, output the audio to the c drive
-      directory = "..\\..\\..\\dimr\\tmpaudio\\";
-      std::cout << "SASO_ROOT not set, audio files will be saved to: " << directory << "\n";
-   }
+
+   // Commented by Shridhar on 10/09/09
+   // Now the output sound-file path is no longer hardcoded, it is obtained from SBM through the RemoteSpeechCmd
+   //if ( saso_root != NULL )
+   //{
+   //   std::string saso_root_string = saso_root;
+   //   directory = saso_root_string + "\\dimr\\tmpaudio\\";
+   //   std::cout << "Audio files will be saved to: " << directory << "\n";
+   //}
+   //else
+   //{
+   //   //if the saso_root is not set, output the audio to the c drive
+   //   directory = "..\\..\\..\\dimr\\tmpaudio\\";
+   //   std::cout << "SASO_ROOT not set, audio files will be saved to: " << directory << "\n";
+   //}
+
+
+   // the below path is only for display purposes. The actual path is obtained from SBM (currently happens to be same as below 10/09/09)
+   directory = "..\\..\\data\\cache\\audio";
+   std::cout << "Audio files will be saved to: " << directory << "\n";
+   std::cout << "This is the default path. Actual path will be obtained from SBM through RemoteSpeechCmd Message.\n";
 
    vhmsg::ttu_set_client_callback( vhmsg_callback );
    int err = vhmsg::ttu_open();
