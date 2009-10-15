@@ -53,6 +53,7 @@ class SkeletalAnimationFrameListener : public ExampleFrameListener
 private:
 	SceneManager * mSceneMgr;
 	BoneBusServer * m_bonebus;
+
 	
 protected:
 	bool mQuit;
@@ -73,16 +74,133 @@ public:
 	}
 
 
+	bool processUnbufferedKeyInput(const FrameEvent& evt)
+	{
+
+		if(mKeyboard->isKeyDown(OIS::KC_A))
+			mTranslateVector.x = -mMoveScale;	// Move camera left
+
+		if(mKeyboard->isKeyDown(OIS::KC_D))
+			mTranslateVector.x = mMoveScale;	// Move camera RIGHT
+
+		if(mKeyboard->isKeyDown(OIS::KC_UP) || mKeyboard->isKeyDown(OIS::KC_W) )
+			mTranslateVector.z = -mMoveScale;	// Move camera forward
+
+		if(mKeyboard->isKeyDown(OIS::KC_DOWN) || mKeyboard->isKeyDown(OIS::KC_S) )
+			mTranslateVector.z = mMoveScale;	// Move camera backward
+
+		if(mKeyboard->isKeyDown(OIS::KC_PGUP))
+			mTranslateVector.y = mMoveScale;	// Move camera up
+
+		if(mKeyboard->isKeyDown(OIS::KC_PGDOWN))
+			mTranslateVector.y = -mMoveScale;	// Move camera down
+
+		if(mKeyboard->isKeyDown(OIS::KC_RIGHT))
+			mCamera->yaw(-mRotScale);
+
+		if(mKeyboard->isKeyDown(OIS::KC_LEFT))
+			mCamera->yaw(mRotScale);
+
+		if( mKeyboard->isKeyDown(OIS::KC_ESCAPE) || mKeyboard->isKeyDown(OIS::KC_Q) )
+			return false;
+
+       	if( mKeyboard->isKeyDown(OIS::KC_F) && mTimeUntilNextToggle <= 0 )
+		{
+			mStatsOn = !mStatsOn;
+			showDebugOverlay(mStatsOn);
+			mTimeUntilNextToggle = 1;
+		}
+
+		if( mKeyboard->isKeyDown(OIS::KC_T) && mTimeUntilNextToggle <= 0 )
+		{
+			switch(mFiltering)
+			{
+			case TFO_BILINEAR:
+				mFiltering = TFO_TRILINEAR;
+				mAniso = 1;
+				break;
+			case TFO_TRILINEAR:
+				mFiltering = TFO_ANISOTROPIC;
+				mAniso = 8;
+				break;
+			case TFO_ANISOTROPIC:
+				mFiltering = TFO_BILINEAR;
+				mAniso = 1;
+				break;
+			default: break;
+			}
+			MaterialManager::getSingleton().setDefaultTextureFiltering(mFiltering);
+			MaterialManager::getSingleton().setDefaultAnisotropy(mAniso);
+
+			showDebugOverlay(mStatsOn);
+			mTimeUntilNextToggle = 1;
+		}
+
+		if(mKeyboard->isKeyDown(OIS::KC_SYSRQ) && mTimeUntilNextToggle <= 0)
+		{
+			std::ostringstream ss;
+			ss << "screenshot_" << ++mNumScreenShots << ".png";
+			mWindow->writeContentsToFile(ss.str());
+			mTimeUntilNextToggle = 0.5;
+			mDebugText = "Saved: " + ss.str();
+		}
+
+		if(mKeyboard->isKeyDown(OIS::KC_R) && mTimeUntilNextToggle <=0)
+		{
+			mSceneDetailIndex = (mSceneDetailIndex+1)%3 ;
+			switch(mSceneDetailIndex) {
+				case 0 : mCamera->setPolygonMode(PM_SOLID); break;
+				case 1 : mCamera->setPolygonMode(PM_WIREFRAME); break;
+				case 2 : mCamera->setPolygonMode(PM_POINTS); break;
+			}
+			mTimeUntilNextToggle = 0.5;
+		}
+
+		static bool displayCameraDetails = false;
+		if(mKeyboard->isKeyDown(OIS::KC_P) && mTimeUntilNextToggle <= 0)
+		{
+			displayCameraDetails = !displayCameraDetails;
+			mTimeUntilNextToggle = 0.5;
+			if (!displayCameraDetails)
+				mDebugText = "";
+		}
+
+
+		// display appropriate scenes
+		if(mKeyboard->isKeyDown(OIS::KC_1))
+		{
+			mSceneMgr->getSceneNode("world_scene_ft")->setVisible(false);
+			mSceneMgr->getSceneNode("world_scene_cm")->setVisible(false);
+			mSceneMgr->getSceneNode("plane_node")->setVisible(true);
+		}
+		if(mKeyboard->isKeyDown(OIS::KC_3))
+		{
+			mSceneMgr->getSceneNode("world_scene_ft")->setVisible(true);
+			mSceneMgr->getSceneNode("world_scene_cm")->setVisible(false);
+			mSceneMgr->getSceneNode("plane_node")->setVisible(false);
+		}
+		if(mKeyboard->isKeyDown(OIS::KC_2))
+		{
+			mSceneMgr->getSceneNode("world_scene_ft")->setVisible(false);
+			mSceneMgr->getSceneNode("world_scene_cm")->setVisible(true);
+			mSceneMgr->getSceneNode("plane_node")->setVisible(false);
+		}
+
+
+		// Print camera details
+		if(displayCameraDetails)
+			mDebugText = "P: " + StringConverter::toString(mCamera->getDerivedPosition()) +
+						 " " + "O: " + StringConverter::toString(mCamera->getDerivedOrientation());
+
+		// Return true to continue rendering
+		return true;
+	}
+
+
 	bool frameStarted( const FrameEvent & evt )
 	{
 		if (mQuit)
 		{
-			// Send vrProcEnd message to ActiveMQ
-			vhmsg::ttu_notify2( "vrProcEnd", "renderer" );
-
-			// Close ActiveMQ
-			vhmsg::ttu_close();
-
 			return false;
 		}
 
@@ -187,6 +305,9 @@ public:
 
 class OgreViewerApplication : public ExampleApplication
 {
+	private:
+		Ogre::SceneNode * sceneNode;
+		Ogre::Entity * sceneEntity;
 	protected:
 		//Map used to store each characters initial bone positions to be 
 		//used in 'OnBonePosition' function to add up with the deltas.
@@ -196,6 +317,15 @@ class OgreViewerApplication : public ExampleApplication
 		OgreViewerApplication() {}
 
 	protected:
+
+		void destroyScene(void)
+		{
+			// Send vrProcEnd message to ActiveMQ
+			vhmsg::ttu_notify2( "vrProcEnd", "renderer" );
+
+			// Close ActiveMQ
+			vhmsg::ttu_close();
+		}
 
 		// Just override the mandatory create scene method
 		void createScene()
@@ -296,6 +426,8 @@ class OgreViewerApplication : public ExampleApplication
 			// Send vrComponent message to ActiveMQ
 			vhmsg::ttu_notify2( "vrComponent", "renderer Ogre" );
 
+
+			//adding plane entity to the scene
 			Plane plane;
 			plane.normal = Vector3::UNIT_Y;
 			plane.d = 100;
@@ -304,7 +436,24 @@ class OgreViewerApplication : public ExampleApplication
 			//pPlaneEnt->setMaterialName( "Examples/Rockwall" );
 			pPlaneEnt->setMaterialName( "Rockwall" );
 			pPlaneEnt->setCastShadows( false );
-			mSceneMgr->getRootSceneNode()->createChildSceneNode( Vector3( 0, 0, 0 ) )->attachObject( pPlaneEnt );
+			mSceneMgr->getRootSceneNode()->createChildSceneNode("plane_node", Vector3( 0, 0, 0 ) )->attachObject( pPlaneEnt );
+
+			// adding diagnostic scene to measure in feet
+			sceneNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("world_scene_ft");
+			sceneEntity = mSceneMgr->createEntity("world_entity_ft","Diagnostic_Level(ft).mesh");
+			sceneNode->attachObject(sceneEntity);
+			sceneNode->setVisible(false);
+
+			// adding diagnostic scene to measure in cm
+			sceneNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("world_scene_cm");
+			sceneEntity = mSceneMgr->createEntity("world_entity_cm","Diagnostic_Level(meter_in_cm).mesh");
+			sceneNode->attachObject(sceneEntity);
+			sceneNode->setVisible(false);
+
+			
+
+
+
 
 
 
