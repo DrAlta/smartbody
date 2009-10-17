@@ -632,11 +632,14 @@ namespace MsSpeechRelay
         /// <param name="e"></param>
         void ttsServer_BookmarkReached(object sender, BookmarkReachedEventArgs e)
         {
+            String bookmark;
+            bookmark = e.Bookmark.Substring(e.Bookmark.IndexOf(':') + 1);
+
             if (doDebugChecks)
             {
-                Console.WriteLine("Reached bookmark: " + e.Bookmark + "\n");
+                Console.WriteLine("Reached bookmark: " + bookmark + "\n");
             }
-            xmlReply += "<mark name=\"" + e.Bookmark + "\" time=\"" + e.AudioPosition.TotalSeconds.ToString() + "\"/>";
+            xmlReply += "<mark name=\"" + bookmark + "\" time=\"" + e.AudioPosition.TotalSeconds.ToString() + "\"/>";
 
             /// Hack begins
             /// Since we don't have a word beginning/ending callback, we resort
