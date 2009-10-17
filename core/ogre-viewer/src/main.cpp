@@ -68,6 +68,10 @@ public:
 		m_bonebus = bonebus;
 		mQuit = false;
 		m_ogreMouseEnabled = true;
+
+
+		// turn off mouse look by default
+		SetOgreMouse( false );
 	}
 
 
