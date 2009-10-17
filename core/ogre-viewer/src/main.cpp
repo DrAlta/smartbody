@@ -54,6 +54,8 @@ private:
 	SceneManager * mSceneMgr;
 	BoneBusServer * m_bonebus;
 
+	bool m_ogreMouseEnabled;
+
 	
 protected:
 	bool mQuit;
@@ -65,6 +67,7 @@ public:
 		mSceneMgr = mgr;
 		m_bonebus = bonebus;
 		mQuit = false;
+		m_ogreMouseEnabled = true;
 	}
 
 
@@ -187,12 +190,29 @@ public:
 		}
 
 
+		if ( mKeyboard->isKeyDown( OIS::KC_J ) )
+		{
+			SetOgreMouse( !m_ogreMouseEnabled );
+		}
+
+
 		// Print camera details
 		if(displayCameraDetails)
 			mDebugText = "P: " + StringConverter::toString(mCamera->getDerivedPosition()) +
 						 " " + "O: " + StringConverter::toString(mCamera->getDerivedOrientation());
 
 		// Return true to continue rendering
+		return true;
+	}
+
+
+	virtual bool processUnbufferedMouseInput( const FrameEvent & evt )
+	{
+		if ( m_ogreMouseEnabled )
+		{
+			return ExampleFrameListener::processUnbufferedMouseInput( evt );
+		}
+
 		return true;
 	}
 
@@ -299,6 +319,75 @@ public:
 	void scheduleQuit(void)
 	{
 		mQuit = true;
+	}
+
+
+	void SetOgreMouse( const bool enabled )
+	{
+		m_ogreMouseEnabled = enabled;
+
+
+		// There's no interface in OIS to set the coop level on individual devices at runtime.
+		// There's also no interface in OIS to set the coop level on individual devices at startup,
+		// so you have to tear down the entire input manager and start from scratch.
+		// Hopefully there's no side-effects from this behavior
+
+		// http://www.wreckedgames.com/forum/index.php/topic,1149.msg6170.html#msg6170
+
+
+		// taken from ExampleFrameListener::windowClosed()
+		LogManager::getSingletonPtr()->logMessage( "*** Destroying OIS ***" );
+		if ( mInputManager )
+		{
+			mInputManager->destroyInputObject( mMouse );
+			mInputManager->destroyInputObject( mKeyboard );
+			mInputManager->destroyInputObject( mJoy );
+
+			OIS::InputManager::destroyInputSystem( mInputManager );
+			mInputManager = 0;
+
+			mMouse = 0;
+			mKeyboard = 0;
+			mJoy = 0;
+		}
+
+
+		// taken from ExampleFrameListener::ExampleFrameListener()
+		LogManager::getSingletonPtr()->logMessage( "*** Initializing OIS ***" );
+		OIS::ParamList pl;
+		size_t windowHnd = 0;
+		std::ostringstream windowHndStr;
+
+		mWindow->getCustomAttribute( "WINDOW", &windowHnd );
+		windowHndStr << windowHnd;
+		pl.insert( std::make_pair( std::string( "WINDOW" ), windowHndStr.str() ) );
+
+
+		if ( m_ogreMouseEnabled )
+		{
+			pl.insert( std::make_pair( std::string( "w32_mouse" ), std::string( "DISCL_EXCLUSIVE" ) ) );
+		}
+		else
+		{
+			pl.insert( std::make_pair( std::string( "w32_mouse" ), std::string( "DISCL_NONEXCLUSIVE" ) ) );
+		}
+
+		pl.insert( std::make_pair( std::string( "w32_mouse" ), std::string( "DISCL_FOREGROUND" ) ) );
+
+
+		mInputManager = OIS::InputManager::createInputSystem( pl );
+
+		//Create all devices (We only catch joystick exceptions here, as, most people have Key/Mouse)
+		mKeyboard = static_cast<OIS::Keyboard *>( mInputManager->createInputObject( OIS::OISKeyboard, false ) );
+		mMouse = static_cast<OIS::Mouse *>( mInputManager->createInputObject( OIS::OISMouse, false ) );
+		try
+		{
+			mJoy = static_cast<OIS::JoyStick *>( mInputManager->createInputObject( OIS::OISJoyStick, false ) );
+		}
+		catch(...)
+		{
+			mJoy = 0;
+		}
 	}
 };
 
