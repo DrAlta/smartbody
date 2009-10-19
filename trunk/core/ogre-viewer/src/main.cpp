@@ -42,10 +42,13 @@ using std::string;
 using std::vector;
 
 
+#define FPS_LIMIT 31
+
 Entity * ent;
 SceneNode * mSceneNode;
 
 std::string skeleton[ 114 ];
+
 
 // Event handler to animate
 class SkeletalAnimationFrameListener : public ExampleFrameListener
@@ -316,6 +319,15 @@ public:
 
 		m_bonebus->Update();
 
+		//Limiting the frames per second as otherwise it takes up entire CPU
+		// Setting it to 30, but in effect it comes up to 60 due to granularity issues
+		Ogre::Root::getSingleton().setFrameSmoothingPeriod(0);
+		Ogre::Real ttW;
+		ttW = 1000.0 / FPS_LIMIT - 1000.0 * evt.timeSinceLastFrame;
+		if (ttW > 0)
+			Sleep(ttW); 
+		
+
 		return true;
 	}
 
@@ -324,6 +336,7 @@ public:
 	{
 		mQuit = true;
 	}
+
 
 
 	void SetOgreMouse( const bool enabled )
