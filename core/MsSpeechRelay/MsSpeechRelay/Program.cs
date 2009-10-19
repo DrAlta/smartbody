@@ -22,6 +22,7 @@
       Edward Fast, USC
 */
 
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,8 @@ using System.Speech.Synthesis;
 using System.Xml;
 using System.IO;
 using System.Threading;
+
+
 
 /**
  * MsSpeech Relay
@@ -47,6 +50,10 @@ namespace MsSpeechRelay
         ///Timer variable
         /// </summary>
         int timer_millisec;
+        /// <summary>
+        /// // FPS Limiting value.
+        /// </summary>
+        const int fps_limit = 100;
         /// <summary>
         /// Message handling server
         /// </summary>
@@ -581,13 +588,15 @@ namespace MsSpeechRelay
 
 
                     // code to limit the CPU usage as otherwise it takes up the complete CPU
-                    // Currently limiting to 60 frames per second. Might not me accurately 60 due to granularity issues.
+                    // Currently limiting to 60 frames per second. Might not be accurately 60 due to granularity issues.
                     int timesincelastframe = System.DateTime.Now.Millisecond - timer_millisec;
-                    timer_millisec = System.DateTime.Now.Millisecond;
+                    
                     int ttW;
-                    ttW = (1000 / 60) - timesincelastframe;
+                    ttW = (1000 / fps_limit) - timesincelastframe;
                     if (ttW > 0)
-                        Thread.Sleep(ttW); 
+                        Thread.Sleep(ttW);
+
+                    timer_millisec = System.DateTime.Now.Millisecond;
                 }
             }
 
