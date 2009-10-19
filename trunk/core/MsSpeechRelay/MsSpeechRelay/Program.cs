@@ -44,6 +44,10 @@ namespace MsSpeechRelay
     class Program
     {
         /// <summary>
+        ///Timer variable
+        /// </summary>
+        int timer_millisec;
+        /// <summary>
         /// Message handling server
         /// </summary>
         public VHMsg.Client vhmsg;
@@ -566,11 +570,24 @@ namespace MsSpeechRelay
                     vhmsg.SendMessage("vrProcEnd tts " + programName);
                 }
 
+                // initializing timer value
+                timer_millisec = System.DateTime.Now.Millisecond;
+
                 /// Loop to process events
                 /// 
                 while (isRunning)
                 {
                     System.Windows.Forms.Application.DoEvents();
+
+
+                    // code to limit the CPU usage as otherwise it takes up the complete CPU
+                    // Currently limiting to 60 frames per second. Might not me accurately 60 due to granularity issues.
+                    int timesincelastframe = System.DateTime.Now.Millisecond - timer_millisec;
+                    timer_millisec = System.DateTime.Now.Millisecond;
+                    int ttW;
+                    ttW = (1000 / 60) - timesincelastframe;
+                    if (ttW > 0)
+                        Thread.Sleep(ttW); 
                 }
             }
 
