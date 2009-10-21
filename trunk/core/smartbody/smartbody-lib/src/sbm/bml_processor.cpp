@@ -161,9 +161,9 @@ namespace BML {
 		// New vrAgentBML form...
 		ostringstream buff2;
 #if USE_RECIPIENT
-		buff2 << agent_id << " RECIPIENT " << message_id << " end ERROR " << error_msg;
+		buff2 << agent_id << " RECIPIENT " << message_id << " end error " << error_msg;
 #else
-		buff2 << agent_id << " " << message_id << " end ERROR " << error_msg;
+		buff2 << agent_id << " " << message_id << " end error " << error_msg;
 #endif
 		// TODO: Avoid singleton
 		mcu->vhmsg_send( "vrAgentBML", buff2.str().c_str() );
@@ -858,7 +858,7 @@ int BML::Processor::bml_end( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
 		}
 	} else if( end_code == "interrupted" ) {
 		// Ended by interruption from another behavior
-	} else if( end_code == "ERROR" ) {
+	} else if( end_code == "ERROR" || end_code == "error" ) {
 		// ended with error
 	} else {
 		cerr << "ERROR: BodyPlannerImpl::bml_end(..): " << bpMsg.actorId << " " << bpMsg.msgId << ": Unknown end_code \""<<end_code<<"\". Treating as complete." << endl;
