@@ -145,7 +145,7 @@ namespace MsSpeechRelay
             /// s, z
             visemeIDMap.Insert(15, "Z");
             /// sh, ch, jh, zh
-            visemeIDMap.Insert(16, "J");
+            visemeIDMap.Insert(16, "j");
             /// th, dh
             visemeIDMap.Insert(17, "Th");
             /// f, v
