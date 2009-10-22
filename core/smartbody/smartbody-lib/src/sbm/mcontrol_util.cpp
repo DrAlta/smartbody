@@ -390,8 +390,9 @@ void mcuCBHandle::update( void )	{
 #endif
 
 	srCmdSeq* seq_p;
+	char *seq_name = NULL;
 	active_seq_map.reset();
-	while( seq_p = active_seq_map.next() )	{
+	while( seq_p = active_seq_map.next( & seq_name ) )	{
 		char *cmd;
 		while( cmd = seq_p->pop( (float)time ) )	{
 			int err = execute( cmd );
@@ -400,11 +401,16 @@ void mcuCBHandle::update( void )	{
 			}
 			delete [] cmd;
 		}
-		// TODO: remove seq_p from active_seq_map if event_count()==0
+		// DONE: remove seq_p from active_seq_map if event_count()==0
 		// Issues:
 		//   * active_seq_map.remove(..) requires a char* key, but iteration provides a pointer
+		//        Optional argument to next()
 		//   * remove(..) resets the shared iterator
-		//   * No mechanism to go from pointer to key
+		//        NO, it should decrement the iterator
+		if( seq_p->get_count() < 1 )	{
+			seq_p = active_seq_map.remove( seq_name );
+			delete seq_p;
+		}
 	}
 
 	SbmPawn* pawn_p;
@@ -604,6 +610,7 @@ int mcuCBHandle::abort_seq( const char* seq_name ) {
 				// print offseted time, so the values are comparable to the MCU abort time
 				cout << "\ttime " << (time+offset) << ":\t"<< cmd << endl;
 				cmd = seq_p->pull( &time );
+				delete [] cmd;
 			}
 		}
 	}
