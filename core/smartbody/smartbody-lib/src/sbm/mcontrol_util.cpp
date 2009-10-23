@@ -911,49 +911,60 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 /////////////////////////////////////////////////////////////
 
-void flatten_inline_sequences( srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p, mcuCBHandle *mcu_p )	{
+/*
+
+	PREPROCESSOR: make paths available immediately to inline seq preprocessor
+	
+		path seq|me|bp <file-path>
+		seq <name> inline
+
+*/
+
+void mcu_preprocess_sequence( srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p, mcuCBHandle *mcu_p )	{
 	float t;
 	char *cmd;
 	
 	fr_seq_p->reset();
 	while( cmd = fr_seq_p->pull( & t ) )	{
+		srArgBuffer args( cmd );
 		srCmdSeq *inline_seq_p = NULL;
 
-		if( strncmp( cmd, "seq", 3 ) == 0 )	{
-			srArgBuffer args( cmd );
-			char *tok = args.read_token();
-			if( strcmp( tok, "seq" ) == 0 )	{
-				char *name = args.read_token();
-				tok = args.read_token();
-				if( strcmp( tok, "inline" ) == 0 )	{
-					inline_seq_p = mcu_p->lookup_seq( name );
-					if( inline_seq_p == NULL )	{
-						printf( "flatten_inline_sequences ERR: inline seq '%s' NOT FOUND\n", name );
-						return;
-					}
+		char *tok = args.read_token();
+		if( strcmp( tok, "path" ) == 0 )	{
+			mcu_filepath_func( args, mcu_p );
+			delete [] cmd;
+			cmd = NULL;
+		}
+		else
+		if( strcmp( tok, "seq" ) == 0 )	{
+			char *name = args.read_token();
+			tok = args.read_token();
+			if( strcmp( tok, "inline" ) == 0 )	{
+
+				inline_seq_p = mcu_p->lookup_seq( name );
+				delete [] cmd;
+				cmd = NULL;
+				if( inline_seq_p == NULL )	{
+					printf( "mcu_preprocess_sequence ERR: inline seq '%s' NOT FOUND\n", name );
+					return;
 				}
 			}
 		}
 		
 		float absolute_offset = fr_seq_p->offset() + t;
 		if( inline_seq_p )	{
-			delete [] cmd;
 			// iterate hierarchy
 			inline_seq_p->offset( absolute_offset );
-			flatten_inline_sequences( to_seq_p, inline_seq_p, mcu_p );
+			mcu_preprocess_sequence( to_seq_p, inline_seq_p, mcu_p );
 		}
-		else	{
+		else
+		if( cmd )	{
+			// propagate un-consumed command
 			to_seq_p->insert_ref( absolute_offset, cmd );
 		}
 	}
 	delete fr_seq_p;
 }
-
-/*
-
-	seq <name> inline
-
-*/
 
 int begin_sequence( char* seq_name, mcuCBHandle *mcu_p )	{
 	int err = CMD_FAILURE;
@@ -963,15 +974,13 @@ int begin_sequence( char* seq_name, mcuCBHandle *mcu_p )	{
 	if( seq_p ) {
 	
 		// EXPAND INLINE SEQs HERE
-#if 1
+
 		srCmdSeq *cp_seq_p = new srCmdSeq;
-		flatten_inline_sequences( cp_seq_p, seq_p, mcu_p );
+		mcu_preprocess_sequence( cp_seq_p, seq_p, mcu_p );
+
 		cp_seq_p->offset( (float)( mcu_p->time ) );
 		err = mcu_p->active_seq_map.insert( seq_name, cp_seq_p );
-#else	
-		seq_p->offset( (float)( mcu_p->time ) );
-		err = mcu_p->active_seq_map.insert( seq_name, seq_p );
-#endif
+
 		if( err != CMD_SUCCESS )	{
 			printf( "begin_sequence ERR: insert active: '%s' FAILED\n", seq_name ); 
 		}
