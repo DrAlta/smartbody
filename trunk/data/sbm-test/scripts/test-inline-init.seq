@@ -1,5 +1,15 @@
 # init test inline seq facility
 
+0 begin
+ echo
+end
+
+0   begin   
+ echo 
+test a b c 
+d e f   
+end
+
 0 echo test-inline AA
 0   path seq HELLO
 0 echo test-inline BB

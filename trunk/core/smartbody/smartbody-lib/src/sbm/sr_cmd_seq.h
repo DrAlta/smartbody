@@ -58,9 +58,9 @@ class srCmdSeq	{
 		float   duration();
 
 		/** Query sequence offset */
-		float	offset() { return event_offset; }				
+		float	offset() { return event_offset; }
 		/** Set pop by event.time + offset */
-		void	offset( float t ) { event_offset = t; }			
+		void	offset( float t ) { event_offset = t; }
 		/** remove first event passed */
 		char	*pop( float time );
 
