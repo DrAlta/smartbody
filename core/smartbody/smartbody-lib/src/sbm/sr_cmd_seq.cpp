@@ -86,6 +86,101 @@ int srCmdSeq::write_file( char *seq_file )	{
 	return( CMD_SUCCESS );
 }
 
+#if 1
+int srCmdSeq::read_file( FILE *seq_fp )	{
+
+	if( seq_fp == NULL )	{
+	    fprintf( stdout, "srCmdSeq::read_file ERR: NULL fp\n" ); 
+		return( CMD_FAILURE );
+	}
+	
+	char fill_buff[ MAX_CMD_ARGL ] = "";
+	char line_buff[ MAX_CMD_ARGL ] = "";
+	char ext_line_buff[ MAX_CMD_ARGL * 10 ] = "";
+	int line_count = 0;
+	float t = 0.0;
+	char *cmd_buff = NULL;
+	bool extended_cmd = false; // <t> begin <cmd> \n end
+	
+	int done = FALSE;
+	while( !done )	{
+
+		if( fscanf( seq_fp, "%[ \t\n]", fill_buff ) == EOF )	{
+			done = TRUE;
+		}
+		else	{
+			if( fscanf( seq_fp, "%[^\n]", line_buff ) == EOF )	{
+				done = TRUE;
+			}
+			else
+			if( line_buff[ 0 ] != '#' )	{
+				srArgBuffer args( line_buff );
+				
+				if( extended_cmd ) {
+				
+					srArgBuffer cmd_args( line_buff );
+					char *tok = cmd_args.read_token();
+					
+					if( strcmp( tok, "end" ) == 0 )	{
+						extended_cmd = false;
+//	printf( "srCmdSeq::read_file EXTENDED: '%s'\n", ext_line_buff );
+						
+						srArgBuffer ext_args( ext_line_buff );
+						int token_count = ext_args.calc_num_tokens();
+						if( token_count > 0 )	{
+
+							if( insert( t, ext_line_buff ) == CMD_FAILURE )	{
+								fprintf( stdout, "srCmdSeq::read_file ERR: insert FAILED: line # %d\n", line_count + 1 );
+								done = TRUE;
+							}
+						}
+						else	{
+							fprintf( stdout, "srCmdSeq::read_file ERR: line # %d\n", line_count + 1 );
+						}
+					}
+					else	{
+						char *cmd_part = args.read_remainder_raw();
+						char *cp_ext_line_buff = _strdup( ext_line_buff );
+						sprintf( ext_line_buff, "%s %s", cp_ext_line_buff, cmd_part );
+						free( cp_ext_line_buff );
+					}
+				}
+				else {
+					int token_count = args.calc_num_tokens();
+					if( token_count > 1 )	{
+
+						t = args.read_float();
+						cmd_buff = args.read_remainder_raw();
+						srArgBuffer cmd_args( cmd_buff );
+						char *tok = cmd_args.read_token();
+						
+						if( strcmp( tok, "begin" ) == 0 )	{
+							extended_cmd = true;
+							char *cmd_part = cmd_args.read_remainder_raw();
+							sprintf( ext_line_buff, "%s", cmd_part );
+						}
+						else
+						if( insert( t, cmd_buff ) == CMD_FAILURE )	{
+							fprintf( stdout, "srCmdSeq::read_file ERR: insert FAILED: line # %d\n", line_count + 1 );
+							done = TRUE;
+						}
+					}
+					else	{
+						fprintf( stdout, "srCmdSeq::read_file ERR: line # %d\n", line_count + 1 );
+					}
+				}
+			}
+		}
+		line_count++;
+	}
+
+	if( extended_cmd ) {
+		fprintf( stdout, "srCmdSeq::read_file ERR: UNMATCHED begin/end\n" );
+		return( CMD_FAILURE );
+	}
+	return( CMD_SUCCESS );
+}
+#else
 int srCmdSeq::read_file( FILE *seq_fp )	{
 
 	if( seq_fp == NULL )	{
@@ -129,6 +224,7 @@ int srCmdSeq::read_file( FILE *seq_fp )	{
 	}
 	return( CMD_SUCCESS );
 }
+#endif
 
 int srCmdSeq::read_file( char *seq_file, int report_open_fail )	{
 	FILE *in_fp;
@@ -147,6 +243,7 @@ int srCmdSeq::read_file( char *seq_file, int report_open_fail )	{
 
 	int err = read_file( in_fp );
 	if( err != CMD_SUCCESS )	{
+	    fprintf( stdout, "srCmdSeq::read_file ERR: '%s' FAILED\n", seq_file ); 
 		return( err );
 	}
 	fclose( in_fp );
