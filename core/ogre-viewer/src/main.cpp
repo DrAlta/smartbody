@@ -1182,7 +1182,7 @@ class OgreViewerApplication : public ExampleApplication
 		}
 
 
-		static void OnBoneRotations( const BoneBusServer::BulkBoneRotations * bulkBoneRotations, void * userData )
+		static void OnBoneRotations( const BulkBoneRotations * bulkBoneRotations, void * userData )
 		{
 			printf( "Set Bone Rotations! - %d %d %d\n", bulkBoneRotations->packetId, bulkBoneRotations->charId, bulkBoneRotations->numBoneRotations );
 
@@ -1331,7 +1331,7 @@ class OgreViewerApplication : public ExampleApplication
 		}
 
 
-		static void OnBonePositions( const BoneBusServer::BulkBonePositions * bulkBonePositions, void * userData )
+		static void OnBonePositions( const BulkBonePositions * bulkBonePositions, void * userData )
 		{
 			printf( "Set Bone Positions! - %d %d %d\n", bulkBonePositions->packetId, bulkBonePositions->charId, bulkBonePositions->numBonePositions );
 
