@@ -4,10 +4,10 @@
  echo
 end
 
-0   begin   
+0   begin
  echo 
-test a b c 
-d e f   
+test a b c
+    d e f    
 end
 
 0 echo test-inline AA
