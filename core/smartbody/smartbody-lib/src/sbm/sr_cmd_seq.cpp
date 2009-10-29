@@ -141,7 +141,12 @@ int srCmdSeq::read_file( FILE *seq_fp )	{
 					else	{
 						char *cmd_part = args.read_remainder_raw();
 						char *cp_ext_line_buff = _strdup( ext_line_buff );
-						sprintf( ext_line_buff, "%s %s", cp_ext_line_buff, cmd_part );
+						// insert single space to minimize buffer usage:
+//						sprintf( ext_line_buff, "%s %s", cp_ext_line_buff, cmd_part );
+						// retain multi-line:
+//						sprintf( ext_line_buff, "%s\n%s", cp_ext_line_buff, cmd_part );
+						// restore fill_buff to preserve formatting:
+						sprintf( ext_line_buff, "%s%s%s", cp_ext_line_buff, fill_buff, cmd_part );
 						free( cp_ext_line_buff );
 					}
 				}
