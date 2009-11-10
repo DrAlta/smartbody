@@ -20,21 +20,17 @@
 *      Ed Fast, USC
 *      Andrew n marshall, USC
 *	   Deepali Mendhekar, USC
+*	   Shridhar Ravikumar, USC
 */
 
 #include "vhcl.h"
-
 #include <windows.h>
-
 #include <map>
 #include <string>
-
 #include "Ogre.h"
 #include "OgreTagPoint.h"
 #include "ExampleApplication.h"
-
 #include "bonebus.h"
-
 #include "vhmsg-tt.h"
 
 
@@ -240,80 +236,6 @@ public:
 		sprintf( temp, "%5.2f %5.2f %5.2f", mCamera->getPosition().x, mCamera->getPosition().y, mCamera->getPosition().z );
 		mDebugText = temp;
 
-
-		/*
-		for ( int i = 0; i < NUM_JAIQUAS; ++i )
-		{
-		Real inc = evt.timeSinceLastFrame * mAnimationSpeed[ i ]; 
-
-		if ( ( mAnimState[ i ]->getTimePosition() + inc ) >= mAnimChop )
-		{
-		// Loop
-		// Need to reposition the scene node origin since animation includes translation
-		// Calculate as an offset to the end position, rotated by the
-		// amount the animation turns the character
-		Quaternion rot(mAnimationRotation, Vector3::UNIT_Y);
-		Vector3 startoffset = mSceneNode[i]->getOrientation() * -mSneakStartOffset;
-		Vector3 endoffset = mSneakEndOffset;
-		Vector3 offset = rot * startoffset;
-		Vector3 currEnd = mSceneNode[i]->getOrientation() * endoffset + mSceneNode[i]->getPosition();
-		mSceneNode[i]->setPosition(currEnd + offset);
-		mSceneNode[i]->rotate(rot);
-
-		mAnimState[i]->setTimePosition((mAnimState[i]->getTimePosition() + inc) - mAnimChop);
-		}
-		else
-		{
-		mAnimState[i]->addTime(inc);
-		}
-		}
-		*/
-
-
-
-
-		//Ogre::Skeleton * skel = ent->getSkeleton();
-
-		//Ogre::Bone * bone = skel->getBone( "spine2" );
-		//bone->setManuallyControlled( true );
-
-		//bone->setOrientation( Quaternion( 1, 0, rand(), 0 ) );
-
-
-		/*
-		Ogre::Bone * bone = skel->getBone( "spine3" );
-		bone->setOrientation( Quaternion( rand(), 0, rand(), 0 ) );
-		Ogre::Bone * bone = skel->getBone( "spine4" );
-		bone->setOrientation( Quaternion( rand(), 0, rand(), 0 ) );
-		Ogre::Bone * bone = skel->getBone( "l_shoulder" );
-		bone->setOrientation( Quaternion( rand(), 0, rand(), 0 ) );
-		Ogre::Bone * bone = skel->getBone( "l_elbow" );
-		bone->setOrientation( Quaternion( rand(), 0, rand(), 0 ) );
-		*/
-
-
-
-		/*
-		Ogre::Bone * headBone;
-		Ogre::Skeleton* skel = head->getSkeleton();
-		headBone = skel->getBone( "Head" );
-		headBone->setManuallyControlled( true );
-
-
-		//we want the head to be facing the camera, along the vector between the camera and the head 
-		//this is done in world space for simplicity
-		Ogre::Vector3 headBonePosition = headBone->getWorldPosition();
-		Ogre::Vector3 objectPosition = object->getPosition();
-		Ogre::Vector3 between = objectPosition-headBonePosition;
-
-
-
-		Ogre::Node * neckBone = headBone->getParent();
-		Ogre::Quaternion neckBoneWorldOrientation = neckBone->getWorldOrientation();
-
-
-		headBone->setOrientation( rot );
-		*/
 
 		vhmsg::ttu_poll();
 
@@ -556,188 +478,7 @@ class OgreViewerApplication : public ExampleApplication
 			sceneNode->attachObject(sceneEntity);
 			sceneNode->setVisible(false);
 
-			
-
-
-
-
-
-
-
-			//Entity * ent;
-			//SceneNode * mSceneNode;
-
-
-			/*
-			ent = mSceneMgr->createEntity( "doctor", "OgreDoctor.mesh" );
-
-			// Add entity to the scene node
-			mSceneNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-			mSceneNode->attachObject( ent );
-			//mSceneNode->rotate( q );
-			//mSceneNode->translate( mBasePositions[ i ] );
-
-			//mAnimState = ent->getAnimationState( "Sneak" );
-			//mAnimState->setEnabled( true );
-			//mAnimState->setLoop( false ); // manual loop since translation involved
-			//mAnimationSpeed = Math::RangeRandom(0.5, 1.5);
-
-			mSceneNode->scale( 0.25, 0.25, 0.25 );
-			mSceneNode->translate( 0, 25, 0 );
-			*/
-
-
-
-
-
-
-
-
-
-
-			/*
-			Num Bones: 112
-			Bone # 1: base
-			Bone # 2: spine1
-			Bone # 3: spine2
-			Bone # 4: spine3
-			Bone # 5: spine4
-			Bone # 6: spine5
-			Bone # 7: skullbase
-			Bone # 8: face_top_parent
-			Bone # 9: brow_parent_left
-			Bone #10: brow01_left
-			Bone #11: brow02_left
-			Bone #12: brow03_left
-			Bone #13: brow04_left
-			Bone #14: ear_left
-			Bone #15: eyeball_left
-			Bone #16: upper_nose_left
-			Bone #17: lower_nose_left
-			Bone #18: lower_eyelid_left
-			Bone #19: upper_eyelid_left
-			Bone #20: brow_parent_right
-			Bone #21: brow01_right
-			Bone #22: brow02_right
-			Bone #23: brow03_right
-			Bone #24: brow04_right
-			Bone #25: upper_eyelid_right
-			Bone #26: eyeball_right
-			Bone #27: lower_eyelid_right
-			Bone #28: upper_nose_right
-			Bone #29: lower_nose_right
-			Bone #30: ear_right
-			Bone #31: joint18
-			Bone #32: face_bottom_parent
-			Bone #33: Jaw
-			Bone #34: Jaw_back
-			Bone #35: Jaw_front
-			Bone #36: Lip_bttm_mid
-			Bone #37: Lip_bttm_left
-			Bone #38: Lip_bttm_right
-			Bone #39: Tongue_back
-			Bone #40: Tongue_mid
-			Bone #41: Tongue_front
-			Bone #42: Lip_top_left
-			Bone #43: cheek_low_left
-			Bone #44: Cheek_up_left
-			Bone #45: Lip_out_left
-			Bone #46: Lip_top_mid
-			Bone #47: Cheek_up_right
-			Bone #48: cheek_low_right
-			Bone #49: Lip_top_right
-			Bone #50: Lip_out_right
-			Bone #51: l_sternoclavicular
-			Bone #52: l_acromioclavicular
-			Bone #53: l_shoulder
-			Bone #54: l_elbow
-			Bone #55: l_forearm
-			Bone #56: l_wrist
-			Bone #57: l_pinky1
-			Bone #58: l_pinky2
-			Bone #59: l_pinky3
-			Bone #60: l_pinky4
-			Bone #61: l_ring1
-			Bone #62: l_ring2
-			Bone #63: l_ring3
-			Bone #64: l_ring4
-			Bone #65: l_middle1
-			Bone #66: l_middle2
-			Bone #67: l_middle3
-			Bone #68: l_middle4
-			Bone #69: l_index1
-			Bone #70: l_index2
-			Bone #71: l_index3
-			Bone #72: l_index4
-			Bone #73: l_thumb1
-			Bone #74: l_thumb2
-			Bone #75: l_thumb3
-			Bone #76: l_thumb4
-			Bone #77: r_sternoclavicular
-			Bone #78: r_acromioclavicular
-			Bone #79: r_shoulder
-			Bone #80: r_elbow
-			Bone #81: r_forearm
-			Bone #82: r_wrist
-			Bone #83: r_pinky1
-			Bone #84: r_pinky2
-			Bone #85: r_pinky3
-			Bone #86: r_pinky4
-			Bone #87: r_ring1
-			Bone #88: r_ring2
-			Bone #89: r_ring3
-			Bone #90: r_ring4
-			Bone #91: r_middle1
-			Bone #92: r_middle2
-			Bone #93: r_middle3
-			Bone #94: r_middle4
-			Bone #95: r_index1
-			Bone #96: r_index2
-			Bone #97: r_index3
-			Bone #98: r_index4
-			Bone #99: r_thumb1
-			Bone #100: r_thumb2
-			Bone #101: r_thumb3
-			Bone #102: r_thumb4
-			Bone #103: l_hip
-			Bone #104: l_knee
-			Bone #105: l_ankle
-			Bone #106: l_forefoot
-			Bone #107: l_toe
-			Bone #108: r_hip
-			Bone #109: r_knee
-			Bone #110: r_ankle
-			Bone #111: r_forefoot
-			Bone #112: r_toe
-			*/
-
-			/*
-			char blah[ 100 ];
-
-
-			Ogre::Skeleton * skel = ent->getSkeleton();
-
-
-			sprintf( blah, "Num Bones: %d\n", skel->getNumBones() );
-			OutputDebugString( blah );
-
-
-			Ogre::Bone * bone = skel->getBone( "spine2" );
-			bone->setManuallyControlled( true );
-
-
-
-
-			int i = 0;
-			Ogre::Skeleton::BoneIterator it = skel->getBoneIterator();
-			while ( it.hasMoreElements() )
-			{
-			Bone * b = it.getNext();
-			i++;
-			sprintf( blah, "Bone #%2d: %d - %s\n", i, b->getHandle(), b->getName().c_str() );
-			//OutputDebugString( blah );
-			}
-			*/
+		
 
 
 			skeleton[ 0 ] = ""; // unused
@@ -856,10 +597,6 @@ class OgreViewerApplication : public ExampleApplication
 			skeleton[ 113 ] = "r_thumb4";
 
 
-
-
-
-
 			m_bonebus.SetOnClientConnectCallback( OnClientConnect, this );
 			m_bonebus.SetOnCreateCharacterFunc( OnCreateCharacter, this );
 			m_bonebus.SetOnDeleteCharacterFunc( OnDeleteCharacter, this );
@@ -943,11 +680,6 @@ class OgreViewerApplication : public ExampleApplication
 			//Store the map containing the initial bone position using charachter ID
 			app->characterInitBonePosMap[characterID] = cachedInitialBonePositions;
 
-			//ent->setMaterialName("Examples/Grass"); 
-			//ent->setVisible( false );
-			//ent->setDisplaySkeleton( true );
-
-			//ent->setVisibilityFlags( 1 );
 
 	#if 0
 			// testing - create new see-through material
@@ -976,16 +708,6 @@ class OgreViewerApplication : public ExampleApplication
 			// Add entity to the scene node
 			SceneNode * mSceneNode = app->mSceneMgr->getRootSceneNode()->createChildSceneNode( charIdStr );
 			mSceneNode->attachObject( ent );
-
-			//mSceneNode->rotate( q );
-			//mSceneNode->scale( 0.25, 0.25, 0.25 );
-			//mSceneNode->scale( 0.55, 0.55, 0.55 );
-			//mSceneNode->translate( 0, 25, 0 );
-			//mSceneNode->translate( charId * 25, 25, 0 );  // 25
-
-			//ent->setVisible( false );
-
-
 
 
 	#if 0
@@ -1117,7 +839,7 @@ class OgreViewerApplication : public ExampleApplication
 			}
 	#endif
 
-			//mSceneMgr->setVisibilityMask( 1 );
+			
 		}
 
 
@@ -1230,74 +952,6 @@ class OgreViewerApplication : public ExampleApplication
 				if ( boneName == "" )
 					continue;
 
-				/*
-				FQuat quat;
-				quat.W = bulkBoneData->bones[ i ].rot_w;
-				quat.X = bulkBoneData->bones[ i ].rot_x;
-				quat.Y = bulkBoneData->bones[ i ].rot_y;
-				quat.Z = bulkBoneData->bones[ i ].rot_z;
-
-				FCoords C_test;
-				C_test = FQuaternionCoords(quat);
-
-				FRotator rot;
-				rot = C_test.OrthoRotation();
-
-				r[ i ].r = rot;
-				*/
-
-				//Stack.Logf(TEXT("****** %d - %d %d %d"), r[ i ].id, r[ i ].r.Yaw, r[ i ].r.Pitch, r[ i ].r.Roll );
-
-
-
-
-				/*
-				CStudioHdr * pStudioHdr = pAnimating->GetModelPtr();
-
-				//mstudiobone_t * pBone = pStudioHdr->pBone( id );
-
-				int boneId = pAnimating->LookupBone( boneName.c_str() );
-				if ( boneId >= 0 )
-				{
-				mstudiobone_t * pBone = pStudioHdr->pBone( boneId );
-
-				pBone->quat[ 0 ] = -bulkBoneData->bones[ i ].rot_x;
-				pBone->quat[ 1 ] =  bulkBoneData->bones[ i ].rot_y;
-				pBone->quat[ 2 ] = -bulkBoneData->bones[ i ].rot_z;
-				pBone->quat[ 3 ] =  bulkBoneData->bones[ i ].rot_w;
-
-				//Msg( "BoneName: %s\n", boneName.c_str() );
-
-
-
-				//matrix3x4_t & matrix = pAnimating->GetBoneForWrite( boneId );
-
-				CBoneCache * pcache = pAnimating->GetBoneCache();
-				matrix3x4_t * pMat = pcache->GetCachedBone( boneId );
-
-				if ( pMat == NULL )
-				continue;
-
-
-				Vector pos;
-				MatrixPosition( *pMat, pos );
-
-				Quaternion q;
-				q[ 0 ] = -bulkBoneData->bones[ i ].rot_x;
-				q[ 1 ] =  bulkBoneData->bones[ i ].rot_y;
-				q[ 2 ] = -bulkBoneData->bones[ i ].rot_z;
-				q[ 3 ] =  bulkBoneData->bones[ i ].rot_w;
-
-				QuaternionMatrix( q, pos, *pMat );
-				}
-				else
-				{
-				Warning( "Bad Bone: %s\n", boneName.c_str() );
-				}
-				*/
-
-
-
 				Ogre::Bone * bone = skel->getBone( boneName.c_str() );
 
 				if ( bone )
@@ -1374,16 +1028,7 @@ class OgreViewerApplication : public ExampleApplication
 				if ( boneName == "" )
 					continue;
 
-				//char blah[ 1024 ];
-				//sprintf( blah, "Bone: %s (%f, %f, %f)\n", boneName.c_str(), bulkBonePositions->bones[ i ].pos_x, bulkBonePositions->bones[ i ].pos_y, bulkBonePositions->bones[ i ].pos_z );
-				//OutputDebugString( blah );
-
-				/*
-				if ( bulkBonePositions->bones[ i ].pos_x == 0 &&
-				bulkBonePositions->bones[ i ].pos_y == 0 && 
-				bulkBonePositions->bones[ i ].pos_z == 0 )
-				continue;
-				*/
+				
 
 				Ogre::Bone * bone = skel->getBone( boneName.c_str() );
 
@@ -1395,19 +1040,12 @@ class OgreViewerApplication : public ExampleApplication
 					Vector3 initialBonePosition = cachedInitialBonePositions[boneName];
 					Vector3 v;
 
-					//if (cachedInitialBonePositions != NULL)
-					//{
-						//v.x = bulkBonePositions->bones[ i ].pos_x;
-						//v.y = -bulkBonePositions->bones[ i ].pos_y;
-						//v.z = bulkBonePositions->bones[ i ].pos_z;
-					//}
-					//else
-					//{
-						//Add initial bone position to delta
-						v.x = initialBonePosition.x + bulkBonePositions->bones[ i ].pos_x;
-						v.y = initialBonePosition.y + -bulkBonePositions->bones[ i ].pos_y;
-						v.z = initialBonePosition.z + bulkBonePositions->bones[ i ].pos_z;
-					//}
+					
+					//Add initial bone position to delta
+					v.x = initialBonePosition.x + bulkBonePositions->bones[ i ].pos_x;
+					v.y = initialBonePosition.y + -bulkBonePositions->bones[ i ].pos_y;
+					v.z = initialBonePosition.z + bulkBonePositions->bones[ i ].pos_z;
+					
 
 					bone->setPosition( v );
 				}
