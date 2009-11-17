@@ -21,6 +21,7 @@
 *      Andrew n marshall, USC
 *	   Deepali Mendhekar, USC
 *	   Shridhar Ravikumar, USC
+*      Arno Hartholt, USC
 */
 
 #include "vhcl.h"
@@ -177,19 +178,29 @@ public:
 		{
 			mSceneMgr->getSceneNode("world_scene_ft")->setVisible(false);
 			mSceneMgr->getSceneNode("world_scene_cm")->setVisible(false);
-			mSceneMgr->getSceneNode("plane_node")->setVisible(true);
-		}
-		if(mKeyboard->isKeyDown(OIS::KC_3))
-		{
-			mSceneMgr->getSceneNode("world_scene_ft")->setVisible(true);
-			mSceneMgr->getSceneNode("world_scene_cm")->setVisible(false);
-			mSceneMgr->getSceneNode("plane_node")->setVisible(false);
+			mSceneMgr->getSceneNode("plane_node")->setVisible(true); 
+		    mSceneMgr->getSceneNode("world_scene_vh")->setVisible(false);
 		}
 		if(mKeyboard->isKeyDown(OIS::KC_2))
 		{
 			mSceneMgr->getSceneNode("world_scene_ft")->setVisible(false);
 			mSceneMgr->getSceneNode("world_scene_cm")->setVisible(true);
 			mSceneMgr->getSceneNode("plane_node")->setVisible(false);
+			mSceneMgr->getSceneNode("world_scene_vh")->setVisible(false);
+		}
+		if(mKeyboard->isKeyDown(OIS::KC_3))
+		{
+			mSceneMgr->getSceneNode("world_scene_ft")->setVisible(true);
+			mSceneMgr->getSceneNode("world_scene_cm")->setVisible(false);
+			mSceneMgr->getSceneNode("plane_node")->setVisible(false);
+			mSceneMgr->getSceneNode("world_scene_vh")->setVisible(false);
+		}
+		if(mKeyboard->isKeyDown(OIS::KC_4))
+		{
+			mSceneMgr->getSceneNode("world_scene_ft")->setVisible(false);
+			mSceneMgr->getSceneNode("world_scene_cm")->setVisible(false);
+			mSceneMgr->getSceneNode("plane_node")->setVisible(false);
+			mSceneMgr->getSceneNode("world_scene_vh")->setVisible(true);
 		}
 
 
@@ -359,16 +370,17 @@ class OgreViewerApplication : public ExampleApplication
 		void createScene()
 		{
 			mSceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_MODULATIVE );
-			mSceneMgr->setShadowTextureSize( 512 );
-			mSceneMgr->setShadowColour( ColourValue( 0.5, 0.5, 0.5 ) );
+			mSceneMgr->setShadowTextureSize( 4048 );
+			mSceneMgr->setShadowColour( ColourValue( 0.3, 0.3, 0.3 ) );
 
 			// Setup animation default
 			Animation::setDefaultInterpolationMode( Animation::IM_LINEAR );
 			Animation::setDefaultRotationInterpolationMode( Animation::RIM_LINEAR );
 
 			// Set ambient light
-			//mSceneMgr->setAmbientLight( ColourValue( 1.0, 1.0, 1.0 ) );
-			mSceneMgr->setAmbientLight( ColourValue::Black );
+			mSceneMgr->setAmbientLight( ColourValue( 0.2, 0.2, 0.2 ) );
+			//mSceneMgr->setAmbientLight( ColourValue::Black );
+			
 
 			//mSceneMgr->setSkyBox( true, "Examples/CloudyNoonSkyBox" );
 			//mSceneMgr->setSkyBox( true, "Examples/SceneSkyBox2" );
@@ -379,48 +391,20 @@ class OgreViewerApplication : public ExampleApplication
 			Light * l;
 			Vector3 dir;
 
-			l = mSceneMgr->createLight( "GreenLight" );
+			l = mSceneMgr->createLight( "WhiteLight" );
 			l->setType( Light::LT_SPOTLIGHT );
-			l->setPosition( 0, 250, 200 );
-			//dir = -l->getPosition();
-			dir = Vector3( 15, 205, 0 );
+			l->setPosition( -100, 350, 150 );
+			l->setCastShadows( true );
+			l->setPowerScale( 1.0 );
+			
+			dir = -l->getPosition();
+			//dir = Vector3( 15, 205, 0 );
 			dir.normalise();
 			l->setDirection( dir );
-			l->setDiffuseColour( 1.0, 1.0, 1.0 );
-			l->setSpecularColour(0.9, 0.9, 1);
+			l->setDiffuseColour( 1.0, 0.9, 0.8 );
+			l->setSpecularColour(1.0, 0.9, 0.8);
 
-			l = mSceneMgr->createLight( "GreenLight2" );
-			l->setType( Light::LT_SPOTLIGHT );
-			l->setPosition( 250, 250, 0 );
-			//dir = -l->getPosition();
-			dir = Vector3( 15, 205, 0 );
-			dir.normalise();
-			l->setDirection( dir );
-			l->setDiffuseColour( 1.0, 1.0, 1.0 );
-			l->setSpecularColour(0.9, 0.9, 1);
-
-			l = mSceneMgr->createLight( "GreenLight3" );
-			l->setType( Light::LT_SPOTLIGHT );
-			l->setPosition( -250, 250, 0 );
-			//dir = -l->getPosition();
-			dir = Vector3( 15, 205, 0 );
-			dir.normalise();
-			l->setDirection( dir );
-			l->setDiffuseColour( 1.0, 1.0, 1.0 );
-			l->setSpecularColour(0.9, 0.9, 1);
-
-			l = mSceneMgr->createLight( "BlueLight" );
-			l->setType( Light::LT_SPOTLIGHT );
-			l->setPosition( 0, 250, -250 );
-			//dir = -l->getPosition();
-			dir = Vector3( 15, 205, 0 );
-			dir.normalise();
-			l->setDirection( dir );
-			l->setDiffuseColour( 1.0, 1.0, 1.0 );
-			l->setSpecularColour(0.9, 0.9, 1);
-
-
-
+			
 			Light * mSunLight;
 			mSunLight = mSceneMgr->createLight("SunLight");
 			mSunLight->setType(Light::LT_SPOTLIGHT);
@@ -429,8 +413,9 @@ class OgreViewerApplication : public ExampleApplication
 			dir = -mSunLight->getPosition();
 			dir.normalise();
 			mSunLight->setDirection(dir);
-			mSunLight->setDiffuseColour(0.85, 0.85, 0.88);
-			mSunLight->setSpecularColour(0.9, 0.9, 1);
+			mSunLight->setDiffuseColour(0.65, 0.65, 0.68);
+			mSunLight->setSpecularColour(0.8, 0.8, 0.9);
+			
 	#endif
 
 
@@ -458,7 +443,7 @@ class OgreViewerApplication : public ExampleApplication
 			//adding plane entity to the scene
 			Plane plane;
 			plane.normal = Vector3::UNIT_Y;
-			plane.d = 100;
+			plane.d = 0;
 			MeshManager::getSingleton().createPlane( "Myplane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 1500, 1500, 20, 20, true, 1, 60, 60, Vector3::UNIT_Z );
 			Entity * pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
 			//pPlaneEnt->setMaterialName( "Examples/Rockwall" );
@@ -478,7 +463,11 @@ class OgreViewerApplication : public ExampleApplication
 			sceneNode->attachObject(sceneEntity);
 			sceneNode->setVisible(false);
 
-		
+			// adding generic VH scene 
+			sceneNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("world_scene_vh");
+			sceneEntity = mSceneMgr->createEntity("world_entity_vh","vh_basic_level.mesh");
+			sceneNode->attachObject(sceneEntity);
+			sceneNode->setVisible(false);
 
 
 			skeleton[ 0 ] = ""; // unused
@@ -708,7 +697,6 @@ class OgreViewerApplication : public ExampleApplication
 			// Add entity to the scene node
 			SceneNode * mSceneNode = app->mSceneMgr->getRootSceneNode()->createChildSceneNode( charIdStr );
 			mSceneNode->attachObject( ent );
-
 
 	#if 0
 			// testing - create geometry for the bones
