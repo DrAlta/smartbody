@@ -188,7 +188,7 @@ material lambert9
 
 			texture_unit
 			{
-				texture background.dds
+				texture background2.dds
 				tex_coord_set 0
 				colour_op modulate
 				scale 1 1

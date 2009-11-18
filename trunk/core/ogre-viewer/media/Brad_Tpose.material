@@ -1,4 +1,4 @@
-material lambert2
+material lambert3
 {
 	technique
 	{
@@ -21,7 +21,7 @@ material lambert2
 		}
 	}
 }
-material lambert3
+material lambert2
 {
 	technique
 	{
@@ -44,7 +44,7 @@ material lambert3
 		}
 	}
 }
-material Brad_Hands
+material lambert4
 {
 	technique
 	{
@@ -67,7 +67,7 @@ material Brad_Hands
 		}
 	}
 }
-material Brad_Pants
+material lambert5
 {
 	technique
 	{
