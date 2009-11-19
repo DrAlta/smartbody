@@ -387,36 +387,58 @@ class OgreViewerApplication : public ExampleApplication
 
 			// Give it a little ambience with lights
 
-	#if 1
-			Light * l;
-			Vector3 dir;
+      #if 1
+                  Light * l;
+                  Vector3 dir;
 
-			l = mSceneMgr->createLight( "WhiteLight" );
-			l->setType( Light::LT_SPOTLIGHT );
-			l->setPosition( -100, 350, 150 );
-			l->setCastShadows( true );
-			l->setPowerScale( 1.0 );
-			
-			dir = -l->getPosition();
-			//dir = Vector3( 15, 205, 0 );
-			dir.normalise();
-			l->setDirection( dir );
-			l->setDiffuseColour( 1.0, 0.9, 0.8 );
-			l->setSpecularColour(1.0, 0.9, 0.8);
+                  l = mSceneMgr->createLight( "WhiteLight" );
+                  l->setType( Light::LT_SPOTLIGHT );
+                  l->setPosition( -150, 450, 200 );
+                  l->setCastShadows( true );
+                  l->setPowerScale( 1.0 );
+                  
+                  dir = -l->getPosition();
+                  //dir = Vector3( 15, 50, 0 );
+                  dir.normalise();
+                  l->setDirection( dir );
+                  l->setDiffuseColour( 1.24, 1.22, 1.15 );
+                  l->setSpecularColour(0.8, 0.8, 0.9);
 
-			
-			Light * mSunLight;
-			mSunLight = mSceneMgr->createLight("SunLight");
-			mSunLight->setType(Light::LT_SPOTLIGHT);
-			mSunLight->setPosition(1500,1750,1300);
-			mSunLight->setSpotlightRange(Degree(30), Degree(50));
-			dir = -mSunLight->getPosition();
-			dir.normalise();
-			mSunLight->setDirection(dir);
-			mSunLight->setDiffuseColour(0.65, 0.65, 0.68);
-			mSunLight->setSpecularColour(0.8, 0.8, 0.9);
-			
-	#endif
+                  Light * mR_FillLight;
+                  mR_FillLight = mSceneMgr->createLight("R_FillLight");
+                  mR_FillLight->setType(Light::LT_SPOTLIGHT);
+                  mR_FillLight->setPosition(1500,100,200);
+                  mR_FillLight->setSpotlightRange(Degree(30), Degree(50));
+                  dir = -mR_FillLight->getPosition();
+                  dir.normalise();
+                  mR_FillLight->setDirection(dir);
+                  mR_FillLight->setDiffuseColour(0.32, 0.37, 0.4);
+                  mR_FillLight->setSpecularColour(0.32, 0.37, 0.4);
+
+                  Light * mL_FillLight;
+                  mL_FillLight = mSceneMgr->createLight("L_FillLight");
+                  mL_FillLight->setType(Light::LT_SPOTLIGHT);
+                  mL_FillLight->setPosition(-1500,100,-100);
+                  mL_FillLight->setSpotlightRange(Degree(30), Degree(50));
+                  dir = -mL_FillLight->getPosition();
+                  dir.normalise();
+                  mL_FillLight->setDirection(dir);
+                  mL_FillLight->setDiffuseColour(0.45, 0.42, 0.40);
+                  mL_FillLight->setSpecularColour(0.45, 0.42, 0.40);
+
+                  Light * mBounceLight;
+                  mBounceLight = mSceneMgr->createLight("BounceLight");
+                  mBounceLight->setType(Light::LT_SPOTLIGHT);
+                  mBounceLight->setPosition(-50,-500,400);
+                  mBounceLight->setSpotlightRange(Degree(30), Degree(50));
+                  dir = -mBounceLight->getPosition();
+                  dir.normalise();
+                  mBounceLight->setDirection(dir);
+                  mBounceLight->setDiffuseColour(0.37, 0.37, 0.36);
+                  mBounceLight->setSpecularColour(0.37, 0.37, 0.36);
+                  
+      #endif
+
 
 
 			// Position the camera
