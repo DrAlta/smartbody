@@ -11,7 +11,7 @@ material lambert1
 		}
 	}
 }
-material lambert2
+material BradPicture2
 {
 	technique
 	{
@@ -34,7 +34,7 @@ material lambert2
 		}
 	}
 }
-material lambert5
+material WoodFloor
 {
 	technique
 	{
@@ -57,7 +57,7 @@ material lambert5
 		}
 	}
 }
-material lambert7
+material WallColor
 {
 	technique
 	{
@@ -80,7 +80,7 @@ material lambert7
 		}
 	}
 }
-material lambert6
+material WhitTrim
 {
 	technique
 	{
@@ -103,7 +103,7 @@ material lambert6
 		}
 	}
 }
-material lambert3
+material Couch1
 {
 	technique
 	{
@@ -152,7 +152,7 @@ material lambert8
 		}
 	}
 }
-material lambert4
+material CopperDoorhandle
 {
 	technique
 	{
@@ -175,7 +175,7 @@ material lambert4
 		}
 	}
 }
-material lambert9
+material OutsideCard
 {
 	technique
 	{
@@ -189,6 +189,29 @@ material lambert9
 			texture_unit
 			{
 				texture background2.dds
+				tex_coord_set 0
+				colour_op modulate
+				scale 1 1
+				scroll 0 0
+				rotate 0
+			}
+		}
+	}
+}
+material Wood
+{
+	technique
+	{
+		pass
+		{
+			ambient 0 0 0 1
+			diffuse 1 1 1 1
+			specular 0 0 0 1
+			emissive 0 0 0
+
+			texture_unit
+			{
+				texture Wood.dds
 				tex_coord_set 0
 				colour_op modulate
 				scale 1 1
