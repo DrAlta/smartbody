@@ -517,30 +517,37 @@ int main( int argc, char **argv )	{
 
 #if LINK_VHMSG_CLIENT
 	char * vhmsg_server = getenv( "VHMSG_SERVER" );
-	if( vhmsg_server != NULL && strcasecmp( vhmsg_server, "none" ) == 0 )	{
-		printf( "SBM: VHMSG_SERVER='%s': DISABLED\n", vhmsg_server );
-	}
-	else	{
-		err = vhmsg::ttu_open();
-		if( err == vhmsg::TTU_SUCCESS ) {
-			vhmsg::ttu_set_client_callback( sbm_vhmsg_callback );
-			err = vhmsg::ttu_register( "sbm" );
-			err = vhmsg::ttu_register( "vrAgentBML" );
-			err = vhmsg::ttu_register( "vrSpeak" );
-			err = vhmsg::ttu_register( "RemoteSpeechReply" );
-			err = vhmsg::ttu_register( "PlaySound" );
-			err = vhmsg::ttu_register( "StopSound" );
-			err = vhmsg::ttu_register( "CommAPI" );
-			err = vhmsg::ttu_register( "object-data" );
-			err = vhmsg::ttu_register( "vrAllCall" );
-			err = vhmsg::ttu_register( "vrKillComponent" );
-			err = vhmsg::ttu_register( "wsp" );
+	bool vhmsg_disabled = ( vhmsg_server != NULL && strcasecmp( vhmsg_server, "none" ) == 0 );  // hope there is no valid server named "none"
 
-			mcu.vhmsg_enabled = true;
+	if( !vhmsg_disabled &&
+		vhmsg::ttu_open()==vhmsg::TTU_SUCCESS )
+	{
+		vhmsg::ttu_set_client_callback( sbm_vhmsg_callback );
+		err = vhmsg::ttu_register( "sbm" );
+		err = vhmsg::ttu_register( "vrAgentBML" );
+		err = vhmsg::ttu_register( "vrSpeak" );
+		err = vhmsg::ttu_register( "RemoteSpeechReply" );
+		err = vhmsg::ttu_register( "PlaySound" );
+		err = vhmsg::ttu_register( "StopSound" );
+		err = vhmsg::ttu_register( "CommAPI" );
+		err = vhmsg::ttu_register( "object-data" );
+		err = vhmsg::ttu_register( "vrAllCall" );
+		err = vhmsg::ttu_register( "vrKillComponent" );
+		err = vhmsg::ttu_register( "wsp" );
+
+		mcu.vhmsg_enabled = true;
+	} else {
+		if( vhmsg_disabled ) {
+			printf( "SBM: VHMSG_SERVER='%s': Messaging disabled.\n", vhmsg_server?"NULL":vhmsg_server );
 		} else {
-			printf( "SBM ERR: ttu_open VHMSG_SERVER='%s' FAILED\n", vhmsg::ttu_get_server() );
-			mcu.vhmsg_enabled = false;
+#if 0 // disable server name query until vhmsg is fixed
+			const char* vhmsg_server_actual = vhmsg::ttu_get_server();
+			printf( "SBM ERR: ttu_open VHMSG_SERVER='%s' FAILED\n", vhmsg_server_actual?"NULL":vhmsg_server_actual );
+#else
+			printf( "SBM ERR: ttu_open FAILED\n" );
+#endif
 		}
+		mcu.vhmsg_enabled = false;
 	}
 #endif
 
