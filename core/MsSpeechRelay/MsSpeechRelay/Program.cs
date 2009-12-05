@@ -377,6 +377,14 @@ namespace MsSpeechRelay
             /// 
             ttsServer = new SpeechSynthesizer();
 
+            Console.WriteLine("\nAvailable SAPI compatible voices on this machine are:\n");
+
+            foreach (InstalledVoice v in ttsServer.GetInstalledVoices())
+            {
+                Console.WriteLine("\"" + v.VoiceInfo.Name + "\"");
+            }
+            Console.WriteLine("\n");
+
             int n = args.Count;
             string voiceHM;
             switch (voiceRequestMode)
