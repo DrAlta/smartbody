@@ -332,7 +332,7 @@ bool MeController::print_bvh_hierarchy( SkJoint* joint_p, int depth )	{
 		SrVec offset_v = joint_p->offset();
 
 	// STUPID-POLYTRANS subtracts OFFSET instead of adds
-#define STUPID_POLYTRANS_FLIP_OFFSET 1
+#define STUPID_POLYTRANS_FLIP_OFFSET 0
 #if STUPID_POLYTRANS_FLIP_OFFSET
 		*_record_output << -offset_v.x << " ";
 		*_record_output << -offset_v.y << " ";
@@ -350,7 +350,10 @@ bool MeController::print_bvh_hierarchy( SkJoint* joint_p, int depth )	{
 	//   SkJointQuat::_active, and 
 	//   SkJointPos:SkVecLimits::frozen()
 	print_tabs( depth + 1 );
-	*_record_output << "CHANNELS 6 Xposition Yposition Zposition Zrotation Xrotation Yrotation\n";
+	if(depth == 0)
+		*_record_output << "CHANNELS 6 Xposition Yposition Zposition Zrotation Xrotation Yrotation\n";
+	else
+		*_record_output << "CHANNELS 3 Zrotation Xrotation Yrotation\n";
 	
 	int num_child = joint_p->num_children();
 	if( num_child == 0 )	{
@@ -401,11 +404,11 @@ bool MeController::print_bvh_motion( SkJoint* joint_p, int depth )	{
 		*_record_output << " " << sk_jp_p->value( 1 ) + offset_v.y;
 		*_record_output << " " << sk_jp_p->value( 2 ) + offset_v.z;
 	}
-	else	{
-		*_record_output << " " << sk_jp_p->value( 0 );
-		*_record_output << " " << sk_jp_p->value( 1 );
-		*_record_output << " " << sk_jp_p->value( 2 );
-	}
+//	else	{
+//		*_record_output << " " << sk_jp_p->value( 0 );
+//		*_record_output << " " << sk_jp_p->value( 1 );
+//		*_record_output << " " << sk_jp_p->value( 2 );
+//	}
 	
 //	SkJointQuat* sk_jq_p = joint_p->quat();
 //	SrQuat sr_q = sk_jq_p->value();
