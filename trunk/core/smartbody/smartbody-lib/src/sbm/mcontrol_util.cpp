@@ -782,90 +782,62 @@ MeController* mcuCBHandle::lookup_ctrl( const string& ctrl_name, const char* pri
 
 void mcuCBHandle::NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton * skeleton )
 {
-	// Send the bone rotation for each joint in the skeleton (To be optimized soon)
-   const SrArray<SkJoint*> & joints  = skeleton->joints();
-
-
-   if ( character )
-   {
-      //NetworkStartSendBoneRotations( handle );
-      character->StartSendBoneRotations();
-   }
-
-	int i;
-	for ( i = 0; i < joints.size(); i++ )
+	if ( character == NULL )
 	{
-		SkJoint * j	= joints[ i ];
+		return;
+	}
 
-		//SrMat m;
+
+	// Send the bone rotation for each joint in the skeleton
+	const SrArray<SkJoint *> & joints  = skeleton->joints();
+
+	character->StartSendBoneRotations();
+
+	for ( int i = 0; i < joints.size(); i++ )
+	{
+		SkJoint * j = joints[ i ];
+
 		SrQuat q = j->quat()->value();
-		//q.get_mat( m );
-
-		//float posx, posy, posz;
-		//posx = j->pos()->value( 0 );
-		//posy = j->pos()->value( 1 );
-		//posz = j->pos()->value( 2 );
-
-		// for old doctor skeleton
-		//SendMEBoneRotation( char_name,j->name(), q.w, -q.z, q.x, -q.y );
-
 
 		// for new doctor skeleton
 		if ( _stricmp( j->name(), "base" ) == 0 )
 		{
-         //NetworkAddBulkRotation( handle, j->name(), q.w, q.x, -q.y, q.z );
-         character->AddBoneRotation( j->name(), q.w, q.x, -q.y, q.z, time );
-			//SendMEBonePosition( char_name,j->name(), posx, -posy, posz );
+			character->AddBoneRotation( j->name(), q.w, q.x, -q.y, q.z, time );
 
 			//printf( "%s %f %f %f\n", (const char *)j->name(),     posx, -posy, posz );
 		}
 		else
 		{
-         //NetworkAddBulkRotation( handle, j->name(), q.w, -q.x, q.y, -q.z );
-         character->AddBoneRotation( j->name(), q.w, -q.x, q.y, -q.z, time );
+			character->AddBoneRotation( j->name(), q.w, -q.x, q.y, -q.z, time );
 		}
 	}
 
-   //NetworkEndSendBoneRotations( handle );
-   character->EndSendBoneRotations();
+	character->EndSendBoneRotations();
 
 
-   //NetworkStartSendBonePositions( handle );
-   character->StartSendBonePositions();
+	character->StartSendBonePositions();
 
-	for ( i = 0; i < joints.size(); i++ )
+	for ( int i = 0; i < joints.size(); i++ )
 	{
-		SkJoint * j	= joints[ i ];
+		SkJoint * j = joints[ i ];
 
-		float posx, posy, posz;
-		posx = j->pos()->value( 0 );
-		posy = j->pos()->value( 1 );
-		posz = j->pos()->value( 2 );
-		if( false ) {
+		float posx = j->pos()->value( 0 );
+		float posy = j->pos()->value( 1 );
+		float posz = j->pos()->value( 2 );
+		if ( false )
+		{
 			posx += j->offset().x;
 			posy += j->offset().y;
 			posz += j->offset().z;
 		}
 
-		if ( _stricmp( j->name(), "base" ) == 0 )
-		{
-         //NetworkAddBulkPosition( handle, j->name(), posx, -posy, posz );
-         character->AddBonePosition( j->name(), posx, -posy, posz, time );
-      }
-        else
-      {
-		  
-		  //these coordinates are meant to mimic the setpositionbyname coordinates you give to move the character
-		  //so if you wanted to move a joint on the face in the x direction you'd do whatever you did to move the actor
-		  //itself further in the x position.
-		  //NetworkAddBulkPosition( handle, j->name(), -posz, -posy, posx );
-		  //NetworkAddBulkPosition( handle, j->name(), posx, -posy, posz );
-         character->AddBonePosition( j->name(), posx, -posy, posz, time );
-	  }
-   }
+		//these coordinates are meant to mimic the setpositionbyname coordinates you give to move the character
+		//so if you wanted to move a joint on the face in the x direction you'd do whatever you did to move the actor
+		//itself further in the x position.
+		character->AddBonePosition( j->name(), posx, -posy, posz, time );
+	}
 
-   //NetworkEndSendBonePositions( handle );
-   character->EndSendBonePositions();
+	character->EndSendBonePositions();
 }
 
 
@@ -1558,100 +1530,64 @@ int mcu_character_ctrl_cmd(
 
 // "sbm char doctor bone base w x y z"
 int mcu_character_bone_cmd(
-	const char* char_name,
-	srArgBuffer& args,
+	const char * char_name,
+	srArgBuffer & args,
 	mcuCBHandle *mcu_p 
 ) {
-    char * bone = args.read_token();
-    float  w    = args.read_float();
-    float  x    = args.read_float();
-    float  y    = args.read_float();
-    float  z    = args.read_float();
+	char * bone = args.read_token();
+	float  w    = args.read_float();
+	float  x    = args.read_float();
+	float  y    = args.read_float();
+	float  z    = args.read_float();
 
-    SbmCharacter * actor = mcu_p->character_map.lookup( char_name );
-    if ( !actor || !actor->skeleton_p )
-    {
-	    return CMD_FAILURE;  // this should really be an ignore/out-of-domain result
-    }
-    else
-    {
-      //NetworkStartSendBoneRotations( actor->net_handle );
-       actor->bonebusCharacter->StartSendBoneRotations();
+	SbmCharacter * actor = mcu_p->character_map.lookup( char_name );
+	if ( !actor || !actor->skeleton_p )
+	{
+		return CMD_FAILURE;  // this should really be an ignore/out-of-domain result
+	}
+	else
+	{
+		actor->bonebusCharacter->StartSendBoneRotations();
 
-		int i;
-		for (	i = 0; i < actor->skeleton_p->joints().size();	i++ )
+		for ( int i = 0; i < actor->skeleton_p->joints().size(); i++ )
 		{
-			SkJoint * j	= actor->skeleton_p->joints()[ i ];
+			SkJoint * j = actor->skeleton_p->joints()[ i ];
 
 			if ( _stricmp( j->name(), bone ) == 0 )
 			{
-				//j->quat()->value().set( 1, 1, 0, 0 );
-				//j->quat()->value()
-				//j->quat()->value( SrQuat( w, x, y, z ) );
-
-				//SrMat m;
-				//SrQuat q = j->quat()->value();
-				//q.get_mat( m );
-
-				//float posx, posy, posz;
-				//posx = j->pos()->value( 0 );
-				//posy = j->pos()->value( 1 );
-				//posz = j->pos()->value( 2 );
-
-				// for old doctor skeleton
-				//SendMEBoneRotation( j->skeleton()->name(),j->name(), q.w, -q.z, q.x, -q.y );
-
-				// for new doctor skeleton
 				if ( _stricmp( j->name(), "base" ) == 0 )
 				{
-					//SendMEBoneRotation( j->skeleton()->name(),j->name(), w, x, -y, z );
-					//SendMEBonePosition( j->skeleton()->name(),j->name(), posx, -posy, posz );
+					actor->bonebusCharacter->AddBoneRotation( j->name(), w, x, -y, z, mcu_p->time );
 
 					//printf( "%s %f %f %f\n", (const char *)j->name(),     posx, -posy, posz );
-
-               //NetworkAddBulkRotation( actor->net_handle, j->name(), w, x, -y, z );
-               actor->bonebusCharacter->AddBoneRotation( j->name(), w, x, -y, z, mcu_p->time );
 				}
 				else
 				{
-					//SendMEBoneRotation( j->skeleton()->name(),j->name(), w, -x, y, -z );
-               //NetworkAddBulkRotation( actor->net_handle, j->name(), w, -x, y, -z );
-               actor->bonebusCharacter->AddBoneRotation( j->name(), w, -x, y, -z, mcu_p->time );
+					actor->bonebusCharacter->AddBoneRotation( j->name(), w, -x, y, -z, mcu_p->time );
 				}
 			}
-      }
+		}
 
-      //NetworkEndSendBoneRotations( actor->net_handle );
-      actor->bonebusCharacter->EndSendBoneRotations();
+		actor->bonebusCharacter->EndSendBoneRotations();
 
 
-      //NetworkStartSendBonePositions( actor->net_handle );
-      actor->bonebusCharacter->StartSendBonePositions();
+		actor->bonebusCharacter->StartSendBonePositions();
 
-      for ( i = 0; i < actor->skeleton_p->joints().size(); i++ )
-	   {
-		   SkJoint * j	= actor->skeleton_p->joints()[ i ];
+		for ( int i = 0; i < actor->skeleton_p->joints().size(); i++ )
+		{
+			SkJoint * j = actor->skeleton_p->joints()[ i ];
 
 			if ( _stricmp( j->name(), bone ) == 0 )
 			{
-		      float posx, posy, posz;
-		      posx = j->pos()->value( 0 );
-		      posy = j->pos()->value( 1 );
-		      posz = j->pos()->value( 2 );
+				float posx = j->pos()->value( 0 );
+				float posy = j->pos()->value( 1 );
+				float posz = j->pos()->value( 2 );
 
-		      if ( _stricmp( j->name(), "base" ) == 0 )
-		      {
-               //NetworkAddBulkPosition( actor->net_handle, j->name(), posx, -posy, posz );
-               actor->bonebusCharacter->AddBonePosition( j->name(), posx, -posy, posz, mcu_p->time );
-            }
-            else
-            {
-            }
-         }
-      }
+				actor->bonebusCharacter->AddBonePosition( j->name(), posx, -posy, posz, mcu_p->time );
+			}
+		}
 
-      //NetworkEndSendBonePositions( actor->net_handle );
-      actor->bonebusCharacter->EndSendBonePositions();
+		actor->bonebusCharacter->EndSendBonePositions();
 	}
 
 	return CMD_SUCCESS;
