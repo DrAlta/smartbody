@@ -823,7 +823,7 @@ int BML::Processor::interrupt( SbmCharacter* actor, const std::string& performan
 
 		if( BML_LOG_INTERRUPT )
 			cout << "LOG: BML::Processor::interrupt(..): Found BehaviorRequest for \"" << performance_id << "\"." << endl;
-		request->unschedule( mcu, duration );
+		request->unschedule( this, mcu, duration );
 		bml_requests.erase( result );
 	} else {
 		// Probably already cleaned up
@@ -864,7 +864,7 @@ int BML::Processor::bml_end( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
 		cerr << "ERROR: BodyPlannerImpl::bml_end(..): " << bpMsg.actorId << " " << bpMsg.msgId << ": Unknown end_code \""<<end_code<<"\". Treating as complete." << endl;
 	}
 
-	request->cleanup( mcu );
+	request->cleanup( this, mcu );
 	bml_requests.erase( requestId );
 
 	return CMD_SUCCESS;

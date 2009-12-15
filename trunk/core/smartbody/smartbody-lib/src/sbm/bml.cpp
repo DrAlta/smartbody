@@ -393,6 +393,7 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 	for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i ) {
 		BehaviorRequestPtr behavior = *i;
 
+		cerr << "Realizing behavior " << behavior->unique_id << endl;
 		behavior->realize( request, mcu );
 
 #if USE_CUSTOM_PRUNE_POLICY
@@ -489,10 +490,11 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 	}
 }
 
-void BmlRequest::unschedule( mcuCBHandle* mcu,
-                             time_sec duration )
+void BmlRequest::unschedule( Processor* bp, mcuCBHandle* mcu, time_sec duration )
 {
 	BmlRequestPtr request = weak_ptr.lock(); // Ref to this
+	if( bp->get_auto_print_controllers() || bp->get_auto_print_sequence() )
+		cout << "BmlRequest::unschedule(..) " << request->actorId << " " << request->requestId << endl;
 
 	if( speech_request ) {
 		speech_request->unschedule( mcu, request, duration );
@@ -516,12 +518,41 @@ void BmlRequest::unschedule( mcuCBHandle* mcu,
 	buff << request->actorId << " " << request->msgId << " end interrupted";
 #endif
 	mcu->vhmsg_send( "vrAgentBML", buff.str().c_str() );
+
+
+	if( bp->get_auto_print_controllers() ) {
+		ostringstream oss;
+		oss << "print character "<< actorId << " schedule";
+		string& cmd = oss.str();
+		if( mcu->execute( (char*)(cmd.c_str() ) ) != CMD_SUCCESS ) {
+			cerr << "WARNING: BML::BmlRequest::unschedule(..): msgId=\""<<msgId<<"\": "<<
+				"Failed to execute \"" << cmd << "\" command"<<endl;
+		}
+	}
+
+	if( bp->get_auto_print_sequence() ) {
+		cout << "DEBUG: BML::BmlRequest::unschedule(..): Sequence \"" << start_seq_name <<"\":"<<endl;
+		srCmdSeq* start_seq = mcu->lookup_seq( start_seq_name.c_str() );
+		if( start_seq )
+			start_seq->print();
+		else
+			cout << "WARNING: Cannot find sequence \"" << start_seq_name << "\"" << endl;
+
+		cout << "DEBUG: BML::BmlRequest::unschedule(..): Sequence \"" << cleanup_seq_name <<"\":"<<endl;
+		srCmdSeq* cleanup_seq = mcu->lookup_seq( cleanup_seq_name.c_str() );
+		if( cleanup_seq )
+			cleanup_seq->print();
+		else
+			cout << "WARNING: Cannot find sequence \"" << cleanup_seq_name << "\"" << endl;
+	}
 }
 
 
-void BmlRequest::cleanup( mcuCBHandle* mcu )
+void BmlRequest::cleanup( Processor* bp, mcuCBHandle* mcu )
 {
 	BmlRequestPtr request = weak_ptr.lock(); // Ref to this
+	if( bp->get_auto_print_controllers() || bp->get_auto_print_sequence() )
+		cout << "BmlRequest::cleanup(..) " << request->actorId << " " << request->requestId << endl;
 
 	if( speech_request ) {
 		speech_request->cleanup( mcu, request );
@@ -549,6 +580,34 @@ void BmlRequest::cleanup( mcuCBHandle* mcu )
 	}
 	mcu->abort_seq( start_seq_name.c_str() );
 	mcu->abort_seq( cleanup_seq_name.c_str() );
+
+
+
+	if( bp->get_auto_print_controllers() ) {
+		ostringstream oss;
+		oss << "print character "<< actorId << " schedule";
+		string& cmd = oss.str();
+		if( mcu->execute( (char*)(cmd.c_str() ) ) != CMD_SUCCESS ) {
+			cerr << "WARNING: BML::BmlRequest::cleanup(..): msgId=\""<<msgId<<"\": "<<
+				"Failed to execute \"" << cmd << "\" command"<<endl;
+		}
+	}
+
+	if( bp->get_auto_print_sequence() ) {
+		cout << "DEBUG: BML::BmlRequest::unschedule(..): Sequence \"" << start_seq_name <<"\":"<<endl;
+		srCmdSeq* start_seq = mcu->lookup_seq( start_seq_name.c_str() );
+		if( start_seq )
+			start_seq->print();
+		else
+			cout << "WARNING: Cannot find sequence \"" << start_seq_name << "\"" << endl;
+
+		cout << "DEBUG: BML::BmlRequest::unschedule(..): Sequence \"" << cleanup_seq_name <<"\":"<<endl;
+		srCmdSeq* cleanup_seq = mcu->lookup_seq( cleanup_seq_name.c_str() );
+		if( cleanup_seq )
+			cleanup_seq->print();
+		else
+			cout << "WARNING: Cannot find sequence \"" << cleanup_seq_name << "\"" << endl;
+	}
 }
 
 

@@ -173,7 +173,7 @@ int sbm_main_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 }
 
 void sbm_vhmsg_callback( const char *op, const char *args, void * user_data ) {
-
+	// Replace singleton with a user_data pointer
 	switch( mcuCBHandle::singleton().execute( op, (char *)args ) ) {
         case CMD_NOT_FOUND:
             fprintf( stdout, "SBM ERR: command NOT FOUND: '%s' + '%s'\n> ", op, args );
