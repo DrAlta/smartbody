@@ -192,9 +192,9 @@ namespace BML {
 		 */
 		void realize( Processor* bp, mcuCBHandle *mcu );
 
-		void unschedule( mcuCBHandle* mcu, time_sec transition_duration );
+		void unschedule( Processor* bp, mcuCBHandle* mcu, time_sec transition_duration );
 
-		void cleanup( mcuCBHandle* mcu );
+		void cleanup( Processor* bp, mcuCBHandle* mcu );
 
 	public:
 		virtual ~BmlRequest();
