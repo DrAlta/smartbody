@@ -1237,6 +1237,8 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		}
 	} else if( char_cmd=="bone" ) {
 		return mcu_character_bone_cmd( char_name.c_str(), args, mcu_p );
+	} else if( char_cmd=="bonep" ) {
+		return mcu_character_bone_position_cmd( char_name.c_str(), args, mcu_p );
 	} else if( char_cmd=="remove" ) {
 		return SbmCharacter::remove_from_scene( char_name.c_str() );
 	} else if( char_cmd=="reholster" ) {
