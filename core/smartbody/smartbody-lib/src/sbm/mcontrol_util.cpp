@@ -447,10 +447,7 @@ void mcuCBHandle::update( void )	{
 					// const_cast because the SrQuat does validation (no const version of value())
 					const SrQuat & q = ((SkJoint *)joint)->quat()->value();
 
-					// yet another wacky mapping between sbm coordinate system and unreal
-					//NetworkSetPosition( char_p->net_handle, z, -x, y );
-					//NetworkSetRotation( char_p->net_handle, (float)q.w, (float)q.z, -(float)q.x, (float)q.y );
-					char_p->bonebusCharacter->SetPosition( z, -x, y, time );
+					char_p->bonebusCharacter->SetPosition( x, y, z, time );
 					char_p->bonebusCharacter->SetRotation( (float)q.w, (float)q.z, -(float)q.x, (float)q.y, time );
 				}
 			}
@@ -834,7 +831,7 @@ void mcuCBHandle::NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton 
 		//these coordinates are meant to mimic the setpositionbyname coordinates you give to move the character
 		//so if you wanted to move a joint on the face in the x direction you'd do whatever you did to move the actor
 		//itself further in the x position.
-		character->AddBonePosition( j->name(), posx, -posy, posz, time );
+		character->AddBonePosition( j->name(), posx, posy, posz, time );
 	}
 
 	character->EndSendBonePositions();
@@ -1583,7 +1580,7 @@ int mcu_character_bone_cmd(
 				float posy = j->pos()->value( 1 );
 				float posz = j->pos()->value( 2 );
 
-				actor->bonebusCharacter->AddBonePosition( j->name(), posx, -posy, posz, mcu_p->time );
+				actor->bonebusCharacter->AddBonePosition( j->name(), posx, posy, posz, mcu_p->time );
 			}
 		}
 
@@ -1644,15 +1641,7 @@ int mcu_character_bone_position_cmd(
             posy = y;
             posz = z;
 
-            if ( _stricmp( j->name(), "base" ) == 0 )
-            {
-               actor->bonebusCharacter->AddBonePosition( j->name(), posx, -posy, posz, mcu_p->time );
-            }
-            else
-            {
-               //actor->bonebusCharacter->AddBonePosition( j->name(), -posz, -posy, posx );
-               actor->bonebusCharacter->AddBonePosition( j->name(), posx, -posy, posz, mcu_p->time );
-            }
+            actor->bonebusCharacter->AddBonePosition( j->name(), posx, posy, posz, mcu_p->time );
          }
       }
 
@@ -3301,32 +3290,7 @@ int mcu_uscriptexec_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 
 /*
-   EDF - Temporary CommAPI hooks into the new CommAPI.  Being used by Ram's group to test out gaze/point detection.
-
-   CommAPI create <unique_id> <object_name> <object_class>
-      Creates an object in the world
-      unique_id = a unique integer identifier of the client's choosing, to identify objects
-      object_name = a string name for human identification
-      object_class = a Unreal class to create
-
-   CommAPI remove <unique_id>
-      Removes an object previously created
-
-   CommAPI setposition <unique_id> <x> <y> <z>
-      Sets an object's position in the world.
-      x,y,z = Unreal world coordinates to set the object to.
-
-   CommAPI setpositionbyname <char_name> <x> <y> <z>
-      Sets an object's position in the world.
-      x,y,z = Unreal world coordinates to set the object to.
-
-   CommAPI setrotation <unique_id> <h> <p> <r>
-      Sets an object's rotation in the world.
-      h,p,r = Orientation.
-
-   CommAPI setrotationbyname <char_name> <h> <p> <r>
-      Sets an object's rotation in the world.
-      h,p,r = Orientation.
+   EDF - Temporary CommAPI hooks into the CommAPI.
 
    CommAPI setcameraposition <x> <y> <z>
       Sets the camera's position in the world.
@@ -3335,7 +3299,6 @@ int mcu_uscriptexec_func( srArgBuffer& args, mcuCBHandle *mcu_p )
    CommAPI setcamerarotation <r> <p> <h>
       Sets the camera's rotation in the world.
       r,p,h = Orientation in degrees.
-
 */
 
 int mcu_commapi_func( srArgBuffer& args, mcuCBHandle *mcu_p )
@@ -3344,94 +3307,12 @@ int mcu_commapi_func( srArgBuffer& args, mcuCBHandle *mcu_p )
    {
       char * command = args.read_token();
 
-      if ( _stricmp( command, "create" ) == 0 )
-      {
-         printf( "CommAPI create ERR: command no longer supported\n" );
-         return CMD_FAILURE;
-      }
-      else if ( _stricmp( command, "remove" ) == 0 )
-      {
-         int unique_id = args.read_int();
-
-         BoneBusCharacter * character = mcu_p->bonebus.FindCharacter( unique_id );
-         if ( character )
-         {
-            mcu_p->bonebus.DeleteCharacter( character );
-         }
-
-         return CMD_SUCCESS;
-      }
-      else if ( _stricmp( command, "setposition" ) == 0 )
-      {
-         int unique_id = args.read_int();
-         float x = args.read_float();
-         float y = args.read_float();
-         float z = args.read_float();
-
-         BoneBusCharacter * character = mcu_p->bonebus.FindCharacter( unique_id );
-         if ( character )
-         {
-            character->SetPosition( x, y, z, mcu_p->time );
-         }
-
-         return CMD_SUCCESS;
-      }
-      else if ( _stricmp( command, "setpositionbyname" ) == 0 )
-      {
-         char * name = args.read_token();
-         float x = args.read_float();
-         float y = args.read_float();
-         float z = args.read_float();
-
-         BoneBusCharacter * character = mcu_p->bonebus.FindCharacterByName( name );
-         if ( character )
-         {
-            character->SetPosition( x, y, z, mcu_p->time );
-         }
-
-         return CMD_SUCCESS;
-      }
-      else if ( _stricmp( command, "setrotation" ) == 0 )
-      {
-         int unique_id = args.read_int();
-         float h = args.read_float();
-         float p = args.read_float();
-         float r = args.read_float();
-
-         quat_t q = euler_t( h, p, r );
-
-         BoneBusCharacter * character = mcu_p->bonebus.FindCharacter( unique_id );
-         if ( character )
-         {
-            character->SetRotation( (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z(), mcu_p->time );
-         }
-
-         return CMD_SUCCESS;
-      }
-      else if ( _stricmp( command, "setrotationbyname" ) == 0 )
-      {
-         char * name = args.read_token();
-         float h = args.read_float();
-         float p = args.read_float();
-         float r = args.read_float();
-
-         quat_t q = euler_t( h, p, r );
-
-         BoneBusCharacter * character = mcu_p->bonebus.FindCharacterByName( name );
-         if ( character )
-         {
-            character->SetRotation( (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z(), mcu_p->time );
-         }
-
-         return CMD_SUCCESS;
-      }
-      else if ( _stricmp( command, "setcameraposition" ) == 0 )
+      if ( _stricmp( command, "setcameraposition" ) == 0 )
       {
          float x = args.read_float();
          float y = args.read_float();
          float z = args.read_float();
 
-         //NetworkSetCameraPosition( x, y, z );
          mcu_p->bonebus.SetCameraPosition( x, y, z );
 
          return CMD_SUCCESS;
@@ -3444,7 +3325,6 @@ int mcu_commapi_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
          quat_t q = euler_t( h, p, r );
 
-         //NetworkSetCameraRotation( (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z() );
          mcu_p->bonebus.SetCameraRotation( (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z() );
 
          return CMD_SUCCESS;
