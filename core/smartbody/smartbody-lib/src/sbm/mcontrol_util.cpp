@@ -448,7 +448,7 @@ void mcuCBHandle::update( void )	{
 					const SrQuat & q = ((SkJoint *)joint)->quat()->value();
 
 					char_p->bonebusCharacter->SetPosition( x, y, z, time );
-					char_p->bonebusCharacter->SetRotation( (float)q.w, (float)q.z, -(float)q.x, (float)q.y, time );
+					char_p->bonebusCharacter->SetRotation( (float)q.w, (float)q.x, (float)q.y, (float)q.z, time );
 				}
 			}
 
@@ -796,17 +796,9 @@ void mcuCBHandle::NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton 
 
 		SrQuat q = j->quat()->value();
 
-		// for new doctor skeleton
-		if ( _stricmp( j->name(), "base" ) == 0 )
-		{
-			character->AddBoneRotation( j->name(), q.w, q.x, -q.y, q.z, time );
+		character->AddBoneRotation( j->name(), q.w, q.x, q.y, q.z, time );
 
-			//printf( "%s %f %f %f\n", (const char *)j->name(),     posx, -posy, posz );
-		}
-		else
-		{
-			character->AddBoneRotation( j->name(), q.w, -q.x, q.y, -q.z, time );
-		}
+		//printf( "%s %f %f %f %f\n", (const char *)j->name(), q.w, q.x, q.y, q.z );
 	}
 
 	character->EndSendBoneRotations();
@@ -1552,16 +1544,9 @@ int mcu_character_bone_cmd(
 
 			if ( _stricmp( j->name(), bone ) == 0 )
 			{
-				if ( _stricmp( j->name(), "base" ) == 0 )
-				{
-					actor->bonebusCharacter->AddBoneRotation( j->name(), w, x, -y, z, mcu_p->time );
+				actor->bonebusCharacter->AddBoneRotation( j->name(), w, x, y, z, mcu_p->time );
 
-					//printf( "%s %f %f %f\n", (const char *)j->name(),     posx, -posy, posz );
-				}
-				else
-				{
-					actor->bonebusCharacter->AddBoneRotation( j->name(), w, -x, y, -z, mcu_p->time );
-				}
+				//printf( "%s %f %f %f %f\n", (const char *)j->name(), w, x, y, z );
 			}
 		}
 
@@ -3296,9 +3281,9 @@ int mcu_uscriptexec_func( srArgBuffer& args, mcuCBHandle *mcu_p )
       Sets the camera's position in the world.
       x,y,z = Unreal world coordinates to set the object to.
 
-   CommAPI setcamerarotation <r> <p> <h>
+   CommAPI setcamerarotation <x> <y> <z>
       Sets the camera's rotation in the world.
-      r,p,h = Orientation in degrees.
+      x,y,z = Orientation in degrees.  (default coord system would match x,y,z to r,h,p
 */
 
 int mcu_commapi_func( srArgBuffer& args, mcuCBHandle *mcu_p )
@@ -3319,11 +3304,11 @@ int mcu_commapi_func( srArgBuffer& args, mcuCBHandle *mcu_p )
       }
       else if ( _stricmp( command, "setcamerarotation" ) == 0 )
       {
-         float h = args.read_float();
-         float p = args.read_float();
-         float r = args.read_float();
+         float x = args.read_float();
+         float y = args.read_float();
+         float z = args.read_float();
 
-         quat_t q = euler_t( h, p, r );
+         quat_t q = euler_t( x, y, z );
 
          mcu_p->bonebus.SetCameraRotation( (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z() );
 
