@@ -879,7 +879,7 @@ class OgreViewerApplication : public ExampleApplication
 			if ( characterID == -1 )
 			{
 				// move the camera
-				app->mCamera->setPosition( -y, z, x );
+				app->mCamera->setPosition( x, y, z );
 			}
 			else
 			{
@@ -887,7 +887,7 @@ class OgreViewerApplication : public ExampleApplication
 				_itoa( characterID, charIdStr, 10 );
 				
 				Node * node = app->mSceneMgr->getRootSceneNode()->getChild( charIdStr );
-				node->setPosition( -y, z, x );
+				node->setPosition( x, y, z );
 			}
 		}
 
@@ -901,7 +901,7 @@ class OgreViewerApplication : public ExampleApplication
 			if ( characterID == -1 )
 			{
 				// move the camera
-				app->mCamera->setOrientation( Quaternion( w, -y, z, x ) );
+				app->mCamera->setOrientation( Quaternion( w, x, y, z ) );
 			}
 			else
 			{
@@ -909,7 +909,7 @@ class OgreViewerApplication : public ExampleApplication
 				_itoa( characterID, charIdStr, 10 );
 
 				Node * node = app->mSceneMgr->getRootSceneNode()->getChild( charIdStr );
-				node->setOrientation( Quaternion( w, -y, z, x ) );
+				node->setOrientation( Quaternion( w, x, y, z ) );
 			}
 		}
 
@@ -970,21 +970,10 @@ class OgreViewerApplication : public ExampleApplication
 
 					Quaternion q;
 
-					if ( boneName == "base" )
-					{
-						//Base bone needs to be manipulated as a special case
-						q.x = bulkBoneRotations->bones[ i ].rot_x;
-						q.y = -bulkBoneRotations->bones[ i ].rot_y;
-						q.z = bulkBoneRotations->bones[ i ].rot_z;
-						q.w =  bulkBoneRotations->bones[ i ].rot_w;
-					}
-					else
-					{
-						q.x = -bulkBoneRotations->bones[ i ].rot_x;
-						q.y = bulkBoneRotations->bones[ i ].rot_y;
-						q.z = -bulkBoneRotations->bones[ i ].rot_z;
-						q.w =  bulkBoneRotations->bones[ i ].rot_w;
-					}
+					q.w = bulkBoneRotations->bones[ i ].rot_w;
+					q.x = bulkBoneRotations->bones[ i ].rot_x;
+					q.y = bulkBoneRotations->bones[ i ].rot_y;
+					q.z = bulkBoneRotations->bones[ i ].rot_z;
 
 					bone->setOrientation( q );
 
@@ -1053,7 +1042,7 @@ class OgreViewerApplication : public ExampleApplication
 					
 					//Add initial bone position to delta
 					v.x = initialBonePosition.x + bulkBonePositions->bones[ i ].pos_x;
-					v.y = initialBonePosition.y + -bulkBonePositions->bones[ i ].pos_y;
+					v.y = initialBonePosition.y + bulkBonePositions->bones[ i ].pos_y;
 					v.z = initialBonePosition.z + bulkBonePositions->bones[ i ].pos_z;
 					
 
