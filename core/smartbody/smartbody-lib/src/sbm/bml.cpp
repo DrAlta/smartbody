@@ -1199,7 +1199,8 @@ MeControllerRequest::MeControllerRequest( const std::string& unique_id,
 										  MeControllerRequest::SchduleType sched_type )
 :	BehaviorRequest( unique_id, syncs_in ),
 	anim_ct( anim_ct ),
-	schedule_ct( schedule_ct )
+	schedule_ct( schedule_ct ),
+	persistent( false )
 {
 	anim_ct->ref();
 	schedule_ct->ref();
@@ -1225,7 +1226,7 @@ MeControllerRequest::~MeControllerRequest() {
 }
 
 
-void MeControllerRequest::registerControllerPrunePolicy( MePrunePolicy* prune_policy ) {
+void MeControllerRequest::register_controller_prune_policy( MePrunePolicy* prune_policy ) {
 	if( anim_ct != NULL ) {
 		anim_ct->prune_policy( prune_policy );
 	}
@@ -1298,7 +1299,7 @@ void MeControllerRequest::unschedule( mcuCBHandle* mcu,
 		}
 	}
 
-	is_persistent = false;
+	persistent = false;
 }
 
 /**
@@ -1308,7 +1309,7 @@ void MeControllerRequest::unschedule( mcuCBHandle* mcu,
 void MeControllerRequest::cleanup( mcuCBHandle* mcu, BmlRequestPtr request )
 {
 	if( schedule_ct ) {
-		if( !is_persistent ) {
+		if( !persistent ) {
 			// TODO: If track is no longer valid, the NULL TrackPtr will be ignored by remove_track
 			schedule_ct->remove_track( schedule_ct->track_for_anim_ct( anim_ct ) );
 		}

@@ -454,7 +454,7 @@ namespace BML {
 		/** The schedule controller the animation was added to. */
 		MeCtScheduler2*          schedule_ct;
 
-		bool                     is_persistent;
+		bool                     persistent;
 
 	public: ///// Methods
 		MeControllerRequest( const std::string& unique_id,
@@ -481,13 +481,16 @@ namespace BML {
 		 *  It's highly recommended to override with a simple boolean
 		 *  value if you know it ahead of time.
 		 */
-		virtual bool isPersistent()
-		{	return is_persistent; }
+		bool is_persistent()
+		{	return persistent; }
+
+		void set_persistent( bool new_value )
+		{	persistent = new_value; }
 
 		/**
 		 *  Registers the give prune policy with all controllers of this behavior.
 		 **/
-		virtual void registerControllerPrunePolicy( MePrunePolicy* prune_policy );
+		virtual void register_controller_prune_policy( MePrunePolicy* prune_policy );
 
 		virtual void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu );
 
