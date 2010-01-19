@@ -40,7 +40,7 @@ namespace BML {
 	 *  That is, the proportions between sync points will always remain constant.
 	 *  Often used by controller-based behaviors.
 	 */
-	class BehaviorSchedulerLinear : public BehaviorScheduler {
+	class BehaviorSchedulerConstantSpeed : public BehaviorScheduler {
 		public:
 #if BEHAVIOR_TIMING_BY_DURATION
 	        // preferred durations between sync points
@@ -62,7 +62,7 @@ namespace BML {
 		public:
 #if BEHAVIOR_TIMING_BY_DURATION
 	        // preferred durations between sync points
-			BehaviorSchedulerLinear(
+			BehaviorSchedulerConstantSpeed(
 				time_sec startReadyDur,
 				time_sec readyStrokeDur,
 				time_sec strokeRelaxDur,
@@ -70,7 +70,7 @@ namespace BML {
 				time_sec speed );
 #else
 	        // preferred "local times" of sync points
-			BehaviorSchedulerLinear(
+			BehaviorSchedulerConstantSpeed(
 				time_sec startTime,
 				time_sec readyTime,
 				time_sec strokeTime,
@@ -81,12 +81,12 @@ namespace BML {
 
 			virtual void schedule( SyncPoints& syncs, time_sec now );
 	};
-	typedef boost::shared_ptr<BehaviorSchedulerLinear> BehaviorSchedulerLinearPtr;
+	typedef boost::shared_ptr<BehaviorSchedulerConstantSpeed> BehaviorSchedulerConstantSpeedPtr;
 
 	/**
 	 *  Build a linear BehaviorScheduler using the metadata of a MeController.
 	 */
-	BehaviorSchedulerLinearPtr buildSchedulerForController( MeController* ct );
+	BehaviorSchedulerConstantSpeedPtr buildSchedulerForController( MeController* ct );
 
 } // namespace BML
 
