@@ -40,7 +40,13 @@ using namespace std;
 
 //============================= MeController ============================
 
+//#if ME_CONTROLLER_ENABLE_XMLIFY
+//const XMLCh* MeController::CONTROLLER_TAG = L"me:controller";
+//#endif // ME_CONTROLLER_ENABLE_XMLIFY
+
+
 int MeController::instance_count = 0;
+
 
 MeController::MeController () 
 :	_active( false ),
@@ -271,6 +277,16 @@ void MeController::record_bvh( const char *full_prefix, int num_frames, double d
 	_record_full_prefix = std::string( full_prefix ); 
 	_record_dt = dt;
 }
+
+#if ME_CONTROLLER_ENABLE_XMLIFY
+DOMElement* xmlify( DOMDocument* doc ) {
+	DOMElement* elem = doc->createElement( L"me:controller" );
+	// TODO: Add name and type name attribute, call xmlify_state and xmlify_children
+
+	return elem;
+}
+#endif // ME_CONTROLLER_ENABLE_XMLIFY
+
 
 void MeController::load_bvh_joint_hmap( void )	{
 	
@@ -599,6 +615,17 @@ void MeController::input ( SrInput& i )
    else
     { _emphasist=-1.0; i.unget_token(); }
  }
+
+#if ME_CONTROLLER_ENABLE_XMLIFY
+void MeController::xmlify_state( DOMElement* elem ) {
+	// Do nothing by default
+}
+
+void MeController::xmlify_children( DOMElement* elem ) {
+	// TODO: append xmlify(..) result from each child
+}
+#endif // ME_CONTROLLER_ENABLE_XMLIFY
+
 
 void MeController::print_state( int tab_count ) {
 	using namespace std;
