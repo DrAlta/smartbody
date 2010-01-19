@@ -1140,11 +1140,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\behavior_scheduler_linear.cpp"
+					RelativePath="..\src\sbm\behavior_scheduler_constant_speed.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\sbm\behavior_scheduler_linear.hpp"
+					RelativePath="..\src\sbm\behavior_scheduler_constant_speed.hpp"
 					>
 				</File>
 				<File

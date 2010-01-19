@@ -21,7 +21,7 @@
  */
 
 #include "bml.hpp"
-#include "behavior_scheduler_linear.hpp"
+#include "behavior_scheduler_constant_speed.hpp"
 
 using namespace std;
 using namespace BML;
@@ -36,7 +36,7 @@ const bool LOG_ABNORMAL_SPEED = false;
 //
 
 
-BehaviorSchedulerLinear::BehaviorSchedulerLinear(
+BehaviorSchedulerConstantSpeed::BehaviorSchedulerConstantSpeed(
 #if BEHAVIOR_TIMING_BY_DURATION
     // preferred durations between sync points
     time_sec startReadyDur,
@@ -101,7 +101,7 @@ bool testSyncAfter(
 
 
 
-void BehaviorSchedulerLinear::schedule( SyncPoints& syncs, time_sec now ) {
+void BehaviorSchedulerConstantSpeed::schedule( SyncPoints& syncs, time_sec now ) {
 	// local references to standard sync points
 	SyncPointPtr start        = syncs.sp_start;
 	SyncPointPtr ready        = syncs.sp_ready;
@@ -477,12 +477,12 @@ void BehaviorSchedulerLinear::schedule( SyncPoints& syncs, time_sec now ) {
 
 
 // Part of a transitional move to BehaviorSchedulers
-BehaviorSchedulerLinearPtr BML::buildSchedulerForController( MeController* ct ) {
+BehaviorSchedulerConstantSpeedPtr BML::buildSchedulerForController( MeController* ct ) {
 	bool is_persistent = ct->controller_duration() < 0;
 
 #if BEHAVIOR_TIMING_BY_DURATION
-	BehaviorSchedulerLinearPtr scheduler( 
-		new BehaviorSchedulerLinear(
+	BehaviorSchedulerConstantSpeedPtr scheduler( 
+		new BehaviorSchedulerConstantSpeed(
 			/* startReadyDur  */ time_sec( ct->indt() ), 
 			/* readyStrokeDur */ time_sec( ct->emphasist() - ct->indt() ), 
 			/* strokeRelaxDur */ time_sec( is_persistent? numeric_limits<time_sec>::max() : ct->controller_duration() - ct->emphasist() - ct->outdt() ),
@@ -491,8 +491,8 @@ BehaviorSchedulerLinearPtr BML::buildSchedulerForController( MeController* ct ) 
 
 #else
 
-	BehaviorSchedulerLinearPtr scheduler( 
-		new BehaviorSchedulerLinear(
+	BehaviorSchedulerConstantSpeedPtr scheduler( 
+		new BehaviorSchedulerConstantSpeed(
 			/* startTime  */ 0, 
 			/* readyTime  */ time_sec( ct->indt() ), 
 			/* strokeTime */ time_sec( ct->emphasist() ),

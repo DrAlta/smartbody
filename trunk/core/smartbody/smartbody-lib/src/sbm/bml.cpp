@@ -1340,7 +1340,7 @@ NodRequest::NodRequest( const std::string& unique_id, NodType type, float repeat
     type(type), repeats(repeats), frequency(frequency), extent(extent)
 {
     MeCtSimpleNod* nod = (MeCtSimpleNod*)anim_ct;
-	BehaviorSchedulerLinearPtr scheduler = buildSchedulerForController( nod );
+	BehaviorSchedulerConstantSpeedPtr scheduler = buildSchedulerForController( nod );
 	set_scheduler( scheduler );
 
 	// Convenience References
@@ -1395,7 +1395,7 @@ TiltRequest::TiltRequest( const std::string& unique_id, MeCtSimpleTilt* tilt, ti
     duration(numeric_limits<time_sec>::infinity())/*hack*/,
 	transitionDuration(transitionDuration)
 {
-	BehaviorSchedulerLinearPtr scheduler = buildSchedulerForController( tilt );
+	BehaviorSchedulerConstantSpeedPtr scheduler = buildSchedulerForController( tilt );
 
     scheduler->readyTime = scheduler->strokeTime = transitionDuration;
     scheduler->relaxTime = scheduler->endTime - transitionDuration;
@@ -1410,7 +1410,7 @@ PostureRequest::PostureRequest( const std::string& unique_id, MeController* pose
     duration(numeric_limits<time_sec>::infinity())/*hack*/,
 	transitionDuration(transitionDuration)
 {
-	BehaviorSchedulerLinearPtr scheduler = buildSchedulerForController( pose );
+	BehaviorSchedulerConstantSpeedPtr scheduler = buildSchedulerForController( pose );
 
     scheduler->readyTime = scheduler->strokeTime = transitionDuration;
     scheduler->relaxTime = scheduler->endTime - transitionDuration;
@@ -1423,7 +1423,7 @@ SequenceRequest::SequenceRequest( const std::string& unique_id, const SyncPoints
                                   time_sec startTime, time_sec readyTime, time_sec strokeTime, time_sec relaxTime, time_sec endTime )
 :	BehaviorRequest( unique_id, syncs_in )
 {
-	set_scheduler( BehaviorSchedulerPtr( new BehaviorSchedulerLinear( startTime, readyTime, strokeTime, relaxTime, endTime, 1 ) ) );
+	set_scheduler( BehaviorSchedulerPtr( new BehaviorSchedulerConstantSpeed( startTime, readyTime, strokeTime, relaxTime, endTime, 1 ) ) );
 }
 
 /**

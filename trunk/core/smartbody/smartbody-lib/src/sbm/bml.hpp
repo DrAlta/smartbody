@@ -34,7 +34,7 @@
 #include "bml_types.hpp"
 #include "behavior_span.hpp"
 #include "behavior_scheduler.hpp"
-#include "behavior_scheduler_linear.hpp" // temporary, for BEHAVIOR_TIMING_BY_DURATION macro
+#include "behavior_scheduler_constant_speed.hpp" // temporary, for BEHAVIOR_TIMING_BY_DURATION macro
 
 #include "mcontrol_util.h"
 #include "sbm_character.hpp"
