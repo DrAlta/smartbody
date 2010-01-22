@@ -184,7 +184,7 @@ The MeController method context_updated() is called every time the
 _context variable is set.  If _context is not NULL, then you should be
 able to query the skeleton connected to the context's channels.  All
 this happens when context( MeControllerContext* ) is called, either by
-adding the controller to a MeControllerPipeline, or a meta-controller.
+adding the controller to a MeControllerTreeRoot, or a meta-controller.
 
 ****************************************************************** */
 

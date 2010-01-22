@@ -419,8 +419,8 @@ void mcuCBHandle::update( void )	{
 	while( pawn_p = pawn_map.next() )	{
 
 		//char_p->scheduler_p->evaluate( time );
-		pawn_p->pipeline_p->evaluate( time );
-		pawn_p->pipeline_p->applyBufferToAllSkeletons();
+		pawn_p->ct_tree_p->evaluate( time );
+		pawn_p->ct_tree_p->applyBufferToAllSkeletons();
 
 		char_p = character_map.lookup( pawn_p->name );
 		if( char_p != NULL ) {
@@ -1279,7 +1279,7 @@ int mcu_character_init(
 	SkMotion* face_neutral_p = mcu_p->net_face_bones? mcu_p->face_neutral_p : NULL;
 	err = char_p->init( skeleton_p, face_neutral_p, &mcu_p->au_motion_map, &mcu_p->viseme_map, unreal_class );
 	if( err == CMD_SUCCESS ) {
-		char_p->pipeline_p->set_evaluation_logger( mcu_p->logger_p );
+		char_p->ct_tree_p->set_evaluation_logger( mcu_p->logger_p );
 
 		err = mcu_p->pawn_map.insert( char_name, char_p );
 		if( err != CMD_SUCCESS )	{

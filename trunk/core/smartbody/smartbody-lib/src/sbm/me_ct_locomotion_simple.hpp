@@ -30,7 +30,7 @@
  *  Calculate new world_offset each frame, given the
  *  locomotion vector and orientation target channels.
  *  These channels should be set by an earlier controller
- *  in the pipeline.
+ *  in the controller tree.
  *
  *  Does not play a walk animation or otherwise account for
  *  foot steps.  The character will just glide into position.

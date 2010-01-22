@@ -464,7 +464,7 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 #define EYELID_Y_LIMIT_UP	0.372f
 #define EYELID_Y_LIMIT_DN	-0.788f
 
-// NOTE: 4/29/09 hacked pipeline precludes proper eyelid control, ignore blinking problem
+// NOTE: 4/29/09 hacked tree precludes proper eyelid control, ignore blinking problem
 	
 	float L_eye_pitch = (float)( L_eye_e.p() );
 	float UL_corrected_posy = 0.0;

@@ -28,7 +28,7 @@
 #include <SK/sk_scene.h>
 #include <SK/sk_skeleton.h>
 
-#include <ME/me_controller_pipeline.hpp>
+#include <ME/me_controller_tree_root.hpp>
 #include <ME/me_ct_raw_writer.hpp>
 #include "wsp.h"
 
@@ -86,8 +86,8 @@ public:  // TODO - properly encapsulate / privatize the following
 	SkSkeleton*		skeleton_p;  // MAY BE NULL!!!
 	SkScene*		scene_p;
 
-	// Temporarily, until there is a unified multi-skeleton pipeline
-	MeControllerPipeline	*pipeline_p;
+	// Temporarily, until there is a unified multi-skeleton controller tree
+	MeControllerTreeRoot	*ct_tree_p;
 
 public:
 	

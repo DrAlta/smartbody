@@ -1,6 +1,7 @@
 /*
- *  me_controller_pipeline.cpp - part of SmartBody-lib's Motion Engine
+ *  me_controller_tree_root.cpp - part of SmartBody-lib's Motion Engine
  *  Copyright (C) 2008  University of Southern California
+ *  ( Formerly me_controller_pipeline.cpp )
  *
  *  SmartBody-lib is free software: you can redistribute it and/or
  *  modify it under the terms of the Lesser GNU General Public License
@@ -27,7 +28,7 @@
 #include <algorithm>
 
 
-#include <ME/me_controller_pipeline.hpp>
+#include <ME/me_controller_tree_root.hpp>
 
 #include <SR/sr.h>
 #include <SK/sk_channel_array.h>
@@ -37,15 +38,15 @@ using namespace std;
 
 
 
-const char* MeControllerPipeline::CONTEXT_TYPE = "MeControllerPipeline";
+const char* MeControllerTreeRoot::CONTEXT_TYPE = "MeControllerTreeRoot";
 
-class MeControllerPipelineImpl;
+class MeControllerTreeRootImpl;
 
 
 ///////////////////////////////////////////////////////////////////////////
-//  PipelineFrameData
-class PipelineFrameData : public MeFrameData {
-	MeControllerPipelineImpl* _context;
+//  TreeRootFrameData
+class TreeRootFrameData : public MeFrameData {
+	MeControllerTreeRootImpl* _context;
 	unsigned int              _count_cur;
 	vector<unsigned int>      _updated;   // channel[n] was last updated on frame _updated[n]
 	SrBuffer<int>             _map;       // channel[n] data is located at buffer[ map[n] ]
@@ -57,8 +58,8 @@ class PipelineFrameData : public MeFrameData {
 
 	
 public:
-	PipelineFrameData( MeControllerPipelineImpl* pipeline )
-		:	_context( pipeline ),
+	TreeRootFrameData( MeControllerTreeRootImpl* tree_root )
+		:	_context( tree_root ),
 			_updated(), _buffer(),
 			_count_cur( 0 ),
 			_last_time( 0 ),
@@ -96,7 +97,7 @@ public:
 	// */
 	//void ct_pre_evaluate( MeController* ct ) {
 	//	if( _last_time < _debug_until ) {
-	//		// TODO: implement PipelineFrameData::ct_pre_evaluate
+	//		// TODO: implement TreeRootFrameData::ct_pre_evaluate
 	//		std::cout << "DEBUG: pre_evaluate: " << ct->controller_type() << " \"" << ct->name() << '\"' << std::endl;
 	//	}
 	//}
@@ -108,15 +109,15 @@ public:
 	// */
 	//void ct_post_evaluate( MeController* ct ) {
 	//	if( _last_time < _debug_until ) {
-	//		// TODO: implement PipelineFrameData::ct_post_evaluate
+	//		// TODO: implement TreeRootFrameData::ct_post_evaluate
 	//		std::cout << "DEBUG: post_evaluate: " << ct->controller_type() << " \"" << ct->name() << '\"' << std::endl;
 	//	}
 	//}
 
 
 private:
-	// Private classes for MeControllerPipeline
-	friend MeControllerPipelineImpl;
+	// Private classes for MeControllerTreeRoot
+	friend MeControllerTreeRootImpl;
 
 	void incrementFrameCount( double time );
 		// defined at bottom of this file (refers to _context members)
@@ -150,9 +151,9 @@ struct RemapAndActivate_Func {
 
 
 ///////////////////////////////////////////////////////////////////////////
-//  MeControllerPipelineImpl
-class MeControllerPipelineImpl
-    : public MeControllerPipeline
+//  MeControllerTreeRootImpl
+class MeControllerTreeRootImpl
+    : public MeControllerTreeRoot
 {
 protected:
     ///////////////////////////////////////////////////////////////////////
@@ -170,7 +171,7 @@ protected:
 	int            _channels_cur; // index to current channel
 
 	std::vector< controller_ptr >  _controllers;
-	PipelineFrameData              _frame_data;
+	TreeRootFrameData              _frame_data;
 
 	//SrBuffer<unsigned int> _updated;   //  Channel n was last updated on frame _updated[n]
     //SrBuffer<float>        _buffer;    // the output of the controller
@@ -185,7 +186,7 @@ public:
     // Public Methods
 
 	// Constructor
-	MeControllerPipelineImpl()
+	MeControllerTreeRootImpl()
 	:	_skeletonName(NULL),
 		_skeleton(NULL),
 		_state(VALID),
@@ -200,7 +201,7 @@ public:
 	}
 
 	// Destructor
-	~MeControllerPipelineImpl() {
+	~MeControllerTreeRootImpl() {
 		vector< controller_ptr >::iterator ct_iter = _controllers.begin();
 		vector< controller_ptr >::iterator ct_end = _controllers.begin();
 		while( ct_iter != ct_end ) {
@@ -221,7 +222,7 @@ public:
     SkChannelArray& channels() {
 #ifdef DEBUG
 		if( _state!=State::VALID )
-			std::cerr << "ERROR: MeControllerPipeline::channels() called while invalid" << std::endl;
+			std::cerr << "ERROR: MeControllerTreeRoot::channels() called while invalid" << std::endl;
 #endif
 		if( _state==INVALID )
 			remapFrameData();
@@ -243,7 +244,7 @@ public:
     //	return true;
 	//}
 	//
-	//void MeControllerPipelineImpl::invalidate() {
+	//void MeControllerTreeRootImpl::invalidate() {
 	//	// reset the channels
 	//	_channels.init();
 	//
@@ -333,13 +334,13 @@ public:
 
 
 	/**
-	 *  Returns count of controllers in the pipeline.
+	 *  Returns count of controllers in the tree.
 	 */
     unsigned int count_controllers() 
     { return _controllers.size(); }
 
     /**
-	 *  Returns a pointer to a controller currently in the pipeline.
+	 *  Returns a pointer to a controller currently in the tree.
 	 */
     MeController* controller( unsigned int n ) 
     { return (0<=n && n<_controllers.size())? _controllers[n].get(): NULL; }
@@ -464,7 +465,7 @@ public:
 		SkChannelArray& channels = _channels[_channels_cur];
 		const int MAX = channels.size();
 		for( int i=0; i<MAX; ++i ) {
-			// MeControllerPipeline only takes skeletons,
+			// MeControllerTreeRoot only takes skeletons,
 			// so all channels should be connected.
 			// Avoiding the check.
 			string name( channels.name(i).get_string() );
@@ -519,12 +520,12 @@ private:
 
 
 ///////////////////////////////////////////////////////////////////////////
-// PipelineFrameData Method Definitons
-MeControllerContext* PipelineFrameData::context() const {
+// TreeRootFrameData Method Definitons
+MeControllerContext* TreeRootFrameData::context() const {
 	return _context;
 }
 
-void PipelineFrameData::incrementFrameCount( double time ) {
+void TreeRootFrameData::incrementFrameCount( double time ) {
 	_count_cur++;
 
 	// Check for overflow
@@ -539,8 +540,8 @@ void PipelineFrameData::incrementFrameCount( double time ) {
 }
 
 
-void PipelineFrameData::remapBuffers( SkChannelArray& cur, SkChannelArray& prev ) {
-	//cout << "PipelineFrameData::remapBuffers(..):" << endl
+void TreeRootFrameData::remapBuffers( SkChannelArray& cur, SkChannelArray& prev ) {
+	//cout << "TreeRootFrameData::remapBuffers(..):" << endl
 	//     << "    cur.size(): " << cur.size() << "      cur.floats():  " << cur.floats() << endl
 	//     << "   prev.size(): " << prev.size() << "     prev.floats(): " << prev.floats() << endl;
 
@@ -624,7 +625,7 @@ void PipelineFrameData::remapBuffers( SkChannelArray& cur, SkChannelArray& prev 
 
 
 ///////////////////////////////////////////////////////////////////////////
-//  MeControllerPipeline
-MeControllerPipeline* MeControllerPipeline::create() {
-	return new MeControllerPipelineImpl();
+//  MeControllerTreeRoot
+MeControllerTreeRoot* MeControllerTreeRoot::create() {
+	return new MeControllerTreeRootImpl();
 }

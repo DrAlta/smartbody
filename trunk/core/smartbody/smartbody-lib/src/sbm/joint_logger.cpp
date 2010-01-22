@@ -70,12 +70,12 @@ int joint_logger::set_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			}
 		}
 
-		// Update all MeControllerPipelines
+		// Update all MeControllerTreeRoots
 		srHashMap<SbmCharacter>& characters = mcu_p->character_map;
 		characters.reset(); // resets the internal iterator
 		SbmCharacter* character = characters.next();
 		while( character ) {
-			character->pipeline_p->set_logged_joints( joints_to_log );
+			character->ct_tree_p->set_logged_joints( joints_to_log );
 			character = characters.next();
 		}
 
@@ -164,7 +164,7 @@ void joint_logger::EvaluationLogger::context_pre_evaluate(
 	MeFrameData& frame
 ) {
 	const char* context_type = context.context_type();
-	bool is_root = context_type == MeControllerPipeline::CONTEXT_TYPE;
+	bool is_root = context_type == MeControllerTreeRoot::CONTEXT_TYPE;
 	if( is_root ) {
 		_enabled = (time < _expiration_time);
 		_indent_len = 0;
@@ -197,7 +197,7 @@ void joint_logger::EvaluationLogger::context_post_evaluate(
 		--_indent_len;
 
 		const char* context_type = context.context_type();
-		if( context_type == MeControllerPipeline::CONTEXT_TYPE 
+		if( context_type == MeControllerTreeRoot::CONTEXT_TYPE 
 			|| context_type == MeCtBlend::Context::CONTEXT_TYPE ) {
 			if( _indent.length() != _indent_len ) {
 				_indent.assign( _indent_len, '\t' );
