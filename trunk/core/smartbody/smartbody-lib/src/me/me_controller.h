@@ -44,7 +44,7 @@ class MeController;
 
 #define ME_CONTROLLER_ENABLE_XMLIFY (0)
 #if ME_CONTROLLER_ENABLE_XMLIFY
-#include "../sbm/xercesc_utils.hpp"  //  Ugly, ugly, ugly, ugly...  TODO: Define MotionEngine interface into XML lib
+#include "../sbm/xercesc_utils.hpp"  //  Imports Xerces libaries and util functions (could be cleaner)
 #endif
 
 
