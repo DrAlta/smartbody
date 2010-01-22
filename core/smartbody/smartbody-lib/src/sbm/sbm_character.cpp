@@ -152,17 +152,17 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	gaze_sched_p->init();
 	head_sched_p->init();
 
-	// Add Prioritized Schedule Controllers to the Controller Pipeline
-	pipeline_p->add_controller( posture_sched_p );
-	pipeline_p->add_controller( motion_sched_p );
-	pipeline_p->add_controller( gaze_sched_p );
-	pipeline_p->add_controller( head_sched_p );
-	pipeline_p->name( std::string(name)+"'s pipeline" );
+	// Add Prioritized Schedule Controllers to the Controller Tree
+	ct_tree_p->add_controller( posture_sched_p );
+	ct_tree_p->add_controller( motion_sched_p );
+	ct_tree_p->add_controller( gaze_sched_p );
+	ct_tree_p->add_controller( head_sched_p );
+	ct_tree_p->name( std::string(name)+"'s ct_tree" );
 
 	// Face controller
 	if( face_neutral ) {
-		pipeline_p->add_controller( face_ct );
-		pipeline_p->add_controller( eyelid_ct );
+		ct_tree_p->add_controller( face_ct );
+		ct_tree_p->add_controller( eyelid_ct );
 	}
 
 	bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( name, unreal_class, mcuCBHandle::singleton().net_face_bones );
@@ -357,9 +357,9 @@ int SbmCharacter::init_skeleton() {
 
 	// Adding viseme and FAC control channels
 	//
-	// Because the channels at the pipeline level are based on
+	// Because the channels at the root are based on
 	// the chanels of a skeleton, we need to use joints to add
-	// these channels.  We need to reimplement the pipeline to
+	// these channels.  We need to reimplement the tree to
 	// use raw channels or channel arrays.
 	const SkJoint* wo_joint_p = get_world_offset_joint();
 	if( !wo_joint_p ) {

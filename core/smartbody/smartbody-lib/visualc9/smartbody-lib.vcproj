@@ -224,11 +224,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\me\me_controller_pipeline.cpp"
+					RelativePath="..\src\me\me_controller_tree_root.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\me\me_controller_pipeline.hpp"
+					RelativePath="..\src\me\me_controller_tree_root.hpp"
 					>
 				</File>
 				<File

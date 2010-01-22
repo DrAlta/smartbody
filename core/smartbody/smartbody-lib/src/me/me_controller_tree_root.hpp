@@ -1,6 +1,7 @@
 /*
- *  me_controller_pipeline.hpp - part of SmartBody-lib's Motion Engine
+ *  me_controller_tree_root.hpp - part of SmartBody-lib's Motion Engine
  *  Copyright (C) 2008  University of Southern California
+ *  ( Formerly me_controller_pipeline.hpp )
  *
  *  SmartBody-lib is free software: you can redistribute it and/or
  *  modify it under the terms of the Lesser GNU General Public License
@@ -21,8 +22,8 @@
  *      Ed Fast, USC
  */
 
-#ifndef ME_CONTROLLER_PIPELINE_HPP
-#define ME_CONTROLLER_PIPELINE_HPP
+#ifndef ME_CONTROLLER_TREE_ROOT_HPP
+#define ME_CONTROLLER_TREE_ROOT_HPP
 
 
 #include <string>
@@ -41,10 +42,10 @@
  *  Simple MeEvaluationContext of a series of MeControllers
  *
  *  Implementation requires several little classes, so to avoid polluting the 
- *  namespace, MeControllerPipeline is an interface to MeControllerPipelineImpl.
- *  Create new pipelines using the MeControllerPipeline::create() factory method.
+ *  namespace, MeControllerTreeRoot is an interface to MeControllerTreeRootImpl.
+ *  Create new controller trees using the MeControllerTreeRoot::create() factory method.
  */
-class MeControllerPipeline
+class MeControllerTreeRoot
     : public MeControllerContext
 {
 public:
@@ -54,7 +55,7 @@ public:
 
     ///////////////////////////////////////////////////////////////////////
     // Public Methods
-	static MeControllerPipeline* create();
+	static MeControllerTreeRoot* create();
 
 	const char* context_type() const
 	{	return CONTEXT_TYPE; }
@@ -85,7 +86,7 @@ public:
     ///**
     // *  Implements MeEvaluationContext::isValid().
     // *
-    // *  MeControllerPipeline is always valid (for now).
+    // *  MeControllerTreeRoot is always valid (for now).
     // */
     //bool isValid() = 0;
     //{ return true; }
@@ -114,18 +115,18 @@ public:
 	{	MeControllerContext::remove_controller( ct );	}
 
 	/**
-	 * Clears the pipeline of all controller and skeleton references.
+	 * Clears the tree of all controller and skeleton references.
 	 */
 	virtual void clear() = 0;
 
 	/**
-	 *  Returns count of controllers in the pipeline.
+	 *  Returns count of controllers in the tree.
 	 */
     virtual size_t count_controllers() = 0;
     //{ return _controllers.size(); }
 
     /**
-	 *  Returns a pointer to a controller currently in the pipeline.
+	 *  Returns a pointer to a controller currently in the tree.
 	 */
     virtual MeController* controller( unsigned int n ) = 0;
     //{ return (0<=n && n<_controllers.size())? _controllers[n].get(): NULL; }
@@ -156,7 +157,7 @@ public:
 	//virtual SrBuffer<float>& getLastFrameBuffer() =0;
 
 	/**
-	 *  Sets the pipeline evaluation logger.
+	 *  Sets the tree's evaluation logger.
 	 */
 	virtual void set_evaluation_logger( MeEvaluationLogger* logger ) = 0;
 
@@ -183,11 +184,11 @@ public:
 
 
 template <class C, class T > // character type, traits
-inline std::basic_ostream<C,T>& operator<< ( std::basic_ostream<C,T>& out, const MeControllerPipeline& pipeline ) {
+inline std::basic_ostream<C,T>& operator<< ( std::basic_ostream<C,T>& out, const MeControllerTreeRoot& tree ) {
 	// Just prints a memory address.
-	return out << "MeControllerPipeline@0x" << &pipeline;
+	return out << "MeControllerTreeRoot@0x" << &tree;
 }
 
 
 
-#endif // ME_CONTROLLER_PIPELINE_HPP
+#endif // ME_CONTROLLER_TREE_ROOT_HPP

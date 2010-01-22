@@ -106,7 +106,7 @@ SbmPawn::SbmPawn( const char * name )
 
 	skeleton_p( NULL ),
 	scene_p( new SkScene() ),
-	pipeline_p( MeControllerPipeline::create() ),
+	ct_tree_p( MeControllerTreeRoot::create() ),
 	world_offset_writer_p( new MeCtRawWriter() ),
 	wo_cache_timestamp( -std::numeric_limits<float>::max() )
 {
@@ -114,17 +114,17 @@ SbmPawn::SbmPawn( const char * name )
 	//skeleton_p->ref();
 	scene_p->ref();
 
-	pipeline_p->ref();
+	ct_tree_p->ref();
 
 	// world_offset_writer_p, applies external inputs to the skeleton,
 	//   and therefore needs to evaluate before other controllers
 	world_offset_writer_p->ref();
-	pipeline_p->add_controller( world_offset_writer_p );
+	ct_tree_p->add_controller( world_offset_writer_p );
 }
 
 int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 	if( skeleton_p ) {
-		pipeline_p->remove_skeleton( skeleton_p->name() );
+		ct_tree_p->remove_skeleton( skeleton_p->name() );
 		skeleton_p->unref();
 	}
 	skeleton_p = new_skeleton_p;
@@ -133,7 +133,7 @@ int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 		if( init_skeleton()!=CMD_SUCCESS ) {
 			return CMD_FAILURE; 
 		}
-		pipeline_p->add_skeleton( skeleton_p->name(), skeleton_p );
+		ct_tree_p->add_skeleton( skeleton_p->name(), skeleton_p );
 	}
 	scene_p->init( skeleton_p );  // if skeleton_p == NULL, the scene is cleared
 
@@ -192,7 +192,7 @@ bool SbmPawn::is_initialized() {
 
 int SbmPawn::prune_controller_tree() {
 	// Unimplemented...
-	//  TODO: walk the controller pipeline for excessive world offset raw writers
+	//  TODO: walk the controller tree for excessive world offset raw writers
 	return CMD_SUCCESS;
 }
 
@@ -231,12 +231,12 @@ SbmPawn::~SbmPawn()	{
 	if ( world_offset_writer_p )
 		world_offset_writer_p->unref();
 
-	pipeline_p->clear();  // Because controllers within reference back to pipeline as context
+	ct_tree_p->clear();  // Because controllers within reference back to tree root context
 
 	scene_p->unref();
 	if( skeleton_p )
 		skeleton_p->unref();
-	pipeline_p->unref();
+	ct_tree_p->unref();
     delete [] name;
 }
 
