@@ -483,6 +483,41 @@ public:
 		return _logged_channel_indices;
 	}
 
+	#if ME_CONTROLLER_ENABLE_XMLIFY
+	/*! Serialize state (or most of it) to a single XML element for later analysis. */
+	DOMElement* xmlify( DOMDocument* doc ) const {
+		DOMElement* elem = doc->createElement( L"me:controller" );
+		// TODO: Add name and type name attribute, call xmlify_state and xmlify_children
+
+/*	// Copied from Mecontroller
+		// _instance_id
+		{	ostringstream oss;
+			oss << _instance_id;
+			XMLCh* instance_id_xstr = XMLString::transcode( oss.str().c_str() );
+			elem->setAttribute( L"instance-id", instance_id_xstr );
+			XMLString::release( &instance_id_xstr );
+		}
+
+		//
+		const char* type_name = controller_type();
+		if( type_name ) {
+			XMLCh* type_name_xstr = XMLString::transcode( type_name ); 
+			elem->setAttribute( L"type", type_name_xstr );
+			XMLString::release( &type_name_xstr );
+		}
+
+		const char* name_str = name();
+		if( name_str ) {
+			XMLCh* name_xstr = XMLString::transcode( name_str );
+			elem->setAttribute( L"name", name_xstr );
+			XMLString::release( &name_xstr );
+		}
+*/
+
+		return elem;
+	}
+#endif // ME_CONTROLLER_ENABLE_XMLIFY
+
 
 private:
 	/**

@@ -241,7 +241,7 @@ double MeCtTether::controller_duration( void ) {
 	return( _duration );
 }
 
-const char* MeCtTether::controller_type( void )	{
+const char* MeCtTether::controller_type( void )	const {
 	return( type_name );
 }
 

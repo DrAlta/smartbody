@@ -814,7 +814,7 @@ double MeCtScheduler2::controller_duration () {
 	return total_dur;
 }
 
-const char* MeCtScheduler2::controller_type ()
+const char* MeCtScheduler2::controller_type () const
  {
    return type_name;
  }

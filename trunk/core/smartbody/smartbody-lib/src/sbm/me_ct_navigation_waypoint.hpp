@@ -42,7 +42,7 @@ public:
 	/** Constructor */
 	MeCtNavigationWaypoint();
 
-	const char* controller_type();
+	const char* controller_type() const;
 
 	/**
 	 *  Initializes the controller with a set of channels to write.

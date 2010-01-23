@@ -167,7 +167,7 @@ protected:
 	inline int local_ch_to_parent( unsigned int i )
 	{	return i<_local_ch_to_parent.size()? _local_ch_to_parent[i] : -1; }
 public:
-    const char* controller_type();
+    const char* controller_type() const;
     //SkChannelArray& controller_channels();  // MeCtUnary provides this
 	void print_state( int tabCount );
 

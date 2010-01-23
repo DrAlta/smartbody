@@ -43,7 +43,7 @@ public:
 
 	MeSpline1D& time_func() { return _time_func; }
 
-    const char* controller_type();
+    const char* controller_type() const;
 
     double controller_duration();
     //SkChannelArray& controller_channels(); // implemented in MeCtUnary

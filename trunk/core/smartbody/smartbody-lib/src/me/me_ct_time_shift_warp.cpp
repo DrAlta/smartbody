@@ -43,7 +43,7 @@ MeCtTimeShiftWarp::MeCtTimeShiftWarp( MeController* child )
 	}
 }
 
-const char* MeCtTimeShiftWarp::controller_type() {
+const char* MeCtTimeShiftWarp::controller_type() const {
 	return CONTROLLER_TYPE;
 }
 

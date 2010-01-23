@@ -128,7 +128,7 @@ class MeCtMotion : public MeController
 	virtual void controller_map_updated();
 	virtual bool controller_evaluate ( double t, MeFrameData& frame );
     virtual SkChannelArray& controller_channels ();
-    virtual const char* controller_type ();
+    virtual const char* controller_type () const;
 };
 
 //======================================= EOF =====================================

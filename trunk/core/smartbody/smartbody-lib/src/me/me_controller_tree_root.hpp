@@ -180,6 +180,11 @@ public:
 	 *  Returns a reference to the currently logged channel indices.
 	 */
 	virtual const std::set<int>& get_logged_channel_indices() const = 0;
+
+#if ME_CONTROLLER_ENABLE_XMLIFY
+	/*! Serialize state (or most of it) to a single XML element for later analysis. */
+	virtual DOMElement* xmlify( DOMDocument* doc ) const = 0;
+#endif // ME_CONTROLLER_ENABLE_XMLIFY
 };
 
 

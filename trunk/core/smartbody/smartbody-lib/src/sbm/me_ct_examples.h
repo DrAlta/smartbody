@@ -117,7 +117,7 @@ class MeCtSimpleNod : public MeController	{
 		
 		virtual SkChannelArray& controller_channels()	{ return( _channels ); }
 		virtual double controller_duration()			{ return( (double)_duration ); }
-		virtual const char* controller_type()			{ return( _type_name ); }
+		virtual const char* controller_type() const		{ return( _type_name ); }
 		virtual void print_state( int tabs );
 		
 		SkChannelArray _channels;

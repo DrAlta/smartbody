@@ -125,7 +125,7 @@ double MeCtAnkleLilt::controller_duration(){
 	return ( (double)_duration);
 }
 
-const char* MeCtAnkleLilt::controller_type(){
+const char* MeCtAnkleLilt::controller_type() const {
 	return( type_name );
 }
 

@@ -555,7 +555,7 @@ double MeCtEyeLid::controller_duration( void ) {
 	return( -1.0 );
 }
 
-const char* MeCtEyeLid::controller_type( void )	{
+const char* MeCtEyeLid::controller_type( void )	const {
 	return( type_name );
 }
 

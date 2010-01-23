@@ -267,7 +267,7 @@ double MeCtMotion::controller_duration ()
    return _loop? -1.0:_duration;
  }
 
-const char* MeCtMotion::controller_type ()
+const char* MeCtMotion::controller_type () const
  {
    return type_name;
  }

@@ -35,7 +35,7 @@ MeCtRawWriter::MeCtRawWriter()
 	_write_next( false )
 {}
 
-const char* MeCtRawWriter::controller_type() {
+const char* MeCtRawWriter::controller_type() const {
 	return MeCtRawWriter::TYPE;
 }
 
