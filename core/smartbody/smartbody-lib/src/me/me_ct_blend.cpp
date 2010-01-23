@@ -279,7 +279,7 @@ void MeCtBlend::init( MeController* new_child ) {
 	}
 }
 
-const char* MeCtBlend::controller_type() {
+const char* MeCtBlend::controller_type() const {
 	return CONTROLLER_TYPE;
 }
 

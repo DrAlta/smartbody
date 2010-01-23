@@ -100,7 +100,7 @@ public:
 	//  Public Methods
 	virtual ~MeCtUnary();
 
-	const char* controller_type() {	return CONTROLLER_TYPE; }
+	const char* controller_type() const {	return CONTROLLER_TYPE; }
 
 	// Overrides MeController::count_children()
 	size_t count_children();

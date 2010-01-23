@@ -340,7 +340,7 @@ class MeCtGaze : public MeController	{
 		virtual bool controller_evaluate( double t, MeFrameData& frame );
 		virtual SkChannelArray& controller_channels()	{ return( _channels ); }
 		virtual double controller_duration()			{ return( (double)_duration ); }
-		virtual const char* controller_type()			{ return( CONTROLLER_TYPE ); }
+		virtual const char* controller_type() const		{ return( CONTROLLER_TYPE ); }
 		virtual void print_state( int tabs );
 };
 

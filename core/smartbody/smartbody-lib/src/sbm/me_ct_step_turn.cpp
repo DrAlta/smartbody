@@ -529,7 +529,7 @@ double MeCtStepTurn::controller_duration( void ) {
 #endif
 }
 
-const char* MeCtStepTurn::controller_type( void )	{
+const char* MeCtStepTurn::controller_type( void ) const	{
 	return type_name;
 }
 

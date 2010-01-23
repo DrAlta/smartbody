@@ -279,7 +279,7 @@ void MeController::record_bvh( const char *full_prefix, int num_frames, double d
 }
 
 #if ME_CONTROLLER_ENABLE_XMLIFY
-DOMElement* MeController::xmlify( DOMDocument* doc ) {
+DOMElement* MeController::xmlify( DOMDocument* doc ) const {
 	DOMElement* elem = doc->createElement( L"me:controller" );
 	// TODO: Add name and type name attribute, call xmlify_state and xmlify_children
 
@@ -640,11 +640,11 @@ void MeController::input ( SrInput& i )
  }
 
 #if ME_CONTROLLER_ENABLE_XMLIFY
-void MeController::xmlify_state( DOMElement* elem ) {
+void MeController::xmlify_state( DOMElement* elem ) const {
 	// Do nothing by default
 }
 
-void MeController::xmlify_children( DOMElement* elem ) {
+void MeController::xmlify_children( DOMElement* elem ) const {
 	// TODO: append xmlify(..) result from each child
 }
 #endif // ME_CONTROLLER_ENABLE_XMLIFY

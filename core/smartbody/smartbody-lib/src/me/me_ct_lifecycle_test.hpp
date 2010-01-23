@@ -61,12 +61,12 @@ protected:
 	bool controller_evaluate( double t, MeFrameData& frame );
 	SkChannelArray& controller_channels();
 	double controller_duration();
-	const char* controller_type();
+	const char* controller_type() const;
 	bool remove_child( MeController* child );
 	void print_state( int tab_count );
 	void print_children( int tab_count );
 
-	void print_method_entry( std::string method, bool reset_eval_count = true );
+	void print_method_entry( std::string method, bool reset_eval_count = true ) const;
 };
 
 #endif // ME_CT_LIFECYCLE_TEST_HPP

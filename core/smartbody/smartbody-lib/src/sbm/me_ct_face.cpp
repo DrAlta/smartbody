@@ -341,7 +341,7 @@ double MeCtFace::controller_duration( void ) {
 	return( _duration );
 }
 
-const char* MeCtFace::controller_type( void )	{
+const char* MeCtFace::controller_type( void ) const	{
 	return( type_name );
 }
 

@@ -45,7 +45,7 @@ MeCtLifecycleTest::MeCtLifecycleTest()
 	evaluate_count( 0 )
 {}
 
-const char* MeCtLifecycleTest::controller_type() {
+const char* MeCtLifecycleTest::controller_type() const {
 	print_method_entry( "controller_type()" );
 
 	return CONTROLLER_TYPE;
@@ -149,7 +149,7 @@ void MeCtLifecycleTest::print_children( int tab_count ) {
 	MeCtUnary::print_children( tab_count );
 }
 
-void MeCtLifecycleTest::print_method_entry( string method, bool reset_eval_count ) {
+void MeCtLifecycleTest::print_method_entry( string method, bool reset_eval_count ) const {
 	if( out ) {
 		string state_descrip = "_context is ";
 		if( _context ) {
@@ -168,5 +168,5 @@ void MeCtLifecycleTest::print_method_entry( string method, bool reset_eval_count
 			   << method << ":\t\t" << state_descrip << endl;
 	}
 	if( reset_eval_count )
-		evaluate_count = 0;
+		(const_cast<MeCtLifecycleTest*>(this))->evaluate_count = 0;
 }

@@ -816,7 +816,7 @@ double MeCtQuickDraw::controller_duration( void ) {
 	return( -1.0 );
 }
 
-const char* MeCtQuickDraw::controller_type( void )	{
+const char* MeCtQuickDraw::controller_type( void ) const	{
 
 	return type_name;
 }

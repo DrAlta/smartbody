@@ -100,7 +100,7 @@ class MeCtPose : public MeController
     virtual bool controller_evaluate ( double t, MeFrameData& frame );
     virtual SkChannelArray& controller_channels ();
     virtual double controller_duration ();
-    virtual const char* controller_type ();
+    virtual const char* controller_type () const;
  };
 
 //======================================= EOF =====================================

@@ -223,7 +223,7 @@ class MeCtQuickDraw : public MeController	{
 		virtual bool controller_evaluate ( double t, MeFrameData& frame );
 		virtual SkChannelArray& controller_channels ();
 		virtual double controller_duration ();
-		virtual const char* controller_type ();
+		virtual const char* controller_type () const;
 		virtual void print_state( int tabCount );
 };
 

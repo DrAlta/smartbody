@@ -254,7 +254,7 @@ public :
 
 #if ME_CONTROLLER_ENABLE_XMLIFY
 	/*! Serialize state (or most of it) to a single XML element for later analysis. */
-	DOMElement* xmlify( DOMDocument* doc );
+	DOMElement* xmlify( DOMDocument* doc ) const;
 #endif // ME_CONTROLLER_ENABLE_XMLIFY
 
    protected :
@@ -281,7 +281,7 @@ public :
 
 #if ME_CONTROLLER_ENABLE_XMLIFY
 	/*! Append child controller xml to the contents of the element. */
-	void xmlify_children( DOMElement* elem );
+	void xmlify_children( DOMElement* elem ) const;
 #endif // ME_CONTROLLER_ENABLE_XMLIFY
 
    protected :
@@ -319,7 +319,7 @@ public :
 
 #if ME_CONTROLLER_ENABLE_XMLIFY
 	/*! Append XML elements describing state to end of elem for later analysis. */
-	virtual void xmlify_state( DOMElement* elem );
+	virtual void xmlify_state( DOMElement* elem ) const;
 #endif // ME_CONTROLLER_ENABLE_XMLIFY
 
    public :
@@ -335,7 +335,7 @@ public :
     
     /*! Returns a string describing the type of the controller. The convention is that
         the string corresponds with the derived class name without the 'SrCn' prefix */
-    virtual const char* controller_type ()=0;
+    virtual const char* controller_type () const = 0;
 
 	/*! Print the info about the controller and its state to stdout.  The first 
 	    line of output should begin immediately, and second and following lines 

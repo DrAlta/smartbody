@@ -220,7 +220,7 @@ double MeCtPose::controller_duration ()
    return _duration;
  }
 
-const char* MeCtPose::controller_type ()
+const char* MeCtPose::controller_type () const
  {
    return type_name;
  }
