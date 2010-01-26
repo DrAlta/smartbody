@@ -11,11 +11,11 @@
 0	echo - execution of children in parallel (longest is 3sec)
 0	echo - if times are the same, the first inlined is the first executed
 0	seq delay1sec inline
-0	echo After delay1sec
+0	echo After "seq delay1sec inline"
 0	seq delay2sec inline
-0	echo After delay2sec
+0	echo After "seq delay2sec inline"
 0	seq delay3sec inline
-0	echo After delay3sec
+0	echo After "seq delay3sec inline"
 
 ###		Grrr.... Can't abort self without crashing (invalid iterator reference)
 #2.5	echo Aborting test-seq-chain before delay3sec completes
