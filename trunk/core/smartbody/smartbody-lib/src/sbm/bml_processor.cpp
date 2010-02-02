@@ -541,7 +541,10 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 				motionCt->name( motion->name() );  // TODO: include BML act and behavior ids
 				motionCt->loop( true );
 
-				return BehaviorRequestPtr( new PostureRequest( unique_id, motionCt, 1, request->actor, tms ) );
+				PostureRequest * posture_new = new PostureRequest( unique_id, motionCt, 1, request->actor, tms );
+				posture_new->set_persistent(true);
+
+				return BehaviorRequestPtr( posture_new );
 			} else {
 				wcerr<<"WARNING: BML::Processor::parse_bml_body(): <body>: posture=\""<<postureName<<"\" not loaded; ignoring <body>."<<endl;
 				return BehaviorRequestPtr();  // a.k.a., NULL
