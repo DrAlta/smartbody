@@ -292,14 +292,7 @@ char* remote_speech::getSpeechPlayCommand( RequestId requestId, const SbmCharact
 	}
 	string& soundFile = *lookupResult;
 
-	// Get bonebus character id for spatialization
-	string characterName;
-	if ( character && character->bonebusCharacter )
-	{
-		characterName = character->bonebusCharacter->m_name;
-	}
-
-	string cmd = vhcl::Format( "send PlaySound %s %s", soundFile.c_str(), characterName.c_str() );
+	string cmd = vhcl::Format( "send PlaySound %s %s", soundFile.c_str(), character->name );
 
 	char* retSoundFile= new char[ cmd.length() + 1];
 	strcpy(retSoundFile, cmd.c_str());

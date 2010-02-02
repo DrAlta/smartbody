@@ -104,6 +104,12 @@ SbmCharacter::~SbmCharacter( void )	{
 		face_ct->unref();
 	eyelid_ct->unref();
 
+
+	if ( mcuCBHandle::singleton().sbm_character_listener )
+	{
+		mcuCBHandle::singleton().sbm_character_listener->OnCharacterDelete( name );
+	}
+
     if ( bonebusCharacter )
     {
        mcuCBHandle::singleton().bonebus.DeleteCharacter( bonebusCharacter );
@@ -166,7 +172,12 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	}
 
 	bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( name, unreal_class, mcuCBHandle::singleton().net_face_bones );
-	
+
+	if ( mcuCBHandle::singleton().sbm_character_listener )
+	{
+		mcuCBHandle::singleton().sbm_character_listener->OnCharacterCreate( name, unreal_class );
+	}
+
 	init_visemes_left_right_channels( "au_1", "unit1_inner_brow_raiser" );
 	init_visemes_left_right_channels( "au_2", "unit2_outer_brow_raiser" );
 	init_visemes_left_right_channels( "au_4", "unit4_inner_brow_lowerer" );
@@ -869,6 +880,16 @@ int SbmCharacter::set_viseme( char* viseme,
 
 			for( ; it!= end; ++it )
 				bonebusCharacter->SetViseme( it->c_str(), weight, rampin_duration );
+		}
+
+		if ( mcuCBHandle::singleton().sbm_character_listener )
+		{
+			// iterate over bonebus_names
+			it  = data->bonebus_names.begin();
+			end = data->bonebus_names.end();
+
+			for( ; it!= end; ++it )
+				mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, it->c_str(), weight, rampin_duration );
 		}
 
 		if( face_ct != NULL ) {

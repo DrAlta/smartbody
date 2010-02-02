@@ -41,8 +41,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;..\smartbody-lib\src&quot;;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				AdditionalIncludeDirectories="&quot;..\smartbody-dll\include&quot;;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -62,10 +62,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Smartbodyd.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib pthreadVSE2.lib xerces-c_3D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_39.lib boost_system-vc90-mt-gd-1_39.lib atl.lib atlsd.lib dbghelp.lib opengl32.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib"
+				LinkLibraryDependencies="false"
+				AdditionalDependencies="smartbody-dll_d.lib vhcl_d.lib vhmsg_d.lib pthreadVSE2.lib activemq-cppd.lib atl.lib atlsd.lib dbghelp.lib opengl32.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;..\smartbody-lib\lib&quot;;..\..\..\lib\vhcl\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\lib\xerces-c\lib&quot;;..\..\..\lib\boost\lib"
+				AdditionalLibraryDirectories="&quot;..\smartbody-dll\lib&quot;;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;&quot;..\..\..\lib\vhcl\libsndfile-1_0_17&quot;;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\lib\xerces-c\lib&quot;;..\..\..\lib\boost\lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
@@ -92,7 +93,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y &quot;$(TargetPath)&quot; .&#x0D;&#x0A;copy /Y ..\..\..\lib\pthreads\lib\pthreadVSE2.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\xerces-c\bin\xerces-c_3_0D.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-gd-1_39.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\boost\lib\boost_system-vc90-mt-gd-1_39.dll .&#x0D;&#x0A;copy /Y &quot;$(VS90COMNTOOLS)\..\IDE\dbghelp.dll&quot; .&#x0D;&#x0A;"
+				CommandLine="if not exist .\bin mkdir .\bin&#x0D;&#x0A;copy /Y &quot;$(TargetPath)&quot; .\bin&#x0D;&#x0A;copy /Y ..\smartbody-dll\lib\smartbody-dll_d.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\alut.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\vhcl\libsndfile-1_0_17\libsndfile-1.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\pthreads\lib\pthreadVSE2.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\xerces-c\bin\xerces-c_3_0D.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-gd-1_39.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\boost\lib\boost_system-vc90-mt-gd-1_39.dll .\bin&#x0D;&#x0A;copy /Y &quot;$(VS90COMNTOOLS)\..\IDE\dbghelp.dll&quot; .\bin&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -140,6 +141,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
 				AdditionalDependencies="Smartbody.lib vhcl.lib vhmsg.lib bonebus.lib wsp.lib pthreadVSE2.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_39.lib boost_system-vc90-mt-1_39.lib atl.lib atls.lib dbghelp.lib opengl32.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;..\smartbody-lib\lib&quot;;..\..\..\lib\vhcl\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\lib\xerces-c\lib&quot;;..\..\..\lib\boost\lib"

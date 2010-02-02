@@ -195,13 +195,7 @@ char * AudioFileSpeech::getSpeechPlayCommand( RequestId requestId, const SbmChar
    hash_map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
    if ( it != m_speechRequestInfo.end() )
    {
-      string characterName;
-      if ( character && character->bonebusCharacter )
-      {
-         characterName = character->bonebusCharacter->m_name;
-      }
-
-      it->second.playCommand = vhcl::Format( "send PlaySound %s %s", it->second.audioFilename.c_str(), characterName.c_str() );
+      it->second.playCommand = vhcl::Format( "send PlaySound %s %s", it->second.audioFilename.c_str(), character->name );
       return (char *)it->second.playCommand.c_str();
    }
 
