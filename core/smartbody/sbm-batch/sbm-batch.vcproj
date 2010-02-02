@@ -122,7 +122,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="3"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories="&quot;..\smartbody-lib\src&quot;;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost"
+				AdditionalIncludeDirectories="&quot;..\smartbody-dll\include&quot;;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -142,9 +142,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="Smartbody.lib vhcl.lib vhmsg.lib bonebus.lib wsp.lib pthreadVSE2.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_39.lib boost_system-vc90-mt-1_39.lib atl.lib atls.lib dbghelp.lib opengl32.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib"
+				AdditionalDependencies="smartbody-dll.lib vhcl.lib vhmsg.lib pthreadVSE2.lib activemq-cpp.lib atl.lib atls.lib dbghelp.lib opengl32.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;..\smartbody-lib\lib&quot;;..\..\..\lib\vhcl\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\lib\xerces-c\lib&quot;;..\..\..\lib\boost\lib"
+				AdditionalLibraryDirectories="&quot;..\smartbody-dll\lib&quot;;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;&quot;..\..\..\lib\vhcl\libsndfile-1_0_17&quot;;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\lib\xerces-c\lib&quot;;..\..\..\lib\boost\lib"
 				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -173,7 +173,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y &quot;$(TargetPath)&quot; .&#x0D;&#x0A;copy /Y ..\..\..\lib\pthreads\lib\pthreadVSE2.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\xerces-c\bin\xerces-c_3_0.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-1_39.dll .&#x0D;&#x0A;copy /Y ..\..\..\lib\boost\lib\boost_system-vc90-mt-1_39.dll .&#x0D;&#x0A;"
+				CommandLine="if not exist .\bin mkdir .\bin&#x0D;&#x0A;copy /Y &quot;$(TargetPath)&quot; .\bin&#x0D;&#x0A;copy /Y ..\smartbody-dll\lib\smartbody-dll_d.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\alut.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\vhcl\libsndfile-1_0_17\libsndfile-1.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\pthreads\lib\pthreadVSE2.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\xerces-c\bin\xerces-c_3_0D.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc90-mt-gd-1_39.dll .\bin&#x0D;&#x0A;copy /Y ..\..\..\lib\boost\lib\boost_system-vc90-mt-gd-1_39.dll .\bin&#x0D;&#x0A;copy /Y &quot;$(VS90COMNTOOLS)\..\IDE\dbghelp.dll&quot; .\bin&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
