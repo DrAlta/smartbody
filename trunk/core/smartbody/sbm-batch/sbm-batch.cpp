@@ -21,12 +21,112 @@
  */
 
 
+#include "vhcl.h"
+
 #include <stdio.h>
+#include <conio.h>
+#include <windows.h>
+#include <mmsystem.h>
+
+#include "smartbody-dll.h"
+#include "vhmsg-tt.h"
+
+
+using std::string;
+using std::vector;
+
+
+Smartbody_dll * sbm = NULL;
+vector< string > characters;
+
+
+class SBMListener : public SmartbodyListener
+{
+   public:
+      virtual void OnCharacterCreate( const string & name )
+      {
+         printf( "Character Create!\n" );
+
+         characters.push_back( name );
+      }
+
+      virtual void OnCharacterDelete( const string & name )
+      {
+         printf( "Character Delete!\n" );
+
+         for ( uint32_t i = 0; i < characters.size(); i++ )
+         {
+            if ( characters[ i ].compare( name ) == 0 )
+            {
+               characters.erase( characters.begin() + i );
+               break;
+            }
+         }
+      }
+};
+
+
+void tt_client_callback( const char * op, const char * args, void * user_data )
+{
+   printf( "received - '%s %s'\n", op, args );
+
+   sbm->ProcessVHMsgs( op, args );
+}
 
 
 int main( int argc, char ** argv )
 {
-   printf( "Hello World\n" );
+   printf( "Starting VHMsg\n" );
 
-   return 0;
+   vhmsg::ttu_set_client_callback( tt_client_callback );
+   vhmsg::ttu_open();
+
+   // sbm related vhmsgs
+   vhmsg::ttu_register( "sbm" );
+   vhmsg::ttu_register( "vrAgentBML" );
+   vhmsg::ttu_register( "vrSpeak" );
+   vhmsg::ttu_register( "RemoteSpeechReply" );
+   vhmsg::ttu_register( "PlaySound" );
+   vhmsg::ttu_register( "StopSound" );
+   vhmsg::ttu_register( "CommAPI" );
+   vhmsg::ttu_register( "object-data" );
+   vhmsg::ttu_register( "wsp" );
+
+   vhmsg::ttu_report_version( "sbm-batch", "all", "all" );
+
+
+   printf( "Starting SBM\n" );
+
+   SBMListener listener;
+   sbm = new Smartbody_dll;
+
+   sbm->Init();
+   sbm->SetListener( &listener );
+
+
+   printf( "Starting main loop, hit 'q' to quit\n" );
+
+   bool loop = true;
+   while ( loop )
+   {
+      sbm->Update();
+      vhmsg::ttu_poll();
+
+
+      for ( uint32_t i = 0; i < characters.size(); i++ )
+      {
+         SmartbodyCharacter c = sbm->GetCharacter( characters[ i ] );
+
+         //printf( "Character %s: %5.2f %5.2f %5.2f\n", c.m_name.c_str(), c.x, c.y, c.z );
+      }
+
+
+      if ( _kbhit() && _getch() == 'q' )
+         loop = false;
+   }
+
+
+   vhmsg::ttu_close();
+   sbm->Shutdown();
+   delete sbm;
 }

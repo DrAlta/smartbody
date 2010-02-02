@@ -1,0 +1,94 @@
+
+#ifndef SMARTBODY_DLL_H
+#define SMARTBODY_DLL_H
+
+
+#ifdef SMARTBODY_DLL_EXPORTS
+#define SMARTBODY_DLL_API __declspec(dllexport)
+#else
+#define SMARTBODY_DLL_API __declspec(dllimport)
+#endif
+
+
+#include "vhcl_public.h"
+
+
+// Listener class that executables should derive from to get Smartbody related notifications.
+class SmartbodyListener
+{
+   public:
+      virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass ) {}
+      virtual void OnCharacterDelete( const std::string & name ) {}
+      virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime ) {}
+};
+
+
+// helper class for receiving individual joint data
+class SmartbodyJoint
+{
+   public:
+      std::string m_name;
+      float x;
+      float y;
+      float z;
+      float rw;
+      float rx;
+      float ry;
+      float rz;
+};
+
+
+// helper class for receiving character data including all the joints
+class SmartbodyCharacter
+{
+   public:
+      std::string m_name;
+      float x;
+      float y;
+      float z;
+      float rw;
+      float rx;
+      float ry;
+      float rz;
+
+      std::vector< SmartbodyJoint > m_joints;
+};
+
+
+class Smartbody_dll_SBMCharacterListener_Internal;
+
+class Smartbody_dll
+{
+   private:
+      SmartbodyListener * m_listener;
+      Smartbody_dll_SBMCharacterListener_Internal * m_internalListener;
+      double m_startTime;
+
+   public:
+      SMARTBODY_DLL_API Smartbody_dll();
+      SMARTBODY_DLL_API virtual ~Smartbody_dll();
+
+      SMARTBODY_DLL_API bool Init();
+      SMARTBODY_DLL_API bool Shutdown();
+
+      SMARTBODY_DLL_API void SetListener( SmartbodyListener * listener );
+
+      SMARTBODY_DLL_API bool Update();
+
+
+      SMARTBODY_DLL_API bool ProcessVHMsgs( const char * op, const char * args );
+
+
+      SMARTBODY_DLL_API int GetNumberOfCharacters();
+
+      SMARTBODY_DLL_API SmartbodyCharacter GetCharacter( const std::string & name );
+
+   protected:
+      bool InitVHMsg();
+      void RegisterCallbacks();
+
+      friend Smartbody_dll_SBMCharacterListener_Internal;
+};
+
+
+#endif  // SMARTBODY_DLL_H

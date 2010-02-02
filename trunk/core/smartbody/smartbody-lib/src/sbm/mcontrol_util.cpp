@@ -67,6 +67,7 @@ mcuCBHandle::mcuCBHandle()
 	net_world_offset_updates( true ),
 	net_face_bones( false ),
 	net_host( NULL ),
+	sbm_character_listener( NULL ),
 	process_id( NULL ),
 	play_internal_audio( false ),
 	viewer_p( NULL ),

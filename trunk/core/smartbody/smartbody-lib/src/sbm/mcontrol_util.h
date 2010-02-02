@@ -90,6 +90,16 @@ namespace WSP
 //////////////////////////////////////////////////////////////////
 
 
+// This class is meant for listening to specific events that could be handled externally from smartbody
+// Currently being used by smartbody-dll
+class SBMCharacterListener
+{
+   public:
+      virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass ) {}
+      virtual void OnCharacterDelete( const std::string & name ) {}
+      virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime ) {}
+};
+
 
 // Motion Controller Utility Callback Handle (Yes, seriously.)
 class mcuCBHandle	{
@@ -109,6 +119,7 @@ class mcuCBHandle	{
 		bool		net_face_bones;
 		const char* net_host;
 		BoneBusClient bonebus;
+		SBMCharacterListener * sbm_character_listener;   // only one listener possible, must be set manually
 		const char* process_id;
 		bool		play_internal_audio;
 		bool		lock_dt; // if true: report fixed dt to animation system
