@@ -181,7 +181,6 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	init_visemes_left_right_channels( "au_1", "unit1_inner_brow_raiser" );
 	init_visemes_left_right_channels( "au_2", "unit2_outer_brow_raiser" );
 	init_visemes_left_right_channels( "au_4", "unit4_inner_brow_lowerer" );
-	init_visemes_left_right_channels( "au_45", "unit45_blink" );
 
 	init_viseme_simple( "au_5",        "unit5_upper_lid_raiser");
 	init_viseme_simple( "au_6",        "unit6_eye_squint");
@@ -195,8 +194,12 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	init_viseme_simple( "au_25",       "unit25_lip_parser");
 	init_viseme_simple( "au_26",       "unit26_jaw_drop");
 	init_viseme_simple( "au_27",       "unit27_jaw_stretch_open");
-	/*init_viseme_simple( "au_45_left",  "unit45_left_blink");
-	init_viseme_simple( "au_45_right", "unit45_right_blink");*/
+	{
+		//init_viseme_simple( "au_45_left",  "unit45_left_blink");
+		//init_viseme_simple( "au_45_right", "unit45_right_blink");
+		VisemeImplDataPtr viseme_blink = init_visemes_left_right_channels( "au_45", "unit45_blink" );
+		viseme_impl_data.insert( make_pair( "blink", viseme_blink ) );  // Synomyn
+	}
 	init_viseme_simple( "au_38",       "unit38_nostril_dilator");
 	init_viseme_simple( "au_39",       "unit39_nostril_compressor");
 
@@ -942,7 +945,7 @@ void SbmCharacter::eye_blink_update( const double frame_time )
       if ( frame_time - eye_blink_last_time > eye_blink_repeat_time )
       {
          // close the eyes
-         bonebusCharacter->SetViseme( "blink", 0.9f, 0.001f );
+         bonebusCharacter->SetViseme( "au_45", 0.9f, 0.001f );
 
          eye_blink_last_time = frame_time;
          eye_blink_closed = true;
@@ -953,7 +956,7 @@ void SbmCharacter::eye_blink_update( const double frame_time )
       if ( frame_time - eye_blink_last_time > blink_down_time )
       {
          // open the eyes
-         bonebusCharacter->SetViseme( "blink", 0, 0.001f );
+         bonebusCharacter->SetViseme( "au_45", 0, 0.001f );
 
          eye_blink_last_time = frame_time;
          eye_blink_closed = false;
