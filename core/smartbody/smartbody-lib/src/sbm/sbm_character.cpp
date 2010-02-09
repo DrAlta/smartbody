@@ -930,22 +930,20 @@ int SbmCharacter::set_viseme( char* viseme,
 
 void SbmCharacter::eye_blink_update( const double frame_time )
 {
-   if ( bonebusCharacter == NULL )
-   {
-      return;
-   }
-
    // automatic blinking routine
    static const double blink_down_time = 0.04;       // how long the eyes should stay closed. ~1 frame
    static const double min_blink_repeat_time = 4.0;  // how long to wait until the next blink
    static const double max_blink_repeat_time = 8.0;  // will pick a random number between these min/max
-   
+
+   mcuCBHandle& mcu = mcuCBHandle::singleton();
+
    if ( !eye_blink_closed )
    {
       if ( frame_time - eye_blink_last_time > eye_blink_repeat_time )
       {
          // close the eyes
-         bonebusCharacter->SetViseme( "au_45", 0.9f, 0.001f );
+         //bonebusCharacter->SetViseme( "blink", 0.9f, 0.001f );
+         set_viseme( "au_45", 0.9f, mcu.time, 0.001f );
 
          eye_blink_last_time = frame_time;
          eye_blink_closed = true;
@@ -956,7 +954,8 @@ void SbmCharacter::eye_blink_update( const double frame_time )
       if ( frame_time - eye_blink_last_time > blink_down_time )
       {
          // open the eyes
-         bonebusCharacter->SetViseme( "au_45", 0, 0.001f );
+         //bonebusCharacter->SetViseme( "blink", 0, 0.001f );
+         set_viseme( "au_45", 0, mcu.time, 0.001f );
 
          eye_blink_last_time = frame_time;
          eye_blink_closed = false;
