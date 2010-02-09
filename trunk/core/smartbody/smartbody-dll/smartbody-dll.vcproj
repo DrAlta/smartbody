@@ -63,7 +63,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="smartbodyd.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib fltkd.lib activemq-cppd.lib xerces-c_3D.lib boost_filesystem-vc90-mt-gd-1_39.lib boost_system-vc90-mt-gd-1_39.lib OpenAL32.lib alut.lib libsndfile-1.lib pthreadVSE2.lib opengl32.lib ws2_32.lib winmm.lib atl.lib atlsd.lib dbghelp.lib comctl32.lib rpcrt4.lib"
+				AdditionalDependencies="smartbodyd.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib fltkd.lib activemq-cppd.lib xerces-c_3D.lib boost_filesystem-vc90-mt-gd-1_42.lib boost_system-vc90-mt-gd-1_42.lib OpenAL32.lib alut.lib libsndfile-1.lib pthreadVSE2.lib opengl32.lib ws2_32.lib winmm.lib atl.lib atlsd.lib dbghelp.lib comctl32.lib rpcrt4.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;..\smartbody-lib\lib&quot;;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;&quot;..\..\..\lib\vhcl\libsndfile-1_0_17&quot;;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\fltk\lib;..\..\..\lib\pthreads\lib;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\lib\xerces-c\lib&quot;;..\..\..\lib\boost\lib"
@@ -146,7 +146,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="smartbody.lib vhcl.lib vhmsg.lib bonebus.lib wsp.lib fltk.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_39.lib boost_system-vc90-mt-1_39.lib OpenAL32.lib alut.lib libsndfile-1.lib pthreadVSE2.lib opengl32.lib ws2_32.lib winmm.lib atl.lib atlsd.lib dbghelp.lib comctl32.lib rpcrt4.lib"
+				AdditionalDependencies="smartbody.lib vhcl.lib vhmsg.lib bonebus.lib wsp.lib fltk.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_42.lib boost_system-vc90-mt-1_42.lib OpenAL32.lib alut.lib libsndfile-1.lib pthreadVSE2.lib opengl32.lib ws2_32.lib winmm.lib atl.lib atlsd.lib dbghelp.lib comctl32.lib rpcrt4.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;..\smartbody-lib\lib&quot;;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;&quot;..\..\..\lib\vhcl\libsndfile-1_0_17&quot;;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\fltk\lib;..\..\..\lib\pthreads\lib;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\lib\xerces-c\lib&quot;;..\..\..\lib\boost\lib"
 				GenerateDebugInformation="true"
