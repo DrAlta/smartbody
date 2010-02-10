@@ -73,13 +73,6 @@ class Smartbody_dll_SBMCharacterListener_Internal : public SBMCharacterListener
 };
 
 
-// TODO - replace with app provided time
-double get_time()
-{
-   return( (double)timeGetTime() / 1000.0 );
-}
-
-
 // static function taken from sbm_main.cpp
 int sbm_main_func( srArgBuffer & args, mcuCBHandle * mcu_p )
 {
@@ -165,9 +158,6 @@ SMARTBODY_DLL_API bool Smartbody_dll::Init()
 
    mcu_vrAllCall_func( srArgBuffer(""), &mcu );
 
-
-   m_startTime = get_time();
-
    return true;
 }
 
@@ -191,11 +181,11 @@ SMARTBODY_DLL_API void Smartbody_dll::SetListener( SmartbodyListener * listener 
 }
 
 
-SMARTBODY_DLL_API bool Smartbody_dll::Update()
+SMARTBODY_DLL_API bool Smartbody_dll::Update( const double timeInSeconds )
 {
    mcuCBHandle & mcu = mcuCBHandle::singleton();
 
-   mcu.set_time( get_time() - m_startTime );
+   mcu.set_time( timeInSeconds );
    mcu.update();
 
    return true;
