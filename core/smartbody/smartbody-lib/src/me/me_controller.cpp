@@ -65,18 +65,18 @@ MeController::MeController ()
 
 	_prune_policy->ref();
 
+	_frames = new std::list<FRAME>;
 	_record_mode = RECORD_NULL;
-	_recording = false;
-	_record_num_frames = 0;
+	_record_max_frames = 0;
 	_record_frame_count = 0;
 }
 
 MeController::~MeController () {
 	//assert( _context==NULL );  // Controller should not be deleted if still referenced by context
-	if( _recording ) {
-		stop_record();
-	}
+	stop_record();
 	
+	if(_frames)	delete _frames;
+
 	if( _prune_policy ) {
 		_prune_policy->unref();
 		_prune_policy = NULL;
@@ -162,16 +162,13 @@ void MeController::prune_policy( MePrunePolicy* prune_policy ) {
 void MeController::start () {
 
 	_active = true;
-	_invocation_count++;
 	controller_start ();
 }
 
 void MeController::stop () {
 
 	_active = false;
-	if( _recording ) {
-		stop_record();
-	}
+	stop_record();
 	controller_stop ();
 // printf( ">>> MeController::stop <<<\n" );
 }
@@ -239,12 +236,8 @@ void MeController::evaluate ( double time, MeFrameData& frame ) {
 	// Reevaluate controller. Even for the same evaluation time as _lastEval, results may be influenced by differing buffer values
 	_active = controller_evaluate ( time, frame );
 	
-	if( _record_mode ) {
-		if( _recording == false )	{
-			init_record();
-		}
+	if( _record_mode ) 
 		cont_record( time, frame );
-	}
 
 	if( logger )
 		logger->controller_post_evaluate( time, *_context, *this, frame );
@@ -257,25 +250,21 @@ void MeController::record_pose( const char *full_prefix ) {
 }
 */
 
-void MeController::record_motion( const char *full_prefix, int num_frames ) { 
+void MeController::record_motion( int max_num_of_frames ) { 
 
-	if( _recording )	{
-		stop_record();
-	}
+	stop_record();
 	_record_mode = RECORD_MOTION; 
-	_record_num_frames = num_frames;
-	_record_full_prefix = std::string( full_prefix ); 
+	_record_max_frames = max_num_of_frames;
+	cout << "MeController::record_motion START"<<endl;
 }
 
-void MeController::record_bvh( const char *full_prefix, int num_frames, double dt )	{
+void MeController::record_bvh( int max_num_of_frames, double dt )	{
 
-	if( _recording )	{
-		stop_record();
-	}
+	stop_record();
 	_record_mode = RECORD_BVH_MOTION; 
-	_record_num_frames = num_frames;
-	_record_full_prefix = std::string( full_prefix ); 
+	_record_max_frames = max_num_of_frames;
 	_record_dt = dt;
+	cout << "MeController::record_bvh START"<<endl;
 }
 
 #if ME_CONTROLLER_ENABLE_XMLIFY
@@ -389,10 +378,7 @@ bool MeController::print_bvh_hierarchy( SkJoint* joint_p, int depth )	{
 	//   SkJointQuat::_active, and 
 	//   SkJointPos:SkVecLimits::frozen()
 	print_tabs( depth + 1 );
-	if(depth == 0)
-		*_record_output << "CHANNELS 6 Xposition Yposition Zposition Zrotation Xrotation Yrotation\n";
-	else
-		*_record_output << "CHANNELS 3 Zrotation Xrotation Yrotation\n";
+	*_record_output << "CHANNELS 6 Xposition Yposition Zposition Zrotation Xrotation Yrotation\n";
 	
 	int num_child = joint_p->num_children();
 	if( num_child == 0 )	{
@@ -423,7 +409,7 @@ bool MeController::print_bvh_hierarchy( SkJoint* joint_p, int depth )	{
 	return( true );
 }
 
-bool MeController::print_bvh_motion( SkJoint* joint_p, int depth )	{ 
+bool MeController::print_bvh_motion( SkJoint* joint_p, int depth, FRAME& frame_data )	{ 
 	// NOTE: depth only used to hack STUPID-POLYTRANS ROOT bug
 	int i;
 
@@ -437,17 +423,21 @@ bool MeController::print_bvh_motion( SkJoint* joint_p, int depth )	{
 //*_record_output << " " << joint_p->name() << " { ";
 	
 	// STUPID-POLYTRANS ignores ROOT OFFSET: add to CHANNEL motion
+	std::ostringstream * frame_data_os = new std::ostringstream;
 	if( depth == 0 )	{
 		SrVec offset_v = joint_p->offset();
-		*_record_output << " " << sk_jp_p->value( 0 ) + offset_v.x;
-		*_record_output << " " << sk_jp_p->value( 1 ) + offset_v.y;
-		*_record_output << " " << sk_jp_p->value( 2 ) + offset_v.z;
+		*frame_data_os << " " << sk_jp_p->value( 0 ) + offset_v.x;
+		*frame_data_os << " " << sk_jp_p->value( 1 ) + offset_v.y;
+		*frame_data_os << " " << sk_jp_p->value( 2 ) + offset_v.z;
+		frame_data += frame_data_os->str();
 	}
-//	else	{
-//		*_record_output << " " << sk_jp_p->value( 0 );
-//		*_record_output << " " << sk_jp_p->value( 1 );
-//		*_record_output << " " << sk_jp_p->value( 2 );
-//	}
+	else	{
+		*frame_data_os << " " << sk_jp_p->value( 0 );
+		*frame_data_os << " " << sk_jp_p->value( 1 );
+		*frame_data_os << " " << sk_jp_p->value( 2 );
+		frame_data += frame_data_os->str();
+	}
+	delete frame_data_os;
 	
 //	SkJointQuat* sk_jq_p = joint_p->quat();
 //	SrQuat sr_q = sk_jq_p->value();
@@ -461,9 +451,12 @@ bool MeController::print_bvh_motion( SkJoint* joint_p, int depth )	{
 
 //inline double RAD( double d ) { return( d * 0.017453292519943295 ); }
 //inline double DEG( double r ) { return( r * 57.295779513082323 ); }
-	*_record_output << " " << ez * 57.295779513082323;
-	*_record_output << " " << ex * 57.295779513082323;
-	*_record_output << " " << ey * 57.295779513082323;
+	std::ostringstream * frame_data_os1 = new std::ostringstream;
+	*frame_data_os1 << " " << ez * 57.295779513082323;
+	*frame_data_os1 << " " << ex * 57.295779513082323;
+	*frame_data_os1 << " " << ey * 57.295779513082323;
+	frame_data += frame_data_os1->str();
+	delete frame_data_os1;
 
 //*_record_output << " }";
 
@@ -471,22 +464,34 @@ bool MeController::print_bvh_motion( SkJoint* joint_p, int depth )	{
 	int num_child = joint_p->num_children();
 	for( i = 0; i < num_child; i++ )	{
 		SkJoint* child_p = joint_p->child( i );
-		print_bvh_motion( child_p, depth + 1 );
+		print_bvh_motion( child_p, depth + 1, frame_data );
 	}
 
 	return( true );
 }
 
-bool MeController::init_record( void )	{
+void MeController::record_stop()	{
+	stop_record();
+	cout << "MeController::record_stop"<<endl;
+}
+
+void MeController::record_clear()	{
+	_frames->clear();
+}
+
+void MeController::record_write( const char *full_prefix ) {
+	
+	_record_full_prefix = std::string(full_prefix);
 	string filename;
 	ostringstream record_id_oss;
 
+	_invocation_count++;
 	if( _name == NULL )	{
 		name( "noname" );
 	}
 	record_id_oss << _instance_id << "." << _invocation_count << "_R";
 	string recordname = string( controller_type() ) + "_" + string( _name ) + "_" + record_id_oss.str();
-
+	
 	if( _record_mode == RECORD_BVH_MOTION )	{
 		filename = _record_full_prefix + recordname + ".bvh";
 		_record_output = new SrOutput( filename.c_str(), "w" );
@@ -496,21 +501,17 @@ bool MeController::init_record( void )	{
 			skeleton_p = _context->channels().skeleton();
 		}
 		if( skeleton_p == NULL )	{
-			cout << "MeController::init_record NOTICE: SkSkeleton not available" << endl;
+			cout << "MeController::record_write NOTICE: SkSkeleton not available" << endl;
 			_record_mode = RECORD_NULL;
-			return( false );
 		}
 		
 		*_record_output << "HIERARCHY\n";
 		print_bvh_hierarchy( skeleton_p->root(), 0 );
-
 		*_record_output << "MOTION\n";
-		*_record_output << "Frames: " << _record_num_frames << srnl;	
+		*_record_output << "Frames: " << _frames->size() << srnl;	
 		*_record_output << "Frame Time: " << _record_dt << srnl;	
-
 //		load_bvh_joint_hmap();
-
-		cout << "MeController::init_record BVH: " << filename << endl;
+		cout << "MeController::write_record BVH: " << filename << endl;
 	}
 	else
 	if( _record_mode == RECORD_MOTION )	{
@@ -525,27 +526,29 @@ bool MeController::init_record( void )	{
 
 		SkChannelArray& channels = controller_channels();
 		*_record_output << channels << srnl;
-		*_record_output << "frames " << _record_num_frames << srnl;	
+		*_record_output << "frames " << _frames->size() << srnl;	
 
-		cout << "MeController::init_record SKM: " << filename << endl;
+		cout << "MeController::write_record SKM: " << filename << endl;
 	}
 	else	{
 		cout << "MeController::init_record NOTICE: POSE not implemented" << endl;
 		_record_mode = RECORD_NULL;
-		return( false );
+		_frames->clear();
 		//filename = _record_full_prefix + recordname + ".skp";
 	}
-
-	_recording = true;
-	return( true );
+	std::list<FRAME>::iterator iter = _frames->begin();
+	std::list<FRAME>::iterator end  = _frames->end();
+	for(;iter!=end; iter++)
+		*_record_output<<(*iter).c_str()<<srnl;
+	record_clear();
+	if( _record_output )	{
+		delete _record_output;
+		_record_output = NULL;
+	}
 }
 
 void MeController::cont_record( double time, MeFrameData& frame )	{
 	
-	if( _record_frame_count >= _record_num_frames )	{
-		stop_record();
-		return;
-	}
 	if( time < 0.0001 ) time = 0.0;
 
 	if( _record_mode == RECORD_BVH_MOTION )	{
@@ -559,17 +562,20 @@ void MeController::cont_record( double time, MeFrameData& frame )	{
 			_record_mode = RECORD_NULL;
 			return;
 		}
-
+		FRAME frame_data;
+		frame_data.clear();
 		// NOTE: depth only used to hack STUPID-POLYTRANS ROOT bug
-		print_bvh_motion( skeleton_p->root(), 0 );
-		*_record_output << srnl;
+		print_bvh_motion( skeleton_p->root(), 0, frame_data );		
+		if((_record_frame_count>=_record_max_frames)&&(_record_max_frames!=0))
+			_frames->pop_front();
+		_frames->push_back(frame_data);
 	}
 	else
 	if( _record_mode == RECORD_MOTION )	{
-
-		ostringstream key_time_oss;
-		key_time_oss << "kt " << time << " fr ";
-		*_record_output << key_time_oss.str().c_str();
+		FRAME frame_data;
+		frame_data.clear();
+		ostringstream frame_data_os;
+		frame_data_os << "kt " << time << " fr ";
 
 		SkChannelArray& channels = controller_channels();
 		int num_channels = channels.size();
@@ -587,33 +593,33 @@ void MeController::cont_record( double time, MeFrameData& frame )	{
 				SrVec axis = q.axis();
 				float ang = q.angle();
 				axis.len ( ang );		
-				*_record_output << axis.x << " ";
-				*_record_output << axis.y << " ";
-				*_record_output << axis.z << " ";
+				frame_data_os << axis.x << " ";
+				frame_data_os << axis.y << " ";
+				frame_data_os << axis.z << " ";
 			}
 			else
 			for( j=0; j<channel_size; j++ )	{
-				*_record_output << buff[ index + j ] << " ";
+				frame_data_os << buff[ index + j ] << " ";
 			}
 		}
-		*_record_output << srnl;
+		frame_data += frame_data_os.str();
+		if((_record_frame_count>=_record_max_frames)&&(_record_max_frames!=0))
+			_frames->pop_front();
+		_frames->push_back(frame_data);
 	}
-
 	_record_frame_count++;
 }
 
 void MeController::stop_record( void )	{
-	_recording = false;
 	_record_mode = RECORD_NULL;
-	_record_num_frames = 0;
+	_record_max_frames = 0;
 	_record_frame_count = 0;
 	if( _record_output )	{
 		delete _record_output;
 		_record_output = NULL;
 	}
-
-	string filename;
-	cout << "MeController::stop_record" << endl;
+	_frames->clear();
+//	cout << "MeController::stop_record" << endl;
 }
 
 void MeController::output ( SrOutput& o )

@@ -26,6 +26,7 @@
 #define ME_CONTROLLER_H
 
 #include <string>
+#include <list>
 
 #include <SR/sr_hash_table.h>
 #include <SR/sr_buffer.h>
@@ -78,8 +79,8 @@ class MeController
 private :
 	static int instance_count;
 
-	int _instance_id;
-	int _invocation_count;
+	int _instance_id;		// character being recorded
+	int _invocation_count;	// number of times outputing recording files	
 
     char* _name;              // a name for this controller
     float _indt;              // initial period for blending, eg static or prep phase
@@ -116,18 +117,19 @@ protected :
 	};
 
 	// motion recording state: output controller results to SkMotion file:
-	bool		_recording;
 	int			_record_mode;
 	std::string	_record_full_prefix;
 //	std::string	_record_bvh_root_name;
-	int			_record_num_frames;
 	int			_record_frame_count;
 	SrOutput	*_record_output; // for recording poses and motions of immediate local results
 	double		_record_dt;
 //	SrHashTable<const char*>(256) _record_joint_hmap;
 //	SrHashTable <SkJointName*>(256) _record_joint_hmap;
 //	int 		_record_tree_state; // tracking outside/inside/culled branches for bvh recording
-	
+	typedef std::string FRAME;
+	std::list<FRAME>	*_frames;	// buffer to store the frame data
+	int			_record_max_frames; // maximum capacity of the buffer
+
 protected :
     /*! Constructor */
     MeController ();
@@ -248,8 +250,11 @@ public :
     void evaluate ( double t, MeFrameData& frame );
 
 //	void record_pose( const char *full_prefix );
-	void record_motion( const char *full_prefix, int num_frames );
-	void record_bvh( const char *full_prefix, int num_frames, double dt );
+	void record_motion( int max_num_of_frames );			//record start SKM
+	void record_bvh( int max_num_of_frames, double dt );	//record start BVH
+	void record_write( const char *full_prefix );			//write the buffer to files
+	void record_clear(void);								//clear the buffer
+	void record_stop(void);									//stop the recording
 //	void record_bvh( const char *full_prefix, const char* skel_root, int num_frames, double dt  );
 
 #if ME_CONTROLLER_ENABLE_XMLIFY
@@ -262,10 +267,10 @@ public :
 	void print_tabs( int depth );
 	bool print_bvh_hierarchy( SkJoint* joint_p, int depth );
 	// NOTE: depth only used to hack STUPID-POLYTRANS ROOT bug
-	bool print_bvh_motion( SkJoint* joint_p, int depth );
+	bool print_bvh_motion( SkJoint* joint_p, int depth, FRAME& frame_data );
 	void load_bvh_joint_hmap( void );
 
-	bool init_record( void );
+//	bool init_record( void );
 	void cont_record( double time, MeFrameData& frame );
 	void stop_record( void );
 
