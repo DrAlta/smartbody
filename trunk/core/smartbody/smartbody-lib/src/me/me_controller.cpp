@@ -360,7 +360,7 @@ bool MeController::print_bvh_hierarchy( SkJoint* joint_p, int depth )	{
 		SrVec offset_v = joint_p->offset();
 
 	// STUPID-POLYTRANS subtracts OFFSET instead of adds
-#define STUPID_POLYTRANS_FLIP_OFFSET 1
+#define STUPID_POLYTRANS_FLIP_OFFSET 0
 #if STUPID_POLYTRANS_FLIP_OFFSET
 		*_record_output << -offset_v.x << " ";
 		*_record_output << -offset_v.y << " ";
