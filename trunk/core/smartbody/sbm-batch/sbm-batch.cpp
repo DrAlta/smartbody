@@ -74,6 +74,12 @@ void tt_client_callback( const char * op, const char * args, void * user_data )
 }
 
 
+double get_time()
+{
+   return( (double)timeGetTime() / 1000.0 );
+}
+
+
 int main( int argc, char ** argv )
 {
    printf( "Starting VHMsg\n" );
@@ -109,7 +115,7 @@ int main( int argc, char ** argv )
    bool loop = true;
    while ( loop )
    {
-      sbm->Update();
+      sbm->Update( get_time() );
       vhmsg::ttu_poll();
 
 
