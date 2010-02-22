@@ -1,5 +1,5 @@
 /*
- *  behavior_scheduler_linear.cpp - part of SmartBody-lib
+ *  behavior_scheduler_constant_speed.cpp - part of SmartBody-lib
  *  Copyright (C) 2008  University of Southern California
  *
  *  SmartBody-lib is free software: you can redistribute it and/or
