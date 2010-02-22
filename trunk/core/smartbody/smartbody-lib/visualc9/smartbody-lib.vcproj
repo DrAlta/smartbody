@@ -1148,6 +1148,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\sbm\behavior_scheduler_fixed.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\behavior_scheduler_fixed.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\sbm\behavior_span.cpp"
 					>
 				</File>

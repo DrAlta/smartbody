@@ -1,5 +1,5 @@
 /*
- *  behavior_scheduler_linear.hpp - part of SmartBody-lib
+ *  behavior_scheduler_constant_speed.hpp - part of SmartBody-lib
  *  Copyright (C) 2008  University of Southern California
  *
  *  SmartBody-lib is free software: you can redistribute it and/or
@@ -20,8 +20,8 @@
  *      Andrew n marshall, USC
  */
 
-#ifndef LINEAR_BEHAVIOR_SCHEDULER_HPP
-#define LINEAR_BEHAVIOR_SCHEDULER_HPP
+#ifndef BEHAVIOR_SCHEDULER_CONSTANT_SPEED_HPP
+#define BEHAVIOR_SCHEDULER_CONSTANT_SPEED_HPP
 
 #include "behavior_scheduler.hpp"
 #include "ME/me_controller.h"
@@ -90,4 +90,4 @@ namespace BML {
 
 } // namespace BML
 
-#endif // LINEAR_BEHAVIOR_SCHEDULER_HPP
+#endif // BEHAVIOR_SCHEDULER_CONSTANT_SPEED_HPP
