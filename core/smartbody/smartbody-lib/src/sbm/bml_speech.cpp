@@ -435,9 +435,10 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 			command.str( "" );
 			command << "char " << actor_id << " viseme " << v->id() << ' ' << v->weight() << ' ';
 			if( v->duration() > 0 ) {
-				// speech implementation doesn't appear to support durations.
 				command << v->duration();
 			} else {
+				// speech implementation doesn't appear to support durations.
+				// using 0.1 transition duration (and starting transition early)
 				command << "0.1";
 				time -= (time_sec)0.05;
 			}
