@@ -36,8 +36,14 @@ namespace BML {
 	 *  Often used by controller-based behaviors.
 	 */
 	class BehaviorSchedulerFixed : public BehaviorScheduler {
+		private:
+			// Ordered list of SynchPoint names to time in seconds after start
+			//   include "start" => 0?
+			std::vector<std::pair<std::string,float>> sync_point_times;
+
 		public:
-			BehaviorSchedulerFixed( /* TODO */ );
+			BehaviorSchedulerFixed( const std::map<std::string,float>& sync_point_times );
+			BehaviorSchedulerFixed( const std::vector<std::pair<std::string,float>>& sync_point_times );
 			virtual void schedule( SyncPoints& syncs, time_sec now );
 	};
 	typedef boost::shared_ptr<BehaviorSchedulerFixed> BehaviorSchedulerFixedPtr;
