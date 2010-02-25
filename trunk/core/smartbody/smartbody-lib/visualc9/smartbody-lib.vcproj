@@ -232,6 +232,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\me\me_ct_adshr_envelope.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\me\me_ct_adshr_envelope.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\me\me_ct_blend.cpp"
 					>
 				</File>
@@ -345,6 +353,14 @@
 				</File>
 				<File
 					RelativePath="..\src\sbm\me_ct_navigation_waypoint.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\me\me_ct_periodic_replay.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\me\me_ct_periodic_replay.hpp"
 					>
 				</File>
 				<File
