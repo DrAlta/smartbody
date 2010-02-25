@@ -438,7 +438,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 				command << v->duration();
 			} else {
 				// speech implementation doesn't appear to support durations.
-				// using 0.1 transition duration (and starting transition early)
+				// using 0.1 transition duration (and start transition early)
 				command << "0.1";
 				time -= (time_sec)0.05;
 			}
