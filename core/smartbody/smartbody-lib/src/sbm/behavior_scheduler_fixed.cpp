@@ -20,6 +20,7 @@
  *      Andrew n marshall, USC
  */
 
+#include <map>
 #include "bml.hpp"
 #include "behavior_scheduler_fixed.hpp"
 
@@ -30,15 +31,20 @@ using namespace BML;
 const bool LOG_ABNORMAL_SPEED = false;
 
 
+// local utility function
+
 
 /////////////////////////////////////////////////////////////////////////////
 //  BehaviorSchedulerLinear
 //
 
+BehaviorSchedulerFixed::BehaviorSchedulerFixed( const std::map<std::string,float>& sync_point_tdimes ) {
+	// TODO
+}
 
-BehaviorSchedulerFixed::BehaviorSchedulerFixed()
-	/* TODO */
-{}
+BehaviorSchedulerFixed::BehaviorSchedulerFixed( const std::vector<std::pair<std::string,float>>& sync_point_times ) {
+	// TODO
+}
 
 
 void BehaviorSchedulerFixed::schedule( SyncPoints& syncs, time_sec now ) {
