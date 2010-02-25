@@ -31,7 +31,8 @@ const char* MeCtAdshrEnvelope::CONTROLLER_TYPE = "MeCtAdshrEnvelope";
 
 
 MeCtAdshrEnvelope::MeCtAdshrEnvelope()
-:	_amplitude( 1.0 ),
+:	_base_level( 0.0 ),
+	_amplitude( 1.0 ),
 	_attack( 1.0 ),
 	_decay( 0.0 ),
 	_sustain( 1.0 ),
