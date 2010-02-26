@@ -40,6 +40,7 @@
 #include "sbm_speech.hpp"
 
 #include <ME/me_ct_scheduler2.h>
+#include <ME/me_ct_periodic_replay.hpp>
 #include <sbm/me_ct_face.h>
 #include <sbm/me_ct_eyelid.h>
 #define MeCtSchedulerClass MeCtScheduler2
@@ -148,6 +149,7 @@ public:
 	MeCtSchedulerClass*	posture_sched_p; // legs / stance / posture
 	MeCtSchedulerClass*	motion_sched_p;  // full body motions
 	MeCtSchedulerClass*	gaze_sched_p;    // back / chest / spine
+	MeCtPeriodicReplay* blink_ct_p;
 	// TODO: Arms
 	// TODO: Hands
 	MeCtSchedulerClass*	head_sched_p; // neck / head orientation
