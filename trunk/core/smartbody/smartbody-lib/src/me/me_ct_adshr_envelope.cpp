@@ -75,6 +75,8 @@ bool MeCtAdshrEnvelope::init( SkChannelArray& channels ) {
 
 	// Initialize superclass anyway
 	MeController::init ();
+
+	return true;
 }
 
 void MeCtAdshrEnvelope::amplitude( float amplitude ) {
