@@ -34,7 +34,10 @@ const char* MeCtPeriodicReplay::CONTROLLER_TYPE = "MeCtPeriodicReplay";
 
 
 MeCtPeriodicReplay::MeCtPeriodicReplay( MeController* child )
-:	MeCtUnary( new MeCtUnary::Context(this), child )
+:	MeCtUnary( new MeCtUnary::Context(this), child ),
+	period( 0 ),
+	period_offset( 0 ),
+	child_time_offset( 0 )
 {
 	if( child ) {
 		_sub_context->add_controller( child );
@@ -61,8 +64,11 @@ double MeCtPeriodicReplay::controller_duration() {
 
 bool MeCtPeriodicReplay::controller_evaluate( double t, MeFrameData & frame ) {
 	if( child() ) {
-		t = fmod( t-period_offset, period ) + child_time_offset;;
-		child()->evaluate( t, frame );
+		double temp1 = t - period_offset;
+		double temp2 = fmod( temp1, period );
+		double temp3 = temp2+child_time_offset;
+		//t = fmod( t-period_offset, period ) + child_time_offset;;
+		child()->evaluate( temp3, frame );
 		return true;
 	} else {
 		return false;

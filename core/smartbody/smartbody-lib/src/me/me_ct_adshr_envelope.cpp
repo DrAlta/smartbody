@@ -128,7 +128,7 @@ bool MeCtAdshrEnvelope::controller_evaluate( double time, MeFrameData& frame ) {
 	// Calculate the value to write
 	// (could be optimized by precomputing durations realtive to start)
 	float value;
-	if( time < 0 || time < controller_duration() ) {
+	if( time < 0 || time > controller_duration() ) {
 		// Beyond elevelope bounds
 		value = _base_level;
 	} else {
@@ -137,7 +137,7 @@ bool MeCtAdshrEnvelope::controller_evaluate( double time, MeFrameData& frame ) {
 			// In attack
 			value = interpolate( _base_level, _amplitude, ftime/_attack );
 		} else {
-			time -= _attack;
+			ftime -= _attack;
 			if( ftime < _decay ) {
 				// In decay
 				value = interpolate( _amplitude, _sustain, ftime/_decay );

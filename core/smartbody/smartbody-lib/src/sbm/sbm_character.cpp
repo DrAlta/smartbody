@@ -31,6 +31,7 @@
 
 
 #include <SK/sk_skeleton.h>
+#include <ME/me_ct_adshr_envelope.hpp>
 #include <ME/me_ct_blend.hpp>
 #include <ME/me_ct_time_shift_warp.hpp>
 #include "mcontrol_util.h"
@@ -41,6 +42,12 @@
 const bool LOG_PRUNE_CMD_TIME                        = false;
 const bool LOG_CONTROLLER_TREE_PRUNING               = false;
 const bool LOG_PRUNE_TRACK_WITHOUT_BLEND_SPLIE_KNOTS = false;
+
+const float BLINK_SHUTTING_DURATION    = 0.05;
+const float BLINK_OPENING_DURATION     = 0.2;
+const float BLINK_MIN_REPEAT_DURATION  = 4.0;  // how long to wait until the next blink
+const float BLINK_MAX_REPEAT_DURATION  = 8.0;  // will pick a random number between these min/max
+
 
 
 using namespace std;
@@ -62,7 +69,6 @@ const char* SbmCharacter::ORIENTATION_TARGET  = "orientation_target";
 
 MeCtSchedulerClass* CreateSchedulerCt( const char* character_name, const char* sched_type_name ) {
 	MeCtSchedulerClass* sched_p = new MeCtSchedulerClass();
-	sched_p->ref();
 	sched_p->active_when_empty( true );
 	string sched_name( character_name );
 	sched_name += "'s ";
@@ -80,11 +86,16 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	posture_sched_p( CreateSchedulerCt( character_name, "posture" ) ),
 	motion_sched_p( CreateSchedulerCt( character_name, "motion" ) ),
 	gaze_sched_p( CreateSchedulerCt( character_name, "gaze" ) ),
+	blink_ct_p( NULL ),
 	head_sched_p( CreateSchedulerCt( character_name, "head" ) ),
 	face_ct( NULL ),
 	eyelid_ct( new MeCtEyeLid() ),
 	face_neutral( NULL )
 {
+	posture_sched_p->ref();
+	motion_sched_p->ref();
+	gaze_sched_p->ref();
+	head_sched_p->ref();
 	eyelid_ct->ref();
 
 	bonebusCharacter = NULL;
@@ -99,6 +110,8 @@ SbmCharacter::~SbmCharacter( void )	{
 	posture_sched_p->unref();
 	motion_sched_p->unref();
 	gaze_sched_p->unref();
+	if( blink_ct_p )
+		blink_ct_p->unref();
 	head_sched_p->unref();
 	if( face_ct )
 		face_ct->unref();
@@ -138,6 +151,26 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		face_neutral->ref();
 		this->au_motion_map     = au_motion_map;
 		this->viseme_motion_map = viseme_motion_map;
+
+		// drive the blink via action units
+		{
+			MeCtAdshrEnvelope* adshr_ct = new MeCtAdshrEnvelope();
+			ostringstream adshr_name;
+			adshr_name << name << "'s blink envelope";
+			adshr_ct->name( adshr_name.str().c_str() );
+			adshr_ct->envelope( (float)0.9, BLINK_SHUTTING_DURATION, 0, (float)0.9, 0, BLINK_OPENING_DURATION );  // I miss the Java 'f' syntax
+			SkChannelArray blink_channels;
+			blink_channels.add( "au_45_left", SkChannel::XPos );
+			blink_channels.add( "au_45_right", SkChannel::XPos );
+			adshr_ct->init( blink_channels );
+
+			blink_ct_p = new MeCtPeriodicReplay( adshr_ct );
+			blink_ct_p->ref();
+			ostringstream replay_name;
+			replay_name << name << "'s blink replay";
+			blink_ct_p->name( replay_name.str().c_str() );
+			blink_ct_p->init( ( BLINK_MIN_REPEAT_DURATION + BLINK_MAX_REPEAT_DURATION ) /2 );  // duration between blinks
+		}
 	}
 
 	int result=SbmPawn::init( new_skeleton_p );
@@ -156,12 +189,19 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	posture_sched_p->init();
 	motion_sched_p->init();
 	gaze_sched_p->init();
+
+	// Blink controller before head group (where visemes are controlled)
+	if( blink_ct_p != NULL ) {
+		ct_tree_p->add_controller( blink_ct_p );
+	}
+
 	head_sched_p->init();
 
 	// Add Prioritized Schedule Controllers to the Controller Tree
 	ct_tree_p->add_controller( posture_sched_p );
 	ct_tree_p->add_controller( motion_sched_p );
 	ct_tree_p->add_controller( gaze_sched_p );
+	ct_tree_p->add_controller( blink_ct_p );
 	ct_tree_p->add_controller( head_sched_p );
 	ct_tree_p->name( std::string(name)+"'s ct_tree" );
 
@@ -780,8 +820,6 @@ void prune_schedule( SbmCharacter*   actor,
  *  what types of controllers will overwrite the results of
  *  of other types of controllers. Fails to recognize partial
  *  body motions and partial spine gazes.
- *
- *  What a glorious hack before I leave for China...  - Anm
  */
 int SbmCharacter::prune_controller_tree( mcuCBHandle* mcu_p ) {
 	double time = mcu_p->time;  // current time
@@ -930,11 +968,7 @@ int SbmCharacter::set_viseme( char* viseme,
 
 void SbmCharacter::eye_blink_update( const double frame_time )
 {
-   // automatic blinking routine
-   static const double blink_down_time = 0.04;       // how long the eyes should stay closed. ~1 frame
-   static const double min_blink_repeat_time = 4.0;  // how long to wait until the next blink
-   static const double max_blink_repeat_time = 8.0;  // will pick a random number between these min/max
-
+   // automatic blinking routine using bonebus viseme commands
    mcuCBHandle& mcu = mcuCBHandle::singleton();
 
    if ( !eye_blink_closed )
@@ -942,8 +976,7 @@ void SbmCharacter::eye_blink_update( const double frame_time )
       if ( frame_time - eye_blink_last_time > eye_blink_repeat_time )
       {
          // close the eyes
-         //bonebusCharacter->SetViseme( "blink", 0.9f, 0.001f );
-         set_viseme( "au_45", 0.9f, mcu.time, 0.001f );
+		 bonebusCharacter->SetViseme( "blink", 0.9f, BLINK_SHUTTING_DURATION );
 
          eye_blink_last_time = frame_time;
          eye_blink_closed = true;
@@ -951,18 +984,17 @@ void SbmCharacter::eye_blink_update( const double frame_time )
    }
    else
    {
-      if ( frame_time - eye_blink_last_time > blink_down_time )
+      if ( frame_time - eye_blink_last_time > BLINK_SHUTTING_DURATION )
       {
          // open the eyes
-         //bonebusCharacter->SetViseme( "blink", 0, 0.001f );
-         set_viseme( "au_45", 0, mcu.time, 0.001f );
+		 bonebusCharacter->SetViseme( "blink", 0, BLINK_OPENING_DURATION );
 
          eye_blink_last_time = frame_time;
          eye_blink_closed = false;
 
          // compute when to close them again
          double fraction = (double)rand() / (double)RAND_MAX;
-         eye_blink_repeat_time = ( fraction * ( max_blink_repeat_time - min_blink_repeat_time ) ) + min_blink_repeat_time;
+         eye_blink_repeat_time = ( fraction * ( BLINK_MAX_REPEAT_DURATION - BLINK_MIN_REPEAT_DURATION ) ) + BLINK_MIN_REPEAT_DURATION;
       }
    }
 }
