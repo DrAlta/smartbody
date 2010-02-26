@@ -43,10 +43,10 @@ const bool LOG_PRUNE_CMD_TIME                        = false;
 const bool LOG_CONTROLLER_TREE_PRUNING               = false;
 const bool LOG_PRUNE_TRACK_WITHOUT_BLEND_SPLIE_KNOTS = false;
 
-const float BLINK_SHUTTING_DURATION    = 0.05;
-const float BLINK_OPENING_DURATION     = 0.2;
-const float BLINK_MIN_REPEAT_DURATION  = 4.0;  // how long to wait until the next blink
-const float BLINK_MAX_REPEAT_DURATION  = 8.0;  // will pick a random number between these min/max
+const float BLINK_SHUTTING_DURATION    = 0.05f;
+const float BLINK_OPENING_DURATION     = 0.2f;
+const float BLINK_MIN_REPEAT_DURATION  = 4.0f;  // how long to wait until the next blink
+const float BLINK_MAX_REPEAT_DURATION  = 8.0f;  // will pick a random number between these min/max
 
 
 
@@ -976,7 +976,15 @@ void SbmCharacter::eye_blink_update( const double frame_time )
       if ( frame_time - eye_blink_last_time > eye_blink_repeat_time )
       {
          // close the eyes
-		 bonebusCharacter->SetViseme( "blink", 0.9f, BLINK_SHUTTING_DURATION );
+         if ( bonebusCharacter )
+         {
+            bonebusCharacter->SetViseme( "blink", 0.9f, BLINK_SHUTTING_DURATION );
+         }
+
+         if ( mcu.sbm_character_listener )
+         {
+            mcu.sbm_character_listener->OnViseme( name, string( "blink" ), 0.9f, BLINK_SHUTTING_DURATION );
+         }
 
          eye_blink_last_time = frame_time;
          eye_blink_closed = true;
@@ -987,7 +995,15 @@ void SbmCharacter::eye_blink_update( const double frame_time )
       if ( frame_time - eye_blink_last_time > BLINK_SHUTTING_DURATION )
       {
          // open the eyes
-		 bonebusCharacter->SetViseme( "blink", 0, BLINK_OPENING_DURATION );
+         if ( bonebusCharacter )
+         {
+            bonebusCharacter->SetViseme( "blink", 0, BLINK_OPENING_DURATION );
+         }
+
+         if ( mcu.sbm_character_listener )
+         {
+            mcu.sbm_character_listener->OnViseme( name, "blink", 0, BLINK_OPENING_DURATION );
+         }
 
          eye_blink_last_time = frame_time;
          eye_blink_closed = false;
