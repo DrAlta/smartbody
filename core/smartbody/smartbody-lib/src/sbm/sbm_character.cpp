@@ -139,49 +139,23 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
                         const VisemeMotionMap* viseme_motion_map,
                         const char* unreal_class )
 {
-	if( face_neutral ) {
-		// Assume the rest of the face channel data is also set
-		face_ct = new MeCtFace();
-		face_ct->ref();
-
-		string face_ct_name( name );
-		face_ct_name += "'s face_ct";
-		face_ct->name( face_ct_name.c_str() );
-
+	if( face_neutral ) {  // Assume the rest of the face channel data is also set
 		// Store pointers for access via init_skeleton()
 		this->face_neutral      = face_neutral;
 		face_neutral->ref();
 		this->au_motion_map     = au_motion_map;
 		this->viseme_motion_map = viseme_motion_map;
-
-		// drive the blink via action units
-		{
-			MeCtAdshrEnvelope* adshr_ct = new MeCtAdshrEnvelope();
-			ostringstream adshr_name;
-			adshr_name << name << "'s blink envelope";
-			adshr_ct->name( adshr_name.str().c_str() );
-			adshr_ct->envelope( (float)0.9, BLINK_SHUTTING_DURATION, 0, (float)0.9, 0, BLINK_OPENING_DURATION );  // I miss the Java 'f' syntax
-			SkChannelArray blink_channels;
-			blink_channels.add( "au_45_left", SkChannel::XPos );
-			blink_channels.add( "au_45_right", SkChannel::XPos );
-			adshr_ct->init( blink_channels );
-
-			blink_ct_p = new MeCtPeriodicReplay( adshr_ct );
-			blink_ct_p->ref();
-			ostringstream replay_name;
-			replay_name << name << "'s blink replay";
-			blink_ct_p->name( replay_name.str().c_str() );
-			blink_ct_p->init( ( BLINK_MIN_REPEAT_DURATION + BLINK_MAX_REPEAT_DURATION ) /2 );  // duration between blinks
-		}
 	}
 
-	int result=SbmPawn::init( new_skeleton_p );
-	if( result!=CMD_SUCCESS ) {
-		return( result ); 
+	int init_result = SbmPawn::init( new_skeleton_p );  // Indirectly calls init_skeleton 
+	if( init_result!=CMD_SUCCESS ) {
+		return( init_result ); 
 	}
 
 	if( face_neutral ) {
-		// Clear pointer data
+		init_face_controllers();  // Should I pass in the viseme_motion_map and au_motion_map here so face_ct can be initialized in here?
+
+		// Clear pointer data no longer used after this point in initialization.
 		this->viseme_motion_map = NULL;
 		this->au_motion_map     = NULL;
 		face_neutral->unref();
@@ -450,7 +424,15 @@ int SbmCharacter::init_skeleton() {
 	}
 
 	if( face_neutral ) {
-		// Face assets are defined, so initialize the face controller and related assets.
+		// Unlike other controllers, face_ct is constructed and initialized in
+		// init_skelton because it initialized by data in the au_motion_map
+		// and viseme_motion_map that is not available later.
+		face_ct = new MeCtFace();
+		face_ct->ref();
+
+		string face_ct_name( name );
+		face_ct_name += "'s face_ct";
+		face_ct->name( face_ct_name.c_str() );
 
 		face_ct->init( face_neutral );
 	
@@ -487,8 +469,6 @@ int SbmCharacter::init_skeleton() {
 
 						// Create the AU control channel
 						add_face_channel( name, wo_index );
-						
-						// TODO: Add to au_channel_map
 
 						// Register control channel with face controller
 						face_ct->add_key( name.c_str(), au->right.get() );
@@ -501,8 +481,6 @@ int SbmCharacter::init_skeleton() {
 
 						// Create the AU control channel
 						add_face_channel( name, wo_index );
-						
-						// TODO: Add to au_channel_map
 
 						// Register control channel with face controller
 						face_ct->add_key( name.c_str(), au->left.get() );
@@ -523,8 +501,6 @@ int SbmCharacter::init_skeleton() {
 					// Create the Viseme control channel
 					add_face_channel( name, wo_index );
 					
-					// TODO: Add to au_channel_map
-
 					// Register control channel with face controller
 					face_ct->add_key( name.c_str(), motion );
 				}
@@ -538,6 +514,30 @@ int SbmCharacter::init_skeleton() {
 	skeleton_p->make_active_channels();
 
 	return CMD_SUCCESS;
+}
+
+void SbmCharacter::init_face_controllers() {
+	// face_ct is actually initialized in init_skeleton to reduce 
+	// because it's initialization depends on the au_motion_map and viseme_motion_map.
+
+	{	// drive the blink via action units
+		MeCtAdshrEnvelope* adshr_ct = new MeCtAdshrEnvelope();
+		ostringstream adshr_name;
+		adshr_name << name << "'s blink envelope";
+		adshr_ct->name( adshr_name.str().c_str() );
+		adshr_ct->envelope( (float)0.9, BLINK_SHUTTING_DURATION, 0, (float)0.9, 0, BLINK_OPENING_DURATION );  // I miss the Java 'f' syntax
+		SkChannelArray blink_channels;
+		blink_channels.add( "au_45_left", SkChannel::XPos );
+		blink_channels.add( "au_45_right", SkChannel::XPos );
+		adshr_ct->init( blink_channels );
+
+		blink_ct_p = new MeCtPeriodicReplay( adshr_ct );
+		blink_ct_p->ref();
+		ostringstream replay_name;
+		replay_name << name << "'s blink replay";
+		blink_ct_p->name( replay_name.str().c_str() );
+		blink_ct_p->init( ( BLINK_MIN_REPEAT_DURATION + BLINK_MAX_REPEAT_DURATION ) /2 );  // duration between blinks
+	}
 }
 
 bool test_ct_for_pruning( MeCtScheduler2::TrackPtr track ) {
