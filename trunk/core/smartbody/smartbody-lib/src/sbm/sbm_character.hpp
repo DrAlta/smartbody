@@ -226,6 +226,12 @@ protected:
 	virtual int init_skeleton();
 
 	/*!
+	 *  Initialize the controllers that drive the viseme, AU, and face bones
+	 *  Only called when the neutral face pose is defined (used by MeCtFace).
+	 */
+	virtual void init_face_controllers();
+
+	/*!
 	 *   Initializes a viseme that is implemented by one channel and/or one bonebus command.
 	 *   Either parameter may be NULL.
 	 */
