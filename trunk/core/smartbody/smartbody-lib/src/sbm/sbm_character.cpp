@@ -43,6 +43,8 @@ const bool LOG_PRUNE_CMD_TIME                        = false;
 const bool LOG_CONTROLLER_TREE_PRUNING               = false;
 const bool LOG_PRUNE_TRACK_WITHOUT_BLEND_SPLIE_KNOTS = false;
 
+const bool ENABLE_EYELID_CORRECTIVE_CT = false;
+
 const float BLINK_SHUTTING_DURATION    = 0.05f;
 const float BLINK_OPENING_DURATION     = 0.2f;
 const float BLINK_MIN_REPEAT_DURATION  = 4.0f;  // how long to wait until the next blink
@@ -208,7 +210,10 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	// Face controller
 	if( face_neutral ) {
 		ct_tree_p->add_controller( face_ct );
+#if ENABLE_EYELID_CORRECTIVE_CT
+		eyelid_ct->init();
 		ct_tree_p->add_controller( eyelid_ct );
+#endif
 	}
 
 	bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( name, unreal_class, mcuCBHandle::singleton().net_face_bones );
@@ -528,10 +533,6 @@ int SbmCharacter::init_skeleton() {
 
 		face_ct->finish_adding();
 	}
-
-#if ADD_EYELID_CORRECTIVE_CT
-	eyelid_ct->init();
-#endif
 
 	// Rebuild the active channels to include new joints
 	skeleton_p->make_active_channels();
