@@ -164,6 +164,11 @@ SMARTBODY_DLL_API bool Smartbody_dll::Init()
 
 SMARTBODY_DLL_API bool Smartbody_dll::Shutdown()
 {
+   {
+      mcuCBHandle & mcu = mcuCBHandle::singleton();
+      mcu.vhmsg_send( "vrProcEnd sbm" );
+   }
+
    mcuCBHandle::destroy_singleton();
 
    XMLPlatformUtils::Terminate();
