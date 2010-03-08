@@ -10,15 +10,11 @@
 
 ### Initialize individual modules.
 ### All inlined sequences must have all command times at 0 to run in-order.
-### FAILS: inlines are preprocessed before the above paths are configured.
-#0	seq init-common-assets   inline
-#0	seq init-test-assets     inline
-#0	seq init-common-face     inline
-#
-#0	seq init-test-characters inline
-#0	seq init-test-pawns      inline
-#
-#0	seq init-common-viewer   inline
+0	seq init-common-assets   inline
+0	seq init-test-assets     inline
+0	seq init-common-face     inline
 
-### Temporary solution: (ugly syntax and does not account for durations of children of children)
-0	seq-chain init-common-assets init-test-assets init-common-face init-test-characters init-test-pawns init-common-viewer
+0	seq init-test-characters inline
+0	seq init-test-pawns      inline
+
+0	seq init-common-viewer   inline
