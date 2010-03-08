@@ -531,7 +531,7 @@ void SbmCharacter::init_face_controllers() {
 		blink_channels.add( "au_45_right", SkChannel::XPos );
 		adshr_ct->init( blink_channels );
 
-		blink_ct_p = new MeCtPeriodicReplay( adshr_ct );
+		blink_ct_p = new MeCtPeriodicReplay( adshr_ct );  // TODO: Replace with aperiodic controller, with proper min/max durations
 		blink_ct_p->ref();
 		ostringstream replay_name;
 		replay_name << name << "'s blink replay";
