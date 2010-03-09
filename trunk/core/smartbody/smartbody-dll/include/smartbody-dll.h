@@ -67,6 +67,8 @@ class Smartbody_dll
       SMARTBODY_DLL_API Smartbody_dll();
       SMARTBODY_DLL_API virtual ~Smartbody_dll();
 
+      SMARTBODY_DLL_API void SetSpeechAudiofileBasePath( const std::string & basePath );
+
       SMARTBODY_DLL_API bool Init();
       SMARTBODY_DLL_API bool Shutdown();
 

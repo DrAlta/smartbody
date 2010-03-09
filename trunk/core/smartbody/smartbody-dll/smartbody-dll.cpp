@@ -143,6 +143,13 @@ SMARTBODY_DLL_API Smartbody_dll::~Smartbody_dll()
 }
 
 
+SMARTBODY_DLL_API void Smartbody_dll::SetSpeechAudiofileBasePath( const std::string & basePath )
+{
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   mcu.speech_audiofile_base_path = basePath;
+}
+
+
 SMARTBODY_DLL_API bool Smartbody_dll::Init()
 {
    m_internalListener = new Smartbody_dll_SBMCharacterListener_Internal( this );
@@ -151,6 +158,7 @@ SMARTBODY_DLL_API bool Smartbody_dll::Init()
 
    mcuCBHandle & mcu = mcuCBHandle::singleton();
    mcu.sbm_character_listener = m_internalListener;
+   SetSpeechAudiofileBasePath( "../../" );
 
    InitVHMsg();
    RegisterCallbacks();
