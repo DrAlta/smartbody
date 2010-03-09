@@ -125,7 +125,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const cha
 
 
    char fullAudioPath[ _MAX_PATH ];
-   string relativeAudioPath = (string)"../../../../" + agent->get_voice_code();
+   string relativeAudioPath = mcu.speech_audiofile_base_path + agent->get_voice_code();
    if ( _fullpath( fullAudioPath, relativeAudioPath.c_str(), _MAX_PATH ) == NULL )
    {
       printf( "AudioFileSpeech::requestSpeechAudio ERR: _fullpath() returned NULL\n" );
@@ -137,7 +137,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const cha
 
    // TODO: Should we fail if the .bml file isn't present?
 
-   string bmlFilename = "../../../../" + agent->get_voice_code() + "/" + ref + ".bml";
+   string bmlFilename = mcu.speech_audiofile_base_path + agent->get_voice_code() + "/" + ref + ".bml";
 
    ReadVisemeDataBML( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData );
    if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )

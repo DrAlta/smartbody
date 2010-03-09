@@ -120,6 +120,7 @@ class mcuCBHandle	{
 		const char* net_host;
 		BoneBusClient bonebus;
 		SBMCharacterListener * sbm_character_listener;   // only one listener possible, must be set manually
+		std::string speech_audiofile_base_path;
 		const char* process_id;
 		bool		play_internal_audio;
 		bool		lock_dt; // if true: report fixed dt to animation system

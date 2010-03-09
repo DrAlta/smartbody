@@ -570,6 +570,8 @@ int main( int argc, char **argv )	{
 		}
 	}
 
+	mcu.speech_audiofile_base_path = "../../../../";
+
 	atexit( exit_callback );
 
 	srCmdLine cmdl;
