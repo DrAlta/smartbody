@@ -1141,7 +1141,6 @@ set<string> SbmCharacter::get_face_names() {
 	return names;
 }
 
-
 // HACK to initiate reholster on all QuickDraw controllers
 int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 	const double now = mcu_p->time;
@@ -1481,6 +1480,10 @@ int SbmCharacter::print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				output << '\t' << *it << endl;
 
 			cout << output.str();
+			return CMD_SUCCESS;
+		} else if( sub_attribute == "channels" ) {
+			// TODO: print list of face activating channels (and associated visemes?)
+			cout << "Pending implementation" << endl;
 			return CMD_SUCCESS;
 		} else {
 			cerr << "ERROR: Expected viseme subattribute \"names\".  Found \""<<sub_attribute<<"\"." << endl;
