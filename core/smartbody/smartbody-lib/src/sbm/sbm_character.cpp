@@ -139,25 +139,25 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
                         const VisemeMotionMap* viseme_motion_map,
                         const char* unreal_class )
 {
-	if( face_neutral ) {  // Assume the rest of the face channel data is also set
-		// Store pointers for access via init_skeleton()
+	// Store pointers for access via init_skeleton()
+	if( face_neutral ) {
 		this->face_neutral      = face_neutral;
 		face_neutral->ref();
-		this->au_motion_map     = au_motion_map;
-		this->viseme_motion_map = viseme_motion_map;
 	}
+	this->au_motion_map     = au_motion_map;
+	this->viseme_motion_map = viseme_motion_map;
 
 	int init_result = SbmPawn::init( new_skeleton_p );  // Indirectly calls init_skeleton 
 	if( init_result!=CMD_SUCCESS ) {
 		return( init_result ); 
 	}
 
-	if( face_neutral ) {
-		init_face_controllers();  // Should I pass in the viseme_motion_map and au_motion_map here so face_ct can be initialized in here?
+	init_face_controllers();  // Should I pass in the viseme_motion_map and au_motion_map here so face_ct can be initialized in here?
 
-		// Clear pointer data no longer used after this point in initialization.
-		this->viseme_motion_map = NULL;
-		this->au_motion_map     = NULL;
+	// Clear pointer data no longer used after this point in initialization.
+	this->viseme_motion_map = NULL;
+	this->au_motion_map     = NULL;
+	if( face_neutral ) {
 		face_neutral->unref();
 		this->face_neutral      = NULL;
 	}
@@ -167,10 +167,6 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	gaze_sched_p->init();
 
 	// Blink controller before head group (where visemes are controlled)
-	if( blink_ct_p != NULL ) {
-		ct_tree_p->add_controller( blink_ct_p );
-	}
-
 	head_sched_p->init();
 
 	// Add Prioritized Schedule Controllers to the Controller Tree
@@ -435,78 +431,84 @@ int SbmCharacter::init_skeleton() {
 		face_ct->name( face_ct_name.c_str() );
 
 		face_ct->init( face_neutral );
+	}
 	
+	{	// Generate AU and viseme activation channels.
+		AUMotionMap::const_iterator i   = au_motion_map->begin();
+		AUMotionMap::const_iterator end = au_motion_map->end();
+		
+		for(; i != end; ++i ) {
+			//const int   id = i->first;
+			stringstream id;
+			id << i->first;
+			AUMotionPtr au( i->second );
 
-		{	AUMotionMap::const_iterator i   = au_motion_map->begin();
-			AUMotionMap::const_iterator end = au_motion_map->end();
-			
-			for(; i != end; ++i ) {
-				//const int   id = i->first;
-				stringstream id;
-				id << i->first;
-				AUMotionPtr au( i->second );
+			if( au->is_bilateral() ) {
+				if( au->left ) {
+					string name = "au_";
+					//name += id;
+					name += id.str();
+					name += "_left";
 
-				if( au->is_bilateral() ) {
-					if( au->left ) {
-						string name = "au_";
-						//name += id;
-						name += id.str();
-						name += "_left";
-
-						// Create the AU control channel
-						add_face_channel( name, wo_index );
-						
-						// TODO: Add to au_channel_map (?)
-
-						// Register control channel with face controller
-						face_ct->add_key( name.c_str(), au->left.get() );
-					}
-					if( au->right ) {
-						string name = "au_";
-						//name += id;
-						name += id.str();
-						name += "_right";
-
-						// Create the AU control channel
-						add_face_channel( name, wo_index );
-
-						// Register control channel with face controller
-						face_ct->add_key( name.c_str(), au->right.get() );
-					}
-				} else {
-					if( au->left ) {
-						string name = "au_";
-						//name += id;
-						name += id.str();
-
-						// Create the AU control channel
-						add_face_channel( name, wo_index );
-
-						// Register control channel with face controller
-						face_ct->add_key( name.c_str(), au->left.get() );
-					}
-				}
-			}
-
-			VisemeMotionMap::const_iterator vi   = viseme_motion_map->begin();
-			VisemeMotionMap::const_iterator vend = viseme_motion_map->end();
-			for(; vi != vend; ++vi ) {
-				const string&    id     = vi->first;
-				SkMotion* motion = vi->second;
-
-				if( motion ) {
-					string name = "viseme_";
-					name += id;
-
-					// Create the Viseme control channel
+					// Create the AU control channel
 					add_face_channel( name, wo_index );
 					
+					// TODO: Add to au_channel_map (?)
+
 					// Register control channel with face controller
-					face_ct->add_key( name.c_str(), motion );
+					if( face_ct )
+						face_ct->add_key( name.c_str(), au->left.get() );
+				}
+				if( au->right ) {
+					string name = "au_";
+					//name += id;
+					name += id.str();
+					name += "_right";
+
+					// Create the AU control channel
+					add_face_channel( name, wo_index );
+
+					// Register control channel with face controller
+					if( face_ct )
+						face_ct->add_key( name.c_str(), au->right.get() );
+				}
+			} else {
+				if( au->left ) {
+					string name = "au_";
+					//name += id;
+					name += id.str();
+
+					// Create the AU control channel
+					add_face_channel( name, wo_index );
+
+					// Register control channel with face controller
+					if( face_ct )
+						face_ct->add_key( name.c_str(), au->left.get() );
 				}
 			}
 		}
 
+		VisemeMotionMap::const_iterator vi   = viseme_motion_map->begin();
+		VisemeMotionMap::const_iterator vend = viseme_motion_map->end();
+		for(; vi != vend; ++vi ) {
+			const string&    id     = vi->first;
+			SkMotion* motion = vi->second;
+
+			if( motion ) {
+				string name = "viseme_";
+				name += id;
+
+				// Create the Viseme control channel
+				add_face_channel( name, wo_index );
+				
+				// Register control channel with face controller
+				if( face_ct )
+					face_ct->add_key( name.c_str(), motion );
+			}
+		}
+	}
+
+	if( face_ct ) {
 		face_ct->finish_adding();
 	}
 
@@ -934,7 +936,8 @@ int SbmCharacter::set_viseme( char* viseme,
 				mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, it->c_str(), weight, rampin_duration );
 		}
 
-		if( face_ct != NULL ) {
+		{	// Viseme/AU channel activation
+
 			// iterate over channel_names
 			it  = data->channel_names.begin();
 			end = data->channel_names.end();
