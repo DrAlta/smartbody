@@ -39,11 +39,14 @@ namespace BML {
 		private:
 			// Ordered list of SynchPoint names to time in seconds after start
 			//   include "start" => 0?
-			std::vector<std::pair<std::string,float>> sync_point_times;
+			std::vector<std::pair<std::wstring,float>> sync_point_times;
+
+			// map of sync_point id to the index of the data
+			std::map<std::wstring,unsigned int> map_indices;
 
 		public:
-			BehaviorSchedulerFixed( const std::map<std::string,float>& sync_point_times );
-			BehaviorSchedulerFixed( const std::vector<std::pair<std::string,float>>& sync_point_times );
+			BehaviorSchedulerFixed( const std::vector<std::pair<std::wstring,float>>& sync_point_pairs );
+
 			virtual void schedule( SyncPoints& syncs, time_sec now );
 	};
 	typedef boost::shared_ptr<BehaviorSchedulerFixed> BehaviorSchedulerFixedPtr;
