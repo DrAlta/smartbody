@@ -42,12 +42,18 @@ namespace BML {
 			std::vector<std::pair<std::wstring,float>> sync_point_times;
 
 			// map of sync_point id to the index of the data
-			std::map<std::wstring,unsigned int> map_indices;
+			std::map<std::wstring,unsigned int> sync_id2index;
 
 		public:
 			BehaviorSchedulerFixed( const std::vector<std::pair<std::wstring,float>>& sync_point_pairs );
 
 			virtual void schedule( SyncPoints& syncs, time_sec now );
+
+		protected:
+			/** Compares SyncPoints orderings to provided fixed orderings.
+			 *  Throws SchedulingException if order does not match.
+			 */
+			void validate_ordering( SyncPoints& syncs );
 	};
 	typedef boost::shared_ptr<BehaviorSchedulerFixed> BehaviorSchedulerFixedPtr;
 

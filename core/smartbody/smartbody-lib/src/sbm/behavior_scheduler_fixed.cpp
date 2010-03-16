@@ -28,6 +28,7 @@ using namespace std;
 using namespace BML;
 
 typedef vector<pair<wstring,float>> vec_sync_pairs;
+typedef std::map<std::wstring,unsigned int> map_id_indices;
 
 
 // local utility function
@@ -48,30 +49,71 @@ BehaviorSchedulerFixed::BehaviorSchedulerFixed( const vec_sync_pairs& input ) {
 		float        last_time = 0;
 		unsigned int cur_index = 0;
 
-		// Make sure we deal with start first
-		if( it->first != BML::ATTR_START ) {
-			sync_point_times.push_back( make_pair<wstring,float>( BML::ATTR_START, 0 ) );
-			map_indices.insert( make_pair<wstring,unsigned int>( BML::ATTR_START, cur_index++ ) );
-		}
+		//// Make sure we deal with start first
+		//if( it->first != BML::ATTR_START ) {
+		//	sync_point_times.push_back( make_pair<wstring,float>( BML::ATTR_START, 0 ) );
+		//	sync_id2index.insert( make_pair<wstring,unsigned int>( BML::ATTR_START, cur_index++ ) );
+		//}
 
+		map_id_indices::iterator map_end = sync_id2index.end();
 		for( ; it != end; ++it ) {
 			if( it->second < last_time ) {
-				throw BML::BmlException( "BehaviorSchedulerFixed: Invalid sync point order." );
+				// TODO: include details like id and times.  Don't forget to transcode the wstring.
+				throw BML::BmlException( "BehaviorSchedulerFixed: Invalid sync point timing." );
 			}
 
 			const wstring& sync_id = it->first;
 			last_time = it->second;
 
 			sync_point_times.push_back( make_pair<wstring,float>( sync_id, last_time ) );
-			map_indices.insert( make_pair<wstring,unsigned int>( sync_id, cur_index++ ) );
+			sync_id2index.insert( make_pair<wstring,unsigned int>( sync_id, cur_index++ ) );
 		}
 	} else {
 		throw BML::BmlException( "BehaviorSchedulerFixed: No sync points specified." );
 	}
 }
 
+void BehaviorSchedulerFixed::validate_ordering( SyncPoints& syncs ) {
+	SyncPoints::iterator sp = syncs.begin();
+	SyncPoints::iterator sp_end = syncs.end();
+
+	vec_sync_pairs::iterator it = sync_point_times.begin();
+	vec_sync_pairs::iterator it_end = sync_point_times.begin();
+
+	SyncPoints::iterator last_sp;
+	for( ; it!=it_end; ++it ) {
+		wstring& name = it->first;
+		SyncPointPtr sync = syncs.sync_for_name( name );
+		if( !sync ) {
+			throw BML::SchedulingException( "BehaviorSchedulerFixed: No such SyncPoint." );
+		}
+		SyncPoints::iterator pos = syncs.pos_of( sync );
+		if( pos <= last_sp ) {
+			throw BML::SchedulingException( "BehaviorSchedulerFixed: Out-of-order SyncPoint timing." );
+		}
+	}
+
+	// Success! Valid ordering.
+}
 
 void BehaviorSchedulerFixed::schedule( SyncPoints& syncs, time_sec now ) {
+	// validate the ordering before manipulating the SyncPoints
+	validate_ordering( syncs );
+
 	// Find first sync point that is set
-	// TODO
+	SyncPoints::iterator sp_end = syncs.end();
+	SyncPoints::iterator first_set = syncs.first_scheduled();
+	if( first_set == sp_end ) {
+		// No SyncPoints previously scheduled
+		// Schedule starting at time zero
+		vec_sync_pairs::iterator it = sync_point_times.begin();
+		vec_sync_pairs::iterator it_end = sync_point_times.begin();
+
+		for( ; it!=it_end; ++it ) {
+			SyncPointPtr sync = syncs.sync_for_name( it->first );  // Must exist.  See validate_ordering(..)
+			sync->time = it->second;
+		}
+	} else {
+		// TODO: "Merge" timing data
+	}
 }

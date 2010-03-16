@@ -300,6 +300,12 @@ namespace BML {
 		SyncPoints::iterator end()
 		{	return syncs.end(); }
 
+		/**
+		 *  Returns the position of the first scheduled SyncPointPtr, or end() is none are scheduled.
+		 */
+		SyncPoints::iterator first_scheduled();
+
+
 		SyncPoints::iterator insert( const std::wstring& id, SyncPointPtr sync, SyncPoints::iterator pos ); 
 
 		SetOfWstring get_sync_names();
@@ -325,6 +331,7 @@ namespace BML {
 		std::wstring idForSyncPoint( SyncPointPtr sync );
 
 		/** For each SyncPoint, if parent is set, applies the parent time and offset. */
+		// Called by BehaviorRequest::schedule, not BehaviorScheduler
 		void applyParentTimes( std::string& warning_context = std::string() );
 
 		/** Prints SyncPoint ids in order, separated by commas. */
