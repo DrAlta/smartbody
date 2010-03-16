@@ -150,6 +150,13 @@ SMARTBODY_DLL_API void Smartbody_dll::SetSpeechAudiofileBasePath( const std::str
 }
 
 
+SMARTBODY_DLL_API void Smartbody_dll::SetFacebone( const bool enabled )
+{
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   mcu.net_face_bones = enabled;
+}
+
+
 SMARTBODY_DLL_API bool Smartbody_dll::Init()
 {
    m_internalListener = new Smartbody_dll_SBMCharacterListener_Internal( this );
