@@ -211,14 +211,21 @@ void process_message( const char * message )
    {
       std::string temp = "";
       std::vector< std::string > tokens;
-      const std::string delimiters = "\\\\";
+      const std::string delimiters = "\\/";
+     
       vhcl::Tokenize( tts->temp_audio_dir_cereproc, tokens, delimiters );
-
-      printf( "Warning, audio temp directory, %s, does not exist. Creating directory...\n", tts->temp_audio_dir_cereproc );
+      
+      printf( "Warning, audio cache directory, %s, does not exist. Creating directory...\n", tts->temp_audio_dir_cereproc );
       for (unsigned int i = 0; i < tokens.size(); i++)
       {
          temp += tokens.at( i ) + "\\";
          _mkdir( temp.c_str() );
+      }
+
+      // Check if directory has been created. Should be done more elegantly, including sending message or timing out.
+      if( !(_access( tts->temp_audio_dir_cereproc, 0 ) == 0 ) )
+      {
+         printf( "ERROR: audio cache directory, %s, could not be created. This will likely lead to errors down the line.\\n", tts->temp_audio_dir_cereproc );
       }
    }
 
