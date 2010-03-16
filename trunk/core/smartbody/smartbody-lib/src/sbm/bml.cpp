@@ -791,6 +791,16 @@ SyncPoints::SyncPoints( const SyncPoints& other )
 	sp_end( other.sp_end )
 {}
 
+SyncPoints::iterator SyncPoints::first_scheduled() {
+	// Find first sync point that is set
+	iterator it = begin();
+	iterator it_end = end();
+	while( !( it==it_end || (*it)->isSet() ) ) {
+		++it;
+	}
+	return it;
+}
+
 SyncPoints::iterator SyncPoints::insert( const wstring& id, SyncPointPtr sync, SyncPoints::iterator pos ) {
 	MapOfSyncPoint::iterator map_it = idToSync.find( id );
 	if( map_it != idToSync.end() )
