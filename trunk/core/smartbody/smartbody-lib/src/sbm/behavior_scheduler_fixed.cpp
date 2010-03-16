@@ -27,25 +27,51 @@
 using namespace std;
 using namespace BML;
 
-
-const bool LOG_ABNORMAL_SPEED = false;
+typedef vector<pair<wstring,float>> vec_sync_pairs;
 
 
 // local utility function
 
 
 /////////////////////////////////////////////////////////////////////////////
-//  BehaviorSchedulerLinear
+//  BehaviorSchedulerFixed
 //
 
-BehaviorSchedulerFixed::BehaviorSchedulerFixed( const std::map<std::string,float>& sync_point_tdimes ) {
-	// TODO
-}
+BehaviorSchedulerFixed::BehaviorSchedulerFixed( const vec_sync_pairs& input ) {
+	// TODO: Replace exceptions in constructor with better solution
 
-BehaviorSchedulerFixed::BehaviorSchedulerFixed( const std::vector<std::pair<std::string,float>>& sync_point_times ) {
-	// TODO
+	vec_sync_pairs::const_iterator it = input.begin();
+	vec_sync_pairs::const_iterator end = input.end();
+
+	if( it != end ) {
+		// At least one sync point
+		float        last_time = 0;
+		unsigned int cur_index = 0;
+
+		// Make sure we deal with start first
+		if( it->first != BML::ATTR_START ) {
+			sync_point_times.push_back( make_pair<wstring,float>( BML::ATTR_START, 0 ) );
+			map_indices.insert( make_pair<wstring,unsigned int>( BML::ATTR_START, cur_index++ ) );
+		}
+
+		for( ; it != end; ++it ) {
+			if( it->second < last_time ) {
+				throw BML::BmlException( "BehaviorSchedulerFixed: Invalid sync point order." );
+			}
+
+			const wstring& sync_id = it->first;
+			last_time = it->second;
+
+			sync_point_times.push_back( make_pair<wstring,float>( sync_id, last_time ) );
+			map_indices.insert( make_pair<wstring,unsigned int>( sync_id, cur_index++ ) );
+		}
+	} else {
+		throw BML::BmlException( "BehaviorSchedulerFixed: No sync points specified." );
+	}
 }
 
 
 void BehaviorSchedulerFixed::schedule( SyncPoints& syncs, time_sec now ) {
+	// Find first sync point that is set
+	// TODO
 }
