@@ -27,6 +27,7 @@
 #include "bml_speech.hpp"
 
 #include "bml.hpp"
+#include "bml_exception.hpp"
 #include "bml_xml_consts.hpp"
 
 

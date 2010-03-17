@@ -52,13 +52,6 @@
 const bool LOG_BML_VISEMES	= false;
 const bool LOG_AUDIO		= false;
 
-/**
- *  Enables a argument-level compatibility mode of vrAgentBML.
- *  When enabled, vrAgentBML requires a recipient token after the agent name,
- *  just like the original vrSpeak.
- */
-#define VRAGENTBML_USES_RECIPIENT (0)
-
 
 namespace BML {
 	//  Helper Function
@@ -73,48 +66,6 @@ namespace BML {
 
 
 	// Class Definitions
-	/** Base class for all BML exceptions. */
-	class BmlException : public std::exception {
-	public:
-		BmlException( const char *const& what_string )
-		:	std::exception( what_string )
-		{}
-
-		virtual const char* type()
-		{	return "BML::BmlException"; }
-	};
-
-	/** Exception of errors that occur during parsing. */
-	class ParsingException : public BmlException {
-	public:
-		ParsingException( const char *const& what_string )
-		:	BmlException( what_string )
-		{}
-
-		virtual const char* type()
-		{	return "BML::ParsingException"; }
-	};
-	/** Exception of errors that occur during scheduling. */
-	class SchedulingException : public BmlException {
-	public:
-		SchedulingException( const char *const& what_string )
-		:	BmlException( what_string )
-		{}
-
-		virtual const char* type()
-		{	return "BML::SchedulingException"; }
-	};
-	/** Exception of errors that occur during realizing. */
-	class RealizingException : public BmlException {
-	public:
-		RealizingException( const char *const& what_string )
-		:	BmlException( what_string )
-		{}
-
-		virtual const char* type()
-		{	return "BML::RealizingException"; }
-	};
-
 	class BmlRequest {
 	public:
 		const SbmCharacter   *actor;

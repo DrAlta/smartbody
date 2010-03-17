@@ -30,6 +30,7 @@
 //#include <algorithm>
 
 #include "bml.hpp"
+#include "bml_exception.hpp"
 #include "bml_xml_consts.hpp"
 
 

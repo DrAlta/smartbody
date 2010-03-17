@@ -21,11 +21,16 @@
  */
 
 #include <map>
-#include "bml.hpp"
+
 #include "behavior_scheduler_fixed.hpp"
+
+#include "bml.hpp"
+#include "bml_exception.hpp"
+
 
 using namespace std;
 using namespace BML;
+
 
 typedef vector<pair<wstring,float>> vec_sync_pairs;
 typedef std::map<std::wstring,unsigned int> map_id_indices;
