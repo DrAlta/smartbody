@@ -182,7 +182,7 @@ namespace BML {
 		std::string buildUniqueBehaviorId( const XMLCh* tag, const XMLCh* id, size_t ordinal );
 
 		bool hasExistingBehaviorId( const std::wstring& id );
-		void importNamedSyncPoints( SyncPoints& syncs, const std::wstring& id, const std::wstring& logging_label );
+		void importNamedSyncPoints( SequenceOfNamedSyncPoints& sync_seq, const std::wstring& id, const std::wstring& logging_label );
 
 		BehaviorSpan getBehaviorSpan();
 
@@ -209,7 +209,7 @@ namespace BML {
 //		bool registerBehavior( const std::wstring& id, SpeechRequestPtr behavior );
 
 		/**
-		 *  Gets the TimeRange for all scheduled SyncPoints in all BehaviorRequests.
+		 *  Gets the TimeRange for all scheduled SequenceOfNamedSyncPoints in all BehaviorRequests.
 		 */
 		SyncPointPtr getSyncPoint( const std::wstring& notation );  // Lookup a SyncPoint
 		
@@ -260,13 +260,14 @@ namespace BML {
 		friend class TriggerEvent;
 	};
 
-	// Ordered list of sync points, with references to standard sync_points.
-	class SyncPoints {
+	// Ordered list of named sync points.
+	// Includes direct references to the standard sync_points.
+	class SequenceOfNamedSyncPoints {
 	public:
 		typedef VecOfSyncPoint::iterator iterator;
 
 	protected:
-		VecOfSyncPoint  syncs;    // Short enough to avoid more complicated structures?
+		VecOfSyncPoint  sync_seq;    // Short enough to avoid more complicated structures?
 		MapOfSyncPoint  idToSync;
 
 	public:
@@ -281,38 +282,38 @@ namespace BML {
 		/**
 		 * Default constructor.  Does not initialize standard SyncPoint fields.
 		 */
-		SyncPoints();
+		SequenceOfNamedSyncPoints();
 
 		/**
 		 * Copy constructor.
 		 */
-		SyncPoints( const SyncPoints& other );
+		SequenceOfNamedSyncPoints( const SequenceOfNamedSyncPoints& other );
 
 		/**
 		 *  Returns the position of the first SyncPointPtr, or end() if empty.
 		 */
-		SyncPoints::iterator begin()
-		{	return syncs.begin(); }
+		SequenceOfNamedSyncPoints::iterator begin()
+		{	return sync_seq.begin(); }
 
 		/**
 		 *  Returns the position after the last SyncPointPtr.
 		 */
-		SyncPoints::iterator end()
-		{	return syncs.end(); }
+		SequenceOfNamedSyncPoints::iterator end()
+		{	return sync_seq.end(); }
 
 		/**
 		 *  Returns the position of the first scheduled SyncPointPtr, or end() is none are scheduled.
 		 */
-		SyncPoints::iterator first_scheduled();
+		SequenceOfNamedSyncPoints::iterator first_scheduled();
 
 
-		SyncPoints::iterator insert( const std::wstring& id, SyncPointPtr sync, SyncPoints::iterator pos ); 
+		SequenceOfNamedSyncPoints::iterator insert( const std::wstring& id, SyncPointPtr sync, SequenceOfNamedSyncPoints::iterator pos ); 
 
 		SetOfWstring get_sync_names();
 
 		SyncPointPtr sync_for_name( const std::wstring& name );
 
-		SyncPoints::iterator pos_of( SyncPointPtr sync );
+		SequenceOfNamedSyncPoints::iterator pos_of( SyncPointPtr sync );
 
 		void parseStandardSyncPoints( DOMElement* elem, BmlRequestPtr request, const std::string& behavior_id );
 
@@ -341,8 +342,8 @@ namespace BML {
 		void printSyncTimes();
 
 	protected:
-		SyncPointPtr SyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const std::string& behavior_id );
-		SyncPointPtr SyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const std::string& behavior_id, iterator pos );
+		SyncPointPtr parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const std::string& behavior_id );
+		SyncPointPtr parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const std::string& behavior_id, iterator pos );
 	};
 
 	//  Structure to keep track of a scheduled SBM command
@@ -370,7 +371,7 @@ namespace BML {
 	public:
 		const std::string     unique_id;
 		bool                  required;
-		SyncPoints            syncs;
+		SequenceOfNamedSyncPoints     sync_seq;
 		BehaviorSchedulerPtr  scheduler;
 
 	private:
@@ -379,7 +380,7 @@ namespace BML {
     ///////////////////////////////////////////////////////////////////
     //  Methods
 	public:
-		BehaviorRequest( const std::string& unique_id, const SyncPoints& syncs );
+		BehaviorRequest( const std::string& unique_id, const SequenceOfNamedSyncPoints& sync_seq );
 		virtual ~BehaviorRequest();
 
 		void set_scheduler( BehaviorSchedulerPtr scheduler );
@@ -400,7 +401,7 @@ namespace BML {
 
 		/**
 		 *   Behavior scheduling method.
-		 *   Reads scheduled times from SyncPoints.
+		 *   Reads scheduled times from SequenceOfNamedSyncPoints.
 		 */
         virtual void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu ) = 0;
 
@@ -467,7 +468,7 @@ namespace BML {
 		MeControllerRequest( const std::string& unique_id,
 		                     MeController *anim_ct,
 							 MeCtSchedulerClass* schedule_ct,
-			                 const SyncPoints& syncs,
+			                 const SequenceOfNamedSyncPoints& sync_seq,
 							 MeControllerRequest::SchduleType sched_type = LINEAR );
 		virtual ~MeControllerRequest();
 
@@ -518,7 +519,7 @@ namespace BML {
 	class MotionRequest : public MeControllerRequest {
 	public:
 		MotionRequest( const std::string& unique_id, MeCtMotion* motion_ct, MeCtSchedulerClass* schedule_ct,
-			           const SyncPoints& syncs );
+			           const SequenceOfNamedSyncPoints& sync_seq );
 	};
 
 	class NodRequest : public MeControllerRequest {
@@ -534,7 +535,7 @@ namespace BML {
 
 	public: ///// Methods
 		NodRequest( const std::string& unique_id, NodType type, float repeats, float frequency, float extent, const SbmCharacter* actor,
-			        const SyncPoints& syncs );
+			        const SequenceOfNamedSyncPoints& sync_seq );
 	};
 
 	class TiltRequest : public MeControllerRequest {
@@ -544,7 +545,7 @@ namespace BML {
 
 	public: ///// Methods
 		TiltRequest( const std::string& unique_id, MeCtSimpleTilt* tilt, time_sec transitionDuration, const SbmCharacter* actor,
-			         const SyncPoints& syncs );
+			         const SequenceOfNamedSyncPoints& sync_seq );
 	};
 
 	class PostureRequest : public MeControllerRequest {
@@ -553,12 +554,12 @@ namespace BML {
         time_sec transitionDuration;
 
 		PostureRequest( const std::string& unique_id, MeController* pose, time_sec transitionDuration, const SbmCharacter* actor,
-			            const SyncPoints& syncs );
+			            const SequenceOfNamedSyncPoints& sync_seq );
 	};
 
 	class SequenceRequest : public BehaviorRequest {
 	protected:
-		SequenceRequest( const std::string& unique_id, const SyncPoints& syncs,
+		SequenceRequest( const std::string& unique_id, const SequenceOfNamedSyncPoints& sync_seq,
 						 time_sec startTime, time_sec readyTime, time_sec strokeTime, time_sec relaxTime, time_sec endTime );
 
 	public:
@@ -597,10 +598,10 @@ namespace BML {
 
 	public:
 		VisemeRequest( const std::string& unique_id, const char *viseme, float weight, time_sec duration,
-			           const SyncPoints& syncs );
+			           const SequenceOfNamedSyncPoints& sync_seq );
 
 		VisemeRequest( const std::string& unique_id, const char *viseme, float weight, time_sec duration,
-			           const SyncPoints& syncs, float rampup, float rampdown);
+			           const SequenceOfNamedSyncPoints& sync_seq, float rampup, float rampdown);
 
         void setVisemeName( const char* viseme );
 

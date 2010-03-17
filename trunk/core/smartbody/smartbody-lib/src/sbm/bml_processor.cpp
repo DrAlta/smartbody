@@ -347,8 +347,8 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 			string unique_id = request->buildUniqueBehaviorId( tag, id, ++behavior_ordinal );
 
 			// Load SyncPoint references
-			SyncPoints syncs;  // TODO: rename (previous this was a TimeMarkers class)
-			syncs.parseStandardSyncPoints( child, request, unique_id );
+			SequenceOfNamedSyncPoints sync_seq;  // TODO: rename (previous this was a TimeMarkers class)
+			sync_seq.parseStandardSyncPoints( child, request, unique_id );
 
 			BehaviorRequestPtr behavior;
 
@@ -358,7 +358,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				// TEMPORARY: <speech> can only be the first behavior
 				if( behavior_ordinal == 1 ) {
 					// This speech is the first
-					SpeechRequestPtr speech_request( parse_bml_speech( child, unique_id, syncs, required, request, mcu ) );
+					SpeechRequestPtr speech_request( parse_bml_speech( child, unique_id, sync_seq, required, request, mcu ) );
 					if( speech_request ) {
 						behavior = speech_request;
 
@@ -382,30 +382,30 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				}
 			} else if( XMLString::compareString( tag, TAG_ANIMATION )==0 ) {
 				// DEPRECATED FORM
-				behavior = parse_bml_animation( child, unique_id, syncs, required, request, mcu );
+				behavior = parse_bml_animation( child, unique_id, sync_seq, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_SBM_ANIMATION )==0 ) {
-				behavior = parse_bml_animation( child, unique_id, syncs, required, request, mcu );
+				behavior = parse_bml_animation( child, unique_id, sync_seq, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_BODY )==0 ) {
-				behavior = parse_bml_body( child, unique_id, syncs, required, request, mcu );
+				behavior = parse_bml_body( child, unique_id, sync_seq, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_HEAD )==0 ) {
-				behavior = parse_bml_head( child, unique_id, syncs, required, request, mcu );
+				behavior = parse_bml_head( child, unique_id, sync_seq, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_FACE )==0 ) {
-				behavior = parse_bml_face( child, unique_id, syncs, required, request, mcu );
+				behavior = parse_bml_face( child, unique_id, sync_seq, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_GAZE )==0 ) {
-				behavior = /*BML::*/parse_bml_gaze( child, unique_id, syncs, required, request, mcu );
+				behavior = /*BML::*/parse_bml_gaze( child, unique_id, sync_seq, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_EVENT )==0 ) {
 				// DEPRECATED FORM
-				behavior = parse_bml_event( child, unique_id, syncs, required, request, mcu );
+				behavior = parse_bml_event( child, unique_id, sync_seq, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_SBM_EVENT )==0 ) {
-				behavior = parse_bml_event( child, unique_id, syncs, required, request, mcu );
+				behavior = parse_bml_event( child, unique_id, sync_seq, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_QUICKDRAW )==0 ) {
-				behavior = parse_bml_quickdraw( child, unique_id, syncs, required, request, mcu );
+				behavior = parse_bml_quickdraw( child, unique_id, sync_seq, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_SPEECH )==0 ) {
 				cerr<<"ERROR: BML::Processor::parseBML(): <speech> BML tag must be first behavior (TEMPORARY HACK)." <<endl;
 			} else if( XMLString::compareString( tag, TAG_LOCOTMOTION )==0 ) {
-				behavior = parse_bml_locomotion( child, unique_id, syncs, required, request, mcu );
+				behavior = parse_bml_locomotion( child, unique_id, sync_seq, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_INTERRUPT )==0 ) {
-				behavior = parse_bml_interrupt( child, unique_id, syncs, required, request, mcu );
+				behavior = parse_bml_interrupt( child, unique_id, sync_seq, required, request, mcu );
 #if BMLR_BML2ANIM
 			// [BMLR]  Note that this brace closes out the if statement above
 			}
@@ -413,7 +413,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 			// [BMLR]
 			if (behavior == NULL) {
 				// [BMLR] support for bml to animations
-				behavior = parse_bml_to_anim(child, tms, request, mcu);
+				behavior = parse_bml_to_anim(child, sync_seq, request, mcu);
 				if( behavior != NULL )
 					request->addBehavior( behavior );
 				else
@@ -474,10 +474,10 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCB
 //
 //		string unique_id = request->buildUniqueBehaviorId( tag, id, ++behavior_ordinal );
 //
-//		SyncPoints syncs;
-//		syncs.parseStandardSyncPoints( child, request, unique_id );
+//		SequenceOfNamedSyncPoints sync_seq;
+//		sync_seq.parseStandardSyncPoints( child, request, unique_id );
 //
-//		SpeechRequestPtr speech_request( parse_bml_speech( child, unique_id, syncs, request, mcu ) );
+//		SpeechRequestPtr speech_request( parse_bml_speech( child, unique_id, sync_seq, request, mcu ) );
 //		if( speech_request ) {
 //			request->registerBehavior( id, speech_request );
 //
@@ -518,7 +518,7 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCB
 	}
 }
 
-BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string& unique_id, SyncPoints& tms, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string& unique_id, SequenceOfNamedSyncPoints& sync_seq, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
 	const XMLCh* postureName = elem->getAttribute( ATTR_POSTURE );
 	if( postureName && XMLString::stringLen( postureName ) ) {
 		// Look up pose
@@ -531,7 +531,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 			poseCt->init( *posture );
 			poseCt->name( posture->name() );  // TODO: include BML act and behavior ids
 
-			return BehaviorRequestPtr( new PostureRequest( unique_id, poseCt, 1, request->actor, tms ) );
+			return BehaviorRequestPtr( new PostureRequest( unique_id, poseCt, 1, request->actor, sync_seq ) );
 		} else {
 			// Check for a motion (a motion texture, or motex) of the same name
 			SkMotion* motion = mcu->motion_map.lookup( pose_id );
@@ -541,7 +541,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 				motionCt->name( motion->name() );  // TODO: include BML act and behavior ids
 				motionCt->loop( true );
 
-				PostureRequest * posture_new = new PostureRequest( unique_id, motionCt, 1, request->actor, tms );
+				PostureRequest * posture_new = new PostureRequest( unique_id, motionCt, 1, request->actor, sync_seq );
 				posture_new->set_persistent(true);
 
 				return BehaviorRequestPtr( posture_new );
@@ -556,7 +556,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 	}
 }
 
-BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string& unique_id, SyncPoints& tms, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string& unique_id, SequenceOfNamedSyncPoints& sync_seq, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
 	const XMLCh* attrType = elem->getAttribute( ATTR_TYPE );
 	if( attrType && XMLString::stringLen( attrType ) ) {
@@ -595,7 +595,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 				                                           (NodRequest::NodType) type,
 												           repeats, velocity, amount, 
                                                            request->actor,
-                                                           tms ) );
+                                                           sync_seq ) );
             }
 
 			case BML::HEAD_ORIENT: {
@@ -669,7 +669,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 // It then reads the file and finds this line:
 // <gesture type="beat">CrossedArms_RArm_LowBeat</gesture>
 // and plays the CrossedArms_RArm_LowBeat.skm animation
-BehaviorRequest* BML::Processor::parse_bml_to_anim( DOMElement* elem, SyncPoints& tms, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequest* BML::Processor::parse_bml_to_anim( DOMElement* elem, SequenceOfNamedSyncPoints& sync_seq, BmlRequestPtr request, mcuCBHandle *mcu ) {
 
 	if (bml2animText.empty())
 	{			
@@ -742,12 +742,12 @@ BehaviorRequest* BML::Processor::parse_bml_to_anim( DOMElement* elem, SyncPoints
 					if( XMLString::compareString( elem->getTagName(), TAG_POSTURE )==0 || XMLString::compareString( elem->getTagName(), TAG_BODY)==0 ) {
 						string posture = "<body posture=\"" + string(XMLString::transcode(animNode->getTextContent())) + "\" />";
 						DOMElement* e = xml_utils::parseMessageXml(Prser, (char*)posture.c_str())->getDocumentElement();
-						return parse_bml_body(e, tms, request, mcu);
+						return parse_bml_body(e, sync_seq, request, mcu);
 					}
 					else {
 						string animation = "<animation name=\"" + string(XMLString::transcode(animNode->getTextContent())) + "\" />";
 						DOMElement* e = xml_utils::parseMessageXml(Prser, (char*)animation.c_str())->getDocumentElement();
-						return parse_bml_animation(e, tms, request, mcu);
+						return parse_bml_animation(e, sync_seq, request, mcu);
 					}
 				}
 			}

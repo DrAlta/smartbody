@@ -33,7 +33,7 @@ namespace BML {
 	 */
 	class BehaviorScheduler {
 	public:
-		virtual void schedule( SyncPoints& syncs, time_sec now ) = 0;
+		virtual void schedule( SequenceOfNamedSyncPoints& sync_seq, time_sec now ) = 0;
 	};
 	typedef boost::shared_ptr<BehaviorScheduler> BehaviorSchedulerPtr;
 } // namespace BML
