@@ -38,6 +38,8 @@
 #include <xercesc/util/XMLStringTokenizer.hpp>
 
 #include "mcontrol_util.h"
+
+#include "bml_exception.hpp"
 #include "bml_processor.hpp"
 #include "bml_xml_consts.hpp"
 

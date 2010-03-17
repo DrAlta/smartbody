@@ -30,6 +30,8 @@
 #include <algorithm>
 
 #include "mcontrol_util.h"
+
+#include "bml_exception.hpp"
 #include "bml_processor.hpp"
 #include "bml_speech.hpp"
 #include "bml_xml_consts.hpp"
