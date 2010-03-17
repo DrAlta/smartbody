@@ -251,14 +251,14 @@ bool BmlRequest::hasExistingBehaviorId( const std::wstring& id ) {
 	return result;
 }
 
-void BmlRequest::importNamedSyncPoints( SyncPoints& syncs, const std::wstring& id, const std::wstring& logging_label ) {
-	// Import named SyncPoints
-	SetOfWstring names = syncs.get_sync_names();
+void BmlRequest::importNamedSyncPoints( SequenceOfNamedSyncPoints& sync_seq, const std::wstring& id, const std::wstring& logging_label ) {
+	// Import named SequenceOfNamedSyncPoints
+	SetOfWstring names = sync_seq.get_sync_names();
 	SetOfWstring::iterator it  = names.begin();
 	SetOfWstring::iterator end = names.end();
 	for( ; it!=end ; ++it ) {
 		wstring& name = *it;
-		SyncPointPtr sync( syncs.sync_for_name( name ) );
+		SyncPointPtr sync( sync_seq.sync_for_name( name ) );
 
 		wstring sync_id = buildBmlId( id, name );
 		if( !sync_id.empty() ) {
@@ -308,14 +308,14 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 			try {
 				behavior->schedule( now );
 #if VALIDATE_BEHAVIOR_SYNCS
-				behavior->syncs.validate();
+				behavior->sync_seq.validate();
 #endif // VALIDATE_BEHAVIOR_SYNCS
 
-				min_time = min( min_time, behavior->syncs.sp_start->time );
+				min_time = min( min_time, behavior->sync_seq.sp_start->time );
 
 				if( LOG_BML_BEHAVIOR_SCHEDULE ) {
-					cout << "DEBUG: BmlRequest::realize(): Behavior \""<< (behavior->unique_id) <<"\" SyncPoints:"<<endl;
-					behavior->syncs.printSyncTimes();
+					cout << "DEBUG: BmlRequest::realize(): Behavior \""<< (behavior->unique_id) <<"\" SequenceOfNamedSyncPoints:"<<endl;
+					behavior->sync_seq.printSyncTimes();
 				}
 			} catch( BML::SchedulingException& e ) {
 				// TODO: test if behavior is required
@@ -341,8 +341,8 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 			for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i ) {
 				BehaviorRequestPtr behavior = *i;
 				
-				VecOfSyncPoint::iterator syncs_end = behavior->syncs.end();
-				for( VecOfSyncPoint::iterator j = behavior->syncs.begin(); j != syncs_end; ++j ) {
+				VecOfSyncPoint::iterator syncs_end = behavior->sync_seq.end();
+				for( VecOfSyncPoint::iterator j = behavior->sync_seq.begin(); j != syncs_end; ++j ) {
 					(*j)->time += offset;
 				}
 			}
@@ -630,16 +630,16 @@ bool BmlRequest::registerBehavior( const std::wstring& id, BehaviorRequestPtr be
 	behaviors.push_back( behavior );
 
 	if( id.size() > 0 ) {
-		importNamedSyncPoints( behavior->syncs, id, L"BehaviorRequest" );
+		importNamedSyncPoints( behavior->sync_seq, id, L"BehaviorRequest" );
 	}
 
 	if( LOG_BEHAVIOR_SYNCHPOINTS ) {
-		cout << "DEBUG: BmlRequest::registerBehavior(): SyncPoints for " << behavior->unique_id << flush;
+		cout << "DEBUG: BmlRequest::registerBehavior(): SequenceOfNamedSyncPoints for " << behavior->unique_id << flush;
 		if( id.size()>0 )
 			wcout << " \"" << id << "\"" << flush;
 		cout << ":" << endl << "\t" << flush;
 
-		behavior->syncs.printSyncIds();
+		behavior->sync_seq.printSyncIds();
 	}
 
 	return true;
@@ -659,7 +659,7 @@ bool BmlRequest::registerBehavior( const std::wstring& id, BehaviorRequestPtr be
 //
 //	speech_request = speech;
 //
-//	importNamedSyncPoints( speech->syncs, id, L"SpeechRequest" );
+//	importNamedSyncPoints( speech->sync_seq, id, L"SpeechRequest" );
 //
 //	return true;
 //}
@@ -776,11 +776,11 @@ void SyncPoint::init( SyncPointPtr self ) {
 
 
 // default constructor
-SyncPoints::SyncPoints()
+SequenceOfNamedSyncPoints::SequenceOfNamedSyncPoints()
 {}
 
-SyncPoints::SyncPoints( const SyncPoints& other )
-:	syncs( other.syncs ),
+SequenceOfNamedSyncPoints::SequenceOfNamedSyncPoints( const SequenceOfNamedSyncPoints& other )
+:	sync_seq( other.sync_seq ),
 	idToSync( other.idToSync ),
 	sp_start( other.sp_start ),
 	sp_ready( other.sp_ready ),
@@ -791,7 +791,7 @@ SyncPoints::SyncPoints( const SyncPoints& other )
 	sp_end( other.sp_end )
 {}
 
-SyncPoints::iterator SyncPoints::first_scheduled() {
+SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::first_scheduled() {
 	// Find first sync point that is set
 	iterator it = begin();
 	iterator it_end = end();
@@ -801,21 +801,21 @@ SyncPoints::iterator SyncPoints::first_scheduled() {
 	return it;
 }
 
-SyncPoints::iterator SyncPoints::insert( const wstring& id, SyncPointPtr sync, SyncPoints::iterator pos ) {
+SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::insert( const wstring& id, SyncPointPtr sync, SequenceOfNamedSyncPoints::iterator pos ) {
 	MapOfSyncPoint::iterator map_it = idToSync.find( id );
 	if( map_it != idToSync.end() )
 		return end();
 
 	if( !idToSync.insert( make_pair( id, sync ) ).second )
 		return end();
-	return syncs.insert( pos, sync );
+	return sync_seq.insert( pos, sync );
 }
 
-SyncPoints::iterator SyncPoints::pos_of( SyncPointPtr sync ) {
+SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::pos_of( SyncPointPtr sync ) {
 	return find( begin(), end(), sync );
 }
 
-SetOfWstring SyncPoints::get_sync_names() {
+SetOfWstring SequenceOfNamedSyncPoints::get_sync_names() {
 	SetOfWstring names;
 
 	MapOfSyncPoint::iterator it  = idToSync.begin();
@@ -823,13 +823,13 @@ SetOfWstring SyncPoints::get_sync_names() {
 	for( ; it!=end; ++it ) {
 		const wstring& name = it->first;
 		if( !( names.insert( name ).second ) )
-			wcerr << "ERROR: SyncPoints::get_sync_names(): Failed to insert SyncPoint name \""<<name<<"\"." << endl;
+			wcerr << "ERROR: SequenceOfNamedSyncPoints::get_sync_names(): Failed to insert SyncPoint name \""<<name<<"\"." << endl;
 	}
 
 	return names;
 }
 
-SyncPointPtr SyncPoints::sync_for_name( const std::wstring& name ) {
+SyncPointPtr SequenceOfNamedSyncPoints::sync_for_name( const std::wstring& name ) {
 	MapOfSyncPoint::iterator result = idToSync.find( name );
 	if( result != idToSync.end() )
 		return result->second;
@@ -837,7 +837,7 @@ SyncPointPtr SyncPoints::sync_for_name( const std::wstring& name ) {
 		return SyncPointPtr();
 }
 
-BehaviorSpan SyncPoints::getBehaviorSpan( time_sec persistent_threshold ) {
+BehaviorSpan SequenceOfNamedSyncPoints::getBehaviorSpan( time_sec persistent_threshold ) {
 	time_sec start_time = TIME_UNSET;
 	time_sec end_time   = TIME_UNSET;
 	bool     persistent = false;
@@ -864,7 +864,7 @@ BehaviorSpan SyncPoints::getBehaviorSpan( time_sec persistent_threshold ) {
 	return BehaviorSpan( start_time, end_time, persistent );
 }
 
-void SyncPoints::parseStandardSyncPoints( DOMElement* elem, BmlRequestPtr request, const string& behavior_id ) {
+void SequenceOfNamedSyncPoints::parseStandardSyncPoints( DOMElement* elem, BmlRequestPtr request, const string& behavior_id ) {
 	// DOM functions never return NULL
 	const wstring tag = elem->getTagName();
 	const wstring id  = elem->getAttribute( ATTR_ID );
@@ -902,11 +902,11 @@ void SyncPoints::parseStandardSyncPoints( DOMElement* elem, BmlRequestPtr reques
 }
 
 
-SyncPointPtr SyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const string& behavior_id ) {
+SyncPointPtr SequenceOfNamedSyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const string& behavior_id ) {
 	return parseSyncPointAttr( elem, elem_id, sync_attr, request, behavior_id, end() );
 }
 
-SyncPointPtr SyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const string& behavior_id, iterator pos ) {
+SyncPointPtr SequenceOfNamedSyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const string& behavior_id, iterator pos ) {
 	SyncPointPtr sync;
 
 	wstring behavior_wid;
@@ -919,7 +919,7 @@ SyncPointPtr SyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstrin
 	MapOfSyncPoint::iterator map_it = idToSync.find( sync_attr );
 	if( map_it != idToSync.end() ) {
 		// TODO: Throw BML ParsingException
-		wcerr << "ERROR: Behavior \""<<behavior_wid<<"\": SyncPoints contains SyncPoint with id \"" << sync_attr << "\".  Ignoring attribute in <"<<elem->getTagName();
+		wcerr << "ERROR: Behavior \""<<behavior_wid<<"\": SequenceOfNamedSyncPoints contains SyncPoint with id \"" << sync_attr << "\".  Ignoring attribute in <"<<elem->getTagName();
 		if( !elem_id.empty() )
 			wcerr<<"> id=\""<<elem_id<<"\"";
 		else
@@ -936,7 +936,7 @@ SyncPointPtr SyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstrin
 
 	if( !sync ) {
 		if( has_sync_ref ) {
-			wcerr<<"WARNING: Behavior \""<<behavior_wid<<"\": SyncPoints::parseSyncPointAttr(..): <"<<(elem->getTagName())<<"> BML tag refers to unknown SyncPoint "<<sync_attr<<"=\""<<sync_ref<<"\".  Creating placeholder..."<<endl;
+			wcerr<<"WARNING: Behavior \""<<behavior_wid<<"\": SequenceOfNamedSyncPoints::parseSyncPointAttr(..): <"<<(elem->getTagName())<<"> BML tag refers to unknown SyncPoint "<<sync_attr<<"=\""<<sync_ref<<"\".  Creating placeholder..."<<endl;
 		}
 
 		TriggerEventPtr trigger;
@@ -961,14 +961,14 @@ SyncPointPtr SyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstrin
 
 #if VALIDATE_BEHAVIOR_SYNCS
 
-string SyncPoints::debug_label( SyncPointPtr& sync ) {
+string SequenceOfNamedSyncPoints::debug_label( SyncPointPtr& sync ) {
 	ostringstream out;
 
 	wstring id = idForSyncPoint( sync );
 
 	int count = 0;
-	iterator it  = syncs.begin();
-	iterator end = syncs.end();
+	iterator it  = sync_seq.begin();
+	iterator end = sync_seq.end();
 	while( it!=end && (*it)!=sync ) {
 		++it;
 		++count;
@@ -988,14 +988,14 @@ string SyncPoints::debug_label( SyncPointPtr& sync ) {
 	return out.str();
 }
 
-void SyncPoints::validate() {
+void SequenceOfNamedSyncPoints::validate() {
 	ostringstream out;
-	out << "SyncPoints validation errors:";
+	out << "SequenceOfNamedSyncPoints validation errors:";
 
 	bool valid = true;
 
-	iterator it  = syncs.begin();
-	iterator end = syncs.end();
+	iterator it  = sync_seq.begin();
+	iterator end = sync_seq.end();
 	if( it != end ) {
 		SyncPointPtr sync = (*it);
 
@@ -1041,7 +1041,7 @@ void SyncPoints::validate() {
 
 #endif // INCOMPLETE_SYNCS_VALIDATION
 
-std::wstring SyncPoints::idForSyncPoint( SyncPointPtr sync ) {
+std::wstring SequenceOfNamedSyncPoints::idForSyncPoint( SyncPointPtr sync ) {
 	MapOfSyncPoint::iterator map_it  = idToSync.begin();
 	MapOfSyncPoint::iterator map_end = idToSync.end();
 
@@ -1055,7 +1055,7 @@ std::wstring SyncPoints::idForSyncPoint( SyncPointPtr sync ) {
 	return wstring();
 }
 
-void SyncPoints::applyParentTimes( std::string& warning_context ) {
+void SequenceOfNamedSyncPoints::applyParentTimes( std::string& warning_context ) {
 	MapOfSyncPoint::iterator it  = idToSync.begin();
 	MapOfSyncPoint::iterator end = idToSync.end();
 
@@ -1091,7 +1091,7 @@ void SyncPoints::applyParentTimes( std::string& warning_context ) {
 	}
 }
 
-void SyncPoints::printSyncIds() {
+void SequenceOfNamedSyncPoints::printSyncIds() {
 	VecOfSyncPoint::iterator vec_it     = begin();
 	VecOfSyncPoint::iterator vec_end    = end();
 
@@ -1109,7 +1109,7 @@ void SyncPoints::printSyncIds() {
 	wcout << endl;
 }
 
-void SyncPoints::printSyncTimes() {
+void SequenceOfNamedSyncPoints::printSyncTimes() {
 	VecOfSyncPoint::iterator vec_it     = begin();
 	VecOfSyncPoint::iterator vec_end    = end();
 
@@ -1152,8 +1152,8 @@ const time_sec BehaviorRequest::PERSISTENCE_THRESHOLD = (time_sec)( MeCtSchedule
 
 
 // methods
-BehaviorRequest::BehaviorRequest( const std::string& unique_id, const SyncPoints& syncs  )
-:	syncs( syncs ),
+BehaviorRequest::BehaviorRequest( const std::string& unique_id, const SequenceOfNamedSyncPoints& sync_seq  )
+:	sync_seq( sync_seq ),
 	unique_id( unique_id ),
 	audioOffset(TIME_UNSET),
 	required(false)
@@ -1170,7 +1170,7 @@ void BehaviorRequest::set_scheduler( BehaviorSchedulerPtr scheduler ) {
 void BehaviorRequest::schedule( time_sec now ) {
 	string warning_context = string( "Behavior \"" ) + unique_id + "\"";
 
-	syncs.applyParentTimes( warning_context );
+	sync_seq.applyParentTimes( warning_context );
 
 	if( !scheduler ) {
 		ostringstream buffer;
@@ -1178,7 +1178,7 @@ void BehaviorRequest::schedule( time_sec now ) {
 		throw SchedulingException( buffer.str().c_str() );
 	}
 
-	scheduler->schedule( syncs, now );
+	scheduler->schedule( sync_seq, now );
 }
 
 void BehaviorRequest::realize( BmlRequestPtr request, mcuCBHandle* mcu ) {
@@ -1187,7 +1187,7 @@ void BehaviorRequest::realize( BmlRequestPtr request, mcuCBHandle* mcu ) {
 
 
 bool BehaviorRequest::isPersistent() {
-	time_sec duration = (syncs.sp_end->time) - (syncs.sp_start->time);
+	time_sec duration = (sync_seq.sp_end->time) - (sync_seq.sp_start->time);
 	return( duration > PERSISTENCE_THRESHOLD );
 }
 
@@ -1195,7 +1195,7 @@ bool BehaviorRequest::isPersistent() {
 
 BehaviorSpan BehaviorRequest::getBehaviorSpan() {
 	// Default algorithm for detecting persistent behaviors.
-	BehaviorSpan span = syncs.getBehaviorSpan( PERSISTENCE_THRESHOLD );
+	BehaviorSpan span = sync_seq.getBehaviorSpan( PERSISTENCE_THRESHOLD );
 
 	return span;
 }
@@ -1205,7 +1205,7 @@ BehaviorSpan BehaviorRequest::getBehaviorSpan() {
 MeControllerRequest::MeControllerRequest( const std::string& unique_id,
                                           MeController* anim_ct,
 										  MeCtSchedulerClass* schedule_ct,
-						                  const SyncPoints& syncs_in,
+						                  const SequenceOfNamedSyncPoints& syncs_in,
 										  MeControllerRequest::SchduleType sched_type )
 :	BehaviorRequest( unique_id, syncs_in ),
 	anim_ct( anim_ct ),
@@ -1243,12 +1243,12 @@ void MeControllerRequest::register_controller_prune_policy( MePrunePolicy* prune
 }
 
 void MeControllerRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu ) {
-	// Get times from SyncPoints
-	time_sec startAt  = syncs.sp_start->time;
-	time_sec readyAt  = syncs.sp_ready->time;
-	time_sec strokeAt = syncs.sp_stroke->time;
-	time_sec relaxAt  = syncs.sp_relax->time;
-	time_sec endAt    = syncs.sp_end->time;
+	// Get times from SequenceOfNamedSyncPoints
+	time_sec startAt  = sync_seq.sp_start->time;
+	time_sec readyAt  = sync_seq.sp_ready->time;
+	time_sec strokeAt = sync_seq.sp_stroke->time;
+	time_sec relaxAt  = sync_seq.sp_relax->time;
+	time_sec endAt    = sync_seq.sp_end->time;
 
 	if( LOG_METHODS || LOG_CONTROLLER_SCHEDULE ) {
 		cout << "DEBUG: MeControllerRequest::schedule(): startAt="<<startAt<<",  readyAt="<<readyAt<<",  strokeAt="<<strokeAt<<",  relaxAt="<<relaxAt<<",  endAt="<<endAt<<endl;
@@ -1335,7 +1335,7 @@ void MeControllerRequest::cleanup( mcuCBHandle* mcu, BmlRequestPtr request )
 
 //  MotionRequest
 MotionRequest::MotionRequest( const std::string& unique_id, MeCtMotion* motion_ct, MeCtSchedulerClass* schedule_ct,
-						      const SyncPoints& syncs_in )
+						      const SequenceOfNamedSyncPoints& syncs_in )
 :	MeControllerRequest( unique_id,
                          motion_ct,
 						 schedule_ct,
@@ -1345,7 +1345,7 @@ MotionRequest::MotionRequest( const std::string& unique_id, MeCtMotion* motion_c
 
 //  NodRequest
 NodRequest::NodRequest( const std::string& unique_id, NodType type, float repeats, float frequency, float extent, const SbmCharacter* actor,
-			            const SyncPoints& syncs_in )
+			            const SequenceOfNamedSyncPoints& syncs_in )
 :	MeControllerRequest( unique_id, new MeCtSimpleNod(), actor->head_sched_p, syncs_in, MeControllerRequest::MANUAL ),
     type(type), repeats(repeats), frequency(frequency), extent(extent)
 {
@@ -1400,7 +1400,7 @@ NodRequest::NodRequest( const std::string& unique_id, NodType type, float repeat
 //  TiltRequest
 TiltRequest::TiltRequest( const std::string& unique_id, MeCtSimpleTilt* tilt, time_sec transitionDuration,
 						  const SbmCharacter* actor,
-						  const SyncPoints& syncs_in )
+						  const SequenceOfNamedSyncPoints& syncs_in )
 :	MeControllerRequest( unique_id, tilt, actor->head_sched_p, syncs_in ),
     duration(numeric_limits<time_sec>::infinity())/*hack*/,
 	transitionDuration(transitionDuration)
@@ -1415,7 +1415,7 @@ TiltRequest::TiltRequest( const std::string& unique_id, MeCtSimpleTilt* tilt, ti
 
 //  PostureRequest
 PostureRequest::PostureRequest( const std::string& unique_id, MeController* pose, time_sec transitionDuration, const SbmCharacter* actor,
-						        const SyncPoints& syncs_in )
+						        const SequenceOfNamedSyncPoints& syncs_in )
 :	MeControllerRequest( unique_id, pose, actor->posture_sched_p, syncs_in ),
     duration(numeric_limits<time_sec>::infinity())/*hack*/,
 	transitionDuration(transitionDuration)
@@ -1429,7 +1429,7 @@ PostureRequest::PostureRequest( const std::string& unique_id, MeController* pose
 }
 
 // SequenceRequest
-SequenceRequest::SequenceRequest( const std::string& unique_id, const SyncPoints& syncs_in,
+SequenceRequest::SequenceRequest( const std::string& unique_id, const SequenceOfNamedSyncPoints& syncs_in,
                                   time_sec startTime, time_sec readyTime, time_sec strokeTime, time_sec relaxTime, time_sec endTime )
 :	BehaviorRequest( unique_id, syncs_in )
 {
@@ -1508,14 +1508,14 @@ bool SequenceRequest::unschedule_sequence( mcuCBHandle* mcu )
 //  VisemeRequest
 //    (no transition/blend yet)
 VisemeRequest::VisemeRequest( const std::string& unique_id, const char *viseme, float weight, time_sec duration,
-                              const SyncPoints& syncs_in )
+                              const SequenceOfNamedSyncPoints& syncs_in )
 :	SequenceRequest( unique_id, syncs_in,
                      /* Default Timing */ 0, 0, 0, duration, duration ),
     viseme(viseme), weight(weight), duration(duration)
 {}
 
 VisemeRequest::VisemeRequest( const std::string& unique_id, const char *viseme, float weight, time_sec duration,
-                              const SyncPoints& syncs_in, float rampup, float rampdown )
+                              const SequenceOfNamedSyncPoints& syncs_in, float rampup, float rampdown )
 :	SequenceRequest( unique_id, syncs_in,
                      /* Default Timing */ 0, 0, 0, duration, duration ),
     viseme(viseme), weight(weight), duration(duration), rampup(rampup), rampdown(rampdown)
@@ -1528,12 +1528,12 @@ void VisemeRequest::setVisemeName( const char* viseme ) {
 
 void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 {
-	// Get times from SyncPoints
-	time_sec startAt  = syncs.sp_start->time;
-	time_sec readyAt  = syncs.sp_ready->time;
-	time_sec strokeAt = syncs.sp_stroke->time;
-	time_sec relaxAt  = syncs.sp_relax->time;
-	time_sec endAt    = syncs.sp_end->time;
+	// Get times from SequenceOfNamedSyncPoints
+	time_sec startAt  = sync_seq.sp_start->time;
+	time_sec readyAt  = sync_seq.sp_ready->time;
+	time_sec strokeAt = sync_seq.sp_stroke->time;
+	time_sec relaxAt  = sync_seq.sp_relax->time;
+	time_sec endAt    = sync_seq.sp_end->time;
 
 	const SbmCharacter* actor    = request->actor;
 	const string&       actor_id = request->actorId; // match string used by request?

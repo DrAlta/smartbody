@@ -73,36 +73,41 @@ BehaviorSchedulerFixed::BehaviorSchedulerFixed( const vec_sync_pairs& input ) {
 	}
 }
 
-void BehaviorSchedulerFixed::validate_ordering( SyncPoints& syncs ) {
-	SyncPoints::iterator sp = syncs.begin();
-	SyncPoints::iterator sp_end = syncs.end();
+void BehaviorSchedulerFixed::validate_match( SequenceOfNamedSyncPoints& sync_seq ) {
+	SequenceOfNamedSyncPoints::iterator sp = sync_seq.begin();
+	SequenceOfNamedSyncPoints::iterator sp_end = sync_seq.end();
 
 	vec_sync_pairs::iterator it = sync_point_times.begin();
 	vec_sync_pairs::iterator it_end = sync_point_times.begin();
 
-	SyncPoints::iterator last_sp;
-	for( ; it!=it_end; ++it ) {
-		wstring& name = it->first;
-		SyncPointPtr sync = syncs.sync_for_name( name );
-		if( !sync ) {
-			throw BML::SchedulingException( "BehaviorSchedulerFixed: No such SyncPoint." );
+	SequenceOfNamedSyncPoints::iterator last_sp;
+	while( it!=it_end ) {
+		if( sp==sp_end ) {
+			throw BML::SchedulingException( "BehaviorSchedulerFixed: SyncPoint does not exist (sp_end reached before it_end)" );
 		}
-		SyncPoints::iterator pos = syncs.pos_of( sync );
-		if( pos <= last_sp ) {
-			throw BML::SchedulingException( "BehaviorSchedulerFixed: Out-of-order SyncPoint timing." );
+
+		if( *sp != sync_seq.sync_for_name( it->first ) ) {
+			throw BML::SchedulingException( "BehaviorSchedulerFixed: Unexpected SyncPoint (unspecified id or ordering issue)" );
 		}
+
+		++it;
+		++sp;
+	}
+
+	if( sp != sp_end ) {
+		throw BML::SchedulingException( "BehaviorSchedulerFixed: Unexpected SyncPoint (reached end of it)" );
 	}
 
 	// Success! Valid ordering.
 }
 
-void BehaviorSchedulerFixed::schedule( SyncPoints& syncs, time_sec now ) {
-	// validate the ordering before manipulating the SyncPoints
-	validate_ordering( syncs );
+void BehaviorSchedulerFixed::schedule( SequenceOfNamedSyncPoints& sync_seq, time_sec now ) {
+	// validate the SequenceOfNamedSyncPoints match before manipulating them
+	validate_match( sync_seq );
 
 	// Find first sync point that is set
-	SyncPoints::iterator sp_end = syncs.end();
-	SyncPoints::iterator first_set = syncs.first_scheduled();
+	SequenceOfNamedSyncPoints::iterator sp_end = sync_seq.end();
+	SequenceOfNamedSyncPoints::iterator first_set = sync_seq.first_scheduled();
 	if( first_set == sp_end ) {
 		// No SyncPoints previously scheduled
 		// Schedule starting at time zero
@@ -110,10 +115,13 @@ void BehaviorSchedulerFixed::schedule( SyncPoints& syncs, time_sec now ) {
 		vec_sync_pairs::iterator it_end = sync_point_times.begin();
 
 		for( ; it!=it_end; ++it ) {
-			SyncPointPtr sync = syncs.sync_for_name( it->first );  // Must exist.  See validate_ordering(..)
+			SyncPointPtr sync = sync_seq.sync_for_name( it->first );  // Must exist.  See validate_match(..)
 			sync->time = it->second;
 		}
 	} else {
+		//unsigned int ref_index = sync_id2index.find( (*first_set)->name )->second;
+		//pair<wstring,float> ref_time = sync_id2index.find( (*sp)->name );
+
 		// TODO: "Merge" timing data
 	}
 }

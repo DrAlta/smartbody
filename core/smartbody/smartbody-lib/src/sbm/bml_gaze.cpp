@@ -353,7 +353,7 @@ bool BML::Gaze::parse_children( DOMElement* elem, Gaze::KeyData* key_data[] ) {
 
 
 
-BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& unique_id, SyncPoints& tms, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& unique_id, SequenceOfNamedSyncPoints& sync_seq, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
 	////////////////////////////////////////////////////////////////
 	//  GAZE BEHAVIORS
@@ -715,7 +715,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		gaze_ct->set_offset_polar( 0, 0, roll );
 	}
 
-	boost::shared_ptr<MeControllerRequest> ct_request( new MeControllerRequest( unique_id, gaze_ct, request->actor->gaze_sched_p, tms ) );
+	boost::shared_ptr<MeControllerRequest> ct_request( new MeControllerRequest( unique_id, gaze_ct, request->actor->gaze_sched_p, sync_seq ) );
 	ct_request->set_persistent( true );
 	return ct_request;
 }

@@ -101,15 +101,15 @@ bool testSyncAfter(
 
 
 
-void BehaviorSchedulerConstantSpeed::schedule( SyncPoints& syncs, time_sec now ) {
+void BehaviorSchedulerConstantSpeed::schedule( SequenceOfNamedSyncPoints& sync_seq, time_sec now ) {
 	// local references to standard sync points
-	SyncPointPtr start        = syncs.sp_start;
-	SyncPointPtr ready        = syncs.sp_ready;
-	SyncPointPtr stroke_start = syncs.sp_stroke_start;
-	SyncPointPtr stroke       = syncs.sp_stroke;
-	SyncPointPtr stroke_end   = syncs.sp_stroke_end;
-	SyncPointPtr relax        = syncs.sp_relax;
-	SyncPointPtr end          = syncs.sp_end;
+	SyncPointPtr start        = sync_seq.sp_start;
+	SyncPointPtr ready        = sync_seq.sp_ready;
+	SyncPointPtr stroke_start = sync_seq.sp_stroke_start;
+	SyncPointPtr stroke       = sync_seq.sp_stroke;
+	SyncPointPtr stroke_end   = sync_seq.sp_stroke_end;
+	SyncPointPtr relax        = sync_seq.sp_relax;
+	SyncPointPtr end          = sync_seq.sp_end;
 
 	/*  The following implements a search for the two most important SyncPoints, and then scales the time to meet both.
      *  Importance is ranked in this order: stroke, ready, relax, start, end

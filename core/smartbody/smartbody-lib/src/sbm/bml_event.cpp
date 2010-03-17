@@ -39,7 +39,7 @@ namespace BML {
 	
 	public:
 		EventRequest( const std::string& unique_id, const char* message,
-			          const SyncPoints& syncs_in )
+			          const SequenceOfNamedSyncPoints& syncs_in )
 		:	SequenceRequest( unique_id, syncs_in,
 							 /* Default Timing */ 0, 0, 0, 0, 0 ),
 			message( message )
@@ -47,7 +47,7 @@ namespace BML {
 	
 		void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 		{
-			time_sec strokeAt = syncs.sp_stroke->time;
+			time_sec strokeAt = sync_seq.sp_stroke->time;
 
 			VecOfSbmCommand commands;
 
@@ -69,12 +69,12 @@ namespace BML {
 	};
 };  // end namespace BML
 
-BehaviorRequestPtr BML::parse_bml_event( DOMElement* elem, const std::string& unique_id, SyncPoints& tms, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_event( DOMElement* elem, const std::string& unique_id, SequenceOfNamedSyncPoints& sync_seq, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
     const XMLCh* attrMesg = elem->getAttribute( ATTR_MESSAGE );
 
 	if( attrMesg && attrMesg[0]!='\0' ) {
-        return BehaviorRequestPtr( new EventRequest( unique_id, XMLString::transcode( attrMesg ), tms ) );
+        return BehaviorRequestPtr( new EventRequest( unique_id, XMLString::transcode( attrMesg ), sync_seq ) );
 	} else {
 		// TODO: Use exception?
         wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag missing "<<ATTR_MESSAGE<<"= attribute.  Behavior ignored."<< endl;

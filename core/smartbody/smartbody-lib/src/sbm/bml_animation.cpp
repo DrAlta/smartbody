@@ -35,7 +35,7 @@ using namespace xml_utils;
 
 
 
-BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string& unique_id, SyncPoints& tms, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string& unique_id, SequenceOfNamedSyncPoints& sync_seq, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
 	//type = BML_MOTION;
 
 	const XMLCh* animName = elem->getAttribute( ATTR_NAME );
@@ -73,7 +73,7 @@ BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string
 			}
 			delete [] speedStr;
 
-			return BehaviorRequestPtr( new MotionRequest( unique_id, motionCt, request->actor->motion_sched_p, tms ) );
+			return BehaviorRequestPtr( new MotionRequest( unique_id, motionCt, request->actor->motion_sched_p, sync_seq ) );
 		} else {
 			// TODO: exception?
 			cerr<<"WARNING: BML::parse_bml_animation(): behavior \""<<unique_id<<"\": name=\""<<asciiName<<"\" not loaded; ignoring behavior."<<endl;

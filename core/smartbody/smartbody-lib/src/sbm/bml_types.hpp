@@ -56,7 +56,7 @@ namespace BML {
 	struct SbmCommand;
 	class TriggerEvent;
 	class SyncPoint;
-	class SyncPoints;
+	class SequenceOfNamedSyncPoints;
 	class BehaviorRequest;
 	class SpeechRequest;
 	//typedef std::map< const XMLCh*, SyncPoint*, xml_utils::XMLStringCmp > SyncPointMap;	  // pre-shared_ptr typedef
