@@ -39,6 +39,8 @@
 
 #include "mcontrol_util.h"
 #include "bml_processor.hpp"
+#include "bml_xml_consts.hpp"
+
 #include "bml_animation.hpp"
 #include "bml_event.hpp"
 #include "bml_face.hpp"

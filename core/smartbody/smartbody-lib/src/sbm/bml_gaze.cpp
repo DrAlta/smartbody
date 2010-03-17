@@ -27,10 +27,13 @@
 
 #include <xercesc/util/XMLStringTokenizer.hpp>
 
-#include "mcontrol_util.h"
 #include "bml_gaze.hpp"
+
+#include "mcontrol_util.h"
 #include "me_ct_gaze.h"
+
 #include "bml_target.hpp"
+#include "bml_xml_consts.hpp"
 #include "xercesc_utils.hpp"
 
 

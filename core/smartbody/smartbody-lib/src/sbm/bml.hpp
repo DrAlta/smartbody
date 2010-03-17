@@ -32,6 +32,7 @@
 
 
 #include "bml_types.hpp"
+#include "bml_sync_point.hpp"
 #include "behavior_span.hpp"
 #include "behavior_scheduler.hpp"
 #include "behavior_scheduler_constant_speed.hpp" // temporary, for BEHAVIOR_TIMING_BY_DURATION macro
@@ -46,10 +47,10 @@
 #include "me_ct_examples.h"
 #include <ME/me_prune_policy.hpp>
 
+#include "bml_sync_point.hpp"
+
 const bool LOG_BML_VISEMES	= false;
 const bool LOG_AUDIO		= false;
-
-#define VALIDATE_BEHAVIOR_SYNCS (1)
 
 /**
  *  Enables a argument-level compatibility mode of vrAgentBML.
@@ -60,29 +61,6 @@ const bool LOG_AUDIO		= false;
 
 
 namespace BML {
-	//  Common XML Identifiers
-	const XMLCh ATTR_ID[]    = L"id";
-	const XMLCh ATTR_TYPE[]  = L"type";
-	const XMLCh ATTR_NAME[]  = L"name";
-	const XMLCh ATTR_LEVEL[] = L"level";
-
-	const XMLCh ATTR_START[]        = L"start";
-	const XMLCh ATTR_READY[]        = L"ready";
-	const XMLCh ATTR_STROKE_START[] = L"stroke_start";
-	const XMLCh ATTR_STROKE[]       = L"stroke";
-	const XMLCh ATTR_STROKE_END[]   = L"stroke_end";
-	const XMLCh ATTR_RELAX[]        = L"relax";
-	const XMLCh ATTR_END[]          = L"end";
-
-	const XMLCh TM_START[]        = L"start";
-	const XMLCh TM_READY[]        = L"ready";
-	const XMLCh TM_STROKE_START[] = L"stroke_start";
-	const XMLCh TM_STROKE[]       = L"stroke";
-	const XMLCh TM_STROKE_END[]   = L"stroke_end";
-	const XMLCh TM_RELAX[]        = L"relax";
-	const XMLCh TM_END[]          = L"end";
-
-
 	//  Helper Function
 	std::wstring buildBmlId( const std::wstring& behavior_id, const std::wstring& sync_id );
 	bool isValidBmlId( const std::wstring& id );
@@ -219,133 +197,6 @@ namespace BML {
 		friend class Processor;
 	};
 
-	class TriggerEvent {
-	public:
-		std::wstring        name;     // for logging / debugging
-		BmlRequestWeakPtr   request;
-
-	private:
-		TriggerEventWeakPtr weak_ptr;  // weak reference to the reference count struct
-
-	protected:
-		TriggerEvent( const std::wstring& name, BmlRequestPtr request );
-		void init( TriggerEventPtr self );
-
-	public:
-		SyncPointPtr addSyncPoint();  // adds SyncPoint before end of trigger
-		SyncPointPtr addSyncPoint( SyncPointPtr par, float off );
-
-		friend class BmlRequest;
-	};
-
-	class SyncPoint {
-	public:
-		const TriggerEventWeakPtr trigger;
-		time_sec                  time;  // TIME_UNSET implies it has not been set
-		SyncPointPtr              parent;
-		float			          offset;	
-
-		bool isSet() { return isTimeSet( time ); }
-
-	private:
-		SyncPointWeakPtr         weak_ptr;  // weak reference to the reference count struct
-
-	protected:
-		SyncPoint( const TriggerEventPtr trigger );
-		SyncPoint( const TriggerEventPtr trigger, SyncPointPtr par, float off );
-		void init( SyncPointPtr self );
-
-	public:
-		friend class BmlRequest;
-		friend class TriggerEvent;
-	};
-
-	// Ordered list of named sync points.
-	// Includes direct references to the standard sync_points.
-	class SequenceOfNamedSyncPoints {
-	public:
-		typedef VecOfSyncPoint::iterator iterator;
-
-	protected:
-		VecOfSyncPoint  sync_seq;    // Short enough to avoid more complicated structures?
-		MapOfSyncPoint  idToSync;
-
-	public:
-		SyncPointPtr sp_start;
-		SyncPointPtr sp_ready;
-		SyncPointPtr sp_stroke_start;
-		SyncPointPtr sp_stroke;
-		SyncPointPtr sp_stroke_end;
-		SyncPointPtr sp_relax;
-		SyncPointPtr sp_end;
-
-		/**
-		 * Default constructor.  Does not initialize standard SyncPoint fields.
-		 */
-		SequenceOfNamedSyncPoints();
-
-		/**
-		 * Copy constructor.
-		 */
-		SequenceOfNamedSyncPoints( const SequenceOfNamedSyncPoints& other );
-
-		/**
-		 *  Returns the position of the first SyncPointPtr, or end() if empty.
-		 */
-		SequenceOfNamedSyncPoints::iterator begin()
-		{	return sync_seq.begin(); }
-
-		/**
-		 *  Returns the position after the last SyncPointPtr.
-		 */
-		SequenceOfNamedSyncPoints::iterator end()
-		{	return sync_seq.end(); }
-
-		/**
-		 *  Returns the position of the first scheduled SyncPointPtr, or end() is none are scheduled.
-		 */
-		SequenceOfNamedSyncPoints::iterator first_scheduled();
-
-
-		SequenceOfNamedSyncPoints::iterator insert( const std::wstring& id, SyncPointPtr sync, SequenceOfNamedSyncPoints::iterator pos ); 
-
-		SetOfWstring get_sync_names();
-
-		SyncPointPtr sync_for_name( const std::wstring& name );
-
-		SequenceOfNamedSyncPoints::iterator pos_of( SyncPointPtr sync );
-
-		void parseStandardSyncPoints( DOMElement* elem, BmlRequestPtr request, const std::string& behavior_id );
-
-		/**
-		 *  Gets the BehaviorSpan for all scheduled SyncPoints.
-		 */
-		BehaviorSpan getBehaviorSpan( time_sec persistent_threshold );
-
-#if VALIDATE_BEHAVIOR_SYNCS
-		std::string debug_label( SyncPointPtr& sync );
-
-		/** Validates the SyncPoint scheduled times are in order, if set.  Throws SchedulingException if out of order.  */
-		void validate();
-#endif // INCOMPLETE_SYNCS_VALIDATION
-
-		std::wstring idForSyncPoint( SyncPointPtr sync );
-
-		/** For each SyncPoint, if parent is set, applies the parent time and offset. */
-		// Called by BehaviorRequest::schedule, not BehaviorScheduler
-		void applyParentTimes( std::string& warning_context = std::string() );
-
-		/** Prints SyncPoint ids in order, separated by commas. */
-		void printSyncIds();
-
-		/** Prints SyncPoints in order, one per line, prefixed with a tab. */
-		void printSyncTimes();
-
-	protected:
-		SyncPointPtr parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const std::string& behavior_id );
-		SyncPointPtr parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const std::string& behavior_id, iterator pos );
-	};
-
 	//  Structure to keep track of a scheduled SBM command
 	//  Needed because the entries of srCmdSeq are not editable,
 	//  and these commands might need to be shifted slightly.
@@ -369,10 +220,10 @@ namespace BML {
 	///////////////////////////////////////////////////////////////////
     //  Data
 	public:
-		const std::string     unique_id;
-		bool                  required;
-		SequenceOfNamedSyncPoints     sync_seq;
-		BehaviorSchedulerPtr  scheduler;
+		const std::string         unique_id;
+		bool                      required;
+		SequenceOfNamedSyncPoints sync_seq;
+		BehaviorSchedulerPtr      scheduler;
 
 	private:
         time_sec audioOffset;
@@ -608,28 +459,5 @@ namespace BML {
 		void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu );
 	};
 } // namespace BML
-
-
-
-//  Output Operators
-template < typename charT, typename traits >
-inline
-std::basic_ostream<charT,traits>& 
-operator << ( std::basic_ostream<charT,traits>& out, const BML::SyncPointPtr& sync ) {
-	out << *(sync.get());
-	return out;
-}
-
-template < typename charT, typename traits >
-inline
-std::basic_ostream<charT,traits>& 
-operator << ( std::basic_ostream<charT,traits>& out, const BML::SyncPoint& sync ) {
-	if( sync.parent ) {
-		out << "time=" << sync.time << "; parent="<< sync.parent.get() << "; offset="<<sync.offset;
-	} else {
-		out << "time="<<sync.time;
-	}
-	return out;
-}
 
 #endif  // BML_HPP
