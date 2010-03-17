@@ -1268,6 +1268,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\sbm\bml_sync_point.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\bml_sync_point.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\sbm\bml_target.cpp"
 					>
 				</File>
@@ -1277,6 +1285,10 @@
 				</File>
 				<File
 					RelativePath="..\src\sbm\bml_types.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\bml_xml_consts.hpp"
 					>
 				</File>
 			</Filter>

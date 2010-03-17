@@ -24,8 +24,11 @@
 #include <sstream>
 #include <string>
 
-#include "mcontrol_util.h"
 #include "bml_face.hpp"
+
+#include "mcontrol_util.h"
+
+#include "bml_xml_consts.hpp"
 #include "xercesc_utils.hpp"
 
 
