@@ -137,10 +137,7 @@ namespace BML {
 		bool registerBehavior( const std::wstring& id, BehaviorRequestPtr behavior );
 //		bool registerBehavior( const std::wstring& id, SpeechRequestPtr behavior );
 
-		/**
-		 *  Gets the TimeRange for all scheduled SequenceOfNamedSyncPoints in all BehaviorRequests.
-		 */
-		SyncPointPtr getSyncPoint( const std::wstring& notation );  // Lookup a SyncPoint
+		SyncPointPtr getSyncByReference( const std::wstring& notation );  // Parse and evaluate a SyncPoint reference
 		
 		bool isPersistent() { return getBehaviorSpan().persistent; }
 

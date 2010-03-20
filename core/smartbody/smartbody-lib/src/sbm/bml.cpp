@@ -250,13 +250,13 @@ bool BmlRequest::hasExistingBehaviorId( const std::wstring& id ) {
 }
 
 void BmlRequest::importNamedSyncPoints( SequenceOfNamedSyncPoints& sync_seq, const std::wstring& id, const std::wstring& logging_label ) {
-	// Import named SequenceOfNamedSyncPoints
+	// Import SequenceOfNamedSyncPoints
 	SetOfWstring names = sync_seq.get_sync_names();
 	SetOfWstring::iterator it  = names.begin();
 	SetOfWstring::iterator end = names.end();
 	for( ; it!=end ; ++it ) {
 		wstring& name = *it;
-		SyncPointPtr sync( sync_seq.sync_for_name( name ) );
+		SyncPointPtr sync( sync_seq.find( name )->sync() );
 
 		wstring sync_id = buildBmlId( id, name );
 		if( !sync_id.empty() ) {
@@ -309,7 +309,7 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 				behavior->sync_seq.validate();
 #endif // VALIDATE_BEHAVIOR_SYNCS
 
-				min_time = min( min_time, behavior->sync_seq.sp_start->time );
+				min_time = min( min_time, behavior->sync_seq.sync_start()->time() );
 
 				if( LOG_BML_BEHAVIOR_SCHEDULE ) {
 					cout << "DEBUG: BmlRequest::realize(): Behavior \""<< (behavior->unique_id) <<"\" SequenceOfNamedSyncPoints:"<<endl;
@@ -339,9 +339,9 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 			for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i ) {
 				BehaviorRequestPtr behavior = *i;
 				
-				VecOfSyncPoint::iterator syncs_end = behavior->sync_seq.end();
-				for( VecOfSyncPoint::iterator j = behavior->sync_seq.begin(); j != syncs_end; ++j ) {
-					(*j)->time += offset;
+				SequenceOfNamedSyncPoints::iterator syncs_end = behavior->sync_seq.end();
+				for( SequenceOfNamedSyncPoints::iterator j = behavior->sync_seq.begin(); j != syncs_end; ++j ) {
+					j->sync()->time += offset;
 				}
 			}
 		}
@@ -664,7 +664,7 @@ bool BmlRequest::registerBehavior( const std::wstring& id, BehaviorRequestPtr be
 
 
 
-SyncPointPtr BmlRequest::getSyncPoint( const std::wstring& notation ) {
+SyncPointPtr BmlRequest::getSyncByReference( const std::wstring& notation ) {
 	typedef wstring::size_type size_type;
 	const size_type npos = wstring::npos;
 
@@ -795,7 +795,11 @@ void BehaviorRequest::realize( BmlRequestPtr request, mcuCBHandle* mcu ) {
 
 
 bool BehaviorRequest::isPersistent() {
-	time_sec duration = (sync_seq.sp_end->time) - (sync_seq.sp_start->time);
+	// Persistence is defined by a threshold to ensure we are operating
+	// within enough significant bits (especially when interpolating)
+	time_sec start_time = sync_seq.sync_start()->time();
+	time_sec end_time = sync_seq.sync_end()->time();
+	time_sec duration = end_time - start_time;
 	return( duration > PERSISTENCE_THRESHOLD );
 }
 
@@ -852,11 +856,11 @@ void MeControllerRequest::register_controller_prune_policy( MePrunePolicy* prune
 
 void MeControllerRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu ) {
 	// Get times from SequenceOfNamedSyncPoints
-	time_sec startAt  = sync_seq.sp_start->time;
-	time_sec readyAt  = sync_seq.sp_ready->time;
-	time_sec strokeAt = sync_seq.sp_stroke->time;
-	time_sec relaxAt  = sync_seq.sp_relax->time;
-	time_sec endAt    = sync_seq.sp_end->time;
+	time_sec startAt  = sync_seq.sync_start()->time();
+	time_sec readyAt  = sync_seq.sync_ready()->time();
+	time_sec strokeAt = sync_seq.sync_stroke()->time();
+	time_sec relaxAt  = sync_seq.sync_relax()->time();
+	time_sec endAt    = sync_seq.sync_end()->time();
 
 	if( LOG_METHODS || LOG_CONTROLLER_SCHEDULE ) {
 		cout << "DEBUG: MeControllerRequest::schedule(): startAt="<<startAt<<",  readyAt="<<readyAt<<",  strokeAt="<<strokeAt<<",  relaxAt="<<relaxAt<<",  endAt="<<endAt<<endl;
@@ -1137,11 +1141,11 @@ void VisemeRequest::setVisemeName( const char* viseme ) {
 void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 {
 	// Get times from SequenceOfNamedSyncPoints
-	time_sec startAt  = sync_seq.sp_start->time;
-	time_sec readyAt  = sync_seq.sp_ready->time;
-	time_sec strokeAt = sync_seq.sp_stroke->time;
-	time_sec relaxAt  = sync_seq.sp_relax->time;
-	time_sec endAt    = sync_seq.sp_end->time;
+	time_sec startAt  = sync_seq.sync_start()->time();
+	time_sec readyAt  = sync_seq.sync_ready()->time();
+	time_sec strokeAt = sync_seq.sync_stroke()->time();
+	time_sec relaxAt  = sync_seq.sync_relax()->time();
+	time_sec endAt    = sync_seq.sync_end()->time();
 
 	const SbmCharacter* actor    = request->actor;
 	const string&       actor_id = request->actorId; // match string used by request?

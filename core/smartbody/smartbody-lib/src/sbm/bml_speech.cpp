@@ -164,7 +164,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	//       rather the default start trigger.  The trigger identifies the additional processing
 	//       necessary for the speech.
 	//TriggerEventPtr trigger = request->createTrigger( L"SPEECH" );
-	TriggerEventPtr trigger = sync_seq.sp_start->trigger.lock();
+	TriggerEventPtr trigger = sync_seq.sync_start()->sync()->trigger.lock();
 
 //// Old code:  sync_seq are now parsed and passed in
 //	// Current Speech behavior constraints prevent us from using the sync point attributes
@@ -193,7 +193,7 @@ BML::SpeechRequest::SpeechRequest(
 :	SequenceRequest( unique_id, syncs_in, 0, 0, 0, 0, 0 ),
 	speech_impl( speech_impl ),
 	speech_request_id( speech_request_id ),
-	trigger( sync_seq.sp_start->trigger.lock() )
+	trigger( sync_seq.sync_start()->sync()->trigger.lock() )
 {
 	// Add SyncPoints for SpeechMarks
 	vector<SpeechMark>::const_iterator end = marks.end();
@@ -202,7 +202,7 @@ BML::SpeechRequest::SpeechRequest(
 		SyncPointPtr sync( trigger->addSyncPoint() );
 
 		// Insert just before stroke_end
-		SequenceOfNamedSyncPoints::iterator stroke_end_pos = sync_seq.pos_of( sync_seq.sp_stroke_end );
+		SequenceOfNamedSyncPoints::iterator stroke_end_pos = sync_seq.sync_stroke_end();
 		SequenceOfNamedSyncPoints::iterator result_pos = sync_seq.insert( mark->id, sync, stroke_end_pos );  // Test insertion, and throw error if problem
 
 		// Remember Word Break
@@ -270,13 +270,13 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 	// if more than one, warn and ignore least important
 
 	// Convience references
-	SyncPointPtr sp_start( sync_seq.sp_start );
-	SyncPointPtr sp_ready( sync_seq.sp_ready );
-	SyncPointPtr sp_stroke_start( sync_seq.sp_stroke_start );
-	SyncPointPtr sp_stroke( sync_seq.sp_stroke );
-	SyncPointPtr sp_stroke_end( sync_seq.sp_stroke_end );
-	SyncPointPtr sp_relax( sync_seq.sp_relax );
-	SyncPointPtr sp_end( sync_seq.sp_end );
+	SyncPointPtr sp_start( sync_seq.sync_start()->sync() );
+	SyncPointPtr sp_ready( sync_seq.sync_ready()->sync() );
+	SyncPointPtr sp_stroke_start( sync_seq.sync_stroke_start()->sync() );
+	SyncPointPtr sp_stroke( sync_seq.sync_stroke()->sync() );
+	SyncPointPtr sp_stroke_end( sync_seq.sync_stroke_end()->sync() );
+	SyncPointPtr sp_relax( sync_seq.sync_relax()->sync() );
+	SyncPointPtr sp_end( sync_seq.sync_end()->sync() );
 
 	string warning_context = string( "Behavior \"" ) + unique_id + "\"";
 	sync_seq.applyParentTimes( warning_context );
@@ -399,11 +399,11 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 {
 	// Get times from SyncPoints
-	time_sec startAt  = sync_seq.sp_start->time;
-	time_sec readyAt  = sync_seq.sp_ready->time;
-	time_sec strokeAt = sync_seq.sp_stroke->time;
-	time_sec relaxAt  = sync_seq.sp_relax->time;
-	time_sec endAt    = sync_seq.sp_end->time;
+	time_sec startAt  = sync_seq.sync_start()->time();
+	time_sec readyAt  = sync_seq.sync_ready()->time();
+	time_sec strokeAt = sync_seq.sync_stroke()->time();
+	time_sec relaxAt  = sync_seq.sync_relax()->time();
+	time_sec endAt    = sync_seq.sync_end()->time();
 
 	const string& actor_id = request->actor->name;
 

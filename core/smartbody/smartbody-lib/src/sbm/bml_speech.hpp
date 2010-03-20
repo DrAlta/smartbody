@@ -92,7 +92,7 @@ namespace BML {
 		{	return sync_seq.get_sync_names(); }
 
 		SyncPointPtr sync_for_name( const std::wstring& name )
-		{	return sync_seq.sync_for_name( name ); }
+		{	return sync_seq.find( name )->sync(); }  // TODO: Revisit the uses of this since sync_seq interfaces changed
 
 		///**
 		// *  Adds wordbreak mark after STROKE or last mark, and before RELAX

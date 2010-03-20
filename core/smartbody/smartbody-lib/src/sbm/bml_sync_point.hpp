@@ -26,7 +26,7 @@
 #define BML_SYNC_POINT_HPP
 
 #include <string>
-#include <vector>
+#include <list>
 #include <map>
 //#include <limits>
 
@@ -71,7 +71,7 @@ namespace BML {
 		SyncPointPtr              parent;
 		float			          offset;	
 
-		bool isSet() { return isTimeSet( time ); }
+		bool is_set() { return isTimeSet( time ); }
 
 	private:
 		SyncPointWeakPtr         weak_ptr;  // weak reference to the reference count struct
@@ -86,25 +86,59 @@ namespace BML {
 		friend class TriggerEvent;
 	};
 
+	/**
+	 *  A SyncPointPtr with a name,
+	 *  not to be confused with a shared_ptr to the name of a SyncPoint.
+	 *  (English is confusing when you try to avoid prepositions.)
+	 *
+	 *  Only a SequenceOfNamedSyncPoints can update the sync reference
+	 *  once the NamedSyncPointPtr is created.
+	 */
+	class NamedSyncPointPtr {
+	protected:
+		std::wstring _name;
+		SyncPointPtr _sync;
+
+	public:
+		NamedSyncPointPtr( const std::wstring& name, SyncPointPtr sync );
+		NamedSyncPointPtr( const NamedSyncPointPtr& other );
+
+		std::wstring name() const { return _name; }
+		SyncPointPtr sync() const { return _sync; }
+
+		// Convience Methods
+		bool is_set() const
+		{	return _sync->is_set(); }
+
+		time_sec time() const
+		{	return _sync->time; }
+
+	protected:
+		friend BML::SequenceOfNamedSyncPoints;
+		void set_sync( SyncPointPtr new_sync ) { _sync = new_sync; }
+	};
+
 	// Ordered list of named sync points.
 	// Includes direct references to the standard sync_points.
 	class SequenceOfNamedSyncPoints {
 	public:
-		typedef VecOfSyncPoint::iterator iterator;
+		typedef std::list<NamedSyncPointPtr> ListOfNamedSyncs;
+		typedef ListOfNamedSyncs::iterator iterator;
 
 	protected:
-		VecOfSyncPoint  sync_seq;    // Short enough to avoid more complicated structures?
-		MapOfSyncPoint  idToSync;
+		ListOfNamedSyncs named_syncs;
+		std::map<const std::wstring,iterator> name_to_pos;
+
+		// Convience references to the standard/core sync points for a behavior
+		iterator start_it;
+		iterator ready_it;
+		iterator stroke_start_it;
+		iterator stroke_it;
+		iterator stroke_end_it;
+		iterator relax_it;
+		iterator end_it;
 
 	public:
-		SyncPointPtr sp_start;
-		SyncPointPtr sp_ready;
-		SyncPointPtr sp_stroke_start;
-		SyncPointPtr sp_stroke;
-		SyncPointPtr sp_stroke_end;
-		SyncPointPtr sp_relax;
-		SyncPointPtr sp_end;
-
 		/**
 		 * Default constructor.  Does not initialize standard SyncPoint fields.
 		 */
@@ -119,27 +153,54 @@ namespace BML {
 		 *  Returns the position of the first SyncPointPtr, or end() if empty.
 		 */
 		SequenceOfNamedSyncPoints::iterator begin()
-		{	return sync_seq.begin(); }
+		{	return named_syncs.begin(); }
 
 		/**
 		 *  Returns the position after the last SyncPointPtr.
 		 */
 		SequenceOfNamedSyncPoints::iterator end()
-		{	return sync_seq.end(); }
+		{	return named_syncs.end(); }
+
+		size_t size()
+		{	return named_syncs.size(); }
+
+		// Accessors for convience refences to standard/core SyncPoints
+		// Returns end() is called before parseStandardSyncPoints(..).
+		SequenceOfNamedSyncPoints::iterator sync_start()
+		{	return SequenceOfNamedSyncPoints::iterator( start_it ); }
+		SequenceOfNamedSyncPoints::iterator sync_ready()
+		{	return SequenceOfNamedSyncPoints::iterator( ready_it ); }
+		SequenceOfNamedSyncPoints::iterator sync_stroke_start()
+		{	return SequenceOfNamedSyncPoints::iterator( stroke_start_it ); }
+		SequenceOfNamedSyncPoints::iterator sync_stroke()
+		{	return SequenceOfNamedSyncPoints::iterator( stroke_it ); }
+		SequenceOfNamedSyncPoints::iterator sync_stroke_end()
+		{	return SequenceOfNamedSyncPoints::iterator( stroke_end_it ); }
+		SequenceOfNamedSyncPoints::iterator sync_relax()
+		{	return SequenceOfNamedSyncPoints::iterator( relax_it ); }
+		SequenceOfNamedSyncPoints::iterator sync_end()
+		{	return SequenceOfNamedSyncPoints::iterator( end_it ); }
+
+		iterator insert( const std::wstring& id, SyncPointPtr sync, SequenceOfNamedSyncPoints::iterator pos ); 
+
+		SetOfWstring get_sync_names();
+
+		/**
+		 *  Returns the iterator refering to this SyncPoint by this name.
+		 *  Returns end() if not found.
+		 */
+		iterator find( const std::wstring& name );
+
+		/**
+		 *  Returns the iterator refering to this SyncPoint.
+		 *  Returns end() if not found.
+		 */
+		iterator pos_of( SyncPointPtr sync );
 
 		/**
 		 *  Returns the position of the first scheduled SyncPointPtr, or end() is none are scheduled.
 		 */
-		SequenceOfNamedSyncPoints::iterator first_scheduled();
-
-
-		SequenceOfNamedSyncPoints::iterator insert( const std::wstring& id, SyncPointPtr sync, SequenceOfNamedSyncPoints::iterator pos ); 
-
-		SetOfWstring get_sync_names();
-
-		SyncPointPtr sync_for_name( const std::wstring& name );
-
-		SequenceOfNamedSyncPoints::iterator pos_of( SyncPointPtr sync );
+		iterator first_scheduled();
 
 		void parseStandardSyncPoints( DOMElement* elem, BmlRequestPtr request, const std::string& behavior_id );
 
@@ -168,8 +229,7 @@ namespace BML {
 		void printSyncTimes();
 
 	protected:
-		SyncPointPtr parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const std::string& behavior_id );
-		SyncPointPtr parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const std::string& behavior_id, iterator pos );
+		SequenceOfNamedSyncPoints::iterator parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const std::string& behavior_id );
 	};
 } // end namespace BML
 
