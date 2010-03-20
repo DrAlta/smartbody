@@ -47,7 +47,7 @@ namespace BML {
 	
 		void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 		{
-			time_sec strokeAt = sync_seq.sp_stroke->time;
+			time_sec strokeAt = sync_seq.sync_stroke()->time();
 
 			VecOfSbmCommand commands;
 

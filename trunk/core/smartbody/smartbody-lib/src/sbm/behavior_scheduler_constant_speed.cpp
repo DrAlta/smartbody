@@ -103,13 +103,13 @@ bool testSyncAfter(
 
 void BehaviorSchedulerConstantSpeed::schedule( SequenceOfNamedSyncPoints& sync_seq, time_sec now ) {
 	// local references to standard sync points
-	SyncPointPtr start        = sync_seq.sp_start;
-	SyncPointPtr ready        = sync_seq.sp_ready;
-	SyncPointPtr stroke_start = sync_seq.sp_stroke_start;
-	SyncPointPtr stroke       = sync_seq.sp_stroke;
-	SyncPointPtr stroke_end   = sync_seq.sp_stroke_end;
-	SyncPointPtr relax        = sync_seq.sp_relax;
-	SyncPointPtr end          = sync_seq.sp_end;
+	SyncPointPtr start        = sync_seq.sync_start()->sync();
+	SyncPointPtr ready        = sync_seq.sync_ready()->sync();
+	SyncPointPtr stroke_start = sync_seq.sync_stroke_start()->sync();
+	SyncPointPtr stroke       = sync_seq.sync_stroke()->sync();
+	SyncPointPtr stroke_end   = sync_seq.sync_stroke_end()->sync();
+	SyncPointPtr relax        = sync_seq.sync_relax()->sync();
+	SyncPointPtr end          = sync_seq.sync_end()->sync();
 
 	/*  The following implements a search for the two most important SyncPoints, and then scales the time to meet both.
      *  Importance is ranked in this order: stroke, ready, relax, start, end
@@ -441,7 +441,7 @@ void BehaviorSchedulerConstantSpeed::schedule( SequenceOfNamedSyncPoints& sync_s
 	}
 
     // Offset all times by startAt-startTime and scale to previously determined speed
-	if( !start->isSet() )
+	if( !start->is_set() )
 		start->time  = start_at;
 #if BEHAVIOR_TIMING_BY_DURATION
 	if( !ready->isSet() )
@@ -453,13 +453,13 @@ void BehaviorSchedulerConstantSpeed::schedule( SequenceOfNamedSyncPoints& sync_s
 	if( !end->isSet() )
 		end->time    = relax->time  + relaxEndDur/speed;
 #else
-	if( !ready->isSet() )
+	if( !ready->is_set() )
 		ready->time  = start_at + (readyTime-startTime)/speed;
-	if( !stroke->isSet() )
+	if( !stroke->is_set() )
 		stroke->time = start_at + (strokeTime-startTime)/speed;
-	if( !relax->isSet() )
+	if( !relax->is_set() )
 		relax->time  = start_at + (relaxTime-startTime)/speed;
-	if( !end->isSet() )
+	if( !end->is_set() )
 		end->time    = start_at + (endTime-startTime)/speed;
 #endif // BEHAVIOR_TIMING_BY_DURATION
 

@@ -42,7 +42,7 @@ namespace BML {
 			std::vector<std::pair<std::wstring,float>> sync_point_times;
 
 			// map of sync_point id to the index of the data
-			std::map<std::wstring,unsigned int> sync_id2index;
+			std::map<std::wstring,size_t> sync_id2index;
 
 		public:
 			BehaviorSchedulerFixed( const std::vector<std::pair<std::wstring,float>>& sync_point_pairs );

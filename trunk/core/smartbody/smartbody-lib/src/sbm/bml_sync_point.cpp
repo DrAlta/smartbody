@@ -18,8 +18,6 @@
  *
  *  CONTRIBUTORS:
  *      Andrew n marshall, USC
- *      Corne Versloot, while at USC
- *      Marcus Thiebaux, USC
  *      Ed Fast, USC
  */
 
@@ -37,6 +35,11 @@
 
 using namespace std;
 using namespace BML;
+
+
+// shorthand type for name_to_pos
+typedef map<const wstring,SequenceOfNamedSyncPoints::iterator> MapNameToPos;  
+
 
 
 //const bool USE_CUSTOM_PRUNE_POLICY          = false; // Future feature
@@ -88,52 +91,94 @@ void SyncPoint::init( SyncPointPtr self ) {
 	weak_ptr = self;
 }
 
+///////////////////////////////////////////////////////////////////////////
+//  NamedSyncPointPtr
+
+NamedSyncPointPtr::NamedSyncPointPtr( const wstring& name, SyncPointPtr sync )
+:	_name( name ),
+	_sync( sync )
+{}
+
+NamedSyncPointPtr::NamedSyncPointPtr( const NamedSyncPointPtr& other )
+:	_name( other.name() ),
+	_sync( other.sync() )
+{}
+
+
+
+///////////////////////////////////////////////////////////////////////////
+//  SequenceOfNamedSyncPoints
 
 // default constructor
 SequenceOfNamedSyncPoints::SequenceOfNamedSyncPoints()
-{}
+{
+	start_it = insert( ATTR_START, SyncPointPtr(), end() );
+	ready_it = insert( ATTR_READY, SyncPointPtr(), end() );
+	stroke_start_it = insert( ATTR_STROKE_START, SyncPointPtr(), end() );
+	stroke_it = insert( ATTR_STROKE, SyncPointPtr(), end() );
+	stroke_end_it = insert( ATTR_STROKE_END, SyncPointPtr(), end() );
+	relax_it = insert( ATTR_RELAX, SyncPointPtr(), end() );
+	end_it = insert( ATTR_END, SyncPointPtr(), end() );
+}
 
 SequenceOfNamedSyncPoints::SequenceOfNamedSyncPoints( const SequenceOfNamedSyncPoints& other )
-:	sync_seq( other.sync_seq ),
-	idToSync( other.idToSync ),
-	sp_start( other.sp_start ),
-	sp_ready( other.sp_ready ),
-	sp_stroke_start( other.sp_stroke_start ),
-	sp_stroke( other.sp_stroke ),
-	sp_stroke_end( other.sp_stroke_end ),
-	sp_relax( other.sp_relax ),
-	sp_end( other.sp_end )
-{}
+:	named_syncs( other.named_syncs )
+{
+	// Repopulate name_to_pos with local iterators
+	iterator it = named_syncs.begin();
+	iterator end = named_syncs.end();
 
-SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::first_scheduled() {
-	// Find first sync point that is set
-	iterator it = begin();
-	iterator it_end = end();
-	while( !( it==it_end || (*it)->isSet() ) ) {
-		++it;
+	for( ; it!=end; ++it ) {
+		name_to_pos.insert( make_pair( it->name(), it ) );
 	}
-	return it;
+
+	// Rebuild Convience references
+	start_it = find( ATTR_START );
+	ready_it = find( ATTR_READY );
+	stroke_start_it = find( ATTR_STROKE_START );
+	stroke_it = find( ATTR_STROKE );
+	stroke_end_it = find( ATTR_STROKE_END );
+	relax_it = find( ATTR_RELAX );
+	end_it = find( ATTR_END );
 }
 
-SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::insert( const wstring& id, SyncPointPtr sync, SequenceOfNamedSyncPoints::iterator pos ) {
-	MapOfSyncPoint::iterator map_it = idToSync.find( id );
-	if( map_it != idToSync.end() )
-		return end();
+SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::insert( const wstring& name, SyncPointPtr sync, SequenceOfNamedSyncPoints::iterator pos ) {
+	// Is there a way to test is pos is a valid iterator for named_syncs?
 
-	if( !idToSync.insert( make_pair( id, sync ) ).second )
-		return end();
-	return sync_seq.insert( pos, sync );
+	iterator insert_pos;
+
+	MapNameToPos::iterator map_it = name_to_pos.find( name );
+	if( map_it != name_to_pos.end() ) {
+		// Name already exists
+
+		insert_pos = map_it->second;
+		// TODO: check position relative to requested position
+
+		if( insert_pos->sync() ) {
+			cout << "ERROR: SequenceOfNamedSyncPoints::insert(..): SyncPoint already exists." << endl;
+			return end();
+		}
+
+		// Update sync point
+		insert_pos->set_sync( sync );
+	} else {
+		insert_pos = named_syncs.insert( pos, NamedSyncPointPtr( name, sync ) );
+		if( insert_pos != named_syncs.end() )
+			name_to_pos.insert( make_pair( name, insert_pos ) );
+	}
+
+	return insert_pos;
 }
 
-SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::pos_of( SyncPointPtr sync ) {
-	return find( begin(), end(), sync );
-}
+//SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::pos_of( SyncPointPtr sync ) {
+//	return find( begin(), end(), sync );
+//}
 
 SetOfWstring SequenceOfNamedSyncPoints::get_sync_names() {
 	SetOfWstring names;
 
-	MapOfSyncPoint::iterator it  = idToSync.begin();
-	MapOfSyncPoint::iterator end = idToSync.end();
+	MapNameToPos::iterator it  = name_to_pos.begin();
+	MapNameToPos::iterator end = name_to_pos.end();
 	for( ; it!=end; ++it ) {
 		const wstring& name = it->first;
 		if( !( names.insert( name ).second ) )
@@ -143,12 +188,21 @@ SetOfWstring SequenceOfNamedSyncPoints::get_sync_names() {
 	return names;
 }
 
-SyncPointPtr SequenceOfNamedSyncPoints::sync_for_name( const std::wstring& name ) {
-	MapOfSyncPoint::iterator result = idToSync.find( name );
-	if( result != idToSync.end() )
-		return result->second;
-	else
-		return SyncPointPtr();
+SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::find( const std::wstring& name ) {
+	MapNameToPos::iterator map_it = name_to_pos.find( name );
+	bool found_name = map_it != name_to_pos.end();
+
+	return found_name? map_it->second : end();  // return iterator is found, else end()
+}
+
+SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::first_scheduled() {
+	// Find first sync point that is set
+	iterator it = begin();
+	iterator it_end = end();
+	while( !( it==it_end || it->is_set() ) ) {
+		++it;
+	}
+	return it;
 }
 
 BehaviorSpan SequenceOfNamedSyncPoints::getBehaviorSpan( time_sec persistent_threshold ) {
@@ -159,7 +213,7 @@ BehaviorSpan SequenceOfNamedSyncPoints::getBehaviorSpan( time_sec persistent_thr
 	iterator it     = begin();
 	iterator it_end = end();
 	for( ; it != it_end; ++it ) {
-		time_sec time = (*it)->time;
+		time_sec time = it->time();
 
 		if( isTimeSet( time ) ) {
 			if( time < persistent_threshold ) {
@@ -206,23 +260,18 @@ void SequenceOfNamedSyncPoints::parseStandardSyncPoints( DOMElement* elem, BmlRe
 	//}
 
 	// Load SyncPoint references
-	sp_start        = parseSyncPointAttr( elem, id, ATTR_START,        request, behavior_id );
-	sp_ready        = parseSyncPointAttr( elem, id, ATTR_READY,        request, behavior_id );
-	sp_stroke_start = parseSyncPointAttr( elem, id, ATTR_STROKE_START, request, behavior_id );
-	sp_stroke       = parseSyncPointAttr( elem, id, ATTR_STROKE,       request, behavior_id );
-	sp_stroke_end   = parseSyncPointAttr( elem, id, ATTR_STROKE_END,   request, behavior_id );
-	sp_relax        = parseSyncPointAttr( elem, id, ATTR_RELAX,        request, behavior_id );
-	sp_end          = parseSyncPointAttr( elem, id, ATTR_END,          request, behavior_id );
+	start_it        = parseSyncPointAttr( elem, id, ATTR_START,        request, behavior_id );
+	ready_it        = parseSyncPointAttr( elem, id, ATTR_READY,        request, behavior_id );
+	stroke_start_it = parseSyncPointAttr( elem, id, ATTR_STROKE_START, request, behavior_id );
+	stroke_it       = parseSyncPointAttr( elem, id, ATTR_STROKE,       request, behavior_id );
+	stroke_end_it   = parseSyncPointAttr( elem, id, ATTR_STROKE_END,   request, behavior_id );
+	relax_it        = parseSyncPointAttr( elem, id, ATTR_RELAX,        request, behavior_id );
+	end_it          = parseSyncPointAttr( elem, id, ATTR_END,          request, behavior_id );
 }
 
 
-SyncPointPtr SequenceOfNamedSyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const string& behavior_id ) {
-	return parseSyncPointAttr( elem, elem_id, sync_attr, request, behavior_id, end() );
-}
-
-SyncPointPtr SequenceOfNamedSyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const string& behavior_id, iterator pos ) {
-	SyncPointPtr sync;
-
+SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const string& behavior_id ) {
+	//  Get behavior id as wstring
 	wstring behavior_wid;
 	{
 		XMLCh* temp = XMLString::transcode( behavior_id.c_str() );
@@ -230,8 +279,11 @@ SyncPointPtr SequenceOfNamedSyncPoints::parseSyncPointAttr( DOMElement* elem, co
 		XMLString::release( &temp );
 	}
 
-	MapOfSyncPoint::iterator map_it = idToSync.find( sync_attr );
-	if( map_it != idToSync.end() ) {
+	// Does the sync point already exist?
+	MapNameToPos::iterator map_it = name_to_pos.find( sync_attr );
+	if( map_it != name_to_pos.end() && map_it->second->sync() ) {
+		// SyncPoint of this name already exists
+
 		// TODO: Throw BML ParsingException
 		wcerr << "ERROR: Behavior \""<<behavior_wid<<"\": SequenceOfNamedSyncPoints contains SyncPoint with id \"" << sync_attr << "\".  Ignoring attribute in <"<<elem->getTagName();
 		if( !elem_id.empty() )
@@ -242,35 +294,24 @@ SyncPointPtr SequenceOfNamedSyncPoints::parseSyncPointAttr( DOMElement* elem, co
 		return map_it->second;
 	}
 
+	// Get the sync refernce string
 	const XMLCh* sync_ref = elem->getAttribute( sync_attr.c_str() );
-	bool has_sync_ref = sync_ref!=NULL && XMLString::stringLen( sync_ref )>0;
-	if( has_sync_ref ) {
-		sync = request->getSyncPoint( sync_ref );
-	}
+	bool has_sync_ref = sync_ref!=NULL && sync_ref[0]!=0;
 
-	if( !sync ) {
-		if( has_sync_ref ) {
-			wcerr<<"WARNING: Behavior \""<<behavior_wid<<"\": SequenceOfNamedSyncPoints::parseSyncPointAttr(..): <"<<(elem->getTagName())<<"> BML tag refers to unknown SyncPoint "<<sync_attr<<"=\""<<sync_ref<<"\".  Creating placeholder..."<<endl;
+	SyncPointPtr sync;  // unset by default
+	if( sync_ref!=NULL && sync_ref[0]!=0 ) {
+		// Has sync reference.
+		sync = request->getSyncByReference( sync_ref );  // Parses the sync reference notation
+
+		if( !sync ) {
+			// TODO: More descriptive string
+			throw BML::ParsingException( "SequenceOfNamedSyncPoints::parseSyncPointAttr: Invalid SyncPoint reference." );
 		}
-
-		TriggerEventPtr trigger;
-		SyncPointPtr prev;
-
-		if( pos != begin() )
-			prev = *(--iterator(pos));
-		if( prev )
-			trigger = prev->trigger.lock();
-		if( !trigger )
-			trigger = request->start_trigger;
-
-		sync = trigger->addSyncPoint();
+	} else {
+		sync = request->start_trigger->addSyncPoint();
 	}
 
-	if( sync ) {  // assert( sync )?
-		insert( sync_attr, sync, pos );
-	}
-
-	return sync;
+	return insert( sync_attr, sync, end() );
 }
 
 #if VALIDATE_BEHAVIOR_SYNCS
@@ -281,9 +322,9 @@ string SequenceOfNamedSyncPoints::debug_label( SyncPointPtr& sync ) {
 	wstring id = idForSyncPoint( sync );
 
 	int count = 0;
-	iterator it  = sync_seq.begin();
-	iterator end = sync_seq.end();
-	while( it!=end && (*it)!=sync ) {
+	iterator it  = named_syncs.begin();
+	iterator end = named_syncs.end();
+	while( it!=end && it->sync()!=sync ) {
 		++it;
 		++count;
 	}
@@ -308,12 +349,12 @@ void SequenceOfNamedSyncPoints::validate() {
 
 	bool valid = true;
 
-	iterator it  = sync_seq.begin();
-	iterator end = sync_seq.end();
+	iterator it  = named_syncs.begin();
+	iterator end = named_syncs.end();
 	if( it != end ) {
-		SyncPointPtr sync = (*it);
+		SyncPointPtr sync = it->sync();
 
-		if( sync != sp_start ) {
+		if( it != start_it ) {
 			out << endl << "\t" << debug_label(sync) << " is not sp_start";
 				valid = false;
 		}
@@ -323,7 +364,7 @@ void SequenceOfNamedSyncPoints::validate() {
 			// Find first set time
 			do {
 				++it;
-			} while( it!=end && !isTimeSet( (*it)->time ) );
+			} while( it!=end && !isTimeSet( it->time() ) );
 
 			if( it == end ) {
 				out << endl << "\tAll SyncPoint::time are unset";
@@ -333,7 +374,7 @@ void SequenceOfNamedSyncPoints::validate() {
 
 		SyncPointPtr prev( sync );
 		for( ++it; it != end; ++it ) {
-			sync = (*it);
+			sync = it->sync();
 
 			if( isTimeSet( sync->time ) ) {
 				if( sync->time < prev->time ) {
@@ -356,12 +397,12 @@ void SequenceOfNamedSyncPoints::validate() {
 #endif // INCOMPLETE_SYNCS_VALIDATION
 
 std::wstring SequenceOfNamedSyncPoints::idForSyncPoint( SyncPointPtr sync ) {
-	MapOfSyncPoint::iterator map_it  = idToSync.begin();
-	MapOfSyncPoint::iterator map_end = idToSync.end();
+	iterator it = named_syncs.begin();
+	iterator end = named_syncs.end();
 
-	for( ; map_it!=map_end; ++map_it ) {
-		if( map_it->second == sync ) {
-			return map_it->first;  // early return
+	for( ; it!=end; ++it ) {
+		if( it->sync() == sync ) {
+			return it->name();  // early return
 		}
 	}
 
@@ -370,69 +411,74 @@ std::wstring SequenceOfNamedSyncPoints::idForSyncPoint( SyncPointPtr sync ) {
 }
 
 void SequenceOfNamedSyncPoints::applyParentTimes( std::string& warning_context ) {
-	MapOfSyncPoint::iterator it  = idToSync.begin();
-	MapOfSyncPoint::iterator end = idToSync.end();
+	iterator it  = named_syncs.begin();
+	iterator end = named_syncs.end();
 
 	for( ; it!=end; ++it ) {
-		const wstring& sync_id = it->first;
-		SyncPointPtr  sync    = it->second;
-		if( sync->parent ) {
+		SyncPointPtr sync = it->sync();
+		if( sync ) {
 			SyncPointPtr parent = sync->parent;
-			if( isTimeSet( parent->time ) ) {
-				if( isTimeSet( sync->time ) ) {
-					char* ascii_sync_id = XMLString::transcode( sync_id.c_str() );
+			if( parent ) {
+				if( parent->is_set() ) {
+					if( sync->is_set() ) {
+						char* ascii_sync_id = XMLString::transcode( it->name().c_str() );
 
+						cerr << "WARNING: ";
+						if( !warning_context.empty() )
+							cerr << warning_context << ": ";
+						cerr << "SyncPoint \""<<ascii_sync_id<<"\" time set before applyParentTimes()." << endl;
+
+						delete [] ascii_sync_id;
+					}
+					sync->time = parent->time + sync->offset;
+				} else {
+					char* ascii_sync_id = XMLString::transcode( it->name().c_str() );
+
+					// Parent not set!!
 					cerr << "WARNING: ";
 					if( !warning_context.empty() )
 						cerr << warning_context << ": ";
-					cerr << "SyncPoint \""<<ascii_sync_id<<"\" time set before applyParentTimes()." << endl;
+					cerr << "SyncPoint \""<<ascii_sync_id<<"\" parent unset." << endl;
 
 					delete [] ascii_sync_id;
 				}
-				sync->time = parent->time + sync->offset;
-			} else {
-				char* ascii_sync_id = XMLString::transcode( sync_id.c_str() );
-
-				// Parent not set!!
-				cerr << "WARNING: ";
-				if( !warning_context.empty() )
-					cerr << warning_context << ": ";
-				cerr << "SyncPoint \""<<ascii_sync_id<<"\" parent unset." << endl;
-
-				delete [] ascii_sync_id;
 			}
 		}
 	}
 }
 
 void SequenceOfNamedSyncPoints::printSyncIds() {
-	VecOfSyncPoint::iterator vec_it     = begin();
-	VecOfSyncPoint::iterator vec_end    = end();
+	wostringstream buffer;
 
-	if( vec_it != vec_end ) {
+	if( !named_syncs.empty() ) {
+		iterator it = named_syncs.begin();
+		iterator end = named_syncs.end();
+
 		// First SyncPoint
-		wstring sync_id = idForSyncPoint( *vec_it );
-		wcout << sync_id;
+		buffer << it->name();
 
 		// Remaining
-		for( ++vec_it; vec_it!=vec_end; ++vec_it ) {
-			sync_id = idForSyncPoint( *vec_it );
-			wcout << ", "<< sync_id;
+		for( ++it; it!=end; ++it ) {
+			buffer << ", " << it->name();
 		}
 	}
-	wcout << endl;
+
+	wcout << buffer.str() << endl;
 }
 
 void SequenceOfNamedSyncPoints::printSyncTimes() {
-	VecOfSyncPoint::iterator vec_it     = begin();
-	VecOfSyncPoint::iterator vec_end    = end();
+	wostringstream buffer; // buffer output for single write
 
-	// Iterate Syncs in order
-	for( ; vec_it!=vec_end; ++vec_it ) {
-		SyncPointPtr sync = (*vec_it);
-		wstring sync_id = idForSyncPoint( sync );
+	if( !named_syncs.empty() ) {
+		iterator it = named_syncs.begin();
+		iterator end = named_syncs.end();
 
-		wcout << "\t" << sync_id << ": " << sync << endl;
+		// Iterate Syncs in order
+		for( ; it!=end; ++it ) {
+			wcout << "\t" << it->name() << ": " << it->sync() << endl;
+		}
 	}
+
+	wcout << buffer.str();
 }
 

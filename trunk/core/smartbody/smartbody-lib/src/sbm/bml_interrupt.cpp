@@ -59,8 +59,8 @@ namespace BML {
 		void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu  )
 		{
 			// Get times from SequenceOfNamedSyncPoints
-			time_sec strokeAt = sync_seq.sp_stroke->time;
-			time_sec relaxAt  = sync_seq.sp_relax->time;
+			time_sec strokeAt = sync_seq.sync_stroke()->time();
+			time_sec relaxAt  = sync_seq.sync_relax()->time();
 
 			VecOfSbmCommand commands;
 
