@@ -71,6 +71,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "smartbody-dll", "core\smart
 		{D41370B8-B1B9-430D-8813-C296D7935F2B} = {D41370B8-B1B9-430D-8813-C296D7935F2B}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsSpeechRelay", "core\MsSpeechRelay\MsSpeechRelay\MsSpeechRelay.csproj", "{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -365,6 +367,26 @@ Global
 		{5C9A5F23-D57B-4B7A-A3E3-0489F9A4F147}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{5C9A5F23-D57B-4B7A-A3E3-0489F9A4F147}.Release|Win32.ActiveCfg = Release|Win32
 		{5C9A5F23-D57B-4B7A-A3E3-0489F9A4F147}.Release|Win32.Build.0 = Release|Win32
+		{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}.Java|Any CPU.ActiveCfg = Release|Any CPU
+		{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}.Java|Any CPU.Build.0 = Release|Any CPU
+		{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}.Java|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}.Java|Mixed Platforms.Build.0 = Release|Any CPU
+		{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}.Java|Win32.ActiveCfg = Release|Any CPU
+		{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}.Lint|Any CPU.ActiveCfg = Release|Any CPU
+		{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}.Lint|Any CPU.Build.0 = Release|Any CPU
+		{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}.Lint|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}.Lint|Mixed Platforms.Build.0 = Release|Any CPU
+		{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}.Lint|Win32.ActiveCfg = Release|Any CPU
+		{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
