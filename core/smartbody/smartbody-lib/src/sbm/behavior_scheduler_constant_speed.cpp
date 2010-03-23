@@ -101,7 +101,7 @@ bool testSyncAfter(
 
 
 
-void BehaviorSchedulerConstantSpeed::schedule( SequenceOfNamedSyncPoints& sync_seq, time_sec now ) {
+void BehaviorSchedulerConstantSpeed::schedule( BehaviorSyncPoints& sync_seq, time_sec now ) {
 	// local references to standard sync points
 	SyncPointPtr start        = sync_seq.sync_start()->sync();
 	SyncPointPtr ready        = sync_seq.sync_ready()->sync();

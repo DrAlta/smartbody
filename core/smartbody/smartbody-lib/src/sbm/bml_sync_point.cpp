@@ -38,7 +38,7 @@ using namespace BML;
 
 
 // shorthand type for name_to_pos
-typedef map<const wstring,SequenceOfNamedSyncPoints::iterator> MapNameToPos;  
+typedef map<const wstring,BehaviorSyncPoints::iterator> MapNameToPos;  
 
 
 
@@ -107,10 +107,10 @@ NamedSyncPointPtr::NamedSyncPointPtr( const NamedSyncPointPtr& other )
 
 
 ///////////////////////////////////////////////////////////////////////////
-//  SequenceOfNamedSyncPoints
+//  BehaviorSyncPoints
 
 // default constructor
-SequenceOfNamedSyncPoints::SequenceOfNamedSyncPoints()
+BehaviorSyncPoints::BehaviorSyncPoints()
 {
 	start_it = insert( ATTR_START, SyncPointPtr(), end() );
 	ready_it = insert( ATTR_READY, SyncPointPtr(), end() );
@@ -121,7 +121,7 @@ SequenceOfNamedSyncPoints::SequenceOfNamedSyncPoints()
 	end_it = insert( ATTR_END, SyncPointPtr(), end() );
 }
 
-SequenceOfNamedSyncPoints::SequenceOfNamedSyncPoints( const SequenceOfNamedSyncPoints& other )
+BehaviorSyncPoints::BehaviorSyncPoints( const BehaviorSyncPoints& other )
 :	named_syncs( other.named_syncs )
 {
 	// Repopulate name_to_pos with local iterators
@@ -142,7 +142,7 @@ SequenceOfNamedSyncPoints::SequenceOfNamedSyncPoints( const SequenceOfNamedSyncP
 	end_it = find( ATTR_END );
 }
 
-SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::insert( const wstring& name, SyncPointPtr sync, SequenceOfNamedSyncPoints::iterator pos ) {
+BehaviorSyncPoints::iterator BehaviorSyncPoints::insert( const wstring& name, SyncPointPtr sync, BehaviorSyncPoints::iterator pos ) {
 	// Is there a way to test is pos is a valid iterator for named_syncs?
 
 	iterator insert_pos;
@@ -155,7 +155,7 @@ SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::insert( const wst
 		// TODO: check position relative to requested position
 
 		if( insert_pos->sync() ) {
-			cout << "ERROR: SequenceOfNamedSyncPoints::insert(..): SyncPoint already exists." << endl;
+			cout << "ERROR: BehaviorSyncPoints::insert(..): SyncPoint already exists." << endl;
 			return end();
 		}
 
@@ -170,11 +170,11 @@ SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::insert( const wst
 	return insert_pos;
 }
 
-//SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::pos_of( SyncPointPtr sync ) {
+//BehaviorSyncPoints::iterator BehaviorSyncPoints::pos_of( SyncPointPtr sync ) {
 //	return find( begin(), end(), sync );
 //}
 
-SetOfWstring SequenceOfNamedSyncPoints::get_sync_names() {
+SetOfWstring BehaviorSyncPoints::get_sync_names() {
 	SetOfWstring names;
 
 	MapNameToPos::iterator it  = name_to_pos.begin();
@@ -182,20 +182,20 @@ SetOfWstring SequenceOfNamedSyncPoints::get_sync_names() {
 	for( ; it!=end; ++it ) {
 		const wstring& name = it->first;
 		if( !( names.insert( name ).second ) )
-			wcerr << "ERROR: SequenceOfNamedSyncPoints::get_sync_names(): Failed to insert SyncPoint name \""<<name<<"\"." << endl;
+			wcerr << "ERROR: BehaviorSyncPoints::get_sync_names(): Failed to insert SyncPoint name \""<<name<<"\"." << endl;
 	}
 
 	return names;
 }
 
-SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::find( const std::wstring& name ) {
+BehaviorSyncPoints::iterator BehaviorSyncPoints::find( const std::wstring& name ) {
 	MapNameToPos::iterator map_it = name_to_pos.find( name );
 	bool found_name = map_it != name_to_pos.end();
 
 	return found_name? map_it->second : end();  // return iterator is found, else end()
 }
 
-SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::first_scheduled() {
+BehaviorSyncPoints::iterator BehaviorSyncPoints::first_scheduled() {
 	// Find first sync point that is set
 	iterator it = begin();
 	iterator it_end = end();
@@ -205,7 +205,7 @@ SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::first_scheduled()
 	return it;
 }
 
-BehaviorSpan SequenceOfNamedSyncPoints::getBehaviorSpan( time_sec persistent_threshold ) {
+BehaviorSpan BehaviorSyncPoints::getBehaviorSpan( time_sec persistent_threshold ) {
 	time_sec start_time = TIME_UNSET;
 	time_sec end_time   = TIME_UNSET;
 	bool     persistent = false;
@@ -232,7 +232,7 @@ BehaviorSpan SequenceOfNamedSyncPoints::getBehaviorSpan( time_sec persistent_thr
 	return BehaviorSpan( start_time, end_time, persistent );
 }
 
-void SequenceOfNamedSyncPoints::parseStandardSyncPoints( DOMElement* elem, BmlRequestPtr request, const string& behavior_id ) {
+void BehaviorSyncPoints::parseStandardSyncPoints( DOMElement* elem, BmlRequestPtr request, const string& behavior_id ) {
 	// DOM functions never return NULL
 	const wstring tag = elem->getTagName();
 	const wstring id  = elem->getAttribute( ATTR_ID );
@@ -270,7 +270,7 @@ void SequenceOfNamedSyncPoints::parseStandardSyncPoints( DOMElement* elem, BmlRe
 }
 
 
-SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const string& behavior_id ) {
+BehaviorSyncPoints::iterator BehaviorSyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const string& behavior_id ) {
 	//  Get behavior id as wstring
 	wstring behavior_wid;
 	{
@@ -285,7 +285,7 @@ SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::parseSyncPointAtt
 		// SyncPoint of this name already exists
 
 		// TODO: Throw BML ParsingException
-		wcerr << "ERROR: Behavior \""<<behavior_wid<<"\": SequenceOfNamedSyncPoints contains SyncPoint with id \"" << sync_attr << "\".  Ignoring attribute in <"<<elem->getTagName();
+		wcerr << "ERROR: Behavior \""<<behavior_wid<<"\": BehaviorSyncPoints contains SyncPoint with id \"" << sync_attr << "\".  Ignoring attribute in <"<<elem->getTagName();
 		if( !elem_id.empty() )
 			wcerr<<"> id=\""<<elem_id<<"\"";
 		else
@@ -305,7 +305,7 @@ SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::parseSyncPointAtt
 
 		if( !sync ) {
 			// TODO: More descriptive string
-			throw BML::ParsingException( "SequenceOfNamedSyncPoints::parseSyncPointAttr: Invalid SyncPoint reference." );
+			throw BML::ParsingException( "BehaviorSyncPoints::parseSyncPointAttr: Invalid SyncPoint reference." );
 		}
 	} else {
 		sync = request->start_trigger->addSyncPoint();
@@ -316,7 +316,7 @@ SequenceOfNamedSyncPoints::iterator SequenceOfNamedSyncPoints::parseSyncPointAtt
 
 #if VALIDATE_BEHAVIOR_SYNCS
 
-string SequenceOfNamedSyncPoints::debug_label( SyncPointPtr& sync ) {
+string BehaviorSyncPoints::debug_label( SyncPointPtr& sync ) {
 	ostringstream out;
 
 	wstring id = idForSyncPoint( sync );
@@ -343,9 +343,9 @@ string SequenceOfNamedSyncPoints::debug_label( SyncPointPtr& sync ) {
 	return out.str();
 }
 
-void SequenceOfNamedSyncPoints::validate() {
+void BehaviorSyncPoints::validate() {
 	ostringstream out;
-	out << "SequenceOfNamedSyncPoints validation errors:";
+	out << "BehaviorSyncPoints validation errors:";
 
 	bool valid = true;
 
@@ -396,7 +396,7 @@ void SequenceOfNamedSyncPoints::validate() {
 
 #endif // INCOMPLETE_SYNCS_VALIDATION
 
-std::wstring SequenceOfNamedSyncPoints::idForSyncPoint( SyncPointPtr sync ) {
+std::wstring BehaviorSyncPoints::idForSyncPoint( SyncPointPtr sync ) {
 	iterator it = named_syncs.begin();
 	iterator end = named_syncs.end();
 
@@ -410,7 +410,7 @@ std::wstring SequenceOfNamedSyncPoints::idForSyncPoint( SyncPointPtr sync ) {
 	return wstring();
 }
 
-void SequenceOfNamedSyncPoints::applyParentTimes( std::string& warning_context ) {
+void BehaviorSyncPoints::applyParentTimes( std::string& warning_context ) {
 	iterator it  = named_syncs.begin();
 	iterator end = named_syncs.end();
 
@@ -447,7 +447,7 @@ void SequenceOfNamedSyncPoints::applyParentTimes( std::string& warning_context )
 	}
 }
 
-void SequenceOfNamedSyncPoints::printSyncIds() {
+void BehaviorSyncPoints::printSyncIds() {
 	wostringstream buffer;
 
 	if( !named_syncs.empty() ) {
@@ -466,7 +466,7 @@ void SequenceOfNamedSyncPoints::printSyncIds() {
 	wcout << buffer.str() << endl;
 }
 
-void SequenceOfNamedSyncPoints::printSyncTimes() {
+void BehaviorSyncPoints::printSyncTimes() {
 	wostringstream buffer; // buffer output for single write
 
 	if( !named_syncs.empty() ) {

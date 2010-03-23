@@ -56,7 +56,7 @@ using namespace xml_utils;
 
 BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 											 std::string& unique_id,
-											 SequenceOfNamedSyncPoints& sync_seq,
+											 BehaviorSyncPoints& sync_seq,
 											 bool required,
 											 BmlRequestPtr request,
 											 mcuCBHandle *mcu )

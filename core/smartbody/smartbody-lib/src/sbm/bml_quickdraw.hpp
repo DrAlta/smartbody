@@ -32,7 +32,7 @@ class mcuCBHandle;
 namespace BML {
 	const XMLCh TAG_QUICKDRAW[] = L"sbm:quickdraw";
 
-	BML::BehaviorRequestPtr parse_bml_quickdraw( DOMElement* elem, std::string& unique_id, BML::SequenceOfNamedSyncPoints& sync_seq, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
+	BML::BehaviorRequestPtr parse_bml_quickdraw( DOMElement* elem, std::string& unique_id, BML::BehaviorSyncPoints& sync_seq, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
 };
 
 #endif // BML_QUICKDRAW_HPP

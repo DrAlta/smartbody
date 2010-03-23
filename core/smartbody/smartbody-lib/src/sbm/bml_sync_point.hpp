@@ -91,7 +91,7 @@ namespace BML {
 	 *  not to be confused with a shared_ptr to the name of a SyncPoint.
 	 *  (English is confusing when you try to avoid prepositions.)
 	 *
-	 *  Only a SequenceOfNamedSyncPoints can update the sync reference
+	 *  Only a BehaviorSyncPoints can update the sync reference
 	 *  once the NamedSyncPointPtr is created.
 	 */
 	class NamedSyncPointPtr {
@@ -114,13 +114,16 @@ namespace BML {
 		{	return _sync->time; }
 
 	protected:
-		friend BML::SequenceOfNamedSyncPoints;
+		friend BML::BehaviorSyncPoints;
 		void set_sync( SyncPointPtr new_sync ) { _sync = new_sync; }
 	};
 
-	// Ordered list of named sync points.
-	// Includes direct references to the standard sync_points.
-	class SequenceOfNamedSyncPoints {
+	/**
+	 *  The ordered, named set of SyncPoints for a single behavior.
+	 *
+	 *  Includes direct references to the BML standard SyncPoints.
+	 */
+	class BehaviorSyncPoints {
 	public:
 		typedef std::list<NamedSyncPointPtr> ListOfNamedSyncs;
 		typedef ListOfNamedSyncs::iterator iterator;
@@ -142,23 +145,23 @@ namespace BML {
 		/**
 		 * Default constructor.  Does not initialize standard SyncPoint fields.
 		 */
-		SequenceOfNamedSyncPoints();
+		BehaviorSyncPoints();
 
 		/**
 		 * Copy constructor.
 		 */
-		SequenceOfNamedSyncPoints( const SequenceOfNamedSyncPoints& other );
+		BehaviorSyncPoints( const BehaviorSyncPoints& other );
 
 		/**
 		 *  Returns the position of the first SyncPointPtr, or end() if empty.
 		 */
-		SequenceOfNamedSyncPoints::iterator begin()
+		BehaviorSyncPoints::iterator begin()
 		{	return named_syncs.begin(); }
 
 		/**
 		 *  Returns the position after the last SyncPointPtr.
 		 */
-		SequenceOfNamedSyncPoints::iterator end()
+		BehaviorSyncPoints::iterator end()
 		{	return named_syncs.end(); }
 
 		size_t size()
@@ -166,22 +169,22 @@ namespace BML {
 
 		// Accessors for convience refences to standard/core SyncPoints
 		// Returns end() is called before parseStandardSyncPoints(..).
-		SequenceOfNamedSyncPoints::iterator sync_start()
-		{	return SequenceOfNamedSyncPoints::iterator( start_it ); }
-		SequenceOfNamedSyncPoints::iterator sync_ready()
-		{	return SequenceOfNamedSyncPoints::iterator( ready_it ); }
-		SequenceOfNamedSyncPoints::iterator sync_stroke_start()
-		{	return SequenceOfNamedSyncPoints::iterator( stroke_start_it ); }
-		SequenceOfNamedSyncPoints::iterator sync_stroke()
-		{	return SequenceOfNamedSyncPoints::iterator( stroke_it ); }
-		SequenceOfNamedSyncPoints::iterator sync_stroke_end()
-		{	return SequenceOfNamedSyncPoints::iterator( stroke_end_it ); }
-		SequenceOfNamedSyncPoints::iterator sync_relax()
-		{	return SequenceOfNamedSyncPoints::iterator( relax_it ); }
-		SequenceOfNamedSyncPoints::iterator sync_end()
-		{	return SequenceOfNamedSyncPoints::iterator( end_it ); }
+		BehaviorSyncPoints::iterator sync_start()
+		{	return BehaviorSyncPoints::iterator( start_it ); }
+		BehaviorSyncPoints::iterator sync_ready()
+		{	return BehaviorSyncPoints::iterator( ready_it ); }
+		BehaviorSyncPoints::iterator sync_stroke_start()
+		{	return BehaviorSyncPoints::iterator( stroke_start_it ); }
+		BehaviorSyncPoints::iterator sync_stroke()
+		{	return BehaviorSyncPoints::iterator( stroke_it ); }
+		BehaviorSyncPoints::iterator sync_stroke_end()
+		{	return BehaviorSyncPoints::iterator( stroke_end_it ); }
+		BehaviorSyncPoints::iterator sync_relax()
+		{	return BehaviorSyncPoints::iterator( relax_it ); }
+		BehaviorSyncPoints::iterator sync_end()
+		{	return BehaviorSyncPoints::iterator( end_it ); }
 
-		iterator insert( const std::wstring& id, SyncPointPtr sync, SequenceOfNamedSyncPoints::iterator pos ); 
+		iterator insert( const std::wstring& id, SyncPointPtr sync, BehaviorSyncPoints::iterator pos ); 
 
 		SetOfWstring get_sync_names();
 
@@ -229,7 +232,7 @@ namespace BML {
 		void printSyncTimes();
 
 	protected:
-		SequenceOfNamedSyncPoints::iterator parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const std::string& behavior_id );
+		BehaviorSyncPoints::iterator parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const std::string& behavior_id );
 	};
 } // end namespace BML
 

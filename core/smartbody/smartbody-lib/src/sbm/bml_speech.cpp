@@ -66,7 +66,7 @@ void BML::SpeechRequest::createStandardSyncPoint( const std::wstring& sync_id, S
 BML::SpeechRequestPtr BML::parse_bml_speech(
 	DOMElement* xml,
 	const std::string& unique_id,
-	BML::SequenceOfNamedSyncPoints& sync_seq,
+	BML::BehaviorSyncPoints& sync_seq,
 	bool required,
 	BML::BmlRequestPtr request,
 	mcuCBHandle *mcu )
@@ -168,7 +168,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 
 //// Old code:  sync_seq are now parsed and passed in
 //	// Current Speech behavior constraints prevent us from using the sync point attributes
-//	// Creating new SequenceOfNamedSyncPoints instead of parsing the attributes.
+//	// Creating new BehaviorSyncPoints instead of parsing the attributes.
 //	createStandardSyncPoint( TM_START,        sync_seq.sp_start );
 //	createStandardSyncPoint( TM_READY,        sync_seq.sp_ready );
 //	createStandardSyncPoint( TM_STROKE_START, sync_seq.sp_stroke_start );
@@ -184,7 +184,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 //    (no transition/blend yet)
 BML::SpeechRequest::SpeechRequest(
 	const std::string& unique_id,
-	SequenceOfNamedSyncPoints& syncs_in,
+	BehaviorSyncPoints& syncs_in,
 	SpeechInterface* speech_impl,
 	RequestId speech_request_id,
 	const vector<SpeechMark>& marks,
@@ -202,8 +202,8 @@ BML::SpeechRequest::SpeechRequest(
 		SyncPointPtr sync( trigger->addSyncPoint() );
 
 		// Insert just before stroke_end
-		SequenceOfNamedSyncPoints::iterator stroke_end_pos = sync_seq.sync_stroke_end();
-		SequenceOfNamedSyncPoints::iterator result_pos = sync_seq.insert( mark->id, sync, stroke_end_pos );  // Test insertion, and throw error if problem
+		BehaviorSyncPoints::iterator stroke_end_pos = sync_seq.sync_stroke_end();
+		BehaviorSyncPoints::iterator result_pos = sync_seq.insert( mark->id, sync, stroke_end_pos );  // Test insertion, and throw error if problem
 
 		// Remember Word Break
 		if( !( wbToSync.insert( make_pair( mark->id, sync ) ).second ) )
@@ -409,8 +409,8 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 
 //// SyncPoints should already be set from viseme processing
 //	{	// Offset prior syncpoint times by startAt
-//		SequenceOfNamedSyncPoints::iterator it = sync_seq.begin();
-//		SequenceOfNamedSyncPoints::iterator end = sync_seq.end();
+//		BehaviorSyncPoints::iterator it = sync_seq.begin();
+//		BehaviorSyncPoints::iterator end = sync_seq.end();
 //		for( ; it != end ; ++it ) {
 //			SyncPointPtr sync = (*it);
 //			if( isTimeSet( sync->time ) ) {

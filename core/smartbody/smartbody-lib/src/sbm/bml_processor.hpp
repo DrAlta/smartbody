@@ -218,14 +218,14 @@ namespace BML {
 		 */
 		void parseBehaviorGroup( DOMElement *el, BML::BmlRequestPtr request, mcuCBHandle *mcu, size_t& behavior_ordinal, bool required );
 
-		BehaviorRequestPtr parse_bml_body( DOMElement* elem, std::string& unique_id, SequenceOfNamedSyncPoints& sync_seq, bool required, BmlRequestPtr request, mcuCBHandle *mcu );
-		BehaviorRequestPtr parse_bml_head( DOMElement* elem, std::string& unique_id, SequenceOfNamedSyncPoints& sync_seq, bool required, BmlRequestPtr request, mcuCBHandle *mcu );
+		BehaviorRequestPtr parse_bml_body( DOMElement* elem, std::string& unique_id, BehaviorSyncPoints& sync_seq, bool required, BmlRequestPtr request, mcuCBHandle *mcu );
+		BehaviorRequestPtr parse_bml_head( DOMElement* elem, std::string& unique_id, BehaviorSyncPoints& sync_seq, bool required, BmlRequestPtr request, mcuCBHandle *mcu );
 
 
 ///  Is the following necessary anymore?
-//		friend BML::BehaviorRequest* BML::parse_bml_interrupt( DOMElement* elem, BML::SequenceOfNamedSyncPoints& sync_seq, BML::BmlRequestPtr request, mcuCBHandle *mcu );
+//		friend BML::BehaviorRequest* BML::parse_bml_interrupt( DOMElement* elem, BML::BehaviorSyncPoints& sync_seq, BML::BmlRequestPtr request, mcuCBHandle *mcu );
 #if BMLR_BML2ANIM
-		BehaviorRequest* parse_bml_to_anim( DOMElement* elem, SequenceOfNamedSyncPoints& sync_seq, BmlRequestPtr request, mcuCBHandle *mcu ); // [BMLR]
+		BehaviorRequest* parse_bml_to_anim( DOMElement* elem, BehaviorSyncPoints& sync_seq, BmlRequestPtr request, mcuCBHandle *mcu ); // [BMLR]
 #endif
 #if BMLR_BML2ANIM
 		BehaviorRequest* parse_bml_to_anim( DOMElement* elem, SynchPoints& sync_seq, BmlRequestPtr request, mcuCBHandle *mcu ); // [BMLR]

@@ -47,13 +47,13 @@ namespace BML {
 		public:
 			BehaviorSchedulerFixed( const std::vector<std::pair<std::wstring,float>>& sync_point_pairs );
 
-			virtual void schedule( SequenceOfNamedSyncPoints& sync_seq, time_sec now );
+			virtual void schedule( BehaviorSyncPoints& sync_seq, time_sec now );
 
 		protected:
-			/** Compares SequenceOfNamedSyncPoints orderings to provided fixed orderings.
+			/** Compares BehaviorSyncPoints orderings to provided fixed orderings.
 			 *  Throws SchedulingException if order does not match.
 			 */
-			void validate_match( SequenceOfNamedSyncPoints& sync_seq );
+			void validate_match( BehaviorSyncPoints& sync_seq );
 	};
 	typedef boost::shared_ptr<BehaviorSchedulerFixed> BehaviorSchedulerFixedPtr;
 

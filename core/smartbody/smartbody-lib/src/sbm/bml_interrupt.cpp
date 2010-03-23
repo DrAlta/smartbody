@@ -51,14 +51,14 @@ namespace BML {
 	public:
 		InterruptBehavior( const std::string& unique_id,
 		                   const std::string& performance_id,
-			               const SequenceOfNamedSyncPoints& sync_seq )
+			               const BehaviorSyncPoints& sync_seq )
 		:	SequenceRequest( unique_id, sync_seq, 0, 0, 0, 0.5, 0.5 ),  // half second default duration
 			performance_id( performance_id )
 		{}
 
 		void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu  )
 		{
-			// Get times from SequenceOfNamedSyncPoints
+			// Get times from BehaviorSyncPoints
 			time_sec strokeAt = sync_seq.sync_stroke()->time();
 			time_sec relaxAt  = sync_seq.sync_relax()->time();
 
@@ -83,7 +83,7 @@ namespace BML {
 };  // end namespace BML
 
 
-BehaviorRequestPtr BML::parse_bml_interrupt( DOMElement* elem, const std::string& unique_id, SequenceOfNamedSyncPoints& sync_seq, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_interrupt( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& sync_seq, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
 
 	const XMLCh* performanceId = elem->getAttribute( ATTR_ACT );

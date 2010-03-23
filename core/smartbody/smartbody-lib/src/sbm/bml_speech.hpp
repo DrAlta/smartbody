@@ -80,7 +80,7 @@ namespace BML {
 		// Methods
 		SpeechRequest(
 			const std::string& unique_id,
-			BML::SequenceOfNamedSyncPoints& sync_seq,
+			BML::BehaviorSyncPoints& sync_seq,
 			SmartBody::SpeechInterface* speech_impl,
 			SmartBody::RequestId speech_request_id,
 			const std::vector<SpeechMark>& marks,
@@ -139,7 +139,7 @@ namespace BML {
 		friend BML::Processor;  //temporary
 	};
 
-	BML::SpeechRequestPtr parse_bml_speech( DOMElement* xml, const std::string& unique_id, BML::SequenceOfNamedSyncPoints& sync_seq, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
+	BML::SpeechRequestPtr parse_bml_speech( DOMElement* xml, const std::string& unique_id, BML::BehaviorSyncPoints& sync_seq, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
 };
 
 
