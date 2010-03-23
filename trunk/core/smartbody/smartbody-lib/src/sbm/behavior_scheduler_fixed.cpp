@@ -78,14 +78,14 @@ BehaviorSchedulerFixed::BehaviorSchedulerFixed( const vec_sync_pairs& input ) {
 	}
 }
 
-void BehaviorSchedulerFixed::validate_match( SequenceOfNamedSyncPoints& sync_seq ) {
-	SequenceOfNamedSyncPoints::iterator seq_it = sync_seq.begin();
-	SequenceOfNamedSyncPoints::iterator seq_end = sync_seq.end();
+void BehaviorSchedulerFixed::validate_match( BehaviorSyncPoints& sync_seq ) {
+	BehaviorSyncPoints::iterator seq_it = sync_seq.begin();
+	BehaviorSyncPoints::iterator seq_end = sync_seq.end();
 
 	vec_sync_pairs::iterator it = sync_point_times.begin();
 	vec_sync_pairs::iterator it_end = sync_point_times.begin();
 
-	SequenceOfNamedSyncPoints::iterator last_sp;
+	BehaviorSyncPoints::iterator last_sp;
 	while( it!=it_end ) {
 		if( seq_it==seq_end ) {
 			throw BML::SchedulingException( "BehaviorSchedulerFixed: SyncPoint does not exist (sp_end reached before it_end)" );
@@ -106,17 +106,17 @@ void BehaviorSchedulerFixed::validate_match( SequenceOfNamedSyncPoints& sync_seq
 	// Success! Valid ordering.
 }
 
-void BehaviorSchedulerFixed::schedule( SequenceOfNamedSyncPoints& sync_seq, time_sec now ) {
-	// validate the SequenceOfNamedSyncPoints match before manipulating them
+void BehaviorSchedulerFixed::schedule( BehaviorSyncPoints& sync_seq, time_sec now ) {
+	// validate the BehaviorSyncPoints match before manipulating them
 	validate_match( sync_seq );
 
 	// Find first sync point that is set
-	SequenceOfNamedSyncPoints::iterator sp_end = sync_seq.end();
-	SequenceOfNamedSyncPoints::iterator first_set = sync_seq.first_scheduled();
+	BehaviorSyncPoints::iterator sp_end = sync_seq.end();
+	BehaviorSyncPoints::iterator first_set = sync_seq.first_scheduled();
 	if( first_set == sp_end ) {
 		// No SyncPoints previously scheduled
 		// Schedule starting at time zero
-		SequenceOfNamedSyncPoints::iterator sync_it = sync_seq.begin();
+		BehaviorSyncPoints::iterator sync_it = sync_seq.begin();
 
 		vec_sync_pairs::iterator it = sync_point_times.begin();
 		vec_sync_pairs::iterator it_end = sync_point_times.begin();

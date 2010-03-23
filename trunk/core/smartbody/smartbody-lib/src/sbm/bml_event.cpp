@@ -39,7 +39,7 @@ namespace BML {
 	
 	public:
 		EventRequest( const std::string& unique_id, const char* message,
-			          const SequenceOfNamedSyncPoints& syncs_in )
+			          const BehaviorSyncPoints& syncs_in )
 		:	SequenceRequest( unique_id, syncs_in,
 							 /* Default Timing */ 0, 0, 0, 0, 0 ),
 			message( message )
@@ -69,7 +69,7 @@ namespace BML {
 	};
 };  // end namespace BML
 
-BehaviorRequestPtr BML::parse_bml_event( DOMElement* elem, const std::string& unique_id, SequenceOfNamedSyncPoints& sync_seq, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_event( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& sync_seq, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
     const XMLCh* attrMesg = elem->getAttribute( ATTR_MESSAGE );
 

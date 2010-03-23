@@ -351,7 +351,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 			string unique_id = request->buildUniqueBehaviorId( tag, id, ++behavior_ordinal );
 
 			// Load SyncPoint references
-			SequenceOfNamedSyncPoints sync_seq;  // TODO: rename (previous this was a TimeMarkers class)
+			BehaviorSyncPoints sync_seq;  // TODO: rename (previous this was a TimeMarkers class)
 			sync_seq.parseStandardSyncPoints( child, request, unique_id );
 
 			BehaviorRequestPtr behavior;
@@ -478,7 +478,7 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCB
 //
 //		string unique_id = request->buildUniqueBehaviorId( tag, id, ++behavior_ordinal );
 //
-//		SequenceOfNamedSyncPoints sync_seq;
+//		BehaviorSyncPoints sync_seq;
 //		sync_seq.parseStandardSyncPoints( child, request, unique_id );
 //
 //		SpeechRequestPtr speech_request( parse_bml_speech( child, unique_id, sync_seq, request, mcu ) );
@@ -522,7 +522,7 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCB
 	}
 }
 
-BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string& unique_id, SequenceOfNamedSyncPoints& sync_seq, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string& unique_id, BehaviorSyncPoints& sync_seq, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
 	const XMLCh* postureName = elem->getAttribute( ATTR_POSTURE );
 	if( postureName && XMLString::stringLen( postureName ) ) {
 		// Look up pose
@@ -560,7 +560,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 	}
 }
 
-BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string& unique_id, SequenceOfNamedSyncPoints& sync_seq, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string& unique_id, BehaviorSyncPoints& sync_seq, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
 	const XMLCh* attrType = elem->getAttribute( ATTR_TYPE );
 	if( attrType && XMLString::stringLen( attrType ) ) {
@@ -673,7 +673,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 // It then reads the file and finds this line:
 // <gesture type="beat">CrossedArms_RArm_LowBeat</gesture>
 // and plays the CrossedArms_RArm_LowBeat.skm animation
-BehaviorRequest* BML::Processor::parse_bml_to_anim( DOMElement* elem, SequenceOfNamedSyncPoints& sync_seq, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequest* BML::Processor::parse_bml_to_anim( DOMElement* elem, BehaviorSyncPoints& sync_seq, BmlRequestPtr request, mcuCBHandle *mcu ) {
 
 	if (bml2animText.empty())
 	{			
