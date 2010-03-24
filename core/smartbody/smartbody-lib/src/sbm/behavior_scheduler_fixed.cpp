@@ -32,10 +32,6 @@ using namespace std;
 using namespace BML;
 
 
-typedef vector<pair<wstring,float>> vec_sync_pairs;
-typedef std::map<std::wstring,unsigned int> map_id_indices;
-
-
 // local utility function
 
 
@@ -43,15 +39,15 @@ typedef std::map<std::wstring,unsigned int> map_id_indices;
 //  BehaviorSchedulerFixed
 //
 
-BehaviorSchedulerFixed::BehaviorSchedulerFixed( const vec_sync_pairs& input ) {
+BehaviorSchedulerFixed::BehaviorSchedulerFixed( const VecSyncPairs& input ) {
 	// TODO: Replace exceptions in constructor with better solution
 
-	vec_sync_pairs::const_iterator it = input.begin();
-	vec_sync_pairs::const_iterator end = input.end();
+	VecSyncPairs::const_iterator it = input.begin();
+	VecSyncPairs::const_iterator end = input.end();
 
 	if( it != end ) {
 		// At least one sync point
-		float        last_time = 0;
+		time_sec     last_time = 0;
 		unsigned int cur_index = 0;
 
 		//// Make sure we deal with start first
@@ -60,7 +56,7 @@ BehaviorSchedulerFixed::BehaviorSchedulerFixed( const vec_sync_pairs& input ) {
 		//	sync_id2index.insert( make_pair<wstring,unsigned int>( BML::ATTR_START, cur_index++ ) );
 		//}
 
-		map_id_indices::iterator map_end = sync_id2index.end();
+		MapNameIndex::iterator map_end = name_to_index.end();
 		for( ; it != end; ++it ) {
 			if( it->second < last_time ) {
 				// TODO: include details like id and times.  Don't forget to transcode the wstring.
@@ -70,20 +66,20 @@ BehaviorSchedulerFixed::BehaviorSchedulerFixed( const vec_sync_pairs& input ) {
 			const wstring& sync_id = it->first;
 			last_time = it->second;
 
-			sync_point_times.push_back( make_pair<wstring,float>( sync_id, last_time ) );
-			sync_id2index.insert( make_pair<wstring,unsigned int>( sync_id, cur_index++ ) );
+			sync_point_times.push_back( make_pair<wstring,time_sec>( sync_id, last_time ) );
+			name_to_index.insert( make_pair<wstring,unsigned int>( sync_id, cur_index++ ) );
 		}
 	} else {
 		throw BML::BmlException( "BehaviorSchedulerFixed: No sync points specified." );
 	}
 }
 
-void BehaviorSchedulerFixed::validate_match( BehaviorSyncPoints& sync_seq ) {
-	BehaviorSyncPoints::iterator seq_it = sync_seq.begin();
-	BehaviorSyncPoints::iterator seq_end = sync_seq.end();
+void BehaviorSchedulerFixed::validate_match( BehaviorSyncPoints& behav_syncs ) {
+	BehaviorSyncPoints::iterator seq_it = behav_syncs.begin();
+	BehaviorSyncPoints::iterator seq_end = behav_syncs.end();
 
-	vec_sync_pairs::iterator it = sync_point_times.begin();
-	vec_sync_pairs::iterator it_end = sync_point_times.begin();
+	VecSyncPairs::iterator it = sync_point_times.begin();
+	VecSyncPairs::iterator it_end = sync_point_times.begin();
 
 	BehaviorSyncPoints::iterator last_sp;
 	while( it!=it_end ) {
@@ -92,7 +88,7 @@ void BehaviorSchedulerFixed::validate_match( BehaviorSyncPoints& sync_seq ) {
 		}
 
 		if( seq_it->name() != it->first ) {
-			throw BML::SchedulingException( "BehaviorSchedulerFixed: Unexpected SyncPoint (unspecified id or ordering issue)" );
+			throw BML::SchedulingException( "BehaviorSchedulerFixed: Unexpected SyncPoint (id mismatch or ordering issue)" );
 		}
 
 		++it;
@@ -100,35 +96,59 @@ void BehaviorSchedulerFixed::validate_match( BehaviorSyncPoints& sync_seq ) {
 	}
 
 	if( seq_it != seq_end ) {
-		throw BML::SchedulingException( "BehaviorSchedulerFixed: Unexpected SyncPoint (reached end of it)" );
+		throw BML::SchedulingException( "BehaviorSchedulerFixed: Unexpected SyncPoint (reached it_end before seq_end)" );
 	}
 
 	// Success! Valid ordering.
 }
 
-void BehaviorSchedulerFixed::schedule( BehaviorSyncPoints& sync_seq, time_sec now ) {
+void BehaviorSchedulerFixed::schedule( BehaviorSyncPoints& behav_syncs, time_sec now ) {
 	// validate the BehaviorSyncPoints match before manipulating them
-	validate_match( sync_seq );
+	validate_match( behav_syncs );
 
 	// Find first sync point that is set
-	BehaviorSyncPoints::iterator sp_end = sync_seq.end();
-	BehaviorSyncPoints::iterator first_set = sync_seq.first_scheduled();
-	if( first_set == sp_end ) {
+	BehaviorSyncPoints::iterator sp_end = behav_syncs.end();
+	BehaviorSyncPoints::iterator sp_first_set = behav_syncs.first_scheduled();
+	if( sp_first_set == sp_end ) {
 		// No SyncPoints previously scheduled
 		// Schedule starting at time zero
-		BehaviorSyncPoints::iterator sync_it = sync_seq.begin();
+		BehaviorSyncPoints::iterator sync_it = behav_syncs.begin();
 
-		vec_sync_pairs::iterator it = sync_point_times.begin();
-		vec_sync_pairs::iterator it_end = sync_point_times.begin();
+		VecSyncPairs::iterator it = sync_point_times.begin();
+		VecSyncPairs::iterator it_end = sync_point_times.begin();
 
 		for( ; it!=it_end; ++it, ++sync_it ) {
 			// Already verified name order in validate_match(..)
-			sync_it->sync()->time = it->second;
+			sync_it->sync()->time = now + it->second;
 		}
 	} else {
-		//unsigned int ref_index = sync_id2index.find( (*first_set)->name )->second;
-		//pair<wstring,float> ref_time = sync_id2index.find( (*sp)->name );
+		size_t first_set_index = name_to_index.find( sp_first_set->name() )->second;
 
-		// TODO: "Merge" timing data
+		time_sec first_set_time = sp_first_set->time(); // Time set by parent sync points
+		time_sec first_set_reltime = sync_point_times[ first_set_index ].second; // time relative to behavior start
+		time_sec offset = first_set_time - first_set_reltime;
+
+		// Verify there are no other SyncPoints with set times before assigning new times
+		BehaviorSyncPoints::iterator sp_it = sp_first_set;
+		size_t index = first_set_index+1;
+		for( ++sp_it; sp_it!=sp_end; ++sp_it, ++index ) {
+			if( sp_it->is_set() ) {
+				// TODO: test if time set on this sync is within an expected threshold of the time as it would be scheduled
+				// TODO construct string with more details
+				throw BML::SchedulingException( "BehaviorSchedulerFixed: Found second SyncPoint previous set by other BehaviorSchedule." );
+			}
+		}
+
+		// Assign the time values
+		sp_it = behav_syncs.begin();
+		index = 0;
+		for( ; sp_it != sp_first_set; ++index, ++sp_it ) {
+			sp_it->sync()->set_time( offset + sync_point_times[ index ].second );
+		}
+		++sp_it;
+		++index;
+		for( ; sp_it != sp_first_set; ++index, ++sp_it ) {
+			sp_it->sync()->set_time( offset + sync_point_times[ index ].second );
+		}
 	}
 }

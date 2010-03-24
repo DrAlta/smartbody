@@ -72,6 +72,7 @@ namespace BML {
 		float			          offset;	
 
 		bool is_set() { return isTimeSet( time ); }
+		void set_time( time_sec time ) { this->time = time; }
 
 	private:
 		SyncPointWeakPtr         weak_ptr;  // weak reference to the reference count struct
