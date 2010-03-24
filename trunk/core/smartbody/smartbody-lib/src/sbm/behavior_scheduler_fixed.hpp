@@ -36,24 +36,28 @@ namespace BML {
 	 *  Often used by controller-based behaviors.
 	 */
 	class BehaviorSchedulerFixed : public BehaviorScheduler {
+		public: 
+			typedef std::vector<std::pair<std::wstring,BML::time_sec>> VecSyncPairs;
+			typedef std::map<std::wstring,size_t> MapNameIndex;
+
 		private:
 			// Ordered list of SynchPoint names to time in seconds after start
 			//   include "start" => 0?
-			std::vector<std::pair<std::wstring,float>> sync_point_times;
+			VecSyncPairs sync_point_times;
 
 			// map of sync_point id to the index of the data
-			std::map<std::wstring,size_t> sync_id2index;
+			MapNameIndex name_to_index;
 
 		public:
-			BehaviorSchedulerFixed( const std::vector<std::pair<std::wstring,float>>& sync_point_pairs );
+			BehaviorSchedulerFixed( const VecSyncPairs& sync_point_pairs );
 
-			virtual void schedule( BehaviorSyncPoints& sync_seq, time_sec now );
+			virtual void schedule( BehaviorSyncPoints& behav_syncs, time_sec now );
 
 		protected:
 			/** Compares BehaviorSyncPoints orderings to provided fixed orderings.
 			 *  Throws SchedulingException if order does not match.
 			 */
-			void validate_match( BehaviorSyncPoints& sync_seq );
+			void validate_match( BehaviorSyncPoints& behav_syncs );
 	};
 	typedef boost::shared_ptr<BehaviorSchedulerFixed> BehaviorSchedulerFixedPtr;
 
