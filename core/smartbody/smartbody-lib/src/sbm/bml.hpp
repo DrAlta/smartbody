@@ -111,7 +111,7 @@ namespace BML {
 		std::string buildUniqueBehaviorId( const XMLCh* tag, const XMLCh* id, size_t ordinal );
 
 		bool hasExistingBehaviorId( const std::wstring& id );
-		void importNamedSyncPoints( BehaviorSyncPoints& sync_seq, const std::wstring& id, const std::wstring& logging_label );
+		void importNamedSyncPoints( BehaviorSyncPoints& behav_syncs, const std::wstring& id, const std::wstring& logging_label );
 
 		BehaviorSpan getBehaviorSpan();
 
@@ -170,7 +170,7 @@ namespace BML {
 	public:
 		const std::string         unique_id;
 		bool                      required;
-		BehaviorSyncPoints sync_seq;
+		BehaviorSyncPoints behav_syncs;
 		BehaviorSchedulerPtr      scheduler;
 
 	private:
@@ -179,7 +179,7 @@ namespace BML {
     ///////////////////////////////////////////////////////////////////
     //  Methods
 	public:
-		BehaviorRequest( const std::string& unique_id, const BehaviorSyncPoints& sync_seq );
+		BehaviorRequest( const std::string& unique_id, const BehaviorSyncPoints& behav_syncs );
 		virtual ~BehaviorRequest();
 
 		void set_scheduler( BehaviorSchedulerPtr scheduler );
@@ -267,7 +267,7 @@ namespace BML {
 		MeControllerRequest( const std::string& unique_id,
 		                     MeController *anim_ct,
 							 MeCtSchedulerClass* schedule_ct,
-			                 const BehaviorSyncPoints& sync_seq,
+			                 const BehaviorSyncPoints& behav_syncs,
 							 MeControllerRequest::SchduleType sched_type = LINEAR );
 		virtual ~MeControllerRequest();
 
@@ -318,7 +318,7 @@ namespace BML {
 	class MotionRequest : public MeControllerRequest {
 	public:
 		MotionRequest( const std::string& unique_id, MeCtMotion* motion_ct, MeCtSchedulerClass* schedule_ct,
-			           const BehaviorSyncPoints& sync_seq );
+			           const BehaviorSyncPoints& behav_syncs );
 	};
 
 	class NodRequest : public MeControllerRequest {
@@ -334,7 +334,7 @@ namespace BML {
 
 	public: ///// Methods
 		NodRequest( const std::string& unique_id, NodType type, float repeats, float frequency, float extent, const SbmCharacter* actor,
-			        const BehaviorSyncPoints& sync_seq );
+			        const BehaviorSyncPoints& behav_syncs );
 	};
 
 	class TiltRequest : public MeControllerRequest {
@@ -344,7 +344,7 @@ namespace BML {
 
 	public: ///// Methods
 		TiltRequest( const std::string& unique_id, MeCtSimpleTilt* tilt, time_sec transitionDuration, const SbmCharacter* actor,
-			         const BehaviorSyncPoints& sync_seq );
+			         const BehaviorSyncPoints& behav_syncs );
 	};
 
 	class PostureRequest : public MeControllerRequest {
@@ -353,12 +353,12 @@ namespace BML {
         time_sec transitionDuration;
 
 		PostureRequest( const std::string& unique_id, MeController* pose, time_sec transitionDuration, const SbmCharacter* actor,
-			            const BehaviorSyncPoints& sync_seq );
+			            const BehaviorSyncPoints& behav_syncs );
 	};
 
 	class SequenceRequest : public BehaviorRequest {
 	protected:
-		SequenceRequest( const std::string& unique_id, const BehaviorSyncPoints& sync_seq,
+		SequenceRequest( const std::string& unique_id, const BehaviorSyncPoints& behav_syncs,
 						 time_sec startTime, time_sec readyTime, time_sec strokeTime, time_sec relaxTime, time_sec endTime );
 
 	public:
@@ -397,10 +397,10 @@ namespace BML {
 
 	public:
 		VisemeRequest( const std::string& unique_id, const char *viseme, float weight, time_sec duration,
-			           const BehaviorSyncPoints& sync_seq );
+			           const BehaviorSyncPoints& behav_syncs );
 
 		VisemeRequest( const std::string& unique_id, const char *viseme, float weight, time_sec duration,
-			           const BehaviorSyncPoints& sync_seq, float rampup, float rampdown);
+			           const BehaviorSyncPoints& behav_syncs, float rampup, float rampdown);
 
         void setVisemeName( const char* viseme );
 

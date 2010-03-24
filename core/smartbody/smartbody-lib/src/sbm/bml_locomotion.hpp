@@ -32,7 +32,7 @@ class mcuCBHandle;
 namespace BML {
 	const XMLCh TAG_LOCOTMOTION[] = L"locomotion";
 
-	BML::BehaviorRequestPtr parse_bml_locomotion( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& sync_seq, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
+	BML::BehaviorRequestPtr parse_bml_locomotion( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
 };
 
 

@@ -31,7 +31,7 @@ namespace BML {
 	const XMLCh ATTR_MESSAGE[]  = L"message";
 
 
-	BML::BehaviorRequestPtr parse_bml_event( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& sync_seq, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
+	BML::BehaviorRequestPtr parse_bml_event( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
 };
 
 

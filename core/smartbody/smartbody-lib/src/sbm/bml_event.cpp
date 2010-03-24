@@ -47,7 +47,7 @@ namespace BML {
 	
 		void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 		{
-			time_sec strokeAt = sync_seq.sync_stroke()->time();
+			time_sec strokeAt = behav_syncs.sync_stroke()->time();
 
 			VecOfSbmCommand commands;
 
@@ -69,12 +69,12 @@ namespace BML {
 	};
 };  // end namespace BML
 
-BehaviorRequestPtr BML::parse_bml_event( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& sync_seq, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_event( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
     const XMLCh* attrMesg = elem->getAttribute( ATTR_MESSAGE );
 
 	if( attrMesg && attrMesg[0]!='\0' ) {
-        return BehaviorRequestPtr( new EventRequest( unique_id, XMLString::transcode( attrMesg ), sync_seq ) );
+        return BehaviorRequestPtr( new EventRequest( unique_id, XMLString::transcode( attrMesg ), behav_syncs ) );
 	} else {
 		// TODO: Use exception?
         wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag missing "<<ATTR_MESSAGE<<"= attribute.  Behavior ignored."<< endl;

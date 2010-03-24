@@ -51,16 +51,16 @@ namespace BML {
 	public:
 		InterruptBehavior( const std::string& unique_id,
 		                   const std::string& performance_id,
-			               const BehaviorSyncPoints& sync_seq )
-		:	SequenceRequest( unique_id, sync_seq, 0, 0, 0, 0.5, 0.5 ),  // half second default duration
+			               const BehaviorSyncPoints& behav_syncs )
+		:	SequenceRequest( unique_id, behav_syncs, 0, 0, 0, 0.5, 0.5 ),  // half second default duration
 			performance_id( performance_id )
 		{}
 
 		void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu  )
 		{
 			// Get times from BehaviorSyncPoints
-			time_sec strokeAt = sync_seq.sync_stroke()->time();
-			time_sec relaxAt  = sync_seq.sync_relax()->time();
+			time_sec strokeAt = behav_syncs.sync_stroke()->time();
+			time_sec relaxAt  = behav_syncs.sync_relax()->time();
 
 			VecOfSbmCommand commands;
 
@@ -83,14 +83,14 @@ namespace BML {
 };  // end namespace BML
 
 
-BehaviorRequestPtr BML::parse_bml_interrupt( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& sync_seq, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_interrupt( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
 
 	const XMLCh* performanceId = elem->getAttribute( ATTR_ACT );
 	if( performanceId && XMLString::stringLen( performanceId ) ) {
 		// performanceId is ASCII, not Unicode
 		char* temp_ascii_id = XMLString::transcode( performanceId );
-		BehaviorRequestPtr interrupt( new InterruptBehavior( unique_id, temp_ascii_id, sync_seq ) );
+		BehaviorRequestPtr interrupt( new InterruptBehavior( unique_id, temp_ascii_id, behav_syncs ) );
 		XMLString::release( &temp_ascii_id );
 
 		return interrupt;

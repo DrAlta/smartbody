@@ -44,7 +44,7 @@ using namespace xml_utils;
 
 
 
-BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& sync_seq, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
 
 	// Viseme transition hack until timing can support multiple sync points
@@ -84,9 +84,9 @@ BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& uni
                     if(LOG_BML_VISEMES) printf( "LOG: BML::parse_bml_face(): FAC weight: %f\n", weight );
 					boost::shared_ptr<VisemeRequest> viseme;
 					if( rampup != -1 && rampdown != -1)
-						viseme.reset( new VisemeRequest( unique_id, "_", weight, 1, sync_seq, rampup, rampdown ) );
+						viseme.reset( new VisemeRequest( unique_id, "_", weight, 1, behav_syncs, rampup, rampdown ) );
 					else
-						viseme.reset( new VisemeRequest( unique_id, "_", weight, 1, sync_seq ) );
+						viseme.reset( new VisemeRequest( unique_id, "_", weight, 1, behav_syncs ) );
 
                     switch( au ) {
                         case 1:

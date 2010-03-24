@@ -249,14 +249,14 @@ bool BmlRequest::hasExistingBehaviorId( const std::wstring& id ) {
 	return result;
 }
 
-void BmlRequest::importNamedSyncPoints( BehaviorSyncPoints& sync_seq, const std::wstring& id, const std::wstring& logging_label ) {
+void BmlRequest::importNamedSyncPoints( BehaviorSyncPoints& behav_syncs, const std::wstring& id, const std::wstring& logging_label ) {
 	// Import BehaviorSyncPoints
-	SetOfWstring names = sync_seq.get_sync_names();
+	SetOfWstring names = behav_syncs.get_sync_names();
 	SetOfWstring::iterator it  = names.begin();
 	SetOfWstring::iterator end = names.end();
 	for( ; it!=end ; ++it ) {
 		wstring& name = *it;
-		SyncPointPtr sync( sync_seq.find( name )->sync() );
+		SyncPointPtr sync( behav_syncs.find( name )->sync() );
 
 		wstring sync_id = buildBmlId( id, name );
 		if( !sync_id.empty() ) {
@@ -306,14 +306,14 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 			try {
 				behavior->schedule( now );
 #if VALIDATE_BEHAVIOR_SYNCS
-				behavior->sync_seq.validate();
+				behavior->behav_syncs.validate();
 #endif // VALIDATE_BEHAVIOR_SYNCS
 
-				min_time = min( min_time, behavior->sync_seq.sync_start()->time() );
+				min_time = min( min_time, behavior->behav_syncs.sync_start()->time() );
 
 				if( LOG_BML_BEHAVIOR_SCHEDULE ) {
 					cout << "DEBUG: BmlRequest::realize(): Behavior \""<< (behavior->unique_id) <<"\" BehaviorSyncPoints:"<<endl;
-					behavior->sync_seq.printSyncTimes();
+					behavior->behav_syncs.printSyncTimes();
 				}
 			} catch( BML::SchedulingException& e ) {
 				// TODO: test if behavior is required
@@ -339,8 +339,8 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 			for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i ) {
 				BehaviorRequestPtr behavior = *i;
 				
-				BehaviorSyncPoints::iterator syncs_end = behavior->sync_seq.end();
-				for( BehaviorSyncPoints::iterator j = behavior->sync_seq.begin(); j != syncs_end; ++j ) {
+				BehaviorSyncPoints::iterator syncs_end = behavior->behav_syncs.end();
+				for( BehaviorSyncPoints::iterator j = behavior->behav_syncs.begin(); j != syncs_end; ++j ) {
 					j->sync()->time += offset;
 				}
 			}
@@ -628,7 +628,7 @@ bool BmlRequest::registerBehavior( const std::wstring& id, BehaviorRequestPtr be
 	behaviors.push_back( behavior );
 
 	if( id.size() > 0 ) {
-		importNamedSyncPoints( behavior->sync_seq, id, L"BehaviorRequest" );
+		importNamedSyncPoints( behavior->behav_syncs, id, L"BehaviorRequest" );
 	}
 
 	if( LOG_BEHAVIOR_SYNCHPOINTS ) {
@@ -637,7 +637,7 @@ bool BmlRequest::registerBehavior( const std::wstring& id, BehaviorRequestPtr be
 			wcout << " \"" << id << "\"" << flush;
 		cout << ":" << endl << "\t" << flush;
 
-		behavior->sync_seq.printSyncIds();
+		behavior->behav_syncs.printSyncIds();
 	}
 
 	return true;
@@ -657,7 +657,7 @@ bool BmlRequest::registerBehavior( const std::wstring& id, BehaviorRequestPtr be
 //
 //	speech_request = speech;
 //
-//	importNamedSyncPoints( speech->sync_seq, id, L"SpeechRequest" );
+//	importNamedSyncPoints( speech->behav_syncs, id, L"SpeechRequest" );
 //
 //	return true;
 //}
@@ -760,8 +760,8 @@ const time_sec BehaviorRequest::PERSISTENCE_THRESHOLD = (time_sec)( MeCtSchedule
 
 
 // methods
-BehaviorRequest::BehaviorRequest( const std::string& unique_id, const BehaviorSyncPoints& sync_seq  )
-:	sync_seq( sync_seq ),
+BehaviorRequest::BehaviorRequest( const std::string& unique_id, const BehaviorSyncPoints& behav_syncs  )
+:	behav_syncs( behav_syncs ),
 	unique_id( unique_id ),
 	audioOffset(TIME_UNSET),
 	required(false)
@@ -778,7 +778,7 @@ void BehaviorRequest::set_scheduler( BehaviorSchedulerPtr scheduler ) {
 void BehaviorRequest::schedule( time_sec now ) {
 	string warning_context = string( "Behavior \"" ) + unique_id + "\"";
 
-	sync_seq.applyParentTimes( warning_context );
+	behav_syncs.applyParentTimes( warning_context );
 
 	if( !scheduler ) {
 		ostringstream buffer;
@@ -786,7 +786,7 @@ void BehaviorRequest::schedule( time_sec now ) {
 		throw SchedulingException( buffer.str().c_str() );
 	}
 
-	scheduler->schedule( sync_seq, now );
+	scheduler->schedule( behav_syncs, now );
 }
 
 void BehaviorRequest::realize( BmlRequestPtr request, mcuCBHandle* mcu ) {
@@ -797,8 +797,8 @@ void BehaviorRequest::realize( BmlRequestPtr request, mcuCBHandle* mcu ) {
 bool BehaviorRequest::isPersistent() {
 	// Persistence is defined by a threshold to ensure we are operating
 	// within enough significant bits (especially when interpolating)
-	time_sec start_time = sync_seq.sync_start()->time();
-	time_sec end_time = sync_seq.sync_end()->time();
+	time_sec start_time = behav_syncs.sync_start()->time();
+	time_sec end_time = behav_syncs.sync_end()->time();
 	time_sec duration = end_time - start_time;
 	return( duration > PERSISTENCE_THRESHOLD );
 }
@@ -807,7 +807,7 @@ bool BehaviorRequest::isPersistent() {
 
 BehaviorSpan BehaviorRequest::getBehaviorSpan() {
 	// Default algorithm for detecting persistent behaviors.
-	BehaviorSpan span = sync_seq.getBehaviorSpan( PERSISTENCE_THRESHOLD );
+	BehaviorSpan span = behav_syncs.getBehaviorSpan( PERSISTENCE_THRESHOLD );
 
 	return span;
 }
@@ -856,11 +856,11 @@ void MeControllerRequest::register_controller_prune_policy( MePrunePolicy* prune
 
 void MeControllerRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu ) {
 	// Get times from BehaviorSyncPoints
-	time_sec startAt  = sync_seq.sync_start()->time();
-	time_sec readyAt  = sync_seq.sync_ready()->time();
-	time_sec strokeAt = sync_seq.sync_stroke()->time();
-	time_sec relaxAt  = sync_seq.sync_relax()->time();
-	time_sec endAt    = sync_seq.sync_end()->time();
+	time_sec startAt  = behav_syncs.sync_start()->time();
+	time_sec readyAt  = behav_syncs.sync_ready()->time();
+	time_sec strokeAt = behav_syncs.sync_stroke()->time();
+	time_sec relaxAt  = behav_syncs.sync_relax()->time();
+	time_sec endAt    = behav_syncs.sync_end()->time();
 
 	if( LOG_METHODS || LOG_CONTROLLER_SCHEDULE ) {
 		cout << "DEBUG: MeControllerRequest::schedule(): startAt="<<startAt<<",  readyAt="<<readyAt<<",  strokeAt="<<strokeAt<<",  relaxAt="<<relaxAt<<",  endAt="<<endAt<<endl;
@@ -1141,11 +1141,11 @@ void VisemeRequest::setVisemeName( const char* viseme ) {
 void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 {
 	// Get times from BehaviorSyncPoints
-	time_sec startAt  = sync_seq.sync_start()->time();
-	time_sec readyAt  = sync_seq.sync_ready()->time();
-	time_sec strokeAt = sync_seq.sync_stroke()->time();
-	time_sec relaxAt  = sync_seq.sync_relax()->time();
-	time_sec endAt    = sync_seq.sync_end()->time();
+	time_sec startAt  = behav_syncs.sync_start()->time();
+	time_sec readyAt  = behav_syncs.sync_ready()->time();
+	time_sec strokeAt = behav_syncs.sync_stroke()->time();
+	time_sec relaxAt  = behav_syncs.sync_relax()->time();
+	time_sec endAt    = behav_syncs.sync_end()->time();
 
 	const SbmCharacter* actor    = request->actor;
 	const string&       actor_id = request->actorId; // match string used by request?
