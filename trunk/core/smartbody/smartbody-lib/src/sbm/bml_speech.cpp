@@ -59,14 +59,14 @@ const char* VISEME_NEUTRAL = "_";
 // SpeechRequest Helper functions
 void BML::SpeechRequest::createStandardSyncPoint( const std::wstring& sync_id, SyncPointPtr& sync ) {
 	sync = trigger->addSyncPoint();
-	sync_seq.insert( sync_id, sync, sync_seq.end() );
+	behav_syncs.insert( sync_id, sync, behav_syncs.end() );
 }
 
 
 BML::SpeechRequestPtr BML::parse_bml_speech(
 	DOMElement* xml,
 	const std::string& unique_id,
-	BML::BehaviorSyncPoints& sync_seq,
+	BML::BehaviorSyncPoints& behav_syncs,
 	bool required,
 	BML::BmlRequestPtr request,
 	mcuCBHandle *mcu )
@@ -164,20 +164,20 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	//       rather the default start trigger.  The trigger identifies the additional processing
 	//       necessary for the speech.
 	//TriggerEventPtr trigger = request->createTrigger( L"SPEECH" );
-	TriggerEventPtr trigger = sync_seq.sync_start()->sync()->trigger.lock();
+	TriggerEventPtr trigger = behav_syncs.sync_start()->sync()->trigger.lock();
 
-//// Old code:  sync_seq are now parsed and passed in
+//// Old code:  behav_syncs are now parsed and passed in
 //	// Current Speech behavior constraints prevent us from using the sync point attributes
 //	// Creating new BehaviorSyncPoints instead of parsing the attributes.
-//	createStandardSyncPoint( TM_START,        sync_seq.sp_start );
-//	createStandardSyncPoint( TM_READY,        sync_seq.sp_ready );
-//	createStandardSyncPoint( TM_STROKE_START, sync_seq.sp_stroke_start );
-//	createStandardSyncPoint( TM_STROKE,       sync_seq.sp_stroke );
-//	createStandardSyncPoint( TM_STROKE_END,   sync_seq.sp_stroke_end );
-//	createStandardSyncPoint( TM_RELAX,        sync_seq.sp_relax );
-//	createStandardSyncPoint( TM_END,          sync_seq.sp_end );
+//	createStandardSyncPoint( TM_START,        behav_syncs.sp_start );
+//	createStandardSyncPoint( TM_READY,        behav_syncs.sp_ready );
+//	createStandardSyncPoint( TM_STROKE_START, behav_syncs.sp_stroke_start );
+//	createStandardSyncPoint( TM_STROKE,       behav_syncs.sp_stroke );
+//	createStandardSyncPoint( TM_STROKE_END,   behav_syncs.sp_stroke_end );
+//	createStandardSyncPoint( TM_RELAX,        behav_syncs.sp_relax );
+//	createStandardSyncPoint( TM_END,          behav_syncs.sp_end );
 
-	return SpeechRequestPtr( new SpeechRequest( unique_id, sync_seq, speech_impl, speech_request_id, marks, request ) );
+	return SpeechRequestPtr( new SpeechRequest( unique_id, behav_syncs, speech_impl, speech_request_id, marks, request ) );
 }
 
 //  SpeechRequest
@@ -193,7 +193,7 @@ BML::SpeechRequest::SpeechRequest(
 :	SequenceRequest( unique_id, syncs_in, 0, 0, 0, 0, 0 ),
 	speech_impl( speech_impl ),
 	speech_request_id( speech_request_id ),
-	trigger( sync_seq.sync_start()->sync()->trigger.lock() )
+	trigger( behav_syncs.sync_start()->sync()->trigger.lock() )
 {
 	// Add SyncPoints for SpeechMarks
 	vector<SpeechMark>::const_iterator end = marks.end();
@@ -202,8 +202,8 @@ BML::SpeechRequest::SpeechRequest(
 		SyncPointPtr sync( trigger->addSyncPoint() );
 
 		// Insert just before stroke_end
-		BehaviorSyncPoints::iterator stroke_end_pos = sync_seq.sync_stroke_end();
-		BehaviorSyncPoints::iterator result_pos = sync_seq.insert( mark->id, sync, stroke_end_pos );  // Test insertion, and throw error if problem
+		BehaviorSyncPoints::iterator stroke_end_pos = behav_syncs.sync_stroke_end();
+		BehaviorSyncPoints::iterator result_pos = behav_syncs.insert( mark->id, sync, stroke_end_pos );  // Test insertion, and throw error if problem
 
 		// Remember Word Break
 		if( !( wbToSync.insert( make_pair( mark->id, sync ) ).second ) )
@@ -265,21 +265,21 @@ void BML::SpeechRequest::speech_response( srArgBuffer& response_args ) {
 
 void BML::SpeechRequest::schedule( time_sec now ) {
 	//// TODO: Sync to prior behaviors
-	// sync_seq.applyParentTimes()
+	// behav_syncs.applyParentTimes()
 	// find set SyncPoints
 	// if more than one, warn and ignore least important
 
 	// Convience references
-	SyncPointPtr sp_start( sync_seq.sync_start()->sync() );
-	SyncPointPtr sp_ready( sync_seq.sync_ready()->sync() );
-	SyncPointPtr sp_stroke_start( sync_seq.sync_stroke_start()->sync() );
-	SyncPointPtr sp_stroke( sync_seq.sync_stroke()->sync() );
-	SyncPointPtr sp_stroke_end( sync_seq.sync_stroke_end()->sync() );
-	SyncPointPtr sp_relax( sync_seq.sync_relax()->sync() );
-	SyncPointPtr sp_end( sync_seq.sync_end()->sync() );
+	SyncPointPtr sp_start( behav_syncs.sync_start()->sync() );
+	SyncPointPtr sp_ready( behav_syncs.sync_ready()->sync() );
+	SyncPointPtr sp_stroke_start( behav_syncs.sync_stroke_start()->sync() );
+	SyncPointPtr sp_stroke( behav_syncs.sync_stroke()->sync() );
+	SyncPointPtr sp_stroke_end( behav_syncs.sync_stroke_end()->sync() );
+	SyncPointPtr sp_relax( behav_syncs.sync_relax()->sync() );
+	SyncPointPtr sp_end( behav_syncs.sync_end()->sync() );
 
 	string warning_context = string( "Behavior \"" ) + unique_id + "\"";
-	sync_seq.applyParentTimes( warning_context );
+	behav_syncs.applyParentTimes( warning_context );
 
 	BmlRequestPtr       request  = trigger->request.lock();
 	const SbmCharacter* actor    = request->actor;
@@ -399,18 +399,18 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 {
 	// Get times from SyncPoints
-	time_sec startAt  = sync_seq.sync_start()->time();
-	time_sec readyAt  = sync_seq.sync_ready()->time();
-	time_sec strokeAt = sync_seq.sync_stroke()->time();
-	time_sec relaxAt  = sync_seq.sync_relax()->time();
-	time_sec endAt    = sync_seq.sync_end()->time();
+	time_sec startAt  = behav_syncs.sync_start()->time();
+	time_sec readyAt  = behav_syncs.sync_ready()->time();
+	time_sec strokeAt = behav_syncs.sync_stroke()->time();
+	time_sec relaxAt  = behav_syncs.sync_relax()->time();
+	time_sec endAt    = behav_syncs.sync_end()->time();
 
 	const string& actor_id = request->actor->name;
 
 //// SyncPoints should already be set from viseme processing
 //	{	// Offset prior syncpoint times by startAt
-//		BehaviorSyncPoints::iterator it = sync_seq.begin();
-//		BehaviorSyncPoints::iterator end = sync_seq.end();
+//		BehaviorSyncPoints::iterator it = behav_syncs.begin();
+//		BehaviorSyncPoints::iterator end = behav_syncs.end();
 //		for( ; it != end ; ++it ) {
 //			SyncPointPtr sync = (*it);
 //			if( isTimeSet( sync->time ) ) {

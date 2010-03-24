@@ -73,14 +73,14 @@ namespace BML {
 		TriggerEventPtr        trigger;
 
 		// wordbreak id to SyncPoint
-		MapOfSyncPoint         wbToSync;  //  TODO: Replace use of wbToSync with BehaviorRequest::sync_seq::idToSync
+		MapOfSyncPoint         wbToSync;  //  TODO: Replace use of wbToSync with BehaviorRequest::behav_syncs::idToSync
 
 	public:
 		///////////////////////////////////////////////////////////////
 		// Methods
 		SpeechRequest(
 			const std::string& unique_id,
-			BML::BehaviorSyncPoints& sync_seq,
+			BML::BehaviorSyncPoints& behav_syncs,
 			SmartBody::SpeechInterface* speech_impl,
 			SmartBody::RequestId speech_request_id,
 			const std::vector<SpeechMark>& marks,
@@ -89,10 +89,10 @@ namespace BML {
 		virtual ~SpeechRequest();
 
 		SetOfWstring get_sync_names()
-		{	return sync_seq.get_sync_names(); }
+		{	return behav_syncs.get_sync_names(); }
 
 		SyncPointPtr sync_for_name( const std::wstring& name )
-		{	return sync_seq.find( name )->sync(); }  // TODO: Revisit the uses of this since sync_seq interfaces changed
+		{	return behav_syncs.find( name )->sync(); }  // TODO: Revisit the uses of this since behav_syncs interfaces changed
 
 		///**
 		// *  Adds wordbreak mark after STROKE or last mark, and before RELAX
@@ -139,7 +139,7 @@ namespace BML {
 		friend BML::Processor;  //temporary
 	};
 
-	BML::SpeechRequestPtr parse_bml_speech( DOMElement* xml, const std::string& unique_id, BML::BehaviorSyncPoints& sync_seq, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
+	BML::SpeechRequestPtr parse_bml_speech( DOMElement* xml, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
 };
 
 

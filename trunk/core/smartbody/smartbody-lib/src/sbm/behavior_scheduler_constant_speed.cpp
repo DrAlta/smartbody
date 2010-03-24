@@ -101,15 +101,15 @@ bool testSyncAfter(
 
 
 
-void BehaviorSchedulerConstantSpeed::schedule( BehaviorSyncPoints& sync_seq, time_sec now ) {
+void BehaviorSchedulerConstantSpeed::schedule( BehaviorSyncPoints& behav_syncs, time_sec now ) {
 	// local references to standard sync points
-	SyncPointPtr start        = sync_seq.sync_start()->sync();
-	SyncPointPtr ready        = sync_seq.sync_ready()->sync();
-	SyncPointPtr stroke_start = sync_seq.sync_stroke_start()->sync();
-	SyncPointPtr stroke       = sync_seq.sync_stroke()->sync();
-	SyncPointPtr stroke_end   = sync_seq.sync_stroke_end()->sync();
-	SyncPointPtr relax        = sync_seq.sync_relax()->sync();
-	SyncPointPtr end          = sync_seq.sync_end()->sync();
+	SyncPointPtr start        = behav_syncs.sync_start()->sync();
+	SyncPointPtr ready        = behav_syncs.sync_ready()->sync();
+	SyncPointPtr stroke_start = behav_syncs.sync_stroke_start()->sync();
+	SyncPointPtr stroke       = behav_syncs.sync_stroke()->sync();
+	SyncPointPtr stroke_end   = behav_syncs.sync_stroke_end()->sync();
+	SyncPointPtr relax        = behav_syncs.sync_relax()->sync();
+	SyncPointPtr end          = behav_syncs.sync_end()->sync();
 
 	/*  The following implements a search for the two most important SyncPoints, and then scales the time to meet both.
      *  Importance is ranked in this order: stroke, ready, relax, start, end

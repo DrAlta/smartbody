@@ -79,7 +79,7 @@ namespace BML {
 				time_sec speed );
 #endif // BEHAVIOR_TIMING_BY_DURATION
 
-			virtual void schedule( BehaviorSyncPoints& sync_seq, time_sec now );
+			virtual void schedule( BehaviorSyncPoints& behav_syncs, time_sec now );
 	};
 	typedef boost::shared_ptr<BehaviorSchedulerConstantSpeed> BehaviorSchedulerConstantSpeedPtr;
 
