@@ -323,6 +323,14 @@ int SkChannel::load ( Type type, SrInput& in, float* v ) // static
       v[1] = q.x;
       v[2] = q.y;
       v[3] = q.z;
+
+#if 0
+	float len = q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
+	if( fabs( len - 1.0 ) > 0.000001 )	{
+		printf( "SkChannel::load Quat: len == %.12f\n", len );
+	}
+#endif
+
       return 4; // the channel size is 4
     }
    if ( type==Swing )
