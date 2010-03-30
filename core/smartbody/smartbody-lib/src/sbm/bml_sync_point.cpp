@@ -37,6 +37,9 @@ using namespace std;
 using namespace BML;
 
 
+#define HACK_BAD_SYNC_POINT_REF_WARN_ONLY (1)
+
+
 // shorthand type for name_to_pos
 typedef map<const wstring,BehaviorSyncPoints::iterator> MapNameToPos;  
 
@@ -304,8 +307,23 @@ BehaviorSyncPoints::iterator BehaviorSyncPoints::parseSyncPointAttr( DOMElement*
 		sync = request->getSyncByReference( sync_ref );  // Parses the sync reference notation
 
 		if( !sync ) {
-			// TODO: More descriptive string
-			throw BML::ParsingException( "BehaviorSyncPoints::parseSyncPointAttr: Invalid SyncPoint reference." );
+			// 8-bit C-string references
+			char* temp_sync_att = XMLString::transcode( sync_attr.c_str() );
+			char* temp_sync_ref = XMLString::transcode( sync_ref );
+
+			ostringstream oss;
+			oss << "BehaviorSyncPoint:parseSyncPointAttr(..): Invalid SyncPoint reference \"" << temp_sync_ref << "\" in behavior \"" << behavior_id << "\" " << temp_sync_att << ".";
+			
+#if HACK_BAD_SYNC_POINT_REF_WARN_ONLY
+			// TEMPORARY HACK: Warn but don't error out, generate blank sync point
+			cerr << "WARNING: " << oss.str() << "; generated unconstrained sync point." << endl;
+			sync = request->start_trigger->addSyncPoint();
+#else
+			throw BML::ParsingException( oss.str().c_str() );
+#endif
+
+			XMLString::release( &temp_sync_att );
+			XMLString::release( &temp_sync_ref );
 		}
 	} else {
 		sync = request->start_trigger->addSyncPoint();
