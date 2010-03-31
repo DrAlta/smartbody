@@ -674,7 +674,16 @@ SyncPointPtr BmlRequest::getSyncByReference( const std::wstring& notation ) {
 	// Get index to last '+' or '-' character
 	size_type last_plus = notation.rfind('+');
 	size_type last_minus = notation.rfind('-');
-	size_type index = std::max( last_plus, last_minus );
+	size_type index = npos;
+	if( last_plus != npos ) {
+		if( last_minus!=npos ) {
+			index = std::max( last_plus, last_minus );  // Only use if you know neither are npos
+		} else {
+			index = last_plus;
+		}
+	} else if( last_minus != npos ) {
+		index = last_minus;
+	}
 
 	if( index != npos && index != 0 ) { //check for offset
 		float offset;
