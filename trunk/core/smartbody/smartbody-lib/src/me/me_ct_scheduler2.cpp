@@ -41,7 +41,7 @@ using namespace std;
 #define DEBUG_LOGGED_CHANNEL_MAPPING (0)
 
 
-const float MeCtScheduler2::MAX_TRACK_DURATION = 4194303.0;
+const float MeCtScheduler2::MAX_TRACK_DURATION = 4194303.0; // Calculated to give 1 second precision with floats
 
 
 
