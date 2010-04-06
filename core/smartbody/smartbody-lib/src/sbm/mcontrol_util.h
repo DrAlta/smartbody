@@ -335,6 +335,7 @@ int mcu_commapi_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 int mcu_vrKillComponent_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_vrAllCall_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_vrQuery_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 
 //////////////////////////////////////////////////////////////////
 

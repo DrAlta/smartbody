@@ -26,6 +26,7 @@
 #ifndef SR_HASH_MAP_H
 #define SR_HASH_MAP_H
 #include <string>
+#include <map>
 
 
 #include "sbm_constants.h"
@@ -48,7 +49,7 @@ class srHashMapBase {
 	public:
 		srHashMapBase( unsigned int size = 128 );
 		srHashMapBase( srHashMapBase & map );
-		virtual ~srHashMapBase( void );
+		virtual ~srHashMapBase( void );		
 
 		void	print( int reverse = 0 );
 		int		get_num_entries( void )	{ return( entry_count ); }
@@ -57,6 +58,7 @@ class srHashMapBase {
 		int		insert( const char *key, void *data, int claim = FALSE );
 		void	*lookup( const char *key );
 		void	*remove( const char *key, int *claimed_p = NULL );
+		
 
 		void	reset( void );					  // start iterator
 		void	*next( char** key_ref_p = NULL ); // lookup iterator
@@ -85,6 +87,8 @@ class srHashMapBase {
 		sr_map_entry_t	**bucket_pp;
 
 		int				entry_count;
+
+		
 };
 
 template <class X> class srHashMap : public srHashMapBase	{
@@ -99,6 +103,21 @@ template <class X> class srHashMap : public srHashMapBase	{
 			if( shallow_copy == false )	{
 				expunge();
 			}
+		}
+
+		// get stl map 
+		std::map<char *, X *> * get_map(){
+			stl_map.clear();
+			reset();
+			char * animation;
+			X* data;
+			data = next(&animation);
+			while(data!=NULL)
+			{
+				stl_map.insert ( std::pair<char *, X *>(animation,data) );
+				data = next(&animation);
+			}
+			return &stl_map;
 		}
 		
 		int insert( const char *key, X *data, int claim = FALSE )	{
@@ -144,6 +163,10 @@ template <class X> class srHashMap : public srHashMapBase	{
 				}
 			}
 		}
+
+
+private:
+	std::map<char *, X *> stl_map;
 };
 
 ///////////////////////////////////////////////////////
