@@ -3370,6 +3370,65 @@ int mcu_vrKillComponent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 }
 
 
+int mcu_vrQuery_func( srArgBuffer& args, mcuCBHandle* mcu_p )
+{
+	string command = args.read_token();
+	if( strcmp(command.c_str(),"anims") && strcmp(command.c_str(),"poses") ) {
+		cerr << "ERROR: Invalid query command" << endl;
+		return CMD_FAILURE;
+	}
+
+	if( !strcmp(command.c_str(),"anims") )
+	{
+		std::map<char *, SkMotion *> * mapOfMotions;
+
+		mapOfMotions = mcu_p->motion_map.get_map();
+		std::map<char *, SkMotion *>::iterator it;
+
+		string message;
+
+		message.append("vrQueryAnimReply ");
+
+		for( it = mapOfMotions->begin(); it!= mapOfMotions->end(); ++it)
+		{
+			printf("\n%s\n",(*it).first);
+			message.append(strcat((*it).first," "));
+		}
+
+		mcu_p->vhmsg_send(message.c_str());
+
+		return (CMD_SUCCESS);
+	}
+	else if( !strcmp(command.c_str(),"poses") )
+	{
+		std::map<char *, SkPosture *> * mapOfPoses;
+
+		mapOfPoses = mcu_p->pose_map.get_map();
+		std::map<char *, SkPosture *>::iterator it;
+
+		string message;
+
+		message.append("vrQueryPoseReply ");
+
+		for( it = mapOfPoses->begin(); it!= mapOfPoses->end(); ++it)
+		{
+			printf("\n%s\n",(*it).first);
+			message.append(strcat((*it).first," "));
+		}
+
+		mcu_p->vhmsg_send(message.c_str());
+
+		return (CMD_SUCCESS);
+	}
+
+	return CMD_FAILURE;
+
+}
+
+
+
+
+
 /*
    vrAllCall
      In response to this message, send out vrComponent to indicate that this component is running

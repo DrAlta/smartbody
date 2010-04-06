@@ -331,6 +331,7 @@ void mcu_register_callbacks( void ) {
 
 	mcu.insert( "vrKillComponent", mcu_vrKillComponent_func );
 	mcu.insert( "vrAllCall", mcu_vrAllCall_func );
+	mcu.insert("vrQuery", mcu_vrQuery_func );
 
 	mcu.insert( "text_speech", text_speech::text_speech_func ); // [BMLR]
 }
