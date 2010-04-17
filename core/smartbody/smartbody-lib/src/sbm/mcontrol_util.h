@@ -74,6 +74,7 @@ class mcuCBHandle;
 #include "sbm_perf.h"
 
 #include "joint_logger.hpp"
+#include "ResourceManager.h"
 
 #include <sbm/action_unit.hpp>
 #include <sbm/viseme_map.hpp>
@@ -117,6 +118,7 @@ class mcuCBHandle	{
 		bool		net_bone_updates;
 		bool		net_world_offset_updates;
 		bool		net_face_bones;
+		bool		use_locomotion;
 		const char* net_host;
 		BoneBusClient bonebus;
 		SBMCharacterListener * sbm_character_listener;   // only one listener possible, must be set manually
@@ -175,7 +177,7 @@ class mcuCBHandle	{
 		WSP::Manager*				theWSP;
 
 		joint_logger::EvaluationLogger* logger_p;
-
+		ResourceManager*			resource_manager;
 
 	private:
 		// Constant
@@ -214,7 +216,7 @@ class mcuCBHandle	{
 		void render( void )	{ if( viewer_p ) { viewer_p->render(); } }
 		
 		void update( void );
-		int insert( char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp )	{
+		int insert( char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp, char* description = NULL )	{
 			return( cmd_map.insert( key, fp ) );
 		}
 

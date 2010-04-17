@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <string>
+#include <direct.h>
 
 #include "sbm_audio.h"
 
@@ -77,7 +78,9 @@ mcuCBHandle::mcuCBHandle()
 	logger_p( new joint_logger::EvaluationLogger() ),
 	test_character_default( "" ),
 	test_recipient_default( "ALL" ),
-	queued_cmds( 0 )
+	queued_cmds( 0 ),
+	use_locomotion( false ),
+	resource_manager(ResourceManager::getResourceManager())
 {
 	
 	root_group_p->ref();
@@ -103,6 +106,7 @@ void mcuCBHandle::reset( void )	{
 	loop = true;
 	time = 0.0;
 	net_bone_updates = true;
+	use_locomotion = false;
 	root_group_p = new SrSnGroup();
 	root_group_p->ref();
 	logger_p = new joint_logger::EvaluationLogger();
@@ -128,6 +132,9 @@ void mcuCBHandle::set_time( double real_time )	{
 }
 
 FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
+	
+
+
 	FILE* file_p = NULL;
 
 	char buffer[ MAX_FILENAME_LEN ];
@@ -138,8 +145,21 @@ FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
 	char* filename = seq_paths.next_filename( buffer, label );
 	while( filename != NULL )	{
 		file_p = fopen( filename, "r" );
-		if( file_p != NULL )
+		if( file_p != NULL ) {
+			
+			char CurrentPath[_MAX_PATH];
+			_getcwd(CurrentPath, _MAX_PATH);
+			cout << CurrentPath << endl;
+
+			// add the file resource
+			FileResource* fres = new FileResource();
+			std::stringstream stream;
+			stream << CurrentPath << "\\" << filename;
+			fres->setFilePath(stream.str());
+			resource_manager->addResource(fres);
+			
 			break;
+		}
 		filename = seq_paths.next_filename( buffer, label );
 	}
 	if( file_p == NULL ) {
@@ -149,8 +169,20 @@ FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
 		seq_paths.reset();
 		filename = seq_paths.next_filename( buffer, label );
 		while( filename )	{
-			if( ( file_p = fopen( filename, "r" ) ) != NULL )
+			if( ( file_p = fopen( filename, "r" ) ) != NULL ) {
+				// add the file resource
+				
+				char CurrentPath[_MAX_PATH];
+				_getcwd(CurrentPath, _MAX_PATH);
+				cout << CurrentPath << endl;
+
+				FileResource* fres = new FileResource();
+				std::stringstream stream;
+				stream << CurrentPath << "\\" << filename;
+				fres->setFilePath(stream.str());
+				resource_manager->addResource(fres);
 				break;
+			}
 			filename = seq_paths.next_filename( buffer, label );
 		}
 	}
@@ -845,7 +877,12 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		char *path_tok = args.read_token();
 		char *path = args.read_token();
 		
+		PathResource* pres = new PathResource();
+		pres->setPath(path);
+
 		if( strcmp( path_tok, "seq" ) == 0 )	{
+			
+			pres->setType("seq");
 			mcu_p->seq_paths.insert( path );
 		}
 		else
@@ -853,6 +890,7 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			( strcmp( path_tok, "me" ) == 0 )||
 			( strcmp( path_tok, "ME" ) == 0 )
 		)	{
+			pres->setType("me");
 			mcu_p->me_paths.insert( path );
 		}
 		else
@@ -860,12 +898,16 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			( strcmp( path_tok, "bp" ) == 0 )||
 			( strcmp( path_tok, "BP" ) == 0 )
 		)	{
+			pres->setType("bp");
 			mcu_p->bp_paths.insert( path );
 		}
 		else	{
+			delete pres;
 			printf( "mcu_filepath_func ERR: token '%s' NOT FOUND\n", path_tok );
 			return( CMD_FAILURE );
 		}
+		
+		mcu_p->resource_manager->addResource(pres);
 		return( CMD_SUCCESS );
 	}
 	return( CMD_FAILURE );
@@ -965,6 +1007,10 @@ int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	if( mcu_p )	{
 		char *seq_name = args.read_token();
 		char *seq_cmd = args.read_token();
+
+		//SeqResource* sres = new SeqResource();
+		//sres->setFilePath(seq_name);
+		//mcu_p->resource_manager->addResource(sres);
 
 		if( ( strcmp( seq_cmd, "begin" ) == 0 )||( strcmp( seq_cmd, EMPTY_STRING ) == 0 ) )	{
 			return(
@@ -1278,8 +1324,15 @@ int mcu_character_init(
 
 	// Only initialize face_neutral if -facebone is enabled
 	SkMotion* face_neutral_p = mcu_p->net_face_bones? mcu_p->face_neutral_p : NULL;
-	err = char_p->init( skeleton_p, face_neutral_p, &mcu_p->au_motion_map, &mcu_p->viseme_map, unreal_class );
+	err = char_p->init( skeleton_p, face_neutral_p, &mcu_p->au_motion_map, &mcu_p->viseme_map, unreal_class, mcu_p->use_locomotion );
 	if( err == CMD_SUCCESS ) {
+
+		if (mcu_p->use_locomotion) {
+			int locoSuccess = char_p->init_locomotion_analyzer(skel_file, mcu_p);//temp init for analyzer Jingqiao Fu Aug/07/09
+			if (locoSuccess != CMD_SUCCESS) {
+			}
+		}
+
 		char_p->ct_tree_p->set_evaluation_logger( mcu_p->logger_p );
 
 		err = mcu_p->pawn_map.insert( char_name, char_p );

@@ -36,13 +36,18 @@ public:
 
 protected:
 	// Data
-	SkChannelArray  _channels;
+	SkChannelArray  request_channels;
+
+	bool is_valid;
+
+	double last_time;
+
 
 public:
 	/** Constructor */
 	MeCtNavigationWaypoint();
 
-	const char* controller_type() const;
+	const char* controller_type();
 
 	/**
 	 *  Initializes the controller with a set of channels to write.
@@ -59,6 +64,11 @@ public:
 	 *  Returns -1, undefined duration.
 	 */
 	double controller_duration();
+
+	/*!
+	 *  Implements MeController::context_updated(..).
+	 */
+	virtual void context_updated();
 
 	/**
 	 *  Implements MeController::controller_evaluate(..).

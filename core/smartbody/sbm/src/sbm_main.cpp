@@ -50,6 +50,8 @@
 #include <sbm/sbm_audio.h>
 #include <sbm/sbm_speech_audiofile.hpp>
 #include <sbm/text_speech.h> // [BMLR]
+#include <sbm/locomotion_cmds.hpp>
+#include <sbm/resource_cmds.h>
 
 #define WIN32_LEAN_AND_MEAN
 #include <sbm/sr_cmd_line.h>
@@ -261,7 +263,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "set",          mcu_set_func );
 	mcu.insert( "print",        mcu_print_func );
 	mcu.insert( "test",			mcu_test_func );
-	
+
 	mcu.insert( "viewer",		mcu_viewer_func );
 	mcu.insert( "camera",		mcu_camera_func );
 	mcu.insert( "time",		mcu_time_func );
@@ -291,7 +293,10 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "RemoteSpeechTimeOut", remoteSpeechTimeOut_func);  // internally routed message
 	mcu.insert( "joint_logger",        joint_logger::start_stop_func );
 	mcu.insert( "J_L",                 joint_logger::start_stop_func );  // shorthand
-
+	mcu.insert( "locomotion",          locomotion_cmd_func );
+	mcu.insert( "loco",                locomotion_cmd_func ); // shorthand
+	mcu.insert( "resource",            resource_cmd_func );
+	
 	mcu.insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands
 
 	mcu.insert_set_cmd( "bp",             BML_PROCESSOR::set_func );
@@ -316,6 +321,8 @@ void mcu_register_callbacks( void ) {
 	mcu.insert_test_cmd( "args", test_args_func );
 	mcu.insert_test_cmd( "bml",  test_bml_func );
 	mcu.insert_test_cmd( "fml",  test_fml_func );
+	mcu.insert_test_cmd( "locomotion", test_locomotion_cmd_func );
+	mcu.insert_test_cmd( "loco",       test_locomotion_cmd_func );  // shorthand
 	mcu.insert_test_cmd( "rhet", remote_speech_test);
 	mcu.insert_test_cmd( "bone_pos", test_bone_pos_func );
 	
@@ -454,6 +461,7 @@ int main( int argc, char **argv )	{
 		{
 			if( ++i < argc ) {
 				printf( "    Adding ME path '%s'\n", argv[i] );
+
 				me_paths.push_back( argv[i] );
 			} else {
 				printf( "ERROR: Expected directory path to follow -mepath\n" );
@@ -464,6 +472,7 @@ int main( int argc, char **argv )	{
 		{
 			if( ++i < argc ) {
 				printf( "    Adding sequence path '%s'\n", argv[i] );
+
 				seq_paths.push_back( argv[i] );
 			} else {
 				printf( "ERROR: Expected directory path to follow -seqpath\n" );

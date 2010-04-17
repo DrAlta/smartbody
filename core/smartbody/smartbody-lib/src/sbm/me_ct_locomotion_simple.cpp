@@ -31,14 +31,18 @@ const char* MeCtLocomotionSimple::TYPE = "MeCtLocomotionSimple";
 
 
 /** Constructor */
-MeCtLocomotionSimple::MeCtLocomotionSimple() {
-	is_valid = false;
-	last_time = std::numeric_limits<float>::quiet_NaN();
-}
+MeCtLocomotionSimple::MeCtLocomotionSimple()
+:	is_valid( false ),
+	last_time( std::numeric_limits<float>::quiet_NaN() )
+{}
 
 /** Destructor */
 MeCtLocomotionSimple::~MeCtLocomotionSimple() {
 	// Nothing allocated to the heap
+}
+
+const char* MeCtLocomotionSimple::controller_type() {
+	return TYPE;
 }
 
 // Implements MeController::controller_channels().
@@ -54,23 +58,26 @@ SkChannelArray& MeCtLocomotionSimple::controller_channels() {
 		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::YPos ); //  5
 		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::ZPos ); //  6
 
-		request_channels.add( SkJointName( SbmCharacter::ORIENTATION_TARGET ), SkChannel::XPos );  //  7
-		request_channels.add( SkJointName( SbmCharacter::ORIENTATION_TARGET ), SkChannel::YPos );  //  8
-		request_channels.add( SkJointName( SbmCharacter::ORIENTATION_TARGET ), SkChannel::ZPos );  //  9
+		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_GLOBAL_ROTATION ), SkChannel::YPos ); //  7
+		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_LOCAL_ROTATION ), SkChannel::YPos ); //  7
+
+		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_ID ), SkChannel::YPos ); //  7
 	}
 
 	return request_channels;
 }
 
-// Implements MeController::context_updated(..).
+// Implements MeController::context_updated(..)
 void MeCtLocomotionSimple::context_updated() {
-	if( _context == NULL )
+	if( _context == NULL ) {
 		is_valid = false;
+		last_time = std::numeric_limits<double>::quiet_NaN();
+	}
 }
 
 // Look up the context indices, and check to make sure it isn't -1
-#define LOOKUP_BUFFER_INDEX( var_name, index ) \
-	var_name = _context->toBufferIndex( _toContextCh[ ( index ) ] );  \
+#define LOOKUP_BUFFER_INDEX( var_name, ct_index ) \
+	var_name = _context->toBufferIndex( _toContextCh[ ( ct_index ) ] );  \
 	is_valid &= ( var_name != -1 );
 
 void MeCtLocomotionSimple::controller_map_updated() {
@@ -87,9 +94,7 @@ void MeCtLocomotionSimple::controller_map_updated() {
 		LOOKUP_BUFFER_INDEX( bi_loco_vel_y, 5 );
 		LOOKUP_BUFFER_INDEX( bi_loco_vel_z, 6 );
 
-		LOOKUP_BUFFER_INDEX( bi_orient_x,   7 );
-		LOOKUP_BUFFER_INDEX( bi_orient_y,   8 );
-		LOOKUP_BUFFER_INDEX( bi_orient_z,   9 );
+		LOOKUP_BUFFER_INDEX( bi_loco_rot_y, 7 );
 	} else {
 		// This shouldn't get here
 		is_valid = false;
@@ -98,10 +103,11 @@ void MeCtLocomotionSimple::controller_map_updated() {
 
 
 bool MeCtLocomotionSimple::controller_evaluate( double time, MeFrameData& frame ) {
-	// TODO: Update MeController to pass in delta time.
-	// Until then, fake it or compute it ourself (but there are some gotchas)
 	float time_delta = 0.033f;
-
+	if( last_time == last_time ) {  // false if NaN
+		time_delta = (float)( time - last_time );
+	}
+	last_time = time;
 
 	const vector3_t UP_VECTOR( 0, 1, 0 );
 
@@ -110,28 +116,27 @@ bool MeCtLocomotionSimple::controller_evaluate( double time, MeFrameData& frame 
 
 		// Read inputs
 		vector3_t world_pos( buffer[ bi_world_x ], buffer[ bi_world_y ], buffer[ bi_world_z ] );
+		quat_t    world_rot( buffer[ bi_world_rot ], buffer[ bi_world_rot+1 ], buffer[ bi_world_rot+2 ], buffer[ bi_world_rot+3 ] );
 		vector3_t loco_vel( buffer[ bi_loco_vel_x ], buffer[ bi_loco_vel_y ], buffer[ bi_loco_vel_z ] );
-		vector3_t orient_pos( buffer[ bi_orient_x ], buffer[ bi_orient_y ], buffer[ bi_orient_z ] );
+		euler_t   loco_drot( 0, DEG( buffer[ bi_loco_rot_y ] ), 0 );
 
 		// Position Calc
 		world_pos += ( loco_vel * time_delta );
 
-		// Orientation Calc (using the update world_pos)
-		vector3_t orient_vec = orient_pos - world_pos;
-		orient_vec.y( 0 ); // rotate around y axis by setting y-delta to 0
-
-		quat_t orient_quat( euler_t( orient_vec, UP_VECTOR ) );
+		// Rotation Calc
+		loco_drot *= time_delta;
+		world_rot = quat_t( loco_drot ) * world_rot;
 
 		// Write Results
 		buffer[ bi_world_x ] = (float)world_pos.x();
 		buffer[ bi_world_y ] = (float)world_pos.y();
 		buffer[ bi_world_z ] = (float)world_pos.z();
 
-		buffer[ bi_world_rot+0 ] = (float)orient_quat.w();
-		buffer[ bi_world_rot+1 ] = (float)orient_quat.x();
-		buffer[ bi_world_rot+2 ] = (float)orient_quat.y();
-		buffer[ bi_world_rot+3 ] = (float)orient_quat.z();
+		buffer[ bi_world_rot+0 ] = (float)world_rot.w();
+		buffer[ bi_world_rot+1 ] = (float)world_rot.x();
+		buffer[ bi_world_rot+2 ] = (float)world_rot.y();
+		buffer[ bi_world_rot+3 ] = (float)world_rot.z();
 	}
 
-	return true;
+	return is_valid;
 }

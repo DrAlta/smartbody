@@ -8,6 +8,10 @@
 0	path seq ../../../../data/sbm-test/scripts
 0	path seq ../../../../data/sbm-common/scripts
 
+### enable the locomotion engine
+0   test locomotion enable
+
+
 ### Initialize individual modules.
 ### All inlined sequences must have all command times at 0 to run in-order.
 0	seq init-common-assets   inline

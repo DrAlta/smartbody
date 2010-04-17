@@ -62,6 +62,12 @@ static inline bool parse_float_or_error( float& var, const char* str, const stri
 /////////////////////////////////////////////////////////////
 //  Static Data
 const char* SbmCharacter::LOCOMOTION_VELOCITY = "locomotion_velocity";
+const char* SbmCharacter::LOCOMOTION_ROTATION = "locomotion_rotation";
+const char* SbmCharacter::LOCOMOTION_GLOBAL_ROTATION = "locomotion_global_rotation";
+const char* SbmCharacter::LOCOMOTION_LOCAL_ROTATION = "locomotion_local_rotation";
+const char* SbmCharacter::LOCOMOTION_ID = "locomotion_id";
+
+/////////////////////////////////////////////////////////////
 const char* SbmCharacter::ORIENTATION_TARGET  = "orientation_target";
 
 
@@ -88,6 +94,8 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	posture_sched_p( CreateSchedulerCt( character_name, "posture" ) ),
 	motion_sched_p( CreateSchedulerCt( character_name, "motion" ) ),
 	gaze_sched_p( CreateSchedulerCt( character_name, "gaze" ) ),
+	locomotion_ct_analysis( NULL ),
+	locomotion_ct( NULL ),
 	blink_ct_p( NULL ),
 	head_sched_p( CreateSchedulerCt( character_name, "head" ) ),
 	face_ct( NULL ),
@@ -132,12 +140,93 @@ SbmCharacter::~SbmCharacter( void )	{
     }
 }
 
+int SbmCharacter::init_locomotion_analyzer(const char* skel_file, mcuCBHandle *mcu_p)
+{
+	std::string walkForwardMotion = "Step_WalkForward";
+	std::string strafeMotion = "Step_StrafeRight";
+	std::string standingMotion = "HandsAtSide_Motex_Softened";
+
+	SkMotion *walking1_p= mcu_p->motion_map.lookup(walkForwardMotion);
+	SkMotion *walking2_p= mcu_p->motion_map.lookup(strafeMotion);
+	SkMotion *standing_p= mcu_p->motion_map.lookup(standingMotion);
+
+	// need better error checking here
+	bool motionsNotLoaded = false;
+	if (!walking1_p)
+	{
+		std::cout << "No " << walkForwardMotion << " animation." << std::endl;
+		motionsNotLoaded = true;
+	}
+	if (!walking2_p)
+	{
+		std::cout << "No " << strafeMotion << " animation." << std::endl;
+		motionsNotLoaded = true;
+	}
+	if (!standing_p)
+	{
+		std::cout << "No " << standingMotion << " animation." << std::endl;
+		motionsNotLoaded = true;
+	}
+	if (motionsNotLoaded)
+	{
+		return CMD_FAILURE;
+	}
+
+	SkSkeleton* walking_skeleton = load_skeleton( skel_file, mcu_p->me_paths );
+	SkSkeleton* standing_skeleton = load_skeleton( skel_file, mcu_p->me_paths );
+
+	locomotion_ct->init_skeleton(standing_skeleton, walking_skeleton);
+	locomotion_ct_analysis->set_ct(locomotion_ct);
+	
+	locomotion_ct_analysis->init(standing_p, mcu_p->me_paths);
+	locomotion_ct_analysis->add_locomotion(walking1_p);
+	locomotion_ct_analysis->add_locomotion(walking2_p);
+	locomotion_ct_analysis->init_blended_anim();
+
+	return CMD_SUCCESS;
+}
+
+void SbmCharacter::automate_locomotion(bool automate)
+{
+	locomotion_ct->automate = automate;
+}
+
+void SbmCharacter::locomotion_reset()
+{
+	locomotion_ct->reset = true;
+}
+
+bool SbmCharacter::is_locomotion_controller_enabled()
+{
+	if (!locomotion_ct)
+		return false;
+
+	return locomotion_ct->is_enabled();
+}
+
+void SbmCharacter::locomotion_set_turning_speed(float radians)
+{
+	//locomotion_ct->set_turning_speed(radians);
+	for(int i = 0; i < locomotion_ct->limb_list.size(); ++i)
+	{
+		locomotion_ct->limb_list.get(i)->direction_planner.set_turning_speed(radians);
+	}
+}
+
+void SbmCharacter::locomotion_set_turning_mode(int mode)
+{
+	for(int i = 0; i < locomotion_ct->limb_list.size(); ++i)
+	{
+		locomotion_ct->limb_list.get(i)->direction_planner.set_turning_mode(mode);
+	}
+}
 
 int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 					    SkMotion* face_neutral,
                         const AUMotionMap* au_motion_map,
                         const VisemeMotionMap* viseme_motion_map,
-                        const char* unreal_class )
+                        const char* unreal_class,
+						bool use_locomotion)
 {
 	// Store pointers for access via init_skeleton()
 	if( face_neutral ) {
@@ -154,6 +243,13 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 	init_face_controllers();  // Should I pass in the viseme_motion_map and au_motion_map here so face_ct can be initialized in here?
 
+
+	if (use_locomotion) {
+		this->locomotion_ct_analysis = new MeCtLocomotionAnalysis();
+		this->locomotion_ct =  new MeCtLocomotionClass();
+		locomotion_ct->ref();
+	}
+
 	// Clear pointer data no longer used after this point in initialization.
 	this->viseme_motion_map = NULL;
 	this->au_motion_map     = NULL;
@@ -164,6 +260,8 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 	posture_sched_p->init();
 	motion_sched_p->init();
+	if( locomotion_ct != NULL )
+		locomotion_ct->init();
 	gaze_sched_p->init();
 
 	// Blink controller before head group (where visemes are controlled)
@@ -176,6 +274,10 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	ct_tree_p->add_controller( blink_ct_p );
 	ct_tree_p->add_controller( head_sched_p );
 	ct_tree_p->name( std::string(name)+"'s ct_tree" );
+
+	// Locomotion controller
+	if( locomotion_ct)
+		ct_tree_p->add_controller( locomotion_ct );
 
 	// Face controller
 	if( face_neutral ) {
@@ -400,6 +502,7 @@ int SbmCharacter::init_skeleton() {
 
 	// Add channels for locomotion control...
 	{
+		
 		const float max_speed = 1000000;   // TODO: set max speed value to some reasonable value for the current scale
 
 		// 3D vector for current speed and trajectory of the body
@@ -410,13 +513,28 @@ int SbmCharacter::init_skeleton() {
 		loc_vector_joint_p->pos()->limits( 1, -max_speed, max_speed );
 		loc_vector_joint_p->pos()->limits( 2, -max_speed, max_speed );
 
-		// 3D position for orientation target
-		SkJoint* orientation_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
-		orientation_joint_p->name( SkJointName( ORIENTATION_TARGET ) );
+		//delete after test
+		//SkJoint* velocity_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
+		//velocity_joint_p->name( SkJointName( LOCOMOTION_ROTATION ) );
+		//velocity_joint_p->pos()->limits( 1, false ); // Unlimit YPos
+		//velocity_joint_p->euler()->activate();
+
+		// 3D position for angular velocity
+		SkJoint* g_angular_velocity_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
+		SkJoint* l_angular_velocity_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
+		SkJoint* id_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
+		g_angular_velocity_joint_p->name( SkJointName( LOCOMOTION_GLOBAL_ROTATION ) );
+		l_angular_velocity_joint_p->name( SkJointName( LOCOMOTION_LOCAL_ROTATION ) );
+		id_joint_p->name( SkJointName( LOCOMOTION_ID ) );
+
 		// Activate positional channels, unlimited
-		orientation_joint_p->pos()->limits( 0, false );
-		orientation_joint_p->pos()->limits( 1, false );
-		orientation_joint_p->pos()->limits( 2, false );
+		g_angular_velocity_joint_p->pos()->limits( 1, false ); // Unlimit YPos
+		l_angular_velocity_joint_p->pos()->limits( 1, false ); // Unlimit YPos
+		id_joint_p->pos()->limits( 1, false ); // Unlimit YPos
+
+		g_angular_velocity_joint_p->euler()->activate();
+		l_angular_velocity_joint_p->euler()->activate();
+		id_joint_p->euler()->activate();
 	}
 
 	if( face_neutral ) {
