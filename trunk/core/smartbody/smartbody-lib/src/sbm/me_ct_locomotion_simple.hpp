@@ -25,12 +25,11 @@
 
 #include <ME/me_controller.h>
 
-
 /**
  *  Calculate new world_offset each frame, given the
  *  locomotion vector and orientation target channels.
  *  These channels should be set by an earlier controller
- *  in the controller tree.
+ *  in the pipeline.
  *
  *  Does not play a walk animation or otherwise account for
  *  foot steps.  The character will just glide into position.
@@ -52,9 +51,9 @@ protected:
 	// Buffer indices ("bi_") to the requested channels
 	int bi_world_x, bi_world_y, bi_world_z, bi_world_rot; // World offset position and rotation
 	int bi_loco_vel_x, bi_loco_vel_y, bi_loco_vel_z;      // Locomotion velocity
-	int bi_orient_x, bi_orient_y, bi_orient_z;            // Orientation target position
+	int bi_loco_rot_y;                                    // Rotational velocity around Y
 
-	float last_time;
+	double last_time;
 
 public:
 	/** Constructor */

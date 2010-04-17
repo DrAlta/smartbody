@@ -45,6 +45,16 @@
 #include <sbm/me_ct_eyelid.h>
 #define MeCtSchedulerClass MeCtScheduler2
 
+#if(1) // Use primary locomotion controller
+#include "me_ct_locomotion.hpp"
+#include "me_ct_locomotion_analysis.hpp"
+#define  MeCtLocomotionClass MeCtLocomotion
+#else
+// "Ghost-walking" implementation, useful for test just the navigation code
+#include "me_ct_locomotion_simple.hpp"
+#define MeCtLocomotionClass MeCtLocomotionSimple
+#endif
+
 #include "sr_path_list.h"
 
 #include "sbm_pawn.hpp"
@@ -58,6 +68,15 @@
 class SbmCharacter : public SbmPawn	{
 public:
 	// Static Constants
+
+	static const char* LOCOMOTION_ROTATION;
+	
+	//! Channel name for instantaneous locomotion rotation, uses YPos
+	static const char* LOCOMOTION_GLOBAL_ROTATION;
+
+	static const char* LOCOMOTION_LOCAL_ROTATION;
+
+	static const char* LOCOMOTION_ID;
 
 	//! Channel name for immediate locomotion speed and trajectory, stored in the joint position channels
 	static const char* LOCOMOTION_VELOCITY;
@@ -81,6 +100,8 @@ protected:
 	SkMotion*         face_neutral;
 	AUChannelMap      au_channel_map;
 	VisemeMotionMap   viseme_map;
+	MeCtLocomotionAnalysis* locomotion_ct_analysis;
+	MeCtLocomotionClass* locomotion_ct;
 	MeCtFace*         face_ct;
 	MeCtEyeLid*       eyelid_ct;
 
@@ -110,13 +131,8 @@ public:
 	          SkMotion* face_neutral,
 	          const AUMotionMap* fac_map,
 			  const VisemeMotionMap* viseme_map,
-			  const char* unreal_class );
-
-	//  Convience method
-	int init( SkSkeleton* skeleton_p,
-			  const char* unreal_class )
-	{	init( skeleton_p, NULL, NULL, NULL, unreal_class );
-	}
+			  const char* unreal_class,
+			  bool use_locomotion );
 
 	//* Overrides SbmPawn::prune_controller_tree()
 	virtual int prune_controller_tree( mcuCBHandle *mcu_p );
@@ -216,6 +232,15 @@ public:
 	 *  Handles commands beginning with "print character <character id> ...".
 	 */
 	static int print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+
+	int init_locomotion_analyzer(const char* skel_file, mcuCBHandle *mcu_p);
+	void automate_locomotion(bool automate);
+
+	//temp command process.............................
+	bool is_locomotion_controller_enabled();
+	void locomotion_reset();
+	void locomotion_set_turning_speed(float radians);
+	void locomotion_set_turning_mode(int mode);
 
 protected:
 	/*!

@@ -20,7 +20,65 @@
  *      Andrew n marshall, USC
  */
 
-#include "me_ct_navigation_waypoint.hpp"
+#include <sbm/me_ct_navigation_waypoint.hpp>
+#include <sbm/sbm_character.hpp>
+
 
 
 const char* MeCtNavigationWaypoint::TYPE = "MeCtNavigationWaypoint";
+
+
+MeCtNavigationWaypoint::MeCtNavigationWaypoint()
+:	is_valid( false ),
+	last_time( std::numeric_limits<float>::quiet_NaN() )
+{}
+
+const char* MeCtNavigationWaypoint::controller_type() {
+	return TYPE;
+}
+
+// Implements MeController::context_updated(..)
+void MeCtNavigationWaypoint::context_updated() {
+	if( _context == NULL ) {
+		is_valid = false;
+		last_time = std::numeric_limits<double>::quiet_NaN();
+	}
+}
+
+// Implements MeController::controller_channels().
+SkChannelArray& MeCtNavigationWaypoint::controller_channels() {
+	if( request_channels.size() == 0 ) {
+		// Initialize Requested Channels                                                           // Indices
+		request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::XPos );  // #0
+		request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::YPos );  //  1
+		request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::ZPos );  //  2
+		request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::Quat );  //  3
+
+		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::XPos ); //  4
+		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::YPos ); //  5
+		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::ZPos ); //  6
+
+		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_GLOBAL_ROTATION ), SkChannel::YPos ); //  7
+		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_LOCAL_ROTATION ), SkChannel::YPos ); //  8
+		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_ID ), SkChannel::YPos ); //  9
+	}
+
+	return request_channels;
+}
+
+bool MeCtNavigationWaypoint::controller_evaluate( double time, MeFrameData& frame ) {
+	if( is_valid ) {
+		float time_delta = 0.033f;
+		if( last_time == last_time ) {  // false if NaN
+			time_delta = (float)( time - last_time );
+		}
+		last_time = time;
+	}
+
+	return is_valid;
+}
+
+void MeCtNavigationWaypoint::print_state( int tab_count ) {
+	// TODO
+	MeController::print_state( tab_count );
+}
