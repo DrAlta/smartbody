@@ -30,6 +30,7 @@ class SeqResource : public FileResource
 {
 	public:
 		SeqResource();
+		~SeqResource();
 
 		std::string dump();
 };
