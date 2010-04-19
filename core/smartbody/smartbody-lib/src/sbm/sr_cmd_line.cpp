@@ -54,6 +54,7 @@ int srCmdLine::pending_cmd(void)
 					{
 						std::cout<< (*iter).c_str();
 						memcpy( cmd_buffer, (*iter).c_str(), (*iter).size());
+						buffer_use = (*iter).size();
 					}
 					else
 					{
