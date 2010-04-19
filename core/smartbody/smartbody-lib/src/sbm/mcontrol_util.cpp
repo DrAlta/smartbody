@@ -131,59 +131,102 @@ void mcuCBHandle::set_time( double real_time )	{
 	perf.update( real_time, time );
 }
 
-FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
-	
+char * mcuCBHandle::return_full_filename( const char * current_path, const char * file_name)
+{
+	if( file_name == NULL)	return NULL;
+	char * currentPath = new char[_MAX_PATH];
+	char * fileName = new char[_MAX_PATH];
+	strcpy( currentPath, current_path );
+	strcpy( fileName, file_name );
+	char * full_filename = new char[_MAX_PATH];
+	std::vector<std::string>	*filename_token = new std::vector<std::string>;		// tokens for the full file name
 
+	char * token;
+	token = strtok( currentPath, "\\" );
+	while(token != NULL)
+	{
+		std::stringstream	stream;
+		stream << token;
+		filename_token->push_back(stream.str());
+		stream.clear();
+		token = strtok( NULL, "\\" );
+	}
+
+	token = strtok( fileName, "/" );
+	while(token!=NULL)
+	{
+		if( strcmp(token, "..") == 0 )
+			filename_token->pop_back();
+		if( token[0] != '.')
+		{
+			std::stringstream	stream;
+			stream << token;
+			filename_token->push_back(stream.str());
+		}
+		token = strtok( NULL, "/" );
+	}	
+	if( !filename_token->empty() )
+	{
+		strcpy( full_filename, (*filename_token)[0].c_str()); 
+		for(unsigned int i = 1 ; i < filename_token->size(); i++)
+		{
+			strcat( full_filename, "/" );
+			strcat( full_filename, (*filename_token)[i].c_str() );
+		}
+	}
+	return full_filename;
+}
+
+FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
 
 	FILE* file_p = NULL;
 
 	char buffer[ MAX_FILENAME_LEN ];
 	char label[ MAX_FILENAME_LEN ];
 	sprintf( label, "%s", seq_name );
+	// current path containing .exe
+	char CurrentPath[_MAX_PATH];
+	_getcwd(CurrentPath, _MAX_PATH);
 
 	seq_paths.reset();
 	char* filename = seq_paths.next_filename( buffer, label );
+	filename = return_full_filename( CurrentPath, filename );
+	
 	while( filename != NULL )	{
 		file_p = fopen( filename, "r" );
 		if( file_p != NULL ) {
-			
-			char CurrentPath[_MAX_PATH];
-			_getcwd(CurrentPath, _MAX_PATH);
-			cout << CurrentPath << endl;
-
+	
 			// add the file resource
 			FileResource* fres = new FileResource();
 			std::stringstream stream;
-			stream << CurrentPath << "\\" << filename;
+			stream << filename;
 			fres->setFilePath(stream.str());
 			resource_manager->addResource(fres);
 			
 			break;
 		}
 		filename = seq_paths.next_filename( buffer, label );
+		filename = return_full_filename( CurrentPath, filename );
 	}
 	if( file_p == NULL ) {
-		// Could not find the file as named.  Perhap it excludes the extension
+		// Could not find the file as named.  Perhap it excludes the extension	
 		sprintf( label, "%s.seq", seq_name );
-
 		seq_paths.reset();
 		filename = seq_paths.next_filename( buffer, label );
+		filename = return_full_filename( CurrentPath, filename );
 		while( filename )	{
 			if( ( file_p = fopen( filename, "r" ) ) != NULL ) {
-				// add the file resource
 				
-				char CurrentPath[_MAX_PATH];
-				_getcwd(CurrentPath, _MAX_PATH);
-				cout << CurrentPath << endl;
-
+				// add the file resource
 				FileResource* fres = new FileResource();
 				std::stringstream stream;
-				stream << CurrentPath << "\\" << filename;
+				stream << filename;
 				fres->setFilePath(stream.str());
 				resource_manager->addResource(fres);
 				break;
 			}
 			filename = seq_paths.next_filename( buffer, label );
+			filename = return_full_filename( CurrentPath, filename );
 		}
 	}
 

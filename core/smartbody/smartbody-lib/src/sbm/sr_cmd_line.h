@@ -29,6 +29,8 @@
 #include    <stdlib.h>
 #include	<string.h>
 #include	<sys/types.h>
+#include	<iostream>
+#include	<list>
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -46,104 +48,21 @@
 class srCmdLine	{
 	
 	public:
-		srCmdLine( int len = 256 )	{
-			buffer_len = 0;
-			buffer_use = 0;
-			cmd_buffer = 0x0;
-			int err = realloc_buffer( len );
-		}
-		virtual ~srCmdLine( void )	{
-			if( cmd_buffer )	{
-				delete [] cmd_buffer;
-			}
-		}
-		
-		int pending_cmd( void )	{
-#ifdef WIN32_LEAN_AND_MEAN
-			while( _kbhit() )	{
-				char c = _getche();
-				if( 
-					( c == '\r' )||
-					( c == '\n' )||
-					( c == '\0' ) )	
-					{
-					fprintf( stdout, "\n" );
-					cmd_buffer[ buffer_use++ ] = '\0';
-					return( TRUE );
-				}
-				if( c == '\b' )	{
-					fprintf( stdout, " " );
-					if( buffer_use > 0 )	{
-						fprintf( stdout, "\b" );
-						buffer_use--;
-					}
-					return( FALSE );
-				}
-				cmd_buffer[ buffer_use++ ] = c;
-				if( buffer_use == buffer_len )	{
-					int err = realloc_buffer( 2 * buffer_len );
-				}
-			}
-			return( FALSE );
-#else
-			struct timeval tp; 
-			fd_set fds;
-			tp.tv_sec = 0; 
-			tp.tv_usec = 0;
-			FD_ZERO( &fds );
-			FD_SET( KR_STDIN_FD, &fds );
-			
-			if( select( 1, &fds, NULL, NULL, &tp ) )	{
-				while( 1 )	{
-					char c = (char)fgetc( stdin );
-					if( 
-						( c == '\r' )||
-						( c == '\n' )||
-						( c == '\0' ) )	
-						{
-						cmd_buffer[ buffer_use++ ] = '\0';
-						return( TRUE );
-					}
-					cmd_buffer[ buffer_use++ ] = c;
-					if( buffer_use == buffer_len )	{
-						int err = realloc_buffer( 2 * buffer_len );
-					}
-				}
-			}
-			return( FALSE );
-#endif
-		}
-		
-		char *read_cmd( void )	{
-			buffer_use = 0;
-			return( cmd_buffer );
-		}
+		srCmdLine( int len = 256 );
+		virtual ~srCmdLine( void );
+		int pending_cmd( void );	
+		char *read_cmd( void );
 	
 	private:
-		int realloc_buffer( int len )	{
-			
-			char *new_buff = new char[ len ];
-			if( new_buff == NULL )	{
-				return( CMD_FAILURE );
-			}
-			if( len < ( buffer_use + 1 ) )	{
-				buffer_use = len - 1;
-			}
-			if( cmd_buffer )	{
-				memcpy( new_buff, cmd_buffer, buffer_use );
-				delete [] cmd_buffer;
-			}
-			else	{
-				new_buff[ 0 ] = '\0';
-			}
-			cmd_buffer = new_buff;
-			buffer_len = len;
-			return( CMD_SUCCESS );
-		}
-		
+		int realloc_buffer( int len );
 		char *cmd_buffer;
 		int buffer_len;
 		int buffer_use;
+	
+		// storing the cmd lines
+		unsigned int max_cmdlines;
+		std::list<std::string>					*cmds;
+		std::list<std::string>::iterator		iter;
 };
 
 ////////////////////////////////////////////////////////////////////

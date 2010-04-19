@@ -283,6 +283,7 @@ class mcuCBHandle	{
 
 	protected:
 		FILE* open_sequence_file( const char *seq_name );
+		char * return_full_filename( const char * current_path, const char * file_name);	// parser which would return a specified file name with full path
 };
 
 /*! Executes a variable setting sub-command.   See mcuCBHandle::insert_set_cmd(..). */
