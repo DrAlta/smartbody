@@ -168,7 +168,7 @@ std::string CmdResource::getCommand()
 std::string CmdResource::dump()
 {
 	std::stringstream stream;
-	stream << "Command: " << command;
+	stream << "* " << command;
 
 	stream << Resource::dump();
 	return stream.str();

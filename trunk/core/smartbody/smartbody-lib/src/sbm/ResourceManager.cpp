@@ -87,12 +87,6 @@ Resource* ResourceManager::getParent()
 	return cur_parent.top();
 }
 
-
-Resource* ResourceManager::getLastCmdResource()
-{
-	return last_resource;
-}
-
 CmdResource* ResourceManager::getCmdResource(std::string id)
 {
 
@@ -130,22 +124,3 @@ CmdResource* ResourceManager::getCmdResourceRecurse(std::string id, CmdResource*
 }
 
 
-void ResourceManager::setIsSeqCmd(bool val)
-{
-	is_seq_cmd = val;
-}
-
-bool ResourceManager::isSeqCmd()
-{
-	return is_seq_cmd;
-}
-
-std::string ResourceManager::getSeqCmdName()
-{
-	return last_seq_cmd_name;
-}
-
-void ResourceManager::setSeqCmdName(std::string seqcmd)
-{
-	last_seq_cmd_name = seqcmd;
-}

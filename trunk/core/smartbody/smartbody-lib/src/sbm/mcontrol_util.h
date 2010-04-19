@@ -260,8 +260,25 @@ class mcuCBHandle	{
 			CmdResource* resource = new CmdResource();
 			resource->setCommand(cmd);
 			resource_manager->addResource(resource);
-			if (resource_manager->isSeqCmd())
-				resource->setId(resource_manager->getSeqCmdName());
+
+			// check to see if this is a sequence command
+			// if so, save the command id
+			std::string checkCmd = cmd;
+			size_t startpos = checkCmd.find_first_not_of(" \t");
+			if( std::string::npos != startpos )
+				checkCmd = checkCmd.substr( startpos );
+			unsigned int seqPos = checkCmd.find("seq");
+			if (seqPos == 0)
+			{
+				std::string remainderCmd = checkCmd.substr(3, checkCmd.size() - 3);
+				size_t startpos = remainderCmd.find_first_not_of(" \t");
+				if( std::string::npos != startpos )
+					remainderCmd = remainderCmd.substr( startpos );
+				size_t endpos = remainderCmd.find_first_of(" \t");
+				remainderCmd = remainderCmd.substr(0, endpos);
+				resource->setId(remainderCmd);
+			}
+
 			return( cmd_map.execute( cmd, this ) ); 
 		}
 

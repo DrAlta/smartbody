@@ -18,13 +18,7 @@ class ResourceManager
 		void addParent(Resource* parent);
 		void removeParent();
 		Resource* getParent();
-		Resource* getLastCmdResource();
 		CmdResource* getCmdResource(std::string id);
-
-		void setIsSeqCmd(bool val);
-		bool isSeqCmd();
-		std::string getSeqCmdName();
-		void setSeqCmdName(std::string seqcmd);
 
 		static ResourceManager* getResourceManager();
 		
