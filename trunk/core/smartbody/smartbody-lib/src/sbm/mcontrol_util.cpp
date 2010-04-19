@@ -468,9 +468,18 @@ void mcuCBHandle::update( void )	{
 	srCmdSeq* seq_p;
 	char *seq_name = NULL;
 	active_seq_map.reset();
+
+	
+
 	while( seq_p = active_seq_map.next( & seq_name ) )	{
+		// the parent resource is associated with seq_name
+		CmdResource* cmdResource = resource_manager->getCmdResource(seq_name);
+		if (cmdResource)
+			resource_manager->addParent(cmdResource);
 		char *cmd;
 		while( cmd = seq_p->pop( (float)time ) )	{
+
+			
 			int err = execute( cmd );
 			if( err != CMD_SUCCESS )	{
 				printf( "mcuCBHandle::update ERR: execute FAILED: '%s'\n", cmd );
@@ -487,6 +496,8 @@ void mcuCBHandle::update( void )	{
 			seq_p = active_seq_map.remove( seq_name );
 			delete seq_p;
 		}
+		if (cmdResource)
+			resource_manager->removeParent();
 	}
 
 	SbmPawn* pawn_p;
@@ -1045,20 +1056,20 @@ int begin_sequence( char* seq_name, mcuCBHandle *mcu_p )	{
 */
 
 int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
+
+	mcu_p->resource_manager->addParent(mcu_p->resource_manager->getLastCmdResource());
+
+	
 	int err;
 	
 	if( mcu_p )	{
 		char *seq_name = args.read_token();
 		char *seq_cmd = args.read_token();
 
-		//SeqResource* sres = new SeqResource();
-		//sres->setFilePath(seq_name);
-		//mcu_p->resource_manager->addResource(sres);
-
 		if( ( strcmp( seq_cmd, "begin" ) == 0 )||( strcmp( seq_cmd, EMPTY_STRING ) == 0 ) )	{
-			return(
-				begin_sequence( seq_name, mcu_p )
-				);
+			int ret = begin_sequence( seq_name, mcu_p );
+			mcu_p->resource_manager->removeParent();
+			return ret;
 		}
 		else	{
 		if( strcmp( seq_cmd, "at" ) == 0 )	{
@@ -1069,13 +1080,16 @@ int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				err = mcu_p->pending_seq_map.insert( seq_name, seq_p );
 				if( err == CMD_FAILURE )	{
 					printf( "mcu_sequence_func ERR: insert pending '%s' FAILED\n", seq_name ); 
+					mcu_p->resource_manager->removeParent();
 					return( err );
 				}
 			}
 			
 			float seq_time = args.read_float();
 			char *seq_string = args.read_remainder_raw();
-			return( seq_p->insert( seq_time, seq_string ) );
+			int ret = seq_p->insert( seq_time, seq_string );
+			mcu_p->resource_manager->removeParent();
+			return ret;
 		}
 		else
 		if( strcmp( seq_cmd, "print" ) == 0 )	{
@@ -1083,6 +1097,7 @@ int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			srCmdSeq *seq_p = mcu_p->pending_seq_map.lookup( seq_name );
 			if( seq_p == NULL )	{
 				printf( "mcu_sequence_func ERR: print: '%s' NOT FOUND\n", seq_name ); 
+				mcu_p->resource_manager->removeParent();
 				return( CMD_FAILURE );
 			}
 			seq_p->print( stdout );
@@ -1093,6 +1108,7 @@ int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			if( result == CMD_NOT_FOUND )	{
 				printf( "mcu_sequence_func ERR: abort: '%s' NOT FOUND\n", seq_name ); 
 			}
+			mcu_p->resource_manager->removeParent();
 			return( result );
 		}
 		else
@@ -1101,14 +1117,20 @@ int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			if( result == CMD_NOT_FOUND )	{
 				printf( "mcu_sequence_func ERR: delete: '%s' NOT FOUND\n", seq_name ); 
 			}
+			mcu_p->resource_manager->removeParent();
 			return( result );
 		}
 		else
+		{
+			mcu_p->resource_manager->removeParent();
 			return( CMD_FAILURE );
 		}
+		}
 		
+		mcu_p->resource_manager->removeParent();
 		return( CMD_SUCCESS );
 	}
+	mcu_p->resource_manager->removeParent();
 	return( CMD_FAILURE );
 }
 
@@ -3640,3 +3662,4 @@ int mcu_wsp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 }
 
 /////////////////////////////////////////////////////////////
+

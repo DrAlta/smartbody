@@ -257,6 +257,11 @@ class mcuCBHandle	{
 		}
 
 		int execute( char *cmd ) { 
+			CmdResource* resource = new CmdResource();
+			resource->setCommand(cmd);
+			resource_manager->addResource(resource);
+			if (resource_manager->isSeqCmd())
+				resource->setId(resource_manager->getSeqCmdName());
 			return( cmd_map.execute( cmd, this ) ); 
 		}
 

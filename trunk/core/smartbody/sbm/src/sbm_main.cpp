@@ -620,6 +620,8 @@ int main( int argc, char **argv )	{
 		 ++it )
 	{
 		SrString seq_command = SrString( "seq " ) << (it->c_str()) << " begin";
+		mcu.resource_manager->setIsSeqCmd(true);
+		mcu.resource_manager->setSeqCmdName(it->c_str());
 		mcu.execute( (char *)(const char *)seq_command );
 	}
 

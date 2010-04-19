@@ -2,6 +2,7 @@
 #define RESOURCE_H
 
 #include <string>
+#include <vector>
 
 class Resource
 {
@@ -9,7 +10,17 @@ class Resource
 		Resource();
 		~Resource();
 
+		void addChild(Resource* resource);
+		int getNumChildren();
+		Resource* getChild(unsigned int num);
+		Resource* getParent();
+		void setParent(Resource* p);
+
 		virtual std::string dump() = 0;
+
+	protected:
+		std::vector<Resource*> children;
+		Resource* parent;
 };
 
 class FileResource : public Resource
@@ -24,15 +35,6 @@ class FileResource : public Resource
 		std::string dump();
 	protected:
 		std::string m_filePath;
-};
-
-class SeqResource : public FileResource
-{
-	public:
-		SeqResource();
-		~SeqResource();
-
-		std::string dump();
 };
 
 class PathResource : public Resource
@@ -51,6 +53,27 @@ class PathResource : public Resource
 	protected:
 		std::string path;
 		std::string type;
+};
+
+class CmdResource : public Resource
+{
+	public:
+		CmdResource();
+		~CmdResource();
+
+		void setId(std::string str);
+		std::string getId();
+
+		void setCommand(std::string c);
+		std::string getCommand();
+
+	
+		std::string dump();
+	
+	protected:
+		std::string id;
+		std::string command;
+
 };
 
 

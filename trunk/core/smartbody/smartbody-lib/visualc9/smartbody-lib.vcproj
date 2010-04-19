@@ -1241,6 +1241,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\sr_cmd_line.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\sr_cmd_line.h"
 				>
 			</File>
