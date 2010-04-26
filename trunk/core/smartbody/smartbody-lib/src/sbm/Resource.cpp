@@ -173,3 +173,39 @@ std::string CmdResource::dump()
 	stream << Resource::dump();
 	return stream.str();
 }
+
+MotionResource::MotionResource()
+{
+}
+
+MotionResource::~MotionResource()
+{
+}
+
+void MotionResource::setMotionFile(std::string motion)
+{
+	motionFile = motion;
+}
+		
+std::string MotionResource::getMotionFile()
+{
+	return motionFile;
+}
+
+void MotionResource::setType(std::string t)
+{
+	type = t;
+}
+		
+std::string MotionResource::getType()
+{
+	return type;
+}
+				
+std::string MotionResource::dump()
+{
+	std::stringstream stream;
+	stream << "MotionFile["<<type<<"]: " << motionFile;
+	stream << Resource::dump();
+	return stream.str();	
+}

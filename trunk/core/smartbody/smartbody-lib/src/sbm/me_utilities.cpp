@@ -26,6 +26,8 @@
 
 #include <string>
 #include <iostream>
+#include <stdio.h>
+#include <direct.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -34,7 +36,6 @@
 
 #include "sbm_constants.h"
 #include "gwiz_math.h"
-
 
 using namespace std;
 using namespace boost::filesystem;
@@ -48,7 +49,7 @@ const char* POSTURE_EXT = ".skp";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list ) {
+SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, ResourceManager* manager ) {
 	FILE *fp = NULL;
 	char buffer[ MAX_FILENAME_LEN ];
 	char *filename;
@@ -90,6 +91,16 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list ) {
 		return NULL;
 	}
 
+
+	char CurrentPath[_MAX_PATH];
+	_getcwd(CurrentPath, _MAX_PATH);
+	char *full_filename = new char[_MAX_PATH];
+	MotionResource * motionRes = new MotionResource();
+	motionRes->setType("sk");
+	full_filename = mcn_return_full_filename_func( CurrentPath, filename );
+	motionRes->setMotionFile( full_filename );
+	manager->addResource(motionRes);
+	
 	// SUCCESS
 	return skeleton_p;
 }
@@ -118,7 +129,7 @@ bool validate_path( path& result, const char* pathname ) {
 	return true;
 }
 
-int load_me_motions_impl( const path& pathname, srHashMap<SkMotion>& map, bool recurse_dirs, const char* error_prefix ) {
+int load_me_motions_impl( const path& pathname, srHashMap<SkMotion>& map, bool recurse_dirs, ResourceManager* manager, const char* error_prefix ) {
 	if( !exists( pathname ) ) {
 		cerr << error_prefix << "Motion path \"" << pathname.native_file_string() << "\" not found." << endl;
 		return CMD_FAILURE;
@@ -131,11 +142,11 @@ int load_me_motions_impl( const path& pathname, srHashMap<SkMotion>& map, bool r
 
 			if( is_directory( cur ) ) {
 				if( recurse_dirs )
-					load_me_motions_impl( cur, map, recurse_dirs, "WARNING: " );
+					load_me_motions_impl( cur, map, recurse_dirs, manager, "WARNING: " );
 			} else {
 				string ext = extension( cur );
 				if( _stricmp( ext.c_str(), MOTION_EXT )==0 ) {
-					load_me_motions_impl( cur, map, recurse_dirs, "WARNING: " );
+					load_me_motions_impl( cur, map, recurse_dirs, manager, "WARNING: " );
 				} else if( DEBUG_LOAD_PATHS ) {
 					cout << "DEBUG: load_me_motion_impl(): Skipping \"" << cur.string() << "\". Extension \"" << ext << "\" does not match MOTION_EXT." << endl;
 				}
@@ -151,6 +162,16 @@ int load_me_motions_impl( const path& pathname, srHashMap<SkMotion>& map, bool r
 		SrInput fullin( (const char *)fullin_string );
 		fullin.filename( pathname.string().c_str() ); // copy filename for error messages
 		if( motion->load( fullin ) ) {
+
+			char CurrentPath[_MAX_PATH];
+			_getcwd(CurrentPath, _MAX_PATH);
+			char *filename = new char[_MAX_PATH];
+			MotionResource * motionRes = new MotionResource();
+			motionRes->setType("skm");
+			filename = mcn_return_full_filename_func( CurrentPath, pathname.string().c_str() );
+			motionRes->setMotionFile( filename );
+			manager->addResource(motionRes);
+
 			string filebase = basename( pathname );
 			const char* name = motion->name();
 			if( name && _stricmp( filebase.c_str(), name ) ) {
@@ -174,7 +195,7 @@ int load_me_motions_impl( const path& pathname, srHashMap<SkMotion>& map, bool r
 	return CMD_SUCCESS;
 }
 
-int load_me_postures_impl( const path& pathname, srHashMap<SkPosture>& map, bool recurse_dirs, const char* error_prefix ) {
+int load_me_postures_impl( const path& pathname, srHashMap<SkPosture>& map, bool recurse_dirs, ResourceManager* manager, const char* error_prefix ) {
 	if( !exists( pathname ) ) {
 		cerr << error_prefix << "Posture path \"" << pathname.native_file_string() << "\" not found." << endl;
 		return CMD_FAILURE;
@@ -187,11 +208,11 @@ int load_me_postures_impl( const path& pathname, srHashMap<SkPosture>& map, bool
 
 			if( is_directory( cur ) ) {
 				if( recurse_dirs )
-					load_me_postures_impl( cur, map, recurse_dirs, "WARNING: " );
+					load_me_postures_impl( cur, map, recurse_dirs, manager, "WARNING: " );
 			} else {
 				string ext = extension( cur );
 				if( _stricmp( ext.c_str(), POSTURE_EXT )==0 ) {
-					load_me_postures_impl( cur, map, recurse_dirs, "WARNING: " );
+					load_me_postures_impl( cur, map, recurse_dirs, manager, "WARNING: " );
 				} else if( DEBUG_LOAD_PATHS ) {
 					cout << "DEBUG: load_me_posture_impl(): Skipping \"" << cur.string() << "\". Extension \"" << ext << "\" does not match POSTURE_EXT." << endl;
 				}
@@ -208,6 +229,16 @@ int load_me_postures_impl( const path& pathname, srHashMap<SkPosture>& map, bool
 			posture->unref();
 			return CMD_FAILURE;
 		} else {
+
+			char CurrentPath[_MAX_PATH];
+			_getcwd(CurrentPath, _MAX_PATH);
+			char *filename = new char[_MAX_PATH];
+			MotionResource * motionRes = new MotionResource();
+			motionRes->setType("skp");
+			filename = mcn_return_full_filename_func( CurrentPath, pathname.string().c_str() );
+			motionRes->setMotionFile( filename );
+			manager->addResource(motionRes);
+
 			string filebase = basename( pathname );
 			const char* name = posture->name();
 			if( name && _stricmp( filebase.c_str(), name ) ) {
@@ -226,20 +257,20 @@ int load_me_postures_impl( const path& pathname, srHashMap<SkPosture>& map, bool
 	return CMD_SUCCESS;
 }
 
-int load_me_motions( const char* pathname, srHashMap<SkMotion>& map, bool recurse_dirs ) {
+int load_me_motions( const char* pathname, srHashMap<SkMotion>& map, bool recurse_dirs, ResourceManager* manager ) {
 	path motions_path;
 	if( validate_path( motions_path, pathname ) ) {
-		return load_me_motions_impl( motions_path, map, recurse_dirs, "ERROR: " );
+		return load_me_motions_impl( motions_path, map, recurse_dirs, manager, "ERROR: " );
 	} else {
 		cerr << "ERROR: Invalid motion path \"" << pathname << "\"." << endl;
 		return CMD_FAILURE;
 	}
 }
 
-int load_me_postures( const char* pathname, srHashMap<SkPosture>& map, bool recurse_dirs ) {
+int load_me_postures( const char* pathname, srHashMap<SkPosture>& map, bool recurse_dirs, ResourceManager* manager ) {
 	path posture_path;
 	if( validate_path( posture_path, pathname ) ) {
-		return load_me_postures_impl( posture_path, map, recurse_dirs, "ERROR: " );
+		return load_me_postures_impl( posture_path, map, recurse_dirs, manager, "ERROR: " );
 	} else {
 		cerr << "ERROR: Invalid posture path \"" << pathname << "\"." << endl;
 		return CMD_FAILURE;

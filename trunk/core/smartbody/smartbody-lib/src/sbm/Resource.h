@@ -23,7 +23,7 @@ class Resource
 		Resource* parent;
 };
 
-class FileResource : public Resource
+class FileResource : public Resource		// Seq file resources
 {
 	public:
 		FileResource();
@@ -37,7 +37,7 @@ class FileResource : public Resource
 		std::string m_filePath;
 };
 
-class PathResource : public Resource
+class PathResource : public Resource		// Path resources with type [ME/SEQ] specified
 {
 	public:
 		PathResource();
@@ -55,7 +55,7 @@ class PathResource : public Resource
 		std::string type;
 };
 
-class CmdResource : public Resource
+class CmdResource : public Resource			// Cmd resources
 {
 	public:
 		CmdResource();
@@ -76,7 +76,24 @@ class CmdResource : public Resource
 
 };
 
+class MotionResource : public Resource		// General motion file resources with [SKM/SKP] type specified
+{
+	public:
+		MotionResource();
+		~MotionResource();
 
+		void setMotionFile(std::string motion);
+		std::string getMotionFile();
+
+		void setType(std::string t);
+		std::string getType();
+		
+		std::string dump();
+
+	protected:
+		std::string type;
+		std::string motionFile;
+};
 
 
 #endif

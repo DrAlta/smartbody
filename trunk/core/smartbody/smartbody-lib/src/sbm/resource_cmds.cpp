@@ -17,7 +17,7 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 	std::string arg = args.read_token();
 	if( arg.empty() || arg=="help" ) {
 		std::cout << "Syntax:" << std::endl
-		     << "\t resource [command|path|file]"<<std::endl;
+		    << "\t resource [command|path|file|motion]"<<std::endl;
 		return CMD_SUCCESS;
 	}
 	
@@ -54,6 +54,17 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 				std::cout << res->dump() << std::endl;
 		}				
 		return CMD_SUCCESS;
+	}
+
+	if(arg == "motion")
+	{
+		for (int r = 0; r < numResources; r++)
+		{
+			MotionResource * res = dynamic_cast<MotionResource  *>(mcu_p->resource_manager->getResource(r));
+			if(res)
+				std::cout << res->dump() << std::endl;
+		}				
+		return CMD_SUCCESS;		
 	}
 	return CMD_SUCCESS;
 }

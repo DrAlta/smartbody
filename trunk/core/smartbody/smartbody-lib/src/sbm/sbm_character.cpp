@@ -172,8 +172,8 @@ int SbmCharacter::init_locomotion_analyzer(const char* skel_file, mcuCBHandle *m
 		return CMD_FAILURE;
 	}
 
-	SkSkeleton* walking_skeleton = load_skeleton( skel_file, mcu_p->me_paths );
-	SkSkeleton* standing_skeleton = load_skeleton( skel_file, mcu_p->me_paths );
+	SkSkeleton* walking_skeleton = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->resource_manager );
+	SkSkeleton* standing_skeleton = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->resource_manager );
 
 	locomotion_ct->init_skeleton(standing_skeleton, walking_skeleton);
 	locomotion_ct_analysis->set_ct(locomotion_ct);

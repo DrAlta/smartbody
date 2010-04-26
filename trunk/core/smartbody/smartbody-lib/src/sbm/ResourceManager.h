@@ -28,7 +28,7 @@ class ResourceManager
 		
 		std::vector<Resource*> resources;
 		static ResourceManager* manager;
-		std::stack<Resource*> cur_parent;
+		std::stack<Resource*> cur_cmd_parent;
 		CmdResource* last_resource;
 		std::string last_seq_cmd_name;
 		bool is_seq_cmd;
