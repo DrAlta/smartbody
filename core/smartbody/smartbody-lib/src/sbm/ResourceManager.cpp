@@ -30,9 +30,9 @@ void ResourceManager::addResource(Resource* r)
 	CmdResource* cmd = dynamic_cast<CmdResource*>(r);
 	if (cmd)
 	{
-		if (cur_parent.size() > 0)
+		if (cur_cmd_parent.size() > 0)
 		{
-			cur_parent.top()->addChild(r);
+			cur_cmd_parent.top()->addChild(r);
 			last_resource = cmd;
 		}
 		else
@@ -49,8 +49,8 @@ void ResourceManager::addResource(Resource* r)
 
 void ResourceManager::removeParent()
 {
-	if (cur_parent.size() > 0)
-		cur_parent.pop();
+	if (cur_cmd_parent.size() > 0)
+		cur_cmd_parent.pop();
 }
 
 
@@ -79,12 +79,12 @@ ResourceManager* ResourceManager::getResourceManager()
 
 void ResourceManager::addParent(Resource* parent)
 {
-	cur_parent.push(parent);
+	cur_cmd_parent.push(parent);
 }
 
 Resource* ResourceManager::getParent()
 {
-	return cur_parent.top();
+	return cur_cmd_parent.top();
 }
 
 CmdResource* ResourceManager::getCmdResource(std::string id)

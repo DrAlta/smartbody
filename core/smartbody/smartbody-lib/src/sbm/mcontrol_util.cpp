@@ -131,7 +131,7 @@ void mcuCBHandle::set_time( double real_time )	{
 	perf.update( real_time, time );
 }
 
-char * mcuCBHandle::return_full_filename( const char * current_path, const char * file_name)
+char * mcn_return_full_filename_func( const char * current_path, const char * file_name)
 {
 	if( file_name == NULL)	return NULL;
 	char * currentPath = new char[_MAX_PATH];
@@ -190,7 +190,7 @@ FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
 
 	seq_paths.reset();
 	char* filename = seq_paths.next_filename( buffer, label );
-	filename = return_full_filename( CurrentPath, filename );
+	filename = mcn_return_full_filename_func( CurrentPath, filename );
 	
 	while( filename != NULL )	{
 		file_p = fopen( filename, "r" );
@@ -206,14 +206,14 @@ FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
 			break;
 		}
 		filename = seq_paths.next_filename( buffer, label );
-		filename = return_full_filename( CurrentPath, filename );
+		filename = mcn_return_full_filename_func( CurrentPath, filename );
 	}
 	if( file_p == NULL ) {
 		// Could not find the file as named.  Perhap it excludes the extension	
 		sprintf( label, "%s.seq", seq_name );
 		seq_paths.reset();
 		filename = seq_paths.next_filename( buffer, label );
-		filename = return_full_filename( CurrentPath, filename );
+		filename = mcn_return_full_filename_func( CurrentPath, filename );
 		while( filename )	{
 			if( ( file_p = fopen( filename, "r" ) ) != NULL ) {
 				
@@ -226,7 +226,7 @@ FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
 				break;
 			}
 			filename = seq_paths.next_filename( buffer, label );
-			filename = return_full_filename( CurrentPath, filename );
+			filename = mcn_return_full_filename_func( CurrentPath, filename );
 		}
 	}
 
@@ -800,11 +800,11 @@ int mcuCBHandle::vhmsg_send( const char* message ) {
 }
 
 int mcuCBHandle::load_motions( const char* pathname, bool recursive ) {
-	return load_me_motions( pathname, motion_map, recursive );
+	return load_me_motions( pathname, motion_map, recursive, resource_manager );
 }
 
 int mcuCBHandle::load_poses( const char* pathname, bool recursive ) {
-	return load_me_postures( pathname, pose_map, recursive );
+	return load_me_postures( pathname, pose_map, recursive, resource_manager );
 }
 
 //  Usage example: mcu_p->lookup_ctrl( ctrl_name, "ERROR: ctrl <controller name>: " );
@@ -1372,7 +1372,7 @@ int mcu_character_init(
 	}
 
 	SbmCharacter *char_p = new SbmCharacter(char_name);
-	SkSkeleton* skeleton_p = load_skeleton( skel_file, mcu_p->me_paths );
+	SkSkeleton* skeleton_p = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->resource_manager );
 	if( !skeleton_p ) {
 		printf( "init_character ERR: Failed to load skeleton \"%s\"\n", skel_file ); 
 		return CMD_FAILURE;
@@ -3193,7 +3193,7 @@ int mcu_load_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				recursive = true;
 				token = args.read_token();
 			}
-			return mcu_p->load_poses( token, recursive );
+			return mcu_p->load_poses( token, recursive);
 		}
 
 		return( CMD_NOT_FOUND );

@@ -32,16 +32,16 @@
 #include "sr_path_list.h"
 #include "sr_hash_map.h"
 #include "mcontrol_util.h"
+#include "Resource.h"
 
 #include <boost/filesystem/path.hpp>
 
 
+SkSkeleton* load_skeleton( const char *filename, srPathList &path_list, ResourceManager* manager );
 
-SkSkeleton* load_skeleton( const char *filename, srPathList &path_list );
+int load_me_motions( const char* pathname, srHashMap<SkMotion>& map, bool recursive, ResourceManager* manager );
 
-int load_me_motions( const char* pathname, srHashMap<SkMotion>& map, bool recursive );
-
-int load_me_postures( const char* pathname, srHashMap<SkPosture>& map, bool recursive );
+int load_me_postures( const char* pathname, srHashMap<SkPosture>& map, bool recursive, ResourceManager* manager );
 
 void print_joint( const SkJoint* joint );
 
