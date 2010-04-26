@@ -20,9 +20,8 @@
  *      Marcelo Kallmann, USC (currently at UC Merced)
  */
 
+# include "fltk_viewer.h"
 
-# include <stdlib.h>
-# include <math.h>
 
 # include <FL/Fl.H>
 # include <FL/gl.h>
@@ -45,7 +44,7 @@
 # include <SR/sr_camera.h>
 # include <SR/sr_trackball.h>
 # include <SR/sr_lines.h>
-# include <SR/sr_viewer.h>
+# include <SR/sr_color.h>
 
 # include <SR/sr_sn.h>
 # include <SR/sr_sn_group.h>
@@ -73,7 +72,7 @@ class srSaSetShapesChanged : public SrSa
 
 Fl_Window* make_help_window ()
  {
-   Fl_Window* win = new Fl_Window ( 300, 200, "SrViewer Help" );
+   Fl_Window* win = new Fl_Window ( 300, 200, "FltkViewer Help" );
    win->set_non_modal();
    return win;
  }
@@ -102,11 +101,11 @@ Fl_Browser* make_help_browser ()
 
 static void menucb ( Fl_Menu_* o, void* v ) 
  {
-   ((SrViewer*)(o->parent()->user_data()))->menu_cmd((SrViewer::MenuCmd)(int)v);
+   ((FltkViewer*)(o->parent()->user_data()))->menu_cmd((FltkViewer::MenuCmd)(int)v);
  }
 
 # define MCB     ((Fl_Callback*)menucb)
-# define CMD(c)  ((void*)SrViewer::c)
+# define CMD(c)  ((void*)FltkViewer::c)
 static Fl_Menu_Item MenuTable[] =
  { 
    { "&help",       0, MCB, CMD(CmdHelp) },
@@ -138,7 +137,7 @@ static Fl_Menu_Item MenuTable[] =
 
 // need to set/get data to be able to share the same popup menu with many instances of viewers
 
-static void set_menu_data ( SrViewer::ViewMode v, SrViewer::RenderMode r,
+static void set_menu_data ( FltkViewer::ViewMode v, FltkViewer::RenderMode r,
                             bool axis, bool bbox, bool stat, bool spin )
  {
    # define SET(i,b)  if(b) MenuTable[i].set(); else MenuTable[i].clear();
@@ -146,12 +145,12 @@ static void set_menu_data ( SrViewer::ViewMode v, SrViewer::RenderMode r,
    # define CMD(i)    ((int)(MenuTable[i].user_data_))
 
    int i=0;
-   while ( CMD(i)!=SrViewer::CmdExaminer ) i++;      SETO (  i+(int)v );
-   while ( CMD(i)!=SrViewer::CmdAsIs ) i++;          SETO (  i+(int)r );
-   while ( CMD(i)!=SrViewer::CmdAxis ) i++;          SET  ( i, axis );
-   while ( CMD(i)!=SrViewer::CmdBoundingBox ) i++;   SET  ( i, bbox );
-   while ( CMD(i)!=SrViewer::CmdStatistics ) i++;    SET  ( i, stat );
-   while ( CMD(i)!=SrViewer::CmdSpinAnim ) i++;      SET  ( i, spin );
+   while ( CMD(i)!=FltkViewer::CmdExaminer ) i++;      SETO (  i+(int)v );
+   while ( CMD(i)!=FltkViewer::CmdAsIs ) i++;          SETO (  i+(int)r );
+   while ( CMD(i)!=FltkViewer::CmdAxis ) i++;          SET  ( i, axis );
+   while ( CMD(i)!=FltkViewer::CmdBoundingBox ) i++;   SET  ( i, bbox );
+   while ( CMD(i)!=FltkViewer::CmdStatistics ) i++;    SET  ( i, stat );
+   while ( CMD(i)!=FltkViewer::CmdSpinAnim ) i++;      SET  ( i, spin );
 
    # undef CMD
    # undef SETO
@@ -169,12 +168,12 @@ static void spin_timeout_func ( void* udata )
 
    ////SR_TRACE5 ( "TIMOUT FUNC\n" );
 
-   SrViewer* v = (SrViewer*)udata;
+   FltkViewer* v = (FltkViewer*)udata;
    v->get_spin_data ( delta, interval, activation );
 
-/*   if ( !v->root() && !v->menu_cmd_activated(SrViewer::CmdAxis) )
-     v->spinning ( false );
-*/
+//   if ( !v->root() && !v->menu_cmd_activated(FltkViewer::CmdAxis) )
+//     v->spinning ( false );
+
    if ( v->spinning() && !v->iconized() ) 
     { v->increment_model_rotation ( delta );
       v->redraw ();
@@ -197,11 +196,11 @@ struct SpinData
    void set_activation ( double a ) { activation = a<0.01? 0.01:a; }
  };
 
-class SrViewerData
+class FltkViewerData
  { public :
    SrSn*  root;              // contains the user scene
-   SrViewer::ViewMode viewmode;     // viewer mode, initially Examiner
-   SrViewer::RenderMode rendermode; // render mode
+   FltkViewer::ViewMode viewmode;     // viewer mode, initially Examiner
+   FltkViewer::RenderMode rendermode; // render mode
 
    bool iconized;      // to stop processing while the window is iconized
    bool spinning;      // indicates if the model is currently spinning
@@ -234,18 +233,18 @@ class SrViewerData
    SrSaBBox bbox_action;
  };
 
-//===================================== SrViewer =================================
+//===================================== FltkViewer =================================
 
 // Called when the small "cross" button to close the window is pressed
 static void _callback_func ( Fl_Widget* win, void* pt )
  {
    //printf("DBG callback_func!\n");
-   SrViewer* v = (SrViewer*)pt;
+   FltkViewer* v = (FltkViewer*)pt;
    v->close_requested ();
  }
 
-SrViewer::SrViewer ( int x, int y, int w, int h, const char *label )
-         :Fl_Gl_Window ( x, y, w, h, label )
+FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
+         : SrViewer(x, y, w, h) , Fl_Gl_Window ( x, y, w, h, label )
  {
    Fl::gl_visual ( FL_RGB8  | FL_DOUBLE | FL_DEPTH );//| FL_ALPHA );
 
@@ -253,7 +252,7 @@ SrViewer::SrViewer ( int x, int y, int w, int h, const char *label )
 
    resizable(this);
 
-   _data = new SrViewerData;
+   _data = new FltkViewerData;
 
    _data->root = new SrSnGroup; // we maintain root pointer always valid
    _data->viewmode = ModeExaminer;
@@ -287,7 +286,7 @@ SrViewer::SrViewer ( int x, int y, int w, int h, const char *label )
    end();
  }
 
-SrViewer::~SrViewer ()
+FltkViewer::~FltkViewer ()
  {
    Fl::remove_timeout ( spin_timeout_func, this );
    _data->root->unref ();
@@ -297,12 +296,12 @@ SrViewer::~SrViewer ()
    delete _data;
  }
 
-SrSn *SrViewer::root ()
+SrSn *FltkViewer::root ()
  { 
    return _data->root; 
  }
 
-void SrViewer::root ( SrSn *r )
+void FltkViewer::root ( SrSn *r )
  { 
    if ( r==_data->root ) return;
    if ( !r ) r = new SrSnGroup;
@@ -311,20 +310,20 @@ void SrViewer::root ( SrSn *r )
    _data->root->ref();
  }
 
-void SrViewer::draw_message ( const char* s )
+void FltkViewer::draw_message ( const char* s )
  {
    if ( _data->message!=s ) redraw();
    _data->message.set(s);
  }
 
-void SrViewer::show_menu ()
+void FltkViewer::show_menu ()
  { 
    set_menu_data ( _data->viewmode, _data->rendermode, _data->displayaxis,
                    _data->boundingbox, _data->statistics, _data->allowspinanim );
    _data->menubut->popup();
  }
 
-void SrViewer::menu_cmd ( MenuCmd s )
+void FltkViewer::menu_cmd ( MenuCmd s )
  {
    switch ( s )
     { case CmdHelp : _data->helpwin->show(); _data->helpwin->active(); break;
@@ -373,7 +372,7 @@ void SrViewer::menu_cmd ( MenuCmd s )
    render ();
  }
 
-bool SrViewer::menu_cmd_activated ( MenuCmd c )
+bool FltkViewer::menu_cmd_activated ( MenuCmd c )
  {
    switch ( c )
     { case CmdExaminer : return _data->viewmode==ModeExaminer? true:false;
@@ -394,14 +393,14 @@ bool SrViewer::menu_cmd_activated ( MenuCmd c )
     }
  }
 
-void SrViewer::update_bbox ()
+void FltkViewer::update_bbox ()
  {
    _data->bbox_action.apply ( _data->root );
    _data->scenebox->shape().init();
    _data->scenebox->shape().push_box ( _data->bbox_action.get(), true );
  }
 
-void SrViewer::update_axis ()
+void FltkViewer::update_axis ()
  {
    _data->bbox_action.apply ( _data->root );
    SrBox b = _data->bbox_action.get();
@@ -417,7 +416,7 @@ void SrViewer::update_axis ()
     _data->sceneaxis->shape().push_axis ( SrPnt::null, len, 3, "xyz" );
  }
 
-void SrViewer::view_all ()
+void FltkViewer::view_all ()
  {
    _data->spindata.init ();
    _data->spinning = false;
@@ -450,22 +449,22 @@ void SrViewer::view_all ()
    render ();
  }
 
-void SrViewer::render () 
+void FltkViewer::render () 
  { 
    if ( !_data->spinning ) redraw(); 
  } 
 
-bool SrViewer::iconized () 
+bool FltkViewer::iconized () 
  { 
    return _data->iconized;
  }
 
-bool SrViewer::spinning ()
+bool FltkViewer::spinning ()
  { 
    return _data->spinning;
  }
 
-void SrViewer::set_spin_data ( const SrQuat &delta, float interval, float activation )
+void FltkViewer::set_spin_data ( const SrQuat &delta, float interval, float activation )
  { 
    SpinData &s = _data->spindata;
    s.set_interval ( interval );
@@ -473,7 +472,7 @@ void SrViewer::set_spin_data ( const SrQuat &delta, float interval, float activa
    s.set_activation ( activation );
  }
 
-void SrViewer::get_spin_data ( SrQuat &delta, double &interval, double &activation )
+void FltkViewer::get_spin_data ( SrQuat &delta, double &interval, double &activation )
  {
    SpinData &s = _data->spindata;
    delta = s.rotdelta;
@@ -481,19 +480,19 @@ void SrViewer::get_spin_data ( SrQuat &delta, double &interval, double &activati
    activation = s.activation;
  }
 
-void SrViewer::spinning ( bool onoff )
+void FltkViewer::spinning ( bool onoff )
  { 
    _data->spinning=onoff;
    if ( _data->spinning )
      Fl::add_timeout ( _data->spindata.interval, spin_timeout_func, (void*)this );
  }
 
-void SrViewer::allow_spin_animation ( bool b )
+void FltkViewer::allow_spin_animation ( bool b )
  { 
    _data->allowspinanim = b;
  }
 
-void SrViewer::increment_model_rotation ( const SrQuat &dq )
+void FltkViewer::increment_model_rotation ( const SrQuat &dq )
  {
    const SrQuat& rotation = _data->trackball.rotation;
    _data->camera *= rotation.inverse() * dq.inverse() * rotation;
@@ -506,37 +505,37 @@ void SrViewer::increment_model_rotation ( const SrQuat &dq )
     }
  }
 
-float SrViewer::fps () 
+float FltkViewer::fps () 
  { 
    return (float)_data->fcounter.mps(); 
  }
 
-sruint SrViewer::curframe () 
+sruint FltkViewer::curframe () 
  { 
    return (sruint) _data->fcounter.measurements(); 
  }
 
-SrColor SrViewer::background ()
+SrColor FltkViewer::background ()
  {
    return _data->bcolor;
  }
 
-void SrViewer::background ( SrColor c )
+void FltkViewer::background ( SrColor c )
  {
    _data->bcolor = c;
  }
 
-SrViewer::ViewMode SrViewer::get_view_mode ()
+FltkViewer::ViewMode FltkViewer::get_view_mode ()
  {
    return _data->viewmode;
  }
 
-void SrViewer::get_camera ( SrCamera &cam )
+void FltkViewer::get_camera ( SrCamera &cam )
  {
    cam = _data->camera;
  }
 
-void SrViewer::set_camera ( const SrCamera &cam )
+void FltkViewer::set_camera ( const SrCamera &cam )
  {
    _data->camera = cam;
 
@@ -544,15 +543,14 @@ void SrViewer::set_camera ( const SrCamera &cam )
     { _data->trackball.init();
       _data->trackball.rotation.set ( cam.eye-cam.center, SrVec::k );
     }
-/*
-   if ( _data->root )
-    { update_bbox ();
-      SrBox box = _data->bbox_action.get();
-      float s = box.max_size();
-      _data->light.constant_attenuation = s;
-    }
-   else _data->light.constant_attenuation = 1.0f; // the default value
-*/
+
+//   if ( _data->root )
+  //  { update_bbox ();
+    //  SrBox box = _data->bbox_action.get();
+      //float s = box.max_size();
+    //  _data->light.constant_attenuation = s;
+   // }
+   //else _data->light.constant_attenuation = 1.0f; // the default value
  }
 
 static void gl_draw_string ( const char* s, float x, float y )
@@ -569,7 +567,7 @@ static void gl_draw_string ( const char* s, float x, float y )
 
 //-- Render  ------------------------------------------------------------------
 
-void SrViewer::init_opengl ( int w, int h )
+void FltkViewer::init_opengl ( int w, int h )
  {
    //sr_out<<"INIT"<<srnl;
    glViewport ( 0, 0, w, h );
@@ -595,20 +593,20 @@ void SrViewer::init_opengl ( int w, int h )
    glShadeModel ( GL_SMOOTH );
  }
 
-void SrViewer::close_requested ()
+void FltkViewer::close_requested ()
  {
    exit ( 0 );
  }
 
-/*# include <SR/sr_sphere.h>
-static SrSnSphere* SPH=0;
-   if ( !SPH ) SPH = new SrSnSphere;
-   SPH->shape().center = light.position;
-   SPH->shape().radius = 0.6f;
-   SPH->color ( SrColor::red );
-   _data->render_action.apply ( SPH );
-*/   
-void SrViewer::draw() 
+//# include <SR/sr_sphere.h>
+//static SrSnSphere* SPH=0;
+//   if ( !SPH ) SPH = new SrSnSphere;
+//   SPH->shape().center = light.position;
+//   SPH->shape().radius = 0.6f;
+//   SPH->color ( SrColor::red );
+//   _data->render_action.apply ( SPH );
+   
+void FltkViewer::draw() 
  {
    if ( !visible() ) return;
    if ( !valid() ) init_opengl ( w(), h() ); // valid() is turned on by fltk after draw() returns
@@ -694,7 +692,7 @@ static void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h )
    e.heigth = h;
  }
 
-int SrViewer::handle ( int event ) 
+int FltkViewer::handle ( int event ) 
  {
    # define POPUP_MENU(e) e.button3
 
@@ -820,7 +818,7 @@ int SrViewer::handle ( int event )
 
 //== handle sr event =======================================================
 
-int SrViewer::handle_event ( const SrEvent &e )
+int FltkViewer::handle_event ( const SrEvent &e )
  {
    int res=0;
 
@@ -851,7 +849,7 @@ int SrViewer::handle_event ( const SrEvent &e )
 # define ZOOMING(e)     (e.shift&&e.ctrl&&e.button1) || (e.shift&&e.button1&&e.button2)
 # define TRANSLATING(e) (e.ctrl&&e.button1) || (e.shift&&e.button2)
 
-int SrViewer::handle_examiner_manipulation ( const SrEvent &e )
+int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
  {
    if ( e.type==SrEvent::Drag )
     { 
@@ -859,7 +857,7 @@ int SrViewer::handle_examiner_manipulation ( const SrEvent &e )
       float dy = e.mousedy() / _data->camera.aspect;
 
       if ( ZOOMING(e) )
-       { _data->camera.fovy += (dx+dy);//*40.0f;
+       { _data->camera.fovy += (dx+dy);//40.0f;
          _data->camera.fovy = SR_BOUND ( _data->camera.fovy, 0.001f, srpi );
        }
       else if ( TRANSLATING(e) )
@@ -895,7 +893,7 @@ int SrViewer::handle_examiner_manipulation ( const SrEvent &e )
 
 //== Planar =============================================================
 
-int SrViewer::handle_planar_manipulation ( const SrEvent& e )
+int FltkViewer::handle_planar_manipulation ( const SrEvent& e )
  {
    SrCamera& c = _data->camera;
 
@@ -928,7 +926,7 @@ int SrViewer::handle_planar_manipulation ( const SrEvent& e )
 
 //== Apply Scene action ==========================================================
 
-int SrViewer::handle_scene_event ( const SrEvent& e )
+int FltkViewer::handle_scene_event ( const SrEvent& e )
  {
    SrSaEvent ea(e);
    ea.apply ( _data->root );
@@ -939,7 +937,7 @@ int SrViewer::handle_scene_event ( const SrEvent& e )
 
 //== Keyboard ==============================================================
 
-int SrViewer::handle_keyboard ( const SrEvent &e )
+int FltkViewer::handle_keyboard ( const SrEvent &e )
  {
    if ( e.ctrl && e.shift )
     { switch ( e.key )
@@ -952,8 +950,37 @@ int SrViewer::handle_keyboard ( const SrEvent &e )
 
 //== Spin Animation ========================================================
 
-void SrViewer::spin_animation_occured ()
- {
- }
+void FltkViewer::spin_animation_occured ()
+{
+}
+
+void FltkViewer::label_viewer(const char* str)
+{
+	label(str);
+}
+
+void FltkViewer::show_viewer()
+{
+	show();
+}
+
+void FltkViewer::hide_viewer()
+{
+	hide();
+}
+
+
+
+//== Viewer Factory ========================================================
+
+
+FltkViewerFactory::FltkViewerFactory()
+{
+}
+
+SrViewer* FltkViewerFactory::create(int x, int y, int w, int h)
+{
+	return new FltkViewer(x, y, w, h);
+}
 
 //================================ End of File =================================================

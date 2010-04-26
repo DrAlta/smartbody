@@ -66,7 +66,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="Smartbodyd.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib fltkd.lib pthreadVSE2.lib xerces-c_3D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_42.lib boost_system-vc90-mt-gd-1_42.lib atl.lib atlsd.lib dbghelp.lib opengl32.lib OpenAL32.lib alut.lib libsndfile-1.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib"
+				AdditionalDependencies="Smartbodyd.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib fltkd.lib pthreadVSE2.lib xerces-c_3D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_42.lib boost_system-vc90-mt-gd-1_42.lib dbghelp.lib opengl32.lib OpenAL32.lib alut.lib libsndfile-1.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib atl.lib atlsd.lib "
 				OutputFile="..\bin\sbm-fltkd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;..\..\smartbody-lib\lib&quot;;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;&quot;..\..\..\..\lib\vhcl\libsndfile-1_0_17&quot;;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk\lib;..\..\..\..\lib\pthreads\lib;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib&quot;;..\..\..\..\lib\boost\lib"
@@ -284,15 +284,15 @@
 			>
 		</File>
 		<File
+			RelativePath="..\src\fltk_viewer.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\src\fltk_viewer.h"
+			>
+		</File>
+		<File
 			RelativePath="..\src\sbm_main.cpp"
-			>
-		</File>
-		<File
-			RelativePath="..\src\sr_viewer.cpp"
-			>
-		</File>
-		<File
-			RelativePath="..\src\sr_viewer.h"
 			>
 		</File>
 	</Files>

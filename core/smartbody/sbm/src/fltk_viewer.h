@@ -21,21 +21,23 @@
  */
 
 
-/** \file sr_viewer.h
+/** \file fltk_viewer.h
  * A fltk-opengl viewer
  */
 
-# ifndef SR_VIEWER_H
-# define SR_VIEWER_H
+# ifndef FLTK_VIEWER_H
+# define FLTK_VIEWER_H
 
 # include <FL/Fl_Gl_Window.H>
-# include <SR/sr_color.h>
+# include <sr/sr_viewer.h>
+# include <sr/sr_color.h>
 
 class SrQuat;
 class SrEvent;
 class SrCamera;
 class SrSn;
-class SrViewerData;
+class SrViewer;
+class FltkViewerData;
 
 /*! \class SrViewer sr_viewer.h
     \brief A fltk-opengl viewer
@@ -45,7 +47,7 @@ class SrViewerData;
     In ModePlanar, only transformation on the XY plane are accepted.
     In all modes, mouse interaction is done together with Ctrl and Shift modifiers.
     A popup menu appears with a right button click or ctrl+shift+m. */
-class SrViewer : public Fl_Gl_Window 
+class FltkViewer : public SrViewer, public Fl_Gl_Window 
  {
    public : // enumerators
 
@@ -80,15 +82,15 @@ class SrViewer : public Fl_Gl_Window
 
    private : // internal data
 
-    SrViewerData *_data;
+    FltkViewerData *_data;
 
    public : //----> public methods 
 
     /*! Constructor needs the size and location of the window. */
-    SrViewer ( int x, int y, int w, int h, const char *label=0 );
+    FltkViewer ( int x, int y, int w, int h, const char *label=0 );
 
     /*! Destructs all internal data, and calls unref() for the root node. */
-    virtual ~SrViewer ();
+    virtual ~FltkViewer ();
 
     /*! Retreave the scene root pointer, without calling unref() for it. Note that
         if the user does not give any root node to SrViewer, an empty (but valid)
@@ -210,8 +212,21 @@ class SrViewer : public Fl_Gl_Window
     /*! Will be called each time a spin animation accured. The SrViewer
         implementation does nothing. */
     virtual void spin_animation_occured ();
+
+	virtual void label_viewer(const char* str);
+	virtual void show_viewer();
+	virtual void hide_viewer();
+ };
+
+
+ class FltkViewerFactory : public SrViewerFactory
+ {
+	public:
+		 FltkViewerFactory();
+
+		virtual SrViewer* create(int x, int y, int w, int h);
  };
 
 //================================ End of File =================================================
 
-# endif // SR_VIEWER_H
+# endif // FLTK_VIEWER_H

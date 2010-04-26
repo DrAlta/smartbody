@@ -31,12 +31,12 @@
 #define SBM_EMAIL_CRASH_REPORTS  1
 
 #include <iostream>
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 #include <vector>
 
 #include <FL/Fl.H>
-
+#include "fltk_viewer.h"
 #include "wsp.h"
 
 #include <sbm/sbm_constants.h>
@@ -52,6 +52,8 @@
 #include <sbm/text_speech.h> // [BMLR]
 #include <sbm/locomotion_cmds.hpp>
 #include <sbm/resource_cmds.h>
+
+
 
 #define WIN32_LEAN_AND_MEAN
 #include <sbm/sr_cmd_line.h>
@@ -434,6 +436,8 @@ int main( int argc, char **argv )	{
 	XMLPlatformUtils::Initialize();  // Initialize Xerces before creating MCU
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	mcu.register_viewer_factory(new FltkViewerFactory());
 
 	// Build the floor for the viewer
 	mcu.add_scene( build_checkerboard_floor( 200.0 ) );
