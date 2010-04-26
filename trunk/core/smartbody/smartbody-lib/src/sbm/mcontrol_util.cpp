@@ -80,6 +80,7 @@ mcuCBHandle::mcuCBHandle()
 	test_recipient_default( "ALL" ),
 	queued_cmds( 0 ),
 	use_locomotion( false ),
+	viewer_factory ( new SrViewerFactory() ),
 	resource_manager(ResourceManager::getResourceManager())
 {
 	
@@ -381,11 +382,11 @@ void mcuCBHandle::clear( void )	{
 int mcuCBHandle::open_viewer( int width, int height, int px, int py )	{
 	
 	if( viewer_p == NULL )	{
-		viewer_p = new SrViewer( px, py, width, height );
-		viewer_p->label( "SBM Viewer" );
+		viewer_p = viewer_factory->create( px, py, width, height );
+		viewer_p->label_viewer( "SBM Viewer" );
 		camera_p = new SrCamera;
 		viewer_p->set_camera( *camera_p );
-		viewer_p->show();
+		viewer_p->show_viewer();
 		if( root_group_p )	{
 			viewer_p->root( root_group_p );
 		}
@@ -1230,14 +1231,14 @@ int mcu_viewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		else
 		if( strcmp( view_cmd, "show" ) == 0 )	{
 			if( mcu_p->viewer_p )	{
-				mcu_p->viewer_p->show();
+				mcu_p->viewer_p->show_viewer();
 				return( CMD_SUCCESS );
 			}
 		}
 		else
 		if( strcmp( view_cmd, "hide" ) == 0 )	{
 			if( mcu_p->viewer_p )	{
-				mcu_p->viewer_p->hide();
+				mcu_p->viewer_p->hide_viewer();
 				return( CMD_SUCCESS );
 			}
 		}
@@ -3653,4 +3654,3 @@ int mcu_wsp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 }
 
 /////////////////////////////////////////////////////////////
-

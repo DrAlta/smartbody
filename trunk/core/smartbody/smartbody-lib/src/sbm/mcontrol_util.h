@@ -131,6 +131,7 @@ class mcuCBHandle	{
 
 		SbmPerfReport perf;
 
+		SrViewerFactory *viewer_factory;
 		SrViewer	*viewer_p;
 		SrCamera	*camera_p;
 		SrSnGroup	*root_group_p;
@@ -302,6 +303,11 @@ class mcuCBHandle	{
 		text_speech* speech_text() { return &_speech_text; } // [BMLR]
 
 		void NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton * skeleton );
+
+		void register_viewer_factory(SrViewerFactory* factory) { 
+				if (viewer_factory != NULL) delete viewer_factory;
+				viewer_factory = factory;
+		}
 
 	protected:
 		FILE* open_sequence_file( const char *seq_name );

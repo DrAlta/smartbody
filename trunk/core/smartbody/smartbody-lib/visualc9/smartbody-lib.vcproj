@@ -45,7 +45,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\src;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost"
+				AdditionalIncludeDirectories="..\src;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -119,7 +119,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\src;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost"
+				AdditionalIncludeDirectories="..\src;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -981,6 +981,10 @@
 				</File>
 				<File
 					RelativePath="..\src\sr\sr_vec2.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sr\sr_viewer.cpp"
 					>
 				</File>
 				<File

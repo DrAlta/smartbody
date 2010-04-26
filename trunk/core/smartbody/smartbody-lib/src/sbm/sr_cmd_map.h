@@ -78,6 +78,12 @@ template <class X> class srCmdMap	{
 			return( fp != NULL );
 		}
 
+		void reset ( ) {
+			cmdToCallback.reset();
+		}
+		
+
+
     protected:
         srHashMapBase cmdToCallback;
 };

@@ -59,7 +59,7 @@ namespace BML {
 #endif
 			const char			*msgId;
 			const SbmCharacter	*actor;
-			const DOMDocument	*xml;
+			const XERCES_CPP_NAMESPACE::DOMDocument	*xml;
 
 			const std::string   requestId;
 
@@ -73,8 +73,8 @@ namespace BML {
 			BMLProcessorMsg( const char *actorId, const char *recipientId, const char *msgId, const SbmCharacter *actor, DOMDocument *xml, const char* args );
 			BMLProcessorMsg( const char *actorId, const char *recipientId, const char *msgId, const SbmCharacter *actor, DOMDocument *xml, srArgBuffer& arg );
 #else
-			BMLProcessorMsg( const char *actorId, const char *msgId, const SbmCharacter *actor, DOMDocument *xml, const char* args );
-			BMLProcessorMsg( const char *actorId, const char *msgId, const SbmCharacter *actor, DOMDocument *xml, srArgBuffer& arg );
+			BMLProcessorMsg( const char *actorId, const char *msgId, const SbmCharacter *actor, XERCES_CPP_NAMESPACE::DOMDocument *xml, const char* args );
+			BMLProcessorMsg( const char *actorId, const char *msgId, const SbmCharacter *actor, XERCES_CPP_NAMESPACE::DOMDocument *xml, srArgBuffer& arg );
 #endif
 			~BMLProcessorMsg();
 		};
