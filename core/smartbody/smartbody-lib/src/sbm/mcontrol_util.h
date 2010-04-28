@@ -259,6 +259,7 @@ class mcuCBHandle	{
 
 		int execute( char *cmd ) { 
 			CmdResource* resource = new CmdResource();
+			resource->setChildrenLimit(resource_manager->getLimit());	// assuming the limit of total resources( path, motion, file, command) is the same with the limit of children ( command resource only) number
 			resource->setCommand(cmd);
 			resource_manager->addResource(resource);
 

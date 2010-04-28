@@ -5,6 +5,7 @@ ResourceManager* ResourceManager::manager = NULL;
 
 ResourceManager::ResourceManager()
 {
+	resource_limit = 1000;
 	last_resource = NULL;
 	is_seq_cmd = false;
 	last_seq_cmd_name = "";
@@ -12,21 +13,14 @@ ResourceManager::ResourceManager()
 
 ResourceManager::~ResourceManager()
 {
-	for (unsigned int r = 0; r < resources.size(); r++)
-	{
-		delete resources[r];
-	}
+//	for (unsigned int r = 0; r < resources.size(); r++)
+//	{
+//		delete resources[r];
+//	}
 }
 
 void ResourceManager::addResource(Resource* r)
 {
-	// set up a limit to the number of resources that can be stored
-	// since too many resources stored may cause excessive memory 
-	// problems for a long-running application
-	//if (maxNumResources > 1000) // or something like that
-	//{
-	//}
-
 	CmdResource* cmd = dynamic_cast<CmdResource*>(r);
 	if (cmd)
 	{
@@ -37,12 +31,16 @@ void ResourceManager::addResource(Resource* r)
 		}
 		else
 		{
+			while(resources.size() >= resource_limit)
+				resources.pop_front();
 			resources.push_back(r);
 			last_resource = cmd;
 		}
 	}
 	else
 	{
+		if(resources.size() >= resource_limit)
+			resources.pop_front();
 		resources.push_back(r);
 	}
 }
@@ -61,10 +59,13 @@ int ResourceManager::getNumResources()
 
 Resource* ResourceManager::getResource(unsigned int index)
 {
-	if (index < resources.size())
-		return resources[index];
-	else
-		return NULL;
+	std::list<Resource *>::iterator iter= resources.begin();
+	for(unsigned int i = 0 ; i < index; i++)
+	{
+		iter ++;
+		if(iter == resources.end())	return NULL;
+	}
+	return *iter;
 }
 
 ResourceManager* ResourceManager::getResourceManager()
@@ -89,10 +90,12 @@ Resource* ResourceManager::getParent()
 
 CmdResource* ResourceManager::getCmdResource(std::string id)
 {
-
+	std::list<Resource *>::iterator iter= resources.begin();
 	for (unsigned int r = 0; r < resources.size(); r++)
 	{
-		CmdResource* cmd = dynamic_cast<CmdResource*>(resources[r]);
+		iter ++;
+		if(iter == resources.end())	return NULL;
+		CmdResource* cmd = dynamic_cast<CmdResource*>(*iter);
 		if (cmd)
 		{
 			CmdResource* c = getCmdResourceRecurse(id, cmd);
@@ -101,8 +104,6 @@ CmdResource* ResourceManager::getCmdResource(std::string id)
 		}
 		
 	}
-	// ...
-	// ...
 	return NULL;
 }
 
@@ -124,3 +125,14 @@ CmdResource* ResourceManager::getCmdResourceRecurse(std::string id, CmdResource*
 }
 
 
+void ResourceManager::setLimit(unsigned int l)
+{
+	resource_limit = l;
+	while(l < resources.size())
+		resources.pop_front();
+}
+
+int ResourceManager::getLimit()
+{
+	return resource_limit;
+}
