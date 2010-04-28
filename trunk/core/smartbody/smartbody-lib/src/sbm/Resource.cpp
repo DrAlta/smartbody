@@ -4,29 +4,48 @@
 
 Resource::Resource()
 {
+	children_limit = 1000;
 	parent = NULL;
 }
 
 Resource::~Resource()
 {
-	for (unsigned int c = 0; c < children.size(); c++)
-	{
-		delete children[c];
-	}
+//	for (unsigned int c = 0; c < children.size(); c++)
+//	{
+//		delete children[c];
+//	}
+}
+
+
+void Resource::setChildrenLimit(int l)
+{
+	children_limit = l;
+	while(l < children.size())
+		children.pop_front();
 }
 
 void Resource::addChild(Resource* resource)
 {
+	while(children.size() >= children_limit)
+		children.pop_front();
 	children.push_back(resource);
 	resource->setParent(this);
 }
 
 Resource* Resource::getChild(unsigned int num)
 {
-	if (children.size() > num)
-		return children[num];
-	else
-		return NULL;
+	std::list<Resource *>::iterator iter = children.begin();
+	for(unsigned int i = 0 ; i < num; i++)
+	{
+		iter++;
+		if(iter == children.end())	return NULL;
+	}
+	return *iter;
+
+//	if (children.size() > num)
+//		return children[num];
+//	else
+//		return NULL;
 }
 
 Resource* Resource::getParent()
@@ -59,11 +78,15 @@ std::string Resource::dump()
 		depth++;
 	}
 
+	std::list<Resource *>::iterator iter = children.begin();
 	for (unsigned int c = 0; c < children.size(); c++)
 	{
+		if(iter == children.end())	return "";
 		for (int d = 0; d < depth; d++)
 			stream << "\t";
-		stream << children[c]->dump() << std::endl;
+//		stream << children[c]->dump() << std::endl;
+		stream << (*iter)->dump() << std::endl;
+		iter ++;
 	}
 	return stream.str();
 }

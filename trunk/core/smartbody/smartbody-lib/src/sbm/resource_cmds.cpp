@@ -17,7 +17,7 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 	std::string arg = args.read_token();
 	if( arg.empty() || arg=="help" ) {
 		std::cout << "Syntax:" << std::endl
-		    << "\t resource [command|path|file|motion]"<<std::endl;
+		    << "\t resource [command|path|file|motion|limit]"<<std::endl;
 		return CMD_SUCCESS;
 	}
 	
@@ -66,5 +66,10 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 		}				
 		return CMD_SUCCESS;		
 	}
+	if(arg == "limit")
+	{
+		mcu_p->resource_manager->setLimit(args.read_int());
+	}
+
 	return CMD_SUCCESS;
 }

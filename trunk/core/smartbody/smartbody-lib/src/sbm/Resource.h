@@ -2,7 +2,7 @@
 #define RESOURCE_H
 
 #include <string>
-#include <vector>
+#include <list>
 
 class Resource
 {
@@ -15,12 +15,14 @@ class Resource
 		Resource* getChild(unsigned int num);
 		Resource* getParent();
 		void setParent(Resource* p);
+		void setChildrenLimit(int l);
 
 		virtual std::string dump() = 0;
 
 	protected:
-		std::vector<Resource*> children;
+		std::list<Resource*> children;
 		Resource* parent;
+		int children_limit;		// limit of children number for a resource parant
 };
 
 class FileResource : public Resource		// Seq file resources

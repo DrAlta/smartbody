@@ -2,7 +2,7 @@
 #define RESOURCEMANAGER_H
 
 #include "Resource.h"
-#include <vector>
+#include <list>
 #include <stack>
 
 class ResourceManager
@@ -20,17 +20,21 @@ class ResourceManager
 		Resource* getParent();
 		CmdResource* getCmdResource(std::string id);
 
+		void setLimit(unsigned int l);
+		int getLimit();
+
 		static ResourceManager* getResourceManager();
 		
 	
 	private:
 		CmdResource* getCmdResourceRecurse(std::string id, CmdResource* r);
 		
-		std::vector<Resource*> resources;
+		std::list<Resource*> resources;
 		static ResourceManager* manager;
 		std::stack<Resource*> cur_cmd_parent;
 		CmdResource* last_resource;
 		std::string last_seq_cmd_name;
 		bool is_seq_cmd;
+		unsigned int resource_limit;
 };
 #endif
