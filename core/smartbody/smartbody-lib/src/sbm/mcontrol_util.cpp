@@ -191,7 +191,7 @@ FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
 
 	seq_paths.reset();
 	char* filename = seq_paths.next_filename( buffer, label );
-	filename = mcn_return_full_filename_func( CurrentPath, filename );
+	//filename = mcn_return_full_filename_func( CurrentPath, filename );
 	
 	while( filename != NULL )	{
 		file_p = fopen( filename, "r" );
@@ -207,14 +207,14 @@ FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
 			break;
 		}
 		filename = seq_paths.next_filename( buffer, label );
-		filename = mcn_return_full_filename_func( CurrentPath, filename );
+		//filename = mcn_return_full_filename_func( CurrentPath, filename );
 	}
 	if( file_p == NULL ) {
 		// Could not find the file as named.  Perhap it excludes the extension	
 		sprintf( label, "%s.seq", seq_name );
 		seq_paths.reset();
 		filename = seq_paths.next_filename( buffer, label );
-		filename = mcn_return_full_filename_func( CurrentPath, filename );
+		//filename = mcn_return_full_filename_func( CurrentPath, filename );
 		while( filename )	{
 			if( ( file_p = fopen( filename, "r" ) ) != NULL ) {
 				
@@ -227,7 +227,7 @@ FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
 				break;
 			}
 			filename = seq_paths.next_filename( buffer, label );
-			filename = mcn_return_full_filename_func( CurrentPath, filename );
+			//filename = mcn_return_full_filename_func( CurrentPath, filename );
 		}
 	}
 
