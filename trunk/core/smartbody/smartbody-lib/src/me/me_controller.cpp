@@ -69,6 +69,7 @@ MeController::MeController ()
 	_record_mode = RECORD_NULL;
 	_record_max_frames = 0;
 	_record_frame_count = 0;
+	_buffer_changes_toggle = false;
 }
 
 MeController::~MeController () {
@@ -235,7 +236,9 @@ void MeController::evaluate ( double time, MeFrameData& frame ) {
 
 	// Reevaluate controller. Even for the same evaluation time as _lastEval, results may be influenced by differing buffer values
 	_active = controller_evaluate ( time, frame );
-	
+	if (this->is_calc_buffer_changes())
+		this->cal_buffer_changes( frame );
+
 	if( _record_mode ) 
 		cont_record( time, frame );
 
@@ -621,6 +624,40 @@ void MeController::stop_record( void )	{
 	_frames->clear();
 //	cout << "MeController::stop_record" << endl;
 }
+
+void MeController::record_buffer_changes_start()
+{
+	_buffer_changes_toggle = true;
+}
+
+
+void MeController::cal_buffer_changes( MeFrameData& frame)
+{
+	_buffer_changes = frame.buffer();
+	for (int i = 0; i < _buffer_changes.size(); i++)
+		_buffer_changes[i] = 0;
+
+	SrBuffer<float>& buff = frame.buffer();
+	SkChannelArray& channelsInUse = this->controller_channels();
+	int channels_size = channelsInUse.size();
+	for( int i = 0 ; i < channels_size; i++ )
+	{
+
+		SkChannel& channel = channelsInUse.get(i);
+		int channelIndex = _toContextCh[ i ];
+		int bufferIndex = frame.toBufferIndex(channelIndex);
+		if( frame.isChannelUpdated(channelIndex) )
+			_buffer_changes[bufferIndex] = frame.buffer()[bufferIndex];
+	}
+
+}
+
+
+SrBuffer<float>& MeController::get_buffer_changes()
+{
+	return _buffer_changes;
+}
+
 
 void MeController::output ( SrOutput& o )
  {
