@@ -903,7 +903,7 @@ void MeCtGaze::controller_start( void )	{
 bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 	
 //printf( "smooth head: %f eye: %f\n", joint_arr[ GAZE_JOINT_SKULL ].smooth, joint_arr[ GAZE_JOINT_EYE_L ].smooth );
-	
+
 #if 0
 	if( !started )	{
 		printf( "MeCtGaze::controller_evaluate ERR: not started for this: 0x%x\n", this );

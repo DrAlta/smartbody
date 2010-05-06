@@ -136,7 +136,9 @@ struct Evaluate_Func {
 		:	time(time), frame(frame) {}
 
 	void operator() ( controller_ptr& ct )
-	{	ct->evaluate( time, frame ); }
+	{
+		ct->evaluate( time, frame );
+	}
 };
 
 // Since std::mem_fun( &MeController::remap ) doesn't seem to work with controller_ptr

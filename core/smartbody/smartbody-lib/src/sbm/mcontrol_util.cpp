@@ -2548,6 +2548,9 @@ int query_controller(
 	ctrl <> record bvh <operation_type> [max <num-frames>]
 #	ctrl <> record pose <full-file-prefix>
 
+	ctrl <> debugger on	
+	ctrl <> debugger off
+
 #	ctrl <> interp <dur> <ctrl-a> <ctrl-b> linear|sine
 #	ctrl <> interp <dur> <ctrl-a> <ctrl-b> curve <curve-name>
 #	ctrl <> point <x y z>
@@ -2703,6 +2706,14 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				}
 				if( strcmp( operation, "clear" ) == 0 )	{
 					ctrl_p->record_clear();
+					return( CMD_SUCCESS );
+				}
+			}
+			else
+			if( strcmp( ctrl_cmd, "debugger" ) == 0 )	{
+				char *operation = args.read_token();
+				if( strcmp( operation, "on" ) == 0 ) {
+					ctrl_p->record_buffer_changes_start();
 					return( CMD_SUCCESS );
 				}
 			}

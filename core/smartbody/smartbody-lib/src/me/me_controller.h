@@ -119,16 +119,16 @@ protected :
 	// motion recording state: output controller results to SkMotion file:
 	int			_record_mode;
 	std::string	_record_full_prefix;
-//	std::string	_record_bvh_root_name;
 	int			_record_frame_count;
 	SrOutput	*_record_output; // for recording poses and motions of immediate local results
 	double		_record_dt;
-//	SrHashTable<const char*>(256) _record_joint_hmap;
-//	SrHashTable <SkJointName*>(256) _record_joint_hmap;
-//	int 		_record_tree_state; // tracking outside/inside/culled branches for bvh recording
 	typedef std::string FRAME;
 	std::list<FRAME>	*_frames;	// buffer to store the frame data
 	int			_record_max_frames; // maximum capacity of the buffer
+
+	// debugging: recording controller's MeFrameData, inspecting the changes each controller make on the buffer data 
+	bool				_buffer_changes_toggle;			// toggle, whenever it's being called, recording the changes that evaluation make
+	SrBuffer<float> _buffer_changes;				// data containing the changes made each time inside the controller evaluation
 
 protected :
     /*! Constructor */
@@ -255,7 +255,12 @@ public :
 	void record_write( const char *full_prefix );			//write the buffer to files
 	void record_clear(void);								//clear the buffer
 	void record_stop(void);									//stop the recording
-//	void record_bvh( const char *full_prefix, const char* skel_root, int num_frames, double dt  );
+
+	/*! Evaluates the controller changes */
+	void record_buffer_changes_start(void);										// start the recording at a certain time
+	void cal_buffer_changes( MeFrameData& frame);
+	SrBuffer<float>& get_buffer_changes();											// get buffer changes caused by controller evaluation
+	bool is_calc_buffer_changes() { return _buffer_changes_toggle; }
 
 #if ME_CONTROLLER_ENABLE_XMLIFY
 	/*! Serialize state (or most of it) to a single XML element for later analysis. */
