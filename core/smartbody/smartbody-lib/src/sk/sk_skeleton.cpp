@@ -37,6 +37,7 @@ SkSkeleton::SkSkeleton ()
    _gmat_uptodate = false;
    _channels = new SkChannelArray;
    _channels->ref();
+   _com.set(0, 0, 0);
  }
 
 SkSkeleton::~SkSkeleton ()

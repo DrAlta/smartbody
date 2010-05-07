@@ -58,7 +58,10 @@ class SkSkeleton : public SrSharedClass
     SkChannelArray* _channels;
     SrArray<SkPosture*> _postures;
 
-   public :
+	// physical properties
+	SrVec _com;
+
+	public :
     /*! Constructor */
     SkSkeleton ();
 
@@ -153,6 +156,12 @@ class SkSkeleton : public SrSharedClass
 
     /*! Save joints definitions that can be merged into a skeleton */
     bool export_joints ( SrOutput& out );
+
+	/*! Computes the center of mass of the skeleton */
+	void compute_com () {}; 
+
+	/*! retrieves the center of mass of the skeleton */
+	SrVec& com () { return _com; };
 
    private :
     int _loadjdata ( SrInput& in, SkJoint* j, SrStringArray& paths );
