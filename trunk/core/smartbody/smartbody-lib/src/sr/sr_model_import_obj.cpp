@@ -197,10 +197,9 @@ static bool process_line ( const SrString& line,
     and the model m will contain the imported object, otherwise false
     is returned. */
 bool SrModel::import_obj ( const char* file )
- {
-   SrInput in ( fopen(file,"ra") );
-   if ( !in.valid() ) return false;
-
+{
+  SrInput in ( fopen(file,"rt") );
+  if ( !in.valid() ) return false;
    in.comment_style ( '#' );
    in.lowercase_tokens ( false );
 
@@ -209,6 +208,7 @@ bool SrModel::import_obj ( const char* file )
    path.extract_file_name(filename);
    SrStringArray paths;
    paths.push ( path );
+  
    //SR_TRACE1 ( "First path:" << path );
 
    int curmtl = -1;

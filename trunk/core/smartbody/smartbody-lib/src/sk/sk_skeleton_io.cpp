@@ -249,8 +249,9 @@ static SrModel* read_model ( SrInput& in, SrPathArray& paths, SrMat* mat )
     }
    else if ( ext=="obj" )
     { //SR_TRACE2 ( "Importing obj geometry..." );
+	  SrString filename = fi.filename();
       fi.close ();
-      ok = m->import_obj(file);
+      ok = m->import_obj(filename);
     }
 
    if ( ok )
