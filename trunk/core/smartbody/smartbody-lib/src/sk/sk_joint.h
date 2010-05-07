@@ -69,6 +69,7 @@ class SkJoint
     char _rtype;           // one of the RotType enumerator
     SkJointQuat* _quat;    // generic access to the quaternion of any parameterization
     SkJointPos _pos;       // controls the translation parameterization
+	float _mass;		   // mass of the bone associated with the joint
 
     friend class SkSkeleton;
     friend class SkColdet;
@@ -212,6 +213,14 @@ class SkJoint
     /*! Get a single collision model for this node and all the
         children (update_gmat) is called */
     void unite_colgeo ( SrModel& m );
+
+	/*! Sets the mass of the bone that is associated with the joint.
+	    The bone is assumed to be at the midpoint between the joint and
+		the average of all the child joints. */
+	void mass (float m) { _mass = m; };
+
+	/*! Gets the mass of the bone. */
+	float mass () const { return _mass; };
  };
 
 //==================================== End of File ===========================================

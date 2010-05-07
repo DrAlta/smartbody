@@ -50,6 +50,8 @@ SkJoint::SkJoint ( SkSkeleton* sk, SkJoint* parent, RotType rtype, int i )
    _rtype =-1;
    rot_type ( rtype );
 
+   _mass = 0;
+
    // TODO: verify we are a parent/ancestor of the parent
    if( parent )
 	   parent->_children.push() = this;

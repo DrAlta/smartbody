@@ -247,6 +247,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	if (use_locomotion) {
 		this->locomotion_ct_analysis = new MeCtLocomotionAnalysis();
 		this->locomotion_ct =  new MeCtLocomotionClass();
+		this->locomotion_ct->name("locomotion");
 		locomotion_ct->ref();
 	}
 
