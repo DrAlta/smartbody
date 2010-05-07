@@ -2713,7 +2713,10 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			if( strcmp( ctrl_cmd, "debugger" ) == 0 )	{
 				char *operation = args.read_token();
 				if( strcmp( operation, "on" ) == 0 ) {
-					ctrl_p->record_buffer_changes_start();
+					ctrl_p->record_buffer_changes(true);
+					return( CMD_SUCCESS );
+				} else if (strcmp( operation, "off" ) == 0 ) {
+					ctrl_p->record_buffer_changes(false);
 					return( CMD_SUCCESS );
 				}
 			}

@@ -127,9 +127,9 @@ protected :
 	int			_record_max_frames; // maximum capacity of the buffer
 
 	// debugging: recording controller's MeFrameData, inspecting the changes each controller make on the buffer data 
-	bool				_buffer_changes_toggle;			// toggle, whenever it's being called, recording the changes that evaluation make
+	bool			_buffer_changes_toggle;			// toggle, whenever it's being called, recording the changes that evaluation make
 	SrBuffer<float> _buffer_changes;				// data containing the changes made each time inside the controller evaluation
-
+	bool			_buffer_changes_toggle_reset;	// flag to initialize the buffer_changes
 protected :
     /*! Constructor */
     MeController ();
@@ -257,10 +257,9 @@ public :
 	void record_stop(void);									//stop the recording
 
 	/*! Evaluates the controller changes */
-	void record_buffer_changes_start(void);										// start the recording at a certain time
-	void cal_buffer_changes( MeFrameData& frame);
-	SrBuffer<float>& get_buffer_changes();											// get buffer changes caused by controller evaluation
-	bool is_calc_buffer_changes() { return _buffer_changes_toggle; }
+	void record_buffer_changes(bool val);				    // store the values of all channels changed by this controller
+	SrBuffer<float>& get_buffer_changes();					// gets the channel data changed by this controller
+	bool is_record_buffer_changes() { return _buffer_changes_toggle; }
 
 #if ME_CONTROLLER_ENABLE_XMLIFY
 	/*! Serialize state (or most of it) to a single XML element for later analysis. */
@@ -278,6 +277,9 @@ public :
 //	bool init_record( void );
 	void cont_record( double time, MeFrameData& frame );
 	void stop_record( void );
+
+	void cal_buffer_changes( MeFrameData& frame ); // stores the channel values changed by this controller
+
 
     /*! Output of the generic controller data.
         This is a protected method: derived classes will be responsible to save 

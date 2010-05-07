@@ -90,7 +90,7 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, Resourc
 		cerr << "ERROR: load_skeleton(..): Unable to load skeleton file \""<<skel_file<<"\"." << endl;
 		return NULL;
 	}
-
+	skeleton_p->skfilename(filename);
 
 	char CurrentPath[_MAX_PATH];
 	_getcwd(CurrentPath, _MAX_PATH);
