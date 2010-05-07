@@ -44,6 +44,7 @@ class SkSkeleton : public SrSharedClass
  { private :
     // basic data:
     SrString _name;
+	SrString _skfilename;
     SkJoint* _root;
     SrArray<SkJoint*> _joints;
     SrHashTableBase _jhash;
@@ -73,6 +74,12 @@ class SkSkeleton : public SrSharedClass
 
     /*! Access to the skeleton name */
     const char* name () { return _name; }
+
+	/*! Sets the filename used to load the skeleton, if any */
+    void skfilename ( const char* s ) { _skfilename = s; }
+
+    /*! Access to the .sk skeleton definiton, if any*/
+    const char* skfilename () { return _skfilename; }
 
     /*! Deletes all data and set the skeleton to be an empty hierarchy */
     void init ();

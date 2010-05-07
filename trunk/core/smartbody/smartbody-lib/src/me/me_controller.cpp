@@ -70,6 +70,7 @@ MeController::MeController ()
 	_record_max_frames = 0;
 	_record_frame_count = 0;
 	_buffer_changes_toggle = false;
+	_buffer_changes_toggle_reset = true;
 }
 
 MeController::~MeController () {
@@ -236,7 +237,7 @@ void MeController::evaluate ( double time, MeFrameData& frame ) {
 
 	// Reevaluate controller. Even for the same evaluation time as _lastEval, results may be influenced by differing buffer values
 	_active = controller_evaluate ( time, frame );
-	if (this->is_calc_buffer_changes())
+	if (this->is_record_buffer_changes())
 		this->cal_buffer_changes( frame );
 
 	if( _record_mode ) 
@@ -625,29 +626,40 @@ void MeController::stop_record( void )	{
 //	cout << "MeController::stop_record" << endl;
 }
 
-void MeController::record_buffer_changes_start()
+void MeController::record_buffer_changes(bool val)
 {
-	_buffer_changes_toggle = true;
+	_buffer_changes_toggle = val;
+	_buffer_changes_toggle_reset = true;
 }
-
 
 void MeController::cal_buffer_changes( MeFrameData& frame)
 {
-	_buffer_changes = frame.buffer();
-	for (int i = 0; i < _buffer_changes.size(); i++)
-		_buffer_changes[i] = 0;
+	if (_buffer_changes_toggle_reset)
+	{
+			// reset the buffer changes
+		_buffer_changes = frame.buffer();
+		for (int i = 0; i < _buffer_changes.size(); i++)
+			_buffer_changes[i] = 0;
+		_buffer_changes_toggle_reset = false;
+	}
 
 	SrBuffer<float>& buff = frame.buffer();
 	SkChannelArray& channelsInUse = this->controller_channels();
 	int channels_size = channelsInUse.size();
 	for( int i = 0 ; i < channels_size; i++ )
 	{
+		SkJointName jname = channelsInUse.name(i);
+
+		std::string actualName = (const char*) jname;
 
 		SkChannel& channel = channelsInUse.get(i);
 		int channelIndex = _toContextCh[ i ];
 		int bufferIndex = frame.toBufferIndex(channelIndex);
-		if( frame.isChannelUpdated(channelIndex) )
-			_buffer_changes[bufferIndex] = frame.buffer()[bufferIndex];
+		if(1)// frame.isChannelUpdated(channelIndex) )
+		{
+			float val = frame.buffer()[bufferIndex];
+			_buffer_changes[bufferIndex] = val;
+		}
 	}
 
 }
