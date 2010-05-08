@@ -648,17 +648,17 @@ void MeController::cal_buffer_changes( MeFrameData& frame)
 	int channels_size = channelsInUse.size();
 	for( int i = 0 ; i < channels_size; i++ )
 	{
-		SkJointName jname = channelsInUse.name(i);
-
-		std::string actualName = (const char*) jname;
-
 		SkChannel& channel = channelsInUse.get(i);
+		int channelSize = channel.size();
 		int channelIndex = _toContextCh[ i ];
 		int bufferIndex = frame.toBufferIndex(channelIndex);
-		if(1)// frame.isChannelUpdated(channelIndex) )
+		if (1)// frame.isChannelUpdated(channelIndex) )
 		{
-			float val = frame.buffer()[bufferIndex];
-			_buffer_changes[bufferIndex] = val;
+			for (int j = 0; j < channelSize; j++)
+			{
+				float val = frame.buffer()[bufferIndex + j];
+				_buffer_changes[bufferIndex + j] = val;
+			}
 		}
 	}
 
