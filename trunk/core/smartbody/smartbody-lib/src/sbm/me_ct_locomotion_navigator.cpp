@@ -374,8 +374,8 @@ void MeCtLocomotionNavigator::update_facing(MeCtLocomotionLimb* limb, bool domin
 		if(dominant_limb) 
 		{
 			facing_angle += -(float)delta_time * local_rps;
-			if(facing_angle > 0.0f) facing_angle -= (int)(0.5f*facing_angle/M_PI)*M_PI*2;
-			else facing_angle += ((int)(-0.5f*facing_angle/M_PI))*M_PI*2;
+			if(facing_angle > 0.0f) facing_angle -= (int)(0.5f*facing_angle/(float)M_PI)*(float)M_PI*2;
+			else facing_angle += ((int)(-0.5f*facing_angle/(float)M_PI))*(float)M_PI*2;
 		}
 	}
 	else if(limb->space_time > 1.5f && limb->space_time < 2.0f)

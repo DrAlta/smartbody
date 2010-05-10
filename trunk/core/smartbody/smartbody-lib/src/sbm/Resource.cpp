@@ -20,13 +20,13 @@ Resource::~Resource()
 void Resource::setChildrenLimit(int l)
 {
 	children_limit = l;
-	while(l < children.size())
+	while(l < (int)children.size())
 		children.pop_front();
 }
 
 void Resource::addChild(Resource* resource)
 {
-	while(children.size() >= children_limit)
+	while((int)children.size() >= children_limit)
 		children.pop_front();
 	children.push_back(resource);
 	resource->setParent(this);
