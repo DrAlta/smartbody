@@ -374,7 +374,7 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 			}
 		}
 
-		displacement /= anim->get_support_joint_num();
+		displacement /= (float)anim->get_support_joint_num();
 	}
 
 	// calculated the velocity if the base joint is fixed
