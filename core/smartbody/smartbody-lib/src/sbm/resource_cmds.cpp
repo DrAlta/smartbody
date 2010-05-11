@@ -68,7 +68,9 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 	}
 	if(arg == "limit")
 	{
-		mcu_p->resource_manager->setLimit(args.read_int());
+		int num = args.read_int();
+		if( num != 0 )
+			mcu_p->resource_manager->setLimit(num);
 	}
 
 	return CMD_SUCCESS;
