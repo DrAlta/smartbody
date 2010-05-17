@@ -2,6 +2,8 @@
 <project name="sbmbuild" default="all" basedir=".">
 
     <!-- set ANT_OPTS=-Xms512m -Xmx1g -->
+    <!-- need ant-contrib-1.0b3.jar in c:\apache-ant-1.8.1\lib dir -->
+    <!-- need antcount.jar in c:\apache-ant-1.8.1\lib dir -->
 
     <!-- ant -Dsvn.password=blah  -->
 
@@ -12,12 +14,11 @@
          - pull sbm from svn
          - compiles sbm
          - moves the build to final destination
-         - generate CRCs
          - gather directory statistics
          - filter revision numbers from svn output
          - filter errors and warnings from compiler output
          - generate email report
-         - tag repositories with email report
+         - tag repository with email report
          - generate build output
     -->
 
@@ -27,7 +28,12 @@
 
 
     <property name="build.suffix" value=""/>
-    <property name="tag.svn" value="yes"/>
+    <property name="tag.svn" value="no"/>
+    <property name="email.report" value="yes"/>
+    <property name="email.host" value="localhost"/>
+    <property name="email.from" value="blah@example.com"/>
+    <property name="email.to" value="blah@example.com"/>
+    <property name="destination.folder" value="D:\SBM-Builds"/>
 
 
     <target name="all" depends="clean,build" description="Full build"></target>
@@ -74,6 +80,8 @@
 
         <!-- filter out revision numbers from svn output -->
 
+        <echo message="--- Analyzing output..."/>
+
         <loadresource property="saso.svn.revisions">
             <propertyresource name="saso.svn.output"/>
             <filterchain>
@@ -85,14 +93,28 @@
             </filterchain>
         </loadresource>
 
+        <!-- assume the last line is the actual revision of the export -->
+        <loadresource property="saso.svn.revision.rev1">
+            <propertyresource name="saso.svn.revisions"/>
+            <filterchain>
+               <tailfilter lines="1"/>
+            </filterchain>
+        </loadresource>
+
+        <propertyregex property="saso.svn.revision" input="${saso.svn.revision.rev1}" regexp="(.*)Exported revision (\d+)(.*)" select="\2" />
+        <echo message="saso revision: ${saso.svn.revision}"/>
+
 
         <!-- filter out compiler errors and warnings -->
+
+        <!-- (C++)  2>vhcl - 0 error(s), 0 warning(s)         -->
+        <!-- (C#)   Compile complete -<>- 2 errors, 0 warnings  -->
 
         <loadresource property="saso.compile.result">
             <propertyresource name="saso.compile.output"/>
             <filterchain>
                 <linecontainsregexp>
-                    <regexp pattern="(.*) - (\d+)(\s?)error(.*)(\d+)(\s?)warning(.*)"/>
+                    <regexp pattern="(.*)- (\d+)(\s?)error(.*)(\d+)(\s?)warning(.*)"/>
                 </linecontainsregexp>
                 <prefixlines prefix="   "/>
             </filterchain>
@@ -101,11 +123,11 @@
         <loadresource property="saso.compile.errors">
             <propertyresource name="saso.compile.result"/>
             <filterchain>
-                <countfilter property="saso.compile.errors.count" match="(.*) - ([1-9]+[0-9]*)(\s?)error(.*?)(\d+)(\s?)warning(.*)">
+                <countfilter property="saso.compile.errors.count" match="(.*)- ([1-9]+[0-9]*)(\s?)error(.*?)(\d+)(\s?)warning(.*)">
                     <sum property="saso.compile.errors.sum" select="\2"/>
                 </countfilter>
                 <linecontainsregexp>
-                    <regexp pattern="(.*) - ([1-9]+[0-9]*)(\s?)error(.*)(\d+)(\s?)warning(.*)"/>
+                    <regexp pattern="(.*)- ([1-9]+[0-9]*)(\s?)error(.*)(\d+)(\s?)warning(.*)"/>
                 </linecontainsregexp>
             </filterchain>
         </loadresource>
@@ -113,11 +135,11 @@
         <loadresource property="saso.compile.warnings">
             <propertyresource name="saso.compile.result"/>
             <filterchain>
-                <countfilter property="saso.compile.warnings.count" match="(.*) - (\d+)(\s?)error(.*?)([1-9]+[0-9]*)(\s?)warning(.*)">
+                <countfilter property="saso.compile.warnings.count" match="(.*)- (\d+)(\s?)error(.*?)([1-9]+[0-9]*)(\s?)warning(.*)">
                     <sum property="saso.compile.warnings.sum" select="\5"/>
                 </countfilter>
                 <linecontainsregexp>
-                    <regexp pattern="(.*) - (\d+)(\s?)error(.*)([1-9]+[0-9]*)(\s?)warning(.*)"/>
+                    <regexp pattern="(.*)- (\d+)(\s?)error(.*)([1-9]+[0-9]*)(\s?)warning(.*)"/>
                 </linecontainsregexp>
             </filterchain>
         </loadresource>
@@ -125,9 +147,7 @@
 
         <!-- determine if build succeeded by looking for compiler errors -->
         <if>
-            <and>
-                <not><isset property="saso.compile.errors"/></not>
-            </and>
+            <not><isset property="saso.compile.errors"/></not>
             <then>
                 <property name="build.success" value="1"/>
                 <echo message="Build Success."/>
@@ -152,21 +172,13 @@
         </if>
         <echo message="folder.name: ${build.folder.name}"/>
 
-        <property name="build.folder" value="D:\SBM-Builds\${build.folder.name}"/>
+        <property name="build.folder" value="${destination.folder}\${build.folder.name}"/>
         <echo message="folder: ${build.folder}"/>
 
 
         <!-- move build to its destination folder -->
         <mkdir dir="${build.folder}"/>
         <move file="smartbody" todir="${build.folder}"/>
-
-
-        <echo message="--- Starting build.crc..."/>
-        <stopwatch name="build.crc.time"/>
-        <exec executable="D:/saso-builds/installs/crc-setup/makecrcfile/makecrcfile.exe" outputproperty="build.crc.output">
-            <arg line="${build.folder} ${build.folder}\crc.txt"/>
-        </exec>
-        <stopwatch name="build.crc.time" action="total"/>
 
 
         <echo message="--- Starting directory statistics..."/>
@@ -183,32 +195,19 @@
         </resourcecount>
 
 
-        <length property="dir.size.saso">
-            <fileset dir="${build.folder}/smartbody"/>
-        </length>
-
-        <resourcecount property="num.files.saso">
-            <fileset dir="${build.folder}/smartbody"/>
-        </resourcecount>
-
-        <resourcecount property="num.dirs.saso">
-            <dirset dir="${build.folder}/smartbody"/>
-        </resourcecount>
-
-
-        <echo message="size:  ${dir.size.total} - ${dir.size.saso}"/>
-        <echo message="files: ${num.files.total} - ${num.files.saso}"/>
-        <echo message="dirs:  ${num.dirs.total} - ${num.dirs.saso}"/>
+        <echo message="size:  ${dir.size.total}"/>
+        <echo message="files: ${num.files.total}"/>
+        <echo message="dirs:  ${num.dirs.total}"/>
 
 
         <stopwatch name="total.build.time" action="total"/>
 
 
         <!-- generate output to be used in email report -->
-        
+
         <property name="final.mail.file" value="${build.folder}/FinalMail.txt"/>
 
-        <concat destfile="${final.mail.file}" append="no">build: Automatically tagging Build #${build.number}
+        <concat destfile="${final.mail.file}" append="no">build: Automatically tagging r${saso.svn.revision} as Build #${build.number}
 
 Build Summary:
 </concat>
@@ -237,21 +236,35 @@ Dirty projects:
 Build ${build.number} took ${total.build.time}
    saso.svn.time ${saso.svn.time}
    saso.compile.time ${saso.compile.time}
-   build.crc.time ${build.crc.time}
 
 Build size: ${dir.size.total} (${num.files.total} files, ${num.dirs.total} dirs)
-       saso: ${dir.size.saso} (${num.files.saso} files, ${num.dirs.saso} dirs)
 
 Build is available at \\arcade\SBM-Builds\${build.folder.name}
 
 Log: \\arcade\SBM-Builds\${build.folder.name}\BuildLog.txt
 
 Revisions used:
-saso revisions:
+saso revisions (based off of r${saso.svn.revision}):
 ${saso.svn.revisions}
 </concat>
 
         <fixcrlf file="${final.mail.file}"/>
+
+
+        <!-- tag the repositories with the email report -->
+
+        <if>
+            <istrue value="${tag.svn}"/>
+            <then>
+            </then>
+        </if>
+
+        <if>
+            <istrue value="${email.report}"/>
+            <then>
+                <mail mailhost="${email.host}" from="${email.from}" tolist="${email.to}" subject="[SBM] Build Results" messagefile="${final.mail.file}"/>
+            </then>
+        </if>
 
 
 <!--        <delete file="${final.mail.file}"/>  -->
@@ -264,42 +277,7 @@ ${saso.svn.revisions}
         <concat destfile="${build.log.file}" force="yes" append="yes">
 ------------------
 
-        </concat>
-
-        <concat destfile="${build.log.file}" force="yes" append="yes">
-------------------
-
-        </concat>
-
-        <concat destfile="${build.log.file}" force="yes" append="yes">
-------------------
-
-        </concat>
-
-        <concat destfile="${build.log.file}" force="yes" append="yes">
-------------------
-
-        </concat>
-
-        <concat destfile="${build.log.file}" force="yes" append="yes">
-------------------
-
-        </concat>
-
-        <concat destfile="${build.log.file}" force="yes" append="yes">
-------------------
-
-        </concat>
-
-        <concat destfile="${build.log.file}" force="yes" append="yes">
-------------------
-
 ${saso.svn.output}
-
-        </concat>
-
-        <concat destfile="${build.log.file}" force="yes" append="yes">
-------------------
 
         </concat>
 
@@ -308,14 +286,6 @@ ${saso.svn.output}
 
 ${saso.compile.output}
 
-        </concat>
-
-        <concat destfile="${build.log.file}" force="yes" append="yes">
-------------------
-
-${build.crc.output}
-
-------------------
         </concat>
 
 
