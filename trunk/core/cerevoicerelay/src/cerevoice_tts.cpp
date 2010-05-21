@@ -109,9 +109,10 @@ void cleanString(std::string &message)
 		message.resize( message.length() - 1 );
 	}
 
-	while ( int pos = message.find("  ") != std::string::npos )
+	unsigned int pos;
+	while ( (pos = message.find("  ")) != std::string::npos )
 	{
-		fprintf(stderr,"Debug: replacing 2 whitespaces at %d(%s) with 1 whitespace\n",pos, message.substr(pos,2));
+		fprintf(stderr,"Debug: replacing 2 whitespaces at %d(%s) with 1 whitespace\n",pos, message.substr(pos,2).c_str());
 		message.replace( pos, 2, " " );
 	}
 
