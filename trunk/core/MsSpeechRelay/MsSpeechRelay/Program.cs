@@ -94,6 +94,15 @@ namespace MsSpeechRelay
         /// Denotes the handling of voice requests, 0 for permissive, 1 for strict, 2 for ignore
         /// </summary>
         private int voiceRequestMode = 0;
+        /// <summary>
+        /// Keeps track of the total duration of the visemes so far encountered in a single request. 
+        /// Used instead of provided AudioPosition starting points, since they are way off.
+        /// </summary>
+        private double totalVisemeDuration = 0;
+        /// <summary>
+        /// Keeps track of the total duration of the phonemes so far encountered in a single request. 
+        /// </summary>
+        private double totalPhonemeDuration = 0;
 
         private Dictionary<string, string> voiceMap = null;
 
@@ -288,6 +297,9 @@ namespace MsSpeechRelay
                 XmlElement elem = (XmlElement)n;
                 elem.SetAttribute("name", spID + ":" + elem.GetAttribute("name"));
             }
+
+            this.totalPhonemeDuration = 0;
+            this.totalVisemeDuration = 0;
 
             /// Done, now generate audio
             /// 
@@ -634,10 +646,16 @@ namespace MsSpeechRelay
 
                 if (vindex != e.Viseme) Console.WriteLine("Viseme index truncated from " + e.Viseme.ToString() + " to " + vindex + "\n");
                 Console.WriteLine("Reached viseme: " + e.Viseme.ToString() + " aka: " + visemeIDMap[vindex] + " at time: " + e.AudioPosition.TotalSeconds.ToString() + " for duration: " + e.Duration.ToString() + "\n");
+                Console.WriteLine("Total viseme duration: " + this.totalVisemeDuration);
             }
 
-            /// This is where the magic happens
-            xmlReply += "<viseme start=\"" + e.AudioPosition.TotalSeconds.ToString() + "\" type=\"" + visemeIDMap[e.Viseme] + "\"/>";
+            // We should be able to just take the AudioPosition time, which denotes the point in the request the viseme starts,
+            // but this is way off for some reason; differnt visemes start at the exact same time, and the schedule extends beyond 
+            // the lenght of the audiofile
+            //xmlReply += "<viseme start=\"" + e.AudioPosition.TotalSeconds.ToString() + "\" type=\"" + visemeIDMap[e.Viseme] + "\"/>";
+            // Instead, we manually keep track of the total duration so far, and use that as the starting point for each viseme.
+            xmlReply += "<viseme start=\"" + totalVisemeDuration.ToString() + "\" type=\"" + visemeIDMap[e.Viseme] + "\"/>";
+            this.totalVisemeDuration += e.Duration.TotalSeconds;
         }
 
         /// <summary>
@@ -647,9 +665,12 @@ namespace MsSpeechRelay
         /// <param name="e"></param>
         void ttsServer_PhonemeReached(object sender, PhonemeReachedEventArgs e)
         {
+            totalPhonemeDuration += e.Duration.TotalSeconds;
+
             if (doDebugChecks)
             {
                 Console.WriteLine("Reached phoneme: " + e.Phoneme + " at time: " + e.AudioPosition.TotalSeconds.ToString() + " for duration: " + e.Duration.ToString() + "\n");
+                Console.WriteLine("Total phoneme duration: " + this.totalPhonemeDuration);
                 //byte[] b = System.Text.Encoding.Unicode.GetBytes(e.Phoneme.ToCharArray());
                 //Console.WriteLine("Chars for bytes: ");
                 //Console.WriteLine(System.Text.Encoding.ASCII.GetChars(b));
@@ -671,7 +692,7 @@ namespace MsSpeechRelay
 
             if (doDebugChecks)
             {
-                Console.WriteLine("Reached bookmark: " + bookmark + "\n");
+                Console.WriteLine("Reached bookmark: " + bookmark + " at time: " + e.AudioPosition.TotalSeconds.ToString() + "\n");
             }
             xmlReply += "<mark name=\"" + bookmark + "\" time=\"" + e.AudioPosition.TotalSeconds.ToString() + "\"/>";
 
