@@ -134,9 +134,9 @@ namespace MsSpeechRelay
             /// er
             visemeIDMap.Insert(5, "Er");
             /// y, iy, ih, ix
-            visemeIDMap.Insert(6, "EE"); // also try OO, Ih
+            visemeIDMap.Insert(6, "Ih"); 
             /// w, uw
-            visemeIDMap.Insert(7, "Oh"); // also try OO
+            visemeIDMap.Insert(7, "Oh"); 
             /// ow
             visemeIDMap.Insert(8, "Oh");
             /// aw
@@ -542,8 +542,7 @@ namespace MsSpeechRelay
             /// The proud name of this program
             /// 
             programName = "msspeechrelay";
-            //programName = "cerevoicerelay";
-
+            
             /// Start message server
             /// 
             using (vhmsg = new VHMsg.Client())
@@ -694,12 +693,13 @@ namespace MsSpeechRelay
             {
                 Console.WriteLine("Reached bookmark: " + bookmark + " at time: " + e.AudioPosition.TotalSeconds.ToString() + "\n");
             }
-            xmlReply += "<mark name=\"" + bookmark + "\" time=\"" + e.AudioPosition.TotalSeconds.ToString() + "\"/>";
+            // The provided AudioPosition is erroneous, so we're mannually keeping track of where we are using aggregate viseme duration.
+            // xmlReply += "<mark name=\"" + bookmark + "\" time=\"" + e.AudioPosition.TotalSeconds.ToString() + "\"/>";
+            xmlReply += "<mark name=\"" + bookmark + "\" time=\"" + totalVisemeDuration + "\"/>";
 
-            /// Hack begins
             /// Since we don't have a word beginning/ending callback, we resort
-            /// to making a simple hack relying on the fact that each word in the SSML
-            /// message is enclosed in a (book)mark, so the number of marks is
+            /// to relying on the fact that each word in the SSML message is 
+            /// enclosed in a (book)mark, so the number of marks is
             /// always even. But the logic used should not rely on the tag name, only
             /// whether it's the odd or even (in order of occurence)
             /// 
@@ -710,14 +710,16 @@ namespace MsSpeechRelay
             {
                 /// word tag exists, write end time
                 /// 
-                xmlReply = xmlReply.Replace(markerString, e.AudioPosition.TotalSeconds.ToString());
+                //xmlReply = xmlReply.Replace(markerString, e.AudioPosition.TotalSeconds.ToString());
+                xmlReply = xmlReply.Replace(markerString, totalVisemeDuration.ToString());
                 xmlReply += "</word>";
             }
             else
             {
                 /// no word tag, add new word tag
                 /// 
-                xmlReply += "<word end=\"" + markerString + "\" start=\"" + e.AudioPosition.TotalSeconds.ToString() + "\">";
+                //xmlReply += "<word end=\"" + markerString + "\" start=\"" + e.AudioPosition.TotalSeconds.ToString() + "\">";
+                xmlReply += "<word end=\"" + markerString + "\" start=\"" + totalVisemeDuration + "\">";
             }
         }
 
