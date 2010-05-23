@@ -79,6 +79,12 @@ namespace SmartBody {
 		
 		/** Return the blend-in duration of the viseme. */
 		float duration() const { return _duration; }
+
+		/** Set the audio relative time to trigger this viseme. */
+		void setTime( float time ) { _time = time; }
+
+		/** Set the blend-in duration of the viseme. */
+		void setDuration( float duration ) { _duration = duration; }
 	};
 
 	/**
