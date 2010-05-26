@@ -205,7 +205,7 @@ void build_vrX( ostringstream& buffer, const string& cmd, const string& char_id,
 	if( for_seq )
 		buffer << "send " << cmd << " ";
 	buffer << char_id << " "<< recip_id << " sbm";
-	if( mcu.process_id )  // Insert process_id if present.
+	if( mcu.process_id != "" )  // Insert process_id if present.
 		buffer << '_' << mcu.process_id; 
 	buffer << "_test_bml_" << (++test_bml_id) << endl << content;
 }
