@@ -80,10 +80,10 @@ int sbm_main_func( srArgBuffer & args, mcuCBHandle * mcu_p )
    if ( strcmp( token, "id" ) == 0 )
    {  // Process specific
       token = args.read_token(); // Process id
-      const char * process_id = mcu_p->process_id;
-      if( process_id == NULL                    // If process id unassigned
-         || strcmp( token, process_id ) != 0 ) // or doesn't match
-         return CMD_SUCCESS;                 // Ignore.
+      const char * process_id = mcu_p->process_id.c_str();
+      if( ( mcu_p->process_id == "" )         // If process id unassigned
+         || strcmp( token, process_id ) !=0 ) // or doesn't match
+         return CMD_SUCCESS;                  // Ignore.
       token = args.read_token(); // Sub-command
    }
 
@@ -154,6 +154,13 @@ SMARTBODY_DLL_API void Smartbody_dll::SetFacebone( const bool enabled )
 {
    mcuCBHandle & mcu = mcuCBHandle::singleton();
    mcu.net_face_bones = enabled;
+}
+
+
+SMARTBODY_DLL_API void Smartbody_dll::SetProcessId( const std::string & processId )
+{
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   mcu.set_process_id( processId.c_str() );
 }
 
 
