@@ -154,8 +154,8 @@ int sbm_main_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	const char* token = args.read_token();
 	if( strcmp(token,"id")==0 ) {  // Process specific
 		token = args.read_token(); // Process id
-		const char* process_id = mcu_p->process_id;
-		if( process_id==NULL                    // If process id unassigned
+		const char* process_id = mcu_p->process_id.c_str();
+		if( ( mcu_p->process_id == "" )        // If process id unassigned
 			|| strcmp( token, process_id )!=0 ) // or doesn't match
 			return CMD_SUCCESS;                 // Ignore.
 		token = args.read_token(); // Sub-command
