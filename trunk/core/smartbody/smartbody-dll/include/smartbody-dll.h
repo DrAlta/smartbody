@@ -69,6 +69,7 @@ class Smartbody_dll
 
       SMARTBODY_DLL_API void SetSpeechAudiofileBasePath( const std::string & basePath );
       SMARTBODY_DLL_API void SetFacebone( const bool enabled );
+      SMARTBODY_DLL_API void SetProcessId( const std::string & processId );
 
       SMARTBODY_DLL_API bool Init();
       SMARTBODY_DLL_API bool Shutdown();
