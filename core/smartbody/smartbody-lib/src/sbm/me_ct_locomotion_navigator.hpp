@@ -42,6 +42,7 @@ public:
 
 	SrVec base_offset;
 	SrQuat base_rot;
+	bool has_destination;
 
 protected:
 	int bi_world_x, bi_world_y, bi_world_z, bi_world_rot; // World offset position and rotation
@@ -49,6 +50,8 @@ protected:
 	int bi_loco_rot_global_y;                             // Rotational velocity around Y
 	int bi_loco_rot_local_y;                             // Rotational velocity around Y
 	int bi_id;											 // ID
+	int bi_has_destination;
+	int bi_loco_dest_x, bi_loco_dest_y, bi_loco_dest_z;
 	int bi_base_offset_x, bi_base_offset_y, bi_base_offset_z, bi_base_rot; // World offset position and rotation
 
 	SrArray<MeCtLocomotionRoutine> routine_stack;
@@ -59,8 +62,16 @@ protected:
 	SrVec world_pos;
 	SrQuat world_rot;
 
+	SrArray<SrVec> destination_list;
+	SrArray<float> speed_list;
+	int curr_dest_index;
+	SrVec dis_to_dest;
+	bool reached_destination;
+
 	SrVec local_vel;
 	SrVec global_vel;
+	SrVec target_local_vel;
+	SrVec target_global_vel;
 	SrVec displacement;
 
 	float facing_angle;
@@ -72,7 +83,6 @@ protected:
 
 	int routine_channel_num;
 
-
 public:
 	/** Constructor */
 	MeCtLocomotionNavigator();
@@ -80,7 +90,7 @@ public:
 	/** Destructor */
 	virtual ~MeCtLocomotionNavigator();
 
-public:
+public: // channels and routine funcs
 	const char* controller_type();
 	SkChannelArray& controller_channels();
 	double controller_duration() { return -1; }
@@ -88,18 +98,31 @@ public:
 	bool controller_map_updated(MeControllerContext* _context, SrBuffer<int>* _toContextCh);
 	bool controller_evaluate(double delta_time, MeCtLocomotionLimbDirectionPlanner* direction_planner, MeCtLocomotionSpeedAccelerator* acc, MeFrameData& frame);
 	void post_controller_evaluate(MeFrameData& frame, MeCtLocomotionLimb* limb, bool reset);
-	SrVec get_local_velocity();
-	float get_facing_angle();
-	float get_pre_facing_angle();
 	int controller_channels(SkChannelArray* request_channels);
-	void CheckNewRoutine(MeFrameData& frame);
 	void AddChannel(SkChannelArray* request_channels, const char* name, SkChannel::Type type);
 
 public:
+	void clear_destination_list();
+	int get_destination_count();
+	int get_curr_destinatio_index();
+	void next_destination(MeFrameData& frame);
+	void add_destination(SrVec* destination);
+	void set_reached_destination(MeFrameData& frame);
+	void add_speed(float speed);
+
+	SrVec get_local_velocity();
+	SrVec get_target_local_velocity();
+	SrVec get_dis_to_dest();
+	SrVec get_world_pos();
+	float get_facing_angle();
+	float get_pre_facing_angle();
+	void calc_target_velocity();
 	void update_framerate_accelerator(float accelerator, SrArray<MeCtLocomotionLimb*>* limb_list);
 	void update(SrBuffer<float>* buffer);
 	void update_facing(MeCtLocomotionLimb* limb, bool dominant_limb);
 	void update_displacement(SrVec* displacement);
+
+	void CheckNewRoutine(MeFrameData& frame);
 	void AddRoutine(MeCtLocomotionRoutine& routine);
 	void DelRoutine(char* name);
 

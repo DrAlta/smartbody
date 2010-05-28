@@ -120,7 +120,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 
 	MeCtNavigationCircle* nav_circle = new MeCtNavigationCircle();
 	nav_circle->ref();
-	nav_circle->init( 0, 0, 0, 0, 0, 0);
+	nav_circle->init( 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	actor->posture_sched_p->create_track( NULL, NULL, nav_circle);
 	nav_circle->unref();
 	
@@ -138,10 +138,26 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		float dx = 0.0f, dy = 0.0f, dz = 0.0f, g_angular = 0.0f, l_angular = 0.0f;
 		int id = -1;
 
-		nav_circle->init( dx, dy, dz, g_angular, l_angular, id );
+		nav_circle->init( dx, dy, dz, g_angular, l_angular, id, 0, 0, 0 );
 
 		return CMD_SUCCESS;
 	}
+
+	else if( arg == "ik" )
+	{
+		int enable = args.read_int();
+		if(enable == 1) 
+		{
+			actor->locomotion_ik_enable(true);
+		}
+		else if(enable == 0)
+		{
+			actor->locomotion_ik_enable(false);
+		}
+
+		return CMD_SUCCESS;
+	}
+
 	else if( arg=="reset" ) {
 
 		actor->locomotion_reset();//temp command process
@@ -162,10 +178,82 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		return CMD_SUCCESS;
 	} 
 	
+	else if (arg == "tx" || arg == "tz" || arg == "spd")
+	{
+		SkChannelArray channels;
+		float tx = 0.0f, ty = 0.0f, tz = 0.0f, spd = 0.0f;
+		int flagx = 0, flagz = 0;
+		int tx_index=-1, ty_index=-1, tz_index=-1, spd_index = -1;
+		actor->get_locomotion_ct()->get_navigator()->clear_destination_list();
+		while( !arg.empty() ) 
+		{
+			if(arg == "tx" || arg == "tz")
+			{
+				while( !arg.empty() ) 
+				{
+					if( arg == "tx" ) 
+					{
+						if( tx_index == -1 ) 
+						{
+							tx_index = channels.size();
+						}
+						tx = args.read_float();
+						flagx = 1;
+					}
+
+					else if( arg == "tz" ) 
+					{
+						if( tz_index == -1 ) 
+						{
+							tz_index = channels.size();
+						}
+						tz = args.read_float();
+						flagz = 1;
+					} 
+
+					else break;
+
+					arg = args.read_token();
+
+					if(flagx == 1 && flagz == 1) break;
+
+				}
+				if(flagx == 1 && flagz == 1)
+				{
+					SrVec dest(tx, 0.0f, tz);
+					actor->get_locomotion_ct()->get_navigator()->add_destination(&dest);
+					actor->get_locomotion_ct()->get_navigator()->has_destination = true;
+					flagx = 0;
+					flagz = 0;
+				}
+			}
+
+			else if( arg == "spd" ) 
+			{
+				if( spd_index == -1 ) {
+					spd_index = channels.size();
+					//channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::ZPos );
+				}
+				spd = args.read_float();
+				actor->get_locomotion_ct()->get_navigator()->add_speed(spd);
+				arg = args.read_token();
+			} 
+			else {
+				cerr << "ERROR: Unexpected token \""<<arg << "\"." <<endl;
+				return CMD_FAILURE;
+			}
+			
+		}
+
+		nav_circle->init( 0.0f, 0.0f, 0.0f, 0, 0, -1, 0, 0, 0 );
+		return CMD_SUCCESS;
+	}
+	
 	else if( arg=="dx" || arg=="dy" || arg == "dz" || arg=="deg_per_sec" || arg=="dps" || arg=="rad_per_sec" || arg=="rps" || arg=="grps" || arg=="lrps" ) {
 		SkChannelArray channels;
+		actor->get_locomotion_ct()->get_navigator()->has_destination = false;
 		int dx_index=-1, dy_index=-1, dz_index=-1, g_angular_index=-1, l_angular_index=-1, id_index = -1;
-		float data[6] = {0,0,0,0,0,0};
+		//float data[6] = {0,0,0,0,0,0};
 		float dx = 0.0f, dy = 0.0f, dz = 0.0f, g_angular = 0.0f, l_angular = 0.0f;
 		int id = -1;
 
@@ -176,68 +264,68 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 					//channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::XPos );
 				}
 				dx = args.read_float();
-				data[ dx_index ] = dx;
+				//data[ dx_index ] = dx;
 			} else if( arg == "dy" ) {
 				if( dy_index == -1 ) {
 					dy_index = channels.size();
 					//channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::YPos );
 				}
 				dy = args.read_float();
-				data[ dy_index ] = dy;
+				//data[ dy_index ] = dy;
 			} else if( arg == "dz" ) {
 				if( dz_index == -1 ) {
 					dz_index = channels.size();
 					//channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::ZPos );
 				}
 				dz = args.read_float();
-				data[ dz_index ] = dz;
+				//data[ dz_index ] = dz;
 			} else if( arg == "deg_per_sec" || arg=="dps" ) {
 				if( g_angular_index == -1 ) {
 					g_angular_index = channels.size();
 					//channels.add( SkJointName( SbmCharacter::LOCOMOTION_GLOBAL_ROTATION ), SkChannel::YPos );
 				}
-				g_angular = float(RAD(args.read_double()));
-				data[ g_angular_index ] = g_angular;
+				g_angular = RAD(args.read_float());
+				//data[ g_angular_index ] = g_angular;
 				if( l_angular_index == -1 ) {
 					l_angular_index = channels.size();
 					//channels.add( SkJointName( SbmCharacter::LOCOMOTION_LOCAL_ROTATION ), SkChannel::YPos );
 				}
 				l_angular = g_angular;
-				data[ l_angular_index ] = l_angular;
+				//data[ l_angular_index ] = l_angular;
 			} else if( arg == "rad_per_sec" || arg=="rps" ) {
 				if( g_angular_index == -1 ) {
 					g_angular_index = channels.size();
 					//channels.add( SkJointName( SbmCharacter::LOCOMOTION_GLOBAL_ROTATION ), SkChannel::YPos );
 				}
 				g_angular = args.read_float();
-				data[ g_angular_index ] = g_angular;
+				//data[ g_angular_index ] = g_angular;
 				if( l_angular_index == -1 ) {
 					l_angular_index = channels.size();
 					//channels.add( SkJointName( SbmCharacter::LOCOMOTION_LOCAL_ROTATION ), SkChannel::YPos );
 				}
 				l_angular = g_angular;
-				data[ l_angular_index ] = l_angular;
+				//data[ l_angular_index ] = l_angular;
 			} else if(arg=="grps" ) {
 				if( g_angular_index == -1 ) {
 					g_angular_index = channels.size();
 					//channels.add( SkJointName( SbmCharacter::LOCOMOTION_GLOBAL_ROTATION ), SkChannel::YPos );
 				}
 				g_angular = args.read_float();
-				data[ g_angular_index ] = g_angular;
+				//data[ g_angular_index ] = g_angular;
 			} else if(arg=="lrps" ) {
 				if( l_angular_index == -1 ) {
 					l_angular_index = channels.size();
 					//channels.add( SkJointName( SbmCharacter::LOCOMOTION_LOCAL_ROTATION ), SkChannel::YPos );
 				}
 				l_angular = args.read_float();
-				data[ l_angular_index ] = l_angular;
+				//data[ l_angular_index ] = l_angular;
 			} else if(arg=="id" ) {
 				if( id_index == -1 ) {
 					id_index = channels.size();
 					//channels.add( SkJointName( SbmCharacter::LOCOMOTION_ID ), SkChannel::YPos );
 				}
 				id = args.read_int();
-				data[ id_index ] = (float)id;
+				//data[ id_index ] = (float)id;
 			} else {
 				cerr << "ERROR: Unexpected token \""<<arg << "\"." <<endl;
 				return CMD_FAILURE;
@@ -246,21 +334,22 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			{
 				id_index = channels.size();
 				//channels.add( SkJointName( SbmCharacter::LOCOMOTION_ID ), SkChannel::YPos );
-				data[ id_index ] = -1.0f;
+				//data[ id_index ] = -1.0f;
 				id = -1;
 			}
 			arg = args.read_token();
 		}
 
-		nav_circle->init( dx, dy, dz, g_angular, l_angular, id );
+		nav_circle->init( dx, dy, dz, g_angular, l_angular, id, 0, 0, 0 );
 
 		return CMD_SUCCESS;
 	}
 
+
 	else if(arg == "del")
 	{
 		int id = args.read_int();
-		nav_circle->init( 0, 0, 0, 0, 0, id );
+		nav_circle->init( 0, 0, 0, 0, 0, id, 0, 0, 0 );
 		return CMD_SUCCESS;
 	}
 

@@ -17,7 +17,7 @@
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
  *
  *  CONTRIBUTORS:
- *      Jingqiao Fu
+ *      Jingqiao Fu, USC
  */
 
 #include "me_ct_locomotion_speed_accelerator.hpp"
@@ -100,6 +100,11 @@ void MeCtLocomotionSpeedAccelerator::set_target_speed(float target_speed)
 float MeCtLocomotionSpeedAccelerator::get_target_speed()
 {
 	return target_speed;
+}
+
+float MeCtLocomotionSpeedAccelerator::get_target_acceleration()
+{
+	return target_acceleration;
 }
 
 float MeCtLocomotionSpeedAccelerator::get_curr_speed()

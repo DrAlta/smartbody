@@ -27,8 +27,10 @@
 
 #pragma once
 
-#define ME_CT_LOCOMOTION_ROUTINE_TYPE_STRAIGHT 0
-#define ME_CT_LOCOMOTION_ROUTINE_TYPE_CIRCULAR 1
+//routine types
+#define ME_CT_LOCOMOTION_ROUTINE_TYPE_STRAIGHT	0
+#define ME_CT_LOCOMOTION_ROUTINE_TYPE_CIRCULAR	1
+#define ME_CT_LOCOMOTION_ROUTINE_TYPE_TARGET	2
 
 
 // Routine definition for locomotion. The effects of Routine can be accumulated. 
@@ -41,9 +43,10 @@ public:
 public:
 	SrVec direction;
 	float speed;
-	int type; //ME_CT_LOCOMOTION_ROUTINE_TYPE_STRAIGHT or ME_CT_LOCOMOTION_ROUTINE_TYPE_CIRCULAR
+	int type; //ME_CT_LOCOMOTION_ROUTINE_TYPE_STRAIGHT, ME_CT_LOCOMOTION_ROUTINE_TYPE_CIRCULAR or ME_CT_LOCOMOTION_ROUTINE_TYPE_TARGET
 	float global_rps;
 	float local_rps;
+	SrVec target;
 	//SrVec start_pos;
 	//double elapsed_time;
 

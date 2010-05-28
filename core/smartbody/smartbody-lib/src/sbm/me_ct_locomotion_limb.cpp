@@ -17,7 +17,7 @@
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
  *
  *  CONTRIBUTORS:
- *      Jingqiao Fu
+ *      Jingqiao Fu, USC
  */
 
 #include "me_ct_locomotion_limb.hpp"
@@ -156,8 +156,8 @@ void MeCtLocomotionLimb::manipulate_turning()
 
 void MeCtLocomotionLimb::calc_blended_anim_speed(MeCtLocomotionLimbAnim* anim1, MeCtLocomotionLimbAnim* anim2, float weight)
 {
-	SrVec v1 = anim1->global_info->direction * anim1->global_info->displacement * (float)anim1->get_timing_space()->get_mode() * weight;
-	SrVec v2 = anim2->global_info->direction * anim2->global_info->displacement * (float)anim2->get_timing_space()->get_mode() * (1-weight);
+	SrVec v1 = anim1->global_info->direction * anim1->global_info->displacement * anim1->get_timing_space()->get_mode() * weight;
+	SrVec v2 = anim2->global_info->direction * anim2->global_info->displacement * anim2->get_timing_space()->get_mode() * (1-weight);
 	SrVec v = v1+v2;
 	blended_anim.global_info->displacement = v.len();
 	blended_anim.global_info->speed = v.len()/(blended_anim.get_timing_space()->get_frame_num()*0.033333f);

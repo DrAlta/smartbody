@@ -61,6 +61,12 @@ SkChannelArray& MeCtNavigationWaypoint::controller_channels() {
 		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_GLOBAL_ROTATION ), SkChannel::YPos ); //  7
 		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_LOCAL_ROTATION ), SkChannel::YPos ); //  8
 		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_ID ), SkChannel::YPos ); //  9
+
+		//request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_HAS_DESTINATION ), SkChannel::YPos ); //  10
+
+		//request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_DESTINATION ), SkChannel::XPos ); //  11
+		//request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_DESTINATION ), SkChannel::YPos ); //  12
+		//request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_DESTINATION ), SkChannel::ZPos ); //  13
 	}
 
 	return request_channels;

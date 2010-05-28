@@ -116,16 +116,20 @@ double MeCtNavigationCircle::controller_duration() {
 	return -1;
 }
 
-void MeCtNavigationCircle::init( float dx, float dy, float dz, float g_angular, float l_angular, int id )
+void MeCtNavigationCircle::init( float dx, float dy, float dz, float g_angular, float l_angular, int id, int has_destination, float tx, float tz)
 {
 	new_routine = true;
 	velocity.x = dx;
 	velocity.y = dy;
 	velocity.z = dz;
+	destination.x = tx;
+	destination.y = 0.0f;
+	destination.z = tz;
 	this->g_angular = g_angular;
 	this->l_angular = l_angular;
 	this->id = id;
 }
+
 
 /*bool MeCtNavigationCircle::controller_evaluate( double time, MeFrameData& frame ) {
 	if( is_valid ) {
@@ -184,6 +188,12 @@ bool MeCtNavigationCircle::controller_evaluate( double time, MeFrameData& frame 
 		buffer[ bi_loco_rot_global_y ] = g_angular;
 		buffer[ bi_loco_rot_local_y ] = l_angular;
 		buffer[ bi_id ] = (float)id;
+
+		//buffer[ bi_has_destination ] = has_destination;
+
+		//buffer[ bi_loco_dest_x ] = destination.x;
+		//buffer[ bi_loco_dest_y ] = destination.y;
+		//buffer[ bi_loco_dest_z ] = destination.z;
 		new_routine = false;
 	}
 

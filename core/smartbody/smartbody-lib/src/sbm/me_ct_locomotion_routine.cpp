@@ -17,7 +17,7 @@
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
  *
  *  CONTRIBUTORS:
- *      Jingqiao Fu
+ *      Jingqiao Fu, USC
  */
 
 #include "me_ct_locomotion_routine.hpp"

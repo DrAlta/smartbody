@@ -80,18 +80,25 @@ public:
 	SrVec								plane_normal;
 	SrVec								plane_point;
 
+	//the forced direction of 
+	SrVec								ik_orientation;
+
+/*//??
 protected:
 	SrVec								orientation;
-	int									orientation_type;
+	int									orientation_type;*/
 
 public:
 	MeCtIKScenario();
 	~MeCtIKScenario();
 
 public:
-	void set_orientation_of_residual_type(int type, SrVec* orientation = NULL);
-	int get_orientation_of_residual_type();
-	SrVec& get_orientation_of_residual();
+	//void set_orientation_of_residual_type(int type, SrVec* orientation = NULL);
+	//int get_orientation_of_residual_type();
+	//SrVec& get_orientation_of_residual();
+
+	void set_plane_normal(SrVec& normal);
+	void set_plane_point(SrVec& point);
 };
 
 #endif // ME_CT_IK_SCENARIO_HPP

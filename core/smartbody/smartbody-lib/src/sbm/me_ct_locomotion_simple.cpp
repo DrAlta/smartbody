@@ -58,10 +58,6 @@ SkChannelArray& MeCtLocomotionSimple::controller_channels() {
 		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::YPos ); //  5
 		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::ZPos ); //  6
 
-		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_GLOBAL_ROTATION ), SkChannel::YPos ); //  7
-		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_LOCAL_ROTATION ), SkChannel::YPos ); //  7
-
-		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_ID ), SkChannel::YPos ); //  7
 	}
 
 	return request_channels;
@@ -94,7 +90,6 @@ void MeCtLocomotionSimple::controller_map_updated() {
 		LOOKUP_BUFFER_INDEX( bi_loco_vel_y, 5 );
 		LOOKUP_BUFFER_INDEX( bi_loco_vel_z, 6 );
 
-		LOOKUP_BUFFER_INDEX( bi_loco_rot_y, 7 );
 	} else {
 		// This shouldn't get here
 		is_valid = false;
