@@ -17,7 +17,7 @@
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
  *
  *  CONTRIBUTORS:
- *      Jingqiao Fu
+ *      Jingqiao Fu, USC
  */
 
 #include "me_ct_locomotion_analysis.hpp"
@@ -216,7 +216,7 @@ void MeCtLocomotionAnalysis::analyze_standing_core(MeCtLocomotionLimb* limb, SkS
 		joint = skeleton->search_joint(*(limb->support_joint_list.get(i)));
 		mat = joint->gmat();
 		pos = mat.pt(12);
-		//pos[1] -= 100.0f;
+		pos[1] += 100.0f;
 		if(i == 0 || ground_height > *(pos+1))
 		{
 			ground_height = *(pos+1);
@@ -229,7 +229,7 @@ void MeCtLocomotionAnalysis::analyze_standing_core(MeCtLocomotionLimb* limb, SkS
 		joint = skeleton->search_joint(*(limb->support_joint_list.get(i)));
 		mat = joint->gmat();
 		pos = mat.pt(12);
-		//pos[1] -= 100.0f;
+		pos[1] += 100.0f;
 		limb->support_height.push() = *(pos+1)- ground_height;
 	}
 
@@ -240,7 +240,7 @@ void MeCtLocomotionAnalysis::analyze_standing_core(MeCtLocomotionLimb* limb, SkS
 void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkMotion* walking, SkMotion* standing, char* limb_base, SrArray<float>* support_height, 
 								   float ground_height, float height_bound)
 {
-	//printf("\nstart analysis......");
+	printf("\nstart analysis......");
 	anim->set_anim(walking);
 
 	motion_locomotion = walking;
@@ -283,43 +283,7 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 	base_joint = skeleton->search_joint("base");
 
 	// analysis for IK.........................................................................
-	for(i = 0; i < walking->frames(); ++i)
-	{
-		joint = skeleton->search_joint(_limb->limb_base_name);
-		for(j = 0; j < _limb->joint_num; ++j)
-		{
-			if(_limb->ik.joint_info_list.get(j).type == JOINT_TYPE_HINGE)
-			{
-				taxis = joint->quat()->value().axis();
-				if(!taxis.iszero())
-				{
-					if(dot(temp_axis[j], taxis) < 0.0f) taxis = - taxis;
-					temp_axis[j] += taxis;
-					++temp_axis_num[j];
-				}
-			}
-			/*else
-			{
-				if(j == 0)
-				{
-					taxis = joint->quat()->value().axis();
-					printf("\n[%i], hip: (%f, %f, %f)", i, taxis.x, taxis.y, taxis.z);
-				}
-			}*/
-			if(joint->num_children())
-			{
-				joint = joint->child(0);
-			}
-		}
-	}
 
-	for(j = 0; j < _limb->joint_num; ++j)
-	{
-		if(_limb->ik.joint_info_list.get(j).type != JOINT_TYPE_HINGE) continue;
-		temp_axis[j] /= (float)temp_axis_num[j];
-		temp_axis[j].normalize();
-		_limb->set_joint_rotation_axis(j, &temp_axis[j]);
-	}
 	// analysis for IK.........................................................................
 
 	for(j = 0; j < anim->get_support_joint_num(); ++j)
@@ -388,12 +352,7 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 		limb_stride += velocity->len();
 	}
 
-	if(displacement.len() < limb_stride/4) estimate_direction(anim, count);
-	else
-	{
-		anim->local_direction = displacement;
-	}
-	filter_displacement(anim, count);
+	estimate_direction(anim, count);
 
 	for(i = 0; i < walking->frames(); ++i)
 	{
@@ -474,7 +433,7 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 	free(pos_z);
 	free(count);
 	free(temp_axis);
-	//printf("\nend analysis......");
+	printf("\nend analysis......");
 }
 
 void MeCtLocomotionAnalysis::estimate_direction(MeCtLocomotionLimbAnim* anim, int* count)
@@ -627,7 +586,7 @@ void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion)
 	{
 		limb = _ct_locomotion->get_limb_list()->get(i);
 		analyze_walking_limb(limb, motion_locomotion, motion_standing);
-		//limb->print_info();
+		limb->print_info();
 		if(i == 0) // let the first limb be the leading limb during analysis process
 		{
 			lower_bound = limb->get_walking_list()->get(limb->get_walking_list()->size()-1)->get_timing_space()->get_virtual_frame(0);

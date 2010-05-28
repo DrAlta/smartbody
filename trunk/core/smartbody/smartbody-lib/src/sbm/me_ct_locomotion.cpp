@@ -17,7 +17,7 @@
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
  *
  *  CONTRIBUTORS:
- *      Jingqiao Fu
+ *      Jingqiao Fu, USC
  */
 
 #include "me_ct_locomotion.hpp"
@@ -44,6 +44,7 @@ MeCtLocomotion::MeCtLocomotion() {
 	reset = false;
 	initialized = false;
 	is_initialized = false;
+	ik_enabled = false;
 }
 
 /** Destructor */
@@ -92,8 +93,6 @@ SkChannelArray& MeCtLocomotion::controller_channels() {
 	return request_channels;
 }
 
-
-
 int MeCtLocomotion::iterate_children(SkJoint* base)
 {
 	const char* name = base->name().get_string();
@@ -126,28 +125,6 @@ void MeCtLocomotion::controller_map_updated()
 		LOOKUP_BUFFER_INDEX( index,  i+joint_channel_start_ind);
 		bi_joint_quats.push() = index;
 	}
-
-	/*if( _context != NULL ) {
-		// request_channel indices (second param) come from the order of request_channels.add(..) calls in controller_channels()
-		LOOKUP_BUFFER_INDEX( bi_world_x,    0 );
-		LOOKUP_BUFFER_INDEX( bi_world_y,    1 );
-		LOOKUP_BUFFER_INDEX( bi_world_z,    2 );
-		LOOKUP_BUFFER_INDEX( bi_world_rot,  3 );
-
-		LOOKUP_BUFFER_INDEX( bi_loco_vel_x, 4 );
-		LOOKUP_BUFFER_INDEX( bi_loco_vel_y, 5 );
-		LOOKUP_BUFFER_INDEX( bi_loco_vel_z, 6 );
-
-		LOOKUP_BUFFER_INDEX( bi_loco_rot_y, 7 );
-		for(int i = 0; i < joint_num; ++i)
-		{
-			LOOKUP_BUFFER_INDEX( index,  i+joint_channel_start_ind);
-			bi_joint_quats.push() = index;
-		}
-	} else {
-		// This shouldn't get here
-		is_valid = false;
-	}*/
 }
 
 bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
@@ -155,7 +132,8 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	// Until then, fake it or compute it ourself (but there are some gotchas)
 
 	//is_valid = false;
-	if(!is_initialized) return false;
+
+	//return false;
 	if( !is_valid ) return is_valid;
 
 	float time_delta = 0.03333333f;
@@ -180,26 +158,28 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 
 	navigator.controller_evaluate(curr_t-last_t, &(limb->direction_planner), &speed_accelerator, frame);
 
+	if(navigator.has_destination && navigator.get_destination_count() > navigator.get_curr_destinatio_index() && navigator.get_curr_destinatio_index()>=0)
+	{
+		SrVec dis_to_dest = navigator.get_dis_to_dest();
+		if(2.0f * dis_to_dest.len() * speed_accelerator.get_target_acceleration()/2.0f <= speed_accelerator.get_curr_speed()*speed_accelerator.get_curr_speed())
+		{
+			if(navigator.get_destination_count() == navigator.get_curr_destinatio_index()+1) navigator.set_reached_destination(frame);
+			else navigator.next_destination(frame);
+		}
+		//printf("\n[%f, %f]", 2.0f * dis_to_dest.len() * speed_accelerator.get_target_acceleration(), speed_accelerator.get_curr_speed()*speed_accelerator.get_curr_speed());
+	}
+
 	if(navigator.get_local_velocity().len() != 0.0f)
 	{
 		for(int i = 0; i < limb_list.size(); ++i)
 		{
 			limb = limb_list.get(i);
-			//limb->direction_planner.set_target_direction(&SrVec(0,0,1));
-			limb->direction_planner.set_target_direction(&navigator.get_local_velocity());
-			//limb->direction_planner.set_curr_direction(&navigator.get_local_velocity());
+			if(navigator.has_destination) limb->direction_planner.set_target_direction(&navigator.get_dis_to_dest());
+			else limb->direction_planner.set_target_direction(&navigator.get_target_local_velocity());
 		}
 		//speed_accelerator.set_target_speed(navigator.get_local_velocity().len());
 	}
-	speed_accelerator.set_target_speed(navigator.get_local_velocity().len());
-	/*else
-	{
-		if(last_time >= 2.0f && last_time < 3.0f )
-		{
-			speed_accelerator.set_target_speed(0.0f);
-			speed_accelerator.set_acceleration(100.0f);
-		}
-	}*/
+	speed_accelerator.set_target_speed(navigator.get_target_local_velocity().len());
 
 	update(inc_frame);
 
@@ -237,14 +217,14 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	return true;
 }
 
-SrArray<MeCtLocomotionLimb*>* MeCtLocomotion::get_limb_list()
-{
-	return &limb_list;
-}
-
 bool MeCtLocomotion::is_enabled()
 {
 	return is_initialized;
+}
+
+SrArray<MeCtLocomotionLimb*>* MeCtLocomotion::get_limb_list()
+{
+	return &limb_list;
 }
 
 SrArray<MeCtLocomotionAnimGlobalInfo*>* MeCtLocomotion::get_anim_global_info()
@@ -397,15 +377,12 @@ void MeCtLocomotion::update(float inc_frame)
 	last_time = limb_list.get(dominant_limb)->space_time;
 	update_pos();
 
+
 	SkJoint* base_joint1 = walking_skeleton->search_joint(limb_list.get(0)->limb_base_name);
 	SkJoint* base_joint2 = walking_skeleton->search_joint(limb_list.get(1)->limb_base_name);
 
-	//get_IK();
-	/*SrQuat q = limb_list.get(0)->quat_buffer.get(1);
-	float a = q.angle();
-	a *=5;
-	q.set(q.axis(), a);
-	limb_list.get(0)->quat_buffer.set(1, q);*/
+	if(ik_enabled) get_IK();
+
 }
 
 void MeCtLocomotion::get_IK()
@@ -420,18 +397,18 @@ void MeCtLocomotion::get_IK()
 	ppos[1] = navigator.base_offset.y;
 	ppos[2] = navigator.base_offset.z;
 
-	for(int i = 0; i < limb_list.size()-1; ++i)
+	for(int i = 0; i < limb_list.size(); ++i)
 	{
 		ik_scenario = &(limb_list.get(i)->ik);
 
 		//temp...............
-		ik_scenario->joint_info_list.get(2).constraint.ball.max = 3.14159265f/4*0;
+		ik_scenario->joint_info_list.get(2).constraint.ball.max = 3.14159265f/4.0f;
 		//temp...............
 
 		ik_scenario->mat = pmat;
 		ik_scenario->start_joint = &(ik_scenario->joint_info_list.get(0));
 		ik_scenario->end_joint = &(ik_scenario->joint_info_list.get(ik_scenario->joint_info_list.size()-1));
-		ik_scenario->plane_normal = SrVec(0.0f, 1.0f, 0.0f);
+		ik_scenario->set_plane_normal(SrVec(0.0f, 1.0f, 0.0f));
 		if(i == 0) ik_scenario->plane_point = SrVec(0.0f, 20.0f, 0.0f);
 		else ik_scenario->plane_point = SrVec(0.0f, 40.0f, 00.0f);
 		ik_scenario->quat_list = limb_list.get(i)->quat_buffer;
@@ -452,7 +429,7 @@ void MeCtLocomotion::get_IK()
 int MeCtLocomotion::get_dominant_limb()
 {
 	float remnant = 0.0f;
-	float r = 0.0f;
+	float r;
 	for(int i = 0; i < limb_list.size(); ++i)
 	{
 		if(limb_list.get(i)->space_time > 1.0f && limb_list.get(i)->space_time < 2.0f) continue;
@@ -523,52 +500,6 @@ SrVec MeCtLocomotion::get_limb_pos(MeCtLocomotionLimb* limb)
 	return pos;
 }
 
-/*
-SrVec MeCtLocomotion::get_limb_pos(MeCtLocomotionLimb* limb)
-{
-	SrMat gmat;
-	SrMat pmat;
-	SrMat lmat;
-	SrVec pos;
-	SkJoint* tjoint = NULL;
-	float* ppos;
-	SkSkeleton* skeleton = limb->walking_skeleton;
-
-	gmat.identity();
-
-	tjoint = skeleton->search_joint(limb->get_limb_base_name());
-	
-	for(int j  = 0;j < limb->quat_buffer.size()-1;++j)
-	{
-		pmat = gmat;
-		lmat = get_lmat(tjoint, &(limb->quat_buffer.get(j)));
-		gmat.mult ( lmat, pmat );
-		if(tjoint->num_children()>0)
-		{ 
-			tjoint = tjoint->child(0);
-		}
-		else break;
-	}
-
-	tjoint = skeleton->search_joint("base");
-	pmat = get_lmat(tjoint, &navigator.base_rot);
-	ppos = pmat.pt(12);
-
-	ppos[0] = navigator.base_offset.x;
-	ppos[1] = navigator.base_offset.y;
-	ppos[2] = navigator.base_offset.z;
-
-	// add transformation code later for joints between the limb base joint and base joint.......................
-
-	// add transformation code later for joints between the limb base joint and base joint.......................
-
-	gmat = gmat * pmat;
-
-	pos.set(*gmat.pt(12), *gmat.pt(13), *gmat.pt(14));
-
-	return pos;
-}*/
-
 void MeCtLocomotion::update_pos()
 {
 	SkJoint* tjoint = NULL;
@@ -631,34 +562,9 @@ void MeCtLocomotion::update_pos()
 	//printf("\nratio1: %f, ratio2: %f", ratio[0], ratio[1]);
 }
 
-/*SrMat MeCtLocomotion::get_lmat (SkJoint* joint, SrQuat* quat)
+
+MeCtLocomotionNavigator* MeCtLocomotion::get_navigator()
 {
-	SrMat _lmat;
-      SrQuat q = *quat;
-
-      float x2  = q.x+q.x;
-      float x2x = x2*q.x;
-      float x2y = x2*q.y;
-      float x2z = x2*q.z;
-      float x2w = x2*q.w;
-      float y2  = q.y+q.y;
-      float y2y = y2*q.y;
-      float y2z = y2*q.z;
-      float y2w = y2*q.w;
-      float z2  = q.z+q.z;
-      float z2z = z2*q.z;
-      float z2w = z2*q.w;
-
-      _lmat[0] = 1.0f - y2y - z2z; _lmat[1] = x2y + z2w;        _lmat[2]  = x2z - y2w;
-      _lmat[4] = x2y - z2w;        _lmat[5] = 1.0f - x2x - z2z; _lmat[6]  = y2z + x2w;
-      _lmat[8] = x2z + y2w;        _lmat[9] = y2z - x2w;        _lmat[10] = 1.0f - x2x - y2y;
-
-      if (_lmat[0]==0 && _lmat[1]==0 && _lmat[2]==0) _lmat.identity(); // to avoid a null matrix
-
-   // now update offset + translation:
-   _lmat[12] = joint->offset().x + joint->pos()->value(0);
-   _lmat[13] = joint->offset().y + joint->pos()->value(1);
-   _lmat[14] = joint->offset().z + joint->pos()->value(2);
-   return _lmat;
- }*/
+	return &navigator;
+}
 

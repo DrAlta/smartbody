@@ -196,14 +196,6 @@ void SbmCharacter::locomotion_reset()
 	locomotion_ct->reset = true;
 }
 
-bool SbmCharacter::is_locomotion_controller_enabled()
-{
-	if (!locomotion_ct)
-		return false;
-
-	return locomotion_ct->is_enabled();
-}
-
 void SbmCharacter::locomotion_set_turning_speed(float radians)
 {
 	//locomotion_ct->set_turning_speed(radians);
@@ -211,6 +203,22 @@ void SbmCharacter::locomotion_set_turning_speed(float radians)
 	{
 		locomotion_ct->limb_list.get(i)->direction_planner.set_turning_speed(radians);
 	}
+}
+
+MeCtLocomotionClass* SbmCharacter::get_locomotion_ct()
+{
+	return this->locomotion_ct;
+}
+
+void SbmCharacter::locomotion_ik_enable(bool enable)
+{
+	locomotion_ct->ik_enabled = enable;
+}
+
+bool SbmCharacter::is_locomotion_controller_enabled()
+{
+	if(locomotion_ct == NULL) return false;
+	return locomotion_ct->is_enabled();
 }
 
 void SbmCharacter::locomotion_set_turning_mode(int mode)

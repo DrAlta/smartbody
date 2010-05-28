@@ -47,7 +47,7 @@ protected:
 	SrArray<SrVec>				joint_pos_list;
 	SrArray<SrVec>				joint_axis_list;
 	SrArray<SrMat>				joint_global_mat_list;
-	SrArray<SrMat>				joint_local_mat_list;
+	//SrArray<SrMat>				joint_local_mat_list;
 
 	SrArray<SrMat>				joint_init_mat_list;
 
@@ -78,6 +78,8 @@ protected:
 	SrVec upright_point_to_plane(SrVec& point, SrVec& plane_normal, SrVec& plane_point);
 
 	float distance_to_plane(SrVec& point, SrVec& plane_normal, SrVec& plane_point);
+
+	bool cross_point_with_plane(SrVec* cross_point, SrVec& line_point, SrVec& direction, SrVec& plane_normal, SrVec& plane_point);
 
 	void update_limb_section_local_pos(int start_index);
 

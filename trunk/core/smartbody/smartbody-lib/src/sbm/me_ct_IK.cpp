@@ -34,7 +34,7 @@ const char* MeCtIK::TYPE = "MeCtIK";
 MeCtIK::MeCtIK() {
 
 	max_iteration = 20;
-	threshold = 0.5f;
+	threshold = 0.01f;
 	recrod_endmat = 0;
 }
 
@@ -55,6 +55,10 @@ void MeCtIK::update(MeCtIKScenario* scenario)
 	int reach = 0;
 	int modified = 0;
 	SrMat inv_end;
+
+	//temp.........delete this
+	SrQuat before = scenario->quat_list.get(2);
+	//temp.........delete this
 	
 	init();
 
@@ -79,6 +83,17 @@ void MeCtIK::update(MeCtIKScenario* scenario)
 		//handles the support joints
 		SrQuat before = scenario->quat_list.get(manipulated_joint_index);
 		//temp
+
+		pm = joint_global_mat_list.get(manipulated_joint_index);
+		pm.set(12, 0.0f);//??
+		pm.set(13, 0.0f);
+		pm.set(14, 0.0f);
+
+		lm = joint_init_mat_list.get(manipulated_joint_index);
+		lm.set(12, 0.0f);//??
+		lm.set(13, 0.0f);
+		lm.set(14, 0.0f);
+
 		inv_end = lm*pm.inverse();
 		before = inv_end * before;
 		SrQuat after = before;
@@ -182,6 +197,17 @@ __forceinline SrVec MeCtIK::upright_point_to_plane(SrVec& point, SrVec& plane_no
 	return (point - plane_normal*dis);
 }
 
+__forceinline bool MeCtIK::cross_point_with_plane(SrVec* cross_point, SrVec& line_point, SrVec& direction, SrVec& plane_normal, SrVec& plane_point)
+{
+	float angle = dot(direction, plane_normal);
+	if(angle == 0.0f) return false;
+	SrVec v;
+	v = plane_point - line_point;
+	v = direction * dot(v, plane_normal)/angle;
+	*cross_point = v + line_point;
+	return true;
+}
+
 __forceinline void MeCtIK::update_limb_section_local_pos(int start_index)
 {
 	/*SrVec v;
@@ -201,12 +227,12 @@ __forceinline void MeCtIK::update_limb_section_local_pos(int start_index)
 __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 {
 
-	SrVec ppp(11,0,0);
+	/*SrVec ppp(11,0,0);
 	SrMat matk;
 	matk.rot(SrVec(1,1,1), 45);
 	ppp = matk*ppp;
 	matk = matk.inverse();
-	ppp = matk*ppp;
+	ppp = matk*ppp;*/
 
 	SrVec v1, v2, v3, v4;
 	SrVec v, i_target, i_src;
@@ -231,7 +257,7 @@ __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 	else if(scenario->joint_info_list.get(start_index).type == JOINT_TYPE_HINGE)
 	{
 		r_axis = SrVec(1,0,0);
-		//axis = joint_axis_list.get(start_index);
+		//r_axis = joint_axis_list.get(start_index);
 		v = upright_point_to_plane(i_target, r_axis, i_src);
 		v2 = v - pivot;
 	}
@@ -326,7 +352,6 @@ __forceinline void MeCtIK::get_next_support_joint()
 		manipulated_joint_index = scenario->joint_info_list.size()-1;
 		manipulated_joint = &(scenario->joint_info_list.get(manipulated_joint_index));
 	}
-
 }
 
 void MeCtIK::init()
@@ -341,8 +366,8 @@ void MeCtIK::init()
 	joint_pos_list.size(size);
 	joint_axis_list.capacity(size);
 	joint_axis_list.size(size);
-	joint_local_mat_list.capacity(size);
-	joint_local_mat_list.size(size);
+	//joint_local_mat_list.capacity(size);
+	//joint_local_mat_list.size(size);
 	joint_global_mat_list.capacity(size);
 	joint_global_mat_list.size(size);
 	joint_init_mat_list.capacity(size);
@@ -393,7 +418,7 @@ __forceinline void MeCtIK::get_limb_section_local_pos(int start_index, int end_i
 		else pmat = joint_global_mat_list.get(j-1);
 
 		lmat = get_lmat(tjoint, &(scenario->quat_list.get(j)));
-		joint_local_mat_list.set(j, lmat);
+		//joint_local_mat_list.set(j, lmat);
 
 		gmat = lmat * pmat;
 		joint_global_mat_list.set(j, gmat);

@@ -69,7 +69,6 @@ protected:
 	//float turning_speed_limit; // temp
 
 	bool is_valid;  // All necessary channels are present
-	bool is_initialized;
 
 	// Buffer indices ("bi_") to the requested channels
 	//int bi_world_x, bi_world_y, bi_world_z, bi_world_rot; // World offset position and rotation
@@ -92,6 +91,7 @@ protected:
 	//SrVec loco_vel;
 
 	bool initialized;
+	bool is_initialized;
 
 	int joint_channel_start_ind;
 
@@ -108,6 +108,7 @@ public:
 
 	bool automate;
 	bool reset;
+	bool ik_enabled;
 
 	int temp;
 
@@ -147,8 +148,6 @@ public:
 	/**
 	 *  Implements MeController::controller_evaluate(..).
 	 */
-
-	bool is_enabled();
 
 	SrArray<MeCtLocomotionLimb*>* get_limb_list();
 
@@ -198,6 +197,10 @@ public:
 	int determine_dominant_limb();
 
 	void get_IK();
+
+	MeCtLocomotionNavigator* get_navigator();
+
+	bool is_enabled();
 };
 
 #endif // ME_CT_LOCOMOTION_HPP

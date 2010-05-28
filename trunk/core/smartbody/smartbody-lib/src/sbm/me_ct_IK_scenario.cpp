@@ -32,8 +32,9 @@ const char* MeCtIKScenario::TYPE = "MeCtIKScenario";
 
 /** Constructor */
 MeCtIKScenario::MeCtIKScenario() {
-	orientation.set(0,0,0);
-	orientation_type = ORIENTATION_RES_UNCHANGED_LOCAL;
+	ik_orientation.set(0,0,0);
+	//orientation.set(0,0,0);
+	//orientation_type = ORIENTATION_RES_UNCHANGED_LOCAL;
 }
 
 /** Destructor */
@@ -51,8 +52,21 @@ MeCtIKScenarioJointInfo::MeCtIKScenarioJointInfo()
 	support_joint_comp = 0.0f;
 	memset(&constraint, 0, sizeof(constraint));
 	axis.set(0,0,0);
+
 }
 
 MeCtIKScenarioJointInfo::~MeCtIKScenarioJointInfo()
 {
+
+}
+
+void MeCtIKScenario::set_plane_normal(SrVec& normal)
+{
+	plane_normal = normal;
+	plane_normal.normalize();
+}
+
+void MeCtIKScenario::set_plane_point(SrVec& point)
+{
+	plane_point = point;
 }
