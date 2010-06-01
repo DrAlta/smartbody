@@ -237,6 +237,7 @@ public:
 	void automate_locomotion(bool automate);
 
 	//temp command process.............................
+	bool is_locomotion_controller_initialized();
 	bool is_locomotion_controller_enabled();
 	void locomotion_reset();
 	void locomotion_set_turning_speed(float radians);

@@ -74,17 +74,10 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		return CMD_SUCCESS;
 	}
 	
-	if(arg=="enable")
+	if(arg=="initialize")
 	{
 		mcu_p->use_locomotion = true;
-		cout << "Locomotion engine has been enabled." << endl;
-
-		return CMD_SUCCESS;
-	}
-	else if(arg=="disable")
-	{
-		mcu_p->use_locomotion = false;
-		cout << "Locomotion engine has been disabled." << endl;
+		cout << "Locomotion engine has been initialized." << endl;
 
 		return CMD_SUCCESS;
 	}
@@ -111,12 +104,32 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		}
 	}
 
+	if(!actor->is_locomotion_controller_initialized()) 
+	{
+		cerr << "ERROR: Locomotion controller not initialized." << endl;
+		return CMD_FAILURE;
+	}
+
+	if(arg=="enable")
+	{
+		actor->get_locomotion_ct()->enabled = true;
+		cout << "Locomotion engine has been enabled." << endl;
+
+		return CMD_SUCCESS;
+	}
+	else if(arg=="disable")
+	{
+		actor->get_locomotion_ct()->enabled = false;
+		cout << "Locomotion engine has been disabled." << endl;
+
+		return CMD_SUCCESS;
+	}
+
 	if(!actor->is_locomotion_controller_enabled()) 
 	{
 		cerr << "ERROR: Locomotion controller not enabled." << endl;
 		return CMD_FAILURE;
 	}
-
 
 	MeCtNavigationCircle* nav_circle = new MeCtNavigationCircle();
 	nav_circle->ref();

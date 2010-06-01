@@ -90,8 +90,8 @@ protected:
 	//SrVec world_pos;
 	//SrVec loco_vel;
 
+	bool dis_initialized;
 	bool initialized;
-	bool is_initialized;
 
 	int joint_channel_start_ind;
 
@@ -109,6 +109,7 @@ public:
 	bool automate;
 	bool reset;
 	bool ik_enabled;
+	bool enabled;
 
 	int temp;
 
@@ -199,6 +200,8 @@ public:
 	void get_IK();
 
 	MeCtLocomotionNavigator* get_navigator();
+
+	bool is_initialized();
 
 	bool is_enabled();
 };
