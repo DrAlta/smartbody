@@ -143,6 +143,15 @@ BehaviorSyncPoints::BehaviorSyncPoints( const BehaviorSyncPoints& other )
 	stroke_end_it = find( ATTR_STROKE_END );
 	relax_it = find( ATTR_RELAX );
 	end_it = find( ATTR_END );
+
+	
+	const std::map<std::wstring, std::wstring>& nameMap = other.getBehaviorToSyncNames();
+	for (std::map<std::wstring, std::wstring>::const_iterator iter = nameMap.begin();
+		iter != nameMap.end();
+		iter++)
+	{
+		behaviorToSyncName.insert(std::pair<std::wstring, std::wstring>((*iter).first, (*iter).second));
+	}
 }
 
 BehaviorSyncPoints::iterator BehaviorSyncPoints::insert( const wstring& name, SyncPointPtr sync, BehaviorSyncPoints::iterator pos ) {
@@ -306,6 +315,9 @@ BehaviorSyncPoints::iterator BehaviorSyncPoints::parseSyncPointAttr( DOMElement*
 		// Has sync reference.
 		sync = request->getSyncByReference( sync_ref );  // Parses the sync reference notation
 
+		// add to the map of beahvior -> sync point names (ashapiro 5/24/10)
+		behaviorToSyncName.insert(std::pair<std::wstring, std::wstring>(sync_attr, sync_ref));
+
 		if( !sync ) {
 			// 8-bit C-string references
 			char* temp_sync_att = XMLString::transcode( sync_attr.c_str() );
@@ -324,6 +336,8 @@ BehaviorSyncPoints::iterator BehaviorSyncPoints::parseSyncPointAttr( DOMElement*
 
 			XMLString::release( &temp_sync_att );
 			XMLString::release( &temp_sync_ref );
+
+			
 		}
 	} else {
 		sync = request->start_trigger->addSyncPoint();
@@ -500,3 +514,7 @@ void BehaviorSyncPoints::printSyncTimes() {
 	wcout << buffer.str();
 }
 
+const std::map<std::wstring, std::wstring>& BehaviorSyncPoints::getBehaviorToSyncNames() const
+{
+	return behaviorToSyncName;
+}

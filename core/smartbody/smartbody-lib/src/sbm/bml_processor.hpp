@@ -106,6 +106,8 @@ namespace BML {
 		Processor();
 		virtual ~Processor();
 
+		void registerRequestCallback(void (*requestcb)(BmlRequest* request, void* data), void* data);
+
 		void reset();
 
 		bool get_auto_print_controllers() {
@@ -203,13 +205,18 @@ namespace BML {
 		 */
 		static int print_func( srArgBuffer& args, mcuCBHandle *mcu );
 
+		void (*requestcb)(BmlRequest* request, void* data);
+		void* requestData;
+
+		
+
 	protected:
 		//////////////////////////////////////////////////////////////////////////
 		// Protected Methods
 #if USE_RECIPIENT
 		BmlRequestPtr createBmlRequest( const SbmCharacter* agent, const std::string & actorId, const std::string & requestId, const std::string & recipientId, const std::string & msgId );
 #else
-		BmlRequestPtr createBmlRequest( const SbmCharacter* agent, const std::string & actorId, const std::string & requestId, const std::string & msgId );
+		BmlRequestPtr createBmlRequest( const SbmCharacter* agent, const std::string & actorId, const std::string & requestId, const std::string & msgId, const  XERCES_CPP_NAMESPACE::DOMDocument* xmlDoc );
 #endif
 
 		/**
@@ -230,6 +237,7 @@ namespace BML {
 #if BMLR_BML2ANIM
 		BehaviorRequest* parse_bml_to_anim( DOMElement* elem, SynchPoints& behav_syncs, BmlRequestPtr request, mcuCBHandle *mcu ); // [BMLR]
 #endif
+		
 	}; // class Processor
 };  // end namespace BML
 

@@ -299,7 +299,12 @@ char* remote_speech::getSpeechPlayCommand( RequestId requestId, const SbmCharact
 	}
 	string& soundFile = *lookupResult;
 
-	string cmd = vhcl::Format( "send PlaySound %s %s", soundFile.c_str(), character->name );
+
+	string cmd;
+	if (character)
+		vhcl::Format( "send PlaySound %s %s", soundFile.c_str(), character->name );
+	else
+		vhcl::Format( "send PlaySound %s", soundFile.c_str());
 
 	char* retSoundFile= new char[ cmd.length() + 1];
 	strcpy(retSoundFile, cmd.c_str());

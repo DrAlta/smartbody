@@ -36,8 +36,6 @@
 
 #include "sbm_speech.hpp"
 
-
-
 namespace BML {
     typedef double time_sec;  // An attempt to generalize the floating point format
 	typedef std::pair<time_sec,time_sec> time_range;
@@ -88,6 +86,9 @@ namespace BML {
 	typedef std::map< std::string, SpeechRequestPtr > MapOfSpeechRequest;
 
 	typedef std::set< std::wstring >                  SetOfWstring;
+
+
+
 } // namespace BML
 
 #endif // BML_TYPES_HPP

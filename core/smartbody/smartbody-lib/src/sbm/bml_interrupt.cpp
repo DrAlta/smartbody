@@ -28,6 +28,7 @@
 #include "bml_processor.hpp"
 #include "bml_interrupt.hpp"
 #include "xercesc_utils.hpp"
+#include "bml_xml_consts.hpp"
 
 
 ////// XML ATTRIBUTES
@@ -50,9 +51,10 @@ namespace BML {
 	
 	public:
 		InterruptBehavior( const std::string& unique_id,
+						   const std::string& localId,
 		                   const std::string& performance_id,
 			               const BehaviorSyncPoints& behav_syncs )
-		:	SequenceRequest( unique_id, behav_syncs, 0, 0, 0, 0.5, 0.5 ),  // half second default duration
+		:	SequenceRequest( unique_id, localId, behav_syncs, 0, 0, 0, 0.5, 0.5 ),  // half second default duration
 			performance_id( performance_id )
 		{}
 
@@ -86,11 +88,16 @@ namespace BML {
 BehaviorRequestPtr BML::parse_bml_interrupt( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
 
+	const XMLCh* id = elem->getAttribute(ATTR_ID);
+	std::string localId;
+	if (id)
+		localId = XMLString::transcode(id);
+
 	const XMLCh* performanceId = elem->getAttribute( ATTR_ACT );
 	if( performanceId && XMLString::stringLen( performanceId ) ) {
 		// performanceId is ASCII, not Unicode
 		char* temp_ascii_id = XMLString::transcode( performanceId );
-		BehaviorRequestPtr interrupt( new InterruptBehavior( unique_id, temp_ascii_id, behav_syncs ) );
+		BehaviorRequestPtr interrupt( new InterruptBehavior( unique_id, localId, temp_ascii_id, behav_syncs ) );
 		XMLString::release( &temp_ascii_id );
 
 		return interrupt;

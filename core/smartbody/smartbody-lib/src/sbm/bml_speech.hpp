@@ -75,11 +75,13 @@ namespace BML {
 		// wordbreak id to SyncPoint
 		MapOfSyncPoint         wbToSync;  //  TODO: Replace use of wbToSync with BehaviorRequest::behav_syncs::idToSync
 
+		std::vector<SpeechMark> speechMarks;
 	public:
 		///////////////////////////////////////////////////////////////
 		// Methods
 		SpeechRequest(
 			const std::string& unique_id,
+			const std::string& localId,
 			BML::BehaviorSyncPoints& behav_syncs,
 			SmartBody::SpeechInterface* speech_impl,
 			SmartBody::RequestId speech_request_id,
@@ -104,6 +106,10 @@ namespace BML {
 		 *  Takes both 'behavior_id:sync_id' and just 'sync_id'.
 		 */
 		SyncPointPtr getWordBreakSync( const std::wstring& id );
+
+		MapOfSyncPoint& getWorkBreakSync();
+
+		const std::vector<SpeechMark>& getMarks();
 
 		/**
 		 *  Processes the speech reply.
@@ -130,6 +136,16 @@ namespace BML {
 		 *  Clean-up remaining objects.
 		 */
 		virtual void cleanup( mcuCBHandle* mcu, BmlRequestPtr request );
+
+		/**
+		* Returns the speech interface
+		*/
+		SmartBody::SpeechInterface* get_speech_interface() { return speech_impl; }
+
+		/**
+		* Returns the speech request id
+		*/
+		SmartBody::RequestId get_speech_request_id() { return speech_request_id; }
 
 
 	protected:

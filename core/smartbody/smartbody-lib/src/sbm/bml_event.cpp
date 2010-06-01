@@ -24,7 +24,7 @@
 #include <sstream>
 
 #include "bml_event.hpp"
-
+#include "bml_xml_consts.hpp"
 
 using namespace std;
 using namespace BML;
@@ -32,49 +32,68 @@ using namespace BML;
 const bool LOG_EVENT_COMMAND = false;
 
 
-namespace BML {
-	class EventRequest : public SequenceRequest {
-	protected:
-		const std::string message;
+BML::EventRequest::EventRequest( const std::string& unique_id, const std::string& localId, const char* message,	const BehaviorSyncPoints& syncs_in, std::string spName )
+						:	SequenceRequest( unique_id, localId, syncs_in,
+						    /* Default Timing */ 0, 0, 0, 0, 0 ),
+							message( message ),
+							syncPointName( spName )
+{
+}
 	
-	public:
-		EventRequest( const std::string& unique_id, const char* message,
-			          const BehaviorSyncPoints& syncs_in )
-		:	SequenceRequest( unique_id, syncs_in,
-							 /* Default Timing */ 0, 0, 0, 0, 0 ),
-			message( message )
-		{}
-	
-		void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
-		{
-			time_sec strokeAt = behav_syncs.sync_stroke()->time();
+void BML::EventRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
+{
+	time_sec strokeAt = behav_syncs.sync_stroke()->time();
 
-			VecOfSbmCommand commands;
+	VecOfSbmCommand commands;
 
-			ostringstream cmd;
-			cmd << "send " << message;
+	ostringstream cmd;
+	cmd << "send " << message;
 
-			if( LOG_EVENT_COMMAND ) {
-				cout << "DEBUG: EventRequest::realize_impl(): Scheduling \"" << unique_id << "\" command: " << endl << "\t" << cmd.str() << endl;
+	if( LOG_EVENT_COMMAND ) {
+		cout << "DEBUG: EventRequest::realize_impl(): Scheduling \"" << unique_id << "\" command: " << endl << "\t" << cmd.str() << endl;
 
-				ostringstream echo;
-				echo << "echo DEBUG: EventRequest::realize_impl(): Sending \"" << unique_id << "\" command: " << endl << "\t" << cmd.str();
-				commands.push_back( new SbmCommand( echo.str(), (float)strokeAt ) );
-			}
+		ostringstream echo;
+		echo << "echo DEBUG: EventRequest::realize_impl(): Sending \"" << unique_id << "\" command: " << endl << "\t" << cmd.str();
+		commands.push_back( new SbmCommand( echo.str(), (float)strokeAt ) );
+	}
 
-			commands.push_back( new SbmCommand( cmd.str(), (float)strokeAt ) );
+	commands.push_back( new SbmCommand( cmd.str(), (float)strokeAt ) );
 
-			realize_sequence( commands, mcu );
-		}
-	};
-};  // end namespace BML
+	realize_sequence( commands, mcu );
+}
+
+const std::string BML::EventRequest::getMessage() 
+{ 
+	return message; 
+}
+
+std::string BML::EventRequest::getSyncPointName() 
+{ 
+	return syncPointName; 
+}
+
 
 BehaviorRequestPtr BML::parse_bml_event( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
     const XMLCh* attrMesg = elem->getAttribute( ATTR_MESSAGE );
 
+	const XMLCh* attrStroke = elem->getAttribute(L"stroke");
+	std::string spName;
+	if (attrStroke)
+	{
+		spName = XMLString::transcode(attrStroke);
+	}
+
+	const XMLCh* id = elem->getAttribute(ATTR_ID);
+	std::string localId;
+	if (id)
+	{
+		localId = XMLString::transcode(id);
+	}
+
+
 	if( attrMesg && attrMesg[0]!='\0' ) {
-        return BehaviorRequestPtr( new EventRequest( unique_id, XMLString::transcode( attrMesg ), behav_syncs ) );
+        return BehaviorRequestPtr( new EventRequest( unique_id, localId, XMLString::transcode( attrMesg ), behav_syncs, spName ) );
 	} else {
 		// TODO: Use exception?
         wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag missing "<<ATTR_MESSAGE<<"= attribute.  Behavior ignored."<< endl;

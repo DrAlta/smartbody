@@ -717,8 +717,13 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	} else if( roll != 0 ) {
 		gaze_ct->set_offset_polar( 0, 0, roll );
 	}
-
-	boost::shared_ptr<MeControllerRequest> ct_request( new MeControllerRequest( unique_id, gaze_ct, request->actor->gaze_sched_p, behav_syncs ) );
+	
+	const XMLCh* id = elem->getAttribute(ATTR_ID);
+	std::string localId;
+	if (id)
+		localId = XMLString::transcode(id);
+	
+	boost::shared_ptr<MeControllerRequest> ct_request( new MeControllerRequest( unique_id, localId, gaze_ct, request->actor->gaze_sched_p, behav_syncs ) );
 	ct_request->set_persistent( true );
 	return ct_request;
 }

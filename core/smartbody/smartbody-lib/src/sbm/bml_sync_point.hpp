@@ -142,6 +142,8 @@ namespace BML {
 		iterator relax_it;
 		iterator end_it;
 
+		std::map<std::wstring, std::wstring> behaviorToSyncName;
+
 	public:
 		/**
 		 * Default constructor.  Does not initialize standard SyncPoint fields.
@@ -165,7 +167,7 @@ namespace BML {
 		BehaviorSyncPoints::iterator end()
 		{	return named_syncs.end(); }
 
-		size_t size()
+		size_t size() const
 		{	return named_syncs.size(); }
 
 		// Accessors for convience refences to standard/core SyncPoints
@@ -231,6 +233,8 @@ namespace BML {
 
 		/** Prints SyncPoints in order, one per line, prefixed with a tab. */
 		void printSyncTimes();
+
+		const std::map<std::wstring, std::wstring>& getBehaviorToSyncNames() const;
 
 	protected:
 		BehaviorSyncPoints::iterator parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const std::string& behavior_id );

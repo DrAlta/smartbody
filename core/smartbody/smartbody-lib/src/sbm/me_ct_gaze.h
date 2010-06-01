@@ -187,6 +187,7 @@ class MeCtGaze : public MeController	{
 		
 		 // deprecate: backwards compatibility
 		void set_target_joint( float x, float y, float z, SkJoint* ref_joint_p = NULL );
+		SkJoint* get_target_joint( float& x, float& y, float& z);
 		void set_target( float x, float y, float z, char *ref_joint_name = NULL ); // world-coord if NULL
 		void set_orient_joint( float p, float h, float r, SkJoint* ref_joint_p = NULL );
 		void set_orient( float p, float h, float r, char *ref_joint_name = NULL );

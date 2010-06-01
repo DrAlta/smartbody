@@ -220,6 +220,16 @@ void MeCtGaze::set_target_joint( float x, float y, float z, SkJoint* joint_p )	{
 	ref_joint_p = joint_p;
 }
 
+SkJoint* MeCtGaze::get_target_joint( float& x, float& y, float& z)
+{ 
+	x = float(point_target_pos.x());
+	y = float(point_target_pos.y());
+	z = float(point_target_pos.z());
+
+	return ref_joint_p;
+}
+
+
 void MeCtGaze::set_target( float x, float y, float z, char *ref_joint_name )	{
 
 	target_mode = TARGET_POINT;	
