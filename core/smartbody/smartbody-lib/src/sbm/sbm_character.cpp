@@ -215,6 +215,12 @@ void SbmCharacter::locomotion_ik_enable(bool enable)
 	locomotion_ct->ik_enabled = enable;
 }
 
+bool SbmCharacter::is_locomotion_controller_initialized()
+{
+	if(locomotion_ct == NULL) return false;
+	return locomotion_ct->is_initialized();
+}
+
 bool SbmCharacter::is_locomotion_controller_enabled()
 {
 	if(locomotion_ct == NULL) return false;
@@ -252,7 +258,8 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	init_face_controllers();  // Should I pass in the viseme_motion_map and au_motion_map here so face_ct can be initialized in here?
 
 
-	if (use_locomotion) {
+	//if (use_locomotion) 
+	{
 		this->locomotion_ct_analysis = new MeCtLocomotionAnalysis();
 		this->locomotion_ct =  new MeCtLocomotionClass();
 		this->locomotion_ct->name("locomotion");

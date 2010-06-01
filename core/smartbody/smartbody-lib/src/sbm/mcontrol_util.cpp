@@ -1383,7 +1383,8 @@ int mcu_character_init(
 	err = char_p->init( skeleton_p, face_neutral_p, &mcu_p->au_motion_map, &mcu_p->viseme_map, unreal_class, mcu_p->use_locomotion );
 	if( err == CMD_SUCCESS ) {
 
-		if (mcu_p->use_locomotion) {
+		//if (mcu_p->use_locomotion) 
+		{
 			int locoSuccess = char_p->init_locomotion_analyzer(skel_file, mcu_p);//temp init for analyzer Jingqiao Fu Aug/07/09
 			if (locoSuccess != CMD_SUCCESS) {
 			}

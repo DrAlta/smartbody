@@ -7,7 +7,7 @@
 ### Assumes current directory is: core/smartbody/sbm/bin
 0	path seq ../../../../data/sbm-common/scripts
 0	seq common-init
-0       test locomotion enable
+0       test locomotion initialize
 
 ###  Common-sk assets are centered on the pelvis,
 ###  placed 102 units above the ground plane.

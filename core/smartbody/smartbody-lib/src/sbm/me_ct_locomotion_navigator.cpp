@@ -145,9 +145,26 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeCtLocomot
 	this->delta_time = delta_time;
 	CheckNewRoutine(frame);
 	world_pos.set( buffer[ bi_world_x ], buffer[ bi_world_y ], buffer[ bi_world_z ] );
-	//world_rot.set( buffer[ bi_world_rot ], buffer[ bi_world_rot+1 ], buffer[ bi_world_rot+2 ], buffer[ bi_world_rot+3 ] );
+	world_rot.set( buffer[ bi_world_rot ], buffer[ bi_world_rot+1 ], buffer[ bi_world_rot+2 ], buffer[ bi_world_rot+3 ] );
 	base_offset.set ( buffer[ bi_base_offset_x ], buffer[ bi_base_offset_y ], buffer[ bi_base_offset_z ] );
 	base_rot.set( buffer[ bi_base_rot ], buffer[ bi_base_rot+1 ], buffer[ bi_base_rot+2 ], buffer[ bi_base_rot+3 ] );
+
+	SrQuat t_world_rot;
+	mat.roty(pre_facing_angle);
+	t_world_rot.set(mat);
+	
+	if(t_world_rot.w != world_rot.w
+		|| t_world_rot.x != world_rot.x
+		|| t_world_rot.y != world_rot.y
+		|| t_world_rot.z != world_rot.z)// if the orientation has been changed manually 
+	{
+		pre_facing_angle = world_rot.angle();
+		mat.roty(pre_facing_angle);
+		t_world_rot.set(mat);
+		if(dot(t_world_rot.axis(), world_rot.axis())< 0.0f) pre_facing_angle = -pre_facing_angle;
+
+		facing_angle = pre_facing_angle;
+	}
 
 	//SrVec d = world_rot.axis();
 	//float x = world_rot.angle();
@@ -251,7 +268,7 @@ void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtL
 	if(reset)
 	{
 		buffer[ bi_world_x ] = 0.0f;
-		buffer[ bi_world_y ] = 0.0f;
+		//buffer[ bi_world_y ] = 0.0f;
 		buffer[ bi_world_z ] = 0.0f;
 	}
 	buffer[ bi_world_x ] = displacement.x + buffer[ bi_world_x ];

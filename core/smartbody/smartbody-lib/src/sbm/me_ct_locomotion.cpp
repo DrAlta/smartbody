@@ -42,9 +42,10 @@ MeCtLocomotion::MeCtLocomotion() {
 	dominant_limb = 0;
 	automate = false;
 	reset = false;
+	dis_initialized = false;
 	initialized = false;
-	is_initialized = false;
 	ik_enabled = false;
+	enabled = false;
 }
 
 /** Destructor */
@@ -133,6 +134,7 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 
 	//is_valid = false;
 
+	if(!enabled) return false;
 	//return false;
 	if( !is_valid ) return is_valid;
 
@@ -217,9 +219,14 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	return true;
 }
 
+bool MeCtLocomotion::is_initialized()
+{
+	return initialized;
+}
+
 bool MeCtLocomotion::is_enabled()
 {
-	return is_initialized;
+	return enabled;
 }
 
 SrArray<MeCtLocomotionLimb*>* MeCtLocomotion::get_limb_list()
@@ -236,7 +243,7 @@ void MeCtLocomotion::init_skeleton(SkSkeleton* standing, SkSkeleton* walking)
 {
 	walking_skeleton = walking;
 	standing_skeleton = standing;
-	is_initialized = true;
+	initialized = true;
 }
 
 const char* MeCtLocomotion::controller_type( void )	const {
@@ -540,7 +547,7 @@ void MeCtLocomotion::update_pos()
 		limb->pos = currpos;
 	}
 
-	if(initialized)
+	if(dis_initialized)
 	{
 		if(sum != 0.0f)
 		{
@@ -555,7 +562,7 @@ void MeCtLocomotion::update_pos()
 			//printf("\nsum = 0");
 		}
 	}
-	else initialized = true;
+	else dis_initialized = true;
 	navigator.update_displacement(&displacement);
 
 	//printf("\ndisplacement: (%f, %f, %f)", displacement.x, displacement.y, displacement.z);
