@@ -71,6 +71,11 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	BML::BmlRequestPtr request,
 	mcuCBHandle *mcu )
 {
+	const XMLCh* id = xml->getAttribute(ATTR_ID);
+	std::string localId;
+	if (id)
+		localId = XMLString::transcode(id);
+
 	vector<SpeechMark> marks;  // Ordered list of named bookmarks
 
 	// Parse <speech> for sync points
@@ -177,20 +182,21 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 //	createStandardSyncPoint( TM_RELAX,        behav_syncs.sp_relax );
 //	createStandardSyncPoint( TM_END,          behav_syncs.sp_end );
 
-	return SpeechRequestPtr( new SpeechRequest( unique_id, behav_syncs, speech_impl, speech_request_id, marks, request ) );
+	return SpeechRequestPtr( new SpeechRequest( unique_id, localId, behav_syncs, speech_impl, speech_request_id, marks, request ) );
 }
 
 //  SpeechRequest
 //    (no transition/blend yet)
 BML::SpeechRequest::SpeechRequest(
 	const std::string& unique_id,
+	const std::string& localId,
 	BehaviorSyncPoints& syncs_in,
 	SpeechInterface* speech_impl,
 	RequestId speech_request_id,
 	const vector<SpeechMark>& marks,
 	BmlRequestPtr request
 )
-:	SequenceRequest( unique_id, syncs_in, 0, 0, 0, 0, 0 ),
+:	SequenceRequest( unique_id, localId, syncs_in, 0, 0, 0, 0, 0 ),
 	speech_impl( speech_impl ),
 	speech_request_id( speech_request_id ),
 	trigger( behav_syncs.sync_start()->sync()->trigger.lock() )
@@ -198,6 +204,10 @@ BML::SpeechRequest::SpeechRequest(
 	// Add SyncPoints for SpeechMarks
 	vector<SpeechMark>::const_iterator end = marks.end();
 	for( vector<SpeechMark>::const_iterator mark = marks.begin(); mark != end; ++mark ) {
+
+		// save the speech marks
+		speechMarks.push_back(*mark);
+
 		// Create a SyncPoint
 		SyncPointPtr sync( trigger->addSyncPoint() );
 
@@ -242,6 +252,16 @@ SyncPointPtr BML::SpeechRequest::getWordBreakSync( const std::wstring& wbId ) {
 		return SyncPointPtr();
 	else
 		return it->second;
+}
+
+MapOfSyncPoint& BML::SpeechRequest::getWorkBreakSync()
+{
+	return wbToSync;
+}
+
+const std::vector<SpeechMark>& BML::SpeechRequest::getMarks()
+{
+	return speechMarks;
 }
 
 void BML::SpeechRequest::speech_response( srArgBuffer& response_args ) {

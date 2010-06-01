@@ -42,6 +42,14 @@ BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string
 	//type = BML_MOTION;
 
 	const XMLCh* animName = elem->getAttribute( ATTR_NAME );
+
+	const XMLCh* id = elem->getAttribute(ATTR_ID);
+	std::string localId;
+	if (id)
+	{
+		localId = XMLString::transcode(id);
+	}
+
 	if( animName && XMLString::stringLen( animName ) ) {
 		// Look up motion
 		string asciiName( xml_utils::asciiString( animName ) );
@@ -61,8 +69,11 @@ BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string
 				float ready = motion->time_ready();
 				float indt = (ready >= 0)? ready : motionCt->indt();
 				float relax = motion->time_relax();
+//				float outdt = (relax<0)? motionCt->outdt()
+//									: ( (relax<duration)? duration-relax : 0 );
+				// is outdt an absolute or a relative time? shapiro 5/28/10
 				float outdt = (relax<0)? motionCt->outdt()
-									: ( (relax<duration)? duration-relax : 0 );
+									: ( (relax<duration)? relax : 0 );
 				motionCt->inoutdt( indt, outdt );
 				float stroke_emphasis = motion->time_stroke_emphasis();
 				if( stroke_emphasis >= 0 )
@@ -76,7 +87,7 @@ BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string
 			}
 			delete [] speedStr;
 
-			return BehaviorRequestPtr( new MotionRequest( unique_id, motionCt, request->actor->motion_sched_p, behav_syncs ) );
+			return BehaviorRequestPtr( new MotionRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs ) );
 		} else {
 			// TODO: exception?
 			cerr<<"WARNING: BML::parse_bml_animation(): behavior \""<<unique_id<<"\": name=\""<<asciiName<<"\" not loaded; ignoring behavior."<<endl;

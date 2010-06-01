@@ -134,12 +134,13 @@ BmlRequest::BmlRequest( const SbmCharacter* actor, const string & actorId, const
 	actorId( actorId ),
 	recipientId( recipientId ),
 #else
-BmlRequest::BmlRequest( const SbmCharacter* actor, const string & actorId, const string & requestId, const string & msgId )
+BmlRequest::BmlRequest( const SbmCharacter* actor, const string & actorId, const string & requestId, const string & msgId, const DOMDocument* xmlDoc )
 :	actor( actor ),
 	actorId( actorId ),
 #endif
 	requestId( requestId ),
-	msgId( msgId )
+	msgId( msgId ),
+	doc (xmlDoc)
 {}
 
 void BmlRequest::init( BmlRequestPtr self ) {
@@ -288,7 +289,6 @@ BehaviorSpan BmlRequest::getBehaviorSpan() {
 
 void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 	// Self reference to pass on...
-	BmlRequestPtr request = weak_ptr.lock();
 
 	VecOfBehaviorRequest::iterator behav_end = behaviors.end();
 	time_sec now = mcu->time;
@@ -346,6 +346,11 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 			}
 		}
 	}
+
+	// callback for BML requests
+	bp->requestcb(this, bp->requestData);
+	BmlRequestPtr request = weak_ptr.lock();
+
 
 	BehaviorSpan span = getBehaviorSpan();
 	if( LOG_REQUEST_REALIZE_TIME_SPAN )
@@ -769,12 +774,25 @@ const time_sec BehaviorRequest::PERSISTENCE_THRESHOLD = (time_sec)( MeCtSchedule
 
 
 // methods
-BehaviorRequest::BehaviorRequest( const std::string& unique_id, const BehaviorSyncPoints& behav_syncs  )
+BehaviorRequest::BehaviorRequest( const std::string& unique_id, const std::string& local, const BehaviorSyncPoints& behav_syncs  )
 :	behav_syncs( behav_syncs ),
 	unique_id( unique_id ),
+	local_id( local ),
 	audioOffset(TIME_UNSET),
 	required(false)
-{}
+{
+
+	//std::cout << "BEHAVIOR REQUEST " << unique_id << " WITH " << behav_syncs.size() << " SYNC POINTS" << std::endl;
+	for (BML::BehaviorSyncPoints::iterator iter = this->behav_syncs.begin(); 
+		iter != this->behav_syncs.end();
+		iter++)
+	{
+		BML::NamedSyncPointPtr namedSyncPoint = (*iter);
+		std::wstring name = namedSyncPoint.name();
+		BML::time_sec time = namedSyncPoint.time();
+		//std::cout << name.c_str() << ": " << time << std::endl;
+	}
+}
 
 BehaviorRequest::~BehaviorRequest() {
 	// nothing to delete.  Yay for SmartPointers!
@@ -782,6 +800,10 @@ BehaviorRequest::~BehaviorRequest() {
 
 void BehaviorRequest::set_scheduler( BehaviorSchedulerPtr scheduler ) {
 	this->scheduler = scheduler;
+}
+
+BehaviorSchedulerPtr  BehaviorRequest::get_scheduler() {
+	return this->scheduler;
 }
 
 void BehaviorRequest::schedule( time_sec now ) {
@@ -824,11 +846,12 @@ BehaviorSpan BehaviorRequest::getBehaviorSpan() {
 
 //  MeControllerRequest
 MeControllerRequest::MeControllerRequest( const std::string& unique_id,
+										  const std::string& localId,
                                           MeController* anim_ct,
 										  MeCtSchedulerClass* schedule_ct,
 						                  const BehaviorSyncPoints& syncs_in,
 										  MeControllerRequest::SchduleType sched_type )
-:	BehaviorRequest( unique_id, syncs_in ),
+:	BehaviorRequest( unique_id, localId, syncs_in ),
 	anim_ct( anim_ct ),
 	schedule_ct( schedule_ct ),
 	persistent( false )
@@ -955,9 +978,10 @@ void MeControllerRequest::cleanup( mcuCBHandle* mcu, BmlRequestPtr request )
 
 
 //  MotionRequest
-MotionRequest::MotionRequest( const std::string& unique_id, MeCtMotion* motion_ct, MeCtSchedulerClass* schedule_ct,
+MotionRequest::MotionRequest( const std::string& unique_id, const std::string& local, MeCtMotion* motion_ct, MeCtSchedulerClass* schedule_ct,
 						      const BehaviorSyncPoints& syncs_in )
 :	MeControllerRequest( unique_id,
+						 local,
                          motion_ct,
 						 schedule_ct,
 						 syncs_in )
@@ -965,9 +989,9 @@ MotionRequest::MotionRequest( const std::string& unique_id, MeCtMotion* motion_c
 
 
 //  NodRequest
-NodRequest::NodRequest( const std::string& unique_id, NodType type, float repeats, float frequency, float extent, const SbmCharacter* actor,
+NodRequest::NodRequest( const std::string& unique_id, const std::string& local, NodType type, float repeats, float frequency, float extent, const SbmCharacter* actor,
 			            const BehaviorSyncPoints& syncs_in )
-:	MeControllerRequest( unique_id, new MeCtSimpleNod(), actor->head_sched_p, syncs_in, MeControllerRequest::MANUAL ),
+:	MeControllerRequest( unique_id, local, new MeCtSimpleNod(), actor->head_sched_p, syncs_in, MeControllerRequest::MANUAL ),
     type(type), repeats(repeats), frequency(frequency), extent(extent)
 {
     MeCtSimpleNod* nod = (MeCtSimpleNod*)anim_ct;
@@ -1019,10 +1043,10 @@ NodRequest::NodRequest( const std::string& unique_id, NodType type, float repeat
 }
 
 //  TiltRequest
-TiltRequest::TiltRequest( const std::string& unique_id, MeCtSimpleTilt* tilt, time_sec transitionDuration,
+TiltRequest::TiltRequest( const std::string& unique_id, const std::string& local, MeCtSimpleTilt* tilt, time_sec transitionDuration,
 						  const SbmCharacter* actor,
 						  const BehaviorSyncPoints& syncs_in )
-:	MeControllerRequest( unique_id, tilt, actor->head_sched_p, syncs_in ),
+:	MeControllerRequest( unique_id, local, tilt, actor->head_sched_p, syncs_in ),
     duration(numeric_limits<time_sec>::infinity())/*hack*/,
 	transitionDuration(transitionDuration)
 {
@@ -1035,9 +1059,9 @@ TiltRequest::TiltRequest( const std::string& unique_id, MeCtSimpleTilt* tilt, ti
 }
 
 //  PostureRequest
-PostureRequest::PostureRequest( const std::string& unique_id, MeController* pose, time_sec transitionDuration, const SbmCharacter* actor,
+PostureRequest::PostureRequest( const std::string& unique_id, const std::string& local, MeController* pose, time_sec transitionDuration, const SbmCharacter* actor,
 						        const BehaviorSyncPoints& syncs_in )
-:	MeControllerRequest( unique_id, pose, actor->posture_sched_p, syncs_in ),
+:	MeControllerRequest( unique_id, local, pose, actor->posture_sched_p, syncs_in ),
     duration(numeric_limits<time_sec>::infinity())/*hack*/,
 	transitionDuration(transitionDuration)
 {
@@ -1050,9 +1074,9 @@ PostureRequest::PostureRequest( const std::string& unique_id, MeController* pose
 }
 
 // SequenceRequest
-SequenceRequest::SequenceRequest( const std::string& unique_id, const BehaviorSyncPoints& syncs_in,
+SequenceRequest::SequenceRequest( const std::string& unique_id, const std::string& local, const BehaviorSyncPoints& syncs_in,
                                   time_sec startTime, time_sec readyTime, time_sec strokeTime, time_sec relaxTime, time_sec endTime )
-:	BehaviorRequest( unique_id, syncs_in )
+:	BehaviorRequest( unique_id, local, syncs_in )
 {
 	set_scheduler( BehaviorSchedulerPtr( new BehaviorSchedulerConstantSpeed( startTime, readyTime, strokeTime, relaxTime, endTime, 1 ) ) );
 }
@@ -1128,16 +1152,16 @@ bool SequenceRequest::unschedule_sequence( mcuCBHandle* mcu )
 
 //  VisemeRequest
 //    (no transition/blend yet)
-VisemeRequest::VisemeRequest( const std::string& unique_id, const char *viseme, float weight, time_sec duration,
+VisemeRequest::VisemeRequest( const std::string& unique_id, const std::string& localId, const char *viseme, float weight, time_sec duration,
                               const BehaviorSyncPoints& syncs_in )
-:	SequenceRequest( unique_id, syncs_in,
+:	SequenceRequest( unique_id, localId, syncs_in,
                      /* Default Timing */ 0, 0, 0, duration, duration ),
     viseme(viseme), weight(weight), duration(duration)
 {}
 
-VisemeRequest::VisemeRequest( const std::string& unique_id, const char *viseme, float weight, time_sec duration,
+VisemeRequest::VisemeRequest( const std::string& unique_id, const std::string& localId, const char *viseme, float weight, time_sec duration,
                               const BehaviorSyncPoints& syncs_in, float rampup, float rampdown )
-:	SequenceRequest( unique_id, syncs_in,
+:	SequenceRequest( unique_id, localId, syncs_in,
                      /* Default Timing */ 0, 0, 0, duration, duration ),
     viseme(viseme), weight(weight), duration(duration), rampup(rampup), rampdown(rampdown)
 {}

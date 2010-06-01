@@ -34,7 +34,7 @@ namespace SmartBody
 
 class AudioFileSpeech : public SpeechInterface
 {
-   private:
+   public:
       struct SpeechRequestInfo
       {
          std::vector< VisemeData > visemeData;
@@ -63,6 +63,7 @@ class AudioFileSpeech : public SpeechInterface
       virtual char * getSpeechAudioFilename( RequestId requestId );
       virtual float getMarkTime( RequestId requestId, const XMLCh * markId );
       virtual void requestComplete( RequestId requestId );
+	  stdext::hash_map< RequestId, SpeechRequestInfo >& getSpeechRequestInfo();
 
    protected:
       virtual void ReadVisemeDataLTF( const char * filename, std::vector< VisemeData > & visemeData );

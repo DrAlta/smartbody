@@ -226,7 +226,8 @@ BML::Processor::Processor()
 	log_syncpoints( false ),
 	warn_unknown_agents( true ),
 	ct_speed_min( CONTROLLER_SPEED_MIN_DEFAULT ),
-	ct_speed_max( CONTROLLER_SPEED_MAX_DEFAULT )
+	ct_speed_max( CONTROLLER_SPEED_MAX_DEFAULT ),
+	requestcb(NULL)
 {
 	try {
 		xmlParser = boost::shared_ptr<XercesDOMParser>( new XercesDOMParser() );
@@ -244,6 +245,13 @@ BML::Processor::Processor()
 		cerr << "ERROR: BML Processor:  UNKNOWN EXCEPTION DURING CONSTRUCTOR.     <<==================" << endl;
 	}
 }
+
+void BML::Processor::registerRequestCallback(void (*cb)(BmlRequest* request, void* data), void* data)
+{
+	requestcb = cb;
+	requestData = data;
+}
+
 
 
 BML::Processor::~Processor()
@@ -266,12 +274,13 @@ BmlRequestPtr BML::Processor::createBmlRequest(
 #if USE_RECIPIENT
 	const std::string & recipientId,
 #endif
-	const std::string & msgId )
+	const std::string & msgId,
+	const DOMDocument* xmlDoc)
 {
 #if USE_RECIPIENT
 	BmlRequestPtr request( new BmlRequest( agent, actorId, requestId, recipientId, msgId ) );
 #else
-	BmlRequestPtr request( new BmlRequest( agent, actorId, requestId, msgId ) );
+	BmlRequestPtr request( new BmlRequest( agent, actorId, requestId, msgId, xmlDoc) );
 #endif
 	request->init( request );  // passes the smart pointer back to BmlRequest so is can create a weak copy for later use.
 
@@ -313,16 +322,21 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
 #if USE_RECIPIENT
 		BmlRequestPtr request( createBmlRequest( bpMsg.actor, bpMsg.actorId, bpMsg.requestId, string(bpMsg.recipientId), string(bpMsg.msgId) ) );
 #else
-		BmlRequestPtr request( createBmlRequest( bpMsg.actor, bpMsg.actorId, bpMsg.requestId, string(bpMsg.msgId) ) );
+		BmlRequestPtr request( createBmlRequest( bpMsg.actor, bpMsg.actorId, bpMsg.requestId, string(bpMsg.msgId), xml ) );
 #endif
 		try {
   			parseBML( bmlElem, request, mcu );
 			bml_requests.insert( make_pair( bpMsg.requestId, request ) );
-
+			
+		
 			if( !( request->speech_request ) ) {
 				// realize immediately
 				request->realize( this, mcu );
 			}
+
+			//if (requestcb)
+			//	requestcb(request.get(), requestData);
+
 		} catch( BML::ParsingException& e ) {
 			ostringstream oss;
 			oss << e.type() << ": " << e.what();
@@ -351,7 +365,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 			string unique_id = request->buildUniqueBehaviorId( tag, id, ++behavior_ordinal );
 
 			// Load SyncPoint references
-			BehaviorSyncPoints behav_syncs;  // TODO: rename (previous this was a TimeMarkers class)
+			BehaviorSyncPoints behav_syncs;  // TODO: rename (previous this was a TimeMarkers class)			
 			behav_syncs.parseStandardSyncPoints( child, request, unique_id );
 
 			BehaviorRequestPtr behavior;
@@ -523,6 +537,12 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCB
 }
 
 BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+	
+	const XMLCh* id = elem->getAttribute(ATTR_ID);
+	std::string localId;
+	if (id)
+		localId = XMLString::transcode(id);
+
 	const XMLCh* postureName = elem->getAttribute( ATTR_POSTURE );
 	if( postureName && XMLString::stringLen( postureName ) ) {
 		// Look up pose
@@ -535,7 +555,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 			poseCt->init( *posture );
 			poseCt->name( posture->name() );  // TODO: include BML act and behavior ids
 
-			return BehaviorRequestPtr( new PostureRequest( unique_id, poseCt, 1, request->actor, behav_syncs ) );
+			return BehaviorRequestPtr( new PostureRequest( unique_id, localId, poseCt, 1, request->actor, behav_syncs ) );
 		} else {
 			// Check for a motion (a motion texture, or motex) of the same name
 			SkMotion* motion = mcu->motion_map.lookup( pose_id );
@@ -545,7 +565,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 				motionCt->name( motion->name() );  // TODO: include BML act and behavior ids
 				motionCt->loop( true );
 
-				PostureRequest * posture_new = new PostureRequest( unique_id, motionCt, 1, request->actor, behav_syncs );
+				PostureRequest * posture_new = new PostureRequest( unique_id, localId, motionCt, 1, request->actor, behav_syncs );
 				posture_new->set_persistent(true);
 
 				return BehaviorRequestPtr( posture_new );
@@ -561,7 +581,13 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 }
 
 BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
-    const XMLCh* tag      = elem->getTagName();
+	
+	const XMLCh* id = elem->getAttribute(ATTR_ID);
+	std::string localId;
+	if (id)
+		localId = XMLString::transcode(id);
+	
+	const XMLCh* tag      = elem->getTagName();
 	const XMLCh* attrType = elem->getAttribute( ATTR_TYPE );
 	if( attrType && XMLString::stringLen( attrType ) ) {
         int type = -1;
@@ -596,6 +622,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
                 float duration = velocity * repeats;
 
                 return BehaviorRequestPtr( new NodRequest( unique_id,
+														   localId,
 				                                           (NodRequest::NodType) type,
 												           repeats, velocity, amount, 
                                                            request->actor,

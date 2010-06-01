@@ -76,6 +76,7 @@ namespace BML {
 		const std::string    recipientId;
 #endif
 		const std::string    msgId;
+		const XERCES_CPP_NAMESPACE::DOMDocument*		 doc;
 
 		VecOfTriggerEvent    triggers;
 		TriggerEventPtr      start_trigger;
@@ -102,9 +103,9 @@ namespace BML {
 
 	protected:
 #if VRAGENTBML_USES_RECIPIENT
-		BmlRequest( const SbmCharacter* agent, const std::string& actorId, const std::string& requestId, const std::string& recipientId, const std::string & msgId );
+		BmlRequest( const SbmCharacter* agent, const std::string& actorId, const std::string& requestId, const std::string& recipientId, const std::string & msgId, const XERCES_CPP_NAMESPACE::DOMDocument* doc );
 #else
-		BmlRequest( const SbmCharacter* agent, const std::string& actorId, const std::string& requestId, const std::string & msgId );
+		BmlRequest( const SbmCharacter* agent, const std::string& actorId, const std::string& requestId, const std::string & msgId, const  XERCES_CPP_NAMESPACE::DOMDocument* doc );
 #endif
 		void init( BmlRequestPtr self );
 
@@ -169,6 +170,7 @@ namespace BML {
     //  Data
 	public:
 		const std::string         unique_id;
+		const std::string         local_id;
 		bool                      required;
 		BehaviorSyncPoints behav_syncs;
 		BehaviorSchedulerPtr      scheduler;
@@ -179,10 +181,11 @@ namespace BML {
     ///////////////////////////////////////////////////////////////////
     //  Methods
 	public:
-		BehaviorRequest( const std::string& unique_id, const BehaviorSyncPoints& behav_syncs );
+		BehaviorRequest( const std::string& unique_id, const std::string& local_id, const BehaviorSyncPoints& behav_syncs );
 		virtual ~BehaviorRequest();
 
 		void set_scheduler( BehaviorSchedulerPtr scheduler );
+		BehaviorSchedulerPtr get_scheduler();
 
 		/**
 		 *  Schedules the behavior's SyncPoints, returning the earliest time (usually the start time).
@@ -255,7 +258,7 @@ namespace BML {
 	public:
 		enum SchduleType { LINEAR, MANUAL };
 
-	protected: // Data
+	public: ///// Methods
 		/** Controller holding the source of the animation (not necessarily a motion or animation). */
 		MeController*            anim_ct;
 		/** The schedule controller the animation was added to. */
@@ -263,8 +266,8 @@ namespace BML {
 
 		bool                     persistent;
 
-	public: ///// Methods
 		MeControllerRequest( const std::string& unique_id,
+						     const std::string& local,
 		                     MeController *anim_ct,
 							 MeCtSchedulerClass* schedule_ct,
 			                 const BehaviorSyncPoints& behav_syncs,
@@ -317,7 +320,7 @@ namespace BML {
 
 	class MotionRequest : public MeControllerRequest {
 	public:
-		MotionRequest( const std::string& unique_id, MeCtMotion* motion_ct, MeCtSchedulerClass* schedule_ct,
+		MotionRequest( const std::string& unique_id, const std::string& localId, MeCtMotion* motion_ct, MeCtSchedulerClass* schedule_ct,
 			           const BehaviorSyncPoints& behav_syncs );
 	};
 
@@ -333,7 +336,7 @@ namespace BML {
         const float extent;    // % of full extension
 
 	public: ///// Methods
-		NodRequest( const std::string& unique_id, NodType type, float repeats, float frequency, float extent, const SbmCharacter* actor,
+		NodRequest( const std::string& unique_id, const std::string& localId, NodType type, float repeats, float frequency, float extent, const SbmCharacter* actor,
 			        const BehaviorSyncPoints& behav_syncs );
 	};
 
@@ -343,7 +346,7 @@ namespace BML {
         time_sec transitionDuration;
 
 	public: ///// Methods
-		TiltRequest( const std::string& unique_id, MeCtSimpleTilt* tilt, time_sec transitionDuration, const SbmCharacter* actor,
+		TiltRequest( const std::string& unique_id, const std::string& localId, MeCtSimpleTilt* tilt, time_sec transitionDuration, const SbmCharacter* actor,
 			         const BehaviorSyncPoints& behav_syncs );
 	};
 
@@ -352,13 +355,13 @@ namespace BML {
         time_sec duration;
         time_sec transitionDuration;
 
-		PostureRequest( const std::string& unique_id, MeController* pose, time_sec transitionDuration, const SbmCharacter* actor,
+		PostureRequest( const std::string& unique_id, const std::string& localId, MeController* pose, time_sec transitionDuration, const SbmCharacter* actor,
 			            const BehaviorSyncPoints& behav_syncs );
 	};
 
 	class SequenceRequest : public BehaviorRequest {
 	protected:
-		SequenceRequest( const std::string& unique_id, const BehaviorSyncPoints& behav_syncs,
+		SequenceRequest( const std::string& unique_id, const std::string& localId, const BehaviorSyncPoints& behav_syncs,
 						 time_sec startTime, time_sec readyTime, time_sec strokeTime, time_sec relaxTime, time_sec endTime );
 
 	public:
@@ -396,10 +399,10 @@ namespace BML {
 		float		rampdown;
 
 	public:
-		VisemeRequest( const std::string& unique_id, const char *viseme, float weight, time_sec duration,
+		VisemeRequest( const std::string& unique_id, const std::string& localId, const char *viseme, float weight, time_sec duration,
 			           const BehaviorSyncPoints& behav_syncs );
 
-		VisemeRequest( const std::string& unique_id, const char *viseme, float weight, time_sec duration,
+		VisemeRequest( const std::string& unique_id, const std::string& localId, const char *viseme, float weight, time_sec duration,
 			           const BehaviorSyncPoints& behav_syncs, float rampup, float rampdown);
 
         void setVisemeName( const char* viseme );

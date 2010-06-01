@@ -31,6 +31,7 @@
 #include "me_ct_quick_draw.h"
 #include "bml_target.hpp"
 #include "xercesc_utils.hpp"
+#include <sbm/bml_xml_consts.hpp>
 
 
 #define DEBUG_DESCRIPTION_LEVELS	(0)
@@ -62,6 +63,11 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 											 mcuCBHandle *mcu )
 {
     const XMLCh* tag      = elem->getTagName();
+
+	const XMLCh* id = elem->getAttribute(ATTR_ID);
+	std::string localId;
+	if (id)
+		localId = XMLString::transcode(id);
 
 	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
 	if( !attrTarget || !XMLString::stringLen( attrTarget ) ) {
@@ -175,5 +181,5 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 	if( set_aim_offset_param ) qdraw_ct->set_aim_offset( aim_offset_p, aim_offset_h, aim_offset_r );
 	if( set_smooth_param ) qdraw_ct->set_smooth( smooth_factor );
 
-	return BehaviorRequestPtr( new MeControllerRequest( unique_id, qdraw_ct, request->actor->motion_sched_p, behav_syncs ) );
+	return BehaviorRequestPtr( new MeControllerRequest( unique_id, localId, qdraw_ct, request->actor->motion_sched_p, behav_syncs ) );
 }

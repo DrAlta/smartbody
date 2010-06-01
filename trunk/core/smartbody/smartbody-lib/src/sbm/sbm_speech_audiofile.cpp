@@ -186,6 +186,8 @@ const vector<VisemeData *> * AudioFileSpeech::getVisemes( RequestId requestId )
 
 char * AudioFileSpeech::getSpeechPlayCommand( RequestId requestId, const SbmCharacter * character )
 {
+	if (!character)
+		return NULL;
    // TODO: Wrap up this SASO/PlaySound specific audio command string generation
    // into a class that can abstracted and shared between speech implementations.
    // The SpeechInterface should only need to provide the audio filename.
@@ -478,4 +480,9 @@ void AudioFileSpeech::ReadSpeechTiming( const char * filename, stdext::hash_map<
 
       timeMarkers[ id ] = (float)atof( time.c_str() );
    }
+}
+
+stdext::hash_map< RequestId, AudioFileSpeech::SpeechRequestInfo >& AudioFileSpeech::getSpeechRequestInfo()
+{
+	return m_speechRequestInfo;
 }
