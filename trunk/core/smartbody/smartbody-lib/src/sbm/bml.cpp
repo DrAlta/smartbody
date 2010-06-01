@@ -348,7 +348,9 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 	}
 
 	// callback for BML requests
-	bp->requestcb(this, bp->requestData);
+	if (bp->requestcb)
+		bp->requestcb(this, bp->requestData);
+
 	BmlRequestPtr request = weak_ptr.lock();
 
 
