@@ -66,6 +66,7 @@ protected:
 	SrArray<float> speed_list;
 	int curr_dest_index;
 	SrVec dis_to_dest;
+	SrVec dis_to_dest_local;
 	bool reached_destination;
 
 	SrVec local_vel;
@@ -113,6 +114,7 @@ public:
 	SrVec get_local_velocity();
 	SrVec get_target_local_velocity();
 	SrVec get_dis_to_dest();
+	SrVec get_dis_to_dest_local();
 	SrVec get_world_pos();
 	float get_facing_angle();
 	float get_pre_facing_angle();
