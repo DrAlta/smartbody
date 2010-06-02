@@ -149,6 +149,8 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeCtLocomot
 	base_offset.set ( buffer[ bi_base_offset_x ], buffer[ bi_base_offset_y ], buffer[ bi_base_offset_z ] );
 	base_rot.set( buffer[ bi_base_rot ], buffer[ bi_base_rot+1 ], buffer[ bi_base_rot+2 ], buffer[ bi_base_rot+3 ] );
 
+
+	world_pos.y = 0.0f;
 	SrQuat t_world_rot;
 	mat.roty(pre_facing_angle);
 	t_world_rot.set(mat);
@@ -156,7 +158,8 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeCtLocomot
 	if(t_world_rot.w != world_rot.w
 		|| t_world_rot.x != world_rot.x
 		|| t_world_rot.y != world_rot.y
-		|| t_world_rot.z != world_rot.z)// if the orientation has been changed manually 
+		|| t_world_rot.z != world_rot.z
+		)// if the orientation has been changed manually 
 	{
 		pre_facing_angle = world_rot.angle();
 		mat.roty(pre_facing_angle);
@@ -219,6 +222,7 @@ inline void MeCtLocomotionNavigator::calc_target_velocity()
 				target_global_vel = dis_to_dest;
 				target_global_vel.normalize();
 				target_local_vel = target_global_vel*mat;
+				dis_to_dest_local = dis_to_dest*mat;
 				target_local_vel *= global_vel.len();
 			}
 			else
@@ -233,6 +237,11 @@ inline void MeCtLocomotionNavigator::calc_target_velocity()
 		target_global_vel = global_vel;
 		target_local_vel = local_vel;
 	}
+}
+
+SrVec MeCtLocomotionNavigator::get_dis_to_dest_local()
+{
+	return dis_to_dest_local;
 }
 
 SrVec MeCtLocomotionNavigator::get_target_local_velocity()
