@@ -51,6 +51,7 @@
 #include "bml_speech.hpp"
 #include "bml_locomotion.hpp"
 #include "bml_quickdraw.hpp"
+#include "bml_general_param.hpp"
 
 #include "me_ct_examples.h"
 #include "me_ct_gaze.h"
@@ -414,6 +415,8 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 			} else if( XMLString::compareString( tag, TAG_EVENT )==0 ) {
 				// DEPRECATED FORM
 				behavior = parse_bml_event( child, unique_id, behav_syncs, required, request, mcu );
+			} else if( XMLString::compareString( tag, TAG_PARAM )==0 ) {
+				behavior = parse_bml_param( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_SBM_EVENT )==0 ) {
 				behavior = parse_bml_event( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_QUICKDRAW )==0 ) {

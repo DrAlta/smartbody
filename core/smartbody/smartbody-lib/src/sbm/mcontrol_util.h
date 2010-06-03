@@ -78,6 +78,7 @@ class mcuCBHandle;
 
 #include <sbm/action_unit.hpp>
 #include <sbm/viseme_map.hpp>
+#include <sbm/general_param_setting.h>
 
 #include BML_PROCESSOR_INCLUDE
 
@@ -159,6 +160,8 @@ class mcuCBHandle	{
 		SkMotion*                   face_neutral_p;
 		AUMotionMap					au_motion_map;
 		VisemeMotionMap				viseme_map;
+
+		GeneralParamMap				param_map;			// map that contains the information of shader parameters
 
 		srHashMap <MeCtPose>		pose_ctrl_map;
 		srHashMap <MeCtMotion>		motion_ctrl_map;
@@ -303,7 +306,7 @@ class mcuCBHandle	{
 		SmartBody::AudioFileSpeech* speech_audiofile() { return &_speech_audiofile; }
 		text_speech* speech_text() { return &_speech_text; } // [BMLR]
 
-		void NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton * skeleton );
+		void NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton * skeleton, GeneralParamMap * param_map );
 
 		void register_viewer_factory(SrViewerFactory* factory) { 
 				if (viewer_factory != NULL) delete viewer_factory;
@@ -379,4 +382,5 @@ int mcu_wsp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 
 //////////////////////////////////////////////////////////////////
+
 #endif

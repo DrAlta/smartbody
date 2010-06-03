@@ -515,7 +515,7 @@ void mcuCBHandle::update( void )	{
 			char_p->scene_p->update();
 
 			if ( net_bone_updates && char_p->skeleton_p && char_p->bonebusCharacter ) {
-				NetworkSendSkeleton( char_p->bonebusCharacter, char_p->skeleton_p );
+				NetworkSendSkeleton( char_p->bonebusCharacter, char_p->skeleton_p, &param_map );
 
 				// what a lot of hoop jumping...
 				if ( net_world_offset_updates ) {
@@ -847,6 +847,8 @@ MeController* mcuCBHandle::lookup_ctrl( const string& ctrl_name, const char* pri
 			ctrl_p = char_p->gaze_sched_p;
 		} else if( ctrl_subname == "head_sched" ) {
 			ctrl_p = char_p->head_sched_p;
+		} else if( ctrl_subname == "param_sched" ) {
+			ctrl_p = char_p->param_sched_p;
 		} else {
 			// TODO: Character specific hash map?
 
@@ -866,7 +868,7 @@ MeController* mcuCBHandle::lookup_ctrl( const string& ctrl_name, const char* pri
 }
 
 
-void mcuCBHandle::NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton * skeleton )
+void mcuCBHandle::NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton * skeleton, GeneralParamMap * param_map )
 {
 	if ( character == NULL )
 	{
@@ -916,6 +918,41 @@ void mcuCBHandle::NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton 
 	}
 
 	character->EndSendBonePositions();
+
+	// Passing General Parameters
+	character->StartSendGeneralParameters();
+	for (int i = 0; i < joints.size(); i++)
+	{
+		SkJoint* j = joints[ i ];
+		// judge whether it is joint for general parameters, usually should have a prefix as "param"
+		string j_name = j->name();
+		int name_end_pos = j_name.find_first_of("_");
+		string test_prefix = j_name.substr( 0, name_end_pos );
+		if( test_prefix == character->m_name )	
+		{
+			// if is, prepare adding data
+			int index = 0;
+			GeneralParamMap::iterator pos;
+			for(pos = param_map->begin(); pos != param_map->end(); pos++)
+			{
+				for(int n = 0; n < pos->second->char_names.size(); n++)
+				{
+					if( character->m_name == pos->second->char_names[n] )
+					{
+						index ++;
+						for(int m = 0 ; m < pos->second->size; m++)
+						{
+							std::stringstream joint_name;
+							joint_name << character->m_name << "_" << index << "_" << ( m + 1 );
+							if(_stricmp( j->name(), joint_name.str().c_str()) == 0)
+								character->AddGeneralParameters(index, pos->second->size, j->pos()->value(0), m, time);
+						}
+					}
+				}
+			}
+		}
+	}
+	character->EndSendGeneralParameters();
 }
 
 
@@ -1380,7 +1417,7 @@ int mcu_character_init(
 
 	// Only initialize face_neutral if -facebone is enabled
 	SkMotion* face_neutral_p = mcu_p->net_face_bones? mcu_p->face_neutral_p : NULL;
-	err = char_p->init( skeleton_p, face_neutral_p, &mcu_p->au_motion_map, &mcu_p->viseme_map, unreal_class, mcu_p->use_locomotion );
+	err = char_p->init( skeleton_p, face_neutral_p, &mcu_p->au_motion_map, &mcu_p->viseme_map, &mcu_p->param_map, unreal_class, mcu_p->use_locomotion );
 	if( err == CMD_SUCCESS ) {
 
 		//if (mcu_p->use_locomotion) 
