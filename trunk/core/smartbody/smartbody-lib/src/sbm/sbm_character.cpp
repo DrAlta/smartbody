@@ -98,6 +98,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	locomotion_ct( NULL ),
 	blink_ct_p( NULL ),
 	head_sched_p( CreateSchedulerCt( character_name, "head" ) ),
+	param_sched_p( CreateSchedulerCt( character_name, "param" ) ),
 	face_ct( NULL ),
 	eyelid_ct( new MeCtEyeLid() ),
 	face_neutral( NULL )
@@ -106,6 +107,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	motion_sched_p->ref();
 	gaze_sched_p->ref();
 	head_sched_p->ref();
+	param_sched_p->ref();
 	eyelid_ct->ref();
 
 	bonebusCharacter = NULL;
@@ -123,6 +125,7 @@ SbmCharacter::~SbmCharacter( void )	{
 	if( blink_ct_p )
 		blink_ct_p->unref();
 	head_sched_p->unref();
+	param_sched_p->unref();
 	if( face_ct )
 		face_ct->unref();
 	eyelid_ct->unref();
@@ -239,6 +242,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 					    SkMotion* face_neutral,
                         const AUMotionMap* au_motion_map,
                         const VisemeMotionMap* viseme_motion_map,
+						const GeneralParamMap* param_map,
                         const char* unreal_class,
 						bool use_locomotion)
 {
@@ -249,6 +253,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	}
 	this->au_motion_map     = au_motion_map;
 	this->viseme_motion_map = viseme_motion_map;
+	this->param_map = param_map;
 
 	int init_result = SbmPawn::init( new_skeleton_p );  // Indirectly calls init_skeleton 
 	if( init_result!=CMD_SUCCESS ) {
@@ -283,12 +288,15 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	// Blink controller before head group (where visemes are controlled)
 	head_sched_p->init();
 
+	param_sched_p->init();
+
 	// Add Prioritized Schedule Controllers to the Controller Tree
 	ct_tree_p->add_controller( posture_sched_p );
 	ct_tree_p->add_controller( motion_sched_p );
 	ct_tree_p->add_controller( gaze_sched_p );
 	ct_tree_p->add_controller( blink_ct_p );
 	ct_tree_p->add_controller( head_sched_p );
+	ct_tree_p->add_controller( param_sched_p );
 	ct_tree_p->name( std::string(name)+"'s ct_tree" );
 
 	// Locomotion controller
@@ -309,6 +317,17 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	if ( mcuCBHandle::singleton().sbm_character_listener )
 	{
 		mcuCBHandle::singleton().sbm_character_listener->OnCharacterCreate( name, unreal_class );
+	}
+
+	// This needs to be tested
+	if( bonebusCharacter )
+	{
+		int index = 0;
+		GeneralParamMap::const_iterator pos = param_map->begin();
+		for ( ; pos != param_map->end(); pos++ )
+		{
+			bonebusCharacter->SetParams( pos->first.c_str(), index );
+		}
 	}
 
 	init_visemes_left_right_channels( "au_1", "unit1_inner_brow_raiser" );
@@ -489,12 +508,15 @@ SbmCharacter::VisemeImplDataPtr SbmCharacter::composite_visemes( VecVisemeImplDa
 	return data;
 }
 
-
 void SbmCharacter::add_face_channel( const string& name, const int wo_index ) {
+	add_bounded_float_channel( name, 0, 2, wo_index );
+}
+
+void SbmCharacter::add_bounded_float_channel( const string& name, float lower, float upper, const int wo_index ) {
 	SkJoint* joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
 	joint_p->name( SkJointName( name.c_str() ) );
 	// Activate channel with lower limit != upper.
-	joint_p->pos()->limits( SkJointPos::X, 0, 2 );  // Setting upper bound to 2 allows some exageration
+	joint_p->pos()->limits( SkJointPos::X, lower, upper );  // Setting upper bound to 2 allows some exageration
 }
 
 int SbmCharacter::init_skeleton() {
@@ -645,6 +667,25 @@ int SbmCharacter::init_skeleton() {
 	if( face_ct ) {
 		face_ct->finish_adding();
 	}
+
+	// Adding general parameter channels using a format of <char_name>_1_1, <char_name>_2_1, <char_name>_2_2, <char_name>_2_3...(for joint name)
+	int Index = 0;
+	for( GeneralParamMap::const_iterator pos = param_map->begin(); pos != param_map->end(); pos++ )
+	{
+		for( int m = 0; m < pos->second->char_names.size(); m++ )
+		{
+			if( pos->second->char_names[m] == string(this->name) )
+			{
+				Index ++;
+				for(int i = 0; i< pos->second->size; i++)
+				{
+					std::stringstream joint_name;
+					joint_name << this->name << "_" << Index << "_" << ( i + 1 );
+					add_bounded_float_channel( joint_name.str(), 0 , 1, wo_index );
+				}
+			}
+		}
+	}	
 
 	// Rebuild the active channels to include new joints
 	skeleton_p->make_active_channels();
@@ -1377,6 +1418,34 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		character = mcu_p->character_map.lookup( char_name.c_str() );
 	}
 
+	if( char_cmd=="param") {
+		char* param_name = args.read_token();
+		GeneralParam * new_param = new GeneralParam;
+		new_param->size = args.read_int();
+		
+		if( new_param->size == 0 )
+		{
+			printf("param_registeration ERR: parameter size not defined!\n");
+			return( CMD_FAILURE );
+		}
+		for(int i = 0 ; i < new_param->char_names.size(); i++)
+		{
+			if(char_name == new_param->char_names[i])
+			{
+				printf("param_registeration ERR: parameter redefinition!\n");
+				return( CMD_FAILURE );				
+			}
+		}
+		new_param->char_names.push_back(char_name);
+		GeneralParamMap::iterator it; 
+		if( (it = mcu_p->param_map.find(param_name)) != mcu_p->param_map.end())
+			it->second->char_names.push_back( char_name );
+		else
+			mcu_p->param_map.insert(make_pair(string(param_name),new_param));
+
+		return( CMD_SUCCESS );
+	}
+	else
 	if( char_cmd=="init" ) {
 		// Original style creation:
 		char* skel_file = args.read_token();

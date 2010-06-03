@@ -62,6 +62,7 @@
 
 #include <sbm/action_unit.hpp>
 #include <sbm/viseme_map.hpp>
+#include <sbm/general_param_setting.h>
 
 
 
@@ -95,6 +96,7 @@ protected:
 	// Face data temporary storage to pass reference into init_skeleton()
 	const AUMotionMap*     au_motion_map;
 	const VisemeMotionMap* viseme_motion_map;
+	const GeneralParamMap*   param_map;
 
 	// Evaluation time face data
 	SkMotion*         face_neutral;
@@ -131,6 +133,7 @@ public:
 	          SkMotion* face_neutral,
 	          const AUMotionMap* fac_map,
 			  const VisemeMotionMap* viseme_map,
+			  const GeneralParamMap* param_map,
 			  const char* unreal_class,
 			  bool use_locomotion );
 
@@ -169,6 +172,7 @@ public:
 	// TODO: Arms
 	// TODO: Hands
 	MeCtSchedulerClass*	head_sched_p; // neck / head orientation
+	MeCtSchedulerClass*	param_sched_p; // general parameters
 
 	BoneBusCharacter * bonebusCharacter;
 	
@@ -278,6 +282,12 @@ protected:
 	VisemeImplDataPtr composite_visemes( std::vector<VisemeImplDataPtr> visemes );
 
 	int set_world_offset_cmd( srArgBuffer& args );
+
+	/*!
+	 *  Adds a single float channel, bounded by lower and upper limits.
+	 */
+	void add_bounded_float_channel( const std::string & name, float lower, float upper, const int wo_index );
+
 
 	/*!
 	 *   Adds a joint of given name with XPos activated
