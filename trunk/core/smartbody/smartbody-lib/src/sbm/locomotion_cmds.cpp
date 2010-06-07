@@ -297,7 +297,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 					g_angular_index = channels.size();
 					//channels.add( SkJointName( SbmCharacter::LOCOMOTION_GLOBAL_ROTATION ), SkChannel::YPos );
 				}
-				g_angular = RAD(args.read_float());
+				g_angular = (float)RAD(args.read_float());
 				//data[ g_angular_index ] = g_angular;
 				if( l_angular_index == -1 ) {
 					l_angular_index = channels.size();

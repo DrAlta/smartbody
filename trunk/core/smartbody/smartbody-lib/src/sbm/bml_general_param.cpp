@@ -71,7 +71,7 @@ BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& un
 	for(; pos!= end; pos++)
 	{
 		if( flag == 1 ) break;
-		for(int i = 0 ; i < pos->second->char_names.size(); i++)
+		for(int i = 0 ; i < (int)pos->second->char_names.size(); i++)
 		{
 			if( pos->second->char_names[i] == char_name)
 			{
@@ -103,7 +103,7 @@ BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& un
 			wcerr<<"WARNING: The input value size is invalid! Size is smaller than required\n"<<endl;
 			return BehaviorRequestPtr();
 		}
-		Data_Array[i] = atof(pch);
+		Data_Array[i] = (float)atof(pch);
 		pch =(strtok(NULL," "));
 		std::stringstream joint_name;
 		joint_name << char_name << "_" << Index << "_" << ( i + 1 );

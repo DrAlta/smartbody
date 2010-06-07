@@ -672,7 +672,7 @@ int SbmCharacter::init_skeleton() {
 	int Index = 0;
 	for( GeneralParamMap::const_iterator pos = param_map->begin(); pos != param_map->end(); pos++ )
 	{
-		for( int m = 0; m < pos->second->char_names.size(); m++ )
+		for( int m = 0; m < (int)pos->second->char_names.size(); m++ )
 		{
 			if( pos->second->char_names[m] == string(this->name) )
 			{
@@ -1428,7 +1428,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			printf("param_registeration ERR: parameter size not defined!\n");
 			return( CMD_FAILURE );
 		}
-		for(int i = 0 ; i < new_param->char_names.size(); i++)
+		for(int i = 0 ; i < (int)new_param->char_names.size(); i++)
 		{
 			if(char_name == new_param->char_names[i])
 			{
