@@ -935,7 +935,7 @@ void mcuCBHandle::NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton 
 			GeneralParamMap::iterator pos;
 			for(pos = param_map->begin(); pos != param_map->end(); pos++)
 			{
-				for(int n = 0; n < pos->second->char_names.size(); n++)
+				for(int n = 0; n < (int)pos->second->char_names.size(); n++)
 				{
 					if( character->m_name == pos->second->char_names[n] )
 					{
