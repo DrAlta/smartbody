@@ -24,15 +24,29 @@
 #define BML_LOCOMOTION_HPP
 
 #include "bml.hpp"
+#include "me_ct_navigation_circle.hpp"
 
+#define BML_LOCOMOTION_TARGET_TYPE_UNKNOWN -1
+#define BML_LOCOMOTION_TARGET_TYPE_TARGET 0 
+#define BML_LOCOMOTION_TARGET_TYPE_DIRECTION 1 
 
 // Forward Declaration
 class mcuCBHandle;
 
-namespace BML {
+
+#pragma once
+
+namespace BML 
+{
 	const XMLCh TAG_LOCOTMOTION[] = L"locomotion";
 
+	namespace Locomotion
+	{
+		void parse_routine(DOMElement* elem, BmlRequestPtr request, int type, int id);
+	};
+
 	BML::BehaviorRequestPtr parse_bml_locomotion( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
+
 };
 
 
