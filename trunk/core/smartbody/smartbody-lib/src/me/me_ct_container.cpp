@@ -42,12 +42,13 @@ void MeCtContainer::Context::add_controller( MeController* child ) {
 
 	if( _container && _container->active() ) {
 		child->remap();
-		child->start();
+		child->start(-1);
 	}
 }
 
 void MeCtContainer::Context::remove_controller( MeController* child ) {
 	child->ref();
+	child->stop(-1);
 	if( _container && _container->remove_child( child ) )
 		MeControllerContext::remove_controller( child );
 	child->unref();
@@ -95,7 +96,7 @@ void MeCtContainer::controller_start() {
 			// Temporary variable to inspect during debugging
 			const char* child_type = child->controller_type();
 
-			child->start();
+			child->start(-1);
 		}
 	}
 }
@@ -105,6 +106,6 @@ void MeCtContainer::controller_stop() {
 	for( unsigned int i=0; i<child_count; ++i ) {
 		MeController* child = this->child( i );
 		if( child )
-			child->stop();
+			child->stop(-1);
 	}
 }

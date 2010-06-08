@@ -30,11 +30,11 @@
 #include <SR/sr_quat.h>
 #include <SR/sr_euler.h>
 #include <ME/me_prune_policy.hpp>
-
+#include <sbm/ResourceManager.h>
 
 using namespace std;
 
-#define WARN_ON_INVALID_BUFFER_INDEX (0)
+#define WARN_ON_INVALID_BUFFER_INDEX (1)
 #define TRACE_REMAP_CHANNELS         (0)
 
 
@@ -57,7 +57,9 @@ MeController::MeController ()
 	_lastEval( -1 ),  // effectively unset.. should really be a less likely value like NaN
 	_prune_policy( new MeDefaultPrunePolicy() ),
 	_context( NULL ),
- 	_record_output( NULL ) // for recording poses and motions of immediate local results
+ 	_record_output( NULL ), // for recording poses and motions of immediate local results
+	_startTime(-1),
+	_stopTime(-1)
 {
 	_instance_id = instance_count;
 	instance_count ++;
@@ -76,7 +78,7 @@ MeController::MeController ()
 MeController::~MeController () {
 	//assert( _context==NULL );  // Controller should not be deleted if still referenced by context
 	stop_record();
-	
+
 	if(_frames)	delete _frames;
 
 	if( _prune_policy ) {
@@ -161,19 +163,45 @@ void MeController::prune_policy( MePrunePolicy* prune_policy ) {
 }
 
 
-void MeController::start () {
+void MeController::start (double time) {
 
+	// add the controller resource as 'start'
+	ControllerResource* cres = new ControllerResource();
+	cres->setControllerName(this->name());
+	cres->setType("start");
+	ResourceManager::getResourceManager()->addResource(cres);
+	
 	_active = true;
 	controller_start ();
+	_startTime = time;
 }
 
-void MeController::stop () {
+double MeController::start_time ()
+{
+	return _startTime;
+}
 
+void MeController::stop (double time) {
+
+	// add the controller resource as 'stop'
+	ControllerResource* cres = new ControllerResource();
+	cres->setControllerName(this->name());
+	cres->setType("stop");
+	ResourceManager::getResourceManager()->addResource(cres);
+	
 	_active = false;
 	stop_record();
 	controller_stop ();
+	_stopTime = time;
+
 // printf( ">>> MeController::stop <<<\n" );
 }
+
+double MeController::stop_time ()
+{
+	return _stopTime;
+}
+
 
 void MeController::remap() {
 #if TRACE_REMAP_CHANNELS
@@ -227,6 +255,54 @@ void MeController::remap() {
 #if TRACE_REMAP_CHANNELS
 	std::cout << "========= Exiting MeController::remap() for " << controller_type() << " \"" << name() << "\" ==" << std::endl;
 #endif
+}
+
+int MeController::getContextChannel(int index)
+{
+	return _toContextCh[index];
+}
+
+
+void MeController::dumpChannelMap()
+{
+	SkChannelArray& localChnls = controller_channels();
+	int size = localChnls.size();
+	_toContextCh.size( size );
+
+	SkChannelArray& contextChnls = _context->channels();
+	for( int i=0; i<size; ++i ) {
+		SkJointName name = localChnls.name( i );
+		SkChannel::Type type = localChnls.type( i );
+		//_toContextCh[i] = contextChnls.search( name, type );
+
+		int parent_index = _toContextCh[i];
+		if( parent_index >= 0 ) {
+#if WARN_ON_INVALID_BUFFER_INDEX
+			// WARN for invalid parent context buffer indices
+			if( _context->toBufferIndex( parent_index ) < 0 ) {
+				const char* parent_ch_type = SkChannel::type_name( _context->channels().type( parent_index ) );
+				const char* parent_ch_name = (const char*)(_context->channels().name( parent_index ));
+				std::cerr << "WARNING: MeController::remap(): "<<controller_type()<<" \""<<this->name()<<"\": "
+					<<_context->context_type()<<" channel "<<parent_index<<", \""<<parent_ch_name<<"\" ("<<parent_ch_type<<") lacks valid buffer index!!" << std::endl;
+			}
+#endif
+
+			// Get a reference to the channel to inspect via debugger
+			const char*     local_ch_name = name.get_string();
+			SkChannel::Type parent_ch_type = _context->channels().type( parent_index );
+			const char*     parent_ch_name = (const char*)(_context->channels().name( parent_index ));
+
+			// Print it out...
+			std::cout << "L#"<< i << "\t-> P#"<<parent_index<<"\t\t"<<local_ch_name<<" ("<<SkChannel::type_name(type)<<")"<< std::endl;
+
+			if( strcmp( local_ch_name, parent_ch_name ) || (type != parent_ch_type ) ) {
+				std::cerr << "ERROR: MeController::remap(): " << controller_type() << " \"" << _name << "\" :"
+					<< " Local \"" << local_ch_name << "\" " << SkChannel::type_name(type) << " != "
+					<< " Parent \"" << parent_ch_name << "\" " << SkChannel::type_name(parent_ch_type) << std::endl;
+			}
+
+		}
+	}
 }
 
 void MeController::evaluate ( double time, MeFrameData& frame ) {
@@ -634,41 +710,54 @@ void MeController::record_buffer_changes(bool val)
 
 void MeController::cal_buffer_changes( MeFrameData& frame)
 {
+
 	if (_buffer_changes_toggle_reset)
 	{
-			// reset the buffer changes
-		_buffer_changes = frame.buffer();
-		for (int i = 0; i < _buffer_changes.size(); i++)
-			_buffer_changes[i] = 0;
-		_buffer_changes_toggle_reset = false;
-	}
-
-	SrBuffer<float>& buff = frame.buffer();
-	SkChannelArray& channelsInUse = this->controller_channels();
-	int channels_size = channelsInUse.size();
-	for( int i = 0 ; i < channels_size; i++ )
-	{
-		SkChannel& channel = channelsInUse.get(i);
-		int channelSize = channel.size();
-		int channelIndex = _toContextCh[ i ];
-		int bufferIndex = frame.toBufferIndex(channelIndex);
-		if (1)// frame.isChannelUpdated(channelIndex) )
+		SkChannelArray& channelsInUse = this->controller_channels();
+		int bufferSize = channelsInUse.floats();
+		if (_bufferRecord.size() != bufferSize)
 		{
-			for (int j = 0; j < channelSize; j++)
-			{
-				float val = frame.buffer()[bufferIndex + j];
-				_buffer_changes[bufferIndex + j] = val;
-			}
+			_bufferRecord.resize(bufferSize);
+		}
+		for (int x = 0; x < bufferSize; x++)
+		{
+			_bufferRecord[x] = 0.0;
 		}
 	}
 
+	SkChannelArray& channelsInUse = this->controller_channels();
+	int bufferSize = channelsInUse.floats();
+	if (_bufferRecord.size() != bufferSize)
+	{
+		_bufferRecord.resize(bufferSize);
+	}
+	int curIndex = 0;
+	int numChannels = channelsInUse.size();
+	for( int i = 0 ; i < numChannels; i++ )
+	{
+		SkChannel& channel = channelsInUse.get(i);
+		int channelIndex = _toContextCh[ i ];
+		int bufferIndex = frame.toBufferIndex(channelIndex);
+		if (bufferIndex < 0)
+			continue;
+
+		int channelSize = channel.size();
+		for (int j = 0; j < channelSize; j++)
+		{
+			float val = frame.buffer()[bufferIndex + j];
+			_bufferRecord[curIndex + j] = val;
+		}
+		curIndex += channelSize;
+    }
+
 }
 
 
-SrBuffer<float>& MeController::get_buffer_changes()
+std::vector<float>& MeController::get_buffer_changes()
 {
-	return _buffer_changes;
+	return _bufferRecord;
 }
+
 
 
 void MeController::output ( SrOutput& o )

@@ -228,7 +228,44 @@ std::string MotionResource::getType()
 std::string MotionResource::dump()
 {
 	std::stringstream stream;
-	stream << "MotionFile["<<type<<"]: " << motionFile;
+	stream << "MotionFile ["<<type<<"]: " << motionFile;
+	stream << Resource::dump();
+	return stream.str();	
+}
+
+
+ControllerResource::ControllerResource()
+{
+}
+
+ControllerResource::~ControllerResource()
+{
+}
+
+void ControllerResource::setControllerName(std::string cname)
+{
+	controllerName = cname;
+}
+
+std::string ControllerResource::getControllerName()
+{
+	return controllerName;
+}
+
+void ControllerResource::setType(std::string t)
+{
+	type = t;
+}
+		
+std::string ControllerResource::getType()
+{
+	return type;
+}
+
+std::string ControllerResource::dump()
+{
+	std::stringstream stream;
+	stream << "Controller [" << controllerName << "]: " << type;
 	stream << Resource::dump();
 	return stream.str();	
 }

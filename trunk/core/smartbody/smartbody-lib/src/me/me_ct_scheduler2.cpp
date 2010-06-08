@@ -286,7 +286,7 @@ MeCtScheduler2::MeCtScheduler2 ()
 }
 
 MeCtScheduler2::~MeCtScheduler2 () {
-   stop ();
+   stop (-1);
    _sub_sched_context->unref();
 }
 

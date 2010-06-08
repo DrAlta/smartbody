@@ -97,5 +97,24 @@ class MotionResource : public Resource		// General motion file resources with [S
 		std::string motionFile;
 };
 
+class ControllerResource : public Resource		
+{
+	public:
+		ControllerResource();
+		~ControllerResource();
+
+		void setControllerName(std::string cname);
+		std::string getControllerName();
+
+		void setType(std::string t);
+		std::string getType();
+
+		std::string dump();
+
+	protected:
+		std::string controllerName;
+		std::string type;
+};
+
 
 #endif
