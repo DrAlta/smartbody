@@ -85,6 +85,8 @@ public:
 	//! Channel name for the body orientation target, stored in the joint position channels
 	static const char* ORIENTATION_TARGET;
 
+	MeCtLocomotionClass* locomotion_ct;
+
 protected:
 	// Private Data
 
@@ -103,7 +105,7 @@ protected:
 	AUChannelMap      au_channel_map;
 	VisemeMotionMap   viseme_map;
 	MeCtLocomotionAnalysis* locomotion_ct_analysis;
-	MeCtLocomotionClass* locomotion_ct;
+	
 	MeCtFace*         face_ct;
 	MeCtEyeLid*       eyelid_ct;
 
