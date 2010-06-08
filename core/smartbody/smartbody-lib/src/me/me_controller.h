@@ -27,6 +27,7 @@
 
 #include <string>
 #include <list>
+#include <vector>
 
 #include <SR/sr_hash_table.h>
 #include <SR/sr_buffer.h>
@@ -88,6 +89,8 @@ private :
     float _emphasist;         // time point of "main importance" in the controller
     bool _active;             // if the controller is still active
     double _lastEval;         // time at which the controller was evaluated last
+	double _startTime;		  // time when the controller was started
+	double _stopTime;         // time when the controller was stopped
 
 	MePrunePolicy* _prune_policy;  // controller tree pruning policy for this controller
 
@@ -128,7 +131,7 @@ protected :
 
 	// debugging: recording controller's MeFrameData, inspecting the changes each controller make on the buffer data 
 	bool			_buffer_changes_toggle;			// toggle, whenever it's being called, recording the changes that evaluation make
-	SrBuffer<float> _buffer_changes;				// data containing the changes made each time inside the controller evaluation
+	std::vector<float>	_bufferRecord;              // data containing the changes made each time inside the controller evaluation
 	bool			_buffer_changes_toggle_reset;	// flag to initialize the buffer_changes
 protected :
     /*! Constructor */
@@ -230,11 +233,17 @@ public :
 	void prune_policy( MePrunePolicy* prune_policy );
 
     /*! This method is to be called before starting to evaluate the controller. */
-    void start ();
+    void start (double time);
+
+	/*! Returns the time that when this controller was started. */
+    double start_time ();
 
     /*! This method will simply set the active flag of the controller to false and
         notify the derived class by calling the virtual method controller_stop(). */
-    void stop ();
+    void stop (double time);
+
+	/*! Returns the time that when this controller was stopped. */
+    double stop_time ();
 
 	/*!
      *  /brief Update _toContextCh with current _channels and _context.
@@ -245,6 +254,11 @@ public :
 	 *  saved as -1.  Called by _context when _context.channels() is updated.
      */
     void remap();
+
+	/*!
+	* Map from the local channels to the context.
+	*/
+	int getContextChannel(int index);
    
     /*! Evaluates the controller at a local time t. */ 
     void evaluate ( double t, MeFrameData& frame );
@@ -258,13 +272,16 @@ public :
 
 	/*! Evaluates the controller changes */
 	void record_buffer_changes(bool val);				    // store the values of all channels changed by this controller
-	SrBuffer<float>& get_buffer_changes();					// gets the channel data changed by this controller
+	/*SrBuffer<float>& get_buffer_changes();					// gets the channel data changed by this controller*/
+	std::vector<float>& get_buffer_changes();
 	bool is_record_buffer_changes() { return _buffer_changes_toggle; }
 
 #if ME_CONTROLLER_ENABLE_XMLIFY
 	/*! Serialize state (or most of it) to a single XML element for later analysis. */
 	DOMElement* xmlify( DOMDocument* doc ) const;
 #endif // ME_CONTROLLER_ENABLE_XMLIFY
+
+	void dumpChannelMap();
 
    protected :
 

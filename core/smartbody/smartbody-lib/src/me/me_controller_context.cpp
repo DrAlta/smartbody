@@ -52,7 +52,7 @@ void MeControllerContext::add_controller( MeController* ct ) {
 
 void MeControllerContext::remove_controller( MeController* ct ) {
 	if( ct->active() )
-		ct->stop();
+		ct->stop(-1);
 
 	ct->_context = NULL;
 	// No unref().  Contexts refs controllers, not vice versa.

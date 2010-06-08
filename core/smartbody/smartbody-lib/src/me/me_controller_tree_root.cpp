@@ -32,7 +32,7 @@
 
 #include <SR/sr.h>
 #include <SK/sk_channel_array.h>
-
+#include <sbm/ResourceManager.h>
 
 using namespace std;
 
@@ -146,7 +146,7 @@ struct RemapAndActivate_Func {
 	void operator() ( controller_ptr& ct ){
 		ct->remap();
 		if( !ct->active() ) {
-			ct->start();
+			ct->start(-1);
 		}
 	}
 };
@@ -330,8 +330,16 @@ public:
 
 		if( _state==VALID ) {
 			ct->remap();
-			ct->start();
+			ct->start(-1);
 		}
+	}
+
+	/**
+	 *	Removes a controller from the controller tree.
+	 */
+	void remove_controller( MeController* ct )
+	{	
+		MeControllerContext::remove_controller( ct );
 	}
 
 

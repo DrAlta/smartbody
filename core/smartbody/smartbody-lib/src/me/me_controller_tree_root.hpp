@@ -111,8 +111,7 @@ public:
 	/**
 	 *  Public variant of MeControllerContext::remove_controller(..).
 	 */
-	virtual void remove_controller( MeController* ct )
-	{	MeControllerContext::remove_controller( ct );	}
+	virtual void remove_controller( MeController* ct ) = 0;
 
 	/**
 	 * Clears the tree of all controller and skeleton references.

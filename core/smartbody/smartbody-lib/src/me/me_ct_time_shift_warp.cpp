@@ -58,8 +58,8 @@ double MeCtTimeShiftWarp::controller_duration() {
 
 bool MeCtTimeShiftWarp::controller_evaluate( double t, MeFrameData & frame ) {
 	if( child() ) {
-		t = _time_func( t );
-		child()->evaluate( t, frame );
+		double warpTime = _time_func( t );
+		child()->evaluate( warpTime, frame );
 		return true;
 	} else {
 		return false;
