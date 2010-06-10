@@ -35,8 +35,9 @@
 #include <string>
 #include <vector>
 
-#include <FL/Fl.H>
+//#include <FL/Fl.H>
 #include "fltk_viewer.h"
+#include "BehaviorWindow.h"
 #include "wsp.h"
 
 #include <sbm/sbm_constants.h>
@@ -267,6 +268,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "test",			mcu_test_func );
 
 	mcu.insert( "viewer",		mcu_viewer_func );
+	mcu.insert( "bmlviewer",    mcu_bmlviewer_func);
 	mcu.insert( "camera",		mcu_camera_func );
 	mcu.insert( "time",		mcu_time_func );
 
@@ -438,6 +440,7 @@ int main( int argc, char **argv )	{
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	mcu.register_viewer_factory(new FltkViewerFactory());
+	mcu.register_bmlviewer_factory(new BehaviorViewerFactory());
 
 	// Build the floor for the viewer
 	mcu.add_scene( build_checkerboard_floor( 200.0 ) );
@@ -640,7 +643,7 @@ int main( int argc, char **argv )	{
 
 		sbm_loop_wait( mcu.desired_max_fps ); // sleep to reach target loop rate
 		mcu.set_time( get_time() - start_t );
-		Fl::check();
+		fltk::check();
 	
 #if LINK_VHMSG_CLIENT
 		if( mcu.vhmsg_enabled )	{

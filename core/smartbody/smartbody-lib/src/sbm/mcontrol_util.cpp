@@ -71,6 +71,7 @@ mcuCBHandle::mcuCBHandle()
 	sbm_character_listener( NULL ),
 	play_internal_audio( false ),
 	viewer_p( NULL ),
+	bmlviewer_p( NULL ),
 	camera_p( NULL ),
 	root_group_p( new SrSnGroup() ),
 	face_neutral_p( NULL ),
@@ -80,6 +81,7 @@ mcuCBHandle::mcuCBHandle()
 	queued_cmds( 0 ),
 	use_locomotion( false ),
 	viewer_factory ( new SrViewerFactory() ),
+	bmlviewer_factory ( new BMLViewerFactory() ),
 	resource_manager(ResourceManager::getResourceManager())
 {
 	
@@ -403,6 +405,26 @@ void mcuCBHandle::close_viewer( void )	{
 	if( camera_p )	{
 		delete camera_p;
 		camera_p = NULL;
+	}
+}
+
+int mcuCBHandle::open_bml_viewer( int width, int height, int px, int py )	{
+	
+	if( bmlviewer_p == NULL )	{
+		bmlviewer_p = bmlviewer_factory->create( px, py, width, height );
+		bmlviewer_p->label_viewer( "SBM BML Viewer" );
+		bmlviewer_p->show_bml_viewer();
+		
+		return( CMD_SUCCESS );
+	}
+	return( CMD_FAILURE );
+}
+
+void mcuCBHandle::close_bml_viewer( void )	{
+
+	if( bmlviewer_p )	{
+		bmlviewer_factory->destroy(bmlviewer_p);
+		bmlviewer_p = NULL;
 	}
 }
 
@@ -1275,6 +1297,54 @@ int mcu_viewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		if( strcmp( view_cmd, "hide" ) == 0 )	{
 			if( mcu_p->viewer_p )	{
 				mcu_p->viewer_p->hide_viewer();
+				return( CMD_SUCCESS );
+			}
+		}
+		else	{
+			return( CMD_NOT_FOUND );
+		}
+	}
+	return( CMD_FAILURE );
+}
+
+/*
+
+	bmlviewer open <width> <height> <px> <py> 
+	bmlviewer show|hide
+	
+*/
+
+int mcu_bmlviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
+	
+	if( mcu_p )	{
+
+		char *bmlview_cmd = args.read_token();
+		if( strcmp( bmlview_cmd, "open" ) == 0 )	{
+
+			if( mcu_p->bmlviewer_p == NULL )	{
+				int argc = args.calc_num_tokens();
+				if( argc >= 4 )	{
+
+					int width = args.read_int();
+					int height = args.read_int();
+					int px = args.read_int();
+					int py = args.read_int();
+					int err = mcu_p->open_bml_viewer( width, height, px, py );
+					return( err );
+				}
+			}
+		}
+		else
+		if( strcmp( bmlview_cmd, "show" ) == 0 )	{
+			if( mcu_p->bmlviewer_p )	{
+				mcu_p->bmlviewer_p->show_bml_viewer();
+				return( CMD_SUCCESS );
+			}
+		}
+		else
+		if( strcmp( bmlview_cmd, "hide" ) == 0 )	{
+			if( mcu_p->bmlviewer_p )	{
+				mcu_p->bmlviewer_p->hide_bml_viewer();
 				return( CMD_SUCCESS );
 			}
 		}

@@ -23,9 +23,11 @@
 # include "fltk_viewer.h"
 
 
-# include <FL/Fl.H>
-# include <FL/gl.h>
-# include <FL/FL_Menu_Item.H>
+# include <fltk/events.h>
+# include <fltk/gl.h>
+# include <fltk/run.h>
+# include <fltk/visual.h>
+# include <fltk/compat/FL/Fl_Menu_Item.H>
 # include <fltk/draw.h>
 # include <fltk/PopupMenu.h>
 # include <fltk/ColorChooser.H>
@@ -569,8 +571,8 @@ static void gl_draw_string ( const char* s, float x, float y )
    glLoadIdentity ();
    glDisable ( GL_LIGHTING );
    glColor ( SrColor::red );
-   gl_font ( FL_TIMES, 12 ); // from fltk
-   gl_draw ( s, x, y );      // from fltk
+   fltk::setfont(fltk::TIMES, 12 ); // from fltk
+   fltk::drawtext(s, x, y );      // from fltk
  }
 
 //-- Render  ------------------------------------------------------------------
@@ -681,14 +683,14 @@ static void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h )
    if ( t==SrEvent::Push || t==SrEvent::Release )
 	   e.button = fltk::event_button();
 
-   if ( fltk::event_state(FL_BUTTON1) ) e.button1 = 1;
-   if ( fltk::event_state(FL_BUTTON2) ) e.button2 = 1;
-   if ( fltk::event_state(FL_BUTTON3) ) e.button3 = 1;
+   if ( fltk::event_state(fltk::BUTTON1) ) e.button1 = 1;
+   if ( fltk::event_state(fltk::BUTTON2) ) e.button2 = 1;
+   if ( fltk::event_state(fltk::BUTTON3) ) e.button3 = 1;
 
-   if ( fltk::event_state(FL_ALT)   ) e.alt = 1;
-   if ( fltk::event_state(FL_CTRL)  ) e.ctrl = 1;
+   if ( fltk::event_state(fltk::ALT)   ) e.alt = 1;
+   if ( fltk::event_state(fltk::CTRL)  ) e.ctrl = 1;
 
-   if ( fltk::event_state(FL_SHIFT) ) e.shift = 1;
+   if ( fltk::event_state(fltk::SHIFT) ) e.shift = 1;
    
    e.key = fltk::event_key();
 
@@ -723,7 +725,7 @@ int FltkViewer::handle ( int event )
 
       case fltk::MOVE:
         //SR_TRACE2 ( "Move buts: "<<(fltk::event_state(FL_BUTTON1)?1:0)<<" "<<(fltk::event_state(FL_BUTTON2)?1:0) );
-        if ( !fltk::event_state(FL_BUTTON1) && !fltk::event_state(FL_BUTTON2) ) break;
+        if ( !fltk::event_state(fltk::BUTTON1) && !fltk::event_state(fltk::BUTTON2) ) break;
         // otherwise, this is a drag: enter in the drag case.
         // not sure if this is a hack or a feature.
       case fltk::DRAG:
@@ -800,7 +802,7 @@ int FltkViewer::handle ( int event )
       _data->camera.get_ray ( e.lmouse.x, e.lmouse.y, e.lray.p1, e.lray.p2 );
       e.mousep = plane.intersect ( e.ray.p1, e.ray.p2 );
       e.lmousep = plane.intersect ( e.lray.p1, e.lray.p2 );
-      if ( event==FL_PUSH  ) // update picking precision
+	  if ( event==fltk::PUSH  ) // update picking precision
        { // define a and b with 1 pixel difference:
          SrPnt2 a ( ((float)w())/2.0f, ((float)h())/2.0f ); // ( float(fltk::event_x()), float(fltk::event_y()) );
          SrPnt2 b (a+SrVec2::one);// ( float(fltk::event_x()+1), float(fltk::event_y()+1) );
