@@ -281,16 +281,64 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="bmlviewer"
+			>
+			<File
+				RelativePath="..\src\BehaviorBlock.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\BehaviorBlock.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\BehaviorEditorWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\BehaviorEditorWidget.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\BehaviorWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\BehaviorWindow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\NonLinearEditor.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\NonLinearEditor.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\NonLinearEditorWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\NonLinearEditorWidget.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="viewer"
+			>
+			<File
+				RelativePath="..\src\fltk_viewer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\fltk_viewer.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\bin\default.seq"
-			>
-		</File>
-		<File
-			RelativePath="..\src\fltk_viewer.cpp"
-			>
-		</File>
-		<File
-			RelativePath="..\src\fltk_viewer.h"
 			>
 		</File>
 		<File

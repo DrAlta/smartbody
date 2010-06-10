@@ -45,6 +45,7 @@ class mcuCBHandle;
 #include "bonebus.h"
 
 
+#include <sbm/BMLViewer.h>
 #include <SR/sr_viewer.h>
 #include <SR/sr_camera.h>
 #include <ME/me_ct_pose.h>
@@ -134,6 +135,8 @@ class mcuCBHandle	{
 
 		SrViewerFactory *viewer_factory;
 		SrViewer	*viewer_p;
+		BMLViewer	*bmlviewer_p;
+		BMLViewerFactory *bmlviewer_factory;
 		SrCamera	*camera_p;
 		SrSnGroup	*root_group_p;
 		
@@ -215,6 +218,8 @@ class mcuCBHandle	{
 
 		int open_viewer( int width, int height, int px, int py );
 		void close_viewer( void );
+		int open_bml_viewer( int width, int height, int px, int py );
+		void close_bml_viewer( void );
 		int add_scene( SrSnGroup *scene_p );
 		int remove_scene( SrSnGroup *scene_p );
 		void render( void )	{ if( viewer_p ) { viewer_p->render(); } }
@@ -312,6 +317,10 @@ class mcuCBHandle	{
 				if (viewer_factory != NULL) delete viewer_factory;
 				viewer_factory = factory;
 		}
+		void register_bmlviewer_factory(BMLViewerFactory* factory) { 
+				if (bmlviewer_factory != NULL) delete bmlviewer_factory;
+				bmlviewer_factory = factory;
+		}
 
 	protected:
 		FILE* open_sequence_file( const char *seq_name );
@@ -330,6 +339,7 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_sequence_chain_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_viewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_bmlviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 

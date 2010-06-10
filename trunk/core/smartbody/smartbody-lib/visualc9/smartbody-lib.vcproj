@@ -1122,6 +1122,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\BMLViewer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\BMLViewer.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\general_param_setting.h"
 				>
 			</File>
