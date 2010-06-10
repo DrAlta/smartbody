@@ -28,7 +28,7 @@
 # ifndef FLTK_VIEWER_H
 # define FLTK_VIEWER_H
 
-# include <FL/Fl_Gl_Window.H>
+# include <fltk/GlWindow.H>
 # include <sr/sr_viewer.h>
 # include <sr/sr_color.h>
 
@@ -47,7 +47,7 @@ class FltkViewerData;
     In ModePlanar, only transformation on the XY plane are accepted.
     In all modes, mouse interaction is done together with Ctrl and Shift modifiers.
     A popup menu appears with a right button click or ctrl+shift+m. */
-class FltkViewer : public SrViewer, public Fl_Gl_Window 
+class FltkViewer : public SrViewer, public fltk::GlWindow 
  {
    public : // enumerators
 

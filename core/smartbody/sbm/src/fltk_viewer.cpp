@@ -25,11 +25,12 @@
 
 # include <FL/Fl.H>
 # include <FL/gl.h>
-# include <FL/fl_draw.H>
-# include <FL/Fl_Menu_Button.H>
-# include <FL/Fl_Color_Chooser.H>
-# include <FL/Fl_File_Chooser.H>
-# include <FL/Fl_Browser.H>
+# include <FL/FL_Menu_Item.H>
+# include <fltk/draw.h>
+# include <fltk/PopupMenu.h>
+# include <fltk/ColorChooser.H>
+# include <fltk/FileChooser.H>
+# include <fltk/Browser.H>
 
 # include <SR/sr_box.h>
 # include <SR/sr_quat.h>
@@ -70,16 +71,16 @@ class srSaSetShapesChanged : public SrSa
 
 //================================= help window ===================================================
 
-Fl_Window* make_help_window ()
+fltk::Window* make_help_window ()
  {
-   Fl_Window* win = new Fl_Window ( 300, 200, "FltkViewer Help" );
+   fltk::Window* win = new fltk::Window ( 300, 200, "FltkViewer Help" );
    win->set_non_modal();
    return win;
  }
 
-Fl_Browser* make_help_browser ()
+fltk::Browser* make_help_browser ()
  {
-   Fl_Browser* b = new Fl_Browser ( 5, 5, 290, 190 );
+  fltk::Browser* b = new fltk::Browser ( 5, 5, 290, 190 );
 
    b->add ( "Left Click: Select\n" );
    b->add ( "Left Click + Shift: Rotate\n" );
@@ -99,13 +100,19 @@ Fl_Browser* make_help_browser ()
 
 //================================= popup menu ===================================================
 
-static void menucb ( Fl_Menu_* o, void* v ) 
+static void menucb ( fltk::Widget* o, void* v ) 
  {
-   ((FltkViewer*)(o->parent()->user_data()))->menu_cmd((FltkViewer::MenuCmd)(int)v);
+	 fltk::Widget* widget = o->parent();
+	 while (widget && widget->parent() != NULL)
+		 widget = widget->parent();
+	 FltkViewer* viewer = dynamic_cast<FltkViewer*>(widget);
+	 if (viewer)
+		 viewer->menu_cmd((FltkViewer::MenuCmd)(int)v);
  }
 
-# define MCB     ((Fl_Callback*)menucb)
+# define MCB     ((fltk::Callback*)menucb)
 # define CMD(c)  ((void*)FltkViewer::c)
+
 static Fl_Menu_Item MenuTable[] =
  { 
    { "&help",       0, MCB, CMD(CmdHelp) },
@@ -132,6 +139,7 @@ static Fl_Menu_Item MenuTable[] =
          { 0 },
    { 0 }
  };
+
 # undef CMD
 # undef MCB
 
@@ -177,7 +185,7 @@ static void spin_timeout_func ( void* udata )
    if ( v->spinning() && !v->iconized() ) 
     { v->increment_model_rotation ( delta );
       v->redraw ();
-      Fl::repeat_timeout ( interval, spin_timeout_func, udata );
+	  fltk::repeat_timeout( float(interval), spin_timeout_func, udata );
     }
 
    v->spin_animation_occured ();
@@ -225,9 +233,9 @@ class FltkViewerData
    SrSnLines* scenebox;  // contains the bounding box to display, and use in view_all
    SrSnLines* sceneaxis; // the current axis being displayed
 
-   Fl_Menu_Button* menubut; // the ctrl+shift+m or button3 menu
-   Fl_Window* helpwin;
-   Fl_Browser* helpbrowser;
+   fltk::PopupMenu* menubut; // the ctrl+shift+m or button3 menu
+   fltk::Window* helpwin;
+   fltk::Browser* helpbrowser;
 
    SrSaGlRender render_action;
    SrSaBBox bbox_action;
@@ -236,7 +244,7 @@ class FltkViewerData
 //===================================== FltkViewer =================================
 
 // Called when the small "cross" button to close the window is pressed
-static void _callback_func ( Fl_Widget* win, void* pt )
+static void _callback_func ( fltk::Widget* win, void* pt )
  {
    //printf("DBG callback_func!\n");
    FltkViewer* v = (FltkViewer*)pt;
@@ -244,9 +252,9 @@ static void _callback_func ( Fl_Widget* win, void* pt )
  }
 
 FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
-         : SrViewer(x, y, w, h) , Fl_Gl_Window ( x, y, w, h, label )
+         : SrViewer(x, y, w, h) , fltk::GlWindow ( x, y, w, h, label )
  {
-   Fl::gl_visual ( FL_RGB8  | FL_DOUBLE | FL_DEPTH );//| FL_ALPHA );
+   fltk::glVisual( fltk::RGB | fltk::DOUBLE_BUFFER | fltk::DEPTH_BUFFER );//| FL_ALPHA );
 
    callback ( _callback_func, this );
 
@@ -277,8 +285,8 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    user_data ( (void*)(this) ); // to be retrieved by the menu callback
    
    begin();
-   _data->menubut = new Fl_Menu_Button(0,0,50,50);
-   _data->menubut->type(Fl_Menu_Button::POPUP23);
+   _data->menubut = new fltk::PopupMenu(0,0,50,50);
+   _data->menubut->type(fltk::PopupMenu::POPUP23);
    _data->menubut->menu(MenuTable);
    _data->menubut->textsize(12);
    _data->helpwin = make_help_window ();
@@ -288,7 +296,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 
 FltkViewer::~FltkViewer ()
  {
-   Fl::remove_timeout ( spin_timeout_func, this );
+   fltk::remove_timeout ( spin_timeout_func, this );
    _data->root->unref ();
    delete _data->helpwin;
    delete _data->scenebox;
@@ -484,7 +492,7 @@ void FltkViewer::spinning ( bool onoff )
  { 
    _data->spinning=onoff;
    if ( _data->spinning )
-     Fl::add_timeout ( _data->spindata.interval, spin_timeout_func, (void*)this );
+	   fltk::add_timeout( float(_data->spindata.interval), spin_timeout_func, (void*)this );
  }
 
 void FltkViewer::allow_spin_animation ( bool b )
@@ -662,7 +670,7 @@ void FltkViewer::draw()
    //----- Fltk will then flush and swap buffers -----------------------------
  }
 
-// Fl::event_x/y() variates from (0,0) to (w(),h())
+// fltk::event_x/y() variates from (0,0) to (w(),h())
 // transformed coords in SrEvent are in "normalized device coordinates" [-1,-1]x[1,1]
 static void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h )
  {
@@ -671,22 +679,22 @@ static void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h )
    e.type = t;
 
    if ( t==SrEvent::Push || t==SrEvent::Release )
-    e.button = Fl::event_button();
+	   e.button = fltk::event_button();
 
-   if ( Fl::event_state(FL_BUTTON1) ) e.button1 = 1;
-   if ( Fl::event_state(FL_BUTTON2) ) e.button2 = 1;
-   if ( Fl::event_state(FL_BUTTON3) ) e.button3 = 1;
+   if ( fltk::event_state(FL_BUTTON1) ) e.button1 = 1;
+   if ( fltk::event_state(FL_BUTTON2) ) e.button2 = 1;
+   if ( fltk::event_state(FL_BUTTON3) ) e.button3 = 1;
 
-   if ( Fl::event_state(FL_ALT)   ) e.alt = 1;
-   if ( Fl::event_state(FL_CTRL)  ) e.ctrl = 1;
+   if ( fltk::event_state(FL_ALT)   ) e.alt = 1;
+   if ( fltk::event_state(FL_CTRL)  ) e.ctrl = 1;
 
-   if ( Fl::event_state(FL_SHIFT) ) e.shift = 1;
+   if ( fltk::event_state(FL_SHIFT) ) e.shift = 1;
    
-   e.key = Fl::event_key();
+   e.key = fltk::event_key();
 
    // put coordinates inside [-1,1] with (0,0) in the middle :
-   e.mouse.x  = ((float)Fl::event_x())*2.0f / ((float)w) - 1.0f;
-   e.mouse.y  = ((float)Fl::event_y())*2.0f / ((float)h) - 1.0f;
+   e.mouse.x  = ((float)fltk::event_x())*2.0f / ((float)w) - 1.0f;
+   e.mouse.y  = ((float)fltk::event_y())*2.0f / ((float)h) - 1.0f;
    e.mouse.y *= -1.0f;
    e.width = w;
    e.heigth = h;
@@ -694,47 +702,47 @@ static void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h )
 
 int FltkViewer::handle ( int event ) 
  {
-   # define POPUP_MENU(e) e.button3
+   # define POPUP_MENU(e) e.ctrl && e.button3
 
    SrEvent &e = _data->event;
    e.type = SrEvent::None;
 
    switch ( event )
-    { case FL_PUSH :
-       { //SR_TRACE1 ( "Mouse Push : but="<<Fl::event_button()<<" ("<<Fl::event_x()<<", "<<Fl::event_y()<<")" <<" Ctrl:"<<Fl::event_state(FL_CTRL) );
+   { case fltk::PUSH:
+       { //SR_TRACE1 ( "Mouse Push : but="<<fltk::event_button()<<" ("<<fltk::event_x()<<", "<<fltk::event_y()<<")" <<" Ctrl:"<<fltk::event_state(FL_CTRL) );
          translate_event ( e, SrEvent::Push, w(), h() );
          if ( POPUP_MENU(e) ) { show_menu(); e.type=SrEvent::None; }
           else _data->spinning=false; 
        } break;
 
-      case FL_RELEASE:
-        //SR_TRACE1 ( "Mouse Release : ("<<Fl::event_x()<<", "<<Fl::event_y()<<") buts: "
-        //             <<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
+      case fltk::RELEASE:
+        //SR_TRACE1 ( "Mouse Release : ("<<fltk::event_x()<<", "<<fltk::event_y()<<") buts: "
+        //             <<(fltk::event_state(fltk::BUTTON1)?1:0)<<" "<<(fltk::event_state(fltk::BUTTON2)?1:0) );
         translate_event ( e, SrEvent::Release, w(), h() );
         break;
 
-      case FL_MOVE:
-        //SR_TRACE2 ( "Move buts: "<<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
-        if ( !Fl::event_state(FL_BUTTON1) && !Fl::event_state(FL_BUTTON2) ) break;
+      case fltk::MOVE:
+        //SR_TRACE2 ( "Move buts: "<<(fltk::event_state(FL_BUTTON1)?1:0)<<" "<<(fltk::event_state(FL_BUTTON2)?1:0) );
+        if ( !fltk::event_state(FL_BUTTON1) && !fltk::event_state(FL_BUTTON2) ) break;
         // otherwise, this is a drag: enter in the drag case.
         // not sure if this is a hack or a feature.
-      case FL_DRAG:
-        //SR_TRACE2 ( "Mouse Drag : ("<<Fl::event_x()<<", "<<Fl::event_y()<<") buts: "
-        //             <<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
+      case fltk::DRAG:
+        //SR_TRACE2 ( "Mouse Drag : ("<<fltk::event_x()<<", "<<fltk::event_y()<<") buts: "
+        //             <<(fltk::event_state(FL_BUTTON1)?1:0)<<" "<<(fltk::event_state(FL_BUTTON2)?1:0) );
         translate_event ( e, SrEvent::Drag, w(), h() );
         break;
 
-      case FL_SHORTCUT: // not sure the relationship between a shortcut and keyboard event...
-        //SR_TRACE1 ( "Shortcut : "<< Fl::event_key() <<" "<<Fl::event_text() );
+      case fltk::SHORTCUT: // not sure the relationship between a shortcut and keyboard event...
+        //SR_TRACE1 ( "Shortcut : "<< fltk::event_key() <<" "<<fltk::event_text() );
         translate_event ( e, SrEvent::Keyboard, w(), h() );
         break;
       
-      case FL_KEYBOARD:
-        //SR_TRACE1 ( "Key Pressed : "<< Fl::event_key() <<" "<<Fl::event_text() );
+//      case fltk::KEYBOARD:
+        //SR_TRACE1 ( "Key Pressed : "<< fltk::event_key() <<" "<<fltk::event_text() );
 //        translate_event ( e, SrEvent::Keyboard, w(), h() );
-        break;
+     //   break;
 
-      case FL_HIDE: // Called when the window is iconized
+      case fltk::HIDE: // Called when the window is iconized
         { //SR_TRACE1 ( "Hide" );
           _data->iconized = true;
           // the opengl lists need to be re-created when the window appears again, so
@@ -745,48 +753,48 @@ int FltkViewer::handle ( int event )
           sa.apply ( _data->root );
         } break;
 
-      case FL_SHOW: // Called when the window is de-iconized or when show() is called
+      case fltk::SHOW: // Called when the window is de-iconized or when show() is called
         //SR_TRACE1 ( "Show" );
         _data->iconized = false;
-        if ( _data->spinning ) Fl::add_timeout ( _data->spindata.interval, spin_timeout_func, (void*)this );
+		if ( _data->spinning ) fltk::add_timeout( float(_data->spindata.interval), spin_timeout_func, (void*)this );
         show ();
         break;
 
       // Other events :
-      case FL_ENTER:          
+      case fltk::ENTER:          
 		  //SR_TRACE2 ( "Enter" );         
 		  break;
-      case FL_LEAVE:          
+      case fltk::LEAVE:          
 		  //SR_TRACE2 ( "Leave" );         
 		  break;
-      case FL_FOCUS:          
+      case fltk::FOCUS:          
 		  //SR_TRACE2 ( "Focus" );         
 		  break;
-      case FL_UNFOCUS:        
+      case fltk::UNFOCUS:        
 		  //SR_TRACE2 ( "Unfocus" );       
 		  break;
-      case FL_CLOSE:          
+     // case FL_CLOSE:          
 		  //SR_TRACE2 ( "Close");          
-		  break;
-      case FL_ACTIVATE:       
+	//	  break;
+      case fltk::ACTIVATE:       
 		  //SR_TRACE2 ( "Activate");       
 		  break;
-      case FL_DEACTIVATE:     
+      case fltk::DEACTIVATE:     
 		  //SR_TRACE2 ( "Deactivate");     
 		  break;
-      case FL_PASTE:          
+      case fltk::PASTE:          
 		  //SR_TRACE2 ( "Paste");          
 		  break;
-      case FL_SELECTIONCLEAR: 
+ //     case FL_SELECTIONCLEAR: 
 		  //SR_TRACE2 ( "SelectionClear"); 
-		  break;
+	//	  break;
     }
 
    //SR_TRACE3 ( e );
 
    if ( e.type == SrEvent::None ) return 0; // not an interesting event
 
-   if ( event==FL_PUSH || event==FL_DRAG )
+   if ( event==fltk::PUSH || event==fltk::DRAG )
     { SrPlane plane ( _data->camera.center, SrVec::k );
       _data->camera.get_ray ( e.mouse.x, e.mouse.y, e.ray.p1, e.ray.p2 );
       _data->camera.get_ray ( e.lmouse.x, e.lmouse.y, e.lray.p1, e.lray.p2 );
@@ -794,8 +802,8 @@ int FltkViewer::handle ( int event )
       e.lmousep = plane.intersect ( e.lray.p1, e.lray.p2 );
       if ( event==FL_PUSH  ) // update picking precision
        { // define a and b with 1 pixel difference:
-         SrPnt2 a ( ((float)w())/2.0f, ((float)h())/2.0f ); // ( float(Fl::event_x()), float(Fl::event_y()) );
-         SrPnt2 b (a+SrVec2::one);// ( float(Fl::event_x()+1), float(Fl::event_y()+1) );
+         SrPnt2 a ( ((float)w())/2.0f, ((float)h())/2.0f ); // ( float(fltk::event_x()), float(fltk::event_y()) );
+         SrPnt2 b (a+SrVec2::one);// ( float(fltk::event_x()+1), float(fltk::event_y()+1) );
          // put coordinates inside [-1,1] with (0,0) in the middle :
          a.x  = a.x*2.0f / float(w()) - 1.0f;
          a.y  = a.y*2.0f / float(h()) - 1.0f; a.y *= -1.0f;
@@ -822,7 +830,7 @@ int FltkViewer::handle_event ( const SrEvent &e )
  {
    int res=0;
 
-   if ( (e.ctrl || e.shift || e.alt) && e.mouse_event() )
+   if ( e.alt && e.mouse_event() )
     { 
       if ( _data->viewmode==ModeExaminer )
         res = handle_examiner_manipulation ( e );
@@ -844,10 +852,10 @@ int FltkViewer::handle_event ( const SrEvent &e )
 
 //== Examiner ==============================================================
 
-# define ROTATING(e)    (e.shift&&e.button1)
-# define ROTATING2(e)   (e.alt&&e.button1)
-# define ZOOMING(e)     (e.shift&&e.ctrl&&e.button1) || (e.shift&&e.button1&&e.button2)
-# define TRANSLATING(e) (e.ctrl&&e.button1) || (e.shift&&e.button2)
+# define ROTATING2(e)    (e.alt && e.button1)
+# define ROTATING(e)   (e.alt && e.shift && e.button1)
+# define ZOOMING(e)     (e.alt && e.button3)
+# define TRANSLATING(e) (e.alt && e.button2)
 
 int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
  {
@@ -884,7 +892,7 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
          //SR_TRACE5 ( _data->spindata.interval<<" < "<<_data->spindata.activation );
          if ( _data->spindata.interval<_data->spindata.activation )
           { _data->spinning=true;
-            Fl::add_timeout ( _data->spindata.interval, spin_timeout_func, (void*)this );
+			fltk::add_timeout ( float(_data->spindata.interval), spin_timeout_func, (void*)this );
           }
        }
     }
