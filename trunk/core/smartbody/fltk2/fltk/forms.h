@@ -26,10 +26,10 @@
 #ifndef __FORMS_H__
 #define __FORMS_H__
 
-#include <fltk/Fl.h>
+//#include <fltk/Fl.h>
 #include <fltk/Fl_Group.h>
 #include <fltk/Fl_Window.h>
-#include <fltk/fl_draw.h>
+#include <fltk/Fl_draw.h>
 
 typedef Fl_Widget FL_OBJECT;
 typedef Fl_Window FL_FORM;
