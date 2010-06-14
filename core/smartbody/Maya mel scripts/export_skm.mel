@@ -29,598 +29,674 @@
 
 
 
-//docServer(1);
-updateRendererUI;
-proc float skmRound ( float $value )
- {
-   int $precision = 5;
-   $power = `pow 10 $precision`;
-   $value = $value * $power;
-   $value = int ( $value+($value<0?-0.5:0.5) );
-   $value = $value / $power;
-   return $value;
- }
-
-// make a quaternion from the given rotation around axis (x,y,z)
-proc skmQuatSet ( float $q[], float $x, float $y, float $z, float $degrees )
- {
-   float $f;
-   float $radians = 3.1415926535897932*$degrees/180.0;
-
-   // normalize axis:
-   $q[1]=$x; $q[2]=$y; $q[3]=$z;
-   $f = $x*$x + $y*$y + $z*$z;
-   if ( $f>0 )
-    { $f = sqrt ( $f );
-      $q[1]/=$f; $q[2]/=$f; $q[3]/=$f;
-    }
-
-   // set the quaternion:
-   $radians/=2;
-   $f = sin ( $radians );
-   $q[1]*=$f; $q[2]*=$f; $q[3]*=$f;
-   $q[0] = cos ( $radians );
- }
-
-// quaternion multiplication
-proc skmQuatMult ( float $q[], float $q1[], float $q2[] )
- {
-   $q[0] = ($q1[0]*$q2[0]) - ($q1[1]*$q2[1] + $q1[2]*$q2[2] + $q1[3]*$q2[3]); // w1*w2-dot(v1,v2)
-   $q[1] = $q1[2]*$q2[3] - $q1[3]*$q2[2]; // cross ($q1.v,$q2.v)
-   $q[2] = $q1[3]*$q2[1] - $q1[1]*$q2[3];
-   $q[3] = $q1[1]*$q2[2] - $q1[2]*$q2[1];
-   $q[1] += ($q1[1]*$q2[0]) + ($q2[1]*$q1[0]);
-   $q[2] += ($q1[2]*$q2[0]) + ($q2[2]*$q1[0]);
-   $q[3] += ($q1[3]*$q2[0]) + ($q2[3]*$q1[0]);
- }
-
-// quaternion to axis-angle representation
-proc quatToAxisAng ( float $q[], float $aa[] )
- {
-   float $ang = 2.0 * acos ( $q[0] );
-   float $norm = sqrt ( $q[1]*$q[1] + $q[2]*$q[2] + $q[3]*$q[3] );
-   if ( $norm==0 || $ang==0 )
-    { $aa[0]=0;
-      $aa[1]=0;
-      $aa[2]=0;
-    }
-   else
-    { $aa[0]=($q[1]/$norm)*$ang;
-      $aa[1]=($q[2]/$norm)*$ang;
-      $aa[2]=($q[3]/$norm)*$ang;
-    }
- }
- 
-// returns the index of the name containing $type, however
-// $type is assumed to be at the end of each name
-// (types are retrieved with: $names = `keyframe -q -name pinky3_l`;)
-proc int skmSearchType ( string $names[], string $type )
- {
-   string $subst;
-   int $size = size($names);
-   int $sizet = size($type);
-   int $sizei;
-   int $i;
-   int $cmp;
-
-   for ( $i=0; $i<$size; $i++ )
-    { $sizei = size($names[$i]);
-      $subst = `substring $names[$i] ($sizei-$sizet+1) $sizei`;
-      $cmp = `strcmp $subst $type`;
-      if ( $cmp==0 ) return $i;
-    }
-
-   return -1;
-}
-
-proc int skmCountJoints ( string $jname, string $joints[] )
- {
-   //=== Get Children ===
-   string $children[];
-   $children = `listRelatives $jname`;
-   int $nchildren = `size $children`;
-
-   //=== Check Type ===
-   string $type = nodeType ( $jname );
-   if ( $type!="joint" )
-    { return 0;
-    }
-
-   //=== Check if there are keys ===
-   int $n=1; // will remain 1 if joint is to be counted, 0 otherwise
-   string $jnames[];
-   $jnames = `keyframe -q -name $jname`;
-   if ( size($jnames)==0 ) $n=0; // no info
-   if ( skmSearchType($jnames,"ateX")==-1 &&
-        skmSearchType($jnames,"ateY")==-1 &&
-        skmSearchType($jnames,"ateZ")==-1 ) $n=0; // no rotate or translate
-   
-   //=== Count this joint if n is 1 ===
-   global int $curJointsId;
-   if ( $n==1 )
-    { $joints[$curJointsId] = $jname;
-      $curJointsId = $curJointsId+1;
-    }
-
-   //=== Recurse ===
-   for ( $i=0; $i<$nchildren; $i++ )
-	{ $n = $n + skmCountJoints ( $children[$i], $joints );
-	}
-   return $n;
-}
-
-//to get key index:     keyframe -eval -index $key  -query $queryName
-//to evaluate at frame: keyframe -eval -time $frame -query $queryName
-proc float skmKeyVal ( int $frame, string $queryName )
- {
-   float $val[];
-
-   // if there is no key we search the 1st prior valid key for the joint
-   while ( size($val)==0 && $frame>0 ) 
-    { $val = `keyframe -eval -time $frame -query $queryName`;
-      $frame = $frame-1;
-    }
-
-   return $val[0];
- }
-
-proc skmCheckAndWriteKey ( int $fileid, string $names[], string $type, int $frame )
- {
-   int $id = skmSearchType ( $names, $type );
-   if ( $id>=0 )
-    { float $val = skmKeyVal ( $frame, $names[$id] );
-      fprint $fileid ( " " + skmRound($val) );
-    }
- }
-
-proc skmCheckAndWriteKeyQuat ( int $fileid, string $names[], int $frame )
- {
-   int $idx = skmSearchType ( $names, "rotateX" );
-   int $idy = skmSearchType ( $names, "rotateY" );
-   int $idz = skmSearchType ( $names, "rotateZ" );
-   if ( $idx<0 && $idy<0 && $idz<0 ) return;
-
-   float $xa=0;
-   float $ya=0;
-   float $za=0;
-   if ( $idx>=0 ) $xa = skmKeyVal ( $frame, $names[$idx] );
-   if ( $idy>=0 ) $ya = skmKeyVal ( $frame, $names[$idy] );
-   if ( $idz>=0 ) $za = skmKeyVal ( $frame, $names[$idz] );
-
-   float $qx[], $qy[], $qz[];
-   skmQuatSet ( $qx, 1, 0, 0, $xa );
-   skmQuatSet ( $qy, 0, 1, 0, $ya );
-   skmQuatSet ( $qz, 0, 0, 1, $za );
-
-   // compose to zyx instead of xyz due to the used column-major matrix format
-   float $qzyx[], $qyx[], $aa[];
-   skmQuatMult ( $qyx, $qy, $qx );
-   skmQuatMult ( $qzyx, $qz, $qyx );
-   quatToAxisAng ( $qzyx, $aa );
-   fprint $fileid ( " " + skmRound($aa[0]) + " " + skmRound($aa[1]) + " " + skmRound($aa[2]) );
- }
-
-proc skmWriteKeyData ( int $fileid, int $frame, string $jointName, int $jid )
- {
-   string $names[];
-   float $val[];
-   int $i;
-   int $trstart = 0;
-
-   // get used rotations/translations in the joint:
-   $names = `keyframe -q -name $jointName`;
-
-   // Note: "keyframe -q -name  base;" returns:
-   //       "base_translateZ base_translateX base_translateY base_rotateX base_rotateY base_rotateZ"
-   if ( $jid==0 ) // send translation only for root
-    { skmCheckAndWriteKey ( $fileid, $names, "translateX", $frame );
-      skmCheckAndWriteKey ( $fileid, $names, "translateY", $frame );
-      skmCheckAndWriteKey ( $fileid, $names, "translateZ", $frame );
-    }
-
-   skmCheckAndWriteKeyQuat ( $fileid, $names, $frame );
- }
-
-proc skmCheckAndWrite ( int $fileid, string $names[], string $type, string $joint, string $skmtype )
- {
-   int $id = skmSearchType ( $names, $type );
-   if ( $id>=0 ) fprint $fileid ( $joint + $skmtype );
- }
- 
-proc skmCheckAndWriteQuat ( int $fileid, string $names[], string $joint )
- {
-   int $idx = skmSearchType ( $names, "rotateX" );
-   int $idy = skmSearchType ( $names, "rotateY" );
-   int $idz = skmSearchType ( $names, "rotateZ" );
-   if ( $idx>=0 || $idy>=0 || $idz>=0 )
-    fprint $fileid ( $joint + " Quat\n" );
- }
-
-proc skmWriteSkm ( int $startFrame, int $endFrame, string $joints[], int $fileid, int $fps )
- {
-   string $names[];
-
-   // Export translations and/or Quat rotations:
-   global int $curJointsId;
-   for ( $i=0; $i<$curJointsId; $i++ )
-    { $names = `keyframe -q -name $joints[$i]`;
-      
-      if ( $i==0 ) // translation allowed only in root
-       { skmCheckAndWrite ( $fileid, $names, "translateX", $joints[$i], " XPos\n" );
-         skmCheckAndWrite ( $fileid, $names, "translateY", $joints[$i], " YPos\n" );
-         skmCheckAndWrite ( $fileid, $names, "translateZ", $joints[$i], " ZPos\n" );
-       }
-
-      skmCheckAndWriteQuat ( $fileid, $names, $joints[$i] );
-    }
-
-   // frames:
-   float $kt=0;
-   float $vec[];
-   float $ktstep = 1.0/$fps;
-
-   if ( $startFrame>$endFrame ) $startFrame=$endFrame;
-   fprint $fileid ( "\nframes " + ($endFrame-$startFrame+1) + "\n" );
-   
-   for ( $f=$startFrame; $f<=$endFrame; $f++ )
-	{ print ( "Writing frame " + $f +"/"+ $endFrame + "...\n");
-
-	  fprint $fileid ( "kt " + $kt + " fr" );
-	  for ( $i=0; $i<$curJointsId; $i++ )
-	   { 
-	     skmWriteKeyData ( $fileid, $f, $joints[$i], $i );
-	   }
-	  $kt += $ktstep;
-	  fprint $fileid ( "\n" );
-    }
- }
-
-global proc int skmWriteSkmToFile ( string $fname, 
-                                    int $startFrame, int $endFrame, int $fps,
-                                    string $version )
- { 
-   //global int inTime;
-   int $fileid = `fopen $fname "w"`;
-
-   string $name = basename( $fname, ".skm" );
-
-   $selectionList = `ls -sl`;
-   if ( size($selectionList)<=0 )
-    { fclose $fileid;
-      error "Nothing selected!\n";
-    }
-
-   int $selectionListSize = `size $selectionList`;
-   int $depth=0;
-   int $njoints;
-   int $nchannels;
-   string $joints[]; // array to be filled with all joints names
-   global int $curJointsId=0; // start filling at position 0 (root is at pos 0)
-
-   for ( $j=0; $j<$selectionListSize; $j++ )
-    { $curJointsId = 0;
-    
-      fprint $fileid ("# SKM Motion Definition - M. Kallmann 2004\n");
-      fprint $fileid ("# Maya exporter v"+$version+"\n\n");
-      fprint $fileid ("SkMotion\n\n");
-      fprint $fileid ("name \"" + $name + "\"\n\n");
-      
-      $njoints = skmCountJoints ( $selectionList[$j], $joints );
-      print ( "Joins found:\n" );
-      print $joints;
-      print ( "\n" );
-
-      $nchannels = $njoints + 3; // all joints' rotations + root 3 translations
-      fprint $fileid ("channels " + $nchannels + "\n");
-        
-      skmWriteSkm ( $startFrame, $endFrame, $joints, $fileid, $fps );
-      fprint $fileid ("\n\n");
-      int $ready = `intSliderGrp -query -value ready`;
-      string $stroke= `intSliderGrp -query -value stroke`;
-	  string $emphasis= `intSliderGrp -query -value emphasis`;
-	  string $strokeStart= `intSliderGrp -query -value strokeStart`;
-      string $relax= `intSliderGrp -query -value relax`;
-      float $readySeconds= float($ready)/$fps;
-      float $relaxSeconds= float($relax)/$fps;
-      float $strokeSeconds= float($stroke)/$fps;
-	  float $strokeStartSeconds= float($strokeStart)/$fps;
-	  float $emphasisSeconds= float($emphasis)/$fps;
-      fprint $fileid ("ready time: "+ $readySeconds + "\n");
-	  fprint $fileid ("strokeStart time: "+ $strokeStartSeconds + "\n");
-	  fprint $fileid ("emphasis time: "+ $emphasisSeconds+ "\n");
-      fprint $fileid ("stroke time: " + $strokeSeconds + "\n");
-      fprint $fileid ("relax time: "+ $relaxSeconds + "\n");
-      
-      	
- 
-    }
-
-   fclose($fileid);
-   print ("Export done.\n");
-   int $ready = `intSliderGrp -query -value ready`;
-   string $stroke= `intSliderGrp -query -value stroke`;
-   string $relax= `intSliderGrp -query -value relax`;
-  // setAttr "fpsNode.framesPerSecond" $fps;
-  // setAttr "firstFrameNode.firstFrameNumber" $startFrame;
-  // setAttr "lastFrameNode.lastFrameNumber" $endFrame;
-  // setAttr "readyNode.readyTime" $ready;
-  // setAttr "strokeNode.strokeTime" $stroke;
-  // setAttr "relaxNode.relaxTime" $relax;
-   return 1;
-}
-
 //=================================== UI =============================================
 
 global proc int skmFileCb( string $filename, string $fileType )
 {
-  textFieldGrp -e -text $filename skmOutputFile;
-  return 1;
+   textFieldGrp -e -text $filename skmOutputFile;
+   return 1;
 }
 
+
+/*----------------------------------------
+PROC: skmUpdateOldFiles
+This will update files created with older versions of the SKM exporter
+----------------------------------------*/
+proc skmUpdateOldFiles( string $newAnimName )
+{
+   //Updates to v0.7
+   int $tempInt;
+
+   if ( `objExists fpsNode` )
+   {
+      if ( `attributeExists framesPerSecond fpsNode` )
+      {
+         int $tempInt = `getAttr "fpsNode.framesPerSecond"`;
+         setAttr ( "AnimDef_" + $newAnimName + ".framesPerSecond" ) $tempInt;
+      }
+
+      delete fpsNode;
+      print "Old fpsNode deleted! \n";
+   }
+
+   if ( `objExists firstFrameNode` )
+   {
+      if ( `attributeExists framesPerSecond firstFrameNode` )
+      {
+         int $tempInt = `getAttr "firstFrameNode.firstFrameNumber"`;
+         setAttr ( "AnimDef_" + $newAnimName + ".firstFrameNumber") $tempInt;
+      }
+
+      delete firstFrameNode;
+      print "Old firstFrameNode deleted! \n";
+   }
+
+   if ( `objExists lastFrameNode` )
+   {
+      if ( `attributeExists lastFrameNumber lastFrameNode` )
+      {
+         int $tempInt = `getAttr "lastFrameNode.lastFrameNumber"`;
+         setAttr ( "AnimDef_" + $newAnimName + ".lastFrameNumber" ) $tempInt;
+      }
+
+      delete lastFrameNode;
+      print "Old lastFrameNode deleted! \n";
+   }
+
+   if ( `objExists readyNode` )
+   {
+      if ( `attributeExists readyTime readyNode` )
+      {
+         int $tempInt = `getAttr "readyNode.readyTime"`;
+         setAttr ( "AnimDef_" + $newAnimName + ".readyTime" ) $tempInt;
+      }
+
+      delete readyNode;
+      print "Old readyNode deleted! \n";
+   }
+
+   if ( `objExists strokeStartNode` )
+   {
+      if ( `attributeExists strokeStartTime strokeStartNode` )
+      {
+         int $tempInt = `getAttr "strokeStartNode.strokeStartTime"`;
+         setAttr ( "AnimDef_" + $newAnimName + ".strokeStartTime" ) $tempInt;
+      }
+
+      delete strokeStartNode;
+      print "Old strokeStartNode deleted! \n";
+   }
+
+   if ( `objExists emphasisNode` )
+   {
+      if ( `attributeExists emphasisTime emphasisNode` )
+      {
+         int $tempInt = `getAttr "emphasisNode.emphasisTime"`;
+         setAttr ( "AnimDef_" + $newAnimName + ".emphasisTime" ) $tempInt;
+      }
+
+      delete emphasisNode;
+      print "Old emphasisNode deleted! \n";
+   }
+
+   if ( `objExists strokeNode` )
+   {
+      if ( `attributeExists strokeTime strokeNode` )
+      {
+         int $tempInt = `getAttr "strokeNode.strokeTime"`;
+         setAttr ( "AnimDef_" + $newAnimName + ".strokeTime" ) $tempInt;
+      }
+
+      delete strokeNode;
+      print "Old strokeNode deleted! \n";
+   }
+
+   if ( `objExists relaxNode` )
+   {
+      if ( `attributeExists relaxTime relaxNode` )
+      {
+         int $tempInt = `getAttr "relaxNode.relaxTime"`;
+         setAttr ( "AnimDef_" + $newAnimName + ".relaxTime" ) $tempInt;
+      }
+
+      delete relaxNode;
+      print "Old relaxNode deleted! \n";
+   }
+}
+
+
+/*----------------------------------------
+GLOBAL PROC: skmAddAnimDef
+----------------------------------------*/
+global proc skmAddAnimDef()
+{
+   string $result = `promptDialog -title "Define New Animation" -message "Animation Name?"
+               -button "OK" -button "Cancel"
+               -defaultButton "OK" -cancelButton "Cancel"
+               -dismissString "Cancel"`;
+
+   if ( $result == "OK" )
+   {
+      $newAnimName = `promptDialog -query -text`;
+      textScrollList -edit -append $newAnimName scrollListAnim;
+
+      //Create node with setting attributes
+      group -n ( "AnimDef_" + $newAnimName ) -em -p SmartbodyExportOptions;
+      addAttr -ln "framesPerSecond" -sn "frmsps" -at "long" -min 1 -dv 30 ( "AnimDef_" + $newAnimName );
+      addAttr -ln "firstFrameNumber" -sn "fFrm" -at "long" ( "AnimDef_" + $newAnimName );
+      addAttr -ln "lastFrameNumber" -sn "lFrm" -at "long" ( "AnimDef_" + $newAnimName );
+      addAttr -ln "readyTime" -sn "rdyTime" -at "double" ( "AnimDef_" + $newAnimName );
+      addAttr -ln "strokeStartTime" -sn "sStart" -at "double" ( "AnimDef_" + $newAnimName );
+      addAttr -ln "emphasisTime" -sn "seTime" -at "double" ( "AnimDef_" + $newAnimName );
+      addAttr -ln "strokeTime" -sn "sEnd" -at "double" ( "AnimDef_" + $newAnimName );
+      addAttr -ln "relaxTime" -sn "rlxTime" -at "double" ( "AnimDef_" + $newAnimName );
+
+      addAttr -ln "skeletonRoot" -sn "skRoot" -dt "string" ( "AnimDef_" + $newAnimName );
+      setAttr -type "string" ( "AnimDef_" + $newAnimName + ".skeletonRoot" ) "base";
+
+      addAttr -ln "outputFile" -sn "outFile" -dt "string" ( "AnimDef_" + $newAnimName );
+      setAttr -type "string" ( "AnimDef_" + $newAnimName + ".outputFile" ) ( $newAnimName + ".skm" );
+
+      textScrollList -edit -si $newAnimName scrollListAnim;
+      updateAnimUI;
+
+      print( "New animation definition created: " + $newAnimName + "\n" );
+   }
+}
+
+
+/*----------------------------------------
+GLOBAL PROC: skmDeleteAnimDef
+----------------------------------------*/
+global proc skmDeleteAnimDef()
+{
+   $selAnim = `textScrollList -q -si scrollListAnim`;
+   textScrollList -edit -ri $selAnim scrollListAnim;
+   delete ( "AnimDef_" + $selAnim[ 0 ] );
+   print( "Animation definition deleted: " + $selAnim[ 0 ] + "\n" );
+}
+
+
+/*----------------------------------------
+GLOBAL PROC: skmRenameAnimDef
+----------------------------------------*/
+global proc skmRenameAnimDef()
+{
+   string $selAnim[];
+   string $selAnimDef;
+   string $newAnimName;
+
+   //Get curernt animation name
+   $selAnim = `textScrollList -q -si scrollListAnim` ;
+
+   //Create "new name" prompt window
+   string $PromptResult = `promptDialog -title "Rename Selected Animation" -message "New Animation Name?"
+               -button "Rename" -button "Cancel"
+               -defaultButton "Rename" -cancelButton "Cancel"
+               -dismissString "Cancel"`;
+
+   //Update naming
+   if ( $PromptResult == "Rename" )
+   {
+      $newAnimName = `promptDialog -query -text`;
+      textScrollList -edit -ri $selAnim[ 0 ] scrollListAnim;
+      textScrollList -edit -append $newAnimName scrollListAnim;
+      rename( "AnimDef_" + $selAnim[ 0 ] ) ( "AnimDef_" + $newAnimName );
+      textScrollList -edit -si $newAnimName scrollListAnim;
+      updateAnimUI;
+   }
+
+   //Finish
+   print( "Animation definition renamed from: " + $selAnim[ 0 ] + " to " + $newAnimName + "\n" );
+}
+
+
+/*----------------------------------------
+GLOBAL PROC: updateAnimUI
+This updates the animation UI when a particular animation definition is selected
+----------------------------------------*/
+global proc updateAnimUI()
+{
+   //get animation definition name
+   string $selAnim[] = `textScrollList -q -si "scrollListAnim" `;
+   string $AnimDef = ( "AnimDef_" + $selAnim[ 0 ] );
+
+   //first and last frame	
+   int $firstFrame = `getAttr( $AnimDef + ".firstFrameNumber" )`;
+   intSliderGrp -edit -value $firstFrame skmFirstFrameSlider;
+
+   int $lastFrame = `getAttr( $AnimDef + ".lastFrameNumber" )`;
+   intSliderGrp -edit -value $lastFrame skmLastFrameSlider;
+
+   //Synch points
+   int $readyFrame = `getAttr( $AnimDef + ".readyTime" )`;
+   intSliderGrp -edit -min $firstFrame -max $lastFrame -value $readyFrame sliderReady;
+
+   int $strokeStartFrame = `getAttr( $AnimDef + ".strokeStartTime" )`;
+   intSliderGrp -edit -min $firstFrame -max $lastFrame -value $strokeStartFrame sliderStrokeStart;
+
+   int $emphasisFrame = `getAttr( $AnimDef + ".emphasisTime" )`;
+   intSliderGrp -edit -min $firstFrame -max $lastFrame -value $emphasisFrame sliderEmphasis;
+
+   int $strokeEndFrame = `getAttr( $AnimDef + ".strokeTime" )`;
+   intSliderGrp -edit -min $firstFrame -max $lastFrame -value $strokeEndFrame sliderStrokeEnd;
+
+   int $relaxFrame = `getAttr( $AnimDef + ".relaxTime" )`;
+   intSliderGrp -edit -min $firstFrame -max $lastFrame -value $relaxFrame sliderRelax;
+
+   //Misc other info
+   int $fps = `getAttr( $AnimDef  + ".framesPerSecond" )`;
+   intSliderGrp -edit -value $fps sliderFps;
+
+   string $skeletonRoot = `getAttr( $AnimDef + ".skeletonRoot" )`;
+   textFieldGrp -edit -text $skeletonRoot skmRootField;
+
+   string $outputFile = `getAttr( $AnimDef + ".outputFile" )`;
+   textFieldGrp -edit -text $outputFile skmOutputFile;
+}
+
+
+
+global proc changeIsFacial()
+{
+	global int $isFacial;
+	
+	if($isFacial)
+	{
+		$isFacial = 0;
+	}
+	else
+	{
+		$isFacial = 1;
+	}
+}
+
+/*----------------------------------------
+GLOBAL PROC: skmExportWin
+This creates the main UI window
+----------------------------------------*/
 global proc skmExportWin()
 {
-  global string $version = "0.6";
+   global string $version = "1.0";
+   
+   global int $isFacial = 0;
 
-  if ( (`window -exists skmMainWin`)==true ) deleteUI skmMainWin;
+   if ( ( `window -exists skmMainWin` ) == true )
+   {
+      deleteUI skmMainWin;
+      windowPref -remove skmMainWin;
+   }
 
-  string $winTitle = "SKM Exporter v"+$version+" - kallmann@ict.usc.edu; ashok@ict.usc.edu";
-  window -title $winTitle -wh 400 200 skmMainWin;
-  int $maxFrame= `playbackOptions -q -animationEndTime`; 
+   //BUILD UI WINDOW
+   string $winTitle = "SKM Exporter v" + $version ;
+   window -title $winTitle -rtf true -s true skmMainWin;
+   columnLayout -adj true -cat "both" 5;
+      frameLayout -borderStyle etchedIn -collapsable false -collapse 0 -label "Animation Definitions";
+         columnLayout -adj true -rs 2 -co "both" 10;
+            textScrollList  -numberOfRows 3 -w 250 -allowMultiSelection false
+                            -showIndexedItem 4 -selectCommand updateAnimUI scrollListAnim;
+            rowColumnLayout -numberOfRows 1 -rh 1 20 -rs 1 2 -cat 1 "right" 3;
+               button -label "Create Animation"  -align "center" -command "skmAddAnimDef";
+               button -label "Rename Animation"  -align "center" -command "skmRenameAnimDef";
+               button -label "Delete Animation"  -align "center" -command "skmDeleteAnimDef";
+               setParent skmMainWin;
+   checkBox -editable false -label "Loaded from existing \"SmatbodyExportOptions\" node" -align "left" loadedBox;
+   checkBox -editable false -changeCommand "changeIsFacial()" -value false -label "Facial Animations" -align "left" facialBox;	
+   frameLayout -borderStyle etchedIn -collapsable false -collapse 0 -label "Animation Length & Synch Points";
+      columnLayout -adj true;
+         intSliderGrp -label "First Frame:" -adj 3 -cw 2 50 -cat 1 "right" 5 -field true -fmn -10000 -fmx 10000 -changeCommand firstFrameUpdate skmFirstFrameSlider; 
+         intSliderGrp -label "Last Frame:"  -adj 3 -cw 2 50 -cat 1 "right" 5 -field true -fmn -10000 -fmx 10000 -changeCommand lastFrameUpdate skmLastFrameSlider;
+         columnLayout -adj true -rs 2 -co "both" 10;
+            button -label "Stroke, Ready, Relax Help" -align "center" -command infoPressed;
+            setParent .. ;
+         intSliderGrp -label "Ready End Frame"     -adj 3 -cw 2 50 -cat 1 "right" 5 -field true -fmn -10000 -fmx 10000 -changeCommand readyUpdate sliderReady ;
+         intSliderGrp -label "Stroke Start Frame:" -adj 3 -cw 2 50 -cat 1 "right" 5 -field true -fmn -10000 -fmx 10000 -changeCommand strokeStartUpdate sliderStrokeStart ;
+         intSliderGrp -label "Emphasis Frame:"     -adj 3 -cw 2 50 -cat 1 "right" 5 -field true -fmn -10000 -fmx 10000 -changeCommand emphasisUpdate sliderEmphasis ;
+         intSliderGrp -label "Stroke End Frame:"   -adj 3 -cw 2 50 -cat 1 "right" 5 -field true -fmn -10000 -fmx 10000 -changeCommand strokeUpdate sliderStrokeEnd ; 
+         intSliderGrp -label "Relax End Frame:"    -adj 3 -cw 2 50 -cat 1 "right" 5 -field true -fmn -10000 -fmx 10000 -changeCommand relaxUpdate sliderRelax ; 
+         setParent skmMainWin;
+   frameLayout -borderStyle etchedIn -collapsable false -collapse 0 -label "Export Setup";
+      columnLayout -adj true;
+         intSliderGrp -label "Frames per Seconds:" -adj 3 -cw 2 50 -cat 1 "right" 5 -field true -fmn -10000 -fmx 10000 -changeCommand fpsUpdate -min 1 -value 30 sliderFps; //<- was "skmFps"
+         textFieldGrp -label "Skeleton Root Joint:" -adj 2 -cat 1 "right" 5 -changeCommand updateSkeletonRoot skmRootField;
+         textFieldGrp -label "Output File:" -adj 2 -cat 1 "right" 5 -changeCommand updateOutput skmOutputFile;
+         columnLayout -adj true -rs 2 -co "both" 10;
+            button -l "Browse Output File" -command "fileBrowserDialog -m 1 -fc \"skmFileCb\" -an \"Select\" -om \"SaveAs\"";
+            setParent skmMainWin;
+   frameLayout -borderStyle etchedIn -collapsable false -collapse 0 -lv false;
+      columnLayout -adj true -rs 5 -co "both" 10;
+         button -l "Export Animation" -command "skmExport()";
+         setParent skmMainWin;
+
+   //ADD INFO NODES & ATTRIBUTES
+   //Create SmartbodyExportOptions node if it doesn't yet exist
+   if ( !`objExists "SmartbodyExportOptions"` )
+   {
+      checkBox -edit -value false loadedBox;
+      group -empty -name "SmartbodyExportOptions";
+      setAttr "SmartbodyExportOptions.visibility" 0;
+   }
+   else
+   {
+      checkBox -edit -value true loadedBox;
+   }
+
+   //Check to see if there are any existing animation definitions
+   select -hi SmartbodyExportOptions;
+   string $tempList[] = `ls -sl`;
+   float $animDefsExist = 0;
+
+   for ( $obj in $tempList )
+   {
+      if ( `substring $obj 1 7` == "AnimDef" )
+      {
+         $animDefsExist = 1;
+         print "Found existing animation definitions. \n";
+      }
+   }
+
+   string $newAnimName;
+
+   //If no animation definitions exist create a default animation definition
+   if ( $animDefsExist == 0 )
+   {
+      //Create node with setting attributes
+      $newAnimName = "DefaultAnim";
+
+         //this bit is meant to get the scene name and anme the anim the same name, not currently working
+         /*
+         string $FileName = `file -q -sceneName`;
+         string $splitFileName[] ;
+         int $TempToken = `tokenize $FileName "." $splitFileName` ;
+         
+         if ($splitFileName[0] == "") {
+            $newAnimName = "UnnamedAnim" ;
+         }
+         else {
+            $newAnimName = $splitFileName[0] ; 	
+         }
+         */
+
+      textScrollList -edit -append $newAnimName scrollListAnim;
+      group -n ( "AnimDef_" + $newAnimName ) -em -p SmartbodyExportOptions;
+
+      addAttr -ln "framesPerSecond" -sn "frmsps" -at "long" -min 1 -dv 30 ( "AnimDef_" + $newAnimName );
+      addAttr -ln "firstFrameNumber" -sn "fFrm" -at "long" ( "AnimDef_" + $newAnimName );
+      addAttr -ln "lastFrameNumber" -sn "lFrm" -at "long" ( "AnimDef_" + $newAnimName );
+      addAttr -ln "readyTime" -sn "rdyTime" -at "double" ( "AnimDef_" + $newAnimName );
+      addAttr -ln "strokeStartTime" -sn "sStart" -at "double" ( "AnimDef_" + $newAnimName );
+      addAttr -ln "emphasisTime" -sn "seTime" -at "double" ( "AnimDef_" + $newAnimName );
+      addAttr -ln "strokeTime" -sn "sEnd" -at "double" ( "AnimDef_" + $newAnimName );
+      addAttr -ln "relaxTime" -sn "rlxTime" -at "double" ( "AnimDef_" + $newAnimName );
+
+      addAttr -ln "skeletonRoot" -sn "skRoot" -dt "string" ( "AnimDef_" + $newAnimName );
+      setAttr -type "string" ( "AnimDef_" + $newAnimName + ".skeletonRoot" ) "base";
+
+      addAttr -ln "outputFile" -sn "outFile" -dt "string" ( "AnimDef_" + $newAnimName );
+      setAttr -type "string" ( "AnimDef_" + $newAnimName + ".outputFile" ) ( $newAnimName + ".skm" );
+
+      textScrollList -edit -si $newAnimName scrollListAnim;
+      updateAnimUI;
+
+      print( "Default animation definition created: " + $newAnimName + "\n" );
+   }
+
+   //Check for pre 0.7 info nodes and transfer their info to default node
+   skmUpdateOldFiles( $newAnimName );
+
+   //If animation definitions do exist add these to the UI
+   if ( $animDefsExist == 1 )
+   {
+      for ( $obj in $tempList )
+      {
+         if ( `substring $obj 1 7` == "AnimDef" )
+         {
+            string $AnimName = `substring $obj 9 250`;
+            textScrollList -edit -append $AnimName scrollListAnim;
+            //print "Found existing animation definitions. \n";
+         }
+      }
+   }
 
 
-  
-  
-  columnLayout -adjustableColumn true; 
-  checkBox -editable false -label "Loaded from Previous"  -align "left" loadedBox;
-  intSliderGrp -label "Frames per Seconds:" -field true -dragCommand fpsUpdate -value 30 skmFps;
-  intSliderGrp -label "First Frame Number:" -field true -dragCommand firstFrameUpdate skmFirstFrameSlider; 
-  intSliderGrp -label "Last Frame Number:" -field true -value $maxFrame -dragCommand lastFrameUpdate skmLastFrameSlider;
-  button -label "Stroke, Ready, Relax Help"  -align "center" -command infoPressed;
-  //radioButton -label "Right"  -align "right";
-  //textFieldGrp -label "Existing IK Handles:" -text $ikHandleList skmIkHandleField;
-  intSliderGrp -label "Ready End Frame" -field true -dragCommand readyUpdate ready; 
-  intSliderGrp -label "Stroke Start Frame:" -field true -dragCommand strokeStartUpdate strokeStart;
-  intSliderGrp -label "Emphasis:" -field true -dragCommand emphasisUpdate emphasis; 
-  intSliderGrp -label "Stroke End Frame:" -field true -dragCommand strokeUpdate stroke;  
-  intSliderGrp -label "Relax End Frame:" -field true -dragCommand relaxUpdate relax;
-  textFieldGrp -label "Skeleton Root Joint:" -text "base" skmRootField;
-  if (!`objExists "fpsNode"`){
-//	print "in if fpsNode \n";
-	group -empty -name "fpsNode";
-	addAttr -ln "framesPerSecond" -sn "frmsps" -at "long";
-	checkBox -edit -value false loadedBox;
-	$fps= `intSliderGrp -q -value skmFps`;
-	setAttr "fpsNode.framesPerSecond" $fps;
-} 
-else {
-//	 print "in else fpsNode \n";
-	 int $fps=`getAttr "fpsNode.framesPerSecond"`;
-	 intSliderGrp -edit -value $fps skmFps;
-	 checkBox -edit -value true loadedBox;
-}
+   //FINISH
+   showWindow skmMainWin;
 
-  if (!`objExists "firstFrameNode"`){
-//	print "in if firstNode \n";
-	group -empty -name "firstFrameNode";
-	addAttr -ln "firstFrameNumber" -sn "fFrm" -at "long";
-	 intSliderGrp -edit -min 1 skmFirstFrameSlider;
-    checkBox -edit -value false loadedBox;
-	int $frameNumber = `intSliderGrp -query -value skmFirstFrameSlider`;
-	if($frameNumber==0)
-	{
-		$frameNumber=1;
-	}
-	setAttr "firstFrameNode.firstFrameNumber" $frameNumber;
-} 
-else {
-	 int $fFN=`getAttr "firstFrameNode.firstFrameNumber"`;
-	 intSliderGrp -edit -min 1 -value ($fFN) skmFirstFrameSlider;
-	 //intSliderGrp -edit -value -min 1;
-}
-  if (!`objExists "lastFrameNode"`){
-//	print "in if lastNode \n";
-	group -empty -name "lastFrameNode";
-	addAttr -ln "lastFrameNumber" -sn "lFrm" -at "long";
-	checkBox -edit -value false loadedBox;
-	int $frameNumber = `intSliderGrp -query -value skmFirstFrameSlider`;
-	setAttr "firstFrameNode.firstFrameNumber" $frameNumber;
-}
-else {
-	 int $lFN=`getAttr "lastFrameNode.lastFrameNumber"`;
-	 intSliderGrp -edit -value $lFN skmLastFrameSlider;
-}
-  if( !`objExists "readyNode"` ) {
-//	print "in if readyNode \n";
-	group -empty -name "readyNode";
-	addAttr -ln "readyTime" -sn "rNde" -at "double";
-	checkBox -edit -value false loadedBox;
-}
-else {
-	 int $rN=`getAttr "readyNode.readyTime"`;
-	 intSliderGrp -edit -value $rN ready;
-}
-
-  if( !`objExists "strokeStartNode"` ){
-//	print "in if strokeNode \n";
-	group -empty -name "strokeStartNode";
-	addAttr -ln "strokeStartTime" -sn "sNde" -at "double";
-	checkBox -edit -value false loadedBox;
-}
-else {
-	int $sN=`getAttr "strokeStartNode.strokeStartTime"`;
-	intSliderGrp -edit -value $sN strokeStart;
-}
-
-  if( !`objExists "emphasisNode"` ){
-//	print "in if emphasis \n";
-	group -empty -name "emphasisNode";
-	addAttr -ln "emphasisTime" -sn "sNde" -at "double";
-	checkBox -edit -value false loadedBox;
-}
-else {
-	int $sN=`getAttr "emphasisNode.emphasisTime"`;
-	intSliderGrp -edit -value $sN emphasis;
-}
-
-  if( !`objExists "strokeNode"` ){
-//	print "in if strokeNode \n";
-	group -empty -name "strokeNode";
-	addAttr -ln "strokeTime" -sn "sNde" -at "double";
-	checkBox -edit -value false loadedBox;
-}
-else {
-	int $sN=`getAttr "strokeNode.strokeTime"`;
-	 intSliderGrp -edit -value $sN stroke;
-}
-
-  if (! `objExists "relaxNode"` ){
-	group -empty -name "relaxNode";
-	addAttr -ln "relaxTime" -sn "rNde" -at "double";
-	checkBox -edit -value false loadedBox;
-}
-else {
-	int $rlxN=`getAttr "relaxNode.relaxTime"`;
-	 intSliderGrp -edit -value $rlxN relax;
-
-}
-  string $fileName= `file -q -sceneName`;
-  string $splitFileName[];
-  int $whatever= `tokenize $fileName "." $splitFileName`;
-  $splitFileName[0]= $splitFileName[0]+".skm"; 
-   textFieldGrp -label "Output File:" -text $splitFileName[0] skmOutputFile;
-  
-  int $W1 = 150, $H1 = 295;	
-  //window -width $W1 -height $H1 -title $TITLE1 -minimizeButton false -maximizeButton false NUKE1;
-  //columnLayout -adjustableColumn true;			
- 
-  //intSliderGrp -edit -min $retimeMin -max $retimeMax -value $retimeMin sNuke; // setup the min/max of slider		
-  button -l "Browse Output File" -command "fileBrowserDialog -m 1 -fc \"skmFileCb\" -an \"Select\" -om \"SaveAs\"";
-  button -l "Export Animation" -command "skmExport()";
-  setParent..;
-
-  showWindow skmMainWin;
-}
-
-global proc infoPressed (){
-	confirmDialog -title "Ready Stroke Relax help" -message "Ready: Anticipation for the stroke (or action)  \nStroke: Climax of Action- point of greatest emphasis \nRelax: Follow-Thru and Settle of the action \nfor more information consult http://twiki.isi.edu/Public/BMLSpecification" -button "close"  -defaultButton "close";
-}
-
-global proc fpsUpdate (){
-	$fps= `intSliderGrp -q -value skmFps`;
-	setAttr "fpsNode.framesPerSecond" $fps;
+   print "SKM Exporter window created. \n" ;
 }
 
-global proc lastFrameUpdate() {
-	int $maxFrame= `playbackOptions -q -animationEndTime`; 
-	int $frameNumber = `intSliderGrp -query -value skmLastFrameSlider`; // the animator is at this framenumber
-	intSliderGrp -edit -max $maxFrame skmLastFrameSlider;
-	currentTime -edit $frameNumber; // UPDATE THE DISPLAY
-	setAttr "lastFrameNode.lastFrameNumber" $frameNumber;
-	//updates ready stroke relax sliders
-	intSliderGrp -edit -max $frameNumber ready;
-	intSliderGrp -edit -max $frameNumber strokeStart;
-	intSliderGrp -edit -max $frameNumber emphasis;	
-	intSliderGrp -edit -max $frameNumber stroke;
-	intSliderGrp -edit -max $frameNumber relax;
-	playbackOptions -max $frameNumber;
+
+/*----------------------------------------
+GLOBAL PROC: infoPressed
+This brings up a help window for setting ready, stroke, relax etc.
+----------------------------------------*/
+global proc infoPressed()
+{
+   confirmDialog -title "Ready Stroke Relax help" -message "Ready: Anticipation for the stroke (or action)  \nStroke: Climax of Action- point of greatest emphasis \nRelax: Follow-Thru and Settle of the action \nfor more information consult http://twiki.isi.edu/Public/BMLSpecification" -button "close"  -defaultButton "close";
 }
 
-global proc firstFrameUpdate(){ 
-	int $endFrame = `intSliderGrp -q -value skmLastFrameSlider`;
-	int $frameNumber = `intSliderGrp -query -value skmFirstFrameSlider`; // the animator is at this framenumber
-	intSliderGrp -edit -max $endFrame skmFirstFrameSlider;
-	currentTime -edit $frameNumber; // UPDATE THE DISPLAY
-	setAttr "firstFrameNode.firstFrameNumber" $frameNumber;
-       //updates ready stroke relax sliders
-	intSliderGrp -edit -min $frameNumber ready;
-	intSliderGrp -edit -max $frameNumber strokeStart; 	
-	intSliderGrp -edit -max $frameNumber emphasis; 
-	intSliderGrp -edit -min $frameNumber stroke;
-	intSliderGrp -edit -min $frameNumber relax;
-	playbackOptions -min $frameNumber;
 
+/*----------------------------------------
+GLOBAL PROC: fpsUpdate
+This updates the scene as the slider is moved
+----------------------------------------*/
+global proc fpsUpdate()
+{
+   string $selAnim[] = `textScrollList -q -si "scrollListAnim" `;
+   string $AnimDef = ( "AnimDef_" + $selAnim[ 0 ] );
+   $fps = `intSliderGrp -q -value sliderFps`;
+   setAttr( $AnimDef + ".framesPerSecond" ) $fps;
 }
 
-global proc readyUpdate ()  {
-	//
-	// this routine is called when the animator drags the slider
-	// the scene is updated as the animator moves from one frame to another
-	//
-	// here we stamp the frames visited and the times at which they were visited
-	//
-	int $startFrame = `intSliderGrp -q -value skmFirstFrameSlider`;
-    int $endFrame = `intSliderGrp -q -value skmLastFrameSlider`;
-	intSliderGrp -edit -min $startFrame -max $endFrame ready; 
-	int $frameNumber = `intSliderGrp -query -value ready`; // the animator is at this framenumber
-	setAttr "readyNode.readyTime" $frameNumber;
-	currentTime -edit $frameNumber; // UPDATE THE DISPLAY
+
+/*----------------------------------------
+GLOBAL PROC: firstFrameUpdate
+This updates the scene as the slider is moved
+----------------------------------------*/
+global proc firstFrameUpdate()
+{
+   string $selAnim[] = `textScrollList -q -si "scrollListAnim" `;
+   string $AnimDef = ( "AnimDef_" + $selAnim[ 0 ] );
+
+   int $frameNumber = `intSliderGrp -query -value skmFirstFrameSlider`; // the animator is at this framenumber
+   currentTime -edit $frameNumber; // UPDATE THE DISPLAY
+   //setAttr "SmartbodyExportOptions.firstFrameNumber" $frameNumber;
+   setAttr ( $AnimDef + ".firstFrameNumber" ) $frameNumber;
+
+   //updates ready stroke relax sliders
+   intSliderGrp -edit -min $frameNumber sliderReady;
+   intSliderGrp -edit -min $frameNumber sliderStrokeStart;
+   intSliderGrp -edit -min $frameNumber sliderEmphasis;
+   intSliderGrp -edit -min $frameNumber sliderStrokeEnd;
+   intSliderGrp -edit -min $frameNumber sliderRelax;
 }
 
-global proc strokeStartUpdate ()  {
-	//
-	// this routine is called when the animator drags the slider
-	// the scene is updated as the animator moves from one frame to another
-	//
-	// here we stamp the frames visited and the times at which they were visited
-	//
-	int $startFrame = `intSliderGrp -q -value skmFirstFrameSlider`;
-     int $endFrame = `intSliderGrp -q -value skmLastFrameSlider`;
-	intSliderGrp -edit -min $startFrame -max $endFrame strokeStart;
-	int $frameNumber = `intSliderGrp -query -value strokeStart`; // the animator is at this framenumber
-	//intSliderGrp -label "Stroke Start Begin Frame:" -field true -dragCommand strokeStartUpdate strokeStart;
-	setAttr "strokeStartNode.strokeStartTime" $frameNumber;
-	currentTime -edit $frameNumber; // UPDATE THE DISPLAY
+
+/*----------------------------------------
+GLOBAL PROC: lastFrameUpdate
+This updates the scene as the slider is moved
+----------------------------------------*/
+global proc lastFrameUpdate()
+{
+   string $selAnim[] = `textScrollList -q -si "scrollListAnim" ` ;
+   string $AnimDef = ( "AnimDef_" + $selAnim[ 0 ] );
+
+   int $frameNumber = `intSliderGrp -query -value skmLastFrameSlider`; // the animator is at this framenumber
+   currentTime -edit $frameNumber; // UPDATE THE DISPLAY
+   setAttr ( $AnimDef + ".lastFrameNumber" ) $frameNumber;
+   //setAttr "SmartbodyExportOptions.lastFrameNumber" $frameNumber;
+
+   //updates ready stroke relax sliders
+   intSliderGrp -edit -max $frameNumber sliderReady;
+   intSliderGrp -edit -max $frameNumber sliderStrokeStart;
+   intSliderGrp -edit -max $frameNumber sliderEmphasis;
+   intSliderGrp -edit -max $frameNumber sliderStrokeEnd;
+   intSliderGrp -edit -max $frameNumber sliderRelax;
 }
 
-global proc emphasisUpdate ()  {
-	//
-	// this routine is called when the animator drags the slider
-	// the scene is updated as the animator moves from one frame to another
-	//
-	// here we stamp the frames visited and the times at which they were visited
-	//
-	int $startFrame = `intSliderGrp -q -value skmFirstFrameSlider`;
-     int $endFrame = `intSliderGrp -q -value skmLastFrameSlider`;
-	intSliderGrp -edit -min $startFrame -max $endFrame emphasis;
-	int $frameNumber = `intSliderGrp -query -value emphasis`; // the animator is at this framenumber
-	//intSliderGrp -label "Emphasis Frame:" -field true -dragCommand emphasisUpdate emphasis;
-	setAttr "emphasisNode.emphasisTime" $frameNumber;
-	currentTime -edit $frameNumber; // UPDATE THE DISPLAY
+
+/*----------------------------------------
+GLOBAL PROC: readyUpdate
+This updates the scene as the slider is moved
+----------------------------------------*/
+global proc readyUpdate()
+{
+   string $selAnim[] = `textScrollList -q -si "scrollListAnim" `;
+   string $AnimDef = ( "AnimDef_" + $selAnim[ 0 ] );
+   int $frameNumber = `intSliderGrp -query -value sliderReady`; // the animator is at this framenumber
+   setAttr ( $AnimDef + ".readyTime" ) $frameNumber;
+   currentTime -edit $frameNumber; // UPDATE THE DISPLAY
 }
 
-global proc strokeUpdate ()  {
-	//
-	// this routine is called when the animator drags the slider
-	// the scene is updated as the animator moves from one frame to another
-	//
-	// here we stamp the frames visited and the times at which they were visited
-	//
-	int $startFrame = `intSliderGrp -q -value skmFirstFrameSlider`;
-     	int $endFrame = `intSliderGrp -q -value skmLastFrameSlider`;
-	intSliderGrp -edit -min $startFrame -max $endFrame stroke;
-	int $frameNumber = `intSliderGrp -query -value stroke`; // the animator is at this framenumber
-	//intSliderGrp -label "Stroke Begin Frame:" -field true -dragCommand strokeUpdate stroke;
-	setAttr "strokeNode.strokeTime" $frameNumber;
-	currentTime -edit $frameNumber; // UPDATE THE DISPLAY
+
+/*----------------------------------------
+GLOBAL PROC: strokeStartUpdate
+This updates the scene as the slider is moved
+----------------------------------------*/
+global proc strokeStartUpdate()
+{
+   string $selAnim[] = `textScrollList -q -si "scrollListAnim" `;
+   string $AnimDef = ( "AnimDef_" + $selAnim[ 0 ] );
+   int $frameNumber = `intSliderGrp -query -value sliderStrokeStart`; // the animator is at this framenumber
+   setAttr ( $AnimDef + ".strokeStartTime" ) $frameNumber;
+   currentTime -edit $frameNumber; // UPDATE THE DISPLAY
 }
 
-global proc relaxUpdate ()  {
-	//
-	// this routine is called when the animator drags the slider
-	// the scene is updated as the animator moves from one frame to another
-	//
-	// here we stamp the frames visited and the times at which they were visited
-	//
-	int $startFrame = `intSliderGrp -q -value skmFirstFrameSlider`;
-     	int $endFrame = `intSliderGrp -q -value skmLastFrameSlider`;
-	intSliderGrp -edit -min $startFrame -max $endFrame relax;
-	int $frameNumber = `intSliderGrp -query -value relax`; // the animator is at this framenumber
-	setAttr "relaxNode.relaxTime" $frameNumber;
-	currentTime -edit $frameNumber; // UPDATE THE DISPLAY
+
+/*----------------------------------------
+GLOBAL PROC: emphasisUpdate
+This updates the scene as the slider is moved
+----------------------------------------*/
+global proc emphasisUpdate()
+{
+   string $selAnim[] = `textScrollList -q -si "scrollListAnim" `;
+   string $AnimDef = ( "AnimDef_" + $selAnim[ 0 ] );
+   int $frameNumber = `intSliderGrp -query -value sliderEmphasis`; // the animator is at this framenumber
+   setAttr ( $AnimDef + ".emphasisTime" ) $frameNumber;
+   currentTime -edit $frameNumber; // UPDATE THE DISPLAY
 }
 
+
+/*----------------------------------------
+GLOBAL PROC: strokeUpdate
+This updates the scene as the slider is moved
+----------------------------------------*/
+global proc strokeUpdate ()
+{
+   string $selAnim[] = `textScrollList -q -si "scrollListAnim" `;
+   string $AnimDef = ( "AnimDef_" + $selAnim[ 0 ] );
+   int $frameNumber = `intSliderGrp -query -value sliderStrokeEnd`; // the animator is at this framenumber
+   setAttr ( $AnimDef + ".strokeTime" ) $frameNumber;
+   currentTime -edit $frameNumber; // UPDATE THE DISPLAY
+}
+
+
+/*----------------------------------------
+GLOBAL PROC: relaxUpdate
+This updates the scene as the slider is moved
+----------------------------------------*/
+global proc relaxUpdate()
+{
+   string $selAnim[] = `textScrollList -q -si "scrollListAnim" `;
+   string $AnimDef = ( "AnimDef_" + $selAnim[ 0 ] );
+   int $frameNumber = `intSliderGrp -query -value sliderRelax`; // the animator is at this framenumber
+   setAttr ( $AnimDef + ".relaxTime" ) $frameNumber;
+   currentTime -edit $frameNumber; // UPDATE THE DISPLAY
+}
+
+
+/*----------------------------------------
+GLOBAL PROC: updateSkeletonRoot
+This updates the scene as the slider is moved
+----------------------------------------*/
+global proc updateSkeletonRoot()
+{
+   string $selAnim[] = `textScrollList -q -si "scrollListAnim" `;
+   string $AnimDef = ( "AnimDef_" + $selAnim[ 0 ] );
+   $skeletonRoot = `textFieldGrp -q -text skmRootField` ;
+   setAttr -type "string" ( $AnimDef + ".skeletonRoot" ) $skeletonRoot ;
+}
+
+
+/*----------------------------------------
+GLOBAL PROC: updateOutput
+This updates the scene as the slider is moved
+----------------------------------------*/
+global proc updateOutput()
+{
+   string $selAnim[] = `textScrollList -q -si "scrollListAnim" `;
+   string $AnimDef = ( "AnimDef_" + $selAnim[ 0 ] );
+   $outputFile = `textFieldGrp -q -text skmOutputFile`;
+   setAttr -type "string" ( $AnimDef + ".outputFile" ) $outputFile ;
+}
+
+
+/*----------------------------------------
+GLOBAL PROC: skmExport
+Starts the export process
+----------------------------------------*/
 global proc skmExport ()
 {
+
+   source export_skm_NoGUI;
+
+
+   print "Beginning export... \n" ;
+
+//NEW
+   //Declare variables
+   string $tempList[];
+   //string $animName;
+   string $AnimDefList[];
+   int $ArraySize;
+   int $ArrayPos;
+
+   //Grab synch point values and check to see if they are valid
+   select -hi SmartbodyExportOptions;
+   $tempList = `ls -sl`;
+
+   //Add animation definitions to $AnimDefList
+   for ( $obj in $tempList )
+   {
+      if ( `substring $obj 1 7` == "AnimDef" )
+      {
+         $ArraySize = `size( $AnimDefList )`;
+         $ArrayPos = $ArraySize;
+         $AnimDefList[ $ArrayPos ] = $obj;
+
+         print( "Put " + $obj + " in " + $ArrayPos + "\n" );
+      }
+   }
+
+   for ( $AnimDef in $AnimDefList )
+   {
+      //get synch point values and make sure they are correct
+      int $readyVal =       `getAttr( $AnimDef + ".readyTime" )`;
+      int $strokeStartVal = `getAttr( $AnimDef + ".strokeStartTime" )`;
+      int $emphasisVal =    `getAttr( $AnimDef + ".emphasisTime" )`;
+      int $strokeVal =      `getAttr( $AnimDef + ".strokeTime" )`;
+      int $relaxVal =       `getAttr( $AnimDef + ".relaxTime" )`;
+
+      if ( $readyVal <= $strokeStartVal && $strokeStartVal <= $emphasisVal && $emphasisVal <= $strokeVal && $strokeVal <= $relaxVal )
+      {
+         //check to see if ik handles exist
+         string $iklist[] = `ls -l -type ikHandle`;
+         string $but = "Continue";
+
+         if ( size( $iklist ) > 0 )
+         {
+            $but = `confirmDialog -title "Confirm"
+                                  -message "IK handles exist; animation must be baked"
+                                  -button "Continue" -button "Abort" -defaultButton "Continue"
+                                  -cancelButton "No" -dismissString "No"`;
+         }
+
+         if ( strcmp( $but,"Continue" ) == 0 )
+         {
+            global string $version;
+            int $startFrame = `getAttr( $AnimDef + ".firstFrameNumber" )`;
+            int $endFrame =   `getAttr( $AnimDef + ".lastFrameNumber" )`;
+            string $root =    `getAttr( $AnimDef + ".skeletonRoot" )`;
+            string $file =    `getAttr( $AnimDef + ".outputFile" )`;
+            int $fps =        `getAttr( $AnimDef + ".framesPerSecond" )`;
+
+            select -r $root ;   // <-Why select this?
+//            currentUnit -linear "cm";
+
+            skmWriteSkmToFileNoGUI( $file, $AnimDef, $startFrame, $endFrame, $fps, $version );
+         }
+      }
+      else
+      {
+         confirmDialog -title "ERROR: Invalid Synch Point Times" -message "Invalid times given for Ready, Stroke, Relax: make sure Relax occurs after Ready and Stroke etc. Hit help button for more information" -button "close"  -defaultButton "close";
+      }
+   }
+}
+
+
+
+/*
+//OLD
   //check to see if the Ready, Stroke, Relax have been set correctly set- pop up dialogue box if they have not
 	int $readyVal = `intSliderGrp -query -value ready`;
 	int $strokeStartVal=  `intSliderGrp -query -value strokeStart`;
@@ -644,7 +720,7 @@ global proc skmExport ()
    { global string $version; 
      string $root = `textFieldGrp -q -text skmRootField`;
      select -r $root;
-     currentUnit -linear "cm";
+     //currentUnit -linear "cm";
      string $file = `textFieldGrp -q -text skmOutputFile`;
      int $startFrame = `intSliderGrp -q -value skmFirstFrameSlider`;
      int $endFrame = `intSliderGrp -q -value skmLastFrameSlider`;
@@ -659,26 +735,47 @@ else{
 
 }
 }
+*/
 
+
+
+
+//Launch UI window
 skmExportWin;
 
-//
-// - joints can have no key data or rotation data, only root may contain translation
-// - The order of the joint rotations is considered to be Euler XYZ
-// - You cannot change the default name of the animation curves (they have to have the form jointName_rotateX, etc)
-// - If the animation uses IK handles, it must be baked before the export
-// - To make sure the animation export will be fine, remove all IK handles and check if the animation in Maya is still correct
-// - Although the script checks it, it is a good idea to change the settings to cms
-// Versions:
-// 0.1 - first version
-// 0.2 - smaller files exported (less decimals used)
-// 0.3 - rounding 5th decimal
-// 0.4 - corrected recursing into joint hierarchy even if joint has no keys
-// Modifications by Ashok Basawapatna
-// 0.5- interim solution to allow artists to specify ready, stroke, and relax using the frame numbers (a more graphical solution should be constructed), frame numbers are converted into time values and written to the bottom of the skm in the followin format
-//ready time: 0.9333333333
-//stroke time: 1.433333333
-//relax time: 1.933333333 
 
-// 0.6- another interim solution-- gives the artist access to the time slider for all sliders in order to specify ready, stroke, and relax;start and end frame again writes the times to the bottom of the skm
-//adds help button to explain ready, stroke, relax to the artist and also has error check to make sure ready, stroke, relax are valid times
+
+/*----------------------------------------
+SCRIPT INFO
+  - joints can have no key data or rotation data, only root may contain translation
+  - The order of the joint rotations is considered to be Euler XYZ
+  - You cannot change the default name of the animation curves (they have to have the form jointName_rotateX, etc)
+  - If the animation uses IK handles, it must be baked before the export
+  - To make sure the animation export will be fine, remove all IK handles and check if the animation in Maya is still correct
+  - Although the script checks it, it is a good idea to change the settings to cms
+ 
+KNOWN ISSUES
+ - under certain conditions, which I have not been able to determine, the output file path will disappear
+  
+VERSION HISTORY:
+  0.1 - first version
+  0.2 - smaller files exported (less decimals used)
+  0.3 - rounding 5th decimal
+  0.4 - corrected recursing into joint hierarchy even if joint has no keys
+  Modifications by Ashok Basawapatna
+  0.5 - interim solution to allow artists to specify ready, stroke, and relax using the frame numbers (a more graphical solution should be constructed), frame numbers are converted into time values and written to the bottom of the skm in the followin format
+	ready time: 0.9333333333
+	stroke time: 1.433333333
+	relax time: 1.933333333 
+  0.6 - another interim solution-- gives the artist access to the time slider for all sliders in order to specify ready, stroke, and relax;start and end frame again writes the times to the bottom of the skm
+	adds help button to explain ready, stroke, relax to the artist and also has error check to make sure ready, stroke, relax are valid times
+  0.7 - changes by Matt Liewer (liewer@ict.usc.edu)
+	disabled timeline resizing when first and last frame values changed
+	put all export option attributes onto one node "SmartbodyExportOptions"
+	commented code a bit
+	general streamlinining of script
+	re-organized interface
+  0.8 - changes by Matt Liewer (liewer@ict.usc.edu)
+	when UI is opened it will check for info created by older version of the exporter and upadte this info to new system
+	can now define and export multiple animations per file
+*/

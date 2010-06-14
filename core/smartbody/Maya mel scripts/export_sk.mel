@@ -19,216 +19,198 @@
 //      Marcelo Kallmann, USC (currently at UC Merced)
 //      Ashok Basawapatna, USC (no longer)
 //      Andrew n marshall, USC
+//      Kristin Parker, USC
 
 
 
 ////////////////////////////////////////////////////////////////
 //  Exports animation skeleton in .sk format for SmartBody
 //  Requires SkViewer to bind the .objs to the .sk skeleton
-//
+//  Will create attribute nodes to keep exporter information between Maya sessions
 
 
-proc float skRound ( float $value )
- {
-   int $precision = 5;
-   $power = `pow 10 $precision`;
-   $value = $value * $power;
-   $value = int ( $value+($value<0?-0.5:0.5) );
-   $value = $value / $power;
-   return $value;
- }
-
-proc int skMargin ( int $fileid, int $depth )
- {
-   for ( $k=0; $k<$depth; $k++ ) fprint $fileid ("  ");
+global proc int skRootJointChanged()
+{
+   string $root = `textFieldGrp -q -text skRootField`;
+   setAttr -type "string" SkelDef.RootJoint $root;
    return 1;
- }
-
-proc int skWriteSk ( string $jname, int $fileid, int $depth )
- {
-   //=== Get Children ===
-   string $children[];
-   $children = `listRelatives $jname`;
-   int $nchildren = `size $children`;
-
-   //=== Check Type ===
-   string $type = nodeType ( $jname );
-  
-   if ( $type=="mesh" )
-    { skMargin ( $fileid, $depth-1 );
-      fprint $fileid ("visgeo \"" + $jname + ".obj\"\n" );
-      skMargin ( $fileid, $depth-1 );
-      fprint $fileid ("colgeo \"" + $jname + ".obj\"\n" );
-    }
-   else if ( $type!="joint" )
-    { print ( "Skipping " + $jname + ": " + $type + "\n" );
-    }
-
-   if ( $type!="joint" )
-    { for ( $i=0; $i<$nchildren; $i++ )
-	   { skWriteSk ( $children[$i], $fileid, $depth+1 );
-	   }
-      return 1;
-    }
-   
-   //=== Export Joint ===
-   print ( "Exporting joint " + $jname + "\n" );
-
-   skMargin ( $fileid, $depth );
-   
-   if ($depth == 0)
-    fprint $fileid ("root ");
-   else
-	fprint $fileid ("joint ");
-
-   fprint $fileid ( $jname + "\n" );
-
-   //=== Offset ===
-   skMargin ( $fileid, $depth );
-   
-   fprint $fileid ("{ offset ");
-
-   float $offset[3];
-   string $s = $jname + ".translateX";
-   $offset[0] = `getAttr $s`;
-   string $s = $jname + ".translateY";
-   $offset[1] = `getAttr $s`;
-   string $s = $jname + ".translateZ";
-   $offset[2] = `getAttr $s`;
-
-   if ( $depth==0 )
-    fprint $fileid ("0 0 0\n") ;
-   else
-	fprint $fileid ( skRound($offset[0]) + " " + skRound($offset[1]) + " " + skRound($offset[2]) + "\n");
-    
-   
-   int $mntmn[]=(`transformLimits -query -etx $jname`);
-   float $xTransLimitValues[]= (`transformLimits -query -tx $jname`);
-   float $yTransLimitValues[]= (`transformLimits -query -ty $jname`);
-   float $zTransLimitValues[]= (`transformLimits -query -tz $jname`);
-   if ($mntmn[0] && $mntmn[1])
-	{
-	  if(!($xTransLimitValues[0]==$xTransLimitValues[1]))
-	  {
-		skMargin ( $fileid, $depth-1 );
-		fprint $fileid ("    channel XPos 0" + " lim "+$xTransLimitValues[0]+" "+$xTransLimitValues[1]+"\n");
-	  }
-	  if(!($yTransLimitValues[0]==$yTransLimitValues[1]))
-	  {
-		skMargin ( $fileid, $depth-1 );
-		fprint $fileid ("    channel YPos 0" + " lim "+$yTransLimitValues[0]+" "+$yTransLimitValues[1]+"\n");
-	  }
-	  if(!($zTransLimitValues[0]==$zTransLimitValues[1]))
-	  {
-		skMargin ( $fileid, $depth-1 );
-		fprint $fileid ("    channel ZPos 0" + " lim "+$zTransLimitValues[0]+" "+$zTransLimitValues[1]+"\n");
-	  }
-    }
-	else{
-	 // skMargin ( $fileid, $depth-1 );
-	 // fprint $fileid ("    channel XPos 0 free\n");
-	 // skMargin ( $fileid, $depth-1 );
-     // fprint $fileid ("    channel YPos 0 free\n");
-	 // skMargin ( $fileid, $depth-1 );
-     // fprint $fileid ("    channel ZPos 0 free\n");
-	}
+}
 
 
-  //=== Translation Channels only for Root ===
-  // if ( $depth==0 )
-  //  { fprint $fileid ("  channel XPos 0 free\n");
-  //    fprint $fileid ("  channel YPos 0 free\n");
-  //    fprint $fileid ("  channel ZPos 0 free\n");
-  //  }
-    
-   //=== Rotation ===
-   skMargin ( $fileid, $depth+1 );
-   fprint $fileid ("channel Quat\n");
+global proc int skNameChanged()
+{
+   string $name = `textFieldGrp -q -text skOutputName`;
 
-   //=== Line Space ===
-   fprint $fileid ("\n");
-   
-   //=== Recurse ===
-   for ( $i=0; $i<$nchildren; $i++ )
-	{ skWriteSk ( $children[$i], $fileid, $depth+1 );
-	}
+   string $filepath = `textFieldGrp -q -text skOutputFile`;
+   textFieldGrp -e -text ( `dirname($filepath)` + "/" + $name + ".sk" ) skOutputFile;
 
-   //=== End ===
-   skMargin ( $fileid, $depth );
-   fprint $fileid ("}\n");
+   setAttr -type "string" SkelDef.SkeletonName $name;
+
+
+   string $file = `textFieldGrp -q -text skOutputFile`;
+   setAttr -type "string" SkelDef.OutputDirectory $file;
 
    return 1;
 }
 
-global proc int skExportToFile ( string $fname, string $skname, string $version )
- { 
-   int $fileid = `fopen $fname "w"`;
-   
-   if ( $fileid==0 )
-    { error ("Could not open file: "+$fname);
-      return 0;
-    }
 
-   $selectionList = `ls -sl`;
-   if ( size($selectionList)<=0 )
-    { fclose $fileid;
-      error "Nothing selected!\n";
-    }
- 
-   int $selectionListSize = `size $selectionList`;
-   int $depth=0;
-
-   for ( $j=0; $j<$selectionListSize; $j++ )
-    {
-      fprint $fileid ("# SK Skeleton Definition - M. Kallmann 2004\n");
-      fprint $fileid ("# File generated with export_sk_v"+$version+".mel\n\n");
-      fprint $fileid ("set_name "+$skname+"\n\n");
-      fprint $fileid ("skeleton\n");
-        
-      skWriteSk ( $selectionList[$j], $fileid, $depth );
-	
-      fprint $fileid ("\n\n");
-      fprint $fileid ("end\n\n");
-    }
-
-   fclose($fileid);
-   print ("Export done.\n");
+global proc int skOutputDirChanged()
+{
+   string $file = `textFieldGrp -q -text skOutputFile`;
+   setAttr -type "string" SkelDef.OutputDirectory $file;
    return 1;
 }
+
 
 global proc int skFileCb( string $filename, string $fileType )
 {
-  textFieldGrp -e -text $filename skOutputFile;
-  return 1;
+   textFieldGrp -e -text ($filename+"/"+`textFieldGrp -q -text skOutputName`+".sk") skOutputFile;
+   return 1;
 }
 
+
+//--------------------------------------------------------------------------------
+// PROC: skAddSkeletonDef
+// This creates a "SkelDef" node to stire various attributes about the skeleton
+//--------------------------------------------------------------------------------
+proc skAddSkeletonDef()
+{
+   string $result = `promptDialog -title "Define New Skeleton" - message "Root Joint's Name?"
+               - button "OK" -button "Cancel" -defaultButton "OK" 
+               - cancelButton "Cancel" -dismissString "Cancel"`;
+
+   if ( $result == "OK" )
+   {
+      $rootJointName = `promptDialog -query -text`;
+
+      //make sure rootJointName is valid
+      if ( `objExists $rootJointName` )
+      {
+         //valid joint entered
+         group -n "SkelDef" -em -p SmartbodyExportOptions ;
+
+         addAttr -ln "RootJoint" -dt "string" SkelDef ;
+         setAttr -type "string" SkelDef.RootJoint $rootJointName;
+
+         addAttr -ln "SkeletonName" -dt "string" SkelDef;
+         setAttr -type "string" SkelDef.SkeletonName "default";
+
+         addAttr -ln "OutputDirectory" -dt "string" SkelDef;
+         setAttr -type "string" SkelDef.OutputDirectory "./default.sk";
+
+         addAttr -ln "ShowAllChannels" -at bool SkelDef;
+         setAttr SkelDef.ShowAllChannels false;
+
+         addAttr -ln "UseLimits" -at bool SkelDef;
+         setAttr SkelDef.UseLimits true;
+      }
+      else
+      {
+         //invalid joint entered
+         string $errorMsg = $rootJointName + " is an invalid name for the root joint. Script has exited.\n ";
+         error( $errorMsg );
+      }
+   }
+}
+
+
+global proc channelsChecked()
+{
+   //the show all channels box has been checked in the gui!
+   setAttr SkelDef.ShowAllChannels true;
+}
+
+
+global proc channelsUnchecked()
+{
+   //the show all channels box has been unchecked in the gui!
+   setAttr SkelDef.ShowAllChannels false;
+}
+
+
+global proc limitsChecked()
+{
+   //the use limits box has been checked in the gui!
+   setAttr SkelDef.UseLimits true;
+}
+
+
+global proc limitsUnchecked()
+{
+   //the use limits box has been unchecked in the gui!
+   setAttr SkelDef.UseLimits false;
+}
+
+
+//--------------------------------------------------------------------------------
+// PROC: skExportWin
+//--------------------------------------------------------------------------------
 global proc skExportWin()
 {
-  global string $version = "0.2";
 
-  if ( (`window -exists skMainWin`)==true ) deleteUI skMainWin;
-  string $winTitle = "SK Exporter v"+$version+" - kallmann@ict.usc.edu";
-  window -title $winTitle -wh 400 180 skMainWin;
-  columnLayout -adjustableColumn true;
-  textFieldGrp -label "Skeleton Root Joint:" -text "base" skRootField;
-  textFieldGrp -label "Output Character Name:" -text "doctor" skOutputName;
-  textFieldGrp -label "Output File:" -text "C:/doctor.sk" skOutputFile;
-  button -l "Browse Output File" -command "fileBrowserDialog -m 1 -fc \"skFileCb\" -an \"Select\" -om \"SaveAs\"";
-  button -l "Export" -command "skExport";
-  setParent..;
-  showWindow skMainWin; 
+   source export_sk_NoGUI;
+
+
+   global string $version = "0.3";
+
+   //Creates SmartbodyExportOptions and SkelDef nodes if they don't exist
+   if ( !`objExists SmartbodyExportOptions` )
+   {
+      //SmartbodyExportOptions needs to be created
+      group -empty -name "SmartbodyExportOptions";
+      setAttr "SmartbodyExportOptions.visibility" 0;
+      skAddSkeletonDef();
+   }
+   else
+   {
+      if ( !`objExists SkelDef` )
+      {
+         //skeleton definition has not been made yet
+         skAddSkeletonDef();
+      }
+   }
+
+   //Build UI
+   if ( ( `window -exists skMainWin` ) == true )
+      deleteUI skMainWin;
+
+   string $winTitle = "SK Exporter v" + $version + " - www.smartbody-anim.org";
+   window -title $winTitle -wh 300 270 skMainWin;
+   columnLayout -adjustableColumn true -columnAttach "both" 10 -rowSpacing 10 -columnWidth 290 MainColumn;
+   textFieldGrp -label "Skeleton Root Joint:" -text `getAttr SkelDef.RootJoint` -cc "skRootJointChanged" skRootField;
+   textFieldGrp -label "Output Character Name:" -text `getAttr SkelDef.SkeletonName` -cc "skNameChanged" skOutputName;
+   textFieldGrp -label "Output File:" -text `getAttr SkelDef.OutputDirectory` -cc "skOutputDirChanged" skOutputFile;
+   setParent MainColumn;
+   columnLayout -columnAttach "both" 85 -columnWidth 290 - rowSpacing 5 CBRow2;
+   setParent CBRow2;
+   checkBox -label "Show All Channels" -value (`getAttr SkelDef.ShowAllChannels`) -onCommand "channelsChecked" -offCommand "channelsUnchecked" skShowAllChannels;
+   checkBox -label "Use Limits" -value (`getAttr SkelDef.UseLimits`) -onCommand "limitsChecked" -offCommand "limitsUnchecked" skUseLimits;
+   setParent MainColumn;
+   button -l "Browse Output File" -command "fileBrowser(\"skFileCb\", \"Text\", \"\", 4)";
+   button -l "Export" -command "skExport";
+   showWindow skMainWin; 
 }
 
-global proc skExport ()
+
+//--------------------------------------------------------------------------------
+// PROC: skExport
+//--------------------------------------------------------------------------------
+global proc skExport()
 {
-  global string $version;
-  string $root = `textFieldGrp -q -text skRootField`;
-  select -r $root;
-  string $file = `textFieldGrp -q -text skOutputFile`;
-  string $name = `textFieldGrp -q -text skOutputName`;
-  currentUnit -linear "cm";
-  skExportToFile ( $file, $name, $version );
+   global string $version;
+
+   string $root   = `getAttr SkelDef.RootJoint`;
+   string $name   = `getAttr SkelDef.SkeletonName`;
+   string $file   = `getAttr SkelDef.OutputDirectory`;
+   int $showAll   = `getAttr SkelDef.ShowAllChannels`;
+   int $useLimits = `getAttr SkelDef.UseLimits`;
+
+   select -r $root;
+//   currentUnit -linear "cm";
+
+   export_sk_NoGUI( $file, $name, $version, $showAll, $useLimits );
 }
+
 
 skExportWin;
 
