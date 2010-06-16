@@ -31,8 +31,6 @@
  *  Transitional mode for calculating the behavior schedules by
  *  durations instead of a fictious local timeline.
  */
-#define BEHAVIOR_TIMING_BY_DURATION (0)
-
 
 namespace BML {
 	/**
@@ -42,42 +40,28 @@ namespace BML {
 	 */
 	class BehaviorSchedulerConstantSpeed : public BehaviorScheduler {
 		public:
-#if BEHAVIOR_TIMING_BY_DURATION
-	        // preferred durations between sync points
-		    time_sec startReadyDur;
-			time_sec readyStrokeDur;
-	        time_sec strokeRelaxDur;
-		    time_sec relaxEndDur;
-#else
 	        // preferred "local times" of sync points
 		    time_sec startTime;
 			time_sec readyTime;
+	        time_sec strokeStartTime;
 	        time_sec strokeTime;
+	        time_sec strokeEndTime;
 		    time_sec relaxTime;
 			time_sec endTime;
-#endif // BEHAVIOR_TIMING_BY_DURATION
 
 	        time_sec speed;  
 
 		public:
-#if BEHAVIOR_TIMING_BY_DURATION
-	        // preferred durations between sync points
-			BehaviorSchedulerConstantSpeed(
-				time_sec startReadyDur,
-				time_sec readyStrokeDur,
-				time_sec strokeRelaxDur,
-				time_sec relaxEndDur,
-				time_sec speed );
-#else
 	        // preferred "local times" of sync points
 			BehaviorSchedulerConstantSpeed(
 				time_sec startTime,
 				time_sec readyTime,
+				time_sec strokeStartTime,
 				time_sec strokeTime,
+				time_sec strokeEndTime,
 				time_sec relaxTime,
 				time_sec endTime,
 				time_sec speed );
-#endif // BEHAVIOR_TIMING_BY_DURATION
 
 			virtual void schedule( BehaviorSyncPoints& behav_syncs, time_sec now );
 	};

@@ -73,7 +73,7 @@ BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string
 //									: ( (relax<duration)? duration-relax : 0 );
 				// is outdt an absolute or a relative time? shapiro 5/28/10
 				float outdt = (relax<0)? motionCt->outdt()
-									: ( (relax<duration)? relax : 0 );
+									: ( (relax<duration)? duration - relax : 0 );
 				motionCt->inoutdt( indt, outdt );
 				float stroke_emphasis = motion->time_stroke_emphasis();
 				if( stroke_emphasis >= 0 )

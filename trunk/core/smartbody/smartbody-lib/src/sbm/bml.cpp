@@ -330,18 +330,22 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 
 		// ...and offset everything to be positive (assumes times are only relative to each other, not wall time, etc.)
 		// ignore differences less than TIME_DELTA
-		if( min_time < now - TIME_DELTA ) {
-			time_sec offset = now - min_time;
-			if( LOG_BML_BEHAVIOR_SCHEDULE ) {
-				cout << "DEBUG: BmlRequest::realize(): offset: "<<offset<<endl;
-			}
 
-			for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i ) {
-				BehaviorRequestPtr behavior = *i;
-				
-				BehaviorSyncPoints::iterator syncs_end = behavior->behav_syncs.end();
-				for( BehaviorSyncPoints::iterator j = behavior->behav_syncs.begin(); j != syncs_end; ++j ) {
-					j->sync()->time += offset;
+		if (0) // disable the shifting of behaviors
+		{
+			if( min_time < now - TIME_DELTA ) {
+				time_sec offset = now - min_time;
+				if( LOG_BML_BEHAVIOR_SCHEDULE ) {
+					cout << "DEBUG: BmlRequest::realize(): offset: "<<offset<<endl;
+				}
+
+				for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i ) {
+					BehaviorRequestPtr behavior = *i;
+					
+					BehaviorSyncPoints::iterator syncs_end = behavior->behav_syncs.end();
+					for( BehaviorSyncPoints::iterator j = behavior->behav_syncs.begin(); j != syncs_end; ++j ) {
+						j->sync()->time += offset;
+					}
 				}
 			}
 		}
@@ -897,7 +901,7 @@ void MeControllerRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu 
 	time_sec endAt    = behav_syncs.sync_end()->time();
 
 	if( LOG_METHODS || LOG_CONTROLLER_SCHEDULE ) {
-		cout << "DEBUG: MeControllerRequest::schedule(): startAt="<<startAt<<",  readyAt="<<readyAt<<",  strokeAt="<<strokeAt<<",  relaxAt="<<relaxAt<<",  endAt="<<endAt<<endl;
+	 	cout << "DEBUG: MeControllerRequest::schedule(): startAt="<<startAt<<",  readyAt="<<readyAt<<",  strokeAt="<<strokeAt<<",  relaxAt="<<relaxAt<<",  endAt="<<endAt<<endl;
 	}
 
 	time_sec indt  = readyAt-startAt;
@@ -912,7 +916,11 @@ void MeControllerRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu 
 	if(LOG_CONTROLLER_SCHEDULE) {
 		cout << "MeControllerRequest::schedule(..): \""<<(anim_ct->name())<<"\" startAt="<<startAt<<",  indt="<<indt<<",  outdt="<<outdt<<endl;
 	}
-	schedule_ct->schedule( anim_ct, (double)startAt, (float)indt, (float)outdt );
+	MeCtMotion* motionController = dynamic_cast<MeCtMotion*>(anim_ct);
+	if (motionController)
+		schedule_ct->schedule( anim_ct, behav_syncs);
+	else
+		schedule_ct->schedule( anim_ct, (double)startAt, (double)endAt, (float)indt, (float)outdt );
 	// TODO: Adapt speed and end time
 
 	////  Old-style MeCtScheduler2 API calls
@@ -1034,10 +1042,10 @@ NodRequest::NodRequest( const std::string& unique_id, const std::string& local, 
     //  TODO: Set a controller name
     switch( type ) {
         case VERTICAL:
-            nod->set_nod( (float)endTime, extent*60, repeats, true );  // TODO: adjust offset to not look so high
+            nod->set_nod( (float)endTime, extent*60.0f, repeats, true );  // TODO: adjust offset to not look so high
             break;
         case HORIZONTAL:
-            nod->set_nod( (float)endTime, extent*90, repeats, false );
+            nod->set_nod( (float)endTime, extent*90.0f, repeats, false );
             break;
         default:
             clog << "WARNING: NodRequest::NodRequest(..): Unknown nod type=" << type << endl;
@@ -1080,7 +1088,7 @@ SequenceRequest::SequenceRequest( const std::string& unique_id, const std::strin
                                   time_sec startTime, time_sec readyTime, time_sec strokeTime, time_sec relaxTime, time_sec endTime )
 :	BehaviorRequest( unique_id, local, syncs_in )
 {
-	set_scheduler( BehaviorSchedulerPtr( new BehaviorSchedulerConstantSpeed( startTime, readyTime, strokeTime, relaxTime, endTime, 1 ) ) );
+	set_scheduler( BehaviorSchedulerPtr( new BehaviorSchedulerConstantSpeed( startTime, readyTime, strokeTime, strokeTime, strokeTime, relaxTime, endTime, 1 ) ) );
 }
 
 /**

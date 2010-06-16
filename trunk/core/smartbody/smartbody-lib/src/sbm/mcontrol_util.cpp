@@ -1582,7 +1582,8 @@ int begin_controller(
 
 			sched_p->schedule(
 				ctrl_p, 
-				mcu_p->time, 
+				mcu_p->time,
+				mcu_p->time + ctrl_p->controller_duration(),
 				ctrl_p->indt(), 
 				ctrl_p->outdt()
 			);
@@ -1611,6 +1612,7 @@ int begin_controller(
 			char_p->motion_sched_p->schedule( // Regardless of type, controllers created via ctrl commands are treated as motions
 				ctrl_p, 
 				mcu_p->time, 
+				mcu_p->time + ctrl_p->controller_duration(),
 				ease_in, 
 				ease_out
 			);
@@ -3198,6 +3200,7 @@ int add_controller_to_scheduler(
 			sched_p->schedule( 
 				ctrl_p, 
 				T_at, 
+				T_at + ctrl_p->controller_duration(),
 				ctrl_p->indt(), 
 				ctrl_p->outdt()
 			);
@@ -3224,6 +3227,7 @@ int add_controller_to_scheduler(
 			sched_p->schedule( 
 				ctrl_p, 
 				T_at, 
+				T_at + ctrl_p->controller_duration(),
 				ease_in, 
 				ease_out
 			);

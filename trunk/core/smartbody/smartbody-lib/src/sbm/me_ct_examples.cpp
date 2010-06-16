@@ -291,7 +291,7 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 	}
 
 	float x = (float)( t / (double)_duration );
-	float angle_deg = (float)( _magnitude * sin( x * 2.0 * M_PI * _repetitions ) );
+	float angle_deg = (float)( -_magnitude * sin( x * 2.0 * M_PI * _repetitions ) );
 	
 	SrBuffer<float>& buff = frame.buffer();
 
@@ -316,7 +316,7 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 		);
 		
 		quat_t Q_out;
-		if( frame.isChannelUpdated( context_channel_index ) )	{
+		if (frame.isChannelUpdated( context_channel_index ) )	{
 			// If channel has been touched, preserve components and add delta
 			if( _affirmative )	{
 				Q_out = euler_t(
