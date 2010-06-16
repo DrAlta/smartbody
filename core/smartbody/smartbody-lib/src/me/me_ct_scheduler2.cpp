@@ -32,7 +32,9 @@
 #include <ME/me_ct_scheduler2.h>
 #include <ME/me_ct_blend.hpp>
 #include <ME/me_ct_time_shift_warp.hpp>
+#include <ME/me_ct_motion.h>
 
+#include <sbm/mcontrol_util.h>
 
 using namespace std;
 
@@ -332,11 +334,11 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::create_track( MeCtUnary* blending,
 	return track;
 }
 
-MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin, float indt, float outdt )
+MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin, double tout, float indt, float outdt )
 {
-	double dur = ct->controller_duration();
-	bool dur_defined = (dur >= 0);
-	double tout = tin + dur;  // Only used if duration is defined.  See below.
+	double ct_dur = ct->controller_duration();
+	bool dur_defined = (ct_dur >= 0);
+	//double tout = tin + dur;  // Only used if duration is defined.  See below.
 
 	MeCtTimeShiftWarp* timingCt   = new MeCtTimeShiftWarp( ct );
 	MeCtBlend*         blendingCt = new MeCtBlend( timingCt );
@@ -389,7 +391,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 	/*                      x        y            (l_tan, l_control_len, r_tan, and r_control_len are all zero) */
 	tMapFunc.make_cusp(     tin,     0,            0, 0, 0, 0 );
 	if( dur_defined ) {
-		tMapFunc.make_cusp( tout,    dur,          0, 0, 0, 0 );
+		tMapFunc.make_cusp( tout,    ct_dur,          0, 0, 0, 0 );
 	} else {
 		tMapFunc.make_cusp( MAX_TRACK_DURATION, MAX_TRACK_DURATION-tin,  0, 0, 0, 0 );
 	}
@@ -402,6 +404,151 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 
 	return create_track( blendingCt, timingCt, ct );
 }
+
+MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::BehaviorSyncPoints& syncPoints)
+{
+	MeCtMotion* motionController = dynamic_cast<MeCtMotion*>(ct);
+	SkMotion* skMotion = motionController->motion();
+	
+	double startAt  = syncPoints.sync_start()->time();
+	double readyAt  = syncPoints.sync_ready()->time();
+	double strokeStartAt = syncPoints.sync_stroke_start()->time();
+	double strokeAt = syncPoints.sync_stroke()->time();
+	double strokeEndAt = syncPoints.sync_stroke_end()->time();
+	double relaxAt  = syncPoints.sync_relax()->time();
+	double endAt    = syncPoints.sync_end()->time();
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	double now = mcu.time;
+
+	// if any of the sync points begin before the current time, 
+	// then offset the motion accordingly
+
+	double indt  = readyAt - startAt;
+	double outdt = endAt - relaxAt;
+
+	double blendStartFirst = startAt;
+	double blendStartSecond = readyAt;
+
+	// if some sync points come before 'now', 
+	// make sure that the indt fits with the next sync point
+	if (startAt < now) {
+		if (readyAt < now) {
+			if (strokeStartAt < now) {
+				if (strokeAt < now) {
+					if (strokeEndAt < now) {
+						if (relaxAt < now) {
+							if (endAt < now) {
+								// do not motion...
+							} else {
+								if (endAt - now < indt)
+									indt = endAt - now;
+								
+							}
+						} else {
+							if (relaxAt - now < indt)
+								indt = relaxAt - now;
+						}
+					} else {
+						if (strokeEndAt - now < indt)
+							indt = strokeEndAt - now;
+					}
+				} else {
+					if (strokeAt - now < indt)
+						indt = strokeAt - now;				
+				}
+			} else {
+				if (strokeStartAt - now < indt)
+					indt = strokeStartAt - now;				
+			}
+		} else {
+			if (readyAt - now < indt)
+					indt = readyAt - now;				
+		}
+
+		// if the motion has one or more sync points < now, change the blend times
+		blendStartFirst = now;
+		blendStartSecond = now + indt;
+	}
+
+	double ct_dur = ct->controller_duration();
+	bool dur_defined = (ct_dur >= 0);
+	//double tout = tin + dur;  // Only used if duration is defined.  See below.
+
+	MeCtTimeShiftWarp* timingCt   = new MeCtTimeShiftWarp( ct );
+	MeCtBlend*         blendingCt = new MeCtBlend( timingCt );
+
+	const char* ct_name = ct->name();
+
+	
+	// Configure blend curve
+
+	//////////////////////////////////////////////////////
+	//  TODO: Utilize slopes when spline is not linear
+	//// slopes
+	//MeSpline1D::range in_slope = 1/indt;
+	//MeSpline1D::range out_slope = -1/outdt;
+	//// control point lengths
+	//MeSpline1D::range in_cp_length = indt/2;
+	//if( in_cp_length > 1 )
+	//	in_cp_length = 1;
+	//MeSpline1D::range mid_cp_length = (dur-indt-outdt)/2;
+	//if( mid_cp_length > 1 )
+	//	mid_cp_length = 1;
+	//MeSpline1D::range out_cp_length = outdt/2;
+	//if( out_cp_length > 1 )
+	//	out_cp_length = 1;
+
+	MeSpline1D& bCurve = blendingCt->blend_curve();
+	/*                  x           y    (control_tan, l_control_len, and r_control_len are all zero) */
+	if( indt>0 ) {
+		bCurve.make_smooth( blendStartFirst,   0,   0, 0, 0 );
+		//bCurve.make_smooth( startAt,   1,   0, 0, 0 );
+		bCurve.make_smooth( blendStartSecond,   1,   0, 0, 0 );
+	} else {
+		bCurve.make_disjoint( blendStartFirst, 1, 0, 0, 0, 0, 0 );
+	}
+	if( dur_defined ) {
+		if( outdt > 0 ) {
+			bCurve.make_smooth( relaxAt, 1,   0, 0, 0 );
+			//bCurve.make_smooth( endAt,   1,   0, 0, 0 );
+			bCurve.make_smooth( endAt,       0,   0, 0, 0 );
+		} else {
+			bCurve.make_disjoint( endAt, 0, 1, 0, 0, 0, 0 );
+		}
+	}
+	// else leave blend fixed at 100% for eternity
+	if( ct_name && (ct_name[0]!='\0') ) {
+		string blend_name( "blending for " );
+		blend_name += ct_name;
+		blendingCt->name( blend_name.c_str() );
+	}
+
+	// Configure time mapping
+	MeSpline1D& tMapFunc = timingCt->time_func();
+	/*                      x        y            (l_tan, l_control_len, r_tan, and r_control_len are all zero) */
+	if (!dur_defined ) {
+		tMapFunc.make_cusp( startAt,     0,            0, 0, 0, 0 );
+		tMapFunc.make_cusp( MAX_TRACK_DURATION, MAX_TRACK_DURATION - startAt,  0, 0, 0, 0 );
+	} else {
+		tMapFunc.make_cusp( startAt,     0,            0, 0, 0, 0 );
+		tMapFunc.make_cusp( readyAt,    skMotion->time_ready(),          0, 0, 0, 0 );
+		tMapFunc.make_cusp( strokeStartAt,    skMotion->time_stroke_start(),          0, 0, 0, 0 );
+		tMapFunc.make_cusp( strokeAt,    skMotion->time_stroke_emphasis(),          0, 0, 0, 0 );
+		tMapFunc.make_cusp( strokeEndAt,    skMotion->time_stroke_end(),          0, 0, 0, 0 );
+		tMapFunc.make_cusp( relaxAt,    skMotion->time_relax(),          0, 0, 0, 0 );
+		tMapFunc.make_cusp( endAt,    ct_dur,          0, 0, 0, 0 );
+	}
+	if( ct_name && (ct_name[0]!='\0') ) {
+		string timing_name( "timing for " );
+		timing_name += ct_name;
+		timingCt->name( timing_name.c_str() );
+	}
+
+
+	return create_track( blendingCt, timingCt, ct );
+}
+
 
 bool MeCtScheduler2::remove_child( MeController *child ) {
 	bool result = remove_child_impl( child );

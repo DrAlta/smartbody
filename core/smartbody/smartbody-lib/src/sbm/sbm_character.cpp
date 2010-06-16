@@ -1135,7 +1135,7 @@ int SbmCharacter::set_viseme( char* viseme,
 				value.size(1);
 				value[0] = (float)weight;
 				ct->set_data(value);
-				head_sched_p->schedule( ct, start_time, rampin_duration, 0 );
+				head_sched_p->schedule( ct, start_time, start_time + ct->controller_duration(), rampin_duration, 0 );
 			}
 		}
 		return CMD_SUCCESS;

@@ -36,8 +36,7 @@
 // Use Boost Smart Point Impl until TR1 is finalized
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
-
-
+#include <sbm/bml_sync_point.hpp>
 
 /*! The scheduler maps each controller to its internal channel array, so that
     after evaluation, the values are copied and blended into the scheduler buffer */
@@ -325,7 +324,16 @@ public:
      *  outdt - ease-out duration for blending with the next controller in the stack.
      *  type - Once will automatically remove c after completion, Static will not remove.
 	 */
-	TrackPtr schedule( MeController* c, double tin, float indt, float outdt );
+	TrackPtr schedule( MeController* c, double tin, double tout, float indt, float outdt );
+
+    /** Backwards compatible schedule function: (sans Static/Once track type)
+	 *
+	 *  Schedule controller c with the given parameters.
+     *  c - the controller to be scheduled.
+     *  behavior syn points
+	 */
+	TrackPtr schedule( MeController* c, BML::BehaviorSyncPoints& syncPoints);
+
 
 	/**
 	 *  Removes the given track from schedule.

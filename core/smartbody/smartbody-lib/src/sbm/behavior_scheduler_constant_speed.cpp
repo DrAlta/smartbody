@@ -37,37 +37,24 @@ const bool LOG_ABNORMAL_SPEED = false;
 
 
 BehaviorSchedulerConstantSpeed::BehaviorSchedulerConstantSpeed(
-#if BEHAVIOR_TIMING_BY_DURATION
-    // preferred durations between sync points
-    time_sec startReadyDur,
-	time_sec readyStrokeDur,
-    time_sec strokeRelaxDur,
-    time_sec relaxEndDur,
-#else
     // preferred "local times" of sync points
     time_sec startTime,
 	time_sec readyTime,
+	time_sec strokeStartTime,
     time_sec strokeTime,
+	time_sec strokeEndTime,
     time_sec relaxTime,
 	time_sec endTime,
-#endif // BEHAVIOR_TIMING_BY_DURATION
-
     time_sec speed
 ) :
-#if BEHAVIOR_TIMING_BY_DURATION
-    // preferred durations between sync points
-    startReadyDur( startReadyDur ),
-	readyStrokeDur( readyStrokeDur ),
-    strokeRelaxDur( strokeRelaxDur ),
-    relaxEndDur( relaxEndDur ),
-#else
     // preferred "local times" of sync points
     startTime( startTime ),
 	readyTime( readyTime ),
+    strokeStartTime( strokeStartTime ),
     strokeTime( strokeTime ),
+    strokeEndTime( strokeEndTime ),
     relaxTime( relaxTime ),
 	endTime( endTime ),
-#endif // BEHAVIOR_TIMING_BY_DURATION
 	speed( speed )
 {}
 
@@ -116,361 +103,199 @@ void BehaviorSchedulerConstantSpeed::schedule( BehaviorSyncPoints& behav_syncs, 
      *  If only one SyncPoint is found, the controller maintains its natural duration.
      *  If no sync points are found, the behavior starts immediately.
      */
-    bool hasStroke = isTimeSet( stroke->time );
-    bool hasReady  = isTimeSet( ready->time );
-    bool hasRelax  = isTimeSet( relax->time );
     bool hasStart  = isTimeSet( start->time );
+    bool hasReady  = isTimeSet( ready->time );
+	bool hasStrokeStart = isTimeSet( stroke_start->time );
+    bool hasStroke = isTimeSet( stroke->time );
+	bool hasStrokeEnd = isTimeSet( stroke_end->time );
+    bool hasRelax  = isTimeSet( relax->time );
     bool hasEnd    = isTimeSet( end->time );
+
+	bool syncPointsSet[7] = { hasStart, hasReady, hasStrokeStart, hasStroke, hasStrokeEnd, hasRelax, hasEnd };
+	bool rawSyncPointsSet[7] = { (startTime >= 0.0), (hasReady >= 0.0), (hasStrokeStart >= 0.0), (hasStroke >= 0.0), (hasStrokeEnd >= 0.0), (hasRelax >= 0.0), (hasEnd >= 0.0) };
+
+	double rawTimes[7] = {	startTime,
+							readyTime,
+							strokeStartTime,
+							strokeTime,
+							strokeEndTime,
+							relaxTime,
+							endTime
+						 };
+
+	double syncTimes[7] = {	start->time,
+							ready->time,
+							stroke_start->time,
+							stroke->time,
+							stroke_end->time,
+							relax->time,
+							end->time
+						  };
+
+	
+	// set up desired -> controller time segments
+	double controllerIntervals[6] = {	readyTime - startTime,
+										strokeStartTime - readyTime,
+										strokeTime - strokeStartTime,
+										strokeEndTime - strokeStartTime,
+										relaxTime - strokeEndTime,
+										endTime - relaxTime
+									   };
+
+	double offsetTime = 0;
 
 	time_sec start_at = TIME_UNSET;
 
-
-    if( hasStroke ) {  // Handle stroke first (most important)
-        if(    hasReady
-			&& testSyncBefore( ready, "ready", stroke, "stroke" )
-		) 
+	// check for invalid sync points desired when no sync point exists
+	// i.e. when a stroke time is set, but motion has no stroke time at all
+	// in this case, ignore the set sync point
+	double lastGoodTime = 0.0;
+	for (int x = 0; x < 7; x++)
+	{
+		if (syncPointsSet[x] && !rawSyncPointsSet[x])
 		{
-			// Stroke and compatible ready
-#if BEHAVIOR_TIMING_BY_DURATION
-			// adjust speed to start and stroke.
-			time_sec rtDur = stroke->time - ready->time;  // realtime duration
-			time_sec bhvrDur  = readyStrokeDur;           // behavior duration
-
-			speed = bhvrDur / rtDur;
-			start_at = ready->time - startReadyDur/speed;
-#else
-            if( readyTime >= strokeTime ) {
-                //clog << "WARNING: MeControllerRequest::calcAudioRelativeStart(): readyTime NOT before strokeTime... ignoring ready." << endl;
-			} else {
-				// adjust speed to start and stroke.
-				time_sec rtDiff = stroke->time - ready->time;  // realtime diff
-				time_sec ctlrDiff = strokeTime - readyTime;
-				speed = ctlrDiff / rtDiff;
-
-				start_at = stroke->time - (strokeTime/speed);
-			}
-#endif // BEHAVIOR_TIMING_BY_DURATION
-        }
-		if(    hasRelax
-			&& !isTimeSet( start_at )  // second sync point or previous failed
-			&& testSyncAfter( stroke, "stroke", relax, "relax" )
-		)
-		{
-			// Stroke and compatible relax
-#if BEHAVIOR_TIMING_BY_DURATION
-			// adjust speed to start and stroke.
-			time_sec rtDur   = relax->time - stroke->time;  // realtime duration
-			time_sec bhvrDur = strokeRelaxDur;              // behavior duration
-
-			speed = bhvrDur / rtDur;
-			start_at = stroke->time - (startReadyDur+readyStrokeDur)/speed;
-#else
-            if( strokeTime >= relaxTime ) {
-                //clog << "WARNING: MeControllerRequest::calcAudioRelativeStart(): strokeTime NOT before relaxTime... ignoring relax." << endl;
-			} else {
-				// adjust speed to start and stroke.
-				time_sec rtDiff = relax->time - stroke->time;  // realtime diff
-				time_sec ctlrDiff = relaxTime - strokeTime;
-				speed = ctlrDiff / rtDiff;
-
-				start_at = stroke->time - (strokeTime/speed);
-			}
-#endif // BEHAVIOR_TIMING_BY_DURATION
-        }
-		if(    hasStart
-			&& !isTimeSet( start_at )  // second sync point or previous failed
-			&& testSyncBefore( start, "start", stroke, "stroke" )
-		)
-		{
-			// Stroke and compatible start
-#if BEHAVIOR_TIMING_BY_DURATION
-			// adjust speed to start and stroke.
-			time_sec rtDur   = stroke->time - start->time;  // realtime duration
-			time_sec bhvrDur = strokeRelaxDur;              // behavior duration
-
-			speed = bhvrDur / rtDur;
-			start_at = start->time;
-#else
-            if( startTime >= strokeTime ) {
-                //clog << "WARNING: MeControllerRequest::calcAudioRelativeStart(): startTime NOT before strokeTime... ignoring start." << endl;
-			} else {
-				// adjust speed to start and stroke.
-				time_sec rtDiff = stroke->time - start->time;  // realtime diff
-				time_sec ctlrDiff = strokeTime - startTime;
-				speed = ctlrDiff / rtDiff;
-
-				start_at = stroke->time - (strokeTime/speed);
-			}
-#endif  // BEHAVIOR_TIMING_BY_DURATION
-        }
-		if(    hasEnd
-			&& !isTimeSet( start_at )  // second sync point or previous failed
-			&& testSyncAfter( stroke, "stroke", end, "end" )
-		)
-		{
-			// Stroke and compatible end
-#if BEHAVIOR_TIMING_BY_DURATION
-			// adjust speed to start and stroke.
-			time_sec rtDur = end->time - stroke->time;      // realtime diff
-			time_sec bhvrDur = strokeRelaxDur + relaxEndDur; // behavior duration
-
-			speed = bhvrDur / rtDur;
-			start_at = stroke->time - (startReadyDur+readyStrokeDur)/speed;
-#else
-            if( strokeTime >= endTime ) {
-                //clog << "WARNING: BehaviorRequest::calcAudioRelativeStart(): strokeTime NOT before endTime... ignoring end." << endl;
-			} else {
-				// adjust speed to start and stroke.
-				time_sec rtDiff = end->time - stroke->time;  // realtime diff
-				time_sec ctlrDiff = endTime - strokeTime;
-				speed = ctlrDiff / rtDiff;
-
-				start_at = stroke->time - (strokeTime/speed);
-			}
-#endif // BEHAVIOR_TIMING_BY_DURATION
+			// warning
+			syncPointsSet[x] = false;
 		}
-		if( !isTimeSet( start_at ) ) {
-			// Only stroke
-			speed = 1;
-#if BEHAVIOR_TIMING_BY_DURATION
-			start_at = stroke->time - ( startReadyDur + readyStrokeDur );
-#else
-			start_at = stroke->time - strokeTime;
-#endif // BEHAVIOR_TIMING_BY_DURATION
+		if (!rawSyncPointsSet[x])
+		{ 
+			// make sure that any missing sync point gets the value 
+			// of the last sync point that had a proper time
+			rawTimes[x] = lastGoodTime;
+			rawSyncPointsSet[x] = true;
 		}
-    } else if( hasReady ) {  // Next comes ready
-		// Skipping stroke. Would have been caught at previous level.
-        if(    hasRelax
-			&& testSyncAfter( ready, "ready", relax, "relax" )
-		)
+		else
 		{
-			// Ready and compatible relax
-#if BEHAVIOR_TIMING_BY_DURATION
-			// adjust speed to start and stroke.
-			time_sec rtDur = relax->time - ready->time;        // realtime diff
-			time_sec bhvrDur = readyStrokeDur + strokeRelaxDur; // behavior duration
-
-			speed = bhvrDur / rtDur;
-			start_at = ready->time - (startReadyDur)/speed;
-#else
-            if( readyTime >= relaxTime ) {
-                //clog << "WARNING: BehaviorRequest::calcAudioRelativeStart(): readyTime NOT before relaxTime... ignoring relax." << endl;
-			} else {
-				// adjust speed to start and ready.
-				time_sec rtDiff = relax->time - ready->time;  // realtime diff
-				time_sec ctlrDiff = relaxTime - readyTime;
-				speed = ctlrDiff / rtDiff;
-
-				start_at = ready->time-(readyTime/speed);
-			}
-#endif // BEHAVIOR_TIMING_BY_DURATION
-        }
-		if(    hasStart
-			&& !isTimeSet( start_at )  // second sync point or previous failed
-			&& testSyncBefore( start, "start", ready, "ready" )
-		)
-		{
-			// Ready and compatible start
-#if BEHAVIOR_TIMING_BY_DURATION
-			// adjust speed to start and stroke.
-			time_sec rtDur = relax->time - ready->time;        // realtime diff
-			time_sec bhvrDur = readyStrokeDur + strokeRelaxDur; // behavior duration
-
-			speed = bhvrDur / rtDur;
-			start_at = start->time;
-#else
-            if( startTime >= readyTime ) {
-                //clog << "WARNING: BehaviorRequest::calcAudioRelativeStart(): startTime NOT before readyTime... ignoring start." << endl;
-			} else {
-				// adjust speed to start and ready.
-				time_sec rtDiff = ready->time - start->time;  // realtime diff
-				time_sec ctlrDiff = readyTime - startTime;
-				speed = ctlrDiff / rtDiff;
-
-				start_at = ready->time-(readyTime/speed);
-			}
-#endif // BEHAVIOR_TIMING_BY_DURATION
-        }
-		if(    hasEnd
-			&& !isTimeSet( start_at )  // second sync point or previous failed
-			&& testSyncAfter( ready, "ready", end, "end" )
-		)
-		{
-			// Ready and compatible end
-#if BEHAVIOR_TIMING_BY_DURATION
-			// adjust speed to start and stroke.
-			time_sec rtDur = end->time - ready->time;        // realtime diff
-			time_sec bhvrDur = readyStrokeDur + strokeRelaxDur + relaxEndDur; // behavior duration
-
-			speed = bhvrDur / rtDur;
-			start_at = ready->time - (startReadyDur)/speed;
-#else
-            if( readyTime >= endTime ) {
-                //clog << "WARNING: BehaviorRequest::calcAudioRelativeStart(): readyTime NOT before endTime... ignoring end." << endl;
-			} else {
-				// adjust speed to start and ready.
-				time_sec rtDiff = end->time - ready->time;  // realtime diff
-				time_sec ctlrDiff = endTime - readyTime;
-				speed = ctlrDiff / rtDiff;
-
-				start_at = ready->time-(readyTime/speed);
-			}
-#endif // BEHAVIOR_TIMING_BY_DURATION
-		}
-		if( !isTimeSet( start_at ) ) {
-			// Only ready
-			speed = 1;
-#if BEHAVIOR_TIMING_BY_DURATION
-			start_at = ready->time - startReadyDur;
-#else
-			start_at = ready->time - readyTime;
-#endif // BEHAVIOR_TIMING_BY_DURATION
-		}
-    } else if( hasRelax ) {  // Next comes relax
-		// Skipping stroke and ready. Would have been caught at previous level.
-        if(    hasStart
-			&& testSyncBefore( start, "start", relax, "relax" )
-		)
-		{
-			// Relax and compatible start
-#if BEHAVIOR_TIMING_BY_DURATION
-			// adjust speed to start and stroke.
-			time_sec rtDur = relax->time - start->time;                         // realtime diff
-			time_sec bhvrDur = startReadyDur + readyStrokeDur + strokeRelaxDur; // behavior duration
-
-			speed = bhvrDur / rtDur;
-			start_at = start->time;
-#else
-            if( startTime >= relaxTime ) {
-                //clog << "WARNING: BehaviorRequest::calcAudioRelativeStart(): startTime NOT before relaxTime... ignoring start." << endl;
-			} else {
-				// adjust speed to start and relax.
-				time_sec rtDiff = relax->time - start->time;  // realtime diff
-				time_sec ctlrDiff = relaxTime - startTime;
-				speed = ctlrDiff / rtDiff;
-
-				start_at = relax->time-(relaxTime/speed);
-			}
-#endif // BEHAVIOR_TIMING_BY_DURATION
-        }
-		if(    hasEnd
-			&& !isTimeSet( start_at )  // second sync point or previous failed
-			&& testSyncAfter( relax, "relax", end, "end" )
-		)
-		{
-			// Relax and compatible end
-#if BEHAVIOR_TIMING_BY_DURATION
-			// adjust speed to start and stroke.
-			time_sec rtDur = end->time - relax->time; // realtime diff
-			time_sec bhvrDur = relaxEndDur;           // behavior duration
-
-			speed = bhvrDur / rtDur;
-			start_at = ready->time - (startReadyDur)/speed;
-#else
-            if( relaxTime >= endTime ) {
-                //clog << "WARNING: BehaviorRequest::calcAudioRelativeStart(): relaxTime NOT before endTime... ignoring end." << endl;
-			} else {
-				// adjust speed to start and relax.
-				time_sec rtDiff = end->time - relax->time;  // realtime diff
-				time_sec ctlrDiff = endTime - relaxTime;
-				speed = ctlrDiff / rtDiff;
-
-				start_at = relax->time-(relaxTime/speed);
-			}
-#endif // BEHAVIOR_TIMING_BY_DURATION
-		}
-		if( !isTimeSet( start_at ) ) {
-			// Only relax
-			speed = 1;
-#if BEHAVIOR_TIMING_BY_DURATION
-			start_at = relax->time - ( startReadyDur + readyStrokeDur + strokeRelaxDur );
-#else
-			start_at = relax->time - relaxTime;
-#endif // BEHAVIOR_TIMING_BY_DURATION
-		}
-    } else if( hasStart ) {  // Next comes start
-		// Skipping stroke, ready and relax.  Would have been caught at previous level.
-        if(    hasEnd
-			&& testSyncAfter( start, "start", end, "end" )
-		)
-		{
-			// Start and compatible end
-#if BEHAVIOR_TIMING_BY_DURATION
-			// adjust speed to start and stroke.
-			time_sec rtDur = end->time - start->time;                                         // realtime diff
-			time_sec bhvrDur = startReadyDur + readyStrokeDur + strokeRelaxDur + relaxEndDur; // behavior duration
-
-			speed = bhvrDur / rtDur;
-			start_at = start->time;
-#else
-            if( startTime >= endTime ) {
-                //clog << "WARNING: BehaviorRequest::calcAudioRelativeStart(): startTime NOT before endTime... ignoring end." << endl;
-			} else {
-				// adjust speed to start and start.
-				time_sec rtDiff = end->time - start->time;  // realtime diff
-				time_sec ctlrDiff = endTime - startTime;
-				speed = ctlrDiff / rtDiff;
-
-				start_at = start->time - (startTime/speed);
-			}
-#endif // BEHAVIOR_TIMING_BY_DURATION
-		}
-		if( !isTimeSet( start_at ) ) {
-			// Only start
-			speed = 1;
-#if BEHAVIOR_TIMING_BY_DURATION
-			start_at = start->time;
-#else
-			start_at = start->time - startTime;  // Strange....
-#endif // BEHAVIOR_TIMING_BY_DURATION
-		}
-	} else {
-		speed = 1;  // End or nothing
-		if( hasEnd ) {  // Last comes end
-			// Only end
-#if BEHAVIOR_TIMING_BY_DURATION
-			start_at = end->time - (startReadyDur + readyStrokeDur + strokeRelaxDur + relaxEndDur);
-#else
-			start_at = end->time - endTime;
-#endif // BEHAVIOR_TIMING_BY_DURATION
-		} else {
-			// No sync_points... align to audio
-			//clog << "WARNING: BehaviorRequest::calcAudioRelativeStart(): no valid time refences." << endl;
-			start_at = now;
+			// make sure that later sync points don't come before earlier ones
+			if (rawTimes[x] < lastGoodTime)
+				rawTimes[x] = lastGoodTime ;
+			else
+				lastGoodTime = rawTimes[x];
 		}
 	}
 
-    // Offset all times by startAt-startTime and scale to previously determined speed
-	if( !start->is_set() )
-		start->time  = start_at;
-#if BEHAVIOR_TIMING_BY_DURATION
-	if( !ready->isSet() )
-		ready->time  = start->time  + startReadyDur/speed;
-	if( !stroke->isSet() )
-		stroke->time = ready->time  + readyStrokeDur/speed;
-	if( !relax->isSet() )
-		relax->time  = stroke->time + strokeRelaxDur/speed;
-	if( !end->isSet() )
-		end->time    = relax->time  + relaxEndDur/speed;
-#else
-	if( !ready->is_set() )
-		ready->time  = start_at + (readyTime-startTime)/speed;
-	if( !stroke->is_set() )
-		stroke->time = start_at + (strokeTime-startTime)/speed;
-	if( !relax->is_set() )
-		relax->time  = start_at + (relaxTime-startTime)/speed;
-	if( !end->is_set() )
-		end->time    = start_at + (endTime-startTime)/speed;
-#endif // BEHAVIOR_TIMING_BY_DURATION
+	int numSyncPointsSet = 0;
+	for (int x = 0; x < 7; x++)
+		if (syncPointsSet[x])
+			numSyncPointsSet++;
 
-	// TODO: validate times are set and in order
-
-	if( LOG_ABNORMAL_SPEED ) {
-		if( speed > 2 )
-			clog << "WARNING: BehaviorRequest::calcAudioRelativeStart(): speed " << speed << " is unusually fast.  Try removing end sync constraint." << endl;
-		else if( speed < 0.3 )
-			clog << "WARNING: BehaviorRequest::calcAudioRelativeStart(): speed " << speed << " is unusually slow.  Try removing end sync constraint." << endl;
+	if (numSyncPointsSet == 0)
+	{
+		start_at = now;
+		for (int x = 0; x < 7; x++)
+		{
+			syncTimes[x] = start_at + rawTimes[x];
+		}
 	}
+	else if (numSyncPointsSet == 1)
+	{
+		start_at = now;
+
+		// which point is sync'ed
+		int syncIndex = 0;
+		for (int x = 0; x < 7; x++)
+		{
+			if (syncPointsSet[x])
+			{
+				syncIndex = x;
+				break;
+			}
+		}
+		// loop over first set of sync points
+		double offset = syncTimes[syncIndex] - (rawTimes[syncIndex] + start_at);
+		for (int x = 0; x < 7; x++)
+		{
+			if (x != syncIndex)
+				syncTimes[x] = rawTimes[x] + start_at + offset;
+		}
+	}
+	else
+	{
+		// determine the intervals
+		int lastPoint = -1;
+		std::vector<std::pair<int, int> > intervals;
+		for (int x = 0; x < 7; x++)
+		{
+			if (syncPointsSet[x])
+			{
+				if (lastPoint == -1)
+				{
+					lastPoint = x;
+				}
+				else
+				{
+					intervals.push_back(std::pair<int, int>(lastPoint, x));
+					lastPoint = x;
+				}
+			}
+		}
+
+		// now determine the scaling within those intervals
+		int lastScaleIndex = 0;
+		double lastScale = 1.0;
+		std::vector<double> intervalScale; // intervalScale[0] = ready - start, intervalScale1 = strokeStart - ready, etc.
+		for (std::vector<std::pair<int, int> >::iterator iter = intervals.begin();
+			iter != intervals.end();
+			iter++)
+		{
+			int start = (*iter).first;
+			int end = (*iter).second;
+
+			double scale = 1.0;
+			if ((rawTimes[end] - rawTimes[start]) != 0)
+				scale = (syncTimes[end] - syncTimes[start]) / (rawTimes[end] - rawTimes[start]);
+
+			for (int x = lastScaleIndex; x < end; x++)
+			{
+				intervalScale.push_back(scale);
+			}
+			lastScaleIndex = end;
+			lastScale = scale;
+		}
+		if (intervalScale.size() < 6)
+		{
+			for (int x = intervalScale.size() - 1; x < 6; x++)
+				intervalScale.push_back(lastScale);
+		}
+		// at this point, intervalScale[] should contain the scaling for those particular intervals
+		// now determine the proper execution times based on the interval scaling
+
+		// set the times that 
+		lastScaleIndex = 0;
+		for (std::vector<std::pair<int, int> >::iterator iter = intervals.begin();
+			iter != intervals.end();
+			iter++)
+		{
+			int start = (*iter).first;
+			int end = (*iter).second;
+			for (int x = end; x >= lastScaleIndex && x > 0; x--)
+			{
+				if (x - 1 == start)
+					continue;
+				double startSyncPointTime = syncTimes[x];
+				double originalInterval = rawTimes[x] - rawTimes[x - 1];
+				double newInterval = originalInterval * intervalScale[x - 1];
+				syncTimes[x - 1] = startSyncPointTime - newInterval;
+			}
+			lastScaleIndex = end + 1;
+		}
+		// make sure the end points are set as well
+		for (int x = lastScaleIndex; x < 7; x++)
+		{
+			double lastSyncPointTime = syncTimes[x - 1];
+			double originalInterval = rawTimes[x] - rawTimes[x - 1];
+			double newInterval = originalInterval * intervalScale[x - 1];
+			syncTimes[x] = lastSyncPointTime + newInterval;
+		}
+	}
+
+	start->time = syncTimes[0];
+	ready->time = syncTimes[1];
+	stroke_start->time = syncTimes[2];
+	stroke->time = syncTimes[3];
+	stroke_end->time = syncTimes[4];
+	relax->time = syncTimes[5];
+	end->time = syncTimes[6];
 }
 
 
@@ -480,26 +305,37 @@ void BehaviorSchedulerConstantSpeed::schedule( BehaviorSyncPoints& behav_syncs, 
 BehaviorSchedulerConstantSpeedPtr BML::buildSchedulerForController( MeController* ct ) {
 	bool is_persistent = ct->controller_duration() < 0;
 
-#if BEHAVIOR_TIMING_BY_DURATION
-	BehaviorSchedulerConstantSpeedPtr scheduler( 
-		new BehaviorSchedulerConstantSpeed(
-			/* startReadyDur  */ time_sec( ct->indt() ), 
-			/* readyStrokeDur */ time_sec( ct->emphasist() - ct->indt() ), 
-			/* strokeRelaxDur */ time_sec( is_persistent? numeric_limits<time_sec>::max() : ct->controller_duration() - ct->emphasist() - ct->outdt() ),
-			/* relaxEndDur    */ time_sec( ct->outdt() ),
-			/* speed      */ 1 ) );
+	MeCtMotion* motionController = dynamic_cast<MeCtMotion*>(ct);
+	if (motionController)
+	{
+		SkMotion* motion = motionController->motion();
 
-#else
+		BehaviorSchedulerConstantSpeedPtr scheduler( 
+			new BehaviorSchedulerConstantSpeed(
+				/* startTime  */ 0, 
+				/* readyTime  */ time_sec( motion->time_ready() ), 
+				/* strokeStartTime */ time_sec( motion->time_stroke_start() ),
+				/* strokeTime */ time_sec( motion->time_stroke_emphasis() ),
+				/* strokeEndTime */ time_sec( motion->time_stroke_end() ),
+				/* relaxTime  */ time_sec( is_persistent? numeric_limits<time_sec>::max() : motion->time_relax() ), 
+				/* endTime    */ time_sec( is_persistent? numeric_limits<time_sec>::max() : motion->duration() ),
+				/* speed      */ 1 ) );
 
-	BehaviorSchedulerConstantSpeedPtr scheduler( 
-		new BehaviorSchedulerConstantSpeed(
-			/* startTime  */ 0, 
-			/* readyTime  */ time_sec( ct->indt() ), 
-			/* strokeTime */ time_sec( ct->emphasist() ),
-			/* relaxTime  */ time_sec( is_persistent? numeric_limits<time_sec>::max() : ct->controller_duration() - ct->outdt() ), 
-			/* endTime    */ time_sec( is_persistent? numeric_limits<time_sec>::max() : ct->controller_duration() ),
-			/* speed      */ 1 ) );
-#endif  // BEHAVIOR_TIMING_BY_DURATION
+		return scheduler;
+	}
+	else
+	{
+		BehaviorSchedulerConstantSpeedPtr scheduler( 
+			new BehaviorSchedulerConstantSpeed(
+				/* startTime  */ 0, 
+				/* readyTime  */ time_sec( ct->indt() ), 
+				/* strokeStartTime */ time_sec( ct->emphasist() ),
+				/* strokeTime */ time_sec( ct->emphasist() ),
+				/* strokeEndTime */ time_sec( ct->emphasist() ),
+				/* relaxTime  */ time_sec( is_persistent? numeric_limits<time_sec>::max() : ct->controller_duration() - ct->outdt() ), 
+				/* endTime    */ time_sec( is_persistent? numeric_limits<time_sec>::max() : ct->controller_duration() ),
+				/* speed      */ 1 ) );
 
-	return scheduler;
+		return scheduler;
+	}
 }
