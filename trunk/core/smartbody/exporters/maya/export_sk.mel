@@ -22,6 +22,9 @@
 //      Kristin Parker, USC
 
 
+string $skVersion = "0.4";
+
+
 
 // --------------------------------------------------------------------------------
 // PROC: skRound
@@ -39,7 +42,8 @@ proc string skRound( float $value )
    string $decNumber ;
 
    //Store if $value is negative then get absolute value to simplify things
-   if (`substring $valueString 1 1` == "-") {
+   if ( `substring $valueString 1 1` == "-" )
+   {
       $sign = "-" ;
    }
    $value = `abs $value` ;
@@ -47,68 +51,66 @@ proc string skRound( float $value )
    //Round the value
    float $precision = 5 ;
    $multiplyer = pow( 10, $precision ) ;
-   $value = ($value * $multiplyer) ;
-   $value = ($value + 0.5) ;
+   $value = ( $value * $multiplyer ) ;
+   $value = ( $value + 0.5 ) ;
    $value = `trunc $value` ;
+   
    //print ($value + "\n") ;
 
    //Covert $value to a string and get its size
    $valueString = $value ;
    $StringSize = `size $valueString` ;
-   //print ($value + "\n") ;
-   //print ("StringSize: " + $StringSize + "\n") ;
+
+   //print ( $value + "\n" ) ;
+   //print ( "StringSize: " + $StringSize + "\n" ) ;
 
    //Deal with very small values
    string $zeroes = "" ;
    int $SmallValues = 0 ;
-   if ($StringSize <= 5) {
-
+   if ( $StringSize <= 5 )
+   {
       $SmallValues = 1 ;
 
-      int $dif = (5 - $StringSize) ;
-      if ($dif == 4) {
+      int $dif = ( 5 - $StringSize ) ;
+      if ( $dif == 4 )
+      {
          $zeroes = "0000" ;
       }
-      else if ($dif == 3) {
+      else if ( $dif == 3 )
+      {
          $zeroes = "000" ;
       }
-      else if ($dif == 2) {
+      else if ( $dif == 2 )
+      {
          $zeroes = "00" ;
       }
-      else if ($dif == 1) {
+      else if ( $dif == 1 )
+      {
          $zeroes = "0" ;
       }
 
       $StringSize = 5 ;
-      $valueString = ($zeroes + $valueString) ;
-      //print ($valueString + "\n") ;
+      $valueString = ( $zeroes + $valueString ) ;
+
+      //print ( $valueString + "\n" ) ;
    }
 
    //Assemble new strings
-   if ($SmallValues == 1) {
+   if ( $SmallValues == 1 )
+   {
       $wholeNumber = "0" ;
    }
-   else {
-      $wholeNumber = `substring $valueString 1 ($StringSize-$precision)` ;
+   else
+   {
+      $wholeNumber = `substring $valueString 1 ( $StringSize - $precision )` ;
    }
 
-   $decNumber = `substring $valueString ($StringSize-($precision-1)) ($StringSize)` ;  //this seems unneccesarry
+   $decNumber = `substring $valueString ( $StringSize - ( $precision - 1 ) ) ( $StringSize )` ;  //this seems unneccesarry
 
-   $valueString = ($sign + $wholeNumber + "." + $decNumber) ;
+   $valueString = ( $sign + $wholeNumber + "." + $decNumber ) ;
 
    //Finish
    return $valueString ;
-
-
-/*
-   Old function
-   float $precision = 5;
-   $power = pow( 10, $precision );
-   $value = $value * $power;
-   $value = int ( $value + ( $value < 0 ? -0.5 : 0.5 ) );
-   $value = $value / $power;
-   return $value;
-*/
 }
 
 
@@ -281,7 +283,7 @@ proc int skWriteSk( string $jname, int $fileid, int $depth, int $showAll, int $u
 }
 
 
-global proc int export_sk_NoGUI( string $fname, string $skname, string $version, int $showAll, int $useLimits )
+global proc int skExport( string $fname, string $skname, string $version, int $showAll, int $useLimits )
 {
    int $fileid = `fopen $fname "w"`;
    if ( $fileid == 0 )
@@ -453,15 +455,30 @@ global proc limitsUnchecked()
 
 
 //--------------------------------------------------------------------------------
+// PROC: skExportButton
+//--------------------------------------------------------------------------------
+global proc skExportButton()
+{
+   global string $skVersion;
+
+   string $root   = `getAttr SkelDef.RootJoint`;
+   string $name   = `getAttr SkelDef.SkeletonName`;
+   string $file   = `getAttr SkelDef.OutputDirectory`;
+   int $showAll   = `getAttr SkelDef.ShowAllChannels`;
+   int $useLimits = `getAttr SkelDef.UseLimits`;
+
+   select -r $root;
+
+   export_sk( $file, $name, $skVersion, $showAll, $useLimits );
+}
+
+
+//--------------------------------------------------------------------------------
 // PROC: skExportWin
 //--------------------------------------------------------------------------------
-global proc skExportWin()
+global proc skExportGUI()
 {
-
-   source export_sk_NoGUI;
-
-
-   global string $version = "0.3";
+   global string $skVersion;
 
    //Creates SmartbodyExportOptions and SkelDef nodes if they don't exist
    if ( !`objExists SmartbodyExportOptions` )
@@ -484,7 +501,7 @@ global proc skExportWin()
    if ( ( `window -exists skMainWin` ) == true )
       deleteUI skMainWin;
 
-   string $winTitle = "SK Exporter v" + $version + " - www.smartbody-anim.org";
+   string $winTitle = "SK Exporter v" + $skVersion + " - www.smartbody-anim.org";
    window -title $winTitle -wh 300 270 skMainWin;
    columnLayout -adjustableColumn true -columnAttach "both" 10 -rowSpacing 10 -columnWidth 290 MainColumn;
    textFieldGrp -label "Skeleton Root Joint:" -text `getAttr SkelDef.RootJoint` -cc "skRootJointChanged" skRootField;
@@ -497,32 +514,11 @@ global proc skExportWin()
    checkBox -label "Use Limits" -value (`getAttr SkelDef.UseLimits`) -onCommand "limitsChecked" -offCommand "limitsUnchecked" skUseLimits;
    setParent MainColumn;
    button -l "Browse Output File" -command "fileBrowser(\"skFileCb\", \"Text\", \"\", 4)";
-   button -l "Export" -command "skExport";
+   button -l "Export" -command "skExportButton";
    showWindow skMainWin; 
 }
 
 
-//--------------------------------------------------------------------------------
-// PROC: skExport
-//--------------------------------------------------------------------------------
-global proc skExport()
-{
-   global string $version;
-
-   string $root   = `getAttr SkelDef.RootJoint`;
-   string $name   = `getAttr SkelDef.SkeletonName`;
-   string $file   = `getAttr SkelDef.OutputDirectory`;
-   int $showAll   = `getAttr SkelDef.ShowAllChannels`;
-   int $useLimits = `getAttr SkelDef.UseLimits`;
-
-   select -r $root;
-//   currentUnit -linear "cm";
-
-   export_sk_NoGUI( $file, $name, $version, $showAll, $useLimits );
-}
-
-
-skExportWin;
 
 //
 // - Three steps are required in order to export a new skeleton/character from Maya:
