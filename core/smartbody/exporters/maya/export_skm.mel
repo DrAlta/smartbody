@@ -25,11 +25,605 @@
 ////////////////////////////////////////////////////////////////
 //  Exports animation in .skm format for SmartBody
 //  Prompts for BML timing metadata
-//
 
 
 
-//=================================== UI =============================================
+global string $g_names[];
+global int    $g_namesWidth;
+
+
+//docServer(1);
+updateRendererUI;
+
+
+// --------------------------------------------------------------------------------
+// PROC: skmRound
+// This will round a number to a certain precision, the bulk of this script actuall deals more with
+// getting the number written out in a format Smartbody understands. In this case Smartbody doesn't
+// use scientific notation for float values, which is something Maya often uses. So the solution is
+// to convert these numeric values to strings.
+// --------------------------------------------------------------------------------
+proc string skmRound( float $value )
+{
+   //Declare variables
+   string $valueString = $value;
+   string $sign = "" ;
+   string $wholeNumber ;
+   string $decNumber ;
+
+   //Store if $value is negative then get absolute value to simplify things
+   if (`substring $valueString 1 1` == "-") {
+      $sign = "-" ;
+   }
+   $value = `abs $value` ;
+
+   //Round the value
+   float $precision = 5 ;
+   $multiplyer = pow( 10, $precision ) ;
+   $value = ($value * $multiplyer) ;
+   $value = ($value + 0.5) ;
+   $value = `trunc $value` ;
+   //print ($value + "\n") ;
+
+   //Covert $value to a string and get its size
+   $valueString = $value ;
+   $StringSize = `size $valueString` ;
+   //print ($value + "\n") ;
+   //print ("StringSize: " + $StringSize + "\n") ;
+
+   //Deal with very small values
+   string $zeroes = "" ;
+   int $SmallValues = 0 ;
+   if ($StringSize <= 5) {
+
+      $SmallValues = 1 ;
+
+      int $dif = (5 - $StringSize) ;
+      if ($dif == 4) {
+         $zeroes = "0000" ;
+      }
+      else if ($dif == 3) {
+         $zeroes = "000" ;
+      }
+      else if ($dif == 2) {
+         $zeroes = "00" ;
+      }
+      else if ($dif == 1) {
+         $zeroes = "0" ;
+      }
+
+      $StringSize = 5 ;
+      $valueString = ($zeroes + $valueString) ;
+      //print ($valueString + "\n") ;
+   }
+
+   //Assemble new strings
+   if ($SmallValues == 1) {
+      $wholeNumber = "0" ;
+   }
+   else {
+      $wholeNumber = `substring $valueString 1 ($StringSize-$precision)` ;
+   }
+
+   $decNumber = `substring $valueString ($StringSize-($precision-1)) ($StringSize)` ;  //this seems unneccesarry
+
+   $valueString = ($sign + $wholeNumber + "." + $decNumber) ;
+
+   //Finish
+   return $valueString ;
+
+
+/*
+   Old function
+   float $precision = 5;
+   $power = pow( 10, $precision );
+   $value = $value * $power;
+   $value = int ( $value + ( $value < 0 ? -0.5 : 0.5 ) );
+   $value = $value / $power;
+   return $value;
+*/
+}
+
+
+// procedures for emulating a 2d array, of a known width
+proc string Get2dArrayString( string $s[], int $width, int $x, int $y )
+{
+   return $s[ ( $x * $width ) + $y ];
+}
+
+
+// procedures for emulating a 2d array, of a known width
+proc Set2dArrayString( string $s[], int $width, int $x, int $y, string $value )
+{
+   $s[ ( $x * $width ) + $y ] = $value;
+}
+
+
+// make a quaternion from the given rotation around axis (x,y,z)
+proc skmQuatSet( float $q[], float $x, float $y, float $z, float $degrees )
+{
+   float $f;
+   float $radians = 3.1415926535897932 * $degrees / 180.0;
+
+   // normalize axis:
+   $q[ 1 ] = $x;
+   $q[ 2 ] = $y;
+   $q[ 3 ] = $z;
+
+   $f = $x * $x + $y * $y + $z * $z;
+
+   if ( $f > 0 )
+   {
+      $f = sqrt( $f );
+      $q[ 1 ] /= $f;
+      $q[ 2 ] /= $f;
+      $q[ 3 ] /= $f;
+   }
+
+   // set the quaternion:
+   $radians /= 2;
+   $f = sin( $radians );
+   $q[ 1 ] *= $f;
+   $q[ 2 ] *= $f;
+   $q[ 3 ] *= $f;
+   $q[ 0 ] = cos( $radians );
+}
+
+
+// quaternion multiplication
+proc skmQuatMult( float $q[], float $q1[], float $q2[] )
+{
+   $q[ 0 ] = ( $q1[ 0 ] * $q2[ 0 ] ) - ( $q1[ 1 ] * $q2[ 1 ] + $q1[ 2 ] * $q2[ 2 ] + $q1[ 3 ] * $q2[ 3 ] ); // w1*w2-dot(v1,v2)
+   $q[ 1 ] = $q1[ 2 ] * $q2[ 3 ] - $q1[ 3 ] * $q2[ 2 ]; // cross ($q1.v,$q2.v)
+   $q[ 2 ] = $q1[ 3 ] * $q2[ 1 ] - $q1[ 1 ] * $q2[ 3 ];
+   $q[ 3 ] = $q1[ 1 ] * $q2[ 2 ] - $q1[ 2 ] * $q2[ 1 ];
+   $q[ 1 ] += ( $q1[ 1 ] * $q2[ 0 ] ) + ( $q2[ 1 ] * $q1[ 0 ] );
+   $q[ 2 ] += ( $q1[ 2 ] * $q2[ 0 ] ) + ( $q2[ 2 ] * $q1[ 0 ] );
+   $q[ 3 ] += ( $q1[ 3 ] * $q2[ 0 ] ) + ( $q2[ 3 ] * $q1[ 0 ] );
+ }
+
+
+// quaternion to axis-angle representation
+proc quatToAxisAng( float $q[], float $aa[] )
+{
+   float $ang = 2.0 * acos( $q[ 0 ] );
+   float $norm = sqrt( $q[ 1 ] * $q[ 1 ] + $q[ 2 ] * $q[ 2 ] + $q[ 3 ] * $q[ 3 ] );
+   if ( $norm==0 || $ang==0 )
+   {
+      $aa[ 0 ] = 0;
+      $aa[ 1 ] = 0;
+      $aa[ 2 ] = 0;
+   }
+   else
+   {
+      $aa[ 0 ] = ( $q[ 1 ] / $norm ) * $ang;
+      $aa[ 1 ] = ( $q[ 2 ] / $norm ) * $ang;
+      $aa[ 2 ] = ( $q[ 3 ] / $norm ) * $ang;
+    }
+}
+
+
+// returns the index of the name containing $type, however
+// $type is assumed to be at the end of each name
+// (types are retrieved with: $names = `keyframe -q -name pinky3_l`;)
+proc int skmSearchType( string $names[], string $type )
+{
+   string $subst;
+   int $size = size( $names );
+   int $sizet = size( $type );
+   int $sizei;
+   int $i;
+   int $cmp;
+
+   for ( $i = 0; $i < $size; $i++ )
+   {
+      $sizei = size( $names[ $i ] );
+      $subst = `substring $names[ $i ] ( $sizei - $sizet + 1 ) $sizei`;
+      $cmp = `strcmp $subst $type`;
+      if ( $cmp == 0 )
+         return $i;
+    }
+
+   return -1;
+}
+
+
+/*----------------------------------------
+PROC: skmCountJoints
+----------------------------------------*/
+proc int skmCountJoints( string $jname, string $joints[] )
+{
+   // Get children of $jname
+   string $children[];
+   $children = `listRelatives $jname`;
+   int $nchildren = `size $children`;
+
+   // Make sure $jname is a joint
+   string $type = nodeType( $jname );
+   if ( $type != "joint" )
+   {
+      return 0;
+   }
+
+   //=== Check if there are keys ===
+   int $n = 1; // will remain 1 if joint is to be counted, 0 otherwise
+   string $jnames[];
+   $jnames = `keyframe -q -name $jname`;
+
+   if ( size( $jnames ) == 0 )
+      $n=0; // no info
+
+   if ( skmSearchType( $jnames, "ateX") == -1 &&
+        skmSearchType( $jnames, "ateY") == -1 &&
+        skmSearchType( $jnames, "ateZ") == -1 )
+   {
+        $n=0; // no rotate or translate
+   }
+
+   //=== Count this joint if n is 1 ===
+   global int $curJointsId;
+   if ( $n == 1 )
+   {
+      $joints[ $curJointsId ] = $jname;
+      $curJointsId = $curJointsId + 1;
+   }
+
+   //=== Recurse ===
+   for ( $i = 0; $i < $nchildren; $i++ )
+   {
+      $n = $n + skmCountJoints( $children[ $i ], $joints );
+   }
+
+   return $n;
+}
+
+
+//to get key index:     keyframe -eval -index $key  -query $queryName
+//to evaluate at frame: keyframe -eval -time $frame -query $queryName
+/*----------------------------------------
+PROC: skmKeyVal
+----------------------------------------*/
+proc float skmKeyVal( int $frame, string $queryName )
+{
+   float $val[];
+   global int $isFacial;
+
+   // if there is no key we search the 1st prior valid key for the joint
+	while ( size( $val ) == 0 )
+	{
+	  if( ($frame <= 0) && ($isFacial == 0) )
+		continue;
+	  $val = `keyframe -eval -time $frame -query $queryName`;
+	  $frame = $frame - 1;
+	}
+
+
+   return $val[ 0 ];
+}
+
+
+proc skmCheckAndWriteKey( int $fileid, string $names[], string $type, int $frame )
+{
+   int $id = skmSearchType( $names, $type );
+   global int $isFacial;
+   float $base;
+	
+   if($isFacial)
+   {
+	  $base = skmKeyVal ( 0 , $names[$id] );
+   }
+   
+   if ( $id >= 0 )
+   {
+      float $val = skmKeyVal( $frame, $names[ $id ] );
+	  
+	  if($isFacial)
+	  {
+		  $val = $val - $base;  // Subtract value at reference frame
+	  }
+	  
+      fprint $fileid ( " " + skmRound( $val ) );
+	  
+	  
+	  
+   }
+}
+
+
+proc skmCheckAndWriteKeyQuat( int $fileid, string $names[], int $frame )
+{
+   int $idx = skmSearchType( $names, "rotateX" );
+   int $idy = skmSearchType( $names, "rotateY" );
+   int $idz = skmSearchType( $names, "rotateZ" );
+   if ( $idx < 0 && $idy < 0 && $idz < 0 )
+      return;
+
+   float $xa = 0;
+   float $ya = 0;
+   float $za = 0;
+   if ( $idx >= 0 ) $xa = skmKeyVal( $frame, $names[ $idx ] );
+   if ( $idy >= 0 ) $ya = skmKeyVal( $frame, $names[ $idy ] );
+   if ( $idz >= 0 ) $za = skmKeyVal( $frame, $names[ $idz ] );
+
+   float $qx[];
+   float $qy[];
+   float $qz[];
+   skmQuatSet( $qx, 1, 0, 0, $xa );
+   skmQuatSet( $qy, 0, 1, 0, $ya );
+   skmQuatSet( $qz, 0, 0, 1, $za );
+
+   // compose to zyx instead of xyz due to the used column-major matrix format
+   float $qzyx[];
+   float $qyx[];
+   float $aa[];
+   skmQuatMult( $qyx, $qy, $qx );
+   skmQuatMult( $qzyx, $qz, $qyx );
+   quatToAxisAng( $qzyx, $aa );
+   fprint $fileid ( " " + skmRound( $aa[ 0 ] ) + " " + skmRound( $aa[ 1 ] ) + " " + skmRound( $aa[ 2 ] ) );
+}
+
+
+proc skmWriteKeyData( int $fileid, int $frame, string $jointName, int $jid )
+{
+   global string $g_names[];
+   global int $g_namesWidth;
+   global int $isFacial;
+
+   string $names[];
+   float $val[];
+   int $i;
+   int $trstart = 0;
+
+   // get used rotations/translations in the joint:
+   //$names = `keyframe -q -name $jointName`;
+
+   // the line above was too slow to be called per joint, per frame.
+   // we stored the array in a 2d array at the beginning.  Now copy the
+   // portion we're interested in to a single array
+   for ( $i = 0; $i < $g_namesWidth; $i++ )
+   {
+      string $s = Get2dArrayString( $g_names, $g_namesWidth, $jid, $i );
+      if ( $s == "" )
+         break;
+
+      $names[ $i ] = $s;
+   }
+
+
+   // Note: "keyframe -q -name  base;" returns:
+   //       "base_translateZ base_translateX base_translateY base_rotateX base_rotateY base_rotateZ"
+   if ( ( $jid == 0 ) || ($isFacial)) // send translation only for root
+   {
+      skmCheckAndWriteKey( $fileid, $names, "translateX", $frame );
+      skmCheckAndWriteKey( $fileid, $names, "translateY", $frame );
+      skmCheckAndWriteKey( $fileid, $names, "translateZ", $frame );
+   }
+
+   skmCheckAndWriteKeyQuat( $fileid, $names, $frame );
+}
+
+
+proc skmCheckAndWrite( int $fileid, string $names[], string $type, string $joint, string $skmtype )
+{
+   int $id = skmSearchType( $names, $type );
+   if ( $id >= 0 )
+      fprint $fileid ( $joint + $skmtype );
+}
+
+
+proc skmCheckAndWriteQuat( int $fileid, string $names[], string $joint )
+{
+   int $idx = skmSearchType( $names, "rotateX" );
+   int $idy = skmSearchType( $names, "rotateY" );
+   int $idz = skmSearchType( $names, "rotateZ" );
+   if ( $idx >= 0 || $idy >= 0 || $idz >= 0 )
+      fprint $fileid ( $joint + " Quat\n" );
+}
+
+
+proc skmWriteSkm( int $startFrame, int $endFrame, string $joints[], int $fileid, int $fps )
+{
+   string $names[];
+   global int $isFacial;
+
+   global string $g_names[];
+   global int $g_namesWidth;
+
+   // Export translations and/or Quat rotations:
+   global int $curJointsId;
+
+   // find max width of names array so we can store in a hacked 2d array
+   $g_namesWidth = 0;
+   for ( $i = 0; $i < $curJointsId; $i++ )
+   {
+      $names = `keyframe -q -name $joints[ $i ]`;
+      if ( size( $names ) > $g_namesWidth )
+      {
+         $g_namesWidth = size( $names );
+      }
+   }
+
+
+   for ( $i = 0; $i < $curJointsId; $i++ )
+   {
+      $names = `keyframe -q -name $joints[ $i ]`;
+
+      // store our hacked 2d array for use later
+      for ( $n = 0; $n < size( $names ); $n++ )
+      {
+         Set2dArrayString( $g_names, $g_namesWidth, $i, $n, $names[ $n ] );
+      }
+
+      if ( ( $i == 0 ) || ($isFacial) ) // translation allowed only in root
+      {
+         skmCheckAndWrite( $fileid, $names, "translateX", $joints[ $i ], " XPos\n" );
+         skmCheckAndWrite( $fileid, $names, "translateY", $joints[ $i ], " YPos\n" );
+         skmCheckAndWrite( $fileid, $names, "translateZ", $joints[ $i ], " ZPos\n" );
+      }
+
+      skmCheckAndWriteQuat( $fileid, $names, $joints[ $i ] );
+   }
+
+   // frames:
+   float $kt = 0;
+   float $vec[];
+   float $ktstep = 1.0 / $fps;
+
+   if ( $startFrame > $endFrame )
+      $startFrame = $endFrame;
+
+   fprint $fileid ( "\nframes " + ( $endFrame - $startFrame + 1 ) + "\n" );
+
+//$startTime1 = `timerX`;
+
+   for ( $f = $startFrame; $f <= $endFrame; $f++ )
+   {
+      print( "Writing frame " + $f +"/"+ $endFrame + "...\n" );
+
+      fprint $fileid ( "kt " + $kt + " fr" );
+
+      for ( $i = 0; $i < $curJointsId; $i++ )
+      {
+         skmWriteKeyData( $fileid, $f, $joints[ $i ], $i );
+      }
+
+      $kt += $ktstep;
+
+      fprint $fileid ( "\n" );
+   }
+
+//$endTime1 = `timerX -st $startTime1`;
+//print ( "TIME: skmWriteKeyData: " + $endTime1 + "\n" );
+}
+
+
+/*----------------------------------------
+GLOBAL PROC: skmWriteSkmToFileNOGUI
+----------------------------------------*/
+global proc int skmWriteSkmToFileNoGUI ( string $fname,
+                                         string $AnimDef,
+                                         int $startFrame,
+                                         int $endFrame,
+                                         int $fps,
+                                         string $version )
+{
+   //global int inTime;
+
+   //Create new file to write data to
+   int $fileid = `fopen $fname "w"`;
+   global int $isFacial;
+
+   string $AnimName = basename( $fname, ".skm" );
+
+   //Close file if nothing exists in scene <-Is this really needed? -Matt
+   $selectionList = `ls -sl`;
+   if ( size( $selectionList ) <= 0 )
+   {
+      fclose $fileid;
+      error "Nothing selected! \n";
+   }
+
+   int $selectionListSize = `size $selectionList`;
+   int $depth = 0;
+   int $njoints;
+   int $nchannels;
+   string $joints[]; // array to be filled with all joints names
+   global int $curJointsId = 0; // start filling at position 0 (root is at pos 0)
+
+   for ( $j = 0; $j < $selectionListSize; $j++ )
+   {
+      $curJointsId = 0;
+
+      //Print basic file information
+      fprint $fileid ( "# SKM Motion Definition \n" );
+      fprint $fileid ( "# Maya Exporter v" + $version + "\n\n" );
+      fprint $fileid ( "SkMotion\n\n" );
+      fprint $fileid ( "name \"" + $AnimName + "\"\n\n" );
+
+      $njoints = skmCountJoints( $selectionList[ $j ], $joints );
+      print( "Joints found:\n" );
+      print $joints;
+      print( "\n" );
+
+      //Print number of channels
+	  if(!($isFacial) )
+	  {
+		$nchannels = $njoints + 3; // all joints' rotations + root 3 translations
+	  }
+	  else
+	  {
+		$nchannels = $njoints * 4; // all joints have 1 rotation and 3 translations
+	  }
+	  
+      fprint $fileid ( "channels " + $nchannels + "\n" );
+
+      skmWriteSkm( $startFrame, $endFrame, $joints, $fileid, $fps );
+      fprint $fileid ( "\n\n" );
+
+
+         /*
+         //Old stuff
+         int $ready = `intSliderGrp -query -value ready`;
+         string $stroke= `intSliderGrp -query -value stroke`;
+	      string $emphasis= `intSliderGrp -query -value emphasis`;
+	      string $strokeStart= `intSliderGrp -query -value strokeStart`;
+         string $relax= `intSliderGrp -query -value relax`;
+
+         float $readySeconds= float($ready)/$fps;
+         float $relaxSeconds= float($relax)/$fps;
+         float $strokeSeconds= float($stroke)/$fps;
+	      float $strokeStartSeconds= float($strokeStart)/$fps;
+	      float $emphasisSeconds= float($emphasis)/$fps;
+         */
+
+
+      //grab synch point values
+      int $readyVal =       `getAttr( $AnimDef + ".readyTime" )`;
+      int $strokeStartVal = `getAttr( $AnimDef + ".strokeStartTime" )`;
+      int $emphasisVal =    `getAttr( $AnimDef + ".emphasisTime" )`;
+      int $strokeVal =      `getAttr( $AnimDef + ".strokeTime" )`;
+      int $relaxVal =       `getAttr( $AnimDef + ".relaxTime" )`;
+
+      //convert synch point values from frames to seconds
+      float $readySeconds =       float( $readyVal ) / $fps;
+      float $strokeStartSeconds = float( $strokeStartVal ) / $fps;
+      float $emphasisSeconds =    float( $emphasisVal ) / $fps;
+      float $strokeSeconds =      float( $strokeVal ) / $fps;
+      float $relaxSeconds =       float( $relaxVal ) / $fps;
+
+      //print synch point values
+      fprint $fileid ( "ready time: "+ $readySeconds + "\n" );
+      fprint $fileid ( "strokeStart time: "+ $strokeStartSeconds + "\n" );
+      fprint $fileid ( "emphasis time: "+ $emphasisSeconds+ "\n" );
+      fprint $fileid ( "stroke time: " + $strokeSeconds + "\n" );
+      fprint $fileid ( "relax time: "+ $relaxSeconds + "\n" );
+   }
+
+   fclose( $fileid );
+
+   //FINISH
+   print( "Export done.\n" );
+
+   /*
+   //Why are these three values grabbed? -Matt
+   int $ready = 	`intSliderGrp -query -value ready`;
+   string $stroke= 	`intSliderGrp -query -value stroke`;
+   string $relax= 	`intSliderGrp -query -value relax`;
+   */
+
+   return 1;
+}
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////
+//  GUI CODE
+////////////////////////////////////////////////////////////////
+
 
 global proc int skmFileCb( string $filename, string $fileType )
 {
