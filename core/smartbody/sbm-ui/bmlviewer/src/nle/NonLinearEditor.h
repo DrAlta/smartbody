@@ -6,8 +6,13 @@
 #include <map>
 #include <fltk/Color.h>
 
+namespace nle 
+{
+
 class Block;
 class Track;
+
+
 
 class Mark
 {
@@ -193,4 +198,5 @@ class NonLinearEditorModel
 		std::string currentContext;
 };
 
+}
 #endif

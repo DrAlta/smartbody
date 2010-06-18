@@ -2,6 +2,7 @@
 #include <sstream>
 #include <limits>
 
+namespace nle {
 
 Mark::Mark()
 {
@@ -43,7 +44,7 @@ bool Mark::isShowName()
 	return showName;
 }
 
-Block* Mark::getBlock()
+nle::Block* Mark::getBlock()
 {
 	return block;
 }
@@ -992,3 +993,4 @@ void NonLinearEditorModel::clearContexts()
 }
 
 
+}

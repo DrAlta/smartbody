@@ -6,8 +6,8 @@
 #include <fltk/TextDisplay.h>
 #include <fltk/Choice.h>
 #include <fltk/LightButton.h>
-#include "NonLinearEditor.h"
-#include "NonLinearEditorWidget.h"
+#include "nle/NonLinearEditor.h"
+#include "nle/NonLinearEditorWidget.h"
 #include "BehaviorEditorWidget.h"
 #include "BehaviorBlock.h"
 #include <sbm/bml_speech.hpp>
@@ -32,25 +32,25 @@ class BehaviorWindow : public fltk::Window, public BMLViewer
         
 		void updateGUI();
         
-		EditorWidget* getEditorWidget();
-		Block* getSelectedBlock();
-        Track* getSelectedTrack();
+		nle::EditorWidget* getEditorWidget();
+		nle::Block* getSelectedBlock();
+        nle::Track* getSelectedTrack();
 		void updateBehaviors(BML::BmlRequest* request);
 
-		void processMotionRequest(BML::MotionRequest* motionRequest, NonLinearEditorModel* model, BML::BehaviorRequest* behavior, 
+		void processMotionRequest(BML::MotionRequest* motionRequest, nle::NonLinearEditorModel* model, BML::BehaviorRequest* behavior, 
 								  double triggerTime, BML::BehaviorSchedulerConstantSpeed* constantSpeedScheduler, 
 								  std::map<std::string, double>& syncMap, std::vector<std::pair<RequestMark*, std::string> >& untimedMarks);
-		void processControllerRequest(BML::MeControllerRequest* contrlllerRequest, NonLinearEditorModel* model, BML::BehaviorRequest* behavior, 
+		void processControllerRequest(BML::MeControllerRequest* contrlllerRequest, nle::NonLinearEditorModel* model, BML::BehaviorRequest* behavior, 
 									  double triggerTime, BML::BehaviorSchedulerConstantSpeed* constantSpeedScheduler, 
 									  std::map<std::string, double>& syncMap, std::vector<std::pair<RequestMark*, std::string> >& untimedMarks);
-		void processSpeechRequest(BML::SpeechRequest* speechRequest, NonLinearEditorModel* model, BML::BehaviorRequest* behavior, 
+		void processSpeechRequest(BML::SpeechRequest* speechRequest, nle::NonLinearEditorModel* model, BML::BehaviorRequest* behavior, 
 									double triggerTime, BML::BehaviorSchedulerConstantSpeed* constantSpeedScheduler, 
 									std::map<std::string, double>& syncMap, std::vector<std::pair<RequestMark*, std::string> >& untimedMarks);
-		void processEventRequest(BML::EventRequest* eventRequest, NonLinearEditorModel* model, BML::BehaviorRequest* behavior, 
+		void processEventRequest(BML::EventRequest* eventRequest, nle::NonLinearEditorModel* model, BML::BehaviorRequest* behavior, 
 									double triggerTime, BML::BehaviorSchedulerConstantSpeed* constantSpeedScheduler, 
 									std::map<std::string, double>& syncMap, std::vector<std::pair<RequestMark*, std::string> >& untimedMarks);
 	
-		void adjustSyncPoints(BML::BehaviorRequest* behavior, Block* block, std::map<std::string, double>& syncMap);
+		void adjustSyncPoints(BML::BehaviorRequest* behavior, nle::Block* block, std::map<std::string, double>& syncMap);
 		
 		static void ContextCB(fltk::Widget* widget, void* data);
 		static void ClearCB(fltk::Widget* widget, void* data);
@@ -66,7 +66,7 @@ class BehaviorWindow : public fltk::Window, public BMLViewer
 		int contextCounter;
 		std::string selectedContext;
 
-		NonLinearEditorModel* nleModel; 
+		nle::NonLinearEditorModel* nleModel;
 };
 
  class BehaviorViewerFactory : public BMLViewerFactory

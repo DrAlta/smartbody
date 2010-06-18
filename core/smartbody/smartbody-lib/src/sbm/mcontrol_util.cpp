@@ -1331,6 +1331,9 @@ int mcu_bmlviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 					int py = args.read_int();
 					int err = mcu_p->open_bml_viewer( width, height, px, py );
 					return( err );
+				} else {
+					int err = mcu_p->open_bml_viewer( 800, 600, 100, 100 );
+					return( err );
 				}
 			}
 		}

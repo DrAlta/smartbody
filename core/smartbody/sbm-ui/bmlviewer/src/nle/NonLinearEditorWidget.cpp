@@ -2,6 +2,9 @@
 #include <iostream>
 #include <fltk/Cursor.h>
 
+namespace nle
+{
+
 EditorWidget::EditorWidget(int x, int y, int w, int h, char* name) :
 									fltk::Group(x, y, w, h, name)
 {
@@ -30,7 +33,7 @@ void EditorWidget::setup()
 	width = right - left;
 	top = padding;
 	bottom = h() - 10;
-	height = top - bottom;
+	height = bottom - top;
 	labelWidth = 100;
 	trackStart = left + labelWidth;
 	timeWindowHeight = 10;
@@ -42,7 +45,7 @@ void EditorWidget::setup()
 	int currentTrackLocation = padding + timeWindowHeight;
 	for (int t = 0; t < model->getNumTracks(); t++)
 	{
-		Track* track = model->getTrack(t);
+		nle::Track* track = model->getTrack(t);
 
 		int trackTop = currentTrackLocation;
 		int trackLeft = trackStart;
@@ -51,7 +54,7 @@ void EditorWidget::setup()
 
 		for (int b = 0; b < track->getNumBlocks(); b++)
 		{
-			Block* block = track->getBlock(b);
+			nle::Block* block = track->getBlock(b);
 			// set up the blocks
 
 			double startTime = block->getStartTime();    
@@ -76,7 +79,7 @@ void EditorWidget::setup()
 
 			for (int m = 0; m < block->getNumMarks(); m++)
 			{
-				Mark* mark = block->getMark(m);
+				nle::Mark* mark = block->getMark(m);
 
 				double markStartTime = mark->getStartTime();    
 				//if (markStartTime > this->getViewableTimeEnd())
@@ -110,12 +113,12 @@ void EditorWidget::setup()
 				hasOverlap = false;
 				for (int m = 0; m < block->getNumMarks(); m++)
 				{
-					Mark* mark = block->getMark(m);
+					nle::Mark* mark = block->getMark(m);
 					int bounds[4];
 					mark->getBounds(bounds[0], bounds[1], bounds[2], bounds[3]);
 					for (int n = m + 1; n < block->getNumMarks(); n++)
 					{
-						Mark* mark2 = block->getMark(n);
+						nle::Mark* mark2 = block->getMark(n);
 						// make sure these aren't the same marks
 						//if (mark->getName() == mark2->getName())
 						//	continue;
@@ -209,12 +212,12 @@ void EditorWidget::resize(int x, int y, int w, int h)
 	setup();
 }
 
-void EditorWidget::setModel(NonLinearEditorModel* m)
+void EditorWidget::setModel(nle::NonLinearEditorModel* m)
 {
 	this->model = m;
 }
 
-NonLinearEditorModel* EditorWidget::getModel()
+nle::NonLinearEditorModel* EditorWidget::getModel()
 {
 	return model;
 }
@@ -257,11 +260,11 @@ double EditorWidget::getViewableTimeEnd()
 void EditorWidget::draw()
 {
 	setup();
-	fltk::Group::draw();
 
+	fltk::Group::draw();
 	if (!model)
 		return;
-
+	
 	// draw the work area
 	drawBackground();
 
@@ -275,23 +278,23 @@ void EditorWidget::draw()
 	int numTracks = model->getNumTracks();
 	for (int t = 0; t < numTracks; t++)
 	{
-		Track* track = model->getTrack(t);
+		nle::Track* track = model->getTrack(t);
 		drawTrack(track, t);
 	}
 
 	// draw each block
 	for (int t = 0; t < numTracks; t++)
 	{
-		Track* track = model->getTrack(t);
+		nle::Track* track = model->getTrack(t);
 		// draw each block
 		for (int b = 0; b < track->getNumBlocks(); b++)
 		{
-			Block* block = track->getBlock(b);
+			nle::Block* block = track->getBlock(b);
 			drawBlock(block, t, b);
 			// draw the marks on the track
 			for (int m = 0; m < block->getNumMarks(); m++)
 			{
-				Mark* mark = block->getMark(m);
+				nle::Mark* mark = block->getMark(m);
 				drawMark(block, mark, t, b, m);
 			}
 		}
@@ -309,11 +312,11 @@ void EditorWidget::draw()
 
 		for (int t = 0; t < numTracks; t++)
 		{
-			Track* track = model->getTrack(t);
+			nle::Track* track = model->getTrack(t);
 			// draw each block
 			for (int b = 0; b < track->getNumBlocks(); b++)
 			{
-				Block* block = track->getBlock(b);
+				nle::Block* block = track->getBlock(b);
 				block->getBounds(loc[0], loc[1], loc[2], loc[3]);
 				fltk::Rectangle r(loc[0], loc[1], loc[2], loc[3]);
 				fltk::fillrect(r);
@@ -328,7 +331,7 @@ void EditorWidget::draw()
 
 	// draw the time if dragging
 	bool leftOrRight;
-	Block* blockBeingDragged = getBlockCandidate(leftOrRight);
+	nle::Block* blockBeingDragged = getBlockCandidate(leftOrRight);
 	if (blockBeingDragged)
 	{
 		double t = 0.0;
@@ -343,6 +346,7 @@ void EditorWidget::draw()
 		blockBeingDragged->getTrack()->getBounds(bounds[0], bounds[1], bounds[2], bounds[3]);
 		fltk::drawtext(buff, float(this->convertTimeToPosition(t)), float(bounds[1]) +  5.0f * float(bounds[3]) / 6.0f);
 	}
+
 
 
 }
@@ -422,13 +426,13 @@ void EditorWidget::drawTimeWindow()
 
 	// draw the time label
 	char buff[128];
-	sprintf(buff, "%6.2f", this->getViewableTimeStart());
-	fltk::drawtext(buff, float(bounds[0]), float((bounds[1] + (bounds[1] + bounds[3])) / 2 + 5));
+	//sprintf(buff, "%6.2f", this->getViewableTimeStart());
+	fltk::drawtext(buff, float(bounds[0]), float((bounds[1] + (bounds[1] + bounds[3])) / 2 + 5) - 10);
 	sprintf(buff, "%6.2f", this->getViewableTimeEnd());
-	fltk::drawtext(buff, float(bounds[0] + bounds[2]), float((bounds[1] + (bounds[1] + bounds[3])) / 2 + 5));
-}
+	fltk::drawtext(buff, float(bounds[0] + bounds[2]), float((bounds[1] + (bounds[1] + bounds[3])) / 2 + 5) - 10);
+	}
 
-void EditorWidget::drawTrack(Track* track, int trackNum)
+void EditorWidget::drawTrack(nle::Track* track, int trackNum)
 {
 	if (!track)
 		return;
@@ -473,12 +477,12 @@ void EditorWidget::drawTrack(Track* track, int trackNum)
 	fltk::strokerect(trackrec);
 }
 
-void EditorWidget::drawBlock(Block* block, int trackNum, int blockNum)
+void EditorWidget::drawBlock(nle::Block* block, int trackNum, int blockNum)
 {
 	int viewableStart = this->convertTimeToPosition(getViewableTimeStart());
 	int viewableEnd = this->convertTimeToPosition(getViewableTimeEnd());
 	
-	Track* track = block->getTrack();
+	nle::Track* track = block->getTrack();
 	int trackBounds[4];
 	track->getBounds(trackBounds[0], trackBounds[1], trackBounds[2], trackBounds[3]);
 	int trackTop = trackBounds[1];
@@ -542,7 +546,7 @@ void EditorWidget::drawBlock(Block* block, int trackNum, int blockNum)
 	}		
 }
 
-void EditorWidget::drawMark(Block* block, Mark* mark, int trackNum, int blockNum, int markNum)
+void EditorWidget::drawMark(nle::Block* block, nle::Mark* mark, int trackNum, int blockNum, int markNum)
 {
 	int viewableStart = this->convertTimeToPosition(getViewableTimeStart());
 	int viewableEnd = this->convertTimeToPosition(getViewableTimeEnd());	
@@ -594,7 +598,7 @@ void EditorWidget::drawMark(Block* block, Mark* mark, int trackNum, int blockNum
 
 int EditorWidget::handle(int event)
 {
-	NonLinearEditorModel* model = this->getModel();
+	nle::NonLinearEditorModel* model = this->getModel();
 
 	if (!model)
 	{
@@ -608,8 +612,8 @@ int EditorWidget::handle(int event)
 	bool found = false;
 	bool foundBorder = false;
 	bool leftOrRight = false;
-	Block* candidateBlock = NULL;             
-    Block* selectedBlock = NULL;   
+	nle::Block* candidateBlock = NULL;             
+    nle::Block* selectedBlock = NULL;   
 
 	switch (event)
 	{
@@ -621,17 +625,17 @@ int EditorWidget::handle(int event)
 					case 'f': 
 						// bring any selected objects in focus
 						// if nothing is selected, bring everything into focus
-						std::vector<Block*> selectedBlocks;
+						std::vector<nle::Block*> selectedBlocks;
 						double minTime = 9999999;
 						double maxTime = -9999999;
 						double selectedMinTime = 0;
 						double selectedMaxTime = 1;
 						for (int t = 0; t < model->getNumTracks(); t++)
 						{
-							Track* track = model->getTrack(t);
+							nle::Track* track = model->getTrack(t);
 							for (int b = 0; b < track->getNumBlocks(); b++)
 							{
-								Block* block = track->getBlock(b);
+								nle::Block* block = track->getBlock(b);
 								if (block->isSelected())
 								{
 									selectedBlocks.push_back(block);
@@ -739,7 +743,7 @@ int EditorWidget::handle(int event)
 				if (leftOrRight)
 				{
 					// find the block whose end time matches this start time                    
-                    Block* blockToLeft = candidateBlock->getTrack()->getPrevBlock(candidateBlock);
+                    nle::Block* blockToLeft = candidateBlock->getTrack()->getPrevBlock(candidateBlock);
                     
                     if (blockToLeft)
                     {
@@ -761,7 +765,7 @@ int EditorWidget::handle(int event)
 				{
                     // if the SHIFT key is selected,
 					// find the block whose end time matches this start time
-                    Block* blockToRight = candidateBlock->getTrack()->getNextBlock(candidateBlock);
+                    nle::Block* blockToRight = candidateBlock->getTrack()->getNextBlock(candidateBlock);
                     
                     if (blockToRight)
                     {
@@ -844,10 +848,10 @@ int EditorWidget::handle(int event)
             // check to see if the user is moving an entire block 
             for (int t = 0; t < model->getNumTracks(); t++)
             {
-                Track* track = model->getTrack(t);
+                nle::Track* track = model->getTrack(t);
                 for (int b = 0; b < track->getNumBlocks(); b++)
                 {
-                    Block* block = track->getBlock(b);
+                    nle::Block* block = track->getBlock(b);
                     if (block->isSelected())
                     {
                         selectedBlock = block;
@@ -868,7 +872,7 @@ int EditorWidget::handle(int event)
                 if (timeDiff > 0) // if moving to the right, move block to the right until another block has been hit
 
                 {
-                    Block* nextBlock = selectedBlock->getTrack()->getNextBlock(selectedBlock);
+                    nle::Block* nextBlock = selectedBlock->getTrack()->getNextBlock(selectedBlock);
                     if (nextBlock)
                     {
                         if (nextBlock->getStartTime() < selectedBlock->getEndTime() + timeDiff)
@@ -881,7 +885,7 @@ int EditorWidget::handle(int event)
                 }
                 else // if moving to the left, move block to the left until another block has been hit
                 {
-                    Block* prevBlock = selectedBlock->getTrack()->getPrevBlock(selectedBlock);
+                    nle::Block* prevBlock = selectedBlock->getTrack()->getPrevBlock(selectedBlock);
                     if (prevBlock)
                     {
                         if (prevBlock->getEndTime() > selectedBlock->getStartTime() + timeDiff)
@@ -992,10 +996,10 @@ int EditorWidget::handle(int event)
 			// check to see if a block was hit			
 			for (int t = 0; t < model->getNumTracks(); t++)
 			{
-				Track* track = model->getTrack(t);
+				nle::Track* track = model->getTrack(t);
 				for (int b = 0; b < track->getNumBlocks(); b++)
 				{
-					Block* block = track->getBlock(b);
+					nle::Block* block = track->getBlock(b);
 					int bounds[4];
 					block->getBounds(bounds[0], bounds[1], bounds[2], bounds[3]);
 					int minX = bounds[0];
@@ -1007,22 +1011,39 @@ int EditorWidget::handle(int event)
 						(mousey >= minY && mousey <= maxY))
 					{
 						block->setSelected(!block->isSelected());
+						changeBlockSelectionEvent(block);
 						for (int t = 0; t < model->getNumTracks(); t++)
 						{
-							Track* selectTrack = model->getTrack(t);
+							nle::Track* selectTrack = model->getTrack(t);
 							if (selectTrack != block->getTrack())
-								selectTrack->setSelected(false);
+								if (selectTrack->isSelected())
+								{
+									selectTrack->setSelected(false);
+									changeTrackSelectionEvent(selectTrack);
+								}
 							else
-								selectTrack->setSelected(true);
+								if (!selectTrack->isSelected())
+								{
+									selectTrack->setSelected(true);
+									changeTrackSelectionEvent(selectTrack);
+								}
 						}
-						block->getTrack()->setSelected(block->isSelected());
+						if (block->getTrack()->isSelected() != block->isSelected())
+						{
+							block->getTrack()->setSelected(block->isSelected());
+							changeBlockSelectionEvent(block);
+						}
 						mouseHit = true;
 						// unselect the other blocks
 						for (int b2 = 0; b2 < track->getNumBlocks(); b2++)
 						{
-							Block* block2 = track->getBlock(b2);
+							nle::Block* block2 = track->getBlock(b2);
 							if (block2 != block)
-								block2->setSelected(false);
+								if (block2->isSelected())
+								{
+									block2->setSelected(false);
+									changeBlockSelectionEvent(block2);
+								}
 						}
 						found = true;
                         model->setModelChanged(true);
@@ -1036,7 +1057,7 @@ int EditorWidget::handle(int event)
 			{
 				for (int t = 0; t < model->getNumTracks(); t++)
 				{
-					Track* track = model->getTrack(t);
+					nle::Track* track = model->getTrack(t);
 					int bounds[4];
 					track->getBounds(bounds[0], bounds[1], bounds[2], bounds[3]);
 					int trackMinX = bounds[0];
@@ -1050,11 +1071,19 @@ int EditorWidget::handle(int event)
 						// hit the track
 						for (int t = 0; t < model->getNumTracks(); t++)
 						{
-							Track* selectTrack = model->getTrack(t);
+							nle::Track* selectTrack = model->getTrack(t);
 							if (selectTrack != track)
-								selectTrack->setSelected(false);
+								if (selectTrack->isSelected())
+								{
+									selectTrack->setSelected(false);
+									changeTrackSelectionEvent(selectTrack);
+								}
 							else
-								selectTrack->setSelected(true);
+								if (!selectTrack->isSelected())
+								{
+									selectTrack->setSelected(true);
+									changeTrackSelectionEvent(selectTrack);
+								}
 						}
 						mouseHit = true;
 					}
@@ -1080,11 +1109,15 @@ int EditorWidget::handle(int event)
 			{
 				for (int t = 0; t < model->getNumTracks(); t++)
 				{
-					Track* track = model->getTrack(t);
+					nle::Track* track = model->getTrack(t);
 					for (int b = 0; b < track->getNumBlocks(); b++)
 					{
-						Block* block = track->getBlock(b);
-						block->setSelected(false);
+						nle::Block* block = track->getBlock(b);
+						if (block->isSelected())
+						{
+							block->setSelected(false);
+							changeBlockSelectionEvent(block);
+						}
 					}
 				}
 			}
@@ -1111,10 +1144,10 @@ int EditorWidget::handle(int event)
 			// then change the cursor type
 			for (int t = 0; t < model->getNumTracks(); t++)
 			{
-				Track* track = model->getTrack(t);
+				nle::Track* track = model->getTrack(t);
 				for (int b = 0; b < track->getNumBlocks(); b++)
 				{
-					Block* block = track->getBlock(b);
+					nle::Block* block = track->getBlock(b);
 					int bounds[4];					
 					block->getBounds(bounds[0], bounds[1], bounds[2], bounds[3]);
 					int leftMinX = bounds[0];
@@ -1285,15 +1318,25 @@ void EditorWidget::setTimeWindowSelected(bool val)
 	timeWindowSelected = val;
 }
 
-Block* EditorWidget::getBlockCandidate(bool& beginning)
+nle::Block* EditorWidget::getBlockCandidate(bool& beginning)
 {
 	beginning = candidateBeginning;
 	return blockCandidate;
 }
 
-void EditorWidget::setBlockCandidate(Block* block, bool beginning)
+void EditorWidget::setBlockCandidate(nle::Block* block, bool beginning)
 {
 	blockCandidate = block;
 	candidateBeginning = beginning;
 }
 
+
+void EditorWidget::changeBlockSelectionEvent(Block* block)
+{
+}
+
+void EditorWidget::changeTrackSelectionEvent(Track* track)
+{
+}
+
+}

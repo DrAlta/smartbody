@@ -2,15 +2,15 @@
 #define _BEHAVIORBLOCK_
 
 #include <sbm/bml.hpp>
-#include "NonLinearEditor.h"
+#include "nle/NonLinearEditor.h"
 
-class BehaviorMark : public Mark
+class BehaviorMark : public nle::Mark
 {
 	public:
 		BehaviorMark();		
 };
 
-class BehaviorTimingMark : public Mark
+class BehaviorTimingMark : public nle::Mark
 {
 	public:
 		BehaviorTimingMark();		
@@ -18,7 +18,7 @@ class BehaviorTimingMark : public Mark
 	protected:
 };
 
-class BehaviorBlock : public Block
+class BehaviorBlock : public nle::Block
 {
 	public:
 		BehaviorBlock();
@@ -29,26 +29,26 @@ class BehaviorBlock : public Block
 		
 };
 
-class BehaviorTrack : public Track
+class BehaviorTrack : public nle::Track
 {
 	public:
 		BehaviorTrack();
 };
 
-class RequestMark : public Mark
+class RequestMark : public nle::Mark
 {
 	public:
 		RequestMark();		
 };
 
-class RequestTimingMark : public Mark
+class RequestTimingMark : public nle::Mark
 {
 	public:
 		RequestTimingMark();		
 	
 };
 
-class RequestBlock : public Block
+class RequestBlock : public nle::Block
 {
 	public:
 		RequestBlock();
@@ -56,7 +56,7 @@ class RequestBlock : public Block
 		
 };
 
-class EventBlock : public Block
+class EventBlock : public nle::Block
 {
 	public:
 		EventBlock();
@@ -64,7 +64,7 @@ class EventBlock : public Block
 		
 };
 
-class MotionBlock : public Block
+class MotionBlock : public nle::Block
 {
 	public:
 		MotionBlock();
@@ -72,7 +72,7 @@ class MotionBlock : public Block
 		
 };
 
-class NodBlock : public Block
+class NodBlock : public nle::Block
 {
 	public:
 		NodBlock();
@@ -81,7 +81,7 @@ class NodBlock : public Block
 };
 
 
-class RequestTrack : public Track
+class RequestTrack : public nle::Track
 {
 	public:
 		RequestTrack();

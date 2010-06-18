@@ -534,7 +534,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 		tMapFunc.make_cusp( startAt,     0,            0, 0, 0, 0 );
 		tMapFunc.make_cusp( readyAt,    skMotion->time_ready(),          0, 0, 0, 0 );
 		tMapFunc.make_cusp( strokeStartAt,    skMotion->time_stroke_start(),          0, 0, 0, 0 );
-		tMapFunc.make_cusp( strokeAt,    skMotion->time_stroke_emphasis(),          0, 0, 0, 0 );
+ 		tMapFunc.make_cusp( strokeAt,    skMotion->time_stroke_emphasis(),          0, 0, 0, 0 );
 		tMapFunc.make_cusp( strokeEndAt,    skMotion->time_stroke_end(),          0, 0, 0, 0 );
 		tMapFunc.make_cusp( relaxAt,    skMotion->time_relax(),          0, 0, 0, 0 );
 		tMapFunc.make_cusp( endAt,    ct_dur,          0, 0, 0, 0 );
@@ -553,7 +553,11 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 bool MeCtScheduler2::remove_child( MeController *child ) {
 	bool result = remove_child_impl( child );
 	if( result )
+	{
+		child->parent(NULL);
+		this->unref();
 		recalc_channels_requested();
+	}
 
 	return result;
 }
