@@ -22,13 +22,18 @@
 //      Kristin Parker, USC
 
 
-string $skVersion = "0.4";
+// - All joints are exported with quaternion rotation channel
+// - Only base joint is exported with translation channels
+// - If "Mirror Joint" is used to create the skeleton in Maya, be sure to use the
+//   "orientation" option (not "behavior")
 
+
+string $skVersion = "0.4";
 
 
 // --------------------------------------------------------------------------------
 // PROC: skRound
-// This will round a number to a certain precision, the bulk of this script actuall deals more with
+// This will round a number to a certain precision, the bulk of this script actually deals more with
 // getting the number written out in a format Smartbody understands. In this case Smartbody doesn't
 // use scientific notation for float values, which is something Maya often uses. So the solution is
 // to convert these numeric values to strings.
@@ -109,7 +114,6 @@ proc string skRound( float $value )
 
    $valueString = ( $sign + $wholeNumber + "." + $decNumber ) ;
 
-   //Finish
    return $valueString ;
 }
 
@@ -517,20 +521,3 @@ global proc skExportGUI()
    button -l "Export" -command "skExportButton";
    showWindow skMainWin; 
 }
-
-
-
-//
-// - Three steps are required in order to export a new skeleton/character from Maya:
-//   1. Use this mel script to export a .sk skeleton definition file
-//   2. Use the obj exporter mel script to export the used rigid models.
-//      Make sure the objs are saved to the same directory of the sk file.
-//   3. Finally, load the sk file in the metool.exe (the character will appear
-//      with the models in strange places), and select the menu option 
-//      Tools->convert skeleton. A new correct skeleton (with srm geometries) will be created.
-// - All joints are exported with quaternion rotation channel
-// - Only base joint is exported with translation channels
-// - Maya should be set to cms
-// - If "Mirror Joint" is used to create the skeleton in Maya, be sure to use the
-//   "orientation" option (not "behavior")
-//
