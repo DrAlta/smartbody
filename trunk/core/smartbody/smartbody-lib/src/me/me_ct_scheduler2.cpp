@@ -554,7 +554,6 @@ bool MeCtScheduler2::remove_child( MeController *child ) {
 	bool result = remove_child_impl( child );
 	if( result )
 	{
-		child->parent(NULL);
 		this->unref();
 		recalc_channels_requested();
 	}
