@@ -54,14 +54,14 @@ BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& uni
 
 	// Viseme transition hack until timing can support multiple sync points
 	const XMLCh* str = elem->getAttribute( L"sbm:rampup" );
-	float rampup = -1;
+	float rampup = 0;
 	if( str && XMLString::stringLen( str ) ) {
 		char* temp = XMLString::transcode(str);
 		rampup =( float(atof(temp)));
 	}
 
 	str = elem->getAttribute( L"sbm:rampdown" );
-	float rampdown = -1;
+	float rampdown = 0;
 	if( str && XMLString::stringLen( str ) ) {
 		char* temp = XMLString::transcode(str);
 		rampdown =( float(atof(temp)));
@@ -88,10 +88,7 @@ BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& uni
                     }
                     if(LOG_BML_VISEMES) printf( "LOG: BML::parse_bml_face(): FAC weight: %f\n", weight );
 					boost::shared_ptr<VisemeRequest> viseme;
-					if( rampup != -1 && rampdown != -1)
-						viseme.reset( new VisemeRequest( unique_id, localId, "_", weight, 1, behav_syncs, rampup, rampdown ) );
-					else
-						viseme.reset( new VisemeRequest( unique_id, localId, "_", weight, 1, behav_syncs ) );
+					viseme.reset( new VisemeRequest( unique_id, localId, "_", weight, 1, behav_syncs, rampup, rampdown ) );
 
                     switch( au ) {
                         case 1:

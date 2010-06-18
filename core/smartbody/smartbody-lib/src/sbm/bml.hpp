@@ -406,6 +406,12 @@ namespace BML {
 			           const BehaviorSyncPoints& behav_syncs, float rampup, float rampdown);
 
         void setVisemeName( const char* viseme );
+		const char* getVisemeName();
+
+		float getWeight();
+		time_sec getDuration();
+		float getRampUp();
+		float getRampDown();
 
 		void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu );
 	};

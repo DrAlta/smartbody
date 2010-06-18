@@ -49,6 +49,9 @@ class BehaviorWindow : public fltk::Window, public BMLViewer
 		void processEventRequest(BML::EventRequest* eventRequest, nle::NonLinearEditorModel* model, BML::BehaviorRequest* behavior, 
 									double triggerTime, BML::BehaviorSchedulerConstantSpeed* constantSpeedScheduler, 
 									std::map<std::string, double>& syncMap, std::vector<std::pair<RequestMark*, std::string> >& untimedMarks);
+		void processVisemeRequest(BML::VisemeRequest* eventRequest, nle::NonLinearEditorModel* model, BML::BehaviorRequest* behavior, 
+									double triggerTime, BML::BehaviorSchedulerConstantSpeed* constantSpeedScheduler, 
+									std::map<std::string, double>& syncMap, std::vector<std::pair<RequestMark*, std::string> >& untimedMarks);
 	
 		void adjustSyncPoints(BML::BehaviorRequest* behavior, nle::Block* block, std::map<std::string, double>& syncMap);
 		
