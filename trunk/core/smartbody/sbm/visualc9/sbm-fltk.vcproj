@@ -75,7 +75,7 @@
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="C:\Users\shapiro\smartbody\trunk\core\smartbody\sbm\lib\sbm-fltkd.lib"
+				ImportLibrary=""
 				TargetMachine="1"
 			/>
 			<Tool
