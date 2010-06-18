@@ -1166,7 +1166,7 @@ VisemeRequest::VisemeRequest( const std::string& unique_id, const std::string& l
                               const BehaviorSyncPoints& syncs_in )
 :	SequenceRequest( unique_id, localId, syncs_in,
                      /* Default Timing */ 0, 0, 0, duration, duration ),
-    viseme(viseme), weight(weight), duration(duration)
+    viseme(viseme), weight(weight), duration(duration), rampup(0), rampdown(0)
 {}
 
 VisemeRequest::VisemeRequest( const std::string& unique_id, const std::string& localId, const char *viseme, float weight, time_sec duration,
@@ -1180,6 +1180,31 @@ VisemeRequest::VisemeRequest( const std::string& unique_id, const std::string& l
 void VisemeRequest::setVisemeName( const char* viseme ) {
     this->viseme = viseme;
 }
+
+const char* VisemeRequest::getVisemeName() {
+    return this->viseme;
+}
+
+float VisemeRequest::getWeight()
+{
+	return weight;
+}
+
+time_sec VisemeRequest::getDuration()
+{
+	return duration;
+}
+
+float VisemeRequest::getRampUp()
+{
+	return rampup;
+}
+
+float VisemeRequest::getRampDown()
+{
+	return rampdown;
+}
+
 
 void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 {

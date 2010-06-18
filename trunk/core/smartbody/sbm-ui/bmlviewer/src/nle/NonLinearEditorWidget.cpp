@@ -426,7 +426,7 @@ void EditorWidget::drawTimeWindow()
 
 	// draw the time label
 	char buff[128];
-	//sprintf(buff, "%6.2f", this->getViewableTimeStart());
+	sprintf(buff, "%6.2f", this->getViewableTimeStart());
 	fltk::drawtext(buff, float(bounds[0]), float((bounds[1] + (bounds[1] + bounds[3])) / 2 + 5) - 10);
 	sprintf(buff, "%6.2f", this->getViewableTimeEnd());
 	fltk::drawtext(buff, float(bounds[0] + bounds[2]), float((bounds[1] + (bounds[1] + bounds[3])) / 2 + 5) - 10);

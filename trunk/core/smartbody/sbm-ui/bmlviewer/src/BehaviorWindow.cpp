@@ -484,6 +484,13 @@ void BehaviorWindow::updateBehaviors(BML::BmlRequest* request)
 			processed = true;
 		}
 
+		BML::VisemeRequest* visemeRequest = dynamic_cast<BML::VisemeRequest*>(behavior);
+		if (visemeRequest)
+		{
+			processVisemeRequest(visemeRequest, model, behavior, triggerTime, constantSpeedScheduler, syncMap, untimedMarks);
+			processed = true;
+		}
+
 		if (!processed)
 		{
 			// need to handle additional request types here
@@ -1188,6 +1195,41 @@ void BehaviorWindow::processEventRequest(BML::EventRequest* eventRequest, nle::N
 	syncPointMark->setName(syncPointName);
 	eventBlock->addMark(syncPointMark);
 	untimedMarks.push_back(std::pair<RequestMark*, std::string> (syncPointMark, syncPointName));
+}
+
+void BehaviorWindow::processVisemeRequest(BML::VisemeRequest* visemeRequest, nle::NonLinearEditorModel* model, BML::BehaviorRequest* behavior, 
+										  double triggerTime, BML::BehaviorSchedulerConstantSpeed* constantSpeedScheduler, 
+										  std::map<std::string, double>& syncMap, std::vector<std::pair<RequestMark*, std::string> >& untimedMarks)
+{
+	RequestTrack* eventTrack = new RequestTrack();
+	eventTrack->setName("Viseme");
+	EventBlock* eventBlock = new EventBlock();
+	eventBlock->setName(visemeRequest->getVisemeName());
+	eventBlock->setStartTime(triggerTime + constantSpeedScheduler->startTime);
+	eventBlock->setEndTime(triggerTime + constantSpeedScheduler->endTime);
+	eventBlock->setColor(fltk::WHITE);
+	eventTrack->addBlock(eventBlock);
+	model->addTrack(eventTrack);
+
+	std::stringstream strstr;
+	strstr << "Weight    = " << visemeRequest->getWeight() << "\n";
+	strstr << "Duration  = " << visemeRequest->getDuration() << "\n";
+	strstr << "Ramp up   = " << visemeRequest->getRampUp() << "\n";
+	strstr << "Ramp down = " << visemeRequest->getRampDown() << "\n";
+	eventBlock->setInfo(strstr.str());
+
+	RequestMark* rampUpMark = new RequestMark();
+	rampUpMark->setName("rampup");
+	rampUpMark->setStartTime(eventBlock->getStartTime() +  visemeRequest->getRampUp());
+	rampUpMark->setEndTime(rampUpMark->getStartTime());
+	eventBlock->addMark(rampUpMark);
+
+	RequestMark* rampDownMark = new RequestMark();
+	rampDownMark->setName("rampdown");
+	rampDownMark->setStartTime(eventBlock->getEndTime() - visemeRequest->getRampDown());
+	rampDownMark->setEndTime(rampDownMark->getStartTime());
+	eventBlock->addMark(rampDownMark);
+	
 }
 
 void BehaviorWindow::adjustSyncPoints(BML::BehaviorRequest* behavior, nle::Block* block, std::map<std::string, double>& syncMap)
