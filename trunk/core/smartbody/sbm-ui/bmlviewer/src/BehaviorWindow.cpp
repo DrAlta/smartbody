@@ -73,11 +73,12 @@ BehaviorWindow::BehaviorWindow(int x, int y, int w, int h, char* name) : Window(
 	selectedContext = "";
 
 
-	nleModel = new NonLinearEditorModel();
-	EditorWidget* behaviorEditorWidget = this->getEditorWidget();
+	nleModel = new nle::NonLinearEditorModel();
+	nle::EditorWidget* behaviorEditorWidget = this->getEditorWidget();
 	behaviorEditorWidget->setModel(nleModel);
 
 	updateGUI();
+	redraw();
 }
 
 
@@ -95,7 +96,11 @@ void BehaviorWindow::show_bml_viewer()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.bml_processor.registerRequestCallback(OnRequest, this);
+
 	this->show();
+	this->updateGUI();
+	this->relayout();
+	this->redraw();
 }
 
 void BehaviorWindow::hide_bml_viewer()
@@ -111,15 +116,13 @@ int BehaviorWindow::handle(int event)
 }
 
 void BehaviorWindow::show()
-{
-    updateGUI();
-    
+{    
     Window::show();   
 }
       
 void BehaviorWindow::draw()
 {
-    NonLinearEditorModel* model = nleWidget->getModel();
+    nle::NonLinearEditorModel* model = nleWidget->getModel();
     if (model)
     {
         if (model->isModelChanged())
@@ -132,23 +135,24 @@ void BehaviorWindow::draw()
     Window::draw();   
 }
 
-EditorWidget* BehaviorWindow::getEditorWidget()
+nle::EditorWidget* BehaviorWindow::getEditorWidget()
 {
 	return nleWidget;
 }
 
 void BehaviorWindow::updateGUI()
 {
-	NonLinearEditorModel* model = nleWidget->getModel();
+	nle::NonLinearEditorModel* model = nleWidget->getModel();
 	if (!model)
 		return;
 
+	model->setContext(selectedContext);
 	choiceContexts->clear();
 
 	int count = 1;
 	choiceContexts->add("-------");
-	std::vector<std::pair<std::string, std::vector<Track*> > >& contexts = model->getContexts();
-	for (std::vector<std::pair<std::string, std::vector<Track*> > >::iterator iter = contexts.begin();
+	std::vector<std::pair<std::string, std::vector<nle::Track*> > >& contexts = model->getContexts();
+	for (std::vector<std::pair<std::string, std::vector<nle::Track*> > >::iterator iter = contexts.begin();
 		iter != contexts.end(); 
 		iter++)
 	{
@@ -167,7 +171,7 @@ void BehaviorWindow::updateGUI()
 	std::string selectedTrackName = "";
 	for (int t = 0; t < model->getNumTracks(); t++)
 	{
-		Track* track = model->getTrack(t);
+		nle::Track* track = model->getTrack(t);
 		if (track->isSelected())
 			selectedTrackName = track->getName();
 	}
@@ -175,7 +179,7 @@ void BehaviorWindow::updateGUI()
  
 	bool found = false;
 	// activate the inputs based on the selected block
-    Track* track = this->getSelectedTrack();
+    nle::Track* track = this->getSelectedTrack();
     if (track)
     {
         std::string trackName = track->getName();
@@ -184,37 +188,35 @@ void BehaviorWindow::updateGUI()
     {
     }
         
-	textXML->buffer()->remove(0, textXML->buffer()->length());
-	Block* block = this->getSelectedBlock();
-	if (block && block->isSelected())
-	{     
-		std::string name = block->getName();
-		double startTime = block->getStartTime();
-		double endTime = block->getEndTime();		
-		textXML->insert(block->getInfo().c_str());
-
-	}
-	else
+	nle::Block* block = this->getSelectedBlock();
+	if (nleWidget->getBlockSelectionChanged())
 	{
+		textXML->buffer()->remove(0, textXML->buffer()->length());
+		if (block && block->isSelected())
+		{   
+			std::string name = block->getName();
+			double startTime = block->getStartTime();
+			double endTime = block->getEndTime();		
+			textXML->insert(block->getInfo().c_str());
+			nleWidget->setBlockSelectionChanged(false);
+		}
 	}
- 
-
 }
 
 
-Block* BehaviorWindow::getSelectedBlock()
+nle::Block* BehaviorWindow::getSelectedBlock()
 {
-	NonLinearEditorModel* model = nleWidget->getModel();
+	nle::NonLinearEditorModel* model = nleWidget->getModel();
 	if (!model)
 		return NULL;
 
 	// activate the inputs based on the selected block
 	for (int t = 0; t < model->getNumTracks(); t++)
 	{
-		Track* track = model->getTrack(t);
+		nle::Track* track = model->getTrack(t);
 		for (int b = 0; b < track->getNumBlocks(); b++)
 		{
-			Block* curBlock = track->getBlock(b);
+			nle::Block* curBlock = track->getBlock(b);
 			if (curBlock->isSelected())
 			{
 				return curBlock;
@@ -224,16 +226,16 @@ Block* BehaviorWindow::getSelectedBlock()
 	return NULL;
 }
 
-Track* BehaviorWindow::getSelectedTrack()
+nle::Track* BehaviorWindow::getSelectedTrack()
 {
-    NonLinearEditorModel* model = nleWidget->getModel();
+    nle::NonLinearEditorModel* model = nleWidget->getModel();
     if (!model)
         return NULL;
 
     // activate the inputs based on the selected block
     for (int t = 0; t < model->getNumTracks(); t++)
     {
-        Track* track = model->getTrack(t);
+        nle::Track* track = model->getTrack(t);
         if (track->isSelected())
             return track;
     }
@@ -261,24 +263,30 @@ void BehaviorWindow::ContextCB(fltk::Widget* widget, void* data)
 	if (val == 0)
 	{
 		window->nleWidget->getModel()->clear(true);
-		window->updateGUI();
 		window->selectedContext = "";
+		window->updateGUI();
+		window->redraw();
 		return;
 	}
+
 	fltk::Widget* choiceWidget = choice->child(val);
 
 	std::string contextName = choiceWidget->label();
 	window->nleWidget->getModel()->setContext(contextName);
+	window->selectedContext = contextName;
+
+	window->nleWidget->setBlockSelectionChanged(true);
+	window->nleWidget->setTrackSelectionChanged(true);
 
 	// set the viewable time to the minimum and maximum block times
 	double minTime = 9999999;
 	double maxTime = -999999;
 	for (int t = 0; t < window->nleWidget->getModel()->getNumTracks(); t++)
 	{
-		Track* track = window->nleWidget->getModel()->getTrack(t);
+		nle::Track* track = window->nleWidget->getModel()->getTrack(t);
 		for (int b = 0; b < track->getNumBlocks(); b++)
 		{
-			Block* block = track->getBlock(b);
+			nle::Block* block = track->getBlock(b);
 			if (block->getStartTime() < minTime)
 				minTime = block->getStartTime();
 			if (block->getEndTime() > maxTime)
@@ -287,13 +295,15 @@ void BehaviorWindow::ContextCB(fltk::Widget* widget, void* data)
 	}
 	window->nleWidget->setViewableTimeStart(minTime);
 	window->nleWidget->setViewableTimeEnd(maxTime);
+	window->nleWidget->getModel()->setEndTime(maxTime);
 	window->selectedContext = contextName;
 	window->updateGUI();
+	window->redraw();
 }
 
 void BehaviorWindow::updateBehaviors(BML::BmlRequest* request)
 {
-	NonLinearEditorModel* model = nleWidget->getModel();
+	nle::NonLinearEditorModel* model = nleWidget->getModel();
 	if (!model)
 		return;
 
@@ -442,13 +452,9 @@ void BehaviorWindow::updateBehaviors(BML::BmlRequest* request)
 		}
 
 		//BML::BehaviorSpan span = behavior->behav_syncs.getBehaviorSpan();
-		std::cout << behavior->unique_id << std::endl;
-		behavior->behav_syncs.printSyncIds();
-		behavior->behav_syncs.printSyncTimes();
-
-
-
-
+		//std::cout << behavior->unique_id << std::endl;
+		//behavior->behav_syncs.printSyncIds();
+		//behavior->behav_syncs.printSyncTimes();
 
 		BML::MotionRequest* motionRequest = dynamic_cast<BML::MotionRequest*>(behavior);
 		if (motionRequest)
@@ -486,7 +492,7 @@ void BehaviorWindow::updateBehaviors(BML::BmlRequest* request)
 		
 	}
 
-	std::vector<std::pair<BML::BehaviorRequest*, Block*> > behaviorBlocks;
+	std::vector<std::pair<BML::BehaviorRequest*, nle::Block*> > behaviorBlocks;
 	// now match any marks against their proper times
 	for (std::vector<std::pair<RequestMark*, std::string> >::iterator iter = untimedMarks.begin();
 		iter != untimedMarks.end();
@@ -527,7 +533,7 @@ void BehaviorWindow::updateBehaviors(BML::BmlRequest* request)
 							}
 						}
 						if (!found)
-							behaviorBlocks.push_back(std::pair<BML::BehaviorRequest*, Block*>((*behavIter).get(), motionBlock));
+							behaviorBlocks.push_back(std::pair<BML::BehaviorRequest*, nle::Block*>((*behavIter).get(), motionBlock));
 					}
 					
 				}
@@ -555,7 +561,7 @@ void BehaviorWindow::updateBehaviors(BML::BmlRequest* request)
 							}
 						}
 						if (!found)
-							behaviorBlocks.push_back(std::pair<BML::BehaviorRequest*, Block*>((*behavIter).get(), nodBlock));
+							behaviorBlocks.push_back(std::pair<BML::BehaviorRequest*, nle::Block*>((*behavIter).get(), nodBlock));
 					}
 				}
 				
@@ -571,7 +577,7 @@ void BehaviorWindow::updateBehaviors(BML::BmlRequest* request)
 		else
 		{
 			// remove this mark
-			Block* b = (*iter).first->getBlock();
+			nle::Block* b = (*iter).first->getBlock();
 			b->removeMark((*iter).first);
 		}
 	}
@@ -585,17 +591,17 @@ void BehaviorWindow::updateBehaviors(BML::BmlRequest* request)
 	double endTime = -99999;
 	for (int t = 0; t < model->getNumTracks(); t++)
 	{
-		Track* track = model->getTrack(t);
+		nle::Track* track = model->getTrack(t);
 		for (int b = 0; b < track->getNumBlocks(); b++)
 		{
-			Block* block = track->getBlock(b);
+			nle::Block* block = track->getBlock(b);
 			if (block->getEndTime() > endTime)
 				endTime = block->getEndTime();
 			if (block->getStartTime() < startTime)
 				startTime = block->getStartTime();
 			for (int m = 0; m < block->getNumMarks(); m++)
 			{
-				Mark* mark = block->getMark(m);
+				nle::Mark* mark = block->getMark(m);
 				if (mark->getEndTime() > endTime)
 					endTime = mark->getEndTime();
 				if (mark->getStartTime() > startTime)
@@ -606,22 +612,28 @@ void BehaviorWindow::updateBehaviors(BML::BmlRequest* request)
 	// set the main block on the first track to span the max times
 	requestBlock->setEndTime(endTime);
 
+	/*
 	// set the time for the widget
 	getEditorWidget()->setViewableTimeStart(startTime);
 	getEditorWidget()->setViewableTimeEnd(endTime);
-	model->setEndTime(endTime);
+	*/
+	
+	
+	//model->setEndTime(endTime);
 	if (model->getNumTracks() > 0)
 		contextCounter++;
 	std::stringstream strstr;
 	strstr << contextCounter;
 	model->saveContext(strstr.str());
+
+	model->setModelChanged(true);
 	updateGUI();
 	redraw();
 }
 
 
 
-void BehaviorWindow::processMotionRequest(BML::MotionRequest* motionRequest, NonLinearEditorModel* model, BML::BehaviorRequest* behavior, 
+void BehaviorWindow::processMotionRequest(BML::MotionRequest* motionRequest, nle::NonLinearEditorModel* model, BML::BehaviorRequest* behavior, 
 										  double triggerTime, BML::BehaviorSchedulerConstantSpeed* constantSpeedScheduler, 
 										  std::map<std::string, double>& syncMap, std::vector<std::pair<RequestMark*, std::string> >& untimedMarks)
 {
@@ -797,28 +809,63 @@ void BehaviorWindow::processMotionRequest(BML::MotionRequest* motionRequest, Non
 		motionBlock->setEndTime(triggerTime + duration);
 		RequestMark* inMark = new RequestMark();
 		inMark->setName("in");
-		inMark->setStartTime(motion->indt() / speed + triggerTime);
-		inMark->setEndTime(motion->indt() / speed + triggerTime);
+		inMark->setStartTime(block->getStartTime() + motion->indt() / speed);
+		inMark->setEndTime(block->getStartTime() + motion->indt() / speed);
 		motionBlock->addMark(inMark);
 		RequestMark* outMark = new RequestMark();
 		outMark->setName("out");
 		motionBlock->addMark(outMark);
 		if (motion->outdt() >= motion->indt())
 		{
-			outMark->setStartTime(motion->outdt() / speed + triggerTime);
-			outMark->setEndTime(motion->outdt()/ speed + triggerTime);
+			outMark->setStartTime(inMark->getStartTime() + duration - motion->outdt() / speed);
+			outMark->setEndTime(inMark->getStartTime() + duration - motion->outdt() / speed);
 		}
 		RequestMark* emphasisMark = new RequestMark();
 		emphasisMark->setName("emphasis");
 		motionBlock->addMark(emphasisMark);
 		emphasisMark->setStartTime(motion->emphasist() / speed + triggerTime);
 		emphasisMark->setEndTime(motion->emphasist() / speed + triggerTime);
+
+		// show the current and original timings in the info box
+		SkMotion* skmotion = motion->motion();
+		std::stringstream strstr;
+		strstr << motion->name() << "\n";
+		strstr << "Original timings:\n";
+		strstr << "Ready       : " << skmotion->time_ready() << "\n";
+		strstr << "StrokeStart : " << skmotion->time_stroke_start() << "\n";
+		strstr << "Stroke      : " << skmotion->time_stroke_emphasis() << "\n";
+		strstr << "StrokeEnd   : " << skmotion->time_stroke_end() << "\n";
+		strstr << "Relax       : " << skmotion->time_relax() << "\n";
+		strstr << "\n";
+		strstr << "Current timings:\n";
+		strstr << "Ready       : " << constantSpeedScheduler->readyTime << "\n";
+		strstr << "StrokeStart : " << constantSpeedScheduler->strokeStartTime << "\n";
+		strstr << "Stroke      : " << constantSpeedScheduler->strokeTime << "\n";
+		strstr << "StrokeEnd   : " << constantSpeedScheduler->strokeEndTime << "\n";
+		strstr << "Relax       : " << constantSpeedScheduler->relaxTime << "\n";
 	
+
+		motionBlock->setInfo(strstr.str());
 	}
+
+	/*
+	// show where the blending occurs
+	MeCtScheduler2* scheduler = NULL;
+	MeController* current = animController;
+	while (current)
+	{
+		MeCtScheduler2* scheduler = dynamic_cast<MeCtScheduler2*>(current->parent());
+		if (scheduler)
+		{
+			break;
+		}
+		current = current->parent();
+	}
+	*/
 }
 
 
-void BehaviorWindow::processControllerRequest(BML::MeControllerRequest* controllerRequest, NonLinearEditorModel* model, BML::BehaviorRequest* behavior, 
+void BehaviorWindow::processControllerRequest(BML::MeControllerRequest* controllerRequest, nle::NonLinearEditorModel* model, BML::BehaviorRequest* behavior, 
 											  double triggerTime, BML::BehaviorSchedulerConstantSpeed* constantSpeedScheduler, 
 											  std::map<std::string, double>& syncMap, std::vector<std::pair<RequestMark*, std::string> >& untimedMarks)
 {
@@ -972,7 +1019,7 @@ void BehaviorWindow::processControllerRequest(BML::MeControllerRequest* controll
 	}
 }
 
-void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, NonLinearEditorModel* model, BML::BehaviorRequest* behavior, 
+void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle::NonLinearEditorModel* model, BML::BehaviorRequest* behavior, 
 										  double triggerTime, BML::BehaviorSchedulerConstantSpeed* constantSpeedScheduler, 
 										  std::map<std::string, double>& syncMap, std::vector<std::pair<RequestMark*, std::string> >& untimedMarks)
 {
@@ -1120,7 +1167,7 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, Non
 	}
 }
 
-void BehaviorWindow::processEventRequest(BML::EventRequest* eventRequest, NonLinearEditorModel* model, BML::BehaviorRequest* behavior, 
+void BehaviorWindow::processEventRequest(BML::EventRequest* eventRequest, nle::NonLinearEditorModel* model, BML::BehaviorRequest* behavior, 
 										  double triggerTime, BML::BehaviorSchedulerConstantSpeed* constantSpeedScheduler, 
 										  std::map<std::string, double>& syncMap, std::vector<std::pair<RequestMark*, std::string> >& untimedMarks)
 {
@@ -1143,7 +1190,7 @@ void BehaviorWindow::processEventRequest(BML::EventRequest* eventRequest, NonLin
 	untimedMarks.push_back(std::pair<RequestMark*, std::string> (syncPointMark, syncPointName));
 }
 
-void BehaviorWindow::adjustSyncPoints(BML::BehaviorRequest* behavior, Block* block, std::map<std::string, double>& syncMap)
+void BehaviorWindow::adjustSyncPoints(BML::BehaviorRequest* behavior, nle::Block* block, std::map<std::string, double>& syncMap)
 {
 	std::string stages[] = { "start", "ready", "stroke_start", "stroke", "stroke_end", "relax", "end" };
 	bool hasTiming[] =     { false,   false,   false,          false,    false,        false,   false };
@@ -1154,7 +1201,7 @@ void BehaviorWindow::adjustSyncPoints(BML::BehaviorRequest* behavior, Block* blo
 	// determine which sync points are present and have legitimate timings
 	for (int x = 0; x < 7; x ++)
 	{
-		Mark* mark = block->getMark(stages[x]);
+		nle::Mark* mark = block->getMark(stages[x]);
 		if (mark)
 			if (mark->getStartTime() == mark->getStartTime())
 			{
@@ -1225,7 +1272,7 @@ void BehaviorWindow::adjustSyncPoints(BML::BehaviorRequest* behavior, Block* blo
 
 				if (hasTiming[y])
 				{
-					Mark* mark = block->getMark(stages[y]);
+					nle::Mark* mark = block->getMark(stages[y]);
 					if (mark)
 					{
 						if (!hasTiming[x])
@@ -1249,12 +1296,13 @@ void BehaviorWindow::adjustSyncPoints(BML::BehaviorRequest* behavior, Block* blo
 		}
 	}
 
+
 	// adjust the block to min/max of marks
 	double minTime = 9999999;
 	double maxTime = -999999;
 	for (int m = 0; m < block->getNumMarks(); m++)
 	{
-		Mark* mark = block->getMark(m);
+		nle::Mark* mark = block->getMark(m);
 		if (mark->getStartTime() < minTime)
 			minTime = mark->getStartTime();
 		if (mark->getEndTime() > maxTime)

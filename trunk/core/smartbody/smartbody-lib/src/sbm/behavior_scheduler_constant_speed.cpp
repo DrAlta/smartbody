@@ -112,8 +112,23 @@ void BehaviorSchedulerConstantSpeed::schedule( BehaviorSyncPoints& behav_syncs, 
     bool hasEnd    = isTimeSet( end->time );
 
 	bool syncPointsSet[7] = { hasStart, hasReady, hasStrokeStart, hasStroke, hasStrokeEnd, hasRelax, hasEnd };
-	bool rawSyncPointsSet[7] = { (startTime >= 0.0), (hasReady >= 0.0), (hasStrokeStart >= 0.0), (hasStroke >= 0.0), (hasStrokeEnd >= 0.0), (hasRelax >= 0.0), (hasEnd >= 0.0) };
-
+	bool rawSyncPointsSet[7] = { false, false, false, false, false, false, false };
+	if (startTime >= 0.0)
+		rawSyncPointsSet[0] = true;
+	if (readyTime >= 0.0)
+		rawSyncPointsSet[1] = true;
+	if (strokeStartTime >= 0.0)
+		rawSyncPointsSet[2] = true;
+	if (strokeTime >= 0.0)
+		rawSyncPointsSet[3] = true;
+	if (strokeEndTime >= 0.0)
+		rawSyncPointsSet[4] = true;
+	if (relaxTime >= 0.0)
+		rawSyncPointsSet[5] = true;
+	if (endTime >= 0.0)
+		rawSyncPointsSet[6] = true;
+	
+	
 	double rawTimes[7] = {	startTime,
 							readyTime,
 							strokeStartTime,

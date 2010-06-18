@@ -30,6 +30,7 @@
 #define SBM_REPORT_MEMORY_LEAKS  0
 #define SBM_EMAIL_CRASH_REPORTS  1
 
+#include <signal.h>
 #include <iostream>
 #include <cstdio>
 #include <string>
@@ -37,7 +38,7 @@
 
 //#include <FL/Fl.H>
 #include "fltk_viewer.h"
-#include "BehaviorWindow.h"
+#include <BehaviorWindow.h>
 #include "wsp.h"
 
 #include <sbm/sbm_constants.h>
@@ -347,7 +348,8 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "text_speech", text_speech::text_speech_func ); // [BMLR]
 }
 
-void exit_callback( void )	{
+
+void cleanup( void )	{
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		if( mcu.loop )	{
@@ -384,6 +386,11 @@ void exit_callback( void )	{
 	_CrtMemCheckpoint( &state );
 	_CrtMemDumpStatistics( &state );
 #endif
+}
+
+void signal_handler(int sig) {
+	cleanup();
+	exit(sig);
 }
 
 void sbm_loop_wait( double target_fps = 100.0 )	{ // sleep to reach target loop rate
@@ -589,7 +596,14 @@ int main( int argc, char **argv )	{
 
 	mcu.speech_audiofile_base_path = "../../../../";
 
-	atexit( exit_callback );
+	(void)signal( SIGABRT, signal_handler );
+	(void)signal( SIGFPE, signal_handler );
+	(void)signal( SIGILL, signal_handler );
+	(void)signal( SIGINT, signal_handler );
+	(void)signal( SIGSEGV, signal_handler );
+	(void)signal( SIGTERM, signal_handler );
+	(void)signal( SIGBREAK, signal_handler );
+	//atexit( exit_callback );
 
 	srCmdLine cmdl;
 	fprintf( stdout, "> " );
@@ -685,4 +699,6 @@ int main( int argc, char **argv )	{
 		mcu.update();
 		mcu.render();
 	}
+
+	cleanup();
 }

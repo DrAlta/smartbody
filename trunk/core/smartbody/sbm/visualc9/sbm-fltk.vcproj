@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk2;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost"
+				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk2;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\sbm-ui\bmlviewer\src&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -66,15 +66,16 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="Smartbodyd.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib pthreadVSE2.lib xerces-c_3D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_42.lib boost_system-vc90-mt-gd-1_42.lib dbghelp.lib opengl32.lib OpenAL32.lib alut.lib libsndfile-1.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib atl.lib atlsd.lib fltk2_gld.lib fltk2d.lib"
+				AdditionalDependencies="Smartbodyd.lib bmlviewerd.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib pthreadVSE2.lib xerces-c_3D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_42.lib boost_system-vc90-mt-gd-1_42.lib dbghelp.lib opengl32.lib OpenAL32.lib alut.lib libsndfile-1.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib atl.lib atlsd.lib fltk2_gld.lib fltk2d.lib"
 				OutputFile="..\bin\sbm-fltkd.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;..\..\smartbody-lib\lib&quot;;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;&quot;..\..\..\..\lib\vhcl\libsndfile-1_0_17&quot;;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk2\lib;..\..\..\..\lib\pthreads\lib;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib&quot;;..\..\..\..\lib\boost\lib"
+				AdditionalLibraryDirectories="&quot;..\..\smartbody-lib\lib&quot;;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;&quot;..\..\..\..\lib\vhcl\libsndfile-1_0_17&quot;;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk2\lib;..\..\..\..\lib\pthreads\lib;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib&quot;;..\..\..\..\lib\boost\lib;&quot;..\..\sbm-ui\bmlviewer\lib&quot;"
 				IgnoreDefaultLibraryNames="libcmtd"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
+				ImportLibrary="C:\Users\shapiro\smartbody\trunk\core\smartbody\sbm\lib\sbm-fltkd.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -134,7 +135,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk2;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost"
+				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk2;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\sbm-ui\bmlviewer\src&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -157,10 +158,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="Smartbody.lib vhcl.lib vhmsg.lib bonebus.lib wsp.lib fltk2.lib fltk2_gl.lib pthreadVSE2.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_42.lib boost_system-vc90-mt-1_42.lib atl.lib atls.lib dbghelp.lib opengl32.lib OpenAL32.lib alut.lib libsndfile-1.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib"
+				AdditionalDependencies="Smartbody.lib bmlviewer.lib vhcl.lib vhmsg.lib bonebus.lib wsp.lib fltk2.lib fltk2_gl.lib pthreadVSE2.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_42.lib boost_system-vc90-mt-1_42.lib atl.lib atls.lib dbghelp.lib opengl32.lib OpenAL32.lib alut.lib libsndfile-1.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib"
 				OutputFile="..\bin\sbm-fltk.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;..\..\smartbody-lib\lib&quot;;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;&quot;..\..\..\..\lib\vhcl\libsndfile-1_0_17&quot;;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk2\lib;..\..\..\..\lib\pthreads\lib;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib&quot;;..\..\..\..\lib\boost\lib"
+				AdditionalLibraryDirectories="&quot;..\..\smartbody-lib\lib&quot;;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;&quot;..\..\..\..\lib\vhcl\libsndfile-1_0_17&quot;;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk2\lib;..\..\..\..\lib\pthreads\lib;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib&quot;;..\..\..\..\lib\boost\lib;&quot;..\..\sbm-ui\bmlviewer\lib&quot;"
 				IgnoreDefaultLibraryNames="libcmt"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -278,50 +279,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\data\sbm-test\scripts\init-test-pawns.seq"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="bmlviewer"
-			>
-			<File
-				RelativePath="..\src\BehaviorBlock.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\BehaviorBlock.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\BehaviorEditorWidget.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\BehaviorEditorWidget.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\BehaviorWindow.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\BehaviorWindow.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\NonLinearEditor.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\NonLinearEditor.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\NonLinearEditorWidget.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\NonLinearEditorWidget.h"
 				>
 			</File>
 		</Filter>

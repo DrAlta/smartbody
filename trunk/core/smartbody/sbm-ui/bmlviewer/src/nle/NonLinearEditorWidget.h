@@ -15,14 +15,17 @@
 
 using namespace fltk;
 
+namespace nle
+{
+
 class EditorWidget : public fltk::Group
 {
 	public:
 		EditorWidget(int x, int y, int w, int h, char* name);
 		~EditorWidget();
 
-		virtual void setModel(NonLinearEditorModel* model);
-		virtual NonLinearEditorModel* getModel();
+		virtual void setModel(nle::NonLinearEditorModel* model);
+		virtual nle::NonLinearEditorModel* getModel();
 
 		virtual void setWindowStart(double time);
 		virtual void setWindowEnd(double time);
@@ -52,8 +55,12 @@ class EditorWidget : public fltk::Group
 		virtual bool isTimeWindowSelected();
 		virtual void setTimeWindowSelected(bool val);
 
-		virtual Block* getBlockCandidate(bool& beginning);
-		virtual void setBlockCandidate(Block* block, bool beginning);
+		virtual nle::Block* getBlockCandidate(bool& beginning);
+		virtual void setBlockCandidate(nle::Block* block, bool beginning);
+
+		virtual void changeBlockSelectionEvent(Block* block);
+		virtual void changeTrackSelectionEvent(Track* track);
+
 
 protected:
 		void initialize();
@@ -61,9 +68,9 @@ protected:
 		virtual void drawBackground();
 		virtual void drawTicks();
 		virtual void drawTimeWindow();
-		virtual void drawTrack(Track* track, int trackNum);
-		virtual void drawBlock(Block* block, int trackNum, int blockNum);
-		virtual void drawMark(Block* block, Mark* mark, int trackNum, int blockNum, int markNum);
+		virtual void drawTrack(nle::Track* track, int trackNum);
+		virtual void drawBlock(nle::Block* block, int trackNum, int blockNum);
+		virtual void drawMark(nle::Block* block, nle::Mark* mark, int trackNum, int blockNum, int markNum);
 
 		int padding;
 		int trackHeight;
@@ -97,13 +104,15 @@ protected:
 		static const int CAMERASTATE_ZOOM = 5;
 		static const int CAMERASTATE_PAN = 6;
 
-		NonLinearEditorModel* model;
+		nle::NonLinearEditorModel* model;
 		double windowStartTime;
 		double windowEndTime;
 		double viewableTimeStart;
 		double viewableTimeEnd;
-		Block* blockCandidate;
+		nle::Block* blockCandidate;
 		bool candidateBeginning;
 };
+
+}
 
 #endif

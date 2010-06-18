@@ -30,9 +30,9 @@
 //#define DFL_GAZE_EYE_SPEED  1000.0
 
 // Default Values per Gaze Key:                      LUMBAR,   THORAX, CERVICAL, CRANIAL,  OPTICAL
-const float MeCtGaze::DEFAULT_LIMIT_PITCH_UP[]   = { 15.0,     6.0,    25.0,     20.0,     50.0    };
-const float MeCtGaze::DEFAULT_LIMIT_PITCH_DOWN[] = { -15.0,    -6.0,   -25.0,    -20.0,    -50.0   };
-const float MeCtGaze::DEFAULT_LIMIT_HEADING[]    = { 30.0,     15.0,   60.0,     45.0,     75.0    };
+const float MeCtGaze::DEFAULT_LIMIT_PITCH_UP[]   = { 15.0,     6.0,    25.0,     20.0,     35.0    };
+const float MeCtGaze::DEFAULT_LIMIT_PITCH_DOWN[] = { -15.0,    -6.0,   -25.0,    -20.0,    -35.0   };
+const float MeCtGaze::DEFAULT_LIMIT_HEADING[]    = { 30.0,     15.0,   60.0,     45.0,     40.0    };
 const float MeCtGaze::DEFAULT_LIMIT_ROLL[]       = { 10.0,     5.0,    20.0,     15.0,     0.0     };
 
 // Defaults for the Old APIs
