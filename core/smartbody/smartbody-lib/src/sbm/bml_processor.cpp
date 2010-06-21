@@ -561,8 +561,10 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 			return BehaviorRequestPtr( new PostureRequest( unique_id, localId, poseCt, 1, request->actor, behav_syncs ) );
 		} else {
 			// Check for a motion (a motion texture, or motex) of the same name
-			SkMotion* motion = mcu->motion_map.lookup( pose_id );
-			if( motion ) {
+			std::map<std::string, SkMotion*>::iterator motionIter = mcu->motion_map.find(pose_id);
+			if (motionIter != mcu->motion_map.end())
+			{
+				SkMotion* motion = (*motionIter).second;
 				MeCtMotion* motionCt = new MeCtMotion();
 				motionCt->init( motion );
 				motionCt->name( motion->name() );  // TODO: include BML act and behavior ids

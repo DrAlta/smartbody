@@ -385,7 +385,8 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 			return CMD_FAILURE;
 		}
 
-		if( mcu->motion_map.lookup( anim.c_str() )==NULL ) {
+		std::map<std::string, SkMotion*>::iterator motionIter = mcu->motion_map.find(anim);
+		if (motionIter == mcu->motion_map.end()) {
 			cerr << "WARNING: Unknown animation \""<<anim<<"\"." <<endl;
 		}
 
@@ -404,9 +405,11 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 			return CMD_FAILURE;
 		}
 
-		if( mcu->pose_map.lookup( posture.c_str() )==NULL &&
-			mcu->motion_map.lookup( posture.c_str() )==NULL ) {
-			cerr << "WARNING: Unknown posture \""<<posture<<"\"." <<endl;
+		if( mcu->pose_map.lookup( posture.c_str() )==NULL) {
+			std::map<std::string, SkMotion*>::iterator motionIter = mcu->motion_map.find(posture);
+			if (motionIter == mcu->motion_map.end()) {
+				cerr << "WARNING: Unknown posture \""<<posture<<"\"." <<endl;
+			}
 		}
 
 		ostringstream bml;

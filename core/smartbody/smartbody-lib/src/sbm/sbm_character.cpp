@@ -149,9 +149,21 @@ int SbmCharacter::init_locomotion_analyzer(const char* skel_file, mcuCBHandle *m
 	std::string strafeMotion = "Step_StrafeRight";
 	std::string standingMotion = "HandsAtSide_Motex_Softened";
 
-	SkMotion *walking1_p= mcu_p->motion_map.lookup(walkForwardMotion);
-	SkMotion *walking2_p= mcu_p->motion_map.lookup(strafeMotion);
-	SkMotion *standing_p= mcu_p->motion_map.lookup(standingMotion);
+	SkMotion* walking1_p = NULL;
+	SkMotion* walking2_p = NULL;
+	SkMotion* standing_p = NULL;
+	
+	std::map<std::string, SkMotion*>::iterator walkIter = mcu_p->motion_map.find(walkForwardMotion);
+	if (walkIter != mcu_p->motion_map.end())
+		walking1_p = (*walkIter).second;
+
+	std::map<std::string, SkMotion*>::iterator strafeIter = mcu_p->motion_map.find(strafeMotion);
+	if (strafeIter != mcu_p->motion_map.end())
+		walking2_p = (*strafeIter).second;
+
+	std::map<std::string, SkMotion*>::iterator standIter = mcu_p->motion_map.find(standingMotion);
+	if (standIter != mcu_p->motion_map.end())
+		standing_p = (*standIter).second;
 
 	// need better error checking here
 	bool motionsNotLoaded = false;

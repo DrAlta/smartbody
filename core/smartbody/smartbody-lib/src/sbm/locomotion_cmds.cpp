@@ -36,9 +36,21 @@ using namespace std;
 int locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	// should this function be removed?
 
-	SkMotion *walking1_p= mcu_p->motion_map.lookup("Step_WalkForward");
-	SkMotion *walking2_p= mcu_p->motion_map.lookup("Step_StrafeRight");
-	SkMotion *standing_p= mcu_p->motion_map.lookup("HandsAtSide_Motex_Softened");
+	SkMotion* walking1_p = NULL;
+	SkMotion* walking2_p = NULL;
+	SkMotion* standing_p = NULL;
+	
+	std::map<std::string, SkMotion*>::iterator walkIter = mcu_p->motion_map.find("Step_WalkForward");
+	if (walkIter != mcu_p->motion_map.end())
+		walking1_p = (*walkIter).second;
+
+	std::map<std::string, SkMotion*>::iterator strafeIter = mcu_p->motion_map.find("Step_StrafeRight");
+	if (strafeIter != mcu_p->motion_map.end())
+		walking2_p = (*strafeIter).second;
+
+	std::map<std::string, SkMotion*>::iterator standIter = mcu_p->motion_map.find("HandsAtSide_Motex_Softened");
+	if (standIter != mcu_p->motion_map.end())
+		standing_p = (*standIter).second;
 
 	if(walking1_p && walking2_p && standing_p)
 	{
