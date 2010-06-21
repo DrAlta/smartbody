@@ -129,7 +129,7 @@ bool validate_path( path& result, const char* pathname ) {
 	return true;
 }
 
-int load_me_motions_impl( const path& pathname, srHashMap<SkMotion>& map, bool recurse_dirs, ResourceManager* manager, const char* error_prefix ) {
+int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>& map, bool recurse_dirs, ResourceManager* manager, const char* error_prefix ) {
 	if( !exists( pathname ) ) {
 		cerr << error_prefix << "Motion path \"" << pathname.native_file_string() << "\" not found." << endl;
 		return CMD_FAILURE;
@@ -180,11 +180,12 @@ int load_me_motions_impl( const path& pathname, srHashMap<SkMotion>& map, bool r
 			}
 			motion->filename( pathname.native_file_string().c_str() );
 
-			if( map.lookup( filebase.c_str() ) ) {
+			std::map<std::string, SkMotion*>::iterator motionIter = map.find(filebase);
+			if (motionIter != map.end()) {
 				cerr << "ERROR: Motion by name of \"" << filebase << "\" already exists.  Ignoring file \"" << pathname.native_file_string() << "\"." << endl;
 				return CMD_FAILURE;
 			}
-			map.insert( filebase.c_str(), motion );
+			map.insert(std::pair<std::string, SkMotion*>(filebase, motion));
 		} else {
 			// SkMotion::load() already prints an error...
 			//cerr << error_prefix << "Failed to load motion \"" << pathname.string() << "\"." << endl;
@@ -257,7 +258,7 @@ int load_me_postures_impl( const path& pathname, srHashMap<SkPosture>& map, bool
 	return CMD_SUCCESS;
 }
 
-int load_me_motions( const char* pathname, srHashMap<SkMotion>& map, bool recurse_dirs, ResourceManager* manager ) {
+int load_me_motions( const char* pathname, std::map<std::string, SkMotion*>& map, bool recurse_dirs, ResourceManager* manager ) {
 	path motions_path;
 	if( validate_path( motions_path, pathname ) ) {
 		return load_me_motions_impl( motions_path, map, recurse_dirs, manager, "ERROR: " );

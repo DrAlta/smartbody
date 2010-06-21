@@ -289,10 +289,12 @@ void mcuCBHandle::clear( void )	{
 		pose_p->unref();
 	}
 	
-	SkMotion* mot_p;
-	motion_map.reset();
-	while( mot_p = motion_map.pull() )	{
-		mot_p->unref();
+	for (std::map<std::string, SkMotion*>::iterator motionIter = motion_map.begin();
+		 motionIter != motion_map.end();
+		 motionIter++)
+	{
+		SkMotion* motion = (*motionIter).second;
+		delete motion;
 	}
 	
 	MeCtPose* pose_ctrl_p;
@@ -1893,12 +1895,11 @@ int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			return CMD_FAILURE;
 		}
 
-		SkMotion* motion_p = mcu_p->motion_map.lookup( motion_name );
-		if( motion_p ) {
-			if( mcu_p->face_neutral_p )
-				mcu_p->face_neutral_p->unref();
+		std::map<std::string, SkMotion*>::iterator motionIter =  mcu_p->motion_map.begin();
+		if (motionIter != mcu_p->motion_map.end())
+		{
+			SkMotion* motion_p = (*motionIter).second;
 			mcu_p->face_neutral_p = motion_p;
-			mcu_p->face_neutral_p->ref();
 			return CMD_SUCCESS;
 		} else {
 			cerr << "ERROR: Unknown motion \"" << motion_name << "\"." << endl;
@@ -1979,11 +1980,13 @@ int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	// Currently we use the first frame of SkMotion because
 	// of limitations in our exports (can't export direct to .skp).
 	// TODO: use .skp and/or convert arbitrary frame number/time to SkPosture
-	SkMotion* motion = mcu_p->motion_map.lookup( face_pose_name );
-	if( motion == NULL ) {
+	std::map<std::string, SkMotion*>::iterator motionIter =  mcu_p->motion_map.find(face_pose_name);
+	if (motionIter == mcu_p->motion_map.end())
+	{
 		cerr << "ERROR: Unknown facial pose \"" << face_pose_name << "\"." << endl;
 		return CMD_FAILURE;
 	}
+	SkMotion* motion =(*motionIter).second;
 
 	AUMotionPtr au;
 	AUMotionMap& au_map = mcu_p->au_motion_map;
@@ -2137,20 +2140,20 @@ int mcu_set_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	// Currently we use the first frame of SkMotion because
 	// of limitations in our exports (can't export direct to .skp).
 	// TODO: use .skp and/or convert arbitrary frame number/time to SkPosture
-	SkMotion* motion = mcu_p->motion_map.lookup( motion_name );
-	if( motion == NULL ) {
+	std::map<std::string, SkMotion*>::iterator motionIter = mcu_p->motion_map.find(motion_name);
+	if (motionIter == mcu_p->motion_map.end())
+	{
 		cerr << "ERROR: Unknown viseme pose \"" << motion_name << "\"." << endl;
 		return CMD_FAILURE;
 	}
-
+	SkMotion* motion = (*motionIter).second;
 	VisemeMotionMap& viseme_map = mcu_p->viseme_map;
 	VisemeMotionMap::iterator pos = viseme_map.find( viseme );
 	if( pos != viseme_map.end() ) {
 		cerr << "WARNING: Overwriting viseme \""<<viseme<<"\" motion mapping." << endl;
 	}
 	viseme_map.insert( make_pair( viseme, motion ) );
-	motion->ref();
-
+	
 	return CMD_SUCCESS;
 }
 
@@ -2244,11 +2247,12 @@ int init_motion_controller(
 )	{
 	int err = CMD_SUCCESS;
 
-	SkMotion *mot_p = mcu_p->motion_map.lookup( mot_name );
-	if( mot_p == NULL ) {
+	std::map<std::string, SkMotion*>::iterator motionIter =  mcu_p->motion_map.find(mot_name);
+	if( motionIter == mcu_p->motion_map.end() ) {
 		printf( "init_motion_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_name ); 
 		return( CMD_FAILURE );
 	}
+	SkMotion *mot_p = (*motionIter).second;
 
 	MeCtMotion* ctrl_p = new MeCtMotion;
 	err = mcu_p->motion_ctrl_map.insert( ctrl_name, ctrl_p );
@@ -2278,11 +2282,12 @@ int init_stepturn_controller(
 )	{
 	int err = CMD_SUCCESS;
 
-	SkMotion *mot_p = mcu_p->motion_map.lookup( mot_name );
-	if( mot_p == NULL ) {
-		printf( "init_stepturn_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_name ); 
+	std::map<std::string, SkMotion*>::iterator motionIter =  mcu_p->motion_map.find(mot_name);
+	if( motionIter == mcu_p->motion_map.end() ) {
+		printf( "init_motion_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_name ); 
 		return( CMD_FAILURE );
 	}
+	SkMotion *mot_p = (*motionIter).second;
 
 	MeCtStepTurn* ctrl_p = new MeCtStepTurn;
 	err = mcu_p->stepturn_ctrl_map.insert( ctrl_name, ctrl_p );
@@ -2313,21 +2318,24 @@ int init_quickdraw_controller(
 )	{
 	int err = CMD_SUCCESS;
 
-	SkMotion *mot_p = mcu_p->motion_map.lookup( mot_name );
-	if( mot_p == NULL ) {
-		printf( "init_quickdraw_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_name ); 
+	std::map<std::string, SkMotion*>::iterator motionIter =  mcu_p->motion_map.find(std::string(mot_name));
+	if( motionIter == mcu_p->motion_map.end() ) {
+		printf( "init_motion_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_name ); 
 		return( CMD_FAILURE );
 	}
-	
+	SkMotion *mot_p = (*motionIter).second;
+
 	SkMotion *alt_mot_p = NULL;
-	if( alt_mot_name )	{
-		alt_mot_p = mcu_p->motion_map.lookup( alt_mot_name );
-		if( alt_mot_p == NULL ) {
+	if (alt_mot_name)
+	{
+		std::map<std::string, SkMotion*>::iterator altMotionIter =  mcu_p->motion_map.find(std::string(alt_mot_name));
+		if( altMotionIter == mcu_p->motion_map.end() ) {
 			printf( "init_quickdraw_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", alt_mot_name ); 
 			return( CMD_FAILURE );
 		}
+		alt_mot_p = (*altMotionIter).second;
 	}
-
+	
 	MeCtQuickDraw* ctrl_p = new MeCtQuickDraw;
 	err = mcu_p->quickdraw_ctrl_map.insert( ctrl_name, ctrl_p );
 	if( err == CMD_FAILURE )	{
@@ -3618,19 +3626,14 @@ int mcu_vrQuery_func( srArgBuffer& args, mcuCBHandle* mcu_p )
 
 	if( !strcmp(command.c_str(),"anims") )
 	{
-		std::map<char *, SkMotion *> * mapOfMotions;
-
-		mapOfMotions = mcu_p->motion_map.get_map();
-		std::map<char *, SkMotion *>::iterator it;
-
 		string message;
-
 		message.append("vrQueryAnimReply ");
 
-		for( it = mapOfMotions->begin(); it!= mapOfMotions->end(); ++it)
+		for (std::map<std::string, SkMotion*>::iterator it = mcu_p->motion_map.begin(); it != mcu_p->motion_map.end(); ++it)
 		{
-			printf("\n%s\n",(*it).first);
-			message.append(strcat((*it).first," "));
+			printf("\n%s\n",(*it).first.c_str());
+			message.append((*it).first);
+			message.append(" ");
 		}
 
 		mcu_p->vhmsg_send(message.c_str());
@@ -3720,10 +3723,11 @@ int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
 	}
 	
 	printf( "MOTIONS:\n" );
-	mcu_p->motion_map.reset();
-	SkMotion * mot_p;
-	while( mot_p = mcu_p->motion_map.next() )	{
-		printf( "  '%s'\n", mot_p->name() );
+	for (std::map<std::string, SkMotion*>::iterator motionIter = mcu_p->motion_map.begin();
+		motionIter != mcu_p->motion_map.end();
+		motionIter++)
+	{
+		printf( "  '%s'\n", (*motionIter).second->name() );
 	}
 	
 	printf( "POSE CTRL:\n" );

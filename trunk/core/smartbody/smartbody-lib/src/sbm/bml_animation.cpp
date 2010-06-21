@@ -53,9 +53,11 @@ BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string
 	if( animName && XMLString::stringLen( animName ) ) {
 		// Look up motion
 		string asciiName( xml_utils::asciiString( animName ) );
-		SkMotion* motion = mcu->motion_map.lookup( asciiName.c_str() );
 
-		if( motion ) {
+		std::map<std::string, SkMotion*>::iterator motionIter = mcu->motion_map.find(asciiName);
+		if (motionIter != mcu->motion_map.end())
+		{
+			SkMotion* motion = (*motionIter).second;
 			MeCtMotion* motionCt = new MeCtMotion();
 			motionCt->init( motion );
 

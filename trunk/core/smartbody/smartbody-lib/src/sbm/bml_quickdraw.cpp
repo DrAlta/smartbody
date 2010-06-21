@@ -88,11 +88,13 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 		XMLString::release( &temp_ascii );
 	}
 
-	SkMotion* anim = mcu->motion_map.lookup( anim_name.c_str() );
-	if( !anim ) {
+	std::map<std::string, SkMotion*>::iterator motionIter = mcu->motion_map.find(anim_name);
+	if( motionIter ==  mcu->motion_map.end()){
         cerr << "WARNING: BML::parse_bml_quickdraw(): Unknown source animation \"" << anim_name << "\"." << endl;
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
+
+	SkMotion* anim = (*motionIter).second;
 
 	float track_duration = -1;  // indefinite tracking by default
 	const XMLCh* attrTrackDur = elem->getAttribute( ATTR_TRACK_DUR );
