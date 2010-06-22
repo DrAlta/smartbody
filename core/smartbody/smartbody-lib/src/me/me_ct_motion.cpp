@@ -36,6 +36,7 @@ MeCtMotion::MeCtMotion ()
    _twarp = _maxtwarp = _mintwarp = 1.0f;
    _loop = false;
    _last_apply_frame = 0;
+   _offset = 0;
  }
 
 MeCtMotion::~MeCtMotion ()
@@ -107,6 +108,10 @@ void MeCtMotion::warp_limits ( float wmin, float wmax ) {
 	_mintwarp = wmin;
 	_maxtwarp = wmax;
 	twarp ( _twarp );
+}
+
+void MeCtMotion::offset ( double amount ) {
+	_offset = amount;
 }
 
 void MeCtMotion::twarp ( float tw ) {
@@ -249,10 +254,16 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 	}
 
 	// Controller Context and FrameData set, use the new available buffer
-	_motion->apply( float(t)*_twarp,
+	_motion->apply( float(t)*_twarp + float(_offset),
 		            &(frame.buffer()[0]),  // pointer to buffer's float array
 					&_mChan_to_buff,
 		            _play_mode, &_last_apply_frame );
+
+	SkChannelArray& allChannels = _motion->channels();
+	for (int i = 0; i < allChannels.size(); ++i)
+	{
+		frame.channelUpdated(i);
+	}
 
 	return continuing;
 }

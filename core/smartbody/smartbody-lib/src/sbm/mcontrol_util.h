@@ -157,7 +157,7 @@ class mcuCBHandle	{
 		srHashMap <srCmdSeq>		pending_seq_map;
 		srHashMap <srCmdSeq>		active_seq_map;
 
-		srHashMap <SkPosture>		pose_map;
+		std::map<std::string, SkPosture*> pose_map;
 		std::map<std::string, SkMotion*> motion_map;
 
 		SkMotion*                   face_neutral_p;

@@ -41,7 +41,7 @@ SkSkeleton* load_skeleton( const char *filename, srPathList &path_list, Resource
 
 int load_me_motions( const char* pathname, std::map<std::string, SkMotion*>& map, bool recursive, ResourceManager* manager );
 
-int load_me_postures( const char* pathname, srHashMap<SkPosture>& map, bool recursive, ResourceManager* manager );
+int load_me_postures( const char* pathname, std::map<std::string, SkPosture*>& map, bool recursive, ResourceManager* manager );
 
 void print_joint( const SkJoint* joint );
 

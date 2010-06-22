@@ -283,10 +283,12 @@ void mcuCBHandle::clear( void )	{
 		delete pawn_p;
 	}
 	
-	SkPosture* pose_p;
-	pose_map.reset();
-	while( pose_p = pose_map.pull() )	{
-		pose_p->unref();
+	for (std::map<std::string, SkPosture*>::iterator postureIter = pose_map.begin();
+		postureIter != pose_map.end();
+		postureIter++)
+	{
+		SkPosture* posture = (*postureIter).second;
+		delete posture;
 	}
 	
 	for (std::map<std::string, SkMotion*>::iterator motionIter = motion_map.begin();
@@ -2213,11 +2215,13 @@ int init_pose_controller(
 )	{
 	int err = CMD_SUCCESS;
 
-	SkPosture *pose_p = mcu_p->pose_map.lookup( pose_name );
-	if( pose_p == NULL ) {
+	std::map<std::string, SkPosture*>::iterator postureIter = mcu_p->pose_map.find(std::string(pose_name));
+	if (postureIter == mcu_p->pose_map.end())
+	{
 		printf( "init_pose_controller ERR: SkPosture '%s' NOT FOUND in pose map\n", pose_name ); 
 		return( CMD_FAILURE );
 	}
+	SkPosture *pose_p = (*postureIter).second;
 
 	MeCtPose* ctrl_p = new MeCtPose;
 	err = mcu_p->pose_ctrl_map.insert( ctrl_name, ctrl_p );
@@ -2695,6 +2699,29 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		char *ctrl_name = args.read_token();
 		char *ctrl_cmd = args.read_token();
 	
+		if( strcmp(ctrl_cmd, "passthrough" ) == 0 )	{
+		
+			srHashMap<SbmCharacter>& character_map = mcu_p->character_map;
+			character_map.reset(); 
+			SbmCharacter* character = character_map.next();
+			while (character)
+			{
+				MeControllerTreeRoot* controllerTree = character->ct_tree_p;
+				int numControllers = controllerTree->count_controllers();
+			
+				for (int c = 0; c < numControllers; c++)
+				{
+					if (strcmp(controllerTree->controller(c)->name(), ctrl_name) == 0)
+					{
+						controllerTree->controller(c)->set_pass_through(!controllerTree->controller(c)->is_pass_through());
+						return CMD_SUCCESS;
+					}
+				}
+			}
+		
+			return CMD_FAILURE;
+		}
+
 		if( strcmp( ctrl_cmd, "pose" ) == 0 )	{
 			char *pose_name = args.read_token();
 			return(
@@ -3642,19 +3669,14 @@ int mcu_vrQuery_func( srArgBuffer& args, mcuCBHandle* mcu_p )
 	}
 	else if( !strcmp(command.c_str(),"poses") )
 	{
-		std::map<char *, SkPosture *> * mapOfPoses;
-
-		mapOfPoses = mcu_p->pose_map.get_map();
-		std::map<char *, SkPosture *>::iterator it;
-
 		string message;
-
 		message.append("vrQueryPoseReply ");
 
-		for( it = mapOfPoses->begin(); it!= mapOfPoses->end(); ++it)
+		for (std::map<std::string, SkPosture*>::iterator it = mcu_p->pose_map.begin(); it != mcu_p->pose_map.end(); ++it)
 		{
-			printf("\n%s\n",(*it).first);
-			message.append(strcat((*it).first," "));
+			printf("\n%s\n",(*it).first.c_str());
+			message.append((*it).first);
+			message.append(" ");
 		}
 
 		mcu_p->vhmsg_send(message.c_str());
@@ -3716,10 +3738,11 @@ int mcu_vrAllCall_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
 
 	printf( "POSES:\n" );
-	mcu_p->pose_map.reset();
-	SkPosture * pose_p;
-	while( pose_p = mcu_p->pose_map.next() )	{
-		printf( "  '%s'\n", pose_p->name() );
+	for (std::map<std::string, SkPosture*>::iterator postureIter = mcu_p->pose_map.begin();
+		postureIter != mcu_p->pose_map.end();
+		postureIter++)
+	{
+		printf( "  '%s'\n", (*postureIter).second->name() );
 	}
 	
 	printf( "MOTIONS:\n" );

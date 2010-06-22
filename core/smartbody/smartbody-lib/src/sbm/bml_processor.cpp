@@ -552,8 +552,9 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 		const char* ascii_pose_id = xml_utils::asciiString(postureName);
 		string pose_id = ascii_pose_id;
 		delete [] ascii_pose_id;
-		SkPosture* posture = mcu->pose_map.lookup( pose_id );
-		if( posture ) {
+		std::map<std::string, SkPosture*>::iterator postureIter =  mcu->pose_map.find(pose_id);
+		if( postureIter !=  mcu->pose_map.end()) {
+			SkPosture* posture = (*postureIter).second;
 			MeCtPose* poseCt = new MeCtPose();
 			poseCt->init( *posture );
 			poseCt->name( posture->name() );  // TODO: include BML act and behavior ids

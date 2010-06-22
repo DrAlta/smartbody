@@ -59,7 +59,8 @@ MeController::MeController ()
 	_context( NULL ),
  	_record_output( NULL ), // for recording poses and motions of immediate local results
 	_startTime(-1),
-	_stopTime(-1)
+	_stopTime(-1),
+	_pass_through(false)
 {
 	_instance_id = instance_count;
 	instance_count ++;
@@ -312,7 +313,9 @@ void MeController::evaluate ( double time, MeFrameData& frame ) {
 		logger->controller_pre_evaluate( time, *_context, *this, frame );
 
 	// Reevaluate controller. Even for the same evaluation time as _lastEval, results may be influenced by differing buffer values
-	_active = controller_evaluate ( time, frame );
+	if (!_pass_through)
+		_active = controller_evaluate ( time, frame );
+
 	if (this->is_record_buffer_changes())
 		this->cal_buffer_changes( frame );
 
