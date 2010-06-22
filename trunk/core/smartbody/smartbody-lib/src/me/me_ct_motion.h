@@ -43,6 +43,7 @@ class MeCtMotion : public MeController
     SkMotion*            _motion;    // the motion,
     SkMotion::InterpType _play_mode; // its play mode
     double               _duration;  // the time-warped duration
+	double               _offset;    // time offset of the animation
     float                _maxtwarp;  // max time warping factor allowed to increase the motion speed
     float                _mintwarp;  // min time warping factor allowed to reduce the motion speed
     float                _twarp;     // current used warping time
@@ -107,6 +108,12 @@ class MeCtMotion : public MeController
     /*! This method will return the fixed total duration time that the controller
         will take, or will return -1 if the controller is looped */
     virtual double controller_duration ();
+
+	/*! Gets the offset from the start of the motion. */
+	virtual double offset () { return _offset; }
+
+	/*! Sets the offset from the start of the motion. */
+	void offset ( double amount );
 
     /*! Returns the duration of the warped motion, which corresponds to the phase in
         a loop controller with undetermined duration */

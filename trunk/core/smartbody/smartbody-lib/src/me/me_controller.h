@@ -130,9 +130,11 @@ protected :
 	int			_record_max_frames; // maximum capacity of the buffer
 
 	// debugging: recording controller's MeFrameData, inspecting the changes each controller make on the buffer data 
-	bool			_buffer_changes_toggle;			// toggle, whenever it's being called, recording the changes that evaluation make
+	bool		_buffer_changes_toggle;			// toggle, whenever it's being called, recording the changes that evaluation make
 	std::vector<float>	_bufferRecord;              // data containing the changes made each time inside the controller evaluation
-	bool			_buffer_changes_toggle_reset;	// flag to initialize the buffer_changes
+	bool		_buffer_changes_toggle_reset;	// flag to initialize the buffer_changes
+
+	bool		_pass_through;						// determines if this controller does not get evaluated. 
 protected :
     /*! Constructor */
     MeController ();
@@ -275,6 +277,9 @@ public :
 	/*SrBuffer<float>& get_buffer_changes();					// gets the channel data changed by this controller*/
 	std::vector<float>& get_buffer_changes();
 	bool is_record_buffer_changes() { return _buffer_changes_toggle; }
+
+	bool is_pass_through() const { return _pass_through; }
+	void set_pass_through(bool val) { _pass_through = val; }
 
 #if ME_CONTROLLER_ENABLE_XMLIFY
 	/*! Serialize state (or most of it) to a single XML element for later analysis. */
