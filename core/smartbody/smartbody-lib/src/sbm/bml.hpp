@@ -333,10 +333,11 @@ namespace BML {
         const NodType type;
         const float repeats;
         const float frequency;
-        const float extent;    // % of full extension
+        const float extent;
+		const float smooth;   
 
 	public: ///// Methods
-		NodRequest( const std::string& unique_id, const std::string& localId, NodType type, float repeats, float frequency, float extent, const SbmCharacter* actor,
+		NodRequest( const std::string& unique_id, const std::string& localId, NodType type, float repeats, float frequency, float extent, float smooth, const SbmCharacter* actor,
 			        const BehaviorSyncPoints& behav_syncs );
 	};
 

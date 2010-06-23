@@ -106,7 +106,7 @@ class MeCtSimpleNod : public MeController	{
 		virtual ~MeCtSimpleNod();
 		
 		void init( void );
-		void set_nod( float dur, float mag, float rep, int aff );
+		void set_nod( float dur, float mag, float rep, int aff, float smooth = .5);
 		
 		// Following must be public for comparisons
 		static const char* _type_name;
@@ -126,6 +126,9 @@ class MeCtSimpleNod : public MeController	{
 		float _magnitude;
 		float _repetitions;
 		int _affirmative;
+		float _smooth;
+		double _prev_time;
+		bool _first_eval;
 };
 
 ///////////////////////////////////////////////////////////////////////////

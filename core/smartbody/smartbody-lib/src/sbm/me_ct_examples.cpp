@@ -269,15 +269,18 @@ void MeCtSimpleNod::init( void )	{
 		_channels.add( SkJointName( joint_labels[ i ] ), SkChannel::Quat );
 	}
 
+	_first_eval = true;
+
 	MeController::init();
 }
 
-void MeCtSimpleNod::set_nod( float dur, float mag, float rep, int aff )	{
+void MeCtSimpleNod::set_nod( float dur, float mag, float rep, int aff, float smooth )	{
 	
 	_duration = dur;
 	_magnitude = mag;
 	_repetitions = rep;
 	_affirmative = aff;
+	_smooth = smooth;
 }
 
 void MeCtSimpleNod::controller_start()	{}
@@ -285,19 +288,35 @@ void MeCtSimpleNod::controller_start()	{}
 bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 	
 	if( _duration > 0.0 )	{
-		if( t > (double)_duration )	{
+		if( t > (double)_duration * 2.0) {
 			return( FALSE );
 		}
 	}
 
-	float x = (float)( t / (double)_duration );
-	float angle_deg = (float)( -_magnitude * sin( x * 2.0 * M_PI * _repetitions ) );
+	float dt;
+	if ( _first_eval ) {
+		_first_eval = false;
+		dt = 0.001f;
+	}
+	else	{
+		dt = (float)(t - _prev_time);
+	}
+	_prev_time = t;
+
+	float angle_deg = 0;
+	if (t <= (double) _duration)
+	{
+		float x = (float)( t / (double)_duration );
+		angle_deg = (float)( -_magnitude * sin( x * 2.0 * M_PI * _repetitions ) );
+	}
 	
 	SrBuffer<float>& buff = frame.buffer();
 
 	// All of our channels are quats and recieve the same values
 	int channels_size = _channels.size(); // Will be zero if init() errored
 	float angle_deg_per_joint = angle_deg / (float)channels_size;
+
+	float smooth_lerp = (float)(0.01 + ( 1.0 - powf( _smooth, dt * 30.0f /*SMOOTH_RATE_REF*/ ) ) * 0.99);
 
 	for( int local_channel_index=0;
 			local_channel_index<channels_size;
@@ -308,13 +327,14 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 		int context_channel_index = _toContextCh[ local_channel_index ];
 		int index = frame.toBufferIndex( context_channel_index );
 
-		euler_t E_in = quat_t(
+		quat_t Q_in = quat_t(
 			buff[ index + 0 ],
 			buff[ index + 1 ],
 			buff[ index + 2 ],
 			buff[ index + 3 ]
 		);
-		
+		euler_t E_in = Q_in;
+
 		quat_t Q_out;
 		if (frame.isChannelUpdated( context_channel_index ) )	{
 			// If channel has been touched, preserve components and add delta
@@ -351,6 +371,12 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 			}
 		}
 		
+		Q_out.lerp( 
+				smooth_lerp, 
+				Q_in,
+				Q_out
+			);
+
 		buff[ index + 0 ] = (float) Q_out.w();
 		buff[ index + 1 ] = (float) Q_out.x();
 		buff[ index + 2 ] = (float) Q_out.y();

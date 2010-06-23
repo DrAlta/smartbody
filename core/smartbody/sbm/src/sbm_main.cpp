@@ -655,8 +655,11 @@ int main( int argc, char **argv )	{
 	double start_t = get_time();
 	while( mcu.loop )	{
 
-		sbm_loop_wait( mcu.desired_max_fps ); // sleep to reach target loop rate
+		if (!mcu.virtualclock) {
+			sbm_loop_wait( mcu.desired_max_fps ); // sleep to reach target loop rate
+		}
 		mcu.set_time( get_time() - start_t );
+
 		fltk::check();
 	
 #if LINK_VHMSG_CLIENT

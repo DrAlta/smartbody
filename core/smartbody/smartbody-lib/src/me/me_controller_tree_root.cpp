@@ -367,6 +367,10 @@ public:
 
 		_frame_data.incrementFrameCount( time );
 
+		// reset the frame to zero
+		SrBuffer<float>& buffer = _frame_data.buffer();
+//		buffer.setall(0); // also need to accomodate quaternions
+
 		if( _logger )
 			_logger->context_pre_evaluate( time, *this, _frame_data );
 		for_each( _controllers.begin(), 
