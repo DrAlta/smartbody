@@ -103,6 +103,7 @@ const XMLCh ATTR_TARGET[]       = L"target";
 const XMLCh ATTR_ANGLE[]        = L"angle";
 const XMLCh ATTR_DIRECTION[]    = L"direction";
 const XMLCh ATTR_ROLL[]         = L"sbm:roll";
+const XMLCh ATTR_SMOOTH[]       = L"sbm:smooth";
 
 ////// XML Direction constants
 // Angular (gaze) and orienting (head)
@@ -625,12 +626,17 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
                 if( attrVelocity && XMLString::stringLen( attrVelocity ) )
                     velocity = xml_utils::xcstof( attrVelocity );
 
+				const XMLCh* attrSmooth = elem->getAttribute( ATTR_SMOOTH );
+                float smooth = .5;  
+                if( attrSmooth && XMLString::stringLen( attrSmooth ) )
+                    smooth = xml_utils::xcstof( attrSmooth );
+
                 float duration = velocity * repeats;
 
                 return BehaviorRequestPtr( new NodRequest( unique_id,
 														   localId,
 				                                           (NodRequest::NodType) type,
-												           repeats, velocity, amount, 
+												           repeats, velocity, amount, smooth,
                                                            request->actor,
                                                            behav_syncs ) );
             }

@@ -82,7 +82,8 @@ mcuCBHandle::mcuCBHandle()
 	use_locomotion( false ),
 	viewer_factory ( new SrViewerFactory() ),
 	bmlviewer_factory ( new BMLViewerFactory() ),
-	resource_manager(ResourceManager::getResourceManager())
+	resource_manager(ResourceManager::getResourceManager()),
+	virtualclock(true)
 {
 	
 	root_group_p->ref();
@@ -1421,7 +1422,7 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	time maxfps|fps <desired-max-fps>
 	time lockdt [0|1]
 	time perf [0|1 [<interval>]]
-
+	time virtualclock
 */
 
 int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
@@ -1458,6 +1459,17 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			}
 			else	{
 				mcu_p->perf.toggle();
+			}
+		}
+		else if( strcmp( time_cmd, "virtualclock" ) == 0 )	{
+			int n = args.calc_num_tokens();
+			if( n ) {
+				int enable = args.read_int();
+				mcu_p->virtualclock = enable;
+			}
+			else
+			{
+				mcu_p->virtualclock = !mcu_p->virtualclock;
 			}
 		}
 		else	{

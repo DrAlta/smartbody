@@ -130,6 +130,7 @@ class mcuCBHandle	{
 		bool		lock_dt; // if true: report fixed dt to animation system
 		double		desired_max_fps;
 		double		time;
+		bool		virtualclock;
 
 		SbmPerfReport perf;
 

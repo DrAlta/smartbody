@@ -918,9 +918,21 @@ void MeControllerRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu 
 	}
 	MeCtMotion* motionController = dynamic_cast<MeCtMotion*>(anim_ct);
 	if (motionController)
+	{
 		schedule_ct->schedule( anim_ct, behav_syncs);
+	}
 	else
-		schedule_ct->schedule( anim_ct, (double)startAt, (double)endAt, (float)indt, (float)outdt );
+	{
+		MeCtSimpleNod* nod = dynamic_cast<MeCtSimpleNod*>(anim_ct);
+		if (nod)
+		{
+			schedule_ct->schedule( anim_ct, behav_syncs);
+		}
+		else
+		{
+			schedule_ct->schedule( anim_ct, (double)startAt, (double)endAt, (float)indt, (float)outdt );
+		}
+	}
 	// TODO: Adapt speed and end time
 
 	////  Old-style MeCtScheduler2 API calls
@@ -999,10 +1011,10 @@ MotionRequest::MotionRequest( const std::string& unique_id, const std::string& l
 
 
 //  NodRequest
-NodRequest::NodRequest( const std::string& unique_id, const std::string& local, NodType type, float repeats, float frequency, float extent, const SbmCharacter* actor,
+NodRequest::NodRequest( const std::string& unique_id, const std::string& local, NodType type, float repeats, float frequency, float extent, float smooth, const SbmCharacter* actor,
 			            const BehaviorSyncPoints& syncs_in )
 :	MeControllerRequest( unique_id, local, new MeCtSimpleNod(), actor->head_sched_p, syncs_in, MeControllerRequest::MANUAL ),
-    type(type), repeats(repeats), frequency(frequency), extent(extent)
+    type(type), repeats(repeats), frequency(frequency), extent(extent), smooth(smooth)
 {
     MeCtSimpleNod* nod = (MeCtSimpleNod*)anim_ct;
 	BehaviorSchedulerConstantSpeedPtr scheduler = buildSchedulerForController( nod );
@@ -1042,10 +1054,10 @@ NodRequest::NodRequest( const std::string& unique_id, const std::string& local, 
     //  TODO: Set a controller name
     switch( type ) {
         case VERTICAL:
-            nod->set_nod( (float)endTime, extent*60.0f, repeats, true );  // TODO: adjust offset to not look so high
+            nod->set_nod( (float)endTime, extent*60.0f, repeats, true, smooth );  // TODO: adjust offset to not look so high
             break;
         case HORIZONTAL:
-            nod->set_nod( (float)endTime, extent*90.0f, repeats, false );
+            nod->set_nod( (float)endTime, extent*90.0f, repeats, false, smooth );
             break;
         default:
             clog << "WARNING: NodRequest::NodRequest(..): Unknown nod type=" << type << endl;
