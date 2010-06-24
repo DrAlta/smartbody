@@ -216,7 +216,7 @@ class mcuCBHandle	{
 		}
 
 		void reset();
-		void set_real_time( double real_time );
+		void set_time( double real_time );
 
 		int open_viewer( int width, int height, int px, int py );
 		void close_viewer( void );

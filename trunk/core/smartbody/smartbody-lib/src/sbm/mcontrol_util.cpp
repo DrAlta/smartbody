@@ -124,7 +124,7 @@ void mcuCBHandle::reset( void )	{
 		bonebus.OpenConnection( net_host );
 }
 
-void mcuCBHandle::set_real_time( double real_time )	{
+void mcuCBHandle::set_time( double real_time )	{
 
 	if( sim_fps > 0.0 )	{
 		time += 1.0 / sim_fps;
