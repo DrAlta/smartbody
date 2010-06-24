@@ -661,7 +661,7 @@ int main( int argc, char **argv )	{
 	while( mcu.loop )	{
 
 		sbm_loop_wait( mcu.sleep_fps ); // sleep to reach target loop rate
-		mcu.set_real_time( get_time() - start_t );
+		mcu.set_time( get_time() - start_t );
 
 		fltk::check();
 	
