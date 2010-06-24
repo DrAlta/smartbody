@@ -1134,7 +1134,104 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 			remote_speech* remoteSpeech = dynamic_cast<remote_speech*>(speechInterface);
 			if (remoteSpeech)
 			{
-				int x = 2;
+				RequestTrack* visemeTrack = new RequestTrack();
+				visemeTrack->setName("viseme");
+				model->addTrack(visemeTrack);
+				RequestBlock* visemeBlock = new RequestBlock();
+				visemeBlock->setName(speechRequest->unique_id);
+				visemeBlock->setStartTime(triggerTime);
+				visemeBlock->setShowName(false);
+				visemeTrack->addBlock(visemeBlock);
+				float lastTime = 0;
+				std::vector<SmartBody::VisemeData*>& visemes = speechRequest->getVisemes();
+				for (unsigned int v = 0; v < visemes.size(); v++)
+				{
+					SmartBody::VisemeData* viseme = visemes[v];
+					const char* id =  viseme->id();
+					float visemeTime = viseme->time();
+					float weight = viseme->weight();
+					float blendDuration = viseme->duration();
+					RequestMark* visemeMark = new RequestMark();
+					visemeMark->setName(id);
+					visemeMark->setStartTime(triggerTime + visemeTime);
+					visemeMark->setEndTime(visemeMark->getStartTime());
+					std::stringstream strstr;
+					strstr << "Id = " << id << std::endl << "Time = " << visemeTime << std::endl << "Weight = " << weight << std::endl << "Duration = " << blendDuration;
+					visemeMark->setInfo(strstr.str());
+					if (weight == 0.0)
+						visemeMark->setColor(fltk::RED);
+					else if (weight == 1.0)
+						visemeMark->setColor(fltk::GREEN);
+
+					visemeBlock->addMark(visemeMark);
+					if (visemeTime > lastTime)
+						lastTime = visemeTime;
+				}
+				visemeBlock->setEndTime(triggerTime + lastTime);
+				block->setEndTime(triggerTime + lastTime);
+
+
+				RequestTrack* timeMarkerTrack = new RequestTrack();
+				timeMarkerTrack->setName("speechtimemarkers");
+				model->addTrack(timeMarkerTrack);
+				RequestBlock* timeMarkerBlock = new RequestBlock();
+				timeMarkerBlock->setName(speechRequest->unique_id);
+				timeMarkerTrack->addBlock(timeMarkerBlock);
+				timeMarkerBlock->setStartTime(triggerTime);
+				timeMarkerBlock->setEndTime(triggerTime + lastTime);
+				timeMarkerBlock->setShowName(false);
+				for (BML::BehaviorSyncPoints::iterator bhIter = speechRequest->behav_syncs.begin(); 
+					bhIter !=  speechRequest->behav_syncs.end();
+					bhIter++)
+				{
+					BML::SyncPointPtr syncPtr = (*bhIter).sync();
+					BML::SyncPoint* sp = syncPtr.get();
+					double time = (*bhIter).time();
+					std::wstring markerNameW = (*bhIter).name();
+					std::string markerName(markerNameW.begin(), markerNameW.end());
+					RequestMark* timeMark = new RequestMark();
+					timeMark->setName(markerName);
+					timeMarkerBlock->addMark(timeMark);
+					if (time == time)
+					{
+						float markerTime = time;
+						timeMark->setStartTime(markerTime);
+						timeMark->setEndTime(timeMark->getStartTime());
+						
+						// add these times to the syncMap so that we can use them 
+						// to calculate other timings
+						std::string syncMapName = speechRequest->local_id;
+						syncMapName.append(":");
+						syncMapName.append(markerName);
+						syncMap.insert(std::pair<std::string, double>(syncMapName, markerTime));
+					}
+					else
+					{
+						std::string prefixMarker = "sp1:";
+						prefixMarker.append(markerName);
+						XMLCh tempStr[100];
+						XMLString::transcode(prefixMarker.c_str(), tempStr, 99);
+						float markTime = speechInterface->getMarkTime(speechRequest->get_speech_request_id(), tempStr);
+						if (markTime != -1)
+						{
+							timeMark->setStartTime(triggerTime + markTime);
+							timeMark->setEndTime(timeMark->getStartTime());
+							
+							// add these times to the syncMap so that we can use them 
+							// to calculate other timings
+							std::string syncMapName = speechRequest->local_id;
+							syncMapName.append(":");
+							syncMapName.append(markerName);
+							syncMap.insert(std::pair<std::string, double>(syncMapName, triggerTime + markTime));
+						}
+						else
+						{
+							untimedMarks.push_back(std::pair<RequestMark*, std::string>(timeMark, timeMark->getName()));
+						}
+					}
+
+				}
+
 			}
 
 		}
