@@ -393,7 +393,7 @@ void signal_handler(int sig) {
 	exit(sig);
 }
 
-void sbm_loop_wait( double target_fps = 100.0 )	{ // sleep to reach target loop rate
+double sbm_loop_wait( double target_fps = 100.0 )	{ // sleep to reach target loop rate
 	static double prev_time = 0.0;
 
 	if( target_fps > 0.0 )	{
@@ -410,6 +410,7 @@ void sbm_loop_wait( double target_fps = 100.0 )	{ // sleep to reach target loop 
 		}
 	}
 	prev_time = get_time();
+	return( prev_time );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -657,11 +658,57 @@ int main( int argc, char **argv )	{
 	// Notify world SBM is ready to receive messages
 	mcu_vrAllCall_func( srArgBuffer(""), &mcu );
 
-	double start_t = get_time();
+	double curr_time = 0.0;
+	double real_time = 0.0;
+	double real_dt = 0.0;
+	double prev_time = 0.0;
+
+	double update_wait = 0.0;
+	bool update_sim = false;
+
+	mcu.start_time = get_time();
 	while( mcu.loop )	{
 
-		sbm_loop_wait( mcu.sleep_fps ); // sleep to reach target loop rate
-		mcu.set_time( get_time() - start_t );
+		if( mcu.do_pause )	{
+			mcu.do_pause = false;
+			mcu.paused = true;
+			mcu.pause_time = real_time;
+		}
+		if( mcu.do_steps )	{
+			mcu.do_resume = true;
+		}
+		if( mcu.do_resume )	{
+			mcu.do_resume = false;
+			mcu.paused = false;
+			mcu.resume_offset = real_time - mcu.pause_time;
+			mcu.start_time += mcu.resume_offset;
+		}
+		if( mcu.do_steps )	{
+			mcu.do_steps--;
+			if( mcu.do_steps == 0 )	{
+				mcu.do_pause = true;
+			}
+		}
+
+		curr_time = sbm_loop_wait( mcu.sleep_fps ); // sleep to reach target loop rate
+		real_time = curr_time - mcu.start_time;
+		real_dt = real_time - prev_time;
+		prev_time = real_time;
+
+		update_wait += real_dt;
+		if( mcu.update_fps > 0.0 )	{
+			if( update_wait >= ( 1.0 / mcu.update_fps ) )	{
+				update_sim = true;
+				update_wait = 0.0;
+			}
+		}
+		else	{
+			update_sim = true;
+		}
+
+		if( !mcu.paused && update_sim )	{
+			mcu.set_real_time( real_time );
+		}
 
 		fltk::check();
 	
@@ -702,7 +749,12 @@ int main( int argc, char **argv )	{
 		}
 
 		mcu.theWSP->broadcast_update();
-		mcu.update();
+
+		if( !mcu.paused && update_sim )	{
+			mcu.update();
+			update_sim = false;
+		}
+
 		mcu.render();
 	}
 

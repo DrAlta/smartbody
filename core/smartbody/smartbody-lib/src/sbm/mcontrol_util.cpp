@@ -62,6 +62,8 @@ mcuCBHandle::mcuCBHandle()
 :	loop( true ),
 	vhmsg_enabled( false ),
 	lock_dt( false ),
+	real_time( 0.0 ),
+	start_time(0.0),
 	time( 0.0 ),
 	perf( 10.0 ),
 	net_bone_updates( true ),
@@ -84,7 +86,14 @@ mcuCBHandle::mcuCBHandle()
 	bmlviewer_factory ( new BMLViewerFactory() ),
 	resource_manager(ResourceManager::getResourceManager()),
 	sleep_fps(0.0),
-	sim_fps(0.0)
+	sim_fps(0.0),
+	update_fps(0.0),
+	do_pause(false),
+	do_resume(false),
+	do_steps(false),
+	paused( false ),
+	pause_time( 0.0 ),
+	resume_offset( 0.0 )
 {
 	
 	root_group_p->ref();
@@ -124,15 +133,16 @@ void mcuCBHandle::reset( void )	{
 		bonebus.OpenConnection( net_host );
 }
 
-void mcuCBHandle::set_time( double real_time )	{
+void mcuCBHandle::set_real_time( double rt )	{
 
+	real_time = rt;
 	if( sim_fps > 0.0 )	{
 		time += 1.0 / sim_fps;
 	}
 	else	{
-		time = real_time;
+		time = rt;
 	}
-	perf.update( real_time, time );
+	perf.update( rt, time );
 }
 
 char * mcn_return_full_filename_func( const char * current_path, const char * file_name)
@@ -1441,6 +1451,10 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			mcu_p->sleep_fps = args.read_float();
 			mcu_p->desired_max_fps = mcu_p->sleep_fps; // deprecate
 		}
+		else 
+			if (strcmp( time_cmd, "updatefps" ) == 0 ) {
+			mcu_p->update_fps = args.read_float();
+		}
 		else
 		if( ( strcmp( time_cmd, "maxfps" ) == 0 ) || ( strcmp( time_cmd, "fps" ) == 0 ) )	{ // deprecate
 			std::cout << "WARNING: 'time maxfps' is deprecated, use 'time sleepfps' instead." << std::endl;
@@ -1462,6 +1476,10 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				mcu_p->sim_fps = mcu_p->desired_max_fps;
 				mcu_p->sleep_fps = mcu_p->desired_max_fps;
 			}
+			else	{
+				mcu_p->sim_fps = 0.0;
+				mcu_p->sleep_fps = 0.0;
+			}
 		}
 		else
 		if( strcmp( time_cmd, "perf" ) == 0 )	{
@@ -1478,7 +1496,30 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				mcu_p->perf.toggle();
 			}
 		}
-		else	{
+		else
+		if (strcmp( time_cmd, "pause" ) == 0 )	{
+			mcu_p->do_pause = true;
+		}
+		else 
+		if (strcmp( time_cmd, "resume" ) == 0 )	{
+			mcu_p->do_resume = true;
+		}
+		else 
+		if (strcmp( time_cmd, "step" ) == 0  || strcmp( time_cmd, "steps" ) == 0)	{
+			if( mcu_p->paused )	{
+				int n = args.calc_num_tokens();
+				if( n ) {
+					mcu_p->do_steps = args.read_int();
+				}
+				else	{
+					mcu_p->do_steps = 1;
+				}
+			}
+			else	{
+				std::cout << "NOT paused, cannot step" << std::endl;
+			}
+		}
+		else {
 			return( CMD_NOT_FOUND );
 		}
 		return( CMD_SUCCESS );

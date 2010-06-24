@@ -129,9 +129,18 @@ class mcuCBHandle	{
 		bool		play_internal_audio;
 		bool		lock_dt; // if true: report fixed dt to animation system
 		double		desired_max_fps;
+		double		real_time;
+		double		start_time;
 		double		time;
 		double      sleep_fps;
 		double      sim_fps;
+		double      update_fps;
+		bool		do_pause;
+		bool		do_resume;
+		int			do_steps;
+		bool		paused;
+		double		pause_time;
+		double		resume_offset;
 
 		SbmPerfReport perf;
 
@@ -216,7 +225,8 @@ class mcuCBHandle	{
 		}
 
 		void reset();
-		void set_time( double real_time );
+		void set_real_time( double real_time );
+		void set_time( double real_time ) { set_real_time( real_time ); } // for Ed
 
 		int open_viewer( int width, int height, int px, int py );
 		void close_viewer( void );
