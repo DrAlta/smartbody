@@ -147,6 +147,11 @@ namespace BML {
 		*/
 		SmartBody::RequestId get_speech_request_id() { return speech_request_id; }
 
+		/**
+		* Returns the visemes and timings
+		*/
+		VecOfVisemeData& getVisemes() { return visemes; }
+
 
 	protected:
 		void createStandardSyncPoint( const std::wstring& attr, SyncPointPtr& sync );
