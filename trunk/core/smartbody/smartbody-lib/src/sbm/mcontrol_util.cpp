@@ -83,7 +83,8 @@ mcuCBHandle::mcuCBHandle()
 	viewer_factory ( new SrViewerFactory() ),
 	bmlviewer_factory ( new BMLViewerFactory() ),
 	resource_manager(ResourceManager::getResourceManager()),
-	virtualclock(true)
+	sleep_fps(0.0),
+	sim_fps(0.0)
 {
 	
 	root_group_p->ref();
@@ -123,10 +124,10 @@ void mcuCBHandle::reset( void )	{
 		bonebus.OpenConnection( net_host );
 }
 
-void mcuCBHandle::set_time( double real_time )	{
+void mcuCBHandle::set_real_time( double real_time )	{
 
-	if( lock_dt )	{
-		time += 1.0/desired_max_fps;
+	if( sim_fps > 0.0 )	{
+		time += 1.0 / sim_fps;
 	}
 	else	{
 		time = real_time;
@@ -1422,21 +1423,33 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	time maxfps|fps <desired-max-fps>
 	time lockdt [0|1]
 	time perf [0|1 [<interval>]]
-	time virtualclock
+	time sleepfps <fps>
+	time simfps <fps>
 */
 
 int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	
 	if( mcu_p )	{
 		char *time_cmd = args.read_token();
-		if( 
-			( strcmp( time_cmd, "maxfps" ) == 0 ) ||
-			( strcmp( time_cmd, "fps" ) == 0 )
-			)	{
-			mcu_p->desired_max_fps = args.read_float();
+		if (strcmp( time_cmd, "simfps" ) == 0 ) {
+			mcu_p->sim_fps = args.read_float();
+			mcu_p->desired_max_fps = mcu_p->sim_fps; // deprecate
+			mcu_p->lock_dt = (mcu_p->sim_fps > 0.0); // deprecate
+		}
+		else 
+			if (strcmp( time_cmd, "sleepfps" ) == 0 ) {
+			mcu_p->sleep_fps = args.read_float();
+			mcu_p->desired_max_fps = mcu_p->sleep_fps; // deprecate
 		}
 		else
-		if( strcmp( time_cmd, "lockdt" ) == 0 )	{
+		if( ( strcmp( time_cmd, "maxfps" ) == 0 ) || ( strcmp( time_cmd, "fps" ) == 0 ) )	{ // deprecate
+			std::cout << "WARNING: 'time maxfps' is deprecated, use 'time sleepfps' instead." << std::endl;
+			mcu_p->desired_max_fps = args.read_float();
+			mcu_p->sleep_fps = mcu_p->desired_max_fps;
+		}
+		else
+		if( strcmp( time_cmd, "lockdt" ) == 0 )	{ // deprecate
+			std::cout << "WARNING: 'time lockdt' is deprecated, use 'time sleepfps' and 'time simfps' instead." << std::endl;
 			int n = args.calc_num_tokens();
 			if( n ) {
 				int enable = args.read_int();
@@ -1444,6 +1457,10 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			}
 			else	{
 				mcu_p->lock_dt = !mcu_p->lock_dt;
+			}
+			if( mcu_p->lock_dt )	{
+				mcu_p->sim_fps = mcu_p->desired_max_fps;
+				mcu_p->sleep_fps = mcu_p->desired_max_fps;
 			}
 		}
 		else
@@ -1459,17 +1476,6 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			}
 			else	{
 				mcu_p->perf.toggle();
-			}
-		}
-		else if( strcmp( time_cmd, "virtualclock" ) == 0 )	{
-			int n = args.calc_num_tokens();
-			if( n ) {
-				int enable = args.read_int();
-				mcu_p->virtualclock = enable;
-			}
-			else
-			{
-				mcu_p->virtualclock = !mcu_p->virtualclock;
 			}
 		}
 		else	{
@@ -2844,12 +2850,12 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 						return( CMD_SUCCESS );
 					}
 					if( strcmp( record_type, "bvh" ) == 0 )	{
-						if( mcu_p->lock_dt )	{
-							ctrl_p->record_bvh( max_num_of_frames, 1.0/mcu_p->desired_max_fps );
+						if( mcu_p->sim_fps > 0.0 )	{
+							ctrl_p->record_bvh( max_num_of_frames, 1.0/mcu_p->sim_fps );
 							return( CMD_SUCCESS );
 						}
 						else	{
-							printf( "mcu_controller_func ERR: BVH recording requires lockdt set\n" );
+							printf( "mcu_controller_func ERR: BVH recording requires 'time simfps' set\n" );
 							return( CMD_FAILURE );
 						}
 					}

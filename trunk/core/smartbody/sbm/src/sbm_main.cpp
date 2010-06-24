@@ -396,15 +396,17 @@ void signal_handler(int sig) {
 void sbm_loop_wait( double target_fps = 100.0 )	{ // sleep to reach target loop rate
 	static double prev_time = 0.0;
 
-	double target_dt = 1.0 / target_fps;
-	double curr_time = get_time();
-	double dt = curr_time - prev_time;
+	if( target_fps > 0.0 )	{
+		double curr_time = get_time();
+		double target_dt = 1.0 / target_fps;
+		double dt = curr_time - prev_time;
 
-	if( dt < target_dt )	{
-		double diff = target_dt - dt;
-		int wait_msec = (int)( diff * 1000.0 );
-		if( wait_msec > 0 ) {
-			sbm_sleep( wait_msec );
+		if( dt < target_dt )	{
+			double diff = target_dt - dt;
+			int wait_msec = (int)( diff * 1000.0 );
+			if( wait_msec > 0 ) {
+				sbm_sleep( wait_msec );
+			}
 		}
 	}
 	prev_time = get_time();
@@ -454,7 +456,7 @@ int main( int argc, char **argv )	{
 	
 	mcu_register_callbacks();
 
-	mcu.desired_max_fps = 100.0;
+	mcu.desired_max_fps = 100.0; // deprecate
 //	mcu.desired_max_fps = 10.0;
 
 	// EDF - taken from tre_main.cpp, a fancier command line parser can be put here if desired.
@@ -520,7 +522,7 @@ int main( int argc, char **argv )	{
 		{
 			SrString fps = s;
 			fps.remove( 0, 5 );
-			mcu.desired_max_fps = atof( fps );
+			mcu.sleep_fps = atof( fps );
 		}
 		else if( s.search( "-perf=" ) == 0 )  // argument starts with -perf=
 		{
@@ -537,6 +539,9 @@ int main( int argc, char **argv )	{
 		{
 			printf( "ERROR: Unrecognized command line argument: \"%s\"\n", (const char*)s );
 		}
+	}
+	if( mcu.lock_dt )	{ // deprecate
+		mcu.sim_fps = mcu.sleep_fps;
 	}
 
 #if LINK_VHMSG_CLIENT
@@ -655,10 +660,8 @@ int main( int argc, char **argv )	{
 	double start_t = get_time();
 	while( mcu.loop )	{
 
-		if (!mcu.virtualclock) {
-			sbm_loop_wait( mcu.desired_max_fps ); // sleep to reach target loop rate
-		}
-		mcu.set_time( get_time() - start_t );
+		sbm_loop_wait( mcu.sleep_fps ); // sleep to reach target loop rate
+		mcu.set_real_time( get_time() - start_t );
 
 		fltk::check();
 	

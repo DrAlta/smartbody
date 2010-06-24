@@ -130,7 +130,8 @@ class mcuCBHandle	{
 		bool		lock_dt; // if true: report fixed dt to animation system
 		double		desired_max_fps;
 		double		time;
-		bool		virtualclock;
+		double      sleep_fps;
+		double      sim_fps;
 
 		SbmPerfReport perf;
 
@@ -215,7 +216,7 @@ class mcuCBHandle	{
 		}
 
 		void reset();
-		void set_time( double real_time );
+		void set_real_time( double real_time );
 
 		int open_viewer( int width, int height, int px, int py );
 		void close_viewer( void );
