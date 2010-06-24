@@ -1056,6 +1056,8 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 		visemeBlock->setStartTime(triggerTime);
 		visemeBlock->setShowName(false);
 		visemeTrack->addBlock(visemeBlock);
+		std::stringstream strstr;
+		strstr << "Visemes:\n";
 		float lastTime = 0;
 		const std::vector<SmartBody::VisemeData *>* visemes = audioSpeechInterface->getVisemes(speechRequest->get_speech_request_id());
 		for (unsigned int v = 0; v < visemes->size(); v++)
@@ -1065,6 +1067,7 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 			float visemeTime = viseme->time();
 			float weight = viseme->weight();
 			float blendDuration = viseme->duration();
+			strstr << id << " " << visemeTime << " " << weight << " " << blendDuration << "\n";
 			RequestMark* visemeMark = new RequestMark();
 			visemeMark->setName(id);
 			visemeMark->setStartTime(triggerTime + visemeTime);
@@ -1083,6 +1086,7 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 		}
 		visemeBlock->setEndTime(triggerTime + lastTime);
 		block->setEndTime(triggerTime + lastTime);
+		visemeBlock->setInfo(strstr.str());
 
 
 		stdext::hash_map< SmartBody::RequestId, SmartBody::AudioFileSpeech::SpeechRequestInfo >& speechRequestInfo = audioSpeechInterface->getSpeechRequestInfo();
@@ -1134,6 +1138,8 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 			remote_speech* remoteSpeech = dynamic_cast<remote_speech*>(speechInterface);
 			if (remoteSpeech)
 			{
+				std::stringstream strstr;
+				strstr << "Visemes:\n";
 				RequestTrack* visemeTrack = new RequestTrack();
 				visemeTrack->setName("viseme");
 				model->addTrack(visemeTrack);
@@ -1151,6 +1157,7 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 					float visemeTime = viseme->time();
 					float weight = viseme->weight();
 					float blendDuration = viseme->duration();
+					strstr << id << " " << visemeTime << " " << weight << " " << blendDuration << "\n";
 					RequestMark* visemeMark = new RequestMark();
 					visemeMark->setName(id);
 					visemeMark->setStartTime(triggerTime + visemeTime);
@@ -1169,7 +1176,7 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 				}
 				visemeBlock->setEndTime(triggerTime + lastTime);
 				block->setEndTime(triggerTime + lastTime);
-
+				visemeBlock->setInfo(strstr.str());
 
 				RequestTrack* timeMarkerTrack = new RequestTrack();
 				timeMarkerTrack->setName("speechtimemarkers");
@@ -1180,6 +1187,8 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 				timeMarkerBlock->setStartTime(triggerTime);
 				timeMarkerBlock->setEndTime(triggerTime + lastTime);
 				timeMarkerBlock->setShowName(false);
+				std::stringstream speechTimeStr;
+				speechTimeStr << "Sync Points\n";
 				for (BML::BehaviorSyncPoints::iterator bhIter = speechRequest->behav_syncs.begin(); 
 					bhIter !=  speechRequest->behav_syncs.end();
 					bhIter++)
@@ -1194,9 +1203,22 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 					timeMarkerBlock->addMark(timeMark);
 					if (time == time)
 					{
-						float markerTime = time;
+						double markerTime = time;
 						timeMark->setStartTime(markerTime);
 						timeMark->setEndTime(timeMark->getStartTime());
+						speechTimeStr << markerName << " " << markerTime << "\n";
+						std::string prefixMarker = speechRequest->local_id;
+						if (prefixMarker.size() > 0)
+							prefixMarker.append(":");
+						prefixMarker.append(markerName);
+						XMLCh tempStr[100];
+						XMLString::transcode(markerName.c_str(), tempStr, 99);
+						double markTimeFromInterface = speechInterface->getMarkTime(speechRequest->get_speech_request_id(), tempStr);
+
+						if (fabs(markTimeFromInterface + triggerTime - markerTime) > .001)
+						{
+							std::cout << "Interface time " << markTimeFromInterface + triggerTime << " does not match sync point time " << markerTime << std::endl;
+						}
 						
 						// add these times to the syncMap so that we can use them 
 						// to calculate other timings
@@ -1207,11 +1229,14 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 					}
 					else
 					{
-						std::string prefixMarker = "sp1:";
+						std::string prefixMarker = speechRequest->local_id;
+						if (prefixMarker.size() > 0)
+							prefixMarker.append(":");
 						prefixMarker.append(markerName);
 						XMLCh tempStr[100];
 						XMLString::transcode(prefixMarker.c_str(), tempStr, 99);
 						float markTime = speechInterface->getMarkTime(speechRequest->get_speech_request_id(), tempStr);
+						speechTimeStr << markerName << " " << markTime << "\n";
 						if (markTime != -1)
 						{
 							timeMark->setStartTime(triggerTime + markTime);
@@ -1231,6 +1256,7 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 					}
 
 				}
+				timeMarkerBlock->setInfo(speechTimeStr.str());
 
 			}
 
