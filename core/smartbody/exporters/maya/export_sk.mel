@@ -473,7 +473,7 @@ global proc skExportButton()
 
    select -r $root;
 
-   export_sk( $file, $name, $skVersion, $showAll, $useLimits );
+   skExport( $file, $name, $skVersion, $showAll, $useLimits );
 }
 
 
