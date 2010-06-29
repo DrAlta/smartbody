@@ -787,7 +787,7 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
                            // but for now is constructed following the known NVBG protocol (markers around words)
 						   // HACK AVOIDED: Fixed to use XML metadata as extracted during parse
                            std::ostringstream ostr;
-                           int i = num_words * 2;
+                           i = num_words * 2;
                            ostr << i;
 						   std::string s = xmlMetaData.speechIdentifier + ":";
                            //std::string s = "sp1:T" + ostr.str();
