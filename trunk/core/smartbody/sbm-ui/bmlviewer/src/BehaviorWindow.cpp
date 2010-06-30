@@ -44,20 +44,21 @@ BehaviorWindow::BehaviorWindow(int x, int y, int w, int h, char* name) : Window(
 		leftGroup->end();
 		leftGroup->resizable(nleWidget);
 
-		Group* rightGroup = new Group(w - 210, 0, 200, h - 40, "Behavior Info");
+		ScrollGroup* rightGroup = new ScrollGroup(w - 210, 0, 200, h - 40, "Behavior Info");
+		rightGroup->type(ScrollGroup::VERTICAL);
 		rightGroup->box(fltk::BORDER_BOX);
 		rightGroup->begin();
-			textXML = new fltk::TextDisplay(10, 10, 180, h - 50);
+			textXML = new fltk::TextDisplay(10, 10, 180, rightGroup->h() - 10);
 			textXML->color(fltk::WHITE);
 			textXML->textcolor(BLACK);
 			bufferXML = new fltk::TextBuffer();
 			textXML->buffer(bufferXML);
 			textXML->wrap_mode(true, 0);
 
-            Group* rightSizer = new Group(80, 110, 90, 20);
+            //Group* rightSizer = new Group(80, 110, 90, 20);
       
 		rightGroup->end();
-		rightGroup->resizable(rightSizer);
+		rightGroup->resizable(textXML);
 
 	bottomGroup->end();
 	bottomGroup->resizable(leftGroup);
@@ -198,7 +199,6 @@ void BehaviorWindow::updateGUI()
 			double startTime = block->getStartTime();
 			double endTime = block->getEndTime();		
 			textXML->buffer()->replace(0, textXML->buffer()->length(), block->getInfo().c_str());
-			textXML->buffer()->call_modify_callbacks();
 			nleWidget->setBlockSelectionChanged(false);
 			textXML->relayout();
 			if (textXML->parent()) 
@@ -1121,6 +1121,8 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 
 			SmartBody::RequestId reqId = (*iter).first;
 			SmartBody::AudioFileSpeech::SpeechRequestInfo& info = (*iter).second;
+			std::stringstream speechTimeStr;
+			speechTimeStr << "Sync Points\n";
 			for(stdext::hash_map< std::string, float >::iterator markerIter = info.timeMarkers.begin();
 				markerIter != info.timeMarkers.end();
 				markerIter++)
@@ -1132,6 +1134,7 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 				timeMark->setStartTime(triggerTime + markerTime);
 				timeMark->setEndTime(timeMark->getStartTime());
 				timeMarkerBlock->addMark(timeMark);
+				speechTimeStr << markerName << " " << markerTime << "\n";
 				// add these times to the syncMap so that we can use them 
 				// to calculate other timings
 				std::string syncMapName = speechRequest->local_id;
@@ -1139,6 +1142,7 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 				syncMapName.append(markerName);
 				syncMap.insert(std::pair<std::string, double>(syncMapName, triggerTime + markerTime));
 			}
+			timeMarkerBlock->setInfo(speechTimeStr.str());
 		}
 	}
 	else
