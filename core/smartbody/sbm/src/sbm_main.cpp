@@ -76,6 +76,8 @@
 #include <vhcl_crash.h>
 #endif
 
+#include <fltk/glut.h>
+#include "pic.h"
 
 #define ENABLE_DEFAULT_BOOTSTRAP	(1)
 #define DEFAULT_SEQUENCE_FILE		("default.seq")
@@ -201,6 +203,53 @@ int sbm_vhmsg_send_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	return mcu_p->vhmsg_send( cmdName, cmdArgs );
 }
 
+// snapshot <windowHeight> <windowWidth> <offsetHeight> <offsetWidth> <output file>
+// The offset is according to the left bottom corner of the image frame buffer
+int mcu_snapshot_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	if( mcu_p )
+	{
+		int windowHeight = args.read_int();
+		int windowWidth = args.read_int();
+		int offsetHeight = args.read_int();
+		int offsetWidth = args.read_int();
+
+		string output_file = args.read_token();
+
+		if( windowHeight == 0 )		windowHeight = 600;							// default window size
+		if( windowWidth == 0 )		windowWidth = 400;
+		if( output_file == "" )		
+		{
+			std::stringstream output_file_os;
+			output_file_os<< "snapshot_"<< mcu_p->snapshot_counter<< ".ppm";	// default output name
+			mcu_p->snapshot_counter++;
+			output_file = output_file_os.str();
+		}
+		// Allocate a picture buffer 
+		Pic * in = pic_alloc(windowWidth, windowHeight, 3, NULL);
+		printf("  File to save to: %s\n", output_file.c_str());
+
+		for (int i=windowHeight-1; i>=0; i--) 
+		{
+			glReadPixels(0 + offsetWidth, windowHeight+offsetHeight-i-1, windowWidth, 1 , GL_RGB, GL_UNSIGNED_BYTE, &in->pix[i*in->nx*in->bpp]);
+		}
+
+		if (ppm_write(output_file.c_str(), in))
+		{
+			pic_free(in);
+			printf("  File saved Successfully\n");
+			return( CMD_SUCCESS );
+		}
+		else
+		{
+			pic_free(in);
+			printf("  Error in Saving\n");
+			return( CMD_FAILURE );
+		}	
+	}
+	return( CMD_SUCCESS );
+}
+
 int mcu_echo_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	
     fprintf( stdout, "%s\n> ", args.read_remainder_raw() );
@@ -262,6 +311,8 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "seq",			mcu_sequence_func );
 	mcu.insert( "seq-chain",	mcu_sequence_chain_func );
 	mcu.insert( "send",			sbm_vhmsg_send_func );
+
+	mcu.insert( "snapshot",		mcu_snapshot_func );
 
 	//  cmd prefixes "set" and "print"
 	mcu.insert( "set",          mcu_set_func );

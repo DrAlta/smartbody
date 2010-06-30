@@ -44,7 +44,6 @@ class mcuCBHandle;
 
 #include "bonebus.h"
 
-
 #include <sbm/BMLViewer.h>
 #include <SR/sr_viewer.h>
 #include <SR/sr_camera.h>
@@ -141,6 +140,8 @@ class mcuCBHandle	{
 		bool		paused;
 		double		pause_time;
 		double		resume_offset;
+
+		int			snapshot_counter;
 
 		SbmPerfReport perf;
 
@@ -404,5 +405,4 @@ int mcu_wsp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 
 //////////////////////////////////////////////////////////////////
-
 #endif

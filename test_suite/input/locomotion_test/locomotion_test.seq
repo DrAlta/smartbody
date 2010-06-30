@@ -1,0 +1,8 @@
+# test locomotion
+0	test loco enable
+1	test loco dx 7
+3	snapshot
+3	test	loco dx -10
+4	snapshot
+5	snapshot
+5	quit

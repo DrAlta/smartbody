@@ -1,0 +1,26 @@
+#	locomotion_test.seq
+#	Contributed by Jingqiao Fu of USC
+1 test loco enable
+6	test loco dz 30
+7	snapshot 1200 1200
+8 	test loco stop
+8	camera eye    100 300 -100
+8	camera center -100 92 500
+
+8	test loco dx 40
+12	snapshot 1200 1200
+13 	test loco stop
+14	test loco dx -40 dz -30
+15	snapshot 1200 1200
+16 	test loco stop
+18	test loco dz 80 rps 1.5 id 0
+20	snapshot 1200 1200
+22	test loco dx 60 lrps 1.0 id 1
+24	snapshot 1200 1200
+26 	test loco stop
+30	test loco dx 60 dz 60 grps 1.5 id 0
+32	snapshot 1200 1200
+34	test loco dx 60 lrps 2.0 id 1
+36	snapshot 1200 1200
+38  	test loco stop
+40	quit

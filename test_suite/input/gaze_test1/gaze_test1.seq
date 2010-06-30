@@ -1,0 +1,74 @@
+0	begin
+	test bml
+	<gaze target="camera">
+		<sbm:chest/><!-- default zeroes -->
+		<sbm:neck pitch="-60" /><!-- upward to jut back -->
+		<sbm:head/><!-- default zeroes, trying to realign -->
+			
+		<!-- the above is the same as...
+		<sbm:neck pitch="-60" interpolate-bias="false" />
+		-->
+	</gaze>
+	end
+
+1	snapshot 600 600
+
+2	begin
+	test bml
+	<gaze target="camera">
+		<sbm:chest/><!-- default zeroes -->
+		<sbm:neck pitch="60" /><!-- downward to jut forward -->
+		<sbm:head/><!-- default zeroes, trying to realign -->
+			
+		<!-- the above is the same as...
+		<sbm:neck pitch="60" interpolate-bias="false" />
+		-->
+	</gaze>
+	end
+
+3	snapshot 600 600
+
+4	begin
+	test bml
+	<gaze target="camera">
+		<sbm:chest pitch="-40"/><!-- lean back -->
+		<sbm:head  heading="10" pitch="-10"/>
+	</gaze>
+	end
+
+6	camera eye 40 150 90
+6	camera center 40 150 0
+6	begin
+	test bml
+	<gaze target="camera">
+		<!-- lean forward -->
+		<sbm:lumbar pitch="80"/>
+		<sbm:chest pitch="80"/>
+		<!-- but tilt head back for interest -->
+		<sbm:head  pitch="-20"/>
+	</gaze>
+	end
+
+7	snapshot 600 600
+
+8	begin
+	test bml
+	<gaze target="camera">
+		<sbm:chest /><!-- zero bias -->
+		<sbm:head  heading="20" pitch="10"/><!-- left, down -->
+	</gaze>
+	end
+
+9	snapshot 600 600
+
+10	begin
+	test bml
+	<gaze target="camera">
+		<sbm:chest /><!-- zero bias -->
+		<sbm:head  heading="25" pitch="-15"/><!-- left, down -->
+	</gaze>
+	end
+
+11	snapshot 600 600
+
+12	quit
