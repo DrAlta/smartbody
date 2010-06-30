@@ -401,7 +401,7 @@ float remote_speech::getMarkTime( RequestId requestId, const XMLCh* markId ){
 			}
 		}
 		}
-	wcerr << "ERROR: remote_speech::getMarkTime("<<requestId<<",\""<<markId<<"\"): Mark Id Not Found" << endl; //if nothing is found print error message and return -1
+//	wcerr << "ERROR: remote_speech::getMarkTime("<<requestId<<",\""<<markId<<"\"): Mark Id Not Found" << endl; //if nothing is found print error message and return -1
 	return -1;
 }
 
