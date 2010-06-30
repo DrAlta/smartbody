@@ -192,7 +192,8 @@ The timestamp is 20051121_150427 (that is, YYYYMMDD_HHMMSS ), so we can check ol
 std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<VisemeData*>* visemes){
 	//this is used to recursively search the DOM tree and return a vector containing the visemes and the appropriate viseme resets (before a subsequent viseme is set the previous one must be reset)
 	VisemeData *singleViseme= NULL;
-	float visemeBlendingDuration = 0;
+	float blendForward = 0;
+	float blendBack = 0;
 	float startTime=0;
 	if(node->getNodeType()==1){ //node is an element node
 		DOMElement *element= (DOMElement *)node; //instantiate an element using this node
@@ -223,16 +224,40 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 				singleViseme= new VisemeData(id, 1.0, startTime); //the weight is always made one
 
 				if ( visemes->size() > 0 ) 
-				{   // Right before adding the current viseme, the previous viseme's id is retrieved, 
+				{   
+					VisemeData* prevViseme = visemes->back();
+
+					// Right before adding the current viseme, the previous viseme's id is retrieved, 
 					// a reset viseme is created in order to turn the previous viseme off (weight of 0.0)
-					if ( *( visemes->back()->id() ) != '_' ) {
-						// Set the duration of the *blend time* to a percentage of the lenght of the viseme
-						visemeBlendingDuration = ( ( startTime - visemes->back()->time() ) / 0.7f );
+					if ( *( prevViseme->id() ) != '_' ) {
+						// make sure that the new viseme does not come before the last viseme
+						if (prevViseme->time() > startTime) {
+							std::cout << "WARNING: Viseme " << singleViseme->id() << " has played at time " << singleViseme->time() << " comes before previous viseme " << prevViseme->id() << " at time " << prevViseme->time() << std::endl;
+						}
+						blendForward = (startTime - prevViseme->time());
+						if (visemes->size() > 1)
+						{
+							VisemeData* prevPrevViseme = (*visemes)[visemes->size() - 2];
+
+							if (*(prevPrevViseme->id()) != '_')
+							{
+								blendBack = (prevViseme->time() - prevPrevViseme->time());
+							}
+							else
+							{
+								blendBack = blendForward;
+							}
+						}
 						// Change the blend duration of the previous viseme
-						visemes->back()->setDuration( visemeBlendingDuration );
-						visemes->back()->setTime( visemes->back()->time() - visemeBlendingDuration );
+						float origVisemeTime = prevViseme->time();
+						prevViseme->setDuration( blendBack );
+						float newVisemeTime = prevViseme->time() - blendBack;
+						if (newVisemeTime < 0)
+							newVisemeTime = 0;
+						prevViseme->setTime(newVisemeTime);
+						
 						// Create and add reset viseme with the same blend duration
-						VisemeData *resetViseme = new VisemeData ( visemes->back()->id(), 0.0, singleViseme->time() - visemeBlendingDuration, visemeBlendingDuration );
+						VisemeData *resetViseme = new VisemeData ( prevViseme->id(), 0.0, origVisemeTime, blendForward );
 						visemes->push_back( resetViseme );
 					}
 				}

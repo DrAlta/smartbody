@@ -191,14 +191,29 @@ void BehaviorWindow::updateGUI()
 	nle::Block* block = this->getSelectedBlock();
 	if (nleWidget->getBlockSelectionChanged())
 	{
-		textXML->buffer()->remove(0, textXML->buffer()->length());
+		
 		if (block && block->isSelected())
 		{   
 			std::string name = block->getName();
 			double startTime = block->getStartTime();
 			double endTime = block->getEndTime();		
-			textXML->insert(block->getInfo().c_str());
+			textXML->buffer()->replace(0, textXML->buffer()->length(), block->getInfo().c_str());
+			textXML->buffer()->call_modify_callbacks();
 			nleWidget->setBlockSelectionChanged(false);
+			textXML->relayout();
+			if (textXML->parent()) 
+			{
+				textXML->parent()->relayout();
+				textXML->parent()->redraw();
+			}
+			else
+			{
+				textXML->redraw();
+			}
+		}
+		else
+		{
+			textXML->buffer()->remove(0, textXML->buffer()->length());
 		}
 	}
 }
@@ -1215,7 +1230,7 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 						XMLString::transcode(markerName.c_str(), tempStr, 99);
 						double markTimeFromInterface = speechInterface->getMarkTime(speechRequest->get_speech_request_id(), tempStr);
 
-						if (fabs(markTimeFromInterface + triggerTime - markerTime) > .001)
+						if (markTimeFromInterface == -1.0 || fabs(markTimeFromInterface + triggerTime - markerTime) > .001)
 						{
 							std::cout << "Interface time " << markTimeFromInterface + triggerTime << " does not match sync point time " << markerTime << std::endl;
 						}
@@ -1284,7 +1299,11 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 		if (time != time)
 		{
 			time = 0; // word breaks should have times set
-			untimedMarks.push_back(std::pair<RequestMark*, std::string>(mark, mark->getName()));
+			std::string prefixMarker = speechRequest->local_id;
+			if (prefixMarker.size() > 0)
+				prefixMarker.append(":");
+			prefixMarker.append(name);
+			untimedMarks.push_back(std::pair<RequestMark*, std::string>(mark, prefixMarker));
 		}
 		//mark->setStartTime(triggerTime + time);
 		//mark->setEndTime(triggerTime + time);
