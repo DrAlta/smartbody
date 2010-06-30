@@ -1,0 +1,23 @@
+0 begin
+test bml
+<gaze target="elder">
+<!-- Any or all of these options are available -->
+<sbm:lumbar   heading="1" pitch="1" roll="1" blend="0.6" />
+<sbm:thorax   heading="2" pitch="2" roll="2" blend="0.7" />
+<sbm:cervical heading="3" pitch="3" roll="3" blend="0.8" />
+<sbm:cranial  heading="4" pitch="4" roll="4" blend="0.9" />
+<sbm:optical  heading="5" pitch="5" roll="5" blend="1.0" /></gaze>
+end
+
+1 snapshot 600 600
+2 test bml <gaze target="elder:base"> </gaze>
+3 snapshot 600 600
+4 test bml <gaze target="elder:spine1"> </gaze>
+5 snapshot 600 600
+6 test bml <gaze target="elder:spine2"> </gaze>
+7 snapshot 600 600
+8 test bml <gaze target="elder:spine3"> </gaze>
+9 snapshot 600 600
+10 test bml <gaze target="elder:spine4"> </gaze>
+11 snapshot 600 600
+12 quit

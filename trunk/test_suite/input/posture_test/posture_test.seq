@@ -1,0 +1,9 @@
+0 test bml character doctor <animation name="LHandOnHip_Arms_GestureWhy" priority="1" />
+0 test bml character elder <animation name="HandsAtSide_RArm_GestureYou" priority="1" />
+1 snapshot 600 600
+1.5 snapshot 600 600
+4 test bml character doctor <animation name="Step_WalkForward" priority="1" />
+4 test bml character elder <animation name="HandsAtSide_Arms_Sweep" priority="1" />
+4.5 snapshot 600 600
+5 snapshot 600 600
+8 quit

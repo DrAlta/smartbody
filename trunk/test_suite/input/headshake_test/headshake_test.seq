@@ -1,0 +1,11 @@
+1	test bml <head type="SHAKE" id="b1"/>
+1.4	snapshot
+5	test bml <head amount="0.2" priority="5" repeats="0.5" type="SHAKE"/>
+8	snapshot
+9	test bml <head amount="0.8" priority="2" repeats="2.0" type="SHAKE"/>
+10	snapshot
+11	snapshot
+13	test bml <head amount="2.8" priority="1" repeats="1.5.0" type="SHAKE"/>
+13.5	snapshot
+14	snapshot
+15	quit

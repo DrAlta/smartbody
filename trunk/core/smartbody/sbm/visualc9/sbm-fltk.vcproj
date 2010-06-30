@@ -299,6 +299,18 @@
 			>
 		</File>
 		<File
+			RelativePath="..\src\pic.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\src\pic.h"
+			>
+		</File>
+		<File
+			RelativePath="..\src\ppm.cpp"
+			>
+		</File>
+		<File
 			RelativePath="..\src\sbm_main.cpp"
 			>
 		</File>

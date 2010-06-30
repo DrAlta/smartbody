@@ -1,0 +1,16 @@
+# test locomotion
+0 ctrl G1 gaze
+0 gaze G1 limit back 15 30 0
+0 gaze G1 limit chest 6 15 0
+0 gaze G1 limit neck 25 60 0
+0 gaze G1 limit head 20 45 0
+0 gaze G1 target point 0 170 100
+0.1 char doctor ctrl G1 begin
+2 gaze G1 target point 100 200 -40
+3 camera eye    160 150 0
+3 snapshot 600 600
+4 gaze G1 target point 100 170 -40
+5 snapshot 600 600
+6 gaze G1 target point 100 100 -40
+7 snapshot 600 600
+8 quit

@@ -93,7 +93,8 @@ mcuCBHandle::mcuCBHandle()
 	do_steps(false),
 	paused( false ),
 	pause_time( 0.0 ),
-	resume_offset( 0.0 )
+	resume_offset( 0.0 ),
+	snapshot_counter( 1 )
 {
 	
 	root_group_p->ref();
@@ -3867,4 +3868,3 @@ int mcu_wsp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	return( CMD_SUCCESS );
 }
 
-/////////////////////////////////////////////////////////////
