@@ -403,6 +403,28 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 			}
 
 			float audioTime = speech_impl->getMarkTime( speech_request_id, wb_id.c_str() );
+			if (audioTime < 0)
+			{
+				std::string wordBreakId(wb_id.begin(), wb_id.end());
+				int pos = wordBreakId.find(":");
+				if (pos == std::string::npos)
+				{ // prefix was not given - try again with proper prefix
+					std::string wordBreakIdWithPrefix = this->local_id;
+					wordBreakIdWithPrefix.append(":");
+					wordBreakIdWithPrefix.append(wordBreakId);
+					XMLCh tempStr[256];
+					XMLString::transcode(wordBreakIdWithPrefix.c_str(), tempStr, 255);
+					audioTime = speech_impl->getMarkTime(speech_request_id, tempStr);
+				}
+				else
+				{ // prefix was given - try again without prefix
+					std::string wordBreakSuffix = wordBreakId.substr(pos + 1, wordBreakId.size() - pos - 1);
+					XMLCh tempStr[256];
+					XMLString::transcode(wordBreakSuffix.c_str(), tempStr, 255);
+					audioTime = speech_impl->getMarkTime(speech_request_id, tempStr);
+				}
+
+			}
 			if( audioTime >= 0 ) {
 				if( LOG_SYNC_POINTS ) wcout << "   Wordbreak SyncPoint \"" << wb_id << "\" @ " << audioTime << endl;
 				cur->time = start_time + audioTime;
