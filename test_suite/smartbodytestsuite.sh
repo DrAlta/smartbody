@@ -58,50 +58,13 @@ INPUTDIR=""
 BASEDIR=""
 SBMBIN=""
 SBMEXE=""
-CONFIGFILE=test.config
+CONFIGFILE=testconfig.sh
 echo ""
 echo =======================================================;
 echo -e "\033[40;32m READING CONFIGURATION SETTINGS......\033[0m"
 echo =======================================================;
 if [ -f "$CONFIGFILE" ]; then
-	while read line
-	do
-		LENGTH=`echo ${#line}`;
-		POS=`expr index $line "="`;
-		NAME=`echo ${line:0:$POS-1}`;
-		VALUE=`echo ${line:$POS:$LENGTH-$POS}`;
-		POS=`expr index $line "$"`;
-		
-		while read tline
-		do
-			TLENGTH=`echo ${#tline}`;
-			TPOS=`expr index $tline "="`;
-			TNAME=`echo ${tline:0:$TPOS-1}`;
-			TVALUE=`echo ${tline:$TPOS:$TLENGTH-$TPOS}`;
-			
-			LASTCHAR=`echo ${tline:$TLENGTH-1:1}`;
-			if [ "$LASTCHAR" = "/" ]; then
-				TVALUE=`echo ${TVALUE%/}`; 
-			fi;
-			VALUE=`echo ${VALUE//"$"$TNAME/$TVALUE}`;
-		done < $CONFIGFILE;
-		
-		LASTCHAR=`echo ${line:$LENGTH-1:1}`;
-		if [ "$LASTCHAR" = "/" ]; then
-			VALUE=`echo ${VALUE%/}`; 
-		fi;
-		
-		if [ "$NAME" = "OUTPUTDIR" ]; then
-			OUTPUTDIR=$VALUE;
-		elif [ "$NAME" = "INPUTDIR" ]; then
-			INPUTDIR=$VALUE;
-		elif [ "$NAME" = "SBMBIN" ]; then
-			SBMBIN=$VALUE;
-		elif [ "$NAME" = "SBMEXE" ]; then
-			SBMEXE=$VALUE;
-		fi;
-		echo -e "    \033[40;33m$NAME\033[0m=$VALUE";
-	done < $CONFIGFILE;
+	source $CONFIGFILE
 else
 	echo "ERROR: Can not find $CONFIGFILE, no default settings found"
 fi
