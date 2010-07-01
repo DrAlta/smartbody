@@ -2760,10 +2760,44 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		char *ctrl_cmd = args.read_token();
 	
 		if( strcmp(ctrl_cmd, "passthrough" ) == 0 )	{
+			bool allControllers = false;
+			if (strcmp(ctrl_name, "*") == 0)
+				allControllers = true;
+
+			char* value = args.read_token();
+			bool passThroughValue = true;
+			bool toggleValue = false;
+			bool checkStatus = false;
+			if (strlen(value) > 0)
+			{
+				if (strcmp("true", value) == 0)
+				{
+					passThroughValue = true;
+				}
+				else if (strcmp("false", value) == 0)
+				{
+					passThroughValue = false;
+				}
+				else if (strcmp("status", value) == 0)
+				{
+					checkStatus = true;
+				}
+				else
+				{
+					std::cout << "Use syntax: ctrl " << ctrl_name << " passthrough <true|false|status>, or ctrl " << ctrl_name << " passthrough " << std::endl;
+					return CMD_FAILURE;
+				}
+			}
+			else
+			{
+				toggleValue = true;
+			}
+
 		
 			srHashMap<SbmCharacter>& character_map = mcu_p->character_map;
 			character_map.reset(); 
 			SbmCharacter* character = character_map.next();
+			int numControllersAffected = 0;
 			while (character)
 			{
 				MeControllerTreeRoot* controllerTree = character->ct_tree_p;
@@ -2771,15 +2805,34 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			
 				for (int c = 0; c < numControllers; c++)
 				{
-					if (strcmp(controllerTree->controller(c)->name(), ctrl_name) == 0)
+					if (checkStatus)
 					{
-						controllerTree->controller(c)->set_pass_through(!controllerTree->controller(c)->is_pass_through());
-						return CMD_SUCCESS;
+						std::string passThroughStr = (controllerTree->controller(c)->is_pass_through())? " true " : " false";							
+						std::cout << "[" << character->name << "] " << controllerTree->controller(c)->name() << " = " << passThroughStr << std::endl;
+					}
+					else if (allControllers)
+					{
+						if (toggleValue)
+							controllerTree->controller(c)->set_pass_through(!controllerTree->controller(c)->is_pass_through());
+						else
+							controllerTree->controller(c)->set_pass_through(passThroughValue);
+						numControllersAffected++;
+					}
+					else if (strcmp(controllerTree->controller(c)->name(), ctrl_name) == 0)
+					{
+						if (toggleValue)
+							controllerTree->controller(c)->set_pass_through(!controllerTree->controller(c)->is_pass_through());
+						else
+							controllerTree->controller(c)->set_pass_through(passThroughValue);
+						numControllersAffected++;
 					}
 				}
+				character = character_map.next();
 			}
-		
-			return CMD_FAILURE;
+			if (numControllersAffected > 0)
+				return CMD_SUCCESS;
+			else
+				return CMD_FAILURE;
 		}
 
 		if( strcmp( ctrl_cmd, "pose" ) == 0 )	{
