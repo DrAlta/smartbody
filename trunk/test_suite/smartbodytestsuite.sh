@@ -18,7 +18,7 @@
 #  CONTRIBUTORS:
 #			Ari Shapiro,		ICT
 #			Jingqiao Fu,		ICT
-#			Yuyu Xu,				ICT
+#			Yuyu Xu,			ICT
 
 #!/bin/sh
 
@@ -163,19 +163,25 @@ do
 		if [ -f "$line" ]; then
 			SH_NUM=$[$SH_NUM+1];
 			TESTLOGFILE=$TESTRESULTS/$line".log";
-			bash $line $SBMBIN $INPUTDIR $TESTDIR $SBMEXE &>$TESTLOGFILE;
+			RESULT=REDO
+			while [ "$RESULT" = "REDO" ]
+			do
+				bash $line $SBMBIN $INPUTDIR $TESTDIR $SBMEXE &>$TESTLOGFILE;
 			
-			# check for test success
-			if [ -f "$TESTLOGFILE" ]; then
+				# check for test success
+				if [ -f "$TESTLOGFILE" ]; then
 
-				RESULT=`tail --lines=1 $TESTLOGFILE`
-				#echo "        Test result: $RESULT"
-				if [ "$RESULT" = "SUCCESS" ] || [ "$RESULT" = "> SUCCESS" ]; then
-					echo -n -e "\t\t\t\t\t\t\t\t$line\t\tSUCCESS\n" >> $LOGFILE;
-				else
-					echo -n -e "\t\t\t\t\t\t\t\t$line\t\tFAILURE\n" >> $LOGFILE;
+					RESULT=`tail --lines=1 $TESTLOGFILE`
+					#echo "        Test result: $RESULT"
+					if [ "$RESULT" = "SUCCESS" ] || [ "$RESULT" = "> SUCCESS" ]; then
+						echo -n -e "\t\t\t\t\t\t\t\t$line\t\tSUCCESS\n" >> $LOGFILE;
+					elif [ "$RESULT" = "REDO" ] || [ "$RESULT" = "> REDO" ]; then
+						echo -n -e "\t\t\t\t\t\t\t\t$line\t\tREDO\n" >> $LOGFILE;
+					else
+						echo -n -e "\t\t\t\t\t\t\t\t$line\t\tFAILURE\n" >> $LOGFILE;
+					fi;
 				fi;
-			fi;
+			done
 			if [ "$RESULT" = "SUCCESS" ] || [ "$RESULT" = "> SUCCESS" ]; then
 				echo -e "        Testing: $line      \033[42;37mSUCCESS\033[0m";
 			else
