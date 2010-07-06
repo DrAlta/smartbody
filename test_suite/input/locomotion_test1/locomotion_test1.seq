@@ -4,8 +4,8 @@
 6	test loco dz 30
 7	snapshot 1200 1200
 8 	test loco stop
-8	camera eye    100 300 -100
-8	camera center -100 92 500
+8	camera eye    100 92 -400
+8	camera center 300 92 500
 
 8	test loco dx 40
 12	snapshot 1200 1200

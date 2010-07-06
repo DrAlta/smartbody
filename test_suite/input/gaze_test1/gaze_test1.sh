@@ -27,6 +27,7 @@ source ../../common_test.sh
 COUNTER=0
 RESULT=""
 FLAG="SUCCESS"
+REDOFLAG="NOREDO"
 while [ $COUNTER -lt $NUMOFCOMP ]; do
 	let COUNTER=COUNTER+1
 	OPTION=$(eval echo \$$"OPTION_$COUNTER")
@@ -34,6 +35,9 @@ while [ $COUNTER -lt $NUMOFCOMP ]; do
 	RESULT=`source ../../common_comp.sh $OPTION $COUNTER $THRESHOLD` 
 	if [ $RESULT = "FAILURE" ]; then
 		FLAG=FAILURE
+	fi
+	if [ $RESULT = "REDO" ]; then
+		REDOFLAG=REDO
 	fi
 
 done
@@ -43,5 +47,7 @@ if [ $FLAG = "FAILURE" ]; then
 else
 	echo SUCCESS
 fi
-
+if [ $REDOFLAG = "REDO" ]; then
+	echo REDO
+fi
 	
