@@ -313,7 +313,20 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 	// Locomotion controller
 	if( locomotion_ct)
-		ct_tree_p->add_controller( locomotion_ct );
+	{
+		// add after the motion scheduler
+		int numControllers = ct_tree_p->count_controllers();
+		for (int c = 0; c < numControllers; c++)
+		{
+			MeController* controller = ct_tree_p->controller(c);
+			if (controller == motion_sched_p)
+			{
+				ct_tree_p->add_controller( locomotion_ct, c + 1);
+				break;
+			}
+		}
+	}
+		
 
 	// Face controller
 	if( face_neutral ) {
@@ -551,6 +564,7 @@ int SbmCharacter::init_skeleton() {
 	
 
 	// Add channels for locomotion control...
+	
 	{
 		
 		const float max_speed = 1000000;   // TODO: set max speed value to some reasonable value for the current scale
@@ -1479,6 +1493,34 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 					character->inspect_skeleton( joint_p );
 //					inspect_skeleton_local_transform( joint_p );
 //					inspect_skeleton_world_transform( joint_p );
+				}
+			}
+		}
+		return CMD_SUCCESS;
+	}
+	else
+	if( char_cmd=="channels" ) {
+		if( character ) {
+			if( character->skeleton_p ) {
+				MeControllerTreeRoot* controllerTree = character->ct_tree_p;
+
+				SkChannelArray channels = character->skeleton_p->channels();
+				int numChannels = channels.size();
+				for (int c = 0; c < numChannels; c++)
+				{
+					std::cout << c << " ";
+					SkJoint* joint = channels.joint(c);
+					if (joint)
+					{
+						std::cout << joint->name().get_string() << " ";
+					}
+					SkChannel& channel = channels[c];
+					int channelSize = channel.size();
+					// get the channel index
+					int channelIndex = controllerTree->toBufferIndex(c);
+					std::cout << channelIndex << " (" << channelSize << ") ";
+					std::cout << std::endl;
+
 				}
 			}
 		}
