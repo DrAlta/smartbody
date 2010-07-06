@@ -1957,7 +1957,7 @@ int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			return CMD_FAILURE;
 		}
 
-		std::map<std::string, SkMotion*>::iterator motionIter =  mcu_p->motion_map.begin();
+		std::map<std::string, SkMotion*>::iterator motionIter =  mcu_p->motion_map.find(motion_name);
 		if (motionIter != mcu_p->motion_map.end())
 		{
 			SkMotion* motion_p = (*motionIter).second;
