@@ -164,7 +164,8 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeCtLocomot
 		pre_facing_angle = world_rot.angle();
 		mat.roty(pre_facing_angle);
 		t_world_rot.set(mat);
-		if(dot(t_world_rot.axis(), world_rot.axis())< 0.0f) pre_facing_angle = -pre_facing_angle;
+		if(dot(t_world_rot.axis(), world_rot.axis())< 0.0f) 
+			pre_facing_angle = -pre_facing_angle;
 
 		facing_angle = pre_facing_angle;
 	}
@@ -202,7 +203,8 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeCtLocomot
 
 	calc_target_velocity();
 	//local_vel.set(0,0,routine.speed);
-	//printf("\nvel:(%f, %f, %f)", local_vel.x, local_vel.y, local_vel.z);
+	//printf("\n%f", pre_facing_angle);
+	//printf("\nvel:(%f, %f, %f)", global_vel.x, global_vel.y, global_vel.z);
 
 	return true;
 }

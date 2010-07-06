@@ -276,6 +276,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	
 	else if( arg=="dx" || arg=="dy" || arg == "dz" || arg=="deg_per_sec" || arg=="dps" || arg=="rad_per_sec" || arg=="rps" || arg=="grps" || arg=="lrps" ) {
 		SkChannelArray channels;
+		actor->get_locomotion_ct()->get_navigator()->clear_destination_list();
 		actor->get_locomotion_ct()->get_navigator()->has_destination = false;
 		int dx_index=-1, dy_index=-1, dz_index=-1, g_angular_index=-1, l_angular_index=-1, id_index = -1;
 		//float data[6] = {0,0,0,0,0,0};
