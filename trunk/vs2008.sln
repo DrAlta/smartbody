@@ -15,9 +15,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "elsender", "lib\elsender\el
 		{DE4240A9-DBBA-410F-888F-462384A5B280} = {DE4240A9-DBBA-410F-888F-462384A5B280}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vs2008-activemq", "lib\activemq\activemq-dotnet\vs2008-activemq.csproj", "{08321F42-4B3D-4815-B592-95962BAC3B9F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vs2008-activemq", "lib\activemq\activemq-dotnet\Apache.NMS.ActiveMQ\vs2008-activemq.csproj", "{08321F42-4B3D-4815-B592-95962BAC3B9F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vs2008-nms", "lib\activemq\activemq-dotnet\vendor\Apache.NMS\vs2008-nms.csproj", "{300C1716-0674-4D01-8F5D-151E59A504FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vs2008-nms", "lib\activemq\activemq-dotnet\Apache.NMS\vs2008-nms.csproj", "{300C1716-0674-4D01-8F5D-151E59A504FE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wsp", "lib\wsp\wsp\visualc9\wsp.vcproj", "{3939E85D-F2B0-465A-8EF4-A33812D76AA0}"
 	ProjectSection(ProjectDependencies) = postProject
