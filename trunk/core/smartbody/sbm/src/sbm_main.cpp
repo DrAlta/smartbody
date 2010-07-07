@@ -440,7 +440,7 @@ void cleanup( void )	{
 }
 
 void signal_handler(int sig) {
-	cleanup();
+	//cleanup(); // 
 	exit(sig);
 }
 
