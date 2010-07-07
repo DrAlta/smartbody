@@ -154,7 +154,6 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 		}
 	} else {
 		SkMotion* motion = new SkMotion();
-		motion->ref();
 
 		SrInput in( pathname.string().c_str(), "rt" );
 		SrString fullin_string;
