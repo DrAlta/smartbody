@@ -212,6 +212,14 @@ void MeCtGaze::set_limit( int key, float p_up, float p_dn, float h, float r )	{
 	key_limit_dirty = 1;
 }
 
+void MeCtGaze::set_all_limits( int key, float pitchUp, float pitchDown, float heading, float roll)
+{
+	MeCtGaze::DEFAULT_LIMIT_PITCH_UP[key] = pitchUp;
+	MeCtGaze::DEFAULT_LIMIT_PITCH_DOWN[key] = pitchDown;
+	MeCtGaze::DEFAULT_LIMIT_HEADING[key] = heading;
+	MeCtGaze::DEFAULT_LIMIT_ROLL[key] = roll;
+}
+
 void MeCtGaze::apply_limit_key( int J, int K, float weight )	{
 	
 	joint_arr[ J ].limit_p_up = 

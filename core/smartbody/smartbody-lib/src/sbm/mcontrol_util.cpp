@@ -58,6 +58,7 @@ mcuCBHandle* mcuCBHandle::_singleton = NULL;
 
 /////////////////////////////////////////////////////////////
 
+
 mcuCBHandle::mcuCBHandle()
 :	loop( true ),
 	vhmsg_enabled( false ),
@@ -105,6 +106,7 @@ mcuCBHandle::mcuCBHandle()
 	// TODO: this needs to have a unique name so that multiple sbm
 	// processes will be identified differently
 	theWSP->init( "SMARTBODY" );
+
 }
 
 /////////////////////////////////////////////////////////////
@@ -993,7 +995,6 @@ void mcuCBHandle::NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton 
 	}
 	character->EndSendGeneralParameters();
 }
-
 
 /////////////////////////////////////////////////////////////
 
@@ -3167,6 +3168,54 @@ int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			printf( "mcu_quickdraw_controller_func ERR: command '%s' NOT RECOGNIZED\n", qdraw_cmd );
 			return( CMD_NOT_FOUND );
 		}
+	}
+	return( CMD_FAILURE );
+}
+
+int mcu_gaze_limit_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	if( mcu_p )
+	{
+		int n = args.calc_num_tokens();
+		int keyIndex = -1;
+		if (n > 0)
+		{
+			char *key_label = args.read_token();
+			keyIndex = MeCtGaze::key_index( key_label );
+			if (keyIndex == -1)
+			{
+					std::cout << key_label << " is not a valid key." << std::endl;
+					return CMD_FAILURE;
+			}
+		}
+		
+		if( n > 3 )
+		{
+			float p_up = args.read_float();
+			float p_dn = args.read_float();
+			float h = args.read_float();
+			float r = args.read_float();
+			
+			MeCtGaze::set_all_limits(keyIndex, p_up, p_dn, h, r );
+		}
+		else if (n == 1 || n == 0)
+		{
+			std::cout << "To set limits, use: gazelimits <lumbar|thorax|cervical|cranial|optical|back|chest|neck|head|eyes> pitchup pitchdown heading roll" << std::endl;
+			int start = 0; 
+			int finish = MeCtGaze::GAZE_KEY_EYES;
+			if (n == 1)
+				start = finish = keyIndex;
+			for (int x = start; x <= finish; x++)
+			{
+				char* label = MeCtGaze::key_label(x);
+				// show the limits for that particular key
+				std::cout << label << " Pitch up  : " << MeCtGaze::DEFAULT_LIMIT_PITCH_UP[x] << std::endl;
+				std::cout << label << " Pitch down: " << MeCtGaze::DEFAULT_LIMIT_PITCH_DOWN[x] << std::endl;
+				std::cout << label << " Heading   : " << MeCtGaze::DEFAULT_LIMIT_HEADING[x] << std::endl;
+				std::cout << label << " Roll      : " << MeCtGaze::DEFAULT_LIMIT_ROLL[x] << std::endl;
+			}
+		}
+		return( CMD_SUCCESS );
 	}
 	return( CMD_FAILURE );
 }
