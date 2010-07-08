@@ -311,7 +311,7 @@ void mcuCBHandle::clear( void )	{
 		 motionIter++)
 	{
 		SkMotion* motion = (*motionIter).second;
-		delete motion;
+		motion->unref();
 	}
 	
 	MeCtPose* pose_ctrl_p;
