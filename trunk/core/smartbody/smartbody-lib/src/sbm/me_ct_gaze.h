@@ -127,10 +127,10 @@ class MeCtGaze : public MeController	{
 		};
 
 		// Default Values by Gaze Key
-		static const float DEFAULT_LIMIT_PITCH_UP[];
-		static const float DEFAULT_LIMIT_PITCH_DOWN[];
-		static const float DEFAULT_LIMIT_HEADING[];
-		static const float DEFAULT_LIMIT_ROLL[];
+		static float DEFAULT_LIMIT_PITCH_UP[];
+		static float DEFAULT_LIMIT_PITCH_DOWN[];
+		static float DEFAULT_LIMIT_HEADING[];
+		static float DEFAULT_LIMIT_ROLL[];
 
 		// Defaults for the Old APIs
 		static const float DEFAULT_SPEED_HEAD;
@@ -236,6 +236,9 @@ class MeCtGaze : public MeController	{
 		// LIMIT: key-group rotation limit
 		void set_limit( int key, float p, float h, float r );
 		void set_limit( int key, float p_up, float p_dn, float h, float r );
+
+		static void set_all_limits( int key, float p_up, float p_dn, float h, float r );
+
 #if 0
 		void set_limit_pitch( int key, float l );
 		void set_limit_heading( int key, float l );
