@@ -62,6 +62,11 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
                       ModeLines,
                       ModePoints
                     };
+	enum CharacterMode { ModeShowGeometry,
+                      ModeShowCollisionGeometry,
+                      ModeShowBones,
+                      ModeShowAxis
+                    };
 
     enum MenuCmd { CmdHelp,
                    CmdViewAll,
@@ -78,6 +83,10 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
                    CmdBoundingBox,
                    CmdStatistics,
                    CmdSpinAnim,
+				   CmdCharacterShowGeometry,
+				   CmdCharacterShowCollisionGeometry,
+				   CmdCharacterShowBones,
+				   CmdCharacterShowAxis,
                  };
 
    private : // internal data
