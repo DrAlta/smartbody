@@ -286,7 +286,11 @@ proc float skmKeyVal( int $frame, string $queryName )
    // if there is no key we search the 1st prior valid key for the joint
    while ( size( $val ) == 0 )
    {
-      if ( ( $frame <= 0 ) && ( $isFacial == 0 ) )
+      // Make sure frame 0 always have a valid key
+      if ( $frame == 0 )
+         $val[0] = 0;
+
+      if ( ( $frame < 0 ) && ( $isFacial == 0 ) )
          continue;
 
       $val = `keyframe -eval -time $frame -query $queryName`;
@@ -533,6 +537,14 @@ global proc int skmExport( string $fname,
       print( "Joints found:\n" );
       print $joints;
       print( "\n" );
+
+      //Give Error if NO key attributes found, which means the animation is not properly baked or maybe anim layer problem
+      if( $njoints == 0 )
+      {
+         fclose $fileid;
+         error -showLineNumber true "No key attributes found. Check animation baking, layer setting";
+      }
+
 
       //Print number of channels
       if ( !( $isFacial ) )
