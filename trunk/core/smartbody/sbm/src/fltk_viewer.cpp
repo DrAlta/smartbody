@@ -57,6 +57,8 @@
 # include <SR/sr_sa_bbox.h>
 # include <SR/sr_sa_gl_render.h>
 
+#include <sbm/mcontrol_util.h>
+
 ////# define SR_USE_TRACE1  // basic fltk events
 ////# define SR_USE_TRACE2  // more fltk events
 ////# define SR_USE_TRACE3  // sr translated events
@@ -133,6 +135,12 @@ static Fl_Menu_Item MenuTable[] =
          { "&lines",   0, MCB, CMD(CmdLines),   FL_MENU_RADIO },
          { "&points",  0, MCB, CMD(CmdPoints),  FL_MENU_RADIO },
          { 0 },
+  { "&characters", 0, 0, 0, FL_SUBMENU },
+         { "&geometry", 0, MCB, CMD(CmdCharacterShowGeometry), FL_MENU_RADIO },
+         { "&collision geometry", 0, MCB, CMD(CmdCharacterShowCollisionGeometry),   FL_MENU_RADIO },
+         { "&bones",   0, MCB, CMD(CmdCharacterShowBones),   FL_MENU_RADIO },
+         { "&axis",   0, MCB, CMD(CmdCharacterShowAxis),   FL_MENU_RADIO },
+         { 0 },
    { "p&references", 0, 0, 0, FL_SUBMENU },
          { "&axis",         0, MCB, CMD(CmdAxis),        FL_MENU_TOGGLE },
          { "b&ounding box", 0, MCB, CMD(CmdBoundingBox), FL_MENU_TOGGLE },
@@ -147,7 +155,7 @@ static Fl_Menu_Item MenuTable[] =
 
 // need to set/get data to be able to share the same popup menu with many instances of viewers
 
-static void set_menu_data ( FltkViewer::ViewMode v, FltkViewer::RenderMode r,
+static void set_menu_data ( FltkViewer::ViewMode v, FltkViewer::RenderMode r, FltkViewer::CharacterMode c,
                             bool axis, bool bbox, bool stat, bool spin )
  {
    # define SET(i,b)  if(b) MenuTable[i].set(); else MenuTable[i].clear();
@@ -157,6 +165,7 @@ static void set_menu_data ( FltkViewer::ViewMode v, FltkViewer::RenderMode r,
    int i=0;
    while ( CMD(i)!=FltkViewer::CmdExaminer ) i++;      SETO (  i+(int)v );
    while ( CMD(i)!=FltkViewer::CmdAsIs ) i++;          SETO (  i+(int)r );
+   while ( CMD(i)!=FltkViewer::CmdCharacterShowGeometry ) i++; SETO (  i+(int)c );
    while ( CMD(i)!=FltkViewer::CmdAxis ) i++;          SET  ( i, axis );
    while ( CMD(i)!=FltkViewer::CmdBoundingBox ) i++;   SET  ( i, bbox );
    while ( CMD(i)!=FltkViewer::CmdStatistics ) i++;    SET  ( i, stat );
@@ -211,6 +220,8 @@ class FltkViewerData
    SrSn*  root;              // contains the user scene
    FltkViewer::ViewMode viewmode;     // viewer mode, initially Examiner
    FltkViewer::RenderMode rendermode; // render mode
+   FltkViewer::CharacterMode charactermode; // render mode
+
 
    bool iconized;      // to stop processing while the window is iconized
    bool spinning;      // indicates if the model is currently spinning
@@ -220,6 +231,11 @@ class FltkViewerData
    bool boundingbox;   // if true will show the bbox of the whole scene
    bool scene_received_event; // to detect and send a release event to the scene graph
                               // when the alt key is released but the mouse is pushed
+   bool showgeometry;
+   bool showcollisiongeometry;
+   bool showbones;
+   bool showaxis;
+
    SrString message;   // user msg to display in the window
    SrLight light;
 
@@ -267,6 +283,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->root = new SrSnGroup; // we maintain root pointer always valid
    _data->viewmode = ModeExaminer;
    _data->rendermode = ModeAsIs;
+   _data->charactermode = ModeShowGeometry;
 
    _data->iconized    = false;
    _data->spinning    = false;
@@ -275,6 +292,10 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->displayaxis = false;
    _data->boundingbox = false;
    _data->scene_received_event = false;
+   _data->showgeometry = true;
+   _data->showcollisiongeometry = false;
+   _data->showbones = false;
+   _data->showaxis = false;
 
    _data->light.init();
 
@@ -328,13 +349,15 @@ void FltkViewer::draw_message ( const char* s )
 
 void FltkViewer::show_menu ()
  { 
-   set_menu_data ( _data->viewmode, _data->rendermode, _data->displayaxis,
+	 set_menu_data ( _data->viewmode, _data->rendermode, _data->charactermode, _data->displayaxis,
                    _data->boundingbox, _data->statistics, _data->allowspinanim );
    _data->menubut->popup();
  }
 
 void FltkViewer::menu_cmd ( MenuCmd s )
  {
+	 bool applyToCharacter = false;
+
    switch ( s )
     { case CmdHelp : _data->helpwin->show(); _data->helpwin->active(); break;
 
@@ -377,7 +400,50 @@ void FltkViewer::menu_cmd ( MenuCmd s )
       case CmdSpinAnim   : SR_SWAPB(_data->allowspinanim); 
                            if (!_data->allowspinanim) _data->spinning=false;
                            break;
+	  case CmdCharacterShowGeometry:
+						_data->showgeometry = true;
+						_data->showcollisiongeometry = false;
+						_data->showbones = false;
+						_data->showaxis = false;
+						applyToCharacter = true;
+						break;
+	  case CmdCharacterShowCollisionGeometry: 
+						_data->showgeometry = false;
+						_data->showcollisiongeometry = true;
+						_data->showbones = false;
+						_data->showaxis = false;
+						applyToCharacter = true;
+						break;
+	  case CmdCharacterShowBones: 
+						_data->showgeometry = false;
+						_data->showcollisiongeometry = false;
+						_data->showbones = true;
+						_data->showaxis = false;
+						applyToCharacter = true;
+						break;
+	  case CmdCharacterShowAxis: 
+						_data->showgeometry = false;
+						_data->showcollisiongeometry = false;
+						_data->showbones = false;
+						_data->showaxis = true;
+						applyToCharacter = true;
+						break;
     }
+	
+	if (applyToCharacter)
+	{
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		srHashMap<SbmCharacter>& character_map = mcu.character_map;
+		character_map.reset();
+		SbmCharacter* character = character_map.next();
+		while ( character )
+		{	
+			// set the visibility parameters of the scene
+			character->scene_p->set_visibility(_data->showbones,_data->showgeometry, _data->showcollisiongeometry, _data->showaxis);
+			character = character_map.next();
+		}
+						
+	}
 
    render ();
  }
@@ -399,6 +465,10 @@ bool FltkViewer::menu_cmd_activated ( MenuCmd c )
       case CmdBoundingBox : return _data->boundingbox? true:false;
       case CmdStatistics  : return _data->statistics? true:false;
       case CmdSpinAnim    : return _data->allowspinanim? true:false;
+	  case CmdCharacterShowGeometry : return _data->showgeometry? true:false;
+	  case CmdCharacterShowCollisionGeometry : return _data->showcollisiongeometry? true:false;
+	  case CmdCharacterShowBones : return _data->showbones? true:false;
+	  case CmdCharacterShowAxis : return _data->showaxis? true:false;
       default : return false;
     }
  }
