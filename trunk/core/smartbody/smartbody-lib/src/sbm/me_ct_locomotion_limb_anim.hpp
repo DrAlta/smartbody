@@ -25,6 +25,7 @@
 
 #include "me_ct_locomotion_timing_space.hpp"
 #include "me_ct_locomotion_anim_global_info.hpp"
+#include "me_ct_locomotion_func.hpp"
 #include <SK/sk_motion.h>
 
 #pragma once
@@ -53,6 +54,9 @@ public:
 
 	SrArray<SrVec*>		displacement_list;
 	SrArray<SrQuat>		quat_buffer;
+
+	SrArray<SrQuat>		nonlimb_quat_buffer;
+
 	SrVec				local_direction;
 	float				local_speed; //local walking speed of the limb.
 	float				displacement;
@@ -91,7 +95,7 @@ public:
 
 	SrArray<SrQuat>*		get_buffer();
 
-	int						iterate_set(SkJoint* base, int index, SrArray<SrQuat>* buff);
+	//int						iterate_set(SkJoint* base, int index, SrArray<SrQuat>* buff);
 
 	void					get_displacement(float start_frame, float end_frame);
 
@@ -103,7 +107,6 @@ public:
 
 };
 
-SrArray<SrQuat>*	get_blended_quat_buffer(SrArray<SrQuat>* dest, SrArray<SrQuat>* quat_buffer1, SrArray<SrQuat>* quat_buffer2, float weight);
 void				clear_buffer(SrArray<SrQuat*>* dest);
 void				get_blended_anim(MeCtLocomotionLimbAnim* dest, MeCtLocomotionLimbAnim* anim1, MeCtLocomotionLimbAnim* anim2, float ratio, float stride);
 #endif // ME_LOCOMOTION_LIMB_ANIM_HPP

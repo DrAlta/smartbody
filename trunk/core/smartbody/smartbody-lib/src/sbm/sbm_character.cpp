@@ -192,6 +192,9 @@ int SbmCharacter::init_locomotion_analyzer(const char* skel_file, mcuCBHandle *m
 
 	locomotion_ct->init_skeleton(standing_skeleton, walking_skeleton);
 	locomotion_ct_analysis->set_ct(locomotion_ct);
+
+	locomotion_ct->add_locomotion_anim(walking1_p);
+	locomotion_ct->add_locomotion_anim(walking2_p);
 	
 	locomotion_ct_analysis->init(standing_p, mcu_p->me_paths);
 	locomotion_ct_analysis->add_locomotion(walking1_p);

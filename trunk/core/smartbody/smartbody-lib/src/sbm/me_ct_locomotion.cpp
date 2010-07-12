@@ -33,9 +33,12 @@ const char* MeCtLocomotion::TYPE = "MeCtLocomotion";
 /** Constructor */
 MeCtLocomotion::MeCtLocomotion() {
 	is_valid = false;
-	joint_num = 0;
+	limb_joint_num = 0;
+	nonlimb_joint_num = 0;
 	last_time = std::numeric_limits<float>::quiet_NaN();
-	bi_joint_quats.capacity(0);
+	limb_joint_index.capacity(0);
+	nonlimb_joint_index.capacity(0);
+	nonlimb_joint_quats.capacity(0);
 	last_time = 0.0f;
 	last_t = -1.0f;
 	ratio = 0.0f;
@@ -46,6 +49,9 @@ MeCtLocomotion::MeCtLocomotion() {
 	initialized = false;
 	ik_enabled = false;
 	enabled = false;
+	joints_indexed = false;
+	base_name = NULL;
+	locomotion_anims.capacity(0);
 }
 
 /** Destructor */
@@ -64,44 +70,108 @@ void MeCtLocomotion::init_limbs()
 	}
 }
 
+// Look up the context indices, and check to make sure it isn't -1
+/*#define LOOKUP_BUFFER_INDEX( var_name, index ) \
+	var_name = _context->toBufferIndex( _toContextCh[ ( index ) ] );  \
+	is_valid &= ( var_name != -1 );*/
+
+int MeCtLocomotion::LOOKUP_BUFFER_INDEX(int var_name, int index )
+{
+	var_name = _context->toBufferIndex( _toContextCh[ ( index ) ] );
+	is_valid &= ( var_name != -1 );
+	return var_name;
+}
+
 // Implements MeController::controller_channels().
 SkChannelArray& MeCtLocomotion::controller_channels() {
-	if( request_channels.size() == 0 ) {
+	if( request_channels.size() == 0 ) 
+	{
 		// Initialize Requested Channels                                                           // Indices
 		request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::XPos );  // #0
 		request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::YPos );  //  1
 		request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::ZPos );  //  2
 		request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::Quat );  //  3
 
-		//request_channels.add( SkJointName("base"), SkChannel::XPos); //4
-		//request_channels.add( SkJointName("base"), SkChannel::YPos); //5
-		//request_channels.add( SkJointName("base"), SkChannel::ZPos); //6
-		//request_channels.add( SkJointName("base"), SkChannel::Quat); //7
-
 		joint_channel_start_ind = 4;
 		joint_channel_start_ind += navigator.controller_channels(&request_channels);
 
-		//init_limbs();
-		joint_num = 0;
+		limb_joint_num = 0;
 		for(int i = 0; i < limb_list.size(); ++i)
 		{
 			MeCtLocomotionLimb* limb = limb_list.get(i);
 			SkJoint* base = standing_skeleton->search_joint(limb->get_limb_base_name());
-			joint_num += iterate_children(base); // starting from joint_channel_start_ind
+			limb_joint_num += iterate_limb_joints(base); // starting from joint_channel_start_ind
 		}
-	}
+		limb_joint_index.capacity(limb_joint_num);
+		limb_joint_index.size(limb_joint_num);
 
+		SkJoint* base = standing_skeleton->search_joint(base_name);
+		nonlimb_joint_num = iterate_nonlimb_joints(base, 0);
+		nonlimb_joint_quats.capacity(nonlimb_joint_num);
+		nonlimb_joint_quats.size(nonlimb_joint_num);
+		nonlimb_joint_index.capacity(nonlimb_joint_num);
+		nonlimb_joint_index.size(nonlimb_joint_num);
+
+		t_joint_quats1.capacity(nonlimb_joint_num);
+		t_joint_quats2.capacity(nonlimb_joint_num);
+		t_joint_quats1.size(nonlimb_joint_num);
+		t_joint_quats2.size(nonlimb_joint_num);
+		joint_quats1.capacity(nonlimb_joint_num);
+		joint_quats2.capacity(nonlimb_joint_num);
+		joint_quats1.size(nonlimb_joint_num);
+		joint_quats2.size(nonlimb_joint_num);
+	}
 	return request_channels;
 }
 
-int MeCtLocomotion::iterate_children(SkJoint* base)
+int MeCtLocomotion::iterate_nonlimb_joints(SkJoint* base, int depth)
+{
+	//if(request_channels.size() >= 90-10-14) return 0;
+	const char* name = base->name().get_string();
+	int i = 0;
+	// check if current joint is the base of a limb
+	for(i = 0; i < limb_list.size(); ++i)
+	{
+		MeCtLocomotionLimb* limb = limb_list.get(i);
+		if(strcmp(name, limb->get_limb_base_name())==0 ) 
+			return 0;
+	}
+	int sum = 0;
+	//if(strcmp(name, "base") != 0) 
+	{
+		if(base->quat()->active() == true)
+		{
+			if(strcmp(name, "r_wrist") == 0)
+				int u = 0;
+			request_channels.add( SkJointName(name), SkChannel::Quat );
+			printf("[%s] %d\n", name, request_channels.size()-1);
+			sum = 1;
+		}
+		else
+		{
+			//printf("\nHELL       '%s' %d", name, request_channels.size()-1);
+		}
+	}
+	for(i = 0; i < base->num_children(); ++i)
+	{
+		//printf("%d", depth);
+		for(int j = 0; j < depth; ++j)
+		{
+			printf(" ");
+		}
+		sum += iterate_nonlimb_joints(base->child(i), depth+1);
+	}
+	return sum;
+}
+
+int MeCtLocomotion::iterate_limb_joints(SkJoint* base)
 {
 	const char* name = base->name().get_string();
 	request_channels.add( SkJointName(name), SkChannel::Quat );
 	int sum = 1;
 	for(int i = 0; i < base->num_children(); ++i)
 	{
-		sum += iterate_children(base->child(i));
+		sum += iterate_limb_joints(base->child(i));
 	}
 	return sum;
 }
@@ -112,19 +182,24 @@ void MeCtLocomotion::context_updated() {
 		is_valid = false;
 }
 
-// Look up the context indices, and check to make sure it isn't -1
-#define LOOKUP_BUFFER_INDEX( var_name, index ) \
-	var_name = _context->toBufferIndex( _toContextCh[ ( index ) ] );  \
-	is_valid &= ( var_name != -1 );
-
 void MeCtLocomotion::controller_map_updated() 
 {
-	int index = 0;
-	is_valid = navigator.controller_map_updated(_context, &_toContextCh);
-	for(int i = 0; i < joint_num; ++i)
+	if(!joints_indexed)
 	{
-		LOOKUP_BUFFER_INDEX( index,  i+joint_channel_start_ind);
-		bi_joint_quats.push() = index;
+		int index = 0;
+		is_valid = navigator.controller_map_updated(_context, &_toContextCh);
+		for(int i = 0; i < limb_joint_num; ++i)
+		{
+			index = LOOKUP_BUFFER_INDEX( index,  i+joint_channel_start_ind);
+			limb_joint_index.set(i, index);
+		}
+
+		for(int i = limb_joint_num; i < nonlimb_joint_num + limb_joint_num; ++i)
+		{
+			index = LOOKUP_BUFFER_INDEX( index,  i+joint_channel_start_ind);
+			nonlimb_joint_index.set(i-limb_joint_num, index);
+		}
+		joints_indexed = true;
 	}
 }
 
@@ -191,14 +266,15 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 
 	int index = 0;
 	SrQuat quat;
-	for(int i = 0; i < joint_num;)
+
+	for(int i = 0; i < limb_joint_num;)
 	{
 		for(int j = 0; j < limb_list.size(); ++j)
 		{
 			SrArray<SrQuat>* quat_buffer = &(limb_list.get(j)->quat_buffer);
 			for(int k = 0; k < quat_buffer->size(); ++k)
 			{
-				index = bi_joint_quats.get(i);
+				index = limb_joint_index.get(i);
 				quat = quat_buffer->get(k);
 				if(k != quat_buffer->size()-1)
 				{
@@ -210,6 +286,16 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 				++i;
 			}
 		}
+	}
+
+	for(int i = 0; i < nonlimb_joint_num; ++i)
+	{
+		index = nonlimb_joint_index.get(i);
+		quat = nonlimb_joint_quats.get(i);
+		buffer[index+0] = (float)quat.w;
+		buffer[index+1] = (float)quat.x;
+		buffer[index+2] = (float)quat.y;
+		buffer[index+3] = (float)quat.z;
 	}
 	
 	last_t = (float)time;
@@ -249,6 +335,13 @@ void MeCtLocomotion::init_skeleton(SkSkeleton* standing, SkSkeleton* walking)
 const char* MeCtLocomotion::controller_type( void )	const {
 
 	return TYPE;
+}
+
+void MeCtLocomotion::set_base_name(char* name)
+{
+	if(base_name != NULL) free(base_name);
+	base_name = (char*)malloc(sizeof(char)*(strlen(name)+1));
+	strcpy(base_name, name);
 }
 
 void MeCtLocomotion::set_skeleton(SkSkeleton* skeleton)
@@ -377,6 +470,10 @@ void MeCtLocomotion::update(float inc_frame)
 		limb_list.get(i)->blend_standing(limb_list.get(i)->walking_list.get(0), navigator.standing_factor);
 		limb_list.get(i)->manipulate_turning();
 	}
+
+	get_frame(locomotion_anims.get(0), walking_skeleton, anim1->get_timing_space()->get_virtual_frame(limb_list.get(1-dominant_limb)->space_time), base_name, &joint_quats1, &t_joint_quats1, &t_joint_quats2);
+	get_frame(locomotion_anims.get(1), walking_skeleton, anim2->get_timing_space()->get_virtual_frame(limb_list.get(1-dominant_limb)->space_time), base_name, &joint_quats2, &t_joint_quats1, &t_joint_quats2);
+	get_blended_quat_buffer(&nonlimb_joint_quats, &joint_quats1, &joint_quats2, dom_ratio);
 
 	//recompute the dominant limb
 	get_dominant_limb();
@@ -573,5 +670,10 @@ void MeCtLocomotion::update_pos()
 MeCtLocomotionNavigator* MeCtLocomotion::get_navigator()
 {
 	return &navigator;
+}
+
+void MeCtLocomotion::add_locomotion_anim(SkMotion* anim)
+{
+	locomotion_anims.push() = anim;
 }
 

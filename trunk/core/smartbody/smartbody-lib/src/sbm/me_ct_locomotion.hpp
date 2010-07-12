@@ -57,38 +57,35 @@ protected:
 
 	SrArray<MeCtLocomotionAnimGlobalInfo*> anim_global_info;
 
-	int dominant_limb;
+	SrArray<SkMotion*> locomotion_anims;
 
-	//float facing_angle;
-	//float pre_facing_angle;
-	//float heading_angle;
+	int dominant_limb;
 
 	SrMat mat;
 
-	//float turning_speed; // circles per second.
-	//float turning_speed_limit; // temp
-
 	bool is_valid;  // All necessary channels are present
-
-	// Buffer indices ("bi_") to the requested channels
-	//int bi_world_x, bi_world_y, bi_world_z, bi_world_rot; // World offset position and rotation
-	//int bi_loco_vel_x, bi_loco_vel_y, bi_loco_vel_z;      // Locomotion velocity
-	//int bi_loco_rot_y;                                    // Rotational velocity around Y
-
 	
 	SrQuat base_quat;
 
-	SrArray<int> bi_joint_quats;
-	int joint_num;
+	bool joints_indexed;
+	SrArray<int> nonlimb_joint_index;
+	int nonlimb_joint_num;
+	SrArray<SrQuat> nonlimb_joint_quats;
+
+	//temp
+	SrArray<SrQuat> t_joint_quats1;
+	SrArray<SrQuat> t_joint_quats2;
+	SrArray<SrQuat> joint_quats1;
+	SrArray<SrQuat> joint_quats2;
+
+	SrArray<int> limb_joint_index;
+	int limb_joint_num;
 
 	float last_time;
 	float last_t;
 	float curr_t;
 
 	char* base_name;
-
-	//SrVec world_pos;
-	//SrVec loco_vel;
 
 	bool dis_initialized;
 	bool initialized;
@@ -128,7 +125,9 @@ public:
 	 */
 	SkChannelArray& controller_channels();
 
-	int iterate_children(SkJoint* base);
+	int iterate_limb_joints(SkJoint* base);
+
+	int iterate_nonlimb_joints(SkJoint* base, int depth);
 
 	/**
 	 *  Implements MeController::controller_duration().  -1 means indefinite.
@@ -204,6 +203,12 @@ public:
 	bool is_initialized();
 
 	bool is_enabled();
+
+	void set_base_name(char* name);
+
+	void add_locomotion_anim(SkMotion* anim);
+
+	int LOOKUP_BUFFER_INDEX(int var_name, int index );
 };
 
 #endif // ME_CT_LOCOMOTION_HPP
