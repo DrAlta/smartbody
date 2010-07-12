@@ -142,13 +142,6 @@ void MeCtLocomotionLimbAnim::init_quat_buffers(int num)
 	quat_buffer_key_frame1.size(num);
 	quat_buffer_key_frame2.capacity(num);
 	quat_buffer_key_frame2.size(num);
-	/*SrQuat q(1,0,0,0);
-	for(int i = 0; i < num; ++i)
-	{
-		quat_buffer.push(q);
-		quat_buffer_key_frame1.push(q);
-		quat_buffer_key_frame2.push(q);
-	}*/
 }
 
 // pass a float index in 
@@ -158,9 +151,9 @@ void MeCtLocomotionLimbAnim::get_frame(float frame, char* limb_base)
 	walking->connect(walking_skeleton);
 	SkJoint* base = walking_skeleton->search_joint(limb_base);
 	walking->apply_frame((int)frame);
-	iterate_set(base, 0, &quat_buffer_key_frame1);
+	iterate_set(base, 0, 0, &quat_buffer_key_frame1);
 	walking->apply_frame((int)frame+1);
-	iterate_set(base, 0, &quat_buffer_key_frame2);
+	iterate_set(base, 0, 0, &quat_buffer_key_frame2);
 	SrQuat q;
 	for(int i = 0; i < quat_buffer.size(); ++i)
 	{
@@ -169,7 +162,7 @@ void MeCtLocomotionLimbAnim::get_frame(float frame, char* limb_base)
 	}
 }
 
-int MeCtLocomotionLimbAnim::iterate_set(SkJoint* base, int index, SrArray<SrQuat>* buff)
+/*int MeCtLocomotionLimbAnim::iterate_set(SkJoint* base, int index, SrArray<SrQuat>* buff)
 {
 	SrQuat q = base->quat()->value();
 	buff->set(index, q);
@@ -178,25 +171,11 @@ int MeCtLocomotionLimbAnim::iterate_set(SkJoint* base, int index, SrArray<SrQuat
 		index = iterate_set(base->child(i), index+1, buff);
 	}
 	return index;
-}
+}*/
 
 SrArray<SrQuat>* MeCtLocomotionLimbAnim::get_buffer()
 {
 	return &quat_buffer;
-}
-
-SrArray<SrQuat>* get_blended_quat_buffer(SrArray<SrQuat>* dest, SrArray<SrQuat>* quat_buffer1, SrArray<SrQuat>* quat_buffer2, float weight)
-{
-	if(quat_buffer1->size() != quat_buffer2->size()) return NULL;
-	if(dest == NULL)
-	{
-		printf("Error. buffer size = 0");
-	}
-	for(int i = 0; i < dest->size(); ++i)
-	{
-		dest->set(i, slerp(quat_buffer1->get(i), quat_buffer2->get(i), 1-weight));
-	}
-	return dest;
 }
 
 void get_blended_anim(MeCtLocomotionLimbAnim* dest, MeCtLocomotionLimbAnim* anim1, MeCtLocomotionLimbAnim* anim2, float weight, float stride)

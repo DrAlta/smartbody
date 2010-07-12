@@ -22,7 +22,7 @@
 
 #include "me_ct_locomotion_func.hpp"
 
-#include "sbm_character.hpp"
+//#include "sbm_character.hpp"
 #include "gwiz_math.h"
 #include "limits.h"
 
@@ -57,3 +57,44 @@ SrMat get_lmat(SkJoint* joint, SrQuat* quat)
    _lmat[14] = joint->offset().z + joint->pos()->value(2);
    return _lmat;
  }
+
+SrArray<SrQuat>* get_blended_quat_buffer(SrArray<SrQuat>* dest, SrArray<SrQuat>* quat_buffer1, SrArray<SrQuat>* quat_buffer2, float weight)
+{
+	if(quat_buffer1->size() != quat_buffer2->size()) return NULL;
+	if(dest == NULL)
+	{
+		printf("Error. buffer size = 0");
+	}
+	for(int i = 0; i < dest->size(); ++i)
+	{
+		dest->set(i, slerp(quat_buffer1->get(i), quat_buffer2->get(i), 1-weight));
+	}
+	return dest;
+}
+
+int iterate_set(SkJoint* base, int index, int depth, SrArray<SrQuat>* buff)
+{
+	if(index >= depth && depth > 0) return index;
+	SrQuat q = base->quat()->value();
+	buff->set(index, q);
+	for(int i = 0; i < base->num_children(); ++i)
+	{
+		index = iterate_set(base->child(i), index+1, depth, buff);
+	}
+	return index;
+}
+
+void get_frame(SkMotion* walking, SkSkeleton* walking_skeleton, float frame, char* limb_base, SrArray<SrQuat>* quat_buffer, SrArray<SrQuat>* quat_buffer1, SrArray<SrQuat>* quat_buffer2)
+{
+	SkJoint* base = walking_skeleton->search_joint(limb_base);
+	walking->apply_frame((int)frame);
+	iterate_set(base, 0, quat_buffer->size(), quat_buffer1);
+	walking->apply_frame((int)frame+1);
+	iterate_set(base, 0, quat_buffer->size(), quat_buffer2);
+	SrQuat q;
+	for(int i = 0; i < quat_buffer->size(); ++i)
+	{
+		q = slerp(quat_buffer1->get(i), quat_buffer2->get(i), frame-(int)frame);
+		quat_buffer->set(i,q);
+	}
+}

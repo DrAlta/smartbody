@@ -67,6 +67,8 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 	}
 	this->motion_standing = standing;
 
+	get_ct()->set_base_name("base");
+
 	MeCtLocomotionLimb* limb = new MeCtLocomotionLimb();
 	limb->init_skeleton(standing_skeleton, walking_skeleton);
 	get_ct()->get_limb_list()->push() = limb;
