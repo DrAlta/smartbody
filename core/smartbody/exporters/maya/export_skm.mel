@@ -365,7 +365,7 @@ proc skmCheckAndWriteKeyQuat( int $fileid, string $names[], int $frame, int $fla
 }
 
 // $flag here indicates whether to zero out the channel, used for partial animation export
-proc skmWriteKeyData( int $fileid, int $frame, string $jointName, int $jid, int $partialFlag )
+proc skmWriteKeyData( int $fileid, int $frame, string $jointName, int $jid, int $partialExportFlag )
 {
    global string $g_names[];
    global int $g_namesWidth;
@@ -395,7 +395,7 @@ proc skmWriteKeyData( int $fileid, int $frame, string $jointName, int $jid, int 
    // Note: "keyframe -q -name  base;" returns:
    //       "base_translateZ base_translateX base_translateY base_rotateX base_rotateY base_rotateZ"
  
-   if( $partialFlag == 0 )  $flag = 0;
+   if( $partialExportFlag == 0 )  $flag = 0;
    else                     $flag = 1;
    if ( ( $jid == 0 ) || ( $isFacial ) ) // send translation only for root
    {
@@ -481,9 +481,9 @@ proc skmWriteSkm( int $startFrame, int $endFrame, string $joints[], int $fileid,
 
 //$startTime1 = `timerX`;
 
-   string $pjname = `textFieldGrp -q -text skmPartialExportJointField`;
-   string $pjchildren[] = `ls -dag $pjname`;
-   int $pjchildrennum = size( $pjchildren );
+   string $peRootName = `textFieldGrp -q -text skmPartialExportRootField`;
+   string $peRootChildren[] = `ls -dag $peRootName`;
+   int $peRootChildrenNum = size( $peRootChildren );
 
    for ( $f = $startFrame; $f <= $endFrame; $f++ )
    {
@@ -491,15 +491,15 @@ proc skmWriteSkm( int $startFrame, int $endFrame, string $joints[], int $fileid,
 
       fprint $fileid ( "kt " + $kt + " fr" );
     
-      int $partialFlag = 0;
-      int $partialCount = 0;
+      int $partialExportFlag = 0;
+      int $partialExportCount = 0;
       for ( $i = 0; $i < $curJointsId; $i++ )
       {
-         if( $pjname == $joints[ $i ] )
-            $partialFlag = 1;
-         if( $partialFlag != 0 )  $partialCount ++;
-         skmWriteKeyData( $fileid, $f, $joints[ $i ], $i , $partialFlag);
-         if( $partialCount >= $pjchildrennum )   $partialFlag = 0;
+         if( $peRootName == $joints[ $i ] )
+            $partialExportFlag = 1;
+         if( $partialExportFlag != 0 )  $partialExportCount ++;
+         skmWriteKeyData( $fileid, $f, $joints[ $i ], $i , $partialExportFlag);
+         if( $partialExportCount >= $peRootChildrenNum )   $partialExportFlag = 0;
       }
 
       $kt += $ktstep;
@@ -853,8 +853,8 @@ global proc updateAnimUI()
    string $outputFile = `getAttr( $AnimDef + ".outputFile" )`;
    skmFileCb( $outputFile, "" );
    
-   string $pjname = `getAttr( $AnimDef + ".peRoot" )`;
-   textFieldGrp -e -text $pjname skmPartialExportJointField;
+   string $peRootName = `getAttr( $AnimDef + ".peRoot" )`;
+   textFieldGrp -e -text $peRootName skmPartialExportRootField;
 }
 
 
@@ -1003,31 +1003,31 @@ global proc updateSkeletonRoot()
 // Update the joint that you want to export from
 global proc updatePartialExportJoint()
 {
-   string $pjname = `textFieldGrp -q -text skmPartialExportJointField`;
+   string $peRootName = `textFieldGrp -q -text skmPartialExportRootField`;
    string $selAnim[] = `textScrollList -q -si "scrollListAnim" `;
    string $AnimDef = ( "AnimDef_" + $selAnim[ 0 ] );     
    string $skeletonRoot = `getAttr( $AnimDef + ".skeletonRoot" )`;
    
    select -cl;
-   int $flag = `joint -exists $pjname`;
+   int $flag = `joint -exists $peRootName`;
    if( $flag == 0 )
    {
       warning -showLineNumber true "partial not exist, please re-enter";
-      textFieldGrp -e -text $skeletonRoot skmPartialExportJointField;   
+      textFieldGrp -e -text $skeletonRoot skmPartialExportRootField;   
    }
    $flag = 0;
    string $children[] = `ls -dag $skeletonRoot`; 
    int $i;
    for( $i = 0 ; $i < size($children); $i = $i + 1)
-      if( $children[ $i ] == $pjname ) {$flag = 1; break;} 
+      if( $children[ $i ] == $peRootName ) {$flag = 1; break;} 
    if($flag == 0) 
    {
       warning -showLineNumber true "partial joint is not under root hierarchy!";
-      textFieldGrp -e -text $skeletonRoot skmPartialExportJointField;   
+      textFieldGrp -e -text $skeletonRoot skmPartialExportRootField;   
    }
    
-   string $pjname = `textFieldGrp -q -text skmPartialExportJointField`;
-   setAttr -type "string" ( $AnimDef + ".peRoot" ) $pjname ;
+   string $peRootName = `textFieldGrp -q -text skmPartialExportRootField`;
+   setAttr -type "string" ( $AnimDef + ".peRoot" ) $peRootName ;
 }
 
 // outputFile Attribute now is composed of directory name and file name
@@ -1116,8 +1116,8 @@ global proc skmExportButton()
 
             if( $partialExportToggle == 0 )
             {
-               string $pjname = `textFieldGrp -q -text skmPartialExportJointField`;
-               select -r $pjname;            
+               string $peRootName = `textFieldGrp -q -text skmPartialExportRootField`;
+               select -r $peRootName;            
             }
             else
                select -r $root ;   // <-Why select this?
@@ -1178,7 +1178,7 @@ global proc skmExportGUI()
       columnLayout -adj true;
          intSliderGrp -label "Frames per Seconds:" -adj 3 -cw 2 50 -cat 1 "right" 5 -field true -fmn -10000 -fmx 10000 -changeCommand fpsUpdate -min 1 -value 30 sliderFps; //<- was "skmFps"
          textFieldGrp -label "Skeleton Root Joint:" -adj 2 -cat 1 "right" 5 -changeCommand updateSkeletonRoot skmRootField;
-         textFieldGrp -label "Partial Exporting, From Joint:" -adj 2 -cat 1 "right" 5 -changeCommand updatePartialExportJoint skmPartialExportJointField;
+         textFieldGrp -label "Partial Exporting, From Joint:" -adj 2 -cat 1 "right" 5 -changeCommand updatePartialExportJoint skmPartialExportRootField;
          textFieldGrp -label "Output Pathname:" -adj 2 -cat 1 "right" 5 -changeCommand updateOutput skmOutputPath;
          textFieldGrp -label "Output Filename:" -adj 2 -cat 1 "right" 5 -changeCommand updateOutput skmOutputFile;
          columnLayout -adj true -rs 2 -co "both" 10;
