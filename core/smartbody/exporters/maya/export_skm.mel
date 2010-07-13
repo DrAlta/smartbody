@@ -622,7 +622,6 @@ global proc int skmFileCb( string $filename, string $fileType )
 {
    string $name = basename( $filename, "");
    string $dirname = dirname( $filename );
-   print ($dirname + "\n");
    textFieldGrp -e -text $name skmOutputFile;
    textFieldGrp -e -text $dirname skmOutputPath;
    updateOutput;
@@ -764,6 +763,9 @@ global proc skmAddAnimDef()
       addAttr -ln "outputFile" -sn "outFile" -dt "string" ( "AnimDef_" + $newAnimName );
       setAttr -type "string" ( "AnimDef_" + $newAnimName + ".outputFile" ) ( $newAnimName + ".skm" );
 
+      addAttr -ln "partialExportRoot" -sn "peRoot" -dt "string" ( "AnimDef_" + $newAnimName );
+      setAttr -type "string" ( "AnimDef_" + $newAnimName + ".partialExportRoot" ) "base";
+
       textScrollList -edit -si $newAnimName scrollListAnim;
       updateAnimUI;
 
@@ -851,10 +853,8 @@ global proc updateAnimUI()
    string $outputFile = `getAttr( $AnimDef + ".outputFile" )`;
    skmFileCb( $outputFile, "" );
    
-   string $pjname = `textFieldGrp -q -text skmPartialExportJointField`;
-   if( $pjname == "" )
-      textFieldGrp -e -text $skeletonRoot skmPartialExportJointField;
-
+   string $pjname = `getAttr( $AnimDef + ".peRoot" )`;
+   textFieldGrp -e -text $pjname skmPartialExportJointField;
 }
 
 
@@ -1025,6 +1025,9 @@ global proc updatePartialExportJoint()
       warning -showLineNumber true "partial joint is not under root hierarchy!";
       textFieldGrp -e -text $skeletonRoot skmPartialExportJointField;   
    }
+   
+   string $pjname = `textFieldGrp -q -text skmPartialExportJointField`;
+   setAttr -type "string" ( $AnimDef + ".peRoot" ) $pjname ;
 }
 
 // outputFile Attribute now is composed of directory name and file name
@@ -1047,7 +1050,6 @@ global proc updateOutput()
       warning -showLineNumber true "Please check the suffix of output file, should be .skm!";
    $outputFile = $outputFilePath + "/" + $outputFileName;
    setAttr -type "string" ( $AnimDef + ".outputFile" ) $outputFile ;
-   print "~~~~~~~~~~~~~~~~~";
 }
 
 
@@ -1209,8 +1211,15 @@ global proc skmExportGUI()
    {
       if ( `substring $obj 1 7` == "AnimDef" )
       {
+         print $obj;
          $animDefsExist = 1;
-         print "Found existing animation definitions. \n";
+         print "Found existing animation definitions. \n";      
+         if(!`attributeExists "partialExportRoot" $obj`)
+         {
+            addAttr -ln "partialExportRoot" -sn "peRoot" -dt "string" $obj;
+            string $rootname = `getAttr ( $obj + ".skeletonRoot" )`;
+            setAttr -type "string" ( $obj + ".partialExportRoot" ) $rootname ;
+         }
       }
    }
 
@@ -1250,9 +1259,12 @@ global proc skmExportGUI()
 
       addAttr -ln "skeletonRoot" -sn "skRoot" -dt "string" ( "AnimDef_" + $newAnimName );
       setAttr -type "string" ( "AnimDef_" + $newAnimName + ".skeletonRoot" ) "base";
-
+      
       addAttr -ln "outputFile" -sn "outFile" -dt "string" ( "AnimDef_" + $newAnimName );
       setAttr -type "string" ( "AnimDef_" + $newAnimName + ".outputFile" ) ( $newAnimName + ".skm" );
+      
+      addAttr -ln "partialExportRoot" -sn "peRoot" -dt "string" ( "AnimDef_" + $newAnimName );
+      setAttr -type "string" ( "AnimDef_" + $newAnimName + ".partialExportRoot" ) "base";
 
       textScrollList -edit -si $newAnimName scrollListAnim;
       updateAnimUI;
