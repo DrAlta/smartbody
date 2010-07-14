@@ -430,6 +430,47 @@ void SkMotion::change_channel_values ( int f1, int f2, int channel, float mfacto
     }
  }
 
+void SkMotion::registerAnimation()
+{
+	_registerOffset[0] = 0;
+	_registerOffset[1] = 0;
+	_registerOffset[2] = 0;
+	_registerOrientation.set(1, 0, 0, 0);
+
+	if (_frames.size() == 0)
+		return;
+
+	SkJointName jname("base");
+	// get the offset from the first frame
+	SkChannelArray& channels = this->channels();
+	int xIndex = channels.search(jname, SkChannel::XPos);
+	int yIndex = channels.search(jname, SkChannel::YPos);
+	int zIndex = channels.search(jname, SkChannel::ZPos);
+	
+	if (xIndex == -1 && yIndex == -1 && zIndex == -1)
+		return;
+
+	// subtract that offset from all the other animation clips
+	for (int f = 0; f < _frames.size(); f++)
+	{	
+		if (f == 0)
+		{
+			if (xIndex >= 0)
+				_registerOffset[0] = _frames[f].posture[xIndex];
+			if (yIndex >= 0)
+				_registerOffset[1] = _frames[f].posture[yIndex];
+			if (zIndex >= 0)
+				_registerOffset[2] = _frames[f].posture[zIndex];
+		}
+		if (xIndex >= 0)
+			_frames[f].posture[xIndex] -= _registerOffset[0];
+		if (yIndex >= 0)
+			_frames[f].posture[yIndex] -= _registerOffset[1];
+		if (zIndex >= 0)
+			_frames[f].posture[zIndex] -= _registerOffset[2];
+	}
+}
+
 /*
 // static:
 struct JT { SkJoint* j; char t[7]; float v[7]; };

@@ -163,6 +163,9 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 		fullin.filename( pathname.string().c_str() ); // copy filename for error messages
 		if( motion->load( fullin ) ) {
 
+			// register the motion
+			motion->registerAnimation();
+
 			char CurrentPath[_MAX_PATH];
 			_getcwd(CurrentPath, _MAX_PATH);
 			char *filename = new char[_MAX_PATH];

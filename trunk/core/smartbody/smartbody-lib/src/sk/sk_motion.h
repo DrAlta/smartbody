@@ -28,7 +28,6 @@
 
 # include <SR/sr_input.h>
 # include <SR/sr_shared_class.h>
-
 # include <SK/sk_channel_array.h>
 
 class SkPosture;
@@ -60,6 +59,8 @@ protected :
 	float _time_stroke_emphasis;
 	float _time_stroke_end;
 	float _time_relax;
+	SrVec _registerOffset;
+	SrQuat _registerOrientation;
 
 public :
 	/*! Constructor */
@@ -244,6 +245,13 @@ public :
 	{	_time_stroke_end = time_stroke_end; }
 	void time_relax(float time_relax )
 	{	_time_relax = time_relax; }
+
+	/*! Registers the animation by placing the world offset and orientation into 
+		the _registerOffset and _registerOrientation variables. These values will
+		then be removed from the animation playback.
+	*/
+	void registerAnimation();
+
 private : 
 	bool _load_bvh ( SrInput& in );
 };
