@@ -324,7 +324,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 			MeController* controller = ct_tree_p->controller(c);
 			if (controller == motion_sched_p)
 			{
-				ct_tree_p->add_controller( locomotion_ct, c + 1);
+				ct_tree_p->add_controller( locomotion_ct, c);
 				break;
 			}
 		}

@@ -138,7 +138,7 @@ void MeCtLocomotionSpeedAccelerator::update_acceleration(MeCtLocomotionLimb* lim
 	float length = timing_space->get_section_length(limb->space_time, 1.0f);
 	float time = length * frame_interval;
 	acceleration = (target_speed - curr_speed)/time;
-	if(acceleration > 0.0f)
+	if(acceleration >= 0.0f)
 	{
 		if(max_acceleration_pos > 0.0f && acceleration > max_acceleration_pos) acceleration = max_acceleration_pos;
 		if(min_acceleration_pos > 0.0f && acceleration < min_acceleration_pos) acceleration = min_acceleration_pos;

@@ -43,6 +43,7 @@ public:
 	SrVec base_offset;
 	SrQuat base_rot;
 	bool has_destination;
+	bool reached_destination;
 
 protected:
 	int bi_world_x, bi_world_y, bi_world_z, bi_world_rot; // World offset position and rotation
@@ -67,7 +68,7 @@ protected:
 	int curr_dest_index;
 	SrVec dis_to_dest;
 	SrVec dis_to_dest_local;
-	bool reached_destination;
+	//bool reached_destination;
 
 	SrVec local_vel;
 	SrVec global_vel;
