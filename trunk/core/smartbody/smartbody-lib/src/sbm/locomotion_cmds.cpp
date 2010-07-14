@@ -48,7 +48,7 @@ int locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	if (strafeIter != mcu_p->motion_map.end())
 		walking2_p = (*strafeIter).second;
 
-	std::map<std::string, SkMotion*>::iterator standIter = mcu_p->motion_map.find("HandsAtSide_Motex_Softened");
+	std::map<std::string, SkMotion*>::iterator standIter = mcu_p->motion_map.find("LHandOnHip_Motex");
 	if (standIter != mcu_p->motion_map.end())
 		standing_p = (*standIter).second;
 
