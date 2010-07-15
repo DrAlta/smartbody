@@ -371,7 +371,20 @@ std::string replacePausePunctuationsFromText(std::string text_string) {
         pos++;
 	  }
 
+	  pos = 0;
 	  while ( (pos = text_string.find(".", pos)) !=std:: string::npos ) {
+		  text_string.replace( pos, 1, "");
+        pos++;
+	  }
+
+	  pos = 0;
+	  while ( (pos = text_string.find("?", pos)) !=std:: string::npos ) {
+		  text_string.replace( pos, 1, "");
+        pos++;
+	  }
+
+	  pos = 0;
+	  while ( (pos = text_string.find("!", pos)) !=std:: string::npos ) {
 		  text_string.replace( pos, 1, "");
         pos++;
 	  }
