@@ -361,6 +361,24 @@ std::string removeXMLTagsAndNewLines( const std::string & txt , SpeechRequestMes
    return txtstream.str() + "</speech>";
 }
 
+//Aded by Apar Suri
+//Added to remove the , and . from the code so that the issue with the time is resolved. 
+//Apparently cerevoice API does not handle . and , properly in a sentence
+std::string replacePausePunctuationsFromText(std::string text_string) {
+	  std::string::size_type pos = 0;
+	  while ( (pos = text_string.find(",", pos)) !=std:: string::npos ) {
+		  text_string.replace( pos, 1, "");
+        pos++;
+	  }
+
+	  while ( (pos = text_string.find(".", pos)) !=std:: string::npos ) {
+		  text_string.replace( pos, 1, "");
+        pos++;
+	  }
+
+	  return text_string;
+}
+
 
 //returns true if file exists, else false
 bool fileExists( const char * fileName )
@@ -619,6 +637,7 @@ void cerevoice_tts::load_voice( char * voice_id )
 
    // Load voice and add to map, with the voice_id being the key
    voices[ voice_id ] = CPRC_load_voice( voice_file, lic_text, static_cast<int>( strlen( lic_text ) ), signature, static_cast<int>( strlen( signature ) ) );
+   //voices[ voice_id ] = CPRC_load_voicef( lic_file, voice_file );
  
    // Free license strings (aalocated in read_license)
    free( lic_text );
@@ -669,7 +688,13 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
 	  // Local variable to store message XML metadata
 	  SpeechRequestMessageData xmlMetaData;
       // Feed in input text, further data is to come
-      Normaliser_parse( norm_id, const_cast<char*>( removeXMLTagsAndNewLines( text, xmlMetaData ).c_str() ), 1 );
+	  //Added by Apar Suri
+	  //Replacing . and , with "" so because there seems to be a bug in CPRCPMOD_spurt_synth while synthesizing multiple spurts
+	  //Apparently a time of 0.0 and 0.1 seems to be added just after the , or .
+	  std::string text_string = removeXMLTagsAndNewLines( text, xmlMetaData);
+	  text_string = replacePausePunctuationsFromText(text_string);
+
+	  Normaliser_parse( norm_id, const_cast<char*>( text_string.c_str()) , 1 );
       //Normaliser_parse( norm_id, "", 1 );
 
       int numspts = Normaliser_get_num_spurts( norm_id );
@@ -787,8 +812,9 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
                            // but for now is constructed following the known NVBG protocol (markers around words)
 						   // HACK AVOIDED: Fixed to use XML metadata as extracted during parse
                            std::ostringstream ostr;
-                           i = num_words * 2;
-                           ostr << i;
+						   //changed by Apar Suri so that it does not coincide with the outer loop i
+                           int double_words = num_words * 2;
+                           ostr << double_words;
 						   std::string s = xmlMetaData.speechIdentifier + ":";
                            //std::string s = "sp1:T" + ostr.str();
 						   //fprintf(stderr, "%d/%d ",num_words * 2, xmlMetaData.tags.size()-1);
@@ -817,8 +843,8 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
                            rootElem->appendChild( markElement );
 
                            std::ostringstream ostr2;
-                           i = num_words * 2 + 1;
-                           ostr2 << i;
+                           double_words = num_words * 2 + 1;
+                           ostr2 << double_words;
 						   s = xmlMetaData.speechIdentifier + ":";
                            //s = "sp1:T" + ostr2.str();
 						   //fprintf(stderr, "%d/%d ",num_words * 2+1, xmlMetaData.tags.size()-1);
