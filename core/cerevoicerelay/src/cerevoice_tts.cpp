@@ -366,7 +366,16 @@ std::string removeXMLTagsAndNewLines( const std::string & txt , SpeechRequestMes
 //Apparently cerevoice API does not handle . and , properly in a sentence
 std::string replacePausePunctuationsFromText(std::string text_string) {
 	  std::string::size_type pos = 0;
-	  while ( (pos = text_string.find(",", pos)) !=std:: string::npos ) {
+
+	  for (std::string::size_type pos = 0; pos < text_string.length(); ++pos)
+	  {
+		  if (text_string.at(pos)==',' || text_string.at(pos)=='.' || text_string.at(pos)=='?' || text_string.at(pos)=='!')
+		  {
+			  text_string.replace(pos, 1, "");
+		  }
+	  }
+	  
+	 /* while ( (pos = text_string.find(",", pos)) !=std:: string::npos ) {
 		  text_string.replace( pos, 1, "");
         pos++;
 	  }
@@ -387,7 +396,7 @@ std::string replacePausePunctuationsFromText(std::string text_string) {
 	  while ( (pos = text_string.find("!", pos)) !=std:: string::npos ) {
 		  text_string.replace( pos, 1, "");
         pos++;
-	  }
+	  }*/
 
 	  return text_string;
 }
