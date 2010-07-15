@@ -26,6 +26,7 @@
 # include <math.h>
 # include <stdlib.h>
 # include <string.h>
+#include <iostream>
 
 # include <SK/sk_motion.h>
 # include <SK/sk_posture.h>
@@ -461,6 +462,9 @@ void SkMotion::registerAnimation()
 				_registerOffset[1] = _frames[f].posture[yIndex];
 			if (zIndex >= 0)
 				_registerOffset[2] = _frames[f].posture[zIndex];
+
+			if (_registerOffset[0] != 0.0 || _registerOffset[1] != 0.0 || _registerOffset[2] != 0.0)
+				std::cout << "Animation " << this->name() << " registered with offset (" << _registerOffset[0] << ", " << _registerOffset[1] << ", " << _registerOffset[2] << ")" << std::endl; 
 		}
 		if (xIndex >= 0)
 			_frames[f].posture[xIndex] -= _registerOffset[0];
