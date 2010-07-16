@@ -1,5 +1,6 @@
 ### Assumes current directory is: core/smartbody/sbm/bin
-### Simple Gaze Test Seq Script
+### Simple Template Seq Script
+### Assumes this seq script is put under ../smartbody/test_suite directory
 
 # ---- Loading data/sbm-common assets
 0	path seq ../../../../data/sbm-common/scripts
@@ -39,20 +40,3 @@
 1	set pawn camera world_offset x 0 y 166 z 185
 
 1	set test character doctor
-
-# ---- Testing gaze
-2 ctrl G1 gaze
-2 gaze G1 limit back 15 30 0
-2 gaze G1 limit chest 6 15 0
-2 gaze G1 limit neck 25 60 0
-2 gaze G1 limit head 20 45 0
-2 gaze G1 target point 0 170 100
-2.1 char doctor ctrl G1 begin
-4 gaze G1 target point 100 200 -40
-5 camera eye    160 150 0
-5 snapshot 600 600
-6 gaze G1 target point 100 170 -40
-7 snapshot 600 600
-8 gaze G1 target point 100 100 -40
-9 snapshot 600 600
-10 quit
