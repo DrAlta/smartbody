@@ -669,7 +669,11 @@ void BehaviorWindow::processMotionRequest(BML::MotionRequest* motionRequest, nle
 	block->setName(behavior->unique_id);
 	block->setShowName(false);
 	int counter = 0;
-	BML::BehaviorSyncPoints syncPoints = behavior->behav_syncs;
+
+	BML::BehaviorSyncPoints syncPoints = motionRequest->behav_syncs;
+
+	double syncTimes[7] = {0, 0, 0, 0, 0, 0, 0};
+	double phaseTimes[6] = {0, 0, 0, 0, 0, 0};
 
 	const std::map<std::wstring, std::wstring>& behaviorToNameMap = syncPoints.getBehaviorToSyncNames();
 	// start
@@ -680,17 +684,19 @@ void BehaviorWindow::processMotionRequest(BML::MotionRequest* motionRequest, nle
 		RequestMark* spMark = new RequestMark();
 		spMark->setName(spMarkName);
 		if (constantSpeedScheduler)
-			spMark->setStartTime(triggerTime + constantSpeedScheduler->startTime / constantSpeedScheduler->speed);
+			spMark->setStartTime(syncPointIter->time());
 		spMark->setEndTime(spMark->getStartTime());
 		block->addMark(spMark);
-
+		syncTimes[0] = syncPointIter->time();
+/*
 		const std::map<std::wstring, std::wstring>::const_iterator iter = behaviorToNameMap.find(spName);
 		if (iter != behaviorToNameMap.end())		
 		{
-			std::string name((*iter).second.begin(), (*iter).second.end());
+			std::string name((*iter).first.begin(), (*iter).first.end());
 			untimedMarks.push_back( std::pair<RequestMark*, std::string>(spMark, name));
 		}
-		
+		*/
+		block->setStartTime(spMark->getStartTime());
 	}
 	// ready
 	{
@@ -700,16 +706,19 @@ void BehaviorWindow::processMotionRequest(BML::MotionRequest* motionRequest, nle
 		RequestMark* spMark = new RequestMark();
 		spMark->setName(spMarkName);
 		if (constantSpeedScheduler)
-			spMark->setStartTime(triggerTime + constantSpeedScheduler->readyTime / constantSpeedScheduler->speed);
+				spMark->setStartTime(syncPointIter->time());
 		spMark->setEndTime(spMark->getStartTime());
 		block->addMark(spMark);
+		syncTimes[1] = syncPointIter->time();
 
+		/*
 		const std::map<std::wstring, std::wstring>::const_iterator iter = behaviorToNameMap.find(spName);
 		if (iter != behaviorToNameMap.end())		
 		{
-			std::string name((*iter).second.begin(), (*iter).second.end());
+			std::string name((*iter).first.begin(), (*iter).first.end());
 			untimedMarks.push_back( std::pair<RequestMark*, std::string>(spMark, name));
 		}
+		*/
 			
 	}
 	// stroke start
@@ -720,16 +729,19 @@ void BehaviorWindow::processMotionRequest(BML::MotionRequest* motionRequest, nle
 		RequestMark* spMark = new RequestMark();
 		spMark->setName(spMarkName);
 		if (constantSpeedScheduler)
-			spMark->setStartTime(triggerTime + constantSpeedScheduler->strokeTime / constantSpeedScheduler->speed);
+			spMark->setStartTime(syncPointIter->time());
 		spMark->setEndTime(spMark->getStartTime());
 		block->addMark(spMark);
+		syncTimes[2] = syncPointIter->time();
 
+		/*
 		const std::map<std::wstring, std::wstring>::const_iterator iter = behaviorToNameMap.find(spName);
 		if (iter != behaviorToNameMap.end())		
 		{
-			std::string name((*iter).second.begin(), (*iter).second.end());
+			std::string name((*iter).first.begin(), (*iter).first.end());
 			untimedMarks.push_back( std::pair<RequestMark*, std::string>(spMark, name));
 		}
+		*/
 	}
 	// stroke 
 	{
@@ -739,16 +751,19 @@ void BehaviorWindow::processMotionRequest(BML::MotionRequest* motionRequest, nle
 		RequestMark* spMark = new RequestMark();
 		spMark->setName(spMarkName);
 		if (constantSpeedScheduler)
-			spMark->setStartTime(triggerTime + constantSpeedScheduler->strokeTime / constantSpeedScheduler->speed);
+			spMark->setStartTime(syncPointIter->time());
 		spMark->setEndTime(spMark->getStartTime());
 		block->addMark(spMark);
+		syncTimes[3] = syncPointIter->time();
 
+		/*
 		const std::map<std::wstring, std::wstring>::const_iterator iter = behaviorToNameMap.find(spName);
 		if (iter != behaviorToNameMap.end())		
 		{
-			std::string name((*iter).second.begin(), (*iter).second.end());
+			std::string name((*iter).first.begin(), (*iter).first.end());
 			untimedMarks.push_back( std::pair<RequestMark*, std::string>(spMark, name));
 		}
+		*/
 	}
 	// stroke end
 	{
@@ -758,16 +773,19 @@ void BehaviorWindow::processMotionRequest(BML::MotionRequest* motionRequest, nle
 		RequestMark* spMark = new RequestMark();
 		spMark->setName(spMarkName);
 		if (constantSpeedScheduler)
-			spMark->setStartTime(triggerTime + constantSpeedScheduler->strokeTime / constantSpeedScheduler->speed);
+			spMark->setStartTime(syncPointIter->time());
 		spMark->setEndTime(spMark->getStartTime());
 		block->addMark(spMark);
+		syncTimes[4] = syncPointIter->time();
 
+		/*
 		const std::map<std::wstring, std::wstring>::const_iterator iter = behaviorToNameMap.find(spName);
 		if (iter != behaviorToNameMap.end())		
 		{
-			std::string name((*iter).second.begin(), (*iter).second.end());
+			std::string name((*iter).first.begin(), (*iter).first.end());
 			untimedMarks.push_back( std::pair<RequestMark*, std::string>(spMark, name));
 		}
+		*/
 	}
 	// relax
 	{
@@ -777,16 +795,19 @@ void BehaviorWindow::processMotionRequest(BML::MotionRequest* motionRequest, nle
 		RequestMark* spMark = new RequestMark();
 		spMark->setName(spMarkName);
 		if (constantSpeedScheduler)
-			spMark->setStartTime(triggerTime + constantSpeedScheduler->relaxTime / constantSpeedScheduler->speed);
+			spMark->setStartTime(syncPointIter->time());
 		spMark->setEndTime(spMark->getStartTime());
 		block->addMark(spMark);
+		syncTimes[5] = syncPointIter->time();
 
+		/*
 		const std::map<std::wstring, std::wstring>::const_iterator iter = behaviorToNameMap.find(spName);
 		if (iter != behaviorToNameMap.end())		
 		{
-			std::string name((*iter).second.begin(), (*iter).second.end());
+			std::string name((*iter).first.begin(), (*iter).first.end());
 			untimedMarks.push_back( std::pair<RequestMark*, std::string>(spMark, name));
 		}
+		*/
 	}
 	// end
 	{
@@ -796,22 +817,54 @@ void BehaviorWindow::processMotionRequest(BML::MotionRequest* motionRequest, nle
 		RequestMark* spMark = new RequestMark();
 		spMark->setName(spMarkName);
 		if (constantSpeedScheduler)
-			spMark->setStartTime(triggerTime + constantSpeedScheduler->endTime / constantSpeedScheduler->speed);
+			spMark->setStartTime(syncPointIter->time());
 		spMark->setEndTime(spMark->getStartTime());
 		block->addMark(spMark);
+		syncTimes[6] = syncPointIter->time();
 
+		/*
 		const std::map<std::wstring, std::wstring>::const_iterator iter = behaviorToNameMap.find(spName);
 		if (iter != behaviorToNameMap.end())		
 		{
-			std::string name((*iter).second.begin(), (*iter).second.end());
+			std::string name((*iter).first.begin(), (*iter).first.end());
 			untimedMarks.push_back( std::pair<RequestMark*, std::string>(spMark, name));
 		}
+		*/
+
+		block->setEndTime(spMark->getEndTime());
 	}
+
+
+	for (int p = 0; p < 6; p++)
+	{
+		phaseTimes[p] = syncTimes[p + 1] - syncTimes[p];
+	}
+
+	/*
+	MeCtScheduler2* schedulerController = motionRequest->schedule_ct;
+	if (schedulerController)
+	{
+		std::vector<MeCtScheduler2::TrackPtr> tracks = schedulerController->tracks();
+		if (tracks.size() > 0)
+		{
+			MeCtUnary* unaryTimingCt = tracks[0]->timing_ct();
+			MeCtTimeShiftWarp* timeWarpCt = dynamic_cast<MeCtTimeShiftWarp*>(unaryTimingCt);
+			if (timeWarpCt)
+			{
+				double t = 0.0;
+				double warpTime = timeWarpCt->time_func()(t);
+			}
+		}
+
+	}
+	*/
+
 
 	MeController* animController = motionRequest->anim_ct;
 	MeCtMotion* motion = dynamic_cast<MeCtMotion*>(animController);
 	if (motion)
 	{ 
+		/*
 		RequestTrack* track = new RequestTrack();
 		track->setName("Motion");
 		model->addTrack(track);
@@ -826,7 +879,7 @@ void BehaviorWindow::processMotionRequest(BML::MotionRequest* motionRequest, nle
 		// TODO
 		// speed needs to change the timing of the motion
 		// set the duration on the original block on the preceding track as well
-		block->setEndTime(block->getStartTime() + duration);
+		
 		motionBlock->setStartTime(triggerTime);
 		motionBlock->setEndTime(triggerTime + duration);
 		RequestMark* inMark = new RequestMark();
@@ -847,11 +900,13 @@ void BehaviorWindow::processMotionRequest(BML::MotionRequest* motionRequest, nle
 		motionBlock->addMark(emphasisMark);
 		emphasisMark->setStartTime(motion->emphasist() / speed + triggerTime);
 		emphasisMark->setEndTime(motion->emphasist() / speed + triggerTime);
+		*/
 
 		// show the current and original timings in the info box
 		SkMotion* skmotion = motion->motion();
 		std::stringstream strstr;
 		strstr << motion->name() << "\n";
+		strstr << "File: " << skmotion->filename() << "\n\n";
 		strstr << "Original timings:\n";
 		strstr << "Ready       : " << skmotion->time_ready() << "\n";
 		strstr << "StrokeStart : " << skmotion->time_stroke_start() << "\n";
@@ -859,31 +914,55 @@ void BehaviorWindow::processMotionRequest(BML::MotionRequest* motionRequest, nle
 		strstr << "StrokeEnd   : " << skmotion->time_stroke_end() << "\n";
 		strstr << "Relax       : " << skmotion->time_relax() << "\n";
 		strstr << "\n";
+		strstr << "indt        : " << motion->indt() << "\n";
+		strstr << "emphasis    : " << motion->emphasist() << "\n";
+		strstr << "outdt       : " << motion->outdt() << "\n";
+		strstr << "\n";
+
 		strstr << "Current timings:\n";
-		strstr << "Ready       : " << constantSpeedScheduler->readyTime << "\n";
-		strstr << "StrokeStart : " << constantSpeedScheduler->strokeStartTime << "\n";
-		strstr << "Stroke      : " << constantSpeedScheduler->strokeTime << "\n";
-		strstr << "StrokeEnd   : " << constantSpeedScheduler->strokeEndTime << "\n";
-		strstr << "Relax       : " << constantSpeedScheduler->relaxTime << "\n";
+		strstr << "Ready       : " << syncTimes[1] - triggerTime << "\n";
+		strstr << "StrokeStart : " <<  syncTimes[2] - triggerTime << "\n";
+		strstr << "Stroke      : " <<  syncTimes[3] - triggerTime << "\n";
+		strstr << "StrokeEnd   : " <<  syncTimes[4] - triggerTime << "\n";
+		strstr << "Relax       : " <<  syncTimes[5] - triggerTime << "\n";
+		strstr << "\n";
+		
+		strstr << "Speedups:\n";
+		if (skmotion->time_ready() == 0 || phaseTimes[0] == 0)
+			strstr << "Start-Ready        : 1\n";
+		else
+			strstr << "Start-Ready        : " << skmotion->time_ready() / phaseTimes[0] << "\n";
+	
+		if ( skmotion->time_stroke_start() - skmotion->time_ready() == 0 || phaseTimes[1] == 0)
+			strstr << "Ready-StrokeStart  : 1\n";
+		else
+			strstr << "Ready-StrokeStart  : " <<  ( skmotion->time_stroke_start() - skmotion->time_ready()) / phaseTimes[1] << "\n";
+
+		if (skmotion->time_stroke_emphasis() - skmotion->time_stroke_start() == 0 || phaseTimes[2] == 0)
+			strstr << "StrokeStart-Stroke : 1\n";
+		else
+			strstr << "StrokeStart-Stroke : " << ( skmotion->time_stroke_emphasis() - skmotion->time_stroke_start()) / phaseTimes[2]  << "\n";
+
+		if (skmotion->time_stroke_end() - skmotion->time_stroke_emphasis() == 0 || phaseTimes[3] == 0)
+			strstr << "Stroke-StrokeEnd   : 1\n";
+		else
+			strstr << "Stroke-StrokeEnd   : " << ( skmotion->time_stroke_end() - skmotion->time_stroke_emphasis()) / phaseTimes[3]  << "\n";
+
+		if (skmotion->time_relax() - skmotion->time_stroke_end() == 0 || phaseTimes[4] == 0)
+			strstr << "StrokeEnd-Relax    : 1\n";
+		else
+			strstr << "StrokeEnd-Relax    : " << ( skmotion->time_relax() - skmotion->time_stroke_end()) / phaseTimes[4] << "\n";
+
+		if (skmotion->duration() - skmotion->time_relax() == 0 || phaseTimes[5] == 0)
+			strstr << "Relax-End          : 1\n";
+		else
+			strstr << "Relax-End          : " << ( skmotion->duration() - skmotion->time_relax()) / phaseTimes[5] << "\n";
 	
 
-		motionBlock->setInfo(strstr.str());
+		//motionBlock->setInfo(strstr.str());
+		block->setInfo(strstr.str());
 	}
 
-	/*
-	// show where the blending occurs
-	MeCtScheduler2* scheduler = NULL;
-	MeController* current = animController;
-	while (current)
-	{
-		MeCtScheduler2* scheduler = dynamic_cast<MeCtScheduler2*>(current->parent());
-		if (scheduler)
-		{
-			break;
-		}
-		current = current->parent();
-	}
-	*/
 }
 
 

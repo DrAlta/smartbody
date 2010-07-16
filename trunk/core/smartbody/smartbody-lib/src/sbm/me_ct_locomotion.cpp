@@ -106,6 +106,8 @@ SkChannelArray& MeCtLocomotion::controller_channels() {
 		limb_joint_index.size(limb_joint_num);
 
 		SkJoint* base = standing_skeleton->search_joint(base_name);
+		if (!base)
+			return request_channels;
 		nonlimb_joint_num = iterate_nonlimb_joints(base, 0);
 		nonlimb_joint_quats.capacity(nonlimb_joint_num);
 		nonlimb_joint_quats.size(nonlimb_joint_num);
