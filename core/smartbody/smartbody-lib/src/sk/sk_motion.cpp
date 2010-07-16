@@ -445,10 +445,9 @@ void SkMotion::registerAnimation()
 	// get the offset from the first frame
 	SkChannelArray& channels = this->channels();
 	int xIndex = channels.search(jname, SkChannel::XPos);
-	int yIndex = channels.search(jname, SkChannel::YPos);
 	int zIndex = channels.search(jname, SkChannel::ZPos);
 	
-	if (xIndex == -1 && yIndex == -1 && zIndex == -1)
+	if (xIndex == -1 && zIndex == -1)
 		return;
 
 	// subtract that offset from all the other animation clips
@@ -458,18 +457,14 @@ void SkMotion::registerAnimation()
 		{
 			if (xIndex >= 0)
 				_registerOffset[0] = _frames[f].posture[xIndex];
-			if (yIndex >= 0)
-				_registerOffset[1] = _frames[f].posture[yIndex];
 			if (zIndex >= 0)
 				_registerOffset[2] = _frames[f].posture[zIndex];
 
-			if (_registerOffset[0] != 0.0 || _registerOffset[1] != 0.0 || _registerOffset[2] != 0.0)
-				std::cout << "Animation " << this->name() << " registered with offset (" << _registerOffset[0] << ", " << _registerOffset[1] << ", " << _registerOffset[2] << ")" << std::endl; 
+			if (_registerOffset[0] != 0.0 || _registerOffset[2] != 0.0)
+				std::cout << "Animation " << this->name() << " registered with offset (" << _registerOffset[0] << ", " << _registerOffset[2] << ")" << std::endl; 
 		}
 		if (xIndex >= 0)
 			_frames[f].posture[xIndex] -= _registerOffset[0];
-		if (yIndex >= 0)
-			_frames[f].posture[yIndex] -= _registerOffset[1];
 		if (zIndex >= 0)
 			_frames[f].posture[zIndex] -= _registerOffset[2];
 	}
