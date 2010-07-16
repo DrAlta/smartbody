@@ -1,30 +1,27 @@
 #!/bin/sh
-
-# initialize parameters, MODIFY HERE
-SBMINPUT="-seqpath ../../../../test_suite/input/headnod_test -seq default-init.seq"
+SBMINPUT="-seqpath E:/smartbody/test_suite/input/headnod_test -seq headnod_test.seq"
 OPTION_1=IMG
+THRESHOLD_1=3000
 OPTION_2=IMG
+THRESHOLD_2=3000
 OPTION_3=IMG
+THRESHOLD_3=3000
 OPTION_4=IMG
+THRESHOLD_4=3000
 OPTION_5=IMG
+THRESHOLD_5=3000
 OPTION_6=IMG
+THRESHOLD_6=3000
 NUMOFCOMP=6
-THRESHOLD_1=3500
-THRESHOLD_2=4000
-THRESHOLD_3=4200
-THRESHOLD_4=3500
-THRESHOLD_5=4000
-THRESHOLD_6=4200
 
-
-# hard coded, DO NOT MODIFY
 SBMBIN=$1
 INPUTDIR=$2
 OUTPUTDIR=$3
 SBMEXE=$4
 BASENAME=`basename $0 .sh`
 
-source ../../common_test.sh
+cd $INPUTDIR
+source ../src/common_test.sh
 
 COUNTER=0
 RESULT=""
@@ -34,13 +31,15 @@ while [ $COUNTER -lt $NUMOFCOMP ]; do
 	let COUNTER=COUNTER+1
 	OPTION=$(eval echo \$$"OPTION_$COUNTER")
 	THRESHOLD=$(eval echo \$$"THRESHOLD_$COUNTER")
-	RESULT=`source ../../common_comp.sh $OPTION $COUNTER $THRESHOLD` 
+	cd $INPUTDIR
+	RESULT=`source ../src/common_comp.sh $OPTION $COUNTER $THRESHOLD` 
 	if [ $RESULT = "FAILURE" ]; then
 		FLAG=FAILURE
 	fi
 	if [ $RESULT = "REDO" ]; then
 		REDOFLAG=REDO
 	fi
+
 done
 
 if [ $FLAG = "FAILURE" ]; then
@@ -51,4 +50,3 @@ fi
 if [ $REDOFLAG = "REDO" ]; then
 	echo REDO
 fi
-	
