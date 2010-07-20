@@ -796,3 +796,12 @@ void MeCtLocomotion::add_locomotion_anim(SkMotion* anim)
 	locomotion_anims.push() = anim;
 }
 
+SrVec MeCtLocomotion::get_facing_vector()
+{
+	SrMat mat;
+	float angle = navigator.get_facing_angle();
+	mat.roty(angle);
+	SrVec direction(0.0, 0.0, 1.0f);
+	direction = direction*mat;
+	return direction;
+}

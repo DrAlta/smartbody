@@ -25,9 +25,7 @@
 
 #include <ME/me_controller.h>
 
-#include "me_ct_locomotion_limb.hpp"
-#include "me_ct_locomotion_func.hpp"
-
+//#include "me_ct_locomotion_limb.hpp"
 
 class MeCtLocomotionLimb;
 
@@ -40,6 +38,10 @@ struct MeCtLocomotionJointInfo
 	SrArray<int> buff_index;
 	SrArray<int> joint_index;
 	SrArray<SrQuat> quat;
+
+	//key frames used to interpolate
+	SrArray<SrQuat> quat_key_frame1;
+	SrArray<SrQuat> quat_key_frame2;
 
 	int iterate(SkJoint* joint, SrArray<char*>* limb_joint_name)
 	{
@@ -74,6 +76,10 @@ struct MeCtLocomotionJointInfo
 		joint_num = iterate(tjoint, limb_joint_name);
 		quat.capacity(joint_num);
 		quat.size(joint_num);
+		quat_key_frame1.capacity(joint_num);
+		quat_key_frame1.size(joint_num);
+		quat_key_frame2.capacity(joint_num);
+		quat_key_frame2.size(joint_num);
 		buff_index.capacity(joint_num);
 		buff_index.size(joint_num);
 	}

@@ -227,7 +227,7 @@ public:
 
 	void update_heading();
 
-	SrVec get_facing();
+	SrVec get_facing_vector();
 
 	char* get_base_name();
 

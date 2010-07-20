@@ -250,7 +250,7 @@ void MeCtLocomotionAnalysis::analyze_standing_core(MeCtLocomotionLimb* limb, SkS
 void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkMotion* walking, SkMotion* standing, char* limb_base, SrArray<float>* support_height, 
 								   float ground_height, float height_bound)
 {
-	printf("\nstart analysis......");
+	//printf("\nstart analysis......");
 	anim->set_anim(walking);
 
 	motion_locomotion = walking;
@@ -443,7 +443,7 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 	free(pos_z);
 	free(count);
 	free(temp_axis);
-	printf("\nend analysis......");
+	//printf("\nend analysis......");
 }
 
 void MeCtLocomotionAnalysis::estimate_direction(MeCtLocomotionLimbAnim* anim, int* count)
@@ -596,7 +596,7 @@ void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion)
 	{
 		limb = _ct_locomotion->get_limb_list()->get(i);
 		analyze_walking_limb(limb, motion_locomotion, motion_standing);
-		limb->print_info();
+		//limb->print_info();
 		if(i == 0) // let the first limb be the leading limb during analysis process
 		{
 			lower_bound = limb->get_walking_list()->get(limb->get_walking_list()->size()-1)->get_timing_space()->get_virtual_frame(0);

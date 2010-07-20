@@ -168,6 +168,28 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		return CMD_SUCCESS;
 	}
 
+	else if( arg == "forward" || arg == "backward")
+	{
+		float spd = 0.0f;
+		SrVec direction = actor->get_locomotion_ct()->get_facing_vector();
+		if(arg == "backward")
+			direction = -direction;
+
+		arg = args.read_token();
+		if(arg == "spd")
+		{
+			spd = args.read_float();
+			direction *= spd;
+		}
+		else 
+		{
+			cerr << "Please specify the speed. (example:'spd 50')" <<endl;
+			return CMD_FAILURE;
+		}
+		nav_circle->init( direction.x, direction.y, direction.z, 0.0f, 0.0f, -1, 0, 0, 0 );
+		return CMD_SUCCESS;
+	}
+
 	else if( arg == "ik" )
 	{
 		int enable = args.read_int();
