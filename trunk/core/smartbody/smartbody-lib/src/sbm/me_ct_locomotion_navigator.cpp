@@ -149,7 +149,6 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeCtLocomot
 	base_offset.set ( buffer[ bi_base_offset_x ], buffer[ bi_base_offset_y ], buffer[ bi_base_offset_z ] );
 	base_rot.set( buffer[ bi_base_rot ], buffer[ bi_base_rot+1 ], buffer[ bi_base_rot+2 ], buffer[ bi_base_rot+3 ] );
 
-
 	world_pos.y = 0.0f;
 	SrQuat t_world_rot;
 	mat.roty(pre_facing_angle);

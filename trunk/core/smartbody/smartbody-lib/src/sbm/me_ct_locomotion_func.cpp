@@ -58,6 +58,13 @@ SrMat get_lmat(SkJoint* joint, SrQuat* quat)
    return _lmat;
  }
 
+
+SrArray<SrQuat>* get_blended_quat_buffer(MeCtLocomotionJointInfo* joint_info, float weight)
+{
+	get_blended_quat_buffer(&(joint_info->quat), &(joint_info->quat_key_frame1), &(joint_info->quat_key_frame2), weight);
+	return &(joint_info->quat);
+}
+
 SrArray<SrQuat>* get_blended_quat_buffer(SrArray<SrQuat>* dest, SrArray<SrQuat>* quat_buffer1, SrArray<SrQuat>* quat_buffer2, float weight)
 {
 	if(quat_buffer1->size() != quat_buffer2->size()) return NULL;
@@ -87,6 +94,11 @@ int iterate_set(SkJoint* base, int index, int depth, SrArray<SrQuat>* buff, SrAr
 		index = iterate_set(base->child(i), index+1, depth, buff, index_buff);
 	}
 	return index;
+}
+
+void get_frame(SkMotion* walking, SkSkeleton* walking_skeleton, float frame, char* limb_base, MeCtLocomotionJointInfo* joint_info)
+{
+	get_frame(walking, walking_skeleton, frame, limb_base, &(joint_info->quat), &(joint_info->quat_key_frame1), &(joint_info->quat_key_frame2), &(joint_info->joint_index));
 }
 
 void get_frame(SkMotion* walking, SkSkeleton* walking_skeleton, float frame, char* limb_base, SrArray<SrQuat>* quat_buffer, SrArray<SrQuat>* quat_buffer1, SrArray<SrQuat>* quat_buffer2, SrArray<int>* index_buff)
