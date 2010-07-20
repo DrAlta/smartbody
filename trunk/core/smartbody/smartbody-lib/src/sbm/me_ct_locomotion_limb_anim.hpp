@@ -91,7 +91,7 @@ public:
 
 	MeCtLocomotionTimingSpace* get_timing_space();
 
-	void					get_frame(float frame, char* limb_base);
+	void					get_frame(float frame, char* limb_base, SrArray<int>* index_buff);
 
 	SrArray<SrQuat>*		get_buffer();
 

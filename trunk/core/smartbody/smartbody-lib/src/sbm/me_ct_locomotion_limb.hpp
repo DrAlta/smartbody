@@ -25,6 +25,7 @@
 
 #include "me_ct_locomotion_limb_anim.hpp"
 #include "me_ct_locomotion_limb_direction_planner.hpp"
+#include "me_ct_locomotion_joint_info.hpp"
 #include "me_ct_IK_scenario.hpp"
 
 class MeCtLocomotionLimbAnim;
@@ -47,13 +48,18 @@ public:
 	SrArray<float>					support_height; // distance from each support joint to ground
 	float							ground_height; // ground height in Y direction
 	char*							skeleton_name;
+	MeCtLocomotionJointInfo			limb_joint_info;
+
 
 public:
 	//temp, to be deleted=================
 	SkSkeleton* walking_skeleton;
 	SkSkeleton* standing_skeleton;
 	MeCtIKScenario					ik;
-	SrArray<SrQuat>					quat_buffer;
+
+	//SrArray<int>					joint_index;
+	//SrArray<int>					joint_buff_index;
+	//SrArray<SrQuat>					quat_buffer;
 
 public:
 	SrArray<MeCtLocomotionLimbAnim*>	walking_list; // originally provided artist-made animation. for each provided walking animation, do analysis in MeCtLocomotionLimbAnim.
@@ -98,7 +104,7 @@ public:
 
 	void	calc_blended_anim_speed(MeCtLocomotionLimbAnim* anim1, MeCtLocomotionLimbAnim* anim2, float weight);
 
-	void	blend_anim(float space_time, int anim_index1, int anim_index2, float weight);
+	void	blend_anim(float space_time, int anim_index1, int anim_index2, float weight, SrArray<int>* index_buff);
 
 	void	blend_standing(MeCtLocomotionLimbAnim* standing, float weight);
 

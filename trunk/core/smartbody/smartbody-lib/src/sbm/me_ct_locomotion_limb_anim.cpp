@@ -145,15 +145,15 @@ void MeCtLocomotionLimbAnim::init_quat_buffers(int num)
 }
 
 // pass a float index in 
-void MeCtLocomotionLimbAnim::get_frame(float frame, char* limb_base)
+void MeCtLocomotionLimbAnim::get_frame(float frame, char* limb_base, SrArray<int>* index_buff)
 {
 	//temp int, must be changed
 	walking->connect(walking_skeleton);
 	SkJoint* base = walking_skeleton->search_joint(limb_base);
 	walking->apply_frame((int)frame);
-	iterate_set(base, 0, 0, &quat_buffer_key_frame1);
+	iterate_set(base, 0, 0, &quat_buffer_key_frame1, index_buff);
 	walking->apply_frame((int)frame+1);
-	iterate_set(base, 0, 0, &quat_buffer_key_frame2);
+	iterate_set(base, 0, 0, &quat_buffer_key_frame2, index_buff);
 	SrQuat q;
 	for(int i = 0; i < quat_buffer.size(); ++i)
 	{

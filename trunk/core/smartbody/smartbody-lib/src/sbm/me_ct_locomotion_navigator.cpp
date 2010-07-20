@@ -422,10 +422,10 @@ int MeCtLocomotionNavigator::controller_channels(SkChannelArray* request_channel
 	//AddChannel(request_channels, SbmCharacter::LOCOMOTION_DESTINATION, SkChannel::YPos );
 	//AddChannel(request_channels, SbmCharacter::LOCOMOTION_DESTINATION, SkChannel::ZPos );
 
-	AddChannel(request_channels, "base", SkChannel::XPos ); 
+	/*AddChannel(request_channels, "base", SkChannel::XPos ); 
 	AddChannel(request_channels, "base", SkChannel::YPos );
 	AddChannel(request_channels, "base", SkChannel::ZPos );
-	AddChannel(request_channels, "base", SkChannel::Quat );
+	AddChannel(request_channels, "base", SkChannel::Quat );*/
 
 	return routine_channel_num;
 }
@@ -566,10 +566,10 @@ void MeCtLocomotionNavigator::print_foot_pos(MeFrameData& frame, MeCtLocomotionL
 	//ppos[0] = 0;
 	//ppos[1] = 0;
 	//ppos[2] = 0; 
-	for(int j  = 0;j < limb->quat_buffer.size()-1;++j)
+	for(int j  = 0;j < limb->limb_joint_info.quat.size()-1;++j)
 	{
 		pmat = gmat;
-		lmat = get_lmat(tjoint, &(limb->quat_buffer.get(j)));
+		lmat = get_lmat(tjoint, &(limb->limb_joint_info.quat.get(j)));
 		gmat.mult ( lmat, pmat );
 		if(tjoint->num_children()>0)
 		{ 
