@@ -785,7 +785,6 @@ quat_t MeCtGaze::world_target_orient( void )	{
 }
 
 void MeCtGaze::controller_start( void )	{
-	int i;
 	
 
 #if ENABLE_HACK_TARGET_CIRCLE
@@ -795,13 +794,8 @@ void MeCtGaze::controller_start( void )	{
 	started = 1;
 	start = 1;
 
-	//{	// The following are for debugger runtime inspection
-	//	SkChannelArray& channels = _context->channels();
-	//	int size = channels().size();
-	//	const char* ch_name = channels.name( 0).get_string();
-	//	SkChannel::Type ch_type = channels.type(0);
-	//	SkJoint* ch_joint = channels.joint( 0 );
-	//}
+#if 0
+	int i;
 
 	if( _context->channels().size() > 0 )	{
 		skeleton_ref_p = _context->channels().skeleton();
@@ -894,10 +888,107 @@ void MeCtGaze::controller_start( void )	{
 		joint_arr[ i ].speed = joint_arr[ i ].speed_ratio * head_speed;
 //		joint_arr[ i ].speed = head_speed / ( priority_joint + 1 );
 	}
+#endif
 
 #if TEST_SENSOR
 	sensor_p->controller_start();
 #endif
+}
+
+void MeCtGaze::controller_start_evaluate( void )	{
+	int i;
+
+	if( _context->channels().size() > 0 )	{
+		skeleton_ref_p = _context->channels().skeleton();
+	}
+	
+	// ensure skeleton global tansforms are up to date
+	update_skeleton_gmat();
+	
+	for( i=0; i<joint_count; i++ )	{
+
+		float local_contrib;
+		if( i < priority_joint )	{
+			local_contrib = 1.0f / ( (float)( priority_joint + 1 - i ) );
+		}
+		else	{
+			local_contrib = 1.0f;
+		}
+		joint_arr[ i ].task_weight = local_contrib;
+		
+		int context_index = _toContextCh[ i ];
+		if( context_index < 0 ) {
+			fprintf( stderr, "MeCtGaze::controller_start ERR: joint idx:%d NOT FOUND in skeleton\n", i );
+		} 
+		else {
+			SkJoint* joint_p = _context->channels().joint( context_index );
+			if( !joint_p )	{
+				fprintf( stderr, "MeCtGaze::controller_start ERR: joint context-idx:%d NOT FOUND in skeleton\n", context_index );
+			} 
+			else {
+				joint_arr[ i ].init( joint_p );
+				joint_arr[ i ].start();
+			}
+		}
+#if 0
+		printf( "start: [%d]", i );
+		printf( " wgt: %.4f",
+			joint_arr[ i ].task_weight 
+		);
+#endif
+	}
+	
+	// set forward position to eyeball center in local coords, 
+	//  after joints have start()ed, to init world transform state
+	load_forward_pos();
+
+	// set head_speed based on head-rot-to-target-rot
+	if( timing_mode == TASK_TIME_HINT )	{
+
+		quat_t w_target_orient;
+		if( target_mode == TARGET_POINT )	{
+			vector_t w_point = world_target_point();
+			// construct an euler from ( z-axis, roll )
+			w_target_orient = euler_t( 
+				w_point - (
+					joint_arr[ GAZE_JOINT_SKULL ].world_pos +
+					joint_arr[ GAZE_JOINT_SKULL ].local_rot *
+					joint_arr[ GAZE_JOINT_SKULL ].forward_pos
+				), 
+				0.0 
+			);
+		}
+		else	{
+			w_target_orient = world_target_orient();
+		}
+		
+		quat_t body_head_rot = 
+			-joint_arr[ GAZE_JOINT_SPINE1 ].parent_rot *
+			joint_arr[ GAZE_JOINT_SKULL ].world_rot * 
+			joint_arr[ GAZE_JOINT_SKULL ].forward_rot;
+		
+		quat_t body_task_rot = 
+			-joint_arr[ GAZE_JOINT_SPINE1 ].parent_rot *
+			w_target_orient * 
+			joint_arr[ GAZE_JOINT_SKULL ].forward_rot;
+		
+		quat_t head_task_rot = ( -body_head_rot ).product( body_task_rot );
+		gw_float_t head_task_deg = head_task_rot.degrees();
+		head_speed = (float)( head_task_deg / head_time );
+//printf( "MeCtGaze::controller_start TASK: %f deg  %f dps\n", head_task_deg, head_speed );
+	}
+
+	float total_w = 0.0;
+	for( i=0; i<=GAZE_JOINT_SKULL; i++ )	{
+		total_w += joint_arr[ i ].task_weight;
+	}
+
+	// move to -update-joint-speed() if dirty bit is set.
+	for( i=0; i<=GAZE_JOINT_SKULL; i++ )	{
+		joint_arr[ i ].speed_ratio = joint_arr[ i ].task_weight / total_w;
+		joint_arr[ i ].speed = joint_arr[ i ].speed_ratio * head_speed;
+//		joint_arr[ i ].speed = head_speed / ( priority_joint + 1 );
+	}
 }
 
 bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
@@ -913,12 +1004,10 @@ bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 	}
 #endif
 	
-#if 1
+#if 0
 	static int once = 1;
 	if( once )	{
 		once = 0;
-
-//printf( "C: 0x%x 0x%x\n", this, skeleton_ref_p );
 
 #if ENABLE_FORWARD_RAY_TEST
 		test_forward_ray();
@@ -946,58 +1035,20 @@ bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 	if( start ) {
 		start = 0;
 		dt = 0.001f;
+		controller_start_evaluate();
 	}
 	else	{
 		dt = (float)(t - prev_time);
 	}
 	prev_time = t;
 
-//printf( "C: 0x%x 0x%x\n", this, skeleton_ref_p );
 	update_skeleton_gmat();
-//printf( "D: 0x%x 0x%x\n", this, skeleton_ref_p );
 	
 	// map key values to joints if set
 	apply_bias_keys();
 	apply_limit_keys();
 	apply_blend_keys();
 	
-#if 0
-	if( timing_mode == TASK_TIME_HINT )	{
-
-		quat_t w_target_orient;
-		if( target_mode == TARGET_POINT )	{
-			vector_t w_point = world_target_point();
-			w_target_orient = euler_t( 
-				w_point - (
-					joint_arr[ GAZE_JOINT_SKULL ].world_pos +
-					joint_arr[ GAZE_JOINT_SKULL ].local_rot *
-					joint_arr[ GAZE_JOINT_SKULL ].forward_pos
-				), 
-				0.0 
-			);
-		}
-		else	{
-			w_target_orient = world_target_orient();
-		}
-		
-		quat_t body_head_rot = 
-			-joint_arr[ GAZE_JOINT_SPINE1 ].parent_rot *
-			joint_arr[ GAZE_JOINT_SKULL ].world_rot * 
-			joint_arr[ GAZE_JOINT_SKULL ].forward_rot;
-		
-		quat_t body_task_rot = 
-			-joint_arr[ GAZE_JOINT_SPINE1 ].parent_rot *
-			w_target_orient * 
-			joint_arr[ GAZE_JOINT_SKULL ].forward_rot;
-		
-		quat_t head_task_rot = ( -body_head_rot ).product( body_task_rot );
-//		quat_t head_task_rot = ( -body_head_rot ).product( body_task_rot ).complement();
-		gw_float_t head_task_deg = head_task_rot.degrees();
-//		head_speed = head_task_deg / head_time;
-		printf( "TASK: %f deg\n", head_task_deg );
-	}
-#endif
-
 	vector_t w_point;
 	quat_t w_orient;
 	if( target_mode == TARGET_POINT )	{
