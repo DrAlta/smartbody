@@ -341,6 +341,7 @@ class MeCtGaze : public MeController	{
 		quat_t		world_target_orient( void );
 		
 		virtual void controller_start();
+		void controller_start_evaluate();
 		virtual bool controller_evaluate( double t, MeFrameData& frame );
 		virtual SkChannelArray& controller_channels()	{ return( _channels ); }
 		virtual double controller_duration()			{ return( (double)_duration ); }
