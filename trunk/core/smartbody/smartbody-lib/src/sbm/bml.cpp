@@ -331,12 +331,12 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 		// ...and offset everything to be positive (assumes times are only relative to each other, not wall time, etc.)
 		// ignore differences less than TIME_DELTA
 
-		if (0) // disable the shifting of behaviors
+		if (mcu->delay_behaviors) // shift the behaviors if this option is sset
 		{
 			if( min_time < now - TIME_DELTA ) {
 				time_sec offset = now - min_time;
 				if( LOG_BML_BEHAVIOR_SCHEDULE ) {
-					cout << "DEBUG: BmlRequest::realize(): offset: "<<offset<<endl;
+					cout << "DEBUG: BmlRequest::realize(): offset: " << offset << endl;
 				}
 
 				for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i ) {

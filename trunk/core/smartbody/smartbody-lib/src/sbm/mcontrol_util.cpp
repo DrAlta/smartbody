@@ -95,7 +95,8 @@ mcuCBHandle::mcuCBHandle()
 	paused( false ),
 	pause_time( 0.0 ),
 	resume_offset( 0.0 ),
-	snapshot_counter( 1 )
+	snapshot_counter( 1 ),
+	delay_behaviors(true)
 {
 	
 	root_group_p->ref();
@@ -3970,3 +3971,45 @@ int mcu_wsp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	return( CMD_SUCCESS );
 }
 
+int mcu_syncpolicy_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+   if ( mcu_p )
+   {
+      int num = args.calc_num_tokens();
+
+      if ( num > 0 )
+      {
+         string command = args.read_token();
+		 if (command == "delay")
+		 {
+			 mcu_p->delay_behaviors = true;
+		 }
+		 else if (command == "nodelay")
+		 {
+			 mcu_p->delay_behaviors = false;
+		 }
+		 else
+		 {
+			 std::cout << "Usage: syncpolicy <delay|nodelay>" << std::endl;
+			 return CMD_FAILURE;
+		 }
+ 
+         return CMD_SUCCESS;
+      }
+	  else
+	  {
+		  std::cout << "Behavior policy is ";
+		  if (mcu_p->delay_behaviors)
+		  {
+			  std::cout << "'delay'. Behaviors will be offset to a future time to make sure that all behaviors are executed in full." << std::endl;
+		  }
+		  else
+		  {
+			  std::cout << "'nodelay'. Behaviors that are calculated to start in the past will be partially executed." << std::endl;
+		  }
+		  return CMD_SUCCESS;
+	  }
+   }
+
+   return CMD_FAILURE;
+}

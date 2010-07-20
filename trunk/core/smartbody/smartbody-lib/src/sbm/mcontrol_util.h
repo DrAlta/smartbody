@@ -140,6 +140,7 @@ class mcuCBHandle	{
 		bool		paused;
 		double		pause_time;
 		double		resume_offset;
+		bool		delay_behaviors;
 
 		int			snapshot_counter;
 
@@ -355,6 +356,7 @@ int mcu_viewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_bmlviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_syncpolicy_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 //int mcu_character_func( srArgBuffer& args, mcuCBHandle *mcu_p );  // Old version... See SbmCharacter::character_cmd_func
 int mcu_character_init( const char* char_name, const char *skel_file, const char *unreal_class, mcuCBHandle *mcu_p );
