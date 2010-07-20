@@ -29,6 +29,7 @@
 #include "me_ct_locomotion_speed_accelerator.hpp"
 #include "me_ct_locomotion_navigator.hpp"
 #include "me_ct_locomotion_func.hpp"
+#include "me_ct_locomotion_joint_info.hpp"
 #include "me_ct_IK.hpp"
 
 
@@ -36,11 +37,60 @@ class MeCtLocomotionLimb;
 
 #pragma once
 
+/*struct MeCtLocomotionJointInfo
+{
+	int joint_num;
+	SrArray<const char*> joint_name;
+	SrArray<int> buff_index;
+	SrArray<int> joint_index;
+	SrArray<SrQuat> quat;
+
+	int iterate(SkJoint* joint, SrArray<char*>* limb_joint_name)
+	{
+		int sum = 0;
+		const char* name = joint->name().get_string();
+		if(limb_joint_name != NULL)
+		{
+			for(int i = 0; i < limb_joint_name->size(); ++i)
+			{
+				if(strcmp(limb_joint_name->get(i), name) == 0) return 0;
+			}
+		}
+		if(joint->quat()->active() == true)
+		{
+			joint_name.push() = name;
+			joint_index.push() = joint->index();
+			sum = 1;
+		}
+
+		for(int i = 0; i < joint->num_children(); ++i)
+		{
+			sum += iterate(joint->child(i), limb_joint_name);
+		}
+		return sum;
+	}
+
+	void Init(SkSkeleton* skeleton, char* base_name, SrArray<char*>* limb_joint_name)
+	{
+		SkJoint* tjoint = skeleton->search_joint(base_name);
+		joint_num = iterate(tjoint, limb_joint_name);
+		quat.capacity(joint_num);
+		quat.size(joint_num);
+		buff_index.capacity(joint_num);
+		buff_index.size(joint_num);
+	}
+};*/
+
 
 class MeCtLocomotion : public MeController {
 public:
 	// Public Constants
 	static const char* TYPE;
+
+public:
+	//SrArray<int>	nonlimb_joint_index;
+	MeCtLocomotionJointInfo nonlimb_joint_info;
+	SrArray<char*> limb_base_name;
 
 protected:
 
@@ -65,12 +115,15 @@ protected:
 
 	bool is_valid;  // All necessary channels are present
 	
-	SrQuat base_quat;
+	//SrQuat base_quat;
 
 	bool joints_indexed;
-	SrArray<int> nonlimb_joint_index;
-	int nonlimb_joint_num;
-	SrArray<SrQuat> nonlimb_joint_quats;
+	//SrArray<MeCtLocomotionJointInfo> nonlimb_joint_info;
+	//SrArray<int> nonlimb_joint_buff_index;
+	//int nonlimb_joint_num;
+	//SrArray<SrQuat> nonlimb_joint_quats;
+
+
 
 	//temp
 	SrArray<SrQuat> t_joint_quats1;
@@ -78,7 +131,7 @@ protected:
 	SrArray<SrQuat> joint_quats1;
 	SrArray<SrQuat> joint_quats2;
 
-	SrArray<int> limb_joint_index;
+	//SrArray<int> limb_joint_index;
 	int limb_joint_num;
 
 	float last_time;
@@ -86,6 +139,7 @@ protected:
 	float curr_t;
 
 	char* base_name;
+	char* nonlimb_blending_base_name;
 
 	bool dis_initialized;
 	bool initialized;
@@ -109,6 +163,7 @@ public:
 	bool enabled;
 
 	int temp;
+	//SrArray<const char*> joint_name;
 
 public:
 	/** Constructor */
@@ -126,6 +181,10 @@ public:
 	SkChannelArray& controller_channels();
 
 	int iterate_limb_joints(SkJoint* base);
+
+	void iterate_joints(MeCtLocomotionJointInfo* joint_info);
+
+	int iterate_limb_joints(SkJoint* base, int depth);
 
 	int iterate_nonlimb_joints(SkJoint* base, int depth);
 
@@ -157,6 +216,9 @@ public:
 
 	void init_skeleton(SkSkeleton* standing, SkSkeleton* walking);
 
+	void init_nonlimb_joint_info();
+
+
 	void update_pos();
 
 	SrVec get_limb_pos(MeCtLocomotionLimb* limb);
@@ -166,6 +228,8 @@ public:
 	void update_heading();
 
 	SrVec get_facing();
+
+	char* get_base_name();
 
 	SrVec get_heading_direction();
 
@@ -204,11 +268,17 @@ public:
 
 	bool is_enabled();
 
-	void set_base_name(char* name);
+	void set_base_name(const char* name);
+
+	void set_nonlimb_blending_base_name(const char* name);
 
 	void add_locomotion_anim(SkMotion* anim);
 
 	int LOOKUP_BUFFER_INDEX(int var_name, int index );
+
+	void update_limb_anim_standing();
+
+	void update_limb_anim_standing(MeCtLocomotionLimbAnim* anim, int index, MeFrameData& frame);
 };
 
 #endif // ME_CT_LOCOMOTION_HPP

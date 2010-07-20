@@ -66,8 +66,10 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 		return;
 	}
 	this->motion_standing = standing;
+	const char* base_name = standing_skeleton->root()->name().get_string();
 
-	get_ct()->set_base_name("base");
+	get_ct()->set_base_name(base_name);
+	get_ct()->set_nonlimb_blending_base_name(base_name);
 
 	MeCtLocomotionLimb* limb = new MeCtLocomotionLimb();
 	limb->init_skeleton(standing_skeleton, walking_skeleton);
@@ -96,6 +98,8 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 	limb->set_joint_type(2, JOINT_TYPE_BALL);
 	limb->set_joint_type(3, JOINT_TYPE_HINGE);
 	limb->set_joint_type(4, JOINT_TYPE_HINGE);
+
+	_ct_locomotion->init_nonlimb_joint_info();
 
 	limb = NULL;
 
@@ -138,6 +142,8 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 			}
 		}
 	}
+
+	
 }
 
 int MeCtLocomotionAnalysis::get_descendant_num(char* base_name)
@@ -183,6 +189,8 @@ void MeCtLocomotionAnalysis::analyze_standing(MeCtLocomotionLimb* limb, SkMotion
 	{
 		analyze_standing_core(limb, skeleton);
 	}
+
+	//_ct_locomotion->nonlimb_joint_info.Init(, base_name);
 	MeCtLocomotionLimbAnim* anim = new MeCtLocomotionLimbAnim();
 	limb->walking_list.push() = anim;
 	anim->set_anim(standing);
@@ -194,7 +202,7 @@ void MeCtLocomotionAnalysis::analyze_standing(MeCtLocomotionLimb* limb, SkMotion
 	limb->pos_buffer.capacity(limb->joint_num);
 	limb->pos_buffer.size(limb->joint_num);
 	anim->init_quat_buffers(limb->joint_num);
-	anim->get_frame(0.0f, limb->limb_base_name);
+	anim->get_frame(0.0f, limb->limb_base_name, &(limb->limb_joint_info.joint_index));
 	for(int i = 0; i < _ct_locomotion->limb_list.size(); ++i)
 	{
 		_ct_locomotion->limb_list.get(i)->direction_planner.ref_time_num = anim->get_timing_space()->get_ref_time_num();
@@ -242,7 +250,7 @@ void MeCtLocomotionAnalysis::analyze_standing_core(MeCtLocomotionLimb* limb, SkS
 void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkMotion* walking, SkMotion* standing, char* limb_base, SrArray<float>* support_height, 
 								   float ground_height, float height_bound)
 {
-	//printf("\nstart analysis......");
+	printf("\nstart analysis......");
 	anim->set_anim(walking);
 
 	motion_locomotion = walking;
@@ -282,7 +290,7 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 
 	SrVec taxis;
 
-	base_joint = skeleton->search_joint("base");
+	base_joint = skeleton->search_joint(this->_ct_locomotion->get_base_name());
 
 	// analysis for IK.........................................................................
 
@@ -435,7 +443,7 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 	free(pos_z);
 	free(count);
 	free(temp_axis);
-	//printf("\nend analysis......");
+	printf("\nend analysis......");
 }
 
 void MeCtLocomotionAnalysis::estimate_direction(MeCtLocomotionLimbAnim* anim, int* count)
@@ -588,7 +596,7 @@ void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion)
 	{
 		limb = _ct_locomotion->get_limb_list()->get(i);
 		analyze_walking_limb(limb, motion_locomotion, motion_standing);
-		//limb->print_info();
+		limb->print_info();
 		if(i == 0) // let the first limb be the leading limb during analysis process
 		{
 			lower_bound = limb->get_walking_list()->get(limb->get_walking_list()->size()-1)->get_timing_space()->get_virtual_frame(0);

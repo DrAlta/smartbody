@@ -38,7 +38,9 @@ MeCtLocomotionLimb::MeCtLocomotionLimb() {
 	limb_base_name = NULL;
 	skeleton_name = NULL;
 	space_time = 0.0f;
-	quat_buffer.capacity(0);
+	limb_joint_info.quat.capacity(0);
+	limb_joint_info.joint_index.capacity(0);
+	limb_joint_info.buff_index.capacity(0);
 	curr_rotation = 0.0f;
 	rotation_record = 0.0f;
 	blended_anim.global_info = new MeCtLocomotionAnimGlobalInfo();
@@ -81,13 +83,14 @@ void MeCtLocomotionLimb::set_limb_base(char* name)
 	int num = get_descendant_num(standing_skeleton->search_joint(name))+1;
 	ik.joint_info_list.capacity(num);
 	ik.joint_info_list.size(num);
-	quat_buffer.capacity(num);
+	limb_joint_info.quat.capacity(num);
 	SrQuat q(1,0,0,0);
 	SrVec v(0,0,0);
 	for(int i = 0; i < num; ++i)
 	{
-		quat_buffer.push(q);
+		limb_joint_info.quat.push(q);
 	}
+	limb_joint_info.Init(walking_skeleton, limb_base_name, NULL);
 }
 
 void MeCtLocomotionLimb::add_support_joint(char* joint_name)
@@ -136,22 +139,22 @@ void MeCtLocomotionLimb::print_info()
 	}
 }
 
-void MeCtLocomotionLimb::blend_anim(float space_time, int anim_index1, int anim_index2, float weight)
+void MeCtLocomotionLimb::blend_anim(float space_time, int anim_index1, int anim_index2, float weight, SrArray<int>* index_buff)
 {
 	MeCtLocomotionLimbAnim* anim1 = walking_list.get(anim_index1);
 	MeCtLocomotionLimbAnim* anim2 = walking_list.get(anim_index2);
-	anim1->get_frame(anim1->get_timing_space()->get_virtual_frame(space_time), limb_base_name);
-	anim2->get_frame(anim2->get_timing_space()->get_virtual_frame(space_time), limb_base_name);
-	get_blended_quat_buffer(&quat_buffer, anim1->get_buffer(), anim2->get_buffer(), weight);
+	anim1->get_frame(anim1->get_timing_space()->get_virtual_frame(space_time), limb_base_name, index_buff);
+	anim2->get_frame(anim2->get_timing_space()->get_virtual_frame(space_time), limb_base_name, index_buff);
+	get_blended_quat_buffer(&(limb_joint_info.quat), anim1->get_buffer(), anim2->get_buffer(), weight);
 }
 
 void MeCtLocomotionLimb::manipulate_turning()
 {
 	SrMat mat;
 	mat.roty(curr_rotation);
-	SrQuat quat = quat_buffer.get(0);
+	SrQuat quat = limb_joint_info.quat.get(0);
 	quat = quat * mat;
-	quat_buffer.set(0, quat);
+	limb_joint_info.quat.set(0, quat);
 }
 
 void MeCtLocomotionLimb::calc_blended_anim_speed(MeCtLocomotionLimbAnim* anim1, MeCtLocomotionLimbAnim* anim2, float weight)
@@ -167,7 +170,7 @@ void MeCtLocomotionLimb::calc_blended_anim_speed(MeCtLocomotionLimbAnim* anim1, 
 
 void MeCtLocomotionLimb::blend_standing(MeCtLocomotionLimbAnim* anim, float weight)
 {
-	get_blended_quat_buffer(&quat_buffer, &quat_buffer, anim->get_buffer(), weight);
+	get_blended_quat_buffer(&(limb_joint_info.quat), &(limb_joint_info.quat), anim->get_buffer(), weight);
 }
 
 void MeCtLocomotionLimb::init_skeleton(SkSkeleton* standing_skeleton, SkSkeleton* walking_skeleton)

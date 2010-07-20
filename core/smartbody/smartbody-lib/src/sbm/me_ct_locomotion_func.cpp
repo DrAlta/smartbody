@@ -72,25 +72,30 @@ SrArray<SrQuat>* get_blended_quat_buffer(SrArray<SrQuat>* dest, SrArray<SrQuat>*
 	return dest;
 }
 
-int iterate_set(SkJoint* base, int index, int depth, SrArray<SrQuat>* buff)
+int iterate_set(SkJoint* base, int index, int depth, SrArray<SrQuat>* buff, SrArray<int>* index_buff)
 {
 	if(index >= depth && depth > 0) return index;
-	SrQuat q = base->quat()->value();
-	buff->set(index, q);
+	if(base->quat()->active() && base->index() == index_buff->get(index))
+	{
+		SrQuat q = base->quat()->value();
+		buff->set(index, q);
+	}
+	else
+		--index;
 	for(int i = 0; i < base->num_children(); ++i)
 	{
-		index = iterate_set(base->child(i), index+1, depth, buff);
+		index = iterate_set(base->child(i), index+1, depth, buff, index_buff);
 	}
 	return index;
 }
 
-void get_frame(SkMotion* walking, SkSkeleton* walking_skeleton, float frame, char* limb_base, SrArray<SrQuat>* quat_buffer, SrArray<SrQuat>* quat_buffer1, SrArray<SrQuat>* quat_buffer2)
+void get_frame(SkMotion* walking, SkSkeleton* walking_skeleton, float frame, char* limb_base, SrArray<SrQuat>* quat_buffer, SrArray<SrQuat>* quat_buffer1, SrArray<SrQuat>* quat_buffer2, SrArray<int>* index_buff)
 {
 	SkJoint* base = walking_skeleton->search_joint(limb_base);
 	walking->apply_frame((int)frame);
-	iterate_set(base, 0, quat_buffer->size(), quat_buffer1);
+	iterate_set(base, 0, quat_buffer->size(), quat_buffer1, index_buff);
 	walking->apply_frame((int)frame+1);
-	iterate_set(base, 0, quat_buffer->size(), quat_buffer2);
+	iterate_set(base, 0, quat_buffer->size(), quat_buffer2, index_buff);
 	SrQuat q;
 	for(int i = 0; i < quat_buffer->size(); ++i)
 	{
