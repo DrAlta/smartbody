@@ -367,7 +367,7 @@ std::string removeXMLTagsAndNewLines( const std::string & txt , SpeechRequestMes
 std::string replacePausePunctuationsFromText(std::string text_string) {
 	  std::string::size_type pos = 0;
 
-	  for (std::string::size_type pos = 0; pos < text_string.length(); ++pos)
+	  for (pos = 0; pos < text_string.length(); ++pos)
 	  {
 		  if (text_string.at(pos)==',' || text_string.at(pos)=='.' || text_string.at(pos)=='?' || text_string.at(pos)=='!')
 		  {
