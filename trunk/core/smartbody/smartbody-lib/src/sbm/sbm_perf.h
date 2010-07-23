@@ -69,7 +69,8 @@ class SbmPerfReport	{
 			
 			if( real_sum >= interval )	{
 				double avg = real_sum / count;
-				if( real_time == sim_time ) {
+//				if( real_time == sim_time ) {
+				if( fabs( real_sum - sim_sum ) < 0.001 ) {
 					printf( "PERF: dt:%.3f fps:%.1f\n", avg, 1.0 / avg );
 				}
 				else	{
