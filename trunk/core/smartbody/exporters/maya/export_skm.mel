@@ -1042,12 +1042,6 @@ global proc updateOutput()
       $outputFilePath = `pwd`;
       textFieldGrp -edit -text $outputFilePath skmOutputPath;
    }
-   int $flag = `filetest -d $outputFilePath`;
-   if( $flag == 0 )
-      warning -showLineNumber true "Please check the input directory!";
-   string $testfilename = basename($outputFileName, ".skm");
-   if( $testfilename == $outputFileName)
-      warning -showLineNumber true "Please check the suffix of output file, should be .skm!";
    $outputFile = $outputFilePath + "/" + $outputFileName;
    setAttr -type "string" ( $AnimDef + ".outputFile" ) $outputFile ;
 }
