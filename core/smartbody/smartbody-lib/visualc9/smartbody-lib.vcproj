@@ -1310,6 +1310,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\time_control.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\time_control.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\viseme_map.hpp"
 				>
 			</File>
