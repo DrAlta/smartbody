@@ -28,7 +28,6 @@
  */
 
 #include "vhcl.h"
-
 #include "mcontrol_util.h"
 
 #include <stdlib.h>
@@ -41,20 +40,43 @@
 #include "me_utilities.hpp"
 #include "wsp.h"
 
-
 using namespace std;
 using namespace WSP;
 
-
-
-
 const bool LOG_ABORTED_SEQ = false;
 
+/////////////////////////////////////////////////////////////
+
+#if 0
+void mcuCBHandle::test_map( void )	{
+	SbmPawn* pawn_p = NULL;
+
+#if 1
+	srHashMap <SbmPawn> pawn_map_cp( pawn_map );
+#endif
+
+	printf( "iterate ---\n" );
+
+	pawn_map.reset();
+	while( pawn_p = pawn_map.next() )	{
+
+		printf( "iterate pawn: %s\n", pawn_p->name );
+	
+#if 1
+		SbmPawn* pawn_cp_p = NULL;
+		pawn_map_cp.reset();
+		while( pawn_cp_p = pawn_map_cp.next() )	{
+			printf( "  pawn: %s\n", pawn_cp_p->name );
+		}
+#endif	
+	}
+	printf( "---\n" );
+}
+#endif
 
 /////////////////////////////////////////////////////////////
 //  Singleton Instance
 mcuCBHandle* mcuCBHandle::_singleton = NULL;
-
 
 /////////////////////////////////////////////////////////////
 
@@ -62,11 +84,7 @@ mcuCBHandle* mcuCBHandle::_singleton = NULL;
 mcuCBHandle::mcuCBHandle()
 :	loop( true ),
 	vhmsg_enabled( false ),
-	lock_dt( false ),
-	real_time( 0.0 ),
-	start_time(0.0),
-	time( 0.0 ),
-	perf( 10.0 ),
+	timer_p( NULL ),
 	net_bone_updates( true ),
 	net_world_offset_updates( true ),
 	net_face_bones( false ),
@@ -86,15 +104,6 @@ mcuCBHandle::mcuCBHandle()
 	viewer_factory ( new SrViewerFactory() ),
 	bmlviewer_factory ( new BMLViewerFactory() ),
 	resource_manager(ResourceManager::getResourceManager()),
-	sleep_fps(0.0),
-	sim_fps(0.0),
-	update_fps(0.0),
-	do_pause(false),
-	do_resume(false),
-	do_steps(false),
-	paused( false ),
-	pause_time( 0.0 ),
-	resume_offset( 0.0 ),
 	snapshot_counter( 1 ),
 	delay_behaviors(true)
 {
@@ -107,7 +116,6 @@ mcuCBHandle::mcuCBHandle()
 	// TODO: this needs to have a unique name so that multiple sbm
 	// processes will be identified differently
 	theWSP->init( "SMARTBODY" );
-
 }
 
 /////////////////////////////////////////////////////////////
@@ -135,18 +143,6 @@ void mcuCBHandle::reset( void )	{
 
 	if ( net_host )
 		bonebus.OpenConnection( net_host );
-}
-
-void mcuCBHandle::set_real_time( double rt )	{
-
-	real_time = rt;
-	if( sim_fps > 0.0 )	{
-		time += 1.0 / sim_fps;
-	}
-	else	{
-		time = rt;
-	}
-	perf.update( rt, time );
 }
 
 char * mcn_return_full_filename_func( const char * current_path, const char * file_name)
@@ -469,33 +465,6 @@ int mcuCBHandle::remove_scene( SrSnGroup *scene_p )	{
 	}
 	return( CMD_FAILURE );
 }
-
-#if 0
-void mcuCBHandle::test_map( void )	{
-	SbmPawn* pawn_p = NULL;
-
-#if 1
-	srHashMap <SbmPawn> pawn_map_cp( pawn_map );
-#endif
-
-	printf( "iterate ---\n" );
-
-	pawn_map.reset();
-	while( pawn_p = pawn_map.next() )	{
-
-		printf( "iterate pawn: %s\n", pawn_p->name );
-	
-#if 1
-		SbmPawn* pawn_cp_p = NULL;
-		pawn_map_cp.reset();
-		while( pawn_cp_p = pawn_map_cp.next() )	{
-			printf( "  pawn: %s\n", pawn_cp_p->name );
-		}
-#endif	
-	}
-	printf( "---\n" );
-}
-#endif
 
 void mcuCBHandle::update( void )	{
 
@@ -1432,94 +1401,116 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 /////////////////////////////////////////////////////////////
 
 /*
-	
-	time maxfps|fps <desired-max-fps>
-	time lockdt [0|1]
-	time perf [0|1 [<interval>]]
+	time speed <real-time-factor>
+
 	time sleepfps <fps>
-	time simfps <fps>
+	time simfps   <fps>
+	time evalfps  <fps>
+	time sleepdt <dt>
+	time simdt   <dt>
+	time evaldt  <dt>
+
+	time pause
+	time resume
+	time step [num-steps]
+
+	time print
+	time perf [<interval>]
 */
 
 int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	
 	if( mcu_p )	{
 		char *time_cmd = args.read_token();
-		if (strcmp( time_cmd, "simfps" ) == 0 ) {
-			mcu_p->sim_fps = args.read_float();
-			mcu_p->desired_max_fps = mcu_p->sim_fps; // deprecate
-			mcu_p->lock_dt = (mcu_p->sim_fps > 0.0); // deprecate
+
+		if( strcmp( time_cmd, "print" ) == 0 )	{
+			if( mcu_p->timer_p )	{
+				mcu_p->timer_p->print();
+			}
+			else	{
+				printf( "TIME:%.3f ~ DT:%.3f %.2f:FPS\n",
+					mcu_p->time,
+					mcu_p->time_dt,
+					1.0 / mcu_p->time_dt
+				);
+			}
+			return( CMD_SUCCESS );
 		}
-		else 
-			if (strcmp( time_cmd, "sleepfps" ) == 0 ) {
-			mcu_p->sleep_fps = args.read_float();
-			mcu_p->desired_max_fps = mcu_p->sleep_fps; // deprecate
+		if( mcu_p->timer_p == NULL )	{
+			printf( "mcu_time_func ERR: %s: TimeRegulator NOT REGISTERED\n", time_cmd ); 
+			return( CMD_FAILURE );
 		}
-		else 
-			if (strcmp( time_cmd, "updatefps" ) == 0 ) {
-			mcu_p->update_fps = args.read_float();
+		TimeRegulator *timer_p = mcu_p->timer_p;
+		
+		if( strcmp( time_cmd, "test" ) == 0 )	{
+			void test_time_regulator( void );
+			test_time_regulator();
 		}
 		else
 		if( ( strcmp( time_cmd, "maxfps" ) == 0 ) || ( strcmp( time_cmd, "fps" ) == 0 ) )	{ // deprecate
 			std::cout << "WARNING: 'time maxfps' is deprecated, use 'time sleepfps' instead." << std::endl;
-			mcu_p->desired_max_fps = args.read_float();
-			mcu_p->sleep_fps = mcu_p->desired_max_fps;
+			timer_p->set_sleep_fps( args.read_float() );
 		}
 		else
 		if( strcmp( time_cmd, "lockdt" ) == 0 )	{ // deprecate
 			std::cout << "WARNING: 'time lockdt' is deprecated, use 'time sleepfps' and 'time simfps' instead." << std::endl;
-			int n = args.calc_num_tokens();
-			if( n ) {
-				int enable = args.read_int();
-				mcu_p->lock_dt = enable ? true : false;
-			}
-			else	{
-				mcu_p->lock_dt = !mcu_p->lock_dt;
-			}
-			if( mcu_p->lock_dt )	{
-				mcu_p->sim_fps = mcu_p->desired_max_fps;
-				mcu_p->sleep_fps = mcu_p->desired_max_fps;
-			}
-			else	{
-				mcu_p->sim_fps = 0.0;
-				mcu_p->sleep_fps = 0.0;
-			}
+			int enable = args.read_int();
+			timer_p->set_sleep_lock( enable != false );
+		}
+		else 
+		if( strcmp( time_cmd, "speed" ) == 0 ) {
+			timer_p->set_speed( args.read_float() );
+		}
+		else 
+		if( strcmp( time_cmd, "sleepfps" ) == 0 ) {
+			timer_p->set_sleep_fps( args.read_float() );
+		}
+		else 
+		if( strcmp( time_cmd, "evalfps" ) == 0 ) {
+			timer_p->set_eval_fps( args.read_float() );
 		}
 		else
+		if( strcmp( time_cmd, "simfps" ) == 0 ) {
+			timer_p->set_sim_fps( args.read_float() );
+		}
+		else 
+		if( strcmp( time_cmd, "sleepdt" ) == 0 ) {
+			timer_p->set_sleep_dt( args.read_float() );
+		}
+		else 
+		if( strcmp( time_cmd, "evaldt" ) == 0 ) {
+			timer_p->set_eval_dt( args.read_float() );
+		}
+		else 
+		if( strcmp( time_cmd, "simdt" ) == 0 ) {
+			timer_p->set_sim_dt( args.read_float() );
+		}
+		else
+		if( strcmp( time_cmd, "pause" ) == 0 )	{
+			timer_p->pause();
+		}
+		else 
+		if( strcmp( time_cmd, "resume" ) == 0 )	{
+			timer_p->resume();
+		}
+		else 
+		if( strcmp( time_cmd, "step" ) == 0 )	{
+			int n = args.calc_num_tokens();
+			if( n ) {
+				timer_p->step( args.read_int() );
+			}
+			else	{
+				timer_p->step( 1 );
+			}
+		}
+		else 
 		if( strcmp( time_cmd, "perf" ) == 0 )	{
 			int n = args.calc_num_tokens();
 			if( n ) {
-				int enable = args.read_int();
-				mcu_p->perf.enable( enable ? true : false );
-				if( n > 1 ) {
-					float interval = args.read_float();
-					mcu_p->perf.set_interval( interval );
-				}
+				timer_p->set_perf( args.read_float() );
 			}
 			else	{
-				mcu_p->perf.toggle();
-			}
-		}
-		else
-		if (strcmp( time_cmd, "pause" ) == 0 )	{
-			mcu_p->do_pause = true;
-		}
-		else 
-		if (strcmp( time_cmd, "resume" ) == 0 )	{
-			mcu_p->do_resume = true;
-		}
-		else 
-		if (strcmp( time_cmd, "step" ) == 0  || strcmp( time_cmd, "steps" ) == 0)	{
-			if( mcu_p->paused )	{
-				int n = args.calc_num_tokens();
-				if( n ) {
-					mcu_p->do_steps = args.read_int();
-				}
-				else	{
-					mcu_p->do_steps = 1;
-				}
-			}
-			else	{
-				std::cout << "NOT paused, cannot step" << std::endl;
+				timer_p->set_perf( 10.0 );
 			}
 		}
 		else {
@@ -1935,7 +1926,6 @@ const char* PRINT_FACE_AU_SYNTAX1_HELP     = "print face au <unit number>";
 const char* PRINT_FACE_AU_SYNTAX2_HELP     = "print face au *";
 const char* PRINT_FACE_VISEME_SYNTAX1_HELP = "print face viseme <viseme name>";
 const char* PRINT_FACE_VISEME_SYNTAX2_HELP = "print face viseme *";
-
 
 
 int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
@@ -2457,7 +2447,6 @@ int init_gaze_controller(
 	ctrl_p->name( ctrl_name );
 	ctrl_p->init(
 		MeCtGaze::key_index( strlen( key_fr ) ? key_fr : "back" ),  // WARN: does not handle NULL string
-//		MeCtGaze::key_index( strlen( key_to ) ? key_to : "eyes" )
 		MeCtGaze::key_index( strlen( key_to ) ? key_to : ( strlen( key_fr ) ? key_fr : "eyes" ) )
 	);
 	return( CMD_SUCCESS );
@@ -2526,42 +2515,9 @@ int init_lilt_controller(
 
 int init_eyelid_controller(
 	char *ctrl_name,
-//	char *mot_A_name,
-//	char *mot_B_name,
-//	char *mot_C_name,
-//	char *mot_D_name,
-//	char *mot_E_name,
 	mcuCBHandle *mcu_p
 )	{
 	int err = CMD_SUCCESS;
-
-#if 0
-	SkMotion *mot_A_p = mcu_p->motion_map.lookup( mot_A_name );
-	if( mot_A_p == NULL ) {
-		printf( "init_eyelid_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_A_name ); 
-		return( CMD_FAILURE );
-	}
-	SkMotion *mot_B_p = mcu_p->motion_map.lookup( mot_B_name );
-	if( mot_B_p == NULL ) {
-		printf( "init_eyelid_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_B_name ); 
-		return( CMD_FAILURE );
-	}
-	SkMotion *mot_C_p = mcu_p->motion_map.lookup( mot_C_name );
-	if( mot_C_p == NULL ) {
-		printf( "init_eyelid_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_C_name ); 
-		return( CMD_FAILURE );
-	}
-	SkMotion *mot_D_p = mcu_p->motion_map.lookup( mot_D_name );
-	if( mot_D_p == NULL ) {
-		printf( "init_eyelid_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_D_name ); 
-		return( CMD_FAILURE );
-	}
-	SkMotion *mot_E_p = mcu_p->motion_map.lookup( mot_E_name );
-	if( mot_E_p == NULL ) {
-		printf( "init_eyelid_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_E_name ); 
-		return( CMD_FAILURE );
-	}
-#endif
 
 	MeCtEyeLid* ctrl_p = new MeCtEyeLid;
 	err = mcu_p->eyelid_ctrl_map.insert( ctrl_name, ctrl_p );
@@ -2580,9 +2536,6 @@ int init_eyelid_controller(
 	ctrl_p->ref();
 	
 	ctrl_p->name( ctrl_name );
-//	ctrl_p->init( mot_A_p, mot_B_p, mot_C_p );
-//	ctrl_p->init( mot_A_p, mot_B_p );
-//	ctrl_p->init( mot_A_p, mot_B_p, mot_C_p, mot_D_p, mot_E_p );
 	ctrl_p->init();
 	return( CMD_SUCCESS );
 }
@@ -2652,23 +2605,6 @@ int set_controller_timing(
 	return( CMD_SUCCESS );
 }
 
-//int set_controller_timing(
-//	char *ctrl_name, 
-//	float indt, 
-//	float outdt, 
-//	float empht, 
-//	mcuCBHandle *mcu_p
-//)	{
-//
-//	if( MeController* ctrl_p = mcu_p->controller_map.lookup( ctrl_name ) )	{
-//		ctrl_p->inoutdt( indt, outdt );
-//		ctrl_p->emphasist( empht );
-//		return( CMD_SUCCESS );
-//	}
-//	printf( "set_controller_timing ERR: MeController '%s' NOT FOUND\n", ctrl_name );
-//	return( CMD_FAILURE );
-//}
-
 int query_controller(
 	MeController* ctrl_p
 )	{
@@ -2693,38 +2629,6 @@ int query_controller(
 //	printf( "> " );
 	return( CMD_SUCCESS );
 }
-
-
-//int query_controller(
-//	char *ctrl_name, 
-//	mcuCBHandle *mcu_p
-//)	{
-//
-//	if( MeController* ctrl_p = mcu_p->controller_map.lookup( ctrl_name ) )	{
-//		printf( "MCU QUERY: MeController '%s':\n", ctrl_name );
-//		printf( "  type... %s\n", ctrl_p->controller_type() );
-//		printf( "  indt... %.3f\n", ctrl_p->indt() );
-//		printf( "  outdt.. %.3f\n", ctrl_p->outdt() );
-//		float emph = ctrl_p->emphasist();
-//		if( emph < 0.0 )	{
-//			printf( "  emph... UNK\n");
-//		}
-//		else	{
-//			printf( "  emph... %.3f\n", emph );
-//		}
-//		double dur = ctrl_p->controller_duration();
-//		if( dur < 0.0 )	{
-//			printf( "  dur.... UNK\n" );
-//		}
-//		else	{
-//			printf( "  dur.... %.3f\n", dur );
-//		}
-////		printf( "> " );
-//		return( CMD_SUCCESS );
-//	}
-//	printf( "query_controller ERR: MeController '%s' NOT FOUND\n", ctrl_name );
-//	return( CMD_FAILURE );
-//}
 
 /*
 
@@ -2880,7 +2784,6 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		}
 		else
 		if( strcmp( ctrl_cmd, "snod" ) == 0 )	{
-//			char *char_name = args.read_token();
 			return(
 				init_simple_nod_controller( ctrl_name, mcu_p )
 			);
@@ -2894,15 +2797,7 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		}
 		else
 		if( strcmp( ctrl_cmd, "eyelid" )== 0) {
-//			char *mot_A_name= args.read_token();
-//			char *mot_B_name= args.read_token();
-//			char *mot_C_name= args.read_token();
-//			char *mot_D_name= args.read_token();
-//			char *mot_E_name= args.read_token();
 			return(
-//				init_eyelid_controller( ctrl_name, mot_A_name, mot_B_name, mot_C_name, mot_D_name, mot_E_name, mcu_p )
-//				init_eyelid_controller( ctrl_name, mot_A_name, mot_B_name, mot_C_name, mcu_p )
-//				init_eyelid_controller( ctrl_name, mot_A_name, mot_B_name, mcu_p )
 				init_eyelid_controller( ctrl_name, mcu_p )
 			);
 		}
@@ -2947,12 +2842,19 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 						return( CMD_SUCCESS );
 					}
 					if( strcmp( record_type, "bvh" ) == 0 )	{
-						if( mcu_p->sim_fps > 0.0 )	{
-							ctrl_p->record_bvh( max_num_of_frames, 1.0/mcu_p->sim_fps );
-							return( CMD_SUCCESS );
+						if( mcu_p->timer_p )	{
+							double sim_dt = mcu_p->timer_p->get_sim_dt();
+							if( sim_dt > 0.0 )	{
+								ctrl_p->record_bvh( max_num_of_frames, sim_dt );
+								return( CMD_SUCCESS );
+							}
+							else	{
+								printf( "mcu_controller_func ERR: BVH recording requires 'time simfps|simdt' set\n" );
+								return( CMD_FAILURE );
+							}
 						}
 						else	{
-							printf( "mcu_controller_func ERR: BVH recording requires 'time simfps' set\n" );
+							printf( "mcu_controller_func ERR: BVH recording requires registered TimeRegulator\n" );
 							return( CMD_FAILURE );
 						}
 					}
@@ -3852,13 +3754,11 @@ int mcu_vrQuery_func( srArgBuffer& args, mcuCBHandle* mcu_p )
 }
 
 
-
-
-
 /*
    vrAllCall
      In response to this message, send out vrComponent to indicate that this component is running
 */
+
 int mcu_vrAllCall_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
     if ( mcu_p )
@@ -3881,8 +3781,6 @@ int mcu_vrAllCall_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 	return CMD_SUCCESS;
 }
-
-
 
 /////////////////////////////////////////////////////////////
 

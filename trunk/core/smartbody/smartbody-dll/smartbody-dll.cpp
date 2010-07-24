@@ -212,9 +212,8 @@ SMARTBODY_DLL_API bool Smartbody_dll::Update( const double timeInSeconds )
 {
    mcuCBHandle & mcu = mcuCBHandle::singleton();
 
-   mcu.set_time( timeInSeconds );
-   mcu.update();
-
+   bool update_sim = mcu.update_timer( timeInSeconds );
+   if( update_sim ) mcu.update();
    return true;
 }
 

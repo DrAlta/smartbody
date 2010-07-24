@@ -36,13 +36,11 @@
 #include <string>
 #include <vector>
 
-//#include <FL/Fl.H>
 #include "fltk_viewer.h"
 #include <BehaviorWindow.h>
 #include "wsp.h"
 
 #include <sbm/sbm_constants.h>
-
 #include <sbm/xercesc_utils.hpp>
 #include <sbm/mcontrol_util.h>
 #include <sbm/sbm_test_cmds.hpp>
@@ -54,8 +52,52 @@
 #include <sbm/text_speech.h> // [BMLR]
 #include <sbm/locomotion_cmds.hpp>
 #include <sbm/resource_cmds.h>
+#include <sbm/time_regulator.h>
 
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
+#if 0
+#include <me/me_spline_1d.hpp>
+void test_1Dspline( void )	{
+	MeSpline1D S;
+
+//	Knot* make_smooth( domain x, range y, range tan, range l_control, range r_control );
+//	Knot* make_cusp( domain x, range y, range l_tan, range l_control, range r_tan, range r_control );
+//	Knot* make_disjoint( domain x, range y, range left_y, range l_tan, range l_control, range r_tan, range r_control );
+// range eval( domain x )
+
+#if 0
+	S.make_disjoint( 0.0, 0.0,  0.0, 0.0, 0.0, 0.0 );
+	S.make_disjoint( 1.0, 1.0,  0.0, 0.0, 0.0, 0.0 );
+	S.make_disjoint( 1.005, 2.0,  0.0, 0.0, 0.0, 0.0 );
+	S.make_disjoint( 2.0, 4.0,  0.0, 0.0, 0.0, 0.0 );
+#elif 1
+	S.make_cusp( 0.0, 0.0,  0.0, 0.0, 0.0, 0.0 );
+	S.make_cusp( 1.0, 1.0,  0.0, 0.0, 0.0, 0.0 );
+	S.make_cusp( 1.0, 2.0,  0.0, 0.0, 0.0, 0.0 );
+	S.make_cusp( 2.0, 4.0,  0.0, 0.0, 0.0, 0.0 );
+#else
+	S.make_smooth( 0.0, 0.0,  0.0, 0.0, 0.0 );
+	S.make_smooth( 1.0, 1.0,  0.0, 0.0, 0.0 );
+	S.make_smooth( 2.0, 4.0,  0.0, 0.0, 0.0 );
+#endif
+
+//	S.update_all_knots();
+	for( int i=0; i<=100; i++ )	{
+		double n = (double)i/100.0;
+		double x = -1.0 + n * 6.0;
+
+		double y = S.eval( x );
+		printf( " [%d]: { %.12f, %.12f }\n", i, x, y );
+	}
+
+	printf( " : { %.12f, %.12f }\n", -0.000001, S.eval( -0.000001 ) );
+	printf( " : { %.12f, %.12f }\n", 3.9999999, S.eval( 3.9999999 ) );
+	printf( " : { %.12f, %.12f }\n", 4.0000001, S.eval( 4.0000001 ) );
+}
+#endif
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define WIN32_LEAN_AND_MEAN
 #include <sbm/sr_cmd_line.h>
@@ -89,67 +131,10 @@
 #define strcasecmp _stricmp
 #endif
 #else
-#include <sys/time.h>
 #endif
-
 
 using std::vector;
 using std::string;
-
-
-
-
-#define ENABLE_QPF_TIME 	(1)
-
-
-double get_time(void) {
-#ifdef WIN32
-#if ENABLE_QPF_TIME
-	static int once = 1;
-	static double inv_freq;
-	static LONGLONG ref_quad;
-	LARGE_INTEGER c;
-	
-	if( once )	{
-		once = 0;
-		LARGE_INTEGER f;
-		QueryPerformanceFrequency( &f );
-		inv_freq = 1.0 / (double)f.QuadPart;
-		QueryPerformanceCounter( &c );
-		ref_quad = c.QuadPart;
-	}
-	QueryPerformanceCounter( &c );
-	LONGLONG diff_quad = c.QuadPart - ref_quad;
-	if( diff_quad < 0 ) {
-		diff_quad = 0;
-	}
-	return( (double)diff_quad * inv_freq );
-#else
-	return( (double)timeGetTime() / 1000.0 );
-#endif
-#else
-	struct timeval tv;
-	gettimeofday( &tv, NULL );
-	return( tv.tv_sec + ( tv.tv_usec / 1000000.0 ) );
-#endif
-}
-
-void sbm_sleep( int msec )	{
-#ifdef WIN32
-#if 0
-	Sleep( msec );
-#else
-	static int once = 1;
-	if( once )	{
-		once = 0;
-		timeBeginPeriod( 1 ); // millisecond resolution
-	}
-	Sleep( msec );
-#endif	
-#else
-	printf( "sbm_sleep ERR: not implemented\n" );
-#endif
-}
 
 ///////////////////////////////////////////////////////////////////////////////////
 
@@ -322,7 +307,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "viewer",		mcu_viewer_func );
 	mcu.insert( "bmlviewer",    mcu_bmlviewer_func);
 	mcu.insert( "camera",		mcu_camera_func );
-	mcu.insert( "time",		mcu_time_func );
+	mcu.insert( "time",			mcu_time_func );
 
 	mcu.insert( "load",			mcu_load_func );
 	mcu.insert( "pawn",			SbmPawn::pawn_cmd_func );
@@ -446,26 +431,6 @@ void signal_handler(int sig) {
 	exit(sig);
 }
 
-double sbm_loop_wait( double target_fps = 100.0 )	{ // sleep to reach target loop rate
-	static double prev_time = 0.0;
-
-	if( target_fps > 0.0 )	{
-		double curr_time = get_time();
-		double target_dt = 1.0 / target_fps;
-		double dt = curr_time - prev_time;
-
-		if( dt < target_dt )	{
-			double diff = target_dt - dt;
-			int wait_msec = (int)( diff * 1000.0 );
-			if( wait_msec > 0 ) {
-				sbm_sleep( wait_msec );
-			}
-		}
-	}
-	prev_time = get_time();
-	return( prev_time );
-}
-
 ///////////////////////////////////////////////////////////////////////////////////
 
 int main( int argc, char **argv )	{
@@ -510,11 +475,12 @@ int main( int argc, char **argv )	{
 	
 	mcu_register_callbacks();
 
-	mcu.desired_max_fps = 100.0; // deprecate
-//	mcu.desired_max_fps = 10.0;
+	TimeRegulator timer;
+	mcu.register_timer( &timer );
 
 	// EDF - taken from tre_main.cpp, a fancier command line parser can be put here if desired.
 	//	check	command line parameters:
+	bool lock_dt_mode = false;
 	int i;
 	SrString	s;
 	for (	i=1; i<argc; i++ )
@@ -570,20 +536,19 @@ int main( int argc, char **argv )	{
 		}
 		else if( s.search( "-lockdt" ) == 0 )  // argument equals -lockdt
 		{
-			mcu.lock_dt = true;
+			lock_dt_mode = true;
 		}
 		else if( s.search( "-fps=" ) == 0 )  // argument starts with -fps=
 		{
 			SrString fps = s;
 			fps.remove( 0, 5 );
-			mcu.sleep_fps = atof( fps );
+			timer.set_sleep_fps( atof( fps ) );
 		}
 		else if( s.search( "-perf=" ) == 0 )  // argument starts with -perf=
 		{
 			SrString interval = s;
 			interval.remove( 0, 6 );
-			mcu.perf.on();
-			mcu.perf.set_interval( atof( interval ) );
+			timer.set_perf( atof( interval ) );
 		}
 		else if ( s.search( "-facebone" ) == 0 )
 		{
@@ -594,8 +559,8 @@ int main( int argc, char **argv )	{
 			printf( "ERROR: Unrecognized command line argument: \"%s\"\n", (const char*)s );
 		}
 	}
-	if( mcu.lock_dt )	{ // deprecate
-		mcu.sim_fps = mcu.sleep_fps;
+	if( lock_dt_mode )	{ 
+		timer.set_sleep_lock();
 	}
 
 #if LINK_VHMSG_CLIENT
@@ -711,58 +676,11 @@ int main( int argc, char **argv )	{
 	// Notify world SBM is ready to receive messages
 	mcu_vrAllCall_func( srArgBuffer(""), &mcu );
 
-	double curr_time = 0.0;
-	double real_time = 0.0;
-	double real_dt = 0.0;
-	double prev_time = 0.0;
-
-	double update_wait = 0.0;
-	bool update_sim = false;
-
-	mcu.start_time = get_time();
+	timer.start();
 	while( mcu.loop )	{
 
-		if( mcu.do_pause )	{
-			mcu.do_pause = false;
-			mcu.paused = true;
-			mcu.pause_time = real_time;
-		}
-		if( mcu.do_steps )	{
-			mcu.do_resume = true;
-		}
-		if( mcu.do_resume )	{
-			mcu.do_resume = false;
-			mcu.paused = false;
-			mcu.resume_offset = real_time - mcu.pause_time;
-			mcu.start_time += mcu.resume_offset;
-		}
-		if( mcu.do_steps )	{
-			mcu.do_steps--;
-			if( mcu.do_steps == 0 )	{
-				mcu.do_pause = true;
-			}
-		}
-
-		curr_time = sbm_loop_wait( mcu.sleep_fps ); // sleep to reach target loop rate
-		real_time = curr_time - mcu.start_time;
-		real_dt = real_time - prev_time;
-		prev_time = real_time;
-
-		update_wait += real_dt;
-		if( mcu.update_fps > 0.0 )	{
-			if( update_wait >= ( 1.0 / mcu.update_fps ) )	{
-				update_sim = true;
-				update_wait = 0.0;
-			}
-		}
-		else	{
-			update_sim = true;
-		}
-
-		if( !mcu.paused && update_sim )	{
-			mcu.set_real_time( real_time );
-		}
-
+		bool update_sim = mcu.update_timer();
+		
 		fltk::check();
 	
 #if LINK_VHMSG_CLIENT
@@ -803,11 +721,10 @@ int main( int argc, char **argv )	{
 
 		mcu.theWSP->broadcast_update();
 
-		if( !mcu.paused && update_sim )	{
+		if( update_sim )	{
 			mcu.update();
-			update_sim = false;
 		}
-
+		
 		mcu.render();
 	}
 

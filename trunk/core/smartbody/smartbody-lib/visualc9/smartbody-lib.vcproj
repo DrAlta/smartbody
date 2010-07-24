@@ -1234,10 +1234,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\sbm_perf.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\sbm\sbm_speech.cpp"
 				>
 			</File>
@@ -1310,11 +1306,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\time_control.cpp"
+				RelativePath="..\src\sbm\time_regulator.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\time_control.h"
+				RelativePath="..\src\sbm\time_regulator.h"
 				>
 			</File>
 			<File
