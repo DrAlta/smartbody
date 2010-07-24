@@ -35,6 +35,7 @@
 #include <ME/me_ct_blend.hpp>
 #include <ME/me_ct_time_shift_warp.hpp>
 #include "mcontrol_util.h"
+#include "mcontrol_callbacks.h"
 #include "me_utilities.hpp"
 #include <ME/me_spline_1d.hpp>
 

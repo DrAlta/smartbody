@@ -1,5 +1,5 @@
 /*
- *  sbm_perf.h - part of SmartBody-lib
+ *  time_regulator.h - part of SmartBody-lib
  *  Copyright (C) 2010  University of Southern California
  *
  *  SmartBody-lib is free software: you can redistribute it and/or

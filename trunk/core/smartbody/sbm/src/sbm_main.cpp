@@ -43,6 +43,7 @@
 #include <sbm/sbm_constants.h>
 #include <sbm/xercesc_utils.hpp>
 #include <sbm/mcontrol_util.h>
+#include <sbm/mcontrol_callbacks.h>
 #include <sbm/sbm_test_cmds.hpp>
 #include BML_PROCESSOR_INCLUDE
 #include <sbm/remote_speech.h>
