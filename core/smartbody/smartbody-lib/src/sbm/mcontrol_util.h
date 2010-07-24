@@ -34,7 +34,6 @@ class mcuCBHandle;
 
 #include <map>
 
-
 #define LINK_VHMSG_CLIENT		(1)
 
 
@@ -71,7 +70,7 @@ class mcuCBHandle;
 #include "sbm_speech_audiofile.hpp"
 #include "me_ct_examples.h"
 #include "me_ct_lilt_try.h"
-#include "sbm_perf.h"
+#include "time_regulator.h"
 
 #include "joint_logger.hpp"
 #include "ResourceManager.h"
@@ -87,7 +86,6 @@ namespace WSP
 {
     class Manager;
 };
-
 
 //////////////////////////////////////////////////////////////////
 
@@ -126,25 +124,13 @@ class mcuCBHandle	{
 		std::string speech_audiofile_base_path;
 		std::string process_id;
 		bool		play_internal_audio;
-		bool		lock_dt; // if true: report fixed dt to animation system
-		double		desired_max_fps;
-		double		real_time;
-		double		start_time;
-		double		time;
-		double      sleep_fps;
-		double      sim_fps;
-		double      update_fps;
-		bool		do_pause;
-		bool		do_resume;
-		int			do_steps;
-		bool		paused;
-		double		pause_time;
-		double		resume_offset;
+		
+		TimeRegulator	*timer_p;
+		double			time; // AKA sim_time
+		double			time_dt;
+
 		bool		delay_behaviors;
-
 		int			snapshot_counter;
-
-		SbmPerfReport perf;
 
 		SrViewerFactory *viewer_factory;
 		SrViewer	*viewer_p;
@@ -212,8 +198,6 @@ class mcuCBHandle	{
 		mcuCBHandle( mcuCBHandle& );
 		mcuCBHandle& operator= (const mcuCBHandle&);
 
-//		void test_map();
-
 	public:
 		static mcuCBHandle& singleton() {
 			if( !_singleton )
@@ -227,8 +211,22 @@ class mcuCBHandle	{
 		}
 
 		void reset();
-		void set_real_time( double real_time );
-		void set_time( double real_time ) { set_real_time( real_time ); } // for Ed
+
+		void register_timer( TimeRegulator *time_reg_p )	{
+			timer_p = time_reg_p;
+		}
+		bool update_timer( double in_time = -1.0 )	{
+			if( timer_p )	{
+				bool ret = timer_p->update( in_time );
+				time = timer_p->get_time();
+				time_dt = timer_p->get_dt();
+				return( ret );
+			}
+			double prev = time;
+			time = in_time;
+			time_dt = time - prev;
+			return( true );
+		}
 
 		int open_viewer( int width, int height, int px, int py );
 		void close_viewer( void );
