@@ -1166,6 +1166,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\mcontrol_callbacks.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\mcontrol_callbacks.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\mcontrol_util.cpp"
 				>
 			</File>

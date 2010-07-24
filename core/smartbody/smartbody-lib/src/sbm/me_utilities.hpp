@@ -32,6 +32,7 @@
 #include "sr_path_list.h"
 #include "sr_hash_map.h"
 #include "mcontrol_util.h"
+#include "mcontrol_callbacks.h"
 #include "Resource.h"
 
 #include <boost/filesystem/path.hpp>
