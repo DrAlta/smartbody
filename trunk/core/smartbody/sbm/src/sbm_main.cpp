@@ -681,6 +681,7 @@ int main( int argc, char **argv )	{
 	while( mcu.loop )	{
 
 		bool update_sim = mcu.update_timer();
+//		bool update_sim = mcu.update_timer( SBM_get_real_time() );
 		
 		fltk::check();
 	

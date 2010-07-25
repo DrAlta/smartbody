@@ -21,6 +21,9 @@
  */
 
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "sbm/time_regulator.h"
 
 #define WIN32_LEAN_AND_MEAN
@@ -47,7 +50,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////
 
-double SBM_get_real_time(void) {
+double SBM_get_real_time( void ) {
 #ifdef WIN32
 #if ENABLE_QPF_TIME
 	static int once = 1;
@@ -92,7 +95,7 @@ void SBM_sleep_msec( int msec )	{
 #endif
 }
 
-double SBM_sleep_wait( double prev_time, double target_dt, bool verbose = false )	{ // sleep to reach target loop rate
+double SBM_sleep_wait( double prev_time, double target_dt, bool verbose )	{ // sleep to reach target loop rate
 
 	if( target_dt > 0.0 )	{
 		
@@ -139,7 +142,22 @@ void TimeRegulator::start( double in_time ) {
 	}
 	
 	clock_time = start_time;
+	prev_loop_time = 0.0;
 	started = true;
+}
+
+void TimeRegulator::reset( double in_time ) {
+
+	double reset_val;
+	if( in_time < 0.0 )	{
+		reset_val = 0.0;
+	}
+	else	{
+		reset_val = in_time;
+	}
+	
+	out_time = reset_val;
+	eval_wait = 0.0;
 }
 
 bool TimeRegulator::update( double in_time ) {
@@ -166,7 +184,9 @@ bool TimeRegulator::update( double in_time ) {
 
 	double loop_time = clock_time - start_time;
 	double loop_dt = loop_time - prev_loop_time;
+//printf( "%f %f %f %f : %f\n", start_time, clock_time, loop_time, prev_loop_time, loop_dt );
 	prev_loop_time = loop_time;
+
 
 	if( !abort ) {
 		if( loop_dt < 0.0 ) {
@@ -181,10 +201,14 @@ bool TimeRegulator::update( double in_time ) {
 		if( loop_dt == 0.0 )	{
 			if( extern_src )	{
 				if( verbose ) printf( "TimeRegulator::update NOTICE: zero external increment\n" );
+				if( ( ( sleep_dt == 0.0 )&&( eval_dt == 0.0 )&&( sim_dt > 0.0 ) ) == false )	{
+					abort = true;
+				}
 			}
-			else
+			else	{
 				printf( "TimeRegulator::update ERR: zero internal increment!!!!\n" );
-			abort = true;
+				abort = true;
+			}
 		}
 	}
 	if( abort ) {
@@ -231,7 +255,6 @@ bool TimeRegulator::update( double in_time ) {
 			do_steps--;
 			do_pause = true;
 		}
-
 		if( !paused )	{
 			if( sim_dt > 0.0 )	{
 				out_dt = sim_dt;
@@ -240,7 +263,7 @@ bool TimeRegulator::update( double in_time ) {
 				out_dt = real_dt * speed;
 			}
 			out_time += out_dt;
-			perf_update();
+			update_perf();
 			return( true );
 		}
 	}
@@ -250,7 +273,7 @@ bool TimeRegulator::update( double in_time ) {
 	return( false );
 }
 
-void TimeRegulator::perf_update( void )	{
+void TimeRegulator::update_perf( void )	{
 
 	if( !perf_enabled ) return;
 
@@ -289,129 +312,108 @@ void TimeRegulator::print( void )	{
 	printf( "   out dt: %.4f : %.2f fps\n", out_dt, ( out_dt > 0.0 )? ( 1.0 / out_dt ): 0.0 );
 	printf( " out time: %.3f\n", out_time );
 }
-		
+
+void TimeRegulator::print_update( int id, double in_time ) {
+
+	bool res = update( in_time );
+	printf( "[%d]:(%d): in:%f time:%f dt:%f\n", id, res, in_time, get_time(), get_dt() );
+}
+
 ///////////////////////////////////////////////////////////////////////////////////
 
 //#include <stdlib.h>
 
 void test_time_regulator( void )	{
-	TimeRegulator tc;
+	TimeRegulator tr;
 	bool res;
+	int c = 0;
 	
-	tc.start();
-	tc.set_verbose();
-	tc.print();
+	tr.start();
+	tr.set_verbose();
+	tr.print();
 	
 	printf( "=====================================================\n" );
 
 #if 0
-	res = tc.update();
-	printf( "[%d]: %f : %f\n", (int)res, tc.get_time(), tc.get_dt() );
-
-	res = tc.update();
-	printf( "[%d]: %f : %f\n", (int)res, tc.get_time(), tc.get_dt() );
-
-	res = tc.update();
-	printf( "[%d]: %f : %f\n", (int)res, tc.get_time(), tc.get_dt() );
-
-	res = tc.update();
-	printf( "[%d]: %f : %f\n", (int)res, tc.get_time(), tc.get_dt() );
-
-	res = tc.update();
-	printf( "[%d]: %f : %f\n", (int)res, tc.get_time(), tc.get_dt() );
+	tr.print_update( c++ );
+	tr.print_update( c++ );
+	tr.print_update( c++ );
+	tr.print_update( c++ );
+	tr.print_update( c++ );
 
 	printf( "=====================================================\n" );
 	
-	res = tc.update( 1.0 );
-	printf( "[%d]: %f : %f\n", (int)res, tc.get_time(), tc.get_dt() );
-
-	res = tc.update( 1.1 );
-	printf( "[%d]: %f : %f\n", (int)res, tc.get_time(), tc.get_dt() );
-
-	res = tc.update( 2.0 );
-	printf( "[%d]: %f : %f\n", (int)res, tc.get_time(), tc.get_dt() );
-
-	res = tc.update( 2.2 );
-	printf( "[%d]: %f : %f\n", (int)res, tc.get_time(), tc.get_dt() );
-
-	res = tc.update( 2.2 );
-	printf( "[%d]: %f : %f\n", (int)res, tc.get_time(), tc.get_dt() );
+	tr.print_update( c++, 1.0 );
+	tr.print_update( c++, 1.1 );
+	tr.print_update( c++, 2.0 );
+	tr.print_update( c++, 2.2 );
+	tr.print_update( c++, 2.2 );
 
 	printf( "=====================================================\n" );
 
-	res = tc.update();
-	printf( "[%d]: %f : %f\n", (int)res, tc.get_time(), tc.get_dt() );
-
-	res = tc.update();
-	printf( "[%d]: %f : %f\n", (int)res, tc.get_time(), tc.get_dt() );
-
-	res = tc.update();
-	printf( "[%d]: %f : %f\n", (int)res, tc.get_time(), tc.get_dt() );
-
-	res = tc.update();
-	printf( "[%d]: %f : %f\n", (int)res, tc.get_time(), tc.get_dt() );
-
-	res = tc.update();
-	printf( "[%d]: %f : %f\n", (int)res, tc.get_time(), tc.get_dt() );
+	tr.print_update( c++ );
+	tr.print_update( c++ );
+	tr.print_update( c++ );
+	tr.print_update( c++ );
+	tr.print_update( c++ );
 
 	printf( "=====================================================\n" );
 	
-	res = tc.update( 1.0 );
-	printf( "[%d]: %f : %f\n", (int)res, tc.get_time(), tc.get_dt() );
-
-	res = tc.update( 2.0 );
-	printf( "[%d]: %f : %f\n", (int)res, tc.get_time(), tc.get_dt() );
-
-	res = tc.update( 3.0 );
-	printf( "[%d]: %f : %f\n", (int)res, tc.get_time(), tc.get_dt() );
-
-	res = tc.update( 0.0 );
-	printf( "[%d]: %f : %f\n", (int)res, tc.get_time(), tc.get_dt() );
-
-	res = tc.update( 4.0 );
-	printf( "[%d]: %f : %f\n", (int)res, tc.get_time(), tc.get_dt() );
+	tr.print_update( c++, 1.0 );
+	tr.print_update( c++, 2.0 );
+	tr.print_update( c++, 3.0 );
+	tr.print_update( c++, 0.0 );
+	tr.print_update( c++, 4.0 );
 
 	printf( "=====================================================\n" );
-	tc.print();
+	tr.print();
 #endif
 	
-	tc.start();
-//	tc.set_speed( 10.0 );
-	tc.set_sleep_fps( 10.0 );
-	tc.set_eval_fps( 10.0 );
-	tc.set_sim_fps( 10.0 );
+	tr.start();
+//	tr.set_speed( 10.0 );
+	tr.set_sleep_fps( 10.0 );
+	tr.set_eval_fps( 10.0 );
+//	tr.set_sim_fps( 10.0 );
 
 #if 0
-	for( int i = 0; i<100; i++ )	{
-		double f = (double)rand() / (double)RAND_MAX;
-		res = tc.update( f );
-		if( res )	{
-			printf( "%f : %f : %f\n", f, tc.get_time(), tc.get_dt() );
-		}
-		else printf( "-\n" );
+	for( int i = 0; i<20; i++ )	{
+		double r = (double)rand() / (double)RAND_MAX;
+		tr.print_update( i, r );
 	}
 	printf( "=====================================================\n" );
 #endif
 
 #if 0
-	tc.set_perf( 1.0 );
+	tr.set_perf( 1.0 );
 	for( int i = 0; i<100; i++ )	{
-		res = tc.update();
+		res = tr.update();
 	}
 	printf( "=====================================================\n" );
-	tc.set_perf( 0.0 );
+	tr.set_perf( 0.0 );
 #endif
 
 #if 1
-	for( int i = 0; i<100; i++ )	{
-		if( i == 10 ) tc.pause();
-		if( i == 20 ) tc.step();
-		if( i == 30 ) tc.resume();
-//		if( i == 40 ) tc.pause();
-		if( i == 50 ) tc.step( 10 );
-		if( i == 70 ) tc.resume();
+	for( int i = 0; i<30; i++ )	{
+		if( i == 10 ) tr.start();
+		if( i == 20 ) tr.reset();
 
-		tc.print_update( i );
+		tr.print_update( i );
+	}
+	printf( "=====================================================\n" );
+#endif
+
+#if 0
+	for( int i = 0; i<100; i++ )	{
+		if( i == 10 ) tr.pause();
+		if( i == 20 ) tr.step();
+		if( i == 30 ) tr.resume();
+//		if( i == 40 ) tr.pause();
+		if( i == 50 ) tr.step( 10 );
+		if( i == 70 ) tr.resume();
+		if( i == 80 ) tr.start();
+//		if( i == 90 ) tr.reset();
+
+		tr.print_update( i );
 	}
 	printf( "=====================================================\n" );
 #endif

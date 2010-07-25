@@ -548,6 +548,12 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	if( mcu_p )	{
 		char *time_cmd = args.read_token();
 
+		if( strcmp( time_cmd, "test" ) == 0 )	{
+			void test_time_regulator( void );
+			test_time_regulator();
+			return( CMD_SUCCESS );
+		}
+		else
 		if( strcmp( time_cmd, "print" ) == 0 )	{
 			if( mcu_p->timer_p )	{
 				mcu_p->timer_p->print();
@@ -567,11 +573,10 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		}
 		TimeRegulator *timer_p = mcu_p->timer_p;
 		
-		if( strcmp( time_cmd, "test" ) == 0 )	{
-			void test_time_regulator( void );
-			test_time_regulator();
+		if( strcmp( time_cmd, "reset" ) == 0 ) {
+			timer_p->reset();
 		}
-		else
+		else 
 		if( ( strcmp( time_cmd, "maxfps" ) == 0 ) || ( strcmp( time_cmd, "fps" ) == 0 ) )	{ // deprecate
 			std::cout << "WARNING: 'time maxfps' is deprecated, use 'time sleepfps' instead." << std::endl;
 			timer_p->set_sleep_fps( args.read_float() );
