@@ -23,44 +23,7 @@
 #ifndef TIME_REGULATOR_H
 #define TIME_REGULATOR_H
 
-#include <stdio.h>
-
 class TimeRegulator	{
-
-	private:
-		void defaults( void )	{
-			
-			verbose = false;
-			started = false;
-			extern_src = false;
-			
-			perf_enabled = false;
-			perf_interval = 0.0;
-			perf_real_sum = 0.0;
-			perf_sim_sum = 0.0;
-		 	perf_count = 0;
-
-			speed = 1.0;
-			sleep_dt = 0.0;
-			eval_dt = 0.0;
-			sim_dt = 0.0;
-		
-			start_time = -1.0;
-			clock_time = -1.0;
-			real_time = 0.0;
-			real_dt = 0.0;
-			prev_real_time = 0.0;
-			prev_loop_time = 0.0;
-			eval_wait = 0.0;
-			
-			do_pause = false;
-			do_resume = false;
-			do_steps = 0;
-			paused = false;
-
-			out_time = 0.0;
-			out_dt = 0.0;
-		}
 
 	public:
 	
@@ -102,30 +65,55 @@ class TimeRegulator	{
 		}
 		
 		void start( double in_time = -1.0 );
+		void reset( double in_time = -1.0 );
 		bool update( double in_time = -1.0 );
 
-		void pause( void )	{
-			do_pause = true;
-		}
-		void step( int num_steps = 1 )	{
-			do_steps = num_steps;
-		}
-		void resume( void )	{
-			do_resume = true;
-		}
+		void pause( void )				{ do_pause = true; }
+		void step( int num_steps = 1 )	{ do_steps = num_steps; }
+		void resume( void )				{ do_resume = true; }
 		
-		double get_time( void ) { return( out_time ); }
-		double get_dt( void ) { return( out_dt ); }
-		double get_sim_dt( void ) { return( sim_dt ); }
+		double get_time( void ) 	{ return( out_time ); }
+		double get_dt( void )		{ return( out_dt ); }
+		double get_sim_dt( void )	{ return( sim_dt ); }
 
 		void print( void );
-		void print_update( int id, double in_time = -1.0 ) {
-			bool res = update( in_time );
-			printf( "[%d]:(%d): time:%f dt:%f\n", id, res, get_time(), get_dt() );
-		}
+		void print_update( int id, double in_time = -1.0 );
 		
 	private:
-		void 	perf_update( void );
+		void defaults( void )	{
+			
+			verbose = false;
+			started = false;
+			extern_src = false;
+			
+			perf_enabled = false;
+			perf_interval = 0.0;
+			perf_real_sum = 0.0;
+			perf_sim_sum = 0.0;
+		 	perf_count = 0;
+
+			speed = 1.0;
+			sleep_dt = 0.0;
+			eval_dt = 0.0;
+			sim_dt = 0.0;
+		
+			start_time = -1.0;
+			clock_time = -1.0;
+			real_time = 0.0;
+			real_dt = 0.0;
+			prev_real_time = 0.0;
+			prev_loop_time = 0.0;
+			eval_wait = 0.0;
+			
+			do_pause = false;
+			do_resume = false;
+			do_steps = 0;
+			paused = false;
+
+			out_time = 0.0;
+			out_dt = 0.0;
+		}
+		void 	update_perf( void );
 
 		bool	verbose;
 		bool	started;
@@ -158,4 +146,9 @@ class TimeRegulator	{
 		double	out_time;
 		double	out_dt;
 };
+
+double SBM_get_real_time( void );
+void SBM_sleep_msec( int msec );
+double SBM_sleep_wait( double prev_time, double target_dt, bool verbose = false );
+
 #endif
