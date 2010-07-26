@@ -184,7 +184,6 @@ bool TimeRegulator::update( double in_time ) {
 
 	double loop_time = clock_time - start_time;
 	double loop_dt = loop_time - prev_loop_time;
-//printf( "%f %f %f %f : %f\n", start_time, clock_time, loop_time, prev_loop_time, loop_dt );
 	prev_loop_time = loop_time;
 
 
@@ -325,12 +324,10 @@ void TimeRegulator::print_update( int id, double in_time ) {
 
 void test_time_regulator( void )	{
 	TimeRegulator tr;
-	bool res;
 	int c = 0;
 	
 	tr.start();
 	tr.set_verbose();
-	tr.print();
 	
 	printf( "=====================================================\n" );
 
@@ -386,18 +383,22 @@ void test_time_regulator( void )	{
 #if 0
 	tr.set_perf( 1.0 );
 	for( int i = 0; i<100; i++ )	{
-		res = tr.update();
+		tr.update();
 	}
 	printf( "=====================================================\n" );
 	tr.set_perf( 0.0 );
 #endif
 
 #if 1
+	tr.set_sleep_fps( 0.0 );
+	tr.set_eval_fps( 0.0 );
+	tr.set_sim_fps( 10.0 );
+	tr.print();
 	for( int i = 0; i<30; i++ )	{
 		if( i == 10 ) tr.start();
 		if( i == 20 ) tr.reset();
 
-		tr.print_update( i );
+		tr.print_update( i, 0.0 );
 	}
 	printf( "=====================================================\n" );
 #endif
