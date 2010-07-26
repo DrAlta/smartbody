@@ -164,7 +164,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 		if( motion->load( fullin ) ) {
 
 			// register the motion
-			motion->registerAnimation();
+			//motion->registerAnimation();
 
 			char CurrentPath[_MAX_PATH];
 			_getcwd(CurrentPath, _MAX_PATH);
