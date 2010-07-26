@@ -50,7 +50,6 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				PrecompiledHeaderFile=""
-				BrowseInformation="1"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 				DisableSpecificWarnings="4355"
