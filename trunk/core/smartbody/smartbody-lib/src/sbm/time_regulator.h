@@ -23,6 +23,79 @@
 #ifndef TIME_REGULATOR_H
 #define TIME_REGULATOR_H
 
+/*
+	TimeRegulator class:
+	
+	- Generates a controllable time stream from an internal or optional external
+	source.
+	- Regulates both simulated time, and real simulation loop performance.
+	- May facilitate decentralized control of time for distributed simulation.
+	
+	Core rate params:
+	
+	- If set to 0.0, function is disabled.
+	
+		sim_dt: 
+			- fixed increment applied to output time
+			- if 0.0, uses 'real' measured time
+		eval_dt:
+			- minimum interval at which time is incremented, independent of
+			application loop update rate
+			- if 0.0, increments each update call
+		sleep_dt:
+			- target loop rate, calls sleep to delay update call
+			
+	Input update param:
+	
+	- If negative, uses internal clock.
+	- If non-negative, param is interpreted as a clock, with increasing sequential
+	values moving the time forward correspondingly.
+	- If non-increasing, no increment occurs.
+	- Switching dynamically from internal to external will not interrupt output stream.
+	
+	Return bool value:
+	
+	- Indicates that update has occured according to specified rate settings.
+	- Indicates that valid output dt value is available.
+	
+	Special cases:
+	
+	- If speed param is set, sim_dt is set to 0.0, and 'real' time is scaled
+	by the speed factor.
+	- If ( sleep_dt == 0.0) && ( eval_dt == 0.0 ) && ( sim_dt > 0.0 ), update 
+	always returns true, using sim_dt increment.
+	- Sleep-lock feature copies sleep_dt to sim_dt.
+	
+	Pausing and stepping:
+	
+	- Pause function will halt clock increments and update returns false.
+	- Step [n] function will pause and step through the next n evaluations.
+	- Resume restores normal behavior.
+	
+	Deterministic control:
+	
+	- The start() function is used internally during a source switch, but can
+	be used to set exact initial clock conditions prior to subsequent update().
+	- The reset() function will allow raw output time to be reset to a non-negative
+	value, to ensure bitwise exact replication of fixed time for regression 
+	testing.
+	
+	Instrumentation:
+	
+	- The set_perf() function will output basic performance info at the specified
+	interval.
+	- The print() function outputs immediate internal state info.
+	- The print_update() function will call update and print the results for testing.
+	- The set_verbose() function will report internal events such as source switch.
+	
+	Supplementary functions:
+	
+	double	SBM_get_real_time( void );
+	void	SBM_sleep_msec( int msec );
+	double	SBM_sleep_wait( double prev_time, double target_dt, bool verbose = false );
+
+*/
+
 class TimeRegulator	{
 
 	public:
