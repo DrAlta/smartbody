@@ -65,6 +65,8 @@ class MeCtFace : public MeController	{
 		SkSkeleton* 	    _skeleton_ref_p;
 
 		SrBuffer<bool>			_include_chan_flag; // key channels to exclude from calculation
+		std::map<std::string, std::vector<int> > _visemeChannelMap;
+		std::vector<int> _baseChannelToBufferIndex;
 		
 	public:
 		static const char* type_name;

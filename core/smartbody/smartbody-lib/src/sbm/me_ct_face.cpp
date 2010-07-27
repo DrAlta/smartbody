@@ -56,6 +56,9 @@ void MeCtFace::clear( void )	{
 	while( key_pose_p = _key_pose_map.pull() )	{
 		key_pose_p->unref();
 	}
+
+	_visemeChannelMap.clear();
+	_baseChannelToBufferIndex.clear();
 }
 
 void MeCtFace::init( SkMotion* base_ref_p ) {
@@ -156,6 +159,46 @@ void MeCtFace::add_key( const char *weight_key, SkMotion* key_pose_p ) {
 void MeCtFace::finish_adding( void )	{
 	if( _context ) {
 		_context->child_channels_updated( this );
+	}
+
+	_visemeChannelMap.clear();
+	_key_pose_map.reset();
+
+	// get a map from the base channel index to the base buffer index
+	SkChannelArray& baseChannelArray = _base_pose_p->channels();
+	int baseSize = baseChannelArray.size();
+	int curIndex = 0;
+	for (int b = 0; b < baseSize; b++)
+	{
+		_baseChannelToBufferIndex.push_back(curIndex);
+		int baseChannelSize = baseChannelArray[b].size();
+		curIndex += baseChannelSize;
+	}
+
+	// now map the key channels to the base channels
+	char* keyName;
+	while (SkMotion* nextKey = _key_pose_map.next(&keyName))
+	{
+		std::vector<int> keyIndices;
+		SkChannelArray& channelArray = nextKey->channels();
+		int size = channelArray.size();
+		for (int c = 0; c < size; c++)
+		{
+			SkChannel& channel = nextKey->channels()[c];
+			SkJointName& jointName = nextKey->channels().name(c);
+			int baseChannelIndex = _base_pose_p->channels().search(jointName, channel.type);
+			if (baseChannelIndex >= 0)
+			{
+				keyIndices.push_back(baseChannelIndex); // mapping from the key pose channel index to the base pose channel index
+			}
+			else
+			{
+				keyIndices.push_back(-1); // key contains channel that does not exist in base pose
+			}
+
+		}
+		
+		_visemeChannelMap.insert(std::pair<std::string, std::vector<int> > (std::string(nextKey->name()), keyIndices));
 	}
 }
 
@@ -272,15 +315,32 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 //				printf( "Face: '%s'\n", key_pose_p->name() );
 			
 				float* key_pose_buff_p = key_pose_p->posture( 0 );
+				int numKeyChannels = key_pose_p->channels().size();
+				SkChannelArray& keyPoseChannels = key_pose_p->channels();
 
 				pose_var_index = 0;
-				for( int i=0; i<nchan; i++ )	{
-					int ch_size = base_channels[ i ].size();
+				std::map<std::string, std::vector<int> >::iterator iter = _visemeChannelMap.find(std::string(key_pose_p->name()));
+				if (iter == _visemeChannelMap.end())
+				{
+					std::cout << "Viseme " << key_pose_p->name() << " not found in channel-buffer map. Programmer needs to fix this! Might be lack of finish_adding function." << std::endl;
+					continue;
+				}
+				std::vector<int>& keyToChannelMap = (*iter).second;
 
-					if( _include_chan_flag[ i ] )	{
-						SkChannel::Type ch_type = base_channels[ i ].type;
+				for( int i=0; i<numKeyChannels; i++ )	{
+					int ch_size = keyPoseChannels[ i ].size();
+					int chIndex = keyToChannelMap[i];
 
-						int base_ch_index = _bChan_to_buff[ i ];
+					int baseIndex = keyToChannelMap[i];
+					if (i == -1) // this should only happen if there is a channel in the key pose that does not exist in the base pose
+						continue;
+
+					int baseBufferIndex = _baseChannelToBufferIndex[baseIndex];
+
+					if(_include_chan_flag[ chIndex ] )	{
+						SkChannel::Type ch_type = keyPoseChannels[ i ].type;
+
+						int base_ch_index = _bChan_to_buff[ chIndex ];
 						if( base_ch_index >= 0 )	{
 							if( 
 								( ch_type == SkChannel::XPos ) ||
@@ -288,7 +348,7 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 								( ch_type == SkChannel::ZPos )
 							)	{
 								fbuffer[ base_ch_index ] += 
-									( key_pose_buff_p[ pose_var_index ] - base_pose_buff_p[ pose_var_index ] ) * key_weight;
+									( key_pose_buff_p[ pose_var_index ] - base_pose_buff_p[ baseBufferIndex ] ) * key_weight;
 							}
 							else
 							if( ch_type == SkChannel::Quat )	{
@@ -300,10 +360,10 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 									fbuffer[ base_ch_index + 3 ]
 								);
 								quat_t base_q( 
-									base_pose_buff_p[ pose_var_index ], 
-									base_pose_buff_p[ pose_var_index + 1 ], 
-									base_pose_buff_p[ pose_var_index + 2 ], 
-									base_pose_buff_p[ pose_var_index + 3 ] 
+									base_pose_buff_p[ baseBufferIndex ], 
+									base_pose_buff_p[ baseBufferIndex + 1 ], 
+									base_pose_buff_p[ baseBufferIndex + 2 ], 
+									base_pose_buff_p[ baseBufferIndex + 3 ] 
 								);
 								quat_t key_q( 
 									key_pose_buff_p[ pose_var_index ], 
