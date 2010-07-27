@@ -543,6 +543,13 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	time perf [<interval>]
 */
 
+void print_timer_deprecation_warning( void )	{
+
+	std::cout << "WARNING: fps/lockdt feature is deprecated" << std::endl;
+	std::cout << " use 'time sleepfps' and 'time simfps' instead" << std::endl;
+	std::cout << " NOTE: if you insist, be sure to set fps first, then lockdt..." << std::endl;
+}
+
 int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	
 	if( mcu_p )	{
@@ -578,12 +585,12 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		}
 		else 
 		if( ( strcmp( time_cmd, "maxfps" ) == 0 ) || ( strcmp( time_cmd, "fps" ) == 0 ) )	{ // deprecate
-			std::cout << "WARNING: 'time maxfps' is deprecated, use 'time sleepfps' instead." << std::endl;
+			print_timer_deprecation_warning();
 			timer_p->set_sleep_fps( args.read_float() );
 		}
 		else
 		if( strcmp( time_cmd, "lockdt" ) == 0 )	{ // deprecate
-			std::cout << "WARNING: 'time lockdt' is deprecated, use 'time sleepfps' and 'time simfps' instead." << std::endl;
+			print_timer_deprecation_warning();
 			int enable = args.read_int();
 			timer_p->set_sleep_lock( enable != false );
 		}
