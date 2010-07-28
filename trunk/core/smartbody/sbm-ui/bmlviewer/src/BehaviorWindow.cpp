@@ -26,7 +26,9 @@ BehaviorWindow::BehaviorWindow(int x, int y, int w, int h, char* name) : Window(
 		choiceContexts->callback(ContextCB, this);
 		buttonClear = new fltk::Button(350, 0, 100, 20, "Clear");
 		buttonClear->callback(ClearCB, this);
-		Group* topSizer = new Group(470, 0, 10, 0);
+		buttonReplay = new fltk::Button(470, 0, 100, 20, "Replay BML");
+		buttonReplay->callback(ReplayCB, this);
+		Group* topSizer = new Group(590, 0, 10, 0);
 		
 	topGroup->end();
 	topGroup->resizable(topSizer);
@@ -264,6 +266,53 @@ void BehaviorWindow::ClearCB(fltk::Widget* widget, void* data)
 
 	window->updateGUI();
 	window->redraw();
+}
+
+void BehaviorWindow::ReplayCB(fltk::Widget* widget, void* data)
+{
+	BehaviorWindow* window = (BehaviorWindow*) data;
+
+	std::vector< std::pair<std::string, std::vector<nle::Track*> > >& contexts = window->nleWidget->getModel()->getContexts();
+	std::string contextName = window->nleWidget->getModel()->getContextName();
+
+	std::vector<nle::Track*> tracks;
+	bool found = window->nleWidget->getModel()->getContext(contextName, tracks);
+	if (found)
+	{
+		if (tracks.size() > 0)
+		{
+			nle::Track* bmlTrack = tracks[0];
+			if (bmlTrack->getNumBlocks() > 0)
+			{
+				std::stringstream strstr;
+				strstr << "test bml ";
+				// get the participant id - this is a little bit of a hack, but the character
+				// name is not preserved, so we need to example the XML looking for participant id=
+				std::string bml = tracks[0]->getBlock(0)->getInfo();
+				std::string searchStr = "participant id=\"";
+				int pos = bml.find(searchStr);
+				if (pos != std::string::npos)
+				{
+					// find the next quote
+					std::string substr = bml.substr(pos + searchStr.size());
+					int quotePos = substr.find("\"");
+					if (quotePos != std::string::npos)
+					{
+						std::string characterId = substr.substr(0, quotePos);
+						strstr << " char " << characterId << " ";
+					}
+				}
+				strstr << bml;
+
+				// run that bml
+				mcuCBHandle& mcu = mcuCBHandle::singleton();
+				mcu.execute((char*) strstr.str().c_str());
+				window->updateGUI();
+				window->redraw();
+			}
+		}
+	}
+
 }
 
 void BehaviorWindow::ContextCB(fltk::Widget* widget, void* data)

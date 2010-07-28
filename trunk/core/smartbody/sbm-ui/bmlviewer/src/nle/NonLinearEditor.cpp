@@ -943,6 +943,29 @@ void NonLinearEditorModel::setContext(std::string name)
 	currentContext = "";
 }
 
+std::string NonLinearEditorModel::getContextName()
+{
+	return currentContext;
+}
+
+bool NonLinearEditorModel::getContext(std::string name, std::vector<Track*>& contextTracks)
+{
+	for (unsigned int c = 0; c < contexts.size(); c++)
+	{
+		if (contexts[c].first == name)
+		{
+		
+			std::vector<Track*>& allTracks = contexts[c].second;
+			for (int t = 0; t < allTracks.size(); t++)
+			{
+				contextTracks.push_back(allTracks[t]);
+			}
+			return true;
+		}
+	}
+
+	return false;
+}
 
 void NonLinearEditorModel::saveContext(std::string name)
 {
