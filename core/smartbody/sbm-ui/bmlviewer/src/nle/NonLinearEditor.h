@@ -184,8 +184,11 @@ class NonLinearEditorModel
         bool isModelChanged();    
 
 		void setContext(std::string name);
+		std::string getContextName();
 		void saveContext(std::string name);
+		bool getContext(std::string name, std::vector<Track*>& contextTracks);
 		std::vector<std::pair<std::string, std::vector<Track*> > >& getContexts();
+		std::vector<Track*>& getContext(std::string name);
 		void clearContexts();
 
 	protected:

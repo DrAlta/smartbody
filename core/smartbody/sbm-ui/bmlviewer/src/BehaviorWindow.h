@@ -57,12 +57,14 @@ class BehaviorWindow : public fltk::Window, public BMLViewer
 		
 		static void ContextCB(fltk::Widget* widget, void* data);
 		static void ClearCB(fltk::Widget* widget, void* data);
+		static void ReplayCB(fltk::Widget* widget, void* data);
 
 		BehaviorEditorWidget* nleWidget;
 
 
 		fltk::Choice* choiceContexts;
 		fltk::Button* buttonClear;
+		fltk::Button* buttonReplay;
 		fltk::TextDisplay* textXML;
 		fltk::TextBuffer* bufferXML;
 
