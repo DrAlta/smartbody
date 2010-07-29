@@ -131,6 +131,10 @@ SbmCharacter::~SbmCharacter( void )	{
 		face_ct->unref();
 	eyelid_ct->unref();
 
+	if (locomotion_ct_analysis)
+		delete locomotion_ct_analysis;
+	if (locomotion_ct)
+		delete locomotion_ct;
 
 	if ( mcuCBHandle::singleton().sbm_character_listener )
 	{

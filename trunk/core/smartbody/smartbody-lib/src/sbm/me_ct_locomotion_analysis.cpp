@@ -43,6 +43,10 @@ MeCtLocomotionAnalysis::MeCtLocomotionAnalysis() {
 /** Destructor */
 MeCtLocomotionAnalysis::~MeCtLocomotionAnalysis() {
 	// Nothing allocated to the heap
+	if (walking_skeleton)
+		walking_skeleton->unref();
+	if (standing_skeleton)
+		standing_skeleton->unref();
 }
 
 void MeCtLocomotionAnalysis::set_ct(MeCtLocomotion* controller)
@@ -66,6 +70,7 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 		return;
 	}
 	this->motion_standing = standing;
+	this->motion_standing->ref();
 	const char* base_name = standing_skeleton->root()->name().get_string();
 
 	get_ct()->set_base_name(base_name);
