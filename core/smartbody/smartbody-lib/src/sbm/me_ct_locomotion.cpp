@@ -64,6 +64,12 @@ MeCtLocomotion::MeCtLocomotion() {
 MeCtLocomotion::~MeCtLocomotion() {
 	// Nothing allocated to the heap
 
+	int num = limb_list.size();
+	for (int x = 0; x < num; x++)
+	{
+		MeCtLocomotionLimb* limb = limb_list.get(x);
+		delete limb;
+	}
 }
 
 void MeCtLocomotion::init_limbs()

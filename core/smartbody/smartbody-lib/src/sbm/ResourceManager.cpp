@@ -13,10 +13,12 @@ ResourceManager::ResourceManager()
 
 ResourceManager::~ResourceManager()
 {
-//	for (unsigned int r = 0; r < resources.size(); r++)
-//	{
-//		delete resources[r];
-//	}
+	for (std::list<Resource*>::iterator iter = resources.begin();
+		iter != resources.end();
+		iter++)
+	{
+		delete (*iter);
+	}
 }
 
 void ResourceManager::addResource(Resource* r)

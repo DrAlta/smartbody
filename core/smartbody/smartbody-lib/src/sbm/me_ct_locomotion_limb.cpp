@@ -50,10 +50,19 @@ MeCtLocomotionLimb::MeCtLocomotionLimb() {
 MeCtLocomotionLimb::~MeCtLocomotionLimb() {
 	// Nothing allocated to the heap
 	limb_base_name = NULL;
+	for (int x = 0; x < walking_list.size(); x++)
+	{
+		MeCtLocomotionLimbAnim* anim = walking_list.get(x);
+		delete anim;
+	}
 	walking_list.capacity(0);
 	support_joint_list.capacity(0);
 	free(limb_base_name);
 	delete blended_anim.global_info;
+	if (walking_skeleton)
+		this->walking_skeleton->unref();
+	if (standing_skeleton)
+		this->standing_skeleton->unref();
 }
 
 int MeCtLocomotionLimb::get_descendant_num(SkJoint* joint)
@@ -176,7 +185,9 @@ void MeCtLocomotionLimb::blend_standing(MeCtLocomotionLimbAnim* anim, float weig
 void MeCtLocomotionLimb::init_skeleton(SkSkeleton* standing_skeleton, SkSkeleton* walking_skeleton)
 {
 	this->walking_skeleton = walking_skeleton;
+	this->walking_skeleton->ref();
 	this->standing_skeleton = standing_skeleton;
+	this->standing_skeleton->ref();
 }
 
 SrArray<MeCtLocomotionLimbAnim*>* MeCtLocomotionLimb::get_walking_list()
