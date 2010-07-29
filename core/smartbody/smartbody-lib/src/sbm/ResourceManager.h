@@ -24,6 +24,7 @@ class ResourceManager
 		int getLimit();
 
 		static ResourceManager* getResourceManager();
+		static void cleanup();
 		
 	
 	private:

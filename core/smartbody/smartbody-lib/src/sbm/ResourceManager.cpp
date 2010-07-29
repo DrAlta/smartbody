@@ -80,6 +80,12 @@ ResourceManager* ResourceManager::getResourceManager()
 	return manager;
 }
 
+void ResourceManager::cleanup()
+{
+	if (manager)
+		delete manager;
+	manager = NULL;
+}
 void ResourceManager::addParent(Resource* parent)
 {
 	cur_cmd_parent.push(parent);
