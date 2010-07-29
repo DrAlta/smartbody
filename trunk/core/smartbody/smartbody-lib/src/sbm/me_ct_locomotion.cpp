@@ -70,6 +70,11 @@ MeCtLocomotion::~MeCtLocomotion() {
 		MeCtLocomotionLimb* limb = limb_list.get(x);
 		delete limb;
 	}
+
+	for (int x = 0; x < anim_global_info.size(); x++)
+	{
+		delete anim_global_info[x];
+	}
 }
 
 void MeCtLocomotion::init_limbs()

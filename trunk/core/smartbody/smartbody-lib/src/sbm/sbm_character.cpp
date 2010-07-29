@@ -1460,6 +1460,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		if( new_param->size == 0 )
 		{
 			printf("param_registeration ERR: parameter size not defined!\n");
+			delete new_param;
 			return( CMD_FAILURE );
 		}
 		for(int i = 0 ; i < (int)new_param->char_names.size(); i++)
@@ -1467,6 +1468,8 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			if(char_name == new_param->char_names[i])
 			{
 				printf("param_registeration ERR: parameter redefinition!\n");
+				
+				delete new_param;
 				return( CMD_FAILURE );				
 			}
 		}

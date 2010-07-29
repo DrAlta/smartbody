@@ -42,6 +42,8 @@ MeCtLocomotionLimbAnim::MeCtLocomotionLimbAnim()
 MeCtLocomotionLimbAnim::~MeCtLocomotionLimbAnim() 
 {
 	// Nothing allocated to the heap
+	for (int x = 0; x < displacement_list.size(); x++)
+		delete displacement_list[x];
 }
 
 int MeCtLocomotionLimbAnim::get_support_joint_num()
