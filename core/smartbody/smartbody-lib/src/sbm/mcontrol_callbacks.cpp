@@ -588,6 +588,7 @@ void print_timer_help( int level = 0 )	{
 		std::cout << "  perf [<interval>]" 								<< std::endl;
 		std::cout << "  print" 											<< std::endl;
 		std::cout << "  prof enable [0|1]" 							<< std::endl;
+		std::cout << "  prof suppress [<level>]" 					<< std::endl;
 		std::cout << "  prof threshold <min-detect>|0" 				<< std::endl;
 		std::cout << "  prof print|report" 							<< std::endl;
 	}
@@ -644,6 +645,13 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			}
 			if( strcmp( prof_cmd, "report" ) == 0 )	{
 				mcu_p->profiler.report();
+				return( CMD_SUCCESS );
+			}
+			if( strcmp( prof_cmd, "suppress" ) == 0 )	{
+				int level = -1;
+				int n = args.calc_num_tokens();
+				if( n ) level = args.read_int();
+				mcu_p->profiler.set_suppression( level );
 				return( CMD_SUCCESS );
 			}
 			if( strcmp( prof_cmd, "threshold" ) == 0 )	{

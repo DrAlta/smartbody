@@ -678,7 +678,7 @@ int main( int argc, char **argv )	{
 	// Notify world SBM is ready to receive messages
 	mcu_vrAllCall_func( srArgBuffer(""), &mcu );
 
-mcu.profiler.mark( __FILE__, __LINE__ );
+mcu.profiler.mark_line( __FILE__, __LINE__ );
 
 	timer.start();
 	while( mcu.loop )	{
