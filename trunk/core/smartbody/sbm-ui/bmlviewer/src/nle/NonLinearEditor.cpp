@@ -956,7 +956,7 @@ bool NonLinearEditorModel::getContext(std::string name, std::vector<Track*>& con
 		{
 		
 			std::vector<Track*>& allTracks = contexts[c].second;
-			for (int t = 0; t < allTracks.size(); t++)
+			for (size_t t = 0; t < allTracks.size(); t++)
 			{
 				contextTracks.push_back(allTracks[t]);
 			}
