@@ -274,7 +274,7 @@ bool TimeRegulator::update( double in_time ) {
 
 void TimeRegulator::update_perf( void )	{
 
-	if( !perf_enabled ) return;
+	if( perf_interval <= 0.0 ) return;
 
 	perf_real_sum += real_dt;
 	perf_sim_sum += sim_dt;

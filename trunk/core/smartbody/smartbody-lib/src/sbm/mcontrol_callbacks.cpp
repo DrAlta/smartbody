@@ -45,6 +45,37 @@ using namespace WSP;
 
 /////////////////////////////////////////////////////////////
 
+int mcu_help_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
+	
+	if( mcu_p )	{
+		int level = args.read_int();
+
+		if( level == 2 )	{
+			std::cout << "API help..." << std::endl;
+
+		}
+		else
+		if( level == 1 )	{
+			std::cout << "Full help..." << std::endl;
+
+		}
+		else	{
+			std::cout << "HELP: <sbm-command>" << std::endl;
+			std::cout << "  <>		argument description"	<< std::endl;
+			std::cout << "  |		or"						<< std::endl;
+			std::cout << "  []		optional"				<< std::endl;
+			std::cout << "  \\		deprecated"				<< std::endl;
+			std::cout << "  #		planned"				<< std::endl;
+			std::cout << "  !		needs attention"		<< std::endl;
+			std::cout << "  ()		description"			<< std::endl;
+			std::cout << "  sbm [id <pid>] <sbm-command>"	<< std::endl;
+		}
+	}
+	return( CMD_SUCCESS );
+}
+
+/////////////////////////////////////////////////////////////
+
 char * mcn_return_full_filename_func( const char * current_path, const char * file_name)
 {
 	if( file_name == NULL)	return NULL;
@@ -525,29 +556,41 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 /////////////////////////////////////////////////////////////
 
-/*
-	time speed <real-time-factor>
-
-	time sleepfps <fps>
-	time simfps   <fps>
-	time evalfps  <fps>
-	time sleepdt <dt>
-	time simdt   <dt>
-	time evaldt  <dt>
-
-	time pause
-	time resume
-	time step [num-steps]
-
-	time print
-	time perf [<interval>]
-*/
-
 void print_timer_deprecation_warning( void )	{
 
 	std::cout << "WARNING: fps/lockdt feature is deprecated" << std::endl;
-	std::cout << " use 'time sleepfps' and 'time simfps' instead" << std::endl;
-	std::cout << " NOTE: if you insist, be sure to set fps first, then lockdt..." << std::endl;
+	std::cout << "  use 'time sleepfps' and 'time simfps' instead" << std::endl;
+	std::cout << "  NOTE: if you insist, be sure to set fps first, then lockdt..." << std::endl;
+}
+
+void print_timer_help( int level = 0 )	{
+	
+	if( level == 2 ) {
+		std::cout << "API help..." << std::endl;
+	
+	}
+	else
+	if( level == 1 )	{
+		std::cout << "Full help..." << std::endl;
+
+	}
+	else	{
+		std::cout << "HELP: time" << std::endl;
+		std::cout << "  help | fullhelp" << std::endl;
+		std::cout << "  maxfps | fps <desired-max-fps>	(DEPRECATED)"	<< std::endl;
+		std::cout << "  lockdt [0|1]					(DEPRECATED)"	<< std::endl;
+		std::cout << "  perf [0|1 [<interval>]]"						<< std::endl;
+		std::cout << "  speed <real-time-factor>"						<< std::endl;
+		std::cout << "  sleepfps | simfps | evalfps <fps>" 				<< std::endl;
+		std::cout << "  sleepdt | simdt | evaldt <dt>" 					<< std::endl;
+		std::cout << "  pause | resume"									<< std::endl;
+		std::cout << "  step [num-steps]"								<< std::endl;
+		std::cout << "  perf [<interval>]" 								<< std::endl;
+		std::cout << "  print" 											<< std::endl;
+		std::cout << "  prof enable [0|1]" 							<< std::endl;
+		std::cout << "  prof threshold <min-detect>|0" 				<< std::endl;
+		std::cout << "  prof print|report" 							<< std::endl;
+	}
 }
 
 int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
@@ -555,6 +598,21 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	if( mcu_p )	{
 		char *time_cmd = args.read_token();
 
+		if( strcmp( time_cmd, "help" ) == 0 )	{
+			print_timer_help();
+			return( CMD_SUCCESS );
+		}
+		else
+		if( strcmp( time_cmd, "fullhelp" ) == 0 )	{
+			print_timer_help( 1 );
+			return( CMD_SUCCESS );
+		}
+		else
+		if( strcmp( time_cmd, "api" ) == 0 )	{
+			print_timer_help( 2 );
+			return( CMD_SUCCESS );
+		}
+		else
 		if( strcmp( time_cmd, "test" ) == 0 )	{
 			void test_time_regulator( void );
 			test_time_regulator();
@@ -574,6 +632,34 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			}
 			return( CMD_SUCCESS );
 		}
+		else
+		if( strcmp( time_cmd, "prof" ) == 0 )	{
+			char *prof_cmd = args.read_token();
+			if( strcmp( prof_cmd, "enable" ) == 0 )	{
+				int enable = true;
+				int n = args.calc_num_tokens();
+				if( n ) enable = args.read_int();
+				mcu_p->profiler.enable( enable != false );
+				return( CMD_SUCCESS );
+			}
+			if( strcmp( prof_cmd, "report" ) == 0 )	{
+				mcu_p->profiler.report();
+				return( CMD_SUCCESS );
+			}
+			if( strcmp( prof_cmd, "threshold" ) == 0 )	{
+				float min = args.read_float();
+				if( min > 0.0 )
+					mcu_p->profiler.set_threshold( (double)min );
+				else
+					mcu_p->profiler.set_threshold( mcu_p->time_dt );
+				return( CMD_SUCCESS );
+			}
+			if( strcmp( prof_cmd, "print" ) == 0 )	{
+				mcu_p->profiler.print();
+				return( CMD_SUCCESS );
+			}
+			return( CMD_FAILURE );
+		}
 		if( mcu_p->timer_p == NULL )	{
 			printf( "mcu_time_func ERR: %s: TimeRegulator NOT REGISTERED\n", time_cmd ); 
 			return( CMD_FAILURE );
@@ -591,7 +677,9 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		else
 		if( strcmp( time_cmd, "lockdt" ) == 0 )	{ // deprecate
 			print_timer_deprecation_warning();
-			int enable = args.read_int();
+			int enable = true;
+			int n = args.calc_num_tokens();
+			if( n ) enable = args.read_int();
 			timer_p->set_sleep_lock( enable != false );
 		}
 		else 

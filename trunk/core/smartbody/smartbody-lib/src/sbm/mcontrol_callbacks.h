@@ -32,6 +32,8 @@
 
 //////////////////////////////////////////////////////////////////
 
+int mcu_help_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+
 // parser which would return a specified file name with full path
 char * mcn_return_full_filename_func( const char * current_path, const char * file_name);	
 

@@ -71,6 +71,7 @@ class mcuCBHandle;
 #include "me_ct_examples.h"
 #include "me_ct_lilt_try.h"
 #include "time_regulator.h"
+#include "time_profiler.h"
 
 #include "joint_logger.hpp"
 #include "ResourceManager.h"
@@ -128,6 +129,7 @@ class mcuCBHandle	{
 		TimeRegulator	*timer_p;
 		double			time; // AKA sim_time
 		double			time_dt;
+		TimeProfiler	profiler;
 
 		bool		delay_behaviors;
 		int			snapshot_counter;
@@ -216,15 +218,18 @@ class mcuCBHandle	{
 			timer_p = time_reg_p;
 		}
 		bool update_timer( double in_time = -1.0 )	{
+			profiler.mark( "update_timer" );
 			if( timer_p )	{
 				bool ret = timer_p->update( in_time );
 				time = timer_p->get_time();
 				time_dt = timer_p->get_dt();
+				profiler.reset( time_dt );
 				return( ret );
 			}
 			double prev = time;
 			time = in_time;
 			time_dt = time - prev;
+			profiler.reset( time_dt );
 			return( true );
 		}
 
