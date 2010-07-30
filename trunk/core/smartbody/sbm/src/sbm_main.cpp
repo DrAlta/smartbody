@@ -442,11 +442,11 @@ int main( int argc, char **argv )	{
 	//   _CrtSetDbgFlag
 	// Memory Leaks - To find out where a memory leak happens:
 	//   Rerun the programs and set this variable in the debugger
-	//   to the alloc # that leaks: {,,msvcr71d.dll}_crtBreakAlloc
+	//   to the alloc # that leaks: {,,msvcr90d.dll}_crtBreakAlloc
 	//   The program will stop right before the alloc happens
 
-	//_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_DELAY_FREE_MEM_DF );
+	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	//_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_DELAY_FREE_MEM_DF );
 
 	_CrtMemState  state;
 	_CrtMemCheckpoint( &state );
