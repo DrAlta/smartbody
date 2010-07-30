@@ -47,6 +47,7 @@ class AudioFileSpeech : public SpeechInterface
 
    private:
       XercesDOMParser * m_xmlParser;
+      HandlerBase * m_xmlHandler;
       int m_requestIdCounter;
 
       stdext::hash_map< RequestId, SpeechRequestInfo > m_speechRequestInfo;

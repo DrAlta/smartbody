@@ -37,7 +37,8 @@ using namespace SmartBody;
 AudioFileSpeech::AudioFileSpeech()
 {
    m_xmlParser = new XercesDOMParser();
-   m_xmlParser->setErrorHandler( new HandlerBase() );
+   m_xmlHandler = new HandlerBase();
+   m_xmlParser->setErrorHandler( m_xmlHandler );
 
    m_requestIdCounter = 1;  // start with 1, in case 0 is a special case
 }
@@ -46,6 +47,7 @@ AudioFileSpeech::AudioFileSpeech()
 AudioFileSpeech::~AudioFileSpeech()
 {
    delete m_xmlParser;  m_xmlParser = NULL;
+   delete m_xmlHandler;  m_xmlHandler = NULL;
 }
 
 
