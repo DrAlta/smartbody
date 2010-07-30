@@ -1313,6 +1313,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\time_profiler.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\time_regulator.cpp"
 				>
 			</File>
