@@ -223,7 +223,8 @@ class mcuCBHandle	{
 				bool ret = timer_p->update( in_time );
 				time = timer_p->get_time();
 				time_dt = timer_p->get_dt();
-				profiler.reset( time_dt );
+				if( ret )
+					profiler.reset( time_dt );
 				return( ret );
 			}
 			double prev = time;
