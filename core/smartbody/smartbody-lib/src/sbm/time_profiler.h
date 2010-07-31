@@ -37,12 +37,13 @@ class TimeProfiler	{
 			req_report = false;
 			reporting = false;
 			dyn_threshold = true;
-			reset_time = 0.0;
-			prev_reset_time = 0.0;
+			smooth_dt = 0.0;
+			prev_dt = 0.0;
 			report_time = 0.0;
 			report_accum_time = 0.0;
 			threshold = 0.0;
 			suppression = -1;
+			selection = -1;
 			count = 0;
 			prev_count = 0;
 			_snprintf(prev_label, TIME_PROFILE_LABEL_BUFFER_SIZE, "START");
@@ -62,6 +63,11 @@ class TimeProfiler	{
 		}
 		void set_suppression( int sup )	{
 			suppression = sup;
+			selection = -1;
+		}
+		void set_selection( int sel )	{
+			selection = sel;
+			suppression = -1;
 		}
 		void set_threshold( double min )	{
 			threshold = min;
@@ -70,16 +76,18 @@ class TimeProfiler	{
 			else
 				dyn_threshold = true;
 		}
+		void set_smooth( double s )	{
+			smooth_dt = s;
+			if( smooth_dt < 0.0 ) smooth_dt = 0.0;
+			if( smooth_dt > 0.999 ) smooth_dt = 0.999;
+		}
 
 		void reset( double curr_dt )	{
 			set_mark( "RESET", 0 );
-			reset_time = SBM_get_real_time();
-			double reset_dt = reset_time - prev_reset_time;
-			prev_reset_time = reset_time;
-			fr = reset_time;
-			to = fr;
 			if( dyn_threshold )	{
-				threshold = curr_dt;
+				threshold = smooth_dt * prev_dt + ( 1.0 - smooth_dt ) * curr_dt;
+//std::cout << "  in: " << curr_dt << " threshold: " << threshold << std::endl;
+				prev_dt = curr_dt;
 			}
 			if( req_enable )	{
 				if( threshold > 0.0 )	{
@@ -87,57 +95,70 @@ class TimeProfiler	{
 					req_enable = false;
 				}
 			}
-			if( reporting ) {
-				reporting = false;
-				double report_interval = fr - report_time;
-				double loss = report_interval - report_accum_time;
-				double percent = 100.0 * loss / report_interval;
-				std::cout << "Total: " << report_accum_time << " Loss: " << loss << " ( " << percent << " % )" << std::endl;
-			}
-			if( req_report )	{
-				reporting = true;
-				req_report = false;
-				std::cout << "TimeProfiler:" << std::endl;
-				report_time = fr;
-				report_accum_time = 0.0;
+			if( enabled || reporting || req_report )	{
+				fr = SBM_get_real_time();
+				to = fr;
+				if( reporting ) {
+					reporting = false;
+					double report_interval = fr - report_time;
+					double loss = report_interval - report_accum_time;
+					double percent = 100.0 * loss / report_interval;
+					std::cout << "  Total: " << report_accum_time << " Loss: " << loss << " ( " << percent << " % )" << std::endl;
+				}
+				if( req_report )	{
+					reporting = true;
+					req_report = false;
+					std::cout << "TimeProfiler:" << std::endl;
+					report_time = fr;
+					report_accum_time = 0.0;
+				}
 			}
 			count = 0;
 		}
 		
-		void set_mark( char *label, int level )	{
+		void set_mark( const char *label, int level )	{
 			if( enabled || reporting )	{
 				to = SBM_get_real_time();
 				double dt = to - fr;
 				fr = to;
 				if( reporting ) {
 					if( label ) {
-						std::cout << "  REPORT[ " << level << " ]( " << dt << " ): \"" << label << "\" " << std::endl;
+						std::cout << "  REPORT[ " << count << " ][ " << level << " ]( " << dt << " ): \"" << label << "\" " << std::endl;
 					}
 					else	{
-						std::cout << "  REPORT[ " << level << " ]( " << dt << " ): # " << count << std::endl;
+						std::cout << "  REPORT[ " << count << " ][ " << level << " ]( " << dt << " ): # " << count << std::endl;
 					}
 					report_accum_time += dt;
 				}
-				if( enabled && ( level > suppression ) )	{
-					if( dt > threshold )	{
-						std::cout << "TimeProfiler[ " << level << " ]( " << dt << " )" << std::endl;
-						if( prev_label[0] != '\0' ) {
-							std::cout << "  FR: \"" << prev_label << "\"" << std::endl;
-						}
-						else	{
-							std::cout << "  FR: # " << prev_count << std::endl;
-						}
-						if( label ) {
-							std::cout << "  TO: \"" << label << "\"" << std::endl;
-						}
-						else	{
-							std::cout << "  TO: # " << count << std::endl;
+				if( enabled )	{
+					if( 
+						( ( selection < 0 )&&( level > suppression ) )||
+						( ( suppression < 0 )&&( level == selection ) )
+					)	{
+						if( dt > threshold )	{
+							std::cout << "TimeProfiler[ " << count << " ][ " << level << " ]( " << dt << " )" << std::endl;
+#if 0
+							if( prev_label[ 0 ] != '\0' ) {
+								std::cout << "  FR: \"" << prev_label << "\"" << std::endl;
+							}
+							else	{
+								std::cout << "  FR: # " << prev_count << std::endl;
+							}
+							if( label ) {
+								std::cout << "  TO: \"" << label << "\"" << std::endl;
+							}
+							else	{
+								std::cout << "  TO: # " << count << std::endl;
+							}
+#else
+							std::cout << "  dt: " << dt << " threshold: " << threshold << std::endl;
+#endif
 						}
 					}
 				}
-				prev_label[0] = '\0';
+				prev_label[ 0 ] = '\0';
 				if( label ) {
-					strncpy(prev_label, label, TIME_PROFILE_LABEL_BUFFER_SIZE);
+					strncpy( prev_label, label, TIME_PROFILE_LABEL_BUFFER_SIZE );
 				}
 				prev_count = count;
 			}
@@ -147,15 +168,15 @@ class TimeProfiler	{
 		void mark( int level = 0 )	{
 			set_mark( NULL, level );
 		}
-		void mark( char *label, int level = 0 )	{
+		void mark( const char *label, int level = 0 )	{
 			set_mark( label, level );
 		}
-		void mark( char *prefix, char *suffix, int level = 0 )	{
+		void mark( const char *prefix, const char *suffix, int level = 0 )	{
 			char label[ TIME_PROFILE_LABEL_BUFFER_SIZE ];
 			_snprintf(label, TIME_PROFILE_LABEL_BUFFER_SIZE, "%s: %s", prefix, suffix );
 			set_mark( label, level );
 		}
-		void mark_line( char *file, int line, int level = 0 )	{ // ie: mark_line( __FILE__, __LINE__ )
+		void mark_line( const char *file, int line, int level = 0 )	{ // ie: mark_line( __FILE__, __LINE__ )
 			char label[ TIME_PROFILE_LABEL_BUFFER_SIZE ];
 			_snprintf( label, TIME_PROFILE_LABEL_BUFFER_SIZE, "file:'%s' line:%d", file, line );
 			set_mark( label, level );
@@ -166,6 +187,8 @@ class TimeProfiler	{
 			printf( "    status: %s\n", enabled ? "ENABLED" : "DISABLED" );
 			printf( "   dynamic: %s\n", dyn_threshold ? "true" : "false" );
 			printf( "  suppress: %d\n", suppression );
+			printf( "    select: %d\n", selection );
+			printf( "    smooth: %f\n", smooth_dt );
 			printf( " threshold: %f\n", threshold );
 		}
 		
@@ -173,15 +196,17 @@ class TimeProfiler	{
 		bool req_enable, enabled;
 		bool req_report, reporting;
 		bool dyn_threshold;
-		double prev_reset_time;
-		double reset_time;
+		double smooth_dt;
+		double prev_dt;
 		double report_accum_time;
 		double report_time;
 		double threshold;
 		double fr, to;
-		char prev_label[TIME_PROFILE_LABEL_BUFFER_SIZE];
-		int prev_count, count;
+		char prev_label[ TIME_PROFILE_LABEL_BUFFER_SIZE ];
+		int prev_count;
+		int count;
 		int suppression;
+		int selection;
 };
 
 #endif
