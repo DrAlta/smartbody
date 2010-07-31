@@ -656,10 +656,7 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			}
 			if( strcmp( prof_cmd, "threshold" ) == 0 )	{
 				float min = args.read_float();
-				if( min > 0.0 )
-					mcu_p->profiler.set_threshold( (double)min );
-				else
-					mcu_p->profiler.set_threshold( mcu_p->time_dt );
+				mcu_p->profiler.set_threshold( (double)min );
 				return( CMD_SUCCESS );
 			}
 			if( strcmp( prof_cmd, "print" ) == 0 )	{

@@ -434,18 +434,21 @@ void mcuCBHandle::update( void )	{
 	char *seq_name = NULL;
 	active_seq_map.reset();
 
-	
+	profiler.mark( "update BEGIN" );
 
 	while( seq_p = active_seq_map.next( & seq_name ) )	{
 		// the parent resource is associated with seq_name
 		CmdResource* cmdResource = resource_manager->getCmdResource(seq_name);
 		if (cmdResource)
 			resource_manager->addParent(cmdResource);
+		profiler.mark("STARTING", seq_name);
 		char *cmd;
 		while( cmd = seq_p->pop( (float)time ) )	{
 
+		profiler.mark("COMMAND", cmd);
 			
 			int err = execute( cmd );
+		profiler.mark("EXECUTECOMMAND", cmd);
 			if( err != CMD_SUCCESS )	{
 				printf( "mcuCBHandle::update ERR: execute FAILED: '%s'\n", cmd );
 			}
@@ -458,11 +461,15 @@ void mcuCBHandle::update( void )	{
 		//   * remove(..) resets the shared iterator
 		//        NO, it should decrement the iterator
 		if( seq_p->get_count() < 1 )	{
+			profiler.mark("REMOVINGSEQ", seq_name);
 			seq_p = active_seq_map.remove( seq_name );
 			delete seq_p;
 		}
 		if (cmdResource)
+		{
 			resource_manager->removeParent();
+			profiler.mark("REMOVINGRESOURCEPARENT");
+		}
 	}
 
 	SbmPawn* pawn_p;
@@ -470,20 +477,27 @@ void mcuCBHandle::update( void )	{
 	pawn_map.reset();
 	while( pawn_p = pawn_map.next() )	{
 
+		profiler.mark("PAWN", pawn_p->name);
 		//char_p->scheduler_p->evaluate( time );
 		pawn_p->ct_tree_p->evaluate( time );
+		profiler.mark("AFTEREVALUATE", pawn_p->name);
 		pawn_p->ct_tree_p->applyBufferToAllSkeletons();
+		profiler.mark("AFTERAPPLYBUFFER", pawn_p->name);
 
 		char_p = character_map.lookup( pawn_p->name );
 		if( char_p != NULL ) {
 			//char_p->scheduler_p->apply();  // old controller API  See applyBufferToAllSkeletons() above
+			profiler.mark("BEFORESCENEUPDATE", char_p->name);
 			char_p->scene_p->update();
+			profiler.mark("AFTERSCENEUPDATE", char_p->name);
 
 			if ( net_bone_updates && char_p->skeleton_p && char_p->bonebusCharacter ) {
 				NetworkSendSkeleton( char_p->bonebusCharacter, char_p->skeleton_p, &param_map );
+				profiler.mark("AFTERNETWORKSEND", char_p->name);
 
 				// what a lot of hoop jumping...
 				if ( net_world_offset_updates ) {
+					profiler.mark("BEFOREWORLDOFFSETS", char_p->name);
 					const SkJoint * joint = char_p->get_world_offset_joint();
 
 					const SkJointPos * pos = joint->const_pos();
@@ -501,10 +515,13 @@ void mcuCBHandle::update( void )	{
 
 					char_p->bonebusCharacter->SetPosition( x, y, z, time );
 					char_p->bonebusCharacter->SetRotation( (float)q.w, (float)q.x, (float)q.y, (float)q.z, time );
+					profiler.mark("AFTERWORLDOFFSETS", char_p->name);
 				}
 			}
 
 			char_p->eye_blink_update( this->time );
+			profiler.mark("AFTEBLINKUPDATE", char_p->name);
+
 		}  // end of char_p processing
 	} // end of loop
 }

@@ -25,6 +25,8 @@
 
 #include "sbm/time_regulator.h"
 
+#define TIME_PROFILE_LABEL_BUFFER_SIZE 8192
+
 class TimeProfiler	{
 
 	public:
@@ -32,20 +34,21 @@ class TimeProfiler	{
 		TimeProfiler( void ) {
 			req_enable = false;
 			enabled = false;
-			dyn_threshold = false;
+			req_report = false;
+			reporting = false;
+			dyn_threshold = true;
+			reset_time = 0.0;
+			prev_reset_time = 0.0;
 			report_time = 0.0;
 			report_accum_time = 0.0;
 			threshold = 0.0;
 			suppression = -1;
 			count = 0;
 			prev_count = 0;
-			prev_label = _strdup( "START" );
+			_snprintf(prev_label, TIME_PROFILE_LABEL_BUFFER_SIZE, "START");
 			reset( 0.0 );
 		}
 		~TimeProfiler( void ) {
-			if( prev_label )	{
-				free( prev_label );
-			}
 		}
 		
 		void enable( bool en )	{
@@ -67,13 +70,17 @@ class TimeProfiler	{
 			else
 				dyn_threshold = true;
 		}
-		
+
 		void reset( double curr_dt )	{
 			set_mark( "RESET", 0 );
-			fr = SBM_get_real_time();
+			reset_time = SBM_get_real_time();
+			double reset_dt = reset_time - prev_reset_time;
+			prev_reset_time = reset_time;
+			fr = reset_time;
 			to = fr;
-			if( dyn_threshold )
+			if( dyn_threshold )	{
 				threshold = curr_dt;
+			}
 			if( req_enable )	{
 				if( threshold > 0.0 )	{
 					enabled = true;
@@ -85,7 +92,7 @@ class TimeProfiler	{
 				double report_interval = fr - report_time;
 				double loss = report_interval - report_accum_time;
 				double percent = 100.0 * loss / report_interval;
-				std::cout << "Loss: " << loss << " ( " << percent << " % )" << std::endl;
+				std::cout << "Total: " << report_accum_time << " Loss: " << loss << " ( " << percent << " % )" << std::endl;
 			}
 			if( req_report )	{
 				reporting = true;
@@ -114,24 +121,25 @@ class TimeProfiler	{
 				if( enabled && ( level > suppression ) )	{
 					if( dt > threshold )	{
 						std::cout << "TimeProfiler[ " << level << " ]( " << dt << " )" << std::endl;
-						if( prev_label ) {
+						if( prev_label[0] != '\0' ) {
 							std::cout << "  FR: \"" << prev_label << "\"" << std::endl;
-							free( prev_label );
-							prev_label = NULL;
 						}
 						else	{
 							std::cout << "  FR: # " << prev_count << std::endl;
 						}
 						if( label ) {
 							std::cout << "  TO: \"" << label << "\"" << std::endl;
-							prev_label = _strdup( label );
 						}
 						else	{
 							std::cout << "  TO: # " << count << std::endl;
 						}
-						prev_count = count;
 					}
 				}
+				prev_label[0] = '\0';
+				if( label ) {
+					strncpy(prev_label, label, TIME_PROFILE_LABEL_BUFFER_SIZE);
+				}
+				prev_count = count;
 			}
 			count++;
 		}
@@ -143,13 +151,13 @@ class TimeProfiler	{
 			set_mark( label, level );
 		}
 		void mark( char *prefix, char *suffix, int level = 0 )	{
-			char label[ 1024 ];
-			sprintf( label, "%s: %s", prefix, suffix );
+			char label[ TIME_PROFILE_LABEL_BUFFER_SIZE ];
+			_snprintf(label, TIME_PROFILE_LABEL_BUFFER_SIZE, "%s: %s", prefix, suffix );
 			set_mark( label, level );
 		}
 		void mark_line( char *file, int line, int level = 0 )	{ // ie: mark_line( __FILE__, __LINE__ )
-			char label[ 1024 ];
-			sprintf( label, "file:'%s' line:%d", file, line );
+			char label[ TIME_PROFILE_LABEL_BUFFER_SIZE ];
+			_snprintf( label, TIME_PROFILE_LABEL_BUFFER_SIZE, "file:'%s' line:%d", file, line );
 			set_mark( label, level );
 		}
 
@@ -165,11 +173,13 @@ class TimeProfiler	{
 		bool req_enable, enabled;
 		bool req_report, reporting;
 		bool dyn_threshold;
-		double report_time;
+		double prev_reset_time;
+		double reset_time;
 		double report_accum_time;
+		double report_time;
 		double threshold;
 		double fr, to;
-		char *prev_label;
+		char prev_label[TIME_PROFILE_LABEL_BUFFER_SIZE];
 		int prev_count, count;
 		int suppression;
 };
