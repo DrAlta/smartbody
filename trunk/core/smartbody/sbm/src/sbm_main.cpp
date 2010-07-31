@@ -744,9 +744,8 @@ mcu.profiler.mark( "mcu.theWSP->broadcast_update()" );
 
 		if( update_sim )	{
 			mcu.update();
-		}
-
 mcu.profiler.mark( "mcu.update()" );
+		}
 
 		mcu.render();
 
