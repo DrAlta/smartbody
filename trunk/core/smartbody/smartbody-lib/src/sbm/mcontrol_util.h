@@ -218,7 +218,7 @@ class mcuCBHandle	{
 			timer_p = time_reg_p;
 		}
 		bool update_timer( double in_time = -1.0 )	{
-			profiler.mark( "update_timer" );
+			profiler.mark( 0, "update_timer" );
 			if( timer_p )	{
 				bool ret = timer_p->update( in_time );
 				time = timer_p->get_time();
