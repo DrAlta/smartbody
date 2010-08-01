@@ -678,17 +678,17 @@ int main( int argc, char **argv )	{
 	// Notify world SBM is ready to receive messages
 	mcu_vrAllCall_func( srArgBuffer(""), &mcu );
 
-mcu.profiler.mark_line( __FILE__, __LINE__ );
+mcu.profiler.mark( 0, __FILE__, __LINE__ );
 
 	timer.start();
 	while( mcu.loop )	{
 
 		bool update_sim = mcu.update_timer();
 //		bool update_sim = mcu.update_timer( SBM_get_real_time() );
-mcu.profiler.mark( "mcu.update_timer()" );
+mcu.profiler.mark( 0, "mcu.update_timer()" );
 
 		fltk::check();
-mcu.profiler.mark( "fltk::check()" );
+mcu.profiler.mark( 0, "fltk::check()" );
  	
 #if LINK_VHMSG_CLIENT
 		if( mcu.vhmsg_enabled )	{
@@ -698,17 +698,17 @@ mcu.profiler.mark( "fltk::check()" );
 			}
 		}
 #endif
-mcu.profiler.mark( "mcu.vhmsg_enabled" );
+mcu.profiler.mark( 0, "mcu.vhmsg_enabled" );
 
 		// [BMLR] Added to support receiving commands from renderer
 		vector<string> commands = mcu.bonebus.GetCommand();
 		for ( size_t i = 0; i < commands.size(); i++ ) {
 			mcu.execute( (char *)commands[i].c_str() );
 
-mcu.profiler.mark( "mcu.bonebus.GetCommand()", (char *)commands[i].c_str() );
+mcu.profiler.mark( 0, "mcu.bonebus.GetCommand()", (char *)commands[i].c_str() );
 		}
 
-mcu.profiler.mark( "mcu.bonebus.GetCommand()" );
+mcu.profiler.mark( 0, "mcu.bonebus.GetCommand()" );
 
 		if( cmdl.pending_cmd() )	{
 			char *cmd = cmdl.read_cmd();
@@ -718,11 +718,11 @@ mcu.profiler.mark( "mcu.bonebus.GetCommand()" );
 						fprintf( stdout, "SBM ERR: command NOT FOUND: '%s'\n> ", cmd );
 						break;
 					case CMD_FAILURE:
-mcu.profiler.mark( "cmdl.pending_cmd()", cmd );
+mcu.profiler.mark( 0, "cmdl.pending_cmd()", cmd );
 						fprintf( stdout, "SBM ERR: command FAILED: '%s'\n> ", cmd );
 						break;
 					case CMD_SUCCESS:
-mcu.profiler.mark( "cmdl.pending_cmd()", cmd );
+mcu.profiler.mark( 0, "cmdl.pending_cmd()", cmd );
 						fprintf( stdout, "> " );  // new prompt
 						break;
 					default:
@@ -736,20 +736,20 @@ mcu.profiler.mark( "cmdl.pending_cmd()", cmd );
 			fflush( stdout );
 		}
 
-mcu.profiler.mark( "cmdl.pending_cmd()" );
+mcu.profiler.mark( 0, "cmdl.pending_cmd()" );
 
 		mcu.theWSP->broadcast_update();
 
-mcu.profiler.mark( "mcu.theWSP->broadcast_update()" );
+mcu.profiler.mark( 0, "mcu.theWSP->broadcast_update()" );
 
 		if( update_sim )	{
 			mcu.update();
-mcu.profiler.mark( "mcu.update()" );
+mcu.profiler.mark( 0, "mcu.update()" );
 		}
 
 		mcu.render();
 
-mcu.profiler.mark( "mcu.render()" );
+mcu.profiler.mark( 0, "mcu.render()" );
 	}
 
 	cleanup();

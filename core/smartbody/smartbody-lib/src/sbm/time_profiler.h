@@ -25,7 +25,128 @@
 
 #include "sbm/time_regulator.h"
 
-#define TIME_PROFILE_LABEL_BUFFER_SIZE 8192
+#define PROFILER_LABEL_SIZE 8192
+
+#if 0
+class IntervalProfiler	{
+
+	private:
+		
+		typedef struct profile_entry_s	{
+
+			char	label[ PROFILER_LABEL_SIZE ];
+			double	time, dt;
+
+			profile_entry_s	*next;
+
+		} profile_entry_t;
+		
+		typedef struct group_entry_s	{
+
+			char	name[ PROFILER_LABEL_SIZE ];
+			bool 	open;
+			
+			profile_entry_t *profiles;
+			srHashMap <profile_entry_t> profile_map;
+
+		} group_entry_t;
+
+		srHashMap <profile_entry_t> profile_map;
+		srHashMap <group_entry_t> group_map;
+		srHashMap <int> interval_map;
+		
+	public:
+		IntervalProfiler( void ) {
+		}
+		~IntervalProfiler( void ) {
+		}
+		
+		void reset( void )	{
+			
+			group_entry_t *group_p = NULL;
+			while( ( group_p = group_map.next() ) != NULL ) {
+				if( group_p->open ) {
+					std::cout << "IntervalProfiler::reset ERR: group '" << group_name << " found open" << std::endl;
+				}
+				
+				profile_entry_t *profiles_p = NULL;
+				while( ( profiles_p = group_p->profile_map.next() ) != NULL ) {
+					
+					
+				}
+				
+				
+			}
+		}
+		
+		void begin( const char* group_name ) {
+			
+			group_entry_t *group_p = group_map.lookup( group_name );
+			if( group_p == NULL )	{
+				group_p = new group_entry_t;
+				_snprintf( group_p->name, PROFILER_LABEL_SIZE, "%s", group_name );
+				group_p->open = false;
+				group_p->profiles = NULL;
+				group_map.insert( group_name, group_p, true ); // delete upon destructor...
+			}
+			
+			if( group_p->open ) {
+				std::cout << "IntervalProfiler::begin ERR: group '" << group_name << " already open" << std::endl;
+			}
+
+			group_p->open = true;
+			mark( -1, group_name, "IntervalProfiler-mark-BEGIN" );
+		}
+		
+		void mark( int level, const char* group_name, const char* label )	{
+		
+			group_entry_t *group_p = group_map.lookup( group_name );
+			if( group_p == NULL )	{
+				std::cout << "IntervalProfiler::mark ERR: group '" << group_name << " not available" << std::endl;
+				return;
+			}
+			if( !group_p->open ) {
+				std::cout << "IntervalProfiler::mark ERR: group '" << group_name << " not open" << std::endl;
+				return;
+			}
+			
+//			char profile_key[ PROFILER_LABEL_SIZE ];
+//			_snprintf( profile_key, PROFILER_LABEL_SIZE, "%s:%s", group_name, label );
+
+//			profile_entry_t *profile_p = group_p->profile_map.lookup( profile_key );
+			profile_entry_t *profile_p = group_p->profile_map.lookup( label );
+			if( profile_p == NULL )	{
+				profile_p = new profile_entry_t;
+//				_snprintf( profile_p->label, PROFILER_LABEL_SIZE, "%s", profile_key );
+				_snprintf( profile_p->label, PROFILER_LABEL_SIZE, "%s", label );
+				group_p->profile_map.insert( profile_key, profile_p, true ); // delete upon destructor...
+			}
+			
+			profile_p->time = SBM_get_real_time();
+		}
+		
+		void end( const char* group_name ) {
+		
+			group_entry_t *group_p = group_map.lookup( group_name );
+			if( group_p == NULL )	{
+				std::cout << "IntervalProfiler::end ERR: group '" << group_name << " not available" << std::endl;
+				return;
+			}
+			if( !group_p->open ) {
+				std::cout << "IntervalProfiler::end ERR: group '" << group_name << " not open" << std::endl;
+			}
+			group_p->open = false;
+		}
+		
+		void end( int level, const char* group_name, const char* label ) {
+			mark( level, group_name, label );
+			end( group_name );
+		}
+		
+	private:
+	
+};
+#endif
 
 class TimeProfiler	{
 
@@ -37,7 +158,7 @@ class TimeProfiler	{
 			req_report = false;
 			reporting = false;
 			dyn_threshold = true;
-			smooth_dt = 0.0;
+			smooth_dt = 0.7;
 			prev_dt = 0.0;
 			report_time = 0.0;
 			report_accum_time = 0.0;
@@ -46,7 +167,7 @@ class TimeProfiler	{
 			selection = -1;
 			count = 0;
 			prev_count = 0;
-			_snprintf(prev_label, TIME_PROFILE_LABEL_BUFFER_SIZE, "START");
+			_snprintf( prev_label, PROFILER_LABEL_SIZE, "START" );
 			reset( 0.0 );
 		}
 		~TimeProfiler( void ) {
@@ -61,6 +182,7 @@ class TimeProfiler	{
 		void report( void )	{
 			req_report = true;
 		}
+		
 		void set_suppression( int sup )	{
 			suppression = sup;
 			selection = -1;
@@ -83,11 +205,9 @@ class TimeProfiler	{
 		}
 
 		void reset( double curr_dt )	{
-			set_mark( "RESET", 0 );
+			mark( 0, "RESET" );
 			if( dyn_threshold )	{
-				threshold = smooth_dt * prev_dt + ( 1.0 - smooth_dt ) * curr_dt;
-//std::cout << "  in: " << curr_dt << " threshold: " << threshold << std::endl;
-				prev_dt = curr_dt;
+				threshold = smooth_dt * threshold + ( 1.0 - smooth_dt ) * curr_dt;
 			}
 			if( req_enable )	{
 				if( threshold > 0.0 )	{
@@ -116,11 +236,10 @@ class TimeProfiler	{
 			count = 0;
 		}
 		
-		void set_mark( const char *label, int level )	{
+		void mark( int level, const char *label )	{
 			if( enabled || reporting )	{
 				to = SBM_get_real_time();
 				double dt = to - fr;
-				fr = to;
 				if( reporting ) {
 					if( label ) {
 						std::cout << "  REPORT[ " << count << " ][ " << level << " ]( " << dt << " ): \"" << label << "\" " << std::endl;
@@ -135,9 +254,9 @@ class TimeProfiler	{
 						( ( selection < 0 )&&( level > suppression ) )||
 						( ( suppression < 0 )&&( level == selection ) )
 					)	{
+
 						if( dt > threshold )	{
 							std::cout << "TimeProfiler[ " << count << " ][ " << level << " ]( " << dt << " )" << std::endl;
-#if 0
 							if( prev_label[ 0 ] != '\0' ) {
 								std::cout << "  FR: \"" << prev_label << "\"" << std::endl;
 							}
@@ -150,36 +269,34 @@ class TimeProfiler	{
 							else	{
 								std::cout << "  TO: # " << count << std::endl;
 							}
-#else
-							std::cout << "  dt: " << dt << " threshold: " << threshold << std::endl;
-#endif
+							if( dyn_threshold )	{
+								threshold = dt;
+							}
 						}
 					}
 				}
 				prev_label[ 0 ] = '\0';
 				if( label ) {
-					strncpy( prev_label, label, TIME_PROFILE_LABEL_BUFFER_SIZE );
+					strncpy( prev_label, label, PROFILER_LABEL_SIZE );
 				}
+				fr = to;
 				prev_count = count;
 			}
 			count++;
 		}
 
 		void mark( int level = 0 )	{
-			set_mark( NULL, level );
+			mark( level, NULL );
 		}
-		void mark( const char *label, int level = 0 )	{
-			set_mark( label, level );
+		void mark( int level, const char *prefix, const char *suffix )	{
+			char label[ PROFILER_LABEL_SIZE ];
+			_snprintf( label, PROFILER_LABEL_SIZE, "%s: %s", prefix, suffix );
+			mark( level, label );
 		}
-		void mark( const char *prefix, const char *suffix, int level = 0 )	{
-			char label[ TIME_PROFILE_LABEL_BUFFER_SIZE ];
-			_snprintf(label, TIME_PROFILE_LABEL_BUFFER_SIZE, "%s: %s", prefix, suffix );
-			set_mark( label, level );
-		}
-		void mark_line( const char *file, int line, int level = 0 )	{ // ie: mark_line( __FILE__, __LINE__ )
-			char label[ TIME_PROFILE_LABEL_BUFFER_SIZE ];
-			_snprintf( label, TIME_PROFILE_LABEL_BUFFER_SIZE, "file:'%s' line:%d", file, line );
-			set_mark( label, level );
+		void mark( int level, const char *file, int line )	{ // ie: mark( __FILE__, __LINE__ )
+			char label[ PROFILER_LABEL_SIZE ];
+			_snprintf( label, PROFILER_LABEL_SIZE, "file:'%s' line:%d", file, line );
+			mark( level, label );
 		}
 
 		void print( void )	{
@@ -202,7 +319,7 @@ class TimeProfiler	{
 		double report_time;
 		double threshold;
 		double fr, to;
-		char prev_label[ TIME_PROFILE_LABEL_BUFFER_SIZE ];
+		char prev_label[ PROFILER_LABEL_SIZE ];
 		int prev_count;
 		int count;
 		int suppression;
