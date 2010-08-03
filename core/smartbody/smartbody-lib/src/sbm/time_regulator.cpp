@@ -53,6 +53,7 @@
 double SBM_get_real_time( void ) {
 #ifdef WIN32
 #if ENABLE_QPF_TIME
+
 	static int once = 1;
 	static double inv_freq;
 	static LONGLONG ref_quad;
@@ -63,6 +64,9 @@ double SBM_get_real_time( void ) {
 		LARGE_INTEGER f;
 		QueryPerformanceFrequency( &f );
 		inv_freq = 1.0 / (double)f.QuadPart;
+
+//printf( "SBM_get_real_time: dt:%.18f fps: %.3f\n", inv_freq, (double)f.QuadPart );
+
 		QueryPerformanceCounter( &c );
 		ref_quad = c.QuadPart;
 	}
@@ -72,6 +76,7 @@ double SBM_get_real_time( void ) {
 		diff_quad = 0;
 	}
 	return( (double)diff_quad * inv_freq );
+	
 #else
 	return( (double)timeGetTime() / 1000.0 );
 #endif
