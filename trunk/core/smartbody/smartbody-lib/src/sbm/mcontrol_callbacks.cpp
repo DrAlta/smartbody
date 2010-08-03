@@ -559,8 +559,8 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 void print_timer_deprecation_warning( void )	{
 
 	std::cout << "WARNING: fps/lockdt feature is deprecated" << std::endl;
-	std::cout << "  use 'time sleepfps' and 'time simfps' instead" << std::endl;
-	std::cout << "  NOTE: if you insist, be sure to set fps first, then lockdt..." << std::endl;
+	std::cout << "  - If you insist, be sure to set fps first, then lockdt..." << std::endl;
+	std::cout << "  - Use 'time sleepfps <fps>' and 'time simfps <fps>' instead" << std::endl;
 }
 
 void print_timer_help( int level = 0 )	{
@@ -616,8 +616,8 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		}
 		else
 		if( strcmp( time_cmd, "test" ) == 0 )	{
-			void test_time_regulator( void );
-			test_time_regulator();
+//			void test_time_regulator( void );
+//			test_time_regulator();
 			return( CMD_SUCCESS );
 		}
 		else
@@ -636,51 +636,69 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		}
 		else
 		if( strcmp( time_cmd, "prof" ) == 0 )	{
+
+			if( mcu_p->profiler_p == NULL )	{
+				printf( "mcu_time_func NOTICE: %s: TimeIntervalProfiler was NOT REGISTERED\n", time_cmd ); 
+				mcu_p->switch_internal_profiler();
+			}
+			TimeIntervalProfiler *prof_p = mcu_p->profiler_p;
+
 			char *prof_cmd = args.read_token();
+			if( strcmp( prof_cmd, "erase" ) == 0 )	{
+				prof_p->erase();
+			}
+			else
+			if( strcmp( prof_cmd, "clobber" ) == 0 )	{
+				prof_p->erase();
+			}
+			else
 			if( strcmp( prof_cmd, "enable" ) == 0 )	{
 				int enable = true;
 				int n = args.calc_num_tokens();
 				if( n ) enable = args.read_int();
-				mcu_p->profiler.enable( enable != false );
-				return( CMD_SUCCESS );
+				prof_p->enable( enable != false );
 			}
+			else
 			if( strcmp( prof_cmd, "report" ) == 0 )	{
-				mcu_p->profiler.report();
-				return( CMD_SUCCESS );
+				prof_p->report();
 			}
+			else
 			if( strcmp( prof_cmd, "suppress" ) == 0 )	{
 				int level = -1;
 				int n = args.calc_num_tokens();
 				if( n ) level = args.read_int();
-				mcu_p->profiler.set_suppression( level );
-				return( CMD_SUCCESS );
+				prof_p->set_suppression( level );
 			}
+			else
 			if( strcmp( prof_cmd, "select" ) == 0 )	{
 				int level = -1;
 				int n = args.calc_num_tokens();
 				if( n ) level = args.read_int();
-				mcu_p->profiler.set_selection( level );
-				return( CMD_SUCCESS );
+				prof_p->set_selection( level );
 			}
+			else
 			if( strcmp( prof_cmd, "threshold" ) == 0 )	{
-				float min = args.read_float();
-				mcu_p->profiler.set_threshold( (double)min );
-				return( CMD_SUCCESS );
+				float factor = args.read_float();
+				prof_p->set_threshold( (double)factor );
 			}
+			else
 			if( strcmp( prof_cmd, "smooth" ) == 0 )	{
 				float sm = args.read_float();
-				mcu_p->profiler.set_smooth( (double)sm );
-				return( CMD_SUCCESS );
+				prof_p->set_smooth( (double)sm );
 			}
+			else
 			if( strcmp( prof_cmd, "print" ) == 0 )	{
-				mcu_p->profiler.print();
-				return( CMD_SUCCESS );
+				prof_p->print();
 			}
-			return( CMD_FAILURE );
+			else {
+				return( CMD_NOT_FOUND );
+			}
+			return( CMD_SUCCESS );
 		}
+		
 		if( mcu_p->timer_p == NULL )	{
-			printf( "mcu_time_func ERR: %s: TimeRegulator NOT REGISTERED\n", time_cmd ); 
-			return( CMD_FAILURE );
+			printf( "mcu_time_func NOTICE: %s: TimeRegulator was NOT REGISTERED\n", time_cmd );
+			mcu_p->switch_internal_profiler(); 
 		}
 		TimeRegulator *timer_p = mcu_p->timer_p;
 		

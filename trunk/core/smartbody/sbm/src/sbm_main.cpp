@@ -55,6 +55,9 @@
 #include <sbm/resource_cmds.h>
 #include <sbm/time_regulator.h>
 
+//#include <sbm/tip.h>
+#include "tip.h"
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 #if 0
@@ -478,7 +481,7 @@ int main( int argc, char **argv )	{
 	mcu_register_callbacks();
 
 	TimeRegulator timer;
-	mcu.register_timer( &timer );
+	mcu.register_timer( timer );
 
 	// EDF - taken from tre_main.cpp, a fancier command line parser can be put here if desired.
 	//	check	command line parameters:
@@ -678,18 +681,37 @@ int main( int argc, char **argv )	{
 	// Notify world SBM is ready to receive messages
 	mcu_vrAllCall_func( srArgBuffer(""), &mcu );
 
-mcu.profiler.mark( 0, __FILE__, __LINE__ );
+
+//mcu.profiler.mark( 0, __FILE__, __LINE__ );
+//test_clock();
 
 	timer.start();
 	while( mcu.loop )	{
 
 		bool update_sim = mcu.update_timer();
 //		bool update_sim = mcu.update_timer( SBM_get_real_time() );
-mcu.profiler.mark( 0, "mcu.update_timer()" );
+
+#if 0
+static int c = 0;
+if( c > 1000 )	{
+	c = 0;
+	prof.erase();
+	printf( "ERASE XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxx\n" );
+//	prof.clobber();
+//	printf( "CLOBBER XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxx\n" );
+}
+c++;
+#endif
+
+//TIP.reset();
+mcu.mark( "A", 0, "a" );
+mcu.mark( "B", 0, "1" );
 
 		fltk::check();
-mcu.profiler.mark( 0, "fltk::check()" );
  	
+mcu.mark( "A", 0, "b" );
+mcu.mark( "B", 0, "1" );
+
 #if LINK_VHMSG_CLIENT
 		if( mcu.vhmsg_enabled )	{
 			err = vhmsg::ttu_poll();
@@ -698,17 +720,18 @@ mcu.profiler.mark( 0, "fltk::check()" );
 			}
 		}
 #endif
-mcu.profiler.mark( 0, "mcu.vhmsg_enabled" );
+
+mcu.mark( "A", 0, "c" );
+mcu.mark( "B", 0, "1" );
 
 		// [BMLR] Added to support receiving commands from renderer
 		vector<string> commands = mcu.bonebus.GetCommand();
 		for ( size_t i = 0; i < commands.size(); i++ ) {
 			mcu.execute( (char *)commands[i].c_str() );
-
-mcu.profiler.mark( 0, "mcu.bonebus.GetCommand()", (char *)commands[i].c_str() );
 		}
 
-mcu.profiler.mark( 0, "mcu.bonebus.GetCommand()" );
+mcu.mark( "A", 0, "d" );
+mcu.mark( "B", 0, "1" );
 
 		if( cmdl.pending_cmd() )	{
 			char *cmd = cmdl.read_cmd();
@@ -718,11 +741,11 @@ mcu.profiler.mark( 0, "mcu.bonebus.GetCommand()" );
 						fprintf( stdout, "SBM ERR: command NOT FOUND: '%s'\n> ", cmd );
 						break;
 					case CMD_FAILURE:
-mcu.profiler.mark( 0, "cmdl.pending_cmd()", cmd );
+						// MARK
 						fprintf( stdout, "SBM ERR: command FAILED: '%s'\n> ", cmd );
 						break;
 					case CMD_SUCCESS:
-mcu.profiler.mark( 0, "cmdl.pending_cmd()", cmd );
+						// MARK
 						fprintf( stdout, "> " );  // new prompt
 						break;
 					default:
@@ -736,20 +759,24 @@ mcu.profiler.mark( 0, "cmdl.pending_cmd()", cmd );
 			fflush( stdout );
 		}
 
-mcu.profiler.mark( 0, "cmdl.pending_cmd()" );
+mcu.mark( "C", 0, "a" );
+
+mcu.mark( "A", 0, "e" );
+mcu.mark( "B", 0, "1" );
 
 		mcu.theWSP->broadcast_update();
 
-mcu.profiler.mark( 0, "mcu.theWSP->broadcast_update()" );
+mcu.mark( "A" );
 
 		if( update_sim )	{
+mcu.mark( "C", 0, "a" );
 			mcu.update();
-mcu.profiler.mark( 0, "mcu.update()" );
 		}
+mcu.mark( "C", 0, "a" );
 
 		mcu.render();
+mcu.mark( "C" );
 
-mcu.profiler.mark( 0, "mcu.render()" );
 	}
 
 	cleanup();

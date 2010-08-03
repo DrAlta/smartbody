@@ -126,10 +126,15 @@ class mcuCBHandle	{
 		std::string process_id;
 		bool		play_internal_audio;
 		
+		TimeRegulator	*internal_timer_p;
+		TimeRegulator	*external_timer_p;
 		TimeRegulator	*timer_p;
 		double			time; // AKA sim_time
 		double			time_dt;
-		TimeProfiler	profiler;
+
+		TimeIntervalProfiler	*internal_profiler_p;
+		TimeIntervalProfiler	*external_profiler_p;
+		TimeIntervalProfiler	*profiler_p;
 
 		bool		delay_behaviors;
 		int			snapshot_counter;
@@ -214,23 +219,46 @@ class mcuCBHandle	{
 
 		void reset();
 
-		void register_timer( TimeRegulator *time_reg_p )	{
-			timer_p = time_reg_p;
+		void register_profiler( TimeIntervalProfiler& time_prof )	{
+			external_profiler_p = &( time_prof );
+			profiler_p = external_profiler_p;
+		}
+		void switch_internal_profiler( void )	{
+			if( internal_profiler_p == NULL ) internal_profiler_p = new TimeIntervalProfiler;
+			profiler_p = internal_profiler_p;
+		}
+		void mark( const char* group_name, int level, const char* label )	{
+			if( profiler_p ) profiler_p->mark( group_name, level, label );
+		}
+		int mark( const char* group_name )	{
+			if( profiler_p ) return( profiler_p->mark( group_name ) );
+			return( 0 );
+		}
+
+		void register_timer( TimeRegulator& time_reg )	{
+			external_timer_p = &( time_reg );
+			timer_p = external_timer_p;
+		}
+		void switch_internal_timer( void )	{
+			if( internal_timer_p == NULL ) internal_timer_p = new TimeRegulator;
+			timer_p = internal_timer_p;
 		}
 		bool update_timer( double in_time = -1.0 )	{
-			profiler.mark( 0, "update_timer" );
+
 			if( timer_p )	{
 				bool ret = timer_p->update( in_time );
 				time = timer_p->get_time();
 				time_dt = timer_p->get_dt();
-				if( ret )
-					profiler.reset( time_dt );
+
+				if( profiler_p ) profiler_p->reset();
+// if( ret )
+// profiler.reset( time_dt );
 				return( ret );
 			}
+
 			double prev = time;
 			time = in_time;
 			time_dt = time - prev;
-			profiler.reset( time_dt );
 			return( true );
 		}
 
