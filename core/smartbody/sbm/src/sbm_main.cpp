@@ -55,8 +55,6 @@
 #include <sbm/resource_cmds.h>
 #include <sbm/time_regulator.h>
 
-//#include <sbm/tip.h>
-#include "tip.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -483,6 +481,9 @@ int main( int argc, char **argv )	{
 	TimeRegulator timer;
 	mcu.register_timer( timer );
 
+	TimeIntervalProfiler* profiler = new TimeIntervalProfiler();
+	mcu.register_profiler(*profiler);
+
 	// EDF - taken from tre_main.cpp, a fancier command line parser can be put here if desired.
 	//	check	command line parameters:
 	bool lock_dt_mode = false;
@@ -703,7 +704,6 @@ if( c > 1000 )	{
 c++;
 #endif
 
-//TIP.reset();
 mcu.mark( "A", 0, "a" );
 mcu.mark( "B", 0, "1" );
 
