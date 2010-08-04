@@ -89,7 +89,6 @@ class TimeIntervalProfiler { // T.I.P.
 		bool	req_clobber;
 		bool	req_enable;
 		bool	enabled;
-//		bool	req_report
 		bool	reporting;
 
 //		bool	dyn_threshold;
@@ -105,7 +104,6 @@ class TimeIntervalProfiler { // T.I.P.
 			req_clobber = false;
 			req_enable = DEFAULT_REQ_ENABLED;
 			enabled = false;
-//			req_report = false;
 			reporting = false;
 			threshold = DEFAULT_THRESHOLD;
 			smooth_factor = DEFAULT_SMOOTHING;
@@ -115,18 +113,9 @@ class TimeIntervalProfiler { // T.I.P.
 		~TimeIntervalProfiler( void ) {
 		}
 		
-		void print_main( void )	{
-			printf( "TIP<>: %s\n", enabled ? "ENABLED" : "DISABLED" );
-//			printf( "     dynamic: %s\n", dyn_threshold ? "true" : "false" );
-			printf( "    suppress: %d\n", suppression );
-			printf( "      select: %d\n", selection );
-			printf( "      smooth: %f\n", smooth_factor );
-			printf( "   threshold: %f\n", threshold );
-		}
 		void print_group( group_entry_t *group_p )	{
 
 			if( group_p )	{
-
 				printf( "  GRP: %s \"%s\"\n", group_p->enabled ? "ENABLED" : "DISABLED", group_p->name );
 				for( int i=0; i< group_p->profile_count; i++ )	{
 					profile_entry_t* profile_p = group_p->profile_p_arr[ i ];
@@ -139,21 +128,20 @@ class TimeIntervalProfiler { // T.I.P.
 				}
 			}
 		}
-		void print_groups( void )	{
+		void print( void )	{
+		
+			printf( "TIP<>: %s\n", enabled ? "ENABLED" : "DISABLED" );
+//			printf( "   dynamic: %s\n", dyn_threshold ? "true" : "false" );
+			printf( "  suppress: %d\n", suppression );
+			printf( "    select: %d\n", selection );
+			printf( "    smooth: %f\n", smooth_factor );
+			printf( " threshold: %f\n", threshold );
 			for( int i=0; i< group_count; i++ )	{
 				group_entry_t *group_p = group_p_arr[ i ];
 				if( group_p )	{
 					print_group( group_p );
 				}
-				else	{
-				
-				}
 			}
-		}
-		
-		void print( void )	{
-			print_main();
-			print_groups();
 		}
 		
 		void erase( void )	{	
@@ -245,7 +233,6 @@ class TimeIntervalProfiler { // T.I.P.
 				profile_p->label
 			);
 		}
-		
 		void print_profile_alert( const char *group_name, profile_entry_t *profile_p )	{
 		
 			printf( 
@@ -265,7 +252,6 @@ class TimeIntervalProfiler { // T.I.P.
 				group_name, dt, da, ra
 			);
 		}
-
 		void print_profile_report( char *prefix, int index, profile_entry_t *profile_p )	{
 		
 			printf( 
@@ -430,7 +416,7 @@ class TimeIntervalProfiler { // T.I.P.
 						}
 						else
 						if( spike )	{
-							print_group_report( 
+							print_group_alert( 
 								group_p->name,
 								total_frame_dt,
 								total_decay_dt,
@@ -456,7 +442,7 @@ class TimeIntervalProfiler { // T.I.P.
 				req_enable = false;
 			}
 			if( req_erase ) {
-#if 0
+#if 1
 				group_map.reset();
 				group_entry_t *erase_group_p;
 				while( ( erase_group_p = group_map.next() ) != NULL ) {
@@ -466,7 +452,7 @@ class TimeIntervalProfiler { // T.I.P.
 				req_erase = false;
 			}
 			if( req_clobber ) {
-#if 0
+#if 1
 				group_map.expunge();
 #endif
 				req_clobber = false;
@@ -607,7 +593,6 @@ class TimeIntervalProfiler { // T.I.P.
 		static double test_clock( int reps = 0 )	{
 
 			if( reps < 1 ) reps = 1000000;
-#if 1
 
 			double *time_hist_arr = new double[ reps ];
     		double *time_hist_end_p = time_hist_arr + reps;
@@ -626,22 +611,8 @@ class TimeIntervalProfiler { // T.I.P.
 				t = time_hist_arr[ i ];
 				dt_hist_arr[ i ] = t - prev;
 			}
-			double total = t - start;
 			delete [] time_hist_arr;
-
-#else
-			double *dt_hist_arr = new double[ reps ];
-
-			double start = SBM_get_real_time();
-			double t = start;
-			double prev;
-			for( int i=0; i<reps; i++ )	{
-				prev = t;
-				t = SBM_get_real_time();
-				dt_hist_arr[ i ] = t - prev;
-			}
 			double total = t - start;
-#endif
 			double avg = total / (double)reps;
 
 			int negs = 0;
@@ -725,8 +696,7 @@ class TimeIntervalProfiler { // T.I.P.
 #endif
 			delete [] dt_hist_arr;
 
-			printf( "test_clock:\n" );
-			printf( " rep: %d\n", reps );
+			printf( "test_clock: %d reps\n", reps );
 			printf( " Tot: %.6f\n", total );
 			printf( "--\n" );
 
@@ -774,7 +744,6 @@ class TimeIntervalProfiler { // T.I.P.
 
 			return( resolution );
 		}
-
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////
