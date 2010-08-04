@@ -682,36 +682,14 @@ int main( int argc, char **argv )	{
 	// Notify world SBM is ready to receive messages
 	mcu_vrAllCall_func( srArgBuffer(""), &mcu );
 
-
-//mcu.profiler.mark( 0, __FILE__, __LINE__ );
-//test_clock();
-
 	timer.start();
 	while( mcu.loop )	{
 
 		bool update_sim = mcu.update_timer();
 //		bool update_sim = mcu.update_timer( SBM_get_real_time() );
 
-#if 0
-static int c = 0;
-if( c > 1000 )	{
-	c = 0;
-	prof.erase();
-	printf( "ERASE XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxx\n" );
-//	prof.clobber();
-//	printf( "CLOBBER XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxx\n" );
-}
-c++;
-#endif
-
-mcu.mark( "A", 0, "a" );
-mcu.mark( "B", 0, "1" );
-
 		fltk::check();
  	
-mcu.mark( "A", 0, "b" );
-mcu.mark( "B", 0, "1" );
-
 #if LINK_VHMSG_CLIENT
 		if( mcu.vhmsg_enabled )	{
 			err = vhmsg::ttu_poll();
@@ -721,17 +699,11 @@ mcu.mark( "B", 0, "1" );
 		}
 #endif
 
-mcu.mark( "A", 0, "c" );
-mcu.mark( "B", 0, "1" );
-
 		// [BMLR] Added to support receiving commands from renderer
 		vector<string> commands = mcu.bonebus.GetCommand();
 		for ( size_t i = 0; i < commands.size(); i++ ) {
 			mcu.execute( (char *)commands[i].c_str() );
 		}
-
-mcu.mark( "A", 0, "d" );
-mcu.mark( "B", 0, "1" );
 
 		if( cmdl.pending_cmd() )	{
 			char *cmd = cmdl.read_cmd();
@@ -741,11 +713,9 @@ mcu.mark( "B", 0, "1" );
 						fprintf( stdout, "SBM ERR: command NOT FOUND: '%s'\n> ", cmd );
 						break;
 					case CMD_FAILURE:
-						// MARK
 						fprintf( stdout, "SBM ERR: command FAILED: '%s'\n> ", cmd );
 						break;
 					case CMD_SUCCESS:
-						// MARK
 						fprintf( stdout, "> " );  // new prompt
 						break;
 					default:
@@ -759,24 +729,13 @@ mcu.mark( "B", 0, "1" );
 			fflush( stdout );
 		}
 
-mcu.mark( "C", 0, "a" );
-
-mcu.mark( "A", 0, "e" );
-mcu.mark( "B", 0, "1" );
-
 		mcu.theWSP->broadcast_update();
 
-mcu.mark( "A" );
-
 		if( update_sim )	{
-mcu.mark( "C", 0, "a" );
 			mcu.update();
 		}
-mcu.mark( "C", 0, "a" );
 
 		mcu.render();
-mcu.mark( "C" );
-
 	}
 
 	cleanup();

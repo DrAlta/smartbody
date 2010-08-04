@@ -116,29 +116,22 @@ class TimeIntervalProfiler { // T.I.P.
 		}
 		
 		void print_main( void )	{
-			printf( "TimeIntervalProfiler:\n" );
-			printf( "    status: %s\n", enabled ? "ENABLED" : "DISABLED" );
-//			printf( "   dynamic: %s\n", dyn_threshold ? "true" : "false" );
-			printf( "  suppress: %d\n", suppression );
-			printf( "    select: %d\n", selection );
-			printf( "    smooth: %f\n", smooth_factor );
-			printf( " threshold: %f\n", threshold );
+			printf( "TIP<>: %s\n", enabled ? "ENABLED" : "DISABLED" );
+//			printf( "     dynamic: %s\n", dyn_threshold ? "true" : "false" );
+			printf( "    suppress: %d\n", suppression );
+			printf( "      select: %d\n", selection );
+			printf( "      smooth: %f\n", smooth_factor );
+			printf( "   threshold: %f\n", threshold );
 		}
 		void print_group( group_entry_t *group_p )	{
 
 			if( group_p )	{
 
-				printf( "TimeIntervalProfiler: Group: \"%s\"\n", group_p->name );
-				printf( "    status: %s\n", group_p->enabled ? "ENABLED" : "DISABLED" );
-				printf( "  profiles: %d\n", group_p->profile_count );
-				
+				printf( "  GRP: %s \"%s\"\n", group_p->enabled ? "ENABLED" : "DISABLED", group_p->name );
 				for( int i=0; i< group_p->profile_count; i++ )	{
 					profile_entry_t* profile_p = group_p->profile_p_arr[ i ];
 					if( profile_p ) {
-					
-						printf( "  profile[ %d ]: \"%s\"\n", i, profile_p->label );
-						printf( "          level: %d\n", profile_p->level );
-						printf( "          accum: %d\n", profile_p->accum_count );
+						printf( "    PRF: \"%s\"\n", profile_p->label );
 					}
 					else	{
 					
@@ -157,6 +150,7 @@ class TimeIntervalProfiler { // T.I.P.
 				}
 			}
 		}
+		
 		void print( void )	{
 			print_main();
 			print_groups();
@@ -214,7 +208,6 @@ class TimeIntervalProfiler { // T.I.P.
 
 		void accum_profile( profile_entry_t *profile_p )	{
 
-// if( profile_p->frame_dt == 0.0 ) {.... !!???}
 			profile_p->sub_frame_dt = profile_p->frame_dt / (double) profile_p->frame_count;
 
 			profile_p->decay_dt =
@@ -250,6 +243,49 @@ class TimeIntervalProfiler { // T.I.P.
 				profile_p->accum_count,
 				profile_p->rolling_dt,
 				profile_p->label
+			);
+		}
+		
+		void print_profile_alert( const char *group_name, profile_entry_t *profile_p )	{
+		
+			printf( 
+				"TIP<%d>: \"%s\" Dt:%.5f (Da:%.5f, Ra%.5f) \"%s\"\n",
+				profile_p->level,
+				group_name,
+				profile_p->frame_dt,
+				profile_p->decay_dt,
+				profile_p->rolling_dt,
+				profile_p->label
+			);
+		}
+		void print_group_alert( const char *group_name, double dt, double da, double ra )	{
+		
+			printf( 
+				"TIP<>: \"%s\" Dt:%.5f (Da:%.5f, Ra%.5f)\n",
+				group_name, dt, da, ra
+			);
+		}
+
+		void print_profile_report( char *prefix, int index, profile_entry_t *profile_p )	{
+		
+			printf( 
+				"%s   [%d]<%d>: Dt:%.5f (Da:%.5f, Ra%.5f)(Mx[%d]:%.5f) \"%s\"\n",
+				prefix,
+				index,
+				profile_p->level,
+				profile_p->frame_dt,
+				profile_p->decay_dt,
+				profile_p->rolling_dt,
+				profile_p->frame_count,
+				profile_p->max_dt,
+				profile_p->label
+			);
+		}
+		void print_group_report( const char *prefix, double dt, double da, double ra )	{
+		
+			printf( 
+				"%s SUM: Dt:%.5f (Da:%.5f, Ra%.5f)\n",
+				prefix, dt, da, ra
 			);
 		}
 
@@ -291,7 +327,7 @@ class TimeIntervalProfiler { // T.I.P.
 
 			if( enabled )	{
 				if( reporting )	{
-					printf( "TimeIntervalProfiler:\n" );
+					printf( "TIP<> report:\n" );
 				}
 
 				group_entry_t *group_p = NULL;
@@ -308,7 +344,7 @@ class TimeIntervalProfiler { // T.I.P.
 
 					if( group_p->enabled )	{
 						if( reporting )	{
-							printf( " Group: \"%s\"\n", group_p->name );
+							printf( "  GRP: \"%s\"\n", group_p->name );
 						}
 						double total_frame_dt = 0.0;
 						double total_decay_dt = 0.0;
@@ -331,6 +367,13 @@ class TimeIntervalProfiler { // T.I.P.
 							}
 
 							if( profile_p->frame_count )	{
+
+								if( profile_p->frame_dt < 0.0 )    { 
+									std::cout 
+										<< "TimeIntervalProfiler::reset WARN: negative dt: %f" 
+										<< profile_p->frame_dt
+										<< std::endl;
+								}
 								accum_profile( profile_p );
 
 								total_frame_dt += profile_p->frame_dt;
@@ -340,16 +383,16 @@ class TimeIntervalProfiler { // T.I.P.
 								spike = check_profile_spike( profile_p );
 								if( reporting )	{
 									if( spike )	{
-										print_profile( " X", "", profile_p );
+										print_profile_report( "*", j, profile_p );
 									}
 									else	{
-										print_profile( "  ", "", profile_p );
+										print_profile_report( " ", j, profile_p );
 									}
 								}
 								else
 								if( spike )	{
 									if( check_profile_show( profile_p->level  ) )	{
-										print_profile( "X ", group_p->name, profile_p );
+										print_profile_alert( group_p->name, profile_p );
 									}
 								}
 
@@ -370,16 +413,24 @@ class TimeIntervalProfiler { // T.I.P.
 							spike = true;
 						}
 						if( reporting )	{
-							printf( " %s Total:< f:%f | d:%f | r:%f >\n",
-								spike ? "X" : "",
-								total_frame_dt,
-								total_decay_dt,
-								total_rolling_dt
-							);
+							if( spike ) {
+								print_group_report( "*",
+									total_frame_dt,
+									total_decay_dt,
+									total_rolling_dt
+								);
+							}
+							else	{
+								print_group_report( " ",
+									total_frame_dt,
+									total_decay_dt,
+									total_rolling_dt
+								);
+							}
 						}
 						else
 						if( spike )	{
-							printf( "X %s:< f:%f | d:%f | r:%f >\n",
+							print_group_report( 
 								group_p->name,
 								total_frame_dt,
 								total_decay_dt,
@@ -428,6 +479,12 @@ class TimeIntervalProfiler { // T.I.P.
 			if( profile_p )	{
 
 				double dt = curr_time - group_p->curr_profile_time;
+                if( dt < 0.0 )    { 
+					std::cout 
+						<< "TimeIntervalProfiler::make_mark WARN: negative dt: %f" 
+						<< profile_p->frame_dt
+						<< std::endl;
+                }
 				if( dt > profile_p->max_dt )	{
 					profile_p->max_dt = dt;
 				}
@@ -545,6 +602,177 @@ class TimeIntervalProfiler { // T.I.P.
 		}
 		int mark( const char* group_name )	{
 			return( mark( group_name, SBM_get_real_time() ) );
+		}
+
+		static double test_clock( int reps = 0 )	{
+
+			if( reps < 1 ) reps = 1000000;
+#if 1
+
+			double *time_hist_arr = new double[ reps ];
+    		double *time_hist_end_p = time_hist_arr + reps;
+			
+    		int countdown = reps;
+    		double start = SBM_get_real_time();
+    		while( countdown )    {
+        		*( time_hist_end_p - ( countdown-- ) ) = SBM_get_real_time();
+    		}
+			
+			double *dt_hist_arr = new double[ reps ];
+			double t = start;
+			double prev = 0.0;
+			for( int i=0; i<reps; i++ )	{
+				prev = t;
+				t = time_hist_arr[ i ];
+				dt_hist_arr[ i ] = t - prev;
+			}
+			double total = t - start;
+			delete [] time_hist_arr;
+
+#else
+			double *dt_hist_arr = new double[ reps ];
+
+			double start = SBM_get_real_time();
+			double t = start;
+			double prev;
+			for( int i=0; i<reps; i++ )	{
+				prev = t;
+				t = SBM_get_real_time();
+				dt_hist_arr[ i ] = t - prev;
+			}
+			double total = t - start;
+#endif
+			double avg = total / (double)reps;
+
+			int negs = 0;
+			int hits = 0;
+			int run = 0;
+			int run_min = 999999999;
+			int run_max = 0;
+			int accum_run = 0;
+
+			int halt = 0;
+			int halt_min = 999999999;
+			int halt_max = 0;
+			int accum_halt = 0;
+
+			double min = 999999999.0;
+			double max = 0.0;
+			double accum_dev = 0.0;
+			for( int i=0; i<reps; i++ )	{
+
+				double dt = dt_hist_arr[ i ];
+
+#if 0
+				if( i % 10 == 0 ) dt = 0.0;
+#endif
+#if 0
+				if( ( (double)rand() / (double)RAND_MAX ) > 0.5 ) dt = 0.0;
+#endif
+
+				if( min > dt ) min = dt;
+				if( max < dt ) max = dt;
+				accum_dev += abs( dt - avg );
+
+				if( dt > 0.0 )	{
+					
+					if( halt )	{
+						if( halt_min > halt ) halt_min = halt;
+						if( halt_max < halt ) halt_max = halt;
+						accum_halt += halt;
+						halt = 0;
+					}
+					run++;
+					hits++;
+				}
+				else	{
+
+					if( dt < 0.0 )	{
+						negs++;
+					}
+					if( run )	{
+						if( run_min > run ) run_min = run;
+						if( run_max < run ) run_max = run;
+						accum_run += run;
+						run = 0;
+					}
+					halt++;
+				}
+			}
+
+			if( run )	{
+				if( run_min > run ) run_min = run;
+				if( run_max < run ) run_max = run;
+				accum_run += run;
+			}
+			if( halt )	{
+				if( halt_min > halt ) halt_min = halt;
+				if( halt_max < halt ) halt_max = halt;
+				accum_halt += halt;
+			}
+			double dev = accum_dev / (double)reps;
+			double hit_ratio = (double)hits / (double)reps;
+			double run_avg = (double)accum_run / (double)reps;
+			double halt_avg = (double)accum_halt / (double)reps;
+
+#if 0
+			for( int i=0; i<reps; i++ )	{
+
+				double dt = dt_hist_arr[ i ];
+
+				// deviation in run/halt length
+			}
+#endif
+			delete [] dt_hist_arr;
+
+			printf( "test_clock:\n" );
+			printf( " rep: %d\n", reps );
+			printf( " Tot: %.6f\n", total );
+			printf( "--\n" );
+
+			printf( " avg: %.12f\n", avg );
+			if( min < max ) {
+				printf( " min: %.18f\n", min );
+				printf( " max: %.12f\n", max );
+			}
+			printf( " dev: %.12f\n", dev );
+			if( negs )	{
+				printf( " neg: %d\n", negs );
+			}
+			printf( "--\n" );
+
+			printf( " fps: %.2f\n", 1.0 / avg );
+			if( max > 0.0 )
+				printf( " min: %.2f\n", 1.0 / max );
+			else
+				printf( " min: <inf>\n" );
+			if( min > 0.0 )
+				printf( " max: %.2f\n", 1.0 / min );
+			else
+				printf( " max: <inf>\n" );
+			printf( "--\n" );
+
+			printf( " hit: %.6f\n", hit_ratio );
+			printf( " avg: %.2f\n", run_avg );
+			if( run_min < run_max ) {
+				printf( " min: %d\n", run_min );
+				printf( " max: %d\n", run_max );
+			}
+			printf( "--\n" );
+
+			printf( " mis: %d\n", accum_halt );
+			printf( " avg: %.2f\n", halt_avg );
+			if( halt_min < halt_max ) {
+				printf( " min: %d\n", halt_min );
+				printf( " max: %d\n", halt_max );
+			}
+			printf( "--\n" );
+
+			double resolution = avg / hit_ratio;
+			printf( " Res: %.12f == %.2f fps\n", resolution, 1.0 / resolution );
+			printf( "--\n" );
+
+			return( resolution );
 		}
 
 };
