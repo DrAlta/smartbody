@@ -690,6 +690,10 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			if( strcmp( prof_cmd, "print" ) == 0 )	{
 				prof_p->print();
 			}
+			else
+			if( strcmp( prof_cmd, "test" ) == 0 )	{
+				prof_p->test_clock();
+			}
 			else {
 				return( CMD_NOT_FOUND );
 			}
@@ -2392,6 +2396,7 @@ int mcu_gaze_limit_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	gaze <> limit <key> <p-up p-dn h r>
 	gaze <> blend <key> <weight>
 	gaze <> priority <key>
+	gaze <> fadein|fadeout <interval>
 */
 
 int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
@@ -2491,6 +2496,18 @@ int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 				char *key_label = args.read_token();
 				gaze_p->set_task_priority( MeCtGaze::key_index( key_label ) );
+				return( CMD_SUCCESS );
+			}
+			if( strcmp( gaze_cmd, "fadein" ) == 0 )	{
+
+				float interval = args.read_float();
+				gaze_p->set_fade_in( interval );
+				return( CMD_SUCCESS );
+			}
+			if( strcmp( gaze_cmd, "fadeout" ) == 0 )	{
+
+				float interval = args.read_float();
+				gaze_p->set_fade_out( interval );
 				return( CMD_SUCCESS );
 			}
 			printf( "mcu_gaze_controller_func ERR: command '%s' NOT RECOGNIZED\n", gaze_cmd );
