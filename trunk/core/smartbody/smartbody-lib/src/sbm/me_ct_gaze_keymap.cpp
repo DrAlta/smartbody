@@ -47,6 +47,70 @@
 
 ///////////////////////////////////////////////////////////////////////////
 
+void MeCtGaze::set_smooth( float smooth_basis ) {
+
+	if( smooth_basis < 0.0 ) smooth_basis = 0.0;
+	if( smooth_basis > 1.0 ) smooth_basis = 1.0;
+
+	joint_key_arr[ GAZE_KEY_EYES ].smooth = smooth_basis;
+	joint_key_arr[ GAZE_KEY_HEAD ].smooth = smooth_basis;
+	joint_key_arr[ GAZE_KEY_CERVICAL ].smooth = smooth_basis;
+	joint_key_arr[ GAZE_KEY_THORAX ].smooth = smooth_basis;
+	joint_key_arr[ GAZE_KEY_LUMBAR ].smooth = smooth_basis;
+	
+	key_smooth_dirty = 1;
+}
+
+void MeCtGaze::set_smooth( float back_sm, float neck_sm, float eyes_sm )	{
+	
+	if( back_sm < 0.0 ) back_sm = 0.0;
+	if( back_sm > 1.0 ) back_sm = 1.0;
+	if( neck_sm < 0.0 ) neck_sm = 0.0;
+	if( neck_sm > 1.0 ) neck_sm = 1.0;
+	if( eyes_sm < 0.0 ) eyes_sm = 0.0;
+	if( eyes_sm > 1.0 ) eyes_sm = 1.0;
+	
+	joint_key_arr[ GAZE_KEY_EYES ].smooth = eyes_sm;
+	joint_key_arr[ GAZE_KEY_HEAD ].smooth = neck_sm;
+	joint_key_arr[ GAZE_KEY_CERVICAL ].smooth = neck_sm;
+	joint_key_arr[ GAZE_KEY_THORAX ].smooth = back_sm;
+	joint_key_arr[ GAZE_KEY_LUMBAR ].smooth = back_sm;
+
+	key_smooth_dirty = 1;
+}
+
+void MeCtGaze::apply_smooth_keys( void )	{
+	
+	if( key_smooth_dirty )	{
+
+		joint_arr[ GAZE_JOINT_SPINE1 ].smooth = 
+			joint_key_arr[ GAZE_KEY_LUMBAR ].smooth;
+
+		joint_arr[ GAZE_JOINT_SPINE2 ].smooth = 
+			0.5f * ( joint_key_arr[ GAZE_KEY_LUMBAR ].smooth + joint_key_arr[ GAZE_KEY_THORAX ].smooth );
+
+		joint_arr[ GAZE_JOINT_SPINE3 ].smooth = 
+			joint_key_arr[ GAZE_KEY_THORAX ].smooth;
+
+		joint_arr[ GAZE_JOINT_SPINE4 ].smooth = 
+			joint_key_arr[ GAZE_KEY_CERVICAL ].smooth;
+
+		joint_arr[ GAZE_JOINT_SPINE5 ].smooth = 
+			0.5f * ( joint_key_arr[ GAZE_KEY_CERVICAL ].smooth + joint_key_arr[ GAZE_KEY_HEAD ].smooth );
+
+		joint_arr[ GAZE_JOINT_SKULL ].smooth = 
+			joint_key_arr[ GAZE_KEY_HEAD ].smooth;
+
+		joint_arr[ GAZE_JOINT_EYE_L ].smooth = 
+			joint_arr[ GAZE_JOINT_EYE_R ].smooth = 
+				joint_key_arr[ GAZE_KEY_EYES ].smooth;
+
+		key_smooth_dirty = 0;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////
+
 void MeCtGaze::set_bias( int key, float p, float h, float r )	{
 	
 	if( ! valid_key( key ) ) return;

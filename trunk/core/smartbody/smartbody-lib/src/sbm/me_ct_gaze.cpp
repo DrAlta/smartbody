@@ -190,11 +190,17 @@ MeCtGaze::MeCtGaze( void )	{
 	timing_mode = TASK_SPEED;
 	head_speed = 1.0;
 	head_time = 1.0;
+	fade_interval = 0.0;
+	fade_remaining = 0.0;
+	fading_normal = 1.0;
+	fading_mode = FADING_MODE_OFF;
 	
 	joint_key_count = 0;
 	joint_key_map = NULL;
 	joint_key_top_map = NULL;
 	joint_key_arr = NULL;
+	
+	key_smooth_dirty = 0;
 	key_bias_dirty = 0;
 	key_limit_dirty = 0;
 	key_blend_dirty = 0;
@@ -496,19 +502,6 @@ printf( "CALC: joint: %s\n", joint_label( priority_joint ) );
 
 ///////////////////////////////////////////////////////////////////////////
 
-void MeCtGaze::set_smooth( float smooth_basis ) {
-
-	if( smooth_basis < 0.0 ) smooth_basis = 0.0;
-	if( smooth_basis > 1.0 ) smooth_basis = 1.0;
-
-	joint_arr[ GAZE_JOINT_SPINE1 ].smooth = smooth_basis;
-	joint_arr[ GAZE_JOINT_SPINE2 ].smooth = smooth_basis;
-	joint_arr[ GAZE_JOINT_SPINE3 ].smooth = smooth_basis;
-	joint_arr[ GAZE_JOINT_SPINE4 ].smooth = smooth_basis;
-	joint_arr[ GAZE_JOINT_SPINE5 ].smooth = smooth_basis;
-	joint_arr[ GAZE_JOINT_SKULL ].smooth = smooth_basis;
-}
-
 void MeCtGaze::set_speed( float head_dps, float eyes_dps )	{
 	timing_mode = TASK_SPEED;
 	head_speed = head_dps;
@@ -520,6 +513,20 @@ void MeCtGaze::set_time_hint( float head_sec )	{
 	
 	timing_mode = TASK_TIME_HINT;
 	head_time = head_sec;
+}
+
+#if 0
+void MeCtGaze::set_smooth( float smooth_basis ) {
+
+	if( smooth_basis < 0.0 ) smooth_basis = 0.0;
+	if( smooth_basis > 1.0 ) smooth_basis = 1.0;
+
+	joint_arr[ GAZE_JOINT_SPINE1 ].smooth = smooth_basis;
+	joint_arr[ GAZE_JOINT_SPINE2 ].smooth = smooth_basis;
+	joint_arr[ GAZE_JOINT_SPINE3 ].smooth = smooth_basis;
+	joint_arr[ GAZE_JOINT_SPINE4 ].smooth = smooth_basis;
+	joint_arr[ GAZE_JOINT_SPINE5 ].smooth = smooth_basis;
+	joint_arr[ GAZE_JOINT_SKULL ].smooth = smooth_basis;
 }
 
 void MeCtGaze::set_smooth( float back_sm, float neck_sm, float eyes_sm )	{
@@ -542,6 +549,7 @@ void MeCtGaze::set_smooth( float back_sm, float neck_sm, float eyes_sm )	{
 	joint_arr[ GAZE_JOINT_EYE_L ].smooth = eyes_sm;
 	joint_arr[ GAZE_JOINT_EYE_R ].smooth = eyes_sm;
 }
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -786,109 +794,12 @@ quat_t MeCtGaze::world_target_orient( void )	{
 
 void MeCtGaze::controller_start( void )	{
 	
-
 #if ENABLE_HACK_TARGET_CIRCLE
 //G_hack_target_heading = 0.0;  // don't update this for every gaze controller
 #endif
 
 	started = 1;
 	start = 1;
-
-#if 0
-	int i;
-
-	if( _context->channels().size() > 0 )	{
-		skeleton_ref_p = _context->channels().skeleton();
-	}
-	
-	// ensure skeleton global tansforms are up to date
-	update_skeleton_gmat();
-	
-	for( i=0; i<joint_count; i++ )	{
-
-		float local_contrib;
-		if( i < priority_joint )	{
-			local_contrib = 1.0f / ( (float)( priority_joint + 1 - i ) );
-		}
-		else	{
-			local_contrib = 1.0f;
-		}
-		joint_arr[ i ].task_weight = local_contrib;
-		
-		int context_index = _toContextCh[ i ];
-		if( context_index < 0 ) {
-			fprintf( stderr, "MeCtGaze::controller_start ERR: joint idx:%d NOT FOUND in skeleton\n", i );
-		} 
-		else {
-			SkJoint* joint_p = _context->channels().joint( context_index );
-			if( !joint_p )	{
-				fprintf( stderr, "MeCtGaze::controller_start ERR: joint context-idx:%d NOT FOUND in skeleton\n", context_index );
-			} 
-			else {
-				joint_arr[ i ].init( joint_p );
-				joint_arr[ i ].start();
-			}
-		}
-#if 0
-		printf( "start: [%d]", i );
-		printf( " wgt: %.4f",
-			joint_arr[ i ].task_weight 
-		);
-#endif
-	}
-	
-	// set forward position to eyeball center in local coords, 
-	//  after joints have start()ed, to init world transform state
-	load_forward_pos();
-
-	// set head_speed based on head-rot-to-target-rot
-	if( timing_mode == TASK_TIME_HINT )	{
-
-		quat_t w_target_orient;
-		if( target_mode == TARGET_POINT )	{
-			vector_t w_point = world_target_point();
-			// construct an euler from ( z-axis, roll )
-			w_target_orient = euler_t( 
-				w_point - (
-					joint_arr[ GAZE_JOINT_SKULL ].world_pos +
-					joint_arr[ GAZE_JOINT_SKULL ].local_rot *
-					joint_arr[ GAZE_JOINT_SKULL ].forward_pos
-				), 
-				0.0 
-			);
-		}
-		else	{
-			w_target_orient = world_target_orient();
-		}
-		
-		quat_t body_head_rot = 
-			-joint_arr[ GAZE_JOINT_SPINE1 ].parent_rot *
-			joint_arr[ GAZE_JOINT_SKULL ].world_rot * 
-			joint_arr[ GAZE_JOINT_SKULL ].forward_rot;
-		
-		quat_t body_task_rot = 
-			-joint_arr[ GAZE_JOINT_SPINE1 ].parent_rot *
-			w_target_orient * 
-			joint_arr[ GAZE_JOINT_SKULL ].forward_rot;
-		
-		quat_t head_task_rot = ( -body_head_rot ).product( body_task_rot );
-		gw_float_t head_task_deg = head_task_rot.degrees();
-		head_speed = (float)( head_task_deg / head_time );
-//printf( "MeCtGaze::controller_start TASK: %f deg  %f dps\n", head_task_deg, head_speed );
-	}
-
-	float total_w = 0.0;
-	for( i=0; i<=GAZE_JOINT_SKULL; i++ )	{
-		total_w += joint_arr[ i ].task_weight;
-	}
-
-	// move to -update-joint-speed() if dirty bit is set.
-	for( i=0; i<=GAZE_JOINT_SKULL; i++ )	{
-		joint_arr[ i ].speed_ratio = joint_arr[ i ].task_weight / total_w;
-		joint_arr[ i ].speed = joint_arr[ i ].speed_ratio * head_speed;
-//		joint_arr[ i ].speed = head_speed / ( priority_joint + 1 );
-	}
-#endif
 
 #if TEST_SENSOR
 	sensor_p->controller_start();
@@ -991,6 +902,83 @@ void MeCtGaze::controller_start_evaluate( void )	{
 	}
 }
 
+void MeCtGaze::set_fade_in( float interval )	{
+	
+	if( fading_normal < 1.0 )	{
+		fade_interval = interval * ( 1.0f - fading_normal );
+		fade_remaining = fade_interval;
+		fading_mode = FADING_MODE_IN;
+	}
+}
+
+void MeCtGaze::set_fade_out( float interval )	{
+
+	fading_mode = FADING_MODE_OUT;
+	if( fading_normal > 0.0 )	{
+		fade_interval = interval * fading_normal;
+		fade_remaining = fade_interval;
+	}
+}
+
+/*
+	for( i = 0; i < NUM_GAZE_KEYS; i++ )	{
+		set_blend( i, 1.0f );
+	}
+	joint_key_arr[ GAZE_KEY_EYES ].smooth = eyes_sm;
+	joint_key_arr[ GAZE_KEY_HEAD ].smooth = neck_sm;
+	joint_key_arr[ GAZE_KEY_CERVICAL ].smooth = neck_sm;
+	joint_key_arr[ GAZE_KEY_THORAX ].smooth = back_sm;
+	joint_key_arr[ GAZE_KEY_LUMBAR ].smooth = back_sm;
+*/
+
+#define SMOOTH_RATE_REF (30.0f)
+
+bool MeCtGaze::update_fading( float dt )	{
+
+printf( "fade: %f %f %f\n", fade_interval, fade_remaining, fading_normal );
+
+	if( fade_remaining <= 0.0 ) {
+		if( fading_mode = FADING_MODE_IN )	{
+			fading_mode = FADING_MODE_OFF;
+			fading_normal = 1.0f;
+			return( true );
+		}
+		fading_normal = 0.0;
+		return( false );
+	}
+
+	if( fading_mode == FADING_MODE_IN )	{
+		fading_normal = 1.0f - fade_remaining / fade_interval;
+	}
+	else
+	if( fading_mode == FADING_MODE_OUT )	{
+		fading_normal = fade_remaining / fade_interval;
+	}
+
+	for( int i = 0; i < joint_key_count; i++ )	{
+
+		MeCtGazeKey* key_p = joint_key_arr + i;
+//		float s = (float)( 0.01 + ( 1.0 - powf( key_p->smooth, dt * SMOOTH_RATE_REF ) ) * 0.99 );
+
+printf( " fr[%d] weight: %f\n", i, key_p->blend_weight );
+
+		float s = (float)( 0.01 + ( 1.0f - powf( key_p->smooth, dt * SMOOTH_RATE_REF / fade_interval ) ) * 0.99 );
+		float super_sm = s * fading_normal;
+		key_p->blend_weight = s * key_p->blend_weight + ( 1.0f - s ) * super_sm;
+
+printf( " to[%d] weight: %f s:%f ssm:%f \n", i, key_p->blend_weight, s, super_sm );
+	}
+	
+	fade_remaining -= dt;
+	if( fading_mode == FADING_MODE_IN )	{
+	}
+	else
+	if( fading_mode == FADING_MODE_OUT )	{
+
+	}
+	return( true );
+}
+
 bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 	
 //printf( "smooth head: %f eye: %f\n", joint_arr[ GAZE_JOINT_SKULL ].smooth, joint_arr[ GAZE_JOINT_EYE_L ].smooth );
@@ -1042,9 +1030,19 @@ bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 	}
 	prev_time = t;
 
+#if 0
+	if( fading_mode != FADING_MODE_OFF )	{
+		update_fading( dt );
+		if( fading_normal <= 0.0 ) {
+			return( TRUE );
+		}
+	}
+#endif
+
 	update_skeleton_gmat();
 	
 	// map key values to joints if set
+	apply_smooth_keys();
 	apply_bias_keys();
 	apply_limit_keys();
 	apply_blend_keys();

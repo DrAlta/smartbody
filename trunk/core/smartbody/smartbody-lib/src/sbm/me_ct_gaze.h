@@ -56,6 +56,7 @@ class MeCtGazeKey	{
 			limit_h = 180.0;
 			limit_r = 180.0;
 			blend_weight = 1.0;
+			smooth = 0.0;
 		}
 		virtual ~MeCtGazeKey() {}
 		
@@ -65,10 +66,8 @@ class MeCtGazeKey	{
 		float	limit_p_up, limit_p_dn, limit_h, limit_r;
 //		float	task_weight;
 		float	blend_weight;
+		float 	smooth;
 };
-
-
-
 
 class MeCtGaze : public MeController	{
 	
@@ -92,6 +91,12 @@ class MeCtGaze : public MeController	{
 			OFFSET_WORLD,
 			OFFSET_JOINT_LOCAL,
 			OFFSET_PARENT_LOCAL
+		};
+
+		enum fading_mode_enum_set	{
+			FADING_MODE_OFF,
+			FADING_MODE_IN,
+			FADING_MODE_OUT
 		};
 
 		enum gaze_joint_enum_set	{
@@ -200,10 +205,10 @@ class MeCtGaze : public MeController	{
 	
 	// TUNE AND SPEED:
 	
-		void set_smooth( float smooth_basis );
 		void set_speed( float head_dps, float eyes_dps = DEFAULT_SPEED_EYES );
 		void set_time_hint( float head_sec ); // derives approximate speed from task angle
 
+		void set_smooth( float smooth_basis );
 		void set_smooth( float back_sm, float neck_sm, float eyes_sm );
 
 #if 0
@@ -233,6 +238,10 @@ class MeCtGaze : public MeController	{
 		void set_blend( int key, float w );
 		void set_blend( int key1, int key2, float w1, float w2 );
 
+		// FADE: automatic fading of controller
+		void set_fade_in( float interval );
+		void set_fade_out( float interval );
+		
 		// LIMIT: key-group rotation limit
 		void set_limit( int key, float p, float h, float r );
 		void set_limit( int key, float p_up, float p_dn, float h, float r );
@@ -309,14 +318,22 @@ class MeCtGaze : public MeController	{
 		int 			timing_mode;
 		float 			head_speed;
 		float 			head_time;
+		float			fade_interval;
+		float			fade_remaining;
+		float			fading_normal;
+		int 			fading_mode;
 
 		int 			joint_key_count;
 		int*			joint_key_map;
 		int*			joint_key_top_map;
 		MeCtGazeKey*	joint_key_arr;
+		
+		int 			key_smooth_dirty;
 		int 			key_bias_dirty;
 		int 			key_limit_dirty;
 		int 			key_blend_dirty;
+
+		void			apply_smooth_keys( void );
 		void			apply_bias_keys( void );
 		void			apply_limit_key( int J, int K, float weight );
 		void			apply_limit_keys( void );
@@ -325,6 +342,8 @@ class MeCtGaze : public MeController	{
 		int 			joint_count;
 		MeCtGazeJoint*	joint_arr;
 
+		bool 		update_fading( float dt );
+		
 		void		inspect_skeleton( SkJoint* joint_p, int depth = 0 );
 		void		inspect_skeleton_local_transform( SkJoint* joint_p, int depth = 0 );
 		void		inspect_skeleton_world_transform( SkJoint* joint_p, int depth = 0 );
