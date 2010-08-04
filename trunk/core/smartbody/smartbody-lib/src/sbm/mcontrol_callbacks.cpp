@@ -576,6 +576,7 @@ void print_timer_help( int level = 0 )	{
 	}
 	else	{
 		std::cout << "HELP: time" << std::endl;
+		
 		std::cout << "  help | fullhelp" << std::endl;
 		std::cout << "  maxfps | fps <desired-max-fps>	(DEPRECATED)"	<< std::endl;
 		std::cout << "  lockdt [0|1]					(DEPRECATED)"	<< std::endl;
@@ -587,11 +588,15 @@ void print_timer_help( int level = 0 )	{
 		std::cout << "  step [num-steps]"								<< std::endl;
 		std::cout << "  perf [<interval>]" 								<< std::endl;
 		std::cout << "  print" 											<< std::endl;
-		std::cout << "  prof enable [0|1]" 							<< std::endl;
-		std::cout << "  prof suppress|select [<level>]" 			<< std::endl;
-		std::cout << "  prof threshold <min-detect>|0" 				<< std::endl;
-		std::cout << "  prof smooth <factor:[0.0,1.0)>" 			<< std::endl;
-		std::cout << "  prof print|report" 							<< std::endl;
+		
+		std::cout << "  prof enable|disable" 					<< std::endl;
+		std::cout << "  prof group <name> enable|disable" 		<< std::endl;
+		std::cout << "  prof suppress|select [<level>]" 		<< std::endl;
+		std::cout << "  prof threshold <min-detect>|0" 			<< std::endl;
+		std::cout << "  prof smooth <factor:[0.0,1.0)>" 		<< std::endl;
+		std::cout << "  prof print|report" 						<< std::endl;
+		std::cout << "  prof erase|clobber" 					<< std::endl;
+		std::cout << "  prof test" 								<< std::endl;
 	}
 }
 
@@ -644,23 +649,24 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			TimeIntervalProfiler *prof_p = mcu_p->profiler_p;
 
 			char *prof_cmd = args.read_token();
-			if( strcmp( prof_cmd, "erase" ) == 0 )	{
-				prof_p->erase();
-			}
-			else
-			if( strcmp( prof_cmd, "clobber" ) == 0 )	{
-				prof_p->erase();
-			}
-			else
 			if( strcmp( prof_cmd, "enable" ) == 0 )	{
-				int enable = true;
-				int n = args.calc_num_tokens();
-				if( n ) enable = args.read_int();
-				prof_p->enable( enable != false );
+				prof_p->enable( true );
 			}
 			else
-			if( strcmp( prof_cmd, "report" ) == 0 )	{
-				prof_p->report();
+			if( strcmp( prof_cmd, "disable" ) == 0 )	{
+				prof_p->enable( false );
+			}
+			else
+			if( strcmp( prof_cmd, "group" ) == 0 )	{
+				char *group_name = args.read_token();
+				char *group_cmd = args.read_token();
+				if( strcmp( group_cmd, "enable" ) == 0 )	{
+					prof_p->enable( group_name, true );
+				}
+				else
+				if( strcmp( group_cmd, "disable" ) == 0 )	{
+					prof_p->enable( group_name, false );
+				}
 			}
 			else
 			if( strcmp( prof_cmd, "suppress" ) == 0 )	{
@@ -689,6 +695,18 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			else
 			if( strcmp( prof_cmd, "print" ) == 0 )	{
 				prof_p->print();
+			}
+			else
+			if( strcmp( prof_cmd, "report" ) == 0 )	{
+				prof_p->report();
+			}
+			else
+			if( strcmp( prof_cmd, "erase" ) == 0 )	{
+				prof_p->erase();
+			}
+			else
+			if( strcmp( prof_cmd, "clobber" ) == 0 )	{
+				prof_p->clobber();
 			}
 			else
 			if( strcmp( prof_cmd, "test" ) == 0 )	{
