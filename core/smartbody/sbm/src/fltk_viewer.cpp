@@ -321,6 +321,8 @@ FltkViewer::~FltkViewer ()
  {
    fltk::remove_timeout ( spin_timeout_func, this );
    _data->root->unref ();
+   if (_data->helpbrowser)
+	   delete _data->helpbrowser;
    delete _data->helpwin;
    delete _data->scenebox;
    delete _data->sceneaxis;

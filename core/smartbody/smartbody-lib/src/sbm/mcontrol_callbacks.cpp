@@ -596,7 +596,7 @@ void print_timer_help( int level = 0 )	{
 		std::cout << "  prof smooth <factor:[0.0,1.0)>" 		<< std::endl;
 		std::cout << "  prof print|report" 						<< std::endl;
 		std::cout << "  prof erase|clobber" 					<< std::endl;
-		std::cout << "  prof test" 								<< std::endl;
+		std::cout << "  prof test [reps]" 						<< std::endl;
 	}
 }
 
@@ -710,7 +710,8 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			}
 			else
 			if( strcmp( prof_cmd, "test" ) == 0 )	{
-				prof_p->test_clock();
+				int reps = args.read_int();
+				prof_p->test_clock( reps );
 			}
 			else {
 				return( CMD_NOT_FOUND );

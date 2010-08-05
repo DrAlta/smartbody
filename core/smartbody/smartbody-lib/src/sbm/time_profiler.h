@@ -127,7 +127,7 @@ class TimeIntervalProfiler { // T.I.P.
 		}
 		void print( void )	{
 		
-			printf( "TIP<>: %s\n", enabled ? "ENABLED" : "DISABLED" );
+			printf( "TIP <>: %s\n", enabled ? "ENABLED" : "DISABLED" );
 //			printf( "   dynamic: %s\n", dyn_threshold ? "true" : "false" );
 			printf( "  suppress: %d\n", suppression );
 			printf( "    select: %d\n", selection );
@@ -159,7 +159,8 @@ class TimeIntervalProfiler { // T.I.P.
 		void print_profile_alert( const char *group_name, profile_entry_t *profile_p )	{
 		
 			printf( 
-				"TIP<%d>: \"%s\" Dt:%.5f (Da:%.5f, Ra%.5f) \"%s\"\n",
+				"TIP <%d>: %s Dt:%.5f (Da:%.5f, Ra%.5f) %s\n",
+//				"TIP <%d>: \"%s\" Dt:%.5f (Da:%.5f, Ra%.5f) \"%s\"\n",
 				profile_p->level,
 				group_name,
 				profile_p->frame_dt,
@@ -171,14 +172,14 @@ class TimeIntervalProfiler { // T.I.P.
 		void print_group_alert( const char *group_name, double dt, double da, double ra )	{
 		
 			printf( 
-				"TIP<>: \"%s\" Dt:%.5f (Da:%.5f, Ra%.5f)\n",
+				"TIP <>: %s Dt:%.5f (Da:%.5f, Ra%.5f)\n",
 				group_name, dt, da, ra
 			);
 		}
 		void print_profile_report( char *prefix, int index, profile_entry_t *profile_p )	{
 		
 			printf( 
-				"%s   [%d]<%d>: Dt:%.5f (Da:%.5f, Ra%.5f)(Mx[%d]:%.5f) \"%s\"\n",
+				"%s   [%d]<%d>: Dt:%.5f (Da:%.5f, Ra%.5f)(Mx[%d]:%.5f) %s\n",
 				prefix,
 				index,
 				profile_p->level,
@@ -216,7 +217,7 @@ class TimeIntervalProfiler { // T.I.P.
 				if( en )
 					group_p->req_enable = true;
 				else
-					group_p->req_enable = false;
+					group_p->enabled = false;
 				return( false );
 			}
 			return( true );
@@ -311,7 +312,7 @@ class TimeIntervalProfiler { // T.I.P.
 
 			if( enabled )	{
 				if( reporting )	{
-					printf( "TIP<> report:\n" );
+					printf( "TIP <> report:\n" );
 				}
 
 				group_entry_t *group_p = NULL;
@@ -389,48 +390,45 @@ class TimeIntervalProfiler { // T.I.P.
 								profile_p->frame_count = 0;
 							}
 						}
-						if( spike_count == 0 )	{
-							spike = false;
-							if( total_frame_dt > ( total_decay_dt * threshold ) )	{
-								spike = true;
+						spike = false;
+						if( total_frame_dt > ( total_decay_dt * threshold ) )	{
+							spike = true;
+						}
+						else
+						if( total_frame_dt > ( total_rolling_dt * threshold ) )	{
+							spike = true;
+						}
+						if( reporting )	{
+							if( spike ) {
+								print_group_report( "*",
+									total_frame_dt,
+									total_decay_dt,
+									total_rolling_dt
+								);
 							}
-							else
-							if( total_frame_dt > ( total_rolling_dt * threshold ) )	{
-								spike = true;
-							}
-							if( reporting )	{
-								if( spike ) {
-									print_group_report( "*",
-										total_frame_dt,
-										total_decay_dt,
-										total_rolling_dt
-									);
-								}
-								else	{
-									print_group_report( " ",
-										total_frame_dt,
-										total_decay_dt,
-										total_rolling_dt
-									);
-								}
-							}
-							else
-							if( spike )	{
-								print_group_alert( 
-									group_p->name,
+							else	{
+								print_group_report( " ",
 									total_frame_dt,
 									total_decay_dt,
 									total_rolling_dt
 								);
 							}
 						}
-						group_p->profile_event_count = 0;
+						else
+						if( spike || ( spike_count > 0 ) )	{
+							print_group_alert( 
+								group_p->name,
+								total_frame_dt,
+								total_decay_dt,
+								total_rolling_dt
+							);
+						}
 					}
-					
 					if( group_p->req_enable )	{
 						group_p->enabled = true;
 						group_p->req_enable = false;
 					}
+					group_p->profile_event_count = 0;
 				}
 				if( reporting )	{
 					reporting = false;

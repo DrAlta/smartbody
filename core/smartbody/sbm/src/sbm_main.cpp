@@ -55,7 +55,6 @@
 #include <sbm/resource_cmds.h>
 #include <sbm/time_regulator.h>
 
-
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 #if 0
@@ -419,6 +418,7 @@ void cleanup( void )	{
 	
 	XMLPlatformUtils::Terminate();
 
+	ResourceManager::cleanup();
 	printf( "SBM: terminated gracefully.\n> " );
 
 
@@ -437,6 +437,7 @@ void signal_handler(int sig) {
 ///////////////////////////////////////////////////////////////////////////////////
 
 int main( int argc, char **argv )	{
+
 
 #if SBM_REPORT_MEMORY_LEAKS
 	// CRT Debugging flags - Search help:
@@ -698,7 +699,6 @@ int main( int argc, char **argv )	{
 			}
 		}
 #endif
-
 		// [BMLR] Added to support receiving commands from renderer
 		vector<string> commands = mcu.bonebus.GetCommand();
 		for ( size_t i = 0; i < commands.size(); i++ ) {
@@ -740,3 +740,4 @@ int main( int argc, char **argv )	{
 
 	cleanup();
 }
+
