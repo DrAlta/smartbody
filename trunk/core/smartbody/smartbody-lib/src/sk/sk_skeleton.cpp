@@ -50,8 +50,16 @@ void SkSkeleton::init ()
  {
    _coldet_free_pairs.size(0);
    _channels->init();
-   while ( _postures.size()>0 ) _postures.pop()->unref();
-   while ( _joints.size()>0 ) delete _joints.pop();
+   while ( _postures.size()>0 ) 
+   {
+	   SkPosture* posture = _postures.pop();
+	   posture->unref();
+   }
+   while ( _joints.size()>0 ) 
+   {
+	   SkJoint* joint = _joints.pop();
+	   delete joint;
+   }
    _jhash.init(0);
    _root = 0;
    _gmat_uptodate = false;

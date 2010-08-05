@@ -44,6 +44,8 @@ MeCtLocomotionLimb::MeCtLocomotionLimb() {
 	curr_rotation = 0.0f;
 	rotation_record = 0.0f;
 	blended_anim.global_info = new MeCtLocomotionAnimGlobalInfo();
+	walking_skeleton = NULL;
+	standing_skeleton = NULL;
 }
 
 /** Destructor */
