@@ -186,9 +186,11 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			std::map<std::string, SkMotion*>::iterator motionIter = map.find(filebase);
 			if (motionIter != map.end()) {
 				cerr << "ERROR: Motion by name of \"" << filebase << "\" already exists.  Ignoring file \"" << pathname.native_file_string() << "\"." << endl;
+				motion->unref();
 				return CMD_FAILURE;
 			}
 			map.insert(std::pair<std::string, SkMotion*>(filebase, motion));
+			
 		} else {
 			// SkMotion::load() already prints an error...
 			//cerr << error_prefix << "Failed to load motion \"" << pathname.string() << "\"." << endl;
@@ -224,6 +226,7 @@ int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture
 		}
 	} else {
 		SkPosture* posture = new SkPosture();
+		posture->ref();
 		
 		SrInput in( pathname.string().c_str(), "rt" );
 		in >> (*posture);
@@ -255,6 +258,7 @@ int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture
 				return CMD_FAILURE;
 			}
 			map.insert(std::pair<std::string, SkPosture*>(filebase, posture));
+			posture->ref();
 		}
 	}
 	return CMD_SUCCESS;

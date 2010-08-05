@@ -269,7 +269,7 @@ void mcuCBHandle::clear( void )	{
 		 motionIter++)
 	{
 		SkMotion* motion = (*motionIter).second;
-		//motion->unref(); // need to cleanup motions - fix
+		motion->unref(); // need to cleanup motions - fix
 	}
 	
 	MeCtPose* pose_ctrl_p;
