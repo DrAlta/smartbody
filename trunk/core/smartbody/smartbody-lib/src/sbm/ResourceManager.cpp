@@ -19,6 +19,13 @@ ResourceManager::~ResourceManager()
 	{
 		delete (*iter);
 	}
+
+	while (!cur_cmd_parent.empty())
+	{
+		Resource* r = cur_cmd_parent.top();
+		delete r;
+		cur_cmd_parent.pop();
+	}
 }
 
 void ResourceManager::addResource(Resource* r)

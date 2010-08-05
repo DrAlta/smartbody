@@ -37,6 +37,7 @@ MeCtLocomotionAnalysis::MeCtLocomotionAnalysis() {
 	_ct_locomotion = NULL;
 	walking_skeleton = NULL;
 	standing_skeleton = NULL;
+	motion_standing = NULL;
 
 }
 
@@ -52,8 +53,15 @@ MeCtLocomotionAnalysis::~MeCtLocomotionAnalysis() {
 void MeCtLocomotionAnalysis::set_ct(MeCtLocomotion* controller)
 {
 	_ct_locomotion = controller;
+	if (walking_skeleton)
+		walking_skeleton->unref();
 	walking_skeleton = _ct_locomotion->walking_skeleton;
+	walking_skeleton->ref();
+
+	if (standing_skeleton)
+		standing_skeleton->unref();
 	standing_skeleton = _ct_locomotion->standing_skeleton;
+	standing_skeleton->ref();
 }
 
 MeCtLocomotion* MeCtLocomotionAnalysis::get_ct()
@@ -69,6 +77,8 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 		printf("Error: no locomotion controller attached.");
 		return;
 	}
+	if (this->motion_standing)
+		this->motion_standing->unref();
 	this->motion_standing = standing;
 	this->motion_standing->ref();
 	const char* base_name = standing_skeleton->root()->name().get_string();
