@@ -23,6 +23,7 @@
  */
 
 #include "me_ct_gaze.h"
+#include <vhcl_log.h>
 
 #define MAX_JOINT_LABEL_LEN	32
 
@@ -67,7 +68,7 @@ int G_debug = 0;
 #if TEST_SENSOR
 #include "me_ct_gaze_sensor.h"
 void test_sensor_callback( int id, int status )	{
-	printf( "test_sensor_callback: id:%d status:%d\n", id, status );
+	LOG( "test_sensor_callback: id:%d status:%d\n", id, status );
 }
 #endif
 
@@ -418,8 +419,8 @@ if( once )	{
 once = 0;
 vector_t a( 0.0, 0.0, 1.0 ), b( 1.0, 0.0, 1.0 );
 float deg = DEG( acos( a.normal().dot( b.normal() ) ) );
-printf( "test dot: %f deg\n", deg );
-printf( "CALC: joint: %s\n", joint_label( priority_joint ) );
+LOG( "test dot: %f deg\n", deg );
+LOG( "CALC: joint: %s\n", joint_label( priority_joint ) );
 }
 #endif
 
@@ -484,7 +485,7 @@ printf( "CALC: joint: %s\n", joint_label( priority_joint ) );
 		get_deg = (float)DEG( acos( fwd_dir.dot( tgt_dir ) ) );
 #endif
 
-//printf( "deg: %f\n", get_deg );
+//LOG( "deg: %f\n", get_deg );
 	}
 	else	{
 		quat_t w_tgt_rot = world_target_orient();
@@ -558,8 +559,8 @@ void MeCtGaze::inspect_skeleton( SkJoint* joint_p, int depth )	{
 	
 	if( joint_p )	{
 		const char *name = joint_p->name();
-		for( j=0; j<depth; j++ ) { printf( " " ); }
-		printf( "%s\n", name );
+		for( j=0; j<depth; j++ ) { LOG( " " ); }
+		LOG( "%s\n", name );
 		n = joint_p->num_children();
 		for( i=0; i<n; i++ )	{
 			inspect_skeleton( joint_p->child( i ), depth + 1 );
@@ -583,8 +584,8 @@ void MeCtGaze::inspect_skeleton_local_transform( SkJoint* joint_p, int depth )	{
 		vector_t pos = M.translation( GWIZ_M_TR );
 		euler_t rot = M.euler( GWIZ_M_TR );
 
-		for( j=0; j<depth; j++ ) { printf( " " ); }
-		printf( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
+		for( j=0; j<depth; j++ ) { LOG( " " ); }
+		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
 			name,
 			pos.x(), pos.y(), pos.z(),
 			rot.p(), rot.h(), rot.r()
@@ -614,8 +615,8 @@ void MeCtGaze::inspect_skeleton_world_transform( SkJoint* joint_p, int depth )	{
 		vector_t pos = M.translation( GWIZ_M_TR );
 		euler_t rot = M.euler( GWIZ_M_TR );
 
-		for( j=0; j<depth; j++ ) { printf( " " ); }
-		printf( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
+		for( j=0; j<depth; j++ ) { LOG( " " ); }
+		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
 			name,
 			pos.x(), pos.y(), pos.z(),
 			rot.p(), rot.h(), rot.r()
@@ -842,8 +843,8 @@ void MeCtGaze::controller_start_evaluate( void )	{
 			}
 		}
 #if 0
-		printf( "start: [%d]", i );
-		printf( " wgt: %.4f",
+		LOG( "start: [%d]", i );
+		LOG( " wgt: %.4f",
 			joint_arr[ i ].task_weight 
 		);
 #endif
@@ -886,7 +887,7 @@ void MeCtGaze::controller_start_evaluate( void )	{
 		quat_t head_task_rot = ( -body_head_rot ).product( body_task_rot );
 		gw_float_t head_task_deg = head_task_rot.degrees();
 		head_speed = (float)( head_task_deg / head_time );
-//printf( "MeCtGaze::controller_start TASK: %f deg  %f dps\n", head_task_deg, head_speed );
+//LOG( "MeCtGaze::controller_start TASK: %f deg  %f dps\n", head_task_deg, head_speed );
 	}
 
 	float total_w = 0.0;
@@ -935,7 +936,7 @@ void MeCtGaze::set_fade_out( float interval )	{
 
 bool MeCtGaze::update_fading( float dt )	{
 
-printf( "fade: %f %f %f\n", fade_interval, fade_remaining, fading_normal );
+LOG( "fade: %f %f %f\n", fade_interval, fade_remaining, fading_normal );
 
 	if( fade_remaining <= 0.0 ) {
 		if( fading_mode = FADING_MODE_IN )	{
@@ -960,13 +961,13 @@ printf( "fade: %f %f %f\n", fade_interval, fade_remaining, fading_normal );
 		MeCtGazeKey* key_p = joint_key_arr + i;
 //		float s = (float)( 0.01 + ( 1.0 - powf( key_p->smooth, dt * SMOOTH_RATE_REF ) ) * 0.99 );
 
-printf( " fr[%d] weight: %f\n", i, key_p->blend_weight );
+LOG( " fr[%d] weight: %f\n", i, key_p->blend_weight );
 
 		float s = (float)( 0.01 + ( 1.0f - powf( key_p->smooth, dt * SMOOTH_RATE_REF / fade_interval ) ) * 0.99 );
 		float super_sm = s * fading_normal;
 		key_p->blend_weight = s * key_p->blend_weight + ( 1.0f - s ) * super_sm;
 
-printf( " to[%d] weight: %f s:%f ssm:%f \n", i, key_p->blend_weight, s, super_sm );
+LOG( " to[%d] weight: %f s:%f ssm:%f \n", i, key_p->blend_weight, s, super_sm );
 	}
 	
 	fade_remaining -= dt;
@@ -981,14 +982,14 @@ printf( " to[%d] weight: %f s:%f ssm:%f \n", i, key_p->blend_weight, s, super_sm
 
 bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 	
-//printf( "smooth head: %f eye: %f\n", joint_arr[ GAZE_JOINT_SKULL ].smooth, joint_arr[ GAZE_JOINT_EYE_L ].smooth );
+//LOG( "smooth head: %f eye: %f\n", joint_arr[ GAZE_JOINT_SKULL ].smooth, joint_arr[ GAZE_JOINT_EYE_L ].smooth );
 
 #if 0
 	if( !started )	{
-		printf( "MeCtGaze::controller_evaluate ERR: not started for this: 0x%x\n", this );
+		LOG( "MeCtGaze::controller_evaluate ERR: not started for this: 0x%x\n", this );
 	}
 	else	{
-		printf( "MeCtGaze::controller_evaluate OK: started for this: 0x%x\n", this );
+		LOG( "MeCtGaze::controller_evaluate OK: started for this: 0x%x\n", this );
 	}
 #endif
 	
@@ -1001,14 +1002,14 @@ bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 		test_forward_ray();
 #endif
 #if 0
-		printf( "-- skeleton:\n" );
+		LOG( "-- skeleton:\n" );
 		if( skeleton_ref_p )	{
 			SkJoint* joint_p = skeleton_ref_p->search_joint( SbmPawn::WORLD_OFFSET_JOINT_NAME );
 			inspect_skeleton( joint_p );
 //			inspect_skeleton_local_transform( joint_p );
 //			inspect_skeleton_world_transform( joint_p );
 		}
-		printf( "--\n" );
+		LOG( "--\n" );
 #endif
 	}
 #endif
@@ -1099,7 +1100,7 @@ bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 				Q_eval = joint_arr[ i ].evaluate( dt, w_orient, offset_rot, 1.0 );
 			}
 
-//printf( "%d: %f\n", i, joint_arr[ i ].blend_weight );
+//LOG( "%d: %f\n", i, joint_arr[ i ].blend_weight );
 			quat_t Q_out = Q_in.lerp( joint_arr[ i ].blend_weight, Q_eval );
 				
 #define SPINE_LOCK_HEAD_TEST 0
@@ -1133,7 +1134,7 @@ G_debug = 0;
 //euler_t e = Q_out; if( i == 6 ) e.print();
 SkJointName n = _channels.name( i );
 euler_t e = Q_out;
-printf( "%d %s %f %f %f\n", i, n.get_string(), e.x(), e.y(), e.z() );
+LOG( "%d %s %f %f %f\n", i, n.get_string(), e.x(), e.y(), e.z() );
 #endif
 
 			// Mark channel changed
@@ -1143,7 +1144,7 @@ printf( "%d %s %f %f %f\n", i, n.get_string(), e.x(), e.y(), e.z() );
 
 if( G_debug_c )	{
 	G_debug_c--;
-	printf( "DEBUG %d ----------------------------------------\n", G_debug_c );
+	LOG( "DEBUG %d ----------------------------------------\n", G_debug_c );
 }
 
 #if TEST_SENSOR
@@ -1153,10 +1154,10 @@ if( G_debug_c )	{
 }
 
 void MeCtGaze::print_state( int tabs )	{
-	fprintf( stdout, "MeCtGaze" );
+	LOG("MeCtGaze" );
 	const char* str = name();
 	if( str )
-		fprintf( stdout, " \"%s\"\n", str );
+		LOG(" \"%s\"\n", str );
 }
 
 ///////////////////////////////////////////////////////////////////////////

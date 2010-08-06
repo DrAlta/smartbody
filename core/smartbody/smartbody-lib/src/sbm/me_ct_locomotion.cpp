@@ -168,17 +168,17 @@ SkChannelArray& MeCtLocomotion::controller_channels() {
 			//MeCtLocomotionJointInfo info;
 			//info.joint_index = base->index();
 			//nonlimb_joint_info.push() = info;
-			printf("[%s] %d\n", name, request_channels.size()-1);
+			LOG("[%s] %d\n", name, request_channels.size()-1);
 			sum = 1;
 		}
 		else
 		{
-			printf(">>>>>>>>>>>>>>>>>>>>[%s] %d\n", name, request_channels.size()-1);
+			LOG(">>>>>>>>>>>>>>>>>>>>[%s] %d\n", name, request_channels.size()-1);
 		}
 	}
 	for(i = 0; i < base->num_children(); ++i)
 	{
-		for(int j = 0; j < depth; ++j) printf(" ");
+		for(int j = 0; j < depth; ++j) LOG(" ");
 		sum += iterate_nonlimb_joints(base->child(i), depth+1);
 	}
 	return sum;
@@ -232,7 +232,7 @@ void MeCtLocomotion::controller_map_updated()
 				index = LOOKUP_BUFFER_INDEX( index,  k+joint_channel_start_ind);
 				if(index < 0)
 				{
-					printf("\ni=%d failed to look up buffer index", k);
+					LOG("\ni=%d failed to look up buffer index", k);
 				}
 				limb->limb_joint_info.buff_index.set(i, index);
 				++k;
@@ -244,7 +244,7 @@ void MeCtLocomotion::controller_map_updated()
 			index = LOOKUP_BUFFER_INDEX( index,  i+joint_channel_start_ind);
 			if(index < 0)
 			{
-				printf("\ni=%d failed to look up buffer index", i);
+				LOG("\ni=%d failed to look up buffer index", i);
 			}
 			//nonlimb_joint_info.get(i-limb_joint_num).buff_index = index;
 			nonlimb_joint_info.buff_index.set(i-limb_joint_num, index);
@@ -324,7 +324,7 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 				navigator.set_reached_destination(frame);
 			else navigator.next_destination(frame);
 		}
-		//printf("\n[%f, %f]", 2.0f * dis_to_dest.len() * speed_accelerator.get_target_acceleration(), speed_accelerator.get_curr_speed()*speed_accelerator.get_curr_speed());
+		//LOG("\n[%f, %f]", 2.0f * dis_to_dest.len() * speed_accelerator.get_target_acceleration(), speed_accelerator.get_curr_speed()*speed_accelerator.get_curr_speed());
 	}
 
 	if(navigator.get_local_velocity().len() != 0.0f)
@@ -349,7 +349,7 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	SrQuat quat;
 	SrQuat quat_buff;
 
-	//printf("\n");
+	//LOG("\n");
 	for(int i = 0; i < limb_list.size(); ++i)
 	{
 		MeCtLocomotionJointInfo* info = &(limb_list.get(i)->limb_joint_info);
@@ -363,7 +363,7 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 			buffer[index+2] = (float)quat.y;
 			buffer[index+3] = (float)quat.z;
 
-			//printf("\n%d", index);
+			//LOG("\n%d", index);
 		}
 	}
 
@@ -390,7 +390,7 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	last_t = (float)time;
 	//navigator.print_foot_pos(frame, limb_list.get(dominant_limb));
 
-	//if(dominant_limb == 0) printf("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> yes    (%f, %f, %f)", limb_list.get(dominant_limb)->pos.x+navigator.x, limb_list.get(dominant_limb)->pos.y+navigator.y, limb_list.get(dominant_limb)->pos.z+navigator.z);
+	//if(dominant_limb == 0) LOG("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> yes    (%f, %f, %f)", limb_list.get(dominant_limb)->pos.x+navigator.x, limb_list.get(dominant_limb)->pos.y+navigator.y, limb_list.get(dominant_limb)->pos.z+navigator.z);
 	return true;
 }
 
@@ -592,7 +592,7 @@ void MeCtLocomotion::update(float inc_frame)
 	get_dominant_limb();
 	/*if(navigator.standing_factor == 0.0f && navigator.reached_destination && navigator.has_destination) 
 	{
-		printf("\n dom_limb: %d, 1:%f, 2:%f", dominant_limb, limb_list.get(0)->space_time, limb_list.get(1)->space_time);
+		LOG("\n dom_limb: %d, 1:%f, 2:%f", dominant_limb, limb_list.get(0)->space_time, limb_list.get(1)->space_time);
 	}*/
 
 	for(int i = 0; i < limb_list.size(); ++i)
@@ -646,9 +646,9 @@ void MeCtLocomotion::get_IK()
 		for(int j = 0; j < ik_scenario->joint_info_list.size(); ++j)
 		{
 			info = &(ik_scenario->joint_info_list.get(j));
-			//if(j == 2) printf("\n(%f)", limb_list.get(i)->pos_buffer.get(j).y);
+			//if(j == 2) LOG("\n(%f)", limb_list.get(i)->pos_buffer.get(j).y);
 			info->support_joint_comp = limb_list.get(i)->pos_buffer.get(j).y - info->support_joint_height;
-			//if(j == 2) printf("\n height: %f", info->support_joint_comp);
+			//if(j == 2) LOG("\n height: %f", info->support_joint_comp);
 		}
 		ik.update(ik_scenario);
 		limb_list.get(i)->limb_joint_info.quat = ik_scenario->quat_list;
@@ -674,7 +674,7 @@ int MeCtLocomotion::get_dominant_limb()
 		}
 		if(r < 0.0f) 
 		{
-			printf("Error: can not determine dominant limb. \n space_time_limb1=%f\nspace_time_limb2=%f", limb_list.get(0)->space_time, limb_list.get(1)->space_time);
+			LOG("Error: can not determine dominant limb. \n space_time_limb1=%f\nspace_time_limb2=%f", limb_list.get(0)->space_time, limb_list.get(1)->space_time);
 			r = 0;
 		}
 		if(r > remnant) 
@@ -786,14 +786,14 @@ void MeCtLocomotion::update_pos()
 		}
 		else
 		{
-			//printf("\nsum = 0");
+			//LOG("\nsum = 0");
 		}
 	}
 	else dis_initialized = true;
 	navigator.update_displacement(&displacement);
 
-	//printf("\ndisplacement: (%f, %f, %f)", displacement.x, displacement.y, displacement.z);
-	//printf("\nratio1: %f, ratio2: %f", ratio[0], ratio[1]);
+	//LOG("\ndisplacement: (%f, %f, %f)", displacement.x, displacement.y, displacement.z);
+	//LOG("\nratio1: %f, ratio2: %f", ratio[0], ratio[1]);
 }
 
 

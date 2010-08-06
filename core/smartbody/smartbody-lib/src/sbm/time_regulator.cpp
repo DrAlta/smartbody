@@ -23,6 +23,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <vhcl_log.h>
 
 #include "sbm/time_regulator.h"
 
@@ -65,7 +66,7 @@ double SBM_get_real_time( void ) {
 		QueryPerformanceFrequency( &f );
 		inv_freq = 1.0 / (double)f.QuadPart;
 
-//printf( "SBM_get_real_time: dt:%.18f fps: %.3f\n", inv_freq, (double)f.QuadPart );
+//LOG( "SBM_get_real_time: dt:%.18f fps: %.3f\n", inv_freq, (double)f.QuadPart );
 
 		QueryPerformanceCounter( &c );
 		ref_quad = c.QuadPart;
@@ -96,7 +97,7 @@ void SBM_sleep_msec( int msec )	{
 	}
 	Sleep( msec );
 #else
-	printf( "SBM_sleep_msec ERR: not implemented\n" );
+	LOG( "SBM_sleep_msec ERR: not implemented\n" );
 #endif
 }
 
@@ -117,7 +118,7 @@ double SBM_sleep_wait( double prev_time, double target_dt, bool verbose )	{ // s
 				
 				if( wait_msec > 0 ) {
 					if( verbose && passes )	{
-						printf( "SBM_sleep_wait NOTICE: slipped %f seconds == %d msec\n", 
+						LOG( "SBM_sleep_wait NOTICE: slipped %f seconds == %d msec\n", 
 							diff, wait_msec 
 						);
 					}
@@ -172,7 +173,7 @@ bool TimeRegulator::update( double in_time ) {
 	
 	if( in_time < 0.0 )	{
 		if( extern_src )	{
-			if( verbose ) printf( "TimeRegulator::update NOTICE: switch to internal\n" );
+			if( verbose ) LOG( "TimeRegulator::update NOTICE: switch to internal\n" );
 			start( in_time );
 			abort = true;
 		}
@@ -180,7 +181,7 @@ bool TimeRegulator::update( double in_time ) {
 	}
 	else	{
 		if( !extern_src )	{
-			if( verbose ) printf( "TimeRegulator::update NOTICE: switch to external\n" );
+			if( verbose ) LOG( "TimeRegulator::update NOTICE: switch to external\n" );
 			start( in_time );
 			abort = true;
 		}
@@ -195,29 +196,29 @@ bool TimeRegulator::update( double in_time ) {
 	if( !abort ) {
 		if( loop_dt < 0.0 ) {
 			if( extern_src )	{
-				if( verbose ) printf( "TimeRegulator::update ERR: negative external increment: %f\n", loop_dt );
+				if( verbose ) LOG( "TimeRegulator::update ERR: negative external increment: %f\n", loop_dt );
 			}
 			else
-				printf( "TimeRegulator::update ERR: negative internal increment!!!!: %f\n", loop_dt );
+				LOG( "TimeRegulator::update ERR: negative internal increment!!!!: %f\n", loop_dt );
 			abort = true;
 		}
 		else
 		if( loop_dt == 0.0 )	{
 			if( extern_src )	{
-				if( verbose ) printf( "TimeRegulator::update NOTICE: zero external increment\n" );
+				if( verbose ) LOG( "TimeRegulator::update NOTICE: zero external increment\n" );
 				if( ( ( sleep_dt == 0.0 )&&( eval_dt == 0.0 )&&( sim_dt > 0.0 ) ) == false )	{
 					abort = true;
 				}
 			}
 			else	{
-				printf( "TimeRegulator::update ERR: zero internal increment!!!!\n" );
+				LOG( "TimeRegulator::update ERR: zero internal increment!!!!\n" );
 				abort = true;
 			}
 		}
 	}
 	if( abort ) {
 		out_dt = 0.0;
-		if( verbose ) printf( "TimeRegulator::update ABORT\n" );
+		if( verbose ) LOG( "TimeRegulator::update ABORT\n" );
 		return( false );
 	}
 	
@@ -242,7 +243,7 @@ bool TimeRegulator::update( double in_time ) {
 		prev_real_time = real_time;
 
 		if( do_pause )	{
-			if( verbose ) printf( "TimeRegulator::update PAUSE\n" );
+			if( verbose ) LOG( "TimeRegulator::update PAUSE\n" );
 			do_pause = false;
 			paused = true;
 		}
@@ -250,12 +251,12 @@ bool TimeRegulator::update( double in_time ) {
 			do_resume = true;
 		}
 		if( do_resume )	{
-			if( verbose ) printf( "TimeRegulator::update RESUME\n" );
+			if( verbose ) LOG( "TimeRegulator::update RESUME\n" );
 			do_resume = false;
 			paused = false;
 		}
 		if( do_steps )	{
-			if( verbose ) printf( "TimeRegulator::update STEP\n" );
+			if( verbose ) LOG( "TimeRegulator::update STEP\n" );
 			do_steps--;
 			do_pause = true;
 		}
@@ -273,7 +274,7 @@ bool TimeRegulator::update( double in_time ) {
 	}
 	
 	out_dt = 0.0;
-	if( verbose ) printf( "TimeRegulator::update SKIP\n" );
+	if( verbose ) LOG( "TimeRegulator::update SKIP\n" );
 	return( false );
 }
 
@@ -290,15 +291,15 @@ void TimeRegulator::update_perf( void )	{
 
 		if( perf_sim_sum > 0.0 ) {
 			double sim_avg = perf_sim_sum / perf_count;
-			printf( "PERF: REAL dt:%.3f fps:%.1f ~ SIM dt:%.3f fps:%.1f\n", 
-//			printf( "PERF: REAL dt:%f fps:%f ~ SIM dt:%f fps:%f\n", 
+			LOG( "PERF: REAL dt:%.3f fps:%.1f ~ SIM dt:%.3f fps:%.1f\n", 
+//			LOG( "PERF: REAL dt:%f fps:%f ~ SIM dt:%f fps:%f\n", 
 				avg, 1.0 / avg,
 				sim_avg, 1.0 / sim_avg
 			);
 		}
 		else	{
-			printf( "PERF: dt:%.3f fps:%.1f\n", avg, 1.0 / avg );
-//			printf( "PERF: dt:%f fps:%f\n", avg, 1.0 / avg );
+			LOG( "PERF: dt:%.3f fps:%.1f\n", avg, 1.0 / avg );
+//			LOG( "PERF: dt:%f fps:%f\n", avg, 1.0 / avg );
 		}
 		perf_real_sum = 0.0;
 		perf_sim_sum = 0.0;
@@ -307,20 +308,20 @@ void TimeRegulator::update_perf( void )	{
 }
 
 void TimeRegulator::print( void )	{
-	printf( "TimeRegulator( %.3f ): \n", real_time );
-	printf( "   status: %s\n", paused ? "PAUSED" : ( do_steps ? "STEPPING" : "RUNNING" ) );
-	printf( "    speed: %.3f\n", speed );
-	printf( "    sleep: %.4f : %.2f fps\n", sleep_dt, ( sleep_dt > 0.0 )? ( 1.0 / sleep_dt ): 0.0 );
-	printf( "     eval: %.4f : %.2f fps\n", eval_dt, ( eval_dt > 0.0 )? ( 1.0 / eval_dt ): 0.0 );
-	printf( "      sim: %.4f : %.2f fps\n", sim_dt, ( sim_dt > 0.0 )? ( 1.0 / sim_dt ): 0.0 );
-	printf( "   out dt: %.4f : %.2f fps\n", out_dt, ( out_dt > 0.0 )? ( 1.0 / out_dt ): 0.0 );
-	printf( " out time: %.3f\n", out_time );
+	LOG( "TimeRegulator( %.3f ): \n", real_time );
+	LOG( "   status: %s\n", paused ? "PAUSED" : ( do_steps ? "STEPPING" : "RUNNING" ) );
+	LOG( "    speed: %.3f\n", speed );
+	LOG( "    sleep: %.4f : %.2f fps\n", sleep_dt, ( sleep_dt > 0.0 )? ( 1.0 / sleep_dt ): 0.0 );
+	LOG( "     eval: %.4f : %.2f fps\n", eval_dt, ( eval_dt > 0.0 )? ( 1.0 / eval_dt ): 0.0 );
+	LOG( "      sim: %.4f : %.2f fps\n", sim_dt, ( sim_dt > 0.0 )? ( 1.0 / sim_dt ): 0.0 );
+	LOG( "   out dt: %.4f : %.2f fps\n", out_dt, ( out_dt > 0.0 )? ( 1.0 / out_dt ): 0.0 );
+	LOG( " out time: %.3f\n", out_time );
 }
 
 void TimeRegulator::print_update( int id, double in_time ) {
 
 	bool res = update( in_time );
-	printf( "[%d]:(%d): in:%f time:%f dt:%f\n", id, res, in_time, get_time(), get_dt() );
+	LOG( "[%d]:(%d): in:%f time:%f dt:%f\n", id, res, in_time, get_time(), get_dt() );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -334,7 +335,7 @@ void test_time_regulator( void )	{
 	tr.start();
 	tr.set_verbose();
 	
-	printf( "=====================================================\n" );
+	LOG( "=====================================================\n" );
 
 #if 0
 	tr.print_update( c++ );
@@ -343,7 +344,7 @@ void test_time_regulator( void )	{
 	tr.print_update( c++ );
 	tr.print_update( c++ );
 
-	printf( "=====================================================\n" );
+	LOG( "=====================================================\n" );
 	
 	tr.print_update( c++, 1.0 );
 	tr.print_update( c++, 1.1 );
@@ -351,7 +352,7 @@ void test_time_regulator( void )	{
 	tr.print_update( c++, 2.2 );
 	tr.print_update( c++, 2.2 );
 
-	printf( "=====================================================\n" );
+	LOG( "=====================================================\n" );
 
 	tr.print_update( c++ );
 	tr.print_update( c++ );
@@ -359,7 +360,7 @@ void test_time_regulator( void )	{
 	tr.print_update( c++ );
 	tr.print_update( c++ );
 
-	printf( "=====================================================\n" );
+	LOG( "=====================================================\n" );
 	
 	tr.print_update( c++, 1.0 );
 	tr.print_update( c++, 2.0 );
@@ -367,7 +368,7 @@ void test_time_regulator( void )	{
 	tr.print_update( c++, 0.0 );
 	tr.print_update( c++, 4.0 );
 
-	printf( "=====================================================\n" );
+	LOG( "=====================================================\n" );
 	tr.print();
 #endif
 	
@@ -382,7 +383,7 @@ void test_time_regulator( void )	{
 		double r = (double)rand() / (double)RAND_MAX;
 		tr.print_update( i, r );
 	}
-	printf( "=====================================================\n" );
+	LOG( "=====================================================\n" );
 #endif
 
 #if 0
@@ -390,7 +391,7 @@ void test_time_regulator( void )	{
 	for( int i = 0; i<100; i++ )	{
 		tr.update();
 	}
-	printf( "=====================================================\n" );
+	LOG( "=====================================================\n" );
 	tr.set_perf( 0.0 );
 #endif
 
@@ -405,7 +406,7 @@ void test_time_regulator( void )	{
 
 		tr.print_update( i, 0.0 );
 	}
-	printf( "=====================================================\n" );
+	LOG( "=====================================================\n" );
 #endif
 
 #if 0
@@ -421,7 +422,7 @@ void test_time_regulator( void )	{
 
 		tr.print_update( i );
 	}
-	printf( "=====================================================\n" );
+	LOG( "=====================================================\n" );
 #endif
 }
 

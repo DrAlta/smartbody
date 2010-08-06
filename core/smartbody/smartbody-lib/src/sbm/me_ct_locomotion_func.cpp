@@ -70,7 +70,7 @@ SrArray<SrQuat>* get_blended_quat_buffer(SrArray<SrQuat>* dest, SrArray<SrQuat>*
 	if(quat_buffer1->size() != quat_buffer2->size()) return NULL;
 	if(dest == NULL)
 	{
-		printf("Error. buffer size = 0");
+		LOG("Error. buffer size = 0");
 	}
 	for(int i = 0; i < dest->size(); ++i)
 	{

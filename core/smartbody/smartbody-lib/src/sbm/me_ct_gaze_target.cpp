@@ -151,7 +151,7 @@ void MeCtGaze::set_target_joint( float x, float y, float z, SkJoint* joint_p = N
 #if 1
 static int once = 1;
 if( once )	{
-	once = 0; printf( "MeCtGaze::set_target_joint( f, f, f, * ) NOTICE: call deprecated\n" );
+	once = 0; LOG( "MeCtGaze::set_target_joint( f, f, f, * ) NOTICE: call deprecated\n" );
 }
 #endif
 
@@ -166,7 +166,7 @@ void MeCtGaze::set_target( float x, float y, float z, char *joint_name = NULL ) 
 #if 1
 static int once = 1;
 if( once )	{
-	once = 0; printf( "MeCtGaze::set_target( f, f, f, * ) NOTICE: call deprecated\n" );
+	once = 0; LOG( "MeCtGaze::set_target( f, f, f, * ) NOTICE: call deprecated\n" );
 }
 #endif
 
@@ -181,7 +181,7 @@ void MeCtGaze::set_orient_joint( float p, float h, float r, SkJoint* joint_p = N
 #if 1
 static int once = 1;
 if( once )	{
-	once = 0; printf( "MeCtGaze::set_orient_joint( f, f, f, * ) NOTICE: call deprecated\n" );
+	once = 0; LOG( "MeCtGaze::set_orient_joint( f, f, f, * ) NOTICE: call deprecated\n" );
 }
 #endif
 
@@ -196,7 +196,7 @@ void MeCtGaze::set_orient( float p, float h, float r, char *joint_name = NULL ) 
 #if 1
 static int once = 1;
 if( once )	{
-	once = 0; printf( "MeCtGaze::set_orient( f, f, f, * ) NOTICE: call deprecated\n" );
+	once = 0; LOG( "MeCtGaze::set_orient( f, f, f, * ) NOTICE: call deprecated\n" );
 }
 #endif
 

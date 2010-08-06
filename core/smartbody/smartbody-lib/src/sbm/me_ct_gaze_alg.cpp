@@ -53,7 +53,7 @@ quat_t rotation_ray_to_target_orient(
 )	{
 	
 	if( Fd.length() < FORWARD_RAY_EPSILON ) {
-		printf( "rotation_ray_to_target_orient ERR: forward direction has no length\n" );
+		LOG( "rotation_ray_to_target_orient ERR: forward direction has no length\n" );
 		return( quat_t() );
 	}
 	
@@ -77,20 +77,20 @@ quat_t rotation_ray_to_target_point(
 	
 #if 0
 if( G_debug )	{
-printf( "-- --\n" );
+LOG( "-- --\n" );
 
 X.print();
 R.print();
 Fo.print();
 Fd.print();
 
-printf( "-- --\n" );
+LOG( "-- --\n" );
 }
 #endif
 
 	if( Fd.length() < FORWARD_RAY_EPSILON ) {
 		if( heading_only == false ) {
-			printf( "rotation_ray_to_target_point ERR: forward direction has no length\n" );
+			LOG( "rotation_ray_to_target_point ERR: forward direction has no length\n" );
 		}
 		return( quat_t() );
 	}
@@ -184,7 +184,7 @@ printf( "-- --\n" );
 	vector_t Aaxis = RT.cross( RX );
 
 	if( gamma > 180.0 )	{
-//printf( "flip gamma\n" );
+//LOG( "flip gamma\n" );
 		gamma = 360.0 - gamma;
 		Aaxis = -Aaxis; // axis of shortest rotation
 	}
@@ -238,14 +238,14 @@ printf( "-- --\n" );
 
 #if 0
 if( G_debug )	{
-printf( "--\n" );
+LOG( "--\n" );
 
-printf( "alpha: %f\n", alpha );
+LOG( "alpha: %f\n", alpha );
 euler_t( Qalpha ).print();
-printf( "beta:  %f\n", beta );
+LOG( "beta:  %f\n", beta );
 euler_t( RT ).print();
 
-printf( "--\n" );
+LOG( "--\n" );
 }
 #endif
 
@@ -290,25 +290,25 @@ void test_forward_ray( void )	{
 	vector_t Fd( 5.0, -10.0, 1.0 );
 #endif
 
-	printf( "--- FORWARD RAY TEST:\n" );
+	LOG( "--- FORWARD RAY TEST:\n" );
 	quat_t Q = rotation_ray_to_target_point( X, R, Fo, Fd, 0.0 );
 
-	printf( "ROTATION:\n" );
+	LOG( "ROTATION:\n" );
 	euler_t E = Q;
 	E.print();
 
-	printf( "NEW FORWARD DIR:\n" );
+	LOG( "NEW FORWARD DIR:\n" );
 	vector_t newFd = Q * Fd;
 	newFd.normal().print();
 
-	printf( "FORWARD ORIGIN TO TARGET:\n" );
+	LOG( "FORWARD ORIGIN TO TARGET:\n" );
 	vector_t Td = X - ( R + Q * ( Fo - R ) );
 	Td.normal().print();
 
-	printf( "DIFF:\n" );
+	LOG( "DIFF:\n" );
 	( Td.normal() - newFd.normal() ).print();
 	
-	printf( "DIFF HEADING-ONLY:\n" );
+	LOG( "DIFF HEADING-ONLY:\n" );
 	( vector_t( Td.x(), 0.0, Td.z() ).normal() - vector_t( newFd.x(), 0.0, newFd.z() ).normal() ).print();
-	printf( "---\n" );
+	LOG( "---\n" );
 }

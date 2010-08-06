@@ -54,6 +54,7 @@
 #include <sbm/locomotion_cmds.hpp>
 #include <sbm/resource_cmds.h>
 #include <sbm/time_regulator.h>
+#include <vhcl_log.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -89,12 +90,12 @@ void test_1Dspline( void )	{
 		double x = -1.0 + n * 6.0;
 
 		double y = S.eval( x );
-		printf( " [%d]: { %.12f, %.12f }\n", i, x, y );
+		LOG( " [%d]: { %.12f, %.12f }\n", i, x, y );
 	}
 
-	printf( " : { %.12f, %.12f }\n", -0.000001, S.eval( -0.000001 ) );
-	printf( " : { %.12f, %.12f }\n", 3.9999999, S.eval( 3.9999999 ) );
-	printf( " : { %.12f, %.12f }\n", 4.0000001, S.eval( 4.0000001 ) );
+	LOG( " : { %.12f, %.12f }\n", -0.000001, S.eval( -0.000001 ) );
+	LOG( " : { %.12f, %.12f }\n", 3.9999999, S.eval( 3.9999999 ) );
+	LOG( " : { %.12f, %.12f }\n", 4.0000001, S.eval( 4.0000001 ) );
 }
 #endif
 
@@ -137,6 +138,7 @@ void test_1Dspline( void )	{
 using std::vector;
 using std::string;
 
+
 ///////////////////////////////////////////////////////////////////////////////////
 
 int sbm_main_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
@@ -155,10 +157,10 @@ int sbm_main_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	int result = mcu_p->execute( token, srArgBuffer( args_raw ) );
 	switch( result ) {
 		case CMD_NOT_FOUND:
-			fprintf( stdout, "SBM ERR: command NOT FOUND: '%s %s'\n> ", token, args_raw );
+			LOG("SBM ERR: command NOT FOUND: '%s %s'\n> ", token, args_raw );
 			break;
 		case CMD_FAILURE:
-			fprintf( stdout, "SBM ERR: command FAILED: '%s %s'\n> ", token, args_raw );
+			LOG("SBM ERR: command FAILED: '%s %s'\n> ", token, args_raw );
 			break;
 		case CMD_SUCCESS:
 			break;
@@ -170,10 +172,10 @@ void sbm_vhmsg_callback( const char *op, const char *args, void * user_data ) {
 	// Replace singleton with a user_data pointer
 	switch( mcuCBHandle::singleton().execute( op, (char *)args ) ) {
         case CMD_NOT_FOUND:
-            fprintf( stdout, "SBM ERR: command NOT FOUND: '%s' + '%s'\n> ", op, args );
+            LOG("SBM ERR: command NOT FOUND: '%s' + '%s'\n> ", op, args );
             break;
         case CMD_FAILURE:
-            fprintf( stdout, "SBM ERR: command FAILED: '%s' + '%s'\n> ", op, args );
+            LOG("SBM ERR: command FAILED: '%s' + '%s'\n> ", op, args );
             break;
     }
 }
@@ -213,7 +215,7 @@ int mcu_snapshot_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 		// Allocate a picture buffer 
 		Pic * in = pic_alloc(windowWidth, windowHeight, 3, NULL);
-		printf("  File to save to: %s\n", output_file.c_str());
+		LOG("  File to save to: %s\n", output_file.c_str());
 
 		for (int i=windowHeight-1; i>=0; i--) 
 		{
@@ -223,13 +225,13 @@ int mcu_snapshot_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		if (ppm_write(output_file.c_str(), in))
 		{
 			pic_free(in);
-			printf("  File saved Successfully\n");
+			LOG("  File saved Successfully\n");
 			return( CMD_SUCCESS );
 		}
 		else
 		{
 			pic_free(in);
-			printf("  Error in Saving\n");
+			LOG("  Error in Saving\n");
 			return( CMD_FAILURE );
 		}	
 	}
@@ -238,7 +240,7 @@ int mcu_snapshot_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 int mcu_echo_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	
-    fprintf( stdout, "%s\n> ", args.read_remainder_raw() );
+    LOG("%s\n> ", args.read_remainder_raw() );
 	return( CMD_SUCCESS );
 }
 
@@ -251,6 +253,7 @@ int mcu_reset_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 int mcu_quit_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 
 	mcu_p->loop = false;
+	ResourceManager::cleanup();
 	return( CMD_SUCCESS );
 }
 
@@ -393,7 +396,7 @@ void cleanup( void )	{
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		if( mcu.loop )	{
-			printf( "SBM NOTE: unexpected exit\n> " );
+			LOG( "SBM NOTE: unexpected exit\n> " );
 			mcu.loop = false;
 		}
 
@@ -419,7 +422,7 @@ void cleanup( void )	{
 	XMLPlatformUtils::Terminate();
 
 	ResourceManager::cleanup();
-	printf( "SBM: terminated gracefully.\n> " );
+	LOG( "SBM: terminated gracefully.\n> " );
 
 
 #if SBM_REPORT_MEMORY_LEAKS
@@ -460,6 +463,10 @@ int main( int argc, char **argv )	{
 	vhcl::Crash::EnableExceptionHandling( true );
 #endif
 
+	// register the log listener
+	vhcl::Log::StdoutListener* listener = new vhcl::Log::StdoutListener();
+	vhcl::Log::g_log.AddListener(listener);
+
 	int err;
 	SrString net_host;
 	vector<string> seq_paths;
@@ -492,7 +499,7 @@ int main( int argc, char **argv )	{
 	SrString	s;
 	for (	i=1; i<argc; i++ )
 	{
-		printf( "SBM ARG[%d]: '%s'\n", i, argv[i] );
+		LOG( "SBM ARG[%d]: '%s'\n", i, argv[i] );
 		s = argv[i];
 
 		if( s.search(	"-host=" ) == 0 )  // argument starts with -host=
@@ -503,32 +510,32 @@ int main( int argc, char **argv )	{
 		else if( s == "-mepath" )  // -mepath <dirpath> to specify where Motion Engine files (.sk, .skm) should be loaded from
 		{
 			if( ++i < argc ) {
-				printf( "    Adding ME path '%s'\n", argv[i] );
+				LOG( "    Adding ME path '%s'\n", argv[i] );
 
 				me_paths.push_back( argv[i] );
 			} else {
-				printf( "ERROR: Expected directory path to follow -mepath\n" );
+				LOG( "ERROR: Expected directory path to follow -mepath\n" );
 				// return -1
 			}
 		}
 		else if( s == "-seqpath" )  // -mepath <dirpath> to specify where sequence files (.seq) should be loaded from
 		{
 			if( ++i < argc ) {
-				printf( "    Adding sequence path '%s'\n", argv[i] );
+				LOG( "    Adding sequence path '%s'\n", argv[i] );
 
 				seq_paths.push_back( argv[i] );
 			} else {
-				printf( "ERROR: Expected directory path to follow -seqpath\n" );
+				LOG( "ERROR: Expected directory path to follow -seqpath\n" );
 				// return -1
 			}
 		}
 		else if( s == "-seq" )  // -seq <filename> to load seq file (replaces old -initseq notation)
 		{
 			if( ++i < argc ) {
-				printf( "    Loading sequence '%s'\n", argv[i] );
+				LOG( "    Loading sequence '%s'\n", argv[i] );
 				init_seqs.push_back( argv[i] );
 			} else {
-				printf( "ERROR: Expected filename to follow -seq\n" );
+				LOG( "ERROR: Expected filename to follow -seq\n" );
 				// return -1
 			}
 		}
@@ -563,7 +570,7 @@ int main( int argc, char **argv )	{
 		}
 		else
 		{
-			printf( "ERROR: Unrecognized command line argument: \"%s\"\n", (const char*)s );
+			LOG( "ERROR: Unrecognized command line argument: \"%s\"\n", (const char*)s );
 		}
 	}
 	if( lock_dt_mode )	{ 
@@ -593,13 +600,13 @@ int main( int argc, char **argv )	{
 		mcu.vhmsg_enabled = true;
 	} else {
 		if( vhmsg_disabled ) {
-			printf( "SBM: VHMSG_SERVER='%s': Messaging disabled.\n", vhmsg_server?"NULL":vhmsg_server );
+			LOG( "SBM: VHMSG_SERVER='%s': Messaging disabled.\n", vhmsg_server?"NULL":vhmsg_server );
 		} else {
 #if 0 // disable server name query until vhmsg is fixed
 			const char* vhmsg_server_actual = vhmsg::ttu_get_server();
-			printf( "SBM ERR: ttu_open VHMSG_SERVER='%s' FAILED\n", vhmsg_server_actual?"NULL":vhmsg_server_actual );
+			LOG( "SBM ERR: ttu_open VHMSG_SERVER='%s' FAILED\n", vhmsg_server_actual?"NULL":vhmsg_server_actual );
 #else
-			printf( "SBM ERR: ttu_open FAILED\n" );
+			LOG( "SBM ERR: ttu_open FAILED\n" );
 #endif
 		}
 		mcu.vhmsg_enabled = false;
@@ -621,7 +628,7 @@ int main( int argc, char **argv )	{
 	{
 		if ( !AUDIO_Init() )
 		{
-			printf( "ERROR: Audio initialization failed\n" );
+			LOG( "ERROR: Audio initialization failed\n" );
 		}
 	}
 
@@ -637,7 +644,7 @@ int main( int argc, char **argv )	{
 	//atexit( exit_callback );
 
 	srCmdLine cmdl;
-	fprintf( stdout, "> " );
+	printf("> " );
 	
 #if ENABLE_DEFAULT_BOOTSTRAP
 	vector<string>::iterator it;
@@ -651,7 +658,7 @@ int main( int argc, char **argv )	{
 	}
 
 	if( seq_paths.empty() ) {
-		printf( "No sequence paths specified. Adding current working directory to seq path\n" );
+		LOG( "No sequence paths specified. Adding current working directory to seq path\n" );
 		seq_paths.push_back( "." );
 	}
 	for( it = seq_paths.begin();
@@ -663,7 +670,7 @@ int main( int argc, char **argv )	{
 	}
 
 	if( init_seqs.empty() ) {
-		printf( "No sequences specified. Loading sequence '%s'\n", DEFAULT_SEQUENCE_FILE );
+		LOG( "No sequences specified. Loading sequence '%s'\n", DEFAULT_SEQUENCE_FILE );
 		init_seqs.push_back( DEFAULT_SEQUENCE_FILE );
 	}
 
@@ -710,21 +717,21 @@ int main( int argc, char **argv )	{
 			if( strlen( cmd ) )	{
 				switch( int ret = mcu.execute( cmd ) ) {
 					case CMD_NOT_FOUND:
-						fprintf( stdout, "SBM ERR: command NOT FOUND: '%s'\n> ", cmd );
+						printf("SBM ERR: command NOT FOUND: '%s'\n> ", cmd );
 						break;
 					case CMD_FAILURE:
-						fprintf( stdout, "SBM ERR: command FAILED: '%s'\n> ", cmd );
+						printf("SBM ERR: command FAILED: '%s'\n> ", cmd );
 						break;
 					case CMD_SUCCESS:
-						fprintf( stdout, "> " );  // new prompt
+						printf("> " );  // new prompt
 						break;
 					default:
-						fprintf( stdout, "SBM ERR: return value %d ERROR: '%s'\n> ", ret, cmd );
+						printf("SBM ERR: return value %d ERROR: '%s'\n> ", ret, cmd );
 						break;
 				}
 			}
 			else	{
-				fprintf( stdout, "> " );
+				printf("> " );
 			}
 			fflush( stdout );
 		}
@@ -739,5 +746,7 @@ int main( int argc, char **argv )	{
 	}
 
 	cleanup();
+	vhcl::Log::g_log.RemoveAllListeners();
+	delete listener;
 }
 

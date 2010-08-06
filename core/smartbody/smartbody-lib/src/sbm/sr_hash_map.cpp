@@ -25,6 +25,7 @@
 
 #include	<stdio.h>
 #include	<string.h>
+#include <vhcl_log.h>
 
 #include "sr_hash_map.h"
 
@@ -94,7 +95,7 @@ srHashMapBase::srHashMapBase( unsigned int size )	{
 	unsigned int i;
 		
 		if( size < 1 )	{
-			printf( "srHashMapBase::srHashMapBase ERR: needs non-zero size\n" );
+			LOG( "srHashMapBase::srHashMapBase ERR: needs non-zero size\n" );
 			return;
 		}
 		
@@ -119,7 +120,7 @@ srHashMapBase::~srHashMapBase( void )	{
 		
 	if( shallow_copy == false )	{
 		if( entry_count > 0 )	{
-			printf( "srHashMapBase::~srHashMapBase ERR: leaking %d entries\n", entry_count );
+			LOG( "srHashMapBase::~srHashMapBase ERR: leaking %d entries\n", entry_count );
 		}
 		delete [] bucket_pp;
 	}
@@ -156,7 +157,7 @@ void srHashMapBase::print( int reverse )	{
 					}
 					sprintf( label, "%s|", label );
 				}
-				printf( "%s \n", label );
+				LOG( "%s \n", label );
 			}
 		}
 }
@@ -260,7 +261,7 @@ void srHashMapBase::removeAll()	{
 	while( get_num_entries() )	{
         pull( &claimed );
 		if( claimed )	{
-			printf( "srHashMapBase::removeAll WARNING: leaking claimed entry!\n" );
+			LOG( "srHashMapBase::removeAll WARNING: leaking claimed entry!\n" );
 		}
 	}
 }

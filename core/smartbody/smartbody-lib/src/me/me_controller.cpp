@@ -195,7 +195,7 @@ void MeController::stop (double time) {
 	controller_stop ();
 	_stopTime = time;
 
-// printf( ">>> MeController::stop <<<\n" );
+// LOG( ">>> MeController::stop <<<\n" );
 }
 
 double MeController::stop_time ()
@@ -398,10 +398,10 @@ void MeController::load_bvh_joint_hmap( void )	{
 //			bool b = _record_joint_hmap.insertstat( strname, 1 );
 			bool b = _record_joint_hmap.insert( jname, 1 );
 			if( b ) {
-				printf( "MeController::load_bvh_joint_hmap SUCCESS: '%s'\n", strname );
+				LOG( "MeController::load_bvh_joint_hmap SUCCESS: '%s'\n", strname );
 			}
 			else	{
-				printf( "MeController::load_bvh_joint_hmap FAILURE: '%s'\n", strname );
+				LOG( "MeController::load_bvh_joint_hmap FAILURE: '%s'\n", strname );
 			}
 		}
 	}

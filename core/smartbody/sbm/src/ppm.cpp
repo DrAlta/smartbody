@@ -2,7 +2,7 @@
 #include <sys/types.h>
 #include <ctype.h>
 #include <string>
-
+#include <vhcl_log.h>
 #include "pic.h"
 
 /*
@@ -102,7 +102,7 @@ Pic *ppm_read(char *file, Pic *opic) {
     }
 
     p = pic_alloc(nx, ny, 3, opic);
-    printf("reading PPM file %s: %dx%d pixels\n", file, p->nx, p->ny);
+    LOG("reading PPM file %s: %dx%d pixels\n", file, p->nx, p->ny);
 
     if (fread(p->pix, p->nx*3, p->ny, fp) != p->ny) {	/* read pixels */
 	fprintf(stderr, "premature EOF on file %s\n", file);

@@ -23,6 +23,7 @@
 
 #include "sbm_pawn.hpp"
 #include "me_ct_step_turn.h"
+#include <vhcl_log.h>
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -237,16 +238,16 @@ void MeCtStepTurn::capture_world_offset_state( void )	{
 					world_offset_rot = M.quat( GWIZ_M_TR );
 					return;
 				}
-				printf( "MeCtStepTurn::capture_world_offset_state ERR: '%s' joint is NULL\n", SbmPawn::WORLD_OFFSET_JOINT_NAME );
+				LOG( "MeCtStepTurn::capture_world_offset_state ERR: '%s' joint is NULL\n", SbmPawn::WORLD_OFFSET_JOINT_NAME );
 				return;
 			}
-			printf( "MeCtStepTurn::capture_world_offset_state ERR: skeleton reference is still NULL\n" );
+			LOG( "MeCtStepTurn::capture_world_offset_state ERR: skeleton reference is still NULL\n" );
 			return;
 		}
-		printf( "MeCtStepTurn::capture_world_offset_state ERR: context channels have no size\n" );
+		LOG( "MeCtStepTurn::capture_world_offset_state ERR: context channels have no size\n" );
 		return;
 	}
-	printf( "MeCtStepTurn::capture_world_offset_state ERR: context is NULL\n" );
+	LOG( "MeCtStepTurn::capture_world_offset_state ERR: context is NULL\n" );
 }
 
 void MeCtStepTurn::update_action_params( void )	{
@@ -280,7 +281,7 @@ void MeCtStepTurn::set_time( float sec )	{
 	static int once = 1;
 	if( once )	{
 		once = 0;
-		printf( "MeCtStepTurn::set_time NOTE: CALL DEPRECATED: use set_duration()\n" );
+		LOG( "MeCtStepTurn::set_time NOTE: CALL DEPRECATED: use set_duration()\n" );
 	}
 	set_duration( sec );
 }
@@ -321,11 +322,11 @@ void MeCtStepTurn::context_updated( void ) {
 	if( _context ) {
 		skeleton_ref_p = _context->channels().skeleton(); // WHY HERE?
 		if( skeleton_ref_p == NULL )	{
-			printf( "MeCtStepTurn::context_updated ERR: skeleton_ref_p is NULL\n" );
+			LOG( "MeCtStepTurn::context_updated ERR: skeleton_ref_p is NULL\n" );
 		}
 	}
 	else	{
-		printf( "MeCtStepTurn::context_updated ERR: context is NULL\n" );
+		LOG( "MeCtStepTurn::context_updated ERR: context is NULL\n" );
 	}
 #endif
 }
@@ -366,8 +367,8 @@ void MeCtStepTurn::controller_map_updated( void ) {
 		base_joint_idx.z = _context->toBufferIndex( base_joint_chan.z );
 		base_joint_idx.q = _context->toBufferIndex( base_joint_chan.q );
 #if 0
-		printf( "world_offset chan: %d index: %d\n", world_offset_chan.x, world_offset_idx.x );
-		printf( "base_joint   chan: %d index: %d\n", base_joint_chan.x, base_joint_idx.x );
+		LOG( "world_offset chan: %d index: %d\n", world_offset_chan.x, world_offset_idx.x );
+		LOG( "base_joint   chan: %d index: %d\n", base_joint_chan.x, base_joint_idx.x );
 #endif
 	} 
 	else {
@@ -535,29 +536,29 @@ const char* MeCtStepTurn::controller_type( void ) const	{
 
 void MeCtStepTurn::print_state( int tabCount ) {
 
-	fprintf( stdout, "MeCtStepTurn" );
+	LOG("MeCtStepTurn" );
 
 	const char* str = name();
 	if( str )
-		fprintf( stdout, " \"%s\"", str );
+		LOG(" \"%s\"", str );
 
-	fprintf( stdout, ", motion" );
+	LOG(", motion" );
 	if( _motion ) {
 
 		// motion name
 		str = _motion->name();
 		if( str )
-			fprintf( stdout, " \"%s\"", str );
+			LOG(" \"%s\"", str );
 
 		// motion filename
 		str = _motion->filename();
 		if( str )
-			fprintf( stdout, " file \"%s\"", str );
+			LOG(" file \"%s\"", str );
 	} 
 	else {
-		fprintf( stdout, "=NULL" );
+		LOG("=NULL" );
 	}
-	fprintf( stdout, "\n" );
+	LOG("\n" );
 }
 
 //////////////////////////////////////////////////////////////////////////////////

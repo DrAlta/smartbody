@@ -162,7 +162,7 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		}
 		else	{
 			delete pres;
-			printf( "mcu_filepath_func ERR: token '%s' NOT FOUND\n", path_tok );
+			LOG( "mcu_filepath_func ERR: token '%s' NOT FOUND\n", path_tok );
 			return( CMD_FAILURE );
 		}
 		
@@ -208,7 +208,7 @@ void mcu_preprocess_sequence( srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p, mcuCBHandl
 				delete [] cmd;
 				cmd = NULL;
 				if( inline_seq_p == NULL )	{
-					printf( "mcu_preprocess_sequence ERR: inline seq '%s' NOT FOUND\n", name );
+					LOG( "mcu_preprocess_sequence ERR: inline seq '%s' NOT FOUND\n", name );
 					return;
 				}
 			}
@@ -245,7 +245,7 @@ int begin_sequence( char* seq_name, mcuCBHandle *mcu_p )	{
 		err = mcu_p->active_seq_map.insert( seq_name, cp_seq_p );
 
 		if( err != CMD_SUCCESS )	{
-			printf( "begin_sequence ERR: insert active: '%s' FAILED\n", seq_name ); 
+			LOG( "begin_sequence ERR: insert active: '%s' FAILED\n", seq_name ); 
 		}
 	}
 
@@ -280,7 +280,7 @@ int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				seq_p = new srCmdSeq;
 				err = mcu_p->pending_seq_map.insert( seq_name, seq_p );
 				if( err == CMD_FAILURE )	{
-					printf( "mcu_sequence_func ERR: insert pending '%s' FAILED\n", seq_name ); 
+					LOG( "mcu_sequence_func ERR: insert pending '%s' FAILED\n", seq_name ); 
 					return( err );
 				}
 			}
@@ -295,7 +295,7 @@ int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			
 			srCmdSeq *seq_p = mcu_p->pending_seq_map.lookup( seq_name );
 			if( seq_p == NULL )	{
-				printf( "mcu_sequence_func ERR: print: '%s' NOT FOUND\n", seq_name ); 
+				LOG( "mcu_sequence_func ERR: print: '%s' NOT FOUND\n", seq_name ); 
 				return( CMD_FAILURE );
 			}
 			seq_p->print( stdout );
@@ -304,7 +304,7 @@ int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		if( strcmp( seq_cmd, "abort" ) == 0 )	{
 			int result = mcu_p->abort_seq( seq_name );
 			if( result == CMD_NOT_FOUND )	{
-				printf( "mcu_sequence_func ERR: abort: '%s' NOT FOUND\n", seq_name ); 
+				LOG( "mcu_sequence_func ERR: abort: '%s' NOT FOUND\n", seq_name ); 
 			}
 			return( result );
 		}
@@ -312,7 +312,7 @@ int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		if( strcmp( seq_cmd, "delete" ) == 0 )	{
 			int result = mcu_p->abort_seq( seq_name );
 			if( result == CMD_NOT_FOUND )	{
-				printf( "mcu_sequence_func ERR: delete: '%s' NOT FOUND\n", seq_name ); 
+				LOG( "mcu_sequence_func ERR: delete: '%s' NOT FOUND\n", seq_name ); 
 			}
 			return( result );
 		}
@@ -361,7 +361,7 @@ int mcu_set_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
     int result = mcu_p->set_cmd_map.execute( arg, args, mcu_p );
 	if( result == CMD_NOT_FOUND ) {
 		// TODO: Differentiate between not finding this var and subargs
-		fprintf( stdout, "SBM ERR: Unknown Variable, Cannot set: '%s'\n> ", arg );  // Clarify this as a set command error
+		LOG("SBM ERR: Unknown Variable, Cannot set: '%s'\n> ", arg );  // Clarify this as a set command error
 		return CMD_SUCCESS; // Avoid multiple error messages
 	} else {
 		return result;
@@ -378,7 +378,7 @@ int mcu_print_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
     int result = mcu_p->print_cmd_map.execute( arg, args, mcu_p );
 	if( result == CMD_NOT_FOUND ) {
 		// TODO: Differentiate between not finding this var and subargs
-		fprintf( stdout, "SBM ERR: Print command NOT FOUND: '%s'\n> ", arg );  // Clarify this as a print command error
+		LOG("SBM ERR: Print command NOT FOUND: '%s'\n> ", arg );  // Clarify this as a print command error
 		return CMD_SUCCESS; // Avoid multiple error messages
 	} else {
 		return result;
@@ -394,7 +394,7 @@ int mcu_test_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
     char* arg = args.read_token();
     int result = mcu_p->test_cmd_map.execute( arg, args, mcu_p );
 	if( result == CMD_NOT_FOUND ) {
-		fprintf( stdout, "SBM ERR: Test command NOT FOUND: '%s'\n> ", arg );  // Clarify this as a test command error
+		LOG("SBM ERR: Test command NOT FOUND: '%s'\n> ", arg );  // Clarify this as a test command error
 		return CMD_SUCCESS; // Avoid multiple error messages
 	} else {
 		return result;
@@ -631,7 +631,7 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				mcu_p->timer_p->print();
 			}
 			else	{
-				printf( "TIME:%.3f ~ DT:%.3f %.2f:FPS\n",
+				LOG( "TIME:%.3f ~ DT:%.3f %.2f:FPS\n",
 					mcu_p->time,
 					mcu_p->time_dt,
 					1.0 / mcu_p->time_dt
@@ -643,7 +643,7 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		if( strcmp( time_cmd, "prof" ) == 0 )	{
 
 			if( mcu_p->profiler_p == NULL )	{
-				printf( "mcu_time_func NOTICE: %s: TimeIntervalProfiler was NOT REGISTERED\n", time_cmd ); 
+				LOG( "mcu_time_func NOTICE: %s: TimeIntervalProfiler was NOT REGISTERED\n", time_cmd ); 
 				mcu_p->switch_internal_profiler();
 			}
 			TimeIntervalProfiler *prof_p = mcu_p->profiler_p;
@@ -720,7 +720,7 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		}
 		
 		if( mcu_p->timer_p == NULL )	{
-			printf( "mcu_time_func NOTICE: %s: TimeRegulator was NOT REGISTERED\n", time_cmd );
+			LOG( "mcu_time_func NOTICE: %s: TimeRegulator was NOT REGISTERED\n", time_cmd );
 			mcu_p->switch_internal_profiler(); 
 		}
 		TimeRegulator *timer_p = mcu_p->timer_p;
@@ -814,18 +814,18 @@ int mcu_character_init(
 	int err;
 	
 	if( strcmp(char_name, "*" )==0 ) {  // TODO: better character name valiadtion
-		printf( "init_character ERR: Invalid SbmCharacter name '%s'\n", char_name ); 
+		LOG( "init_character ERR: Invalid SbmCharacter name '%s'\n", char_name ); 
 		return( CMD_FAILURE );
 	}
 	if( mcu_p->character_map.lookup( char_name ) )	{
-		printf( "init_character ERR: SbmCharacter '%s' EXISTS\n", char_name ); 
+		LOG( "init_character ERR: SbmCharacter '%s' EXISTS\n", char_name ); 
 		return( CMD_FAILURE );
 	}
 
 	SbmCharacter *char_p = new SbmCharacter(char_name);
 	SkSkeleton* skeleton_p = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->resource_manager );
 	if( !skeleton_p ) {
-		printf( "init_character ERR: Failed to load skeleton \"%s\"\n", skel_file ); 
+		LOG( "init_character ERR: Failed to load skeleton \"%s\"\n", skel_file ); 
 		return CMD_FAILURE;
 	}
 
@@ -845,14 +845,14 @@ int mcu_character_init(
 
 		err = mcu_p->pawn_map.insert( char_name, char_p );
 		if( err != CMD_SUCCESS )	{
-			printf( "init_character ERR: SbmCharacter pawn_map.insert(..) '%s' FAILED\n", char_name ); 
+			LOG( "init_character ERR: SbmCharacter pawn_map.insert(..) '%s' FAILED\n", char_name ); 
 			delete char_p;
 			return( err );
 		}
 
 		err = mcu_p->character_map.insert( char_name, char_p );
 		if( err != CMD_SUCCESS )	{
-			printf( "init_character ERR: SbmCharacter character_map.insert(..) '%s' FAILED\n", char_name ); 
+			LOG( "init_character ERR: SbmCharacter character_map.insert(..) '%s' FAILED\n", char_name ); 
 			mcu_p->pawn_map.remove( char_name );
 			delete char_p;
 			return( err );
@@ -860,7 +860,7 @@ int mcu_character_init(
 
 		err = mcu_p->add_scene( char_p->scene_p );
 		if( err != CMD_SUCCESS )	{
-			printf( "init_character ERR: add_scene '%s' FAILED\n", char_name ); 
+			LOG( "init_character ERR: add_scene '%s' FAILED\n", char_name ); 
 			return( err );
 		}
 
@@ -871,12 +871,12 @@ int mcu_character_init(
 
 		err = mcu_p->theWSP->register_vector_3d_source( wsp_world_offset, "position", SbmPawn::wsp_world_position_accessor, char_p );
 		if( err != CMD_SUCCESS )	{
-			printf( "WARNING: mcu_character_init \"%s\": Failed to register character position.\n", char_name ); 
+			LOG( "WARNING: mcu_character_init \"%s\": Failed to register character position.\n", char_name ); 
 		}
 
 		err = mcu_p->theWSP->register_vector_4d_source( wsp_world_offset, "rotation", SbmPawn::wsp_world_rotation_accessor, char_p );
 		if( err != CMD_SUCCESS )	{
-			printf( "WARNING: mcu_character_init \"%s\": Failed to register character rotation.\n", char_name ); 
+			LOG( "WARNING: mcu_character_init \"%s\": Failed to register character rotation.\n", char_name ); 
 		}
 
 
@@ -893,13 +893,13 @@ int mcu_character_init(
 			err = mcu_p->theWSP->register_vector_3d_source( wsp_joint_name, "position", SbmPawn::wsp_position_accessor, char_p );
 			if ( err != CMD_SUCCESS )
 			{
-				printf( "WARNING: mcu_character_init \"%s\": Failed to register joint \"%s\" position.\n", char_name, wsp_joint_name ); 
+				LOG( "WARNING: mcu_character_init \"%s\": Failed to register joint \"%s\" position.\n", char_name, wsp_joint_name ); 
 			}
 
 			err = mcu_p->theWSP->register_vector_4d_source( wsp_joint_name, "rotation", SbmPawn::wsp_rotation_accessor, char_p );
 			if ( err != CMD_SUCCESS )
 			{
-				printf( "WARNING: mcu_character_init \"%s\": Failed to register joint \"%s\" rotation.\n", char_name, wsp_joint_name ); 
+				LOG( "WARNING: mcu_character_init \"%s\": Failed to register joint \"%s\" rotation.\n", char_name, wsp_joint_name ); 
 			}
 		}
 	}
@@ -933,10 +933,10 @@ int begin_controller(
 			);
 			return( CMD_SUCCESS );
 		}
-		printf( "begin_controller ERR: ctrl '%s' NOT FOUND\n", ctrl_name );
+		LOG( "begin_controller ERR: ctrl '%s' NOT FOUND\n", ctrl_name );
 		return( CMD_FAILURE );
 	}
-	printf( "begin_controller ERR: char '%s' NOT FOUND\n", char_name );
+	LOG( "begin_controller ERR: char '%s' NOT FOUND\n", char_name );
 	return( CMD_FAILURE );
 }
 
@@ -962,10 +962,10 @@ int begin_controller(
 			);
 			return( CMD_SUCCESS );
 		}
-		printf( "begin_controller ERR: ctrl '%s' NOT FOUND\n", ctrl_name );
+		LOG( "begin_controller ERR: ctrl '%s' NOT FOUND\n", ctrl_name );
 		return( CMD_FAILURE );
 	}
-	printf( "begin_controller ERR: char '%s' NOT FOUND\n", char_name );
+	LOG( "begin_controller ERR: char '%s' NOT FOUND\n", char_name );
 	return( CMD_FAILURE );
 }
 
@@ -1004,7 +1004,7 @@ int mcu_character_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		 
 			SbmCharacter * actor = mcu_p->character_map.lookup( char_name );
 			if ( !actor ) {
-				printf( "ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"%s\".\n", char_name );
+				LOG( "ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"%s\".\n", char_name );
 				return CMD_FAILURE;  // this should really be an ignore/out-of-domain result
 			} else {
 				actor->set_viseme( viseme, weight, duration );
@@ -1067,7 +1067,7 @@ int mcu_character_ctrl_cmd(
 	if( strcmp( ctrl_cmd, "end" ) == 0 )	{
 		
 		//// TODO
-		printf( "ERROR: \"char <char id> ctrl <ctrl id> end ...\" Unimplemented.\n" );
+		LOG( "ERROR: \"char <char id> ctrl <ctrl id> end ...\" Unimplemented.\n" );
 		return( CMD_FAILURE );
 	}
 	else
@@ -1108,7 +1108,7 @@ int mcu_character_bone_cmd(
 			{
 				actor->bonebusCharacter->AddBoneRotation( j->name(), w, x, y, z, mcu_p->time );
 
-				//printf( "%s %f %f %f %f\n", (const char *)j->name(), w, x, y, z );
+				//LOG( "%s %f %f %f %f\n", (const char *)j->name(), w, x, y, z );
 			}
 		}
 
@@ -1551,7 +1551,7 @@ int init_pose_controller(
 	std::map<std::string, SkPosture*>::iterator postureIter = mcu_p->pose_map.find(std::string(pose_name));
 	if (postureIter == mcu_p->pose_map.end())
 	{
-		printf( "init_pose_controller ERR: SkPosture '%s' NOT FOUND in pose map\n", pose_name ); 
+		LOG( "init_pose_controller ERR: SkPosture '%s' NOT FOUND in pose map\n", pose_name ); 
 		return( CMD_FAILURE );
 	}
 	SkPosture *pose_p = (*postureIter).second;
@@ -1559,7 +1559,7 @@ int init_pose_controller(
 	MeCtPose* ctrl_p = new MeCtPose;
 	err = mcu_p->pose_ctrl_map.insert( ctrl_name, ctrl_p );
 	if( err == CMD_FAILURE )	{
-		printf( "init_pose_controller ERR: MeCtPose '%s' EXISTS\n", ctrl_name ); 
+		LOG( "init_pose_controller ERR: MeCtPose '%s' EXISTS\n", ctrl_name ); 
 		delete ctrl_p;
 		return( CMD_FAILURE );
 	}
@@ -1567,7 +1567,7 @@ int init_pose_controller(
 
 	err = mcu_p->controller_map.insert( ctrl_name, ctrl_p );
 	if( err == CMD_FAILURE )	{
-		printf( "init_pose_controller ERR: MeCtPose '%s' EXISTS\n", ctrl_name ); 
+		LOG( "init_pose_controller ERR: MeCtPose '%s' EXISTS\n", ctrl_name ); 
 		return( CMD_FAILURE );
 	}
 	ctrl_p->ref();
@@ -1586,7 +1586,7 @@ int init_motion_controller(
 
 	std::map<std::string, SkMotion*>::iterator motionIter =  mcu_p->motion_map.find(mot_name);
 	if( motionIter == mcu_p->motion_map.end() ) {
-		printf( "init_motion_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_name ); 
+		LOG( "init_motion_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_name ); 
 		return( CMD_FAILURE );
 	}
 	SkMotion *mot_p = (*motionIter).second;
@@ -1594,7 +1594,7 @@ int init_motion_controller(
 	MeCtMotion* ctrl_p = new MeCtMotion;
 	err = mcu_p->motion_ctrl_map.insert( ctrl_name, ctrl_p );
 	if( err == CMD_FAILURE )	{
-		printf( "init_motion_controller ERR: MeCtMotion '%s' EXISTS\n", ctrl_name ); 
+		LOG( "init_motion_controller ERR: MeCtMotion '%s' EXISTS\n", ctrl_name ); 
 		delete ctrl_p;
 		return( CMD_FAILURE );
 	}
@@ -1602,7 +1602,7 @@ int init_motion_controller(
 
 	err = mcu_p->controller_map.insert( ctrl_name, ctrl_p );
 	if( err == CMD_FAILURE )	{
-		printf( "init_motion_controller ERR: MeController '%s' EXISTS\n", ctrl_name ); 
+		LOG( "init_motion_controller ERR: MeController '%s' EXISTS\n", ctrl_name ); 
 		return( CMD_FAILURE );
 	}
 	ctrl_p->ref();
@@ -1621,7 +1621,7 @@ int init_stepturn_controller(
 
 	std::map<std::string, SkMotion*>::iterator motionIter =  mcu_p->motion_map.find(mot_name);
 	if( motionIter == mcu_p->motion_map.end() ) {
-		printf( "init_motion_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_name ); 
+		LOG( "init_motion_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_name ); 
 		return( CMD_FAILURE );
 	}
 	SkMotion *mot_p = (*motionIter).second;
@@ -1629,7 +1629,7 @@ int init_stepturn_controller(
 	MeCtStepTurn* ctrl_p = new MeCtStepTurn;
 	err = mcu_p->stepturn_ctrl_map.insert( ctrl_name, ctrl_p );
 	if( err == CMD_FAILURE )	{
-		printf( "init_stepturn_controller ERR: MeCtStepTurn '%s' EXISTS\n", ctrl_name ); 
+		LOG( "init_stepturn_controller ERR: MeCtStepTurn '%s' EXISTS\n", ctrl_name ); 
 		delete ctrl_p;
 		return( CMD_FAILURE );
 	}
@@ -1637,7 +1637,7 @@ int init_stepturn_controller(
 
 	err = mcu_p->controller_map.insert( ctrl_name, ctrl_p );
 	if( err == CMD_FAILURE )	{
-		printf( "init_stepturn_controller ERR: MeController '%s' EXISTS\n", ctrl_name ); 
+		LOG( "init_stepturn_controller ERR: MeController '%s' EXISTS\n", ctrl_name ); 
 		return( CMD_FAILURE );
 	}
 	ctrl_p->ref();
@@ -1657,7 +1657,7 @@ int init_quickdraw_controller(
 
 	std::map<std::string, SkMotion*>::iterator motionIter =  mcu_p->motion_map.find(std::string(mot_name));
 	if( motionIter == mcu_p->motion_map.end() ) {
-		printf( "init_motion_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_name ); 
+		LOG( "init_motion_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", mot_name ); 
 		return( CMD_FAILURE );
 	}
 	SkMotion *mot_p = (*motionIter).second;
@@ -1667,7 +1667,7 @@ int init_quickdraw_controller(
 	{
 		std::map<std::string, SkMotion*>::iterator altMotionIter =  mcu_p->motion_map.find(std::string(alt_mot_name));
 		if( altMotionIter == mcu_p->motion_map.end() ) {
-			printf( "init_quickdraw_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", alt_mot_name ); 
+			LOG( "init_quickdraw_controller ERR: SkMotion '%s' NOT FOUND in motion map\n", alt_mot_name ); 
 			return( CMD_FAILURE );
 		}
 		alt_mot_p = (*altMotionIter).second;
@@ -1676,7 +1676,7 @@ int init_quickdraw_controller(
 	MeCtQuickDraw* ctrl_p = new MeCtQuickDraw;
 	err = mcu_p->quickdraw_ctrl_map.insert( ctrl_name, ctrl_p );
 	if( err == CMD_FAILURE )	{
-		printf( "init_quickdraw_controller ERR: MeCtQuickDraw '%s' EXISTS\n", ctrl_name ); 
+		LOG( "init_quickdraw_controller ERR: MeCtQuickDraw '%s' EXISTS\n", ctrl_name ); 
 		delete ctrl_p;
 		return( CMD_FAILURE );
 	}
@@ -1684,7 +1684,7 @@ int init_quickdraw_controller(
 
 	err = mcu_p->controller_map.insert( ctrl_name, ctrl_p );
 	if( err == CMD_FAILURE )	{
-		printf( "init_quickdraw_controller ERR: MeController '%s' EXISTS\n", ctrl_name ); 
+		LOG( "init_quickdraw_controller ERR: MeController '%s' EXISTS\n", ctrl_name ); 
 		return( CMD_FAILURE );
 	}
 	ctrl_p->ref();
@@ -1705,14 +1705,14 @@ int init_gaze_controller(
 	MeCtGaze *ctrl_p;
 	ctrl_p = mcu_p->gaze_ctrl_map.lookup( ctrl_name );
 	if( ctrl_p )	{
-		printf( "init_gaze_controller ERR: MeCtGaze '%s' EXISTS\n", ctrl_name ); 
+		LOG( "init_gaze_controller ERR: MeCtGaze '%s' EXISTS\n", ctrl_name ); 
 		return( CMD_FAILURE );
 	}
 
 	ctrl_p = new MeCtGaze;
 	err = mcu_p->gaze_ctrl_map.insert( ctrl_name, ctrl_p );
 	if( err == CMD_FAILURE )	{
-		printf( "init_gaze_controller ERR: MeCtGaze '%s' insertion FAILED\n", ctrl_name ); 
+		LOG( "init_gaze_controller ERR: MeCtGaze '%s' insertion FAILED\n", ctrl_name ); 
 		delete ctrl_p;
 		return( err );
 	}
@@ -1720,7 +1720,7 @@ int init_gaze_controller(
 
 	err = mcu_p->controller_map.insert( ctrl_name, ctrl_p );
 	if( err == CMD_FAILURE )	{
-		printf( "init_gaze_controller ERR: MeCtGaze '%s' EXISTS\n", ctrl_name ); 
+		LOG( "init_gaze_controller ERR: MeCtGaze '%s' EXISTS\n", ctrl_name ); 
 		return( err );
 	}
 	ctrl_p->ref();
@@ -1742,7 +1742,7 @@ int init_simple_nod_controller(
 	MeCtSimpleNod* ctrl_p = new MeCtSimpleNod;
 	err = mcu_p->snod_ctrl_map.insert( ctrl_name, ctrl_p );
 	if( err == CMD_FAILURE )	{
-		printf( "init_simple_nod_controller ERR: MeCtSimpleNod '%s' EXISTS\n", ctrl_name ); 
+		LOG( "init_simple_nod_controller ERR: MeCtSimpleNod '%s' EXISTS\n", ctrl_name ); 
 		delete ctrl_p;
 		return( err );
 	}
@@ -1750,7 +1750,7 @@ int init_simple_nod_controller(
 	
 	err = mcu_p->controller_map.insert( ctrl_name, ctrl_p );
 	if( err == CMD_FAILURE )	{
-		printf( "init_simple_nod_controller ERR: MeCtSimpleNod '%s' EXISTS\n", ctrl_name ); 
+		LOG( "init_simple_nod_controller ERR: MeCtSimpleNod '%s' EXISTS\n", ctrl_name ); 
 		return( err );
 	}
 	ctrl_p->ref();
@@ -1769,23 +1769,23 @@ int init_lilt_controller(
 	
 	SbmCharacter *char_p= mcu_p->character_map.lookup( char_name );
 	if ( !char_p ) {
-		printf( "init_lilt_controller ERR: SbmCharacter '%s' NOT FOUND\n", char_name );
+		LOG( "init_lilt_controller ERR: SbmCharacter '%s' NOT FOUND\n", char_name );
 		return( CMD_FAILURE );
 	}
 	if ( !char_p->motion_sched_p ) {
-		printf( "init_lilt_controller ERR: SbmCharacter '%s' UNINITIALIZED\n", char_name );
+		LOG( "init_lilt_controller ERR: SbmCharacter '%s' UNINITIALIZED\n", char_name );
 		return( CMD_FAILURE );
 	}
 	MeCtAnkleLilt* ctrl_p = new MeCtAnkleLilt;
 	err = mcu_p->lilt_ctrl_map.insert( ctrl_name, ctrl_p );
 	if ( err == CMD_FAILURE ) {
-		printf( "init_lilt_controller ERR: MeCtAnkleLilt '%s' EXISTS\n", ctrl_name );
+		LOG( "init_lilt_controller ERR: MeCtAnkleLilt '%s' EXISTS\n", ctrl_name );
 		delete ctrl_p;
 		return( err );
 	}
 	err = mcu_p->controller_map.insert( ctrl_name, ctrl_p );
 	if (err == CMD_FAILURE){
-		printf( "init_lilt_controller ERR: MeCtSimpleNod '%s' EXISTS\n", ctrl_name);
+		LOG( "init_lilt_controller ERR: MeCtSimpleNod '%s' EXISTS\n", ctrl_name);
 		return( err );
 	}
 	ctrl_p->ref();
@@ -1803,7 +1803,7 @@ int init_eyelid_controller(
 	MeCtEyeLid* ctrl_p = new MeCtEyeLid;
 	err = mcu_p->eyelid_ctrl_map.insert( ctrl_name, ctrl_p );
 	if( err == CMD_FAILURE )	{
-		printf( "init_eyelid_controller ERR: MeCtEyeLid '%s' EXISTS\n", ctrl_name ); 
+		LOG( "init_eyelid_controller ERR: MeCtEyeLid '%s' EXISTS\n", ctrl_name ); 
 		delete ctrl_p;
 		return( CMD_FAILURE );
 	}
@@ -1811,7 +1811,7 @@ int init_eyelid_controller(
 
 	err = mcu_p->controller_map.insert( ctrl_name, ctrl_p );
 	if( err == CMD_FAILURE )	{
-		printf( "init_eyelid_controller ERR: MeCtEyeLid '%s' EXISTS\n", ctrl_name ); 
+		LOG( "init_eyelid_controller ERR: MeCtEyeLid '%s' EXISTS\n", ctrl_name ); 
 		return( CMD_FAILURE );
 	}
 	ctrl_p->ref();
@@ -1825,12 +1825,12 @@ int init_lifecycle_controller( char *ctrl_name, char *child_name, mcuCBHandle *m
 
 	MeController* ct = mcu_p->controller_map.lookup( child_name );
 	if( ct==NULL ) {
-		printf( "init_lifecycle_controller ERROR: MeController '%s' NOT FOUND\n", ctrl_name );
+		LOG( "init_lifecycle_controller ERROR: MeController '%s' NOT FOUND\n", ctrl_name );
 		return( CMD_FAILURE );
 	}
 	MeCtLifecycleTest* lifecycle_ct = new MeCtLifecycleTest();
 	if( mcu_p->controller_map.insert( ctrl_name, lifecycle_ct ) != CMD_SUCCESS ) {
-		printf( "init_lifecycle_controller ERROR: Failed to insert into controller_map\n" );
+		LOG( "init_lifecycle_controller ERROR: Failed to insert into controller_map\n" );
 		return( CMD_FAILURE );
 	}
 	lifecycle_ct->ref();
@@ -1853,7 +1853,7 @@ int init_scheduler_controller(
 		MeCtScheduler2* sched_p = new MeCtScheduler2;
 		err = mcu_p->sched_ctrl_map.insert( ctrl_name, sched_p );
 		if( err == CMD_FAILURE )	{
-			printf( "init_scheduler_controller ERR: MeCtScheduler '%s' EXISTS\n", ctrl_name ); 
+			LOG( "init_scheduler_controller ERR: MeCtScheduler '%s' EXISTS\n", ctrl_name ); 
 			delete sched_p;
 			return( err );
 		}
@@ -1861,7 +1861,7 @@ int init_scheduler_controller(
 	
 		err = mcu_p->controller_map.insert( ctrl_name, sched_p );
 		if( err == CMD_FAILURE )	{
-			printf( "init_scheduler_controller ERR: MeController '%s' EXISTS\n", ctrl_name ); 
+			LOG( "init_scheduler_controller ERR: MeController '%s' EXISTS\n", ctrl_name ); 
 			return( err );
 		}
 		sched_p->ref();
@@ -1871,7 +1871,7 @@ int init_scheduler_controller(
 		return( CMD_SUCCESS );
 	}
 
-	printf( "init_scheduler_controller ERR: SbmCharacter '%s' NOT FOUND\n", char_name ); 
+	LOG( "init_scheduler_controller ERR: SbmCharacter '%s' NOT FOUND\n", char_name ); 
 	return( CMD_FAILURE );
 }
 
@@ -1889,25 +1889,25 @@ int set_controller_timing(
 int query_controller(
 	MeController* ctrl_p
 )	{
-	printf( "MCU QUERY: MeController '%s':\n", ctrl_p->name() );
-	printf( "  type... %s\n", ctrl_p->controller_type() );
-	printf( "  indt... %.3f\n", ctrl_p->indt() );
-	printf( "  outdt.. %.3f\n", ctrl_p->outdt() );
+	LOG( "MCU QUERY: MeController '%s':\n", ctrl_p->name() );
+	LOG( "  type... %s\n", ctrl_p->controller_type() );
+	LOG( "  indt... %.3f\n", ctrl_p->indt() );
+	LOG( "  outdt.. %.3f\n", ctrl_p->outdt() );
 	float emph = ctrl_p->emphasist();
 	if( emph < 0.0 )	{
-		printf( "  emph... UNK\n");
+		LOG( "  emph... UNK\n");
 	}
 	else	{
-		printf( "  emph... %.3f\n", emph );
+		LOG( "  emph... %.3f\n", emph );
 	}
 	double dur = ctrl_p->controller_duration();
 	if( dur < 0.0 )	{
-		printf( "  dur.... UNK\n" );
+		LOG( "  dur.... UNK\n" );
 	}
 	else	{
-		printf( "  dur.... %.3f\n", dur );
+		LOG( "  dur.... %.3f\n", dur );
 	}
-//	printf( "> " );
+//	LOG( "> " );
 	return( CMD_SUCCESS );
 }
 
@@ -2130,12 +2130,12 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 								return( CMD_SUCCESS );
 							}
 							else	{
-								printf( "mcu_controller_func ERR: BVH recording requires 'time simfps|simdt' set\n" );
+								LOG( "mcu_controller_func ERR: BVH recording requires 'time simfps|simdt' set\n" );
 								return( CMD_FAILURE );
 							}
 						}
 						else	{
-							printf( "mcu_controller_func ERR: BVH recording requires registered TimeRegulator\n" );
+							LOG( "mcu_controller_func ERR: BVH recording requires registered TimeRegulator\n" );
 							return( CMD_FAILURE );
 						}
 					}
@@ -2349,7 +2349,7 @@ int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				qdraw_p->set_track_duration( 0.0 );
 				return( CMD_SUCCESS );
 			}
-			printf( "mcu_quickdraw_controller_func ERR: command '%s' NOT RECOGNIZED\n", qdraw_cmd );
+			LOG( "mcu_quickdraw_controller_func ERR: command '%s' NOT RECOGNIZED\n", qdraw_cmd );
 			return( CMD_NOT_FOUND );
 		}
 	}
@@ -2447,7 +2447,7 @@ int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 //					gaze_p->set_target_euler( p, h, r );
 					return( CMD_SUCCESS );
 				}
-				printf( "mcu_gaze_controller_func ERR: target '%s' NOT RECOGNIZED\n", target_type );
+				LOG( "mcu_gaze_controller_func ERR: target '%s' NOT RECOGNIZED\n", target_type );
 				return( CMD_NOT_FOUND );
 			}
 			if( strcmp( gaze_cmd, "offset" ) == 0 )	{
@@ -2461,7 +2461,7 @@ int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 					gaze_p->set_offset_euler( p, h, r );
 					return( CMD_SUCCESS );
 				}
-				printf( "mcu_gaze_controller_func ERR: offset '%s' NOT RECOGNIZED\n", offset_type );
+				LOG( "mcu_gaze_controller_func ERR: offset '%s' NOT RECOGNIZED\n", offset_type );
 				return( CMD_NOT_FOUND );
 			}
 			if( strcmp( gaze_cmd, "smooth" ) == 0 )	{
@@ -2529,10 +2529,10 @@ int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				gaze_p->set_fade_out( interval );
 				return( CMD_SUCCESS );
 			}
-			printf( "mcu_gaze_controller_func ERR: command '%s' NOT RECOGNIZED\n", gaze_cmd );
+			LOG( "mcu_gaze_controller_func ERR: command '%s' NOT RECOGNIZED\n", gaze_cmd );
 			return( CMD_NOT_FOUND );
 		}
-		printf( "mcu_gaze_controller_func ERR: MeCtGaze '%s' NOT FOUND\n", ctrl_name );
+		LOG( "mcu_gaze_controller_func ERR: MeCtGaze '%s' NOT FOUND\n", ctrl_name );
 	}
 	return( CMD_FAILURE );
 }
@@ -3017,7 +3017,7 @@ int mcu_vrQuery_func( srArgBuffer& args, mcuCBHandle* mcu_p )
 
 		for (std::map<std::string, SkMotion*>::iterator it = mcu_p->motion_map.begin(); it != mcu_p->motion_map.end(); ++it)
 		{
-			printf("\n%s\n",(*it).first.c_str());
+			LOG("\n%s\n",(*it).first.c_str());
 			message.append((*it).first);
 			message.append(" ");
 		}
@@ -3033,7 +3033,7 @@ int mcu_vrQuery_func( srArgBuffer& args, mcuCBHandle* mcu_p )
 
 		for (std::map<std::string, SkPosture*>::iterator it = mcu_p->pose_map.begin(); it != mcu_p->pose_map.end(); ++it)
 		{
-			printf("\n%s\n",(*it).first.c_str());
+			LOG("\n%s\n",(*it).first.c_str());
 			message.append((*it).first);
 			message.append(" ");
 		}
@@ -3092,63 +3092,63 @@ int mcu_vrAllCall_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
 
-	printf( "POSES:\n" );
+	LOG( "POSES:\n" );
 	for (std::map<std::string, SkPosture*>::iterator postureIter = mcu_p->pose_map.begin();
 		postureIter != mcu_p->pose_map.end();
 		postureIter++)
 	{
-		printf( "  '%s'\n", (*postureIter).second->name() );
+		LOG( "  '%s'\n", (*postureIter).second->name() );
 	}
 	
-	printf( "MOTIONS:\n" );
+	LOG( "MOTIONS:\n" );
 	for (std::map<std::string, SkMotion*>::iterator motionIter = mcu_p->motion_map.begin();
 		motionIter != mcu_p->motion_map.end();
 		motionIter++)
 	{
-		printf( "  '%s'\n", (*motionIter).second->name() );
+		LOG( "  '%s'\n", (*motionIter).second->name() );
 	}
 	
-	printf( "POSE CTRL:\n" );
+	LOG( "POSE CTRL:\n" );
 	mcu_p->pose_ctrl_map.reset();
 	MeCtPose * pose_ctrl_p;
 	while( pose_ctrl_p = mcu_p->pose_ctrl_map.next() )	{
-		printf( "  '%s' : '%s'\n", pose_ctrl_p->name(), pose_ctrl_p->posture_name() );
+		LOG( "  '%s' : '%s'\n", pose_ctrl_p->name(), pose_ctrl_p->posture_name() );
 	}
 	
-	printf( "MOTION CTRL:\n" );
+	LOG( "MOTION CTRL:\n" );
 	mcu_p->motion_ctrl_map.reset();
 	MeCtMotion * mot_ctrl_p;
 	while( mot_ctrl_p = mcu_p->motion_ctrl_map.next() )	{
-		printf( "  '%s' : '%s'\n", mot_ctrl_p->name(), mot_ctrl_p->motion()->name() );
+		LOG( "  '%s' : '%s'\n", mot_ctrl_p->name(), mot_ctrl_p->motion()->name() );
 	}
 	
-	printf( "SIMPLE-NOD:\n" );
+	LOG( "SIMPLE-NOD:\n" );
 	mcu_p->snod_ctrl_map.reset();
 	MeCtSimpleNod * snod_p;
 	while( snod_p = mcu_p->snod_ctrl_map.next() )	{
-		printf( "  '%s'\n", snod_p->name() );
+		LOG( "  '%s'\n", snod_p->name() );
 	}
 	
-	printf( "ANKLE-LILT:\n" );
+	LOG( "ANKLE-LILT:\n" );
 	mcu_p->lilt_ctrl_map.reset();
 	MeCtAnkleLilt * lilt_p;
 	while( lilt_p = mcu_p->lilt_ctrl_map.next() )	{
-		printf( "  '%s'\n", lilt_p->name() );
+		LOG( "  '%s'\n", lilt_p->name() );
 	}
 	
-	printf( "SCHEDULE:\n" );
+	LOG( "SCHEDULE:\n" );
 	mcu_p->sched_ctrl_map.reset();
 	MeCtScheduler2 * sched_p;
 
 	while( sched_p = mcu_p->sched_ctrl_map.next() )	{
-		printf( "  '%s'\n", sched_p->name() );
+		LOG( "  '%s'\n", sched_p->name() );
 	}
 	
-	printf( "ALL CONTROLLERS:\n" );
+	LOG( "ALL CONTROLLERS:\n" );
 	mcu_p->controller_map.reset();
 	MeController * ctrl_p;
 	while( ctrl_p = mcu_p->controller_map.next() )	{
-		printf( "  '%s'\n", ctrl_p->name() );
+		LOG( "  '%s'\n", ctrl_p->name() );
 	}
 	
 	return (CMD_SUCCESS);

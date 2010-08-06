@@ -24,6 +24,7 @@
 
 
 # include <ME/me_ct_pose.h>
+#include <vhcl_log.h>
 
 
 
@@ -226,15 +227,15 @@ const char* MeCtPose::controller_type () const
  }
 
 void MeCtPose::print_state( int tabCount ) {
-	fprintf( stdout, "MeCtPose" );
+	LOG("MeCtPose" );
 
 	const char* str = name();
 	if( str )
-		fprintf( stdout, " \"%s\"", str );
+		LOG(" \"%s\"", str );
 
 	if( _posture_name )
-		fprintf( stdout, ", posture \"%s\"", _posture_name );
-	fprintf( stdout, "\n" );
+		LOG(", posture \"%s\"", _posture_name );
+	LOG("\n" );
 }
 
 //======================================= EOF =====================================

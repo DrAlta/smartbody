@@ -513,7 +513,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 		// schedule for later
 		sbm_commands.push_back( new SbmCommand( audioPlay, startAt ) );
 		//if( seq->insert( (float)(audioOffset<0? 0: audioOffset), audioPlay.c_str() ) != CMD_SUCCESS ) {
-		//	printf( "ERROR: BodyPlannerImpl::realizeRequest: insert audio trigger into seq FAILED, msgId=%s\n", bpMsg.msgId ); 
+		//	LOG( "ERROR: BodyPlannerImpl::realizeRequest: insert audio trigger into seq FAILED, msgId=%s\n", bpMsg.msgId ); 
 		//}
 	} else {
 		cerr << "WARNING: BodyPlannerImpl::realizeRequest(..): "<< //"msgId=\""<<bpMsg.msgId<<"\": "<<

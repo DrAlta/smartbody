@@ -22,6 +22,7 @@
 
 # include <stdio.h>
 # include <SR/sr_timer.h>
+#include <vhcl_log.h>
 
 # ifdef SR_TARGET_WINDOWS // defined in sr.h
 # include <windows.h>
@@ -43,7 +44,7 @@ SrUtcTimer::SrUtcTimer ()
    LARGE_INTEGER lpPerformanceCount;
    struct _timeb tbuf;
    if ( QueryPerformanceFrequency(&lpFrequency)==false )
-    printf("SrTimer: WIN32 High Resolution Performance Counter not supported.\n");
+    LOG("SrTimer: WIN32 High Resolution Performance Counter not supported.\n");
    else
     { _perf_freq = (double)lpFrequency.QuadPart;
       QueryPerformanceCounter ( &lpPerformanceCount );

@@ -22,6 +22,8 @@
  */
 
 #include "me_ct_lilt_try.h"
+#include <vhcl_log.h>
+
 //#include <iostream>
 using namespace std;
 
@@ -130,8 +132,8 @@ const char* MeCtAnkleLilt::controller_type() const {
 }
 
 void MeCtAnkleLilt::print_state( int tabs ){
-	fprintf( stdout, "MeCtAnkleLilt\n" );
-	fprintf( stdout, "currentAngle :", _currentAngle);
-	fprintf( stdout, "duration :",_duration); 
+	LOG("MeCtAnkleLilt\n" );
+	LOG("currentAngle :", _currentAngle);
+	LOG("duration :",_duration); 
 
 }

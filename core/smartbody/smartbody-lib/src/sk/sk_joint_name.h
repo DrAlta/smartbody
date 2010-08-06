@@ -67,7 +67,7 @@ class SkJointName
     bool operator== ( const char* st );
 
     /*! Type cast to a const char pointer ("" is returned in case the name is undefined).
-        Note: this type cast must be used when sending a SkJointName to printf() */
+        Note: this type cast must be used when sending a SkJointName to LOG() */
     operator const char* () const { return _id<0? "":_htable.key(_id); }
     
 	/* thiebaux 6/19/2006 */

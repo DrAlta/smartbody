@@ -48,7 +48,7 @@ int MeCtLocomotionTimingSpace::set_mode(int mode)
 {
 	if(mode != 1 && mode != -1) 
 	{
-		printf("Error: timing space mode must be either 1 or -1");
+		LOG("Error: timing space mode must be either 1 or -1");
 	}
 	else this->mode = mode;
 	return this->mode;
@@ -70,7 +70,7 @@ void MeCtLocomotionTimingSpace::set_ref_time(int index, float frame)
 {
 	if(index > _ref_time.size())
 	{
-		printf("Error: MeCtLocomotionTimingSpace::set_ref_time(), index out of range");
+		LOG("Error: MeCtLocomotionTimingSpace::set_ref_time(), index out of range");
 	}
 	_ref_time.set(index, frame);
 }
@@ -81,7 +81,7 @@ float MeCtLocomotionTimingSpace::get_ref_time(char* ref_name)
 	{
 		if(strcmp(ref_name, _ref_time_name.get(i)) == 0) return _ref_time.get(i);
 	}
-	printf("Error: failed to get ref time.");
+	LOG("Error: failed to get ref time.");
 	return -1.0f;
 }
 
@@ -165,7 +165,7 @@ float MeCtLocomotionTimingSpace::get_ref_time(int index)
 {
 	if(index < 0 || index > frame_num-1) 
 	{
-		printf("Error: wrong reference time index: %d", index);
+		LOG("Error: wrong reference time index: %d", index);
 		return 0;
 	}
 	if(mode == -1) return frame_num - _ref_time.get(index);
@@ -181,7 +181,7 @@ float MeCtLocomotionTimingSpace::get_virtual_frame(float space_value)
 {
 	if(space_value < 0.0f || space_value >= _ref_time.size())
 	{
-		printf("Error: invalid space_value: %f", space_value);
+		LOG("Error: invalid space_value: %f", space_value);
 		return -1.0f;
 	}
 	int space_index = 0;
@@ -227,7 +227,7 @@ float MeCtLocomotionTimingSpace::get_space_value(float frame)
 {
 	if(frame < 0.0f || frame > frame_num)
 	{
-		printf("Error: invalid input frame: %f", frame);
+		LOG("Error: invalid input frame: %f", frame);
 	}
 
 	float space_value = 0.0f;
@@ -363,10 +363,10 @@ bool check_timing_space(MeCtLocomotionTimingSpace* space1, MeCtLocomotionTimingS
 
 void MeCtLocomotionTimingSpace::print_info()
 {
-	printf("\nnew MeCtLocomotionTimingSpace");
-	printf("\nframe num: %f", frame_num);
+	LOG("\nnew MeCtLocomotionTimingSpace");
+	LOG("\nframe num: %f", frame_num);
 	for(int i = 0; i < _ref_time.size(); ++i)
 	{
-		printf("\n[%d]: frame:%f", i, _ref_time.get(i));
+		LOG("\n[%d]: frame:%f", i, _ref_time.get(i));
 	}
 }

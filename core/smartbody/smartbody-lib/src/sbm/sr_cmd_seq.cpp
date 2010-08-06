@@ -25,8 +25,10 @@
 #include "sr_arg_buff.h"
 
 #include <string.h>
+#include <vhcl_log.h>
 
 #define MAX_CMD_ARGL 2048
+
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -44,7 +46,7 @@ srCmdSeq::srCmdSeq( void )	{
 srCmdSeq::~srCmdSeq( void )	{
 
 	if( event_count > 0 )	{
-		//printf( "srCmdSeq::~srCmdSeq NOTE: deleting %d events\n", event_count );
+		//LOG( "srCmdSeq::~srCmdSeq NOTE: deleting %d events\n", event_count );
 		char *cmd;
 		reset();
 		while( cmd = pull() )	{
@@ -70,12 +72,12 @@ int srCmdSeq::write_file( char *seq_file )	{
 	FILE *out_fp;
 
 	if( seq_file == NULL )	{
-	    fprintf( stdout, "srCmdSeq::write_file ERR: NULL filename\n" ); 
+	    LOG("srCmdSeq::write_file ERR: NULL filename\n" ); 
 		return( CMD_FAILURE );
 	}
 
 	if( ( out_fp = fopen( seq_file, "w" ) ) == NULL ) { 
-	    fprintf( stdout, "srCmdSeq::write_file ERR: file '%s' not opened\n", seq_file ); 
+	    LOG("srCmdSeq::write_file ERR: file '%s' not opened\n", seq_file ); 
 		return( CMD_FAILURE );
 	}
 	
@@ -90,7 +92,7 @@ int srCmdSeq::write_file( char *seq_file )	{
 int srCmdSeq::read_file( FILE *seq_fp )	{
 
 	if( seq_fp == NULL )	{
-	    fprintf( stdout, "srCmdSeq::read_file ERR: NULL fp\n" ); 
+	    LOG("srCmdSeq::read_file ERR: NULL fp\n" ); 
 		return( CMD_FAILURE );
 	}
 	
@@ -123,19 +125,19 @@ int srCmdSeq::read_file( FILE *seq_fp )	{
 					
 					if( strcmp( tok, "end" ) == 0 )	{
 						extended_cmd = false;
-//	printf( "srCmdSeq::read_file EXTENDED: '%s'\n", ext_line_buff );
+//	LOG( "srCmdSeq::read_file EXTENDED: '%s'\n", ext_line_buff );
 						
 						srArgBuffer ext_args( ext_line_buff );
 						int token_count = ext_args.calc_num_tokens();
 						if( token_count > 0 )	{
 
 							if( insert( t, ext_line_buff ) == CMD_FAILURE )	{
-								fprintf( stdout, "srCmdSeq::read_file ERR: insert FAILED: line # %d\n", line_count + 1 );
+								LOG("srCmdSeq::read_file ERR: insert FAILED: line # %d\n", line_count + 1 );
 								done = TRUE;
 							}
 						}
 						else	{
-							fprintf( stdout, "srCmdSeq::read_file ERR: line # %d\n", line_count + 1 );
+							LOG("srCmdSeq::read_file ERR: line # %d\n", line_count + 1 );
 						}
 					}
 					else	{
@@ -166,12 +168,12 @@ int srCmdSeq::read_file( FILE *seq_fp )	{
 						}
 						else
 						if( insert( t, cmd_buff ) == CMD_FAILURE )	{
-							fprintf( stdout, "srCmdSeq::read_file ERR: insert FAILED: line # %d\n", line_count + 1 );
+							LOG("srCmdSeq::read_file ERR: insert FAILED: line # %d\n", line_count + 1 );
 							done = TRUE;
 						}
 					}
 					else	{
-						fprintf( stdout, "srCmdSeq::read_file ERR: line # %d\n", line_count + 1 );
+						LOG("srCmdSeq::read_file ERR: line # %d\n", line_count + 1 );
 					}
 				}
 			}
@@ -180,7 +182,7 @@ int srCmdSeq::read_file( FILE *seq_fp )	{
 	}
 
 	if( extended_cmd ) {
-		fprintf( stdout, "srCmdSeq::read_file ERR: UNMATCHED begin/end\n" );
+		LOG("srCmdSeq::read_file ERR: UNMATCHED begin/end\n" );
 		return( CMD_FAILURE );
 	}
 	return( CMD_SUCCESS );
@@ -189,7 +191,7 @@ int srCmdSeq::read_file( FILE *seq_fp )	{
 int srCmdSeq::read_file( FILE *seq_fp )	{
 
 	if( seq_fp == NULL )	{
-	    fprintf( stdout, "srCmdSeq::read_file ERR: NULL fp\n" ); 
+	    LOG("srCmdSeq::read_file ERR: NULL fp\n" ); 
 		return( CMD_FAILURE );
 	}
 	char fill_buff[ MAX_CMD_ARGL ] = "";
@@ -215,12 +217,12 @@ int srCmdSeq::read_file( FILE *seq_fp )	{
 						float t = args.read_float();
 						char *cmd = args.read_remainder_raw();
 						if( insert( t, cmd ) == CMD_FAILURE )	{
-							fprintf( stdout, "srCmdSeq::read_file ERR: insert FAILED: line # %d\n", line_count + 1 );
+							LOG("srCmdSeq::read_file ERR: insert FAILED: line # %d\n", line_count + 1 );
 							done = TRUE;
 						}
 					}
 					else	{
-						fprintf( stdout, "srCmdSeq::read_file ERR: line # %d\n", line_count + 1 );
+						LOG("srCmdSeq::read_file ERR: line # %d\n", line_count + 1 );
 					}
 				}
 			}
@@ -235,20 +237,20 @@ int srCmdSeq::read_file( char *seq_file, int report_open_fail )	{
 	FILE *in_fp;
 	
 	if( seq_file == NULL )	{
-	    fprintf( stdout, "srCmdSeq::read_file ERR: NULL filename\n" ); 
+	    LOG("srCmdSeq::read_file ERR: NULL filename\n" ); 
 		return( CMD_FAILURE );
 	}
 	
 	if( ( in_fp = fopen( seq_file, "r" ) ) == NULL ) { 
 		if( report_open_fail )	{
-		    fprintf( stdout, "srCmdSeq::read_file ERR: file '%s' not found\n", seq_file ); 
+		    LOG("srCmdSeq::read_file ERR: file '%s' not found\n", seq_file ); 
 		}
 		return( CMD_FAILURE );
 	}
 
 	int err = read_file( in_fp );
 	if( err != CMD_SUCCESS )	{
-	    fprintf( stdout, "srCmdSeq::read_file ERR: '%s' FAILED\n", seq_file ); 
+	    LOG("srCmdSeq::read_file ERR: '%s' FAILED\n", seq_file ); 
 		return( err );
 	}
 	fclose( in_fp );

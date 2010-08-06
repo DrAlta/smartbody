@@ -1115,7 +1115,7 @@ int SbmCharacter::set_viseme( char* viseme,
 							  double start_time,
 							  float rampin_duration )
 {
-    //fprintf( stdout, "Recieved: SbmCharacter(\"%s\")::set_viseme( \"%s\", %f, %f )\n", name, viseme, weight, rampin_duration );
+    //LOG("Recieved: SbmCharacter(\"%s\")::set_viseme( \"%s\", %f, %f )\n", name, viseme, weight, rampin_duration );
 
 	VisemeToDataMap::const_iterator it;
 
@@ -1236,8 +1236,8 @@ void SbmCharacter::inspect_skeleton( SkJoint* joint_p, int depth )	{
 	
 	if( joint_p )	{
 		const char *name = joint_p->name();
-		for( j=0; j<depth; j++ ) { printf( " " ); }
-		printf( "%s\n", name );
+		for( j=0; j<depth; j++ ) { LOG( " " ); }
+		LOG( "%s\n", name );
 		n = joint_p->num_children();
 		for( i=0; i<n; i++ )	{
 			inspect_skeleton( joint_p->child( i ), depth + 1 );
@@ -1261,8 +1261,8 @@ void SbmCharacter::inspect_skeleton_local_transform( SkJoint* joint_p, int depth
 		vector_t pos = M.translation( GWIZ_M_TR );
 		euler_t rot = M.euler( GWIZ_M_TR );
 
-		for( j=0; j<depth; j++ ) { printf( " " ); }
-		printf( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
+		for( j=0; j<depth; j++ ) { LOG( " " ); }
+		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
 			name,
 			pos.x(), pos.y(), pos.z(),
 			rot.p(), rot.h(), rot.r()
@@ -1292,8 +1292,8 @@ void SbmCharacter::inspect_skeleton_world_transform( SkJoint* joint_p, int depth
 		vector_t pos = M.translation( GWIZ_M_TR );
 		euler_t rot = M.euler( GWIZ_M_TR );
 
-		for( j=0; j<depth; j++ ) { printf( " " ); }
-		printf( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
+		for( j=0; j<depth; j++ ) { LOG( " " ); }
+		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
 			name,
 			pos.x(), pos.y(), pos.z(),
 			rot.p(), rot.h(), rot.r()
@@ -1459,7 +1459,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		
 		if( new_param->size == 0 )
 		{
-			printf("param_registeration ERR: parameter size not defined!\n");
+			LOG("param_registeration ERR: parameter size not defined!\n");
 			delete new_param;
 			return( CMD_FAILURE );
 		}
@@ -1467,7 +1467,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		{
 			if(char_name == new_param->char_names[i])
 			{
-				printf("param_registeration ERR: parameter redefinition!\n");
+				LOG("param_registeration ERR: parameter redefinition!\n");
 				
 				delete new_param;
 				return( CMD_FAILURE );				
@@ -1629,7 +1629,7 @@ int SbmCharacter::remove_from_scene( const char* char_name ) {
 
 			return CMD_SUCCESS;
 		} else {
-			printf( "ERROR: Unknown character \"%s\".\n", char_name );
+			LOG( "ERROR: Unknown character \"%s\".\n", char_name );
 			return CMD_FAILURE;
 		}
 	}

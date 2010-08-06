@@ -81,12 +81,12 @@ BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& uni
                     float weight = 0.5f;
                     const XMLCh* attrAmount = elem->getAttribute( ATTR_AMOUNT );
                     if( attrAmount && XMLString::stringLen( attrAmount )>0 ) {
-                        if(LOG_BML_VISEMES) printf( "LOG: BML::parse_bml_face(): FAC has specified weight!\n" );
+                        if(LOG_BML_VISEMES) LOG( "LOG: BML::parse_bml_face(): FAC has specified weight!\n" );
                         wistringstream inAmount( attrAmount );
                         if( !( inAmount >> weight ) )
                             wcerr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_AMOUNT<<"=\""<<attrAmount<<"\" />: Illegal attribute value."<<endl;
                     }
-                    if(LOG_BML_VISEMES) printf( "LOG: BML::parse_bml_face(): FAC weight: %f\n", weight );
+                    if(LOG_BML_VISEMES) LOG( "LOG: BML::parse_bml_face(): FAC weight: %f\n", weight );
 					boost::shared_ptr<VisemeRequest> viseme;
 					viseme.reset( new VisemeRequest( unique_id, localId, "_", weight, 1, behav_syncs, rampup, rampdown ) );
 
