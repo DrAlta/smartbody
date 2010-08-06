@@ -174,17 +174,17 @@ int SbmCharacter::init_locomotion_analyzer(const char* skel_file, mcuCBHandle *m
 	bool motionsNotLoaded = false;
 	if (!walking1_p)
 	{
-		std::cout << "No " << walkForwardMotion << " animation." << std::endl;
+		LOG("No %s animation", walkForwardMotion.c_str());
 		motionsNotLoaded = true;
 	}
 	if (!walking2_p)
 	{
-		std::cout << "No " << strafeMotion << " animation." << std::endl;
+		LOG("No %s animation", strafeMotion.c_str());
 		motionsNotLoaded = true;
 	}
 	if (!standing_p)
 	{
-		std::cout << "No " << standingMotion << " animation." << std::endl;
+		LOG("No %s animation", standingMotion.c_str());
 		motionsNotLoaded = true;
 	}
 	if (motionsNotLoaded)
@@ -1523,18 +1523,19 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				int numChannels = channels.size();
 				for (int c = 0; c < numChannels; c++)
 				{
-					std::cout << c << " ";
+					std::stringstream strstr;
+					strstr << c << " ";
 					SkJoint* joint = channels.joint(c);
 					if (joint)
 					{
-						std::cout << joint->name().get_string() << " ";
+						strstr << joint->name().get_string() << " ";
 					}
 					SkChannel& channel = channels[c];
 					int channelSize = channel.size();
 					// get the channel index
 					int channelIndex = controllerTree->toBufferIndex(c);
-					std::cout << channelIndex << " (" << channelSize << ") ";
-					std::cout << std::endl;
+					strstr << channelIndex << " (" << channelSize << ") ";
+					LOG("%s", strstr.str().c_str());
 
 				}
 			}

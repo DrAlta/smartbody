@@ -51,24 +51,24 @@ int mcu_help_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		int level = args.read_int();
 
 		if( level == 2 )	{
-			std::cout << "API help..." << std::endl;
+			LOG("API help...");
 
 		}
 		else
 		if( level == 1 )	{
-			std::cout << "Full help..." << std::endl;
+			LOG("Full help...");
 
 		}
 		else	{
-			std::cout << "HELP: <sbm-command>" << std::endl;
-			std::cout << "  <>		argument description"	<< std::endl;
-			std::cout << "  |		or"						<< std::endl;
-			std::cout << "  []		optional"				<< std::endl;
-			std::cout << "  \\		deprecated"				<< std::endl;
-			std::cout << "  #		planned"				<< std::endl;
-			std::cout << "  !		needs attention"		<< std::endl;
-			std::cout << "  ()		description"			<< std::endl;
-			std::cout << "  sbm [id <pid>] <sbm-command>"	<< std::endl;
+			LOG("HELP: <sbm-command>");
+			LOG("  <>		argument description");
+			LOG("  |		or");
+			LOG("  []		optional");
+			LOG("  \\		deprecated");
+			LOG("  #		planned");
+			LOG("  !		needs attention");
+			LOG("  ()		description");
+			LOG("  sbm [id <pid>] <sbm-command>");
 		}
 	}
 	return( CMD_SUCCESS );
@@ -566,37 +566,36 @@ void print_timer_deprecation_warning( void )	{
 void print_timer_help( int level = 0 )	{
 	
 	if( level == 2 ) {
-		std::cout << "API help..." << std::endl;
+		LOG("API help...");
 	
 	}
 	else
 	if( level == 1 )	{
-		std::cout << "Full help..." << std::endl;
-
+		LOG("Full help...");
 	}
 	else	{
-		std::cout << "HELP: time" << std::endl;
+		LOG("HELP: time");
 		
-		std::cout << "  help | fullhelp" << std::endl;
-		std::cout << "  maxfps | fps <desired-max-fps>	(DEPRECATED)"	<< std::endl;
-		std::cout << "  lockdt [0|1]					(DEPRECATED)"	<< std::endl;
-		std::cout << "  perf [0|1 [<interval>]]"						<< std::endl;
-		std::cout << "  speed <real-time-factor>"						<< std::endl;
-		std::cout << "  sleepfps | simfps | evalfps <fps>" 				<< std::endl;
-		std::cout << "  sleepdt | simdt | evaldt <dt>" 					<< std::endl;
-		std::cout << "  pause | resume"									<< std::endl;
-		std::cout << "  step [num-steps]"								<< std::endl;
-		std::cout << "  perf [<interval>]" 								<< std::endl;
-		std::cout << "  print" 											<< std::endl;
+		LOG("  help | fullhelp");
+		LOG("  maxfps | fps <desired-max-fps>	(DEPRECATED)");
+		LOG("  lockdt [0|1]					(DEPRECATED)");
+		LOG("  perf [0|1 [<interval>]]");
+		LOG("  speed <real-time-factor>");
+		LOG("  sleepfps | simfps | evalfps <fps>");
+		LOG("  sleepdt | simdt | evaldt <dt>");
+		LOG("  pause | resume");
+		LOG("  step [num-steps]");
+		LOG("  perf [<interval>]");
+		LOG("  print");
 		
-		std::cout << "  prof enable|disable" 					<< std::endl;
-		std::cout << "  prof group <name> enable|disable" 		<< std::endl;
-		std::cout << "  prof suppress|select [<level>]" 		<< std::endl;
-		std::cout << "  prof threshold <min-detect>|0" 			<< std::endl;
-		std::cout << "  prof smooth <factor:[0.0,1.0)>" 		<< std::endl;
-		std::cout << "  prof print|report" 						<< std::endl;
-		std::cout << "  prof erase|clobber" 					<< std::endl;
-		std::cout << "  prof test [reps]" 						<< std::endl;
+		LOG("  prof enable|disable");
+		LOG("  prof group <name> enable|disable");
+		LOG("  prof suppress|select [<level>]");
+		LOG("  prof threshold <min-detect>|0");
+		LOG("  prof smooth <factor:[0.0,1.0)>");
+		LOG("  prof print|report");
+		LOG("  prof erase|clobber");
+		LOG("  prof test [reps]");
 	}
 }
 

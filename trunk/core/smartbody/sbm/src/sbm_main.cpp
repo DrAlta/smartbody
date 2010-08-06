@@ -157,10 +157,10 @@ int sbm_main_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	int result = mcu_p->execute( token, srArgBuffer( args_raw ) );
 	switch( result ) {
 		case CMD_NOT_FOUND:
-			LOG("SBM ERR: command NOT FOUND: '%s %s'\n> ", token, args_raw );
+			LOG("SBM ERR: command NOT FOUND: '%s %s' ", token, args_raw );
 			break;
 		case CMD_FAILURE:
-			LOG("SBM ERR: command FAILED: '%s %s'\n> ", token, args_raw );
+			LOG("SBM ERR: command FAILED: '%s %s' ", token, args_raw );
 			break;
 		case CMD_SUCCESS:
 			break;
@@ -172,10 +172,10 @@ void sbm_vhmsg_callback( const char *op, const char *args, void * user_data ) {
 	// Replace singleton with a user_data pointer
 	switch( mcuCBHandle::singleton().execute( op, (char *)args ) ) {
         case CMD_NOT_FOUND:
-            LOG("SBM ERR: command NOT FOUND: '%s' + '%s'\n> ", op, args );
+            LOG("SBM ERR: command NOT FOUND: '%s' + '%s'", op, args );
             break;
         case CMD_FAILURE:
-            LOG("SBM ERR: command FAILED: '%s' + '%s'\n> ", op, args );
+            LOG("SBM ERR: command FAILED: '%s' + '%s'", op, args );
             break;
     }
 }
@@ -240,7 +240,7 @@ int mcu_snapshot_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 int mcu_echo_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	
-    LOG("%s\n> ", args.read_remainder_raw() );
+    LOG("%s ", args.read_remainder_raw() );
 	return( CMD_SUCCESS );
 }
 
@@ -396,7 +396,7 @@ void cleanup( void )	{
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		if( mcu.loop )	{
-			LOG( "SBM NOTE: unexpected exit\n> " );
+			LOG( "SBM NOTE: unexpected exit " );
 			mcu.loop = false;
 		}
 
@@ -422,7 +422,7 @@ void cleanup( void )	{
 	XMLPlatformUtils::Terminate();
 
 	ResourceManager::cleanup();
-	LOG( "SBM: terminated gracefully.\n> " );
+	LOG( "SBM: terminated gracefully." );
 
 
 #if SBM_REPORT_MEMORY_LEAKS

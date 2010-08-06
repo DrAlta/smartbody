@@ -24,6 +24,7 @@
 #define TIME_INTERVAL_PROFILER_H
 
 #include "sbm/time_regulator.h"
+#include <vhcl_log.h>
 
 #define DEFAULT_REQ_ENABLED		false
 #define DEFAULT_GROUP_ENABLED	true
