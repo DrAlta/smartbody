@@ -232,7 +232,7 @@ void SkMotion::apply ( float t,
 		return;
 	if ( t<_frames[0].keytime )	{
 #if DEBUG_T
-		printf("SkMotion::apply NOTICE: t=%.16f < f[0]:%.16f \n", t, _frames[0].keytime );
+		LOG("SkMotion::apply NOTICE: t=%.16f < f[0]:%.16f \n", t, _frames[0].keytime );
 #endif
 		return;
 	}
@@ -242,7 +242,7 @@ void SkMotion::apply ( float t,
 
 #if DEBUG_T
 	if ( t<_frames[0].keytime )	{
-		printf("SkMotion::apply ERR: cubic t=%.16f < f[0]:%.16f \n", t, _frames[0].keytime );
+		LOG("SkMotion::apply ERR: cubic t=%.16f < f[0]:%.16f \n", t, _frames[0].keytime );
 	}
 #endif
 
@@ -280,7 +280,7 @@ void SkMotion::apply ( float t,
 
 #if DEBUG_T
 	if ( t<0.0 )	{
-		printf("SkMotion::apply ERR: mapped t=%.16f < 0.0 \n", t );
+		LOG("SkMotion::apply ERR: mapped t=%.16f < 0.0 \n", t );
 	}
 #endif
 

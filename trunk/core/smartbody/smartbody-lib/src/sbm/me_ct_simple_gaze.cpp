@@ -27,6 +27,7 @@
 #include "gwiz_math.h"
 
 #include <SR/sr_alg.h>
+#include <vhcl_log.h>
 
 #define MAX_JOINT_LABEL_LEN	32
 
@@ -66,7 +67,7 @@ quat_t rotation_ray_to_target_orient_SG(
 )	{
 	
 	if( Fd.length() < FORWARD_RAY_EPSILON ) {
-		printf( "rotation_ray_to_target_orient_SG ERR: forward direction has no length\n" );
+		LOG( "rotation_ray_to_target_orient_SG ERR: forward direction has no length\n" );
 		return( quat_t() );
 	}
 	
@@ -88,7 +89,7 @@ quat_t rotation_ray_to_target_point_SG(
 	
 	if( Fd.length() < FORWARD_RAY_EPSILON ) {
 		if( heading_only == FALSE ) {
-			printf( "rotation_ray_to_target_point_SG ERR: forward direction has no length\n" );
+			LOG( "rotation_ray_to_target_point_SG ERR: forward direction has no length\n" );
 		}
 		return( quat_t() );
 	}
@@ -236,27 +237,27 @@ void test_forward_ray( void )	{
 	vector_t Fd( 5.0, -10.0, 1.0 );
 #endif
 
-	printf( "--- FORWARD RAY TEST:\n" );
+	LOG( "--- FORWARD RAY TEST:\n" );
 	quat_t Q = rotation_ray_to_target_point_SG( X, R, Fo, Fd, 0.0 );
 
-	printf( "ROTATION:\n" );
+	LOG( "ROTATION:\n" );
 	euler_t E = Q;
 	E.print();
 
-	printf( "NEW FORWARD DIR:\n" );
+	LOG( "NEW FORWARD DIR:\n" );
 	vector_t newFd = Q * Fd;
 	newFd.normal().print();
 
-	printf( "FORWARD ORIGIN TO TARGET:\n" );
+	LOG( "FORWARD ORIGIN TO TARGET:\n" );
 	vector_t Td = X - ( R + Q * ( Fo - R ) );
 	Td.normal().print();
 
-	printf( "DIFF:\n" );
+	LOG( "DIFF:\n" );
 	( Td.normal() - newFd.normal() ).print();
 	
-	printf( "DIFF HEADING-ONLY:\n" );
+	LOG( "DIFF HEADING-ONLY:\n" );
 	( vector_t( Td.x(), 0.0, Td.z() ).normal() - vector_t( newFd.x(), 0.0, newFd.z() ).normal() ).print();
-	printf( "---\n" );
+	LOG( "---\n" );
 }
 #endif
 
@@ -358,7 +359,7 @@ void MeCtSimpleGazeJoint::capture_joint_state( void ) {
 		}
 		else	{
 			const char *name = joint_p->name();
-			printf( "MeCtSimpleGazeJoint::capture_joint_state ERR: parent of joint '%s' not found\n", name );
+			LOG( "MeCtSimpleGazeJoint::capture_joint_state ERR: parent of joint '%s' not found\n", name );
 		}
 	}
 }
@@ -722,8 +723,8 @@ void MeCtSimpleGaze::inspect_skeleton( SkJoint* joint_p, int depth )	{
 	
 	if( joint_p )	{
 		const char *name = joint_p->name();
-		for( j=0; j<depth; j++ ) { printf( " " ); }
-		printf( "%s\n", name );
+		for( j=0; j<depth; j++ ) { LOG( " " ); }
+		LOG( "%s\n", name );
 		n = joint_p->num_children();
 		for( i=0; i<n; i++ )	{
 			inspect_skeleton( joint_p->child( i ), depth + 1 );
@@ -747,8 +748,8 @@ void MeCtSimpleGaze::inspect_skeleton_local_transform( SkJoint* joint_p, int dep
 		vector_t pos = M.translation( GWIZ_M_TR );
 		euler_t rot = M.euler( GWIZ_M_TR );
 
-		for( j=0; j<depth; j++ ) { printf( " " ); }
-		printf( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
+		for( j=0; j<depth; j++ ) { LOG( " " ); }
+		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
 			name,
 			pos.x(), pos.y(), pos.z(),
 			rot.p(), rot.h(), rot.r()
@@ -778,8 +779,8 @@ void MeCtSimpleGaze::inspect_skeleton_world_transform( SkJoint* joint_p, int dep
 		vector_t pos = M.translation( GWIZ_M_TR );
 		euler_t rot = M.euler( GWIZ_M_TR );
 
-		for( j=0; j<depth; j++ ) { printf( " " ); }
-		printf( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
+		for( j=0; j<depth; j++ ) { LOG( " " ); }
+		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
 			name,
 			pos.x(), pos.y(), pos.z(),
 			rot.p(), rot.h(), rot.r()
@@ -952,12 +953,12 @@ void MeCtSimpleGaze::controller_start( void )	{
 		}
 
 #if 0
-		printf( "start: [%d]", i );
-		printf( " c:%.4f x f:%.4f == w: %.4f", 
+		LOG( "start: [%d]", i );
+		LOG( " c:%.4f x f:%.4f == w: %.4f", 
 			local_contrib, local_flex, 
 			joint_arr[ i ].weight 
 		);
-		printf( " lim: %.4f\n", 
+		LOG( " lim: %.4f\n", 
 			joint_arr[ i ].limit 
 		);
 #endif
@@ -975,14 +976,14 @@ bool MeCtSimpleGaze::controller_evaluate( double t, MeFrameData& frame )	{
 		test_forward_ray();
 #endif
 #if 0
-		printf( "-- skeleton:\n" );
+		LOG( "-- skeleton:\n" );
 		if( skeleton_ref_p )	{
 			SkJoint* joint_p = skeleton_ref_p->search_joint( SbmPawn::WORLD_OFFSET_JOINT_NAME );
 //			inspect_skeleton( joint_p );
 //			inspect_skeleton_local_transform( joint_p );
 			inspect_skeleton_world_transform( joint_p );
 		}
-		printf( "--\n" );
+		LOG( "--\n" );
 #endif
 	}
 #endif
@@ -1070,17 +1071,17 @@ G_debug_SG = 0;
 
 if( G_debug_c_SG )	{
 	G_debug_c_SG--;
-	printf( "DEBUG %d\n", G_debug_c_SG );
+	LOG( "DEBUG %d\n", G_debug_c_SG );
 }
 
 	return( TRUE );
 }
 
 void MeCtSimpleGaze::print_state( int tabs )	{
-	fprintf( stdout, "MeCtSimpleGaze" );
+	LOG("MeCtSimpleGaze" );
 	const char* str = name();
 	if( str )
-		fprintf( stdout, " \"%s\"\n", str );
+		LOG(" \"%s\"\n", str );
 }
 
 ///////////////////////////////////////////////////////////////////////////

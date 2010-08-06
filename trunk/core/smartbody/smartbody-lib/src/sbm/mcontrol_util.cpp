@@ -55,22 +55,22 @@ void mcuCBHandle::test_map( void )	{
 	srHashMap <SbmPawn> pawn_map_cp( pawn_map );
 #endif
 
-	printf( "iterate ---\n" );
+	LOG( "iterate ---\n" );
 
 	pawn_map.reset();
 	while( pawn_p = pawn_map.next() )	{
 
-		printf( "iterate pawn: %s\n", pawn_p->name );
+		LOG( "iterate pawn: %s\n", pawn_p->name );
 	
 #if 1
 		SbmPawn* pawn_cp_p = NULL;
 		pawn_map_cp.reset();
 		while( pawn_cp_p = pawn_map_cp.next() )	{
-			printf( "  pawn: %s\n", pawn_cp_p->name );
+			LOG( "  pawn: %s\n", pawn_cp_p->name );
 		}
 #endif	
 	}
-	printf( "---\n" );
+	LOG( "---\n" );
 }
 #endif
 
@@ -460,7 +460,7 @@ void mcuCBHandle::update( void )	{
 			
 			int err = execute( cmd );
 			if( err != CMD_SUCCESS )	{
-				printf( "mcuCBHandle::update ERR: execute FAILED: '%s'\n", cmd );
+				LOG( "mcuCBHandle::update ERR: execute FAILED: '%s'\n", cmd );
 			}
 			delete [] cmd;
 		}
@@ -871,7 +871,7 @@ void mcuCBHandle::NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton 
 
 		character->AddBoneRotation( j->name(), q.w, q.x, q.y, q.z, time );
 
-		//printf( "%s %f %f %f %f\n", (const char *)j->name(), q.w, q.x, q.y, q.z );
+		//LOG( "%s %f %f %f %f\n", (const char *)j->name(), q.w, q.x, q.y, q.z );
 	}
 
 	character->EndSendBoneRotations();

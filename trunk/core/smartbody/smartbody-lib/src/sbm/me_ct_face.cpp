@@ -24,6 +24,7 @@
 //#include "sbm_pawn.hpp"
 #include "gwiz_math.h"
 #include "me_ct_face.h"
+#include <vhcl_log.h>
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -87,7 +88,7 @@ void MeCtFace::init( SkMotion* base_ref_p ) {
 
 	}
 	else	{
-		printf( "MeCtFace::init ERR: base_ref_p is NULL\n" );
+		LOG( "MeCtFace::init ERR: base_ref_p is NULL\n" );
 	}
 }
 
@@ -100,22 +101,22 @@ void MeCtFace::remove_joint( const char *joint_name ) {
 			int size = mchan_arr.size();
 			for( int i = 0; i < size; i++ )	{
 				if( mchan_arr.name( i ) == joint_name ) {
-//					printf( "MeCtFace::remove_joint: exclude[ %d ]: '%s:%s'\n", 
+//					LOG( "MeCtFace::remove_joint: exclude[ %d ]: '%s:%s'\n", 
 //						i, mchan_arr.name( i ).get_string(), SkChannel::type_name( mchan_arr.type( i ) ) );
 					_include_chan_flag[ i ] = 0;
 					found = 1;
 				}
 			}
 			if( !found )	{
-				printf( "MeCtFace::remove_joint ERR: joint '%s' NOT FOUND\n", joint_name );
+				LOG( "MeCtFace::remove_joint ERR: joint '%s' NOT FOUND\n", joint_name );
 			}
 		}
 		else	{
-			printf( "MeCtFace::remove_joint ERR: _base_pose_p is NULL\n" );
+			LOG( "MeCtFace::remove_joint ERR: _base_pose_p is NULL\n" );
 		}
 	}
 	else	{
-		printf( "MeCtFace::remove_joint ERR: joint_name is NULL\n" );
+		LOG( "MeCtFace::remove_joint ERR: joint_name is NULL\n" );
 	}
 }
 
@@ -128,22 +129,22 @@ void MeCtFace::remove_channel( const char *joint_name, SkChannel::Type ch_type )
 			int size = mchan_arr.size();
 			for( int i = 0; i < size; i++ )	{
 				if( ( mchan_arr.name( i ) == joint_name )&&( mchan_arr.type( i ) == ch_type ) ) {
-//					printf( "MeCtFace::remove_channel: exclude[ %d ]: '%s:%s'\n", 
+//					LOG( "MeCtFace::remove_channel: exclude[ %d ]: '%s:%s'\n", 
 //						i, mchan_arr.name( i ).get_string(), SkChannel::type_name( mchan_arr.type( i ) ) );
 					_include_chan_flag[ i ] = 0;
 					found = 1;
 				}
 			}
 			if( !found )	{
-				printf( "MeCtFace::remove_channel ERR: channel '%s:%s' NOT FOUND\n", joint_name, SkChannel::type_name( ch_type ) );
+				LOG( "MeCtFace::remove_channel ERR: channel '%s:%s' NOT FOUND\n", joint_name, SkChannel::type_name( ch_type ) );
 			}
 		}
 		else	{
-			printf( "MeCtFace::remove_channel ERR: _base_pose_p is NULL\n" );
+			LOG( "MeCtFace::remove_channel ERR: _base_pose_p is NULL\n" );
 		}
 	}
 	else	{
-		printf( "MeCtFace::remove_channel ERR: joint_name is NULL\n" );
+		LOG( "MeCtFace::remove_channel ERR: joint_name is NULL\n" );
 	}
 }
 
@@ -210,11 +211,11 @@ void MeCtFace::context_updated( void ) {
 	if( _context ) {
 		_skeleton_ref_p = _context->channels().skeleton(); // WHY HERE?
 		if( _skeleton_ref_p == NULL )	{
-			printf( "MeCtFace::context_updated ERR: _skeleton_ref_p is NULL\n" );
+			LOG( "MeCtFace::context_updated ERR: _skeleton_ref_p is NULL\n" );
 		}
 	}
 	else	{
-		printf( "MeCtFace::context_updated ERR: context is NULL\n" );
+		LOG( "MeCtFace::context_updated ERR: context is NULL\n" );
 	}
 #endif
 }
@@ -312,7 +313,7 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 			float key_weight = fbuffer[ weight_index ];
 			if( fabs( key_weight ) > 0.0 )	{
 			
-//				printf( "Face: '%s'\n", key_pose_p->name() );
+//				LOG( "Face: '%s'\n", key_pose_p->name() );
 			
 				float* key_pose_buff_p = key_pose_p->posture( 0 );
 				int numKeyChannels = key_pose_p->channels().size();
@@ -382,7 +383,7 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 						}
 					}
 					else	{
-//						printf( "exclude: %d\n", i );
+//						LOG( "exclude: %d\n", i );
 					}
 					pose_var_index += ch_size;
 				}
@@ -407,13 +408,13 @@ const char* MeCtFace::controller_type( void ) const	{
 
 void MeCtFace::print_state( int tabCount ) {
 
-	fprintf( stdout, "MeCtFace" );
+	LOG("MeCtFace" );
 
 	const char* str = name();
 	if( str )
-		fprintf( stdout, " \"%s\"", str );
+		LOG(" \"%s\"", str );
 
-	fprintf( stdout, "\n" );
+	LOG("\n" );
 }
 
 //////////////////////////////////////////////////////////////////////////////////

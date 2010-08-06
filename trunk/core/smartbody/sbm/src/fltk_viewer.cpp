@@ -264,7 +264,7 @@ class FltkViewerData
 // Called when the small "cross" button to close the window is pressed
 static void _callback_func ( fltk::Widget* win, void* pt )
  {
-   //printf("DBG callback_func!\n");
+   //LOG("DBG callback_func!\n");
    FltkViewer* v = (FltkViewer*)pt;
    v->close_requested ();
  }

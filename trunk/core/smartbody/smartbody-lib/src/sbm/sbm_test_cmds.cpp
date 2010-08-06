@@ -111,7 +111,7 @@ int test_args_func( srArgBuffer& args, mcuCBHandle *mcu_p  ) {
 	//char *A = args.read_token();
 	//char *B = args.read_token();
 	//char *C = args.read_token();
-	//printf( "TEST: [%d]:{ '%s', '%s', '%s' }\n", count,A,B,C );
+	//LOG( "TEST: [%d]:{ '%s', '%s', '%s' }\n", count,A,B,C );
 	return( CMD_SUCCESS );
 }
 

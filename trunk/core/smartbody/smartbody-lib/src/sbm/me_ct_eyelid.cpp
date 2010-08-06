@@ -23,6 +23,7 @@
 
 #include "gwiz_math.h"
 #include "me_ct_eyelid.h"
+#include <vhcl_log.h>
 
 /*
 	JOINTS:
@@ -120,7 +121,7 @@ float MeCtEyeLid::calc_upper_correction(
 		out_lid_y = adj_lid_y + blink_norm * ( EYELID_Y_LIMIT_UP - adj_lid_y );
 	}
 
-//if( G_debug ) printf( "eye: %f  lid: %f  --> %f\n", in_eye_p, in_lid_y, out_lid_y );
+//if( G_debug ) LOG( "eye: %f  lid: %f  --> %f\n", in_eye_p, in_lid_y, out_lid_y );
 
 	return( out_lid_y );
 }
@@ -162,7 +163,7 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 		once = 0;
 		G_debug = 1;
 		
-		printf( "look fwd:\n" );   // ( eye, lid )
+		LOG( "look fwd:\n" );   // ( eye, lid )
 		calc_upper_correction( 0.0, 0.4 ); // over-wide
 		calc_upper_correction( 0.0, 0.1 ); // wide
 		calc_upper_correction( 0.0, 0.05 );
@@ -173,7 +174,7 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 		calc_upper_correction( 0.0, -0.788 ); // closed
 		calc_upper_correction( 0.0, -0.8 ); // over-closed
 
-		printf( "look up:\n" );
+		LOG( "look up:\n" );
 		calc_upper_correction( -20.0, 0.1 ); // wide
 		calc_upper_correction( -20.0, 0.05 );
 		calc_upper_correction( -20.0, 0.0 ); // neutral
@@ -182,7 +183,7 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 		calc_upper_correction( -20.0, -0.2 ); // sleepy
 		calc_upper_correction( -20.0, -0.788 ); // closed
 
-		printf( "look down:\n" );
+		LOG( "look down:\n" );
 		calc_upper_correction( 20.0, 0.1 ); // wide
 		calc_upper_correction( 20.0, 0.05 );
 		calc_upper_correction( 20.0, 0.0 ); // neutral
@@ -228,7 +229,7 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 	fbuffer[ UR_lid_y_map ] = UL_correct_posy;
 
 #if 0
-	if( fabs( UL_lid_y ) > 0.0 ) printf( "UL_lid_y: %f -> %f\n", UL_lid_y, UL_correct_posy );
+	if( fabs( UL_lid_y ) > 0.0 ) LOG( "UL_lid_y: %f -> %f\n", UL_lid_y, UL_correct_posy );
 #endif
 
 	return true;
@@ -248,12 +249,12 @@ const char* MeCtEyeLid::controller_type( void )	const {
 
 void MeCtEyeLid::print_state( int tabCount ) {
 
-	fprintf( stdout, "MeCtEyeLid" );
+	LOG("MeCtEyeLid" );
 
 	const char* str = name();
 	if( str )
-		fprintf( stdout, " \"%s\"", str );
+		LOG(" \"%s\"", str );
 
-	fprintf( stdout, "\n" );
+	LOG("\n" );
 }
 

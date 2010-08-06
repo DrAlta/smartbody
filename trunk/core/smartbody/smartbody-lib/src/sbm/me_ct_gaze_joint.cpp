@@ -136,7 +136,7 @@ void MeCtGazeJoint::capture_joint_state( void ) {
 		}
 		else	{
 			const char *name = joint_p->name();
-			printf( "MeCtGazeJoint::capture_joint_state ERR: parent of joint '%s' not found\n", name );
+			LOG( "MeCtGazeJoint::capture_joint_state ERR: parent of joint '%s' not found\n", name );
 		}
 	}
 }
@@ -399,7 +399,7 @@ quat_t MeCtGazeJoint::constrain_ellipse( quat_t task_rot )	{
 	float sw_x = (float)st.x();
 	float sw_y = (float)st.y();
 
-//if( id == 6 ) printf( "%f %f %f %f\n", limit_p_up, limit_p_dn, limit_h, limit_r );
+//if( id == 6 ) LOG( "%f %f %f %f\n", limit_p_up, limit_p_dn, limit_h, limit_r );
 //euler_t e = task_rot; if( id == 6 ) e.print();
 
 	// Marcelo's exact ellipse solution:
@@ -443,7 +443,7 @@ if( id == 5 )	{ // MeCtGaze::GAZE_JOINT_SKULL
  t_elapse += dt;
  Q_dif = ( world_rot * ( -prev_world_rot ) ).shortest();
  dps = (float)( Q_dif.degrees() ) / dt;
- if( dps > 0.1 ) printf( "MeCtGazeJoint world-speed: %f  at %f\n", dps, t_elapse );
+ if( dps > 0.1 ) LOG( "MeCtGazeJoint world-speed: %f  at %f\n", dps, t_elapse );
 }
 #endif
 

@@ -91,7 +91,7 @@ WSP::WSP_ERROR remote_pawn_rotation_update( std::string id, std::string attribut
 
 void handle_wsp_error( std::string id, std::string attribute_name, int error, std::string reason, void* data ) {
 
-	printf( "error getting id: %s attribute_name: %s. error_code: %d reason: %s\n", id.c_str(), attribute_name.c_str(), error, reason.c_str() );
+	LOG( "error getting id: %s attribute_name: %s. error_code: %d reason: %s\n", id.c_str(), attribute_name.c_str(), error, reason.c_str() );
 }
 
 /////////////////////////////////////////////////////////////
@@ -492,7 +492,7 @@ int SbmPawn::remove_from_scene( const char* pawn_name ) {
 
 			return CMD_SUCCESS;
 		} else {
-			printf( "ERROR: Unknown pawn \"%s\".\n", pawn_name );
+			LOG( "ERROR: Unknown pawn \"%s\".\n", pawn_name );
 			return CMD_FAILURE;
 		}
 	}

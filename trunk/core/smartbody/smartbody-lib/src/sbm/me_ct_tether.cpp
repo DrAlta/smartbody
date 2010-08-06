@@ -23,6 +23,7 @@
 
 #include "gwiz_math.h"
 #include "me_ct_tether.h"
+#include <vhcl_log.h>
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -247,12 +248,12 @@ const char* MeCtTether::controller_type( void )	const {
 
 void MeCtTether::print_state( int tabCount ) {
 
-	fprintf( stdout, "MeCtTether" );
+	LOG("MeCtTether" );
 
 	const char* str = name();
 	if( str )
-		fprintf( stdout, " \"%s\"", str );
+		LOG(" \"%s\"", str );
 
-	fprintf( stdout, "\n" );
+	LOG("\n" );
 }
 

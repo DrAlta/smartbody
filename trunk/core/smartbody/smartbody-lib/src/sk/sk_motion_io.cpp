@@ -369,7 +369,7 @@ bool SkMotion::load ( SrInput& in ) {
 //		}
 //	}
 	
-//	printf( "SkMotion::load '%s' %d frames\n", name(), frames() );
+//	LOG( "SkMotion::load '%s' %d frames\n", name(), frames() );
 	return true;
 }
 

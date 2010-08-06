@@ -121,7 +121,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const cha
    SbmCharacter * agent = mcu.character_map.lookup( agentName );
    if ( agent == NULL )
    {
-      printf( "AudioFileSpeech::requestSpeechAudio ERR: insert AudioFile voice code lookup FAILED, msgId=%s\n", agentName ); 
+      LOG( "AudioFileSpeech::requestSpeechAudio ERR: insert AudioFile voice code lookup FAILED, msgId=%s\n", agentName ); 
       return 0;
    }
 
@@ -130,7 +130,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const cha
    string relativeAudioPath = mcu.speech_audiofile_base_path + agent->get_voice_code();
    if ( _fullpath( fullAudioPath, relativeAudioPath.c_str(), _MAX_PATH ) == NULL )
    {
-      printf( "AudioFileSpeech::requestSpeechAudio ERR: _fullpath() returned NULL\n" );
+      LOG( "AudioFileSpeech::requestSpeechAudio ERR: _fullpath() returned NULL\n" );
       return 0;
    }
 
@@ -144,14 +144,14 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const cha
    ReadVisemeDataBML( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData );
    if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
    {
-      printf( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlFilename.c_str() );
+      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlFilename.c_str() );
       //return 0;
    }
 
    ReadSpeechTiming( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers );
    if ( m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.size() == 0 )
    {
-      printf( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlFilename.c_str() );
+      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlFilename.c_str() );
       //return 0;
    }
 

@@ -117,16 +117,16 @@ void MeCtLocomotionLimbAnim::set_anim(SkMotion* walking)
 void MeCtLocomotionLimbAnim::print_info()
 {
 	SrVec* velocity = NULL;
-	printf("\n Printing info for walking animation %s:", walking->name());
+	LOG("\n Printing info for walking animation %s:", walking->name());
 	/*for(int i = 0; i < get_support_joint_num(); ++i)
 	{
-		printf("\n land_frame[%s]: %d", (const char*)*(support_joint_list->get(i)), land_frame.get(i));
-		printf("\n lift_frame[%s]: %d", (const char*)*(support_joint_list->get(i)), lift_frame.get(i));
+		LOG("\n land_frame[%s]: %d", (const char*)*(support_joint_list->get(i)), land_frame.get(i));
+		LOG("\n lift_frame[%s]: %d", (const char*)*(support_joint_list->get(i)), lift_frame.get(i));
 	}*/
 	for(int j = 0; j < walking->frames() && j < displacement_list.size(); ++j)
 	{
 		velocity = displacement_list.get(j);
-		printf("\n%d (%.2f, %.2f, %.2f)", j, velocity->x, velocity->y, velocity->z);
+		LOG("\n%d (%.2f, %.2f, %.2f)", j, velocity->x, velocity->y, velocity->z);
 	}
 }
 

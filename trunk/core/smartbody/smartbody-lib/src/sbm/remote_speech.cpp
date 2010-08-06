@@ -78,7 +78,7 @@ RequestId remote_speech::requestSpeechAudio( const char* agentName, const DOMNod
 	xml_utils::xmlToString( node, xmlConverted ); //Xml to string recursively searches DOM tree and returns a string of the xml document
 	
 /*	if(xmlConverted=="BADSTRING"){ 
-		printf( "remote_speech::RvoiceXmlCmd ERR: Invalid DOMNode type encountered"); 
+		LOG( "remote_speech::RvoiceXmlCmd ERR: Invalid DOMNode type encountered"); 
 		return(CMD_FAILURE);
 	}*/
 	//converts string to char*
@@ -127,7 +127,7 @@ RequestId remote_speech::requestSpeechAudio( const char* agentName, const char* 
 	tmpdatebuf[0]= '2';tmpdatebuf[1]='0';tmpdatebuf[2]=datebuf[6];tmpdatebuf[3]=datebuf[7];tmpdatebuf[4]=datebuf[0];tmpdatebuf[5]=datebuf[1];tmpdatebuf[6]=datebuf[3];tmpdatebuf[7]=datebuf[4]; tmpdatebuf[8]=NULL;
 	string date= tmpdatebuf;
 	string time= timebuf;
-	if( LOG_RHETORIC_SPEECH ) printf(tmpdatebuf, "\n");
+	if( LOG_RHETORIC_SPEECH ) LOG(tmpdatebuf, "\n");
 	//
 
 	//the following is the RemoteSpeechCmd, the soundfile produced is explained in the following comment
@@ -181,7 +181,7 @@ The timestamp is 20051121_150427 (that is, YYYYMMDD_HHMMSS ), so we can check ol
 	sprintf( seqName, "RemoteSpeechTimeOut", myStream.str() );  // Anm - huh?? No % in format arg.
 	mcu.active_seq_map.remove( seqName );  // remove old sequence by this name
 	if( mcu.active_seq_map.insert( seqName, rVoiceTimeout ) != CMD_SUCCESS ) {
-		printf( "remote_speech::rVoiceTimeOut ERR:insert Rvoice timeoutCheck into active_seq_map FAILED, msgId=%s\n", seqName ); 
+		LOG( "remote_speech::rVoiceTimeOut ERR:insert Rvoice timeoutCheck into active_seq_map FAILED, msgId=%s\n", seqName ); 
 	}
 	
 	delete [] seqName;
@@ -430,7 +430,7 @@ char*  remote_speech::getSpeechAudioFilename( RequestId requestId ){
 }
 
 int remoteSpeechResult_func( srArgBuffer& args, mcuCBHandle* mcu_p ) { //this function is not a member function of remote_speech; it waits for and processes the RemoteSpeechReply
-	if( LOG_RHETORIC_SPEECH ) printf("\n \n *************in recieving_func***************** \n \n" );
+	if( LOG_RHETORIC_SPEECH ) LOG("\n \n *************in recieving_func***************** \n \n" );
 
 	char* character_name = args.read_token(); //character speaking
 	SbmCharacter* character = mcu_p->character_map.lookup( character_name );
@@ -452,7 +452,7 @@ int remoteSpeechResult_func( srArgBuffer& args, mcuCBHandle* mcu_p ) { //this fu
 }
 
 int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgID, char* status, char* result, mcuCBHandle* mcu_p ) { //this function is not a member function of remote_speech; it waits for and processes the RemoteSpeechReply
-	if( LOG_RHETORIC_SPEECH ) printf("\n \n *************in remote_speech::recieving_func***************** \n \n");
+	if( LOG_RHETORIC_SPEECH ) LOG("\n \n *************in remote_speech::recieving_func***************** \n \n");
 	
 	if( !remote_speech::commandLookUp.does_key_exist( msgID ) ) { //of the response from Rvoice Relay timed out the key would be deleted
 		// TODO: Log / print error
@@ -474,7 +474,7 @@ int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgI
 						string command= string(commandChars)+" "+character->name+" "+string(msgID)+ "ERROR::remote_speech Remote speech process returns NULL document";
 						char* failCmd= new char[command.length()+1];
 						strcpy(failCmd, command.c_str());
-						printf(failCmd);
+						LOG(failCmd);
 						return (CMD_FAILURE);
 					} else {
 						// Rvoice is talking to someone else... ignore
@@ -594,13 +594,13 @@ int remoteSpeechReady_func(srArgBuffer& args, mcuCBHandle* mcu_p){
 			//DELETE THIS- THIS IS JUST TO TEST THE STOP AND START AUDIO COMMAND!!!
 			char* what= x.getSpeechPlayCommand(reqId);
 			cout<<endl<<"Play speech command:"<<endl;
-			printf(what);
+			LOG(what);
 			char* who= x.getSpeechStopCommand(reqId);
 			cout<<endl<<"Stop speech command:"<<endl;
-			printf(who);
+			LOG(who);
 			char* where= x.getSpeechAudioFilename(reqId);
 			cout<<endl<<"Audio File Name:"<<endl;
-			printf(where);
+			LOG(where);
 
 			//Delete This- THis is just to test the get mark time fcn!!
 			cout<<endl<<"Mark Time: "<<x.getMarkTime(reqId, L"mark")<<endl;
@@ -616,7 +616,7 @@ int remoteSpeechReady_func(srArgBuffer& args, mcuCBHandle* mcu_p){
 
 int remote_speech_test( srArgBuffer& args, mcuCBHandle* mcu_p ) { //Tester function for remote Speech 
 	try{
-		if( LOG_RHETORIC_SPEECH ) printf("\n \n *************In remote_speech_test***************** \n \n");
+		if( LOG_RHETORIC_SPEECH ) LOG("\n \n *************In remote_speech_test***************** \n \n");
 		char* x= "<?xml version=\"1.0\" encoding=\"UTF-8\"?><speak> Something <mark name=\"hello\"/> to <mark name=\"mark\"/> say <mark name= \"wtf\"/>  </speak>";
 		XercesDOMParser *xmlParser;
 		xmlParser = new XercesDOMParser();
@@ -647,7 +647,7 @@ int set_char_voice(char* char_name, char* voiceCode, mcuCBHandle* mcu_p) //handl
 		return (CMD_SUCCESS);
 	}
 	else{
-		printf( "set_char_voice ERR: SbmCharacter '%s' DOES NOT EXIST\n", char_name );
+		LOG( "set_char_voice ERR: SbmCharacter '%s' DOES NOT EXIST\n", char_name );
 		return( CMD_FAILURE );
 	}
 	return (CMD_FAILURE);

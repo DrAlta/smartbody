@@ -74,7 +74,7 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 {
 	if(_ct_locomotion == NULL) 
 	{
-		printf("Error: no locomotion controller attached.");
+		LOG("Error: no locomotion controller attached.");
 		return;
 	}
 	if (this->motion_standing)
@@ -265,7 +265,7 @@ void MeCtLocomotionAnalysis::analyze_standing_core(MeCtLocomotionLimb* limb, SkS
 void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkMotion* walking, SkMotion* standing, char* limb_base, SrArray<float>* support_height, 
 								   float ground_height, float height_bound)
 {
-	//printf("\nstart analysis......");
+	//LOG("\nstart analysis......");
 	anim->set_anim(walking);
 
 	motion_locomotion = walking;
@@ -333,7 +333,7 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 			pos_z[i] = pos[2] - base_pos[2];
 
 			displacement += *((SrVec*)base_pos)-prev_base_pos;
-			//printf("\nheight[frame%2d]:%f", i, height[i]);
+			//LOG("\nheight[frame%2d]:%f", i, height[i]);
 		}
 		int next = -1;
 
@@ -458,7 +458,7 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 	free(pos_z);
 	free(count);
 	free(temp_axis);
-	//printf("\nend analysis......");
+	//LOG("\nend analysis......");
 }
 
 void MeCtLocomotionAnalysis::estimate_direction(MeCtLocomotionLimbAnim* anim, int* count)
@@ -570,7 +570,7 @@ void MeCtLocomotionAnalysis::add_ref_times(MeCtLocomotionLimbAnim* anim, int* co
 	anim->get_timing_space()->set_ref_time(counter++, (float)start);
 
 	anim->get_timing_space()->set_frame_num((float)motion_locomotion->frames());
-	//printf("\nstance_time:%f; lift_time:%f; land_time:%f", anim->get_timing_space()->get_ref_time(0), anim->get_timing_space()->get_ref_time(1), anim->get_timing_space()->get_ref_time(2));
+	//LOG("\nstance_time:%f; lift_time:%f; land_time:%f", anim->get_timing_space()->get_ref_time(0), anim->get_timing_space()->get_ref_time(1), anim->get_timing_space()->get_ref_time(2));
 
 }
 
@@ -682,6 +682,6 @@ void MeCtLocomotionAnalysis::calc_velocity()
 		walking->connected_skeleton()->update_global_matrices();
 		get_ct()->update_facing();
 		vec = get_ct()->get_facing();
-		printf("\nfaceing[%d]: <%f, %f, %f>", i, vec.x, vec.y, vec.z);
+		LOG("\nfaceing[%d]: <%f, %f, %f>", i, vec.x, vec.y, vec.z);
 	}
 }*/

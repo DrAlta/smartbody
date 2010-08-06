@@ -144,11 +144,11 @@ void MeCtLocomotionLimb::set_ground_height(float ground_height)
 //temp function for test, to be deleted......
 void MeCtLocomotionLimb::print_info()
 {
-	printf("\n ground_height: %f", ground_height);
-	printf("\n height_bound: %f", height_bound);
+	LOG("\n ground_height: %f", ground_height);
+	LOG("\n height_bound: %f", height_bound);
 	for(int i = 0; i < get_support_joint_num(); ++i)
 	{
-		printf("\n support_height[%s]: %f", (const char*)*support_joint_list.get(i), support_height.get(i));
+		LOG("\n support_height[%s]: %f", (const char*)*support_joint_list.get(i), support_height.get(i));
 	}
 	for(int j = 0; j < walking_list.size(); ++j)
 	{

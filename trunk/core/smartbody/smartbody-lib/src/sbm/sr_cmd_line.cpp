@@ -1,5 +1,6 @@
 #include "sr_cmd_line.h"
 #include <sstream>
+#include <vhcl_log.h>
 
 srCmdLine::srCmdLine( int len )
 {
@@ -80,14 +81,14 @@ int srCmdLine::pending_cmd(void)
 				cmds->push_back(stream.str());
 			}
 			iter = cmds->end();
-			fprintf( stdout, "\n" );
+			printf("\n" );
 			cmd_buffer[ buffer_use++ ] = '\0';
 			return( TRUE );
 		}
 		if( c == '\b' )	{
-			fprintf( stdout, " " );
+			printf(" " );
 			if( buffer_use > 0 )	{
-				fprintf( stdout, "\b" );
+				printf("\b" );
 				buffer_use--;
 			}
 			return( FALSE );

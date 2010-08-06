@@ -202,8 +202,8 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeCtLocomot
 
 	calc_target_velocity();
 	//local_vel.set(0,0,routine.speed);
-	//printf("\n%f", pre_facing_angle);
-	//printf("\nvel:(%f, %f, %f)", global_vel.x, global_vel.y, global_vel.z);
+	//LOG("\n%f", pre_facing_angle);
+	//LOG("\nvel:(%f, %f, %f)", global_vel.x, global_vel.y, global_vel.z);
 
 	return true;
 }
@@ -293,11 +293,11 @@ void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtL
 	//y = buffer[ bi_world_y ];
 	//z = buffer[ bi_world_z ];
 
-	//printf("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  base world_offset   (%f, %f, %f)", x, y, z);
+	//LOG("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  base world_offset   (%f, %f, %f)", x, y, z);
 
-	//if(facing_angle != 0.0f) printf("\n\npos:[%f, %f, %f]", limb->pos.x+buffer[ bi_world_x ], limb->pos.y+buffer[ bi_world_y ], limb->pos.z+buffer[ bi_world_z ]);
-	//if(facing_angle != 0.0f) printf("\ncurr_pos:[%f, %f, %f]", limb->pos.x, limb->pos.y, limb->pos.z);
-	//if(facing_angle != 0.0f) printf("\ndisplacement:[%f, %f, %f]", displacement.x, displacement.y, displacement.z);
+	//if(facing_angle != 0.0f) LOG("\n\npos:[%f, %f, %f]", limb->pos.x+buffer[ bi_world_x ], limb->pos.y+buffer[ bi_world_y ], limb->pos.z+buffer[ bi_world_z ]);
+	//if(facing_angle != 0.0f) LOG("\ncurr_pos:[%f, %f, %f]", limb->pos.x, limb->pos.y, limb->pos.z);
+	//if(facing_angle != 0.0f) LOG("\ndisplacement:[%f, %f, %f]", displacement.x, displacement.y, displacement.z);
 
 	SrMat mat;
 	mat.roty(facing_angle);
@@ -346,7 +346,7 @@ void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtL
 		//target_world_rot = target_world_rot * mat;
 		routine_stack.set(i, routine);
 	}
-	//printf("\ntarget world pos: (%f, %f, %f)", target_world_pos.x, target_world_pos.y, target_world_pos.z);
+	//LOG("\ntarget world pos: (%f, %f, %f)", target_world_pos.x, target_world_pos.y, target_world_pos.z);
 }
 
 SkChannelArray& MeCtLocomotionNavigator::controller_channels() {
@@ -463,7 +463,7 @@ void MeCtLocomotionNavigator::update_facing(MeCtLocomotionLimb* limb, bool domin
 		limb->curr_rotation -= (float)delta_time * local_rps;
 		//limb->rotation_record = limb->curr_rotation;
 	}
-	//printf("\nrotation: %f; space time: %f", limb->curr_rotation, limb->space_time);
+	//LOG("\nrotation: %f; space time: %f", limb->curr_rotation, limb->space_time);
 }
 
 void MeCtLocomotionNavigator::clear_destination_list()
@@ -588,6 +588,6 @@ void MeCtLocomotionNavigator::print_foot_pos(MeFrameData& frame, MeCtLocomotionL
 	pos.x += buffer[ bi_world_x ];
 	pos.y += buffer[ bi_world_y ];
 	pos.z += buffer[ bi_world_z ];
-	//if(facing_angle != 0.0f) printf("\npos: [%f, %f, %f]", pos.x, pos.y, pos.z);
+	//if(facing_angle != 0.0f) LOG("\npos: [%f, %f, %f]", pos.x, pos.y, pos.z);
 
 }

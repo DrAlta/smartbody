@@ -739,7 +739,7 @@ BehaviorRequest* BML::Processor::parse_bml_to_anim( DOMElement* elem, BehaviorSy
 				thefile.close();
 			}
 			else
-				printf("Unable to open bml2anim.xml in mepath");			
+				LOG("Unable to open bml2anim.xml in mepath");			
 		}
 		mcu->me_paths.reset();
 	}

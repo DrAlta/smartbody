@@ -23,6 +23,7 @@
 
 #include "me_ct_examples.h"
 #include "gwiz_math.h"
+#include <vhcl_log.h>
 
 #define MAX_JOINT_LABEL_LEN	32
 
@@ -125,13 +126,13 @@ bool MeCtHeadOrient::controller_evaluate( double t, MeFrameData& frame )	{
 }
 
 void MeCtHeadOrient::print_state( int tabs )	{
-	fprintf( stdout, "MeCtSimpleTilt" );
+	LOG("MeCtSimpleTilt" );
 
 	const char* str = name();
 	if( str )
-		fprintf( stdout, " \"%s\"", str );
+		LOG(" \"%s\"", str );
 
-    fprintf( stdout, " p:%.3g h:%.3g r:%.3g degs for %.3g sec\n", 
+    LOG(" p:%.3g h:%.3g r:%.3g degs for %.3g sec\n", 
 		_pitch_deg, _heading_deg, _roll_deg, _duration );
 }
 
@@ -229,13 +230,13 @@ bool MeCtSimpleTilt::controller_evaluate( double t, MeFrameData& frame )	{
 }
 
 void MeCtSimpleTilt::print_state( int tabs )	{
-	fprintf( stdout, "MeCtSimpleTilt" );
+	LOG("MeCtSimpleTilt" );
 
 	const char* str = name();
 	if( str )
-		fprintf( stdout, " \"%s\"", str );
+		LOG(" \"%s\"", str );
 
-    fprintf( stdout, " %.3g degs for %.3g sec\n", _angle_deg, _duration );
+    LOG(" %.3g degs for %.3g sec\n", _angle_deg, _duration );
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -390,18 +391,18 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 }
 		
 void MeCtSimpleNod::print_state( int tabs )	{
-	fprintf( stdout, "MeCtSimpleNod" );
+	LOG("MeCtSimpleNod" );
 
 	const char* str = name();
 	if( str )
-		fprintf( stdout, " \"%s\"", str );
+		LOG(" \"%s\"", str );
 
     if( _affirmative )
-		fprintf( stdout, " affirmative" );
+		LOG(" affirmative" );
     else
-		fprintf( stdout, " negative" );
+		LOG(" negative" );
 
-    fprintf( stdout, " %.3g reps @ %.3g degs for %.3g sec\n", _repetitions, _magnitude, _duration );
+    LOG(" %.3g reps @ %.3g degs for %.3g sec\n", _repetitions, _magnitude, _duration );
 }
 
 ///////////////////////////////////////////////////////////////////////////

@@ -23,6 +23,7 @@
 
 
 # include <ME/me_ct_motion.h>
+#include <vhcl_log.h>
 
 //=================================== MeCtMotion =====================================
 
@@ -230,7 +231,7 @@ void MeCtMotion::controller_map_updated() {
 		int world_offset_ch_y = cChannels.search( SkJointName("world_offset"), SkChannel::YPos );
 		int world_offset_ch_z = cChannels.search( SkJointName("world_offset"), SkChannel::ZPos );
 		int world_offset_ch_q = cChannels.search( SkJointName("world_offset"), SkChannel::Quat );
-//		printf( "world_offset_ch_x: %d\n", world_offset_ch_x );
+//		LOG( "world_offset_ch_x: %d\n", world_offset_ch_x );
 #endif
 
 		for( int i=0; i<size; ++i ) {
@@ -284,27 +285,27 @@ const char* MeCtMotion::controller_type () const
  }
 
 void MeCtMotion::print_state( int tabCount ) {
-	fprintf( stdout, "MeCtMotion" );
+	LOG("MeCtMotion" );
 
 	const char* str = name();
 	if( str )
-		fprintf( stdout, " \"%s\"", str );
+		LOG(" \"%s\"", str );
 
-	fprintf( stdout, ", motion" );
+	LOG(", motion" );
 	if( _motion ) {
 		// motion name
 		str = _motion->name();
 		if( str )
-			fprintf( stdout, " \"%s\"", str );
+			LOG(" \"%s\"", str );
 
 		// motion filename
 		str = _motion->filename();
 		if( str )
-			fprintf( stdout, " file \"%s\"", str );
+			LOG(" file \"%s\"", str );
 	} else {
-		fprintf( stdout, "=NULL" );
+		LOG("=NULL" );
 	}
-	fprintf( stdout, "\n" );
+	LOG("\n" );
 }
 
 //======================================= EOF =====================================

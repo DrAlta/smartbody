@@ -116,23 +116,23 @@ class TimeIntervalProfiler { // T.I.P.
 		void print_group( group_entry_t *group_p )	{
 
 			if( group_p )	{
-				printf( "  GRP: %s \"%s\"\n", group_p->enabled ? "ENABLED" : "DISABLED", group_p->name );
+				LOG( "  GRP: %s \"%s\"\n", group_p->enabled ? "ENABLED" : "DISABLED", group_p->name );
 				for( int i=0; i< group_p->profile_count; i++ )	{
 					profile_entry_t* profile_p = group_p->profile_p_arr[ i ];
 					if( profile_p ) {
-						printf( "    PRF: \"%s\"\n", profile_p->label );
+						LOG( "    PRF: \"%s\"\n", profile_p->label );
 					}
 				}
 			}
 		}
 		void print( void )	{
 		
-			printf( "TIP <>: %s\n", enabled ? "ENABLED" : "DISABLED" );
-//			printf( "   dynamic: %s\n", dyn_threshold ? "true" : "false" );
-			printf( "  suppress: %d\n", suppression );
-			printf( "    select: %d\n", selection );
-			printf( "    smooth: %f\n", smooth_factor );
-			printf( " threshold: %f\n", threshold );
+			LOG( "TIP <>: %s\n", enabled ? "ENABLED" : "DISABLED" );
+//			LOG( "   dynamic: %s\n", dyn_threshold ? "true" : "false" );
+			LOG( "  suppress: %d\n", suppression );
+			LOG( "    select: %d\n", selection );
+			LOG( "    smooth: %f\n", smooth_factor );
+			LOG( " threshold: %f\n", threshold );
 			for( int i=0; i< group_count; i++ )	{
 				group_entry_t *group_p = group_p_arr[ i ];
 				if( group_p )	{
@@ -142,7 +142,7 @@ class TimeIntervalProfiler { // T.I.P.
 		}
 		void print_profile( const char *prefix, const char *group_name, profile_entry_t *profile_p )	{
 
-			printf( 
+			LOG( 
 				"%s%s [%d]< m[%d]:%.6f | f:%.6f | d:%.6f | r[%d]:%.6f >:\"%s\"\n",
 				prefix,
 				group_name,
@@ -158,7 +158,7 @@ class TimeIntervalProfiler { // T.I.P.
 		}
 		void print_profile_alert( const char *group_name, profile_entry_t *profile_p )	{
 		
-			printf( 
+			LOG( 
 				"TIP <%d>: %s Dt:%.5f (Da:%.5f, Ra%.5f) %s\n",
 //				"TIP <%d>: \"%s\" Dt:%.5f (Da:%.5f, Ra%.5f) \"%s\"\n",
 				profile_p->level,
@@ -171,14 +171,14 @@ class TimeIntervalProfiler { // T.I.P.
 		}
 		void print_group_alert( const char *group_name, double dt, double da, double ra )	{
 		
-			printf( 
+			LOG( 
 				"TIP <>: %s Dt:%.5f (Da:%.5f, Ra%.5f)\n",
 				group_name, dt, da, ra
 			);
 		}
 		void print_profile_report( char *prefix, int index, profile_entry_t *profile_p )	{
 		
-			printf( 
+			LOG( 
 				"%s   [%d]<%d>: Dt:%.5f (Da:%.5f, Ra%.5f)(Mx[%d]:%.5f) %s\n",
 				prefix,
 				index,
@@ -193,7 +193,7 @@ class TimeIntervalProfiler { // T.I.P.
 		}
 		void print_group_report( const char *prefix, double dt, double da, double ra )	{
 		
-			printf( 
+			LOG( 
 				"%s SUM: Dt:%.5f (Da:%.5f, Ra%.5f)\n",
 				prefix, dt, da, ra
 			);
@@ -312,7 +312,7 @@ class TimeIntervalProfiler { // T.I.P.
 
 			if( enabled )	{
 				if( reporting )	{
-					printf( "TIP <> report:\n" );
+					LOG( "TIP <> report:\n" );
 				}
 
 				group_entry_t *group_p = NULL;
@@ -329,7 +329,7 @@ class TimeIntervalProfiler { // T.I.P.
 
 					if( group_p->enabled )	{
 						if( reporting )	{
-							printf( "  GRP: \"%s\"\n", group_p->name );
+							LOG( "  GRP: \"%s\"\n", group_p->name );
 						}
 						double total_frame_dt = 0.0;
 						double total_decay_dt = 0.0;
@@ -700,51 +700,51 @@ class TimeIntervalProfiler { // T.I.P.
 #endif
 			delete [] dt_hist_arr;
 
-			printf( "test_clock: %d reps\n", reps );
-			printf( " Tot: %.6f\n", total );
-			printf( "--\n" );
+			LOG( "test_clock: %d reps\n", reps );
+			LOG( " Tot: %.6f\n", total );
+			LOG( "--\n" );
 
-			printf( " avg: %.12f\n", avg );
+			LOG( " avg: %.12f\n", avg );
 			if( min < max ) {
-				printf( " min: %.18f\n", min );
-				printf( " max: %.12f\n", max );
+				LOG( " min: %.18f\n", min );
+				LOG( " max: %.12f\n", max );
 			}
-			printf( " dev: %.12f\n", dev );
+			LOG( " dev: %.12f\n", dev );
 			if( negs )	{
-				printf( " neg: %d\n", negs );
+				LOG( " neg: %d\n", negs );
 			}
-			printf( "--\n" );
+			LOG( "--\n" );
 
-			printf( " fps: %.2f\n", 1.0 / avg );
+			LOG( " fps: %.2f\n", 1.0 / avg );
 			if( max > 0.0 )
-				printf( " min: %.2f\n", 1.0 / max );
+				LOG( " min: %.2f\n", 1.0 / max );
 			else
-				printf( " min: <inf>\n" );
+				LOG( " min: <inf>\n" );
 			if( min > 0.0 )
-				printf( " max: %.2f\n", 1.0 / min );
+				LOG( " max: %.2f\n", 1.0 / min );
 			else
-				printf( " max: <inf>\n" );
-			printf( "--\n" );
+				LOG( " max: <inf>\n" );
+			LOG( "--\n" );
 
-			printf( " hit: %.6f\n", hit_ratio );
-			printf( " avg: %.2f\n", run_avg );
+			LOG( " hit: %.6f\n", hit_ratio );
+			LOG( " avg: %.2f\n", run_avg );
 			if( run_min < run_max ) {
-				printf( " min: %d\n", run_min );
-				printf( " max: %d\n", run_max );
+				LOG( " min: %d\n", run_min );
+				LOG( " max: %d\n", run_max );
 			}
-			printf( "--\n" );
+			LOG( "--\n" );
 
-			printf( " mis: %d\n", accum_halt );
-			printf( " avg: %.2f\n", halt_avg );
+			LOG( " mis: %d\n", accum_halt );
+			LOG( " avg: %.2f\n", halt_avg );
 			if( halt_min < halt_max ) {
-				printf( " min: %d\n", halt_min );
-				printf( " max: %d\n", halt_max );
+				LOG( " min: %d\n", halt_min );
+				LOG( " max: %d\n", halt_max );
 			}
-			printf( "--\n" );
+			LOG( "--\n" );
 
 			double resolution = avg / hit_ratio;
-			printf( " Res: %.12f == %.2f fps\n", resolution, 1.0 / resolution );
-			printf( "--\n" );
+			LOG( " Res: %.12f == %.2f fps\n", resolution, 1.0 / resolution );
+			LOG( "--\n" );
 
 			return( resolution );
 		}

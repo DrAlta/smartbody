@@ -64,7 +64,7 @@ void MeCtIK::update(MeCtIKScenario* scenario)
 
 	for(int k = 0; k < support_joint_num; ++k)
 	{
-		//printf("\ntarget: (%f, %f, %f)", target.x, target.y, target.z);
+		//LOG("\ntarget: (%f, %f, %f)", target.x, target.y, target.z);
 		reach = 0;
 		for(i = 0; i < max_iteration; ++i)
 		{
@@ -177,7 +177,7 @@ __forceinline int MeCtIK::check_constraint(SrQuat* quat, int index)
 __forceinline int MeCtIK::reach_destination()
 {
 	SrVec v = joint_pos_list.get(manipulated_joint_index) - target;
-	//printf("\n dis: %f", v.len());
+	//LOG("\n dis: %f", v.len());
 	if(v.len() < threshold) return 1;
 	return 0;
 }

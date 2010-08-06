@@ -327,7 +327,7 @@ int SkChannel::load ( Type type, SrInput& in, float* v ) // static
 #if 0
 	float len = q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z;
 	if( fabs( len - 1.0 ) > 0.000001 )	{
-		printf( "SkChannel::load Quat: len == %.12f\n", len );
+		LOG( "SkChannel::load Quat: len == %.12f\n", len );
 	}
 #endif
 
