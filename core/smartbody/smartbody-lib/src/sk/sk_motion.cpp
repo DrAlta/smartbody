@@ -23,6 +23,7 @@
  *      Ed Fast, USC
  */
 
+#include "vhcl.h"
 # include <math.h>
 # include <stdlib.h>
 # include <string.h>
@@ -461,7 +462,7 @@ void SkMotion::registerAnimation()
 				_registerOffset[2] = _frames[f].posture[zIndex];
 
 			if (_registerOffset[0] != 0.0 || _registerOffset[2] != 0.0)
-				std::cout << "Animation " << this->name() << " registered with offset (" << _registerOffset[0] << ", " << _registerOffset[2] << ")" << std::endl; 
+				LOG("Animation %s registered with offset (%f, %f)", this->name(), _registerOffset[0], _registerOffset[2]);
 		}
 		if (xIndex >= 0)
 			_frames[f].posture[xIndex] -= _registerOffset[0];

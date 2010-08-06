@@ -112,15 +112,15 @@ bool validate_path( path& result, const char* pathname ) {
 	string path_str( pathname );
 	if( native( path_str ) ) {
 		if( DEBUG_LOAD_PATHS )
-			cout << "DEBUG: validate_path(..): Native path \"" << path_str << "\"." << endl;
+			LOG("DEBUG: validate_path(..): Native path \"%s\".", path_str.c_str());
 		result = path( path_str, native );
 	} else if( no_check( path_str ) ) {
 		if( DEBUG_LOAD_PATHS )
-			cout << "DEBUG: validate_path(..): Valid no_check path \"" << path_str << "\"." << endl;
+			LOG("DEBUG: validate_path(..): Valid no_check path  \"%s\".", path_str.c_str());
 		result = path( path_str, no_check );
 	} else {
 		if( DEBUG_LOAD_PATHS )
-			cout << "DEBUG: validate_path(..): Invalid name \"" << path_str << "\".  Tried native and no_check." << endl;
+			LOG("DEBUG: validate_path(..): Invalid name \"%s\". Tried native and no_check.", path_str);
 		return false;
 	}
 

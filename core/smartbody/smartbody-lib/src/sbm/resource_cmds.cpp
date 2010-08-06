@@ -40,7 +40,7 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 		{
 			PathResource * res = dynamic_cast<PathResource  *>(mcu_p->resource_manager->getResource(r));
 			if(res)
-				std::cout << res->dump() << std::endl;
+				LOG("%s", res->dump().c_str());
 		}		
 		return CMD_SUCCESS;
 	}
@@ -51,7 +51,7 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 		{
 			FileResource * res = dynamic_cast<FileResource  *>(mcu_p->resource_manager->getResource(r));
 			if(res)
-				std::cout << res->dump() << std::endl;
+				LOG("%s", res->dump().c_str());
 		}				
 		return CMD_SUCCESS;
 	}
@@ -62,7 +62,8 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 		{
 			MotionResource * res = dynamic_cast<MotionResource  *>(mcu_p->resource_manager->getResource(r));
 			if(res)
-				std::cout << res->dump() << std::endl;
+				LOG("%s", res->dump().c_str());
+
 		}				
 		return CMD_SUCCESS;		
 	}
@@ -72,7 +73,7 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 		{
 			ControllerResource * res = dynamic_cast<ControllerResource  *>(mcu_p->resource_manager->getResource(r));
 			if(res)
-				std::cout << res->dump() << std::endl;
+				LOG("%s", res->dump().c_str());
 		}				
 		return CMD_SUCCESS;		
 	}

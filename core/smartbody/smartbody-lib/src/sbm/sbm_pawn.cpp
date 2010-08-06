@@ -620,7 +620,7 @@ int SbmPawn::print_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& arg
 		//  Print out the current state of the named joints
 		string joint_name = args.read_token();
 		if( joint_name.length()==0 ) {
-			cerr << "ERROR: SbmPawn::print_attribute(..): Missing joint name of joint to print." << endl;
+			LOG("ERROR: SbmPawn::print_attribute(..): Missing joint name of joint to print.");
 			return CMD_FAILURE;
 		}
 
@@ -628,7 +628,7 @@ int SbmPawn::print_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& arg
 			cout << "pawn " << pawn->name << " joint "<<joint_name<<":\t";
 			const SkJoint* joint = pawn->get_joint( joint_name.c_str() );
 			if( joint==NULL ) {
-				cout << "No joint \""<<joint_name<<"\"." << endl;
+				LOG("No joint \"%s\".", joint_name);
 			} else {
 				print_joint( joint );
 			}
@@ -638,7 +638,7 @@ int SbmPawn::print_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& arg
 
 		return CMD_SUCCESS;
 	} else {
-		cerr << "ERROR: SbmPawn::print_attribute(..): Unknown attribute \""<< attribute<<"\"." << endl;
+		LOG("ERROR: SbmPawn::print_attribute(..): Unknown attribute \"%s\".", attribute);
 		return CMD_FAILURE;
 	}
 }
@@ -649,8 +649,7 @@ int SbmPawn::create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	int interval = args.read_int();
 
 	if( pawn_and_attribute.length()==0 ) {
-	
-		std::cerr << "ERROR: Expected pawn name." << std::endl;
+		LOG("ERROR: Expected pawn name.");
 		return CMD_FAILURE;
 	}
 
@@ -659,8 +658,7 @@ int SbmPawn::create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	pawn_p = mcu_p->pawn_map.lookup( pawn_and_attribute.c_str() );
 
 	if( pawn_p != NULL ) {
-
-		std::cerr << "ERROR: Pawn \"" << pawn_and_attribute << "\" already exists." << std::endl;
+		LOG("ERROR: Pawn \"%s\" already exists.", pawn_and_attribute);
 		return CMD_FAILURE;
 	}
 
@@ -676,8 +674,7 @@ int SbmPawn::create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	int err = pawn_p->init( skeleton );
 
 	if( err != CMD_SUCCESS ) {
-
-		std::cerr << "ERROR: Unable to initialize SbmPawn \"" << pawn_and_attribute << "\"." << std::endl;
+		LOG("ERROR: Unable to initialize SbmPawn \"%s\".", pawn_and_attribute);
 		delete pawn_p;
 		skeleton->unref();
 		return err;
@@ -686,8 +683,7 @@ int SbmPawn::create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	err = mcu_p->pawn_map.insert( pawn_and_attribute.c_str(), pawn_p );
 
 	if( err != CMD_SUCCESS )	{
-
-		std::cerr << "ERROR: SbmPawn pawn_map.insert(..) \"" << pawn_and_attribute << "\" FAILED" << std::endl; 
+		LOG("ERROR: SbmPawn pawn_map.insert(..) \"%s\" FAILED", pawn_and_attribute);
 		delete pawn_p;
 		skeleton->unref();
 		return err;
@@ -696,8 +692,7 @@ int SbmPawn::create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	err = mcu_p->add_scene( pawn_p->scene_p );
 
 	if( err != CMD_SUCCESS )	{
-
-		std::cerr << "ERROR: SbmPawn pawn_map.insert(..) \"" << pawn_and_attribute << "\" FAILED" << std::endl; 
+		LOG("ERROR: SbmPawn pawn_map.insert(..) \"%s\" FAILED", pawn_and_attribute);
 		delete pawn_p;
 		skeleton->unref();
 		return err;
@@ -716,7 +711,7 @@ int SbmPawn::remove_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 	if( pawn_name.length()==0 ) {
 	
-		std::cerr << "ERROR: Expected pawn name." << std::endl;
+		LOG("ERROR: Expected pawn name.");
 		return CMD_FAILURE;
 	}
 
@@ -731,9 +726,7 @@ int SbmPawn::remove_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 		return CMD_SUCCESS;
 	} else {
-
-		cerr << "ERROR: Pawn \""<<pawn_name<<"\" not found." << endl;
-
+		LOG("ERROR: Pawn \"%s\" not found.", pawn_name);
 		return CMD_FAILURE;
 	}
 }

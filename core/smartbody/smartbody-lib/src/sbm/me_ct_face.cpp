@@ -323,7 +323,7 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 				std::map<std::string, std::vector<int> >::iterator iter = _visemeChannelMap.find(std::string(key_pose_p->name()));
 				if (iter == _visemeChannelMap.end())
 				{
-					std::cout << "Viseme " << key_pose_p->name() << " not found in channel-buffer map. Programmer needs to fix this! Might be lack of finish_adding function." << std::endl;
+					LOG("Viseme %s not found in channel-buffer map. Programmer needs to fix this! Might be lack of finish_adding function.", key_pose_p->name());
 					continue;
 				}
 				std::vector<int>& keyToChannelMap = (*iter).second;

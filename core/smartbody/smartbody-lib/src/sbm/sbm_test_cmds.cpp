@@ -46,9 +46,9 @@ int sbm_set_test_func( srArgBuffer& args, mcuCBHandle *mcu  ) {
 			mcu->character_map.reset();
 			SbmCharacter* character = mcu->character_map.next();
 			if( character==NULL ) {
-				cerr << "WARNING: Unknown test character \""<<mcu->test_character_default<<"\"." << endl;
+				LOG("WARNING: Unknown default test character: \"%s\"", mcu->test_character_default.c_str());
 			} else {
-				cout << "Default test character: \"" << mcu->test_character_default << "\"" << endl;
+				LOG("Default test character: \"%s\"", mcu->test_character_default.c_str());
 			}
 		}
 		return CMD_SUCCESS;
@@ -59,9 +59,9 @@ int sbm_set_test_func( srArgBuffer& args, mcuCBHandle *mcu  ) {
 			mcu->character_map.reset();
 			SbmCharacter* character = mcu->character_map.next();
 			if( character==NULL ) {
-				cerr << "WARNING: Unknown test recipient \""<<mcu->test_recipient_default<<"\"." << endl;
+				LOG("WARNING: Unknown default test recipient: \"%s\"", mcu->test_recipient_default.c_str());
 			} else {
-				cout << "Default test recipient: \"" << mcu->test_recipient_default << "\"" << endl;
+				LOG("Default test recipient: \"%s\"", mcu->test_recipient_default.c_str());
 			}
 		}
 		return CMD_SUCCESS;
@@ -75,10 +75,10 @@ int sbm_set_test_func( srArgBuffer& args, mcuCBHandle *mcu  ) {
 int sbm_print_test_func( srArgBuffer& args, mcuCBHandle *mcu_p  ) {
 	string arg = args.read_token();
 	if( arg=="char" || arg=="character" ) {
-		cout << "Default test character: \"" << mcu_p->test_character_default << "\"" << endl;
+		LOG("Default test character: \"%s\"", mcu_p->test_character_default);
 		return CMD_SUCCESS;
 	} else {
-		cerr << "ERROR: Unrecogized test variable \"" << arg << "\"." << endl;
+		LOG("ERROR: Unrecogized test variable \"%s\"", arg);
 		return CMD_NOT_FOUND;
 	}
 }
@@ -88,18 +88,19 @@ int sbm_print_test_func( srArgBuffer& args, mcuCBHandle *mcu_p  ) {
 
 int test_args_func( srArgBuffer& args, mcuCBHandle *mcu_p  ) {
 	int count = args.calc_num_tokens();
-	cout << "TEST ARGS: "<< count << " arguments";
+	std::stringstream strstr;
+	strstr << "TEST ARGS: "<< count << " arguments";
 	if( count ) {
-		cout << ": { \""<< args.read_token();
+		strstr << ": { \""<< args.read_token();
 
 		string token( args.read_token() );
 		while( token.length() ) {
-			cout << "\", \"" << token;
+			strstr << "\", \"" << token;
 			token = args.read_token();
 		}
-		cout << "\" }";
+		strstr << "\" }";
 	}
-	cout << endl;
+	LOG("%s", strstr.str().c_str());
 
 
 	////int count = args.calc_num_quotes();
@@ -226,7 +227,7 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 	if( seq_id.length()==0 ) {
 		if( echo ) {
 			build_vrX( msg, cmd, char_id, recip_id, bml, false );
-			cout << cmd << " " << msg.str() << endl;
+			LOG("%s %s", cmd, msg.str().c_str());
 		}
 
 		if( send ) {
@@ -310,7 +311,8 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 }
 
 void print_test_bml_help() {
-	cout << "Syntax:" << endl
+	std::stringstream strstr;
+	strstr << "Syntax:" << endl
 		 << "\ttest bml [char[acter] <character id or * for all>] [echo|noecho] [send|nosend] [seq <seq id>] <test subcommand>" << endl
 		 << "where the test subcommand can be any of . . ." << endl
 	     << "\thelp                             // prints this text" << endl
@@ -332,6 +334,7 @@ void print_test_bml_help() {
 	     << "\t<act>...</act>                   // sends inline <act> XML" << endl
 	     << "\t<bml>...</bml>                   // sends inline <bml> XML" << endl
 	     << "\t< ... />                         // sends inline behavior XML (can be multiple)" << endl;
+	LOG("%s", strstr.str().c_str());
 }
 
 // Handles all "test bml ..." sbm commands.
@@ -493,13 +496,15 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 
 		string arg = args.read_token();
 		if( arg=="" || arg=="help" ) {
-			cout << "Available \"test bml head\" commands:" << endl
+			std::stringstream strstr;
+			strstr << "Available \"test bml head\" commands:" << endl
 			     << "\tnod                         // single vertical (x-axis) nod" << endl
 			     << "\tshake                       // single horizontal (y-axis) nod" << endl
 			     << "\ttoss                        // z-axis nod?" << endl
 			     << "\torient <direction> <angle>  // angles the head" << endl
-			     << "\torient target <target>      // orients head toward target" << endl;
-			     //<< "\torient target <target> [<direction> <angle>]" << endl;
+			     << "\torient target <target>      // orients head toward target";
+			LOG("%s", strstr.str().c_str());
+			   //<< "\torient target <target> [<direction> <angle>]" << endl;
 			return CMD_SUCCESS;
 		} else if( arg=="nod" ) {
 			head_attrs << "type=\"NOD\"";
@@ -634,16 +639,16 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 }
 
 void print_test_fml_help() {
-	cout << "Syntax:" << endl
-		 << "\ttest fml [char[acter] <character id or * for all>] [echo|noecho] [send|nosend] [seq <seq id>] <test subcommand>" << endl
-		 << "where the test subcommand can be any of . . ." << endl
-	     << "\thelp                        // prints this text" << endl
-	     << "\tspeech [text] <sentence>    // performs plain text speech" << endl
-	     << "\tspeech ssml <sentence>      // performs ssml speech" << endl
-	     << "\tfile <filename>             // calls vrSpeak on a BML file" << endl
-	     << "\t<?xml ...                   // sends inline XML" << endl
-	     << "\t<act>...</act>              // sends inline <act> XML" << endl
-	     << "\t<fml>...</fml>              // sends inline <fml> XML" << endl;
+	LOG("Syntax:");
+	LOG("\ttest fml [char[acter] <character id or * for all>] [echo|noecho] [send|nosend] [seq <seq id>] <test subcommand>");
+	LOG("where the test subcommand can be any of . . .");
+	LOG("\thelp                        // prints this text");
+	LOG("\tspeech [text] <sentence>    // performs plain text speech");
+	LOG("\tspeech ssml <sentence>      // performs ssml speech");
+	LOG("\tfile <filename>             // calls vrSpeak on a BML file");
+	LOG("\t<?xml ...                   // sends inline XML");
+	LOG("\t<act>...</act>              // sends inline <act> XML");
+	LOG("\t<fml>...</fml>              // sends inline <fml> XML");
 }
 
 int test_fml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
