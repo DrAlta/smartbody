@@ -226,12 +226,12 @@ int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture
 		}
 	} else {
 		SkPosture* posture = new SkPosture();
-		posture->ref();
 		
 		SrInput in( pathname.string().c_str(), "rt" );
 		in >> (*posture);
 		if( in.had_error() ) {
 			cerr << error_prefix << "Failed to load posture \"" << pathname.string() << "\"." << endl;
+			posture->unref();
 			return CMD_FAILURE;
 		} else {
 

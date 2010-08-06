@@ -1476,10 +1476,14 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		new_param->char_names.push_back(char_name);
 		GeneralParamMap::iterator it; 
 		if( (it = mcu_p->param_map.find(param_name)) != mcu_p->param_map.end())
+		{
 			it->second->char_names.push_back( char_name );
+			delete new_param;
+		}
 		else
+		{
 			mcu_p->param_map.insert(make_pair(string(param_name),new_param));
-
+		}
 		return( CMD_SUCCESS );
 	}
 	else

@@ -10,10 +10,12 @@ Resource::Resource()
 
 Resource::~Resource()
 {
-//	for (unsigned int c = 0; c < children.size(); c++)
-//	{
-//		delete children[c];
-//	}
+	for (std::list<Resource*>::iterator iter = children.begin(); 
+		 iter != children.end();
+		 iter++)
+	{
+		delete (*iter);
+	}
 }
 
 

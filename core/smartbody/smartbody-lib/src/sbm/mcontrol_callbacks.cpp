@@ -84,7 +84,7 @@ char * mcn_return_full_filename_func( const char * current_path, const char * fi
 	strcpy( currentPath, current_path );
 	strcpy( fileName, file_name );
 	char * full_filename = new char[_MAX_PATH];
-	std::vector<std::string>	*filename_token = new std::vector<std::string>;		// tokens for the full file name
+	std::vector<std::string> filename_token;		// tokens for the full file name
 
 	char * token;
 	token = strtok( currentPath, "\\" );
@@ -92,7 +92,7 @@ char * mcn_return_full_filename_func( const char * current_path, const char * fi
 	{
 		std::stringstream	stream;
 		stream << token;
-		filename_token->push_back(stream.str());
+		filename_token.push_back(stream.str());
 		stream.clear();
 		token = strtok( NULL, "\\" );
 	}
@@ -101,22 +101,22 @@ char * mcn_return_full_filename_func( const char * current_path, const char * fi
 	while(token!=NULL)
 	{
 		if( strcmp(token, "..") == 0 )
-			filename_token->pop_back();
+			filename_token.pop_back();
 		if( token[0] != '.')
 		{
 			std::stringstream	stream;
 			stream << token;
-			filename_token->push_back(stream.str());
+			filename_token.push_back(stream.str());
 		}
 		token = strtok( NULL, "/" );
 	}	
-	if( !filename_token->empty() )
+	if( !filename_token.empty() )
 	{
-		strcpy( full_filename, (*filename_token)[0].c_str()); 
-		for(unsigned int i = 1 ; i < filename_token->size(); i++)
+		strcpy( full_filename, filename_token[0].c_str()); 
+		for(unsigned int i = 1 ; i < filename_token.size(); i++)
 		{
 			strcat( full_filename, "/" );
-			strcat( full_filename, (*filename_token)[i].c_str() );
+			strcat( full_filename, filename_token[i].c_str() );
 		}
 	}
 	return full_filename;
