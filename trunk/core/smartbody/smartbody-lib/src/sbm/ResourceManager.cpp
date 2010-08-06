@@ -41,7 +41,11 @@ void ResourceManager::addResource(Resource* r)
 		else
 		{
 			while(resources.size() >= resource_limit)
+			{
+				Resource* last = resources.front();
 				resources.pop_front();
+				delete last;
+			}
 			resources.push_back(r);
 			last_resource = cmd;
 		}
@@ -49,7 +53,11 @@ void ResourceManager::addResource(Resource* r)
 	else
 	{
 		if(resources.size() >= resource_limit)
+		{
+			Resource* last = resources.front();
 			resources.pop_front();
+			delete last;
+		}
 		resources.push_back(r);
 	}
 }

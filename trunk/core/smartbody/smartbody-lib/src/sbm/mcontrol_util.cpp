@@ -261,7 +261,7 @@ void mcuCBHandle::clear( void )	{
 		postureIter++)
 	{
 		SkPosture* posture = (*postureIter).second;
-		delete posture;
+		posture->unref();
 	}
 	
 	for (std::map<std::string, SkMotion*>::iterator motionIter = motion_map.begin();
@@ -272,6 +272,15 @@ void mcuCBHandle::clear( void )	{
 		motion->unref(); // need to cleanup motions - fix
 	}
 	
+	for (GeneralParamMap::iterator iter = param_map.begin(); 
+		iter != param_map.end(); 
+		iter++ )
+	{
+		GeneralParam* param = (*iter).second;
+		delete param;
+	}
+
+
 	MeCtPose* pose_ctrl_p;
 	pose_ctrl_map.reset();
 	while( pose_ctrl_p = pose_ctrl_map.pull() )	{
@@ -441,21 +450,15 @@ void mcuCBHandle::update( void )	{
 	char *seq_name = NULL;
 	active_seq_map.reset();
 
-mark( "update BEGIN", 0, "x" );
-
 	while( seq_p = active_seq_map.next( & seq_name ) )	{
 		// the parent resource is associated with seq_name
 		CmdResource* cmdResource = resource_manager->getCmdResource(seq_name);
 		if (cmdResource)
 			resource_manager->addParent(cmdResource);
-mark( "STARTING", 0, seq_name );
 		char *cmd;
 		while( cmd = seq_p->pop( (float)time ) )	{
-
-mark( "COMMAND", 0, cmd );
 			
 			int err = execute( cmd );
-mark( "EXECUTECOMMAND", 0, cmd );
 			if( err != CMD_SUCCESS )	{
 				printf( "mcuCBHandle::update ERR: execute FAILED: '%s'\n", cmd );
 			}
@@ -468,14 +471,12 @@ mark( "EXECUTECOMMAND", 0, cmd );
 		//   * remove(..) resets the shared iterator
 		//        NO, it should decrement the iterator
 		if( seq_p->get_count() < 1 )	{
-mark( "REMOVINGSEQ", 0, seq_name );
 			seq_p = active_seq_map.remove( seq_name );
 			delete seq_p;
 		}
 		if (cmdResource)
 		{
 			resource_manager->removeParent();
-mark( "REMOVINGRESOURCEPARENT", 0, "removeParent" );
 		}
 	}
 
@@ -484,27 +485,20 @@ mark( "REMOVINGRESOURCEPARENT", 0, "removeParent" );
 	pawn_map.reset();
 	while( pawn_p = pawn_map.next() )	{
 
-mark( "PAWN", 0, pawn_p->name );
 		//char_p->scheduler_p->evaluate( time );
 		pawn_p->ct_tree_p->evaluate( time );
-mark( "AFTEREVALUATE", 0, pawn_p->name );
 		pawn_p->ct_tree_p->applyBufferToAllSkeletons();
-mark( "AFTERAPPLYBUFFER", 0, pawn_p->name );
 
 		char_p = character_map.lookup( pawn_p->name );
 		if( char_p != NULL ) {
 			//char_p->scheduler_p->apply();  // old controller API  See applyBufferToAllSkeletons() above
-mark( "BEFORESCENEUPDATE", 0, char_p->name );
 			char_p->scene_p->update();
-mark( "AFTERSCENEUPDATE", 0, char_p->name );
 
 			if ( net_bone_updates && char_p->skeleton_p && char_p->bonebusCharacter ) {
 				NetworkSendSkeleton( char_p->bonebusCharacter, char_p->skeleton_p, &param_map );
-mark( "AFTERNETWORKSEND", 0, char_p->name );
 
 				// what a lot of hoop jumping...
 				if ( net_world_offset_updates ) {
-mark( "BEFOREWORLDOFFSETS", 0, char_p->name );
 					const SkJoint * joint = char_p->get_world_offset_joint();
 
 					const SkJointPos * pos = joint->const_pos();
@@ -522,15 +516,14 @@ mark( "BEFOREWORLDOFFSETS", 0, char_p->name );
 
 					char_p->bonebusCharacter->SetPosition( x, y, z, time );
 					char_p->bonebusCharacter->SetRotation( (float)q.w, (float)q.x, (float)q.y, (float)q.z, time );
-mark( "AFTERWORLDOFFSETS", 0, char_p->name );
 				}
 			}
 
 			char_p->eye_blink_update( this->time );
-mark( "AFTEBLINKUPDATE", 0, char_p->name );
 
 		}  // end of char_p processing
 	} // end of loop
+
 }
 
 srCmdSeq* mcuCBHandle::lookup_seq( const char* seq_name ) {
