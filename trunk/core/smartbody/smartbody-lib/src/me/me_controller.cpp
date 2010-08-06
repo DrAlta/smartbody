@@ -31,6 +31,7 @@
 #include <SR/sr_euler.h>
 #include <ME/me_prune_policy.hpp>
 #include <sbm/ResourceManager.h>
+#include <vhcl_log.h>
 
 using namespace std;
 
@@ -294,7 +295,7 @@ void MeController::dumpChannelMap()
 			const char*     parent_ch_name = (const char*)(_context->channels().name( parent_index ));
 
 			// Print it out...
-			std::cout << "L#"<< i << "\t-> P#"<<parent_index<<"\t\t"<<local_ch_name<<" ("<<SkChannel::type_name(type)<<")"<< std::endl;
+			LOG("L# %d \t-> P#%d\t\t%s (%s)", i, parent_index, local_ch_name, SkChannel::type_name(type));
 
 			if( strcmp( local_ch_name, parent_ch_name ) || (type != parent_ch_type ) ) {
 				std::cerr << "ERROR: MeController::remap(): " << controller_type() << " \"" << _name << "\" :"
@@ -338,7 +339,7 @@ void MeController::record_motion( int max_num_of_frames ) {
 	stop_record();
 	_record_mode = RECORD_MOTION; 
 	_record_max_frames = max_num_of_frames;
-	cout << "MeController::record_motion START"<<endl;
+	LOG("MeController::record_motion START");
 }
 
 void MeController::record_bvh( int max_num_of_frames, double dt )	{
@@ -347,7 +348,7 @@ void MeController::record_bvh( int max_num_of_frames, double dt )	{
 	_record_mode = RECORD_BVH_MOTION; 
 	_record_max_frames = max_num_of_frames;
 	_record_dt = dt;
-	cout << "MeController::record_bvh START"<<endl;
+	LOG("MeController::record_bvh START");
 }
 
 #if ME_CONTROLLER_ENABLE_XMLIFY
@@ -417,7 +418,7 @@ bool MeController::print_bvh_hierarchy( SkJoint* joint_p, int depth )	{
 	int i;
 	
 	if( joint_p == NULL )	{
-		cout << "MeController::print_bvh_hierarchy ERR: NULL joint_p" << endl;
+		LOG("MeController::print_bvh_hierarchy ERR: NULL joint_p");
 		return( false );
 	}
 	
@@ -497,7 +498,7 @@ bool MeController::print_bvh_motion( SkJoint* joint_p, int depth, FRAME& frame_d
 	int i;
 
 	if( joint_p == NULL )	{
-		cout << "MeController::print_bvh_motion ERR: NULL joint_p" << endl;
+		LOG("MeController::print_bvh_motion ERR: NULL joint_p");
 		return( false );
 	}
 	
@@ -555,7 +556,7 @@ bool MeController::print_bvh_motion( SkJoint* joint_p, int depth, FRAME& frame_d
 
 void MeController::record_stop()	{
 	stop_record();
-	cout << "MeController::record_stop"<<endl;
+	LOG("MeController::record_stop");
 }
 
 void MeController::record_clear()	{
@@ -584,7 +585,7 @@ void MeController::record_write( const char *full_prefix ) {
 			skeleton_p = _context->channels().skeleton();
 		}
 		if( skeleton_p == NULL )	{
-			cout << "MeController::record_write NOTICE: SkSkeleton not available" << endl;
+			LOG("MeController::record_write NOTICE: SkSkeleton not available");
 			_record_mode = RECORD_NULL;
 		}
 		
@@ -594,7 +595,7 @@ void MeController::record_write( const char *full_prefix ) {
 		*_record_output << "Frames: " << _frames->size() << srnl;	
 		*_record_output << "Frame Time: " << _record_dt << srnl;	
 //		load_bvh_joint_hmap();
-		cout << "MeController::write_record BVH: " << filename << endl;
+		LOG("MeController::write_record BVH: %s", filename);
 	}
 	else
 	if( _record_mode == RECORD_MOTION )	{
@@ -611,10 +612,10 @@ void MeController::record_write( const char *full_prefix ) {
 		*_record_output << channels << srnl;
 		*_record_output << "frames " << _frames->size() << srnl;	
 
-		cout << "MeController::write_record SKM: " << filename << endl;
+		LOG("MeController::write_record SKM: %s", filename);
 	}
 	else	{
-		cout << "MeController::init_record NOTICE: POSE not implemented" << endl;
+		LOG("MeController::init_record NOTICE: POSE not implemented");
 		_record_mode = RECORD_NULL;
 		_frames->clear();
 		//filename = _record_full_prefix + recordname + ".skp";
@@ -641,7 +642,7 @@ void MeController::cont_record( double time, MeFrameData& frame )	{
 			skeleton_p = _context->channels().skeleton();
 		}
 		if( skeleton_p == NULL )	{
-			cout << "MeController::cont_record NOTICE: SkSkeleton not available" << endl;
+			LOG("MeController::cont_record NOTICE: SkSkeleton not available");
 			_record_mode = RECORD_NULL;
 			return;
 		}

@@ -761,7 +761,7 @@ bool test_ct_for_pruning( MeCtScheduler2::TrackPtr track ) {
 			prune_ok = prune_policy->shouldPrune( ct, track->animation_parent_ct() );
 
 			if( LOG_CONTROLLER_TREE_PRUNING && !prune_ok )
-				cout << "DEBUG: "<<ct->controller_type()<<" \""<<ct->name()<<"\" withheld from pruning by MePrunePolicy."<<endl;
+				LOG("DEBUG: %s \"%s\" withheld from pruning by MePrunePolicy.", ct->controller_type(), ct->name());
 		}
 	}
 
@@ -781,7 +781,8 @@ void prune_schedule( SbmCharacter*   actor,
 					 MeCtPose*       &pose_ct,
 					 SkChannelArray  &raw_channels
 ) {
-	if( LOG_CONTROLLER_TREE_PRUNING ) cout << "DEBUG: sbm_character.cpp prune_schedule(..): Pruning schedule \""<<sched->name()<<"\":"<<endl;
+	if( LOG_CONTROLLER_TREE_PRUNING ) 
+		LOG("DEBUG: sbm_character.cpp prune_schedule(..): Pruning schedule \"%s\":", sched->name());
 
 	typedef MeCtScheduler2::TrackPtr   TrackPtr;
 	typedef MeCtScheduler2::VecOfTrack VecOfTrack;
@@ -835,7 +836,7 @@ void prune_schedule( SbmCharacter*   actor,
 					MeSpline1D::range  y = knot->get_y();
 
 					if( LOG_CONTROLLER_TREE_PRUNING )
-						cout << "\tblend_Ct \""<<blend_ct->name()<<"\": blend curve last knot: x = "<<x<<", y = "<< y <<endl;
+						LOG("\tblend_Ct \"%s\": blend curve last knot: x = %f y = %f", blend_ct->name(), x, y);
 					if( x < time ) {
 						flat_blend_curve = true;
 						if( y == 0 ) {
@@ -1309,14 +1310,14 @@ void SbmCharacter::inspect_skeleton_world_transform( SkJoint* joint_p, int depth
 int SbmCharacter::print_controller_schedules() {
 		//  Command: print character <character id> schedule
 		//  Print out the current state of the character's schedule
-		cout << "Character " << name << "'s schedule:" << endl;
-		cout << "POSTURE Schedule:" << endl;
+		LOG("Character %s's schedule:", name);
+		LOG("POSTURE Schedule:");
 		posture_sched_p->print_state( 0 );
-		cout << "MOTION Schedule:" << endl;
+		LOG("MOTION Schedule");
 		motion_sched_p->print_state( 0 );
-		cout << "GAZE Schedule:" << endl;
+		LOG("GAZE Schedule:");
 		gaze_sched_p->print_state( 0 );
-		cout << "HEAD Schedule:" << endl;
+		LOG("HEAD Schedule:");
 		head_sched_p->print_state( 0 );
 		// Print Face?
 
@@ -1674,11 +1675,11 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle 
 		character->set_voice_code( string("") );
 		
 		// Give feedback if unsetting
-		cout << "Unset " << character->name << "'s voice." << endl;
+		LOG("Unset %s's voice.", character->name);
 	} else if( _strcmpi( impl_id, "remote" )==0 ) {
 		const char* voice_id = args.read_token();
 		if( strlen( voice_id )==0 ) {
-			cerr << "ERROR: Expected remote voice id." << endl;
+			LOG("ERROR: Expected remote voice id.");
 			return CMD_FAILURE;
 		}
 		character->set_speech_impl( mcu_p->speech_rvoice() );
@@ -1686,7 +1687,7 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle 
 	} else if( _strcmpi( impl_id, "audiofile" )==0 ) {
 		const char* voice_path = args.read_token();
 		if( strlen( voice_path )==0 ) {
-			cerr << "ERROR: Expected audiofile voice path." << endl;
+			LOG("ERROR: Expected audiofile voice path.");
 			return CMD_FAILURE;
 		}
 		character->set_speech_impl( mcu_p->speech_audiofile() );
@@ -1696,7 +1697,7 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle 
 	} else if( _strcmpi( impl_id, "text" )==0 ) {
 		const char* voice_path = args.read_token();
 		if( strlen( voice_path )==0 ) {
-			cerr << "ERROR: Expected id." << endl;
+			LOG("ERROR: Expected id.");
 			return CMD_FAILURE;
 		}
 		character->set_speech_impl( mcu_p->speech_text() );
@@ -1704,7 +1705,7 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle 
 		voice_path_str+=voice_path;
 		character->set_voice_code( voice_path_str );
 	} else {
-		cerr << "ERROR: Unknown speech implementation \"" << impl_id << "\"." << endl;
+		LOG("ERROR: Unknown speech implementation \"%s\".", impl_id);
 		return CMD_FAILURE;
 	}
 	return CMD_SUCCESS;
@@ -1713,13 +1714,13 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle 
 int SbmCharacter::print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	string character_id = args.read_token();
 	if( character_id.length()==0 ) {
-		cerr << "ERROR: SbmCharacter::print_cmd_func(..): Missing character id." << endl;
+		LOG("ERROR: SbmCharacter::print_cmd_func(..): Missing character id.");
 		return CMD_FAILURE;
 	}
 
 	SbmCharacter* character = mcu_p->character_map.lookup( character_id.c_str() );
 	if( character==NULL ) {
-		cerr << "ERROR: SbmCharacter::print_cmd_func(..): Unknown character \""<<character<<"\"." << endl;
+		LOG("ERROR: SbmCharacter::print_cmd_func(..): Unknown character \"%s\".", character);
 		return CMD_FAILURE;
 	}
 
@@ -1757,10 +1758,10 @@ int SbmCharacter::print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			return CMD_SUCCESS;
 		} else if( sub_attribute == "channels" ) {
 			// TODO: print list of face activating channels (and associated visemes?)
-			cout << "Pending implementation" << endl;
+			LOG("Pending implementation");
 			return CMD_SUCCESS;
 		} else {
-			cerr << "ERROR: Expected viseme subattribute \"names\".  Found \""<<sub_attribute<<"\"." << endl;
+			LOG("ERROR: Expected viseme subattribute \"names\".  Found \"%s\".", sub_attribute);
 			return CMD_FAILURE;
 		}
 	} else {

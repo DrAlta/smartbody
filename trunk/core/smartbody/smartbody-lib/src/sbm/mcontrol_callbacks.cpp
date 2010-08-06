@@ -558,9 +558,9 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 void print_timer_deprecation_warning( void )	{
 
-	std::cout << "WARNING: fps/lockdt feature is deprecated" << std::endl;
-	std::cout << "  - If you insist, be sure to set fps first, then lockdt..." << std::endl;
-	std::cout << "  - Use 'time sleepfps <fps>' and 'time simfps <fps>' instead" << std::endl;
+	LOG("WARNING: fps/lockdt feature is deprecated");
+	LOG("  - If you insist, be sure to set fps first, then lockdt...");
+	LOG("  - Use 'time sleepfps <fps>' and 'time simfps <fps>' instead");
 }
 
 void print_timer_help( int level = 0 )	{
@@ -1212,9 +1212,9 @@ int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	string type = args.read_token();
 	if( type.length() == 0 || type=="help" ) {
 		// No arguments => help message
-		cout << "Syntax:"<< endl
-		     << "\t" << SET_FACE_AU_SYNTAX_HELP << endl
-		     << "\t" << SET_FACE_VISEME_SYNTAX_HELP << endl;
+		LOG("Syntax:");
+		LOG("\t%s", SET_FACE_AU_SYNTAX_HELP);
+		LOG("\t%s", SET_FACE_VISEME_SYNTAX_HELP);
 		return CMD_SUCCESS;
 	}
 
@@ -1249,11 +1249,13 @@ int mcu_print_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	string type = args.read_token();
 	if( type.length() == 0 || type=="help" ) {
 		// No arguments => help message
-		cout << "Syntax:"<< endl
+		std::stringstream strstr;
+		strstr << "Syntax:"<< endl
 		     << "\t" << PRINT_FACE_AU_SYNTAX1_HELP << endl
 		     << "\t" << PRINT_FACE_AU_SYNTAX2_HELP << endl
 		     << "\t" << PRINT_FACE_VISEME_SYNTAX1_HELP << endl
-		     << "\t" << PRINT_FACE_VISEME_SYNTAX2_HELP << endl;
+		     << "\t" << PRINT_FACE_VISEME_SYNTAX2_HELP;
+		LOG("%s", strstr.str().c_str());
 		return CMD_SUCCESS;
 	}
 
@@ -1262,10 +1264,10 @@ int mcu_print_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	} else if( type=="viseme" ) {
 		return mcu_print_face_viseme_func( args, mcu_p );
 	} else if( type=="neutral" ) {
-		cout << "UNIMPLEMENTED" << endl;
+		LOG("UNIMPLEMENTED");
 		return CMD_FAILURE;
 	} else {
-		cerr << "ERROR: Unknown command \"print face "<<type<<"\"." << endl;
+		LOG("ERROR: Unknown command \"print face %s.", type.c_str());
 		return CMD_NOT_FOUND;
 	}
 }
@@ -1279,7 +1281,7 @@ int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	string unit_str = args.read_token();
 	if( unit_str.length()==0 ) {
 		// No arguments => help message
-		cout << "Syntax: " << SET_FACE_AU_SYNTAX_HELP << endl;
+		LOG("Syntax: %s", SET_FACE_AU_SYNTAX_HELP);
 		return CMD_SUCCESS;
 	}
 
@@ -1288,7 +1290,7 @@ int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	if( !( unit_iss >> unit )
 		|| ( unit < 1 ) )
 	{
-		cerr << "ERROR: Invalid action unit number \"" << unit_str << "\"." << endl;
+		LOG("ERROR: Invalid action unit number \"%s\".", unit_str);
 		return CMD_FAILURE;
 	}
 
@@ -1307,7 +1309,7 @@ int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	}
 
 	if( face_pose_name.length()==0 ) {
-		cerr << "ERROR: Missing viseme motion name." << endl;
+		LOG("ERROR: Missing viseme motion name.");
 		return CMD_FAILURE;
 	}
 
@@ -1317,7 +1319,7 @@ int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	std::map<std::string, SkMotion*>::iterator motionIter =  mcu_p->motion_map.find(face_pose_name);
 	if (motionIter == mcu_p->motion_map.end())
 	{
-		cerr << "ERROR: Unknown facial pose \"" << face_pose_name << "\"." << endl;
+		LOG("ERROR: Unknown facial pose \"%s\".", face_pose_name);
 		return CMD_FAILURE;
 	}
 	SkMotion* motion =(*motionIter).second;
@@ -1338,7 +1340,7 @@ int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				break;
 			default:
 				// Invalid code.  Throw assert?
-				cerr << "ERROR: Invalid side \""<<side<<"\"" << endl;
+				LOG("ERROR: Invalid side \"%s\".", side);
 				return CMD_FAILURE;
 		}
 		au_map.insert( make_pair( unit, au ) );
@@ -1347,22 +1349,22 @@ int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		switch( side ) {
 			case UNIFIED:
 				if( au->left || au->right )
-					cerr << "WARNING: Overwritting au #" << unit << endl;
+					LOG("WARNING: Overwritting au #%s", unit);
 				au->set( motion );
 				break;
 			case LEFT:
 				if( au->left )
-					cerr << "WARNING: Overwritting au #" << unit << " left" <<endl;
+					LOG("WARNING: Overwritting au #%s left", unit);
 				au->set( motion, au->right );
 				break;
 			case RIGHT:
 				if( au->right )
-					cerr << "WARNING: Overwritting au #" << unit << " right" <<endl;
+					LOG("WARNING: Overwritting au #%s right", unit);
 				au->set( au->left, motion );
 				break;
 			default:
 				// Invalid code.  Throw assert?
-				cerr << "ERROR: Invalid side \""<<side<<"\"" << endl;
+				LOG("ERROR: Invalid side \"%s\"", side);
 				return CMD_FAILURE;
 		}
 	}
@@ -1372,29 +1374,33 @@ int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 inline void print_au( const int unit, const AUMotionPtr au ) {
 	if( au->is_bilateral() ) {
-		cout << "Action Unit #" << unit << ": Left SkMotion ";
+		std::stringstream strstr;
+		strstr << "Action Unit #" << unit << ": Left SkMotion ";
 		if( au->left ) {
-			cout << '\"' << au->left->name() << "\".";
+			strstr << '\"' << au->left->name() << "\".";
 		} else {
-			cout << "is NULL.";
+			strstr << "is NULL.";
 		}
-		cout << endl;
+		LOG("%s", strstr.str().c_str());
 
-		cout << "Action Unit #" << unit << ": Right SkMotion ";
+		strstr.clear();
+		strstr << "Action Unit #" << unit << ": Right SkMotion ";
 		if( au->right ) {
-			cout << '\"' << au->right->name() << "\".";
+			strstr << '\"' << au->right->name() << "\".";
 		} else {
-			cout << "is NULL.";
+			strstr << "is NULL.";
 		}
+		LOG("%s", strstr.str().c_str());
 	} else {
-		cout << "Action Unit #" << unit << ": SkMotion ";
+		std::stringstream strstr;
+		strstr << "Action Unit #" << unit << ": SkMotion ";
 		if( au->left ) {
-			cout << '\"' << au->left->name() << "\".";
+			strstr << '\"' << au->left->name() << "\".";
 		} else {
-			cout << "is NULL.";
+			strstr << "is NULL.";
 		}
+		LOG("%s", strstr.str().c_str());
 	}
-	cout << endl;
 }
 
 /**
@@ -1410,9 +1416,11 @@ int mcu_print_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	string unit_str = args.read_token();
 	if( unit_str.length()==0 ) {
 		// No arguments => help message
-		cout << "Syntax:" << endl
+		std::stringstream strstr;
+		strstr << "Syntax:" << endl
 		     << "\t" << PRINT_FACE_AU_SYNTAX1_HELP << endl
-		     << "\t" << PRINT_FACE_AU_SYNTAX2_HELP<< endl;
+		     << "\t" << PRINT_FACE_AU_SYNTAX2_HELP;
+		LOG("%s", strstr.str().c_str());
 		return CMD_SUCCESS;
 	}
 
@@ -1424,7 +1432,7 @@ int mcu_print_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		if( !( unit_iss >> unit )
 			|| ( unit < 1 ) )
 		{
-			cerr << "ERROR: Invalid action unit number \"" << unit_str << "\"." << endl;
+			LOG("ERROR: Invalid action unit number \"%s\".", unit_str);
 			return CMD_FAILURE;
 		}
 	}
@@ -1443,7 +1451,7 @@ int mcu_print_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	} else {
 		pos = au_map.find( unit );
 		if( pos == end ) {
-			cout << "Action Unit #" << unit << " is not set." << endl;
+			LOG("Action Unit #%s is not set.", unit);
 		} else {
 			print_au( unit, pos->second );
 		}
@@ -1461,13 +1469,13 @@ int mcu_set_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	string viseme = args.read_token();
 	if( viseme.length() == 0 ) {
 		// No arguments => help message
-		cout << "Syntax: " << SET_FACE_VISEME_SYNTAX_HELP << endl;
+		LOG("Syntax: %s", SET_FACE_VISEME_SYNTAX_HELP);
 		return CMD_SUCCESS;
 	}
 
 	string motion_name = args.read_token();
 	if( motion_name.length()==0 ) {
-		cerr << "ERROR: Missing viseme motion name." << endl;
+		LOG("ERROR: Missing viseme motion name.");
 		return CMD_FAILURE;
 	}
 
@@ -1477,14 +1485,14 @@ int mcu_set_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	std::map<std::string, SkMotion*>::iterator motionIter = mcu_p->motion_map.find(motion_name);
 	if (motionIter == mcu_p->motion_map.end())
 	{
-		cerr << "ERROR: Unknown viseme pose \"" << motion_name << "\"." << endl;
+		LOG("ERROR: Unknown viseme pose \"%s\".", motion_name);
 		return CMD_FAILURE;
 	}
 	SkMotion* motion = (*motionIter).second;
 	VisemeMotionMap& viseme_map = mcu_p->viseme_map;
 	VisemeMotionMap::iterator pos = viseme_map.find( viseme );
 	if( pos != viseme_map.end() ) {
-		cerr << "WARNING: Overwriting viseme \""<<viseme<<"\" motion mapping." << endl;
+		LOG("WARNING: Overwriting viseme \"%s\" motion mapping.", viseme);
 	}
 	viseme_map.insert( make_pair( viseme, motion ) );
 	
@@ -1492,13 +1500,14 @@ int mcu_set_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 }
 
 void print_viseme( const string& viseme, const SkMotion* motion ) {
-	cout << "Viseme \""<<viseme<<"\" pose: ";
+	std::stringstream strstr;
+	strstr << "Viseme \""<<viseme<<"\" pose: ";
 	if( motion == NULL ) {
-		cout << "NULL";
+		strstr << "NULL";
 	} else {
-		cout << '\"' << motion->name() << '\"';
+		strstr << '\"' << motion->name() << '\"';
 	}
-	cout << endl;
+	LOG("%s", strstr.str().c_str());
 }
 
 /**
@@ -1970,7 +1979,7 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				}
 				else
 				{
-					std::cout << "Use syntax: ctrl " << ctrl_name << " passthrough <true|false|status>, or ctrl " << ctrl_name << " passthrough " << std::endl;
+					LOG("Use syntax: ctrl %s passthrough <true|false|status>, or ctrl %s passthrough ", ctrl_name, ctrl_name);
 					return CMD_FAILURE;
 				}
 			}
@@ -1994,7 +2003,7 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 					if (checkStatus)
 					{
 						std::string passThroughStr = (controllerTree->controller(c)->is_pass_through())? " true " : " false";							
-						std::cout << "[" << character->name << "] " << controllerTree->controller(c)->name() << " = " << passThroughStr << std::endl;
+						LOG("[%s]=%s", character->name, controllerTree->controller(c)->name(), passThroughStr.c_str());
 					}
 					else if (allControllers)
 					{
@@ -2367,7 +2376,7 @@ int mcu_gaze_limit_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			keyIndex = MeCtGaze::key_index( key_label );
 			if (keyIndex == -1)
 			{
-					std::cout << key_label << " is not a valid key." << std::endl;
+					LOG("%s is not a valid key.", key_label);
 					return CMD_FAILURE;
 			}
 		}
@@ -2383,7 +2392,7 @@ int mcu_gaze_limit_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 		else if (n == 1 || n == 0)
 		{
-			std::cout << "To set limits, use: gazelimits <lumbar|thorax|cervical|cranial|optical|back|chest|neck|head|eyes> pitchup pitchdown heading roll" << std::endl;
+			LOG("To set limits, use: gazelimits <lumbar|thorax|cervical|cranial|optical|back|chest|neck|head|eyes> pitchup pitchdown heading roll");
 			int start = 0; 
 			int finish = MeCtGaze::GAZE_KEY_EYES;
 			if (n == 1)
@@ -2392,10 +2401,10 @@ int mcu_gaze_limit_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			{
 				char* label = MeCtGaze::key_label(x);
 				// show the limits for that particular key
-				std::cout << label << " Pitch up  : " << MeCtGaze::DEFAULT_LIMIT_PITCH_UP[x] << std::endl;
-				std::cout << label << " Pitch down: " << MeCtGaze::DEFAULT_LIMIT_PITCH_DOWN[x] << std::endl;
-				std::cout << label << " Heading   : " << MeCtGaze::DEFAULT_LIMIT_HEADING[x] << std::endl;
-				std::cout << label << " Roll      : " << MeCtGaze::DEFAULT_LIMIT_ROLL[x] << std::endl;
+				LOG("%s Pitch up  : %f ", label, MeCtGaze::DEFAULT_LIMIT_PITCH_UP[x]);
+				LOG("%s Pitch down: %f", label, MeCtGaze::DEFAULT_LIMIT_PITCH_DOWN[x]);
+				LOG("%s Heading   : %f", label, MeCtGaze::DEFAULT_LIMIT_HEADING[x]);
+				LOG("%s Roll      : %f", label, MeCtGaze::DEFAULT_LIMIT_ROLL[x]);
 			}
 		}
 		return( CMD_SUCCESS );
@@ -3181,22 +3190,21 @@ int mcu_syncpolicy_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		 }
 		 else
 		 {
-			 std::cout << "Usage: syncpolicy <delay|nodelay>" << std::endl;
-			 return CMD_FAILURE;
+			LOG("Usage: syncpolicy <delay|nodelay>");
+			return CMD_FAILURE;
 		 }
  
          return CMD_SUCCESS;
       }
 	  else
 	  {
-		  std::cout << "Behavior policy is ";
 		  if (mcu_p->delay_behaviors)
 		  {
-			  std::cout << "'delay'. Behaviors will be offset to a future time to make sure that all behaviors are executed in full." << std::endl;
+			 LOG("Behavior policy is 'delay'. Behaviors will be offset to a future time to make sure that all behaviors are executed in full.");
 		  }
 		  else
 		  {
-			  std::cout << "'nodelay'. Behaviors that are calculated to start in the past will be partially executed." << std::endl;
+			 LOG("Behavior policy is 'nodelay'. Behaviors that are calculated to start in the past will be partially executed.");
 		  }
 		  return CMD_SUCCESS;
 	  }

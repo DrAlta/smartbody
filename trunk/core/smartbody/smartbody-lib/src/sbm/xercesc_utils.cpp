@@ -20,6 +20,7 @@
  *      Andrew n marshall, USC
  */
 
+#include "vhcl.h"
 #include <stdlib.h>
 #include <iostream>
 
@@ -29,7 +30,7 @@
 #include <xercesc/framework/MemBufInputSource.hpp>
 
 
-#define LOG (0)
+#define USELOG (0)
 
 using namespace std;
 
@@ -175,10 +176,10 @@ DOMDocument* xml_utils::parseMessageXml( XercesDOMParser* xmlParser, const char 
 	try {
 		// xml in a file?
 		if( str[0]=='<' ) {
-			if(LOG) cout<<"Parsing inline XML."<<endl;
+			if (USELOG) LOG("Parsing inline XML.");
 			xml_utils::parseCString( str, xmlParser );
 		} else {
-			if(LOG) cout<<"Parsing XML from file \""<<str<<"\""<<endl;
+			if (USELOG) LOG("Parsing XML from file \"%s\"", str);
 			xmlParser->parse( str );
 		}
 		int errorCount = xmlParser->getErrorCount();

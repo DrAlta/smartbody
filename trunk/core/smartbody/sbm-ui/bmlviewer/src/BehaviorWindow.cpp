@@ -1364,7 +1364,7 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 
 						if (markTimeFromInterface == -1.0 || fabs(markTimeFromInterface + triggerTime - markerTime) > .001)
 						{
-							std::cout << "Interface time " << markTimeFromInterface + triggerTime << " does not match sync point time " << markerTime << std::endl;
+							LOG("Interface time %f does not match sync point time %f", (markTimeFromInterface + triggerTime), markerTime);
 						}
 						
 						// add these times to the syncMap so that we can use them 

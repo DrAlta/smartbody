@@ -21,6 +21,7 @@
  *      Ed Fast, USC
  */
 
+#include "vhcl.h"
 #include <ME/me_ct_blend.hpp>
 
 
@@ -67,7 +68,7 @@ MeCtBlend::Context::Context( MeCtBlend* blend )
 
 void MeCtBlend::Context::remap_channels() {
 #if TRACE_BLEND_CONTEXT_REMAP
-	std::cout << "========= Entering MeCtBlend::Context::remap_channels() for \"" << _container.name() << "\" ==" << std::endl;
+	LOG("========= Entering MeCtBlend::Context::remap_channels() for \"%s\" ==", _container.name().c_str());
 #endif
 	if( _container == NULL )  // parent has been deleted
 		return;
@@ -109,8 +110,8 @@ void MeCtBlend::Context::remap_channels() {
 					<<'('<<SkChannel::type_name(type)<<"), ";
 			}
 
-			cout << "DEBUG: MeCtBlend::controller_map_updated(): Context's logged channels:" << endl
-				<< '\t' << oss.str() << endl;
+			LOG("DEBUG: MeCtBlend::controller_map_updated(): Context's logged channels:");
+			LOG("\t%s", oss.str().c_str());;
 		}
 
 		//  Iterate through parent_channels, looking for matching child_channels
@@ -485,14 +486,18 @@ bool MeCtBlend::controller_evaluate( double t, MeFrameData & frame ) {
 							// Print lots of details to identify the problem
 							if( !has_printed_error_header ) {
 								has_printed_error_header = true;
-								cout << "===================================================================" << endl;
+								LOG("===================================================================");
 								print_state( 0 );
 								print_children( 0 );
 							}
-							cout << "ERROR: MeCtBlend: parent_index out of bounds." << endl;
-							cout << "\ti: " << i << " of " << num_channels
-								<< " (channel \"" << local_channels.name( i ) << "\" " << SkChannel::type_name( local_channels.type( i ) ) << ")" << endl;
-							cout << "\tparent_index: " << parent_index << " of " << parent_ch_size << endl;
+							LOG("ERROR: MeCtBlend: parent_index out of bounds.");
+							std::stringstream strstr;
+							strstr << "\ti: " << i << " of " << num_channels
+								<< " (channel \"" << local_channels.name( i ) << "\" " << SkChannel::type_name( local_channels.type( i ) ) << ")";
+							LOG("%s", strstr.str().c_str());
+							strstr.clear();
+							strstr << "\tparent_index: " << parent_index << " of " << parent_ch_size;
+							LOG("%s", strstr.str().c_str());
 							continue;
 						}
 
@@ -514,10 +519,13 @@ bool MeCtBlend::controller_evaluate( double t, MeFrameData & frame ) {
 									print_state( 0 );
 									print_children( 0 );
 								}
-								cout << "ERROR: MeCtBlend: local_buffer_index out of bounds." << endl;
-								cout << "\ti: " << i << " of " << num_channels
+								LOG("ERROR: MeCtBlend: local_buffer_index out of bounds.");
+								std::stringstream strstr;
+								strstr << "\ti: " << i << " of " << num_channels
 								     << " (channel \"" << local_channels.name( i ) << "\" " << SkChannel::type_name( local_channels.type( i ) ) << ")" << endl;
-								cout << "\tlocal_buffer_index: " << local_buffer_index << " of " << local_buffer_size << endl;
+								strstr << "\tlocal_buffer_index: " << local_buffer_index << " of " << local_buffer_size;
+								LOG("%s", strstr.str().c_str());
+								
 							}
 						}
 					}
@@ -617,7 +625,7 @@ void MeCtBlend::print_state( int tab_count ) {
 			knot = knot->get_next();
 		}
 	}
-	cout << out.str();
+	LOG("%s", out.str().c_str());
 
 	print_children( tab_count );
 }

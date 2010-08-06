@@ -21,6 +21,7 @@
  *      Ed Fast, USC
  */
 
+#include "vhcl.h"
 #include <ME/me_ct_periodic_replay.hpp>
 
 
@@ -92,7 +93,7 @@ void MeCtPeriodicReplay::print_state( int tab_count ) {
 		out << "; period_offset=" << period_offset;
 		out << "; child_time_offset=" << child_time_offset;
 	}
-	cout << out.str();
+	LOG("%s", out.str().c_str());
 
 	print_children( tab_count );
 }

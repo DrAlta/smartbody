@@ -20,10 +20,11 @@
  *      Andrew n marshall, USC
  */
 
+#include <vhcl.h>
 #include <ME/me_ct_raw_writer.hpp>
 
-#include <stdlib.h>
-
+#include <cstdlib>
+#include <sstream>
 
 
 const char* MeCtRawWriter::TYPE = "MeCtRawWriter";
@@ -128,8 +129,10 @@ void MeCtRawWriter::print_state( int tab_count ) {
 	const char* name = this->name();
 	SkChannelArray& channels = controller_channels();
 
-	cout << controller_type();
+	std::stringstream strstr;
+	strstr << controller_type();
 	if( name!=NULL && name[0]!='\0' )
-		cout << " \"" << name << "\"";
-	cout << " @0x" << this << endl;
+		strstr << " \"" << name << "\"";
+	strstr << " @0x" << this;
+	LOG("%s", strstr.str().c_str());
 }

@@ -232,7 +232,7 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 					if ( *( prevViseme->id() ) != '_' ) {
 						// make sure that the new viseme does not come before the last viseme
 						if (prevViseme->time() > startTime) {
-							std::cout << "WARNING: Viseme " << singleViseme->id() << " has played at time " << singleViseme->time() << " comes before previous viseme " << prevViseme->id() << " at time " << prevViseme->time() << std::endl;
+							LOG("WARNING: Viseme %s has played at time %f comes before previous viseme %s at time %f", singleViseme->id(), singleViseme->time(), prevViseme->id(), prevViseme->time());
 						}
 						blendForward = (startTime - prevViseme->time());
 						if (visemes->size() > 1)
