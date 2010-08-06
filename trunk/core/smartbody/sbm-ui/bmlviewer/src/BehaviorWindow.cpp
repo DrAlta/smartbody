@@ -3,6 +3,8 @@
 #include <fltk/ScrollGroup.h>
 #include <iostream>
 #include <vector>
+#include <vhcl_log.h>
+
 #include <sbm/mcontrol_util.h>
 #include <me/me_ct_blend.hpp>
 #include <me/me_ct_time_shift_warp.hpp>

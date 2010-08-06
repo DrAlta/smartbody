@@ -25,6 +25,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <vhcl_log.h>
 
 
 #include "sbm_test_cmds.hpp"
