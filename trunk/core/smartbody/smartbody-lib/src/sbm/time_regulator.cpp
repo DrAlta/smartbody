@@ -51,7 +51,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////
 
-double SBM_get_real_time( void ) {
+double SBM_get_real_time_nodelay( void ) {
 #ifdef WIN32
 #if ENABLE_QPF_TIME
 
@@ -86,6 +86,18 @@ double SBM_get_real_time( void ) {
 	gettimeofday( &tv, NULL );
 	return( tv.tv_sec + ( tv.tv_usec / 1000000.0 ) );
 #endif
+}
+
+double SBM_get_real_time( void ) {
+
+	static double t = -1.0;
+	double next_t = 0.0;
+	do	{
+		next_t = SBM_get_real_time_nodelay();
+	}
+	while( next_t == t );
+	t = next_t;
+	return( t );
 }
 
 void SBM_sleep_msec( int msec )	{
