@@ -24,6 +24,8 @@
 #include <sstream>
 #include <string>
 
+#include <vhcl_log.h>
+
 #include "bml_face.hpp"
 
 #include "mcontrol_util.h"

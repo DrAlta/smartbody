@@ -698,6 +698,7 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			else
 			if( strcmp( prof_cmd, "report" ) == 0 )	{
 				prof_p->report();
+//				prof_p->full_report();
 			}
 			else
 			if( strcmp( prof_cmd, "erase" ) == 0 )	{
@@ -709,8 +710,10 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			}
 			else
 			if( strcmp( prof_cmd, "test" ) == 0 )	{
+				mcu_p->mark( "mcu_time_func", 0, "test" );
 				int reps = args.read_int();
 				prof_p->test_clock( reps );
+				mcu_p->mark( "mcu_time_func" );
 			}
 			else {
 				return( CMD_NOT_FOUND );

@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 
+#include <vhcl_log.h>
+
 #include "resource_cmds.h"
 
 

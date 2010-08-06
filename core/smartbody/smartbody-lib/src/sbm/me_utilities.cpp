@@ -28,6 +28,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <direct.h>
+#include <vhcl_log.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>

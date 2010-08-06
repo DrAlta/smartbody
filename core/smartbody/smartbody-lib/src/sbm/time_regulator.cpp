@@ -109,7 +109,7 @@ void SBM_sleep_msec( int msec )	{
 	}
 	Sleep( msec );
 #else
-	LOG( "SBM_sleep_msec ERR: not implemented\n" );
+	LOG( "SBM_sleep_msec ERR: not implemented" );
 #endif
 }
 
@@ -130,7 +130,7 @@ double SBM_sleep_wait( double prev_time, double target_dt, bool verbose )	{ // s
 				
 				if( wait_msec > 0 ) {
 					if( verbose && passes )	{
-						LOG( "SBM_sleep_wait NOTICE: slipped %f seconds == %d msec\n", 
+						LOG( "SBM_sleep_wait NOTICE: slipped %f seconds == %d msec", 
 							diff, wait_msec 
 						);
 					}
@@ -185,7 +185,7 @@ bool TimeRegulator::update( double in_time ) {
 	
 	if( in_time < 0.0 )	{
 		if( extern_src )	{
-			if( verbose ) LOG( "TimeRegulator::update NOTICE: switch to internal\n" );
+			if( verbose ) LOG( "TimeRegulator::update NOTICE: switch to internal" );
 			start( in_time );
 			abort = true;
 		}
@@ -193,7 +193,7 @@ bool TimeRegulator::update( double in_time ) {
 	}
 	else	{
 		if( !extern_src )	{
-			if( verbose ) LOG( "TimeRegulator::update NOTICE: switch to external\n" );
+			if( verbose ) LOG( "TimeRegulator::update NOTICE: switch to external" );
 			start( in_time );
 			abort = true;
 		}
@@ -208,29 +208,29 @@ bool TimeRegulator::update( double in_time ) {
 	if( !abort ) {
 		if( loop_dt < 0.0 ) {
 			if( extern_src )	{
-				if( verbose ) LOG( "TimeRegulator::update ERR: negative external increment: %f\n", loop_dt );
+				if( verbose ) LOG( "TimeRegulator::update ERR: negative external increment: %f", loop_dt );
 			}
 			else
-				LOG( "TimeRegulator::update ERR: negative internal increment!!!!: %f\n", loop_dt );
+				LOG( "TimeRegulator::update ERR: negative internal increment!!!!: %f", loop_dt );
 			abort = true;
 		}
 		else
 		if( loop_dt == 0.0 )	{
 			if( extern_src )	{
-				if( verbose ) LOG( "TimeRegulator::update NOTICE: zero external increment\n" );
+				if( verbose ) LOG( "TimeRegulator::update NOTICE: zero external increment" );
 				if( ( ( sleep_dt == 0.0 )&&( eval_dt == 0.0 )&&( sim_dt > 0.0 ) ) == false )	{
 					abort = true;
 				}
 			}
 			else	{
-				LOG( "TimeRegulator::update ERR: zero internal increment!!!!\n" );
+				LOG( "TimeRegulator::update ERR: zero internal increment!!!!" );
 				abort = true;
 			}
 		}
 	}
 	if( abort ) {
 		out_dt = 0.0;
-		if( verbose ) LOG( "TimeRegulator::update ABORT\n" );
+		if( verbose ) LOG( "TimeRegulator::update ABORT" );
 		return( false );
 	}
 	
@@ -255,7 +255,7 @@ bool TimeRegulator::update( double in_time ) {
 		prev_real_time = real_time;
 
 		if( do_pause )	{
-			if( verbose ) LOG( "TimeRegulator::update PAUSE\n" );
+			if( verbose ) LOG( "TimeRegulator::update PAUSE" );
 			do_pause = false;
 			paused = true;
 		}
@@ -263,12 +263,12 @@ bool TimeRegulator::update( double in_time ) {
 			do_resume = true;
 		}
 		if( do_resume )	{
-			if( verbose ) LOG( "TimeRegulator::update RESUME\n" );
+			if( verbose ) LOG( "TimeRegulator::update RESUME" );
 			do_resume = false;
 			paused = false;
 		}
 		if( do_steps )	{
-			if( verbose ) LOG( "TimeRegulator::update STEP\n" );
+			if( verbose ) LOG( "TimeRegulator::update STEP" );
 			do_steps--;
 			do_pause = true;
 		}
@@ -286,7 +286,7 @@ bool TimeRegulator::update( double in_time ) {
 	}
 	
 	out_dt = 0.0;
-	if( verbose ) LOG( "TimeRegulator::update SKIP\n" );
+	if( verbose ) LOG( "TimeRegulator::update SKIP" );
 	return( false );
 }
 
@@ -303,14 +303,14 @@ void TimeRegulator::update_perf( void )	{
 
 		if( perf_sim_sum > 0.0 ) {
 			double sim_avg = perf_sim_sum / perf_count;
-			LOG( "PERF: REAL dt:%.3f fps:%.1f ~ SIM dt:%.3f fps:%.1f\n", 
+			LOG( "PERF: REAL dt:%.3f fps:%.1f ~ SIM dt:%.3f fps:%.1f", 
 //			LOG( "PERF: REAL dt:%f fps:%f ~ SIM dt:%f fps:%f\n", 
 				avg, 1.0 / avg,
 				sim_avg, 1.0 / sim_avg
 			);
 		}
 		else	{
-			LOG( "PERF: dt:%.3f fps:%.1f\n", avg, 1.0 / avg );
+			LOG( "PERF: dt:%.3f fps:%.1f", avg, 1.0 / avg );
 //			LOG( "PERF: dt:%f fps:%f\n", avg, 1.0 / avg );
 		}
 		perf_real_sum = 0.0;
@@ -321,19 +321,19 @@ void TimeRegulator::update_perf( void )	{
 
 void TimeRegulator::print( void )	{
 	LOG( "TimeRegulator( %.3f ): \n", real_time );
-	LOG( "   status: %s\n", paused ? "PAUSED" : ( do_steps ? "STEPPING" : "RUNNING" ) );
-	LOG( "    speed: %.3f\n", speed );
-	LOG( "    sleep: %.4f : %.2f fps\n", sleep_dt, ( sleep_dt > 0.0 )? ( 1.0 / sleep_dt ): 0.0 );
-	LOG( "     eval: %.4f : %.2f fps\n", eval_dt, ( eval_dt > 0.0 )? ( 1.0 / eval_dt ): 0.0 );
-	LOG( "      sim: %.4f : %.2f fps\n", sim_dt, ( sim_dt > 0.0 )? ( 1.0 / sim_dt ): 0.0 );
-	LOG( "   out dt: %.4f : %.2f fps\n", out_dt, ( out_dt > 0.0 )? ( 1.0 / out_dt ): 0.0 );
-	LOG( " out time: %.3f\n", out_time );
+	LOG( "   status: %s", paused ? "PAUSED" : ( do_steps ? "STEPPING" : "RUNNING" ) );
+	LOG( "    speed: %.3f", speed );
+	LOG( "    sleep: %.4f : %.2f fps", sleep_dt, ( sleep_dt > 0.0 )? ( 1.0 / sleep_dt ): 0.0 );
+	LOG( "     eval: %.4f : %.2f fps", eval_dt, ( eval_dt > 0.0 )? ( 1.0 / eval_dt ): 0.0 );
+	LOG( "      sim: %.4f : %.2f fps", sim_dt, ( sim_dt > 0.0 )? ( 1.0 / sim_dt ): 0.0 );
+	LOG( "   out dt: %.4f : %.2f fps", out_dt, ( out_dt > 0.0 )? ( 1.0 / out_dt ): 0.0 );
+	LOG( " out time: %.3f", out_time );
 }
 
 void TimeRegulator::print_update( int id, double in_time ) {
 
 	bool res = update( in_time );
-	LOG( "[%d]:(%d): in:%f time:%f dt:%f\n", id, res, in_time, get_time(), get_dt() );
+	LOG( "[%d]:(%d): in:%f time:%f dt:%f", id, res, in_time, get_time(), get_dt() );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////

@@ -29,6 +29,7 @@
 #include <string>
 #include <cstring>
 
+#include <vhcl_log.h>
 
 #include <SK/sk_skeleton.h>
 #include <ME/me_ct_adshr_envelope.hpp>
