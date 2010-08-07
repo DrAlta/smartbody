@@ -107,6 +107,7 @@ class TimeIntervalProfiler { // T.I.P.
 		bool	reporting;
 
 //		bool	dyn_threshold;
+//		bool	fix_threshold;
 		double	threshold;
 		double	smooth_factor;
 		int 	suppression;
@@ -268,27 +269,28 @@ class TimeIntervalProfiler { // T.I.P.
 				}
 			}
 		}
-		
 		void print_profile_alert( double reset_dt, group_entry_t* group_p, profile_entry_t *profile_p )	{
 			
 			printf( 
-				"TIP <%d>: [F:%.2f%%, G:%.2f%%] Dt:%.5f ",
+				"TIP <%d>: [F:%.2f%%, G:%.2f%%] ",
 				profile_p->level,
 				100.0 * profile_p->frame_dt / reset_dt,
-				100.0 * profile_p->frame_dt / group_p->frame_dt,
-				profile_p->frame_dt
+				100.0 * profile_p->frame_dt / group_p->frame_dt
 			);
 			if( profile_p->frame_count > 1 )	{
 				printf( 
-					"(Max[%d]:%.2f%%) ",
+					"[Max(%d):%.2f%%] ",
 					profile_p->frame_count,
-					100.0 * profile_p->frame_dt
+					100.0 * profile_p->max_dt / profile_p->frame_dt
 				);
 			}
-			printf( "%s:%s\n", group_p->name, profile_p->label );
+			printf( "Dt:%.5f %s:%s\n", 
+				profile_p->frame_dt,
+				group_p->name, 
+				profile_p->label 
+			);
 		}
-
-		void print_profile_group_alert( double reset_dt, group_entry_t* group_p )	{
+		void print_group_alert( double reset_dt, group_entry_t* group_p )	{
 		
 			printf( 
 				"TIP <>: %s [F:%.2f%%] (Ra:%.5f, Da:%.5f) Dt:%.5f\n",
@@ -299,29 +301,36 @@ class TimeIntervalProfiler { // T.I.P.
 				group_p->frame_dt
 			);
 		}
-
 		void print_profile_report( char *prefix, profile_entry_t *profile_p )	{
 		
 			printf( 
-				"%s   <%d>: Dt:%.5f (Da:%.5f, Ra:%.5f) (Mx[%d]:%.5f) %s\n",
+				"%s   <%d>: (Ra:%.5f, Da:%.5f) ",
 				prefix,
 				profile_p->level,
-				profile_p->frame_dt,
-				profile_p->decay_dt,
 				profile_p->rolling_dt,
-				profile_p->frame_count,
-				profile_p->max_dt,
+				profile_p->decay_dt,
+				profile_p->frame_count
+			);
+			if( profile_p->frame_count > 1 )	{
+				printf( 
+					"[Mx(%d):%.2f%%] ",
+					100.0 * profile_p->max_dt / profile_p->frame_dt
+				);
+			}
+			printf( 
+				"Dt:%.5f %s\n",
+				profile_p->frame_dt,
 				profile_p->label
 			);
 		}
 		void print_group_report( const char *prefix, group_entry_t* group_p )	{
 		
 			printf( 
-				"%s SUM: Dt:%.5f (Da:%.5f, Ra%.5f)\n",
+				"%s SUM: (Ra:%.5f, Da:%.5f) Dt:%.5f\n",
 				prefix,
-				group_p->frame_dt,
+				group_p->rolling_dt,
 				group_p->decay_dt,
-				group_p->rolling_dt
+				group_p->frame_dt
 			);
 		}
 		
@@ -530,7 +539,7 @@ class TimeIntervalProfiler { // T.I.P.
 						}
 						else
 						if( spike || ( spike_count > 0 ) )	{
-							print_profile_group_alert( reset_dt, group_p );
+							print_group_alert( reset_dt, group_p );
 						}
 					}
 					
