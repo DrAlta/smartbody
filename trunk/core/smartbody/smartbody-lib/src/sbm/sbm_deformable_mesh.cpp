@@ -1,4 +1,6 @@
 #include "sbm_deformable_mesh.h"
+#include "mcontrol_util.h"
+
 DeformableMesh::DeformableMesh() 
 {
 	binding = false;
@@ -32,8 +34,7 @@ void DeformableMesh::update()
 				SrVec finalVec;
 				for (int j = 0; j < numOfInfJoints; j++)
 				{
-					const char* jointName = skinWeight->infJointName[skinWeight->jointNameIndex[globalCounter]].c_str();
-					const SkJoint* curJoint = skeleton->search_joint(jointName);
+					const SkJoint* curJoint = skinWeight->infJoint[skinWeight->jointNameIndex[globalCounter]];
 					const SrMat& gMat = curJoint->gmat();
 					SrMat& invBMat = skinWeight->bindPoseMat[skinWeight->jointNameIndex[globalCounter]];	
 					double jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
