@@ -39,6 +39,8 @@
 #include "me_utilities.hpp"
 #include "wsp.h"
 #include "mcontrol_callbacks.h"
+#include "sr/sr_model.h"
+#include "sbm_pawn.hpp"
 
 using namespace std;
 using namespace WSP;
@@ -805,6 +807,274 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		return( CMD_SUCCESS );
 	}
 	return( CMD_FAILURE );
+}
+
+int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHandle *mcu_p)
+{
+	SbmCharacter* char_p = mcu_p->character_map.lookup( char_name );
+	if( !char_p )	
+	{
+		LOG( "mcu_character_load_mesh ERR: SbmCharacter '%s' NOT FOUND\n", char_name ); 
+		return( CMD_FAILURE );
+	}
+	SrModel* objModel = new SrModel();
+	if (!objModel->import_obj(obj_file))
+	{
+		LOG( "mcu_character_load_mesh ERR\n" );
+		return( CMD_FAILURE );
+	}
+	
+	SrSnModel* srSnModelDynamic = new SrSnModel();
+	SrSnModel* srSnModelStatic = new SrSnModel();
+	srSnModelDynamic->shape(*objModel);
+	srSnModelStatic->shape(*objModel);
+	srSnModelDynamic->changed(true);
+	srSnModelDynamic->visible(false);
+	const int char_max = 128;
+	char file[char_max];
+	char drive[char_max];
+	char dir[char_max];
+	char ext[char_max];
+	_splitpath(obj_file, drive, dir, file, ext);
+	srSnModelStatic->shape().name = std::string(file).c_str();
+	srSnModelDynamic->shape().name = std::string(file).c_str();
+	char_p->dMesh_p->dMeshDynamic_p.push_back(srSnModelDynamic);
+	char_p->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
+	mcu_p->root_group_p->add(srSnModelDynamic);
+	return( CMD_SUCCESS );
+}
+
+std::string nodeStr(const XMLCh* s)
+{
+	if (!s)	return "";
+	std::string str = XMLString::transcode(s);
+	return str;
+}
+
+std::string tokenize( std::string& str,
+					  const std::string& delimiters = " ",
+					  int mode = 1 )
+{
+	// Skip delimiters at beginning.
+	std::string::size_type lastPos = str.find_first_not_of(delimiters, 0);
+	// Find first "non-delimiter".
+	std::string::size_type pos     = str.find_first_of(delimiters, lastPos);
+
+	if (std::string::npos != pos || std::string::npos != lastPos)
+	{
+		// Found a token, add it to the vector.
+		std::string return_string = str.substr(lastPos, pos - lastPos);
+		std::string::size_type lastPos = str.find_first_not_of(delimiters, pos);
+		if (mode == 1)
+		{
+			if (std::string::npos == lastPos)	str = "";
+			else								str = str.substr(lastPos, str.size() - lastPos);
+		}
+		return return_string;
+	}
+	else
+		return "";
+}
+
+
+void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, mcuCBHandle* mcu_p)
+{
+	SbmCharacter* char_p = mcu_p->character_map.lookup( char_name );
+	const xercesc_3_0::DOMNodeList* list = node->getChildNodes();
+	for (unsigned int c = 0; c < list->getLength(); c++)
+	{
+		xercesc_3_0::DOMNode* node = list->item(c);
+		int type = node->getNodeType();
+		std::string name = nodeStr(node->getNodeName());
+		std::string value = nodeStr(node->getNodeValue());
+		if (name == "controller")
+		{
+			xercesc_3_0::DOMNamedNodeMap* attributes = node->getAttributes();
+			xercesc_3_0::DOMNode* idNode = attributes->getNamedItem(XMLString::transcode("id"));
+			if (!idNode)	continue;
+			std::string skinId = nodeStr(idNode->getNodeValue());
+			if (node->hasChildNodes())
+			{
+				const xercesc_3_0::DOMNodeList* childrenList = node->getChildNodes();
+				for (unsigned int cc = 0; cc < childrenList->getLength(); cc++)
+				{
+					xercesc_3_0::DOMNode* childNode = childrenList->item(cc);
+					std::string childName = nodeStr(childNode->getNodeName());
+					if (childName == "skin")
+					{
+						xercesc_3_0::DOMNamedNodeMap* skinAttributes = childNode->getAttributes();			
+						xercesc_3_0::DOMNode* skinNode = skinAttributes->getNamedItem(XMLString::transcode("source"));	
+						std::string skinSource = nodeStr(skinNode->getNodeValue());
+						skinSource = skinSource.substr(1, skinSource.size() - 1);
+						SkinWeight* skinWeight = new SkinWeight();
+						skinWeight->sourceMesh = skinSource;
+
+						// futhur for children
+						const xercesc_3_0::DOMNodeList* childListOfSkin = childNode->getChildNodes();
+						for (unsigned int cSkin = 0; cSkin < childListOfSkin->getLength(); cSkin++)
+						{
+							xercesc_3_0::DOMNode* childNodeOfSkin = childListOfSkin->item(cSkin);
+							std::string childNameOfSkin = nodeStr(childNodeOfSkin->getNodeName());
+							std::string bindJointName = skinSource + "-skin-joints";
+							std::string bindWeightName = skinSource + "-skin-weights";
+							std::string bindPoseMatName = skinSource + "-skin-bind_poses";
+
+							if (childNameOfSkin == "bind_shape_matrix")
+							{
+								std::string tokenBlock = nodeStr(childNodeOfSkin->getTextContent());
+								float* bindShapeMat = new float[16];
+								for (int i = 0; i < 16; i++)
+									bindShapeMat[i] = (float)atof(tokenize(tokenBlock).c_str());
+								skinWeight->bindShapeMat.set(bindShapeMat);
+								skinWeight->bindShapeMat.transpose();
+							}
+							if (childNameOfSkin == "source")
+							{
+								xercesc_3_0::DOMNamedNodeMap* sourceAttributes = childNodeOfSkin->getAttributes();
+								xercesc_3_0::DOMNodeList* realContentNodeList = childNodeOfSkin->getChildNodes();
+								std::string sourceId = nodeStr(sourceAttributes->getNamedItem(XMLString::transcode("id"))->getNodeValue());
+								for (unsigned int cSource = 0; cSource < realContentNodeList->getLength(); cSource++)
+								{
+									xercesc_3_0::DOMNode* realContentNode = realContentNodeList->item(cSource);
+									std::string realNodeName = nodeStr(realContentNode->getNodeName());		
+
+									std::string tokenBlock = nodeStr(realContentNode->getTextContent());
+									std::string content = tokenize(tokenBlock);
+									int matCounter = 0;
+									float* bindPosMat = new float[16];
+									SrMat* newMat = new SrMat();
+									while (content != "")
+									{
+										if ( sourceId == bindJointName && realNodeName == "Name_array")
+											skinWeight->infJointName.push_back(content);
+										if ( sourceId == bindWeightName && realNodeName == "float_array")
+											skinWeight->bindWeight.push_back((float)atof(content.c_str()));
+										if ( sourceId == bindPoseMatName && realNodeName == "float_array")
+										{
+											bindPosMat[matCounter] = (float)atof(content.c_str());
+											matCounter ++;
+											if (matCounter == 16)
+											{
+												matCounter = 0;
+												newMat->set(bindPosMat);
+												newMat->transpose();
+												skinWeight->bindPoseMat.push_back(*newMat);
+											}
+										}
+										content = tokenize(tokenBlock);
+									}
+								}								
+							} // end of if (childNameOfSkin == "source")
+							if (childNameOfSkin == "vertex_weights")
+							{
+								xercesc_3_0::DOMNodeList* indexNodeList = childNodeOfSkin->getChildNodes();
+								for (unsigned int cVertexWeights = 0; cVertexWeights < indexNodeList->getLength(); cVertexWeights++)
+								{
+									xercesc_3_0::DOMNode* indexNode = indexNodeList->item(cVertexWeights);
+									std::string indexNodeName = nodeStr(indexNode->getNodeName());
+									std::string tokenBlock = nodeStr(indexNode->getTextContent());
+									std::string content = tokenize(tokenBlock);
+									if (indexNodeName == "vcount")
+									{
+										while (content != "")
+										{
+											skinWeight->numInfJoints.push_back(atoi(content.c_str()));
+											content = tokenize(tokenBlock);
+										}											
+									}
+									else if (indexNodeName == "v")
+									{
+										while (content != "")
+										{
+											skinWeight->jointNameIndex.push_back(atoi(content.c_str()));
+											content = tokenize(tokenBlock);
+											skinWeight->weightIndex.push_back(atoi(content.c_str()));
+											content = tokenize(tokenBlock);
+										}											
+									}
+									else continue;
+								}
+							}
+						}
+						char_p->dMesh_p->skinWeights.push_back(skinWeight);
+					}
+				}
+			}
+		}
+	}
+}
+
+void parseNode(xercesc_3_0::DOMNode* node, const char* char_name, mcuCBHandle* mcu_p)
+{
+	int type = node->getNodeType();
+	std::string name = nodeStr(node->getNodeName());
+	std::string value = nodeStr(node->getNodeValue());
+	    
+
+	if (name == "library_controllers" && node->getNodeType() ==  xercesc_3_0::DOMNode::ELEMENT_NODE)
+	{
+		  parseLibraryControllers(node, char_name, mcu_p);
+	}
+	if (node->hasChildNodes())
+	{
+		  const xercesc_3_0::DOMNodeList* list = node->getChildNodes();
+		  for (unsigned int c = 0; c < list->getLength(); c++)
+		  {
+				parseNode(list->item(c), char_name, mcu_p);
+		  }
+	}
+}
+
+
+int mcu_character_load_skinweights( const char* char_name, const char* skin_file, mcuCBHandle* mcu_p )
+{
+	try 
+	{
+		XMLPlatformUtils::Initialize();
+	}
+	catch (const XMLException& toCatch) 
+	{
+		char* message = XMLString::transcode(toCatch.getMessage());
+		std::cout << "Error during initialization! :\n" << message << "\n";
+		XMLString::release(&message);
+		return( CMD_FAILURE );
+	}
+
+	XercesDOMParser* parser = new XercesDOMParser();
+	parser->setValidationScheme(XercesDOMParser::Val_Always);
+	parser->setDoNamespaces(true);    // optional
+
+	ErrorHandler* errHandler = (ErrorHandler*) new HandlerBase();
+	parser->setErrorHandler(errHandler);
+
+	try 
+	{
+		parser->parse(skin_file);
+		xercesc_3_0::DOMDocument* doc = parser->getDocument();
+		parseNode(doc, char_name, mcu_p);
+	}
+	catch (const XMLException& toCatch) 
+	{
+		char* message = XMLString::transcode(toCatch.getMessage());
+		std::cout << "Exception message is: \n" << message << "\n";
+		XMLString::release(&message);
+		return( CMD_FAILURE );
+	}
+	catch (const DOMException& toCatch) {
+		char* message = XMLString::transcode(toCatch.msg);
+		std::cout << "Exception message is: \n" << message << "\n";
+		XMLString::release(&message);
+		return( CMD_FAILURE );
+	}
+		catch (...) {
+		std::cout << "Unexpected Exception \n" ;
+		return( CMD_FAILURE );
+	}
+
+	delete parser;
+	delete errHandler;
+
+	return( CMD_SUCCESS );	
 }
 
 int mcu_character_init( 

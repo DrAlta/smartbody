@@ -33,6 +33,7 @@
 
 #include "mcontrol_util.h"
 #include "me_utilities.hpp"
+#include "sr/sr_model.h"
 
 
 
@@ -106,6 +107,7 @@ SbmPawn::SbmPawn( const char * name )
 
 	skeleton_p( NULL ),
 	scene_p( new SkScene() ),
+	dMesh_p( new DeformableMesh() ),
 	ct_tree_p( MeControllerTreeRoot::create() ),
 	world_offset_writer_p( new MeCtRawWriter() ),
 	wo_cache_timestamp( -std::numeric_limits<float>::max() )
@@ -136,6 +138,7 @@ int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 		ct_tree_p->add_skeleton( skeleton_p->name(), skeleton_p );
 	}
 	scene_p->init( skeleton_p );  // if skeleton_p == NULL, the scene is cleared
+	dMesh_p->skeleton = new_skeleton_p;
 
 	// Name the controllers
 	string ct_name( name );

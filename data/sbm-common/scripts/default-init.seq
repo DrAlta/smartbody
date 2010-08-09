@@ -31,5 +31,13 @@
 
 1	seq default-viewer
 
-1	set test character doctor
+#1	set test character doctor
 1	set test recipient elder
+
+
+###  Loading up smooth bound skin and smooth bound weights
+#2	char homeless init Homeless1.sk
+#2	set character homeless world_offset x 0 y 102 h 0
+#2	char homeless smoothbindmesh e://headShape.obj
+#2	char homeless smoothbindweight e://Homeless.xml
+#2	set test character homeless

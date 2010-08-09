@@ -85,6 +85,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
                    CmdSpinAnim,
 				   CmdCharacterShowGeometry,
 				   CmdCharacterShowCollisionGeometry,
+				   CmdCharacterShowDeformableGeometry,
 				   CmdCharacterShowBones,
 				   CmdCharacterShowAxis,
                  };

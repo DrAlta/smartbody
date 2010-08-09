@@ -122,6 +122,7 @@ void test_1Dspline( void )	{
 
 #include <fltk/glut.h>
 #include "pic.h"
+#include "sr/sr_model.h"
 
 #define ENABLE_DEFAULT_BOOTSTRAP	(1)
 #define DEFAULT_SEQUENCE_FILE		("default.seq")
@@ -438,7 +439,6 @@ void signal_handler(int sig) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
-
 int main( int argc, char **argv )	{
 
 
@@ -737,7 +737,6 @@ int main( int argc, char **argv )	{
 		}
 
 		mcu.theWSP->broadcast_update();
-
 		if( update_sim )	{
 			mcu.update();
 		}

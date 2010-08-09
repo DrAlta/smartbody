@@ -1498,6 +1498,16 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		);
 	} 
 	else 
+	if( char_cmd=="smoothbindmesh" ) {
+		char* obj_file = args.read_token();
+		return mcu_character_load_mesh( char_name.c_str(), obj_file, mcu_p );
+	} 
+	else 
+	if( char_cmd=="smoothbindweight" ) {
+	char* skin_file = args.read_token();
+	return mcu_character_load_skinweights( char_name.c_str(), skin_file, mcu_p );
+	} 
+	else 
 	if( char_cmd=="ctrl" ) {
 		return mcu_character_ctrl_cmd( char_name.c_str(), args, mcu_p );
 	} 

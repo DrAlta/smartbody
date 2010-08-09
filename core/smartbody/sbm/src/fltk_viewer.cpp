@@ -138,6 +138,7 @@ static Fl_Menu_Item MenuTable[] =
   { "&characters", 0, 0, 0, FL_SUBMENU },
          { "&geometry", 0, MCB, CMD(CmdCharacterShowGeometry), FL_MENU_RADIO },
          { "&collision geometry", 0, MCB, CMD(CmdCharacterShowCollisionGeometry),   FL_MENU_RADIO },
+         { "&deformable geometry", 0, MCB, CMD(CmdCharacterShowDeformableGeometry),   FL_MENU_RADIO },
          { "&bones",   0, MCB, CMD(CmdCharacterShowBones),   FL_MENU_RADIO },
          { "&axis",   0, MCB, CMD(CmdCharacterShowAxis),   FL_MENU_RADIO },
          { 0 },
@@ -233,6 +234,7 @@ class FltkViewerData
                               // when the alt key is released but the mouse is pushed
    bool showgeometry;
    bool showcollisiongeometry;
+   bool showdeformablegeometry;
    bool showbones;
    bool showaxis;
 
@@ -405,6 +407,7 @@ void FltkViewer::menu_cmd ( MenuCmd s )
 	  case CmdCharacterShowGeometry:
 						_data->showgeometry = true;
 						_data->showcollisiongeometry = false;
+						_data->showdeformablegeometry = false;
 						_data->showbones = false;
 						_data->showaxis = false;
 						applyToCharacter = true;
@@ -412,6 +415,15 @@ void FltkViewer::menu_cmd ( MenuCmd s )
 	  case CmdCharacterShowCollisionGeometry: 
 						_data->showgeometry = false;
 						_data->showcollisiongeometry = true;
+						_data->showdeformablegeometry = false;
+						_data->showbones = false;
+						_data->showaxis = false;
+						applyToCharacter = true;
+						break;
+	  case CmdCharacterShowDeformableGeometry: 
+						_data->showgeometry = false;
+						_data->showcollisiongeometry = false;
+						_data->showdeformablegeometry = true;
 						_data->showbones = false;
 						_data->showaxis = false;
 						applyToCharacter = true;
@@ -419,6 +431,7 @@ void FltkViewer::menu_cmd ( MenuCmd s )
 	  case CmdCharacterShowBones: 
 						_data->showgeometry = false;
 						_data->showcollisiongeometry = false;
+						_data->showdeformablegeometry = false;
 						_data->showbones = true;
 						_data->showaxis = false;
 						applyToCharacter = true;
@@ -426,6 +439,7 @@ void FltkViewer::menu_cmd ( MenuCmd s )
 	  case CmdCharacterShowAxis: 
 						_data->showgeometry = false;
 						_data->showcollisiongeometry = false;
+						_data->showdeformablegeometry = false;
 						_data->showbones = false;
 						_data->showaxis = true;
 						applyToCharacter = true;
@@ -442,6 +456,7 @@ void FltkViewer::menu_cmd ( MenuCmd s )
 		{	
 			// set the visibility parameters of the scene
 			character->scene_p->set_visibility(_data->showbones,_data->showgeometry, _data->showcollisiongeometry, _data->showaxis);
+			character->dMesh_p->set_visibility(_data->showdeformablegeometry);
 			character = character_map.next();
 		}
 						
@@ -469,6 +484,7 @@ bool FltkViewer::menu_cmd_activated ( MenuCmd c )
       case CmdSpinAnim    : return _data->allowspinanim? true:false;
 	  case CmdCharacterShowGeometry : return _data->showgeometry? true:false;
 	  case CmdCharacterShowCollisionGeometry : return _data->showcollisiongeometry? true:false;
+	  case CmdCharacterShowDeformableGeometry : return _data->showdeformablegeometry? true:false;
 	  case CmdCharacterShowBones : return _data->showbones? true:false;
 	  case CmdCharacterShowAxis : return _data->showaxis? true:false;
       default : return false;

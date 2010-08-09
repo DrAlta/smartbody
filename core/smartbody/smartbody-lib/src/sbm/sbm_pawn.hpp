@@ -35,7 +35,7 @@
 #include <map>
 
 #include "sbm_constants.h"
-
+#include "sbm_deformable_mesh.h"
 
 // Declare classes used (avoid circular references)
 class mcuCBHandle;
@@ -44,7 +44,6 @@ class srArgBuffer;
 
 #define SBM_PAWN_USE_WORLD_OFFSET_WRITER	(1)
 #define SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK	(0)
-
 
 class SbmPawn {
 public:
@@ -84,7 +83,8 @@ protected:
 public:  // TODO - properly encapsulate / privatize the following
     char*           name;
 	SkSkeleton*		skeleton_p;  // MAY BE NULL!!!
-	SkScene*		scene_p;
+	SkScene*		scene_p;	 // Skeleton Scene and Rigid Mesh		
+	DeformableMesh*	dMesh_p;	 // Deformable Mesh using smooth skinning
 
 	// Temporarily, until there is a unified multi-skeleton controller tree
 	MeControllerTreeRoot	*ct_tree_p;

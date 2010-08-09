@@ -1233,6 +1233,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\sbm_deformable_mesh.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\sbm_deformable_mesh.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\sbm_pawn.cpp"
 				>
 			</File>
