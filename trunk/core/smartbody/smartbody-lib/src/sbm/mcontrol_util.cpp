@@ -39,6 +39,8 @@
 
 #include "me_utilities.hpp"
 #include "wsp.h"
+#include "sr/sr_model.h"
+#include "sbm_deformable_mesh.h"
 
 using namespace std;
 using namespace WSP;
@@ -496,6 +498,7 @@ void mcuCBHandle::update( void )	{
 			//char_p->scheduler_p->apply();  // old controller API  See applyBufferToAllSkeletons() above
 //mark( "BEFORESCENEUPDATE", 0, char_p->name );
 			char_p->scene_p->update();
+			char_p->dMesh_p->update();
 //mark( "AFTERSCENEUPDATE", 0, char_p->name );
 
 			if ( net_bone_updates && char_p->skeleton_p && char_p->bonebusCharacter ) {
