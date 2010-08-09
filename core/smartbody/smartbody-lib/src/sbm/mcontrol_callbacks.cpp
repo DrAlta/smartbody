@@ -1002,6 +1002,18 @@ void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, 
 			}
 		}
 	}
+
+	// cache the joint names for each skin weight
+	for (size_t x = 0; x < char_p->dMesh_p->skinWeights.size(); x++)
+	{
+		SkinWeight* skinWeight = char_p->dMesh_p->skinWeights[x];
+		for (size_t j = 0; j < skinWeight->infJointName.size(); j++)
+		{
+			std::string& jointName = skinWeight->infJointName[j];
+			SkJoint* curJoint = char_p->skeleton_p->search_joint(jointName.c_str());
+			skinWeight->infJoint.push_back(curJoint); // NOTE: If joints are added/removed during runtime, this list will contain stale data
+		}
+	}
 }
 
 void parseNode(xercesc_3_0::DOMNode* node, const char* char_name, mcuCBHandle* mcu_p)

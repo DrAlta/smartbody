@@ -11,6 +11,7 @@ class SkinWeight
 {
 public:
 	std::vector<std::string>	infJointName;	// name array
+	std::vector<SkJoint*>		infJoint;         // corresponding joint for each infJointName
 	std::vector<float>			bindWeight;		// weight array
 	std::vector<SrMat>			bindPoseMat;	// each joint, binding pose transformation matrix
 	SrMat						bindShapeMat;	// overall bind shape transformation matrix
