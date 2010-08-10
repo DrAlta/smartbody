@@ -225,6 +225,11 @@ void mcuCBHandle::clear( void )	{
 
 	au_motion_map.clear();
 
+	for (size_t x = 0; x < this->cameraTracking.size(); x++)
+	{
+		delete this->cameraTracking[x];
+	}
+
 	srCmdSeq* seq_p;
 	pending_seq_map.reset();
 	while( seq_p = pending_seq_map.pull() )	{
@@ -534,6 +539,22 @@ void mcuCBHandle::update( void )	{
 
 		}  // end of char_p processing
 	} // end of loop
+
+	// update any tracked cameras
+	for (size_t x = 0; x < this->cameraTracking.size(); x++)
+	{
+		// move the camera relative to the joint
+		SkJoint* joint = this->cameraTracking[x]->joint;
+		joint->skeleton()->update_global_matrices();
+		joint->update_gmat();
+		const SrMat& jointGmat = joint->gmat();
+		SrVec jointLoc(jointGmat[12], jointGmat[13], jointGmat[14]);
+		SrVec target = jointLoc + this->cameraTracking[x]->diff;
+		SrVec eye = target + this->cameraTracking[x]->targetDiff;
+		this->camera_p->center.set( target.x, target.y, target.z);
+		this->camera_p->eye.set( eye.x, eye.y, eye.z);
+		this->viewer_p->set_camera(*( this->camera_p ));
+	}
 }
 
 srCmdSeq* mcuCBHandle::lookup_seq( const char* seq_name ) {
