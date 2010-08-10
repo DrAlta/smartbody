@@ -101,6 +101,13 @@ class SBMCharacterListener
       virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime ) {}
 };
 
+class CameraTrack
+{
+	public:
+		SkJoint* joint;
+		SrVec diff;
+		SrVec targetDiff;
+};
 
 // Motion Controller Utility Callback Handle (Yes, seriously.)
 class mcuCBHandle	{
@@ -191,6 +198,7 @@ class mcuCBHandle	{
 
 		joint_logger::EvaluationLogger* logger_p;
 		ResourceManager*			resource_manager;
+		std::vector<CameraTrack*>	cameraTracking;
 
 	private:
 		// Constant
