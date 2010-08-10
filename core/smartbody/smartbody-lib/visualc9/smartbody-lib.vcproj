@@ -1321,6 +1321,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\time_profiler.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\time_profiler.h"
 				>
 			</File>
