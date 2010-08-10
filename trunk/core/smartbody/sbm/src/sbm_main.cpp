@@ -56,6 +56,8 @@
 #include <sbm/time_regulator.h>
 #include <vhcl_log.h>
 
+//#include "tip.h"
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 #if 0
@@ -216,7 +218,7 @@ int mcu_snapshot_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 		// Allocate a picture buffer 
 		Pic * in = pic_alloc(windowWidth, windowHeight, 3, NULL);
-		LOG("  File to save to: %s\n", output_file.c_str());
+		LOG("  File to save to: %s", output_file.c_str());
 
 		for (int i=windowHeight-1; i>=0; i--) 
 		{
@@ -314,6 +316,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "bmlviewer",    mcu_bmlviewer_func);
 	mcu.insert( "camera",		mcu_camera_func );
 	mcu.insert( "time",			mcu_time_func );
+	mcu.insert( "tip",			mcu_time_ival_prof_func );
 
 	mcu.insert( "load",			mcu_load_func );
 	mcu.insert( "pawn",			SbmPawn::pawn_cmd_func );
@@ -499,7 +502,7 @@ int main( int argc, char **argv )	{
 	SrString	s;
 	for (	i=1; i<argc; i++ )
 	{
-		LOG( "SBM ARG[%d]: '%s'\n", i, argv[i] );
+		LOG( "SBM ARG[%d]: '%s'", i, argv[i] );
 		s = argv[i];
 
 		if( s.search(	"-host=" ) == 0 )  // argument starts with -host=
@@ -696,8 +699,13 @@ int main( int argc, char **argv )	{
 		bool update_sim = mcu.update_timer();
 //		bool update_sim = mcu.update_timer( SBM_get_real_time() );
 
+
+//mcu.mark( "main", 0, "fltk::check" );
+
 		fltk::check();
- 	
+
+//mcu.mark( "main", 0, "ttu_poll" );
+
 #if LINK_VHMSG_CLIENT
 		if( mcu.vhmsg_enabled )	{
 			err = vhmsg::ttu_poll();
@@ -706,6 +714,7 @@ int main( int argc, char **argv )	{
 			}
 		}
 #endif
+
 		// [BMLR] Added to support receiving commands from renderer
 		vector<string> commands = mcu.bonebus.GetCommand();
 		for ( size_t i = 0; i < commands.size(); i++ ) {
@@ -737,11 +746,14 @@ int main( int argc, char **argv )	{
 		}
 
 		mcu.theWSP->broadcast_update();
+
 		if( update_sim )	{
 			mcu.update();
 		}
 
 		mcu.render();
+
+//mcu.mark( "main" );
 	}
 
 	cleanup();

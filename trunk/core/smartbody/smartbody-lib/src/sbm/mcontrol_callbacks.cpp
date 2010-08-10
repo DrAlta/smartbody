@@ -558,14 +558,14 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 /////////////////////////////////////////////////////////////
 
-void print_timer_deprecation_warning( void )	{
+void mcu_print_timer_deprecation_warning( void )	{
 
 	LOG("WARNING: fps/lockdt feature is deprecated");
 	LOG("  - If you insist, be sure to set fps first, then lockdt...");
 	LOG("  - Use 'time sleepfps <fps>' and 'time simfps <fps>' instead");
 }
 
-void print_timer_help( int level = 0 )	{
+void mcu_print_timer_help( int level = 0 )	{
 	
 	if( level == 2 ) {
 		LOG("API help...");
@@ -576,8 +576,7 @@ void print_timer_help( int level = 0 )	{
 		LOG("Full help...");
 	}
 	else	{
-		LOG("HELP: time");
-		
+		LOG("HELP: time");	
 		LOG("  help | fullhelp");
 		LOG("  maxfps | fps <desired-max-fps>	(DEPRECATED)");
 		LOG("  lockdt [0|1]					(DEPRECATED)");
@@ -589,15 +588,6 @@ void print_timer_help( int level = 0 )	{
 		LOG("  step [num-steps]");
 		LOG("  perf [<interval>]");
 		LOG("  print");
-		
-		LOG("  prof enable|disable");
-		LOG("  prof group <name> enable|disable");
-		LOG("  prof suppress|select [<level>]");
-		LOG("  prof threshold <min-detect>|0");
-		LOG("  prof smooth <factor:[0.0,1.0)>");
-		LOG("  prof print|report");
-		LOG("  prof erase|clobber");
-		LOG("  prof test [reps]");
 	}
 }
 
@@ -607,17 +597,17 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		char *time_cmd = args.read_token();
 
 		if( strcmp( time_cmd, "help" ) == 0 )	{
-			print_timer_help();
+			mcu_print_timer_help();
 			return( CMD_SUCCESS );
 		}
 		else
 		if( strcmp( time_cmd, "fullhelp" ) == 0 )	{
-			print_timer_help( 1 );
+			mcu_print_timer_help( 1 );
 			return( CMD_SUCCESS );
 		}
 		else
 		if( strcmp( time_cmd, "api" ) == 0 )	{
-			print_timer_help( 2 );
+			mcu_print_timer_help( 2 );
 			return( CMD_SUCCESS );
 		}
 		else
@@ -640,89 +630,7 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			}
 			return( CMD_SUCCESS );
 		}
-		else
-		if( strcmp( time_cmd, "prof" ) == 0 )	{
 
-			if( mcu_p->profiler_p == NULL )	{
-				LOG( "mcu_time_func NOTICE: %s: TimeIntervalProfiler was NOT REGISTERED\n", time_cmd ); 
-				mcu_p->switch_internal_profiler();
-			}
-			TimeIntervalProfiler *prof_p = mcu_p->profiler_p;
-
-			char *prof_cmd = args.read_token();
-			if( strcmp( prof_cmd, "enable" ) == 0 )	{
-				prof_p->enable( true );
-			}
-			else
-			if( strcmp( prof_cmd, "disable" ) == 0 )	{
-				prof_p->enable( false );
-			}
-			else
-			if( strcmp( prof_cmd, "group" ) == 0 )	{
-				char *group_name = args.read_token();
-				char *group_cmd = args.read_token();
-				if( strcmp( group_cmd, "enable" ) == 0 )	{
-					prof_p->enable( group_name, true );
-				}
-				else
-				if( strcmp( group_cmd, "disable" ) == 0 )	{
-					prof_p->enable( group_name, false );
-				}
-			}
-			else
-			if( strcmp( prof_cmd, "suppress" ) == 0 )	{
-				int level = -1;
-				int n = args.calc_num_tokens();
-				if( n ) level = args.read_int();
-				prof_p->set_suppression( level );
-			}
-			else
-			if( strcmp( prof_cmd, "select" ) == 0 )	{
-				int level = -1;
-				int n = args.calc_num_tokens();
-				if( n ) level = args.read_int();
-				prof_p->set_selection( level );
-			}
-			else
-			if( strcmp( prof_cmd, "threshold" ) == 0 )	{
-				float factor = args.read_float();
-				prof_p->set_threshold( (double)factor );
-			}
-			else
-			if( strcmp( prof_cmd, "smooth" ) == 0 )	{
-				float sm = args.read_float();
-				prof_p->set_smooth( (double)sm );
-			}
-			else
-			if( strcmp( prof_cmd, "print" ) == 0 )	{
-				prof_p->print();
-			}
-			else
-			if( strcmp( prof_cmd, "report" ) == 0 )	{
-				prof_p->report();
-//				prof_p->full_report();
-			}
-			else
-			if( strcmp( prof_cmd, "erase" ) == 0 )	{
-				prof_p->erase();
-			}
-			else
-			if( strcmp( prof_cmd, "clobber" ) == 0 )	{
-				prof_p->clobber();
-			}
-			else
-			if( strcmp( prof_cmd, "test" ) == 0 )	{
-				mcu_p->mark( "mcu_time_func", 0, "test" );
-				int reps = args.read_int();
-				prof_p->test_clock( reps );
-				mcu_p->mark( "mcu_time_func" );
-			}
-			else {
-				return( CMD_NOT_FOUND );
-			}
-			return( CMD_SUCCESS );
-		}
-		
 		if( mcu_p->timer_p == NULL )	{
 			LOG( "mcu_time_func NOTICE: %s: TimeRegulator was NOT REGISTERED\n", time_cmd );
 			mcu_p->switch_internal_profiler(); 
@@ -734,12 +642,12 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		}
 		else 
 		if( ( strcmp( time_cmd, "maxfps" ) == 0 ) || ( strcmp( time_cmd, "fps" ) == 0 ) )	{ // deprecate
-			print_timer_deprecation_warning();
+			mcu_print_timer_deprecation_warning();
 			timer_p->set_sleep_fps( args.read_float() );
 		}
 		else
 		if( strcmp( time_cmd, "lockdt" ) == 0 )	{ // deprecate
-			print_timer_deprecation_warning();
+			mcu_print_timer_deprecation_warning();
 			int enable = true;
 			int n = args.calc_num_tokens();
 			if( n ) enable = args.read_int();
@@ -808,6 +716,134 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	}
 	return( CMD_FAILURE );
 }
+
+/////////////////////////////////////////////////////////////
+
+void mcu_print_profiler_help( int level = 0 )	{
+	
+	if( level == 2 ) {
+		LOG("API help...");
+	}
+	else
+	if( level == 1 )	{
+		LOG("Full help...");
+	}
+	else	{
+		LOG("HELP: tip");	
+		LOG("  help | fullhelp");
+		LOG("  enable|disable");
+		LOG("  group <name> enable|disable");
+		LOG("  suppress|select [<level>]");
+		LOG("  threshold <min-detect>|0");
+		LOG("  smooth <factor:[0.0,1.0)>");
+		LOG("  print|report");
+		LOG("  erase|clobber");
+		LOG("  test [reps]");
+	}
+}
+
+int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
+	
+	if( mcu_p )	{
+		char *tip_cmd = args.read_token();
+
+		if( strcmp( tip_cmd, "help" ) == 0 )	{
+			mcu_print_profiler_help();
+			return( CMD_SUCCESS );
+		}
+		else
+		if( strcmp( tip_cmd, "fullhelp" ) == 0 )	{
+			mcu_print_profiler_help( 1 );
+			return( CMD_SUCCESS );
+		}
+		else
+		if( strcmp( tip_cmd, "api" ) == 0 )	{
+			mcu_print_profiler_help( 2 );
+			return( CMD_SUCCESS );
+		}
+
+		if( mcu_p->profiler_p == NULL )	{
+			LOG( "mcu_time_ival_prof_func NOTICE: %s: TimeIntervalProfiler was NOT REGISTERED\n", tip_cmd ); 
+			mcu_p->switch_internal_profiler();
+		}
+		TimeIntervalProfiler *prof_p = mcu_p->profiler_p;
+
+		if( strcmp( tip_cmd, "enable" ) == 0 )	{
+			prof_p->enable( true );
+		}
+		else
+		if( strcmp( tip_cmd, "disable" ) == 0 )	{
+			prof_p->enable( false );
+		}
+		else
+		if( strcmp( tip_cmd, "group" ) == 0 )	{
+			char *group_name = args.read_token();
+			char *group_cmd = args.read_token();
+			if( strcmp( group_cmd, "enable" ) == 0 )	{
+				prof_p->enable( group_name, true );
+			}
+			else
+			if( strcmp( group_cmd, "disable" ) == 0 )	{
+				prof_p->enable( group_name, false );
+			}
+		}
+		else
+		if( strcmp( tip_cmd, "suppress" ) == 0 )	{
+			int level = -1;
+			int n = args.calc_num_tokens();
+			if( n ) level = args.read_int();
+			prof_p->set_suppression( level );
+		}
+		else
+		if( strcmp( tip_cmd, "select" ) == 0 )	{
+			int level = -1;
+			int n = args.calc_num_tokens();
+			if( n ) level = args.read_int();
+			prof_p->set_selection( level );
+		}
+		else
+		if( strcmp( tip_cmd, "threshold" ) == 0 )	{
+			float factor = args.read_float();
+			prof_p->set_threshold( (double)factor );
+		}
+		else
+		if( strcmp( tip_cmd, "smooth" ) == 0 )	{
+			float sm = args.read_float();
+			prof_p->set_smooth( (double)sm );
+		}
+		else
+		if( strcmp( tip_cmd, "print" ) == 0 )	{
+			prof_p->print();
+		}
+		else
+		if( strcmp( tip_cmd, "report" ) == 0 )	{
+			prof_p->report();
+//			prof_p->full_report();
+		}
+		else
+		if( strcmp( tip_cmd, "erase" ) == 0 )	{
+			prof_p->erase();
+		}
+		else
+		if( strcmp( tip_cmd, "clobber" ) == 0 )	{
+			prof_p->clobber();
+		}
+		else
+		if( strcmp( tip_cmd, "test" ) == 0 )	{
+			mcu_p->mark( "mcu_tip_func", 0, "test" );
+			int reps = args.read_int();
+			prof_p->test_clock( reps );
+			mcu_p->mark( "mcu_tip_func" );
+		}
+		else {
+			return( CMD_NOT_FOUND );
+		}
+		return( CMD_SUCCESS );
+	}
+	return( CMD_FAILURE );
+}
+
+///////////////////////////////////////////////////////////////////
 
 int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHandle *mcu_p)
 {

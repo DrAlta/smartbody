@@ -51,6 +51,7 @@ int mcu_viewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_bmlviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 //int mcu_character_func( srArgBuffer& args, mcuCBHandle *mcu_p );  // Old version... See SbmCharacter::character_cmd_func
 
