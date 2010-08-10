@@ -25,6 +25,7 @@
 
 #include "bml.hpp"
 
+#include "vhcl.h"
 #include <cstdlib>
 #include <iostream>
 #include <algorithm>
@@ -402,7 +403,7 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 	for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i ) {
 		BehaviorRequestPtr behavior = *i;
 
-		cerr << "Realizing behavior " << behavior->unique_id << endl;
+		LOG("Realizing behavior %s", behavior->unique_id.c_str());
 		behavior->realize( request, mcu );
 
 #if USE_CUSTOM_PRUNE_POLICY
