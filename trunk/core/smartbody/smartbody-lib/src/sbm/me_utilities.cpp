@@ -179,14 +179,14 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			string filebase = basename( pathname );
 			const char* name = motion->name();
 			if( name && _stricmp( filebase.c_str(), name ) ) {
-				cerr << "WARNING: Motion name \"" << name << "\" does not equal base of filename \"" << pathname.native_file_string() << "\".  Using \"" << filebase << "\" in posture map." << endl;
+				LOG("WARNING: Motion name \"%s\" does not equal base of filename '%s'. Using '%s' in posture map.", name, pathname.native_file_string().c_str(), filebase.c_str());
 				motion->name( filebase.c_str() );
 			}
 			motion->filename( pathname.native_file_string().c_str() );
 
 			std::map<std::string, SkMotion*>::iterator motionIter = map.find(filebase);
 			if (motionIter != map.end()) {
-				cerr << "ERROR: Motion by name of \"" << filebase << "\" already exists.  Ignoring file \"" << pathname.native_file_string() << "\"." << endl;
+				LOG("ERROR: Motion by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
 				motion->unref();
 				return CMD_FAILURE;
 			}

@@ -20,6 +20,7 @@
  *      Jingqiao Fu, USC
  */
 
+#include "vhcl.h"
 #include <iostream>
 #include <string>
 
@@ -89,7 +90,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	if(arg=="initialize")
 	{
 		mcu_p->use_locomotion = true;
-		cout << "Locomotion engine has been initialized." << endl;
+		LOG("Locomotion engine has been initialized.");
 
 		return CMD_SUCCESS;
 	}
@@ -99,47 +100,47 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		string name = args.read_token();
 		actor = mcu_p->character_map.lookup( name );
 		if( actor == NULL ) {
-			cerr << "ERROR: Could not find character \""<<name<<"\"." <<endl;
+			LOG("ERROR: Could not find character \"%s\".", name.c_str());
 			return CMD_FAILURE;
 		}
 
 		arg = args.read_token();
 	} else {
 		if( mcu_p->test_character_default.empty() ) {
-			cerr << "ERROR: No character specified, and no default set." <<endl;
+			LOG("ERROR: No character specified, and no default set.");
 			return CMD_FAILURE;
 		}
 		actor = mcu_p->character_map.lookup( mcu_p->test_character_default );
 		if( actor == NULL ) {
-			cerr << "ERROR: Could not find default character \""<<mcu_p->test_character_default<<"\"." <<endl;
+			LOG("ERROR: Could not find default character \"%s\".", mcu_p->test_character_default.c_str());
 			return CMD_FAILURE;
 		}
 	}
 
 	if(!actor->is_locomotion_controller_initialized()) 
 	{
-		cerr << "ERROR: Locomotion controller not initialized." << endl;
+		LOG("ERROR: Locomotion controller not initialized.");
 		return CMD_FAILURE;
 	}
 
 	if(arg=="enable")
 	{
 		actor->get_locomotion_ct()->enabled = true;
-		cout << "Locomotion engine has been enabled." << endl;
+		LOG("Locomotion engine has been enabled.");
 
 		return CMD_SUCCESS;
 	}
 	else if(arg=="disable")
 	{
 		actor->get_locomotion_ct()->enabled = false;
-		cout << "Locomotion engine has been disabled." << endl;
+		LOG("Locomotion engine has been disabled.");
 
 		return CMD_SUCCESS;
 	}
 
 	if(!actor->is_locomotion_controller_enabled()) 
 	{
-		cerr << "ERROR: Locomotion controller not enabled." << endl;
+		LOG("ERROR: Locomotion controller not enabled.");
 		return CMD_FAILURE;
 	}
 
@@ -183,7 +184,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		}
 		else 
 		{
-			cerr << "Please specify the speed. (example:'spd 50')" <<endl;
+			LOG("Please specify the speed. (example:'spd 50')");
 			return CMD_FAILURE;
 		}
 		nav_circle->init( direction.x, direction.y, direction.z, 0.0f, 0.0f, -1, 0, 0, 0 );
@@ -286,7 +287,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 				arg = args.read_token();
 			} 
 			else {
-				cerr << "ERROR: Unexpected token \""<<arg << "\"." <<endl;
+				LOG("ERROR: Unexpected token \"%s\"", arg);
 				return CMD_FAILURE;
 			}
 			

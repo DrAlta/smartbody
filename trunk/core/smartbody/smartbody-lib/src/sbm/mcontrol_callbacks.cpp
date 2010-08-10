@@ -543,12 +543,89 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				mcu_p->viewer_p->set_camera( *( mcu_p->camera_p ) );
 			}
 			else
+			if( strcmp( cam_cmd, "track" ) == 0 )	{
+				char* name = args.read_token();
+				if (!name || strcmp(name, "") == 0)
+				{
+					if (mcu_p->cameraTracking.size() > 0)
+					{
+						for (std::vector<CameraTrack*>::iterator iter = mcu_p->cameraTracking.begin();
+							 iter != mcu_p->cameraTracking.end();
+							 iter++)
+						{
+							CameraTrack* cameraTrack = (*iter);
+							delete cameraTrack;
+						}
+						mcu_p->cameraTracking.clear();
+						LOG("Removing current tracked object.");
+						return( CMD_SUCCESS );
+					}
+					LOG("Need to specify an object and a joint to track.");
+					return( CMD_FAILURE );
+				}
+				SbmPawn* pawn = mcu_p->pawn_map.lookup(name);
+				if (!pawn)
+				{
+					pawn = mcu_p->character_map.lookup(name);
+					if (!pawn)
+					{
+						LOG("Object %s was not found, cannot track.", name);
+						return( CMD_FAILURE );
+					}
+				}
+				char* jointName = args.read_token();
+				if (!jointName || strcmp(jointName, "") == 0)
+				{
+					LOG("Need to specify a joint to track.");
+					return( CMD_FAILURE );
+				}
+				SkSkeleton* skeleton = NULL;
+				skeleton = pawn->skeleton_p;
+
+				SkJoint* joint = pawn->skeleton_p->search_joint(jointName);
+				if (!joint)
+				{
+					LOG("Could not find joint %s on object %s.", jointName, name);
+					return( CMD_FAILURE );
+				}
+	
+				if (mcu_p->cameraTracking.size() > 0)
+				{
+					for (std::vector<CameraTrack*>::iterator iter = mcu_p->cameraTracking.begin();
+							 iter != mcu_p->cameraTracking.end();
+							 iter++)
+					{
+						CameraTrack* cameraTrack = (*iter);
+						delete cameraTrack;
+					}
+					mcu_p->cameraTracking.clear();
+					LOG("Removing current tracked object.");
+				}
+				joint->skeleton()->update_global_matrices();
+				joint->update_gmat();
+				const SrMat& jointMat = joint->gmat();
+				SrVec vec(jointMat[12], jointMat[13], jointMat[14]);
+				CameraTrack* cameraTrack = new CameraTrack();
+				cameraTrack->joint = joint;
+				cameraTrack->diff = mcu_p->camera_p->center - vec;
+				LOG("Vector from joint to target is %f %f %f", cameraTrack->diff.x, cameraTrack->diff.y, cameraTrack->diff.z);
+				cameraTrack->targetDiff = mcu_p->camera_p->eye - mcu_p->camera_p->center;
+				LOG("Vector from target to eye is %f %f %f", cameraTrack->targetDiff.x, cameraTrack->targetDiff.y, cameraTrack->targetDiff.z);				
+				mcu_p->cameraTracking.push_back(cameraTrack);
+				LOG("Object %s will now be tracked at joint %s.", name, jointName);
+				
+			}
+			else
 			if( strcmp( cam_cmd, "default" ) == 0 )	{
 				int preset = args.read_int();
 				
 				if( preset == 1 )	{
 					mcu_p->viewer_p->view_all();
 				}
+			}
+			else if (strcmp( cam_cmd, "reset" ) == 0 ) {
+				mcu_p->execute("camera eye 0 166 185");
+				mcu_p->execute("camera center 0 92 0");
 			}
 			return( CMD_SUCCESS );
 		}
@@ -1546,7 +1623,7 @@ int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	} else if( type=="neutral" ) {
 		const string motion_name = args.read_token();
 		if( motion_name.length()==0 ) {
-			cerr << "ERROR: Missing motion name." << endl;
+			LOG("ERROR: Missing motion name.");
 			return CMD_FAILURE;
 		}
 
@@ -1557,11 +1634,11 @@ int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			mcu_p->face_neutral_p = motion_p;
 			return CMD_SUCCESS;
 		} else {
-			cerr << "ERROR: Unknown motion \"" << motion_name << "\"." << endl;
+			LOG("ERROR: Unknown motion \"%s\".", motion_name.c_str());
 			return CMD_FAILURE;
 		}
 	} else {
-		cerr << "ERROR: Unknown command \"set face "<<type<<"\"." << endl;
+		LOG("ERROR: Unknown command \"set face %s.", type.c_str());
 		return CMD_NOT_FOUND;
 	}
 }

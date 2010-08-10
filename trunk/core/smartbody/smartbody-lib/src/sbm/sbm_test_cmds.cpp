@@ -67,7 +67,7 @@ int sbm_set_test_func( srArgBuffer& args, mcuCBHandle *mcu  ) {
 		}
 		return CMD_SUCCESS;
 	} else {
-		cerr << "ERROR: Unrecogized test variable \"" << arg << "\"." << endl;
+		LOG("ERROR: Unrecogized test variable \"%s\".", arg.c_str());
 		return CMD_NOT_FOUND;
 	}
 }
@@ -385,13 +385,13 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 	} else if( arg=="anim" || arg=="animation") { //  anim[ation] <animation name>
 		string anim = args.read_token();
 		if( anim.length()==0 ) {
-			cerr << "ERROR: test bml " << arg << ": Missing animation name." << endl;
+			LOG("ERROR: test bml %s: Missing animation name.", arg.c_str());
 			return CMD_FAILURE;
 		}
 
 		std::map<std::string, SkMotion*>::iterator motionIter = mcu->motion_map.find(anim);
 		if (motionIter == mcu->motion_map.end()) {
-			cerr << "WARNING: Unknown animation \""<<anim<<"\"." <<endl;
+			LOG("WARNING: Unknown animation \"%s\".", anim.c_str());
 		}
 
 		ostringstream bml;
@@ -405,13 +405,13 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 	} else if( arg=="posture") { // posture <posture name>
 		string posture = args.read_token();
 		if( posture.length()==0 ) {
-			cerr << "ERROR: test bml " << arg << ": Missing posture name." << endl;
+			LOG("ERROR: test bml %s Missing posture name.", arg.c_str());
 			return CMD_FAILURE;
 		}
 
 		std::map<std::string, SkPosture*>::iterator postureIter = mcu->pose_map.find(posture);
 		if (postureIter == mcu->pose_map.end()) {
-			cerr << "WARNING: Unknown posture \""<<posture<<"\"." <<endl;
+			LOG("WARNING: Unknown posture \"%s\".", posture.c_str());
 		}
 
 		ostringstream bml;
