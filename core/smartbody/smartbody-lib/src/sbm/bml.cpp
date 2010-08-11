@@ -23,9 +23,10 @@
  *      Ed Fast, USC
  */
 
+#include "vhcl.h"
+
 #include "bml.hpp"
 
-#include "vhcl.h"
 #include <cstdlib>
 #include <iostream>
 #include <algorithm>
