@@ -136,6 +136,7 @@ int sbm_vhmsg_send_func( srArgBuffer & args, mcuCBHandle * mcu_p )
 SMARTBODY_DLL_API Smartbody_dll::Smartbody_dll() :
    m_internalListener( NULL )
 {
+   vhcl::Log::g_log.AddListener( new vhcl::Log::DebuggerListener() );
 }
 
 
