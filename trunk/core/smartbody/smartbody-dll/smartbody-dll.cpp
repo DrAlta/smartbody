@@ -100,6 +100,8 @@ int sbm_main_func( srArgBuffer & args, mcuCBHandle * mcu_p )
          break;
       case CMD_SUCCESS:
          break;
+      default:
+         break;
    }
 
    return CMD_SUCCESS;
@@ -127,8 +129,8 @@ int mcu_reset_func( srArgBuffer & args, mcuCBHandle * mcu_p )
 // static function taken from sbm_main.cpp
 int sbm_vhmsg_send_func( srArgBuffer & args, mcuCBHandle * mcu_p )
 {
-   char * cmdName = args.read_token();
-   char * cmdArgs = args.read_remainder_raw();
+   const char * cmdName = args.read_token();
+   const char * cmdArgs = args.read_remainder_raw();
    return mcu_p->vhmsg_send( cmdName, cmdArgs );
 }
 
@@ -244,7 +246,7 @@ SMARTBODY_DLL_API SmartbodyCharacter Smartbody_dll::GetCharacter( const string &
 
    SmartbodyCharacter c;
 
-   SbmCharacter * char_p = mcu.character_map.lookup( name );
+   const SbmCharacter * char_p = mcu.character_map.lookup( name );
    if ( char_p )
    {
       const SkJoint * joint = char_p->get_world_offset_joint();
@@ -277,7 +279,8 @@ SMARTBODY_DLL_API SmartbodyCharacter Smartbody_dll::GetCharacter( const string &
 
       for ( int i = 0; i < joints.size(); i++ )
       {
-         SkJoint * j = joints[ i ];
+         // const_cast because the SrQuat does validation (no const version of value())
+         SkJoint * j = (SkJoint *)joints.const_get( i );
 
          SrQuat q = j->quat()->value();
 
