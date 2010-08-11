@@ -806,16 +806,20 @@ void mcu_print_profiler_help( int level = 0 )	{
 		LOG("Full help...");
 	}
 	else	{
-		LOG("HELP: tip");	
-		LOG("  help | fullhelp");
-		LOG("  enable|disable");
-		LOG("  group <name> enable|disable");
-		LOG("  suppress|select [<level>]");
-		LOG("  threshold <min-detect>|0");
-		LOG("  smooth <factor:[0.0,1.0)>");
-		LOG("  print|report");
-		LOG("  erase|clobber");
-		LOG("  test [reps]");
+		LOG( "HELP: tip" );	
+		LOG( "  help | fullhelp | legend" );
+		LOG( "  on | off | enable | disable | preload" );
+		LOG( "  group <name> enable | disable | preload" );
+		LOG( "  suppress | select [<level>]" );
+		LOG( "  threshold <factor> | 0" );
+		LOG( "  override <fixed-dt> | 0" );
+		LOG( "  dynamic <sniff> <avoid>" );
+		LOG( "  sniff <sniff:[0.0,1.0)>" );
+		LOG( "  avoid <avoid:(1.0,...)>" );
+		LOG( "  decay <factor:[0.0,1.0)>" );
+		LOG( "  print | report" );
+		LOG( "  erase | clobber" );
+		LOG( "  test [reps]" );
 	}
 }
 
@@ -845,12 +849,20 @@ int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		}
 		TimeIntervalProfiler *prof_p = mcu_p->profiler_p;
 
-		if( strcmp( tip_cmd, "enable" ) == 0 )	{
+		if( strcmp( tip_cmd, "legend" ) == 0 ) {
+			prof_p->print_legend();
+		}
+		else 
+		if( ( strcmp( tip_cmd, "enable" ) == 0 )||( strcmp( tip_cmd, "on" ) == 0 ) )	{
 			prof_p->enable( true );
 		}
 		else
-		if( strcmp( tip_cmd, "disable" ) == 0 )	{
+		if( ( strcmp( tip_cmd, "disable" ) == 0 )||( strcmp( tip_cmd, "off" ) == 0 ) )	{
 			prof_p->enable( false );
+		}
+		else
+		if( strcmp( tip_cmd, "preload" ) == 0 )	{
+			prof_p->preload();
 		}
 		else
 		if( strcmp( tip_cmd, "group" ) == 0 )	{
@@ -862,6 +874,10 @@ int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			else
 			if( strcmp( group_cmd, "disable" ) == 0 )	{
 				prof_p->enable( group_name, false );
+			}
+			else
+			if( strcmp( group_cmd, "preload" ) == 0 )	{
+				prof_p->preload( group_name );
 			}
 		}
 		else
@@ -884,9 +900,30 @@ int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			prof_p->set_threshold( (double)factor );
 		}
 		else
-		if( strcmp( tip_cmd, "smooth" ) == 0 )	{
+		if( strcmp( tip_cmd, "override" ) == 0 )	{
+			float value = args.read_float();
+			prof_p->set_override( (double)value );
+		}
+		else
+		if( strcmp( tip_cmd, "dynamic" ) == 0 )	{
+			float sniff = args.read_float();
+			float avoid = args.read_float();
+			prof_p->set_dynamic( (double)sniff, (double)avoid );
+		}
+		else
+		if( strcmp( tip_cmd, "sniff" ) == 0 )	{
+			float value = args.read_float();
+			prof_p->set_sniff( (double)value );
+		}
+		else
+		if( strcmp( tip_cmd, "avoid" ) == 0 )	{
+			float value = args.read_float();
+			prof_p->set_avoid( (double)value );
+		}
+		else
+		if( strcmp( tip_cmd, "decay" ) == 0 )	{
 			float sm = args.read_float();
-			prof_p->set_smooth( (double)sm );
+			prof_p->set_decay( (double)sm );
 		}
 		else
 		if( strcmp( tip_cmd, "print" ) == 0 )	{

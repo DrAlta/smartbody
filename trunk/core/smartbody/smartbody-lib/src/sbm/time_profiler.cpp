@@ -23,47 +23,41 @@
 #include <math.h>
 #include "sbm/time_profiler.h"
 
-/*
-
-	@	- profile Active
-	*	- *spike reported in active profile
-	<>	- priority level
-	()	- (2)==(number of items, or items)
-	[]	- percent
-	T	- report Time
-	i	- raw Interval
-	R	- Running average
-	D	- Decaying average
-	F	- % of whole Frame time taken up by interval or group
-	G	- % of Group time taken up by interval
-	M(reps)	- % of interval taken up by Maximum repetition (if reps>1)
-
-*/
-
 ////////////////////////////////////////////////////////////////////////////////////////
+
+void TimeIntervalProfiler::print_legend( void )	{
+	
+	printf( "TIP <> legend:" );								printf( "\n" );
+	printf( "@	- profile Active" );						printf( "\n" );
+	printf( "*	- *spike reported in active profile" );		printf( "\n" );
+	printf( "<>	- priority level" );						printf( "\n" );
+	printf( "()	- (2)==(number of items, or items)" );		printf( "\n" );
+	printf( "[]	- percent" );					printf( "\n" );
+	printf( "T	- event Time" );				printf( "\n" );
+	printf( "i	- raw Interval" );				printf( "\n" );
+	printf( "R	- Running average" );			printf( "\n" );
+	printf( "D	- Decaying average" );			printf( "\n" );
+	printf( "F	- %% of whole Frame taken up by interval or group" );	printf( "\n" );
+	printf( "G	- %% of whole Group time taken up by interval" );		printf( "\n" );
+	printf( "M(rep)	- %% of interval taken up by Maximum repetition" );	printf( "\n" );
+}
 
 void TimeIntervalProfiler::print_group( group_entry_t *group_p )	{
 
 	if( group_p )	{
-//		printf( "  group: %s %s\n", group_p->name, group_p->enabled ? "ENABLED" : "DISABLED" );
+
 		printf( "  GRP: %s(%d) :%s\n", group_p->name, group_p->active_profile_count, group_p->enabled ? "ENABLED" : "DISABLED" );
 		for( int i=0; i< group_p->profile_arr_count; i++ )	{
+
 			profile_entry_t* profile_p = group_p->profile_p_arr[ i ];
 			if( profile_p ) {
-#if 0
+
 				printf( "%s   <%d>: %s T:%.4f\n", 
-					( profile_p->intra_count > 0 ) ? "@" : " ", 
+					( ( profile_p->reset == false )&&( profile_p->intra_count > 0 ) ) ? "@" : " ", 
 					profile_p->level, 
 					profile_p->label,
-					profile_p->update_time
+					profile_p->event_time
 				);
-#else
-				printf( "%s   <%d>: %s\n", 
-					( profile_p->intra_count > 0 ) ? "@" : " ", 
-					profile_p->level, 
-					profile_p->label 
-				);
-#endif
 			}
 		}
 	}
@@ -75,12 +69,12 @@ void TimeIntervalProfiler::print_data( void )	{
 	printf( "  suppress: %d\n", suppression );
 	printf( "    select: %d\n", selection );
 	printf( " threshold: %f\n", threshold );
-	printf( "     decay: %f\n", smooth_factor );
+	printf( "     decay: %f\n", decaying_factor );
 	printf( "   running: %f\n", MAX_ROLLING );
-//			printf( "   dynamic: %s\n", dyn_threshold ? "true" : "false" );
-//			printf( "       sniff: %s\n",  );
-//			printf( "       avoid: %s\n",  );
-//			printf( "  override: %s\n",  );
+	printf( "   dynamic: %s\n", dyn_threshold ? "true" : "false" );
+	printf( "       sniff: %f\n", dyn_sniff );
+	printf( "       avoid: %f\n", dyn_avoid );
+	printf( "  override: %f\n", fix_threshold );
 	printf( "--\n" );
 	printf( "TIP groups(%d):\n", group_arr_count );
 	for( int i=0; i< group_arr_count; i++ )	{
@@ -109,13 +103,13 @@ void TimeIntervalProfiler::print_profile_report( char *prefix, profile_entry_t *
 			100.0 * profile_p->max_intra_dt / profile_p->interval_dt
 		);
 	}
-	printf( 
-		"%s \n",
-		profile_p->label
-	);
-	// if( profile_p->spiked ) printf( "T:%.4f" );
-	// printf( "\n" );
+	printf( "%s ", profile_p->label );
+	if( profile_p->spike ) {
+			printf( "T:%.4f", profile_p->event_time );
+	}
+	printf( "\n" );
 }
+
 void TimeIntervalProfiler::print_group_report( const char *prefix, group_entry_t* group_p )	{
 
 	printf( 
@@ -173,8 +167,8 @@ void TimeIntervalProfiler::accum_profile( profile_entry_t *profile_p )	{
 	}
 	else	{
 		profile_p->decay_dt =
-			smooth_factor * profile_p->decay_dt +
-			( 1.0 - smooth_factor ) * profile_p->interval_dt;
+			decaying_factor * profile_p->decay_dt +
+			( 1.0 - decaying_factor ) * profile_p->interval_dt;
 	}
 	
 	profile_p->accum_roll_dt += profile_p->interval_dt;
@@ -194,23 +188,31 @@ void TimeIntervalProfiler::accum_profile( profile_entry_t *profile_p )	{
 
 bool TimeIntervalProfiler::check_profile_spike( profile_entry_t *profile_p )	{
 
-#if 0
-	// harsh
-	if(
-		( profile_p->intra_count > 1 )&&
-		( profile_p->max_intra_dt > ( profile_p->prev_dt * threshold ) )
-	)	{
-		return( true );
+	if( fix_threshold > 0.0 )	{
+		if( profile_p->interval_dt > fix_threshold )	{
+			return( true );
+		}
 	}
-#endif
-	// smooth harsh
-	if( profile_p->interval_dt > ( profile_p->decay_dt * threshold ) )	{
-		return( true );
-	}
+	else	{
 
-	// fair
-	if( profile_p->interval_dt > ( profile_p->roll_dt * threshold ) )	{
-		return( true );
+		// harsh
+#if 0
+		if(
+			( profile_p->intra_count > 1 )&&
+			( profile_p->max_intra_dt > ( profile_p->prev_dt * threshold ) )
+		)	{
+			return( true );
+		}
+#endif
+		// smooth harsh
+		if( profile_p->interval_dt > ( profile_p->decay_dt * threshold ) )	{
+			return( true );
+		}
+
+		// fair
+		if( profile_p->interval_dt > ( profile_p->roll_dt * threshold ) )	{
+			return( true );
+		}
 	}
 	return( false );
 }
@@ -229,11 +231,36 @@ bool TimeIntervalProfiler::check_profile_show( int level )	{
 
 ///////////////////////////////////////////////////
 
-void TimeIntervalProfiler::reset( double time ) {
+void TimeIntervalProfiler::update( double time ) {
 
 	double prev_time = reset_time;
 	reset_time = time;
 	reset_dt = time - prev_time;
+
+// Close hanging intervals, check arrays:
+	if( enabled )	{
+		for( int i=0; i< group_arr_count; i++ ) {
+
+			group_entry_t *group_p = group_p_arr[ i ];
+			if( group_p == NULL ) {
+				printf( "TimeIntervalProfiler::update ERR: NULL group_p in group_p_arr[ %d ]\n", i );
+				return;
+			}
+			for( int j=0; j< group_p->profile_arr_count; j++ ) {
+
+				profile_entry_t *profile_p = group_p->profile_p_arr[ j ];
+				if( profile_p == NULL ) {
+					printf( "TimeIntervalProfiler::update ERR: NULL profile_p in group_p_arr[ %d ][ %d ]\n", i, j );
+					return;
+				}
+			}
+			if( group_p->enabled )	{
+				if( group_p->open ) {  // close...
+					mark_time( group_p->name, time );
+				}
+			}
+		}
+	}
 
 	if( req_print ) {
 		print_data();
@@ -244,164 +271,189 @@ void TimeIntervalProfiler::reset( double time ) {
 	if( reporting )  {
 
 		printf( "TIP <> report:\n" );
-		printf( "PREVIOUS:\n" );
-		for( int i=active_group_count; i< group_arr_count; i++ ) {
+		printf( "PREVIOUS GROUPS:\n" );
+		for( int i=0; i< group_arr_count; i++ ) {
 
 			group_entry_t *group_p = group_p_arr[ i ];
-//			printf( "  GRP: %s: %s\n", group_p->enabled ? "ENABLED" : "DISABLED", group_p->name );
-//			printf( "  GRP: %s() :%s\n", group_p->name, group_p->enabled ? "ENABLED" : "DISABLED" );
-			printf( "  GRP: %s(%d) :%s\n", 
-				group_p->name, 
-				group_p->active_profile_count, 
-				group_p->enabled ? "ENABLED" : "DISABLED" 
-			);
+			if( group_p->reset == true ) {
 
-			for( int j=group_p->active_profile_count; j< group_p->profile_arr_count; j++ ) {
+				printf( "  GRP: %s(%d) :%s\n", 
+					group_p->name, 
+					group_p->active_profile_count, 
+					group_p->enabled ? "ENABLED" : "DISABLED" 
+				);
+				for( int j=0; j< group_p->profile_arr_count; j++ ) {
 
-				profile_entry_t *profile_p = group_p->profile_p_arr[ j ];
-				if( profile_p->intra_count > 0 )	{
-					print_profile_report( " ", profile_p );
+					profile_entry_t *profile_p = group_p->profile_p_arr[ j ];
+					if( profile_p->intra_count > 0 )	{
+
+						print_profile_report( " ", profile_p );
+					}
+				}
+				print_group_report( " ", group_p );
+			}
+		}
+
+		printf( "PREVIOUS PROFILES:\n" );
+		for( int i=0; i< group_arr_count; i++ ) {
+
+			group_entry_t *group_p = group_p_arr[ i ];
+			if( group_p->reset == false ) {
+
+				bool found_prev = false;
+				for( int j=0; !found_prev &&( j< group_p->profile_arr_count ); j++ ) {
+					if( group_p->profile_p_arr[ j ]->reset == true ) found_prev = true;
+				}
+				if( found_prev )	{
+
+					printf( "  GRP: %s(%d) :%s\n", 
+						group_p->name, 
+						group_p->active_profile_count, 
+						group_p->enabled ? "ENABLED" : "DISABLED" 
+					);
+					for( int j=0; j< group_p->profile_arr_count; j++ ) {
+
+						profile_entry_t *profile_p = group_p->profile_p_arr[ j ];
+						if( profile_p->reset == true )	{
+
+							if( profile_p->intra_count > 0 )	{
+								print_profile_report( " ", profile_p );
+							}
+						}
+					}
+					print_group_report( " ", group_p );
 				}
 			}
-			print_group_report( " ", group_p );
 		}
 	}
 
 	if( enabled )	{
 
 	// Accumulate:
-		for( int i=0; i< active_group_count; i++ ) {
+		for( int i=0; i< group_arr_count; i++ ) {
 
 			group_entry_t *group_p = group_p_arr[ i ];
-			if( group_p == NULL ) {
-				std::cout 
-					<< "TimeIntervalProfiler::reset ERR: NULL group_p in group_p_arr[ " 
-					<< i << "]" 
-					<< std::endl;
-				return;
-			}
-
 			if( group_p->enabled )	{
+				if( group_p->reset == false ) {
 
-				group_p->interval_dt = 0.0;
-				group_p->decay_dt = 0.0;
-				group_p->roll_dt = 0.0;
+					for( int j=0; j< group_p->profile_arr_count; j++ ) {
 
-				for( int j=0; j< group_p->active_profile_count; j++ ) {
+						profile_entry_t *profile_p = group_p->profile_p_arr[ j ];
+						if( profile_p->reset == false )	{
+							if( profile_p->intra_count > 0 )	{
 
-					profile_entry_t *profile_p = group_p->profile_p_arr[ j ];
-					if( profile_p == NULL ) {
-						std::cout 
-							<< "TimeIntervalProfiler::reset ERR: NULL profile_p in group_p_arr[ " 
-							<< i 
-							<< "] profile_p_arr[ " 
-							<< j 
-							<< " ]" 
-							<< std::endl;
-						return;
-					}
-					if( profile_p->intra_count > 0 )	{
-
-						if( profile_p->interval_dt < 0.0 )    { 
-							std::cout 
-								<< "TimeIntervalProfiler::reset WARN: negative dt: %f" 
-								<< profile_p->interval_dt
-								<< std::endl;
+								if( profile_p->interval_dt < 0.0 )    { 
+									printf( "TimeIntervalProfiler::update WARN: negative dt: %f\n", profile_p->interval_dt );
+								}
+								accum_profile( profile_p );
+								group_p->interval_dt += profile_p->interval_dt;
+								group_p->decay_dt += profile_p->decay_dt;
+								group_p->roll_dt += profile_p->roll_dt;
+							}
 						}
-						accum_profile( profile_p );
-						group_p->interval_dt += profile_p->interval_dt;
-						group_p->decay_dt += profile_p->decay_dt;
-						group_p->roll_dt += profile_p->roll_dt;
 					}
 				}
 			}
 		}
 
 	// Report Current:
+		int total_spike_count = 0;
 		if( reporting )	{
 			printf( "CURRENT:\n" );
 		}
-		for( int i=0; i< active_group_count; i++ ) {
+		for( int i=0; i< group_arr_count; i++ ) {
 
+			int group_spike_count = 0;
 			group_entry_t *group_p = group_p_arr[ i ];
 			if( group_p->enabled )	{
+				if( group_p->reset == false ) {
 
-				if( reporting )	{
-					printf( "  GRP: %s(%d)\n", group_p->name, group_p->active_profile_count );
-				}
-				bool spike = false;
-				int prof_spike_count = 0;
+					if( reporting )	{
+						printf( "  GRP: %s(%d)\n", group_p->name, group_p->active_profile_count );
+					}
+					for( int j=0; j< group_p->profile_arr_count; j++ ) {
 
-//printf( "curr: %d\n", group_p->active_profile_count );
-				for( int j=0; j< group_p->active_profile_count; j++ ) {
+						profile_entry_t *profile_p = group_p->profile_p_arr[ j ];
+						if( profile_p->reset == false )	{
+							if( profile_p->intra_count > 0 )	{
 
-					profile_entry_t *profile_p = group_p->profile_p_arr[ j ];
-//printf( "  prof count: '%s' %d\n", profile_p->label, profile_p->intra_count );
-
-					if( profile_p->intra_count > 0 )	{
-
-						spike = check_profile_spike( profile_p );
-						if( spike ) prof_spike_count++;
-						if( reporting )	{
-							if( spike )	{
-								print_profile_report( "*", profile_p );
-							}
-							else	{
-								print_profile_report( " ", profile_p );
+								profile_p->spike = check_profile_spike( profile_p );
+								if( reporting )	{
+									if( profile_p->spike )	{
+										group_spike_count++;
+										print_profile_report( "*", profile_p );
+									}
+									else	{
+										print_profile_report( " ", profile_p );
+									}
+								}
+								else
+								if( profile_p->spike )	{
+									if( check_profile_show( profile_p->level  ) )	{
+										group_spike_count++;
+										print_profile_alert( reset_dt, group_p, profile_p );
+									}
+								}
+								profile_p->reset = true;
 							}
 						}
-						else
-						if( spike )	{
-							if( check_profile_show( profile_p->level  ) )	{
-								print_profile_alert( reset_dt, group_p, profile_p );
+					}
+					if( group_p->interval_dt > ( group_p->decay_dt * threshold ) )	{
+						group_p->spike = true;
+					}
+					else
+					if( group_p->interval_dt > ( group_p->roll_dt * threshold ) )	{
+						group_p->spike = true;
+					}
+					if( reporting )	{
+						if( group_p->spike ) {
+							if( group_spike_count == 0 )	{
+								total_spike_count++;
 							}
+							print_group_report( "*", group_p );
+						}
+						else	{
+							print_group_report( " ", group_p );
 						}
 					}
-				}
-				spike = false;
-				if( group_p->interval_dt > ( group_p->decay_dt * threshold ) )	{
-					spike = true;
-				}
-				else
-				if( group_p->interval_dt > ( group_p->roll_dt * threshold ) )	{
-					spike = true;
-				}
-				if( reporting )	{
-					if( spike ) {
-						print_group_report( "*", group_p );
+					else
+					if( group_spike_count > 0 )	{
+						print_group_alert( "", reset_dt, group_p );
 					}
-					else	{
-						print_group_report( " ", group_p );
+					else
+					if( group_p->spike )	{
+						print_group_alert( "GRP", reset_dt, group_p );
+						total_spike_count++;
 					}
-				}
-				else
-				if( prof_spike_count > 0 )	{
-					print_group_alert( "", reset_dt, group_p );
-				}
-				else
-				if( spike )	{
-					print_group_alert( "GRP", reset_dt, group_p );
+					group_p->reset = true;
 				}
 			}
-			
-			group_p->active_profile_count = 0;
-			group_p->profile_event_count = 0;
-		}
-		if( reporting )	{
-			printf( "--tip\n" );
-		}
-		for( int i=0; i< group_arr_count; i++ ) {
-			group_entry_t *group_p = group_p_arr[ i ];
 			if( group_p->req_enable )	{
 				group_p->enabled = true;
 				group_p->req_enable = false;
 			}
-			for( int j=0; j< group_p->profile_arr_count; j++ ) {
-				profile_entry_t *profile_p = group_p->profile_p_arr[ j ];
-				profile_p->reset = true;
+			if( group_p->req_disable )	{
+				group_p->enabled = false;
+				group_p->req_disable = false;
 			}
+			if( group_p->preloading )	{
+				group_p->preloading = false;
+			}
+			if( group_p->req_preload )	{
+				group_p->preloading = true;
+			}
+			total_spike_count += group_spike_count;
+		}
+		if( reporting )	{
+			printf( "--tip\n" );
 		}
 		active_group_count = 0;
+		if( dyn_threshold )	{
+			if( total_spike_count > 0 )	{
+				threshold *= dyn_avoid;
+			}
+			threshold *= ( 1.0 - reset_dt * ( 1.0 - dyn_sniff ) );
+		}
 	}
 
 // Wrapup:
@@ -411,6 +463,10 @@ void TimeIntervalProfiler::reset( double time ) {
 	if( req_enable )	{
 		enabled = true;
 		req_enable = false;
+	}
+	if( req_disable )	{
+		enabled = false;
+		req_disable = false;
 	}
 	if( req_erase ) {
 		group_map.reset();
@@ -425,8 +481,13 @@ void TimeIntervalProfiler::reset( double time ) {
 		group_arr_count = 0;
 		active_group_count = 0;
 		req_enable = false;
-		reporting = false;
 		req_clobber = false;
+	}
+	if( preloading )	{
+		preloading = false;
+	}
+	if( req_preload )	{
+		preloading = true;
 	}
 }
 
@@ -447,8 +508,12 @@ TimeIntervalProfiler::get_group( const char* group_name ) {
 			group_arr_count++;
 		}
 		else	{
-			std::cout << "TimeIntervalProfiler::get_group ERR: MAX_GROUPS: " << MAX_GROUPS << std::endl;
+			printf( "TimeIntervalProfiler::get_group ERR: MAX_GROUPS: %d", MAX_GROUPS );
 		}
+	}
+	else
+	if( group_p->reset ) {
+		reset_group( group_p );
 	}
 	return( group_p );
 }
@@ -459,7 +524,6 @@ TimeIntervalProfiler::get_profile( group_entry_t *group_p, const char* label ) {
 	profile_entry_t *profile_p = group_p->profile_map.lookup( label );
 	if( profile_p == NULL ) {
 
-//printf( "get_profile NEW: %s\n", label );
 		profile_p = new profile_entry_t;
 		null_profile( profile_p, label );
 		group_p->profile_map.insert( label, profile_p, true ); // delete upon destructor...
@@ -467,10 +531,9 @@ TimeIntervalProfiler::get_profile( group_entry_t *group_p, const char* label ) {
 		if( group_p->profile_arr_count < MAX_PROFILES ) {
 			group_p->profile_p_arr[ group_p->profile_arr_count ] = profile_p;
 			group_p->profile_arr_count++;
-//printf( "  count: %d\n", group_p->profile_arr_count );
 		}
 		else	{
-			std::cout << "TimeIntervalProfiler::get_profile ERR: MAX_PROFILES: " << MAX_PROFILES << std::endl;
+			printf( "TimeIntervalProfiler::get_profile ERR: MAX_PROFILES: %d", MAX_PROFILES );
 		}
 	}
 	else
@@ -493,26 +556,19 @@ void TimeIntervalProfiler::make_mark( group_entry_t *group_p, double curr_time )
 		if( group_p->active_profile_count < MAX_PROFILES ) {
 			group_p->active_profile_count++;
 		}
-
-		double dt = curr_time - group_p->curr_profile_time;
+		double dt = curr_time - profile_p->event_time;
 		if( dt < 0.0 )    { 
-			std::cout 
-				<< "TimeIntervalProfiler::make_mark WARN: negative dt: %f" 
-				<< profile_p->interval_dt
-				<< std::endl;
+			printf( "TimeIntervalProfiler::make_mark WARN: negative dt: %f\n", dt );
 		}
-		
 		if( dt > profile_p->max_intra_dt )	{
 			profile_p->max_intra_dt = dt;
 		}
 		profile_p->interval_dt += dt;
 		profile_p->intra_count++;
-//		printf( "make mark: '%s' %d\n", profile_p->label, profile_p->intra_count );
 		group_p->profile_event_count++;
-
 		return;
 	}
-	std::cout << "TimeIntervalProfiler::make_mark ERR: no current profile" << std::endl;
+	printf( "TimeIntervalProfiler::make_mark ERR: no current profile" );
 }
 
 ///////////////////////////////////////////////////
