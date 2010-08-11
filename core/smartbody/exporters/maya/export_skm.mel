@@ -426,7 +426,7 @@ proc skmCheckAndWriteQuat( int $fileid, string $names[], string $joint )
 }
 
 
-proc skmWriteSkm( int $startFrame, int $endFrame, string $joints[], int $fileid, int $fps )
+proc skmWriteSkm( int $startFrame, int $endFrame, string $joints[], int $fileid, int $fps, string $AnimDef )
 {
    global int $isFacial;
 
@@ -481,7 +481,7 @@ proc skmWriteSkm( int $startFrame, int $endFrame, string $joints[], int $fileid,
 
 //$startTime1 = `timerX`;
 
-   string $peRootName = `textFieldGrp -q -text skmPartialExportRootField`;
+   string $peRootName = `getAttr ($AnimDef + ".partialExportRoot")` ;
    string $peRootChildren[] = `ls -dag $peRootName`;
    int $peRootChildrenNum = size( $peRootChildren );
 
@@ -574,7 +574,7 @@ global proc int skmExport( string $fname,
 
       fprint $fileid ( "channels " + $nchannels + "\n" );
 
-      skmWriteSkm( $startFrame, $endFrame, $joints, $fileid, $fps );
+      skmWriteSkm( $startFrame, $endFrame, $joints, $fileid, $fps, $AnimDef );
       fprint $fileid ( "\n\n" );
 
 
@@ -1005,7 +1005,9 @@ global proc updatePartialExportJoint()
 {
    string $peRootName = `textFieldGrp -q -text skmPartialExportRootField`;
    string $selAnim[] = `textScrollList -q -si "scrollListAnim" `;
-   string $AnimDef = ( "AnimDef_" + $selAnim[ 0 ] );     
+   string $AnimDef = ( "AnimDef_" + $selAnim[ 0 ] ); 
+	
+   
    string $skeletonRoot = `getAttr( $AnimDef + ".skeletonRoot" )`;
    
    select -cl;
@@ -1100,8 +1102,7 @@ global proc skmExportButton()
                                   -cancelButton "No" -dismissString "No"`;
          }
 
-         if ( strcmp( $but,"Continue" ) == 0 )
-         {
+         if ( strcmp( $but,"Continue" ) == 0 ) {
             int $startFrame = `getAttr( $AnimDef + ".firstFrameNumber" )`;
             int $endFrame =   `getAttr( $AnimDef + ".lastFrameNumber" )`;
             string $root =    `getAttr( $AnimDef + ".skeletonRoot" )`;
@@ -1110,14 +1111,17 @@ global proc skmExportButton()
 
             if( $partialExportToggle == 0 )
             {
-               string $peRootName = `textFieldGrp -q -text skmPartialExportRootField`;
-               select -r $peRootName;            
+				string $peRootName = `getAttr ($AnimDef + ".partialExportRoot")` ;
+				select -r $peRootName;            
             }
-            else
-               select -r $root ;   // <-Why select this?
-            skmExport( $file, $AnimDef, $startFrame, $endFrame, $fps, $skmVersion );
-         }
-      }
+			 
+            else {
+				select -r $root ;   // <-Why select this?
+			}
+			
+			skmExport( $file, $AnimDef, $startFrame, $endFrame, $fps, $skmVersion );
+		}
+     }
       else
       {
          confirmDialog -title "ERROR: Invalid Synch Point Times" -message "Invalid times given for Ready, Stroke, Relax: make sure Relax occurs after Ready and Stroke etc. Hit help button for more information" -button "close"  -defaultButton "close";
