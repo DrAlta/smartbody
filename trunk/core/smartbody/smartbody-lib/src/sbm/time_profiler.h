@@ -27,11 +27,13 @@
 #include "sbm/sr_hash_map.h"
 #include "sbm/time_regulator.h"
 
-#define DEFAULT_ENABLED			false
+#define DEFAULT_BYPASS			true
+#define DEFAULT_ENABLED			true
 #define DEFAULT_SNIFF			0.95
 #define DEFAULT_AVOID			1.5
 #define DEFAULT_THRESHOLD		10.0
 #define DEFAULT_DECAYING		0.99
+#define MAX_SNIFF_DT			0.2
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -79,7 +81,8 @@ class TimeIntervalProfiler { // T.I.P.
 			bool	enabled;
 			char	name[ LABEL_SIZE ];
 			bool 	open;
-
+			bool	open_err;
+			
 			double  interval_dt;
 			double	decay_dt;
 			double	roll_dt;
@@ -92,6 +95,7 @@ class TimeIntervalProfiler { // T.I.P.
 
 			profile_entry_t* curr_profile_p;
 			int 	profile_event_count;
+			
 			bool	spike;
 			bool	req_preload;
 			bool	preloading;
@@ -106,170 +110,124 @@ class TimeIntervalProfiler { // T.I.P.
 		int 	group_arr_count;
 		int 	active_group_count; // UNUSED!!!
 
+		bool	sys_bypass;
+		bool	dis_sys_bypass;
+		bool	enabled;
+		bool	preloading;
+
 		double	reset_time;
 		double	reset_dt;
 
 		bool	req_print;
+		bool	req_report;
 		bool	req_erase;
 		bool	req_clobber;
 		bool	req_enable;
 		bool	req_disable;
 		bool	req_preload;
-		bool	enabled;
-		bool	reporting;
-		bool	preloading;
-
-		bool	dyn_threshold;
+		bool	pending_request;
+		
+		double	abs_threshold;
+		double	rel_threshold;
+		bool	dyn_abs_thr;
+		bool	dyn_rel_thr;
 		double	dyn_sniff; // decaying: positive, less than 1
 		double	dyn_avoid; // bumping: greater than 1: small hiccup, x2... large hiccup, x1.1
-		double	fix_threshold;
-		double	threshold;
 
 		double	decaying_factor;
+//		int 	rolling_length;
 		int 	suppression;
 		int 	selection;
 
-	public:
-		TimeIntervalProfiler( void ) { null(); }
-		~TimeIntervalProfiler( void ) {}
-
-	private:
-
-		void null( void )	{
-			group_arr_count = 0;
-			active_group_count = 0;
-			reset_time = 0.0;
-			reset_dt = 0.0;
-			req_print = false;
-			req_erase = false;
-			req_clobber = false;
-			req_enable = DEFAULT_ENABLED;
-			req_disable = false;
-			req_preload = false;
-			enabled = false;
-			reporting = false;
-			preloading = false;
-			dyn_threshold = false;
-			dyn_sniff = DEFAULT_SNIFF;
-			dyn_avoid = DEFAULT_AVOID;
-			fix_threshold = 0.0;
-			threshold = DEFAULT_THRESHOLD;
-			decaying_factor = DEFAULT_DECAYING;
-			suppression = -1;
-			selection = -1;
-		}
-
-		void null_group( group_entry_t* group_p, const char* group_name = "" ) {
+		void null( void );
+		void defaults( void );
 		
-			group_p->req_enable = false;
-			group_p->req_disable = false;
-			group_p->enabled = true;
-			_snprintf( group_p->name, LABEL_SIZE, "%s", group_name );
-			group_p->open = false;
-			group_p->interval_dt = 0.0;
-			group_p->decay_dt = 0.0;
-			group_p->roll_dt = 0.0;
-			group_p->profile_map.expunge();
-			group_p->profile_arr_count = 0;
-			group_p->active_profile_count = 0;
-			group_p->curr_profile_p = NULL;
-			group_p->profile_event_count = 0;
-			group_p->spike = false;
-			group_p->req_preload = false;
-			group_p->preloading = false;
-			group_p->reset = false;		
-		}
-
-		void null_profile( profile_entry_t* profile_p, const char* label = "" ) {
+		void null_group( group_entry_t* group_p, const char* group_name = "" );
+		void null_profile( profile_entry_t* profile_p, const char* label = "" );
 		
-			profile_p->level = -1;
-			_snprintf( profile_p->label, LABEL_SIZE, "%s", label );
-			profile_p->prev_dt = 0.0;
-			profile_p->interval_dt = 0.0;
-			profile_p->intra_count = 0;
-			profile_p->avg_intra_dt = 0.0;
-			profile_p->max_intra_dt = 0.0;
-			profile_p->decay_dt = 0.0;
-			profile_p->accum_roll_dt = 0.0;
-			profile_p->accum_count = 0;
-			profile_p->roll_dt = 0.0;
-			profile_p->roll_index = 0;
-			profile_p->event_time = 0.0;
-			profile_p->spike = false;
-			profile_p->reset = false;
-		}
-
-		void reset_group( group_entry_t* group_p ) {
+		void reset_group( group_entry_t* group_p );
+		void reset_profile( profile_entry_t* profile_p );
 		
-			group_p->interval_dt = 0.0;
-			group_p->decay_dt = 0.0;
-			group_p->roll_dt = 0.0;
-			group_p->active_profile_count = 0;
-			group_p->profile_event_count = 0;
-			group_p->spike = false;
-			group_p->reset = false;
-		}
-
-		void reset_profile( profile_entry_t* profile_p ) {
-		
-			profile_p->level = -1;
-			profile_p->prev_dt = profile_p->interval_dt;
-			profile_p->interval_dt = 0.0;
-			profile_p->intra_count = 0;
-			profile_p->max_intra_dt = 0.0;
-			profile_p->event_time = 0.0;
-			profile_p->spike = false;
-			profile_p->reset = false;
-		}
-
 ///////////////////////////////////////////////////
 
 	public:
 
-		void print( void )	{	
+		TimeIntervalProfiler( void ) { defaults(); }
+		~TimeIntervalProfiler( void ) {}
+
+		void bypass( bool bp ) {
+			if( bp )	{
+				sys_bypass = true;
+			}
+			else	{
+				bool has_disable = req_disable;
+				defaults();
+				dis_sys_bypass = true;
+				req_enable = !has_disable;
+				pending_request = true;
+			}
+		}
+		void reset( void )	{
+			defaults();
+		}
+
+		void print( void )	{
+			if( sys_bypass )
+				printf( "TIP BYPASS: print request noted\n" );
 			req_print = true;
+			pending_request = true;
 		}
-		void erase( void )	{	
+		void report( void )	{
+			if( sys_bypass )
+				printf( "TIP BYPASS: report request noted\n" );
+			req_report = true;
+			pending_request = true;
+		}
+
+		void erase( void )	{
+			if( sys_bypass )
+				printf( "TIP BYPASS: erase request noted\n" );
 			req_erase = true;
-		}
-		void clobber( void )	{	
-			req_clobber = true;
+			pending_request = true;
 		}
 		void enable( bool en )	{
+			if( sys_bypass )
+				printf( "TIP BYPASS: enable request noted\n" );
 			if( en )
 				req_enable = true;
 			else
 				req_disable = true;
+			pending_request = true;
 		}
+		void preload( void )	{
+			if( sys_bypass )
+				printf( "TIP BYPASS: preload request noted\n" );
+			req_preload = true;
+			pending_request = true;
+		}
+
 		int enable( const char* group_name, bool en )	{
+			if( sys_bypass )
+				printf( "TIP BYPASS: enable request noted\n" );
 			group_entry_t* group_p = get_group( group_name );
 			if( group_p )	{
 				if( en )
 					group_p->req_enable = true;
 				else
 					group_p->req_disable = true;
-				return( false );
+				return( true );
 			}
-			return( true );
-		}
-		void preload( void )	{
-			req_preload = true;
+			return( false );
 		}
 		int preload( const char* group_name )	{
+			if( sys_bypass )
+				printf( "TIP BYPASS: preload request noted\n" );
 			group_entry_t* group_p = get_group( group_name );
 			if( group_p )	{
 				group_p->req_preload = true;
 				return( false );
 			}
 			return( true );
-		}
-		void report( void )	{
-			if( enabled )	{
-				reporting = true;
-			}
-			else	{
-				printf( "TimeIntervalProfiler::report ERR: not enabled \n" );
-			}
 		}
 
 		void set_suppression( int sup )	{
@@ -280,36 +238,33 @@ class TimeIntervalProfiler { // T.I.P.
 			selection = sel;
 			suppression = -1;
 		}
-		void set_threshold( double factor )	{
-			threshold = factor;
-			if( threshold > 0.0 )	{
-				dyn_threshold = false;
-			}
-			else	{
-				dyn_threshold = true;
-			}
-			fix_threshold = 0.0;
-		}
-		void set_override( double value )	{
-			fix_threshold = value;
-			if( fix_threshold > 0.0 )	{
-				dyn_threshold = false;
+
+		void set_abs_threshold( float delta )	{
+			abs_threshold = delta;
+			if( abs_threshold <= 0.0 )    {
+				abs_threshold = 0.0;
 			}
 		}
-		void set_dynamic( double sniff, double avoid )	{
-			if( sniff > 0.0 ) dyn_sniff = sniff;
-			if( avoid > 1.0 ) dyn_avoid = avoid;
-			if( dyn_sniff >= 1.0 ) dyn_sniff = 0.99999;
-			if( dyn_avoid <= 1.0 ) dyn_avoid = 1.1;
-			dyn_threshold = true; 
+		void set_rel_threshold( double factor ) {
+			rel_threshold = factor;
+			if( rel_threshold <= 0.0 )    {
+				rel_threshold = 100.0;
+			}
 		}
+		void set_dynamic_abs( bool dyn )	{
+			dyn_abs_thr = dyn;
+		}
+		void set_dynamic_rel( bool dyn )	{
+			dyn_rel_thr = dyn;
+		}
+
 		void set_sniff( double sniff )	{
 			if( sniff > 0.0 ) dyn_sniff = sniff;
-			if( dyn_sniff >= 1.0 ) dyn_sniff = 0.99999;
+			if( dyn_sniff >= 1.0 ) dyn_sniff = 0.999;
 		}
 		void set_avoid( double avoid )	{
 			if( avoid > 1.0 ) dyn_avoid = avoid;
-			if( dyn_avoid <= 1.0 ) dyn_avoid = 1.1;
+			if( dyn_avoid <= 1.0 ) dyn_avoid = 1.01;
 		}
 		void set_decay( double s )	{
 			decaying_factor = s;
@@ -333,6 +288,7 @@ class TimeIntervalProfiler { // T.I.P.
 		
 		void accum_profile( profile_entry_t *profile_p );
 		bool check_profile_spike( profile_entry_t *profile_p );
+		bool check_group_spike( group_entry_t* group_p );
 		bool check_profile_show( int level );
 
 		group_entry_t* get_group( const char* group_name );
@@ -340,15 +296,35 @@ class TimeIntervalProfiler { // T.I.P.
 
 		void make_mark( group_entry_t *group_p, double curr_time );
 
+		void sys_update( double time );
+
 	public:
 
-		void update( double time );
+		void update( double time ) {
+			if( dis_sys_bypass ) { sys_bypass = false; dis_sys_bypass = false; }
+			if( sys_bypass ) return;
+			sys_update( time );
+		}
 		void update( void ) {
 			update( SBM_get_real_time() );
 		}
 
+		void touch_profile( group_entry_t *group_p, int level, const char* label )	{
+
+			profile_entry_t *profile_p = get_profile( group_p, label );
+			if( level > profile_p->level )	{
+				profile_p->level = level;
+			}
+		}
+		void touch_group( const char* group_name, int level, const char* label )	{
+		
+			group_entry_t *group_p = get_group( group_name );
+			touch_profile( group_p, level, label );
+		}
+		
 		void mark_time( const char* group_name, int level, const char* label, double curr_time )	{
 
+			if( sys_bypass ) return;
 			if( enabled )	{
 
 				group_entry_t *group_p = get_group( group_name );
@@ -371,25 +347,19 @@ class TimeIntervalProfiler { // T.I.P.
 					}
 					else
 					if( group_p->preloading )	{
-						profile_entry_t *profile_p = get_profile( group_p, label ); // already done?
-						if( level > profile_p->level )	{
-							profile_p->level = level;
-						}
+						touch_profile( group_p, level, label );
 					}
 				}
 			}
 			else
 			if( preloading )	{
-				group_entry_t *group_p = get_group( group_name );
-				profile_entry_t *profile_p = get_profile( group_p, label );
-				if( level > profile_p->level )	{
-					profile_p->level = level;
-				}
+				touch_group( group_name, level, label );
 			}
 		}
 
 		int mark_time( const char* group_name, double curr_time )	{
 
+			if( sys_bypass ) return( 0 );
 			if( enabled )	{
 				group_entry_t *group_p = group_map.lookup( group_name );
 				if( group_p ) {
