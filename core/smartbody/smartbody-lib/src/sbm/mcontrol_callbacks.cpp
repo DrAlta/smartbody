@@ -811,14 +811,15 @@ void mcu_print_profiler_help( int level = 0 )	{
 		LOG( "  on | off | enable | disable | preload" );
 		LOG( "  group <name> enable | disable | preload" );
 		LOG( "  suppress | select [<level>]" );
-		LOG( "  threshold <factor> | 0" );
-		LOG( "  override <fixed-dt> | 0" );
-		LOG( "  dynamic <sniff> <avoid>" );
-		LOG( "  sniff <sniff:[0.0,1.0)>" );
-		LOG( "  avoid <avoid:(1.0,...)>" );
+		LOG( "  abs <delta> | 0" );
+		LOG( "  rel <factor> | 0" );
+		LOG( "  fix [abs|rel]" );
+		LOG( "  dyn [abs|rel]" );
+		LOG( "  sniff <factor:[0.0,1.0)>" );
+		LOG( "  avoid <factor:(1.0,...)>" );
 		LOG( "  decay <factor:[0.0,1.0)>" );
 		LOG( "  print | report" );
-		LOG( "  erase | clobber" );
+		LOG( "  erase | reset" );
 		LOG( "  test [reps]" );
 	}
 }
@@ -853,11 +854,19 @@ int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			prof_p->print_legend();
 		}
 		else 
-		if( ( strcmp( tip_cmd, "enable" ) == 0 )||( strcmp( tip_cmd, "on" ) == 0 ) )	{
+		if( strcmp( tip_cmd, "on" ) == 0 )	{
+			prof_p->bypass( false );
+		}
+		else
+		if( strcmp( tip_cmd, "off" ) == 0 )	{
+			prof_p->bypass( true );
+		}
+		else 
+		if( strcmp( tip_cmd, "enable" ) == 0 )	{
 			prof_p->enable( true );
 		}
 		else
-		if( ( strcmp( tip_cmd, "disable" ) == 0 )||( strcmp( tip_cmd, "off" ) == 0 ) )	{
+		if( strcmp( tip_cmd, "disable" ) == 0 )  {
 			prof_p->enable( false );
 		}
 		else
@@ -895,20 +904,58 @@ int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			prof_p->set_selection( level );
 		}
 		else
-		if( strcmp( tip_cmd, "threshold" ) == 0 )	{
+		if( strcmp( tip_cmd, "abs" ) == 0 )	{
+			float delta = args.read_float();
+			prof_p->set_abs_threshold( (double)delta );
+		}
+		else
+		if( strcmp( tip_cmd, "rel" ) == 0 )	{
 			float factor = args.read_float();
-			prof_p->set_threshold( (double)factor );
+			prof_p->set_rel_threshold( (double)factor );
 		}
 		else
-		if( strcmp( tip_cmd, "override" ) == 0 )	{
-			float value = args.read_float();
-			prof_p->set_override( (double)value );
+		if( strcmp( tip_cmd, "fix" ) == 0 )	{
+			int n = args.calc_num_tokens();
+			if( n ) {
+				char *opt = args.read_token();
+				if( strcmp( opt, "abs" ) == 0 )	{
+					prof_p->set_dynamic_abs( false );
+				}
+				else
+				if( strcmp( opt, "rel" ) == 0 )	{
+					prof_p->set_dynamic_rel( false );
+				}
+				else	{
+					LOG("ERROR: Unknown command option '%s'", opt );
+					return( CMD_NOT_FOUND );
+				}
+			}
+			else	{
+				prof_p->set_dynamic_abs( false );
+				prof_p->set_dynamic_rel( false );
+			}
 		}
 		else
-		if( strcmp( tip_cmd, "dynamic" ) == 0 )	{
-			float sniff = args.read_float();
-			float avoid = args.read_float();
-			prof_p->set_dynamic( (double)sniff, (double)avoid );
+		if( strcmp( tip_cmd, "dyn" ) == 0 )	{
+			int n = args.calc_num_tokens();
+			if( n ) {
+				char *opt = args.read_token();
+				if( strcmp( opt, "abs" ) == 0 )	{
+					prof_p->set_dynamic_abs( true );
+				}
+				else
+				if( strcmp( opt, "rel" ) == 0 )	{
+					prof_p->set_dynamic_rel( true );
+				}
+				else	{
+					LOG("ERROR: Unknown command option '%s'", opt );
+					return( CMD_NOT_FOUND );
+				}
+			}
+			else	{
+				prof_p->set_dynamic_abs( true );
+				prof_p->set_dynamic_rel( true );
+			}
 		}
 		else
 		if( strcmp( tip_cmd, "sniff" ) == 0 )	{
@@ -939,8 +986,8 @@ int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			prof_p->erase();
 		}
 		else
-		if( strcmp( tip_cmd, "clobber" ) == 0 )	{
-			prof_p->clobber();
+		if( strcmp( tip_cmd, "reset" ) == 0 )	{
+			prof_p->reset();
 		}
 		else
 		if( strcmp( tip_cmd, "test" ) == 0 )	{
