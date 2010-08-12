@@ -35,6 +35,7 @@
 #include <cstdio>
 #include <string>
 #include <vector>
+#include <fstream>
 
 #include "fltk_viewer.h"
 #include <BehaviorWindow.h>
@@ -55,6 +56,8 @@
 #include <sbm/resource_cmds.h>
 #include <sbm/time_regulator.h>
 #include <vhcl_log.h>
+#include "SBMWindow.h"
+#include "CommandWindow.h"
 
 //#include "tip.h"
 
@@ -437,6 +440,49 @@ void cleanup( void )	{
 }
 
 void signal_handler(int sig) {
+	std::cout << "SmartBody shutting down after catching signal " << sig << std::endl;
+
+	// get the current directory
+	char buffer[MAX_PATH];
+	::GetCurrentDirectory(MAX_PATH, buffer);
+
+	// dump to an available file in the current directory
+	int counter = 1;
+	bool fileOk = false;
+	char file[1024];
+	while (!fileOk || counter > 999)
+	{
+		sprintf(file, "%s\\smartbodycommands%.5d.dump", buffer, counter);
+
+		std::fstream fs(file, std::ios_base::in);// attempt open for read
+		if (!fs)
+		{
+			fileOk = true;
+			fs.close();
+			std::ofstream dumpFile;
+			dumpFile.open(file);
+
+			dumpFile << "Last commands run:" << std::endl;
+
+			// dump the command resources
+			int numResources = mcuCBHandle::singleton().resource_manager->getNumResources();
+			for (int r = 0; r < numResources; r++)
+			{
+				CmdResource * res = dynamic_cast<CmdResource  *>(mcuCBHandle::singleton().resource_manager->getResource(r));
+				if(res)
+					dumpFile << res->dump() << std::endl;
+			}
+			dumpFile.close();
+			std::cout << "Wrote commands to " << file << std::endl;
+
+		}
+		else //ok, file exists. close and reopen in write mode
+		{
+		  fs.close();
+		  counter++;
+		}
+	}
+	
 	//cleanup(); // 
 	exit(sig);
 }
@@ -466,6 +512,13 @@ int main( int argc, char **argv )	{
 	vhcl::Crash::EnableExceptionHandling( true );
 #endif
 
+//	SBMWindow* sbmWindow = new SBMWindow(100, 100, 640, 480, "SmartBody");
+//	sbmWindow->show();
+//	CommandWindow* commandWindow = sbmWindow->getCommandWindow();
+//	CommandWindow* commandWindow = new CommandWindow(100, 100, 640, 480);
+//	vhcl::Log::g_log.AddListener(commandWindow);
+	FltkViewer* viewer = new FltkViewer(100, 150, 640, 480, "SmartBody");
+
 	// register the log listener
 	vhcl::Log::StdoutListener* listener = new vhcl::Log::StdoutListener();
 	vhcl::Log::g_log.AddListener(listener);
@@ -481,7 +534,10 @@ int main( int argc, char **argv )	{
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	mcu.register_viewer_factory(new FltkViewerFactory());
+	FltkViewerFactory* viewerFactory = new FltkViewerFactory();
+	//viewerFactory->setFltkViewer(sbmWindow->getFltkViewer());
+	viewerFactory->setFltkViewer(viewer);
+	mcu.register_viewer_factory(viewerFactory);
 	mcu.register_bmlviewer_factory(new BehaviorViewerFactory());
 
 	// Build the floor for the viewer
@@ -757,7 +813,8 @@ int main( int argc, char **argv )	{
 	}
 
 	cleanup();
-	vhcl::Log::g_log.RemoveAllListeners();
-	delete listener;
+	//vhcl::Log::g_log.RemoveAllListeners();
+	//delete listener;
+//	delete sbmWindow;
 }
 
