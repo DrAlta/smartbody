@@ -409,7 +409,7 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 		if(sec_num > -1)
 		{
 			float sum = 0, tsum = 0;
-			int index = -1;
+			int index = 0;
 			for(i = 0; i <= sec_num; ++i)
 			{
 				tsum = 0;
