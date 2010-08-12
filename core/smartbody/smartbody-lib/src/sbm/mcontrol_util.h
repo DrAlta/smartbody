@@ -251,11 +251,13 @@ class mcuCBHandle	{
 			if( internal_timer_p == NULL ) internal_timer_p = new TimeRegulator;
 			timer_p = internal_timer_p;
 		}
-		bool update_timer( double in_time = -1.0 )	{
-			
+		void update_profiler( double in_time = -1.0 )	{
 			if( profiler_p )	{
 				profiler_p->update();
 			}
+		}
+		bool update_timer( double in_time = -1.0 )	{
+			
 			if( timer_p )	{
 				bool ret = timer_p->update( in_time );
 				time = timer_p->get_time();

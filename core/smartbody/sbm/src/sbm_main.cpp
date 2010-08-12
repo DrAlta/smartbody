@@ -751,7 +751,9 @@ int main( int argc, char **argv )	{
 
 	timer.start();
 	while( mcu.loop )	{
-
+		
+		mcu.update_profiler();
+//		mcu.update_profiler( SBM_get_real_time() );
 		bool update_sim = mcu.update_timer();
 //		bool update_sim = mcu.update_timer( SBM_get_real_time() );
 
@@ -760,7 +762,7 @@ int main( int argc, char **argv )	{
 
 		fltk::check();
 
-//mcu.mark( "main", 0, "ttu_poll" );
+//mcu.mark( "main", 0, "commands" );
 
 #if LINK_VHMSG_CLIENT
 		if( mcu.vhmsg_enabled )	{
@@ -803,9 +805,12 @@ int main( int argc, char **argv )	{
 
 		mcu.theWSP->broadcast_update();
 
+//mcu.mark( "main", 0, "update" );
 		if( update_sim )	{
 			mcu.update();
 		}
+
+//mcu.mark( "main", 1, "render" );
 
 		mcu.render();
 

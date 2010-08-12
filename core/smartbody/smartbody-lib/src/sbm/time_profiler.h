@@ -52,7 +52,10 @@ class TimeIntervalProfiler { // T.I.P.
 
 			int 	level;
 			char	label[ LABEL_SIZE ];
+			bool	spike;
+			bool	req_reset;
 
+			double	event_time;
 			double	prev_dt;
 			double  interval_dt;
 
@@ -68,10 +71,6 @@ class TimeIntervalProfiler { // T.I.P.
 			double	roll_dt_arr[ MAX_ROLLING ];
 			int 	roll_index;
 			
-			double	event_time;
-			bool	spike;
-			bool	reset;
-
 		} profile_entry_t;
 
 		typedef struct group_entry_s {
@@ -83,40 +82,42 @@ class TimeIntervalProfiler { // T.I.P.
 			bool 	open;
 			bool	open_err;
 			
+			bool	req_preload;
+			bool	preloading;
+			bool	spike;
+			bool	req_reset;
+
 			double  interval_dt;
 			double	decay_dt;
 			double	roll_dt;
 
 			srHashMap <profile_entry_t> profile_map;
 			profile_entry_t* profile_p_arr[ MAX_PROFILES ];
+			bool	full_err;
 			
 			int 	profile_arr_count;
 			int 	active_profile_count;
-
-			profile_entry_t* curr_profile_p;
 			int 	profile_event_count;
+			profile_entry_t* curr_profile_p;
 			
-			bool	spike;
-			bool	req_preload;
-			bool	preloading;
-			bool	reset;
-
 		} group_entry_t;
 
 
 		srHashMap <group_entry_t> group_map;
 		group_entry_t* group_p_arr[ MAX_GROUPS ];
+		bool	full_err;
 		
 		int 	group_arr_count;
-		int 	active_group_count; // UNUSED!!!
+		int 	active_group_count;
+		int 	group_event_count;
 
 		bool	sys_bypass;
 		bool	dis_sys_bypass;
 		bool	enabled;
 		bool	preloading;
 
-		double	reset_time;
-		double	reset_dt;
+		double	update_time;
+		double	update_dt;
 
 		bool	req_print;
 		bool	req_report;
@@ -131,7 +132,7 @@ class TimeIntervalProfiler { // T.I.P.
 		double	rel_threshold;
 		bool	dyn_abs_thr;
 		bool	dyn_rel_thr;
-		double	dyn_sniff; // decaying: positive, less than 1
+		double	dyn_sniff; // decaying: positive, less than 1, per second.
 		double	dyn_avoid; // bumping: greater than 1: small hiccup, x2... large hiccup, x1.1
 
 		double	decaying_factor;
@@ -140,8 +141,6 @@ class TimeIntervalProfiler { // T.I.P.
 		int 	selection;
 
 		void null( void );
-		void defaults( void );
-		
 		void null_group( group_entry_t* group_p, const char* group_name = "" );
 		void null_profile( profile_entry_t* profile_p, const char* label = "" );
 		
@@ -152,7 +151,7 @@ class TimeIntervalProfiler { // T.I.P.
 
 	public:
 
-		TimeIntervalProfiler( void ) { defaults(); }
+		TimeIntervalProfiler( void ) { reset(); }
 		~TimeIntervalProfiler( void ) {}
 
 		void bypass( bool bp ) {
@@ -161,14 +160,21 @@ class TimeIntervalProfiler { // T.I.P.
 			}
 			else	{
 				bool has_disable = req_disable;
-				defaults();
+				reset();
 				dis_sys_bypass = true;
 				req_enable = !has_disable;
 				pending_request = true;
 			}
 		}
 		void reset( void )	{
-			defaults();
+			null();
+			sys_bypass = DEFAULT_BYPASS;
+			req_enable = DEFAULT_ENABLED;
+			rel_threshold = DEFAULT_THRESHOLD;
+			dyn_sniff = DEFAULT_SNIFF;
+			dyn_avoid = DEFAULT_AVOID;
+			decaying_factor = DEFAULT_DECAYING;
+		//	rolling_length = MAX_ROLLING;
 		}
 
 		void print( void )	{
@@ -192,7 +198,7 @@ class TimeIntervalProfiler { // T.I.P.
 		}
 		void enable( bool en )	{
 			if( sys_bypass )
-				printf( "TIP BYPASS: enable request noted\n" );
+				printf( "TIP BYPASS: %s request noted\n", en ? "enable" : "disable" );
 			if( en )
 				req_enable = true;
 			else
@@ -208,7 +214,7 @@ class TimeIntervalProfiler { // T.I.P.
 
 		int enable( const char* group_name, bool en )	{
 			if( sys_bypass )
-				printf( "TIP BYPASS: enable request noted\n" );
+				printf( "TIP BYPASS: group %s request noted\n", en ? "enable" : "disable" );
 			group_entry_t* group_p = get_group( group_name );
 			if( group_p )	{
 				if( en )
@@ -221,7 +227,7 @@ class TimeIntervalProfiler { // T.I.P.
 		}
 		int preload( const char* group_name )	{
 			if( sys_bypass )
-				printf( "TIP BYPASS: preload request noted\n" );
+				printf( "TIP BYPASS: group preload request noted\n" );
 			group_entry_t* group_p = get_group( group_name );
 			if( group_p )	{
 				group_p->req_preload = true;
@@ -239,7 +245,7 @@ class TimeIntervalProfiler { // T.I.P.
 			suppression = -1;
 		}
 
-		void set_abs_threshold( float delta )	{
+		void set_abs_threshold( double delta )	{
 			abs_threshold = delta;
 			if( abs_threshold <= 0.0 )    {
 				abs_threshold = 0.0;
@@ -275,56 +281,61 @@ class TimeIntervalProfiler { // T.I.P.
 ///////////////////////////////////////////////////
 
 		void print_legend( void );
-		void print_group( group_entry_t *group_p );
 		void print_data( void );
 
 	private:
 
+		void print_group( group_entry_t *group_p );
 		void print_profile_report( char *prefix, profile_entry_t *profile_p );
 		void print_group_report( const char *prefix, group_entry_t* group_p );
 
-		void print_profile_alert( double reset_dt, group_entry_t* group_p, profile_entry_t *profile_p );
-		void print_group_alert( const char *prefix, double reset_dt, group_entry_t* group_p );
+		void print_profile_alert( double dt, group_entry_t* group_p, profile_entry_t *profile_p );
+		void print_group_alert( const char *prefix, double dt, group_entry_t* group_p );
 		
 		void accum_profile( profile_entry_t *profile_p );
 		bool check_profile_spike( profile_entry_t *profile_p );
 		bool check_group_spike( group_entry_t* group_p );
 		bool check_profile_show( int level );
 
+		void sys_update( double time );
+
 		group_entry_t* get_group( const char* group_name );
 		profile_entry_t* get_profile( group_entry_t *group_p, const char* label );
 
-		void make_mark( group_entry_t *group_p, double curr_time );
-
-		void sys_update( double time );
-
-	public:
-
-		void update( double time ) {
-			if( dis_sys_bypass ) { sys_bypass = false; dis_sys_bypass = false; }
-			if( sys_bypass ) return;
-			sys_update( time );
-		}
-		void update( void ) {
-			update( SBM_get_real_time() );
-		}
-
+		void accum_mark( group_entry_t *group_p, double time );
 		void touch_profile( group_entry_t *group_p, int level, const char* label )	{
-
 			profile_entry_t *profile_p = get_profile( group_p, label );
 			if( level > profile_p->level )	{
 				profile_p->level = level;
 			}
 		}
 		void touch_group( const char* group_name, int level, const char* label )	{
-		
 			group_entry_t *group_p = get_group( group_name );
 			touch_profile( group_p, level, label );
 		}
 		
-		void mark_time( const char* group_name, int level, const char* label, double curr_time )	{
+		double convert_time( double time )	{
+			if( time < 0.0 )	{
+				return( SBM_get_real_time() );
+			}
+			return( time );
+		}
+		
+	public:
+
+		void update( double time ) {
+			if( dis_sys_bypass ) { sys_bypass = false; dis_sys_bypass = false; }
+			if( sys_bypass ) return;
+			sys_update( convert_time( time ) );
+		}
+		void update( void ) {
+			update( -1.0 );
+		}
+
+		void mark_time( const char* group_name, int level, const char* label, double time )	{
 
 			if( sys_bypass ) return;
+			double curr_time = convert_time( time );
 			if( enabled )	{
 
 				group_entry_t *group_p = get_group( group_name );
@@ -334,7 +345,7 @@ class TimeIntervalProfiler { // T.I.P.
 
 						profile_entry_t *profile_p = get_profile( group_p, label );
 						if( group_p->open ) {  // continuation
-							make_mark( group_p, curr_time );
+							accum_mark( group_p, curr_time );
 						}
 						else	{  // new segment
 							group_p->open = true;
@@ -357,15 +368,16 @@ class TimeIntervalProfiler { // T.I.P.
 			}
 		}
 
-		int mark_time( const char* group_name, double curr_time )	{
+		int mark_time( const char* group_name, double time )	{
 
 			if( sys_bypass ) return( 0 );
+			double curr_time = convert_time( time );
 			if( enabled )	{
 				group_entry_t *group_p = group_map.lookup( group_name );
 				if( group_p ) {
 					if( group_p->enabled )	{
 						if( group_p->open ) {  // close...
-							make_mark( group_p, curr_time );
+							accum_mark( group_p, curr_time );
 							group_p->open = false;
 							group_p->curr_profile_p = NULL;
 							return( group_p->profile_event_count );
@@ -377,10 +389,10 @@ class TimeIntervalProfiler { // T.I.P.
 		}
 
 		void mark( const char* group_name, int level, const char* label )	{
-			mark_time( group_name, level, label, SBM_get_real_time() );
+			mark_time( group_name, level, label, -1.0 );
 		}
 		int mark( const char* group_name )	{
-			return( mark_time( group_name, SBM_get_real_time() ) );
+			return( mark_time( group_name, -1.0 ) );
 		}
 
 		static double test_clock( int reps = 0 );
