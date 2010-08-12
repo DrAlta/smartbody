@@ -199,7 +199,7 @@ char * AudioFileSpeech::getSpeechPlayCommand( RequestId requestId, const SbmChar
    hash_map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
    if ( it != m_speechRequestInfo.end() )
    {
-      it->second.playCommand = vhcl::Format( "send PlaySound %s %s", it->second.audioFilename.c_str(), character->name );
+      it->second.playCommand = vhcl::Format( "send PlaySound \"%s\" %s", it->second.audioFilename.c_str(), character->name );
       return (char *)it->second.playCommand.c_str();
    }
 
@@ -224,7 +224,7 @@ char * AudioFileSpeech::getSpeechStopCommand( RequestId requestId, const SbmChar
          characterName = character->bonebusCharacter->m_name;
       }
 
-      it->second.stopCommand = vhcl::Format( "send StopSound %s %s", it->second.audioFilename.c_str(), characterName.c_str() );
+      it->second.stopCommand = vhcl::Format( "send StopSound \"%s\" %s", it->second.audioFilename.c_str(), characterName.c_str() );
       return (char *)it->second.stopCommand.c_str();
    }
 

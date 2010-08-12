@@ -327,9 +327,9 @@ char* remote_speech::getSpeechPlayCommand( RequestId requestId, const SbmCharact
 
 	string cmd;
 	if (character)
-		cmd = vhcl::Format( "send PlaySound %s %s", soundFile.c_str(), character->name );
+		cmd = vhcl::Format( "send PlaySound \"%s\" %s", soundFile.c_str(), character->name );
 	else
-		cmd = vhcl::Format( "send PlaySound %s", soundFile.c_str());
+		cmd = vhcl::Format( "send PlaySound \"%s\"", soundFile.c_str());
 
 	char* retSoundFile= new char[ cmd.length() + 1];
 	strcpy(retSoundFile, cmd.c_str());
@@ -361,7 +361,7 @@ char* remote_speech::getSpeechStopCommand( RequestId requestId, const SbmCharact
 		characterName = character->bonebusCharacter->m_name;
 	}
 
-	string cmd = vhcl::Format( "send StopSound %s %s", soundFile.c_str(), characterName.c_str() );
+	string cmd = vhcl::Format( "send StopSound \"%s\" %s", soundFile.c_str(), characterName.c_str() );
 
 	char* retSoundFile= new char[cmd.length() + 1];
 	strcpy(retSoundFile, cmd.c_str());
