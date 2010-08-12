@@ -29,10 +29,11 @@
 
 #define DEFAULT_BYPASS			true
 #define DEFAULT_ENABLED			true
-#define DEFAULT_SNIFF			0.95
+#define DEFAULT_SNIFF			0.9
 #define DEFAULT_AVOID			1.5
 #define DEFAULT_THRESHOLD		10.0
 #define DEFAULT_DECAYING		0.99
+#define DEFAULT_ROLLING 		32
 #define MAX_SNIFF_DT			0.2
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -136,7 +137,7 @@ class TimeIntervalProfiler { // T.I.P.
 		double	dyn_avoid; // bumping: greater than 1: small hiccup, x2... large hiccup, x1.1
 
 		double	decaying_factor;
-//		int 	rolling_length;
+		int 	rolling_length;
 		int 	suppression;
 		int 	selection;
 
@@ -174,25 +175,33 @@ class TimeIntervalProfiler { // T.I.P.
 			dyn_sniff = DEFAULT_SNIFF;
 			dyn_avoid = DEFAULT_AVOID;
 			decaying_factor = DEFAULT_DECAYING;
-		//	rolling_length = MAX_ROLLING;
+			rolling_length = DEFAULT_ROLLING;
 		}
 
+		void print_legend( void );
+
 		void print( void )	{
-			if( sys_bypass )
-				printf( "TIP BYPASS: print request noted\n" );
+			if( sys_bypass )	{
+				printf( "TIP BYPASS: print request ignored\n" );
+				return;
+			}
 			req_print = true;
 			pending_request = true;
 		}
 		void report( void )	{
-			if( sys_bypass )
-				printf( "TIP BYPASS: report request noted\n" );
+			if( sys_bypass )	{
+				printf( "TIP BYPASS: report request ignored\n" );
+				return;
+			}
 			req_report = true;
 			pending_request = true;
 		}
 
 		void erase( void )	{
-			if( sys_bypass )
-				printf( "TIP BYPASS: erase request noted\n" );
+			if( sys_bypass )	{
+				printf( "TIP BYPASS: erase request ignored\n" );
+				return;
+			}
 			req_erase = true;
 			pending_request = true;
 		}
@@ -206,15 +215,19 @@ class TimeIntervalProfiler { // T.I.P.
 			pending_request = true;
 		}
 		void preload( void )	{
-			if( sys_bypass )
-				printf( "TIP BYPASS: preload request noted\n" );
+			if( sys_bypass )	{
+				printf( "TIP BYPASS: preload request ignored\n" );
+				return;
+			}
 			req_preload = true;
 			pending_request = true;
 		}
 
-		int enable( const char* group_name, bool en )	{
-			if( sys_bypass )
-				printf( "TIP BYPASS: group %s request noted\n", en ? "enable" : "disable" );
+		bool enable( const char* group_name, bool en )	{
+			if( sys_bypass )	{
+				printf( "TIP BYPASS: group %s request ignored\n", en ? "enable" : "disable" );
+				return( false );
+			}
 			group_entry_t* group_p = get_group( group_name );
 			if( group_p )	{
 				if( en )
@@ -225,15 +238,17 @@ class TimeIntervalProfiler { // T.I.P.
 			}
 			return( false );
 		}
-		int preload( const char* group_name )	{
-			if( sys_bypass )
-				printf( "TIP BYPASS: group preload request noted\n" );
+		bool preload( const char* group_name )	{
+			if( sys_bypass )	{
+				printf( "TIP BYPASS: group preload request ignored\n" );
+				return( false );
+			}
 			group_entry_t* group_p = get_group( group_name );
 			if( group_p )	{
 				group_p->req_preload = true;
-				return( false );
+				return( true );
 			}
-			return( true );
+			return( false );
 		}
 
 		void set_suppression( int sup )	{
@@ -272,19 +287,36 @@ class TimeIntervalProfiler { // T.I.P.
 			if( avoid > 1.0 ) dyn_avoid = avoid;
 			if( dyn_avoid <= 1.0 ) dyn_avoid = 1.01;
 		}
-		void set_decay( double s )	{
+		void set_decaying( double s )	{
 			decaying_factor = s;
 			if( decaying_factor < 0.0 ) decaying_factor = 0.0;
 			if( decaying_factor > 0.999 ) decaying_factor = 0.999;
 		}
+		void set_rolling( int len )	{
+
+			rolling_length = len;
+			if( rolling_length < 1 ) rolling_length = 1;
+			if( rolling_length > MAX_ROLLING ) rolling_length = MAX_ROLLING;
+			
+			// for now, just set counts to 0:
+			group_entry_t *group_p;
+			group_map.reset();
+			while( ( group_p = group_map.next() ) != NULL ) {
+				profile_entry_t *profile_p;
+				group_p->profile_map.reset();
+				while( ( profile_p = group_p->profile_map.next() ) != NULL ) {
+					profile_p->accum_roll_dt = 0.0;
+					profile_p->accum_count = 0;
+					profile_p->roll_index = 0;
+				}
+			}
+		}
 
 ///////////////////////////////////////////////////
 
-		void print_legend( void );
-		void print_data( void );
-
 	private:
 
+		void print_data( void );
 		void print_group( group_entry_t *group_p );
 		void print_profile_report( char *prefix, profile_entry_t *profile_p );
 		void print_group_report( const char *prefix, group_entry_t* group_p );
