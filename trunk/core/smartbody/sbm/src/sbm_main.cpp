@@ -56,7 +56,7 @@
 #include <sbm/resource_cmds.h>
 #include <sbm/time_regulator.h>
 #include <vhcl_log.h>
-#include "SBMWindow.h"
+//#include "SBMWindow.h"
 #include "CommandWindow.h"
 
 //#include "tip.h"
