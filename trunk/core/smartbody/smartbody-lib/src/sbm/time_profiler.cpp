@@ -54,7 +54,7 @@ void TimeIntervalProfiler::null( void )	{
 	dyn_sniff = 1.0;
 	dyn_avoid = 1.0;
 	decaying_factor = 1.0;
-//	rolling_length = 1;
+	rolling_length = 1;
 	suppression = -1;
 	selection = -1;
 }
@@ -99,6 +99,7 @@ void TimeIntervalProfiler::null_profile( profile_entry_t* profile_p, const char*
 	profile_p->accum_roll_dt = 0.0;
 	profile_p->accum_count = 0;
 	profile_p->roll_dt = 0.0;
+	for( int i=0; i<MAX_ROLLING; i++ ) profile_p->roll_dt_arr[ i ] = 0.0;
 	profile_p->roll_index = 0;
 }
 
@@ -141,6 +142,7 @@ void TimeIntervalProfiler::print_legend( void )	{
 	printf( "h	- Hash count" );				printf( "\n" );
 	printf( "T	- event Time" );				printf( "\n" );
 	printf( "i	- raw Interval" );				printf( "\n" );
+	printf( "r	- Rolling average count" );		printf( "\n" );
 	printf( "R	- Rolling average" );			printf( "\n" );
 	printf( "D	- Decaying average" );			printf( "\n" );
 	printf( "F	- %% of whole Frame taken up by interval or group" );	printf( "\n" );
@@ -166,10 +168,11 @@ void TimeIntervalProfiler::print_group( group_entry_t *group_p )	{
 			profile_entry_t* profile_p = group_p->profile_p_arr[ i ];
 			if( profile_p ) {
 
-				printf( "%s   <%d>: T:%.4f %s",
+				printf( "%s   <%d>: T:%.4f (r:%d) %s",
 					( profile_p->req_reset == false ) ? "@" : " ",
 					profile_p->level,
 					profile_p->event_time,
+					profile_p->accum_count,
 					profile_p->label
 				);
 				if( profile_p->intra_count > 1 )	{
@@ -188,7 +191,7 @@ void TimeIntervalProfiler::print_data( void )	{
 	printf( "    select: %d\n", selection );
 	printf( "  averages:\n" );
 	printf( "   decaying: %f\n", decaying_factor );
-	printf( "    rolling: %f\n", MAX_ROLLING );
+	printf( "    rolling: %d\n", rolling_length );
 	printf( " threshold:\n" );
 	printf( "        abs: %f :%s\n", abs_threshold, dyn_abs_thr ? "dyn" : "fix" );
 	printf( "        rel: %f :%s\n", rel_threshold, dyn_rel_thr ? "dyn" : "fix" );
@@ -214,23 +217,26 @@ void TimeIntervalProfiler::print_data( void )	{
 void TimeIntervalProfiler::print_profile_report( char *prefix, profile_entry_t *profile_p )	{
 
 	printf( 
-		"%s   <%d>: i:%.5f (R:%.5f, D:%.5f) ",
+		"%s   <%d>: i:%.5f (D:%.5f, R:%.5f, r:%d)",
 		prefix,
 		profile_p->level,
 		profile_p->interval_dt,
+		profile_p->decay_dt,
 		profile_p->roll_dt,
-		profile_p->decay_dt
+		profile_p->accum_count
 	);
 	if( profile_p->intra_count > 1 )	{
 		printf( 
-			"[M(%d):%.1f] ",
+			" [M(%d):%.1f]",
 			profile_p->intra_count,
 			100.0 * profile_p->max_intra_dt / profile_p->interval_dt
 		);
 	}
-	printf( "%s ", profile_p->label );
+	printf( " %s",
+		profile_p->label
+	);
 	if( profile_p->spike ) {
-			printf( "T:%.4f", profile_p->event_time );
+			printf( " T:%.4f", profile_p->event_time );
 	}
 	printf( "\n" );
 }
@@ -238,22 +244,22 @@ void TimeIntervalProfiler::print_profile_report( char *prefix, profile_entry_t *
 void TimeIntervalProfiler::print_group_report( const char *prefix, group_entry_t* group_p )	{
 
 	printf( 
-		"%s   SUM: i:%.5f (R:%.5f, D:%.5f)\n",
+		"%s   SUM: i:%.5f (D:%.5f, R:%.5f)\n",
 		prefix,
 		group_p->interval_dt,
-		group_p->roll_dt,
-		group_p->decay_dt
+		group_p->decay_dt,
+		group_p->roll_dt
 	);
 }
 
 void TimeIntervalProfiler::print_profile_alert( double dt, group_entry_t* group_p, profile_entry_t *profile_p )	{
 	
 	printf( 
-		"TIP <%d>: i:%.5f [F:%.3f, G:%.1f",
+		"TIP <%d>: i:%.5f [G:%.1f, F:%.3f",
 		profile_p->level,
 		profile_p->interval_dt,
-		100.0 * profile_p->interval_dt / dt,
-		100.0 * profile_p->interval_dt / group_p->interval_dt
+		100.0 * profile_p->interval_dt / group_p->interval_dt,
+		100.0 * profile_p->interval_dt / dt
 	);
 	if( profile_p->intra_count > 1 )	{
 		printf( 
@@ -262,7 +268,8 @@ void TimeIntervalProfiler::print_profile_alert( double dt, group_entry_t* group_
 			100.0 * profile_p->max_intra_dt / profile_p->interval_dt
 		);
 	}
-	printf( "] %s:%s\n", 
+	printf( "] (r:%d) %s:%s\n",
+		profile_p->accum_count,
 		group_p->name, 
 		profile_p->label 
 	);
@@ -270,12 +277,12 @@ void TimeIntervalProfiler::print_profile_alert( double dt, group_entry_t* group_
 void TimeIntervalProfiler::print_group_alert( const char *prefix, double dt, group_entry_t* group_p )	{
 
 	printf( 
-		"TIP %s: i:%.5f [F:%.3f] (R:%.5f, D:%.5f) %s (a:%d)\n",
+		"TIP %s: i:%.5f [F:%.3f] (D:%.5f, R:%.5f) %s (a:%d)\n",
 		prefix,
 		group_p->interval_dt,
 		100.0 * group_p->interval_dt / dt,
-		group_p->roll_dt,
 		group_p->decay_dt,
+		group_p->roll_dt,
 		group_p->name,
 		group_p->active_profile_count
 	);
@@ -297,7 +304,7 @@ void TimeIntervalProfiler::accum_profile( profile_entry_t *profile_p )	{
 	}
 	
 	profile_p->accum_roll_dt += profile_p->interval_dt;
-	if( profile_p->accum_count >= MAX_ROLLING )	{
+	if( profile_p->accum_count >= rolling_length )	{
 		profile_p->accum_roll_dt -= profile_p->roll_dt_arr[ profile_p->roll_index ];
 	}
 	else	{
@@ -306,7 +313,7 @@ void TimeIntervalProfiler::accum_profile( profile_entry_t *profile_p )	{
 	
 	profile_p->roll_dt_arr[ profile_p->roll_index ] = profile_p->interval_dt;
 	profile_p->roll_index++;
-	if( profile_p->roll_index >= MAX_ROLLING )	{
+	if( profile_p->roll_index >= rolling_length )	{
 		profile_p->roll_index = 0;
 	}
 	

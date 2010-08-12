@@ -817,7 +817,8 @@ void mcu_print_profiler_help( int level = 0 )	{
 		LOG( "  dyn [abs|rel]" );
 		LOG( "  sniff <factor:[0.0,1.0)>" );
 		LOG( "  avoid <factor:(1.0,...)>" );
-		LOG( "  decay <factor:[0.0,1.0)>" );
+		LOG( "  decaying <factor:[0.0,1.0)>" );
+		LOG( "  rolling <count>" );
 		LOG( "  print | report" );
 		LOG( "  erase | reset" );
 		LOG( "  test [reps]" );
@@ -852,6 +853,23 @@ int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 		if( strcmp( tip_cmd, "legend" ) == 0 ) {
 			prof_p->print_legend();
+		}
+		else
+		if( strcmp( tip_cmd, "print" ) == 0 )	{
+			prof_p->print();
+		}
+		else
+		if( strcmp( tip_cmd, "report" ) == 0 )	{
+			prof_p->report();
+//			prof_p->full_report();
+		}
+		else
+		if( strcmp( tip_cmd, "erase" ) == 0 )	{
+			prof_p->erase();
+		}
+		else
+		if( strcmp( tip_cmd, "reset" ) == 0 )	{
+			prof_p->reset();
 		}
 		else 
 		if( strcmp( tip_cmd, "on" ) == 0 )	{
@@ -968,26 +986,14 @@ int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			prof_p->set_avoid( (double)value );
 		}
 		else
-		if( strcmp( tip_cmd, "decay" ) == 0 )	{
+		if( strcmp( tip_cmd, "decaying" ) == 0 )	{
 			float sm = args.read_float();
-			prof_p->set_decay( (double)sm );
+			prof_p->set_decaying( (double)sm );
 		}
 		else
-		if( strcmp( tip_cmd, "print" ) == 0 )	{
-			prof_p->print();
-		}
-		else
-		if( strcmp( tip_cmd, "report" ) == 0 )	{
-			prof_p->report();
-//			prof_p->full_report();
-		}
-		else
-		if( strcmp( tip_cmd, "erase" ) == 0 )	{
-			prof_p->erase();
-		}
-		else
-		if( strcmp( tip_cmd, "reset" ) == 0 )	{
-			prof_p->reset();
+		if( strcmp( tip_cmd, "rolling" ) == 0 )	{
+			int c = args.read_int();
+			prof_p->set_rolling( c );
 		}
 		else
 		if( strcmp( tip_cmd, "test" ) == 0 )	{
