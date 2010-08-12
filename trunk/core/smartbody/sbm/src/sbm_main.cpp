@@ -536,7 +536,7 @@ int main( int argc, char **argv )	{
 
 	FltkViewerFactory* viewerFactory = new FltkViewerFactory();
 	//viewerFactory->setFltkViewer(sbmWindow->getFltkViewer());
-	viewerFactory->setFltkViewer(viewer);
+//	viewerFactory->setFltkViewer(viewer);
 	mcu.register_viewer_factory(viewerFactory);
 	mcu.register_bmlviewer_factory(new BehaviorViewerFactory());
 
