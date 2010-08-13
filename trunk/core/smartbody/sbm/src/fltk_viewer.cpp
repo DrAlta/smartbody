@@ -803,6 +803,7 @@ static char t_direction[200];
 static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h)
 {
 	e.type = t;
+	bool not_locomotion = false;
 	e.key = fltk::event_key();
 	char cmd[300];
 	cmd[0] = '\0';
@@ -861,6 +862,7 @@ static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h
 		sprintf(cmd, "test loco stop");
 		break;
 	default:
+		not_locomotion = true;
 		break;
 	}
 	char tt[200];
@@ -869,7 +871,7 @@ static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h
 	if(e.key != ' ') strcat(cmd, tt);
 	//if(e.key != ' ') sprintf(cmd, "test loco dx %f dz %f rps %f time 1.0", loco_x_speed * x_flag, loco_z_speed * z_flag, rps_flag * rps);
 	//printf("\n%s", cmd);
-	mcu.execute(cmd);
+	if(not_locomotion == false) mcu.execute(cmd);
 }
 
 
