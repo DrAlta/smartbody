@@ -63,6 +63,7 @@ int mcu_character_bone_position_cmd( const char* char_name, srArgBuffer& args, m
 int mcu_character_load_mesh( const char* char_name, const char* obj_file, mcuCBHandle* mcu_p );	// support obj file for now
 int mcu_character_load_skinweights( const char* char_name, const char* skin_file, mcuCBHandle* mcu_p );	// support colladda for now
 
+
 //  The following have been replace by SbmCharacter::remove_from_scene( const char* )
 //int mcu_character_remove( const char * char_name, mcuCBHandle * mcu_p );
 //int mcu_removeallcharacters_func( srArgBuffer& args, mcuCBHandle *mcu_p );
@@ -103,5 +104,7 @@ int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 int mcu_wsp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_syncpolicy_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
+// examine the motion for specific skeleton
+int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 //////////////////////////////////////////////////////////////////
 #endif
