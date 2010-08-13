@@ -31,7 +31,7 @@
 SrMat get_lmat(SkJoint* joint, SrQuat* quat)
 {
 	SrMat _lmat;
-      SrQuat q = *quat;
+    SrQuat q = *quat;
 
       float x2  = q.x+q.x;
       float x2x = x2*q.x;
@@ -51,11 +51,11 @@ SrMat get_lmat(SkJoint* joint, SrQuat* quat)
       _lmat[8] = x2z + y2w;        _lmat[9] = y2z - x2w;        _lmat[10] = 1.0f - x2x - y2y;
 
       if (_lmat[0]==0 && _lmat[1]==0 && _lmat[2]==0) _lmat.identity(); // to avoid a null matrix
-
    // now update offset + translation:
    _lmat[12] = joint->offset().x + joint->pos()->value(0);
    _lmat[13] = joint->offset().y + joint->pos()->value(1);
    _lmat[14] = joint->offset().z + joint->pos()->value(2);
+
    return _lmat;
  }
 
@@ -73,9 +73,11 @@ SrArray<SrQuat>* get_blended_quat_buffer(SrArray<SrQuat>* dest, SrArray<SrQuat>*
 	{
 		LOG("Error. buffer size = 0");
 	}
+	SrQuat q;
 	for(int i = 0; i < dest->size(); ++i)
 	{
-		dest->set(i, slerp(quat_buffer1->get(i), quat_buffer2->get(i), 1-weight));
+		q = slerp(quat_buffer1->get(i), quat_buffer2->get(i), 1.0f-weight);
+		dest->set(i, q);
 	}
 	return dest;
 }

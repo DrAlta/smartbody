@@ -58,7 +58,7 @@ void MeCtLocomotionLimbDirectionPlanner::set_automation(bool automatic)
 	this->automatic = automatic;
 }
 
-float MeCtLocomotionLimbDirectionPlanner::get_ratio(MeCtLocomotionLimbAnim* anim1, MeCtLocomotionLimbAnim* anim2)
+/*float MeCtLocomotionLimbDirectionPlanner::get_ratio(MeCtLocomotionLimbAnim* anim1, MeCtLocomotionLimbAnim* anim2)
 {
 	SrVec v1 = anim1->global_info->direction*(float)anim1->get_timing_space()->get_mode();
 	SrVec v2 = anim2->global_info->direction*(float)anim2->get_timing_space()->get_mode();
@@ -73,6 +73,23 @@ float MeCtLocomotionLimbDirectionPlanner::get_ratio(MeCtLocomotionLimbAnim* anim
 	s = len2*p2/s;
 	if(s > 1.0f) s = 1.0f;
 	return s;
+}*/
+
+float MeCtLocomotionLimbDirectionPlanner::get_ratio(MeCtLocomotionLimbAnim* anim1, MeCtLocomotionLimbAnim* anim2)
+{
+	SrVec v1 = anim1->global_info->direction*(float)anim1->get_timing_space()->get_mode();
+	SrVec v2 = anim2->global_info->direction*(float)anim2->get_timing_space()->get_mode();
+	SrVec dir = curr_direction;
+	float len1 = anim1->global_info->displacement;
+	float len2 = anim2->global_info->displacement;
+	dir.normalize();
+	float cos1 = dot(anim1->global_info->direction, dir);
+	float cos2 = dot(anim2->global_info->direction, dir);
+
+	float sin1 = sqrt(1.0f-cos1*cos1)*len1;
+	float sin2 = sqrt(1.0f-cos2*cos2)*len2;
+	//printf("\n%f", sin2*len2/(sin1*len1+sin2*len2));
+	return sin2/(sin1+sin2);
 }
 
 void MeCtLocomotionLimbDirectionPlanner::reset()

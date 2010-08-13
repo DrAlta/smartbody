@@ -371,6 +371,7 @@ int mcuCBHandle::open_viewer( int width, int height, int px, int py )	{
 		viewer_p->label_viewer( "SBM Viewer" );
 		camera_p = new SrCamera;
 		viewer_p->set_camera( *camera_p );
+		//((FltkViewer*)viewer_p)->set_mcu(this);
 		viewer_p->show_viewer();
 		if( root_group_p )	{
 			viewer_p->root( root_group_p );

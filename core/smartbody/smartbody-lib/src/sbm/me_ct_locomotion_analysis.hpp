@@ -71,7 +71,7 @@ public:
 
 	void init(SkMotion* standing, srPathList &me_paths); //temp hard-coded init for human characters
 
-	void add_locomotion(SkMotion* motion_locomotion);
+	void add_locomotion(SkMotion* motion_locomotion, int type, int walking_style);
 
 	void calc_velocity();
 	void calc_velocity(int index);
@@ -80,7 +80,11 @@ public:
 
 	void analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkMotion* walking, SkMotion* standing, char* limb_base, SrArray<float>* support_height, 
 								   float ground_height, float height_bound);
-	void analyze_walking_limb(MeCtLocomotionLimb* limb, SkMotion* walking, SkMotion* standing);
+
+	void analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkMotion* walking, SkMotion* standing, char* limb_base, int land_time, int stance_time, int lift_time);
+
+	void analyze_walking_limb(MeCtLocomotionLimb* limb, SkMotion* walking, SkMotion* standing, int walking_style);
+	void analyze_walking_limb(MeCtLocomotionLimb* limb, SkMotion* walking, SkMotion* standing, int land_time, int stance_time, int lift_time, int walking_style);
 
 	void analyze_standing(MeCtLocomotionLimb* limb, SkMotion* standing);
 
@@ -103,6 +107,8 @@ public:
 	void init_blended_anim();
 	//temp funcs.............
 	void test_facing(SkMotion* walking);
+
+	void print_info();
 
 };
 

@@ -71,6 +71,7 @@ public:
 	int get_next_ref_time_index(int index);
 	float get_section_length(int ref1, int ref2);
 	float get_section_length(float space_value1, float space_value2);
+	float get_section_length_by_frame(float frame1, float frame2);
 
 	float get_normalized_frame(float frame);
 

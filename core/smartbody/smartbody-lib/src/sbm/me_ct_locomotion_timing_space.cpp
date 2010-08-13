@@ -161,9 +161,17 @@ float MeCtLocomotionTimingSpace::get_section_length(float space_value1, float sp
 	return len;
 }
 
+float MeCtLocomotionTimingSpace::get_section_length_by_frame(float frame1, float frame2)
+{
+	frame1 = get_normalized_frame(frame1);
+	frame2 = get_normalized_frame(frame2);
+	if(frame2 < frame1) frame2 = frame_num+frame2;
+	return (frame2-frame1);
+}
+
 float MeCtLocomotionTimingSpace::get_ref_time(int index)
 {
-	if(index < 0 || index > frame_num-1) 
+	if(index < 0 || index > _ref_time.size()-1) 
 	{
 		LOG("Error: wrong reference time index: %d", index);
 		return 0;
@@ -330,6 +338,10 @@ MeCtLocomotionTimingSpace* get_blended_timing_space(MeCtLocomotionTimingSpace* s
 	int next2 = 0;
 	space->set_frame_num(space1->get_frame_num()*weight1 + space2->get_frame_num()*weight2);
 	space->set_lower_bound(space1->get_lower_bound()*weight1 + space2->get_lower_bound()*weight2);
+
+	//printf("\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+	//space1->print_info();
+	//space2->print_info();
 
 	float t1 = space1->get_ref_time(0);
 	float t2 = space2->get_ref_time(0);

@@ -147,6 +147,11 @@ void MeCtLocomotionLimb::print_info()
 {
 	LOG("\n ground_height: %f", ground_height);
 	LOG("\n height_bound: %f", height_bound);
+	for(int i = 0; i < walking_list.size(); ++i)
+	{
+		SrVec walking_dir = walking_list.get(i)->local_direction;
+		printf("\n walking animation %d direction: (%f, %f, %f)", i, walking_dir.x, walking_dir.y, walking_dir.z);
+	}
 	for(int i = 0; i < get_support_joint_num(); ++i)
 	{
 		LOG("\n support_height[%s]: %f", (const char*)*support_joint_list.get(i), support_height.get(i));
@@ -164,6 +169,7 @@ void MeCtLocomotionLimb::blend_anim(float space_time, int anim_index1, int anim_
 	anim1->get_frame(anim1->get_timing_space()->get_virtual_frame(space_time), limb_base_name, index_buff);
 	anim2->get_frame(anim2->get_timing_space()->get_virtual_frame(space_time), limb_base_name, index_buff);
 	get_blended_quat_buffer(&(limb_joint_info.quat), anim1->get_buffer(), anim2->get_buffer(), weight);
+	//r_base_pos = anim1->get_base_pos()*weight + anim2->get_base_pos()*(1.0f-weight);
 }
 
 void MeCtLocomotionLimb::manipulate_turning()

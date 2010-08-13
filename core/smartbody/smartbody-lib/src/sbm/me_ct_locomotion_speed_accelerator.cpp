@@ -34,17 +34,17 @@ const char* MeCtLocomotionSpeedAccelerator::TYPE = "MeCtLocomotionSpeedAccelerat
 MeCtLocomotionSpeedAccelerator::MeCtLocomotionSpeedAccelerator() {
 	curr_speed = 0.0f;
 	target_speed = 0.0f;
-	target_acceleration = 100.0f;
-	acceleration = 100.0f;
+	target_acceleration = 10.0f;
+	acceleration = 10.0f;
 	//automate = true;
 	proceed_acceleration = true;
 	auto_accelerated = true;
 	speed_limit = 200.0f;
 	frame_interval = 0.013333f;
-	max_acceleration_pos = 500.0f;
+	max_acceleration_pos = 200.0f;
 	min_acceleration_pos = 0.0f;
-	max_acceleration_neg = -300.0f;
-	min_acceleration_neg = -1000.0f;
+	max_acceleration_neg = -30.0f;
+	min_acceleration_neg = -200.0f;
 }
 
 /** Destructor */

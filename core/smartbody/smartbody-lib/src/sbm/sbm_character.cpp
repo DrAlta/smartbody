@@ -203,9 +203,11 @@ int SbmCharacter::init_locomotion_analyzer(const char* skel_file, mcuCBHandle *m
 	locomotion_ct->add_locomotion_anim(walking2_p);
 	
 	locomotion_ct_analysis->init(standing_p, mcu_p->me_paths);
-	locomotion_ct_analysis->add_locomotion(walking1_p);
-	locomotion_ct_analysis->add_locomotion(walking2_p);
+	locomotion_ct_analysis->add_locomotion(walking1_p, 1, 0);
+	locomotion_ct_analysis->add_locomotion(walking2_p, 2, 0);
 	locomotion_ct_analysis->init_blended_anim();
+
+	locomotion_ct_analysis->print_info();
 
 	return CMD_SUCCESS;
 }
@@ -988,7 +990,11 @@ void prune_schedule( SbmCharacter*   actor,
 							raw_channels.add( ct_channels.name(*it), ct_channels.type(*it) );
 						}
 					}
-				} else {
+				} 
+				else if(anim_ct_type == MeCtNavigationCircle::TYPE)
+				{
+				}
+				else {
 					//  TODO: Throttle warnings....
 					cerr << "WARNING: Cannot prune unknown controller type \"" << anim_source->controller_type() << "\"" << endl;
 				}
