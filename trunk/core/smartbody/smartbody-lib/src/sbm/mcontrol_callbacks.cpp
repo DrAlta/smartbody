@@ -3700,3 +3700,137 @@ int mcu_syncpolicy_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
    return CMD_FAILURE;
 }
+
+// Functions:
+// 1. connecting the motion with the character, print out the channels inside the motion
+// 2. examine whether these channels exist inside the skeleton
+// 3. If frame number exist, this will output which channels are affected 
+// check motion/skeleton <character name> <motion name> [frame number]
+// frame number is optional
+int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	if (mcu_p)
+	{
+		char* operation = args.read_token();
+		char* charName = args.read_token();
+		char* motionName = args.read_token();
+		char* frameNumString = args.read_token();
+		int frameNum = -1;
+		if (frameNumString != "")	frameNum = atoi(frameNumString);
+		int mode = -1;
+		int chanSize;
+		SkChannel chan;
+
+		if (strcmp(operation, "motion") == 0)	mode = 1;
+		if (strcmp(operation, "skeleton") == 0)	mode = 2;
+		if (mode == -1)
+		{
+			LOG("mcu_check_func ERR: Mode %s not FOUND!", operation);
+			return CMD_FAILURE;
+		}
+
+		SbmCharacter* character = mcu_p->character_map.lookup(charName);
+		SkMotion* motion;
+		std::map<std::string, SkMotion*>::iterator motionIter = mcu_p->motion_map.find(motionName);
+		if (motionIter != mcu_p->motion_map.end())
+			motion = motionIter->second;
+		else
+		{
+			LOG("mcu_check_func ERR: Motion %s NOT EXIST!", motionName);
+			return CMD_FAILURE;
+		}
+		if (character)
+		{
+			int numValidChannels = motion->connect(character->skeleton_p);	// connect and check for the joints
+			SkChannelArray& mChanArray = motion->channels();
+			int mChanSize = mChanArray.size();
+			SkChannelArray& skelChanArray = character->skeleton_p->channels();
+			int skelChanSize = skelChanArray.size();
+			if (mode == 1)
+			{
+				chanSize = mChanSize;
+				LOG("Channels in motion %s's channel matching %s's skeleton are preceeded with '+'", motionName, charName);
+				LOG("motion %s's Channel Info:", motionName);
+			}
+			if (mode == 2)
+			{
+				chanSize = skelChanSize;
+				LOG("Channels in skeleton %s's channel matching motion %s's channel are preceeded with '+'", charName, motionName);
+				LOG("character %s's Channel Info:", charName);
+			}
+			LOG("Channel Size: %d", chanSize);
+			for (int i = 0; i < chanSize; i++)
+			{				
+				std::stringstream outputInfo;
+				if (mode == 1)	chan = mChanArray[i];
+				if (mode == 2)	chan = skelChanArray[i];
+				std::string jointName = chan.joint->name().get_string();
+				int	chanType = chan.type;
+				std::string chanTypeString;
+				switch (chanType)
+				{
+					case 0:
+						chanTypeString = "XPos";
+						break;
+					case 1:	
+						chanTypeString = "YPos";
+						break;
+					case 2:
+						chanTypeString = "ZPos";
+						break;
+					case 6:
+						chanTypeString = "Quat";
+						break;
+					default:
+						chanTypeString = "Others";
+				}
+				int pos;
+				if (mode == 1)	pos = skelChanArray.search(chan.joint->name(), chan.type);
+				if (mode == 2)	pos = mChanArray.search(chan.joint->name(), chan.type);
+				if (pos != -1)
+					outputInfo << "+ ";
+				if (pos == -1)	
+					outputInfo << "  ";
+				outputInfo << i << ": " << jointName.c_str() << " (" << chanTypeString << ")";
+				LOG("%s", outputInfo.str().c_str());
+			}
+			
+			// check the non-zero channel
+			if (frameNum >= 0 && frameNum < motion->frames())
+			{
+				float* frameData = motion->posture(frameNum);
+				int channelCounter = 0;
+				for (int c = 0; c < mChanArray.size(); c++)
+				{
+					SkChannel& channel = mChanArray.get(c);
+					SkJointName& jointName = mChanArray.name(c);
+					int chanSize = channel.size();
+					int numZeroFrames = 0;
+					for (int x = 0; x < chanSize; x++)
+					{
+						if (fabs(frameData[channelCounter]) < .00001)
+							numZeroFrames++;
+						channelCounter++;
+					}
+					if (numZeroFrames == 0)
+					{
+						LOG("Channel %s/%s has non-zero values.", jointName.get_string(), channel.type_name());
+					}
+				}
+				motion->disconnect();
+			}
+			else
+			{
+				LOG("mcu_check_func ERR: Frame Number not Exist!");
+				motion->disconnect();
+				return CMD_FAILURE;			
+			}
+		}
+		else
+		{
+			LOG("mcu_check_func ERR: Character %s NOT EXIST!", charName);
+			return CMD_FAILURE;
+		}
+	}
+	return CMD_SUCCESS;
+}

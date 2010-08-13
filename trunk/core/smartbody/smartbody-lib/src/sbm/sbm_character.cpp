@@ -1510,8 +1510,8 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	} 
 	else 
 	if( char_cmd=="smoothbindweight" ) {
-	char* skin_file = args.read_token();
-	return mcu_character_load_skinweights( char_name.c_str(), skin_file, mcu_p );
+		char* skin_file = args.read_token();
+		return mcu_character_load_skinweights( char_name.c_str(), skin_file, mcu_p );
 	} 
 	else 
 	if( char_cmd=="ctrl" ) {
