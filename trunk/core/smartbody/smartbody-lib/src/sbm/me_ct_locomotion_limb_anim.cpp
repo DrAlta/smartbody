@@ -124,10 +124,15 @@ void MeCtLocomotionLimbAnim::print_info()
 		LOG("\n land_frame[%s]: %d", (const char*)*(support_joint_list->get(i)), land_frame.get(i));
 		LOG("\n lift_frame[%s]: %d", (const char*)*(support_joint_list->get(i)), lift_frame.get(i));
 	}*/
+	for(int i = 0; i < this->timing_space.get_ref_time_num(); ++i)
+	{
+		printf("\n %s: %f", timing_space.get_ref_time_name(i), timing_space.get_ref_time(i));
+	}
 	for(int j = 0; j < walking->frames() && j < displacement_list.size(); ++j)
 	{
 		velocity = displacement_list.get(j);
 		LOG("\n%d (%.2f, %.2f, %.2f)", j, velocity->x, velocity->y, velocity->z);
+		//printf("\n%d (%f, %f, %f)", j, velocity->x, velocity->y, velocity->z);
 	}
 }
 
@@ -151,20 +156,30 @@ void MeCtLocomotionLimbAnim::init_quat_buffers(int num)
 void MeCtLocomotionLimbAnim::get_frame(float frame, char* limb_base, SrArray<int>* index_buff)
 {
 	//temp int, must be changed
+	//printf("\nframe: %f", frame);
+	float ratio = frame-(int)frame;
 	walking->connect(walking_skeleton);
+
 	SkJoint* base = walking_skeleton->search_joint(limb_base);
+
 	walking->apply_frame((int)frame);
 	iterate_set(base, 0, 0, &quat_buffer_key_frame1, index_buff);
+
 	walking->apply_frame((int)frame+1);
 	iterate_set(base, 0, 0, &quat_buffer_key_frame2, index_buff);
+
 	SrQuat q;
 	for(int i = 0; i < quat_buffer.size(); ++i)
 	{
-		q = slerp(quat_buffer_key_frame1.get(i), quat_buffer_key_frame2.get(i), frame-(int)frame);
+		q = slerp(quat_buffer_key_frame1.get(i), quat_buffer_key_frame2.get(i), ratio);
 		quat_buffer.set(i,q);
 	}
 }
 
+SrVec MeCtLocomotionLimbAnim::get_base_pos()
+{
+	return base_pos;
+}
 /*int MeCtLocomotionLimbAnim::iterate_set(SkJoint* base, int index, SrArray<SrQuat>* buff)
 {
 	SrQuat q = base->quat()->value();

@@ -34,13 +34,14 @@ class MeCtLocomotionLimbAnim{
 public:
 	// Public Constants
 	static const char* TYPE;
+	SkMotion*			walking;
+	int					style;
 
 protected:
 	// Data
 
-	SkMotion*			walking;
 	SrArray<SrString*>*	support_joint_list;
-	SrVec				pos;
+	SrVec				base_pos;
 	bool				is_blended;
 	MeCtLocomotionTimingSpace timing_space;
 	
@@ -98,6 +99,8 @@ public:
 	//int						iterate_set(SkJoint* base, int index, SrArray<SrQuat>* buff);
 
 	void					get_displacement(float start_frame, float end_frame);
+
+	SrVec					get_base_pos();
 
 	void					estimate_direction(int* count);
 

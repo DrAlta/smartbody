@@ -790,6 +790,89 @@ static void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h )
    e.heigth = h;
  }
 
+
+static float loco_x_speed = 0.0f;
+static float loco_z_speed = 100.0f;
+static float rps = 1.0f;
+static int x_flag = 1;
+static int z_flag = 1;
+static int rps_flag = 0;
+static float spd;
+static char t_direction[200];
+
+static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h)
+{
+	e.type = t;
+	e.key = fltk::event_key();
+	char cmd[300];
+	cmd[0] = '\0';
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	sprintf(cmd, "test loco ");
+
+	// locomotion control
+	switch (e.key)
+	{
+	case fltk::UpKey: //move forward
+		rps_flag = 0;
+		z_flag = 1;
+		spd = 70;
+		sprintf(t_direction, "forward ");
+		break;
+
+    case fltk::DownKey://move back
+		z_flag = -1;
+		rps_flag = 0;
+		spd = 70;
+		sprintf(t_direction, "backward ");
+		break;
+
+	case fltk::LeftKey://turn left
+		rps_flag = -1;
+		spd = 70;
+		//strcat(cmd, "leftward ");
+		break;
+
+	case fltk::RightKey://turn right
+		rps_flag = 1;
+		spd = 70;
+		break;
+
+	case 'w'://speed control
+		loco_z_speed += 10.0f;
+		spd += 10;
+		break;
+
+	case 's'://speed control
+		loco_z_speed -= 10.0f;
+		spd -= 10;
+		break;
+
+	case 'a'://speed control
+		loco_x_speed += 10.0f;
+		break;
+
+	case 'd'://speed control
+		loco_x_speed -= 10.0f;
+		break;
+
+	case ' ':// stop
+		sprintf(cmd, "test loco stop");
+		break;
+	default:
+		break;
+	}
+	char tt[200];
+	strcat(cmd, t_direction);
+	sprintf(tt, "spd %f rps %f time 2.0", spd, rps_flag * rps);
+	if(e.key != ' ') strcat(cmd, tt);
+	//if(e.key != ' ') sprintf(cmd, "test loco dx %f dz %f rps %f time 1.0", loco_x_speed * x_flag, loco_z_speed * z_flag, rps_flag * rps);
+	//printf("\n%s", cmd);
+	mcu.execute(cmd);
+}
+
+
 int FltkViewer::handle ( int event ) 
  {
    # define POPUP_MENU(e) e.ctrl && e.button3
@@ -824,9 +907,14 @@ int FltkViewer::handle ( int event )
 
       case fltk::SHORTCUT: // not sure the relationship between a shortcut and keyboard event...
         //SR_TRACE1 ( "Shortcut : "<< fltk::event_key() <<" "<<fltk::event_text() );
-        translate_event ( e, SrEvent::Keyboard, w(), h() );
+        //translate_event ( e, SrEvent::Keyboard, w(), h() );
+        //break;
+
+	  case fltk::KEY:
+        //SR_TRACE1 ( "Key Pressed : "<< fltk::event_key() <<" "<<fltk::event_text() );
+        translate_keyboard_event ( e, SrEvent::Keyboard, w(), h());
         break;
-      
+
 //      case fltk::KEYBOARD:
         //SR_TRACE1 ( "Key Pressed : "<< fltk::event_key() <<" "<<fltk::event_text() );
 //        translate_event ( e, SrEvent::Keyboard, w(), h() );

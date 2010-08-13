@@ -37,50 +37,6 @@ class MeCtLocomotionLimb;
 
 #pragma once
 
-/*struct MeCtLocomotionJointInfo
-{
-	int joint_num;
-	SrArray<const char*> joint_name;
-	SrArray<int> buff_index;
-	SrArray<int> joint_index;
-	SrArray<SrQuat> quat;
-
-	int iterate(SkJoint* joint, SrArray<char*>* limb_joint_name)
-	{
-		int sum = 0;
-		const char* name = joint->name().get_string();
-		if(limb_joint_name != NULL)
-		{
-			for(int i = 0; i < limb_joint_name->size(); ++i)
-			{
-				if(strcmp(limb_joint_name->get(i), name) == 0) return 0;
-			}
-		}
-		if(joint->quat()->active() == true)
-		{
-			joint_name.push() = name;
-			joint_index.push() = joint->index();
-			sum = 1;
-		}
-
-		for(int i = 0; i < joint->num_children(); ++i)
-		{
-			sum += iterate(joint->child(i), limb_joint_name);
-		}
-		return sum;
-	}
-
-	void Init(SkSkeleton* skeleton, char* base_name, SrArray<char*>* limb_joint_name)
-	{
-		SkJoint* tjoint = skeleton->search_joint(base_name);
-		joint_num = iterate(tjoint, limb_joint_name);
-		quat.capacity(joint_num);
-		quat.size(joint_num);
-		buff_index.capacity(joint_num);
-		buff_index.size(joint_num);
-	}
-};*/
-
 
 class MeCtLocomotion : public MeController {
 public:
@@ -88,9 +44,23 @@ public:
 	static const char* TYPE;
 
 public:
-	//SrArray<int>	nonlimb_joint_index;
+	//MeCtLocomotionJointInfo loco_irre_joint_info; // locomotion irrelative joints
+	//MeCtLocomotionJointInfo base_to_limb_joint_info; // joints from base joint to limb base joint(not included), 
+
 	MeCtLocomotionJointInfo nonlimb_joint_info;
+
 	SrArray<char*> limb_base_name;
+	float pre_blended_base_height;
+	float r_blended_base_height;
+	SrQuat r_blended_base_rot;
+	//SrQuat pre_blended_base_rot;
+	//float prev_frame;
+	int base_index;
+	SrQuat buff_base_rot;
+
+	int r_anim1_index;
+	int r_anim2_index;
+	int style;
 
 protected:
 
@@ -124,7 +94,6 @@ protected:
 	//SrArray<SrQuat> nonlimb_joint_quats;
 
 
-
 	//temp
 	SrArray<SrQuat> t_joint_quats1;
 	SrArray<SrQuat> t_joint_quats2;
@@ -133,6 +102,8 @@ protected:
 
 	//SrArray<int> limb_joint_index;
 	int limb_joint_num;
+
+	float motion_time;
 
 	float last_time;
 	float last_t;
@@ -218,6 +189,7 @@ public:
 
 	void init_nonlimb_joint_info();
 
+	void get_anim_indices(int limb_index, SrVec direction);
 
 	void update_pos();
 
@@ -249,7 +221,9 @@ public:
 
 	void normalize_proportion();
 
-	void orthonormal_decompose(const SrVec& svec, const SrVec& direction, SrVec* dvec1, SrVec* dvec2);
+	//void orthonormal_decompose(const SrVec& svec, const SrVec& direction, SrVec* dvec1, SrVec* dvec2);
+
+	void blend_base_joint(float space_time, int anim_index1, int anim_index2, float weight);
 
 	//temp. to be deleted or modified...
 	//SrMat get_lmat (SkJoint* joint, SrQuat* quat);
@@ -279,6 +253,8 @@ public:
 	void update_limb_anim_standing();
 
 	void update_limb_anim_standing(MeCtLocomotionLimbAnim* anim, int index, MeFrameData& frame);
+
+	void set_motion_time(float time);
 };
 
 #endif // ME_CT_LOCOMOTION_HPP

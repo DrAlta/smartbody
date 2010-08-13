@@ -36,6 +36,9 @@ public:
 	// Public Constants
 	static const char* TYPE;
 	float standing_factor;
+
+	float standing_factor_on_stop_t;
+
 	float framerate_accelerator;
 	SkChannelArray  request_channels;
 	bool is_valid;

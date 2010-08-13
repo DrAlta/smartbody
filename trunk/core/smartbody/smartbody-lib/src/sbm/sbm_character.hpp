@@ -46,6 +46,7 @@
 #define MeCtSchedulerClass MeCtScheduler2
 
 #if(1) // Use primary locomotion controller
+#include "me_ct_navigation_circle.hpp"
 #include "me_ct_locomotion.hpp"
 #include "me_ct_locomotion_analysis.hpp"
 #define  MeCtLocomotionClass MeCtLocomotion

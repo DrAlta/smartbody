@@ -59,8 +59,8 @@ int locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		MeCtLocomotionAnalysis analysis;
 		analysis.set_ct(&ct_locomotion);
 		analysis.init(standing_p, mcu_p->me_paths);
-		analysis.add_locomotion(walking1_p);
-		analysis.add_locomotion(walking2_p);
+		analysis.add_locomotion(walking1_p, 1, 0);
+		analysis.add_locomotion(walking2_p, 2, 0);
 		return CMD_SUCCESS;
 	}
 	else
@@ -144,6 +144,8 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		return CMD_FAILURE;
 	}
 
+	bool local = false;
+	SrVec global_direction;
 	MeCtNavigationCircle* nav_circle = new MeCtNavigationCircle();
 	nav_circle->ref();
 	nav_circle->init( 0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -169,25 +171,67 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		return CMD_SUCCESS;
 	}
 
-	else if( arg == "forward" || arg == "backward")
+	if( arg == "local")
+	{
+		global_direction = actor->get_locomotion_ct()->get_facing_vector();
+		local = true;
+	}
+
+	if( arg == "forward" || arg == "backward" || arg == "leftward" || arg == "rightward")
 	{
 		float spd = 0.0f;
+		float rps = 0.0f;
+		float time = 0.0f;
+		SrMat mat;
 		SrVec direction = actor->get_locomotion_ct()->get_facing_vector();
-		if(arg == "backward")
-			direction = -direction;
 
-		arg = args.read_token();
-		if(arg == "spd")
+		while( !arg.empty() ) 
 		{
-			spd = args.read_float();
-			direction *= spd;
+			if(arg == "forward")
+			{
+				direction = direction;
+			}
+			else if(arg == "backward")
+			{
+				direction = -direction;
+			}
+
+			else if(arg == "leftward")
+			{
+				SrVec v(0.0f, 0.0f, 1.0f);
+				mat.roty(acos(dot(direction, v)));
+				direction = direction*mat;
+			}
+
+			else if(arg == "rghtward")
+			{
+				//direction = -direction;
+			}
+
+			else if(arg == "spd")
+			{
+				spd = args.read_float();
+				direction *= spd;
+			}
+			else if(arg == "rps")
+			{
+				rps = args.read_float();
+			}
+			else if(arg == "time")
+			{
+				time = args.read_float();
+				actor->get_locomotion_ct()->set_motion_time(time);
+			}
+			else 
+			{
+				cerr << "Unknown token" <<endl;
+				//cerr << "Please specify the speed. (example:'spd 50')" <<endl;
+				return CMD_FAILURE;
+			}
+			arg = args.read_token();
 		}
-		else 
-		{
-			LOG("Please specify the speed. (example:'spd 50')");
-			return CMD_FAILURE;
-		}
-		nav_circle->init( direction.x, direction.y, direction.z, 0.0f, 0.0f, -1, 0, 0, 0 );
+		nav_circle->init( direction.x, direction.y, direction.z, rps, rps, -1, 0, 0, 0 );
+
 		return CMD_SUCCESS;
 	}
 
@@ -297,13 +341,13 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		return CMD_SUCCESS;
 	}
 	
-	else if( arg=="dx" || arg=="dy" || arg == "dz" || arg=="deg_per_sec" || arg=="dps" || arg=="rad_per_sec" || arg=="rps" || arg=="grps" || arg=="lrps" ) {
+	else if( arg=="dx" || arg=="dy" || arg == "dz" || arg=="deg_per_sec" || arg=="dps" || arg=="rad_per_sec" || arg=="rps" || arg=="grps" || arg=="lrps" || arg == "time") {
 		SkChannelArray channels;
 		actor->get_locomotion_ct()->get_navigator()->clear_destination_list();
 		actor->get_locomotion_ct()->get_navigator()->has_destination = false;
 		int dx_index=-1, dy_index=-1, dz_index=-1, g_angular_index=-1, l_angular_index=-1, id_index = -1;
 		//float data[6] = {0,0,0,0,0,0};
-		float dx = 0.0f, dy = 0.0f, dz = 0.0f, g_angular = 0.0f, l_angular = 0.0f;
+		float dx = 0.0f, dy = 0.0f, dz = 0.0f, g_angular = 0.0f, l_angular = 0.0f, time = -1.0f;
 		int id = -1;
 
 		while( !arg.empty() ) {
@@ -368,6 +412,9 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 				}
 				l_angular = args.read_float();
 				//data[ l_angular_index ] = l_angular;
+			} else if(arg=="time" ) {
+				time = args.read_float();
+				//data[ l_angular_index ] = l_angular;
 			} else if(arg=="id" ) {
 				if( id_index == -1 ) {
 					id_index = channels.size();
@@ -388,8 +435,8 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			}
 			arg = args.read_token();
 		}
-
-		nav_circle->init( dx, dy, dz, g_angular, l_angular, id, 0, 0, 0 );
+		actor->get_locomotion_ct()->set_motion_time(time);
+		nav_circle->init( dx, dy, dz, g_angular, l_angular, id, 0, 0, 0);
 
 		return CMD_SUCCESS;
 	}
