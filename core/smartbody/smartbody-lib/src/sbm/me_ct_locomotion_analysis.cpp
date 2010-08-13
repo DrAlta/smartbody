@@ -792,7 +792,7 @@ void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, int typ
 		limb = _ct_locomotion->get_limb_list()->get(i);
 
 
-		/*if(type == 1) // forward
+		if(type == 1) // forward
 		{
 			if(i == 1) //right leg
 			{
@@ -821,9 +821,9 @@ void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, int typ
 				stance_time = 7;
 				lift_time = 28;
 			}
-		}*/
+		}
 
-		if(type == 1)// forward
+		/*if(type == 1)// forward
 		{
 			if(i == 1) //right leg
 			{
@@ -852,7 +852,7 @@ void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, int typ
 				stance_time = 2;
 				lift_time = 34;
 			}
-		}
+		}*/
 
 		analyze_walking_limb(limb, motion_locomotion, motion_standing, land_time, stance_time, lift_time, 0);
 		//limb->print_info();
