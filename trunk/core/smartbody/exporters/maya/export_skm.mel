@@ -586,11 +586,11 @@ global proc int skmExport( string $fname,
       int $relaxVal =       `getAttr( $AnimDef + ".relaxTime" )`;
 
       //convert synch point values from frames to seconds
-      float $readySeconds =       float( $readyVal ) / $fps;
-      float $strokeStartSeconds = float( $strokeStartVal ) / $fps;
-      float $emphasisSeconds =    float( $emphasisVal ) / $fps;
-      float $strokeSeconds =      float( $strokeVal ) / $fps;
-      float $relaxSeconds =       float( $relaxVal ) / $fps;
+      float $readySeconds =       float( $readyVal - $startFrame ) / $fps;
+      float $strokeStartSeconds = float( $strokeStartVal - $startFrame ) / $fps;
+      float $emphasisSeconds =    float( $emphasisVal - $startFrame ) / $fps;
+      float $strokeSeconds =      float( $strokeVal - $startFrame ) / $fps;
+      float $relaxSeconds =       float( $relaxVal - $startFrame ) / $fps;
 
       //print synch point values
       fprint $fileid ( "ready time: "+ $readySeconds + "\n" );
