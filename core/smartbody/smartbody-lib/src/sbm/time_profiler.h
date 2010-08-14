@@ -32,8 +32,8 @@
 #define DEFAULT_SNIFF			0.9
 #define DEFAULT_AVOID			1.5
 #define DEFAULT_THRESHOLD		10.0
-#define DEFAULT_DECAYING		0.99
-#define DEFAULT_ROLLING 		32
+#define DEFAULT_DECAYING		0.95
+#define DEFAULT_ROLLING 		64
 #define MAX_SNIFF_DT			0.2
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -43,17 +43,31 @@ class TimeIntervalProfiler { // T.I.P.
 	private:
 		enum time_profiler_enum_set	{
 		
+#if 0
 			LABEL_SIZE =	8192,
 			MAX_GROUPS =	256,
 			MAX_PROFILES =	256,
 			MAX_ROLLING = 	256
-		};
+#elif 1
+			LABEL_SIZE =	512,
+			MAX_GROUPS =	32,
+			MAX_PROFILES =	32,
+			MAX_ROLLING = 	64
+#else
+			LABEL_SIZE =	512,
+			MAX_GROUPS =	1,
+			MAX_PROFILES =	1,
+			MAX_ROLLING = 	64
+#endif
+	};
 
 		typedef struct profile_entry_s {
 
+			int 	index;
 			int 	level;
 			char	label[ LABEL_SIZE ];
 			bool	spike;
+			bool	show;
 			bool	req_reset;
 
 			double	event_time;
@@ -76,16 +90,18 @@ class TimeIntervalProfiler { // T.I.P.
 
 		typedef struct group_entry_s {
 
+			int 	index;
+			char	name[ LABEL_SIZE ];
 			bool	req_enable;
 			bool	req_disable;
 			bool	enabled;
-			char	name[ LABEL_SIZE ];
 			bool 	open;
 			bool	open_err;
 			
 			bool	req_preload;
 			bool	preloading;
 			bool	spike;
+			int		spike_count;
 			bool	req_reset;
 
 			double  interval_dt;
@@ -317,6 +333,7 @@ class TimeIntervalProfiler { // T.I.P.
 	private:
 
 		void print_data( void );
+		void print_profile( profile_entry_t* profile_p );
 		void print_group( group_entry_t *group_p );
 		void print_profile_report( char *prefix, profile_entry_t *profile_p );
 		void print_group_report( const char *prefix, group_entry_t* group_p );
@@ -328,6 +345,10 @@ class TimeIntervalProfiler { // T.I.P.
 		bool check_profile_spike( profile_entry_t *profile_p );
 		bool check_group_spike( group_entry_t* group_p );
 		bool check_profile_show( int level );
+
+		void report_recent_groups( group_entry_t* group_p );
+		void report_recent_profiles( group_entry_t* group_p );
+		void report_current_group( group_entry_t* group_p );
 
 		void sys_update( double time );
 

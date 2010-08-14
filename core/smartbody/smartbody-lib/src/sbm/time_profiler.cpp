@@ -61,16 +61,18 @@ void TimeIntervalProfiler::null( void )	{
 
 void TimeIntervalProfiler::null_group( group_entry_t* group_p, const char* group_name ) {
 
+	group_p->index = -1;
+	_snprintf( group_p->name, LABEL_SIZE, "%s", group_name );
 	group_p->req_enable = false;
 	group_p->req_disable = false;
 	group_p->enabled = false;
-	_snprintf( group_p->name, LABEL_SIZE, "%s", group_name );
 	group_p->open = false;
 	group_p->open_err = false;
 	group_p->req_preload = false;
 	group_p->preloading = false;
 	group_p->spike = false;
-	group_p->req_reset = false;		
+	group_p->spike_count = 0;
+	group_p->req_reset = false;	
 	group_p->interval_dt = 0.0;
 	group_p->decay_dt = 0.0;
 	group_p->roll_dt = 0.0;
@@ -85,9 +87,11 @@ void TimeIntervalProfiler::null_group( group_entry_t* group_p, const char* group
 
 void TimeIntervalProfiler::null_profile( profile_entry_t* profile_p, const char* label ) {
 
+	profile_p->index = -1;
 	profile_p->level = -1;
 	_snprintf( profile_p->label, LABEL_SIZE, "%s", label );
 	profile_p->spike = false;
+	profile_p->show = false;
 	profile_p->req_reset = false;
 	profile_p->event_time = 0.0;
 	profile_p->prev_dt = 0.0;
@@ -106,6 +110,7 @@ void TimeIntervalProfiler::null_profile( profile_entry_t* profile_p, const char*
 void TimeIntervalProfiler::reset_group( group_entry_t* group_p ) {
 
 	group_p->spike = false;
+	group_p->spike_count = 0;
 	group_p->req_reset = false;
 	group_p->interval_dt = 0.0;
 	group_p->decay_dt = 0.0;
@@ -133,6 +138,7 @@ void TimeIntervalProfiler::print_legend( void )	{
 	printf( "TIP <> legend:" );								printf( "\n" );
 	printf( "@	- profile Active" );						printf( "\n" );
 	printf( "*	- *spike reported in active profile" );		printf( "\n" );
+	printf( "#	- overflow groups and profiles" );			printf( "\n" );
 	printf( "<>	- priority level" );						printf( "\n" );
 	printf( "()	- (2)==(number of items, or items)" );		printf( "\n" );
 	printf( "[]	- percent" );					printf( "\n" );
@@ -151,11 +157,32 @@ void TimeIntervalProfiler::print_legend( void )	{
 	printf( "--tip\n" );
 }
 
+void TimeIntervalProfiler::print_profile( profile_entry_t* profile_p )	{
+
+	if( profile_p ) {
+
+		printf( "%s %s <%d>: T:%.4f (r:%d) %s",
+			( profile_p->index < 0 ) ? "#" : " ",
+			( profile_p->req_reset == false ) ? "@" : " ",
+			profile_p->level,
+			profile_p->event_time,
+			profile_p->accum_count,
+			profile_p->label
+		);
+		if( profile_p->intra_count > 1 )	{
+			printf( " (e:%d)", profile_p->intra_count );
+		}
+		printf( "\n" );
+	}
+}
+
 void TimeIntervalProfiler::print_group( group_entry_t *group_p )	{
 
 	if( group_p )	{
 
-		printf( "  GRP: %s (e:%d, a:%d, c:%d, h:%d) :%s\n",
+		printf( 
+			"%s GRP: %s (e:%d, a:%d, c:%d, h:%d) :%s\n",
+			( group_p->index < 0 ) ? "#" : " ",
 			group_p->name,
 			group_p->profile_event_count,
 			group_p->active_profile_count,
@@ -163,22 +190,16 @@ void TimeIntervalProfiler::print_group( group_entry_t *group_p )	{
 			group_p->profile_map.get_num_entries(),
 			group_p->enabled ? "ENABLED" : "DISABLED"
 		);
+
 		for( int i=0; i< group_p->profile_arr_count; i++ )	{
+			print_profile( group_p->profile_p_arr[ i ] );
+		}
 
-			profile_entry_t* profile_p = group_p->profile_p_arr[ i ];
-			if( profile_p ) {
-
-				printf( "%s   <%d>: T:%.4f (r:%d) %s",
-					( profile_p->req_reset == false ) ? "@" : " ",
-					profile_p->level,
-					profile_p->event_time,
-					profile_p->accum_count,
-					profile_p->label
-				);
-				if( profile_p->intra_count > 1 )	{
-					printf( " (e:%d)", profile_p->intra_count );
-				}
-				printf( "\n" );
+		profile_entry_t *profile_p;
+		group_p->profile_map.reset();
+		while( ( profile_p = group_p->profile_map.next() ) != NULL ) {
+			if( profile_p->index < 0 )	{
+				print_profile( profile_p );
 			}
 		}
 	}
@@ -199,15 +220,22 @@ void TimeIntervalProfiler::print_data( void )	{
 	printf( "      sniff: %f\n", dyn_sniff );
 	printf( "      avoid: %f\n", dyn_avoid );
 	printf( "--\n" );
-	printf( "TIP groups (e:%d, a:%d, c:%d, h:%d):\n", 
+	printf( 
+		"TIP groups (e:%d, a:%d, c:%d, h:%d):\n", 
 		group_event_count,
 		active_group_count,
 		group_arr_count,
 		group_map.get_num_entries()
 	);
+
 	for( int i=0; i< group_arr_count; i++ )	{
-		group_entry_t *group_p = group_p_arr[ i ];
-		if( group_p )	{
+		print_group( group_p_arr[ i ] );
+	}
+
+	group_entry_t *group_p;
+	group_map.reset();
+	while( ( group_p = group_map.next() ) != NULL ) {
+		if( group_p->index < 0 )	{
 			print_group( group_p );
 		}
 	}
@@ -217,7 +245,8 @@ void TimeIntervalProfiler::print_data( void )	{
 void TimeIntervalProfiler::print_profile_report( char *prefix, profile_entry_t *profile_p )	{
 
 	printf( 
-		"%s   <%d>: i:%.5f (D:%.5f, R:%.5f, r:%d)",
+		"%s %s <%d>: i:%.5f (D:%.5f, R:%.5f, r:%d)",
+		( profile_p->index < 0 ) ? "#" : " ",
 		prefix,
 		profile_p->level,
 		profile_p->interval_dt,
@@ -244,7 +273,8 @@ void TimeIntervalProfiler::print_profile_report( char *prefix, profile_entry_t *
 void TimeIntervalProfiler::print_group_report( const char *prefix, group_entry_t* group_p )	{
 
 	printf( 
-		"%s   SUM: i:%.5f (D:%.5f, R:%.5f)\n",
+		"%s %s SUM: i:%.5f (D:%.5f, R:%.5f)\n",
+		( group_p->index < 0 ) ? "#" : " ",
 		prefix,
 		group_p->interval_dt,
 		group_p->decay_dt,
@@ -255,7 +285,8 @@ void TimeIntervalProfiler::print_group_report( const char *prefix, group_entry_t
 void TimeIntervalProfiler::print_profile_alert( double dt, group_entry_t* group_p, profile_entry_t *profile_p )	{
 	
 	printf( 
-		"TIP <%d>: i:%.5f [G:%.1f, F:%.3f",
+		"TIP %s <%d>: i:%.5f [G:%.1f, F:%.3f",
+		( profile_p->index < 0 ) ? "#" : "-",
 		profile_p->level,
 		profile_p->interval_dt,
 		100.0 * profile_p->interval_dt / group_p->interval_dt,
@@ -277,7 +308,8 @@ void TimeIntervalProfiler::print_profile_alert( double dt, group_entry_t* group_
 void TimeIntervalProfiler::print_group_alert( const char *prefix, double dt, group_entry_t* group_p )	{
 
 	printf( 
-		"TIP %s: i:%.5f [F:%.3f] (D:%.5f, R:%.5f) %s (a:%d)\n",
+		"TIP %s %s: i:%.5f [F:%.3f] (D:%.5f, R:%.5f) %s (a:%d)\n",
+		( group_p->index < 0 ) ? "#" : "-",
 		prefix,
 		group_p->interval_dt,
 		100.0 * group_p->interval_dt / dt,
@@ -378,6 +410,166 @@ bool TimeIntervalProfiler::check_profile_show( int level )	{
 
 ///////////////////////////////////////////////////
 
+void TimeIntervalProfiler::report_recent_groups( group_entry_t* group_p ) {
+
+	if( group_p->req_reset == true ) {
+
+		printf( "%s GRP: %s (e:%d, a:%d) :%s\n",
+			( group_p->index < 0 ) ? "#" : " ",
+			group_p->name,
+			group_p->profile_event_count,
+			group_p->active_profile_count,
+			group_p->enabled ? "ENABLED" : "DISABLED"
+		);
+
+		profile_entry_t *profile_p;
+		for( int j=0; j< group_p->profile_arr_count; j++ ) {
+
+			profile_p = group_p->profile_p_arr[ j ];
+			if( profile_p->req_reset == true )	{
+
+				print_profile_report( " ", profile_p );
+			}
+		}
+
+		group_p->profile_map.reset();
+		while( ( profile_p = group_p->profile_map.next() ) != NULL ) {
+
+			if( profile_p->index < 0 )	{
+				if( profile_p->req_reset == true )	{
+					print_profile_report( " ", profile_p );
+				}
+			}
+		}
+		print_group_report( " ", group_p );
+	}
+}
+
+void TimeIntervalProfiler::report_recent_profiles( group_entry_t* group_p ) {
+
+	if( group_p->req_reset == false ) {
+		profile_entry_t *profile_p;
+
+		bool found_prev = false;
+		for( int j=0; !found_prev &&( j< group_p->profile_arr_count ); j++ ) {
+			if( group_p->profile_p_arr[ j ]->req_reset == true ) found_prev = true;
+		}
+		group_p->profile_map.reset();
+		while( ( !found_prev )&&( ( profile_p = group_p->profile_map.next() ) != NULL ) ) {
+			if( profile_p->req_reset == true ) found_prev = true;
+		}
+		
+		if( found_prev )	{
+
+			printf( "%s GRP: %s (e:%d, a:%d) :%s\n",
+				( group_p->index < 0 ) ? "#" : " ",
+				group_p->name,
+				group_p->profile_event_count,
+				group_p->active_profile_count,
+				group_p->enabled ? "ENABLED" : "DISABLED"
+			);
+
+			for( int j=0; j< group_p->profile_arr_count; j++ ) {
+
+				profile_p = group_p->profile_p_arr[ j ];
+				if( profile_p->req_reset == true )	{
+					print_profile_report( " ", profile_p );
+				}
+			}
+
+			group_p->profile_map.reset();
+			while( ( profile_p = group_p->profile_map.next() ) != NULL ) {
+
+				if( profile_p->index < 0 )	{
+					if( profile_p->req_reset == true )	{
+						print_profile_report( " ", profile_p );
+					}
+				}
+			}
+			print_group_report( " ", group_p );
+		}
+	}
+}
+
+void TimeIntervalProfiler::report_current_group( group_entry_t* group_p ) {
+
+	if( group_p->enabled )	{
+		if( group_p->req_reset == false ) {
+			profile_entry_t *profile_p;
+ 
+			if( req_report )	{
+				printf( "%s GRP: %s (e:%d, a:%d)\n",
+					( group_p->index < 0 ) ? "#" : " ",
+					group_p->name,
+					group_p->profile_event_count,
+					group_p->active_profile_count
+				);
+			}
+
+			for( int j=0; j< group_p->profile_arr_count; j++ ) {
+
+				profile_p = group_p->profile_p_arr[ j ];
+				if( profile_p->req_reset == false )	{
+
+					if( req_report )	{
+						if( profile_p->spike )	{
+							print_profile_report( "*", profile_p );
+						}
+						else	{
+							print_profile_report( " ", profile_p );
+						}
+					}
+					else
+					if( profile_p->spike && profile_p->show )	{
+						print_profile_alert( update_dt, group_p, profile_p );
+					}
+				}
+			}
+
+			group_p->profile_map.reset();
+			while( ( profile_p = group_p->profile_map.next() ) != NULL ) {
+
+				if( profile_p->index < 0 )	{
+					if( profile_p->req_reset == false )	{
+
+						if( req_report )	{
+							if( profile_p->spike )	{
+								print_profile_report( "*", profile_p );
+							}
+							else	{
+								print_profile_report( " ", profile_p );
+							}
+						}
+						else
+						if( profile_p->spike && profile_p->show )	{
+							print_profile_alert( update_dt, group_p, profile_p );
+						}
+					}
+				}
+			}
+
+			if( req_report )	{
+				if( group_p->spike ) {
+					print_group_report( "*", group_p );
+				}
+				else	{
+					print_group_report( " ", group_p );
+				}
+			}
+			else
+			if( group_p->spike_count > 0 )	{
+				print_group_alert( "SUM", update_dt, group_p );
+			}
+			else
+			if( group_p->spike )	{
+				print_group_alert( "GRP", update_dt, group_p );
+			}
+		}
+	}
+}
+
+///////////////////////////////////////////////////
+
 void TimeIntervalProfiler::sys_update( double time ) {
 
 	double prev = update_time;
@@ -390,12 +582,14 @@ void TimeIntervalProfiler::sys_update( double time ) {
 		return;
 	}
 
+	group_entry_t *group_p = NULL;
+
 	if( enabled )	{
 
 	// Check arrays:
 		for( int i=0; i< group_arr_count; i++ ) {
 
-			group_entry_t *group_p = group_p_arr[ i ];
+			group_p = group_p_arr[ i ];
 			if( group_p == NULL ) {
 				printf( "TimeIntervalProfiler::sys_update ERR: NULL group_p in group_p_arr[ %d ]\n", i );
 				return;
@@ -411,7 +605,6 @@ void TimeIntervalProfiler::sys_update( double time ) {
 		}
 		
 	// Close hanging intervals:
-		group_entry_t *group_p;
 		group_map.reset();
 		while( ( group_p = group_map.next() ) != NULL ) {
 			if( group_p->enabled )	{
@@ -438,70 +631,35 @@ void TimeIntervalProfiler::sys_update( double time ) {
 			printf( "TIP <> report:\n" );
 			printf( "RECENT GROUPS:\n" );
 			for( int i=0; i< group_arr_count; i++ ) {
-
-				group_entry_t *group_p = group_p_arr[ i ];
-				if( group_p->req_reset == true ) {
-
-					printf( "  GRP: %s (e:%d, a:%d) :%s\n",
-						group_p->name,
-						group_p->profile_event_count,
-						group_p->active_profile_count,
-						group_p->enabled ? "ENABLED" : "DISABLED"
-					);
-					for( int j=0; j< group_p->profile_arr_count; j++ ) {
-
-						profile_entry_t *profile_p = group_p->profile_p_arr[ j ];
-						if( profile_p->intra_count > 0 )	{
-
-							print_profile_report( " ", profile_p );
-						}
-					}
-					print_group_report( " ", group_p );
+				report_recent_groups( group_p_arr[ i ] );
+			}
+			group_map.reset();
+			while( ( group_p = group_map.next() ) != NULL ) {
+				if( group_p->index < 0 )	{
+					report_recent_groups( group_p );
 				}
 			}
-
 			printf( "RECENT PROFILES:\n" );
 			for( int i=0; i< group_arr_count; i++ ) {
-
-				group_entry_t *group_p = group_p_arr[ i ];
-				if( group_p->req_reset == false ) {
-
-					bool found_prev = false;
-					for( int j=0; !found_prev &&( j< group_p->profile_arr_count ); j++ ) {
-						if( group_p->profile_p_arr[ j ]->req_reset == true ) found_prev = true;
-					}
-					if( found_prev )	{
-
-						printf( "  GRP: %s (e:%d, a:%d) :%s\n",
-							group_p->name,
-							group_p->profile_event_count,
-							group_p->active_profile_count,
-							group_p->enabled ? "ENABLED" : "DISABLED"
-						);
-						for( int j=0; j< group_p->profile_arr_count; j++ ) {
-
-							profile_entry_t *profile_p = group_p->profile_p_arr[ j ];
-							if( profile_p->req_reset == true )	{
-
-								if( profile_p->intra_count > 0 )	{
-									print_profile_report( " ", profile_p );
-								}
-							}
-						}
-						print_group_report( " ", group_p );
-					}
+				report_recent_profiles( group_p_arr[ i ] );
+			}
+			group_map.reset();
+			while( ( group_p = group_map.next() ) != NULL ) {
+				if( group_p->index < 0 )	{
+					report_recent_profiles( group_p );
 				}
 			}
 		}
 	}
-	
+
 	if( enabled )	{
 
+		int total_spike_count = 0;
+
 	// Accumulate:
-		group_entry_t *group_p;
 		group_map.reset();
 		while( ( group_p = group_map.next() ) != NULL ) {
-
+			
 			if( group_p->enabled )	{
 				if( group_p->req_reset == false ) {
 
@@ -510,24 +668,42 @@ void TimeIntervalProfiler::sys_update( double time ) {
 					while( ( profile_p = group_p->profile_map.next() ) != NULL ) {
 
 						if( profile_p->req_reset == false )	{
-							if( profile_p->intra_count > 0 )	{
 
-								if( profile_p->interval_dt < 0.0 )    {
-									printf( "TimeIntervalProfiler::sys_update WARN: negative dt: %f\n", profile_p->interval_dt );
+							if( profile_p->interval_dt < 0.0 )    {
+								printf( "TimeIntervalProfiler::sys_update WARN: negative dt: %f\n", profile_p->interval_dt );
+							}
+							accum_profile( profile_p );
+							group_p->interval_dt += profile_p->interval_dt;
+							group_p->decay_dt += profile_p->decay_dt;
+							group_p->roll_dt += profile_p->roll_dt;
+						}
+					}
+					group_p->profile_map.reset();
+					while( ( profile_p = group_p->profile_map.next() ) != NULL ) {
+					
+						if( profile_p->req_reset == false )	{
+
+							profile_p->spike = check_profile_spike( profile_p );
+							profile_p->show = check_profile_show( profile_p->level );
+							if( profile_p->spike )	{
+								if( req_report || profile_p->show )	{
+									group_p->spike_count++;
 								}
-								accum_profile( profile_p );
-								group_p->interval_dt += profile_p->interval_dt;
-								group_p->decay_dt += profile_p->decay_dt;
-								group_p->roll_dt += profile_p->roll_dt;
 							}
 						}
 					}
+					group_p->spike = check_group_spike( group_p );
+					if( group_p->spike_count == 0 )	{
+						if( group_p->spike )	{
+							total_spike_count++;
+						}
+					}
+					total_spike_count += group_p->spike_count;
 				}
 			}
 		}
 
 	// Report Current:
-		int total_spike_count = 0;
 		if( req_report )	{
 			printf( "ACTIVE: (e:%d, a:%d)\n",
 				group_event_count,
@@ -535,67 +711,29 @@ void TimeIntervalProfiler::sys_update( double time ) {
 			);
 		}
 		for( int i=0; i< group_arr_count; i++ ) {
+			report_current_group( group_p_arr[ i ] );
+		}
+		group_map.reset();
+		while( ( group_p = group_map.next() ) != NULL ) {
+			if( group_p->index < 0 )	{
+				report_current_group( group_p );
+			}
+		}
+		if( req_report )	{
+			printf( "--tip\n" );
+		}
 
-			int group_spike_count = 0;
-			group_entry_t *group_p = group_p_arr[ i ];
+	// Reset:
+		group_map.reset();
+		while( ( group_p = group_map.next() ) != NULL ) {
+
 			if( group_p->enabled )	{
-				if( group_p->req_reset == false ) {
-
-					if( req_report )	{
-						printf( "  GRP: %s (e:%d, a:%d)\n",
-							group_p->name,
-							group_p->profile_event_count,
-							group_p->active_profile_count
-						);
-					}
-					for( int j=0; j< group_p->profile_arr_count; j++ ) {
-
-						profile_entry_t *profile_p = group_p->profile_p_arr[ j ];
-						if( profile_p->req_reset == false )	{
-							if( profile_p->intra_count > 0 )	{
-
-								profile_p->spike = check_profile_spike( profile_p );
-								if( req_report )	{
-									if( profile_p->spike )	{
-										group_spike_count++;
-										print_profile_report( "*", profile_p );
-									}
-									else	{
-										print_profile_report( " ", profile_p );
-									}
-								}
-								else
-								if( profile_p->spike )	{
-									if( check_profile_show( profile_p->level  ) )	{
-										group_spike_count++;
-										print_profile_alert( update_dt, group_p, profile_p );
-									}
-								}
-							}
-						}
-					}
-					group_p->spike = check_group_spike( group_p );
-					if( req_report )	{
-						if( group_p->spike ) {
-							if( group_spike_count == 0 )	{
-								total_spike_count++;
-							}
-							print_group_report( "*", group_p );
-						}
-						else	{
-							print_group_report( " ", group_p );
-						}
-					}
-					else
-					if( group_spike_count > 0 )	{
-						print_group_alert( "SUM", update_dt, group_p );
-					}
-					else
-					if( group_p->spike )	{
-						print_group_alert( "GRP", update_dt, group_p );
-						total_spike_count++;
-					}
+				group_p->profile_map.reset();
+				profile_entry_t *profile_p;
+				while( ( profile_p = group_p->profile_map.next() ) != NULL ) {
+					profile_p->req_reset = true;
 				}
+				group_p->req_reset = true;
 			}
 			if( group_p->req_enable )	{
 				group_p->enabled = true;
@@ -609,11 +747,11 @@ void TimeIntervalProfiler::sys_update( double time ) {
 			if( group_p->req_preload )	{
 				group_p->preloading = true;
 			}
-			total_spike_count += group_spike_count;
 		}
-		if( req_report )	{
-			printf( "--tip\n" );
-		}
+		active_group_count = 0;
+		group_event_count = 0;
+
+	// Sniff:
 		if( dyn_abs_thr || dyn_rel_thr )	{
 		
 			double avoid = 1.0;
@@ -622,7 +760,6 @@ void TimeIntervalProfiler::sys_update( double time ) {
 			}
 			double clamp_dt = ( update_dt < MAX_SNIFF_DT ) ? update_dt : MAX_SNIFF_DT;
 			double sniff = 1.0 - clamp_dt * ( 1.0 - dyn_sniff );
-
 			if( dyn_abs_thr &&( abs_threshold > 0.0 ) ) {
 				abs_threshold *= avoid * sniff;
 			}
@@ -630,24 +767,6 @@ void TimeIntervalProfiler::sys_update( double time ) {
 				rel_threshold *= avoid * sniff;
 			}
 		}
-
-	// Reset:
-		group_map.reset();
-		while( ( group_p = group_map.next() ) != NULL ) {
-
-			if( group_p->enabled )	{
-
-				group_p->profile_map.reset();
-				profile_entry_t *profile_p;
-				while( ( profile_p = group_p->profile_map.next() ) != NULL ) {
-
-					profile_p->req_reset = true;
-				}
-				group_p->req_reset = true;
-			}
-		}
-		active_group_count = 0;
-		group_event_count = 0;
 	}
 
 	if( pending_request )	{
@@ -663,7 +782,6 @@ void TimeIntervalProfiler::sys_update( double time ) {
 		}
 		if( req_erase ) {
 			group_map.reset();
-			group_entry_t *group_p;
 			while( ( group_p = group_map.next() ) != NULL ) {
 				null_group( group_p, group_p->name );
 			}
@@ -691,6 +809,7 @@ TimeIntervalProfiler::get_group( const char* group_name ) {
 		group_map.insert( group_name, group_p, true );
 
 		if( group_arr_count < MAX_GROUPS )	{
+			group_p->index = group_arr_count;
 			group_p_arr[ group_arr_count ] = group_p;
 			group_arr_count++;
 		}
@@ -719,6 +838,7 @@ TimeIntervalProfiler::get_profile( group_entry_t *group_p, const char* label ) {
 		group_p->profile_map.insert( label, profile_p, true );
 
 		if( group_p->profile_arr_count < MAX_PROFILES ) {
+			profile_p->index = group_p->profile_arr_count;
 			group_p->profile_p_arr[ group_p->profile_arr_count ] = profile_p;
 			group_p->profile_arr_count++;
 		}
