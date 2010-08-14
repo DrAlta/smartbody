@@ -1002,6 +1002,13 @@ int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			prof_p->test_clock( reps );
 			mcu_p->mark( "mcu_tip_func" );
 		}
+		else
+		if( strcmp( tip_cmd, "test2" ) == 0 )	{
+			mcu_p->mark( "mcu_tip_func", 0, "test2" );
+			int reps = args.read_int();
+			prof_p->test_clock( reps );
+			mcu_p->mark( "mcu_tip_func" );
+		}
 		else {
 			return( CMD_NOT_FOUND );
 		}
