@@ -38,6 +38,8 @@ struct MeCtLocomotionJointInfo
 	SrArray<int> buff_index;
 	SrArray<int> joint_index;
 	SrArray<SrQuat> quat;
+	SrArray<int> mat_valid;
+	SrArray<SrMat>	mat;
 
 	//key frames used to interpolate
 	SrArray<SrQuat> quat_key_frame1;
@@ -76,12 +78,26 @@ struct MeCtLocomotionJointInfo
 		joint_num = iterate(tjoint, limb_joint_name);
 		quat.capacity(joint_num);
 		quat.size(joint_num);
+		mat.capacity(joint_num);
+		mat.size(joint_num);
+		mat_valid.size(joint_num);
+		mat_valid.capacity(joint_num);
 		quat_key_frame1.capacity(joint_num);
 		quat_key_frame1.size(joint_num);
 		quat_key_frame2.capacity(joint_num);
 		quat_key_frame2.size(joint_num);
 		buff_index.capacity(joint_num);
 		buff_index.size(joint_num);
+	}
+
+	int get_index_by_name(const char* name)
+	{
+		for(int i = 0; i < joint_name.size(); ++i)
+		{
+			if(strcmp(joint_name.get(i), name) == 0) return i;
+		}
+		printf("Error: joint: '%s' not found.", name);
+		return -1;
 	}
 };
 

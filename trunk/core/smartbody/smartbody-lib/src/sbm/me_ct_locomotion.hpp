@@ -84,14 +84,8 @@ protected:
 	SrMat mat;
 
 	bool is_valid;  // All necessary channels are present
-	
-	//SrQuat base_quat;
 
 	bool joints_indexed;
-	//SrArray<MeCtLocomotionJointInfo> nonlimb_joint_info;
-	//SrArray<int> nonlimb_joint_buff_index;
-	//int nonlimb_joint_num;
-	//SrArray<SrQuat> nonlimb_joint_quats;
 
 
 	//temp
@@ -100,7 +94,6 @@ protected:
 	SrArray<SrQuat> joint_quats1;
 	SrArray<SrQuat> joint_quats2;
 
-	//SrArray<int> limb_joint_index;
 	int limb_joint_num;
 
 	float motion_time;
@@ -215,7 +208,7 @@ public:
 
 	void blend();
 
-	void update(float inc_frame);
+	void update(float inc_frame, MeFrameData& frame);
 
 	void update_facing(MeCtLocomotionLimb* limb);
 
@@ -255,6 +248,12 @@ public:
 	void update_limb_anim_standing(MeCtLocomotionLimbAnim* anim, int index, MeFrameData& frame);
 
 	void set_motion_time(float time);
+
+	void update_nonlimb_mat();
+
+	void update_nonlimb_mat(SkJoint* joint, SrMat* mat);
+
+	void blend_standing(MeFrameData& frame);
 };
 
 #endif // ME_CT_LOCOMOTION_HPP
