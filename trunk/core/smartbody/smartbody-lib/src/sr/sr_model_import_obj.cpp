@@ -224,7 +224,7 @@ bool SrModel::import_obj ( const char* file )
 
    validate ();
    remove_redundant_materials ();
-   remove_redundant_normals ();
+//   remove_redundant_normals ();
    compress ();
 
    //SR_TRACE1("Ok!");

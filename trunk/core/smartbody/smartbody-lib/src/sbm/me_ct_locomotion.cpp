@@ -257,7 +257,10 @@ void MeCtLocomotion::controller_map_updated()
 		joints_indexed = true;
 	}
 
-	base_index = nonlimb_joint_info.buff_index.get(0);
+	if (nonlimb_joint_info.buff_index.size() > 0)
+		base_index = nonlimb_joint_info.buff_index.get(0);
+	else
+		base_index = -1;
 }
 
 char* MeCtLocomotion::get_base_name()
