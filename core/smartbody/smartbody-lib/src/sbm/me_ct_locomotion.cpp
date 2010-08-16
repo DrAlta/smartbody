@@ -70,15 +70,15 @@ MeCtLocomotion::~MeCtLocomotion() {
 	// Nothing allocated to the heap
 
 	int num = limb_list.size();
-	for (int x = 0; x < num; x++)
+	for (int i = 0; i < num; i++)
 	{
-		MeCtLocomotionLimb* limb = limb_list.get(x);
+		MeCtLocomotionLimb* limb = limb_list.get(i);
 		delete limb;
 	}
 
-	for (int x = 0; x < anim_global_info.size(); x++)
+	for (int i = 0; i < anim_global_info.size(); i++)
 	{
-		delete anim_global_info[x];
+		delete anim_global_info[i];
 	}
 }
 
@@ -265,39 +265,11 @@ char* MeCtLocomotion::get_base_name()
 	return base_name;
 }
 
-/*void MeCtLocomotion::update_limb_anim_standing(MeCtLocomotionLimbAnim* anim, int index, MeFrameData& frame)
-{
-	SrBuffer<float>& buffer = frame.buffer();
-	SrArray<SrQuat>* anim_buff = anim->get_buffer();
-	SrQuat quat;
-	for(int i = 0; i < anim_buff->size(); ++i)
-	{
-		index = limb_joint_index.get(i+index);
-		quat.w = buffer[index+0];
-		quat.x = buffer[index+1];
-		quat.y = buffer[index+2];
-		quat.z = buffer[index+3];
-		anim_buff->set(i, quat);
-	}
-}*/
-
-/*void MeCtLocomotion::update_limb_anim_standing()
-{
-	for(int i = 0; i < limb_list.size(); ++i)
-	{
-		limb_list.get(i).
-		update_limb_anim_standing(, int index, MeFrameData& frame)
-	}
-}*/
-
 bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	// TODO: Update MeController to pass in delta time.
 	// Until then, fake it or compute it ourself (but there are some gotchas)
 
-	//is_valid = false;
-
 	if(!enabled) return false;
-	//return false;
 	if( !is_valid ) return is_valid;
 
 	float time_delta = 0.03333333f;
@@ -362,7 +334,7 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	}
 	speed_accelerator.set_target_speed(navigator.get_target_local_velocity().len());
 
-	update(inc_frame);
+	update(inc_frame, frame);
 
 	navigator.post_controller_evaluate(frame, limb_list.get(dominant_limb), reset);
 
@@ -394,20 +366,23 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	{
 		index = nonlimb_joint_info.buff_index.get(i);
 		quat = nonlimb_joint_info.quat.get(i);
-		//index = nonlimb_joint_info.get(i).buff_index;
-		//quat = nonlimb_joint_info.get(i).quat;
 
-		quat_buff.w = buffer[index+0];
+		/*quat_buff.w = buffer[index+0];
 		quat_buff.x = buffer[index+1];
 		quat_buff.y = buffer[index+2];
 		quat_buff.z = buffer[index+3];
 
-		//quat_buff = slerp(quat_buff, quat, 1.0f);
 		quat_buff = slerp(quat_buff, quat, navigator.standing_factor);
+
 		buffer[index+0] = (float)quat_buff.w;
 		buffer[index+1] = (float)quat_buff.x;
 		buffer[index+2] = (float)quat_buff.y;
-		buffer[index+3] = (float)quat_buff.z;
+		buffer[index+3] = (float)quat_buff.z;*/
+
+		buffer[index+0] = (float)quat.w;
+		buffer[index+1] = (float)quat.x;
+		buffer[index+2] = (float)quat.y;
+		buffer[index+3] = (float)quat.z;
 	}
 
 	//buffer[base_index+0] = (float)r_blended_base_rot.w;
@@ -452,6 +427,19 @@ void MeCtLocomotion::init_nonlimb_joint_info()
 		limb_base_name.set(i, limb_list.get(i)->get_limb_base_name());
 	}
 	nonlimb_joint_info.Init(walking_skeleton, base_name, &limb_base_name);
+	SkJoint* joint = NULL;
+	int index = -1;
+	for(int i = 0; i < limb_list.size(); ++i)
+	{
+		joint = walking_skeleton->search_joint(limb_list.get(i)->get_limb_base_name());
+		while(true)
+		{
+			joint = joint->parent();
+			if(joint == NULL) break;
+			index = nonlimb_joint_info.get_index_by_name(joint->name().get_string());
+			nonlimb_joint_info.mat_valid.set(index, 1);
+		}
+	}
 }
 
 void MeCtLocomotion::init_skeleton(SkSkeleton* standing, SkSkeleton* walking)
@@ -546,14 +534,17 @@ void MeCtLocomotion::blend_base_joint(float space_time, int anim_index1, int ani
 	mat = base->gmat();
 	r_blended_base_height = *pheight*(1.0f-ratio)*weight;
 	rot1 = base->quat()->value();
+	//printf("\nrot1 (%f, %f, %f, %f)", rot1.w, rot1.x, rot1.y, rot1.z);
 
 	anim1->walking->apply_frame((int)frame1+1);
 	base->update_gmat();
 	mat = base->gmat();
 	r_blended_base_height += *pheight*ratio*weight;
 	rot2 = base->quat()->value();
+	//printf("\nrot2 (%f, %f, %f, %f)", rot2.w, rot2.x, rot2.y, rot2.z);
 
 	rot3 = slerp(rot1, rot2, ratio);
+	//printf("\nrot3 (%f, %f, %f, %f)", rot3.w, rot3.x, rot3.y, rot3.z);
 
 	anim2->walking->connect(walking_skeleton);
 	ratio = frame2 - (int)frame2;
@@ -563,18 +554,21 @@ void MeCtLocomotion::blend_base_joint(float space_time, int anim_index1, int ani
 	mat = base->gmat();
 	r_blended_base_height += *pheight*(1.0f-ratio)*(1.0f-weight);
 	rot1 = base->quat()->value();
+	//printf("\nrot1 (%f, %f, %f, %f)", rot1.w, rot1.x, rot1.y, rot1.z);
 
 	anim2->walking->apply_frame((int)frame2+1);
 	base->update_gmat();
 	mat = base->gmat();
 	r_blended_base_height += *pheight*ratio*(1.0f-weight);
 	rot2 = base->quat()->value();
+	//printf("\nrot2 (%f, %f, %f, %f)", rot2.w, rot2.x, rot2.y, rot2.z);
 
 	rot4 = slerp(rot1, rot2, ratio);
-
+	//printf("\nrot4 (%f, %f, %f, %f)", rot4.w, rot4.x, rot4.y, rot4.z);
 	//r_blended_base_height = (r_blended_base_height - pre_blended_base_height)* (1-navigator.standing_factor);
 
 	r_blended_base_rot = slerp(rot3, rot4, 1-weight);
+	//printf("\nr_blended_base_rot (%f, %f, %f, %f)", r_blended_base_rot.w, r_blended_base_rot.x, r_blended_base_rot.y, r_blended_base_rot.z);
 
 	r_blended_base_rot = slerp(buff_base_rot, r_blended_base_rot, navigator.standing_factor);
 }
@@ -586,7 +580,7 @@ void MeCtLocomotion::set_motion_time(float time)
 }
 
 // main stream
-void MeCtLocomotion::update(float inc_frame)
+void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 {
 	if(inc_frame < 0) inc_frame = 0.0f;
 	float frame_num; 
@@ -674,9 +668,6 @@ void MeCtLocomotion::update(float inc_frame)
 			navigator.update_facing(limb_list.get(i), false);
 			limb_list.get(i)->blend_anim(limb_list.get(i)->space_time, r_anim1_index, r_anim2_index, ratio, &(limb_list.get(i)->limb_joint_info.joint_index));
 		}
-		//blend the animation with standing if acceleration < 1.0f
-		//limb_list.get(i)->blend_standing(limb_list.get(i)->walking_list.get(0), navigator.standing_factor);
-		//limb_list.get(i)->manipulate_turning();
 	}
 
 	anim1 = limb_list.get(0)->get_walking_list()->get(r_anim1_index);
@@ -686,29 +677,16 @@ void MeCtLocomotion::update(float inc_frame)
 	//get_blended_quat_buffer(&t_joint_quats1, &joint_quats1, &joint_quats2, dom_ratio);
 	get_blended_quat_buffer(&(nonlimb_joint_info.quat), &joint_quats1, &joint_quats2, dom_ratio);
 
+
 	//recompute the dominant limb
 	get_dominant_limb();
 
-	
-	/*printf("\n");
-	printf("\ndominant_limb: %d", dominant_limb);
-	for(int i = 0; i < limb_list.size(); ++i)
-	{
-<<<<<<< .mine
-		printf("\nspace time: %f", limb_list.get(i)->space_time);
-		anim1 = limb_list.get(i)->get_walking_list()->get(1);
-		anim2 = limb_list.get(i)->get_walking_list()->get(2);
-		printf("\nframe1: %f", anim1->get_timing_space()->get_virtual_frame(limb_list.get(i)->space_time));
-		printf("\nframe2: %f", anim2->get_timing_space()->get_virtual_frame(limb_list.get(i)->space_time));
-=======
-		LOG("\n dom_limb: %d, 1:%f, 2:%f", dominant_limb, limb_list.get(0)->space_time, limb_list.get(1)->space_time);
->>>>>>> .r817
-	}*/
+	blend_standing(frame);
 
 	for(int i = 0; i < limb_list.size(); ++i)
 	{
 		//blend the animation with standing if acceleration < 1.0f
-		limb_list.get(i)->blend_standing(limb_list.get(i)->walking_list.get(0), navigator.standing_factor);
+		//limb_list.get(i)->blend_standing(limb_list.get(i)->walking_list.get(0), navigator.standing_factor);
 		limb_list.get(i)->manipulate_turning();
 	}
 
@@ -716,15 +694,93 @@ void MeCtLocomotion::update(float inc_frame)
 
 	blend_base_joint(limb_list.get(0)->space_time, r_anim1_index, r_anim2_index, dom_ratio);
 
+	update_nonlimb_mat();
+
 	update_pos();
 
 	//if(ik_enabled) get_IK();
 }
 
-/*void MeCtLocomotion::blend_standing(MeCtLocomotionLimbAnim* anim, float weight)
+void MeCtLocomotion::blend_standing(MeFrameData& frame)
 {
+	MeCtLocomotionLimb* limb = NULL;
+	int index;
+	SrQuat quat;
+	SrQuat quat_buff;
+	SrBuffer<float>& buffer = frame.buffer();
+	for(int j = 0; j < limb_list.size(); ++j)
+	{
+		limb = limb_list.get(j);
+		for(int i = 0; i < limb->limb_joint_info.buff_index.size(); ++i)
+		{
+			index = limb->limb_joint_info.buff_index.get(i);
+			quat = limb->limb_joint_info.quat.get(i);
 
-}*/
+			quat_buff.w = buffer[index+0];
+			quat_buff.x = buffer[index+1];
+			quat_buff.y = buffer[index+2];
+			quat_buff.z = buffer[index+3];
+
+			quat_buff = slerp(quat_buff, quat, navigator.standing_factor);
+			limb->limb_joint_info.quat.set(i, quat_buff);
+		}
+	}
+	for(int i = 0; i < nonlimb_joint_info.buff_index.size(); ++i)
+	{
+		index = nonlimb_joint_info.buff_index.get(i);
+		quat = nonlimb_joint_info.quat.get(i);
+
+		quat_buff.w = buffer[index+0];
+		quat_buff.x = buffer[index+1];
+		quat_buff.y = buffer[index+2];
+		quat_buff.z = buffer[index+3];
+
+		quat_buff = slerp(quat_buff, quat, navigator.standing_factor);
+		nonlimb_joint_info.quat.set(i, quat_buff);
+	}
+}
+
+void MeCtLocomotion::update_nonlimb_mat()
+{
+	SkJoint* joint = walking_skeleton->search_joint(base_name);
+	SrMat mat;
+	mat = get_lmat(joint, &(nonlimb_joint_info.quat.get(0)));
+	float* ppos = mat.pt(12);
+	ppos[0] = 0.0f;
+	ppos[1] = 0.0f;
+	ppos[2] = 0.0f;
+	nonlimb_joint_info.mat.set(0, mat);
+	update_nonlimb_mat(joint, &mat);
+}
+
+void MeCtLocomotion::update_nonlimb_mat(SkJoint* joint, SrMat* mat)
+{
+	SkJoint* tjoint = NULL;
+	int index = -1;
+	SrMat lmat;
+	SrMat gmat;
+	bool cont = false;
+	for(int i = 0; i < joint->num_children(); ++i)
+	{
+		cont = false;
+		tjoint = joint->child(i);
+		for(int j = 0; j < limb_list.size(); ++j)
+		{
+			if(strcmp(tjoint->name().get_string(), limb_list.get(j)->limb_base_name) == 0) 
+			{
+				cont = true;
+				break;
+			}
+		}
+		if(cont) continue;
+		index = nonlimb_joint_info.get_index_by_name(tjoint->name().get_string());
+		if(nonlimb_joint_info.mat_valid.get(index) != 1) continue;
+		lmat = get_lmat(tjoint, &(nonlimb_joint_info.quat.get(index)));
+		gmat = lmat * *mat;
+		nonlimb_joint_info.mat.set(index, gmat);
+		update_nonlimb_mat(joint->child(i), &gmat);
+	}
+}
 
 void MeCtLocomotion::get_IK()
 {
@@ -860,31 +916,24 @@ SrVec MeCtLocomotion::get_limb_pos(MeCtLocomotionLimb* limb)
 	float* ppos;
 	SkSkeleton* skeleton = limb->walking_skeleton;
 
-	tjoint = skeleton->search_joint(base_name);
-	//pmat = get_lmat(tjoint, &navigator.base_rot);
+	/*tjoint = skeleton->search_joint(base_name);
 
 	pmat = get_lmat(tjoint, &r_blended_base_rot);
-	//printf("\nrotation: (%f, %f, %f, %f)", r_blended_base_rot.w, r_blended_base_rot.x, r_blended_base_rot.y, r_blended_base_rot.z);
 	ppos = pmat.pt(12);
 
 	ppos[0] = 0.0f;
 	ppos[1] = 0.0f;
 	ppos[2] = 0.0f;
-
 	//ppos[0] = navigator.base_offset.x;
 	//ppos[1] = navigator.base_offset.y;
 	//ppos[2] = navigator.base_offset.z;
 
 	gmat = pmat;
-
-	// add transformation code later for joints between the limb base joint and base joint.......................
-
-	// add transformation code later for joints between the limb base joint and base joint.......................
-
-	//gmat.identity();
+	tjoint = skeleton->search_joint(limb->get_limb_base_name());*/
 
 	tjoint = skeleton->search_joint(limb->get_limb_base_name());
-	
+	int parent_ind = nonlimb_joint_info.get_index_by_name(tjoint->parent()->name().get_string());
+	gmat = nonlimb_joint_info.mat.get(parent_ind);
 	for(int j  = 0; j <= limb->limb_joint_info.quat.size()-1; ++j)
 	{
 		pmat = gmat;
