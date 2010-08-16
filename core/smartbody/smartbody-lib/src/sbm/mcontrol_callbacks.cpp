@@ -421,15 +421,18 @@ int mcu_viewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 			if( mcu_p->viewer_p == NULL )	{
 				int argc = args.calc_num_tokens();
+				int width = 640;
+				int height = 480;
+				int px = 100;
+				int py = 100;
 				if( argc >= 4 )	{
-
-					int width = args.read_int();
-					int height = args.read_int();
-					int px = args.read_int();
-					int py = args.read_int();
-					int err = mcu_p->open_viewer( width, height, px, py );
-					return( err );
+					width = args.read_int();
+					height = args.read_int();
+					px = args.read_int();
+					py = args.read_int();
 				}
+				int err = mcu_p->open_viewer( width, height, px, py );
+				return( err );
 			}
 		}
 		else

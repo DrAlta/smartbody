@@ -854,6 +854,22 @@ void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, int typ
 			}
 		}
 
+		if (motion_locomotion->frames() <= land_time)
+		{
+			LOG("Land time for motion %s at frame %d, only %d frames. Setting to %d.", motion_locomotion->name(), land_time, motion_locomotion->frames(), motion_locomotion->frames() - 1);
+			land_time = motion_locomotion->frames() - 1;
+		}
+		if (motion_locomotion->frames() <= stance_time)
+		{
+			LOG("Stance time for motion %s at frame %d, only %d frames. Setting to %d.", motion_locomotion->name(), stance_time, motion_locomotion->frames(), motion_locomotion->frames() - 1);
+			stance_time = motion_locomotion->frames() - 1;
+		}
+		if (motion_locomotion->frames() <= lift_time)
+		{
+			LOG("Lift time for motion %s at frame %d, only %d frames. Setting to %d.", motion_locomotion->name(), lift_time, motion_locomotion->frames(), motion_locomotion->frames() - 1);
+			lift_time = motion_locomotion->frames() - 1;
+		}
+
 		analyze_walking_limb(limb, motion_locomotion, motion_standing, land_time, stance_time, lift_time, 0);
 		//limb->print_info();
 		if(i == 0) // let the first limb be the leading limb during analysis process
