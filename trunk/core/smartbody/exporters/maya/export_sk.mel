@@ -195,7 +195,9 @@ proc int skWriteSk( string $jname, int $fileid, int $depth, int $showAll, int $u
    $offset[ 2 ] = `getAttr ( $jname + ".translateZ" )`;
 
    skMargin ( $fileid, $depth );
-   fprint $fileid ( "{ offset " );
+   fprint $fileid ( "{\r\n" );
+   skMargin ( $fileid, $depth + 1 );
+   fprint $fileid ( "offset " );
    fprint $fileid ( skRound( $offset[ 0 ] ) + " " + skRound( $offset[ 1 ] ) + " " + skRound( $offset[ 2 ] ) + "\r\n" );
 
 
@@ -333,9 +335,24 @@ proc int skWriteSk( string $jname, int $fileid, int $depth, int $showAll, int $u
 }
 
 
-global proc int skExport( string $fname, string $skname, string $version, int $showAll, int $useLimits, int $useChannelAttributes )
+global proc int skExport( string $fname )
 {
-   print( "skExport() - $fname=" + $fname + " $skname=" + $skname + " $version=" + $version + " $showAll=" + $showAll + " $useLimits=" + $useLimits + " $useChannelAttributes=" + $useChannelAttributes + "\n" );
+   // main entry point for exporting .sk file.
+   // if you want to specify your own file name and location for .sk, then call this function.
+   // to pull the file name from maya file, then call skExportButton()
+
+   global string $skVersion;
+
+   string $root   = `getAttr SkelDef.RootJoint`;
+   string $skName = `getAttr SkelDef.SkeletonName`;
+   int $showAll   = `getAttr SkelDef.ShowAllChannels`;
+   int $useLimits = `getAttr SkelDef.UseLimits`;
+   int $useChannelAttributes = `getAttr SkelDef.UseChannelAttributes`;
+
+   select -r $root;
+
+
+   print( "skExport() - $fname=" + $fname + " $skName=" + $skName + " $skVersion=" + $skVersion + " $showAll=" + $showAll + " $useLimits=" + $useLimits + " $useChannelAttributes=" + $useChannelAttributes + "\n" );
 
 
    int $fileid = `fopen $fname "w"`;
@@ -362,8 +379,8 @@ global proc int skExport( string $fname, string $skname, string $version, int $s
       print ( "----------SK Export Report----------\n" );
 
       fprint $fileid ( "# SK Skeleton Definition\r\n" );
-      fprint $fileid ( "# File generated with export_sk.mel version " + $version + "\r\n\r\n" );
-      fprint $fileid ( "set_name " + $skname + "\r\n\r\n" );
+      fprint $fileid ( "# File generated with export_sk.mel v" + $skVersion + "\r\n\r\n" );
+      fprint $fileid ( "set_name " + $skName + "\r\n\r\n" );
       fprint $fileid ( "skeleton\r\n" );
 
       skWriteSk( $selectionList[ $j ], $fileid, $depth, $showAll, $useLimits, $useChannelAttributes );
@@ -387,59 +404,10 @@ global proc int skExport( string $fname, string $skname, string $version, int $s
 ////////////////////////////////////////////////////////////////
 
 
-
-////////////////////////////////////////////////////////////////
-//  Exports animation skeleton in .sk format for SmartBody
-//  Requires SkViewer to bind the .objs to the .sk skeleton
-//  Will create attribute nodes to keep exporter information between Maya sessions
-
-
-global proc int skRootJointChanged()
-{
-   string $root = `textFieldGrp -q -text skRootField`;
-   setAttr -type "string" SkelDef.RootJoint $root;
-   return 1;
-}
-
-
-global proc int skNameChanged()
-{
-   string $name = `textFieldGrp -q -text skOutputName`;
-
-   string $filepath = `textFieldGrp -q -text skOutputFile`;
-   textFieldGrp -e -text ( `dirname($filepath)` + "/" + $name + ".sk" ) skOutputFile;
-
-   setAttr -type "string" SkelDef.SkeletonName $name;
-
-
-   string $file = `textFieldGrp -q -text skOutputFile`;
-   setAttr -type "string" SkelDef.OutputDirectory $file;
-
-   return 1;
-}
-
-
-global proc int skOutputDirChanged()
-{
-   string $file = `textFieldGrp -q -text skOutputFile`;
-   setAttr -type "string" SkelDef.OutputDirectory $file;
-   return 1;
-}
-
-
-global proc int skFileCb( string $filename, string $fileType )
-{
-   textFieldGrp -e -text ($filename+"/"+`textFieldGrp -q -text skOutputName`+".sk") skOutputFile;
-   return 1;
-}
-
-
-//--------------------------------------------------------------------------------
-// PROC: skAddSkeletonDef
-// This creates a "SkelDef" node to stire various attributes about the skeleton
-//--------------------------------------------------------------------------------
 proc skAddSkeletonDef()
 {
+   // This creates a "SkelDef" node to store various attributes about the skeleton
+
    string $result = `promptDialog -title "Define New Skeleton" - message "Root Joint's Name?"
                - button "OK" -button "Cancel" -defaultButton "OK" 
                - cancelButton "Cancel" -dismissString "Cancel"`;
@@ -448,10 +416,10 @@ proc skAddSkeletonDef()
    {
       $rootJointName = `promptDialog -query -text`;
 
-      //make sure rootJointName is valid
+      // Make sure rootJointName is valid
       if ( `objExists $rootJointName` )
       {
-         //valid joint entered
+         // Valid joint entered
          group -n "SkelDef" -em -p SmartbodyExportOptions ;
 
          addAttr -ln "RootJoint" -dt "string" SkelDef ;
@@ -474,7 +442,6 @@ proc skAddSkeletonDef()
       }
       else
       {
-         //invalid joint entered
          string $errorMsg = $rootJointName + " is an invalid name for the root joint. Script has exited.\n ";
          error( $errorMsg );
       }
@@ -482,77 +449,97 @@ proc skAddSkeletonDef()
 }
 
 
-global proc channelsChecked()
+proc int skRootJointChanged()
 {
-   //the show all channels box has been checked in the gui!
+   string $root = `textFieldGrp -q -text skRootField`;
+   setAttr -type "string" SkelDef.RootJoint $root;
+   return 1;
+}
+
+
+proc int skNameChanged()
+{
+   string $name = `textFieldGrp -q -text skOutputName`;
+
+   string $filepath = `textFieldGrp -q -text skOutputFile`;
+   textFieldGrp -e -text ( `dirname($filepath)` + "/" + $name + ".sk" ) skOutputFile;
+
+   setAttr -type "string" SkelDef.SkeletonName $name;
+
+
+   string $file = `textFieldGrp -q -text skOutputFile`;
+   setAttr -type "string" SkelDef.OutputDirectory $file;
+
+   return 1;
+}
+
+
+proc int skOutputDirChanged()
+{
+   string $file = `textFieldGrp -q -text skOutputFile`;
+   setAttr -type "string" SkelDef.OutputDirectory $file;
+   return 1;
+}
+
+
+proc int skFileCb( string $filename, string $fileType )
+{
+   textFieldGrp -e -text ($filename+"/"+`textFieldGrp -q -text skOutputName`+".sk") skOutputFile;
+   return 1;
+}
+
+
+proc ChannelsChecked()
+{
    setAttr SkelDef.ShowAllChannels true;
 }
 
 
-global proc channelsUnchecked()
+proc ChannelsUnchecked()
 {
-   //the show all channels box has been unchecked in the gui!
    setAttr SkelDef.ShowAllChannels false;
 }
 
 
-global proc limitsChecked()
+proc LimitsChecked()
 {
-   //the use limits box has been checked in the gui!
    setAttr SkelDef.UseLimits true;
 }
 
 
-global proc limitsUnchecked()
+proc LimitsUnchecked()
 {
-   //the use limits box has been unchecked in the gui!
    setAttr SkelDef.UseLimits false;
 }
 
 
-global proc UseChannelAttributesChecked()
+proc UseChannelAttributesChecked()
 {
    setAttr SkelDef.UseChannelAttributes true;
 }
 
 
-global proc UseChannelAttributesUnchecked()
+proc UseChannelAttributesUnchecked()
 {
    setAttr SkelDef.UseChannelAttributes false;
 }
 
 
-//--------------------------------------------------------------------------------
-// PROC: skExportButton
-//--------------------------------------------------------------------------------
 global proc skExportButton()
 {
-   global string $skVersion;
-
-   string $root   = `getAttr SkelDef.RootJoint`;
-   string $name   = `getAttr SkelDef.SkeletonName`;
-   string $file   = `getAttr SkelDef.OutputDirectory`;
-   int $showAll   = `getAttr SkelDef.ShowAllChannels`;
-   int $useLimits = `getAttr SkelDef.UseLimits`;
-   int $useChannelAttributes = `getAttr SkelDef.UseChannelAttributes`;
-
-   select -r $root;
-
-   skExport( $file, $name, $skVersion, $showAll, $useLimits, $useChannelAttributes );
+   string $file = `getAttr SkelDef.OutputDirectory`;
+   skExport( $file );
 }
 
 
-//--------------------------------------------------------------------------------
-// PROC: skExportWin
-//--------------------------------------------------------------------------------
 global proc skExportGUI()
 {
    global string $skVersion;
 
-   //Creates SmartbodyExportOptions and SkelDef nodes if they don't exist
+   // Creates SmartbodyExportOptions and SkelDef nodes if they don't exist
    if ( !`objExists SmartbodyExportOptions` )
    {
-      //SmartbodyExportOptions needs to be created
+      // SmartbodyExportOptions needs to be created
       group -empty -name "SmartbodyExportOptions";
       setAttr "SmartbodyExportOptions.visibility" 0;
       skAddSkeletonDef();
@@ -561,27 +548,27 @@ global proc skExportGUI()
    {
       if ( !`objExists SkelDef` )
       {
-         //skeleton definition has not been made yet
+         // Skeleton definition has not been made yet
          skAddSkeletonDef();
       }
    }
 
-   //Build UI
+   // Build UI
    if ( ( `window -exists skMainWin` ) == true )
       deleteUI skMainWin;
 
-   string $winTitle = "SK Exporter v" + $skVersion + " - www.smartbody-anim.org";
+   string $winTitle = "SK Exporter v" + $skVersion;
    window -title $winTitle -wh 300 270 skMainWin;
    columnLayout -adjustableColumn true -columnAttach "both" 10 -rowSpacing 10 -columnWidth 290 MainColumn;
    textFieldGrp -label "Skeleton Root Joint:" -text `getAttr SkelDef.RootJoint` -cc "skRootJointChanged" skRootField;
    textFieldGrp -label "Output Character Name:" -text `getAttr SkelDef.SkeletonName` -cc "skNameChanged" skOutputName;
    textFieldGrp -label "Output File:" -text `getAttr SkelDef.OutputDirectory` -cc "skOutputDirChanged" skOutputFile;
    setParent MainColumn;
-   columnLayout -columnAttach "both" 85 -columnWidth 300 - rowSpacing 5 CBRow2;
+   columnLayout -columnAttach "left" 85 -columnWidth 300 - rowSpacing 5 CBRow2;
    setParent CBRow2;
-   checkBox -label "Export All Channels" -value (`getAttr SkelDef.ShowAllChannels`) -onCommand "channelsChecked" -offCommand "channelsUnchecked" skShowAllChannels;
-   checkBox -label "Export Limits" -value (`getAttr SkelDef.UseLimits`) -onCommand "limitsChecked" -offCommand "limitsUnchecked" skUseLimits;
    checkBox -label "Use Channel Attributes" -value (`getAttr SkelDef.UseChannelAttributes`) -onCommand "UseChannelAttributesChecked" -offCommand "UseChannelAttributesUnchecked" skUseChannelAttributes;
+   checkBox -label "Export All Channels" -value (`getAttr SkelDef.ShowAllChannels`) -onCommand "ChannelsChecked" -offCommand "ChannelsUnchecked" skShowAllChannels;
+   checkBox -label "Export Limits" -value (`getAttr SkelDef.UseLimits`) -onCommand "LimitsChecked" -offCommand "LimitsUnchecked" skUseLimits;
    setParent MainColumn;
    button -l "Browse Output File" -command "fileBrowser(\"skFileCb\", \"Text\", \"\", 4)";
    button -l "Export" -command "skExportButton";
