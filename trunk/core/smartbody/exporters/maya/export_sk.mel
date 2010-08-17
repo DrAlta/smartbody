@@ -195,9 +195,7 @@ proc int skWriteSk( string $jname, int $fileid, int $depth, int $showAll, int $u
    $offset[ 2 ] = `getAttr ( $jname + ".translateZ" )`;
 
    skMargin ( $fileid, $depth );
-   fprint $fileid ( "{\r\n" );
-   skMargin ( $fileid, $depth + 1 );
-   fprint $fileid ( "offset " );
+   fprint $fileid ( "{ offset " );
    fprint $fileid ( skRound( $offset[ 0 ] ) + " " + skRound( $offset[ 1 ] ) + " " + skRound( $offset[ 2 ] ) + "\r\n" );
 
 
@@ -211,9 +209,9 @@ proc int skWriteSk( string $jname, int $fileid, int $depth, int $showAll, int $u
    if ( $useChannelAttributes )
    {
       if ( `objExists ( $jname + ".SbodyPosX" )` )  $channelAttributePosX = `getAttr ( $jname + ".SbodyPosX" )`;
-      if ( `objExists ( $jname + ".SbodyPosX" )` )  $channelAttributePosY = `getAttr ( $jname + ".SbodyPosY" )`;
-      if ( `objExists ( $jname + ".SbodyPosX" )` )  $channelAttributePosZ = `getAttr ( $jname + ".SbodyPosZ" )`;
-      if ( `objExists ( $jname + ".SbodyPosX" )` )  $channelAttributeQuat = `getAttr ( $jname + ".SbodyQuat" )`;
+      if ( `objExists ( $jname + ".SbodyPosY" )` )  $channelAttributePosY = `getAttr ( $jname + ".SbodyPosY" )`;
+      if ( `objExists ( $jname + ".SbodyPosZ" )` )  $channelAttributePosZ = `getAttr ( $jname + ".SbodyPosZ" )`;
+      if ( `objExists ( $jname + ".SbodyQuat" )` )  $channelAttributeQuat = `getAttr ( $jname + ".SbodyQuat" )`;
    }
 
 
@@ -225,37 +223,97 @@ proc int skWriteSk( string $jname, int $fileid, int $depth, int $showAll, int $u
    if ( $mntmn[ 0 ] && $mntmn[ 1 ] )
    {
       // limits exist
+
+      int $printLimits = 0;
+
       if ( ( $xTransLimitValues[ 0 ] != $xTransLimitValues[ 1 ] ) && ( $useLimits ) )
+         $printLimits = 1;
+
+      if ( $useChannelAttributes )
       {
-         skMargin( $fileid, $depth + 1 );
-         fprint $fileid ( "channel XPos 0" + " lim " + $xTransLimitValues[ 0 ] + " " + $xTransLimitValues[ 1 ] + "\r\n" );
+         if ( $channelAttributePosX )
+         {
+            if ( $printLimits )
+            {
+               skMargin( $fileid, $depth + 1 );
+               fprint $fileid ( "channel XPos 0" + " lim " + $xTransLimitValues[ 0 ] + " " + $xTransLimitValues[ 1 ] + "\r\n" );
+            }
+            else
+            {
+               skMargin( $fileid, $depth + 1 );
+               fprint $fileid ( "channel XPos 0 free\r\n" );
+            }
+         }
       }
-      else if ( ( $showAll ) || ( ( $xTransLimitValues[ 0 ] != $xTransLimitValues[ 1 ] ) && ( !$useLimits ) ) )
+      else
       {
-         skMargin( $fileid, $depth + 1 );
-         fprint $fileid ( "channel XPos 0 free\r\n" );
+         if ( $showAll )
+         {
+            skMargin( $fileid, $depth + 1 );
+            fprint $fileid ( "channel XPos 0 free\r\n" );
+         }
       }
+
+
+      $printLimits = 0;
 
       if ( ( $yTransLimitValues[ 0 ] != $yTransLimitValues[ 1 ] ) && ( $useLimits ) )
+         $printLimits = 1;
+
+      if ( $useChannelAttributes )
       {
-         skMargin( $fileid, $depth + 1 );
-         fprint $fileid ( "channel YPos 0" + " lim " + $yTransLimitValues[ 0 ] + " " + $yTransLimitValues[ 1 ] + "\r\n" );
+         if ( $channelAttributePosY )
+         {
+            if ( $printLimits )
+            {
+               skMargin( $fileid, $depth + 1 );
+               fprint $fileid ( "channel YPos 0" + " lim " + $yTransLimitValues[ 0 ] + " " + $yTransLimitValues[ 1 ] + "\r\n" );
+            }
+            else
+            {
+               skMargin( $fileid, $depth + 1 );
+               fprint $fileid ( "channel YPos 0 free\r\n" );
+            }
+         }
       }
-      else if ( ( $showAll ) || ( ( $yTransLimitValues[ 0 ] != $yTransLimitValues[ 1 ] ) && ( !$useLimits ) ) )
+      else
       {
-         skMargin( $fileid, $depth + 1 );
-         fprint $fileid ( "channel YPos 0 free\r\n" );
+         if ( $showAll )
+         {
+            skMargin( $fileid, $depth + 1 );
+            fprint $fileid ( "channel YPos 0 free\r\n" );
+         }
       }
 
+
+      $printLimits = 0;
+
       if ( ( $zTransLimitValues[ 0 ] != $zTransLimitValues[ 1 ] ) && ( $useLimits ) )
+         $printLimits = 1;
+
+      if ( $useChannelAttributes )
       {
-         skMargin( $fileid, $depth + 1 );
-         fprint $fileid ( "channel ZPos 0" + " lim " + $zTransLimitValues[ 0 ] + " " + $zTransLimitValues[ 1 ] + "\r\n" );
+         if ( $channelAttributePosY )
+         {
+            if ( $printLimits )
+            {
+               skMargin( $fileid, $depth + 1 );
+               fprint $fileid ( "channel ZPos 0" + " lim " + $zTransLimitValues[ 0 ] + " " + $zTransLimitValues[ 1 ] + "\r\n" );
+            }
+            else
+            {
+               skMargin( $fileid, $depth + 1 );
+               fprint $fileid ( "channel ZPos 0 free\r\n" );
+            }
+         }
       }
-      else if ( ( $showAll ) || ( ( $zTransLimitValues[ 0 ] != $zTransLimitValues[ 1 ] ) && ( !$useLimits ) ) )
+      else
       {
-         skMargin( $fileid, $depth + 1 );
-         fprint $fileid ( "channel ZPos 0 free\r\n" );
+         if ( $showAll )
+         {
+            skMargin( $fileid, $depth + 1 );
+            fprint $fileid ( "channel ZPos 0 free\r\n" );
+         }
       }
    }
    else
