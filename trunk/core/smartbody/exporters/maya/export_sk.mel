@@ -28,7 +28,7 @@
 //   "orientation" option (not "behavior")
 
 
-string $skVersion = "0.4";
+string $skVersion = "0.5";
 
 
 // --------------------------------------------------------------------------------
@@ -127,8 +127,11 @@ proc int skMargin( int $fileid, int $depth )
 }
 
 
-proc int skWriteSk( string $jname, int $fileid, int $depth, int $showAll, int $useLimits )
+proc int skWriteSk( string $jname, int $fileid, int $depth, int $showAll, int $useLimits, int $useChannelAttributes )
 {
+   // RECURSIVE function
+
+
    //=== Get Children ===
    string $children[];
    $children = `listRelatives $jname`;
@@ -138,7 +141,7 @@ proc int skWriteSk( string $jname, int $fileid, int $depth, int $showAll, int $u
    string $type = nodeType( $jname );
 
 
-   // Write info for meshes
+   // Write info for visible geometry meshes
    if ( $type == "mesh" )
    {
       skMargin( $fileid, $depth - 1 );
@@ -159,7 +162,7 @@ proc int skWriteSk( string $jname, int $fileid, int $depth, int $showAll, int $u
 
       for ( $i = 0; $i < $nchildren; $i++ )
       {
-         skWriteSk( $children[ $i ], $fileid, $depth + 1, $showAll, $useLimits );
+         skWriteSk( $children[ $i ], $fileid, $depth + 1, $showAll, $useLimits, $useChannelAttributes );
       }
 
       return 1;
@@ -184,22 +187,33 @@ proc int skWriteSk( string $jname, int $fileid, int $depth, int $showAll, int $u
 
    fprint $fileid ( $jname + "\r\n" );
 
-   skMargin ( $fileid, $depth );
-   fprint $fileid ( "{ offset " );
 
    //Get and then write translation offsets
    float $offset[ 3 ];
-   string $s = $jname + ".translateX";
-   $offset[ 0 ] = `getAttr $s`;
-   string $s = $jname + ".translateY";
-   $offset[ 1 ] = `getAttr $s`;
-   string $s = $jname + ".translateZ";
-   $offset[ 2 ] = `getAttr $s`;
+   $offset[ 0 ] = `getAttr ( $jname + ".translateX" )`;
+   $offset[ 1 ] = `getAttr ( $jname + ".translateY" )`;
+   $offset[ 2 ] = `getAttr ( $jname + ".translateZ" )`;
 
+   skMargin ( $fileid, $depth );
+   fprint $fileid ( "{ offset " );
    fprint $fileid ( skRound( $offset[ 0 ] ) + " " + skRound( $offset[ 1 ] ) + " " + skRound( $offset[ 2 ] ) + "\r\n" );
 
 
    // Write translation channels and limits
+
+   $channelAttributePosX = 0;
+   $channelAttributePosY = 0;
+   $channelAttributePosZ = 0;
+   $channelAttributeQuat = 0;
+
+   if ( $useChannelAttributes )
+   {
+      if ( `objExists ( $jname + ".SbodyPosX" )` )  $channelAttributePosX = `getAttr ( $jname + ".SbodyPosX" )`;
+      if ( `objExists ( $jname + ".SbodyPosX" )` )  $channelAttributePosY = `getAttr ( $jname + ".SbodyPosY" )`;
+      if ( `objExists ( $jname + ".SbodyPosX" )` )  $channelAttributePosZ = `getAttr ( $jname + ".SbodyPosZ" )`;
+      if ( `objExists ( $jname + ".SbodyPosX" )` )  $channelAttributeQuat = `getAttr ( $jname + ".SbodyQuat" )`;
+   }
+
 
    int $mntmn[] = ( `transformLimits -query -etx $jname` );
    float $xTransLimitValues[] = ( `transformLimits -query -tx $jname` );
@@ -244,38 +258,70 @@ proc int skWriteSk( string $jname, int $fileid, int $depth, int $showAll, int $u
    }
    else
    {
-      if ( $showAll )
+      if ( $useChannelAttributes )
       {
-         skMargin( $fileid, $depth + 1 );
-         fprint $fileid ( "channel XPos 0 free\r\n" );
-         skMargin( $fileid, $depth + 1 );
-         fprint $fileid ( "channel YPos 0 free\r\n" );
-         skMargin( $fileid, $depth + 1 );
-         fprint $fileid ( "channel ZPos 0 free\r\n" );
+         if ( $channelAttributePosX )
+         {
+            skMargin( $fileid, $depth + 1 );
+            fprint $fileid ( "channel XPos 0 free\r\n" );
+         }
+         if ( $channelAttributePosY )
+         {
+            skMargin( $fileid, $depth + 1 );
+            fprint $fileid ( "channel YPos 0 free\r\n" );
+         }
+         if ( $channelAttributePosZ )
+         {
+            skMargin( $fileid, $depth + 1 );
+            fprint $fileid ( "channel ZPos 0 free\r\n" );
+         }
       }
-      else if ( $jname == "base" )
+      else
       {
-         // HACK - special case for the "base" joint.  Expose the position channels.  Need to find a way to do this through the exporter on a joint by joint basis
-
-         skMargin( $fileid, $depth + 1 );
-         fprint $fileid ( "channel XPos 0 free\r\n" );
-         skMargin( $fileid, $depth + 1 );
-         fprint $fileid ( "channel YPos 0 free\r\n" );
-         skMargin( $fileid, $depth + 1 );
-         fprint $fileid ( "channel ZPos 0 free\r\n" );
+         if ( $showAll )
+         {
+            skMargin( $fileid, $depth + 1 );
+            fprint $fileid ( "channel XPos 0 free\r\n" );
+            skMargin( $fileid, $depth + 1 );
+            fprint $fileid ( "channel YPos 0 free\r\n" );
+            skMargin( $fileid, $depth + 1 );
+            fprint $fileid ( "channel ZPos 0 free\r\n" );
+         }
+         else if ( $jname == "base" )
+         {
+            // HACK - special case for the "base" joint.  Expose the position channels.  Need to find a way to do this through the exporter on a joint by joint basis
+   
+            skMargin( $fileid, $depth + 1 );
+            fprint $fileid ( "channel XPos 0 free\r\n" );
+            skMargin( $fileid, $depth + 1 );
+            fprint $fileid ( "channel YPos 0 free\r\n" );
+            skMargin( $fileid, $depth + 1 );
+            fprint $fileid ( "channel ZPos 0 free\r\n" );
+         }
       }
    }
 
 
    // Write rotation channel
-   skMargin( $fileid, $depth + 1 );
-   fprint $fileid ( "channel Quat\r\n" );
+   if ( $useChannelAttributes )
+   {
+      if ( $channelAttributeQuat )
+      {
+         skMargin( $fileid, $depth + 1 );
+         fprint $fileid ( "channel Quat\r\n" );
+      }
+   }
+   else
+   {
+      skMargin( $fileid, $depth + 1 );
+      fprint $fileid ( "channel Quat\r\n" );
+   }
 
 
    //=== Recurse ===
    for ( $i = 0; $i < $nchildren; $i++ )
    {
-      skWriteSk( $children[ $i ], $fileid, $depth + 1, $showAll, $useLimits );
+      skWriteSk( $children[ $i ], $fileid, $depth + 1, $showAll, $useLimits, $useChannelAttributes );
    }
 
 
@@ -287,8 +333,11 @@ proc int skWriteSk( string $jname, int $fileid, int $depth, int $showAll, int $u
 }
 
 
-global proc int skExport( string $fname, string $skname, string $version, int $showAll, int $useLimits )
+global proc int skExport( string $fname, string $skname, string $version, int $showAll, int $useLimits, int $useChannelAttributes )
 {
+   print( "skExport() - $fname=" + $fname + " $skname=" + $skname + " $version=" + $version + " $showAll=" + $showAll + " $useLimits=" + $useLimits + " $useChannelAttributes=" + $useChannelAttributes + "\n" );
+
+
    int $fileid = `fopen $fname "w"`;
    if ( $fileid == 0 )
    {
@@ -313,11 +362,11 @@ global proc int skExport( string $fname, string $skname, string $version, int $s
       print ( "----------SK Export Report----------\n" );
 
       fprint $fileid ( "# SK Skeleton Definition\r\n" );
-      fprint $fileid ( "# File generated with export_sk_v" + $version + ".mel\r\n\r\n" );
+      fprint $fileid ( "# File generated with export_sk.mel version " + $version + "\r\n\r\n" );
       fprint $fileid ( "set_name " + $skname + "\r\n\r\n" );
       fprint $fileid ( "skeleton\r\n" );
 
-      skWriteSk( $selectionList[ $j ], $fileid, $depth, $showAll, $useLimits );
+      skWriteSk( $selectionList[ $j ], $fileid, $depth, $showAll, $useLimits, $useChannelAttributes );
 
       fprint $fileid ( "\r\n" );
       fprint $fileid ( "end\r\n" );
@@ -419,6 +468,9 @@ proc skAddSkeletonDef()
 
          addAttr -ln "UseLimits" -at bool SkelDef;
          setAttr SkelDef.UseLimits true;
+
+         addAttr -ln "UseChannelAttributes" -at bool SkelDef;
+         setAttr SkelDef.UseChannelAttributes false;
       }
       else
       {
@@ -458,6 +510,18 @@ global proc limitsUnchecked()
 }
 
 
+global proc UseChannelAttributesChecked()
+{
+   setAttr SkelDef.UseChannelAttributes true;
+}
+
+
+global proc UseChannelAttributesUnchecked()
+{
+   setAttr SkelDef.UseChannelAttributes false;
+}
+
+
 //--------------------------------------------------------------------------------
 // PROC: skExportButton
 //--------------------------------------------------------------------------------
@@ -470,10 +534,11 @@ global proc skExportButton()
    string $file   = `getAttr SkelDef.OutputDirectory`;
    int $showAll   = `getAttr SkelDef.ShowAllChannels`;
    int $useLimits = `getAttr SkelDef.UseLimits`;
+   int $useChannelAttributes = `getAttr SkelDef.UseChannelAttributes`;
 
    select -r $root;
 
-   skExport( $file, $name, $skVersion, $showAll, $useLimits );
+   skExport( $file, $name, $skVersion, $showAll, $useLimits, $useChannelAttributes );
 }
 
 
@@ -512,10 +577,11 @@ global proc skExportGUI()
    textFieldGrp -label "Output Character Name:" -text `getAttr SkelDef.SkeletonName` -cc "skNameChanged" skOutputName;
    textFieldGrp -label "Output File:" -text `getAttr SkelDef.OutputDirectory` -cc "skOutputDirChanged" skOutputFile;
    setParent MainColumn;
-   columnLayout -columnAttach "both" 85 -columnWidth 290 - rowSpacing 5 CBRow2;
+   columnLayout -columnAttach "both" 85 -columnWidth 300 - rowSpacing 5 CBRow2;
    setParent CBRow2;
-   checkBox -label "Show All Channels" -value (`getAttr SkelDef.ShowAllChannels`) -onCommand "channelsChecked" -offCommand "channelsUnchecked" skShowAllChannels;
-   checkBox -label "Use Limits" -value (`getAttr SkelDef.UseLimits`) -onCommand "limitsChecked" -offCommand "limitsUnchecked" skUseLimits;
+   checkBox -label "Export All Channels" -value (`getAttr SkelDef.ShowAllChannels`) -onCommand "channelsChecked" -offCommand "channelsUnchecked" skShowAllChannels;
+   checkBox -label "Export Limits" -value (`getAttr SkelDef.UseLimits`) -onCommand "limitsChecked" -offCommand "limitsUnchecked" skUseLimits;
+   checkBox -label "Use Channel Attributes" -value (`getAttr SkelDef.UseChannelAttributes`) -onCommand "UseChannelAttributesChecked" -offCommand "UseChannelAttributesUnchecked" skUseChannelAttributes;
    setParent MainColumn;
    button -l "Browse Output File" -command "fileBrowser(\"skFileCb\", \"Text\", \"\", 4)";
    button -l "Export" -command "skExportButton";
