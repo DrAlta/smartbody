@@ -52,11 +52,11 @@ public:
 	SrArray<char*> limb_base_name;
 	float pre_blended_base_height;
 	float r_blended_base_height;
-	SrQuat r_blended_base_rot;
+	//SrQuat r_blended_base_rot;
 	//SrQuat pre_blended_base_rot;
 	//float prev_frame;
 	int base_index;
-	SrQuat buff_base_rot;
+	//SrQuat buff_base_rot;
 
 	int r_anim1_index;
 	int r_anim2_index;
@@ -77,7 +77,7 @@ protected:
 
 	SrArray<MeCtLocomotionAnimGlobalInfo*> anim_global_info;
 
-	SrArray<SkMotion*> locomotion_anims;
+	
 
 	int dominant_limb;
 
@@ -118,7 +118,7 @@ public:
 	float dom_ratio;
 
 	SrArray<MeCtLocomotionLimb*> limb_list; //limbs
-	
+	SrArray<SkMotion*> locomotion_anims;
 	//SrVec displacement;
 
 	bool automate;

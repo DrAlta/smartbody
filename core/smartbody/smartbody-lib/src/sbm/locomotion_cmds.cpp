@@ -117,6 +117,42 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		}
 	}
 
+	if(arg == "anim")
+	{
+		std::string type = args.read_token();
+		SkMotion* anim_p = NULL;
+		bool motionsNotLoaded = false;
+		arg = args.read_token();
+		std::map<std::string, SkMotion*>::iterator animIter = mcu_p->motion_map.find(arg);
+		if (animIter != mcu_p->motion_map.end())
+		anim_p = (*animIter).second;
+		if (!anim_p)
+		{
+			LOG("No animation: %s", arg.c_str());
+			motionsNotLoaded = true;
+			return CMD_FAILURE;
+		}
+		if(type == "standing")
+		{
+			actor->get_locomotion_ct_analysis()->init(anim_p, mcu_p->me_paths);
+			actor->get_locomotion_ct_analysis()->init_blended_anim();
+		}
+		else if(type == "walking")
+		{
+			float l_land_time = args.read_float();
+			float l_stance_time = args.read_float();
+			float l_lift_time = args.read_float();
+
+			float r_land_time = args.read_float();
+			float r_stance_time = args.read_float();
+			float r_lift_time = args.read_float();
+
+			actor->get_locomotion_ct()->add_locomotion_anim(anim_p);
+			actor->get_locomotion_ct_analysis()->add_locomotion(anim_p, l_land_time, l_stance_time, l_lift_time, r_land_time, r_stance_time, r_lift_time);
+		}
+		return CMD_SUCCESS;
+	}
+
 	if(!actor->is_locomotion_controller_initialized()) 
 	{
 		LOG("ERROR: Locomotion controller not initialized.");

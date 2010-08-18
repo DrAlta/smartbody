@@ -154,8 +154,6 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 			}
 		}
 	}
-
-	
 }
 
 int MeCtLocomotionAnalysis::get_descendant_num(char* base_name)
@@ -259,7 +257,7 @@ void MeCtLocomotionAnalysis::analyze_standing_core(MeCtLocomotionLimb* limb, SkS
 
 }
 
-void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkMotion* walking, SkMotion* standing, char* limb_base, int land_time, int stance_time, int lift_time)
+void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkMotion* walking, SkMotion* standing, char* limb_base, float land_time, float stance_time, float lift_time)
 {
 	//printf("\nstart analysis......");
 	anim->set_anim(walking);
@@ -742,7 +740,7 @@ void MeCtLocomotionAnalysis::analyze_walking_limb(MeCtLocomotionLimb* limb, SkMo
 }
 
 //temp copy of analyze_walking_limb to enable preset of land time and lift time
-void MeCtLocomotionAnalysis::analyze_walking_limb(MeCtLocomotionLimb* limb, SkMotion* walking, SkMotion* standing, int land_time, int stance_time, int lift_time, int walking_style)
+void MeCtLocomotionAnalysis::analyze_walking_limb(MeCtLocomotionLimb* limb, SkMotion* walking, SkMotion* standing, float land_time, float stance_time, float lift_time, int walking_style)
 {
 	_limb = limb;
 	MeCtLocomotionLimbAnim* anim = new MeCtLocomotionLimbAnim();
@@ -752,7 +750,7 @@ void MeCtLocomotionAnalysis::analyze_walking_limb(MeCtLocomotionLimb* limb, SkMo
 	anim->set_support_joint_list(&(limb->support_joint_list));
 	int limb_joint_num = get_descendant_num(limb->limb_base_name)+1;
 	anim->init_quat_buffers(limb_joint_num);
-	analyze_limb_anim(anim, walking, standing, limb->get_limb_base_name(), land_time, stance_time, lift_time);
+	analyze_limb_anim(anim, walking, standing, limb->get_limb_base_name(), (float)land_time, (float)stance_time, (float)lift_time);
 	limb->walking_list.push() = anim;
 }
 
@@ -777,7 +775,84 @@ void MeCtLocomotionAnalysis::print_info()
 	for(int i = 0; i < _ct_locomotion->get_limb_list()->size();++i)
 	{
 		limb = _ct_locomotion->get_limb_list()->get(i);
+		limb->print_info();
+	}
+}
+
+void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, float l_land_time, float l_stance_time, float l_lift_time, float r_land_time, float r_stance_time, float r_lift_time)
+{
+	MeCtLocomotionLimb* limb = NULL;
+	float lower_bound = 0.0f;
+	int i = 0;
+	float land_time, lift_time, stance_time;
+	for(i = 0; i < _ct_locomotion->get_limb_list()->size();++i)
+	{
+		limb = _ct_locomotion->get_limb_list()->get(i);
+		if(i == 0)
+		{
+			land_time = l_land_time;
+			lift_time = l_lift_time;
+			stance_time = l_stance_time;
+		}
+		else
+		{
+			land_time = r_land_time;
+			lift_time = r_lift_time;
+			stance_time = r_stance_time;
+		}
+
+		analyze_walking_limb(limb, motion_locomotion, motion_standing, land_time, stance_time, lift_time, 0);
 		//limb->print_info();
+		if(i == 0) // let the first limb be the leading limb during analysis process
+		{
+			lower_bound = limb->get_walking_list()->get(limb->get_walking_list()->size()-1)->get_timing_space()->get_virtual_frame(0);
+		}
+		limb->get_walking_list()->get(limb->get_walking_list()->size()-1)->get_timing_space()->set_lower_bound(lower_bound);
+	}
+
+	//calculate direction & complete velocity list
+	SrVec* vel = NULL;
+	SrVec sum(0.0f, 0.0f, 0.0f);
+	SrVec presum(0.0f, 0.0f, 0.0f);
+	SrVec direction(0.0f, 0.0f, 0.0f);
+	int count = 0;
+	float t = 0.0f;
+	float sum_t = 0.0f;
+	for(int j = 0; j < motion_locomotion->frames(); ++j)
+	{
+		count = 0;
+		sum.set(0.0f, 0.0f, 0.0f);
+		t = 0.0f;
+		for(int i = 0; i < _ct_locomotion->get_limb_list()->size();++i)
+		{
+			limb = _ct_locomotion->get_limb_list()->get(i);
+			vel = limb->walking_list.get(limb->walking_list.size()-1)->get_displacement_list()->get(j);
+			if(!vel->iszero())
+			{
+				++count;
+				sum += *vel;
+			}
+		}
+		if(count == 0) sum = presum; // if all limbs are in the air, speed and direction remain the same as lift time.
+		else sum /= (float)count; // averaqge of all the supporting limbs.
+		if(j < motion_locomotion->frames()-1) t = motion_locomotion->keytime(j+1)- motion_locomotion->keytime(j);
+		sum_t += t;
+		direction += sum;
+		presum = sum;
+	}
+
+	MeCtLocomotionAnimGlobalInfo* info = new MeCtLocomotionAnimGlobalInfo();
+	info->displacement = direction.len();
+	direction /= sum_t;
+	info->speed = direction.len();
+	info->direction = -direction/direction.len();
+	_ct_locomotion->get_anim_global_info()->push() = info;
+
+	for(int i = 0; i < _ct_locomotion->get_limb_list()->size();++i)
+	{
+		limb = _ct_locomotion->get_limb_list()->get(i);
+		//limb->walking_list.get(limb->walking_list.size()-1)->direction = -*direction;
+		limb->walking_list.get(limb->walking_list.size()-1)->global_info = info;
 	}
 }
 
@@ -790,7 +865,6 @@ void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, int typ
 	for(i = 0; i < _ct_locomotion->get_limb_list()->size();++i)
 	{
 		limb = _ct_locomotion->get_limb_list()->get(i);
-
 
 		/*if(type == 1) // forward
 		{
@@ -870,7 +944,8 @@ void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, int typ
 			lift_time = motion_locomotion->frames() - 1;
 		}
 
-		analyze_walking_limb(limb, motion_locomotion, motion_standing, land_time, stance_time, lift_time, 0);
+		analyze_walking_limb(limb, motion_locomotion, motion_standing, (float)land_time, (float)stance_time, (float)lift_time, 0);
+
 		//limb->print_info();
 		if(i == 0) // let the first limb be the leading limb during analysis process
 		{
@@ -924,24 +999,3 @@ void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, int typ
 		limb->walking_list.get(limb->walking_list.size()-1)->global_info = info;
 	}
 }
-
-void MeCtLocomotionAnalysis::calc_velocity()
-{
-
-
-}
-
-/*void MeCtLocomotionAnalysis::test_facing(SkMotion* walking)
-{
-	SkSkeleton* skeleton = walking->connected_skeleton();
-	get_ct()->set_skeleton(skeleton);
-	SrVec vec;
-	for(int i = 0; i < walking->frames(); ++i)
-	{
-		walking->apply_frame(i);
-		walking->connected_skeleton()->update_global_matrices();
-		get_ct()->update_facing();
-		vec = get_ct()->get_facing();
-		LOG("\nfaceing[%d]: <%f, %f, %f>", i, vec.x, vec.y, vec.z);
-	}
-}*/

@@ -251,6 +251,7 @@ public:
 	void locomotion_set_turning_mode(int mode);
 	void locomotion_ik_enable(bool enable);
 	MeCtLocomotionClass* get_locomotion_ct();
+	MeCtLocomotionAnalysis* get_locomotion_ct_analysis();
 
 protected:
 	/*!
