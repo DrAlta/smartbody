@@ -27,7 +27,7 @@
 //  Prompts for BML timing metadata
 
 
-string $skmVersion = "1.1";
+string $skmVersion = "1.2";
 int $isFacial = 0;
 int $partialExportToggle = 0;
 
@@ -365,7 +365,7 @@ proc skmCheckAndWriteKeyQuat( int $fileid, string $names[], int $frame, int $fla
 }
 
 // $flag here indicates whether to zero out the channel, used for partial animation export
-proc skmWriteKeyData( int $fileid, int $frame, string $jointName, int $jid, int $partialExportFlag )
+proc skmWriteKeyData( int $fileid, int $frame, string $jointName, int $jid, string $AnimDef, int $partialExportFlag )
 {
    global string $g_names[];
    global int $g_namesWidth;
@@ -394,17 +394,41 @@ proc skmWriteKeyData( int $fileid, int $frame, string $jointName, int $jid, int 
 
    // Note: "keyframe -q -name  base;" returns:
    //       "base_translateZ base_translateX base_translateY base_rotateX base_rotateY base_rotateZ"
- 
-   if( $partialExportFlag == 0 )  $flag = 0;
-   else                     $flag = 1;
-   if ( ( $jid == 0 ) || ( $isFacial ) ) // send translation only for root
-   {
-      skmCheckAndWriteKey( $fileid, $names, "translateX", $frame, $flag );
-      skmCheckAndWriteKey( $fileid, $names, "translateY", $frame, $flag );
-      skmCheckAndWriteKey( $fileid, $names, "translateZ", $frame, $flag );
-   }
 
-   skmCheckAndWriteKeyQuat( $fileid, $names, $frame, $flag );
+   int $useChannelAttributes = `getAttr ( $AnimDef + ".UseChannelAttributes" )`;
+   if ( $useChannelAttributes )
+   {
+      int $channelAttributePosX = 0;
+      int $channelAttributePosY = 0;
+      int $channelAttributePosZ = 0;
+      int $channelAttributeQuat = 0;
+
+      if ( `objExists ( $jointName + ".SbodyPosX" )` )  $channelAttributePosX = `getAttr ( $jointName + ".SbodyPosX" )`;
+      if ( `objExists ( $jointName + ".SbodyPosY" )` )  $channelAttributePosY = `getAttr ( $jointName + ".SbodyPosY" )`;
+      if ( `objExists ( $jointName + ".SbodyPosZ" )` )  $channelAttributePosZ = `getAttr ( $jointName + ".SbodyPosZ" )`;
+      if ( `objExists ( $jointName + ".SbodyQuat" )` )  $channelAttributeQuat = `getAttr ( $jointName + ".SbodyQuat" )`;
+
+      if ( $channelAttributePosX )  skmCheckAndWriteKey( $fileid, $names, "translateX", $frame, 1 );
+      if ( $channelAttributePosY )  skmCheckAndWriteKey( $fileid, $names, "translateY", $frame, 1 );
+      if ( $channelAttributePosZ )  skmCheckAndWriteKey( $fileid, $names, "translateZ", $frame, 1 );
+      if ( $channelAttributeQuat )  skmCheckAndWriteKeyQuat( $fileid, $names, $frame, 1 );
+   }
+   else
+   {
+      if ( $partialExportFlag == 0 )
+         $flag = 0;
+      else
+         $flag = 1;
+
+      if ( ( $jid == 0 ) || ( $isFacial ) ) // send translation only for root
+      {
+         skmCheckAndWriteKey( $fileid, $names, "translateX", $frame, $flag );
+         skmCheckAndWriteKey( $fileid, $names, "translateY", $frame, $flag );
+         skmCheckAndWriteKey( $fileid, $names, "translateZ", $frame, $flag );
+      }
+
+      skmCheckAndWriteKeyQuat( $fileid, $names, $frame, $flag );
+   }
 }
 
 
@@ -459,14 +483,36 @@ proc skmWriteSkm( int $startFrame, int $endFrame, string $joints[], int $fileid,
          Set2dArrayString( $g_names, $g_namesWidth, $i, $n, $names[ $n ] );
       }
 
-      if ( ( $i == 0 ) || ($isFacial) ) // translation allowed only in root
-      {
-         skmCheckAndWrite( $fileid, $names, "translateX", $joints[ $i ], " XPos\n" );
-         skmCheckAndWrite( $fileid, $names, "translateY", $joints[ $i ], " YPos\n" );
-         skmCheckAndWrite( $fileid, $names, "translateZ", $joints[ $i ], " ZPos\n" );
-      }
 
-      skmCheckAndWriteQuat( $fileid, $names, $joints[ $i ] );
+      int $useChannelAttributes = `getAttr ( $AnimDef + ".UseChannelAttributes" )`;
+      if ( $useChannelAttributes )
+      {
+         int $channelAttributePosX = 0;
+         int $channelAttributePosY = 0;
+         int $channelAttributePosZ = 0;
+         int $channelAttributeQuat = 0;
+
+         if ( `objExists ( $joints[ $i ] + ".SbodyPosX" )` )  $channelAttributePosX = `getAttr ( $joints[ $i ] + ".SbodyPosX" )`;
+         if ( `objExists ( $joints[ $i ] + ".SbodyPosY" )` )  $channelAttributePosY = `getAttr ( $joints[ $i ] + ".SbodyPosY" )`;
+         if ( `objExists ( $joints[ $i ] + ".SbodyPosZ" )` )  $channelAttributePosZ = `getAttr ( $joints[ $i ] + ".SbodyPosZ" )`;
+         if ( `objExists ( $joints[ $i ] + ".SbodyQuat" )` )  $channelAttributeQuat = `getAttr ( $joints[ $i ] + ".SbodyQuat" )`;
+
+         if ( $channelAttributePosX )  skmCheckAndWrite( $fileid, $names, "translateX", $joints[ $i ], " XPos\n" );
+         if ( $channelAttributePosY )  skmCheckAndWrite( $fileid, $names, "translateY", $joints[ $i ], " YPos\n" );
+         if ( $channelAttributePosZ )  skmCheckAndWrite( $fileid, $names, "translateZ", $joints[ $i ], " ZPos\n" );
+         if ( $channelAttributeQuat )  skmCheckAndWriteQuat( $fileid, $names, $joints[ $i ] );
+      }
+      else
+      {
+         if ( ( $i == 0 ) || ($isFacial) ) // translation allowed only in root
+         {
+            skmCheckAndWrite( $fileid, $names, "translateX", $joints[ $i ], " XPos\n" );
+            skmCheckAndWrite( $fileid, $names, "translateY", $joints[ $i ], " YPos\n" );
+            skmCheckAndWrite( $fileid, $names, "translateZ", $joints[ $i ], " ZPos\n" );
+         }
+
+         skmCheckAndWriteQuat( $fileid, $names, $joints[ $i ] );
+      }
    }
 
    // frames:
@@ -498,7 +544,7 @@ proc skmWriteSkm( int $startFrame, int $endFrame, string $joints[], int $fileid,
          if( $peRootName == $joints[ $i ] )
             $partialExportFlag = 1;
          if( $partialExportFlag != 0 )  $partialExportCount ++;
-         skmWriteKeyData( $fileid, $f, $joints[ $i ], $i , $partialExportFlag);
+         skmWriteKeyData( $fileid, $f, $joints[ $i ], $i , $AnimDef, $partialExportFlag);
          if( $partialExportCount >= $peRootChildrenNum )   $partialExportFlag = 0;
       }
 
@@ -748,6 +794,7 @@ global proc skmAddAnimDef()
 
       // Create node with setting attributes
       group -n ( "AnimDef_" + $newAnimName ) -em -p SmartbodyExportOptions;
+      addAttr -ln "UseChannelAttributes" -at bool ( "AnimDef_" + $newAnimName );
       addAttr -ln "framesPerSecond" -sn "frmsps" -at "long" -min 1 -dv 30 ( "AnimDef_" + $newAnimName );
       addAttr -ln "firstFrameNumber" -sn "fFrm" -at "long" ( "AnimDef_" + $newAnimName );
       addAttr -ln "lastFrameNumber" -sn "lFrm" -at "long" ( "AnimDef_" + $newAnimName );
@@ -820,6 +867,13 @@ global proc updateAnimUI()
    string $selAnim[] = `textScrollList -q -si "scrollListAnim" `;
    string $AnimDef = ( "AnimDef_" + $selAnim[ 0 ] );
 
+
+   if ( !`objExists ( $AnimDef + ".UseChannelAttributes" )` )  addAttr -ln "UseChannelAttributes" -at bool $AnimDef;
+
+
+   int $channelAttributesSelected = `getAttr( $AnimDef + ".UseChannelAttributes" )`;
+   checkBox -e -value $channelAttributesSelected channelAttributesBox;
+
    // First and last frame
    int $firstFrame = `getAttr( $AnimDef + ".firstFrameNumber" )`;
    intSliderGrp -edit -value $firstFrame skmFirstFrameSlider;
@@ -855,6 +909,24 @@ global proc updateAnimUI()
    
    string $peRootName = `getAttr( $AnimDef + ".peRoot" )`;
    textFieldGrp -e -text $peRootName skmPartialExportRootField;
+}
+
+
+global proc ChannelAttributesOn()
+{
+   string $selAnim[] = `textScrollList -q -si "scrollListAnim" `;
+   string $AnimDef = ( "AnimDef_" + $selAnim[ 0 ] );
+
+   setAttr ( $AnimDef + ".UseChannelAttributes" ) true;
+}
+
+
+global proc ChannelAttributesOff()
+{
+   string $selAnim[] = `textScrollList -q -si "scrollListAnim" `;
+   string $AnimDef = ( "AnimDef_" + $selAnim[ 0 ] );
+
+   setAttr ( $AnimDef + ".UseChannelAttributes" ) false;
 }
 
 
@@ -1156,6 +1228,7 @@ global proc skmExportGUI()
                button -label "Delete Animation"  -align "center" -command "skmDeleteAnimDef";
                setParent skmMainWin;
    checkBox -editable false -label "Loaded from existing \"SmatbodyExportOptions\" node" -align "left" loadedBox;
+   checkBox -editable false -label "Use Channel Attributes" -onCommand "ChannelAttributesOn" -offCommand "ChannelAttributesOff" -align "left" channelAttributesBox;
    checkBox -editable false -changeCommand "toggleIsFacial()" -value false -label "Facial Animations" -align "left" facialBox;
    checkBox -editable false -changeCommand "togglePartialExport()" -value false -label "Partial Animation Exporting- ON: Zero-out OFF: Eliminate Other joints " -align "left" partialExportBox;
    
@@ -1211,7 +1284,7 @@ global proc skmExportGUI()
       {
          print $obj;
          $animDefsExist = 1;
-         print "Found existing animation definitions. \n";      
+         print " Found existing animation definitions. \n";      
          if(!`attributeExists "partialExportRoot" $obj`)
          {
             addAttr -ln "partialExportRoot" -sn "peRoot" -dt "string" $obj;
@@ -1246,6 +1319,7 @@ global proc skmExportGUI()
       textScrollList -edit -append $newAnimName scrollListAnim;
       group -n ( "AnimDef_" + $newAnimName ) -em -p SmartbodyExportOptions;
 
+      addAttr -ln "UseChannelAttributes" -at bool ( "AnimDef_" + $newAnimName );
       addAttr -ln "framesPerSecond" -sn "frmsps" -at "long" -min 1 -dv 30 ( "AnimDef_" + $newAnimName );
       addAttr -ln "firstFrameNumber" -sn "fFrm" -at "long" ( "AnimDef_" + $newAnimName );
       addAttr -ln "lastFrameNumber" -sn "lFrm" -at "long" ( "AnimDef_" + $newAnimName );
