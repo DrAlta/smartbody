@@ -151,7 +151,7 @@ SbmCharacter::~SbmCharacter( void )	{
 
 int SbmCharacter::init_locomotion_analyzer(const char* skel_file, mcuCBHandle *mcu_p)
 {
-	std::string walkForwardMotion = "Step_WalkForward";
+	/*std::string walkForwardMotion = "Step_WalkForward";
 	std::string strafeMotion = "Step_StrafeRight";
 	std::string standingMotion = "HandsAtSide_Motex_Softened";
 
@@ -191,7 +191,7 @@ int SbmCharacter::init_locomotion_analyzer(const char* skel_file, mcuCBHandle *m
 	if (motionsNotLoaded)
 	{
 		return CMD_FAILURE;
-	}
+	}*/
 
 	SkSkeleton* walking_skeleton = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->resource_manager );
 	SkSkeleton* standing_skeleton = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->resource_manager );
@@ -199,15 +199,18 @@ int SbmCharacter::init_locomotion_analyzer(const char* skel_file, mcuCBHandle *m
 	locomotion_ct->init_skeleton(standing_skeleton, walking_skeleton);
 	locomotion_ct_analysis->set_ct(locomotion_ct);
 
-	locomotion_ct->add_locomotion_anim(walking1_p);
-	locomotion_ct->add_locomotion_anim(walking2_p);
-	
-	locomotion_ct_analysis->init(standing_p, mcu_p->me_paths);
-	locomotion_ct_analysis->add_locomotion(walking1_p, 1, 0);
-	locomotion_ct_analysis->add_locomotion(walking2_p, 2, 0);
+	/*locomotion_ct_analysis->init(standing_p, mcu_p->me_paths);
 	locomotion_ct_analysis->init_blended_anim();
 
-	locomotion_ct_analysis->print_info();
+	locomotion_ct->add_locomotion_anim(walking1_p);
+	//locomotion_ct_analysis->add_locomotion(walking1_p, 1, 0);
+	locomotion_ct_analysis->add_locomotion(walking1_p, 29, 45, 6, 1, 17, 33);
+
+	locomotion_ct->add_locomotion_anim(walking2_p);
+	//locomotion_ct_analysis->add_locomotion(walking2_p, 2, 0);
+	locomotion_ct_analysis->add_locomotion(walking2_p, 50, 2, 34, 24, 51, 3);*/
+	
+	//locomotion_ct_analysis->print_info();
 
 	return CMD_SUCCESS;
 }
@@ -234,6 +237,11 @@ void SbmCharacter::locomotion_set_turning_speed(float radians)
 MeCtLocomotionClass* SbmCharacter::get_locomotion_ct()
 {
 	return this->locomotion_ct;
+}
+
+MeCtLocomotionAnalysis* SbmCharacter::get_locomotion_ct_analysis()
+{
+	return this->locomotion_ct_analysis;
 }
 
 void SbmCharacter::locomotion_ik_enable(bool enable)
