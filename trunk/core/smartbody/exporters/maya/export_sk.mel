@@ -201,17 +201,23 @@ proc int skWriteSk( string $jname, int $fileid, int $depth, int $showAll, int $u
 
    // Write translation channels and limits
 
-   $channelAttributePosX = 0;
-   $channelAttributePosY = 0;
-   $channelAttributePosZ = 0;
-   $channelAttributeQuat = 0;
+   int $channelAttributePosX = 0;
+   int $channelAttributePosY = 0;
+   int $channelAttributePosZ = 0;
+   int $channelAttributeQuat = 0;
 
    if ( $useChannelAttributes )
    {
-      if ( `objExists ( $jname + ".SbodyPosX" )` )  $channelAttributePosX = `getAttr ( $jname + ".SbodyPosX" )`;
-      if ( `objExists ( $jname + ".SbodyPosY" )` )  $channelAttributePosY = `getAttr ( $jname + ".SbodyPosY" )`;
-      if ( `objExists ( $jname + ".SbodyPosZ" )` )  $channelAttributePosZ = `getAttr ( $jname + ".SbodyPosZ" )`;
-      if ( `objExists ( $jname + ".SbodyQuat" )` )  $channelAttributeQuat = `getAttr ( $jname + ".SbodyQuat" )`;
+      // if the attributes don't exist, add them to the joint
+      if ( !`objExists ( $jname + ".SbodyPosX" )` )  addAttr -longName "SbodyPosX" -attributeType bool -defaultValue 0 $jname;
+      if ( !`objExists ( $jname + ".SbodyPosY" )` )  addAttr -longName "SbodyPosY" -attributeType bool -defaultValue 0 $jname;
+      if ( !`objExists ( $jname + ".SbodyPosZ" )` )  addAttr -longName "SbodyPosZ" -attributeType bool -defaultValue 0 $jname;
+      if ( !`objExists ( $jname + ".SbodyQuat" )` )  addAttr -longName "SbodyQuat" -attributeType bool -defaultValue 0 $jname;
+
+      $channelAttributePosX = `getAttr ( $jname + ".SbodyPosX" )`;
+      $channelAttributePosY = `getAttr ( $jname + ".SbodyPosY" )`;
+      $channelAttributePosZ = `getAttr ( $jname + ".SbodyPosZ" )`;
+      $channelAttributeQuat = `getAttr ( $jname + ".SbodyQuat" )`;
    }
 
 
@@ -350,7 +356,7 @@ proc int skWriteSk( string $jname, int $fileid, int $depth, int $showAll, int $u
          else if ( $jname == "base" )
          {
             // HACK - special case for the "base" joint.  Expose the position channels.  Need to find a way to do this through the exporter on a joint by joint basis
-   
+
             skMargin( $fileid, $depth + 1 );
             fprint $fileid ( "channel XPos 0 free\r\n" );
             skMargin( $fileid, $depth + 1 );
@@ -462,52 +468,84 @@ global proc int skExport( string $fname )
 ////////////////////////////////////////////////////////////////
 
 
-proc skAddSkeletonDef()
+proc skCheckSkeletonDef()
 {
-   // This creates a "SkelDef" node to store various attributes about the skeleton
+   // this function is called every time, to make sure maya file has the right attributes created
+   // (for backward compatibility).  But it doesn't modify attributes that already exist.
 
-   string $result = `promptDialog -title "Define New Skeleton" - message "Root Joint's Name?"
-               - button "OK" -button "Cancel" -defaultButton "OK" 
-               - cancelButton "Cancel" -dismissString "Cancel"`;
+   // This creates a "SkelDef" node to store attributes about the skeleton
 
-   if ( $result == "OK" )
+   global string $skVersion;
+
+   if ( !`objExists SmartbodyExportOptions` )
    {
-      $rootJointName = `promptDialog -query -text`;
+      group -empty -name "SmartbodyExportOptions";
+      setAttr "SmartbodyExportOptions.visibility" 0;
+   }
 
-      // Make sure rootJointName is valid
-      if ( `objExists $rootJointName` )
+   if ( !`objExists SkelDef` )  group -empty -name "SkelDef" -parent SmartbodyExportOptions;
+
+   if ( !`objExists SkelDef.Version` )
+   {
+      addAttr -longName "Version" -dataType "string" SkelDef;
+      setAttr -type "string" SkelDef.Version $skVersion;
+   }
+
+   if ( !`objExists SkelDef.RootJoint` )
+   {
+      addAttr -longName "RootJoint" -dataType "string" SkelDef;
+
+      string $result = `promptDialog -title "Define New Skeleton" - message "Root Joint's Name?"
+                       - button "OK" -button "Cancel" -defaultButton "OK" 
+                       - cancelButton "Cancel" -dismissString "Cancel"`;
+
+      if ( $result == "OK" )
       {
-         // Valid joint entered
-         group -n "SkelDef" -em -p SmartbodyExportOptions ;
+         $rootJointName = `promptDialog -query -text`;
 
-         addAttr -ln "RootJoint" -dt "string" SkelDef ;
+         // Make sure rootJointName is valid
+         if ( !`objExists $rootJointName` )
+         {
+            print( $rootJointName + " is an invalid name for the root joint\n" );
+         }
+
          setAttr -type "string" SkelDef.RootJoint $rootJointName;
-
-         addAttr -ln "SkeletonName" -dt "string" SkelDef;
-         setAttr -type "string" SkelDef.SkeletonName "default";
-
-         addAttr -ln "OutputDirectory" -dt "string" SkelDef;
-         setAttr -type "string" SkelDef.OutputDirectory "./default.sk";
-
-         addAttr -ln "ShowAllChannels" -at bool SkelDef;
-         setAttr SkelDef.ShowAllChannels false;
-
-         addAttr -ln "UseLimits" -at bool SkelDef;
-         setAttr SkelDef.UseLimits true;
-
-         addAttr -ln "UseChannelAttributes" -at bool SkelDef;
-         setAttr SkelDef.UseChannelAttributes false;
       }
-      else
-      {
-         string $errorMsg = $rootJointName + " is an invalid name for the root joint. Script has exited.\n ";
-         error( $errorMsg );
-      }
+   }
+
+   if ( !`objExists SkelDef.SkeletonName` )
+   {
+      addAttr -longName "SkeletonName" -dataType "string" SkelDef;
+      setAttr -type "string" SkelDef.SkeletonName "default";
+   }
+
+   if ( !`objExists SkelDef.OutputDirectory` )
+   {
+      addAttr -longName "OutputDirectory" -dataType "string" SkelDef;
+      setAttr -type "string" SkelDef.OutputDirectory "./default.sk";
+   }
+
+   if ( !`objExists SkelDef.ShowAllChannels` )
+   {
+      addAttr -longName "ShowAllChannels" -attributeType bool SkelDef;
+      setAttr SkelDef.ShowAllChannels false;
+   }
+
+   if ( !`objExists SkelDef.UseLimits` )
+   {
+      addAttr -longName "UseLimits" -attributeType bool SkelDef;
+      setAttr SkelDef.UseLimits true;
+   }
+
+   if ( !`objExists SkelDef.UseChannelAttributes` )
+   {
+      addAttr -longName "UseChannelAttributes" -attributeType bool SkelDef;
+      setAttr SkelDef.UseChannelAttributes false;
    }
 }
 
 
-proc int skRootJointChanged()
+global proc int skRootJointChanged()
 {
    string $root = `textFieldGrp -q -text skRootField`;
    setAttr -type "string" SkelDef.RootJoint $root;
@@ -515,7 +553,7 @@ proc int skRootJointChanged()
 }
 
 
-proc int skNameChanged()
+global proc int skNameChanged()
 {
    string $name = `textFieldGrp -q -text skOutputName`;
 
@@ -532,7 +570,7 @@ proc int skNameChanged()
 }
 
 
-proc int skOutputDirChanged()
+global proc int skOutputDirChanged()
 {
    string $file = `textFieldGrp -q -text skOutputFile`;
    setAttr -type "string" SkelDef.OutputDirectory $file;
@@ -547,37 +585,37 @@ proc int skFileCb( string $filename, string $fileType )
 }
 
 
-proc ChannelsChecked()
+global proc ChannelsChecked()
 {
    setAttr SkelDef.ShowAllChannels true;
 }
 
 
-proc ChannelsUnchecked()
+global proc ChannelsUnchecked()
 {
    setAttr SkelDef.ShowAllChannels false;
 }
 
 
-proc LimitsChecked()
+global proc LimitsChecked()
 {
    setAttr SkelDef.UseLimits true;
 }
 
 
-proc LimitsUnchecked()
+global proc LimitsUnchecked()
 {
    setAttr SkelDef.UseLimits false;
 }
 
 
-proc UseChannelAttributesChecked()
+global proc UseChannelAttributesChecked()
 {
    setAttr SkelDef.UseChannelAttributes true;
 }
 
 
-proc UseChannelAttributesUnchecked()
+global proc UseChannelAttributesUnchecked()
 {
    setAttr SkelDef.UseChannelAttributes false;
 }
@@ -594,22 +632,10 @@ global proc skExportGUI()
 {
    global string $skVersion;
 
-   // Creates SmartbodyExportOptions and SkelDef nodes if they don't exist
-   if ( !`objExists SmartbodyExportOptions` )
-   {
-      // SmartbodyExportOptions needs to be created
-      group -empty -name "SmartbodyExportOptions";
-      setAttr "SmartbodyExportOptions.visibility" 0;
-      skAddSkeletonDef();
-   }
-   else
-   {
-      if ( !`objExists SkelDef` )
-      {
-         // Skeleton definition has not been made yet
-         skAddSkeletonDef();
-      }
-   }
+
+   // check to make sure Smartbody nodes exist
+   skCheckSkeletonDef();
+
 
    // Build UI
    if ( ( `window -exists skMainWin` ) == true )
@@ -618,9 +644,9 @@ global proc skExportGUI()
    string $winTitle = "SK Exporter v" + $skVersion;
    window -title $winTitle -wh 300 270 skMainWin;
    columnLayout -adjustableColumn true -columnAttach "both" 10 -rowSpacing 10 -columnWidth 290 MainColumn;
-   textFieldGrp -label "Skeleton Root Joint:" -text `getAttr SkelDef.RootJoint` -cc "skRootJointChanged" skRootField;
-   textFieldGrp -label "Output Character Name:" -text `getAttr SkelDef.SkeletonName` -cc "skNameChanged" skOutputName;
-   textFieldGrp -label "Output File:" -text `getAttr SkelDef.OutputDirectory` -cc "skOutputDirChanged" skOutputFile;
+   textFieldGrp -label "Skeleton Root Joint:" -text `getAttr SkelDef.RootJoint` -changeCommand "skRootJointChanged" skRootField;
+   textFieldGrp -label "Output Character Name:" -text `getAttr SkelDef.SkeletonName` -changeCommand "skNameChanged" skOutputName;
+   textFieldGrp -label "Output File:" -text `getAttr SkelDef.OutputDirectory` -changeCommand "skOutputDirChanged" skOutputFile;
    setParent MainColumn;
    columnLayout -columnAttach "left" 85 -columnWidth 300 - rowSpacing 5 CBRow2;
    setParent CBRow2;
@@ -628,7 +654,7 @@ global proc skExportGUI()
    checkBox -label "Export All Channels" -value (`getAttr SkelDef.ShowAllChannels`) -onCommand "ChannelsChecked" -offCommand "ChannelsUnchecked" skShowAllChannels;
    checkBox -label "Export Limits" -value (`getAttr SkelDef.UseLimits`) -onCommand "LimitsChecked" -offCommand "LimitsUnchecked" skUseLimits;
    setParent MainColumn;
-   button -l "Browse Output File" -command "fileBrowser(\"skFileCb\", \"Text\", \"\", 4)";
-   button -l "Export" -command "skExportButton";
+   button -label "Browse Output File" -command "fileBrowser(\"skFileCb\", \"Text\", \"\", 4)";
+   button -label "Export" -command "skExportButton";
    showWindow skMainWin; 
 }
