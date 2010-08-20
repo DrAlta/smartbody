@@ -110,7 +110,7 @@ public:
 
 	void	blend_standing(MeCtLocomotionLimbAnim* standing, float weight);
 
-	void	manipulate_turning();
+	void	manipulate_turning(SrMat& root_mat);
 
 	void	set_joint_type(int index, int type);
 

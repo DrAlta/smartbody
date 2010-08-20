@@ -234,18 +234,17 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 
 			else if(arg == "leftward")
 			{
-				SrVec v(0.0f, 0.0f, 1.0f);
+				SrVec v(1.0f, 0.0f, 0.0f);
 				mat.roty(acos(dot(direction, v)));
 				direction = direction*mat;
 			}
 
-			else if(arg == "rghtward")
+			else if(arg == "rightward")
 			{
-				//direction = -direction;
-				/*SrVec v(0.0f, 1.0f, 0.0f);
-				cross(direction, v);
+				SrVec v(1.0f, 0.0f, 0.0f);
 				mat.roty(acos(dot(direction, v)));
-				direction = direction*mat;*/
+				direction = direction*mat;
+				direction = - direction;
 			}
 
 			else if(arg == "spd")
