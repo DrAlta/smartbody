@@ -70,7 +70,7 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 		localId = XMLString::transcode(id);
 
 	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
-	if( !attrTarget || !XMLString::stringLen( attrTarget ) ) {
+	if( !attrTarget || *attrTarget == 0 ) {
         wcerr << "WARNING: BML::parse_bml_quickdraw(): <"<<tag<<"> BML tag missing "<<ATTR_TARGET<<"= attribute." << endl;
 		return BehaviorRequestPtr();  // a.k.a., NULL
     }
@@ -82,7 +82,7 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 
 	string anim_name( DEFAULT_QUICKDRAW_ANIM );
 	const XMLCh* attrAnim = elem->getAttribute( ATTR_ANIM );
-	if( attrTarget && XMLString::stringLen( attrAnim )>0 ) {
+	if( attrTarget && *attrAnim != 0 ) {
 		char* temp_ascii = XMLString::transcode( attrAnim );
 		anim_name = temp_ascii;
 		XMLString::release( &temp_ascii );
@@ -98,7 +98,7 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 
 	float track_duration = -1;  // indefinite tracking by default
 	const XMLCh* attrTrackDur = elem->getAttribute( ATTR_TRACK_DUR );
-	if( attrTrackDur && XMLString::stringLen( attrTrackDur )>0 ) {
+	if( attrTrackDur && *attrTrackDur != 0 ) {
 		char* temp_ascii = XMLString::transcode( attrTrackDur );
 		string parse_buffer( temp_ascii );
 		istringstream parser( parse_buffer );
@@ -111,7 +111,7 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 	bool set_gundraw_dur_param = false;
 	float gundraw_dur = 0.0;
 	const XMLCh* attrGundrawDur = elem->getAttribute( ATTR_GUNDRAW_DUR );
-	if( attrGundrawDur && XMLString::stringLen( attrGundrawDur )>0 ) {
+	if( attrGundrawDur && *attrGundrawDur != 0 ) {
 		char* temp_ascii = XMLString::transcode( attrGundrawDur );
 		string parse_buffer( temp_ascii );
 		istringstream parser( parse_buffer );
@@ -127,7 +127,7 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 	bool set_holster_dur_param = false;
 	float holster_dur = 0.0;
 	const XMLCh* attrHolsterDur = elem->getAttribute( ATTR_HOLSTER_DUR );
-	if( attrHolsterDur && XMLString::stringLen( attrHolsterDur )>0 ) {
+	if( attrHolsterDur && *attrHolsterDur != 0 ) {
 		char* temp_ascii = XMLString::transcode( attrHolsterDur );
 		string parse_buffer( temp_ascii );
 		istringstream parser( parse_buffer );
@@ -145,7 +145,7 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 	float aim_offset_h = 0.0;
 	float aim_offset_r = 0.0;
 	const XMLCh* attrAimOffset = elem->getAttribute( ATTR_AIM_OFFSET );
-	if( attrAimOffset && XMLString::stringLen( attrAimOffset )>0 ) {
+	if( attrAimOffset && *attrAimOffset != 0 ) {
 		char* temp_ascii = XMLString::transcode( attrAimOffset );
 		string parse_buffer( temp_ascii );
 		istringstream parser( parse_buffer );
@@ -161,7 +161,7 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 	bool set_smooth_param = false;
 	float smooth_factor = 0.0;
 	const XMLCh* attrSmooth = elem->getAttribute( ATTR_SMOOTH );
-	if( attrSmooth && XMLString::stringLen( attrSmooth )>0 ) {
+	if( attrSmooth && *attrSmooth != 0 ) {
 		char* temp_ascii = XMLString::transcode( attrSmooth );
 		string parse_buffer( temp_ascii );
 		istringstream parser( parse_buffer );

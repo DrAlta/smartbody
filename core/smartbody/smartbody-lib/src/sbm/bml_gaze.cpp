@@ -362,7 +362,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	//  GAZE BEHAVIORS
 
 	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
-	if( !attrTarget || !XMLString::stringLen( attrTarget ) ) {
+	if( !attrTarget || *attrTarget == 0 ) {
         wcerr << "WARNING: BML::parse_bml_gaze(): <"<<tag<<"> BML tag missing "<<ATTR_TARGET<<"= attribute." << endl;
 		return BehaviorRequestPtr();  // a.k.a., NULL
     }
@@ -395,7 +395,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	int high_key_index = MeCtGaze::GAZE_KEY_EYES;
 
 	const XMLCh* attrJointRange = elem->getAttribute( ATTR_JOINT_RANGE );
-	if( attrJointRange && XMLString::stringLen( attrJointRange ) ) {
+	if( attrJointRange && *attrJointRange != 0 ) {
 		//  Parse sbm:joint-range
 		XMLStringTokenizer tokenizer( attrJointRange, L" \r\n\t\f" );  // include the dash to delimit ranges
 		if( tokenizer.countTokens()==0 ) {
@@ -447,7 +447,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	int priority_key_index = high_key_index;
 
 	const XMLCh* attrPriority = elem->getAttribute( ATTR_PRIORITY_JOINT );
-	if( attrPriority && XMLString::stringLen(attrPriority) > 0 ) 
+	if( attrPriority && *attrPriority != 0 ) 
 	{
 		const char* priority_key_name = asciiString(attrPriority);
 		priority_key_index = MeCtGaze::key_index(priority_key_name);
@@ -477,7 +477,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 
 	// parse sbm:joint-speed
 	const XMLCh* attrSpeed = elem->getAttribute( ATTR_JOINT_SPEED );
-	if( attrSpeed && XMLString::stringLen( attrSpeed ) ) {
+	if( attrSpeed && *attrSpeed != 0 ) {
 		// Ugly mix of XMLStringTokenizer and streams to get a token count before parsing
 		XMLStringTokenizer tokenizer( attrSpeed );
 		switch( tokenizer.countTokens() ) {
@@ -519,7 +519,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 
 	// parse sbm:speed-smoothing
 	const XMLCh* attrSmooth = elem->getAttribute( ATTR_JOINT_SMOOTH );
-	if( attrSmooth && XMLString::stringLen( attrSmooth ) ) {
+	if( attrSmooth && *attrSmooth != 0 ) {
 		// Ugly mix of XMLStringTokenizer and streams to get a token count before parsing
 		XMLStringTokenizer tokenizer( attrSmooth );
 		switch( tokenizer.countTokens() ) {
@@ -658,7 +658,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 
 	float roll = 0;
 	const XMLCh* attrRoll = elem->getAttribute( ATTR_SBM_ROLL );
-	if( attrRoll && XMLString::stringLen(attrRoll)>0 ) {
+	if( attrRoll && *attrRoll != 0 ) {
 		if( !( wistringstream( attrRoll ) >> roll ) ) {
 			wcerr << "WARNING: BML::parse_bml_gaze(): Expected float for "<<ATTR_SBM_ROLL<<" attribute \"" << attrRoll << "\"." << endl;
 		}
@@ -666,14 +666,14 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 
 	// New code: uses set_offset_polar
 	const XMLCh* attrDirection = elem->getAttribute( ATTR_DIRECTION );
-	if( attrDirection && XMLString::stringLen(attrDirection)>0 ) {
+	if( attrDirection && *attrDirection != 0 ) {
 		wistringstream dir_in( attrDirection );
 		wstring token;
 		if( dir_in >> token ) {
 			float angle = 45;  // Over-exagerated default until further analysis
 
 			const XMLCh* attrAngle = elem->getAttribute( ATTR_ANGLE );
-			if( attrAngle && XMLString::stringLen(attrAngle)>0 ) {
+			if( attrAngle && *attrAngle != 0 ) {
 				if( !( wistringstream( attrAngle ) >> angle ) ) {
 					wcerr << "WARNING: BML::parse_bml_gaze(): Expected float for angle attribute \"" << attrAngle << "\"." << endl;
 				}

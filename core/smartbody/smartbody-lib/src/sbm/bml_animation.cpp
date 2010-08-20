@@ -49,8 +49,9 @@ BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string
 	{
 		localId = XMLString::transcode(id);
 	}
-
-	if( animName && XMLString::stringLen( animName ) ) {
+	
+	if( animName != 0 && *animName != 0 )	{
+//	if( animName && XMLString::stringLen( animName ) ) {
 		// Look up motion
 		string asciiName( xml_utils::asciiString( animName ) );
 

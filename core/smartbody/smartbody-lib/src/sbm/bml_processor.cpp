@@ -548,7 +548,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 		localId = XMLString::transcode(id);
 
 	const XMLCh* postureName = elem->getAttribute( ATTR_POSTURE );
-	if( postureName && XMLString::stringLen( postureName ) ) {
+	if( postureName && *postureName != 0 ) {
 		// Look up pose
 		const char* ascii_pose_id = xml_utils::asciiString(postureName);
 		string pose_id = ascii_pose_id;
@@ -596,7 +596,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 	
 	const XMLCh* tag      = elem->getTagName();
 	const XMLCh* attrType = elem->getAttribute( ATTR_TYPE );
-	if( attrType && XMLString::stringLen( attrType ) ) {
+	if( attrType && *attrType != 0 ) {
         int type = -1;
 
         if( XMLString::compareIString( attrType, L"nod" )==0 ) {
@@ -613,22 +613,22 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
             case BML::HEAD_SHAKE: {
                 const XMLCh* attrRepeats = elem->getAttribute( ATTR_REPEATS );
                 float repeats = 1;  // default to one complete cycle
-                if( attrRepeats && XMLString::stringLen( attrRepeats ) )
+                if( attrRepeats && *attrRepeats != 0 )
                     repeats = xml_utils::xcstof( attrRepeats );
 
                 const XMLCh* attrAmount = elem->getAttribute( ATTR_AMOUNT );
                 float amount = 0.5;  // default to a moderate amount.  Range 0.0 to 1.0
-                if( attrAmount && XMLString::stringLen( attrAmount ) )
+                if( attrAmount && *attrAmount != 0 )
                     amount = xml_utils::xcstof( attrAmount );
 
                 const XMLCh* attrVelocity = elem->getAttribute( ATTR_VELOCITY );
                 float velocity = 1;  // default to one cycle per second
-                if( attrVelocity && XMLString::stringLen( attrVelocity ) )
+                if( attrVelocity && *attrVelocity != 0 )
                     velocity = xml_utils::xcstof( attrVelocity );
 
 				const XMLCh* attrSmooth = elem->getAttribute( ATTR_SMOOTH );
                 float smooth = .5;  
-                if( attrSmooth && XMLString::stringLen( attrSmooth ) )
+                if( attrSmooth && *attrSmooth != 0 )
                     smooth = xml_utils::xcstof( attrSmooth );
 
                 float duration = velocity * repeats;
@@ -646,11 +646,11 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 				const XMLCh* target    = elem->getAttribute( ATTR_TARGET );
 				const XMLCh* angle     = elem->getAttribute( ATTR_ANGLE );
 
-				if( target && XMLString::stringLen( target ) ) {
+				if( target && *target != 0 ) {
 					// TODO
 					wcerr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a target.  Ignoring behavior." << endl;
 					return BehaviorRequestPtr();  // a.k.a., NULL
-				} else if( direction && XMLString::stringLen( direction ) ) {
+				} else if( direction && *direction != 0 ) {
 					if( XMLString::compareIString( direction, DIR_RIGHT )==0 ) {
 						// TODO
 						wcerr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<<DIR_RIGHT<<"\".  Ignoring behavior." << endl;
