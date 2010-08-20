@@ -974,9 +974,9 @@ void MeCtLocomotion::update_pos()
 			{
 				displacement += dis[i]*ratio[i]/sum;
 				//displacement.set(0.0f, 0.0f, 0.0f);
-				displacement.x = 0.0f;
+				//displacement.x = 0.0f;
 				displacement.y = r_blended_base_height-pre_blended_base_height;
-				displacement.z = 0.0f;
+				//displacement.z = 0.0f;
 			}
 			//if(displacement.len()>0.8f) printf("\n====================================================");
 			//printf("\ndisplacement: (%f, %f, %f)", displacement.x, displacement.y, displacement.z);
