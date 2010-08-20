@@ -74,7 +74,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	// Viseme transition hack until timing can support multiple sync points
 
 	attrType = elem->getAttribute( ATTR_TYPE );
-	if( attrType && XMLString::stringLen( attrType ) ) 
+	if( attrType && *attrType != 0 ) 
 	{
 		if( XMLString::compareIString( attrType, ATTR_TARGET )==0 ) 
 		{
@@ -99,7 +99,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 
 	// Enable/disable locomotion controller
 	attrEnable = elem->getAttribute( ATTR_ENABLE );
-	if( attrEnable && XMLString::stringLen( attrEnable ) ) 
+	if( attrEnable && *attrEnable != 0 ) 
 	{
 		if( XMLString::compareIString( attrEnable, L"true" )==0 ) 
 		{
@@ -112,7 +112,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	}
 
 	attrID = elem->getAttribute( ATTR_ID );
-	if( attrType && XMLString::stringLen( attrID ) ) 
+	if( attrType && *attrID != 0 ) 
 	{
 		// ID of the locomotion routine
 		XMLStringTokenizer tokenizer( attrID );

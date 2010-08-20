@@ -51,38 +51,39 @@ BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& uni
 
 	std::string localId = "";
 	const XMLCh* id = elem->getAttribute( ATTR_ID);
-	if (id &&  XMLString::stringLen( id ))
+//	if (id &&  XMLString::stringLen( id ))
+	if (id &&  *id != 0 )
 		localId = XMLString::transcode(id);
 
 	// Viseme transition hack until timing can support multiple sync points
 	const XMLCh* str = elem->getAttribute( L"sbm:rampup" );
 	float rampup = 0;
-	if( str && XMLString::stringLen( str ) ) {
+	if( str && *str != 0 ) {
 		char* temp = XMLString::transcode(str);
 		rampup =( float(atof(temp)));
 	}
 
 	str = elem->getAttribute( L"sbm:rampdown" );
 	float rampdown = 0;
-	if( str && XMLString::stringLen( str ) ) {
+	if( str && *str != 0 ) {
 		char* temp = XMLString::transcode(str);
 		rampdown =( float(atof(temp)));
 	}
 
 	
 	const XMLCh* attrType = elem->getAttribute( ATTR_TYPE );
-	if( attrType && XMLString::stringLen( attrType ) ) {
+	if( attrType && *attrType != 0 ) {
         int type = -1;
 
         if( XMLString::compareIString( attrType, L"facs" )==0 ) {
             const XMLCh* attrAu = elem->getAttribute( ATTR_AU );
-            if( attrAu && XMLString::stringLen( attrAu )>0 ) {
+            if( attrAu && *attrAu != 0 ) {
                 wistringstream inAu( attrAu );
                 int au;
                 if( inAu >> au ) {
                     float weight = 0.5f;
                     const XMLCh* attrAmount = elem->getAttribute( ATTR_AMOUNT );
-                    if( attrAmount && XMLString::stringLen( attrAmount )>0 ) {
+                    if( attrAmount && *attrAmount != 0 ) {
                         if(LOG_BML_VISEMES) LOG( "LOG: BML::parse_bml_face(): FAC has specified weight!\n" );
                         wistringstream inAmount( attrAmount );
                         if( !( inAmount >> weight ) )

@@ -231,7 +231,8 @@ std::string BmlRequest::buildUniqueBehaviorId( const XMLCh* tag,
 	unique_id << "_#" << ordinal << "_<" << ascii << '>';
 	XMLString::release( &ascii );
 
-	if( XMLString::stringLen(id) > 0 ) {
+	if( id != 0 && *id != 0 )	{
+//	if( XMLString::stringLen(id) > 0 ) {
 		ascii = XMLString::transcode( id );
 		unique_id << "_\"" << ascii << "\"";
 		XMLString::release( &ascii );

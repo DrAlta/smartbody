@@ -94,7 +94,7 @@ BehaviorRequestPtr BML::parse_bml_interrupt( DOMElement* elem, const std::string
 		localId = XMLString::transcode(id);
 
 	const XMLCh* performanceId = elem->getAttribute( ATTR_ACT );
-	if( performanceId && XMLString::stringLen( performanceId ) ) {
+	if( performanceId && *performanceId != 0 ) {
 		// performanceId is ASCII, not Unicode
 		char* temp_ascii_id = XMLString::transcode( performanceId );
 		BehaviorRequestPtr interrupt( new InterruptBehavior( unique_id, localId, temp_ascii_id, behav_syncs ) );

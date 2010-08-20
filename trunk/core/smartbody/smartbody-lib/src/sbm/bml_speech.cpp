@@ -83,7 +83,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	if( type ) {
 #if ENABLE_BMLR_SPEECH_REQUEST_CODE
 		// [BMLR] text/plain as default type
-		if( XMLString::stringLen( type) == 0 ) {
+		if( *type == 0 ) {
 			type = VALUE_TEXT_PLAIN;
 		}
 #endif
