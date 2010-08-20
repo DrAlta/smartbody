@@ -470,7 +470,7 @@ global proc int skExport( string $fname )
 
 proc skCheckSkeletonDef()
 {
-   // this function is called every time, to make sure maya file has the right attributes created
+   // this function is called every time the UI is loaded, to make sure maya file has the right attributes created
    // (for backward compatibility).  But it doesn't modify attributes that already exist.
 
    // This creates a "SkelDef" node to store attributes about the skeleton
@@ -483,7 +483,10 @@ proc skCheckSkeletonDef()
       setAttr "SmartbodyExportOptions.visibility" 0;
    }
 
-   if ( !`objExists SkelDef` )  group -empty -name "SkelDef" -parent SmartbodyExportOptions;
+   if ( !`objExists SkelDef` )
+   {
+      group -empty -name "SkelDef" -parent SmartbodyExportOptions;
+   }
 
    if ( !`objExists SkelDef.Version` )
    {
