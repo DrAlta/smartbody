@@ -521,7 +521,8 @@ int main( int argc, char **argv )	{
 	FltkViewer* viewer = new FltkViewer(100, 150, 640, 480, "SmartBody");
 
 	// register the log listener
-	vhcl::Log::StdoutListener* listener = new vhcl::Log::StdoutListener();
+	vhcl::Log::FileListener* listener = new vhcl::Log::FileListener("c:\\aoh.txt");
+	//vhcl::Log::StdoutListener* listener = new vhcl::Log::StdoutListener();
 	vhcl::Log::g_log.AddListener(listener);
 
 	int err;
@@ -694,13 +695,13 @@ int main( int argc, char **argv )	{
 
 	mcu.speech_audiofile_base_path = "../../../../";
 
-	(void)signal( SIGABRT, signal_handler );
+	/*(void)signal( SIGABRT, signal_handler );
 	(void)signal( SIGFPE, signal_handler );
 	(void)signal( SIGILL, signal_handler );
 	(void)signal( SIGINT, signal_handler );
 	(void)signal( SIGSEGV, signal_handler );
 	(void)signal( SIGTERM, signal_handler );
-	(void)signal( SIGBREAK, signal_handler );
+	(void)signal( SIGBREAK, signal_handler );*/
 	//atexit( exit_callback );
 
 	srCmdLine cmdl;
