@@ -620,14 +620,45 @@ global proc int skmExport( string $fname,
       }
 
 
-      //Print number of channels
-      if ( !( $isFacial ) )
+
+      int $useChannelAttributes = `getAttr ( $AnimDef + ".UseChannelAttributes" )`;
+      if ( $useChannelAttributes )
       {
-         $nchannels = $njoints + 3; // all joints' rotations + root 3 translations
+         $nchannels = 0;
+
+         for ( $i = 0; $i < $curJointsId; $i++ )
+         {
+            int $useChannelAttributes = `getAttr ( $AnimDef + ".UseChannelAttributes" )`;
+            if ( $useChannelAttributes )
+            {
+               int $channelAttributePosX = 0;
+               int $channelAttributePosY = 0;
+               int $channelAttributePosZ = 0;
+               int $channelAttributeQuat = 0;
+
+               if ( `objExists ( $joints[ $i ] + ".SbodyPosX" )` )  $channelAttributePosX = `getAttr ( $joints[ $i ] + ".SbodyPosX" )`;
+               if ( `objExists ( $joints[ $i ] + ".SbodyPosY" )` )  $channelAttributePosY = `getAttr ( $joints[ $i ] + ".SbodyPosY" )`;
+               if ( `objExists ( $joints[ $i ] + ".SbodyPosZ" )` )  $channelAttributePosZ = `getAttr ( $joints[ $i ] + ".SbodyPosZ" )`;
+               if ( `objExists ( $joints[ $i ] + ".SbodyQuat" )` )  $channelAttributeQuat = `getAttr ( $joints[ $i ] + ".SbodyQuat" )`;
+
+               if ( $channelAttributePosX )  $nchannels++;
+               if ( $channelAttributePosY )  $nchannels++;
+               if ( $channelAttributePosZ )  $nchannels++;
+               if ( $channelAttributeQuat )  $nchannels++;
+            }
+         }
       }
       else
       {
-         $nchannels = $njoints * 4; // all joints have 1 rotation and 3 translations
+         //Print number of channels
+         if ( !( $isFacial ) )
+         {
+            $nchannels = $njoints + 3; // all joints' rotations + root 3 translations
+         }
+         else
+         {
+            $nchannels = $njoints * 4; // all joints have 1 rotation and 3 translations
+         }
       }
 
       fprint $fileid ( "channels " + $nchannels + "\n" );
