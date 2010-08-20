@@ -790,15 +790,16 @@ static void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h )
    e.heigth = h;
  }
 
-
-static float loco_x_speed = 0.0f;
-static float loco_z_speed = 100.0f;
-static float rps = 1.0f;
+static float rps = 2.0f;
 static int x_flag = 1;
 static int z_flag = 1;
 static int rps_flag = 0;
 static float spd;
+static float x_spd = 7;
+static float z_spd = 70;
 static char t_direction[200];
+static char character[100];
+static int char_flag = -1;
 
 static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h)
 {
@@ -807,6 +808,12 @@ static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h
 	e.key = fltk::event_key();
 	char cmd[300];
 	cmd[0] = '\0';
+
+	if(char_flag == -1) 
+	{	
+		char_flag = 0;
+		sprintf(character, "char doctor ");
+	}
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
@@ -818,44 +825,64 @@ static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h
 	case fltk::UpKey: //move forward
 		rps_flag = 0;
 		z_flag = 1;
-		spd = 70;
+		x_flag = 0;
+		spd = z_spd;
 		sprintf(t_direction, "forward ");
 		break;
 
     case fltk::DownKey://move back
 		z_flag = -1;
+		x_flag = 0;
 		rps_flag = 0;
-		spd = 70;
+		spd = z_spd;
 		sprintf(t_direction, "backward ");
 		break;
 
 	case fltk::LeftKey://turn left
 		rps_flag = -1;
-		spd = 70;
-		//strcat(cmd, "leftward ");
+		break;
+
+	case 'q':
+		if(char_flag == 1) char_flag = 0;
+		else if(char_flag == 0) char_flag = 1;
+		if(char_flag == 0)
+			sprintf(character, "char doctor ");
+		else sprintf(character, "char elder ");
+		not_locomotion = true;
 		break;
 
 	case fltk::RightKey://turn right
 		rps_flag = 1;
-		spd = 70;
 		break;
 
 	case 'w'://speed control
-		loco_z_speed += 10.0f;
-		spd += 10;
+		if(z_flag != 0) z_spd += 10;
+		else if(x_flag != 0) x_spd += 1;
+		not_locomotion = true;
 		break;
 
 	case 's'://speed control
-		loco_z_speed -= 10.0f;
-		spd -= 10;
+		if(z_flag != 0) z_spd -= 10;
+		else if(x_flag != 0) x_spd -= 1;
+		if(z_spd < 0) z_spd = 0;
+		if(x_spd < 0) x_spd = 0;
+		not_locomotion = true;
 		break;
 
 	case 'a'://speed control
-		loco_x_speed += 10.0f;
+		x_flag = 1;
+		z_flag = 0;
+		rps_flag = 0;
+		spd = x_spd;
+		sprintf(t_direction, "leftward ");
 		break;
 
 	case 'd'://speed control
-		loco_x_speed -= 10.0f;
+		x_flag = -1;
+		z_flag = 0;
+		rps_flag = 0;
+		spd = x_spd;
+		sprintf(t_direction, "rightward ");
 		break;
 
 	case ' ':// stop
@@ -866,12 +893,15 @@ static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h
 		break;
 	}
 	char tt[200];
+	strcat(cmd, character);
 	strcat(cmd, t_direction);
 	sprintf(tt, "spd %f rps %f time 2.0", spd, rps_flag * rps);
-	if(e.key != ' ') strcat(cmd, tt);
-	//if(e.key != ' ') sprintf(cmd, "test loco dx %f dz %f rps %f time 1.0", loco_x_speed * x_flag, loco_z_speed * z_flag, rps_flag * rps);
-	//printf("\n%s", cmd);
-	if(not_locomotion == false) mcu.execute(cmd);
+	if(not_locomotion == false) 
+	{
+		strcat(cmd, tt);
+		//printf("\n%s", cmd);
+		mcu.execute(cmd);
+	}
 }
 
 
