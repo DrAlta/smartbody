@@ -491,6 +491,8 @@ void MeCtLocomotionNavigator::update_facing(MeCtLocomotionLimb* limb, bool domin
 
 	if(reached_destination)
 		limb->curr_rotation *= ratio;
+
+	//if(limb->curr_rotation != 0.0f) printf("\n rotation: [%f]", limb->curr_rotation);
 }
 
 void MeCtLocomotionNavigator::clear_destination_list()

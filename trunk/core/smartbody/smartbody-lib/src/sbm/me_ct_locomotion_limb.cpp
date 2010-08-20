@@ -172,10 +172,11 @@ void MeCtLocomotionLimb::blend_anim(float space_time, int anim_index1, int anim_
 	//r_base_pos = anim1->get_base_pos()*weight + anim2->get_base_pos()*(1.0f-weight);
 }
 
-void MeCtLocomotionLimb::manipulate_turning()
+void MeCtLocomotionLimb::manipulate_turning(SrMat& root_mat)
 {
 	SrMat mat;
 	mat.roty(curr_rotation);
+	//mat = root_mat.*mat;
 	SrQuat quat = limb_joint_info.quat.get(0);
 	quat = quat * mat;
 	limb_joint_info.quat.set(0, quat);

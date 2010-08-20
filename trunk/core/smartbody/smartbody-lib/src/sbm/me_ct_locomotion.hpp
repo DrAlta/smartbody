@@ -44,29 +44,24 @@ public:
 	static const char* TYPE;
 
 public:
-	//MeCtLocomotionJointInfo loco_irre_joint_info; // locomotion irrelative joints
-	//MeCtLocomotionJointInfo base_to_limb_joint_info; // joints from base joint to limb base joint(not included), 
-
 	MeCtLocomotionJointInfo nonlimb_joint_info;
+	int translation_joint_index;
 
 	SrArray<char*> limb_base_name;
 	float pre_blended_base_height;
 	float r_blended_base_height;
-	//SrQuat r_blended_base_rot;
-	//SrQuat pre_blended_base_rot;
-	//float prev_frame;
-	int base_index;
-	//SrQuat buff_base_rot;
+
+	//int base_index;
 
 	int r_anim1_index;
 	int r_anim2_index;
 	int style;
 
 protected:
-
 	MeCtIK ik;
-	// Data
+
 	MeCtLocomotionNavigator navigator;
+
 	MeCtLocomotionSpeedAccelerator speed_accelerator; // to be moved to MeCtLocomotionLimb
 
 	SkChannelArray  request_channels;
@@ -77,8 +72,6 @@ protected:
 
 	SrArray<MeCtLocomotionAnimGlobalInfo*> anim_global_info;
 
-	
-
 	int dominant_limb;
 
 	SrMat mat;
@@ -86,7 +79,6 @@ protected:
 	bool is_valid;  // All necessary channels are present
 
 	bool joints_indexed;
-
 
 	//temp
 	SrArray<SrQuat> t_joint_quats1;
@@ -182,6 +174,8 @@ public:
 
 	void init_nonlimb_joint_info();
 
+	void get_translation_base_joint_index();
+
 	void get_anim_indices(int limb_index, SrVec direction);
 
 	void update_pos();
@@ -216,7 +210,7 @@ public:
 
 	//void orthonormal_decompose(const SrVec& svec, const SrVec& direction, SrVec* dvec1, SrVec* dvec2);
 
-	void blend_base_joint(float space_time, int anim_index1, int anim_index2, float weight);
+	void blend_base_joint(MeFrameData& frame, float space_time, int anim_index1, int anim_index2, float weight);
 
 	//temp. to be deleted or modified...
 	//SrMat get_lmat (SkJoint* joint, SrQuat* quat);
@@ -254,6 +248,8 @@ public:
 	void update_nonlimb_mat(SkJoint* joint, SrMat* mat);
 
 	void blend_standing(MeFrameData& frame);
+
+	float get_buffer_base_height(SrBuffer<float>& buffer);
 };
 
 #endif // ME_CT_LOCOMOTION_HPP
