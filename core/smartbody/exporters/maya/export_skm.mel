@@ -521,7 +521,6 @@ proc skmWriteSkm( int $startFrame, int $endFrame, string $joints[], int $fileid,
 
    // frames:
    float $kt = 0;
-   float $vec[];
    float $ktstep = 1.0 / $fps;
 
    if ( $startFrame > $endFrame )
@@ -585,13 +584,13 @@ global proc int skmExportFile( string $fname, string $animDef )
    string $iklist[] = `ls -l -type ikHandle`;
    if ( size( $iklist ) > 0 )
    {
-      print( "WARNING - IK handles exist; animation must be baked" );
+      print( "\nWARNING - IK handles exist; animation must be baked\n\n" );
    }
 
 
    int $fileid = `fopen $fname "w"`;
 
-   string $AnimName = basename( $fname, ".skm" );
+   string $animName = basename( $fname, ".skm" );
 
    // Close file if nothing exists in scene    <-Is this really needed? -Matt
    $selectionList = `ls -sl`;
@@ -602,11 +601,6 @@ global proc int skmExportFile( string $fname, string $animDef )
    }
 
    int $selectionListSize = `size $selectionList`;
-   int $depth = 0;
-   int $njoints;
-   int $nchannels;
-   string $joints[]; // array to be filled with all joints names
-
    for ( $j = 0; $j < $selectionListSize; $j++ )
    {
       $curJointsId = 0;
@@ -615,15 +609,24 @@ global proc int skmExportFile( string $fname, string $animDef )
       fprint $fileid ( "# SKM Motion Definition \n" );
       fprint $fileid ( "# Maya Exporter v" + $skmVersion + "\n\n" );
       fprint $fileid ( "SkMotion\n\n" );
-      fprint $fileid ( "name \"" + $AnimName + "\"\n\n" );
+      fprint $fileid ( "name \"" + $animName + "\"\n\n" );
 
-      $njoints = skmCountJoints( $selectionList[ $j ], $joints);
-      
-      print( "Joints found:\n" );
-      print $joints;
-      print( "\n" );
+      string $joints[];  // array to be filled with all joints names
+      int $njoints = skmCountJoints( $selectionList[ $j ], $joints );
 
-      //Give Error if NO key attributes found, which means the animation is not properly baked or maybe anim layer problem
+      print( $njoints + " joints found (" );
+      for ( $joint = 0; $joint < $njoints; $joint++ )
+      {
+         if ( $joint > 5 )
+         {
+            print( "etc...)\n" );
+            break;
+         }
+         print ( $joints[ $joint ] + ", " );
+      }
+      //print $joints;
+
+      // Give Error if NO key attributes found, which means the animation is not properly baked or maybe anim layer problem
       if ( $njoints == 0 )
       {
          fclose $fileid;
@@ -631,8 +634,8 @@ global proc int skmExportFile( string $fname, string $animDef )
       }
 
 
-
-      //Print number of channels
+      // Print number of channels
+      int $nchannels;
       int $useChannelAttributes = `getAttr ( $animDef + ".UseChannelAttributes" )`;
       if ( $useChannelAttributes )
       {
@@ -680,7 +683,6 @@ global proc int skmExportFile( string $fname, string $animDef )
       int $fps =        `getAttr( $animDef + ".framesPerSecond" )`;
 
       skmWriteSkm( $startFrame, $endFrame, $joints, $fileid, $fps, $animDef );
-      fprint $fileid ( "\n\n" );
 
 
       //grab synch point values
@@ -703,6 +705,7 @@ global proc int skmExportFile( string $fname, string $animDef )
       float $relaxSeconds =       float( $relaxVal - $startFrame ) / $fps;
 
       //print synch point values
+      fprint $fileid ( "\n\n" );
       fprint $fileid ( "ready time: "+ $readySeconds + "\n" );
       fprint $fileid ( "strokeStart time: "+ $strokeStartSeconds + "\n" );
       fprint $fileid ( "emphasis time: "+ $emphasisSeconds+ "\n" );
@@ -712,7 +715,7 @@ global proc int skmExportFile( string $fname, string $animDef )
 
    fclose( $fileid );
 
-   print( "Export done.\n" );
+   print( "Export done - " + $animName + "\n\n" );
 
    return 1;
 }
