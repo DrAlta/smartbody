@@ -31,6 +31,10 @@ string $skmVersion = "1.2";
 int $isFacial = 0;
 int $partialExportToggle = 0;
 
+//  g_names is a pseudo 2d array, containing something like:
+//     l_hip_scaleX l_hip_scaleY l_hip_scaleZ l_hip_translateX l_hip_translateY l_hip_translateZ l_hip_rotateX l_hip_rotateY l_hip_rotateZ l_hip_visibility
+//     l_knee_scaleX l_knee_scaleY l_knee_scaleZ l_knee_translateX l_knee_translateY l_knee_translateZ l_knee_rotateX l_knee_rotateY l_knee_rotateZ l_knee_visibility
+//     etc...
 global string $g_names[];
 global int    $g_namesWidth;
 
@@ -145,7 +149,6 @@ proc Set2dArrayString( string $s[], int $width, int $x, int $y, string $value )
 // make a quaternion from the given rotation around axis (x,y,z)
 proc skmQuatSet( float $q[], float $x, float $y, float $z, float $degrees )
 {
-   float $f;
    float $radians = 3.1415926535897932 * $degrees / 180.0;
 
    // normalize axis:
@@ -153,7 +156,7 @@ proc skmQuatSet( float $q[], float $x, float $y, float $z, float $degrees )
    $q[ 2 ] = $y;
    $q[ 3 ] = $z;
 
-   $f = $x * $x + $y * $y + $z * $z;
+   float $f = $x * $x + $y * $y + $z * $z;
 
    if ( $f > 0 )
    {
@@ -211,21 +214,17 @@ proc quatToAxisAng( float $q[], float $aa[] )
 // (types are retrieved with: $names = `keyframe -q -name pinky3_l`;)
 proc int skmSearchType( string $names[], string $type )
 {
-   string $subst;
    int $size = size( $names );
    int $sizet = size( $type );
-   int $sizei;
-   int $i;
-   int $cmp;
 
    for ( $i = 0; $i < $size; $i++ )
    {
-      $sizei = size( $names[ $i ] );
-      $subst = `substring $names[ $i ] ( $sizei - $sizet + 1 ) $sizei`;
-      $cmp = `strcmp $subst $type`;
+      int $sizei = size( $names[ $i ] );
+      string $subst = `substring $names[ $i ] ( $sizei - $sizet + 1 ) $sizei`;
+      int $cmp = `strcmp $subst $type`;
       if ( $cmp == 0 )
          return $i;
-    }
+   }
 
    return -1;
 }
@@ -283,8 +282,9 @@ proc int skmCountJoints( string $jname, string $joints[] )
 //to evaluate at frame: keyframe -eval -time $frame -query $queryName
 proc float skmKeyVal( int $frame, string $queryName )
 {
-   float $val[];
    global int $isFacial;
+
+   float $val[];
 
    // if there is no key we search the 1st prior valid key for the joint
    while ( size( $val ) == 0 )
@@ -294,10 +294,11 @@ proc float skmKeyVal( int $frame, string $queryName )
          $frame = 0;
 
       $val = `keyframe -eval -time $frame -query $queryName`;
-            
+
       // Make sure frame 0 always have a valid key
-      if ( ($frame == 0) && (size($val)==0) )
+      if ( ( $frame == 0 ) && ( size( $val ) == 0 ) )
          return 0;
+
       $frame = $frame - 1;
    }
 
@@ -308,6 +309,7 @@ proc float skmKeyVal( int $frame, string $queryName )
 proc skmCheckAndWriteKey( int $fileid, string $names[], string $type, int $frame, int $zeroChannelFlag )
 {
    global int $isFacial;
+
    float $base;
 
    int $id = skmSearchType( $names, $type );
@@ -384,6 +386,10 @@ proc skmWriteKeyData( int $fileid, int $frame, string $jointName, int $jid, stri
    int $i;
    int $trstart = 0;
 
+
+   // Note: "keyframe -q -name  base;" returns:
+   //       "base_translateZ base_translateX base_translateY base_rotateX base_rotateY base_rotateZ"
+
    // get used rotations/translations in the joint:
    //$names = `keyframe -q -name $jointName`;
 
@@ -399,9 +405,6 @@ proc skmWriteKeyData( int $fileid, int $frame, string $jointName, int $jid, stri
       $names[ $i ] = $s;
    }
 
-
-   // Note: "keyframe -q -name  base;" returns:
-   //       "base_translateZ base_translateX base_translateY base_rotateX base_rotateY base_rotateZ"
 
    int $useChannelAttributes = `getAttr ( $animDef + ".UseChannelAttributes" )`;
    if ( $useChannelAttributes )
@@ -479,6 +482,9 @@ proc skmWriteSkm( int $startFrame, int $endFrame, string $joints[], int $fileid,
 
    for ( $i = 0; $i < $curJointsId; $i++ )
    {
+      // Note: "keyframe -q -name  base;" returns:
+      //       "base_translateZ base_translateX base_translateY base_rotateX base_rotateY base_rotateZ"
+
       string $names[] = `keyframe -q -name $joints[ $i ]`;
 
       // store our hacked 2d array for use later
@@ -634,7 +640,7 @@ global proc int skmExportFile( string $fname, string $animDef )
       }
 
 
-      // Print number of channels
+      // Count number of channels
       int $nchannels;
       int $useChannelAttributes = `getAttr ( $animDef + ".UseChannelAttributes" )`;
       if ( $useChannelAttributes )
@@ -674,6 +680,8 @@ global proc int skmExportFile( string $fname, string $animDef )
             $nchannels = $njoints * 4; // all joints have 1 rotation and 3 translations
          }
       }
+
+      print ( $nchannels + " channels found\n" );
 
       fprint $fileid ( "channels " + $nchannels + "\n" );
 
