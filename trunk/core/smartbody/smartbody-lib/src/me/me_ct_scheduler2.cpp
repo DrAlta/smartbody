@@ -334,6 +334,47 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::create_track( MeCtUnary* blending,
 	return track;
 }
 
+// This schedule function define arbitary blending curve
+// numKeys: number of Knots used to define the curve
+// curveInfo: knots information, each knot is composed of four float, time weight slope-in slope-out
+MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin, float* curveInfo, int numKeys)
+{	
+	MeCtTimeShiftWarp* timingCt   = new MeCtTimeShiftWarp( ct );
+	MeCtBlend*         blendingCt = new MeCtBlend( timingCt );
+
+	const char* ct_name = ct->name();
+
+	MeSpline1D& bCurve = blendingCt->blend_curve();
+	/*                  x           y    (control_tan, l_control_len, and r_control_len are all zero) */
+	for (int i = 0; i < numKeys; i++)
+	{
+		float weight = curveInfo[i*4+1];
+		float inTime = curveInfo[i*4+0];
+		bCurve.make_smooth(tin+inTime, weight, 0, 0, 0);		
+	}
+	double dur = curveInfo[(numKeys-1)*4] - tin;
+
+	if( ct_name && (ct_name[0]!='\0') ) {
+		string blend_name( "blending for " );
+		blend_name += ct_name;
+		blendingCt->name( blend_name.c_str() );
+	}
+
+	// Configure time mapping
+	MeSpline1D& tMapFunc = timingCt->time_func();
+	/*                      x        y            (l_tan, l_control_len, r_tan, and r_control_len are all zero) */
+	tMapFunc.make_cusp(     tin,     0,            0, 0, 0, 0 );
+	tMapFunc.make_cusp(     tin+dur, dur,          0, 0, 0, 0 );
+
+	if( ct_name && (ct_name[0]!='\0') ) {
+		string timing_name( "timing for " );
+		timing_name += ct_name;
+		timingCt->name( timing_name.c_str() );
+	}
+	return create_track( blendingCt, timingCt, ct );
+}
+
+
 MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin, double tout, float indt, float outdt )
 {
 	double ct_dur = ct->controller_duration();

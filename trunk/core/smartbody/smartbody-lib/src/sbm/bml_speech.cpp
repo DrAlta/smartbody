@@ -162,6 +162,13 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 		throw BML::ParsingException( oss.str().c_str() );
 	}
 
+	// Before speech implementation, check if it's audio implementation, if yes, set the viseme mode
+	AudioFileSpeech* audioSpeechImpl = dynamic_cast<AudioFileSpeech*>(speech_impl);
+	if (audioSpeechImpl)
+	{	
+		bool visemeMode = request->actor->is_viseme_curve();
+		audioSpeechImpl->setVisemeMode(visemeMode);
+	}
 	// Found speech implementation.  Making request.
 	RequestId speech_request_id = speech_impl->requestSpeechAudio( request->actorId.c_str(), xml, "bp speech_ready " );
 
@@ -474,27 +481,38 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 		const size_t viseme_count = visemes.size();
 		for( size_t i=0; i<viseme_count; i++ ) { //adds visemes for audio into sequence file
 			VisemeData* v = visemes.at(i);
-			time_sec time = (time_sec)( v->time() + startAt );
-
-			command.str( "" );
-			command << "char " << actor_id << " viseme " << v->id() << ' ' << v->weight() << ' ';
-			if( v->duration() > 0 ) {
-				command << v->duration();
-			} else {
-				// speech implementation doesn't appear to support durations.
-				// using 0.1 transition duration (and start transition early)
-				command << "0.1";
-				time -= (time_sec)0.05;
+			SbmCharacter* char_p = mcu->character_map.lookup(actor_id);
+			if (!char_p->is_viseme_curve())
+			{
+				time_sec time = (time_sec)( v->time() + startAt );
+				command.str( "" );
+				command << "char " << actor_id << " viseme " << v->id() << ' ' << v->weight() << ' ';
+				if( v->duration() > 0 ) {
+					command << v->duration();
+				} else {
+					// speech implementation doesn't appear to support durations.
+					// using 0.1 transition duration (and start transition early)
+					command << "0.1";
+					time -= (time_sec)0.05;
+				}
+				if( LOG_BML_VISEMES ) cout << "command (complete): " << command.str() << endl;
+				sbm_commands.push_back( new SbmCommand( command.str(), time ) );
+			}
+			else
+			{
+				command.str( "" );
+				command << "char " << actor_id << " viseme " << v->id() << " curve " << v->getNumKeys() << ' ' << v->getCurveInfo();
+				time_sec time = mcu->time;
+				if( LOG_BML_VISEMES ) cout << "command (complete): " << command.str() << endl;
+				sbm_commands.push_back( new SbmCommand( command.str(), time ) );
 			}
 
-			
-			if( LOG_BML_VISEMES ) cout << "command (complete): " << command.str() << endl;
-			sbm_commands.push_back( new SbmCommand( command.str(), time ) );
 			////visemes get set a specified time
 			//if( seq->insert( time, (char*)(command.str().c_str()) )!=CMD_SUCCESS ) {
 			//	cerr << "WARNING: BodyPlannerImpl::realizeRequest(..): msgId=\""<<bpMsg.msgId<<"\": "<<
 			//		"Failed to insert viseme \""<<v->id()<<"\" @ "<<time<<endl;
 			//}
+			time_sec time = v->time();
 			if( LOG_BML_VISEMES ) {
 				ostringstream echo;
 				echo << "echo LOG_BML_VISEMES:\t" << time << ":\t" << command.str();

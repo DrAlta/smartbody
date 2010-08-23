@@ -51,15 +51,24 @@ namespace SmartBody {
 		float _weight;
 		float _time;
 		float _duration;
+		int		_numKeys;
+		std::string	_curveInfo;
+		bool _curveMode;
 
 	public:
 		VisemeData( const char * id, float weight, float time )
-			: _id( id ), _weight( weight ), _time( time ), _duration( 0 )
+			: _id( id ), _weight( weight ), _time( time ), _duration( 0 ), _numKeys( 0 ), _curveInfo( "" ), _curveMode(false)
 		{
 		}
 		
 		VisemeData( const char * id, float weight, float time, float duration )
-			: _id( id ), _weight( weight ), _time( time ), _duration( duration )
+			: _id( id ), _weight( weight ), _time( time ), _duration( duration ), _numKeys( 0 ), _curveInfo( "" ), _curveMode(false)
+		{
+		}
+
+
+		VisemeData( const char * id, int numKeys, const char * curveInfo )
+			: _id( id ), _weight( 1.0 ), _time( 0.0 ), _duration( 0.0 ), _numKeys( numKeys ), _curveInfo( curveInfo ), _curveMode(true)
 		{
 		}
 
@@ -85,6 +94,15 @@ namespace SmartBody {
 
 		/** Set the blend-in duration of the viseme. */
 		void setDuration( float duration ) { _duration = duration; }
+
+		/** Get the number of keys. */
+		int getNumKeys() {return _numKeys;}
+
+		/** Get the curve information. */
+		const char* getCurveInfo() {return _curveInfo.c_str();}
+
+		/** Get the viseme Mode. */
+		bool isCurveMode() {return _curveMode;}
 	};
 
 	/**
@@ -169,6 +187,7 @@ namespace SmartBody {
          *  discarded.  May be called (...?)
          */
         virtual void requestComplete( RequestId requestId ) = 0;
+
     };
 }  // end namespace SmartBody
 
