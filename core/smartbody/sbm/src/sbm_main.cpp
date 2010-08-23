@@ -521,8 +521,8 @@ int main( int argc, char **argv )	{
 	FltkViewer* viewer = new FltkViewer(100, 150, 640, 480, "SmartBody");
 
 	// register the log listener
-	vhcl::Log::FileListener* listener = new vhcl::Log::FileListener("c:\\aoh.txt");
-	//vhcl::Log::StdoutListener* listener = new vhcl::Log::StdoutListener();
+	//vhcl::Log::FileListener* listener = new vhcl::Log::FileListener("c:\\aoh.txt");
+	vhcl::Log::StdoutListener* listener = new vhcl::Log::StdoutListener();
 	vhcl::Log::g_log.AddListener(listener);
 
 	int err;
