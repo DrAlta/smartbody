@@ -64,6 +64,7 @@
 #include <sbm/action_unit.hpp>
 #include <sbm/viseme_map.hpp>
 #include <sbm/general_param_setting.h>
+#include <me/me_spline_1d.hpp>
 
 
 
@@ -127,6 +128,11 @@ protected:
 	typedef std::map<std::string,VisemeImplDataPtr> VisemeToDataMap;
 	VisemeToDataMap viseme_impl_data;
 
+	// Viseme Curve Info
+	std::map <std::string, MeSpline1D*> visemeCurve;
+	bool			use_viseme_curve;
+	float			time_delay;
+
 public:
 	//  Methods
 	SbmCharacter( const char * char_name );
@@ -179,7 +185,8 @@ public:
 
 	BoneBusCharacter * bonebusCharacter;
 	
-	int set_viseme( char* viseme, float weight , double start_time, float rampin_duration );
+	int set_viseme( char* viseme, float weight , double start_time, float rampin_duration, float* curve_info, int numKeys );
+	void bonebus_viseme_update(double curTime);
 
 	bool   eye_blink_closed;
 	double eye_blink_last_time;
@@ -252,6 +259,15 @@ public:
 	void locomotion_ik_enable(bool enable);
 	MeCtLocomotionClass* get_locomotion_ct();
 	MeCtLocomotionAnalysis* get_locomotion_ct_analysis();
+
+public:
+	// temporary hack for viseme curve which requests the buffer channel data to be zero before blending
+	// also hard coded inside
+	void reset_viseme_channels();
+	bool is_viseme_curve() const {return use_viseme_curve;}
+	void set_viseme_curve(bool mode) {use_viseme_curve = mode;}
+	void set_viseme_time_delay(float timeDelay) {time_delay = timeDelay;}
+	float get_viseme_time_delay() {return time_delay;}
 
 protected:
 	/*!

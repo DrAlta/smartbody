@@ -49,6 +49,7 @@ class AudioFileSpeech : public SpeechInterface
       XercesDOMParser * m_xmlParser;
       HandlerBase * m_xmlHandler;
       int m_requestIdCounter;
+	  bool visemeCurveMode;
 
       stdext::hash_map< RequestId, SpeechRequestInfo > m_speechRequestInfo;
 
@@ -65,6 +66,8 @@ class AudioFileSpeech : public SpeechInterface
       virtual float getMarkTime( RequestId requestId, const XMLCh * markId );
       virtual void requestComplete( RequestId requestId );
 	  stdext::hash_map< RequestId, SpeechRequestInfo >& getSpeechRequestInfo();
+
+	  void setVisemeMode(bool mode) {visemeCurveMode = mode;}
 
    protected:
       virtual void ReadVisemeDataLTF( const char * filename, std::vector< VisemeData > & visemeData );

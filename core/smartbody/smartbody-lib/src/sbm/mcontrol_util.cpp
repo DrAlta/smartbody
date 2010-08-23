@@ -507,6 +507,10 @@ void mcuCBHandle::update( void )	{
 			char_p->dMesh_p->update();
 //mark( "AFTERSCENEUPDATE", 0, char_p->name );
 
+			char_p->reset_viseme_channels();		// Temporary Hack for Solving feedback problem, this isn't necessary for non-facebonebone implementations
+			if (char_p->is_viseme_curve())			// For bone bus viseme in Curve Mode
+				char_p->bonebus_viseme_update(time);	
+
 			if ( net_bone_updates && char_p->skeleton_p && char_p->bonebusCharacter ) {
 				NetworkSendSkeleton( char_p->bonebusCharacter, char_p->skeleton_p, &param_map );
 //mark( "AFTERNETWORKSEND", 0, char_p->name );

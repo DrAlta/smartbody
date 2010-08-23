@@ -176,7 +176,10 @@ const vector<VisemeData *> * AudioFileSpeech::getVisemes( RequestId requestId )
       for ( size_t i = 0; i < it->second.visemeData.size(); i++ )
       {
          VisemeData & v = it->second.visemeData[ i ];
-         visemeCopy->push_back( new VisemeData( v.id(), v.weight(), v.time() ) );
+		 if (!v.isCurveMode())
+			 visemeCopy->push_back( new VisemeData( v.id(), v.weight(), v.time() ) );
+		 else
+			 visemeCopy->push_back( new VisemeData( v.id(), v.getNumKeys(), v.getCurveInfo() ));
       }
 
       return visemeCopy;
@@ -400,7 +403,6 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
 {
    visemeData.clear();
 
-
    DOMDocument * doc = xml_utils::parseMessageXml( m_xmlParser, filename );
    if ( doc == NULL )
    {
@@ -412,39 +414,63 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
    // TODO: make sure it's "bml"
 
    // <lips viseme="Ih" articulation="1.0" start="0.17" ready="0.17" relax="0.31" end="0.31" />
-
-   DOMNodeList * syncList = bml->getElementsByTagName( L"lips" );
-   for ( XMLSize_t i = 0; i < syncList->getLength(); i++ )
+   if (!visemeCurveMode)
    {
-      DOMElement * e = (DOMElement *)syncList->item( i );
+	   DOMNodeList * syncList = bml->getElementsByTagName( L"lips" );
+	   for ( XMLSize_t i = 0; i < syncList->getLength(); i++ )
+	   {
+		  DOMElement * e = (DOMElement *)syncList->item( i );
 
-      char * xmlViseme = XMLString::transcode( e->getAttribute( L"viseme" ) );
-      string viseme = xmlViseme;
-      XMLString::release( &xmlViseme );
+		  char * xmlViseme = XMLString::transcode( e->getAttribute( L"viseme" ) );
+		  string viseme = xmlViseme;
+		  XMLString::release( &xmlViseme );
 
-      char * xmlArticulation = XMLString::transcode( e->getAttribute( L"articulation" ) );
-      string articulation = xmlArticulation;
-      XMLString::release( &xmlArticulation );
+		  char * xmlArticulation = XMLString::transcode( e->getAttribute( L"articulation" ) );
+		  string articulation = xmlArticulation;
+		  XMLString::release( &xmlArticulation );
 
-      char * xmlStart = XMLString::transcode( e->getAttribute( L"start" ) );
-      string start = xmlStart;
-      XMLString::release( &xmlStart );
+		  char * xmlStart = XMLString::transcode( e->getAttribute( L"start" ) );
+		  string start = xmlStart;
+		  XMLString::release( &xmlStart );
 
-      char * xmlReady = XMLString::transcode( e->getAttribute( L"ready" ) );
-      string ready = xmlReady;
-      XMLString::release( &xmlReady );
+		  char * xmlReady = XMLString::transcode( e->getAttribute( L"ready" ) );
+		  string ready = xmlReady;
+		  XMLString::release( &xmlReady );
 
-      char * xmlRelax = XMLString::transcode( e->getAttribute( L"relax" ) );
-      string relax = xmlRelax;
-      XMLString::release( &xmlRelax );
+		  char * xmlRelax = XMLString::transcode( e->getAttribute( L"relax" ) );
+		  string relax = xmlRelax;
+		  XMLString::release( &xmlRelax );
 
-      char * xmlEnd = XMLString::transcode( e->getAttribute( L"end" ) );
-      string end = xmlEnd;
-      XMLString::release( &xmlEnd );
+		  char * xmlEnd = XMLString::transcode( e->getAttribute( L"end" ) );
+		  string end = xmlEnd;
+		  XMLString::release( &xmlEnd );
 
 
-      visemeData.push_back( VisemeData( viseme.c_str(), (float)atof( articulation.c_str() ), (float)atof( start.c_str() ) ) );
-      visemeData.push_back( VisemeData( viseme.c_str(), 0.0f,                                (float)atof( end.c_str() ) ) );
+		  visemeData.push_back( VisemeData( viseme.c_str(), (float)atof( articulation.c_str() ), (float)atof( start.c_str() ) ) );
+		  visemeData.push_back( VisemeData( viseme.c_str(), 0.0f,                                (float)atof( end.c_str() ) ) );
+	   }
+   }
+   else
+   {
+	   DOMNodeList* syncCurveList = bml->getElementsByTagName(L"curve");
+	   for (XMLSize_t i = 0; i < syncCurveList->getLength(); i++)
+	   {
+		   DOMElement* e = (DOMElement*)syncCurveList->item(i);
+
+		   char* xmlVisemeName = XMLString::transcode(e->getAttribute(L"name"));
+		   string visemeName = xmlVisemeName;
+		   XMLString::release(&xmlVisemeName);
+
+		   char* xmlNumKeys = XMLString::transcode(e->getAttribute(L"num_keys"));
+		   string numKeys = xmlNumKeys;
+		   XMLString::release(&xmlNumKeys);
+
+		   char* xmlCurveInfo = XMLString::transcode(e->getTextContent());
+		   string curveInfo = xmlCurveInfo;
+		   XMLString::release(&xmlCurveInfo);
+
+		   visemeData.push_back(VisemeData(visemeName.c_str(), atoi(numKeys.c_str()), curveInfo.c_str()));
+	   }
    }
 }
 

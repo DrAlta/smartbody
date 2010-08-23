@@ -103,7 +103,8 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	param_sched_p( CreateSchedulerCt( character_name, "param" ) ),
 	face_ct( NULL ),
 	eyelid_ct( new MeCtEyeLid() ),
-	face_neutral( NULL )
+	face_neutral( NULL ),
+	use_viseme_curve( false )
 {
 	posture_sched_p->ref();
 	motion_sched_p->ref();
@@ -117,6 +118,8 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	eye_blink_closed = false;
 	eye_blink_last_time = 0;
 	eye_blink_repeat_time = 0;
+
+	time_delay = 0.0;
 }
 
 //  Destructor
@@ -561,6 +564,23 @@ void SbmCharacter::add_bounded_float_channel( const string& name, float lower, f
 	joint_p->name( SkJointName( name.c_str() ) );
 	// Activate channel with lower limit != upper.
 	joint_p->pos()->limits( SkJointPos::X, lower, upper );  // Setting upper bound to 2 allows some exageration
+}
+
+void SbmCharacter::reset_viseme_channels()
+{
+	SkChannelArray& channels = skeleton_p->channels();
+	MeFrameData& frameData = ct_tree_p->getLastFrame();
+	int chanSize = channels.size();
+	for (int c = 0; c < chanSize; c++)
+	{
+		SkChannel& chan = channels[c];
+		std::string jointName = std::string(channels.name(c).get_string());
+		if (jointName.substr(0,2) == std::string("au") || jointName.substr(0,6) == std::string("viseme"))
+		{
+			int buffIndex = ct_tree_p->toBufferIndex(c);
+			frameData.buffer()[buffIndex] = 0;
+		}
+	}
 }
 
 int SbmCharacter::init_skeleton() {
@@ -1125,11 +1145,34 @@ const std::string& SbmCharacter::get_voice_code() const
 	return voice_code; //if voice isn't NULL-- no error message; just returns the string
 }
 
+void SbmCharacter::bonebus_viseme_update(double curTime)
+{
+	std::map<std::string, MeSpline1D*>::iterator iter;
+	for (iter = visemeCurve.begin(); iter != visemeCurve.end(); iter++)
+	{
+		VisemeToDataMap::const_iterator visemeToDataMapIter;
+		visemeToDataMapIter = viseme_impl_data.find(iter->first);
+		if( visemeToDataMapIter != viseme_impl_data.end() )
+		{
+			VisemeImplDataPtr data( visemeToDataMapIter->second );
+			std::vector<string>::const_iterator it, end;
+			it  = data->bonebus_names.begin();
+			end = data->bonebus_names.end();
+			for( ; it!= end; ++it )
+			{
+				float weight = (float)iter->second->eval(curTime);
+				bonebusCharacter->SetViseme(it->c_str(), weight, 0.0);
+			}
+		}
+	}
+}
 
 int SbmCharacter::set_viseme( char* viseme,
 							  float weight,
 							  double start_time,
-							  float rampin_duration )
+							  float rampin_duration,
+							  float* curve_info,
+							  int numKeys )
 {
     //LOG("Recieved: SbmCharacter(\"%s\")::set_viseme( \"%s\", %f, %f )\n", name, viseme, weight, rampin_duration );
 
@@ -1142,14 +1185,38 @@ int SbmCharacter::set_viseme( char* viseme,
 		VisemeImplDataPtr data( it->second );
 
 		std::vector<string>::const_iterator it, end;
-
-		if ( bonebusCharacter ) {
-			// iterate over bonebus_names
-			it  = data->bonebus_names.begin();
-			end = data->bonebus_names.end();
-
-			for( ; it!= end; ++it )
-				bonebusCharacter->SetViseme( it->c_str(), weight, rampin_duration );
+		if (bonebusCharacter) 
+		{
+			if (!this->is_viseme_curve())
+			{
+				// iterate over bonebus_names
+				it  = data->bonebus_names.begin();
+				end = data->bonebus_names.end();
+				for( ; it!= end; ++it )
+					bonebusCharacter->SetViseme( it->c_str(), weight, rampin_duration );
+			}
+			else
+			{
+				if (numKeys > 0)
+				{
+					std::map<std::string, MeSpline1D*>::iterator iter = visemeCurve.find(std::string(viseme));
+					if (iter != visemeCurve.end())
+					{
+						visemeCurve.erase(iter);
+					}
+					MeSpline1D* curve = new MeSpline1D();
+					curve->make_smooth(start_time, 0, 0, 0, 0);
+					float timeDelay = this->get_viseme_time_delay();
+					for (int i = 0; i < numKeys; i++)
+					{
+						float weight = curve_info[i*4+1];
+						float inTime = curve_info[i*4+0];
+						curve->make_smooth(start_time+inTime+timeDelay, weight, 0, 0, 0);		
+					}
+					visemeCurve.insert(make_pair(std::string(viseme), curve));
+				}
+				return CMD_SUCCESS;
+			}
 		}
 
 		if ( mcuCBHandle::singleton().sbm_character_listener )
@@ -1185,13 +1252,21 @@ int SbmCharacter::set_viseme( char* viseme,
 				value.size(1);
 				value[0] = (float)weight;
 				ct->set_data(value);
-				head_sched_p->schedule( ct, start_time, start_time + ct->controller_duration(), rampin_duration, 0 );
+				// Curve Mode: viseme in buffer channel has to be set to 0.0 at the beginning of frame (temporary solution to the feedback problem)
+				//				local channel is set to 1.0 all the time
+				//				final result inside buffer channel is controlled by the blend curve
+				// Original Add On Mode: viseme in buffer channel keep the same value unless it is being changed at certain time
+				//							which means after modifying channel data to 1.0, you have to reset it to 0.0 later on
+				if (numKeys > 0)	// Curve MODE
+					head_sched_p->schedule(ct, start_time, curve_info, numKeys);
+				else				// Original Add On MODE
+					head_sched_p->schedule( ct, start_time, start_time + ct->controller_duration(), rampin_duration, 0 );
 			}
 		}
 		return CMD_SUCCESS;
 	} else {
 		cerr << "WARNING: Unknown viseme \"" << viseme << "\" for character \"" << name << "\"." << endl;
-		return CMD_FAILURE;
+		return CMD_SUCCESS;
 	}
 }
 
@@ -1591,15 +1666,65 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return result;
 	}
 	else 
+	// Command: char <> viseme curveon
+	//			char <> viseme curveoff
+	//			char <> viseme timedelay <timedelay>
+	//			char <> viseme <viseme name> <weight> <ramp in>
+	//			char <> viseme <viseme name> curve <number of keys> <curve information>
+	// P.S.		1) the time delay function is used to postpone viseme curve which now is a little bit mismatch with the sound
+	//			2) need to modify the curve slope in and out later, now they are always 0
 	if( char_cmd=="viseme" ) {
-        char * viseme = args.read_token();
-        float  weight = args.read_float();
-		float  rampin_duration = args.read_float();
-		 
+        char* viseme = args.read_token();		// viseme name
+		char* next = args.read_token();			// two modes: original add-on or curve
+		float* curveInfo;
+		float weight;
+		float rampin_duration;
+		int numKeys;
+
+		// viseme
+		if (_strcmpi(viseme, "curveon") == 0)
+		{
+			character->set_viseme_curve(true);
+			return CMD_SUCCESS;
+		}
+		else if(_strcmpi(viseme, "curveoff") == 0)
+		{
+			character->set_viseme_curve(false);
+			return CMD_SUCCESS;
+		}
+		else if(_strcmpi(viseme, "timedelay") == 0)
+		{
+			float timeDelay = (float)atof(next);
+			character->set_viseme_time_delay(timeDelay);
+			return CMD_SUCCESS;
+		}
+
+		// keyword next to viseme
+		if (_strcmpi(next, "curve") == 0)
+		{
+			weight = 1.0;
+			rampin_duration = 0.0;
+			numKeys = args.read_int();			// every key have four floats: time, weight, slope in, slope out
+			if (numKeys <= 0)	
+			{
+				LOG("ERROR: incorrect viseme curve!");
+				return CMD_FAILURE;
+			}
+			curveInfo = new float[numKeys * 4];
+			args.read_float_vect(curveInfo, numKeys * 4);
+		}
+		else
+		{
+			weight = (float)atof(next);
+			rampin_duration = args.read_float();
+			numKeys = 0;
+			curveInfo = NULL;
+		}
+
 		if( all_characters ) {
 			mcu_p->character_map.reset();
 			while( character = mcu_p->character_map.next() ) {
-				character->set_viseme( viseme, weight, mcu_p->time, rampin_duration );
+				character->set_viseme( viseme, weight, mcu_p->time, rampin_duration, curveInfo, numKeys );
 			}
 			return CMD_SUCCESS;
 		} else {
@@ -1607,7 +1732,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				cerr << "ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"" << char_name << "\"." << endl;
 				return CMD_FAILURE;  // ignore/out-of-domain? But it's not a standard network message.
 			} else {
-				return character->set_viseme( viseme, weight, mcu_p->time, rampin_duration );
+				return character->set_viseme( viseme, weight, mcu_p->time, rampin_duration, curveInfo, numKeys );
 			}
 		}
 	} else if( char_cmd=="bone" ) {
