@@ -344,7 +344,7 @@ int mcu_sequence_chain_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	}
 
 	if( seq_names.empty() ) {
-		cerr << "ERROR: seq-chain expected one or more .seq filenames." << endl;
+		LOG("ERROR: seq-chain expected one or more .seq filenames.");
 		return CMD_FAILURE;
 	}
 
@@ -3513,7 +3513,7 @@ int mcu_vrQuery_func( srArgBuffer& args, mcuCBHandle* mcu_p )
 {
 	string command = args.read_token();
 	if( strcmp(command.c_str(),"anims") && strcmp(command.c_str(),"poses") ) {
-		cerr << "ERROR: Invalid query command" << endl;
+		LOG("ERROR: Invalid query command");
 		return CMD_FAILURE;
 	}
 
@@ -3813,19 +3813,48 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				int channelCounter = 0;
 				for (int c = 0; c < mChanArray.size(); c++)
 				{
+					int curIndex = channelCounter;
 					SkChannel& channel = mChanArray.get(c);
 					SkJointName& jointName = mChanArray.name(c);
 					int chanSize = channel.size();
 					int numZeroFrames = 0;
-					for (int x = 0; x < chanSize; x++)
+					int	chanType = channel.type;
+					if (chanType == SkChannel::Quat)
 					{
-						if (fabs(frameData[channelCounter]) < .00001)
-							numZeroFrames++;
-						channelCounter++;
+						if (fabs(frameData[channelCounter] - 1.0) > .0001 ||
+							fabs(frameData[channelCounter + 1]) > .0001 ||
+							fabs(frameData[channelCounter + 2]) > .0001 ||
+							fabs(frameData[channelCounter + 3]) > .0001)
+						{
+							numZeroFrames = 0;
+						}
+						else
+						{
+							numZeroFrames = 1;
+						}
+						channelCounter += 4;
 					}
+					else
+					{
+						for (int x = 0; x < chanSize; x++)
+						{
+							if (fabs(frameData[channelCounter]) < .0001)
+								numZeroFrames++;
+							channelCounter++;
+						}
+							
+					}
+										
 					if (numZeroFrames == 0)
 					{
-						LOG("Channel %s/%s has non-zero values.", jointName.get_string(), channel.type_name());
+						if (chanType == SkChannel::XPos || chanType == SkChannel::YPos || chanType == SkChannel::ZPos ||
+							chanType == SkChannel::XRot || chanType == SkChannel::YRot || chanType == SkChannel::ZRot || 
+							chanType == SkChannel::Twist)
+							LOG("Channel %s/%s has non-zero value: %f.", jointName.get_string(), channel.type_name(), frameData[curIndex]);
+						else if (chanType == SkChannel::Swing)
+							LOG("Channel %s/%s has non-zero value: %f %f.", jointName.get_string(), channel.type_name(), frameData[curIndex], frameData[curIndex + 1]);
+						else if (chanType == SkChannel::Quat)
+							LOG("Channel %s/%s has non-zero value: %f %f %f %f.", jointName.get_string(), channel.type_name(), frameData[curIndex], frameData[curIndex+ 1], frameData[curIndex + 2], frameData[curIndex + 3]);
 					}
 				}
 				motion->disconnect();
