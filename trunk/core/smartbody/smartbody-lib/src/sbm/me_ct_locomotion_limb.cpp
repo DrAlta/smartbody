@@ -49,6 +49,12 @@ MeCtLocomotionLimb::MeCtLocomotionLimb() {
 	standing_skeleton = NULL;
 }
 
+MeCtLocomotionLimb::MeCtLocomotionLimb(char* name) 
+{
+	MeCtLocomotionLimb();
+	limb_name = name;
+}
+
 /** Destructor */
 MeCtLocomotionLimb::~MeCtLocomotionLimb() {
 	// Nothing allocated to the heap

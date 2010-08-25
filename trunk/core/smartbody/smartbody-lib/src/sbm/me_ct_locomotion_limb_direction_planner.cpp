@@ -178,17 +178,20 @@ void MeCtLocomotionLimbDirectionPlanner::update_direction(float time_interval, f
 	}
 	else
 	{
-		angle = turning_speed*time_interval;
+		//angle = turning_speed*time_interval;
+		int y = 0;
 	}
 
 	mat.roty(angle);
 	curr_direction = curr_direction*mat;
+
 	if(!target_direction.iszero())
 	{
 		SrVec vec2 = cross(curr_direction, target_direction);
 		if(vec1.y*vec2.y <= 0.0f)
 		{
-			if(dot(target_direction, curr_direction) > 0.0f && p == 1) curr_direction = target_direction;
+			if(dot(target_direction, curr_direction) > 0.0f && p == 1) 
+				curr_direction = target_direction;
 			else if(dot(target_direction, curr_direction) < 0.0f && p == -1)
 			{
 				//if(*space_time < last_space_time)

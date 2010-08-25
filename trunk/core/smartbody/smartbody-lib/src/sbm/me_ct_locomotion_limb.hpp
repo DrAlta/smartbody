@@ -49,6 +49,7 @@ public:
 	float							ground_height; // ground height in Y direction
 	char*							skeleton_name;
 	MeCtLocomotionJointInfo			limb_joint_info;
+	SrString						limb_name;
 
 
 public:
@@ -83,6 +84,8 @@ public:
 public:
 	MeCtLocomotionLimb();
 	~MeCtLocomotionLimb();
+
+	MeCtLocomotionLimb(char* name);
 
 	void	set_height_bound(float bound);
 	float	get_height_bound();

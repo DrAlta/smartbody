@@ -790,7 +790,7 @@ static void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h )
    e.heigth = h;
  }
 
-static float rps = 2.0f;
+static float rps = 1.0f;
 static int x_flag = 1;
 static int z_flag = 1;
 static int rps_flag = 0;

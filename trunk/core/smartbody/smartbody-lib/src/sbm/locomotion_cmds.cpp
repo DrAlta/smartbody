@@ -153,6 +153,11 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		return CMD_SUCCESS;
 	}
 
+	if(arg == "status")
+	{
+		actor->get_locomotion_ct()->print_info();
+	}
+
 	if(!actor->is_locomotion_controller_initialized()) 
 	{
 		LOG("ERROR: Locomotion controller not initialized.");

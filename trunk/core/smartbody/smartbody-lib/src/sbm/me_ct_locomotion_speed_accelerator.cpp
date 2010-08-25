@@ -40,7 +40,7 @@ MeCtLocomotionSpeedAccelerator::MeCtLocomotionSpeedAccelerator() {
 	proceed_acceleration = true;
 	auto_accelerated = true;
 	speed_limit = 200.0f;
-	frame_interval = 0.013333f;
+	frame_interval = 0.03333333f;
 	max_acceleration_pos = 200.0f;
 	min_acceleration_pos = 0.0f;
 	max_acceleration_neg = -30.0f;
@@ -135,9 +135,16 @@ void MeCtLocomotionSpeedAccelerator::set_max_acceleration(float max)
 void MeCtLocomotionSpeedAccelerator::update_acceleration(MeCtLocomotionLimb* limb, MeCtLocomotionTimingSpace* timing_space)
 {
 	if(proceed_acceleration == false || auto_accelerated == false) return;
-	float length = timing_space->get_section_length(limb->space_time, 1.0f);
-	float time = length * frame_interval;
+	float length = 0.0f;
+	if(target_speed >= curr_speed) 
+		length = timing_space->get_section_length(limb->space_time, 1.0f);
+	else
+		length = timing_space->get_section_length(limb->space_time, 0.0f);
+	float time;
+		
+	time = length * frame_interval;
 	acceleration = (target_speed - curr_speed)/time;
+	
 	if(acceleration >= 0.0f)
 	{
 		if(max_acceleration_pos > 0.0f && acceleration > max_acceleration_pos) acceleration = max_acceleration_pos;
