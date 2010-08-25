@@ -93,11 +93,12 @@ protected:
 	float last_time;
 	float last_t;
 	float curr_t;
+	float delta_time;
 
 	char* base_name;
 	char* nonlimb_blending_base_name;
 
-	bool dis_initialized;
+	bool dis_initialized; // limb joint positiona calculated
 	bool initialized;
 
 	int joint_channel_start_ind;
@@ -250,6 +251,8 @@ public:
 	void blend_standing(MeFrameData& frame);
 
 	float get_buffer_base_height(SrBuffer<float>& buffer);
+
+	void print_info();
 };
 
 #endif // ME_CT_LOCOMOTION_HPP

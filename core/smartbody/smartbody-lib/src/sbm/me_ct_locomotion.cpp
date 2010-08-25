@@ -26,6 +26,8 @@
 #include "gwiz_math.h"
 #include "limits.h"
 #include <vhcl_log.h>
+#include <iostream>
+#include <string>
 
 
 const char* MeCtLocomotion::TYPE = "MeCtLocomotion";
@@ -244,11 +246,11 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	if(!enabled) return false;
 	if( !is_valid ) return is_valid;
 
-	float time_delta = 0.03333333f;
+	delta_time = 0.03333333f;
 
 	if(motion_time > 0.0f)
 	{
-		motion_time -= time_delta;
+		motion_time -= delta_time;
 		if(motion_time < 0.0f) motion_time = 0.0f;
 	}
 	if(motion_time == 0.0f)
@@ -256,17 +258,15 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 		navigator.set_reached_destination(frame);
 	}
 
-	//time_delta = 0.033333333f;
-
-	if(last_t == -1.0f) last_t = (float)time-0.033333f;
+	if(last_t == -1.0f) last_t = (float)time-delta_time;
 
 	curr_t = (float)time;
 
-	if(curr_t - last_t > 0.033333f)  curr_t = last_t + 0.033333f;
+	if(curr_t - last_t > delta_time)  curr_t = last_t + delta_time;
 
 	if(curr_t < last_t) curr_t = last_t;
 	
-	float inc_frame = (float)((curr_t-last_t)/time_delta);
+	float inc_frame = (float)((curr_t-last_t)/delta_time);
 
 	const vector3_t UP_VECTOR( 0, 1, 0 );
 
@@ -390,7 +390,6 @@ void MeCtLocomotion::init_skeleton(SkSkeleton* standing, SkSkeleton* walking)
 {
 	walking_skeleton = walking;
 	standing_skeleton = standing;
-
 	initialized = true;
 }
 
@@ -545,6 +544,8 @@ void MeCtLocomotion::blend_base_joint(MeFrameData& frame, float space_time, int 
 	float standing_height = get_buffer_base_height(buffer);
 
 	r_blended_base_height = r_blended_base_height * (navigator.standing_factor) + standing_height * (1.0-navigator.standing_factor);
+
+	//printf("\nHeight: %f", r_blended_base_height);
 }
 
 void MeCtLocomotion::set_motion_time(float time)
@@ -570,10 +571,11 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 		}
 	}
 
-	speed_accelerator.update_speed(curr_t - last_t);
+	if(speed_accelerator.get_target_speed() > speed_accelerator.get_curr_speed() || limb_list.get(dominant_limb)->space_time > 2.0f) 
+		speed_accelerator.update_speed(delta_time);
 
 	//get current direction
-	limb_list.get(dominant_limb)->direction_planner.update_direction(curr_t - last_t, &limb_list.get(dominant_limb)->space_time);
+	limb_list.get(dominant_limb)->direction_planner.update_direction(delta_time, &limb_list.get(dominant_limb)->space_time);
 
 	// set r_anim1_index amd r_anim2_index
 	get_anim_indices(dominant_limb, limb_list.get(dominant_limb)->direction_planner.get_curr_direction());
@@ -590,6 +592,7 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 	navigator.update_framerate_accelerator(acc, &limb_list);
 
 	get_blended_timing_space(blended_anim->get_timing_space(), anim1->get_timing_space(), anim2->get_timing_space(), dom_ratio);
+
 
 	//the current frame number is the addition of previous frame number + increased frame num * acceleration
 	frame_num = blended_anim->get_timing_space()->get_virtual_frame(limb_list.get(dominant_limb)->space_time) + inc_frame * navigator.framerate_accelerator;
@@ -612,7 +615,7 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 	{
 		if(i != dominant_limb)
 		{
-			limb_list.get(i)->direction_planner.update_direction((curr_t - last_t), &limb_list.get(i)->space_time);
+			limb_list.get(i)->direction_planner.update_direction(delta_time, &limb_list.get(i)->space_time);
 			anim1 = limb_list.get(i)->get_walking_list()->get(r_anim1_index);
 			anim2 = limb_list.get(i)->get_walking_list()->get(r_anim2_index);
 			blended_anim = &limb_list.get(i)->blended_anim;
@@ -621,7 +624,7 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 			//get a subordinate timing space which has the same scale as the dominant timing space,
 			//then map the frame number into the space value of this timing space.
 			//the reason for this is that provided the freedom of all the limbs, the animation can be unsmooth if frame number is not mapped into the dominant limb's timing space
-			get_anim_indices(i, limb_list.get(dominant_limb)->direction_planner.get_curr_direction());
+			get_anim_indices(i, limb_list.get(i)->direction_planner.get_curr_direction());
 			get_blended_timing_space(blended_anim->get_timing_space(), anim1->get_timing_space(), anim2->get_timing_space(), dom_ratio);
 			if(navigator.standing_factor != 0.0f) 
 				limb_list.get(i)->space_time = blended_anim->get_timing_space()->get_space_value(frame_num);
@@ -660,6 +663,7 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 
 	blend_base_joint(frame, limb_list.get(0)->space_time, r_anim1_index, r_anim2_index, dom_ratio);
 
+	//printf("\nstanding_ratio: %f", navigator.standing_factor);
 	update_nonlimb_mat();
 
 	update_pos();
@@ -843,6 +847,8 @@ void MeCtLocomotion::get_anim_indices(int limb_index, SrVec direction)
 	r_anim2_index = index2;
 	limb->get_walking_list()->get(index1)->get_timing_space()->set_mode(mode1);
 	limb->get_walking_list()->get(index2)->get_timing_space()->set_mode(mode2);
+
+	//printf("\n[%d, %d]", r_anim1_index, r_anim2_index);
 }
 
 int MeCtLocomotion::get_dominant_limb()
@@ -976,6 +982,7 @@ void MeCtLocomotion::update_pos()
 				//displacement.set(0.0f, 0.0f, 0.0f);
 				//displacement.x = 0.0f;
 				displacement.y = r_blended_base_height-pre_blended_base_height;
+				//printf("\ndisplacement: %f", displacement.y);
 				//displacement.z = 0.0f;
 			}
 			//if(displacement.len()>0.8f) printf("\n====================================================");
@@ -1012,4 +1019,36 @@ SrVec MeCtLocomotion::get_facing_vector()
 	SrVec direction(0.0, 0.0, 1.0f);
 	direction = direction*mat;
 	return direction;
+}
+
+void MeCtLocomotion::print_info()
+{
+	printf("\nAnimations loaded:");
+	for(int i = 0; i < locomotion_anims.size(); ++i)
+	{
+		printf("\n\t[%d] %s", i, locomotion_anims.get(i)->name());
+	}
+
+	printf("\nLimbs:");
+	printf("\  Total number: %d", limb_list.size());
+	MeCtLocomotionLimb* limb;
+	for(int i = 0; i < limb_list.size(); ++i)
+	{
+		limb = limb_list.get(i);
+		printf("\n\t%s:", limb->limb_name.get(0));
+		//limb->print_info();
+		printf("\n\tSupport joints:");
+		for(int j = 0; j < limb->get_support_joint_num(); ++j)
+		{
+			printf("\n\t\t%s", (const char*)*(limb->support_joint_list.get(j)));
+		}
+	}
+
+	printf("\nInitialized: ");
+	if(initialized) printf("Yes");
+	else printf("No");
+
+	printf("\nEnabled: ");
+	if(enabled) printf("Yes");
+	else printf("No");
 }
