@@ -504,15 +504,21 @@ void MeCtLocomotion::blend_base_joint(MeFrameData& frame, float space_time, int 
 	SrQuat rot1, rot2, rot3, rot4;
 	float ratio = 0.0f;
 	const float* pheight = mat.pt(13);
+	float base_height;
+	char* translate_base;
+	SkJoint* base;
 
 	MeCtLocomotionLimbAnim* anim1 = limb_list.get(0)->walking_list.get(anim_index1);
 	MeCtLocomotionLimbAnim* anim2 = limb_list.get(0)->walking_list.get(anim_index2);
 	float frame1 = anim1->get_timing_space()->get_virtual_frame(space_time);
 	float frame2 = anim2->get_timing_space()->get_virtual_frame(space_time);
 
-	const char* translate_base = nonlimb_joint_info.joint_name.get(translation_joint_index);
+	translate_base = (char*)nonlimb_joint_info.joint_name.get(0);
+	base = walking_skeleton->search_joint(translate_base);
+	base_height = base->offset().y;
 
-	SkJoint* base = walking_skeleton->search_joint(translate_base);
+	translate_base = (char*)nonlimb_joint_info.joint_name.get(translation_joint_index);
+	base = walking_skeleton->search_joint(translate_base);
 
 	anim1->walking->connect(walking_skeleton);
 	ratio = frame1 - (int)frame1;
@@ -539,6 +545,8 @@ void MeCtLocomotion::blend_base_joint(MeFrameData& frame, float space_time, int 
 	base->update_gmat();
 	mat = base->gmat();
 	r_blended_base_height += *pheight*ratio*(1.0f-weight);
+
+	r_blended_base_height += base_height;
 
 	SrBuffer<float>& buffer = frame.buffer();
 	float standing_height = get_buffer_base_height(buffer);
@@ -571,8 +579,8 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 		}
 	}
 
-	if(speed_accelerator.get_target_speed() > speed_accelerator.get_curr_speed() || limb_list.get(dominant_limb)->space_time > 2.0f) 
-		speed_accelerator.update_speed(delta_time);
+	//if(speed_accelerator.get_target_speed() > speed_accelerator.get_curr_speed() || limb_list.get(dominant_limb)->space_time > 2.0f) 
+	speed_accelerator.update_speed(delta_time);
 
 	//get current direction
 	limb_list.get(dominant_limb)->direction_planner.update_direction(delta_time, &limb_list.get(dominant_limb)->space_time);
