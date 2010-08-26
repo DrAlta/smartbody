@@ -558,6 +558,8 @@ int main( int argc, char **argv )	{
 	bool lock_dt_mode = false;
 	int i;
 	SrString	s;
+	FltkViewer::MenuCmd cmd;		// for -viewermode
+	bool fixedViewerMode = false;			// this boolean is used when -viewermode= is activated
 	for (	i=1; i<argc; i++ )
 	{
 		LOG( "SBM ARG[%d]: '%s'", i, argv[i] );
@@ -628,6 +630,33 @@ int main( int argc, char **argv )	{
 		else if ( s.search( "-facebone" ) == 0 )
 		{
 			mcu.net_face_bones = true;
+		}
+		else if ( s.search( "-viewermode=" ) == 0 )  // argument starts with -viewermode=
+		{
+			SrString modeString = s;
+			modeString.remove(0, 12);
+			int mode = atoi(modeString);
+			switch (mode)
+			{
+				case 0:
+					cmd = FltkViewer::CmdCharacterShowGeometry;
+					break;
+				case 1:
+					cmd = FltkViewer::CmdCharacterShowCollisionGeometry;
+					break;
+				case 2:
+					cmd = FltkViewer::CmdCharacterShowDeformableGeometry;
+					break;
+				case 3:
+					cmd = FltkViewer::CmdCharacterShowBones;
+					break;
+				case 4:
+					cmd = FltkViewer::CmdCharacterShowAxis;
+					break;
+				default:
+					break;
+			}
+			fixedViewerMode = true;
 		}
 		else
 		{
@@ -812,7 +841,8 @@ int main( int argc, char **argv )	{
 		}
 
 		mcu.render();
-
+		if (fixedViewerMode)
+			viewer->menu_cmd(cmd);
 //mcu.mark( "main" );
 	}
 
