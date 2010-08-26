@@ -449,14 +449,6 @@ int mcu_viewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				return( CMD_SUCCESS );
 			}
 		}
-		else
-		if( strcmp( view_cmd, "mode" ) == 0 )	{
-			int mode = args.read_int();
-			if( mcu_p->viewer_p )	{
-				mcu_p->viewer_p->set_viewer_mode(mode);
-				return( CMD_SUCCESS );
-			}
-		}
 		else	{
 			return( CMD_NOT_FOUND );
 		}
