@@ -58,6 +58,7 @@
 # include <SR/sr_sa_gl_render.h>
 
 #include <sbm/mcontrol_util.h>
+#include "vhcl_log.h"
 
 ////# define SR_USE_TRACE1  // basic fltk events
 ////# define SR_USE_TRACE2  // more fltk events
@@ -87,9 +88,9 @@ fltk::Browser* make_help_browser ()
   fltk::Browser* b = new fltk::Browser ( 5, 5, 290, 190 );
 
    b->add ( "Left Click: Select\n" );
-   b->add ( "Left Click + Shift: Rotate\n" );
-   b->add ( "Left Click + Ctrl: Translate\n" );
-   b->add ( "Left Click + Ctrl + Shift: Zoom\n" );
+   b->add ( "Left Click + ALT: Rotate\n" );
+   b->add ( "Middle Click + ALT: Translate\n" );
+   b->add ( "Right Click + ALT: Zoom\n" );
    b->add ( "Left Click + Alt: Y Rotation\n" );
    b->add ( "Ctrl + Shift + m: Menu\n" );
    b->add ( "Ctrl + Shift + x: Exit\n" );
@@ -301,7 +302,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 
    _data->light.init();
 
-   _data->bcolor = SrColor::white;
+   _data->bcolor = SrColor(.63f, .63f, .63f);
    _data->spin_inc_count = 0;
 
    _data->scenebox = new SrSnLines;
@@ -317,6 +318,16 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->helpwin = make_help_window ();
    _data->helpbrowser = make_help_browser ();
    end();
+
+   gridColor[0] = .5;
+   gridColor[1] = .5;
+   gridColor[2] = .5;
+   gridHighlightColor[0] = .0;
+   gridHighlightColor[1] = .0;
+   gridHighlightColor[2] = .0;
+   gridSize = 200.0;
+   gridStep = 20.0;
+   gridList = -1;
  }
 
 FltkViewer::~FltkViewer ()
@@ -734,6 +745,11 @@ void FltkViewer::draw()
    glScalef ( cam.scale, cam.scale, cam.scale );
 //   glRotate ( _model_rotation );
 
+   // draw the grid
+   if (gridList == -1)
+	   initGridList();
+   drawGrid();
+
    //----- Render user scene -------------------------------------------
    //glClearColor ( _data->bcolor );
    //glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -762,14 +778,37 @@ void FltkViewer::draw()
 
 // fltk::event_x/y() variates from (0,0) to (w(),h())
 // transformed coords in SrEvent are in "normalized device coordinates" [-1,-1]x[1,1]
-static void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h )
+static void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h, FltkViewer* viewer )
  {
    e.init_lmouse ();
 
    e.type = t;
 
-   if ( t==SrEvent::Push || t==SrEvent::Release )
+   // put coordinates inside [-1,1] with (0,0) in the middle :
+   e.mouse.x  = ((float)fltk::event_x())*2.0f / ((float)w) - 1.0f;
+   e.mouse.y  = ((float)fltk::event_y())*2.0f / ((float)h) - 1.0f;
+   e.mouse.y *= -1.0f;
+   e.width = w;
+   e.height = h;
+   e.mouseCoord.x = fltk::event_x();
+   e.mouseCoord.y = fltk::event_y();
+
+   if ( t==SrEvent::Push)
+   {
 	   e.button = fltk::event_button();
+	   e.origUp = viewer->getData()->camera.up;
+	   e.origEye = viewer->getData()->camera.eye;
+	   e.origCenter = viewer->getData()->camera.center;
+	   e.origMouse.x = e.mouseCoord.x;
+	   e.origMouse.y = e.mouseCoord.y;
+   }
+   else if (t==SrEvent::Release )
+   {
+	   e.button = fltk::event_button();
+	   e.origMouse.x = -1;
+	   e.origMouse.y = -1;
+   }
+
 
    if ( fltk::event_state(fltk::BUTTON1) ) e.button1 = 1;
    if ( fltk::event_state(fltk::BUTTON2) ) e.button2 = 1;
@@ -782,12 +821,9 @@ static void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h )
    
    e.key = fltk::event_key();
 
-   // put coordinates inside [-1,1] with (0,0) in the middle :
-   e.mouse.x  = ((float)fltk::event_x())*2.0f / ((float)w) - 1.0f;
-   e.mouse.y  = ((float)fltk::event_y())*2.0f / ((float)h) - 1.0f;
-   e.mouse.y *= -1.0f;
-   e.width = w;
-   e.heigth = h;
+
+
+
  }
 
 static float rps = 1.0f;
@@ -915,7 +951,7 @@ int FltkViewer::handle ( int event )
    switch ( event )
    { case fltk::PUSH:
        { //SR_TRACE1 ( "Mouse Push : but="<<fltk::event_button()<<" ("<<fltk::event_x()<<", "<<fltk::event_y()<<")" <<" Ctrl:"<<fltk::event_state(FL_CTRL) );
-         translate_event ( e, SrEvent::Push, w(), h() );
+         translate_event ( e, SrEvent::Push, w(), h(), this );
          if ( POPUP_MENU(e) ) { show_menu(); e.type=SrEvent::None; }
           else _data->spinning=false; 
        } break;
@@ -923,7 +959,7 @@ int FltkViewer::handle ( int event )
       case fltk::RELEASE:
         //SR_TRACE1 ( "Mouse Release : ("<<fltk::event_x()<<", "<<fltk::event_y()<<") buts: "
         //             <<(fltk::event_state(fltk::BUTTON1)?1:0)<<" "<<(fltk::event_state(fltk::BUTTON2)?1:0) );
-        translate_event ( e, SrEvent::Release, w(), h() );
+        translate_event ( e, SrEvent::Release, w(), h(), this);
         break;
 
       case fltk::MOVE:
@@ -934,7 +970,7 @@ int FltkViewer::handle ( int event )
       case fltk::DRAG:
         //SR_TRACE2 ( "Mouse Drag : ("<<fltk::event_x()<<", "<<fltk::event_y()<<") buts: "
         //             <<(fltk::event_state(FL_BUTTON1)?1:0)<<" "<<(fltk::event_state(FL_BUTTON2)?1:0) );
-        translate_event ( e, SrEvent::Drag, w(), h() );
+        translate_event ( e, SrEvent::Drag, w(), h(), this );
         break;
 
       case fltk::SHORTCUT: // not sure the relationship between a shortcut and keyboard event...
@@ -1067,6 +1103,35 @@ int FltkViewer::handle_event ( const SrEvent &e )
 # define ZOOMING(e)     (e.alt && e.button3)
 # define TRANSLATING(e) (e.alt && e.button2)
 
+SrVec rotatePoint(SrVec point, SrVec origin, SrVec direction, float angle)
+{
+	float originalLength = point.len();
+
+	SrVec v = direction;
+	SrVec o = origin;
+	SrVec p = point;
+	float c = cos(angle);
+	float s = sin(angle);
+	float C = 1.0f - c;
+
+	SrMat mat;
+	mat.e11() = v[0] * v[0] * C + c;
+	mat.e12() = v[0] * v[1] * C - v[2] * s;
+	mat.e13() = v[0] * v[2] * C + v[1] * s;
+	mat.e21() = v[1] * v[0] * C + v[2] * s;
+	mat.e22() = v[1] * v[1] * C + c;
+	mat.e23() = v[1] * v[2] * C - v[0] * s;
+	mat.e31() = v[2] * v[0] * C - v[1] * s;
+	mat.e32() = v[2] * v[1] * C + v[0] * s;
+	mat.e33() = v[2] * v[2] * C + c;
+
+	mat.transpose();
+
+	SrVec result = origin + mat * (point - origin);
+
+	return result;
+}
+
 int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
  {
    if ( e.type==SrEvent::Drag )
@@ -1088,12 +1153,26 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
         _data->spindata.lasttime = _data->fcounter.time();
        }
       else if ( ROTATING2(e) )
-       { SrQuat q ( SrVec::j, -(e.mouse.x-e.lmouse.x)*2.0f ); // around Y
-         _data->camera.center = _data->camera.center*q;
-         _data->camera.eye = _data->camera.eye * q;
-         _data->camera.up = _data->camera.up * q;
-       }
-      redraw();
+       { 
+ 		float deltaX = -(e.mouseCoord.x - e.origMouse.x) / e.width;
+		float deltaY = -(e.mouseCoord.y -  e.origMouse.y) / e.height;
+		if (deltaX == 0.0 && deltaY == 0.0)
+			return 1;
+
+		SrVec origUp = e.origUp;
+		SrVec origCenter = e.origCenter;
+		SrVec origCamera = e.origEye;
+
+		SrVec dirX = origUp;
+		SrVec  dirY;
+		dirY.cross(origUp, (origCenter - origCamera));
+		dirY /= dirY.len();
+
+		SrVec camera = rotatePoint(origCamera, origCenter, dirX, -deltaX * float(M_PI));
+		camera = rotatePoint(camera, origCenter, dirY, deltaY * float(M_PI));
+
+		_data->camera.eye = camera;
+	  }
     }
    else if ( e.type==SrEvent::Release )
     { if ( e.button==1 && _data->allowspinanim && _data->spindata.lasttime>0 ) 
@@ -1187,6 +1266,69 @@ void FltkViewer::hide_viewer()
 	hide();
 }
 
+
+void FltkViewer::initGridList()
+{
+	glDeleteLists(gridList, 1);
+	gridList = glGenLists(1);
+	if ( gridList == GL_INVALID_VALUE || gridList == GL_INVALID_OPERATION)
+		return;
+	glNewList(gridList, GL_COMPILE);
+	drawGrid();
+	glEndList();
+}
+
+void FltkViewer::drawGrid()
+{
+	glPushAttrib(GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT);
+	bool colorChanged = false;
+	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+    glDisable(GL_COLOR_MATERIAL);
+
+	glColor3f(gridColor[0], gridColor[1], gridColor[2]);			
+	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
+	glLineWidth(1);
+//	glLineStipple(1, 0xAAAA);
+	glBegin(GL_LINES);
+	for (float x = -gridSize; x <= gridSize; x += gridStep)
+	{
+		if (x == 0.0) {
+			colorChanged = true;
+			glColor3f(gridHighlightColor[0], gridHighlightColor[1], gridHighlightColor[2]);
+		}
+		glVertex3f(x, 0.0, -gridSize);
+		glVertex3f(x, 0.0, gridSize);
+		
+		if (colorChanged) {
+			colorChanged = false;
+			glColor3f(gridColor[0], gridColor[1], gridColor[2]);
+		}
+
+	}
+	for (float x = -gridSize; x <= gridSize; x += gridStep)
+	{
+		if (x == 0) {
+			colorChanged = true;
+			glColor3f(gridHighlightColor[0], gridHighlightColor[1], gridHighlightColor[2]);
+		}
+		glVertex3f(-gridSize, 0.0, x);
+		glVertex3f(gridSize, 0.0, x);
+		if (colorChanged) {
+			colorChanged = false;
+			glColor3f(gridColor[0], gridColor[1], gridColor[2]);
+		}
+	}
+
+	glEnd();
+	glDisable(GL_BLEND);
+//	glDisable(GL_LINE_STIPPLE);
+
+	glPopAttrib();
+}
 
 
 //== Viewer Factory ========================================================

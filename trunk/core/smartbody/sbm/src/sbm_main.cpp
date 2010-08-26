@@ -473,8 +473,9 @@ void signal_handler(int sig) {
 				if(res)
 					dumpFile << res->dump() << std::endl;
 			}
-			dumpFile.close();
 			std::cout << "Wrote commands to " << file << std::endl;
+
+			dumpFile.close();
 
 		}
 		else //ok, file exists. close and reopen in write mode
@@ -490,7 +491,6 @@ void signal_handler(int sig) {
 
 ///////////////////////////////////////////////////////////////////////////////////
 int main( int argc, char **argv )	{
-
 
 #if SBM_REPORT_MEMORY_LEAKS
 	// CRT Debugging flags - Search help:
@@ -515,13 +515,13 @@ int main( int argc, char **argv )	{
 
 //	SBMWindow* sbmWindow = new SBMWindow(100, 100, 640, 480, "SmartBody");
 //	sbmWindow->show();
-//	CommandWindow* commandWindow = sbmWindow->getCommandWindow();
-//	CommandWindow* commandWindow = new CommandWindow(100, 100, 640, 480);
+//	CommandWindow* commandWindow = new CobmWindow->getCommandWindow();
+//	CommandWindow* commandWindow = new CommandWindow(100, 100, 640, 480, "Commands");
+//	commandWindow->show();
 //	vhcl::Log::g_log.AddListener(commandWindow);
 	FltkViewer* viewer = new FltkViewer(100, 150, 640, 480, "SmartBody");
 
 	// register the log listener
-	//vhcl::Log::FileListener* listener = new vhcl::Log::FileListener("c:\\aoh.txt");
 	vhcl::Log::StdoutListener* listener = new vhcl::Log::StdoutListener();
 	vhcl::Log::g_log.AddListener(listener);
 
@@ -538,12 +538,12 @@ int main( int argc, char **argv )	{
 
 	FltkViewerFactory* viewerFactory = new FltkViewerFactory();
 	//viewerFactory->setFltkViewer(sbmWindow->getFltkViewer());
-//	viewerFactory->setFltkViewer(viewer);
+	//viewerFactory->setFltkViewer(viewer);
 	mcu.register_viewer_factory(viewerFactory);
 	mcu.register_bmlviewer_factory(new BehaviorViewerFactory());
 
 	// Build the floor for the viewer
-	mcu.add_scene( build_checkerboard_floor( 200.0 ) );
+	//mcu.add_scene( build_checkerboard_floor( 200.0 ) );
 	
 	mcu_register_callbacks();
 
@@ -695,13 +695,13 @@ int main( int argc, char **argv )	{
 
 	mcu.speech_audiofile_base_path = "../../../../";
 
-	/*(void)signal( SIGABRT, signal_handler );
+/*	(void)signal( SIGABRT, signal_handler );
 	(void)signal( SIGFPE, signal_handler );
 	(void)signal( SIGILL, signal_handler );
 	(void)signal( SIGINT, signal_handler );
 	(void)signal( SIGSEGV, signal_handler );
 	(void)signal( SIGTERM, signal_handler );
-	(void)signal( SIGBREAK, signal_handler );*/
+	//(void)signal( SIGBREAK, signal_handler );*/
 	//atexit( exit_callback );
 
 	srCmdLine cmdl;
@@ -764,7 +764,7 @@ int main( int argc, char **argv )	{
 
 		fltk::check();
 
-//mcu.mark( "main", 0, "commands" );
+//mcu.mark( "main", 0, "ttu_poll" );
 
 #if LINK_VHMSG_CLIENT
 		if( mcu.vhmsg_enabled )	{
@@ -807,12 +807,9 @@ int main( int argc, char **argv )	{
 
 		mcu.theWSP->broadcast_update();
 
-//mcu.mark( "main", 0, "update" );
 		if( update_sim )	{
 			mcu.update();
 		}
-
-//mcu.mark( "main", 1, "render" );
 
 		mcu.render();
 

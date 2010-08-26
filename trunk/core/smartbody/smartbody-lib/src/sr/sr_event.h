@@ -58,7 +58,7 @@ class SrEvent
     char button;  //!< The button number 1, 2 or 3 if event type was Push or Release, 0 otherwise
     int  key;     //!< The ascii code / code of the key pressed (uppercase) if it was a keyboard event, 0 otherwise
     int  width;   //!< The width of the screen when the event occured
-    int  heigth;  //!< The heigth of the screen when the event occured
+    int  height;  //!< The heigth of the screen when the event occured
 //    float scenew; //!< Width in the units of the scene
 //    float sceneh; //!< Heigth in the units of the scene
 
@@ -70,9 +70,15 @@ class SrEvent
     char ctrl;    //!< Contains 1 if the Ctrl modifier key state is pressed, 0 otherwise
     char shift;   //!< Contains 1 if the Shift modifier key state is pressed, 0 otherwise
 
+	SrVec origUp;
+	SrVec origEye;
+	SrVec origCenter;
+
    public : //--- mouse coordinates :
     SrVec2 mouse;  //!< Current mouse push position in normalized coords [-1,1]
     SrVec2 lmouse; //!< Last mouse x push position in normalized coords [-1,1]
+	SrVec mouseCoord; // current mouse push position in pixel coordinates
+	SrVec2 origMouse; // last mouse push position in pixel coordinates
 
    public : //--- scene information :
     SrLine ray;  

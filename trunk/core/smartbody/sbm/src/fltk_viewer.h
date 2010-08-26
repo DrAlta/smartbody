@@ -172,6 +172,8 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
     void get_camera ( SrCamera &cam );
     void set_camera ( const SrCamera &cam );
 
+	FltkViewerData* getData() { return _data; };
+
    public : // virtual methods
 
     /*! When the window manager asks the window to close.
@@ -223,18 +225,35 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
         implementation does nothing. */
     virtual void spin_animation_occured ();
 
+	void initGridList();
+	void drawGrid();
+
+	int gridList;
+	float gridColor[3];
+	float gridHighlightColor[3];
+	float gridSize;
+	float gridStep;
+
 	virtual void label_viewer(const char* str);
 	virtual void show_viewer();
 	virtual void hide_viewer();
+
+
  };
 
 
  class FltkViewerFactory : public SrViewerFactory
  {
 	public:
-		 FltkViewerFactory();
+		FltkViewerFactory();
+
+		//void setFltkViewer(FltkViewer* viewer);
 
 		virtual SrViewer* create(int x, int y, int w, int h);
+
+	private:
+		FltkViewer* m_viewer;
+
  };
 
 //================================ End of File =================================================
