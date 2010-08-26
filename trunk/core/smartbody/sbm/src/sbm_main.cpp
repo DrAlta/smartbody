@@ -519,7 +519,7 @@ int main( int argc, char **argv )	{
 //	CommandWindow* commandWindow = new CommandWindow(100, 100, 640, 480, "Commands");
 //	commandWindow->show();
 //	vhcl::Log::g_log.AddListener(commandWindow);
-	FltkViewer* viewer = new FltkViewer(100, 150, 640, 480, "SmartBody");
+	//FltkViewer* viewer = new FltkViewer(100, 150, 640, 480, "SmartBody");
 
 	// register the log listener
 	vhcl::Log::StdoutListener* listener = new vhcl::Log::StdoutListener();
