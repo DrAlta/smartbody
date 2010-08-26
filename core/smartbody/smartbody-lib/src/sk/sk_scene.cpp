@@ -98,6 +98,7 @@ void SkScene::init ( SkSkeleton* s )
    g->separator ( true );
   
    sphere = new SrSnSphere; // shared sphere
+   sphere->color(SrColor::white);
    sphere->shape().radius = _cradius * _sfactor;
    sphere->visible ( false );
    sphere->ref();
@@ -142,6 +143,7 @@ void SkScene::init ( SkSkeleton* s )
     
       for ( j=0; j<joints[i]->num_children(); j++ )
        { SrSnCylinder* c = new SrSnCylinder;
+		 c->color(SrColor::white);
          c->shape().a = SrPnt::null;
          c->shape().b = joints[i]->child(j)->offset();
          c->shape().radius = _cradius;

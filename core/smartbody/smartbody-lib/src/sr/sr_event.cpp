@@ -39,7 +39,7 @@ void SrEvent::init ()
    button = 0;
    button1 = button2 = button3 = 0;
    ctrl = shift = alt = key = 0;
-   width = heigth = 0;
+   width = height = 0;
    pixel_size = 0.05f;
  }
 
@@ -53,6 +53,7 @@ void SrEvent::init_lmouse ()
    lmouse = mouse;
    lmouse = mouse;
    mouse.x = mouse.y = 0;
+   mouseCoord.x = mouseCoord.y = 0;
  }
 
 const char *SrEvent::type_name () const
