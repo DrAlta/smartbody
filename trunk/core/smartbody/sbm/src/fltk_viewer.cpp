@@ -835,7 +835,7 @@ static float x_spd = 7;
 static float z_spd = 70;
 static char t_direction[200];
 static char character[100];
-static int char_flag = -1;
+static int char_index = 0;
 
 static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h)
 {
@@ -844,14 +844,15 @@ static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h
 	e.key = fltk::event_key();
 	char cmd[300];
 	cmd[0] = '\0';
-
-	if(char_flag == -1) 
-	{	
-		char_flag = 0;
-		sprintf(character, "char doctor ");
-	}
-
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	SbmCharacter* actor = NULL;
+	mcu.character_map.reset();
+	for(int i = 0; i <= char_index; ++i)
+	{
+		actor = mcu.character_map.next();
+		sprintf(character, "char %s ", actor->name);
+	}
 
 	sprintf(cmd, "test loco ");
 
@@ -878,12 +879,12 @@ static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h
 		rps_flag = -1;
 		break;
 
-	case 'q':
-		if(char_flag == 1) char_flag = 0;
-		else if(char_flag == 0) char_flag = 1;
-		if(char_flag == 0)
-			sprintf(character, "char doctor ");
-		else sprintf(character, "char elder ");
+	case 'x':
+		++char_index;
+		if(char_index >= mcu.character_map.get_num_entries())
+		{
+			char_index = 0;
+		}
 		not_locomotion = true;
 		break;
 
@@ -939,6 +940,7 @@ static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h
 		mcu.execute(cmd);
 	}
 }
+
 
 
 int FltkViewer::handle ( int event ) 
