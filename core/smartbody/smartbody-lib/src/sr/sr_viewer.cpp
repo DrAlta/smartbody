@@ -67,6 +67,10 @@ void SrViewer::hide_viewer()
 {
 }
 
+void SrViewer::set_viewer_mode(int mode)
+{
+}
+
 SrViewerFactory::SrViewerFactory()
 {
 }
