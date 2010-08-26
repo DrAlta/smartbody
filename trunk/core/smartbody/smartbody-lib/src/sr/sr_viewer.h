@@ -86,7 +86,7 @@ class SrViewer
 	virtual void show_viewer();
 	virtual void hide_viewer();
 
-
+	virtual void set_viewer_mode(int mode);
  };
 
 class SrViewerFactory

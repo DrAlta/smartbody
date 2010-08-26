@@ -1268,6 +1268,31 @@ void FltkViewer::hide_viewer()
 	hide();
 }
 
+void FltkViewer::set_viewer_mode(int mode)
+{
+	MenuCmd cmd;
+	switch (mode)
+	{
+		case 0:
+			cmd = CmdCharacterShowGeometry;
+			break;
+		case 1:
+			cmd = CmdCharacterShowCollisionGeometry;
+			break;
+		case 2:
+			cmd = CmdCharacterShowDeformableGeometry;
+			break;
+		case 3:
+			cmd = CmdCharacterShowBones;
+			break;
+		case 4:
+			cmd = CmdCharacterShowAxis;
+			break;
+		default:
+			break;
+	}
+	menu_cmd(cmd);
+}
 
 void FltkViewer::initGridList()
 {
