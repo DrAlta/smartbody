@@ -558,8 +558,8 @@ int main( int argc, char **argv )	{
 	bool lock_dt_mode = false;
 	int i;
 	SrString	s;
-	FltkViewer::MenuCmd cmd;		// for -viewermode
-	bool fixedViewerMode = false;			// this boolean is used when -viewermode= is activated
+	FltkViewer::MenuCmd viewerModeCmd;  // for -viewermode
+	bool fixedViewerMode = false;       // this boolean is used when -viewermode= is activated
 	for (	i=1; i<argc; i++ )
 	{
 		LOG( "SBM ARG[%d]: '%s'", i, argv[i] );
@@ -638,20 +638,20 @@ int main( int argc, char **argv )	{
 			int mode = atoi(modeString);
 			switch (mode)
 			{
-				case 0:
-					cmd = FltkViewer::CmdCharacterShowGeometry;
-					break;
 				case 1:
-					cmd = FltkViewer::CmdCharacterShowCollisionGeometry;
+					viewerModeCmd = FltkViewer::CmdCharacterShowGeometry;
 					break;
 				case 2:
-					cmd = FltkViewer::CmdCharacterShowDeformableGeometry;
+					viewerModeCmd = FltkViewer::CmdCharacterShowCollisionGeometry;
 					break;
 				case 3:
-					cmd = FltkViewer::CmdCharacterShowBones;
+					viewerModeCmd = FltkViewer::CmdCharacterShowDeformableGeometry;
 					break;
 				case 4:
-					cmd = FltkViewer::CmdCharacterShowAxis;
+					viewerModeCmd = FltkViewer::CmdCharacterShowBones;
+					break;
+				case 5:
+					viewerModeCmd = FltkViewer::CmdCharacterShowAxis;
 					break;
 				default:
 					break;
@@ -780,6 +780,13 @@ int main( int argc, char **argv )	{
 	// Notify world SBM is ready to receive messages
 	mcu_vrAllCall_func( srArgBuffer(""), &mcu );
 
+	// create and set params on a viewer if indicated
+	if (fixedViewerMode)
+	{
+		FltkViewer* viewer = dynamic_cast<FltkViewer*>(viewerFactory->create(100, 100, 640, 480));
+		viewer->menu_cmd(viewerModeCmd);
+	}
+
 	timer.start();
 	while( mcu.loop )	{
 		
@@ -841,8 +848,7 @@ int main( int argc, char **argv )	{
 		}
 
 		mcu.render();
-		if (fixedViewerMode)
-			viewer->menu_cmd(cmd);
+	
 //mcu.mark( "main" );
 	}
 
