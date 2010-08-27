@@ -1102,7 +1102,9 @@ int FltkViewer::handle_event ( const SrEvent &e )
 
 # define ROTATING2(e)    (e.alt && e.button1)
 # define ROTATING(e)   (e.alt && e.shift && e.button1)
-# define ZOOMING(e)     (e.alt && e.button3)
+# define ZOOMING(e)   (e.alt && e.button3)
+//# define ZOOMING(e)     (e.alt && e.ctrl && e.button3)
+//# define DOLLYING(e)     (e.alt && e.button3)
 # define TRANSLATING(e) (e.alt && e.button2)
 
 SrVec rotatePoint(SrVec point, SrVec origin, SrVec direction, float angle)
@@ -1145,6 +1147,21 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
        { _data->camera.fovy += (dx+dy);//40.0f;
          _data->camera.fovy = SR_BOUND ( _data->camera.fovy, 0.001f, srpi );
        }
+	/*  else if ( DOLLYING(e) )
+       { 
+		    float amount = .2f;
+			SrVec cameraPos(_data->camera.eye);
+			SrVec targetPos(_data->camera.center);
+			SrVec diff = targetPos - cameraPos;
+			diff.normalize();
+			
+			float virtualSize = ;
+
+			SrVec oldCameraEye = _data->camera.eye;
+			_data->camera.eye = cameraPos;
+			_data->camera.center += (_data->camera.eye - oldCameraEye);
+       }
+	   */
       else if ( TRANSLATING(e) )
        { _data->camera.apply_translation_from_mouse_motion ( e.lmouse.x, e.lmouse.y, e.mouse.x, e.mouse.y );
        }
@@ -1265,7 +1282,8 @@ void FltkViewer::show_viewer()
 
 void FltkViewer::hide_viewer()
 {
-	hide();
+	if (this->shown())
+		this->hide();
 }
 
 void FltkViewer::initGridList()
@@ -1335,13 +1353,18 @@ void FltkViewer::drawGrid()
 //== Viewer Factory ========================================================
 
 
+FltkViewer* FltkViewerFactory::s_viewer = NULL;
+
 FltkViewerFactory::FltkViewerFactory()
 {
+	s_viewer = NULL;
 }
 
 SrViewer* FltkViewerFactory::create(int x, int y, int w, int h)
 {
-	return new FltkViewer(x, y, w, h);
+	if (!s_viewer)
+		s_viewer = new FltkViewer(x, y, w, h);
+	return s_viewer;
 }
 
 //================================ End of File =================================================

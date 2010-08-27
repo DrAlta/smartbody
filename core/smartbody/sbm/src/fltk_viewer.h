@@ -251,7 +251,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 		virtual SrViewer* create(int x, int y, int w, int h);
 
 	private:
-		FltkViewer* m_viewer;
+		static FltkViewer* s_viewer;
 
  };
 
