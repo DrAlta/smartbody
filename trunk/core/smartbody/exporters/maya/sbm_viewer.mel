@@ -1,0 +1,322 @@
+//  sbm_viewer.mel - part of SmartBody Project
+//  Copyright (C) 2005-2008  University of Southern California
+//
+//  SmartBody is free software: you can redistribute it and/or
+//  modify it under the terms of the Lesser GNU General Public License
+//  as published by the Free Software Foundation, version 3 of the
+//  license.
+//
+//  SmartBody is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  Lesser GNU General Public License for more details.
+//
+//  You should have received a copy of the Lesser GNU General Public
+//  License along with SmartBody.  If not, see:
+//      http://www.gnu.org/licenses/lgpl-3.0.txt
+//
+//  CONTRIBUTORS:
+//      Yuyu Xu, USC ICT
+
+string $sbmViewerVersion = "0.1";
+
+// get current viewer preference
+global proc string getSelectedViewerPreference()
+{
+//	string $selected[] = `textScrollList -q -selectItem scrollListPreference`;
+	return "Viewer_Default";
+}
+
+// get current project
+global proc string getSelectedProject()
+{
+	string $selected[] = `textScrollList -q -selectItem scrollListProject`;
+	return $selected[0];
+}
+
+// get current character
+global proc string getSelectedCharacter()
+{
+	string $selected[] = `textScrollList -q -selectItem scrollListCharacter`;
+	return $selected[0];
+}
+
+// get current viewer skeleton
+global proc string getSelectedSkeleton()
+{
+	string $selected[] = `textScrollList -q -selectItem scrollListSkeleton`;
+	return $selected[0];
+}
+
+// get current motion
+global proc string getSelectedMotion()
+{
+	string $selected[] = `textScrollList -q -selectItem scrollListMotion`;
+	return $selected[0];
+}
+
+global proc viewerPreferenceCheck()
+{
+	if ( !`objExists SmartbodyViewerOptions` )
+	{
+		group -empty -name "SmartbodyViewerOptions";
+		setAttr "SmartbodyViewerOptions.visibility" 0;
+	}
+
+
+	// Check to see if there are any existing preference
+	select -hi SmartbodyViewerOptions;
+	string $prefList[] = `ls -sl`;
+
+	int $numPref = 0;
+	for ($pref in $prefList)
+	{
+		if (startsWith($pref, "Viewer_"))
+			$numPref ++;
+	}
+
+	if ($numPref == 0)
+		$prefList = {"Viewer_Default"};
+
+	for ($pref in $prefList)
+	{
+		if (!startsWith($pref, "Viewer_"))
+			continue;
+		
+		// Create New pref Instance if not exist!
+		if ( !`objExists $pref` )
+			group -empty -name $pref -parent SmartbodyViewerOptions;
+
+		if ( !`objExists ( $pref + ".ProjectRootDir" )` )
+		{
+			addAttr -longName "ProjectRootDir" -dataType "string" $pref;
+			setAttr -type "string" ( $pref + ".ProjectRootDir" ) "C:/Projects";
+		}
+
+		if ( !`objExists ( $pref + ".SbmBin" )` )
+		{
+			addAttr -longName "SbmBin" -dataType "string" $pref;
+			setAttr -type "string" ( $pref + ".SbmBin" ) "C:/Projects/Pando/trunk/scripts/SmartBodyRunTime/bin/sbm-fltkd.exe";
+		}		
+		
+		// Append them to the scrollList and choose the first one
+//		textScrollList -e -append $pref scrollListPreference;
+	}
+}
+
+proc updateProjectScrollList()
+{
+	int $i;
+	// clean scroll list first
+	textScrollList -e -removeAll scrollListProject;
+	textScrollList -e -removeAll scrollListCharacter;
+	textScrollList -e -removeAll scrollListSkeleton;
+	textScrollList -e -removeAll scrollListMotion;
+	
+	// append scroll list
+	string $curPref = getSelectedViewerPreference();
+	string $projectRoot = `getAttr ($curPref + ".ProjectRootDir")`;
+	string $projectFiles[] = `getFileList -folder ($projectRoot + "/")`;	
+	for ($i = 0; $i < size($projectFiles); $i = $i + 1)
+	{
+		if (`filetest -d ($projectRoot + "/" + $projectFiles[$i])`)
+			textScrollList -e -append $projectFiles[$i] scrollListProject;
+	}		
+}
+
+// After changing advanced setting, update attribute
+global proc preferenceAttrUpdate()
+{
+	// get attributes to be set
+	string $projectRoot = `textFieldGrp -q -text projectRoot`;
+	string $sbmBin = `textFieldGrp -q -text smartbodyBin`;
+	
+	// get selected preference
+	string $curPref = getSelectedViewerPreference();
+	
+	// set attribute
+	setAttr -type "string" ($curPref + ".ProjectRootDir") $projectRoot;
+	setAttr -type "string" ($curPref + ".SbmBin") $sbmBin;
+	updateProjectScrollList();
+}
+
+// Having selected preference, update all other stuff
+global proc updateOverallInfo()
+{
+	// get selected preference
+	//string $curPref = getSelectedViewerPreference();
+	string $curPref = "Viewer_Default";
+	// set advanced text field
+	string $sbmBin = `getAttr ($curPref + ".SbmBin")`;
+	string $projectRoot = `getAttr ($curPref + ".ProjectRootDir")`;
+	textFieldGrp -e -text $sbmBin smartbodyBin;
+	textFieldGrp -e -text $projectRoot projectRoot;
+	
+	// update project scroll list
+	updateProjectScrollList();
+}
+
+
+global proc updateCharacterScrollList()
+{
+	int $i;	
+	
+	// get character directory
+	string $curPref = getSelectedViewerPreference();
+	string $projectName = getSelectedProject();
+	
+	string $projectRootDir = `getAttr ($curPref + ".ProjectRootDir")`;
+	string $charDir = $projectRootDir + "/" + $projectName + "/Exports-Smartbody/";	
+
+	// clean first
+	textScrollList -e -removeAll scrollListCharacter;
+	textScrollList -e -removeAll scrollListSkeleton;
+	textScrollList -e -removeAll scrollListMotion;	
+	
+	// for character scroll list
+	string $characterFiles[] = `getFileList -folder $charDir`;	
+	for ($i = 0; $i < size($characterFiles); $i = $i + 1)
+	{
+		if (`filetest -d ($charDir + $characterFiles[$i])`)
+			textScrollList -e -append $characterFiles[$i] scrollListCharacter;
+	}		
+}
+
+global proc updateSkSkmScrollList()
+{
+	int $i;		
+
+	// get selected preference
+	string $curPref = getSelectedViewerPreference();
+	string $projectName = getSelectedProject();
+	string $charName = getSelectedCharacter();	
+	
+	string $projectRootDir = `getAttr ($curPref + ".ProjectRootDir")`;
+	string $finalDir = $projectRootDir + "/" + $projectName + "/Exports-Smartbody/" + $charName + "/";	
+
+	//clean first
+	textScrollList -e -removeAll scrollListSkeleton;
+	textScrollList -e -removeAll scrollListMotion;		
+	
+	// for sk and skm scroll list
+	if (`filetest -d $finalDir`)
+	{	
+		string $skmFiles[] = `getFileList -folder $finalDir -filespec "*.skm"`;
+		string $skFiles[] = `getFileList -folder $finalDir -filespec "*.sk"`;
+		for ($i = 0; $i < size($skmFiles); $i = $i + 1)
+			textScrollList -e -append $skmFiles[$i] scrollListMotion;
+		for ($i = 0; $i < size($skFiles); $i = $i + 1)
+			textScrollList -e -append $skFiles[$i] scrollListSkeleton;		
+	}
+}
+
+global proc viewerRunButton()
+{
+	// current preference
+	string $curPref = getSelectedViewerPreference();
+	string $projectName = getSelectedProject();
+	string $charName = getSelectedCharacter();	
+	
+	string $projectRootDir = `getAttr ($curPref + ".ProjectRootDir")`;
+	string $sbmBin = `getAttr ($curPref + ".SbmBin")`;
+	
+	string $finalDir = $projectRootDir + "/" + $projectName + "/Exports-Smartbody/" + $charName + "/";
+	string $binDir = dirname($sbmBin);
+	string $scriptDir = $binDir + "/../scripts";
+	string $seqFile = $scriptDir + "/" + "mayaSbmViewer.seq";
+	
+	int $fileExistFlag = `filetest -e $seqFile`;
+	if ($fileExistFlag == 1)
+		sysFile -delete $seqFile;
+
+		
+	//---------Following is the Generation of Seq File for SmartBody
+	// default setting
+	system("echo " + "# " + $seqFile + " >> " + $seqFile);
+
+	// viewer and camera setting
+	system("echo 3 viewer open   800 800  50 50" + " >> " + $seqFile);	
+	system("echo 3 camera eye    0 166 185" + " >> " + $seqFile);	
+	system("echo 3 camera center 0 92 0" + " >> " + $seqFile);	
+	
+	//	character name
+	string $character = $charName;
+	if ($character == "")
+		$character = "defaultCharacter";	
+	
+	//	load skeleton
+	string $skeleton = getSelectedSkeleton();
+	if ($skeleton != "")
+	{
+		string $skeletonName = basename($skeleton, "");	
+		system("echo 0 path ME " + $finalDir  + " >> " + $seqFile);
+		system("echo 2 char " + $character + " init " + $skeletonName + " >> " + $seqFile);
+		system("echo 2 set character " +  $character + " world_offset x 35 y 102 h -17" + " >> " + $seqFile);		
+	}
+	
+	//	load motion
+	string $motion = getSelectedMotion();
+	if ($motion != "")
+	{
+		string $motionName = basename($motion, ".skm");	
+		system("echo 0 path ME " + $finalDir  + " >> " + $seqFile);
+		system("echo 0 load motions -R " + $finalDir  + " >> " + $seqFile);	
+		system("echo 3 test bml char " + $character + " ^<body posture=\"" + $motionName + "\"\/^>" + " >> " + $seqFile);	
+	}
+		
+	string $runCommand = "start " + $sbmBin + " -seqpath " + $scriptDir + " -seq " + "mayaSbmViewer.seq" + " -viewermode=3";
+	system($runCommand);
+}
+
+global proc sbmViewerGUI()
+{
+	global string $sbmViewerVersion;
+	if ( ( `window -exists viewerMainWin` ) == true )
+	{
+		deleteUI viewerMainWin;
+		windowPref -remove viewerMainWin;
+	}	
+	
+	// UI Window
+	window -title ("Smartbody Viewer v" + $sbmViewerVersion) -resizeToFitChildren true -sizeable true viewerMainWin;
+	columnLayout -adjustableColumn true -columnAttach "both" 5;
+	
+//		frameLayout -label "SmartBody Preferences" -borderStyle etchedIn -collapsable false -collapse 0;
+//			columnLayout -adjustableColumn true -rowSpacing 2 -columnOffset "both" 10;
+//				textScrollList  -numberOfRows 3 -width 250 -allowMultiSelection false -showIndexedItem 4 -selectCommand updateOverallInfo scrollListPreference;
+//				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
+//					button -label "Create Preference" -align "center";
+//					button -label "Rename Preference" -align "center";
+//					button -label "Delete Preference" -align "center";
+//					setParent viewerMainWin;	
+	
+		frameLayout -label "Viewer Option" -borderStyle etchedIn -collapsable false -collapse 0;
+			columnLayout -adjustableColumn true;
+				text -label "Project List";
+				textScrollList  -numberOfRows 3 -width 250 -allowMultiSelection false -showIndexedItem 3 -selectCommand updateCharacterScrollList scrollListProject;
+				text -label "Character List";
+				textScrollList  -numberOfRows 3 -width 250 -allowMultiSelection false -showIndexedItem 3 -selectCommand updateSkSkmScrollList scrollListCharacter;				
+				text -label "Skeleton List";
+				textScrollList  -numberOfRows 3 -width 250 -allowMultiSelection false -showIndexedItem 3 scrollListSkeleton;
+				text -label "Motion List";
+				textScrollList  -numberOfRows 3 -width 250 -allowMultiSelection false -showIndexedItem 3  scrollListMotion;
+				setParent viewerMainWin;	
+							
+		frameLayout -borderStyle etchedIn -collapsable true -collapse 1 -label "Advanced Setting";
+			columnLayout -adjustableColumn true;
+				textFieldGrp -label "SBM Bin: " -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand preferenceAttrUpdate smartbodyBin;
+				textFieldGrp -label "Project Root Directory: " -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand preferenceAttrUpdate projectRoot;
+				setParent viewerMainWin;
+		
+		frameLayout -borderStyle etchedIn -collapsable false -collapse 0 -labelVisible false;
+			columnLayout -adjustableColumn true -rowSpacing 5 -columnOffset "both" 10;
+				button -label "Run Smartbody" -command viewerRunButton;
+				setParent viewerMainWin;								
+	
+	// Intialization to Viewer Instance ScrollList
+	viewerPreferenceCheck();
+	updateOverallInfo();
+	
+	// Show the Main Window
+	showWindow viewerMainWin;
+}
