@@ -96,7 +96,7 @@ global proc viewerPreferenceCheck()
 		if ( !`objExists ( $pref + ".SbmBin" )` )
 		{
 			addAttr -longName "SbmBin" -dataType "string" $pref;
-			setAttr -type "string" ( $pref + ".SbmBin" ) "C:/Projects/Pando/trunk/scripts/SmartBodyRunTime/bin/sbm-fltkd.exe";
+			setAttr -type "string" ( $pref + ".SbmBin" ) "C:/Projects/Pando/scripts/SmartBodyRunTime/bin/sbm-fltkd.exe";
 		}		
 		
 		// Append them to the scrollList and choose the first one
