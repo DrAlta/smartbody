@@ -321,6 +321,7 @@ class MeCtGaze : public MeController	{
 		float			fade_interval;
 		float			fade_remaining;
 		float			fading_normal;
+		bool			fading_complete;
 		int 			fading_mode;
 
 		int 			joint_key_count;
