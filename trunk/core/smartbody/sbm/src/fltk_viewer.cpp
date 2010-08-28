@@ -790,8 +790,8 @@ static void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h, FltkVie
    e.mouse.y *= -1.0f;
    e.width = w;
    e.height = h;
-   e.mouseCoord.x = fltk::event_x();
-   e.mouseCoord.y = fltk::event_y();
+   e.mouseCoord.x = (float)fltk::event_x();
+   e.mouseCoord.y = (float)fltk::event_y();
 
    if ( t==SrEvent::Push)
    {
