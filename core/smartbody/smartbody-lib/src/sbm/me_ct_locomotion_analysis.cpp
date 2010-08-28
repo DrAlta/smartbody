@@ -280,7 +280,7 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 	float* pos = NULL;
 	float* base_pos = NULL;
 	int mode = 0;
-	int i,j;
+	int j;
 	SrVec walking_direction(0,0,0);
 	//SrVec displacement(0,0,0);
 	SrVec prev_base_pos(0,0,0);
@@ -331,7 +331,7 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 		base_mat = base_joint->gmat();
 		walking_direction += *((SrVec*)base_pos)-prev_base_pos;
 
-		int ind = land_time;
+		int ind = (int)land_time;
 		for(int i = 0; i < walking->frames(); ++i)
 		{
 			if(ind == lift_time) break;
@@ -371,7 +371,7 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 	}
 	
 	stance_frame.capacity(0);
-	stance_frame.push() = stance_time;
+	stance_frame.push() = (int)stance_time;
 	//calc_stance_time(anim, limb_base);
 
 	anim->get_timing_space()->add_ref_time_name("stance_time");
