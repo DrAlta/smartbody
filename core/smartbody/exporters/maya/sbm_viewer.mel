@@ -129,7 +129,7 @@ global proc viewerPreferenceCreate()
 		select -hi SmartbodyViewerOptions;
 		string $prefList[] = `ls -sl`;		
 		viewerPreferenceCheck();
-		updateViewerUI();
+		updateViewerUI(7);
 	}
 }
 
@@ -168,7 +168,7 @@ global proc viewerPreferenceReset()
 	setAttr -type "string"($curPref + ".MeshName") "";
 	setAttr -type "string"($curPref + ".BindingName") "";
 	
-	updateViewerUI();
+	updateViewerUI(7);
 }
 
 // delete current preference
@@ -178,7 +178,7 @@ global proc viewerPreferenceDelete()
 	string $curPref = getSelectedViewerPreference();	
 	textScrollList -e -removeItem $selPref[0] scrollListPreference;
 	delete $curPref;
-	updateViewerUI();
+	updateViewerUI(7);
 }
 
 
@@ -195,32 +195,37 @@ global proc updateAttr(int $index)
 		setAttr -type "string"($curPref + ".MotionName") "";
 		setAttr -type "string"($curPref + ".MeshName") "";
 		setAttr -type "string"($curPref + ".BindingName") "";
+		updateViewerUI(0);	
 	}
-	if ($index == 1)	// character attr
+	else if ($index == 1)	// character attr
 	{
 		string $selected[] = `textScrollList -q -selectItem scrollListCharacter`;		
 		setAttr -type "string"($curPref + ".CharacterName") $selected[0];
 		setAttr -type "string"($curPref + ".SkeletonName") "";
 		setAttr -type "string"($curPref + ".MotionName") "";
 		setAttr -type "string"($curPref + ".MeshName") "";
-		setAttr -type "string"($curPref + ".BindingName") "";	
+		setAttr -type "string"($curPref + ".BindingName") "";
+		updateViewerUI(1);		
 	}
-	if ($index == 2)	// skeleton attr
+	else if ($index == 2)	// skeleton attr
 	{
 		string $selected[] = `textScrollList -q -selectItem scrollListSkeleton`;		
 		setAttr -type "string"($curPref + ".SkeletonName") $selected[0];	
+		updateViewerUI(2);	
 	}
-	if ($index == 3)	// motion attr
+	else if ($index == 3)	// motion attr
 	{
 		string $selected[] = `textScrollList -q -selectItem scrollListMotion`;		
 		setAttr -type "string"($curPref + ".MotionName") $selected[0];
+		updateViewerUI(3);	
 	}
-	if ($index == 4)	// binding attr
+	else if ($index == 4)	// binding attr
 	{
 		string $selected[] = `textScrollList -q -selectItem scrollListBinding`;		
 		setAttr -type "string"($curPref + ".BindingName") $selected[0];
+		updateViewerUI(4);	
 	}
-	if ($index == 5)	// mesh attr
+	else if ($index == 5)	// mesh attr
 	{
 		string $selected[] = `textScrollList -q -selectItem scrollListMesh`;	
 		int $i;
@@ -228,8 +233,9 @@ global proc updateAttr(int $index)
 		for ($i = 0; $i < size($selected); $i = $i + 1)
 			$meshAttr = $meshAttr + " " + $selected[$i];
 		setAttr -type "string"($curPref + ".MeshName") $meshAttr;
+		updateViewerUI(5);	
 	}
-	if ($index == 6)	//advanced setting
+	else if ($index == 6)	//advanced setting
 	{
 		string $projectRoot = `textFieldGrp -q -text projectRoot`;
 		string $sbmBin = `textFieldGrp -q -text smartbodyBin`;
@@ -248,12 +254,16 @@ global proc updateAttr(int $index)
 		}
 		else
 			print ("Warning: No Preference is selected!");		
+			
+		updateViewerUI(7);		
 	}
-	updateViewerUI();	
+	else
+		updateViewerUI(7);	
+	
 }
 
 // update the UI according to selected viewer preference
-global proc updateViewerUI()
+global proc updateViewerUI(int $index)
 {
 	int $i;
 	
@@ -277,101 +287,141 @@ global proc updateViewerUI()
 			textScrollList -e -append $viewerSubstring scrollListPreference;
 	}	
 	string $curPref = getSelectedViewerPreference();
-	if (($curPref == "Viewer_") && (size($viewerList) != 0))
+	if (($curPref == "Viewer_") && (size($viewerList) > 1))
 	{
 		textScrollList -e -selectIndexedItem 1 scrollListPreference;	
 		$curPref = getSelectedViewerPreference();
 	}
 
-	//------ Update other UI
-	// If no preference is selected, clean all field
-	textScrollList -e -removeAll scrollListProject;
-	textScrollList -e -removeAll scrollListCharacter;
-	textScrollList -e -removeAll scrollListSkeleton;
-	textScrollList -e -removeAll scrollListMotion;
-	textScrollList -e -removeAll scrollListMesh;
-	textScrollList -e -removeAll scrollListBinding;
-	
+	//------ Update other UI	
 	if ($curPref == "Viewer_")
 	{
+		textScrollList -e -removeAll scrollListProject;
+		textScrollList -e -removeAll scrollListCharacter;
+		textScrollList -e -removeAll scrollListSkeleton;
+		textScrollList -e -removeAll scrollListMotion;
+		textScrollList -e -removeAll scrollListMesh;
+		textScrollList -e -removeAll scrollListBinding;			
 		textFieldGrp -e -text "" smartbodyBin;
 		textFieldGrp -e -text "" projectRoot;		
 	}
 	else
-	{	
-		// append project scroll list
-		string $projectRootDir = `getAttr ($curPref + ".ProjectRootDir")`;
-		if ($projectRootDir != "")
-		{
-			string $projectFiles[] = `getFileList -folder ($projectRootDir + "/")`;	
-			for ($i = 0; $i < size($projectFiles); $i = $i + 1)
-			{
-				if (`filetest -d ($projectRootDir + "/" + $projectFiles[$i])`)
-					textScrollList -e -append $projectFiles[$i] scrollListProject;
-			}
-		}		
-		
-		// append character scroll list
+	{
+		string $projectRootDir = `getAttr ($curPref + ".ProjectRootDir")`;	
 		string $projectName = `getAttr ($curPref + ".ProjectName")`;
-		if ($projectName != "")
-		{
-			textScrollList -e -selectItem $projectName scrollListProject;		
-			string $charDir = $projectRootDir + "/" + $projectName + "/Exports-Smartbody/";
-			string $characterFiles[] = `getFileList -folder $charDir`;	
-			for ($i = 0; $i < size($characterFiles); $i = $i + 1)
-			{
-				if (`filetest -d ($charDir + $characterFiles[$i])`)
-					textScrollList -e -append $characterFiles[$i] scrollListCharacter;
-			}
-		}		
-		
-		// append skeleton, skm, mesh, binding information scroll list
 		string $charName = `getAttr ($curPref + ".CharacterName")`;	
-		if ($charName != "")
-		{
-			textScrollList -e -selectItem $charName scrollListCharacter;			
-			string $materialDir = $projectRootDir + "/" + $projectName + "/Exports-Smartbody/" + $charName + "/";	
-			if (`filetest -d $materialDir`)
-			{
-				string $skmFiles[] = `getFileList -folder $materialDir -filespec "*.skm"`;
-				string $skFiles[] = `getFileList -folder $materialDir -filespec "*.sk"`;
-				string $meshFiles[] = `getFileList -folder $materialDir -filespec "*.obj"`;
-				string $openColladaFiles[] = `getFileList -folder $materialDir -filespec "*.xml"`;		
-				for ($i = 0; $i < size($skmFiles); $i = $i + 1)
-					textScrollList -e -append $skmFiles[$i] scrollListMotion;
-				for ($i = 0; $i < size($skFiles); $i = $i + 1)
-					textScrollList -e -append $skFiles[$i] scrollListSkeleton;		
-				for ($i = 0; $i < size($meshFiles); $i = $i + 1)
-					textScrollList -e -append $meshFiles[$i] scrollListMesh;	
-				for ($i = 0; $i < size($openColladaFiles); $i = $i + 1)
-					textScrollList -e -append $openColladaFiles[$i] scrollListBinding;				
-			}			
-		}
-		
+		string $skeletonName = `getAttr ($curPref + ".SkeletonName")`;	
 		string $motionName = `getAttr ($curPref + ".MotionName")`;
-		if ($motionName != "")
-			textScrollList -e -selectItem $motionName scrollListMotion;
+		string $bindingName = `getAttr ($curPref + ".BindingName")`;			
+		string $meshName = `getAttr ($curPref + ".MeshName")`;		
+
+		string $materialDir = $projectRootDir + "/" + $projectName + "/Exports-Smartbody/" + $charName + "/";			
+
+		if ($index == 7)
+		{
+			// clean first
+			textScrollList -e -removeAll scrollListProject;
+			textScrollList -e -removeAll scrollListCharacter;
+			textScrollList -e -removeAll scrollListSkeleton;
+			textScrollList -e -removeAll scrollListMotion;
+			textScrollList -e -removeAll scrollListMesh;
+			textScrollList -e -removeAll scrollListBinding;			
+			// append project scroll list
+			if ($projectRootDir != "")
+			{
+				string $projectFiles[] = `getFileList -folder ($projectRootDir + "/")`;	
+				for ($i = 0; $i < size($projectFiles); $i = $i + 1)
+				{
+					if (`filetest -d ($projectRootDir + "/" + $projectFiles[$i])`)
+						textScrollList -e -append $projectFiles[$i] scrollListProject;
+				}
+			}
+		}
+		if ($index == 0 || $index == 7)
+		{
+			// clean first
+			textScrollList -e -removeAll scrollListCharacter;
+			textScrollList -e -removeAll scrollListSkeleton;
+			textScrollList -e -removeAll scrollListMotion;
+			textScrollList -e -removeAll scrollListMesh;
+			textScrollList -e -removeAll scrollListBinding;		
+			// append character scroll list
+			if ($projectName != "")
+			{
+				textScrollList -e -selectItem $projectName scrollListProject;		
+				string $projectRootDir = `getAttr ($curPref + ".ProjectRootDir")`;				
+				string $charDir = $projectRootDir + "/" + $projectName + "/Exports-Smartbody/";
+				string $characterFiles[] = `getFileList -folder $charDir`;	
+				for ($i = 0; $i < size($characterFiles); $i = $i + 1)
+				{
+					if (`filetest -d ($charDir + $characterFiles[$i])`)
+						textScrollList -e -append $characterFiles[$i] scrollListCharacter;
+				}
+			}
+		}	
+		if ($index == 1 || $index == 7)
+		{
+			// clean first
+			textScrollList -e -removeAll scrollListSkeleton;
+			textScrollList -e -removeAll scrollListMotion;
+			textScrollList -e -removeAll scrollListMesh;
+			textScrollList -e -removeAll scrollListBinding;			
+			// append skeleton, skm, mesh, binding information scroll list
+			if ($charName != "")
+			{
+				textScrollList -e -selectItem $charName scrollListCharacter;			
+				if (`filetest -d $materialDir`)
+				{
+					string $skmFiles[] = `getFileList -folder $materialDir -filespec "*.skm"`;
+					string $skFiles[] = `getFileList -folder $materialDir -filespec "*.sk"`;
+					string $meshFiles[] = `getFileList -folder $materialDir -filespec "*.obj"`;
+					string $openColladaFiles[] = `getFileList -folder $materialDir -filespec "*.xml"`;		
+					for ($i = 0; $i < size($skmFiles); $i = $i + 1)
+						textScrollList -e -append $skmFiles[$i] scrollListMotion;
+					for ($i = 0; $i < size($skFiles); $i = $i + 1)
+						textScrollList -e -append $skFiles[$i] scrollListSkeleton;		
+					for ($i = 0; $i < size($meshFiles); $i = $i + 1)
+						textScrollList -e -append $meshFiles[$i] scrollListMesh;	
+					for ($i = 0; $i < size($openColladaFiles); $i = $i + 1)
+						textScrollList -e -append $openColladaFiles[$i] scrollListBinding;				
+				}			
+			}
+		}
+		if ($index == 2 || $index == 7)	// update skeleton scroll list
+		{		
+			if ($skeletonName != "")
+				textScrollList -e -selectItem $skeletonName scrollListSkeleton;
+		}	
 		
-		string $skeletonName = `getAttr ($curPref + ".SkeletonName")`;			
-		if ($skeletonName != "")
-			textScrollList -e -selectItem $skeletonName scrollListSkeleton;
-		
-		string $meshName = `getAttr ($curPref + ".MeshName")`;			
-		if ($meshName != "")
-		{	
-			string $meshList[];
-			tokenize $meshName " " $meshList;
-			for ($i = 0; $i < size($meshList); $i = $i + 1)
-				textScrollList -e -selectItem $meshList[$i] scrollListMesh;		
+		if ($index == 3 || $index == 7)	// update motion scroll list
+		{
+			if ($motionName != "")
+				textScrollList -e -selectItem $motionName scrollListMotion;
 		}
 		
-		string $bindingName = `getAttr ($curPref + ".BindingName")`;				
-		if ($bindingName!= "")
-			textScrollList -e -selectItem $bindingName scrollListBinding;			
+		if ($index == 4 || $index == 7)	// update binding scroll list
+		{				
+			if ($bindingName!= "")
+				textScrollList -e -selectItem $bindingName scrollListBinding;			
+		}
 		
-		// advanced setting
-		textFieldGrp -e -text (`getAttr ($curPref + ".SbmBin")`) smartbodyBin;
-		textFieldGrp -e -text $projectRootDir projectRoot;					
+		if ($index == 5 || $index == 7)	// update mesh scroll list
+		{		
+			if ($meshName != "")
+			{	
+				string $meshList[];
+				tokenize $meshName " " $meshList;
+				for ($i = 0; $i < size($meshList); $i = $i + 1)
+					textScrollList -e -selectItem $meshList[$i] scrollListMesh;		
+			}
+		}
+		
+		if ($index == 7)
+		{
+			// advanced setting
+			textFieldGrp -e -text (`getAttr ($curPref + ".SbmBin")`) smartbodyBin;
+			textFieldGrp -e -text $projectRootDir projectRoot;					
+		}
 	}
 }
 
@@ -507,7 +557,7 @@ global proc sbmViewerGUI()
 	
 		frameLayout -label "SmartBody Preferences" -borderStyle etchedIn -collapsable false -collapse 0;
 			columnLayout -adjustableColumn true -rowSpacing 2 -columnOffset "both" 10;
-				textScrollList  -numberOfRows 3 -width 250 -height 50 -allowMultiSelection false -showIndexedItem 4 -selectCommand updateViewerUI scrollListPreference;
+				textScrollList  -numberOfRows 3 -width 250 -height 50 -allowMultiSelection false -showIndexedItem 4 -selectCommand "updateViewerUI(7)" scrollListPreference;
 				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
 					button -label "Create Preference" -align "center" -command viewerPreferenceCreate;
 					button -label "Rename Preference" -align "center" -command viewerPreferenceRename;
@@ -544,7 +594,7 @@ global proc sbmViewerGUI()
 	
 	// Intialization to Viewer UI
 	viewerPreferenceCheck();
-	updateViewerUI();
+	updateViewerUI(7);
 	
 	// Show the Main Window
 	showWindow viewerMainWin;
