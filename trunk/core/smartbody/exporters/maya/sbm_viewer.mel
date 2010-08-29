@@ -446,6 +446,7 @@ global proc viewerRunButton()
 			confirmDialog -title "Hint" -message "Please select a skeleton" -button "Ok" -defaultButton "Ok" -dismissString "Ok";
 		
 		// check if need to be run under smooth binding mode
+		string $viewermode;
 		string $meshList[];
 		tokenize $mesh " " $meshList;
 		int $i;
