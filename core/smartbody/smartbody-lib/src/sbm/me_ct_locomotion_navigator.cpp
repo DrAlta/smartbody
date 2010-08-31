@@ -149,7 +149,7 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeCtLocomot
 	base_offset.set ( buffer[ bi_base_offset_x ], buffer[ bi_base_offset_y ], buffer[ bi_base_offset_z ] );
 	base_rot.set( buffer[ bi_base_rot ], buffer[ bi_base_rot+1 ], buffer[ bi_base_rot+2 ], buffer[ bi_base_rot+3 ] );
 
-	world_pos.y = 0.0f;
+	//world_pos.y = 0.0f;
 	SrQuat t_world_rot;
 	mat.roty(pre_facing_angle);
 	t_world_rot.set(mat);
@@ -293,23 +293,14 @@ void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtL
 		//buffer[ bi_world_y ] = 0.0f;
 		buffer[ bi_world_z ] = 0.0f;
 	}
-	buffer[ bi_world_x ] = displacement.x + buffer[ bi_world_x ];
+
+	buffer[ bi_world_x ] = displacement.x + world_pos.x;
+	buffer[ bi_world_y ] = displacement.y + world_pos.y;
+	buffer[ bi_world_z ] = displacement.z + world_pos.z;
+
+	/*buffer[ bi_world_x ] = displacement.x + buffer[ bi_world_x ];
 	buffer[ bi_world_y ] = displacement.y + buffer[ bi_world_y ];
-	buffer[ bi_world_z ] = displacement.z + buffer[ bi_world_z ];
-
-	//buffer[ bi_world_x ] = displacement.x;
-	//buffer[ bi_world_y ] = displacement.y;
-	//buffer[ bi_world_z ] = displacement.z;
-
-	//x = buffer[ bi_world_x ];
-	//y = buffer[ bi_world_y ];
-	//z = buffer[ bi_world_z ];
-
-	//LOG("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  base world_offset   (%f, %f, %f)", x, y, z);
-
-	//if(facing_angle != 0.0f) LOG("\n\npos:[%f, %f, %f]", limb->pos.x+buffer[ bi_world_x ], limb->pos.y+buffer[ bi_world_y ], limb->pos.z+buffer[ bi_world_z ]);
-	//if(facing_angle != 0.0f) LOG("\ncurr_pos:[%f, %f, %f]", limb->pos.x, limb->pos.y, limb->pos.z);
-	//if(facing_angle != 0.0f) LOG("\ndisplacement:[%f, %f, %f]", displacement.x, displacement.y, displacement.z);
+	buffer[ bi_world_z ] = displacement.z + buffer[ bi_world_z ];*/
 
 	SrMat mat;
 	mat.roty(facing_angle);
@@ -509,6 +500,7 @@ void MeCtLocomotionNavigator::next_destination(MeFrameData& frame)
 
 	SrVec dest = destination_list.get(curr_dest_index);
 	SrVec v = dest-world_pos;
+	v.y = 0.0f;
 	v.normalize();
 	v *= speed_list.get(curr_dest_index);
 	SrBuffer<float>& buffer = frame.buffer();
