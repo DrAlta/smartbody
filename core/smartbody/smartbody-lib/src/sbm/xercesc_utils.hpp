@@ -86,4 +86,7 @@ namespace xml_utils {
 	};
 };
 
+std::string convertWStringToString(std::wstring w);
+
+
 #endif  //  XERCESC_UTILS_HPP

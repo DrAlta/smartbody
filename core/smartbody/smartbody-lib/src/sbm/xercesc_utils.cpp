@@ -23,7 +23,7 @@
 #include "vhcl.h"
 #include <stdlib.h>
 #include <iostream>
-
+#include <sstream>
 
 #include "xercesc_utils.hpp"
 
@@ -177,7 +177,11 @@ DOMDocument* xml_utils::parseMessageXml( XercesDOMParser* xmlParser, const char 
 		// xml in a file?
 		if( str[0]=='<' ) {
 			if (USELOG) LOG("Parsing inline XML.");
-			xml_utils::parseCString( str, xmlParser );
+			int numErrors = xml_utils::parseCString( str, xmlParser );
+			if (numErrors > 0)
+			{
+				LOG("Found %d errors when parsing %s.", numErrors, str);
+			}
 		} else {
 			if (USELOG) LOG("Parsing XML from file \"%s\"", str);
 			xmlParser->parse( str );
@@ -185,27 +189,44 @@ DOMDocument* xml_utils::parseMessageXml( XercesDOMParser* xmlParser, const char 
 		int errorCount = xmlParser->getErrorCount();
 		if( errorCount > 0 ) {
 			//char* message = XMLString::transcode(e.getMessage());
-			cerr << "xml_utils::parseMessageXml(): "<<errorCount<<" errors while parsing xml: "<< endl;
+			std::stringstream strstr;
+			strstr << "xml_utils::parseMessageXml(): "<<errorCount<<" errors while parsing xml: ";
+			LOG(strstr.str().c_str());
 			// TODO: print errors
 			return NULL;
 		}
 		return xmlParser->getDocument();
 	} catch( const XMLException& e ) {
 		char* message = XMLString::transcode(e.getMessage());
-		cerr << "xml_utils::parseMessageXml(): XMLException while parsing xml: "<<message<< endl;
+		std::stringstream strstr;
+		strstr << "xml_utils::parseMessageXml(): XMLException while parsing xml: "<<message;
+		LOG(strstr.str().c_str());
 		return NULL;
 	} catch( const SAXParseException& e ) {
 		char* message = XMLString::transcode(e.getMessage());
-		cerr << "xml_utils::parseMessageXml(): SAXException while parsing xml: "<<message
-				<< " (line "<<e.getLineNumber()<<", col "<<e.getColumnNumber()<<")"<< endl;
+		std::stringstream strstr;
+		strstr << "xml_utils::parseMessageXml(): SAXException while parsing xml: "<<message
+				<< " (line "<<e.getLineNumber()<<", col "<<e.getColumnNumber()<<")";
+		LOG(strstr.str().c_str());
 		return NULL;
 	} catch( const SAXException& e ) {
 		char* message = XMLString::transcode(e.getMessage());
-		cerr << "xml_utils::parseMessageXml(): SAXException while parsing xml: "<<message<< endl;
+		std::stringstream strstr;
+		strstr << "xml_utils::parseMessageXml(): SAXException while parsing xml: "<<message;
+		LOG(strstr.str().c_str());
 		return NULL;
 	} catch( const DOMException& e ) {
 		char* message = XMLString::transcode(e.getMessage());
-		cerr << "xml_utils::parseMessageXml(): DOMException while parsing xml: "<<message<< endl;
+		std::stringstream strstr;
+		strstr << "xml_utils::parseMessageXml(): DOMException while parsing xml: "<<message;
+		LOG(strstr.str().c_str());
 		return NULL;
 	}
+}
+		
+
+std::string convertWStringToString(std::wstring w)
+{
+	std::string str(w.begin(), w.end());
+	return str;
 }
