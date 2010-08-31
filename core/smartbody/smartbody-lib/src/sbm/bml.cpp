@@ -120,7 +120,9 @@ bool BML::isValidTmId( const std::wstring& id ) {
 class BmlProcPrunePolicy : public MePrunePolicy {
 public:
 	virtual bool shouldPrune( MeController* ct, MeController* parent ) {
-		cout << "====================> BmlProcPrunePolicy: pruning " << ct->controller_type() << " \"" << ct->name() << " from parent " << parent->controller_type() << " \"" << parent->name() << '"' << endl;
+		std::stringstream strstr;
+		strstr << "====================> BmlProcPrunePolicy: pruning " << ct->controller_type() << " \"" << ct->name() << " from parent " << parent->controller_type() << " \"" << parent->name() << '"';
+		LOG(strstr.str().c_str());
 		return true;
 	};
 };
@@ -267,7 +269,9 @@ void BmlRequest::importNamedSyncPoints( BehaviorSyncPoints& behav_syncs, const s
 			bool map_insert_success = idToSync.insert( make_pair( sync_id, sync ) ).second;
 
 			if( !map_insert_success ) {
-				wcerr << "ERROR: BmlRequest::registerBehavior(..): Failed to insert "<<logging_label<<" SyncPoint \""<<sync_id<<"\"." << endl;
+				std::wstringstream wstrstr;
+				wstrstr << "ERROR: BmlRequest::registerBehavior(..): Failed to insert "<<logging_label<<" SyncPoint \""<<sync_id<<"\"." << endl;
+				LOG(convertWStringToString(wstrstr.str()).c_str());
 			}
 		}
 	}
@@ -298,7 +302,7 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 	this->bml_start->time = now;
 
 	if( LOG_BML_BEHAVIOR_SCHEDULE ) {
-		cout << "DEBUG: BmlRequest::realize(): time = "<< (mcu->time) <<endl;
+		LOG("DEBUG: BmlRequest::realize(): time = %f", mcu->time);
 	}
 
 	// Find earliest BehaviorRequest start time schedule before speech
@@ -312,10 +316,12 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 				behavior->behav_syncs.validate();
 #endif // VALIDATE_BEHAVIOR_SYNCS
 
-				min_time = min( min_time, behavior->behav_syncs.sync_start()->time() );
+				// behav_syncs can sometimes yield a -std::numeric_limits<>::max() - need to protect against this
+				if  (behavior->behav_syncs.sync_start()->time() >= 0.0)
+					min_time = min( min_time, behavior->behav_syncs.sync_start()->time() );
 
 				if( LOG_BML_BEHAVIOR_SCHEDULE ) {
-					cout << "DEBUG: BmlRequest::realize(): Behavior \""<< (behavior->unique_id) <<"\" BehaviorSyncPoints:"<<endl;
+					LOG("DEBUG: BmlRequest::realize(): Behavior \"%s\" BehaviorSyncPoints:", behavior->unique_id.c_str());
 					behavior->behav_syncs.printSyncTimes();
 				}
 			} catch( BML::SchedulingException& e ) {
@@ -328,7 +334,7 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 		}
 
 		if( LOG_BML_BEHAVIOR_SCHEDULE ) {
-			cout << "DEBUG: BmlRequest::realize(): min_time: "<<min_time<<endl;
+			LOG("DEBUG: BmlRequest::realize(): min_time: %f", min_time);
 		}
 
 		// ...and offset everything to be positive (assumes times are only relative to each other, not wall time, etc.)
@@ -339,7 +345,7 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 			if( min_time < now - TIME_DELTA ) {
 				time_sec offset = now - min_time;
 				if( LOG_BML_BEHAVIOR_SCHEDULE ) {
-					cout << "DEBUG: BmlRequest::realize(): offset: " << offset << endl;
+					LOG("DEBUG: BmlRequest::realize(): offset: %f", offset);
 				}
 
 				for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i ) {
@@ -363,7 +369,11 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 
 	BehaviorSpan span = getBehaviorSpan();
 	if( LOG_REQUEST_REALIZE_TIME_SPAN )
-		cout << "DEBUG: BML::BmlRequest::realize(..): "<< actorId<<" BML \""<<msgId<<"\": time = "<<mcu->time<<"; span = "<<span.start<<" to "<<span.end<<endl;
+	{
+		std::stringstream strstr;
+		strstr << "DEBUG: BML::BmlRequest::realize(..): "<< actorId<<" BML \""<<msgId<<"\": time = "<<mcu->time<<"; span = "<<span.start<<" to "<<span.end;
+		LOG(strstr.str().c_str());
+	}
 	time_sec start_time = span.isSet()? span.start : mcu->time;
 	time_sec end_time   = span.isSet()? span.end : mcu->time;
 
@@ -381,8 +391,10 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 #endif
 
 		if( start_seq->insert( (float)start_time, (char*)(start_command.str().c_str()) )!=CMD_SUCCESS ) {
-			cerr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
-				"Failed to insert \""<<start_command<<"\" command."<<endl;
+			std::stringstream strstr;
+			strstr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
+				"Failed to insert \""<<start_command<<"\" command.";
+			LOG(strstr.str().c_str());
 		}
 
 		// Sechdule this sequence immediately, before behavior sequences are scheduled
@@ -405,7 +417,8 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 	for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i ) {
 		BehaviorRequestPtr behavior = *i;
 
-		LOG("Realizing behavior %s", behavior->unique_id.c_str());
+		// commented out by Ari Shapiro 8/19/10 to make the output less noisy
+		//LOG("Realizing behavior %s", behavior->unique_id.c_str());
 		behavior->realize( request, mcu );
 
 #if USE_CUSTOM_PRUNE_POLICY
@@ -432,8 +445,10 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 			end_command << " persistent";
 
 		if( cleanup_seq->insert( (float)end_time, (char*)(end_command.str().c_str()) )!=CMD_SUCCESS ) {
-			cerr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
-				"Failed to insert \""<<end_command<<"\" command."<<endl;
+			std::stringstream strstr;
+			strstr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
+				"Failed to insert \""<<end_command<<"\" command.";
+			LOG(strstr.str().c_str());
 		}
 	}
 
@@ -463,7 +478,7 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 				oss.str("");  // clear the buffer
 				oss << command_prefix << name << "\t@ " << time;
 				if( seq->insert( (float)seqTime, (char*)(oss.str().c_str()) )!=CMD_SUCCESS ) {
-					cerr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<bpMsg.msgId<<"\": "<<
+					strstr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<bpMsg.msgId<<"\": "<<
 						"Failed to insert echo timesync_point message"<<endl;
 				}
 			}
@@ -476,8 +491,10 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 		oss << "print character "<< actorId << " schedule";
 		string& cmd = oss.str();
 		if( cleanup_seq->insert( 0, (char*)(cmd.c_str()) )!=CMD_SUCCESS ) {
-			cerr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
-				"Failed to insert \"" << cmd << "\" command"<<endl;
+			std::stringstream strstr;
+			strstr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
+				"Failed to insert \"" << cmd << "\" command";
+			LOG(strstr.str().c_str());
 		}
 	}
 
@@ -494,10 +511,10 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 
 
 	if( bp->get_auto_print_sequence() ) {
-		cout << "DEBUG: BML::BmlRequest::realize(..): Sequence \"" << start_seq_name <<"\":"<<endl;
+		LOG("DEBUG: BML::BmlRequest::realize(..): Sequence\"%s\":", start_seq_name.c_str());
 		start_seq->print();
 
-		cout << "DEBUG: BML::BmlRequest::realize(..): Sequence \"" << cleanup_seq_name <<"\":"<<endl;
+		LOG("DEBUG: BML::BmlRequest::realize(..): Sequence \"%s\": ", cleanup_seq_name.c_str());
 		cleanup_seq->print();
 	}
 }
@@ -506,7 +523,7 @@ void BmlRequest::unschedule( Processor* bp, mcuCBHandle* mcu, time_sec duration 
 {
 	BmlRequestPtr request = weak_ptr.lock(); // Ref to this
 	if( bp->get_auto_print_controllers() || bp->get_auto_print_sequence() )
-		cout << "BmlRequest::unschedule(..) " << request->actorId << " " << request->requestId << endl;
+		LOG("BmlRequest::unschedule(..) %s %s", request->actorId.c_str(), request->requestId);
 
 	if( speech_request ) {
 		speech_request->unschedule( mcu, request, duration );
@@ -537,25 +554,27 @@ void BmlRequest::unschedule( Processor* bp, mcuCBHandle* mcu, time_sec duration 
 		oss << "print character "<< actorId << " schedule";
 		string& cmd = oss.str();
 		if( mcu->execute( (char*)(cmd.c_str() ) ) != CMD_SUCCESS ) {
-			cerr << "WARNING: BML::BmlRequest::unschedule(..): msgId=\""<<msgId<<"\": "<<
-				"Failed to execute \"" << cmd << "\" command"<<endl;
+			std::stringstream strstr;
+			strstr << "WARNING: BML::BmlRequest::unschedule(..): msgId=\""<<msgId<<"\": "<<
+				"Failed to execute \"" << cmd << "\" command";
+			LOG(strstr.str().c_str());
 		}
 	}
 
 	if( bp->get_auto_print_sequence() ) {
-		cout << "DEBUG: BML::BmlRequest::unschedule(..): Sequence \"" << start_seq_name <<"\":"<<endl;
+		LOG("DEBUG: BML::BmlRequest::unschedule(..): Sequence \"%s\"", start_seq_name.c_str());
 		srCmdSeq* start_seq = mcu->lookup_seq( start_seq_name.c_str() );
 		if( start_seq )
 			start_seq->print();
 		else
-			cout << "WARNING: Cannot find sequence \"" << start_seq_name << "\"" << endl;
+			LOG("WARNING: Cannot find sequence \"%s\"", start_seq_name.c_str());
 
-		cout << "DEBUG: BML::BmlRequest::unschedule(..): Sequence \"" << cleanup_seq_name <<"\":"<<endl;
+		LOG("DEBUG: BML::BmlRequest::unschedule(..): Sequence \"%s\":", cleanup_seq_name.c_str());
 		srCmdSeq* cleanup_seq = mcu->lookup_seq( cleanup_seq_name.c_str() );
 		if( cleanup_seq )
 			cleanup_seq->print();
 		else
-			cout << "WARNING: Cannot find sequence \"" << cleanup_seq_name << "\"" << endl;
+			LOG("WARNING: Cannot find sequence \"%s\"", cleanup_seq_name.c_str());
 	}
 }
 
@@ -564,7 +583,7 @@ void BmlRequest::cleanup( Processor* bp, mcuCBHandle* mcu )
 {
 	BmlRequestPtr request = weak_ptr.lock(); // Ref to this
 	if( bp->get_auto_print_controllers() || bp->get_auto_print_sequence() )
-		cout << "BmlRequest::cleanup(..) " << request->actorId << " " << request->requestId << endl;
+		LOG("BmlRequest::cleanup(..) %s %s", request->actorId, request->requestId);
 
 	if( speech_request ) {
 		speech_request->cleanup( mcu, request );
@@ -586,8 +605,10 @@ void BmlRequest::cleanup( Processor* bp, mcuCBHandle* mcu )
 		command += " prune";
 
 		if( mcu->execute_later( command.c_str(), 1 ) != CMD_SUCCESS ) {
-			cerr << "WARNING: BML::BmlRequest::cleanup(..): msgId=\""<<msgId<<"\": "<<
-				"Failed to execute_later \""<<command<<"\"." << endl;
+			std::stringstream strstr;
+			strstr << "WARNING: BML::BmlRequest::cleanup(..): msgId=\""<<msgId<<"\": "<<
+				"Failed to execute_later \""<<command<<"\".";
+			LOG(strstr.str().c_str());
 		}
 	}
 	mcu->abort_seq( start_seq_name.c_str() );
@@ -600,8 +621,10 @@ void BmlRequest::cleanup( Processor* bp, mcuCBHandle* mcu )
 		oss << "print character "<< actorId << " schedule";
 		string& cmd = oss.str();
 		if( mcu->execute( (char*)(cmd.c_str() ) ) != CMD_SUCCESS ) {
-			cerr << "WARNING: BML::BmlRequest::cleanup(..): msgId=\""<<msgId<<"\": "<<
-				"Failed to execute \"" << cmd << "\" command"<<endl;
+			std::stringstream strstr;
+			strstr << "WARNING: BML::BmlRequest::cleanup(..): msgId=\""<<msgId<<"\": "<<
+				"Failed to execute \"" << cmd << "\" command";
+			LOG(strstr.str().c_str());
 		}
 	}
 
@@ -634,7 +657,9 @@ TriggerEventPtr BmlRequest::createTrigger( const wstring& name ) {
 
 bool BmlRequest::registerBehavior( const std::wstring& id, BehaviorRequestPtr behavior ) {
 	if( id.size() > 0 && hasExistingBehaviorId( id ) ) {
-		wcerr <<  "ERROR: BmlRequest::registerBehavior(..): BehaviorRequest id \""<< id <<"\" is already in use!" << endl;
+		std::wstringstream wstrstr;
+		wstrstr <<  "ERROR: BmlRequest::registerBehavior(..): BehaviorRequest id \""<< id <<"\" is already in use!";
+		LOG(convertWStringToString(wstrstr.str()).c_str());
 		return false; // duplicate id
 	}
 
@@ -660,12 +685,12 @@ bool BmlRequest::registerBehavior( const std::wstring& id, BehaviorRequestPtr be
 //// TODO: Merge with above after SpeechRequest is a type of BehaviorRequest
 //bool BmlRequest::registerBehavior( const std::wstring& id, SpeechRequestPtr speech ) {
 //	if( speech_request ) {
-//		wcerr <<  "ERROR: BmlRequest::registerBehavior(..): Only one SpeechRequest per BmlRequest (temporary limitation)." << endl;
+//		wstrstr <<  "ERROR: BmlRequest::registerBehavior(..): Only one SpeechRequest per BmlRequest (temporary limitation)." << endl;
 //		return false;
 //	}
 //
 //	if( hasExistingBehaviorId( id ) ) {
-//		wcerr <<  "ERROR: BmlRequest::registerBehavior(..): SpeechRequest id \""<< (speech->id) <<"\" is already in use!" << endl;
+//		wstrstr <<  "ERROR: BmlRequest::registerBehavior(..): SpeechRequest id \""<< (speech->id) <<"\" is already in use!" << endl;
 //		return false; // duplicate id
 //	}
 //
@@ -712,7 +737,9 @@ SyncPointPtr BmlRequest::getSyncByReference( const std::wstring& notation ) {
 
 			MapOfSyncPoint::iterator mySearchIter = idToSync.find(key);
 			if( mySearchIter == idToSync.end() ) {
-				wcerr<<"WARNING: BmlRequest::getSyncPoint: BML offset refers to unknown "<<key<<" point.  Ignoring..."<<endl;
+				std::wstringstream wstrstr;
+				wstrstr<<"WARNING: BmlRequest::getSyncPoint: BML offset refers to unknown "<<key<<" point.  Ignoring...";
+				LOG(convertWStringToString(wstrstr.str()).c_str());
 			} else {
 				SyncPointPtr parent = mySearchIter->second;
 				if( parent ) {
@@ -723,14 +750,18 @@ SyncPointPtr BmlRequest::getSyncByReference( const std::wstring& notation ) {
 							sync->time = parent->time + offset;
 						}
 					} else {
-						wcerr << "WARNING: parent sync does not have a valid trigger" << endl;
+						LOG("WARNING: parent sync does not have a valid trigger.");
 					}
 				} else {
-					wcerr << "ERROR: Map returned invalid parent for key \"" << key << "\"" << endl;
+					std::wstringstream wstrstr;
+					wstrstr << "ERROR: Map returned invalid parent for key \"" << key << "\"";
+					LOG(convertWStringToString(wstrstr.str()).c_str());
 				}
 			}
 		} else {
-			wcerr << "ERROR: Invalid offset \""<<offset_str<<"\" in notation \"" << notation << "\"" << endl;
+			std::wstringstream wstrstr;
+			wstrstr << "ERROR: Invalid offset \""<<offset_str<<"\" in notation \"" << notation << "\"";
+			LOG(convertWStringToString(wstrstr.str()).c_str());
 		}
 	} else if( index==0 || notation.find(':')==npos ) {
 		float offset;
@@ -738,7 +769,9 @@ SyncPointPtr BmlRequest::getSyncByReference( const std::wstring& notation ) {
 		if( offset_reader >> offset ) {
 			sync = start_trigger->addSyncPoint( bml_start, offset );
 		} else {
-			wcerr << "ERROR: Invalid SyncPoint numeric notation \""<<notation<<"\"." << endl;
+			std::wstringstream wstrstr;
+			wstrstr << "ERROR: Invalid SyncPoint numeric notation \""<<notation<<"\".";
+			LOG(convertWStringToString(wstrstr.str()).c_str());
 		}
 	} else {
 		MapOfSyncPoint::iterator mySearchIter = idToSync.find(notation);
@@ -746,7 +779,9 @@ SyncPointPtr BmlRequest::getSyncByReference( const std::wstring& notation ) {
 			SyncPointPtr parent = (*mySearchIter).second;
 			sync.reset( new SyncPoint( parent->trigger.lock(), parent, 0 ) );
 		} else {
-			wcerr << "WARNING: Unknown sync for notation \"" << notation << "\"" << endl;
+			std::wstringstream wstrstr;
+			wstrstr << "WARNING: Unknown sync for notation \"" << notation << "\"";
+			LOG(convertWStringToString(wstrstr.str()).c_str());
 		}
 	}
 
@@ -1132,8 +1167,10 @@ bool SequenceRequest::realize_sequence( VecOfSbmCommand& commands, mcuCBHandle* 
 	}
 
 	if( mcu->active_seq_map.lookup( unique_id.c_str() ) ) {
-		cerr << "ERROR: SequenceRequest::realize_sequence(..): SequenceRequest \"" << unique_id << "\": "<<
-		        "Sequence with matching ID already exists." << endl;
+		std::stringstream strstr;
+		strstr << "ERROR: SequenceRequest::realize_sequence(..): SequenceRequest \"" << unique_id << "\": "<<
+		        "Sequence with matching ID already exists.";
+		LOG(strstr.str().c_str());
 		return false;
 	}
 
@@ -1149,8 +1186,10 @@ bool SequenceRequest::realize_sequence( VecOfSbmCommand& commands, mcuCBHandle* 
 		if( command != NULL ) {
 			if( seq->insert( (float)(command->time), command->command.c_str() ) != CMD_SUCCESS ) {
 				// TODO: Throw RealizingException
-				cerr << "ERROR: SequenceRequest::realize_sequence(..): SequenceRequest \"" << unique_id << "\": "
-				     << "Failed to insert SbmCommand \"" << (command->command) << "\" at time " << (command->time) << "Aborting remaining commands." << endl;
+				std::stringstream strstr;
+				strstr << "ERROR: SequenceRequest::realize_sequence(..): SequenceRequest \"" << unique_id << "\": "
+				     << "Failed to insert SbmCommand \"" << (command->command) << "\" at time " << (command->time) << "Aborting remaining commands.";
+				LOG(strstr.str().c_str());
 				success = false;
 			}
 			delete command;
@@ -1163,7 +1202,9 @@ bool SequenceRequest::realize_sequence( VecOfSbmCommand& commands, mcuCBHandle* 
 		// TODO: test result, possible throwing RealizingException
 		if( mcu->execute_seq( seq, unique_id.c_str() ) != CMD_SUCCESS ) {
 			// TODO: Throw RealizingException
-			cerr << "ERROR: SequenceRequest::realize_sequence(..): SequenceRequest \"" << unique_id << "\": " << "Failed to execute sequence \"" << unique_id.c_str() << "\"." << endl;
+			std::stringstream strstr;
+			strstr << "ERROR: SequenceRequest::realize_sequence(..): SequenceRequest \"" << unique_id << "\": " << "Failed to execute sequence \"" << unique_id.c_str() << "\".";
+			LOG(strstr.str().c_str());
 		}
 	}
 
