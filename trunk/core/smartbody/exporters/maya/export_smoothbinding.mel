@@ -1,0 +1,127 @@
+string $smoothbindingVersion = 0.1;
+string $defaultRoot = "C:/Projects";
+
+global proc initializePlugin()
+{
+	if (!`pluginInfo -q -loaded COLLADAMaya`)
+		loadPlugin COLLADAMaya;
+	if (!`pluginInfo -q -loaded objExport`)
+		loadPlugin objExport;
+}
+
+global proc objFileBrowser(string $fileName, string $fileType)
+{
+	string $dirName = dirname($fileName);
+	textFieldGrp -e -text $dirName objDir;
+}
+
+global proc openColladaFileBrowser(string $fileName, string $fileType)
+{
+	string $dirName = dirname($fileName);
+	textFieldGrp -e -text $dirName openColladaDir;
+}
+
+global proc updateObjList()
+{
+	string $objList[] = lsType("mesh");
+	int $i;
+	for ($i = 0; $i < size($objList); $i ++)
+		if ($objList[$i] != "<done>")
+			textScrollList -e -append $objList[$i] scrollListObj;
+}
+
+global proc selectMesh()
+{
+	select -cl;
+	string $objList[] = `textScrollList -q -selectItem scrollListObj`;
+	int $i;
+	for ($i = 0; $i < size($objList); $i ++)
+		select -add $objList[$i];
+}
+
+global proc objExportFunc()
+{
+	select -cl;
+	string $objList[] = `textScrollList -q -selectItem scrollListObj`;
+	int $i;
+	string $objDir = `textFieldGrp -q -text objDir`;
+	if (`filetest -d $objDir`)
+	{
+		for ($i = 0; $i < size($objList); $i ++)	
+		{
+			select $objList[$i];
+			file -op "groups=1;ptgroups=1;materials=1;smoothing=1;normals=1" -typ "OBJexport" -pr -es ($objDir + "/" + $objList[$i]);
+			
+			// post export process - get rid of material files
+			if (`filetest -e ($objDir + "/" + $objList[$i] + ".mtl")`)
+				sysFile -delete ($objDir + "/" + $objList[$i] + ".mtl");
+		}
+		print ("Exporting OBJ Finished!");
+	}
+	else
+		print ("Directory Not Exist!");
+}
+
+global proc openColladaExportFunc()
+{
+	string $openColladaDir = `textFieldGrp -q -text openColladaDir`;
+	if (`filetest -d $openColladaDir`)	
+	{
+		file -op "bakeTransforms=0;relativePaths=0;copyTextures=0;exportTriangles=0;cgfxFileReferences=1;isSampling=0;curveConstrainSampling=0;removeStaticCurves=1;exportPolygonMeshes=0;exportLights=0;exportCameras=0;exportJointsAndSkin=1;exportAnimations=0;exportInvisibleNodes=0;exportDefaultCameras=0;exportTexCoords=0;exportNormals=0;exportNormalsPerVertex=0;exportVertexColors=0;exportVertexColorsPerVertex=0;exportTexTangents=0;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;exportXRefs=1;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0;" 
+			 -typ "OpenCOLLADA exporter" -pr -ea ($openColladaDir + "/openCollada");
+
+		// post export process - change suffix to .xml
+		if (`filetest -e ($openColladaDir + "/openCollada.dae")`)
+			sysFile -rename ($openColladaDir + "/openCollada.xml") ($openColladaDir + "/openCollada.dae");			 
+	}
+	else
+		print ("Directory Not Exist!");
+}
+
+//--------------------- Main Window ------------------------
+global proc smoothbindingExportGUI()
+{
+	global string $smoothbindingVersion;
+	global string $defaultRoot;
+	
+	if ((`window -exists smoothbindingMainWin`) == true)
+	{
+		deleteUI smoothbindingMainWin;
+		windowPref -remove smoothbindingMainWin;
+	}
+	
+	initializePlugin();
+
+	// create UI Window here
+	window -title ("Smooth Binding Exporter v" + $smoothbindingVersion) -resizeToFitChildren true -sizeable true smoothbindingMainWin;
+	columnLayout -adjustableColumn true -columnAttach "both" 5;
+		frameLayout -label "Obj Export" -borderStyle etchedIn -collapsable false -collapse 0;
+			columnLayout -adjustableColumn true;
+				textScrollList  -numberOfRows 3 -width 250 -height 150 -allowMultiSelection true -showIndexedItem 4 -selectCommand selectMesh scrollListObj;
+				button -label "Clear" -align "center" -command "textScrollList -e -deselectAll scrollListObj";	
+				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
+					textFieldGrp -label "Output Director: " -adjustableColumn 2 -columnAttach 1 "right" 5 objDir;				
+					button -label ".." -align "center" -command "fileBrowserDialog -m 1 -fc \"objFileBrowser\" -an \"Select\" -om \"SaveAs\"";	
+					setParent ..;					
+				button -label "Obj Export" -command objExportFunc;				
+					setParent smoothbindingMainWin;				
+					
+		frameLayout -label "Open Collada Export" -borderStyle etchedIn -collapsable false -collapse 0;
+			columnLayout -adjustableColumn true -rowSpacing 5 -columnOffset "both" 10;
+				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
+					textFieldGrp -label "Output Director: " -adjustableColumn 2 -columnAttach 1 "right" 5 openColladaDir;			
+					button -label ".." -align "center" -command "fileBrowserDialog -m 1 -fc \"openColladaFileBrowser\" -an \"Select\" -om \"SaveAs\"";	
+					setParent ..;					
+				button -label "Open Collada Export" -command openColladaExportFunc;
+				setParent smoothbindingMainWin;
+	
+	// initialize UI
+	textFieldGrp -e -text $defaultRoot objDir;
+	textFieldGrp -e -text $defaultRoot openColladaDir;
+					
+	// Show the Main Window
+	showWindow smoothbindingMainWin;
+	
+	// Show the boj list
+	updateObjList();	
+}
