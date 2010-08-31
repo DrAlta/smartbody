@@ -35,6 +35,7 @@ void DeformableMesh::update()
 				for (int j = 0; j < numOfInfJoints; j++)
 				{
 					const SkJoint* curJoint = skinWeight->infJoint[skinWeight->jointNameIndex[globalCounter]];
+					if (curJoint == NULL) continue;
 					const SrMat& gMat = curJoint->gmat();
 					SrMat& invBMat = skinWeight->bindPoseMat[skinWeight->jointNameIndex[globalCounter]];	
 					double jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
