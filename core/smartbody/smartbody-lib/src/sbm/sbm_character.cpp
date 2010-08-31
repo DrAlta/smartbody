@@ -137,9 +137,8 @@ SbmCharacter::~SbmCharacter( void )	{
 
 	if (locomotion_ct_analysis)
 		delete locomotion_ct_analysis;
-	if (locomotion_ct)
-		delete locomotion_ct;
-
+	locomotion_ct->unref();
+		
 	if ( mcuCBHandle::singleton().sbm_character_listener )
 	{
 		mcuCBHandle::singleton().sbm_character_listener->OnCharacterDelete( name );
