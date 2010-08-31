@@ -551,7 +551,7 @@ void MeCtLocomotion::blend_base_joint(MeFrameData& frame, float space_time, int 
 	SrBuffer<float>& buffer = frame.buffer();
 	float standing_height = get_buffer_base_height(buffer);
 
-	r_blended_base_height = r_blended_base_height * (navigator.standing_factor) + standing_height * (1.0f-navigator.standing_factor);
+	r_blended_base_height = r_blended_base_height * (navigator.standing_factor) + standing_height * (1.0-navigator.standing_factor);
 
 	//printf("\nHeight: %f", r_blended_base_height);
 }
@@ -716,8 +716,6 @@ void MeCtLocomotion::blend_standing(MeFrameData& frame)
 		quat_buff = slerp(quat_buff, quat, navigator.standing_factor);
 		nonlimb_joint_info.quat.set(i, quat_buff);
 	}
-
-
 }
 
 void MeCtLocomotion::update_nonlimb_mat()
@@ -895,12 +893,13 @@ SrVec MeCtLocomotion::get_limb_pos(MeCtLocomotionLimb* limb)
 	SrMat lmat;
 	SrVec pos;
 	SkJoint* tjoint = NULL;
-	//float* ppos;
+	SkJoint* tjoint_base = NULL;
+	float* ppos;
 	SkSkeleton* skeleton = limb->walking_skeleton;
 
 	/*tjoint = skeleton->search_joint(base_name);
 
-	pmat = get_lmat(tjoint, &r_blended_base_rot);
+	pmat = get_lmat(tjoint, &nonlimb_joint_info.quat.get(0));
 	ppos = pmat.pt(12);
 
 	ppos[0] = 0.0f;
@@ -914,8 +913,12 @@ SrVec MeCtLocomotion::get_limb_pos(MeCtLocomotionLimb* limb)
 	tjoint = skeleton->search_joint(limb->get_limb_base_name());*/
 
 	tjoint = skeleton->search_joint(limb->get_limb_base_name());
+	tjoint_base = skeleton->search_joint(tjoint->parent()->name().get_string());
 	int parent_ind = nonlimb_joint_info.get_index_by_name(tjoint->parent()->name().get_string());
-	gmat = nonlimb_joint_info.mat.get(parent_ind);
+	//gmat = nonlimb_joint_info.mat.get(parent_ind);
+
+	gmat = get_lmat(tjoint_base, &nonlimb_joint_info.quat.get(parent_ind));
+
 	for(int j  = 0; j <= limb->limb_joint_info.quat.size()-1; ++j)
 	{
 		pmat = gmat;
@@ -974,8 +977,6 @@ void MeCtLocomotion::update_pos()
 			dis[i].y = 0.0f;
 			sum += ratio[i];
 		}
-		//printf("\ncurr: (%f, %f, %f)", currpos.x, currpos.y, currpos.z);
-		//printf("\nprev: (%f, %f, %f)", limb->pos.x, limb->pos.y, limb->pos.z);
 		limb->pos = currpos;
 
 	}
@@ -987,14 +988,10 @@ void MeCtLocomotion::update_pos()
 			for(int i = 0; i < 2; ++i)
 			{
 				displacement += dis[i]*ratio[i]/sum;
-				//displacement.set(0.0f, 0.0f, 0.0f);
 				//displacement.x = 0.0f;
 				displacement.y = r_blended_base_height-pre_blended_base_height;
-				//printf("\ndisplacement: %f", displacement.y);
 				//displacement.z = 0.0f;
 			}
-			//if(displacement.len()>0.8f) printf("\n====================================================");
-			//printf("\ndisplacement: (%f, %f, %f)", displacement.x, displacement.y, displacement.z);
 		}
 		else
 		{
@@ -1003,9 +1000,6 @@ void MeCtLocomotion::update_pos()
 	}
 	else dis_initialized = true;
 	navigator.update_displacement(&displacement);
-
-	//LOG("\ndisplacement: (%f, %f, %f)", displacement.x, displacement.y, displacement.z);
-	//LOG("\nratio1: %f, ratio2: %f", ratio[0], ratio[1]);
 }
 
 
@@ -1038,7 +1032,7 @@ void MeCtLocomotion::print_info()
 	}
 
 	printf("\nLimbs:");
-	printf("\n  Total number: %d", limb_list.size());
+	printf("\  Total number: %d", limb_list.size());
 	MeCtLocomotionLimb* limb;
 	for(int i = 0; i < limb_list.size(); ++i)
 	{
