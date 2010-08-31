@@ -1740,6 +1740,34 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return mcu_character_bone_position_cmd( char_name.c_str(), args, mcu_p );
 	} else if( char_cmd=="remove" ) {
 		return SbmCharacter::remove_from_scene( char_name.c_str() );
+	} else if( char_cmd=="viewer" ) {
+		int mode = args.read_int();
+		switch (mode)
+		{
+			case 0:
+				character->scene_p->set_visibility(1,0,0,0);
+				character->dMesh_p->set_visibility(0);
+				break;
+			case 1:
+				character->scene_p->set_visibility(0,1,0,0);
+				character->dMesh_p->set_visibility(0);
+				break;
+			case 2:
+				character->scene_p->set_visibility(0,0,1,0);
+				character->dMesh_p->set_visibility(0);
+				break;
+			case 3:
+				character->scene_p->set_visibility(0,0,0,1);
+				character->dMesh_p->set_visibility(0);
+				break;
+			case 4:
+				character->scene_p->set_visibility(0,0,0,0);
+				character->dMesh_p->set_visibility(1);
+				break;
+			default:	
+				break;
+		}
+		return CMD_SUCCESS;
 	} else if( char_cmd=="reholster" ) {
 		if( all_characters ) {
 			mcu_p->character_map.reset();

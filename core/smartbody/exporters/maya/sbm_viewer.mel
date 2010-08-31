@@ -18,7 +18,7 @@
 //  CONTRIBUTORS:
 //      Yuyu Xu, USC ICT
 
-string $sbmViewerVersion = "0.2";
+string $sbmViewerVersion = "0.3";
 
 // get current viewer preference
 global proc string getSelectedViewerPreference()
@@ -181,6 +181,17 @@ global proc viewerPreferenceDelete()
 	updateViewerUI(7);
 }
 
+// update sk text field
+global proc skFileBrowser(string $fileName, string $fileType)
+{
+	textFieldGrp -e -text $fileName skDir;
+}
+
+// update skm text field
+global proc skmFileBrowser(string $fileName, string $fileType)
+{
+	textFieldGrp -e -text $fileName skmDir;
+}
 
 // update the attribute according to input index
 global proc updateAttr(int $index)
@@ -437,6 +448,11 @@ global proc int detectProcess(string $processName)
 // this function get called when the "run smartbody" button is pressed
 global proc viewerRunButton()
 {
+	int $noError = 1;
+	//--------- Collecting Info
+	string $testSkeleton = `textFieldGrp -q -text skDir`;
+	string $testMotion = `textFieldGrp -q -text skmDir`;
+
 	// getting attr of current preference
 	string $curPref = getSelectedViewerPreference();
 	string $projectName = `getAttr ($curPref + ".ProjectName")`;
@@ -448,13 +464,36 @@ global proc viewerRunButton()
 	string $projectRootDir = `getAttr ($curPref + ".ProjectRootDir")`;
 	string $sbmBin = `getAttr ($curPref + ".SbmBin")`;
 	
+	string $character = $charName;
+	if ($character == "")
+		$character = "defaultCharacter";	
+	string $motionName = basename($motion, ".skm");		
+	string $skeletonName = basename($skeleton, "");		
+	
 	// construct some path
-	string $materialDir = $projectRootDir + "/" + $projectName + "/Exports-Smartbody/" + $charName + "/";
+	string $skeletonDir = $projectRootDir + "/" + $projectName + "/Exports-Smartbody/" + $charName + "/";
+	string $motionDir = $skeletonDir;
+	string $smoothBindingDir = $skeletonDir;
 	string $binDir = dirname($sbmBin);
 	string $binName = basename($sbmBin, "");	
 	string $scriptDir = $binDir + "/../scripts";
 	string $seqFile = $scriptDir + "/" + "mayaSbmViewer.seq";
 	
+	// check to see if in quick test mode
+	if ($testSkeleton != "" && $testMotion != "")
+	{
+		print "Quick Test Mode!\n";
+		$character = "defaultCharacter";
+		$motionName = basename($testMotion, ".skm");	
+		$skeletonName = basename($testSkeleton, "");	
+		$bindingInfo = "";	
+		$mesh = "";		
+		$skeletonDir = dirname($testSkeleton);
+		$motionDir = dirname($testMotion);
+	}	
+	
+
+	//------- Process begins here
 	int $foundProcess = detectProcess($binName);
 	int $fileExistFlag = `filetest -e $seqFile`;
 	if ($fileExistFlag == 1)
@@ -466,73 +505,73 @@ global proc viewerRunButton()
 		system("echo " + "# " + $seqFile + " >> " + $seqFile);
 		
 		// viewer and camera setting
-		system("echo 5 viewer open   800 800  50 50" + " >> " + $seqFile);	
-		system("echo 5 camera eye    0 166 185" + " >> " + $seqFile);	
-		system("echo 5 camera center 0 92 0" + " >> " + $seqFile);	
-		
-		//	character name
-		string $character = $charName;
-		if ($character == "")
-			$character = "defaultCharacter";	
+		system("echo 0.2 viewer open   800 800  50 50" + " >> " + $seqFile);	
+		system("echo 0.2 camera eye    0 166 185" + " >> " + $seqFile);	
+		system("echo 0.2 camera center 0 92 0" + " >> " + $seqFile);		
 		
 		//	load skeleton
 		if ($skeleton != "")
 		{
-			string $skeletonName = basename($skeleton, "");	
-			system("echo 0 path ME " + $materialDir  + " >> " + $seqFile);
-			system("echo 1 char " + $character + " init " + $skeletonName + " >> " + $seqFile);
-			system("echo 1 set character " +  $character + " world_offset x 35 y 102 h -17" + " >> " + $seqFile);		
-
-			//	load motion
-			if ($motion != "")
-			{
-				string $motionName = basename($motion, ".skm");	
-				system("echo 0 path ME " + $materialDir  + " >> " + $seqFile);
-				system("echo 0 load motions -R " + $materialDir  + " >> " + $seqFile);	
-				system("echo 2 test bml char " + $character + " ^<animation name=\"" + $motionName + "\"\/^>" + " >> " + $seqFile);	
-			}			
+			system("echo 0 path ME " + $skeletonDir  + " >> " + $seqFile);
+			system("echo 0.1 char " + $character + " init " + $skeletonName + " >> " + $seqFile);
+			system("echo 0.1 set character " +  $character + " world_offset x 0 y 102 h 0" + " >> " + $seqFile);				
 		}
 		else
+		{
 			confirmDialog -title "Hint" -message "Please select a skeleton" -button "Ok" -defaultButton "Ok" -dismissString "Ok";
+			$noError = 0;
+		}
+			
+		//	load motion
+		if ($motion != "")
+		{
+			system("echo 0 path ME " + $motionDir  + " >> " + $seqFile);
+			system("echo 0 load motions -R " + $motionDir  + " >> " + $seqFile);	
+		}
+		else
+		{
+			confirmDialog -title "Hint" -message "Please select a motion" -button "Ok" -defaultButton "Ok" -dismissString "Ok";	
+			$noError = 0;
+		}			
 		
 		// check if need to be run under smooth binding mode
-		string $viewermode;
 		string $meshList[];
 		tokenize $mesh " " $meshList;
 		int $i;
 		if ($bindingInfo != "")
 		{
-			system("echo 5 char " + $character + " smoothbindweight " + $materialDir + $bindingInfo + " >> " + $seqFile);
-			$viewermode = " -viewermode=2";
+			system("echo 0.2 char " + $character + " smoothbindweight " + $smoothBindingDir + $bindingInfo + " >> " + $seqFile);
 			if ($mesh != "")
 			{
 				for ($i = 0; $i < size($meshList); $i = $i + 1)
-					system("echo 5 char " + $character + " smoothbindmesh " + $materialDir + $meshList[$i] + " >> " + $seqFile);	
+					system("echo 0.2 char " + $character + " smoothbindmesh " + $smoothBindingDir + $meshList[$i] + " >> " + $seqFile);	
+				system("echo 3.5 char " + $character + " viewer 4 " + " >> " + $seqFile);	
+				system("echo 4 test bml char " + $character + " ^<animation name=\"" + $motionName + "\"\/^>" + " >> " + $seqFile);					
 			}
 			else
+			{
 				confirmDialog -title "Hint" -message "Please select a binding xml file" -button "Ok" -defaultButton "Ok" -dismissString "Ok";
+				system("echo 0.2 char " + $character + " viewer 0 " + " >> " + $seqFile);
+				system("echo 0.3 test bml char " + $character + " ^<animation name=\"" + $motionName + "\"\/^>" + " >> " + $seqFile);				
+			}
 		}
 		else
-			$viewermode = " -viewermode=3";
+		{
+			system("echo 0.2 char " + $character + " viewer 0 " + " >> " + $seqFile);
+			system("echo 0.3 test bml char " + $character + " ^<animation name=\"" + $motionName + "\"\/^>" + " >> " + $seqFile);				
+		}			
 			
-		string $runCommand = "start " + $sbmBin + " -seqpath " + $scriptDir + " -seq " + "mayaSbmViewer.seq" + $viewermode;
-		system($runCommand);			
+		string $runCommand = "start " + $sbmBin + " -seqpath " + $scriptDir + " -seq " + "mayaSbmViewer.seq";
+		if ($noError)
+			system($runCommand);			
 	}
 	else
 	{
 		//	load motion
 		if ($motion != "")
 		{			
-			//	character name
-			string $character = $charName;
-			if ($character == "")
-			$character = "defaultCharacter";	
-
-			if ($skeleton != "")
-			{			
-				string $motionName = basename($motion, ".skm");	
+			if ($skeleton != "")		
 				system("echo 0 test bml char " + $character + " ^<animation name=\"" + $motionName + "\"\/^>" + " >> " + $seqFile);	
-			}
 			else
 				confirmDialog -title "Hint" -message "Please select a skeleton" -button "Ok" -defaultButton "Ok" -dismissString "Ok";
 		}
@@ -565,7 +604,18 @@ global proc sbmViewerGUI()
 					button -label "Reset Preference" -align "center" -command viewerPreferenceReset;
 					setParent viewerMainWin;	
 	
-		frameLayout -label "Viewer Option" -borderStyle etchedIn -collapsable false -collapse 0;	
+		frameLayout -label "Viewer Quick Test" -borderStyle etchedIn -collapsable true -collapse 1;
+			columnLayout -adjustableColumn true -rowSpacing 2 -columnOffset "both" 10;
+				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
+					textFieldGrp -label "SK Director: " -adjustableColumn 2 -columnAttach 1 "right" 5 skDir;				
+					button -label ".." -align "center" -command "fileBrowserDialog -m 0 -fc \"skFileBrowser\" -an \"Select\" -om \"Import\"";	
+					setParent ..;		
+				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
+					textFieldGrp -label "SKM Director: " -adjustableColumn 2 -columnAttach 1 "right" 5 skmDir;				
+					button -label ".." -align "center" -command "fileBrowserDialog -m 0 -fc \"skmFileBrowser\" -an \"Select\" -om \"Import\"";	
+					setParent viewerMainWin;							
+	
+		frameLayout -label "Viewer Option" -borderStyle etchedIn -collapsable true -collapse 0;	
 			columnLayout -adjustableColumn true;
 				text -label "Project List";
 				textScrollList -width 250 -height 50 -allowMultiSelection false -showIndexedItem 3 -selectCommand "updateAttr(0)" scrollListProject;
@@ -604,4 +654,8 @@ global proc sbmViewerGUI()
 VERSION HISTORY:
   0.1 - first version
   0.2 - supporting viewer preference, smooth binding
+  0.3 - add quick test mode. If sk and skm text field is filled up, this mode is activated
+  
+LIMIT:
+  - after sbm-fltk.exe is setup, user can only change the motion
 */
