@@ -26,8 +26,13 @@ global proc updateObjList()
 	string $objList[] = lsType("mesh");
 	int $i;
 	for ($i = 0; $i < size($objList); $i ++)
-		if ($objList[$i] != "<done>")
+	{
+		int $startPos = (size($objList[$i]) - 3);
+		int $endPos = size($objList[$i]);
+		string $suffixString = `substring $objList[$i] $startPos $endPos`;
+		if ($objList[$i] != "<done>" && $suffixString != "Orig")
 			textScrollList -e -append $objList[$i] scrollListObj;
+	}
 }
 
 global proc selectMesh()
