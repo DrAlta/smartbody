@@ -195,7 +195,7 @@ global proc skFileBrowser(string $fileName, string $fileType)
 global proc skmFileBrowser(string $fileName, string $fileType)
 {
 	string $curPref = getSelectedViewerPreference();
-	setAttr -type "string" ($curPref + ".MotionDir") $fileName
+	setAttr -type "string" ($curPref + ".MotionDir") $fileName;
 	setAttr -type "string" ($curPref + ".MotionName") "";	
 	updateViewerUI();
 }
