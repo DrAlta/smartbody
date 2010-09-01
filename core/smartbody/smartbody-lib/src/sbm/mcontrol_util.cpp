@@ -449,42 +449,33 @@ void mcuCBHandle::update( void )	{
 	char *seq_name = NULL;
 	active_seq_map.reset();
 
-//mark( "update BEGIN", 0, "x" );
-
 	while( seq_p = active_seq_map.next( & seq_name ) )	{
-		// the parent resource is associated with seq_name
-		CmdResource* cmdResource = resource_manager->getCmdResource(seq_name);
-		if (cmdResource)
-			resource_manager->addParent(cmdResource);
-//mark( "STARTING", 0, seq_name );
+			
 		char *cmd;
 		while( cmd = seq_p->pop( (float)time ) )	{
-
-//mark( "COMMAND", 0, cmd );
 			
+#if 0
+			// the parent resource is associated with seq_name
+			CmdResource* cmdResource = resource_manager->getCmdResource(seq_name);
+			if(cmdResource)	{
+				resource_manager->addParent(cmdResource);
+			}
+#endif
 			int err = execute( cmd );
-//mark( "EXECUTECOMMAND", 0, cmd );
 			if( err != CMD_SUCCESS )	{
 				printf( "mcuCBHandle::update ERR: execute FAILED: '%s'\n", cmd );
 			}
 			delete [] cmd;
 		}
-		// DONE: remove seq_p from active_seq_map if event_count()==0
-		// Issues:
-		//   * active_seq_map.remove(..) requires a char* key, but iteration provides a pointer
-		//        Optional argument to next()
-		//   * remove(..) resets the shared iterator
-		//        NO, it should decrement the iterator
 		if( seq_p->get_count() < 1 )	{
-//mark( "REMOVINGSEQ", 0, seq_name );
 			seq_p = active_seq_map.remove( seq_name );
 			delete seq_p;
 		}
-		if (cmdResource)
-		{
+#if 0
+		if (cmdResource)	{
 			resource_manager->removeParent();
-//mark( "REMOVINGRESOURCEPARENT", 0, "removeParent" );
 		}
+#endif
 	}
 
 	SbmPawn* pawn_p;
@@ -492,32 +483,28 @@ void mcuCBHandle::update( void )	{
 	pawn_map.reset();
 	while( pawn_p = pawn_map.next() )	{
 
-//mark( "PAWN", 0, pawn_p->name );
 		//char_p->scheduler_p->evaluate( time );
 		pawn_p->ct_tree_p->evaluate( time );
-//mark( "AFTEREVALUATE", 0, pawn_p->name );
 		pawn_p->ct_tree_p->applyBufferToAllSkeletons();
-//mark( "AFTERAPPLYBUFFER", 0, pawn_p->name );
 
 		char_p = character_map.lookup( pawn_p->name );
 		if( char_p != NULL ) {
+
 			//char_p->scheduler_p->apply();  // old controller API  See applyBufferToAllSkeletons() above
-//mark( "BEFORESCENEUPDATE", 0, char_p->name );
 			char_p->scene_p->update();
 			char_p->dMesh_p->update();
-//mark( "AFTERSCENEUPDATE", 0, char_p->name );
 
 			char_p->reset_viseme_channels();		// Temporary Hack for Solving feedback problem, this isn't necessary for non-facebonebone implementations
-			if (char_p->is_viseme_curve())			// For bone bus viseme in Curve Mode
+			if (char_p->is_viseme_curve())	{		// For bone bus viseme in Curve Mode
 				char_p->bonebus_viseme_update(time);	
+			}
 
 			if ( net_bone_updates && char_p->skeleton_p && char_p->bonebusCharacter ) {
 				NetworkSendSkeleton( char_p->bonebusCharacter, char_p->skeleton_p, &param_map );
-//mark( "AFTERNETWORKSEND", 0, char_p->name );
 
 				// what a lot of hoop jumping...
 				if ( net_world_offset_updates ) {
-//mark( "BEFOREWORLDOFFSETS", 0, char_p->name );
+
 					const SkJoint * joint = char_p->get_world_offset_joint();
 
 					const SkJointPos * pos = joint->const_pos();
@@ -527,7 +514,7 @@ void mcuCBHandle::update( void )	{
 
 					SkJoint::RotType rot_type = joint->rot_type();
 					if ( rot_type != SkJoint::TypeQuat ) {
-						//cerr << "ERROR: Unsupported world_offset rotation type: " << rot_type << " (Expected TypeQuat, "<<SkJoint::TypeQuat<<")"<<endl;
+						//strstr << "ERROR: Unsupported world_offset rotation type: " << rot_type << " (Expected TypeQuat, "<<SkJoint::TypeQuat<<")"<<endl;
 					}
 
 					// const_cast because the SrQuat does validation (no const version of value())
@@ -535,12 +522,10 @@ void mcuCBHandle::update( void )	{
 
 					char_p->bonebusCharacter->SetPosition( x, y, z, time );
 					char_p->bonebusCharacter->SetRotation( (float)q.w, (float)q.x, (float)q.y, (float)q.z, time );
-//mark( "AFTERWORLDOFFSETS", 0, char_p->name );
 				}
 			}
 
 			char_p->eye_blink_update( this->time );
-//mark( "AFTEBLINKUPDATE", 0, char_p->name );
 
 		}  // end of char_p processing
 	} // end of loop
@@ -602,7 +587,7 @@ int mcuCBHandle::execute_seq( srCmdSeq* seq ) {
 int mcuCBHandle::execute_seq( srCmdSeq* seq, const char* seq_id ) {
 
 	if ( active_seq_map.insert( seq_id, seq ) != CMD_SUCCESS ) {
-		cerr << "ERROR: mcuCBHandle::execute_seq(..): Failed to insert srCmdSeq \"" << seq_id << "\" into active_seq_map." << endl;
+		LOG("ERROR: mcuCBHandle::execute_seq(..): Failed to insert srCmdSeq \"%s\"into active_seq_map.", seq_id);
 		return CMD_FAILURE;
 	}
 
@@ -622,7 +607,7 @@ int mcuCBHandle::execute_seq_chain( const vector<string>& seq_names, const char*
 	FILE* first_file_p = open_sequence_file( first_seq_name.c_str() );
 	if( first_file_p == NULL ) {
 		if( error_prefix )
-			cerr << error_prefix << "Cannot find sequence \"" << first_seq_name << "\". Aborting seq-chain." << endl;
+			LOG("%s Cannot find sequence \"%s\". Aborting seq-chain.", error_prefix, first_seq_name.c_str());
 		return CMD_FAILURE;
 	}
 
@@ -631,7 +616,7 @@ int mcuCBHandle::execute_seq_chain( const vector<string>& seq_names, const char*
 	fclose( first_file_p );
 	if( parse_result != CMD_SUCCESS ) {
 		if( error_prefix )
-			cerr << error_prefix << "Unable to parse sequence \"" << first_seq_name << "\"." << endl;
+			LOG("%s Unable to parse sequence\"%s\".", error_prefix, first_seq_name.c_str());
 
 		delete seq_p;
 		seq_p = NULL;
@@ -647,7 +632,7 @@ int mcuCBHandle::execute_seq_chain( const vector<string>& seq_names, const char*
 		FILE* file = open_sequence_file( next_seq.c_str() );
 		if( file == NULL ) {
 			if( error_prefix )
-				cerr << error_prefix << "Cannot find sequence \"" << next_seq << "\". Aborting seq-chain." << endl;
+				LOG("%s Cannot find sequence \"%s\". Aborting seq-chain.", error_prefix, next_seq);
 			return CMD_FAILURE;
 		} else {
 			fclose( file );
@@ -671,7 +656,7 @@ int mcuCBHandle::execute_seq_chain( const vector<string>& seq_names, const char*
 		int result = seq_p->insert( time, oss.str().c_str() );
 		if( result != CMD_SUCCESS ) {
 			if( error_prefix )
-				cerr << error_prefix << "Failed to insert seq-chain command at time "<<time<<endl;
+				LOG("%s Failed to insert seq-chain command at time %f", error_prefix, time);
 
 			delete seq_p;
 			seq_p = NULL;
@@ -760,7 +745,9 @@ int mcuCBHandle::vhmsg_send( const char *op, const char* message ) {
 	if( vhmsg_enabled ) {
 		int err = vhmsg::ttu_notify2( op, message );
 		if( err != vhmsg::TTU_SUCCESS )	{
-			std::cerr << "ERROR: mcuCBHandle::vhmsg_send(..): ttu_notify2 failed on message \"" << op << '  ' << message << "\"." << std::endl;
+			std::stringstream strstr;
+			strstr << "ERROR: mcuCBHandle::vhmsg_send(..): ttu_notify2 failed on message \"" << op << '  ' << message << "\"." << std::endl;
+			LOG(strstr.str().c_str());
 		}
 	} else {
 		// append to command queue if header token has callback function
@@ -794,7 +781,9 @@ int mcuCBHandle::vhmsg_send( const char* message ) {
 	if( vhmsg_enabled ) {
 		int err = vhmsg::ttu_notify1( message );
 		if( err != vhmsg::TTU_SUCCESS )	{
-			std::cerr << "ERROR: mcuCBHandle::vhmsg_send(..): ttu_notify1 failed on message \"" << message << "\"." << std::endl;
+			std::stringstream strstr;
+			strstr << "ERROR: mcuCBHandle::vhmsg_send(..): ttu_notify1 failed on message \"" << message << "\"." << std::endl;
+			LOG(strstr.str().c_str());
 		}
 	} else {
 		// append to command queue if header token has callback function
@@ -832,27 +821,27 @@ MeController* mcuCBHandle::lookup_ctrl( const string& ctrl_name, const char* pri
 		string::size_type index = ctrl_name.find( "/" );
 		if( index == string::npos ) {
 			if( print_error_prefix )
-				cerr << print_error_prefix<<"Invalid controller name \""<<ctrl_name<<"\".  Missing '/' after character name." << endl;
+				LOG("%s Invalid controller name \"%s\".  Missing '/' after character name.", print_error_prefix, ctrl_name.c_str());
 			return NULL;
 		}
 		const string char_name( ctrl_name, 1, index-1 );
 		if( char_name.length() == 0 ) {
 			if( print_error_prefix )
-				cerr <<print_error_prefix<<"Invalid controller name \""<<ctrl_name<<"\".  Empty character name." << endl;
+				LOG("%s Invalid controller name \"%s\".  Empty character name.", print_error_prefix, ctrl_name);
 			return NULL;
 		}
 
 		SbmCharacter* char_p = character_map.lookup( char_name.c_str() );
 		if( char_p == NULL ) {
 			if( print_error_prefix )
-				cerr <<print_error_prefix<<"Unknown character \""<<char_name<<"\" in controller reference \""<<ctrl_name<<"\"." << endl;
+				LOG("%s Unknown character \"%s\" in controller reference \"%s\"", print_error_prefix, char_name.c_str(), ctrl_name.c_str());
 			return NULL;
 		}
 
 		++index; // character after slash
 		if( index == ctrl_name.length() ) {  // slash was the last character
 			if( print_error_prefix )
-				cerr <<print_error_prefix<<"Invalid controller name \""<<ctrl_name<<"\".  Missing controller name after character." << endl;
+				LOG("%s Invalid controller name \"%s\". Missing controller name after character.", print_error_prefix, ctrl_name.c_str());
 			return NULL;
 		}
 		const string ctrl_subname( ctrl_name, index );
@@ -871,14 +860,19 @@ MeController* mcuCBHandle::lookup_ctrl( const string& ctrl_name, const char* pri
 			// TODO: Character specific hash map?
 
 			if( print_error_prefix )
-				cerr <<print_error_prefix<<"Unknown controller \""<<ctrl_subname<<"\" relative to character \""<<char_name<<"\"." << endl;
+			{
+				std::stringstream strstr;
+				strstr <<print_error_prefix<<"Unknown controller \""<<ctrl_subname<<"\" relative to character \""<<char_name<<"\".";
+				LOG(strstr.str().c_str());
+			}
+				
 			return NULL;
 		}
 	} else {
 		ctrl_p = controller_map.lookup( ctrl_name.c_str() );
 		if( ctrl_p == NULL ) {
 			if( print_error_prefix )
-				cerr <<print_error_prefix<<"Unknown controller \""<<ctrl_name<<"\"." << endl;
+				LOG("%s Unknown controller %s.", print_error_prefix, ctrl_name.c_str());
 			return NULL;
 		}
 	}
