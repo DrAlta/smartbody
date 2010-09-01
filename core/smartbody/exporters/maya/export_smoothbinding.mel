@@ -11,14 +11,12 @@ global proc initializePlugin()
 
 global proc objFileBrowser(string $fileName, string $fileType)
 {
-	string $dirName = dirname($fileName);
-	textFieldGrp -e -text $dirName objDir;
+	textFieldGrp -e -text $fileName objDir;
 }
 
 global proc openColladaFileBrowser(string $fileName, string $fileType)
 {
-	string $dirName = dirname($fileName);
-	textFieldGrp -e -text $dirName openColladaDir;
+	textFieldGrp -e -text $fileName openColladaDir;
 }
 
 global proc updateObjList()
@@ -27,10 +25,7 @@ global proc updateObjList()
 	int $i;
 	for ($i = 0; $i < size($objList); $i ++)
 	{
-		int $startPos = (size($objList[$i]) - 3);
-		int $endPos = size($objList[$i]);
-		string $suffixString = `substring $objList[$i] $startPos $endPos`;
-		if ($objList[$i] != "<done>" && $suffixString != "Orig")
+		if ($objList[$i] != "<done>")
 			textScrollList -e -append $objList[$i] scrollListObj;
 	}
 }
@@ -106,7 +101,7 @@ global proc smoothbindingExportGUI()
 				button -label "Clear" -align "center" -command "textScrollList -e -deselectAll scrollListObj";	
 				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
 					textFieldGrp -label "Output Director: " -adjustableColumn 2 -columnAttach 1 "right" 5 objDir;				
-					button -label ".." -align "center" -command "fileBrowserDialog -m 1 -fc \"objFileBrowser\" -an \"Select\" -om \"SaveAs\"";	
+					button -label ".." -align "center" -command "fileBrowserDialog -m 4 -fc \"objFileBrowser\" -an \"Select\" -om \"SaveAs\"";	
 					setParent ..;					
 				button -label "Obj Export" -command objExportFunc;				
 					setParent smoothbindingMainWin;				
@@ -115,7 +110,7 @@ global proc smoothbindingExportGUI()
 			columnLayout -adjustableColumn true -rowSpacing 5 -columnOffset "both" 10;
 				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
 					textFieldGrp -label "Output Director: " -adjustableColumn 2 -columnAttach 1 "right" 5 openColladaDir;			
-					button -label ".." -align "center" -command "fileBrowserDialog -m 1 -fc \"openColladaFileBrowser\" -an \"Select\" -om \"SaveAs\"";	
+					button -label ".." -align "center" -command "fileBrowserDialog -m 4 -fc \"openColladaFileBrowser\" -an \"Select\" -om \"SaveAs\"";	
 					setParent ..;					
 				button -label "Open Collada Export" -command openColladaExportFunc;
 				setParent smoothbindingMainWin;
