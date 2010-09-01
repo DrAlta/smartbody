@@ -464,11 +464,6 @@ global proc viewerRunButton()
 	string $projectRootDir = `getAttr ($curPref + ".ProjectRootDir")`;
 	string $sbmBin = `getAttr ($curPref + ".SbmBin")`;
 	
-	string $character = $charName;
-	if ($character == "")
-		$character = "defaultCharacter";	
-	string $motionName = basename($motion, ".skm");		
-	string $skeletonName = basename($skeleton, "");		
 	
 	// construct some path
 	string $skeletonDir = $projectRootDir + "/" + $projectName + "/Exports-Smartbody/" + $charName + "/";
@@ -483,15 +478,20 @@ global proc viewerRunButton()
 	if ($testSkeleton != "" && $testMotion != "")
 	{
 		print "Quick Test Mode!\n";
-		$character = "defaultCharacter";
-		$motionName = basename($testMotion, ".skm");	
-		$skeletonName = basename($testSkeleton, "");	
+		$character = "";
+		$motion = $testMotion;
+		$skeleton = $testSkeleton;	
 		$bindingInfo = "";	
 		$mesh = "";		
 		$skeletonDir = dirname($testSkeleton);
 		$motionDir = dirname($testMotion);
 	}	
 	
+	string $character = $charName;
+	if ($character == "")
+		$character = "defaultCharacter";	
+	string $motionName = basename($motion, ".skm");		
+	string $skeletonName = basename($skeleton, "");			
 
 	//------- Process begins here
 	int $foundProcess = detectProcess($binName);
