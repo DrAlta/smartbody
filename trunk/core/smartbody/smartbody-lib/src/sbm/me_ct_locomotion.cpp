@@ -551,7 +551,7 @@ void MeCtLocomotion::blend_base_joint(MeFrameData& frame, float space_time, int 
 	SrBuffer<float>& buffer = frame.buffer();
 	float standing_height = get_buffer_base_height(buffer);
 
-	r_blended_base_height = r_blended_base_height * (navigator.standing_factor) + standing_height * (1.0-navigator.standing_factor);
+	r_blended_base_height = r_blended_base_height * (navigator.standing_factor) + standing_height * (1.0f-navigator.standing_factor);
 
 	//printf("\nHeight: %f", r_blended_base_height);
 }
@@ -894,7 +894,7 @@ SrVec MeCtLocomotion::get_limb_pos(MeCtLocomotionLimb* limb)
 	SrVec pos;
 	SkJoint* tjoint = NULL;
 	SkJoint* tjoint_base = NULL;
-	float* ppos;
+	//float* ppos;
 	SkSkeleton* skeleton = limb->walking_skeleton;
 
 	/*tjoint = skeleton->search_joint(base_name);
@@ -1032,7 +1032,7 @@ void MeCtLocomotion::print_info()
 	}
 
 	printf("\nLimbs:");
-	printf("\  Total number: %d", limb_list.size());
+	printf("\n  Total number: %d", limb_list.size());
 	MeCtLocomotionLimb* limb;
 	for(int i = 0; i < limb_list.size(); ++i)
 	{
