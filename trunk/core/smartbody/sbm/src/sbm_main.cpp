@@ -259,7 +259,7 @@ int mcu_reset_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 int mcu_quit_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 
 	mcu_p->loop = false;
-	ResourceManager::cleanup();
+
 	return( CMD_SUCCESS );
 }
 
