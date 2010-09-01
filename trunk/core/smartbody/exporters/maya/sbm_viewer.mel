@@ -186,8 +186,7 @@ global proc viewerPreferenceDelete()
 global proc skFileBrowser(string $fileName, string $fileType)
 {
 	string $curPref = getSelectedViewerPreference();
-	string $dirName = dirname($fileName);
-	setAttr -type "string" ($curPref + ".SkeletonDir") $dirName;
+	setAttr -type "string" ($curPref + ".SkeletonDir") $fileName;
 	setAttr -type "string" ($curPref + ".SkeletonName") "";
 	updateViewerUI();
 }
@@ -196,8 +195,7 @@ global proc skFileBrowser(string $fileName, string $fileType)
 global proc skmFileBrowser(string $fileName, string $fileType)
 {
 	string $curPref = getSelectedViewerPreference();
-	string $dirName = dirname($fileName);
-	setAttr -type "string" ($curPref + ".MotionDir") $dirName;
+	setAttr -type "string" ($curPref + ".MotionDir") $fileName
 	setAttr -type "string" ($curPref + ".MotionName") "";	
 	updateViewerUI();
 }
@@ -206,8 +204,7 @@ global proc skmFileBrowser(string $fileName, string $fileType)
 global proc bindingFileBrowser(string $fileName, string $fileType)
 {
 	string $curPref = getSelectedViewerPreference();
-	string $dirName = dirname($fileName);
-	setAttr -type "string" ($curPref + ".BindingDir") $dirName;
+	setAttr -type "string" ($curPref + ".BindingDir") $fileName;
 	setAttr -type "string" ($curPref + ".BindingName") "";	
 	setAttr -type "string" ($curPref + ".MeshName") "";		
 	updateViewerUI();
@@ -271,6 +268,12 @@ global proc updateObjAttr()
 	setAttr -type "string"($curPref + ".MeshName") $meshAttr;
 }
 
+global proc updateSbmBinAttr()
+{
+	string $curPref = getSelectedViewerPreference();
+	setAttr -type "string"($curPref + ".SbmBin") `textFieldGrp -q -text smartbodyBin`;		
+}
+
 global proc selectAllMesh()
 {
 	string $curPref = getSelectedViewerPreference();
@@ -302,7 +305,7 @@ global proc	updateViewerUI()
 		if (!startsWith( $viewer, "Viewer_" ))
 			continue;
 
-		string $viewerSubstring = substituteAllString( $viewer, "Viewer_", "" );
+		string $viewerSubstring = substituteAllString($viewer, "Viewer_", "");
 		int $found = 0;
 		for ($pref in $prefList)
 		{
@@ -388,7 +391,9 @@ global proc	updateViewerUI()
 			tokenize $meshName " " $meshList;
 			for ($i = 0; $i < size($meshList); $i = $i + 1)
 				textScrollList -e -selectItem $meshList[$i] scrollListMesh;		
-		}			
+		}
+		// by default select all mesh
+		selectAllMesh();
 			
 		// advanced setting
 		textFieldGrp -e -text (`getAttr ($curPref + ".SbmBin")`) smartbodyBin;
@@ -437,84 +442,89 @@ global proc viewerRunButton()
 	if ($fileExistFlag == 1)
 		sysFile -delete $seqFile;
 		
-	if (!$foundProcess)
-	{
-		// default setting
-		system("echo " + "# " + $seqFile + " >> " + $seqFile);
-		
-		// viewer and camera setting
-		system("echo 0.2 viewer open   800 800  50 50" + " >> " + $seqFile);	
-		system("echo 0.2 camera eye    0 166 185" + " >> " + $seqFile);	
-		system("echo 0.2 camera center 0 92 0" + " >> " + $seqFile);		
-		
-		//	load skeleton
-		if ($skeleton != "")
-		{
-			system("echo 0 path ME " + $skeletonDir  + " >> " + $seqFile);
-			system("echo 0.1 char " + $character + " init " + $skeletonName + " >> " + $seqFile);
-			system("echo 0.1 set character " +  $character + " world_offset x 0 y 102 h 0" + " >> " + $seqFile);				
-		}
-		else
-		{
-			confirmDialog -title "Hint" -message "Please select a skeleton" -button "Ok" -defaultButton "Ok" -dismissString "Ok";
-			$noError = 0;
-		}
-			
-		//	load motion
-		if ($motion != "")
-		{
-			system("echo 0 path ME " + $motionDir  + " >> " + $seqFile);
-			system("echo 0 load motions -R " + $motionDir  + " >> " + $seqFile);	
-		}
-		else
-		{
-			confirmDialog -title "Hint" -message "Please select a motion" -button "Ok" -defaultButton "Ok" -dismissString "Ok";	
-			$noError = 0;
-		}			
-		
-		// check if need to be run under smooth binding mode
-		string $meshList[];
-		tokenize $mesh " " $meshList;
-		int $i;
-		if ($bindingInfo != "")
-		{
-			system("echo 0.2 char " + $character + " smoothbindweight " + $smoothBindingDir + "/" + $bindingInfo + " >> " + $seqFile);
-			if ($mesh != "")
-			{
-				for ($i = 0; $i < size($meshList); $i = $i + 1)
-					system("echo 0.2 char " + $character + " smoothbindmesh " + $smoothBindingDir + "/" + $meshList[$i] + " >> " + $seqFile);	
-				system("echo 3.5 char " + $character + " viewer 4 " + " >> " + $seqFile);	
-				system("echo 4 test bml char " + $character + " ^<animation name=\"" + $motionName + "\"\/^>" + " >> " + $seqFile);					
-			}
-			else
-			{
-				confirmDialog -title "Hint" -message "Please select a binding xml file" -button "Ok" -defaultButton "Ok" -dismissString "Ok";
-				system("echo 0.2 char " + $character + " viewer 0 " + " >> " + $seqFile);
-				system("echo 0.3 test bml char " + $character + " ^<animation name=\"" + $motionName + "\"\/^>" + " >> " + $seqFile);				
-			}
-		}
-		else
-		{
-			system("echo 0.2 char " + $character + " viewer 0 " + " >> " + $seqFile);
-			system("echo 0.3 test bml char " + $character + " ^<animation name=\"" + $motionName + "\"\/^>" + " >> " + $seqFile);				
-		}			
-			
-		string $runCommand = "start " + $sbmBin + " -seqpath " + $scriptDir + " -seq " + "mayaSbmViewer.seq";
-		if ($noError)
-			system($runCommand);			
-	}
+	if (!`filetest -x $sbmBin`)
+		print ("Sbm Run Time Problem, Please Check Advanced Setting!\n");
 	else
 	{
-		//	load motion
-		if ($motion != "")
-		{			
-			if ($skeleton != "")		
-				system("echo 0 test bml char " + $character + " ^<animation name=\"" + $motionName + "\"\/^>" + " >> " + $seqFile);	
+		if (!$foundProcess)
+		{
+			// default setting
+			system("echo " + "# " + $seqFile + " >> " + $seqFile);
+			
+			// viewer and camera setting
+			system("echo 0.2 viewer open   800 800  50 50" + " >> " + $seqFile);	
+			system("echo 0.2 camera eye    0 166 185" + " >> " + $seqFile);	
+			system("echo 0.2 camera center 0 92 0" + " >> " + $seqFile);		
+			
+			//	load skeleton
+			if ($skeleton != "")
+			{
+				system("echo 0 path ME " + $skeletonDir  + " >> " + $seqFile);
+				system("echo 0.1 char " + $character + " init " + $skeletonName + " >> " + $seqFile);
+				system("echo 0.1 set character " +  $character + " world_offset x 0 y 102 h 0" + " >> " + $seqFile);				
+			}
 			else
+			{
 				confirmDialog -title "Hint" -message "Please select a skeleton" -button "Ok" -defaultButton "Ok" -dismissString "Ok";
+				$noError = 0;
+			}
+				
+			//	load motion
+			if ($motion != "")
+			{
+				system("echo 0 path ME " + $motionDir  + " >> " + $seqFile);
+				system("echo 0 load motions -R " + $motionDir  + " >> " + $seqFile);	
+			}
+			else
+			{
+				confirmDialog -title "Hint" -message "Please select a motion" -button "Ok" -defaultButton "Ok" -dismissString "Ok";	
+				$noError = 0;
+			}			
+			
+			// check if need to be run under smooth binding mode
+			string $meshList[];
+			tokenize $mesh " " $meshList;
+			int $i;
+			if ($bindingInfo != "")
+			{
+				system("echo 0.2 char " + $character + " smoothbindweight " + $smoothBindingDir + "/" + $bindingInfo + " >> " + $seqFile);
+				if ($mesh != "")
+				{
+					for ($i = 0; $i < size($meshList); $i = $i + 1)
+						system("echo 0.2 char " + $character + " smoothbindmesh " + $smoothBindingDir + "/" + $meshList[$i] + " >> " + $seqFile);	
+					system("echo 3.5 char " + $character + " viewer 4 " + " >> " + $seqFile);	
+					system("echo 4 test bml char " + $character + " ^<animation name=\"" + $motionName + "\"\/^>" + " >> " + $seqFile);					
+				}
+				else
+				{
+					confirmDialog -title "Hint" -message "Please select a binding xml file" -button "Ok" -defaultButton "Ok" -dismissString "Ok";
+					system("echo 0.2 char " + $character + " viewer 0 " + " >> " + $seqFile);
+					system("echo 0.3 test bml char " + $character + " ^<animation name=\"" + $motionName + "\"\/^>" + " >> " + $seqFile);				
+				}
+			}
+			else
+			{
+				system("echo 0.2 char " + $character + " viewer 0 " + " >> " + $seqFile);
+				system("echo 0.3 test bml char " + $character + " ^<animation name=\"" + $motionName + "\"\/^>" + " >> " + $seqFile);				
+			}			
+				
+			string $runCommand = "start " + $sbmBin + " -seqpath " + $scriptDir + " -seq " + "mayaSbmViewer.seq";
+			if ($noError)
+				system($runCommand);		
 		}
-		string $runCommand = $binDir + "/elsender.exe -m " + "\"sbm seq mayaSbmViewer.seq\"";
-		system($runCommand); 
+		else
+		{
+			//	load motion
+			if ($motion != "")
+			{			
+				if ($skeleton != "")		
+					system("echo 0 test bml char " + $character + " ^<animation name=\"" + $motionName + "\"\/^>" + " >> " + $seqFile);	
+				else
+					confirmDialog -title "Hint" -message "Please select a skeleton" -button "Ok" -defaultButton "Ok" -dismissString "Ok";
+			}
+			string $runCommand = $binDir + "/elsender.exe -m " + "\"sbm seq mayaSbmViewer.seq\"";
+			system($runCommand); 
+		}
 	}
 }
 
@@ -546,21 +556,21 @@ global proc sbmViewerGUI()
 			columnLayout -adjustableColumn true;
 				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
 					textFieldGrp -label "SK Directory: " -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand updateSkDirAttr skDir;				
-					button -label ".." -align "center" -command "fileBrowserDialog -m 0 -fc \"skFileBrowser\" -an \"Select\" -om \"SaveAs\"";	
+					button -label ".." -align "center" -command "fileBrowserDialog -m 4 -fc \"skFileBrowser\" -an \"Select\" -om \"SaveAs\"";	
 					setParent ..;		
 				text -label "Skeleton List";
 				textScrollList -width 250 -height 50 -allowMultiSelection false -showIndexedItem 3 -selectCommand updateSkAttr scrollListSkeleton;
 				
 				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
 					textFieldGrp -label "SKM Directory: " -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand updateSkmDirAttr skmDir;				
-					button -label ".." -align "center" -command "fileBrowserDialog -m 0 -fc \"skmFileBrowser\" -an \"Select\" -om \"SaveAs\"";	
+					button -label ".." -align "center" -command "fileBrowserDialog -m 4 -fc \"skmFileBrowser\" -an \"Select\" -om \"SaveAs\"";	
 					setParent ..;				
 				text -label "Motion List";
 				textScrollList -width 250 -height 100 -allowMultiSelection false -showIndexedItem 3 -selectCommand updateSkmAttr scrollListMotion;
 
 				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
 					textFieldGrp -label "Binding Directory: " -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand updateBindingDirAttr bindingDir;				
-					button -label ".." -align "center" -command "fileBrowserDialog -m 0 -fc \"bindingFileBrowser\" -an \"Select\" -om \"SaveAs\"";	
+					button -label ".." -align "center" -command "fileBrowserDialog -m 4 -fc \"bindingFileBrowser\" -an \"Select\" -om \"SaveAs\"";	
 					setParent ..;				
 				text -label "Binding Info List";
 				textScrollList -width 250 -height 30 -allowMultiSelection false -showIndexedItem 3 -selectCommand updateOpenColladaAttr scrollListBinding;				
