@@ -18,7 +18,8 @@
 //  CONTRIBUTORS:
 //      Yuyu Xu, USC ICT
 
-string $sbmViewerVersion = "0.3";
+string $sbmViewerVersion = "0.5";
+
 
 // get current viewer preference
 global proc string getSelectedViewerPreference()
@@ -59,51 +60,50 @@ global proc viewerPreferenceCheck()
 			continue;
 		
 		// Create New pref Instance if not exist!
-		if ( !`objExists $pref` )
+		if (!`objExists $pref`)
 		{
 			group -empty -name $pref -parent SmartbodyViewerOptions;	
 		}
 
 		// advanced setting attributes
-		if ( !`objExists ( $pref + ".ProjectRootDir" )` )
-		{
-			addAttr -longName "ProjectRootDir" -dataType "string" $pref;
-			setAttr -type "string" ( $pref + ".ProjectRootDir" ) "C:/Projects";
-		}
-
-		if ( !`objExists ( $pref + ".SbmBin" )` )
+		if (!`objExists($pref + ".SbmBin")`)
 		{
 			addAttr -longName "SbmBin" -dataType "string" $pref;
-			setAttr -type "string" ( $pref + ".SbmBin" ) "C:/Projects/Pando/scripts/SmartBodyRunTime/bin/sbm-fltk.exe";
+			setAttr -type "string" ($pref + ".SbmBin") "C:/Projects/Pando/scripts/SmartBodyRunTime/bin/sbm-fltk.exe";
 		}		
 		
 		// viewer option attributes
-		if ( !`objExists ( $pref + ".ProjectName" )` )
+		if (!`objExists($pref + ".SkeletonDir")`)
 		{
-			addAttr -longName "ProjectName" -dataType "string" $pref;
-			setAttr -type "string" ( $pref + ".ProjectName" ) "";
+			addAttr -longName "SkeletonDir" -dataType "string" $pref;
+			setAttr -type "string" ( $pref + ".SkeletonDir" ) "";
 		}
-		if ( !`objExists ( $pref + ".CharacterName" )` )
+		if (!`objExists($pref + ".MotionDir")`)
 		{
-			addAttr -longName "CharacterName" -dataType "string" $pref;
-			setAttr -type "string" ( $pref + ".CharacterName" ) "";
+			addAttr -longName "MotionDir" -dataType "string" $pref;
+			setAttr -type "string" ( $pref + ".MotionDir" ) "";
 		}
-		if ( !`objExists ( $pref + ".SkeletonName" )` )
+		if (!`objExists($pref + ".BindingDir")`)
+		{
+			addAttr -longName "BindingDir" -dataType "string" $pref;
+			setAttr -type "string" ( $pref + ".BindingDir" ) "";
+		}		
+		if (!`objExists($pref + ".SkeletonName")`)
 		{
 			addAttr -longName "SkeletonName" -dataType "string" $pref;
 			setAttr -type "string" ( $pref + ".SkeletonName" ) "";
 		}
-		if ( !`objExists ( $pref + ".MotionName" )` )
+		if (!`objExists($pref + ".MotionName")`)
 		{
 			addAttr -longName "MotionName" -dataType "string" $pref;
 			setAttr -type "string" ( $pref + ".MotionName" ) "";
 		}			
-		if ( !`objExists ( $pref + ".MeshName" )` )
+		if (!`objExists($pref + ".MeshName")`)
 		{
 			addAttr -longName "MeshName" -dataType "string" $pref;
 			setAttr -type "string" ( $pref + ".MeshName" ) "";
 		}	
-		if ( !`objExists ( $pref + ".BindingName" )` )
+		if (!`objExists($pref + ".BindingName")`)
 		{
 			addAttr -longName "BindingName" -dataType "string" $pref;
 			setAttr -type "string" ( $pref + ".BindingName" ) "";
@@ -129,7 +129,7 @@ global proc viewerPreferenceCreate()
 		select -hi SmartbodyViewerOptions;
 		string $prefList[] = `ls -sl`;		
 		viewerPreferenceCheck();
-		updateViewerUI(7);
+		updateViewerUI();
 	}
 }
 
@@ -161,14 +161,15 @@ global proc viewerPreferenceRename()
 global proc viewerPreferenceReset()
 {
 	string $curPref = getSelectedViewerPreference();
-	setAttr -type "string"($curPref + ".ProjectName") "";
-	setAttr -type "string"($curPref + ".CharacterName") "";
+	setAttr -type "string"($curPref + ".SkeletonDir") "";
+	setAttr -type "string"($curPref + ".MotionDir") "";
+	setAttr -type "string"($curPref + ".BindingDir") "";	
 	setAttr -type "string"($curPref + ".SkeletonName") "";
 	setAttr -type "string"($curPref + ".MotionName") "";
 	setAttr -type "string"($curPref + ".MeshName") "";
 	setAttr -type "string"($curPref + ".BindingName") "";
 	
-	updateViewerUI(7);
+	updateViewerUI();
 }
 
 // delete current preference
@@ -178,103 +179,117 @@ global proc viewerPreferenceDelete()
 	string $curPref = getSelectedViewerPreference();	
 	textScrollList -e -removeItem $selPref[0] scrollListPreference;
 	delete $curPref;
-	updateViewerUI(7);
+	updateViewerUI();
 }
 
 // update sk text field
 global proc skFileBrowser(string $fileName, string $fileType)
 {
-	textFieldGrp -e -text $fileName skDir;
+	string $curPref = getSelectedViewerPreference();
+	string $dirName = dirname($fileName);
+	setAttr -type "string" ($curPref + ".SkeletonDir") $dirName;
+	setAttr -type "string" ($curPref + ".SkeletonName") "";
+	updateViewerUI();
 }
 
 // update skm text field
 global proc skmFileBrowser(string $fileName, string $fileType)
 {
-	textFieldGrp -e -text $fileName skmDir;
+	string $curPref = getSelectedViewerPreference();
+	string $dirName = dirname($fileName);
+	setAttr -type "string" ($curPref + ".MotionDir") $dirName;
+	setAttr -type "string" ($curPref + ".MotionName") "";	
+	updateViewerUI();
 }
 
-// update the attribute according to input index
-global proc updateAttr(int $index)
+// update binding text field
+global proc bindingFileBrowser(string $fileName, string $fileType)
 {
 	string $curPref = getSelectedViewerPreference();
-	if ($index == 0)	// project attr
-	{
-		string $selected[] = `textScrollList -q -selectItem scrollListProject`;	
-		setAttr -type "string"($curPref + ".ProjectName") $selected[0];
-		setAttr -type "string"($curPref + ".CharacterName") "";
-		setAttr -type "string"($curPref + ".SkeletonName") "";
-		setAttr -type "string"($curPref + ".MotionName") "";
-		setAttr -type "string"($curPref + ".MeshName") "";
-		setAttr -type "string"($curPref + ".BindingName") "";
-		updateViewerUI(0);	
-	}
-	else if ($index == 1)	// character attr
-	{
-		string $selected[] = `textScrollList -q -selectItem scrollListCharacter`;		
-		setAttr -type "string"($curPref + ".CharacterName") $selected[0];
-		setAttr -type "string"($curPref + ".SkeletonName") "";
-		setAttr -type "string"($curPref + ".MotionName") "";
-		setAttr -type "string"($curPref + ".MeshName") "";
-		setAttr -type "string"($curPref + ".BindingName") "";
-		updateViewerUI(1);		
-	}
-	else if ($index == 2)	// skeleton attr
-	{
-		string $selected[] = `textScrollList -q -selectItem scrollListSkeleton`;		
-		setAttr -type "string"($curPref + ".SkeletonName") $selected[0];	
-		updateViewerUI(2);	
-	}
-	else if ($index == 3)	// motion attr
-	{
-		string $selected[] = `textScrollList -q -selectItem scrollListMotion`;		
-		setAttr -type "string"($curPref + ".MotionName") $selected[0];
-		updateViewerUI(3);	
-	}
-	else if ($index == 4)	// binding attr
-	{
-		string $selected[] = `textScrollList -q -selectItem scrollListBinding`;		
-		setAttr -type "string"($curPref + ".BindingName") $selected[0];
-		updateViewerUI(4);	
-	}
-	else if ($index == 5)	// mesh attr
-	{
-		string $selected[] = `textScrollList -q -selectItem scrollListMesh`;	
-		int $i;
-		string $meshAttr;
-		for ($i = 0; $i < size($selected); $i = $i + 1)
-			$meshAttr = $meshAttr + " " + $selected[$i];
-		setAttr -type "string"($curPref + ".MeshName") $meshAttr;
-		updateViewerUI(5);	
-	}
-	else if ($index == 6)	//advanced setting
-	{
-		string $projectRoot = `textFieldGrp -q -text projectRoot`;
-		string $sbmBin = `textFieldGrp -q -text smartbodyBin`;
-	
-		if ($curPref != "Viewer_")
-		{
-			// set attribute
-			setAttr -type "string" ($curPref + ".ProjectRootDir") $projectRoot;
-			setAttr -type "string" ($curPref + ".SbmBin") $sbmBin;
-			setAttr -type "string" ($curPref + ".ProjectName") "";
-			setAttr -type "string" ($curPref + ".CharacterName") "";
-			setAttr -type "string" ($curPref + ".SkeletonName") "";
-			setAttr -type "string" ($curPref + ".MotionName") "";
-			setAttr -type "string"($curPref + ".MeshName") "";
-			setAttr -type "string"($curPref + ".BindingName") "";		
-		}
-		else
-			print ("Warning: No Preference is selected!");		
-			
-		updateViewerUI(7);		
-	}
-	else
-		updateViewerUI(7);	
-	
+	string $dirName = dirname($fileName);
+	setAttr -type "string" ($curPref + ".BindingDir") $dirName;
+	setAttr -type "string" ($curPref + ".BindingName") "";	
+	setAttr -type "string" ($curPref + ".MeshName") "";		
+	updateViewerUI();
+}
+
+global proc updateSkDirAttr()
+{
+	string $curPref = getSelectedViewerPreference();
+	setAttr -type "string" ($curPref + ".SkeletonDir") `textFieldGrp -q -text skDir`;
+	setAttr -type "string" ($curPref + ".SkeletonName") "";	
+	updateViewerUI();	
+}
+
+global proc updateSkmDirAttr()
+{
+	string $curPref = getSelectedViewerPreference();
+	setAttr -type "string" ($curPref + ".MotionDir") `textFieldGrp -q -text skmDir`;
+	setAttr -type "string" ($curPref + ".MotionName") "";	
+	updateViewerUI();	
+}
+
+global proc updateBindingDirAttr()
+{
+	string $curPref = getSelectedViewerPreference();
+	setAttr -type "string" ($curPref + ".BindingDir") `textFieldGrp -q -text bindingDir`;
+	setAttr -type "string" ($curPref + ".BindingName") "";	
+	setAttr -type "string" ($curPref + ".MeshName") "";		
+	updateViewerUI();
+}
+
+// update scroll list attributes
+global proc updateSkAttr()
+{
+	string $curPref = getSelectedViewerPreference();
+	string $selected[] = `textScrollList -q -selectItem scrollListSkeleton`;		
+	setAttr -type "string"($curPref + ".SkeletonName") $selected[0];	
+}
+
+global proc updateSkmAttr()
+{
+	string $curPref = getSelectedViewerPreference();
+	string $selected[] = `textScrollList -q -selectItem scrollListMotion`;		
+	setAttr -type "string"($curPref + ".MotionName") $selected[0];
+}
+
+global proc updateOpenColladaAttr()
+{
+	string $curPref = getSelectedViewerPreference();
+	string $selected[] = `textScrollList -q -selectItem scrollListBinding`;		
+	setAttr -type "string"($curPref + ".BindingName") $selected[0];
+}
+
+global proc updateObjAttr()
+{
+	string $curPref = getSelectedViewerPreference();
+	string $selected[] = `textScrollList -q -selectItem scrollListMesh`;	
+	int $i;
+	string $meshAttr;
+	for ($i = 0; $i < size($selected); $i = $i + 1)
+		$meshAttr = $meshAttr + " " + $selected[$i];
+	setAttr -type "string"($curPref + ".MeshName") $meshAttr;
+}
+
+global proc selectAllMesh()
+{
+	string $curPref = getSelectedViewerPreference();
+	string $allMesh[] = `textScrollList -q -allItems scrollListMesh`;
+	int $i;
+	for ($i = 0; $i < size($allMesh); $i = $i + 1)
+		textScrollList -e -selectItem $allMesh[$i] scrollListMesh;
+	updateObjAttr();
+}
+
+global proc clearAllMesh()
+{
+	string $curPref = getSelectedViewerPreference();
+	textScrollList -e -deselectAll scrollListMesh;
+	updateObjAttr();
 }
 
 // update the UI according to selected viewer preference
-global proc updateViewerUI(int $index)
+global proc	updateViewerUI()
 {
 	int $i;
 	
@@ -305,134 +320,78 @@ global proc updateViewerUI(int $index)
 	}
 
 	//------ Update other UI	
+	textScrollList -e -removeAll scrollListSkeleton;
+	textScrollList -e -removeAll scrollListMotion;
+	textScrollList -e -removeAll scrollListMesh;
+	textScrollList -e -removeAll scrollListBinding;	
+	
 	if ($curPref == "Viewer_")
 	{
-		textScrollList -e -removeAll scrollListProject;
-		textScrollList -e -removeAll scrollListCharacter;
-		textScrollList -e -removeAll scrollListSkeleton;
-		textScrollList -e -removeAll scrollListMotion;
-		textScrollList -e -removeAll scrollListMesh;
-		textScrollList -e -removeAll scrollListBinding;			
+		textFieldGrp -e -text "" skDir;	
+		textFieldGrp -e -text "" skmDir;	
+		textFieldGrp -e -text "" bindingDir;		
 		textFieldGrp -e -text "" smartbodyBin;
-		textFieldGrp -e -text "" projectRoot;		
 	}
 	else
-	{
-		string $projectRootDir = `getAttr ($curPref + ".ProjectRootDir")`;	
-		string $projectName = `getAttr ($curPref + ".ProjectName")`;
-		string $charName = `getAttr ($curPref + ".CharacterName")`;	
+	{	
+		string $skDir = `getAttr ($curPref + ".SkeletonDir")`;	
+		string $skmDir = `getAttr ($curPref + ".MotionDir")`;
+		string $bindingDir = `getAttr ($curPref + ".BindingDir")`;	
 		string $skeletonName = `getAttr ($curPref + ".SkeletonName")`;	
 		string $motionName = `getAttr ($curPref + ".MotionName")`;
 		string $bindingName = `getAttr ($curPref + ".BindingName")`;			
 		string $meshName = `getAttr ($curPref + ".MeshName")`;		
 
-		string $materialDir = $projectRootDir + "/" + $projectName + "/Exports-Smartbody/" + $charName + "/";			
+		textFieldGrp -e -text $skDir skDir;
+		if (`filetest -d ($skDir + "/")`)
+		{
+			string $skFiles[] = `getFileList -folder ($skDir + "/") -filespec "*.sk"`;
+			for ($i = 0; $i < size($skFiles); $i = $i + 1)
+				textScrollList -e -append $skFiles[$i] scrollListSkeleton;
+		}
+		else
+			print ("WARNING: Directory Not Valid!");
+		
+		textFieldGrp -e -text $skmDir skmDir;
+		if (`filetest -d ($skmDir + "/")`)
+		{
+			string $skmFiles[] = `getFileList -folder ($skmDir + "/") -filespec "*.skm"`;
+			for ($i = 0; $i < size($skmFiles); $i = $i + 1)
+				textScrollList -e -append $skmFiles[$i] scrollListMotion;
+		}
+		else
+			print ("WARNING: Directory Not Valid!");
 
-		if ($index == 7)
+		textFieldGrp -e -text $bindingDir bindingDir;
+		if (`filetest -d ($bindingDir + "/")`)
 		{
-			// clean first
-			textScrollList -e -removeAll scrollListProject;
-			textScrollList -e -removeAll scrollListCharacter;
-			textScrollList -e -removeAll scrollListSkeleton;
-			textScrollList -e -removeAll scrollListMotion;
-			textScrollList -e -removeAll scrollListMesh;
-			textScrollList -e -removeAll scrollListBinding;			
-			// append project scroll list
-			if ($projectRootDir != "")
-			{
-				string $projectFiles[] = `getFileList -folder ($projectRootDir + "/")`;	
-				for ($i = 0; $i < size($projectFiles); $i = $i + 1)
-				{
-					if (`filetest -d ($projectRootDir + "/" + $projectFiles[$i])`)
-						textScrollList -e -append $projectFiles[$i] scrollListProject;
-				}
-			}
+			string $bindingFiles[] = `getFileList -folder ($bindingDir + "/") -filespec "*.xml"`;
+			string $objFiles[] = `getFileList -folder ($bindingDir + "/") -filespec "*.obj"`;
+			for ($i = 0; $i < size($bindingFiles); $i = $i + 1)
+				textScrollList -e -append $bindingFiles[$i] scrollListBinding;
+			for ($i = 0; $i < size($objFiles); $i = $i + 1)
+				textScrollList -e -append $objFiles[$i] scrollListMesh;				
 		}
-		if ($index == 0 || $index == 7)
-		{
-			// clean first
-			textScrollList -e -removeAll scrollListCharacter;
-			textScrollList -e -removeAll scrollListSkeleton;
-			textScrollList -e -removeAll scrollListMotion;
-			textScrollList -e -removeAll scrollListMesh;
-			textScrollList -e -removeAll scrollListBinding;		
-			// append character scroll list
-			if ($projectName != "")
-			{
-				textScrollList -e -selectItem $projectName scrollListProject;		
-				string $projectRootDir = `getAttr ($curPref + ".ProjectRootDir")`;				
-				string $charDir = $projectRootDir + "/" + $projectName + "/Exports-Smartbody/";
-				string $characterFiles[] = `getFileList -folder $charDir`;	
-				for ($i = 0; $i < size($characterFiles); $i = $i + 1)
-				{
-					if (`filetest -d ($charDir + $characterFiles[$i])`)
-						textScrollList -e -append $characterFiles[$i] scrollListCharacter;
-				}
-			}
-		}	
-		if ($index == 1 || $index == 7)
-		{
-			// clean first
-			textScrollList -e -removeAll scrollListSkeleton;
-			textScrollList -e -removeAll scrollListMotion;
-			textScrollList -e -removeAll scrollListMesh;
-			textScrollList -e -removeAll scrollListBinding;			
-			// append skeleton, skm, mesh, binding information scroll list
-			if ($charName != "")
-			{
-				textScrollList -e -selectItem $charName scrollListCharacter;			
-				if (`filetest -d $materialDir`)
-				{
-					string $skmFiles[] = `getFileList -folder $materialDir -filespec "*.skm"`;
-					string $skFiles[] = `getFileList -folder $materialDir -filespec "*.sk"`;
-					string $meshFiles[] = `getFileList -folder $materialDir -filespec "*.obj"`;
-					string $openColladaFiles[] = `getFileList -folder $materialDir -filespec "*.xml"`;		
-					for ($i = 0; $i < size($skmFiles); $i = $i + 1)
-						textScrollList -e -append $skmFiles[$i] scrollListMotion;
-					for ($i = 0; $i < size($skFiles); $i = $i + 1)
-						textScrollList -e -append $skFiles[$i] scrollListSkeleton;		
-					for ($i = 0; $i < size($meshFiles); $i = $i + 1)
-						textScrollList -e -append $meshFiles[$i] scrollListMesh;	
-					for ($i = 0; $i < size($openColladaFiles); $i = $i + 1)
-						textScrollList -e -append $openColladaFiles[$i] scrollListBinding;				
-				}			
-			}
-		}
-		if ($index == 2 || $index == 7)	// update skeleton scroll list
-		{		
-			if ($skeletonName != "")
-				textScrollList -e -selectItem $skeletonName scrollListSkeleton;
-		}	
+		else
+			print ("WARNING: Directory Not Valid!");
 		
-		if ($index == 3 || $index == 7)	// update motion scroll list
-		{
-			if ($motionName != "")
-				textScrollList -e -selectItem $motionName scrollListMotion;
-		}
 		
-		if ($index == 4 || $index == 7)	// update binding scroll list
-		{				
-			if ($bindingName!= "")
-				textScrollList -e -selectItem $bindingName scrollListBinding;			
-		}
-		
-		if ($index == 5 || $index == 7)	// update mesh scroll list
-		{		
-			if ($meshName != "")
-			{	
-				string $meshList[];
-				tokenize $meshName " " $meshList;
-				for ($i = 0; $i < size($meshList); $i = $i + 1)
-					textScrollList -e -selectItem $meshList[$i] scrollListMesh;		
-			}
-		}
-		
-		if ($index == 7)
-		{
-			// advanced setting
-			textFieldGrp -e -text (`getAttr ($curPref + ".SbmBin")`) smartbodyBin;
-			textFieldGrp -e -text $projectRootDir projectRoot;					
-		}
+		if ($skeletonName != "")
+			textScrollList -e -selectItem $skeletonName scrollListSkeleton;
+		if ($motionName != "")
+			textScrollList -e -selectItem $motionName scrollListMotion;	
+		if ($bindingName!= "")
+			textScrollList -e -selectItem $bindingName scrollListBinding;
+		if ($meshName != "")
+		{	
+			string $meshList[];
+			tokenize $meshName " " $meshList;
+			for ($i = 0; $i < size($meshList); $i = $i + 1)
+				textScrollList -e -selectItem $meshList[$i] scrollListMesh;		
+		}			
+			
+		// advanced setting
+		textFieldGrp -e -text (`getAttr ($curPref + ".SbmBin")`) smartbodyBin;
 	}
 }
 
@@ -445,51 +404,30 @@ global proc int detectProcess(string $processName)
 	return $found;
 }
 
+
 // this function get called when the "run smartbody" button is pressed
 global proc viewerRunButton()
 {
 	int $noError = 1;
-	//--------- Collecting Info
-	string $testSkeleton = `textFieldGrp -q -text skDir`;
-	string $testMotion = `textFieldGrp -q -text skmDir`;
-
 	// getting attr of current preference
 	string $curPref = getSelectedViewerPreference();
-	string $projectName = `getAttr ($curPref + ".ProjectName")`;
-	string $charName = `getAttr ($curPref + ".CharacterName")`;
+	string $skeletonDir = `getAttr ($curPref + ".SkeletonDir")`;
+	string $motionDir = `getAttr ($curPref + ".MotionDir")`;
+	string $smoothBindingDir = `getAttr ($curPref + ".BindingDir")`;
 	string $skeleton = `getAttr ($curPref + ".SkeletonName")`;	
 	string $motion = `getAttr ($curPref + ".MotionName")`;	
 	string $bindingInfo = `getAttr ($curPref + ".BindingName")`;	
 	string $mesh = `getAttr ($curPref + ".MeshName")`;	
-	string $projectRootDir = `getAttr ($curPref + ".ProjectRootDir")`;
 	string $sbmBin = `getAttr ($curPref + ".SbmBin")`;
 	
 	
-	// construct some path
-	string $skeletonDir = $projectRootDir + "/" + $projectName + "/Exports-Smartbody/" + $charName + "/";
-	string $motionDir = $skeletonDir;
-	string $smoothBindingDir = $skeletonDir;
-	string $binDir = dirname($sbmBin);
-	string $binName = basename($sbmBin, "");	
+	// getting other setting
+	string $binDir = dirname($sbmBin);	
+	string $binName = basename($sbmBin, "");		
 	string $scriptDir = $binDir + "/../scripts";
 	string $seqFile = $scriptDir + "/" + "mayaSbmViewer.seq";
 	
-	// check to see if in quick test mode
-	if ($testSkeleton != "" && $testMotion != "")
-	{
-		print "Quick Test Mode!\n";
-		$character = "";
-		$motion = $testMotion;
-		$skeleton = $testSkeleton;	
-		$bindingInfo = "";	
-		$mesh = "";		
-		$skeletonDir = dirname($testSkeleton);
-		$motionDir = dirname($testMotion);
-	}	
-	
-	string $character = $charName;
-	if ($character == "")
-		$character = "defaultCharacter";	
+	string $character = "defaultCharacter";
 	string $motionName = basename($motion, ".skm");		
 	string $skeletonName = basename($skeleton, "");			
 
@@ -540,11 +478,11 @@ global proc viewerRunButton()
 		int $i;
 		if ($bindingInfo != "")
 		{
-			system("echo 0.2 char " + $character + " smoothbindweight " + $smoothBindingDir + $bindingInfo + " >> " + $seqFile);
+			system("echo 0.2 char " + $character + " smoothbindweight " + $smoothBindingDir + "/" + $bindingInfo + " >> " + $seqFile);
 			if ($mesh != "")
 			{
 				for ($i = 0; $i < size($meshList); $i = $i + 1)
-					system("echo 0.2 char " + $character + " smoothbindmesh " + $smoothBindingDir + $meshList[$i] + " >> " + $seqFile);	
+					system("echo 0.2 char " + $character + " smoothbindmesh " + $smoothBindingDir + "/" + $meshList[$i] + " >> " + $seqFile);	
 				system("echo 3.5 char " + $character + " viewer 4 " + " >> " + $seqFile);	
 				system("echo 4 test bml char " + $character + " ^<animation name=\"" + $motionName + "\"\/^>" + " >> " + $seqFile);					
 			}
@@ -596,7 +534,7 @@ global proc sbmViewerGUI()
 	
 		frameLayout -label "SmartBody Preferences" -borderStyle etchedIn -collapsable false -collapse 0;
 			columnLayout -adjustableColumn true -rowSpacing 2 -columnOffset "both" 10;
-				textScrollList  -numberOfRows 3 -width 250 -height 50 -allowMultiSelection false -showIndexedItem 4 -selectCommand "updateViewerUI(7)" scrollListPreference;
+				textScrollList  -numberOfRows 3 -width 250 -height 50 -allowMultiSelection false -showIndexedItem 4 -selectCommand updateViewerUI scrollListPreference;
 				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
 					button -label "Create Preference" -align "center" -command viewerPreferenceCreate;
 					button -label "Rename Preference" -align "center" -command viewerPreferenceRename;
@@ -604,37 +542,43 @@ global proc sbmViewerGUI()
 					button -label "Reset Preference" -align "center" -command viewerPreferenceReset;
 					setParent viewerMainWin;	
 	
-		frameLayout -label "Viewer Quick Test" -borderStyle etchedIn -collapsable true -collapse 1;
-			columnLayout -adjustableColumn true -rowSpacing 2 -columnOffset "both" 10;
-				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
-					textFieldGrp -label "SK Director: " -adjustableColumn 2 -columnAttach 1 "right" 5 skDir;				
-					button -label ".." -align "center" -command "fileBrowserDialog -m 0 -fc \"skFileBrowser\" -an \"Select\" -om \"Import\"";	
-					setParent ..;		
-				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
-					textFieldGrp -label "SKM Director: " -adjustableColumn 2 -columnAttach 1 "right" 5 skmDir;				
-					button -label ".." -align "center" -command "fileBrowserDialog -m 0 -fc \"skmFileBrowser\" -an \"Select\" -om \"Import\"";	
-					setParent viewerMainWin;							
-	
 		frameLayout -label "Viewer Option" -borderStyle etchedIn -collapsable true -collapse 0;	
 			columnLayout -adjustableColumn true;
-				text -label "Project List";
-				textScrollList -width 250 -height 50 -allowMultiSelection false -showIndexedItem 3 -selectCommand "updateAttr(0)" scrollListProject;
-				text -label "Character List";
-				textScrollList -width 250 -height 50 -allowMultiSelection false -showIndexedItem 3 -selectCommand "updateAttr(1)" scrollListCharacter;				
+				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
+					textFieldGrp -label "SK Directory: " -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand updateSkDirAttr skDir;				
+					button -label ".." -align "center" -command "fileBrowserDialog -m 0 -fc \"skFileBrowser\" -an \"Select\" -om \"SaveAs\"";	
+					setParent ..;		
 				text -label "Skeleton List";
-				textScrollList -width 250 -height 50 -allowMultiSelection false -showIndexedItem 3 -selectCommand "updateAttr(2)" scrollListSkeleton;
+				textScrollList -width 250 -height 50 -allowMultiSelection false -showIndexedItem 3 -selectCommand updateSkAttr scrollListSkeleton;
+				
+				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
+					textFieldGrp -label "SKM Directory: " -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand updateSkmDirAttr skmDir;				
+					button -label ".." -align "center" -command "fileBrowserDialog -m 0 -fc \"skmFileBrowser\" -an \"Select\" -om \"SaveAs\"";	
+					setParent ..;				
 				text -label "Motion List";
-				textScrollList -width 250 -height 100 -allowMultiSelection false -showIndexedItem 3 -selectCommand "updateAttr(3)" scrollListMotion;
-				text -label "Binding Info List";
-				textScrollList -width 250 -height 30 -allowMultiSelection false -showIndexedItem 3 -selectCommand "updateAttr(4)" scrollListBinding;				
-				text -label "Mesh List";
-				textScrollList -width 250 -height 100 -allowMultiSelection true -showIndexedItem 3 -selectCommand "updateAttr(5)" scrollListMesh;
-				setParent viewerMainWin;
+				textScrollList -width 250 -height 100 -allowMultiSelection false -showIndexedItem 3 -selectCommand updateSkmAttr scrollListMotion;
 
+				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
+					textFieldGrp -label "Binding Directory: " -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand updateBindingDirAttr bindingDir;				
+					button -label ".." -align "center" -command "fileBrowserDialog -m 0 -fc \"bindingFileBrowser\" -an \"Select\" -om \"SaveAs\"";	
+					setParent ..;				
+				text -label "Binding Info List";
+				textScrollList -width 250 -height 30 -allowMultiSelection false -showIndexedItem 3 -selectCommand updateOpenColladaAttr scrollListBinding;				
+				text -label "Mesh List";
+				textScrollList -width 250 -height 100 -allowMultiSelection true -showIndexedItem 3 -selectCommand updateObjAttr scrollListMesh;
+				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
+					button -label "Select All" -align "center" -command selectAllMesh;
+					button -label "Clear All" -align "center" -command clearAllMesh;
+					setParent viewerMainWin;
+
+		frameLayout -borderStyle etchedIn -collapsable true -collapse 1 -label "Smooth Binding Exporter";
+			columnLayout -adjustableColumn true;
+				button -label "Smooth Binding Exporter" -command "source export_smoothbinding.mel; smoothbindingExportGUI";
+				setParent viewerMainWin;
+				
 		frameLayout -borderStyle etchedIn -collapsable true -collapse 1 -label "Advanced Setting";
 			columnLayout -adjustableColumn true;
-				textFieldGrp -label "SBM Bin: " -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand "updateAttr(6)" smartbodyBin;
-				textFieldGrp -label "Project Root Directory: " -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand "updateAttr(6)" projectRoot;
+				textFieldGrp -label "SBM Bin: " -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand updateSbmBinAttr smartbodyBin;
 				setParent viewerMainWin;
 		
 		frameLayout -borderStyle etchedIn -collapsable false -collapse 0 -labelVisible false;
@@ -644,7 +588,7 @@ global proc sbmViewerGUI()
 	
 	// Intialization to Viewer UI
 	viewerPreferenceCheck();
-	updateViewerUI(7);
+	updateViewerUI();
 	
 	// Show the Main Window
 	showWindow viewerMainWin;
@@ -655,6 +599,8 @@ VERSION HISTORY:
   0.1 - first version
   0.2 - supporting viewer preference, smooth binding
   0.3 - add quick test mode. If sk and skm text field is filled up, this mode is activated
+  0.4 - re-design the UI to make the tool more flexible
+  0.5 - add the smooth binding exporter
   
 LIMIT:
   - after sbm-fltk.exe is setup, user can only change the motion
