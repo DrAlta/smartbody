@@ -486,8 +486,16 @@ void signal_handler(int sig) {
 	}
 	
 	//cleanup(); // 
-	exit(sig);
+	//exit(sig);
 }
+
+
+class SBMCrashCallback : public vhcl::Crash::CrashCallback
+{
+   public:
+      virtual void OnCrash() { signal_handler( -1 ); }
+};
+
 
 ///////////////////////////////////////////////////////////////////////////////////
 int main( int argc, char **argv )	{
@@ -511,6 +519,7 @@ int main( int argc, char **argv )	{
 #if SBM_EMAIL_CRASH_REPORTS
 	// Log crashes, with a dialog option to report via email
 	vhcl::Crash::EnableExceptionHandling( true );
+	vhcl::Crash::AddCrashCallback( new SBMCrashCallback() );
 #endif
 
 //	SBMWindow* sbmWindow = new SBMWindow(100, 100, 640, 480, "SmartBody");
