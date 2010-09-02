@@ -82,15 +82,15 @@ RequestId remote_speech::requestSpeechAudio( const char* agentName, const DOMNod
 		return(CMD_FAILURE);
 	}*/
 	//converts string to char*
-	char* text= new char[xmlConverted.length()+1];
-	strcpy(text, xmlConverted.c_str()); 
-	RequestId ret= requestSpeechAudio(agentName, text, callbackCmd );
+	//char* text= new char[xmlConverted.length()+1];
+	//strcpy(text, xmlConverted.c_str()); 
+	RequestId ret= requestSpeechAudio(agentName, xmlConverted, callbackCmd );
 	//delete [] text; text=0;
 	return (ret); //string is converted to char* and sent to other request audio fcn
 }
 
 
-RequestId remote_speech::requestSpeechAudio( const char* agentName, const char* text, const char* callbackCmd ){
+RequestId remote_speech::requestSpeechAudio( const char* agentName, std::string text, const char* callbackCmd ){
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
     
@@ -264,7 +264,7 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 				// Add current viseme. It's blend duration will be updated during the next loop.
 				visemes->push_back(singleViseme);
 			} else {
-				cerr << "ERROR: remote_speech::extractVisemes(..): <viseme> without type= attribute found... Ignoring" << endl;
+				LOG("ERROR: remote_speech::extractVisemes(..): <viseme> without type= attribute found... Ignoring");
 			}
 		}
 	}
@@ -401,7 +401,7 @@ float remote_speech::getMarkTime( RequestId requestId, const XMLCh* markId ){
 			}
 		}
 		}
-//	wcerr << "ERROR: remote_speech::getMarkTime("<<requestId<<",\""<<markId<<"\"): Mark Id Not Found" << endl; //if nothing is found print error message and return -1
+//	wstrstr << "ERROR: remote_speech::getMarkTime("<<requestId<<",\""<<markId<<"\"): Mark Id Not Found" << endl; //if nothing is found print error message and return -1
 	return -1;
 }
 
@@ -526,7 +526,7 @@ int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgI
 		}
 
 	} catch( const exception& e ) {
-		cerr << "vrSpeakSeq: std::exception: "<<e.what()<< endl;
+		LOG("vrSpeakSeq: std::exception: %s", e.what());
 
 		string callbackCmd= string(remote_speech::commandLookUp.lookup(msgID)) +" "+ character->name+" "+ string(msgID)+" ERROR XercesC error: "+e.what();
 		char* callback= new char[callbackCmd.length()];
@@ -593,13 +593,13 @@ int remoteSpeechReady_func(srArgBuffer& args, mcuCBHandle* mcu_p){
 		if( LOG_RHETORIC_SPEECH )  {
 			//DELETE THIS- THIS IS JUST TO TEST THE STOP AND START AUDIO COMMAND!!!
 			char* what= x.getSpeechPlayCommand(reqId);
-			cout<<endl<<"Play speech command:"<<endl;
+			LOG("Play speech command:");
 			LOG(what);
 			char* who= x.getSpeechStopCommand(reqId);
-			cout<<endl<<"Stop speech command:"<<endl;
+			LOG("Stop speech command:");
 			LOG(who);
 			char* where= x.getSpeechAudioFilename(reqId);
-			cout<<endl<<"Audio File Name:"<<endl;
+			LOG("Audio File Name:");
 			LOG(where);
 
 			//Delete This- THis is just to test the get mark time fcn!!
@@ -607,7 +607,7 @@ int remoteSpeechReady_func(srArgBuffer& args, mcuCBHandle* mcu_p){
 		}
 	} else {
 		// Speech failed
-		cerr<<endl<<"ERROR: Speech "<<agentId<<" #"<<reqId<<" failed: " << args.read_remainder_raw() <<endl;
+		LOG("ERROR: Speech %s %d failed: %s", agentId, reqId, args.read_remainder_raw());
 	}
 //////////////////////////////////////////////////////////////////////
 	x.requestComplete(reqId);
@@ -631,7 +631,7 @@ int remote_speech_test( srArgBuffer& args, mcuCBHandle* mcu_p ) { //Tester funct
 		return(CMD_SUCCESS);
 	
 	} catch( const exception& e ) {
-		cerr << "remote_speech: std::exception: "<<e.what()<< endl;
+		LOG("remote_speech: std::exception: %s", e.what());
 		return CMD_FAILURE;
 	}
 }
@@ -666,7 +666,7 @@ int remote_speech::testRemoteSpeechTimeOut( const char* request_id_str, mcuCBHan
 	
 	if( !remote_speech::uttLookUp.does_key_exist(request_id_str) && remote_speech::soundLookUp.does_key_exist(request_id_str) ) //a timeout has occurred
 	{
-		cout<<endl<<endl<<"remote_speech::rVoiceTimeOut ERR: RemoteSpeechReply Message NOT RECIEVED for utterance #"<<request_id_str<<". Please check if the remote speech process is on and is accessable by SBM"<<endl;
+		LOG("remote_speech::rVoiceTimeOut ERR: RemoteSpeechReply Message NOT RECIEVED for utterance #%s . Please check if the remote speech process is on and is accessable by SBM.", request_id_str);
 
 		RequestId request_id = atoi(request_id_str);
 		// verify parsing is number?

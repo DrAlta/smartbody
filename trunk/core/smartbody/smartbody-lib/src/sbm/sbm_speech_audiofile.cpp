@@ -22,11 +22,11 @@
  */
 
 #include "vhcl.h"
-
 #include "sbm_speech_audiofile.hpp"
-
 #include "mcontrol_util.h"
-
+#include "rapidxml.hpp"
+#include "rapidxml_utils.hpp"
+#include <fstream>
 
 using std::string;
 using std::vector;
@@ -66,38 +66,248 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const DOM
 
    xml_utils::xmlToString( node, xmlConverted ); //Xml to string recursively searches DOM tree and returns a string of the xml document
 
-   return requestSpeechAudio( agentName, xmlConverted.c_str(), callbackCmd );
+   return requestSpeechAudio( agentName, xmlConverted, callbackCmd );
 }
-
-
-RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const char * text, const char * callbackCmd )
+/*
+RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::string text, const char * callbackCmd )
 {
+	
+    mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.mark("requestSpeechAudio", 4, "begin");
+	rapidxml::xml_document<> doc;
+	std::vector<char> xml(text.begin(), text.end());
+    xml.push_back('\0');
+
+	std::string ref = "";
+	try {
+		doc.parse<0>(&xml[0]);
+
+		std::string name = doc.name();
+		rapidxml::xml_node<>* node = doc.first_node(); 
+
+		rapidxml::xml_attribute<>* refAttr = node->first_attribute("ref");
+		
+		if (refAttr)
+			ref = refAttr->value();
+
+		rapidxml::xml_attribute<>* speechIdAttr = node->first_attribute("id");
+		std::string speechId = "";
+		if (speechIdAttr)
+			speechId = speechIdAttr->value();
+
+		m_speechRequestInfo[ m_requestIdCounter ].id = speechId;
+	} catch (...) {
+		LOG("Problem parsing XML speech request.");
+		return 0;
+	}
+
+   SbmCharacter * agent = mcu.character_map.lookup( agentName );
+   if ( agent == NULL )
+   {
+      LOG( "AudioFileSpeech::requestSpeechAudio ERR: insert AudioFile voice code lookup FAILED, msgId=%s\n", agentName ); 
+	    mcu.mark("requestSpeechAudio");
+      return 0;
+   }
+
+
+   char fullAudioPath[ _MAX_PATH ];
+   string relativeAudioPath = mcu.speech_audiofile_base_path + agent->get_voice_code();
+   if ( _fullpath( fullAudioPath, relativeAudioPath.c_str(), _MAX_PATH ) == NULL )
+   {
+      LOG( "AudioFileSpeech::requestSpeechAudio ERR: _fullpath() returned NULL\n" );
+	    mcu.mark("requestSpeechAudio");
+      return 0;
+   }
+
+   m_speechRequestInfo[ m_requestIdCounter ].audioFilename = (string)fullAudioPath + "\\" + ref + ".wav";
+
+
+   // TODO: Should we fail if the .bml file isn't present?
+
+   string bmlFilename = mcu.speech_audiofile_base_path + agent->get_voice_code() + "/" + ref + ".bml";
+//////////////////////////////////
+   //ReadVisemeDataBML( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData );
+   m_speechRequestInfo[ m_requestIdCounter ].visemeData.clear();
+
+   mcu.mark("requestSpeechAudio", 4, "lips");
+   rapidxml::file<char> bmlFile(bmlFilename.c_str());
+   mcu.mark("requestSpeechAudio", 4, "fileconstruction");
+   rapidxml::xml_document<> bmldoc;
+   mcu.mark("requestSpeechAudio", 4, "parse");
+   bmldoc.parse< rapidxml::parse_declaration_node>(bmlFile.data());
+
+   mcu.mark("requestSpeechAudio", 4, "traverse");
+   if (!visemeCurveMode)
+   {	      
+	   rapidxml::xml_node<>* bmlnode = bmldoc.first_node("bml");
+	   if (!bmlnode)
+	   {
+		   LOG( "Could not find <bml> tag in %s.", bmlFilename.c_str());
+	   }
+
+	   rapidxml::xml_node<>* node = bmlnode->first_node("lips");
+	   while (node)
+	   {
+		  rapidxml::xml_attribute<>* visemeAttr = node->first_attribute("viseme");
+		  string viseme = "";
+		  if (visemeAttr)
+			  viseme = visemeAttr->value();
+
+		  rapidxml::xml_attribute<>* artiulationAttr = node->first_attribute("articulation");
+		  string articulation = "";
+		  if (artiulationAttr)
+			  articulation = artiulationAttr->value();
+
+		  rapidxml::xml_attribute<>* startAttr = node->first_attribute("start");
+		  string start = "";
+		  if (startAttr)
+			  start = startAttr->value();
+
+
+		  rapidxml::xml_attribute<>* readyAttr = node->first_attribute("start");
+		  string ready = "";
+		  if (readyAttr)
+			  ready = readyAttr->value();
+
+
+		  rapidxml::xml_attribute<>* relaxAttr = node->first_attribute("relax");
+		  string relax = "";
+		  if (relaxAttr)
+			  relax = relaxAttr->value();
+
+		  rapidxml::xml_attribute<>* endAttr = node->first_attribute("end");
+		  string end = "";
+		  if (endAttr)
+			  end = endAttr->value();
+
+		  m_speechRequestInfo[ m_requestIdCounter ].visemeData.push_back( VisemeData( viseme.c_str(), (float)atof( articulation.c_str() ), (float)atof( start.c_str() ) ) );
+		  m_speechRequestInfo[ m_requestIdCounter ].visemeData.push_back( VisemeData( viseme.c_str(), 0.0f,                                (float)atof( end.c_str() ) ) );
+
+		  node = node->next_sibling("lips");
+	   }
+   }
+   else
+   {
+	   rapidxml::xml_node<>* bmlnode = bmldoc.first_node("bml");
+	   if (!bmlnode)
+	   {
+		   LOG( "Could not find <bml> tag in %s.", bmlFilename.c_str());
+	   }
+	   else
+	   {
+		   rapidxml::xml_node<>* curvesnode = bmlnode->first_node("curves");
+		   if (!curvesnode)
+		   {
+			   LOG( "Could not find <curves> tag in %s.", bmlFilename.c_str());
+		   }
+		   else
+		   {
+				rapidxml::xml_node<>* node = bmlnode->first_node("curve");
+			   while (node)
+			   {
+				  rapidxml::xml_attribute<>* nameAttr = node->first_attribute("name");
+				  string name = "";
+				  if (nameAttr)
+					  name = nameAttr->value();
+
+				  rapidxml::xml_attribute<>* numKeysAttr = node->first_attribute("num_keys");
+				  string numKeys = "";
+				  if (numKeysAttr)
+					  numKeys = numKeysAttr->value();
+
+				  rapidxml::xml_node<>* keyData = node->first_node();
+				  if (keyData)
+				  {
+					  std::string curveInfo = keyData->value();
+					  m_speechRequestInfo[ m_requestIdCounter ].visemeData.push_back(VisemeData(name.c_str(), atoi(numKeys.c_str()), curveInfo.c_str()));
+
+				  }
+
+				   node = node->next_sibling();
+			   }
+		   }
+	   }
+   }
+//////////////////////////////////
+
+   if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
+   {
+      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlFilename.c_str() );
+      //return 0;
+   }
+
+   //ReadSpeechTiming( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers );
+//////////////////////////
+    m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.clear();
+
+
+	mcu.mark("requestSpeechAudio", 4, "sync");
+	rapidxml::xml_node<>* bmlnode = bmldoc.first_node("bml");
+	rapidxml::xml_node<>* speechnode = bmlnode->first_node("speech");
+	if (speechnode)
+	{
+		rapidxml::xml_node<>* textNode = speechnode->first_node("text");
+		if (textNode)
+		{
+			rapidxml::xml_node<>* syncNode = textNode->first_node("sync");
+			while (syncNode)
+			{
+				rapidxml::xml_attribute<>* idAttr = syncNode->first_attribute("id");
+				string id = "";
+				if (idAttr)
+					id = idAttr->value();
+
+				rapidxml::xml_attribute<>* timeAttr = syncNode->first_attribute("time");
+				string time = "";
+				if (timeAttr)
+					time = timeAttr->value();
+
+				 m_speechRequestInfo[ m_requestIdCounter ].timeMarkers[ id ] = (float)atof( time.c_str() );
+				 syncNode = syncNode->next_sibling("sync");
+
+			}
+		}
+	}
+	
+	
+ 
+   /////////////////////////
+
+
+
+
+   if ( m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.size() == 0 )
+   {
+      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlFilename.c_str() );
+      //return 0;
+   }
+
+
+   mcu.execute_later( vhcl::Format( "%s %s %d %s", callbackCmd, agentName, m_requestIdCounter, "SUCCESS" ).c_str() );
+
+
+     mcu.mark("requestSpeechAudio");
+   return m_requestIdCounter++;
+
+}
+*/
+
+
+RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::string text, const char * callbackCmd )
+{
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.mark("requestSpeechAudio", 4, "begin");
    // TODO:  Does return 0 signify error code?
    // TODO:  Handle xerces exceptions?
 
-   // sample input
-   // +		text	0x01c5a318 "<?xml version="1.0" encoding="UTF-8"?><speech ref="off-top-dont-know" type="text/plain">I don't know the answer to that question</speech>"	const char *
-   /*
-    +		text	0x04883548 "<?xml version="1.0" encoding="UTF-8"?><speech id="sp1" ref="rio-i_like_shootin_things" type="application/ssml+xml">
-         <mark name="sp1:T0" />And
-         <mark name="sp1:T1" />
-         <mark name="sp1:T2" />I
-         <mark name="sp1:T3" />
-         <mark name="sp1:T4" />like
-         <mark name="sp1:T5" />
-         <mark name="sp1:T6" />shooting
-         <mark name="sp1:T7" />
-         <mark name="sp1:T8" />things,
-         <mark name="sp1:T9" />
-         <mark n	const char *
-   */
 
    // parse text to get the name of the audio file
    // parse .bml file to get viseme timings
    // parse .bml file to get mark timings
 
 
-   DOMDocument * doc = xml_utils::parseMessageXml( m_xmlParser, text );
+   DOMDocument * doc = xml_utils::parseMessageXml( m_xmlParser, text.c_str() );
 
    DOMElement * speech = doc->getDocumentElement();
 
@@ -116,12 +326,13 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const cha
    m_speechRequestInfo[ m_requestIdCounter ].id = speechId;
 
 
-   mcuCBHandle& mcu = mcuCBHandle::singleton();
+   
 
    SbmCharacter * agent = mcu.character_map.lookup( agentName );
    if ( agent == NULL )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: insert AudioFile voice code lookup FAILED, msgId=%s\n", agentName ); 
+	  mcu.mark("requestSpeechAudio");
       return 0;
    }
 
@@ -131,6 +342,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const cha
    if ( _fullpath( fullAudioPath, relativeAudioPath.c_str(), _MAX_PATH ) == NULL )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: _fullpath() returned NULL\n" );
+	  mcu.mark("requestSpeechAudio");
       return 0;
    }
 
@@ -141,6 +353,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const cha
 
    string bmlFilename = mcu.speech_audiofile_base_path + agent->get_voice_code() + "/" + ref + ".bml";
 
+    mcu.mark("requestSpeechAudio", 4, "lips");
    ReadVisemeDataBML( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData );
    if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
    {
@@ -148,6 +361,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const cha
       //return 0;
    }
 
+   mcu.mark("requestSpeechAudio", 4, "sync");
    ReadSpeechTiming( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers );
    if ( m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.size() == 0 )
    {
@@ -159,6 +373,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const cha
    mcu.execute_later( vhcl::Format( "%s %s %d %s", callbackCmd, agentName, m_requestIdCounter, "SUCCESS" ).c_str() );
 
 
+   mcu.mark("requestSpeechAudio");
    return m_requestIdCounter++;
 }
 

@@ -276,7 +276,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			}
 			else 
 			{
-				cerr << "Unknown token" <<endl;
+				LOG("Unknown token");
 				//cerr << "Please specify the speed. (example:'spd 50')" <<endl;
 				return CMD_FAILURE;
 			}
@@ -475,7 +475,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 				id = args.read_int();
 				//data[ id_index ] = (float)id;
 			} else {
-				cerr << "ERROR: Unexpected token \""<<arg << "\"." <<endl;
+				LOG("ERROR: Unexpected token \"%d\".", arg.c_str());
 				return CMD_FAILURE;
 			}
 			if(id_index == -1)

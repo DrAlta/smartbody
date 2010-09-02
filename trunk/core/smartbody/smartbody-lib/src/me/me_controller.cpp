@@ -228,8 +228,10 @@ void MeController::remap() {
 			if( _context->toBufferIndex( parent_index ) < 0 ) {
 				const char* parent_ch_type = SkChannel::type_name( _context->channels().type( parent_index ) );
 				const char* parent_ch_name = (const char*)(_context->channels().name( parent_index ));
-				std::cerr << "WARNING: MeController::remap(): "<<controller_type()<<" \""<<this->name()<<"\": "
-					<<_context->context_type()<<" channel "<<parent_index<<", \""<<parent_ch_name<<"\" ("<<parent_ch_type<<") lacks valid buffer index!!" << std::endl;
+				std::stringstream strstr;
+				strstr << "WARNING: MeController::remap(): "<<controller_type()<<" \""<<this->name()<<"\": "
+					<<_context->context_type()<<" channel "<<parent_index<<", \""<<parent_ch_name<<"\" ("<<parent_ch_type<<") lacks valid buffer index!!";
+				LOG(strstr.str().c_str());
 			}
 #endif
 
@@ -243,9 +245,10 @@ void MeController::remap() {
 			std::cout << "L#"<< i << "\t-> P#"<<parent_index<<"\t\t"<<local_ch_name<<" ("<<SkChannel::type_name(type)<<")"<< std::endl;
 
 			if( strcmp( local_ch_name, parent_ch_name ) || (type != parent_ch_type ) ) {
-				std::cerr << "ERROR: MeController::remap(): " << controller_type() << " \"" << _name << "\" :"
+				strstr << "ERROR: MeController::remap(): " << controller_type() << " \"" << _name << "\" :"
 					<< " Local \"" << local_ch_name << "\" " << SkChannel::type_name(type) << " != "
 					<< " Parent \"" << parent_ch_name << "\" " << SkChannel::type_name(parent_ch_type) << std::endl;
+				LOG(strstr.str());
 			}
 
 #endif
@@ -284,8 +287,10 @@ void MeController::dumpChannelMap()
 			if( _context->toBufferIndex( parent_index ) < 0 ) {
 				const char* parent_ch_type = SkChannel::type_name( _context->channels().type( parent_index ) );
 				const char* parent_ch_name = (const char*)(_context->channels().name( parent_index ));
-				std::cerr << "WARNING: MeController::remap(): "<<controller_type()<<" \""<<this->name()<<"\": "
-					<<_context->context_type()<<" channel "<<parent_index<<", \""<<parent_ch_name<<"\" ("<<parent_ch_type<<") lacks valid buffer index!!" << std::endl;
+				std::stringstream strstr;
+				strstr << "WARNING: MeController::remap(): "<<controller_type()<<" \""<<this->name()<<"\": "
+					<<_context->context_type()<<" channel "<<parent_index<<", \""<<parent_ch_name<<"\" ("<<parent_ch_type<<") lacks valid buffer index!!";
+				LOG(strstr.str().c_str());
 			}
 #endif
 
@@ -298,9 +303,11 @@ void MeController::dumpChannelMap()
 			LOG("L# %d \t-> P#%d\t\t%s (%s)", i, parent_index, local_ch_name, SkChannel::type_name(type));
 
 			if( strcmp( local_ch_name, parent_ch_name ) || (type != parent_ch_type ) ) {
-				std::cerr << "ERROR: MeController::remap(): " << controller_type() << " \"" << _name << "\" :"
+				std::stringstream strstr;
+				strstr << "ERROR: MeController::remap(): " << controller_type() << " \"" << _name << "\" :"
 					<< " Local \"" << local_ch_name << "\" " << SkChannel::type_name(type) << " != "
 					<< " Parent \"" << parent_ch_name << "\" " << SkChannel::type_name(parent_ch_type) << std::endl;
+				LOG(strstr.str().c_str());
 			}
 
 		}

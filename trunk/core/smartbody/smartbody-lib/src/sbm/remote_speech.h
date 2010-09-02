@@ -54,7 +54,7 @@ class remote_speech: public SmartBody::SpeechInterface {
 
 		// Methods
 		SmartBody::RequestId requestSpeechAudio( const char* agentName, const DOMNode* node, const char* callbackCmd ); //accepts dom document of which sound will be created from, returns Request ID
-		SmartBody::RequestId requestSpeechAudio( const char* agentName, const char* text, const char* callbackCmd ); //accepts char* of above and returns request ID
+		SmartBody::RequestId requestSpeechAudio( const char* agentName, std::string text, const char* callbackCmd ); //accepts char* of above and returns request ID
 		std::vector<SmartBody::VisemeData *>* getVisemes( SmartBody::RequestId requestId ); //returns visemes  for given request
 		char* getSpeechPlayCommand( SmartBody::RequestId requestId, const SbmCharacter* character = NULL ); //returns the command to play speech
 		char* getSpeechStopCommand( SmartBody::RequestId requestId, const SbmCharacter* character = NULL ); //''                     stop

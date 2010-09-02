@@ -7,6 +7,7 @@
 #include <sstream>
 #include <float.h>
 #include "time.h"
+#include "vhcl_log.h"
 
 #include "xercesc_utils.hpp"
 #include "text_speech.h"
@@ -44,7 +45,7 @@ RequestId text_speech::requestSpeechAudio( const char* agentName, const DOMNode*
 }
 
 
-RequestId text_speech::requestSpeechAudio( const char* agentName, const char* text, const char* callbackCmd ){
+RequestId text_speech::requestSpeechAudio( const char* agentName, std::string text, const char* callbackCmd ){
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
     
 	msgNumber++; //to make the message number unique it must not belong to any single object instantiation and thus resides in "lookup" along with other items that must be globally accessable among all text_speech objects
@@ -75,7 +76,7 @@ RequestId text_speech::requestSpeechAudio( const char* agentName, const char* te
 	Prser->setErrorHandler( new HandlerBase() );
 
 	// schedule the text
-	DOMDocument* textXml = xml_utils::parseMessageXml( Prser, (char*)text );
+	DOMDocument* textXml = xml_utils::parseMessageXml( Prser, text.c_str() );
 	DOMNode* speechNode = textXml->getFirstChild();
 	DOMNode* markNode = speechNode->getFirstChild();
 	float currentTime = 0.0;
@@ -102,9 +103,7 @@ RequestId text_speech::requestSpeechAudio( const char* agentName, const char* te
 	charLookUp.insert(myStream.str().c_str(),agentNamePtr);
 	
 	// adds the document to accessable lookup table
-	char* xml = new char[strlen(text)];
-	strcpy(xml, text);
-	DOMDocument *replyDoc = xml_utils::parseMessageXml( Prser, xml );
+	DOMDocument *replyDoc = xml_utils::parseMessageXml( Prser, text.c_str() );
 	uttLookUp.insert(myStream.str().c_str(), replyDoc->getDocumentElement());
 
 	string seqName = "text_speech" + myStream.str();
@@ -156,7 +155,7 @@ std::vector<VisemeData*>* text_speech::extractVisemes(DOMNode* node, vector<Vise
 
 				visemes->push_back(singleViseme);
 			} else {
-				cerr << "ERROR: text_speech::extractVisemes(..): <viseme> without type= attribute found... Ignoring" << endl;
+				LOG("ERROR: text_speech::extractVisemes(..): <viseme> without type= attribute found... Ignoring");
 			}
 		}
 	}
@@ -224,7 +223,9 @@ float text_speech::getMarkTime( RequestId requestId, const XMLCh* markId ){
 				}
 			}
 		}
-	wcerr << "ERROR: text_speech::getMarkTime("<<requestId<<",\""<<markId<<"\"): Mark Id Not Found" << endl; //if nothing is found print error message and return -1
+	std::wstringstream wstrstr;
+	wstrstr << "ERROR: text_speech::getMarkTime("<<requestId<<",\""<<markId<<"\"): Mark Id Not Found" << endl; //if nothing is found print error message and return -1
+	LOG(convertWStringToString(wstrstr.str()).c_str());
 	return -1;
 }
 

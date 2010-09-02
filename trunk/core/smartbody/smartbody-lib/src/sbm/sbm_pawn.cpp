@@ -60,7 +60,9 @@ WSP::WSP_ERROR remote_pawn_position_update( std::string id, std::string attribut
 	}
 	else
 	{
-		cerr << "ERROR: SbmPawn::remote_pawn_position_update: SbmPawn '" << id << "' is NULL, cannot set_world_offset" << endl;
+		std::stringstream strstr;
+		strstr << "ERROR: SbmPawn::remote_pawn_position_update: SbmPawn '" << id << "' is NULL, cannot set_world_offset";
+		LOG(strstr.str().c_str());
 		return not_found_error( "SbmPawn is NULL" );
 	}
 
@@ -83,7 +85,9 @@ WSP::WSP_ERROR remote_pawn_rotation_update( std::string id, std::string attribut
 	}
 	else
 	{
-		cerr << "ERROR: SbmPawn::remote_pawn_rotation_update: SbmPawn '" << id << "' is NULL, cannot set_world_offset" << endl;
+		std::stringstream strstr;
+		strstr << "ERROR: SbmPawn::remote_pawn_rotation_update: SbmPawn '" << id << "' is NULL, cannot set_world_offset";
+		LOG(strstr.str().c_str());
 		return not_found_error( "SbmPawn is NULL" );
 	}
 
@@ -151,7 +155,9 @@ int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 int SbmPawn::init_skeleton() {
 	// Verifiy the joint name is not already in use.
 	if( skeleton_p->search_joint( SbmPawn::WORLD_OFFSET_JOINT_NAME ) ) {
-		cerr << "ERROR: SbmPawn::init_skeleton_offset: Skeleton already contains joint \"" << SbmPawn::WORLD_OFFSET_JOINT_NAME << "\"." << endl; 
+		std::stringstream strstr;
+		strstr << "ERROR: SbmPawn::init_skeleton_offset: Skeleton already contains joint \"" << SbmPawn::WORLD_OFFSET_JOINT_NAME << "\".";
+		LOG(strstr.str().c_str());
 		return( CMD_FAILURE ); 
 	}
 
@@ -286,6 +292,8 @@ void SbmPawn::set_world_offset( float x, float y, float z,
 	woj_pos->value( SkJointPos::Y, y );
 	woj_pos->value( SkJointPos::Z, z );
 
+	
+	std::stringstream strstr;
 	switch( woj->rot_type() ) {
 		case SkJoint::TypeEuler: {
 				SkJointEuler* joint_euler = woj->euler();
@@ -302,18 +310,23 @@ void SbmPawn::set_world_offset( float x, float y, float z,
 			}
 			break;
 		case SkJoint::TypeSwingTwist:
-			cerr << "ERROR: SbmPawn::set_world_offset(..): Unsupported joint rotation type SwingTwist." << endl;
+			strstr << "ERROR: SbmPawn::set_world_offset(..): Unsupported joint rotation type SwingTwist.";
+			LOG(strstr.str().c_str());
 			break;
 		default:
-			cerr << "ERROR: SbmPawn::set_world_offset(..): Unknown joint rotation type: " << woj->rot_type() << endl;
+			strstr << "ERROR: SbmPawn::set_world_offset(..): Unknown joint rotation type: " << woj->rot_type();
+			LOG(strstr.str().c_str());
 			break;
 	}
 }
 
 void SbmPawn::wo_cache_update() {
 	const SkJoint* joint = get_world_offset_joint();
-	if( joint==NULL ) {
-		cerr << "ERROR: SbmPawn::wo_cache_update(..): \"" << name << "\" does not have a " << WORLD_OFFSET_JOINT_NAME << " joint." << endl;
+	if( joint==NULL )
+	{
+		std::stringstream strstr;
+		strstr << "ERROR: SbmPawn::wo_cache_update(..): \"" << name << "\" does not have a " << WORLD_OFFSET_JOINT_NAME << " joint.";
+		LOG(strstr.str().c_str());
 		return;
 	}
 	const SkJointPos* pos = joint->const_pos();
@@ -323,7 +336,9 @@ void SbmPawn::wo_cache_update() {
 
 	SkJoint::RotType rot_type = joint->rot_type();
 	if( rot_type != SkJoint::TypeQuat ) {
-		cerr << "ERROR: SbmPawn::wo_cache_update(..): Unsupported world_offset rotation type: " << rot_type << " (Expected TypeQuat, "<<SkJoint::TypeQuat<<")"<<endl;
+		std::stringstream strstr;
+		strstr << "ERROR: SbmPawn::wo_cache_update(..): Unsupported world_offset rotation type: " << rot_type << " (Expected TypeQuat, "<<SkJoint::TypeQuat<<")";
+		LOG(strstr.str().c_str());
 		return;
 	}
 
@@ -340,13 +355,18 @@ void SbmPawn::wo_cache_update() {
 int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	string pawn_name = args.read_token();
 	if( pawn_name.length()==0 ) {
-		cerr << "ERROR: Expected pawn name." << endl;
+		
+		std::stringstream strstr;
+		strstr << "ERROR: Expected pawn name." << endl;
+		LOG(strstr.str().c_str());
 		return CMD_FAILURE;
 	}
 
 	string pawn_cmd  = args.read_token();
 	if( pawn_cmd.length()==0 ) {
-		cerr << "ERROR: Expected pawn command." << endl;
+		std::stringstream strstr;
+		strstr << "ERROR: Expected pawn command." << endl;
+		LOG(strstr.str().c_str());
 		return CMD_FAILURE;
 	}
 
@@ -362,11 +382,15 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		// pawn <name> init [loc <x> <y> <z>] [geom <shape name>] [color <color hex>] [size <size>]
 
 		if( pawn_name == "*" ) {  // TODO: better character name valiadtion
-			cerr << "ERROR: Invalid SbmPawn name \"" << pawn_name << "\"." << endl;
+			std::stringstream strstr;
+			strstr << "ERROR: Invalid SbmPawn name \"" << pawn_name << "\"." << endl;
+			LOG(strstr.str().c_str());
 			return( CMD_FAILURE );
 		}
 		if( pawn_p != NULL ) {
-			cerr << "ERROR: Pawn \"" << pawn_name << "\" already exists." << endl;
+			std::stringstream strstr;
+			strstr << "ERROR: Pawn \"" << pawn_name << "\" already exists." << endl;
+			LOG(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
 		// Options
@@ -391,7 +415,9 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				color_str = args.read_token();
 				has_geom = true;
 			} else {
-				cerr << "WARNING: Unrecognized pawn init option \"" << option << "\"." << endl;
+				std::stringstream strstr;
+				strstr << "WARNING: Unrecognized pawn init option \"" << option << "\"." << endl;
+				LOG(strstr.str().c_str());
 			}
 		}
 
@@ -405,12 +431,14 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		skeleton->make_active_channels();
 
 		if( has_geom ) {
-			cerr << "WARNING: SbmPawn geometry not implemented.  Ignoring options." << endl;
+			LOG("WARNING: SbmPawn geometry not implemented.  Ignoring options.");
 		}
 
 		int err = pawn_p->init( skeleton );
 		if( err != CMD_SUCCESS ) {
-			cerr << "ERROR: Unable to initialize SbmPawn \"" << pawn_name << "\"." << endl;
+			std::stringstream strstr;		
+			strstr << "ERROR: Unable to initialize SbmPawn \"" << pawn_name << "\".";
+			LOG(strstr.str().c_str());
 			delete pawn_p;
 			skeleton->unref();
 			return err;
@@ -418,7 +446,9 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 		err = mcu_p->pawn_map.insert( pawn_name.c_str(), pawn_p );
 		if( err != CMD_SUCCESS )	{
-			cerr << "ERROR: SbmPawn pawn_map.insert(..) \"" << pawn_name << "\" FAILED" << endl; 
+			std::stringstream strstr;
+			strstr << "ERROR: SbmPawn pawn_map.insert(..) \"" << pawn_name << "\" FAILED";
+			LOG(strstr.str().c_str());
 			delete pawn_p;
 			skeleton->unref();
 			return err;
@@ -426,7 +456,9 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 		err = mcu_p->add_scene( pawn_p->scene_p );
 		if( err != CMD_SUCCESS )	{
-			cerr << "ERROR: SbmPawn pawn_map.insert(..) \"" << pawn_name << "\" FAILED" << endl; 
+			std::stringstream strstr;
+			strstr << "ERROR: SbmPawn pawn_map.insert(..) \"" << pawn_name << "\" FAILED";
+			LOG(strstr.str().c_str());
 			delete pawn_p;
 			skeleton->unref();
 			return err;
@@ -446,18 +478,24 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			mcu_p->pawn_map.reset();
 			while( pawn_p = mcu_p->pawn_map.next() ) {
 				if( pawn_p->prune_controller_tree() != CMD_SUCCESS ) {
-					cerr << "ERROR: Failed to prune pawn \""<<pawn_name<<"\"." << endl;
+					std::stringstream strstr;
+					strstr << "ERROR: Failed to prune pawn \""<<pawn_name<<"\".";
+					LOG(strstr.str().c_str());
 					result = CMD_FAILURE;
 				}
 			}
 		} else if( pawn_p ) {
 			result = pawn_p->prune_controller_tree();
 			if( result != CMD_SUCCESS ) {
-				cerr << "ERROR: Failed to prune pawn \""<<pawn_name<<"\"." << endl;
+				std::stringstream strstr;
+				strstr << "ERROR: Failed to prune pawn \""<<pawn_name<<"\".";
+				LOG(strstr.str().c_str());
 				result = CMD_FAILURE;
 			}
 		} else {
-			cerr << "ERROR: Pawn \""<<pawn_name<<"\" not found." << endl;
+			std::stringstream strstr;
+			strstr << "ERROR: Pawn \""<<pawn_name<<"\" not found.";
+			LOG(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
 		return result;
@@ -467,7 +505,9 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			pawn_p->remove_from_scene();
 			return CMD_SUCCESS;
 		} else {
-			cerr << "ERROR: Pawn \""<<pawn_name<<"\" not found." << endl;
+			std::stringstream strstr;
+			strstr << "ERROR: Pawn \""<<pawn_name<<"\" not found.";
+			LOG(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
 	} else {
@@ -504,19 +544,19 @@ int SbmPawn::remove_from_scene( const char* pawn_name ) {
 int SbmPawn::set_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	string pawn_id = args.read_token();
 	if( pawn_id.length()==0 ) {
-		cerr << "ERROR: SbmPawn::set_cmd_func(..): Missing pawn id." << endl;
+		LOG("ERROR: SbmPawn::set_cmd_func(..): Missing pawn id.");
 		return CMD_FAILURE;
 	}
 
 	SbmPawn* pawn = mcu_p->pawn_map.lookup( pawn_id.c_str() );
 	if( pawn==NULL ) {
-		cerr << "ERROR: SbmPawn::set_cmd_func(..): Unknown pawn id \""<<pawn_id<<"\"." << endl;
+		LOG("ERROR: SbmPawn::set_cmd_func(..): Unknown pawn id \"%s\".", pawn_id.c_str());
 		return CMD_FAILURE;
 	}
 
 	string attribute = args.read_token();
 	if( attribute.length()==0 ) {
-		cerr << "ERROR: SbmPawn::set_cmd_func(..): Missing attribute \"" << attribute << "\" to set." << endl;
+		LOG("ERROR: SbmPawn::set_cmd_func(..): Missing attribute \"%s\" to set.", attribute.c_str());
 		return CMD_FAILURE;
 	}
 
@@ -529,7 +569,7 @@ int SbmPawn::set_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& args,
 		//  Sets the parameters of the world_offset joint
 		return SbmPawn::set_world_offset_cmd( pawn, args );
 	} else {
-		cerr << "ERROR: SbmPawn::set_cmd_func(..): Unknown attribute \""<< attribute<<"\"." << endl;
+		LOG("ERROR: SbmPawn::set_cmd_func(..): Unknown attribute \"%s\".", attribute);
 		return CMD_FAILURE;
 	}
 }
@@ -542,7 +582,7 @@ int SbmPawn::set_world_offset_cmd( SbmPawn* pawn, srArgBuffer& args ) {
 	bool has_error = false;
 	string arg = args.read_token();
 	if( arg.length() == 0 ) {
-		cerr << "ERROR: SbmPawn::set_world_offset: Missing offset parameters." <<endl;
+		LOG("ERROR: SbmPawn::set_world_offset: Missing offset parameters.");
 		return CMD_FAILURE;
 	}
 
@@ -571,7 +611,7 @@ int SbmPawn::set_world_offset_cmd( SbmPawn* pawn, srArgBuffer& args ) {
 			has_error |= !parse_float_or_error( x, args.read_token(), arg );
 			has_error |= !parse_float_or_error( x, args.read_token(), arg );
 		} else {
-			cerr << "ERROR: Unknown world_offset attribute \"" << arg << "\" ." << endl;
+			LOG("ERROR: Unknown world_offset attribute \"%s\".", arg.c_str());
 			has_error = true;
 		}
 		arg = args.read_token();
@@ -587,19 +627,19 @@ int SbmPawn::set_world_offset_cmd( SbmPawn* pawn, srArgBuffer& args ) {
 int SbmPawn::print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	string pawn_id = args.read_token();
 	if( pawn_id.length()==0 ) {
-		cerr << "ERROR: SbmPawn::print_cmd_func(..): Missing pawn id." << endl;
+		LOG("ERROR: SbmPawn::print_cmd_func(..): Missing pawn id.");
 		return CMD_FAILURE;
 	}
 
 	SbmPawn* pawn = mcu_p->pawn_map.lookup( pawn_id.c_str() );
 	if( pawn==NULL ) {
-		cerr << "ERROR: SbmPawn::print_cmd_func(..): Unknown pawn \""<<pawn_id<<"\"." << endl;
+		LOG("ERROR: SbmPawn::print_cmd_func(..): Unknown pawn \"%s\".", pawn_id.c_str());
 		return CMD_FAILURE;
 	}
 
 	string attribute = args.read_token();
 	if( attribute.length()==0 ) {
-		cerr << "ERROR: SbmPawn::print_cmd_func(..): Missing attribute to print." << endl;
+		LOG("ERROR: SbmPawn::print_cmd_func(..): Missing attribute to print.");
 		return CMD_FAILURE;
 	}
 
@@ -863,6 +903,6 @@ bool parse_float_or_error( float& var, const char* str, const string& var_name )
 	if( istringstream( str ) >> var )
 		return true; // no error
 	// else
-	cerr << "ERROR: Invalid value for " << var_name << ": " << str << endl;
+	LOG("ERROR: Invalid value for %s: %s", var_name.c_str(), str);
 	return false;
 }

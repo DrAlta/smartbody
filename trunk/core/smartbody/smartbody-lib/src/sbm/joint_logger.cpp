@@ -23,6 +23,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include "vhcl_log.h"
 
 #include <ME/me_ct_blend.hpp>
 
@@ -87,20 +88,24 @@ int joint_logger::set_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			double d;
 			in >> d;
 			if( in.fail() ) {
-				cerr << "ERROR: joint_logger::set_func(..) \" failed to read duration as a double from \"" << arg << "\"." << endl;
+				std::stringstream strstr;
+				strstr << "ERROR: joint_logger::set_func(..) \" failed to read duration as a double from \"" << arg << "\".";
+				LOG(strstr.str().c_str());
 				return CMD_FAILURE;
 			}
 			joint_logger::logging_duration = d;
 			return CMD_SUCCESS;
 		} else {
-			cerr << "ERROR: joint_logger::set_func(..) \" missing argument to set " << attribute << "." << endl;
+			std::stringstream strstr;
+			strstr << "ERROR: joint_logger::set_func(..) \" missing argument to set " << attribute << ".";
+			LOG(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
 	} else if( attribute == "" ) {
-		cerr << "ERROR: joint_logger::set_func(..) missing attribute to set. Expected \"joints\" or \"duration\"." << endl;
+		LOG("ERROR: joint_logger::set_func(..) missing attribute to set. Expected \"joints\" or \"duration\".");
 		return CMD_FAILURE;
 	} else {
-		cerr << "ERROR: joint_logger::set_func(..) unknown attribute: " << attribute << endl;
+		LOG("ERROR: joint_logger::set_func(..) unknown attribute: %s", attribute.c_str());
 		return CMD_FAILURE;
 	}
 }
@@ -122,13 +127,13 @@ int joint_logger::print_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		cout << "joint_logger joints:" << out.str() << endl;
 		return CMD_SUCCESS;
 	} else if( attribute == "duration" ) {
-		cout << "joint_logger duration: " << joint_logger::logging_duration << endl;
+		LOG("joint_logger duration: %f", joint_logger::logging_duration);
 		return CMD_SUCCESS;
 	} else if( attribute == "" ) {
-		cerr << "ERROR: joint_logger::print_func(..) missing attribute to print. Expected \"joints\" or \"duration\"." << endl;
+		LOG("ERROR: joint_logger::print_func(..) missing attribute to print. Expected \"joints\" or \"duration\".");
 		return CMD_FAILURE;
 	} else {
-		cerr << "ERROR: joint_logger::print_func(..) unknown attribute: " << attribute << endl;
+		LOG("ERROR: joint_logger::print_func(..) unknown attribute: %s", attribute.c_str());
 		return CMD_FAILURE;
 	}
 }
@@ -144,7 +149,7 @@ int joint_logger::start_stop_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		logger->set_expiration_time( 0 );
 		return CMD_SUCCESS;
 	} else {
-		cerr << "ERROR: joint_logger::start_stop_func(..) unknown joint_logger command: \""<< command<<"\"."<< endl;
+		LOG("ERROR: joint_logger::start_stop_func(..) unknown joint_logger command: \"%s\"", command.c_str());
 		return CMD_FAILURE;
 	}
 }

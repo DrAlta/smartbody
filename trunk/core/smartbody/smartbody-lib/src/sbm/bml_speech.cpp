@@ -24,6 +24,7 @@
 #include <sstream>
 #include <vector>
 
+#include "vhcl_log.h"
 #include "bml_speech.hpp"
 
 #include "bml.hpp"
@@ -114,9 +115,11 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 							marks.push_back( SpeechMark( tmId, TIME_UNSET ) );
 						} else {
 #if ENABLE_BMLR_SPEECH_REQUEST_CODE
-							wcerr << "ERROR: Invalid <mark> name=\"" << tmId << "\"" << endl;
+							wstrstr << "ERROR: Invalid <mark> name=\"" << tmId << "\"" << endl;
 #else
-							wcerr << "ERROR: Invalid <tm> id=\"" << tmId << "\"" << endl;
+							std::wstringstream wstrstr;
+							wstrstr << "ERROR: Invalid <tm> id=\"" << tmId << "\"";
+							LOG(convertWStringToString(wstrstr.str()).c_str());
 #endif
 							// TODO: remove mark from XML
 						}
@@ -139,7 +142,9 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 						if( isValidTmId( tmId ) ) {
 							marks.push_back( SpeechMark( tmId, TIME_UNSET ) );
 						} else {
-							wcerr << "ERROR: Invalid <mark> name=\"" << tmId << "\"" << endl;
+							std::wstringstream wstrstr;
+							wstrstr << "ERROR: Invalid <mark> name=\"" << tmId << "\"" << endl;
+							LOG(convertWStringToString(wstrstr.str()).c_str());
 							// TODO: remove <mark> from XML
 						}
 					}
@@ -147,10 +152,12 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 				child = xml_utils::getNextElement( child );
 			}
 		} else {
-			wcerr << "ERROR: SpeechRequest::SpeechRequest(..): Unrecognized speech behavior type=\"" << type << "\"" << endl;
+			std::wstringstream wstrstr;
+			wstrstr << "ERROR: SpeechRequest::SpeechRequest(..): Unrecognized speech behavior type=\"" << type << "\"";
+			LOG(convertWStringToString(wstrstr.str()).c_str());
 		}
 	} else {
-		cerr << "ERROR: SpeechRequest::SpeechRequest(..): Speech behavior lacks type attribute" << endl;
+		LOG("ERROR: SpeechRequest::SpeechRequest(..): Speech behavior lacks type attribute");
 	}
 	// Successfully parsed!!
 
@@ -189,7 +196,9 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 //	createStandardSyncPoint( TM_RELAX,        behav_syncs.sp_relax );
 //	createStandardSyncPoint( TM_END,          behav_syncs.sp_end );
 
-	return SpeechRequestPtr( new SpeechRequest( unique_id, localId, behav_syncs, speech_impl, speech_request_id, marks, request ) );
+	SpeechRequestPtr speechResult( new SpeechRequest( unique_id, localId, behav_syncs, speech_impl, speech_request_id, marks, request ) );
+	return speechResult;
+
 }
 
 //  SpeechRequest
@@ -208,10 +217,10 @@ BML::SpeechRequest::SpeechRequest(
 	speech_request_id( speech_request_id ),
 	trigger( behav_syncs.sync_start()->sync()->trigger.lock() )
 {
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	// Add SyncPoints for SpeechMarks
 	vector<SpeechMark>::const_iterator end = marks.end();
 	for( vector<SpeechMark>::const_iterator mark = marks.begin(); mark != end; ++mark ) {
-
 		// save the speech marks
 		speechMarks.push_back(*mark);
 
@@ -224,7 +233,11 @@ BML::SpeechRequest::SpeechRequest(
 
 		// Remember Word Break
 		if( !( wbToSync.insert( make_pair( mark->id, sync ) ).second ) )
-			wcerr << "ERROR: SpeechRequest(..): Failed to insert word break SyncPoint \""<<mark->id<<"\" into wbToSync map." << endl;
+		{
+			std::wstringstream wstrstr;
+			wstrstr << "ERROR: SpeechRequest(..): Failed to insert word break SyncPoint \""<<mark->id<<"\" into wbToSync map.";
+			LOG(convertWStringToString(wstrstr.str()).c_str());
+		}
 	}
 }
 
@@ -340,7 +353,11 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 		vector<VisemeData*>::iterator end = visemes.end();
 
 		if( LOG_SPEECH && cur==end )
-			cerr << "ERROR: BodyPlannerImpl::speechReply(): speech.getVisemes( " << speech_request_id << " ) is empty." << endl;
+		{
+			std::stringstream strstr;
+			strstr << "ERROR: BodyPlannerImpl::speechReply(): speech.getVisemes( " << speech_request_id << " ) is empty.";
+			LOG(strstr.str().c_str());
+		}
 
 		for( ; cur!=end; ++cur ) {
 			VisemeData* v = (*cur);
@@ -358,7 +375,11 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 		}
 	} else {
 		if( LOG_SPEECH )
-			cerr << "WARNING: BodyPlannerImpl::speechReply(): speech.getVisemes( " << speech_request_id << " ) returned NULL." << endl;
+		{
+			std::stringstream strstr;
+			strstr << "WARNING: BodyPlannerImpl::speechReply(): speech.getVisemes( " << speech_request_id << " ) returned NULL.";
+			LOG(strstr.str().c_str());
+		}
 	}
 
 	time_sec start_time = now; // TODO: sync to prior behaviors
@@ -405,8 +426,11 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 			const wstring& wb_id = wb_it->first;
 			SyncPointPtr  cur   = wb_it->second;
 
-			if( cur->parent != NULL && !isTimeSet( cur->parent->time ) ) {
-				wcerr << "ERROR: BodyPlannerImpl::speechReply(): Unhandled case of Wordbreak SyncPoint \"" << wb_id << "\" with scheduled parent SyncPoint.  Ignoring offset." << endl;
+			if( cur->parent != NULL && !isTimeSet( cur->parent->time ) )
+			{
+				std::wstringstream wstrstr;
+				wstrstr << "ERROR: BodyPlannerImpl::speechReply(): Unhandled case of Wordbreak SyncPoint \"" << wb_id << "\" with scheduled parent SyncPoint.  Ignoring offset.";
+				LOG(convertWStringToString(wstrstr.str()).c_str());
 			}
 
 			float audioTime = speech_impl->getMarkTime( speech_request_id, wb_id.c_str() );
@@ -436,7 +460,9 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 				if( LOG_SYNC_POINTS ) wcout << "   Wordbreak SyncPoint \"" << wb_id << "\" @ " << audioTime << endl;
 				cur->time = start_time + audioTime;
 			} else {
-				wcerr << "ERROR: BodyPlannerImpl::speechReply(): No audioTime for Wordbreak SyncPoint \"" << wb_id << "\"" << endl;
+				std::wstringstream wstrstr;
+				wstrstr << "ERROR: BodyPlannerImpl::speechReply(): No audioTime for Wordbreak SyncPoint \"" << wb_id << "\"";
+				LOG(convertWStringToString(wstrstr.str()).c_str());
 			}
 		}
 	} else {
@@ -509,7 +535,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 
 			////visemes get set a specified time
 			//if( seq->insert( time, (char*)(command.str().c_str()) )!=CMD_SUCCESS ) {
-			//	cerr << "WARNING: BodyPlannerImpl::realizeRequest(..): msgId=\""<<bpMsg.msgId<<"\": "<<
+			//	strstr << "WARNING: BodyPlannerImpl::realizeRequest(..): msgId=\""<<bpMsg.msgId<<"\": "<<
 			//		"Failed to insert viseme \""<<v->id()<<"\" @ "<<time<<endl;
 			//}
 			time_sec time = v->time();
@@ -520,8 +546,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 			}
 		}
 	} else {
-		cerr << "WARNING: BodyPlannerImpl::realizeRequest(..): "<<//"msgId=\""<<bpMsg.msgId<<"\": "<<
-			"SpeechRequest has no visemes." <<endl;
+		LOG("WARNING: BodyPlannerImpl::realizeRequest(..): SpeechRequest has no visemes.");
 	}
 
 	// Schedule audio
@@ -534,8 +559,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 		//	LOG( "ERROR: BodyPlannerImpl::realizeRequest: insert audio trigger into seq FAILED, msgId=%s\n", bpMsg.msgId ); 
 		//}
 	} else {
-		cerr << "WARNING: BodyPlannerImpl::realizeRequest(..): "<< //"msgId=\""<<bpMsg.msgId<<"\": "<<
-			"SpeechRequest has no audioPlay command." <<endl;
+		LOG("WARNING: BodyPlannerImpl::realizeRequest(..): SpeechRequest has no audioPlay command.");
 	}
 
 	realize_sequence( sbm_commands, mcu );
@@ -556,7 +580,7 @@ void BML::SpeechRequest::unschedule( mcuCBHandle* mcu,
 	if( !audioStop.empty() )
 		mcu->execute_later( audioStop.c_str() );
 	else
-		cerr << "WARNING: SpeechRequest::unschedule(): unique_id \""<<unique_id<<"\": Missing audioStop." << endl;
+		LOG("WARNING: SpeechRequest::unschedule(): unique_id \"%s\": Missing audioStop.", unique_id.c_str());
 }
 	                            
 void BML::SpeechRequest::cleanup( mcuCBHandle* mcu, BmlRequestPtr request )

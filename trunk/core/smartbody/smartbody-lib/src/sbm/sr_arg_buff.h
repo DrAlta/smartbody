@@ -58,7 +58,8 @@ class srArgBuffer	{
 
         /**
          *  Read the remainder of the argument buffer as a single string.
-         *  Does not do any token or quote processing.
+         *  Does not do any token or quote processing. After calling this 
+		 *  function, no more tokens will remain.
          *
          *  The string returned is owned by the srArgBuffer, and should not
          *  be freed or deleted.
@@ -66,6 +67,16 @@ class srArgBuffer	{
 		char *read_remainder_raw( void );
 
 
+		/**
+         *  Read the remainder of the argument buffer as a single string.
+         *  Does not do any token or quote processing. After calling this
+		 *  function, the args can be processed as usual and will not be
+		 *  removed (as is done by the read_remainder_raw function).
+         *
+         *  The string returned is owned by the srArgBuffer, and should not
+         *  be freed or deleted.
+         */
+        char *peek_string( void );
 
         /////////////////////////////////////////////////////////////////////
         //  Inline convience functions...
@@ -128,7 +139,6 @@ class srArgBuffer	{
 		char *tok_buff;
 		char *token;
 
-        char *peek_string( void );
 };
 
 //////////////////////////////////////////////////////////////////

@@ -289,7 +289,7 @@ class MeCtGaze : public MeController	{
 		
 	private:
 		double	prev_time;
-		int 	start;	// to initialize prev_time, dt
+		int 	foostart;	// to initialize prev_time, dt
 		int 	started;
 
 		int		key_min, key_max;
@@ -367,6 +367,9 @@ class MeCtGaze : public MeController	{
 		virtual double controller_duration()			{ return( (double)_duration ); }
 		virtual const char* controller_type() const		{ return( CONTROLLER_TYPE ); }
 		virtual void print_state( int tabs );
+public:
+		int getStart();
+		void setStart(int val);
 };
 
 

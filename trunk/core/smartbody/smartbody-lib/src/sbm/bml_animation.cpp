@@ -23,11 +23,9 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-
+#include "vhcl_log.h"
 #include "bml_animation.hpp"
-
 #include "mcontrol_util.h"
-
 #include "bml_xml_consts.hpp"
 
 
@@ -38,7 +36,7 @@ using namespace xml_utils;
 
 
 
-BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
 	//type = BML_MOTION;
 
 	const XMLCh* animName = elem->getAttribute( ATTR_NAME );
@@ -52,6 +50,7 @@ BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string
 	
 	if( animName != 0 && *animName != 0 )	{
 //	if( animName && XMLString::stringLen( animName ) ) {
+
 		// Look up motion
 		string asciiName( xml_utils::asciiString( animName ) );
 
@@ -83,22 +82,28 @@ BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string
 					motionCt->emphasist( stroke_emphasis );
 			}
 
-			const char* speedStr = xml_utils::asciiString( elem->getAttribute( ATTR_SPEED ) );
+			const char* speedStr = xml_utils::asciiString( elem->getAttribute( BML::ATTR_SPEED ) );
 			if( speedStr[0] != 0 ) {  // speed attribute is not empty
 				motionCt->warp_limits( (float)0.01, 100 );  // override limits
 				motionCt->twarp( (float) atof( speedStr ) );
 			}
 			delete [] speedStr;
 
-			return BehaviorRequestPtr( new MotionRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs ) );
+			BehaviorRequestPtr behavPtr(new MotionRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs ) );
+			return behavPtr; 
 		} else {
 			// TODO: exception?
-			cerr<<"WARNING: BML::parse_bml_animation(): behavior \""<<unique_id<<"\": name=\""<<asciiName<<"\" not loaded; ignoring behavior."<<endl;
+			//cerr<<"WARNING: BML::parse_bml_animation(): behavior \""<<unique_id<<"\": name=\""<<asciiName<<"\" not loaded; ignoring behavior."<<endl;
+			LOG("WARNING: BML::parse_bml_animation(): behavior \"%s\": name=\"%s\" not loaded; ignoring behavior.", unique_id.c_str(), asciiName.c_str());
+			
 			return BehaviorRequestPtr();  // a.k.a., NULL
 		}
 	} else {
 		// TODO: exception?
-		cerr<<"WARNING: BML::parse_bml_animation(): behavior \""<<unique_id<<"\": missing name= attribute; ignoring <animation>."<<endl;
+		std::wstringstream wstrstr;
+		cerr<<"WARNING: BML::parse_bml_animation(): behavior \""<<unique_id<<"\": missing name= attribute; ignoring <animation>.";
+		LOG(convertWStringToString(wstrstr.str()).c_str());
+
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 }

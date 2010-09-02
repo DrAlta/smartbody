@@ -27,6 +27,9 @@
 # include <stdlib.h>
 # include <SK/sk_motion.h>
 #include <iostream>
+#include <sstream>
+#include "vhcl.h"
+
 using namespace std;
 
 
@@ -121,7 +124,9 @@ bool parse_timing_metadata( SrInput& in, SrString name, float& time ) {
 	if( token_type!=SrInput::Name ||
 		token!="time" )
 	{
-		cerr << "ERROR: SkMotion::load(): File \""<<in.filename()<<"\", line "<<line_number<<": Invalid \""<<name<<"\" line. Expected \"time:\" before value, but recieved \"" << token << "\" (token_type "<<token_type<<")." << endl;
+		std::stringstream strstr;
+		strstr << "ERROR: SkMotion::load(): File \""<<in.filename()<<"\", line "<<line_number<<": Invalid \""<<name<<"\" line. Expected \"time:\" before value, but recieved \"" << token << "\" (token_type "<<token_type<<").";
+		LOG(strstr.str().c_str());
 		return false;
 	}
 	token_type = in.get_token();
@@ -131,7 +136,9 @@ bool parse_timing_metadata( SrInput& in, SrString name, float& time ) {
 	}
 	token      = in.last_token();
 	if( token_type!=SrInput::Real && token_type!=SrInput::Integer ) {
-		cerr << "ERROR: SkMotion::load(): File \""<<in.filename()<<"\", line "<<line_number<<": Invalid \""<<name<<"\" time value. Expected number, but recieved \"" << token << "\" (token_type "<<token_type<<")." << endl;
+		std::stringstream strstr;
+		strstr << "ERROR: SkMotion::load(): File \""<<in.filename()<<"\", line "<<line_number<<": Invalid \""<<name<<"\" time value. Expected number, but recieved \"" << token << "\" (token_type "<<token_type<<").";
+		LOG(strstr.str().c_str());
 		return false;
 	}
 	time = token.atof();
@@ -258,45 +265,71 @@ bool SkMotion::load ( SrInput& in ) {
 					return false;
 			} else if( token=="strokeStart" ) {
 				if( DEPRECATE_BAD_METADATA_NAMES )
-					cerr << "WARNING: SkMotion::load(): File \""<<in.filename()<<"\", line "<<in.curline()<<": Metadata \"strokeStart\" has been deprecated in favor of \"stroke_start\" to match BML." << endl;
+				{
+					std::stringstream strstr;
+					strstr << "WARNING: SkMotion::load(): File \""<<in.filename()<<"\", line "<<in.curline()<<": Metadata \"strokeStart\" has been deprecated in favor of \"stroke_start\" to match BML.";
+					LOG(strstr.str().c_str());
+				}
 				if( parse_timing_metadata( in, token, _time_stroke_start ) )
 					metadata_flags |= STROKE_START;
 				else
 					return false;
 			} else if( token=="emphasis" ) {
 				if( DEPRECATE_BAD_METADATA_NAMES )
-					cerr << "WARNING: SkMotion::load(): File \""<<in.filename()<<"\", line "<<in.curline()<<": Metadata \"emphasis\" has been deprecated in favor of \"stroke_emphasis\" to match BML." << endl;
+				{
+					std::stringstream strstr;
+					strstr << "WARNING: SkMotion::load(): File \""<<in.filename()<<"\", line "<<in.curline()<<": Metadata \"emphasis\" has been deprecated in favor of \"stroke_emphasis\" to match BML." << endl;
+					LOG(strstr.str().c_str());
+				}
 				if( parse_timing_metadata( in, token, _time_stroke_emphasis ) )
 					metadata_flags |= STROKE_EMPH;
 				else
 					return false;
 			} else if( token=="stroke" ) {
 				if( DEPRECATE_BAD_METADATA_NAMES )
-					cerr << "WARNING: SkMotion::load(): File \""<<in.filename()<<"\", line "<<in.curline()<<": Metadata \"stroke\" has been deprecated in favor of \"stroke_end\" to match BML." << endl;
+				{
+					std::stringstream strstr;
+					strstr << "WARNING: SkMotion::load(): File \""<<in.filename()<<"\", line "<<in.curline()<<": Metadata \"stroke\" has been deprecated in favor of \"stroke_end\" to match BML." << endl;
+					LOG(strstr.str().c_str());
+				}
 				if( parse_timing_metadata( in, token, _time_stroke_end ) )
 					metadata_flags |= STROKE_END;
 				else
 					return false;
 			} else if( token=="strokeEnd" ) {
 				if( DEPRECATE_BAD_METADATA_NAMES )
-					cerr << "WARNING: SkMotion::load(): File \""<<in.filename()<<"\", line "<<in.curline()<<": Metadata \"strokeEnd\" has been deprecated in favor of \"stroke_end\" to match BML." << endl;
+				{
+					std::stringstream strstr;
+					strstr << "WARNING: SkMotion::load(): File \""<<in.filename()<<"\", line "<<in.curline()<<": Metadata \"strokeEnd\" has been deprecated in favor of \"stroke_end\" to match BML." << endl;
+					LOG(strstr.str().c_str());
+				}
 				if( parse_timing_metadata( in, token, _time_stroke_end ) )
 					metadata_flags |= STROKE_END;
 				else
 					return false;
 			} else {
-				cout << "ERROR: SkMotion::load(): ";
+				std::stringstream strstr;
+				strstr << "ERROR: SkMotion::load(): ";
 				if( in.filename() )
-					cout << "File \""<<in.filename()<<"\", line "<<in.curline();
+				{
+					strstr << "File \""<<in.filename()<<"\", line "<<in.curline();
+				}
 				else
-					cout << "Unknown file, line "<<in.curline();
-				cout <<": Expected metadata name, but recieved \"" << token << "\"." << endl;
+				{
+					strstr << "Unknown file, line "<<in.curline();
+				}
+				strstr <<": Expected metadata name, but recieved \"" << token << "\".";
+				LOG(strstr.str().c_str());
 				return false;
 			}
 		} while( in.get_token() != SrInput::EndOfFile );
 
 		if( metadata_flags != ALL )
-			cerr << "WARNING: SkMotion::load(): File \""<<in.filename()<<"\": Timing Metadata incomplete before end of file (metadata_flags: "<<metadata_flags<<")."<< endl;
+		{
+			std::stringstream strstr;
+			strstr << "WARNING: SkMotion::load(): File \""<<in.filename()<<"\": Timing Metadata incomplete before end of file (metadata_flags: "<<metadata_flags<<").";
+			LOG(strstr.str().c_str());
+		}
 	}
 
 //	bool metadata_valid = true;

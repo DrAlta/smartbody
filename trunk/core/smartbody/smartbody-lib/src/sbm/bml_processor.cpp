@@ -23,6 +23,7 @@
  *      Corne Versloot, while at USC
  */
 
+#include "vhcl.h"
 #include <stdlib.h>
 #include <exception>
 #include <iostream>
@@ -155,8 +156,7 @@ namespace BML {
 		if( error_msg==NULL || error_msg[0]=='\0' )
 			error_msg = "INVALID_ERROR_MESSAGE";
 
-		cerr << "WARNING: bml_error(..): " << error_msg << "   (agent \"" << agent_id <<
-			"\", message id \"" << message_id << "\")" << endl;
+		LOG("WARNING: bml_error(..): %s (agent \"%s\", message id \"%s\")", error_msg, agent_id, message_id);
 
 		// Old vrSpeakFailed form (sans recipient)
 		ostringstream buff;
@@ -240,11 +240,11 @@ BML::Processor::Processor()
 		//xmlParser->setErrorHandler(errHandler);
 		//xmlParser->setErrorHandler( new HandlerBase() );
 	} catch( const XMLException& e ) {
-		cerr << "ERROR: BML Processor:  XMLException during constructor: "<< e.getMessage() << endl;
+		LOG("ERROR: BML Processor:  XMLException during constructor: %s", e.getMessage());
 	} catch( const std::exception& e ) {
-		cerr << "ERROR: BML Processor:  std::exception during constructor: "<< e.what() << endl;
+		LOG("ERROR: BML Processor:  std::exception during constructor: %s", e.what());
 	} catch(...) {
-		cerr << "ERROR: BML Processor:  UNKNOWN EXCEPTION DURING CONSTRUCTOR.     <<==================" << endl;
+		LOG("ERROR: BML Processor:  UNKNOWN EXCEPTION DURING CONSTRUCTOR.     <<==================");
 	}
 }
 
@@ -295,18 +295,21 @@ BmlRequestPtr BML::Processor::createBmlRequest(
 void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
     if(LOG_METHODS) cout<<"BodyPlannerImpl::vrSpeak(..)"<<endl;
 
+	int suppress = 2;
 	//BmlRequest *request = requests.lookup( bpMsg.requestId.c_str() );  // srHashMap
+
 	MapOfBmlRequest::iterator result = bml_requests.find( bpMsg.requestId );
     if( result != bml_requests.end() ) {
-        cerr << "Duplicate BML Request Message ID: "<<bpMsg.requestId<<endl;
+		LOG("Duplicate BML Request Message ID: %s", bpMsg.requestId.c_str());
 		//  TODO: call vrSpeakFailed?  How do we show we're not failing on the original agent/message-id request?
-        return;
+		return;
     }
 
-    const DOMDocument* xml = bpMsg.xml;
-    DOMElement* root = xml->getDocumentElement();
-    if( XMLString::compareString( root->getTagName(), TAG_ACT )!=0 )
-		cerr << "WARNING: BodyPlanner: Expected <act> tag as XML root." << endl;
+   const DOMDocument* xml = bpMsg.xml;
+	DOMElement* root = xml->getDocumentElement();  
+	if( XMLString::compareString( root->getTagName(), TAG_ACT )!=0 )
+		LOG("WARNING: BodyPlanner: Expected <act> tag as XML root.");
+
 
 	DOMElement* child = xml_utils::getFirstChildElement( root );
 	DOMElement* bmlElem = NULL;
@@ -327,7 +330,7 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
 		BmlRequestPtr request( createBmlRequest( bpMsg.actor, bpMsg.actorId, bpMsg.requestId, string(bpMsg.msgId), xml ) );
 #endif
 		try {
-  			parseBML( bmlElem, request, mcu );
+ 			parseBML( bmlElem, request, mcu );
 			bml_requests.insert( make_pair( bpMsg.requestId, request ) );
 			
 		
@@ -343,19 +346,20 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
 			ostringstream oss;
 			oss << e.type() << ": " << e.what();
 
-			cerr << "ERROR: BML::Processor::bml_request(): " << oss.str() << endl;
+			LOG("ERROR: BML::Processor::bml_request(): %s", oss.str().c_str());
 			bml_requests.erase( bpMsg.requestId );  // No further references if we're going to fail.
 			bml_error( bpMsg.actorId, bpMsg.msgId, oss.str().c_str(), mcu );
 		}
 	} else {
 		const char* message = "No BML element found.";
-		cerr << "ERROR: BML::Processor::bml_request(): " << message << endl;
+		LOG("ERROR: BML::Processor::bml_request(): %s", message);
 		bml_error( bpMsg.actorId, bpMsg.msgId, message, mcu );
 	}
 }
 
 void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr request, mcuCBHandle* mcu,
                                          size_t& behavior_ordinal, bool required ) {
+
 	// look for BML behavior command tags
 	DOMElement*  child = xml_utils::getFirstChildElement( group );
 	while( child!=NULL ) {
@@ -367,7 +371,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 			string unique_id = request->buildUniqueBehaviorId( tag, id, ++behavior_ordinal );
 
 			// Load SyncPoint references
-			BehaviorSyncPoints behav_syncs;  // TODO: rename (previous this was a TimeMarkers class)			
+			BehaviorSyncPoints behav_syncs;  // TODO: rename (previous this was a TimeMarkers class)	
 			behav_syncs.parseStandardSyncPoints( child, request, unique_id );
 
 			BehaviorRequestPtr behavior;
@@ -378,7 +382,8 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				// TEMPORARY: <speech> can only be the first behavior
 				if( behavior_ordinal == 1 ) {
 					// This speech is the first
-					SpeechRequestPtr speech_request( parse_bml_speech( child, unique_id, behav_syncs, required, request, mcu ) );
+					BML::SpeechRequestPtr speechPtr =  parse_bml_speech( child, unique_id, behav_syncs, required, request, mcu );
+					SpeechRequestPtr speech_request(speechPtr);
 					if( speech_request ) {
 						behavior = speech_request;
 
@@ -387,18 +392,23 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 						string speechKey = buildSpeechKey( request->actor, speech_request->speech_request_id );
 						bool insert_success = speeches.insert( make_pair( speechKey, speech_request ) ).second;  // store for later reply
 						if( !insert_success ) {
-							cerr << "ERROR: BML::Processor.vrSpeak(..): BmlProcessor::speehces already contains an entry for speechKey \"" << speechKey << "\".  Cannot process speech behavior.  Failing BML request.  (This error should not occur. Let Andrew know immeidately.)"  << endl;
+							LOG("ERROR: BML::Processor.vrSpeak(..): BmlProcessor::speehces already contains an entry for speechKey \"%s\".  Cannot process speech behavior.  Failing BML request.  (This error should not occur. Let Andrew know immeidately.)", speechKey.c_str());
 							// TODO: Send vrSpeakFailed
 						}
 
 						request->speech_request = speech_request;
 					} else {
 						//  Speech is always treated as required
-						wcerr<<"ERROR: BML::Processor::parseBML(): Failed to parse <"<<tag<<"> tag."<<endl;
+						std::wstringstream wstrstr;
+						wstrstr<<"ERROR: BML::Processor::parseBML(): Failed to parse <"<<tag<<"> tag.";
+						LOG(convertWStringToString(wstrstr.str()).c_str());
 					}
 				} else {
-					wcerr<<"ERROR: BML <"<<tag<<"> must be first behavior."<<endl;
-					cerr<<"\t(unique_id \""<<unique_id<<"\"."<<endl;  // unique id is not multibyte, and I'm lazily refusing to convert just to put it on the same line).
+					std::wstringstream wstrstr;
+					wstrstr<<"ERROR: BML <"<<tag<<"> must be first behavior.";
+					LOG(convertWStringToString(wstrstr.str()).c_str());
+					LOG("\t(unique_id \"%s\".", unique_id.c_str()); // unique id is not multibyte, and I'm lazily refusing to convert just to put it on the same line).
+					
 				}
 			} else if( XMLString::compareString( tag, TAG_ANIMATION )==0 ) {
 				// DEPRECATED FORM
@@ -423,7 +433,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 			} else if( XMLString::compareString( tag, TAG_QUICKDRAW )==0 ) {
 				behavior = parse_bml_quickdraw( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_SPEECH )==0 ) {
-				cerr<<"ERROR: BML::Processor::parseBML(): <speech> BML tag must be first behavior (TEMPORARY HACK)." <<endl;
+				LOG("ERROR: BML::Processor::parseBML(): <speech> BML tag must be first behavior (TEMPORARY HACK).");
 			} else if( XMLString::compareString( tag, TAG_LOCOTMOTION )==0 ) {
 				behavior = parse_bml_locomotion( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_INTERRUPT )==0 ) {
@@ -443,9 +453,12 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 			}
 #else
 			} else {
-				wcerr<<"WARNING: BML::Processor::parseBML(): <"<<tag<<"> BML tag unrecognized or unsupported."<<endl;
+				std::wstringstream wstrstr;
+				wstrstr<<"WARNING: BML::Processor::parseBML(): <"<<tag<<"> BML tag unrecognized or unsupported.";
+				LOG(convertWStringToString(wstrstr.str()).c_str());
 			}
 #endif
+			
 
 			if( behavior != NULL ) {
 				behavior->required = required;
@@ -478,7 +491,21 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCB
 	parseBehaviorGroup( bmlElem, request, mcu, behavior_ordinal, false );
 
 	if( behavior_ordinal==0 ) { // No change
-		cout << " WARNING: BML \""<<request->msgId<<"\" does not contain any behaviors!" <<endl;
+		// uncomment the following to see any bml being processed that does not contain any behaviors
+		/*
+		LOG("WARNING: BML \"%s\" does not contain any behaviors!", request->msgId.c_str());
+		// dump the xml
+		XMLCh tempStr[100];
+		XMLString::transcode("LS", tempStr, 99);
+		DOMImplementation *impl = DOMImplementationRegistry::getDOMImplementation(tempStr);
+		DOMLSSerializer* theSerializer = ((DOMImplementationLS*)impl)->createLSSerializer();
+		XMLCh* xmlOutput = theSerializer->writeToString(request->doc);
+		theSerializer->release();
+		std::wstring xmlStrWide = xmlOutput;
+		std::string xmlStr(xmlStrWide.begin(), xmlStrWide.end());
+		
+		LOG("%s", xmlStr.c_str());
+		*/
 		return;
 	}
 
@@ -508,7 +535,7 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCB
 //			string speechKey = buildSpeechKey( request->actor, speech_request->speech_request_id );
 //			bool insert_success = speeches.insert( make_pair( speechKey, speech_request ) ).second;  // store for later reply
 //			if( !insert_success ) {
-//				cerr << "ERROR: BML::Processor.vrSpeak(..): BmlProcessor::speehces already contains an entry for speechKey \"" << speechKey << "\".  Cannot process speech behavior.  Failing BML request.  (This error should not occur. Let Andrew know immeidately.)"  << endl;
+//				strstr << "ERROR: BML::Processor.vrSpeak(..): BmlProcessor::speehces already contains an entry for speechKey \"" << speechKey << "\".  Cannot process speech behavior.  Failing BML request.  (This error should not occur. Let Andrew know immeidately.)"  << endl;
 //				// TODO: Send vrSpeakFailed
 //			}
 //
@@ -577,12 +604,14 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 
 				return BehaviorRequestPtr( posture_new );
 			} else {
-				wcerr<<"WARNING: BML::Processor::parse_bml_body(): <body>: posture=\""<<postureName<<"\" not loaded; ignoring <body>."<<endl;
+				std::wstringstream wstrstr;
+				wstrstr<<"WARNING: BML::Processor::parse_bml_body(): <body>: posture=\""<<postureName<<"\" not loaded; ignoring <body>.";
+				LOG(convertWStringToString(wstrstr.str()).c_str());
 				return BehaviorRequestPtr();  // a.k.a., NULL
 			}
 		}
 	} else {
-		wcerr<<"WARNING: BML::Processor::parse_bml_body(): <body> missing posture = attribute; ignoring <body>."<<endl;
+		LOG("WARNING: BML::Processor::parse_bml_body(): <body> missing posture = attribute; ignoring <body>.");
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 }
@@ -648,57 +677,87 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 
 				if( target && *target != 0 ) {
 					// TODO
-					wcerr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a target.  Ignoring behavior." << endl;
+					std::wstringstream wstrstr;
+					wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a target.  Ignoring behavior.";
+					LOG(convertWStringToString(wstrstr.str()).c_str());
 					return BehaviorRequestPtr();  // a.k.a., NULL
 				} else if( direction && *direction != 0 ) {
 					if( XMLString::compareIString( direction, DIR_RIGHT )==0 ) {
 						// TODO
-						wcerr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<<DIR_RIGHT<<"\".  Ignoring behavior." << endl;
+						std::wstringstream wstrstr;
+						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<<DIR_RIGHT<<"\".  Ignoring behavior.";
+						LOG(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
 					} else if( XMLString::compareIString( direction, DIR_LEFT )==0 ) {
 						// TODO
-						wcerr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<<DIR_LEFT<<"\".  Ignoring behavior." << endl;
+						std::wstringstream wstrstr;
+						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<<DIR_LEFT<<"\".  Ignoring behavior.";
+						LOG(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
 					} else if( XMLString::compareIString( direction, DIR_UP )==0 ) {
 						// TODO
-						wcerr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<<DIR_UP<<"\".  Ignoring behavior." << endl;
+						std::wstringstream wstrstr;
+						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<<DIR_UP<<"\".  Ignoring behavior.";
+						LOG(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
 					} else if( XMLString::compareIString( direction, DIR_DOWN )==0 ) {
 						// TODO
-						wcerr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<<DIR_DOWN<<"\".  Ignoring behavior." << endl;
+						std::wstringstream wstrstr;
+						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<<DIR_DOWN<<"\".  Ignoring behavior.";
+						LOG(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
 					} else if( XMLString::compareIString( direction, DIR_ROLLRIGHT )==0 ) {
 						// TODO
-						wcerr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<<DIR_ROLLRIGHT<<"\".  Ignoring behavior." << endl;
+						std::wstringstream wstrstr;
+						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<<DIR_ROLLRIGHT<<"\".  Ignoring behavior.";
+						LOG(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
 					} else if( XMLString::compareIString( direction, DIR_ROLLRIGHT )==0 ) {
 						// TODO
-						wcerr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<<DIR_ROLLRIGHT<<"\".  Ignoring behavior." << endl;
+						std::wstringstream wstrstr;
+						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<<DIR_ROLLRIGHT<<"\".  Ignoring behavior.";
+						LOG(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
 					} else {
-						wcerr << "WARNING: BML::Processor::parse_bml_head(): Unrecognized direction \""<<direction<<"\" in <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">.  Ignoring behavior." << endl;
+						std::wstringstream wstrstr;
+						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unrecognized direction \""<<direction<<"\" in <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">.  Ignoring behavior.";
+						LOG(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
 					}
 
 					// TODO
-					wcerr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction.  Ignoring behavior." << endl;
+					std::wstringstream wstrstr;
+					wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction.  Ignoring behavior.";
+					LOG(convertWStringToString(wstrstr.str()).c_str());
 					return BehaviorRequestPtr();  // a.k.a., NULL
 				} else {
-					wcerr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> requires a target or a direction attribute.  Ignoring behavior." << endl;
+					std::wstringstream wstrstr;
+					wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> requires a target or a direction attribute.  Ignoring behavior.";
+					LOG(convertWStringToString(wstrstr.str()).c_str());
 					return BehaviorRequestPtr();  // a.k.a., NULL
 				}
 			}
 
 			case BML::HEAD_TOSS:
-				wcerr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">.  Ignoring behavior." << endl;
+				{
+				std::wstringstream wstrstr;
+				wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">.  Ignoring behavior.";
+				LOG(convertWStringToString(wstrstr.str()).c_str());
 				return BehaviorRequestPtr();  // a.k.a., NULL
+				}
 
 			default:
-                wcerr << "WARNING: BML::Processor::parse_bml_head(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unknown type value, ignore command" << endl;
+				{
+				std::wstringstream wstrstr;
+                wstrstr << "WARNING: BML::Processor::parse_bml_head(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unknown type value, ignore command";
+				LOG(convertWStringToString(wstrstr.str()).c_str());
 				return BehaviorRequestPtr();  // a.k.a., NULL
+				}
         }
     } else {
-        wcerr << "WARNING: BML::Processor::parse_bml_head(): <"<<tag<<"> BML tag missing "<<ATTR_TYPE<<"= attribute." << endl;
+		std::wstringstream wstrstr;
+        wstrstr << "WARNING: BML::Processor::parse_bml_head(): <"<<tag<<"> BML tag missing "<<ATTR_TYPE<<"= attribute.";
+		LOG(convertWStringToString(wstrstr.str()).c_str());
 		return BehaviorRequestPtr();  // a.k.a., NULL
     }
 }
@@ -837,25 +896,36 @@ void BML::Processor::speechReply( SbmCharacter* actor, SmartBody::RequestId requ
 
 					request->realize( this, mcu );
 				} catch( std::exception& e ) {
-					ostringstream error_msg;
-					cerr << "ERROR: BML::Processor::speechReply() exception:" << e.what() << endl;
+					std::stringstream strstr;
+					strstr << "ERROR: BML::Processor::speechReply() exception:" << e.what();
+					LOG(strstr.str().c_str());
 					bml_error( actor->name, request->msgId.c_str(), e.what(), mcu );
 				}
 			} else {
 				if( LOG_SPEECH )
-					cerr << "ERROR: BodyPlannerImpl::speechReply(..): SpeechRequest found for \"" << requestId << "\", but BmlRequest is missing" << endl;
+				{
+					std::stringstream strstr;
+					strstr << "ERROR: BodyPlannerImpl::speechReply(..): SpeechRequest found for \"" << requestId << "\", but BmlRequest is missing";
+					LOG(strstr.str().c_str());
+				}
 				// NO ERROR MESSAGE!  Missing BmlRequest means vrSpeakFailed fields are lost.
 			}   // else ignore... not a part of this BodyPlanner or expired
 		} else {
 			if( LOG_SPEECH )
-				cerr << "ERROR: BodyPlannerImpl::speechReply(..): SpeechRequest not found for \"" << requestId << "\"." << endl;
+			{
+				std::stringstream strstr;
+				strstr << "ERROR: BodyPlannerImpl::speechReply(..): SpeechRequest not found for \"" << requestId << "\".";
+				LOG(strstr.str().c_str());
+			}
 			// NO ERROR MESSAGE!  Missing SpeechRequest means BmlRequest's vrSpeakFailed fields are also lost.
 		}   // else ignore... not a part of this BodyPlanner or expired
 
 		// Clear the lookup table (shouldn't be referenced twice)
 		speeches.erase( speechKey );
 	} else if( LOG_SPEECH ) {
-		cerr << "ERROR: BodyPlannerImpl::speechReply(..): No speech found for \"" << requestId << "\"" << endl;
+		std::stringstream strstr;
+		strstr << "ERROR: BodyPlannerImpl::speechReply(..): No speech found for \"" << requestId << "\"";
+		LOG(strstr.str().c_str());
 	}   // else ignore... not a part of this BodyPlanner or expired
 }
 
@@ -886,7 +956,7 @@ int BML::Processor::bml_end( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
 	MapOfBmlRequest::iterator find_result = bml_requests.find( requestId );
 	if( find_result == bml_requests.end() ) {
 		// Assume already cleaned up...
-		//cerr << "WARNING: BodyPlannerImpl::bml_end(..): " << bpMsg.actorId << ": Unknown msgId=" << bpMsg.msgId << endl;
+		//strstr << "WARNING: BodyPlannerImpl::bml_end(..): " << bpMsg.actorId << ": Unknown msgId=" << bpMsg.msgId << endl;
 		return CMD_SUCCESS;
 	}
 	BmlRequestPtr request( find_result->second );
@@ -900,14 +970,18 @@ int BML::Processor::bml_end( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
 		} else if( complete_code == "persistent" ) {
 			// Persistent behaviors.  Some controllers may remain active.
 		} else {
-			cerr << "ERROR: BodyPlannerImpl::bml_end(..): " << bpMsg.actorId << " " << bpMsg.msgId << ": Unknown end complete_code \""<<complete_code<<"\". Treating as normal complete." << endl;
+			std::stringstream strstr;
+			strstr << "ERROR: BodyPlannerImpl::bml_end(..): " << bpMsg.actorId << " " << bpMsg.msgId << ": Unknown end complete_code \""<<complete_code<<"\". Treating as normal complete.";
+			LOG(strstr.str().c_str());
 		}
 	} else if( end_code == "interrupted" ) {
 		// Ended by interruption from another behavior
 	} else if( end_code == "ERROR" || end_code == "error" ) {
 		// ended with error
 	} else {
-		cerr << "ERROR: BodyPlannerImpl::bml_end(..): " << bpMsg.actorId << " " << bpMsg.msgId << ": Unknown end_code \""<<end_code<<"\". Treating as complete." << endl;
+		std::stringstream strstr;
+		strstr << "ERROR: BodyPlannerImpl::bml_end(..): " << bpMsg.actorId << " " << bpMsg.msgId << ": Unknown end_code \""<<end_code<<"\". Treating as complete." << endl;
+		LOG(strstr.str().c_str());
 	}
 
 	request->cleanup( this, mcu );
@@ -929,7 +1003,11 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 	if( character == NULL ) {
 		//  Character is not managed by this SBM process
 		if( bp.warn_unknown_agents )
-			cerr << "WARNING: BmlProcessor: Unknown agent \"" << character_id << "\"." << endl;
+		{
+			std::stringstream strstr;
+			strstr << "WARNING: BmlProcessor: Unknown agent \"" << character_id << "\".";
+			LOG(strstr.str().c_str());
+		}
 		// Ignore
 		return CMD_SUCCESS;
 	}
@@ -1005,26 +1083,32 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 			return bp.bml_end( BMLProcessorMsg( character_id, message_id, character, NULL, args ), mcu );
 #endif
 		} catch( BmlException& e ) {
-			cerr << "vrAgentBML .. end: " << e.type() << ": " << e.what() << endl;
+			std::stringstream strstr;
+			strstr << "vrAgentBML .. end: " << e.type() << ": " << e.what() << endl;
+			LOG(strstr.str().c_str());
 			return CMD_FAILURE;
 		//} catch( AssertException& e ) {
-		//	cerr << "vrSpeak: AssertionException: "<<e.getMessage()<< endl;
+		//	strstr << "vrSpeak: AssertionException: "<<e.getMessage()<< endl;
 		//	return CMD_FAILURE;
 		} catch( const exception& e ) {
-			cerr << "vrAgentBML .. end: std::exception: "<<e.what()<< endl;
+			std::stringstream strstr;
+			strstr << "vrAgentBML .. end: std::exception: "<<e.what()<< endl;
+			LOG(strstr.str().c_str());
 			return CMD_FAILURE;
 		//} catch( ... ) {
-		//	cerr << "vrSpeak: Unknown exception."<< endl;
+		//	strstr << "vrSpeak: Unknown exception."<< endl;
 		//	//std::unexpected();
 		//	return CMD_FAILURE;
 		}
 	} else {
 #if USE_RECIPIENT
-		cerr << "ERROR: vrAgentBML: Unknown subcommand \"" << command << "\" in message:\n\t"
+		strstr << "ERROR: vrAgentBML: Unknown subcommand \"" << command << "\" in message:\n\t"
 		     << "vrAgentBML " << character_id << " "<<recipient_id<<" " << message_id << " " << command << " " << args.read_remainder_raw() << endl;
 #else
-		cerr << "ERROR: vrAgentBML: Unknown subcommand \"" << command << "\" in message:\n\t"
-		     << "vrAgentBML " << character_id << " " << message_id << " " << command << " " << args.read_remainder_raw() << endl;
+		std::stringstream strstr;
+		strstr << "ERROR: vrAgentBML: Unknown subcommand \"" << command << "\" in message:\n\t"
+		     << "vrAgentBML " << character_id << " " << message_id << " " << command << " " << args.read_remainder_raw();
+		LOG(strstr.str().c_str());
 #endif
 		return CMD_FAILURE;
 	}
@@ -1032,6 +1116,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 
 int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 	Processor& bp = mcu->bml_processor;
+	int suppress = 1;
 
 	const char *agent_id     = args.read_token();
 	const char *recipient_id = args.read_token();
@@ -1067,7 +1152,13 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 		if( agent==NULL ) {
 			//  Agent is not managed by this SBM process
 			if( bp.warn_unknown_agents )
-				cerr << "WARNING: BmlProcessor: Unknown agent \"" << agent_id << "\"." << endl;
+			{
+				std::stringstream strstr;
+				strstr << "WARNING: BmlProcessor: Unknown agent \"" << agent_id << "\".";
+				LOG(strstr.str().c_str());
+			}
+
+				
 			// Ignore
 			return CMD_SUCCESS;
 		}
@@ -1078,6 +1169,7 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 		}
 
         DOMDocument *xmlDoc = xml_utils::parseMessageXml( bp.xmlParser.get(), xml );
+
 		if( xmlDoc == NULL ) {
 			bml_error( agent_id, message_id, "XML parser returned NULL document.", mcu );
 			return CMD_FAILURE;
@@ -1139,10 +1231,12 @@ int BML::Processor::vrSpoke_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 		bml_error( agent_id, message_id, msg.str().c_str(), mcu );
 		return CMD_FAILURE;
 	} catch( const exception& e ) {
-		cerr << "vrSpoke: std::exception: "<<e.what()<< endl;
+		std::stringstream strstr;
+		strstr << "vrSpoke: std::exception: " << e.what();
+		LOG(strstr.str().c_str());
 		return CMD_FAILURE;
 	//} catch( ... ) {
-	//	cerr << "vrSpeak: Unknown exception."<< endl;
+	//	strstr << "vrSpeak: Unknown exception."<< endl;
 	//	//std::unexpected();
 	//	return CMD_FAILURE;
 	}
@@ -1160,7 +1254,9 @@ int BML::Processor::bp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 		char* actorId = args.read_token();
 		SbmCharacter* actor = mcu->character_map.lookup( actorId );
 		if( actor==NULL ) {
-			cerr << "WARNING: BML::Processor::bp_cmd_func(): Unknown actor \"" << actorId << "\".  This is probably an error since the command \"bp speech_reply\" is not supposed to be sent over the network, thus it should not be coming from another SBM process." << endl;
+			std::stringstream strstr;
+			strstr << "WARNING: BML::Processor::bp_cmd_func(): Unknown actor \"" << actorId << "\".  This is probably an error since the command \"bp speech_reply\" is not supposed to be sent over the network, thus it should not be coming from another SBM process." << endl;
+			LOG(strstr.str().c_str());
 			return CMD_SUCCESS;
 		}
 
@@ -1226,7 +1322,9 @@ int BML::Processor::set_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 			bp.auto_print_controllers = false;
 			return CMD_SUCCESS;
 		} else {
-			cerr << "ERROR: BML::Processor::set_func(): expected \"on\" or \"off\" for " << attribute <<".  Found \""<<value<<"\"."<< endl;
+			std::stringstream strstr;
+			strstr << "ERROR: BML::Processor::set_func(): expected \"on\" or \"off\" for " << attribute <<".  Found \""<<value<<"\".";
+			LOG(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
 	} else if( attribute == "auto_print_sequence" ||
@@ -1239,7 +1337,9 @@ int BML::Processor::set_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 			bp.auto_print_sequence = false;
 			return CMD_SUCCESS;
 		} else {
-			cerr << "ERROR: BML::Processor::set_func(): expected \"on\" or \"off\" for " << attribute <<".  Found \""<<value<<"\"."<< endl;
+			std::stringstream strstr;
+			strstr << "ERROR: BML::Processor::set_func(): expected \"on\" or \"off\" for " << attribute <<".  Found \""<<value<<"\".";
+			LOG(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
 	} else if( attribute == "log_sync_points" ||
@@ -1252,14 +1352,18 @@ int BML::Processor::set_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 			bp.log_syncpoints = false;
 			return CMD_SUCCESS;
 		} else {
-			cerr << "ERROR: BML::Processor::set_func(): expected \"on\" or \"off\" for " << attribute <<".  Found \""<<value<<"\"."<< endl;
+			std::stringstream strstr;
+			strstr << "ERROR: BML::Processor::set_func(): expected \"on\" or \"off\" for " << attribute <<".  Found \""<<value<<"\".";
+			LOG(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
 	} else if( attribute == "controller_speed" ||
 	           attribute == "controller-speed" ) {
 		string sub_attribute = args.read_token();
 		if( sub_attribute.empty() ) {
-			cerr << "ERROR: Missing sub-attributes 'min <value>' or 'max <value>'." << endl;
+			std::stringstream strstr;
+			strstr << "ERROR: Missing sub-attributes 'min <value>' or 'max <value>'.";
+			LOG(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
 
@@ -1272,7 +1376,9 @@ int BML::Processor::set_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 				if( value == "default" ) {
 					ct_speed_min = BML::CONTROLLER_SPEED_MIN_DEFAULT;
 				} else if( value.empty() || !(istringstream( value ) >> ct_speed_min) ) {
-					cerr << "ERROR: Invalid " << attribute << ' ' << sub_attribute << " value string \"" << value << "\"." << endl;
+					std::stringstream strstr;
+					strstr << "ERROR: Invalid " << attribute << ' ' << sub_attribute << " value string \"" << value << "\".";
+					LOG(strstr.str().c_str());
 					return CMD_FAILURE;
 				}
 			} else if( sub_attribute == "max" ) {
@@ -1280,11 +1386,15 @@ int BML::Processor::set_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 				if( value == "default" ) {
 					ct_speed_max = BML::CONTROLLER_SPEED_MAX_DEFAULT;
 				} else if( value.empty() || !(istringstream( value ) >> ct_speed_max) ) {
-					cerr << "ERROR: Invalid " << attribute << ' ' << sub_attribute << " value string \"" << value << "\"." << endl;
+					std::stringstream strstr;
+					strstr << "ERROR: Invalid " << attribute << ' ' << sub_attribute << " value string \"" << value << "\".";
+					LOG(strstr.str().c_str());
 					return CMD_FAILURE;
 				}
 			} else {
-				cerr << "ERROR: Unexpected sub_attribute \"" << sub_attribute << "\" for bp controller_speed." << endl;
+				std::stringstream strstr;
+				strstr << "ERROR: Unexpected sub_attribute \"" << sub_attribute << "\" for bp controller_speed.";
+				LOG(strstr.str().c_str());
 				return CMD_FAILURE;
 			}
 			sub_attribute = args.read_token();
@@ -1292,14 +1402,20 @@ int BML::Processor::set_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 
 		bool valid = true;
 		if( ct_speed_min >= 1 ) {
-			cerr << "ERROR: controller_speed min must be less than 1." << endl;
+			std::stringstream strstr;
+			strstr << "ERROR: controller_speed min must be less than 1.";
+			LOG(strstr.str().c_str());
 			valid = false;
 		} else if( ct_speed_min <= 0 ) {
-			cerr << "ERROR: controller_speed min must be greater than 0." << endl;
+			std::stringstream strstr;
+			strstr << "ERROR: controller_speed min must be greater than 0.";
+			LOG(strstr.str().c_str());
 			valid = false;
 		}
 		if(  ct_speed_max <= 1 ) {
-			cerr << "ERROR: controller_speed max must be greater than 1." << endl;
+			std::stringstream strstr;
+			strstr << "ERROR: controller_speed max must be greater than 1.";
+			LOG(strstr.str().c_str());
 			valid = false;
 		}
 		if( valid ) {
@@ -1327,11 +1443,15 @@ int BML::Processor::set_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 
 			return BML::Gaze::set_gaze_smoothing( lumbar, cervical, eyeball );
 		} else {
-			cerr << "ERROR: BML::Processor::set_func(): Unknown gaze attribute \"" << attribute <<"\"."<< endl;
+			std::stringstream strstr;
+			strstr << "ERROR: BML::Processor::set_func(): Unknown gaze attribute \"" << attribute <<"\".";
+			LOG(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
 	} else {
-		cerr << "ERROR: BML::Processor::set_func(): Unknown attribute \"" << attribute <<"\"."<< endl;
+		std::stringstream strstr;
+		strstr << "ERROR: BML::Processor::set_func(): Unknown attribute \"" << attribute <<"\".";
+		LOG(strstr.str().c_str());
         return CMD_NOT_FOUND;
 	}
 }
@@ -1370,11 +1490,15 @@ int BML::Processor::print_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 			BML::Gaze::print_gaze_smoothing();
 			return CMD_SUCCESS;
 		} else {
-			cerr << "ERROR: BML::Processor::set_func(): Unknown gaze attribute \"" << attribute <<"\"."<< endl;
+			std::stringstream strstr;
+			strstr << "ERROR: BML::Processor::set_func(): Unknown gaze attribute \"" << attribute <<"\".";
+			LOG(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
 	} else {
-		cerr << "ERROR: BML::Processor::print_func(): Unknown attribute \"" << attribute <<"\"."<< endl;
+		std::stringstream strstr;
+		strstr << "ERROR: BML::Processor::print_func(): Unknown attribute \"" << attribute <<"\".";
+		LOG(strstr.str().c_str());
         return CMD_NOT_FOUND;
 	}
 }

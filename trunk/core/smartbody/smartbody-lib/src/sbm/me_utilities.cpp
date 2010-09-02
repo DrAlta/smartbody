@@ -69,12 +69,12 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, Resourc
 		}
 	}
 	if( fp == NULL )	{
-		cerr << "ERROR: load_skeleton(..): Skeleton file \""<<skel_file<<"\" not found." << endl;
+		LOG("ERROR: load_skeleton(..): Skeleton file \"%s\" not found.", skel_file);
 		return NULL;
 	}
 	SrInput input( fp );
 	if( !input.valid() ) {
-		cerr << "ERROR: load_skeleton(..): Unable to access skeleton file \""<<skel_file<<"\"." << endl;
+		LOG("ERROR: load_skeleton(..): Unable to access skeleton file \"%s\".", skel_file);
 		return NULL;
 	}
 
@@ -88,7 +88,7 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, Resourc
 	input.filename(filename);
 	if( !skeleton_p->load( input ) )	{ 
 #endif
-		cerr << "ERROR: load_skeleton(..): Unable to load skeleton file \""<<skel_file<<"\"." << endl;
+		LOG("ERROR: load_skeleton(..): Unable to load skeleton file \"%s\".", skel_file);
 		return NULL;
 	}
 	skeleton_p->skfilename(filename);
@@ -132,7 +132,7 @@ bool validate_path( path& result, const char* pathname ) {
 
 int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>& map, bool recurse_dirs, ResourceManager* manager, const char* error_prefix ) {
 	if( !exists( pathname ) ) {
-		cerr << error_prefix << "Motion path \"" << pathname.native_file_string() << "\" not found." << endl;
+		LOG("%s Motion path \"%s\" not found.", error_prefix,  pathname.native_file_string().c_str());
 		return CMD_FAILURE;
 	}
 
@@ -149,7 +149,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 				if( _stricmp( ext.c_str(), MOTION_EXT )==0 ) {
 					load_me_motions_impl( cur, map, recurse_dirs, manager, "WARNING: " );
 				} else if( DEBUG_LOAD_PATHS ) {
-					cout << "DEBUG: load_me_motion_impl(): Skipping \"" << cur.string() << "\". Extension \"" << ext << "\" does not match MOTION_EXT." << endl;
+					LOG("DEBUG: load_me_motion_impl(): Skipping \"%s\".  Extension \"%s\" does not match MOTION_EXT.", cur.string(), ext);
 				}
 			}
 		}
@@ -162,6 +162,11 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 		in.getall( fullin_string );
 		SrInput fullin( (const char *)fullin_string );
 		fullin.filename( pathname.string().c_str() ); // copy filename for error messages
+		if (pathname.string() == "../../../../data/sbm-common/common-sk/motion/Asalah.skm")
+		{
+			int x = 10;
+		}
+
 		if( motion->load( fullin ) ) {
 
 			// register the motion
@@ -194,7 +199,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			
 		} else {
 			// SkMotion::load() already prints an error...
-			//cerr << error_prefix << "Failed to load motion \"" << pathname.string() << "\"." << endl;
+			//strstr << error_prefix << "Failed to load motion \"" << pathname.string() << "\"." << endl;
 			motion->unref();
 			return CMD_FAILURE;
 		}
@@ -204,7 +209,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 
 int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture*>& map, bool recurse_dirs, ResourceManager* manager, const char* error_prefix ) {
 	if( !exists( pathname ) ) {
-		cerr << error_prefix << "Posture path \"" << pathname.native_file_string() << "\" not found." << endl;
+		LOG("%s Posture path \"%s\" not found.", error_prefix, pathname.native_file_string().c_str());
 		return CMD_FAILURE;
 	}
 
@@ -221,7 +226,7 @@ int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture
 				if( _stricmp( ext.c_str(), POSTURE_EXT )==0 ) {
 					load_me_postures_impl( cur, map, recurse_dirs, manager, "WARNING: " );
 				} else if( DEBUG_LOAD_PATHS ) {
-					cout << "DEBUG: load_me_posture_impl(): Skipping \"" << cur.string() << "\". Extension \"" << ext << "\" does not match POSTURE_EXT." << endl;
+					LOG("DEBUG: load_me_posture_impl(): Skipping \"%s\". Extension \"%s\" does not match POSTURE_EXT.",  cur.string().c_str(), ext.c_str());
 				}
 			}
 		}
@@ -231,7 +236,9 @@ int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture
 		SrInput in( pathname.string().c_str(), "rt" );
 		in >> (*posture);
 		if( in.had_error() ) {
-			cerr << error_prefix << "Failed to load posture \"" << pathname.string() << "\"." << endl;
+			std::stringstream strstr;
+			strstr << error_prefix << "Failed to load posture \"" << pathname.string() << "\".";
+			LOG(strstr.str().c_str());
 			posture->unref();
 			return CMD_FAILURE;
 		} else {
@@ -248,14 +255,18 @@ int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture
 			string filebase = basename( pathname );
 			const char* name = posture->name();
 			if( name && _stricmp( filebase.c_str(), name ) ) {
-				cerr << "WARNING: Posture name \"" << name << "\" does not equal base of filename \"" << pathname.native_file_string() << "\".  Using \"" << filebase << "\" in posture map." << endl;
+				std::stringstream strstr;
+				strstr << "WARNING: Posture name \"" << name << "\" does not equal base of filename \"" << pathname.native_file_string() << "\".  Using \"" << filebase << "\" in posture map." << endl;
+				LOG(strstr.str().c_str());
 				posture->name( filebase.c_str() );
 			}
 			posture->filename( pathname.native_file_string().c_str() );
 
 			std::map<std::string, SkPosture*>::iterator postureIter = map.find(filebase);
 			if (postureIter != map.end()) {
-				cerr << "ERROR: Posture by name of \"" << filebase << "\" already exists.  Ignoring file \"" << pathname.native_file_string() << "\"." << endl;
+				std::stringstream strstr;
+				strstr << "ERROR: Posture by name of \"" << filebase << "\" already exists.  Ignoring file \"" << pathname.native_file_string() << "\"." << endl;
+				LOG(strstr.str().c_str());
 				return CMD_FAILURE;
 			}
 			map.insert(std::pair<std::string, SkPosture*>(filebase, posture));
@@ -270,7 +281,7 @@ int load_me_motions( const char* pathname, std::map<std::string, SkMotion*>& map
 	if( validate_path( motions_path, pathname ) ) {
 		return load_me_motions_impl( motions_path, map, recurse_dirs, manager, "ERROR: " );
 	} else {
-		cerr << "ERROR: Invalid motion path \"" << pathname << "\"." << endl;
+		LOG("ERROR: Invalid motion path \"%s\".", pathname);
 		return CMD_FAILURE;
 	}
 }
@@ -280,7 +291,7 @@ int load_me_postures( const char* pathname, std::map<std::string, SkPosture*>& m
 	if( validate_path( posture_path, pathname ) ) {
 		return load_me_postures_impl( posture_path, map, recurse_dirs, manager, "ERROR: " );
 	} else {
-		cerr << "ERROR: Invalid posture path \"" << pathname << "\"." << endl;
+		LOG("ERROR: Invalid posture path \"%s\".", pathname);
 		return CMD_FAILURE;
 	}
 }

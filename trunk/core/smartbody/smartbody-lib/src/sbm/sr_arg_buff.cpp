@@ -107,8 +107,6 @@ char* srArgBuffer::read_remainder_raw( void )	{
 }
 
 
-//////////////////////////
-//  Private methods
 char* srArgBuffer::peek_string( void )	{
 	if( token == NULL )	{
 		return( tok_buff );

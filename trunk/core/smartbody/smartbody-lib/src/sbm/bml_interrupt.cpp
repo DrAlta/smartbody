@@ -24,6 +24,7 @@
 #include <sstream>
 #include <string>
 
+#include "vhcl_log.h"
 #include "mcontrol_util.h"
 #include "bml_processor.hpp"
 #include "bml_interrupt.hpp"
@@ -102,7 +103,9 @@ BehaviorRequestPtr BML::parse_bml_interrupt( DOMElement* elem, const std::string
 
 		return interrupt;
     } else {
-        wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag missing "<<ATTR_ACT<<"= attribute." << endl;
+		std::wstringstream wstrstr;
+        wstrstr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag missing "<<ATTR_ACT<<"= attribute." << endl;
+		LOG(convertWStringToString(wstrstr.str()).c_str());
 		return BehaviorRequestPtr();  // a.k.a., NULL
     }
 }

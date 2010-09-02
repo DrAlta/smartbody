@@ -28,6 +28,7 @@
 #include "bml_general_param.hpp"
 #include "sbm/general_param_setting.h"
 #include "bml_xml_consts.hpp"
+#include "vhcl_log.h"
 
 
 ////// XML ATTRIBUTES
@@ -82,7 +83,10 @@ BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& un
 	}
 	if(flag == 0)
 	{	
-		wcerr<<"WARNING: Cannot find the parameter name! Please check your initialization in Sequence File\n"<<endl;
+		std::wstringstream wstrstr;
+		wcerr<<"WARNING: Cannot find the parameter name! Please check your initialization in Sequence File\n";
+		LOG(convertWStringToString(wstrstr.str()).c_str());
+
 		return BehaviorRequestPtr();
 	}
 
@@ -100,7 +104,7 @@ BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& un
 		if(pch == NULL) 
 		{
 			flag = 0; 
-			wcerr<<"WARNING: The input value size is invalid! Size is smaller than required\n"<<endl;
+			LOG("WARNING: The input value size is invalid! Size is smaller than required");
 			return BehaviorRequestPtr();
 		}
 		Data_Array[i] = (float)atof(pch);
@@ -115,7 +119,7 @@ BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& un
 	if(pch != NULL) 
 	{
 		flag = 0; 
-		wcerr<<"WARNING: The input value size is invalid! Size is larger than required\n"<<endl;
+		LOG("WARNING: The input value size is invalid! Size is larger than required");
 		return BehaviorRequestPtr();
 	}
 

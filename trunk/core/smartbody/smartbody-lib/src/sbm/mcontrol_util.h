@@ -311,10 +311,24 @@ class mcuCBHandle	{
 		srCmdSeq* lookup_seq( const char* );
 
 		int execute( const char *key, srArgBuffer& args ) { 
+			std::stringstream strstr;
+			strstr << key << " " << args.peek_string();
+			CmdResource* resource = new CmdResource();
+			resource->setChildrenLimit(resource_manager->getLimit());	// assuming the limit of total resources( path, motion, file, command) is the same with the limit of children ( command resource only) number
+			resource->setCommand(strstr.str());
+			resource_manager->addResource(resource);
+			
 			return( cmd_map.execute( key, args, this ) ); 
 		}
 
 		int execute( const char *key, char* strArgs ) { 
+			std::stringstream strstr;
+			strstr << key << " " << strArgs;
+			CmdResource* resource = new CmdResource();
+			resource->setChildrenLimit(resource_manager->getLimit());	// assuming the limit of total resources( path, motion, file, command) is the same with the limit of children ( command resource only) number
+			resource->setCommand(strstr.str());
+			resource_manager->addResource(resource);
+
             srArgBuffer args( strArgs );
 			return( cmd_map.execute( key, args, this ) ); 
 		}
@@ -381,4 +395,6 @@ class mcuCBHandle	{
 };
 
 //////////////////////////////////////////////////////////////////
+
+
 #endif
