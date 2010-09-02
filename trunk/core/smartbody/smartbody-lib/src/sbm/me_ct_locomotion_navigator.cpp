@@ -146,8 +146,8 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeCtLocomot
 	CheckNewRoutine(frame);
 	world_pos.set( buffer[ bi_world_x ], buffer[ bi_world_y ], buffer[ bi_world_z ] );
 	world_rot.set( buffer[ bi_world_rot ], buffer[ bi_world_rot+1 ], buffer[ bi_world_rot+2 ], buffer[ bi_world_rot+3 ] );
-	base_offset.set ( buffer[ bi_base_offset_x ], buffer[ bi_base_offset_y ], buffer[ bi_base_offset_z ] );
-	base_rot.set( buffer[ bi_base_rot ], buffer[ bi_base_rot+1 ], buffer[ bi_base_rot+2 ], buffer[ bi_base_rot+3 ] );
+	base_pos.set ( buffer[ bi_base_x ], buffer[ bi_base_y ], buffer[ bi_base_z ] );
+	//base_rot.set( buffer[ bi_base_rot ], buffer[ bi_base_rot+1 ], buffer[ bi_base_rot+2 ], buffer[ bi_base_rot+3 ] );
 
 	//world_pos.y = 0.0f;
 	SrQuat t_world_rot;
@@ -376,29 +376,33 @@ bool MeCtLocomotionNavigator::controller_map_updated(MeControllerContext* _conte
 	if( _context != NULL ) 
 	{
 		// request_channel indices (second param) come from the order of request_channels.add(..) calls in controller_channels()
-		LOOKUP_BUFFER_INDEX( bi_world_x,    0 );
-		LOOKUP_BUFFER_INDEX( bi_world_y,    1 );
-		LOOKUP_BUFFER_INDEX( bi_world_z,    2 );
-		LOOKUP_BUFFER_INDEX( bi_world_rot,  3 );
+		LOOKUP_BUFFER_INDEX( bi_world_x,    bi_world_x );
+		LOOKUP_BUFFER_INDEX( bi_world_y,    bi_world_y );
+		LOOKUP_BUFFER_INDEX( bi_world_z,    bi_world_z );
+		LOOKUP_BUFFER_INDEX( bi_world_rot,  bi_world_rot );
 
-		LOOKUP_BUFFER_INDEX( bi_loco_vel_x, 4 );
-		LOOKUP_BUFFER_INDEX( bi_loco_vel_y, 5 );
-		LOOKUP_BUFFER_INDEX( bi_loco_vel_z, 6 );
+		LOOKUP_BUFFER_INDEX( bi_base_x,    bi_base_x );
+		LOOKUP_BUFFER_INDEX( bi_base_y,    bi_base_y );
+		LOOKUP_BUFFER_INDEX( bi_base_z,    bi_base_z );
 
-		LOOKUP_BUFFER_INDEX( bi_loco_rot_global_y, 7 );
-		LOOKUP_BUFFER_INDEX( bi_loco_rot_local_y, 8 );
+		LOOKUP_BUFFER_INDEX( bi_loco_vel_x, bi_loco_vel_x );
+		LOOKUP_BUFFER_INDEX( bi_loco_vel_y, bi_loco_vel_y );
+		LOOKUP_BUFFER_INDEX( bi_loco_vel_z, bi_loco_vel_z );
 
-		LOOKUP_BUFFER_INDEX( bi_id, 9 );
+		LOOKUP_BUFFER_INDEX( bi_loco_rot_global_y, bi_loco_rot_global_y );
+		LOOKUP_BUFFER_INDEX( bi_loco_rot_local_y, bi_loco_rot_local_y );
+
+		LOOKUP_BUFFER_INDEX( bi_id, bi_id );
 
 		//LOOKUP_BUFFER_INDEX( bi_has_destination, 10 );
 		//LOOKUP_BUFFER_INDEX( bi_loco_dest_x, 10 );
 		//LOOKUP_BUFFER_INDEX( bi_loco_dest_y, 11 );
 		//LOOKUP_BUFFER_INDEX( bi_loco_dest_z, 12 );
 
-		LOOKUP_BUFFER_INDEX( bi_base_offset_x,    10 );
-		LOOKUP_BUFFER_INDEX( bi_base_offset_y,    11 );
-		LOOKUP_BUFFER_INDEX( bi_base_offset_z,    12 );
-		LOOKUP_BUFFER_INDEX( bi_base_rot,  13 );
+		//LOOKUP_BUFFER_INDEX( bi_base_offset_x,    10 );
+		//LOOKUP_BUFFER_INDEX( bi_base_offset_y,    11 );
+		//LOOKUP_BUFFER_INDEX( bi_base_offset_z,    12 );
+		//LOOKUP_BUFFER_INDEX( bi_base_rot,  13 );
 	} 
 	else 
 	{
@@ -412,29 +416,38 @@ int MeCtLocomotionNavigator::controller_channels(SkChannelArray* request_channel
 {
 	// Initialize Requested Channels                                                  // Indices
 	routine_channel_num = 0;
-	AddChannel(request_channels, SbmCharacter::LOCOMOTION_VELOCITY, SkChannel::XPos); 
-	AddChannel(request_channels, SbmCharacter::LOCOMOTION_VELOCITY, SkChannel::YPos );
-	AddChannel(request_channels, SbmCharacter::LOCOMOTION_VELOCITY, SkChannel::ZPos );
-	AddChannel(request_channels, SbmCharacter::LOCOMOTION_GLOBAL_ROTATION, SkChannel::YPos );
-	AddChannel(request_channels, SbmCharacter::LOCOMOTION_LOCAL_ROTATION, SkChannel::YPos );
-	AddChannel(request_channels, SbmCharacter::LOCOMOTION_ID, SkChannel::YPos );
 
-	//AddChannel(request_channels, SbmCharacter::LOCOMOTION_HAS_DESTINATION, SkChannel::YPos ); 
-	//AddChannel(request_channels, SbmCharacter::LOCOMOTION_DESTINATION, SkChannel::XPos ); 
-	//AddChannel(request_channels, SbmCharacter::LOCOMOTION_DESTINATION, SkChannel::YPos );
-	//AddChannel(request_channels, SbmCharacter::LOCOMOTION_DESTINATION, SkChannel::ZPos );
+	// Initialize Requested Channels                                                           // Indices
 
-	/*AddChannel(request_channels, "base", SkChannel::XPos ); 
-	AddChannel(request_channels, "base", SkChannel::YPos );
-	AddChannel(request_channels, "base", SkChannel::ZPos );
-	AddChannel(request_channels, "base", SkChannel::Quat );*/
+	AddChannel(request_channels, SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::XPos, &bi_world_x);
+	AddChannel(request_channels, SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::YPos, &bi_world_y);
+	AddChannel(request_channels, SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::ZPos, &bi_world_z);
+	AddChannel(request_channels, SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::Quat, &bi_world_rot);
+
+	AddChannel(request_channels, SkJointName( "base" ), SkChannel::XPos, &bi_base_x);
+	AddChannel(request_channels, SkJointName( "base" ), SkChannel::YPos, &bi_base_y);
+	AddChannel(request_channels, SkJointName( "base" ), SkChannel::ZPos, &bi_base_z);
+
+	AddChannel(request_channels, SbmCharacter::LOCOMOTION_VELOCITY, SkChannel::XPos, &bi_loco_vel_x); 
+	AddChannel(request_channels, SbmCharacter::LOCOMOTION_VELOCITY, SkChannel::YPos, &bi_loco_vel_y);
+	AddChannel(request_channels, SbmCharacter::LOCOMOTION_VELOCITY, SkChannel::ZPos, &bi_loco_vel_z);
+
+	AddChannel(request_channels, SbmCharacter::LOCOMOTION_GLOBAL_ROTATION, SkChannel::YPos, &bi_loco_rot_global_y);
+	AddChannel(request_channels, SbmCharacter::LOCOMOTION_LOCAL_ROTATION, SkChannel::YPos, &bi_loco_rot_local_y);
+	AddChannel(request_channels, SbmCharacter::LOCOMOTION_ID, SkChannel::YPos, &bi_id);
 
 	return routine_channel_num;
 }
 
-void MeCtLocomotionNavigator::AddChannel(SkChannelArray* request_channels, const char* name, SkChannel::Type type)
+SrVec MeCtLocomotionNavigator::get_base_pos()
+{
+	return base_pos;
+}
+
+void MeCtLocomotionNavigator::AddChannel(SkChannelArray* request_channels, const char* name, SkChannel::Type type, int* index)
 {
 	request_channels->add( SkJointName(name), type);
+	*index = routine_channel_num;
 	++routine_channel_num;
 }
 

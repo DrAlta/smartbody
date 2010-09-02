@@ -96,6 +96,17 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	}
 
 	SbmCharacter* actor = NULL;
+	if(arg == "status")
+	{
+		mcu_p->character_map.reset();
+		for(int i = 0; i < mcu_p->character_map.get_num_entries(); ++i)
+		{
+			actor = mcu_p->character_map.next();
+			actor->get_locomotion_ct()->print_info(actor->name);
+		}
+		return CMD_SUCCESS;
+	}
+	
 	if( arg=="character" || arg=="char" ) {
 		string name = args.read_token();
 		actor = mcu_p->character_map.lookup( name );
@@ -153,10 +164,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		return CMD_SUCCESS;
 	}
 
-	if(arg == "status")
-	{
-		actor->get_locomotion_ct()->print_info();
-	}
+
 
 	if(!actor->is_locomotion_controller_initialized()) 
 	{
