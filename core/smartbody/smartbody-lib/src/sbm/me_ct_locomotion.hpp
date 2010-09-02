@@ -51,6 +51,8 @@ public:
 	float pre_blended_base_height;
 	float r_blended_base_height;
 
+	SrVec pre_world_offset_to_base;
+
 	//int base_index;
 
 	int r_anim1_index;
@@ -252,7 +254,9 @@ public:
 
 	float get_buffer_base_height(SrBuffer<float>& buffer);
 
-	void print_info();
+	SrVec calc_rotational_displacement();
+
+	void print_info(char* name);
 };
 
 #endif // ME_CT_LOCOMOTION_HPP

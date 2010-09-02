@@ -37,12 +37,7 @@ const char* MeCtLocomotion::TYPE = "MeCtLocomotion";
 MeCtLocomotion::MeCtLocomotion() {
 	is_valid = false;
 	limb_joint_num = 0;
-
 	last_time = std::numeric_limits<float>::quiet_NaN();
-	//limb_joint_index.capacity(0);
-
-	//nonlimb_joint_buff_index.capacity(0);
-	//nonlimb_joint_quats.capacity(0);
 	nonlimb_joint_info.joint_num = 0;
 	nonlimb_joint_info.buff_index.capacity(0);
 	nonlimb_joint_info.joint_index.capacity(0);
@@ -110,14 +105,13 @@ int MeCtLocomotion::LOOKUP_BUFFER_INDEX(int var_name, int index )
 SkChannelArray& MeCtLocomotion::controller_channels() {
 	if( request_channels.size() == 0 ) 
 	{
-		// Initialize Requested Channels                                                           // Indices
-		request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::XPos );  // #0
-		request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::YPos );  //  1
-		request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::ZPos );  //  2
-		request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::Quat );  //  3
+		get_translation_base_joint_index();
 
-		joint_channel_start_ind = 4;
-		joint_channel_start_ind += navigator.controller_channels(&request_channels);
+		//request_channels.add( SkJointName( nonlimb_joint_info.joint_name.get(translation_joint_index) ), SkChannel::XPos );  // 4
+		//request_channels.add( SkJointName( nonlimb_joint_info.joint_name.get(translation_joint_index) ), SkChannel::YPos );  // 5
+		//request_channels.add( SkJointName( nonlimb_joint_info.joint_name.get(translation_joint_index) ), SkChannel::ZPos );  // 6
+
+		joint_channel_start_ind = navigator.controller_channels(&request_channels);
 
 		limb_joint_num = 0;
 		for(int i = 0; i < limb_list.size(); ++i)
@@ -128,14 +122,8 @@ SkChannelArray& MeCtLocomotion::controller_channels() {
 			iterate_joints(&(limb->limb_joint_info));
 			limb_joint_num += limb->limb_joint_info.joint_num;
 		}
-		//limb_joint_index.capacity(limb_joint_num);
-		//limb_joint_index.size(limb_joint_num);
-
-		//SkJoint* base = standing_skeleton->search_joint(nonlimb_blending_base_name);
 
 		iterate_joints(&nonlimb_joint_info);
-
-		get_translation_base_joint_index();
 
 		t_joint_quats1.capacity(nonlimb_joint_info.joint_num);
 		t_joint_quats2.capacity(nonlimb_joint_info.joint_num);
@@ -359,6 +347,43 @@ SrArray<MeCtLocomotionLimb*>* MeCtLocomotion::get_limb_list()
 SrArray<MeCtLocomotionAnimGlobalInfo*>* MeCtLocomotion::get_anim_global_info()
 {
 	return &anim_global_info;
+}
+
+SrVec MeCtLocomotion::calc_rotational_displacement()
+{
+	SrVec v;
+	SkJoint* tjoint = walking_skeleton->search_joint(nonlimb_joint_info.joint_name.get(0));
+	SrMat gmat, pmat, lmat;
+	gmat.identity();
+	for(int i = 0; i <= translation_joint_index; ++i)
+	{
+		pmat = gmat;
+		lmat = get_lmat(tjoint, &(nonlimb_joint_info.quat.get(i)));
+		gmat = lmat * pmat;
+		if(tjoint->num_children()>0)
+		{ 
+			tjoint = tjoint->child(0);
+		}
+		else break;
+	}
+	
+	v.set(-gmat.e41(), -gmat.e42(), -gmat.e43());
+
+	v = -navigator.get_base_pos();
+	pmat.roty(navigator.get_facing_angle());
+
+	SrVec world_offset_to_base = v*pmat;
+	v = world_offset_to_base - pre_world_offset_to_base;
+	v.y = 0.0f;
+
+	pre_world_offset_to_base = world_offset_to_base;
+
+	if(!dis_initialized) 
+	{
+		v.set(0.0f, 0.0f, 0.0f);
+		return v;
+	}
+	return v;
 }
 
 void MeCtLocomotion::init_nonlimb_joint_info()
@@ -768,9 +793,9 @@ void MeCtLocomotion::get_IK()
 	SrMat pmat = get_lmat(tjoint, &navigator.base_rot);
 	float* ppos = pmat.pt(12);
 
-	ppos[0] = navigator.base_offset.x;
-	ppos[1] = navigator.base_offset.y;
-	ppos[2] = navigator.base_offset.z;
+	//ppos[0] = navigator.base_offset.x;
+	//ppos[1] = navigator.base_offset.y;
+	//ppos[2] = navigator.base_offset.z;
 
 	for(int i = 0; i < limb_list.size(); ++i)
 	{
@@ -988,10 +1013,12 @@ void MeCtLocomotion::update_pos()
 			for(int i = 0; i < 2; ++i)
 			{
 				displacement += dis[i]*ratio[i]/sum;
-				//displacement.x = 0.0f;
-				displacement.y = r_blended_base_height-pre_blended_base_height;
-				//displacement.z = 0.0f;
+
 			}
+			displacement += calc_rotational_displacement();
+			//displacement.x = 0.0f;
+			displacement.y = r_blended_base_height-pre_blended_base_height;
+			//displacement.z = 0.0f;
 		}
 		else
 		{
@@ -1023,34 +1050,33 @@ SrVec MeCtLocomotion::get_facing_vector()
 	return direction;
 }
 
-void MeCtLocomotion::print_info()
+void MeCtLocomotion::print_info(char* name)
 {
-	printf("\nAnimations loaded:");
+	LOG("Locomotion status of character: %s", name);
+	LOG("Animations loaded:");
 	for(int i = 0; i < locomotion_anims.size(); ++i)
 	{
-		printf("\n\t[%d] %s", i, locomotion_anims.get(i)->name());
+		LOG("\t[%d] %s", i, locomotion_anims.get(i)->name());
 	}
 
-	printf("\nLimbs:");
-	printf("\n  Total number: %d", limb_list.size());
+	LOG("Limbs:");
+	LOG("  Total number: %d", limb_list.size());
 	MeCtLocomotionLimb* limb;
 	for(int i = 0; i < limb_list.size(); ++i)
 	{
 		limb = limb_list.get(i);
-		printf("\n\t%s:", limb->limb_name.get(0));
+		LOG("\t%s:", limb->limb_name.get(0));
 		//limb->print_info();
-		printf("\n\tSupport joints:");
+		LOG("\tSupport joints:");
 		for(int j = 0; j < limb->get_support_joint_num(); ++j)
 		{
-			printf("\n\t\t%s", (const char*)*(limb->support_joint_list.get(j)));
+			LOG("\t\t%s", (const char*)*(limb->support_joint_list.get(j)));
 		}
 	}
 
-	printf("\nInitialized: ");
-	if(initialized) printf("Yes");
-	else printf("No");
+	if(initialized) LOG("Initialized: Yes");
+	else LOG("Initialized: No");
 
-	printf("\nEnabled: ");
-	if(enabled) printf("Yes");
-	else printf("No");
+	if(enabled) LOG("Enabled: Yes");
+	else LOG("Enabled: No");
 }

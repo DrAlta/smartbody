@@ -43,7 +43,7 @@ public:
 	SkChannelArray  request_channels;
 	bool is_valid;
 
-	SrVec base_offset;
+	//SrVec base_offset;
 	SrQuat base_rot;
 	bool has_destination;
 	bool reached_destination;
@@ -56,7 +56,7 @@ protected:
 	int bi_id;											 // ID
 	int bi_has_destination;
 	int bi_loco_dest_x, bi_loco_dest_y, bi_loco_dest_z;
-	int bi_base_offset_x, bi_base_offset_y, bi_base_offset_z, bi_base_rot; // World offset position and rotation
+	int bi_base_x, bi_base_y, bi_base_z, bi_base_rot; // Base local position and rotation
 
 	SrArray<MeCtLocomotionRoutine> routine_stack;
 
@@ -65,6 +65,7 @@ protected:
 
 	SrVec world_pos;
 	SrQuat world_rot;
+	SrVec base_pos;
 
 	SrArray<SrVec> destination_list;
 	SrArray<float> speed_list;
@@ -104,7 +105,7 @@ public: // channels and routine funcs
 	bool controller_evaluate(double delta_time, MeCtLocomotionLimbDirectionPlanner* direction_planner, MeCtLocomotionSpeedAccelerator* acc, MeFrameData& frame);
 	void post_controller_evaluate(MeFrameData& frame, MeCtLocomotionLimb* limb, bool reset);
 	int controller_channels(SkChannelArray* request_channels);
-	void AddChannel(SkChannelArray* request_channels, const char* name, SkChannel::Type type);
+	void AddChannel(SkChannelArray* request_channels, const char* name, SkChannel::Type type, int* index);
 
 public:
 	void clear_destination_list();
@@ -120,6 +121,7 @@ public:
 	SrVec get_dis_to_dest();
 	SrVec get_dis_to_dest_local();
 	SrVec get_world_pos();
+	SrVec get_base_pos();
 	float get_facing_angle();
 	float get_pre_facing_angle();
 	void calc_target_velocity();
