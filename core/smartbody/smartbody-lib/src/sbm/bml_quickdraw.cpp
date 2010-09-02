@@ -26,6 +26,7 @@
 
 #include <xercesc/util/XMLStringTokenizer.hpp>
 
+#include "vhcl.h"
 #include "mcontrol_util.h"
 #include "bml_quickdraw.hpp"
 #include "me_ct_quick_draw.h"
@@ -71,7 +72,8 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 
 	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
 	if( !attrTarget || *attrTarget == 0 ) {
-        wcerr << "WARNING: BML::parse_bml_quickdraw(): <"<<tag<<"> BML tag missing "<<ATTR_TARGET<<"= attribute." << endl;
+		std::wostringstream wstrstr;
+        wstrstr << "WARNING: BML::parse_bml_quickdraw(): <"<<tag<<"> BML tag missing "<<ATTR_TARGET<<"= attribute." << endl;
 		return BehaviorRequestPtr();  // a.k.a., NULL
     }
 
@@ -90,7 +92,9 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 
 	std::map<std::string, SkMotion*>::iterator motionIter = mcu->motion_map.find(anim_name);
 	if( motionIter ==  mcu->motion_map.end()){
-        cerr << "WARNING: BML::parse_bml_quickdraw(): Unknown source animation \"" << anim_name << "\"." << endl;
+		std::stringstream strstr;
+        strstr << "WARNING: BML::parse_bml_quickdraw(): Unknown source animation \"" << anim_name << "\"." << endl;
+		LOG(strstr.str().c_str());
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 
@@ -103,7 +107,11 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 		string parse_buffer( temp_ascii );
 		istringstream parser( parse_buffer );
 		if( !( parser >> track_duration ) ) {
-			wcerr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<<ATTR_TRACK_DUR<<"=\""<<attrTrackDur<<"\" is not a valid number." << endl;
+			std::wstringstream wstrstr;
+			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<<ATTR_TRACK_DUR<<"=\""<<attrTrackDur<<"\" is not a valid number.";
+			std::string str = convertWStringToString(wstrstr.str());
+			LOG(str.c_str());
+
 		}
 		XMLString::release( &temp_ascii );
 	}
@@ -116,7 +124,10 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 		string parse_buffer( temp_ascii );
 		istringstream parser( parse_buffer );
 		if( !( parser >> gundraw_dur ) ) {
-			wcerr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<<ATTR_GUNDRAW_DUR<<"=\""<<attrGundrawDur<<"\" is not a valid number." << endl;
+			std::wstringstream wstrstr;
+			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<<ATTR_GUNDRAW_DUR<<"=\""<<attrGundrawDur<<"\" is not a valid number.";
+			std::string str = convertWStringToString(wstrstr.str());
+			LOG(str.c_str());
 		}
 		else	{
 			set_gundraw_dur_param = true;
@@ -132,7 +143,10 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 		string parse_buffer( temp_ascii );
 		istringstream parser( parse_buffer );
 		if( !( parser >> gundraw_dur ) ) {
-			wcerr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<<ATTR_HOLSTER_DUR<<"=\""<<attrHolsterDur<<"\" is not a valid number." << endl;
+			std::wstringstream wstrstr;
+			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<<ATTR_HOLSTER_DUR<<"=\""<<attrHolsterDur<<"\" is not a valid number.";
+			std::string str = convertWStringToString(wstrstr.str());
+			LOG(str.c_str());
 		}
 		else	{
 			set_holster_dur_param = true;
@@ -150,7 +164,10 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 		string parse_buffer( temp_ascii );
 		istringstream parser( parse_buffer );
 		if( !( parser >> aim_offset_p >> aim_offset_h >> aim_offset_r ) ) {
-			wcerr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<<ATTR_AIM_OFFSET<<"=\""<<attrAimOffset<<"\" is not valid." << endl;
+			std::wstringstream wstrstr;
+			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<<ATTR_AIM_OFFSET<<"=\""<<attrAimOffset<<"\" is not valid.";
+			std::string str = convertWStringToString(wstrstr.str());
+			LOG(str.c_str());
 		}
 		else	{
 			set_aim_offset_param = true;
@@ -166,7 +183,10 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 		string parse_buffer( temp_ascii );
 		istringstream parser( parse_buffer );
 		if( !( parser >> smooth_factor ) ) {
-			wcerr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<<ATTR_SMOOTH<<"=\""<<attrSmooth<<"\" is not a valid number." << endl;
+			std::wstringstream wstrstr;
+			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<<ATTR_SMOOTH<<"=\""<<attrSmooth<<"\" is not a valid number.";
+			std::string str = convertWStringToString(wstrstr.str());
+			LOG(str.c_str());
 		}
 		else	{
 			set_smooth_param = true;

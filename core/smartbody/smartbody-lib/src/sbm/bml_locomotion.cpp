@@ -27,6 +27,7 @@
 #include <xercesc/util/XMLStringTokenizer.hpp>
 #include <sbm/me_ct_navigation_circle.hpp>
 #include <me/me_ct_raw_writer.hpp>
+#include "vhcl.h"
 
 #include "bml_locomotion.hpp"
 
@@ -83,7 +84,12 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			{
 				type = BML_LOCOMOTION_TARGET_TYPE_TARGET;
 			}
-			else wcerr << "WARNING: BML::parse_bml_locomotion(): <"<<tag<<"> BML target type conflicts with previous setting " << endl;
+			else 
+			{
+				std::wstringstream wstrstr;
+				wstrstr << "WARNING: BML::parse_bml_locomotion(): <"<<tag<<"> BML target type conflicts with previous setting ";
+				LOG(convertWStringToString(wstrstr.str()).c_str());
+			}
 
 		} 
 		else if( XMLString::compareIString( attrType, ATTR_DIRECTION )==0 ) 
@@ -93,7 +99,12 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			{
 				type = BML_LOCOMOTION_TARGET_TYPE_DIRECTION;
 			}
-			else wcerr << "WARNING: BML::parse_bml_locomotion(): <"<<tag<<"> BML target type conflicts with previous setting " << endl;
+			else
+			{
+				std::wstringstream wstrstr;
+				wstrstr << "WARNING: BML::parse_bml_locomotion(): <"<<tag<<"> BML target type conflicts with previous setting ";
+				LOG(convertWStringToString(wstrstr.str()).c_str());
+			}
 		} 
 	}
 
@@ -135,7 +146,9 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 
 	if(0)
 	{
-		wcerr << "WARNING: BML::parse_bml_locomotion(): <"<<tag<<"> BML tag missing "<<ATTR_TYPE<<"= attribute." << endl;
+		std::wstringstream wstrstr;
+		wstrstr << "WARNING: BML::parse_bml_locomotion(): <"<<tag<<"> BML tag missing "<<ATTR_TYPE<<"= attribute.";
+		LOG(convertWStringToString(wstrstr.str()).c_str());
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 	
@@ -177,7 +190,9 @@ void BML::Locomotion::parse_routine(DOMElement* elem, BmlRequestPtr request, int
 		{
 			if(type != BML_LOCOMOTION_TARGET_TYPE_TARGET)
 			{
-				wcerr << "WARNING: BML::parse_routine(): locomotion routine type unmatched"<< endl;
+				std::wstringstream wstrstr;
+				wstrstr << "WARNING: BML::parse_routine(): locomotion routine type unmatched";
+				LOG(convertWStringToString(wstrstr.str()).c_str());
 				return;  // a.k.a., NULL
 			}
 			const XMLCh* attrTarget[3];
@@ -227,7 +242,9 @@ void BML::Locomotion::parse_routine(DOMElement* elem, BmlRequestPtr request, int
 		{
 			if(type != BML_LOCOMOTION_TARGET_TYPE_DIRECTION)
 			{
-				wcerr << "WARNING: BML::parse_routine(): locomotion routine type unmatched"<< endl;
+				std::wstringstream wstrstr;
+				wstrstr << "WARNING: BML::parse_routine(): locomotion routine type unmatched";
+				LOG(convertWStringToString(wstrstr.str()).c_str());
 				return;  // a.k.a., NULL
 			}
 			const XMLCh* attrDir[3];
@@ -280,7 +297,9 @@ void BML::Locomotion::parse_routine(DOMElement* elem, BmlRequestPtr request, int
 		{
 			if(type != BML_LOCOMOTION_TARGET_TYPE_DIRECTION)
 			{
-				wcerr << "WARNING: BML::parse_routine(): locomotion routine type unmatched"<< endl;
+				std::wstringstream wstrstr;
+				wstrstr << "WARNING: BML::parse_routine(): locomotion routine type unmatched.";
+				LOG(convertWStringToString(wstrstr.str()).c_str());
 				return;  // a.k.a., NULL
 			}
 			const XMLCh* attrVel[3];

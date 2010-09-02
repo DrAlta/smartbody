@@ -71,6 +71,7 @@ BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& uni
 	}
 
 	
+	
 	const XMLCh* attrType = elem->getAttribute( ATTR_TYPE );
 	if( attrType && *attrType != 0 ) {
         int type = -1;
@@ -87,12 +88,18 @@ BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& uni
                         if(LOG_BML_VISEMES) LOG( "LOG: BML::parse_bml_face(): FAC has specified weight!\n" );
                         wistringstream inAmount( attrAmount );
                         if( !( inAmount >> weight ) )
-                            wcerr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_AMOUNT<<"=\""<<attrAmount<<"\" />: Illegal attribute value."<<endl;
+						{
+							std::wstringstream wstrstr;
+							wstrstr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_AMOUNT<<"=\""<<attrAmount<<"\" />: Illegal attribute value.";
+							LOG(convertWStringToString(wstrstr.str()).c_str());
+						}	
+                         
                     }
                     if(LOG_BML_VISEMES) LOG( "LOG: BML::parse_bml_face(): FAC weight: %f\n", weight );
 					boost::shared_ptr<VisemeRequest> viseme;
 					viseme.reset( new VisemeRequest( unique_id, localId, "_", weight, 1, behav_syncs, rampup, rampdown ) );
 
+					std::wstringstream wstrstr;
                     switch( au ) {
                         case 1:
                             viseme->setVisemeName( "unit1_inner_brow_raiser" );
@@ -147,33 +154,48 @@ BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& uni
                             break;
 
                         default:
-                            wcerr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_AU<<".. />: Unknown action unit #"<<au<<"."<<endl;
+                            wstrstr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_AU<<".. />: Unknown action unit #"<<au<<".";
+							LOG(convertWStringToString(wstrstr.str()).c_str());
                             viseme.reset();
                     }
 					return viseme;
                 } else {
-                    wcerr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_AU<<"=\""<<attrAu<<"\" />: Illegal attribute value."<<endl;
+					std::wstringstream wstrstr;
+                    wstrstr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_AU<<"=\""<<attrAu<<"\" />: Illegal attribute value.";
+					LOG(convertWStringToString(wstrstr.str()).c_str());
 					return BehaviorRequestPtr();  // a.k.a., NULL
                 }
             } else {
-                wcerr << "WARNING: BML::parse_bml_face(): <"<<tag<<"> BML tag missing "<<ATTR_AU<<"= attribute." << endl;
+				std::wstringstream wstrstr;
+                wstrstr << "WARNING: BML::parse_bml_face(): <"<<tag<<"> BML tag missing "<<ATTR_AU<<"= attribute.";
+				LOG(convertWStringToString(wstrstr.str()).c_str());
 				return BehaviorRequestPtr();  // a.k.a., NULL
             }
         } else if( XMLString::compareIString( attrType, L"eyebrows" )==0 ) {
-            wcerr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unimplemented type." << endl;
+			std::wstringstream wstrstr;
+            wstrstr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unimplemented type.";
+			LOG(convertWStringToString(wstrstr.str()).c_str());
 			return BehaviorRequestPtr();  // a.k.a., NULL
         } else if( XMLString::compareIString( attrType, L"eyelids" )==0 ) {
-            wcerr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unimplemented type." << endl;
+			std::wstringstream wstrstr;
+            wstrstr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unimplemented type.";
+			LOG(convertWStringToString(wstrstr.str()).c_str());
 			return BehaviorRequestPtr();  // a.k.a., NULL
         } else if( XMLString::compareIString( attrType, L"mouth" )==0 ) {
-            wcerr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unimplemented type." << endl;
+			std::wstringstream wstrstr;
+            wstrstr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unimplemented type.";
+			LOG(convertWStringToString(wstrstr.str()).c_str());
 			return BehaviorRequestPtr();  // a.k.a., NULL
         } else {
-            wcerr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unknown type value, ignore command" << endl;
+			std::wstringstream wstrstr;
+            wstrstr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unknown type value, ignore command";
+			LOG(convertWStringToString(wstrstr.str()).c_str());
 			return BehaviorRequestPtr();  // a.k.a., NULL
         }
     } else {
-        wcerr << "WARNING: BML::parse_bml_face(): <"<<tag<<"> BML tag missing "<<ATTR_TYPE<<"= attribute." << endl;
+		std::wstringstream wstrstr;
+        wstrstr << "WARNING: BML::parse_bml_face(): <"<<tag<<"> BML tag missing "<<ATTR_TYPE<<"= attribute.";
+		LOG(convertWStringToString(wstrstr.str()).c_str());
 		return BehaviorRequestPtr();  // a.k.a., NULL
     }
 }

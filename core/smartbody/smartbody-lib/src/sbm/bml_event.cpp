@@ -22,6 +22,7 @@
 
 #include <iostream>
 #include <sstream>
+#include "vhcl.h"
 
 #include "bml_event.hpp"
 #include "bml_xml_consts.hpp"
@@ -96,7 +97,9 @@ BehaviorRequestPtr BML::parse_bml_event( DOMElement* elem, const std::string& un
         return BehaviorRequestPtr( new EventRequest( unique_id, localId, XMLString::transcode( attrMesg ), behav_syncs, spName ) );
 	} else {
 		// TODO: Use exception?
-        wcerr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag missing "<<ATTR_MESSAGE<<"= attribute.  Behavior ignored."<< endl;
+		std::wstringstream wstrstr;
+        wstrstr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag missing "<<ATTR_MESSAGE<<"= attribute.  Behavior ignored.";
+		LOG(convertWStringToString(wstrstr.str()).c_str());
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 }

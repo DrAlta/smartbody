@@ -595,7 +595,7 @@ int SbmCharacter::init_skeleton() {
 	// use raw channels or channel arrays.
 	const SkJoint* wo_joint_p = get_world_offset_joint();
 	if( !wo_joint_p ) {
-		cerr << "ERROR: SbmCharacter lacks world_offset joint after SbmPawn::init_skeleton." << endl;
+		LOG("ERROR: SbmCharacter lacks world_offset joint after SbmPawn::init_skeleton.");
 		return CMD_FAILURE;
 	}
 	const int wo_index = wo_joint_p->index();  // World offest joint index
@@ -904,7 +904,9 @@ void prune_schedule( SbmCharacter*   actor,
 					}
 				} else {
 					if( LOG_PRUNE_TRACK_WITHOUT_BLEND_SPLIE_KNOTS ) {
-						cout << "DEBUG: prune_schedule(..): sched \""<<sched->name()<<"\", anim_source \""<<anim_source->name()<<"\": blend_ct without spline knots." <<endl;
+						std::stringstream strstr;
+						strstr << "DEBUG: prune_schedule(..): sched \""<<sched->name()<<"\", anim_source \""<<anim_source->name()<<"\": blend_ct without spline knots.";
+						LOG(strstr.str().c_str());
 						blend_ct->print_state(1);  // Prints controller type, name, and blend curve
 					}
 
@@ -915,10 +917,14 @@ void prune_schedule( SbmCharacter*   actor,
 
 			const char* anim_ct_type = anim_source->controller_type();
 			if( LOG_CONTROLLER_TREE_PRUNING )
-				cout << '\t' << anim_ct_type << " \"" << anim_source->name() << "\": in_use = "<<in_use<<", flat_blend_curve = "<<flat_blend_curve<<endl;
+			{
+				std::stringstream strstr;
+				strstr << '\t' << anim_ct_type << " \"" << anim_source->name() << "\": in_use = "<<in_use<<", flat_blend_curve = "<<flat_blend_curve<<endl;
+				LOG(strstr.str().c_str());
+			}
 			if( !in_use ) {
 				if( LOG_CONTROLLER_TREE_PRUNING )
-					cout << "\t- Pruned (not in use)!!" << endl;
+					LOG("\t- Pruned (not in use)!!");
 			} else if( flat_blend_curve ) {  // Ignore tracks with future blend activity or are already not in use
 				// Determine if the animation will be occluded by
 				// (previously visited) higher priority controllers
@@ -1023,20 +1029,23 @@ void prune_schedule( SbmCharacter*   actor,
 				}
 				else {
 					//  TODO: Throttle warnings....
-					cerr << "WARNING: Cannot prune unknown controller type \"" << anim_source->controller_type() << "\"" << endl;
+					LOG("WARNING: Cannot prune unknown controller type \"%s\"", anim_source->controller_type());
 				}
 				if( LOG_CONTROLLER_TREE_PRUNING )
-					cout << ( in_use? "\t- Not Pruned (primary ct of type)." : "\t- Pruned (occluded)!!" ) << endl;
+					if (in_use)
+						LOG("\t- Not Pruned (primary ct of type).");
+					else
+						LOG("\t- Pruned (occluded)!!");
 			} else {
 				if( LOG_CONTROLLER_TREE_PRUNING )
-					cout << "\t- Not Pruned (future activity)." << endl;
+					LOG("\t- Not Pruned (future activity).");
 			}
 		} else {
 			// No animation source
 			in_use = false;
 
 			if( LOG_CONTROLLER_TREE_PRUNING )
-				cout << "\t- Pruned (no anim ct)!!" << endl;
+				LOG("\t- Pruned (no anim ct)!!");
 		}
 
 		if( !in_use && test_ct_for_pruning( track ) ) {
@@ -1073,7 +1082,11 @@ int SbmCharacter::prune_controller_tree( mcuCBHandle* mcu_p ) {
 	double time = mcu_p->time;  // current time
 
 	if( LOG_PRUNE_CMD_TIME || LOG_CONTROLLER_TREE_PRUNING )
-		cout << "SbmCharacter \""<<name<<"\" prune_controller_tree(..) @ time "<<time<<endl;
+	{
+		std::stringstream strstr;
+		strstr << "SbmCharacter \""<<name<<"\" prune_controller_tree(..) @ time "<<time<<endl;
+		LOG(strstr.str().c_str());
+	}
 
 	// Pointers to the most active controllers of each type.
 	MeCtGaze**     gaze_key_cts = new MeCtGaze*[ MeCtGaze::NUM_GAZE_KEYS ];
@@ -1099,7 +1112,7 @@ int SbmCharacter::prune_controller_tree( mcuCBHandle* mcu_p ) {
 	prune_schedule( this, posture_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
 
 	if( LOG_CONTROLLER_TREE_PRUNING ) {
-		cout << endl;
+		LOG("");
 		print_controller_schedules();
 	}
 
@@ -1264,7 +1277,9 @@ int SbmCharacter::set_viseme( char* viseme,
 		}
 		return CMD_SUCCESS;
 	} else {
-		cerr << "WARNING: Unknown viseme \"" << viseme << "\" for character \"" << name << "\"." << endl;
+		std::stringstream strstr;
+		strstr << "WARNING: Unknown viseme \"" << viseme << "\" for character \"" << name << "\"." << endl;
+		LOG(strstr.str().c_str());
 		return CMD_SUCCESS;
 	}
 }
@@ -1500,7 +1515,9 @@ int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 	}
 
 	if( !found_quickdraw ) {
-		cout << "WARNING: Character \""<<name<<"\" reholster(): No quickdraw controller found." << endl;
+		std::stringstream strstr;
+		strstr << "WARNING: Character \""<<name<<"\" reholster(): No quickdraw controller found.";
+		LOG(strstr.str().c_str());
 	}
 
 ////  Won't compile, and I'm tired:
@@ -1524,13 +1541,13 @@ int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	string char_name = args.read_token();
 	if( char_name.length()==0 ) {
-		cerr << "ERROR: Expected character name." << endl;
+		LOG("ERROR: Expected character name.");
 		return CMD_FAILURE;
 	}
 
 	string char_cmd  = args.read_token();
 	if( char_cmd.length()==0 ) {
-		cerr << "ERROR: Expected character command." << endl;
+		LOG("ERROR: Expected character command.");
 		return CMD_FAILURE;
 	}
 
@@ -1649,17 +1666,17 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			mcu_p->character_map.reset();
 			while( character = mcu_p->character_map.next() ) {
 				if( character->prune_controller_tree( mcu_p ) != CMD_SUCCESS ) {
-					cerr << "ERROR: Failed to prune controller tree of character \""<<character->name<<"\"."<<endl;
+					LOG("ERROR: Failed to prune controller tree of character \"%s\".", character->name);
 					result = CMD_FAILURE;
 				}
 			}
 		} else if( character ) {
 			int result = character->prune_controller_tree( mcu_p );
 			if( result != CMD_SUCCESS ) {
-				cerr << "ERROR: Failed to prune controller tree of character \""<<char_name<<"\"."<<endl;
+				LOG("ERROR: Failed to prune controller tree of character \"%s\".", character->name);
 			}
 		} else {
-			cerr<<"ERROR: Unknown character \""<<char_name<<"\" for prune command."<<endl;
+			LOG("ERROR: Unknown character  \"%s\"  for prune command.", char_name.c_str());
 			result = CMD_FAILURE;
 		}
 		return result;
@@ -1728,7 +1745,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			return CMD_SUCCESS;
 		} else {
 			if ( !character ) {
-				cerr << "ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"" << char_name << "\"." << endl;
+				LOG("ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"%s\".", char_name);
 				return CMD_FAILURE;  // ignore/out-of-domain? But it's not a standard network message.
 			} else {
 				return character->set_viseme( viseme, weight, mcu_p->time, rampin_duration, curveInfo, numKeys );
@@ -1777,7 +1794,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			return CMD_SUCCESS;
 		} else {
 			if ( !character ) {
-				cerr << "ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"" << char_name << "\"." << endl;
+				LOG("ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"%s\".", char_name);
 				return CMD_FAILURE;  // ignore/out-of-domain? But it's not a standard network message.
 			} else {
 				return character->reholster_quickdraw( mcu_p );
@@ -1817,19 +1834,19 @@ int SbmCharacter::remove_from_scene( const char* char_name ) {
 int SbmCharacter::set_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	string character_id = args.read_token();
 	if( character_id.length()==0 ) {
-		cerr << "ERROR: SbmCharacter::set_cmd_func(..): Missing character id." << endl;
+		LOG("ERROR: SbmCharacter::set_cmd_func(..): Missing character id.");
 		return CMD_FAILURE;
 	}
 
 	SbmCharacter* character = mcu_p->character_map.lookup( character_id.c_str() );
 	if( character==NULL ) {
-		cerr << "ERROR: SbmCharacter::set_cmd_func(..): Unknown character \""<<character_id<<"\" to set." << endl;
+		LOG("ERROR: SbmCharacter::set_cmd_func(..): Unknown character \"%s\" to set.", character_id.c_str());
 		return CMD_FAILURE;
 	}
 
 	string attribute = args.read_token();
 	if( attribute.length()==0 ) {
-		cerr << "ERROR: SbmCharacter::set_cmd_func(..): Missing attribute to set." << endl;
+		LOG("ERROR: SbmCharacter::set_cmd_func(..): Missing attribute to set.");
 		return CMD_FAILURE;
 	}
 
@@ -1903,25 +1920,27 @@ int SbmCharacter::print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 	string attribute = args.read_token();
 	if( attribute.length()==0 ) {
-		cerr << "ERROR: SbmCharacter::print_cmd_func(..): Missing attribute to print." << endl;
+		LOG("ERROR: SbmCharacter::print_cmd_func(..): Missing attribute to print.");
 		return CMD_FAILURE;
 	}
 
 	if( attribute=="voice" || attribute=="voice_code" || attribute=="voice-code" ) {
 		//  Command: print character <character id> voice_code
 		//  Print out the character's voice_id
-		cout << "character " << character_id << "'s voice_code: " << character->get_voice_code() << endl;
+		std::stringstream strstr;
+		strstr << "character " << character_id << "'s voice_code: " << character->get_voice_code();
+		LOG(strstr.str().c_str());
 		return CMD_SUCCESS;
 	} else if( attribute=="schedule" ) {
 		return character->print_controller_schedules();
 	} else if( attribute=="face" ) {
 		string sub_attribute = args.read_token();
 		if( sub_attribute=="names" ) {
-			ostringstream output;
+			std::stringstream strstr;
 			if( character->is_face_controller_enabled() ) {
-				output << "Using bone based face control:" << endl;
+				strstr << "Using bone based face control:" << endl;
 			} else {
-				output << "Using renderer face control via BoneBus (implementation of the following will depend upon the render):" << endl;
+				strstr << "Using renderer face control via BoneBus (implementation of the following will depend upon the render):" << endl;
 			}
 
 			set<string> names = character->get_face_names();
@@ -1929,9 +1948,9 @@ int SbmCharacter::print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			set<string>::iterator it = names.begin();
 			set<string>::iterator end = names.end();
 			for( ; it!=end; ++it )
-				output << '\t' << *it << endl;
+				strstr << '\t' << *it << endl;
 
-			cout << output.str();
+			LOG(strstr.str().c_str());
 			return CMD_SUCCESS;
 		} else if( sub_attribute == "channels" ) {
 			// TODO: print list of face activating channels (and associated visemes?)
@@ -1955,6 +1974,6 @@ bool parse_float_or_error( float& var, const char* str, const string& var_name )
 	if( istringstream( str ) >> var )
 		return true; // no error
 	// else
-	cerr << "ERROR: Invalid value for " << var_name << ": " << str << endl;
+	LOG("ERROR: Invalid value for %s: %s", var_name.c_str(), str);
 	return false;
 }

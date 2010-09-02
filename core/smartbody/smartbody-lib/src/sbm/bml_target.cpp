@@ -20,9 +20,11 @@
  *      Andrew n marshall, USC
  */
 
+
 #include <iostream>
 #include <sstream>
 #include <string>
+#include "vhcl_log.h"
 
 #include "bml_target.hpp"
 
@@ -44,6 +46,7 @@ using namespace xml_utils;
 const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget, mcuCBHandle *mcu ) {
 	// TODO: If the first non-whitespace character is 0..9.-+, then assume it is a coordinate
 	XMLStringTokenizer tokenizer( attrTarget );
+	std::stringstream strstr;
 	switch( tokenizer.countTokens() ) {
 		case 1: {
 			// One token is an object id
@@ -64,17 +67,27 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 					// Target is a character, look at eyeball
 					bone_id = "eyeball_left";
 					if( DEBUG_BML_TARGET )
-						cerr << "DEBUG: BML::parse_target(): Gaze: Found target character \"" << object_id << "\". Assuming joint \""<<bone_id<<"\"."<< endl;
+					{
+						std::stringstream strstr;
+						strstr << "DEBUG: BML::parse_target(): Gaze: Found target character \"" << object_id << "\". Assuming joint \""<<bone_id<<"\".";
+						LOG(strstr.str().c_str());
+					}
 				} else {
 					// Target is a pawn, look at world offset
 					target = mcu->pawn_map.lookup( object_id.c_str() );
 					if( target ) {
 						bone_id = SbmPawn::WORLD_OFFSET_JOINT_NAME;
 						if( DEBUG_BML_TARGET )
-							cerr << "DEBUG: BML::parse_target(): Gaze: Found target pawn \"" << object_id << "\". Assuming joint \""<<bone_id<<"\"."<< endl;
+						{
+							std::stringstream strstr;
+							strstr << "DEBUG: BML::parse_target(): Gaze: Found target pawn \"" << object_id << "\". Assuming joint \""<<bone_id<<"\".";
+							LOG(strstr.str().c_str());
+						}
 					} else {
 						// TODO: Query World State Protocol (requires event delay)
-						cerr << "WARNING: BML::parse_target(): Gaze: Unknown target \""<<object_id<<"\". (TODO: Query WSP.) Behavior ignored."<< endl;
+						std::stringstream strstr;
+						strstr << "WARNING: BML::parse_target(): Gaze: Unknown target \""<<object_id<<"\". (TODO: Query WSP.) Behavior ignored."<< endl;
+						LOG(strstr.str().c_str());
 						return NULL;
 					}
 				}
@@ -93,11 +106,17 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 					{
 						bone_id = SbmPawn::WORLD_OFFSET_JOINT_NAME;
 						if( DEBUG_BML_TARGET )
-							cerr << "DEBUG: BML::parse_target(): Gaze: Found target pawn \"" << object_id << "\". Assuming joint \""<<bone_id<<"\"."<< endl;
+						{
+							std::stringstream strstr;
+							strstr << "DEBUG: BML::parse_target(): Gaze: Found target pawn \"" << object_id << "\". Assuming joint \""<<bone_id<<"\".";
+							LOG(strstr.str().c_str());
+						}
 					}
 					else
 					{
-						cerr << "WARNING: BML::parse_target(): Gaze: Unknown object id \""<<object_id<<"\". (TODO: Query WSP.) Behavior ignored."<< endl;
+						std::stringstream strstr;
+						strstr << "WARNING: BML::parse_target(): Gaze: Unknown object id \""<<object_id<<"\". (TODO: Query WSP.) Behavior ignored."<< endl;
+						LOG(strstr.str().c_str());
 						return NULL;
 					}
 				}
@@ -106,7 +125,8 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 			// Look up the joint
 			const SkJoint* joint = target->get_joint( bone_id.c_str() );
 			if( joint == NULL ) {
-				cerr << "WARNING: BML::parse_target(): Gaze: Target \""<<object_id<<"\" does not have joint \""<<bone_id<<"\". Behavior ignored."<< endl;
+				strstr << "WARNING: BML::parse_target(): Gaze: Target \""<<object_id<<"\" does not have joint \""<<bone_id<<"\". Behavior ignored.";
+				LOG(strstr.str().c_str());
 				return NULL;
 			}
 
@@ -117,11 +137,13 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 			XMLCh* token = tokenizer.nextToken();
 
 			// TODO
-		    wcerr << "WARNING: BML::parse_target(): Unimplented <"<<tagname<<" "<<ATTR_TARGET<<"=\"x, y, z\" ... />.  Behavior ignored."<< endl;
+		    strstr << "WARNING: BML::parse_target(): Unimplented <"<<tagname<<" "<<ATTR_TARGET<<"=\"x, y, z\" ... />.  Behavior ignored.";
+			LOG(strstr.str().c_str());
 			return NULL;
 		}
 		default: {
-		    wcerr << "WARNING: BML::parse_target(): Invalid token count in <"<<tagname<<" "<<ATTR_TARGET<<"=\"x, y, z\" ... />.  Behavior ignored."<< endl;
+		    strstr << "WARNING: BML::parse_target(): Invalid token count in <"<<tagname<<" "<<ATTR_TARGET<<"=\"x, y, z\" ... />.  Behavior ignored.";
+			LOG(strstr.str().c_str());
 			return NULL;
 		}
 	}  // end switch( tokenizer.countTokens() )

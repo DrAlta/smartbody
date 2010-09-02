@@ -33,6 +33,7 @@
 #include <SR/sr.h>
 #include <SK/sk_channel_array.h>
 #include <sbm/ResourceManager.h>
+#include "vhcl_log.h"
 
 using namespace std;
 
@@ -224,7 +225,7 @@ public:
     SkChannelArray& channels() {
 #ifdef DEBUG
 		if( _state!=State::VALID )
-			std::cerr << "ERROR: MeControllerTreeRoot::channels() called while invalid" << std::endl;
+			LOG("ERROR: MeControllerTreeRoot::channels() called while invalid");
 #endif
 		if( _state==INVALID )
 			remapFrameData();
@@ -271,14 +272,11 @@ public:
 		SR_ASSERT( _state!=REMAPPING );  // simple lock
 
 		if( skeleton==NULL ) {
-			cerr << "MeEvaluationContextSimple::addSkeleton(..):" << endl
-				<< "   skeleton is NULL" << endl;
+			LOG("MeEvaluationContextSimple::addSkeleton(..): skeleton is NULL");
 			return;
 		}
 		if( _skeleton!=NULL && _skeleton!=skeleton ) {
-			cerr << " **********************************************" << endl
-				<< " * MeEvaluationContextSimple::addSkeleton(..):" << endl
-				<< " *    Unimplemented: Multiple Skeletons." << endl;
+			LOG("MeEvaluationContextSimple::addSkeleton(..): Unimplemented: Multiple Skeletons.");
 			return;
 		}
 
@@ -447,10 +445,10 @@ public:
 						//fp_max = std::max( fp_max, fp );
 						channel.set( fp );
 					} else {
-						cerr << "ERROR: applyBufferToAllSkeletons(): channels[" << i << "].joint.skeleton() != _skeleton" << endl;
+						LOG("ERROR: applyBufferToAllSkeletons(): channels[%d].joint.skeleton() != _skeleton", i);
 					}
 				} else {
-					cerr << "ERROR: applyBufferToAllSkeletons(): channels[" << i << "].joint == NULL" << endl;
+					LOG("ERROR: applyBufferToAllSkeletons(): channels[%d].joint == NULL", i);
 				}
 			}
 		}

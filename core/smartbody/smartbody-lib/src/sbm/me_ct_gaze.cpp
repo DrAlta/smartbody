@@ -162,10 +162,10 @@ char * MeCtGaze::key_label( const int key )	{
 
 ///////////////////////////////////////////////////////////////////////////
 
-MeCtGaze::MeCtGaze( void )	{
+MeCtGaze::MeCtGaze( void )	: MeController() {
 	
 	started = 0;
-	start = 0;
+	setStart(0);
 	prev_time = 0.0;
 
 	priority_joint = GAZE_JOINT_EYE_L;
@@ -756,12 +756,14 @@ quat_t MeCtGaze::world_target_orient( void )	{
 
 void MeCtGaze::controller_start( void )	{
 	
+//	LOG("START ON %s", this->name());
 #if ENABLE_HACK_TARGET_CIRCLE
 //G_hack_target_heading = 0.0;  // don't update this for every gaze controller
 #endif
 
 	started = 1;
-	start = 1;
+	setStart(1);
+
 
 #if TEST_SENSOR
 	sensor_p->controller_start();
@@ -769,6 +771,7 @@ void MeCtGaze::controller_start( void )	{
 }
 
 void MeCtGaze::controller_start_evaluate( void )	{
+//	LOG("START_EVALUTE ON %s", this->name());
 	int i;
 
 	if( _context->channels().size() > 0 )	{
@@ -992,8 +995,9 @@ bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 	}
 	
 	float dt;
-	if( start ) {
-		start = 0;
+//	LOG("EVALUATE ON %s WITH START AT %d", this->name(), this->getStart());
+	if( getStart() ) {
+		setStart(0);
 		dt = 0.001f;
 		controller_start_evaluate();
 	}
@@ -1110,3 +1114,14 @@ void MeCtGaze::print_state( int tabs )	{
 }
 
 ///////////////////////////////////////////////////////////////////////////
+
+int MeCtGaze::getStart()
+{
+	return foostart;
+}
+
+void MeCtGaze::setStart(int value)
+{
+//	LOG("START SET TO %d ON %s", value, this->name());
+	foostart = value;
+}

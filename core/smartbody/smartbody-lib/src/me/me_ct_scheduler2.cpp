@@ -35,6 +35,7 @@
 #include <ME/me_ct_motion.h>
 
 #include <sbm/mcontrol_util.h>
+#include "vhcl_log.h"
 
 using namespace std;
 
@@ -770,8 +771,8 @@ void MeCtScheduler2::controller_map_updated() {
 					<<'('<<SkChannel::type_name(type)<<"), ";
 			}
 
-			cout << "DEBUG: MeCtBlend::controller_map_updated(): Context's logged channels:" << endl
-				<< '\t' << oss.str() << endl;
+			LOG("DEBUG: MeCtBlend::controller_map_updated(): Context's logged channels:");
+			LOG("\t%s", oss.str().c_str());
 		}
 
 		SkChannelArray& local_channels = controller_channels();
@@ -797,7 +798,7 @@ void MeCtScheduler2::controller_map_updated() {
 					// Log this channel
 					_channels_logged.insert( i );
 					if( DEBUG_LOGGED_CHANNEL_MAPPING ) {
-						cout << "DEBUG: MeCtBlend::controller_map_updated(): Logged parent channel "<< parent_index << " maps to " << i << std::endl;
+						LOG("DEBUG: MeCtBlend::controller_map_updated(): Logged parent channel %d maps to %d", parent_index, i);
 					}
 				}
 			}
@@ -844,6 +845,7 @@ bool MeCtScheduler2::controller_evaluate( double time, MeFrameData& frame ) {
 	vector< TrackPtr > to_remove( 0 );  // zero size because it is rarely used (don't allocate for array until needed)
 
 	VecOfTrack::iterator end = _tracks.end();
+
 	for( VecOfTrack::iterator i = _tracks.begin(); i != end; ++i ) {
 		TrackPtr track = *i;
 		bool result = track->evaluate( time, frame );

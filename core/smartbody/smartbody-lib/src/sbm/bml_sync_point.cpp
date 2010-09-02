@@ -30,6 +30,8 @@
 #include "bml.hpp"
 #include "bml_exception.hpp"
 #include "bml_xml_consts.hpp"
+#include <sstream>
+#include "vhcl_log.h"
 
 
 
@@ -194,7 +196,12 @@ SetOfWstring BehaviorSyncPoints::get_sync_names() {
 	for( ; it!=end; ++it ) {
 		const wstring& name = it->first;
 		if( !( names.insert( name ).second ) )
-			wcerr << "ERROR: BehaviorSyncPoints::get_sync_names(): Failed to insert SyncPoint name \""<<name<<"\"." << endl;
+		{
+			std::wstringstream wstrstr;
+			wstrstr << "ERROR: BehaviorSyncPoints::get_sync_names(): Failed to insert SyncPoint name \""<<name<<"\".";
+			std::string str = convertWStringToString(wstrstr.str());
+			LOG(str.c_str());
+		}
 	}
 
 	return names;
@@ -245,6 +252,8 @@ BehaviorSpan BehaviorSyncPoints::getBehaviorSpan( time_sec persistent_threshold 
 }
 
 void BehaviorSyncPoints::parseStandardSyncPoints( DOMElement* elem, BmlRequestPtr request, const string& behavior_id ) {
+	
+
 	// DOM functions never return NULL
 	const wstring tag = elem->getTagName();
 	const wstring id  = elem->getAttribute( ATTR_ID );
@@ -283,6 +292,8 @@ void BehaviorSyncPoints::parseStandardSyncPoints( DOMElement* elem, BmlRequestPt
 
 
 BehaviorSyncPoints::iterator BehaviorSyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const string& behavior_id ) {
+	
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	//  Get behavior id as wstring
 	wstring behavior_wid;
 	{
@@ -297,12 +308,15 @@ BehaviorSyncPoints::iterator BehaviorSyncPoints::parseSyncPointAttr( DOMElement*
 		// SyncPoint of this name already exists
 
 		// TODO: Throw BML ParsingException
-		wcerr << "ERROR: Behavior \""<<behavior_wid<<"\": BehaviorSyncPoints contains SyncPoint with id \"" << sync_attr << "\".  Ignoring attribute in <"<<elem->getTagName();
+		std::wstringstream wstrstr;
+		wstrstr << "ERROR: Behavior \""<<behavior_wid<<"\": BehaviorSyncPoints contains SyncPoint with id \"" << sync_attr << "\".  Ignoring attribute in <"<<elem->getTagName();
 		if( !elem_id.empty() )
-			wcerr<<"> id=\""<<elem_id<<"\"";
+			wstrstr<<"> id=\""<<elem_id<<"\"";
 		else
-			wcerr<<">";
-		wcerr << " and returning existing SyncPoint."<<endl;
+			wstrstr<<">";
+		wstrstr << " and returning existing SyncPoint.";
+		std::string str = convertWStringToString(wstrstr.str());
+		LOG(str.c_str());
 		return map_it->second;
 	}
 
@@ -323,12 +337,12 @@ BehaviorSyncPoints::iterator BehaviorSyncPoints::parseSyncPointAttr( DOMElement*
 			char* temp_sync_att = XMLString::transcode( sync_attr.c_str() );
 			char* temp_sync_ref = XMLString::transcode( sync_ref );
 
-			ostringstream oss;
-			oss << "BehaviorSyncPoint:parseSyncPointAttr(..): Invalid SyncPoint reference \"" << temp_sync_ref << "\" in behavior \"" << behavior_id << "\" " << temp_sync_att << ".";
-			
+			std::stringstream strstr;
+			strstr << "BehaviorSyncPoint:parseSyncPointAttr(..): Invalid SyncPoint reference \"" << temp_sync_ref << "\" in behavior \"" << behavior_id << "\" " << temp_sync_att << "; generated unconstrained sync point.";		
 #if HACK_BAD_SYNC_POINT_REF_WARN_ONLY
+			LOG(strstr.str().c_str());
+
 			// TEMPORARY HACK: Warn but don't error out, generate blank sync point
-			cerr << "WARNING: " << oss.str() << "; generated unconstrained sync point." << endl;
 			sync = request->start_trigger->addSyncPoint();
 #else
 			throw BML::ParsingException( oss.str().c_str() );
@@ -343,6 +357,7 @@ BehaviorSyncPoints::iterator BehaviorSyncPoints::parseSyncPointAttr( DOMElement*
 		sync = request->start_trigger->addSyncPoint();
 	}
 
+	
 	return insert( sync_attr, sync, end() );
 }
 
@@ -455,10 +470,12 @@ void BehaviorSyncPoints::applyParentTimes( std::string& warning_context ) {
 					if( sync->is_set() ) {
 						char* ascii_sync_id = XMLString::transcode( it->name().c_str() );
 
-						cerr << "WARNING: ";
+						std::stringstream strstr;
+						strstr << "WARNING: ";
 						if( !warning_context.empty() )
-							cerr << warning_context << ": ";
-						cerr << "SyncPoint \""<<ascii_sync_id<<"\" time set before applyParentTimes()." << endl;
+							strstr << warning_context << ": ";
+						strstr << "SyncPoint \""<<ascii_sync_id<<"\" time set before applyParentTimes().";
+						LOG(strstr.str().c_str());
 
 						delete [] ascii_sync_id;
 					}
@@ -467,10 +484,12 @@ void BehaviorSyncPoints::applyParentTimes( std::string& warning_context ) {
 					char* ascii_sync_id = XMLString::transcode( it->name().c_str() );
 
 					// Parent not set!!
-					cerr << "WARNING: ";
+					std::stringstream strstr;
+					strstr << "WARNING: ";
 					if( !warning_context.empty() )
-						cerr << warning_context << ": ";
-					cerr << "SyncPoint \""<<ascii_sync_id<<"\" parent unset." << endl;
+						strstr << warning_context << ": ";
+					strstr << "SyncPoint \""<<ascii_sync_id<<"\" parent unset.";
+					LOG(strstr.str().c_str());
 
 					delete [] ascii_sync_id;
 				}

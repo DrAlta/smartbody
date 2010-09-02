@@ -19,7 +19,7 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 	std::string arg = args.read_token();
 	if( arg.empty() || arg=="help" ) {
 		LOG("Syntax:");
-		LOG("\t resource [command|path|file|motion|controller|limit]");
+		LOG("\t resource [command <max>|path <exprmatch>|file <exprmatch>|motion <exprmatch>|controller <exprmatch>|limit]");
 		return CMD_SUCCESS;
 	}
 	
@@ -27,7 +27,14 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 
 	if(arg=="command")
 	{
-		for (int r = 0; r < numResources; r++)
+		int resourceLimit = numResources;
+		if (args.calc_num_tokens() > 0)
+		{
+			resourceLimit = args.read_int();
+			if (resourceLimit < 0 || resourceLimit > numResources)
+				resourceLimit = numResources;
+		}
+		for (int r = numResources - resourceLimit; r < numResources; r++)
 		{
 			CmdResource * res = dynamic_cast<CmdResource  *>(mcu_p->resource_manager->getResource(r));
 			if(res)
@@ -38,6 +45,7 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 
 	if(arg=="path")
 	{
+		std::string match = "";
 		for (int r = 0; r < numResources; r++)
 		{
 			PathResource * res = dynamic_cast<PathResource  *>(mcu_p->resource_manager->getResource(r));

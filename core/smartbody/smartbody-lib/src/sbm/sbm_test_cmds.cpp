@@ -131,14 +131,19 @@ bool normalize_character_id( const string& module, const string& role, const str
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	if( char_id.length()==0 ) {
-		cerr << "ERROR: "<<module<<": No "<<role<<" specified." << endl;
+		std::stringstream strstr;
+		strstr << "ERROR: "<<module<<": No "<<role<<" specified.";
+		LOG(strstr.str().c_str());
+
 		return false;
 	} else {
 		// Lookup character
 		if( char_id!="*" ) {
 			SbmCharacter* character = mcu.character_map.lookup( char_id.c_str() );
 			if( character == NULL ) {
-				cerr << "WARNING: "<<module<<": Unknown "<<role<<" id \""<<char_id<<"\"." << endl;
+				std::stringstream strstr;
+				strstr << "WARNING: "<<module<<": Unknown "<<role<<" id \""<<char_id<<"\".";
+				LOG(strstr.str().c_str());
 			}
 		}
 	}
@@ -255,11 +260,15 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 		if( echo ) {
 			msg << "echo // Running sequence \"" << seq_id << "\"...";
 			if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
-				cerr << "WARNING: send_vrX(..): Failed to insert echo header command for character \"" << char_id << "\"." <<endl;
+				std::stringstream strstr;
+				strstr << "WARNING: send_vrX(..): Failed to insert echo header command for character \"" << char_id << "\".";
+				LOG(strstr.str().c_str());
 			}
 			build_vrX( msg, cmd, char_id, recip_id, bml, false );
 			if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
-				cerr << "WARNING: send_vrX(..): Failed to insert echoed command for character \"" << char_id << "\"." <<endl;
+				std::stringstream strstr;
+				strstr << "WARNING: send_vrX(..): Failed to insert echoed command for character \"" << char_id << "\".";
+				LOG(strstr.str().c_str());
 			}
 		}
 
@@ -273,11 +282,13 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 				//echo.str("");
 				//echo << "echo " << msg.str();
 				//if( seq->insert( 0, echo.str().c_str() )!=CMD_SUCCESS ) {
-				//	cerr << "WARNING: send_vrSpeak(..): Failed to insert vrSpeak command echo for character \"" << char_id << "\"." <<endl;
+				//	strstr << "WARNING: send_vrSpeak(..): Failed to insert vrSpeak command echo for character \"" << char_id << "\"." <<endl;
 				//}
 
 				if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
-					cerr << "WARNING: send_vrX(..): Failed to insert vrSpeak command for character \"" << char_id << "\"." <<endl;
+					std::stringstream strstr;
+					strstr << "WARNING: send_vrX(..): Failed to insert vrSpeak command for character \"" << char_id << "\".";
+					LOG(strstr.str().c_str());
 				}
 			}
 		} else {
@@ -286,24 +297,30 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 			//echo.str("");
 			//echo << "echo " << msg.str();
 			//if( seq->insert( 0, echo.str().c_str() )!=CMD_SUCCESS ) {
-			//	cerr << "WARNING: send_vrSpeak(..): Failed to insert vrSpeak command echo for character \"" << char_id << "\"." <<endl;
+			//	strstr << "WARNING: send_vrSpeak(..): Failed to insert vrSpeak command echo for character \"" << char_id << "\"." <<endl;
 			//}
 
 			if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
-				cerr << "WARNING: send_vrX(..): Failed to insert vrSpeak command for character \"" << char_id << "\"." <<endl;
+				std::stringstream strstr;
+				strstr << "WARNING: send_vrX(..): Failed to insert vrSpeak command for character \"" << char_id << "\".";
+				LOG(strstr.str().c_str());
 			}
 		}
 
 		if( send ) {
 			mcu.active_seq_map.remove( seq_id.c_str() );  // remove old sequence by this name
 			if( mcu.active_seq_map.insert( seq_id.c_str(), seq ) != CMD_SUCCESS ) {
-				cerr << "ERROR: send_vrX(..): Failed to insert seq into active_seq_map." << endl; 
+				std::stringstream strstr;
+				strstr << "ERROR: send_vrX(..): Failed to insert seq into active_seq_map.";
+				LOG(strstr.str().c_str());
 				return CMD_FAILURE;
 			}
 		} else {
 			mcu.pending_seq_map.remove( seq_id.c_str() );  // remove old sequence by this name
 			if( mcu.pending_seq_map.insert( seq_id.c_str(), seq ) != CMD_SUCCESS ) {
-				cerr << "ERROR: send_vrX(..): Failed to insert seq into active_seq_map." << endl; 
+				std::stringstream strstr;
+				strstr << "ERROR: send_vrX(..): Failed to insert seq into active_seq_map.";
+				LOG(strstr.str().c_str());
 				return CMD_FAILURE;
 			}
 		}
@@ -464,7 +481,7 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 				if( arg=="target" ) {
 					arg = args.read_token();
 				} else if( targetAttr.length()>0 ) {
-					cerr << "ERROR: test bml gaze: Unexpected second target value."<<endl;
+					LOG("ERROR: test bml gaze: Unexpected second target value.");
 					return CMD_FAILURE;
 				}
 
@@ -476,10 +493,10 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 		}
 
 		if( targetAttr.length()==0 ) {
-			cerr << "WARNING: test bml gaze: Expected a target value."<<endl;
+			LOG("WARNING: test bml gaze: Expected a target value.");
 		}
 		if( angleAttr.length()>0 && directionAttr.length()==0 ) {
-			cerr << "WARNING: test bml gaze: Expected a direction when specifying angle."<<endl;
+			LOG("WARNING: test bml gaze: Expected a direction when specifying angle.");
 			return CMD_FAILURE;
 		}
 
@@ -518,7 +535,7 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 
 			arg = args.read_token();
 			if( arg=="target" ) {
-				cerr << "ERROR: test bml head orient: Command \"target\" unimplemented."<< endl;
+				LOG("ERROR: test bml head orient: Command \"target\" unimplemented.");
 				return CMD_FAILURE;
 			} else if( arg=="right" || arg=="left" || arg=="up" || arg=="down" ||
 			           arg=="rollright" || arg=="rollleft" ) {
@@ -529,13 +546,17 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 					head_attrs << " angle=\"" << arg << "\"";
 				}
 			} else {
-				cerr << "ERROR: test bml head orient: Unrecognized head orientation \""<<arg<<"\"."<< endl
-					<< "\tRecognized directions: right, left, up, down, rollright, rollleft" << endl;
+				std::stringstream strstr;
+				strstr << "ERROR: test bml head orient: Unrecognized head orientation \""<<arg<<"\"."<< endl
+					<< "\tRecognized directions: right, left, up, down, rollright, rollleft";
+				LOG(strstr.str().c_str());
 
 				return CMD_FAILURE;
 			}
 		} else {
-			cerr << "ERROR: test bml head: Unrecognized command \""<<arg<<"\". Expected: orient, shake, or nod"<< endl;
+			std::stringstream strstr;
+			strstr << "ERROR: test bml head: Unrecognized command \""<<arg<<"\". Expected: orient, shake, or nod";
+			LOG(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
 		ostringstream bml;
@@ -571,7 +592,7 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 				speech_tag = "<speech type=\"application/ssml+xml\">";
 				break;
 			default:
-				cerr << "INTERNAL ERROR: BML::Processor::test_bml_func(..): Invalid speech_type: "<<speech_type<<endl;
+				LOG("INTERNAL ERROR: BML::Processor::test_bml_func(..): Invalid speech_type: %d", speech_type);
 		}
 
 		ostringstream bml;
@@ -585,7 +606,7 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 	} else if( arg=="interrupt") {
 		string act = args.read_token();
 		if( act.length()==0 ) {
-			cerr << "ERROR: test bml " << arg << ": Missing BML performance id." << endl;
+			LOG("ERROR: test bml %s: Missing BML performance id.", arg.c_str());
 			return CMD_FAILURE;
 		}
 
@@ -600,7 +621,7 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 	} else if( arg=="qdraw" || arg=="quickdraw" ) {  // Shhh! Its a secret!
 		string target = args.read_token();
 		if( target.length()==0 ) {
-			cerr << "ERROR: test bml " << arg << ": Missing target id." << endl;
+			LOG("ERROR: test bml %s: Missing target id.", arg.c_str());
 			return CMD_FAILURE;
 		}
 
@@ -633,7 +654,7 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 
 		return send_vrX( "vrSpeak", char_id, recip_id, seq_id, echo, send, bml.str() );
 	} else {
-		cerr << "ERROR: test bml: Unrecognized \"test bml\" subscommand \""<<arg<<"\"."<< endl;
+		LOG("ERROR: test bml: Unrecognized \"test bml\" subscommand \"%s\".", arg.c_str());
 		print_test_bml_help();
 		return CMD_FAILURE;
 	}
@@ -683,7 +704,7 @@ int test_fml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 			    << "<act>" << arg << args.read_remainder_raw() << "</act>";
 			return send_vrX( "vrExpress", char_id, recip_id, seq_id, echo, send, fml.str() );
 		} else {
-			cerr << "ERROR: test_fml_func: Unrecognized test FML command: \"" << arg << "\"" << endl;
+			LOG("ERROR: test_fml_func: Unrecognized test FML command: \"%s\"", arg.c_str());
 			return CMD_FAILURE;
 		}
 	} else if( arg=="file") {
@@ -697,7 +718,7 @@ int test_fml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 		ostringstream fml;
 		ifstream file( filename.c_str() );
 		if( !file ) {
-			cerr << "ERROR: test_fml_func: Unable to open file: \"" << filename << "\"" << endl;
+			LOG("ERROR: test_fml_func: Unable to open file: \"%s\"", filename.c_str());
 			return CMD_FAILURE;
 		}
 		fml << file.rdbuf();
@@ -727,7 +748,7 @@ int test_fml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 				speech_tag = "<speech id=\"s1\" type=\"application/ssml+xml\">";
 				break;
 			default:
-				cerr << "INTERNAL ERROR: BML::Processor::test_bml_func(..): Invalid speech_type: "<<speech_type<<endl;
+				LOG("INTERNAL ERROR: BML::Processor::test_bml_func(..): Invalid speech_type: %d", speech_type);
 		}
 
 		ostringstream fml;
@@ -740,7 +761,7 @@ int test_fml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 			<< "</act>";
 		return send_vrX( "vrExpress", char_id, recip_id, seq_id, echo, send, fml.str() );
 	} else {
-		cerr << "ERROR: test bml: Unrecognized command \""<<arg<<"\"."<< endl;
+		LOG("ERROR: test bml: Unrecognized command \"%s\".", arg.c_str());
 		print_test_fml_help();
 		return CMD_FAILURE;
 	}
@@ -750,13 +771,13 @@ int test_fml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 int test_bone_pos_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
 	string& character_id = mcu_p->test_character_default;
 	if( character_id.empty() ) {
-		cerr << "ERROR: No test character defined" << endl;
+		LOG("ERROR: No test character defined");
 		return CMD_FAILURE;
 	}
 
 	SbmCharacter* character = mcu_p->character_map.lookup( character_id.c_str() );
 	if( character == NULL ) {
-		cerr << "ERROR: Unknown test character \"" << character_id << "\"" << endl;
+		LOG("ERROR: Unknown test character \"%s\"", character_id.c_str());
 		return CMD_FAILURE;
 	}
 

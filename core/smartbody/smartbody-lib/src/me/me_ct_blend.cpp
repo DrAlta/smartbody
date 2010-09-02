@@ -138,9 +138,10 @@ void MeCtBlend::Context::remap_channels() {
 				const char* parent_ch_name = name.get_string();
 				if( strcmp( child_ch_name, parent_ch_name )!=0
 					|| ( child_ch_type != type ) ) {
-						cerr << "ERROR: MeCtBlend::Context::remap_channels(): MeCtBlend \"" << _container.name()<< "\":"
+						strstr << "ERROR: MeCtBlend::Context::remap_channels(): MeCtBlend \"" << _container.name()<< "\":"
 							<<" Child #"<<child_index << " \""<<child_ch_name<< " (" << SkChannel::type_name(child_ch_type) << ") != "
-							<<" Parent #"<<parent_index << " \""<<parent_ch_name<<" (" << SkChannel::type_name(type)<<")" << endl;
+							<<" Parent #"<<parent_index << " \""<<parent_ch_name<<" (" << SkChannel::type_name(type)<<")";
+						LOG(strstr.str().c_str());
 				}
 #endif
 				// Create new local channel, passing skeleton joint reference if available
@@ -160,7 +161,8 @@ void MeCtBlend::Context::remap_channels() {
 			} else {
 #if TRACE_BLEND_CONTEXT_REMAP
 				// C is for Child
-				cout << "P#" << parent_index << "\t\t\t\t\t" << name.get_string() << " ("<<SkChannel::type_name(type) <<") Does not exist in child." << endl;
+				strstr << "P#" << parent_index << "\t\t\t\t\t" << name.get_string() << " ("<<SkChannel::type_name(type) <<") Does not exist in child." << endl;
+				LOG(strstr.str().c_str());
 #endif
 			}
 		}
@@ -311,9 +313,10 @@ void MeCtBlend::controller_map_updated() {
 
 				// Test child vs local
 				if( ( child_ch_name != local_ch_name ) || (child_ch_type != local_ch_type) ) {
-					cerr << "ERROR: MeCtBlend::controller_map_updated(): Invalid channel mapping..." << endl
+					strstr << "ERROR: MeCtBlend::controller_map_updated(): Invalid channel mapping..." << endl
 					     << "\tChild channel #"<<child_index<<" \""<<child_ch_name.get_string()<<"\" ("<<SkChannel::type_name(child_ch_type)<<")" << endl
 						 << "\tLocal channel #"<<local_index<<" \""<<local_ch_name.get_string()<<"\" ("<<SkChannel::type_name(local_ch_type)<<")" << endl;
+					LOG(strstr.str().c_str());
 				}
 
 				// Test local vs parent
@@ -324,15 +327,17 @@ void MeCtBlend::controller_map_updated() {
 					SkChannel::Type parent_ch_type = parent_channels.type( parent_index );
 
 					if( ( local_ch_name != parent_ch_name ) || (local_ch_type != parent_ch_type) ) {
-						cerr << "ERROR: MeCtBlend::controller_map_updated(): Invalid channel mapping..." << endl
+						strstr << "ERROR: MeCtBlend::controller_map_updated(): Invalid channel mapping..." << endl
 						     << "\tChild channel #"<<child_index<<" \""<<child_ch_name.get_string()<<"\" ("<<SkChannel::type_name(child_ch_type)<<")" << endl
 						     << "\tLocal channel #"<<local_index<<" \""<<local_ch_name.get_string()<<"\" ("<<SkChannel::type_name(local_ch_type)<<")" << endl
-						     << "\tParent channel #"<<parent_index<<" \""<<parent_ch_name.get_string()<<"\" ("<<SkChannel::type_name(parent_ch_type)<<")" << endl;
+						     << "\tParent channel #"<<parent_index<<" \""<<parent_ch_name.get_string()<<"\" ("<<SkChannel::type_name(parent_ch_type)<<")";
+							LOG(strstr.str().c_str());
 					}
 				} else {
-					cerr << "ERROR: MeCtBlend::controller_map_updated(): Invalid parent index: "<< parent_index << endl
+					strstr << "ERROR: MeCtBlend::controller_map_updated(): Invalid parent index: "<< parent_index << endl
 					     << "\tChild channel #"<<child_index<<" \""<<child_ch_name.get_string()<<"\" ("<<SkChannel::type_name(child_ch_type)<<")" << endl
-					     << "\tLocal channel #"<<local_index<<" \""<<local_ch_name.get_string()<<"\" ("<<SkChannel::type_name(local_ch_type)<<")" << endl;
+					     << "\tLocal channel #"<<local_index<<" \""<<local_ch_name.get_string()<<"\" ("<<SkChannel::type_name(local_ch_type)<<")";
+					LOG(strstr.str().c_str());
 				}
 			}
 		}
@@ -400,9 +405,10 @@ bool MeCtBlend::controller_evaluate( double t, MeFrameData & frame ) {
 #if VALIDATE_BLEND_CHANNEL_REMAP  // #define'd in me_controller.h
 					if( strcmp( local_ch_name, parent_ch_name )!=0
 						|| ( local_ch_type != parent_ch_type ) ) {
-							cerr << "ERROR: MeCtBlend::Context::controller_evaluate(): MeCtBlend \"" <<name()<< "\" copy for child:"
+							strstr << "ERROR: MeCtBlend::Context::controller_evaluate(): MeCtBlend \"" <<name()<< "\" copy for child:"
 							     <<" Local Channel #"<< i << " \""<<local_ch_name<< " (" << SkChannel::type_name(local_ch_type) << ") != "
-							     <<" Parent #"<<parent_index << " \""<<parent_ch_name<<" (" << SkChannel::type_name(parent_ch_type)<<")" << endl;
+							     <<" Parent #"<<parent_index << " \""<<parent_ch_name<<" (" << SkChannel::type_name(parent_ch_type)<<")";
+							LOG(strstr.str().c_str());
 					}
 #endif
 
@@ -476,9 +482,10 @@ bool MeCtBlend::controller_evaluate( double t, MeFrameData & frame ) {
 #if VALIDATE_BLEND_CHANNEL_REMAP  // #define'd in me_controller.h
 						if( strcmp( local_ch_name, parent_ch_name )!=0
 							|| ( local_ch_type != parent_ch_type ) ) {
-								cerr << "ERROR: MeCtBlend::Context::controller_evaluate(): MeCtBlend \"" << name()<< "\" blend for parent:"
+								strstr << "ERROR: MeCtBlend::Context::controller_evaluate(): MeCtBlend \"" << name()<< "\" blend for parent:"
 									<<" Child #"<< i << " \""<<local_ch_name<< " (" << SkChannel::type_name(local_ch_type) << ") != "
-									<<" Parent #"<<parent_index << " \""<<parent_ch_name<<" (" << SkChannel::type_name(parent_ch_type)<<")" << endl;
+									<<" Parent #"<<parent_index << " \""<<parent_ch_name<<" (" << SkChannel::type_name(parent_ch_type)<<")";
+								LOG(strstr.str().c_str());
 						}
 #endif
 
@@ -555,9 +562,10 @@ bool MeCtBlend::controller_evaluate( double t, MeFrameData & frame ) {
 #if VALIDATE_BLEND_CHANNEL_REMAP  // #define'd in me_controller.h
 						if( strcmp( local_ch_name, parent_ch_name )!=0
 							|| ( local_ch_type != parent_ch_type ) ) {
-								cerr << "ERROR: MeCtBlend::Context::controller_evaluate(): MeCtBlend \"" << name()<< "\" copy for parent:"
+								strstr << "ERROR: MeCtBlend::Context::controller_evaluate(): MeCtBlend \"" << name()<< "\" copy for parent:"
 									<<" Local Channel #"<< i << " \""<<local_ch_name<< " (" << SkChannel::type_name(local_ch_type) << ") != "
-									<<" Parent #"<<parent_index << " \""<<parent_ch_name<<" (" << SkChannel::type_name(parent_ch_type)<<")" << endl;
+									<<" Parent #"<<parent_index << " \""<<parent_ch_name<<" (" << SkChannel::type_name(parent_ch_type)<<")";
+								LOG(strstr.str().c_str());
 						}
 #endif
 						int parent_buffer_index = frame.toBufferIndex( parent_index );

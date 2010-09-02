@@ -3861,9 +3861,12 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			}
 			else
 			{
-				LOG("mcu_check_func ERR: Frame Number not Exist!");
-				motion->disconnect();
-				return CMD_FAILURE;			
+				if (frameNumString != "")
+				{
+					LOG("mcu_check_func ERR: Frame Number not Exist!");
+					motion->disconnect();
+					return CMD_FAILURE;			
+				}
 			}
 		}
 		else
