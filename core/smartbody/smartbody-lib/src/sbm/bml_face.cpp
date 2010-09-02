@@ -39,7 +39,6 @@ const XMLCh ATTR_AU[]     = L"au";
 const XMLCh ATTR_AMOUNT[] = L"amount";
 
 
-
 using namespace std;
 using namespace BML;
 using namespace xml_utils;
@@ -70,7 +69,12 @@ BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& uni
 		rampdown =( float(atof(temp)));
 	}
 
-	
+	str = elem->getAttribute( L"sbm:duration" );
+	float duration = 1.0;
+	if( str && *str != 0 ) {
+		char* temp = XMLString::transcode(str);
+		duration =( float(atof(temp)));
+	}
 	
 	const XMLCh* attrType = elem->getAttribute( ATTR_TYPE );
 	if( attrType && *attrType != 0 ) {
@@ -97,7 +101,7 @@ BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& uni
                     }
                     if(LOG_BML_VISEMES) LOG( "LOG: BML::parse_bml_face(): FAC weight: %f\n", weight );
 					boost::shared_ptr<VisemeRequest> viseme;
-					viseme.reset( new VisemeRequest( unique_id, localId, "_", weight, 1, behav_syncs, rampup, rampdown ) );
+					viseme.reset( new VisemeRequest( unique_id, localId, "_", weight, duration, behav_syncs, rampup, rampdown ) );
 
 					std::wstringstream wstrstr;
                     switch( au ) {
