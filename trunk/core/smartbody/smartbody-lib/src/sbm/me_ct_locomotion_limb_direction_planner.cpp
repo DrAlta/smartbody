@@ -34,7 +34,7 @@ const char* MeCtLocomotionLimbDirectionPlanner::TYPE = "MeCtLocomotionLimbDirect
 MeCtLocomotionLimbDirectionPlanner::MeCtLocomotionLimbDirectionPlanner() {
 
 	curr_ratio = 0.0f;
-	set_turning_speed(0.5f);
+	set_turning_speed(1.0f);
 	curr_direction.set(0.0f, 0.0f, 1.0f);
 	target_direction.set(0.0f, 0.0f, 0.0f);
 	turning_mode = 0;

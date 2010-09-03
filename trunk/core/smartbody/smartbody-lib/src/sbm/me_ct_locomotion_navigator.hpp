@@ -108,6 +108,8 @@ public: // channels and routine funcs
 	void AddChannel(SkChannelArray* request_channels, const char* name, SkChannel::Type type, int* index);
 
 public:
+	float get_turning_angle();
+
 	void clear_destination_list();
 	int get_destination_count();
 	int get_curr_destinatio_index();
