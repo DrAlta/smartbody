@@ -648,10 +648,10 @@ void FltkViewer::set_camera ( const SrCamera &cam )
  {
    _data->camera = cam;
 
-   if ( _data->viewmode==ModeExaminer )
-    { _data->trackball.init();
-      _data->trackball.rotation.set ( cam.eye-cam.center, SrVec::k );
-    }
+ //  if ( _data->viewmode==ModeExaminer )
+//    { _data->trackball.init();
+  //    _data->trackball.rotation.set ( cam.eye-cam.center, SrVec::k );
+   // }
 
 //   if ( _data->root )
   //  { update_bbox ();
@@ -1102,9 +1102,9 @@ int FltkViewer::handle_event ( const SrEvent &e )
 
 # define ROTATING2(e)    (e.alt && e.button1)
 # define ROTATING(e)   (e.alt && e.shift && e.button1)
-# define ZOOMING(e)   (e.alt && e.button3)
-//# define ZOOMING(e)     (e.alt && e.ctrl && e.button3)
-//# define DOLLYING(e)     (e.alt && e.button3)
+//# define ZOOMING(e)   (e.alt && e.button3)
+# define ZOOMING(e)     (e.shift && e.ctrl && e.button3)
+# define DOLLYING(e)     (e.alt && e.button3)
 # define TRANSLATING(e) (e.alt && e.button2)
 
 SrVec rotatePoint(SrVec point, SrVec origin, SrVec direction, float angle)
@@ -1143,25 +1143,28 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
       float dx = e.mousedx() * _data->camera.aspect;
       float dy = e.mousedy() / _data->camera.aspect;
 
-      if ( ZOOMING(e) )
-       { _data->camera.fovy += (dx+dy);//40.0f;
-         _data->camera.fovy = SR_BOUND ( _data->camera.fovy, 0.001f, srpi );
-       }
-	/*  else if ( DOLLYING(e) )
-       { 
-		    float amount = .2f;
+		if ( ZOOMING(e) )
+		{
+			_data->camera.fovy += (dx+dy);//40.0f;
+			_data->camera.fovy = SR_BOUND ( _data->camera.fovy, 0.001f, srpi );
+		}
+		else if ( DOLLYING(e) )
+		{ 
+			float amount = dx;
 			SrVec cameraPos(_data->camera.eye);
 			SrVec targetPos(_data->camera.center);
 			SrVec diff = targetPos - cameraPos;
+			float distance = diff.len();
 			diff.normalize();
-			
-			float virtualSize = ;
 
-			SrVec oldCameraEye = _data->camera.eye;
-			_data->camera.eye = cameraPos;
-			_data->camera.center += (_data->camera.eye - oldCameraEye);
-       }
-	   */
+			if (amount >= distance)
+				amount = distance - .000001f;
+
+			SrVec diffVector = diff;
+			SrVec adjustment = diffVector * distance * amount;
+			cameraPos += adjustment;
+			_data->camera.eye = cameraPos;			
+		}
       else if ( TRANSLATING(e) )
        { _data->camera.apply_translation_from_mouse_motion ( e.lmouse.x, e.lmouse.y, e.mouse.x, e.mouse.y );
        }

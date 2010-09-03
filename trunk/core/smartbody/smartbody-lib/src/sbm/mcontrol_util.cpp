@@ -539,10 +539,10 @@ void mcuCBHandle::update( void )	{
 		joint->update_gmat();
 		const SrMat& jointGmat = joint->gmat();
 		SrVec jointLoc(jointGmat[12], jointGmat[13], jointGmat[14]);
-		SrVec target = jointLoc + this->cameraTracking[x]->diff;
-		SrVec eye = target + this->cameraTracking[x]->targetDiff;
-		this->camera_p->center.set( target.x, target.y, target.z);
-		this->camera_p->eye.set( eye.x, eye.y, eye.z);
+		SrVec cameraLoc = jointLoc + this->cameraTracking[x]->jointToCamera;
+		this->camera_p->eye.set(cameraLoc.x, cameraLoc.y, cameraLoc.z);
+		SrVec targetLoc = cameraLoc - this->cameraTracking[x]->targetToCamera;
+		this->camera_p->center.set( targetLoc.x, targetLoc.y, targetLoc.z);
 		this->viewer_p->set_camera(*( this->camera_p ));
 	}
 }

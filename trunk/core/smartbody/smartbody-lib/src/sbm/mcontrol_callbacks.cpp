@@ -607,13 +607,13 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				joint->skeleton()->update_global_matrices();
 				joint->update_gmat();
 				const SrMat& jointMat = joint->gmat();
-				SrVec vec(jointMat[12], jointMat[13], jointMat[14]);
+				SrVec jointPos(jointMat[12], jointMat[13], jointMat[14]);
 				CameraTrack* cameraTrack = new CameraTrack();
 				cameraTrack->joint = joint;
-				cameraTrack->diff = mcu_p->camera_p->center - vec;
-				LOG("Vector from joint to target is %f %f %f", cameraTrack->diff.x, cameraTrack->diff.y, cameraTrack->diff.z);
-				cameraTrack->targetDiff = mcu_p->camera_p->eye - mcu_p->camera_p->center;
-				LOG("Vector from target to eye is %f %f %f", cameraTrack->targetDiff.x, cameraTrack->targetDiff.y, cameraTrack->targetDiff.z);				
+				cameraTrack->jointToCamera = mcu_p->camera_p->eye - jointPos;
+				LOG("Vector from joint to target is %f %f %f", cameraTrack->jointToCamera.x, cameraTrack->jointToCamera.y, cameraTrack->jointToCamera.z);
+				cameraTrack->targetToCamera = mcu_p->camera_p->eye - mcu_p->camera_p->center;
+				LOG("Vector from target to eye is %f %f %f", cameraTrack->targetToCamera.x, cameraTrack->targetToCamera.y, cameraTrack->targetToCamera.z);				
 				mcu_p->cameraTracking.push_back(cameraTrack);
 				LOG("Object %s will now be tracked at joint %s.", name, jointName);
 				

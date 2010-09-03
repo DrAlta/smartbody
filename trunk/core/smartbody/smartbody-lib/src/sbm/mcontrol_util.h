@@ -105,8 +105,8 @@ class CameraTrack
 {
 	public:
 		SkJoint* joint;
-		SrVec diff;
-		SrVec targetDiff;
+		SrVec jointToCamera;
+		SrVec targetToCamera;
 };
 
 // Motion Controller Utility Callback Handle (Yes, seriously.)
