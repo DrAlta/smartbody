@@ -234,7 +234,11 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	if(!enabled) return false;
 	if( !is_valid ) return is_valid;
 
-	delta_time = 0.03333333f;
+	curr_t = time;
+
+	delta_time = curr_t - last_t;
+
+	if(delta_time > 0.03333333f) delta_time = 0.03333333f;
 
 	if(motion_time > 0.0f)
 	{
@@ -244,19 +248,8 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	if(motion_time == 0.0f)
 	{
 		navigator.set_reached_destination(frame);
+		motion_time = -1.0f;
 	}
-
-	//if(last_t == -1.0f) last_t = (float)time-delta_time;
-
-	curr_t = time;
-
-	//if(curr_t - last_t > delta_time)  curr_t = last_t + delta_time;
-
-	//if(curr_t < last_t) curr_t = last_t;
-
-	delta_time = curr_t - last_t;
-
-	if(delta_time > 0.03333333f) delta_time = 0.03333333f;
 	
 	float inc_frame;
 	inc_frame = (float)(delta_time/0.03333333f);
