@@ -280,6 +280,8 @@ void MeCtLocomotionNavigator::set_reached_destination(MeFrameData& frame)
 	buffer[ bi_loco_rot_local_y ] = 0.0f;
 	reached_destination = true;
 	standing_factor_on_stop_t = standing_factor;
+	has_destination = false;
+	destination_list.size(0);
 }
 
 void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtLocomotionLimb* limb, bool reset) 
@@ -468,7 +470,6 @@ void MeCtLocomotionNavigator::update_facing(MeCtLocomotionLimb* limb, bool domin
 	if(limb->space_time > 1.0f && limb->space_time <= 1.5f) 
 	{
 		limb->curr_rotation = limb->rotation_record * (1.5f - limb->space_time)*2.0f;
-		printf("\n%f", limb->curr_rotation);
 	}
 
 	else if(limb->space_time >= 2.0f || limb->space_time <= 1.0f)
