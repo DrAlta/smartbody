@@ -93,8 +93,10 @@ protected:
 	float motion_time;
 
 	float last_time;
-	float last_t;
-	float curr_t;
+
+	double last_t;
+	double curr_t;
+
 	float delta_time;
 
 	char* base_name;

@@ -181,8 +181,11 @@ void MeCtLocomotionLimb::blend_anim(float space_time, int anim_index1, int anim_
 void MeCtLocomotionLimb::manipulate_turning(SrMat& root_mat)
 {
 	SrMat mat;
-	mat.roty(curr_rotation);
-	//mat = root_mat.*mat;
+	SrVec y(0.0f, 1.0f, 0.0f);
+	root_mat.invert();
+	//y = root_mat*y;
+	//y = y*root_mat;
+	mat.rot(y, curr_rotation);
 	SrQuat quat = limb_joint_info.quat.get(0);
 	quat = quat * mat;
 	limb_joint_info.quat.set(0, quat);
