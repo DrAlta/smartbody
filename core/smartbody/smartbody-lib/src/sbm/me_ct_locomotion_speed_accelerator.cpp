@@ -102,6 +102,11 @@ float MeCtLocomotionSpeedAccelerator::get_target_speed()
 	return target_speed;
 }
 
+float MeCtLocomotionSpeedAccelerator::get_curr_acceleration()
+{
+	return acceleration;
+}
+
 float MeCtLocomotionSpeedAccelerator::get_target_acceleration()
 {
 	return target_acceleration;
@@ -112,13 +117,13 @@ float MeCtLocomotionSpeedAccelerator::get_curr_speed()
 	return curr_speed;
 }
 
-void MeCtLocomotionSpeedAccelerator::set_acceleration(float acc)
+/*void MeCtLocomotionSpeedAccelerator::set_acceleration(float acc)
 {
 	if(acc < 0.0f) acc = -acc;
 	target_acceleration = acc;
 	if(this->acceleration > 0) this->acceleration = target_acceleration;
 	else this->acceleration = -target_acceleration;
-}
+}*/
 
 void MeCtLocomotionSpeedAccelerator::set_max_acceleration(float max)
 {
@@ -136,6 +141,7 @@ void MeCtLocomotionSpeedAccelerator::update_acceleration(MeCtLocomotionLimb* lim
 {
 	if(proceed_acceleration == false || auto_accelerated == false) return;
 	float length = 0.0f;
+
 	if(target_speed >= curr_speed) 
 		length = timing_space->get_section_length(limb->space_time, 1.0f);
 	else
@@ -155,4 +161,14 @@ void MeCtLocomotionSpeedAccelerator::update_acceleration(MeCtLocomotionLimb* lim
 		if(max_acceleration_neg < 0.0f && acceleration > max_acceleration_neg) acceleration = max_acceleration_neg;
 		if(min_acceleration_neg < 0.0f && acceleration < min_acceleration_neg) acceleration = min_acceleration_neg;
 	}
+}
+
+float MeCtLocomotionSpeedAccelerator::get_max_acceleration_neg()
+{
+	return max_acceleration_neg;
+}
+
+float MeCtLocomotionSpeedAccelerator::get_min_acceleration_neg()
+{
+	return min_acceleration_neg;
 }

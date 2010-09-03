@@ -391,15 +391,6 @@ bool MeCtLocomotionNavigator::controller_map_updated(MeControllerContext* _conte
 
 		LOOKUP_BUFFER_INDEX( bi_id, bi_id );
 
-		//LOOKUP_BUFFER_INDEX( bi_has_destination, 10 );
-		//LOOKUP_BUFFER_INDEX( bi_loco_dest_x, 10 );
-		//LOOKUP_BUFFER_INDEX( bi_loco_dest_y, 11 );
-		//LOOKUP_BUFFER_INDEX( bi_loco_dest_z, 12 );
-
-		//LOOKUP_BUFFER_INDEX( bi_base_offset_x,    10 );
-		//LOOKUP_BUFFER_INDEX( bi_base_offset_y,    11 );
-		//LOOKUP_BUFFER_INDEX( bi_base_offset_z,    12 );
-		//LOOKUP_BUFFER_INDEX( bi_base_rot,  13 );
 	} 
 	else 
 	{
@@ -448,8 +439,16 @@ void MeCtLocomotionNavigator::AddChannel(SkChannelArray* request_channels, const
 	++routine_channel_num;
 }
 
+float MeCtLocomotionNavigator::get_turning_angle()
+{
+	// Temporary solution: If there is no speed, no rotation.
+	if(local_vel.len() == 0.0f) return 0.0f;
+	return (float)delta_time * local_rps;
+}
+
 void MeCtLocomotionNavigator::update_facing(MeCtLocomotionLimb* limb, bool dominant_limb)
 {
+	// when coming to stop the limbs should rotate back to original orientation.
 	if(local_rps == 0.0f && local_vel.len() != 0.0f) 
 	{
 		if(limb->space_time > 1.0f && limb->space_time < 2.0f) 
@@ -459,10 +458,11 @@ void MeCtLocomotionNavigator::update_facing(MeCtLocomotionLimb* limb, bool domin
 		}
 		return;
 	}
-	SrMat mat;
-	float time = 0.0f;
+	
 	limb->pre_rotation = limb->curr_rotation;
 
+	SrMat mat;
+	float time = 0.0f;
 	float ratio = 0.0f;
 	
 	if(standing_factor_on_stop_t > 0.0f) ratio = standing_factor / standing_factor_on_stop_t;
@@ -474,13 +474,14 @@ void MeCtLocomotionNavigator::update_facing(MeCtLocomotionLimb* limb, bool domin
 
 	else if(limb->space_time >= 2.0f || limb->space_time <= 1.0f)
 	{
-		float delta_angle = (float)delta_time * local_rps;
+		float delta_angle = get_turning_angle();
+		
 		limb->curr_rotation += delta_angle;
 
 		if(dominant_limb) 
 		{
 			if(reached_destination)
-				facing_angle += -(float)delta_time * local_rps * ratio;
+				facing_angle += -delta_angle * ratio;
 			else 
 				facing_angle += -delta_angle;
 	
@@ -490,7 +491,7 @@ void MeCtLocomotionNavigator::update_facing(MeCtLocomotionLimb* limb, bool domin
 	}
 	else if(limb->space_time > 1.5f && limb->space_time < 2.0f)
 	{
-		limb->curr_rotation -= (float)delta_time * local_rps;
+		limb->curr_rotation -= get_turning_angle();
 	}
 
 	if(reached_destination)
@@ -499,7 +500,6 @@ void MeCtLocomotionNavigator::update_facing(MeCtLocomotionLimb* limb, bool domin
 	if( limb->space_time >= 2.0f || limb->space_time <= 1.0f )
 		limb->rotation_record = limb->curr_rotation;
 
-	//if(limb->curr_rotation != 0.0f) printf("\n rotation: [%f]", limb->curr_rotation);
 }
 
 void MeCtLocomotionNavigator::clear_destination_list()

@@ -265,7 +265,7 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	if(navigator.has_destination && navigator.get_destination_count() > navigator.get_curr_destinatio_index() && navigator.get_curr_destinatio_index()>=0)
 	{
 		SrVec dis_to_dest = navigator.get_dis_to_dest();
-		if(2.0f * dis_to_dest.len() * speed_accelerator.get_target_acceleration() <= speed_accelerator.get_target_speed()*speed_accelerator.get_target_speed())
+		if(2.0f * dis_to_dest.len() * abs(speed_accelerator.get_min_acceleration_neg()) <= speed_accelerator.get_curr_speed()*speed_accelerator.get_curr_speed())
 		{
 			if(navigator.get_destination_count() == navigator.get_curr_destinatio_index()+1) 
 				navigator.set_reached_destination(frame);
@@ -285,6 +285,8 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	speed_accelerator.set_target_speed(navigator.get_target_local_velocity().len());
 
 	update(inc_frame, frame);
+
+
 
 	navigator.post_controller_evaluate(frame, limb_list.get(dominant_limb), reset);
 

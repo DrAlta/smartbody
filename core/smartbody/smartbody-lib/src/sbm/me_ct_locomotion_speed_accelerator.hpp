@@ -63,7 +63,11 @@ public:
 	void		set_target_speed(float target_speed);
 	float		get_target_speed();
 	float		get_target_acceleration();
+	float		get_curr_acceleration();
 	float		get_curr_speed();
+
+	float		get_max_acceleration_neg();
+	float		get_min_acceleration_neg();
 
 	void		set_acceleration(float acc);
 	void		set_max_acceleration(float max);
