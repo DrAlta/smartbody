@@ -43,7 +43,7 @@ MeCtLocomotion::MeCtLocomotion() {
 	nonlimb_joint_info.joint_index.capacity(0);
 	nonlimb_joint_info.quat.capacity(0);
 	last_time = 0.0f;
-	last_t = -1.0f;
+	//last_t = -1.0f;
 	ratio = 0.0f;
 	dominant_limb = 0;
 	automate = false;
@@ -246,15 +246,20 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 		navigator.set_reached_destination(frame);
 	}
 
-	if(last_t == -1.0f) last_t = (float)time-delta_time;
+	//if(last_t == -1.0f) last_t = (float)time-delta_time;
 
-	curr_t = (float)time;
+	curr_t = time;
 
-	if(curr_t - last_t > delta_time)  curr_t = last_t + delta_time;
+	//if(curr_t - last_t > delta_time)  curr_t = last_t + delta_time;
 
-	if(curr_t < last_t) curr_t = last_t;
+	//if(curr_t < last_t) curr_t = last_t;
+
+	delta_time = curr_t - last_t;
+
+	if(delta_time > 0.03333333f) delta_time = 0.03333333f;
 	
-	float inc_frame = (float)((curr_t-last_t)/delta_time);
+	float inc_frame;
+	inc_frame = (float)(delta_time/0.03333333f);
 
 	const vector3_t UP_VECTOR( 0, 1, 0 );
 
@@ -262,7 +267,7 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
  
 	MeCtLocomotionLimb* limb = limb_list.get(dominant_limb);
 
-	navigator.controller_evaluate(curr_t-last_t, &(limb->direction_planner), &speed_accelerator, frame);
+	navigator.controller_evaluate(delta_time, &(limb->direction_planner), &speed_accelerator, frame);
 
 	if(navigator.has_destination && navigator.get_destination_count() > navigator.get_curr_destinatio_index() && navigator.get_curr_destinatio_index()>=0)
 	{
@@ -322,7 +327,7 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 		buffer[index+3] = (float)quat.z;
 	}
 	
-	last_t = (float)time;
+	last_t = time;
 	//navigator.print_foot_pos(frame, limb_list.get(dominant_limb));
 
 	//if(dominant_limb == 0) LOG("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> yes    (%f, %f, %f)", limb_list.get(dominant_limb)->pos.x+navigator.x, limb_list.get(dominant_limb)->pos.y+navigator.y, limb_list.get(dominant_limb)->pos.z+navigator.z);
@@ -612,6 +617,10 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 
 	// set r_anim1_index amd r_anim2_index
 	get_anim_indices(dominant_limb, limb_list.get(dominant_limb)->direction_planner.get_curr_direction());
+
+	//SrVec v = limb_list.get(dominant_limb)->direction_planner.get_curr_direction();
+	//printf("\n(%f, %f, %f)", v.x, v.y, v.z);
+
 	MeCtLocomotionLimbAnim* anim1 = limb_list.get(dominant_limb)->get_walking_list()->get(r_anim1_index);
 	MeCtLocomotionLimbAnim* anim2 = limb_list.get(dominant_limb)->get_walking_list()->get(r_anim2_index);
 	MeCtLocomotionLimbAnim* blended_anim = &limb_list.get(dominant_limb)->blended_anim;
@@ -922,21 +931,6 @@ SrVec MeCtLocomotion::get_limb_pos(MeCtLocomotionLimb* limb)
 	//float* ppos;
 	SkSkeleton* skeleton = limb->walking_skeleton;
 
-	/*tjoint = skeleton->search_joint(base_name);
-
-	pmat = get_lmat(tjoint, &nonlimb_joint_info.quat.get(0));
-	ppos = pmat.pt(12);
-
-	ppos[0] = 0.0f;
-	ppos[1] = 0.0f;
-	ppos[2] = 0.0f;
-	//ppos[0] = navigator.base_offset.x;
-	//ppos[1] = navigator.base_offset.y;
-	//ppos[2] = navigator.base_offset.z;
-
-	gmat = pmat;
-	tjoint = skeleton->search_joint(limb->get_limb_base_name());*/
-
 	tjoint = skeleton->search_joint(limb->get_limb_base_name());
 	tjoint_base = skeleton->search_joint(tjoint->parent()->name().get_string());
 	int parent_ind = nonlimb_joint_info.get_index_by_name(tjoint->parent()->name().get_string());
@@ -982,8 +976,9 @@ void MeCtLocomotion::update_pos()
 		currpos = get_limb_pos(limb);
 		ratio[i] = 0;
 		dis[i].set(0,0,0);
-		if(limb->space_time >= 2.0f || limb->space_time <= 1.0f)
+		if((limb->space_time >= 2.0f || limb->space_time <= 1.0f))
 		{
+			
 			if(limb->space_time >= 2.0f) ratio[i] = limb->space_time - 2.0f;
 			else if(limb->space_time <= 1.0f) ratio[i] = 1.0f - limb->space_time;
 			ratio[i] *= ratio[i];
@@ -1001,6 +996,7 @@ void MeCtLocomotion::update_pos()
 
 			dis[i].y = 0.0f;
 			sum += ratio[i];
+
 		}
 		limb->pos = currpos;
 
@@ -1013,7 +1009,6 @@ void MeCtLocomotion::update_pos()
 			for(int i = 0; i < 2; ++i)
 			{
 				displacement += dis[i]*ratio[i]/sum;
-
 			}
 			displacement += calc_rotational_displacement();
 			//displacement.x = 0.0f;
