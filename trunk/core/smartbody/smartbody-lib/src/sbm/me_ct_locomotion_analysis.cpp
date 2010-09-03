@@ -54,12 +54,14 @@ void MeCtLocomotionAnalysis::set_ct(MeCtLocomotion* controller)
 	if (walking_skeleton)
 		walking_skeleton->unref();
 	walking_skeleton = _ct_locomotion->walking_skeleton;
-	walking_skeleton->ref();
+	if (walking_skeleton)
+		walking_skeleton->ref();
 
 	if (standing_skeleton)
 		standing_skeleton->unref();
 	standing_skeleton = _ct_locomotion->standing_skeleton;
-	standing_skeleton->ref();
+	if (standing_skeleton)
+		standing_skeleton->ref();
 }
 
 MeCtLocomotion* MeCtLocomotionAnalysis::get_ct()

@@ -943,7 +943,7 @@ int BML::Processor::interrupt( SbmCharacter* actor, const std::string& performan
 		bml_requests.erase( result );
 	} else {
 		// Probably already cleaned up
-		cout << "WARNING: BML::Processor::interrupt(..): No such BmlRequest for actor \""<<actor->name<<"\" and performance_id \""<<performance_id<<"\"." <<endl;
+		LOG("WARNING: BML::Processor::interrupt(..): No such BmlRequest for actor \"%s\" and performance_id %s.", actor->name, performance_id.c_str());
 		// ignore without error
 	}
 
