@@ -46,9 +46,13 @@ public:
 	int type; //ME_CT_LOCOMOTION_ROUTINE_TYPE_STRAIGHT, ME_CT_LOCOMOTION_ROUTINE_TYPE_CIRCULAR or ME_CT_LOCOMOTION_ROUTINE_TYPE_TARGET
 	float global_rps;
 	float local_rps;
+	float local_angle;
 	SrVec target;
 	//SrVec start_pos;
 	//double elapsed_time;
+
+public:
+	float angle;
 
 public:
 	MeCtLocomotionRoutine();

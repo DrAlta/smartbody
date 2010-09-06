@@ -53,6 +53,7 @@ protected:
 	int bi_loco_vel_x, bi_loco_vel_y, bi_loco_vel_z;  // Output: Locomotion velocity
 	int bi_loco_rot_global_y;                             // Rotational velocity around Y
 	int bi_loco_rot_local_y;                             // Rotational velocity around Y
+	int bi_loco_rot_local_angle;
 	int bi_id;											 // ID
 	int bi_has_destination;
 	int bi_loco_dest_x, bi_loco_dest_y, bi_loco_dest_z;
@@ -65,6 +66,7 @@ protected:
 	int has_destination;
 	float g_angular;
 	float l_angular;
+	float l_angle;
 	int id;
 
 
@@ -79,7 +81,7 @@ public:
 	 */
 	void initByRadiansPerSecond( float forward_vel, float radians_per_sec );
 
-	void init( float dx, float dy, float dz, float g_angular, float l_angular, int id, int has_destination, float tx, float tz );
+	void init( float dx, float dy, float dz, float g_angular, float l_angular, float l_angle, int id, int has_destination, float tx, float tz );
 	/**
 	 *  Initializes the controller.
 	 */
