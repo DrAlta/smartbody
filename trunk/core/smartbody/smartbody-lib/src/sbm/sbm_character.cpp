@@ -67,6 +67,7 @@ const char* SbmCharacter::LOCOMOTION_VELOCITY = "locomotion_velocity";
 const char* SbmCharacter::LOCOMOTION_ROTATION = "locomotion_rotation";
 const char* SbmCharacter::LOCOMOTION_GLOBAL_ROTATION = "locomotion_global_rotation";
 const char* SbmCharacter::LOCOMOTION_LOCAL_ROTATION = "locomotion_local_rotation";
+const char* SbmCharacter::LOCOMOTION_LOCAL_ROTATION_ANGLE = "locomotion_local_rotation_angle";
 const char* SbmCharacter::LOCOMOTION_ID = "locomotion_id";
 
 /////////////////////////////////////////////////////////////
@@ -624,18 +625,22 @@ int SbmCharacter::init_skeleton() {
 		// 3D position for angular velocity
 		SkJoint* g_angular_velocity_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
 		SkJoint* l_angular_velocity_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
+		SkJoint* l_angular_angle_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
 		SkJoint* id_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
 		g_angular_velocity_joint_p->name( SkJointName( LOCOMOTION_GLOBAL_ROTATION ) );
 		l_angular_velocity_joint_p->name( SkJointName( LOCOMOTION_LOCAL_ROTATION ) );
+		l_angular_angle_joint_p->name( SkJointName( LOCOMOTION_LOCAL_ROTATION_ANGLE ) );
 		id_joint_p->name( SkJointName( LOCOMOTION_ID ) );
 
 		// Activate positional channels, unlimited
 		g_angular_velocity_joint_p->pos()->limits( 1, false ); // Unlimit YPos
 		l_angular_velocity_joint_p->pos()->limits( 1, false ); // Unlimit YPos
+		l_angular_angle_joint_p->pos()->limits( 1, false ); // Unlimit YPos
 		id_joint_p->pos()->limits( 1, false ); // Unlimit YPos
 
 		g_angular_velocity_joint_p->euler()->activate();
 		l_angular_velocity_joint_p->euler()->activate();
+		l_angular_angle_joint_p->euler()->activate();
 		id_joint_p->euler()->activate();
 	}
 

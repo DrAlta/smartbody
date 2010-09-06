@@ -36,7 +36,7 @@ MeCtNavigationCircle::MeCtNavigationCircle()
 	radians_per_second( 0 ),
 	forward_velocity( 0 ),
 //	radius( 0 ),
-	bi_world_rot(-1), bi_loco_vel_x(-1), bi_loco_vel_y(-1), bi_loco_vel_z(-1), bi_loco_rot_global_y(-1), bi_loco_rot_local_y(-1), bi_id(-1) 
+	bi_world_rot(-1), bi_loco_vel_x(-1), bi_loco_vel_y(-1), bi_loco_vel_z(-1), bi_loco_rot_global_y(-1), bi_loco_rot_local_y(-1), bi_loco_rot_local_angle(-1), bi_id(-1) 
 {}
 
 void MeCtNavigationCircle::initByRadius( float forward_velocity, float radius ) {
@@ -79,8 +79,9 @@ SkChannelArray& MeCtNavigationCircle::controller_channels() {
 
 		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_GLOBAL_ROTATION ), SkChannel::YPos ); //  4
 		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_LOCAL_ROTATION ), SkChannel::YPos ); //  5
+		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_LOCAL_ROTATION_ANGLE ), SkChannel::YPos ); //  6
 
-		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_ID ), SkChannel::YPos ); //  6
+		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_ID ), SkChannel::YPos ); //  7
 	}
 
 	return request_channels;
@@ -104,8 +105,9 @@ void MeCtNavigationCircle::controller_map_updated() {
 
 		LOOKUP_BUFFER_INDEX( bi_loco_rot_global_y, 4 );
 		LOOKUP_BUFFER_INDEX( bi_loco_rot_local_y, 5 );
+		LOOKUP_BUFFER_INDEX( bi_loco_rot_local_angle, 6 );
 
-		LOOKUP_BUFFER_INDEX( bi_id, 6 );
+		LOOKUP_BUFFER_INDEX( bi_id, 7 );
 	} else {
 		// This shouldn't get here
 		is_valid = false;
@@ -116,7 +118,7 @@ double MeCtNavigationCircle::controller_duration() {
 	return -1;
 }
 
-void MeCtNavigationCircle::init( float dx, float dy, float dz, float g_angular, float l_angular, int id, int has_destination, float tx, float tz)
+void MeCtNavigationCircle::init( float dx, float dy, float dz, float g_angular, float l_angular, float l_angle, int id, int has_destination, float tx, float tz)
 {
 	new_routine = true;
 	velocity.x = dx;
@@ -127,6 +129,7 @@ void MeCtNavigationCircle::init( float dx, float dy, float dz, float g_angular, 
 	destination.z = tz;
 	this->g_angular = g_angular;
 	this->l_angular = l_angular;
+	this->l_angle = l_angle;
 	this->id = id;
 }
 
@@ -187,6 +190,7 @@ bool MeCtNavigationCircle::controller_evaluate( double time, MeFrameData& frame 
 
 		buffer[ bi_loco_rot_global_y ] = g_angular;
 		buffer[ bi_loco_rot_local_y ] = l_angular;
+		buffer[ bi_loco_rot_local_angle ] = l_angle;
 		buffer[ bi_id ] = (float)id;
 
 		//buffer[ bi_has_destination ] = has_destination;

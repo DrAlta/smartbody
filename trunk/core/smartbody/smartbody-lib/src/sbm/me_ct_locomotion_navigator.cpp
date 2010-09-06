@@ -97,6 +97,8 @@ void MeCtLocomotionNavigator::CheckNewRoutine(MeFrameData& frame)
 	MeCtLocomotionRoutine routine;
 	routine.global_rps = buffer[bi_loco_rot_global_y];
 	routine.local_rps = buffer[bi_loco_rot_local_y];
+	routine.local_angle = buffer[bi_loco_rot_local_angle];
+	routine.angle = 0.0f;
 	if(routine.global_rps == 0.0f) routine.type = ME_CT_LOCOMOTION_ROUTINE_TYPE_STRAIGHT;
 	else routine.type = ME_CT_LOCOMOTION_ROUTINE_TYPE_CIRCULAR;
 	routine.direction.set(buffer[bi_loco_vel_x], buffer[bi_loco_vel_y], buffer[bi_loco_vel_z]);
@@ -183,6 +185,18 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeCtLocomot
 	{
 		routine = routine_stack.get(i);
 		//routine.elapsed_time += delta_time;
+		if(routine.local_angle != 0.0f)
+		{
+			if(abs(routine.local_angle) < abs(routine.angle+routine.local_rps*delta_time))
+			{
+				routine.local_rps = (routine.local_angle - routine.angle)/delta_time;
+				routine.local_angle = 0.0f;
+				routine.angle = 0.0f;
+				local_rps += routine.local_rps;
+				routine.local_rps = 0.0f;
+				routine_stack.set(i, routine);
+			}
+		}
 		switch(routine.type)
 		{
 		case ME_CT_LOCOMOTION_ROUTINE_TYPE_STRAIGHT:
@@ -196,6 +210,16 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeCtLocomot
 		}
 		local_rps += routine.local_rps;
 		global_vel += routine.direction * routine.speed;
+	}
+
+	for(i = 0; i < routine_stack.size(); ++i)
+	{
+		routine = routine_stack.get(i);
+		if(routine.local_angle != 0.0f)
+		{
+			routine.angle += local_rps*delta_time;
+			routine_stack.set(i, routine);
+		}
 	}
 
 	mat.roty(-pre_facing_angle);
@@ -316,6 +340,7 @@ void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtL
 	{
 		routine = routine_stack.get(i);
 		//routine.elapsed_time += delta_time;
+
 		switch(routine.type)
 		{
 		case ME_CT_LOCOMOTION_ROUTINE_TYPE_STRAIGHT:
@@ -323,7 +348,7 @@ void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtL
 			break;
 
 		case ME_CT_LOCOMOTION_ROUTINE_TYPE_CIRCULAR:
-			delta_angle = routine.global_rps * (float)delta_time;
+			delta_angle = facing_angle - pre_facing_angle;
 
 			//get the displacement of rotation
 			mat.roty(0.5f * delta_angle);
@@ -333,7 +358,7 @@ void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtL
 
 			//mat.roty(facing_angle-routine.start_facing_angle);
 			//routine.direction = SrVec(0,0,1)* mat;
-			mat.roty(facing_angle - pre_facing_angle);
+			mat.roty(delta_angle);
 
 			routine.direction = routine.direction* mat;
 			break;
@@ -388,6 +413,7 @@ bool MeCtLocomotionNavigator::controller_map_updated(MeControllerContext* _conte
 
 		LOOKUP_BUFFER_INDEX( bi_loco_rot_global_y, bi_loco_rot_global_y );
 		LOOKUP_BUFFER_INDEX( bi_loco_rot_local_y, bi_loco_rot_local_y );
+		LOOKUP_BUFFER_INDEX( bi_loco_rot_local_angle, bi_loco_rot_local_angle );
 
 		LOOKUP_BUFFER_INDEX( bi_id, bi_id );
 
@@ -422,6 +448,11 @@ int MeCtLocomotionNavigator::controller_channels(SkChannelArray* request_channel
 
 	AddChannel(request_channels, SbmCharacter::LOCOMOTION_GLOBAL_ROTATION, SkChannel::YPos, &bi_loco_rot_global_y);
 	AddChannel(request_channels, SbmCharacter::LOCOMOTION_LOCAL_ROTATION, SkChannel::YPos, &bi_loco_rot_local_y);
+
+	AddChannel(request_channels, SbmCharacter::LOCOMOTION_LOCAL_ROTATION_ANGLE, SkChannel::YPos, &bi_loco_rot_local_angle);
+
+	//AddChannel(request_channels, SkJointName( "base" ), SkChannel::ZPos, &bi_base_z);
+
 	AddChannel(request_channels, SbmCharacter::LOCOMOTION_ID, SkChannel::YPos, &bi_id);
 
 	return routine_channel_num;
