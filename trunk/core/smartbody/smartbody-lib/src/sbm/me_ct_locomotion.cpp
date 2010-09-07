@@ -233,6 +233,10 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 
 	if(!enabled) return false;
 	if( !is_valid ) return is_valid;
+	if(limb_list.size() == 0) 
+	{
+		return false;
+	}
 
 	curr_t = time;
 
