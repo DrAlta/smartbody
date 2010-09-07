@@ -827,8 +827,8 @@ static void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h, FltkVie
  }
 
 static float rps = 1.0f;
-static int x_flag = 1;
-static int z_flag = 1;
+static int x_flag = 0;
+static int z_flag = 0;
 static int rps_flag = 0;
 static float spd;
 static float x_spd = 7;
@@ -845,6 +845,15 @@ static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h
 	char cmd[300];
 	cmd[0] = '\0';
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	if(x_flag == 0 && z_flag == 0)
+	{
+		rps_flag = 0;
+		z_flag = 1;
+		x_flag = 0;
+		spd = z_spd;
+		sprintf(t_direction, "forward ");
+	}
 
 	SbmCharacter* actor = NULL;
 	mcu.character_map.reset();
@@ -932,7 +941,9 @@ static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h
 	char tt[200];
 	strcat(cmd, character);
 	strcat(cmd, t_direction);
-	sprintf(tt, "spd %f rps %f time 2.0", spd, rps_flag * rps);
+	//sprintf(tt, "spd %f rps %f time 0.5", spd, rps_flag * rps);
+
+	sprintf(tt, "spd 0 rps %f time 0.5", rps_flag * rps);
 	if(not_locomotion == false) 
 	{
 		strcat(cmd, tt);
@@ -940,6 +951,7 @@ static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h
 		mcu.execute(cmd);
 	}
 }
+
 
 
 

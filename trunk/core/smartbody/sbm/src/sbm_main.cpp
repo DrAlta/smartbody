@@ -347,8 +347,8 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "RemoteSpeechTimeOut", remoteSpeechTimeOut_func);  // internally routed message
 	mcu.insert( "joint_logger",        joint_logger::start_stop_func );
 	mcu.insert( "J_L",                 joint_logger::start_stop_func );  // shorthand
-	mcu.insert( "locomotion",          locomotion_cmd_func );
-	mcu.insert( "loco",                locomotion_cmd_func ); // shorthand
+	//mcu.insert( "locomotion",          locomotion_cmd_func );
+	//mcu.insert( "loco",                locomotion_cmd_func ); // shorthand
 	mcu.insert( "resource",            resource_cmd_func );
 	mcu.insert( "syncpolicy",          mcu_syncpolicy_func );
 	mcu.insert( "check",			   mcu_check_func);		// check matching between .skm and .sk
