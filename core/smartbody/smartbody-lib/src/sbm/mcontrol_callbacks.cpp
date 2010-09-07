@@ -2922,7 +2922,7 @@ int mcu_gaze_limit_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	gaze <> limit <key> <p-up p-dn h r>
 	gaze <> blend <key> <weight>
 	gaze <> priority <key>
-	gaze <> fadein|fadeout <interval>
+	gaze <> fadein|fadeout [<interval>]
 */
 
 int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
