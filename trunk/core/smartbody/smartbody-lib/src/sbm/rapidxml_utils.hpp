@@ -12,6 +12,7 @@
 #include <string>
 #include <fstream>
 #include <stdexcept>
+#include <io.h>
 
 namespace rapidxml
 {
@@ -25,7 +26,8 @@ namespace rapidxml
         
         //! Loads file into the memory. Data will be automatically destroyed by the destructor.
         //! \param filename Filename to load.
-        file(const char *filename)
+#if 0 
+		file(const char *filename)
         {
             using namespace std;
 
@@ -45,6 +47,60 @@ namespace rapidxml
             stream.read(&m_data.front(), static_cast<streamsize>(size));
             m_data[size] = 0;
         }
+#else
+		file( const char *filename, int method = 0 )	{
+			
+			if( method == 0 )	{
+				int fh = _open( filename, _O_RDONLY ); 
+				if( fh != -1 ) {
+					long len = _lseek( fh, 0L, SEEK_END );
+					if( len != -1L )	{
+						_lseek( fh, 0L, SEEK_SET );
+						m_data.resize( len + 1 );
+						_read( fh, &m_data.front(), len )
+						m_data[ len ] = 0;
+					}
+					_close( fh );
+				}
+			}
+			else
+			if( method == 1 )	{
+				FILE *fp = fopen( filename, "r" );
+				if( fp != NULL )	{
+					int ret = fseek( fp, 0L, SEEK_END );
+					if( ret == 0 )	{
+						long len = ftell( fp );
+						if( len != -1L )	{
+							fseek( fp, 0L, SEEK_SET );
+							m_data.resize( len + 1 );
+							fread( &m_data.front(), sizeof( char ), len, fp )
+							m_data[ len ] = 0;
+						}
+					}
+					fclose( fp );
+				}
+			}
+			else	{
+				using namespace std;
+
+				// Open stream
+				basic_ifstream<Ch> stream(filename, ios::binary);
+				if (!stream)
+					throw runtime_error(string("cannot open file ") + filename);
+				stream.unsetf(ios::skipws);
+	            
+				// Determine stream size
+				stream.seekg(0, ios::end);
+				size_t size = stream.tellg();
+				stream.seekg(0);   
+	            
+				// Load data and add terminating 0
+				m_data.resize(size + 1);
+				stream.read(&m_data.front(), static_cast<streamsize>(size));
+				m_data[size] = 0;
+			}
+        }
+#endif
 
         //! Loads file into the memory. Data will be automatically destroyed by the destructor
         //! \param stream Stream to load from
