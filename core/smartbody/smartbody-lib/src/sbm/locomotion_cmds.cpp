@@ -193,6 +193,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		return CMD_FAILURE;
 	}
 
+	if(actor->get_locomotion_ct()->get_anim_global_info()->size() == 0) return CMD_FAILURE;
 	bool local = false;
 	SrVec global_direction;
 	MeCtNavigationCircle* nav_circle = new MeCtNavigationCircle();
