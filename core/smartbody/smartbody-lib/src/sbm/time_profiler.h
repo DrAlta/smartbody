@@ -63,6 +63,7 @@ class TimeIntervalProfiler { // T.I.P.
 
 		typedef struct profile_entry_s {
 
+			int 	id;
 			int 	index;
 			int 	level;
 			char	label[ LABEL_SIZE ];
@@ -90,6 +91,7 @@ class TimeIntervalProfiler { // T.I.P.
 
 		typedef struct group_entry_s {
 
+			int 	id;
 			int 	index;
 			char	name[ LABEL_SIZE ];
 			bool	req_enable;
@@ -124,6 +126,7 @@ class TimeIntervalProfiler { // T.I.P.
 		group_entry_t* group_p_arr[ MAX_GROUPS ];
 		bool	full_err;
 		
+		int 	id_counter;
 		int 	group_arr_count;
 		int 	active_group_count;
 		int 	group_event_count;
@@ -335,8 +338,8 @@ class TimeIntervalProfiler { // T.I.P.
 		void print_data( void );
 		void print_profile( profile_entry_t* profile_p );
 		void print_group( group_entry_t *group_p );
-		void print_profile_report( char *prefix, profile_entry_t *profile_p );
-		void print_group_report( const char *prefix, group_entry_t* group_p );
+		void print_profile_report( profile_entry_t *profile_p, int group_id );
+		void print_group_report( group_entry_t* group_p );
 
 		void print_profile_alert( double dt, group_entry_t* group_p, profile_entry_t *profile_p );
 		void print_group_alert( const char *prefix, double dt, group_entry_t* group_p );
@@ -356,15 +359,15 @@ class TimeIntervalProfiler { // T.I.P.
 		profile_entry_t* get_profile( group_entry_t *group_p, const char* label );
 
 		void accum_mark( group_entry_t *group_p, double time );
-		void touch_profile( group_entry_t *group_p, int level, const char* label )	{
-			profile_entry_t *profile_p = get_profile( group_p, label );
+		void touch_profile( profile_entry_t *profile_p, int level )	{
 			if( level > profile_p->level )	{
 				profile_p->level = level;
 			}
 		}
 		void touch_group( const char* group_name, int level, const char* label )	{
 			group_entry_t *group_p = get_group( group_name );
-			touch_profile( group_p, level, label );
+			profile_entry_t *profile_p = get_profile( group_p, label );
+			touch_profile( profile_p, level );
 		}
 		
 		double convert_time( double time )	{
@@ -394,24 +397,22 @@ class TimeIntervalProfiler { // T.I.P.
 				group_entry_t *group_p = get_group( group_name );
 				if( group_p ) {
 
+					profile_entry_t *profile_p = get_profile( group_p, label );
 					if( group_p->enabled )	{
 
-						profile_entry_t *profile_p = get_profile( group_p, label );
 						if( group_p->open ) {  // continuation
 							accum_mark( group_p, curr_time );
 						}
 						else	{  // new segment
 							group_p->open = true;
 						}
-						if( level > profile_p->level )	{
-							profile_p->level = level;
-						}
+						touch_profile( profile_p, level );
 						profile_p->event_time = curr_time;
 						group_p->curr_profile_p = profile_p;
 					}
 					else
 					if( group_p->preloading )	{
-						touch_profile( group_p, level, label );
+						touch_profile( profile_p, level );
 					}
 				}
 			}

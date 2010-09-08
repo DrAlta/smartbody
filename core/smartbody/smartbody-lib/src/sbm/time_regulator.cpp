@@ -320,7 +320,7 @@ void TimeRegulator::update_perf( void )	{
 }
 
 void TimeRegulator::print( void )	{
-	LOG( "TimeRegulator( %.3f ): \n", real_time );
+	LOG( "TimeRegulator( %.3f ): ", real_time );
 	LOG( "   status: %s", paused ? "PAUSED" : ( do_steps ? "STEPPING" : "RUNNING" ) );
 	LOG( "    speed: %.3f", speed );
 	LOG( "    sleep: %.4f : %.2f fps", sleep_dt, ( sleep_dt > 0.0 )? ( 1.0 / sleep_dt ): 0.0 );
