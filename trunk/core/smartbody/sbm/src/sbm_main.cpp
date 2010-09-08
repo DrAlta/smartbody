@@ -638,6 +638,18 @@ int main( int argc, char **argv )	{
 		{
 			mcu.net_face_bones = true;
 		}
+		else if ( s.search( "-skscale=" ) == 0 )
+		{
+			SrString skScale = s;
+			skScale.remove( 0, 9 );
+			mcu.skScale = atof(skScale);
+		}
+		else if ( s.search( "-skmscale=" ) == 0 )
+		{
+			SrString skmScale = s;
+			skmScale.remove( 0, 10 );
+			mcu.skmScale = atof(skmScale);
+		}
 		else
 		{
 			LOG( "ERROR: Unrecognized command line argument: \"%s\"\n", (const char*)s );

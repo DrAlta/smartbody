@@ -95,7 +95,7 @@ public :
 
 	/*! Loads a motion file and returns true if no errors.
 	Both .skm and .bvh formats are read here */
-	bool load ( SrInput& in );
+	bool load ( SrInput& in, double scale = 1.0 );
 
 	/*! Save the motion to a file and returns true if no errors */
 	bool save ( SrOutput& out );

@@ -136,11 +136,10 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
     if( mcu_p )	{
 		char *path_tok = args.read_token();
-		char *path = args.read_token();
-		
+		char* path = args.read_token();
+
 		PathResource* pres = new PathResource();
 		pres->setPath(path);
-
 		if( strcmp( path_tok, "seq" ) == 0 )	{
 			
 			pres->setType("seq");
@@ -1113,7 +1112,7 @@ void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, 
 				{
 					xercesc_3_0::DOMNode* childNode = childrenList->item(cc);
 					std::string childName = nodeStr(childNode->getNodeName());
-					if (childName == "skin")
+					if (childName == "skin")	// parsing skinning weights
 					{
 						xercesc_3_0::DOMNamedNodeMap* skinAttributes = childNode->getAttributes();			
 						xercesc_3_0::DOMNode* skinNode = skinAttributes->getNamedItem(XMLString::transcode("source"));	
@@ -1209,8 +1208,47 @@ void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, 
 								}
 							}
 						}
-						char_p->dMesh_p->skinWeights.push_back(skinWeight);
-					}
+						if (char_p)
+							char_p->dMesh_p->skinWeights.push_back(skinWeight);
+					} // end of if (childName == "skin")
+					if (childName == "morph")	// parsing morph targets
+					{
+						xercesc_3_0::DOMNamedNodeMap* morphAttributes = childNode->getAttributes();			
+						xercesc_3_0::DOMNode* morphNode = morphAttributes->getNamedItem(XMLString::transcode("source"));	
+						std::string morphName = nodeStr(morphNode->getNodeValue());
+						morphName = morphName.substr(1, morphName.size() - 1);
+						std::string morphFullName = morphName + "-morph";
+						
+						// futhur for children
+						const xercesc_3_0::DOMNodeList* childListOfMorph = childNode->getChildNodes();
+						for (unsigned int cMorph = 0; cMorph < childListOfMorph->getLength(); cMorph++)
+						{
+							xercesc_3_0::DOMNode* childNodeOfMorph = childListOfMorph->item(cMorph);
+							std::string childNameOfMorph = nodeStr(childNodeOfMorph->getNodeName());
+							if (childNameOfMorph == "source")
+							{
+								const xercesc_3_0::DOMNodeList* childListOfSource = childNodeOfMorph->getChildNodes();
+								for (size_t cMorphSource = 0; cMorphSource < childListOfSource->getLength(); cMorphSource++)
+								{
+									xercesc_3_0::DOMNode* childNodeOfSource = childListOfSource->item(cMorphSource);
+									std::string childNameOfSource = nodeStr(childNodeOfSource->getNodeName());
+									if (childNameOfSource == "IDREF_array")
+									{
+										std::vector<std::string> refMesh;
+										std::string tokenBlock = nodeStr(childNodeOfMorph->getTextContent());
+										std::string content = tokenize(tokenBlock, " \n");
+										while (content != "")
+										{
+											refMesh.push_back(content);
+											content = tokenize(tokenBlock, " \n");
+										}
+										refMesh.push_back(morphName);
+										char_p->dMesh_p->morphTargets.insert(make_pair(morphFullName, refMesh));
+									}
+								}
+							}
+						}
+					} // end of if (childName == "morph")
 				}
 			}
 		}
@@ -1320,7 +1358,7 @@ int mcu_character_init(
 	}
 
 	SbmCharacter *char_p = new SbmCharacter(char_name);
-	SkSkeleton* skeleton_p = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->resource_manager );
+	SkSkeleton* skeleton_p = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->resource_manager, mcu_p->skScale );
 	if( !skeleton_p ) {
 		LOG( "init_character ERR: Failed to load skeleton \"%s\"\n", skel_file ); 
 		return CMD_FAILURE;

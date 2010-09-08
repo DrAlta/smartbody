@@ -147,7 +147,7 @@ bool parse_timing_metadata( SrInput& in, SrString name, float& time ) {
 
 //============================= load ============================
 
-bool SkMotion::load ( SrInput& in ) {
+bool SkMotion::load ( SrInput& in, double scale ) {
 	//  unset/invalid ready stroke relax times are given a value of -1
 	_time_ready=-1;
 	_time_stroke_start=-1;
@@ -217,7 +217,7 @@ bool SkMotion::load ( SrInput& in ) {
 		in.get_token(); // fr
 		pt = _frames[f].posture;
 		for ( i=0; i<chsize; i++ ) {
-			pt += _channels[i].load ( in, pt );
+			pt += _channels[i].load ( in, pt, scale );
 		}
 		++f;
 	}
