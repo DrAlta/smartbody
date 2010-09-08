@@ -30,6 +30,7 @@ void TimeIntervalProfiler::null( void )	{
 	group_map.expunge();
 	for( int i=0; i<MAX_GROUPS; i++ ) group_p_arr[ i ] = NULL;
 	full_err = false;
+	id_counter = 0;
 	group_arr_count = 0;
 	active_group_count = 0;
 	group_event_count = 0;
@@ -61,6 +62,7 @@ void TimeIntervalProfiler::null( void )	{
 
 void TimeIntervalProfiler::null_group( group_entry_t* group_p, const char* group_name ) {
 
+	group_p->id = -1;
 	group_p->index = -1;
 	_snprintf( group_p->name, LABEL_SIZE, "%s", group_name );
 	group_p->req_enable = false;
@@ -72,7 +74,7 @@ void TimeIntervalProfiler::null_group( group_entry_t* group_p, const char* group
 	group_p->preloading = false;
 	group_p->spike = false;
 	group_p->spike_count = 0;
-	group_p->req_reset = false;	
+	group_p->req_reset = false;
 	group_p->interval_dt = 0.0;
 	group_p->decay_dt = 0.0;
 	group_p->roll_dt = 0.0;
@@ -87,6 +89,7 @@ void TimeIntervalProfiler::null_group( group_entry_t* group_p, const char* group
 
 void TimeIntervalProfiler::null_profile( profile_entry_t* profile_p, const char* label ) {
 
+	profile_p->id = -1;
 	profile_p->index = -1;
 	profile_p->level = -1;
 	_snprintf( profile_p->label, LABEL_SIZE, "%s", label );
@@ -136,9 +139,10 @@ void TimeIntervalProfiler::reset_profile( profile_entry_t* profile_p ) {
 void TimeIntervalProfiler::print_legend( void )	{
 	
 	printf( "TIP <> legend:" );								printf( "\n" );
+	printf( "#	- overflow groups and profiles" );			printf( "\n" );
 	printf( "@	- profile Active" );						printf( "\n" );
 	printf( "*	- *spike reported in active profile" );		printf( "\n" );
-	printf( "#	- overflow groups and profiles" );			printf( "\n" );
+	printf( "+	- included in +SUM" );						printf( "\n" );
 	printf( "<>	- priority level" );						printf( "\n" );
 	printf( "()	- (2)==(number of items, or items)" );		printf( "\n" );
 	printf( "[]	- percent" );					printf( "\n" );
@@ -157,13 +161,16 @@ void TimeIntervalProfiler::print_legend( void )	{
 	printf( "--tip\n" );
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+
 void TimeIntervalProfiler::print_profile( profile_entry_t* profile_p )	{
 
 	if( profile_p ) {
 
-		printf( "%s %s <%d>: T:%.4f (r:%d) %s",
+		printf( "%s%s%s   <%d>: T:%.4f (r:%d) %s",
 			( profile_p->index < 0 ) ? "#" : " ",
 			( profile_p->req_reset == false ) ? "@" : " ",
+			( profile_p->spike ) ? "*" : " ",
 			profile_p->level,
 			profile_p->event_time,
 			profile_p->accum_count,
@@ -181,8 +188,10 @@ void TimeIntervalProfiler::print_group( group_entry_t *group_p )	{
 	if( group_p )	{
 
 		printf( 
-			"%s GRP: %s (e:%d, a:%d, c:%d, h:%d) :%s\n",
+			"%s%s%s GRP: %s (e:%d, a:%d, c:%d, h:%d) :%s\n",
 			( group_p->index < 0 ) ? "#" : " ",
+			( group_p->req_reset == false ) ? "@" : " ",
+			( group_p->spike ) ? "*" : " ",
 			group_p->name,
 			group_p->profile_event_count,
 			group_p->active_profile_count,
@@ -242,12 +251,16 @@ void TimeIntervalProfiler::print_data( void )	{
 	printf( "--tip\n" );
 }
 
-void TimeIntervalProfiler::print_profile_report( char *prefix, profile_entry_t *profile_p )	{
+////////////////////////////////////////////////////////////////////////////////////////
+
+void TimeIntervalProfiler::print_profile_report( profile_entry_t *profile_p, int group_id )	{
 
 	printf( 
-		"%s %s <%d>: i:%.5f (D:%.5f, R:%.5f, r:%d)",
+		"%s%s%s%s<%d>: i:%.5f (D:%.5f, R:%.5f, r:%d)",
 		( profile_p->index < 0 ) ? "#" : " ",
-		prefix,
+		( profile_p->req_reset == false ) ? "@" : " ",
+		( profile_p->spike ) ? "*" : " ",
+		( profile_p->id == group_id ) ? "+" : " ",
 		profile_p->level,
 		profile_p->interval_dt,
 		profile_p->decay_dt,
@@ -264,18 +277,15 @@ void TimeIntervalProfiler::print_profile_report( char *prefix, profile_entry_t *
 	printf( " %s",
 		profile_p->label
 	);
-	if( profile_p->spike ) {
-			printf( " T:%.4f", profile_p->event_time );
-	}
 	printf( "\n" );
 }
 
-void TimeIntervalProfiler::print_group_report( const char *prefix, group_entry_t* group_p )	{
+void TimeIntervalProfiler::print_group_report( group_entry_t* group_p )	{
 
 	printf( 
 		"%s %s SUM: i:%.5f (D:%.5f, R:%.5f)\n",
 		( group_p->index < 0 ) ? "#" : " ",
-		prefix,
+		( group_p->spike ) ? "*" : " ",
 		group_p->interval_dt,
 		group_p->decay_dt,
 		group_p->roll_dt
@@ -428,7 +438,7 @@ void TimeIntervalProfiler::report_recent_groups( group_entry_t* group_p ) {
 			profile_p = group_p->profile_p_arr[ j ];
 			if( profile_p->req_reset == true )	{
 
-				print_profile_report( " ", profile_p );
+				print_profile_report( profile_p, group_p->id );
 			}
 		}
 
@@ -437,11 +447,12 @@ void TimeIntervalProfiler::report_recent_groups( group_entry_t* group_p ) {
 
 			if( profile_p->index < 0 )	{
 				if( profile_p->req_reset == true )	{
-					print_profile_report( " ", profile_p );
+				
+					print_profile_report( profile_p, group_p->id );
 				}
 			}
 		}
-		print_group_report( " ", group_p );
+		print_group_report( group_p );
 	}
 }
 
@@ -473,7 +484,8 @@ void TimeIntervalProfiler::report_recent_profiles( group_entry_t* group_p ) {
 
 				profile_p = group_p->profile_p_arr[ j ];
 				if( profile_p->req_reset == true )	{
-					print_profile_report( " ", profile_p );
+				
+					print_profile_report( profile_p, group_p->id );
 				}
 			}
 
@@ -482,11 +494,12 @@ void TimeIntervalProfiler::report_recent_profiles( group_entry_t* group_p ) {
 
 				if( profile_p->index < 0 )	{
 					if( profile_p->req_reset == true )	{
-						print_profile_report( " ", profile_p );
+					
+						print_profile_report( profile_p, group_p->id );
 					}
 				}
 			}
-			print_group_report( " ", group_p );
+			print_group_report( group_p );
 		}
 	}
 }
@@ -512,12 +525,7 @@ void TimeIntervalProfiler::report_current_group( group_entry_t* group_p ) {
 				if( profile_p->req_reset == false )	{
 
 					if( req_report )	{
-						if( profile_p->spike )	{
-							print_profile_report( "*", profile_p );
-						}
-						else	{
-							print_profile_report( " ", profile_p );
-						}
+						print_profile_report( profile_p, group_p->id );
 					}
 					else
 					if( profile_p->spike && profile_p->show )	{
@@ -533,12 +541,7 @@ void TimeIntervalProfiler::report_current_group( group_entry_t* group_p ) {
 					if( profile_p->req_reset == false )	{
 
 						if( req_report )	{
-							if( profile_p->spike )	{
-								print_profile_report( "*", profile_p );
-							}
-							else	{
-								print_profile_report( " ", profile_p );
-							}
+							print_profile_report( profile_p, group_p->id );
 						}
 						else
 						if( profile_p->spike && profile_p->show )	{
@@ -549,12 +552,7 @@ void TimeIntervalProfiler::report_current_group( group_entry_t* group_p ) {
 			}
 
 			if( req_report )	{
-				if( group_p->spike ) {
-					print_group_report( "*", group_p );
-				}
-				else	{
-					print_group_report( " ", group_p );
-				}
+				print_group_report( group_p );
 			}
 			else
 			if( group_p->spike_count > 0 )	{
@@ -793,6 +791,7 @@ void TimeIntervalProfiler::sys_update( double time ) {
 		}
 		pending_request = false;
 	}
+	id_counter++;
 }
 
 ///////////////////////////////////////////////////
@@ -816,7 +815,7 @@ TimeIntervalProfiler::get_group( const char* group_name ) {
 		else
 		if( full_err == false )	{
 			full_err = true;
-			printf( "TimeIntervalProfiler::get_group ERR: MAX_GROUPS: %d", MAX_GROUPS );
+			printf( "TimeIntervalProfiler::get_group WARN: MAX_GROUPS: %d", MAX_GROUPS );
 			printf( "\n" );
 		}
 	}
@@ -824,6 +823,7 @@ TimeIntervalProfiler::get_group( const char* group_name ) {
 	if( group_p->req_reset ) {
 		reset_group( group_p );
 	}
+	group_p->id = id_counter;
 	return( group_p );
 }
 
@@ -845,7 +845,7 @@ TimeIntervalProfiler::get_profile( group_entry_t *group_p, const char* label ) {
 		else
 		if( group_p->full_err == false )	{
 			group_p->full_err = true;
-			printf( "TimeIntervalProfiler::get_profile ERR: MAX_PROFILES: %d", MAX_PROFILES );
+			printf( "TimeIntervalProfiler::get_profile WARN: MAX_PROFILES: %d", MAX_PROFILES );
 			printf( "\n" );
 		}
 	}
@@ -853,6 +853,7 @@ TimeIntervalProfiler::get_profile( group_entry_t *group_p, const char* label ) {
 	if( profile_p->req_reset ) {
 		reset_profile( profile_p );
 	}
+	profile_p->id = group_p->id;
 	return( profile_p );
 }
 
