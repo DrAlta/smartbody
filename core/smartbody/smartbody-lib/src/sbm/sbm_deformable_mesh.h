@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 #include <SR/sr_sn_shape.h>
 #include <SK/sk_skeleton.h>
 #include <SR/sr_model.h>
@@ -34,8 +35,9 @@ public:
 	std::vector<SrSnModel*>		dMeshDynamic_p;
 	std::vector<SrSnModel*>		dMeshStatic_p;
 	std::vector<SkinWeight*>	skinWeights;
+	std::map<std::string, std::vector<std::string>> morphTargets;
 	SkSkeleton*					skeleton;			// pointer to current skeleton
-	bool						binding;
+	bool						binding;			// whether in deformable mesh mode
 
 public:
 	DeformableMesh();

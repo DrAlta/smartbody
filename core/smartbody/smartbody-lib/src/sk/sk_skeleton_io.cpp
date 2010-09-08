@@ -422,7 +422,7 @@ SkJoint* SkSkeleton::_loadj ( SrInput& in, SkJoint* p, SrStringArray& paths, boo
  }
 
 // parse main keywords
-bool SkSkeleton::load ( SrInput& in, const char* basedir )
+bool SkSkeleton::load ( SrInput& in, double skScale, const char* basedir )
  {
    SrString path;
    SrPathArray paths;
@@ -433,6 +433,7 @@ bool SkSkeleton::load ( SrInput& in, const char* basedir )
    float scale=1.0f;
    bool scale_offsets=false;
    bool scale_limits=false;
+   scale *= skScale;
 
    in.comment_style ( '#' );
    in.lowercase_tokens ( false );
@@ -517,7 +518,7 @@ bool SkSkeleton::load ( SrInput& in, const char* basedir )
    SkJoint* j2;
 
    // check scalings
-   if ( scale_offsets )
+//   if ( scale_offsets )
     for ( i=0; i<_joints.size(); i++ )
      _joints[i]->_offset *= scale;
 

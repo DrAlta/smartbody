@@ -291,7 +291,7 @@ int SkChannel::save ( Type type, SrOutput& o, const float* v ) // static
    return 0;
  }
 
-int SkChannel::load ( Type type, SrInput& in, float* v ) // static
+int SkChannel::load ( Type type, SrInput& in, float* v, double scale ) // static
  {
    FILE* f = in.filept(); // direct reading from file is faster
    if ( in.has_unget_data() ) f=0; // avoid problems with unget data
@@ -301,6 +301,7 @@ int SkChannel::load ( Type type, SrInput& in, float* v ) // static
        { fscanf ( f, "%f", v ); }
       else
        { in >> v[0]; }
+	  v[0] *= scale;
       return 1;
     }
    if ( type<=ZRot || type==Twist )

@@ -100,6 +100,8 @@ mcuCBHandle::mcuCBHandle()
 	net_host( NULL ),
 	sbm_character_listener( NULL ),
 	play_internal_audio( false ),
+	skScale( 1.0 ),
+	skmScale( 1.0 ),
 	viewer_p( NULL ),
 	bmlviewer_p( NULL ),
 	camera_p( NULL ),
@@ -807,11 +809,11 @@ int mcuCBHandle::vhmsg_send( const char* message ) {
 }
 
 int mcuCBHandle::load_motions( const char* pathname, bool recursive ) {
-	return load_me_motions( pathname, motion_map, recursive, resource_manager );
+	return load_me_motions( pathname, motion_map, recursive, resource_manager, skmScale );
 }
 
 int mcuCBHandle::load_poses( const char* pathname, bool recursive ) {
-	return load_me_postures( pathname, pose_map, recursive, resource_manager );
+	return load_me_postures( pathname, pose_map, recursive, resource_manager, skmScale );
 }
 
 //  Usage example: mcu_p->lookup_ctrl( ctrl_name, "ERROR: ctrl <controller name>: " );

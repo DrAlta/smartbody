@@ -133,6 +133,10 @@ class mcuCBHandle	{
 		std::string process_id;
 		bool		play_internal_audio;
 		
+		// scale factor (used for SmartBody to handle unit convert, both sk and skm)
+		double		skScale;
+		double		skmScale;
+
 		TimeRegulator	*internal_timer_p;
 		TimeRegulator	*external_timer_p;
 		TimeRegulator	*timer_p;

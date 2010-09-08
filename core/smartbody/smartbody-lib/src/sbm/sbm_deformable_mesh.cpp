@@ -17,37 +17,45 @@ void DeformableMesh::update()
 {
 	if (!binding)	return;
 	skeleton->update_global_matrices();
-	for (unsigned int counter = 0; counter < skinWeights.size(); counter++)
+	for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
 	{
-		int globalCounter = 0;
-		SkinWeight* skinWeight = skinWeights[counter];
-		int pos = this->getMesh(skinWeight->sourceMesh);
-		if (pos != -1)
-		{
-			SrSnModel* dMeshStatic = dMeshStatic_p[pos];
-			SrSnModel* dMeshDynamic = dMeshDynamic_p[pos];
-			int numVertices = dMeshStatic->shape().V.size();
-			for (int i = 0; i < numVertices; i++)
+		SkinWeight* skinWeight = skinWeights[skinCounter];
+		std::map<std::string, std::vector<std::string>>::iterator iter = this->morphTargets.find(skinWeight->sourceMesh);
+		size_t morphSize = 1;
+		if (iter != this->morphTargets.end())	morphSize = iter->second.size();	
+		for (size_t morphCounter = 0; morphCounter < morphSize; morphCounter++)
+		{	
+			int pos;
+			int globalCounter = 0;
+			if (iter != this->morphTargets.end())	pos = this->getMesh(iter->second[morphCounter]);
+			else									pos = this->getMesh(skinWeight->sourceMesh);
+			if (pos != -1)
 			{
-				int numOfInfJoints = skinWeight->numInfJoints[i];
-				SrVec& skinLocalVec = dMeshStatic->shape().V[i];
-				SrVec finalVec;
-				for (int j = 0; j < numOfInfJoints; j++)
+				SrSnModel* dMeshStatic = dMeshStatic_p[pos];
+				SrSnModel* dMeshDynamic = dMeshDynamic_p[pos];
+				int numVertices = dMeshStatic->shape().V.size();
+				for (int i = 0; i < numVertices; i++)
 				{
-					const SkJoint* curJoint = skinWeight->infJoint[skinWeight->jointNameIndex[globalCounter]];
-					if (curJoint == NULL) continue;
-					const SrMat& gMat = curJoint->gmat();
-					SrMat& invBMat = skinWeight->bindPoseMat[skinWeight->jointNameIndex[globalCounter]];	
-					double jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
-					globalCounter ++;
-					finalVec = finalVec + (float(jointWeight) * (skinLocalVec * invBMat * gMat));
+					int numOfInfJoints = skinWeight->numInfJoints[i];
+					SrVec& skinLocalVec = dMeshStatic->shape().V[i];
+					SrVec finalVec;
+					for (int j = 0; j < numOfInfJoints; j++)
+					{
+						const SkJoint* curJoint = skinWeight->infJoint[skinWeight->jointNameIndex[globalCounter]];
+						if (curJoint == NULL) continue;
+						const SrMat& gMat = curJoint->gmat();
+						SrMat& invBMat = skinWeight->bindPoseMat[skinWeight->jointNameIndex[globalCounter]];	
+						double jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
+						globalCounter ++;
+						finalVec = finalVec + (float(jointWeight) * (skinLocalVec * invBMat * gMat));
+					}
+					dMeshDynamic->shape().V[i] = finalVec;
 				}
-				dMeshDynamic->shape().V[i] = finalVec;
+				dMeshDynamic->changed(true);	
 			}
-			dMeshDynamic->changed(true);	
+			else
+				continue;
 		}
-		else
-			continue;
 	}
 }
 

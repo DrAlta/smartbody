@@ -122,10 +122,10 @@ class SkChannel
     
     /*! Inputs the channel values to v according to type and returns
         the number of floats put in v */
-    static int load ( Type type, SrInput& in, float* v ); // static
+    static int load ( Type type, SrInput& in, float* v, double scale = 1.0 ); // static
 
     /*! Member function version of load() */
-    int load ( SrInput& in, float* v ) { return load(type,in,v); }
+    int load ( SrInput& in, float* v, double scale = 1.0 ) { return load(type,in,v,scale); }
  };
 
 //==================================== End of File ===========================================

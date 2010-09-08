@@ -1764,30 +1764,33 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return SbmCharacter::remove_from_scene( char_name.c_str() );
 	} else if( char_cmd=="viewer" ) {
 		int mode = args.read_int();
-		switch (mode)
+		if (character)
 		{
-			case 0:
-				character->scene_p->set_visibility(1,0,0,0);
-				character->dMesh_p->set_visibility(0);
-				break;
-			case 1:
-				character->scene_p->set_visibility(0,1,0,0);
-				character->dMesh_p->set_visibility(0);
-				break;
-			case 2:
-				character->scene_p->set_visibility(0,0,1,0);
-				character->dMesh_p->set_visibility(0);
-				break;
-			case 3:
-				character->scene_p->set_visibility(0,0,0,1);
-				character->dMesh_p->set_visibility(0);
-				break;
-			case 4:
-				character->scene_p->set_visibility(0,0,0,0);
-				character->dMesh_p->set_visibility(1);
-				break;
-			default:	
-				break;
+			switch (mode)
+			{
+				case 0:
+					character->scene_p->set_visibility(1,0,0,0);
+					character->dMesh_p->set_visibility(0);
+					break;
+				case 1:
+					character->scene_p->set_visibility(0,1,0,0);
+					character->dMesh_p->set_visibility(0);
+					break;
+				case 2:
+					character->scene_p->set_visibility(0,0,1,0);
+					character->dMesh_p->set_visibility(0);
+					break;
+				case 3:
+					character->scene_p->set_visibility(0,0,0,1);
+					character->dMesh_p->set_visibility(0);
+					break;
+				case 4:
+					character->scene_p->set_visibility(0,0,0,0);
+					character->dMesh_p->set_visibility(1);
+					break;
+				default:	
+					break;
+			}
 		}
 		return CMD_SUCCESS;
 	} else if( char_cmd=="reholster" ) {
