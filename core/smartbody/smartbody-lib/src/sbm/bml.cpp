@@ -814,7 +814,8 @@ SbmCommand& SbmCommand::operator= (const SbmCommand& other ) {
 // BehaviorRequest
 
 
-const time_sec BehaviorRequest::PERSISTENCE_THRESHOLD = (time_sec)( MeCtScheduler2::MAX_TRACK_DURATION * 0.9 );
+const time_sec BehaviorRequest::PERSISTENCE_THRESHOLD = (time_sec)(1000000.0f);
+const time_sec BehaviorRequest::TEN_MILLION = (time_sec)(10000000.0f);
 
 
 // methods
