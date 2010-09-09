@@ -332,8 +332,8 @@ BehaviorSchedulerConstantSpeedPtr BML::buildSchedulerForController( MeController
 				/* strokeStartTime */ time_sec( motion->time_stroke_start() ),
 				/* strokeTime */ time_sec( motion->time_stroke_emphasis() ),
 				/* strokeEndTime */ time_sec( motion->time_stroke_end() ),
-				/* relaxTime  */ time_sec( is_persistent? 1000000.0f : motion->time_relax() ), 
-				/* endTime    */ time_sec( is_persistent? 1000000.0f : motion->duration() ),
+				/* relaxTime  */ time_sec( is_persistent? BehaviorRequest::TEN_MILLION : motion->time_relax() ), 
+				/* endTime    */ time_sec( is_persistent? BehaviorRequest::TEN_MILLION : motion->duration() ),
 				/* speed      */ 1 ) );
 
 		return scheduler;
@@ -347,8 +347,8 @@ BehaviorSchedulerConstantSpeedPtr BML::buildSchedulerForController( MeController
 				/* strokeStartTime */ time_sec( ct->emphasist() ),
 				/* strokeTime */ time_sec( ct->emphasist() ),
 				/* strokeEndTime */ time_sec( ct->emphasist() ),
-				/* relaxTime  */ time_sec( is_persistent? 1000000.0f :  ct->controller_duration() - ct->outdt() ), 
-				/* endTime    */ time_sec( is_persistent? 1000000.0f : ct->controller_duration() ),
+				/* relaxTime  */ time_sec( is_persistent? BehaviorRequest::TEN_MILLION :  ct->controller_duration() - ct->outdt() ), 
+				/* endTime    */ time_sec( is_persistent? BehaviorRequest::TEN_MILLION : ct->controller_duration() ),
 				/* speed      */ 1 ) );
 
 		return scheduler;

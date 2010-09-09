@@ -165,6 +165,7 @@ namespace BML {
     //  Constants
 	public:
 		static const time_sec PERSISTENCE_THRESHOLD;
+		static const time_sec TEN_MILLION;
 
 	///////////////////////////////////////////////////////////////////
     //  Data
