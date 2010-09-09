@@ -365,6 +365,15 @@ global proc updateBindingUI()
 		
 		if ($bindingName!= "")
 			textScrollList -e -selectItem $bindingName scrollListBinding;
+		else	// if no default attribute
+		{
+			string $bindingInfos[] = `textScrollList -q -allItems scrollListBinding`;
+			if (size($bindingInfos) == 1)	//if there's only one xml file, just select it
+			{
+				textScrollList -e -selectItem $bindingInfos[0]	scrollListBinding;
+				updateOpenColladaAttr();
+			}
+		}
 
 		if ($meshName != "")
 		{	
@@ -489,7 +498,7 @@ global proc viewerRunButton()
 		sysFile -delete $seqFile;
 		
 	if (!`filetest -x $sbmBin`)
-		print ("Sbm Run Time Problem, Please Check Advanced Setting!\n");
+		confirmDialog -title "Hint" -message "Sbm Run Time Problem, Please Check Advanced Setting!" -button "Ok" -defaultButton "Ok" -dismissString "Ok";
 	else
 	{
 		if (!$foundProcess)
@@ -661,5 +670,9 @@ VERSION HISTORY:
   0.5 - add the smooth binding exporter
   
 LIMIT:
-  - after sbm-fltk.exe is setup, user can only change the motion
+  - after sbm-fltk window starts, user can only change the motion inside the scroll list
+  - when open a new scene inside one scene, viewer window has to be re-lauched because SmartbodyViewerOption Node is gone in the new scene
+  - open collada binding the mesh to the binding pose, SmartBody starts from T pose, which means exporting smoothbinding has to occur at T pose, otherwise the animation would be messy
+  - now the morph targets mesh exported works under SkinRig Scene, not working under AnimReady Scene
+  - obj Exporter (coming with Maya) is exporting only centimeter, so to solve the inconsistency, I enforce the unit to be centimeter when exporting open collada and obj and change the unit back afterwards.
 */
