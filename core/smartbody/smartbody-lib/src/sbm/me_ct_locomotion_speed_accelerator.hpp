@@ -59,7 +59,7 @@ public:
 	virtual ~MeCtLocomotionSpeedAccelerator();
 
 	float		update(SrVec* direction, MeCtLocomotionLimb* limb);
-	void		update_speed(float time_interval);
+	void		update_speed(double time_interval);
 	void		set_target_speed(float target_speed);
 	float		get_target_speed();
 	float		get_target_acceleration();

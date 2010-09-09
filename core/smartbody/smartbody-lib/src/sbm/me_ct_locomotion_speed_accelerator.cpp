@@ -41,10 +41,10 @@ MeCtLocomotionSpeedAccelerator::MeCtLocomotionSpeedAccelerator() {
 	auto_accelerated = true;
 	speed_limit = 200.0f;
 	frame_interval = 0.03333333f;
-	max_acceleration_pos = 100.0f;
+	max_acceleration_pos = 200.0f;
 	min_acceleration_pos = 0.0f;
 	max_acceleration_neg = -30.0f;
-	min_acceleration_neg = -100.0f;
+	min_acceleration_neg = -200.0f;
 }
 
 /** Destructor */
@@ -53,7 +53,7 @@ MeCtLocomotionSpeedAccelerator::~MeCtLocomotionSpeedAccelerator() {
 
 }
 
-void MeCtLocomotionSpeedAccelerator::update_speed(float time_interval)
+void MeCtLocomotionSpeedAccelerator::update_speed(double time_interval)
 {
 	if(!proceed_acceleration)
 	{
@@ -61,7 +61,7 @@ void MeCtLocomotionSpeedAccelerator::update_speed(float time_interval)
 		return;
 	}
 	if(curr_speed == target_speed) return;
-	curr_speed += acceleration * time_interval;
+	curr_speed += acceleration * (float)time_interval;
 	if(acceleration != 0.0f && (curr_speed - target_speed)*acceleration >= 0.0f)
 	{
 		curr_speed = target_speed;

@@ -57,6 +57,8 @@ public:
 
 	int r_anim1_index;
 	int r_anim2_index;
+	int r_anim1_index_dominant;
+	int r_anim2_index_dominant;
 	int style;
 
 protected:
@@ -90,14 +92,14 @@ protected:
 
 	int limb_joint_num;
 
-	float motion_time;
+	double motion_time;
 
 	float last_time;
 
 	double last_t;
 	double curr_t;
 
-	float delta_time;
+	double delta_time;
 
 	char* base_name;
 	char* nonlimb_blending_base_name;
@@ -181,7 +183,7 @@ public:
 
 	void get_translation_base_joint_index();
 
-	void get_anim_indices(int limb_index, SrVec direction);
+	void get_anim_indices(int limb_index, SrVec direction, int* anim1_index, int* anim2_index);
 
 	void update_pos();
 
