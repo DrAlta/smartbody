@@ -103,7 +103,7 @@ public: // channels and routine funcs
 	double controller_duration() { return -1; }
 	void context_updated(MeControllerContext* _context);
 	bool controller_map_updated(MeControllerContext* _context, SrBuffer<int>* _toContextCh);
-	bool controller_evaluate(double delta_time, MeCtLocomotionLimbDirectionPlanner* direction_planner, MeCtLocomotionSpeedAccelerator* acc, MeFrameData& frame);
+	bool controller_evaluate(double delta_time, MeFrameData& frame);
 	void post_controller_evaluate(MeFrameData& frame, MeCtLocomotionLimb* limb, bool reset);
 	int controller_channels(SkChannelArray* request_channels);
 	void AddChannel(SkChannelArray* request_channels, const char* name, SkChannel::Type type, int* index);
@@ -133,6 +133,7 @@ public:
 	void update_facing(MeCtLocomotionLimb* limb, bool dominant_limb);
 	void update_displacement(SrVec* displacement);
 
+	bool check_stopped(SrArray<MeCtLocomotionLimb*>* limb_list);
 	void CheckNewRoutine(MeFrameData& frame);
 	void AddRoutine(MeCtLocomotionRoutine& routine);
 	void DelRoutine(char* name);

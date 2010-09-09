@@ -37,7 +37,7 @@ MeCtLocomotionNavigator::MeCtLocomotionNavigator()
 	displacement.set(0.0f, 0.0f, 0.0f);
 	facing_angle = 0;
 	pre_facing_angle = facing_angle;
-	standing_factor = 1.0f;
+	standing_factor = 0.0f;
 	has_destination = false;
 	reached_destination = false;
 	destination_list.capacity(20);
@@ -137,7 +137,22 @@ void MeCtLocomotionNavigator::CheckNewRoutine(MeFrameData& frame)
 	}
 }
 
-bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeCtLocomotionLimbDirectionPlanner* direction_planner, MeCtLocomotionSpeedAccelerator* acc, MeFrameData& frame ) 
+bool MeCtLocomotionNavigator::check_stopped(SrArray<MeCtLocomotionLimb*>* limb_list)
+{
+	MeCtLocomotionLimb* limb;
+	if(target_local_vel.len() != 0.0f || standing_factor != 0.0f) return false;
+
+	for(int i = 0; i < limb_list->size(); ++i)
+	{
+		limb = limb_list->get(i);
+		if(limb->curr_rotation != 0.0f) return false;
+	}
+	routine_stack.size(0);
+	routine_stack.capacity(0);
+	return true;
+}
+
+bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeFrameData& frame ) 
 {
 	//if(reached_destination) return true;
 	SrMat mat;
@@ -149,7 +164,6 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeCtLocomot
 	world_pos.set( buffer[ bi_world_x ], buffer[ bi_world_y ], buffer[ bi_world_z ] );
 	world_rot.set( buffer[ bi_world_rot ], buffer[ bi_world_rot+1 ], buffer[ bi_world_rot+2 ], buffer[ bi_world_rot+3 ] );
 	base_pos.set ( buffer[ bi_base_x ], buffer[ bi_base_y ], buffer[ bi_base_z ] );
-	//base_rot.set( buffer[ bi_base_rot ], buffer[ bi_base_rot+1 ], buffer[ bi_base_rot+2 ], buffer[ bi_base_rot+3 ] );
 
 	//world_pos.y = 0.0f;
 	SrQuat t_world_rot;
@@ -171,25 +185,19 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeCtLocomot
 		facing_angle = pre_facing_angle;
 	}
 
-	//SrVec d = world_rot.axis();
-	//float x = world_rot.angle();
-	//if(d.y < 0.0f) x = -x;
-	//facing_angle = x;
-
 	global_vel.set(0,0,0);
 	local_rps = 0.0f;
 	MeCtLocomotionRoutine routine;
-	//printf("\n%d", routine_stack.size());
+
 	int i;
 	for(i = 0; i < routine_stack.size(); ++i)
 	{
 		routine = routine_stack.get(i);
-		//routine.elapsed_time += delta_time;
 		if(routine.local_angle != 0.0f)
 		{
 			if(abs(routine.local_angle) < abs(routine.angle+routine.local_rps*delta_time))
 			{
-				routine.local_rps = (routine.local_angle - routine.angle)/delta_time;
+				routine.local_rps = (routine.local_angle - routine.angle)/(float)delta_time;
 				routine.local_angle = 0.0f;
 				routine.angle = 0.0f;
 				local_rps += routine.local_rps;
@@ -217,7 +225,7 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeCtLocomot
 		routine = routine_stack.get(i);
 		if(routine.local_angle != 0.0f)
 		{
-			routine.angle += local_rps*delta_time;
+			routine.angle += local_rps*(float)delta_time;
 			routine_stack.set(i, routine);
 		}
 	}
@@ -226,10 +234,7 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeCtLocomot
 	local_vel = global_vel*mat;
 
 	calc_target_velocity();
-	//local_vel.set(0,0,routine.speed);
-	//LOG("\n%f", pre_facing_angle);
-	//LOG("\nvel:(%f, %f, %f)", global_vel.x, global_vel.y, global_vel.z);
-
+		
 	return true;
 }
 

@@ -38,7 +38,7 @@ MeCtLocomotionLimbDirectionPlanner::MeCtLocomotionLimbDirectionPlanner() {
 	curr_direction.set(0.0f, 0.0f, 1.0f);
 	target_direction.set(0.0f, 0.0f, 0.0f);
 	turning_mode = 0;
-	last_space_time = -1.0f;
+	//last_space_time = -1.0f;
 	automatic = true;
 }
 
@@ -86,9 +86,18 @@ float MeCtLocomotionLimbDirectionPlanner::get_ratio(MeCtLocomotionLimbAnim* anim
 	float cos1 = dot(anim1->global_info->direction, dir);
 	float cos2 = dot(anim2->global_info->direction, dir);
 
-	float sin1 = sqrt(1.0f-cos1*cos1)*len1;
-	float sin2 = sqrt(1.0f-cos2*cos2)*len2;
-	//printf("\n%f", sin2*len2/(sin1*len1+sin2*len2));
+	float sin1;
+	float sin2;
+	if(cos1 >= 1.0f)
+	{
+		sin1 = 0.0f;
+	}
+	else sin1 = sqrt(1.0f-cos1*cos1)*len1;
+	if(cos2 >= 1.0f)
+	{
+		sin2 = 0.0f;
+	}
+	else sin2 = sqrt(1.0f-cos2*cos2)*len2;
 	return sin2/(sin1+sin2);
 }
 
@@ -153,11 +162,17 @@ void MeCtLocomotionLimbDirectionPlanner::update_anim_mode(MeCtLocomotionLimbAnim
 	anim->get_timing_space()->set_mode(mode);
 }
 
-void MeCtLocomotionLimbDirectionPlanner::update_direction(float time_interval, float* space_time)
+void MeCtLocomotionLimbDirectionPlanner::update_direction(double time_interval, float* space_time, bool dominant_limb)
 {
 	if(!automatic) return;
-	if(last_space_time == -1.0f) last_space_time = *space_time;
+	//if(last_space_time == -1.0f) last_space_time = *space_time;
 	if(time_interval == 0.0f || curr_direction == target_direction) return;
+
+	//if(*space_time > 1.0f && *space_time < 1.8f)
+	{
+	//	if(dot(curr_direction-target_direction, target_direction) < 0.0f) return;
+	}
+
 	SrMat mat;
 	float angle = 0.0f;
 	int p = 0;
@@ -167,19 +182,14 @@ void MeCtLocomotionLimbDirectionPlanner::update_direction(float time_interval, f
 		vec1 = cross(curr_direction, target_direction);
 		if(turning_mode == 0 && dot(target_direction, curr_direction) >= 0.0f || turning_mode == 1)
 		{
-			angle = turning_speed*time_interval;
+			angle = (float)(turning_speed*time_interval);
 			p = 1;
 		}
 		else if(turning_mode == 0 && dot(target_direction, curr_direction) < 0.0f || turning_mode == 2)
 		{
-			angle = -turning_speed*time_interval;
+			angle = -(float)(turning_speed*time_interval);
 			p = -1;
 		}
-	}
-	else
-	{
-		//angle = turning_speed*time_interval;
-		int y = 0;
 	}
 
 	mat.roty(angle);
@@ -190,21 +200,19 @@ void MeCtLocomotionLimbDirectionPlanner::update_direction(float time_interval, f
 		SrVec vec2 = cross(curr_direction, target_direction);
 		if(vec1.y*vec2.y <= 0.0f)
 		{
-			if(dot(target_direction, curr_direction) > 0.0f && p == 1) 
+			float angle = dot(target_direction, curr_direction);
+			if(angle > 0.0f && p == 1) 
 				curr_direction = target_direction;
-			else if(dot(target_direction, curr_direction) < 0.0f && p == -1)
+			else if(angle < 0.0f && p == -1)
 			{
-				//if(*space_time < last_space_time)
-				{
-					curr_direction = target_direction;
-					direction_inversed = true;
-				}
-				//else curr_direction = -target_direction;
+				curr_direction = target_direction;
+				if(dominant_limb) direction_inversed = true;
 			}
 		}
 	}
+
 	update_space_time(space_time);
-	last_space_time = *space_time;
+
 }
 
 void MeCtLocomotionLimbDirectionPlanner::update_space_time(float* space_time)

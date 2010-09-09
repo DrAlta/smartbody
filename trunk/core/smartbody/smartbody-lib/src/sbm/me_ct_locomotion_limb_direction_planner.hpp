@@ -39,7 +39,7 @@ public:
 								//2: opposite turn and reverse.
 
 	float		curr_ratio;
-	float		last_space_time;
+	//float		last_space_time;
 
 	float		turning_speed; // in radians
 	float		target_turning_speed; // in radians
@@ -70,7 +70,7 @@ public:
 
 	float		get_ratio();
 
-	void		update_direction(float time_interval, float* space_time);
+	void		update_direction(double time_interval, float* space_time, bool dominant_limb);
 
 	void		update_anim_mode(MeCtLocomotionLimbAnim* anim);
 
