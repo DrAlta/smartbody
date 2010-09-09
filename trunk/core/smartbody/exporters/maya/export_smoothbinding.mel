@@ -71,6 +71,10 @@ global proc selectMesh()
 
 global proc smoothBindingExportFunc()
 {	
+	// enforce the current unit to be cm
+	string $sceneUnit = `currentUnit -q -linear`;
+	currentUnit -linear "cm";
+
 	select -cl;
 	string $objList[] = `textScrollList -q -selectItem scrollListObj`;
 	int $i;
@@ -109,6 +113,9 @@ global proc smoothBindingExportFunc()
 	}
 	else
 		print ("Directory Not Exist!");
+	
+	// change the unit back to original unit
+	currentUnit -linear $sceneUnit;
 }
 
 //--------------------- Main Window ------------------------
