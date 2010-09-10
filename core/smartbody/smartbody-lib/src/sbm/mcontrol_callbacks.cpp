@@ -3338,43 +3338,68 @@ int mcu_play_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
    if ( mcu_p )
    {
-      char * command = args.read_token();
+      char * remainder = args.read_remainder_raw();
+      string sArgs = remainder;
+      vector< string > splitArgs;
+      vhcl::Tokenize( sArgs, splitArgs );
 
-
-      if ( strlen( command ) > 0 )
+      if ( splitArgs.size() >= 2 )
       {
+         string soundFile = splitArgs[ 0 ];
+         string characterName = splitArgs[ 1 ];
+
+         // check for double-quotes around sound file
+         if ( soundFile.length() > 1 )
+         {
+            if ( soundFile[ 0 ] == '\"' )
+            {
+               size_t first = sArgs.find_first_of( "\"" );
+               if ( first == string::npos )
+               {
+                  LOG( "Error parsing PlaySound message ''", sArgs.c_str() );
+                  return CMD_FAILURE;
+               }
+
+               size_t second = sArgs.find_first_of( "\"", first + 1 );
+               if ( second == string::npos )
+               {
+                  LOG( "Error parsing PlaySound message ''", sArgs.c_str() );
+                  return CMD_FAILURE;
+               }
+
+               soundFile = sArgs.substr( first + 1, second - first - 1 );
+               characterName = sArgs.substr( second + 2 );
+            }
+         }
+
          bool absolutePath = false;
 
-         if ( strlen( command ) > 1 )
+         if ( soundFile.length() > 1 )
          {
-            if ( command[ 0 ] == '\\' ||
-                 command[ 0 ] == '/' ||
-                 command[ 1 ] == ':' )
+            if ( soundFile[ 0 ] == '\\' ||
+                 soundFile[ 0 ] == '/' ||
+                 soundFile[ 1 ] == ':' )
             {
                absolutePath = true;
             }
          }
-
-         string path = command;
 
          if ( !absolutePath )
          {
             char full[ _MAX_PATH ];
             if ( _fullpath( full, "..\\..\\..\\..\\..", _MAX_PATH ) != NULL )
             {
-               path = string( full ) + string( "\\" ) + path;
+               soundFile = string( full ) + string( "\\" ) + soundFile;
             }
          }
 
-         char * charName = args.read_token();
-
          if ( mcu_p->play_internal_audio )
          {
-            AUDIO_Play( path.c_str() );
+            AUDIO_Play( soundFile.c_str() );
          }
          else
          {
-            mcu_p->bonebus.SendPlaySound( path.c_str(), charName );
+            mcu_p->bonebus.SendPlaySound( soundFile.c_str(), characterName.c_str() );
          }
 
          return CMD_SUCCESS;
@@ -3398,35 +3423,62 @@ int mcu_stop_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
    if ( mcu_p )
    {
-      char * command = args.read_token();
+      char * remainder = args.read_remainder_raw();
+      string sArgs = remainder;
+      vector< string > splitArgs;
+      vhcl::Tokenize( sArgs, splitArgs );
 
-      if ( strlen( command ) > 0 )
+      if ( splitArgs.size() >= 2 )
       {
+         string soundFile = splitArgs[ 0 ];
+         string characterName = splitArgs[ 1 ];
+
+         // check for double-quotes around sound file
+         if ( soundFile.length() > 1 )
+         {
+            if ( soundFile[ 0 ] == '\"' )
+            {
+               size_t first = sArgs.find_first_of( "\"" );
+               if ( first == string::npos )
+               {
+                  LOG( "Error parsing StopSound message ''", sArgs.c_str() );
+                  return CMD_FAILURE;
+               }
+
+               size_t second = sArgs.find_first_of( "\"", first + 1 );
+               if ( second == string::npos )
+               {
+                  LOG( "Error parsing StopSound message ''", sArgs.c_str() );
+                  return CMD_FAILURE;
+               }
+
+               soundFile = sArgs.substr( first + 1, second - first - 1 );
+               characterName = sArgs.substr( second + 2 );
+            }
+         }
+
          bool absolutePath = false;
 
-         if ( strlen( command ) > 1 )
+         if ( soundFile.length() > 1 )
          {
-            if ( command[ 0 ] == '\\' ||
-                 command[ 0 ] == '/' ||
-                 command[ 1 ] == ':' )
+            if ( soundFile[ 0 ] == '\\' ||
+                 soundFile[ 0 ] == '/' ||
+                 soundFile[ 1 ] == ':' )
             {
                absolutePath = true;
             }
          }
-
-         string path = command;
 
          if ( !absolutePath )
          {
             char full[ _MAX_PATH ];
             if ( _fullpath( full, "..\\..\\..\\..\\..", _MAX_PATH ) != NULL )
             {
-               path = string( full ) + string( "\\" ) + path;
+               soundFile = string( full ) + string( "\\" ) + soundFile;
             }
          }
 
-         //SendStopSound( path.c_str() );
-         mcu_p->bonebus.SendStopSound( path.c_str() );
+         mcu_p->bonebus.SendStopSound( soundFile.c_str() );
 
          return CMD_SUCCESS;
       }
