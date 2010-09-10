@@ -433,7 +433,7 @@ bool SkSkeleton::load ( SrInput& in, double skScale, const char* basedir )
    float scale=1.0f;
    bool scale_offsets=false;
    bool scale_limits=false;
-   scale *= skScale;
+   scale *= (float)skScale;
 
    in.comment_style ( '#' );
    in.lowercase_tokens ( false );
