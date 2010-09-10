@@ -376,183 +376,54 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 			bonebusCharacter->SetParams( pos->first.c_str(), index );
 		}
 	}
-
-	init_visemes_left_right_channels( "au_1", "unit1_inner_brow_raiser" );
-	init_visemes_left_right_channels( "au_2", "unit2_outer_brow_raiser" );
-	init_visemes_left_right_channels( "au_4", "unit4_inner_brow_lowerer" );
-
-	init_viseme_simple( "au_5",        "unit5_upper_lid_raiser");
-	init_viseme_simple( "au_6",        "unit6_eye_squint");
-	init_viseme_simple( "au_7",        "unit7_lid_tightener");
-	init_viseme_simple( "au_9",        "unit9_nose_wrinkle");
-	init_viseme_simple( "au_10",       "unit10_upper_lip_raiser");
-	init_viseme_simple( "au_12",       "unit12_smile_mouth");
-	init_viseme_simple( "au_15",       "unit15_lip_corner_depressor");
-	init_viseme_simple( "au_20",       "unit20_lip_stretcher");
-	init_viseme_simple( "au_23",       "unit23_lip_tightener");
-	init_viseme_simple( "au_25",       "unit25_lip_parser");
-	init_viseme_simple( "au_26",       "unit26_jaw_drop");
-	init_viseme_simple( "au_27",       "unit27_jaw_stretch_open");
-	{
-		//init_viseme_simple( "au_45_left",  "unit45_left_blink");
-		//init_viseme_simple( "au_45_right", "unit45_right_blink");
-		VisemeImplDataPtr viseme_blink = init_visemes_left_right_channels( "au_45", "unit45_blink" );
-		viseme_impl_data.insert( make_pair( "blink", viseme_blink ) );  // Synomyn
-	}
-	init_viseme_simple( "au_38",       "unit38_nostril_dilator");
-	init_viseme_simple( "au_39",       "unit39_nostril_compressor");
-
-	VecVisemeImplData visemes;
-	visemes.push_back( init_viseme_simple( "viseme_ao",   "Ao") );
-	visemes.push_back( init_viseme_simple( "viseme_d",    "D") );
-	visemes.push_back( init_viseme_simple( "viseme_ee",   "EE") );
-	visemes.push_back( init_viseme_simple( "viseme_er",   "Er") );
-	{
-		VisemeImplDataPtr viseme_f = init_viseme_simple( "viseme_f", "f");
-		viseme_impl_data.insert( make_pair( "F", viseme_f ) );  // Compatibility patch...
-		visemes.push_back( viseme_f );
-	}
-	visemes.push_back( init_viseme_simple( "viseme_ih",   "Ih") );
-	visemes.push_back( init_viseme_simple( "viseme_j",    "j") );
-	visemes.push_back( init_viseme_simple( "viseme_kg",   "KG") );
-	visemes.push_back( init_viseme_simple( "viseme_oh",   "oh") );
-	{
-		VisemeImplDataPtr viseme_oh = init_viseme_simple( "viseme_oh", "oh");
-		viseme_impl_data.insert( make_pair( "Oh", viseme_oh ) );  // Compatibility patch...
-		viseme_impl_data.insert( make_pair( "OW", viseme_oh ) );  // Compatibility patch...  TODO: Fix in RVoiceRelay lines 164 & 214 (and others?)
-		visemes.push_back( viseme_oh );
-	}
-	visemes.push_back( init_viseme_simple( "viseme_oo",   "OO") );
-	visemes.push_back( init_viseme_simple( "viseme_ng",   "NG") );
-	visemes.push_back( init_viseme_simple( "viseme_r",    "R") );
-	visemes.push_back( init_viseme_simple( "viseme_th",   "Th") );
-	visemes.push_back( init_viseme_simple( "viseme_z",    "Z") );
-
-	viseme_impl_data.insert( make_pair( "ALL", composite_visemes( visemes ) ) );
-
-	VisemeImplDataPtr closed_mouth( new VisemeImplData() );  // Does nothing, but signals as recognized
-	viseme_impl_data.insert( make_pair( "_", closed_mouth ) );
-	viseme_impl_data.insert( make_pair( "BMP", closed_mouth ) );
 	
-/*
-	viseme_to_channel.insert(pair<const char*, const char*>("unit1_left_inner_brow_raiser","au_1_left"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit1_right_inner_brow_raiser","au_1_right"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit2_left_outer_brow_raiser","au_2_left"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit2_right_outer_brow_raiser","au_2_right"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit4_left_brow_raiser","au_4_left"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit4_right_brow_raiser","au_4_right"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit5_upper_lid_raiser","au_5"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit6_eye_squint","au_6"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit7_lid_tightener","au_7"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit9_nose_wrinkle","au_9"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit10_upper_lip_raiser","au_10"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit12_smile_mouth","au_12"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit15_lip_corner_depressor","au_15"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit20_lip_stretcher","au_20"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit23_lip_tightener","au_23"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit25_lip_parser","au_25"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit26_jaw_drop","au_26"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit27_jaw_stretch_open","au_27"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit45_left_blink","au_45_left"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit45_right_blink","au_45_right"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit38_nostril_dilator","au_38"));
-	viseme_to_channel.insert(pair<const char*, const char*>("unit39_nostril_compressor","au_39"));
+	// Do the bone bus name patch here
+	// hard coded, can be removed if these are added to bone bus and rendering side
+	std::vector<std::string> closed_mouth;							// this should is an empty vector
+	bonebus_name_patch.insert(make_pair("_", closed_mouth));	// when receiving this two viseme, do not send signal to bone bus
+	bonebus_name_patch.insert(make_pair("BMP", closed_mouth));
+	
+	std::vector<std::string> f_patch;								// "F" patch (match to "f")
+	f_patch.push_back("f");
+	bonebus_name_patch.insert(make_pair("F",f_patch));
+	
+	std::vector<std::string> oh_patch;								// "OW" patch (match to "oh")
+	oh_patch.push_back("oh");
+	bonebus_name_patch.insert(make_pair("OW",oh_patch));
 
-	viseme_to_channel.insert(pair<const char*, const char*>("Ao","viseme_ao"));
-	viseme_to_channel.insert(pair<const char*, const char*>("D","viseme_d"));
-	viseme_to_channel.insert(pair<const char*, const char*>("EE","viseme_ee"));
-	viseme_to_channel.insert(pair<const char*, const char*>("Er","viseme_er"));
-	viseme_to_channel.insert(pair<const char*, const char*>("f","viseme_f"));
-	viseme_to_channel.insert(pair<const char*, const char*>("kg","viseme_kg"));
-	viseme_to_channel.insert(pair<const char*, const char*>("Ih","viseme_ih"));
-	viseme_to_channel.insert(pair<const char*, const char*>("NG","viseme_ng"));
-	viseme_to_channel.insert(pair<const char*, const char*>("oh","viseme_oh"));
-	viseme_to_channel.insert(pair<const char*, const char*>("OO","viseme_oo"));
-	viseme_to_channel.insert(pair<const char*, const char*>("R","viseme_r"));
-	viseme_to_channel.insert(pair<const char*, const char*>("Th","viseme_th"));
-	viseme_to_channel.insert(pair<const char*, const char*>("Z","viseme_z"));
-*/
-
+	std::vector<std::string> all_viseme;							// "ALL" patch (match to all the viseme)
+	all_viseme.push_back("Ao");
+	all_viseme.push_back("D");
+	all_viseme.push_back("EE");
+	all_viseme.push_back("Er");
+	all_viseme.push_back("f");
+	all_viseme.push_back("Ih");
+	all_viseme.push_back("j");
+	all_viseme.push_back("KG");
+	all_viseme.push_back("oh");
+	all_viseme.push_back("OO");
+	all_viseme.push_back("NG");
+	all_viseme.push_back("R");
+	all_viseme.push_back("Th");
+	all_viseme.push_back("Z");
+	// new added visemes: here viseme needs a better name, because following is really facial expressions
+	all_viseme.push_back("base");
+	all_viseme.push_back("base_lower_face");
+	all_viseme.push_back("base_upper_face");
+	all_viseme.push_back("fe103_effort");
+	all_viseme.push_back("fe107_surprised");
+	all_viseme.push_back("fe112_happy");
+	all_viseme.push_back("fe113_sad");
+	all_viseme.push_back("fe119_bored");
+	all_viseme.push_back("fe124_dislike");
+	all_viseme.push_back("fe7_worried");
+	all_viseme.push_back("fe8_scared");
+	all_viseme.push_back("fe9_thinking");
+	all_viseme.push_back("fe127_yawn");
+	all_viseme.push_back("fe129_angry");
+	bonebus_name_patch.insert(make_pair("ALL",all_viseme));
+	
 	return( CMD_SUCCESS ); 
-}
-
-SbmCharacter::VisemeImplDataPtr SbmCharacter::init_viseme_simple( const char* channel_name, const char* bonebus_name ) {
-	VisemeImplDataPtr data( new VisemeImplData() );
-	if( bonebus_name ) {
-		data->bonebus_names.push_back( bonebus_name );
-		viseme_impl_data.insert( make_pair( bonebus_name, data ) );
-	}
-	if( channel_name ) {
-		data->channel_names.push_back( channel_name );
-		viseme_impl_data.insert( make_pair( channel_name, data ) );
-	}
-
-	return data;
-}
-
-/*!
- *   Initializes a set of visemes for relate left and right components.
- *   Bonebus does not implement independent left and right variants, but the face controller often does.
- *   This method registers the independent channel implementations, as well as a unified viseme of both channels
- *   and the single bonebus name.
- */
-SbmCharacter::VisemeImplDataPtr SbmCharacter::init_visemes_left_right_channels( const char* channel_name, const char* bonebus_name ) {
-	VisemeImplDataPtr left_right;
-	if( channel_name ) {
-		int len = strlen( channel_name );
-		VecVisemeImplData vec;
-
-		string channel_left( channel_name );
-		channel_left.append( "_left" );
-		vec.push_back( init_viseme_simple( channel_left.c_str(), NULL ) );
-		
-		string channel_right( channel_name );
-		channel_right.append( "_right" );
-		vec.push_back( init_viseme_simple( channel_right.c_str(), NULL ) );
-
-		left_right = composite_visemes( vec );
-	} else {
-		left_right.reset( new VisemeImplData() );
-	}
-
-	if( bonebus_name ) {
-		left_right->bonebus_names.push_back( bonebus_name );
-		viseme_impl_data.insert( make_pair( bonebus_name, left_right ) );
-	}
-	if( channel_name ) {
-		viseme_impl_data.insert( make_pair( channel_name, left_right ) );
-	}
-
-	return left_right;
-}
-
-SbmCharacter::VisemeImplDataPtr SbmCharacter::composite_visemes( VecVisemeImplData visemes ) {
-	// Temporarily store names in a set to prevent duplicates
-	set<string> bonebus_names, channel_names;
-
-	{
-		VecVisemeImplData::iterator it = visemes.begin();
-		VecVisemeImplData::iterator end = visemes.end();
-		for( ; it != end; ++it ) {
-			// Add all bonebus names
-			bonebus_names.insert( (*it)->bonebus_names.begin(), (*it)->bonebus_names.end() );
-			// Add all channel names
-			channel_names.insert( (*it)->channel_names.begin(), (*it)->channel_names.end() );
-		}
-	}
-
-	VisemeImplDataPtr data( new VisemeImplData() );
-	// Add all bonebus and channel names in set into the new VisemeImplData
-	data->bonebus_names.insert(
-		data->bonebus_names.end(),
-		bonebus_names.begin(), bonebus_names.end()
-	);
-	data->channel_names.insert(
-		data->channel_names.end(),
-		channel_names.begin(), channel_names.end()
-	);
-
-	return data;
 }
 
 void SbmCharacter::add_face_channel( const string& name, const int wo_index ) {
@@ -677,7 +548,7 @@ int SbmCharacter::init_skeleton() {
 
 					// Create the AU control channel
 					add_face_channel( name, wo_index );
-					
+
 					// TODO: Add to au_channel_map (?)
 
 					// Register control channel with face controller
@@ -1164,23 +1035,19 @@ const std::string& SbmCharacter::get_voice_code() const
 
 void SbmCharacter::bonebus_viseme_update(double curTime)
 {
-	std::map<std::string, MeSpline1D*>::iterator iter;
-	for (iter = visemeCurve.begin(); iter != visemeCurve.end(); iter++)
+	std::map<std::string, MeSpline1D*>::iterator curveIter;
+	for (curveIter = visemeCurve.begin(); curveIter != visemeCurve.end(); curveIter++)
 	{
-		VisemeToDataMap::const_iterator visemeToDataMapIter;
-		visemeToDataMapIter = viseme_impl_data.find(iter->first);
-		if( visemeToDataMapIter != viseme_impl_data.end() )
+		float weight = (float)curveIter->second->eval(curTime);
+		std::map<std::string, std::vector<std::string>>::iterator bonebusPatchIter;
+		bonebusPatchIter = bonebus_name_patch.find(curveIter->first);
+		if (bonebusPatchIter != bonebus_name_patch.end())
 		{
-			VisemeImplDataPtr data( visemeToDataMapIter->second );
-			std::vector<string>::const_iterator it, end;
-			it  = data->bonebus_names.begin();
-			end = data->bonebus_names.end();
-			for( ; it!= end; ++it )
-			{
-				float weight = (float)iter->second->eval(curTime);
-				bonebusCharacter->SetViseme(it->c_str(), weight, 0.0);
-			}
+			for (size_t nCount = 0; nCount < bonebusPatchIter->second.size(); nCount++)
+				bonebusCharacter->SetViseme( bonebusPatchIter->second[nCount].c_str(), weight, 0.0 );
 		}
+		else
+			bonebusCharacter->SetViseme( curveIter->first.c_str(), weight, 0.0 );
 	}
 }
 
@@ -1192,101 +1059,79 @@ int SbmCharacter::set_viseme( char* viseme,
 							  int numKeys )
 {
     //LOG("Recieved: SbmCharacter(\"%s\")::set_viseme( \"%s\", %f, %f )\n", name, viseme, weight, rampin_duration );
-
-	VisemeToDataMap::const_iterator it;
-
-	// tolower(viseme) removed until BoneBone visemes are also lowercased
-
-	it = viseme_impl_data.find( viseme );
-	if( it != viseme_impl_data.end() ) {
-		VisemeImplDataPtr data( it->second );
-
-		std::vector<string>::const_iterator it, end;
-		if (bonebusCharacter) 
+	if (bonebusCharacter)	// if it is bone bus character
+	{
+		if (!this->is_viseme_curve())
 		{
-			if (!this->is_viseme_curve())
+			if (curve_info != NULL)
 			{
-				// iterate over bonebus_names
-				it  = data->bonebus_names.begin();
-				end = data->bonebus_names.end();
-				for( ; it!= end; ++it )
-					bonebusCharacter->SetViseme( it->c_str(), weight, rampin_duration );
+				LOG("SbmCharacter::set_viseme WARNING: Now Curve Mode is OFF, Check the char <> viseme command!");
+				return CMD_FAILURE;
+			}
+			std::map<std::string, std::vector<std::string>>::iterator iter;
+			iter = bonebus_name_patch.find(viseme);
+			if (iter != bonebus_name_patch.end())
+			{
+				for (size_t nCount = 0; nCount < iter->second.size(); nCount++)
+					bonebusCharacter->SetViseme( iter->second[nCount].c_str(), weight, rampin_duration );
 			}
 			else
-			{
-				if (numKeys > 0)
-				{
-					std::map<std::string, MeSpline1D*>::iterator iter = visemeCurve.find(std::string(viseme));
-					if (iter != visemeCurve.end())
-					{
-						visemeCurve.erase(iter);
-					}
-					MeSpline1D* curve = new MeSpline1D();
-					curve->make_smooth(start_time, 0, 0, 0, 0);
-					float timeDelay = this->get_viseme_time_delay();
-					for (int i = 0; i < numKeys; i++)
-					{
-						float weight = curve_info[i*4+1];
-						float inTime = curve_info[i*4+0];
-						curve->make_smooth(start_time+inTime+timeDelay, weight, 0, 0, 0);		
-					}
-					visemeCurve.insert(make_pair(std::string(viseme), curve));
-				}
-				return CMD_SUCCESS;
-			}
+				bonebusCharacter->SetViseme( viseme, weight, rampin_duration );
 		}
-
-		if ( mcuCBHandle::singleton().sbm_character_listener )
+		else
 		{
-			// iterate over bonebus_names
-			it  = data->bonebus_names.begin();
-			end = data->bonebus_names.end();
-
-			for( ; it!= end; ++it )
-				mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, it->c_str(), weight, rampin_duration );
-		}
-
-		{	// Viseme/AU channel activation
-
-			// iterate over channel_names
-			it  = data->channel_names.begin();
-			end = data->channel_names.end();
-
-			for( ; it!= end; ++it ) {
-				// Add controllers to drive the face channels
-				const char* channel = it->c_str();
-
-				ostringstream ct_name;
-				ct_name << "Viseme \"" << viseme << "\", Channel \"" << channel << "\"";
-
-				SkChannelArray channels;
-				channels.add( SkJointName(channel), SkChannel::XPos );
-
-				MeCtRawWriter* ct = new MeCtRawWriter();
-				ct->name( ct_name.str().c_str() );
-				ct->init( channels, true );
-				SrBuffer<float> value;
-				value.size(1);
-				value[0] = (float)weight;
-				ct->set_data(value);
-				// Curve Mode: viseme in buffer channel has to be set to 0.0 at the beginning of frame (temporary solution to the feedback problem)
-				//				local channel is set to 1.0 all the time
-				//				final result inside buffer channel is controlled by the blend curve
-				// Original Add On Mode: viseme in buffer channel keep the same value unless it is being changed at certain time
-				//							which means after modifying channel data to 1.0, you have to reset it to 0.0 later on
-				if (numKeys > 0)	// Curve MODE
-					head_sched_p->schedule(ct, start_time, curve_info, numKeys);
-				else				// Original Add On MODE
-					head_sched_p->schedule( ct, start_time, start_time + ct->controller_duration(), rampin_duration, 0 );
+			if (numKeys > 0)
+			{
+				std::map<std::string, MeSpline1D*>::iterator iter = visemeCurve.find(std::string(viseme));
+				if (iter != visemeCurve.end())
+				{
+					visemeCurve.erase(iter);
+				}
+				MeSpline1D* curve = new MeSpline1D();
+				curve->make_smooth(start_time, 0, 0, 0, 0);
+				float timeDelay = this->get_viseme_time_delay();
+				for (int i = 0; i < numKeys; i++)
+				{
+					float weight = curve_info[i*4+1];
+					float inTime = curve_info[i*4+0];
+					curve->make_smooth(start_time+inTime+timeDelay, weight, 0, 0, 0);		
+				}
+				visemeCurve.insert(make_pair(std::string(viseme), curve));
 			}
 		}
-		return CMD_SUCCESS;
-	} else {
-		std::stringstream strstr;
-		strstr << "WARNING: Unknown viseme \"" << viseme << "\" for character \"" << name << "\"." << endl;
-		LOG(strstr.str().c_str());
-		return CMD_SUCCESS;
 	}
+
+	if ( mcuCBHandle::singleton().sbm_character_listener )
+	{
+			mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, viseme, weight, rampin_duration );
+	}
+
+	if (!bonebusCharacter)	// if it is not going through bone bus
+	{	// Viseme/AU channel activation
+		ostringstream ct_name;
+		ct_name << "Viseme \"" << viseme << "\", Channel \"" << viseme << "\"";
+
+		SkChannelArray channels;
+		channels.add( SkJointName(viseme), SkChannel::XPos );
+
+		MeCtRawWriter* ct = new MeCtRawWriter();
+		ct->name( ct_name.str().c_str() );
+		ct->init( channels, true );
+		SrBuffer<float> value;
+		value.size(1);
+		value[0] = (float)weight;
+		ct->set_data(value);
+		// Curve Mode: viseme in buffer channel has to be set to 0.0 at the beginning of frame (temporary solution to the feedback problem)
+		//				local channel is set to 1.0 all the time
+		//				final result inside buffer channel is controlled by the blend curve
+		// Original Add On Mode: viseme in buffer channel keep the same value unless it is being changed at certain time
+		//							which means after modifying channel data to 1.0, you have to reset it to 0.0 later on
+		if (numKeys > 0)	// Curve MODE
+			head_sched_p->schedule(ct, start_time, curve_info, numKeys);
+		else				// Original Add On MODE
+			head_sched_p->schedule( ct, start_time, start_time + ct->controller_duration(), rampin_duration, 0 );
+	}
+	return CMD_SUCCESS;
 }
 
 
@@ -1435,30 +1280,6 @@ int SbmCharacter::print_controller_schedules() {
 
 bool SbmCharacter::is_face_controller_enabled() {
 	return (face_ct!=NULL && face_ct->context()!=NULL);
-}
-
-set<string> SbmCharacter::get_face_names() {
-	set<string> names;
-
-	bool using_facebone = is_face_controller_enabled();
-
-	VisemeToDataMap::const_iterator vid_it  = viseme_impl_data.begin();
-	VisemeToDataMap::const_iterator vid_end = viseme_impl_data.end();
-	for( ; vid_it!=vid_end; ++vid_it ) {
-		VisemeImplDataPtr data = vid_it->second;
-
-		if( using_facebone ) {
-			// Valid if at least one input channel exists 
-			if( !data->channel_names.empty() )
-				names.insert( vid_it->first );
-		} else {
-			// Valid if at least one bonebus name exists
-			if( !data->bonebus_names.empty() )
-				names.insert( vid_it->first );
-		}
-	}
-
-	return names;
 }
 
 // HACK to initiate reholster on all QuickDraw controllers
@@ -1941,33 +1762,6 @@ int SbmCharacter::print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return CMD_SUCCESS;
 	} else if( attribute=="schedule" ) {
 		return character->print_controller_schedules();
-	} else if( attribute=="face" ) {
-		string sub_attribute = args.read_token();
-		if( sub_attribute=="names" ) {
-			std::stringstream strstr;
-			if( character->is_face_controller_enabled() ) {
-				strstr << "Using bone based face control:" << endl;
-			} else {
-				strstr << "Using renderer face control via BoneBus (implementation of the following will depend upon the render):" << endl;
-			}
-
-			set<string> names = character->get_face_names();
-
-			set<string>::iterator it = names.begin();
-			set<string>::iterator end = names.end();
-			for( ; it!=end; ++it )
-				strstr << '\t' << *it << endl;
-
-			LOG(strstr.str().c_str());
-			return CMD_SUCCESS;
-		} else if( sub_attribute == "channels" ) {
-			// TODO: print list of face activating channels (and associated visemes?)
-			LOG("Pending implementation");
-			return CMD_SUCCESS;
-		} else {
-			LOG("ERROR: Expected viseme subattribute \"names\".  Found \"%s\".", sub_attribute);
-			return CMD_FAILURE;
-		}
 	} else {
 		return SbmPawn::print_attribute( character, attribute, args, mcu_p );
 	}
