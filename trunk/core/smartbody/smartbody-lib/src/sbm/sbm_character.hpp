@@ -31,6 +31,7 @@
 #include <iostream>
 #include <string>
 #include <set>
+#include <map>
 
 #include "bonebus.h"
 
@@ -117,18 +118,9 @@ protected:
 	// and may also refer to an action unit or other face shape.
 	// They are all controlled by the "character .. viseme .." command.
 
-	// Strings used to control a viseme.
-	struct VisemeImplData {
-		// Names used by the BoneBus code (renderer-side implementation)
-		std::vector<std::string> bonebus_names;
-		// Channel names used by Motion Engine controllers (i.e., -facebone mode)
-		std::vector<std::string> channel_names;
-	};
-	typedef boost::shared_ptr<VisemeImplData> VisemeImplDataPtr;
-	// Mapping of viseme name to its implementation data. 
-	typedef std::vector<VisemeImplDataPtr> VecVisemeImplData;
-	typedef std::map<std::string,VisemeImplDataPtr> VisemeToDataMap;
-	VisemeToDataMap viseme_impl_data;
+	// bonebus name patch
+	// in case there's a mis-match between audio file or remote speech and Bonebus Network Map
+	std::map<std::string, std::vector<std::string>> bonebus_name_patch;
 
 	// Viseme Curve Info
 	std::map <std::string, MeSpline1D*> visemeCurve;
@@ -211,10 +203,6 @@ public:
 	/** Returns true if face controller is active on this character. */
 	bool is_face_controller_enabled();
 
-	/** Return a list of named faceposes implemented in this character. */
-	std::set<std::string> get_face_names();
-
-
 	//////////////////////////////////////////
 	// Static command handlers
 
@@ -284,24 +272,6 @@ protected:
 	 *  Only called when the neutral face pose is defined (used by MeCtFace).
 	 */
 	virtual void init_face_controllers();
-
-	/*!
-	 *   Initializes a viseme that is implemented by one channel and/or one bonebus command.
-	 *   Either parameter may be NULL.
-	 */
-	VisemeImplDataPtr init_viseme_simple( const char* channel_name, const char* bonebus_name );
-
-	/*!
-	 *   Initializes a set of visemes for relate left and right components.
-	 *   Bonebus does not implement independent left and right variants, but the face controller often does.
-	 *   This method registers the independent channel implementations, as well as a unified viseme of both channels
-	 *   and the single bonebus name.
-	 */
-	VisemeImplDataPtr init_visemes_left_right_channels( const char* channel_name, const char* bonebus_name );
-
-	/*!
-	 */
-	VisemeImplDataPtr composite_visemes( std::vector<VisemeImplDataPtr> visemes );
 
 	int set_world_offset_cmd( srArgBuffer& args );
 
