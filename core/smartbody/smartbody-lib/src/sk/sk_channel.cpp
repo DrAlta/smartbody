@@ -301,7 +301,7 @@ int SkChannel::load ( Type type, SrInput& in, float* v, double scale ) // static
        { fscanf ( f, "%f", v ); }
       else
        { in >> v[0]; }
-	  v[0] *= scale;
+	  v[0] *= (float)scale;
       return 1;
     }
    if ( type<=ZRot || type==Twist )
