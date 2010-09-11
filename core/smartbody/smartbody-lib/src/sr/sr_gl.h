@@ -63,7 +63,8 @@ void glDrawBox ( const SrVec& a, const SrVec& b ); //!< Send quads with normals 
 
 void glClearColor ( const SrColor& c );
 void glColor ( const SrColor& c );
-void glLight ( int id, const SrLight& l ); //!< id = x E {0,...,7}, from GL_LIGHTx
+void glLight ( int id, const SrLight& l, bool bind_pos = true ); //!< id = x E {0,...,7}, from GL_LIGHTx
+void glLightPos( int id, const SrLight& l );
 void glMaterial ( const SrMaterial &m ); //!< Sets material for GL_FRONT_AND_BACK
 void glMaterialFront ( const SrMaterial &m );
 void glMaterialBack ( const SrMaterial &m );
