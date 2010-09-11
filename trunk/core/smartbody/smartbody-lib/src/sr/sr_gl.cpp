@@ -144,7 +144,7 @@ void glColor ( const SrColor& c )
    glColor4ubv ( (const GLubyte*)&c );
  }
 
-void glLight ( int id, const SrLight& l )
+void glLight ( int id, const SrLight& l, bool bind_pos )
  {
    float f[4];
 
@@ -167,10 +167,28 @@ void glLight ( int id, const SrLight& l )
    l.diffuse.get(f);  glLightfv ( n, GL_DIFFUSE, f );
    l.specular.get(f); glLightfv ( n, GL_SPECULAR, f );
 
-   l.position.get ( f );
-   f[3] = l.directional? 0.0f:1.0f;
-   glLightfv ( n, GL_POSITION, f );
+   if( bind_pos )	{
+	l.position.get ( f );
+	f[3] = l.directional? 0.0f:1.0f;
+	glLightfv ( n, GL_POSITION, f );
+   }
+   glEnable( n );
  }
+
+void glLightPos( int id, const SrLight& l )	{
+   float f[4];
+   GLenum n = id==0? GL_LIGHT0 :
+              id==1? GL_LIGHT1 :
+              id==2? GL_LIGHT2 :
+              id==3? GL_LIGHT3 :
+              id==4? GL_LIGHT4 :
+              id==5? GL_LIGHT5 :
+              id==6? GL_LIGHT6 : GL_LIGHT7;
+
+	l.position.get ( f );
+	f[3] = l.directional? 0.0f:1.0f;
+	glLightfv ( n, GL_POSITION, f );
+}
 
 void glMaterial ( const SrMaterial &m )
  {

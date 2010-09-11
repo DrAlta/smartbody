@@ -719,15 +719,22 @@ void FltkViewer::draw()
  {
    if ( !visible() ) return;
    if ( !valid() ) init_opengl ( w(), h() ); // valid() is turned on by fltk after draw() returns
-//   sr_out<<"DRAW\n";
- 
+
    SrLight &light = _data->light;
    SrCamera &cam  = _data->camera;
    SrMat mat ( SrMat::NotInitialized );
 
-   light.directional = false;
-   light.position = cam.eye;
-   light.constant_attenuation = 1.0f/cam.scale;
+	light.directional = false;
+//   light.position = cam.eye;
+	light.diffuse = SrColor( 1.0f, 0.95f, 0.8f );
+	light.position = SrVec( -200.0, 300.0, 400.0 );
+	light.constant_attenuation = 1.0f/cam.scale;
+
+	SrLight light2;
+	light2 = light;
+	light2.diffuse = SrColor( 0.8f, 0.85f, 1.0f );
+//	light2.position = SrVec( 400.0, 600.0, -300.0 );
+	light2.position = SrVec( 200.0, 800.0, -300.0 );
 
    //----- Clear Background --------------------------------------------
    glClearColor ( _data->bcolor );
@@ -741,8 +748,8 @@ void FltkViewer::draw()
    //----- Set Visualisation -------------------------------------------
    glMatrixMode ( GL_MODELVIEW );
    glLoadMatrix ( cam.get_view_mat(mat) );
-   glLight ( 0, light );
    glScalef ( cam.scale, cam.scale, cam.scale );
+
 //   glRotate ( _model_rotation );
 
    // draw the grid
@@ -751,14 +758,33 @@ void FltkViewer::draw()
    drawGrid();
 
    //----- Render user scene -------------------------------------------
-   //glClearColor ( _data->bcolor );
-   //glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-   _data->fcounter.start();
-   if ( _data->displayaxis ) _data->render_action.apply ( _data->sceneaxis );
-   if ( _data->boundingbox ) _data->render_action.apply ( _data->scenebox );
-   if ( _data->root ) _data->render_action.apply ( _data->root );
-   _data->fcounter.stop();
+	_data->fcounter.start();
+	if ( _data->displayaxis ) _data->render_action.apply ( _data->sceneaxis );
+	if ( _data->boundingbox ) _data->render_action.apply ( _data->scenebox );
+
+	if( _data->root )	{
+
+		glLight ( 0, light );
+		glLight ( 1, light2 );
+
+		_data->render_action.apply ( _data->root );
+
+#if 0
+		glPushMatrix();
+	
+			glScalef( 1.0f, 0.5f, 1.0f );
+			glTranslatef( 0.0f, 0.0f, -100.0f );
+		
+			glLight ( 0, light );
+			glLight ( 1, light2 );
+
+			_data->render_action.apply ( _data->root );
+	
+		glPopMatrix();
+#endif
+	}
+	_data->fcounter.stop();
 
    if ( _data->message.len() )
     { gl_draw_string ( _data->message, -1, -1 );
