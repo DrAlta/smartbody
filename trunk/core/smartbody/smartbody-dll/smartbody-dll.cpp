@@ -12,6 +12,7 @@
 #include "sbm/sbm_character.hpp"
 #include "sbm/sbm_test_cmds.hpp"
 #include "sbm/resource_cmds.h"
+#include "sbm/locomotion_cmds.hpp"
 
 using std::string;
 
@@ -380,6 +381,9 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert( "RemoteSpeechTimeOut", remoteSpeechTimeOut_func);  // internally routed message
    mcu.insert( "joint_logger",        joint_logger::start_stop_func );
    mcu.insert( "J_L",                 joint_logger::start_stop_func );  // shorthand
+   mcu.insert( "locomotion",          locomotion_cmd_func );
+   mcu.insert( "loco",                locomotion_cmd_func ); // shorthand
+   mcu.insert( "check",                mcu_check_func ); // shorthand
 
    mcu.insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands
 
