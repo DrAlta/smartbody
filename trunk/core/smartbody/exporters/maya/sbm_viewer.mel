@@ -97,6 +97,11 @@ global proc viewerPreferenceCheck()
 		{
 			addAttr -longName "MotionName" -dataType "string" $pref;
 			setAttr -type "string" ( $pref + ".MotionName" ) "";
+		}		
+		if (!`objExists($pref + ".IdleMotionName")`)
+		{
+			addAttr -longName "IdleMotionName" -dataType "string" $pref;
+			setAttr -type "string" ( $pref + ".IdleMotionName" ) "";
 		}			
 		if (!`objExists($pref + ".MeshName")`)
 		{
@@ -154,7 +159,7 @@ global proc viewerPreferenceRename()
 			textScrollList -e -selectItem $newPrefName scrollListPreference;		
 		}
 		else
-			print ("Warning: No preference is selected");
+			confirmDialog -title "Hint" -message "Warning: No preference is selected" -button "Ok" -defaultButton "Ok" -dismissString "Ok";
 	}
 }
 
@@ -166,6 +171,7 @@ global proc viewerPreferenceReset()
 	setAttr -type "string"($curPref + ".BindingDir") "";	
 	setAttr -type "string"($curPref + ".SkeletonName") "";
 	setAttr -type "string"($curPref + ".MotionName") "";
+	setAttr -type "string"($curPref + ".IdleMotionName") "";
 	setAttr -type "string"($curPref + ".MeshName") "";
 	setAttr -type "string"($curPref + ".BindingName") "";
 	
@@ -196,7 +202,8 @@ global proc skmFileBrowser(string $fileName, string $fileType)
 {
 	string $curPref = getSelectedViewerPreference();
 	setAttr -type "string" ($curPref + ".MotionDir") $fileName;
-	setAttr -type "string" ($curPref + ".MotionName") "";	
+	setAttr -type "string" ($curPref + ".MotionName") "";
+	setAttr -type "string" ($curPref + ".IdleMotionName") "";	
 	updateSkmUI();
 }
 
@@ -222,7 +229,8 @@ global proc updateSkmDirAttr()
 {
 	string $curPref = getSelectedViewerPreference();
 	setAttr -type "string" ($curPref + ".MotionDir") `textFieldGrp -q -text skmDir`;
-	setAttr -type "string" ($curPref + ".MotionName") "";	
+	setAttr -type "string" ($curPref + ".MotionName") "";
+	setAttr -type "string" ($curPref + ".IdleMotionName") "";
 	updateSkmUI();	
 }
 
@@ -246,8 +254,19 @@ global proc updateSkAttr()
 global proc updateSkmAttr()
 {
 	string $curPref = getSelectedViewerPreference();
-	string $selected[] = `textScrollList -q -selectItem scrollListMotion`;		
-	setAttr -type "string"($curPref + ".MotionName") $selected[0];
+	string $selected[] = `textScrollList -q -selectItem scrollListMotion`;
+	int $i;
+	string $skmAttr;
+	for ($i = 0; $i < size($selected); $i = $i + 1)
+		$skmAttr = $skmAttr + " " + $selected[$i];	
+	setAttr -type "string"($curPref + ".MotionName") $skmAttr;
+}
+
+global proc updateIdleSkmAttr()
+{
+	string $curPref = getSelectedViewerPreference();
+	string $selected[] = `textScrollList -q -selectItem scrollListIdleMotion`;		
+	setAttr -type "string"($curPref + ".IdleMotionName") $selected[0];
 }
 
 global proc updateOpenColladaAttr()
@@ -272,11 +291,6 @@ global proc updateSbmBinAttr()
 {
 	string $curPref = getSelectedViewerPreference();
 	setAttr -type "string"($curPref + ".SbmBin") `textFieldGrp -q -text smartbodyBin`;		
-}
-
-global proc updateScaleAttr()
-{
-	
 }
 
 global proc selectAllMesh()
@@ -311,7 +325,7 @@ global proc updateSkUI()
 				textScrollList -e -append $skFiles[$i] scrollListSkeleton;
 		}
 		else
-			print ("WARNING: Directory Not Valid!");
+			confirmDialog -title "Hint" -message "WARNING: Directory Not Valid!" -button "Ok" -defaultButton "Ok" -dismissString "Ok";			
 		if ($skeletonName != "")
 			textScrollList -e -selectItem $skeletonName scrollListSkeleton;		
 	}
@@ -322,20 +336,33 @@ global proc updateSkmUI()
 {
 	$curPref = getSelectedViewerPreference();
 	textScrollList -e -removeAll scrollListMotion;
+	textScrollList -e -removeAll scrollListIdleMotion;
 	string $skmDir = `getAttr ($curPref + ".MotionDir")`;
 	if ($skmDir != "")
 	{
 		string $motionName = `getAttr ($curPref + ".MotionName")`;	
+		string $idleMotionName = `getAttr ($curPref + ".IdleMotionName")`;
 		if (`filetest -d ($skmDir + "/")`)
 		{
 			string $skmFiles[] = `getFileList -folder ($skmDir + "/") -filespec "*.skm"`;
 			for ($i = 0; $i < size($skmFiles); $i = $i + 1)
+			{
 				textScrollList -e -append $skmFiles[$i] scrollListMotion;
+				textScrollList -e -append $skmFiles[$i] scrollListIdleMotion;
+			}
 		}
 		else
-			print ("WARNING: Directory Not Valid!");	
+			confirmDialog -title "Hint" -message "WARNING: Directory Not Valid!" -button "Ok" -defaultButton "Ok" -dismissString "Ok";
 		if ($motionName != "")
-			textScrollList -e -selectItem $motionName scrollListMotion;	
+		{	
+			string $motionList[];
+			int $i;
+			tokenize $motionName " " $motionList;
+			for ($i = 0; $i < size($motionList); $i = $i + 1)
+				textScrollList -e -selectItem $motionList[$i] scrollListMotion;		
+		}			
+		if ($idleMotionName != "")
+			textScrollList -e -selectItem $idleMotionName scrollListIdleMotion;				
 	}
 	textFieldGrp -e -text $skmDir skmDir;	
 }
@@ -361,7 +388,7 @@ global proc updateBindingUI()
 				textScrollList -e -append $objFiles[$i] scrollListMesh;				
 		}
 		else
-			print ("WARNING: Directory Not Valid!");
+			confirmDialog -title "Hint" -message "WARNING: Directory Not Valid!" -button "Ok" -defaultButton "Ok" -dismissString "Ok";
 		
 		if ($bindingName!= "")
 			textScrollList -e -selectItem $bindingName scrollListBinding;
@@ -425,6 +452,7 @@ global proc	updatePrefUI()
 		// clear UI
 		textScrollList -e -removeAll scrollListSkeleton;
 		textScrollList -e -removeAll scrollListMotion;
+		textScrollList -e -removeAll scrollListIdleMotion;
 		textScrollList -e -removeAll scrollListMesh;
 		textScrollList -e -removeAll scrollListBinding;		
 		textFieldGrp -e -text "" skDir;	
@@ -456,6 +484,7 @@ global proc int detectProcess(string $processName)
 global proc viewerRunButton()
 {
 	int $noError = 1;
+	int $i;
 	// getting attr of current preference
 	string $curPref = getSelectedViewerPreference();
 	string $skeletonDir = `getAttr ($curPref + ".SkeletonDir")`;
@@ -463,6 +492,7 @@ global proc viewerRunButton()
 	string $smoothBindingDir = `getAttr ($curPref + ".BindingDir")`;
 	string $skeleton = `getAttr ($curPref + ".SkeletonName")`;	
 	string $motion = `getAttr ($curPref + ".MotionName")`;	
+	string $idleMotion = `getAttr ($curPref + ".IdleMotionName")`;
 	string $bindingInfo = `getAttr ($curPref + ".BindingName")`;	
 	string $mesh = `getAttr ($curPref + ".MeshName")`;	
 	string $sbmBin = `getAttr ($curPref + ".SbmBin")`;
@@ -475,8 +505,12 @@ global proc viewerRunButton()
 	string $seqFile = $scriptDir + "/" + "mayaSbmViewer.seq";
 	
 	string $character = "defaultCharacter";
-	string $motionName = basename($motion, ".skm");		
-	string $skeletonName = basename($skeleton, "");			
+	string $motionList[];
+	tokenize $motion " " $motionList;
+	for ($i = 0; $i < size($motionList); $i = $i + 1)
+		$motionList[$i] = basename($motionList[$i], ".skm");	
+	string $idleMotionName = basename($idleMotion, ".skm");
+	string $skeletonName = basename($skeleton, "");	
 
 	// getting scale factor
 	int $scaleChoice = `radioButtonGrp -q -select unitConverterSK`;
@@ -547,20 +581,51 @@ global proc viewerRunButton()
 				{
 					for ($i = 0; $i < size($meshList); $i = $i + 1)
 						system("echo 0.2 char " + $character + " smoothbindmesh " + "\"" + $smoothBindingDir + "/" + $meshList[$i] + "\"" + " >> " + $seqFile);	
-					system("echo 3.5 char " + $character + " viewer 4 " + " >> " + $seqFile);	
-					system("echo 4 test bml char " + $character + " ^<animation name=\"" + $motionName + "\"\/^>" + " >> " + $seqFile);					
+					system("echo 3.5 char " + $character + " viewer 4 " + " >> " + $seqFile);
+					
+					string $runMotion;
+					for ($i = 0; $i < size($motionList); $i = $i + 1)
+					{
+						if ($i == 0)
+							$runMotion = "echo 4 test bml char " + $character + " ^<animation name=\"" + $motionList[$i] + "\"" + " id=\"anim" + $i + "\""  + "\/^>";
+						else
+							$runMotion = $runMotion + ("^<animation name=\"" + $motionList[$i] + "\"" + " id=\"anim" + $i + "\"" + " start=\"anim" + ($i - 1) + ":end" + "\"" + "\/^>");
+					}
+					system($runMotion + " >> " + $seqFile);
+					if ($idleMotionName != "")
+						system("echo 4 test bml char " + $character + " ^<body posture=\"" + $idleMotionName + "\"\/^>" + " >> " + $seqFile);	
 				}
 				else
 				{
 					confirmDialog -title "Hint" -message "Please select a binding xml file" -button "Ok" -defaultButton "Ok" -dismissString "Ok";
 					system("echo 0.2 char " + $character + " viewer 0 " + " >> " + $seqFile);
-					system("echo 0.3 test bml char " + $character + " ^<animation name=\"" + $motionName + "\"\/^>" + " >> " + $seqFile);				
+					string $runMotion;
+					for ($i = 0; $i < size($motionList); $i = $i + 1)
+					{
+						if ($i == 0)
+							$runMotion = "echo 0.3 test bml char " + $character + " ^<animation name=\"" + $motionList[$i] + "\"" + " id=\"anim" + $i + "\""  + "\/^>";
+						else
+							$runMotion = $runMotion + ("^<animation name=\"" + $motionList[$i] + "\"" + " id=\"anim" + $i + "\"" + " start=\"anim" + ($i - 1) + ":end" + "\"" + "\/^>");
+					}
+					system($runMotion + " >> " + $seqFile);
+					if ($idleMotionName != "")
+						system("echo 0.3 test bml char " + $character + " ^<body posture=\"" + $idleMotionName + "\"\/^>" + " >> " + $seqFile);						
 				}
 			}
 			else
 			{
-				system("echo 0.2 char " + $character + " viewer 0 " + " >> " + $seqFile);
-				system("echo 0.3 test bml char " + $character + " ^<animation name=\"" + $motionName + "\"\/^>" + " >> " + $seqFile);				
+				system("echo 0.3 char " + $character + " viewer 0 " + " >> " + $seqFile);
+				string $runMotion;
+				for ($i = 0; $i < size($motionList); $i = $i + 1)
+				{
+					if ($i == 0)
+						$runMotion = "echo 0.3 test bml char " + $character + " ^<animation name=\"" + $motionList[$i] + "\"" + " id=\"anim" + $i + "\""  + "\/^>";
+					else
+						$runMotion = $runMotion + ("^<animation name=\"" + $motionList[$i] + "\"" + " id=\"anim" + $i + "\"" + " start=\"anim" + ($i - 1) + ":end" + "\"" + "\/^>");
+				}
+				system($runMotion + " >> " + $seqFile);
+				if ($idleMotionName != "")
+					system("echo 0.3 test bml char " + $character + " ^<body posture=\"" + $idleMotionName + "\"\/^>" + " >> " + $seqFile);					
 			}			
 				
 			string $runCommand = "start " + $sbmBin + " -seqpath " + $scriptDir + " -seq " + "mayaSbmViewer.seq" + " -skscale=" + $scaleSK + " -skmscale=" + $scaleSKM;
@@ -572,8 +637,20 @@ global proc viewerRunButton()
 			//	load motion
 			if ($motion != "")
 			{			
-				if ($skeleton != "")		
-					system("echo 0 test bml char " + $character + " ^<animation name=\"" + $motionName + "\"\/^>" + " >> " + $seqFile);	
+				if ($skeleton != "")
+				{
+					string $runMotion;
+					for ($i = 0; $i < size($motionList); $i = $i + 1)
+					{
+						if ($i == 0)
+							$runMotion = "echo 0 test bml char " + $character + " ^<animation name=\"" + $motionList[$i] + "\"" + " id=\"anim" + $i + "\""  + "\/^>";	
+						else
+							$runMotion = $runMotion + ("^<animation name=\"" + $motionList[$i] + "\"" + " id=\"anim" + $i + "\"" + " start=\"anim" + ($i - 1) + ":end" + "\"" + "\/^>");
+					}
+					system($runMotion + " >> " + $seqFile);
+					if ($idleMotionName != "")
+						system("echo 0 test bml char " + $character + " ^<body posture=\"" + $idleMotionName + "\"\/^>" + " >> " + $seqFile);	
+				}
 				else
 					confirmDialog -title "Hint" -message "Please select a skeleton" -button "Ok" -defaultButton "Ok" -dismissString "Ok";
 			}
@@ -607,7 +684,7 @@ global proc sbmViewerGUI()
 					button -label "Reset Preference" -align "center" -command viewerPreferenceReset;
 					setParent viewerMainWin;	
 	
-		frameLayout -label "Viewer Option" -borderStyle etchedIn -collapsable true -collapse 0;	
+		frameLayout -label "SK" -borderStyle etchedIn -collapsable true -collapse 0;	
 			columnLayout -adjustableColumn true;
 				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
 					textFieldGrp -label "SK Directory: " -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand updateSkDirAttr skDir;				
@@ -616,28 +693,41 @@ global proc sbmViewerGUI()
 				text -label "Skeleton List";
 				textScrollList -width 250 -height 50 -allowMultiSelection false -showIndexedItem 3 -selectCommand updateSkAttr scrollListSkeleton;
 				radioButtonGrp -numberOfRadioButtons 3 -label "Scale(SK)" -labelArray3 "none" "ft to cm" "cm to ft" -select 1 unitConverterSK;
-				
+				setParent viewerMainWin;
+		
+		frameLayout -label "SKM" -borderStyle etchedIn -collapsable true -collapse 0;	
+			columnLayout -adjustableColumn true;		
 				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
 					textFieldGrp -label "SKM Directory: " -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand updateSkmDirAttr skmDir;				
 					button -label ".." -align "center" -command "fileBrowserDialog -m 4 -fc \"skmFileBrowser\" -an \"Select\" -om \"SaveAs\"";	
 					setParent ..;				
 				text -label "Motion List";
-				textScrollList -width 250 -height 100 -allowMultiSelection false -showIndexedItem 3 -selectCommand updateSkmAttr scrollListMotion;
+				textScrollList -width 250 -height 100 -allowMultiSelection true -showIndexedItem 3 -selectCommand updateSkmAttr -doubleClickCommand viewerRunButton scrollListMotion;				
+				text -label "Idle List";
+				textScrollList -width 250 -height 100 -allowMultiSelection false -showIndexedItem 3 -selectCommand updateIdleSkmAttr -doubleClickCommand viewerRunButton scrollListIdleMotion;	
+				
 				radioButtonGrp -numberOfRadioButtons 3 -label "Scale(SKM)" -labelArray3 "none" "ft to cm" "cm to ft" -select 1 unitConverterSKM;
+				setParent viewerMainWin;	
 
+		frameLayout -label "Binding" -borderStyle etchedIn -collapsable true -collapse 0;
+			columnLayout -adjustableColumn true;
 				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
 					textFieldGrp -label "Binding Directory: " -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand updateBindingDirAttr bindingDir;				
 					button -label ".." -align "center" -command "fileBrowserDialog -m 4 -fc \"bindingFileBrowser\" -an \"Select\" -om \"SaveAs\"";	
 					setParent ..;				
 				text -label "Binding Info List";
+				setParent viewerMainWin;
+				
+		frameLayout -borderStyle etchedIn -collapsable true -collapse 1 -label "Advanced Binding Options";
+			columnLayout -adjustableColumn true;
 				textScrollList -width 250 -height 30 -allowMultiSelection false -showIndexedItem 3 -selectCommand updateOpenColladaAttr scrollListBinding;				
 				text -label "Mesh List";
 				textScrollList -width 250 -height 100 -allowMultiSelection true -showIndexedItem 3 -selectCommand updateObjAttr scrollListMesh;
 				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
 					button -label "Select All" -align "center" -command selectAllMesh;
 					button -label "Clear All" -align "center" -command clearAllMesh;
-					setParent viewerMainWin;
-
+					setParent viewerMainWin;				
+				
 		frameLayout -borderStyle etchedIn -collapsable true -collapse 1 -label "Smooth Binding Exporter";
 			columnLayout -adjustableColumn true;
 				button -label "Smooth Binding Exporter" -command "source export_smoothbinding.mel; smoothbindingExportGUI";
@@ -647,7 +737,7 @@ global proc sbmViewerGUI()
 			columnLayout -adjustableColumn true;
 				textFieldGrp -label "SBM Bin: " -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand updateSbmBinAttr smartbodyBin;
 				setParent viewerMainWin;
-		
+	
 		frameLayout -borderStyle etchedIn -collapsable false -collapse 0 -labelVisible false;
 			columnLayout -adjustableColumn true -rowSpacing 5 -columnOffset "both" 10;
 				button -label "Run Smartbody" -command viewerRunButton;
@@ -670,7 +760,7 @@ VERSION HISTORY:
   0.5 - add the smooth binding exporter
   
 LIMIT:
-  - after sbm-fltk window starts, user can only change the motion inside the scroll list
+  - after sbm-fltk window starts, user can only change the motion and idle motion inside the scroll list
   - when open a new scene inside one scene, viewer window has to be re-lauched because SmartbodyViewerOption Node is gone in the new scene
   - open collada binding the mesh to the binding pose, SmartBody starts from T pose, which means exporting smoothbinding has to occur at T pose, otherwise the animation would be messy
   - now the morph targets mesh exported works under SkinRig Scene, not working under AnimReady Scene

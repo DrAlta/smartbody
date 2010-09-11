@@ -112,7 +112,7 @@ global proc smoothBindingExportFunc()
 		print ("Exporting Process Finshed!\n");
 	}
 	else
-		print ("Directory Not Exist!");
+		confirmDialog -title "Hint" -message ("Directory " + $exportDir + " does not exist!") -button "Ok" -defaultButton "Ok" -dismissString "Ok";
 	
 	// change the unit back to original unit
 	currentUnit -linear $sceneUnit;
