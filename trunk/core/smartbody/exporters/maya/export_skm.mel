@@ -1122,16 +1122,51 @@ global proc skmFirstFrameUpdate()
 {
    string $animDef = skmGetSelectedAnimDefName();
 
-   int $frameNumber = `intSliderGrp -query -value skmFirstFrameSlider`; // the animator is at this framenumber
-   currentTime -edit $frameNumber; // UPDATE THE DISPLAY
-   setAttr ( $animDef + ".firstFrameNumber" ) $frameNumber;
+   string $SeqPointSLiders[] =
+   {
+      "sliderReady",
+      "sliderStrokeStart",
+      "sliderEmphasis",
+      "sliderStrokeEnd",
+      "sliderRelax"
+   };
 
-   //updates ready stroke relax sliders
-   intSliderGrp -edit -min $frameNumber sliderReady;
-   intSliderGrp -edit -min $frameNumber sliderStrokeStart;
-   intSliderGrp -edit -min $frameNumber sliderEmphasis;
-   intSliderGrp -edit -min $frameNumber sliderStrokeEnd;
-   intSliderGrp -edit -min $frameNumber sliderRelax;
+   string $SeqPointAttrs[] =
+   {
+      "readyTime",
+      "strokeStartTime",
+      "emphasisTime",
+      "strokeTime",
+      "relaxTime"
+   };
+
+   int $FirstFrame = `intSliderGrp -query -value "skmFirstFrameSlider"`;
+
+   // set value for first frame
+   currentTime -edit $FirstFrame; // UPDATE THE DISPLAY
+   setAttr ( $animDef + ".firstFrameNumber" ) $FirstFrame;
+
+   // if attr in AnimDefs is less than minimum value, increase it to minimum value
+   for ( $Attr in $SeqPointAttrs )
+   {
+      if ( `getAttr ( $animDef + "." + $Attr )` < $FirstFrame )
+      {
+         setAttr ( $animDef + "." + $Attr ) $FirstFrame;
+      }
+   }
+
+   //update UI
+   for ( $Slider in $SeqPointSLiders )
+   {
+      // set minimum value of slider to be first frame number
+      intSliderGrp -edit -min $FirstFrame $Slider;
+
+      // if current values are less than min value update them to be min value
+      if ( `intSliderGrp -query -value $Slider` < $FirstFrame )
+      {
+         intSliderGrp -edit -value $FirstFrame $Slider;
+      }
+   }
 }
 
 
@@ -1139,16 +1174,52 @@ global proc skmLastFrameUpdate()
 {
    string $animDef = skmGetSelectedAnimDefName();
 
-   int $frameNumber = `intSliderGrp -query -value skmLastFrameSlider`; // the animator is at this framenumber
-   currentTime -edit $frameNumber; // UPDATE THE DISPLAY
-   setAttr ( $animDef + ".lastFrameNumber" ) $frameNumber;
+   string $SeqPointSLiders[] =
+   {
+      "sliderReady",
+      "sliderStrokeStart",
+      "sliderEmphasis",
+      "sliderStrokeEnd",
+      "sliderRelax"
+   };
 
-   //updates ready stroke relax sliders
-   intSliderGrp -edit -max $frameNumber sliderReady;
-   intSliderGrp -edit -max $frameNumber sliderStrokeStart;
-   intSliderGrp -edit -max $frameNumber sliderEmphasis;
-   intSliderGrp -edit -max $frameNumber sliderStrokeEnd;
-   intSliderGrp -edit -max $frameNumber sliderRelax;
+   string $SeqPointAttrs[] =
+   {
+      "readyTime",
+      "strokeStartTime",
+      "emphasisTime",
+      "strokeTime",
+      "relaxTime"
+   };
+   
+   //int $frameNumber = `intSliderGrp -query -value skmLastFrameSlider`;
+   int $LastFrame = `intSliderGrp -query -value skmLastFrameSlider`;
+
+   // set value for last frame
+   currentTime -edit $LastFrame; // UPDATE THE DISPLAY
+   setAttr ( $animDef + ".lastFrameNumber" ) $LastFrame;
+ 
+   // if attr in AnimDefs is less than minimum value, increase it to minimum value
+   for ( $Attr in $SeqPointAttrs)
+   {
+      if ( `getAttr ( $animDef + "." + $Attr )` > $LastFrame )
+      {
+         setAttr ( $animDef + "." + $Attr ) $LastFrame;
+      }
+   }
+
+   // update UI
+   for ($Slider in $SeqPointSLiders)
+   {
+      // set minimum value of slider to be first frame number
+      intSliderGrp -edit -max $LastFrame $Slider;
+
+      // if current values are less than min value update them to be min value
+      if ( `intSliderGrp -query -value $Slider` > $LastFrame )
+      {
+         intSliderGrp -edit -value $LastFrame $Slider;
+      }
+   }
 }
 
 
@@ -1300,16 +1371,16 @@ global proc skmExportGUI()
 
    frameLayout -label "Animation Length & Synch Points" -borderStyle etchedIn -collapsable false -collapse 0;
       columnLayout -adj true;
-         intSliderGrp -label "First Frame:" -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmFirstFrameUpdate skmFirstFrameSlider;
-         intSliderGrp -label "Last Frame:"  -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmLastFrameUpdate skmLastFrameSlider;
+         intSliderGrp -label "First Frame:" -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmFirstFrameUpdate "skmFirstFrameSlider";
+         intSliderGrp -label "Last Frame:"  -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmLastFrameUpdate "skmLastFrameSlider";
          columnLayout -adjustableColumn true -rowSpacing 2 -columnOffset "both" 10;
             button -label "Stroke, Ready, Relax Help" -align "center" -command skmInfoPressed;
             setParent ..;
-         intSliderGrp -label "Ready End Frame"     -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmReadyUpdate sliderReady;
-         intSliderGrp -label "Stroke Start Frame:" -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmStrokeStartUpdate sliderStrokeStart;
-         intSliderGrp -label "Emphasis Frame:"     -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmEmphasisUpdate sliderEmphasis;
-         intSliderGrp -label "Stroke End Frame:"   -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmStrokeUpdate sliderStrokeEnd;
-         intSliderGrp -label "Relax End Frame:"    -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmRelaxUpdate sliderRelax;
+         intSliderGrp -label "Ready End Frame"     -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmReadyUpdate "sliderReady";
+         intSliderGrp -label "Stroke Start Frame:" -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmStrokeStartUpdate "sliderStrokeStart";
+         intSliderGrp -label "Emphasis Frame:"     -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmEmphasisUpdate "sliderEmphasis";
+         intSliderGrp -label "Stroke End Frame:"   -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmStrokeUpdate "sliderStrokeEnd";
+         intSliderGrp -label "Relax End Frame:"    -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmRelaxUpdate "sliderRelax";
          setParent skmMainWin;
    frameLayout -label "Export Setup" -borderStyle etchedIn -collapsable false -collapse 0;
       columnLayout -adjustableColumn true;
