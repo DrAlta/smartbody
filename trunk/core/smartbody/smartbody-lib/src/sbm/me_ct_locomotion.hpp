@@ -260,6 +260,8 @@ public:
 
 	SrVec calc_rotational_displacement();
 
+	void set_target_height_displacement(float displacement);
+
 	void print_info(char* name);
 };
 

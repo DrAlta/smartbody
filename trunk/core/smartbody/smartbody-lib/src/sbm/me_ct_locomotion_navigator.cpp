@@ -42,6 +42,9 @@ MeCtLocomotionNavigator::MeCtLocomotionNavigator()
 	reached_destination = false;
 	destination_list.capacity(20);
 	speed_list.capacity(20);
+	target_height_displacement = 0.0f;
+	prev_height_displacement = 0.0f;
+	curr_height_displacement = 0.0f;
 }
 
 /** Destructor */
@@ -165,6 +168,7 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeFrameData
 	world_rot.set( buffer[ bi_world_rot ], buffer[ bi_world_rot+1 ], buffer[ bi_world_rot+2 ], buffer[ bi_world_rot+3 ] );
 	base_pos.set ( buffer[ bi_base_x ], buffer[ bi_base_y ], buffer[ bi_base_z ] );
 
+	//printf("\n(%f, %f, %f)", world_pos.x, world_pos.y, world_pos.z);
 	//world_pos.y = 0.0f;
 	SrQuat t_world_rot;
 	mat.roty(pre_facing_angle);
@@ -316,7 +320,8 @@ void MeCtLocomotionNavigator::set_reached_destination(MeFrameData& frame)
 void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtLocomotionLimb* limb, bool reset) 
 {
 	//if(reached_destination) return;
-	
+	prev_height_displacement = curr_height_displacement;
+
 	SrBuffer<float>& buffer = frame.buffer();
 	if(reset)
 	{
@@ -325,8 +330,11 @@ void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtL
 		buffer[ bi_world_z ] = 0.0f;
 	}
 
+	curr_height_displacement = target_height_displacement * standing_factor;
+
+
 	buffer[ bi_world_x ] = displacement.x + world_pos.x;
-	buffer[ bi_world_y ] = displacement.y + world_pos.y;
+	buffer[ bi_world_y ] = displacement.y + world_pos.y + curr_height_displacement - prev_height_displacement;
 	buffer[ bi_world_z ] = displacement.z + world_pos.z;
 
 	SrMat mat;

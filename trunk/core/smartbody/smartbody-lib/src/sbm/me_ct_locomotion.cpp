@@ -50,7 +50,7 @@ MeCtLocomotion::MeCtLocomotion() {
 	reset = false;
 	dis_initialized = false;
 	initialized = false;
-	ik_enabled = false;
+	ik_enabled = true;
 	enabled = false;
 	joints_indexed = false;
 	base_name = NULL;
@@ -60,6 +60,7 @@ MeCtLocomotion::MeCtLocomotion() {
 	r_blended_base_height = 0.0f;
 	style = 0;
 	motion_time = -1.0f;
+	
 }
 
 /** Destructor */
@@ -259,7 +260,8 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	SrBuffer<float>& buffer = frame.buffer(); // convenience reference
 	navigator.controller_evaluate(delta_time, frame);
 	//if the character is stopped, locomotion controller will not take computational time.
-	if(navigator.check_stopped(&limb_list)) return true;
+	//if(navigator.check_stopped(&limb_list)) 
+		//return true;
 	
 	float inc_frame;
 	inc_frame = (float)(delta_time/0.03333333f);
@@ -701,12 +703,11 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 
 	blend_base_joint(frame, limb_list.get(0)->space_time, r_anim1_index_dominant, r_anim2_index_dominant, dom_ratio);
 
-	//printf("\nstanding_ratio: %f", navigator.standing_factor);
 	update_nonlimb_mat();
 
 	update_pos();
 
-	//if(ik_enabled) get_IK();
+	if(ik_enabled) get_IK();
 }
 
 void MeCtLocomotion::blend_standing(MeFrameData& frame)
@@ -790,13 +791,19 @@ void MeCtLocomotion::update_nonlimb_mat(SkJoint* joint, SrMat* mat)
 	}
 }
 
+void MeCtLocomotion::set_target_height_displacement(float displacement)
+{
+	navigator.target_height_displacement = displacement;
+}
+
 void MeCtLocomotion::get_IK()
 {
+	if(navigator.target_height_displacement == 0.0f) return;
 	MeCtIKScenario* ik_scenario = NULL;
 	MeCtIKScenarioJointInfo* info = NULL;
 	SkJoint* tjoint = walking_skeleton->search_joint(base_name);
 	SrMat pmat = get_lmat(tjoint, &navigator.base_rot);
-	float* ppos = pmat.pt(12);
+	//float* ppos = pmat.pt(12);
 
 	//ppos[0] = navigator.base_offset.x;
 	//ppos[1] = navigator.base_offset.y;
@@ -807,15 +814,19 @@ void MeCtLocomotion::get_IK()
 		ik_scenario = &(limb_list.get(i)->ik);
 
 		//temp...............
-		ik_scenario->joint_info_list.get(2).constraint.ball.max = 3.14159265f/4.0f;
+		//ik_scenario->joint_info_list.get(2).constraint.ball.max = 3.14159265f/4.0f;
 		//temp...............
 
-		ik_scenario->mat = pmat;
+		SkJoint* tjoint = walking_skeleton->search_joint(limb_list.get(i)->get_limb_base_name());
+		int parent_ind = nonlimb_joint_info.get_index_by_name(tjoint->parent()->name().get_string());
+		ik_scenario->mat = nonlimb_joint_info.mat.get(parent_ind);
+		//ik_scenario->mat = pmat;
 		ik_scenario->start_joint = &(ik_scenario->joint_info_list.get(0));
 		ik_scenario->end_joint = &(ik_scenario->joint_info_list.get(ik_scenario->joint_info_list.size()-1));
 		ik_scenario->set_plane_normal(SrVec(0.0f, 1.0f, 0.0f));
-		if(i == 0) ik_scenario->plane_point = SrVec(0.0f, 20.0f, 0.0f);
-		else ik_scenario->plane_point = SrVec(0.0f, 40.0f, 00.0f);
+		//if(i == 0) ik_scenario->plane_point = SrVec(0.0f, 20.0f-target_height_displacement, 0.0f);
+		//else ik_scenario->plane_point = SrVec(0.0f, 40.0f-target_height_displacement, 00.0f);
+		ik_scenario->plane_point = SrVec(0.0f, -navigator.target_height_displacement*navigator.standing_factor, 00.0f);
 		ik_scenario->quat_list = limb_list.get(i)->limb_joint_info.quat;
 		for(int j = 0; j < ik_scenario->joint_info_list.size(); ++j)
 		{
@@ -1015,7 +1026,7 @@ void MeCtLocomotion::update_pos()
 		}
 		else
 		{
-			printf("\nsum = 0");
+			LOG("No limb touches the ground");
 		}
 	}
 	else dis_initialized = true;

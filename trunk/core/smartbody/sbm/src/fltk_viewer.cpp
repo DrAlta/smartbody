@@ -862,6 +862,159 @@ static float z_spd = 70;
 static char t_direction[200];
 static char character[100];
 static int char_index = 0;
+static int mode = 0;
+static float height_disp = 0.0f;
+static float height_disp_delta = 1.0f;
+static bool height_disp_inc = false;
+static bool height_disp_dec = false;
+static bool upkey = false;
+static bool downkey = false;
+static bool leftkey = false;
+static bool rightkey = false;
+
+static void translate_keyboard_state()
+{
+	bool locomotion_cmd = false;
+	char cmd[300];
+	cmd[0] = '\0';
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	if(x_flag == 0 && z_flag == 0)
+	{
+		rps_flag = 0;
+		z_flag = 1;
+		x_flag = 0;
+		spd = z_spd;
+		sprintf(t_direction, "forward ");
+	}
+
+	SbmCharacter* actor = NULL;
+	mcu.character_map.reset();
+	for(int i = 0; i <= char_index; ++i)
+	{
+		actor = mcu.character_map.next();
+		sprintf(character, "char %s ", actor->name);
+	}
+
+	sprintf(cmd, "test loco ");
+
+
+	if(fltk::get_key_state('r'))
+	{
+		height_disp += height_disp_delta;
+		if(height_disp > 0.0f) height_disp = 0.0f;
+		actor->get_locomotion_ct()->set_target_height_displacement(height_disp);
+	}
+	if(fltk::get_key_state('f'))
+	{
+		height_disp -= height_disp_delta;
+		if(height_disp < -50.0f) height_disp = -50.0f;
+		actor->get_locomotion_ct()->set_target_height_displacement(height_disp);
+	}
+	if(fltk::get_key_state('x'))
+	{
+		++char_index;
+		if(char_index >= mcu.character_map.get_num_entries())
+		{
+			char_index = 0;
+		}
+	}
+
+	if(fltk::get_key_state('w'))
+	{
+		if(z_flag != 0) z_spd += 10;
+		else if(x_flag != 0) x_spd += 1;
+	}
+	if(fltk::get_key_state('s'))
+	{
+		if(z_flag != 0) z_spd -= 10;
+		else if(x_flag != 0) x_spd -= 1;
+		if(z_spd < 0) z_spd = 0;
+		if(x_spd < 0) x_spd = 0;
+	}
+
+	//direction control
+	if(fltk::get_key_state(fltk::UpKey) 
+		|| fltk::get_key_state(fltk::DownKey)
+		|| fltk::get_key_state(fltk::RightKey)
+		|| fltk::get_key_state(fltk::LeftKey))
+	{
+		locomotion_cmd = true;
+	}
+	if(fltk::get_key_state(fltk::UpKey))
+	{
+		if(!upkey)
+		{
+			rps_flag = 0;
+			z_flag = 1;
+			x_flag = 0;
+			spd = z_spd;
+			mode = 0;
+			sprintf(t_direction, "forward ");
+			upkey = true;
+		}
+	}
+	else
+	{
+		upkey = false;
+	}
+	if(fltk::get_key_state(fltk::DownKey))
+	{
+		if(!downkey)
+		{
+			z_flag = -1;
+			x_flag = 0;
+			rps_flag = 0;
+			spd = z_spd;
+			mode = 0;
+			sprintf(t_direction, "backward ");
+			downkey = true;
+		}
+	}
+	else
+	{
+		downkey = false;
+	}
+	if(fltk::get_key_state(fltk::LeftKey))
+	{
+		if(!leftkey)
+		{
+			rps_flag = -1;
+			leftkey = true;
+		}
+	}
+	else
+	{
+		leftkey = false;
+	}
+	if(fltk::get_key_state(fltk::RightKey))
+	{
+		if(!rightkey)
+		{
+			rps_flag = 1;
+			rightkey = true;
+		}
+	}
+	else
+	{
+		rightkey = false;
+	}
+
+	char tt[200];
+	strcat(cmd, character);
+	strcat(cmd, t_direction);
+	//sprintf(tt, "spd %f rps %f time 0.5", spd, rps_flag * rps);
+
+	if(mode == 0) sprintf(tt, "spd 0 rps %f time 0.7", rps_flag * rps);
+	else sprintf(tt, "spd 0 lrps %f angle 3.14159265 time 1.0", rps_flag * rps);
+
+	if(locomotion_cmd) 
+	{
+		strcat(cmd, tt);
+		//printf("\n%s", cmd);
+		mcu.execute(cmd);
+	}
+}
 
 static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h)
 {
@@ -988,6 +1141,8 @@ int FltkViewer::handle ( int event )
    SrEvent &e = _data->event;
    e.type = SrEvent::None;
 
+   translate_keyboard_state();
+
    switch ( event )
    { case fltk::PUSH:
        { //SR_TRACE1 ( "Mouse Push : but="<<fltk::event_button()<<" ("<<fltk::event_x()<<", "<<fltk::event_y()<<")" <<" Ctrl:"<<fltk::event_state(FL_CTRL) );
@@ -1020,7 +1175,7 @@ int FltkViewer::handle ( int event )
 
 	  case fltk::KEY:
         //SR_TRACE1 ( "Key Pressed : "<< fltk::event_key() <<" "<<fltk::event_text() );
-        translate_keyboard_event ( e, SrEvent::Keyboard, w(), h());
+        //translate_keyboard_event ( e, SrEvent::Keyboard, w(), h());
         break;
 
 //      case fltk::KEYBOARD:

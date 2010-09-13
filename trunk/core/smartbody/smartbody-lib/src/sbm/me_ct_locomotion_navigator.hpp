@@ -48,6 +48,10 @@ public:
 	bool has_destination;
 	bool reached_destination;
 
+	float target_height_displacement;
+	float curr_height_displacement;
+	float prev_height_displacement;
+
 protected:
 	int bi_world_x, bi_world_y, bi_world_z, bi_world_rot; // World offset position and rotation
 	int bi_loco_vel_x, bi_loco_vel_y, bi_loco_vel_z;      // Locomotion velocity

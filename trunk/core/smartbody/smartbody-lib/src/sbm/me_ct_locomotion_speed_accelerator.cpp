@@ -95,6 +95,7 @@ void MeCtLocomotionSpeedAccelerator::set_target_speed(float target_speed)
 	if(target_speed > speed_limit) target_speed = speed_limit;
 	this->target_speed = target_speed;
 	if((target_speed - curr_speed)*acceleration < 0.0f) acceleration = -acceleration;
+
 }
 
 float MeCtLocomotionSpeedAccelerator::get_target_speed()
