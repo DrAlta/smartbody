@@ -314,19 +314,19 @@ proc skmCheckAndWriteKey( int $fileid, string $names[], string $type, int $frame
 
    int $id = skmSearchType( $names, $type );
 
-   if ( $isFacial )
-   {
+   //if ( $isFacial )
+   //{
       $base = skmKeyVal( 0, $names[ $id ] );
-   }
+   //}
 
    if ( $id >= 0 )
    {
       float $val = skmKeyVal( $frame, $names[ $id ] );
 
-      if ( $isFacial )
-      {
+      //if ( $isFacial )
+      //{
          $val = $val - $base;  // Subtract value at reference frame
-      }
+      //}
 
       if ( $zeroChannelFlag != 0 )
          fprint $fileid ( " " + skmRound( $val ) );
