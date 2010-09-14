@@ -229,11 +229,13 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	void drawGrid();
 
 	int gridList;
-	float gridColor[3];
+	float gridColor[4];
 	float gridHighlightColor[3];
 	float gridSize;
 	float gridStep;
 
+	bool enable_shadow_projection;
+	
 	virtual void label_viewer(const char* str);
 	virtual void show_viewer();
 	virtual void hide_viewer();

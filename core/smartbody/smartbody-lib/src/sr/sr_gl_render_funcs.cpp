@@ -60,7 +60,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 
    if ( shape->material_is_overriden() ) fmsize=0; // model materials are ignored
   
-   glEnable ( GL_LIGHTING );
+//   glEnable ( GL_LIGHTING );
    glShadeModel ( GL_SMOOTH );
 
    if ( model.culling )
@@ -237,7 +237,7 @@ void SrGlRenderFuncs::render_box ( SrSnShapeBase* shape )
    glColor ( shape->material().diffuse );
    glMaterial ( shape->material() );
    glShadeModel ( GL_SMOOTH );
-   glEnable ( GL_LIGHTING );
+//   glEnable ( GL_LIGHTING );
    glEnable ( GL_CULL_FACE );
 
    switch ( shape->render_mode() )
@@ -297,7 +297,7 @@ void SrGlRenderFuncs::render_sphere ( SrSnShapeBase* shape )
 
    srRenderMode rm = shape->render_mode();
    glEnable ( GL_CULL_FACE );
-   glEnable ( GL_LIGHTING );
+//   glEnable ( GL_LIGHTING );
    glMaterial ( shape->material() );
 
    switch ( rm )
@@ -443,7 +443,7 @@ void SrGlRenderFuncs::render_cylinder ( SrSnShapeBase* shape )
 
    srRenderMode rm = shape->render_mode();
    glEnable ( GL_CULL_FACE );
-   glEnable ( GL_LIGHTING );
+//   glEnable ( GL_LIGHTING );
 
    glMaterial ( shape->material() );
 
