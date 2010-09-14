@@ -319,15 +319,18 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->helpbrowser = make_help_browser ();
    end();
 
-   gridColor[0] = .5;
-   gridColor[1] = .5;
-   gridColor[2] = .5;
+   gridColor[0] = 0.5;
+   gridColor[1] = 0.5;
+   gridColor[2] = 0.5;
+   gridColor[3] = 0.5;
    gridHighlightColor[0] = .0;
    gridHighlightColor[1] = .0;
    gridHighlightColor[2] = .0;
    gridSize = 200.0;
    gridStep = 20.0;
    gridList = -1;
+   
+   enable_shadow_projection = true;
  }
 
 FltkViewer::~FltkViewer ()
@@ -714,6 +717,58 @@ void FltkViewer::close_requested ()
 //   SPH->shape().radius = 0.6f;
 //   SPH->color ( SrColor::red );
 //   _data->render_action.apply ( SPH );
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+void MakeShadowMatrix( GLfloat points[3][3], GLfloat light[4], GLfloat matrix[4][4] )	{
+	GLfloat plane[ 2 ][ 3 ];
+    GLfloat coeff[4];
+    GLfloat dot;
+
+    // Find the plane equation coefficients
+    // Find the first three coefficients the same way we find a normal.
+//    calcNormal(points,planeCoeff);
+
+	plane[ 0 ][ 0 ] = points[ 1 ][ 0 ] - points[ 0 ][ 0 ];
+	plane[ 0 ][ 1 ] = points[ 1 ][ 1 ] - points[ 0 ][ 1 ];
+	plane[ 0 ][ 2 ] = points[ 1 ][ 2 ] - points[ 0 ][ 2 ];
+	plane[ 1 ][ 0 ] = points[ 2 ][ 0 ] - points[ 1 ][ 0 ];
+	plane[ 1 ][ 1 ] = points[ 2 ][ 1 ] - points[ 1 ][ 1 ];
+	plane[ 1 ][ 2 ] = points[ 2 ][ 2 ] - points[ 1 ][ 2 ];
+	
+	coeff[ 0 ] = plane[ 0 ][ 1 ] * plane[ 1 ][ 2 ] - plane[ 0 ][ 2 ] * plane[ 1 ][ 1 ];
+	coeff[ 1 ] = plane[ 0 ][ 2 ] * plane[ 1 ][ 0 ] - plane[ 0 ][ 0 ] * plane[ 1 ][ 2 ];
+	coeff[ 2 ] = plane[ 0 ][ 0 ] * plane[ 1 ][ 1 ] - plane[ 0 ][ 1 ] * plane[ 1 ][ 0 ];
+
+    // Find the last coefficient by back substitutions
+    coeff[3] = -( ( coeff[ 0 ] * points[ 2 ][ 0 ] ) + ( coeff[ 1 ] * points[ 2 ][ 1 ] ) + ( coeff[ 2 ] * points[ 2 ][ 2 ] ) );
+
+    // Dot product of plane and light position
+    dot = coeff[0] * light[0] + coeff[1] * light[1] + coeff[2] * light[2] + coeff[3] * light[3];
+
+    matrix[0][0] = dot - light[0] * coeff[0];
+    matrix[1][0] = 0.0f - light[0] * coeff[1];
+    matrix[2][0] = 0.0f - light[0] * coeff[2];
+    matrix[3][0] = 0.0f - light[0] * coeff[3];
+
+    matrix[0][1] = 0.0f - light[1] * coeff[0];
+    matrix[1][1] = dot - light[1] * coeff[1];
+    matrix[2][1] = 0.0f - light[1] * coeff[2];
+    matrix[3][1] = 0.0f - light[1] * coeff[3];
+
+    matrix[0][2] = 0.0f - light[2] * coeff[0];
+    matrix[1][2] = 0.0f - light[2] * coeff[1];
+    matrix[2][2] = dot - light[2] * coeff[2];
+    matrix[3][2] = 0.0f - light[2] * coeff[3];
+
+    matrix[0][3] = 0.0f - light[3] * coeff[0];
+    matrix[1][3] = 0.0f - light[3] * coeff[1];
+    matrix[2][3] = 0.0f - light[3] * coeff[2];
+    matrix[3][3] = dot - light[3] * coeff[3];
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+
    
 void FltkViewer::draw() 
  {
@@ -724,10 +779,13 @@ void FltkViewer::draw()
    SrCamera &cam  = _data->camera;
    SrMat mat ( SrMat::NotInitialized );
 
-	light.directional = false;
+//	light.directional = false;
+	light.directional = true;
 //   light.position = cam.eye;
 	light.diffuse = SrColor( 1.0f, 0.95f, 0.8f );
-	light.position = SrVec( -200.0, 300.0, 400.0 );
+//	light.position = SrVec( -200.0, 300.0, 400.0 );
+//	light.position = SrVec( 200.0, 300.0, 400.0 );
+	light.position = SrVec( 100.0, 250.0, 400.0 );
 	light.constant_attenuation = 1.0f/cam.scale;
 
 	SrLight light2;
@@ -752,11 +810,6 @@ void FltkViewer::draw()
 
 //   glRotate ( _model_rotation );
 
-   // draw the grid
-   if (gridList == -1)
-	   initGridList();
-   drawGrid();
-
    //----- Render user scene -------------------------------------------
 
 	_data->fcounter.start();
@@ -765,25 +818,56 @@ void FltkViewer::draw()
 
 	if( _data->root )	{
 
+		glEnable ( GL_LIGHTING );
 		glLight ( 0, light );
 		glLight ( 1, light2 );
 
 		_data->render_action.apply ( _data->root );
 
-#if 0
-		glPushMatrix();
-	
-			glScalef( 1.0f, 0.5f, 1.0f );
-			glTranslatef( 0.0f, 0.0f, -100.0f );
-		
-			glLight ( 0, light );
-			glLight ( 1, light2 );
+		glDisable( GL_LIGHTING );
 
-			_data->render_action.apply ( _data->root );
-	
-		glPopMatrix();
-#endif
+		if( enable_shadow_projection )	{
+			GLfloat shadow_plane_points[3][3] = {
+				{ 0.0, 0.0, 0.0 }, 
+				{ 1.0, 0.0, 0.0 }, 
+				{ 1.0, 0.0, -1.0 }
+			};
+			GLfloat shadow_light_pos[4];
+			GLfloat shadow_matrix[4][4];
+
+
+			shadow_light_pos[ 0 ] = light2.position.x;
+			shadow_light_pos[ 1 ] = light2.position.y;
+			shadow_light_pos[ 2 ] = light2.position.z;
+			shadow_light_pos[ 3 ] = light2.directional ? 0.0f : 1.0f;
+
+			MakeShadowMatrix( shadow_plane_points, shadow_light_pos, shadow_matrix );
+			glPushMatrix();
+		    	glMultMatrixf( (GLfloat *)shadow_matrix );
+				glColor3f( 0.6f, 0.57f, 0.53f );
+				_data->render_action.apply ( _data->root );
+			glPopMatrix();
+
+			shadow_light_pos[ 0 ] = light.position.x;
+			shadow_light_pos[ 1 ] = light.position.y;
+			shadow_light_pos[ 2 ] = light.position.z;
+			shadow_light_pos[ 3 ] = light.directional ? 0.0f : 1.0f;
+
+			MakeShadowMatrix( shadow_plane_points, shadow_light_pos, shadow_matrix );
+			glPushMatrix();
+				glTranslatef( 0.0, 0.25, 0.0 );
+		    	glMultMatrixf( (GLfloat *)shadow_matrix );
+				glColor3f( 0.4f, 0.45f, 0.55f );
+				_data->render_action.apply ( _data->root );
+			glPopMatrix();
+		}
 	}
+
+   // draw the grid
+//   if (gridList == -1)
+//	   initGridList();
+   drawGrid();
+
 	_data->fcounter.stop();
 
    if ( _data->message.len() )
@@ -1495,13 +1579,20 @@ void FltkViewer::initGridList()
 
 void FltkViewer::drawGrid()
 {
+//	if( gridList != -1 )	{
+//		glCallList( gridList );
+//		return;
+//	}
+
+	GLfloat floor_height = 0.5f;
+
 	glPushAttrib(GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT);
 	bool colorChanged = false;
 	glDisable(GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
     glDisable(GL_COLOR_MATERIAL);
 
-	glColor3f(gridColor[0], gridColor[1], gridColor[2]);			
+	glColor4f(gridColor[0], gridColor[1], gridColor[2], gridColor[3]);
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1513,14 +1604,14 @@ void FltkViewer::drawGrid()
 	{
 		if (x == 0.0) {
 			colorChanged = true;
-			glColor3f(gridHighlightColor[0], gridHighlightColor[1], gridHighlightColor[2]);
+			glColor4f(gridHighlightColor[0], gridHighlightColor[1], gridHighlightColor[2], 1.0f);
 		}
-		glVertex3f(x, 0.0, -gridSize);
-		glVertex3f(x, 0.0, gridSize);
+		glVertex3f(x, floor_height, -gridSize);
+		glVertex3f(x, floor_height, gridSize);
 		
 		if (colorChanged) {
 			colorChanged = false;
-			glColor3f(gridColor[0], gridColor[1], gridColor[2]);
+			glColor4f(gridColor[0], gridColor[1], gridColor[2], gridColor[3]);
 		}
 
 	}
@@ -1528,13 +1619,13 @@ void FltkViewer::drawGrid()
 	{
 		if (x == 0) {
 			colorChanged = true;
-			glColor3f(gridHighlightColor[0], gridHighlightColor[1], gridHighlightColor[2]);
+			glColor4f(gridHighlightColor[0], gridHighlightColor[1], gridHighlightColor[2], 1.0f );
 		}
-		glVertex3f(-gridSize, 0.0, x);
-		glVertex3f(gridSize, 0.0, x);
+		glVertex3f(-gridSize, floor_height, x);
+		glVertex3f(gridSize, floor_height, x);
 		if (colorChanged) {
 			colorChanged = false;
-			glColor3f(gridColor[0], gridColor[1], gridColor[2]);
+			glColor4f(gridColor[0], gridColor[1], gridColor[2], gridColor[3]);
 		}
 	}
 
