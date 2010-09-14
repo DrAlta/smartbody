@@ -136,6 +136,10 @@ static Fl_Menu_Item MenuTable[] =
          { "&lines",   0, MCB, CMD(CmdLines),   FL_MENU_RADIO },
          { "&points",  0, MCB, CMD(CmdPoints),  FL_MENU_RADIO },
          { 0 },
+	{ "&shadows", 0, 0, 0, FL_SUBMENU },
+         { "&no shadows",   0, MCB, CMD(CmdNoShadows),    FL_MENU_RADIO },
+         { "&shadows",  0, MCB, CMD(CmdShadows),  FL_MENU_RADIO },
+         { 0 },
   { "&characters", 0, 0, 0, FL_SUBMENU },
          { "&geometry", 0, MCB, CMD(CmdCharacterShowGeometry), FL_MENU_RADIO },
          { "&collision geometry", 0, MCB, CMD(CmdCharacterShowCollisionGeometry),   FL_MENU_RADIO },
@@ -223,6 +227,7 @@ class FltkViewerData
    FltkViewer::ViewMode viewmode;     // viewer mode, initially Examiner
    FltkViewer::RenderMode rendermode; // render mode
    FltkViewer::CharacterMode charactermode; // render mode
+   FltkViewer::ShadowMode shadowmode;     // viewer mode, initially Examiner
 
 
    bool iconized;      // to stop processing while the window is iconized
@@ -287,6 +292,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->viewmode = ModeExaminer;
    _data->rendermode = ModeAsIs;
    _data->charactermode = ModeShowGeometry;
+   _data->shadowmode = ModeShadows;
 
    _data->iconized    = false;
    _data->spinning    = false;
@@ -329,8 +335,6 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    gridSize = 200.0;
    gridStep = 20.0;
    gridList = -1;
-   
-   enable_shadow_projection = true;
  }
 
 FltkViewer::~FltkViewer ()
@@ -409,7 +413,10 @@ void FltkViewer::menu_cmd ( MenuCmd s )
       case CmdAxis : SR_SWAPB(_data->displayaxis); 
                      if ( _data->displayaxis ) update_axis();
                      break;
-
+	  case CmdShadows  : _data->shadowmode = ModeShadows;             
+                       break;
+      case CmdNoShadows : _data->shadowmode = ModeNoShadows;
+                       break;
       case CmdBoundingBox : SR_SWAPB(_data->boundingbox); 
                             if ( _data->boundingbox ) update_bbox();
                             break;
@@ -491,6 +498,8 @@ bool FltkViewer::menu_cmd_activated ( MenuCmd c )
       case CmdFlat     : return _data->rendermode==ModeFlat? true:false;
       case CmdLines    : return _data->rendermode==ModeLines? true:false;
       case CmdPoints   : return _data->rendermode==ModePoints? true:false;
+      case CmdShadows   : return _data->shadowmode==ModeShadows? true:false;
+      case CmdNoShadows   : return _data->shadowmode==ModeNoShadows? true:false;
 
       case CmdAxis        : return _data->displayaxis? true:false;
       case CmdBoundingBox : return _data->boundingbox? true:false;
@@ -806,9 +815,14 @@ void FltkViewer::draw()
    //----- Set Visualisation -------------------------------------------
    glMatrixMode ( GL_MODELVIEW );
    glLoadMatrix ( cam.get_view_mat(mat) );
+
    glScalef ( cam.scale, cam.scale, cam.scale );
 
 //   glRotate ( _model_rotation );
+
+   // draw the heightfield/terrain
+   glDisable(GL_LIGHTING);
+   //_heightField->render();
 
    //----- Render user scene -------------------------------------------
 
@@ -824,9 +838,10 @@ void FltkViewer::draw()
 
 		_data->render_action.apply ( _data->root );
 
-		glDisable( GL_LIGHTING );
+			glDisable( GL_LIGHTING );
 
-		if( enable_shadow_projection )	{
+		if (_data->shadowmode == ModeShadows)
+		{
 			GLfloat shadow_plane_points[3][3] = {
 				{ 0.0, 0.0, 0.0 }, 
 				{ 1.0, 0.0, 0.0 }, 
@@ -843,7 +858,7 @@ void FltkViewer::draw()
 
 			MakeShadowMatrix( shadow_plane_points, shadow_light_pos, shadow_matrix );
 			glPushMatrix();
-		    	glMultMatrixf( (GLfloat *)shadow_matrix );
+    			glMultMatrixf( (GLfloat *)shadow_matrix );
 				glColor3f( 0.6f, 0.57f, 0.53f );
 				_data->render_action.apply ( _data->root );
 			glPopMatrix();
@@ -856,7 +871,7 @@ void FltkViewer::draw()
 			MakeShadowMatrix( shadow_plane_points, shadow_light_pos, shadow_matrix );
 			glPushMatrix();
 				glTranslatef( 0.0, 0.25, 0.0 );
-		    	glMultMatrixf( (GLfloat *)shadow_matrix );
+    			glMultMatrixf( (GLfloat *)shadow_matrix );
 				glColor3f( 0.4f, 0.45f, 0.55f );
 				_data->render_action.apply ( _data->root );
 			glPopMatrix();

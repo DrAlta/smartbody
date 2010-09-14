@@ -32,6 +32,7 @@
 # include <sr/sr_viewer.h>
 # include <sr/sr_color.h>
 
+
 class SrQuat;
 class SrEvent;
 class SrCamera;
@@ -62,6 +63,11 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
                       ModeLines,
                       ModePoints
                     };
+
+	enum ShadowMode { ModeNoShadows,
+					  ModeShadows
+                };
+
 	enum CharacterMode { ModeShowGeometry,
                       ModeShowCollisionGeometry,
                       ModeShowBones,
@@ -80,6 +86,8 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
                    CmdLines,
                    CmdPoints,
                    CmdAxis,
+				   CmdNoShadows,
+				   CmdShadows,
                    CmdBoundingBox,
                    CmdStatistics,
                    CmdSpinAnim,
@@ -233,13 +241,10 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	float gridHighlightColor[3];
 	float gridSize;
 	float gridStep;
-
-	bool enable_shadow_projection;
 	
 	virtual void label_viewer(const char* str);
 	virtual void show_viewer();
 	virtual void hide_viewer();
-
  };
 
 
