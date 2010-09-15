@@ -1149,6 +1149,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\Heightfield.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\Heightfield.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\joint_logger.cpp"
 				>
 			</File>

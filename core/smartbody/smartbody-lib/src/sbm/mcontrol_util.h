@@ -72,6 +72,7 @@ class mcuCBHandle;
 #include "me_ct_lilt_try.h"
 #include "time_regulator.h"
 #include "time_profiler.h"
+#include "Heightfield.h"
 
 #include "joint_logger.hpp"
 #include "ResourceManager.h"
@@ -156,6 +157,8 @@ class mcuCBHandle	{
 		BMLViewerFactory *bmlviewer_factory;
 		SrCamera	*camera_p;
 		SrSnGroup	*root_group_p;
+		
+		Heightfield *height_field_p;
 		
 		srPathList	seq_paths;
 		srPathList	me_paths;
@@ -281,6 +284,23 @@ class mcuCBHandle	{
 		int add_scene( SrSnGroup *scene_p );
 		int remove_scene( SrSnGroup *scene_p );
 		void render( void )	{ if( viewer_p ) { viewer_p->render(); } }
+		
+		void render_terrain( void ) {
+			if( height_field_p )	{
+				height_field_p->render();
+			}
+		}
+		float query_terrain( float x, float z, float *normal_p )	{
+			if( height_field_p )	{
+				return( height_field_p->get_elevation( x, z, normal_p ) );
+			}
+			if( normal_p )	{
+				normal_p[ 0 ] = 0.0;
+				normal_p[ 1 ] = 1.0;
+				normal_p[ 2 ] = 0.0;
+			}
+			return( 0.0 );
+		}
 		
 		void update( void );
 		int insert( char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp, char* description = NULL )	{
