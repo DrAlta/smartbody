@@ -40,6 +40,16 @@ Heightfield::~Heightfield()
 	delete _header;
 	if (_imageData)
 		delete [] _imageData;
+		
+	if( vertex_arr )	{
+		delete [] vertex_arr;
+	}
+	if( normal_arr )	{
+		delete [] normal_arr;
+	}
+	if( color_arr )	{
+		delete [] color_arr;
+	}
 }
 
 void Heightfield::load(char* filename)
