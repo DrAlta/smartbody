@@ -65,10 +65,16 @@ void Heightfield::load(char* filename)
 void Heightfield::render( void )	{
 
 	if( vertex_arr )	{
+	
+		if( normal_arr == NULL )	{
+			load_normals();
+		}
+	
 		glPushMatrix();
 		glTranslatef( mesh_origin[ 0 ], mesh_origin[ 1 ], mesh_origin[ 2 ] );
 		glScalef( mesh_scale[ 0 ], mesh_scale[ 1 ], mesh_scale[ 2 ] );
 
+#if 0
 		for( int j = 0; j < mesh_resz - 1; j++ )	{
 
 			glBegin( GL_TRIANGLE_STRIP );
@@ -92,8 +98,79 @@ void Heightfield::render( void )	{
 			}
 			glEnd();
 		}
+
+#else
+		int norm_index = 0;
+		glBegin( GL_TRIANGLES );
+//	glColor3ub( 127, 127, 127 );
+		for( int j = 0; j < mesh_resz - 1; j++ )	{
+		
+			for( int i = 0; i < mesh_resx - 1; i++ )	{
+			
+				glNormal3fv( normal_arr + norm_index );
+				int index = ( j * mesh_resx + i ) * 3;
+				glColor3ubv( color_arr + index );
+				glVertex3fv( vertex_arr + index );
+
+				index = ( ( j + 1 ) * mesh_resx + i ) * 3;
+				glColor3ubv( color_arr + index );
+				glVertex3fv( vertex_arr + index );
+
+				index = ( j * mesh_resx + i + 1 ) * 3;
+				glColor3ubv( color_arr + index );
+				glVertex3fv( vertex_arr + index );
+
+				norm_index += 3;
+
+				glNormal3fv( normal_arr + norm_index );
+				index = ( j * mesh_resx + i + 1 ) * 3;
+				glColor3ubv( color_arr + index );
+				glVertex3fv( vertex_arr + index );
+
+				index = ( ( j + 1 ) * mesh_resx + i ) * 3;
+				glColor3ubv( color_arr + index );
+				glVertex3fv( vertex_arr + index );
+
+				index = ( ( j + 1 ) * mesh_resx + i + 1 ) * 3;
+				glColor3ubv( color_arr + index );
+				glVertex3fv( vertex_arr + index );
+
+				norm_index += 3;
+			}
+		}
+		glEnd();
+#endif
+
 		glPopMatrix();
 	}
+}
+
+void Heightfield::normalize_arr3( float V[ 3 ] ) {
+
+	float len = sqrt( V[ 0 ] * V[ 0 ] + V[ 1 ] * V[ 1 ] + V[ 2 ] * V[ 2 ] );
+	V[ 0 ] /= len;
+	V[ 1 ] /= len;
+	V[ 2 ] /= len;
+}
+
+void Heightfield::calc_normal( float *N_out, float *A, float *B, float *C, float *S )	{
+
+	float v0[ 3 ];
+	v0[ 0 ] = ( B[ 0 ] - A[ 0 ] ) * S[ 0 ];
+	v0[ 1 ] = ( B[ 1 ] - A[ 1 ] ) * S[ 1 ];
+	v0[ 2 ] = ( B[ 2 ] - A[ 2 ] ) * S[ 2 ];
+	normalize_arr3( v0 );
+	
+	float v1[ 3 ];
+	v1[ 0 ] = ( C[ 0 ] - B[ 0 ] ) * S[ 0 ];
+	v1[ 1 ] = ( C[ 1 ] - B[ 1 ] ) * S[ 1 ];
+	v1[ 2 ] = ( C[ 2 ] - B[ 2 ] ) * S[ 2 ];
+	normalize_arr3( v1 );
+	
+	N_out[ 0 ] = v0[ 1 ] * v1[ 2 ] - v0[ 2 ] * v1[ 1 ];
+	N_out[ 1 ] = v0[ 2 ] * v1[ 0 ] - v0[ 0 ] * v1[ 2 ];
+	N_out[ 2 ] = v0[ 0 ] * v1[ 1 ] - v0[ 1 ] * v1[ 0 ];
+	normalize_arr3( N_out );
 }
 
 void Heightfield::initializeTerrain(unsigned char* terrain)
@@ -109,7 +186,6 @@ void Heightfield::initializeTerrain(unsigned char* terrain)
 #endif
 
 	vertex_arr = new float[ image_width * image_height * 3 ];
-	normal_arr = new float[ image_width * image_height * 3 ];
 	color_arr = new unsigned char[ image_width * image_height * 3 ];
 
 	for( int j = 0; j < image_height; j++ )	{
@@ -130,32 +206,57 @@ void Heightfield::initializeTerrain(unsigned char* terrain)
 
 	mesh_resx = image_width;
 	mesh_resz = image_height;
+}
 
-#if 0
-	mesh_scale[ 0 ] = TERRAIN_SCALE;
-	mesh_scale[ 1 ] = ELEVATION_SCALE;
-	mesh_scale[ 2 ] = TERRAIN_SCALE;
+void Heightfield::load_normals( void )	{
 
-	mesh_origin[ 0 ] = -mesh_scale[ 0 ] * 0.5f;
-	mesh_origin[ 1 ] = 0.0f;
-	mesh_origin[ 2 ] = -mesh_scale[ 2 ] * 0.5f;
+	normal_arr = new float[ ( image_width - 1 ) * ( image_height - 1 ) * 2 * 3 ];
+	int norm_index = 0;
 
-	float center_elev = getHeight( 0.0f, 0.0f );
-	mesh_origin[ 1 ] = -center_elev;
-#endif
+	for( int j = 0; j < mesh_resz - 1; j++ )	{
+		for( int i = 0; i < mesh_resx - 1; i++ )	{
+			
+			int A_index = ( j * mesh_resx + i ) * 3;
+			int B_index = ( ( j + 1 ) * mesh_resx + i ) * 3;
+			int C_index = ( j * mesh_resx + i + 1 ) * 3;
+
+			calc_normal( 
+				normal_arr + norm_index,
+				vertex_arr + A_index,
+				vertex_arr + B_index,
+				vertex_arr + C_index,
+				mesh_scale
+			);
+			norm_index += 3;
+
+			A_index = ( j * mesh_resx + i + 1 ) * 3;
+			B_index = ( ( j + 1 ) * mesh_resx + i ) * 3;
+			C_index = ( ( j + 1 ) * mesh_resx + i + 1 ) * 3;
+			
+			calc_normal( 
+				normal_arr + norm_index,
+				vertex_arr + A_index,
+				vertex_arr + B_index,
+				vertex_arr + C_index,
+				mesh_scale
+			);
+			norm_index += 3;
+		}
+	}
 
 #if 0
 	for( int i = 0; i <= 10; i++ )	{
-//		float px = 0.0;
-//		float px = 1.0;
-		float px = (float)i/10.0;
+//		float px = 0.0f;
+//		float px = 1.0f;
+		float px = (float)i/10.0f;
 //		float px = 1.0f - (float)i/10.0f;
-//		float pz = 0.0;
-//		float pz = 1.0;
-		float pz = (float)i/10.0;
+//		float pz = 0.0f;
+//		float pz = 1.0f;
+		float pz = (float)i/10.0f;
 //		float pz = 1.0f - (float)i/10.0f;
-		float y = getHeight( px, pz );
-		printf( "%f %f : %f\n", px, pz, y );
+		float n[ 3 ];
+		float y = get_elevation( px, pz, n );
+		printf( "%f %f : %f : %f %f %f\n", px, pz, y, n[0], n[1], n[2] );
 	}
 #endif
 }
@@ -180,7 +281,7 @@ void Heightfield::set_auto_origin( void )	{
 	mesh_origin[ 1 ] = 0.0f;
 	mesh_origin[ 2 ] = -mesh_scale[ 2 ] * 0.5f;
 
-	float center_elev = getHeight( 0.0f, 0.0f );
+	float center_elev = get_elevation( 0.0f, 0.0f );
 	mesh_origin[ 1 ] = -center_elev;
 }
 
@@ -310,7 +411,7 @@ unsigned char* Heightfield::LoadBitmapFile(char *filename, BITMAPINFOHEADER * bi
 	return bitmapImage;
 }
 
-float Heightfield::getNHeight( int i, int j )	{
+float Heightfield::get_raw_elevation( int i, int j )	{
 
 	if( i < 0 ) return( 0.0f );
 	if( j < 0 ) return( 0.0f );
@@ -319,76 +420,74 @@ float Heightfield::getNHeight( int i, int j )	{
 	return( vertex_arr[ ( j * image_width + i ) * 3 + 1 ] );
 }
 
-float Heightfield::getHeight( float px, float pz )	{
+float Heightfield::get_elevation( float px, float pz, float *normal_p )	{
 
-//	float dnX = floorf( x / mesh_resx );
-//	float dnZ = floorf( z / mesh_resz );
+	if( vertex_arr )	{
 
-//    float dx = ( x - ( dnX * mesh_resx ) ) / mesh_resx;
-//    float dz = ( z - ( dnZ * mesh_resz ) ) / mesh_resz;
+		float nx = ( px - mesh_origin[ 0 ] ) / mesh_scale[ 0 ];
+		float nz = ( pz - mesh_origin[ 2 ] ) / mesh_scale[ 2 ];
 
-	float nx = ( px - mesh_origin[ 0 ] ) / mesh_scale[ 0 ];
-	float nz = ( pz - mesh_origin[ 2 ] ) / mesh_scale[ 2 ];
-	
-	float ix = nx * ( mesh_resx - 1 );
-	float iz = nz * ( mesh_resz - 1 );
-	
-	int i = (int) ix;
-	int j = (int) iz;
-	
-	float dx = ix - (float)i;
-	float dz = iz - (float)j;
-	
-    float y, y0;
+		if( ( nx < 0.0 )||( nz < 0.0 )||( nx >= 1.0 )||( nz >= 1.0 ) )	{
+			if( normal_p )	{
+				normal_p[ 0 ] = 0.0;
+				normal_p[ 1 ] = 1.0;
+				normal_p[ 2 ] = 0.0;
+			}
+			return( 0.0 );
+		}
 
-	if( ( dx + dz ) < 1.0f )	{
+		float ix = nx * ( mesh_resx - 1 );
+		float iz = nz * ( mesh_resz - 1 );
 
-		y0 = getNHeight( i, j );
-		y = y0 
-			+ ( getNHeight( i + 1, j ) - y0 ) * dx
-			+ ( getNHeight( i, j + 1 ) - y0 ) * dz;
+		int i = (int) ix;
+		int j = (int) iz;
+
+		float dx = ix - (float)i;
+		float dz = iz - (float)j;
+
+		float y, y0;
+
+		if( ( dx + dz ) < 1.0f )	{
+
+			y0 = get_raw_elevation( i, j );
+			y = y0 
+				+ ( get_raw_elevation( i + 1, j ) - y0 ) * dx
+				+ ( get_raw_elevation( i, j + 1 ) - y0 ) * dz;
+
+			if( normal_p )	{
+				int ni = ( ( j * ( mesh_resx - 1 ) + i ) * 2 ) * 3;
+				float *np = normal_arr + ni;
+				normal_p[ 0 ] = np[ 0 ];
+				normal_p[ 1 ] = np[ 1 ];
+				normal_p[ 2 ] = np[ 2 ];
+			}
+		}
+		else	{
+
+			y0 = get_raw_elevation( i + 1, j + 1 );
+			y = y0 
+				+ ( get_raw_elevation( i + 1, j ) - y0 ) * ( 1.0f - dz )
+				+ ( get_raw_elevation( i, j + 1 ) - y0 ) * ( 1.0f - dx );
+
+			if( normal_p )	{
+				int ni = ( ( j * ( mesh_resx - 1 ) + i ) * 2 + 1 ) * 3;
+				float *np = normal_arr + ni;
+				normal_p[ 0 ] = np[ 0 ];
+				normal_p[ 1 ] = np[ 1 ];
+				normal_p[ 2 ] = np[ 2 ];
+			}
+		}
+		
+		float py = y * mesh_scale[ 1 ] + mesh_origin[ 1 ];
+		return( py );
 	}
-	else	{
-	
-		y0 = getNHeight( i + 1, j + 1 );
-		y = y0 
-			+ ( getNHeight( i + 1, j ) - y0 ) * ( 1.0f - dz )
-			+ ( getNHeight( i, j + 1 ) - y0 ) * ( 1.0f - dx );
+	else
+	if( normal_p )	{
+		normal_p[ 0 ] = 0.0;
+		normal_p[ 1 ] = 1.0;
+		normal_p[ 2 ] = 0.0;
 	}
-	
-#if 0
-	float x = ( px - mesh_origin[ 0 ] ) / mesh_scale[ 0 ];
-	float z = ( pz - mesh_origin[ 2 ] ) / mesh_scale[ 2 ];
-
-	float dnX = floorf( x / ( mesh_resx - 1 ) );
-	float dnZ = floorf( z / ( mesh_resz - 1 ) );
-
-    float dx = ( x - ( dnX * ( mesh_resx - 1 ) ) ) / ( mesh_resx - 1 );
-    float dz = ( z - ( dnZ * ( mesh_resz - 1 ) ) ) / ( mesh_resz - 1 );
-
-    int nX = int( dnX );
-    int nZ = int( dnZ );
-
-    float y, y0;
-
-    if ( dx + dz <= 1.0f ) 
-    {
-        y0 = getNHeight( nX, nZ );
-
-        y = y0 + ( getNHeight( nX + 1, nZ ) - y0 ) * dx
-            + ( getNHeight( nX, nZ + 1 ) - y0 ) * dz;
-    }
-    else
-    {
-        y0 = getNHeight( nX + 1, nZ + 1 );
-
-        y = y0	+ ( getNHeight( nX + 1, nZ ) - y0 ) * ( 1.0f - dz ) +
-            ( getNHeight( nX, nZ + 1 ) - y0 ) * ( 1.0f - dx );
-    }
-#endif
-
-	float py = y * mesh_scale[ 1 ] + mesh_origin[ 1 ];
-    return( py );
+    return( 0.0 );
 }
 
 

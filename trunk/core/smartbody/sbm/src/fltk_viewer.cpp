@@ -59,7 +59,7 @@
 
 #include <sbm/mcontrol_util.h>
 #include "vhcl_log.h"
-#include "Heightfield.h"
+//#include "Heightfield.h"
 
 ////# define SR_USE_TRACE1  // basic fltk events
 ////# define SR_USE_TRACE2  // more fltk events
@@ -336,19 +336,6 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    gridSize = 200.0;
    gridStep = 20.0;
    gridList = -1;
-
-#if 0
-   _heightField = new Heightfield();
-
-   _heightField->load( "../../../../data/range1.e.bmp" );
-//   _heightField->load("c:/users/shapiro/smartbody/trunk/data/Terrain.bmp");
-//   _heightField->load("c:/users/shapiro/smartbody/trunk/data/blank.bmp");
-
-	_heightField->set_scale( 5000.0f, 500.0f, 5000.0f );
-	_heightField->set_auto_origin();
-#else
-	_heightField = NULL;
-#endif
 }
 
 FltkViewer::~FltkViewer ()
@@ -361,9 +348,6 @@ FltkViewer::~FltkViewer ()
    delete _data->scenebox;
    delete _data->sceneaxis;
    delete _data;
-
-	if( _heightField )
-	   delete _heightField;
  }
 
 SrSn *FltkViewer::root ()
@@ -801,6 +785,8 @@ void FltkViewer::draw()
    if ( !visible() ) return;
    if ( !valid() ) init_opengl ( w(), h() ); // valid() is turned on by fltk after draw() returns
 
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
    SrLight &light = _data->light;
    SrCamera &cam  = _data->camera;
    SrMat mat ( SrMat::NotInitialized );
@@ -818,7 +804,8 @@ void FltkViewer::draw()
 	light2 = light;
 	light2.diffuse = SrColor( 0.8f, 0.85f, 1.0f );
 //	light2.position = SrVec( 400.0, 600.0, -300.0 );
-	light2.position = SrVec( 200.0, 800.0, -300.0 );
+//	light2.position = SrVec( 200.0, 800.0, -300.0 );
+	light2.position = SrVec( 200.0, 500.0, -300.0 );
 
    //----- Clear Background --------------------------------------------
    glClearColor ( _data->bcolor );
@@ -835,21 +822,26 @@ void FltkViewer::draw()
 
    glScalef ( cam.scale, cam.scale, cam.scale );
 
-//   glRotate ( _model_rotation );
+	glEnable ( GL_LIGHTING );
+	glLight ( 0, light );
+	glLight ( 1, light2 );
 
-	if( _heightField )	{
-		_heightField->render();
-	}
+	static GLfloat mat_emissin[] = { 0.0,  0.0,    0.0,    1.0 };
+	static GLfloat mat_ambient[] = { 0.0,  0.0,    0.0,    1.0 };
+	static GLfloat mat_diffuse[] = { 1.0,  1.0,    1.0,    1.0 };
+	static GLfloat mat_speclar[] = { 0.0,  0.0,    0.0,    1.0 };
+	glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION, mat_emissin );
+	glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient );
+	glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse );
+	glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, mat_speclar );
+	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 0.0 );
+	glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
+	glEnable( GL_COLOR_MATERIAL );
+	glEnable( GL_NORMALIZE );
 
-#if 0
-		glDisable(GL_LIGHTING);
+	mcu.render_terrain();
 
-		static GLdouble plane_eq_floor[ 4 ] = { 0.0, 1.0, 0.0, 0.0 };
-		glClipPlane( GL_CLIP_PLANE0, plane_eq_floor );
-		glEnable( GL_CLIP_PLANE0 );
-
-		glDisable( GL_CLIP_PLANE0 );
-#endif
+	glDisable( GL_COLOR_MATERIAL );
 
    //----- Render user scene -------------------------------------------
 
@@ -859,51 +851,79 @@ void FltkViewer::draw()
 
 	if( _data->root )	{
 
-		glEnable ( GL_LIGHTING );
-		glLight ( 0, light );
-		glLight ( 1, light2 );
-
 		_data->render_action.apply ( _data->root );
 
-			glDisable( GL_LIGHTING );
+		glDisable( GL_LIGHTING );
 
 		if (_data->shadowmode == ModeShadows)
 //		if ( 1 )
 		{
-				GLfloat shadow_plane_points[3][3] = {
-					{ 0.0, 0.0, 0.0 }, 
-					{ 1.0, 0.0, 0.0 }, 
-					{ 1.0, 0.0, -1.0 }
-				};
-				GLfloat shadow_light_pos[4];
-				GLfloat shadow_matrix[4][4];
+			GLfloat shadow_plane_floor[3][3] = {
+				{ 0.0, 0.0, 0.0 }, 
+				{ 1.0, 0.0, 0.0 }, 
+				{ 1.0, 0.0, -1.0 }
+			};
+			GLfloat shadow_light_pos[4];
+			GLfloat shadow_matrix[4][4];
 
+			shadow_light_pos[ 0 ] = light2.position.x;
+			shadow_light_pos[ 1 ] = light2.position.y;
+			shadow_light_pos[ 2 ] = light2.position.z;
+			shadow_light_pos[ 3 ] = light2.directional ? 0.0f : 1.0f;
 
-				shadow_light_pos[ 0 ] = light2.position.x;
-				shadow_light_pos[ 1 ] = light2.position.y;
-				shadow_light_pos[ 2 ] = light2.position.z;
-				shadow_light_pos[ 3 ] = light2.directional ? 0.0f : 1.0f;
+			MakeShadowMatrix( shadow_plane_floor, shadow_light_pos, shadow_matrix );
+			glPushMatrix();
+				glMultMatrixf( (GLfloat *)shadow_matrix );
+				glColor3f( 0.6f, 0.57f, 0.53f );
+				_data->render_action.apply ( _data->root );
+			glPopMatrix();
 
-				MakeShadowMatrix( shadow_plane_points, shadow_light_pos, shadow_matrix );
-				glPushMatrix();
-		    		glMultMatrixf( (GLfloat *)shadow_matrix );
-					glColor3f( 0.6f, 0.57f, 0.53f );
-					_data->render_action.apply ( _data->root );
-				glPopMatrix();
+			shadow_light_pos[ 0 ] = light.position.x;
+			shadow_light_pos[ 1 ] = light.position.y;
+			shadow_light_pos[ 2 ] = light.position.z;
+			shadow_light_pos[ 3 ] = light.directional ? 0.0f : 1.0f;
 
-				shadow_light_pos[ 0 ] = light.position.x;
-				shadow_light_pos[ 1 ] = light.position.y;
-				shadow_light_pos[ 2 ] = light.position.z;
-				shadow_light_pos[ 3 ] = light.directional ? 0.0f : 1.0f;
+			MakeShadowMatrix( shadow_plane_floor, shadow_light_pos, shadow_matrix );
+#if 1
+			glPushMatrix();
+				glTranslatef( 0.0, 0.25, 0.0 );
+				glMultMatrixf( (GLfloat *)shadow_matrix );
+				glColor3f( 0.4f, 0.45f, 0.55f );
+				_data->render_action.apply ( _data->root );
+			glPopMatrix();
+#else
+			glEnable( GL_CLIP_PLANE0 );
 
-				MakeShadowMatrix( shadow_plane_points, shadow_light_pos, shadow_matrix );
-				glPushMatrix();
-					glTranslatef( 0.0, 0.25, 0.0 );
-		    		glMultMatrixf( (GLfloat *)shadow_matrix );
-					glColor3f( 0.4f, 0.45f, 0.55f );
-					_data->render_action.apply ( _data->root );
-				glPopMatrix();
-			
+			GLdouble plane_eq_wall[ 4 ] = { 0.0, 0.0, 1.0, gridSize };
+			glClipPlane( GL_CLIP_PLANE0, plane_eq_wall );
+
+			glPushMatrix();
+				glTranslatef( 0.0, 0.25, 0.0 );
+				glMultMatrixf( (GLfloat *)shadow_matrix );
+				glColor3f( 0.4f, 0.45f, 0.55f );
+				_data->render_action.apply ( _data->root );
+			glPopMatrix();
+
+			GLfloat shadow_plane_wall[3][3] = {
+				{ 0.0, 0.0, -gridSize }, 
+				{ 1.0, 0.0, -gridSize }, 
+				{ 1.0, 1.0, -gridSize }
+			};
+
+			MakeShadowMatrix( shadow_plane_wall, shadow_light_pos, shadow_matrix );
+
+			GLdouble plane_eq_floor[ 4 ] = { 0.0, 1.0, 0.0, 0.0 };
+			glClipPlane( GL_CLIP_PLANE0, plane_eq_floor );
+
+			glPushMatrix();
+				glTranslatef( 0.0, 0.25, 0.0 );
+				glMultMatrixf( (GLfloat *)shadow_matrix );
+				glColor3f( 0.4f, 0.45f, 0.55f );
+				_data->render_action.apply ( _data->root );
+			glPopMatrix();
+
+			glDisable( GL_CLIP_PLANE0 );
+#endif
 		}
 	}
 

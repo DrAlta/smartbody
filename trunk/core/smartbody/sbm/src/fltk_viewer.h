@@ -39,7 +39,6 @@ class SrCamera;
 class SrSn;
 class SrViewer;
 class FltkViewerData;
-class Heightfield;
 
 /*! \class SrViewer sr_viewer.h
     \brief A fltk-opengl viewer
@@ -49,6 +48,7 @@ class Heightfield;
     In ModePlanar, only transformation on the XY plane are accepted.
     In all modes, mouse interaction is done together with Ctrl and Shift modifiers.
     A popup menu appears with a right button click or ctrl+shift+m. */
+
 class FltkViewer : public SrViewer, public fltk::GlWindow 
  {
    public : // enumerators
@@ -246,9 +246,6 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	virtual void label_viewer(const char* str);
 	virtual void show_viewer();
 	virtual void hide_viewer();
-
-	Heightfield* _heightField;
-
  };
 
 
