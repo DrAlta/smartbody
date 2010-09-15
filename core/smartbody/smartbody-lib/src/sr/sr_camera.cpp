@@ -49,8 +49,8 @@ SrCamera::SrCamera ( const SrPnt& e, const SrPnt& c, const SrVec& u )
          : eye(e), center(c), up(u)
  {
    fovy  = SR_TORAD(60);
-   znear = 0.1f; 
-   zfar  = 1000.0f; 
+   znear = 1.0f; 
+   zfar  = 10000.0f; 
    aspect = 1.0f;
  }
 
@@ -60,8 +60,8 @@ void SrCamera::init ()
    center = SrVec::null;
    up = SrVec::j;
    fovy  = SR_TORAD(60);
-   znear = 0.1f; 
-   zfar  = 1000.0f; 
+   znear = 1.0f; 
+   zfar  = 10000.0f; 
    aspect = 1.0f;
    scale = 1.0f;
  }

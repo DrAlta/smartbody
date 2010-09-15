@@ -299,6 +299,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\src\Heightfield.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\src\Heightfield.h"
+			>
+		</File>
+		<File
 			RelativePath="..\src\pic.cpp"
 			>
 		</File>

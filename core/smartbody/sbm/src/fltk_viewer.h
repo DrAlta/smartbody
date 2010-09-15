@@ -39,6 +39,7 @@ class SrCamera;
 class SrSn;
 class SrViewer;
 class FltkViewerData;
+class Heightfield;
 
 /*! \class SrViewer sr_viewer.h
     \brief A fltk-opengl viewer
@@ -245,6 +246,9 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	virtual void label_viewer(const char* str);
 	virtual void show_viewer();
 	virtual void hide_viewer();
+
+	Heightfield* _heightField;
+
  };
 
 
