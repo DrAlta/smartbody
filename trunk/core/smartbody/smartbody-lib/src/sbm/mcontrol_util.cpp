@@ -277,8 +277,8 @@ void mcuCBHandle::clear( void )	{
 		 motionIter != motion_map.end();
 		 motionIter++)
 	{
-		SkMotion* motion = (*motionIter).second;
-		motion->unref(); // need to cleanup motions - fix
+		//SkMotion* motion = (*motionIter).second;
+		//motion->unref(); // need to cleanup motions - fix
 	}
 	
 	MeCtPose* pose_ctrl_p;
@@ -452,7 +452,7 @@ void mcuCBHandle::update( void )	{
 	active_seq_map.reset();
 
 	while( seq_p = active_seq_map.next( & seq_name ) )	{
-			
+
 		char *cmd;
 		while( cmd = seq_p->pop( (float)time ) )	{
 			
