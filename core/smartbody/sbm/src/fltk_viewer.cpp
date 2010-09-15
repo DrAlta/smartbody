@@ -346,6 +346,8 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 
 	_heightField->set_scale( 5000.0f, 500.0f, 5000.0f );
 	_heightField->set_auto_origin();
+#else
+	_heightField = NULL;
 #endif
 }
 
@@ -360,7 +362,8 @@ FltkViewer::~FltkViewer ()
    delete _data->sceneaxis;
    delete _data;
 
-   delete _heightField;
+	if( _heightField )
+	   delete _heightField;
  }
 
 SrSn *FltkViewer::root ()
@@ -834,9 +837,19 @@ void FltkViewer::draw()
 
 //   glRotate ( _model_rotation );
 
-   // draw the heightfield/terrain
-   glDisable(GL_LIGHTING);
-   _heightField->render();
+	if( _heightField )	{
+		_heightField->render();
+	}
+
+#if 0
+		glDisable(GL_LIGHTING);
+
+		static GLdouble plane_eq_floor[ 4 ] = { 0.0, 1.0, 0.0, 0.0 };
+		glClipPlane( GL_CLIP_PLANE0, plane_eq_floor );
+		glEnable( GL_CLIP_PLANE0 );
+
+		glDisable( GL_CLIP_PLANE0 );
+#endif
 
    //----- Render user scene -------------------------------------------
 
@@ -855,6 +868,7 @@ void FltkViewer::draw()
 			glDisable( GL_LIGHTING );
 
 		if (_data->shadowmode == ModeShadows)
+//		if ( 1 )
 		{
 				GLfloat shadow_plane_points[3][3] = {
 					{ 0.0, 0.0, 0.0 }, 
