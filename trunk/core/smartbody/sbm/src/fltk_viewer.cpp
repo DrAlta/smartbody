@@ -59,6 +59,7 @@
 
 #include <sbm/mcontrol_util.h>
 #include "vhcl_log.h"
+#include "Heightfield.h"
 
 ////# define SR_USE_TRACE1  // basic fltk events
 ////# define SR_USE_TRACE2  // more fltk events
@@ -292,7 +293,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->viewmode = ModeExaminer;
    _data->rendermode = ModeAsIs;
    _data->charactermode = ModeShowGeometry;
-   _data->shadowmode = ModeShadows;
+   _data->shadowmode = ModeNoShadows;
 
    _data->iconized    = false;
    _data->spinning    = false;
@@ -335,7 +336,18 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    gridSize = 200.0;
    gridStep = 20.0;
    gridList = -1;
- }
+
+#if 0
+   _heightField = new Heightfield();
+
+   _heightField->load( "../../../../data/range1.e.bmp" );
+//   _heightField->load("c:/users/shapiro/smartbody/trunk/data/Terrain.bmp");
+//   _heightField->load("c:/users/shapiro/smartbody/trunk/data/blank.bmp");
+
+	_heightField->set_scale( 5000.0f, 500.0f, 5000.0f );
+	_heightField->set_auto_origin();
+#endif
+}
 
 FltkViewer::~FltkViewer ()
  {
@@ -347,6 +359,8 @@ FltkViewer::~FltkViewer ()
    delete _data->scenebox;
    delete _data->sceneaxis;
    delete _data;
+
+   delete _heightField;
  }
 
 SrSn *FltkViewer::root ()
@@ -822,7 +836,7 @@ void FltkViewer::draw()
 
    // draw the heightfield/terrain
    glDisable(GL_LIGHTING);
-   //_heightField->render();
+   _heightField->render();
 
    //----- Render user scene -------------------------------------------
 
@@ -842,39 +856,40 @@ void FltkViewer::draw()
 
 		if (_data->shadowmode == ModeShadows)
 		{
-			GLfloat shadow_plane_points[3][3] = {
-				{ 0.0, 0.0, 0.0 }, 
-				{ 1.0, 0.0, 0.0 }, 
-				{ 1.0, 0.0, -1.0 }
-			};
-			GLfloat shadow_light_pos[4];
-			GLfloat shadow_matrix[4][4];
+				GLfloat shadow_plane_points[3][3] = {
+					{ 0.0, 0.0, 0.0 }, 
+					{ 1.0, 0.0, 0.0 }, 
+					{ 1.0, 0.0, -1.0 }
+				};
+				GLfloat shadow_light_pos[4];
+				GLfloat shadow_matrix[4][4];
 
 
-			shadow_light_pos[ 0 ] = light2.position.x;
-			shadow_light_pos[ 1 ] = light2.position.y;
-			shadow_light_pos[ 2 ] = light2.position.z;
-			shadow_light_pos[ 3 ] = light2.directional ? 0.0f : 1.0f;
+				shadow_light_pos[ 0 ] = light2.position.x;
+				shadow_light_pos[ 1 ] = light2.position.y;
+				shadow_light_pos[ 2 ] = light2.position.z;
+				shadow_light_pos[ 3 ] = light2.directional ? 0.0f : 1.0f;
 
-			MakeShadowMatrix( shadow_plane_points, shadow_light_pos, shadow_matrix );
-			glPushMatrix();
-    			glMultMatrixf( (GLfloat *)shadow_matrix );
-				glColor3f( 0.6f, 0.57f, 0.53f );
-				_data->render_action.apply ( _data->root );
-			glPopMatrix();
+				MakeShadowMatrix( shadow_plane_points, shadow_light_pos, shadow_matrix );
+				glPushMatrix();
+		    		glMultMatrixf( (GLfloat *)shadow_matrix );
+					glColor3f( 0.6f, 0.57f, 0.53f );
+					_data->render_action.apply ( _data->root );
+				glPopMatrix();
 
-			shadow_light_pos[ 0 ] = light.position.x;
-			shadow_light_pos[ 1 ] = light.position.y;
-			shadow_light_pos[ 2 ] = light.position.z;
-			shadow_light_pos[ 3 ] = light.directional ? 0.0f : 1.0f;
+				shadow_light_pos[ 0 ] = light.position.x;
+				shadow_light_pos[ 1 ] = light.position.y;
+				shadow_light_pos[ 2 ] = light.position.z;
+				shadow_light_pos[ 3 ] = light.directional ? 0.0f : 1.0f;
 
-			MakeShadowMatrix( shadow_plane_points, shadow_light_pos, shadow_matrix );
-			glPushMatrix();
-				glTranslatef( 0.0, 0.25, 0.0 );
-    			glMultMatrixf( (GLfloat *)shadow_matrix );
-				glColor3f( 0.4f, 0.45f, 0.55f );
-				_data->render_action.apply ( _data->root );
-			glPopMatrix();
+				MakeShadowMatrix( shadow_plane_points, shadow_light_pos, shadow_matrix );
+				glPushMatrix();
+					glTranslatef( 0.0, 0.25, 0.0 );
+		    		glMultMatrixf( (GLfloat *)shadow_matrix );
+					glColor3f( 0.4f, 0.45f, 0.55f );
+					_data->render_action.apply ( _data->root );
+				glPopMatrix();
+			
 		}
 	}
 

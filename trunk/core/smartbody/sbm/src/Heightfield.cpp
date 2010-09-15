@@ -9,16 +9,30 @@
 #include <math.h>
 
 #define BITMAP_ID 0x4D42
-//#define MAP_SCALE 20.0f
-//#define PI 3.14159
 
-Heightfield::Heightfield()
-{
+Heightfield::Heightfield( void )	{
+
 	_header = NULL;
 	_imageData = NULL;
+	
 	image_width = 0;
 	image_height = 0;
 	num_color_comps = 0;
+	
+	mesh_resx = 0;
+	mesh_resz = 0;
+
+	mesh_scale[ 0 ] = 1.0f;
+	mesh_scale[ 1 ] = 1.0f;
+	mesh_scale[ 2 ] = 1.0f;
+
+	mesh_origin[ 0 ] = 0.0f;
+	mesh_origin[ 1 ] = 0.0f;
+	mesh_origin[ 2 ] = 0.0f;
+	
+	vertex_arr = NULL;
+	normal_arr = NULL;
+	color_arr = NULL;
 }
 
 Heightfield::~Heightfield()
@@ -38,96 +52,180 @@ void Heightfield::load(char* filename)
 	initializeTerrain(_imageData);
 }
 
-void Heightfield::render()
-{
-	if (true)
-	{
-		//we are going to loop through all of our terrain's data points,
-		//but we only want to draw one triangle strip for each set along the x axis.
-		for (int z = 0; z < TERRAIN_SIZE_Z-1; z++ )
-		{
-			glBegin(GL_TRIANGLE_STRIP);
-			for (int x = 0; x < TERRAIN_SIZE_X-1; x++ )
-			{
-				//for each vertex, we calculate the grayscale shade color,
-				//we set the texture coordinate, and we draw the vertex.
+void Heightfield::render( void )	{
 
-				/*
-				the vertices are drawn in this order:
+	if( vertex_arr )	{
+		glPushMatrix();
+		glTranslatef( mesh_origin[ 0 ], mesh_origin[ 1 ], mesh_origin[ 2 ] );
+		glScalef( mesh_scale[ 0 ], mesh_scale[ 1 ], mesh_scale[ 2 ] );
 
-				0 --->1
-					/
-				   /
-				  /
-				2 --->3
-					   */
+		for( int j = 0; j < mesh_resz - 1; j++ )	{
 
-				//draw vertex 0
-				glColor3f(_terrain[x][z][1]/255.0f, _terrain[x][z][1]/255.0f, _terrain[x][z][1]/255.0f);
-				glVertex3f(_terrain[x][z][0], _terrain[x][z][1], _terrain[x][z][2]);
+			glBegin( GL_TRIANGLE_STRIP );
+			for( int i = 0; i < mesh_resx - 1; i++ )	{
 
-				//draw vertex 1
-				glColor3f(_terrain[x+1][z][1]/255.0f, _terrain[x+1][z][1]/255.0f, _terrain[x+1][z][1]/255.0f);
-				glVertex3f(_terrain[x+1][z][0], _terrain[x+1][z][1], _terrain[x+1][z][2]);
+				int index = ( j * mesh_resx + i ) * 3;
+				glColor3ubv( color_arr + index );
+				glVertex3fv( vertex_arr + index );
 
-				//draw vertex 2
-				glColor3f(_terrain[x][z+1][1]/255.0f, _terrain[x][z+1][1]/255.0f, _terrain[x][z+1][1]/255.0f);
-				glVertex3f(_terrain[x][z+1][0], _terrain[x][z+1][1], _terrain[x][z+1][2]);
+				index = ( ( j + 1 ) * mesh_resx + i ) * 3;
+				glColor3ubv( color_arr + index );
+				glVertex3fv( vertex_arr + index );
 
-				//draw vertex 3
-				glColor3f(_terrain[x+1][z+1][1]/255.0f, _terrain[x+1][z+1][1]/255.0f, _terrain[x+1][z+1][1]/255.0f);
-				glVertex3f(_terrain[x+1][z+1][0], _terrain[x+1][z+1][1], _terrain[x+1][z+1][2]);
+				index = ( j * mesh_resx + i + 1 ) * 3;
+				glColor3ubv( color_arr + index );
+				glVertex3fv( vertex_arr + index );
+
+				index = ( ( j + 1 ) * mesh_resx + i + 1 ) * 3;
+				glColor3ubv( color_arr + index );
+				glVertex3fv( vertex_arr + index );
 			}
 			glEnd();
 		}
+		glPopMatrix();
 	}
 }
 
 void Heightfield::initializeTerrain(unsigned char* terrain)
 {
 
+#if 0
 	int hist[ 8 ] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 	int n = image_width * image_height * num_color_comps;
 	for( int i=0; i< n; i++ )	{
 		hist[ (int)( terrain[ i ] ) / 32 ]++;
 	}
 	printf( "HIST: %d %d %d %d %d %d %d %d\n", hist[0], hist[1], hist[2], hist[3], hist[4], hist[5], hist[6], hist[7] );
+#endif
 
-	// loop through all of the heightfield points, calculating the coordinates for each point
-	for (int z = 0; z < TERRAIN_SIZE_Z; z++)
-	{
-		for (int x = 0; x < TERRAIN_SIZE_X; x++)
-		{
-			unsigned char celev = _imageData[ ( z * image_width + x ) * num_color_comps ];
-			_terrain[x][z][1] = ELEVATION_SCALE * (float)celev / 255.0f;
-			_terrain[x][z][0] = float(x)*TERRAIN_SCALE / ( TERRAIN_SIZE_X - 1 );
-			_terrain[x][z][2] = -float(z)*TERRAIN_SCALE / ( TERRAIN_SIZE_Z - 1 );
+	vertex_arr = new float[ image_width * image_height * 3 ];
+	normal_arr = new float[ image_width * image_height * 3 ];
+	color_arr = new unsigned char[ image_width * image_height * 3 ];
+
+	for( int j = 0; j < image_height; j++ )	{
+		for( int i = 0; i < image_width; i++ )	{
+			
+			int img_index = ( j * image_width + i ) * num_color_comps;
+			int arr_index = ( j * image_width + i ) * 3;
+			
+			vertex_arr[ arr_index + 0 ] = (float) i / (float)( image_width - 1 );
+			vertex_arr[ arr_index + 1 ] = (float) _imageData[ img_index ] / 255.0f;
+			vertex_arr[ arr_index + 2 ] = (float) j / (float)( image_height - 1 );
+			
+			color_arr[ arr_index + 0 ] = _imageData[ img_index ];
+			color_arr[ arr_index + 1 ] = _imageData[ img_index ];
+			color_arr[ arr_index + 2 ] = _imageData[ img_index ];
 		}
 	}
+
+	mesh_resx = image_width;
+	mesh_resz = image_height;
+
+#if 0
+	mesh_scale[ 0 ] = TERRAIN_SCALE;
+	mesh_scale[ 1 ] = ELEVATION_SCALE;
+	mesh_scale[ 2 ] = TERRAIN_SCALE;
+
+	mesh_origin[ 0 ] = -mesh_scale[ 0 ] * 0.5f;
+	mesh_origin[ 1 ] = 0.0f;
+	mesh_origin[ 2 ] = -mesh_scale[ 2 ] * 0.5f;
+
+	float center_elev = getHeight( 0.0f, 0.0f );
+	mesh_origin[ 1 ] = -center_elev;
+#endif
+
+#if 0
+	for( int i = 0; i <= 10; i++ )	{
+//		float px = 0.0;
+//		float px = 1.0;
+		float px = (float)i/10.0;
+//		float px = 1.0f - (float)i/10.0f;
+//		float pz = 0.0;
+//		float pz = 1.0;
+		float pz = (float)i/10.0;
+//		float pz = 1.0f - (float)i/10.0f;
+		float y = getHeight( px, pz );
+		printf( "%f %f : %f\n", px, pz, y );
+	}
+#endif
 }
 
+void Heightfield::set_scale( float x, float y, float z )	{
+
+	mesh_scale[ 0 ] = x;
+	mesh_scale[ 1 ] = y;
+	mesh_scale[ 2 ] = z;
+}
+
+void Heightfield::set_origin( float x, float y, float z )	{
+
+	mesh_origin[ 0 ] = x;
+	mesh_origin[ 1 ] = y;
+	mesh_origin[ 2 ] = z;
+}
+
+void Heightfield::set_auto_origin( void )	{
+
+	mesh_origin[ 0 ] = -mesh_scale[ 0 ] * 0.5f;
+	mesh_origin[ 1 ] = 0.0f;
+	mesh_origin[ 2 ] = -mesh_scale[ 2 ] * 0.5f;
+
+	float center_elev = getHeight( 0.0f, 0.0f );
+	mesh_origin[ 1 ] = -center_elev;
+}
 
 unsigned char* Heightfield::LoadBitmapFile(char *filename, BITMAPINFOHEADER * bitmapInfoHeader)
 {
 	FILE *filePtr; //the file pointer
 	BITMAPFILEHEADER bitmapFileHeader; //bitmap file header
 	unsigned char *bitmapImage; //bitmap image data
-	int imageIdx = 0; //image index counter
-	unsigned char tempRGB; //swap variable
 
-	printf( "HF:BM: open '%s'\n", filename );
+#if 0
+	bitmapImage = (unsigned char*)malloc( 4 );
+	image_width = 2;
+	image_height = 2;
+	num_color_comps = 1;
+	bitmapImage[ 0 ] = 0;
+	bitmapImage[ 1 ] = 63;
+	bitmapImage[ 2 ] = 0;
+	bitmapImage[ 3 ] = 255;
+	return bitmapImage;
+#endif
+
+#if 0
+	bitmapImage = (unsigned char*)malloc( 9 );
+	image_width = 3;
+	image_height = 3;
+	num_color_comps = 1;
+	bitmapImage[ 0 ] = 0;
+	bitmapImage[ 1 ] = 0;
+	bitmapImage[ 2 ] = 0;
+	bitmapImage[ 3 ] = 0;
+	bitmapImage[ 4 ] = 255;
+	bitmapImage[ 5 ] = 0;
+	bitmapImage[ 6 ] = 0;
+	bitmapImage[ 7 ] = 0;
+	bitmapImage[ 8 ] = 0;
+	return bitmapImage;
+#endif
+
+	printf( "Heightfield::LoadBitmapFile: open '%s'\n", filename );
 
 	//open filename in "read binary" mode
-	filePtr = fopen(filename, "rb");
-	if( filePtr == NULL)
-	return NULL;
-
+	filePtr = fopen( filename, "rb" );
+	if( filePtr == NULL)	{
+		printf( "Heightfield::LoadBitmapFile ERR: fopen '%s' FAILED\n", filename );
+		return NULL;
+	}
+	
 	//read the bitmap file header
 	fread(&bitmapFileHeader, sizeof(BITMAPFILEHEADER), 1, filePtr);
 
+#if 0
 	printf( "HF:BM: FileHeader:\n" );
 	printf( "HF:BM: bfType %d == %d\n", bitmapFileHeader.bfType, BITMAP_ID );
 	printf( "HF:BM: bfSize %d\n", bitmapFileHeader.bfSize );
+#endif
 
 	//verify that this is a bitmap by checking for the universal bitmap id
 	if( bitmapFileHeader.bfType != BITMAP_ID )
@@ -139,6 +237,7 @@ unsigned char* Heightfield::LoadBitmapFile(char *filename, BITMAPINFOHEADER * bi
 	//read the bitmap information header
 	fread(bitmapInfoHeader, sizeof(BITMAPFILEHEADER), 1, filePtr);
 
+#if 0
 	printf( "HF:BM: InfoHeader:\n" );
 	printf( "HF:BM: biSize %d\n", bitmapInfoHeader->biSize );
 	printf( "HF:BM: biWidth %d\n", bitmapInfoHeader->biWidth );
@@ -149,49 +248,48 @@ unsigned char* Heightfield::LoadBitmapFile(char *filename, BITMAPINFOHEADER * bi
 	printf( "HF:BM: biSizeImage %d\n", bitmapInfoHeader->biSizeImage );
 	printf( "HF:BM: biClrUsed %d\n", bitmapInfoHeader->biClrUsed );
 	printf( "HF:BM: biClrImportant %d\n", bitmapInfoHeader->biClrImportant );
+#endif
 
 	image_width = bitmapInfoHeader->biWidth;
 	image_height = bitmapInfoHeader->biHeight;
 	long image_area = image_width * image_height;
 	num_color_comps = 0;
 	for( int i=1; num_color_comps == 0; i++ )	{
-		if( ( image_area * ( i + 1 ) ) > bitmapFileHeader.bfSize )	{
+		if( ( image_area * ( i + 1 ) ) > (int)( bitmapFileHeader.bfSize ) )	{
 			num_color_comps = i;
 		}
 	}
-	printf( "HF:BM: color comps %d\n", num_color_comps );
+	printf( " image: width %d height %d comps %d\n", image_width, image_height, num_color_comps );
 	long image_bytes = image_area * num_color_comps;
 
 	//move file pointer to beginning of bitmap data
-	fseek(filePtr, bitmapFileHeader.bfOffBits, SEEK_SET);
+	fseek( filePtr, bitmapFileHeader.bfOffBits, SEEK_SET );
 
 	//allocate enough memory for the bitmap image data
-//	bitmapImage = (unsigned char*)malloc(bitmapInfoHeader->biSizeImage);
 	bitmapImage = (unsigned char*)malloc( image_bytes );
 
 	//verify memory allocation
-	if(!bitmapImage)
-	{
-		free(bitmapImage);
+	if( bitmapImage == NULL )	{
+		printf( "Heightfield::LoadBitmapFile ERR: malloc %d bytes FAILED\n", image_bytes );
 		fclose(filePtr);
 		return NULL;
 	}
 
 	//read in the bitmap image data
-//	fread(bitmapImage, 1, bitmapInfoHeader->biSizeImage, filePtr);
 	size_t bytes_read = fread( bitmapImage, 1, image_bytes, filePtr );
-	printf( "HF:BM: bytes read %d\n", bytes_read );
+
+	fclose(filePtr);
 
 	//make sure bitmap image data was read
-//	if (bitmapImage == NULL)
-//	{
-//		fclose(filePtr);
-//		return NULL;
-//	}
+	if( (int)( bytes_read ) < image_bytes )	{
+		printf( "Heightfield::LoadBitmapFile ERR: file '%s': read %d of %d bytes\n", bytes_read, image_bytes );
+		return NULL;
+	}
 
 #if 0
+	unsigned char tempRGB; //swap variable
 	//swap the R and B values to get RGB since the bitmap color format is in BGR
-	for( imageIdx = 0; imageIdx < image_bytes; imageIdx += 3 )
+	for( int imageIdx = 0; imageIdx < image_bytes; imageIdx += 3 )
 	{
 		tempRGB = bitmapImage[imageIdx];
 		bitmapImage[imageIdx] = bitmapImage[imageIdx + 2];
@@ -199,56 +297,88 @@ unsigned char* Heightfield::LoadBitmapFile(char *filename, BITMAPINFOHEADER * bi
 	}
 #endif
 
-	//close the file and return the bitmap image data
-	fclose(filePtr);
-
 	return bitmapImage;
 }
 
-float Heightfield::getHeight( int x, int z )
-{
-    float h=0;
-  
-    if ( x < 0 ) x = 0;
-    if ( z < 0 ) z = 0;
-    if ( x > TERRAIN_SIZE_X - 1 ) x = TERRAIN_SIZE_X - 1;
-    if ( z > TERRAIN_SIZE_Z - 1 ) z = TERRAIN_SIZE_Z - 1;
+float Heightfield::getNHeight( int i, int j )	{
 
-    
-    h = _terrain[x][z][1];
-
-    return h;
+	if( i < 0 ) return( 0.0f );
+	if( j < 0 ) return( 0.0f );
+	if( i >= mesh_resx ) return( 0.0f );
+	if( j >= mesh_resz ) return( 0.0f );
+	return( vertex_arr[ ( j * image_width + i ) * 3 + 1 ] );
 }
 
-float Heightfield::getHeight( float x, float z )
-{
-	float dnX = floorf( x * 1.0f / TERRAIN_SIZE_X);
-	float dnZ = floorf( z * 1.0f / TERRAIN_SIZE_Z );
+float Heightfield::getHeight( float px, float pz )	{
 
-    float dx = ( x - ( dnX * TERRAIN_SIZE_X ) ) * 1.0f / TERRAIN_SIZE_X;
-    float dz = ( z - ( dnZ * TERRAIN_SIZE_Z ) ) * 1.0f / TERRAIN_SIZE_Z;
+//	float dnX = floorf( x / mesh_resx );
+//	float dnZ = floorf( z / mesh_resz );
+
+//    float dx = ( x - ( dnX * mesh_resx ) ) / mesh_resx;
+//    float dz = ( z - ( dnZ * mesh_resz ) ) / mesh_resz;
+
+	float nx = ( px - mesh_origin[ 0 ] ) / mesh_scale[ 0 ];
+	float nz = ( pz - mesh_origin[ 2 ] ) / mesh_scale[ 2 ];
+	
+	float ix = nx * ( mesh_resx - 1 );
+	float iz = nz * ( mesh_resz - 1 );
+	
+	int i = (int) ix;
+	int j = (int) iz;
+	
+	float dx = ix - (float)i;
+	float dz = iz - (float)j;
+	
+    float y, y0;
+
+	if( ( dx + dz ) < 1.0f )	{
+
+		y0 = getNHeight( i, j );
+		y = y0 
+			+ ( getNHeight( i + 1, j ) - y0 ) * dx
+			+ ( getNHeight( i, j + 1 ) - y0 ) * dz;
+	}
+	else	{
+	
+		y0 = getNHeight( i + 1, j + 1 );
+		y = y0 
+			+ ( getNHeight( i + 1, j ) - y0 ) * ( 1.0f - dz )
+			+ ( getNHeight( i, j + 1 ) - y0 ) * ( 1.0f - dx );
+	}
+	
+#if 0
+	float x = ( px - mesh_origin[ 0 ] ) / mesh_scale[ 0 ];
+	float z = ( pz - mesh_origin[ 2 ] ) / mesh_scale[ 2 ];
+
+	float dnX = floorf( x / ( mesh_resx - 1 ) );
+	float dnZ = floorf( z / ( mesh_resz - 1 ) );
+
+    float dx = ( x - ( dnX * ( mesh_resx - 1 ) ) ) / ( mesh_resx - 1 );
+    float dz = ( z - ( dnZ * ( mesh_resz - 1 ) ) ) / ( mesh_resz - 1 );
 
     int nX = int( dnX );
     int nZ = int( dnZ );
 
     float y, y0;
 
-    if ( dx + dz <= float( 1.0 ) ) // Use <= comparison to prefer simpler branch
+    if ( dx + dz <= 1.0f ) 
     {
-        y0 = getHeight( nX, nZ );
+        y0 = getNHeight( nX, nZ );
 
-        y = y0 + ( getHeight( nX + 1, nZ ) - y0 ) * dx
-            + ( getHeight( nX, nZ + 1 ) - y0 ) * dz;
+        y = y0 + ( getNHeight( nX + 1, nZ ) - y0 ) * dx
+            + ( getNHeight( nX, nZ + 1 ) - y0 ) * dz;
     }
     else
     {
-        y0 = getHeight( nX + 1, nZ + 1 );
+        y0 = getNHeight( nX + 1, nZ + 1 );
 
-        y = y0	+ ( getHeight( nX + 1, nZ ) - y0 ) * ( float(1.0) - dz ) +
-            ( getHeight( nX, nZ + 1 ) - y0 ) * ( float(1.0) - dx );
+        y = y0	+ ( getNHeight( nX + 1, nZ ) - y0 ) * ( 1.0f - dz ) +
+            ( getNHeight( nX, nZ + 1 ) - y0 ) * ( 1.0f - dx );
     }
+#endif
 
-    return y;
+	float py = y * mesh_scale[ 1 ] + mesh_origin[ 1 ];
+    return( py );
 }
 
 
