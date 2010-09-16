@@ -11,6 +11,14 @@
 #define BITMAP_ID 0x4D42
 
 Heightfield::Heightfield( void )	{
+	defaults();
+}
+
+Heightfield::~Heightfield() {
+	clear();
+}
+
+void Heightfield::defaults( void ) {
 
 	_header = NULL;
 	_imageData = NULL;
@@ -22,9 +30,9 @@ Heightfield::Heightfield( void )	{
 	mesh_resx = 0;
 	mesh_resz = 0;
 
-	mesh_scale[ 0 ] = 1.0f;
-	mesh_scale[ 1 ] = 1.0f;
-	mesh_scale[ 2 ] = 1.0f;
+	mesh_scale[ 0 ] = 100.0f;
+	mesh_scale[ 1 ] = 100.0f;
+	mesh_scale[ 2 ] = 100.0f;
 
 	mesh_origin[ 0 ] = 0.0f;
 	mesh_origin[ 1 ] = 0.0f;
@@ -33,11 +41,13 @@ Heightfield::Heightfield( void )	{
 	vertex_arr = NULL;
 	normal_arr = NULL;
 	color_arr = NULL;
+	dirty_normals = true;
 }
 
-Heightfield::~Heightfield()
-{
-	delete _header;
+void Heightfield::clear( void ) {
+
+	if (_header)
+		delete _header;
 	if (_imageData)
 		delete [] _imageData;
 		
@@ -52,21 +62,21 @@ Heightfield::~Heightfield()
 	}
 }
 
-void Heightfield::load(char* filename)
-{
-	if (_header)
-		delete _header;
-	_header = new BITMAPINFOHEADER();
+void Heightfield::load( char* filename )	{
 
-	_imageData = LoadBitmapFile(filename, _header);
-	initializeTerrain(_imageData);
+	clear();
+	defaults();
+	
+	_header = new BITMAPINFOHEADER();
+	_imageData = LoadBitmapFile( filename, _header );
+	initializeTerrain( _imageData );
 }
 
 void Heightfield::render( void )	{
 
 	if( vertex_arr )	{
 	
-		if( normal_arr == NULL )	{
+		if( dirty_normals )	{
 			load_normals();
 		}
 	
@@ -99,10 +109,9 @@ void Heightfield::render( void )	{
 			glEnd();
 		}
 
-#else
+#elif 1
 		int norm_index = 0;
 		glBegin( GL_TRIANGLES );
-//	glColor3ub( 127, 127, 127 );
 		for( int j = 0; j < mesh_resz - 1; j++ )	{
 		
 			for( int i = 0; i < mesh_resx - 1; i++ )	{
@@ -133,6 +142,41 @@ void Heightfield::render( void )	{
 
 				index = ( ( j + 1 ) * mesh_resx + i + 1 ) * 3;
 				glColor3ubv( color_arr + index );
+				glVertex3fv( vertex_arr + index );
+
+				norm_index += 3;
+			}
+		}
+		glEnd();
+#else
+		int norm_index = 0;
+		glBegin( GL_TRIANGLES );
+	glColor3ub( 127, 127, 127 );
+//	glColor3ub( 255, 255, 255 );
+		for( int j = 0; j < mesh_resz - 1; j++ )	{
+		
+			for( int i = 0; i < mesh_resx - 1; i++ )	{
+			
+				glNormal3fv( normal_arr + norm_index );
+				int index = ( j * mesh_resx + i ) * 3;
+				glVertex3fv( vertex_arr + index );
+
+				index = ( ( j + 1 ) * mesh_resx + i ) * 3;
+				glVertex3fv( vertex_arr + index );
+
+				index = ( j * mesh_resx + i + 1 ) * 3;
+				glVertex3fv( vertex_arr + index );
+
+				norm_index += 3;
+
+				glNormal3fv( normal_arr + norm_index );
+				index = ( j * mesh_resx + i + 1 ) * 3;
+				glVertex3fv( vertex_arr + index );
+
+				index = ( ( j + 1 ) * mesh_resx + i ) * 3;
+				glVertex3fv( vertex_arr + index );
+
+				index = ( ( j + 1 ) * mesh_resx + i + 1 ) * 3;
 				glVertex3fv( vertex_arr + index );
 
 				norm_index += 3;
@@ -198,9 +242,10 @@ void Heightfield::initializeTerrain(unsigned char* terrain)
 			vertex_arr[ arr_index + 1 ] = (float) _imageData[ img_index ] / 255.0f;
 			vertex_arr[ arr_index + 2 ] = (float) j / (float)( image_height - 1 );
 			
-			color_arr[ arr_index + 0 ] = _imageData[ img_index ];
-			color_arr[ arr_index + 1 ] = _imageData[ img_index ];
-			color_arr[ arr_index + 2 ] = _imageData[ img_index ];
+			char grey = 63 + _imageData[ img_index ] / 2;
+			color_arr[ arr_index + 0 ] = grey;
+			color_arr[ arr_index + 1 ] = grey;
+			color_arr[ arr_index + 2 ] = grey;
 		}
 	}
 
@@ -210,6 +255,9 @@ void Heightfield::initializeTerrain(unsigned char* terrain)
 
 void Heightfield::load_normals( void )	{
 
+	if( normal_arr )	{
+		delete [] normal_arr;
+	}
 	normal_arr = new float[ ( image_width - 1 ) * ( image_height - 1 ) * 2 * 3 ];
 	int norm_index = 0;
 
@@ -243,7 +291,7 @@ void Heightfield::load_normals( void )	{
 			norm_index += 3;
 		}
 	}
-
+	dirty_normals = false;
 #if 0
 	for( int i = 0; i <= 10; i++ )	{
 //		float px = 0.0f;
@@ -266,6 +314,7 @@ void Heightfield::set_scale( float x, float y, float z )	{
 	mesh_scale[ 0 ] = x;
 	mesh_scale[ 1 ] = y;
 	mesh_scale[ 2 ] = z;
+	dirty_normals = true;
 }
 
 void Heightfield::set_origin( float x, float y, float z )	{
@@ -273,6 +322,7 @@ void Heightfield::set_origin( float x, float y, float z )	{
 	mesh_origin[ 0 ] = x;
 	mesh_origin[ 1 ] = y;
 	mesh_origin[ 2 ] = z;
+	dirty_normals = true;
 }
 
 void Heightfield::set_auto_origin( void )	{
@@ -283,6 +333,7 @@ void Heightfield::set_auto_origin( void )	{
 
 	float center_elev = get_elevation( 0.0f, 0.0f );
 	mesh_origin[ 1 ] = -center_elev;
+	dirty_normals = true;
 }
 
 unsigned char* Heightfield::LoadBitmapFile(char *filename, BITMAPINFOHEADER * bitmapInfoHeader)

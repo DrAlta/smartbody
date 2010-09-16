@@ -335,6 +335,8 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    gridHighlightColor[2] = .0;
    gridSize = 200.0;
    gridStep = 20.0;
+//   gridSize = 400.0;
+//   gridStep = 50.0;
    gridList = -1;
 }
 
@@ -793,19 +795,17 @@ void FltkViewer::draw()
 
 //	light.directional = false;
 	light.directional = true;
-//   light.position = cam.eye;
 	light.diffuse = SrColor( 1.0f, 0.95f, 0.8f );
-//	light.position = SrVec( -200.0, 300.0, 400.0 );
-//	light.position = SrVec( 200.0, 300.0, 400.0 );
 	light.position = SrVec( 100.0, 250.0, 400.0 );
-	light.constant_attenuation = 1.0f/cam.scale;
+//	light.constant_attenuation = 1.0f/cam.scale;
+	light.constant_attenuation = 1.0f;
 
-	SrLight light2;
-	light2 = light;
+	SrLight light2 = light;
+	light2.directional = false;
 	light2.diffuse = SrColor( 0.8f, 0.85f, 1.0f );
-//	light2.position = SrVec( 400.0, 600.0, -300.0 );
-//	light2.position = SrVec( 200.0, 800.0, -300.0 );
-	light2.position = SrVec( 200.0, 500.0, -300.0 );
+	light2.position = SrVec( 100.0, 500.0, -200.0 );
+//	light2.constant_attenuation = 1.0f;
+//	light2.linear_attenuation = 2.0f;
 
    //----- Clear Background --------------------------------------------
    glClearColor ( _data->bcolor );
@@ -855,7 +855,7 @@ void FltkViewer::draw()
 
 		glDisable( GL_LIGHTING );
 
-		if (_data->shadowmode == ModeShadows)
+		if( _data->shadowmode == ModeShadows )
 //		if ( 1 )
 		{
 			GLfloat shadow_plane_floor[3][3] = {
@@ -884,7 +884,7 @@ void FltkViewer::draw()
 			shadow_light_pos[ 3 ] = light.directional ? 0.0f : 1.0f;
 
 			MakeShadowMatrix( shadow_plane_floor, shadow_light_pos, shadow_matrix );
-#if 1
+#if 0
 			glPushMatrix();
 				glTranslatef( 0.0, 0.25, 0.0 );
 				glMultMatrixf( (GLfloat *)shadow_matrix );

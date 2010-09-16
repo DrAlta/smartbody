@@ -318,6 +318,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "viewer",		mcu_viewer_func );
 	mcu.insert( "bmlviewer",    mcu_bmlviewer_func);
 	mcu.insert( "camera",		mcu_camera_func );
+	mcu.insert( "terrain",		mcu_terrain_func );
 	mcu.insert( "time",			mcu_time_func );
 	mcu.insert( "tip",			mcu_time_ival_prof_func );
 
@@ -781,11 +782,11 @@ int main( int argc, char **argv )	{
 //		bool update_sim = mcu.update_timer( SBM_get_real_time() );
 
 
-//mcu.mark( "main", 0, "fltk::check" );
+mcu.mark( "main", 0, "fltk-check" );
 
 		fltk::check();
 
-//mcu.mark( "main", 0, "ttu_poll" );
+mcu.mark( "main", 0, "ttu_poll" );
 
 #if LINK_VHMSG_CLIENT
 		if( mcu.vhmsg_enabled )	{
@@ -796,12 +797,15 @@ int main( int argc, char **argv )	{
 		}
 #endif
 
+mcu.mark( "main", 0, "bonebus" );
+
 		// [BMLR] Added to support receiving commands from renderer
 		vector<string> commands = mcu.bonebus.GetCommand();
 		for ( size_t i = 0; i < commands.size(); i++ ) {
 			mcu.execute( (char *)commands[i].c_str() );
 		}
 
+mcu.mark( "main", 0, "pending_cmd" );
 		if( cmdl.pending_cmd() )	{
 			char *cmd = cmdl.read_cmd();
 			if( strlen( cmd ) )	{
@@ -826,15 +830,18 @@ int main( int argc, char **argv )	{
 			fflush( stdout );
 		}
 
+mcu.mark( "main", 0, "broadcast_update" );
 		mcu.theWSP->broadcast_update();
 
+mcu.mark( "main", 0, "update_sim" );
 		if( update_sim )	{
 			mcu.update();
 		}
 
+mcu.mark( "main", 0, "render" );
 		mcu.render();
 	
-//mcu.mark( "main" );
+mcu.mark( "main" );
 	}
 
 	cleanup();
