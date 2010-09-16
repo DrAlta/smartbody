@@ -390,24 +390,24 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	std::vector<std::string> au_45_patch;
 	au_45_patch.push_back("au_45_left");
 	au_45_patch.push_back("au_45_right");
-	sbm_name_patch.insert(make_pair("au_1", au_1_patch));
-	sbm_name_patch.insert(make_pair("au_2", au_2_patch));
-	sbm_name_patch.insert(make_pair("au_4", au_4_patch));
-	sbm_name_patch.insert(make_pair("au_45", au_45_patch));
+	viseme_name_patch.insert(make_pair("au_1", au_1_patch));
+	viseme_name_patch.insert(make_pair("au_2", au_2_patch));
+	viseme_name_patch.insert(make_pair("au_4", au_4_patch));
+	viseme_name_patch.insert(make_pair("au_45", au_45_patch));
 
 	// Do the bone bus viseme name patch here
 	// hard coded, can be removed if these are added to bone bus and rendering side
 	std::vector<std::string> closed_mouth;							// this should is an empty vector
-	bonebus_name_patch.insert(make_pair("_", closed_mouth));	// when receiving this two viseme, do not send signal to bone bus
-	bonebus_name_patch.insert(make_pair("BMP", closed_mouth));
+	viseme_name_patch.insert(make_pair("_", closed_mouth));	// when receiving this two viseme, do not send signal to bone bus
+	viseme_name_patch.insert(make_pair("BMP", closed_mouth));
 	
 	std::vector<std::string> f_patch;								// "F" patch (match to "f")
 	f_patch.push_back("f");
-	bonebus_name_patch.insert(make_pair("F",f_patch));
+	viseme_name_patch.insert(make_pair("F",f_patch));
 	
 	std::vector<std::string> oh_patch;								// "OW" patch (match to "oh")
 	oh_patch.push_back("oh");
-	bonebus_name_patch.insert(make_pair("OW",oh_patch));
+	viseme_name_patch.insert(make_pair("OW",oh_patch));
 
 	std::vector<std::string> all_viseme;							// "ALL" patch (match to all the viseme)
 	all_viseme.push_back("Ao");
@@ -439,7 +439,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	all_viseme.push_back("fe9_thinking");
 	all_viseme.push_back("fe127_yawn");
 	all_viseme.push_back("fe129_angry");
-	bonebus_name_patch.insert(make_pair("ALL",all_viseme));
+	viseme_name_patch.insert(make_pair("ALL",all_viseme));
 	
 	return( CMD_SUCCESS ); 
 }
@@ -1058,12 +1058,12 @@ void SbmCharacter::bonebus_viseme_update(double curTime)
 	for (curveIter = visemeCurve.begin(); curveIter != visemeCurve.end(); curveIter++)
 	{
 		float weight = (float)curveIter->second->eval(curTime);
-		std::map<std::string, std::vector<std::string>>::iterator bonebusPatchIter;
-		bonebusPatchIter = bonebus_name_patch.find(curveIter->first);
-		if (bonebusPatchIter != bonebus_name_patch.end())
+		std::map<std::string, std::vector<std::string>>::iterator namePatchIter;
+		namePatchIter = viseme_name_patch.find(curveIter->first);
+		if (namePatchIter != viseme_name_patch.end())
 		{
-			for (size_t nCount = 0; nCount < bonebusPatchIter->second.size(); nCount++)
-				bonebusCharacter->SetViseme( bonebusPatchIter->second[nCount].c_str(), weight, 0.0 );
+			for (size_t nCount = 0; nCount < namePatchIter->second.size(); nCount++)
+				bonebusCharacter->SetViseme( namePatchIter->second[nCount].c_str(), weight, 0.0 );
 		}
 		else
 			bonebusCharacter->SetViseme( curveIter->first.c_str(), weight, 0.0 );
@@ -1078,67 +1078,60 @@ int SbmCharacter::set_viseme( char* viseme,
 							  int numKeys )
 {
     //LOG("Recieved: SbmCharacter(\"%s\")::set_viseme( \"%s\", %f, %f )\n", name, viseme, weight, rampin_duration );
-	if (bonebusCharacter)	// if it is bone bus character
+	std::vector<std::string> visemeNames;
+	std::map<std::string, std::vector<std::string>>::iterator iter;
+	iter = viseme_name_patch.find(viseme);
+	if (iter != viseme_name_patch.end())
 	{
-		if (!this->is_viseme_curve())
+		for (size_t nCount = 0; nCount < iter->second.size(); nCount++)
+			visemeNames.push_back(iter->second[nCount]);
+	}
+	else
+		visemeNames.push_back(viseme);
+
+	for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
+	{
+		if (bonebusCharacter)	// if it is bone bus character
 		{
-			if (curve_info != NULL)
+			if (!this->is_viseme_curve())
 			{
-				LOG("SbmCharacter::set_viseme WARNING: Now Curve Mode is OFF, Check the char <> viseme command!");
-				return CMD_FAILURE;
-			}
-			std::map<std::string, std::vector<std::string>>::iterator iter;
-			iter = bonebus_name_patch.find(viseme);
-			if (iter != bonebus_name_patch.end())
-			{
-				for (size_t nCount = 0; nCount < iter->second.size(); nCount++)
-					bonebusCharacter->SetViseme( iter->second[nCount].c_str(), weight, rampin_duration );
+				if (curve_info != NULL)
+				{
+					LOG("SbmCharacter::set_viseme WARNING: Now Curve Mode is OFF, Check the char <> viseme command!");
+					return CMD_FAILURE;
+				}
+				bonebusCharacter->SetViseme( visemeNames[nCount].c_str(), weight, rampin_duration );
 			}
 			else
-				bonebusCharacter->SetViseme( viseme, weight, rampin_duration );
-		}
-		else
-		{
-			if (numKeys > 0)
 			{
-				std::map<std::string, MeSpline1D*>::iterator iter = visemeCurve.find(std::string(viseme));
-				if (iter != visemeCurve.end())
+				if (numKeys > 0)
 				{
-					visemeCurve.erase(iter);
+					std::map<std::string, MeSpline1D*>::iterator iter = visemeCurve.find(visemeNames[nCount]);
+					if (iter != visemeCurve.end())
+					{
+						visemeCurve.erase(iter);
+					}
+					MeSpline1D* curve = new MeSpline1D();
+					curve->make_smooth(start_time, 0, 0, 0, 0);
+					float timeDelay = this->get_viseme_time_delay();
+					for (int i = 0; i < numKeys; i++)
+					{
+						float weight = curve_info[i*4+1];
+						float inTime = curve_info[i*4+0];
+						curve->make_smooth(start_time+inTime+timeDelay, weight, 0, 0, 0);		
+					}
+					visemeCurve.insert(make_pair(visemeNames[nCount], curve));
 				}
-				MeSpline1D* curve = new MeSpline1D();
-				curve->make_smooth(start_time, 0, 0, 0, 0);
-				float timeDelay = this->get_viseme_time_delay();
-				for (int i = 0; i < numKeys; i++)
-				{
-					float weight = curve_info[i*4+1];
-					float inTime = curve_info[i*4+0];
-					curve->make_smooth(start_time+inTime+timeDelay, weight, 0, 0, 0);		
-				}
-				visemeCurve.insert(make_pair(std::string(viseme), curve));
 			}
 		}
-	}
 
-	if ( mcuCBHandle::singleton().sbm_character_listener )
-	{
-			mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, viseme, weight, rampin_duration );
-	}
-
-	if (!bonebusCharacter)	// if it is not going through bone bus
-	{	// Viseme/AU channel activation
-
-		std::map<std::string, std::vector<std::string>>::iterator sbmPatchIter;
-		sbmPatchIter = sbm_name_patch.find(viseme);
-		std::vector<std::string> visemeNames;
-		if (sbmPatchIter != sbm_name_patch.end())
-			for (size_t nCount = 0; nCount < sbmPatchIter->second.size(); nCount++)
-				visemeNames.push_back(sbmPatchIter->second[nCount]);
-		else
-			visemeNames.push_back(viseme);
-
-		for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
+		if ( mcuCBHandle::singleton().sbm_character_listener )
 		{
+				mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, visemeNames[nCount].c_str(), weight, rampin_duration );
+		}
+
+		if (!bonebusCharacter)	// if it is not going through bone bus
+		{	// Viseme/AU channel activation
 			ostringstream ct_name;
 			ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
 
