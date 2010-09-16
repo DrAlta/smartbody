@@ -64,7 +64,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="libFestival.lib libestbase.lib libestools.lib libeststring.lib Ws2_32.lib winmm.lib vhcl_d.lib xerces-c_3D.lib vhmsg_d.lib pthreadVSE2.lib activemq-cppd.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\lib\festival\src\lib;..\..\lib\speech_tools\lib;..\..\lib\vhcl\lib;&quot;..\..\lib\vhmsg\vhmsg-c\lib&quot;;&quot;..\..\lib\xerces-c\lib&quot;;..\..\lib\pthreads\lib;&quot;..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;"
+				AdditionalLibraryDirectories="..\..\lib\festival\src\lib;..\..\lib\speech_tools\lib;..\..\lib\vhcl\lib;&quot;..\..\lib\vhmsg\vhmsg-c\lib&quot;;&quot;..\..\lib\xerces-c\lib&quot;;..\..\lib\pthreads\lib;&quot;..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -89,7 +89,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll .&#x0D;&#x0A;copy /Y ..\..\lib\xerces-c\bin\xerces-c_3_0D.dll ."
+				CommandLine="copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll .&#x0D;&#x0A;copy /Y ..\..\lib\xerces-c\bin\xerces-c_3_0D.dll .&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration

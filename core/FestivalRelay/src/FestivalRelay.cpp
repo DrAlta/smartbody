@@ -107,7 +107,7 @@ class XStr
 
 #define X( str ) XStr( str ).unicodeForm()
 XERCES_CPP_NAMESPACE_USE
-#define FESTIVAL_HEAP_SIZE 999999
+//#define FESTIVAL_HEAP_SIZE 999999
 
 bool done = false;
 extern SpeechRequestData xmlMetaData;
@@ -263,6 +263,7 @@ std::string storeXMLMetaData( const std::string & txt)
    }
    else {
 	   fprintf(stderr, "Error: Unable to instantiate DOM Xml parser, exiting \n");
+	   return "";
    }
 }
 
@@ -438,6 +439,7 @@ int main(int argc, char **argv)
 	festival_eval_command("(set! after_synth_hooks (list Duration_VirtualHuman))");
 	// setting duration stretch parameter
 	festival_eval_command("(Parameter.set 'Duration_Stretch 0.8)");
+	festival_eval_command("(set! voice_default 'voice_rab_diphone)");
 
 	
 	printf( "Starting ActiveMQ\n");
