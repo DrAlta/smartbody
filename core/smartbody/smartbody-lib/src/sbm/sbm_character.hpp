@@ -119,14 +119,13 @@ protected:
 	// They are all controlled by the "character .. viseme .." command.
 
 	// Following patch can be removed after the other parts are fullfilled
-	// bonebus viseme name patch
-	// in case there's a mis-match between audio file or remote speech and Bonebus Network Map
-	std::map<std::string, std::vector<std::string>> bonebus_name_patch;
-	
-	// sbm viseme name patch
-	// doing this for bilateral au, e.g. mapping au_1 to au_1_left and au_1_right
+	// viseme name patch
+	// in case there's a mis-match between audio file&remote speech viseme name and Bonebus&SBM viseme name
+	// e.g. Oh <-> oh, OW <-> oh
+	// also doing this for bilateral au, e.g. mapping au_1 to au_1_left and au_1_right
 	// in this way, au_1 can control both au_1_left and au_1_right
-	std::map<std::string, std::vector<std::string>> sbm_name_patch;
+	std::map<std::string, std::vector<std::string>> viseme_name_patch;
+
 
 	// Viseme Curve Info
 	std::map <std::string, MeSpline1D*> visemeCurve;
