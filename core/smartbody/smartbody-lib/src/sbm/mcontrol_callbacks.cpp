@@ -637,6 +637,88 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 /////////////////////////////////////////////////////////////
 
+int mcu_terrain_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
+	
+	if( mcu_p )	{
+		char *terr_cmd = args.read_token();
+
+		if( strcmp( terr_cmd, "help" ) == 0 )	{
+			LOG("HELP: terrain");	
+			LOG("  load [<filename>]");
+			LOG("  scale <X Y Z>");
+			LOG("  origin <X Y Z>|auto");
+			LOG("  delete");
+			return( CMD_SUCCESS );
+		}
+		else
+		if( strcmp( terr_cmd, "load" ) == 0 )	{
+
+			if( mcu_p->height_field_p == NULL )	{
+				mcu_p->height_field_p = new Heightfield();
+			}
+			int n = args.calc_num_tokens();
+			if( n == 0 )	{
+				mcu_p->height_field_p->load( "../../../../data/terrain/range1.e.bmp" );
+				mcu_p->height_field_p->set_scale( 5000.0f, 300.0f, 5000.0f );
+				mcu_p->height_field_p->set_auto_origin();
+			}
+			else	{
+				char *filename = args.read_token();
+				mcu_p->height_field_p->load( filename );
+			}
+			return( CMD_SUCCESS );
+		}
+		else
+		if( mcu_p->height_field_p == NULL ) {
+			LOG( "mcu_terrain_func: ERR: no heightfield loaded" );
+			return( CMD_FAILURE );
+		}
+
+		if( strcmp( terr_cmd, "scale" ) == 0 )	{
+			
+			float x = args.read_float();
+			float y = args.read_float();
+			float z = args.read_float();
+			mcu_p->height_field_p->set_scale( x, y, z );
+		}
+		else
+		if( strcmp( terr_cmd, "origin" ) == 0 )	{
+
+			int n = args.calc_num_tokens();
+			if( n == 1 )	{
+				char *sub_cmd = args.read_token();
+				if( strcmp( sub_cmd, "auto" ) == 0 )	{
+					mcu_p->height_field_p->set_auto_origin();
+				}
+				else	{
+					LOG( "mcu_terrain_func: ERR: token '%s' not recognized", sub_cmd );
+					return( CMD_NOT_FOUND );
+				}
+			}
+			else	{
+				
+				float x = args.read_float();
+				float y = args.read_float();
+				float z = args.read_float();
+				mcu_p->height_field_p->set_origin( x, y, z );
+			}
+		}
+		else
+		if( strcmp( terr_cmd, "delete" ) == 0 )	{
+			
+			delete mcu_p->height_field_p;
+			mcu_p->height_field_p = NULL;
+		}
+		else {
+			return( CMD_NOT_FOUND );
+		}
+		return( CMD_SUCCESS );
+	}
+	return( CMD_FAILURE );
+}
+
+/////////////////////////////////////////////////////////////
+
 void mcu_print_timer_deprecation_warning( void )	{
 
 	LOG("WARNING: fps/lockdt feature is deprecated");

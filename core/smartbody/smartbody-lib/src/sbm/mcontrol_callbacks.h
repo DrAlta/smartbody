@@ -50,6 +50,7 @@ int mcu_sequence_chain_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_viewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_bmlviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_terrain_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 

@@ -128,32 +128,6 @@ mcuCBHandle::mcuCBHandle()
 	// TODO: this needs to have a unique name so that multiple sbm
 	// processes will be identified differently
 	theWSP->init( "SMARTBODY" );
-	
-#if 0
-	height_field_p = new Heightfield();
-	height_field_p->load( "../../../../data/terrain/range1.e0.bmp" );
-//	height_field_p->set_scale( 100.0f, 100.0f, 100.0f );
-//	height_field_p->set_scale( 1000.0f, 500.0f, 1000.0f );
-	height_field_p->set_scale( 5000.0f, 500.0f, 5000.0f );
-//	height_field_p->set_scale( 5000.0f, 1000.0f, 5000.0f );
-	height_field_p->set_auto_origin();
-
-#if 0
-	for( int i = 0; i <= 10; i++ )	{
-//		float px = 0.0;
-//		float px = 1.0;
-		float px = (float)i/10.0;
-//		float px = 1.0f - (float)i/10.0f;
-//		float pz = 0.0;
-//		float pz = 1.0;
-		float pz = (float)i/10.0;
-//		float pz = 1.0f - (float)i/10.0f;
-		float n[ 3 ];
-		float y = height_field_p->get_elevation( px, pz, n );
-		printf( "%f %f : %f : %f %f %f\n", px, pz, y, n[0], n[1], n[2] );
-	}
-#endif
-#endif
 }
 
 /////////////////////////////////////////////////////////////

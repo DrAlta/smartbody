@@ -11,21 +11,24 @@ class Heightfield
 	public:
 		Heightfield();
 		~Heightfield();
-	
+		
 		void load( char* filename );
 		void set_scale( float x, float y, float z );
 		void set_origin( float x, float y, float z );
 		void set_auto_origin( void );
-		void load_normals( void );
 		
 		void render( void ); 
 		float get_elevation( float x, float z, float *normal_p = NULL );
 
 	private:
+		void clear( void );
+		void defaults( void );
+		
 		unsigned char *LoadBitmapFile(char *filename, BITMAPINFOHEADER* bitmapInfoHeader);
 		void initializeTerrain(unsigned char* terrain);
 		void calc_normal( float *N_out, float *A, float *B, float *C, float *S );
 		void normalize_arr3( float V[ 3 ] );
+		void load_normals( void );
 		
 		float get_raw_elevation( int i, int j );
 
@@ -44,5 +47,7 @@ class Heightfield
 		float *vertex_arr;
 		float *normal_arr;
 		unsigned char *color_arr;
+		
+		bool dirty_normals;
 };
 #endif
