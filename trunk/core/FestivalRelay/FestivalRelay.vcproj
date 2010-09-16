@@ -25,6 +25,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="cd ..\..\lib\speech_tools&#x0D;&#x0A;nmake /nologo /FVCMakefile&#x0D;&#x0A;cd ..\festival&#x0D;&#x0A;nmake /nologo /FVCMakefile&#x0D;&#x0A;cd ..\..\core\FestivalRelay"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -88,6 +89,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll .&#x0D;&#x0A;copy /Y ..\..\lib\xerces-c\bin\xerces-c_3_0.dll ."
 			/>
 		</Configuration>
 		<Configuration
