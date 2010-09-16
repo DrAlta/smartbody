@@ -377,7 +377,25 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		}
 	}
 	
-	// Do the bone bus name patch here
+	// Do the sbm viseme name patch here
+	std::vector<std::string> au_1_patch;
+	au_1_patch.push_back("au_1_left");
+	au_1_patch.push_back("au_1_right");
+	std::vector<std::string> au_2_patch;
+	au_2_patch.push_back("au_2_left");
+	au_2_patch.push_back("au_2_right");
+	std::vector<std::string> au_4_patch;
+	au_4_patch.push_back("au_4_left");
+	au_4_patch.push_back("au_4_right");
+	std::vector<std::string> au_45_patch;
+	au_45_patch.push_back("au_45_left");
+	au_45_patch.push_back("au_45_right");
+	sbm_name_patch.insert(make_pair("au_1", au_1_patch));
+	sbm_name_patch.insert(make_pair("au_2", au_2_patch));
+	sbm_name_patch.insert(make_pair("au_4", au_4_patch));
+	sbm_name_patch.insert(make_pair("au_45", au_45_patch));
+
+	// Do the bone bus viseme name patch here
 	// hard coded, can be removed if these are added to bone bus and rendering side
 	std::vector<std::string> closed_mouth;							// this should is an empty vector
 	bonebus_name_patch.insert(make_pair("_", closed_mouth));	// when receiving this two viseme, do not send signal to bone bus
@@ -1108,28 +1126,41 @@ int SbmCharacter::set_viseme( char* viseme,
 
 	if (!bonebusCharacter)	// if it is not going through bone bus
 	{	// Viseme/AU channel activation
-		ostringstream ct_name;
-		ct_name << "Viseme \"" << viseme << "\", Channel \"" << viseme << "\"";
 
-		SkChannelArray channels;
-		channels.add( SkJointName(viseme), SkChannel::XPos );
+		std::map<std::string, std::vector<std::string>>::iterator sbmPatchIter;
+		sbmPatchIter = sbm_name_patch.find(viseme);
+		std::vector<std::string> visemeNames;
+		if (sbmPatchIter != sbm_name_patch.end())
+			for (size_t nCount = 0; nCount < sbmPatchIter->second.size(); nCount++)
+				visemeNames.push_back(sbmPatchIter->second[nCount]);
+		else
+			visemeNames.push_back(viseme);
 
-		MeCtRawWriter* ct = new MeCtRawWriter();
-		ct->name( ct_name.str().c_str() );
-		ct->init( channels, true );
-		SrBuffer<float> value;
-		value.size(1);
-		value[0] = (float)weight;
-		ct->set_data(value);
-		// Curve Mode: viseme in buffer channel has to be set to 0.0 at the beginning of frame (temporary solution to the feedback problem)
-		//				local channel is set to 1.0 all the time
-		//				final result inside buffer channel is controlled by the blend curve
-		// Original Add On Mode: viseme in buffer channel keep the same value unless it is being changed at certain time
-		//							which means after modifying channel data to 1.0, you have to reset it to 0.0 later on
-		if (numKeys > 0)	// Curve MODE
-			head_sched_p->schedule(ct, start_time, curve_info, numKeys);
-		else				// Original Add On MODE
-			head_sched_p->schedule( ct, start_time, start_time + ct->controller_duration(), rampin_duration, 0 );
+		for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
+		{
+			ostringstream ct_name;
+			ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
+
+			SkChannelArray channels;
+			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
+
+			MeCtRawWriter* ct = new MeCtRawWriter();
+			ct->name( ct_name.str().c_str() );
+			ct->init( channels, true );
+			SrBuffer<float> value;
+			value.size(1);
+			value[0] = (float)weight;
+			ct->set_data(value);
+			// Curve Mode: viseme in buffer channel has to be set to 0.0 at the beginning of frame (temporary solution to the feedback problem)
+			//				local channel is set to 1.0 all the time
+			//				final result inside buffer channel is controlled by the blend curve
+			// Original Add On Mode: viseme in buffer channel keep the same value unless it is being changed at certain time
+			//							which means after modifying channel data to 1.0, you have to reset it to 0.0 later on
+			if (numKeys > 0)	// Curve MODE
+				head_sched_p->schedule(ct, start_time, curve_info, numKeys);
+			else				// Original Add On MODE
+				head_sched_p->schedule( ct, start_time, start_time + ct->controller_duration(), rampin_duration, 0 );
+		}
 	}
 	return CMD_SUCCESS;
 }

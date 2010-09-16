@@ -118,9 +118,15 @@ protected:
 	// and may also refer to an action unit or other face shape.
 	// They are all controlled by the "character .. viseme .." command.
 
-	// bonebus name patch
+	// Following patch can be removed after the other parts are fullfilled
+	// bonebus viseme name patch
 	// in case there's a mis-match between audio file or remote speech and Bonebus Network Map
 	std::map<std::string, std::vector<std::string>> bonebus_name_patch;
+	
+	// sbm viseme name patch
+	// doing this for bilateral au, e.g. mapping au_1 to au_1_left and au_1_right
+	// in this way, au_1 can control both au_1_left and au_1_right
+	std::map<std::string, std::vector<std::string>> sbm_name_patch;
 
 	// Viseme Curve Info
 	std::map <std::string, MeSpline1D*> visemeCurve;
