@@ -609,15 +609,16 @@ int SbmCharacter::init_skeleton() {
 			SkMotion* motion = vi->second;
 
 			if( motion ) {
-				string name = "viseme_";
-				name += id;
+				/* get rid of the "viseme_" prefix */ 
+//				string name = "viseme_";
+//				name += id;
 
 				// Create the Viseme control channel
-				add_face_channel( name, wo_index );
+				add_face_channel( id, wo_index );
 				
 				// Register control channel with face controller
 				if( face_ct )
-					face_ct->add_key( name.c_str(), motion );
+					face_ct->add_key( id.c_str(), motion );
 			}
 		}
 	}
