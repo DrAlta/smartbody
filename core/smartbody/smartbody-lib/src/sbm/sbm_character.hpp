@@ -126,7 +126,6 @@ protected:
 	// in this way, au_1 can control both au_1_left and au_1_right
 	std::map<std::string, std::vector<std::string>> viseme_name_patch;
 
-
 	// Viseme Curve Info
 	std::map <std::string, MeSpline1D*> visemeCurve;
 	bool			use_viseme_curve;
@@ -256,13 +255,19 @@ public:
 	MeCtLocomotionAnalysis* get_locomotion_ct_analysis();
 
 public:
-	// temporary hack for viseme curve which requests the buffer channel data to be zero before blending
-	// also hard coded inside
+	// reset the buffer channel data to be zero before blending
+	// hope we have cleverer way later
 	void reset_viseme_channels();
+
+	// viseme curve related functions
 	bool is_viseme_curve() const {return use_viseme_curve;}
 	void set_viseme_curve(bool mode) {use_viseme_curve = mode;}
 	void set_viseme_time_delay(float timeDelay) {time_delay = timeDelay;}
 	float get_viseme_time_delay() {return time_delay;}
+
+private:
+	int viseme_channel_start_pos;
+	int viseme_channel_end_pos;
 
 protected:
 	/*!
