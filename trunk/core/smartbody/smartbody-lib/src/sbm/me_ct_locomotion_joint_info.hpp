@@ -40,6 +40,7 @@ struct MeCtLocomotionJointInfo
 	SrArray<SrQuat> quat;
 	SrArray<int> mat_valid;
 	SrArray<SrMat>	mat;
+	//SrArray<SrMat>	gmat;
 
 	//key frames used to interpolate
 	SrArray<SrQuat> quat_key_frame1;

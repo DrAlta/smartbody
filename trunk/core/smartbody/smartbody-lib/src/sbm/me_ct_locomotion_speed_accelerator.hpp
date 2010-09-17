@@ -35,6 +35,7 @@ public:
 	float				target_speed;
 	float				curr_speed;
 	float				target_acceleration;
+	float				acceleration_factor;
 	float				acceleration;
 
 	float				max_acceleration_pos; // max acceleration limit. 0: not used; > 0: limit

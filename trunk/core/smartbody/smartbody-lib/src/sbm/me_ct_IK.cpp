@@ -104,21 +104,27 @@ void MeCtIK::update(MeCtIKScenario* scenario)
 		SrQuat after = before;*/
 		modified = check_constraint(&after, manipulated_joint_index);
 		scenario->quat_list.set(manipulated_joint_index, before);
-		if(modified == 0) break;
+		if(modified == 0) 
+		{
+			//break;
+			get_next_support_joint();
+			get_limb_section_local_pos(manipulated_joint_index-1, -1);
+			calc_target(scenario->ik_orientation);
+		}
 		else 
 		{
 			recrod_endmat = 0;
 			get_next_support_joint();
 			get_limb_section_local_pos(0, -1);
 			scenario->quat_list.set(manipulated_joint_index-1, after);
-			calc_target();
+			calc_target(scenario->ik_orientation);
 			//end_mat.rot(after.axis(), after.angle() - before.angle());
 		}
 	}
 	
 }
 
-void MeCtIK::adjust_support_joints()
+/*void MeCtIK::adjust_support_joints()
 {
 	for(int i = manipulated_joint_index; i < scenario->joint_info_list.size(); ++i)
 	{
@@ -127,7 +133,7 @@ void MeCtIK::adjust_support_joints()
 			
 		}
 	}
-}
+}*/
 
 int MeCtIK::get_support_joint_num()
 {
@@ -191,6 +197,13 @@ __forceinline float MeCtIK::distance_to_plane(SrVec& point, SrVec& plane_normal,
 	return dis;
 }
 
+__forceinline SrVec MeCtIK::cross_point_on_plane(SrVec& point, SrVec& line, SrVec& plane_normal, SrVec& plane_point)
+{
+	float dis = distance_to_plane(point, plane_normal, plane_point);
+	float cos = dot(line, plane_normal)/plane_normal.len();
+	return (point - line*dis/cos);
+}
+
 __forceinline SrVec MeCtIK::upright_point_to_plane(SrVec& point, SrVec& plane_normal, SrVec& plane_point)
 {
 	float dis = distance_to_plane(point, plane_normal, plane_point);
@@ -210,15 +223,6 @@ __forceinline bool MeCtIK::cross_point_with_plane(SrVec* cross_point, SrVec& lin
 
 __forceinline void MeCtIK::update_limb_section_local_pos(int start_index)
 {
-	/*SrVec v;
-	for(int i = start_index; i < joint_pos_list->size()-1; ++i)
-	{
-		v = joint_pos_list.get(j);
-		v = mat * v;
-		joint_pos_list.set(j, v);
-	}*/
-
-
 	//temp solution, for efficiency, this must be replaced.
 	get_limb_section_local_pos(start_index, -1);
 	//temp solution, for efficiency, this must be replaced.
@@ -226,14 +230,6 @@ __forceinline void MeCtIK::update_limb_section_local_pos(int start_index)
 
 __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 {
-
-	/*SrVec ppp(11,0,0);
-	SrMat matk;
-	matk.rot(SrVec(1,1,1), 45);
-	ppp = matk*ppp;
-	matk = matk.inverse();
-	ppp = matk*ppp;*/
-
 	SrVec v1, v2, v3, v4;
 	SrVec v, i_target, i_src;
 	SrVec axis, r_axis;
@@ -283,55 +279,14 @@ __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 	//update_manipulated_joint_pos(start_index);
 }
 
-/*__forceinline void MeCtIK::rotate(SrVec& src, int start_index)
+__forceinline void MeCtIK::calc_target(SrVec& orientation)
 {
-	SrVec v1, v2, v3, v4;
-	SrVec v;
-	SrVec axis, r_axis;
-	SrMat mat;
-	SrVec& pivot = joint_pos_list.get(start_index);
-	v4 = target - src;
-	v1 = src - pivot;
-	if(scenario->joint_info_list.get(start_index).type == JOINT_TYPE_BALL)
-	{
-		//compute the axis 
-		v2 = target - pivot;
-		axis = cross(v2, v1);
-		r_axis = axis;
-	}
-	else if(scenario->joint_info_list.get(start_index).type == JOINT_TYPE_HINGE)
-	{
-		axis = joint_axis_list.get(start_index);
-		v = upright_point_to_plane(target, axis, src);
-		v2 = v - pivot;
-		r_axis = SrVec(1,0,0);
-	}
-	
-	v1.normalize();
-	v2.normalize();
-	float dot_v = dot(v1, v2);
-	if(dot_v > 1.0f) dot_v = 1.0f;
-	float angle = (float)acos(dot_v);
-
-	v3 = cross(v1, v2);
-	if(dot(v3, axis) > 0.0f) mat.rot(r_axis, angle);
-	else mat.rot(r_axis, -angle);
-	
-	SrQuat q = scenario->quat_list.get(start_index);
-	q = mat * q;
-
-	check_constraint(&q, start_index);
-
-	//end_mat = mat * end_mat;
-	scenario->quat_list.set(start_index, q);
-	get_limb_section_local_pos(start_index, -1);
-	//update_manipulated_joint_pos(start_index);
-}*/
-
-__forceinline void MeCtIK::calc_target()
-{
+	orientation.normalize();
 	SrVec pos = joint_pos_list.get(manipulated_joint_index);
-	target = (manipulated_joint->support_joint_comp + manipulated_joint->support_joint_height - distance_to_plane(pos, scenario->plane_normal, scenario->plane_point)) * scenario->plane_normal + pos;
+	//target = (manipulated_joint->support_joint_comp + manipulated_joint->support_joint_height - distance_to_plane(pos, scenario->plane_normal, scenario->plane_point)) * scenario->plane_normal + pos;
+	SrVec t = cross_point_on_plane(pos, orientation, scenario->plane_normal, scenario->plane_point);
+	target = -(manipulated_joint->support_joint_comp + manipulated_joint->support_joint_height)*orientation + t;
+	//printf("\n(%f, %f, %f)", pos.x, pos.y, pos.z);
 }
 
 __forceinline void MeCtIK::get_next_support_joint()
@@ -381,8 +336,8 @@ void MeCtIK::init()
 	manipulated_joint_index = -1;
 	support_joint_num = get_support_joint_num();
 	get_next_support_joint();
-	calc_target();
-	adjust_support_joints();
+	calc_target(scenario->ik_orientation);
+	//adjust_support_joints();
 }
 
 __forceinline void MeCtIK::get_init_mat_list()

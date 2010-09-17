@@ -36,6 +36,7 @@ MeCtLocomotionSpeedAccelerator::MeCtLocomotionSpeedAccelerator() {
 	target_speed = 0.0f;
 	target_acceleration = 10.0f;
 	acceleration = 10.0f;
+	acceleration_factor = 30.0f;
 	//automate = true;
 	proceed_acceleration = true;
 	auto_accelerated = true;
@@ -43,7 +44,7 @@ MeCtLocomotionSpeedAccelerator::MeCtLocomotionSpeedAccelerator() {
 	frame_interval = 0.03333333f;
 	max_acceleration_pos = 200.0f;
 	min_acceleration_pos = 0.0f;
-	max_acceleration_neg = -30.0f;
+	max_acceleration_neg = -1.0f;
 	min_acceleration_neg = -200.0f;
 }
 
@@ -59,6 +60,16 @@ void MeCtLocomotionSpeedAccelerator::update_speed(double time_interval)
 	{
 		curr_speed = target_speed;
 		return;
+	}
+	if(target_acceleration > acceleration)
+	{
+		acceleration += acceleration_factor*time_interval;
+		if(acceleration > target_acceleration) acceleration = target_acceleration;
+	}
+	else
+	{
+		acceleration -= acceleration_factor*time_interval;
+		if(acceleration < target_acceleration) acceleration = target_acceleration;
 	}
 	if(curr_speed == target_speed) return;
 	curr_speed += acceleration * (float)time_interval;
@@ -94,7 +105,11 @@ void MeCtLocomotionSpeedAccelerator::set_target_speed(float target_speed)
 {
 	if(target_speed > speed_limit) target_speed = speed_limit;
 	this->target_speed = target_speed;
-	if((target_speed - curr_speed)*acceleration < 0.0f) acceleration = -acceleration;
+	if((target_speed - curr_speed)*acceleration < 0.0f) 
+	{
+		target_acceleration = -target_acceleration;
+		acceleration = -acceleration;
+	}
 
 }
 
@@ -150,18 +165,20 @@ void MeCtLocomotionSpeedAccelerator::update_acceleration(MeCtLocomotionLimb* lim
 	float time;
 		
 	time = length * frame_interval;
-	acceleration = (target_speed - curr_speed)/time;
+	target_acceleration = (target_speed - curr_speed)/time;
 	
-	if(acceleration >= 0.0f)
+	if(target_acceleration >= 0.0f)
 	{
-		if(max_acceleration_pos > 0.0f && acceleration > max_acceleration_pos) acceleration = max_acceleration_pos;
-		if(min_acceleration_pos > 0.0f && acceleration < min_acceleration_pos) acceleration = min_acceleration_pos;
+		if(max_acceleration_pos > 0.0f && target_acceleration > max_acceleration_pos) target_acceleration = max_acceleration_pos;
+		if(min_acceleration_pos > 0.0f && target_acceleration < min_acceleration_pos) target_acceleration = min_acceleration_pos;
 	}
 	else
 	{
-		if(max_acceleration_neg < 0.0f && acceleration > max_acceleration_neg) acceleration = max_acceleration_neg;
-		if(min_acceleration_neg < 0.0f && acceleration < min_acceleration_neg) acceleration = min_acceleration_neg;
+		if(max_acceleration_neg < 0.0f && target_acceleration > max_acceleration_neg) target_acceleration = max_acceleration_neg;
+		if(min_acceleration_neg < 0.0f && target_acceleration < min_acceleration_neg) target_acceleration = min_acceleration_neg;
 	}
+
+	if(curr_speed > 0.0f) printf("\n%f %f", target_acceleration, curr_speed);
 }
 
 float MeCtLocomotionSpeedAccelerator::get_max_acceleration_neg()

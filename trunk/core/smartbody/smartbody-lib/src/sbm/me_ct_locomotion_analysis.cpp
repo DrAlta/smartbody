@@ -147,7 +147,7 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 				{
 					limb->ik.joint_info_list.get(j).is_support_joint = 1;
 					limb->ik.joint_info_list.get(j).support_joint_height = limb->support_height.get(k);
-					limb->ik.joint_info_list.get(j).support_joint_comp = 0.0f;
+					//limb->ik.joint_info_list.get(j).support_joint_comp = 0.0f;
 				}
 			}
 			if(joint->num_children() > 0)

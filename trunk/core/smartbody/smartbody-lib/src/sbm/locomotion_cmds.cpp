@@ -300,6 +300,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			}
 			arg = args.read_token();
 		}
+
 		nav_circle->init( direction.x, direction.y, direction.z, rps, lrps, angle, -1, 0, 0, 0 );
 
 		return CMD_SUCCESS;
@@ -343,7 +344,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	else if (arg == "tx" || arg == "tz" || arg == "spd")
 	{
 		SkChannelArray channels;
-		float tx = 0.0f, ty = 0.0f, tz = 0.0f, lrps = 0.0f, spd = 0.0f, angle = 0.0f;
+		float tx = 0.0f, ty = 0.0f, tz = 0.0f, lrps = 0.0f, rps = 0.0f, spd = 0.0f, angle = 0.0f;
 		int flagx = 0, flagz = 0;
 		int tx_index=-1, ty_index=-1, tz_index=-1, spd_index = -1;
 		actor->get_locomotion_ct()->get_navigator()->clear_destination_list();
@@ -389,6 +390,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 					flagz = 0;
 				}
 			}
+
 			else if(arg == "lrps")
 			{
 				lrps = args.read_float();
@@ -418,7 +420,25 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			
 		}
 
-		nav_circle->init( 0.0f, 0.0f, 0.0f, 0, lrps, angle, -1, 0, 0, 0 );
+		if(angle == 0.0f)
+		{
+			SrVec orientation(0,0,1);
+			SrMat mat;
+			mat.roty(actor->get_locomotion_ct()->get_navigator()->get_facing_angle());
+			orientation = orientation * mat;
+
+			SrVec v;
+			SrVec world_pos = actor->get_locomotion_ct()->get_navigator()->get_world_pos();
+			
+			v.set(tx-world_pos.x, 0.0f, tz-world_pos.z);
+			v.normalize();
+			orientation.normalize();
+			if(cross(orientation, v).y > 0.0f)
+				angle = -acos(dot(orientation, v));
+			else angle = acos(dot(orientation, v));
+		}
+
+		nav_circle->init( 0.0f, 0.0f, 0.0f, rps, lrps, angle, -1, 0, 0, 0 );
 		return CMD_SUCCESS;
 	}
 	
