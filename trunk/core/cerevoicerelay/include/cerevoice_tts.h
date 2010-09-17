@@ -56,6 +56,8 @@ class cerevoice_tts
 
 protected:
       void load_voice( char * voice_id );
+
+	  std::string addUselTag(std::string);
          
 };
 
