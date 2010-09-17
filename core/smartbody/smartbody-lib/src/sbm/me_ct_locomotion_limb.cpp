@@ -182,12 +182,14 @@ void MeCtLocomotionLimb::manipulate_turning(SrMat& root_mat)
 {
 	SrMat mat;
 	SrVec y(0.0f, 1.0f, 0.0f);
-	root_mat.invert();
+	//root_mat.invert();
 	//y = root_mat*y;
 	//y = y*root_mat;
+	//printf("\n%f", curr_rotation);
 	mat.rot(y, curr_rotation);
 	SrQuat quat = limb_joint_info.quat.get(0);
 	quat = quat * mat;
+	//quat = mat* quat;
 	limb_joint_info.quat.set(0, quat);
 }
 

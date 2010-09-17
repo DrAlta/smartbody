@@ -317,10 +317,21 @@ void MeCtLocomotionNavigator::set_reached_destination(MeFrameData& frame)
 	destination_list.size(0);
 }
 
+void MeCtLocomotionNavigator::update_world_offset()
+{
+	prev_height_displacement = curr_height_displacement;
+	curr_height_displacement = target_height_displacement;
+	//curr_height_displacement = target_height_displacement * standing_factor;
+
+	world_pos.x = displacement.x + world_pos.x;
+	world_pos.y = displacement.y + world_pos.y + curr_height_displacement - prev_height_displacement;
+	world_pos.z = displacement.z + world_pos.z;
+}
+
 void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtLocomotionLimb* limb, bool reset) 
 {
 	//if(reached_destination) return;
-	prev_height_displacement = curr_height_displacement;
+
 
 	SrBuffer<float>& buffer = frame.buffer();
 	if(reset)
@@ -330,12 +341,10 @@ void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtL
 		buffer[ bi_world_z ] = 0.0f;
 	}
 
-	curr_height_displacement = target_height_displacement * standing_factor;
 
-
-	buffer[ bi_world_x ] = displacement.x + world_pos.x;
-	buffer[ bi_world_y ] = displacement.y + world_pos.y + curr_height_displacement - prev_height_displacement;
-	buffer[ bi_world_z ] = displacement.z + world_pos.z;
+	buffer[ bi_world_x ] = world_pos.x;
+	buffer[ bi_world_y ] = world_pos.y;
+	buffer[ bi_world_z ] = world_pos.z;
 
 	SrMat mat;
 	mat.roty(facing_angle);
@@ -529,8 +538,10 @@ void MeCtLocomotionNavigator::update_facing(MeCtLocomotionLimb* limb, bool domin
 			else 
 				facing_angle += -delta_angle;
 	
-			if(facing_angle > 0.0f) facing_angle -= (int)(0.5f*facing_angle/(float)M_PI)*(float)M_PI*2;
-			else facing_angle += ((int)(-0.5f*facing_angle/(float)M_PI))*(float)M_PI*2;
+			if(facing_angle > 0.0f) 
+				facing_angle -= (int)(0.5f*facing_angle/(float)M_PI)*(float)M_PI*2;
+			else 
+				facing_angle += ((int)(-0.5f*facing_angle/(float)M_PI))*(float)M_PI*2;
 		}
 	}
 	else if(limb->space_time > 1.5f && limb->space_time < 2.0f)
@@ -574,7 +585,7 @@ int MeCtLocomotionNavigator::get_destination_count()
 	return destination_list.size();
 }
 
-int MeCtLocomotionNavigator::get_curr_destinatio_index()
+int MeCtLocomotionNavigator::get_curr_destination_index()
 {
 	return curr_dest_index;
 }

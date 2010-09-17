@@ -1038,6 +1038,8 @@ static bool upkey = false;
 static bool downkey = false;
 static bool leftkey = false;
 static bool rightkey = false;
+static bool a_key = false;
+static bool d_key = false;
 
 static void translate_keyboard_state()
 {
@@ -1066,16 +1068,17 @@ static void translate_keyboard_state()
 	sprintf(cmd, "test loco ");
 
 
+
 	if(fltk::get_key_state('r'))
 	{
 		height_disp += height_disp_delta;
-		if(height_disp > 0.0f) height_disp = 0.0f;
+		//if(height_disp > 0.0f) height_disp = 0.0f;
 		actor->get_locomotion_ct()->set_target_height_displacement(height_disp);
 	}
 	if(fltk::get_key_state('f'))
 	{
 		height_disp -= height_disp_delta;
-		if(height_disp < -50.0f) height_disp = -50.0f;
+		//if(height_disp < -50.0f) height_disp = -50.0f;
 		actor->get_locomotion_ct()->set_target_height_displacement(height_disp);
 	}
 	if(fltk::get_key_state('x'))
@@ -1104,7 +1107,9 @@ static void translate_keyboard_state()
 	if(fltk::get_key_state(fltk::UpKey) 
 		|| fltk::get_key_state(fltk::DownKey)
 		|| fltk::get_key_state(fltk::RightKey)
-		|| fltk::get_key_state(fltk::LeftKey))
+		|| fltk::get_key_state(fltk::LeftKey)
+		|| fltk::get_key_state('a')
+		|| fltk::get_key_state('d'))
 	{
 		locomotion_cmd = true;
 	}
@@ -1167,6 +1172,43 @@ static void translate_keyboard_state()
 		rightkey = false;
 	}
 
+	if(fltk::get_key_state('a'))//speed control
+	{
+		if(!a_key)
+		{
+			x_flag = 1;
+			z_flag = 0;
+			rps_flag = 0;
+			spd = x_spd;
+			sprintf(t_direction, "leftward ");
+		}
+	}
+	else
+	{
+		a_key = false;
+	}
+
+	if(fltk::get_key_state('d'))//speed control
+	{
+		if(!d_key)
+		{
+			x_flag = -1;
+			z_flag = 0;
+			rps_flag = 0;
+			spd = x_spd;
+			sprintf(t_direction, "rightward ");
+		}
+	}
+	else
+	{
+		d_key = false;
+	}
+
+	if(!rightkey && !leftkey)
+	{
+		rps_flag = 0.0f;
+	}
+
 	char tt[200];
 	strcat(cmd, character);
 	strcat(cmd, t_direction);
@@ -1182,6 +1224,7 @@ static void translate_keyboard_state()
 		mcu.execute(cmd);
 	}
 }
+
 
 static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h)
 {

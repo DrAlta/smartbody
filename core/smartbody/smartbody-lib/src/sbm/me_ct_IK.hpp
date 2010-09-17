@@ -81,6 +81,8 @@ protected:
 
 	bool cross_point_with_plane(SrVec* cross_point, SrVec& line_point, SrVec& direction, SrVec& plane_normal, SrVec& plane_point);
 
+	SrVec cross_point_on_plane(SrVec& point, SrVec& line, SrVec& plane_normal, SrVec& plane_point);
+
 	void update_limb_section_local_pos(int start_index);
 
 	void rotate(SrVec& src, int start_index);
@@ -97,9 +99,9 @@ protected:
 
 	int get_support_joint_num();
 
-	void adjust_support_joints();
+	//void adjust_support_joints();
 
-	void calc_target();
+	void calc_target(SrVec& orientation);
 
 	void get_init_mat_list();
 

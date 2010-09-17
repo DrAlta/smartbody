@@ -115,6 +115,8 @@ public:
 	SkSkeleton* standing_skeleton;
 	float ratio;
 	float dom_ratio;
+	float abs_ground_height; // absolute height of base joint when standing.
+
 
 	SrArray<MeCtLocomotionLimb*> limb_list; //limbs
 	SrArray<SkMotion*> locomotion_anims;
@@ -228,7 +230,7 @@ public:
 
 	int determine_dominant_limb();
 
-	void get_IK();
+	void apply_IK();
 
 	MeCtLocomotionNavigator* get_navigator();
 
@@ -261,6 +263,8 @@ public:
 	SrVec calc_rotational_displacement();
 
 	void set_target_height_displacement(float displacement);
+
+	void update_nonlimb_mat_with_global_info();
 
 	void print_info(char* name);
 };

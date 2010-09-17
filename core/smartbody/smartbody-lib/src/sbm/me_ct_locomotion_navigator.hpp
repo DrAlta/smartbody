@@ -51,6 +51,7 @@ public:
 	float target_height_displacement;
 	float curr_height_displacement;
 	float prev_height_displacement;
+	SrVec displacement;
 
 protected:
 	int bi_world_x, bi_world_y, bi_world_z, bi_world_rot; // World offset position and rotation
@@ -83,7 +84,7 @@ protected:
 	SrVec global_vel;
 	SrVec target_local_vel;
 	SrVec target_global_vel;
-	SrVec displacement;
+
 
 	float facing_angle;
 	float pre_facing_angle;
@@ -117,7 +118,7 @@ public:
 
 	void clear_destination_list();
 	int get_destination_count();
-	int get_curr_destinatio_index();
+	int get_curr_destination_index();
 	void next_destination(MeFrameData& frame);
 	void add_destination(SrVec* destination);
 	void set_reached_destination(MeFrameData& frame);
@@ -136,6 +137,7 @@ public:
 	void update(SrBuffer<float>* buffer);
 	void update_facing(MeCtLocomotionLimb* limb, bool dominant_limb);
 	void update_displacement(SrVec* displacement);
+	void update_world_offset();
 
 	bool check_stopped(SrArray<MeCtLocomotionLimb*>* limb_list);
 	void CheckNewRoutine(MeFrameData& frame);
