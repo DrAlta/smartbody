@@ -666,6 +666,30 @@ void cerevoice_tts::load_voice( char * voice_id )
    free( signature );
 }
 
+std::string cerevoice_tts::addUselTag(std::string text)
+{
+	std::string tempText = text;
+	int indexOfStartTag = text.find_first_of(">");
+	if (indexOfStartTag > 0 && indexOfStartTag < text.size())
+	{
+		text.insert(indexOfStartTag + 1, "<usel genre=\'spon\'>");
+		int indexOfEndTag = text.find_last_of("<");
+		if (indexOfEndTag > 0 && indexOfEndTag < text.size())
+		{
+			text.insert(indexOfEndTag, "<\/usel>");
+			return text;
+		}
+		/*std::string tempText = text.substr(0, indexOfStartTag + 1);
+		std::string finalText = tempText.append("");
+		if (indexOfStartTag + 2 < text.size()) {
+			tempText = tempText.substr(indexOfStartTag + 2);
+			tempText.insert(
+			finalText = finalText.append(tempText);
+		}*/
+	}
+	return tempText;
+}
+
 std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_name, const char * player_file_name, std::string voice_id )
 {
    char * result = "";
@@ -714,7 +738,14 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
 	  //Replacing . and , with "" so because there seems to be a bug in CPRCPMOD_spurt_synth while synthesizing multiple spurts
 	  //Apparently a time of 0.0 and 0.1 seems to be added just after the , or .
 	  std::string text_string = removeXMLTagsAndNewLines( text, xmlMetaData);
-	  text_string = replacePausePunctuationsFromText(text_string);
+	  //commenting replacing pause punctuations
+	  //text_string = replacePausePunctuationsFromText(text_string);
+
+	  //Checking to see if it is conv voice, then add the tag "<usel genre='spon'>"
+	  if (voice_id.compare("starconv") == 0)
+	  {
+		  text_string = addUselTag(text_string);
+	  }
 
 	  Normaliser_parse( norm_id, const_cast<char*>( text_string.c_str()) , 1 );
       //Normaliser_parse( norm_id, "", 1 );
