@@ -1005,12 +1005,12 @@ void MeCtLocomotion::update_pos()
 		currpos = get_limb_pos(limb);
 		ratio[i] = 0;
 		dis[i].set(0,0,0);
-		if(i == dominant_limb)
-		//if((limb->space_time >= 2.0f || limb->space_time <= 1.0f))
+		//if(i == dominant_limb)
+		if((limb->space_time >= 2.0f || limb->space_time <= 1.0f))
 		{
 			if(limb->space_time >= 2.0f) ratio[i] = limb->space_time - 2.0f;
 			else if(limb->space_time <= 1.0f) ratio[i] = 1.0f - limb->space_time;
-			ratio[i] *= ratio[i];
+			//ratio[i] *= ratio[i];
 			SrMat mat;
 
 			mat.roty(navigator.get_pre_facing_angle());
