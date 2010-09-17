@@ -141,18 +141,23 @@ static Fl_Menu_Item MenuTable[] =
          { "&no shadows",   0, MCB, CMD(CmdNoShadows),    FL_MENU_RADIO },
          { "&shadows",  0, MCB, CMD(CmdShadows),  FL_MENU_RADIO },
          { 0 },
-  { "&characters", 0, 0, 0, FL_SUBMENU },
+    { "&characters", 0, 0, 0, FL_SUBMENU },
          { "&geometry", 0, MCB, CMD(CmdCharacterShowGeometry), FL_MENU_RADIO },
          { "&collision geometry", 0, MCB, CMD(CmdCharacterShowCollisionGeometry),   FL_MENU_RADIO },
          { "&deformable geometry", 0, MCB, CMD(CmdCharacterShowDeformableGeometry),   FL_MENU_RADIO },
          { "&bones",   0, MCB, CMD(CmdCharacterShowBones),   FL_MENU_RADIO },
          { "&axis",   0, MCB, CMD(CmdCharacterShowAxis),   FL_MENU_RADIO },
          { 0 },
-   { "p&references", 0, 0, 0, FL_SUBMENU },
+    { "p&references", 0, 0, 0, FL_SUBMENU },
          { "&axis",         0, MCB, CMD(CmdAxis),        FL_MENU_TOGGLE },
          { "b&ounding box", 0, MCB, CMD(CmdBoundingBox), FL_MENU_TOGGLE },
          { "&statistics",   0, MCB, CMD(CmdStatistics),  FL_MENU_TOGGLE },
          { "spi&n anim",    0, MCB, CMD(CmdSpinAnim),    FL_MENU_TOGGLE },
+         { 0 },
+    { "&terrain", 0, 0, 0, FL_SUBMENU },
+         { "&no terrain",   0, MCB, CMD(CmdNoTerrain),    FL_MENU_RADIO },
+         { "&terrain wireframe",  0, MCB, CMD(CmdTerrainWireframe),  FL_MENU_RADIO },
+         { "&terrain",  0, MCB, CMD(CmdTerrain),  FL_MENU_RADIO },
          { 0 },
    { 0 }
  };
@@ -228,7 +233,9 @@ class FltkViewerData
    FltkViewer::ViewMode viewmode;     // viewer mode, initially Examiner
    FltkViewer::RenderMode rendermode; // render mode
    FltkViewer::CharacterMode charactermode; // render mode
-   FltkViewer::ShadowMode shadowmode;     // viewer mode, initially Examiner
+   FltkViewer::ShadowMode shadowmode;     // shadow mode
+   FltkViewer::TerrainMode terrainmode;     // terrain mode
+
 
 
    bool iconized;      // to stop processing while the window is iconized
@@ -294,6 +301,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->rendermode = ModeAsIs;
    _data->charactermode = ModeShowGeometry;
    _data->shadowmode = ModeNoShadows;
+   _data->terrainmode = ModeTerrain;
 
    _data->iconized    = false;
    _data->spinning    = false;
@@ -420,6 +428,12 @@ void FltkViewer::menu_cmd ( MenuCmd s )
                        break;
       case CmdNoShadows : _data->shadowmode = ModeNoShadows;
                        break;
+	  case CmdNoTerrain  : _data->terrainmode = ModeNoTerrain;             
+                       break;
+      case CmdTerrainWireframe : _data->terrainmode = ModeTerrainWireframe;
+                       break;
+      case CmdTerrain : _data->terrainmode = ModeTerrain;
+                       break;
       case CmdBoundingBox : SR_SWAPB(_data->boundingbox); 
                             if ( _data->boundingbox ) update_bbox();
                             break;
@@ -503,7 +517,9 @@ bool FltkViewer::menu_cmd_activated ( MenuCmd c )
       case CmdPoints   : return _data->rendermode==ModePoints? true:false;
       case CmdShadows   : return _data->shadowmode==ModeShadows? true:false;
       case CmdNoShadows   : return _data->shadowmode==ModeNoShadows? true:false;
-
+	  case CmdTerrain   : return _data->terrainmode==ModeTerrain? true:false;
+      case CmdTerrainWireframe   : return _data->terrainmode==ModeTerrainWireframe? true:false;
+	  case CmdNoTerrain   : return _data->terrainmode==ModeNoTerrain? true:false;
       case CmdAxis        : return _data->displayaxis? true:false;
       case CmdBoundingBox : return _data->boundingbox? true:false;
       case CmdStatistics  : return _data->statistics? true:false;
@@ -839,7 +855,10 @@ void FltkViewer::draw()
 	glEnable( GL_COLOR_MATERIAL );
 	glEnable( GL_NORMALIZE );
 
-	mcu.render_terrain();
+	if (_data->terrainmode == FltkViewer::ModeTerrain)
+		mcu.render_terrain(0);
+	else if (_data->terrainmode == FltkViewer::ModeTerrainWireframe)
+		mcu.render_terrain(1);
 
 	glDisable( GL_COLOR_MATERIAL );
 

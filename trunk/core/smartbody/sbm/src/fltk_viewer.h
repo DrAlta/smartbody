@@ -75,6 +75,11 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
                       ModeShowAxis
                     };
 
+	enum TerrainMode { ModeNoTerrain,
+					   ModeTerrainWireframe,
+					   ModeTerrain,
+                };
+
     enum MenuCmd { CmdHelp,
                    CmdViewAll,
                    CmdBackground,
@@ -97,6 +102,9 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdCharacterShowDeformableGeometry,
 				   CmdCharacterShowBones,
 				   CmdCharacterShowAxis,
+				   CmdNoTerrain,
+				   CmdTerrainWireframe,
+				   CmdTerrain,
                  };
 
    private : // internal data
