@@ -18,14 +18,14 @@
 ###  NOTE: increment time to insure common-init is processed in order.
 1	char doctor init common.sk SasoBase.SasoDoctorPerez
 1	test loco char doctor anim standing HandsAtSide_Motex
-1	test loco char doctor anim walking Walk 27 40 7 52 10 33
+1	test loco char doctor anim walking Walk 27 40 12 52 10 33
 1	test loco char doctor anim walking Strafe 25 39 1 52 25 27
 1	set character doctor world_offset x 35 y 102 h -17
 1	set character doctor voice remote M021
 
 1	char elder init common.sk SasoBase.Mayor
 1	test loco char elder anim standing HandsAtSide_Motex
-1	test loco char elder anim walking Walk 27 40 7 52 10 33
+1	test loco char elder anim walking Walk 27 40 12 52 10 33
 1	test loco char elder anim walking Strafe 25 39 1 52 25 27
 1	set character elder world_offset x -35 y 102 h 17
 1	set character elder voice remote M009

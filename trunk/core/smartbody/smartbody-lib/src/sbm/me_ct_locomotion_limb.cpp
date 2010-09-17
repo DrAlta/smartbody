@@ -188,8 +188,8 @@ void MeCtLocomotionLimb::manipulate_turning(SrMat& root_mat)
 	//printf("\n%f", curr_rotation);
 	mat.rot(y, curr_rotation);
 	SrQuat quat = limb_joint_info.quat.get(0);
-	quat = quat * mat;
-	//quat = mat* quat;
+	//quat = quat * mat;
+	quat = mat* quat;
 	limb_joint_info.quat.set(0, quat);
 }
 
