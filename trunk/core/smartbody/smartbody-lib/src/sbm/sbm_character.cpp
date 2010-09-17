@@ -1149,7 +1149,7 @@ int SbmCharacter::set_viseme( char* viseme,
 				mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, visemeNames[nCount].c_str(), weight, rampin_duration );
 		}
 
-		if (!bonebusCharacter)	// if it is not going through bone bus
+		//if (!bonebusCharacter)	// if it is not going through bone bus
 		{	// Viseme/AU channel activation
 			ostringstream ct_name;
 			ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
