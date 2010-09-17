@@ -283,11 +283,11 @@ class mcuCBHandle	{
 		void close_bml_viewer( void );
 		int add_scene( SrSnGroup *scene_p );
 		int remove_scene( SrSnGroup *scene_p );
-		void render( void )	{ if( viewer_p ) { viewer_p->render(); } }
+		void render()	{ if( viewer_p ) { viewer_p->render(); } }
 		
-		void render_terrain( void ) {
+		void render_terrain( int renderMode ) {
 			if( height_field_p )	{
-				height_field_p->render();
+				height_field_p->render(renderMode);
 			}
 		}
 		float query_terrain( float x, float z, float *normal_p )	{

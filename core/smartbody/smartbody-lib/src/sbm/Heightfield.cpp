@@ -72,10 +72,15 @@ void Heightfield::load( char* filename )	{
 	initializeTerrain( _imageData );
 }
 
-void Heightfield::render( void )	{
+void Heightfield::render( int renderMode )	{
 
 	if( vertex_arr )	{
 	
+		glPushAttrib(GL_POLYGON_BIT);
+		if (renderMode == 0)
+			glPolygonMode(GL_FRONT, GL_FILL);
+		else
+			glPolygonMode(GL_FRONT, GL_LINE);
 		if( dirty_normals )	{
 			load_normals();
 		}
@@ -186,6 +191,8 @@ void Heightfield::render( void )	{
 #endif
 
 		glPopMatrix();
+		glPopAttrib();
+
 	}
 }
 
