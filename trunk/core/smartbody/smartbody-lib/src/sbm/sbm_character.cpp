@@ -459,16 +459,12 @@ void SbmCharacter::reset_viseme_channels()
 {
 	SkChannelArray& channels = skeleton_p->channels();
 	MeFrameData& frameData = ct_tree_p->getLastFrame();
-	int chanSize = channels.size();
-	for (int c = 0; c < chanSize; c++)
+	for (int c = viseme_channel_start_pos; c < viseme_channel_end_pos; c++)
 	{
 		SkChannel& chan = channels[c];
 		std::string jointName = std::string(channels.name(c).get_string());
-		if (jointName.substr(0,2) == std::string("au") || jointName.substr(0,6) == std::string("viseme"))
-		{
-			int buffIndex = ct_tree_p->toBufferIndex(c);
-			frameData.buffer()[buffIndex] = 0;
-		}
+		int buffIndex = ct_tree_p->toBufferIndex(c);
+		frameData.buffer()[buffIndex] = 0;
 	}
 }
 
@@ -546,7 +542,10 @@ int SbmCharacter::init_skeleton() {
 
 		face_ct->init( face_neutral );
 	}
-	
+
+	std::string viseme_start_name;
+	int visemeChannelCounter = 0;
+
 	{	// Generate AU and viseme activation channels.
 		AUMotionMap::const_iterator i   = au_motion_map->begin();
 		AUMotionMap::const_iterator end = au_motion_map->end();
@@ -566,6 +565,8 @@ int SbmCharacter::init_skeleton() {
 
 					// Create the AU control channel
 					add_face_channel( name, wo_index );
+					if (visemeChannelCounter == 0)	viseme_start_name = name;
+					visemeChannelCounter ++;
 
 					// TODO: Add to au_channel_map (?)
 
@@ -581,6 +582,8 @@ int SbmCharacter::init_skeleton() {
 
 					// Create the AU control channel
 					add_face_channel( name, wo_index );
+					if (visemeChannelCounter == 0)	viseme_start_name = name;
+					visemeChannelCounter ++;
 
 					// Register control channel with face controller
 					if( face_ct )
@@ -594,6 +597,8 @@ int SbmCharacter::init_skeleton() {
 
 					// Create the AU control channel
 					add_face_channel( name, wo_index );
+					if (visemeChannelCounter == 0)	viseme_start_name = name;
+					visemeChannelCounter ++;
 
 					// Register control channel with face controller
 					if( face_ct )
@@ -615,6 +620,8 @@ int SbmCharacter::init_skeleton() {
 
 				// Create the Viseme control channel
 				add_face_channel( id, wo_index );
+				if (visemeChannelCounter == 0)	viseme_start_name = id;
+				visemeChannelCounter ++;
 				
 				// Register control channel with face controller
 				if( face_ct )
@@ -648,6 +655,18 @@ int SbmCharacter::init_skeleton() {
 
 	// Rebuild the active channels to include new joints
 	skeleton_p->make_active_channels();
+
+	// keep record of viseme channel start index
+	if (viseme_start_name != "")
+	{
+		viseme_channel_start_pos = skeleton_p->channels().search(SkJointName(viseme_start_name.c_str()), SkChannel::XPos);
+		viseme_channel_end_pos = viseme_channel_start_pos + visemeChannelCounter;
+	}
+	else	// no map exist
+	{
+		viseme_channel_start_pos = 0;
+		viseme_channel_end_pos = 0;
+	}
 
 	return CMD_SUCCESS;
 }
