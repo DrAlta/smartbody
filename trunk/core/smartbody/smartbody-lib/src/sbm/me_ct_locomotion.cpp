@@ -53,6 +53,7 @@ MeCtLocomotion::MeCtLocomotion() {
 	ik_enabled = false;
 	enabled = false;
 	joints_indexed = false;
+	motions_loaded = true;
 	base_name = NULL;
 	nonlimb_blending_base_name = NULL;
 	locomotion_anims.capacity(0);
@@ -236,6 +237,9 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 
 	if(!enabled) return false;
 	if( !is_valid ) return is_valid;
+	if(!motions_loaded) return motions_loaded;
+	
+
 
 	if(limb_list.size() == 0) 
 	{
@@ -264,7 +268,7 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	//if the character is stopped, locomotion controller will not take computational time.
 	//if(navigator.check_stopped(&limb_list)) 
 		//return true;
-	
+
 	float inc_frame;
 	inc_frame = (float)(delta_time/0.03333333f);
 
@@ -772,13 +776,8 @@ void MeCtLocomotion::blend_standing(MeFrameData& frame)
 void MeCtLocomotion::update_nonlimb_mat()//without global rotation
 {
 	SkJoint* joint = walking_skeleton->root();
-	//SkJoint* joint = walking_skeleton->search_joint(base_name);
 	SrMat mat;
 	mat = get_lmat(joint, &(nonlimb_joint_info.quat.get(0)));
-	//float* ppos = mat.pt(12);
-	//ppos[0] = 0.0f;
-	//ppos[1] = 0.0f;
-	//ppos[2] = 0.0f;
 	nonlimb_joint_info.mat.set(0, mat);
 	update_nonlimb_mat(joint, &mat);
 }

@@ -141,6 +141,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		{
 			LOG("No animation: %s", arg.c_str());
 			motionsNotLoaded = true;
+			actor->get_locomotion_ct()->motions_loaded = false;
 			return CMD_FAILURE;
 		}
 		if(type == "standing")
@@ -190,6 +191,12 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	if(!actor->is_locomotion_controller_enabled()) 
 	{
 		LOG("ERROR: Locomotion controller not enabled.");
+		return CMD_FAILURE;
+	}
+
+	if(!actor->get_locomotion_ct()->motions_loaded)
+	{
+		LOG("locomotion animations not loaded correctly.");
 		return CMD_FAILURE;
 	}
 
