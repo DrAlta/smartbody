@@ -61,6 +61,8 @@ public:
 	int r_anim2_index_dominant;
 	int style;
 
+	bool motions_loaded;
+
 protected:
 	MeCtIK ik;
 
@@ -83,6 +85,8 @@ protected:
 	bool is_valid;  // All necessary channels are present
 
 	bool joints_indexed;
+
+	
 
 	//temp
 	SrArray<SrQuat> t_joint_quats1;
