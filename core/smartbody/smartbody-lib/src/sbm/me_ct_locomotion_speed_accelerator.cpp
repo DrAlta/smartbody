@@ -36,7 +36,7 @@ MeCtLocomotionSpeedAccelerator::MeCtLocomotionSpeedAccelerator() {
 	target_speed = 0.0f;
 	target_acceleration = 10.0f;
 	acceleration = 10.0f;
-	acceleration_factor = 400.0f;
+	acceleration_factor = 800.0f;
 	//automate = true;
 	proceed_acceleration = true;
 	auto_accelerated = true;

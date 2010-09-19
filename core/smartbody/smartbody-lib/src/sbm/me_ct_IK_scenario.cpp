@@ -70,3 +70,8 @@ void MeCtIKScenario::set_plane_point(SrVec& point)
 {
 	plane_point = point;
 }
+
+void MeCtIKScenario::set_offset(SrVec& offset)
+{
+	this->ik_offset = offset;
+}

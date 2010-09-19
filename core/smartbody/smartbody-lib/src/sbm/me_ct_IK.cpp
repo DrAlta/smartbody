@@ -62,6 +62,8 @@ void MeCtIK::update(MeCtIKScenario* scenario)
 	
 	init();
 
+	//printf("\ntarget(%f,%f,%f), offset(%f,%f,%f)", target.x, target.y, target.z, scenario->ik_offset.x, scenario->ik_offset.y, scenario->ik_offset.z);
+
 	for(int k = 0; k < support_joint_num; ++k)
 	{
 		//LOG("\ntarget: (%f, %f, %f)", target.x, target.y, target.z);
@@ -109,7 +111,7 @@ void MeCtIK::update(MeCtIKScenario* scenario)
 			//break;
 			get_next_support_joint();
 			get_limb_section_local_pos(manipulated_joint_index-1, -1);
-			calc_target(scenario->ik_orientation);
+			calc_target(scenario->ik_orientation, scenario->ik_offset);
 		}
 		else 
 		{
@@ -117,11 +119,10 @@ void MeCtIK::update(MeCtIKScenario* scenario)
 			get_next_support_joint();
 			get_limb_section_local_pos(0, -1);
 			scenario->quat_list.set(manipulated_joint_index-1, after);
-			calc_target(scenario->ik_orientation);
+			calc_target(scenario->ik_orientation, scenario->ik_offset);
 			//end_mat.rot(after.axis(), after.angle() - before.angle());
 		}
 	}
-	
 }
 
 /*void MeCtIK::adjust_support_joints()
@@ -279,14 +280,17 @@ __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 	//update_manipulated_joint_pos(start_index);
 }
 
-__forceinline void MeCtIK::calc_target(SrVec& orientation)
+__forceinline void MeCtIK::calc_target(SrVec& orientation, SrVec& offset)
 {
 	orientation.normalize();
 	SrVec pos = joint_pos_list.get(manipulated_joint_index);
+	pos += offset;
 	//target = (manipulated_joint->support_joint_comp + manipulated_joint->support_joint_height - distance_to_plane(pos, scenario->plane_normal, scenario->plane_point)) * scenario->plane_normal + pos;
 	SrVec t = cross_point_on_plane(pos, orientation, scenario->plane_normal, scenario->plane_point);
 	target = -(manipulated_joint->support_joint_comp + manipulated_joint->support_joint_height)*orientation + t;
 	//printf("\n(%f, %f, %f)", pos.x, pos.y, pos.z);
+
+
 }
 
 __forceinline void MeCtIK::get_next_support_joint()
@@ -336,7 +340,7 @@ void MeCtIK::init()
 	manipulated_joint_index = -1;
 	support_joint_num = get_support_joint_num();
 	get_next_support_joint();
-	calc_target(scenario->ik_orientation);
+	calc_target(scenario->ik_orientation, scenario->ik_offset);
 	//adjust_support_joints();
 }
 

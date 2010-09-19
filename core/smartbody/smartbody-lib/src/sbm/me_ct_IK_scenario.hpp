@@ -80,6 +80,9 @@ public:
 	SrVec								plane_normal;
 	SrVec								plane_point;
 
+	SrVec								ik_offset;	// offset from the current position to the position which is 
+													// used to calculate the target position.
+
 	//the forced direction of 
 	SrVec								ik_orientation;
 
@@ -99,6 +102,7 @@ public:
 
 	void set_plane_normal(SrVec& normal);
 	void set_plane_point(SrVec& point);
+	void set_offset(SrVec& offset);
 };
 
 #endif // ME_CT_IK_SCENARIO_HPP

@@ -523,6 +523,7 @@ void MeCtLocomotionNavigator::update_facing(MeCtLocomotionLimb* limb, bool domin
 	if(limb->space_time > 1.0f && limb->space_time <= 1.5f) 
 	{
 		limb->curr_rotation = limb->rotation_record * (1.5f - limb->space_time)*2.0f;
+
 	}
 
 	else if(limb->space_time >= 2.0f || limb->space_time <= 1.0f)

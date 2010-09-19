@@ -21,7 +21,7 @@
  */
 
 #include "me_ct_locomotion.hpp"
-
+#include "mcontrol_util.h"
 #include "sbm_character.hpp"
 #include "gwiz_math.h"
 #include "limits.h"
@@ -50,7 +50,7 @@ MeCtLocomotion::MeCtLocomotion() {
 	reset = false;
 	dis_initialized = false;
 	initialized = false;
-	ik_enabled = false;
+	ik_enabled = true;
 	enabled = false;
 	joints_indexed = false;
 	motions_loaded = true;
@@ -702,6 +702,7 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 
 	for(int i = 0; i < limb_list.size(); ++i)
 	{
+		if(limb_list.get(i)->curr_rotation == 0.0f) continue;
 		SkJoint* tjoint = walking_skeleton->search_joint(limb_list.get(i)->get_limb_base_name());
 		int parent_ind = nonlimb_joint_info.get_index_by_name(tjoint->parent()->name().get_string());
 		SrMat mat = nonlimb_joint_info.mat.get(parent_ind);
@@ -821,6 +822,10 @@ void MeCtLocomotion::apply_IK()
 	//if(navigator.target_height_displacement == 0.0f) return;
 	MeCtIKScenario* ik_scenario = NULL;
 	MeCtIKScenarioJointInfo* info = NULL;
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	float normal[3];
+	
 
 	for(int i = 0; i < limb_list.size(); ++i)
 	{
@@ -835,12 +840,21 @@ void MeCtLocomotion::apply_IK()
 		ik_scenario->mat = nonlimb_joint_info.mat.get(parent_ind);
 		ik_scenario->start_joint = &(ik_scenario->joint_info_list.get(0));
 		ik_scenario->end_joint = &(ik_scenario->joint_info_list.get(ik_scenario->joint_info_list.size()-1));
-		ik_scenario->set_plane_normal(SrVec(0.2f, 1.0f, 0.0f));
+		
 		//if(i == 0) ik_scenario->plane_point = SrVec(0.0f, 20.0f-target_height_displacement, 0.0f);
 		//else ik_scenario->plane_point = SrVec(0.0f, 40.0f-target_height_displacement, 00.0f);
 		//ik_scenario->plane_point = SrVec(0.0f, -navigator.target_height_displacement*navigator.standing_factor, 00.0f);
-		
-		ik_scenario->plane_point = SrVec(0.0f, 0.0f, 0.0f);
+
+		SrVec pos = limb_list.get(i)->pos_buffer.get(2);
+		pos += navigator.get_world_pos();
+
+		float height = mcu.query_terrain(pos.x, pos.z, normal);
+
+		ik_scenario->set_plane_normal(SrVec(normal[0], normal[1], normal[2]));
+
+		ik_scenario->plane_point = SrVec(pos.x, height, pos.z);
+
+		ik_scenario->set_offset(limb_list.get(i)->ik_offset);
 		
 		ik_scenario->quat_list = limb_list.get(i)->limb_joint_info.quat;
 
@@ -998,6 +1012,7 @@ void MeCtLocomotion::update_pos()
 	float ratio[2];//temp
 	float sum = 0.0f;
 	displacement.set(0,0,0);
+	int y = 0;
 	for(int i = 0; i < limb_list.size(); ++i)
 	{
 		MeCtLocomotionLimb* limb = limb_list.get(i);
@@ -1024,7 +1039,7 @@ void MeCtLocomotion::update_pos()
 
 			dis[i].y = 0.0f;
 			sum += ratio[i];
-
+			++y;
 		}
 		limb->pos = currpos;
 
@@ -1038,6 +1053,28 @@ void MeCtLocomotion::update_pos()
 			{
 				displacement += dis[i]*ratio[i]/sum;
 			}
+			
+			if(navigator.standing_factor != 0.0f)
+			{
+				// update the ik_offset for each limb
+				for(int i = 0; i < 2; ++i)
+				{
+					MeCtLocomotionLimb* limb = limb_list.get(i);
+					if(limb->space_time >= 2.0f || limb->space_time <= 1.0f)
+					{
+						limb->ik_offset += (dis[i]-displacement)/3.0f;
+						limb->ik_offset_record = limb->ik_offset;
+						//printf("\n(%f, %f, %f)", limb->ik_offset.x, limb->ik_offset.y, limb->ik_offset.z);
+					}
+					else if(limb->space_time > 1.0f && limb->space_time <= 1.5f)
+					{
+						limb->ik_offset = limb->ik_offset_record * (1.5f - limb->space_time)*2.0f;
+					}
+					else
+						limb->ik_offset.set(0,0,0);
+				}
+			}
+
 			displacement += calc_rotational_displacement();
 			//displacement.x = 0.0f;
 			displacement.y = r_blended_base_height-pre_blended_base_height;
