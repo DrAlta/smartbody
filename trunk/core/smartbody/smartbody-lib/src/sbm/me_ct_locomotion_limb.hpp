@@ -54,13 +54,15 @@ public:
 
 public:
 	//temp, to be deleted=================
-	SkSkeleton* walking_skeleton;
-	SkSkeleton* standing_skeleton;
+	SkSkeleton*						walking_skeleton;
+	SkSkeleton*						standing_skeleton;
 	MeCtIKScenario					ik;
+	SrVec							ik_offset;
+	SrVec							ik_offset_record;
 
 	//SrArray<int>					joint_index;
 	//SrArray<int>					joint_buff_index;
-	//SrArray<SrQuat>					quat_buffer;
+	//SrArray<SrQuat>				quat_buffer;
 
 public:
 	SrArray<MeCtLocomotionLimbAnim*>	walking_list; // originally provided artist-made animation. for each provided walking animation, do analysis in MeCtLocomotionLimbAnim.

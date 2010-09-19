@@ -47,6 +47,7 @@ MeCtLocomotionLimb::MeCtLocomotionLimb() {
 	blended_anim.global_info = new MeCtLocomotionAnimGlobalInfo();
 	walking_skeleton = NULL;
 	standing_skeleton = NULL;
+	ik_offset.set(0,0,0);
 }
 
 MeCtLocomotionLimb::MeCtLocomotionLimb(char* name) 
@@ -190,7 +191,7 @@ void MeCtLocomotionLimb::manipulate_turning(SrMat& root_mat)
 	//y = root_mat*y;
 	y = y*root_mat;
 	//printf("\n%f", curr_rotation);
-	y.normalize();
+	//y.normalize();
 	mat.rot(y, curr_rotation);
 	SrQuat quat = limb_joint_info.quat.get(0);
 	//quat = quat * mat;

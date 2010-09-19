@@ -65,6 +65,8 @@ protected:
 	SrMat						lm;
 	SrMat						pm;
 
+	
+
 public:
 	MeCtIK();
 	~MeCtIK();
@@ -101,11 +103,12 @@ protected:
 
 	//void adjust_support_joints();
 
-	void calc_target(SrVec& orientation);
+	void calc_target(SrVec& orientation, SrVec& offset);
 
 	void get_init_mat_list();
 
 	void update_manipulated_joint_pos(int index);
+
 };
 
 #endif // ME_CT_IK_HPP
