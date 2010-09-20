@@ -669,14 +669,14 @@ void cerevoice_tts::load_voice( char * voice_id )
 std::string cerevoice_tts::addUselTag(std::string text)
 {
 	std::string tempText = text;
-	int indexOfStartTag = text.find_first_of(">");
+	unsigned int indexOfStartTag = text.find_first_of(">");
 	if (indexOfStartTag > 0 && indexOfStartTag < text.size())
 	{
 		text.insert(indexOfStartTag + 1, "<usel genre=\'spon\'>");
-		int indexOfEndTag = text.find_last_of("<");
+		unsigned int indexOfEndTag = text.find_last_of("<");
 		if (indexOfEndTag > 0 && indexOfEndTag < text.size())
 		{
-			text.insert(indexOfEndTag, "<\/usel>");
+			text.insert(indexOfEndTag, "</usel>");
 			return text;
 		}
 		/*std::string tempText = text.substr(0, indexOfStartTag + 1);
