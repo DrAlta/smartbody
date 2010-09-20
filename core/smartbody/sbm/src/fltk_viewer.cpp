@@ -1206,7 +1206,7 @@ static void translate_keyboard_state()
 
 	if(!rightkey && !leftkey)
 	{
-		rps_flag = 0.0f;
+		rps_flag = (int)0.0f;
 	}
 
 	char tt[200];
