@@ -82,6 +82,8 @@ protected:
 
 	SrMat mat;
 
+
+
 	bool is_valid;  // All necessary channels are present
 
 	bool joints_indexed;
@@ -269,6 +271,8 @@ public:
 	void set_target_height_displacement(float displacement);
 
 	void update_nonlimb_mat_with_global_info();
+
+	void update_limb_mat_with_global_info();
 
 	void print_info(char* name);
 };

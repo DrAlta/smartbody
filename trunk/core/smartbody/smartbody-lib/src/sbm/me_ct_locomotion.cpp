@@ -718,20 +718,30 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 	update_pos();
 
 	navigator.update_world_offset();
+	navigator.update_world_mat();
+
 	update_nonlimb_mat_with_global_info();
 	
 }
 
 void MeCtLocomotion::update_nonlimb_mat_with_global_info()
 {
-	SrMat global_mat;
-	global_mat.roty(navigator.get_facing_angle());
-	global_mat.set(12, navigator.get_world_pos().x);
-	global_mat.set(13, navigator.get_world_pos().y);
-	global_mat.set(14, navigator.get_world_pos().z);
+	SrMat mat = navigator.get_world_mat();
 	for(int i = 0; i < nonlimb_joint_info.joint_name.size(); ++i)
 	{
-		nonlimb_joint_info.mat.set(i, nonlimb_joint_info.mat.get(i)*global_mat);
+		nonlimb_joint_info.mat.set(i, nonlimb_joint_info.mat.get(i)*mat);
+	}
+}
+
+void MeCtLocomotion::update_limb_mat_with_global_info()
+{
+	SrMat mat = navigator.get_world_mat();
+	for(int j = 0; j < limb_list.size(); ++j)
+	{
+		for(int i = 0; i < nonlimb_joint_info.joint_name.size(); ++i)
+		{
+			nonlimb_joint_info.mat.set(i, nonlimb_joint_info.mat.get(i)*mat);
+		}
 	}
 }
 
@@ -825,7 +835,12 @@ void MeCtLocomotion::apply_IK()
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	float normal[3];
-	
+
+	SrMat global_mat;
+	global_mat.roty(navigator.get_facing_angle());
+	global_mat.set(12, navigator.get_world_pos().x);
+	global_mat.set(13, navigator.get_world_pos().y);
+	global_mat.set(14, navigator.get_world_pos().z);
 
 	for(int i = 0; i < limb_list.size(); ++i)
 	{
@@ -846,7 +861,7 @@ void MeCtLocomotion::apply_IK()
 		//ik_scenario->plane_point = SrVec(0.0f, -navigator.target_height_displacement*navigator.standing_factor, 00.0f);
 
 		SrVec pos = limb_list.get(i)->pos_buffer.get(2);
-		pos += navigator.get_world_pos();
+		pos  = pos * global_mat;
 
 		float height = mcu.query_terrain(pos.x, pos.z, normal);
 
