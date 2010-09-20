@@ -1959,7 +1959,7 @@ int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				break;
 			default:
 				// Invalid code.  Throw assert?
-				LOG("ERROR: Invalid side \"%s\".", side);
+				LOG("ERROR: Invalid side \"%d\".", side);
 				return CMD_FAILURE;
 		}
 		au_map.insert( make_pair( unit, au ) );
@@ -1968,22 +1968,22 @@ int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		switch( side ) {
 			case UNIFIED:
 				if( au->left || au->right )
-					LOG("WARNING: Overwritting au #%s", unit);
+					LOG("WARNING: Overwritting au #%d", unit);
 				au->set( motion );
 				break;
 			case LEFT:
 				if( au->left )
-					LOG("WARNING: Overwritting au #%s left", unit);
+					LOG("WARNING: Overwritting au #%d left", unit);
 				au->set( motion, au->right );
 				break;
 			case RIGHT:
 				if( au->right )
-					LOG("WARNING: Overwritting au #%s right", unit);
+					LOG("WARNING: Overwritting au #%d right", unit);
 				au->set( au->left, motion );
 				break;
 			default:
 				// Invalid code.  Throw assert?
-				LOG("ERROR: Invalid side \"%s\"", side);
+				LOG("ERROR: Invalid side \"%d\"", side);
 				return CMD_FAILURE;
 		}
 	}
