@@ -71,6 +71,7 @@ protected:
 
 	SrVec world_pos;
 	SrQuat world_rot;
+	SrMat world_mat;
 	SrVec base_pos;
 
 	SrArray<SrVec> destination_list;
@@ -129,6 +130,7 @@ public:
 	SrVec get_dis_to_dest();
 	SrVec get_dis_to_dest_local();
 	SrVec get_world_pos();
+	SrMat get_world_mat();
 	SrVec get_base_pos();
 	float get_facing_angle();
 	float get_pre_facing_angle();
@@ -138,6 +140,7 @@ public:
 	void update_facing(MeCtLocomotionLimb* limb, bool dominant_limb);
 	void update_displacement(SrVec* displacement);
 	void update_world_offset();
+	void update_world_mat();
 
 	bool check_stopped(SrArray<MeCtLocomotionLimb*>* limb_list);
 	void CheckNewRoutine(MeFrameData& frame);

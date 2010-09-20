@@ -328,6 +328,14 @@ void MeCtLocomotionNavigator::update_world_offset()
 	world_pos.z = displacement.z + world_pos.z;
 }
 
+void MeCtLocomotionNavigator::update_world_mat()
+{
+	world_mat.roty(get_facing_angle());
+	world_mat.set(12, world_pos.x);
+	world_mat.set(13, world_pos.y);
+	world_mat.set(14, world_pos.z);
+}
+
 void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtLocomotionLimb* limb, bool reset) 
 {
 	//if(reached_destination) return;
@@ -502,13 +510,19 @@ float MeCtLocomotionNavigator::get_turning_angle()
 void MeCtLocomotionNavigator::update_facing(MeCtLocomotionLimb* limb, bool dominant_limb)
 {
 	// when coming to stop the limbs should rotate back to original orientation.
-	if(local_rps == 0.0f && local_vel.len() != 0.0f) 
+	/*if(local_rps == 0.0f && local_vel.len() != 0.0f) 
 	{
 		if(limb->space_time > 1.0f && limb->space_time < 2.0f) 
 		{
-			limb->curr_rotation *= 0.8f;
+			limb->curr_rotation *= 0.95f;
 			limb->rotation_record = limb->curr_rotation;
 		}
+		return;
+	}*/
+	if(local_vel.len() == 0.0f)
+	{
+		limb->curr_rotation *= 0.95f;
+		limb->rotation_record = limb->curr_rotation;
 		return;
 	}
 	
@@ -548,6 +562,7 @@ void MeCtLocomotionNavigator::update_facing(MeCtLocomotionLimb* limb, bool domin
 	else if(limb->space_time > 1.5f && limb->space_time < 2.0f)
 	{
 		limb->curr_rotation -= get_turning_angle();
+		limb->rotation_record = limb->curr_rotation;
 	}
 
 	if(reached_destination)
@@ -609,6 +624,11 @@ void MeCtLocomotionNavigator::add_speed(float speed)
 SrVec MeCtLocomotionNavigator::get_world_pos()
 {
 	return world_pos;
+}
+
+SrMat MeCtLocomotionNavigator::get_world_mat()
+{
+	return world_mat;
 }
 
 void MeCtLocomotionNavigator::update_displacement(SrVec* displacement)
