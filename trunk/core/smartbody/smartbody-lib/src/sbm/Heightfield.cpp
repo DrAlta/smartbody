@@ -74,17 +74,17 @@ void Heightfield::load( char* filename )	{
 
 void Heightfield::render( int renderMode )	{
 
-	if( vertex_arr )	{
+	if( dirty_normals )	{
+		load_normals();
+	}
+	if( vertex_arr && normal_arr && color_arr )	{
 	
 		glPushAttrib(GL_POLYGON_BIT);
 		if (renderMode == 0)
 			glPolygonMode(GL_FRONT, GL_FILL);
 		else
 			glPolygonMode(GL_FRONT, GL_LINE);
-		if( dirty_normals )	{
-			load_normals();
-		}
-	
+
 		glPushMatrix();
 		glTranslatef( mesh_origin[ 0 ], mesh_origin[ 1 ], mesh_origin[ 2 ] );
 		glScalef( mesh_scale[ 0 ], mesh_scale[ 1 ], mesh_scale[ 2 ] );
@@ -262,6 +262,7 @@ void Heightfield::initializeTerrain(unsigned char* terrain)
 
 void Heightfield::load_normals( void )	{
 
+	printf( "Heightfield::load_normals\n" );
 	if( normal_arr )	{
 		delete [] normal_arr;
 	}
@@ -480,7 +481,11 @@ float Heightfield::get_raw_elevation( int i, int j )	{
 
 float Heightfield::get_elevation( float px, float pz, float *normal_p )	{
 
-	if( vertex_arr )	{
+	if( dirty_normals )	{
+		load_normals();
+	}
+
+	if( vertex_arr && normal_arr )	{
 
 		float nx = ( px - mesh_origin[ 0 ] ) / mesh_scale[ 0 ];
 		float nz = ( pz - mesh_origin[ 2 ] ) / mesh_scale[ 2 ];
@@ -541,6 +546,9 @@ float Heightfield::get_elevation( float px, float pz, float *normal_p )	{
 	}
 	else
 	if( normal_p )	{
+
+			printf( "Heightfield::get_elevation NOT INITIALIZED\n" );
+
 		normal_p[ 0 ] = 0.0;
 		normal_p[ 1 ] = 1.0;
 		normal_p[ 2 ] = 0.0;

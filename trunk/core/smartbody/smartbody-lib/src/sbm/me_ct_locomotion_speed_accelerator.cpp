@@ -36,7 +36,7 @@ MeCtLocomotionSpeedAccelerator::MeCtLocomotionSpeedAccelerator() {
 	target_speed = 0.0f;
 	target_acceleration = 10.0f;
 	acceleration = 10.0f;
-	acceleration_factor = 800.0f;
+	acceleration_factor = 8800.0f;
 	//automate = true;
 	proceed_acceleration = true;
 	auto_accelerated = true;
@@ -63,12 +63,12 @@ void MeCtLocomotionSpeedAccelerator::update_speed(double time_interval)
 	}
 	if(target_acceleration > acceleration)
 	{
-		acceleration += acceleration_factor * (float)time_interval;
+		acceleration += (float)(acceleration_factor*time_interval);
 		if(acceleration > target_acceleration) acceleration = target_acceleration;
 	}
 	else
 	{
-		acceleration -= acceleration_factor * (float)time_interval;
+		acceleration -= (float)acceleration_factor*time_interval;
 		if(acceleration < target_acceleration) acceleration = target_acceleration;
 	}
 	if(curr_speed == target_speed) return;

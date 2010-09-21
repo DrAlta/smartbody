@@ -336,6 +336,13 @@ void MeCtLocomotionNavigator::update_world_mat()
 	world_mat.set(14, world_pos.z);
 }
 
+void MeCtLocomotionNavigator::update_world_mat_offset()
+{
+	world_mat.set(12, world_pos.x);
+	world_mat.set(13, world_pos.y);
+	world_mat.set(14, world_pos.z);
+}
+
 void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtLocomotionLimb* limb, bool reset) 
 {
 	//if(reached_destination) return;

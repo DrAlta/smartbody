@@ -141,6 +141,8 @@ public:
 	void update_displacement(SrVec* displacement);
 	void update_world_offset();
 	void update_world_mat();
+	void update_world_mat_offset();
+
 
 	bool check_stopped(SrArray<MeCtLocomotionLimb*>* limb_list);
 	void CheckNewRoutine(MeFrameData& frame);
