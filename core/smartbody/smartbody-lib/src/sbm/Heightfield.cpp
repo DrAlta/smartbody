@@ -79,6 +79,7 @@ void Heightfield::load( char* filename )	{
 	}
 }
 
+#if 0
 void Heightfield::paste_img( void )	{
 
 	int alignment;
@@ -116,6 +117,7 @@ void Heightfield::paste_img( void )	{
 
 	glPixelStorei( GL_UNPACK_ALIGNMENT, alignment );
 }
+#endif
 
 void Heightfield::render( int renderMode )	{
 

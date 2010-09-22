@@ -18,7 +18,7 @@ class Heightfield
 		void set_origin( float x, float y, float z );
 		void set_auto_origin( void );
 		
-		void paste_img( void );
+//		void paste_img( void );
 		void render( int renderMode ); 
 		float get_elevation( float x, float z, float *normal_p = NULL );
 
