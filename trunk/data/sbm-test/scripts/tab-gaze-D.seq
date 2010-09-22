@@ -36,6 +36,5 @@
 4 gaze A offset euler 5 -5 0
 4.2 gaze A offset euler 0 0 0
 
-
-10 gaze A fadeout
-10 gaze B fadeout
+7 gaze A fadeout
+7 gaze B fadeout
