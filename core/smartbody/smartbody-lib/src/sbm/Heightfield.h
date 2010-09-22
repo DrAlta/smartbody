@@ -2,6 +2,7 @@
 #define _HEIGHTFIELD_
 
 #include <windows.h>
+#include <stdio.h>
 
 #define TERRAIN_SCALE	2000.0f
 #define ELEVATION_SCALE 200.0f
@@ -17,6 +18,7 @@ class Heightfield
 		void set_origin( float x, float y, float z );
 		void set_auto_origin( void );
 		
+		void paste_img( void );
 		void render( int renderMode ); 
 		float get_elevation( float x, float z, float *normal_p = NULL );
 
@@ -24,8 +26,11 @@ class Heightfield
 		void clear( void );
 		void defaults( void );
 		
-		unsigned char *LoadBitmapFile(char *filename, BITMAPINFOHEADER* bitmapInfoHeader);
-		void initializeTerrain(unsigned char* terrain);
+		unsigned char* parse_ppm( FILE *stream );
+		unsigned char* read_ppm( const char* filename );
+		unsigned char *LoadBitmapFile( char *filename, BITMAPINFOHEADER* bitmapInfoHeader );
+
+		void initializeTerrain( unsigned char* terrain );
 		void calc_normal( float *N_out, float *A, float *B, float *C, float *S );
 		void normalize_arr3( float V[ 3 ] );
 		void load_normals( void );

@@ -407,14 +407,6 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\sbm\me_ct_locomotion_height_offset.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_locomotion_height_offset.hpp"
-						>
-					</File>
-					<File
 						RelativePath="..\src\sbm\me_ct_locomotion_joint_info.cpp"
 						>
 					</File>
