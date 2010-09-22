@@ -1,0 +1,8 @@
+#
+
+0 echo tab 2010 gaze demo sequence
+
+0 seq tab-gaze-A
+30 seq tab-gaze-B
+40 seq tab-gaze-C
+60 seq tab-gaze-D
