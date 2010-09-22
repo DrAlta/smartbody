@@ -46,11 +46,12 @@ void Heightfield::defaults( void ) {
 
 void Heightfield::clear( void ) {
 
-	if (_header)
+	if (_header)	{
 		delete _header;
-	if (_imageData)
+	}
+	if (_imageData) {
 		delete [] _imageData;
-		
+	}
 	if( vertex_arr )	{
 		delete [] vertex_arr;
 	}
@@ -67,17 +68,62 @@ void Heightfield::load( char* filename )	{
 	clear();
 	defaults();
 	
+#if 0
 	_header = new BITMAPINFOHEADER();
 	_imageData = LoadBitmapFile( filename, _header );
-	initializeTerrain( _imageData );
+#else
+	_imageData = read_ppm( filename );
+#endif
+	if( _imageData )	{
+		initializeTerrain( _imageData );
+	}
+}
+
+void Heightfield::paste_img( void )	{
+
+	int alignment;
+	glGetIntegerv( GL_UNPACK_ALIGNMENT, &alignment );
+	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+
+	int w = mesh_resx + 1;
+	int h = mesh_resz;
+
+	GLfloat project_mat[ 16 ];
+	glGetFloatv( GL_PROJECTION_MATRIX, project_mat );
+	glPushAttrib( GL_VIEWPORT_BIT|GL_SCISSOR_BIT );
+		glPushMatrix();
+			glViewport( 0, 0, w, h ); 
+			glScissor( 0, 0, w, h ); 
+			glMatrixMode( GL_PROJECTION );
+			glLoadIdentity();
+//			gluOrtho2D( 0.0, (GLdouble)w, 0.0, (GLdouble)h );
+			glOrtho( 0.0, (GLdouble)w, 0.0, (GLdouble)h, 0.0, 0.0 );
+			glMatrixMode( GL_MODELVIEW );
+			glLoadIdentity();
+
+			glRasterPos2i( 0, 0 );
+			glDrawPixels( 
+				w, h, 
+				GL_RGB, GL_UNSIGNED_BYTE, 
+				(GLvoid*)_imageData
+			);
+
+		glPopMatrix();
+	glPopAttrib();
+	glMatrixMode( GL_PROJECTION );
+	glLoadMatrixf( project_mat );
+	glMatrixMode( GL_MODELVIEW );
+
+	glPixelStorei( GL_UNPACK_ALIGNMENT, alignment );
 }
 
 void Heightfield::render( int renderMode )	{
 
-	if( dirty_normals )	{
-		load_normals();
-	}
-	if( vertex_arr && normal_arr && color_arr )	{
+	if( vertex_arr && color_arr )	{
+
+		if( dirty_normals )	{
+			load_normals();
+		}
 	
 		glPushAttrib(GL_POLYGON_BIT);
 		if (renderMode == 0)
@@ -224,8 +270,7 @@ void Heightfield::calc_normal( float *N_out, float *A, float *B, float *C, float
 	normalize_arr3( N_out );
 }
 
-void Heightfield::initializeTerrain(unsigned char* terrain)
-{
+void Heightfield::initializeTerrain( unsigned char* terrain )	{
 
 #if 0
 	int hist[ 8 ] = { 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -262,7 +307,6 @@ void Heightfield::initializeTerrain(unsigned char* terrain)
 
 void Heightfield::load_normals( void )	{
 
-	printf( "Heightfield::load_normals\n" );
 	if( normal_arr )	{
 		delete [] normal_arr;
 	}
@@ -344,6 +388,132 @@ void Heightfield::set_auto_origin( void )	{
 	dirty_normals = true;
 }
 
+unsigned char* Heightfield::parse_ppm( FILE *stream )	{
+	
+	char ppm_key[256];
+	if( fscanf( stream, "%s", ppm_key ) != 1 )	{
+		printf( "Heightfield::parse_ppm ERR: could not scan ppm_key\n" );
+		return( NULL );
+	}
+
+	int binary;
+	if( strcmp( ppm_key, "P3" ) == 0 )
+		binary = 0;
+	else
+	if( strcmp( ppm_key, "P6" ) == 0 )
+		binary = 1;
+	else	{
+		printf( "Heightfield::parse_ppm ERR: key '%s' not recognized\n", ppm_key );
+		return( NULL );
+	}
+
+	char tmp_buffer[1024];
+	int found_size = 0;
+	while( !found_size )	{
+		if( fscanf( stream, "%d %d", &image_width, &image_height ) == 2 )	{
+			if( image_width * image_height > 0 )	{
+				found_size = 1;
+			}
+			else	{
+				printf( "Heightfield::parse_ppm ERR: could not read size\n" );
+				return( NULL );
+			}
+		}
+		else
+			fscanf( stream, "%[^\n]", tmp_buffer );
+	}
+
+	num_color_comps = 3;
+	long image_area = image_width * image_height;
+	printf( " image: width %d height %d comps %d\n", image_width, image_height, num_color_comps );
+	long image_bytes = image_area * num_color_comps;
+
+	float max = 0.0;
+	int found_max = 0;
+	while( !found_max )	{
+		if( fscanf( stream, "%f", &max ) == 1 )	{
+			if( max > 0.0 )	{
+				if( binary && ( max != 255.0f ) )	{
+					printf( "Heightfield::parse_ppm ERR: maxval '%f' not supported\n", max );
+					return( NULL );
+				}
+				found_max = 1;
+			}
+			else	{
+				printf( "Heightfield::parse_ppm ERR: could not read maxval\n" );
+				return( NULL );
+			}
+		}
+		else
+			fscanf( stream, "%[^\n]", tmp_buffer );
+	}
+
+	unsigned char* buff = new unsigned char [ image_bytes ];
+	if( buff == NULL )	{
+		printf( "Heightfield::Heightfield ERR: new [%d] bytes FAILED\n", image_bytes );
+		return( NULL );
+	}
+
+	int i, j, k;
+	long n = 0;
+	if( buff == NULL )	{
+		printf( "Heightfield::write_ppm ERR: no pixels\n" );
+		return( NULL );
+	}
+	if( binary )	{
+		unsigned char new_line;
+		fread( &new_line, sizeof( unsigned char ), 1, stream );
+		if( new_line != '\n' )	{
+			printf( "Heightfield::parse_ppm ERR: read byte: %d: not a newline\n", (int)new_line );
+			delete [] buff;
+			return( NULL );
+		}
+		int err = 0;
+		for( j=image_height-1;j>=0 && !err;j-- )	{
+#if 1
+			n += (int)fread( (void*)( buff + j * image_width * num_color_comps ), sizeof( unsigned char ), image_width * num_color_comps, stream );
+#else
+			long b = (int)fread( (void*)( buff + j * image_width * num_color_comps ), sizeof( unsigned char ), size_t( image_width * num_color_comps ), stream );
+			n += b;
+			printf( "[%d]: (%d): %d : e:%d eof:%d\n", j, image_width * num_color_comps, b, ferror( stream ), feof( stream ) );
+#endif
+			if( ferror( stream ) || feof( stream ) )	{
+				err = 1;
+			}
+		}
+	}
+	else	{
+		float inv_max = 1.0f/max;
+		float f;
+		for( j=image_height-1;j>=0;j-- )	{
+			for( i=0;i<image_width;i++ )	{
+				for( k=0;k<num_color_comps;k++ )	{
+					n += fscanf( stream, "%f", &f );
+					buff[ ( j * image_width + i ) * num_color_comps + k ] = (unsigned char)( f * inv_max * 255.0 );
+				}
+			}
+		}
+	}
+	if( n != image_bytes )	{
+		printf( "Heightfield::parse_ppm ERR: read %d of %d components\n", n, image_bytes );
+		delete [] buff;
+		return( NULL );
+	}
+	return( buff );
+}
+
+unsigned char* Heightfield::read_ppm( const char* filename )	{
+
+	FILE *stream = fopen( filename, "rb" );
+	if( stream == NULL )	{
+		printf( "Heightfield::read_ppm ERR: fopen '%s' FAILED\n", filename );
+		return( NULL );
+	}
+	unsigned char* buff = parse_ppm( stream );
+	fclose( stream );
+	return( buff );
+}
+
 unsigned char* Heightfield::LoadBitmapFile(char *filename, BITMAPINFOHEADER * bitmapInfoHeader)
 {
 	FILE *filePtr; //the file pointer
@@ -359,6 +529,20 @@ unsigned char* Heightfield::LoadBitmapFile(char *filename, BITMAPINFOHEADER * bi
 	bitmapImage[ 1 ] = 63;
 	bitmapImage[ 2 ] = 0;
 	bitmapImage[ 3 ] = 255;
+	return bitmapImage;
+#endif
+
+#if 0
+	bitmapImage = (unsigned char*)malloc( 6 );
+	image_width = 3;
+	image_height = 2;
+	num_color_comps = 1;
+	bitmapImage[ 0 ] = 0;
+	bitmapImage[ 1 ] = 0;
+	bitmapImage[ 2 ] = 0;
+	bitmapImage[ 3 ] = 63;
+	bitmapImage[ 4 ] = 127;
+	bitmapImage[ 5 ] = 255;
 	return bitmapImage;
 #endif
 
@@ -436,7 +620,8 @@ unsigned char* Heightfield::LoadBitmapFile(char *filename, BITMAPINFOHEADER * bi
 	fseek( filePtr, bitmapFileHeader.bfOffBits, SEEK_SET );
 
 	//allocate enough memory for the bitmap image data
-	bitmapImage = (unsigned char*)malloc( image_bytes );
+//	bitmapImage = (unsigned char*)malloc( image_bytes );
+	bitmapImage = new unsigned char [ image_bytes ];
 
 	//verify memory allocation
 	if( bitmapImage == NULL )	{
@@ -476,22 +661,22 @@ float Heightfield::get_raw_elevation( int i, int j )	{
 	if( j < 0 ) return( 0.0f );
 	if( i >= mesh_resx ) return( 0.0f );
 	if( j >= mesh_resz ) return( 0.0f );
-	return( vertex_arr[ ( j * image_width + i ) * 3 + 1 ] );
+	return( vertex_arr[ ( j * mesh_resx + i ) * 3 + 1 ] );
 }
 
 float Heightfield::get_elevation( float px, float pz, float *normal_p )	{
 
-	if( dirty_normals )	{
-		load_normals();
-	}
+	if( vertex_arr )	{
 
-	if( vertex_arr && normal_arr )	{
+		if( dirty_normals )	{
+			load_normals();
+		}
 
 		float nx = ( px - mesh_origin[ 0 ] ) / mesh_scale[ 0 ];
 		float nz = ( pz - mesh_origin[ 2 ] ) / mesh_scale[ 2 ];
 
 		if( ( nx < 0.0 )||( nz < 0.0 )||( nx >= 1.0 )||( nz >= 1.0 ) )	{
-			if( normal_p )	{
+			if( normal_p != NULL )	{
 				normal_p[ 0 ] = 0.0;
 				normal_p[ 1 ] = 1.0;
 				normal_p[ 2 ] = 0.0;
@@ -517,7 +702,7 @@ float Heightfield::get_elevation( float px, float pz, float *normal_p )	{
 				+ ( get_raw_elevation( i + 1, j ) - y0 ) * dx
 				+ ( get_raw_elevation( i, j + 1 ) - y0 ) * dz;
 
-			if( normal_p )	{
+			if( normal_p != NULL )	{
 				int ni = ( ( j * ( mesh_resx - 1 ) + i ) * 2 ) * 3;
 				float *np = normal_arr + ni;
 				normal_p[ 0 ] = np[ 0 ];
@@ -532,7 +717,7 @@ float Heightfield::get_elevation( float px, float pz, float *normal_p )	{
 				+ ( get_raw_elevation( i + 1, j ) - y0 ) * ( 1.0f - dz )
 				+ ( get_raw_elevation( i, j + 1 ) - y0 ) * ( 1.0f - dx );
 
-			if( normal_p )	{
+			if( normal_p != NULL )	{
 				int ni = ( ( j * ( mesh_resx - 1 ) + i ) * 2 + 1 ) * 3;
 				float *np = normal_arr + ni;
 				normal_p[ 0 ] = np[ 0 ];
@@ -545,10 +730,7 @@ float Heightfield::get_elevation( float px, float pz, float *normal_p )	{
 		return( py );
 	}
 	else
-	if( normal_p )	{
-
-			printf( "Heightfield::get_elevation NOT INITIALIZED\n" );
-
+	if( normal_p != NULL )	{
 		normal_p[ 0 ] = 0.0;
 		normal_p[ 1 ] = 1.0;
 		normal_p[ 2 ] = 0.0;
