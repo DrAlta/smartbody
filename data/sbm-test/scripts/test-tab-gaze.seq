@@ -7,19 +7,19 @@
 0 char elder ctrl AA begin
 0 gaze AA fadein
 
-#0 seq tab-gaze-A
+0 seq tab-gaze-A
 # dur: 23 sec
 
-#25 seq tab-gaze-B
+25 seq tab-gaze-B
 # dur: 8
 
-#35 seq tab-gaze-C
+35 seq tab-gaze-C
 # dur: 15
 
-#55 seq tab-gaze-D
+55 seq tab-gaze-D
 # dur: 7
 
-#65 seq tab-gaze-E
+65 seq tab-gaze-E
 # dur: 20
 
 85 gaze AA fadeout
