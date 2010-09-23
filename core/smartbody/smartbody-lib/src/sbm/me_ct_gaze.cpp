@@ -503,6 +503,7 @@ LOG( "CALC: joint: %s\n", joint_label( priority_joint ) );
 void MeCtGaze::set_speed( float head_dps, float eyes_dps )	{
 	timing_mode = TASK_SPEED;
 	head_speed = head_dps;
+
 	joint_arr[ GAZE_JOINT_EYE_L ].speed = eyes_dps;
 	joint_arr[ GAZE_JOINT_EYE_R ].speed = eyes_dps;
 }
