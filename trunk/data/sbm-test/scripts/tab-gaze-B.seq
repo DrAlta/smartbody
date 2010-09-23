@@ -6,6 +6,7 @@
 0 gaze C priority eyes
 0 gaze C offset euler 0 0 0
 0 gaze C bias head 0 0 0
+0 gaze C speed 2000
 0 gaze C smooth 0.8
 0 gaze C target point 0 166 190
 0 char doctor ctrl C begin
@@ -16,6 +17,7 @@
 2 gaze F priority chest
 2 gaze F offset euler 0 0 0
 2 gaze F bias head 0 0 0
+2 gaze F speed 2000
 2 gaze F smooth 0.8
 2 gaze F target point 200 200 0
 2 char doctor ctrl F begin

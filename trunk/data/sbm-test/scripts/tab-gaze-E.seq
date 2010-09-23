@@ -8,6 +8,7 @@
 5 gaze B priority eyes
 5 gaze B offset euler 0 0 0
 5 gaze B bias head 0 0 0
+5 gaze B speed 2000
 5 gaze B smooth 0.8
 5 gaze B target point 0 166 190
 5 char doctor ctrl B begin
@@ -20,6 +21,7 @@
 8 gaze D priority eyes
 8 gaze D offset euler 0 0 0
 8 gaze D bias head 0 0 0
+8 gaze D speed 2000
 8 gaze D smooth 0.8
 8 gaze D target point 0 166 190
 8 char doctor ctrl D begin
@@ -34,6 +36,7 @@
 10 gaze D bias head 0 0 0
 11 gaze D fadeout
 
+13 gaze D speed 1500
 13 gaze D smooth 0.9
 13 gaze D fadein
 14 gaze D offset euler 0 0 20
@@ -41,6 +44,7 @@
 15 test loco char doctor leftward spd 1 rps -1 angle -0.8 time 4
 
 20 gaze B fadeout
+20 gaze D speed 2000
 20 gaze D smooth 0.8
 20 gaze D fadeout
 
