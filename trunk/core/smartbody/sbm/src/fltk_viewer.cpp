@@ -1014,9 +1014,6 @@ static void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h, FltkVie
    
    e.key = fltk::event_key();
 
-
-
-
  }
 
 static float rps = 1.0f;

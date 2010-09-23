@@ -51,41 +51,42 @@ void MeCtLocomotionHeightOffset::set_limb_list(SrArray<MeCtLocomotionLimb*>* lim
 	}
 }*/
 
-void MeCtLocomotionHeightOffset::update(SrMat& parent_mat)
+void MeCtLocomotionHeightOffset::update(SrMat& parent_mat, float base_height_displacement)
 {
 	SrVec wpos;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	float normal[3];
 	float* height = (float*)malloc(limb_list->size()*sizeof(float));
-	SrArray<SrVec> pos;
+	
 	int min_index = -1;
 	float min_height = 0.0f;
-	float min_pos = 0.0f;
 	height_offset = 0.0f;
-	float comp = 0.0f;
 
-	pos.capacity(limb_list->size());
-	pos.size(limb_list->size());
+	SrVec pos;
+	SrVec base_pos;
+	base_pos.set(parent_mat.get(12), parent_mat.get(13), parent_mat.get(14));
+	//SrArray<SrVec> pos;
+	//pos.capacity(limb_list->size());
+	//pos.size(limb_list->size());
 
-	for(int i = 0; i < limb_list->size(); ++i)
+	/*for(int i = 0; i < limb_list->size(); ++i)
 	{
 		pos.set(i, limb_list->get(i)->pos_buffer.get(2));
-	}
+	}*/
 	for(int i = 0; i < limb_list->size(); ++i)
 	{
-		//pos = limb_list->get(i)->pos_buffer.get(2);
-		wpos = pos.get(i) * parent_mat;
+		pos = limb_list->get(i)->pos_buffer.get(2);
+		wpos = pos * parent_mat;
 		height[i] = mcu.query_terrain(wpos.x, wpos.z, normal);
 		
 		if(min_index < 0 || min_height > height[i]) 
 		{
 			min_index = i;
 			min_height = height[i];
-			min_pos = wpos.y;
-			comp = pos.get(i).y + translation_base_joint_height;
 		}
 	}
-	height_offset = min_height - min_pos + comp;
+	height_offset = -(base_pos.y - min_height - translation_base_joint_height - base_height_displacement);
+	//height_offset = 0.0f;
 	//printf("\n%f", height_offset);
 	free(height);
 }

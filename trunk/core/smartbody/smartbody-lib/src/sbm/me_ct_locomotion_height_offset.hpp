@@ -50,7 +50,7 @@ public:
 public:
 	void set_limb_list(SrArray<MeCtLocomotionLimb*>* limb_list);
 	void set_translation_base_joint_height(float height);
-	void update(SrMat& parent_mat);
+	void update(SrMat& parent_mat, float base_height_displacement);
 	float get_height_offset();
 
 };
