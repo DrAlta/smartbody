@@ -68,7 +68,7 @@ void MeCtLocomotionSpeedAccelerator::update_speed(double time_interval)
 	}
 	else
 	{
-		acceleration -= (float)acceleration_factor*time_interval;
+		acceleration -= (float)(acceleration_factor*time_interval);
 		if(acceleration < target_acceleration) acceleration = target_acceleration;
 	}
 	if(curr_speed == target_speed) return;

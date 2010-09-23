@@ -52,6 +52,7 @@ public:
 	float curr_height_displacement;
 	float prev_height_displacement;
 	SrVec displacement;
+	SrVec world_pos;
 
 protected:
 	int bi_world_x, bi_world_y, bi_world_z, bi_world_rot; // World offset position and rotation
@@ -69,7 +70,7 @@ protected:
 	SrVec target_world_pos;
 	SrQuat target_world_rot;
 
-	SrVec world_pos;
+	
 	SrQuat world_rot;
 	SrMat world_mat;
 	SrVec base_pos;
@@ -134,6 +135,8 @@ public:
 	SrVec get_base_pos();
 	float get_facing_angle();
 	float get_pre_facing_angle();
+	SrVec get_displacement();
+
 	void calc_target_velocity();
 	void update_framerate_accelerator(float accelerator, SrArray<MeCtLocomotionLimb*>* limb_list);
 	void update(SrBuffer<float>* buffer);
@@ -141,7 +144,10 @@ public:
 	void update_displacement(SrVec* displacement);
 	void update_world_offset();
 	void update_world_mat();
+	void update_world_mat_rotation();
 	void update_world_mat_offset();
+
+	void set_world_mat(SrMat& mat);
 
 
 	bool check_stopped(SrArray<MeCtLocomotionLimb*>* limb_list);

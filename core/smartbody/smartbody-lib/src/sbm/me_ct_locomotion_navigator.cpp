@@ -317,6 +317,11 @@ void MeCtLocomotionNavigator::set_reached_destination(MeFrameData& frame)
 	destination_list.size(0);
 }
 
+SrVec MeCtLocomotionNavigator::get_displacement()
+{
+	return displacement;
+}
+
 void MeCtLocomotionNavigator::update_world_offset()
 {
 	prev_height_displacement = curr_height_displacement;
@@ -334,6 +339,16 @@ void MeCtLocomotionNavigator::update_world_mat()
 	world_mat.set(12, world_pos.x);
 	world_mat.set(13, world_pos.y);
 	world_mat.set(14, world_pos.z);
+}
+
+void MeCtLocomotionNavigator::set_world_mat(SrMat& mat)
+{
+	world_mat = mat;
+}
+
+void MeCtLocomotionNavigator::update_world_mat_rotation()
+{
+	world_mat.roty(get_facing_angle());
 }
 
 void MeCtLocomotionNavigator::update_world_mat_offset()

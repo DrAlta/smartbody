@@ -143,10 +143,18 @@ SkChannelArray& MeCtLocomotion::controller_channels() {
 
 void MeCtLocomotion::get_translation_base_joint_index()
 {
-	for(int i = 0 ; i < nonlimb_joint_info.joint_name.size(); ++i)
+	/*for(int i = 0 ; i < nonlimb_joint_info.joint_name.size(); ++i)
 	{
 		SkJoint* joint = walking_skeleton->search_joint(nonlimb_joint_info.joint_name.get(i));
 		if(!joint->pos()->frozen(1))
+		{
+			translation_joint_index = i;
+			return;
+		}
+	}*/
+	for(int i = 0 ; i < nonlimb_joint_info.joint_name.size(); ++i)
+	{
+		if(nonlimb_joint_info.joint_name.get(i) == translation_joint_name)
 		{
 			translation_joint_index = i;
 			return;
@@ -297,8 +305,7 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 
 	update(inc_frame, frame);
 
-	if(ik_enabled) 
-		apply_IK();
+	if(ik_enabled) apply_IK();
 
 	navigator.post_controller_evaluate(frame, limb_list.get(dominant_limb), reset);
 
@@ -538,6 +545,61 @@ float MeCtLocomotion::get_buffer_base_height(SrBuffer<float>& buffer)
 void MeCtLocomotion::blend_base_joint(MeFrameData& frame, float space_time, int anim_index1, int anim_index2, float weight)
 {
 	pre_blended_base_height = r_blended_base_height;
+
+	SrQuat rot1, rot2, rot3, rot4;
+	float ratio = 0.0f;
+	float pheight = 0.0f;
+	char* translate_base;
+	SkJoint* base;
+
+	MeCtLocomotionLimbAnim* anim1 = limb_list.get(0)->walking_list.get(anim_index1);
+	MeCtLocomotionLimbAnim* anim2 = limb_list.get(0)->walking_list.get(anim_index2);
+	float frame1 = anim1->get_timing_space()->get_virtual_frame(space_time);
+	float frame2 = anim2->get_timing_space()->get_virtual_frame(space_time);
+
+	translate_base = (char*)nonlimb_joint_info.joint_name.get(translation_joint_index);
+	base = walking_skeleton->search_joint(translate_base);
+
+	anim1->walking->connect(walking_skeleton);
+	ratio = frame1 - (int)frame1;
+
+	anim1->walking->apply_frame((int)frame1);
+	//base->update_gmat();
+	pheight = base->pos()->value(1);
+	r_blended_base_height = pheight*(1.0f-ratio)*(weight);
+
+	anim1->walking->apply_frame((int)frame1+1);
+	pheight = base->pos()->value(1);
+	r_blended_base_height += pheight*ratio*(weight);
+
+	anim2->walking->connect(walking_skeleton);
+	ratio = frame2 - (int)frame2;
+
+	anim2->walking->apply_frame((int)frame2);
+	pheight = base->pos()->value(1);
+	r_blended_base_height += pheight*(1.0f-ratio)*(1.0f-weight);
+
+	anim2->walking->apply_frame((int)frame2+1);
+	pheight = base->pos()->value(1);
+	r_blended_base_height += pheight*ratio*(1.0f-weight);
+
+	SrBuffer<float>& buffer = frame.buffer();
+
+	SrVec base_pos = navigator.get_base_pos();
+	base->pos()->value(0, base_pos.x);
+	base->pos()->value(1, base_pos.y);
+	base->pos()->value(2, base_pos.z);
+
+	//printf("\n%f, %f", standing_height, navigator.get_base_pos().y);
+
+	r_blended_base_height = r_blended_base_height * (navigator.standing_factor) + base_pos.y * (1.0f-navigator.standing_factor);
+
+	//printf("\nHeight: %f", r_blended_base_height);
+}
+
+/*void MeCtLocomotion::blend_base_joint(MeFrameData& frame, float space_time, int anim_index1, int anim_index2, float weight)
+{
+	pre_blended_base_height = r_blended_base_height;
 	SrMat mat;
 	SrQuat rot1, rot2, rot3, rot4;
 	float ratio = 0.0f;
@@ -588,7 +650,7 @@ void MeCtLocomotion::blend_base_joint(MeFrameData& frame, float space_time, int 
 	r_blended_base_height = r_blended_base_height * (navigator.standing_factor) + standing_height * (1.0f-navigator.standing_factor);
 
 	//printf("\nHeight: %f", r_blended_base_height);
-}
+}*/
 
 void MeCtLocomotion::set_motion_time(float time)
 {
@@ -718,7 +780,18 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 	update_pos();
 
 	navigator.update_world_offset();
+
 	navigator.update_world_mat();
+
+	height_offset.set_limb_list(&limb_list);
+	height_offset.set_translation_base_joint_height(translation_joint_height);
+	SrVec displacement(0,0,0);
+	SrMat w_mat = navigator.get_world_mat();
+	height_offset.update(nonlimb_joint_info.mat.get(translation_joint_index) * w_mat);
+	w_mat.set(13, w_mat.get(13) + height_offset.get_height_offset());
+	navigator.set_world_mat(w_mat);
+	navigator.world_pos.y += height_offset.get_height_offset();
+	//printf("\n%f", w_mat.get(13));
 
 	update_nonlimb_mat_with_global_info();
 	
@@ -837,11 +910,6 @@ void MeCtLocomotion::apply_IK()
 
 	SrMat global_mat;
 	global_mat = navigator.get_world_mat();
-	/*global_mat.roty(navigator.get_facing_angle());
-	global_mat.set(12, navigator.get_world_pos().x);
-	global_mat.set(13, navigator.get_world_pos().y);
-	global_mat.set(14, navigator.get_world_pos().z);*/
-
 
 	for(int i = 0; i < limb_list.size(); ++i)
 	{
@@ -880,14 +948,13 @@ void MeCtLocomotion::apply_IK()
 		for(int j = 0; j < ik_scenario->joint_info_list.size(); ++j)
 		{
 			info = &(ik_scenario->joint_info_list.get(j));
-			//info->support_joint_comp = nonlimb_joint_info.mat.get(parent_ind).e42()+limb_list.get(i)->pos_buffer.get(j).y - info->support_joint_height;
-			info->support_joint_comp = nonlimb_joint_info.mat.get(parent_ind).e42()-navigator.target_height_displacement- abs_ground_height + limb_list.get(i)->pos_buffer.get(j).y - info->support_joint_height;
+			info->support_joint_comp = translation_joint_height + r_blended_base_height + limb_list.get(i)->pos_buffer.get(j).y - info->support_joint_height;
 		}
 		ik.update(ik_scenario);
 		limb_list.get(i)->limb_joint_info.quat = ik_scenario->quat_list;
 		//ik_scenario->quat_list. = limb_list.get(i)->quat_buffer
 	}
-
+	//printf("\n%f", r_blended_base_height);
 }
 
 void MeCtLocomotion::get_anim_indices(int limb_index, SrVec direction, int* anim1_index, int* anim2_index)
@@ -988,9 +1055,9 @@ SrVec MeCtLocomotion::get_limb_pos(MeCtLocomotionLimb* limb)
 	tjoint_base = skeleton->search_joint(tjoint->parent()->name().get_string());
 	int parent_ind = nonlimb_joint_info.get_index_by_name(tjoint->parent()->name().get_string());
 	gmat = nonlimb_joint_info.mat.get(parent_ind);
-	gmat.set(11, 0.0f);
 	gmat.set(12, 0.0f);
 	gmat.set(13, 0.0f);
+	gmat.set(14, 0.0f);
 	//SrVec origin;
 	//origin.set(gmat.e41(), gmat.e42(), gmat.e43());
 	//pmat = nonlimb_joint_info.mat.get(translation_joint_index);

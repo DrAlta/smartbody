@@ -107,8 +107,13 @@ public:
 	void filter_displacement(MeCtLocomotionLimbAnim* anim, int* count);
 
 	void init_blended_anim();
+
+	int get_translation_base_joint_name(SkSkeleton* skeleton);
+
 	//temp funcs.............
 	void test_facing(SkMotion* walking);
+
+
 
 	void print_info();
 

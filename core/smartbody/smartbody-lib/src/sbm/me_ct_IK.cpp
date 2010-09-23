@@ -1,5 +1,5 @@
 /*
- *  me_ct_IK_scenario.cpp - part of SmartBody-lib's Motion Engine
+ *  me_ct_IK.cpp - part of SmartBody-lib's Motion Engine
  *  Copyright (C) 2009  University of Southern California
  *
  *  SmartBody-lib is free software: you can redistribute it and/or
@@ -46,6 +46,13 @@ MeCtIK::~MeCtIK() {
 void MeCtIK::set_max_iteration(int iter)
 {
 	max_iteration = iter;
+}
+
+SrVec MeCtIK::get_joint_pos(int index)
+{
+	SrMat mat = joint_global_mat_list.get(index);
+	SrVec pos(mat.get(12), mat.get(13), mat.get(14));
+	return pos;
 }
 
 void MeCtIK::update(MeCtIKScenario* scenario)
@@ -288,9 +295,7 @@ __forceinline void MeCtIK::calc_target(SrVec& orientation, SrVec& offset)
 	//target = (manipulated_joint->support_joint_comp + manipulated_joint->support_joint_height - distance_to_plane(pos, scenario->plane_normal, scenario->plane_point)) * scenario->plane_normal + pos;
 	SrVec t = cross_point_on_plane(pos, orientation, scenario->plane_normal, scenario->plane_point);
 	target = -(manipulated_joint->support_joint_comp + manipulated_joint->support_joint_height)*orientation + t;
-	//printf("\n(%f, %f, %f)", pos.x, pos.y, pos.z);
-
-
+	//printf("\n(%f, %f, %f)", target.x, target.y, target.z);
 }
 
 __forceinline void MeCtIK::get_next_support_joint()
