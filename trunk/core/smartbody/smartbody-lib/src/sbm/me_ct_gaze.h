@@ -208,7 +208,7 @@ class MeCtGaze : public MeController	{
 		void set_speed( float head_dps, float eyes_dps = DEFAULT_SPEED_EYES );
 		void set_time_hint( float head_sec ); // derives approximate speed from task angle
 
-		void set_smooth( float smooth_basis );
+		void set_smooth( float smooth_basis, float eye_smooth_basis = DEFAULT_SMOOTHING_EYEBALL );
 		void set_smooth( float back_sm, float neck_sm, float eyes_sm );
 
 #if 0

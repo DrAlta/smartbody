@@ -47,12 +47,14 @@
 
 ///////////////////////////////////////////////////////////////////////////
 
-void MeCtGaze::set_smooth( float smooth_basis ) {
+void MeCtGaze::set_smooth( float smooth_basis, float eye_smooth_basis ) {
 
 	if( smooth_basis < 0.0 ) smooth_basis = 0.0;
 	if( smooth_basis > 1.0 ) smooth_basis = 1.0;
+	if( eye_smooth_basis < 0.0 ) eye_smooth_basis = 0.0;
+	if( eye_smooth_basis > 1.0 ) eye_smooth_basis = 1.0;
 
-	joint_key_arr[ GAZE_KEY_EYES ].smooth = smooth_basis;
+	joint_key_arr[ GAZE_KEY_EYES ].smooth = eye_smooth_basis;
 	joint_key_arr[ GAZE_KEY_HEAD ].smooth = smooth_basis;
 	joint_key_arr[ GAZE_KEY_CERVICAL ].smooth = smooth_basis;
 	joint_key_arr[ GAZE_KEY_THORAX ].smooth = smooth_basis;
