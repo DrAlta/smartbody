@@ -10,6 +10,8 @@
 0 seq tab-gaze-A
 # dur: 23 sec
 
+24 gaze AA fadeout
+25 gaze AA fadein
 25 seq tab-gaze-B
 # dur: 8
 
@@ -22,4 +24,5 @@
 65 seq tab-gaze-E
 # dur: 20
 
-85 gaze AA fadeout
+78 gaze AA fadeout
+#85 gaze AA fadeout

@@ -6,6 +6,7 @@
 0 gaze E priority eyes
 0 gaze E offset euler 0 0 0
 0 gaze E bias head 0 0 0
+0 gaze E speed 2000
 0 gaze E smooth 0.8
 0 gaze E target point 0 166 190
 0 char doctor ctrl E begin
