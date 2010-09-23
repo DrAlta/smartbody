@@ -783,14 +783,17 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 
 	navigator.update_world_mat();
 
-	height_offset.set_limb_list(&limb_list);
-	height_offset.set_translation_base_joint_height(translation_joint_height);
-	SrVec displacement(0,0,0);
-	SrMat w_mat = navigator.get_world_mat();
-	height_offset.update(nonlimb_joint_info.mat.get(translation_joint_index) * w_mat);
-	w_mat.set(13, w_mat.get(13) + height_offset.get_height_offset());
-	navigator.set_world_mat(w_mat);
-	navigator.world_pos.y += height_offset.get_height_offset();
+	if(ik_enabled)
+	{
+		height_offset.set_limb_list(&limb_list);
+		height_offset.set_translation_base_joint_height(translation_joint_height);
+		SrVec displacement(0,0,0);
+		SrMat w_mat = navigator.get_world_mat();
+		height_offset.update(nonlimb_joint_info.mat.get(translation_joint_index) * w_mat, r_blended_base_height);
+		w_mat.set(13, w_mat.get(13) + height_offset.get_height_offset());
+		navigator.set_world_mat(w_mat);
+		navigator.world_pos.y += height_offset.get_height_offset();
+	}
 	//printf("\n%f", w_mat.get(13));
 
 	update_nonlimb_mat_with_global_info();
