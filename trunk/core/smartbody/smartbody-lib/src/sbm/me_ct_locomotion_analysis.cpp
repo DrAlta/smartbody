@@ -223,6 +223,23 @@ void MeCtLocomotionAnalysis::analyze_standing(MeCtLocomotionLimb* limb, SkMotion
 	//limb->init_skeleton(standing, standing);
 }
 
+int MeCtLocomotionAnalysis::get_translation_base_joint_name(SkSkeleton* skeleton)
+{
+	SkJoint* joint = skeleton->root();
+	for(int i = 0 ; i < skeleton->get_joint_array().size(); ++i)
+	{
+		if(!joint->pos()->frozen(1))
+		{
+			this->_ct_locomotion->translation_joint_name = joint->name().get_string();
+			return i;
+		}
+		joint = joint->child(0);
+	}
+
+	this->_ct_locomotion->translation_joint_name = NULL;
+	return -1;
+}
+
 void MeCtLocomotionAnalysis::analyze_standing_core(MeCtLocomotionLimb* limb, SkSkeleton* skeleton)
 {
 	SkJoint* joint = NULL;
@@ -238,7 +255,7 @@ void MeCtLocomotionAnalysis::analyze_standing_core(MeCtLocomotionLimb* limb, SkS
 		joint = skeleton->search_joint(*(limb->support_joint_list.get(i)));
 		mat = joint->gmat();
 		pos = mat.pt(12);
-		pos[1] += 100.0f;
+		//pos[1] += 100.0f;
 		if(i == 0 || ground_height > *(pos+1))
 		{
 			ground_height = *(pos+1);
@@ -246,16 +263,24 @@ void MeCtLocomotionAnalysis::analyze_standing_core(MeCtLocomotionLimb* limb, SkS
 	}
 	//calculate the distance from support joint to ground, 
 	//use these values to calculate the time support joints hit the ground
+	
 	for(int i = 0; i < limb->get_support_joint_num(); ++i)
 	{
 		joint = skeleton->search_joint(*(limb->support_joint_list.get(i)));
 		mat = joint->gmat();
 		pos = mat.pt(12);
-		pos[1] += 100.0f;
+		//pos[1] += 100.0f;
 		limb->support_height.push() = *(pos+1)- ground_height;
 	}
 
 	limb->set_ground_height(ground_height);
+
+	int translation_base_joint_index = get_translation_base_joint_name(skeleton);
+
+	joint = skeleton->search_joint(this->_ct_locomotion->translation_joint_name);
+
+	mat = joint->gmat();
+	this->_ct_locomotion->translation_joint_height = mat.get(13)-ground_height;
 
 }
 

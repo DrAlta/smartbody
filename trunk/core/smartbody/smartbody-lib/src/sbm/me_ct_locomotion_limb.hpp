@@ -56,9 +56,12 @@ public:
 	//temp, to be deleted=================
 	SkSkeleton*						walking_skeleton;
 	SkSkeleton*						standing_skeleton;
+
+public://for IK
 	MeCtIKScenario					ik;
 	SrVec							ik_offset;
 	SrVec							ik_offset_record;
+	float							ik_target_comp;
 
 	//SrArray<int>					joint_index;
 	//SrArray<int>					joint_buff_index;

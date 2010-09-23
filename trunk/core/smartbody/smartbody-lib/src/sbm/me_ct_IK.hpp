@@ -47,7 +47,7 @@ protected:
 	SrArray<SrVec>				joint_pos_list;
 	SrArray<SrVec>				joint_axis_list;
 	SrArray<SrMat>				joint_global_mat_list;
-	//SrArray<SrMat>				joint_local_mat_list;
+	//SrArray<SrMat>			joint_local_mat_list;
 
 	SrArray<SrMat>				joint_init_mat_list;
 
@@ -73,6 +73,7 @@ public:
 
 public:
 	void update(MeCtIKScenario* scenario);
+	SrVec get_joint_pos(int index);
 
 protected:
 	void set_max_iteration(int iter);

@@ -30,6 +30,7 @@
 #include "me_ct_locomotion_navigator.hpp"
 #include "me_ct_locomotion_func.hpp"
 #include "me_ct_locomotion_joint_info.hpp"
+#include "me_ct_locomotion_height_offset.hpp"
 #include "me_ct_IK.hpp"
 
 
@@ -52,6 +53,8 @@ public:
 	float r_blended_base_height;
 
 	SrVec pre_world_offset_to_base;
+	SrString translation_joint_name;
+	float translation_joint_height;
 
 	//int base_index;
 
@@ -67,6 +70,8 @@ protected:
 	MeCtIK ik;
 
 	MeCtLocomotionNavigator navigator;
+
+	MeCtLocomotionHeightOffset height_offset;
 
 	MeCtLocomotionSpeedAccelerator speed_accelerator; // to be moved to MeCtLocomotionLimb
 

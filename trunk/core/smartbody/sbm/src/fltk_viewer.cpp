@@ -1104,15 +1104,7 @@ static void translate_keyboard_state()
 	}
 
 	//direction control
-	if(fltk::get_key_state(fltk::UpKey) 
-		|| fltk::get_key_state(fltk::DownKey)
-		|| fltk::get_key_state(fltk::RightKey)
-		|| fltk::get_key_state(fltk::LeftKey)
-		|| fltk::get_key_state('a')
-		|| fltk::get_key_state('d'))
-	{
-		locomotion_cmd = true;
-	}
+
 	if(fltk::get_key_state(fltk::UpKey))
 	{
 		if(!upkey)
@@ -1206,7 +1198,17 @@ static void translate_keyboard_state()
 
 	if(!rightkey && !leftkey)
 	{
-		rps_flag = (int)0.0f;
+		rps_flag = 0;
+	}
+
+		if(upkey
+		|| downkey
+		|| rightkey
+		|| leftkey
+		|| a_key
+		|| d_key)
+	{
+		locomotion_cmd = true;
 	}
 
 	char tt[200];
@@ -1224,6 +1226,7 @@ static void translate_keyboard_state()
 		mcu.execute(cmd);
 	}
 }
+
 
 
 static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h)
