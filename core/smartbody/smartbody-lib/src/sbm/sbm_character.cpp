@@ -1615,7 +1615,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			return CMD_SUCCESS;
 		} else {
 			if ( !character ) {
-				LOG("ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"%s\".", char_name);
+				LOG("ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"%s\".", char_name.c_str());
 				return CMD_FAILURE;  // ignore/out-of-domain? But it's not a standard network message.
 			} else {
 				return character->set_viseme( viseme, weight, mcu_p->time, rampin_duration, curveInfo, numKeys );
@@ -1667,7 +1667,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			return CMD_SUCCESS;
 		} else {
 			if ( !character ) {
-				LOG("ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"%s\".", char_name);
+				LOG("ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"%s\".", char_name.c_str());
 				return CMD_FAILURE;  // ignore/out-of-domain? But it's not a standard network message.
 			} else {
 				return character->reholster_quickdraw( mcu_p );
@@ -1787,7 +1787,7 @@ int SbmCharacter::print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 	SbmCharacter* character = mcu_p->character_map.lookup( character_id.c_str() );
 	if( character==NULL ) {
-		LOG("ERROR: SbmCharacter::print_cmd_func(..): Unknown character \"%s\".", character);
+		LOG("ERROR: SbmCharacter::print_cmd_func(..): Unknown character \"%s\".", character_id.c_str());
 		return CMD_FAILURE;
 	}
 
