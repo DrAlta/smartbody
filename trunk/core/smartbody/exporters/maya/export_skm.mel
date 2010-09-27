@@ -578,6 +578,8 @@ global proc int skmExportFile( string $fname, string $animDef )
    // This function allows you to override the filename in the animDef.  If you don't need this, call skmExport().
    // If you wish to export all .skm's defined, call skmExportAll()
 
+   string $UnitsLinear = `currentUnit -q -linear` ;
+
    global string $skmVersion;
 
    print( "skmExport() - $fname=" + $fname + " $animDef=" + $animDef + "\n" );
@@ -613,7 +615,7 @@ global proc int skmExportFile( string $fname, string $animDef )
 
       //Print basic file information
       fprint $fileid ( "# SKM Motion Definition \n" );
-      fprint $fileid ( "# Maya Exporter v" + $skmVersion + "\n\n" );
+      fprint $fileid ( "# Maya Exporter v" + $skmVersion + "    Units: " + $UnitsLinear + "\n\n" );
       fprint $fileid ( "SkMotion\n\n" );
       fprint $fileid ( "name \"" + $animName + "\"\n\n" );
 
