@@ -412,6 +412,7 @@ global proc int skExport( string $fname )
    int $showAll   = `getAttr SkelDef.ShowAllChannels`;
    int $useLimits = `getAttr SkelDef.UseLimits`;
    int $useChannelAttributes = `getAttr SkelDef.UseChannelAttributes`;
+   string $UnitsLinear = `currentUnit -q -linear` ;
 
    select -r $root;
 
@@ -443,7 +444,7 @@ global proc int skExport( string $fname )
       print ( "----------SK Export Report----------\n" );
 
       fprint $fileid ( "# SK Skeleton Definition\r\n" );
-      fprint $fileid ( "# File generated with export_sk.mel v" + $skVersion + "\r\n\r\n" );
+      fprint $fileid ( "# File generated with export_sk.mel v" + $skVersion + "    Units: " + $UnitsLinear + "\r\n\r\n" );
       fprint $fileid ( "set_name " + $skName + "\r\n\r\n" );
       fprint $fileid ( "skeleton\r\n" );
 
