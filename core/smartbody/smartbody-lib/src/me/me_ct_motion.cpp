@@ -265,7 +265,6 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 	{
 		frame.channelUpdated(i);
 	}
-
 	return continuing;
 }
 
@@ -308,5 +307,9 @@ void MeCtMotion::print_state( int tabCount ) {
 	LOG("\n" );
 }
 
+SrBuffer<int>& MeCtMotion::get_context_map()
+{
+	return _mChan_to_buff;
+}
 //======================================= EOF =====================================
 
