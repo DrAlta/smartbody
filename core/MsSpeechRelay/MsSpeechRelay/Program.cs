@@ -184,6 +184,9 @@ namespace MsSpeechRelay
             bool allOk = true;
             xmlReply = "<speak><soundFile name=\"" + messageOutputFileName + "\"/>";
 
+            // Adding this line to make the application compatible with the NeoSpeech Voice engine
+            message = message.Replace("</speak>",".</speak>");
+
             ttsServer.SetOutputToWaveFile(outputFileName);
             if (voiceRequestMode < 2 && voiceMap != null && voiceMap.Count > 0)
             {
