@@ -2194,14 +2194,14 @@ int mcu_set_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	std::map<std::string, SkMotion*>::iterator motionIter = mcu_p->motion_map.find(motion_name);
 	if (motionIter == mcu_p->motion_map.end())
 	{
-		LOG("ERROR: Unknown viseme pose \"%s\".", motion_name);
+		LOG("ERROR: Unknown viseme pose \"%s\".", motion_name.c_str());
 		return CMD_FAILURE;
 	}
 	SkMotion* motion = (*motionIter).second;
 	VisemeMotionMap& viseme_map = mcu_p->viseme_map;
 	VisemeMotionMap::iterator pos = viseme_map.find( viseme );
 	if( pos != viseme_map.end() ) {
-		LOG("WARNING: Overwriting viseme \"%s\" motion mapping.", viseme);
+		LOG("WARNING: Overwriting viseme \"%s\" motion mapping.", viseme.c_str());
 	}
 	viseme_map.insert( make_pair( viseme, motion ) );
 	
