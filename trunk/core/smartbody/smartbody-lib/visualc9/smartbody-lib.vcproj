@@ -359,6 +359,14 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\me\me_ct_interpolator.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\me\me_ct_interpolator.h"
+						>
+					</File>
+					<File
 						RelativePath="..\src\me\me_ct_lifecycle_test.cpp"
 						>
 					</File>

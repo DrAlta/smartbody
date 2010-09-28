@@ -91,6 +91,8 @@ mcuCBHandle::mcuCBHandle()
 	timer_p( NULL ),
 	time( 0.0 ),
 	time_dt( 0.0 ),
+	is_fixed_weight( true ),
+	panim_weight( 0.0 ),
 	internal_profiler_p( NULL ),
 	external_profiler_p( NULL ),
 	profiler_p( NULL ),
@@ -104,6 +106,7 @@ mcuCBHandle::mcuCBHandle()
 	skmScale( 1.0 ),
 	viewer_p( NULL ),
 	bmlviewer_p( NULL ),
+	panimationviewer_p( NULL ),
 	camera_p( NULL ),
 	root_group_p( new SrSnGroup() ),
 	height_field_p( NULL ),
@@ -115,6 +118,7 @@ mcuCBHandle::mcuCBHandle()
 	use_locomotion( false ),
 	viewer_factory ( new SrViewerFactory() ),
 	bmlviewer_factory ( new BMLViewerFactory() ),
+	panimationviewer_factory ( new BMLViewerFactory() ),
 	resource_manager(ResourceManager::getResourceManager()),
 	snapshot_counter( 1 ),
 	delay_behaviors(true)
@@ -418,6 +422,26 @@ void mcuCBHandle::close_bml_viewer( void )	{
 	if( bmlviewer_p )	{
 		bmlviewer_factory->destroy(bmlviewer_p);
 		bmlviewer_p = NULL;
+	}
+}
+
+int mcuCBHandle::open_panimation_viewer( int width, int height, int px, int py )
+{
+	if( panimationviewer_p == NULL )	{
+		panimationviewer_p = panimationviewer_factory->create( px, py, width, height );
+		panimationviewer_p->label_viewer( "Parameterized Animation Viewer" );
+		panimationviewer_p->show_bml_viewer();
+		
+		return( CMD_SUCCESS );
+	}
+	return( CMD_FAILURE );
+}
+
+void mcuCBHandle::close_panimation_viewer( void )
+{
+	if( panimationviewer_p )	{
+		panimationviewer_factory->destroy(bmlviewer_p);
+		panimationviewer_p = NULL;
 	}
 }
 

@@ -325,6 +325,20 @@ namespace BML {
 			           const BehaviorSyncPoints& behav_syncs );
 	};
 
+	class ParameterizedMotionRequest : public MeControllerRequest {
+	public:
+		ParameterizedMotionRequest( const std::string& unique_id, const std::string& localId, MeCtMotion* motion1ct, MeCtMotion* motion2ct, MeCtSchedulerClass* schedule_ct,
+			           const BehaviorSyncPoints& behav_syncs, float value, bool inLoop);
+
+		virtual void realize_impl( BmlRequestPtr request, mcuCBHandle* mcu );
+
+	private:
+		MeCtMotion* motion1Ct;
+		MeCtMotion* motion2Ct;
+		float paramValue;
+		bool loop;
+	};
+
 	class NodRequest : public MeControllerRequest {
 	public: ///// Constants
 		enum NodType { HORIZONTAL = HEAD_SHAKE,

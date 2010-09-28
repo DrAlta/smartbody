@@ -345,6 +345,15 @@ public:
 	 */
 	TrackPtr schedule( MeController* c, BML::BehaviorSyncPoints& syncPoints);
 
+    /** Backwards compatible schedule function: (sans Static/Once track type)
+	 *
+	 *  Schedule controller c with the given parameters.
+     *  ct1, ct2 - the motion controllers to be scheduled into interpolator controller.
+	 *  value - the blending weight for ct1 and ct2
+     *  type - Once will automatically remove c after completion, Static will not remove.
+	 */
+	TrackPtr schedule( MeController* ct1, MeController* ct2, float value, bool loop, BML::BehaviorSyncPoints& syncPoints);
+
 	/**
 	 *  Removes the given track from schedule.
 	 *  If the track_iterator is recognized and removed successfully,

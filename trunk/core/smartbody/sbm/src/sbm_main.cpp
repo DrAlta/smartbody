@@ -39,6 +39,7 @@
 
 #include "fltk_viewer.h"
 #include <BehaviorWindow.h>
+#include <PanimationWindow.h>
 #include "wsp.h"
 
 #include <sbm/sbm_constants.h>
@@ -317,10 +318,13 @@ void mcu_register_callbacks( void ) {
 
 	mcu.insert( "viewer",		mcu_viewer_func );
 	mcu.insert( "bmlviewer",    mcu_bmlviewer_func);
+	mcu.insert( "panimviewer",  mcu_panimationviewer_func);
 	mcu.insert( "camera",		mcu_camera_func );
 	mcu.insert( "terrain",		mcu_terrain_func );
 	mcu.insert( "time",			mcu_time_func );
 	mcu.insert( "tip",			mcu_time_ival_prof_func );
+
+	mcu.insert( "panim",		mcu_panim_keys_func );	
 
 	mcu.insert( "load",			mcu_load_func );
 	mcu.insert( "pawn",			SbmPawn::pawn_cmd_func );
@@ -551,6 +555,7 @@ int main( int argc, char **argv )	{
 	//viewerFactory->setFltkViewer(viewer);
 	mcu.register_viewer_factory(viewerFactory);
 	mcu.register_bmlviewer_factory(new BehaviorViewerFactory());
+	mcu.register_panimationviewer_factory(new PanimationViewerFactory());
 
 	// Build the floor for the viewer
 	//mcu.add_scene( build_checkerboard_floor( 200.0 ) );

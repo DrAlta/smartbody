@@ -90,6 +90,8 @@ const XMLCh TAG_SBM_COMMAND[] = L"sbm:command";
 const XMLCh TAG_ANIMATION[] = L"animation";
 const XMLCh TAG_EVENT[]     = L"event";
 
+const XMLCh TAG_PANIMATION[] = L"panimation";
+
 // XMLStrings (utf-16 character arrays) for parsing vrSpeak's XML
 const XMLCh ATTR_SPEAKER[]      = L"speaker";
 const XMLCh ATTR_ADDRESSEE[]    = L"addressee";
@@ -415,6 +417,8 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				behavior = parse_bml_animation( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_SBM_ANIMATION )==0 ) {
 				behavior = parse_bml_animation( child, unique_id, behav_syncs, required, request, mcu );
+			} else if( XMLString::compareString( tag, TAG_SBM_PANIMATION )==0 ) {
+				behavior = parse_bml_panimation( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_BODY )==0 ) {
 				behavior = parse_bml_body( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_HEAD )==0 ) {

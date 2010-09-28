@@ -49,11 +49,12 @@ int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_sequence_chain_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_viewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_bmlviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_panimationviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_terrain_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-
+int mcu_panim_keys_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 //int mcu_character_func( srArgBuffer& args, mcuCBHandle *mcu_p );  // Old version... See SbmCharacter::character_cmd_func
 
 int mcu_character_init( const char* char_name, const char *skel_file, const char *unreal_class, mcuCBHandle *mcu_p );
@@ -63,7 +64,6 @@ int mcu_character_bone_position_cmd( const char* char_name, srArgBuffer& args, m
 
 int mcu_character_load_mesh( const char* char_name, const char* obj_file, mcuCBHandle* mcu_p );	// support obj file for now
 int mcu_character_load_skinweights( const char* char_name, const char* skin_file, mcuCBHandle* mcu_p );	// support colladda for now
-
 
 //  The following have been replace by SbmCharacter::remove_from_scene( const char* )
 //int mcu_character_remove( const char * char_name, mcuCBHandle * mcu_p );

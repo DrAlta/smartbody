@@ -138,6 +138,11 @@ class mcuCBHandle	{
 		double		skScale;
 		double		skmScale;
 
+		// parameterized animation engine paramters
+		bool		is_fixed_weight;
+		float		panim_weight;
+		std::map<std::string, std::vector<int>>	panim_key_map;
+
 		TimeRegulator	*internal_timer_p;
 		TimeRegulator	*external_timer_p;
 		TimeRegulator	*timer_p;
@@ -154,7 +159,9 @@ class mcuCBHandle	{
 		SrViewerFactory *viewer_factory;
 		SrViewer	*viewer_p;
 		BMLViewer	*bmlviewer_p;
+		BMLViewer	*panimationviewer_p;
 		BMLViewerFactory *bmlviewer_factory;
+		BMLViewerFactory *panimationviewer_factory;
 		SrCamera	*camera_p;
 		SrSnGroup	*root_group_p;
 		
@@ -281,6 +288,8 @@ class mcuCBHandle	{
 		void close_viewer( void );
 		int open_bml_viewer( int width, int height, int px, int py );
 		void close_bml_viewer( void );
+		int open_panimation_viewer( int width, int height, int px, int py );
+		void close_panimation_viewer( void );
 		int add_scene( SrSnGroup *scene_p );
 		int remove_scene( SrSnGroup *scene_p );
 		void render()	{ if( viewer_p ) { viewer_p->render(); } }
@@ -412,6 +421,10 @@ class mcuCBHandle	{
 		void register_bmlviewer_factory(BMLViewerFactory* factory) { 
 				if (bmlviewer_factory != NULL) delete bmlviewer_factory;
 				bmlviewer_factory = factory;
+		}
+		void register_panimationviewer_factory(BMLViewerFactory* factory) { 
+				if (panimationviewer_factory != NULL) delete panimationviewer_factory;
+				panimationviewer_factory = factory;
 		}
 
 	protected:

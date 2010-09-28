@@ -127,6 +127,8 @@ class MeCtMotion : public MeController
     bool input ( SrInput& inp, const SrHashTable<SkMotion*>& motions );
 
 	virtual void print_state( int tabCount );
+	
+	SrBuffer<int>& get_context_map();
 
    private:
 	void map_floats();

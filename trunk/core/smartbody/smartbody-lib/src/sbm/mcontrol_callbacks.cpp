@@ -506,6 +506,96 @@ int mcu_bmlviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	return( CMD_FAILURE );
 }
 
+/*
+
+	panimviewer open <width> <height> <px> <py> 
+	panimviewer show|hide
+	
+*/
+
+int mcu_panimationviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	if( mcu_p )	{
+		char *panimview_cmd = args.read_token();
+		if( strcmp( panimview_cmd, "open" ) == 0 )	{
+
+			if( mcu_p->panimationviewer_p == NULL )	{
+				int argc = args.calc_num_tokens();
+				if( argc >= 4 )	{
+
+					int width = args.read_int();
+					int height = args.read_int();
+					int px = args.read_int();
+					int py = args.read_int();
+					int err = mcu_p->open_panimation_viewer( width, height, px, py );
+					return( err );
+				} else {
+					int err = mcu_p->open_panimation_viewer( 300, 200, 100, 100 );
+					return( err );
+				}
+			}
+		}
+		else
+		if( strcmp( panimview_cmd, "show" ) == 0 )	{
+			if( mcu_p->panimationviewer_p )	{
+				mcu_p->panimationviewer_p->show_bml_viewer();
+				return( CMD_SUCCESS );
+			}
+		}
+		else
+		if( strcmp( panimview_cmd, "hide" ) == 0 )	{
+			if( mcu_p->panimationviewer_p )	{
+				mcu_p->panimationviewer_p->hide_bml_viewer();
+				return( CMD_SUCCESS );
+			}
+		}
+		else	{
+			return( CMD_NOT_FOUND );
+		}
+	}
+	return( CMD_FAILURE );
+}
+
+// panim <motion name> keys <key size> <keys>
+// keys should be in ascending order
+int mcu_panim_keys_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	if (mcu_p)
+	{
+		char* motionName = args.read_token();
+		char* nextToken = args.read_token();
+
+		if (strcmp(motionName, "") != 0)
+		{
+			if (strcmp(nextToken, "keys") == 0)
+			{
+				std::vector<int> keyContainer;
+				int keySize = atoi(args.read_token());
+				for (int i = 0; i < keySize; i++)
+				{
+					keyContainer.push_back(atoi(args.read_token()));
+					// check whether is ascending order
+					if (i != 0)
+						if (keyContainer[i] < keyContainer[i - 1])
+						{
+							LOG("WARNING: The input key array should be in ascending order!");
+							return CMD_FAILURE;
+						}
+				}
+				mcu_p->panim_key_map.insert(std::make_pair(motionName, keyContainer));
+			}
+			else
+			{
+				LOG("WARNING: Missing Motion Name!");
+				return CMD_FAILURE;		
+			}
+		}
+		else
+			return CMD_FAILURE;
+	}
+	return CMD_SUCCESS;
+}
+
 /////////////////////////////////////////////////////////////
 
 /*

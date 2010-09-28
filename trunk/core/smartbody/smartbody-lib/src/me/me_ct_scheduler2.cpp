@@ -33,6 +33,7 @@
 #include <ME/me_ct_blend.hpp>
 #include <ME/me_ct_time_shift_warp.hpp>
 #include <ME/me_ct_motion.h>
+#include <ME/me_ct_interpolator.h>
 
 #include <sbm/mcontrol_util.h>
 #include "vhcl_log.h"
@@ -605,6 +606,81 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 
 	return create_track( blendingCt, timingCt, ct );
 }
+
+
+MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct1, MeController* ct2, float value, bool loop, BML::BehaviorSyncPoints& syncPoints)
+{
+	double startAt  = syncPoints.sync_start()->time();
+	double readyAt  = syncPoints.sync_ready()->time();
+	double strokeStartAt = syncPoints.sync_stroke_start()->time();
+	double strokeAt = syncPoints.sync_stroke()->time();
+	double strokeEndAt = syncPoints.sync_stroke_end()->time();
+	double relaxAt  = syncPoints.sync_relax()->time();
+	double endAt    = syncPoints.sync_end()->time();
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	double now = mcu.time;
+
+	// if any of the sync points begin before the current time, 
+	// then offset the motion accordingly
+
+	double indt  = readyAt - startAt;
+	double outdt = endAt - relaxAt;
+
+	MeCtInterpolator* interpolator = new MeCtInterpolator(ct1, ct2, value, loop);
+	double ct_dur = interpolator->controller_duration();
+	bool dur_defined = (ct_dur >= 0);
+
+	MeCtTimeShiftWarp* timingCt   = new MeCtTimeShiftWarp( interpolator );
+	MeCtBlend*         blendingCt = new MeCtBlend( timingCt );
+
+	const char* ct_name = interpolator->name();
+
+	MeSpline1D& bCurve = blendingCt->blend_curve();
+	/*                  x           y    (control_tan, l_control_len, and r_control_len are all zero) */
+	if( indt>0 ) {
+		bCurve.make_smooth( startAt,        0,   0, 0, 0 );
+		bCurve.make_smooth( readyAt,		1,   0, 0, 0 );
+	} else {
+		bCurve.make_disjoint( startAt, 1, 0, 0, 0, 0, 0 );
+	}
+	if( dur_defined ) {
+		if( outdt>0 ) {
+			bCurve.make_smooth( startAt + ct_dur - outdt,		 1,   0, 0, 0 );
+			bCurve.make_smooth( startAt + ct_dur,				 0,   0, 0, 0 );
+		} else {
+			bCurve.make_disjoint( startAt + ct_dur, 0, 1, 0, 0, 0, 0 );
+		}
+	}
+	// else leave blend fixed at 100% for eternity
+	if( ct_name && (ct_name[0]!='\0') ) {
+		string blend_name( "blending for " );
+		blend_name += ct_name;
+		blendingCt->name( blend_name.c_str() );
+	}
+
+	// Configure time mapping
+	MeSpline1D& tMapFunc = timingCt->time_func();
+	if (!dur_defined ) 
+	{
+		tMapFunc.make_cusp( startAt,     0,            0, 0, 0, 0 );
+		tMapFunc.make_cusp( MAX_TRACK_DURATION, MAX_TRACK_DURATION - startAt,  0, 0, 0, 0 );
+	} 
+	else 
+	{
+		tMapFunc.make_cusp( startAt,			0,            0, 0, 0, 0 );
+		tMapFunc.make_cusp( startAt + ct_dur,    ct_dur,          0, 0, 0, 0 );
+	}
+
+	if( ct_name && (ct_name[0]!='\0') ) {
+		std::string timing_name( "timing for " );
+		timing_name += ct_name;
+		timingCt->name( timing_name.c_str() );
+	}
+
+	return create_track( blendingCt, timingCt, interpolator );
+}
+
 
 
 bool MeCtScheduler2::remove_child( MeController *child ) {

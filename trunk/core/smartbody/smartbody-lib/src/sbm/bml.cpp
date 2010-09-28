@@ -41,8 +41,6 @@
 #include "ME/me_ct_blend.hpp"
 
 
-
-
 using namespace std;
 using namespace BML;
 using namespace SmartBody;
@@ -983,6 +981,28 @@ void MeControllerRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu 
 	// TODO: set sync point times
 }
 
+void ParameterizedMotionRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
+{
+	// Get times from BehaviorSyncPoints
+	time_sec startAt  = behav_syncs.sync_start()->time();
+	time_sec readyAt  = behav_syncs.sync_ready()->time();
+	time_sec strokeAt = behav_syncs.sync_stroke()->time();
+	time_sec relaxAt  = behav_syncs.sync_relax()->time();
+	time_sec endAt    = behav_syncs.sync_end()->time();
+
+	if( LOG_METHODS || LOG_CONTROLLER_SCHEDULE )
+	 	cout << "DEBUG: MeControllerRequest::schedule(): startAt=" << startAt << ",  readyAt=" << readyAt << ",  strokeAt=" << strokeAt << ",  relaxAt=" << relaxAt << ",  endAt=" << endAt << endl;
+
+	time_sec indt  = readyAt-startAt;
+	time_sec outdt = endAt-relaxAt;
+
+	if(LOG_CONTROLLER_SCHEDULE)
+		cout << "MeControllerRequest::schedule(..): \"" << motion1Ct->name() << " and " << motion2Ct->name() << "\" startAt=" << startAt << ",  indt=" << indt << ",  outdt=" << outdt << endl;
+
+	if (motion1Ct && motion2Ct)
+		schedule_ct->schedule( motion1Ct, motion2Ct, paramValue, loop, behav_syncs);
+}
+
 /**
  *  Implemtents BehaviorRequest::unschedule(..),
  *  ramping down the blend curve of the MeController.
@@ -1048,6 +1068,20 @@ MotionRequest::MotionRequest( const std::string& unique_id, const std::string& l
 						 syncs_in )
 {}
 
+// Parameterized Motion Request
+ParameterizedMotionRequest::ParameterizedMotionRequest( const std::string& unique_id, const std::string& localId, MeCtMotion* ct1, MeCtMotion* ct2, MeCtSchedulerClass* schedule_ct,
+			           const BehaviorSyncPoints& syncs_in, float value, bool inLoop)
+:	MeControllerRequest( unique_id,
+						 localId,
+                         ct1,		// here ct1 does nothing, just to keep the same format
+						 schedule_ct,
+						 syncs_in )
+{
+	motion1Ct = ct1;
+	motion2Ct = ct2;
+	paramValue = value;
+	loop = inLoop;
+}
 
 //  NodRequest
 NodRequest::NodRequest( const std::string& unique_id, const std::string& local, NodType type, float repeats, float frequency, float extent, float smooth, const SbmCharacter* actor,
