@@ -1999,7 +1999,7 @@ int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	if( !( unit_iss >> unit )
 		|| ( unit < 1 ) )
 	{
-		LOG("ERROR: Invalid action unit number \"%s\".", unit_str);
+		LOG("ERROR: Invalid action unit number \"%s\".", unit_str.c_str());
 		return CMD_FAILURE;
 	}
 
@@ -2028,7 +2028,7 @@ int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	std::map<std::string, SkMotion*>::iterator motionIter =  mcu_p->motion_map.find(face_pose_name);
 	if (motionIter == mcu_p->motion_map.end())
 	{
-		LOG("ERROR: Unknown facial pose \"%s\".", face_pose_name);
+		LOG("ERROR: Unknown facial pose \"%s\".", face_pose_name.c_str());
 		return CMD_FAILURE;
 	}
 	SkMotion* motion =(*motionIter).second;
