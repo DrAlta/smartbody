@@ -333,7 +333,8 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 					int chIndex = keyToChannelMap[i];
 
 					int baseIndex = keyToChannelMap[i];
-					if (i == -1) // this should only happen if there is a channel in the key pose that does not exist in the base pose
+//					if (i == -1) // this should only happen if there is a channel in the key pose that does not exist in the base pose
+					if (baseIndex == -1) // this should only happen if there is a channel in the key pose that does not exist in the base pose
 						continue;
 
 					int baseBufferIndex = _baseChannelToBufferIndex[baseIndex];
