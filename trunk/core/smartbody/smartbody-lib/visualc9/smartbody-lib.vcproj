@@ -423,6 +423,14 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\sbm\me_ct_locomotion_IK.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_locomotion_IK.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\sbm\me_ct_locomotion_joint_info.cpp"
 						>
 					</File>
@@ -484,6 +492,14 @@
 					</File>
 					<File
 						RelativePath="..\src\sbm\me_ct_locomotion_speed_accelerator.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_locomotion_terrain.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_locomotion_terrain.hpp"
 						>
 					</File>
 					<File
