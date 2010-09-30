@@ -59,7 +59,7 @@ const float MeCtGaze::DEFAULT_SPEED_EYES         = 10000.0;
 
 const float MeCtGaze::DEFAULT_SMOOTHING_LUMBAR   = 0.8f; 
 const float MeCtGaze::DEFAULT_SMOOTHING_CERVICAL = 0.8f;
-const float MeCtGaze::DEFAULT_SMOOTHING_EYEBALL  = 0.1f;
+const float MeCtGaze::DEFAULT_SMOOTHING_EYEBALL  = 0.0f;
 
 #if TEST_SENSOR
 #include "me_ct_gaze_sensor.h"
@@ -87,6 +87,7 @@ float G_hack_target_heading = 0.0;
 
 	LUMBAR: 	{ "spine1", "spine2" }
 	THORAX: 	{ "spine3" }
+		CERVICAL:	{ "spine4", "spine5", "skullbase" }
 	CERVICAL:	{ "spine4", "spine5" }
 	HEAD:		{ "skullbase" }
 	EYES:		{ "eyeball_left", "eyeball_right" }
@@ -135,27 +136,30 @@ char * MeCtGaze::joint_label( const int index ) {
 
 int MeCtGaze::key_index( const char *label )	{
 	if( label )	{
-		if( _stricmp( label, "lumbar" ) == 0 )   return( GAZE_KEY_LUMBAR );
-		if( _stricmp( label, "thorax" ) == 0 )   return( GAZE_KEY_THORAX );
-		if( _stricmp( label, "cervical" ) == 0 ) return( GAZE_KEY_CERVICAL );
-		if( _stricmp( label, "cranial" ) == 0 )  return( GAZE_KEY_CRANIAL );
-		if( _stricmp( label, "optical" ) == 0 )  return( GAZE_KEY_OPTICAL );
-		if( _stricmp( label, "back" ) == 0 )     return( GAZE_KEY_LUMBAR );
-		if( _stricmp( label, "chest" ) == 0 )    return( GAZE_KEY_THORAX );
-		if( _stricmp( label, "neck" ) == 0 )     return( GAZE_KEY_CERVICAL );
-		if( _stricmp( label, "head" ) == 0 )     return( GAZE_KEY_CRANIAL );
-		if( _stricmp( label, "eyes" ) == 0 )     return( GAZE_KEY_OPTICAL );
+		if( _stricmp( label, "lumbar" ) == 0 )   return( GAZE_KEY_BACK );
+		if( _stricmp( label, "thorax" ) == 0 )   return( GAZE_KEY_CHEST );
+		if( _stricmp( label, "cervical" ) == 0 ) return( GAZE_KEY_NECK );
+		if( _stricmp( label, "cranial" ) == 0 )  return( GAZE_KEY_HEAD );
+		if( _stricmp( label, "optical" ) == 0 )  return( GAZE_KEY_EYES );
+		if( _stricmp( label, "back" ) == 0 )     return( GAZE_KEY_BACK );
+		if( _stricmp( label, "chest" ) == 0 )    return( GAZE_KEY_CHEST );
+		if( _stricmp( label, "neck" ) == 0 )     return( GAZE_KEY_NECK );
+		if( _stricmp( label, "head" ) == 0 )     return( GAZE_KEY_HEAD );
+		if( _stricmp( label, "eyes" ) == 0 )     return( GAZE_KEY_EYES );
 	}
 	return( -1 ); // default err
 }
 
 char * MeCtGaze::key_label( const int key )	{
 	switch( key )	{
-		case GAZE_KEY_LUMBAR:   return( "LUMBAR" );
-		case GAZE_KEY_THORAX:   return( "THORAX" );
-		case GAZE_KEY_CERVICAL: return( "CERVICAL" );
-		case GAZE_KEY_CRANIAL:  return( "CRANIAL" );
-		case GAZE_KEY_OPTICAL:  return( "OPTICAL" );
+		case GAZE_KEY_BACK: 	return( "BACK" );
+		case GAZE_KEY_CHEST:	return( "CHEST" );
+		case GAZE_KEY_NECK: 	return( "NECK" );
+#if GAZE_KEY_COMBINE_HEAD_AND_NECK
+#else
+		case GAZE_KEY_HEAD:		return( "HEAD" );
+#endif
+		case GAZE_KEY_EYES: 	return( "EYES" );
 	}
 	return( "UNKNOWN" ); // default err
 }
@@ -245,17 +249,24 @@ void MeCtGaze::init( int key_fr, int key_to )	{
 	joint_key_count = NUM_GAZE_KEYS;
 
 	joint_key_map = new int[ joint_key_count ];
-	joint_key_map[ GAZE_KEY_LUMBAR ] = GAZE_JOINT_SPINE1;
-	joint_key_map[ GAZE_KEY_THORAX ] = GAZE_JOINT_SPINE3;
-	joint_key_map[ GAZE_KEY_CERVICAL ] = GAZE_JOINT_SPINE4;
+	joint_key_map[ GAZE_KEY_BACK ] = GAZE_JOINT_SPINE1;
+	joint_key_map[ GAZE_KEY_CHEST ] = GAZE_JOINT_SPINE3;
+	joint_key_map[ GAZE_KEY_NECK ] = GAZE_JOINT_SPINE4;
+#if GAZE_KEY_COMBINE_HEAD_AND_NECK
+#else
 	joint_key_map[ GAZE_KEY_HEAD ] = GAZE_JOINT_SKULL;
+#endif
 	joint_key_map[ GAZE_KEY_EYES ] = GAZE_JOINT_EYE_L;
 
 	joint_key_top_map = new int[ joint_key_count ];
-	joint_key_top_map[ GAZE_KEY_LUMBAR ] = GAZE_JOINT_SPINE2;
-	joint_key_top_map[ GAZE_KEY_THORAX ] = GAZE_JOINT_SPINE3;
-	joint_key_top_map[ GAZE_KEY_CERVICAL ] = GAZE_JOINT_SPINE5;
+	joint_key_top_map[ GAZE_KEY_BACK ] = GAZE_JOINT_SPINE2;
+	joint_key_top_map[ GAZE_KEY_CHEST ] = GAZE_JOINT_SPINE3;
+#if GAZE_KEY_COMBINE_HEAD_AND_NECK
+	joint_key_top_map[ GAZE_KEY_NECK ] = GAZE_JOINT_SKULL;
+#else
+	joint_key_top_map[ GAZE_KEY_NECK ] = GAZE_JOINT_SPINE5;
 	joint_key_top_map[ GAZE_KEY_HEAD ] = GAZE_JOINT_SKULL;
+#endif
 	joint_key_top_map[ GAZE_KEY_EYES ] = GAZE_JOINT_EYE_L;
 
 	joint_key_arr = new MeCtGazeKey[ joint_key_count ];
@@ -271,7 +282,7 @@ void MeCtGaze::init( int key_fr, int key_to )	{
 	
 	// Sort key range:
 	if( key_fr < 0 )	{
-		key_fr = GAZE_KEY_LUMBAR;
+		key_fr = GAZE_KEY_BACK;
 	}
 	if( key_fr >= NUM_GAZE_KEYS )	{
 		key_fr = GAZE_KEY_EYES;
@@ -315,30 +326,33 @@ void MeCtGaze::init( int key_fr, int key_to )	{
 	set_limit( GAZE_KEY_EYES,     50.0, 75.0, 0.0 );
 	*/
 
-	set_limit( GAZE_KEY_LUMBAR,   DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_LUMBAR],
-								  DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_LUMBAR],
-								  DEFAULT_LIMIT_HEADING[GAZE_KEY_LUMBAR],
-								  DEFAULT_LIMIT_ROLL[GAZE_KEY_LUMBAR]);
+	set_limit( GAZE_KEY_BACK,   DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_BACK],
+								  DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_BACK],
+								  DEFAULT_LIMIT_HEADING[GAZE_KEY_BACK],
+								  DEFAULT_LIMIT_ROLL[GAZE_KEY_BACK]);
 
-	set_limit( GAZE_KEY_THORAX,   DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_THORAX],
-								  DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_THORAX],
-								  DEFAULT_LIMIT_HEADING[GAZE_KEY_THORAX],
-								  DEFAULT_LIMIT_ROLL[GAZE_KEY_THORAX]);
+	set_limit( GAZE_KEY_CHEST,   DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_CHEST],
+								  DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_CHEST],
+								  DEFAULT_LIMIT_HEADING[GAZE_KEY_CHEST],
+								  DEFAULT_LIMIT_ROLL[GAZE_KEY_CHEST]);
 
-	set_limit( GAZE_KEY_CERVICAL, DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_CERVICAL],
-								  DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_CERVICAL],
-								  DEFAULT_LIMIT_HEADING[GAZE_KEY_CERVICAL],
-								  DEFAULT_LIMIT_ROLL[GAZE_KEY_CERVICAL]);
+	set_limit( GAZE_KEY_NECK, DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_NECK],
+								  DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_NECK],
+								  DEFAULT_LIMIT_HEADING[GAZE_KEY_NECK],
+								  DEFAULT_LIMIT_ROLL[GAZE_KEY_NECK]);
 
-	set_limit( GAZE_KEY_CRANIAL,  DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_CRANIAL],
-								  DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_CRANIAL],
-								  DEFAULT_LIMIT_HEADING[GAZE_KEY_CRANIAL],
-								  DEFAULT_LIMIT_ROLL[GAZE_KEY_CRANIAL]);
+#if GAZE_KEY_COMBINE_HEAD_AND_NECK
+#else
+	set_limit( GAZE_KEY_HEAD,  DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_HEAD],
+								  DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_HEAD],
+								  DEFAULT_LIMIT_HEADING[GAZE_KEY_HEAD],
+								  DEFAULT_LIMIT_ROLL[GAZE_KEY_HEAD]);
+#endif
 
-	set_limit( GAZE_KEY_OPTICAL,  DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_OPTICAL],
-								  DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_OPTICAL],
-								  DEFAULT_LIMIT_HEADING[GAZE_KEY_OPTICAL],
-								  DEFAULT_LIMIT_ROLL[GAZE_KEY_OPTICAL]);
+	set_limit( GAZE_KEY_EYES,  DEFAULT_LIMIT_PITCH_UP[GAZE_KEY_EYES],
+								  DEFAULT_LIMIT_PITCH_DOWN[GAZE_KEY_EYES],
+								  DEFAULT_LIMIT_HEADING[GAZE_KEY_EYES],
+								  DEFAULT_LIMIT_ROLL[GAZE_KEY_EYES]);
 
 	for( i = 0; i < NUM_GAZE_KEYS; i++ )	{
 		set_bias( i, 0.0f, 0.0f, 0.0f );

@@ -23,6 +23,9 @@
 #include "me_ct_gaze.h"
 
 /*
+	Original key mapping intended to bracket spine between
+	BACK and HEAD keys:
+
 	LUMBAR: 	{ SPINE1, SPINE2 }
 	THORAX: 	{ SPINE3 }
 	CERVICAL:	{ SPINE4, SPINE5 }
@@ -45,6 +48,30 @@
 	eyes:  optical:  { eyeball_left, eyeball_right }
 */
 
+/*
+
+	GAZE_KEY_COMBINE_HEAD_AND_NECK:
+	
+	LUMBAR: 	{ SPINE1, SPINE2 }
+	THORAX: 	{ SPINE3 }
+	CERVICAL:	{ SPINE4, SPINE5, SKULL }
+	EYES:		{ EYE_L, EYE_R }
+	
+	SPINE1: 	LUMBAR
+	SPINE2: 	LUMBAR + THORAX
+	SPINE3: 	THORAX
+	SPINE4: 	CERVICAL
+	SPINE5: 	CERVICAL
+	SKULL:		CERVICAL
+	EYE_L:		EYES
+	EYE_R:		EYES
+
+	back:  lumbar:   { spine1, spine2 }
+	chest: thorax:   { spine3 }
+	neck:  cervical: { spine4, spine5, skullbase }
+	eyes:  optical:  { eyeball_left, eyeball_right }
+*/
+
 ///////////////////////////////////////////////////////////////////////////
 
 void MeCtGaze::set_smooth( float smooth_basis, float eye_smooth_basis ) {
@@ -54,11 +81,14 @@ void MeCtGaze::set_smooth( float smooth_basis, float eye_smooth_basis ) {
 	if( eye_smooth_basis < 0.0 ) eye_smooth_basis = 0.0;
 	if( eye_smooth_basis > 1.0 ) eye_smooth_basis = 1.0;
 
-	joint_key_arr[ GAZE_KEY_EYES ].smooth = eye_smooth_basis;
+	joint_key_arr[ GAZE_KEY_BACK ].smooth = smooth_basis;
+	joint_key_arr[ GAZE_KEY_CHEST ].smooth = smooth_basis;
+	joint_key_arr[ GAZE_KEY_NECK ].smooth = smooth_basis;
+#if GAZE_KEY_COMBINE_HEAD_AND_NECK
+#else
 	joint_key_arr[ GAZE_KEY_HEAD ].smooth = smooth_basis;
-	joint_key_arr[ GAZE_KEY_CERVICAL ].smooth = smooth_basis;
-	joint_key_arr[ GAZE_KEY_THORAX ].smooth = smooth_basis;
-	joint_key_arr[ GAZE_KEY_LUMBAR ].smooth = smooth_basis;
+#endif
+	joint_key_arr[ GAZE_KEY_EYES ].smooth = eye_smooth_basis;
 	
 	key_smooth_dirty = 1;
 }
@@ -72,11 +102,14 @@ void MeCtGaze::set_smooth( float back_sm, float neck_sm, float eyes_sm )	{
 	if( eyes_sm < 0.0 ) eyes_sm = 0.0;
 	if( eyes_sm > 1.0 ) eyes_sm = 1.0;
 	
-	joint_key_arr[ GAZE_KEY_EYES ].smooth = eyes_sm;
+	joint_key_arr[ GAZE_KEY_BACK ].smooth = back_sm;
+	joint_key_arr[ GAZE_KEY_CHEST ].smooth = back_sm;
+	joint_key_arr[ GAZE_KEY_NECK ].smooth = neck_sm;
+#if GAZE_KEY_COMBINE_HEAD_AND_NECK
+#else
 	joint_key_arr[ GAZE_KEY_HEAD ].smooth = neck_sm;
-	joint_key_arr[ GAZE_KEY_CERVICAL ].smooth = neck_sm;
-	joint_key_arr[ GAZE_KEY_THORAX ].smooth = back_sm;
-	joint_key_arr[ GAZE_KEY_LUMBAR ].smooth = back_sm;
+#endif
+	joint_key_arr[ GAZE_KEY_EYES ].smooth = eyes_sm;
 
 	key_smooth_dirty = 1;
 }
@@ -86,26 +119,33 @@ void MeCtGaze::apply_smooth_keys( void )	{
 	if( key_smooth_dirty )	{
 
 		joint_arr[ GAZE_JOINT_SPINE1 ].smooth = 
-			joint_key_arr[ GAZE_KEY_LUMBAR ].smooth;
+			joint_key_arr[ GAZE_KEY_BACK ].smooth;
 
 		joint_arr[ GAZE_JOINT_SPINE2 ].smooth = 
-			0.5f * ( joint_key_arr[ GAZE_KEY_LUMBAR ].smooth + joint_key_arr[ GAZE_KEY_THORAX ].smooth );
+			0.5f * ( joint_key_arr[ GAZE_KEY_BACK ].smooth + joint_key_arr[ GAZE_KEY_CHEST ].smooth );
 
 		joint_arr[ GAZE_JOINT_SPINE3 ].smooth = 
-			joint_key_arr[ GAZE_KEY_THORAX ].smooth;
+			joint_key_arr[ GAZE_KEY_CHEST ].smooth;
 
+#if GAZE_KEY_COMBINE_HEAD_AND_NECK
 		joint_arr[ GAZE_JOINT_SPINE4 ].smooth = 
-			joint_key_arr[ GAZE_KEY_CERVICAL ].smooth;
+		joint_arr[ GAZE_JOINT_SPINE5 ].smooth = 
+		joint_arr[ GAZE_JOINT_SKULL ].smooth = 
+			joint_key_arr[ GAZE_KEY_NECK ].smooth;
+#else
+		joint_arr[ GAZE_JOINT_SPINE4 ].smooth = 
+			joint_key_arr[ GAZE_KEY_NECK ].smooth;
 
 		joint_arr[ GAZE_JOINT_SPINE5 ].smooth = 
-			0.5f * ( joint_key_arr[ GAZE_KEY_CERVICAL ].smooth + joint_key_arr[ GAZE_KEY_HEAD ].smooth );
+			0.5f * ( joint_key_arr[ GAZE_KEY_NECK ].smooth + joint_key_arr[ GAZE_KEY_HEAD ].smooth );
 
 		joint_arr[ GAZE_JOINT_SKULL ].smooth = 
 			joint_key_arr[ GAZE_KEY_HEAD ].smooth;
+#endif
 
 		joint_arr[ GAZE_JOINT_EYE_L ].smooth = 
-			joint_arr[ GAZE_JOINT_EYE_R ].smooth = 
-				joint_key_arr[ GAZE_KEY_EYES ].smooth;
+		joint_arr[ GAZE_JOINT_EYE_R ].smooth = 
+			joint_key_arr[ GAZE_KEY_EYES ].smooth;
 
 		key_smooth_dirty = 0;
 	}
@@ -201,13 +241,41 @@ void MeCtGaze::set_bias_roll( int key1, int key2, float r1, float r2 )	{
 	}
 }
 
+#if GAZE_KEY_COMBINE_HEAD_AND_NECK
+void MeCtGaze::set_bias_pitch( float l_p, float t_p, float c_p, float e_p ) {
+
+	joint_key_arr[ GAZE_KEY_BACK ].bias_rot.p( l_p );
+	joint_key_arr[ GAZE_KEY_CHEST ].bias_rot.p( t_p );
+	joint_key_arr[ GAZE_KEY_NECK ].bias_rot.p( c_p );
+	joint_key_arr[ GAZE_KEY_EYES ].bias_rot.p( e_p );
+	key_bias_dirty = 1;
+}
+
+void MeCtGaze::set_bias_heading( float l_h, float t_h, float c_h, float e_h )	{
+
+	joint_key_arr[ GAZE_KEY_BACK ].bias_rot.h( l_h );
+	joint_key_arr[ GAZE_KEY_CHEST ].bias_rot.h( t_h );
+	joint_key_arr[ GAZE_KEY_NECK ].bias_rot.h( c_h );
+	joint_key_arr[ GAZE_KEY_EYES ].bias_rot.h( e_h );
+	key_bias_dirty = 1;
+}
+
+void MeCtGaze::set_bias_roll( float l_r, float t_r, float c_r, float e_r ) {
+
+	joint_key_arr[ GAZE_KEY_BACK ].bias_rot.r( l_r );
+	joint_key_arr[ GAZE_KEY_CHEST ].bias_rot.r( t_r );
+	joint_key_arr[ GAZE_KEY_NECK ].bias_rot.r( c_r );
+	joint_key_arr[ GAZE_KEY_EYES ].bias_rot.r( e_r );
+	key_bias_dirty = 1;
+}
+#else
 void MeCtGaze::set_bias_pitch( float e_p, float h_p, float c_p, float t_p, float l_p ) {
 
 	joint_key_arr[ GAZE_KEY_EYES ].bias_rot.p( e_p );
 	joint_key_arr[ GAZE_KEY_HEAD ].bias_rot.p( h_p );
-	joint_key_arr[ GAZE_KEY_CERVICAL ].bias_rot.p( c_p );
-	joint_key_arr[ GAZE_KEY_THORAX ].bias_rot.p( t_p );
-	joint_key_arr[ GAZE_KEY_LUMBAR ].bias_rot.p( l_p );
+	joint_key_arr[ GAZE_KEY_NECK ].bias_rot.p( c_p );
+	joint_key_arr[ GAZE_KEY_CHEST ].bias_rot.p( t_p );
+	joint_key_arr[ GAZE_KEY_BACK ].bias_rot.p( l_p );
 	key_bias_dirty = 1;
 }
 
@@ -215,9 +283,9 @@ void MeCtGaze::set_bias_heading( float e_h, float h_h, float c_h, float t_h, flo
 
 	joint_key_arr[ GAZE_KEY_EYES ].bias_rot.h( e_h );
 	joint_key_arr[ GAZE_KEY_HEAD ].bias_rot.h( h_h );
-	joint_key_arr[ GAZE_KEY_CERVICAL ].bias_rot.h( c_h );
-	joint_key_arr[ GAZE_KEY_THORAX ].bias_rot.h( t_h );
-	joint_key_arr[ GAZE_KEY_LUMBAR ].bias_rot.h( l_h );
+	joint_key_arr[ GAZE_KEY_NECK ].bias_rot.h( c_h );
+	joint_key_arr[ GAZE_KEY_CHEST ].bias_rot.h( t_h );
+	joint_key_arr[ GAZE_KEY_BACK ].bias_rot.h( l_h );
 	key_bias_dirty = 1;
 }
 
@@ -225,33 +293,46 @@ void MeCtGaze::set_bias_roll( float e_r, float h_r, float c_r, float t_r, float 
 
 	joint_key_arr[ GAZE_KEY_EYES ].bias_rot.r( e_r );
 	joint_key_arr[ GAZE_KEY_HEAD ].bias_rot.r( h_r );
-	joint_key_arr[ GAZE_KEY_CERVICAL ].bias_rot.r( c_r );
-	joint_key_arr[ GAZE_KEY_THORAX ].bias_rot.r( t_r );
-	joint_key_arr[ GAZE_KEY_LUMBAR ].bias_rot.r( l_r );
+	joint_key_arr[ GAZE_KEY_NECK ].bias_rot.r( c_r );
+	joint_key_arr[ GAZE_KEY_CHEST ].bias_rot.r( t_r );
+	joint_key_arr[ GAZE_KEY_BACK ].bias_rot.r( l_r );
 	key_bias_dirty = 1;
 }
+#endif
 
 void MeCtGaze::apply_bias_keys( void ) {
 
 	if( key_bias_dirty )   {
 
 		joint_arr[ GAZE_JOINT_SPINE1 ].forward_rot = 
-			joint_key_arr[ GAZE_KEY_LUMBAR ].bias_rot;
+			joint_key_arr[ GAZE_KEY_BACK ].bias_rot;
 
 		joint_arr[ GAZE_JOINT_SPINE2 ].forward_rot = 
-			joint_key_arr[ GAZE_KEY_LUMBAR ].bias_rot.lerp( 0.5, joint_key_arr[ GAZE_KEY_THORAX ].bias_rot );
+			joint_key_arr[ GAZE_KEY_BACK ].bias_rot.lerp( 0.5, joint_key_arr[ GAZE_KEY_CHEST ].bias_rot );
 
 		joint_arr[ GAZE_JOINT_SPINE3 ].forward_rot = 
-			joint_key_arr[ GAZE_KEY_THORAX ].bias_rot;
+			joint_key_arr[ GAZE_KEY_CHEST ].bias_rot;
 
+#if GAZE_KEY_COMBINE_HEAD_AND_NECK
 		joint_arr[ GAZE_JOINT_SPINE4 ].forward_rot = 
-			joint_key_arr[ GAZE_KEY_CERVICAL ].bias_rot;
+			joint_key_arr[ GAZE_KEY_NECK ].bias_rot * 0.333333f;
 
 		joint_arr[ GAZE_JOINT_SPINE5 ].forward_rot = 
-			joint_key_arr[ GAZE_KEY_CERVICAL ].bias_rot.lerp( 0.5, joint_key_arr[ GAZE_KEY_HEAD ].bias_rot );
+			joint_key_arr[ GAZE_KEY_NECK ].bias_rot * 0.333333f;
+
+		joint_arr[ GAZE_JOINT_SKULL ].forward_rot = 
+			joint_key_arr[ GAZE_KEY_NECK ].bias_rot * 0.333333f;
+
+#else
+		joint_arr[ GAZE_JOINT_SPINE4 ].forward_rot = 
+			joint_key_arr[ GAZE_KEY_NECK ].bias_rot;
+
+		joint_arr[ GAZE_JOINT_SPINE5 ].forward_rot = 
+			joint_key_arr[ GAZE_KEY_NECK ].bias_rot.lerp( 0.5, joint_key_arr[ GAZE_KEY_HEAD ].bias_rot );
 
 		joint_arr[ GAZE_JOINT_SKULL ].forward_rot = 
 			joint_key_arr[ GAZE_KEY_HEAD ].bias_rot;
+#endif
 
 		joint_arr[ GAZE_JOINT_EYE_L ].forward_rot = 
 			joint_arr[ GAZE_JOINT_EYE_R ].forward_rot = 
@@ -304,12 +385,18 @@ void MeCtGaze::apply_limit_key( int J, int K, float weight )	{
 void MeCtGaze::apply_limit_keys( void )	{
 	
 	if( key_limit_dirty )	{
-		apply_limit_key( GAZE_JOINT_SPINE1, GAZE_KEY_LUMBAR, 0.5f );
-		apply_limit_key( GAZE_JOINT_SPINE2, GAZE_KEY_LUMBAR, 0.5f );
-		apply_limit_key( GAZE_JOINT_SPINE3, GAZE_KEY_THORAX, 1.0f );
-		apply_limit_key( GAZE_JOINT_SPINE4, GAZE_KEY_CERVICAL, 0.5f );
-		apply_limit_key( GAZE_JOINT_SPINE5, GAZE_KEY_CERVICAL, 0.5f );
+		apply_limit_key( GAZE_JOINT_SPINE1, GAZE_KEY_BACK, 0.5f );
+		apply_limit_key( GAZE_JOINT_SPINE2, GAZE_KEY_BACK, 0.5f );
+		apply_limit_key( GAZE_JOINT_SPINE3, GAZE_KEY_CHEST, 1.0f );
+#if GAZE_KEY_COMBINE_HEAD_AND_NECK
+		apply_limit_key( GAZE_JOINT_SPINE4, GAZE_KEY_NECK, 0.333333f );
+		apply_limit_key( GAZE_JOINT_SPINE5, GAZE_KEY_NECK, 0.333333f );
+		apply_limit_key( GAZE_JOINT_SKULL, GAZE_KEY_NECK, 0.333333f );
+#else
+		apply_limit_key( GAZE_JOINT_SPINE4, GAZE_KEY_NECK, 0.5f );
+		apply_limit_key( GAZE_JOINT_SPINE5, GAZE_KEY_NECK, 0.5f );
 		apply_limit_key( GAZE_JOINT_SKULL, GAZE_KEY_HEAD, 1.0f );
+#endif
 		apply_limit_key( GAZE_JOINT_EYE_L, GAZE_KEY_EYES, 1.0f );
 		apply_limit_key( GAZE_JOINT_EYE_R, GAZE_KEY_EYES, 1.0f );
 		key_limit_dirty = 0;
@@ -325,15 +412,26 @@ void MeCtGaze::set_blend( int key, float w )	{
 	key_blend_dirty = 1;
 }
 
+#if GAZE_KEY_COMBINE_HEAD_AND_NECK
+void MeCtGaze::set_blend( float l_w, float t_w, float c_w, float e_w ) {
+
+	joint_key_arr[ GAZE_KEY_BACK ].blend_weight = l_w;
+	joint_key_arr[ GAZE_KEY_CHEST ].blend_weight = t_w;
+	joint_key_arr[ GAZE_KEY_NECK ].blend_weight = c_w;
+	joint_key_arr[ GAZE_KEY_EYES ].blend_weight = e_w;
+	key_blend_dirty = 1;
+}
+#else
 void MeCtGaze::set_blend( float l_w, float t_w, float c_w, float h_w, float e_w ) {
 
-	joint_key_arr[ GAZE_KEY_LUMBAR ].blend_weight = l_w;
-	joint_key_arr[ GAZE_KEY_THORAX ].blend_weight = t_w;
-	joint_key_arr[ GAZE_KEY_CERVICAL ].blend_weight = c_w;
+	joint_key_arr[ GAZE_KEY_BACK ].blend_weight = l_w;
+	joint_key_arr[ GAZE_KEY_CHEST ].blend_weight = t_w;
+	joint_key_arr[ GAZE_KEY_NECK ].blend_weight = c_w;
 	joint_key_arr[ GAZE_KEY_HEAD ].blend_weight = h_w;
 	joint_key_arr[ GAZE_KEY_EYES ].blend_weight = e_w;
 	key_blend_dirty = 1;
 }
+#endif
 
 void MeCtGaze::set_blend( int key1, int key2, float w1, float w2 )	{
 	int i;
@@ -360,26 +458,34 @@ void MeCtGaze::apply_blend_keys( void )	{
 	if( key_blend_dirty )	{
 
 		joint_arr[ GAZE_JOINT_SPINE1 ].blend_weight = 
-			joint_key_arr[ GAZE_KEY_LUMBAR ].blend_weight;
+			joint_key_arr[ GAZE_KEY_BACK ].blend_weight;
 
 		joint_arr[ GAZE_JOINT_SPINE2 ].blend_weight = 
-			0.5f * ( joint_key_arr[ GAZE_KEY_LUMBAR ].blend_weight + joint_key_arr[ GAZE_KEY_THORAX ].blend_weight );
+			0.5f * ( joint_key_arr[ GAZE_KEY_BACK ].blend_weight + joint_key_arr[ GAZE_KEY_CHEST ].blend_weight );
 
 		joint_arr[ GAZE_JOINT_SPINE3 ].blend_weight = 
-			joint_key_arr[ GAZE_KEY_THORAX ].blend_weight;
+			joint_key_arr[ GAZE_KEY_CHEST ].blend_weight;
 
+#if GAZE_KEY_COMBINE_HEAD_AND_NECK
 		joint_arr[ GAZE_JOINT_SPINE4 ].blend_weight = 
-			joint_key_arr[ GAZE_KEY_CERVICAL ].blend_weight;
+		joint_arr[ GAZE_JOINT_SPINE5 ].blend_weight = 
+		joint_arr[ GAZE_JOINT_SKULL ].blend_weight = 
+			joint_key_arr[ GAZE_KEY_NECK ].blend_weight;
+
+#else
+		joint_arr[ GAZE_JOINT_SPINE4 ].blend_weight = 
+			joint_key_arr[ GAZE_KEY_NECK ].blend_weight;
 
 		joint_arr[ GAZE_JOINT_SPINE5 ].blend_weight = 
-			0.5f * ( joint_key_arr[ GAZE_KEY_CERVICAL ].blend_weight + joint_key_arr[ GAZE_KEY_HEAD ].blend_weight );
+			0.5f * ( joint_key_arr[ GAZE_KEY_NECK ].blend_weight + joint_key_arr[ GAZE_KEY_HEAD ].blend_weight );
 
 		joint_arr[ GAZE_JOINT_SKULL ].blend_weight = 
 			joint_key_arr[ GAZE_KEY_HEAD ].blend_weight;
+#endif
 
 		joint_arr[ GAZE_JOINT_EYE_L ].blend_weight = 
-			joint_arr[ GAZE_JOINT_EYE_R ].blend_weight = 
-				joint_key_arr[ GAZE_KEY_EYES ].blend_weight;
+		joint_arr[ GAZE_JOINT_EYE_R ].blend_weight = 
+			joint_key_arr[ GAZE_KEY_EYES ].blend_weight;
 
 		key_blend_dirty = 0;
 	}
