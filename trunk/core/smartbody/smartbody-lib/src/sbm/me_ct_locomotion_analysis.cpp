@@ -83,7 +83,7 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 	const char* base_name = standing_skeleton->root()->name().get_string();
 
 	get_ct()->set_base_name(base_name);
-	get_ct()->set_nonlimb_blending_base_name(base_name);
+	//get_ct()->set_nonlimb_blending_base_name(base_name);
 
 	MeCtLocomotionLimb* limb = new MeCtLocomotionLimb();
 	limb->init_skeleton(standing_skeleton, walking_skeleton);
@@ -327,7 +327,9 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 
 	SrVec taxis;
 
-	base_joint = skeleton->search_joint(this->_ct_locomotion->get_base_name());
+	//base_joint = skeleton->search_joint(this->_ct_locomotion->get_base_name());
+
+	base_joint = skeleton->root();
 
 	j = 2;
 	//for(j = 0; j < anim->get_support_joint_num(); ++j)
@@ -463,7 +465,9 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 
 	SrVec taxis;
 
-	base_joint = skeleton->search_joint(this->_ct_locomotion->get_base_name());
+	//base_joint = skeleton->search_joint(this->_ct_locomotion->get_base_name());
+
+	base_joint = skeleton->root();
 
 	// analysis for IK.........................................................................
 

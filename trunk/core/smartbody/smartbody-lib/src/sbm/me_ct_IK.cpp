@@ -77,7 +77,7 @@ void MeCtIK::update(MeCtIKScenario* scenario)
 		reach = 0;
 		for(i = 0; i < max_iteration; ++i)
 		{
-			for(j = 0; j != manipulated_joint_index; ++j)
+			for(j = start_joint_index; j != manipulated_joint_index; ++j)
 			{
 				if(reach_destination()) 
 				{
@@ -116,8 +116,9 @@ void MeCtIK::update(MeCtIKScenario* scenario)
 		if(modified == 0) 
 		{
 			//break;
+			start_joint_index = manipulated_joint_index;
 			get_next_support_joint();
-			get_limb_section_local_pos(manipulated_joint_index-1, -1);
+			get_limb_section_local_pos(start_joint_index, -1);
 			calc_target(scenario->ik_orientation, scenario->ik_offset);
 		}
 		else 
@@ -190,7 +191,7 @@ __forceinline int MeCtIK::check_constraint(SrQuat* quat, int index)
 
 __forceinline int MeCtIK::reach_destination()
 {
-	SrVec v = joint_pos_list.get(manipulated_joint_index) - target;
+	SrVec v = joint_pos_list.get(manipulated_joint_index) - target.get(manipulated_joint_index);
 	//LOG("\n dis: %f", v.len());
 	if(v.len() < threshold) return 1;
 	return 0;
@@ -246,7 +247,7 @@ __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 	else mat_inv = joint_global_mat_list.get(start_index-1).inverse();
 	SrVec& pivot = joint_pos_list.get(start_index);
 	pivot = pivot * mat_inv;
-	i_target = target * mat_inv;
+	i_target = target.get(manipulated_joint_index) * mat_inv;
 	i_src = src * mat_inv;
 
 	v4 = i_target - i_src;
@@ -294,8 +295,8 @@ __forceinline void MeCtIK::calc_target(SrVec& orientation, SrVec& offset)
 	pos += offset;
 	//target = (manipulated_joint->support_joint_comp + manipulated_joint->support_joint_height - distance_to_plane(pos, scenario->plane_normal, scenario->plane_point)) * scenario->plane_normal + pos;
 	SrVec t = cross_point_on_plane(pos, orientation, scenario->plane_normal, scenario->plane_point);
-	target = -(manipulated_joint->support_joint_comp + manipulated_joint->support_joint_height)*orientation + t;
-	//printf("\n(%f, %f, %f)", target.x, target.y, target.z);
+	target.set(manipulated_joint_index, -(manipulated_joint->support_joint_comp + manipulated_joint->support_joint_height)*orientation + t);
+
 }
 
 __forceinline void MeCtIK::get_next_support_joint()
@@ -326,6 +327,8 @@ void MeCtIK::init()
 
 	int size = scenario->quat_list.size();
 
+	target.capacity(size);
+	target.size(size);
 	joint_pos_list.capacity(size);
 	joint_pos_list.size(size);
 	joint_axis_list.capacity(size);
@@ -345,6 +348,10 @@ void MeCtIK::init()
 	manipulated_joint_index = -1;
 	support_joint_num = get_support_joint_num();
 	get_next_support_joint();
+
+	start_joint_index = 0;
+	end_joint_index = support_joint_num;
+
 	calc_target(scenario->ik_orientation, scenario->ik_offset);
 	//adjust_support_joints();
 }
@@ -414,4 +421,9 @@ __forceinline void MeCtIK::get_limb_section_local_pos(int start_index, int end_i
 		}
 		else break;
 	}
+}
+
+SrVec MeCtIK::get_target(int index)
+{
+	return target.get(index);
 }

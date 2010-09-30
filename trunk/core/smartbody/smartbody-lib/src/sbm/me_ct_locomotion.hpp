@@ -31,8 +31,7 @@
 #include "me_ct_locomotion_func.hpp"
 #include "me_ct_locomotion_joint_info.hpp"
 #include "me_ct_locomotion_height_offset.hpp"
-#include "me_ct_IK.hpp"
-
+#include "me_ct_locomotion_IK.hpp"
 
 class MeCtLocomotionLimb;
 
@@ -67,7 +66,7 @@ public:
 	bool motions_loaded;
 
 protected:
-	MeCtIK ik;
+	MeCtLocomotionIK ik;
 
 	MeCtLocomotionNavigator navigator;
 
@@ -113,7 +112,7 @@ protected:
 	double delta_time;
 
 	char* base_name;
-	char* nonlimb_blending_base_name;
+	//char* nonlimb_blending_base_name;
 
 	bool dis_initialized; // limb joint positiona calculated
 	bool initialized;
@@ -184,15 +183,36 @@ public:
 	 *  Implements MeController::controller_evaluate(..).
 	 */
 
-	SrArray<MeCtLocomotionLimb*>* get_limb_list();
+public:
+	MeCtLocomotionNavigator* get_navigator();
+
+	void add_locomotion_anim(SkMotion* anim);
 
 	SrArray<MeCtLocomotionAnimGlobalInfo*>* get_anim_global_info();
 
-	void init_limbs();
+	SrVec get_facing_vector();
+
+	void set_motion_time(float time);
 
 	void init_skeleton(SkSkeleton* standing, SkSkeleton* walking);
+	
+	bool is_initialized();
+
+	bool is_enabled();
+
+	SrArray<MeCtLocomotionLimb*>* get_limb_list();
 
 	void init_nonlimb_joint_info();
+
+	void set_target_height_displacement(float displacement);
+
+	void set_base_name(const char* name);
+
+	void print_info(char* name);
+
+protected:
+
+	void init_limbs();
 
 	void get_translation_base_joint_index();
 
@@ -205,8 +225,6 @@ public:
 	void update_facing();
 
 	void update_heading();
-
-	SrVec get_facing_vector();
 
 	char* get_base_name();
 
@@ -228,12 +246,7 @@ public:
 
 	void normalize_proportion();
 
-	//void orthonormal_decompose(const SrVec& svec, const SrVec& direction, SrVec* dvec1, SrVec* dvec2);
-
 	void blend_base_joint(MeFrameData& frame, float space_time, int anim_index1, int anim_index2, float weight);
-
-	//temp. to be deleted or modified...
-	//SrMat get_lmat (SkJoint* joint, SrQuat* quat);
 
 	int get_dominant_limb();
 
@@ -243,17 +256,7 @@ public:
 
 	void apply_IK();
 
-	MeCtLocomotionNavigator* get_navigator();
-
-	bool is_initialized();
-
-	bool is_enabled();
-
-	void set_base_name(const char* name);
-
-	void set_nonlimb_blending_base_name(const char* name);
-
-	void add_locomotion_anim(SkMotion* anim);
+	//void set_nonlimb_blending_base_name(const char* name);
 
 	int LOOKUP_BUFFER_INDEX(int var_name, int index );
 
@@ -261,25 +264,20 @@ public:
 
 	void update_limb_anim_standing(MeCtLocomotionLimbAnim* anim, int index, MeFrameData& frame);
 
-	void set_motion_time(float time);
-
 	void update_nonlimb_mat();
 
 	void update_nonlimb_mat(SkJoint* joint, SrMat* mat);
 
 	void blend_standing(MeFrameData& frame);
 
-	float get_buffer_base_height(SrBuffer<float>& buffer);
+	//float get_buffer_base_height(SrBuffer<float>& buffer);
 
 	SrVec calc_rotational_displacement();
-
-	void set_target_height_displacement(float displacement);
 
 	void update_nonlimb_mat_with_global_info();
 
 	void update_limb_mat_with_global_info();
 
-	void print_info(char* name);
 };
 
 #endif // ME_CT_LOCOMOTION_HPP

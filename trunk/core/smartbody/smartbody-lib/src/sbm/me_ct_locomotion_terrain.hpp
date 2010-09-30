@@ -1,5 +1,5 @@
 /*
- *  me_ct_locomotion_anim_global_info.hpp - part of SmartBody-lib's Motion Engine
+ *  me_ct_locomotion_terrain.hpp - part of SmartBody-lib's Motion Engine
  *  Copyright (C) 2009  University of Southern California
  *
  *  SmartBody-lib is free software: you can redistribute it and/or
@@ -20,30 +20,25 @@
  *      Jingqiao Fu, USC
  */
 
-#ifndef ME_LOCOMOTION_ANIM_GLOBAL_INFO_HPP
-#define ME_LOCOMOTION_ANIM_GLOBAL_INFO_HPP
+#ifndef ME_CT_LOCOMOTION_TERRAIN_HPP
+#define ME_CT_LOCOMOTION_TERRAIN_HPP
 
-#include <SK/sk_motion.h>
 
 #pragma once
 
-class MeCtLocomotionAnimGlobalInfo{
-public:
-	// Public Constants
-	static const char* TYPE;
+class MeCtLocomotionTerrain
+{
+protected:
+	
 
 public:
-	// Data
-	SkMotion*			_motion;
-	//SrArray<SrVec*>		velocity_list;
-	SrVec				direction;		//global direction
-	float				speed;			//global average walking speed of the animation.
-	float				displacement;   //global displacement absolute value
+	MeCtLocomotionTerrain();
+	~MeCtLocomotionTerrain();
 
 public:
-	MeCtLocomotionAnimGlobalInfo();
-	~MeCtLocomotionAnimGlobalInfo();
-
+	float get_height(float x, float z, float* normal);
 };
 
-#endif // ME_LOCOMOTION_ANIM_GLOBAL_INFO_HPP
+
+
+#endif // ME_CT_LOCOMOTION_TERRAIN_HPP

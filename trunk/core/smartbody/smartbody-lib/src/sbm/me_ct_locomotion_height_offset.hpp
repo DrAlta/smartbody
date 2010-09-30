@@ -24,6 +24,7 @@
 #define ME_CT_LOCOMOTION_HEIGHT_OFFSET_HPP
 
 #include "me_ct_locomotion_limb.hpp"
+#include "me_ct_locomotion_terrain.hpp"
 
 #pragma once
 
@@ -43,6 +44,8 @@ protected:
 	SrArray<SrVec> joint_pos_prev;
 	SrArray<SrVec> joint_pos_curr;
 
+	MeCtLocomotionTerrain terrain;
+
 public:
 	MeCtLocomotionHeightOffset();
 	~MeCtLocomotionHeightOffset();
@@ -50,7 +53,8 @@ public:
 public:
 	void set_limb_list(SrArray<MeCtLocomotionLimb*>* limb_list);
 	void set_translation_base_joint_height(float height);
-	void update(SrMat& parent_mat, float base_height_displacement);
+	void update_height_offset(SrMat& parent_mat, float base_height_displacement);
+	void update_supporting_joint_orientation();
 	float get_height_offset();
 
 };
