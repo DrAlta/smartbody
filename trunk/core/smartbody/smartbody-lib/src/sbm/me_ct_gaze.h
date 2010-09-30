@@ -43,6 +43,8 @@ class MeCtGazeSensor;
 extern int G_hack_target_circle;
 #endif
 
+#define GAZE_KEY_COMBINE_HEAD_AND_NECK	1
+
 ///////////////////////////////////////////////////////////////////////////
 
 class MeCtGazeKey	{
@@ -117,6 +119,21 @@ class MeCtGaze : public MeController	{
 
 	public:
 	
+#if GAZE_KEY_COMBINE_HEAD_AND_NECK
+		enum gaze_key_enum_set	{
+			GAZE_KEY_LUMBAR,
+			GAZE_KEY_THORAX,
+			GAZE_KEY_CERVICAL,
+			GAZE_KEY_OPTICAL,
+			NUM_GAZE_KEYS,
+			GAZE_KEY_BACK = GAZE_KEY_LUMBAR,
+			GAZE_KEY_CHEST = GAZE_KEY_THORAX,
+			GAZE_KEY_NECK = GAZE_KEY_CERVICAL,
+			GAZE_KEY_EYES = GAZE_KEY_OPTICAL,
+			GAZE_KEY_CRANIAL = GAZE_KEY_CERVICAL, // head is redundant for neck
+			GAZE_KEY_HEAD = GAZE_KEY_CERVICAL
+		};
+#else
 		enum gaze_key_enum_set	{
 			GAZE_KEY_LUMBAR,
 			GAZE_KEY_THORAX,
@@ -130,6 +147,7 @@ class MeCtGaze : public MeController	{
 			GAZE_KEY_HEAD = GAZE_KEY_CRANIAL,
 			GAZE_KEY_EYES = GAZE_KEY_OPTICAL
 		};
+#endif
 
 		// Default Values by Gaze Key
 		static float DEFAULT_LIMIT_PITCH_UP[];
@@ -144,8 +162,6 @@ class MeCtGaze : public MeController	{
 		static const float DEFAULT_SMOOTHING_LUMBAR; 
 		static const float DEFAULT_SMOOTHING_CERVICAL;
 		static const float DEFAULT_SMOOTHING_EYEBALL;
-
-
 
 		static int joint_index( const char *label );
 		static char * joint_label( const int index );
@@ -176,6 +192,7 @@ class MeCtGaze : public MeController	{
 		void set_target_coord_world( void );
 		void set_target_coord_joint( char *joint_name );
 		void set_target_coord_joint( SkJoint* joint_p );
+		void set_target_coord_parent( void ); // relative to each joint's parent
 		
 		// offset coordinate
 		void set_offset_point( float x, float y, float z );
@@ -192,7 +209,6 @@ class MeCtGaze : public MeController	{
 		
 		 // deprecate: backwards compatibility
 		void set_target_joint( float x, float y, float z, SkJoint* ref_joint_p = NULL );
-		SkJoint* get_target_joint( float& x, float& y, float& z);
 		void set_target( float x, float y, float z, char *ref_joint_name = NULL ); // world-coord if NULL
 		void set_orient_joint( float p, float h, float r, SkJoint* ref_joint_p = NULL );
 		void set_orient( float p, float h, float r, char *ref_joint_name = NULL );
@@ -200,6 +216,9 @@ class MeCtGaze : public MeController	{
 		void set_offset_euler( float off_p, float off_h, float off_r = 0.0 );
 		void set_offset_swing( float off_p, float off_h, float off_r = 0.0 ); // swing-twist: pitch, heading, roll
 		void set_offset_polar( float off_d, float off_a, float off_r = 0.0 ); // direction, radial angle, roll
+
+		// Ari: used in BehaviorWindow::processControllerRequest(...)
+		SkJoint* get_target_joint( float& x, float& y, float& z);
 
 #endif
 	
@@ -229,12 +248,22 @@ class MeCtGaze : public MeController	{
 		void set_bias_heading( int key1, int key2, float h1, float h2 );
 		void set_bias_roll( int key1, int key2, float r1, float r2 );
 
+#if GAZE_KEY_COMBINE_HEAD_AND_NECK
+		void set_bias_pitch( float l_p, float t_p, float c_p, float e_p );
+		void set_bias_heading( float l_h, float t_h, float c_h, float e_h );
+		void set_bias_roll( float l_r, float t_r, float c_r, float e_r );
+#else
 		void set_bias_pitch( float e_p, float h_p, float c_p, float t_p, float l_p );
 		void set_bias_heading( float e_h, float h_h, float c_h, float t_h, float l_h );
 		void set_bias_roll( float e_r, float h_r, float c_r, float t_r, float l_r );
+#endif
 
 		// BLEND: blending weight against underlying pose
+#if GAZE_KEY_COMBINE_HEAD_AND_NECK
+		void set_blend( float l_w, float t_w, float c_w, float e_w );
+#else
 		void set_blend( float l_w, float t_w, float c_w, float h_w, float e_w );
+#endif
 		void set_blend( int key, float w );
 		void set_blend( int key1, int key2, float w1, float w2 );
 
@@ -253,16 +282,17 @@ class MeCtGaze : public MeController	{
 		void set_limit_heading( int key, float l );
 		void set_limit_roll( int key, float l );
 
-		void set_limit_pitch( float e_l, float h_l, float c_l, float t_l, float l_l );
-		void set_limit_heading( float e_l, float h_l, float c_l, float t_l, float l_l );
-		void set_limit_roll( float e_l, float h_l, float c_l, float t_l, float l_l );
+		void set_limit_pitch( float l_l, float t_l, float c_l, float e_l );
+		void set_limit_heading( float l_l, float t_l, float c_l, float e_l );
+		void set_limit_roll( float l_l, float t_l, float c_l, float e_l );
 
 		void set_limit_pitch( int key1, int key2, float l1, float l2 );
 		void set_limit_heading( int key1, int key2, float l1, float l2 );
 		void set_limit_roll( int key1, int key2, float l1, float l2 );
 
 		// WEIGHT: task weight distribution
-		void set_weight( float e_w, float h_w, float c_w, float t_w, float l_w );
+//		void set_weight( float e_w, float h_w, float c_w, float t_w, float l_w );
+		void set_weight( float l_w, float t_w, float c_w, float e_w );
 		void set_weight( int key, float w );
 		void set_weight( int key1, int key2, float w1, float w2 );
 #endif
