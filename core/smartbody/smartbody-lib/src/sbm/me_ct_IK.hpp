@@ -53,10 +53,12 @@ protected:
 
 	SrMat						end_mat;
 	
-	SrVec						target;
+	SrArray<SrVec>				target;
 	float						threshold;
 
 	MeCtIKScenarioJointInfo*	manipulated_joint;
+	int							start_joint_index;
+	int							end_joint_index;
 	int							manipulated_joint_index;
 	int							support_joint_num;
 
@@ -74,6 +76,7 @@ public:
 public:
 	void update(MeCtIKScenario* scenario);
 	SrVec get_joint_pos(int index);
+	SrVec get_target(int index);
 
 protected:
 	void set_max_iteration(int iter);
@@ -104,7 +107,7 @@ protected:
 
 	//void adjust_support_joints();
 
-	void calc_target(SrVec& orientation, SrVec& offset);
+	virtual void calc_target(SrVec& orientation, SrVec& offset);
 
 	void get_init_mat_list();
 

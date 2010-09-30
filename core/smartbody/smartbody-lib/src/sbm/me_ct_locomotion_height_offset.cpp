@@ -21,7 +21,6 @@
  */
 
 #include "me_ct_locomotion_height_offset.hpp"
-#include "mcontrol_util.h"
 
 
 MeCtLocomotionHeightOffset::MeCtLocomotionHeightOffset()
@@ -44,17 +43,39 @@ void MeCtLocomotionHeightOffset::set_limb_list(SrArray<MeCtLocomotionLimb*>* lim
 	this->limb_list = limb_list;
 }
 
-/*void MeCtLocomotionHeightOffset::update(SrMat& parent_mat)
+void MeCtLocomotionHeightOffset::update_supporting_joint_orientation()
 {
-	for(int ;;)
+	MeCtLocomotionLimb* limb = NULL;
+	SrVec axis;
+	SrMat mat;
+	for(int i = 0; i < limb_list->size(); ++i)
 	{
+		limb = limb_list->get(i);
+		//limb->ik_terrain_normal = limb->ik_terrain_target_normal;
+		//continue;
+		if(limb->ik_terrain_normal == limb->ik_terrain_target_normal) continue;
+		if(limb->ik_terrain_normal.iszero())
+		{
+			limb->ik_terrain_normal = limb->ik_terrain_target_normal;
+			continue;
+		}
+		if(dot(limb->ik_terrain_normal, limb->ik_terrain_target_normal) >= cos(0.02f))
+		{
+			limb->ik_terrain_normal = limb->ik_terrain_target_normal;
+			//printf("shit");
+			continue;
+		}
+		axis = cross(limb->ik_terrain_normal, limb->ik_terrain_target_normal);
+		mat.rot(axis, 0.02f);
+		limb->ik_terrain_normal = limb->ik_terrain_normal * mat;
+		//printf("OK");
+		limb->ik_terrain_normal.normalize();
 	}
-}*/
+}
 
-void MeCtLocomotionHeightOffset::update(SrMat& parent_mat, float base_height_displacement)
+void MeCtLocomotionHeightOffset::update_height_offset(SrMat& parent_mat, float base_height_displacement)
 {
 	SrVec wpos;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	float normal[3];
 	float* height = (float*)malloc(limb_list->size()*sizeof(float));
 	
@@ -65,19 +86,19 @@ void MeCtLocomotionHeightOffset::update(SrMat& parent_mat, float base_height_dis
 	SrVec pos;
 	SrVec base_pos;
 	base_pos.set(parent_mat.get(12), parent_mat.get(13), parent_mat.get(14));
-	//SrArray<SrVec> pos;
-	//pos.capacity(limb_list->size());
-	//pos.size(limb_list->size());
 
-	/*for(int i = 0; i < limb_list->size(); ++i)
-	{
-		pos.set(i, limb_list->get(i)->pos_buffer.get(2));
-	}*/
+	MeCtLocomotionLimb* limb = NULL;
+
 	for(int i = 0; i < limb_list->size(); ++i)
 	{
-		pos = limb_list->get(i)->pos_buffer.get(2);
+		limb = limb_list->get(i);
+		pos = limb->pos_buffer.get(2);
 		wpos = pos * parent_mat;
-		height[i] = mcu.query_terrain(wpos.x, wpos.z, normal);
+		wpos += limb->ik_offset;
+
+		height[i] = terrain.get_height(wpos.x, wpos.z, normal);
+
+		limb->ik_terrain_target_normal.set(normal[0], normal[1], normal[2]);
 		
 		if(min_index < 0 || min_height > height[i]) 
 		{
@@ -86,10 +107,45 @@ void MeCtLocomotionHeightOffset::update(SrMat& parent_mat, float base_height_dis
 		}
 	}
 	height_offset = -(base_pos.y - min_height - translation_base_joint_height - base_height_displacement);
-	//height_offset = 0.0f;
+
+	update_supporting_joint_orientation();
 	//printf("\n%f", height_offset);
 	free(height);
 }
+
+/*void MeCtLocomotionHeightOffset::update(SrMat& parent_mat, float base_height_displacement)
+{
+	SrVec wpos;
+	//mcuCBHandle& mcu = mcuCBHandle::singleton();
+	float normal[3];
+	float* height = (float*)malloc(limb_list->size()*sizeof(float));
+	
+	int min_index = -1;
+	float min_height = 0.0f;
+	height_offset = 0.0f;
+
+	SrVec pos;
+	SrVec base_pos;
+	base_pos.set(parent_mat.get(12), parent_mat.get(13), parent_mat.get(14));
+
+	for(int i = 0; i < limb_list->size(); ++i)
+	{
+		pos = limb_list->get(i)->pos_buffer.get(2);
+		wpos = pos * parent_mat;
+		height[i] = terrain.get_height(wpos.x, wpos.z, normal);
+		//mcu.query_terrain(wpos.x, wpos.z, normal);
+		
+		if(min_index < 0 || min_height > height[i]) 
+		{
+			min_index = i;
+			min_height = height[i];
+		}
+	}
+	height_offset = -(base_pos.y - min_height - translation_base_joint_height - base_height_displacement);
+
+	//printf("\n%f", height_offset);
+	free(height);
+}*/
 
 float MeCtLocomotionHeightOffset::get_height_offset()
 {

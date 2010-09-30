@@ -71,7 +71,7 @@ struct MeCtLocomotionJointInfo
 		return sum;
 	}
 
-	void Init(SkSkeleton* skeleton, char* base_name, SrArray<char*>* limb_joint_name)
+	void Init(SkSkeleton* skeleton, const char* base_name, SrArray<char*>* limb_joint_name)
 	{
 		joint_name.capacity(0);
 		joint_index.capacity(0);

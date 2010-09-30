@@ -61,6 +61,8 @@ public://for IK
 	MeCtIKScenario					ik;
 	SrVec							ik_offset;
 	SrVec							ik_offset_record;
+	SrVec							ik_terrain_normal;
+	SrVec							ik_terrain_target_normal;
 	float							ik_target_comp;
 
 	//SrArray<int>					joint_index;

@@ -48,6 +48,8 @@ MeCtLocomotionLimb::MeCtLocomotionLimb() {
 	walking_skeleton = NULL;
 	standing_skeleton = NULL;
 	ik_offset.set(0,0,0);
+	ik_terrain_normal.set(0.0f, 0.0f, 0.0f);
+	ik_terrain_target_normal.set(0.0f, 0.0f, 0.0f);
 }
 
 MeCtLocomotionLimb::MeCtLocomotionLimb(char* name) 
