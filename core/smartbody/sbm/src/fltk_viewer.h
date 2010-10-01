@@ -53,10 +53,6 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
  {
    public : // enumerators
 
-    enum ViewMode { ModeExaminer,
-                    ModePlanar
-                  };
-
     enum RenderMode { ModeAsIs,
                       ModeDefault,
                       ModeSmooth,
@@ -75,7 +71,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
                       ModeShowAxis
                     };
 
-	enum TerrainMode { ModeNoTerrain,
+	enum terrainMode { ModeNoTerrain,
 					   ModeTerrainWireframe,
 					   ModeTerrain,
                 };
@@ -83,8 +79,6 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
     enum MenuCmd { CmdHelp,
                    CmdViewAll,
                    CmdBackground,
-                   CmdExaminer,   //!< examiner model manipulation
-                   CmdPlanar,     //!< planar manipulation
                    CmdAsIs,
                    CmdDefault,
                    CmdSmooth,
@@ -96,7 +90,6 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdShadows,
                    CmdBoundingBox,
                    CmdStatistics,
-                   CmdSpinAnim,
 				   CmdCharacterShowGeometry,
 				   CmdCharacterShowCollisionGeometry,
 				   CmdCharacterShowDeformableGeometry,
@@ -152,30 +145,11 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
         leaving the camera with a 60 degreed fovy. The up vector is set to (0,1,0). */
     void view_all ();
 
-    /*! Will make SrViewer to render the scene in the next fltk loop. If the
-        current scene is spinning, then the scene is already being rendered by the
-        spin animation timeout with a defined frequency, an then a call to render()
-        will have no effect. */
+    /*! Will make SrViewer to render the scene in the next fltk loop. */
     void render ();
 
     /*! Returns true if the window is iconized, false otherwise. */
     bool iconized ();
-
-    /*! Returns true if the scene is spinning, false otherwise. When the scene is 
-        spinning, then a spin animation timeout function is created in fltk that
-        stays calling render() with a calculated frequency. */
-    bool spinning () ;
-
-    /*! Sets data to be considered by the spin animation. */
-    void set_spin_data ( const SrQuat &delta, float interval, float activation=0.1f );
-
-    /*! Gets the current spin animation data being used. */
-    void get_spin_data ( SrQuat &delta, double &interval, double &activation );
-
-    /*! Forces spin animation to start or stop. */
-    void spinning ( bool onoff );
-
-    void allow_spin_animation ( bool b );
 
     void increment_model_rotation ( const SrQuat &dq );
 
@@ -185,7 +159,6 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
     SrColor background ();
     void background ( SrColor c );
 
-    ViewMode get_view_mode ();
     void get_camera ( SrCamera &cam );
     void set_camera ( const SrCamera &cam );
 
@@ -206,8 +179,8 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
         method is called also each time the window is reshaped. */
     virtual void init_opengl ( int w, int h );
 
-    /*! hande(int) controls the activation of the button menu, controls the
-        spinning animation, and translates fltk events into the SrEvent class
+    /*! hande(int) controls the activation of the button menu, 
+		and translates fltk events into the SrEvent class
         to then call handle_event(). Note that all handle methods should return
         1 when the event was understood and executed, and return 0 otherwise.
         This is a derived FLTK method. */ 
@@ -223,11 +196,6 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
         handle_scene_event(). */
     virtual int handle_examiner_manipulation ( const SrEvent &e );
 
-    /*! Takes mouse events to rotate, scale and translate the scene in planar mode. 
-        If the event is not used, it is passed to the scene by calling
-        handle_scene_event(). */
-    virtual int handle_planar_manipulation ( const SrEvent &e );
-   
     /*! Applies an event action to the scene */
     virtual int handle_scene_event ( const SrEvent &e );
 
@@ -238,12 +206,9 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
        otherwise it passes the event to the scene graph. */
     virtual int handle_keyboard ( const SrEvent &e );
 
-    /*! Will be called each time a spin animation accured. The SrViewer
-        implementation does nothing. */
-    virtual void spin_animation_occured ();
-
 	void initGridList();
 	void drawGrid();
+	void drawSteeringInfo();
 
 	int gridList;
 	float gridColor[4];

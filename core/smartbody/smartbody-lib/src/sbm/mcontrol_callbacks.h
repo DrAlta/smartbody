@@ -71,10 +71,10 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 
 int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_print_face_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_print_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_set_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_print_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string name );
+int mcu_print_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string name  );
+int mcu_set_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string name );
+int mcu_print_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string name  );
 
 int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_sched_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );

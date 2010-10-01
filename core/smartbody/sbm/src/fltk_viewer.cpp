@@ -77,12 +77,7 @@ class srSaSetShapesChanged : public SrSa
 
 //================================= help window ===================================================
 
-fltk::Window* make_help_window ()
- {
-   fltk::Window* win = new fltk::Window ( 300, 200, "FltkViewer Help" );
-   win->set_non_modal();
-   return win;
- }
+
 
 fltk::Browser* make_help_browser ()
  {
@@ -102,6 +97,16 @@ fltk::Browser* make_help_browser ()
    b->add ( "Ctrl + Shift + o: Export all models in scene\n" );
 
    return b;
+ }
+
+fltk::Window* make_help_window ()
+ {
+   fltk::Window* win = new fltk::Window ( 300, 200, "FltkViewer Help" );
+   win->set_non_modal();
+
+   fltk::Browser* browser = make_help_browser();
+   win->add(browser);
+   return win;
  }
 
 //================================= popup menu ===================================================
@@ -125,10 +130,6 @@ static Fl_Menu_Item MenuTable[] =
    { "&view all",   0, MCB, CMD(CmdViewAll) },
    { "&background", 0, MCB, CMD(CmdBackground) }, // FL_MENU_DIVIDER
 
-   { "&mode", 0, 0, 0, FL_SUBMENU },
-         { "&examiner", 0, MCB, CMD(CmdExaminer), FL_MENU_RADIO },
-         { "&planar",   0, MCB, CMD(CmdPlanar),   FL_MENU_RADIO },
-         { 0 },
    { "&draw style", 0, 0, 0, FL_SUBMENU },
          { "&as is",   0, MCB, CMD(CmdAsIs),    FL_MENU_RADIO },
          { "d&efault", 0, MCB, CMD(CmdDefault), FL_MENU_RADIO },
@@ -152,7 +153,6 @@ static Fl_Menu_Item MenuTable[] =
          { "&axis",         0, MCB, CMD(CmdAxis),        FL_MENU_TOGGLE },
          { "b&ounding box", 0, MCB, CMD(CmdBoundingBox), FL_MENU_TOGGLE },
          { "&statistics",   0, MCB, CMD(CmdStatistics),  FL_MENU_TOGGLE },
-         { "spi&n anim",    0, MCB, CMD(CmdSpinAnim),    FL_MENU_TOGGLE },
          { 0 },
     { "&terrain", 0, 0, 0, FL_SUBMENU },
          { "&no terrain",   0, MCB, CMD(CmdNoTerrain),    FL_MENU_RADIO },
@@ -167,80 +167,37 @@ static Fl_Menu_Item MenuTable[] =
 
 // need to set/get data to be able to share the same popup menu with many instances of viewers
 
-static void set_menu_data ( FltkViewer::ViewMode v, FltkViewer::RenderMode r, FltkViewer::CharacterMode c,
-                            bool axis, bool bbox, bool stat, bool spin )
+static void set_menu_data ( FltkViewer::RenderMode r, FltkViewer::CharacterMode c,
+                            bool axis, bool bbox, bool stat)
  {
    # define SET(i,b)  if(b) MenuTable[i].set(); else MenuTable[i].clear();
    # define SETO(i)   MenuTable[i].setonly();
    # define CMD(i)    ((int)(MenuTable[i].user_data_))
 
    int i=0;
-   while ( CMD(i)!=FltkViewer::CmdExaminer ) i++;      SETO (  i+(int)v );
    while ( CMD(i)!=FltkViewer::CmdAsIs ) i++;          SETO (  i+(int)r );
    while ( CMD(i)!=FltkViewer::CmdCharacterShowGeometry ) i++; SETO (  i+(int)c );
    while ( CMD(i)!=FltkViewer::CmdAxis ) i++;          SET  ( i, axis );
    while ( CMD(i)!=FltkViewer::CmdBoundingBox ) i++;   SET  ( i, bbox );
    while ( CMD(i)!=FltkViewer::CmdStatistics ) i++;    SET  ( i, stat );
-   while ( CMD(i)!=FltkViewer::CmdSpinAnim ) i++;      SET  ( i, spin );
 
-   # undef CMD
+# undef CMD
    # undef SETO
    # undef SET
  }
 
-//======================================= timeout ===================================
-
-// The timeout is called by fltk even when the app is iconized.
-static void spin_timeout_func ( void* udata ) 
- {
-   SrQuat delta;
-   double interval;
-   double activation;
-
-   ////SR_TRACE5 ( "TIMOUT FUNC\n" );
-
-   FltkViewer* v = (FltkViewer*)udata;
-   v->get_spin_data ( delta, interval, activation );
-
-//   if ( !v->root() && !v->menu_cmd_activated(FltkViewer::CmdAxis) )
-//     v->spinning ( false );
-
-   if ( v->spinning() && !v->iconized() ) 
-    { v->increment_model_rotation ( delta );
-      v->redraw ();
-	  fltk::repeat_timeout( float(interval), spin_timeout_func, udata );
-    }
-
-   v->spin_animation_occured ();
- }
 
 //================================= Internal Structures =================================
-
-struct SpinData
- { SrQuat rotdelta;    // spin current rotation delta used for the spinning animation
-   double lasttime;    // last spin time
-   double activation;  // spin activation
-   double interval;    // spin interval
-   SpinData ()  { lasttime=0; init(); }
-   void init () { activation=0.1f; interval=0.01f; rotdelta=SrQuat::null; }
-   void set_interval ( double i ) { interval = i<0.01? 0.01:i; }
-   void set_activation ( double a ) { activation = a<0.01? 0.01:a; }
- };
 
 class FltkViewerData
  { public :
    SrSn*  root;              // contains the user scene
-   FltkViewer::ViewMode viewmode;     // viewer mode, initially Examiner
    FltkViewer::RenderMode rendermode; // render mode
    FltkViewer::CharacterMode charactermode; // render mode
    FltkViewer::ShadowMode shadowmode;     // shadow mode
-   FltkViewer::TerrainMode terrainmode;     // terrain mode
-
-
+   FltkViewer::terrainMode terrainMode;     // terrain mode
 
    bool iconized;      // to stop processing while the window is iconized
-   bool spinning;      // indicates if the model is currently spinning
-   bool allowspinanim; // allows spin animation or not
    bool statistics;    // shows statistics or not
    bool displayaxis;   // if shows the axis or not
    bool boundingbox;   // if true will show the bbox of the whole scene
@@ -255,9 +212,6 @@ class FltkViewerData
    SrString message;   // user msg to display in the window
    SrLight light;
 
-   int spin_inc_count;    // counts increments applied to spin animation (for normalization)
-   SpinData   spindata;   // Data for spin animation
-   SrTrackball trackball; // To process spin rotations
    SrTimer    fcounter;   // To count frames and measure frame rate
    SrEvent    event;      // The translated event from fltk to sr format
    SrColor    bcolor;     // Background color currently used
@@ -269,7 +223,6 @@ class FltkViewerData
 
    fltk::PopupMenu* menubut; // the ctrl+shift+m or button3 menu
    fltk::Window* helpwin;
-   fltk::Browser* helpbrowser;
 
    SrSaGlRender render_action;
    SrSaBBox bbox_action;
@@ -297,15 +250,12 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data = new FltkViewerData;
 
    _data->root = new SrSnGroup; // we maintain root pointer always valid
-   _data->viewmode = ModeExaminer;
    _data->rendermode = ModeAsIs;
    _data->charactermode = ModeShowGeometry;
    _data->shadowmode = ModeNoShadows;
-   _data->terrainmode = ModeTerrain;
+   _data->terrainMode = ModeTerrain;
 
    _data->iconized    = false;
-   _data->spinning    = false;
-   _data->allowspinanim = true;
    _data->statistics  = false;
    _data->displayaxis = false;
    _data->boundingbox = false;
@@ -318,7 +268,6 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->light.init();
 
    _data->bcolor = SrColor(.63f, .63f, .63f);
-   _data->spin_inc_count = 0;
 
    _data->scenebox = new SrSnLines;
    _data->sceneaxis = new SrSnLines;
@@ -331,7 +280,6 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->menubut->menu(MenuTable);
    _data->menubut->textsize(12);
    _data->helpwin = make_help_window ();
-   _data->helpbrowser = make_help_browser ();
    end();
 
    gridColor[0] = 0.5;
@@ -350,10 +298,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 
 FltkViewer::~FltkViewer ()
  {
-   fltk::remove_timeout ( spin_timeout_func, this );
    _data->root->unref ();
-   if (_data->helpbrowser)
-	   delete _data->helpbrowser;
    delete _data->helpwin;
    delete _data->scenebox;
    delete _data->sceneaxis;
@@ -382,8 +327,8 @@ void FltkViewer::draw_message ( const char* s )
 
 void FltkViewer::show_menu ()
  { 
-	 set_menu_data ( _data->viewmode, _data->rendermode, _data->charactermode, _data->displayaxis,
-                   _data->boundingbox, _data->statistics, _data->allowspinanim );
+	 set_menu_data (_data->rendermode, _data->charactermode, _data->displayaxis,
+                   _data->boundingbox, _data->statistics);
    _data->menubut->popup();
  }
 
@@ -396,12 +341,6 @@ void FltkViewer::menu_cmd ( MenuCmd s )
 
       case CmdViewAll : view_all (); break;
 
-      case CmdExaminer : _data->viewmode = ModeExaminer; 
-                         update_axis(); spinning(false); view_all();
-                         break;
-      case CmdPlanar   : _data->viewmode = ModePlanar;
-                         update_axis(); spinning(false); view_all();
-                         break;
       case CmdAsIs   : _data->rendermode = ModeAsIs;
                        _data->render_action.restore_render_mode ( _data->root );
                        break;
@@ -428,20 +367,17 @@ void FltkViewer::menu_cmd ( MenuCmd s )
                        break;
       case CmdNoShadows : _data->shadowmode = ModeNoShadows;
                        break;
-	  case CmdNoTerrain  : _data->terrainmode = ModeNoTerrain;             
+	  case CmdNoTerrain  : _data->terrainMode = ModeNoTerrain;             
                        break;
-      case CmdTerrainWireframe : _data->terrainmode = ModeTerrainWireframe;
+      case CmdTerrainWireframe : _data->terrainMode = ModeTerrainWireframe;
                        break;
-      case CmdTerrain : _data->terrainmode = ModeTerrain;
+      case CmdTerrain : _data->terrainMode = ModeTerrain;
                        break;
       case CmdBoundingBox : SR_SWAPB(_data->boundingbox); 
                             if ( _data->boundingbox ) update_bbox();
                             break;
 
       case CmdStatistics : SR_SWAPB(_data->statistics); break;
-      case CmdSpinAnim   : SR_SWAPB(_data->allowspinanim); 
-                           if (!_data->allowspinanim) _data->spinning=false;
-                           break;
 	  case CmdCharacterShowGeometry:
 						_data->showgeometry = true;
 						_data->showcollisiongeometry = false;
@@ -506,10 +442,7 @@ void FltkViewer::menu_cmd ( MenuCmd s )
 bool FltkViewer::menu_cmd_activated ( MenuCmd c )
  {
    switch ( c )
-    { case CmdExaminer : return _data->viewmode==ModeExaminer? true:false;
-      case CmdPlanar   : return _data->viewmode==ModePlanar? true:false;
-
-      case CmdAsIs     : return _data->rendermode==ModeAsIs? true:false;
+    { case CmdAsIs     : return _data->rendermode==ModeAsIs? true:false;
       case CmdDefault  : return _data->rendermode==ModeDefault? true:false;
       case CmdSmooth   : return _data->rendermode==ModeSmooth? true:false;
       case CmdFlat     : return _data->rendermode==ModeFlat? true:false;
@@ -517,13 +450,12 @@ bool FltkViewer::menu_cmd_activated ( MenuCmd c )
       case CmdPoints   : return _data->rendermode==ModePoints? true:false;
       case CmdShadows   : return _data->shadowmode==ModeShadows? true:false;
       case CmdNoShadows   : return _data->shadowmode==ModeNoShadows? true:false;
-	  case CmdTerrain   : return _data->terrainmode==ModeTerrain? true:false;
-      case CmdTerrainWireframe   : return _data->terrainmode==ModeTerrainWireframe? true:false;
-	  case CmdNoTerrain   : return _data->terrainmode==ModeNoTerrain? true:false;
+	  case CmdTerrain   : return _data->terrainMode==ModeTerrain? true:false;
+      case CmdTerrainWireframe   : return _data->terrainMode==ModeTerrainWireframe? true:false;
+	  case CmdNoTerrain   : return _data->terrainMode==ModeNoTerrain? true:false;
       case CmdAxis        : return _data->displayaxis? true:false;
       case CmdBoundingBox : return _data->boundingbox? true:false;
       case CmdStatistics  : return _data->statistics? true:false;
-      case CmdSpinAnim    : return _data->allowspinanim? true:false;
 	  case CmdCharacterShowGeometry : return _data->showgeometry? true:false;
 	  case CmdCharacterShowCollisionGeometry : return _data->showcollisiongeometry? true:false;
 	  case CmdCharacterShowDeformableGeometry : return _data->showdeformablegeometry? true:false;
@@ -550,22 +482,14 @@ void FltkViewer::update_axis ()
 
    _data->sceneaxis->shape().init();
 
-   if ( _data->viewmode==ModePlanar )
-    _data->sceneaxis->shape().push_axis ( SrPnt::null, len, 2, "xy" );
-   else
-    _data->sceneaxis->shape().push_axis ( SrPnt::null, len, 3, "xyz" );
+   _data->sceneaxis->shape().push_axis ( SrPnt::null, len, 3, "xyz" );
  }
 
 void FltkViewer::view_all ()
  {
-   _data->spindata.init ();
-   _data->spinning = false;
-
    _data->camera.center = SrVec::null;
    _data->camera.up = SrVec::j;
    _data->camera.eye.set ( 0, 0, 1.0f );
-
-   _data->trackball.init ();
 
    if ( _data->root )
     { update_bbox ();
@@ -591,58 +515,12 @@ void FltkViewer::view_all ()
 
 void FltkViewer::render () 
  { 
-   if ( !_data->spinning ) redraw(); 
+   redraw(); 
  } 
 
 bool FltkViewer::iconized () 
  { 
    return _data->iconized;
- }
-
-bool FltkViewer::spinning ()
- { 
-   return _data->spinning;
- }
-
-void FltkViewer::set_spin_data ( const SrQuat &delta, float interval, float activation )
- { 
-   SpinData &s = _data->spindata;
-   s.set_interval ( interval );
-   s.rotdelta = delta;
-   s.set_activation ( activation );
- }
-
-void FltkViewer::get_spin_data ( SrQuat &delta, double &interval, double &activation )
- {
-   SpinData &s = _data->spindata;
-   delta = s.rotdelta;
-   interval = s.interval;
-   activation = s.activation;
- }
-
-void FltkViewer::spinning ( bool onoff )
- { 
-   _data->spinning=onoff;
-   if ( _data->spinning )
-	   fltk::add_timeout( float(_data->spindata.interval), spin_timeout_func, (void*)this );
- }
-
-void FltkViewer::allow_spin_animation ( bool b )
- { 
-   _data->allowspinanim = b;
- }
-
-void FltkViewer::increment_model_rotation ( const SrQuat &dq )
- {
-   const SrQuat& rotation = _data->trackball.rotation;
-   _data->camera *= rotation.inverse() * dq.inverse() * rotation;
-   _data->trackball.increment_rotation ( dq );
-
-   if ( _data->spin_inc_count++%300==0 )
-    { _data->trackball.rotation.normalize();
-      _data->trackball.last_spin.normalize();
-      _data->spin_inc_count = 0;
-    }
  }
 
 float FltkViewer::fps () 
@@ -663,11 +541,6 @@ SrColor FltkViewer::background ()
 void FltkViewer::background ( SrColor c )
  {
    _data->bcolor = c;
- }
-
-FltkViewer::ViewMode FltkViewer::get_view_mode ()
- {
-   return _data->viewmode;
  }
 
 void FltkViewer::get_camera ( SrCamera &cam )
@@ -855,9 +728,9 @@ void FltkViewer::draw()
 	glEnable( GL_COLOR_MATERIAL );
 	glEnable( GL_NORMALIZE );
 
-	if (_data->terrainmode == FltkViewer::ModeTerrain)
+	if (_data->terrainMode == FltkViewer::ModeTerrain)
 		mcu.render_terrain(0);
-	else if (_data->terrainmode == FltkViewer::ModeTerrainWireframe)
+	else if (_data->terrainMode == FltkViewer::ModeTerrainWireframe)
 		mcu.render_terrain(1);
 
 	glDisable( GL_COLOR_MATERIAL );
@@ -947,9 +820,9 @@ void FltkViewer::draw()
 	}
 
    // draw the grid
-//   if (gridList == -1)
-//	   initGridList();
-   drawGrid();
+	//   if (gridList == -1)
+	//	   initGridList();
+	   drawGrid();
 
 	_data->fcounter.stop();
 
@@ -1358,7 +1231,7 @@ int FltkViewer::handle ( int event )
        { //SR_TRACE1 ( "Mouse Push : but="<<fltk::event_button()<<" ("<<fltk::event_x()<<", "<<fltk::event_y()<<")" <<" Ctrl:"<<fltk::event_state(FL_CTRL) );
          translate_event ( e, SrEvent::Push, w(), h(), this );
          if ( POPUP_MENU(e) ) { show_menu(); e.type=SrEvent::None; }
-          else _data->spinning=false; 
+          
        } break;
 
       case fltk::RELEASE:
@@ -1407,7 +1280,6 @@ int FltkViewer::handle ( int event )
       case fltk::SHOW: // Called when the window is de-iconized or when show() is called
         //SR_TRACE1 ( "Show" );
         _data->iconized = false;
-		if ( _data->spinning ) fltk::add_timeout( float(_data->spindata.interval), spin_timeout_func, (void*)this );
         show ();
         break;
 
@@ -1483,10 +1355,7 @@ int FltkViewer::handle_event ( const SrEvent &e )
 
    if ( e.alt && e.mouse_event() )
     { 
-      if ( _data->viewmode==ModeExaminer )
         res = handle_examiner_manipulation ( e );
-      else if ( _data->viewmode==ModePlanar )
-        res = handle_planar_manipulation ( e );
 
       if ( res ) return res;
     }
@@ -1572,10 +1441,7 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
        { _data->camera.apply_translation_from_mouse_motion ( e.lmouse.x, e.lmouse.y, e.mouse.x, e.mouse.y );
        }
       else if ( ROTATING(e) )
-       { SrQuat drot;
-         SrTrackball::get_spin_from_mouse_motion ( e.lmouse.x, e.lmouse.y, e.mouse.x, e.mouse.y, drot );
-         increment_model_rotation ( drot );
-        _data->spindata.lasttime = _data->fcounter.time();
+       { 
        }
       else if ( ROTATING2(e) )
        { 
@@ -1600,49 +1466,8 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
 	  }
     }
    else if ( e.type==SrEvent::Release )
-    { if ( e.button==1 && _data->allowspinanim && _data->spindata.lasttime>0 ) 
-       { _data->spindata.set_interval ( _data->fcounter.time()-_data->spindata.lasttime );
-         _data->spindata.rotdelta = _data->trackball.last_spin;
-         //SR_TRACE5 ( _data->spindata.interval<<" < "<<_data->spindata.activation );
-         if ( _data->spindata.interval<_data->spindata.activation )
-          { _data->spinning=true;
-			fltk::add_timeout ( float(_data->spindata.interval), spin_timeout_func, (void*)this );
-          }
-       }
-    }
-   return 1;
- }
-
-//== Planar =============================================================
-
-int FltkViewer::handle_planar_manipulation ( const SrEvent& e )
- {
-   SrCamera& c = _data->camera;
-
-   if ( e.type==SrEvent::Drag )
     { 
-      float dx = e.mousedx() * c.aspect;
-      float dy = e.mousedy() / c.aspect;
-
-      if ( ZOOMING(e) ) // scaling effect in planar mode
-       { c.fovy += (dx+dy)*2;
-         c.fovy = SR_BOUND ( c.fovy, 0.01f, srpi );
-       }
-      else if ( TRANSLATING(e) ) // this will translate in planar mode
-       { _data->camera.apply_translation_from_mouse_motion ( e.lmouse.x, e.lmouse.y, e.mouse.x, e.mouse.y );
-       }
-      else if ( ROTATING(e) ) // planar mode
-       { 
-         SrQuat drot;
-         SrPnt p1 ( e.lmousep.x, e.lmousep.y, 0 );
-         SrPnt p2 ( e.mousep.x, e.mousep.y, 0 );
-         drot.set ( p1, p2 );
-         c.up = c.up * drot;
-       }
-
-      redraw();
     }
-
    return 1;
  }
 
@@ -1670,11 +1495,6 @@ int FltkViewer::handle_keyboard ( const SrEvent &e )
    return 0;
  }
 
-//== Spin Animation ========================================================
-
-void FltkViewer::spin_animation_occured ()
-{
-}
 
 void FltkViewer::label_viewer(const char* str)
 {
@@ -1761,6 +1581,7 @@ void FltkViewer::drawGrid()
 
 	glPopAttrib();
 }
+
 
 
 //== Viewer Factory ========================================================

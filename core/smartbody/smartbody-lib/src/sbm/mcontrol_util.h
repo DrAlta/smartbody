@@ -110,6 +110,16 @@ class CameraTrack
 		SrVec targetToCamera;
 };
 
+class FaceMotion
+{
+	public:
+		SkMotion* face_neutral_p;
+		AUMotionMap au_motion_map;
+		VisemeMotionMap viseme_map;
+
+		FaceMotion() { face_neutral_p = NULL; }
+};
+
 // Motion Controller Utility Callback Handle (Yes, seriously.)
 class mcuCBHandle	{
 	protected:
@@ -184,12 +194,9 @@ class mcuCBHandle	{
 		srHashMap <srCmdSeq>		pending_seq_map;
 		srHashMap <srCmdSeq>		active_seq_map;
 
+		std::map<std::string, FaceMotion*> face_map;
 		std::map<std::string, SkPosture*> pose_map;
 		std::map<std::string, SkMotion*> motion_map;
-
-		SkMotion*                   face_neutral_p;
-		AUMotionMap					au_motion_map;
-		VisemeMotionMap				viseme_map;
 
 		GeneralParamMap				param_map;			// map that contains the information of shader parameters
 
