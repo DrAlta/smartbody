@@ -17,6 +17,7 @@ EditorWidget::EditorWidget(int x, int y, int w, int h, char* name) :
 	selectState = STATE_NORMAL;
 	cameraState = CAMERASTATE_NORMAL;
 	setBlockCandidate(NULL, true);
+	blockOpLocked = false;
 }
 
 EditorWidget::~EditorWidget()
@@ -345,6 +346,7 @@ void EditorWidget::draw()
 		int bounds[4];
 		blockBeingDragged->getTrack()->getBounds(bounds[0], bounds[1], bounds[2], bounds[3]);
 		fltk::drawtext(buff, float(this->convertTimeToPosition(t)), float(bounds[1]) +  5.0f * float(bounds[3]) / 6.0f);
+		
 	}
 
 
@@ -571,7 +573,7 @@ void EditorWidget::drawMark(nle::Block* block, nle::Mark* mark, int trackNum, in
 		return;
 
 	if (mark->isSelected())
-		fltk::setcolor(fltk::YELLOW);
+		fltk::setcolor(fltk::GREEN);
 	else
 		fltk::setcolor(mark->getColor());
 
@@ -624,6 +626,7 @@ int EditorWidget::handle(int event)
 	bool leftOrRight = false;
 	nle::Block* candidateBlock = NULL;             
     nle::Block* selectedBlock = NULL;   
+	nle::Mark* selectedMark = NULL;
 
 	switch (event)
 	{
@@ -745,7 +748,7 @@ int EditorWidget::handle(int event)
 				}
 			}
 			candidateBlock = this->getBlockCandidate(leftOrRight);
-			if (candidateBlock)
+			if (candidateBlock && !blockOpLocked)
 			{
                 bool shiftKeyPressed = (fltk::get_key_state(fltk::LeftShiftKey) || fltk::get_key_state(fltk::RightShiftKey));
 
@@ -855,23 +858,80 @@ int EditorWidget::handle(int event)
 				}
 			}
 
-            // check to see if the user is moving an entire block 
+            // check to see if the user is moving an entire mark 
             for (int t = 0; t < model->getNumTracks(); t++)
             {
                 nle::Track* track = model->getTrack(t);
                 for (int b = 0; b < track->getNumBlocks(); b++)
                 {
                     nle::Block* block = track->getBlock(b);
-                    if (block->isSelected())
-                    {
-                        selectedBlock = block;
-                        break;
-                    }
+					for (int m = 0; m < block->getNumMarks(); m++)
+					{
+						nle::Mark* mark = block->getMark(m);
+						if (mark->isSelected())
+						{
+							selectedMark = mark;
+							break;
+						}
+					}
+					if (selectedMark)
+						break;
                 }
-                if (selectedBlock)
-                    break;
+				if (selectedMark)
+					break;
             }
-            if (selectedBlock) // block is selected and user clicked on the middle of the block
+
+			if (selectedMark == NULL)
+			{
+				// check to see if the user is moving an entire block 
+				for (int t = 0; t < model->getNumTracks(); t++)
+				{
+					nle::Track* track = model->getTrack(t);
+					for (int b = 0; b < track->getNumBlocks(); b++)
+					{
+						nle::Block* block = track->getBlock(b);
+						if (block->isSelected())
+						{
+							selectedBlock = block;
+							break;
+						}
+					}
+					if (selectedBlock)
+						break;
+				}
+			}
+			
+			if (selectedMark) // mark is selected and user clicked on the middle of the block
+			{
+                // determine where to move the block
+                double origTime = this->convertViewablePositionToTime(clickPositionX);
+                double newTime = this->convertViewablePositionToTime(mousex);
+                double timeDiff = newTime - origTime; // adjust block start/end by this amount
+                                
+                bool okToMove = true;
+                if (okToMove)
+                {
+                    // make sure that the block doesn't go beyond the beginning
+                    double startTime = selectedMark->getStartTime() + timeDiff;
+                    double endTime = selectedMark->getEndTime() + timeDiff;
+					if (startTime >= 0 && endTime <= selectedMark->getBlock()->getEndTime())
+                    {
+                        selectedMark->setStartTime(startTime);
+                        selectedMark->setEndTime(endTime);
+						char buff[256];
+						sprintf(buff, "%6.2f", selectedMark->getStartTime());
+						selectedMark->setName(buff);
+                    }              
+                        
+                    // reset the mouse position
+                    clickPositionX = mousex;
+                    model->setModelChanged(true);
+                    redraw();
+                }				
+			}
+
+
+            if (selectedBlock && !blockOpLocked) // block is selected and user clicked on the middle of the block
             {
                 // determine where to move the block
                 double origTime = this->convertViewablePositionToTime(clickPositionX);
@@ -1003,62 +1063,151 @@ int EditorWidget::handle(int event)
 				}
 			}
 
-			// check to see if a block was hit			
+			// check to see if a mark was hit			
 			for (int t = 0; t < model->getNumTracks(); t++)
 			{
 				nle::Track* track = model->getTrack(t);
 				for (int b = 0; b < track->getNumBlocks(); b++)
 				{
 					nle::Block* block = track->getBlock(b);
-					int bounds[4];
-					block->getBounds(bounds[0], bounds[1], bounds[2], bounds[3]);
-					int minX = bounds[0];
-					int maxX = bounds[0] + bounds[2];
-					int minY = bounds[1];
-					int maxY = bounds[1] + bounds[3];
-
-					if ((mousex >= minX && mousex <= maxX) &&
-						(mousey >= minY && mousey <= maxY))
+					for (int m = 0; m < block->getNumMarks(); m++)
 					{
-						block->setSelected(!block->isSelected());
-						changeBlockSelectionEvent(block);
-						for (int t = 0; t < model->getNumTracks(); t++)
+						nle::Mark* mark = block->getMark(m);
+						int bounds[4];
+						mark->getBounds(bounds[0], bounds[1], bounds[2], bounds[3]);
+						int minX = bounds[0];
+						int maxX = bounds[0] + bounds[2];
+						int minY = bounds[1];
+						int maxY = bounds[1] + bounds[3];
+
+						if ((mousex >= minX && mousex <= maxX) &&
+							(mousey >= minY && mousey <= maxY))
 						{
-							nle::Track* selectTrack = model->getTrack(t);
-							if (selectTrack != block->getTrack())
-								if (selectTrack->isSelected())
+							mark->setSelected(!mark->isSelected());
+							changeMarkSelectionEvent(mark);
+							// modify track selection according to mark hit
+							for (int t1 = 0; t1 < model->getNumTracks(); t1++)
+							{
+								nle::Track* selectTrack = model->getTrack(t1);
+								if (selectTrack != mark->getBlock()->getTrack())
+									if (selectTrack->isSelected())
+									{
+										selectTrack->setSelected(false);
+										changeTrackSelectionEvent(selectTrack);
+									}
+								else
+									if (!selectTrack->isSelected())
+									{
+										selectTrack->setSelected(true);
+										changeTrackSelectionEvent(selectTrack);
+									}
+							}
+			
+							// modify block selection according to mark hit
+							for (int b1 = 0; b1 < track->getNumBlocks() ; b1++)
+							{
+								nle::Block* selectBlock = track->getBlock(b1);
+								if (selectBlock != mark->getBlock())
+									if (selectBlock->isSelected())
+									{
+										selectBlock->setSelected(false);
+										changeBlockSelectionEvent(selectBlock);
+									}
+								else
+									if (!selectBlock->isSelected())
+									{
+										selectBlock->setSelected(true);
+										changeBlockSelectionEvent(selectBlock);
+									}
+							}
+
+							// unselect the other marks
+							for (int t1 = 0; t1 < model->getNumTracks(); t1++)
+							{
+								nle::Track* track1 = model->getTrack(t1);
+								for (int b1 = 0; b1 < track1->getNumBlocks(); b1++)
 								{
-									selectTrack->setSelected(false);
-									changeTrackSelectionEvent(selectTrack);
+									nle::Block* block1 = track1->getBlock(b1);
+									for (int m1 = 0; m1 < block1->getNumMarks(); m1++)
+									{
+										nle::Mark* mark1 = block1->getMark(m1);
+										if (mark1 != mark)
+											if (mark1->isSelected())
+											{
+												mark1->setSelected(false);
+												changeMarkSelectionEvent(mark1);
+											}
+									}
 								}
-							else
-								if (!selectTrack->isSelected())
-								{
-									selectTrack->setSelected(true);
-									changeTrackSelectionEvent(selectTrack);
-								}
-						}
-						if (block->getTrack()->isSelected() != block->isSelected())
+							}
+							mouseHit = true;
+							found = true;
+							model->setModelChanged(true);
+							redraw();
+						}				
+					}
+				}
+			}
+
+			if (!blockOpLocked)
+			{
+				// check to see if a block was hit			
+				for (int t = 0; t < model->getNumTracks(); t++)
+				{
+					nle::Track* track = model->getTrack(t);
+					for (int b = 0; b < track->getNumBlocks(); b++)
+					{
+						nle::Block* block = track->getBlock(b);
+						int bounds[4];
+						block->getBounds(bounds[0], bounds[1], bounds[2], bounds[3]);
+						int minX = bounds[0];
+						int maxX = bounds[0] + bounds[2];
+						int minY = bounds[1];
+						int maxY = bounds[1] + bounds[3];
+
+						if ((mousex >= minX && mousex <= maxX) &&
+							(mousey >= minY && mousey <= maxY))
 						{
-							block->getTrack()->setSelected(block->isSelected());
+							block->setSelected(!block->isSelected());
 							changeBlockSelectionEvent(block);
+							for (int t = 0; t < model->getNumTracks(); t++)
+							{
+								nle::Track* selectTrack = model->getTrack(t);
+								if (selectTrack != block->getTrack())
+									if (selectTrack->isSelected())
+									{
+										selectTrack->setSelected(false);
+										changeTrackSelectionEvent(selectTrack);
+									}
+								else
+									if (!selectTrack->isSelected())
+									{
+										selectTrack->setSelected(true);
+										changeTrackSelectionEvent(selectTrack);
+									}
+							}
+							if (block->getTrack()->isSelected() != block->isSelected())
+							{
+								block->getTrack()->setSelected(block->isSelected());
+								changeBlockSelectionEvent(block);
+							}
+							mouseHit = true;
+							// unselect the other blocks
+							for (int b2 = 0; b2 < track->getNumBlocks(); b2++)
+							{
+								nle::Block* block2 = track->getBlock(b2);
+								if (block2 != block)
+									if (block2->isSelected())
+									{
+										block2->setSelected(false);
+										changeBlockSelectionEvent(block2);
+									}
+							}
+							found = true;
+							model->setModelChanged(true);
+							redraw();
 						}
-						mouseHit = true;
-						// unselect the other blocks
-						for (int b2 = 0; b2 < track->getNumBlocks(); b2++)
-						{
-							nle::Block* block2 = track->getBlock(b2);
-							if (block2 != block)
-								if (block2->isSelected())
-								{
-									block2->setSelected(false);
-									changeBlockSelectionEvent(block2);
-								}
-						}
-						found = true;
-                        model->setModelChanged(true);
-                        redraw();
-                    }
+					}
 				}
 			}
 
@@ -1128,6 +1277,15 @@ int EditorWidget::handle(int event)
 							block->setSelected(false);
 							changeBlockSelectionEvent(block);
 						}
+						for (int m = 0; m < block->getNumMarks(); m++)
+						{
+							nle::Mark* mark = block->getMark(m);
+							if (mark->isSelected())
+							{
+								mark->setSelected(false);
+								changeMarkSelectionEvent(mark);
+							}
+						}
 					}
 				}
 			}
@@ -1152,38 +1310,41 @@ int EditorWidget::handle(int event)
 		case fltk::MOVE:
 			// if the cursor is above a block border, 
 			// then change the cursor type
-			for (int t = 0; t < model->getNumTracks(); t++)
+			if (!blockOpLocked)
 			{
-				nle::Track* track = model->getTrack(t);
-				for (int b = 0; b < track->getNumBlocks(); b++)
+				for (int t = 0; t < model->getNumTracks(); t++)
 				{
-					nle::Block* block = track->getBlock(b);
-					int bounds[4];					
-					block->getBounds(bounds[0], bounds[1], bounds[2], bounds[3]);
-					int leftMinX = bounds[0];
-					int leftMaxX = bounds[0] + 4;
-					int leftMinY = bounds[1];
-					int leftMaxY = bounds[1] + bounds[3];
+					nle::Track* track = model->getTrack(t);
+					for (int b = 0; b < track->getNumBlocks(); b++)
+					{
+						nle::Block* block = track->getBlock(b);
+						int bounds[4];					
+						block->getBounds(bounds[0], bounds[1], bounds[2], bounds[3]);
+						int leftMinX = bounds[0];
+						int leftMaxX = bounds[0] + 4;
+						int leftMinY = bounds[1];
+						int leftMaxY = bounds[1] + bounds[3];
 
-					int rightMinX = bounds[0] + bounds[2] - 4;
-					int rightMaxX = bounds[0] + bounds[2];
-					int rightMinY = bounds[1];
-					int rightMaxY = bounds[1] + bounds[3];
+						int rightMinX = bounds[0] + bounds[2] - 4;
+						int rightMaxX = bounds[0] + bounds[2];
+						int rightMinY = bounds[1];
+						int rightMaxY = bounds[1] + bounds[3];
 
 
-					if ((mousex >= leftMinX && mousex <= leftMaxX) &&
-						(mousey >= leftMinY && mousey <= leftMaxY))
-					{	
-						this->setBlockCandidate(block, true);
-						this->cursor(CURSOR_CROSS);
-						foundBorder = true;
-					}
-					else if ((mousex >= rightMinX && mousex <= rightMaxX) &&
-							 (mousey >= rightMinY && mousey <= rightMaxY))
-					{	
-						this->setBlockCandidate(block, false);
-						this->cursor(CURSOR_CROSS);
-						foundBorder = true;
+						if ((mousex >= leftMinX && mousex <= leftMaxX) &&
+							(mousey >= leftMinY && mousey <= leftMaxY))
+						{	
+							this->setBlockCandidate(block, true);
+							this->cursor(CURSOR_CROSS);
+							foundBorder = true;
+						}
+						else if ((mousex >= rightMinX && mousex <= rightMaxX) &&
+								 (mousey >= rightMinY && mousey <= rightMaxY))
+						{	
+							this->setBlockCandidate(block, false);
+							this->cursor(CURSOR_CROSS);
+							foundBorder = true;
+						}
 					}
 				}
 			}
@@ -1347,6 +1508,21 @@ void EditorWidget::changeBlockSelectionEvent(Block* block)
 
 void EditorWidget::changeTrackSelectionEvent(Track* track)
 {
+}
+
+void EditorWidget::changeMarkSelectionEvent(Mark* mark)
+{
+}
+
+
+void EditorWidget::lockBlockFunc(bool val)
+{
+	blockOpLocked = val;
+}
+
+bool EditorWidget::getBlockLockedStatus()
+{
+	return blockOpLocked;
 }
 
 }

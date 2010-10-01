@@ -60,6 +60,10 @@ class EditorWidget : public fltk::Group
 
 		virtual void changeBlockSelectionEvent(Block* block);
 		virtual void changeTrackSelectionEvent(Track* track);
+		virtual void changeMarkSelectionEvent(Mark* mark);
+
+		virtual void lockBlockFunc(bool val);
+		virtual bool getBlockLockedStatus();
 
 
 protected:
@@ -111,6 +115,8 @@ protected:
 		double viewableTimeEnd;
 		nle::Block* blockCandidate;
 		bool candidateBeginning;
+
+		bool blockOpLocked;
 };
 
 }

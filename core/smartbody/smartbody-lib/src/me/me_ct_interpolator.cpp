@@ -67,7 +67,7 @@ void MeCtInterpolator::initKeys()
 
 	// get key map
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::map<std::string, std::vector<int>>::iterator iter = mcu.panim_key_map.find(motion1->name());
+	std::map<std::string, std::vector<double>>::iterator iter = mcu.panim_key_map.find(motion1->name());
 	if (iter != mcu.panim_key_map.end())
 		_key1 = iter->second;
 	iter = mcu.panim_key_map.find(motion2->name());
@@ -75,7 +75,7 @@ void MeCtInterpolator::initKeys()
 		_key2 = iter->second;
 
 	// check key map validation
-	if (_key1.size() != _key2.size())
+	if (_key1.size() != _key2.size() || _key1.size() == 1 || _key2.size() == 1)
 	{
 		_key1.clear();
 		_key2.clear();
@@ -86,9 +86,9 @@ void MeCtInterpolator::initKeys()
 		for (size_t i = 0; i < _key1.size(); i++)
 		{
 			if (_key1[i] < 0)						_key1[i] = 0;
-			if (_key1[i] > motion1->frames() - 1)	_key1[i] = motion1->frames() - 1;
+			if (_key1[i] > motion1->duration())		_key1[i] = motion1->duration();
 			if (_key2[i] < 0)						_key2[i] = 0;
-			if (_key2[i] > motion2->frames() - 1)	_key2[i] = motion2->frames() - 1;
+			if (_key2[i] > motion2->duration())		_key2[i] = motion2->duration();
 		}
 	}
 
@@ -96,22 +96,16 @@ void MeCtInterpolator::initKeys()
 	{
 		_key1.push_back(0);
 		_key2.push_back(0);
-		_key1.push_back(motion1->frames() - 1);
-		_key2.push_back(motion2->frames() - 1);
+		_key1.push_back(motion1->duration());
+		_key2.push_back(motion2->duration());
 	}
 }
 
 void MeCtInterpolator::initDuration()
 {
 	// init duration - has to happen after init keys
-	double dur1 = _child1->controller_duration();
-	double dur2 = _child2->controller_duration();
-
-	MeCtMotion* motionCt1 = dynamic_cast<MeCtMotion*> (_child1);
-	MeCtMotion* motionCt2 = dynamic_cast<MeCtMotion*> (_child2);
-
-	dur1 *= double(_key1[_key1.size() - 1] - _key1[0]) / double(motionCt1->motion()->frames() - 1);
-	dur2 *= double(_key2[_key2.size() - 1] - _key2[0]) / double(motionCt2->motion()->frames() - 1);
+	double dur1 = _key1[_key1.size() - 1] - _key1[0];
+	double dur2 = _key2[_key2.size() - 1] - _key2[0];
 
 	_duration = dur1 * _paramValue + dur2 * (1 - _paramValue);
 }
@@ -124,8 +118,21 @@ void MeCtInterpolator::controller_map_updated()
 
 bool MeCtInterpolator::controller_evaluate(double t, MeFrameData& frame)
 {
+	// update the weight and duration 
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	float weight;
+	if (mcu.is_fixed_weight)	weight = _paramValue;
+	else						weight = mcu.panim_weight;
+
+	if (!mcu.is_fixed_weight)
+	{
+		double d1 = _key1[_key1.size() - 1] - _key1[0];
+		double d2 = _key2[_key2.size() - 1] - _key2[0];
+		_duration = d1 * weight + d2 * (1 - weight);
+	}
+
 	bool continuing = true;
-	if (_loop)	// not working now
+	if (_loop)
 	{
 		double x = t/_duration;
 		if (x > 1.0)
@@ -134,17 +141,13 @@ bool MeCtInterpolator::controller_evaluate(double t, MeFrameData& frame)
 	else
 		continuing = t < _duration;
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	float weight;
-	if (mcu.is_fixed_weight)	weight = _paramValue;
-	else						weight = mcu.panim_weight;
+
 
 	// variable and pre-processing
 	MeCtMotion* motionCt1 = dynamic_cast<MeCtMotion*> (_child1);
 	MeCtMotion* motionCt2 = dynamic_cast<MeCtMotion*> (_child2);
 	SkMotion* motion1 = motionCt1->motion();
 	SkMotion* motion2 = motionCt2->motion();
-
 	SrBuffer<float> buffer1;
 	SrBuffer<float> buffer2;
 	buffer1.size(frame.buffer().size());
@@ -156,8 +159,8 @@ bool MeCtInterpolator::controller_evaluate(double t, MeFrameData& frame)
 	double dur = 0.0;
 	double dur1 = 0.0;
 	double dur2 = 0.0;
-	double t1_offset = _key1[0] * delta_t1;
-	double t2_offset = _key2[0] * delta_t2;
+	double t1_offset = _key1[0];
+	double t2_offset = _key2[0];
 	double t_offset = t1_offset * weight + t2_offset * (1 - weight);
 	double t_offset_absolute = t_offset;
 
@@ -167,16 +170,16 @@ bool MeCtInterpolator::controller_evaluate(double t, MeFrameData& frame)
 	{
 		if (i != 0)
 		{
-			t1_offset = _key1[i - 1] * delta_t1;
-			t2_offset = _key2[i - 1] * delta_t2;
+			t1_offset = _key1[i - 1];
+			t2_offset = _key2[i - 1];
 			t_offset = t1_offset * weight + t2_offset * (1 - weight);
 		}
-		double t_absolute = _key1[i] * delta_t1 * weight + _key2[i] * delta_t2 * (1 - weight);
+		double t_absolute = _key1[i] * weight + _key2[i] * (1 - weight);
 		if (t <= t_absolute - t_offset_absolute)
 		{
 			dur = t_absolute - t_offset;
-			dur1 = _key1[i] * delta_t1 - t1_offset;
-			dur2 = _key2[i] * delta_t2 - t2_offset;
+			dur1 = _key1[i] - t1_offset;
+			dur2 = _key2[i] - t2_offset;
 			warningFlag = true;
 			break;
 		}

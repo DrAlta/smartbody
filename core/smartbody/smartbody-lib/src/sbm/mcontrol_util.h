@@ -151,7 +151,7 @@ class mcuCBHandle	{
 		// parameterized animation engine paramters
 		bool		is_fixed_weight;
 		float		panim_weight;
-		std::map<std::string, std::vector<int>>	panim_key_map;
+		std::map<std::string, std::vector<double>>	panim_key_map;
 
 		TimeRegulator	*internal_timer_p;
 		TimeRegulator	*external_timer_p;

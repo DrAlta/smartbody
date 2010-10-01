@@ -78,6 +78,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bmlviewer", "core\smartbody\sbm-ui\bmlviewer\visualc9\bmlviewer.vcproj", "{EFB27DF2-CE03-4A6E-B5E0-ADBB430E2708}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "panimationviewer", "core\smartbody\sbm-ui\panimationviewer\visualc9\visualc9.vcproj", "{7BB15076-9AA3-40CC-9D6A-949C87ECCF81}"
+	ProjectSection(ProjectDependencies) = postProject
+		{EFB27DF2-CE03-4A6E-B5E0-ADBB430E2708} = {EFB27DF2-CE03-4A6E-B5E0-ADBB430E2708}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

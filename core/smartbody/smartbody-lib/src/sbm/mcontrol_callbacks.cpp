@@ -537,7 +537,7 @@ int mcu_panimationviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					int err = mcu_p->open_panimation_viewer( width, height, px, py );
 					return( err );
 				} else {
-					int err = mcu_p->open_panimation_viewer( 300, 200, 100, 100 );
+					int err = mcu_p->open_panimation_viewer( 800, 600, 50, 50 );
 					return( err );
 				}
 			}
@@ -576,11 +576,11 @@ int mcu_panim_keys_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		{
 			if (strcmp(nextToken, "keys") == 0)
 			{
-				std::vector<int> keyContainer;
+				std::vector<double> keyContainer;
 				int keySize = atoi(args.read_token());
 				for (int i = 0; i < keySize; i++)
 				{
-					keyContainer.push_back(atoi(args.read_token()));
+					keyContainer.push_back(atof(args.read_token()));
 					// check whether is ascending order
 					if (i != 0)
 						if (keyContainer[i] < keyContainer[i - 1])
