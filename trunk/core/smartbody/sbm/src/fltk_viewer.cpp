@@ -159,6 +159,10 @@ static Fl_Menu_Item MenuTable[] =
          { "&terrain wireframe",  0, MCB, CMD(CmdTerrainWireframe),  FL_MENU_RADIO },
          { "&terrain",  0, MCB, CMD(CmdTerrain),  FL_MENU_RADIO },
          { 0 },
+   { "&eye beams", 0, 0, 0, FL_SUBMENU },
+         { "&no eye beams",   0, MCB, CMD(CmdNoEyeBeams),    FL_MENU_RADIO },
+         { "&eye beams",  0, MCB, CMD(CmdEyeBeams),  FL_MENU_RADIO },
+         { 0 },
    { 0 }
  };
 
@@ -196,6 +200,7 @@ class FltkViewerData
    FltkViewer::CharacterMode charactermode; // render mode
    FltkViewer::ShadowMode shadowmode;     // shadow mode
    FltkViewer::terrainMode terrainMode;     // terrain mode
+   FltkViewer::EyeBeamMode eyeBeamMode;     // eye beam mode
 
    bool iconized;      // to stop processing while the window is iconized
    bool statistics;    // shows statistics or not
@@ -254,6 +259,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->charactermode = ModeShowGeometry;
    _data->shadowmode = ModeNoShadows;
    _data->terrainMode = ModeTerrain;
+   _data->eyeBeamMode = ModeNoEyeBeams;
 
    _data->iconized    = false;
    _data->statistics  = false;
@@ -372,6 +378,10 @@ void FltkViewer::menu_cmd ( MenuCmd s )
       case CmdTerrainWireframe : _data->terrainMode = ModeTerrainWireframe;
                        break;
       case CmdTerrain : _data->terrainMode = ModeTerrain;
+                       break;
+	  case CmdNoEyeBeams  : _data->eyeBeamMode = ModeNoEyeBeams;             
+                       break;
+      case CmdEyeBeams: _data->eyeBeamMode = ModeEyeBeams;
                        break;
       case CmdBoundingBox : SR_SWAPB(_data->boundingbox); 
                             if ( _data->boundingbox ) update_bbox();
@@ -823,6 +833,8 @@ void FltkViewer::draw()
 	//   if (gridList == -1)
 	//	   initGridList();
 	   drawGrid();
+
+	drawEyeBeams();
 
 	_data->fcounter.stop();
 
@@ -1582,6 +1594,49 @@ void FltkViewer::drawGrid()
 	glPopAttrib();
 }
 
+void FltkViewer::drawEyeBeams()
+{
+	if (_data->eyeBeamMode == ModeNoEyeBeams)
+		return;
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	srHashMap<SbmCharacter>& character_map = mcu.character_map;
+	character_map.reset();
+	SbmCharacter* character = character_map.next();
+
+	while ( character )
+	{
+		character->skeleton_p->update_global_matrices();
+		SkJoint* eyeRight = character->skeleton_p->search_joint("eyeball_right");
+		if (eyeRight)
+		{
+			SrMat gmat = eyeRight->gmat();
+			glPushMatrix();
+			glMultMatrixf((const float*) gmat);
+			glColor3f(1.0, 0.0, 0.0);
+			glBegin(GL_LINES);
+			glVertex3f(0, 0, 0);
+			glVertex3f(0, 0, 100);
+			glEnd();
+			glPopMatrix();
+		}
+		SkJoint* eyeLeft = character->skeleton_p->search_joint("eyeball_left");
+		if (eyeLeft)
+		{
+			SrMat gmat = eyeLeft->gmat();
+			glPushMatrix();
+			glMultMatrixf((const float*) gmat);
+			glColor3f(1.0, 0.0, 0.0);
+			glBegin(GL_LINES);
+			glVertex3f(0, 0, 0);
+			glVertex3f(0, 0, 100);
+			glEnd();
+			glPopMatrix();
+		}
+		character = character_map.next();
+	}
+
+}
 
 
 //== Viewer Factory ========================================================

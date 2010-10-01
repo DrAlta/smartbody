@@ -76,6 +76,10 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 					   ModeTerrain,
                 };
 
+	enum EyeBeamMode { ModeNoEyeBeams,
+					   ModeEyeBeams
+                };
+
     enum MenuCmd { CmdHelp,
                    CmdViewAll,
                    CmdBackground,
@@ -98,6 +102,8 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdNoTerrain,
 				   CmdTerrainWireframe,
 				   CmdTerrain,
+				   CmdNoEyeBeams,
+				   CmdEyeBeams
                  };
 
    private : // internal data
@@ -208,7 +214,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 
 	void initGridList();
 	void drawGrid();
-	void drawSteeringInfo();
+	void drawEyeBeams();
 
 	int gridList;
 	float gridColor[4];
