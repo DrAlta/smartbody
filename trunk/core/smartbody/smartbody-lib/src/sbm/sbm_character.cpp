@@ -39,7 +39,7 @@
 #include "mcontrol_callbacks.h"
 #include "me_utilities.hpp"
 #include <ME/me_spline_1d.hpp>
-
+#include <ME/me_ct_interpolator.h>
 
 const bool LOG_PRUNE_CMD_TIME                        = false;
 const bool LOG_CONTROLLER_TREE_PRUNING               = false;
@@ -939,6 +939,9 @@ void prune_schedule( SbmCharacter*   actor,
 					}
 				} 
 				else if(anim_ct_type == MeCtNavigationCircle::TYPE)
+				{
+				}
+				else if(anim_ct_type == MeCtInterpolator::CONTROLLER_TYPE)
 				{
 				}
 				else {

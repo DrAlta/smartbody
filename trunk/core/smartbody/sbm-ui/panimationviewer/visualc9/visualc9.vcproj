@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\fltk2;&quot;..\..\..\smartbody-lib\src&quot;;..\..\..\..\..\lib\boost;&quot;..\..\..\..\..\lib\xerces-c\include&quot;;&quot;..\..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\..\lib\vhcl\include;..\..\..\..\..\lib\bonebus\include;..\..\..\..\..\lib\wsp\wsp\include"
+				AdditionalIncludeDirectories="..\..\..\fltk2;&quot;..\..\..\smartbody-lib\src&quot;;..\..\..\..\..\lib\boost;&quot;..\..\..\..\..\lib\xerces-c\include&quot;;&quot;..\..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\..\lib\vhcl\include;..\..\..\..\..\lib\bonebus\include;..\..\..\..\..\lib\wsp\wsp\include;..\..\bmlviewer\src"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -148,11 +148,35 @@
 	</References>
 	<Files>
 		<File
+			RelativePath="..\..\bmlviewer\src\nle\NonLinearEditor.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\bmlviewer\src\nle\NonLinearEditorWidget.h"
+			>
+		</File>
+		<File
 			RelativePath="..\src\PanimationWindow.cpp"
 			>
 		</File>
 		<File
 			RelativePath="..\src\PanimationWindow.h"
+			>
+		</File>
+		<File
+			RelativePath="..\src\ParamAnimBlock.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\src\ParamAnimBlock.h"
+			>
+		</File>
+		<File
+			RelativePath="..\src\ParamAnimEditorWidget.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\src\ParamAnimEditorWidget.h"
 			>
 		</File>
 	</Files>

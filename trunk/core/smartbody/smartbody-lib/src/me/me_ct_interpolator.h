@@ -59,8 +59,8 @@ private:
 	float _paramValue;
 	
 	// key time infomations, matching key info, ascending order
-	std::vector<int> _key1;				// key frame numbers for motion1, these got passed in
-	std::vector<int> _key2;				// key frame numbers for motion2, these got passed in
+	std::vector<double> _key1;				// key frame numbers for motion1, these got passed in
+	std::vector<double> _key2;				// key frame numbers for motion2, these got passed in
 
 	SkChannelArray _channels;
 };
