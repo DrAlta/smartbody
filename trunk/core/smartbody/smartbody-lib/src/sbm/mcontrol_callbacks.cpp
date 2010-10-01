@@ -433,6 +433,13 @@ int mcu_viewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				int err = mcu_p->open_viewer( width, height, px, py );
 				return( err );
 			}
+		}		
+		else
+		if( strcmp( view_cmd, "close" ) == 0 )	{
+			if( mcu_p->viewer_p )	{
+				mcu_p->close_viewer();
+				return( CMD_SUCCESS );
+			}
 		}
 		else
 		if( strcmp( view_cmd, "show" ) == 0 )	{
@@ -1537,8 +1544,39 @@ int mcu_character_init(
 	}
 
 	// Only initialize face_neutral if -facebone is enabled
-	SkMotion* face_neutral_p = mcu_p->net_face_bones? mcu_p->face_neutral_p : NULL;
-	err = char_p->init( skeleton_p, face_neutral_p, &mcu_p->au_motion_map, &mcu_p->viseme_map, &mcu_p->param_map, unreal_class, mcu_p->use_locomotion );
+	SkMotion* face_neutral_p = NULL;
+	AUMotionMap* auMotionMap = NULL;
+	VisemeMotionMap* visemeMotionMap = NULL;
+
+	// get the face motion mapping per character
+	std::map<std::string, FaceMotion*>::iterator faceIter = mcu_p->face_map.find(std::string(char_name));
+	if (faceIter !=  mcu_p->face_map.end())
+	{
+		FaceMotion* faceMotion = (*faceIter).second;
+		if (mcu_p->net_face_bones)
+			face_neutral_p = faceMotion->face_neutral_p;
+		auMotionMap = &faceMotion->au_motion_map;
+		visemeMotionMap = &faceMotion->viseme_map;
+	}
+	else
+	{
+		// get the default face motion mapping
+		faceIter = mcu_p->face_map.find("_default_");
+		if (faceIter !=  mcu_p->face_map.end())
+		{
+			FaceMotion* faceMotion = (*faceIter).second;
+			if (mcu_p->net_face_bones)
+				face_neutral_p = faceMotion->face_neutral_p;
+			auMotionMap = &faceMotion->au_motion_map;
+			visemeMotionMap = &faceMotion->viseme_map;
+		}
+		else
+		{
+			LOG("Couldn't find _default_ face motion mappings! Check code.");
+		}
+	}
+
+	err = char_p->init( skeleton_p, face_neutral_p, auMotionMap, visemeMotionMap, &mcu_p->param_map, unreal_class, mcu_p->use_locomotion );
 	if( err == CMD_SUCCESS ) {
 
 		if (mcu_p->use_locomotion) 
@@ -1918,6 +1956,7 @@ const char* PRINT_FACE_VISEME_SYNTAX2_HELP = "print face viseme *";
 
 
 int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
+
 	string type = args.read_token();
 	if( type.length() == 0 || type=="help" ) {
 		// No arguments => help message
@@ -1927,10 +1966,28 @@ int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return CMD_SUCCESS;
 	}
 
+	string charName = "";
+
+	// check to see if we are loading character-specific face mappings
+	std::string characterName = "_default_";
+	if (type == "char")
+	{
+		// now get the character name
+		characterName= args.read_token();
+		if (characterName == "")
+		{
+			LOG("Character name needed. Use: set face char <name> <au|viseme|neutral> <skmfile>");
+			return CMD_FAILURE;
+		}
+
+		// restore the type
+		type = args.read_token();
+	}
+
 	if( type=="au" ) {
-		return mcu_set_face_au_func( args, mcu_p );
+		return mcu_set_face_au_func( args, mcu_p, characterName );
 	} else if( type=="viseme" ) {
-		return mcu_set_face_viseme_func( args, mcu_p );
+		return mcu_set_face_viseme_func( args, mcu_p, characterName );
 	} else if( type=="neutral" ) {
 		const string motion_name = args.read_token();
 		if( motion_name.length()==0 ) {
@@ -1942,7 +1999,21 @@ int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		if (motionIter != mcu_p->motion_map.end())
 		{
 			SkMotion* motion_p = (*motionIter).second;
-			mcu_p->face_neutral_p = motion_p;
+
+			FaceMotion* faceMotion = NULL;
+			std::map<std::string, FaceMotion*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
+			if (faceMotionIter == mcu_p->face_map.end())
+			{
+				// face motion mappings for character do not yet exist - create them
+				faceMotion = new FaceMotion();
+				mcu_p->face_map.insert(std::pair<std::string, FaceMotion*>(characterName, faceMotion));
+			}
+			else
+			{
+				faceMotion = (*faceMotionIter).second;
+			}
+
+			faceMotion->face_neutral_p = motion_p;
 			return CMD_SUCCESS;
 		} else {
 			LOG("ERROR: Unknown motion \"%s\".", motion_name.c_str());
@@ -1968,10 +2039,26 @@ int mcu_print_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return CMD_SUCCESS;
 	}
 
+	// check to see if we are loading character-specific face mappings
+	std::string characterName = "_default_";
+	if (type == "char")
+	{
+		// now get the character name
+		characterName= args.read_token();
+		if (characterName == "")
+		{
+			LOG("Character name needed. Use: set face char <name> <au|viseme|neutral> <skmfile>");
+			return CMD_FAILURE;
+		}
+
+		// restore the type
+		type = args.read_token();
+	}
+
 	if( type=="au" ) {
-		return mcu_print_face_au_func( args, mcu_p );
+		return mcu_print_face_au_func( args, mcu_p, characterName );
 	} else if( type=="viseme" ) {
-		return mcu_print_face_viseme_func( args, mcu_p );
+		return mcu_print_face_viseme_func( args, mcu_p, characterName );
 	} else if( type=="neutral" ) {
 		LOG("UNIMPLEMENTED");
 		return CMD_FAILURE;
@@ -1986,7 +2073,7 @@ int mcu_print_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
  *  Syntax:
  *		set face au <unit-number> [left|right] <motion-name>
  */
-int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
+int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string characterName ) {
 	string unit_str = args.read_token();
 	if( unit_str.length()==0 ) {
 		// No arguments => help message
@@ -2033,8 +2120,21 @@ int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	}
 	SkMotion* motion =(*motionIter).second;
 
+	FaceMotion* faceMotion = NULL;
+	std::map<std::string, FaceMotion*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
+	if (faceMotionIter == mcu_p->face_map.end())
+	{
+		// face motion mappings for character do not yet exist - create them
+		faceMotion = new FaceMotion();
+		mcu_p->face_map.insert(std::pair<std::string, FaceMotion*>(characterName, faceMotion));
+	}
+	else
+	{
+		faceMotion = (*faceMotionIter).second;
+	}
+
 	AUMotionPtr au;
-	AUMotionMap& au_map = mcu_p->au_motion_map;
+	AUMotionMap& au_map = faceMotion->au_motion_map;
 	AUMotionMap::iterator pos = au_map.find(unit);
 	if( pos == au_map.end() ) {
 		switch( side ) {
@@ -2119,7 +2219,7 @@ inline void print_au( const int unit, const AUMotionPtr au ) {
  *     print face au <unit-number>
  *     print face au *
  */
-int mcu_print_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
+int mcu_print_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string characterName ) {
 	const int ALL_ACTION_UNITS = 0;  // Marker
 
 	string unit_str = args.read_token();
@@ -2146,8 +2246,21 @@ int mcu_print_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		}
 	}
 
+	FaceMotion* faceMotion = NULL;
+	std::map<std::string, FaceMotion*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
+	if (faceMotionIter == mcu_p->face_map.end())
+	{
+		// face motion mappings for character do not yet exist
+		LOG("Character %s does not yet have any AU mappings for the face.", characterName.c_str());
+		return CMD_FAILURE;
+	}
+	else
+	{
+		faceMotion = (*faceMotionIter).second;
+	}
+
 	AUMotionPtr au;
-	AUMotionMap& au_map = mcu_p->au_motion_map;
+	AUMotionMap& au_map = faceMotion->au_motion_map;
 	AUMotionMap::iterator pos;
 	AUMotionMap::iterator end = au_map.end();
 	if( unit == ALL_ACTION_UNITS ) {
@@ -2174,7 +2287,7 @@ int mcu_print_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
  *  Syntax: set face viseme <viseme symbol> <motion-name>
  */
 
-int mcu_set_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
+int mcu_set_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string characterName ) {
 	string viseme = args.read_token();
 	if( viseme.length() == 0 ) {
 		// No arguments => help message
@@ -2198,7 +2311,21 @@ int mcu_set_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return CMD_FAILURE;
 	}
 	SkMotion* motion = (*motionIter).second;
-	VisemeMotionMap& viseme_map = mcu_p->viseme_map;
+
+	FaceMotion* faceMotion = NULL;
+	std::map<std::string, FaceMotion*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
+	if (faceMotionIter == mcu_p->face_map.end())
+	{
+		// face motion mappings for character do not yet exist
+		LOG("Character %s does not yet have any AU mappings for the face.", characterName.c_str());
+		return CMD_FAILURE;
+	}
+	else
+	{
+		faceMotion = (*faceMotionIter).second;
+	}
+
+	VisemeMotionMap& viseme_map = faceMotion->viseme_map;
 	VisemeMotionMap::iterator pos = viseme_map.find( viseme );
 	if( pos != viseme_map.end() ) {
 		LOG("WARNING: Overwriting viseme \"%s\" motion mapping.", viseme.c_str());
@@ -2227,7 +2354,7 @@ void print_viseme( const string& viseme, const SkMotion* motion ) {
  *     print face viseme *
  */
 
-int mcu_print_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
+int mcu_print_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p,std::string characterName ) {
 	string viseme = args.read_token();
 	if( viseme.length() == 0 ) {
 		// No arguments => help message
@@ -2237,7 +2364,16 @@ int mcu_print_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return CMD_SUCCESS;
 	}
 
-	VisemeMotionMap& viseme_map = mcu_p->viseme_map;
+	FaceMotion* faceMotion = NULL;
+	std::map<std::string, FaceMotion*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
+	if (faceMotionIter == mcu_p->face_map.end())
+	{
+		// face motion mappings for character do not yet exist
+		LOG("Character %s does not yet have any viseme mappings for the face.", characterName.c_str());
+		return CMD_FAILURE;
+	}
+
+	VisemeMotionMap& viseme_map = faceMotion->viseme_map;
 	VisemeMotionMap::iterator pos;
 	VisemeMotionMap::iterator end = viseme_map.end();
 	if( viseme=="*" ) {
@@ -4139,3 +4275,5 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	}
 	return CMD_SUCCESS;
 }
+
+

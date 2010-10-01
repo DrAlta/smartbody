@@ -530,9 +530,9 @@ int main( int argc, char **argv )	{
 //	SBMWindow* sbmWindow = new SBMWindow(100, 100, 640, 480, "SmartBody");
 //	sbmWindow->show();
 //	CommandWindow* commandWindow = new CobmWindow->getCommandWindow();
-//	CommandWindow* commandWindow = new CommandWindow(100, 100, 640, 480, "Commands");
-//	commandWindow->show();
-//	vhcl::Log::g_log.AddListener(commandWindow);
+	//CommandWindow* commandWindow = new CommandWindow(100, 100, 640, 480, "Commands");
+	//commandWindow->show();
+	//vhcl::Log::g_log.AddListener(commandWindow);
 	//FltkViewer* viewer = new FltkViewer(100, 150, 640, 480, "SmartBody");
 
 	// register the log listener

@@ -110,7 +110,6 @@ mcuCBHandle::mcuCBHandle()
 	camera_p( NULL ),
 	root_group_p( new SrSnGroup() ),
 	height_field_p( NULL ),
-	face_neutral_p( NULL ),
 	logger_p( new joint_logger::EvaluationLogger() ),
 	test_character_default( "" ),
 	test_recipient_default( "ALL" ),
@@ -132,6 +131,9 @@ mcuCBHandle::mcuCBHandle()
 	// TODO: this needs to have a unique name so that multiple sbm
 	// processes will be identified differently
 	theWSP->init( "SMARTBODY" );
+
+	// initialize the default face motion mappings
+	face_map["_default_"] = new FaceMotion();
 }
 
 /////////////////////////////////////////////////////////////
@@ -223,14 +225,27 @@ FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
  *  Used by reset and destructor.
  */
 void mcuCBHandle::clear( void )	{
-	VisemeMotionMap::iterator vis_it = viseme_map.begin();
-	VisemeMotionMap::iterator vis_end = viseme_map.end();
-	for( ; vis_it != vis_end; ++vis_it ) {
-		vis_it->second->unref();  // unref SkMotion
-	}
-	viseme_map.clear();
 
-	au_motion_map.clear();
+	for (std::map<std::string, FaceMotion*>::iterator iter = this->face_map.begin();
+		iter != face_map.end();
+		iter++)
+	{
+		FaceMotion* face = (*iter).second;
+		VisemeMotionMap::iterator vis_it = face->viseme_map.begin();
+		VisemeMotionMap::iterator vis_end = face->viseme_map.end();
+		for( ; vis_it != vis_end; ++vis_it ) {
+			vis_it->second->unref();  // unref SkMotion
+		}
+		face->viseme_map.clear();
+		face->au_motion_map.clear();
+
+		
+		if (face->face_neutral_p)
+		{
+			face->face_neutral_p->unref();
+			face->face_neutral_p = NULL;
+		}
+	}
 
 	for (size_t x = 0; x < this->cameraTracking.size(); x++)
 	{
@@ -356,11 +371,6 @@ void mcuCBHandle::clear( void )	{
 		root_group_p = NULL;
 	}
 
-	if( face_neutral_p ) {
-		face_neutral_p->unref();
-		face_neutral_p = NULL;
-	}
-
 	if( logger_p ) {
 		logger_p->unref();
 		logger_p = NULL;
@@ -372,6 +382,7 @@ void mcuCBHandle::clear( void )	{
 		bonebus.CloseConnection();
 
 	theWSP->shutdown();
+
 }
 
 /////////////////////////////////////////////////////////////
@@ -468,6 +479,7 @@ int mcuCBHandle::remove_scene( SrSnGroup *scene_p )	{
 }
 
 void mcuCBHandle::update( void )	{
+
 
 #if 0
 	static int c = 3;
