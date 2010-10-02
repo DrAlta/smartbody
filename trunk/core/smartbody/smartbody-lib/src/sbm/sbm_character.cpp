@@ -1661,7 +1661,39 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			}
 		}
 		return CMD_SUCCESS;
-	} else if( char_cmd=="reholster" ) {
+	} 
+	else 
+	if( char_cmd=="gazefade" ) {
+
+		string fade_cmd = args.read_token();
+		bool fade_in;
+		if( fade_cmd=="in" ) {
+			fade_in = true;
+		}
+		else
+		if( fade_cmd=="out" ) {
+			fade_in = false;
+		}
+		else	{
+			return( CMD_NOT_FOUND );
+		}
+		float interval = args.read_float();
+		int n = character->get_num_gaze_controllers();
+		for( int i = 0; i < n; i++ )	{
+			MeCtGaze *gaze_p = character->get_gaze_controller( i );
+			if( gaze_p )	{	
+				if( fade_in )	{
+					gaze_p->set_fade_in( interval );
+				}
+				else	{
+					gaze_p->set_fade_out( interval );
+				}
+			}
+		}
+		return CMD_SUCCESS;
+	} 
+	else 
+	if( char_cmd=="reholster" ) {
 		if( all_characters ) {
 			mcu_p->character_map.reset();
 			while( character = mcu_p->character_map.next() ) {
@@ -1676,10 +1708,12 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				return character->reholster_quickdraw( mcu_p );
 			}
 		}
-	} else {
-		return CMD_NOT_FOUND;
 	}
+	return CMD_NOT_FOUND;
 }
+
+	
+
 
 int SbmCharacter::remove_from_scene( const char* char_name ) {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();

@@ -188,7 +188,10 @@ protected:
 	 *  Chose list so that iterators remain consistent while adding and 
 	 *  removing surrounding tracks.
 	 */
+
+public: // temporary...
     VecOfTrack _tracks;
+protected:
 
 	/**
 	 *  Union of channels for all tracks.

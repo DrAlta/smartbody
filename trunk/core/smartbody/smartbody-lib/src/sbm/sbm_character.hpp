@@ -44,6 +44,7 @@
 #include <ME/me_ct_periodic_replay.hpp>
 #include <sbm/me_ct_face.h>
 #include <sbm/me_ct_eyelid.h>
+#include <sbm/me_ct_gaze.h>
 #define MeCtSchedulerClass MeCtScheduler2
 
 #if(1) // Use primary locomotion controller
@@ -200,6 +201,23 @@ public:
 
 	int reholster_quickdraw( mcuCBHandle *mcu_p );  // HACK to initiate reholster on all QuickDraw controllers
 
+	// HACK to enable access to gaze controllers
+	int get_num_gaze_controllers( void )	{
+		return( gaze_sched_p->_tracks.size() );
+	}
+	MeCtGaze* get_gaze_controller( int i )	{
+		if( i < 0 )	{
+			return( NULL );
+		}
+		int n = get_num_gaze_controllers();
+		if( i < n )	{
+			MeCtScheduler2::TrackPtr t_p = gaze_sched_p->_tracks[ i ]; // protected member: write an access function...
+			MeController* ct_p = t_p->animation_ct();
+			MeCtGaze* gaze_p = dynamic_cast<MeCtGaze*> (ct_p);
+			return( gaze_p );
+		}
+		return( NULL );
+	}
 
 	int print_controller_schedules();
 

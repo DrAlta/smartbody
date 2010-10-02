@@ -273,7 +273,7 @@ int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			int ret = begin_sequence( seq_name, mcu_p );
 			return ret;
 		}
-		else	{
+		else
 		if( strcmp( seq_cmd, "at" ) == 0 )	{
 		
 			srCmdSeq *seq_p = mcu_p->pending_seq_map.lookup( seq_name );
@@ -302,30 +302,18 @@ int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			seq_p->print( stdout );
 		}
 		else
-		if( strcmp( seq_cmd, "abort" ) == 0 )	{
+		if( ( strcmp( seq_cmd, "abort" ) == 0 )||( strcmp( seq_cmd, "delete" ) == 0 ) )	{
 			int result = mcu_p->abort_seq( seq_name );
 			if( result == CMD_NOT_FOUND )	{
-				LOG( "mcu_sequence_func ERR: abort: '%s' NOT FOUND\n", seq_name ); 
+				LOG( "mcu_sequence_func ERR: abort|delete: '%s' NOT FOUND\n", seq_name ); 
 			}
 			return( result );
 		}
-		else
-		if( strcmp( seq_cmd, "delete" ) == 0 )	{
-			int result = mcu_p->abort_seq( seq_name );
-			if( result == CMD_NOT_FOUND )	{
-				LOG( "mcu_sequence_func ERR: delete: '%s' NOT FOUND\n", seq_name ); 
-			}
-			return( result );
+		else {
+			return( CMD_NOT_FOUND );
 		}
-		else
-		{
-			return( CMD_FAILURE );
-		}
-		}
-		
 		return( CMD_SUCCESS );
 	}
-
 	return( CMD_FAILURE );
 }
 
