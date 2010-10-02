@@ -106,7 +106,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\..\..\fltk2;&quot;..\..\..\smartbody-lib\src&quot;;..\..\..\..\..\lib\boost;&quot;..\..\..\..\..\lib\xerces-c\include&quot;;&quot;..\..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\..\lib\vhcl\include;..\..\..\..\..\lib\bonebus\include;..\..\..\..\..\lib\wsp\wsp\include"
+				AdditionalIncludeDirectories="..\..\..\fltk2;&quot;..\..\..\smartbody-lib\src&quot;;..\..\..\..\..\lib\boost;&quot;..\..\..\..\..\lib\xerces-c\include&quot;;&quot;..\..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\..\lib\vhcl\include;..\..\..\..\..\lib\bonebus\include;..\..\..\..\..\lib\wsp\wsp\include;..\..\bmlviewer\src"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
