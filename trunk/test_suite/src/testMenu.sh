@@ -1,6 +1,11 @@
 #!/bin/sh
-
 exitFlag=0
+if [ $1 = "edit" ]; then
+  while [ $# -gt 0 ]
+  do
+    shift
+  done
+fi
 numInput=$#
 
 while [ $exitFlag = 0 ]

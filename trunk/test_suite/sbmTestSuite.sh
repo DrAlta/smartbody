@@ -27,12 +27,15 @@ else
 fi
 echo ""
 
-if [ $# -eq 0 ]; then
-  echo -n "Press any key to continue..."
-  read -n 1 -s
-fi
+echo -n "Press any key to continue..."
+read -n 1 -s
 
 if [ "$configFlag" = "1" ]; then
-  source ./src/testMenu.sh $@
-fi 
-
+  if [ $# -eq 0 ]; then
+    source ./src/testMenu.sh 2
+  else
+    if [ $1 = "edit" ]; then
+      source ./src/testMenu.sh
+    fi
+  fi
+fi
