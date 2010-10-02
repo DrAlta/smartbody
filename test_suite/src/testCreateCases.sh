@@ -71,7 +71,7 @@ do
     touch $scriptName
     echo "#!/bin/sh" >> $scriptName
     winInputDir=`cygpath -m $INPUTDIR`
-    echo "SBMINPUT=\"-seqpath $winInputDir/$folderName -seq $folderName.seq\"" >> $scriptName  
+    echo "SBMINPUT=\"-seqpath ../../../../test_suite/input/$folderName -seq $folderName.seq\"" >> $scriptName  
     imgCounter=0
     while [ $imgCounter -lt $imgNum ]; do
       (( imgCounter ++ ))

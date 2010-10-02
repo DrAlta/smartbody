@@ -9,12 +9,14 @@ Usage of SBM Testing System
 5. Exit
 
 * Run sbmTestSuite.sh
-  If no input parameter, system would go to main menu, run in NORMAL MODE
+  If no input parameter, system would go to menu 2, running all the tests exist
+  If there is input parameter, system would go to main menu only if the input parameter is "edit"
   
-  If there are input parameters, they should be in the following format
-    ./sbmTestSuite.sh 1 test.seq
-  first parameter indicate the operation, all the left is the parameters for that particular operation
-  This is run in BATCH MODE
+//  This is for the old version - replaced by above 2010-10-01 Yuyu Xu
+//  If there are input parameters, they should be in the following format
+//    ./sbmTestSuite.sh 1 test.seq
+//  first parameter indicate the operation, all the left is the parameters for that particular operation
+//  This is run in BATCH MODE
 
 * How to use different functions
   0. Input parameters' format: <casename1> <casename2> <casename3>...
