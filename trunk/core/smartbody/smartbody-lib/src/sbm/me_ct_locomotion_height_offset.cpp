@@ -25,8 +25,11 @@
 
 MeCtLocomotionHeightOffset::MeCtLocomotionHeightOffset()
 {
-	height_offset = 0.0f;
+	target_height_offset = 0.0f;
 	translation_base_joint_height = 0.0f;
+	acceleration = 20.0f;
+	height_offset = 0.0f;
+	height_offset_initialized = false;
 }
 
 MeCtLocomotionHeightOffset::~MeCtLocomotionHeightOffset()
@@ -51,8 +54,6 @@ void MeCtLocomotionHeightOffset::update_supporting_joint_orientation()
 	for(int i = 0; i < limb_list->size(); ++i)
 	{
 		limb = limb_list->get(i);
-		//limb->ik_terrain_normal = limb->ik_terrain_target_normal;
-		//continue;
 		if(limb->ik_terrain_normal == limb->ik_terrain_target_normal) continue;
 		if(limb->ik_terrain_normal.iszero())
 		{
@@ -62,18 +63,16 @@ void MeCtLocomotionHeightOffset::update_supporting_joint_orientation()
 		if(dot(limb->ik_terrain_normal, limb->ik_terrain_target_normal) >= cos(0.02f))
 		{
 			limb->ik_terrain_normal = limb->ik_terrain_target_normal;
-			//printf("shit");
 			continue;
 		}
 		axis = cross(limb->ik_terrain_normal, limb->ik_terrain_target_normal);
 		mat.rot(axis, 0.02f);
 		limb->ik_terrain_normal = limb->ik_terrain_normal * mat;
-		//printf("OK");
 		limb->ik_terrain_normal.normalize();
 	}
 }
 
-void MeCtLocomotionHeightOffset::update_height_offset(SrMat& parent_mat, float base_height_displacement)
+void MeCtLocomotionHeightOffset::update_height_offset(SrMat& parent_mat, float base_height_displacement, float time)
 {
 	SrVec wpos;
 	float normal[3];
@@ -81,7 +80,7 @@ void MeCtLocomotionHeightOffset::update_height_offset(SrMat& parent_mat, float b
 	
 	int min_index = -1;
 	float min_height = 0.0f;
-	height_offset = 0.0f;
+	target_height_offset = 0.0f;
 
 	SrVec pos;
 	SrVec base_pos;
@@ -106,9 +105,23 @@ void MeCtLocomotionHeightOffset::update_height_offset(SrMat& parent_mat, float b
 			min_height = height[i];
 		}
 	}
-	height_offset = -(base_pos.y - min_height - translation_base_joint_height - base_height_displacement);
 
 	update_supporting_joint_orientation();
+
+	target_height_offset = -(base_pos.y - min_height - translation_base_joint_height - base_height_displacement);
+	
+	height_offset = target_height_offset;
+	/*if(!height_offset_initialized)
+	{
+		height_offset = target_height_offset;
+		height_offset_initialized = true;
+	}
+
+	float delta = acceleration * time;
+	if(abs(target_height_offset - height_offset) < delta) height_offset = target_height_offset;
+	else if(target_height_offset > height_offset) height_offset += delta;
+	else if(target_height_offset < height_offset) height_offset -= delta;*/
+
 	//printf("\n%f", height_offset);
 	free(height);
 }
@@ -152,3 +165,7 @@ float MeCtLocomotionHeightOffset::get_height_offset()
 	return height_offset;
 }
 
+void MeCtLocomotionHeightOffset::set_target_height_offset(float offset)
+{
+	target_height_offset = offset;
+}

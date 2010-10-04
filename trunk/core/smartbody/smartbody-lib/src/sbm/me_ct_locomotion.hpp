@@ -32,6 +32,7 @@
 #include "me_ct_locomotion_joint_info.hpp"
 #include "me_ct_locomotion_height_offset.hpp"
 #include "me_ct_locomotion_IK.hpp"
+#include "me_ct_locomotion_balance.hpp"
 
 class MeCtLocomotionLimb;
 
@@ -72,6 +73,8 @@ protected:
 
 	MeCtLocomotionHeightOffset height_offset;
 
+	MeCtLocomotionBalance balance;
+
 	MeCtLocomotionSpeedAccelerator speed_accelerator; // to be moved to MeCtLocomotionLimb
 
 	SkChannelArray  request_channels;
@@ -86,13 +89,9 @@ protected:
 
 	SrMat mat;
 
-
-
 	bool is_valid;  // All necessary channels are present
 
 	bool joints_indexed;
-
-	
 
 	//temp
 	SrArray<SrQuat> t_joint_quats1;

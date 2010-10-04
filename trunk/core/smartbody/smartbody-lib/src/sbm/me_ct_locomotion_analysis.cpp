@@ -125,7 +125,8 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 	{
 		limb = _ct_locomotion->get_limb_list()->get(i);
 		limb->set_height_bound(0.5f);
-		analyze_standing(limb, standing);
+		//analyze_standing(limb, standing);
+		analyze_standing(limb, NULL);
 		limb->walking_list.get(limb->walking_list.size()-1)->global_info = info;
 	}
 	SkJoint* joint = NULL;
@@ -197,7 +198,7 @@ void MeCtLocomotionAnalysis::analyze_standing(MeCtLocomotionLimb* limb, SkMotion
 			analyze_standing_core(limb, skeleton);
 		}
 	}
-	else // if default posture (usually in 'T' shape)
+	else // if default posture (usually in 'T' pose)
 	{
 		analyze_standing_core(limb, skeleton);
 	}
@@ -214,11 +215,11 @@ void MeCtLocomotionAnalysis::analyze_standing(MeCtLocomotionLimb* limb, SkMotion
 	limb->pos_buffer.capacity(limb->joint_num);
 	limb->pos_buffer.size(limb->joint_num);
 	anim->init_quat_buffers(limb->joint_num);
-	anim->get_frame(0.0f, limb->limb_base_name, &(limb->limb_joint_info.joint_index));
+	/*anim->get_frame(0.0f, limb->limb_base_name, &(limb->limb_joint_info.joint_index));
 	for(int i = 0; i < _ct_locomotion->limb_list.size(); ++i)
 	{
 		_ct_locomotion->limb_list.get(i)->direction_planner.ref_time_num = anim->get_timing_space()->get_ref_time_num();
-	}
+	}*/
 	limb->blended_anim.init_quat_buffers(limb->joint_num);
 	//limb->init_skeleton(standing, standing);
 }
@@ -281,6 +282,7 @@ void MeCtLocomotionAnalysis::analyze_standing_core(MeCtLocomotionLimb* limb, SkS
 
 	mat = joint->gmat();
 	this->_ct_locomotion->translation_joint_height = mat.get(13)-ground_height;
+	//this->_ct_locomotion->translation_joint_height = 103.0f;
 
 }
 

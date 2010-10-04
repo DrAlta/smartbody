@@ -162,7 +162,7 @@ void MeCtLocomotionLimbDirectionPlanner::update_anim_mode(MeCtLocomotionLimbAnim
 	anim->get_timing_space()->set_mode(mode);
 }
 
-void MeCtLocomotionLimbDirectionPlanner::update_direction(double time_interval, float* space_time, bool dominant_limb)
+void MeCtLocomotionLimbDirectionPlanner::update_direction(double time_interval, float* space_time, int ref_time_num, bool dominant_limb)
 {
 	if(!automatic) return;
 	//if(last_space_time == -1.0f) last_space_time = *space_time;
@@ -211,11 +211,11 @@ void MeCtLocomotionLimbDirectionPlanner::update_direction(double time_interval, 
 		}
 	}
 
-	update_space_time(space_time);
+	update_space_time(space_time, ref_time_num);
 
 }
 
-void MeCtLocomotionLimbDirectionPlanner::update_space_time(float* space_time)
+void MeCtLocomotionLimbDirectionPlanner::update_space_time(float* space_time, int ref_time_num)
 {
 	if(direction_inversed) 
 	{

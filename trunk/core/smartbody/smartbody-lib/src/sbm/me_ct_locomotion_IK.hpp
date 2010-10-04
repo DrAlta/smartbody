@@ -24,7 +24,6 @@
 #define ME_CT_LOCOMOTION_IK_HPP
 
 #include "me_ct_IK.hpp"
-#include "me_ct_locomotion_limb.hpp"
 #include "me_ct_locomotion_terrain.hpp"
 
 

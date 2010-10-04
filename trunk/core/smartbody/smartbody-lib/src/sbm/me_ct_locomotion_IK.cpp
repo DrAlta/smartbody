@@ -42,16 +42,12 @@ __forceinline void MeCtLocomotionIK::calc_target(SrVec& orientation, SrVec& offs
 	pos += offset;
 
 	float normal[3];
-
 	float height = terrain.get_height(pos.x, pos.z, normal);
 	
-	//SrVec plane_normal = SrVec(normal[0], normal[1], normal[2]);
-	//SrVec plane_point = SrVec(pos.x, height, pos.z);
-	//SrVec t = cross_point_on_plane(pos, orientation, plane_normal, plane_point);
 	SrVec t = cross_point_on_plane(pos, orientation, scenario->plane_normal, scenario->plane_point);
 	if(t.y < height) t.y = height;
-	target.set(manipulated_joint_index, -(manipulated_joint->support_joint_comp + manipulated_joint->support_joint_height)*orientation + t);
-	//if(manipulated_joint_index == 2) printf("\n(%f, %f, %f)", target.get(manipulated_joint_index).x, target.get(manipulated_joint_index).y, target.get(manipulated_joint_index).z);
+	target.set(manipulated_joint_index, -(manipulated_joint->support_joint_comp + manipulated_joint->support_joint_height)/scenario->ik_compensate_factor*orientation + t);
+
 }
 
 

@@ -229,6 +229,12 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		return CMD_SUCCESS;
 	}
 
+	if( arg == "height_offset" )
+	{
+		actor->get_locomotion_ct()->translation_joint_height = args.read_float();
+		return CMD_SUCCESS;
+	}
+
 	if( arg == "local")
 	{
 		global_direction = actor->get_locomotion_ct()->get_facing_vector();
