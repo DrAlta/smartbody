@@ -25,10 +25,16 @@
 MeCtLocomotionBalance::MeCtLocomotionBalance()
 {
 	rotational_speed = 0.5f;
+	factor = 1.0f;
 }
 
 MeCtLocomotionBalance::~MeCtLocomotionBalance()
 {
+}
+
+void MeCtLocomotionBalance::set_factor(float factor)
+{
+	this->factor = factor;
 }
 
 void MeCtLocomotionBalance::update(SrArray<MeCtLocomotionLimb*>& limb_list, SrVec& orientation, MeCtLocomotionJointInfo* nonlimb_joint_info, float facing, int translation_joint_index, float time)
@@ -39,7 +45,7 @@ void MeCtLocomotionBalance::update(SrArray<MeCtLocomotionLimb*>& limb_list, SrVe
 
 	float angle = acos(dot(normal, orientation)/(normal.len()*orientation.len()));
 
-	angle /= 4.0f;
+	angle = factor*angle/4.0f;
 
 	SrVec axis;
 	SrVec up(0.0f, 1.0f, 0.0f);

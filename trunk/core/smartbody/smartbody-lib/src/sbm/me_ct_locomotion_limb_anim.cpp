@@ -96,24 +96,6 @@ void MeCtLocomotionLimbAnim::set_anim(SkMotion* walking)
 	this->walking = walking;
 }
 
-/*void MeCtLocomotionLimbAnim::estimate_direction(int* count)
-{
-	SrVec direction(0,0,0);
-	for(int i = 0; i < displacement_list.size(); ++i)
-	{
-		if(count[i] <= 0) continue;
-		direction += *(displacement_list.get(i));
-	}
-	for(int i = 0; i < displacement_list.size(); ++i)
-	{
-		if(dot(*displacement_list.get(i), direction)<=0.0f) 
-		{
-			displacement_list.get(i)->set(0,0,0);
-			count[i] = 0;
-		}
-	}
-}*/
-
 //temp function for test, to be deleted......
 void MeCtLocomotionLimbAnim::print_info()
 {
@@ -180,16 +162,6 @@ SrVec MeCtLocomotionLimbAnim::get_base_pos()
 {
 	return base_pos;
 }
-/*int MeCtLocomotionLimbAnim::iterate_set(SkJoint* base, int index, SrArray<SrQuat>* buff)
-{
-	SrQuat q = base->quat()->value();
-	buff->set(index, q);
-	for(int i = 0; i < base->num_children(); ++i)
-	{
-		index = iterate_set(base->child(i), index+1, buff);
-	}
-	return index;
-}*/
 
 SrArray<SrQuat>* MeCtLocomotionLimbAnim::get_buffer()
 {

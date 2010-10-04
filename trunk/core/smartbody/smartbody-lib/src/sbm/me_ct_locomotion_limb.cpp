@@ -178,7 +178,6 @@ void MeCtLocomotionLimb::blend_anim(float space_time, int anim_index1, int anim_
 	anim1->get_frame(anim1->get_timing_space()->get_virtual_frame(space_time), limb_base_name, index_buff);
 	anim2->get_frame(anim2->get_timing_space()->get_virtual_frame(space_time), limb_base_name, index_buff);
 	get_blended_quat_buffer(&(limb_joint_info.quat), anim1->get_buffer(), anim2->get_buffer(), weight);
-	//r_base_pos = anim1->get_base_pos()*weight + anim2->get_base_pos()*(1.0f-weight);
 }
 
 void MeCtLocomotionLimb::manipulate_turning(SrMat& root_mat)
@@ -190,13 +189,11 @@ void MeCtLocomotionLimb::manipulate_turning(SrMat& root_mat)
 	root_mat.set(14, 0.0f);
 
 	root_mat.invert();
-	//y = root_mat*y;
 	y = y*root_mat;
-	//printf("\n%f", curr_rotation);
-	//y.normalize();
+
 	mat.rot(y, curr_rotation);
 	SrQuat quat = limb_joint_info.quat.get(0);
-	//quat = quat * mat;
+
 	quat = mat* quat;
 	limb_joint_info.quat.set(0, quat);
 }

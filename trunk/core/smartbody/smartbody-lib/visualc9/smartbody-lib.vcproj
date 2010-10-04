@@ -479,6 +479,14 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\sbm\me_ct_locomotion_quadratic_synchronizer.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_locomotion_quadratic_synchronizer.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\sbm\me_ct_locomotion_routine.cpp"
 						>
 					</File>

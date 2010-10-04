@@ -368,6 +368,11 @@ SrArray<MeCtLocomotionAnimGlobalInfo*>* MeCtLocomotion::get_anim_global_info()
 	return &anim_global_info;
 }
 
+void MeCtLocomotion::set_balance_factor(float factor)
+{
+	balance.set_factor(factor);
+}
+
 SrVec MeCtLocomotion::calc_rotational_displacement()
 {
 	SrVec v;

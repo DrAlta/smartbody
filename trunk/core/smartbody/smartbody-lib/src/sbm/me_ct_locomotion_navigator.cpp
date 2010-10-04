@@ -532,15 +532,7 @@ float MeCtLocomotionNavigator::get_turning_angle()
 void MeCtLocomotionNavigator::update_facing(MeCtLocomotionLimb* limb, bool dominant_limb)
 {
 	// when coming to stop the limbs should rotate back to original orientation.
-	/*if(local_rps == 0.0f && local_vel.len() != 0.0f) 
-	{
-		if(limb->space_time > 1.0f && limb->space_time < 2.0f) 
-		{
-			limb->curr_rotation *= 0.95f;
-			limb->rotation_record = limb->curr_rotation;
-		}
-		return;
-	}*/
+
 	if(local_vel.len() == 0.0f)
 	{
 		limb->curr_rotation *= 0.95f;

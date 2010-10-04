@@ -169,9 +169,9 @@ void MeCtLocomotionLimbDirectionPlanner::update_direction(double time_interval, 
 	if(time_interval == 0.0f || curr_direction == target_direction) return;
 
 	//if(*space_time > 1.0f && *space_time < 1.8f)
-	{
+	//{
 	//	if(dot(curr_direction-target_direction, target_direction) < 0.0f) return;
-	}
+	//}
 
 	SrMat mat;
 	float angle = 0.0f;
