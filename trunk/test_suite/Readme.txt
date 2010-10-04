@@ -35,3 +35,5 @@ Usage of SBM Testing System
   4. Input parameters' format: N/A
   5. Input parameters' format: N/A
   
+* Known Issues:
+- For now, if you have seperate data for your test case (especially for the deformable geometry). You have to run the test first. After the test folder is created, go there and create a data folder and put your data there. This means the seq file before test is created and the seq file after would be different because the data path is changed. This is a large amount of manual work. Has to be improved later.
