@@ -407,6 +407,14 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\sbm\me_ct_locomotion_balance.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_locomotion_balance.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\sbm\me_ct_locomotion_func.cpp"
 						>
 					</File>

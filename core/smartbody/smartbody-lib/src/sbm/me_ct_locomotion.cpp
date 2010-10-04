@@ -308,6 +308,8 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	if(ik_enabled) 
 		apply_IK(); 
 
+	balance.update(limb_list, SrVec(0.0f,1.0f,0.0f), &nonlimb_joint_info, navigator.get_facing_angle(), translation_joint_index, delta_time);
+
 	navigator.post_controller_evaluate(frame, limb_list.get(dominant_limb), reset);
 
 	reset = false;
@@ -681,7 +683,7 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 	speed_accelerator.update_speed(delta_time);
 
 	//get current direction
-	limb_list.get(dominant_limb)->direction_planner.update_direction(delta_time, &limb_list.get(dominant_limb)->space_time, true);
+	limb_list.get(dominant_limb)->direction_planner.update_direction(delta_time, &limb_list.get(dominant_limb)->space_time, limb_list.get(dominant_limb)->get_walking_list()->get(1)->get_timing_space()->get_ref_time_num(), true);
 
 	// set r_anim1_index_dominant amd r_anim2_index_dominant
 	get_anim_indices(dominant_limb, limb_list.get(dominant_limb)->direction_planner.get_curr_direction(), &r_anim1_index_dominant, &r_anim2_index_dominant);
@@ -740,7 +742,7 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 				limb_list.get(i)->space_time = blended_anim->get_timing_space()->get_space_value(frame_num);
 			
 			//compute the direction and orientation based on the real timing space
-			limb_list.get(i)->direction_planner.update_direction(delta_time, &limb_list.get(i)->space_time, false);
+			limb_list.get(i)->direction_planner.update_direction(delta_time, &limb_list.get(i)->space_time, blended_anim->get_timing_space()->get_ref_time_num(), false);
 			get_anim_indices(i, limb_list.get(i)->direction_planner.get_curr_direction(), &r_anim1_index, &r_anim2_index);
 			anim1 = limb_list.get(i)->get_walking_list()->get(r_anim1_index);
 			anim2 = limb_list.get(i)->get_walking_list()->get(r_anim2_index);
@@ -792,7 +794,7 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 		SrVec displacement(0,0,0);
 		SrMat w_mat = navigator.get_world_mat();
 		//height_offset.update_height_offset(nonlimb_joint_info.mat.get(translation_joint_index) * w_mat, r_blended_base_height);
-		height_offset.update_height_offset(w_mat, r_blended_base_height);
+		height_offset.update_height_offset(w_mat, r_blended_base_height, delta_time);
 		w_mat.set(13, w_mat.get(13) + height_offset.get_height_offset());
 		navigator.set_world_mat(w_mat);
 		navigator.world_pos.y += height_offset.get_height_offset();
@@ -942,27 +944,27 @@ void MeCtLocomotion::apply_IK()
 
 		float height = mcu.query_terrain(pos.x, pos.z, normal);
 
-		//ik_scenario->set_plane_normal(SrVec(normal[0], normal[1], normal[2]));
-
-		ik_scenario->set_plane_normal(SrVec(limb_list.get(i)->ik_terrain_normal.x, limb_list.get(i)->ik_terrain_normal.y, limb_list.get(i)->ik_terrain_normal.z));
-
-		ik_scenario->plane_point = SrVec(pos.x, height, pos.z);
-
 		ik_scenario->set_offset(limb_list.get(i)->ik_offset);
 		
 		ik_scenario->quat_list = limb_list.get(i)->limb_joint_info.quat;
 
 		ik_scenario->ik_orientation.set(0.0f, -1.0f, 0.0f);
+
+		ik_scenario->set_plane_normal(SrVec(limb_list.get(i)->ik_terrain_normal.x, limb_list.get(i)->ik_terrain_normal.y, limb_list.get(i)->ik_terrain_normal.z));
+		ik_scenario->plane_point = SrVec(pos.x, height, pos.z);
+
+		SrVec v1 = -limb_list.get(i)->ik_terrain_normal;
+		ik_scenario->ik_compensate_factor = dot(v1, ik_scenario->ik_orientation);
 		for(int j = 0; j < ik_scenario->joint_info_list.size(); ++j)
 		{
 			info = &(ik_scenario->joint_info_list.get(j));
 			info->support_joint_comp = translation_joint_height + r_blended_base_height + limb_list.get(i)->pos_buffer.get(j).y - info->support_joint_height;
+			if(info->support_joint_comp < 0.0f) info->support_joint_comp = 0.0f;// mannually check if the compensation is valid
 		}
+
 		ik.update(ik_scenario);
 		limb_list.get(i)->limb_joint_info.quat = ik_scenario->quat_list;
-		//ik_scenario->quat_list. = limb_list.get(i)->quat_buffer
 	}
-	//printf("\n%f", r_blended_base_height);
 }
 
 void MeCtLocomotion::get_anim_indices(int limb_index, SrVec direction, int* anim1_index, int* anim2_index)

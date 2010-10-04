@@ -86,7 +86,7 @@ public:
 	//the forced direction of 
 	SrVec								ik_orientation;
 
-	float								ik_compentate;
+	float								ik_compensate_factor;
 
 /*//??
 protected:

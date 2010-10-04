@@ -47,7 +47,7 @@ public:
 	SrVec		curr_direction;
 	SrVec		target_direction;
 	bool		direction_inversed;
-	int			ref_time_num;
+	//int			ref_time_num;
 
 	bool		automatic;
 
@@ -70,11 +70,11 @@ public:
 
 	float		get_ratio();
 
-	void		update_direction(double time_interval, float* space_time, bool dominant_limb);
+	void		update_direction(double time_interval, float* space_time, int ref_time_num, bool dominant_limb);
 
 	void		update_anim_mode(MeCtLocomotionLimbAnim* anim);
 
-	void		update_space_time(float* space_time);
+	void		update_space_time(float* space_time, int ref_time_num);
 
 	SrVec		get_curr_direction();
 
