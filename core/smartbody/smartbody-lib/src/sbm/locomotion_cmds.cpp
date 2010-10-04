@@ -235,6 +235,11 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		return CMD_SUCCESS;
 	}
 
+	if( arg == "balance")
+	{
+		actor->get_locomotion_ct()->set_balance_factor(args.read_float());
+	}
+
 	if( arg == "local")
 	{
 		global_direction = actor->get_locomotion_ct()->get_facing_vector();

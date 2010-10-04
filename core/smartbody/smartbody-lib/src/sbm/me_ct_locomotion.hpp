@@ -209,6 +209,8 @@ public:
 
 	void print_info(char* name);
 
+	void set_balance_factor(float factor);
+
 protected:
 
 	void init_limbs();

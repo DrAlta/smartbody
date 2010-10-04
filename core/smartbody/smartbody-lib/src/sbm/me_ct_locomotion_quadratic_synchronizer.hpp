@@ -1,5 +1,5 @@
 /*
- *  me_ct_locomotion_balance.hpp - part of SmartBody-lib's Motion Engine
+ *  me_ct_locomotion_quadratic_synchronizer.hpp - part of SmartBody-lib's Motion Engine
  *  Copyright (C) 2009  University of Southern California
  *
  *  SmartBody-lib is free software: you can redistribute it and/or
@@ -20,33 +20,27 @@
  *      Jingqiao Fu, USC
  */
 
-#ifndef ME_CT_LOCOMOTION_BALANCE_HPP
-#define ME_CT_LOCOMOTION_BALANCE_HPP
+#ifndef ME_CT_LOCOMOTION_QUADRATIC_SYNCHRONIZER_HPP
+#define ME_CT_LOCOMOTION_QUADRATIC_SYNCHRONIZER_HPP
 
-#include "me_ct_locomotion_joint_info.hpp"
-#include "me_ct_locomotion_limb.hpp"
+
 
 #pragma once
 
-class MeCtLocomotionBalance
+class MeCtLocomotionQuadraticSynchronizer
 {
 protected:
-	SrVec target_normal;
-	SrVec normal;
-	float rotational_speed;
-	float factor;
+	
 
 public:
-	MeCtLocomotionBalance();
-	~MeCtLocomotionBalance();
+	MeCtLocomotionQuadraticSynchronizer();
+	~MeCtLocomotionQuadraticSynchronizer();
 
 public:
-	void update(SrArray<MeCtLocomotionLimb*>& limb_list, SrVec& orientation, MeCtLocomotionJointInfo* nonlimb_joint_info, float facing, int translation_joint_index, float time);
-	void calc_target_normal(SrArray<MeCtLocomotionLimb*>& limb_list, SrVec& orientation);
-	void calc_normal(float time);
-	void set_factor(float factor);
+	
+
 };
 
 
 
-#endif // ME_CT_LOCOMOTION_BALANCE_HPP
+#endif // ME_CT_LOCOMOTION_QUADRATIC_SYNCHRONIZER_HPP
