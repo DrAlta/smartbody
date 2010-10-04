@@ -52,7 +52,7 @@ do
   fi
   
   cd $SBMBIN
-  ./$SBMEXE -seq $caseName
+  ./$SBMEXE -seq $caseName -facebone
 	
 	imgNum=0  
   for image in *.ppm
@@ -71,7 +71,7 @@ do
     touch $scriptName
     echo "#!/bin/sh" >> $scriptName
     winInputDir=`cygpath -m $INPUTDIR`
-    echo "SBMINPUT=\"-seqpath ../../../../test_suite/input/$folderName -seq $folderName.seq\"" >> $scriptName  
+    echo "SBMINPUT=\"-seqpath ../../../../test_suite/input/$folderName -seq $folderName.seq -facebone\"" >> $scriptName  
     imgCounter=0
     while [ $imgCounter -lt $imgNum ]; do
       (( imgCounter ++ ))
