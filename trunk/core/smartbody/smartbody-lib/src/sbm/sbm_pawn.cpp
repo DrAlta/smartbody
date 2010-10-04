@@ -333,6 +333,9 @@ void SbmPawn::wo_cache_update() {
 	float x = pos->value( SkJointPos::X );
 	float y = pos->value( SkJointPos::Y );
 	float z = pos->value( SkJointPos::Z );
+	this->wo_cache.x = x;
+	this->wo_cache.y = y;
+	this->wo_cache.z = z;
 
 	SkJoint::RotType rot_type = joint->rot_type();
 	if( rot_type != SkJoint::TypeQuat ) {
@@ -349,6 +352,9 @@ void SbmPawn::wo_cache_update() {
 	float p = (float)euler.x();
 	float h = (float)euler.y();
 	float r = (float)euler.z();
+	this->wo_cache.p = p;
+	this->wo_cache.h = h;
+	this->wo_cache.r = r;
 }
 
 
@@ -568,7 +574,36 @@ int SbmPawn::set_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& args,
 		//  Command: set pawn <character id> world_offset ...
 		//  Sets the parameters of the world_offset joint
 		return SbmPawn::set_world_offset_cmd( pawn, args );
-	} else {
+	} 
+	else if (attribute == "mass")
+	{
+		std::string jointName = args.read_token();
+		if (jointName.length() == 0)
+		{
+			LOG("ERROR: SbmCharacter::set_cmd_func(..): Need joint name. Use: set char mass <joint> <amount>");
+			return CMD_FAILURE;
+		}
+		const SkJoint* joint = pawn->get_joint(jointName.c_str());
+		if (jointName.length() == 0)
+		{
+			LOG("ERROR: SbmCharacter::set_cmd_func(..): No joint found with name '%s'.", jointName.c_str());
+			return CMD_FAILURE;
+		}
+		float mass = args.read_float();
+		if (mass < 0)
+		{
+			LOG("ERROR: SbmCharacter::set_cmd_func(..): Mass must be > 0.");
+			return CMD_FAILURE;
+		}
+		// is there a function that returns an SkJoint* and not a const SkJoint*?
+		// That would make this next line of code unnecessary.
+		SkJoint* editableJoint = const_cast<SkJoint*>(joint);
+		editableJoint->mass(mass);
+		LOG("Set joint '%s' on character '%s' to mass '%f'.", jointName.c_str(), pawn->name, mass);
+		return CMD_SUCCESS;
+	} 
+	else 
+	{
 		LOG("ERROR: SbmPawn::set_cmd_func(..): Unknown attribute \"%s\".", attribute);
 		return CMD_FAILURE;
 	}

@@ -163,6 +163,11 @@ static Fl_Menu_Item MenuTable[] =
          { "&no eye beams",   0, MCB, CMD(CmdNoEyeBeams),    FL_MENU_RADIO },
          { "&eye beams",  0, MCB, CMD(CmdEyeBeams),  FL_MENU_RADIO },
          { 0 },
+ { "&dynamics", 0, 0, 0, FL_SUBMENU },
+         { "&no dynamics",   0, MCB, CMD(CmdNoDynamics),    FL_MENU_RADIO },
+         { "&show COM",  0, MCB, CMD(CmdShowCOM),  FL_MENU_RADIO },
+         { "&show COM and support polygon",  0, MCB, CMD(CmdShowCOMSupportPolygon),  FL_MENU_RADIO },
+         { 0 },
    { 0 }
  };
 
@@ -201,6 +206,8 @@ class FltkViewerData
    FltkViewer::ShadowMode shadowmode;     // shadow mode
    FltkViewer::terrainMode terrainMode;     // terrain mode
    FltkViewer::EyeBeamMode eyeBeamMode;     // eye beam mode
+   FltkViewer::DynamicsMode dynamicsMode;     // dynamics information mode
+
 
    bool iconized;      // to stop processing while the window is iconized
    bool statistics;    // shows statistics or not
@@ -260,6 +267,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->shadowmode = ModeNoShadows;
    _data->terrainMode = ModeTerrain;
    _data->eyeBeamMode = ModeNoEyeBeams;
+   _data->dynamicsMode = ModeNoDynamics;
 
    _data->iconized    = false;
    _data->statistics  = false;
@@ -383,6 +391,12 @@ void FltkViewer::menu_cmd ( MenuCmd s )
                        break;
       case CmdEyeBeams: _data->eyeBeamMode = ModeEyeBeams;
                        break;
+	  case CmdNoDynamics  : _data->eyeBeamMode = ModeNoEyeBeams;             
+                       break;
+      case CmdShowCOM:_data->dynamicsMode = ModeShowCOM;
+                       break;
+	  case CmdShowCOMSupportPolygon: _data->dynamicsMode = ModeShowCOMSupportPolygon;
+                       break;
       case CmdBoundingBox : SR_SWAPB(_data->boundingbox); 
                             if ( _data->boundingbox ) update_bbox();
                             break;
@@ -463,6 +477,11 @@ bool FltkViewer::menu_cmd_activated ( MenuCmd c )
 	  case CmdTerrain   : return _data->terrainMode==ModeTerrain? true:false;
       case CmdTerrainWireframe   : return _data->terrainMode==ModeTerrainWireframe? true:false;
 	  case CmdNoTerrain   : return _data->terrainMode==ModeNoTerrain? true:false;
+	  case CmdNoEyeBeams  : return _data->eyeBeamMode==ModeNoEyeBeams? true:false;
+      case CmdEyeBeams   : return _data->eyeBeamMode==ModeEyeBeams? true:false;
+	  case CmdNoDynamics   : return _data->dynamicsMode==ModeNoDynamics? true:false;
+      case CmdShowCOM   : return _data->dynamicsMode==ModeShowCOM? true:false;
+	  case CmdShowCOMSupportPolygon   : return _data->dynamicsMode==ModeShowCOMSupportPolygon? true:false;
       case CmdAxis        : return _data->displayaxis? true:false;
       case CmdBoundingBox : return _data->boundingbox? true:false;
       case CmdStatistics  : return _data->statistics? true:false;
@@ -835,6 +854,7 @@ void FltkViewer::draw()
 	   drawGrid();
 
 	drawEyeBeams();
+	drawDynamics();
 
 	_data->fcounter.stop();
 
@@ -1638,7 +1658,120 @@ void FltkViewer::drawEyeBeams()
 
 }
 
+void FltkViewer::drawDynamics()
+{
+	if (_data->dynamicsMode == ModeNoDynamics)
+		return;
 
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	srHashMap<SbmCharacter>& character_map = mcu.character_map;
+	character_map.reset();
+	SbmCharacter* character = character_map.next();
+
+	while ( character )
+	{
+		character->skeleton_p->update_global_matrices();
+
+		glPushMatrix();
+		glPushAttrib(GL_POINT_BIT);
+		glPointSize(4.0);
+		SrVec com(0, 0, 0);
+		if (_data->dynamicsMode == ModeShowCOM ||
+			_data->dynamicsMode == ModeShowCOMSupportPolygon)
+		{
+			const SrArray<SkJoint*>& joints = character->skeleton_p->joints();
+		
+			int numJoints = 0;
+			float totalMass = 0;
+			for (int j = 0; j < joints.size(); j++)
+			{
+				float mass = joints[j]->mass();
+				if (mass > 0)
+				{
+					totalMass += mass;
+					SrMat gmat = joints[j]->gmat();
+					SrVec loc(*gmat.pt(12), *gmat.pt(13), *gmat.pt(14)); 
+					com += mass * loc;
+					numJoints++;
+				}
+			}
+			if (totalMass != 0)
+				com /= totalMass;
+			// draw the center of mass of the character
+			glColor3f(1.0, 1.0, 0.0);
+			glPushMatrix();
+			glTranslatef(com[0], com[1], com[2]);
+			glBegin(GL_POINTS);
+			glVertex3f(0.0, 0.0, 0.0);
+			glEnd();
+			glPopMatrix();
+
+			
+		}
+
+		if (_data->dynamicsMode == ModeShowCOMSupportPolygon)
+		{
+			// draw the support polygon of the character
+			// get the heel/toe points for the left and right foot
+			SrVec polygon[4];
+			// left heel, toe
+			SkJoint* leftFoot = character->skeleton_p->search_joint("l_ankle");
+			if (leftFoot)
+			{
+				SrMat gmat = leftFoot->gmat();
+				polygon[0].set(*gmat.pt(12), *gmat.pt(13), *gmat.pt(14)); 
+			}
+			SkJoint* leftToe = character->skeleton_p->search_joint("l_toe");
+			if (leftToe)
+			{
+				SrMat gmat  = leftToe->gmat();
+				polygon[1].set(*gmat.pt(12), *gmat.pt(13), *gmat.pt(14)); 
+			}			
+			// right heel, toe
+			SkJoint* rightFoot =character->skeleton_p->search_joint("r_ankle");
+			if (rightFoot)
+			{
+				SrMat gmat = rightFoot->gmat();
+				polygon[3].set(*gmat.pt(12), *gmat.pt(13), *gmat.pt(14)); 
+			}
+			SkJoint* rightToe = character->skeleton_p->search_joint("r_toe");
+			if (rightToe)
+			{
+				SrMat gmat = rightToe->gmat();
+				polygon[2].set(*gmat.pt(12), *gmat.pt(13), *gmat.pt(14)); 
+			}			
+
+			glColor3f(1.0, 0.0, 0.0);
+			glBegin(GL_LINE_LOOP);
+			for (int x = 0; x < 4; x++)
+			{
+				glVertex3f(polygon[x][0], polygon[x][1], polygon[x][2]);
+			}
+			glEnd();
+
+			// show the center of mass projected on the ground as well
+			float yLoc = 0;
+			for (int i = 0; i < 4; i++)
+				yLoc += polygon[i][1];
+			yLoc /= 4.0;
+			glColor3f(1.0, 1.0, 0.0);
+			glPushMatrix();
+			glTranslatef(com[0], yLoc, com[2]);
+			glBegin(GL_POINTS);
+			glVertex3f(0.0, 0.0, 0.0);
+			glEnd();
+			glPopMatrix();
+
+		}
+		
+		glPopAttrib();
+		glPopMatrix();
+		character = character_map.next();
+	}
+
+	
+
+}
 //== Viewer Factory ========================================================
 
 
