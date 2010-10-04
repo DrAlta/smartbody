@@ -42,3 +42,5 @@
 
 1	test loco char doctor enable
 1	test loco char elder enable
+
+1	seq default-dynamics

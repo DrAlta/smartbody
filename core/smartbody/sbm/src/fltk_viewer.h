@@ -79,6 +79,10 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	enum EyeBeamMode { ModeNoEyeBeams,
 					   ModeEyeBeams
                 };
+	enum DynamicsMode { ModeNoDynamics,
+					    ModeShowCOM,
+						ModeShowCOMSupportPolygon
+                };
 
     enum MenuCmd { CmdHelp,
                    CmdViewAll,
@@ -103,7 +107,10 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdTerrainWireframe,
 				   CmdTerrain,
 				   CmdNoEyeBeams,
-				   CmdEyeBeams
+				   CmdEyeBeams,
+				   CmdNoDynamics,
+				   CmdShowCOM,
+				   CmdShowCOMSupportPolygon
                  };
 
    private : // internal data
@@ -215,6 +222,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	void initGridList();
 	void drawGrid();
 	void drawEyeBeams();
+	void drawDynamics();
 
 	int gridList;
 	float gridColor[4];
