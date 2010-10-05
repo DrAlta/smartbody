@@ -391,9 +391,9 @@ void FltkViewer::menu_cmd ( MenuCmd s )
                        break;
       case CmdEyeBeams: _data->eyeBeamMode = ModeEyeBeams;
                        break;
-	  case CmdNoDynamics  : _data->eyeBeamMode = ModeNoEyeBeams;             
+	  case CmdNoDynamics  : _data->dynamicsMode = ModeNoDynamics;             
                        break;
-      case CmdShowCOM:_data->dynamicsMode = ModeShowCOM;
+      case CmdShowCOM:		_data->dynamicsMode = ModeShowCOM;
                        break;
 	  case CmdShowCOMSupportPolygon: _data->dynamicsMode = ModeShowCOMSupportPolygon;
                        break;
