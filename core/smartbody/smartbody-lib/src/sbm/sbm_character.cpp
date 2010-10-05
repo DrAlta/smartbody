@@ -1667,6 +1667,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 		string fade_cmd = args.read_token();
 		bool fade_in;
+		bool print_track = false;
 		if( fade_cmd=="in" ) {
 			fade_in = true;
 		}
@@ -1674,14 +1675,28 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		if( fade_cmd=="out" ) {
 			fade_in = false;
 		}
+		else
+		if( fade_cmd=="print" ) {
+			print_track = true;
+		}
 		else	{
 			return( CMD_NOT_FOUND );
 		}
 		float interval = args.read_float();
-		int n = character->get_num_gaze_controllers();
+		if( print_track )	{
+			LOG( "char '%s' gaze tracks:", character->name );
+		}
+		MeCtScheduler2::VecOfTrack track_vec = character->gaze_sched_p->tracks();
+		int n = track_vec.size();
 		for( int i = 0; i < n; i++ )	{
-			MeCtGaze *gaze_p = character->get_gaze_controller( i );
+			MeCtScheduler2::TrackPtr t_p = track_vec[ i ];
+			MeController* ct_p = t_p->animation_ct();
+			MeCtGaze* gaze_p = dynamic_cast<MeCtGaze*> (ct_p);
 			if( gaze_p )	{	
+				if( print_track )	{
+					LOG( " %s", gaze_p->name() );
+				}
+				else
 				if( fade_in )	{
 					gaze_p->set_fade_in( interval );
 				}
