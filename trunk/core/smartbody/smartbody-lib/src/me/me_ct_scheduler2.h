@@ -188,10 +188,7 @@ protected:
 	 *  Chose list so that iterators remain consistent while adding and 
 	 *  removing surrounding tracks.
 	 */
-
-public: // temporary...
     VecOfTrack _tracks;
-protected:
 
 	/**
 	 *  Union of channels for all tracks.
@@ -288,7 +285,6 @@ public:
 	 *  Returns a current copy of the tracks.
 	 */
 	VecOfTrack tracks();
-
 
 	///** Returns a reference to the track index i (0 is at the bottom). Use with care. */
 	//Track& track( int i ) { return _tracks.at(i); }
