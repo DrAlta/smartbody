@@ -81,7 +81,8 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
                 };
 	enum DynamicsMode { ModeNoDynamics,
 					    ModeShowCOM,
-						ModeShowCOMSupportPolygon
+						ModeShowCOMSupportPolygon,
+						ModeShowMasses
                 };
 
     enum MenuCmd { CmdHelp,
@@ -110,7 +111,8 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdEyeBeams,
 				   CmdNoDynamics,
 				   CmdShowCOM,
-				   CmdShowCOMSupportPolygon
+				   CmdShowCOMSupportPolygon,
+				   CmdShowMasses
                  };
 
    private : // internal data

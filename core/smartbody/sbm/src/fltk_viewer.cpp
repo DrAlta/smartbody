@@ -35,6 +35,7 @@
 # include <fltk/Browser.H>
 
 # include <SR/sr_box.h>
+# include <SR/sr_sphere.h>
 # include <SR/sr_quat.h>
 # include <SR/sr_line.h>
 # include <SR/sr_plane.h>
@@ -56,6 +57,7 @@
 # include <SR/sr_sa_event.h>
 # include <SR/sr_sa_bbox.h>
 # include <SR/sr_sa_gl_render.h>
+# include <SR/sr_gl_render_funcs.h>
 
 #include <sbm/mcontrol_util.h>
 #include "vhcl_log.h"
@@ -167,6 +169,7 @@ static Fl_Menu_Item MenuTable[] =
          { "&no dynamics",   0, MCB, CMD(CmdNoDynamics),    FL_MENU_RADIO },
          { "&show COM",  0, MCB, CMD(CmdShowCOM),  FL_MENU_RADIO },
          { "&show COM and support polygon",  0, MCB, CMD(CmdShowCOMSupportPolygon),  FL_MENU_RADIO },
+		 { "&show masses",   0, MCB, CMD(CmdShowMasses),  FL_MENU_TOGGLE },
          { 0 },
    { 0 }
  };
@@ -220,6 +223,7 @@ class FltkViewerData
    bool showdeformablegeometry;
    bool showbones;
    bool showaxis;
+   bool showmasses;
 
    SrString message;   // user msg to display in the window
    SrLight light;
@@ -238,6 +242,7 @@ class FltkViewerData
 
    SrSaGlRender render_action;
    SrSaBBox bbox_action;
+
  };
 
 //===================================== FltkViewer =================================
@@ -278,6 +283,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->showcollisiongeometry = false;
    _data->showbones = false;
    _data->showaxis = false;
+   _data->showmasses = false;
 
    _data->light.init();
 
@@ -397,6 +403,8 @@ void FltkViewer::menu_cmd ( MenuCmd s )
                        break;
 	  case CmdShowCOMSupportPolygon: _data->dynamicsMode = ModeShowCOMSupportPolygon;
                        break;
+	  case CmdShowMasses: _data->showmasses =  !_data->showmasses;
+                       break;
       case CmdBoundingBox : SR_SWAPB(_data->boundingbox); 
                             if ( _data->boundingbox ) update_bbox();
                             break;
@@ -482,6 +490,7 @@ bool FltkViewer::menu_cmd_activated ( MenuCmd c )
 	  case CmdNoDynamics   : return _data->dynamicsMode==ModeNoDynamics? true:false;
       case CmdShowCOM   : return _data->dynamicsMode==ModeShowCOM? true:false;
 	  case CmdShowCOMSupportPolygon   : return _data->dynamicsMode==ModeShowCOMSupportPolygon? true:false;
+	  case CmdShowMasses : return _data->showmasses? true:false;
       case CmdAxis        : return _data->displayaxis? true:false;
       case CmdBoundingBox : return _data->boundingbox? true:false;
       case CmdStatistics  : return _data->statistics? true:false;
@@ -1660,7 +1669,7 @@ void FltkViewer::drawEyeBeams()
 
 void FltkViewer::drawDynamics()
 {
-	if (_data->dynamicsMode == ModeNoDynamics)
+	if (_data->dynamicsMode == ModeNoDynamics && !_data->showmasses)
 		return;
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -1672,31 +1681,34 @@ void FltkViewer::drawDynamics()
 	{
 		character->skeleton_p->update_global_matrices();
 
+		const SrArray<SkJoint*>& joints = character->skeleton_p->joints();
+		
+		int numJoints = 0;
+		float totalMass = 0;
+		SrVec com(0, 0, 0);
+		for (int j = 0; j < joints.size(); j++)
+		{
+			float mass = joints[j]->mass();
+			if (mass > 0)
+			{
+				totalMass += mass;
+				SrMat gmat = joints[j]->gmat();
+				SrVec loc(*gmat.pt(12), *gmat.pt(13), *gmat.pt(14)); 
+				com += mass * loc;
+				numJoints++;
+			}
+		}
+		if (totalMass != 0)
+				com /= totalMass;
+
 		glPushMatrix();
 		glPushAttrib(GL_POINT_BIT);
 		glPointSize(4.0);
-		SrVec com(0, 0, 0);
+		
 		if (_data->dynamicsMode == ModeShowCOM ||
 			_data->dynamicsMode == ModeShowCOMSupportPolygon)
 		{
-			const SrArray<SkJoint*>& joints = character->skeleton_p->joints();
-		
-			int numJoints = 0;
-			float totalMass = 0;
-			for (int j = 0; j < joints.size(); j++)
-			{
-				float mass = joints[j]->mass();
-				if (mass > 0)
-				{
-					totalMass += mass;
-					SrMat gmat = joints[j]->gmat();
-					SrVec loc(*gmat.pt(12), *gmat.pt(13), *gmat.pt(14)); 
-					com += mass * loc;
-					numJoints++;
-				}
-			}
-			if (totalMass != 0)
-				com /= totalMass;
+			
 			// draw the center of mass of the character
 			glColor3f(1.0, 1.0, 0.0);
 			glPushMatrix();
@@ -1762,6 +1774,32 @@ void FltkViewer::drawDynamics()
 			glEnd();
 			glPopMatrix();
 
+		}
+
+		if (_data->showmasses && totalMass > 0)
+		{
+			glPushAttrib(GL_LIGHTING_BIT);
+			glEnable(GL_LIGHTING);
+			glColor3f(1.0f, 1.0f, 0.0f);
+			SrSnSphere sphere;
+			float height = 200.0;
+			for (int j = 0; j < joints.size(); j++)
+			{
+				float mass = joints[j]->mass();
+				if (mass > 0)
+				{
+					float proportion = mass / totalMass;
+					// draw a sphere of proportionate size to entire character to show mass distribution
+					SrMat gmat = joints[j]->gmat();
+					glPushMatrix();
+					sphere.shape().center = SrPnt(*gmat.pt(12), *gmat.pt(13), *gmat.pt(14));
+					sphere.shape().radius = proportion * height;
+					SrGlRenderFuncs::render_sphere(&sphere);
+					// draw sphere with size (proportion * height)
+					glPopMatrix();
+				}
+			}
+			glPopAttrib();
 		}
 		
 		glPopAttrib();
