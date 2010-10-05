@@ -2360,6 +2360,7 @@ int mcu_print_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p,std::strin
 		LOG("Character %s does not yet have any viseme mappings for the face.", characterName.c_str());
 		return CMD_FAILURE;
 	}
+	faceMotion = (*faceMotionIter).second;
 
 	VisemeMotionMap& viseme_map = faceMotion->viseme_map;
 	VisemeMotionMap::iterator pos;
