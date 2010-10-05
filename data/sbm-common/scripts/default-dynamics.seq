@@ -9,7 +9,7 @@
 2 set char doctor mass r_hip 8.35
 2 set char doctor mass r_knee 4.16
 2 set char doctor mass r_ankle .67
-2 set char doctor mass r_forefoot 7.5
+2 set char doctor mass r_forefoot .67
 2 set char doctor mass spine1 7.5
 2 set char doctor mass spine2 7.5
 2 set char doctor mass spine3 7.5
@@ -35,7 +35,7 @@
 2 set char elder mass r_hip 8.35
 2 set char elder mass r_knee 4.16
 2 set char elder mass r_ankle .67
-2 set char elder mass r_forefoot 7.5
+2 set char elder mass r_forefoot .67
 2 set char elder mass spine1 7.5
 2 set char elder mass spine2 7.5
 2 set char elder mass spine3 7.5

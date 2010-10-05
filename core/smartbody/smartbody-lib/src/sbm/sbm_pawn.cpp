@@ -577,6 +577,17 @@ int SbmPawn::set_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& args,
 	} 
 	else if (attribute == "mass")
 	{
+		if (args.calc_num_tokens() == 0)
+		{
+			SkSkeleton* skeleton = pawn->skeleton_p;
+			SrArray<SkJoint*>& joints = skeleton->get_joint_array();
+			for (int j = 0; j < joints.size(); j++)
+			{
+				LOG("%s : %f", joints[j]->name().get_string(), joints[j]->mass());
+				
+			}
+			return CMD_SUCCESS;
+		}
 		std::string jointName = args.read_token();
 		if (jointName.length() == 0)
 		{
@@ -584,7 +595,7 @@ int SbmPawn::set_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& args,
 			return CMD_FAILURE;
 		}
 		const SkJoint* joint = pawn->get_joint(jointName.c_str());
-		if (jointName.length() == 0)
+		if (!joint)
 		{
 			LOG("ERROR: SbmCharacter::set_cmd_func(..): No joint found with name '%s'.", jointName.c_str());
 			return CMD_FAILURE;
@@ -599,7 +610,7 @@ int SbmPawn::set_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& args,
 		// That would make this next line of code unnecessary.
 		SkJoint* editableJoint = const_cast<SkJoint*>(joint);
 		editableJoint->mass(mass);
-		LOG("Set joint '%s' on character '%s' to mass '%f'.", jointName.c_str(), pawn->name, mass);
+		//LOG("Set joint '%s' on character '%s' to mass '%f'.", jointName.c_str(), pawn->name, mass);
 		return CMD_SUCCESS;
 	} 
 	else 

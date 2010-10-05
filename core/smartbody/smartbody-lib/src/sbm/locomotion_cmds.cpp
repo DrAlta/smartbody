@@ -238,6 +238,8 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	if( arg == "balance")
 	{
 		actor->get_locomotion_ct()->set_balance_factor(args.read_float());
+
+		return CMD_SUCCESS;
 	}
 
 	if( arg == "local")
