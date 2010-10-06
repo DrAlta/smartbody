@@ -25,12 +25,14 @@
 
 #include "me_ct_locomotion_limb.hpp"
 #include "me_ct_locomotion_terrain.hpp"
+#include "me_ct_locomotion_quadratic_synchronizer.hpp"
 
 #pragma once
 
 class MeCtLocomotionHeightOffset
 {
 protected:
+	MeCtLocomotionQuadraticSynchronizer synchronizer;
 	SrArray<MeCtLocomotionLimb*>* limb_list;
 	float acceleration;
 
