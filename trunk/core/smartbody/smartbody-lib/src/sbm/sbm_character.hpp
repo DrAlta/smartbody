@@ -267,6 +267,7 @@ public:
 private:
 	int viseme_channel_start_pos;
 	int viseme_channel_end_pos;
+	bool softEyes;
 
 protected:
 	/*!
@@ -295,6 +296,11 @@ protected:
 	 *   for the channel to control an aspect of the face.
 	 */
 	void add_face_channel( const std::string& name, const int wo_index );
+
+
+	void setSoftEyes(bool val);
+	bool isSoftEyes();
+
 };
 
 /////////////////////////////////////////////////////////////
