@@ -45,7 +45,8 @@ const bool LOG_PRUNE_CMD_TIME                        = false;
 const bool LOG_CONTROLLER_TREE_PRUNING               = false;
 const bool LOG_PRUNE_TRACK_WITHOUT_BLEND_SPLIE_KNOTS = false;
 
-const bool ENABLE_EYELID_CORRECTIVE_CT = false;
+//const bool ENABLE_EYELID_CORRECTIVE_CT = false;
+const bool ENABLE_EYELID_CORRECTIVE_CT = true;
 
 const float BLINK_SHUTTING_DURATION    = 0.05f;
 const float BLINK_OPENING_DURATION     = 0.2f;
@@ -105,7 +106,8 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	face_ct( NULL ),
 	eyelid_ct( new MeCtEyeLid() ),
 	face_neutral( NULL ),
-	use_viseme_curve( false )
+	use_viseme_curve( false ),
+	softEyes( ENABLE_EYELID_CORRECTIVE_CT )
 {
 	posture_sched_p->ref();
 	motion_sched_p->ref();
@@ -353,10 +355,10 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	// Face controller
 	if( face_neutral ) {
 		ct_tree_p->add_controller( face_ct );
-#if ENABLE_EYELID_CORRECTIVE_CT
-		eyelid_ct->init();
-		ct_tree_p->add_controller( eyelid_ct );
-#endif
+		if  (ENABLE_EYELID_CORRECTIVE_CT) {
+			eyelid_ct->init();
+			ct_tree_p->add_controller( eyelid_ct );
+		}
 	}
 
 	bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( name, unreal_class, mcuCBHandle::singleton().net_face_bones );
@@ -1724,6 +1726,38 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			}
 		}
 	}
+	if (char_cmd == "softeyes")
+	{
+		if (args.calc_num_tokens() == 0)
+		{
+			if (character->isSoftEyes())
+			{
+				LOG("Soft eyes are on for character %s", char_name.c_str());
+			}
+			else
+			{
+				LOG("Soft eyes are off for character %s", char_name.c_str());
+			}
+			return CMD_SUCCESS;
+		}
+		std::string softEyesState = args.read_token();
+		if (softEyesState == "on")
+		{
+			character->setSoftEyes(true);
+			return CMD_SUCCESS;
+		}
+		else if (softEyesState == "off")
+		{
+			character->setSoftEyes(false);
+			return CMD_SUCCESS;
+		}
+		else
+		{
+			LOG("ERROR: SbmCharacter::character_cmd_func(..): Use: char <name> softeyes <on|off>");
+			return CMD_FAILURE;
+		}
+
+	}
 	return CMD_NOT_FOUND;
 }
 
@@ -1874,4 +1908,19 @@ bool parse_float_or_error( float& var, const char* str, const string& var_name )
 	// else
 	LOG("ERROR: Invalid value for %s: %s", var_name.c_str(), str);
 	return false;
+}
+
+void SbmCharacter::setSoftEyes(bool val)
+{
+	softEyes = val;
+	// disable the eyelid controller if available
+	if (eyelid_ct)
+	{
+		eyelid_ct->set_pass_through(!val);
+	}
+}
+
+bool SbmCharacter::isSoftEyes()
+{
+	return softEyes;
 }
