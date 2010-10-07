@@ -973,7 +973,8 @@ static void translate_keyboard_state()
 	for(int i = 0; i <= char_index; ++i)
 	{
 		actor = mcu.character_map.next();
-		sprintf(character, "char %s ", actor->name);
+		if (actor)
+			sprintf(character, "char %s ", actor->name);
 	}
 
 	sprintf(cmd, "test loco ");

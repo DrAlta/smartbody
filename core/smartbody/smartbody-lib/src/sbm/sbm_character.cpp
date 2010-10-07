@@ -351,11 +351,13 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		}
 	}
 		
-
-	// Face controller
+	// Face controller and softeyes control
 	if( face_neutral ) {
 		ct_tree_p->add_controller( face_ct );
 		if  (ENABLE_EYELID_CORRECTIVE_CT) {
+			std::string eyelidCtName( name );
+			eyelidCtName += "'s eyelid_ct";
+			eyelid_ct->name( eyelidCtName.c_str() );
 			eyelid_ct->init();
 			ct_tree_p->add_controller( eyelid_ct );
 		}
@@ -401,7 +403,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	// hard coded, can be removed if these are added to bone bus and rendering side
 	std::vector<std::string> closed_mouth;							// this should is an empty vector
 	viseme_name_patch.insert(make_pair("_", closed_mouth));	// when receiving this two viseme, do not send signal to bone bus
-	viseme_name_patch.insert(make_pair("BMP", closed_mouth));
+	//viseme_name_patch.insert(make_pair("BMP", closed_mouth));
 	
 	std::vector<std::string> f_patch;								// "F" patch (match to "f")
 	f_patch.push_back("f");
