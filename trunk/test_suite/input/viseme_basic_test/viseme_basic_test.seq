@@ -19,6 +19,9 @@
 3	char BillFord init BillFord.sk
 3	set character BillFord world_offset x 0 y 102 h 0
 3	char BillFord smoothbindmesh ../../../../test_suite/input/viseme_basic_test/data/headShape.obj
+3	char BillFord smoothbindmesh ../../../../test_suite/input/viseme_basic_test/data/L_eyeballShape.obj
+3	char BillFord smoothbindmesh ../../../../test_suite/input/viseme_basic_test/data/R_eyeballShape.obj
+3	char BillFord smoothbindmesh ../../../../test_suite/input/viseme_basic_test/data/TongueShape.obj
 3	char BillFord smoothbindweight ../../../../test_suite/input/viseme_basic_test/data/BillFord.xml
 3	set test character BillFord
 3	char BillFord viewer 4
