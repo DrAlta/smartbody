@@ -930,7 +930,7 @@ static void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h, FltkVie
 
  }
 
-static float rps = 1.0f;
+static float rps = 0.7f;
 static int x_flag = 0;
 static int z_flag = 0;
 static int rps_flag = 0;
