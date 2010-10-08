@@ -23,6 +23,7 @@
 #ifndef ME_CT_LOCOMOTION_QUADRATIC_SYNCHRONIZER_HPP
 #define ME_CT_LOCOMOTION_QUADRATIC_SYNCHRONIZER_HPP
 
+#define QUAD_SYNC_NONE -1
 #define QUAD_SYNC_TIME 0
 #define QUAD_SYNC_DISTANCE 1
 #define QUAD_SYNC_ACCELERATION 2
@@ -31,15 +32,34 @@
 #pragma once
 
 #include <iostream>
+#include "math.h"
 
 class MeCtLocomotionQuadraticSynchronizer
 {
 protected:
-	float target[4];
+	bool time_flag;
+	float target_time;
+	float time;
+
+	bool distance_flag;
+	float target_distance;
+	float distance;
+
+	bool acceleration_flag;
+	float target_acceleration;
+	float acceleration;
+
+	bool speed_flag;
+	float target_speed;
+	float speed;
+
+	float max_acceleration;
+
+	/*float target[4];
 	float value[4];
 	float max[4];
 	float min[4];
-	bool flag[4];
+	bool flag[4];*/
 	int primary_ind;
 
 	float delta_distance;
@@ -56,9 +76,9 @@ public:
 	void update_for_time_speed(float time);
 	void update_for_time_distance(float time);
 	void update_for_speed_distance(float time);
-	float get_value(int index);
+	void update_on_distance(float delta_time);
 	float get_delta_distance();
-	void set_bound(int index, float max, float min);
+	void set_max_acceleration(float value);
 };
 
 

@@ -25,8 +25,22 @@
 
 MeCtLocomotionQuadraticSynchronizer::MeCtLocomotionQuadraticSynchronizer()
 {
-	memset(target, 0, sizeof(float)*4);
-	memset(value, 0, sizeof(float)*4);
+	time_flag = false;
+	target_time = 0.0f;
+	time = 0.0f;
+
+	distance_flag = false;
+	target_distance = 0.0f;
+	distance = 0.0f;
+
+	acceleration_flag = false;
+	target_acceleration = 0.0f;
+	acceleration = 0.0f;
+
+	speed_flag = false;
+	target_speed = 0.0f;
+	speed = 0.0f;
+
 	delta_distance = 0.0f;
 }
 
@@ -37,128 +51,185 @@ MeCtLocomotionQuadraticSynchronizer::~MeCtLocomotionQuadraticSynchronizer()
 
 void MeCtLocomotionQuadraticSynchronizer::set_target_flag(int ind1, int ind2)
 {
-	for(int i = 0; i < 4; ++i)
-	{
-		flag[i] = false;
-	}
-	flag[ind1] = true;
-	if(ind1 == QUAD_SYNC_DISTANCE) value[ind1] = 0.0f;
-	flag[ind2] = true;
-	if(ind2 == QUAD_SYNC_DISTANCE) value[ind2] = 0.0f;
-	primary_ind = ind1;
+	time_flag = false;
+	distance_flag = false;
+	acceleration_flag = false;
+	speed_flag = false;
+
+	if(ind1 == QUAD_SYNC_DISTANCE || ind2 == QUAD_SYNC_DISTANCE) distance_flag = true;
+	if(ind1 == QUAD_SYNC_TIME || ind2 == QUAD_SYNC_TIME) time_flag = true;
+	if(ind1 == QUAD_SYNC_ACCELERATION || ind2 == QUAD_SYNC_ACCELERATION) acceleration_flag = true;
+	if(ind1 == QUAD_SYNC_SPEED || ind2 == QUAD_SYNC_SPEED) speed_flag = true;
+	if(ind1 != QUAD_SYNC_NONE) primary_ind = ind1;
+	else if(ind2 != QUAD_SYNC_NONE) primary_ind = ind2;
+	else printf("MeCtLocomotionQuadraticSynchronizer::set_target_flag(): Error: no valid flag set");
 }
 
 void MeCtLocomotionQuadraticSynchronizer::update_target(int ind, float target_value)
 {
-	if(!flag[ind]) printf("MeCtLocomotionQuadraticSynchronizer::update_target(): Error, target not exist");
-	target[ind] = target_value;
-	
+	if(ind == QUAD_SYNC_DISTANCE)
+	{
+		if(distance_flag == false) printf("MeCtLocomotionQuadraticSynchronizer::update_target(): Error, target not exist");
+		else target_distance = target_value;
+	}
+	if(ind == QUAD_SYNC_TIME)
+	{
+		if(time_flag == false) printf("MeCtLocomotionQuadraticSynchronizer::update_target(): Error, target not exist");
+		else target_time = target_value;
+	}
+	if(ind == QUAD_SYNC_SPEED)
+	{
+		if(speed_flag == false) printf("MeCtLocomotionQuadraticSynchronizer::update_target(): Error, target not exist");
+		else target_speed = target_value;
+	}
+	if(ind == QUAD_SYNC_ACCELERATION)
+	{
+		if(acceleration_flag == false) printf("MeCtLocomotionQuadraticSynchronizer::update_target(): Error, target not exist");
+		else target_acceleration = target_value;
+	}
 }
 
-void MeCtLocomotionQuadraticSynchronizer::update(float time)
+void MeCtLocomotionQuadraticSynchronizer::update(float delta_time)
 {
-	if(flag[QUAD_SYNC_TIME] && flag[QUAD_SYNC_SPEED]) update_for_time_speed(time);
-	else if(flag[QUAD_SYNC_TIME] && flag[QUAD_SYNC_DISTANCE]) update_for_time_distance(time);
-	else if(flag[QUAD_SYNC_SPEED] && flag[QUAD_SYNC_DISTANCE]) update_for_speed_distance(time);
+	if(time_flag && speed_flag) update_for_time_speed(delta_time);
+	else if(time_flag && distance_flag) update_for_time_distance(delta_time);
+	else if(speed_flag && distance_flag) update_for_speed_distance(delta_time);
+	else if(distance_flag) update_on_distance(delta_time);
 }
 
-void MeCtLocomotionQuadraticSynchronizer::update_for_time_speed(float time)
+void MeCtLocomotionQuadraticSynchronizer::update_on_distance(float delta_time)
 {
-	value[QUAD_SYNC_ACCELERATION] = (target[QUAD_SYNC_SPEED]-value[QUAD_SYNC_SPEED])/(target[QUAD_SYNC_TIME]-value[QUAD_SYNC_TIME]);
-	value[QUAD_SYNC_TIME] += time;
-	value[QUAD_SYNC_SPEED] += time*value[QUAD_SYNC_ACCELERATION];
+	acceleration = 0.0f;
+	if(target_distance > 0.0f) 
+	{
+		//acceleration = max_acceleration;
+	}
+	else if(target_distance < 0.0f) 
+		acceleration = -max_acceleration;
+	delta_distance = speed * delta_time + 0.5f * acceleration * delta_time * delta_time;
+	speed += acceleration * delta_time;
+	if(target_distance < 0.0f && delta_distance < target_distance
+	|| target_distance > 0.0f && delta_distance > target_distance)
+	{
+		delta_distance = target_distance;
+	}
+}
+
+void MeCtLocomotionQuadraticSynchronizer::update_for_time_speed(float delta_time)
+{
+	acceleration = (target_speed - speed)/(target_time - time);
+	time += delta_time;
+	speed += delta_time * acceleration;
 	if(primary_ind == QUAD_SYNC_SPEED)
 	{
-		if(value[QUAD_SYNC_ACCELERATION] > 0.0f && value[QUAD_SYNC_SPEED]> target[QUAD_SYNC_SPEED]) 
-			value[QUAD_SYNC_SPEED] = target[QUAD_SYNC_SPEED];
-		else if(value[QUAD_SYNC_ACCELERATION] < 0.0f && value[QUAD_SYNC_SPEED] < target[QUAD_SYNC_SPEED])
-			value[QUAD_SYNC_SPEED] = target[QUAD_SYNC_SPEED];
+		if(acceleration > 0.0f && speed > target_speed) 
+			speed = target_speed;
+		else if(acceleration < 0.0f && speed < target_speed)
+			speed = target_speed;
 	}
-	else if(primary_ind == QUAD_SYNC_TIME && value[QUAD_SYNC_TIME]> target[QUAD_SYNC_TIME]) 
-		value[QUAD_SYNC_SPEED] = target[QUAD_SYNC_SPEED];
+	else if(primary_ind == QUAD_SYNC_TIME && time> target_time) 
+		speed = target_speed;
 }
 
-void MeCtLocomotionQuadraticSynchronizer::update_for_time_distance(float time)
+void MeCtLocomotionQuadraticSynchronizer::update_for_time_distance(float delta_time)
 {
-	float t_time = target[QUAD_SYNC_TIME] - value[QUAD_SYNC_TIME];
-	value[QUAD_SYNC_ACCELERATION] = 2*(target[QUAD_SYNC_DISTANCE]-value[QUAD_SYNC_DISTANCE]-value[QUAD_SYNC_SPEED]*t_time)/t_time*t_time;
-	delta_distance = value[QUAD_SYNC_SPEED]*time+0.5f*value[QUAD_SYNC_ACCELERATION]*time*time;
-	value[QUAD_SYNC_DISTANCE] += delta_distance;
-	value[QUAD_SYNC_SPEED] += value[QUAD_SYNC_ACCELERATION]*time;
-	value[QUAD_SYNC_TIME] += time;
+	float t_time = target_time - delta_time;
+	acceleration = 2*(target_distance - distance - speed * t_time) / t_time * t_time;
+	if(acceleration > 0.0f && acceleration > max_acceleration) acceleration = max_acceleration;
+	if(acceleration < 0.0f && acceleration < -max_acceleration) acceleration = -max_acceleration;
+	delta_distance = speed * delta_time + 0.5f * acceleration * delta_time * delta_time;
+	distance += delta_distance;
+	speed += acceleration * delta_time;
+	//time += delta_time;
 	
-	if(primary_ind == QUAD_SYNC_TIME && value[QUAD_SYNC_TIME] > target[QUAD_SYNC_TIME]) value[QUAD_SYNC_TIME] = target[QUAD_SYNC_TIME];
-	else if(primary_ind == QUAD_SYNC_DISTANCE)
+	//if(primary_ind == QUAD_SYNC_TIME && time > target_time) time = target_time;
+	if(primary_ind == QUAD_SYNC_DISTANCE)
 	{
-		if(value[QUAD_SYNC_TIME] > 0.0f && value[QUAD_SYNC_DISTANCE] > target[QUAD_SYNC_DISTANCE]) value[QUAD_SYNC_DISTANCE] = target[QUAD_SYNC_DISTANCE];
-		if(value[QUAD_SYNC_TIME] < 0.0f && value[QUAD_SYNC_DISTANCE] < target[QUAD_SYNC_DISTANCE]) value[QUAD_SYNC_DISTANCE] = target[QUAD_SYNC_DISTANCE];
+		if(time > 0.0f && distance > target_distance) distance = target_distance;
+		if(time < 0.0f && distance < target_distance) distance = target_distance;
 	}
 }
 
-void MeCtLocomotionQuadraticSynchronizer::set_bound(int index, float max, float min)
+void MeCtLocomotionQuadraticSynchronizer::set_max_acceleration(float value)
 {
-	if(index < 0 || index > 3) printf("MeCtLocomotionQuadraticSynchronizer::set_bound(): Error");
-	this->max[index] = max;
-	this->min[index] = min;
+	max_acceleration = value;
 }
 
-void MeCtLocomotionQuadraticSynchronizer::update_for_speed_distance(float time)
+void MeCtLocomotionQuadraticSynchronizer::update_for_speed_distance(float delta_time)
 {
 	float a = 0.0f;
-	if(target[QUAD_SYNC_DISTANCE]<0.0f && value[QUAD_SYNC_SPEED]>0.0f 
-		|| target[QUAD_SYNC_DISTANCE]>0.0f && value[QUAD_SYNC_SPEED]<0.0f)
+	if(target_distance != 0.0f && speed == 0.0f && acceleration == 0.0f)
 	{
-		if(target[QUAD_SYNC_DISTANCE]>0.0f) a = max[QUAD_SYNC_ACCELERATION];
-		else if(target[QUAD_SYNC_DISTANCE]< 0.0f) a = -max[QUAD_SYNC_ACCELERATION];
-		float v = value[QUAD_SYNC_SPEED] + a*time;
-		if(v > 0.0f && a < 0.0f || v < 0.0f && a > 0.0f)
+		if(target_distance > 0.0f) a = max_acceleration;
+		else if(target_distance < 0.0f) a = -max_acceleration;
+		if(delta_time >= 2*sqrt(target_distance/a))
 		{
-			time = -value[QUAD_SYNC_SPEED]/a;
-			if(time<0.0f) printf("time");
-			delta_distance = value[QUAD_SYNC_SPEED]*time+0.5f*a*time*time;
-			value[QUAD_SYNC_SPEED] = 0.0f;
+			delta_distance = target_distance;
+			speed = 0.0f;
+			acceleration = 0.0f;
+			return;
 		}
-		else delta_distance = value[QUAD_SYNC_SPEED]*time+0.5f*a*time*time;
-		value[QUAD_SYNC_SPEED] += a*time;
-		value[QUAD_SYNC_ACCELERATION] = a;
 	}
-	else if(target[QUAD_SYNC_DISTANCE] == 0.0f)
+	if(target_distance < 0.0f && speed > 0.0f || target_distance > 0.0f && speed < 0.0f)
 	{
-		//value[QUAD_SYNC_SPEED] = 0.0f;
-		delta_distance = value[QUAD_SYNC_SPEED]*time;
-		value[QUAD_SYNC_ACCELERATION] = 0.0f;
+		if(target_distance > 0.0f) a = max_acceleration;
+		else if(target_distance < 0.0f) a = -max_acceleration;
+		float v = speed + a * delta_time;
+		if(speed > 0.0f && v < 0.0f || speed < 0.0f && v > 0.0f)
+		{
+			delta_time = -speed / a;
+			if(delta_time<0.0f) printf("time");
+			delta_distance = speed * delta_time + 0.5f * a * delta_time * delta_time;
+			speed = 0.0f;
+			acceleration = a;
+		}
+		else 
+		{
+			delta_distance = speed * delta_time + 0.5f * a * delta_time * delta_time;
+			speed += a * delta_time;
+			acceleration = a;
+		}
+		if(target_distance < 0.0f && delta_distance < target_distance
+		|| target_distance > 0.0f && delta_distance > target_distance)
+		{
+			delta_distance = target_distance;
+		}
+
+	}
+	else if(target_distance == 0.0f)
+	{
+		delta_distance = speed * delta_time;
+		acceleration = 0.0f;
 	}
 	else
 	{
-		a = -0.5f*value[QUAD_SYNC_SPEED]*value[QUAD_SYNC_SPEED]/target[QUAD_SYNC_DISTANCE];
-		if(a < -max[QUAD_SYNC_ACCELERATION] || a > max[QUAD_SYNC_ACCELERATION])
+		a = -0.5f * speed * speed / target_distance;
+		if(a < -max_acceleration || a > max_acceleration)
 		{
-			if(a < -max[QUAD_SYNC_ACCELERATION]) a = -max[QUAD_SYNC_ACCELERATION];
-			else a = max[QUAD_SYNC_ACCELERATION];
-			delta_distance = value[QUAD_SYNC_SPEED]*time+0.5f*a*time*time;
-			value[QUAD_SYNC_SPEED] += a*time;
-			value[QUAD_SYNC_ACCELERATION] = a;
-			if(target[QUAD_SYNC_DISTANCE] < 0.0f && delta_distance < target[QUAD_SYNC_DISTANCE]
-			|| target[QUAD_SYNC_DISTANCE] > 0.0f && delta_distance > target[QUAD_SYNC_DISTANCE])
+			if(a < -max_acceleration) a = -max_acceleration;
+			else a = max_acceleration;
+			delta_distance = speed * delta_time + 0.5f * a * delta_time * delta_time;
+			speed += a * delta_time;
+			acceleration = a;
+			if(target_distance < 0.0f && delta_distance < target_distance
+			|| target_distance > 0.0f && delta_distance > target_distance)
 			{
-				value[QUAD_SYNC_SPEED] = 0.0f;
-				delta_distance = target[QUAD_SYNC_DISTANCE];
-				value[QUAD_SYNC_ACCELERATION] = 0.0f;
+				speed = 0.0f;
+				delta_distance = target_distance;
+				acceleration = 0.0f;
 			}
 		}
 		else
 		{
-			if(target[QUAD_SYNC_DISTANCE]>0.0f) 
-				a = max[QUAD_SYNC_ACCELERATION];
-			else if(target[QUAD_SYNC_DISTANCE]<0.0f)
-				a = -max[QUAD_SYNC_ACCELERATION];
-			delta_distance = value[QUAD_SYNC_SPEED]*time+0.5f*a*time*time;
-			value[QUAD_SYNC_SPEED] += a*time;
-			value[QUAD_SYNC_ACCELERATION] = a;
-			if(target[QUAD_SYNC_DISTANCE] < 0.0f && delta_distance < target[QUAD_SYNC_DISTANCE]/2
-			|| target[QUAD_SYNC_DISTANCE] > 0.0f && delta_distance > target[QUAD_SYNC_DISTANCE]/2)
+			if(target_distance>0.0f) a = max_acceleration;
+			else if(target_distance<0.0f) a = -max_acceleration;
+			delta_distance = speed * delta_time + 0.5f * a * delta_time * delta_time;
+			speed += a * delta_time;
+			acceleration = a;
+			if(target_distance < 0.0f && delta_distance < target_distance / 2
+			|| target_distance > 0.0f && delta_distance > target_distance / 2)
 			{
-				delta_distance = target[QUAD_SYNC_DISTANCE]/2.0f;
+				delta_distance = target_distance / 2.0f;
 			}
 		}
 
@@ -204,15 +275,6 @@ void MeCtLocomotionQuadraticSynchronizer::update_for_speed_distance(float time)
 		if(value[QUAD_SYNC_ACCELERATION] < 0.0f && value[QUAD_SYNC_DISTANCE] < target[QUAD_SYNC_DISTANCE]) value[QUAD_SYNC_DISTANCE] = target[QUAD_SYNC_DISTANCE];
 	}
 }*/
-
-float MeCtLocomotionQuadraticSynchronizer::get_value(int index)
-{
-	if(index < 0 || index > 3) 
-	{
-		printf("MeCtLocomotionQuadraticSynchronizer::get_value(): Error.");
-	}
-	return value[index];
-}
 
 float MeCtLocomotionQuadraticSynchronizer::get_delta_distance()
 {
