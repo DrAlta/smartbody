@@ -109,43 +109,16 @@ void MeCtLocomotionHeightOffset::update_height_offset(SrMat& parent_mat, float b
 	update_supporting_joint_orientation();
 
 	target_height_offset = -(base_pos.y - min_height - translation_base_joint_height - base_height_displacement);
-	
-	height_offset = target_height_offset;
 
-	float space_time = limb_list->get(min_index)->space_time;
-	/*if(space_time > 1.0f && space_time < 2.0f)
-	{
-		float section = limb_list->get(min_index)->blended_anim.get_timing_space()->get_section_length(space_time, 2.0f);
-		synchronizer.set_target_flag(QUAD_SYNC_SPEED, QUAD_SYNC_DISTANCE);
-		synchronizer.update_target(QUAD_SYNC_DISTANCE, height_offset*2.0f);
-		synchronizer.update_target(QUAD_SYNC_SPEED, 0.0f);
-		synchronizer.set_bound(QUAD_SYNC_ACCELERATION, 300.0f, 1.0f);
-		synchronizer.update(time);
-		height_offset = synchronizer.get_delta_distance();
-	}
-	else*/
-	{
-		float section = limb_list->get(min_index)->blended_anim.get_timing_space()->get_section_length(space_time, 2.0f);
-		synchronizer.set_target_flag(QUAD_SYNC_SPEED, QUAD_SYNC_DISTANCE);
-		synchronizer.update_target(QUAD_SYNC_DISTANCE, height_offset);
-		synchronizer.update_target(QUAD_SYNC_SPEED, 0.0f);
-		synchronizer.set_bound(QUAD_SYNC_ACCELERATION, 400.0f, 1.0f);
-		synchronizer.update(time);
-		height_offset = synchronizer.get_delta_distance();
-	}
+	synchronizer.set_target_flag(QUAD_SYNC_SPEED, QUAD_SYNC_DISTANCE);
+	synchronizer.update_target(QUAD_SYNC_DISTANCE, target_height_offset);
+	synchronizer.update_target(QUAD_SYNC_SPEED, 0.0f);
+	synchronizer.set_max_acceleration(600.0f);
+	synchronizer.update(time);
+	height_offset = synchronizer.get_delta_distance();
 
-	/*if(!height_offset_initialized)
-	{
-		height_offset = target_height_offset;
-		height_offset_initialized = true;
-	}
+	//height_offset = target_height_offset;
 
-	float delta = acceleration * time;
-	if(abs(target_height_offset - height_offset) < delta) height_offset = target_height_offset;
-	else if(target_height_offset > height_offset) height_offset += delta;
-	else if(target_height_offset < height_offset) height_offset -= delta;*/
-
-	//printf("\n%f", height_offset);
 	free(height);
 }
 
