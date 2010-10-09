@@ -209,6 +209,36 @@ proc quatToAxisAng( float $q[], float $aa[] )
 }
 
 
+proc skmMergeAnimLayers()
+{
+   // this function is the same as selecting all anim layers, then going to Layers->Merge Layers
+   // then unlocking the resulting layer
+
+
+   string $layers[] = `ls -l -type animLayer`;
+   if ( size( $layers ) <= 1 )
+      return;
+
+
+      //  Input Arguments:
+      //      0 - Execute the command.
+      //      1 - Show the option box dialog.
+      //      2 - Return the command.
+
+   print( "Merging Animation Layers, Maya file has been modified." + "\n" );
+   layerEditorMergeAnimLayer( $layers, 0 );
+
+
+   string $layers[] = `ls -l -type animLayer`;
+   if ( size( $layers ) == 0 )
+      return;    // something bad happened here with the merge, there should be one left over
+
+
+   // unlock the layer
+   animLayer -edit -lock 0 $layers[ 0 ];
+}
+
+
 // returns the index of the name containing $type, however
 // $type is assumed to be at the end of each name
 // (types are retrieved with: $names = `keyframe -q -name pinky3_l`;)
@@ -618,6 +648,10 @@ global proc int skmExportFile( string $fname, string $animDef )
       fprint $fileid ( "# Maya Exporter v" + $skmVersion + "    Units: " + $UnitsLinear + "\n\n" );
       fprint $fileid ( "SkMotion\n\n" );
       fprint $fileid ( "name \"" + $animName + "\"\n\n" );
+
+
+      skmMergeAnimLayers();
+
 
       string $joints[];  // array to be filled with all joints names
       int $njoints = skmCountJoints( $selectionList[ $j ], $joints );
