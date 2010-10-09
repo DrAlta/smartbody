@@ -22,6 +22,8 @@
 3	char BillFord smoothbindmesh ../../../../test_suite/input/viseme_basic_test/data/L_eyeballShape.obj
 3	char BillFord smoothbindmesh ../../../../test_suite/input/viseme_basic_test/data/R_eyeballShape.obj
 3	char BillFord smoothbindmesh ../../../../test_suite/input/viseme_basic_test/data/TongueShape.obj
+3	char BillFord smoothbindmesh ../../../../test_suite/input/viseme_basic_test/data/UpperTeethShape.obj
+3	char BillFord smoothbindmesh ../../../../test_suite/input/viseme_basic_test/data/LowerTeethShape.obj
 3	char BillFord smoothbindweight ../../../../test_suite/input/viseme_curve_test/data/BillFord.xml
 3	set test character BillFord
 3	char BillFord viewer 4
