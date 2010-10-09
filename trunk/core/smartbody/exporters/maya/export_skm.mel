@@ -1227,14 +1227,14 @@ global proc skmLastFrameUpdate()
       "strokeTime",
       "relaxTime"
    };
-   
+
    //int $frameNumber = `intSliderGrp -query -value skmLastFrameSlider`;
    int $LastFrame = `intSliderGrp -query -value skmLastFrameSlider`;
 
    // set value for last frame
    currentTime -edit $LastFrame; // UPDATE THE DISPLAY
    setAttr ( $animDef + ".lastFrameNumber" ) $LastFrame;
- 
+
    // if attr in AnimDefs is less than minimum value, increase it to minimum value
    for ( $Attr in $SeqPointAttrs)
    {
@@ -1394,7 +1394,7 @@ global proc skmExportGUI()
    columnLayout -adjustableColumn true -columnAttach "both" 5;
       frameLayout -label "Animation Definitions" -borderStyle etchedIn -collapsable false -collapse 0;
          columnLayout -adjustableColumn true -rowSpacing 2 -columnOffset "both" 10;
-			textScrollList  -numberOfRows 15 -width 250 -allowMultiSelection false
+         textScrollList  -numberOfRows 15 -width 250 -allowMultiSelection false
                             -showIndexedItem 4 -selectCommand skmUpdateAnimUI scrollListAnim;
             rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
                button -label "Create Animation" -command "skmAddAnimDef" -align "center";
