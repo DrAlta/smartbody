@@ -308,7 +308,7 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	if(ik_enabled) 
 		apply_IK(); 
 
-	balance.update(limb_list, SrVec(0.0f,1.0f,0.0f), &nonlimb_joint_info, navigator.get_facing_angle(), translation_joint_index, delta_time);
+	balance.update(limb_list, SrVec(0.0f,1.0f,0.0f), &nonlimb_joint_info, navigator.get_facing_angle(), translation_joint_index, (float)delta_time);
 
 	navigator.post_controller_evaluate(frame, limb_list.get(dominant_limb), reset);
 
@@ -799,7 +799,7 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 		SrVec displacement(0,0,0);
 		SrMat w_mat = navigator.get_world_mat();
 		//height_offset.update_height_offset(nonlimb_joint_info.mat.get(translation_joint_index) * w_mat, r_blended_base_height);
-		height_offset.update_height_offset(w_mat, r_blended_base_height, delta_time);
+		height_offset.update_height_offset(w_mat, r_blended_base_height, (float)delta_time);
 		w_mat.set(13, w_mat.get(13) + height_offset.get_height_offset());
 		navigator.set_world_mat(w_mat);
 		navigator.world_pos.y += height_offset.get_height_offset();
