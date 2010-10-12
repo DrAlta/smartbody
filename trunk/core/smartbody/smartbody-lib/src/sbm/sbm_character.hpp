@@ -264,6 +264,12 @@ public:
 	void set_viseme_time_delay(float timeDelay) {time_delay = timeDelay;}
 	float get_viseme_time_delay() {return time_delay;}
 
+	void setSoftEyes(bool val);
+	bool isSoftEyes();
+
+	void setHeight(float height);
+	float getHeight();
+
 private:
 	int viseme_channel_start_pos;
 	int viseme_channel_end_pos;
@@ -299,11 +305,7 @@ protected:
 	void add_face_channel( const std::string& name, const int wo_index );
 
 
-	void setSoftEyes(bool val);
-	bool isSoftEyes();
 
-	void setHeight(float height);
-	float getHeight();
 
 };
 

@@ -1638,6 +1638,7 @@ void FltkViewer::drawEyeBeams()
 	{
 		character->skeleton_p->update_global_matrices();
 		SkJoint* eyeRight = character->skeleton_p->search_joint("eyeball_right");
+		float eyebeamLength = 100 * character->getHeight() / 175.0f;
 		if (eyeRight)
 		{
 			SrMat gmat = eyeRight->gmat();
@@ -1646,7 +1647,7 @@ void FltkViewer::drawEyeBeams()
 			glColor3f(1.0, 0.0, 0.0);
 			glBegin(GL_LINES);
 			glVertex3f(0, 0, 0);
-			glVertex3f(0, 0, 100);
+			glVertex3f(0, 0, eyebeamLength);
 			glEnd();
 			glPopMatrix();
 		}
@@ -1659,7 +1660,7 @@ void FltkViewer::drawEyeBeams()
 			glColor3f(1.0, 0.0, 0.0);
 			glBegin(GL_LINES);
 			glVertex3f(0, 0, 0);
-			glVertex3f(0, 0, 100);
+			glVertex3f(0, 0, eyebeamLength);
 			glEnd();
 			glPopMatrix();
 		}
