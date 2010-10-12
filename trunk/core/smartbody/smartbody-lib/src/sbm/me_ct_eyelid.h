@@ -18,7 +18,6 @@
  *
  *  CONTRIBUTORS:
  *      Marcus Thiebaux, USC
- *      Andrew n marshall, USC
  */
 
 #ifndef ME_CT_EYELID_H
@@ -26,6 +25,12 @@
 
 #include <SK/sk_skeleton.h>
 #include <ME/me_controller.h>
+
+/*
+	char <> softeyes [on|off]
+	char <> softeyes weight <upper> <lower>
+	char <> softeyes eyepitch|upperlid|lowerlid <upper> <lower>
+*/
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -35,10 +40,11 @@ class MeCtEyeLid : public MeController	{
 
 		SkChannelArray		_channels; // override motion channels, to include world_offset
 		SkSkeleton* 	    _skeleton_ref_p;
-		float				_eyeballRotLimitUp;
-		float				_eyeballRotLimitDown;
-		float				_eyeballTransLimitUp;
-		float				_eyeballTransLimitDown;
+		
+		float				_eyelidWeight[ 2 ];
+		float				_eyelidUpperTransRange[ 2 ];
+		float				_eyelidLowerTransRange[ 2 ];
+		float				_eyeballPitchRange[ 2 ];
 		
 	public:
 		static const char* type_name;
@@ -48,27 +54,54 @@ class MeCtEyeLid : public MeController	{
 
 		/*! Destructor is public but pay attention to the use of ref()/unref() */
 		virtual ~MeCtEyeLid( void );
-		
 		void clear( void );
-
 		void init( void );
-
-		void setEyeballRotLimitUp(float val);
-		void setEyeballRotLimitDown(float val);
-		void setEyeballTransLimitUp(float val);
-		void setEyeballTransLimitDown(float val);
-
-		float getEyeballRotLimitUp();
-		float getEyeballRotLimitDown();
-		float getEyeballTransLimitUp();
-		float getEyeballTransLimitDown();
 		
+		void setEyelidWeight( float up, float dn )	{
+			_eyelidWeight[ 0 ] = up;
+			_eyelidWeight[ 1 ] = dn;
+		}
+		void getEyelidWeight( float &up, float &dn )	{
+			up = _eyelidWeight[ 0 ];
+			dn = _eyelidWeight[ 1 ];
+		}
+
+		void setEyelidUpperTransRange( float up, float dn ) {
+			_eyelidUpperTransRange[ 0 ] = up;
+			_eyelidUpperTransRange[ 1 ] = dn;
+		}
+		void setEyelidLowerTransRange( float up, float dn ) {
+			_eyelidLowerTransRange[ 0 ] = up;
+			_eyelidLowerTransRange[ 1 ] = dn;
+		}
+		void getEyelidUpperTransRange( float &up, float &dn ) {
+			up = _eyelidUpperTransRange[ 0 ];
+			dn = _eyelidUpperTransRange[ 1 ];
+		}
+		void getEyelidLowerTransRange( float &up, float &dn ) {
+			up = _eyelidLowerTransRange[ 0 ];
+			dn = _eyelidLowerTransRange[ 1 ];
+		}
+
+		void setEyeballPitchRange( float up, float dn ) {
+			_eyeballPitchRange[ 0 ] = up;
+			_eyeballPitchRange[ 1 ] = dn;
+		}
+		void getEyeballPitchRange( float &up, float &dn ) {
+			up = _eyeballPitchRange[ 0 ];
+			dn = _eyeballPitchRange[ 1 ];
+		}
+
 	private:
 		SkJoint*		source_ref_joint( void );
 
-		float	calc_upper_correction( float in_eye_p, float in_lid_y );
+		float	calc_lid_correction( 
+			float in_eye_p, 
+			float eye_range[ 2 ], 
+			float in_lid_y,
+			float lid_range[ 2 ]
+		);
 			
-		// callbacks for the base class
 		virtual void context_updated( void );
 		virtual void controller_map_updated();
 		virtual void controller_start();

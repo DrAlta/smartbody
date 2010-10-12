@@ -18,7 +18,6 @@
  *
  *  CONTRIBUTORS:
  *      Marcus Thiebaux, USC
- *      Andrew n marshall, USC
  */
 
 #include "gwiz_math.h"
@@ -65,29 +64,27 @@
 		pitch = 12.8
 */
 
-//static int G_debug = 0;
+#define EYEBALL_ROT_LIMIT_UP	-35.0f
+#define EYEBALL_ROT_LIMIT_DN	30.0f
+
+#define EYELID_UPPER_Y_LIMIT_UP	0.372f
+#define EYELID_UPPER_Y_LIMIT_DN	-0.788f
+
+#define EYELID_LOWER_Y_LIMIT_UP	0.0
+#define EYELID_LOWER_Y_LIMIT_DN	-0.788f
 
 //////////////////////////////////////////////////////////////////////////////////
 
 const char* MeCtEyeLid::type_name = "EyeLid";
 
-// default limits, set for character in centimeters
-#define EYEBALL_ROT_LIMIT_UP	-35.0f
-#define EYEBALL_ROT_LIMIT_DN	30.0f
-#define EYELID_Y_LIMIT_UP	0.372f
-#define EYELID_Y_LIMIT_DN	-0.788f
-
 MeCtEyeLid::MeCtEyeLid( void )	{
 
    _skeleton_ref_p = NULL;
 
-   // initialize limits
-   setEyeballRotLimitUp(EYEBALL_ROT_LIMIT_UP);
-   setEyeballRotLimitDown(EYEBALL_ROT_LIMIT_DN);
-   // note that translational limits are defaults for
-   // a normal-sized human using centimeters
-   setEyeballTransLimitUp(EYELID_Y_LIMIT_UP);
-   setEyeballTransLimitDown(EYELID_Y_LIMIT_DN);
+	setEyelidWeight( 1.0f, 0.2f );
+	setEyeballPitchRange( EYEBALL_ROT_LIMIT_UP, EYEBALL_ROT_LIMIT_DN );
+	setEyelidUpperTransRange( EYELID_UPPER_Y_LIMIT_UP, EYELID_UPPER_Y_LIMIT_DN );
+	setEyelidLowerTransRange( EYELID_LOWER_Y_LIMIT_UP, EYELID_LOWER_Y_LIMIT_DN );
 }
 
 MeCtEyeLid::~MeCtEyeLid( void )	{
@@ -100,80 +97,38 @@ void MeCtEyeLid::clear( void )	{
    _skeleton_ref_p = NULL;
 }
 
-
-
-float MeCtEyeLid::calc_upper_correction( 
-	float in_eye_p,
-	float in_lid_y
+float MeCtEyeLid::calc_lid_correction( 
+	float in_eye_p, float eye_range[ 2 ],
+	float in_lid_y, float lid_range[ 2 ]
 	)	{
 	float adj_lid_y = 0.0;
 
 	// adjust for eye pitch
 	if( in_eye_p < 0.0 ) { // looking up
-		float eye_norm = in_eye_p / _eyeballRotLimitUp;
-		adj_lid_y = eye_norm * _eyeballTransLimitUp;
+		float eye_norm = in_eye_p / eye_range[ 0 ];
+		adj_lid_y = eye_norm * lid_range[ 0 ];
 	}
 	else
 	if( in_eye_p > 0.0 )	{ // looking down
-		float eye_norm = in_eye_p / _eyeballRotLimitDown;
-		adj_lid_y = eye_norm * _eyeballTransLimitDown;
+		float eye_norm = in_eye_p / eye_range[ 1 ];
+		adj_lid_y = eye_norm * lid_range[ 1 ];
 	}
 
 	// adjust for blink/lift
 	float out_lid_y = adj_lid_y;
 	if( in_lid_y < 0.0 )	{ // eye is effectively closing/blinking
-		float blink_norm = in_lid_y / _eyeballTransLimitDown;
-		out_lid_y = adj_lid_y - blink_norm * ( adj_lid_y - _eyeballTransLimitDown );
+		float blink_norm = in_lid_y / lid_range[ 1 ];
+		out_lid_y = adj_lid_y - blink_norm * ( adj_lid_y - lid_range[ 1 ] );
 	}
 	else
 	if( in_lid_y > 0.0 )	{ // eye is effectively lifting
-		float blink_norm = in_lid_y / _eyeballTransLimitUp;
-		out_lid_y = adj_lid_y + blink_norm * ( _eyeballTransLimitUp - adj_lid_y );
+		float blink_norm = in_lid_y / lid_range[ 0 ];
+		out_lid_y = adj_lid_y + blink_norm * ( lid_range[ 0 ] - adj_lid_y );
 	}
 
 //if( G_debug ) 	LOG( "eye: %f  lid: %f  --> %f", in_eye_p, in_lid_y, out_lid_y );
 
 	return( out_lid_y );
-}
-
-void MeCtEyeLid::setEyeballRotLimitUp(float val)
-{
-	_eyeballRotLimitUp = val;
-}
-
-void MeCtEyeLid::setEyeballRotLimitDown(float val)
-{
-	_eyeballRotLimitDown = val;
-}
-
-void MeCtEyeLid::setEyeballTransLimitUp(float val)
-{
-	_eyeballTransLimitUp = val;
-}
-
-void MeCtEyeLid::setEyeballTransLimitDown(float val)
-{
-	_eyeballTransLimitDown = val;
-}
-
-float MeCtEyeLid::getEyeballRotLimitUp()
-{
-	return _eyeballRotLimitUp;
-}
-
-float MeCtEyeLid::getEyeballRotLimitDown()
-{
-	return _eyeballRotLimitDown;
-}
-
-float MeCtEyeLid::getEyeballTransLimitUp()
-{
-	return _eyeballTransLimitUp;
-}
-
-float MeCtEyeLid::getEyeballTransLimitDown()
-{
-	return _eyeballTransLimitDown;
 }
 
 void MeCtEyeLid::init( void ) {
@@ -253,10 +208,13 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 	int n_chan = _channels.size();
 
 	int L_eye_quat_chan_index = _context->channels().search( SkJointName( "eyeball_left" ), SkChannel::Quat );
-	int R_eye_quat_chan_index =  _context->channels().search( SkJointName( "eyeball_right" ), SkChannel::Quat );
+//	int R_eye_quat_chan_index =  _context->channels().search( SkJointName( "eyeball_right" ), SkChannel::Quat );
 
 	int UL_lid_posy_chan_index =  _context->channels().search( SkJointName( "upper_eyelid_left" ), SkChannel::YPos );
 	int UR_lid_posy_chan_index =  _context->channels().search( SkJointName( "upper_eyelid_right" ), SkChannel::YPos );
+
+	int LL_lid_posy_chan_index =  _context->channels().search( SkJointName( "lower_eyelid_left" ), SkChannel::YPos );
+	int LR_lid_posy_chan_index =  _context->channels().search( SkJointName( "lower_eyelid_right" ), SkChannel::YPos );
 
 	int i_map;
 	
@@ -272,12 +230,33 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 	float UL_lid_y = fbuffer[ UL_lid_y_map ];
 
 	int UR_lid_y_map = _context->toBufferIndex( UR_lid_posy_chan_index );
-	float UR_lid_y = fbuffer[ UR_lid_y_map ];
+//	float UR_lid_y = fbuffer[ UR_lid_y_map ];
 
-	float UL_correct_posy = calc_upper_correction( (float)( L_eye_e.p() ), UL_lid_y );
+	int LL_lid_y_map = _context->toBufferIndex( LL_lid_posy_chan_index );
+	float LL_lid_y = fbuffer[ LL_lid_y_map ];
+
+	int LR_lid_y_map = _context->toBufferIndex( LR_lid_posy_chan_index );
+//	float LR_lid_y = fbuffer[ LR_lid_y_map ];
+
+	float UL_correct_posy = _eyelidWeight[ 0 ] * calc_lid_correction( 
+		(float)( L_eye_e.p() ), 
+		_eyeballPitchRange,
+		UL_lid_y, 
+		_eyelidUpperTransRange
+	);
+
+	float LL_correct_posy = _eyelidWeight[ 1 ] * calc_lid_correction( 
+		(float)( L_eye_e.p() ), 
+		_eyeballPitchRange,
+		LL_lid_y, 
+		_eyelidLowerTransRange
+	);
 
 	fbuffer[ UL_lid_y_map ] = UL_correct_posy;
 	fbuffer[ UR_lid_y_map ] = UL_correct_posy;
+
+	fbuffer[ LL_lid_y_map ] = LL_correct_posy;
+	fbuffer[ LR_lid_y_map ] = LL_correct_posy;
 
 	return true;
 }
