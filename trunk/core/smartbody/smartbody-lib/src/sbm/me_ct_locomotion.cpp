@@ -61,7 +61,7 @@ MeCtLocomotion::MeCtLocomotion() {
 	r_blended_base_height = 0.0f;
 	style = 0;
 	motion_time = -1.0f;
-
+	last_t = 0.0f;
 	abs_ground_height = 0.0f;
 	
 }
@@ -396,7 +396,7 @@ SrVec MeCtLocomotion::calc_rotational_displacement()
 	v = -navigator.get_base_pos();
 	pmat.roty(navigator.get_facing_angle());
 
-	SrVec world_offset_to_base = v*pmat;
+	world_offset_to_base = v*pmat;
 	v = world_offset_to_base - pre_world_offset_to_base;
 	v.y = 0.0f;
 
@@ -408,6 +408,11 @@ SrVec MeCtLocomotion::calc_rotational_displacement()
 		return v;
 	}
 	return v;
+}
+
+SrVec MeCtLocomotion::get_base_pos()
+{
+	return navigator.get_world_pos()-world_offset_to_base;
 }
 
 void MeCtLocomotion::init_nonlimb_joint_info()
@@ -766,7 +771,7 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 	get_blended_quat_buffer(&(nonlimb_joint_info.quat), &joint_quats1, &joint_quats2, dom_ratio);
 
 	//recompute the dominant limb
-	get_dominant_limb();
+	determine_dominant_limb_index();
 
 	//blend with standing animation is standing factor > 0
 	blend_standing(frame);
@@ -811,6 +816,11 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 	
 }
 
+float MeCtLocomotion::get_current_speed()
+{
+	return speed_accelerator.get_curr_speed();
+}
+
 void MeCtLocomotion::update_nonlimb_mat_with_global_info()
 {
 	SrMat mat = navigator.get_world_mat();
@@ -818,6 +828,11 @@ void MeCtLocomotion::update_nonlimb_mat_with_global_info()
 	{
 		nonlimb_joint_info.mat.set(i, nonlimb_joint_info.mat.get(i)*mat);
 	}
+}
+
+int MeCtLocomotion::get_dominant_limb_index()
+{
+	return dominant_limb;
 }
 
 void MeCtLocomotion::update_limb_mat_with_global_info()
@@ -1026,7 +1041,7 @@ void MeCtLocomotion::get_anim_indices(int limb_index, SrVec direction, int* anim
 	limb->get_walking_list()->get(index2)->get_timing_space()->set_mode(mode2);
 }
 
-int MeCtLocomotion::get_dominant_limb()
+int MeCtLocomotion::determine_dominant_limb_index()
 {
 	float remnant = 0.0f;
 	float r = -1;

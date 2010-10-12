@@ -71,6 +71,8 @@ void MeCtLocomotionNavigator::update_framerate_accelerator(float accelerator, Sr
 		}
 		else
 		{
+			if(abs(accelerator-standing_factor) > 0.4f)
+				int y = 0;
 			standing_factor = accelerator;
 			framerate_accelerator = 1.0f;
 		}
@@ -280,6 +282,11 @@ inline void MeCtLocomotionNavigator::calc_target_velocity()
 			target_local_vel = local_vel;
 		}
 	}
+}
+
+SrVec MeCtLocomotionNavigator::get_global_velocity()
+{
+	return global_vel;
 }
 
 SrVec MeCtLocomotionNavigator::get_dis_to_dest_local()
