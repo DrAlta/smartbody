@@ -35,6 +35,10 @@ class MeCtEyeLid : public MeController	{
 
 		SkChannelArray		_channels; // override motion channels, to include world_offset
 		SkSkeleton* 	    _skeleton_ref_p;
+		float				_eyeballRotLimitUp;
+		float				_eyeballRotLimitDown;
+		float				_eyeballTransLimitUp;
+		float				_eyeballTransLimitDown;
 		
 	public:
 		static const char* type_name;
@@ -48,6 +52,16 @@ class MeCtEyeLid : public MeController	{
 		void clear( void );
 
 		void init( void );
+
+		void setEyeballRotLimitUp(float val);
+		void setEyeballRotLimitDown(float val);
+		void setEyeballTransLimitUp(float val);
+		void setEyeballTransLimitDown(float val);
+
+		float getEyeballRotLimitUp();
+		float getEyeballRotLimitDown();
+		float getEyeballTransLimitUp();
+		float getEyeballTransLimitDown();
 		
 	private:
 		SkJoint*		source_ref_joint( void );

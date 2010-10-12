@@ -268,6 +268,7 @@ private:
 	int viseme_channel_start_pos;
 	int viseme_channel_end_pos;
 	bool softEyes;
+	float _height;
 
 protected:
 	/*!
@@ -300,6 +301,9 @@ protected:
 
 	void setSoftEyes(bool val);
 	bool isSoftEyes();
+
+	void setHeight(float height);
+	float getHeight();
 
 };
 

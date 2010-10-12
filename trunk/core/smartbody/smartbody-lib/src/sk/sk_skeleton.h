@@ -169,6 +169,8 @@ class SkSkeleton : public SrSharedClass
 
 	/*! retrieves the center of mass of the skeleton */
 	SrVec& com () { return _com; };
+	
+	float getCurrentHeight();
 
    private :
     int _loadjdata ( SrInput& in, SkJoint* j, SrStringArray& paths );

@@ -177,4 +177,20 @@ void SkSkeleton::set_geo_local ()
    update_global_matrices ();
 }
 
+float SkSkeleton::getCurrentHeight()
+{
+	SrBox initialBoundingBox;
+	update_global_matrices();
+	SrArray<SkJoint*>& joints = get_joint_array();
+	for (int j = 0; j < joints.size(); j++)
+	{
+		joints[j]->update_gmat();
+		const SrMat& gmat = joints[j]->gmat();
+		SrVec point(gmat.get(3, 0), gmat.get(3, 1), gmat.get(3, 2));
+		initialBoundingBox.extend(point);
+	}
+
+	return initialBoundingBox.size().y;
+}
+
 //============================ End of File ============================
