@@ -52,6 +52,7 @@ public:
 	float pre_blended_base_height;
 	float r_blended_base_height;
 
+	SrVec world_offset_to_base;
 	SrVec pre_world_offset_to_base;
 	SrString translation_joint_name;
 	float translation_joint_height;
@@ -211,9 +212,16 @@ public:
 
 	void set_balance_factor(float factor);
 
+	SrVec get_base_pos();
+
+	float get_current_speed();
+
+	int get_dominant_limb_index();
+
 protected:
 
-	void init_limbs();
+	//void init_limbs();
+	int determine_dominant_limb_index();
 
 	void get_translation_base_joint_index();
 
@@ -229,7 +237,7 @@ protected:
 
 	char* get_base_name();
 
-	SrVec get_heading_direction();
+	//SrVec get_heading_direction();
 
 	void set_turning_speed(float radians);
 
@@ -239,7 +247,7 @@ protected:
 
 	void analyze_motion( SkMotion* motion );
 
-	void blend();
+	//void blend();
 
 	void update(float inc_frame, MeFrameData& frame);
 
@@ -249,7 +257,7 @@ protected:
 
 	void blend_base_joint(MeFrameData& frame, float space_time, int anim_index1, int anim_index2, float weight);
 
-	int get_dominant_limb();
+	
 
 	SrVec get_local_direction(SrVec* direction);
 
@@ -278,6 +286,8 @@ protected:
 	void update_nonlimb_mat_with_global_info();
 
 	void update_limb_mat_with_global_info();
+
+
 
 };
 

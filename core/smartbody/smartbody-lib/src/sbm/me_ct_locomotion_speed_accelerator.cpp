@@ -82,6 +82,7 @@ void MeCtLocomotionSpeedAccelerator::update_speed(double time_interval)
 
 float MeCtLocomotionSpeedAccelerator::update(SrVec* direction, MeCtLocomotionLimb* limb)
 {
+	if(direction->iszero()) return 0.0f;
 	anim_indices.capacity(0);
 	anim_indices.push() = 1;
 	anim_indices.push() = 2;
@@ -97,8 +98,10 @@ float MeCtLocomotionSpeedAccelerator::update(SrVec* direction, MeCtLocomotionLim
 	m.normalize();
 	SrVec dir = d2- d1;
 	float a = dir.x/dir.z;
-	float len = (d1.x - a * d1.z)/(m.x - a * m.z);
-	return curr_speed/len;
+
+	limb->blended_anim.global_info->speed = (d1.x - a * d1.z)/(m.x - a * m.z);
+	//float len = (d1.x - a * d1.z)/(m.x - a * m.z);
+	return curr_speed/limb->blended_anim.global_info->speed;
 }
 
 void MeCtLocomotionSpeedAccelerator::set_target_speed(float target_speed)

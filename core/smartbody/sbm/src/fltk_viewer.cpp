@@ -33,7 +33,7 @@
 # include <fltk/ColorChooser.H>
 # include <fltk/FileChooser.H>
 # include <fltk/Browser.H>
-
+# include <fltk/ToggleItem.H>
 # include <SR/sr_box.h>
 # include <SR/sr_sphere.h>
 # include <SR/sr_quat.h>
@@ -161,15 +161,23 @@ static Fl_Menu_Item MenuTable[] =
          { "&terrain wireframe",  0, MCB, CMD(CmdTerrainWireframe),  FL_MENU_RADIO },
          { "&terrain",  0, MCB, CMD(CmdTerrain),  FL_MENU_RADIO },
          { 0 },
-   { "&eye beams", 0, 0, 0, FL_SUBMENU },
+	{ "&eye beams", 0, 0, 0, FL_SUBMENU },
          { "&no eye beams",   0, MCB, CMD(CmdNoEyeBeams),    FL_MENU_RADIO },
          { "&eye beams",  0, MCB, CMD(CmdEyeBeams),  FL_MENU_RADIO },
          { 0 },
- { "&dynamics", 0, 0, 0, FL_SUBMENU },
+	{ "&dynamics", 0, 0, 0, FL_SUBMENU },
          { "&no dynamics",   0, MCB, CMD(CmdNoDynamics),    FL_MENU_RADIO },
          { "&show COM",  0, MCB, CMD(CmdShowCOM),  FL_MENU_RADIO },
          { "&show COM and support polygon",  0, MCB, CMD(CmdShowCOMSupportPolygon),  FL_MENU_RADIO },
 		 { "&show masses",   0, MCB, CMD(CmdShowMasses),  FL_MENU_TOGGLE },
+         { 0 },
+	{ "&locomotion", 0, 0, 0, FL_SUBMENU },
+         { "&enable locomotion",   0, MCB, CMD(CmdEnableLocomotion),    FL_MENU_TOGGLE },
+         //{ "&show all",  0, MCB, CMD(CmdShowLocomotionAll),  FL_MENU_TOGGLE },
+         { "&show velocity",  0, MCB, CMD(CmdShowVelocity),  FL_MENU_TOGGLE },
+		 { "&show orientation",   0, MCB, CMD(CmdShowOrientation),  FL_MENU_TOGGLE },
+		 { "&show selection",   0, MCB, CMD(CmdShowSelection),  FL_MENU_TOGGLE },
+		 { "&show foot step marks",   0, MCB, CMD(CmdShowFootStepMarks),  FL_MENU_TOGGLE },
          { 0 },
    { 0 }
  };
@@ -210,6 +218,7 @@ class FltkViewerData
    FltkViewer::terrainMode terrainMode;     // terrain mode
    FltkViewer::EyeBeamMode eyeBeamMode;     // eye beam mode
    FltkViewer::DynamicsMode dynamicsMode;     // dynamics information mode
+   FltkViewer::LocomotionMode locomotionMode;   // locomotion mode
 
 
    bool iconized;      // to stop processing while the window is iconized
@@ -224,6 +233,12 @@ class FltkViewerData
    bool showbones;
    bool showaxis;
    bool showmasses;
+
+   bool locomotionenabled;
+   bool showlocomotionall;
+   bool showvelocity;
+   bool showorientation;
+   bool showselection;
 
    SrString message;   // user msg to display in the window
    SrLight light;
@@ -273,6 +288,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->terrainMode = ModeTerrain;
    _data->eyeBeamMode = ModeNoEyeBeams;
    _data->dynamicsMode = ModeNoDynamics;
+   _data->locomotionMode = ModeEnableLocomotion;
 
    _data->iconized    = false;
    _data->statistics  = false;
@@ -284,6 +300,10 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->showbones = false;
    _data->showaxis = false;
    _data->showmasses = false;
+   _data->showlocomotionall = false;
+   _data->showvelocity = false;
+   _data->showorientation = false;
+   _data->showselection = false;
 
    _data->light.init();
 
@@ -405,6 +425,32 @@ void FltkViewer::menu_cmd ( MenuCmd s )
                        break;
 	  case CmdShowMasses: _data->showmasses =  !_data->showmasses;
                        break;
+	  case CmdEnableLocomotion  : _data->locomotionenabled = !_data->locomotionenabled;             
+                       break;
+	  case CmdShowLocomotionAll  : _data->showlocomotionall = !_data->showlocomotionall;
+						if(_data->showlocomotionall)
+						{
+							_data->showvelocity = true;
+							_data->showorientation = true;
+							_data->showselection = true;
+
+						}
+						else
+						{
+							_data->showvelocity = false;
+							_data->showorientation = false;
+							_data->showselection = false;
+						}
+                       break;
+      case CmdShowVelocity  : _data->showvelocity = !_data->showvelocity;
+						if(!_data->showvelocity) _data->showlocomotionall = false;
+                       break;
+	  case CmdShowOrientation  : _data->showorientation = !_data->showorientation;
+						if(!_data->showorientation) _data->showlocomotionall = false;
+                       break;
+	  case CmdShowSelection  : _data->showselection = !_data->showselection;
+						if(!_data->showselection) _data->showlocomotionall = false;
+                       break;
       case CmdBoundingBox : SR_SWAPB(_data->boundingbox); 
                             if ( _data->boundingbox ) update_bbox();
                             break;
@@ -491,6 +537,11 @@ bool FltkViewer::menu_cmd_activated ( MenuCmd c )
       case CmdShowCOM   : return _data->dynamicsMode==ModeShowCOM? true:false;
 	  case CmdShowCOMSupportPolygon   : return _data->dynamicsMode==ModeShowCOMSupportPolygon? true:false;
 	  case CmdShowMasses : return _data->showmasses? true:false;
+	  case CmdEnableLocomotion : return _data->locomotionenabled? true:false;
+	  case CmdShowLocomotionAll : return _data->showlocomotionall? true:false;
+	  case CmdShowVelocity : return _data->showvelocity? true:false;
+	  case CmdShowOrientation : return _data->showorientation? true:false;
+	  case CmdShowSelection : return _data->showselection? true:false;
       case CmdAxis        : return _data->displayaxis? true:false;
       case CmdBoundingBox : return _data->boundingbox? true:false;
       case CmdStatistics  : return _data->statistics? true:false;
@@ -864,6 +915,7 @@ void FltkViewer::draw()
 
 	drawEyeBeams();
 	drawDynamics();
+	drawLocomotion();
 
 	_data->fcounter.stop();
 
@@ -940,7 +992,7 @@ static float z_spd = 70;
 static char t_direction[200];
 static char character[100];
 static int char_index = 0;
-static int mode = 0;
+static int kmode = 0;
 static float height_disp = 0.0f;
 static float height_disp_delta = 1.0f;
 static bool height_disp_inc = false;
@@ -952,7 +1004,7 @@ static bool rightkey = false;
 static bool a_key = false;
 static bool d_key = false;
 
-static void translate_keyboard_state()
+void FltkViewer::translate_keyboard_state()
 {
 	bool locomotion_cmd = false;
 	char cmd[300];
@@ -979,8 +1031,6 @@ static void translate_keyboard_state()
 
 	sprintf(cmd, "test loco ");
 
-
-
 	if(fltk::get_key_state('r'))
 	{
 		height_disp += height_disp_delta;
@@ -1000,6 +1050,46 @@ static void translate_keyboard_state()
 		{
 			char_index = 0;
 		}
+		//_data->showselection = !_data->showselection;
+		// check the widget
+		/*int numChildren = _data->menubut->children();
+		for (int c = 0; c < numChildren; c++)
+		{
+			Widget* wchild = _data->menubut->child(c);
+			if (strcmp(wchild->label(), "&locomotion") == 0)
+			{
+				Group* group = dynamic_cast<Group*>(wchild);
+				if (group)
+				{
+					int numGrandChildren = group->children();
+					for (int g = 0; g < numGrandChildren; g++)
+					{
+						std::cout << group->label() << std::endl;
+						Widget* grandChild = group->child(g);
+						if (strcmp(grandChild->label(), "&show selection") == 0)
+						{
+							int vals[1] = { g };
+							
+							grandChild->click_to_focus();
+							grandChild->set_selected();
+							grandChild->redraw();
+							_data->menubut->set_item(vals, 1);
+							fltk::ToggleItem* item = dynamic_cast<fltk::ToggleItem*>(grandChild);
+							int y = 0;
+							if (item)
+							{
+								
+							}
+						}
+						
+					}
+				}
+				std::cout << group->label() << std::endl;
+				
+			}
+			
+		}*/
+
 	}
 
 	if(fltk::get_key_state('w'))
@@ -1025,7 +1115,7 @@ static void translate_keyboard_state()
 			z_flag = 1;
 			x_flag = 0;
 			spd = z_spd;
-			mode = 0;
+			kmode = 0;
 			sprintf(t_direction, "forward ");
 			upkey = true;
 		}
@@ -1042,7 +1132,7 @@ static void translate_keyboard_state()
 			x_flag = 0;
 			rps_flag = 0;
 			spd = z_spd;
-			mode = 0;
+			kmode = 0;
 			sprintf(t_direction, "backward ");
 			downkey = true;
 		}
@@ -1128,7 +1218,7 @@ static void translate_keyboard_state()
 	strcat(cmd, t_direction);
 	//sprintf(tt, "spd %f rps %f time 0.5", spd, rps_flag * rps);
 
-	if(mode == 0) sprintf(tt, "spd 0 rps %f time 0.7", rps_flag * rps);
+	if(kmode == 0) sprintf(tt, "spd 0 rps %f time 0.7", rps_flag * rps);
 	else sprintf(tt, "spd 0 lrps %f angle 3.14159265 time 1.0", rps_flag * rps);
 
 	if(locomotion_cmd) 
@@ -1667,6 +1757,321 @@ void FltkViewer::drawEyeBeams()
 		character = character_map.next();
 	}
 
+}
+
+void FltkViewer::drawCircle(float cx, float cy, float cz, float r, int num_segments, SrVec& color) 
+{ 
+	float theta = 2.0f * 3.1415926f / float(num_segments); 
+	float tangetial_factor = tanf(theta);//calculate the tangential factor 
+
+	float radial_factor = cosf(theta);//calculate the radial factor 
+	
+	float x = r;//we start at angle = 0 
+
+	float z = 0; 
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND); 
+	glColor4f(color.x, color.y, color.z, 0.3f);
+	glBegin(GL_LINE_LOOP); 
+	for(int ii = 0; ii < num_segments; ii++) 
+	{ 
+		glVertex3f(x + cx, cy, z + cz);//output vertex 
+        
+		float tx = -z; 
+		float tz = x; 
+
+		x += tx * tangetial_factor; 
+		z += tz * tangetial_factor; 
+
+		x *= radial_factor; 
+		z *= radial_factor; 
+	} 
+	glEnd(); 
+}
+static float spin_angle = 0.0f;
+static float time = 0.0f;
+void FltkViewer::drawActiveArrow(SrVec& from, SrVec& to, int num, float width, SrVec& color, bool spin)
+{
+	spin_angle += 0.02f;
+	if(spin_angle >= 3.1415926535f*2.0f) spin_angle = 0.0f;
+	SrVec di = (to - from)/(float)num;
+
+
+	float speed = 40.0f;
+	float acc = -80.0f;
+	float latency = 0.10f;
+	
+	time += 0.01666f;
+
+	SrVec p[6];
+	p[5] = to;
+	SrMat mat;
+	mat.rot(di, spin_angle);
+
+	p[1].x = width/2.0f;
+	p[1].z = width/2.0f;
+	p[2].x = width/2.0f;
+	p[2].z = -width/2.0f;
+	p[3].x = -width/2.0f;
+	p[3].z = -width/2.0f;
+	p[4].x = -width/2.0f;
+	p[4].z = width/2.0f;
+
+	p[1] = p[1]*mat;
+	p[2] = p[2]*mat;
+	p[3] = p[3]*mat;
+	p[4] = p[4]*mat;
+	p[1] = p[5]+p[1];
+	p[2] = p[5]+p[2];
+	p[3] = p[5]+p[3];
+	p[4] = p[5]+p[4];
+
+	p[0] = p[5]+di;
+
+	float t_time = 0.0f;
+	float t_speed = 0.0f;
+	float dis = 0.0f;
+	float s_time;
+	float prev_dis = 0.0f;
+
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND); 
+	glColor4f(color.x, color.y, color.z, 0.5f);
+	glBegin(GL_TRIANGLES);
+	//printf("\n");
+	for(int i = 0; i < num; ++i)
+	{
+
+		p[0] -= di;
+		p[1] -= di;
+		p[2] -= di;
+		p[3] -= di;
+		p[4] -= di;
+		p[5] -= di;
+		t_time = time+latency*i;
+		t_speed = speed+acc*t_time;
+		if(abs(t_speed) > abs(speed))
+		{
+			t_time = (t_speed+speed)/acc;
+		}
+		if(i == 0) s_time = t_time;
+		prev_dis = dis;
+		dis = speed*t_time+0.5f*acc*t_time*t_time;
+		t_speed = speed+acc*t_time;
+		
+		glColor4f(color.x, color.y, color.z, 0.5f*abs(t_speed)/abs(speed));
+
+		//printf("\n%f", dis);
+
+		p[0].y += dis-prev_dis;
+		p[1].y += dis-prev_dis;
+		p[2].y += dis-prev_dis;
+		p[3].y += dis-prev_dis;
+		p[4].y += dis-prev_dis;
+		p[5].y += dis-prev_dis;
+
+		glVertex3f(p[0].x, p[0].y, p[0].z);
+		glVertex3f(p[2].x, p[2].y, p[2].z);
+		glVertex3f(p[1].x, p[1].y, p[1].z);
+
+		glVertex3f(p[0].x, p[0].y, p[0].z);
+		glVertex3f(p[3].x, p[3].y, p[3].z);
+		glVertex3f(p[2].x, p[2].y, p[2].z);
+
+		glVertex3f(p[0].x, p[0].y, p[0].z);
+		glVertex3f(p[4].x, p[4].y, p[4].z);
+		glVertex3f(p[3].x, p[3].y, p[3].z);
+
+		glVertex3f(p[0].x, p[0].y, p[0].z);
+		glVertex3f(p[1].x, p[1].y, p[1].z);
+		glVertex3f(p[4].x, p[4].y, p[4].z);
+
+		glVertex3f(p[1].x, p[1].y, p[1].z);
+		glVertex3f(p[2].x, p[2].y, p[2].z);
+		glVertex3f(p[3].x, p[3].y, p[3].z);
+
+		glVertex3f(p[1].x, p[1].y, p[1].z);
+		glVertex3f(p[3].x, p[3].y, p[3].z);
+		glVertex3f(p[4].x, p[4].y, p[4].z);
+	}
+	time = s_time;
+	glEnd();
+	glDisable(GL_BLEND); 
+}
+/*void FltkViewer::drawActiveArrow(SrVec& from, SrVec& to, int num, float width, SrVec& color, bool spin)
+{
+	spin_angle += 0.02f;
+	if(spin_angle >= 3.1415926535f*2.0f) spin_angle = 0.0f;
+	SrVec di = (to - from)/num;
+
+
+	float speed = 40.0f;
+	float acc = -80.0f;
+	float latency = 0.06f;
+	
+	time += 0.01666f;
+
+	SrVec p[4];
+	p[3] = to;
+	SrMat mat;
+	mat.rot(di, spin_angle);
+
+	p[1].x = width/2.0f;
+	p[2].x = -width/2.0f;
+
+	p[1] = p[1]*mat;
+	p[2] = p[2]*mat;
+	p[1] = p[3]+p[1];
+	p[2] = p[3]+p[2];
+	p[0] = p[3]+di;
+
+	float t_time = 0.0f;
+	float t_speed = 0.0f;
+	float dis = 0.0f;
+	float s_time;
+	float prev_dis = 0.0f;
+
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND); 
+	glColor4f(color.x, color.y, color.z, 0.3f);
+	glBegin(GL_TRIANGLES);
+	//printf("\n");
+	for(int i = 0; i < num; ++i)
+	{
+		p[0] -= di;
+		p[3] -= di;
+		p[1] -= di;
+		p[2] -= di;
+		t_time = time+latency*i;
+		t_speed = speed+acc*t_time;
+		if(abs(t_speed) > abs(speed))
+		{
+			t_time = (t_speed+speed)/acc;
+		}
+		if(i == 0) s_time = t_time;
+		prev_dis = dis;
+		dis = speed*t_time+0.5f*acc*t_time*t_time;
+
+		//printf("\n%f", dis);
+
+		p[0].y += dis-prev_dis;
+		p[1].y += dis-prev_dis;
+		p[2].y += dis-prev_dis;
+		p[3].y += dis-prev_dis;
+
+		glVertex3f(p[0].x, p[0].y, p[0].z);
+		glVertex3f(p[1].x, p[1].y, p[1].z);
+		glVertex3f(p[2].x, p[2].y, p[2].z);
+
+		glVertex3f(p[0].x, p[0].y, p[0].z);
+		glVertex3f(p[2].x, p[2].y, p[2].z);
+		glVertex3f(p[1].x, p[1].y, p[1].z);
+	}
+	time = s_time;
+	glEnd();
+	glDisable(GL_BLEND); 
+}*/
+
+void FltkViewer::drawArrow(SrVec& from, SrVec& to, float width, SrVec& color)
+{
+	SrVec p[2];
+	SrVec c[4];
+	SrMat mat;
+	SrVec normal;
+	int seg = 5;
+	
+	SrVec di = from - to;
+	di.normalize();
+	normal = di;
+	di *= width;
+	mat.roty(3.15159265f/6);
+	p[0] = di*mat + to;
+	c[0] = (di/2.0f)*mat + to;
+	mat.roty(-3.15159265f/6);
+	p[1] = di*mat + to;
+	c[1] = (di/2.0f)*mat + to;
+
+	c[2] = c[0] + (from-to) - normal*di.len()/2.0f;
+	c[3] = c[1] + (from-to) - normal*di.len()/2.0f;
+
+
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND); 
+
+	glColor4f(color.x, color.y, color.z, 1.0f);
+
+	glBegin(GL_TRIANGLES);
+	glVertex3f(to.x, to.y, to.z);
+	glVertex3f(p[0].x, p[0].y, p[0].z);
+	glVertex3f(p[1].x, p[1].y, p[1].z);
+	glVertex3f(to.x, to.y, to.z);
+	glVertex3f(p[1].x, p[1].y, p[1].z);
+	glVertex3f(p[0].x, p[0].y, p[0].z);
+
+	SrVec t[4];
+	SrVec gap;
+	gap = (from-to)/((float)seg*6.0f);
+	t[3] = c[0]+gap;
+	t[2] = c[1]+gap;
+	for(int i = 0; i < seg; ++i)
+	{
+		glColor4f(color.x, color.y, color.z, (float)((float)(seg-i)/(float)(seg+1)));
+
+		t[0] = t[3]+gap;
+		t[1] = t[2]+gap;
+		t[3] = t[0]+gap*2;
+		t[2] = t[1]+gap*2;
+		glVertex3f(t[0].x, t[0].y, t[0].z);
+		glVertex3f(t[1].x, t[1].y, t[1].z);
+		glVertex3f(t[2].x, t[2].y, t[2].z);
+		glVertex3f(t[0].x, t[0].y, t[0].z);
+		glVertex3f(t[2].x, t[2].y, t[2].z);
+		glVertex3f(t[1].x, t[1].y, t[1].z);
+	
+		glVertex3f(t[0].x, t[0].y, t[0].z);
+		glVertex3f(t[3].x, t[3].y, t[3].z);
+		glVertex3f(t[2].x, t[2].y, t[2].z);
+		glVertex3f(t[0].x, t[0].y, t[0].z);
+		glVertex3f(t[2].x, t[2].y, t[2].z);
+		glVertex3f(t[3].x, t[3].y, t[3].z);
+	}
+	glEnd();
+	glDisable(GL_BLEND); 
+}
+
+void FltkViewer::drawLocomotion()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	SbmCharacter* character = NULL;
+	mcu.character_map.reset();
+	for(int i = 0; i < mcu.character_map.get_num_entries(); ++i)
+	{
+		character = mcu.character_map.next();
+		SrVec arrow_start = character->get_locomotion_ct()->get_base_pos();
+		SrVec arrow_end;
+		if(_data->showvelocity)
+		{
+			SrVec velocity = character->get_locomotion_ct()->get_navigator()->get_global_velocity();
+			velocity.normalize();
+			velocity *= character->get_locomotion_ct()->get_current_speed()/2.0f;
+			float default_speed = character->get_locomotion_ct()->get_limb_list()->get(character->get_locomotion_ct()->get_dominant_limb_index())->blended_anim.global_info->speed/2.0f;
+			arrow_end = arrow_start + velocity;
+			glDisable(GL_DEPTH_TEST);
+			drawArrow(arrow_start, arrow_end, 5, SrVec(0.1f, 0.3f, 1.0f));
+			drawCircle(arrow_start.x, arrow_start.y, arrow_start.z, default_speed, 72, SrVec(0.1f, 0.3f, 1.0f));
+		}
+		if(_data->showselection)
+		{
+			if(i == char_index)
+			{
+				arrow_end = arrow_start;
+				arrow_end.y += 70;
+				arrow_start.y += 100;
+				drawActiveArrow(arrow_start, arrow_end, 3, 10, SrVec(1.0f, 0.0f, 0.0f), false);
+			}
+		}
+	}
 }
 
 void FltkViewer::drawDynamics()

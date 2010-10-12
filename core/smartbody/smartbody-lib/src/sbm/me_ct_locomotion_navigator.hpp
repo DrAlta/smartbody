@@ -128,6 +128,7 @@ public:
 
 	SrVec get_local_velocity();
 	SrVec get_target_local_velocity();
+	SrVec get_global_velocity();
 	SrVec get_dis_to_dest();
 	SrVec get_dis_to_dest_local();
 	SrVec get_world_pos();

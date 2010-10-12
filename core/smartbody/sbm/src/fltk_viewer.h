@@ -34,6 +34,7 @@
 
 
 class SrQuat;
+class SrVec;
 class SrEvent;
 class SrCamera;
 class SrSn;
@@ -84,6 +85,15 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 						ModeShowCOMSupportPolygon,
 						ModeShowMasses
                 };
+	enum LocomotionMode { 
+						ModeEnableLocomotion,
+						ModeShowAll,
+						ModeShowVelocity,
+						ModeShowOrientation,
+						ModeShowSelection,
+					    ModeShowFootStepMarks
+
+                };
 
     enum MenuCmd { CmdHelp,
                    CmdViewAll,
@@ -112,7 +122,13 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdNoDynamics,
 				   CmdShowCOM,
 				   CmdShowCOMSupportPolygon,
-				   CmdShowMasses
+				   CmdShowMasses,
+				   CmdEnableLocomotion,
+				   CmdShowLocomotionAll,
+				   CmdShowVelocity,
+				   CmdShowOrientation,
+				   CmdShowSelection,
+				   CmdShowFootStepMarks
                  };
 
    private : // internal data
@@ -168,6 +184,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 
     void increment_model_rotation ( const SrQuat &dq );
 
+	void translate_keyboard_state();
     float fps ();
     sruint curframe ();
 
@@ -225,6 +242,10 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	void drawGrid();
 	void drawEyeBeams();
 	void drawDynamics();
+	void drawLocomotion();
+	void drawArrow(SrVec& from, SrVec& to, float width, SrVec& color);
+	void drawCircle(float cx, float cy, float cz, float r, int num_segments, SrVec& color);
+	void drawActiveArrow(SrVec& from, SrVec& to, int num, float width, SrVec& color, bool spin);
 
 	int gridList;
 	float gridColor[4];
