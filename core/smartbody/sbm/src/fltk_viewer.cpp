@@ -1786,7 +1786,9 @@ void FltkViewer::drawCircle(float cx, float cy, float cz, float r, int num_segme
 		x *= radial_factor; 
 		z *= radial_factor; 
 	} 
+	
 	glEnd(); 
+	glDisable(GL_BLEND); 
 }
 static float spin_angle = 0.0f;
 static float time = 0.0f;
@@ -2057,7 +2059,6 @@ void FltkViewer::drawLocomotion()
 			velocity *= character->get_locomotion_ct()->get_current_speed()/2.0f;
 			float default_speed = character->get_locomotion_ct()->get_limb_list()->get(character->get_locomotion_ct()->get_dominant_limb_index())->blended_anim.global_info->speed/2.0f;
 			arrow_end = arrow_start + velocity;
-			glDisable(GL_DEPTH_TEST);
 			drawArrow(arrow_start, arrow_end, 5, SrVec(0.1f, 0.3f, 1.0f));
 			drawCircle(arrow_start.x, arrow_start.y, arrow_start.z, default_speed, 72, SrVec(0.1f, 0.3f, 1.0f));
 		}
