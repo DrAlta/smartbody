@@ -71,9 +71,23 @@
 
 const char* MeCtEyeLid::type_name = "EyeLid";
 
+// default limits, set for character in centimeters
+#define EYEBALL_ROT_LIMIT_UP	-35.0f
+#define EYEBALL_ROT_LIMIT_DN	30.0f
+#define EYELID_Y_LIMIT_UP	0.372f
+#define EYELID_Y_LIMIT_DN	-0.788f
+
 MeCtEyeLid::MeCtEyeLid( void )	{
 
    _skeleton_ref_p = NULL;
+
+   // initialize limits
+   setEyeballRotLimitUp(EYEBALL_ROT_LIMIT_UP);
+   setEyeballRotLimitDown(EYEBALL_ROT_LIMIT_DN);
+   // note that translational limits are defaults for
+   // a normal-sized human using centimeters
+   setEyeballTransLimitUp(EYELID_Y_LIMIT_UP);
+   setEyeballTransLimitDown(EYELID_Y_LIMIT_DN);
 }
 
 MeCtEyeLid::~MeCtEyeLid( void )	{
@@ -86,11 +100,7 @@ void MeCtEyeLid::clear( void )	{
    _skeleton_ref_p = NULL;
 }
 
-#define EYEBALL_ROT_LIMIT_UP	-35.0f
-#define EYEBALL_ROT_LIMIT_DN	30.0f
 
-#define EYELID_Y_LIMIT_UP	0.372f
-#define EYELID_Y_LIMIT_DN	-0.788f
 
 float MeCtEyeLid::calc_upper_correction( 
 	float in_eye_p,
@@ -100,30 +110,70 @@ float MeCtEyeLid::calc_upper_correction(
 
 	// adjust for eye pitch
 	if( in_eye_p < 0.0 ) { // looking up
-		float eye_norm = in_eye_p / EYEBALL_ROT_LIMIT_UP;
-		adj_lid_y = eye_norm * EYELID_Y_LIMIT_UP;
+		float eye_norm = in_eye_p / _eyeballRotLimitUp;
+		adj_lid_y = eye_norm * _eyeballTransLimitUp;
 	}
 	else
 	if( in_eye_p > 0.0 )	{ // looking down
-		float eye_norm = in_eye_p / EYEBALL_ROT_LIMIT_DN;
-		adj_lid_y = eye_norm * EYELID_Y_LIMIT_DN;
+		float eye_norm = in_eye_p / _eyeballRotLimitDown;
+		adj_lid_y = eye_norm * _eyeballTransLimitDown;
 	}
 
 	// adjust for blink/lift
 	float out_lid_y = adj_lid_y;
 	if( in_lid_y < 0.0 )	{ // eye is effectively closing/blinking
-		float blink_norm = in_lid_y / EYELID_Y_LIMIT_DN;
-		out_lid_y = adj_lid_y - blink_norm * ( adj_lid_y - EYELID_Y_LIMIT_DN );
+		float blink_norm = in_lid_y / _eyeballTransLimitDown;
+		out_lid_y = adj_lid_y - blink_norm * ( adj_lid_y - _eyeballTransLimitDown );
 	}
 	else
 	if( in_lid_y > 0.0 )	{ // eye is effectively lifting
-		float blink_norm = in_lid_y / EYELID_Y_LIMIT_UP;
-		out_lid_y = adj_lid_y + blink_norm * ( EYELID_Y_LIMIT_UP - adj_lid_y );
+		float blink_norm = in_lid_y / _eyeballTransLimitUp;
+		out_lid_y = adj_lid_y + blink_norm * ( _eyeballTransLimitUp - adj_lid_y );
 	}
 
-//if( G_debug ) LOG( "eye: %f  lid: %f  --> %f\n", in_eye_p, in_lid_y, out_lid_y );
+//if( G_debug ) 	LOG( "eye: %f  lid: %f  --> %f", in_eye_p, in_lid_y, out_lid_y );
 
 	return( out_lid_y );
+}
+
+void MeCtEyeLid::setEyeballRotLimitUp(float val)
+{
+	_eyeballRotLimitUp = val;
+}
+
+void MeCtEyeLid::setEyeballRotLimitDown(float val)
+{
+	_eyeballRotLimitDown = val;
+}
+
+void MeCtEyeLid::setEyeballTransLimitUp(float val)
+{
+	_eyeballTransLimitUp = val;
+}
+
+void MeCtEyeLid::setEyeballTransLimitDown(float val)
+{
+	_eyeballTransLimitDown = val;
+}
+
+float MeCtEyeLid::getEyeballRotLimitUp()
+{
+	return _eyeballRotLimitUp;
+}
+
+float MeCtEyeLid::getEyeballRotLimitDown()
+{
+	return _eyeballRotLimitDown;
+}
+
+float MeCtEyeLid::getEyeballTransLimitUp()
+{
+	return _eyeballTransLimitUp;
+}
+
+float MeCtEyeLid::getEyeballTransLimitDown()
+{
+	return _eyeballTransLimitDown;
 }
 
 void MeCtEyeLid::init( void ) {
@@ -225,12 +275,9 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 	float UR_lid_y = fbuffer[ UR_lid_y_map ];
 
 	float UL_correct_posy = calc_upper_correction( (float)( L_eye_e.p() ), UL_lid_y );
+
 	fbuffer[ UL_lid_y_map ] = UL_correct_posy;
 	fbuffer[ UR_lid_y_map ] = UL_correct_posy;
-
-#if 0
-	if( fabs( UL_lid_y ) > 0.0 ) LOG( "UL_lid_y: %f -> %f\n", UL_lid_y, UL_correct_posy );
-#endif
 
 	return true;
 }

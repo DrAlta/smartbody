@@ -27,7 +27,7 @@
 #include <string.h>
 #include <vhcl_log.h>
 
-#define MAX_CMD_ARGL 2048
+#define MAX_CMD_ARGL 8192
 
 
 //////////////////////////////////////////////////////////////////////////////////
