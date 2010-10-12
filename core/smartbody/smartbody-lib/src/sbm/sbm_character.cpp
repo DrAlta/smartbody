@@ -365,8 +365,17 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 			// determine the size of the character to set the 
 			// appropriate scaling factor for the eyelids. 
-			eyelid_ct->setEyeballTransLimitUp(eyelid_ct->getEyeballTransLimitUp() * getHeight() / 175.0f);
-			eyelid_ct->setEyeballTransLimitDown(eyelid_ct->getEyeballTransLimitDown() * getHeight() / 175.0f);
+			
+			float dfl_hgt = 175.0f;
+			float rel_scale = getHeight() / dfl_hgt;
+			float up, dn;
+
+			eyelid_ct->getEyelidUpperTransRange( up, dn );
+			eyelid_ct->setEyelidUpperTransRange( up * rel_scale, dn * rel_scale );
+
+			eyelid_ct->getEyelidLowerTransRange( up, dn );
+			eyelid_ct->setEyelidLowerTransRange( up * rel_scale, dn * rel_scale );
+			
 			eyelid_ct->init();
 			ct_tree_p->add_controller( eyelid_ct );
 		}
@@ -1737,6 +1746,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			}
 		}
 	}
+	else
 	if (char_cmd == "softeyes")
 	{
 		if (!character)
@@ -1744,66 +1754,79 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			LOG("ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"%s\".", char_name.c_str());
 			return CMD_FAILURE;
 		}
+		MeCtEyeLid *eyelid_ct = character->eyelid_ct;
+		if (!eyelid_ct)
+		{
+			LOG("ERROR: SbmCharacter::character_cmd_func(..): character \"%s\" has no eyelid_ct.", char_name.c_str());
+			return CMD_FAILURE;
+		}
+		
 		if (args.calc_num_tokens() == 0)
 		{
-			if (character->isSoftEyes())
-			{
-				LOG("Soft eyes are on for character %s", char_name.c_str());
-			}
-			else
-			{
-				LOG("Soft eyes are off for character %s", char_name.c_str());
-			}
+			LOG( "softeyes params: %s", character->isSoftEyes() ? "ENABLED" : "DISABLED" );
+			float up, dn;
 
-			LOG("Eyeball rotation limit up: %f", character->eyelid_ct->getEyeballRotLimitUp());
-			LOG("Eyeball rotation limit down: %f", character->eyelid_ct->getEyeballRotLimitDown());
-			LOG("Eyeball translation limit up: %f", character->eyelid_ct->getEyeballTransLimitUp());
-			LOG("Eyeball translation limit down: %f", character->eyelid_ct->getEyeballTransLimitDown());
-			LOG("Use: char <> softeyes limitrotup|limitrotdown|limittransup|limittransdown <val>");
+			eyelid_ct->getEyelidWeight( up, dn );
+			LOG( " eyelid weight: { %f, %f }", up, dn );
 
+			eyelid_ct->getEyelidUpperTransRange( up, dn );
+			LOG( " eyelid upper trans: { %f, %f }", up, dn );
+
+			eyelid_ct->getEyelidLowerTransRange( up, dn );
+			LOG( " eyelid lower trans: { %f, %f }", up, dn );
+
+			eyelid_ct->getEyeballPitchRange( up, dn );
+			LOG( " eyeball pitch: { %f, %f }", up, dn );
+
+			LOG( "commmands:" );
+			LOG( " char <> softeyes [on|off] " );
+			LOG( " char <> softeyes weight <upper> <lower>" );
+			LOG( " char <> softeyes upperlid|lowerlid|eyepitch <upper> <lower>" );
 			return CMD_SUCCESS;
 		}
+
 		std::string softEyesCommand = args.read_token();
 		if (softEyesCommand == "on")
 		{
 			character->setSoftEyes(true);
-			return CMD_SUCCESS;
 		}
-		else if (softEyesCommand == "off")
+		else 
+		if (softEyesCommand == "off")
 		{
 			character->setSoftEyes(false);
+		}
+		else	{
+			
+			float up = args.read_float();
+			float dn = args.read_float();
+			
+			if (softEyesCommand == "weight")
+			{
+				eyelid_ct->setEyelidWeight( up, dn );
+			}
+			else 
+			if (softEyesCommand == "upperlid")
+			{
+				eyelid_ct->setEyelidUpperTransRange( up, dn );
+			}
+			else 
+			if (softEyesCommand == "lowerlid")
+			{
+				eyelid_ct->setEyelidLowerTransRange( up, dn );
+			}
+			else 
+			if (softEyesCommand == "eyepitch")
+			{
+				eyelid_ct->setEyeballPitchRange( up, dn );
+			}
+			else
+			{
+				LOG( "SbmCharacter::character_cmd_func ERR: command '%s' not recognized" );
+				return CMD_NOT_FOUND;
+			}
 			return CMD_SUCCESS;
 		}
-		else if (softEyesCommand == "limitrotup")
-		{
-			float val = args.read_float();
-			character->eyelid_ct->setEyeballRotLimitUp(val);
-			return CMD_SUCCESS;
-		}
-		else if (softEyesCommand == "limitrotdown")
-		{
-			float val = args.read_float();
-			character->eyelid_ct->setEyeballRotLimitDown(val);
-			return CMD_SUCCESS;
-		}
-		else if (softEyesCommand == "limittransup")
-		{
-			float val = args.read_float();
-			character->eyelid_ct->setEyeballTransLimitUp(val);
-			return CMD_SUCCESS;
-		}
-		else if (softEyesCommand == "limittransdown")
-		{
-			float val = args.read_float();
-			character->eyelid_ct->setEyeballTransLimitDown(val);
-			return CMD_SUCCESS;
-		}
-		else
-		{
-			LOG("ERROR: SbmCharacter::character_cmd_func(..): Use: char <name> softeyes <on|off>");
-			return CMD_FAILURE;
-		}
-
+		return CMD_SUCCESS;
 	}
 	return CMD_NOT_FOUND;
 }
