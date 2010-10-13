@@ -1781,7 +1781,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			LOG( "commmands:" );
 			LOG( " char <> softeyes [on|off] " );
 			LOG( " char <> softeyes weight <upper> <lower>" );
-			LOG( " char <> softeyes upperlid|lowerlid|eyepitch <upper> <lower>" );
+			LOG( " char <> softeyes upperlid|lowerlid|eyepitch <upper-range> <lower-range>" );
 			return CMD_SUCCESS;
 		}
 

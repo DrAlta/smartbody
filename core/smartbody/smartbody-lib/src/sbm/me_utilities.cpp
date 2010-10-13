@@ -137,6 +137,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 	}
 
 	if( is_directory( pathname ) ) {
+
 		directory_iterator end;
 		for( directory_iterator i( pathname ); i!=end; ++i ) {
 			const path& cur = *i;
@@ -154,6 +155,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			}
 		}
 	} else {
+
 		SkMotion* motion = new SkMotion();
 		motion->ref();
 
