@@ -6,10 +6,12 @@
 ### Load data/sbm-common assets
 ### Assumes current directory is: core/smartbody/sbm/bin
 0	path seq ../../../../data/sbm-common/scripts
-0	seq common-init
+0	path seq ../../../../data/sbm-test/scripts
+
+0	seq common-init inline 
 0	test locomotion initialize
 0	seq init-general-parameters
-
+0   seq init-common-face
 
 ###  Common-sk assets are centered on the pelvis,
 ###  placed 102 units above the ground plane.
