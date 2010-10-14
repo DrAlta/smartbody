@@ -103,6 +103,15 @@ char* MeCtLocomotionLimb::get_limb_base_name()
 	return limb_base_name;
 }
 
+SrVec MeCtLocomotionLimb::get_orientation()
+{
+	SrVec v(0.0f, 0.0f, 1.0f);
+	SrMat mat;
+	mat.rot(SrVec(0.0f, 1.0f, 0.0f), curr_rotation);
+	v = v * mat;
+	return mat;
+}
+
 void MeCtLocomotionLimb::set_limb_base(char* name)
 {
 	limb_base_name = (char*)malloc(sizeof(char)*(strlen(name)+1));

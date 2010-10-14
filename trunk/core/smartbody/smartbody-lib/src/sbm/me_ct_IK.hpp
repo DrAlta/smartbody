@@ -38,13 +38,14 @@ public:
 	// Public Constants
 	static const char* TYPE;
 
+	SrArray<SrVec>				joint_pos_list;
 
 protected:
 	// Data
 	MeCtIKScenario*				scenario;
 	SkJoint*					base_joint;
 	int							max_iteration;
-	SrArray<SrVec>				joint_pos_list;
+	
 	SrArray<SrVec>				joint_axis_list;
 	SrArray<SrMat>				joint_global_mat_list;
 	//SrArray<SrMat>			joint_local_mat_list;

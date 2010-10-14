@@ -62,7 +62,7 @@ MeCtLocomotion::MeCtLocomotion() {
 	style = 0;
 	motion_time = -1.0f;
 	last_t = 0.0f;
-	abs_ground_height = 0.0f;
+	//abs_ground_height = 0.0f;
 	
 }
 
@@ -693,7 +693,7 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 	speed_accelerator.update_speed(delta_time);
 
 	//get current direction
-	limb_list.get(dominant_limb)->direction_planner.update_direction(delta_time, &limb_list.get(dominant_limb)->space_time, limb_list.get(dominant_limb)->get_walking_list()->get(1)->get_timing_space()->get_ref_time_num(), true);
+	limb_list.get(dominant_limb)->direction_planner.update_direction(delta_time, &limb_list.get(dominant_limb)->space_time, 3, true);
 
 	// set r_anim1_index_dominant amd r_anim2_index_dominant
 	get_anim_indices(dominant_limb, limb_list.get(dominant_limb)->direction_planner.get_curr_direction(), &r_anim1_index_dominant, &r_anim2_index_dominant);
@@ -933,6 +933,24 @@ void MeCtLocomotion::set_target_height_displacement(float displacement)
 	navigator.target_height_displacement = displacement;
 }
 
+// temp function
+SrVec MeCtLocomotion::get_heel_pos(int index, SrVec* orientation, SrVec* normal)
+{
+	//SrVec pos = limb_list.get(index)->pos_buffer.get(2) * navigator.get_world_mat();
+	//pos.y -= limb_list.get(index)->support_height.get(0);
+	float tnormal[3];
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SrVec pos = limb_list.get(index)->pos_buffer.get(2);
+	float height = mcu.query_terrain(pos.x, pos.z, tnormal);
+	pos.y = height;
+	SrVec pos1 = limb_list.get(index)->pos_buffer.get(3);
+	height = mcu.query_terrain(pos1.x, pos1.z, NULL);
+	pos1.y = height;
+	*orientation = pos1-pos;
+	normal->set(tnormal[0], tnormal[1], tnormal[2]);
+	return pos;
+}
+// temp function
 void MeCtLocomotion::apply_IK()
 {
 	//if(navigator.target_height_displacement == 0.0f) return;
@@ -942,6 +960,10 @@ void MeCtLocomotion::apply_IK()
 
 	SrMat global_mat;
 	global_mat = navigator.get_world_mat();
+
+	global_mat.set(12, global_mat.get(12) - world_offset_to_base.x);
+	global_mat.set(13, global_mat.get(13) - world_offset_to_base.y);
+	global_mat.set(14, global_mat.get(14) - world_offset_to_base.z);
 
 	for(int i = 0; i < limb_list.size(); ++i)
 	{
@@ -954,11 +976,17 @@ void MeCtLocomotion::apply_IK()
 		SkJoint* tjoint = walking_skeleton->search_joint(limb_list.get(i)->get_limb_base_name());
 		int parent_ind = nonlimb_joint_info.get_index_by_name(tjoint->parent()->name().get_string());
 		ik_scenario->mat = nonlimb_joint_info.mat.get(parent_ind);
+		ik_scenario->mat.set(12, ik_scenario->mat.get(12) - world_offset_to_base.x);
+		ik_scenario->mat.set(13, ik_scenario->mat.get(13) - world_offset_to_base.y);
+		ik_scenario->mat.set(14, ik_scenario->mat.get(14) - world_offset_to_base.z);
 		ik_scenario->start_joint = &(ik_scenario->joint_info_list.get(0));
 		ik_scenario->end_joint = &(ik_scenario->joint_info_list.get(ik_scenario->joint_info_list.size()-1));
 		
 		SrVec pos = limb_list.get(i)->pos_buffer.get(2);
 		pos  = pos * global_mat;
+
+
+		//printf("\n(%f, %f)", pos.x, pos.z);
 
 		float normal[3] = {0.0f, 0.0f, 0.0f};
 
@@ -984,6 +1012,7 @@ void MeCtLocomotion::apply_IK()
 
 		ik.update(ik_scenario);
 		limb_list.get(i)->limb_joint_info.quat = ik_scenario->quat_list;
+		limb_list.get(i)->pos_buffer = ik.joint_pos_list;
 	}
 }
 
@@ -1067,6 +1096,7 @@ int MeCtLocomotion::determine_dominant_limb_index()
 			dominant_limb = i;
 		}
 	}
+
 	return dominant_limb;
 }
 

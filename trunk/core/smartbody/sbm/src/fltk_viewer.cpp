@@ -239,6 +239,7 @@ class FltkViewerData
    bool showvelocity;
    bool showorientation;
    bool showselection;
+   bool showfootstepmarks;
 
    SrString message;   // user msg to display in the window
    SrLight light;
@@ -304,6 +305,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->showvelocity = false;
    _data->showorientation = false;
    _data->showselection = false;
+   _data->showfootstepmarks = false;
 
    _data->light.init();
 
@@ -334,6 +336,8 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 //   gridSize = 400.0;
 //   gridStep = 50.0;
    gridList = -1;
+
+   init_foot_print();
 }
 
 FltkViewer::~FltkViewer ()
@@ -451,6 +455,9 @@ void FltkViewer::menu_cmd ( MenuCmd s )
 	  case CmdShowSelection  : _data->showselection = !_data->showselection;
 						if(!_data->showselection) _data->showlocomotionall = false;
                        break;
+	  case CmdShowFootStepMarks  : _data->showfootstepmarks = !_data->showfootstepmarks;
+						if(!_data->showfootstepmarks) _data->showlocomotionall = false;
+                       break;
       case CmdBoundingBox : SR_SWAPB(_data->boundingbox); 
                             if ( _data->boundingbox ) update_bbox();
                             break;
@@ -542,6 +549,7 @@ bool FltkViewer::menu_cmd_activated ( MenuCmd c )
 	  case CmdShowVelocity : return _data->showvelocity? true:false;
 	  case CmdShowOrientation : return _data->showorientation? true:false;
 	  case CmdShowSelection : return _data->showselection? true:false;
+	  case CmdShowFootStepMarks : return _data->showfootstepmarks? true:false;
       case CmdAxis        : return _data->displayaxis? true:false;
       case CmdBoundingBox : return _data->boundingbox? true:false;
       case CmdStatistics  : return _data->statistics? true:false;
@@ -1974,6 +1982,143 @@ void FltkViewer::drawActiveArrow(SrVec& from, SrVec& to, int num, float width, S
 	glDisable(GL_BLEND); 
 }*/
 
+static SrVec footprintpos[10];
+static int footprintstart = 0;
+//static int footprintend = 0;
+static SrVec footprintorientation[10];
+static SrVec footprintnormal[10];
+static float footprinttime[10];
+static int footprintside[10];
+static SrVec footprint[2][12];
+static float fadeouttime = 9.0f;
+static float footprintscacle = 1.0f;
+static SrVec footprintoffset;
+
+void FltkViewer::init_foot_print()
+{
+	footprintoffset = SrVec(0.0f, 0.0f, -16.0f);
+	int i = -1;
+	footprint[0][++i].x = 8.0f;
+	footprint[0][i].z = 4.0f;
+
+	footprint[0][++i].x = 4.0f;
+
+	footprint[0][++i].x = -6.0f;
+	
+
+	footprint[0][++i].x = -10.0f;
+	footprint[0][i].z = 4.0f;
+
+	footprint[0][++i].x = -9.0f;
+	footprint[0][i].z = 17.0f;
+
+	footprint[0][++i].x = 7.0f;
+	footprint[0][i].z = 17.0f;
+
+
+	footprint[0][++i].x = 7.0f;
+	footprint[0][i].z = 20.0f;
+
+	footprint[0][++i].x = -9.0f;
+	footprint[0][i].z = 20.0f;
+
+	footprint[0][++i].x = -22.0f;
+	footprint[0][i].z = 55.0f;
+
+	footprint[0][++i].x = -12.0f;
+	footprint[0][i].z = 69.0f;
+
+	footprint[0][++i].x = -6.0f;
+	footprint[0][i].z = 69.0f;
+
+	footprint[0][++i].x = 10.0f;
+	footprint[0][i].z = 50.0f;
+
+	footprintscacle = 0.3f;
+	for(int i = 0; i < 12; ++i)
+	{
+		footprint[0][i].x += 2.0f;
+		footprint[0][i] += footprintoffset;
+		footprint[0][i] *= footprintscacle;
+		footprint[1][11-i] = footprint[0][i];
+		footprint[1][11-i].x = -footprint[1][11-i].x;
+	}
+
+}
+
+void FltkViewer::drawFootPrints()
+{
+	int i = 0;
+	SrVec vertex;
+	SrMat mat, tmat;
+	SrVec forward(0.0f ,0.0f, 1.0f);
+	SrVec up(0.0f, 1.0f, 0.0f);
+
+	SrVec color;
+
+	//glDisable(GL_DEPTH_TEST);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND); 
+
+	for(int j = 0; j < 10; ++j)
+	{
+		//footprintpos[j] = SrVec(40, 0, 40);
+		if(footprinttime[j] > fadeouttime) continue;
+		up.set(0.0f, 1.0f, 0.0f);
+		i = 0;
+		mat.rot(forward, footprintorientation[j]);
+		up = up * mat;
+		tmat.rot(up, footprintnormal[j]);
+
+		if(footprintside[j] == 0) color.set(0.0f, 1.0f, 0.4f);
+		else color.set(0.0f, 0.4f, 1.0f);
+
+		glColor4f(color.x, color.y, color.z, 0.6f*(fadeouttime-footprinttime[j])/fadeouttime);
+		glBegin(GL_POLYGON);
+		for(; i < 6; ++i)
+		{
+			vertex = footprint[footprintside[j]][i];
+			vertex = vertex * mat;
+			vertex = vertex * tmat;
+			vertex += footprintpos[j];
+			glVertex3f(vertex.x, vertex.y, vertex.z);
+		}
+		glEnd();
+
+		glBegin(GL_POLYGON);
+		for(; i < 12; ++i)
+		{
+			vertex = footprint[footprintside[j]][i];
+			vertex = vertex * mat;
+			vertex = vertex * tmat;
+			vertex += footprintpos[j];
+			glVertex3f(vertex.x, vertex.y, vertex.z);
+		}
+		glEnd();
+	}
+	glDisable(GL_BLEND); 
+
+	for(int i = 0; i < 10; ++i)
+	{
+		if(footprinttime[i] > fadeouttime) continue;
+		footprinttime[i] += 0.0166666f;
+	}
+	//glEnable(GL_DEPTH_TEST);
+}
+
+
+void FltkViewer::newPrints(SrVec& heel_pos, SrVec& orientation, SrVec& normal, SrVec& color, int side)
+{
+	++footprintstart;
+	if(footprintstart >= 10) footprintstart = 0;
+
+	footprintpos[footprintstart] = heel_pos;
+	footprinttime[footprintstart] = 0.0f;
+	footprintorientation[footprintstart] = orientation;
+	footprintnormal[footprintstart] = normal;
+	footprintside[footprintstart] = side;
+}
+
 void FltkViewer::drawArrow(SrVec& from, SrVec& to, float width, SrVec& color)
 {
 	SrVec p[2];
@@ -2041,6 +2186,7 @@ void FltkViewer::drawArrow(SrVec& from, SrVec& to, float width, SrVec& color)
 	glDisable(GL_BLEND); 
 }
 
+static int pre_dominant = 0;
 void FltkViewer::drawLocomotion()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -2054,22 +2200,48 @@ void FltkViewer::drawLocomotion()
 		SrVec arrow_end;
 		if(_data->showvelocity)
 		{
-			SrVec velocity = character->get_locomotion_ct()->get_navigator()->get_global_velocity();
-			velocity.normalize();
-			velocity *= character->get_locomotion_ct()->get_current_speed()/2.0f;
-			float default_speed = character->get_locomotion_ct()->get_limb_list()->get(character->get_locomotion_ct()->get_dominant_limb_index())->blended_anim.global_info->speed/2.0f;
-			arrow_end = arrow_start + velocity;
-			drawArrow(arrow_start, arrow_end, 5, SrVec(0.1f, 0.3f, 1.0f));
-			drawCircle(arrow_start.x, arrow_start.y, arrow_start.z, default_speed, 72, SrVec(0.1f, 0.3f, 1.0f));
+			if(character->get_locomotion_ct()->get_limb_list()->size() > character->get_locomotion_ct()->get_dominant_limb_index())
+			{
+				SrVec velocity = character->get_locomotion_ct()->get_navigator()->get_global_velocity();
+				velocity.normalize();
+				velocity *= character->get_locomotion_ct()->get_current_speed()/2.0f;
+				float default_speed = character->get_locomotion_ct()->get_limb_list()->get(character->get_locomotion_ct()->get_dominant_limb_index())->blended_anim.global_info->speed/2.0f;
+				arrow_end = arrow_start + velocity;
+				drawArrow(arrow_start, arrow_end, 5, SrVec(0.1f, 0.3f, 1.0f));
+				drawCircle(arrow_start.x, arrow_start.y, arrow_start.z, default_speed, 72, SrVec(0.1f, 0.3f, 1.0f));
+			}
 		}
 		if(_data->showselection)
 		{
+			float height = character->getHeight();
 			if(i == char_index)
 			{
 				arrow_end = arrow_start;
-				arrow_end.y += 70;
-				arrow_start.y += 100;
+				arrow_end.y += height - character->get_locomotion_ct()->translation_joint_height;
+				arrow_start.y += height - character->get_locomotion_ct()->translation_joint_height+30;
 				drawActiveArrow(arrow_start, arrow_end, 3, 10, SrVec(1.0f, 0.0f, 0.0f), false);
+			}
+		}
+		if(_data->showfootstepmarks)
+		{
+			int cur_dominant = character->get_locomotion_ct()->get_dominant_limb_index();
+			if(i == char_index && character->get_locomotion_ct()->limb_list.size()>cur_dominant)
+			{
+				//printf("\n%d", cur_dominant);
+				if(cur_dominant != pre_dominant && character->get_locomotion_ct()->limb_list.get(cur_dominant)->space_time > 0.0f
+					&& character->get_locomotion_ct()->limb_list.get(cur_dominant)->space_time < 1.0f)
+				{
+					//printf("\nNew!");
+					SrMat mat;
+					mat.rot(SrVec(0,1,0), character->get_locomotion_ct()->limb_list.get(cur_dominant)->curr_rotation+character->get_locomotion_ct()->get_navigator()->get_facing_angle());
+					SrVec orientation = SrVec(0,0,1)*mat;
+					SrVec normal;
+					SrVec pos = character->get_locomotion_ct()->get_heel_pos(cur_dominant, &orientation, &normal);
+					pos.y += 0.1f;
+					newPrints(pos, orientation, normal, SrVec(1.0f, 0.0f, 0.0f), cur_dominant);
+					pre_dominant = cur_dominant;
+				}
+				drawFootPrints();
 			}
 		}
 	}
