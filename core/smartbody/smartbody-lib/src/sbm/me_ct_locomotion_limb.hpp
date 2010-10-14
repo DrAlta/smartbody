@@ -97,6 +97,8 @@ public:
 	void	set_height_bound(float bound);
 	float	get_height_bound();
 
+	SrVec	get_orientation();
+
 	//void	get_base_pos();
 
 	float	get_ground_height();

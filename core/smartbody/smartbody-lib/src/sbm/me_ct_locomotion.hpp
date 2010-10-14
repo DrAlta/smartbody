@@ -125,7 +125,7 @@ public:
 	SkSkeleton* standing_skeleton;
 	float ratio;
 	float dom_ratio;
-	float abs_ground_height; // absolute height of base joint when standing.
+	//float abs_ground_height; // absolute height of base joint when standing.
 
 
 	SrArray<MeCtLocomotionLimb*> limb_list; //limbs
@@ -217,6 +217,9 @@ public:
 	float get_current_speed();
 
 	int get_dominant_limb_index();
+
+	//temp function
+	SrVec get_heel_pos(int index, SrVec* orientation, SrVec* normal);
 
 protected:
 
