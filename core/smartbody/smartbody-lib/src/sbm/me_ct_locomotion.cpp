@@ -951,36 +951,33 @@ void MeCtLocomotion::blend_standing(MeFrameData& frame)
 void MeCtLocomotion::update_nonlimb_mat(SkJoint* joint, SrMat* mat, int depth)
 {
 	if(joint == NULL) joint = walking_skeleton->root();
-	SkJoint* tjoint = NULL;
+	//SkJoint* tjoint = NULL;
 	int index = -1;
 	SrMat lmat;
 	SrMat gmat;
 	if(mat == NULL) mat = &gmat;
-	bool cont = false;
+
+	for(int j = 0; j < limb_list.size(); ++j)
+	{
+		if(strcmp(joint->name().get_string(), limb_list.get(j)->limb_base_name) == 0) 
+		{
+			return;
+		}
+	}
+
+	index = nonlimb_joint_info.get_index_by_name(joint->name().get_string());
+	if(nonlimb_joint_info.mat_valid.get(index) != 1) return;
+	lmat = get_lmat(joint, &(nonlimb_joint_info.quat.get(index)));
+	if(depth <= translation_joint_index)
+	{
+		lmat.set(12, 0.0f);
+		lmat.set(13, 0.0f);
+		lmat.set(14, 0.0f);
+	}
+	gmat = lmat * *mat;
+	nonlimb_joint_info.mat.set(index, gmat);
 	for(int i = 0; i < joint->num_children(); ++i)
 	{
-		cont = false;
-		tjoint = joint->child(i);
-		for(int j = 0; j < limb_list.size(); ++j)
-		{
-			if(strcmp(tjoint->name().get_string(), limb_list.get(j)->limb_base_name) == 0) 
-			{
-				cont = true;
-				break;
-			}
-		}
-		if(cont) continue;
-		index = nonlimb_joint_info.get_index_by_name(tjoint->name().get_string());
-		if(nonlimb_joint_info.mat_valid.get(index) != 1) continue;
-		lmat = get_lmat(tjoint, &(nonlimb_joint_info.quat.get(index)));
-		if(depth <= translation_joint_index)
-		{
-			lmat.set(12, 0.0f);
-			lmat.set(13, 0.0f);
-			lmat.set(14, 0.0f);
-		}
-		gmat = lmat * *mat;
-		nonlimb_joint_info.mat.set(index, gmat);
 		update_nonlimb_mat(joint->child(i), &gmat, depth+1);
 	}
 }
