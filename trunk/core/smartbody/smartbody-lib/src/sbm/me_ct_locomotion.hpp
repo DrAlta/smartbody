@@ -46,7 +46,7 @@ public:
 
 public:
 	MeCtLocomotionJointInfo nonlimb_joint_info;
-	int translation_joint_index;
+	
 
 	SrArray<char*> limb_base_name;
 	float pre_blended_base_height;
@@ -54,10 +54,13 @@ public:
 
 	SrVec world_offset_to_base;
 	SrVec pre_world_offset_to_base;
+
+	int translation_joint_index;
 	SrString translation_joint_name;
 	float translation_joint_height;
 
 	//int base_index;
+	SrVec displacement;
 
 	int r_anim1_index;
 	int r_anim2_index;
@@ -219,7 +222,9 @@ public:
 	int get_dominant_limb_index();
 
 	//temp function
-	SrVec get_heel_pos(int index, SrVec* orientation, SrVec* normal);
+	SrVec get_supporting_joint_pos(int joint_index, int limb_index, SrVec* orientation, SrVec* normal);
+
+	void temp_update_for_footprint(MeFrameData& frame);
 
 protected:
 
@@ -276,9 +281,11 @@ protected:
 
 	void update_limb_anim_standing(MeCtLocomotionLimbAnim* anim, int index, MeFrameData& frame);
 
-	void update_nonlimb_mat();
+	//void update_nonlimb_mat();
 
-	void update_nonlimb_mat(SkJoint* joint, SrMat* mat);
+	//void update_nonlimb_mat(SkJoint* joint, SrMat* mat);
+
+	void MeCtLocomotion::update_nonlimb_mat(SkJoint* joint, SrMat* mat, int depth);
 
 	void blend_standing(MeFrameData& frame);
 

@@ -151,6 +151,11 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		}
 		else if(type == "walking")
 		{
+			if(!actor->get_locomotion_ct_analysis()->get_standing_initialized())
+			{
+				actor->get_locomotion_ct_analysis()->init(NULL, mcu_p->me_paths);
+				actor->get_locomotion_ct_analysis()->init_blended_anim();
+			}
 			float l_land_time = args.read_float();
 			float l_stance_time = args.read_float();
 			float l_lift_time = args.read_float();
@@ -175,6 +180,11 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 
 	if(arg=="enable")
 	{
+		if(!actor->get_locomotion_ct_analysis()->get_standing_initialized())
+		{
+			actor->get_locomotion_ct_analysis()->init(NULL, mcu_p->me_paths);
+			actor->get_locomotion_ct_analysis()->init_blended_anim();
+		}
 		actor->get_locomotion_ct()->enabled = true;
 		LOG("Locomotion engine has been enabled.");
 

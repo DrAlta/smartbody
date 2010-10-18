@@ -99,6 +99,12 @@ public:
 
 	SrVec	get_orientation();
 
+	float	get_off_ground_height(int joint_index)
+	{
+		if(walking_list.size()<2) return pos_buffer.get(joint_index).y-support_height.get(joint_index-2)-7.0f;
+		return ik.joint_info_list.get(joint_index).support_joint_comp;
+	}
+
 	//void	get_base_pos();
 
 	float	get_ground_height();

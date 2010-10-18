@@ -35,7 +35,9 @@
 
 #pragma once
 
+SrVec get_offset(SkJoint* from_joint, int depth, SrArray<SrQuat>& quat);
 SrMat get_lmat(SkJoint* joint, SrQuat* quat);
+SrMat get_gmat(SkJoint* from_joint, int depth, SrArray<SrQuat>& quat);
 
 SrArray<SrQuat>* get_blended_quat_buffer(MeCtLocomotionJointInfo* joint_info, float weight);
 SrArray<SrQuat>* get_blended_quat_buffer(SrArray<SrQuat>* dest, SrArray<SrQuat>* quat_buffer1, SrArray<SrQuat>* quat_buffer2, float weight);
