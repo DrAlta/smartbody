@@ -90,28 +90,42 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 	get_ct()->set_base_name(base_name);
 	//get_ct()->set_nonlimb_blending_base_name(base_name);
 
+	int result = 0;
+
 	MeCtLocomotionLimb* limb = new MeCtLocomotionLimb();
 	limb->init_skeleton(standing_skeleton, walking_skeleton);
 	get_ct()->get_limb_list()->push() = limb;
 	limb->set_skeleton_name("common.sk");
-	limb->set_limb_base("l_hip");
-	limb->add_support_joint("l_ankle");
-	limb->add_support_joint("l_forefoot");
-	limb->add_support_joint("l_toe");
+	result += limb->set_limb_base("l_hip");
+	result += limb->add_support_joint("l_ankle");
+	result += limb->add_support_joint("l_forefoot");
+	result += limb->add_support_joint("l_toe");
+	if(result != 0)
+	{
+		_ct_locomotion->set_valid(false);
+		return;
+	}
 	limb->set_joint_type(0, JOINT_TYPE_BALL);
 	limb->set_joint_type(1, JOINT_TYPE_HINGE);
 	limb->set_joint_type(2, JOINT_TYPE_BALL);
 	limb->set_joint_type(3, JOINT_TYPE_HINGE);
 	limb->set_joint_type(4, JOINT_TYPE_HINGE);
 
+	result = 0;
 	limb = new MeCtLocomotionLimb();
 	limb->init_skeleton(standing_skeleton, walking_skeleton);
 	get_ct()->get_limb_list()->push() = limb;
 	limb->set_skeleton_name("common.sk");
-	limb->set_limb_base("r_hip");
-	limb->add_support_joint("r_ankle");
-	limb->add_support_joint("r_forefoot");
-	limb->add_support_joint("r_toe");
+	result += limb->set_limb_base("r_hip");
+	result += limb->add_support_joint("r_ankle");
+	result += limb->add_support_joint("r_forefoot");
+	result += limb->add_support_joint("r_toe");
+
+	if(result != 0)
+	{
+		_ct_locomotion->set_valid(false);
+		return;
+	}
 	limb->set_joint_type(0, JOINT_TYPE_BALL);
 	limb->set_joint_type(1, JOINT_TYPE_HINGE);
 	limb->set_joint_type(2, JOINT_TYPE_BALL);

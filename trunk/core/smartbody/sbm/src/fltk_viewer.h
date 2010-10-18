@@ -30,6 +30,7 @@
 
 # include <fltk/GlWindow.H>
 # include <sr/sr_viewer.h>
+#include <fltk/Input.h>
 # include <sr/sr_color.h>
 
 
@@ -91,7 +92,8 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 						ModeShowVelocity,
 						ModeShowOrientation,
 						ModeShowSelection,
-					    ModeShowFootStepMarks
+						ModeShowKinematicFootprints,
+					    ModeShowLocomotionFootprints
 
                 };
 
@@ -128,12 +130,16 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdShowVelocity,
 				   CmdShowOrientation,
 				   CmdShowSelection,
-				   CmdShowFootStepMarks
+				   CmdShowKinematicFootprints,
+				   CmdShowLocomotionFootprints
                  };
 
    private : // internal data
 
     FltkViewerData *_data;
+
+ private:
+	 fltk::Input* off_height_window;
 
    public : //----> public methods 
 
@@ -247,8 +253,10 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	void drawCircle(float cx, float cy, float cz, float r, int num_segments, SrVec& color);
 	void drawActiveArrow(SrVec& from, SrVec& to, int num, float width, SrVec& color, bool spin);
 	void init_foot_print();
-	void drawFootPrints();
-	void newPrints(bool newprint, int index, SrVec& pos, SrVec& orientation, SrVec& normal, SrVec& color, int side);
+	//void drawLocomotionFootprints();
+	void drawKinematicFootprints(int index);
+	void newPrints(bool newprint, int index, SrVec& pos, SrVec& orientation, SrVec& normal, SrVec& color, int side, int type);
+	static void ChangeOffGroundHeight(fltk::Widget* widget, void* data);
 
 	int gridList;
 	float gridColor[4];

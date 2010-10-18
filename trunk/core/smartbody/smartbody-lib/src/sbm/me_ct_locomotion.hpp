@@ -93,7 +93,8 @@ protected:
 
 	SrMat mat;
 
-	bool is_valid;  // All necessary channels are present
+	bool channels_valid;  // All necessary channels are present
+	bool valid;
 
 	bool joints_indexed;
 
@@ -203,6 +204,10 @@ public:
 
 	bool is_enabled();
 
+	bool is_valid();
+
+	bool is_channels_valid();
+
 	SrArray<MeCtLocomotionLimb*>* get_limb_list();
 
 	void init_nonlimb_joint_info();
@@ -220,6 +225,8 @@ public:
 	float get_current_speed();
 
 	int get_dominant_limb_index();
+
+	void set_valid(bool valid);
 
 	//temp function
 	SrVec get_supporting_joint_pos(int joint_index, int limb_index, SrVec* orientation, SrVec* normal);

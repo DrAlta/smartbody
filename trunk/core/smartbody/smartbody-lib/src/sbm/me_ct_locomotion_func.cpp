@@ -46,6 +46,7 @@ SrMat get_gmat(SkJoint* from_joint, int depth, SrArray<SrQuat>& quat)
 SrVec get_offset(SkJoint* from_joint, int depth, SrArray<SrQuat>& quat)
 {
 	SrVec offset;
+	if(depth <= 0) return offset;
 	SrMat lmat, gmat;
 	SrQuat q;
 	for(int i = 0; ; ++i)

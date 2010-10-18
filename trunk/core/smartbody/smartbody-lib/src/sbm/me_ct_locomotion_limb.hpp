@@ -101,7 +101,7 @@ public:
 
 	float	get_off_ground_height(int joint_index)
 	{
-		if(walking_list.size()<2) return pos_buffer.get(joint_index).y-support_height.get(joint_index-2)-7.0f;
+		if(walking_list.size()<2) return pos_buffer.get(joint_index).y-support_height.get(joint_index-2);
 		return ik.joint_info_list.get(joint_index).support_joint_comp;
 	}
 
@@ -112,8 +112,8 @@ public:
 
 	void	init_skeleton(SkSkeleton* standing_skeleton, SkSkeleton* walking_skeleton);
 
-	void	add_support_joint(char* joint_name);
-	void	set_limb_base(char* name);
+	int		add_support_joint(char* joint_name);
+	int		set_limb_base(char* name);
 
 	int		get_descendant_num(SkJoint* joint);
 	int		get_support_joint_num();

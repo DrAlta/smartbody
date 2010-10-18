@@ -112,11 +112,18 @@ SrVec MeCtLocomotionLimb::get_orientation()
 	return v;
 }
 
-void MeCtLocomotionLimb::set_limb_base(char* name)
+int MeCtLocomotionLimb::set_limb_base(char* name)
 {
+	SkJoint* joint = standing_skeleton->search_joint(name);
+	if(joint == NULL) 
+	{
+		printf("\nMeCtLocomotionLimb::set_limb_base(): Joint:%s does not exist", name);
+		return -1;
+	}
+
 	limb_base_name = (char*)malloc(sizeof(char)*(strlen(name)+1));
 	strcpy(limb_base_name, name);
-	int num = get_descendant_num(standing_skeleton->search_joint(name))+1;
+	int num = get_descendant_num(joint)+1;
 	ik.joint_info_list.capacity(num);
 	ik.joint_info_list.size(num);
 	limb_joint_info.quat.capacity(num);
@@ -127,12 +134,20 @@ void MeCtLocomotionLimb::set_limb_base(char* name)
 		limb_joint_info.quat.push(q);
 	}
 	limb_joint_info.Init(walking_skeleton, limb_base_name, NULL);
+	return 0;
 }
 
-void MeCtLocomotionLimb::add_support_joint(char* joint_name)
+int MeCtLocomotionLimb::add_support_joint(char* joint_name)
 {
-	SrString* joint = new SrString(joint_name);
-	support_joint_list.push() = joint;
+	SkJoint* joint = standing_skeleton->search_joint(joint_name);
+	if(joint == NULL) 
+	{
+		printf("\nMeCtLocomotionLimb::add_support_joint(): Joint:%s does not exist", joint_name);
+		return -1;
+	}
+	SrString* str_joint = new SrString(joint_name);
+	support_joint_list.push() = str_joint;
+	return 0;
 }
 
 void MeCtLocomotionLimb::set_skeleton_name(char* name)

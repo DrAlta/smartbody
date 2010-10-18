@@ -170,8 +170,6 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		return CMD_SUCCESS;
 	}
 
-
-
 	if(!actor->is_locomotion_controller_initialized()) 
 	{
 		LOG("ERROR: Locomotion controller not initialized.");
@@ -183,6 +181,11 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		if(!actor->get_locomotion_ct_analysis()->get_standing_initialized())
 		{
 			actor->get_locomotion_ct_analysis()->init(NULL, mcu_p->me_paths);
+			if(!actor->get_locomotion_ct()->is_valid()) 
+			{
+				LOG("Locomotion not valid, can not be enabled.");
+				return CMD_FAILURE;
+			}
 			actor->get_locomotion_ct_analysis()->init_blended_anim();
 		}
 		actor->get_locomotion_ct()->enabled = true;
