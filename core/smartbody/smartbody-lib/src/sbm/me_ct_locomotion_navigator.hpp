@@ -48,10 +48,10 @@ public:
 	bool has_destination;
 	bool reached_destination;
 
-	float target_height_displacement;
-	float curr_height_displacement;
-	float prev_height_displacement;
-	SrVec displacement;
+	float target_height_adjustment;
+	float curr_height_adjustment;
+	float prev_height_adjustment;
+	//SrVec displacement;
 	SrVec world_pos;
 
 protected:
@@ -142,8 +142,8 @@ public:
 	void update_framerate_accelerator(float accelerator, SrArray<MeCtLocomotionLimb*>* limb_list);
 	void update(SrBuffer<float>* buffer);
 	void update_facing(MeCtLocomotionLimb* limb, bool dominant_limb);
-	void update_displacement(SrVec* displacement);
-	void update_world_offset();
+	//void update_displacement(SrVec* displacement);
+	void update_world_offset(SrVec& displacement);
 	void update_world_mat();
 	void update_world_mat_rotation();
 	void update_world_mat_offset();

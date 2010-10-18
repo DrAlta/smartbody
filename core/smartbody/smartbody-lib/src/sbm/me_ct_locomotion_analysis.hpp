@@ -60,10 +60,14 @@ protected:
 	SkSkeleton* walking_skeleton;
 	SkSkeleton* standing_skeleton;
 
+	bool standing_initialized;
+
 public:
 	MeCtLocomotionAnalysis();
 
 	~MeCtLocomotionAnalysis();
+
+	bool get_standing_initialized();
 
 	void set_ct(MeCtLocomotion* controller);
 

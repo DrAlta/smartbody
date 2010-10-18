@@ -248,7 +248,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	void drawActiveArrow(SrVec& from, SrVec& to, int num, float width, SrVec& color, bool spin);
 	void init_foot_print();
 	void drawFootPrints();
-	void newPrints(SrVec& heel_pos, SrVec& orientation, SrVec& normal, SrVec& color, int side);
+	void newPrints(bool newprint, int index, SrVec& pos, SrVec& orientation, SrVec& normal, SrVec& color, int side);
 
 	int gridList;
 	float gridColor[4];

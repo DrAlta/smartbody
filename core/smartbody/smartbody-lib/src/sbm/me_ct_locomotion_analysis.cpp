@@ -40,7 +40,7 @@ MeCtLocomotionAnalysis::MeCtLocomotionAnalysis() {
 	walking_skeleton = NULL;
 	standing_skeleton = NULL;
 	motion_standing = NULL;
-
+	standing_initialized = false;
 }
 
 /** Destructor */
@@ -68,6 +68,11 @@ MeCtLocomotion* MeCtLocomotionAnalysis::get_ct()
 {
 	return _ct_locomotion;
 
+}
+
+bool MeCtLocomotionAnalysis::get_standing_initialized()
+{
+	return standing_initialized;
 }
 
 void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //temp hard-coded init for human characters
@@ -157,6 +162,8 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 			}
 		}
 	}
+
+	standing_initialized = true;
 }
 
 int MeCtLocomotionAnalysis::get_descendant_num(char* base_name)

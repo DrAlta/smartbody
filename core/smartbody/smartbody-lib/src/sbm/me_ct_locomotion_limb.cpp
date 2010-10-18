@@ -109,7 +109,7 @@ SrVec MeCtLocomotionLimb::get_orientation()
 	SrMat mat;
 	mat.rot(SrVec(0.0f, 1.0f, 0.0f), curr_rotation);
 	v = v * mat;
-	return mat;
+	return v;
 }
 
 void MeCtLocomotionLimb::set_limb_base(char* name)

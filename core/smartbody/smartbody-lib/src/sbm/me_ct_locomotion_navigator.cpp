@@ -34,7 +34,7 @@ const char* MeCtLocomotionNavigator::TYPE = "MeCtLocomotionNavigator";
 MeCtLocomotionNavigator::MeCtLocomotionNavigator() 
 {
 	is_valid = false;
-	displacement.set(0.0f, 0.0f, 0.0f);
+	//displacement.set(0.0f, 0.0f, 0.0f);
 	facing_angle = 0;
 	pre_facing_angle = facing_angle;
 	standing_factor = 0.0f;
@@ -42,9 +42,9 @@ MeCtLocomotionNavigator::MeCtLocomotionNavigator()
 	reached_destination = false;
 	destination_list.capacity(20);
 	speed_list.capacity(20);
-	target_height_displacement = 0.0f;
-	prev_height_displacement = 0.0f;
-	curr_height_displacement = 0.0f;
+	target_height_adjustment = 0.0f;
+	prev_height_adjustment = 0.0f;
+	curr_height_adjustment = 0.0f;
 }
 
 /** Destructor */
@@ -324,19 +324,19 @@ void MeCtLocomotionNavigator::set_reached_destination(MeFrameData& frame)
 	destination_list.size(0);
 }
 
-SrVec MeCtLocomotionNavigator::get_displacement()
+/*SrVec MeCtLocomotionNavigator::get_displacement()
 {
 	return displacement;
-}
+}*/
 
-void MeCtLocomotionNavigator::update_world_offset()
+void MeCtLocomotionNavigator::update_world_offset(SrVec& displacement)
 {
-	prev_height_displacement = curr_height_displacement;
-	curr_height_displacement = target_height_displacement;
+	prev_height_adjustment = curr_height_adjustment;
+	curr_height_adjustment = target_height_adjustment;
 	//curr_height_displacement = target_height_displacement * standing_factor;
 
 	world_pos.x = displacement.x + world_pos.x;
-	world_pos.y = displacement.y + world_pos.y + curr_height_displacement - prev_height_displacement;
+	world_pos.y = displacement.y + world_pos.y + curr_height_adjustment - prev_height_adjustment;
 	world_pos.z = displacement.z + world_pos.z;
 }
 
@@ -652,10 +652,10 @@ SrMat MeCtLocomotionNavigator::get_world_mat()
 	return world_mat;
 }
 
-void MeCtLocomotionNavigator::update_displacement(SrVec* displacement)
+/*void MeCtLocomotionNavigator::update_displacement(SrVec* displacement)
 {
 	this->displacement = *displacement;
-}
+}*/
 
 float MeCtLocomotionNavigator::get_facing_angle()
 {
