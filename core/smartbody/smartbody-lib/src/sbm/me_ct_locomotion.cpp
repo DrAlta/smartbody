@@ -35,7 +35,7 @@ const char* MeCtLocomotion::TYPE = "MeCtLocomotion";
 
 /** Constructor */
 MeCtLocomotion::MeCtLocomotion() {
-	is_valid = false;
+	channels_valid = false;
 	limb_joint_num = 0;
 	last_time = std::numeric_limits<float>::quiet_NaN();
 	nonlimb_joint_info.joint_num = 0;
@@ -91,7 +91,7 @@ MeCtLocomotion::~MeCtLocomotion() {
 int MeCtLocomotion::LOOKUP_BUFFER_INDEX(int var_name, int index )
 {
 	var_name = _context->toBufferIndex( _toContextCh[ ( index ) ] );
-	is_valid &= ( var_name != -1 );
+	channels_valid &= ( var_name != -1 );
 	return var_name;
 }
 
@@ -178,7 +178,7 @@ void MeCtLocomotion::iterate_joints(MeCtLocomotionJointInfo* joint_info)
 // Implements MeController::context_updated(..).
 void MeCtLocomotion::context_updated() {
 	if( _context == NULL )
-		is_valid = false;
+		channels_valid = false;
 }
 
 void MeCtLocomotion::controller_map_updated() 
@@ -187,7 +187,7 @@ void MeCtLocomotion::controller_map_updated()
 	{
 		int index = 0;
 		int k = 0;
-		is_valid = navigator.controller_map_updated(_context, &_toContextCh);
+		channels_valid = navigator.controller_map_updated(_context, &_toContextCh);
 		for(int j = 0; j < limb_list.size(); ++j)
 		{
 			MeCtLocomotionLimb* limb = limb_list.get(j);
@@ -260,11 +260,16 @@ void MeCtLocomotion::temp_update_for_footprint(MeFrameData& frame)
 			limb->limb_joint_info.quat.set(i, quat_buff);
 		}
 		get_limb_pos(limb);
+	}
+	calc_rotational_displacement();
+	for(int j = 0; j < limb_list.size(); ++j)
+	{
+		limb = limb_list.get(j);
 		for(int i = 0; i < limb->pos_buffer.size(); ++i)
 		{
 			pos = limb->pos_buffer.get(i);
 			pos += navigator.get_world_pos();
-			pos += navigator.get_base_pos();
+			pos -= world_offset_to_base;
 			limb->pos_buffer.set(i, pos);
 		}
 	}
@@ -285,14 +290,16 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	// TODO: Update MeController to pass in delta time.
 	// Until then, fake it or compute it ourselves (but there are some gotchas)
 
+	
+	if(!valid) return false;
+	if(!channels_valid ) return false;
+
 	if(!enabled) return false;
-	if( !is_valid ) return is_valid;
 	if(!motions_loaded) return motions_loaded;
 
 	if(limb_list.get(dominant_limb)->walking_list.size() < 2) 
 	{
 		temp_update_for_footprint(frame);
-		
 		return false;
 	}
 	
@@ -399,6 +406,21 @@ bool MeCtLocomotion::is_enabled()
 	return enabled;
 }
 
+bool MeCtLocomotion::is_valid()
+{
+	return valid;
+}
+
+bool MeCtLocomotion::is_channels_valid()
+{
+	return channels_valid;
+}
+
+void MeCtLocomotion::set_valid(bool valid)
+{
+	this->valid = valid;
+}
+
 SrArray<MeCtLocomotionLimb*>* MeCtLocomotion::get_limb_list()
 {
 	return &limb_list;
@@ -438,6 +460,8 @@ SrVec MeCtLocomotion::calc_rotational_displacement()
 	//v = -navigator.get_base_pos();
 
 	v = -get_offset(walking_skeleton->root(), translation_joint_index+1, nonlimb_joint_info.quat);
+
+	v -= navigator.get_base_pos();
 
 	pmat.roty(navigator.get_facing_angle());
 

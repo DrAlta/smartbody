@@ -177,7 +177,8 @@ static Fl_Menu_Item MenuTable[] =
          { "&show velocity",  0, MCB, CMD(CmdShowVelocity),  FL_MENU_TOGGLE },
 		 { "&show orientation",   0, MCB, CMD(CmdShowOrientation),  FL_MENU_TOGGLE },
 		 { "&show selection",   0, MCB, CMD(CmdShowSelection),  FL_MENU_TOGGLE },
-		 { "&show foot step marks",   0, MCB, CMD(CmdShowFootStepMarks),  FL_MENU_TOGGLE },
+		 { "&show kinematic footprints",   0, MCB, CMD(CmdShowKinematicFootprints),  FL_MENU_TOGGLE },
+		 { "&show locomotion footprints",   0, MCB, CMD(CmdShowLocomotionFootprints),  FL_MENU_TOGGLE },
          { 0 },
    { 0 }
  };
@@ -239,7 +240,8 @@ class FltkViewerData
    bool showvelocity;
    bool showorientation;
    bool showselection;
-   bool showfootstepmarks;
+   bool showlocofootprints;
+   bool showkinematicfootprints;
 
    SrString message;   // user msg to display in the window
    SrLight light;
@@ -305,7 +307,20 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->showvelocity = false;
    _data->showorientation = false;
    _data->showselection = false;
-   _data->showfootstepmarks = false;
+   _data->showlocofootprints = false;
+   _data->showkinematicfootprints = false;
+
+   	Group* firstGroup = new fltk::Group(-100, 20, w - 20, h/2 - 20, "locomotion");
+	firstGroup->begin();
+    off_height_window = new fltk::Input(-100, 20, 200, 20, "input off ground height ");
+	off_height_window->when(fltk::WHEN_ENTER_KEY);
+	off_height_window->callback(ChangeOffGroundHeight, this);
+	firstGroup->end();
+	firstGroup->resizable(off_height_window);
+	firstGroup->box(fltk::BORDER_FRAME);
+	firstGroup->box(fltk::BORDER_BOX);
+	firstGroup->label("Animation and Character Setting");
+	redraw();
 
    _data->light.init();
 
@@ -455,8 +470,11 @@ void FltkViewer::menu_cmd ( MenuCmd s )
 	  case CmdShowSelection  : _data->showselection = !_data->showselection;
 						if(!_data->showselection) _data->showlocomotionall = false;
                        break;
-	  case CmdShowFootStepMarks  : _data->showfootstepmarks = !_data->showfootstepmarks;
-						if(!_data->showfootstepmarks) _data->showlocomotionall = false;
+	  case CmdShowKinematicFootprints  : _data->showkinematicfootprints = !_data->showkinematicfootprints;
+						if(!_data->showkinematicfootprints) _data->showlocomotionall = false;
+                       break;
+	  case CmdShowLocomotionFootprints  : _data->showlocofootprints = !_data->showlocofootprints;
+						if(!_data->showlocofootprints) _data->showlocomotionall = false;
                        break;
       case CmdBoundingBox : SR_SWAPB(_data->boundingbox); 
                             if ( _data->boundingbox ) update_bbox();
@@ -549,7 +567,8 @@ bool FltkViewer::menu_cmd_activated ( MenuCmd c )
 	  case CmdShowVelocity : return _data->showvelocity? true:false;
 	  case CmdShowOrientation : return _data->showorientation? true:false;
 	  case CmdShowSelection : return _data->showselection? true:false;
-	  case CmdShowFootStepMarks : return _data->showfootstepmarks? true:false;
+	  case CmdShowKinematicFootprints : return _data->showkinematicfootprints? true:false;
+	  case CmdShowLocomotionFootprints : return _data->showlocofootprints? true:false;
       case CmdAxis        : return _data->displayaxis? true:false;
       case CmdBoundingBox : return _data->boundingbox? true:false;
       case CmdStatistics  : return _data->statistics? true:false;
@@ -1012,6 +1031,8 @@ static bool rightkey = false;
 static bool a_key = false;
 static bool d_key = false;
 
+static float off_height_comp = 0.0f;
+
 void FltkViewer::translate_keyboard_state()
 {
 	bool locomotion_cmd = false;
@@ -1051,13 +1072,33 @@ void FltkViewer::translate_keyboard_state()
 		//if(height_disp < -50.0f) height_disp = -50.0f;
 		actor->get_locomotion_ct()->set_target_height_displacement(height_disp);
 	}
+	if(fltk::get_key_state('k'))
+	{
+		++off_height_comp;
+	}
+	if(fltk::get_key_state('m'))
+	{
+		--off_height_comp;
+	}
 	if(fltk::get_key_state('x'))
 	{
-		++char_index;
-		if(char_index >= mcu.character_map.get_num_entries())
+		SbmCharacter* actor = NULL;
+		
+		for(int i = 0; i < mcu.character_map.get_num_entries(); ++i)
 		{
-			char_index = 0;
+			++char_index;
+			if(char_index >= mcu.character_map.get_num_entries())
+			{
+				char_index = 0;
+			}
+			mcu.character_map.reset();
+			for(int j = 0; j <= char_index; ++j)
+			{
+				actor = mcu.character_map.next();
+			}
+			if(actor->get_locomotion_ct()->is_valid()) break;
 		}
+
 		//_data->showselection = !_data->showselection;
 		// check the widget
 		/*int numChildren = _data->menubut->children();
@@ -1982,17 +2023,30 @@ void FltkViewer::drawActiveArrow(SrVec& from, SrVec& to, int num, float width, S
 	glDisable(GL_BLEND); 
 }*/
 
-static SrVec footprintpos[3][10];
+#define FOOT_PRINT_NUM 20
+static SrVec footprintpos[3][FOOT_PRINT_NUM][2];
 static int footprintstart = 0;
 //static int footprintend = 0;
-static SrVec footprintorientation[10];
-static SrVec footprintnormal[10];
-static float footprinttime[10];
-static int footprintside[10];
+static SrVec footprintcolor[FOOT_PRINT_NUM][2];
+static SrVec footprintorientation[FOOT_PRINT_NUM][2];
+static SrVec footprintnormal[FOOT_PRINT_NUM][2];
+static float footprinttime[FOOT_PRINT_NUM][2];
+static int footprintside[FOOT_PRINT_NUM][2];
 static SrVec footprint[3][12][2];
 static float fadeouttime = 9.0f;
 static float footprintscacle = 1.0f;
 static SrVec footprintoffset;
+
+
+void FltkViewer::ChangeOffGroundHeight(fltk::Widget* widget, void* data)
+{
+	FltkViewer* window = (FltkViewer*) data;
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	const char* motionName = window->off_height_window->value();
+
+	window->redraw();
+}
 
 void FltkViewer::init_foot_print()
 {
@@ -2077,7 +2131,7 @@ void FltkViewer::init_foot_print()
 
 }
 
-void FltkViewer::drawFootPrints()
+void FltkViewer::drawKinematicFootprints(int index)
 {
 	int i = 0;
 	SrVec vertex;
@@ -2091,30 +2145,31 @@ void FltkViewer::drawFootPrints()
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND); 
 
-	for(int j = 0; j < 10; ++j)
+	for(int j = 0; j < FOOT_PRINT_NUM; ++j)
 	{
 		//footprintpos[j] = SrVec(40, 0, 40);
-		if(footprinttime[j] > fadeouttime) continue;
+		if(footprinttime[j][index] > fadeouttime) continue;
 		up.set(0.0f, 1.0f, 0.0f);
-		mat.rot(forward, footprintorientation[j]);
+		mat.rot(forward, footprintorientation[j][index]);
 		up = up * mat;
-		tmat.rot(up, footprintnormal[j]);
+		tmat.rot(up, footprintnormal[j][index]);
 
-		if(footprintside[j] == 0) color.set(0.0f, 1.0f, 0.4f);
-		else color.set(0.0f, 0.4f, 1.0f);
+		//if(footprintside[j] == 0) color.set(0.0f, 1.0f, 0.4f);
+		//else color.set(0.0f, 0.4f, 1.0f);
 
-		glColor4f(color.x, color.y, color.z, 0.6f*(fadeouttime-footprinttime[j])/fadeouttime);
+		glColor4f(footprintcolor[j][index].x, footprintcolor[j][index].y, footprintcolor[j][index].z, 0.6f*(fadeouttime-footprinttime[j][index])/fadeouttime);
 		
 		for(int k = 0; k < 3; ++k)
 		{
-			if(footprintpos[k][j].len() == 0.0f) continue;
+			if(footprintpos[k][j][index].len() == 0.0f) continue;
 			glBegin(GL_POLYGON);
 			for(int i = 0; i < 6; ++i)
 			{
-				vertex = footprint[k][i][footprintside[j]];
+				vertex = footprint[k][i][footprintside[j][index]];
 				vertex = vertex * mat;
 				vertex = vertex * tmat;
-				vertex += footprintpos[k][j];
+				vertex += footprintpos[k][j][index];
+				vertex.y += index;
 				glVertex3f(vertex.x, vertex.y, vertex.z);
 			}
 			glEnd();
@@ -2123,28 +2178,30 @@ void FltkViewer::drawFootPrints()
 	}
 	glDisable(GL_BLEND); 
 
-	for(int i = 0; i < 10; ++i)
+	for(int i = 0; i < FOOT_PRINT_NUM; ++i)
 	{
 		if( i == footprintstart) continue;
-		if(footprinttime[i] > fadeouttime) continue;
-		footprinttime[i] += 0.0166666f;
+		if(footprinttime[i][index] > fadeouttime) continue;
+		footprinttime[i][index] += 0.0166666f;
 	}
 	//glEnable(GL_DEPTH_TEST);
 }
 
 
-void FltkViewer::newPrints(bool newprint, int index, SrVec& pos, SrVec& orientation, SrVec& normal, SrVec& color, int side)
+void FltkViewer::newPrints(bool newprint, int index, SrVec& pos, SrVec& orientation, SrVec& normal, SrVec& color, int side, int type)
 {
 	if(newprint)
 	{
 		++footprintstart;
-		if(footprintstart >= 10) footprintstart = 0;
+		if(footprintstart >= FOOT_PRINT_NUM) footprintstart = 0;
 
 		SrVec v;
 		bool j = false;
-		for(int i = 0; i < 10; ++i)
+		for(int i = 0; i < FOOT_PRINT_NUM; ++i)
 		{
-			v = footprintpos[index][i] - pos;
+			v = footprintpos[index][i][type];
+			v.y = 0.0f;
+			v = v - pos;
 			if(v.len()<5.0f)
 			{
 				footprintstart = i;
@@ -2160,16 +2217,16 @@ void FltkViewer::newPrints(bool newprint, int index, SrVec& pos, SrVec& orientat
 		{
 			for(int i = 0; i < 3; ++i)
 			{
-				footprintpos[i][footprintstart].set(0.0f, 0.0f, 0.0f);
+				footprintpos[i][footprintstart][type].set(0.0f, 0.0f, 0.0f);
 			}
 		}
 	}
-
-	footprintpos[index][footprintstart] = pos;
-	footprinttime[footprintstart] = 0.0f;
-	footprintorientation[footprintstart] = orientation;
-	footprintnormal[footprintstart] = normal;
-	footprintside[footprintstart] = side;
+	footprintcolor[footprintstart][type] = color;
+	footprintpos[index][footprintstart][type] = pos;
+	footprinttime[footprintstart][type] = 0.0f;
+	footprintorientation[footprintstart][type] = orientation;
+	footprintnormal[footprintstart][type] = normal;
+	footprintside[footprintstart][type] = side;
 }
 
 void FltkViewer::drawArrow(SrVec& from, SrVec& to, float width, SrVec& color)
@@ -2249,6 +2306,7 @@ void FltkViewer::drawLocomotion()
 	for(int i = 0; i < mcu.character_map.get_num_entries(); ++i)
 	{
 		character = mcu.character_map.next();
+		if(!character->get_locomotion_ct()->is_valid()) continue;
 		SrVec arrow_start = character->get_locomotion_ct()->get_base_pos();
 		SrVec arrow_end;
 		if(_data->showvelocity)
@@ -2276,7 +2334,7 @@ void FltkViewer::drawLocomotion()
 				drawActiveArrow(arrow_start, arrow_end, 3, 10.0f, SrVec(1.0f, 0.0f, 0.0f), false);
 			}
 		}
-		if(_data->showfootstepmarks)
+		if(_data->showkinematicfootprints)
 		{
 			//int cur_dominant = character->get_locomotion_ct()->get_dominant_limb_index();
 			//if(i == char_index && character->get_locomotion_ct()->limb_list.size()>cur_dominant)
@@ -2297,16 +2355,48 @@ void FltkViewer::drawLocomotion()
 					for(int j = 0; j < 3; ++j)
 					{
 						off_height = character->get_locomotion_ct()->limb_list.get(k)->get_off_ground_height(j+2);
+						if(character->get_locomotion_ct()->limb_list.get(0)->walking_list.size() < 2) off_height -= off_height_comp;
 						//printf("%f ", off_height);
 						if(off_height > 0.0f) continue;
 						SrVec pos = character->get_locomotion_ct()->get_supporting_joint_pos(j, k, &orientation, &normal);
 						pos.y += 0.1f;
-						newPrints(newprint, j, pos, orientation, normal, SrVec(1.0f, 0.0f, 0.0f), k);
+						newPrints(newprint, j, pos, orientation, normal, SrVec(0.2f, (float)k, (float)(1-k)), k, 0);
 						newprint = false;
 					}
 					//pre_dominant = k;
 				}
-				drawFootPrints();
+				drawKinematicFootprints(0);
+			}
+		}
+		if(_data->showlocofootprints)
+		{
+			int cur_dominant = character->get_locomotion_ct()->get_dominant_limb_index();
+			if(i == char_index && character->get_locomotion_ct()->limb_list.size()>cur_dominant)
+			{
+				if(cur_dominant != pre_dominant && character->get_locomotion_ct()->limb_list.get(cur_dominant)->space_time >= 0.0f
+					&& character->get_locomotion_ct()->limb_list.get(cur_dominant)->space_time < 1.0f)
+				{
+					SrMat mat;
+					mat.rot(SrVec(0,1,0), character->get_locomotion_ct()->limb_list.get(cur_dominant)->curr_rotation+character->get_locomotion_ct()->get_navigator()->get_facing_angle());
+					SrVec orientation = SrVec(0,0,1)*mat;
+					SrVec normal;
+					bool newprint = true;
+					//float off_height = 0.0f;
+					//int j = 0;
+					//printf("\n");
+					for(int j = 0; j < 3; ++j)
+					{
+						//off_height = character->get_locomotion_ct()->limb_list.get(cur_dominant)->get_off_ground_height(j+2);
+						//printf("%f ", off_height);
+						//if(off_height > 0.0f) continue;
+						SrVec pos = character->get_locomotion_ct()->get_supporting_joint_pos(j, cur_dominant, &orientation, &normal);
+						pos.y += 0.1f;
+						newPrints(newprint, j, pos, orientation, normal, SrVec(0.0f, (float)cur_dominant*0.3f, (float)(1-cur_dominant)*0.3f), cur_dominant, 1);
+						newprint = false;
+					}
+					pre_dominant = cur_dominant;
+				}
+				drawKinematicFootprints(1);
 			}
 		}
 	}
