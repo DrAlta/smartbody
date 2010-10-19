@@ -66,7 +66,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="Smartbodyd.lib bmlviewerd.lib panimationviewerd.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib pthreadVSE2.lib xerces-c_3D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_44.lib boost_system-vc90-mt-gd-1_44.lib log4cxxd.lib OpenAL32.lib alut.lib libsndfile-1.lib fltk2_gld.lib fltk2d.lib opengl32.lib dbghelp.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib"
+				AdditionalDependencies="Smartbodyd.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib pthreadVSE2.lib xerces-c_3D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_44.lib boost_system-vc90-mt-gd-1_44.lib log4cxxd.lib OpenAL32.lib alut.lib libsndfile-1.lib fltk2_gld.lib fltk2d.lib opengl32.lib dbghelp.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib"
 				OutputFile="..\bin\sbm-fltkd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;..\..\smartbody-lib\lib&quot;;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;&quot;..\..\..\..\lib\vhcl\libsndfile-1_0_17&quot;;..\..\..\..\lib\vhcl\log4cxx\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk2\lib;..\..\..\..\lib\pthreads\lib;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib&quot;;..\..\..\..\lib\boost\lib;&quot;..\..\sbm-ui\panimationviewer\lib&quot;;&quot;..\..\sbm-ui\bmlviewer\lib&quot;"
@@ -158,7 +158,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="Smartbody.lib bmlviewer.lib panimationviewer.lib vhcl.lib vhmsg.lib bonebus.lib wsp.lib fltk2.lib fltk2_gl.lib pthreadVSE2.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_44.lib boost_system-vc90-mt-1_44.lib log4cxx.lib dbghelp.lib opengl32.lib OpenAL32.lib alut.lib libsndfile-1.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib"
+				AdditionalDependencies="Smartbody.lib vhcl.lib vhmsg.lib bonebus.lib wsp.lib fltk2.lib fltk2_gl.lib pthreadVSE2.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_44.lib boost_system-vc90-mt-1_44.lib log4cxx.lib dbghelp.lib opengl32.lib OpenAL32.lib alut.lib libsndfile-1.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib"
 				OutputFile="..\bin\sbm-fltk.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;..\..\smartbody-lib\lib&quot;;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;&quot;..\..\..\..\lib\vhcl\libsndfile-1_0_17&quot;;..\..\..\..\lib\vhcl\log4cxx\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk2\lib;..\..\..\..\lib\pthreads\lib;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib&quot;;..\..\..\..\lib\boost\lib;&quot;..\..\sbm-ui\panimationviewer\lib&quot;;&quot;..\..\sbm-ui\bmlviewer\lib&quot;"
@@ -223,66 +223,6 @@
 	</References>
 	<Files>
 		<Filter
-			Name="sbm-common"
-			>
-			<File
-				RelativePath="..\..\..\..\data\sbm-common\scripts\common-init.seq"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\data\sbm-common\common-sk\common-test.sk"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\data\sbm-common\common-sk\common.sk"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\data\sbm-common\scripts\default-init-characters.seq"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\data\sbm-common\scripts\default-init.seq"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\data\sbm-common\scripts\default-viewer.seq"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\data\sbm-common\scripts\init-common-assets.seq"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\data\sbm-common\scripts\init-common-face.seq"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\data\sbm-common\scripts\init-common-viewer.seq"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="sbm-test"
-			>
-			<File
-				RelativePath="..\..\..\..\data\sbm-test\scripts\default-init.seq"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\data\sbm-test\scripts\init-test-assets.seq"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\data\sbm-test\scripts\init-test-characters.seq"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\data\sbm-test\scripts\init-test-pawns.seq"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="viewer"
 			>
 			<File
@@ -294,10 +234,82 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath="..\bin\default.seq"
+		<Filter
+			Name="bmlviewer"
 			>
-		</File>
+			<File
+				RelativePath="..\src\bmlviewer\BehaviorBlock.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlviewer\BehaviorBlock.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlviewer\BehaviorEditorWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlviewer\BehaviorEditorWidget.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlviewer\BehaviorWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlviewer\BehaviorWindow.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="nle"
+			>
+			<File
+				RelativePath="..\src\nle\NonLinearEditor.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\nle\NonLinearEditor.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\nle\NonLinearEditorWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\nle\NonLinearEditorWidget.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="panimationviewer"
+			>
+			<File
+				RelativePath="..\src\panimationviewer\PanimationWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\panimationviewer\PanimationWindow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\panimationviewer\ParamAnimBlock.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\panimationviewer\ParamAnimBlock.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\panimationviewer\ParamAnimEditorWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\panimationviewer\ParamAnimEditorWidget.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\src\pic.cpp"
 			>
