@@ -45,10 +45,8 @@ public:
 	static const char* TYPE;
 
 public:
-	MeCtLocomotionJointInfo nonlimb_joint_info;
-	
 
-	SrArray<char*> limb_base_name;
+	//SrArray<char*> limb_base_name;
 	float pre_blended_base_height;
 	float r_blended_base_height;
 
@@ -59,16 +57,30 @@ public:
 	SrString translation_joint_name;
 	float translation_joint_height;
 
-	//int base_index;
 	SrVec displacement;
 
+	int style;
+
+protected: // flags
+	
+	bool channels_valid;  // All necessary channels are present
+	bool valid;
+	bool joints_indexed;
+	bool dis_initialized; // limb joint position calculated
+	bool initialized;
+	bool enabled;
+
+public:
+	bool motions_loaded;
+	bool reset;
+	bool ik_enabled;
+	
+protected:
+	MeCtLocomotionJointInfo nonlimb_joint_info;
 	int r_anim1_index;
 	int r_anim2_index;
 	int r_anim1_index_dominant;
 	int r_anim2_index_dominant;
-	int style;
-
-	bool motions_loaded;
 
 protected:
 	MeCtLocomotionIK ik;
@@ -85,18 +97,9 @@ protected:
 
 	SkSkeleton* _skeleton_ref_p;
 
-	SkMotion *_motion;
-
 	SrArray<MeCtLocomotionAnimGlobalInfo*> anim_global_info;
 
 	int dominant_limb;
-
-	SrMat mat;
-
-	bool channels_valid;  // All necessary channels are present
-	bool valid;
-
-	bool joints_indexed;
 
 	//temp
 	SrArray<SrQuat> t_joint_quats1;
@@ -104,45 +107,26 @@ protected:
 	SrArray<SrQuat> joint_quats1;
 	SrArray<SrQuat> joint_quats2;
 
-	int limb_joint_num;
-
 	double motion_time;
-
-	float last_time;
-
-	double last_t;
-	double curr_t;
-
+	double last_time;
 	double delta_time;
 
 	char* base_name;
 	//char* nonlimb_blending_base_name;
 
-	bool dis_initialized; // limb joint positiona calculated
-	bool initialized;
 
+protected: // channel initialization related
 	int joint_channel_start_ind;
+	int limb_joint_num;
 
 	//temp, to be deleted=================
 public:
 	SkSkeleton* walking_skeleton;
 	SkSkeleton* standing_skeleton;
-	float ratio;
-	float dom_ratio;
-	//float abs_ground_height; // absolute height of base joint when standing.
-
 
 	SrArray<MeCtLocomotionLimb*> limb_list; //limbs
 	SrArray<SkMotion*> locomotion_anims;
-	//SrVec displacement;
 
-	bool automate;
-	bool reset;
-	bool ik_enabled;
-	bool enabled;
-
-	int temp;
-	//SrArray<const char*> joint_name;
 
 public:
 	/** Constructor */
@@ -183,9 +167,6 @@ public:
 	 */
 	virtual void controller_map_updated();
 
-	/**
-	 *  Implements MeController::controller_evaluate(..).
-	 */
 
 public:
 	MeCtLocomotionNavigator* get_navigator();
@@ -206,6 +187,8 @@ public:
 
 	bool is_valid();
 
+	bool is_motions_loaded();
+
 	bool is_channels_valid();
 
 	SrArray<MeCtLocomotionLimb*>* get_limb_list();
@@ -215,6 +198,8 @@ public:
 	void set_target_height_displacement(float displacement);
 
 	void set_base_name(const char* name);
+
+	void set_enabled(bool enable){enabled = enable;}
 
 	void print_info(char* name);
 
@@ -228,14 +213,13 @@ public:
 
 	void set_valid(bool valid);
 
-	//temp function
+	//temp functions
 	SrVec get_supporting_joint_pos(int joint_index, int limb_index, SrVec* orientation, SrVec* normal);
 
 	void temp_update_for_footprint(MeFrameData& frame);
 
 protected:
 
-	//void init_limbs();
 	int determine_dominant_limb_index();
 
 	void get_translation_base_joint_index();
@@ -262,8 +246,6 @@ protected:
 
 	void analyze_motion( SkMotion* motion );
 
-	//void blend();
-
 	void update(float inc_frame, MeFrameData& frame);
 
 	void update_facing(MeCtLocomotionLimb* limb);
@@ -272,15 +254,11 @@ protected:
 
 	void blend_base_joint(MeFrameData& frame, float space_time, int anim_index1, int anim_index2, float weight);
 
-	
-
 	SrVec get_local_direction(SrVec* direction);
 
 	int determine_dominant_limb();
 
 	void apply_IK();
-
-	//void set_nonlimb_blending_base_name(const char* name);
 
 	int LOOKUP_BUFFER_INDEX(int var_name, int index );
 
@@ -288,15 +266,9 @@ protected:
 
 	void update_limb_anim_standing(MeCtLocomotionLimbAnim* anim, int index, MeFrameData& frame);
 
-	//void update_nonlimb_mat();
-
-	//void update_nonlimb_mat(SkJoint* joint, SrMat* mat);
-
-	void MeCtLocomotion::update_nonlimb_mat(SkJoint* joint, SrMat* mat, int depth);
+	void update_nonlimb_mat(SkJoint* joint, SrMat* mat, int depth);
 
 	void blend_standing(MeFrameData& frame);
-
-	//float get_buffer_base_height(SrBuffer<float>& buffer);
 
 	SrVec calc_rotational_displacement();
 

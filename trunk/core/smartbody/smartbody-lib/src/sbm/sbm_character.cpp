@@ -221,10 +221,10 @@ int SbmCharacter::init_locomotion_analyzer(const char* skel_file, mcuCBHandle *m
 	return CMD_SUCCESS;
 }
 
-void SbmCharacter::automate_locomotion(bool automate)
+/*void SbmCharacter::automate_locomotion(bool automate)
 {
 	locomotion_ct->automate = automate;
-}
+}*/
 
 void SbmCharacter::locomotion_reset()
 {
@@ -349,7 +349,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 			MeController* controller = ct_tree_p->controller(c);
 			if (controller == motion_sched_p)
 			{
-				ct_tree_p->add_controller( locomotion_ct, c);
+				ct_tree_p->add_controller( locomotion_ct, c+1);
 				break;
 			}
 		}

@@ -65,10 +65,6 @@ public://for IK
 	SrVec							ik_terrain_target_normal;
 	float							ik_target_comp;
 
-	//SrArray<int>					joint_index;
-	//SrArray<int>					joint_buff_index;
-	//SrArray<SrQuat>				quat_buffer;
-
 public:
 	SrArray<MeCtLocomotionLimbAnim*>	walking_list; // originally provided artist-made animation. for each provided walking animation, do analysis in MeCtLocomotionLimbAnim.
 
@@ -76,7 +72,6 @@ public:
 	SrArray<SrVec>					pos_buffer;
 	MeCtLocomotionLimbAnim			blended_anim; // blended run-time animation
 	MeCtLocomotionLimbDirectionPlanner direction_planner; 
-	//MeCtLocomotionLimbAnim			orientation_anim;
 	float							space_time;
 	SrVec							pos;
 	char*							limb_base_name;
@@ -104,8 +99,6 @@ public:
 		if(walking_list.size()<2) return pos_buffer.get(joint_index).y-support_height.get(joint_index-2);
 		return ik.joint_info_list.get(joint_index).support_joint_comp;
 	}
-
-	//void	get_base_pos();
 
 	float	get_ground_height();
 	void	set_ground_height(float ground_height);

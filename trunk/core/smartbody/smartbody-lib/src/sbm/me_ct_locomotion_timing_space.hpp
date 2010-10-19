@@ -34,8 +34,6 @@ public:
 
 protected:
 	// Data
-
-	//SrArray<MeCtLocomotionRefTime*> _ref_time;
 	SrArray<float> _ref_time;
 	SrArray<char*> _ref_time_name;
 	float frame_num;
