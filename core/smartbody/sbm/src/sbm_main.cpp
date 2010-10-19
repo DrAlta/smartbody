@@ -38,8 +38,8 @@
 #include <fstream>
 
 #include "fltk_viewer.h"
-#include <BehaviorWindow.h>
-#include <PanimationWindow.h>
+#include <bmlviewer/BehaviorWindow.h>
+#include <panimationviewer/PanimationWindow.h>
 #include "wsp.h"
 
 #include <sbm/sbm_constants.h>
