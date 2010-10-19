@@ -62,7 +62,7 @@ MeCtLocomotion::MeCtLocomotion() {
 	motion_time = -1.0f;
 	last_t = 0.0f;
 	translation_joint_height = 0.0f;
-
+	valid = false;
 	
 }
 

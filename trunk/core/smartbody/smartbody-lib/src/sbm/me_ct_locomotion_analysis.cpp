@@ -176,7 +176,7 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 			}
 		}
 	}
-
+	_ct_locomotion->set_valid(true);
 	standing_initialized = true;
 }
 
