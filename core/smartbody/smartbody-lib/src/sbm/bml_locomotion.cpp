@@ -114,11 +114,11 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	{
 		if( XMLString::compareIString( attrEnable, L"true" )==0 ) 
 		{
-			ct_locomotion->enabled = true;
+			ct_locomotion->set_enabled(true);
 		}
 		else if( XMLString::compareIString( attrEnable, L"false" )==0 )
 		{
-			ct_locomotion->enabled = false;
+			ct_locomotion->set_enabled(false);
 		}
 	}
 

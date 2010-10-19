@@ -44,9 +44,9 @@ MeCtLocomotion::MeCtLocomotion() {
 	nonlimb_joint_info.quat.capacity(0);
 	last_time = 0.0f;
 	//last_t = -1.0f;
-	ratio = 0.0f;
+	//ratio = 0.0f;
 	dominant_limb = 0;
-	automate = false;
+//	automate = false;
 	reset = false;
 	dis_initialized = false;
 	initialized = false;
@@ -60,7 +60,7 @@ MeCtLocomotion::MeCtLocomotion() {
 	r_blended_base_height = 0.0f;
 	style = 0;
 	motion_time = -1.0f;
-	last_t = 0.0f;
+	last_time = 0.0f;
 	translation_joint_height = 0.0f;
 	valid = false;
 	
@@ -285,6 +285,10 @@ void MeCtLocomotion::temp_update_for_footprint(MeFrameData& frame)
 
 }
 
+bool MeCtLocomotion::is_motions_loaded()
+{
+	return motions_loaded;
+}
 
 bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	// TODO: Update MeController to pass in delta time.
@@ -303,9 +307,9 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 		return false;
 	}
 	
-	curr_t = time;
+	//curr_t = time;
 
-	delta_time = curr_t - last_t;
+	delta_time = time - last_time;
 
 	if(delta_time > 0.03333333f) delta_time = 0.03333333f;
 
@@ -392,7 +396,7 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 		buffer[index+3] = (float)quat.z;
 	}
 	
-	last_t = time;
+	last_time = time;
 	return true;
 }
 
@@ -577,54 +581,6 @@ int MeCtLocomotion::determine_dominant_limb()
 	return min_ind;
 }
 
-/*float MeCtLocomotion::get_buffer_base_height(SrBuffer<float>& buffer)
-{
-	SkJoint* tjoint = walking_skeleton->root();
-	SrQuat quat;
-	int index;
-	SrMat gmat;
-	SrMat pmat, lmat;
-	bool found = false;
-	while(true)
-	{
-		index = nonlimb_joint_info.get_index_by_name(tjoint->name().get_string());
-
-		SrVec base_pos = navigator.get_base_pos();
-		if(index == translation_joint_index)
-		{
-			tjoint->pos()->value(0, base_pos.x);
-			tjoint->pos()->value(1, base_pos.y);
-			tjoint->pos()->value(2, base_pos.z);
-		}
-		
-		quat.w = buffer[index+0];
-		quat.x = buffer[index+1];
-		quat.y = buffer[index+2];
-		quat.z = buffer[index+3];
-
-		pmat = gmat;
-		lmat = get_lmat(tjoint, &quat);
-		gmat = lmat * pmat;
-
-		if(strcmp(nonlimb_joint_info.joint_name.get(translation_joint_index), tjoint->name().get_string()) == 0)
-		{
-			found = true;
-			break;
-		}
-
-		if(tjoint->num_children()>0)
-		{ 
-			tjoint = tjoint->child(0);
-		}
-		else break;
-	}
-	if(found == false)
-	{
-		LOG("\nError: MeCtLocomotion::get_buffer_base_height(). translation joint not found.");
-	}
-	return gmat.e42();
-}*/
-
 void MeCtLocomotion::blend_base_joint(MeFrameData& frame, float space_time, int anim_index1, int anim_index2, float weight)
 {
 	pre_blended_base_height = r_blended_base_height;
@@ -676,61 +632,6 @@ void MeCtLocomotion::blend_base_joint(MeFrameData& frame, float space_time, int 
 
 }
 
-/*void MeCtLocomotion::blend_base_joint(MeFrameData& frame, float space_time, int anim_index1, int anim_index2, float weight)
-{
-	pre_blended_base_height = r_blended_base_height;
-	SrMat mat;
-	SrQuat rot1, rot2, rot3, rot4;
-	float ratio = 0.0f;
-	const float* pheight = mat.pt(13);
-	float base_height = 0.0f;
-	char* translate_base;
-	SkJoint* base;
-
-	MeCtLocomotionLimbAnim* anim1 = limb_list.get(0)->walking_list.get(anim_index1);
-	MeCtLocomotionLimbAnim* anim2 = limb_list.get(0)->walking_list.get(anim_index2);
-	float frame1 = anim1->get_timing_space()->get_virtual_frame(space_time);
-	float frame2 = anim2->get_timing_space()->get_virtual_frame(space_time);
-
-	translate_base = (char*)nonlimb_joint_info.joint_name.get(translation_joint_index);
-	base = walking_skeleton->search_joint(translate_base);
-
-	anim1->walking->connect(walking_skeleton);
-	ratio = frame1 - (int)frame1;
-
-	anim1->walking->apply_frame((int)frame1);
-	base->update_gmat();
-	mat = base->gmat();
-	r_blended_base_height = *pheight*(1.0f-ratio)*(weight);
-
-	anim1->walking->apply_frame((int)frame1+1);
-	base->update_gmat();
-	mat = base->gmat();
-	r_blended_base_height += *pheight*ratio*(weight);
-
-	anim2->walking->connect(walking_skeleton);
-	ratio = frame2 - (int)frame2;
-
-	anim2->walking->apply_frame((int)frame2);
-	base->update_gmat();
-	mat = base->gmat();
-	r_blended_base_height += *pheight*(1.0f-ratio)*(1.0f-weight);
-
-	anim2->walking->apply_frame((int)frame2+1);
-	base->update_gmat();
-	mat = base->gmat();
-	r_blended_base_height += *pheight*ratio*(1.0f-weight);
-
-	r_blended_base_height += base_height;
-
-	SrBuffer<float>& buffer = frame.buffer();
-	float standing_height = get_buffer_base_height(buffer);
-
-	r_blended_base_height = r_blended_base_height * (navigator.standing_factor) + standing_height * (1.0f-navigator.standing_factor);
-
-	//printf("\nHeight: %f", r_blended_base_height);
-}*/
-
 void MeCtLocomotion::set_motion_time(float time)
 {
 	navigator.reached_destination = false;
@@ -741,7 +642,9 @@ void MeCtLocomotion::set_motion_time(float time)
 void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 {
 	if(inc_frame < 0) inc_frame = 0.0f;
-	float frame_num; 
+	float frame_num = 0.0f; 
+	float ratio = 0.0f;
+	float dom_ratio = 0.0f;
 
 	// set the after limb the dominant limb and the the space value to 0 when starting the locomotion.
 	if(navigator.standing_factor == 0.0f)

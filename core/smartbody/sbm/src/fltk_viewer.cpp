@@ -1084,19 +1084,19 @@ void FltkViewer::translate_keyboard_state()
 	{
 		SbmCharacter* actor = NULL;
 		
-		for(int i = 0; i < mcu.character_map.get_num_entries(); ++i)
+		//for(int i = 0; i < mcu.character_map.get_num_entries(); ++i)
 		{
 			++char_index;
 			if(char_index >= mcu.character_map.get_num_entries())
 			{
 				char_index = 0;
 			}
-			mcu.character_map.reset();
+			/*mcu.character_map.reset();
 			for(int j = 0; j <= char_index; ++j)
 			{
 				actor = mcu.character_map.next();
 			}
-			if(actor->get_locomotion_ct()->is_valid()) break;
+			if(actor->get_locomotion_ct()->is_valid()) break;*/
 		}
 
 		//_data->showselection = !_data->showselection;
@@ -2306,7 +2306,7 @@ void FltkViewer::drawLocomotion()
 	for(int i = 0; i < mcu.character_map.get_num_entries(); ++i)
 	{
 		character = mcu.character_map.next();
-		if(!character->get_locomotion_ct()->is_valid()) continue;
+		//if(!character->get_locomotion_ct()->is_valid()) continue;
 		SrVec arrow_start = character->get_locomotion_ct()->get_base_pos();
 		SrVec arrow_end;
 		if(_data->showvelocity)
@@ -2324,14 +2324,24 @@ void FltkViewer::drawLocomotion()
 		}
 		if(_data->showselection)
 		{
-			float height = character->getHeight();
 			if(i == char_index)
 			{
+				float height = character->getHeight();
+				SrVec color;
 				float base_height = character->get_locomotion_ct()->translation_joint_height;
 				arrow_end = arrow_start;
 				arrow_end.y += height - base_height;
 				arrow_start.y += height - base_height + 30.0f;
-				drawActiveArrow(arrow_start, arrow_end, 3, 10.0f, SrVec(1.0f, 0.0f, 0.0f), false);
+				if(character->get_locomotion_ct()->is_enabled())
+				{
+					if(character->get_locomotion_ct()->get_limb_list()->get(0)->walking_list.size() < 2)
+					{
+						color.set(1.0f, 1.0f, 0.0f);
+					}
+					else color.set(0.0f, 1.0f, 0.2f);
+				}
+				else color.set(1.0f, 0.0f, 0.0f);
+				drawActiveArrow(arrow_start, arrow_end, 3, 10.0f, color, false);
 			}
 		}
 		if(_data->showkinematicfootprints)

@@ -188,14 +188,14 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			}
 			actor->get_locomotion_ct_analysis()->init_blended_anim();
 		}
-		actor->get_locomotion_ct()->enabled = true;
+		actor->get_locomotion_ct()->set_enabled(true);
 		LOG("Locomotion engine has been enabled.");
 
 		return CMD_SUCCESS;
 	}
 	else if(arg=="disable")
 	{
-		actor->get_locomotion_ct()->enabled = false;
+		actor->get_locomotion_ct()->set_enabled(false);
 		LOG("Locomotion engine has been disabled.");
 
 		return CMD_SUCCESS;
@@ -208,6 +208,12 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	}
 
 	if(!actor->get_locomotion_ct()->motions_loaded)
+	{
+		LOG("locomotion animations not loaded correctly.");
+		return CMD_FAILURE;
+	}
+
+	if(actor->get_locomotion_ct()->get_limb_list()->get(0)->walking_list.size() < 3)
 	{
 		LOG("locomotion animations not loaded correctly.");
 		return CMD_FAILURE;
