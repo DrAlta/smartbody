@@ -29,7 +29,7 @@
 
 
 string $skVersion = "0.5";
-
+global string $treeVisualization;
 
 // --------------------------------------------------------------------------------
 // PROC: skRound
@@ -624,6 +624,81 @@ global proc UseChannelAttributesUnchecked()
    setAttr SkelDef.UseChannelAttributes false;
 }
 
+global proc printSkJointChannel(int $useChannelAttributes, int $showAll, string $jointName, int $counter)
+{
+	global int $isFacial;
+	global string $treeVisualization;
+	int $i	;
+	$treeVisualization = $treeVisualization	+ "\n";
+	if ($counter > 0)
+	{
+		for ($i = 0; $i < $counter; $i = $i + 1)
+			$treeVisualization = $treeVisualization + "  ";
+	}
+	$treeVisualization = $treeVisualization + " -" + $jointName + "  ";
+	
+	if ($useChannelAttributes)
+	{
+	  int $channelAttributePosX = 0;
+	  int $channelAttributePosY = 0;
+	  int $channelAttributePosZ = 0;
+	  int $channelAttributeQuat = 0;
+
+	  if ( `objExists ( $jointName + ".SbodyPosX" )` )  $channelAttributePosX = `getAttr ( $jointName + ".SbodyPosX" )`;
+	  if ( `objExists ( $jointName + ".SbodyPosY" )` )  $channelAttributePosY = `getAttr ( $jointName + ".SbodyPosY" )`;
+	  if ( `objExists ( $jointName + ".SbodyPosZ" )` )  $channelAttributePosZ = `getAttr ( $jointName + ".SbodyPosZ" )`;
+	  if ( `objExists ( $jointName + ".SbodyQuat" )` )  $channelAttributeQuat = `getAttr ( $jointName + ".SbodyQuat" )`;
+
+	  if ( $channelAttributePosX )  $treeVisualization = $treeVisualization + "(XPos) ";
+	  if ( $channelAttributePosY )  $treeVisualization = $treeVisualization + "(YPos) ";
+	  if ( $channelAttributePosZ )  $treeVisualization = $treeVisualization + "(ZPos) ";
+	  if ( $channelAttributeQuat )  $treeVisualization = $treeVisualization + "[Quat] ";
+	}
+	
+	$counter = $counter + 1;
+	string $Children[] = `listRelatives $jointName`;
+	print $Children;
+	for ($i = 0; $i < size($Children); $i = $i + 1)
+	{
+		string $type = nodeType($Children[$i]);
+		if ($type != "joint")  continue;
+		printSkJointChannel($useChannelAttributes, $showAll, $Children[$i], $counter);
+	}
+	$counter = $counter - 1;	
+}
+
+global proc showExportingChannelsWin()
+{
+	global string $treeVisualization;
+	global int $partialExportToggle;
+	if ((`window -exists showExportingChannelsWin`) == true)
+	{
+		deleteUI showExportingChannelsWin;
+		windowPref -remove showExportingChannelsWin;
+	}
+
+	// create UI Window here
+	window -title ("Exporting Channels Manager") -resizeToFitChildren true -sizeable true -width 600 -height 800 showExportingChannelsWin;
+    string $tabs = `tabLayout`;
+	// display here
+	string $root = `getAttr SkelDef.RootJoint`;
+	string $skelName = `getAttr SkelDef.SkeletonName`;
+	int $showAll   = `getAttr SkelDef.ShowAllChannels`;
+	$treeVisualization  = "";
+	
+	// recursive print tree visualization
+	int $counter  = 0;
+    int $useChannelAttributes = `getAttr SkelDef.UseChannelAttributes`;	
+	printSkJointChannel($useChannelAttributes, $showAll, $root, $counter);
+
+	string $tab = `columnLayout`;
+	scrollField -wordWrap false -text $treeVisualization -editable false -width 600 -height 800;	  
+	setParent ..;
+	tabLayout -edit -tabLabel $tab $skelName $tabs;	  
+	  
+	showWindow showExportingChannelsWin;
+}
+
 
 global proc skExportButton()
 {
@@ -646,7 +721,7 @@ global proc skExportGUI()
       deleteUI skMainWin;
 
    string $winTitle = "SK Exporter v" + $skVersion;
-   window -title $winTitle -wh 300 270 skMainWin;
+   window -title $winTitle -wh 300 290 skMainWin;
    columnLayout -adjustableColumn true -columnAttach "both" 10 -rowSpacing 10 -columnWidth 290 MainColumn;
    textFieldGrp -label "Skeleton Root Joint:" -text `getAttr SkelDef.RootJoint` -changeCommand "skRootJointChanged" skRootField;
    textFieldGrp -label "Output Character Name:" -text `getAttr SkelDef.SkeletonName` -changeCommand "skNameChanged" skOutputName;
@@ -658,7 +733,8 @@ global proc skExportGUI()
    checkBox -label "Export All Channels" -value (`getAttr SkelDef.ShowAllChannels`) -onCommand "ChannelsChecked" -offCommand "ChannelsUnchecked" skShowAllChannels;
    checkBox -label "Export Limits" -value (`getAttr SkelDef.UseLimits`) -onCommand "LimitsChecked" -offCommand "LimitsUnchecked" skUseLimits;
    setParent MainColumn;
-   button -label "Browse Output File" -command "fileBrowser(\"skFileCb\", \"Text\", \"\", 4)";
+   button -label "Show Exporting Channels" -command showExportingChannelsWin;
+   button -label "Browse Output File" -command "fileBrowser(\"skFileCb\", \"Text\", \"\", 4)";   
    button -label "Export" -command "skExportButton";
    showWindow skMainWin; 
 }
