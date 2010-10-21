@@ -771,6 +771,23 @@ global proc skmExport( string $animDef )
    // If you wish to export all .skm's defined, call skmExportAll()
 
    string $file = `getAttr( $animDef + ".outputFile" )`;
+
+   // resolve file path according to project root directory
+   string $projectRoot = `workspace -en ""`;
+   $file = substituteAllString($file, "\\", "/");   
+   string $afterSubstitute = substituteAllString($file, "//", "*");  
+   if ($afterSubstitute == $file)
+     $file = $projectRoot + $file;
+   else
+   {
+     if ($afterSubstitute != $file)
+	 {
+       string $tokens[];
+       int $numTokens = `tokenize $afterSubstitute "*" $tokens`;
+	   $file = $projectRoot + $tokens[$numTokens - 1];
+	 }
+   }
+   $file = `workspace -en $file`;   
    skmExportFile( $file, $animDef );
 }
 
@@ -1355,20 +1372,12 @@ global proc skmUpdateOutput()
    string $outputFilePath = `textFieldGrp -q -text skmOutputPath`;
 
    if ( $outputFilePath == "" )
-      $outputFilePath = `workspace -en ""`;
-
-   // check for maya path notation (double slash)
-   if (!endsWith($outputFilePath, "//"))
    {
-	  if (endsWith($outputFilePath, "/"))
-		$outputFilePath = $outputFilePath + "/";
-	  else
-		$outputFilePath = $outputFilePath + "//";
+      $outputFilePath = `pwd`;
+      textFieldGrp -edit -text $outputFilePath skmOutputPath;
    }
-   
-   textFieldGrp -edit -text $outputFilePath skmOutputPath;
 
-   $outputFile = $outputFilePath + $outputFileName;
+   $outputFile = $outputFilePath + "/" + $outputFileName;
    setAttr -type "string" ( $animDef + ".outputFile" ) $outputFile ;
 }
 
@@ -1427,11 +1436,9 @@ proc updateChannelAttributes(string $jointName)
 global proc updateUseChannelAttributes()
 {
 	// display here
-	global int $partialExportToggle;	
 	string $animDef = skmGetSelectedAnimDefName();		
-	string $root;
-	if ($partialExportToggle == 0)	$root = `getAttr ( $animDef + ".partialExportRoot" )` ;
-	else	$root = `getAttr( $animDef + ".skeletonRoot" )`; 
+	string $root = `getAttr( $animDef + ".skeletonRoot" )`;
+	
 	//recursively update channel attribute here
 	updateChannelAttributes($root);		
 }
@@ -1481,7 +1488,6 @@ global proc printJointChannel(int $useChannelAttributes, string $jointName, int 
 
 global proc showExportingChannelsWin()
 {
-	global int $partialExportToggle;
 	if ((`window -exists showExportingChannelsWin`) == true)
 	{
 		deleteUI showExportingChannelsWin;
@@ -1492,9 +1498,7 @@ global proc showExportingChannelsWin()
 	window -title ("Exporting Channels Manager") -resizeToFitChildren true -sizeable true -width 600 -height 800 showExportingChannelsWin;
 	// display here
 	string $animDef = skmGetSelectedAnimDefName();
-	string $root;
-	if ($partialExportToggle == 0)	$root = `getAttr ( $animDef + ".partialExportRoot" )` ;
-	else	$root = `getAttr( $animDef + ".skeletonRoot" )`; 
+	string $root = `getAttr( $animDef + ".skeletonRoot" )`; 
 	int $useChannelAttributes = `getAttr ( $animDef + ".UseChannelAttributes" )`;
 
 	// recursive print tree visualization
