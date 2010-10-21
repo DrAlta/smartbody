@@ -270,19 +270,19 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 		UL_lid_y, 
 		_eyelidUpperTransRange
 	);
+	fbuffer[ UL_lid_y_map ] = UL_correct_posy;
+	fbuffer[ UR_lid_y_map ] = UL_correct_posy;
 
+#if 0
 	float LL_correct_posy = _eyelidWeight[ 1 ] * calc_lid_correction( 
 		(float)( L_eye_e.p() ), 
 		_eyeballPitchRange,
 		LL_lid_y, 
 		_eyelidLowerTransRange
 	);
-
-	fbuffer[ UL_lid_y_map ] = UL_correct_posy;
-	fbuffer[ UR_lid_y_map ] = UL_correct_posy;
-
 	fbuffer[ LL_lid_y_map ] = LL_correct_posy;
 	fbuffer[ LR_lid_y_map ] = LL_correct_posy;
+#endif
 
 	return true;
 }
