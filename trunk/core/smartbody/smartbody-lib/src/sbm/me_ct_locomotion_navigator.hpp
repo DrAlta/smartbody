@@ -35,7 +35,7 @@ class MeCtLocomotionNavigator{
 public:
 	// Public Constants
 	static const char* TYPE;
-	float standing_factor;
+	float limb_blending_factor;
 
 	float standing_factor_on_stop_t;
 

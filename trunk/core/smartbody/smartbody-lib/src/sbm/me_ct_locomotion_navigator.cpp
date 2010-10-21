@@ -37,7 +37,7 @@ MeCtLocomotionNavigator::MeCtLocomotionNavigator()
 	//displacement.set(0.0f, 0.0f, 0.0f);
 	facing_angle = 0;
 	pre_facing_angle = facing_angle;
-	standing_factor = 0.0f;
+	limb_blending_factor = 0.0f;
 	has_destination = false;
 	reached_destination = false;
 	destination_list.capacity(20);
@@ -61,7 +61,7 @@ void MeCtLocomotionNavigator::update_framerate_accelerator(float accelerator, Sr
 	{
 		if(accelerator == 0.0f)
 		{
-			standing_factor = 0.0f;
+			limb_blending_factor = 0.0f;
 			//limb_list.get(dominating_limb)->space_time = 0.0f;
 			for(int i = 0; i < limb_list->size(); ++i)
 			{
@@ -71,13 +71,13 @@ void MeCtLocomotionNavigator::update_framerate_accelerator(float accelerator, Sr
 		}
 		else
 		{
-			if(abs(accelerator-standing_factor) > 0.4f)
+			if(abs(accelerator-limb_blending_factor) > 0.4f)
 				int y = 0;
-			standing_factor = accelerator;
+			limb_blending_factor = accelerator;
 			framerate_accelerator = 1.0f;
 		}
 	}
-	else standing_factor = 1.0;
+	else limb_blending_factor = 1.0;
 }
 
 void MeCtLocomotionNavigator::update(SrBuffer<float>* buffer)
@@ -145,7 +145,7 @@ void MeCtLocomotionNavigator::CheckNewRoutine(MeFrameData& frame)
 bool MeCtLocomotionNavigator::check_stopped(SrArray<MeCtLocomotionLimb*>* limb_list)
 {
 	MeCtLocomotionLimb* limb;
-	if(target_local_vel.len() != 0.0f || standing_factor != 0.0f) return false;
+	if(target_local_vel.len() != 0.0f || limb_blending_factor != 0.0f) return false;
 
 	for(int i = 0; i < limb_list->size(); ++i)
 	{
@@ -319,7 +319,7 @@ void MeCtLocomotionNavigator::set_reached_destination(MeFrameData& frame)
 	buffer[ bi_loco_rot_global_y ] = 0.0f;
 	buffer[ bi_loco_rot_local_y ] = 0.0f;
 	reached_destination = true;
-	standing_factor_on_stop_t = standing_factor;
+	standing_factor_on_stop_t = limb_blending_factor;
 	has_destination = false;
 	destination_list.size(0);
 }
@@ -553,7 +553,7 @@ void MeCtLocomotionNavigator::update_facing(MeCtLocomotionLimb* limb, bool domin
 	float time = 0.0f;
 	float ratio = 0.0f;
 	
-	if(standing_factor_on_stop_t > 0.0f) ratio = standing_factor / standing_factor_on_stop_t;
+	if(standing_factor_on_stop_t > 0.0f) ratio = limb_blending_factor / standing_factor_on_stop_t;
 
 	if(limb->space_time > 1.0f && limb->space_time <= 1.5f) 
 	{

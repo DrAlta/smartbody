@@ -301,7 +301,7 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	if(!enabled) return false;
 	if(!motions_loaded) return motions_loaded;
 
-	if(limb_list.get(dominant_limb)->walking_list.size() < 2) 
+	if(anim_global_info.size() < 2) 
 	{
 		temp_update_for_footprint(frame);
 		return false;
@@ -540,10 +540,10 @@ void MeCtLocomotion::set_base_name(const char* name)
 	strcpy(nonlimb_blending_base_name, name);
 }*/
 
-void MeCtLocomotion::set_skeleton(SkSkeleton* skeleton)
+/*void MeCtLocomotion::set_skeleton(SkSkeleton* skeleton)
 {
 	_skeleton_ref_p = skeleton;
-}
+}*/
 
 void MeCtLocomotion::set_turning_speed(float radians)
 {
@@ -628,7 +628,7 @@ void MeCtLocomotion::blend_base_joint(MeFrameData& frame, float space_time, int 
 	base->pos()->value(1, base_pos.y);
 	base->pos()->value(2, base_pos.z);
 
-	r_blended_base_height = r_blended_base_height * (navigator.standing_factor) + base_pos.y * (1.0f-navigator.standing_factor);
+	r_blended_base_height = r_blended_base_height * (navigator.limb_blending_factor) + base_pos.y * (1.0f-navigator.limb_blending_factor);
 
 }
 
@@ -647,7 +647,7 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 	float dom_ratio = 0.0f;
 
 	// set the after limb the dominant limb and the the space value to 0 when starting the locomotion.
-	if(navigator.standing_factor == 0.0f)
+	if(navigator.limb_blending_factor == 0.0f)
 	{
 		//if starting locomotion from standing pose
 		if(speed_accelerator.get_target_speed() != 0.0f)
@@ -689,7 +689,7 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 	frame_num = blended_anim->get_timing_space()->get_normalized_frame(frame_num); // in case new frame number is beyond the range. 
 
 	//space time was computed with current frame number
-	if(navigator.standing_factor != 0.0f) 
+	if(navigator.limb_blending_factor != 0.0f) 
 		limb_list.get(dominant_limb)->space_time = blended_anim->get_timing_space()->get_space_value(frame_num);
 	
 	// update the current orientation of dominant limb
@@ -716,7 +716,7 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 			blended_anim = &limb_list.get(i)->blended_anim;
 			get_blended_timing_space(blended_anim->get_timing_space(), anim1->get_timing_space(), anim2->get_timing_space(), dom_ratio);
 			
-			if(navigator.standing_factor != 0.0f) 
+			if(navigator.limb_blending_factor != 0.0f) 
 				limb_list.get(i)->space_time = blended_anim->get_timing_space()->get_space_value(frame_num);
 			
 			//compute the direction and orientation based on the real timing space
@@ -825,7 +825,7 @@ void MeCtLocomotion::update_limb_mat_with_global_info()
 
 void MeCtLocomotion::blend_standing(MeFrameData& frame)
 {
-	if(navigator.standing_factor == 1.0f) return;
+	if(navigator.limb_blending_factor == 1.0f) return;
 	MeCtLocomotionLimb* limb = NULL;
 	int index;
 	SrQuat quat;
@@ -844,7 +844,7 @@ void MeCtLocomotion::blend_standing(MeFrameData& frame)
 			quat_buff.y = buffer[index+2];
 			quat_buff.z = buffer[index+3];
 
-			quat_buff = slerp(quat_buff, quat, navigator.standing_factor);
+			quat_buff = slerp(quat_buff, quat, navigator.limb_blending_factor);
 			limb->limb_joint_info.quat.set(i, quat_buff);
 		}
 	}
@@ -858,7 +858,7 @@ void MeCtLocomotion::blend_standing(MeFrameData& frame)
 		quat_buff.y = buffer[index+2];
 		quat_buff.z = buffer[index+3];
 
-		quat_buff = slerp(quat_buff, quat, navigator.standing_factor);
+		quat_buff = slerp(quat_buff, quat, navigator.limb_blending_factor);
 		nonlimb_joint_info.quat.set(i, quat_buff);
 	}
 }
@@ -1063,7 +1063,7 @@ void MeCtLocomotion::get_anim_indices(int limb_index, SrVec direction, int* anim
 
 int MeCtLocomotion::determine_dominant_limb_index()
 {
-	if(navigator.standing_factor == 0.0f)
+	if(navigator.limb_blending_factor == 0.0f)
 	{
 		++dominant_limb;
 		if(dominant_limb >= limb_list.size()) dominant_limb = 0;
@@ -1190,7 +1190,7 @@ void MeCtLocomotion::update_pos()
 				displacement += dis[i]*ratio[i]/sum;
 			}
 			
-			if(navigator.standing_factor != 0.0f)
+			if(navigator.limb_blending_factor != 0.0f)
 			{
 				// update the ik_offset for each limb
 				for(int i = 0; i < 2; ++i)

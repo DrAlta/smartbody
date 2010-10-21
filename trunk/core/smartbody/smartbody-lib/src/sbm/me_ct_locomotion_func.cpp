@@ -51,11 +51,19 @@ SrVec get_offset(SkJoint* from_joint, int depth, SrArray<SrQuat>& quat)
 	SrQuat q;
 	for(int i = 0; ; ++i)
 	{
+		if(i == depth-1) 
+		{
+			lmat.identity();
+			lmat.set(12, from_joint->offset().x);
+			lmat.set(13, from_joint->offset().y);
+			lmat.set(14, from_joint->offset().z);
+			gmat = lmat*gmat;
+			break;
+		}
 		q = quat.get(i);
 		lmat = get_lmat(from_joint, &q);
 		gmat = lmat*gmat;
 
-		if(i == depth-1) break;
 		from_joint = from_joint->child(0);
 	}
 	offset.set(gmat.get(12), gmat.get(13), gmat.get(14));
