@@ -497,7 +497,7 @@ void mcuCBHandle::update( void )	{
 
 		char *cmd;
 		while( cmd = seq_p->pop( (float)time ) )	{
-			
+
 #if 0
 			// the parent resource is associated with seq_name
 			CmdResource* cmdResource = resource_manager->getCmdResource(seq_name);
@@ -527,11 +527,15 @@ void mcuCBHandle::update( void )	{
 	pawn_map.reset();
 	while( pawn_p = pawn_map.next() )	{
 
+		char_p = character_map.lookup( pawn_p->name );
+		if( char_p != NULL ) {
+			char_p->eye_blink_update( this->time );
+		}
+
 		//char_p->scheduler_p->evaluate( time );
 		pawn_p->ct_tree_p->evaluate( time );
 		pawn_p->ct_tree_p->applyBufferToAllSkeletons();
 
-		char_p = character_map.lookup( pawn_p->name );
 		if( char_p != NULL ) {
 
 			//char_p->scheduler_p->apply();  // old controller API  See applyBufferToAllSkeletons() above
@@ -568,9 +572,6 @@ void mcuCBHandle::update( void )	{
 					char_p->bonebusCharacter->SetRotation( (float)q.w, (float)q.x, (float)q.y, (float)q.z, time );
 				}
 			}
-
-			char_p->eye_blink_update( this->time );
-
 		}  // end of char_p processing
 	} // end of loop
 
@@ -628,10 +629,13 @@ int mcuCBHandle::execute_seq( srCmdSeq* seq ) {
 	return execute_seq( seq, seq_id.str().c_str() );
 }
 
-int mcuCBHandle::execute_seq( srCmdSeq* seq, const char* seq_id ) {
+int mcuCBHandle::execute_seq( srCmdSeq* seq_p, const char* seq_id ) {
 
-	if ( active_seq_map.insert( seq_id, seq ) != CMD_SUCCESS ) {
-		LOG("ERROR: mcuCBHandle::execute_seq(..): Failed to insert srCmdSeq \"%s\"into active_seq_map.", seq_id);
+//	printf( "mcuCBHandle::execute_seq: id: '%s'\n", seq_id );
+//	seq_p->print();
+
+	if ( active_seq_map.insert( seq_id, seq_p ) != CMD_SUCCESS ) {
+		LOG("ERROR: mcuCBHandle::execute_seq(..): Failed to insert srCmdSeq \"%s\"into active_seq_map.", seq_id );
 		return CMD_FAILURE;
 	}
 
