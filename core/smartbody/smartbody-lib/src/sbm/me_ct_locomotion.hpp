@@ -95,7 +95,7 @@ protected:
 
 	SkChannelArray  request_channels;
 
-	SkSkeleton* _skeleton_ref_p;
+	//SkSkeleton* _skeleton_ref_p;
 
 	SrArray<MeCtLocomotionAnimGlobalInfo*> anim_global_info;
 
