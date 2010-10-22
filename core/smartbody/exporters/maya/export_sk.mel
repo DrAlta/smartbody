@@ -747,6 +747,25 @@ global proc showExportingChannelsWin()
 global proc skExportButton()
 {
    string $file = `getAttr SkelDef.OutputDirectory`;
+  // resolve file path according to project root directory
+   string $projectRoot = `workspace -en ""`;
+   $file = substituteAllString($file, "\\", "/");   
+   string $afterSubstitute = substituteAllString($file, "//", "*");  
+   if ($afterSubstitute == $file)
+   {
+     string $absoluteFile = substituteAllString($file, ":", "");
+	 if ($absoluteFile == $file)  $file = $projectRoot + $file;
+   }
+   else
+   {
+     if ($afterSubstitute != $file)
+	 {
+       string $tokens[];
+       int $numTokens = `tokenize $afterSubstitute "*" $tokens`;
+	   $file = $projectRoot + $tokens[$numTokens - 1];
+	 }
+   }
+   $file = `workspace -en $file`;      
    skExport( $file );
 }
 
