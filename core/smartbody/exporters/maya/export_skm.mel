@@ -771,13 +771,16 @@ global proc skmExport( string $animDef )
    // If you wish to export all .skm's defined, call skmExportAll()
 
    string $file = `getAttr( $animDef + ".outputFile" )`;
-
+  
    // resolve file path according to project root directory
    string $projectRoot = `workspace -en ""`;
    $file = substituteAllString($file, "\\", "/");   
    string $afterSubstitute = substituteAllString($file, "//", "*");  
    if ($afterSubstitute == $file)
-     $file = $projectRoot + $file;
+   {
+     string $absoluteFile = substituteAllString($file, ":", "");
+	 if ($absoluteFile == $file)  $file = $projectRoot + $file;
+   }
    else
    {
      if ($afterSubstitute != $file)
