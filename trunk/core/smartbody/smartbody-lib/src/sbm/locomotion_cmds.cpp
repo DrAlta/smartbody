@@ -292,16 +292,16 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 
 			else if(arg == "leftward")
 			{
-				SrVec v(1.0f, 0.0f, 0.0f);
-				mat.roty(acos(dot(direction, v)));
+				//SrVec v(1.0f, 0.0f, 0.0f);
+				mat.roty(3.14159265f*0.5f);
 				direction = direction*mat;
 				spd = actor->get_locomotion_ct()->get_anim_global_info()->get(2)->speed;
 			}
 
 			else if(arg == "rightward")
 			{
-				SrVec v(1.0f, 0.0f, 0.0f);
-				mat.roty(acos(dot(direction, v)));
+				//SrVec v(1.0f, 0.0f, 0.0f);
+				mat.roty(3.14159265f*0.5f);
 				direction = direction*mat;
 				direction = - direction;
 				spd = actor->get_locomotion_ct()->get_anim_global_info()->get(2)->speed;

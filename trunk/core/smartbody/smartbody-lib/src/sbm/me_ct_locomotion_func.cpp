@@ -130,13 +130,17 @@ SrArray<SrQuat>* get_blended_quat_buffer(SrArray<SrQuat>* dest, SrArray<SrQuat>*
 int iterate_set(SkJoint* base, int index, int depth, SrArray<SrQuat>* buff, SrArray<int>* index_buff)
 {
 	if(index >= depth && depth > 0) return index;
-	if(base->quat()->active() && base->index() == index_buff->get(index))
+	if(base->quat()->active())
 	{
-		SrQuat q = base->quat()->value();
-		buff->set(index, q);
+		if( base->index() == index_buff->get(index))
+		{
+			SrQuat q = base->quat()->value();
+			buff->set(index, q);
+		}
+		else
+			--index;
 	}
-	else
-		--index;
+
 	for(int i = 0; i < base->num_children(); ++i)
 	{
 		index = iterate_set(base->child(i), index+1, depth, buff, index_buff);

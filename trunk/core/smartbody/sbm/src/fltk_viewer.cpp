@@ -1224,6 +1224,7 @@ void FltkViewer::translate_keyboard_state()
 			rps_flag = 0;
 			spd = x_spd;
 			sprintf(t_direction, "leftward ");
+			a_key = true;
 		}
 	}
 	else
@@ -1240,6 +1241,7 @@ void FltkViewer::translate_keyboard_state()
 			rps_flag = 0;
 			spd = x_spd;
 			sprintf(t_direction, "rightward ");
+			d_key = true;
 		}
 	}
 	else

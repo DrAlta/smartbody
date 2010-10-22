@@ -37,6 +37,7 @@ struct MeCtLocomotionJointInfo
 	SrArray<const char*> joint_name;
 	SrArray<int> buff_index;
 	SrArray<int> joint_index;
+	SrArray<int> quat_valid;
 	SrArray<SrQuat> quat;
 	SrArray<int> mat_valid;
 	SrArray<SrMat>	mat;
@@ -59,10 +60,17 @@ struct MeCtLocomotionJointInfo
 		}
 		if(joint->quat()->active() == true)
 		{
-			joint_name.push() = name;
-			joint_index.push() = joint->index();
-			sum = 1;
+			quat_valid.push() = 1;
 		}
+		else 
+		{
+			quat_valid.push() = 0;
+		}
+
+		joint_name.push() = name;
+		joint_index.push() = joint->index();
+		sum = 1;
+
 
 		for(int i = 0; i < joint->num_children(); ++i)
 		{
