@@ -43,10 +43,7 @@ MeCtLocomotion::MeCtLocomotion() {
 	nonlimb_joint_info.joint_index.capacity(0);
 	nonlimb_joint_info.quat.capacity(0);
 	last_time = 0.0f;
-	//last_t = -1.0f;
-	//ratio = 0.0f;
 	dominant_limb = 0;
-//	automate = false;
 	reset = false;
 	dis_initialized = false;
 	initialized = false;
@@ -148,7 +145,7 @@ void MeCtLocomotion::get_translation_base_joint_index()
 	translation_joint_index = 0;
 }
 
-int MeCtLocomotion::iterate_limb_joints(SkJoint* base, int depth)
+/*int MeCtLocomotion::iterate_limb_joints(SkJoint* base, int depth)
 {
 	const char* name = base->name().get_string();
 	int sum = 0;
@@ -164,14 +161,19 @@ int MeCtLocomotion::iterate_limb_joints(SkJoint* base, int depth)
 		sum += iterate_limb_joints(base->child(i), depth+1);
 	}
 	return sum;
-}
+}*/
 
 void MeCtLocomotion::iterate_joints(MeCtLocomotionJointInfo* joint_info)
 {
+	SrQuat quat;
 	for(int i = 0; i < joint_info->joint_num; ++i)
 	{
 		const char* name = joint_info->joint_name.get(i);
-		request_channels.add( SkJointName(name), SkChannel::Quat );
+		if(joint_info->quat_valid.get(i) == 1)
+		{
+			request_channels.add( SkJointName(name), SkChannel::Quat );
+		}
+		else joint_info->quat.set(i, quat);
 	}
 }
 
@@ -191,8 +193,14 @@ void MeCtLocomotion::controller_map_updated()
 		for(int j = 0; j < limb_list.size(); ++j)
 		{
 			MeCtLocomotionLimb* limb = limb_list.get(j);
+
 			for(int i = 0; i < limb->limb_joint_info.joint_num; ++i)
 			{
+				if(limb->limb_joint_info.quat_valid.get(i) == 0) 
+				{
+					limb->limb_joint_info.buff_index.set(i, -1);
+					continue;
+				}
 				index = LOOKUP_BUFFER_INDEX( index,  k+joint_channel_start_ind);
 				if(index < 0)
 				{
@@ -203,14 +211,20 @@ void MeCtLocomotion::controller_map_updated()
 			}
 		}
 
-		for(int i = limb_joint_num; i < nonlimb_joint_info.joint_num + limb_joint_num; ++i)
+		for(int i = 0; i < nonlimb_joint_info.joint_num; ++i)
 		{
-			index = LOOKUP_BUFFER_INDEX( index,  i+joint_channel_start_ind);
+			if(nonlimb_joint_info.quat_valid.get(i) == 0) 
+			{
+				nonlimb_joint_info.buff_index.set(i, -1);
+				continue;
+			}
+			index = LOOKUP_BUFFER_INDEX( index,  k+joint_channel_start_ind);
 			if(index < 0)
 			{
 				LOG("\ni=%d failed to look up buffer index", i);
 			}
-			nonlimb_joint_info.buff_index.set(i-limb_joint_num, index);
+			nonlimb_joint_info.buff_index.set(i, index);
+			++k;
 		}
 		joints_indexed = true;
 	}
@@ -232,6 +246,7 @@ void MeCtLocomotion::temp_update_for_footprint(MeFrameData& frame)
 	for(int i = 0; i < nonlimb_joint_info.buff_index.size(); ++i)
 	{
 		index = nonlimb_joint_info.buff_index.get(i);
+		if(index < 0) continue;
 		quat = nonlimb_joint_info.quat.get(i);
 
 		quat_buff.w = buffer[index+0];
@@ -250,6 +265,7 @@ void MeCtLocomotion::temp_update_for_footprint(MeFrameData& frame)
 		for(int i = 0; i < limb->limb_joint_info.buff_index.size(); ++i)
 		{
 			index = limb->limb_joint_info.buff_index.get(i);
+			if(index < 0) continue;
 			quat = limb->limb_joint_info.quat.get(i);
 
 			quat_buff.w = buffer[index+0];
@@ -376,6 +392,7 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 		for(int j = 0; j < info->quat.size(); ++j)
 		{
 			index = info->buff_index.get(j);
+			if(index < 0) continue;
 			quat = info->quat.get(j);
 
 			buffer[index+0] = (float)quat.w;
@@ -388,6 +405,7 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	for(int i = 0; i < nonlimb_joint_info.joint_num; ++i)
 	{
 		index = nonlimb_joint_info.buff_index.get(i);
+		if(index < 0) continue;
 		quat = nonlimb_joint_info.quat.get(i);
 
 		buffer[index+0] = (float)quat.w;
@@ -837,6 +855,7 @@ void MeCtLocomotion::blend_standing(MeFrameData& frame)
 		for(int i = 0; i < limb->limb_joint_info.buff_index.size(); ++i)
 		{
 			index = limb->limb_joint_info.buff_index.get(i);
+			if(index < 0) continue;
 			quat = limb->limb_joint_info.quat.get(i);
 
 			quat_buff.w = buffer[index+0];
@@ -851,6 +870,7 @@ void MeCtLocomotion::blend_standing(MeFrameData& frame)
 	for(int i = 0; i < nonlimb_joint_info.buff_index.size(); ++i)
 	{
 		index = nonlimb_joint_info.buff_index.get(i);
+		if(index < 0) continue;
 		quat = nonlimb_joint_info.quat.get(i);
 
 		quat_buff.w = buffer[index+0];
@@ -882,6 +902,7 @@ void MeCtLocomotion::update_nonlimb_mat(SkJoint* joint, SrMat* mat, int depth)
 	int index = -1;
 	SrMat lmat;
 	SrMat gmat;
+	SrQuat quat;
 	if(mat == NULL) mat = &gmat;
 
 	for(int j = 0; j < limb_list.size(); ++j)
@@ -894,7 +915,8 @@ void MeCtLocomotion::update_nonlimb_mat(SkJoint* joint, SrMat* mat, int depth)
 
 	index = nonlimb_joint_info.get_index_by_name(joint->name().get_string());
 	if(nonlimb_joint_info.mat_valid.get(index) != 1) return;
-	lmat = get_lmat(joint, &(nonlimb_joint_info.quat.get(index)));
+	if(nonlimb_joint_info.quat_valid.get(index) == 1) quat = nonlimb_joint_info.quat.get(index);
+	lmat = get_lmat(joint, &quat);
 	if(depth <= translation_joint_index)
 	{
 		lmat.set(12, 0.0f);

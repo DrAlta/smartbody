@@ -144,8 +144,8 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 	{
 		limb = _ct_locomotion->get_limb_list()->get(i);
 		limb->set_height_bound(0.5f);
-		//analyze_standing(limb, standing);
-		analyze_standing(limb, NULL);
+		analyze_standing(limb, standing);
+		//analyze_standing(limb, NULL);
 		limb->walking_list.get(limb->walking_list.size()-1)->global_info = info;
 	}
 	SkJoint* joint = NULL;
