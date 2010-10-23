@@ -37,7 +37,7 @@ public:
 	static const char* TYPE;
 	float limb_blending_factor;
 
-	float standing_factor_on_stop_t;
+	float limb_blending_factor_on_stop_t;
 
 	float framerate_accelerator;
 	SkChannelArray  request_channels;
@@ -88,8 +88,8 @@ protected:
 	SrVec target_global_vel;
 
 
-	float facing_angle;
-	float pre_facing_angle;
+	float orientation_angle;
+	float pre_orientation_angle;
 
 	float local_rps;
 
@@ -134,9 +134,9 @@ public:
 	SrVec get_world_pos();
 	SrMat get_world_mat();
 	SrVec get_base_pos();
-	float get_facing_angle();
+	float get_orientation_angle();
 	float get_pre_facing_angle();
-	SrVec get_displacement();
+	//SrVec get_displacement();
 
 	void calc_target_velocity();
 	void update_framerate_accelerator(float accelerator, SrArray<MeCtLocomotionLimb*>* limb_list);

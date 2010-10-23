@@ -2357,7 +2357,7 @@ void FltkViewer::drawLocomotion()
 				for(int k = 0; k < character->get_locomotion_ct()->limb_list.size();++k)
 				{
 					SrMat mat;
-					mat.rot(SrVec(0,1,0), character->get_locomotion_ct()->limb_list.get(k)->curr_rotation+character->get_locomotion_ct()->get_navigator()->get_facing_angle());
+					mat.rot(SrVec(0,1,0), character->get_locomotion_ct()->limb_list.get(k)->curr_rotation+character->get_locomotion_ct()->get_navigator()->get_orientation_angle());
 					SrVec orientation = SrVec(0,0,1)*mat;
 					SrVec normal;
 					bool newprint = true;
@@ -2389,7 +2389,7 @@ void FltkViewer::drawLocomotion()
 					&& character->get_locomotion_ct()->limb_list.get(cur_dominant)->space_time < 1.0f)
 				{
 					SrMat mat;
-					mat.rot(SrVec(0,1,0), character->get_locomotion_ct()->limb_list.get(cur_dominant)->curr_rotation+character->get_locomotion_ct()->get_navigator()->get_facing_angle());
+					mat.rot(SrVec(0,1,0), character->get_locomotion_ct()->limb_list.get(cur_dominant)->curr_rotation+character->get_locomotion_ct()->get_navigator()->get_orientation_angle());
 					SrVec orientation = SrVec(0,0,1)*mat;
 					SrVec normal;
 					bool newprint = true;

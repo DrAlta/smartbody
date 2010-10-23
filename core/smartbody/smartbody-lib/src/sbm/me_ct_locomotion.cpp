@@ -376,7 +376,7 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 
 	if(ik_enabled) apply_IK(); 
 
-	balance.update(limb_list, SrVec(0.0f,1.0f,0.0f), &nonlimb_joint_info, navigator.get_facing_angle(), translation_joint_index, (float)delta_time);
+	balance.update(limb_list, SrVec(0.0f,1.0f,0.0f), &nonlimb_joint_info, navigator.get_orientation_angle(), translation_joint_index, (float)delta_time);
 
 	navigator.post_controller_evaluate(frame, limb_list.get(dominant_limb), reset);
 
@@ -485,7 +485,7 @@ SrVec MeCtLocomotion::calc_rotational_displacement()
 
 	v -= navigator.get_base_pos();
 
-	pmat.roty(navigator.get_facing_angle());
+	pmat.roty(navigator.get_orientation_angle());
 
 	world_offset_to_base = v*pmat;
 	v = world_offset_to_base - pre_world_offset_to_base;
@@ -988,30 +988,24 @@ void MeCtLocomotion::apply_IK()
 
 		SkJoint* tjoint = walking_skeleton->search_joint(limb_list.get(i)->get_limb_base_name());
 		int parent_ind = nonlimb_joint_info.get_index_by_name(tjoint->parent()->name().get_string());
-		ik_scenario->mat = nonlimb_joint_info.mat.get(parent_ind);
-		ik_scenario->mat.set(12, ik_scenario->mat.get(12) - world_offset_to_base.x);
-		ik_scenario->mat.set(13, ik_scenario->mat.get(13) - world_offset_to_base.y);
-		ik_scenario->mat.set(14, ik_scenario->mat.get(14) - world_offset_to_base.z);
+		ik_scenario->gmat = nonlimb_joint_info.mat.get(parent_ind);
+		ik_scenario->gmat.set(12, ik_scenario->gmat.get(12) - world_offset_to_base.x);
+		ik_scenario->gmat.set(13, ik_scenario->gmat.get(13) - world_offset_to_base.y);
+		ik_scenario->gmat.set(14, ik_scenario->gmat.get(14) - world_offset_to_base.z);
 		ik_scenario->start_joint = &(ik_scenario->joint_info_list.get(0));
 		ik_scenario->end_joint = &(ik_scenario->joint_info_list.get(ik_scenario->joint_info_list.size()-1));
 		
 		SrVec pos = limb_list.get(i)->pos_buffer.get(2);
 		pos  = pos * global_mat;
 
-
-		//printf("\n(%f, %f)", pos.x, pos.z);
-
 		float normal[3] = {0.0f, 0.0f, 0.0f};
 
 		float height = mcu.query_terrain(pos.x, pos.z, normal);
 
-		ik_scenario->set_offset(limb_list.get(i)->ik_offset);
-		
-		ik_scenario->quat_list = limb_list.get(i)->limb_joint_info.quat;
-
+		ik_scenario->ik_offset = limb_list.get(i)->ik_offset;
+		ik_scenario->joint_quat_list = limb_list.get(i)->limb_joint_info.quat;
 		ik_scenario->ik_orientation.set(0.0f, -1.0f, 0.0f);
-
-		ik_scenario->set_plane_normal(SrVec(limb_list.get(i)->ik_terrain_normal.x, limb_list.get(i)->ik_terrain_normal.y, limb_list.get(i)->ik_terrain_normal.z));
+		ik_scenario->plane_normal = SrVec(limb_list.get(i)->ik_terrain_normal.x, limb_list.get(i)->ik_terrain_normal.y, limb_list.get(i)->ik_terrain_normal.z);
 		ik_scenario->plane_point = SrVec(pos.x, height, pos.z);
 
 		SrVec v1 = -limb_list.get(i)->ik_terrain_normal;
@@ -1024,8 +1018,8 @@ void MeCtLocomotion::apply_IK()
 		}
 
 		ik.update(ik_scenario);
-		limb_list.get(i)->limb_joint_info.quat = ik_scenario->quat_list;
-		limb_list.get(i)->pos_buffer = ik.joint_pos_list;
+		limb_list.get(i)->limb_joint_info.quat = ik_scenario->joint_quat_list;
+		limb_list.get(i)->pos_buffer = ik_scenario->joint_pos_list;
 	}
 }
 
@@ -1189,7 +1183,7 @@ void MeCtLocomotion::update_pos()
 
 			SrVec v1 = limb->pos * mat;
 
-			mat.roty(navigator.get_facing_angle());
+			mat.roty(navigator.get_orientation_angle());
 
 			SrVec v2 = currpos * mat;
 
@@ -1261,7 +1255,7 @@ void MeCtLocomotion::add_locomotion_anim(SkMotion* anim)
 SrVec MeCtLocomotion::get_facing_vector()
 {
 	SrMat mat;
-	float angle = navigator.get_facing_angle();
+	float angle = navigator.get_orientation_angle();
 	mat.roty(angle);
 	SrVec direction(0.0, 0.0, 1.0f);
 	direction = direction*mat;

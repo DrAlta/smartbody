@@ -35,8 +35,8 @@ MeCtLocomotionNavigator::MeCtLocomotionNavigator()
 {
 	is_valid = false;
 	//displacement.set(0.0f, 0.0f, 0.0f);
-	facing_angle = 0;
-	pre_facing_angle = facing_angle;
+	orientation_angle = 0;
+	pre_orientation_angle = orientation_angle;
 	limb_blending_factor = 0.0f;
 	has_destination = false;
 	reached_destination = false;
@@ -173,7 +173,7 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeFrameData
 	//printf("\n(%f, %f, %f)", world_pos.x, world_pos.y, world_pos.z);
 	//world_pos.y = 0.0f;
 	SrQuat t_world_rot;
-	mat.roty(pre_facing_angle);
+	mat.roty(pre_orientation_angle);
 	t_world_rot.set(mat);
 	
 	if(t_world_rot.w != world_rot.w
@@ -182,13 +182,13 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeFrameData
 		|| t_world_rot.z != world_rot.z
 		)// if the orientation has been changed manually 
 	{
-		pre_facing_angle = world_rot.angle();
-		mat.roty(pre_facing_angle);
+		pre_orientation_angle = world_rot.angle();
+		mat.roty(pre_orientation_angle);
 		t_world_rot.set(mat);
 		if(dot(t_world_rot.axis(), world_rot.axis())< 0.0f) 
-			pre_facing_angle = -pre_facing_angle;
+			pre_orientation_angle = -pre_orientation_angle;
 
-		facing_angle = pre_facing_angle;
+		orientation_angle = pre_orientation_angle;
 	}
 
 	global_vel.set(0,0,0);
@@ -236,7 +236,7 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeFrameData
 		}
 	}
 
-	mat.roty(-pre_facing_angle);
+	mat.roty(-pre_orientation_angle);
 	local_vel = global_vel*mat;
 
 	calc_target_velocity();
@@ -251,7 +251,7 @@ inline void MeCtLocomotionNavigator::calc_target_velocity()
 		if(destination_list.size() > curr_dest_index && curr_dest_index >= 0)
 		{
 			SrMat mat;
-			mat.roty(-pre_facing_angle);
+			mat.roty(-pre_orientation_angle);
 			dis_to_dest = destination_list.get(curr_dest_index) - world_pos;
 			dis_to_dest.y = 0.0f;
 			if(!reached_destination)
@@ -319,15 +319,10 @@ void MeCtLocomotionNavigator::set_reached_destination(MeFrameData& frame)
 	buffer[ bi_loco_rot_global_y ] = 0.0f;
 	buffer[ bi_loco_rot_local_y ] = 0.0f;
 	reached_destination = true;
-	standing_factor_on_stop_t = limb_blending_factor;
+	limb_blending_factor_on_stop_t = limb_blending_factor;
 	has_destination = false;
 	destination_list.size(0);
 }
-
-/*SrVec MeCtLocomotionNavigator::get_displacement()
-{
-	return displacement;
-}*/
 
 void MeCtLocomotionNavigator::update_world_offset(SrVec& displacement)
 {
@@ -342,7 +337,7 @@ void MeCtLocomotionNavigator::update_world_offset(SrVec& displacement)
 
 void MeCtLocomotionNavigator::update_world_mat()
 {
-	world_mat.roty(get_facing_angle());
+	world_mat.roty(get_orientation_angle());
 	world_mat.set(12, world_pos.x);
 	world_mat.set(13, world_pos.y);
 	world_mat.set(14, world_pos.z);
@@ -355,7 +350,7 @@ void MeCtLocomotionNavigator::set_world_mat(SrMat& mat)
 
 void MeCtLocomotionNavigator::update_world_mat_rotation()
 {
-	world_mat.roty(get_facing_angle());
+	world_mat.roty(get_orientation_angle());
 }
 
 void MeCtLocomotionNavigator::update_world_mat_offset()
@@ -384,7 +379,7 @@ void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtL
 	buffer[ bi_world_z ] = world_pos.z;
 
 	SrMat mat;
-	mat.roty(facing_angle);
+	mat.roty(orientation_angle);
 	world_rot.set(mat);
 
 	buffer[ bi_world_rot+0 ] = world_rot.w;
@@ -407,7 +402,7 @@ void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtL
 			break;
 
 		case ME_CT_LOCOMOTION_ROUTINE_TYPE_CIRCULAR:
-			delta_angle = facing_angle - pre_facing_angle;
+			delta_angle = orientation_angle - pre_orientation_angle;
 
 			//get the displacement of rotation
 			mat.roty(0.5f * delta_angle);
@@ -429,7 +424,7 @@ void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtL
 		//target_world_rot = target_world_rot * mat;
 		routine_stack.set(i, routine);
 	}
-	pre_facing_angle = facing_angle;
+	pre_orientation_angle = orientation_angle;
 	//LOG("\ntarget world pos: (%f, %f, %f)", target_world_pos.x, target_world_pos.y, target_world_pos.z);
 }
 
@@ -553,7 +548,7 @@ void MeCtLocomotionNavigator::update_facing(MeCtLocomotionLimb* limb, bool domin
 	float time = 0.0f;
 	float ratio = 0.0f;
 	
-	if(standing_factor_on_stop_t > 0.0f) ratio = limb_blending_factor / standing_factor_on_stop_t;
+	if(limb_blending_factor_on_stop_t > 0.0f) ratio = limb_blending_factor / limb_blending_factor_on_stop_t;
 
 	if(limb->space_time > 1.0f && limb->space_time <= 1.5f) 
 	{
@@ -570,14 +565,14 @@ void MeCtLocomotionNavigator::update_facing(MeCtLocomotionLimb* limb, bool domin
 		if(dominant_limb) 
 		{
 			if(reached_destination)
-				facing_angle += -delta_angle * ratio;
+				orientation_angle += -delta_angle * ratio;
 			else 
-				facing_angle += -delta_angle;
+				orientation_angle += -delta_angle;
 	
-			if(facing_angle > 0.0f) 
-				facing_angle -= (int)(0.5f*facing_angle/(float)M_PI)*(float)M_PI*2;
+			if(orientation_angle > 0.0f) 
+				orientation_angle -= (int)(0.5f*orientation_angle/(float)M_PI)*(float)M_PI*2;
 			else 
-				facing_angle += ((int)(-0.5f*facing_angle/(float)M_PI))*(float)M_PI*2;
+				orientation_angle += ((int)(-0.5f*orientation_angle/(float)M_PI))*(float)M_PI*2;
 		}
 	}
 	else if(limb->space_time > 1.5f && limb->space_time < 2.0f)
@@ -657,14 +652,14 @@ SrMat MeCtLocomotionNavigator::get_world_mat()
 	this->displacement = *displacement;
 }*/
 
-float MeCtLocomotionNavigator::get_facing_angle()
+float MeCtLocomotionNavigator::get_orientation_angle()
 {
-	return facing_angle;
+	return orientation_angle;
 }
 
 float MeCtLocomotionNavigator::get_pre_facing_angle()
 {
-	return pre_facing_angle;
+	return pre_orientation_angle;
 }
 
 void MeCtLocomotionNavigator::AddRoutine(MeCtLocomotionRoutine& routine)
@@ -691,14 +686,9 @@ void MeCtLocomotionNavigator::print_foot_pos(MeFrameData& frame, MeCtLocomotionL
 	SrMat lmat;
 	SrQuat rotation;
 	SrVec pos;
-	//float* ppos;
 	SkSkeleton* skeleton = limb->walking_skeleton;
 	SkJoint* tjoint = skeleton->search_joint(limb->get_limb_base_name());
 	gmat = tjoint->parent()->gmat();
-	//ppos = gmat.pt(12);
-	//ppos[0] = 0;
-	//ppos[1] = 0;
-	//ppos[2] = 0; 
 	for(int j  = 0;j < limb->limb_joint_info.quat.size()-1;++j)
 	{
 		pmat = gmat;
@@ -722,6 +712,5 @@ void MeCtLocomotionNavigator::print_foot_pos(MeFrameData& frame, MeCtLocomotionL
 	pos.x += buffer[ bi_world_x ];
 	pos.y += buffer[ bi_world_y ];
 	pos.z += buffer[ bi_world_z ];
-	//if(facing_angle != 0.0f) LOG("\npos: [%f, %f, %f]", pos.x, pos.y, pos.z);
 
 }

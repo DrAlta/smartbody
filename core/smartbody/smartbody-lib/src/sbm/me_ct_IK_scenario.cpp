@@ -33,8 +33,7 @@ const char* MeCtIKScenario::TYPE = "MeCtIKScenario";
 /** Constructor */
 MeCtIKScenario::MeCtIKScenario() {
 	ik_orientation.set(0,0,0);
-	//orientation.set(0,0,0);
-	//orientation_type = ORIENTATION_RES_UNCHANGED_LOCAL;
+	ik_compensate_factor = 1.0f;
 }
 
 /** Destructor */
@@ -45,7 +44,7 @@ MeCtIKScenario::~MeCtIKScenario() {
 MeCtIKScenarioJointInfo::MeCtIKScenarioJointInfo()
 {
 	type = JOINT_TYPE_UNKNOWN; // JOINT_TYPE_HINGE or JOINT_TYPE_BALL
-	index = 0;
+	//index = 0;
 	sk_joint = NULL;
 	is_support_joint = 0;
 	support_joint_height = 0.0f;
@@ -58,20 +57,4 @@ MeCtIKScenarioJointInfo::MeCtIKScenarioJointInfo()
 MeCtIKScenarioJointInfo::~MeCtIKScenarioJointInfo()
 {
 
-}
-
-void MeCtIKScenario::set_plane_normal(SrVec& normal)
-{
-	plane_normal = normal;
-	plane_normal.normalize();
-}
-
-void MeCtIKScenario::set_plane_point(SrVec& point)
-{
-	plane_point = point;
-}
-
-void MeCtIKScenario::set_offset(SrVec& offset)
-{
-	this->ik_offset = offset;
 }
