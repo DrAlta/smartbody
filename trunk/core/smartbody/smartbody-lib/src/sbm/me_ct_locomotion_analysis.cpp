@@ -88,7 +88,6 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 	const char* base_name = standing_skeleton->root()->name().get_string();
 
 	get_ct()->set_base_name(base_name);
-	//get_ct()->set_nonlimb_blending_base_name(base_name);
 
 	int result = 0;
 
@@ -158,6 +157,8 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 		{
 			limb->ik.joint_info_list.get(j).is_support_joint = 0;
 			limb->ik.joint_info_list.get(j).sk_joint = joint;
+			if(limb->get_joint_type(j) == JOINT_TYPE_HINGE) 
+				limb->ik.joint_info_list.get(j).axis = SrVec(1.0f, 0.0f, 0.0f);
 			for(int k = 0; k < limb->get_support_joint_num(); ++k)
 			{
 				SrString* a = limb->support_joint_list.get(k);
@@ -167,7 +168,6 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 				{
 					limb->ik.joint_info_list.get(j).is_support_joint = 1;
 					limb->ik.joint_info_list.get(j).support_joint_height = limb->support_height.get(k);
-					//limb->ik.joint_info_list.get(j).support_joint_comp = 0.0f;
 				}
 			}
 			if(joint->num_children() > 0)

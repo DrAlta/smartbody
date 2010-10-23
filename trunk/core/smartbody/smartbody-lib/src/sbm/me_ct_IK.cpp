@@ -48,52 +48,34 @@ void MeCtIK::set_max_iteration(int iter)
 	max_iteration = iter;
 }
 
-SrVec MeCtIK::get_joint_pos(int index)
-{
-	SrMat mat = joint_global_mat_list.get(index);
-	SrVec pos(mat.get(12), mat.get(13), mat.get(14));
-	return pos;
-}
-
 void MeCtIK::update(MeCtIKScenario* scenario)
 {
 	this->scenario = scenario;
-	int i, j;
-	int reach = 0;
 	int modified = 0;
 	SrMat inv_end;
 
-	//temp.........delete this
-	SrQuat before = scenario->quat_list.get(2);
-	//temp.........delete this
-	
-	init();
+	SrQuat before;
+	for(int i = 0; i < scenario->joint_info_list.size(); ++i)
+	{
+		if(scenario->joint_info_list.get(i).is_support_joint)
+		{
+			before = scenario->joint_quat_list.get(i);
+			break;
+		}
+	}
 
-	//printf("\ntarget(%f,%f,%f), offset(%f,%f,%f)", target.x, target.y, target.z, scenario->ik_offset.x, scenario->ik_offset.y, scenario->ik_offset.z);
+	init();
 
 	for(int k = 0; k < support_joint_num; ++k)
 	{
-		//LOG("\ntarget: (%f, %f, %f)", target.x, target.y, target.z);
-		reach = 0;
-		for(i = 0; i < max_iteration; ++i)
-		{
-			for(j = start_joint_index; j != manipulated_joint_index; ++j)
-			{
-				if(reach_destination()) 
-				{
-					reach = 1;
-					break;
-				}
-				rotate(joint_pos_list.get(manipulated_joint_index), j);
-			}
-			if(reach) break;
-		}
+		if(manipulated_joint_index - start_joint_index == 1) adjust_2_joints();
+		else adjust();
 
 		//handles the support joints
-		SrQuat before = scenario->quat_list.get(manipulated_joint_index);
+		SrQuat before = scenario->joint_quat_list.get(manipulated_joint_index);
 		//temp
 
-		pm = joint_global_mat_list.get(manipulated_joint_index);
+		pm = scenario->joint_global_mat_list.get(manipulated_joint_index);
 		pm.set(12, 0.0f);//??
 		pm.set(13, 0.0f);
 		pm.set(14, 0.0f);
@@ -108,14 +90,10 @@ void MeCtIK::update(MeCtIKScenario* scenario)
 		SrQuat after = before;
 		//temp
 
-		/*inv_end = end_mat.inverse();
-		before = inv_end * before;
-		SrQuat after = before;*/
 		modified = check_constraint(&after, manipulated_joint_index);
-		scenario->quat_list.set(manipulated_joint_index, before);
+		scenario->joint_quat_list.set(manipulated_joint_index, before);
 		if(modified == 0) 
 		{
-			//break;
 			start_joint_index = manipulated_joint_index;
 			get_next_support_joint();
 			get_limb_section_local_pos(start_joint_index, -1);
@@ -126,23 +104,36 @@ void MeCtIK::update(MeCtIKScenario* scenario)
 			recrod_endmat = 0;
 			get_next_support_joint();
 			get_limb_section_local_pos(0, -1);
-			scenario->quat_list.set(manipulated_joint_index-1, after);
+			scenario->joint_quat_list.set(manipulated_joint_index-1, after);
 			calc_target(scenario->ik_orientation, scenario->ik_offset);
-			//end_mat.rot(after.axis(), after.angle() - before.angle());
 		}
 	}
 }
 
-/*void MeCtIK::adjust_support_joints()
+// fast solution for 2 joints
+__forceinline void MeCtIK::adjust_2_joints()
 {
-	for(int i = manipulated_joint_index; i < scenario->joint_info_list.size(); ++i)
+	rotate(scenario->joint_pos_list.get(manipulated_joint_index), start_joint_index);
+}
+
+__forceinline void MeCtIK::adjust()
+{
+	int reach = 0;
+	int i,j;
+	for(i = 0; i < max_iteration; ++i)
 	{
-		if(scenario->joint_info_list.get(i).is_support_joint)
+		for(j = start_joint_index; j != manipulated_joint_index; ++j)
 		{
-			
+			if(reach_destination()) 
+			{
+				reach = 1;
+				break;
+			}
+			rotate(scenario->joint_pos_list.get(manipulated_joint_index), j);
 		}
+		if(reach) break;
 	}
-}*/
+}
 
 int MeCtIK::get_support_joint_num()
 {
@@ -191,8 +182,7 @@ __forceinline int MeCtIK::check_constraint(SrQuat* quat, int index)
 
 __forceinline int MeCtIK::reach_destination()
 {
-	SrVec v = joint_pos_list.get(manipulated_joint_index) - target.get(manipulated_joint_index);
-	//LOG("\n dis: %f", v.len());
+	SrVec v = scenario->joint_pos_list.get(manipulated_joint_index) - target.get(manipulated_joint_index);
 	if(v.len() < threshold) return 1;
 	return 0;
 }
@@ -232,21 +222,22 @@ __forceinline bool MeCtIK::cross_point_with_plane(SrVec* cross_point, SrVec& lin
 
 __forceinline void MeCtIK::update_limb_section_local_pos(int start_index)
 {
-	//temp solution, for efficiency, this must be replaced.
+	//temp solution, for efficiency, this must be replaced with optimized methods.
 	get_limb_section_local_pos(start_index, -1);
-	//temp solution, for efficiency, this must be replaced.
+	//temp solution, for efficiency, this must be replaced with optimized methods.
 }
 
+//The rotate function basicaly puts the joint back to its local coordinate
 __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 {
 	SrVec v1, v2, v3, v4;
 	SrVec v, i_target, i_src;
 	SrVec axis, r_axis;
 	SrMat mat, mat_inv;
-	if(start_index == 0) mat_inv = scenario->mat.inverse();
-	else mat_inv = joint_global_mat_list.get(start_index-1).inverse();
-	SrVec& pivot = joint_pos_list.get(start_index);
-	pivot = pivot * mat_inv;
+	if(start_index == 0) mat_inv = scenario->gmat.inverse();
+	else mat_inv = scenario->joint_global_mat_list.get(start_index-1).inverse();
+	SrVec& pivot = scenario->joint_pos_list.get(start_index);
+	pivot = pivot * mat_inv; // tranverse joint back to its local coordinate
 	i_target = target.get(manipulated_joint_index) * mat_inv;
 	i_src = src * mat_inv;
 
@@ -261,8 +252,7 @@ __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 	}
 	else if(scenario->joint_info_list.get(start_index).type == JOINT_TYPE_HINGE)
 	{
-		r_axis = SrVec(1,0,0);
-		//r_axis = joint_axis_list.get(start_index);
+		r_axis = scenario->joint_info_list.get(start_index).axis;
 		v = upright_point_to_plane(i_target, r_axis, i_src);
 		v2 = v - pivot;
 	}
@@ -277,23 +267,20 @@ __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 	if(dot(v3, r_axis) > 0.0f) mat.rot(r_axis, angle);
 	else mat.rot(r_axis, -angle);
 	
-	SrQuat q = scenario->quat_list.get(start_index);
+	SrQuat q = scenario->joint_quat_list.get(start_index);
 	q = mat * q;
 
 	check_constraint(&q, start_index);
 
-	//end_mat = mat * end_mat;
-	scenario->quat_list.set(start_index, q);
+	scenario->joint_quat_list.set(start_index, q);
 	get_limb_section_local_pos(start_index, -1);
-	//update_manipulated_joint_pos(start_index);
 }
 
 __forceinline void MeCtIK::calc_target(SrVec& orientation, SrVec& offset)
 {
 	orientation.normalize();
-	SrVec pos = joint_pos_list.get(manipulated_joint_index);
+	SrVec pos = scenario->joint_pos_list.get(manipulated_joint_index);
 	pos += offset;
-	//target = (manipulated_joint->support_joint_comp + manipulated_joint->support_joint_height - distance_to_plane(pos, scenario->plane_normal, scenario->plane_point)) * scenario->plane_normal + pos;
 	SrVec t = cross_point_on_plane(pos, orientation, scenario->plane_normal, scenario->plane_point);
 	target.set(manipulated_joint_index, -(manipulated_joint->support_joint_comp + manipulated_joint->support_joint_height)*orientation + t);
 
@@ -325,18 +312,14 @@ void MeCtIK::init()
 	recrod_endmat = 0;
 	end_mat.identity();
 
-	int size = scenario->quat_list.size();
+	int size = scenario->joint_quat_list.size();
 
 	target.capacity(size);
 	target.size(size);
-	joint_pos_list.capacity(size);
-	joint_pos_list.size(size);
-	joint_axis_list.capacity(size);
-	joint_axis_list.size(size);
-	//joint_local_mat_list.capacity(size);
-	//joint_local_mat_list.size(size);
-	joint_global_mat_list.capacity(size);
-	joint_global_mat_list.size(size);
+	scenario->joint_pos_list.capacity(size);
+	scenario->joint_pos_list.size(size);
+	scenario->joint_global_mat_list.capacity(size);
+	scenario->joint_global_mat_list.size(size);
 	joint_init_mat_list.capacity(size);
 	joint_init_mat_list.size(size);
 
@@ -353,17 +336,16 @@ void MeCtIK::init()
 	end_joint_index = support_joint_num;
 
 	calc_target(scenario->ik_orientation, scenario->ik_offset);
-	//adjust_support_joints();
 }
 
 __forceinline void MeCtIK::get_init_mat_list()
 {
-	joint_init_mat_list = joint_global_mat_list;
+	joint_init_mat_list = scenario->joint_global_mat_list;
 }
 
 __forceinline void MeCtIK::update_manipulated_joint_pos(int index)
 {
-	joint_pos_list.set(manipulated_joint_index, joint_global_mat_list.get(index) * joint_pos_list.get(manipulated_joint_index));
+	scenario->joint_pos_list.set(manipulated_joint_index, scenario->joint_global_mat_list.get(index) * scenario->joint_pos_list.get(manipulated_joint_index));
 }
 
 __forceinline void MeCtIK::get_limb_section_local_pos(int start_index, int end_index)
@@ -373,7 +355,6 @@ __forceinline void MeCtIK::get_limb_section_local_pos(int start_index, int end_i
 	SrMat lmat;
 	SrVec axis;
 	SrVec ppos;
-	float* pt;
 	SkJoint* tjoint = scenario->start_joint->sk_joint;
 	for(int i = 0; i < start_index; ++i)
 	{
@@ -384,35 +365,26 @@ __forceinline void MeCtIK::get_limb_section_local_pos(int start_index, int end_i
 
 	for(int j  = start_index; j <= end_index; ++j)
 	{
-		scenario->joint_info_list.get(j).index = j;
-		if(j == 0) pmat = scenario->mat;
-		else pmat = joint_global_mat_list.get(j-1);
+		//scenario->joint_info_list.get(j).index = j;
+		if(j == 0) pmat = scenario->gmat;
+		else pmat = scenario->joint_global_mat_list.get(j-1);
 
-		lmat = get_lmat(tjoint, &(scenario->quat_list.get(j)));
+		lmat = get_lmat(tjoint, &(scenario->joint_quat_list.get(j)));
 		//joint_local_mat_list.set(j, lmat);
 
 		gmat = lmat * pmat;
-		joint_global_mat_list.set(j, gmat);
+		scenario->joint_global_mat_list.set(j, gmat);
 
 		ppos.set(*gmat.pt(12), *gmat.pt(13), *gmat.pt(14));
-		joint_pos_list.set(j, ppos);
+		scenario->joint_pos_list.set(j, ppos);
 
 		if(scenario->joint_info_list.get(j).type == JOINT_TYPE_BALL)
 		{
-
+			//do nothing
 		}
 		else if(scenario->joint_info_list.get(j).type == JOINT_TYPE_HINGE)
 		{
-			pmat = gmat;
-			pt = pmat.pt(12);
-			pt[0] = 0.0f;
-			pt[1] = 0.0f;
-			pt[2] = 0.0f;
-			axis = scenario->joint_info_list.get(j).axis;
-			SrVec n_axis = pmat*axis;
-			pmat.rot(axis, n_axis);
-			axis = pmat*axis;
-			joint_axis_list.set(j, axis);
+			// do nothing
 		}
 
 		if(tjoint->num_children()>0 && tjoint != scenario->end_joint->sk_joint)

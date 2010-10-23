@@ -256,6 +256,11 @@ void MeCtLocomotionLimb::set_joint_type(int index, int type)
 	ik.joint_info_list.get(index).type = type;
 }
 
+int MeCtLocomotionLimb::get_joint_type(int index)
+{
+	return ik.joint_info_list.get(index).type;
+}
+
 void MeCtLocomotionLimb::set_joint_rotation_axis(int index, SrVec* axis)
 {
 	ik.joint_info_list.get(index).axis = *axis;

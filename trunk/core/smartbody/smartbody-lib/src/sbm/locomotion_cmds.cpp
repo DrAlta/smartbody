@@ -463,7 +463,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		{
 			SrVec orientation(0,0,1);
 			SrMat mat;
-			mat.roty(actor->get_locomotion_ct()->get_navigator()->get_facing_angle());
+			mat.roty(actor->get_locomotion_ct()->get_navigator()->get_orientation_angle());
 			orientation = orientation * mat;
 
 			SrVec v;

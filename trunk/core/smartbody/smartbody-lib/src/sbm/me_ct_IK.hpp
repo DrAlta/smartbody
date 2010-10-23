@@ -33,23 +33,21 @@
 
 ///////////////////////////////////////////////
 
+//Not much to say about the use of this, fill out the MeCtIKScenario structure, 
+//simply call update(MeCtIKScenario* scenario) and pass in the structure.
+
 class MeCtIK{
 public:
 	// Public Constants
 	static const char* TYPE;
 
-	SrArray<SrVec>				joint_pos_list;
-
 protected:
-	// Data
+
 	MeCtIKScenario*				scenario;
 	SkJoint*					base_joint;
 	int							max_iteration;
 	
-	SrArray<SrVec>				joint_axis_list;
-	SrArray<SrMat>				joint_global_mat_list;
-	//SrArray<SrMat>			joint_local_mat_list;
-
+	//SrArray<SrVec>				joint_axis_list;
 	SrArray<SrMat>				joint_init_mat_list;
 
 	SrMat						end_mat;
@@ -76,10 +74,13 @@ public:
 
 public:
 	void update(MeCtIKScenario* scenario);
-	SrVec get_joint_pos(int index);
 	SrVec get_target(int index);
 
 protected:
+	void adjust();
+
+	void adjust_2_joints();
+
 	void set_max_iteration(int iter);
 
 	SrVec upright_point_to_plane(SrVec& point, SrVec& plane_normal, SrVec& plane_point);

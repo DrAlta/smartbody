@@ -125,6 +125,8 @@ public:
 
 	void	set_joint_type(int index, int type);
 
+	int		get_joint_type(int index);
+
 	void	set_joint_rotation_axis(int index, SrVec* axis);
 
 	SrArray<MeCtLocomotionLimbAnim*>* get_walking_list();

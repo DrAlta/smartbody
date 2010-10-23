@@ -33,9 +33,9 @@
 #define JOINT_TYPE_HINGE 1
 #define JOINT_TYPE_BALL 2
 
-#define ORIENTATION_RES_UNCHANGED_LOCAL 0
+/*#define ORIENTATION_RES_UNCHANGED_LOCAL 0
 #define ORIENTATION_RES_PLANE 1
-#define ORIENTATION_RES_UNCHANGED_WORLD 2
+#define ORIENTATION_RES_UNCHANGED_WORLD 2*/
 
 ///////////////////////////////////////////////
 
@@ -43,18 +43,17 @@ class MeCtIKScenarioJointInfo
 {
 public:
 	int			type; // JOINT_TYPE_HINGE or JOINT_TYPE_BALL
-	int			index;
 	SkJoint*	sk_joint;
-	//SrVec offset;
-	int			is_support_joint;
-	float		support_joint_height;
-	float		support_joint_comp;
+
+	int			is_support_joint; // 0: no; 1: yes
+	float		support_joint_height; // How much distance off the ground can be considered touching the ground.
+	float		support_joint_comp; // In case a compensation is needed to maintain a certain distance beyond support_joint_height.
 	union
 	{
 		struct{float max;}ball;
 		struct{float min; float max;}hinge;
-	}constraint;
-	SrVec		axis;
+	}constraint; // the default set is ball joint
+	SrVec		axis; // for hinge joint, the rotation axis in its local coordinate.
 
 public:
 	MeCtIKScenarioJointInfo();
@@ -67,44 +66,35 @@ public:
 	// Public Constants
 	static const char* TYPE;
 
-public:
-	// Data
-	SrMat				mat;
-	MeCtIKScenarioJointInfo*			start_joint;
-	MeCtIKScenarioJointInfo*			end_joint;
+public: // User provide data
 	
-	SrArray<MeCtIKScenarioJointInfo>	joint_info_list;
-	SrArray<SrQuat>						quat_list;
+	SrMat								gmat;				// global translation matrix of the start joint.
+	MeCtIKScenarioJointInfo*			start_joint;		// The start joint that will be manipulated by IK, usually the root of a limb.
+	MeCtIKScenarioJointInfo*			end_joint;			// The end joint that will be manipulated by IK, usually the tip of a limb.
+	SrArray<MeCtIKScenarioJointInfo>	joint_info_list;	// Joint info, see above
+	
+	//definition for plane the limb should be adapted to.
+	SrVec								plane_normal;		// The normal of plane on which the limb should be adapted to.
+	SrVec								plane_point;		// A point of plane on which the limb should be adapted to.
+	//definition for plane the limb should be adapted to.
 
-	//definition for plane
-	SrVec								plane_normal;
-	SrVec								plane_point;
+	SrVec								ik_offset;			// offset from the current position to the position that is 
+															// used to calculate the target position.
+	SrVec								ik_orientation;		// Orientation of the limb, may not be in the direction of plane normal
+	float								ik_compensate_factor; // Compensate for the off-ground height, usually cos(plane_normal, ik_orientation)
 
-	SrVec								ik_offset;	// offset from the current position to the position which is 
-													// used to calculate the target position.
+public:// User provide data & Return data
+	SrArray<SrQuat>						joint_quat_list;	// quaternions of joints
 
-	//the forced direction of 
-	SrVec								ik_orientation;
-
-	float								ik_compensate_factor;
-
-/*//??
-protected:
-	SrVec								orientation;
-	int									orientation_type;*/
+public:// Return data
+	SrArray<SrVec>						joint_pos_list;		// global position of joints
+	SrArray<SrMat>						joint_global_mat_list; // global matrices of joints
 
 public:
 	MeCtIKScenario();
 	~MeCtIKScenario();
 
 public:
-	//void set_orientation_of_residual_type(int type, SrVec* orientation = NULL);
-	//int get_orientation_of_residual_type();
-	//SrVec& get_orientation_of_residual();
-
-	void set_plane_normal(SrVec& normal);
-	void set_plane_point(SrVec& point);
-	void set_offset(SrVec& offset);
 };
 
 #endif // ME_CT_IK_SCENARIO_HPP
