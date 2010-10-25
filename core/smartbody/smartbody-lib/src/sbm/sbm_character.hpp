@@ -93,6 +93,12 @@ public:
 
 	MeCtLocomotionClass* locomotion_ct;
 
+		// Face data temporary storage to pass reference into init_skeleton()
+	AUMotionMap*     au_motion_map;
+	VisemeMotionMap* viseme_motion_map;
+	GeneralParamMap*   param_map;
+
+
 protected:
 	// Private Data
 
@@ -101,10 +107,6 @@ protected:
 	/** The voice code used by the implementation (empty string if unset) */
 	std::string		           voice_code;
 
-	// Face data temporary storage to pass reference into init_skeleton()
-	const AUMotionMap*     au_motion_map;
-	const VisemeMotionMap* viseme_motion_map;
-	const GeneralParamMap*   param_map;
 
 	// Evaluation time face data
 	SkMotion*         face_neutral;
@@ -139,9 +141,9 @@ public:
 	
 	int init( SkSkeleton* skeleton_p,
 	          SkMotion* face_neutral,
-	          const AUMotionMap* fac_map,
-			  const VisemeMotionMap* viseme_map,
-			  const GeneralParamMap* param_map,
+	          AUMotionMap* fac_map,
+			  VisemeMotionMap* viseme_map,
+			  GeneralParamMap* param_map,
 			  const char* unreal_class,
 			  bool use_locomotion );
 
@@ -290,11 +292,13 @@ protected:
 	 */
 	virtual void init_face_controllers();
 
-	int set_world_offset_cmd( srArgBuffer& args );
+//	int set_world_offset_cmd( srArgBuffer& args ); // NOT DEFINED
 
 	/*!
 	 *  Adds a single float channel, bounded by lower and upper limits.
 	 */
+
+	// NOTE: called for shader params, bound ( 0, 2 )
 	void add_bounded_float_channel( const std::string & name, float lower, float upper, const int wo_index );
 
 
@@ -302,10 +306,9 @@ protected:
 	 *   Adds a joint of given name with XPos activated
 	 *   for the channel to control an aspect of the face.
 	 */
+
+	// NOTE: called for A-units and visemes; bound ( 0, 1 )
 	void add_face_channel( const std::string& name, const int wo_index );
-
-
-
 
 };
 

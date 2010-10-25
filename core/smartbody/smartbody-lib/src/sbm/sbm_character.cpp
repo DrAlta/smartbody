@@ -277,9 +277,9 @@ void SbmCharacter::locomotion_set_turning_mode(int mode)
 
 int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 					    SkMotion* face_neutral,
-                        const AUMotionMap* au_motion_map,
-                        const VisemeMotionMap* viseme_motion_map,
-						const GeneralParamMap* param_map,
+                        AUMotionMap* au_motion_map,
+                        VisemeMotionMap* viseme_motion_map,
+						GeneralParamMap* param_map,
                         const char* unreal_class,
 						bool use_locomotion)
 {
@@ -466,9 +466,11 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	return( CMD_SUCCESS ); 
 }
 
+
 void SbmCharacter::add_face_channel( const string& name, const int wo_index ) {
 	add_bounded_float_channel( name, 0, 2, wo_index );
 }
+
 
 void SbmCharacter::add_bounded_float_channel( const string& name, float lower, float upper, const int wo_index ) {
 	SkJoint* joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
