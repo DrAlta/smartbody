@@ -248,7 +248,8 @@ void MeCtLocomotionAnalysis::analyze_standing(MeCtLocomotionLimb* limb, SkMotion
 int MeCtLocomotionAnalysis::get_translation_base_joint_name(SkSkeleton* skeleton)
 {
 	SkJoint* joint = skeleton->root();
-	for(int i = 0 ; i < skeleton->get_joint_array().size(); ++i)
+	int n = skeleton->get_joint_array().size();
+	for(int i = 0 ; i < n; ++i)
 	{
 		if(!joint->pos()->frozen(1))
 		{
