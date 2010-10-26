@@ -100,7 +100,7 @@ void SkScene::init ( SkSkeleton* s )
    sphere = new SrSnSphere; // shared sphere
    sphere->color(SrColor::white);
    float height = s->getCurrentHeight();
-   float scaleFactor =  height / 175.0;
+   float scaleFactor =  height / 175.0f;
    if (scaleFactor == 0.0f)
 	   scaleFactor = 1.0f;
    sphere->shape().radius = scaleFactor * _cradius * _sfactor;
