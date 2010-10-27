@@ -64,14 +64,18 @@
 		pitch = 12.8
 */
 
-#define EYEBALL_ROT_LIMIT_UP	-35.0f
-#define EYEBALL_ROT_LIMIT_DN	30.0f
 
-#define EYELID_UPPER_Y_LIMIT_UP	0.372f
-#define EYELID_UPPER_Y_LIMIT_DN	-0.788f
+#define DFL_EYEBALL_ROT_LIMIT_UP	-30.0f
+#define DFL_EYEBALL_ROT_LIMIT_DN	35.0f
 
-#define EYELID_LOWER_Y_LIMIT_UP	0.0
-#define EYELID_LOWER_Y_LIMIT_DN	-0.788f
+#define DFL_EYELID_UPPER_Y_LIMIT_UP	0.372f
+#define DFL_EYELID_UPPER_Y_LIMIT_DN	-0.788f
+
+#define DFL_EYELID_LOWER_Y_LIMIT_UP	0.2f
+#define DFL_EYELID_LOWER_Y_LIMIT_DN	-0.2f
+
+#define DFL_EYELID_UPPER_WEIGHT		1.0f
+#define DFL_EYELID_LOWER_WEIGHT		0.2f
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -83,10 +87,10 @@ MeCtEyeLid::MeCtEyeLid( void )	{
 
    _skeleton_ref_p = NULL;
 
-	setEyelidWeight( 1.0f, 0.2f );
-	setEyeballPitchRange( EYEBALL_ROT_LIMIT_UP, EYEBALL_ROT_LIMIT_DN );
-	setEyelidUpperTransRange( EYELID_UPPER_Y_LIMIT_UP, EYELID_UPPER_Y_LIMIT_DN );
-	setEyelidLowerTransRange( EYELID_LOWER_Y_LIMIT_UP, EYELID_LOWER_Y_LIMIT_DN );
+	setEyeballPitchRange( DFL_EYEBALL_ROT_LIMIT_UP, DFL_EYEBALL_ROT_LIMIT_DN );
+	setEyelidUpperTransRange( DFL_EYELID_UPPER_Y_LIMIT_UP, DFL_EYELID_UPPER_Y_LIMIT_DN );
+	setEyelidLowerTransRange( DFL_EYELID_LOWER_Y_LIMIT_UP, DFL_EYELID_LOWER_Y_LIMIT_DN );
+	setEyelidWeight( DFL_EYELID_UPPER_WEIGHT, DFL_EYELID_LOWER_WEIGHT );
 }
 
 MeCtEyeLid::~MeCtEyeLid( void )	{
@@ -99,31 +103,43 @@ void MeCtEyeLid::clear( void )	{
    _skeleton_ref_p = NULL;
 }
 
+#define LID_CORRECTION_EPSILON	0.0001f
+
 float MeCtEyeLid::calc_lid_correction( 
 	float in_eye_p, float eye_range[ 2 ],
 	float in_lid_y, float lid_range[ 2 ]
 	)	{
 	float adj_lid_y = 0.0;
 
+	// TODO: first clamp eye-pitch to range...
+	// use EPSILON
+	if( in_eye_p < eye_range[ 0 ] ) in_eye_p = eye_range[ 0 ];
+	if( in_eye_p > eye_range[ 1 ] ) in_eye_p = eye_range[ 1 ];
+
 	// adjust for eye pitch
-	if( in_eye_p < 0.0 ) { // looking up
+	if( in_eye_p < -LID_CORRECTION_EPSILON ) { // looking up
 		float eye_norm = in_eye_p / eye_range[ 0 ];
 		adj_lid_y = eye_norm * lid_range[ 0 ];
 	}
 	else
-	if( in_eye_p > 0.0 )	{ // looking down
+	if( in_eye_p > LID_CORRECTION_EPSILON )	{ // looking down
 		float eye_norm = in_eye_p / eye_range[ 1 ];
 		adj_lid_y = eye_norm * lid_range[ 1 ];
 	}
 
+	// TODO: then clamp lid to range...
+	// will this resolve normalization against 0.0?
+	if( in_lid_y > lid_range[ 0 ] ) in_lid_y = lid_range[ 0 ];
+	if( in_lid_y < lid_range[ 1 ] ) in_lid_y = lid_range[ 1 ];
+
 	// adjust for blink/lift
 	float out_lid_y = adj_lid_y;
-	if( in_lid_y < 0.0 )	{ // eye is effectively closing/blinking
+	if( in_lid_y < -LID_CORRECTION_EPSILON )	{ // lid is lowering
 		float blink_norm = in_lid_y / lid_range[ 1 ];
 		out_lid_y = adj_lid_y - blink_norm * ( adj_lid_y - lid_range[ 1 ] );
 	}
 	else
-	if( in_lid_y > 0.0 )	{ // eye is effectively lifting
+	if( in_lid_y > LID_CORRECTION_EPSILON )	{ // lid is lifting
 		float blink_norm = in_lid_y / lid_range[ 0 ];
 		out_lid_y = adj_lid_y + blink_norm * ( lid_range[ 0 ] - adj_lid_y );
 	}
@@ -170,8 +186,14 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 		once = 0;
 		G_debug = 1;
 		
-		LOG( "UPPER:\n" );
-		LOG( "look fwd:\n" ); 
+#if 1
+
+		LOG( "eye: %f %f", _eyeballPitchRange[ 0 ], _eyeballPitchRange[ 1 ] );
+
+		LOG( "UPPER:" );
+		LOG( "lid: %f %f", _eyelidUpperTransRange[ 0 ], _eyelidUpperTransRange[ 1 ] );
+
+		LOG( "look fwd:" ); 
 		calc_lid_correction( 0.0, _eyeballPitchRange, 0.4, _eyelidUpperTransRange ); // over-wide
 		calc_lid_correction( 0.0, _eyeballPitchRange, 0.1, _eyelidUpperTransRange ); // wide
 		calc_lid_correction( 0.0, _eyeballPitchRange, 0.05, _eyelidUpperTransRange );
@@ -179,51 +201,65 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 		calc_lid_correction( 0.0, _eyeballPitchRange, -0.05, _eyelidUpperTransRange );
 		calc_lid_correction( 0.0, _eyeballPitchRange, -0.1, _eyelidUpperTransRange );
 		calc_lid_correction( 0.0, _eyeballPitchRange, -0.2, _eyelidUpperTransRange ); // sleepy
-		calc_lid_correction( 0.0, _eyeballPitchRange, -0.788, _eyelidUpperTransRange ); // closed
-		calc_lid_correction( 0.0, _eyeballPitchRange, -0.8, _eyelidUpperTransRange ); // over-closed
+		calc_lid_correction( 0.0, _eyeballPitchRange, -0.8, _eyelidUpperTransRange ); // closed
+		calc_lid_correction( 0.0, _eyeballPitchRange, -1.0, _eyelidUpperTransRange ); // over-closed
 
-		LOG( "look up:\n" );
+		LOG( "look up:" );
 		calc_lid_correction( -20.0, _eyeballPitchRange, 0.1, _eyelidUpperTransRange ); // wide
 		calc_lid_correction( -20.0, _eyeballPitchRange, 0.05, _eyelidUpperTransRange );
 		calc_lid_correction( -20.0, _eyeballPitchRange, 0.0, _eyelidUpperTransRange ); // neutral
 		calc_lid_correction( -20.0, _eyeballPitchRange, -0.05, _eyelidUpperTransRange );
 		calc_lid_correction( -20.0, _eyeballPitchRange, -0.1, _eyelidUpperTransRange );
 		calc_lid_correction( -20.0, _eyeballPitchRange, -0.2, _eyelidUpperTransRange ); // sleepy
-		calc_lid_correction( -20.0, _eyeballPitchRange, -0.788, _eyelidUpperTransRange ); // closed
+		calc_lid_correction( -20.0, _eyeballPitchRange, -0.8, _eyelidUpperTransRange ); // closed
+		calc_lid_correction( -20.0, _eyeballPitchRange, -1.0, _eyelidUpperTransRange ); // closed
 
-		LOG( "look down:\n" );
+		LOG( "look down:" );
 		calc_lid_correction( 20.0, _eyeballPitchRange, 0.1, _eyelidUpperTransRange ); // wide
 		calc_lid_correction( 20.0, _eyeballPitchRange, 0.05, _eyelidUpperTransRange );
 		calc_lid_correction( 20.0, _eyeballPitchRange, 0.0, _eyelidUpperTransRange ); // neutral
 		calc_lid_correction( 20.0, _eyeballPitchRange, -0.05, _eyelidUpperTransRange );
 		calc_lid_correction( 20.0, _eyeballPitchRange, -0.1, _eyelidUpperTransRange );
 		calc_lid_correction( 20.0, _eyeballPitchRange, -0.2, _eyelidUpperTransRange ); // sleepy
-		calc_lid_correction( 20.0, _eyeballPitchRange, -0.788, _eyelidUpperTransRange ); // closed
+		calc_lid_correction( 20.0, _eyeballPitchRange, -0.8, _eyelidUpperTransRange ); // closed
+		calc_lid_correction( 20.0, _eyeballPitchRange, -1.0, _eyelidUpperTransRange ); // closed
+#endif
+#if 1
+		LOG( "LOWER:" );
+		LOG( "lid: %f %f", _eyelidLowerTransRange[ 0 ], _eyelidLowerTransRange[ 1 ] );
 
-		LOG( "LOWER:\n" );
-		LOG( "look fwd:\n" ); 
+		LOG( "look fwd:" ); 
+		calc_lid_correction( 0.0, _eyeballPitchRange, 0.3, _eyelidLowerTransRange ); // neutral
+		calc_lid_correction( 0.0, _eyeballPitchRange, 0.2, _eyelidLowerTransRange ); // neutral
+		calc_lid_correction( 0.0, _eyeballPitchRange, 0.1, _eyelidLowerTransRange ); // neutral
 		calc_lid_correction( 0.0, _eyeballPitchRange, 0.0, _eyelidLowerTransRange ); // neutral
 		calc_lid_correction( 0.0, _eyeballPitchRange, -0.05, _eyelidLowerTransRange );
 		calc_lid_correction( 0.0, _eyeballPitchRange, -0.1, _eyelidLowerTransRange );
 		calc_lid_correction( 0.0, _eyeballPitchRange, -0.2, _eyelidLowerTransRange ); // sleepy
-		calc_lid_correction( 0.0, _eyeballPitchRange, -0.788, _eyelidLowerTransRange ); // closed
-		calc_lid_correction( 0.0, _eyeballPitchRange, -0.8, _eyelidLowerTransRange ); // over-closed
+		calc_lid_correction( 0.0, _eyeballPitchRange, -0.3, _eyelidLowerTransRange ); // closed
 
-		LOG( "look up:\n" );
+		LOG( "look up:" );
+		calc_lid_correction( -20.0, _eyeballPitchRange, 0.3, _eyelidLowerTransRange ); // neutral
+		calc_lid_correction( -20.0, _eyeballPitchRange, 0.2, _eyelidLowerTransRange ); // neutral
+		calc_lid_correction( -20.0, _eyeballPitchRange, 0.1, _eyelidLowerTransRange ); // neutral
 		calc_lid_correction( -20.0, _eyeballPitchRange, 0.0, _eyelidLowerTransRange ); // neutral
 		calc_lid_correction( -20.0, _eyeballPitchRange, -0.05, _eyelidLowerTransRange );
 		calc_lid_correction( -20.0, _eyeballPitchRange, -0.1, _eyelidLowerTransRange );
 		calc_lid_correction( -20.0, _eyeballPitchRange, -0.2, _eyelidLowerTransRange ); // sleepy
-		calc_lid_correction( -20.0, _eyeballPitchRange, -0.788, _eyelidLowerTransRange ); // closed
+		calc_lid_correction( -20.0, _eyeballPitchRange, -0.3, _eyelidLowerTransRange ); // closed
 
-		LOG( "look down:\n" );
+		LOG( "look down:" );
+		calc_lid_correction( 20.0, _eyeballPitchRange, 0.3, _eyelidLowerTransRange ); // neutral
+		calc_lid_correction( 20.0, _eyeballPitchRange, 0.2, _eyelidLowerTransRange ); // neutral
+		calc_lid_correction( 20.0, _eyeballPitchRange, 0.1, _eyelidLowerTransRange ); // neutral
 		calc_lid_correction( 20.0, _eyeballPitchRange, 0.0, _eyelidLowerTransRange ); // neutral
 		calc_lid_correction( 20.0, _eyeballPitchRange, -0.05, _eyelidLowerTransRange );
 		calc_lid_correction( 20.0, _eyeballPitchRange, -0.1, _eyelidLowerTransRange );
 		calc_lid_correction( 20.0, _eyeballPitchRange, -0.2, _eyelidLowerTransRange ); // sleepy
-		calc_lid_correction( 20.0, _eyeballPitchRange, -0.788, _eyelidLowerTransRange ); // closed
+		calc_lid_correction( 20.0, _eyeballPitchRange, -0.3, _eyelidLowerTransRange ); // closed
 		G_debug = 0;
 	}
+#endif
 #endif
 
 	if( t < 0.0 )	{
