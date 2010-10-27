@@ -368,13 +368,13 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 			
 			float dfl_hgt = 175.0f;
 			float rel_scale = getHeight() / dfl_hgt;
-			float up, dn;
+			float lo, up;
 
-			eyelid_ct->getEyelidUpperTransRange( up, dn );
-			eyelid_ct->setEyelidUpperTransRange( up * rel_scale, dn * rel_scale );
+			eyelid_ct->get_upper_lid_range( lo, up );
+			eyelid_ct->set_upper_lid_range( lo * rel_scale, up * rel_scale );
 
-			eyelid_ct->getEyelidLowerTransRange( up, dn );
-			eyelid_ct->setEyelidLowerTransRange( up * rel_scale, dn * rel_scale );
+			eyelid_ct->get_lower_lid_range( lo, up );
+			eyelid_ct->set_lower_lid_range( lo * rel_scale, up * rel_scale );
 			
 			eyelid_ct->init();
 			ct_tree_p->add_controller( eyelid_ct );
@@ -1766,24 +1766,24 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		if (args.calc_num_tokens() == 0)
 		{
 			LOG( "softeyes params: %s", character->isSoftEyes() ? "ENABLED" : "DISABLED" );
-			float up, dn;
+			float lo, up;
 
-			eyelid_ct->getEyelidWeight( up, dn );
-			LOG( " eyelid weight: { %f, %f }", up, dn );
+			eyelid_ct->get_weight( lo, up );
+			LOG( " eyelid weight: { %f, %f }", lo, up );
 
-			eyelid_ct->getEyelidUpperTransRange( up, dn );
-			LOG( " eyelid upper trans: { %f, %f }", up, dn );
+			eyelid_ct->get_upper_lid_range( lo, up );
+			LOG( " eyelid upper trans: { %f, %f }", lo, up );
 
-			eyelid_ct->getEyelidLowerTransRange( up, dn );
-			LOG( " eyelid lower trans: { %f, %f }", up, dn );
+			eyelid_ct->get_lower_lid_range( lo, up );
+			LOG( " eyelid lower trans: { %f, %f }", lo, up );
 
-			eyelid_ct->getEyeballPitchRange( up, dn );
-			LOG( " eyeball pitch: { %f, %f }", up, dn );
+			eyelid_ct->get_eye_pitch_range( lo, up );
+			LOG( " eyeball pitch: { %f, %f }", lo, up );
 
 			LOG( "commmands:" );
 			LOG( " char <> softeyes [on|off] " );
-			LOG( " char <> softeyes weight <upper> <lower>" );
-			LOG( " char <> softeyes upperlid|lowerlid|eyepitch <upper-range> <lower-range>" );
+			LOG( " char <> softeyes weight <lower> <upper>" );
+			LOG( " char <> softeyes upperlid|lowerlid|eyepitch <lower-lim> <upper-lim>" );
 			return CMD_SUCCESS;
 		}
 
@@ -1799,27 +1799,27 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		}
 		else	{
 			
+			float lo = args.read_float();
 			float up = args.read_float();
-			float dn = args.read_float();
 			
 			if (softEyesCommand == "weight")
 			{
-				eyelid_ct->setEyelidWeight( up, dn );
+				eyelid_ct->set_weight( lo, up );
 			}
 			else 
 			if (softEyesCommand == "upperlid")
 			{
-				eyelid_ct->setEyelidUpperTransRange( up, dn );
+				eyelid_ct->set_upper_lid_range( lo, up );
 			}
 			else 
 			if (softEyesCommand == "lowerlid")
 			{
-				eyelid_ct->setEyelidLowerTransRange( up, dn );
+				eyelid_ct->set_lower_lid_range( lo, up );
 			}
 			else 
 			if (softEyesCommand == "eyepitch")
 			{
-				eyelid_ct->setEyeballPitchRange( up, dn );
+				eyelid_ct->set_eye_pitch_range( lo, up );
 			}
 			else
 			{

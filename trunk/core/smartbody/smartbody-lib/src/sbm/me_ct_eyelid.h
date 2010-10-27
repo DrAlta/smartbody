@@ -39,13 +39,22 @@ class MeCtEyeLid : public MeController	{
 	private:
 
 		SkChannelArray		_channels; // override motion channels, to include world_offset
-		SkSkeleton* 	    _skeleton_ref_p;
 		
-		float				_eyelidWeight[ 2 ];
-		float				_eyelidUpperTransRange[ 2 ];
-		float				_eyelidLowerTransRange[ 2 ];
-		float				_eyeballPitchRange[ 2 ];
+		float	precision;
+		float	lid_weight[ 2 ];
+		float	upper_lid_range[ 2 ];
+		float	lower_lid_range[ 2 ];
+		float	eye_pitch_range[ 2 ];
 		
+		float min( float a, float b )	{
+			if( a < b ) return( a );
+			return( b );
+		}
+		float max( float a, float b )	{
+			if( a > b ) return( a );
+			return( b );
+		}
+
 	public:
 		static const char* type_name;
 
@@ -54,47 +63,45 @@ class MeCtEyeLid : public MeController	{
 
 		/*! Destructor is public but pay attention to the use of ref()/unref() */
 		virtual ~MeCtEyeLid( void );
-		void clear( void );
 		void init( void );
 		
-		void setEyelidWeight( float up, float dn )	{
-			_eyelidWeight[ 0 ] = up;
-			_eyelidWeight[ 1 ] = dn;
+		void set_weight( float lo, float up )	{
+			lid_weight[ 0 ] = lo;
+			lid_weight[ 1 ] = up;
 		}
-		void getEyelidWeight( float &up, float &dn )	{
-			up = _eyelidWeight[ 0 ];
-			dn = _eyelidWeight[ 1 ];
+		void get_weight( float &lo, float &up )	{
+			lo = lid_weight[ 0 ];
+			up = lid_weight[ 1 ];
 		}
-
-		void setEyelidUpperTransRange( float up, float dn ) {
-			_eyelidUpperTransRange[ 0 ] = up;
-			_eyelidUpperTransRange[ 1 ] = dn;
+		
+		void set_lower_lid_range( float a, float b ) {
+			lower_lid_range[ 0 ] = min( a, b );
+			lower_lid_range[ 1 ] = max( a, b );
 		}
-		void setEyelidLowerTransRange( float up, float dn ) {
-			_eyelidLowerTransRange[ 0 ] = up;
-			_eyelidLowerTransRange[ 1 ] = dn;
+		void get_lower_lid_range( float &lo, float &up ) {
+			lo = lower_lid_range[ 0 ];
+			up = lower_lid_range[ 1 ];
 		}
-		void getEyelidUpperTransRange( float &up, float &dn ) {
-			up = _eyelidUpperTransRange[ 0 ];
-			dn = _eyelidUpperTransRange[ 1 ];
+		
+		void set_upper_lid_range( float a, float b ) {
+			upper_lid_range[ 0 ] = min( a, b );
+			upper_lid_range[ 1 ] = max( a, b );
 		}
-		void getEyelidLowerTransRange( float &up, float &dn ) {
-			up = _eyelidLowerTransRange[ 0 ];
-			dn = _eyelidLowerTransRange[ 1 ];
+		void get_upper_lid_range( float &lo, float &up ) {
+			lo = upper_lid_range[ 0 ];
+			up = upper_lid_range[ 1 ];
 		}
-
-		void setEyeballPitchRange( float up, float dn ) {
-			_eyeballPitchRange[ 0 ] = up;
-			_eyeballPitchRange[ 1 ] = dn;
+		
+		void set_eye_pitch_range( float a, float b )	{
+			eye_pitch_range[ 0 ] = max( a, b ); // down is positive...
+			eye_pitch_range[ 1 ] = min( a, b );
 		}
-		void getEyeballPitchRange( float &up, float &dn ) {
-			up = _eyeballPitchRange[ 0 ];
-			dn = _eyeballPitchRange[ 1 ];
+		void get_eye_pitch_range( float &lo, float &up )	{
+			lo = eye_pitch_range[ 0 ];
+			up = eye_pitch_range[ 1 ];
 		}
-
+		
 	private:
-		SkJoint*		source_ref_joint( void );
-
 		float	calc_lid_correction( 
 			float in_eye_p, 
 			float eye_range[ 2 ], 
