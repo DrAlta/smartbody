@@ -151,6 +151,10 @@ static Fl_Menu_Item MenuTable[] =
          { "&bones",   0, MCB, CMD(CmdCharacterShowBones),   FL_MENU_RADIO },
          { "&axis",   0, MCB, CMD(CmdCharacterShowAxis),   FL_MENU_RADIO },
          { 0 },
+	{ "&pawns", 0, 0, 0, FL_SUBMENU },
+         { "&no pawns shown", 0, MCB, CMD(CmdNoPawns), FL_MENU_RADIO },
+         { "&show pawns as spheres", 0, MCB, CMD(CmdPawnShowAsSpheres),   FL_MENU_RADIO },
+         { 0 },
     { "p&references", 0, 0, 0, FL_SUBMENU },
          { "&axis",         0, MCB, CMD(CmdAxis),        FL_MENU_TOGGLE },
          { "b&ounding box", 0, MCB, CMD(CmdBoundingBox), FL_MENU_TOGGLE },
@@ -214,7 +218,8 @@ class FltkViewerData
  { public :
    SrSn*  root;              // contains the user scene
    FltkViewer::RenderMode rendermode; // render mode
-   FltkViewer::CharacterMode charactermode; // render mode
+   FltkViewer::CharacterMode charactermode; // character mode
+   FltkViewer::PawnMode pawnmode; // pawn mode
    FltkViewer::ShadowMode shadowmode;     // shadow mode
    FltkViewer::terrainMode terrainMode;     // terrain mode
    FltkViewer::EyeBeamMode eyeBeamMode;     // eye beam mode
@@ -287,6 +292,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->root = new SrSnGroup; // we maintain root pointer always valid
    _data->rendermode = ModeAsIs;
    _data->charactermode = ModeShowGeometry;
+   _data->pawnmode = ModePawnShowAsSpheres;
    _data->shadowmode = ModeNoShadows;
    _data->terrainMode = ModeTerrain;
    _data->eyeBeamMode = ModeNoEyeBeams;
@@ -521,6 +527,10 @@ void FltkViewer::menu_cmd ( MenuCmd s )
 						_data->showaxis = true;
 						applyToCharacter = true;
 						break;
+	  case CmdNoPawns : _data->pawnmode = ModeNoPawns;
+                       break;
+	  case CmdPawnShowAsSpheres  : _data->pawnmode = ModePawnShowAsSpheres;             
+                       break;
     }
 	
 	if (applyToCharacter)
@@ -943,6 +953,7 @@ void FltkViewer::draw()
 	drawEyeBeams();
 	drawDynamics();
 	drawLocomotion();
+	drawPawns();
 
 	_data->fcounter.stop();
 
@@ -1807,6 +1818,47 @@ void FltkViewer::drawEyeBeams()
 		}
 		character = character_map.next();
 	}
+
+}
+
+void FltkViewer::drawPawns()
+{
+	if (_data->pawnmode == ModeNoPawns)
+		return;
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	srHashMap<SbmPawn>& pawn_map = mcu.pawn_map;
+	pawn_map.reset();
+	SbmPawn* pawn = pawn_map.next();
+
+	glPushAttrib(GL_LIGHTING_BIT);
+	glDisable(GL_LIGHTING);
+	while ( pawn )
+	{
+		if (!pawn->skeleton_p)
+			continue;
+		pawn->skeleton_p->update_global_matrices();
+		SrArray<SkJoint*>& joints = pawn->skeleton_p->get_joint_array();
+		
+		
+		glColor3f(1.0f, 1.0f, 0.0f);
+		SrMat gmat = joints[0]->gmat();
+		
+		glPushMatrix();
+		glMultMatrixf((const float*) gmat);
+		glColor3f(1.0, 0.0, 0.0);
+		SrSnSphere sphere;
+		glPushMatrix();
+		sphere.shape().center = SrPnt(0, 0, 0);
+		sphere.shape().radius = 1.0f;
+		SrGlRenderFuncs::render_sphere(&sphere);
+		glEnd();
+		glPopMatrix();
+		glPopMatrix();
+	
+		pawn = pawn_map.next();
+	}
+	glPopAttrib();
 
 }
 
