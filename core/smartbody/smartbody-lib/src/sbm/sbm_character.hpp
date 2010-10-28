@@ -187,7 +187,7 @@ public:
 	BoneBusCharacter * bonebusCharacter;
 	
 	int set_viseme( char* viseme, float weight , double start_time, float rampin_duration, float* curve_info, int numKeys );
-	void bonebus_viseme_update(double curTime);
+	void reset_viseme_bonebus(double curTime);
 
 	bool   eye_blink_closed;
 	double eye_blink_last_time;

@@ -102,6 +102,8 @@ public:
 	virtual int prune_controller_tree();  // removes unused or overwritten controllers
 	virtual void remove_from_scene();
 
+	void reset_all_channels();
+
 	const SkJoint* get_joint( const char* joint_name ) const;
 	const SkJoint* get_world_offset_joint() const
 	{	return get_joint( WORLD_OFFSET_JOINT_NAME ); }
