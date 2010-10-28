@@ -265,7 +265,7 @@ proc int skmCountJoints( string $jname, string $joints[] )
 
    // Get children of $jname
    string $children[];
-   $children = `listRelatives $jname`;
+   $children = `listRelatives -children $jname`;
    int $nchildren = `size $children`;
 
    // Make sure $jname is a joint
@@ -469,21 +469,59 @@ proc skmWriteKeyData( int $fileid, int $frame, string $jointName, int $jid, stri
 }
 
 
+// This is where the joint name(s) and their translation channels are written
 proc skmCheckAndWrite( int $fileid, string $names[], string $type, string $joint, string $skmtype )
 {
+	//Variables
+	string $Tokens[] ;
+
+	//Proc
+	int $id = skmSearchType( $names, $type );
+	if ( $id >= 0 ) {
+		//print ("$joint: " + $joint + "\n") ;
+		//print ("$skmtype: " + $joint + "\n") ;
+		
+		//remove any Maya namespace if it exists
+		tokenize $joint ":" $Tokens ;
+		$joint =  $Tokens[((size ($Tokens))-1)] ;
+		
+		
+		fprint $fileid ( $joint + $skmtype );
+	}
+
+	// Original //
+	/*
    int $id = skmSearchType( $names, $type );
    if ( $id >= 0 )
       fprint $fileid ( $joint + $skmtype );
+	 */
 }
 
 
+// This is where the joint name(s) and their quaternion channels are written
 proc skmCheckAndWriteQuat( int $fileid, string $names[], string $joint )
 {
+	string $Tokens[] ;
+   int $idx = skmSearchType( $names, "rotateX" );
+   int $idy = skmSearchType( $names, "rotateY" );
+   int $idz = skmSearchType( $names, "rotateZ" );
+	if ( $idx >= 0 || $idy >= 0 || $idz >= 0 ) {
+		
+		//remove any Maya namespace if it exists
+		tokenize $joint ":" $Tokens ;
+		$joint =  $Tokens[((size ($Tokens))-1)] ;
+		
+		fprint $fileid ( $joint + " Quat\n" );
+	}
+
+	// Original //
+	/*
    int $idx = skmSearchType( $names, "rotateX" );
    int $idy = skmSearchType( $names, "rotateY" );
    int $idz = skmSearchType( $names, "rotateZ" );
    if ( $idx >= 0 || $idy >= 0 || $idz >= 0 )
       fprint $fileid ( $joint + " Quat\n" );
+	*/
 }
 
 
@@ -530,14 +568,16 @@ proc skmWriteSkm( int $startFrame, int $endFrame, string $joints[], int $fileid,
          int $channelAttributePosY = 0;
          int $channelAttributePosZ = 0;
          int $channelAttributeQuat = 0;
-
+		 
+		 //see if channel attributes exist & if so get their value
          if ( `objExists ( $joints[ $i ] + ".SbodyPosX" )` )  $channelAttributePosX = `getAttr ( $joints[ $i ] + ".SbodyPosX" )`;
          if ( `objExists ( $joints[ $i ] + ".SbodyPosY" )` )  $channelAttributePosY = `getAttr ( $joints[ $i ] + ".SbodyPosY" )`;
          if ( `objExists ( $joints[ $i ] + ".SbodyPosZ" )` )  $channelAttributePosZ = `getAttr ( $joints[ $i ] + ".SbodyPosZ" )`;
          if ( `objExists ( $joints[ $i ] + ".SbodyQuat" )` )  $channelAttributeQuat = `getAttr ( $joints[ $i ] + ".SbodyQuat" )`;
 
+		 //if channel attributes are on/checked then write the channel
          if ( $channelAttributePosX )  skmCheckAndWrite( $fileid, $names, "translateX", $joints[ $i ], " XPos\n" );
-         if ( $channelAttributePosY )  skmCheckAndWrite( $fileid, $names, "translateY", $joints[ $i ], " YPos\n" );
+		 if ( $channelAttributePosY )  skmCheckAndWrite( $fileid, $names, "translateY", $joints[ $i ], " YPos\n" );
          if ( $channelAttributePosZ )  skmCheckAndWrite( $fileid, $names, "translateZ", $joints[ $i ], " ZPos\n" );
          if ( $channelAttributeQuat )  skmCheckAndWriteQuat( $fileid, $names, $joints[ $i ] );
       }
@@ -606,13 +646,12 @@ global proc int skmExportFile( string $fname, string $animDef )
    // Main entry point for exporting a single .skm
    // This function allows you to override the filename in the animDef.  If you don't need this, call skmExport().
    // If you wish to export all .skm's defined, call skmExportAll()
-
+	print( "Running: proc: skmExportFile( $fname=" + $fname + ", $animDef=" + $animDef + "\n" );
+   
+   //Variables
    string $UnitsLinear = `currentUnit -q -linear` ;
 
    global string $skmVersion;
-
-   print( "skmExport() - $fname=" + $fname + " $animDef=" + $animDef + "\n" );
-
    global int $curJointsId = 0; // start filling at position 0 (root is at pos 0)
    global int $isFacial;
 
@@ -653,7 +692,9 @@ global proc int skmExportFile( string $fname, string $animDef )
 
 
       string $joints[];  // array to be filled with all joints names
-      int $njoints = skmCountJoints( $selectionList[ $j ], $joints );
+      
+	  //Print message indicating number of joints found
+	  int $njoints = skmCountJoints( $selectionList[ $j ], $joints );
 
       print( $njoints + " joints found (" );
       for ( $joint = 0; $joint < $njoints; $joint++ )
@@ -665,7 +706,7 @@ global proc int skmExportFile( string $fname, string $animDef )
          }
          print ( $joints[ $joint ] + ", " );
       }
-      //print $joints;
+
 
       // Give Error if NO key attributes found, which means the animation is not properly baked or maybe anim layer problem
       if ( $njoints == 0 )
@@ -726,6 +767,10 @@ global proc int skmExportFile( string $fname, string $animDef )
       int $fps =        `getAttr( $animDef + ".framesPerSecond" )`;
 
       skmWriteSkm( $startFrame, $endFrame, $joints, $fileid, $fps, $animDef );
+	  
+	  print "Size of joint list: "  ;
+	  print `size $joints` ;
+	  print "\n" ;
 
 
       //grab synch point values
@@ -769,6 +814,7 @@ global proc skmExport( string $animDef )
    // Main entry point for exporting a single .skm
    // If you wish to define your own output filename, call skmExportFile().
    // If you wish to export all .skm's defined, call skmExportAll()
+	print ("Running: proc: skmExport( $animDef=" + $animDef + " ) \n") ;
 
    string $file = `getAttr( $animDef + ".outputFile" )`;
   
@@ -800,8 +846,12 @@ global proc skmExportAll()
    // Main entry point for exporting .skm files
    // This function will export all .skm's defined in this file
    // If you wish to export a single .skm, use skmExport() above.
-
+	print "Running: global proc: skmExportAll() \n" ;
+   
    global int $partialExportToggle;
+   string $root ;
+   string $AllRoots[] ;
+   string $AllPeRoots[] ;
 
 
    select -hi SmartbodyExportOptions;
@@ -814,17 +864,42 @@ global proc skmExportAll()
       }
 
 
-      string $root = `getAttr( $animDef + ".skeletonRoot" )`;
+		//search scene for object named $root
+		$root = `getAttr( $animDef + ".skeletonRoot" )`;
+		$AllRoots = `SbmGetAllNamed( $root )` ;
+		if (`size $AllRoots` > 1) {
+			error ("More than one object found named: " + $root + "\n") ;
+		}
+		if (`size $AllRoots` < 0) {
+			error ("No object found named: " + $root + "\n") ;
+		}
+		else {
+			$root = $AllRoots[0] ;
+		}
+		
+		//original
+		//$root = `getAttr( $animDef + ".skeletonRoot" )`;
 
-      if ( $partialExportToggle == 0 )
-      {
-         string $peRootName = `getAttr ( $animDef + ".partialExportRoot" )` ;
-         select -r $peRootName;
-      }
-      else
-      {
-         select -r $root ;   // <-Why select this?
-      }
+		if ( $partialExportToggle == 0 )
+		{
+			string $peRootName = `getAttr ( $animDef + ".partialExportRoot" )` ;
+			 
+			$AllPeRoots = `SbmGetAllNamed( $peRootName )` ;
+			if (`size $AllPeRoots` > 1) {
+				error ("More than one object found named: " + $root + "\n") ;
+			}
+			if (`size $AllPeRoots` < 0) {
+				error ("No object found named: " + $root + "\n") ;
+			}
+			else { 
+				$peRootName = $AllPeRoots[0] ;
+				select -r $peRootName;
+			}
+		}
+		else
+		{
+			select -r $root ;   // <-Why select this?
+		}
 
       skmExport( $animDef );
    }
