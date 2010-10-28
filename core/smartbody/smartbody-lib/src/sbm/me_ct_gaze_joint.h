@@ -67,9 +67,12 @@ class MeCtGazeJoint	{
 		
 		vector_t	world_pos;
 		quat_t		world_rot;
-	quat_t		prev_world_rot; // to measure absolute speed of head
-	float t_elapse;
+		quat_t		prev_world_rot; // to measure absolute speed of head
+		float t_elapse;
 	
+		vector_t	parent_loc_pos; // local coord of immediate parent joint
+		quat_t		parent_loc_rot;
+
 		vector_t	parent_pos; // world coord of immediate parent joint
 		quat_t		parent_rot;
 
