@@ -486,9 +486,9 @@ void SbmCharacter::reset_viseme_channels()
 	for (int c = viseme_channel_start_pos; c < viseme_channel_end_pos; c++)
 	{
 		SkChannel& chan = channels[c];
-		std::string jointName = std::string(channels.name(c).get_string());
 		int buffIndex = ct_tree_p->toBufferIndex(c);
-		frameData.buffer()[buffIndex] = 0;
+		if( buffIndex > -1 )	
+			frameData.buffer()[buffIndex] = 0;
 	}
 }
 
@@ -1098,7 +1098,7 @@ const std::string& SbmCharacter::get_voice_code() const
 	return voice_code; //if voice isn't NULL-- no error message; just returns the string
 }
 
-void SbmCharacter::bonebus_viseme_update(double curTime)
+void SbmCharacter::reset_viseme_bonebus(double curTime)
 {
 	std::map<std::string, MeSpline1D*>::iterator curveIter;
 	for (curveIter = visemeCurve.begin(); curveIter != visemeCurve.end(); curveIter++)

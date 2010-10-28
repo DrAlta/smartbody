@@ -184,6 +184,34 @@ int SbmPawn::init_skeleton() {
 	return( CMD_SUCCESS ); 
 }
 
+void SbmPawn::reset_all_channels()
+{
+	SkChannelArray& channels = skeleton_p->channels();
+	MeFrameData& frameData = ct_tree_p->getLastFrame();
+	SrBuffer<float> sr_fbuff = frameData.buffer();
+	int n = channels.size();
+	for (int c = 0; c < n; c++)
+	{
+		SkChannel& chan = channels[c];
+		int buffIndex = ct_tree_p->toBufferIndex(c);
+		if( buffIndex > -1 )	
+		{
+			// Assume only have Quat or X/Y/Z
+			if (chan.type == SkChannel::Quat)
+			{
+				sr_fbuff[ buffIndex + 0 ] = 1.0f;
+				sr_fbuff[ buffIndex + 1 ] = 0.0f;
+				sr_fbuff[ buffIndex + 2 ] = 0.0f;
+				sr_fbuff[ buffIndex + 3 ] = 0.0f;			
+			}
+			else
+			{
+				sr_fbuff[ buffIndex ] = 0.0f;
+			}
+		}
+	}
+}
+
 void SbmPawn::init_world_offset_channels() {
 	if( WORLD_OFFSET_CHANNELS_P.size()==0 ) {
 		SkJointName world_offset_joint_name( WORLD_OFFSET_JOINT_NAME );
