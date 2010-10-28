@@ -30,11 +30,21 @@
 //#define DFL_GAZE_HEAD_SPEED 180.0
 //#define DFL_GAZE_EYE_SPEED  1000.0
 
-// Default Values per Gaze Key:                      LUMBAR,   THORAX, CERVICAL, CRANIAL,  OPTICAL
-float MeCtGaze::DEFAULT_LIMIT_PITCH_UP[]   = { 15.0,     6.0,    25.0,     20.0,     35.0    };
-float MeCtGaze::DEFAULT_LIMIT_PITCH_DOWN[] = { -15.0,    -6.0,   -25.0,    -20.0,    -35.0   };
+#if GAZE_KEY_COMBINE_HEAD_AND_NECK
+
+// Default Values per Gaze Key:                LUMBAR,   THORAX, CERVICAL, OPTICAL
+float MeCtGaze::DEFAULT_LIMIT_PITCH_UP[]   = { -15.0,    -6.0,   -45.0,    -35.0    };
+float MeCtGaze::DEFAULT_LIMIT_PITCH_DOWN[] = { 15.0,     6.0,    45.0,     35.0   };
+float MeCtGaze::DEFAULT_LIMIT_HEADING[]    = { 30.0,     15.0,   90.0,     40.0    };
+float MeCtGaze::DEFAULT_LIMIT_ROLL[]       = { 10.0,     5.0,    35.0,     0.0     };
+#else
+
+// Default Values per Gaze Key:                LUMBAR,   THORAX, CERVICAL, CRANIAL,  OPTICAL
+float MeCtGaze::DEFAULT_LIMIT_PITCH_UP[]   = { -15.0,    -6.0,   -25.0,    -20.0,    -35.0    };
+float MeCtGaze::DEFAULT_LIMIT_PITCH_DOWN[] = { 15.0,     6.0,    25.0,     20.0,     35.0   };
 float MeCtGaze::DEFAULT_LIMIT_HEADING[]    = { 30.0,     15.0,   60.0,     45.0,     40.0    };
 float MeCtGaze::DEFAULT_LIMIT_ROLL[]       = { 10.0,     5.0,    20.0,     15.0,     0.0     };
+#endif
 
 // Defaults for the Old APIs
 // History of Values:
@@ -54,11 +64,11 @@ float MeCtGaze::DEFAULT_LIMIT_ROLL[]       = { 10.0,     5.0,    20.0,     15.0,
 //     Speed     (head, eyes, default eyes arg): 360, 10000, 10000
 //     Smoothing (back, neck, eyes): 0.8, 0.8, 0.1
 
-const float MeCtGaze::DEFAULT_SPEED_HEAD         = 2500;
-const float MeCtGaze::DEFAULT_SPEED_EYES         = 10000.0;
+const float MeCtGaze::DEFAULT_SPEED_HEAD         = 1000.0f;
+const float MeCtGaze::DEFAULT_SPEED_EYES         = 1000.0f;
 
-const float MeCtGaze::DEFAULT_SMOOTHING_LUMBAR   = 0.8f; 
-const float MeCtGaze::DEFAULT_SMOOTHING_CERVICAL = 0.8f;
+const float MeCtGaze::DEFAULT_SMOOTHING_LUMBAR   = 0.6f;
+const float MeCtGaze::DEFAULT_SMOOTHING_CERVICAL = 0.5f;
 const float MeCtGaze::DEFAULT_SMOOTHING_EYEBALL  = 0.0f;
 
 #if TEST_SENSOR
@@ -485,9 +495,9 @@ LOG( "CALC: joint: %s\n", joint_label( priority_joint ) );
 */
 		
 		vector_t biased_offset_joint_fwd = 
-		
 //		vector_t tgt_dir = ( w_tgt_pos - world_pos ).normalize();
 		joint_arr[ priority_joint ].forward_pos;
+		
 		vector_t tgt_dir = ( w_tgt_pos - w_joint_pos ).normalize();
 
 //		vector_t fwd_dir = w_joint_rot * vector_t( 0.0, 0.0, 1.0 );
@@ -530,26 +540,27 @@ void MeCtGaze::set_time_hint( float head_sec )	{
 
 /////////////////////////////////////////////////////////////////////////////
 
-void MeCtGaze::inspect_skeleton( SkJoint* joint_p, int depth )	{
-	int i, j, n;
+void MeCtGaze::inspect_skeleton_down( SkJoint* joint_p, int depth )	{
 	
 	if( joint_p )	{
 		const char *name = joint_p->name();
-		for( j=0; j<depth; j++ ) { LOG( " " ); }
-		LOG( "%s\n", name );
+		char indent[ 256 ];
+		int c, i, n;
+		for( c=0; c<depth; c++ ) { indent[ c ] = ' '; }
+		LOG( "%s%s\n", indent, name );
 		n = joint_p->num_children();
 		for( i=0; i<n; i++ )	{
-			inspect_skeleton( joint_p->child( i ), depth + 1 );
+			inspect_skeleton_down( joint_p->child( i ), depth + 1 );
 		}
 	}
 }
 
-void MeCtGaze::inspect_skeleton_local_transform( SkJoint* joint_p, int depth )	{
+void MeCtGaze::inspect_skeleton_local_transform_down( SkJoint* joint_p, int depth )	{
 	
 	if( joint_p )	{
 		const char *name = joint_p->name();
 		matrix_t M;
-		int i, j;
+		int i, j, c;
 
 		SrMat sr_M = joint_p->lmat();
 		for( i=0; i<4; i++ )	{
@@ -560,26 +571,28 @@ void MeCtGaze::inspect_skeleton_local_transform( SkJoint* joint_p, int depth )	{
 		vector_t pos = M.translation( GWIZ_M_TR );
 		euler_t rot = M.euler( GWIZ_M_TR );
 
-		for( j=0; j<depth; j++ ) { LOG( " " ); }
-		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
-			name,
+		char indent[ 256 ];
+		for( c=0; c<depth; c++ ) { indent[ c ] = ' '; }
+		indent[ c ] = 0;
+		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }", 
+			indent, name,
 			pos.x(), pos.y(), pos.z(),
 			rot.p(), rot.h(), rot.r()
 		);
 
 		int n = joint_p->num_children();
 		for( i=0; i<n; i++ )	{
-			inspect_skeleton_local_transform( joint_p->child( i ), depth + 1 );
+			inspect_skeleton_local_transform_down( joint_p->child( i ), depth + 1 );
 		}
 	}
 }
 
-void MeCtGaze::inspect_skeleton_world_transform( SkJoint* joint_p, int depth )	{
+void MeCtGaze::inspect_skeleton_world_transform_down( SkJoint* joint_p, int depth )	{
 	
 	if( joint_p )	{
 		const char *name = joint_p->name();
 		matrix_t M;
-		int i, j;
+		int i, j, c;
 
 		joint_p->update_gmat_up();
 		SrMat sr_M = joint_p->gmat();
@@ -591,17 +604,48 @@ void MeCtGaze::inspect_skeleton_world_transform( SkJoint* joint_p, int depth )	{
 		vector_t pos = M.translation( GWIZ_M_TR );
 		euler_t rot = M.euler( GWIZ_M_TR );
 
-		for( j=0; j<depth; j++ ) { LOG( " " ); }
-		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
-			name,
+		char indent[ 256 ];
+		for( c=0; c<depth; c++ ) { indent[ c ] = ' '; }
+		indent[ c ] = 0;
+		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }", 
+			indent, name,
 			pos.x(), pos.y(), pos.z(),
 			rot.p(), rot.h(), rot.r()
 		);
 		
 		int n = joint_p->num_children();
 		for( i=0; i<n; i++ )	{
-			inspect_skeleton_world_transform( joint_p->child( i ), depth + 1 );
+			inspect_skeleton_world_transform_down( joint_p->child( i ), depth + 1 );
 		}
+	}
+}
+
+void MeCtGaze::inspect_skeleton_local_transform_up( SkJoint* joint_p, int depth )	{
+	
+	if( joint_p )	{
+		const char *name = joint_p->name();
+		matrix_t M;
+		int i, j, c;
+
+		SrMat sr_M = joint_p->lmat();
+		for( i=0; i<4; i++ )	{
+			for( j=0; j<4; j++ )	{
+				M.set( i, j, sr_M.get( i, j ) );
+			}
+		}
+		vector_t pos = M.translation( GWIZ_M_TR );
+		euler_t rot = M.euler( GWIZ_M_TR );
+
+		char indent[ 256 ];
+		for( c=0; c<depth; c++ ) { indent[ c ] = ' '; }
+		indent[ c ] = 0;
+		LOG( "%s%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }", 
+			indent, name,
+			pos.x(), pos.y(), pos.z(),
+			rot.p(), rot.h(), rot.r()
+		);
+
+		inspect_skeleton_local_transform_up( joint_p->parent(), depth + 1 );
 	}
 }
 
@@ -637,17 +681,24 @@ void MeCtGaze::update_skeleton_gmat( void )	{
 	}
 }
 
+#if 0
 void MeCtGaze::load_forward_pos( void ) {
 
 	vector_t world_mid_eye_pos = 
 		joint_arr[ GAZE_JOINT_EYE_L ].world_pos.lerp( 
 			0.5, joint_arr[ GAZE_JOINT_EYE_R ].world_pos 
 		) +
-		vector_t( 0.0, 0.0, 5.0 );
+		vector_t( 0.0, 0.0, 5.0 ); // NOTE: PRESUMES 5CM SCALE...
+
+	printf( "eyes:\n" );
+	world_mid_eye_pos.print();
 
 	joint_arr[ GAZE_JOINT_SPINE1 ].forward_pos =
 		world_mid_eye_pos - joint_arr[ GAZE_JOINT_SPINE1 ].world_pos;
-		
+	
+	printf( "spine1:\n" );
+	joint_arr[ GAZE_JOINT_SPINE1 ].forward_pos.print();
+
 	joint_arr[ GAZE_JOINT_SPINE2 ].forward_pos =
 		world_mid_eye_pos - joint_arr[ GAZE_JOINT_SPINE2 ].world_pos;
 		
@@ -663,6 +714,49 @@ void MeCtGaze::load_forward_pos( void ) {
 	joint_arr[ GAZE_JOINT_SKULL ].forward_pos =
 		world_mid_eye_pos - joint_arr[ GAZE_JOINT_SKULL ].world_pos;
 }
+#else
+
+void MeCtGaze::load_forward_pos( void ) {
+
+#if 0
+printf( "eye: %f\n", joint_arr[ GAZE_JOINT_EYE_L ].local_pos.y() );
+printf( "eye-p: %f\n", joint_arr[ GAZE_JOINT_EYE_L ].parent_loc_pos.y() );
+printf( "skull: %f\n", joint_arr[ GAZE_JOINT_SKULL ].local_pos.y() );
+printf( "s5: %f\n", joint_arr[ GAZE_JOINT_SPINE5 ].local_pos.y() );
+printf( "s4: %f\n", joint_arr[ GAZE_JOINT_SPINE4 ].local_pos.y() );
+printf( "s3: %f\n", joint_arr[ GAZE_JOINT_SPINE3 ].local_pos.y() );
+printf( "s2: %f\n", joint_arr[ GAZE_JOINT_SPINE2 ].local_pos.y() );
+printf( "s1: %f\n", joint_arr[ GAZE_JOINT_SPINE1 ].local_pos.y() );
+#endif
+
+	gw_float_t interocular = 
+		joint_arr[ GAZE_JOINT_EYE_L ].local_pos.x() - 
+		joint_arr[ GAZE_JOINT_EYE_R ].local_pos.x();
+		
+	gw_float_t height;
+	
+	height = 
+		joint_arr[ GAZE_JOINT_EYE_L ].local_pos.y() +
+		joint_arr[ GAZE_JOINT_EYE_L ].parent_loc_pos.y();
+	joint_arr[ GAZE_JOINT_SKULL ].forward_pos = vector_t( 0.0, height, interocular );
+	
+	height += joint_arr[ GAZE_JOINT_SKULL ].local_pos.y();
+	joint_arr[ GAZE_JOINT_SPINE5 ].forward_pos = vector_t( 0.0, height, interocular );
+
+	height += joint_arr[ GAZE_JOINT_SPINE5 ].local_pos.y();
+	joint_arr[ GAZE_JOINT_SPINE4 ].forward_pos = vector_t( 0.0, height, interocular );
+	
+	height += joint_arr[ GAZE_JOINT_SPINE4 ].local_pos.y();
+	joint_arr[ GAZE_JOINT_SPINE3 ].forward_pos = vector_t( 0.0, height, interocular );
+	
+	height += joint_arr[ GAZE_JOINT_SPINE3 ].local_pos.y();
+	joint_arr[ GAZE_JOINT_SPINE2 ].forward_pos = vector_t( 0.0, height, interocular );
+	
+	height += joint_arr[ GAZE_JOINT_SPINE2 ].local_pos.y();
+	joint_arr[ GAZE_JOINT_SPINE1 ].forward_pos = vector_t( 0.0, height, interocular );
+}
+
+#endif
 
 #if 0
 SkJoint* MeCtGaze::get_joint( char *joint_str, SkJoint *joint_p )	{
@@ -809,12 +903,14 @@ void MeCtGaze::controller_start_evaluate( void )	{
 		
 		int context_index = _toContextCh[ i ];
 		if( context_index < 0 ) {
-			fprintf( stderr, "MeCtGaze::controller_start ERR: joint idx:%d NOT FOUND in skeleton\n", i );
+			joint_arr[ i ].active = 0;
+			fprintf( stderr, "MeCtGaze:: ERR: '%s' NOT FOUND in skeleton\n", joint_label( i ) );
 		} 
 		else {
 			SkJoint* joint_p = _context->channels().joint( context_index );
 			if( !joint_p )	{
-				fprintf( stderr, "MeCtGaze::controller_start ERR: joint context-idx:%d NOT FOUND in skeleton\n", context_index );
+				joint_arr[ i ].active = 0;
+				fprintf( stderr, "MeCtGaze:: ERR: joint( %d ): '%s' NOT FOUND in skeleton\n", context_index, joint_label( i ) );
 			} 
 			else {
 				joint_arr[ i ].init( joint_p );
@@ -973,44 +1069,7 @@ bool MeCtGaze::update_fading( float dt )	{
 
 bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 	
-#if 0
-	if( !started )	{
-		LOG( "MeCtGaze::controller_evaluate ERR: not started for this: 0x%x\n", this );
-	}
-	else	{
-		LOG( "MeCtGaze::controller_evaluate OK: started for this: 0x%x\n", this );
-	}
-#endif
-	
-#if 0
-	static int once = 1;
-	if( once )	{
-		once = 0;
-
-#if ENABLE_FORWARD_RAY_TEST
-		test_forward_ray();
-#endif
-#if 0
-		LOG( "-- skeleton:\n" );
-		if( skeleton_ref_p )	{
-			SkJoint* joint_p = skeleton_ref_p->search_joint( SbmPawn::WORLD_OFFSET_JOINT_NAME );
-			inspect_skeleton( joint_p );
-//			inspect_skeleton_local_transform( joint_p );
-//			inspect_skeleton_world_transform( joint_p );
-		}
-		LOG( "--\n" );
-#endif
-	}
-#endif
-	
-	if( _duration > 0.0 )	{
-		if( t > (double)_duration )	{
-			return( FALSE );
-		}
-	}
-	
 	float dt;
-//	LOG("EVALUATE ON %s WITH START AT %d", this->name(), this->getStart());
 	if( getStart() ) {
 		setStart(0);
 		dt = 0.001f;
@@ -1020,6 +1079,35 @@ bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 		dt = (float)(t - prev_time);
 	}
 	prev_time = t;
+	
+#if 0
+	static int once = 1;
+	if( once )	{
+		once = 0;
+
+//		test_forward_ray();
+#if 0
+		LOG( "-- skeleton:" );
+		if( skeleton_ref_p )	{
+
+//			SkJoint* joint_p = skeleton_ref_p->search_joint( SbmPawn::WORLD_OFFSET_JOINT_NAME );
+//			inspect_skeleton_down( joint_p );
+//			inspect_skeleton_local_transform_down( joint_p );
+//			inspect_skeleton_world_transform_down( joint_p );
+
+			SkJoint* joint_p = skeleton_ref_p->search_joint( "eyeball_left" );
+			inspect_skeleton_local_transform_up( joint_p );
+		}
+		LOG( "--" );
+#endif
+	}
+#endif
+	
+	if( _duration > 0.0 )	{
+		if( t > (double)_duration )	{
+			return( FALSE );
+		}
+	}
 
 	if( update_fading( dt ) )	{
 		return( TRUE );
@@ -1056,6 +1144,15 @@ bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 	else	{
 		
 	}
+#endif
+
+#if 0
+printf( "eyelim: %f %f %f %f\n", 
+	joint_key_arr[ GAZE_KEY_EYES ].limit_p_up,
+	joint_key_arr[ GAZE_KEY_EYES ].limit_p_dn,
+	joint_key_arr[ GAZE_KEY_EYES ].limit_h,
+	joint_key_arr[ GAZE_KEY_EYES ].limit_r
+);
 #endif
 
 	SrBuffer<float>& buff = frame.buffer();

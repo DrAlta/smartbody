@@ -375,9 +375,13 @@ class MeCtGaze : public MeController	{
 
 		bool 		update_fading( float dt );
 		
-		void		inspect_skeleton( SkJoint* joint_p, int depth = 0 );
-		void		inspect_skeleton_local_transform( SkJoint* joint_p, int depth = 0 );
-		void		inspect_skeleton_world_transform( SkJoint* joint_p, int depth = 0 );
+		void		inspect_skeleton_down( SkJoint* joint_p, int depth = 0 );
+		void		inspect_skeleton_local_transform_down( SkJoint* joint_p, int depth = 0 );
+		void		inspect_skeleton_world_transform_down( SkJoint* joint_p, int depth = 0 );
+
+//		void		inspect_skeleton_up( SkJoint* joint_p, int depth = 0 );
+		void		inspect_skeleton_local_transform_up( SkJoint* joint_p, int depth = 0 );
+//		void		inspect_skeleton_world_transform_up( SkJoint* joint_p, int depth = 0 );
 
 		void		update_skeleton_gmat( void );
 		void		load_forward_pos( void );

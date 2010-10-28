@@ -126,6 +126,15 @@ void MeCtGazeJoint::capture_joint_state( void ) {
 		SkJoint* parent_p = joint_p->parent();
 		if( parent_p )	{
 
+			sr_M = parent_p->lmat();
+			for( i=0; i<4; i++ )	{
+				for( j=0; j<4; j++ )	{
+					M.set( i, j, sr_M.get( i, j ) );
+				}
+			}
+			parent_loc_pos = M.translation( GWIZ_M_TR );
+			parent_loc_rot = M.quat( GWIZ_M_TR );
+
 			sr_M = parent_p->gmat();
 			for( i=0; i<4; i++ )	{
 				for( j=0; j<4; j++ )	{
