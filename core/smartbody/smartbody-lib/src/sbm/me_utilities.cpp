@@ -163,12 +163,8 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 		SrString fullin_string;
 		in.getall( fullin_string );
 		SrInput fullin( (const char *)fullin_string );
-		fullin.filename( pathname.string().c_str() ); // copy filename for error messages
-		if (pathname.string() == "../../../../data/sbm-common/common-sk/motion/Asalah.skm")
-		{
-			int x = 10;
-		}
-
+		fullin.filename( pathname.string().c_str() ); // copy filename for error message
+		
 		if( motion->load( fullin, scale ) ) {
 
 			// register the motion
@@ -215,7 +211,9 @@ int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture
 		return CMD_FAILURE;
 	}
 
+
 	if( is_directory( pathname ) ) {
+		
 		directory_iterator end;
 		for( directory_iterator i( pathname ); i!=end; ++i ) {
 			const path& cur = *i;

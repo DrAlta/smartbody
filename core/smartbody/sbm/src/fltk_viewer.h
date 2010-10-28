@@ -73,6 +73,10 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
                       ModeShowAxis
                     };
 
+	enum PawnMode {	  ModeNoPawns,
+                      ModePawnShowAsSpheres,
+                    };
+
 	enum terrainMode { ModeNoTerrain,
 					   ModeTerrainWireframe,
 					   ModeTerrain,
@@ -116,6 +120,8 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdCharacterShowDeformableGeometry,
 				   CmdCharacterShowBones,
 				   CmdCharacterShowAxis,
+				   CmdNoPawns,
+				   CmdPawnShowAsSpheres,
 				   CmdNoTerrain,
 				   CmdTerrainWireframe,
 				   CmdTerrain,
@@ -249,6 +255,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	void drawEyeBeams();
 	void drawDynamics();
 	void drawLocomotion();
+	void drawPawns();
 	void drawArrow(SrVec& from, SrVec& to, float width, SrVec& color);
 	void drawCircle(float cx, float cy, float cz, float r, int num_segments, SrVec& color);
 	void drawActiveArrow(SrVec& from, SrVec& to, int num, float width, SrVec& color, bool spin);
