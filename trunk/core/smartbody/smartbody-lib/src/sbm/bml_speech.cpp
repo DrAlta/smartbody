@@ -163,21 +163,50 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 
 	// request speech through Speech API
 	SmartBody::SpeechInterface* speech_impl = request->actor->get_speech_impl();
-	if( !speech_impl ) {
+	// get the backup speech
+	SmartBody::SpeechInterface* speech_impl_backup = request->actor->get_speech_impl_backup();
+	if( !speech_impl && speech_impl_backup ) {
+		speech_impl = speech_impl_backup;
+		speech_impl_backup = NULL;
+	}
+
+	SmartBody::SpeechInterface* cur_speech_impl = speech_impl;
+	SmartBody::SpeechInterface* cur_speech_impl_backup = speech_impl_backup;
+
+	if (!cur_speech_impl) {
 		ostringstream oss;
 		oss << "No voice defined for actor \""<<request->actorId<<"\".  Cannot perform behavior \""<<unique_id<<"\".";
 		throw BML::ParsingException( oss.str().c_str() );
 	}
 
+	
+
 	// Before speech implementation, check if it's audio implementation, if yes, set the viseme mode
-	AudioFileSpeech* audioSpeechImpl = dynamic_cast<AudioFileSpeech*>(speech_impl);
+	AudioFileSpeech* audioSpeechImpl = dynamic_cast<AudioFileSpeech*>(cur_speech_impl);
 	if (audioSpeechImpl)
 	{	
 		bool visemeMode = request->actor->is_viseme_curve();
 		audioSpeechImpl->setVisemeMode(visemeMode);
 	}
+	AudioFileSpeech* audioSpeechImplBackup = dynamic_cast<AudioFileSpeech*>(cur_speech_impl_backup);
+	if (audioSpeechImplBackup)
+	{	
+		bool visemeMode = request->actor->is_viseme_curve();
+		audioSpeechImplBackup->setVisemeMode(visemeMode);
+	}
+
 	// Found speech implementation.  Making request.
-	RequestId speech_request_id = speech_impl->requestSpeechAudio( request->actorId.c_str(), xml, "bp speech_ready " );
+	RequestId speech_request_id;
+	try {
+		speech_request_id = cur_speech_impl->requestSpeechAudio( request->actorId.c_str(), xml, "bp speech_ready " );
+	} catch (...) {
+		if (cur_speech_impl_backup) {
+			cur_speech_impl = cur_speech_impl_backup;
+			cur_speech_impl_backup = NULL;
+			speech_request_id = cur_speech_impl->requestSpeechAudio( request->actorId.c_str(), xml, "bp speech_ready " );
+		}
+		else throw;
+	}
 
 	// TODO: SyncPoints of a speech behavior should be grouped under a unique TriggerEvent,
 	//       rather the default start trigger.  The trigger identifies the additional processing
@@ -196,7 +225,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 //	createStandardSyncPoint( TM_RELAX,        behav_syncs.sp_relax );
 //	createStandardSyncPoint( TM_END,          behav_syncs.sp_end );
 
-	SpeechRequestPtr speechResult( new SpeechRequest( unique_id, localId, behav_syncs, speech_impl, speech_request_id, marks, request ) );
+	SpeechRequestPtr speechResult( new SpeechRequest( unique_id, localId, behav_syncs, cur_speech_impl, cur_speech_impl_backup, speech_request_id, marks, request ) );
 	return speechResult;
 
 }
@@ -208,12 +237,14 @@ BML::SpeechRequest::SpeechRequest(
 	const std::string& localId,
 	BehaviorSyncPoints& syncs_in,
 	SpeechInterface* speech_impl,
+	SpeechInterface* speech_impl_backup,
 	RequestId speech_request_id,
 	const vector<SpeechMark>& marks,
 	BmlRequestPtr request
 )
 :	SequenceRequest( unique_id, localId, syncs_in, 0, 0, 0, 0, 0 ),
 	speech_impl( speech_impl ),
+	speech_impl_backup( speech_impl_backup ),
 	speech_request_id( speech_request_id ),
 	trigger( behav_syncs.sync_start()->sync()->trigger.lock() )
 {
@@ -346,7 +377,12 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 
 	// Process Visemes
 	const vector<VisemeData*>* result_visemes = speech_impl->getVisemes( speech_request_id );
-	if( result_visemes ) {
+	if( !result_visemes ) {
+		if (speech_impl_backup) // run the backup speech server if available
+			result_visemes = speech_impl->getVisemes( speech_request_id );
+	}
+
+	if (result_visemes) {
 		visemes = *result_visemes;  // Copy contents
 
 		vector<VisemeData*>::iterator cur = visemes.begin();
@@ -374,6 +410,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 			last_viseme = v->time() + v->duration();
 		}
 	} else {
+
 		if( LOG_SPEECH )
 		{
 			std::stringstream strstr;
