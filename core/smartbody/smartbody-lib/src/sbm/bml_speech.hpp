@@ -60,6 +60,7 @@ namespace BML {
 		///////////////////////////////////////////////////////////////
 		// Data
 		SmartBody::SpeechInterface* speech_impl; // Dangerous.  Not yet reference counted
+		SmartBody::SpeechInterface* speech_impl_backup; // Dangerous.  Not yet reference counted
 		SmartBody::RequestId        speech_request_id;
 		std::string                 speech_error_msg;
 
@@ -84,6 +85,7 @@ namespace BML {
 			const std::string& localId,
 			BML::BehaviorSyncPoints& behav_syncs,
 			SmartBody::SpeechInterface* speech_impl,
+			SmartBody::SpeechInterface* speech_impl_backup,
 			SmartBody::RequestId speech_request_id,
 			const std::vector<SpeechMark>& marks,
 			BmlRequestPtr request
@@ -141,6 +143,12 @@ namespace BML {
 		* Returns the speech interface
 		*/
 		SmartBody::SpeechInterface* get_speech_interface() { return speech_impl; }
+
+		/**
+		* Returns the backup speech interface
+		*/
+		SmartBody::SpeechInterface* get_speech_interface_backup() { return speech_impl_backup; }
+
 
 		/**
 		* Returns the speech request id

@@ -59,6 +59,7 @@ using namespace std;
 
 // Predeclare private functions defined below
 static int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle *mcu_p );
+static int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle *mcu_p );
 static inline bool parse_float_or_error( float& var, const char* str, const string& var_name );
 
 
@@ -95,6 +96,7 @@ MeCtSchedulerClass* CreateSchedulerCt( const char* character_name, const char* s
 SbmCharacter::SbmCharacter( const char* character_name )
 :	SbmPawn( character_name ),
 	speech_impl( NULL ),
+	speech_impl_backup( NULL ),
 	posture_sched_p( CreateSchedulerCt( character_name, "posture" ) ),
 	motion_sched_p( CreateSchedulerCt( character_name, "motion" ) ),
 	gaze_sched_p( CreateSchedulerCt( character_name, "gaze" ) ),
@@ -1081,10 +1083,23 @@ int SbmCharacter::set_speech_impl( SmartBody::SpeechInterface *speech_impl ) {
 	return CMD_SUCCESS;
 }
 
+int SbmCharacter::set_speech_impl_backup( SmartBody::SpeechInterface *speech_impl ) {
+	this->speech_impl_backup = speech_impl;
+
+	return CMD_SUCCESS;
+}
+
+
 //returns speech implementation if set or NULL if not
 SmartBody::SpeechInterface* SbmCharacter::get_speech_impl() const {
 	return speech_impl;
 }
+
+//returns speech implementation if set or NULL if not
+SmartBody::SpeechInterface* SbmCharacter::get_speech_impl_backup() const {
+	return speech_impl_backup;
+}
+
 
 int SbmCharacter::set_voice_code( std::string& voice_code ) //allows you to set the voice-- made different from the init because of non Rhetoric might not have voice codes
 {
@@ -1093,9 +1108,22 @@ int SbmCharacter::set_voice_code( std::string& voice_code ) //allows you to set 
 	return (CMD_SUCCESS);
 }
 
+int SbmCharacter::set_voice_code_backup( std::string& voice_code ) //allows you to set the voice-- made different from the init because of non Rhetoric might not have voice codes
+{
+	//TODO: LOOK AND SEE IF THIS VOICE EXISTS AND IF IT DOESN'T PRINT ERROR MESSAGE AND RETURN FAILURE
+	this->voice_code_backup = voice_code; //sets voice 
+	return (CMD_SUCCESS);
+}
+
+
 const std::string& SbmCharacter::get_voice_code() const
 {
 	return voice_code; //if voice isn't NULL-- no error message; just returns the string
+}
+
+const std::string& SbmCharacter::get_voice_code_backup() const
+{
+	return voice_code_backup; //if voice isn't NULL-- no error message; just returns the string
 }
 
 void SbmCharacter::reset_viseme_bonebus(double curTime)
@@ -1884,6 +1912,8 @@ int SbmCharacter::set_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	//  voice_code and voice-code are backward compatible patches
 	if( attribute=="voice" || attribute=="voice_code" || attribute=="voice-code" ) {
 		return set_voice_cmd_func( character, args, mcu_p );
+	} else if( attribute == "voicebackup") {
+		return set_voicebackup_cmd_func( character, args, mcu_p );
 	} else {
 		return SbmPawn::set_attribute( character, attribute, args, mcu_p );
 	}
@@ -1929,6 +1959,53 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle 
 		string voice_path_str= "";
 		voice_path_str+=voice_path;
 		character->set_voice_code( voice_path_str );
+	} else {
+		LOG("ERROR: Unknown speech implementation \"%s\".", impl_id);
+		return CMD_FAILURE;
+	}
+	return CMD_SUCCESS;
+}
+
+int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle *mcu_p ) {
+	//  Command: set character voice <speech_impl> <character id> voice <implementation-id> <voice code>
+	//  Where <implementation-id> is "remote" or "audiofile"
+	//  Sets character's voice code
+	const char* impl_id = args.read_token();
+
+	if( strlen( impl_id )==0 ) {
+		character->set_speech_impl_backup( NULL );
+		character->set_voice_code_backup( string("") );
+		
+		// Give feedback if unsetting
+		LOG("Unset %s's voice.", character->name);
+	} else if( _strcmpi( impl_id, "remote" )==0 ) {
+		const char* voice_id = args.read_token();
+		if( strlen( voice_id )==0 ) {
+			LOG("ERROR: Expected remote voice id.");
+			return CMD_FAILURE;
+		}
+		character->set_speech_impl_backup( mcu_p->speech_rvoice() );
+		character->set_voice_code_backup( string( voice_id ) );
+	} else if( _strcmpi( impl_id, "audiofile" )==0 ) {
+		const char* voice_path = args.read_token();
+		if( strlen( voice_path )==0 ) {
+			LOG("ERROR: Expected audiofile voice path.");
+			return CMD_FAILURE;
+		}
+		character->set_speech_impl_backup( mcu_p->speech_audiofile() );
+		string voice_path_str= "";
+		voice_path_str+=voice_path;
+		character->set_voice_code_backup( voice_path_str );
+	} else if( _strcmpi( impl_id, "text" )==0 ) {
+		const char* voice_path = args.read_token();
+		if( strlen( voice_path )==0 ) {
+			LOG("ERROR: Expected id.");
+			return CMD_FAILURE;
+		}
+		character->set_speech_impl_backup( mcu_p->speech_text() );
+		string voice_path_str= "";
+		voice_path_str+=voice_path;
+		character->set_voice_code_backup( voice_path_str );
 	} else {
 		LOG("ERROR: Unknown speech implementation \"%s\".", impl_id);
 		return CMD_FAILURE;

@@ -102,10 +102,13 @@ public:
 protected:
 	// Private Data
 
-	/** The implementation to be used for speech (NULL if unset) */
-	SmartBody::SpeechInterface *speech_impl;
-	/** The voice code used by the implementation (empty string if unset) */
+	// The implementation to be used for speech (NULL if unset) 
+	SmartBody::SpeechInterface* speech_impl;
+	// The voice code used by the implementation (empty string if unset) 
 	std::string		           voice_code;
+
+	SmartBody::SpeechInterface* speech_impl_backup;
+	std::string		           voice_code_backup;
 
 
 	// Evaluation time face data
@@ -159,9 +162,20 @@ public:
 	int set_speech_impl(SmartBody::SpeechInterface *speech_impl); //set speech returns CMD_SUCCESS  
 
 	/**
+	 *  Sets the character's backup speech implementation.
+	 */
+	int set_speech_impl_backup(SmartBody::SpeechInterface *speech_impl); //set speech returns CMD_SUCCESS  
+
+
+	/**
 	 *  Gets the character's speech implementation.
 	 */
 	SmartBody::SpeechInterface* get_speech_impl() const; //returns speech implementation if set or NULL if not
+	
+	/**
+	 *  Gets the character's backup speech implementation.
+	 */
+	SmartBody::SpeechInterface* get_speech_impl_backup() const; //returns speech implementation if set or NULL if not
 	
 	/**
 	 *  Sets the character's voice code string.
@@ -169,9 +183,22 @@ public:
 	int set_voice_code(std::string& voice_code); //set Voice returns CMD_SUCCESS  
 
 	/**
+	 *  Sets the character's backup voice code string which will be activated if the primary voice fails.
+	 */
+	int set_voice_code_backup(std::string& voice_code); //set Voice returns CMD_SUCCESS  
+
+
+	/**
 	 *  Gets the character's voice code string.
 	 */
 	const std::string& get_voice_code() const; //returns voice if exists or NULL if not
+
+	/**
+	 *  Gets the character's backup voice code string.
+	 */
+	const std::string& get_voice_code_backup() const; //returns voice if exists or NULL if not
+
+
 
 	// Prioritized Schedules for behaviors (known as "blocking" in manual animation)
 	// TODO: Rename by body part, rather than controller type
