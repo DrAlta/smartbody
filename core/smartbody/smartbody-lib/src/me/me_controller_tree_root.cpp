@@ -29,6 +29,7 @@
 
 
 #include <ME/me_controller_tree_root.hpp>
+#include <ME/me_ct_container.hpp>
 
 #include <SR/sr.h>
 #include <SK/sk_channel_array.h>
@@ -340,6 +341,27 @@ public:
 		MeControllerContext::remove_controller( ct );
 	}
 
+	MeController* findControllerByHandle(std::string handle)
+	{
+		for (size_t x = 0; x < _controllers.size(); x++)
+		{
+			if (_controllers[x]->handle() == handle)
+			{
+				return _controllers[x].get();
+			}
+			else
+			{
+				MeCtContainer* container = dynamic_cast<MeCtContainer*>(_controllers[x].get());
+				if (container)
+				{
+					MeController* controller = container->findControllerByHandle(handle);
+					if (controller)
+						return controller;
+				}
+			}
+		}
+		return NULL;
+	}
 
 	/**
 	 *  Returns count of controllers in the tree.

@@ -648,10 +648,31 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 				<< "\tgaze_smooth_eyeball = " << gaze_smooth_eyeball << endl;
 	}
 
-	MeCtGaze* gaze_ct = new MeCtGaze();
-	gaze_ct->init( low_key_index, high_key_index );
+	// determine if the requestor wants to use an existing gaze controller
+	// identified by the 'handle' attribute
+	MeCtGaze* gaze_ct = NULL;
+	const XMLCh* attrHandle = elem->getAttribute( ATTR_HANDLE );
+	std::string handle = "";
+	if( attrHandle && XMLString::stringLen( attrHandle ) ) {
+		handle = asciiString(attrHandle);
+		// look for a gaze controller with that handle
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		const SbmCharacter* character = request->actor;
+		if (character)
+		{
+			MeControllerTreeRoot* controllerTree = character->ct_tree_p;
+			MeController* controller = controllerTree->findControllerByHandle(handle);
+			gaze_ct = dynamic_cast<MeCtGaze*>(controller);
+		}
+	}
+
+	if (!gaze_ct) {
+		gaze_ct = new MeCtGaze();
+		gaze_ct->handle(handle);
+		gaze_ct->init( low_key_index, high_key_index );
+		gaze_ct->set_task_priority( priority_key_index );
+	}
 	gaze_ct->set_target_joint( 0, 0, 0, const_cast<SkJoint*>(joint) );
-	gaze_ct->set_task_priority( priority_key_index );
 	gaze_ct->set_speed( gaze_speed_head, gaze_speed_eyeball );
 	gaze_ct->set_smooth( gaze_smooth_lumbar, gaze_smooth_cervical, gaze_smooth_eyeball );
 	float pitch_minimum, pitch_maximum;

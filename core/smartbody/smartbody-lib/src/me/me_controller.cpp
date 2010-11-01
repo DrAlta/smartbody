@@ -61,7 +61,8 @@ MeController::MeController ()
  	_record_output( NULL ), // for recording poses and motions of immediate local results
 	_startTime(-1),
 	_stopTime(-1),
-	_pass_through(false)
+	_pass_through(false),
+	_handle("")
 {
 	_instance_id = instance_count;
 	instance_count ++;

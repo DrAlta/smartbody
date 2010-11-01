@@ -62,7 +62,11 @@ public:
 		 *  Public (unlike overridden method) to provide container controller access.
 		 */
 		void remove_controller( MeController* child );
+
 	};
+
+public:
+	MeController* findControllerByHandle(std::string handle);
 
 protected:
 	//////////////////////////////////////////////////////////
@@ -93,6 +97,7 @@ protected:
 
 	// Called immeidately after a context has been set.
 	virtual void context_updated();
+
 
 protected:
 	// Overrides MeController::controller_start() to call start() on each child.

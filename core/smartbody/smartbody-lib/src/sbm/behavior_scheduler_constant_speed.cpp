@@ -318,7 +318,7 @@ void BehaviorSchedulerConstantSpeed::schedule( BehaviorSyncPoints& behav_syncs, 
 
 // Part of a transitional move to BehaviorSchedulers
 BehaviorSchedulerConstantSpeedPtr BML::buildSchedulerForController( MeController* ct ) {
-	bool is_persistent = ct->controller_duration() < 0;
+	bool is_undefined_duration = ct->controller_duration() < 0;
 
 	MeCtMotion* motionController = dynamic_cast<MeCtMotion*>(ct);
 	if (motionController)
@@ -332,8 +332,8 @@ BehaviorSchedulerConstantSpeedPtr BML::buildSchedulerForController( MeController
 				/* strokeStartTime */ time_sec( motion->time_stroke_start() ),
 				/* strokeTime */ time_sec( motion->time_stroke_emphasis() ),
 				/* strokeEndTime */ time_sec( motion->time_stroke_end() ),
-				/* relaxTime  */ time_sec( is_persistent? BehaviorRequest::TEN_MILLION : motion->time_relax() ), 
-				/* endTime    */ time_sec( is_persistent? BehaviorRequest::TEN_MILLION : motion->duration() ),
+				/* relaxTime  */ time_sec( is_undefined_duration? BehaviorRequest::TEN_MILLION : motion->time_relax() ), 
+				/* endTime    */ time_sec( is_undefined_duration? BehaviorRequest::TEN_MILLION : motion->duration() ),
 				/* speed      */ 1 ) );
 
 		return scheduler;
@@ -347,8 +347,8 @@ BehaviorSchedulerConstantSpeedPtr BML::buildSchedulerForController( MeController
 				/* strokeStartTime */ time_sec( ct->emphasist() ),
 				/* strokeTime */ time_sec( ct->emphasist() ),
 				/* strokeEndTime */ time_sec( ct->emphasist() ),
-				/* relaxTime  */ time_sec( is_persistent? BehaviorRequest::TEN_MILLION :  ct->controller_duration() - ct->outdt() ), 
-				/* endTime    */ time_sec( is_persistent? BehaviorRequest::TEN_MILLION : ct->controller_duration() ),
+				/* relaxTime  */ time_sec( is_undefined_duration? BehaviorRequest::TEN_MILLION :  ct->controller_duration() - ct->outdt() ), 
+				/* endTime    */ time_sec( is_undefined_duration? BehaviorRequest::TEN_MILLION : ct->controller_duration() ),
 				/* speed      */ 1 ) );
 
 		return scheduler;

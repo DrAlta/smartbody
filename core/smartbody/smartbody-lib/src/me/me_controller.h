@@ -92,6 +92,7 @@ private :
 	double _startTime;		  // time when the controller was started
 	double _stopTime;         // time when the controller was stopped
 
+	std::string _handle;	  // handle of the controller - used to match requests to changes in the controller parameters
 	MePrunePolicy* _prune_policy;  // controller tree pruning policy for this controller
 
 protected :
@@ -148,6 +149,8 @@ public :
     const char* name () const { return _name? _name:""; }
     void name ( const char* n ) { sr_string_set ( _name, n ); }
 
+	std::string handle() const { return _handle; }
+    void handle ( std::string handle ) { _handle = handle; }
 
 	///////////////////////////////////////////////////////////////////////
     // Controller tree traversal methods
