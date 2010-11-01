@@ -109,3 +109,24 @@ void MeCtContainer::controller_stop() {
 			child->stop(-1);
 	}
 }
+
+MeController* MeCtContainer::findControllerByHandle(std::string handle)
+{
+	const unsigned int child_count = count_children();
+	for (unsigned int i=0; i < child_count; i++)
+	{
+		MeController* child = this->child( i );
+		if (child->handle() == handle)
+			return child;
+		MeCtContainer* container = dynamic_cast<MeCtContainer*>(child);
+		if (container)
+		{
+			MeController* controller = container->findControllerByHandle(handle);
+			if (controller)
+				return controller;
+		}
+	}
+
+	return NULL;
+}
+

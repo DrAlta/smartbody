@@ -114,6 +114,12 @@ public:
 	virtual void remove_controller( MeController* ct ) = 0;
 
 	/**
+	 *  Locates a controller by its handle.
+	 */
+	virtual MeController* findControllerByHandle(std::string handle) = 0;
+
+
+	/**
 	 * Clears the tree of all controller and skeleton references.
 	 */
 	virtual void clear() = 0;

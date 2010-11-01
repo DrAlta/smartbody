@@ -35,6 +35,7 @@ namespace BML {
 	const XMLCh ATTR_TYPE[]  = L"type";
 	const XMLCh ATTR_NAME[]  = L"name";
 	const XMLCh ATTR_LEVEL[] = L"level";
+	const XMLCh ATTR_HANDLE[] = L"sbm:handle";
 
 	const XMLCh ATTR_START[]        = L"start";
 	const XMLCh ATTR_READY[]        = L"ready";
