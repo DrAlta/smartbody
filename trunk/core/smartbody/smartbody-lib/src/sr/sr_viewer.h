@@ -80,7 +80,7 @@ class SrViewer
 
 	virtual void label_viewer(const char* str);
 
-    virtual void get_camera ( SrCamera &cam );
+    virtual SrCamera* get_camera();
     virtual void set_camera ( const SrCamera &cam );
 
 	virtual void show_viewer();

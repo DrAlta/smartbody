@@ -51,8 +51,9 @@ void  SrViewer::label_viewer(const char* str)
 {
 }
 
-void SrViewer::get_camera ( SrCamera &cam )
+SrCamera* SrViewer::get_camera()
 {
+	return NULL;
 }
 
 void SrViewer::set_camera ( const SrCamera &cam )

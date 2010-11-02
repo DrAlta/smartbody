@@ -669,10 +669,10 @@ void FltkViewer::background ( SrColor c )
    _data->bcolor = c;
  }
 
-void FltkViewer::get_camera ( SrCamera &cam )
- {
-   cam = _data->camera;
- }
+SrCamera* FltkViewer::get_camera()
+{
+	return &_data->camera;
+}
 
 void FltkViewer::set_camera ( const SrCamera &cam )
  {
