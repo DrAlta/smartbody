@@ -292,7 +292,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->root = new SrSnGroup; // we maintain root pointer always valid
    _data->rendermode = ModeAsIs;
    _data->charactermode = ModeShowGeometry;
-   _data->pawnmode = ModePawnShowAsSpheres;
+   _data->pawnmode = ModeNoPawns;
    _data->shadowmode = ModeNoShadows;
    _data->terrainMode = ModeTerrain;
    _data->eyeBeamMode = ModeNoEyeBeams;
@@ -1850,7 +1850,11 @@ void FltkViewer::drawPawns()
 		SrSnSphere sphere;
 		glPushMatrix();
 		sphere.shape().center = SrPnt(0, 0, 0);
-		sphere.shape().radius = 1.0f;
+		float size = 1.0f;
+		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
+		if (character)
+			size *= character->getHeight() / 200.0;
+		sphere.shape().radius = size;
 		SrGlRenderFuncs::render_sphere(&sphere);
 		glEnd();
 		glPopMatrix();
