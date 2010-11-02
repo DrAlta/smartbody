@@ -67,8 +67,9 @@ const XMLCh ATTR_BLEND[]        = L"blend";
 const XMLCh ATTR_INTERPOLATE_BIAS[] = L"interpolate-bias";
 
 const XMLCh ATTR_PRIORITY_JOINT[] = L"sbm:priority-joint";
-const XMLCh ATTR_PITCH_MIN[] = L"pitch-min";
-const XMLCh ATTR_PITCH_MAX[] = L"pitch-max";
+const XMLCh ATTR_PITCH_MIN[]	= L"pitch-min";
+const XMLCh ATTR_PITCH_MAX[]	= L"pitch-max";
+const XMLCh ATTR_FADE_OUT[]		= L"sbm:fade-out";
 
 ////// XML Direction constants
 // Angular (gaze) and orienting (head)
@@ -93,7 +94,7 @@ namespace BML {
 		float smooth_lumbar   = MeCtGaze::DEFAULT_SMOOTHING_LUMBAR;
 		float smooth_cervical = MeCtGaze::DEFAULT_SMOOTHING_CERVICAL;
 		float smooth_eyeball  = MeCtGaze::DEFAULT_SMOOTHING_EYEBALL;
-
+		float fade_out_ival  = -1.0f;
 
 		/**
 		 *  Contains the possible values for a gaze key
@@ -107,7 +108,6 @@ namespace BML {
 
 			float bias_heading;
 			float bias_roll;
-
 			bool interpolate_bias;
 
 			float blend_weight;
@@ -117,7 +117,6 @@ namespace BML {
 				bias_heading( 0.0 ),
 				bias_roll( 0.0 ),
 				interpolate_bias( true ),
-
 				blend_weight( 1.0 ),
 				pitch_min( -1.0 ),
 				pitch_max( -1.0 )  //used as flags to indicate non-initialization.
@@ -545,7 +544,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	float gaze_smooth_lumbar   = BML::Gaze::smooth_lumbar;
 	float gaze_smooth_cervical = BML::Gaze::smooth_cervical;
 	float gaze_smooth_eyeball  = BML::Gaze::smooth_eyeball;
-	
+	float gaze_fade_out_ival   = BML::Gaze::fade_out_ival;
 
 	// parse sbm:joint-speed
 	const XMLCh* attrSpeed = elem->getAttribute( ATTR_JOINT_SPEED );
@@ -639,13 +638,25 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		}
 	}
 
+	const XMLCh* attrFadeOut = elem->getAttribute( ATTR_FADE_OUT );
+	if(attrFadeOut != NULL && attrFadeOut[0] != '\0') 
+	{
+		if( !( wistringstream( attrFadeOut ) >> gaze_fade_out_ival ) )
+		{
+			std::stringstream strstr;
+			strstr << "WARNING: Failed to parse fade-out interval attribute \""<< XMLString::transcode(attrFadeOut) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
+			LOG(strstr.str().c_str());
+		}
+	}
+
 	if( LOG_GAZE_PARAMS ) {
 		cout << "DEBUG: Gaze parameters:" << endl
 				<< "\tgaze_speed_head = " << gaze_speed_head << endl
 				<< "\tgaze_speed_eyeball = " << gaze_speed_eyeball << endl
 				<< "\tgaze_smooth_lumbar = " << gaze_smooth_lumbar << endl
 				<< "\tgaze_smooth_cervical = " << gaze_smooth_cervical << endl
-				<< "\tgaze_smooth_eyeball = " << gaze_smooth_eyeball << endl;
+				<< "\tgaze_smooth_eyeball = " << gaze_smooth_eyeball << endl
+				<< "\tgaze_fade_out_ival = " << gaze_fade_out_ival << endl;
 	}
 
 	// determine if the requestor wants to use an existing gaze controller
@@ -822,6 +833,12 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		gaze_ct->set_offset_polar( 0, 0, roll );
 	}
 	
+	if( gaze_fade_out_ival >= 0.0f )	{
+		// assuming we are freeing this little angel...
+		// gaze_ct->recurrent = false...
+		gaze_ct->set_fade_out( gaze_fade_out_ival );
+	}
+
 	const XMLCh* id = elem->getAttribute(ATTR_ID);
 	std::string localId;
 	if (id)
