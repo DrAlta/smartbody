@@ -203,8 +203,8 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
     SrColor background ();
     void background ( SrColor c );
 
-    void get_camera ( SrCamera &cam );
-    void set_camera ( const SrCamera &cam );
+    SrCamera* get_camera();
+    void set_camera (const SrCamera &cam);
 
 	FltkViewerData* getData() { return _data; };
 
