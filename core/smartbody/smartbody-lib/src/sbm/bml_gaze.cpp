@@ -410,8 +410,31 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	////////////////////////////////////////////////////////////////
 	//  GAZE BEHAVIORS
 
+
+	// determine if the requestor wants to use an existing gaze controller
+	// identified by the 'handle' attribute
+
+
+	MeCtGaze* gaze_ct = NULL;
+	const XMLCh* attrHandle = elem->getAttribute( ATTR_HANDLE );
+	std::string handle = "";
+	if( attrHandle && XMLString::stringLen( attrHandle ) ) {
+		handle = asciiString(attrHandle);
+		// look for a gaze controller with that handle
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		const SbmCharacter* character = request->actor;
+		if (character)
+		{
+			MeControllerTreeRoot* controllerTree = character->ct_tree_p;
+			MeController* controller = controllerTree->findControllerByHandle(handle);
+			gaze_ct = dynamic_cast<MeCtGaze*>(controller);
+		}
+	}
+	// Note that if a BML gaze request uses a handle and the controller exists, then we don't
+	// need the target and some other options
+
 	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
-	if( !attrTarget || !XMLString::stringLen( attrTarget ) ) {
+	if( !gaze_ct && (!attrTarget || !XMLString::stringLen( attrTarget ) ) ) {
 		std::wstringstream wstrstr;
         wstrstr << "WARNING: BML::parse_bml_gaze(): <"<<tag<<"> BML tag missing "<<ATTR_TARGET<<"= attribute.";
 		std::string str = convertWStringToString(wstrstr.str());
@@ -419,8 +442,12 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		return BehaviorRequestPtr();  // a.k.a., NULL
     }
 
-	const SkJoint* joint = parse_target( tag, attrTarget, mcu );
-	if( joint == NULL ) {  // Invalid target.  Assume parse_target(..) printed error.
+	const SkJoint* joint = NULL;
+	if (attrTarget && XMLString::stringLen( attrTarget ))
+	{
+		joint = parse_target( tag, attrTarget, mcu );
+	}
+	if (joint == NULL && !gaze_ct) {  // Invalid target.  Assume parse_target(..) printed error.
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 
@@ -447,28 +474,27 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	int high_key_index = MeCtGaze::GAZE_KEY_EYES;
 
 	const XMLCh* attrJointRange = elem->getAttribute( ATTR_JOINT_RANGE );
-	if( attrJointRange && XMLString::stringLen( attrJointRange ) ) {
-		//  Parse sbm:joint-range
-		XMLStringTokenizer tokenizer( attrJointRange, L" \r\n\t\f" );  // include the dash to delimit ranges
-		if( tokenizer.countTokens()==0 ) {
+	if( attrJointRange && XMLString::stringLen( attrJointRange ) )
+	{
+		if (gaze_ct)
+		{
 			std::wstringstream wstrstr;
-			wstrstr << "ERROR: No valid tokens in <gaze ../> behavior attribute "<<ATTR_JOINT_RANGE;
+			wstrstr << "WARNING: BML::parse_bml_gaze(..): Gaze joints cannot be reassigned." << endl;
 			std::string str = convertWStringToString(wstrstr.str());
 			LOG(str.c_str());
-		} else {
-			const char* key_name = asciiString( tokenizer.nextToken() );
-			int key_index = MeCtGaze::key_index( key_name );
-			if( key_index == -1 ) {
+		}
+		else
+		{
+			//  Parse sbm:joint-range
+			XMLStringTokenizer tokenizer( attrJointRange, L" \r\n\t\f" );  // include the dash to delimit ranges
+			if( tokenizer.countTokens()==0 ) {
 				std::wstringstream wstrstr;
-				wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid joint range token \""<<key_name<<"\".";
+				wstrstr << "ERROR: No valid tokens in <gaze ../> behavior attribute "<<ATTR_JOINT_RANGE;
 				std::string str = convertWStringToString(wstrstr.str());
 				LOG(str.c_str());
-			}
-			delete [] key_name;
-
-			while( key_index == -1 && tokenizer.countTokens() > 0 ) {  // find first valid key
-				key_name = asciiString( tokenizer.nextToken() );
-				key_index = MeCtGaze::key_index( key_name );
+			} else {
+				const char* key_name = asciiString( tokenizer.nextToken() );
+				int key_index = MeCtGaze::key_index( key_name );
 				if( key_index == -1 ) {
 					std::wstringstream wstrstr;
 					wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid joint range token \""<<key_name<<"\".";
@@ -476,19 +502,11 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 					LOG(str.c_str());
 				}
 				delete [] key_name;
-			}
-			if( key_index != -1 ) {  // found a valid key
-				low_key_index = high_key_index = key_index;
 
-				while( tokenizer.countTokens() > 0 ) {
+				while( key_index == -1 && tokenizer.countTokens() > 0 ) {  // find first valid key
 					key_name = asciiString( tokenizer.nextToken() );
 					key_index = MeCtGaze::key_index( key_name );
-					if( key_index != -1 ) {
-						if( key_index < low_key_index )
-							low_key_index = key_index;
-						else if( key_index > high_key_index ) 
-							high_key_index = key_index;
-					} else {
+					if( key_index == -1 ) {
 						std::wstringstream wstrstr;
 						wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid joint range token \""<<key_name<<"\".";
 						std::string str = convertWStringToString(wstrstr.str());
@@ -496,14 +514,34 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 					}
 					delete [] key_name;
 				}
-			}
+				if( key_index != -1 ) {  // found a valid key
+					low_key_index = high_key_index = key_index;
 
-		}
-	}
-	if( DEBUG_JOINT_RANGE ) {
-		cout << "DEBUG: BML::parse_bml_gaze(..): "
-			<< "low_key_index = "<<low_key_index<<",\t"
-			<< "high_key_index = "<<high_key_index<<endl;
+					while( tokenizer.countTokens() > 0 ) {
+						key_name = asciiString( tokenizer.nextToken() );
+						key_index = MeCtGaze::key_index( key_name );
+						if( key_index != -1 ) {
+							if( key_index < low_key_index )
+								low_key_index = key_index;
+							else if( key_index > high_key_index ) 
+								high_key_index = key_index;
+						} else {
+							std::wstringstream wstrstr;
+							wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid joint range token \""<<key_name<<"\".";
+							std::string str = convertWStringToString(wstrstr.str());
+							LOG(str.c_str());
+						}
+						delete [] key_name;
+					}
+				}
+			}
+			if( DEBUG_JOINT_RANGE ) 
+			{
+				cout << "DEBUG: BML::parse_bml_gaze(..): "
+					<< "low_key_index = "<<low_key_index<<",\t"
+					<< "high_key_index = "<<high_key_index<<endl;
+			}
+		}		
 	}
 	
 	/////////////////////////////////////////////////////////////
@@ -513,24 +551,34 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	const XMLCh* attrPriority = elem->getAttribute( ATTR_PRIORITY_JOINT );
 	if( attrPriority && XMLString::stringLen(attrPriority) > 0 ) 
 	{
-		const char* priority_key_name = asciiString(attrPriority);
-		priority_key_index = MeCtGaze::key_index(priority_key_name);
-		if(priority_key_index < low_key_index)
+		if (gaze_ct)
 		{
-			priority_key_index = low_key_index;
 			std::wstringstream wstrstr;
-			wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid priority key attribute\"" << priority_key_name << "\"." << endl;
+			wstrstr << "WARNING: BML::parse_bml_gaze(..): Priority joint cannot be reassigned." << endl;
 			std::string str = convertWStringToString(wstrstr.str());
 			LOG(str.c_str());
 		}
-		if(priority_key_index > high_key_index)
+		else
 		{
-			priority_key_index = high_key_index;
-			std::wstringstream wstrstr;
-			wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid priority key attribute\"" << priority_key_name << "\"." << endl;
-			std::string str = convertWStringToString(wstrstr.str());
-			LOG(str.c_str());
+			const char* priority_key_name = asciiString(attrPriority);
+			priority_key_index = MeCtGaze::key_index(priority_key_name);
+			if(priority_key_index < low_key_index)
+			{
+				priority_key_index = low_key_index;
+				std::wstringstream wstrstr;
+				wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid priority key attribute\"" << priority_key_name << "\"." << endl;
+				std::string str = convertWStringToString(wstrstr.str());
+				LOG(str.c_str());
+			}
+			if(priority_key_index > high_key_index)
+			{
+				priority_key_index = high_key_index;
+				std::wstringstream wstrstr;
+				wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid priority key attribute\"" << priority_key_name << "\"." << endl;
+				std::string str = convertWStringToString(wstrstr.str());
+				LOG(str.c_str());
 
+			}
 		}
 	}
 
@@ -657,24 +705,6 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 				<< "\tgaze_smooth_cervical = " << gaze_smooth_cervical << endl
 				<< "\tgaze_smooth_eyeball = " << gaze_smooth_eyeball << endl
 				<< "\tgaze_fade_out_ival = " << gaze_fade_out_ival << endl;
-	}
-
-	// determine if the requestor wants to use an existing gaze controller
-	// identified by the 'handle' attribute
-	MeCtGaze* gaze_ct = NULL;
-	const XMLCh* attrHandle = elem->getAttribute( ATTR_HANDLE );
-	std::string handle = "";
-	if( attrHandle && XMLString::stringLen( attrHandle ) ) {
-		handle = asciiString(attrHandle);
-		// look for a gaze controller with that handle
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		const SbmCharacter* character = request->actor;
-		if (character)
-		{
-			MeControllerTreeRoot* controllerTree = character->ct_tree_p;
-			MeController* controller = controllerTree->findControllerByHandle(handle);
-			gaze_ct = dynamic_cast<MeCtGaze*>(controller);
-		}
 	}
 
 	if (!gaze_ct) {

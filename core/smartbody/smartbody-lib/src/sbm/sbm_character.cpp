@@ -931,6 +931,13 @@ void prune_schedule( SbmCharacter*   actor,
 
 						// If still ocluded (after testing each key) then it is not in use
 						in_use = !is_occluded;
+
+						// don't remove gazes that have handles
+						if (!in_use)
+						{
+							if (gaze_ct->handle() != "")
+								in_use = true;
+						}
 					}
 				} else if( anim_ct_type == MeCtMotion::type_name || anim_ct_type == MeCtQuickDraw::type_name ) {
 					if( motion_ct || pose_ct ) {

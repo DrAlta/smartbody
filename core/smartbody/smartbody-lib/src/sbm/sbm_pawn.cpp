@@ -681,9 +681,9 @@ int SbmPawn::set_world_offset_cmd( SbmPawn* pawn, srArgBuffer& args ) {
 			has_error |= !parse_float_or_error( y, args.read_token(), "y" );
 			has_error |= !parse_float_or_error( z, args.read_token(), "z" );
 		} else if( arg=="hpr" ) {
-			has_error |= !parse_float_or_error( x, args.read_token(), "heading" );
-			has_error |= !parse_float_or_error( x, args.read_token(), arg );
-			has_error |= !parse_float_or_error( x, args.read_token(), arg );
+			has_error |= !parse_float_or_error( h, args.read_token(), "heading" );
+			has_error |= !parse_float_or_error( p, args.read_token(), arg );
+			has_error |= !parse_float_or_error( r, args.read_token(), arg );
 		} else {
 			LOG("ERROR: Unknown world_offset attribute \"%s\".", arg.c_str());
 			has_error = true;
