@@ -50,7 +50,7 @@ void GlChartView::initGL(int width, int height)
 	glEnable ( GL_POLYGON_SMOOTH );
 
 	glEnable ( GL_POINT_SMOOTH );
-	glPointSize ( 2.0 );
+	glPointSize ( 1.0 );
 
 	glShadeModel ( GL_SMOOTH );
 }
@@ -149,6 +149,7 @@ void GlChartView::draw()
 	glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 	camera.aspect = (float)w()/(float)h();
+
 	glMatrixMode ( GL_PROJECTION );
 	glLoadMatrix ( camera.get_perspective_mat(mat) );
 
@@ -178,6 +179,7 @@ void GlChartView::draw()
 	//glLoadIdentity();
 	draw_coordinate();
 	draw_series();
+
 
 	//glutSwapBuffers();
 
