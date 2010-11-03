@@ -9,6 +9,7 @@
 ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name) : Window(w, h, name), BMLViewer(x, y, w, h)
 {
 	set_default_values();
+	char value[10];
 	this->begin();
 	// first group: animation name and character name
 	Group* firstGroup = new fltk::Group(10, 20, w - 20, h/2 - 20, "");
@@ -43,8 +44,10 @@ ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name)
 	Group* secondGroup = new fltk::Group(10, h/4+30, w - 20, h/2 - 40, "");
 	secondGroup->begin();
 		frame_num = new fltk::Input(120, 0, 40, 18, "No. of frames shown:");
+		sprintf(value, "%d", num_of_frames);
 		frame_num->when(fltk::WHEN_ENTER_KEY);
 		frame_num->callback(refreshMaxSize, this);
+		frame_num->value(value);
 
 		quat = new fltk::Choice(300, 0, (int)(1.5f*w/8), 18, "quaternions shown as:");
 		initQuat();
@@ -57,6 +60,7 @@ ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name)
 	secondGroup->end();
 	secondGroup->resizable(chartview);
 	this->resizable(secondGroup);
+
 	//redraw();
 }
 
