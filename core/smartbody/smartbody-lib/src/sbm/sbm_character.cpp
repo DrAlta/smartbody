@@ -252,6 +252,11 @@ MeCtLocomotionAnalysis* SbmCharacter::get_locomotion_ct_analysis()
 	return this->locomotion_ct_analysis;
 }
 
+AUChannelMap& SbmCharacter::get_au_channel_map()
+{
+	return au_channel_map;
+}
+
 void SbmCharacter::locomotion_ik_enable(bool enable)
 {
 	locomotion_ct->ik_enabled = enable;

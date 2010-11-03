@@ -105,8 +105,7 @@ public:
 	/**
 	 *  Inserts controller at position, or end if position > countChildren()
 	 */
-    virtual void add_controller( MeController* ct,
-                        unsigned int position = std::numeric_limits<unsigned int>::max() ) = 0;
+    virtual void add_controller( MeController* ct, unsigned int position = std::numeric_limits<unsigned int>::max() ) = 0;
 
 	/**
 	 *  Public variant of MeControllerContext::remove_controller(..).

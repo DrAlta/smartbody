@@ -282,6 +282,8 @@ public:
 	MeCtLocomotionClass* get_locomotion_ct();
 	MeCtLocomotionAnalysis* get_locomotion_ct_analysis();
 
+	AUChannelMap& get_au_channel_map();
+
 public:
 	// reset the buffer channel data to be zero before blending
 	// hope we have cleverer way later
