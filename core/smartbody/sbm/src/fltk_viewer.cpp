@@ -1841,7 +1841,7 @@ void FltkViewer::drawPawns()
 		float size = 1.0f;
 		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
 		if (character)
-			size *= character->getHeight() / 200.0;
+			size *= character->getHeight() / 200.0f;
 		sphere.shape().radius = size;
 		SrGlRenderFuncs::render_sphere(&sphere);
 		glEnd();
