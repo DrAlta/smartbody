@@ -107,6 +107,7 @@ mcuCBHandle::mcuCBHandle()
 	viewer_p( NULL ),
 	bmlviewer_p( NULL ),
 	panimationviewer_p( NULL ),
+	channelbufferviewer_p( NULL ),
 	camera_p( NULL ),
 	root_group_p( new SrSnGroup() ),
 	height_field_p( NULL ),
@@ -118,6 +119,7 @@ mcuCBHandle::mcuCBHandle()
 	viewer_factory ( new SrViewerFactory() ),
 	bmlviewer_factory ( new BMLViewerFactory() ),
 	panimationviewer_factory ( new BMLViewerFactory() ),
+	channelbufferviewer_factory ( new BMLViewerFactory() ),
 	resource_manager(ResourceManager::getResourceManager()),
 	snapshot_counter( 1 ),
 	delay_behaviors(true)
@@ -453,6 +455,26 @@ void mcuCBHandle::close_panimation_viewer( void )
 	if( panimationviewer_p )	{
 		panimationviewer_factory->destroy(bmlviewer_p);
 		panimationviewer_p = NULL;
+	}
+}
+
+int mcuCBHandle::open_channelbuffer_viewer( int width, int height, int px, int py )
+{
+	if( channelbufferviewer_p == NULL )	{
+		channelbufferviewer_p = channelbufferviewer_factory->create( px, py, width, height );
+		channelbufferviewer_p->label_viewer( "Channel Buffer Viewer" );
+		channelbufferviewer_p->show_bml_viewer();
+		
+		return( CMD_SUCCESS );
+	}
+	return( CMD_FAILURE );
+}
+
+void mcuCBHandle::close_channelbuffer_viewer( void )
+{
+	if( channelbufferviewer_p )	{
+		channelbufferviewer_factory->destroy(bmlviewer_p);
+		channelbufferviewer_p = NULL;
 	}
 }
 

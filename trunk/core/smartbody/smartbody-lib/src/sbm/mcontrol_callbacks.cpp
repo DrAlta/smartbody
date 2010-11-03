@@ -551,6 +551,49 @@ int mcu_panimationviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return( CMD_FAILURE );
 }
 
+int mcu_channelbufferviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	if( mcu_p )	{
+		char *cbufferview_cmd = args.read_token();
+		if( strcmp( cbufferview_cmd, "open" ) == 0 )	{
+
+			if( mcu_p->channelbufferviewer_p == NULL )	{
+				int argc = args.calc_num_tokens();
+				if( argc >= 4 )	{
+
+					int width = args.read_int();
+					int height = args.read_int();
+					int px = args.read_int();
+					int py = args.read_int();
+					int err = mcu_p->open_channelbuffer_viewer( width, height, px, py );
+					return( err );
+				} else {
+					int err = mcu_p->open_channelbuffer_viewer( 800, 600, 50, 50 );
+					return( err );
+				}
+			}
+		}
+		else
+		if( strcmp( cbufferview_cmd, "show" ) == 0 )	{
+			if( mcu_p->channelbufferviewer_p )	{
+				mcu_p->channelbufferviewer_p->show_bml_viewer();
+				return( CMD_SUCCESS );
+			}
+		}
+		else
+		if( strcmp( cbufferview_cmd, "hide" ) == 0 )	{
+			if( mcu_p->channelbufferviewer_p )	{
+				mcu_p->channelbufferviewer_p->hide_bml_viewer();
+				return( CMD_SUCCESS );
+			}
+		}
+		else	{
+			return( CMD_NOT_FOUND );
+		}
+	}
+	return( CMD_FAILURE );
+}
+
 // panim <motion name> keys <key size> <keys>
 // keys should be in ascending order
 int mcu_panim_keys_func( srArgBuffer& args, mcuCBHandle *mcu_p )

@@ -38,6 +38,10 @@
 #define ORIENTATION_RES_UNCHANGED_WORLD 2*/
 
 ///////////////////////////////////////////////
+// This is a generic IK solution for multi-joint adjustment
+// Not much to say about the use, simply fill out the MeCtIKScenario structure, 
+// call update(MeCtIKScenario* scenario) and pass in the structure. The returned data
+// include joint quaternions, joint positions and global matrices
 
 class MeCtIKScenarioJointInfo
 {
@@ -83,10 +87,10 @@ public: // User provide data
 	SrVec								ik_orientation;		// Orientation of the limb, may not be in the direction of plane normal
 	float								ik_compensate_factor; // Compensate for the off-ground height, usually cos(plane_normal, ik_orientation)
 
-public:// User provide data & Return data
+public:// User provide data & Returned data
 	SrArray<SrQuat>						joint_quat_list;	// quaternions of joints
 
-public:// Return data
+public:// Returned data
 	SrArray<SrVec>						joint_pos_list;		// global position of joints
 	SrArray<SrMat>						joint_global_mat_list; // global matrices of joints
 

@@ -25,17 +25,17 @@
 
 
 #include <ME/me_controller.h>
-#include "me_ct_locomotion_func.hpp"
 #include "me_ct_IK_scenario.hpp"
 
 #pragma once
 
 
 ///////////////////////////////////////////////
-
-//Not much to say about the use of this, fill out the MeCtIKScenario structure, 
-//simply call update(MeCtIKScenario* scenario) and pass in the structure.
-
+// This is a generic IK solution for multi-joint adjustment
+// Not much to say about the use, simply fill out the MeCtIKScenario structure, 
+// call update(MeCtIKScenario* scenario) and pass in the structure. The returned data
+// include joint quaternions, joint positions and global matrices
+ 
 class MeCtIK{
 public:
 	// Public Constants
@@ -47,7 +47,6 @@ protected:
 	SkJoint*					base_joint;
 	int							max_iteration;
 	
-	//SrArray<SrVec>				joint_axis_list;
 	SrArray<SrMat>				joint_init_mat_list;
 
 	SrMat						end_mat;
@@ -79,6 +78,8 @@ public:
 protected:
 	void adjust();
 
+	void adjust_3_joints();
+
 	void adjust_2_joints();
 
 	void set_max_iteration(int iter);
@@ -106,8 +107,6 @@ protected:
 	void get_next_support_joint();
 
 	int get_support_joint_num();
-
-	//void adjust_support_joints();
 
 	virtual void calc_target(SrVec& orientation, SrVec& offset);
 

@@ -40,6 +40,7 @@
 #include "fltk_viewer.h"
 #include <bmlviewer/BehaviorWindow.h>
 #include <panimationviewer/PanimationWindow.h>
+#include "channelbufferWindow.hpp"
 #include "wsp.h"
 
 #include <sbm/sbm_constants.h>
@@ -319,6 +320,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "viewer",		mcu_viewer_func );
 	mcu.insert( "bmlviewer",    mcu_bmlviewer_func);
 	mcu.insert( "panimviewer",  mcu_panimationviewer_func);
+	mcu.insert( "cbufviewer",	mcu_channelbufferviewer_func);
 	mcu.insert( "camera",		mcu_camera_func );
 	mcu.insert( "terrain",		mcu_terrain_func );
 	mcu.insert( "time",			mcu_time_func );
@@ -556,6 +558,7 @@ int main( int argc, char **argv )	{
 	mcu.register_viewer_factory(viewerFactory);
 	mcu.register_bmlviewer_factory(new BehaviorViewerFactory());
 	mcu.register_panimationviewer_factory(new PanimationViewerFactory());
+	mcu.register_channelbufferviewer_factory(new ChannelBufferViewerFactory());
 
 	// Build the floor for the viewer
 	//mcu.add_scene( build_checkerboard_floor( 200.0 ) );
@@ -842,6 +845,23 @@ mcu.mark( "main", 0, "update_sim" );
 		if( update_sim )	{
 			mcu.update();
 		}
+mcu.mark( "main", 0, "update_channel_buffer_viewer");
+		SbmPawn* pawn_p = NULL;
+		SbmCharacter* char_p = NULL;
+		mcu.pawn_map.reset();
+		while(pawn_p = mcu.pawn_map.next())
+		{
+			const char* name = ((ChannelBufferWindow*)mcu.channelbufferviewer_p)->getSelectedCharacterName();
+			if( name != NULL && strcmp(pawn_p->name, name) == 0) break;
+		}
+		//char_p = mcu.character_map.lookup( pawn_p->name );
+		if(pawn_p != NULL)
+		{
+			SrBuffer<float>& buffer = pawn_p->ct_tree_p->getLastFrame().buffer();
+			((ChannelBufferWindow*)mcu.channelbufferviewer_p)->chartview->get_archive()->Update(buffer);
+			((ChannelBufferWindow*)mcu.channelbufferviewer_p)->chartview->render();
+		}
+		
 
 mcu.mark( "main", 0, "render" );
 		mcu.render();

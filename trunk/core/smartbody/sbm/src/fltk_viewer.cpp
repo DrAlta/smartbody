@@ -316,18 +316,6 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->showlocofootprints = false;
    _data->showkinematicfootprints = false;
 
-   	Group* firstGroup = new fltk::Group(-100, 20, w - 20, h/2 - 20, "locomotion");
-	firstGroup->begin();
-    off_height_window = new fltk::Input(-100, 20, 200, 20, "input off ground height ");
-	off_height_window->when(fltk::WHEN_ENTER_KEY);
-	off_height_window->callback(ChangeOffGroundHeight, this);
-	firstGroup->end();
-	firstGroup->resizable(off_height_window);
-	firstGroup->box(fltk::BORDER_FRAME);
-	firstGroup->box(fltk::BORDER_BOX);
-	firstGroup->label("Animation and Character Setting");
-	redraw();
-
    _data->light.init();
 
    _data->bcolor = SrColor(.63f, .63f, .63f);

@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk2;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\sbm-ui\panimationviewer\src&quot;;&quot;..\..\sbm-ui\bmlviewer\src&quot;"
+				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk2;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\sbm-ui\panimationviewer\src&quot;;&quot;..\..\sbm-ui\bmlviewer\src&quot;;..\..\sbm\src\channelbufferviewer"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -66,7 +66,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="Smartbodyd.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib pthreadVSE2.lib xerces-c_3D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_44.lib boost_system-vc90-mt-gd-1_44.lib log4cxxd.lib OpenAL32.lib alut.lib libsndfile-1.lib fltk2_gld.lib fltk2d.lib opengl32.lib dbghelp.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib"
+				AdditionalDependencies="Smartbodyd.lib bmlviewerd.lib panimationviewerd.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib pthreadVSE2.lib xerces-c_3D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_44.lib boost_system-vc90-mt-gd-1_44.lib log4cxxd.lib OpenAL32.lib alut.lib libsndfile-1.lib fltk2_gld.lib fltk2d.lib opengl32.lib dbghelp.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib"
 				OutputFile="..\bin\sbm-fltkd.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;..\..\smartbody-lib\lib&quot;;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;&quot;..\..\..\..\lib\vhcl\libsndfile-1_0_17&quot;;..\..\..\..\lib\vhcl\log4cxx\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk2\lib;..\..\..\..\lib\pthreads\lib;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib&quot;;..\..\..\..\lib\boost\lib;&quot;..\..\sbm-ui\panimationviewer\lib&quot;;&quot;..\..\sbm-ui\bmlviewer\lib&quot;"
@@ -135,7 +135,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk2;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\sbm-ui\panimationviewer\src&quot;;&quot;..\..\sbm-ui\bmlviewer\src&quot;"
+				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk2;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\sbm-ui\panimationviewer\src&quot;;&quot;..\..\sbm-ui\bmlviewer\src&quot;;&quot;..\..\sbm-ui\channelbufferviewer\src&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -158,10 +158,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="Smartbody.lib vhcl.lib vhmsg.lib bonebus.lib wsp.lib fltk2.lib fltk2_gl.lib pthreadVSE2.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_44.lib boost_system-vc90-mt-1_44.lib log4cxx.lib dbghelp.lib opengl32.lib OpenAL32.lib alut.lib libsndfile-1.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib"
+				AdditionalDependencies="Smartbody.lib bmlviewer.lib panimationviewer.lib vhcl.lib vhmsg.lib bonebus.lib wsp.lib fltk2.lib fltk2_gl.lib pthreadVSE2.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_44.lib boost_system-vc90-mt-1_44.lib log4cxx.lib dbghelp.lib opengl32.lib OpenAL32.lib alut.lib libsndfile-1.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib"
 				OutputFile="..\bin\sbm-fltk.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;..\..\smartbody-lib\lib&quot;;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;&quot;..\..\..\..\lib\vhcl\libsndfile-1_0_17&quot;;..\..\..\..\lib\vhcl\log4cxx\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk2\lib;..\..\..\..\lib\pthreads\lib;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib&quot;;..\..\..\..\lib\boost\lib;&quot;..\..\sbm-ui\panimationviewer\lib&quot;;&quot;..\..\sbm-ui\bmlviewer\lib&quot;"
+				AdditionalLibraryDirectories="&quot;..\..\smartbody-lib\lib&quot;;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;&quot;..\..\..\..\lib\vhcl\libsndfile-1_0_17&quot;;..\..\..\..\lib\vhcl\log4cxx\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk2\lib;..\..\..\..\lib\pthreads\lib;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib&quot;;..\..\..\..\lib\boost\lib;&quot;..\..\sbm-ui\panimationviewer\lib&quot;;&quot;..\..\sbm-ui\bmlviewer\lib&quot;;&quot;..\..\sbm-ui\channelbufferviewer\lib&quot;"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -307,6 +307,34 @@
 			</File>
 			<File
 				RelativePath="..\src\panimationviewer\ParamAnimEditorWidget.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="channelbufferviewer"
+			>
+			<File
+				RelativePath="..\src\channelbufferviewer\channelbufferWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\channelbufferviewer\channelbufferWindow.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\channelbufferviewer\GlChartView.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\channelbufferviewer\GlChartView.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\channelbufferviewer\GlChartViewArchive.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\channelbufferviewer\GlChartViewArchive.hpp"
 				>
 			</File>
 		</Filter>

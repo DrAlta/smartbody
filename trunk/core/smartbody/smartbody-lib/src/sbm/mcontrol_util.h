@@ -170,8 +170,10 @@ class mcuCBHandle	{
 		SrViewer	*viewer_p;
 		BMLViewer	*bmlviewer_p;
 		BMLViewer	*panimationviewer_p;
+		BMLViewer	*channelbufferviewer_p;
 		BMLViewerFactory *bmlviewer_factory;
 		BMLViewerFactory *panimationviewer_factory;
+		BMLViewerFactory *channelbufferviewer_factory;
 		SrCamera	*camera_p;
 		SrSnGroup	*root_group_p;
 		
@@ -297,6 +299,8 @@ class mcuCBHandle	{
 		void close_bml_viewer( void );
 		int open_panimation_viewer( int width, int height, int px, int py );
 		void close_panimation_viewer( void );
+		int open_channelbuffer_viewer( int width, int height, int px, int py );
+		void close_channelbuffer_viewer( void );
 		int add_scene( SrSnGroup *scene_p );
 		int remove_scene( SrSnGroup *scene_p );
 		void render()	{ if( viewer_p ) { viewer_p->render(); } }
@@ -432,6 +436,10 @@ class mcuCBHandle	{
 		void register_panimationviewer_factory(BMLViewerFactory* factory) { 
 				if (panimationviewer_factory != NULL) delete panimationviewer_factory;
 				panimationviewer_factory = factory;
+		}
+		void register_channelbufferviewer_factory(BMLViewerFactory* factory) { 
+				if (channelbufferviewer_factory != NULL) delete channelbufferviewer_factory;
+				channelbufferviewer_factory = factory;
 		}
 
 	protected:
