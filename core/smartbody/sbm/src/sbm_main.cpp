@@ -40,7 +40,7 @@
 #include "fltk_viewer.h"
 #include <bmlviewer/BehaviorWindow.h>
 #include <panimationviewer/PanimationWindow.h>
-#include "channelbufferWindow.hpp"
+#include <channelbufferviewer/channelbufferWindow.hpp>
 #include "wsp.h"
 
 #include <sbm/sbm_constants.h>
