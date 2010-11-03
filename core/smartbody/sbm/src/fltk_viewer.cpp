@@ -790,6 +790,7 @@ void FltkViewer::draw()
    if ( !visible() ) return;
    if ( !valid() ) init_opengl ( w(), h() ); // valid() is turned on by fltk after draw() returns
 
+   glViewport ( 0, 0, w(), h() );
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
    SrLight &light = _data->light;
