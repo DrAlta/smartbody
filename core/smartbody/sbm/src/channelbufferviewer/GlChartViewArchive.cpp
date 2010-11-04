@@ -308,7 +308,8 @@ GlChartViewArchive::GlChartViewArchive()
 GlChartViewArchive::~GlChartViewArchive()
 {
 	GlChartViewSeries* series = NULL;
-	for(int i = 0;; ++i)
+	int num = series_list.size();
+	for(int i = 0; i < num; ++i)
 	{
 		series = series_list.pop();
 		series->clear();
