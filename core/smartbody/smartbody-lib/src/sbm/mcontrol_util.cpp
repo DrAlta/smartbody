@@ -549,12 +549,12 @@ void mcuCBHandle::update( void )	{
 	pawn_map.reset();
 	while( pawn_p = pawn_map.next() )	{
 
-		pawn_p->reset_all_channels();
+		//pawn_p->reset_all_channels();
 
 		// blinking hack...
 		char_p = character_map.lookup( pawn_p->name );
 		if( char_p ) {
-			//char_p->reset_viseme_channels();		// Temporary Hack for Solving feedback problem, this isn't necessary for non-facebonebone implementations
+			char_p->reset_viseme_channels();		// Temporary Hack for Solving feedback problem, this isn't necessary for non-facebonebone implementations
 			char_p->eye_blink_update( this->time );
 		}
 
