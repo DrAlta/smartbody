@@ -25,6 +25,7 @@
 #include "sbm_character.hpp"
 #include "gwiz_math.h"
 #include "limits.h"
+#include "mcontrol_util.h"
 
 
 const char* MeCtLocomotionNavigator::TYPE = "MeCtLocomotionNavigator";
@@ -45,6 +46,8 @@ MeCtLocomotionNavigator::MeCtLocomotionNavigator()
 	target_height_adjustment = 0.0f;
 	prev_height_adjustment = 0.0f;
 	curr_height_adjustment = 0.0f;
+
+	worldOffsetWriter = NULL;
 }
 
 /** Destructor */
@@ -373,19 +376,32 @@ void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtL
 		buffer[ bi_world_z ] = 0.0f;
 	}
 
-
-	buffer[ bi_world_x ] = world_pos.x;
-	buffer[ bi_world_y ] = world_pos.y;
-	buffer[ bi_world_z ] = world_pos.z;
-
 	SrMat mat;
 	mat.roty(orientation_angle);
 	world_rot.set(mat);
 
-	buffer[ bi_world_rot+0 ] = world_rot.w;
-	buffer[ bi_world_rot+1 ] = world_rot.x;
-	buffer[ bi_world_rot+2 ] = world_rot.y;
-	buffer[ bi_world_rot+3 ] = world_rot.z;
+	if(worldOffsetWriter != NULL)
+	{
+		float world_offset_data[7];
+		world_offset_data[0] = world_pos.x;
+		world_offset_data[1] = world_pos.y;
+		world_offset_data[2] = world_pos.z;
+		world_offset_data[3] = world_rot.w;
+		world_offset_data[4] = world_rot.x;
+		world_offset_data[5] = world_rot.y;
+		world_offset_data[6] = world_rot.z;
+		worldOffsetWriter->set_data(world_offset_data);
+	}
+	else
+	{
+		buffer[ bi_world_x ] = world_pos.x;
+		buffer[ bi_world_y ] = world_pos.y;
+		buffer[ bi_world_z ] = world_pos.z;
+		buffer[ bi_world_rot+0 ] = world_rot.w;
+		buffer[ bi_world_rot+1 ] = world_rot.x;
+		buffer[ bi_world_rot+2 ] = world_rot.y;
+		buffer[ bi_world_rot+3 ] = world_rot.z;
+	}
 
 	MeCtLocomotionRoutine routine;
 	SrVec di;

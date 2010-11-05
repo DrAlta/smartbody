@@ -314,7 +314,9 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	{
 		this->locomotion_ct_analysis = new MeCtLocomotionAnalysis();
 		this->locomotion_ct =  new MeCtLocomotionClass();
-		this->locomotion_ct->name("locomotion");
+		std::string locomotionname = std::string(name)+ "'s locomotion controller";
+		this->locomotion_ct->name( locomotionname.c_str() );
+		locomotion_ct->get_navigator()->setWordOffsetController(world_offset_writer_p);
 		locomotion_ct->ref();
 	}
 
@@ -337,30 +339,18 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 	param_sched_p->init();
 
+	ct_tree_p->name( std::string(name)+"'s ct_tree" );
+
 	// Add Prioritized Schedule Controllers to the Controller Tree
 	ct_tree_p->add_controller( posture_sched_p );
 	ct_tree_p->add_controller( motion_sched_p );
+	if (locomotion_ct)
+		ct_tree_p->add_controller( locomotion_ct );
 	ct_tree_p->add_controller( gaze_sched_p );
 	ct_tree_p->add_controller( blink_ct_p );
 	ct_tree_p->add_controller( head_sched_p );
 	ct_tree_p->add_controller( param_sched_p );
-	ct_tree_p->name( std::string(name)+"'s ct_tree" );
-
-	// Locomotion controller
-	if( locomotion_ct)
-	{
-		// add after the motion scheduler
-		int numControllers = ct_tree_p->count_controllers();
-		for (int c = 0; c < numControllers; c++)
-		{
-			MeController* controller = ct_tree_p->controller(c);
-			if (controller == motion_sched_p)
-			{
-				ct_tree_p->add_controller( locomotion_ct, c+1);
-				break;
-			}
-		}
-	}
+	
 		
 	// Face controller and softeyes control
 	if( face_neutral ) {
@@ -783,6 +773,7 @@ void prune_schedule( SbmCharacter*   actor,
 
 		MeController* anim_source = track->animation_ct();
 		if( anim_source ) {
+
 #if 0 // DYNAMIC_CASTS_ACTUALLY_WORK?
 			// These don't seem to work, even with Runtime Type Inspection enabled
 			MeCtBlend*         blend_ct = dynamic_cast<MeCtBlend*>( track->blending_ct() );
