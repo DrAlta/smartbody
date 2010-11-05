@@ -519,6 +519,11 @@ proc skmCheckAndWriteQuat( int $fileid, string $names[], string $joint )
 		
 		fprint $fileid ( $joint + " Quat\n" );
 	}
+	else
+	{
+	   string $warningMsg = "Rotation Channel of " + $joint + " is missing\n";
+	   confirmDialog -title "Warning On Channels" -message $warningMsg -button "close"  -defaultButton "close";
+	}	
 
 	// Original //
 	/*
