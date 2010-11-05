@@ -345,7 +345,8 @@ proc skmCheckAndWriteKey( int $fileid, string $names[], string $type, int $frame
 
    //if ( $isFacial )
    //{
-      $base = skmKeyVal( 0, $names[ $id ] );
+	  if ($id >= 0)
+        $base = skmKeyVal( 0, $names[ $id ] );
    //}
 
    if ( $id >= 0 )
@@ -487,6 +488,11 @@ proc skmCheckAndWrite( int $fileid, string $names[], string $type, string $joint
 		
 		
 		fprint $fileid ( $joint + $skmtype );
+	}
+	else
+	{
+	   string $warningMsg = "Channel " + $joint + "_" + $type + " is missing\n";
+	   confirmDialog -title "Warning On Channels" -message $warningMsg -button "close"  -defaultButton "close";
 	}
 
 	// Original //
