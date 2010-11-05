@@ -549,7 +549,7 @@ void mcuCBHandle::update( void )	{
 	pawn_map.reset();
 	while( pawn_p = pawn_map.next() )	{
 
-		//pawn_p->reset_all_channels();
+		pawn_p->reset_all_channels();
 
 		// blinking hack...
 		char_p = character_map.lookup( pawn_p->name );
@@ -569,7 +569,6 @@ void mcuCBHandle::update( void )	{
 
 			//char_p->scheduler_p->evaluate( time );
 			if (char_p->is_viseme_curve())	{		// For bone bus viseme in Curve Mode
-				// ????? A BETTER PLACE FOR THIS??
 				char_p->reset_viseme_bonebus(time);	
 			}
 

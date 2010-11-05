@@ -28,6 +28,7 @@
 #include "me_ct_locomotion_routine.hpp"
 #include "me_ct_locomotion_speed_accelerator.hpp"
 #include "me_ct_locomotion_limb_direction_planner.hpp"
+#include "ME/me_ct_raw_writer.hpp"
 
 #pragma once
 
@@ -97,12 +98,20 @@ protected:
 
 	int routine_channel_num;
 
+	MeCtRawWriter* worldOffsetWriter;
+
 public:
 	/** Constructor */
 	MeCtLocomotionNavigator();
 
 	/** Destructor */
 	virtual ~MeCtLocomotionNavigator();
+
+public:
+
+	
+	void setWordOffsetController(MeCtRawWriter* offsetWriter) { worldOffsetWriter = offsetWriter; offsetWriter->ref(); }
+	MeCtRawWriter* getWordOffsetController() { return worldOffsetWriter; }
 
 public: // channels and routine funcs
 	const char* controller_type();

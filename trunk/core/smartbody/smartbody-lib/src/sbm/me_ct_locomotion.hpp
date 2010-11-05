@@ -115,6 +115,8 @@ protected:
 	//char* nonlimb_blending_base_name;
 
 
+
+
 protected: // channel initialization related
 	int joint_channel_start_ind;
 	int limb_joint_num;
@@ -134,6 +136,8 @@ public:
 
 	/** Destructor */
 	virtual ~MeCtLocomotion();
+
+
 
 	const char* controller_type() const;
 

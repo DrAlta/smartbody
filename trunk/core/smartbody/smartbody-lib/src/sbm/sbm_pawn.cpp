@@ -172,7 +172,7 @@ int SbmPawn::init_skeleton() {
 	skeleton_p->compress();
 
 	init_world_offset_channels();
-	world_offset_writer_p->init( WORLD_OFFSET_CHANNELS_P, false );
+	world_offset_writer_p->init( WORLD_OFFSET_CHANNELS_P, true );
 
 	wo_cache.x = 0;
 	wo_cache.y = 0;
@@ -188,7 +188,7 @@ void SbmPawn::reset_all_channels()
 {
 	SkChannelArray& channels = skeleton_p->channels();
 	MeFrameData& frameData = ct_tree_p->getLastFrame();
-	SrBuffer<float> sr_fbuff = frameData.buffer();
+	SrBuffer<float>& sr_fbuff = frameData.buffer();
 	int n = channels.size();
 	for (int c = 0; c < n; c++)
 	{
