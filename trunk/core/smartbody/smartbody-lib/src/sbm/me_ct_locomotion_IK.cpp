@@ -34,7 +34,7 @@ MeCtLocomotionIK::~MeCtLocomotionIK()
 }
 
 
-//overwrite function calc_target of MeCtIK
+//overwrites function calc_target of MeCtIK
 __forceinline void MeCtLocomotionIK::calc_target(SrVec& orientation, SrVec& offset)
 {
 	orientation.normalize();

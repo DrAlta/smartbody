@@ -74,6 +74,9 @@ public:
 	bool motions_loaded;
 	bool reset;
 	bool ik_enabled;
+	bool freezed;
+
+	double freeze_delta_time;
 	
 protected:
 	MeCtLocomotionJointInfo nonlimb_joint_info;
@@ -183,9 +186,13 @@ public:
 
 	void set_motion_time(float time);
 
+	void set_freeze(bool freeze);
+
 	void init_skeleton(SkSkeleton* standing, SkSkeleton* walking);
 	
 	bool is_initialized();
+
+	bool is_freezed();
 
 	bool is_enabled();
 

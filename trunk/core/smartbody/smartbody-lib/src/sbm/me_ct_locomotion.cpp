@@ -60,7 +60,8 @@ MeCtLocomotion::MeCtLocomotion() {
 	last_time = 0.0f;
 	translation_joint_height = 0.0f;
 	valid = false;
-	
+	freezed = false;
+	freeze_delta_time = 0.0f;
 }
 
 /** Destructor */
@@ -322,12 +323,16 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 		temp_update_for_footprint(frame);
 		return false;
 	}
-	
-	//curr_t = time;
 
 	delta_time = time - last_time;
 
 	if(delta_time > 0.03333333f) delta_time = 0.03333333f;
+
+	if(freezed) 
+	{
+		delta_time = freeze_delta_time;
+		freeze_delta_time = 0.00f;
+	}
 
 	if(motion_time > 0.0f)
 	{
@@ -614,28 +619,40 @@ void MeCtLocomotion::blend_base_joint(MeFrameData& frame, float space_time, int 
 	float frame1 = anim1->get_timing_space()->get_virtual_frame(space_time);
 	float frame2 = anim2->get_timing_space()->get_virtual_frame(space_time);
 
+	int t_frame1;
+	int t_frame2;
+
 	translate_base = (char*)nonlimb_joint_info.joint_name.get(translation_joint_index);
 	base = walking_skeleton->search_joint(translate_base);
 
-	anim1->walking->connect(walking_skeleton);
-	ratio = frame1 - (int)frame1;
+	t_frame1 = (int)frame1;
+	t_frame2 = (int)frame1+1;
+	if(t_frame2 >= anim1->walking->frames()) t_frame2 = 0;
 
-	anim1->walking->apply_frame((int)frame1);
+	anim1->walking->connect(walking_skeleton);
+	ratio = frame1 - t_frame1;
+
+	anim1->walking->apply_frame(t_frame1);
 	pheight = base->pos()->value(1);
 	r_blended_base_height = pheight*(1.0f-ratio)*(weight);
 
-	anim1->walking->apply_frame((int)frame1+1);
+	anim1->walking->apply_frame(t_frame2);
 	pheight = base->pos()->value(1);
 	r_blended_base_height += pheight*ratio*(weight);
 
-	anim2->walking->connect(walking_skeleton);
-	ratio = frame2 - (int)frame2;
 
-	anim2->walking->apply_frame((int)frame2);
+	t_frame1 = (int)frame2;
+	t_frame2 = (int)frame2+1;
+	if(t_frame2 >= anim2->walking->frames()) t_frame2 = 0;
+
+	anim2->walking->connect(walking_skeleton);
+	ratio = frame2 - t_frame1;
+
+	anim2->walking->apply_frame(t_frame1);
 	pheight = base->pos()->value(1);
 	r_blended_base_height += pheight*(1.0f-ratio)*(1.0f-weight);
 
-	anim2->walking->apply_frame((int)frame2+1);
+	anim2->walking->apply_frame(t_frame2);
 	pheight = base->pos()->value(1);
 	r_blended_base_height += pheight*ratio*(1.0f-weight);
 
@@ -654,6 +671,16 @@ void MeCtLocomotion::set_motion_time(float time)
 {
 	navigator.reached_destination = false;
 	motion_time = time;
+}
+
+void MeCtLocomotion::set_freeze(bool freeze)
+{
+	freezed = freeze;
+}
+
+bool MeCtLocomotion::is_freezed()
+{
+	return freezed;
 }
 
 // main stream
@@ -695,12 +722,12 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 	float acc = speed_accelerator.update(&(limb_list.get(dominant_limb)->direction_planner.get_curr_direction()), limb_list.get(dominant_limb));
 
 	// get the ratio of the two animations
-	dom_ratio = limb_list.get(dominant_limb)->direction_planner.get_ratio(anim1, anim2);
 
 	navigator.update_framerate_accelerator(acc, &limb_list);
 
-	get_blended_timing_space(blended_anim->get_timing_space(), anim1->get_timing_space(), anim2->get_timing_space(), dom_ratio);
+	dom_ratio = limb_list.get(dominant_limb)->direction_planner.get_ratio(anim1, anim2);
 
+	get_blended_timing_space(blended_anim->get_timing_space(), anim1->get_timing_space(), anim2->get_timing_space(), dom_ratio);
 
 	//the current frame number is the addition of previous frame number + increased frame num * acceleration
 	frame_num = blended_anim->get_timing_space()->get_virtual_frame(limb_list.get(dominant_limb)->space_time) + inc_frame * navigator.framerate_accelerator;
@@ -749,6 +776,7 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 		}
 	}
 
+	//printf("\n%f %f", limb_list.get(dominant_limb)->space_time, limb_list.get(1-dominant_limb)->space_time);
 	//blend non-limb joints
 	anim1 = limb_list.get(0)->get_walking_list()->get(r_anim1_index_dominant);
 	anim2 = limb_list.get(0)->get_walking_list()->get(r_anim2_index_dominant);

@@ -139,15 +139,20 @@ void MeCtLocomotionLimbAnim::get_frame(float frame, char* limb_base, SrArray<int
 {
 	//temp int, must be changed
 	//printf("\nframe: %f", frame);
-	float ratio = frame-(int)frame;
+
+	int frame1 = (int)frame;
+	int frame2 = ((int)frame+1);
+	frame2 = (frame2 >= walking->frames()? 0: frame2);
+
+	float ratio = frame - frame1;
 	walking->connect(walking_skeleton);
 
 	SkJoint* base = walking_skeleton->search_joint(limb_base);
 
-	walking->apply_frame((int)frame);
+	walking->apply_frame(frame1);
 	iterate_set(base, 0, 0, &quat_buffer_key_frame1, index_buff);
 
-	walking->apply_frame((int)frame+1);
+	walking->apply_frame(frame2);
 	iterate_set(base, 0, 0, &quat_buffer_key_frame2, index_buff);
 
 	SrQuat q;
