@@ -544,13 +544,22 @@ global proc viewerRunButton()
 			system("echo 0.2 viewer open   800 800  50 50" + " >> " + $seqFile);	
 			system("echo 0.2 camera eye    0 166 185" + " >> " + $seqFile);	
 			system("echo 0.2 camera center 0 92 0" + " >> " + $seqFile);		
+
+			// decide whether to add pre load sequence file
+			int $isUsingPreLoadSeq = 0;
+			$isUsingPreLoadSeq = `checkBox -q -value checkBoxPreLoad`;
+			if ($isUsingPreLoadSeq == 1)
+			{
+				system("echo 0 path seq " + $scriptDir + " >> " + $seqFile);
+				system("echo 1 seq preLoad >> " + $seqFile);
+			}
 			
 			//	load skeleton
 			if ($skeleton != "")
 			{
 				system("echo 0.1 path ME " + "\"" + $skeletonDir + "\""  + " >> " + $seqFile);
-				system("echo 0.1 char " + $character + " init " + $skeletonName + " >> " + $seqFile);
-				system("echo 0.1 set character " +  $character + " world_offset x 0 y 102 h 0" + " >> " + $seqFile);				
+				system("echo 3.1 char " + $character + " init " + $skeletonName + " >> " + $seqFile);
+				system("echo 3.1 set character " +  $character + " world_offset x 0 y 102 h 0" + " >> " + $seqFile);				
 			}
 			else
 			{
@@ -568,7 +577,7 @@ global proc viewerRunButton()
 			{
 				confirmDialog -title "Hint" -message "Please select a motion" -button "Ok" -defaultButton "Ok" -dismissString "Ok";	
 				$noError = 0;
-			}			
+			}	
 			
 			// check if need to be run under smooth binding mode
 			string $meshList[];
@@ -576,18 +585,18 @@ global proc viewerRunButton()
 			int $i;
 			if ($bindingInfo != "")
 			{
-				system("echo 0.2 char " + $character + " smoothbindweight " + "\"" + $smoothBindingDir + "/" + $bindingInfo + "\"" + " >> " + $seqFile);
+				system("echo 3.2 char " + $character + " smoothbindweight " + "\"" + $smoothBindingDir + "/" + $bindingInfo + "\"" + " >> " + $seqFile);
 				if ($mesh != "")
 				{
 					for ($i = 0; $i < size($meshList); $i = $i + 1)
-						system("echo 0.2 char " + $character + " smoothbindmesh " + "\"" + $smoothBindingDir + "/" + $meshList[$i] + "\"" + " >> " + $seqFile);	
-					system("echo 3.5 char " + $character + " viewer 4 " + " >> " + $seqFile);
+						system("echo 3.2 char " + $character + " smoothbindmesh " + "\"" + $smoothBindingDir + "/" + $meshList[$i] + "\"" + " >> " + $seqFile);	
+					system("echo 3.2 char " + $character + " viewer 4 " + " >> " + $seqFile);
 					
 					string $runMotion;
 					for ($i = 0; $i < size($motionList); $i = $i + 1)
 					{
 						if ($i == 0)
-							$runMotion = "echo 4 test bml char " + $character + " ^<animation name=\"" + $motionList[$i] + "\"" + " id=\"anim" + $i + "\""  + "\/^>";
+							$runMotion = "echo 4.5 test bml char " + $character + " ^<animation name=\"" + $motionList[$i] + "\"" + " id=\"anim" + $i + "\""  + "\/^>";
 						else
 							$runMotion = $runMotion + ("^<animation name=\"" + $motionList[$i] + "\"" + " id=\"anim" + $i + "\"" + " start=\"anim" + ($i - 1) + ":end" + "\"" + "\/^>");
 					}
@@ -598,37 +607,50 @@ global proc viewerRunButton()
 				else
 				{
 					confirmDialog -title "Hint" -message "Please select a binding xml file" -button "Ok" -defaultButton "Ok" -dismissString "Ok";
-					system("echo 0.2 char " + $character + " viewer 0 " + " >> " + $seqFile);
+					system("echo 3.2 char " + $character + " viewer 0 " + " >> " + $seqFile);
 					string $runMotion;
 					for ($i = 0; $i < size($motionList); $i = $i + 1)
 					{
 						if ($i == 0)
-							$runMotion = "echo 0.3 test bml char " + $character + " ^<animation name=\"" + $motionList[$i] + "\"" + " id=\"anim" + $i + "\""  + "\/^>";
+							$runMotion = "echo 3.3 test bml char " + $character + " ^<animation name=\"" + $motionList[$i] + "\"" + " id=\"anim" + $i + "\""  + "\/^>";
 						else
 							$runMotion = $runMotion + ("^<animation name=\"" + $motionList[$i] + "\"" + " id=\"anim" + $i + "\"" + " start=\"anim" + ($i - 1) + ":end" + "\"" + "\/^>");
 					}
 					system($runMotion + " >> " + $seqFile);
 					if ($idleMotionName != "")
-						system("echo 0.3 test bml char " + $character + " ^<body posture=\"" + $idleMotionName + "\"\/^>" + " >> " + $seqFile);						
+						system("echo 3.3 test bml char " + $character + " ^<body posture=\"" + $idleMotionName + "\"\/^>" + " >> " + $seqFile);						
 				}
 			}
 			else
 			{
-				system("echo 0.3 char " + $character + " viewer 0 " + " >> " + $seqFile);
+				system("echo 3.3 char " + $character + " viewer 0 " + " >> " + $seqFile);
 				string $runMotion;
 				for ($i = 0; $i < size($motionList); $i = $i + 1)
 				{
 					if ($i == 0)
-						$runMotion = "echo 0.3 test bml char " + $character + " ^<animation name=\"" + $motionList[$i] + "\"" + " id=\"anim" + $i + "\""  + "\/^>";
+						$runMotion = "echo 4 test bml char " + $character + " ^<animation name=\"" + $motionList[$i] + "\"" + " id=\"anim" + $i + "\""  + "\/^>";
 					else
 						$runMotion = $runMotion + ("^<animation name=\"" + $motionList[$i] + "\"" + " id=\"anim" + $i + "\"" + " start=\"anim" + ($i - 1) + ":end" + "\"" + "\/^>");
 				}
 				system($runMotion + " >> " + $seqFile);
 				if ($idleMotionName != "")
-					system("echo 0.3 test bml char " + $character + " ^<body posture=\"" + $idleMotionName + "\"\/^>" + " >> " + $seqFile);					
-			}			
-				
+					system("echo 4 test bml char " + $character + " ^<body posture=\"" + $idleMotionName + "\"\/^>" + " >> " + $seqFile);					
+			}		
+
+			// decide whether to add post load sequence file
+			int $isUsingPostLoadSeq = 0;
+			$isUsingPostLoadSeq = `checkBox -q -value checkBoxPostLoad`;
+			if ($isUsingPostLoadSeq == 1)
+			{
+				system("echo 0 path seq " + $scriptDir + " >> " + $seqFile);
+				system("echo 7 seq postLoad >> " + $seqFile);
+			}
+			
 			string $runCommand = "start " + $sbmBin + " -seqpath " + $scriptDir + " -seq " + "mayaSbmViewer.seq" + " -skscale=" + $scaleSK + " -skmscale=" + $scaleSKM;
+			int $isUsingFaceBone = 0;
+			$isUsingFaceBone = `checkBox -q -value checkBoxPostFaceBone`;
+			if ($isUsingFaceBone == 1)
+				$runCommand = $runCommand + " -facebone ";
 			if ($noError)
 				system($runCommand);		
 		}
@@ -658,6 +680,16 @@ global proc viewerRunButton()
 			system($runCommand); 
 		}
 	}
+}
+
+global proc helpPreloadButton()
+{
+	confirmDialog -title "Hint" -message "Please customize your own preLoad.seq file\nIt's under /Pando/scripts/SmartBodyRunTime/scripts\nThere's an example template you can reference" -button "Ok" -defaultButton "Ok" -dismissString "Ok";	
+}
+
+global proc helpPostloadButton()
+{
+	confirmDialog -title "Hint" -message "Please customize your own postLoad.seq file\nIt's under /Pando/scripts/SmartBodyRunTime/scripts\nThere's an example template you can reference" -button "Ok" -defaultButton "Ok" -dismissString "Ok";
 }
 
 //--------------------- Main Window ------------------------
@@ -727,7 +759,19 @@ global proc sbmViewerGUI()
 					button -label "Select All" -align "center" -command selectAllMesh;
 					button -label "Clear All" -align "center" -command clearAllMesh;
 					setParent viewerMainWin;				
-				
+
+		frameLayout -borderStyle etchedIn -collapsable true -collapse 1 -label "Other SmartBody Setting";
+			columnLayout -adjustableColumn true;
+				checkBox -label "Use Facebone" -align "left" -value 1 checkBoxPostFaceBone;
+				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
+					checkBox -label "Use Pre -load seq file" -align "left" -value 1 checkBoxPreLoad;
+					button -label "help" -align "right" -command helpPreloadButton;
+					setParent ..;	
+				rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
+					checkBox -label "Use Post-load seq file" -align "left" -value 0 checkBoxPostLoad;
+					button -label "help" -align "right" -command helpPostloadButton;
+					setParent viewerMainWin;	
+					
 		frameLayout -borderStyle etchedIn -collapsable true -collapse 1 -label "Smooth Binding Exporter";
 			columnLayout -adjustableColumn true;
 				button -label "Smooth Binding Exporter" -command "source export_smoothbinding.mel; smoothbindingExportGUI";
