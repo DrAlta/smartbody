@@ -1059,6 +1059,8 @@ void FltkViewer::translate_keyboard_state()
 	}
 
 	sprintf(cmd, "test loco ");
+	strcat(cmd, character);
+
 
 	if(fltk::get_key_state('r'))
 	{
@@ -1152,6 +1154,25 @@ void FltkViewer::translate_keyboard_state()
 		else if(x_flag != 0) x_spd -= 1;
 		if(z_spd < 0) z_spd = 0;
 		if(x_spd < 0) x_spd = 0;
+	}
+
+	if(fltk::get_key_state('l'))
+	{
+		if(actor->get_locomotion_ct()->is_freezed())
+			strcat(cmd, "unfreeze");
+		else strcat(cmd, "freeze");
+		mcu.execute(cmd);
+		return;
+	}
+
+	if(fltk::get_key_state('p'))
+	{
+		if(actor->get_locomotion_ct()->is_freezed())
+		{
+			strcat(cmd, "nextframe");
+			mcu.execute(cmd);
+		}
+		return;
 	}
 
 	//direction control
@@ -1265,7 +1286,7 @@ void FltkViewer::translate_keyboard_state()
 	}
 
 	char tt[200];
-	strcat(cmd, character);
+	
 	strcat(cmd, t_direction);
 	//sprintf(tt, "spd %f rps %f time 0.5", spd, rps_flag * rps);
 

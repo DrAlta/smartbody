@@ -140,8 +140,6 @@ float MeCtLocomotionTimingSpace::get_section_length(int ref1, int ref2)
 
 float MeCtLocomotionTimingSpace::get_section_length(float space_value1, float space_value2)
 {
-	if(space_value1 < 2.01 && space_value1 > 2.0 && space_value2 == 2.0f)
-		int y  =0;
 	float f1 = get_virtual_frame(space_value1);
 	float f2 = get_virtual_frame(space_value2);
 	float len = 0.0f;
@@ -211,8 +209,8 @@ float MeCtLocomotionTimingSpace::get_virtual_frame(float space_value)
 	else framecount += end - start;
 	frame = framecount*(space_value - (int)space_value)+start;
 
-	if(frame > frame_num-1 && frame < frame_num)
-		int y = 0;
+	//if(frame > frame_num-1 && frame < frame_num)
+	//	int y = 0;
 	frame = get_normalized_frame(frame);
 	/*while(true)
 	{

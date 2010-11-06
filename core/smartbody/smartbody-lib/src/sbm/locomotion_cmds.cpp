@@ -248,6 +248,39 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		return CMD_SUCCESS;
 	}
 
+	if( arg == "freeze" )
+	{
+		arg = args.read_token();
+		actor->get_locomotion_ct()->set_freeze(true);
+		/*if(!arg.empty())
+		{
+			if(arg == "spacetime")
+			{
+				float dominant_space_time = args.read_float();
+				actor->get_locomotion_ct()->get_limb_list()->get(actor->get_locomotion_ct()->get_dominant_limb_index())->space_time = dominant_space_time;
+				
+			}
+		}*/
+		return CMD_SUCCESS;
+	}
+
+	if( arg == "unfreeze" )
+	{
+		arg = args.read_token();
+		actor->get_locomotion_ct()->set_freeze(false);
+		return CMD_SUCCESS;
+	}
+
+	if( arg == "nextframe" )
+	{
+		if(actor->get_locomotion_ct()->is_freezed())
+		{
+			arg = args.read_token();
+			actor->get_locomotion_ct()->freeze_delta_time = 0.0016666667f;
+		}
+		return CMD_SUCCESS;
+	}
+
 	if( arg == "height_offset" )
 	{
 		actor->get_locomotion_ct()->translation_joint_height = args.read_float();
@@ -257,7 +290,6 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	if( arg == "balance")
 	{
 		actor->get_locomotion_ct()->set_balance_factor(args.read_float());
-
 		return CMD_SUCCESS;
 	}
 
