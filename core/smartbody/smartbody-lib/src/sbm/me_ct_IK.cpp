@@ -234,6 +234,7 @@ __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 	SrVec v, i_target, i_src;
 	//SrVec axis, r_axis;
 	SrVec r_axis;
+	SrQuat q;
 	SrMat mat, mat_inv;
 	if(start_index == 0) mat_inv = scenario->gmat.inverse();
 	else mat_inv = scenario->joint_global_mat_list.get(start_index-1).inverse();
@@ -248,14 +249,17 @@ __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 	if(scenario->joint_info_list.get(start_index).type == JOINT_TYPE_BALL)
 	{
 		//compute the axis
-		v4 = i_target - i_src;
-		v4.normalize();
-		i_target = v4*v1.len()/2.0f+i_src;
+		//v4 = i_target - i_src;
+		//v4.normalize();
+		
+		//
 		v2 = i_target - pivot;
 		v2.normalize();
-		//if()
+
+		//v3 = v4*v1.len()/2.0f+i_src;
 		
 		r_axis = cross(v2, v1);
+		r_axis.normalize();
 		//r_axis = axis;
 	}
 	else if(scenario->joint_info_list.get(start_index).type == JOINT_TYPE_HINGE)
@@ -268,15 +272,18 @@ __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 	
 	//v1.normalize();
 	//v2.normalize();
-	float dot_v = dot(v1, v2);
+	double dot_v = dot(v1, v2);
 	if(dot_v > 1.0f) dot_v = 1.0f;
-	float angle = (float)acos(dot_v);
+	double angle = acos(dot_v);
+
+	if(dot_v > 0.995f) angle /= 2.0f;
 
 	v3 = cross(v1, v2);
+	v3.normalize();
 	if(dot(v3, r_axis) > 0.0f) mat.rot(r_axis, angle);
 	else mat.rot(r_axis, -angle);
 	
-	SrQuat q = scenario->joint_quat_list.get(start_index);
+	q = scenario->joint_quat_list.get(start_index);
 	q = mat * q;
 
 	check_constraint(&q, start_index);
