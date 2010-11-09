@@ -169,8 +169,17 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeFrameData
 	if(has_destination && curr_dest_index == -1 && destination_list.size() > 0) next_destination(frame);
 	this->delta_time = delta_time;
 	CheckNewRoutine(frame);
-	world_pos.set( buffer[ bi_world_x ], buffer[ bi_world_y ], buffer[ bi_world_z ] );
-	world_rot.set( buffer[ bi_world_rot ], buffer[ bi_world_rot+1 ], buffer[ bi_world_rot+2 ], buffer[ bi_world_rot+3 ] );
+	if (worldOffsetWriter)
+	{
+		SrBuffer<float>& data = worldOffsetWriter->get_data();
+		world_pos.set( data[0], data[1], data[2] );
+		world_rot.set( data[3], data[4], data[5], data[6] );
+	}
+	else
+	{
+		world_pos.set( buffer[ bi_world_x ], buffer[ bi_world_y ], buffer[ bi_world_z ] );
+		world_rot.set( buffer[ bi_world_rot ], buffer[ bi_world_rot+1 ], buffer[ bi_world_rot+2 ], buffer[ bi_world_rot+3 ] );
+	}
 	base_pos.set ( buffer[ bi_base_x ], buffer[ bi_base_y ], buffer[ bi_base_z ] );
 
 	//printf("\n(%f, %f, %f)", world_pos.x, world_pos.y, world_pos.z);
