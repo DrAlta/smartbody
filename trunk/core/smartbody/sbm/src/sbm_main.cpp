@@ -848,21 +848,25 @@ mcu.mark( "main", 0, "update_sim" );
 mcu.mark( "main", 0, "update_channel_buffer_viewer");
 		if((ChannelBufferWindow*)mcu.channelbufferviewer_p != NULL)
 		{
-			SbmPawn* pawn_p = NULL;
-			SbmCharacter* char_p = NULL;
-			mcu.pawn_map.reset();
-			while(pawn_p = mcu.pawn_map.next())
+			if(!((ChannelBufferWindow*)mcu.channelbufferviewer_p)->is_freezed)
 			{
-				const char* name = ((ChannelBufferWindow*)mcu.channelbufferviewer_p)->getSelectedCharacterName();
-				if( name != NULL && strcmp(pawn_p->name, name) == 0) break;
+				SbmPawn* pawn_p = NULL;
+				SbmCharacter* char_p = NULL;
+				mcu.pawn_map.reset();
+				while(pawn_p = mcu.pawn_map.next())
+				{
+					const char* name = ((ChannelBufferWindow*)mcu.channelbufferviewer_p)->getSelectedCharacterName();
+					if( name != NULL && strcmp(pawn_p->name, name) == 0) break;
+				}
+				//char_p = mcu.character_map.lookup( pawn_p->name );
+				if(pawn_p != NULL)
+				{
+					SrBuffer<float>& buffer = pawn_p->ct_tree_p->getLastFrame().buffer();
+					((ChannelBufferWindow*)mcu.channelbufferviewer_p)->chartview->get_archive()->Update(buffer);
+					
+				}
 			}
-			//char_p = mcu.character_map.lookup( pawn_p->name );
-			if(pawn_p != NULL)
-			{
-				SrBuffer<float>& buffer = pawn_p->ct_tree_p->getLastFrame().buffer();
-				((ChannelBufferWindow*)mcu.channelbufferviewer_p)->chartview->get_archive()->Update(buffer);
-				((ChannelBufferWindow*)mcu.channelbufferviewer_p)->chartview->render();
-			}
+			((ChannelBufferWindow*)mcu.channelbufferviewer_p)->chartview->render();
 		}
 		
 

@@ -232,7 +232,8 @@ __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 {
 	SrVec v1, v2, v3, v4;
 	SrVec v, i_target, i_src;
-	SrVec axis, r_axis;
+	//SrVec axis, r_axis;
+	SrVec r_axis;
 	SrMat mat, mat_inv;
 	if(start_index == 0) mat_inv = scenario->gmat.inverse();
 	else mat_inv = scenario->joint_global_mat_list.get(start_index-1).inverse();
@@ -241,24 +242,32 @@ __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 	i_target = target.get(manipulated_joint_index) * mat_inv;
 	i_src = src * mat_inv;
 
-	v4 = i_target - i_src;
+	//
 	v1 = i_src - pivot;
+	v1.normalize();
 	if(scenario->joint_info_list.get(start_index).type == JOINT_TYPE_BALL)
 	{
-		//compute the axis 
+		//compute the axis
+		v4 = i_target - i_src;
+		v4.normalize();
+		i_target = v4*v1.len()/2.0f+i_src;
 		v2 = i_target - pivot;
-		axis = cross(v2, v1);
-		r_axis = axis;
+		v2.normalize();
+		//if()
+		
+		r_axis = cross(v2, v1);
+		//r_axis = axis;
 	}
 	else if(scenario->joint_info_list.get(start_index).type == JOINT_TYPE_HINGE)
 	{
 		r_axis = scenario->joint_info_list.get(start_index).axis;
 		v = upright_point_to_plane(i_target, r_axis, i_src);
 		v2 = v - pivot;
+		v2.normalize();
 	}
 	
-	v1.normalize();
-	v2.normalize();
+	//v1.normalize();
+	//v2.normalize();
 	float dot_v = dot(v1, v2);
 	if(dot_v > 1.0f) dot_v = 1.0f;
 	float angle = (float)acos(dot_v);

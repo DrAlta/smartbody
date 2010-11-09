@@ -26,6 +26,7 @@ MeCtLocomotionBalance::MeCtLocomotionBalance()
 {
 	rotational_speed = 0.5f;
 	factor = 1.0f;
+	target_normal.set(0.0f, 1.0f, 0.0f);
 }
 
 MeCtLocomotionBalance::~MeCtLocomotionBalance()

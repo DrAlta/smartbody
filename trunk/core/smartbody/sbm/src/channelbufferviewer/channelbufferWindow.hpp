@@ -5,6 +5,7 @@
 #include <fltk/Choice.h>
 #include <fltk/Browser.h>
 #include <fltk/Button.h>
+#include <fltk/CheckButton.h>
 #include <fltk/LightButton.h>
 #include <fltk/Group.h>
 #include <fltk/Input.h>
@@ -36,6 +37,7 @@ public:
 	fltk::Choice* character;
 	fltk::Choice* quat;
 	fltk::Button* refresh;
+	fltk::Button* freeze;
 	fltk::Button* reset_camera;
 	fltk::Browser* channel_list;
 	fltk::Browser* channel_monitor;
@@ -45,6 +47,7 @@ public:
 
 	SrArray<int> buffer_index;
 	int num_of_frames;
+	bool is_freezed;
 
 public:
 	const char* getSelectedCharacterName();
@@ -55,6 +58,7 @@ public:
 	static void refreshMaxSize(fltk::Widget* widget, void* data);
 	static void refreshQuat(fltk::Widget* widget, void* data);
 	static void resetCamera(fltk::Widget* widget, void* data);
+	static void freezeView(fltk::Widget* widget, void* data);
 
 protected:
 	void initQuat();
