@@ -3,6 +3,7 @@
 0 echo tab 2010 gaze demo sequence
 
 0 ctrl AA gaze neck eyes
+0 ctrl AA handle AA
 0 gaze AA target point 200 180 0
 0 char elder ctrl AA begin
 0 gaze AA fadein
@@ -25,4 +26,3 @@
 # dur: 20
 
 78 gaze AA fadeout
-#85 gaze AA fadeout

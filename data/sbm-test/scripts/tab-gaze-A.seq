@@ -2,6 +2,7 @@
 
 # EYES ONLY
 0 ctrl A gaze eyes
+0 ctrl A handle A
 0 gaze A priority eyes
 0 gaze A offset euler 0 0 0
 0 gaze A bias head 0 0 0
@@ -15,6 +16,7 @@
 
 # HEAD AND EYES
 5 ctrl B gaze head eyes
+5 ctrl B handle B
 5 gaze B priority eyes
 5 gaze B offset euler 0 0 0
 5 gaze B bias head 0 0 0
@@ -30,6 +32,7 @@
 
 # NECK, HEAD, EYES
 10 ctrl C gaze neck eyes
+10 ctrl C handle C
 10 gaze C priority eyes
 10 gaze C offset euler 0 0 0
 10 gaze C bias head 0 0 0
@@ -45,6 +48,7 @@
 
 # CHEST, NECK, HEAD, EYES
 15 ctrl D gaze chest eyes
+15 ctrl D handle D
 15 gaze D priority eyes
 15 gaze D offset euler 0 0 0
 15 gaze D bias head 0 0 0
@@ -60,6 +64,7 @@
 
 # BACK, CHEST, NECK, HEAD, EYES
 20 ctrl E gaze back eyes
+20 ctrl E handle E
 20 gaze E priority eyes
 20 gaze E offset euler 0 0 0
 20 gaze E bias head 0 0 0
