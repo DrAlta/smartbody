@@ -55,8 +55,8 @@
 #8 gaze G1 target point 0 200 100
 
 #0 gaze G1 target euler 0 0 45
-0 gaze G1 target point 0 200 1000
+0 gaze G1 target point 0 0 0
 #0 gaze G1 offset euler 0 0 45
-0 gaze G1 bias head 0 0 45
-0 gaze G1 bias neck 0 0 45
+#0 gaze G1 bias head 0 0 45
+#0 gaze G1 bias neck 0 0 45
 0 char doctor ctrl G1 begin

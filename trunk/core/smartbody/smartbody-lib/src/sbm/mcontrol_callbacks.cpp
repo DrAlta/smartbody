@@ -2799,6 +2799,7 @@ int query_controller(
 
 /*
 
+	ctrl <> handle <handle-name>
 	ctrl <> query
 	ctrl <> timing <ease-in> <ease-out> [<emph>]
 	ctrl <> record motion <operation_type> [max <num-frames>]
@@ -3072,6 +3073,12 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				return(
 					query_controller( ctrl_p )
 				);
+			}
+			else
+			if( strcmp( ctrl_cmd, "handle" ) == 0 )	{
+				char *handle = args.read_token();
+				ctrl_p->handle( handle );
+				return( CMD_SUCCESS );
 			}
 			else
 			return( CMD_NOT_FOUND );

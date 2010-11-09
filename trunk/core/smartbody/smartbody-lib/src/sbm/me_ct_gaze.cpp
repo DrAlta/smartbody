@@ -998,6 +998,7 @@ void MeCtGaze::set_fade_out( float interval )	{
 }
 
 #define SMOOTH_RATE_REF (30.0f)
+#define FADE_EPSILON	(0.001f)
 
 bool MeCtGaze::update_fading( float dt )	{
 
@@ -1029,7 +1030,10 @@ bool MeCtGaze::update_fading( float dt )	{
 					min_val = blend;
 				}
 			}
-			if( min_val > 0.999f )	{
+			if( min_val > ( 1.0 - FADE_EPSILON ) )	{
+				for( int i = 0; i < joint_key_count; i++ )	{
+					set_blend( i, 1.0 );
+				}
 				fading_normal = 1.0f;
 				fading_mode = FADING_MODE_OFF;
 //				LOG( "MeCtGaze::update_fading FULL WEIGHT" );
@@ -1056,7 +1060,10 @@ bool MeCtGaze::update_fading( float dt )	{
 						max_val = blend;
 					}
 				}
-				if( max_val < 0.001f )	{
+				if( max_val < FADE_EPSILON )	{
+					for( int i = 0; i < joint_key_count; i++ )	{
+						set_blend( i, 0.0 );
+					}
 					fading_normal = 0.0f;
 					fading_complete = true;
 //					LOG( "MeCtGaze::update_fading ZERO WEIGHT" );
