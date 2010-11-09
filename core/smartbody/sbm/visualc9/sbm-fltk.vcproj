@@ -43,6 +43,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk2;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\sbm-ui\panimationviewer\src&quot;;&quot;..\..\sbm-ui\bmlviewer\src&quot;;..\..\sbm\src\channelbufferviewer"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB"
@@ -130,6 +131,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
 				Optimization="3"
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
