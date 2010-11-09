@@ -18,7 +18,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)\core\FestivalRelay"
+			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="1"
@@ -62,7 +62,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
 				AdditionalDependencies="libFestival.lib libestbase.lib libestools.lib libeststring.lib Ws2_32.lib winmm.lib vhcl_d.lib xerces-c_3D.lib vhmsg_d.lib pthreadVSE2.lib activemq-cppd.lib"
+				OutputFile="$(OutDir)\$(ProjectName)d.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib\festival\src\lib;..\..\lib\speech_tools\lib;..\..\lib\vhcl\lib;&quot;..\..\lib\vhmsg\vhmsg-c\lib&quot;;&quot;..\..\lib\xerces-c\lib&quot;;..\..\lib\pthreads\lib;&quot;..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;"
 				GenerateDebugInformation="true"
@@ -89,12 +91,12 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll .&#x0D;&#x0A;copy /Y ..\..\lib\xerces-c\bin\xerces-c_3_0D.dll .&#x0D;&#x0A;"
+				CommandLine="copy /Y &quot;$(TargetPath)&quot; .&#x0D;&#x0A;copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll .&#x0D;&#x0A;copy /Y ..\..\lib\xerces-c\bin\xerces-c_3_0D.dll .&#x0D;&#x0A;&#x0D;&#x0A;if not exist ..\..\bin\FestivalRelay mkdir ..\..\bin\FestivalRelay&#x0D;&#x0A;copy /Y &quot;$(TargetPath)&quot; ..\..\bin\FestivalRelay&#x0D;&#x0A;copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll ..\..\bin\FestivalRelay&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..\..\bin\FestivalRelay&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..\..\bin\FestivalRelay&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..\..\bin\FestivalRelay&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll ..\..\bin\FestivalRelay&#x0D;&#x0A;copy /Y ..\..\lib\xerces-c\bin\xerces-c_3_0D.dll ..\..\bin\FestivalRelay&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)\core\FestivalRelay"
+			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="1"
@@ -140,6 +142,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkLibraryDependencies="false"
 				AdditionalDependencies="libFestival.lib libestbase.lib libestools.lib libeststring.lib Ws2_32.lib winmm.lib xerces-c_3.lib vhcl.lib vhmsg.lib pthreadVSE2.lib activemq-cpp.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib\festival\src\lib;..\..\lib\speech_tools\lib;&quot;..\..\lib\xerces-c\lib&quot;;..\..\lib\vhcl\lib;&quot;..\..\lib\vhmsg\vhmsg-c\lib&quot;;&quot;..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;..\..\lib\pthreads\lib"
@@ -169,35 +172,17 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /Y &quot;$(TargetPath)&quot; .&#x0D;&#x0A;copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll .&#x0D;&#x0A;copy /Y ..\..\lib\xerces-c\bin\xerces-c_3_0.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .&#x0D;&#x0A;"
+				CommandLine="copy /Y &quot;$(TargetPath)&quot; .&#x0D;&#x0A;copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll .&#x0D;&#x0A;copy /Y ..\..\lib\xerces-c\bin\xerces-c_3_0.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .&#x0D;&#x0A;&#x0D;&#x0A;if not exist ..\..\bin\FestivalRelay mkdir ..\..\bin\FestivalRelay&#x0D;&#x0A;copy /Y &quot;$(TargetPath)&quot; ..\..\bin\FestivalRelay&#x0D;&#x0A;copy /Y ..\..\lib\pthreads\lib\pthreadVSE2.dll ..\..\bin\FestivalRelay&#x0D;&#x0A;copy /Y ..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll ..\..\bin\FestivalRelay&#x0D;&#x0A;copy /Y ..\..\lib\xerces-c\bin\xerces-c_3_0.dll ..\..\bin\FestivalRelay&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..\..\bin\FestivalRelay&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..\..\bin\FestivalRelay&#x0D;&#x0A;copy /Y ..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..\..\bin\FestivalRelay&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
 	<References>
 	</References>
 	<Files>
-		<Filter
-			Name="Source Files"
-			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+		<File
+			RelativePath=".\src\FestivalRelay.cpp"
 			>
-			<File
-				RelativePath=".\src\FestivalRelay.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
-		</Filter>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
