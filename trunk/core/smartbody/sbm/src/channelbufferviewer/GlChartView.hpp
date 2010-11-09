@@ -4,6 +4,7 @@
 #include <fltk/GlWindow.H>
 #include <SR/sr_camera.h>
 #include <SR/sr_light.h>
+#include "GlChartViewCoordinate.hpp"
 #include "GlChartViewArchive.hpp"
 #include <sbm/mcontrol_util.h>
 //#include ""
@@ -17,6 +18,7 @@ public:
 
 	SrEvent e;
 
+	GlChartViewCoordinate coordinate;
 	GlChartViewArchive archive;
 
 	int quat_shown_type; //0: 4 series of values; 1: euler angle;
