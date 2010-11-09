@@ -53,6 +53,10 @@ ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name)
 		initQuat();
 		quat->callback(refreshQuat, this);
 
+		freeze = new fltk::Button(w-200, 0, 80, 18, "Freeze");
+		freeze->callback(freezeView, this);
+		is_freezed = false;
+
 		reset_camera = new fltk::Button(w-100, 0, 80, 18, "Reset Camera");
 		reset_camera->callback(resetCamera, this);
 
@@ -72,6 +76,15 @@ void ChannelBufferWindow::resetCamera(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	window->chartview->init_camera();
+}
+
+void ChannelBufferWindow::freezeView(fltk::Widget* widget, void* data)
+{
+	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
+	window->is_freezed = !window->is_freezed;
+	if(window->is_freezed) window->freeze->label("Unfreeze");
+	else window->freeze->label("Freeze");
+
 }
 
 void ChannelBufferWindow::refreshQuat(fltk::Widget* widget, void* data)

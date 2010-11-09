@@ -337,6 +337,14 @@
 				RelativePath="..\src\channelbufferviewer\GlChartViewArchive.hpp"
 				>
 			</File>
+			<File
+				RelativePath="..\src\channelbufferviewer\GlChartViewCoordinate.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\channelbufferviewer\GlChartViewCoordinate.hpp"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath="..\src\pic.cpp"

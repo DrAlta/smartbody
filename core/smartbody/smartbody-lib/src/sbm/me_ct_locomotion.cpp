@@ -811,7 +811,7 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 
 	navigator.update_world_mat();
 
-	if(ik_enabled)
+	//if(ik_enabled)
 	{
 		height_offset.set_limb_list(&limb_list);
 		height_offset.set_translation_base_joint_height(translation_joint_height);

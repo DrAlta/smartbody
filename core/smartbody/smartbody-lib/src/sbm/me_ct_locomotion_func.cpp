@@ -156,9 +156,14 @@ void get_frame(SkMotion* walking, SkSkeleton* walking_skeleton, float frame, cha
 void get_frame(SkMotion* walking, SkSkeleton* walking_skeleton, float frame, char* limb_base, SrArray<SrQuat>* quat_buffer, SrArray<SrQuat>* quat_buffer1, SrArray<SrQuat>* quat_buffer2, SrArray<int>* index_buff)
 {
 	SkJoint* base = walking_skeleton->search_joint(limb_base);
-	walking->apply_frame((int)frame);
+
+	int frame1 = (int)frame;
+	int frame2 = ((int)frame+1);
+	frame2 = (frame2 >= walking->frames()? 0: frame2);
+
+	walking->apply_frame(frame1);
 	iterate_set(base, 0, quat_buffer->size(), quat_buffer1, index_buff);
-	walking->apply_frame((int)frame+1);
+	walking->apply_frame(frame2);
 	iterate_set(base, 0, quat_buffer->size(), quat_buffer2, index_buff);
 	SrQuat q;
 	for(int i = 0; i < quat_buffer->size(); ++i)
