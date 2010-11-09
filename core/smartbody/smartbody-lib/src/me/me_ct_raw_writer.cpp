@@ -83,6 +83,10 @@ void MeCtRawWriter::set_data( float data[] ) {
 	_write_next = true;
 }
 
+SrBuffer<float>& MeCtRawWriter::get_data() {
+	return _data;
+}
+
 SkChannelArray& MeCtRawWriter::controller_channels() {
 	return _channels;
 }

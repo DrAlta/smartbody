@@ -73,6 +73,8 @@ public:
 	 */
 	void set_data( float data[] );
 
+	SrBuffer<float>& get_data();
+
 	/**
 	 *  Implements MeController::controller_channels().
 	 */
