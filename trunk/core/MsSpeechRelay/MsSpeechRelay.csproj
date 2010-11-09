@@ -68,7 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
@@ -93,7 +93,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\lib\vhmsg\vhmsg-net\vhmsg-net.csproj">
+    <ProjectReference Include="..\..\lib\vhmsg\vhmsg-net\vhmsg-net.csproj">
       <Project>{DE4240A9-DBBA-410F-888F-462384A5B280}</Project>
       <Name>vhmsg-net</Name>
     </ProjectReference>
@@ -107,18 +107,18 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug copy /Y "$(TargetPath)" "..\..\..\$(TargetName)d$(TargetExt)"
-if $(ConfigurationName) == Release copy /Y "$(TargetPath)" ..\..\..
-copy /Y "$(TargetDir)\vhmsg-net.dll" ..\..\..
-copy /Y "$(TargetDir)\Apache.NMS.dll" ..\..\..
-copy /Y "$(TargetDir)\Apache.NMS.ActiveMQ.dll" ..\..\..
+    <PostBuildEvent>if $(ConfigurationName) == Debug copy /Y "$(TargetPath)" "..\..\$(TargetName)d$(TargetExt)"
+if $(ConfigurationName) == Release copy /Y "$(TargetPath)" ..\..
+copy /Y "$(TargetDir)\vhmsg-net.dll" ..\..
+copy /Y "$(TargetDir)\Apache.NMS.dll" ..\..
+copy /Y "$(TargetDir)\Apache.NMS.ActiveMQ.dll" ..\..
 
-if not exist ..\..\..\..\..\bin\MsSpeechRelay mkdir ..\..\..\..\..\bin\MsSpeechRelay
-if $(ConfigurationName) == Debug copy /Y "$(TargetPath)" "..\..\..\..\..\bin\MsSpeechRelay\$(TargetName)d$(TargetExt)"
-if $(ConfigurationName) == Release copy /Y "$(TargetPath)" ..\..\..\..\..\bin\MsSpeechRelay
-copy /Y "$(TargetDir)\vhmsg-net.dll" ..\..\..\..\..\bin\MsSpeechRelay
-copy /Y "$(TargetDir)\Apache.NMS.dll" ..\..\..\..\..\bin\MsSpeechRelay
-copy /Y "$(TargetDir)\Apache.NMS.ActiveMQ.dll" ..\..\..\..\..\bin\MsSpeechRelay
+if not exist ..\..\..\..\bin\MsSpeechRelay mkdir ..\..\..\..\bin\MsSpeechRelay
+if $(ConfigurationName) == Debug copy /Y "$(TargetPath)" "..\..\..\..\bin\MsSpeechRelay\$(TargetName)d$(TargetExt)"
+if $(ConfigurationName) == Release copy /Y "$(TargetPath)" ..\..\..\..\bin\MsSpeechRelay
+copy /Y "$(TargetDir)\vhmsg-net.dll" ..\..\..\..\bin\MsSpeechRelay
+copy /Y "$(TargetDir)\Apache.NMS.dll" ..\..\..\..\bin\MsSpeechRelay
+copy /Y "$(TargetDir)\Apache.NMS.ActiveMQ.dll" ..\..\..\..\bin\MsSpeechRelay
 </PostBuildEvent>
   </PropertyGroup>
 </Project>
