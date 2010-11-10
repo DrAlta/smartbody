@@ -185,6 +185,9 @@ SMARTBODY_DLL_API bool Smartbody_dll::Init()
 
    mcu_vrAllCall_func( srArgBuffer(""), &mcu );
 
+   vhcl::Log::Listener* listener = new vhcl::Log::FileListener("./smartbody.log");
+   vhcl::Log::g_log.AddListener(listener);
+
    return true;
 }
 

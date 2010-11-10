@@ -554,7 +554,6 @@ void mcuCBHandle::update( void )	{
 		// blinking hack...
 		char_p = character_map.lookup( pawn_p->name );
 		if( char_p ) {
-			char_p->reset_viseme_channels();		// Temporary Hack for Solving feedback problem, this isn't necessary for non-facebonebone implementations
 			char_p->eye_blink_update( this->time );
 		}
 
