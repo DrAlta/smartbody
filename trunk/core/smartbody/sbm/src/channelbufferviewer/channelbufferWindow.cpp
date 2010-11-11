@@ -23,11 +23,19 @@ ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name)
 		refresh = new fltk::Button(60+w/8+5, 20, w/16, 20, "Refresh");
 		refresh->callback(refreshCharacters, this);
 
-		channel_list = new fltk::Browser(50+w/4+w/16, 20, w/4, 120, "Channels");
+		channel_filter = new fltk::Input(50+w/4+w/16+50, 0, w/4-50, 18, "Channels:");
+		channel_filter->when(fltk::WHEN_CHANGED);
+		channel_filter->callback(FilterChannelItem, this);
+
+		channel_list = new fltk::Browser(50+w/4+w/16, 20, w/4, 120, "");
 		channel_list->type(fltk::Browser::MULTI);
 		loadChannels(this);
 
-		channel_monitor = new fltk::Browser(50+w/2+w/8+20, 20, w/4, 120, "Monitored Channels");
+		channel_monitored_filter = new fltk::Input(50+w/2+w/8+20+50, 0, w/4-50, 18, "Monitored:");
+		channel_monitored_filter->when(fltk::WHEN_CHANGED);
+		channel_monitored_filter->callback(FilterMonitoredChannelItem, this);
+
+		channel_monitor = new fltk::Browser(50+w/2+w/8+20, 20, w/4, 120, "");
 		channel_monitor->type(fltk::Browser::MULTI);
 		//loadChannels(character, channel_monitor);
 
@@ -72,10 +80,49 @@ ChannelBufferWindow::~ChannelBufferWindow()
 {
 }
 
+void ChannelBufferWindow::FilterChannelItem(fltk::Widget* widget, void* data)
+{
+	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
+	FilterItem(window->channel_list, window->channel_filter);
+}
+
+void ChannelBufferWindow::FilterMonitoredChannelItem(fltk::Widget* widget, void* data)
+{
+	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
+	FilterItem(window->channel_monitor, window->channel_monitored_filter);
+}
+
+void ChannelBufferWindow::FilterItem(fltk::Browser* list, fltk::Input* filter)
+{
+	const char* keyword = filter->value();
+	if(keyword[0] == '\0')
+	{
+		for(int i = 0; i < list->size(); ++i)
+		{
+			list->goto_index(i)->show();
+		}
+		return;
+	}
+	for(int i = 0; i < list->size(); ++i)
+	{
+		const char* item = list->goto_index(i)->label();
+		if(strstr(item, keyword)!= NULL) 
+		{
+			list->goto_index(i)->show();
+		}
+		else 
+		{
+			list->goto_index(i)->hide();
+		}
+	}
+	//list->redraw();
+}
+
 void ChannelBufferWindow::resetCamera(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	window->chartview->init_camera();
+	window->chartview->update_coordinate = true;
 }
 
 void ChannelBufferWindow::freezeView(fltk::Widget* widget, void* data)
@@ -93,7 +140,8 @@ void ChannelBufferWindow::refreshQuat(fltk::Widget* widget, void* data)
 	int i = 0;
 
 	if(strcmp(window->quat->get_item()->label(), "4 series of values") == 0) i = 0;
-	else if(strcmp(window->quat->get_item()->label(), "Euler angle") == 0) i = 1;
+	else if(strcmp(window->quat->get_item()->label(), "3 series of values") == 0) i = 1;
+	else if(strcmp(window->quat->get_item()->label(), "3D vector") == 0) i = 2;
 	
 	window->chartview->set_quat_show_type(i);
 }
@@ -101,7 +149,8 @@ void ChannelBufferWindow::refreshQuat(fltk::Widget* widget, void* data)
 void ChannelBufferWindow::initQuat()
 {
 	quat->add("4 series of values");
-	quat->add("Euler angle");
+	quat->add("3 series of values");
+	quat->add("3D vector");
 }
 
 void ChannelBufferWindow::refreshMaxSize(fltk::Widget* widget, void* data)
@@ -191,7 +240,6 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 		window->buffer_index.push() = channel_index;
 		channel_index += channelSize;
 	}
-
 }
 
 const char* ChannelBufferWindow::getSelectedCharacterName()
@@ -263,6 +311,45 @@ void ChannelBufferWindow::moveChannels(GlChartView* chartview, fltk::Browser* fr
 		}
 	}
 }
+
+/*void ChannelBufferWindow::moveChannels(GlChartView* chartview, fltk::Browser* from, fltk::Browser* to, bool add_series, SrArray<int>& buffer_index)
+{
+	for(int i = 0; i < from->size(); ++i)
+	{
+		if(from->selected(i))
+		{
+			const char* title = from->goto_index(i)->label();
+			
+			if(add_series) 
+			{
+				chartview->get_archive()->NewSeries(title, get_size(title), buffer_index.get(i));
+				chartview->get_archive()->GetLastSeries()->SetMaxSize(chartview->max_buffer_size);
+				from->goto_index(i)->hide();
+				to->add(title);
+				//buffer_index.remove(i);
+			}
+			else 
+			{
+				GlChartViewSeries* series = chartview->get_archive()->GetSeries(title);
+				if(series == NULL)
+				{
+					printf("\nERROR: ChannelBufferWindow::moveChannels(). series not found");
+				}
+				//else buffer_index.push() = series->GetBufferIndex();
+				chartview->get_archive()->DeleteSeries(title);
+				for(int j = 0; j < to->size(); ++j)
+				{
+					const char* str = to->goto_index(j)->label();
+					if(strcmp(str, title) == 0) to->goto_index(j)->set_visible();
+				}
+				from->remove(i);
+				--i;
+			}
+		}
+	}
+	from->redraw();
+	to->redraw();
+}*/
 
 int ChannelBufferWindow::get_size(const char* title)
 {

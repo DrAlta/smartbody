@@ -10,6 +10,7 @@ GlChartView::GlChartView(int x, int y, int w, int h, char* name) : fltk::GlWindo
 	th = 0;
 	max_buffer_size = 800;
 	quat_shown_type = 0;
+	update_coordinate = true;
 }
 
 GlChartView::~GlChartView()
@@ -19,6 +20,7 @@ GlChartView::~GlChartView()
 void GlChartView::set_max_buffer_size(int max_size)
 {
 	max_buffer_size = max_size;
+	coordinate.SetXSize(max_size);
 }
 
 void GlChartView::initGL(int width, int height)
@@ -58,13 +60,15 @@ void GlChartView::initGL(int width, int height)
 void GlChartView::init_camera()
 {
 	camera.init();
+	camera.aspect = (float)w()/(float)h();
+	coordinate.Update((float)w(), (float)h(), camera);
+	camera.eye.x = coordinate.GetXScale()/2;
 	camera.eye.z = 2000.0f;
 	camera.eye.y = 0.0f;
-	camera.eye.x = 2000.0f;
-	camera.center.x = 2000.0f;
+	camera.center.x = coordinate.GetXScale()/2;
 	camera.center.y = 0.0f;
 	camera.center.z = 0.0f;
-	camera.aspect = (float)w()/(float)h();
+	coordinate.y_scale_zoom = 1.0f;
 }
 
 void GlChartView::reshape(int width, int height)
@@ -78,56 +82,9 @@ void GlChartView::reshape(int width, int height)
 
 void GlChartView::render()
 {
+	if(update_coordinate) coordinate.Update((float)w(), (float)h(), camera);
 	redraw();
 }
-
-/*void GlChartView::print_bitmap_string(float x,float y, float z, void *font, char* s) 
-{
-	glRasterPos3f(x,y,z);
-	if (s && strlen(s))
-	{
-		while (*s)
-		{
-			glutBitmapCharacter(font, *s);
-			s++;
-		}
-	}
-}
-
-void GlChartView::displayText(char* text, int X1, int Y1) 
-{
-	glEnable(GL_DEPTH_TEST);
-
-	if (glGetError() != GL_NO_ERROR) printf("OpenGL error.\n");
-
-	// prepare OpenGL matrices for rendering the bitmap string
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	gluOrtho2D (0, w(), 0, h());
-
-	//int X1 = 10;
-	//int Y1 = WindowHeight-20;
-	glColor3f(1.0,0,0); // text color
-	print_bitmap_string(X1, Y1, -0.9, GLUT_BITMAP_8_BY_13, text);
-	//print_bitmap_string(X1, Y1, -0.9, GLUT_BITMAP_9_BY_15, text);
-
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-
-	// end of bitmap
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	gluLookAt(0, 0, -300.0f, 0.0,0.0,0.0, 0.0,1.0,0.0); 
-}*/
-
 
 void GlChartView::draw()
 {
@@ -175,35 +132,13 @@ void GlChartView::draw()
 	glEnable( GL_COLOR_MATERIAL );
 	glEnable( GL_NORMALIZE );
 
-
-	//glLoadIdentity();
 	draw_coordinate();
 	draw_series();
-
-
-	//glutSwapBuffers();
-
 }
 
 void GlChartView::draw_coordinate()
 {
-	glBegin(GL_LINES);
-	glColor4f(1.0f, 0.0f, 0.0f, 0.3f);
-	glVertex3f(0.0f, 0.0f, 0.0f);
-	glVertex3f(4000.0f, 0.0f, 0.0f);
-
-	glColor4f(0.0f, 1.0f, 0.0f, 0.3f);
-	glVertex3f(0.0f, 0.0f, 0.0f);
-	glVertex3f(0.0f, 1000.0f, 0.0f);
-
-	glColor4f(0.0f, 1.0f, 0.0f, 0.3f);
-	glVertex3f(0.0f, 0.0f, 0.0f);
-	glVertex3f(0.0f, -1000.0f, 0.0f);
-
-	/*glColor4f(0.0f, 0.0f, 1.0f, 0.3f);
-	glVertex3f(0.0f, 0.0f, 0.0f);
-	glVertex3f(0.0f, 0.0f, 1000.0f);*/
-	glEnd();
+	coordinate.Draw();
 }
 
 void GlChartView::draw_series()
@@ -227,8 +162,9 @@ void GlChartView::draw_series()
 
 		else if(series->data_type == CHART_DATA_TYPE_QUAT)
 		{
-			if(quat_shown_type == 1) draw_series_euler(series);
-			else if(quat_shown_type == 0) draw_series_quat(series);
+			if(quat_shown_type == 0) draw_series_quat(series);
+			else if(quat_shown_type == 1) draw_series_euler(series);
+			else if(quat_shown_type == 2) draw_series_3D_euler(series);
 		}
 	}
 }
@@ -262,7 +198,7 @@ void GlChartView::draw_series_vec3(GlChartViewSeries* series)
 
 }
 
-void GlChartView::draw_series_euler(GlChartViewSeries* series)
+void GlChartView::draw_series_3D_euler(GlChartViewSeries* series)
 {
 	SrVec euler;
 	SrVec prev_euler;
@@ -287,17 +223,55 @@ void GlChartView::draw_series_euler(GlChartViewSeries* series)
 
 }
 
+void GlChartView::draw_series_euler(GlChartViewSeries* series)
+{
+	SrVec euler;
+	SrVec color;
+	float step = coordinate.GetXScale()/(series->max_size-1);
+	float y_scale = coordinate.GetYScale();
+	color = series->GetColor(1);
+	glColor4f(color.x, color.y, color.z, 0.5f);
+	glBegin(GL_LINE_STRIP);
+		for(int i = 0; i < series->size; ++i)
+		{
+			euler = series->GetEuler(i);
+			glVertex3f(i*step, euler.x*y_scale, 0.0f);
+		}
+	glEnd();
+	color = series->GetColor(2);
+	glColor4f(color.x, color.y, color.z, 0.5f);
+	glBegin(GL_LINE_STRIP);
+		for(int i = 0; i < series->size; ++i)
+		{
+			euler = series->GetEuler(i);
+			glVertex3f(i*step, euler.y*y_scale, 0.0f);
+		}
+	glEnd();
+	color = series->GetColor(3);
+	glColor4f(color.x, color.y, color.z, 0.5f);
+	glBegin(GL_LINE_STRIP);
+		for(int i = 0; i < series->size; ++i)
+		{
+			euler = series->GetEuler(i);
+			glVertex3f(i*step, euler.z*y_scale, 0.0f);
+		}
+	glEnd();
+
+}
+
 void GlChartView::draw_series_quat(GlChartViewSeries* series)
 {
 	SrQuat quat;
 	SrVec color;
+	float step = coordinate.GetXScale()/(series->max_size-1);
+	float y_scale = coordinate.GetYScale();
 	color = series->GetColor(1);
 	glColor4f(color.x, color.y, color.z, 0.5f);
 	glBegin(GL_LINE_STRIP);
 		for(int i = 0; i < series->size; ++i)
 		{
 			quat = series->GetQuat(i);
-			glVertex3f(i*5.0f, quat.x*1000, 0.0f);
+			glVertex3f(i*step, quat.x*y_scale, 0.0f);
 		}
 	glEnd();
 	color = series->GetColor(2);
@@ -306,7 +280,7 @@ void GlChartView::draw_series_quat(GlChartViewSeries* series)
 		for(int i = 0; i < series->size; ++i)
 		{
 			quat = series->GetQuat(i);
-			glVertex3f(i*5.0f, quat.y*1000, 0.0f);
+			glVertex3f(i*step, quat.y*y_scale, 0.0f);
 		}
 	glEnd();
 	color = series->GetColor(3);
@@ -315,7 +289,7 @@ void GlChartView::draw_series_quat(GlChartViewSeries* series)
 		for(int i = 0; i < series->size; ++i)
 		{
 			quat = series->GetQuat(i);
-			glVertex3f(i*5.0f, quat.z*1000, 0.0f);
+			glVertex3f(i*step, quat.z*y_scale, 0.0f);
 		}
 	glEnd();
 
@@ -325,7 +299,7 @@ void GlChartView::draw_series_quat(GlChartViewSeries* series)
 		for(int i = 0; i < series->size; ++i)
 		{
 			quat = series->GetQuat(i);
-			glVertex3f(i*5.0f, quat.w*1000, 0.0f);
+			glVertex3f(i*step, quat.w*y_scale, 0.0f);
 		}
 	glEnd();
 }
@@ -350,8 +324,9 @@ int GlChartView::handle ( int event )
         translate_event ( e, SrEvent::Release, w(), h(), this);
 		break;
 
-	case fltk::MOVE:
 	case fltk::DRAG:
+		update_coordinate = false;
+	case fltk::MOVE:
         translate_event ( e, SrEvent::Drag, w(), h(), this );
         break;
 
@@ -463,13 +438,17 @@ int GlChartView::mouse_event ( const SrEvent &e )
 
 			if ( e.alt && e.button3 )
 			{
-				camera.fovy += (dx+dy);//40.0f;
-				camera.fovy = SR_BOUND ( camera.fovy, 0.001f, srpi );
+				//camera.fovy += (dx+dy);//40.0f;
+				//camera.fovy = SR_BOUND ( camera.fovy, 0.001f, srpi );
+				float s = sqrt((e.lmouse.x - e.mouse.x)*(e.lmouse.x - e.mouse.x) + (e.lmouse.y - e.mouse.y)*(e.lmouse.y - e.mouse.y));
+				if(e.lmouse.y > e.mouse.y) s = -s;
+				coordinate.y_scale_zoom += s*coordinate.y_scale_zoom;
+				if(coordinate.y_scale_zoom < 1.0f) coordinate.y_scale_zoom = 1.0f;
 			}
 			else if(e.button1 && !e.alt)
 			{
-				camera.center.x += (e.lmouse.x - e.mouse.x)*100.0f;
-				camera.eye.x += (e.lmouse.x - e.mouse.x)*100.0f;
+				camera.center.x += (e.lmouse.x - e.mouse.x)*coordinate.GetXScale()/2;
+				camera.eye.x += (e.lmouse.x - e.mouse.x)*coordinate.GetXScale()/2;
 			}
 			else if ( e.alt && e.button3 )
 			{ 

@@ -57,10 +57,33 @@ int GlChartViewSeries::GetBufferIndex()
 	return buffer_index;
 }
 
-void GlChartViewSeries::SetBufferIndex(int index)
+void GlChartViewSeries::SetRGBColor()
 {
-	buffer_index = index;
-	srand(buffer_index);
+	color_x.x = 1.0f;
+	color_x.y = 0.0f;
+	color_x.z = 0.0f;
+
+	color_y.x = 0.0f;
+	color_y.y = 1.0f;
+	color_y.z = 0.0f;
+
+	color_z.x = 0.0f;
+	color_z.y = 0.0f;
+	color_z.z = 1.0f;
+
+	color_w.x = 1.0f;
+	color_w.y = 1.0f;
+	color_w.z = 1.0f;
+}
+
+void GlChartViewSeries::SetColorOnBufferIndex()
+{
+	SetColorOnBufferIndex(buffer_index);
+}
+
+void GlChartViewSeries::SetColorOnBufferIndex(int index)
+{
+	srand(index);
 	while(true)
 	{
 		color_x.x = (float)(rand()%512)/512.0f;
@@ -93,6 +116,11 @@ void GlChartViewSeries::SetBufferIndex(int index)
 		if(color_w.x < 0.4f && color_w.y < 0.4f && color_w.z < 0.4f) continue;
 		break;
 	}
+}
+
+void GlChartViewSeries::SetBufferIndex(int index)
+{
+	buffer_index = index;
 }
 
 __forceinline int GlChartViewSeries::CheckIndex(int index)
@@ -324,7 +352,9 @@ void GlChartViewArchive::NewSeries(const char* title, int type, int buffer_index
 	series->title.set(title);
 	series->data_type = type;
 	series->SetBufferIndex(buffer_index);
-	series->SetMaxSize(800);
+	if(series_list.size() == 0) series->SetRGBColor();
+	else series->SetColorOnBufferIndex();
+	series->SetMaxSize(0);
 	series_list.push() = series;
 }
 

@@ -63,6 +63,9 @@ public:
 	void Push(SrQuat& quat);
 	void SetMaxSize(int max_size);
 	void SetBufferIndex(int index);
+	void SetColorOnBufferIndex();
+	void SetColorOnBufferIndex(int index);
+	void SetRGBColor();
 	int GetBufferIndex();
 	void SetColor(int index, SrVec& color);
 	SrVec GetColor(int index);
