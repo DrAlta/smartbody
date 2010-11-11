@@ -276,7 +276,7 @@ __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 	if(dot_v > 1.0f) dot_v = 1.0f;
 	double angle = acos(dot_v);
 
-	if(dot_v > 0.995f) angle /= 2.0f;
+	if(dot_v > 0.995f) angle /= 4.0f;
 
 	v3 = cross(v1, v2);
 	v3.normalize();

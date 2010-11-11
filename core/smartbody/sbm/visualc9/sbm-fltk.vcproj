@@ -347,6 +347,14 @@
 				RelativePath="..\src\channelbufferviewer\GlChartViewCoordinate.hpp"
 				>
 			</File>
+			<File
+				RelativePath="..\src\channelbufferviewer\glfont2.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\channelbufferviewer\glfont2.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath="..\src\pic.cpp"

@@ -44,6 +44,8 @@ public:
 	fltk::Button* channel_add;
 	fltk::Button* channel_remove;
 	fltk::Input* frame_num;
+	fltk::Input* channel_filter;
+	fltk::Input* channel_monitored_filter;
 
 	SrArray<int> buffer_index;
 	int num_of_frames;
@@ -59,12 +61,15 @@ public:
 	static void refreshQuat(fltk::Widget* widget, void* data);
 	static void resetCamera(fltk::Widget* widget, void* data);
 	static void freezeView(fltk::Widget* widget, void* data);
+	static void FilterChannelItem(fltk::Widget* widget, void* data);
+	static void FilterMonitoredChannelItem(fltk::Widget* widget, void* data);
 
 protected:
 	void initQuat();
 	void set_default_values();
 	static void clearMonitoredChannel(ChannelBufferWindow* window);
 	static void addMonitoredChannel(fltk::Widget* widget, void* data);
+	static void FilterItem(fltk::Browser* list, fltk::Input* filter);
 	static void removeMonitoredChannel(fltk::Widget* widget, void* data);
 	static void moveChannels(GlChartView* chartview, fltk::Browser* from, fltk::Browser* to, bool add_series, SrArray<int>& buffer_index);
 	static int get_size(const char* title);

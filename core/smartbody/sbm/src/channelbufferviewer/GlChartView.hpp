@@ -7,7 +7,7 @@
 #include "GlChartViewCoordinate.hpp"
 #include "GlChartViewArchive.hpp"
 #include <sbm/mcontrol_util.h>
-//#include ""
+//#include "glfont.h"
 
 class GlChartView : public fltk::GlWindow, public SrViewer
 {
@@ -15,6 +15,8 @@ public:
 	int th;
 	SrCamera camera;
 	int max_buffer_size;
+	bool update_coordinate;
+	//float y_scale;
 
 	SrEvent e;
 
@@ -57,6 +59,7 @@ protected:
 	void draw_series_vec2(GlChartViewSeries* series);
 	void draw_series_vec3(GlChartViewSeries* series);
 	void draw_series_euler(GlChartViewSeries* series);
+	void draw_series_3D_euler(GlChartViewSeries* series);
 	void draw_series_quat(GlChartViewSeries* series);
 
 };
