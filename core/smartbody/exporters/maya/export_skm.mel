@@ -1123,20 +1123,32 @@ global proc skmUpdateAnimUI()
    string $skeletonRoot = `getAttr( $animDef + ".skeletonRoot" )`;
    textFieldGrp -e -text $skeletonRoot skmRootField;
 
+   string $projectRootDir = `workspace -en ""`;
+   textFieldGrp -e -text $projectRootDir skmProjectRootDir;
+   
    string $outputFile = `getAttr( $animDef + ".outputFile" )`;
-   skmFileCb( $outputFile, "" );
+   string $name = basename( $outputFile, "");
+   string $dirname = dirname( $outputFile );
+   textFieldGrp -e -text $name skmOutputFile;
+   textFieldGrp -e -text $dirname skmOutputPath;
 
    string $peRootName = `getAttr( $animDef + ".partialExportRoot" )`;
    textFieldGrp -e -text $peRootName skmPartialExportRootField;
 }
 
 
-global proc int skmFileCb( string $filename, string $fileType )
+global proc int skmFileCb( string $fileDir, string $fileType )
 {
-   string $name = basename( $filename, "");
-   string $dirname = dirname( $filename );
-   textFieldGrp -e -text $name skmOutputFile;
-   textFieldGrp -e -text $dirname skmOutputPath;
+   //--- here, get the relative path
+   string $absPath = $fileDir;
+   string $refPath = `workspace -en ""`;
+   
+   string $finalDir = substituteAllString($absPath, $refPath, "");
+   if ($finalDir == $absPath)
+     textFieldGrp -e -text $absPath skmOutputPath;  
+   else
+     textFieldGrp -e -text $finalDir skmOutputPath;       
+   
    skmUpdateOutput();
    return 1;
 }
@@ -1656,10 +1668,11 @@ global proc skmExportGUI()
          intSliderGrp -label "Frames per Seconds:" -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmFpsUpdate -minValue 1 -value 30 sliderFps; //<- was "skmFps"
          textFieldGrp -label "Skeleton Root Joint:" -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand skmUpdateSkeletonRoot skmRootField;
          textFieldGrp -label "Partial Exporting, From Joint:" -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand skmUpdatePartialExportJoint skmPartialExportRootField;
+         textFieldGrp -label "Project Root Directory:" -adjustableColumn 2 -columnAttach 1 "right" 5 -ed false skmProjectRootDir;		 
          textFieldGrp -label "Output Pathname:" -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand skmUpdateOutput skmOutputPath;
          textFieldGrp -label "Output Filename:" -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand skmUpdateOutput skmOutputFile;
          columnLayout -adjustableColumn true -rowSpacing 2 -columnOffset "both" 10;
-            button -label "Browse Output File" -command "fileBrowserDialog -m 1 -fc \"skmFileCb\" -an \"Select\" -om \"SaveAs\"";
+            button -label "Browse Output File" -command "fileBrowserDialog -m 4 -fc \"skmFileCb\" -an \"Select\" -om \"SaveAs\"";
             setParent skmMainWin;
    frameLayout -borderStyle etchedIn -collapsable false -collapse 0 -labelVisible false;
       columnLayout -adjustableColumn true -rowSpacing 5 -columnOffset "both" 10;
