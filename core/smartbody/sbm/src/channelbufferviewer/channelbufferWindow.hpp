@@ -35,6 +35,7 @@ public:
 public:
 	GlChartView* chartview;
 	fltk::Choice* character;
+	fltk::Choice* controller;
 	fltk::Choice* quat;
 	fltk::Button* refresh;
 	fltk::Button* freeze;
@@ -54,8 +55,11 @@ public:
 public:
 	const char* getSelectedCharacterName();
 	static void loadCharacters(fltk::Choice* character);
+	static void loadControllers(fltk::Choice* controller, fltk::Choice* character);
 	static void loadChannels(ChannelBufferWindow* window);
 	static void refreshCharacters(fltk::Widget* widget, void* data);
+	static void refreshControllers(fltk::Widget* widget, void* data);
+	static void refreshControllerChannels(fltk::Widget* widget, void* data);
 	static void refreshChannels(fltk::Widget* widget, void* data);
 	static void refreshMaxSize(fltk::Widget* widget, void* data);
 	static void refreshQuat(fltk::Widget* widget, void* data);

@@ -15,6 +15,7 @@
 //#include "stdlib.h"
 //#include "fltk/gl.h"
 #include "glfont2.h"
+
 using namespace glfont;
 
 class GlChartViewCoordinate

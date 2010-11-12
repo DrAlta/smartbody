@@ -23,6 +23,10 @@ ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name)
 		refresh = new fltk::Button(60+w/8+5, 20, w/16, 20, "Refresh");
 		refresh->callback(refreshCharacters, this);
 
+		controller = new fltk::Choice(60, 50, w/4, 20, "Controller");
+		loadControllers(controller, character);
+		controller->callback(refreshControllerChannels, this);
+
 		channel_filter = new fltk::Input(50+w/4+w/16+50, 0, w/4-50, 18, "Channels:");
 		channel_filter->when(fltk::WHEN_CHANGED);
 		channel_filter->callback(FilterChannelItem, this);
@@ -57,7 +61,7 @@ ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name)
 		frame_num->callback(refreshMaxSize, this);
 		frame_num->value(value);
 
-		quat = new fltk::Choice(300, 0, (int)(1.5f*w/8), 18, "quaternions shown as:");
+		quat = new fltk::Choice(300, 0, (int)(1.5f*w/8), 18, "Rotation shown as:");
 		initQuat();
 		quat->callback(refreshQuat, this);
 
@@ -139,18 +143,16 @@ void ChannelBufferWindow::refreshQuat(fltk::Widget* widget, void* data)
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	int i = 0;
 
-	if(strcmp(window->quat->get_item()->label(), "4 series of values") == 0) i = 0;
-	else if(strcmp(window->quat->get_item()->label(), "3 series of values") == 0) i = 1;
-	else if(strcmp(window->quat->get_item()->label(), "3D vector") == 0) i = 2;
+	if(strcmp(window->quat->get_item()->label(), "Quaternion") == 0) i = 0;
+	else if(strcmp(window->quat->get_item()->label(), "Euler angle") == 0) i = 1;
 	
 	window->chartview->set_quat_show_type(i);
 }
 
 void ChannelBufferWindow::initQuat()
 {
-	quat->add("4 series of values");
-	quat->add("3 series of values");
-	quat->add("3D vector");
+	quat->add("Quaternion");
+	quat->add("Euler angle");
 }
 
 void ChannelBufferWindow::refreshMaxSize(fltk::Widget* widget, void* data)
@@ -182,6 +184,27 @@ void ChannelBufferWindow::loadCharacters(fltk::Choice* character)
 		character->add(actor->name);
 	}
 }
+void ChannelBufferWindow::loadControllers(fltk::Choice* controller, fltk::Choice* character)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	controller->clear();
+
+	if(character->get_item()== NULL) return;
+
+	SbmCharacter* actor = mcu.character_map.lookup(character->get_item()->label());
+
+	controller->add("All controllers");
+
+	int ct_num = actor->ct_tree_p->count_controllers();
+	for(int i = 0; i < ct_num; ++i)
+	{
+		//ct = actor->ct_tree_p->controller(i)->name();
+		controller->add(actor->ct_tree_p->controller(i)->name());
+		actor->ct_tree_p->controller(i)->record_buffer_changes(true);
+	}
+}
+
 
 void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 {
@@ -256,12 +279,68 @@ void ChannelBufferWindow::refreshCharacters(fltk::Widget* widget, void* data)
 	//loadChannels(window->character, window->channel_list);
 }
 
+void ChannelBufferWindow::refreshControllers(fltk::Widget* widget, void* data)
+{
+	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
+	loadControllers(window->controller, window->character);
+	//loadChannels(window->character, window->channel_list);
+}
+
 void ChannelBufferWindow::refreshChannels(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	loadChannels(window);
 	clearMonitoredChannel(window);
 }
+
+void ChannelBufferWindow::refreshControllerChannels(fltk::Widget* widget, void* data)
+{
+	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
+	fltk::Browser* channels = window->channel_list;
+
+	if(strcmp(window->controller->get_item()->label(), "All controllers") == 0)
+	{
+		for(int i = 0; i < channels->size(); ++i)
+		{
+			channels->goto_index(i)->show();
+		}
+		return;
+	}
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SbmCharacter* actor = mcu.character_map.lookup(window->character->get_item()->label());
+	
+	for(int i = 0; i < channels->size(); ++i)
+	{
+		channels->goto_index(i)->hide();
+	}
+
+	int ct_num = actor->ct_tree_p->count_controllers();
+	for(int i = 0; i < ct_num; ++i)
+	{
+		if(strcmp(actor->ct_tree_p->controller(i)->name(), window->controller->get_item()->label())== 0)
+		{
+			std::vector<float> buff = actor->ct_tree_p->controller(i)->get_buffer_changes();
+			SkChannelArray& channelsInUse = actor->ct_tree_p->controller(i)->controller_channels();
+			for(int j = 0; j < channelsInUse.size(); ++j)
+			{
+				int index = actor->ct_tree_p->controller(i)->getContextChannel(j);
+				channels->goto_index(index)->show();
+				/*for(int k = 0; k < channels->size(); ++k)
+				{
+					if(window->buffer_index.get(k) == index) 
+					{
+						channels->goto_index(k)->show();
+						break;
+					}
+				}*/
+			}
+		}
+	}
+
+
+}
+
 
 void ChannelBufferWindow::addMonitoredChannel(fltk::Widget* widget, void* data)
 {
