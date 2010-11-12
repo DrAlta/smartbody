@@ -445,10 +445,13 @@ int GlChartView::mouse_event ( const SrEvent &e )
 				coordinate.y_scale_zoom += s*coordinate.y_scale_zoom;
 				if(coordinate.y_scale_zoom < 1.0f) coordinate.y_scale_zoom = 1.0f;
 			}
-			else if(e.button1 && !e.alt)
+			else if(e.button1 && e.alt)
 			{
-				camera.center.x += (e.lmouse.x - e.mouse.x)*coordinate.GetXScale()/2;
-				camera.eye.x += (e.lmouse.x - e.mouse.x)*coordinate.GetXScale()/2;
+				//camera.center.x += (e.lmouse.x - e.mouse.x)*coordinate.GetXScale()/2;
+				//camera.eye.x += (e.lmouse.x - e.mouse.x)*coordinate.GetXScale()/2;
+
+				camera.center.y += (e.lmouse.y - e.mouse.y)*coordinate.GetYScale();
+				camera.eye.y += (e.lmouse.y - e.mouse.y)*coordinate.GetYScale();
 			}
 			else if ( e.alt && e.button3 )
 			{ 
@@ -474,7 +477,8 @@ int GlChartView::mouse_event ( const SrEvent &e )
 			else if (e.alt && e.shift && e.button1)
 			{ 
 			}
-			else if (e.alt && e.button1)
+			//rotation with mouse doesn't seem useful in this case?
+			/*else if (e.alt && e.button1) 
 			{ 
  				float deltaX = -(e.mouseCoord.x - e.origMouse.x) / e.width;
 				float deltaY = -(e.mouseCoord.y -  e.origMouse.y) / e.height;
@@ -494,9 +498,9 @@ int GlChartView::mouse_event ( const SrEvent &e )
 				camera_p = rotatePoint(camera_p, origCenter, dirY, deltaY * float(M_PI));
 
 				camera.eye = camera_p;
-			}
+			}*/
 		}
-		 else if ( e.type==SrEvent::Release )
+		else if ( e.type==SrEvent::Release )
 		{ 
 		}
 	}

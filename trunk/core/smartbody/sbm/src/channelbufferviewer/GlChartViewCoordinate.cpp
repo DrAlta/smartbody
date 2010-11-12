@@ -1,4 +1,5 @@
 #include "GlChartViewCoordinate.hpp"
+#include <vhcl_log.h>
 #include <fltk/gl.h>
 
 GlChartViewCoordinate::GlChartViewCoordinate()
@@ -32,8 +33,11 @@ void GlChartViewCoordinate::InitFont()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glGenTextures(0, &textureName);
 
-	if (!label.Create("../src/channelbufferviewer/fonts/font.glf", 0))
-		printf("Cannot load font file\n");
+	if (!label.Create("../../../../data/fonts/font.glf", 0))
+	{
+		if(!label.Create(".font.glf", 0))
+			LOG("GlChartViewCoordinate::InitFont(): Error: Cannot load font file\n");
+	}
 }
 
 void GlChartViewCoordinate::Update(float WindowWidth, float WindowHeight, SrCamera& camera)
