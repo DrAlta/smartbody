@@ -290,7 +290,7 @@ MeCtScheduler2::MeCtScheduler2 ()
 }
 
 MeCtScheduler2::~MeCtScheduler2 () {
-   stop (-1);
+   stop (mcuCBHandle::singleton().time);
    _sub_sched_context->unref();
 }
 

@@ -24,6 +24,7 @@
 
 
 #include <ME/me_controller_context.hpp>
+#include "sbm/mcontrol_util.h"
 
 
 MeControllerContext::MeControllerContext()
@@ -52,7 +53,7 @@ void MeControllerContext::add_controller( MeController* ct ) {
 
 void MeControllerContext::remove_controller( MeController* ct ) {
 	if( ct->active() )
-		ct->stop(-1);
+		ct->stop(mcuCBHandle::singleton().time);
 
 	ct->_context = NULL;
 	// No unref().  Contexts refs controllers, not vice versa.

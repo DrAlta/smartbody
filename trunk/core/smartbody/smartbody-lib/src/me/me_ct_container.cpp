@@ -21,7 +21,7 @@
  */
 
 #include <ME/me_ct_container.hpp>
-
+#include <sbm/mcontrol_util.h>
 
 
 //////////////////////////////////////////////////////////////
@@ -42,13 +42,13 @@ void MeCtContainer::Context::add_controller( MeController* child ) {
 
 	if( _container && _container->active() ) {
 		child->remap();
-		child->start(-1);
+		child->start(mcuCBHandle::singleton().time);
 	}
 }
 
 void MeCtContainer::Context::remove_controller( MeController* child ) {
 	child->ref();
-	child->stop(-1);
+	child->stop(mcuCBHandle::singleton().time);
 	if( _container && _container->remove_child( child ) )
 		MeControllerContext::remove_controller( child );
 	child->unref();
@@ -96,7 +96,7 @@ void MeCtContainer::controller_start() {
 			// Temporary variable to inspect during debugging
 			const char* child_type = child->controller_type();
 
-			child->start(-1);
+			child->start(mcuCBHandle::singleton().time);
 		}
 	}
 }
@@ -106,7 +106,7 @@ void MeCtContainer::controller_stop() {
 	for( unsigned int i=0; i<child_count; ++i ) {
 		MeController* child = this->child( i );
 		if( child )
-			child->stop(-1);
+			child->stop(mcuCBHandle::singleton().time);
 	}
 }
 

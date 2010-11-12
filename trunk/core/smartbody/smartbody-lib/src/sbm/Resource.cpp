@@ -161,6 +161,8 @@ std::string PathResource::dump()
 
 CmdResource::CmdResource()
 {
+	id = "";
+	command = "";
 }
 
 CmdResource::~CmdResource()
@@ -238,6 +240,8 @@ std::string MotionResource::dump()
 
 ControllerResource::ControllerResource()
 {
+	time = -1;
+	type = "";
 }
 
 ControllerResource::~ControllerResource()
@@ -258,6 +262,16 @@ void ControllerResource::setType(std::string t)
 {
 	type = t;
 }
+
+void ControllerResource::setTime(double t)
+{
+	time = t;
+}
+
+double ControllerResource::getTime()
+{
+	return time;
+}
 		
 std::string ControllerResource::getType()
 {
@@ -267,7 +281,7 @@ std::string ControllerResource::getType()
 std::string ControllerResource::dump()
 {
 	std::stringstream stream;
-	stream << "Controller [" << controllerName << "]: " << type;
+	stream << "Controller [" << controllerName << "]: " << type << " " << time;
 	stream << Resource::dump();
 	return stream.str();	
 }

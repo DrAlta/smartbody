@@ -109,11 +109,15 @@ class ControllerResource : public Resource
 		void setType(std::string t);
 		std::string getType();
 
+		void setTime(double t);
+		double getTime();
+
 		std::string dump();
 
 	protected:
 		std::string controllerName;
 		std::string type;
+		double time;
 };
 
 
