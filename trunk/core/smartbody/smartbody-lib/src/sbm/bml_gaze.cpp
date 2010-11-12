@@ -59,6 +59,7 @@ const XMLCh ATTR_DIRECTION[]    = L"direction";
 const XMLCh ATTR_SBM_ROLL[]     = L"sbm:roll";
 const XMLCh ATTR_JOINT_RANGE[]  = L"sbm:joint-range";
 const XMLCh ATTR_JOINT_SPEED[]  = L"sbm:joint-speed";
+const XMLCh ATTR_TIME_HINT[]	= L"sbm:time-hint";
 const XMLCh ATTR_JOINT_SMOOTH[] = L"sbm:speed-smoothing";
 const XMLCh ATTR_PITCH[]        = L"pitch";
 const XMLCh ATTR_HEADING[]      = L"heading";
@@ -593,53 +594,116 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	float gaze_smooth_cervical = BML::Gaze::smooth_cervical;
 	float gaze_smooth_eyeball  = BML::Gaze::smooth_eyeball;
 	float gaze_fade_out_ival   = BML::Gaze::fade_out_ival;
+	float gaze_time_hint = -1.0;
+	
+	std::wstringstream wstrstr;
+
+	// parse sbm:time-hint
+	const XMLCh* attrTimeHint = elem->getAttribute( ATTR_TIME_HINT );
+	if( attrTimeHint && XMLString::stringLen( attrTimeHint ) ) {
+		if( !( wistringstream( attrTimeHint ) >> gaze_time_hint ) )
+		{
+			std::stringstream strstr;
+			strstr << "WARNING: Failed to parse time-hint interval attribute \""<< XMLString::transcode(attrTimeHint) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
+			LOG(strstr.str().c_str());
+		}
+	}
 
 	// parse sbm:joint-speed
 	const XMLCh* attrSpeed = elem->getAttribute( ATTR_JOINT_SPEED );
-	std::wstringstream wstrstr;
 	if( attrSpeed && XMLString::stringLen( attrSpeed ) ) {
-		// Ugly mix of XMLStringTokenizer and streams to get a token count before parsing
-		XMLStringTokenizer tokenizer( attrSpeed );
-		std::wstringstream wstrstr;
-		switch( tokenizer.countTokens() ) {
-			case 3: {
-				float values[3];
-				wistringstream in;
-				bool  valid = !in.fail();
-
-				int i=0;
-				XMLCh* token;
-				// Takes in up three values for backward compatibility
-				//   but first two values are summed to get total head speed
-				// TODO: support single value (head only) and two values (head and eyes)
-				for( ; valid && i<3; ++i ) {
-					token = tokenizer.nextToken();
+		if( attrTimeHint )	{
+			std::stringstream strstr;
+			strstr << "WARNING: speed notsupported with time-hint attribute set\""<< XMLString::transcode(attrSpeed) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
+			LOG(strstr.str().c_str());
+		}
+		else {
+			// Ugly mix of XMLStringTokenizer and streams to get a token count before parsing
+			XMLStringTokenizer tokenizer( attrSpeed );
+	//		std::wstringstream wstrstr;
+			switch( tokenizer.countTokens() ) {
+				case 3: {
+					float values[3];
+					wistringstream in;
+					bool  valid = !in.fail();
+					int i=0;
+					XMLCh* token;
+					// Takes in up three values for backward compatibility
+					//   but first two values are summed to get total head speed
+					for( ; valid && i<3; ++i ) {
+						token = tokenizer.nextToken();
+						in.clear();
+						in.str( token );
+						in.seekg(0);
+						valid = !( in >> values[i] ).fail();
+					}
+					if( valid ) {
+						if( check_gaze_speed( values[0]+values[1], values[2] ) ) {
+							gaze_speed_head    = values[0] + values[1];
+							gaze_speed_eyeball = values[2];
+						}
+					} else {
+						wstrstr << "WARNING: Expected three numerical tokens in gaze behavior attribute " << ATTR_JOINT_SPEED << "=\"" << attrSpeed << "\"."
+							<< "  Unable to parse token "<<i<<" \""<<token<<"\" ("<<in.rdstate()<<": "<<(in.bad()?"BAD ":"")<<(in.fail()?"FAIL ":"")<<(in.eof()?"EOF":"")<<").  Ignoring attribute.";
+						std::string str = convertWStringToString(wstrstr.str());
+						LOG(str.c_str());
+					}
+					break;
+				}
+				case 2: {
+					float values[2];
+					wistringstream in;
+					bool  valid = !in.fail();
+					int i=0;
+					XMLCh* token;
+					for( ; valid && i<2; ++i ) {
+						token = tokenizer.nextToken();
+						in.clear();
+						in.str( token );
+						in.seekg(0);
+						valid = !( in >> values[i] ).fail();
+					}
+					if( valid ) {
+						if( check_gaze_speed( values[0], values[1] ) ) {
+							gaze_speed_head    = values[0];
+							gaze_speed_eyeball = values[1];
+						}
+					} else {
+						wstrstr << "WARNING: Expected 2 numerical tokens in gaze behavior attribute " << ATTR_JOINT_SPEED << "=\"" << attrSpeed << "\"."
+							<< "  Unable to parse token "<<i<<" \""<<token<<"\" ("<<in.rdstate()<<": "<<(in.bad()?"BAD ":"")<<(in.fail()?"FAIL ":"")<<(in.eof()?"EOF":"")<<").  Ignoring attribute.";
+						std::string str = convertWStringToString(wstrstr.str());
+						LOG(str.c_str());
+					}
+					break;
+				}
+				case 1: {
+					float value;
+					wistringstream in;
+					bool  valid = !in.fail();
+					int i=0;
+					XMLCh* token = tokenizer.nextToken();
 					in.clear();
 					in.str( token );
 					in.seekg(0);
-					valid = !( in >> values[i] ).fail();
-				}
-				if( valid ) {
-					// 
-					if( check_gaze_speed( values[0]+values[1], values[2] ) ) {
-						gaze_speed_head    = values[0] + values[1];
-						gaze_speed_eyeball = values[2];
+					valid = !( in >> value ).fail();
+					if( valid ) {
+						if( value > 0.0 ) {
+							gaze_speed_head = value;
+						}
+					} else {
+						wstrstr << "WARNING: Expected 1 numerical token in gaze behavior attribute " << ATTR_JOINT_SPEED << "=\"" << attrSpeed << "\"."
+							<< "  Unable to parse token "<<i<<" \""<<token<<"\" ("<<in.rdstate()<<": "<<(in.bad()?"BAD ":"")<<(in.fail()?"FAIL ":"")<<(in.eof()?"EOF":"")<<").  Ignoring attribute.";
+						std::string str = convertWStringToString(wstrstr.str());
+						LOG(str.c_str());
 					}
-				} else {
-					wstrstr << "WARNING: Expected three numerical tokens in gaze behavior attribute " << ATTR_JOINT_SPEED << "=\"" << attrSpeed << "\"."
-						<< "  Unable to parse token "<<i<<" \""<<token<<"\" ("<<in.rdstate()<<": "<<(in.bad()?"BAD ":"")<<(in.fail()?"FAIL ":"")<<(in.eof()?"EOF":"")<<").  Ignoring attribute.";
+					break;
+				}
+				default:
+					wstrstr << "WARNING: Expected up to three numerical tokens in gaze behavior attribute " << ATTR_JOINT_SPEED << "=\"" << attrSpeed << "\".  Found " << tokenizer.countTokens() << ".  Ignoring attribute." << endl;
 					std::string str = convertWStringToString(wstrstr.str());
 					LOG(str.c_str());
-
-				}
-
-				break;
+					break;						
 			}
-			default:
-				wstrstr << "WARNING: Expected three numerical tokens in gaze behavior attribute " << ATTR_JOINT_SPEED << "=\"" << attrSpeed << "\".  Found " << tokenizer.countTokens() << ".  Ignoring attribute." << endl;
-				std::string str = convertWStringToString(wstrstr.str());
-				LOG(str.c_str());
-				break;						
 		}
 	}
 
@@ -704,7 +768,8 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 				<< "\tgaze_smooth_lumbar = " << gaze_smooth_lumbar << endl
 				<< "\tgaze_smooth_cervical = " << gaze_smooth_cervical << endl
 				<< "\tgaze_smooth_eyeball = " << gaze_smooth_eyeball << endl
-				<< "\tgaze_fade_out_ival = " << gaze_fade_out_ival << endl;
+				<< "\tgaze_fade_out_ival = " << gaze_fade_out_ival << endl
+				<< "\tgaze_time_hint = " << gaze_time_hint << endl;
 	}
 
 	if (!gaze_ct) {
@@ -714,7 +779,12 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		gaze_ct->set_task_priority( priority_key_index );
 	}
 	gaze_ct->set_target_joint( 0, 0, 0, const_cast<SkJoint*>(joint) );
-	gaze_ct->set_speed( gaze_speed_head, gaze_speed_eyeball );
+	if( gaze_time_hint > 0.0 )	{
+		gaze_ct->set_time_hint( gaze_time_hint );
+	}
+	else	{
+		gaze_ct->set_speed( gaze_speed_head, gaze_speed_eyeball );
+	}
 	gaze_ct->set_smooth( gaze_smooth_lumbar, gaze_smooth_cervical, gaze_smooth_eyeball );
 	float pitch_minimum, pitch_maximum;
 
