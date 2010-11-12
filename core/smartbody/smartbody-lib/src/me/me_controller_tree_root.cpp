@@ -34,6 +34,7 @@
 #include <SR/sr.h>
 #include <SK/sk_channel_array.h>
 #include <sbm/ResourceManager.h>
+#include "sbm/mcontrol_util.h"
 #include "vhcl_log.h"
 
 using namespace std;
@@ -148,7 +149,7 @@ struct RemapAndActivate_Func {
 	void operator() ( controller_ptr& ct ){
 		ct->remap();
 		if( !ct->active() ) {
-			ct->start(-1);
+			ct->start(mcuCBHandle::singleton().time);
 		}
 	}
 };
@@ -329,7 +330,7 @@ public:
 
 		if( _state==VALID ) {
 			ct->remap();
-			ct->start(-1);
+			ct->start(mcuCBHandle::singleton().time);
 		}
 	}
 
