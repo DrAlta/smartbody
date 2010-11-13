@@ -50,8 +50,8 @@
 #define WHITE_SPACE		" \t\n\r"
 
 
-#define MAX_FILENAME_LEN	512
-
+#define MAX_FILENAME_LEN	(512)
+#define MAX_JOINT_LABEL_LEN	(128)
 
 #define BML_PROCESSOR_INCLUDE		<sbm/bml_processor.hpp>
 #define BML_PROCESSOR				BML::Processor
