@@ -2,6 +2,8 @@
 
 #include <sstream>
 
+int CmdResource::commandIndex = 0;
+
 Resource::Resource()
 {
 	children_limit = 1000;
@@ -163,10 +165,22 @@ CmdResource::CmdResource()
 {
 	id = "";
 	command = "";
+	time = -1;
+
+	commandIndex++; // increment the counter
+	index = commandIndex;
 }
 
 CmdResource::~CmdResource()
 {
+}
+
+
+int CmdResource::getCommandIndex()
+{
+	
+
+	return commandIndex;
 }
 
 void CmdResource::setId(std::string str)
@@ -190,12 +204,20 @@ std::string CmdResource::getCommand()
 	return command;
 }
 
+void CmdResource::setTime(double t)
+{
+	time = t;
+}
 
+double CmdResource::getTime()
+{
+	return time;
+}
 
 std::string CmdResource::dump()
 {
 	std::stringstream stream;
-	stream << "* " << command;
+	stream << "* " << index << " " << time << " " << command;
 
 	stream << Resource::dump();
 	return stream.str();
