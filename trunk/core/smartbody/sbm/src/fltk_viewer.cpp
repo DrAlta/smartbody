@@ -58,6 +58,7 @@
 # include <SR/sr_sa_bbox.h>
 # include <SR/sr_sa_gl_render.h>
 # include <SR/sr_gl_render_funcs.h>
+# include <SBM/me_ct_eyelid.h>
 
 #include <sbm/mcontrol_util.h>
 #include "vhcl_log.h"
@@ -169,6 +170,10 @@ static Fl_Menu_Item MenuTable[] =
          { "&no eye beams",   0, MCB, CMD(CmdNoEyeBeams),    FL_MENU_RADIO },
          { "&eye beams",  0, MCB, CMD(CmdEyeBeams),  FL_MENU_RADIO },
          { 0 },
+	{ "&eye lids", 0, 0, 0, FL_SUBMENU },
+         { "&no eye lids",   0, MCB, CMD(CmdNoEyeLids),    FL_MENU_RADIO },
+         { "&eye lids",  0, MCB, CMD(CmdEyeLids),  FL_MENU_RADIO },
+         { 0 },
 	{ "&dynamics", 0, 0, 0, FL_SUBMENU },
          { "&no dynamics",   0, MCB, CMD(CmdNoDynamics),    FL_MENU_RADIO },
          { "&show COM",  0, MCB, CMD(CmdShowCOM),  FL_MENU_RADIO },
@@ -223,6 +228,7 @@ class FltkViewerData
    FltkViewer::ShadowMode shadowmode;     // shadow mode
    FltkViewer::terrainMode terrainMode;     // terrain mode
    FltkViewer::EyeBeamMode eyeBeamMode;     // eye beam mode
+   FltkViewer::EyeLidMode eyeLidMode;     // eye lid mode
    FltkViewer::DynamicsMode dynamicsMode;     // dynamics information mode
    FltkViewer::LocomotionMode locomotionMode;   // locomotion mode
 
@@ -296,6 +302,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->shadowmode = ModeNoShadows;
    _data->terrainMode = ModeTerrain;
    _data->eyeBeamMode = ModeNoEyeBeams;
+   _data->eyeLidMode = ModeNoEyeLids;
    _data->dynamicsMode = ModeNoDynamics;
    _data->locomotionMode = ModeEnableLocomotion;
 
@@ -430,6 +437,10 @@ void FltkViewer::menu_cmd ( MenuCmd s )
                        break;
       case CmdEyeBeams: _data->eyeBeamMode = ModeEyeBeams;
                        break;
+	  case CmdNoEyeLids  : _data->eyeLidMode = ModeNoEyeLids;             
+                       break;
+	  case CmdEyeLids: _data->eyeLidMode = ModeEyeLids;
+                       break;
 	  case CmdNoDynamics  : _data->dynamicsMode = ModeNoDynamics;             
                        break;
       case CmdShowCOM:		_data->dynamicsMode = ModeShowCOM;
@@ -556,6 +567,8 @@ bool FltkViewer::menu_cmd_activated ( MenuCmd c )
 	  case CmdNoTerrain   : return _data->terrainMode==ModeNoTerrain? true:false;
 	  case CmdNoEyeBeams  : return _data->eyeBeamMode==ModeNoEyeBeams? true:false;
       case CmdEyeBeams   : return _data->eyeBeamMode==ModeEyeBeams? true:false;
+	  case CmdNoEyeLids  : return _data->eyeLidMode==ModeNoEyeLids? true:false;
+      case CmdEyeLids  : return _data->eyeLidMode==ModeEyeLids? true:false;
 	  case CmdNoDynamics   : return _data->dynamicsMode==ModeNoDynamics? true:false;
       case CmdShowCOM   : return _data->dynamicsMode==ModeShowCOM? true:false;
 	  case CmdShowCOMSupportPolygon   : return _data->dynamicsMode==ModeShowCOMSupportPolygon? true:false;
@@ -940,6 +953,7 @@ void FltkViewer::draw()
 	   drawGrid();
 
 	drawEyeBeams();
+	drawEyeLids();
 	drawDynamics();
 	drawLocomotion();
 	drawPawns();
@@ -1828,6 +1842,182 @@ void FltkViewer::drawEyeBeams()
 		}
 		character = character_map.next();
 	}
+
+}
+
+void FltkViewer::drawEyeLids()
+{
+	if (_data->eyeLidMode == ModeNoEyeLids)
+		return;
+
+	glPushAttrib(GL_LIGHTING_BIT | GL_POINT_BIT);
+	glDisable(GL_LIGHTING);
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	srHashMap<SbmCharacter>& character_map = mcu.character_map;
+	character_map.reset();
+	SbmCharacter* character = character_map.next();
+
+	while ( character )
+	{
+		MeControllerTreeRoot* controllerTree = character->ct_tree_p;
+		int numControllers = controllerTree->count_controllers();
+	
+		MeCtEyeLid* eyelidCt = NULL;
+		for (int c = 0; c < numControllers; c++)
+		{
+			MeController* controller = controllerTree->controller(c);
+			eyelidCt = dynamic_cast<MeCtEyeLid*>(controller);
+			if (eyelidCt)
+				break;
+		}
+		if (!eyelidCt)
+		{
+			character = character_map.next();
+			continue;
+		}
+
+		character->skeleton_p->update_global_matrices();
+		
+		float upperHi;
+		float upperLo;
+		eyelidCt->get_upper_lid_range(upperLo, upperHi);
+
+		float lowerHi;
+		float lowerLo;
+		eyelidCt->get_lower_lid_range(lowerLo, lowerHi);
+
+		SkJoint* eyeLidUpperRight = character->skeleton_p->search_joint("upper_eyelid_right");
+		SkJoint* eyeLidUpperLeft = character->skeleton_p->search_joint("upper_eyelid_left");
+		SkJoint* eyeLidLowerRight = character->skeleton_p->search_joint("lower_eyelid_right");
+		SkJoint* eyeLidLowerLeft = character->skeleton_p->search_joint("lower_eyelid_left");
+
+		glPointSize(10);
+		float range = character->getHeight() / 175.0 * 2.0;
+		if (eyeLidUpperRight)
+		{
+			const SkJoint* parent = eyeLidUpperRight->parent();
+			if (parent)
+			{
+				SrMat gmat = parent->gmat();
+				glPushMatrix();
+				glMultMatrixf((const float*) gmat);
+				glColor3f(1.0, 0.0, 0.0);
+				SrVec offset = eyeLidUpperRight->offset();
+				glBegin(GL_POINTS);
+				glVertex3f(offset.x, offset.y, offset.z);
+				glEnd();
+
+				glTranslatef(offset.x, offset.y, offset.z);
+
+				// add the up/down offsets
+				glColor3f(1.0, 1.0, 0.0);
+				glPushMatrix();
+				glBegin(GL_LINE_LOOP);
+				glVertex3f(-range, upperHi, 0);
+				glVertex3f(range, upperHi, 0);
+				glVertex3f(range, upperLo, 0);
+				glVertex3f(-range, upperLo, 0);
+				glEnd();
+				glPopMatrix();
+
+				glPopMatrix();
+			}
+		}
+		if (eyeLidUpperLeft)
+		{
+			const SkJoint* parent = eyeLidUpperLeft->parent();
+			if (parent)
+			{
+				SrMat gmat = parent->gmat();
+				glPushMatrix();
+				glMultMatrixf((const float*) gmat);
+				glColor3f(1.0, 0.0, 0.0);
+				SrVec offset = eyeLidUpperLeft->offset();
+				glBegin(GL_POINTS);
+				glVertex3f(offset.x, offset.y, offset.z);
+				glEnd();
+
+				glTranslatef(offset.x, offset.y, offset.z);
+
+				// add the up/down offsets
+				glColor3f(1.0, 1.0, 0.0);
+				glPushMatrix();
+				glBegin(GL_LINE_LOOP);
+				glVertex3f(-range, upperHi, 0);
+				glVertex3f(range, upperHi, 0);
+				glVertex3f(range, upperLo, 0);
+				glVertex3f(-range, upperLo, 0);
+				glEnd();
+				glPopMatrix();
+
+				glPopMatrix();
+			}
+		}
+		if (eyeLidLowerRight)
+		{
+			const SkJoint* parent = eyeLidLowerRight->parent();
+			if (parent)
+			{
+				SrMat gmat = parent->gmat();
+				glPushMatrix();
+				glMultMatrixf((const float*) gmat);
+				glColor3f(1.0, 0.0, 0.0);
+				SrVec offset = eyeLidLowerRight->offset();
+				glBegin(GL_POINTS);
+				glVertex3f(offset.x, offset.y, offset.z);
+				glEnd();
+
+				glTranslatef(offset.x, offset.y, offset.z);
+
+				// add the up/down offsets
+				glColor3f(0.0, 1.0, 0.0);
+				glPushMatrix();
+				glBegin(GL_LINE_LOOP);
+				glVertex3f(-range, lowerHi, 0);
+				glVertex3f(range, lowerHi, 0);
+				glVertex3f(range, lowerLo, 0);
+				glVertex3f(-range, lowerLo, 0);
+				glEnd();
+				glPopMatrix();
+
+				glPopMatrix();
+			}
+		}
+		if (eyeLidLowerLeft)
+		{
+			const SkJoint* parent = eyeLidLowerLeft->parent();
+			if (parent)
+			{
+				SrMat gmat = parent->gmat();
+				glPushMatrix();
+				glMultMatrixf((const float*) gmat);
+				glColor3f(1.0, 0.0, 0.0);
+				SrVec offset = eyeLidLowerLeft->offset();
+				glBegin(GL_POINTS);
+				glVertex3f(offset.x, offset.y, offset.z);
+				glEnd();
+
+				glTranslatef(offset.x, offset.y, offset.z);
+
+				// add the up/down offsets
+				glColor3f(0.0, 1.0, 0.0);
+				glPushMatrix();
+				glBegin(GL_LINE_LOOP);
+				glVertex3f(-range, lowerHi, 0);
+				glVertex3f(range, lowerHi, 0);
+				glVertex3f(range, lowerLo, 0);
+				glVertex3f(-range, lowerLo, 0);
+				glEnd();
+				glPopMatrix();
+
+				glPopMatrix();
+			}
+		}
+
+		character = character_map.next();
+	}
+
+	glPopAttrib();
 
 }
 

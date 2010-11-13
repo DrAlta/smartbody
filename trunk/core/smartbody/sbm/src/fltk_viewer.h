@@ -85,6 +85,9 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	enum EyeBeamMode { ModeNoEyeBeams,
 					   ModeEyeBeams
                 };
+	enum EyeLidMode { ModeNoEyeLids,
+					   ModeEyeLids
+                };
 	enum DynamicsMode { ModeNoDynamics,
 					    ModeShowCOM,
 						ModeShowCOMSupportPolygon,
@@ -127,6 +130,8 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdTerrain,
 				   CmdNoEyeBeams,
 				   CmdEyeBeams,
+				   CmdNoEyeLids,
+				   CmdEyeLids,
 				   CmdNoDynamics,
 				   CmdShowCOM,
 				   CmdShowCOMSupportPolygon,
@@ -253,6 +258,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	void initGridList();
 	void drawGrid();
 	void drawEyeBeams();
+	void drawEyeLids();
 	void drawDynamics();
 	void drawLocomotion();
 	void drawPawns();
