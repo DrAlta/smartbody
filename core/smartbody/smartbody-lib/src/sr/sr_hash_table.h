@@ -27,6 +27,8 @@
 
 # include <SR/sr_array.h>
 
+#define SR_HASH_TABLE_OVERRIDE	( 0 )
+
 //================================ SrHashTableBase ===============================
 
 /*! \class SrHashTableBase sr_hash_table.h
