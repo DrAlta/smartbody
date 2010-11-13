@@ -75,7 +75,7 @@ protected:
 	static void addMonitoredChannel(fltk::Widget* widget, void* data);
 	static void FilterItem(fltk::Browser* list, fltk::Input* filter);
 	static void removeMonitoredChannel(fltk::Widget* widget, void* data);
-	static void moveChannels(GlChartView* chartview, fltk::Browser* from, fltk::Browser* to, bool add_series, SrArray<int>& buffer_index);
+	static void moveChannels(ChannelBufferWindow* cbufwindow, fltk::Browser* from, fltk::Browser* to, bool add_series, SrArray<int>& buffer_index);
 	static int get_size(const char* title);
 };
 

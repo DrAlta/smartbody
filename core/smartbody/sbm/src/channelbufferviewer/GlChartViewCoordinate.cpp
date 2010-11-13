@@ -18,7 +18,11 @@ GlChartViewCoordinate::GlChartViewCoordinate()
 
 GlChartViewCoordinate::~GlChartViewCoordinate()
 {
-	
+}
+
+void GlChartViewCoordinate::SetYSize(float size)
+{
+	y_size = size;
 }
 
 void GlChartViewCoordinate::SetXSize(float size)
@@ -62,9 +66,14 @@ float GlChartViewCoordinate::GetYScale()
 	return y_scale*y_scale_zoom;
 }
 
+float GlChartViewCoordinate::GetYSize()
+{
+	return y_size;
+}
+
 void GlChartViewCoordinate::Draw()
 {
-	float y_length = GetYScale();
+	float y_length = GetYScale()*y_size;
 	float x_length = GetXScale();
 	glColor4f(0.1f, 0.1f, 0.1f, 0.3f);
 	for(int i = y_label_num; i > 0; --i)
@@ -89,11 +98,11 @@ void GlChartViewCoordinate::Draw()
 	glBegin(GL_LINES);
 		glColor4f(1.0f, 0.0f, 0.0f, 0.3f);
 		glVertex3f(0.0f, 0.0f, 0.0f);
-		glVertex3f(GetXScale(), 0.0f, 0.0f);
+		glVertex3f(x_length, 0.0f, 0.0f);
 
 		glColor4f(0.0f, 1.0f, 0.0f, 0.3f);
-		glVertex3f(0.0f, GetYScale(), 0.0f);
-		glVertex3f(0.0f, -GetYScale(), 0.0f);
+		glVertex3f(0.0f, y_length, 0.0f);
+		glVertex3f(0.0f, -y_length, 0.0f);
 
 	glEnd();
 	
@@ -130,7 +139,7 @@ void GlChartViewCoordinate::DrawCoordinateLabels()
 		font_initialized = true;
 	}
 	float x_length = GetXScale();
-	float y_length = GetYScale();
+	float y_length = GetYScale()*y_size;
 	//float x, y;
 	char value[10];
 	SrVec size;
@@ -165,32 +174,4 @@ void GlChartViewCoordinate::DrawCoordinateLabels()
 
 
 	glDisable(GL_TEXTURE_2D);
-}
-
-
-
-void GlChartViewCoordinate::DrawFonts()
-{
-	if(!font_initialized) 
-	{
-		InitFont();
-		font_initialized = true;
-	}
-	//glMatrixMode(GL_MODELVIEW);
-	//glLoadIdentity( );
-
-	/*glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity( );*/
-	glEnable(GL_BLEND);
-	glEnable(GL_TEXTURE_2D);
-	glColor3f(1.0f, 1.0f, 1.0f);
-
-		label.Begin();
-		label.DrawString(std::string("Hello"), 10, 50, 50);
-
-	//printf("Trying to draw with an uninitialized font\n");
-
-	glDisable(GL_TEXTURE_2D);
-	glDisable(GL_BLEND);
-	//glLoadIdentity();
 }
