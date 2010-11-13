@@ -28,8 +28,7 @@
 
 #include <SR/sr_alg.h>
 #include <vhcl_log.h>
-
-#define MAX_JOINT_LABEL_LEN	32
+#include "sbm_constants.h"
 
 int G_debug_c_SG = 0;
 int G_debug_SG = 0;

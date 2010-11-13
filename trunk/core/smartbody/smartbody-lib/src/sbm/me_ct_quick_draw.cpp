@@ -24,7 +24,8 @@
 #include "me_ct_quick_draw.h"
 #include <vhcl_log.h>
 
-#define MAX_JOINT_LABEL_LEN 	( 64 )
+#include "sbm_constants.h"
+
 #define DFL_CTRL_TIME_INDT		( 0.3f )
 #define DFL_CTRL_TIME_OUTDT		( 0.3f )
 

@@ -25,8 +25,6 @@
 #include "me_ct_gaze.h"
 #include <vhcl_log.h>
 
-#define MAX_JOINT_LABEL_LEN	32
-
 //#define DFL_GAZE_HEAD_SPEED 180.0
 //#define DFL_GAZE_EYE_SPEED  1000.0
 
