@@ -51,9 +51,11 @@ public:
 	float GetXScale();
 	float GetYScale();
 	
-	void DrawFonts();
+	//void DrawFonts();
 	void Draw();
 	void SetXSize(float size);
+	void SetYSize(float size);
+	float GetYSize();
 
 protected:
 	void DrawCoordinateLabels();

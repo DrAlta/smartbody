@@ -125,7 +125,10 @@ void ChannelBufferWindow::FilterItem(fltk::Browser* list, fltk::Input* filter)
 void ChannelBufferWindow::resetCamera(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
-	window->chartview->init_camera();
+	int i = -1;
+	if(strcmp(window->quat->get_item()->label(), "Quaternion") == 0) i = 0;
+	else if(strcmp(window->quat->get_item()->label(), "Euler angle") == 0) i = 1;
+	window->chartview->init_camera(i);
 	window->chartview->update_coordinate = true;
 }
 
@@ -158,12 +161,12 @@ void ChannelBufferWindow::initQuat()
 void ChannelBufferWindow::refreshMaxSize(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
-	int max_buffer_size = atoi(window->frame_num->value());
-	window->chartview->set_max_buffer_size(max_buffer_size);
+	window->num_of_frames = atoi(window->frame_num->value());
+	//window->chartview->set_max_buffer_size(max_buffer_size);
 	int series_count = window->chartview->get_archive()->GetSeriesCount();
 	for(int i = 0; i < series_count; ++i)
 	{
-		window->chartview->get_archive()->GetSeries(i)->SetMaxSize(max_buffer_size);
+		window->chartview->get_archive()->GetSeries(i)->SetMaxSize(window->num_of_frames);
 	}
 }
 
@@ -183,6 +186,8 @@ void ChannelBufferWindow::loadCharacters(fltk::Choice* character)
 		actor = mcu.character_map.next();
 		character->add(actor->name);
 	}
+	int ind = 0;
+	character->set_item(&ind, 0);
 }
 void ChannelBufferWindow::loadControllers(fltk::Choice* controller, fltk::Choice* character)
 {
@@ -296,6 +301,7 @@ void ChannelBufferWindow::refreshChannels(fltk::Widget* widget, void* data)
 void ChannelBufferWindow::refreshControllerChannels(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
+	if(window->character->get_item() == NULL) return;
 	fltk::Browser* channels = window->channel_list;
 
 	if(strcmp(window->controller->get_item()->label(), "All controllers") == 0)
@@ -326,26 +332,15 @@ void ChannelBufferWindow::refreshControllerChannels(fltk::Widget* widget, void* 
 			{
 				int index = actor->ct_tree_p->controller(i)->getContextChannel(j);
 				channels->goto_index(index)->show();
-				/*for(int k = 0; k < channels->size(); ++k)
-				{
-					if(window->buffer_index.get(k) == index) 
-					{
-						channels->goto_index(k)->show();
-						break;
-					}
-				}*/
 			}
 		}
 	}
-
-
 }
-
 
 void ChannelBufferWindow::addMonitoredChannel(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
-	moveChannels(window->chartview, window->channel_list, window->channel_monitor, true, window->buffer_index);
+	moveChannels(window, window->channel_list, window->channel_monitor, true, window->buffer_index);
 }
 
 void ChannelBufferWindow::clearMonitoredChannel(ChannelBufferWindow* window)
@@ -358,10 +353,10 @@ void ChannelBufferWindow::clearMonitoredChannel(ChannelBufferWindow* window)
 void ChannelBufferWindow::removeMonitoredChannel(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
-	moveChannels(window->chartview, window->channel_monitor, window->channel_list, false, window->buffer_index);
+	moveChannels(window, window->channel_monitor, window->channel_list, false, window->buffer_index);
 }
 
-void ChannelBufferWindow::moveChannels(GlChartView* chartview, fltk::Browser* from, fltk::Browser* to, bool add_series, SrArray<int>& buffer_index)
+void ChannelBufferWindow::moveChannels(ChannelBufferWindow* cbufwindow, fltk::Browser* from, fltk::Browser* to, bool add_series, SrArray<int>& buffer_index)
 {
 	for(int i = 0; i < from->size(); ++i)
 	{
@@ -371,19 +366,19 @@ void ChannelBufferWindow::moveChannels(GlChartView* chartview, fltk::Browser* fr
 			to->add(title);
 			if(add_series) 
 			{
-				chartview->get_archive()->NewSeries(title, get_size(title), buffer_index.get(i));
-				chartview->get_archive()->GetLastSeries()->SetMaxSize(chartview->max_buffer_size);
+				cbufwindow->chartview->get_archive()->NewSeries(title, get_size(title), buffer_index.get(i));
+				cbufwindow->chartview->get_archive()->GetLastSeries()->SetMaxSize(cbufwindow->num_of_frames);
 				buffer_index.remove(i);
 			}
 			else 
 			{
-				GlChartViewSeries* series = chartview->get_archive()->GetSeries(title);
+				GlChartViewSeries* series = cbufwindow->chartview->get_archive()->GetSeries(title);
 				if(series == NULL)
 				{
 					printf("\nERROR: ChannelBufferWindow::moveChannels(). series not found");
 				}
 				else buffer_index.push() = series->GetBufferIndex();
-				chartview->get_archive()->DeleteSeries(title);
+				cbufwindow->chartview->get_archive()->DeleteSeries(title);
 			}
 			from->remove(i);
 			--i;

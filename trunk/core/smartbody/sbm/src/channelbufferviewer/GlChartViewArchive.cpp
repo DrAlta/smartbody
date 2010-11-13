@@ -25,10 +25,10 @@ void GlChartViewSeries::SetColor(int index, SrVec& color)
 SrVec GlChartViewSeries::GetEulerFromQuaternion(SrQuat& quat)
 {
 	SrVec euler;
-	euler.x = atan2(2.0f*(quat.w*quat.x+quat.y*quat.z), 1.0f-2.0f*(quat.x*quat.x+quat.y*quat.y));
-	euler.y = asin(2.0f*(quat.w*quat.y - quat.z*quat.x));
-	euler.z = atan2(2.0f*(quat.w*quat.z + quat.x*quat.y), 1.0f-2.0f*(quat.y*quat.y+quat.z*quat.z));
-	euler.normalize();
+	euler.x = atan2(2.0f*(quat.w*quat.x+quat.y*quat.z), 1.0f-2.0f*(quat.x*quat.x+quat.y*quat.y))*180.0f/3.14159265f;
+	euler.y = asin(2.0f*(quat.w*quat.y - quat.z*quat.x))*180.0f/3.14159265f;
+	euler.z = atan2(2.0f*(quat.w*quat.z + quat.x*quat.y), 1.0f-2.0f*(quat.y*quat.y+quat.z*quat.z))*180.0f/3.14159265f;
+	//euler.normalize();
 	return euler;
 }
 
@@ -439,7 +439,10 @@ void GlChartViewArchive::Update(SrBuffer<float>& buffer)
 		if(series->data_type >= CHART_DATA_TYPE_VEC) z = buffer[buffer_index+2];
 		if(series->data_type >= CHART_DATA_TYPE_QUAT) w = buffer[buffer_index+3];
 		 
-		if(series->data_type == CHART_DATA_TYPE_VALUE) series->Push(x);
+		if(series->data_type == CHART_DATA_TYPE_VALUE) 
+		{
+			series->Push(x);
+		}
 		if(series->data_type == CHART_DATA_TYPE_VEC2) series->Push(x, y);
 		if(series->data_type == CHART_DATA_TYPE_VEC) series->Push(x, y, z);
 		if(series->data_type == CHART_DATA_TYPE_QUAT) series->Push(x, y, z, w);

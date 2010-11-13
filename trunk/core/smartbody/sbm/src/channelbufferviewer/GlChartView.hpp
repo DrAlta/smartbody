@@ -14,16 +14,14 @@ class GlChartView : public fltk::GlWindow, public SrViewer
 public:
 	int th;
 	SrCamera camera;
-	int max_buffer_size;
 	bool update_coordinate;
-	//float y_scale;
 
 	SrEvent e;
 
 	GlChartViewCoordinate coordinate;
 	GlChartViewArchive archive;
 
-	int quat_shown_type; //0: 4 series of values; 1: euler angle;
+	int quat_shown_type; //0: quaternion; 1: euler angle;
 
 
 public:
@@ -42,7 +40,7 @@ public:
 	void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h, GlChartView* viewer );
 	int mouse_event ( const SrEvent &e );
 	SrVec rotatePoint(SrVec point, SrVec origin, SrVec direction, float angle);
-	void init_camera();
+	void init_camera(int type);
 
 protected:
 	void initGL(int width, int height);

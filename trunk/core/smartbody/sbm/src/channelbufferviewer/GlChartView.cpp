@@ -6,9 +6,9 @@
 GlChartView::GlChartView(int x, int y, int w, int h, char* name) : fltk::GlWindow( x, y, w, h, name ), SrViewer(x, y, w, h, name)
 {
 	initGL(w, h);
-	init_camera();
+	init_camera(0);
 	th = 0;
-	max_buffer_size = 800;
+	//max_buffer_size = 800;
 	quat_shown_type = 0;
 	update_coordinate = true;
 }
@@ -19,8 +19,8 @@ GlChartView::~GlChartView()
 
 void GlChartView::set_max_buffer_size(int max_size)
 {
-	max_buffer_size = max_size;
-	coordinate.SetXSize(max_size);
+	//max_buffer_size = max_size;
+	coordinate.SetXSize((float)max_size);
 }
 
 void GlChartView::initGL(int width, int height)
@@ -57,7 +57,7 @@ void GlChartView::initGL(int width, int height)
 	glShadeModel ( GL_SMOOTH );
 }
 
-void GlChartView::init_camera()
+void GlChartView::init_camera(int type)
 {
 	camera.init();
 	camera.aspect = (float)w()/(float)h();
@@ -68,7 +68,16 @@ void GlChartView::init_camera()
 	camera.center.x = coordinate.GetXScale()/2;
 	camera.center.y = 0.0f;
 	camera.center.z = 0.0f;
-	coordinate.y_scale_zoom = 1.0f;
+	if(type == 0) 
+	{
+		coordinate.y_scale_zoom = 1.0f;
+		coordinate.SetYSize(1.0f);
+	}
+	else if(type == 1)
+	{
+		coordinate.y_scale_zoom = 1.0f/180.0f;
+		coordinate.SetYSize(180.0f);
+	}
 }
 
 void GlChartView::reshape(int width, int height)
@@ -172,19 +181,37 @@ void GlChartView::draw_series()
 void GlChartView::set_quat_show_type(int type)
 {
 	quat_shown_type = type;
+	if(type == 0 && coordinate.GetYSize() == 180.0f) 
+	{
+		coordinate.SetYSize(1.0f);
+		coordinate.y_scale_zoom = 1.0f;
+	}
+	else if(type == 1 && coordinate.GetYSize() == 1.0f) 
+	{
+		coordinate.SetYSize(180.0f);
+		coordinate.y_scale_zoom = 1.0f/180.0f;
+	}
 }
 
 void GlChartView::draw_series_value(GlChartViewSeries* series)
 {
 	float value = 0.0f;
 	SrVec color;
+	float step = coordinate.GetXScale()/(series->max_size-1);
+	float y_scale = coordinate.GetYScale();
+	float y_size = coordinate.GetYSize();
 	color = series->GetColor(1);
 	glColor4f(color.x, color.y, color.z, 0.5f);
 	glBegin(GL_LINE_STRIP);
 		for(int i = 0; i < series->size; ++i)
 		{
 			value = series->GetValue(i);
-			glVertex3f(i*5.0f, value*100.0f, 0.0f);
+			if(abs(value) > this->coordinate.GetYSize()) 
+			{
+				coordinate.y_scale_zoom = 1.0f/abs(value);
+				this->coordinate.SetYSize(abs(value));
+			}
+			glVertex3f(i*step, value*y_scale, 0.0f);
 		}
 	glEnd();
 }
@@ -198,6 +225,7 @@ void GlChartView::draw_series_vec3(GlChartViewSeries* series)
 
 }
 
+// not used for now
 void GlChartView::draw_series_3D_euler(GlChartViewSeries* series)
 {
 	SrVec euler;
@@ -263,6 +291,7 @@ void GlChartView::draw_series_quat(GlChartViewSeries* series)
 {
 	SrQuat quat;
 	SrVec color;
+
 	float step = coordinate.GetXScale()/(series->max_size-1);
 	float y_scale = coordinate.GetYScale();
 	color = series->GetColor(1);
@@ -440,10 +469,22 @@ int GlChartView::mouse_event ( const SrEvent &e )
 			{
 				//camera.fovy += (dx+dy);//40.0f;
 				//camera.fovy = SR_BOUND ( camera.fovy, 0.001f, srpi );
-				float s = sqrt((e.lmouse.x - e.mouse.x)*(e.lmouse.x - e.mouse.x) + (e.lmouse.y - e.mouse.y)*(e.lmouse.y - e.mouse.y));
-				if(e.lmouse.y > e.mouse.y) s = -s;
-				coordinate.y_scale_zoom += s*coordinate.y_scale_zoom;
-				if(coordinate.y_scale_zoom < 1.0f) coordinate.y_scale_zoom = 1.0f;
+
+				if(coordinate.y_scale_zoom < 1.0f) 
+				{
+					//coordinate.y_scale_zoom = 1.0f;
+					if(e.lmouse.y > e.mouse.y) coordinate.y_scale_zoom = 0.93f*coordinate.y_scale_zoom;
+					else coordinate.y_scale_zoom = coordinate.y_scale_zoom/0.93f;
+					if(coordinate.y_scale_zoom < 0.0001f) coordinate.y_scale_zoom = 0.0001f;
+					coordinate.SetYSize(1.0f/coordinate.y_scale_zoom);
+				}
+				else 
+				{
+					float s = e.mouse.y - e.lmouse.y;
+					//if(e.lmouse.y > e.mouse.y) s = -s;
+					coordinate.y_scale_zoom += s*coordinate.y_scale_zoom;
+					coordinate.SetYSize(1.0f);
+				}
 			}
 			else if(e.button1 && e.alt)
 			{
