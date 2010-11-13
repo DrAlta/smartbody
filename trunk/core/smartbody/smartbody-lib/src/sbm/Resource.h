@@ -63,18 +63,26 @@ class CmdResource : public Resource			// Cmd resources
 		CmdResource();
 		~CmdResource();
 
+		int getCommandIndex();
+
 		void setId(std::string str);
 		std::string getId();
 
 		void setCommand(std::string c);
 		std::string getCommand();
 
+		void setTime(double t);
+		double getTime();
 	
 		std::string dump();
 	
 	protected:
 		std::string id;
 		std::string command;
+		double time;
+		int index;
+
+		static int commandIndex;
 
 };
 

@@ -268,6 +268,7 @@ int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	if( mcu_p )	{
 		char *seq_name = args.read_token();
 		char *seq_cmd = args.read_token();
+		std::cout << "SEQUENCE LOADED: " << seq_name << " " << seq_cmd << std::endl;
 
 		if( ( strcmp( seq_cmd, "begin" ) == 0 )||( strcmp( seq_cmd, EMPTY_STRING ) == 0 ) )	{
 			int ret = begin_sequence( seq_name, mcu_p );
