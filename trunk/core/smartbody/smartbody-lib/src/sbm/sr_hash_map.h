@@ -28,8 +28,9 @@
 #include <string>
 #include <map>
 
-
 #include "sbm_constants.h"
+
+#define SR_HASH_MAP_OVERRIDE	( 0 )
 
 ///////////////////////////////////////////////////////
 
@@ -65,18 +66,19 @@ class srHashMapBase {
 		void	*pull( int *claimed_p = NULL );	  // remove iterator
 
 		// checks for existence of KEY in hash table independent of the value it hashes to
-		bool	does_key_exist(const char *key ) { return( key_in_use( key ) ); } 
+//		bool	does_key_exist(const char *key ) { return( key_in_use( key ) ); } 
 
 		// dump entries regardless of ownership: see template class: expunge()
-        void    removeAll();
+//        void    removeAll();
 
 	protected:
 		bool shallow_copy;
 		
 	private:
+		unsigned int	unsigned_hash_string( const char *string, unsigned int limit );
 		sr_map_entry_t	*new_table_entry( const char *key, void *data, int claim, sr_map_entry_t *next );
 		void			*find_table_data( sr_map_entry_t *bucket_p, const char *key );
-
+		
 		void			increment_iterator(void);
 		void			decrement_iterator(void);
 
@@ -87,8 +89,6 @@ class srHashMapBase {
 		sr_map_entry_t	**bucket_pp;
 
 		int				entry_count;
-
-		
 };
 
 template <class X> class srHashMap : public srHashMapBase	{
@@ -164,9 +164,8 @@ template <class X> class srHashMap : public srHashMapBase	{
 			}
 		}
 
-
-private:
-	std::map<char *, X *> stl_map;
+	private:
+		std::map<char *, X *> stl_map;
 };
 
 ///////////////////////////////////////////////////////

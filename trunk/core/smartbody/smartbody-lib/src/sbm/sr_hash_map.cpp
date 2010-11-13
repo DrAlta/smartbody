@@ -34,7 +34,7 @@
 
 ///////////////////////////////////////////////////////////////////
 
-unsigned int unsigned_hash_string( const char *string, unsigned int limit )	{
+unsigned int srHashMapBase::unsigned_hash_string( const char *string, unsigned int limit )	{
 	unsigned int i = 0;
 	unsigned int accum = 0;
 		
@@ -46,7 +46,13 @@ unsigned int unsigned_hash_string( const char *string, unsigned int limit )	{
 					^ ( accum >> ( ( sizeof( accum ) - sizeof( char ) ) * 8 - 1 ) );
 				i++;
 			}
+#if SR_HASH_MAP_OVERRIDE
+			srand( accum + SR_HASH_MAP_OVERRIDE );
+			int r = rand();
+			return( r % limit );
+#else
 			return( accum % limit );
+#endif
 		}
 #endif
 		return( 0 );
@@ -254,6 +260,7 @@ void *srHashMapBase::remove( const char *key, int *claimed_p )	{
 		return( NULL );
 }
 
+#if 0
 void srHashMapBase::removeAll()	{
 
 	int claimed = FALSE;
@@ -265,6 +272,7 @@ void srHashMapBase::removeAll()	{
 		}
 	}
 }
+#endif
 
 ////////////////////////////////////////////////////////////
  

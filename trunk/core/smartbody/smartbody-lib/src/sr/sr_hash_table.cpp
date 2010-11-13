@@ -23,6 +23,9 @@
  */
 
 # include <SR/sr_hash_table.h>
+#include <stdlib.h>
+#include <stdio.h>
+//#include <time.h>
 
 //================================ hash function =============================
 
@@ -38,9 +41,15 @@ static int hash ( const char* s, int size )
       s++;
     }
    h = SR_ABS(h);
-   h = h%size;
-   return h;
- }
+
+#if SR_HASH_TABLE_OVERRIDE
+	srand( h + SR_HASH_TABLE_OVERRIDE );
+	int r = rand();
+	return( r % size );
+#else
+	return( h % size );
+#endif
+}
 
 /*static int hash ( const char *string, int limit ) // worse
  {

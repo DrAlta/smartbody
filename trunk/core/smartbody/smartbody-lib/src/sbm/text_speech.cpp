@@ -235,7 +235,7 @@ void text_speech::requestComplete( RequestId requestId ){
 	complStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
 	
 	//removes the item from all the lookupTables; deletes any allocated heap memory
-	if(uttLookUp.does_key_exist(complStream.str().c_str()))
+	if(uttLookUp.key_in_use(complStream.str().c_str()))
 	{
 		uttLookUp.remove(complStream.str().c_str());
 	}

@@ -454,7 +454,7 @@ int remoteSpeechResult_func( srArgBuffer& args, mcuCBHandle* mcu_p ) { //this fu
 int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgID, char* status, char* result, mcuCBHandle* mcu_p ) { //this function is not a member function of remote_speech; it waits for and processes the RemoteSpeechReply
 	if( LOG_RHETORIC_SPEECH ) LOG("\n \n *************in remote_speech::recieving_func***************** \n \n");
 	
-	if( !remote_speech::commandLookUp.does_key_exist( msgID ) ) { //of the response from Rvoice Relay timed out the key would be deleted
+	if( !remote_speech::commandLookUp.key_in_use( msgID ) ) { //of the response from Rvoice Relay timed out the key would be deleted
 		// TODO: Log / print error
 		return( CMD_FAILURE );  // known character but unknown message id
 	}
@@ -549,16 +549,16 @@ void remote_speech::requestComplete( RequestId requestId ){
 	
 	//removes the item from all the lookupTables; deletes any allocated heap memory
 
-	if(uttLookUp.does_key_exist(complStream.str().c_str()))
+	if(uttLookUp.key_in_use(complStream.str().c_str()))
 	{
 		uttLookUp.remove(complStream.str().c_str());
 	}
 		
-	if(soundLookUp.does_key_exist(complStream.str().c_str())){
+	if(soundLookUp.key_in_use(complStream.str().c_str())){
 		 soundLookUp.remove(complStream.str().c_str());
 	}
 	
-	if(commandLookUp.does_key_exist(complStream.str().c_str())){
+	if(commandLookUp.key_in_use(complStream.str().c_str())){
 		 commandLookUp.remove(complStream.str().c_str());
 	}
 
@@ -664,7 +664,7 @@ int remote_speech::testRemoteSpeechTimeOut( const char* request_id_str, mcuCBHan
 	/* function gets called a certain # of seconds (specified by const int timeout in remoteoric::speech and if the request hasn't been
 	processed it's a Timout and all the request info is deleted inside the lookup tables */
 	
-	if( !remote_speech::uttLookUp.does_key_exist(request_id_str) && remote_speech::soundLookUp.does_key_exist(request_id_str) ) //a timeout has occurred
+	if( !remote_speech::uttLookUp.key_in_use(request_id_str) && remote_speech::soundLookUp.key_in_use(request_id_str) ) //a timeout has occurred
 	{
 		LOG("remote_speech::rVoiceTimeOut ERR: RemoteSpeechReply Message NOT RECIEVED for utterance #%s . Please check if the remote speech process is on and is accessable by SBM.", request_id_str);
 
