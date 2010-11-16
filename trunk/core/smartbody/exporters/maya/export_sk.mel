@@ -582,9 +582,19 @@ global proc int skOutputDirChanged()
 }
 
 
-proc int skFileCb( string $filename, string $fileType )
+global proc int skFileCb( string $filename, string $fileType )
 {
-   textFieldGrp -e -text ($filename+"/"+`textFieldGrp -q -text skOutputName`+".sk") skOutputFile;
+   //--- here, get the relative path
+   string $absPath = $filename;
+   string $refPath = `workspace -en ""`;
+   
+   string $finalDir = substituteAllString($absPath, $refPath, "");
+   if ($finalDir == $absPath)
+     textFieldGrp -e -text ($filename+"/"+`textFieldGrp -q -text skOutputName`+".sk") skOutputFile; 
+   else
+     textFieldGrp -e -text ($finalDir+"/"+`textFieldGrp -q -text skOutputName`+".sk") skOutputFile;   
+   
+   skOutputDirChanged();
    return 1;
 }
 
