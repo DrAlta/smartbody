@@ -4214,6 +4214,12 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				std::stringstream outputInfo;
 				if (mode == 1)	chan = mChanArray[i];
 				if (mode == 2)	chan = skelChanArray[i];
+				if (!chan.joint)
+				{
+					LOG("  %d: (No mathing joint)", i);
+					continue;
+				}
+
 				std::string jointName = chan.joint->name().get_string();
 				int	chanType = chan.type;
 				std::string chanTypeString;
