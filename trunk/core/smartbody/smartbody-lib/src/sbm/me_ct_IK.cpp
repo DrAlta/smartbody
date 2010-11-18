@@ -280,8 +280,8 @@ __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 
 	v3 = cross(v1, v2);
 	v3.normalize();
-	if(dot(v3, r_axis) > 0.0f) mat.rot(r_axis, angle);
-	else mat.rot(r_axis, -angle);
+	if(dot(v3, r_axis) > 0.0f) mat.rot(r_axis, (float)angle);
+	else mat.rot(r_axis, (float)-angle);
 	
 	q = scenario->joint_quat_list.get(start_index);
 	q = mat * q;
