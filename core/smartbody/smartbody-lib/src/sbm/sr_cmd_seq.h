@@ -18,7 +18,6 @@
  *
  *  CONTRIBUTORS:
  *      Marcus Thiebaux, USC
- *      Andrew n marshall, USC
  */
 
 #ifndef SR_COMMAND_SEQUENCE_H
