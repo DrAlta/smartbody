@@ -87,6 +87,50 @@ void GlChartViewSeries::SetColorOnBufferIndex(int index)
 	srand(index);
 	while(true)
 	{
+		color_x.x = (float)rand()/(float)RAND_MAX;
+		color_x.y = (float)rand()/(float)RAND_MAX;
+		color_x.z = (float)rand()/(float)RAND_MAX;
+		if(color_x.x < 0.4f && color_x.y < 0.4f && color_x.z < 0.4f) continue;
+		break;
+	}
+	while(true)
+	{
+		color_y.x = (float)rand()/(float)RAND_MAX;
+		color_y.y = (float)rand()/(float)RAND_MAX;
+		color_y.z = (float)rand()/(float)RAND_MAX;
+		if(color_y.x < 0.4f && color_y.y < 0.4f && color_y.z < 0.4f) continue;
+		SrVec t = color_x-color_y;
+		if(t.len()<0.3f) continue;
+		break;
+	}
+	while(true)
+	{
+		color_z.x = (float)rand()/(float)RAND_MAX;
+		color_z.y = (float)rand()/(float)RAND_MAX;
+		color_z.z = (float)rand()/(float)RAND_MAX;
+		if(color_z.x < 0.4f && color_z.y < 0.4f && color_z.z < 0.4f) continue;
+		SrVec t = color_z-color_x;
+		if(t.len()<0.3f) continue;
+		break;
+	}
+	while(true)
+	{
+		color_w.x = (float)rand()/(float)RAND_MAX;
+		color_w.y = (float)rand()/(float)RAND_MAX;
+		color_w.z = (float)rand()/(float)RAND_MAX;
+		if(color_w.x < 0.4f && color_w.y < 0.4f && color_w.z < 0.4f) continue;
+		SrVec t = color_y-color_w;
+		if(t.len()<0.3f) continue;
+		break;
+	}
+	
+}
+
+/*void GlChartViewSeries::SetColorOnBufferIndex(int index)
+{
+	srand(index);
+	while(true)
+	{
 		color_x.x = (float)(rand()%512)/512.0f;
 		color_x.y = (float)(rand()%512)/512.0f;
 		color_x.z = (float)(rand()%512)/512.0f;
@@ -99,6 +143,8 @@ void GlChartViewSeries::SetColorOnBufferIndex(int index)
 		color_y.y = (float)(rand()%512)/512.0f;
 		color_y.z = (float)(rand()%512)/512.0f;
 		if(color_y.x < 0.4f && color_y.y < 0.4f && color_y.z < 0.4f) continue;
+		SrVec t = color_x-color_y;
+		if(t.len()<0.3f) continue;
 		break;
 	}
 	while(true)
@@ -107,6 +153,8 @@ void GlChartViewSeries::SetColorOnBufferIndex(int index)
 		color_z.y = (float)(rand()%512)/512.0f;
 		color_z.z = (float)(rand()%512)/512.0f;
 		if(color_z.x < 0.4f && color_z.y < 0.4f && color_z.z < 0.4f) continue;
+		SrVec t = color_z-color_x;
+		if(t.len()<0.3f) continue;
 		break;
 	}
 	while(true)
@@ -115,9 +163,11 @@ void GlChartViewSeries::SetColorOnBufferIndex(int index)
 		color_w.y = (float)(rand()%512)/512.0f;
 		color_w.z = (float)(rand()%512)/512.0f;
 		if(color_w.x < 0.4f && color_w.y < 0.4f && color_w.z < 0.4f) continue;
+		SrVec t = color_y-color_w;
+		if(t.len()<0.3f) continue;
 		break;
 	}
-}
+}*/
 
 void GlChartViewSeries::SetBufferIndex(int index)
 {
