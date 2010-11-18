@@ -15,6 +15,16 @@
 #include <sbm/mcontrol_util.h>
 #include "GlChartView.hpp"
 
+class ChannelItem
+{
+public:
+	int index;
+	SrString* label;
+	bool monitored;
+	bool filtered;
+	bool not_in_search;
+};
+
 
 class ChannelBufferWindow : public BMLViewer, public fltk::Window 
 {
@@ -37,6 +47,10 @@ public:
 	fltk::Choice* character;
 	fltk::Choice* controller;
 	fltk::Choice* quat;
+	fltk::CheckButton* show_x;
+	fltk::CheckButton* show_y;
+	fltk::CheckButton* show_z;
+	fltk::CheckButton* show_w;
 	fltk::Button* refresh;
 	fltk::Button* freeze;
 	fltk::Button* reset_camera;
@@ -48,15 +62,23 @@ public:
 	fltk::Input* channel_filter;
 	fltk::Input* channel_monitored_filter;
 
-	SrArray<int> buffer_index;
+	SrArray<ChannelItem> Channel_item_list;
+
 	int num_of_frames;
 	bool is_freezed;
 
 public:
 	const char* getSelectedCharacterName();
+
+protected:
 	static void loadCharacters(fltk::Choice* character);
 	static void loadControllers(fltk::Choice* controller, fltk::Choice* character);
 	static void loadChannels(ChannelBufferWindow* window);
+
+	static void refreshChannelsWidget(ChannelBufferWindow* window);
+	static void refreshMonitoredChannelsWidget(ChannelBufferWindow* window);
+
+	static void refreshBold(fltk::Widget* widget, void* data);
 	static void refreshCharacters(fltk::Widget* widget, void* data);
 	static void refreshControllers(fltk::Widget* widget, void* data);
 	static void refreshControllerChannels(fltk::Widget* widget, void* data);
@@ -68,14 +90,20 @@ public:
 	static void FilterChannelItem(fltk::Widget* widget, void* data);
 	static void FilterMonitoredChannelItem(fltk::Widget* widget, void* data);
 
+	static void refreshShowX(fltk::Widget* widget, void* data);
+	static void refreshShowY(fltk::Widget* widget, void* data);
+	static void refreshShowZ(fltk::Widget* widget, void* data);
+	static void refreshShowW(fltk::Widget* widget, void* data);
+
+	static void setXYZVisibility(ChannelBufferWindow* window);
+
 protected:
 	void initQuat();
 	void set_default_values();
 	static void clearMonitoredChannel(ChannelBufferWindow* window);
 	static void addMonitoredChannel(fltk::Widget* widget, void* data);
-	static void FilterItem(fltk::Browser* list, fltk::Input* filter);
+	static void FilterItem(ChannelBufferWindow* window, fltk::Browser* list, fltk::Input* filter, bool monitored);
 	static void removeMonitoredChannel(fltk::Widget* widget, void* data);
-	static void moveChannels(ChannelBufferWindow* cbufwindow, fltk::Browser* from, fltk::Browser* to, bool add_series, SrArray<int>& buffer_index);
 	static int get_size(const char* title);
 };
 

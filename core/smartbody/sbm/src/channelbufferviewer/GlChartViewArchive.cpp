@@ -7,6 +7,7 @@ GlChartViewSeries::GlChartViewSeries()
 	max_size = 0;
 	current_ind = -1;
 	size = 0;
+	bold = false;
 };
 
 GlChartViewSeries::~GlChartViewSeries()
