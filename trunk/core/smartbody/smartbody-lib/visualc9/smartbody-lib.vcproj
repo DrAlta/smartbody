@@ -1365,6 +1365,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\sr_linear_curve.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\sr_path_list.h"
 				>
 			</File>
