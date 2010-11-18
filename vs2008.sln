@@ -71,7 +71,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "smartbody-dll", "core\smart
 		{D41370B8-B1B9-430D-8813-C296D7935F2B} = {D41370B8-B1B9-430D-8813-C296D7935F2B}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsSpeechRelay", "core\MsSpeechRelay\MsSpeechRelay\MsSpeechRelay.csproj", "{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsSpeechRelay", "core\MsSpeechRelay\MsSpeechRelay.csproj", "{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
