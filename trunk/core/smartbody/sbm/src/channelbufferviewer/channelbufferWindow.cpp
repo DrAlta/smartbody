@@ -12,7 +12,7 @@ ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name)
 	char value[10];
 	this->begin();
 	// first group: animation name and character name
-	Group* firstGroup = new fltk::Group(10, 20, w - 20, h/2 - 20, "");
+	Group* firstGroup = new fltk::Group(10, 20, w - 20, h/4 - 20, "");
 	firstGroup->begin();
 	// left part
 
@@ -34,14 +34,17 @@ ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name)
 		channel_list = new fltk::Browser(50+w/4+w/16, 20, w/4, 120, "");
 		channel_list->type(fltk::Browser::MULTI);
 		loadChannels(this);
-
+		refreshChannelsWidget(this);
+		
 		channel_monitored_filter = new fltk::Input(50+w/2+w/8+20+50, 0, w/4-50, 18, "Monitored:");
 		channel_monitored_filter->when(fltk::WHEN_CHANGED);
 		channel_monitored_filter->callback(FilterMonitoredChannelItem, this);
 
 		channel_monitor = new fltk::Browser(50+w/2+w/8+20, 20, w/4, 120, "");
 		channel_monitor->type(fltk::Browser::MULTI);
-		//loadChannels(character, channel_monitor);
+		channel_monitor->when(fltk::WHEN_CHANGED);
+		channel_monitor->callback(refreshBold, this);
+		refreshMonitoredChannelsWidget(this);
 
 		channel_add = new fltk::Button(50+w/2+w/16+10, 20, w/16, 20, ">>>");
 		channel_add->callback(addMonitoredChannel, this);
@@ -62,8 +65,22 @@ ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name)
 		frame_num->value(value);
 
 		quat = new fltk::Choice(300, 0, (int)(1.5f*w/8), 18, "Rotation shown as:");
-		initQuat();
 		quat->callback(refreshQuat, this);
+
+		show_x = new fltk::CheckButton(300+(int)(1.5f*w/8), 0, 18, 18, "X");
+		show_x->callback(refreshShowX, this);
+		show_x->state(true);
+		show_y = new fltk::CheckButton(300+(int)(1.5f*w/8)+30, 0, 18, 18, "Y");
+		show_y->callback(refreshShowY, this);
+		show_y->state(true);
+		show_z = new fltk::CheckButton(300+(int)(1.5f*w/8)+60, 0, 18, 18, "Z");
+		show_z->callback(refreshShowZ, this);
+		show_z->state(true);
+		show_w = new fltk::CheckButton(300+(int)(1.5f*w/8)+90, 0, 18, 18, "W");
+		show_w->callback(refreshShowW, this);
+		show_w->state(true);
+
+		initQuat();
 
 		freeze = new fltk::Button(w-200, 0, 80, 18, "Freeze");
 		freeze->callback(freezeView, this);
@@ -84,42 +101,71 @@ ChannelBufferWindow::~ChannelBufferWindow()
 {
 }
 
+void ChannelBufferWindow::refreshBold(fltk::Widget* widget, void* data)
+{
+	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
+	for(int j = 0; j < window->channel_monitor->size(); ++j)
+	{
+		window->chartview->get_archive()->GetSeries(j)->bold = false;
+		if(window->channel_monitor->selected(j))
+		{
+			const char* label = window->channel_monitor->goto_index(j)->label();
+			for(int i = 0; i < window->Channel_item_list.size(); ++i)
+			{
+				ChannelItem& item = window->Channel_item_list.get(i);
+				if(item.monitored)
+				{
+					if(strcmp(&(item.label->get(0)), label) == 0)
+					{
+						window->chartview->get_archive()->GetSeries(j)->bold = true;
+					}
+				}
+			}
+		}
+	}
+}
+
 void ChannelBufferWindow::FilterChannelItem(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
-	FilterItem(window->channel_list, window->channel_filter);
+	FilterItem(window, window->channel_list, window->channel_filter, false);
+	refreshChannelsWidget(window);
 }
 
 void ChannelBufferWindow::FilterMonitoredChannelItem(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
-	FilterItem(window->channel_monitor, window->channel_monitored_filter);
+	FilterItem(window, window->channel_monitor, window->channel_monitored_filter, true);
+	refreshMonitoredChannelsWidget(window);
 }
 
-void ChannelBufferWindow::FilterItem(fltk::Browser* list, fltk::Input* filter)
+void ChannelBufferWindow::FilterItem(ChannelBufferWindow* window, fltk::Browser* list, fltk::Input* filter, bool monitored)
 {
 	const char* keyword = filter->value();
 	if(keyword[0] == '\0')
 	{
-		for(int i = 0; i < list->size(); ++i)
+		for(int i = 0; i < window->Channel_item_list.size(); ++i)
 		{
-			list->goto_index(i)->show();
+			if(window->Channel_item_list.get(i).monitored == monitored)
+			{
+				window->Channel_item_list.get(i).not_in_search = false;
+			}
 		}
 		return;
 	}
-	for(int i = 0; i < list->size(); ++i)
+	for(int i = 0; i < window->Channel_item_list.size(); ++i)
 	{
-		const char* item = list->goto_index(i)->label();
+		if(window->Channel_item_list.get(i).monitored != monitored) continue;
+		const char* item = &(window->Channel_item_list.get(i).label->get(0));
 		if(strstr(item, keyword)!= NULL) 
 		{
-			list->goto_index(i)->show();
+			window->Channel_item_list.get(i).not_in_search = false;
 		}
 		else 
 		{
-			list->goto_index(i)->hide();
+			window->Channel_item_list.get(i).not_in_search = true;
 		}
 	}
-	//list->redraw();
 }
 
 void ChannelBufferWindow::resetCamera(fltk::Widget* widget, void* data)
@@ -141,6 +187,30 @@ void ChannelBufferWindow::freezeView(fltk::Widget* widget, void* data)
 
 }
 
+void ChannelBufferWindow::refreshShowX(fltk::Widget* widget, void* data)
+{
+	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
+	window->chartview->show_x = !window->chartview->show_x;
+}
+
+void ChannelBufferWindow::refreshShowY(fltk::Widget* widget, void* data)
+{
+	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
+	window->chartview->show_y = !window->chartview->show_y;
+}
+
+void ChannelBufferWindow::refreshShowZ(fltk::Widget* widget, void* data)
+{
+	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
+	window->chartview->show_z = !window->chartview->show_z;
+}
+
+void ChannelBufferWindow::refreshShowW(fltk::Widget* widget, void* data)
+{
+	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
+	window->chartview->show_w = !window->chartview->show_w;
+}
+
 void ChannelBufferWindow::refreshQuat(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
@@ -150,12 +220,40 @@ void ChannelBufferWindow::refreshQuat(fltk::Widget* widget, void* data)
 	else if(strcmp(window->quat->get_item()->label(), "Euler angle") == 0) i = 1;
 	
 	window->chartview->set_quat_show_type(i);
+	setXYZVisibility(window);
 }
 
 void ChannelBufferWindow::initQuat()
 {
 	quat->add("Quaternion");
 	quat->add("Euler angle");
+	setXYZVisibility(this);
+}
+
+void ChannelBufferWindow::setXYZVisibility(ChannelBufferWindow* window)
+{
+	fltk::Color color;
+	if(strcmp(window->quat->get_item()->label(), "Quaternion") == 0)
+	{
+		color = 0x38;
+		window->show_x->activate();
+		window->show_y->activate();
+		window->show_z->activate();
+		window->show_w->activate();
+		window->show_x->textcolor(color);
+		window->show_y->textcolor(color);
+		window->show_z->textcolor(color);
+		window->show_w->textcolor(color);
+	}
+	else if(strcmp(window->quat->get_item()->label(), "Euler angle") == 0)
+	{
+		color = 47;
+		window->show_x->activate();
+		window->show_y->activate();
+		window->show_z->activate();
+		window->show_w->deactivate();
+		window->show_w->textcolor(color);
+	}
 }
 
 void ChannelBufferWindow::refreshMaxSize(fltk::Widget* widget, void* data)
@@ -168,6 +266,7 @@ void ChannelBufferWindow::refreshMaxSize(fltk::Widget* widget, void* data)
 	{
 		window->chartview->get_archive()->GetSeries(i)->SetMaxSize(window->num_of_frames);
 	}
+	window->chartview->coordinate.SetXSize(window->num_of_frames);
 }
 
 void ChannelBufferWindow::set_default_values()
@@ -189,6 +288,7 @@ void ChannelBufferWindow::loadCharacters(fltk::Choice* character)
 	int ind = 0;
 	character->set_item(&ind, 0);
 }
+
 void ChannelBufferWindow::loadControllers(fltk::Choice* controller, fltk::Choice* character)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -210,29 +310,54 @@ void ChannelBufferWindow::loadControllers(fltk::Choice* controller, fltk::Choice
 	}
 }
 
+void ChannelBufferWindow::refreshChannelsWidget(ChannelBufferWindow* window)
+{
+	window->channel_list->clear();
+	int num = window->Channel_item_list.size();
+	for(int i = 0; i < num; ++i)
+	{
+		ChannelItem& item = window->Channel_item_list.get(i);
+		if(!item.filtered && !item.monitored && !item.not_in_search)
+		{
+			window->channel_list->add(&(item.label->get(0)));
+		}
+	}
+}
+
+void ChannelBufferWindow::refreshMonitoredChannelsWidget(ChannelBufferWindow* window)
+{
+	window->channel_monitor->clear();
+	int num = window->Channel_item_list.size();
+	for(int i = 0; i < num; ++i)
+	{
+		ChannelItem& item = window->Channel_item_list.get(i);
+		if(item.monitored && !item.not_in_search)
+		{
+			window->channel_monitor->add(&(item.label->get(0)));
+		}
+	}
+}
 
 void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 {
 	fltk::Choice* character = window->character;
-	fltk::Browser* channel_list = window->channel_list;
-	window->buffer_index.size(0);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	channel_list->clear();
-
 	if(character->get_item()== NULL) return;
-
 	SbmCharacter* actor = mcu.character_map.lookup(character->get_item()->label());
-
 	SkSkeleton* skeleton = actor->skeleton_p;
 
 	SkChannelArray& channels = skeleton->channels();
 	int numChannels = channels.size();
+
+	window->Channel_item_list.capacity(numChannels);
+	window->Channel_item_list.size(numChannels);
+
 	SkJoint* joint = NULL;
 	char str[100];
 	int channel_index = 0;
 	char ext[3];
 	int ext_count = 0;
+
 	for (int i = 0; i < numChannels; i++)
 	{
 		joint = channels.joint(i);
@@ -263,9 +388,14 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 			ext[0] = '\0';
 			ext_count = 0;
 		}
+
 		sprintf(str, "%s%s (%d)", joint->name().get_string(), ext, channelSize);
-		channel_list->add(str);
-		window->buffer_index.push() = channel_index;
+		ChannelItem& item = window->Channel_item_list.get(i);
+		item.filtered = false;
+		item.monitored = false;
+		item.not_in_search = false;
+		item.index = channel_index;
+		item.label = new SrString(str);
 		channel_index += channelSize;
 	}
 }
@@ -295,7 +425,8 @@ void ChannelBufferWindow::refreshChannels(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	loadChannels(window);
-	clearMonitoredChannel(window);
+	//clearMonitoredChannel(window);
+	refreshChannelsWidget(window);
 }
 
 void ChannelBufferWindow::refreshControllerChannels(fltk::Widget* widget, void* data)
@@ -306,21 +437,26 @@ void ChannelBufferWindow::refreshControllerChannels(fltk::Widget* widget, void* 
 
 	if(strcmp(window->controller->get_item()->label(), "All controllers") == 0)
 	{
-		for(int i = 0; i < channels->size(); ++i)
+		//channels->goto_index(i)->show();
+		//window->is_filtered.setall(false);
+		for(int i = 0; i < window->Channel_item_list.size(); ++i)
 		{
-			channels->goto_index(i)->show();
+			window->Channel_item_list.get(i).filtered = false;
 		}
+		//_loadChannels(window);
+		refreshChannelsWidget(window);
 		return;
 	}
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SbmCharacter* actor = mcu.character_map.lookup(window->character->get_item()->label());
 	
-	for(int i = 0; i < channels->size(); ++i)
+	//window->is_filtered.setall(true);
+	for(int i = 0; i < window->Channel_item_list.size(); ++i)
 	{
-		channels->goto_index(i)->hide();
+		window->Channel_item_list.get(i).filtered = true;
 	}
-
+	
 	int ct_num = actor->ct_tree_p->count_controllers();
 	for(int i = 0; i < ct_num; ++i)
 	{
@@ -331,99 +467,66 @@ void ChannelBufferWindow::refreshControllerChannels(fltk::Widget* widget, void* 
 			for(int j = 0; j < channelsInUse.size(); ++j)
 			{
 				int index = actor->ct_tree_p->controller(i)->getContextChannel(j);
-				channels->goto_index(index)->show();
+				//channels->goto_index(index)->show();
+				window->Channel_item_list.get(index).filtered = false;
+				//window->is_filtered.set(index, false);
 			}
 		}
 	}
+	//_loadChannels(window);
+	refreshChannelsWidget(window);
 }
 
 void ChannelBufferWindow::addMonitoredChannel(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
-	moveChannels(window, window->channel_list, window->channel_monitor, true, window->buffer_index);
-}
-
-void ChannelBufferWindow::clearMonitoredChannel(ChannelBufferWindow* window)
-{
-	fltk::Browser* monitoredchannel = window->channel_monitor;
-	window->chartview->get_archive()->ClearSeries();
-	monitoredchannel->clear();
+	
+	//moveChannels(window, window->channel_list, window->channel_monitor, true, window->buffer_index_channel);
+	for(int i = 0; i < window->channel_list->size(); ++i)
+	{
+		if(window->channel_list->selected(i))
+		{
+			for(int j = 0; j < window->Channel_item_list.size(); ++j)
+			{
+				if(strcmp(&(window->Channel_item_list.get(j).label->get(0)), window->channel_list->goto_index(i)->label()) == 0)
+				{
+					ChannelItem& item = window->Channel_item_list.get(j);
+					item.monitored = true;
+					const char* label = &(item.label->get(0));
+					window->chartview->get_archive()->NewSeries(label, get_size(label), window->Channel_item_list.get(j).index);
+					window->chartview->get_archive()->GetLastSeries()->SetMaxSize(window->num_of_frames);
+					break;
+				}
+			}
+		}
+	}
+	refreshChannelsWidget(window);
+	refreshMonitoredChannelsWidget(window);
 }
 
 void ChannelBufferWindow::removeMonitoredChannel(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
-	moveChannels(window, window->channel_monitor, window->channel_list, false, window->buffer_index);
-}
-
-void ChannelBufferWindow::moveChannels(ChannelBufferWindow* cbufwindow, fltk::Browser* from, fltk::Browser* to, bool add_series, SrArray<int>& buffer_index)
-{
-	for(int i = 0; i < from->size(); ++i)
+	for(int i = 0; i < window->channel_monitor->size(); ++i)
 	{
-		if(from->selected(i))
+		if(window->channel_monitor->selected(i))
 		{
-			const char* title = from->goto_index(i)->label();
-			to->add(title);
-			if(add_series) 
+			for(int j = 0; j < window->Channel_item_list.size(); ++j)
 			{
-				cbufwindow->chartview->get_archive()->NewSeries(title, get_size(title), buffer_index.get(i));
-				cbufwindow->chartview->get_archive()->GetLastSeries()->SetMaxSize(cbufwindow->num_of_frames);
-				buffer_index.remove(i);
-			}
-			else 
-			{
-				GlChartViewSeries* series = cbufwindow->chartview->get_archive()->GetSeries(title);
-				if(series == NULL)
+				if(strcmp(&(window->Channel_item_list.get(j).label->get(0)), window->channel_monitor->goto_index(i)->label()) == 0)
 				{
-					printf("\nERROR: ChannelBufferWindow::moveChannels(). series not found");
+					ChannelItem& item = window->Channel_item_list.get(j);
+					const char* label = &(item.label->get(0));
+					item.monitored = false;
+					window->chartview->get_archive()->DeleteSeries(label);
+					break;
 				}
-				else buffer_index.push() = series->GetBufferIndex();
-				cbufwindow->chartview->get_archive()->DeleteSeries(title);
-			}
-			from->remove(i);
-			--i;
-		}
-	}
-}
-
-/*void ChannelBufferWindow::moveChannels(GlChartView* chartview, fltk::Browser* from, fltk::Browser* to, bool add_series, SrArray<int>& buffer_index)
-{
-	for(int i = 0; i < from->size(); ++i)
-	{
-		if(from->selected(i))
-		{
-			const char* title = from->goto_index(i)->label();
-			
-			if(add_series) 
-			{
-				chartview->get_archive()->NewSeries(title, get_size(title), buffer_index.get(i));
-				chartview->get_archive()->GetLastSeries()->SetMaxSize(chartview->max_buffer_size);
-				from->goto_index(i)->hide();
-				to->add(title);
-				//buffer_index.remove(i);
-			}
-			else 
-			{
-				GlChartViewSeries* series = chartview->get_archive()->GetSeries(title);
-				if(series == NULL)
-				{
-					printf("\nERROR: ChannelBufferWindow::moveChannels(). series not found");
-				}
-				//else buffer_index.push() = series->GetBufferIndex();
-				chartview->get_archive()->DeleteSeries(title);
-				for(int j = 0; j < to->size(); ++j)
-				{
-					const char* str = to->goto_index(j)->label();
-					if(strcmp(str, title) == 0) to->goto_index(j)->set_visible();
-				}
-				from->remove(i);
-				--i;
 			}
 		}
 	}
-	from->redraw();
-	to->redraw();
-}*/
+	refreshChannelsWidget(window);
+	refreshMonitoredChannelsWidget(window);
+}
 
 int ChannelBufferWindow::get_size(const char* title)
 {

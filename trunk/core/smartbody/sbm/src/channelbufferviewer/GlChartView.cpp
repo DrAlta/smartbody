@@ -11,6 +11,10 @@ GlChartView::GlChartView(int x, int y, int w, int h, char* name) : fltk::GlWindo
 	//max_buffer_size = 800;
 	quat_shown_type = 0;
 	update_coordinate = true;
+	show_x = true;
+	show_y = true;
+	show_z = true;
+	show_w = true;
 }
 
 GlChartView::~GlChartView()
@@ -200,6 +204,10 @@ void GlChartView::draw_series_value(GlChartViewSeries* series)
 	float step = coordinate.GetXScale()/(series->max_size-1);
 	float y_scale = coordinate.GetYScale();
 	float y_size = coordinate.GetYSize();
+	if(series->bold)
+	{
+		glLineWidth(3.0f);
+	}
 	color = series->GetColor(1);
 	glColor4f(color.x, color.y, color.z, 0.5f);
 	glBegin(GL_LINE_STRIP);
@@ -214,6 +222,7 @@ void GlChartView::draw_series_value(GlChartViewSeries* series)
 			glVertex3f(i*step, value*y_scale, 0.0f);
 		}
 	glEnd();
+	glLineWidth(1.0f);
 }
 
 void GlChartView::draw_series_vec2(GlChartViewSeries* series)
@@ -257,34 +266,49 @@ void GlChartView::draw_series_euler(GlChartViewSeries* series)
 	SrVec color;
 	float step = coordinate.GetXScale()/(series->max_size-1);
 	float y_scale = coordinate.GetYScale();
-	color = series->GetColor(1);
-	glColor4f(color.x, color.y, color.z, 0.5f);
-	glBegin(GL_LINE_STRIP);
-		for(int i = 0; i < series->size; ++i)
-		{
-			euler = series->GetEuler(i);
-			glVertex3f(i*step, euler.x*y_scale, 0.0f);
-		}
-	glEnd();
-	color = series->GetColor(2);
-	glColor4f(color.x, color.y, color.z, 0.5f);
-	glBegin(GL_LINE_STRIP);
-		for(int i = 0; i < series->size; ++i)
-		{
-			euler = series->GetEuler(i);
-			glVertex3f(i*step, euler.y*y_scale, 0.0f);
-		}
-	glEnd();
-	color = series->GetColor(3);
-	glColor4f(color.x, color.y, color.z, 0.5f);
-	glBegin(GL_LINE_STRIP);
-		for(int i = 0; i < series->size; ++i)
-		{
-			euler = series->GetEuler(i);
-			glVertex3f(i*step, euler.z*y_scale, 0.0f);
-		}
-	glEnd();
+	if(series->bold)
+	{
+		glLineWidth(3.0f);
+	}
 
+
+	if(show_x)
+	{
+		color = series->GetColor(1);
+		glColor4f(color.x, color.y, color.z, 0.5f);
+		glBegin(GL_LINE_STRIP);
+			for(int i = 0; i < series->size; ++i)
+			{
+				euler = series->GetEuler(i);
+				glVertex3f(i*step, euler.x*y_scale, 0.0f);
+			}
+		glEnd();
+	}
+	if(show_y)
+	{
+		color = series->GetColor(2);
+		glColor4f(color.x, color.y, color.z, 0.5f);
+		glBegin(GL_LINE_STRIP);
+			for(int i = 0; i < series->size; ++i)
+			{
+				euler = series->GetEuler(i);
+				glVertex3f(i*step, euler.y*y_scale, 0.0f);
+			}
+		glEnd();
+	}
+	if(show_z)
+	{
+		color = series->GetColor(3);
+		glColor4f(color.x, color.y, color.z, 0.5f);
+		glBegin(GL_LINE_STRIP);
+			for(int i = 0; i < series->size; ++i)
+			{
+				euler = series->GetEuler(i);
+				glVertex3f(i*step, euler.z*y_scale, 0.0f);
+			}
+		glEnd();
+	}
+	glLineWidth(1.0f);
 }
 
 void GlChartView::draw_series_quat(GlChartViewSeries* series)
@@ -294,43 +318,62 @@ void GlChartView::draw_series_quat(GlChartViewSeries* series)
 
 	float step = coordinate.GetXScale()/(series->max_size-1);
 	float y_scale = coordinate.GetYScale();
-	color = series->GetColor(1);
-	glColor4f(color.x, color.y, color.z, 0.5f);
-	glBegin(GL_LINE_STRIP);
-		for(int i = 0; i < series->size; ++i)
-		{
-			quat = series->GetQuat(i);
-			glVertex3f(i*step, quat.x*y_scale, 0.0f);
-		}
-	glEnd();
-	color = series->GetColor(2);
-	glColor4f(color.x, color.y, color.z, 0.5f);
-	glBegin(GL_LINE_STRIP);
-		for(int i = 0; i < series->size; ++i)
-		{
-			quat = series->GetQuat(i);
-			glVertex3f(i*step, quat.y*y_scale, 0.0f);
-		}
-	glEnd();
-	color = series->GetColor(3);
-	glColor4f(color.x, color.y, color.z, 0.5f);
-	glBegin(GL_LINE_STRIP);
-		for(int i = 0; i < series->size; ++i)
-		{
-			quat = series->GetQuat(i);
-			glVertex3f(i*step, quat.z*y_scale, 0.0f);
-		}
-	glEnd();
+	if(series->bold)
+	{
+		glLineWidth(3.0f);
+	}
 
-	color = series->GetColor(4);
-	glColor4f(color.x, color.y, color.z, 0.5f);
-	glBegin(GL_LINE_STRIP);
-		for(int i = 0; i < series->size; ++i)
-		{
-			quat = series->GetQuat(i);
-			glVertex3f(i*step, quat.w*y_scale, 0.0f);
-		}
-	glEnd();
+	if(show_x)
+	{
+		color = series->GetColor(1);
+		glColor4f(color.x, color.y, color.z, 0.5f);
+		glBegin(GL_LINE_STRIP);
+			for(int i = 0; i < series->size; ++i)
+			{
+				quat = series->GetQuat(i);
+				glVertex3f(i*step, quat.x*y_scale, 0.0f);
+			}
+		glEnd();
+	}
+	if(show_y)
+	{
+		color = series->GetColor(2);
+		glColor4f(color.x, color.y, color.z, 0.5f);
+		glBegin(GL_LINE_STRIP);
+			for(int i = 0; i < series->size; ++i)
+			{
+				quat = series->GetQuat(i);
+				glVertex3f(i*step, quat.y*y_scale, 0.0f);
+			}
+		glEnd();
+	}
+	if(show_z)
+	{
+		color = series->GetColor(3);
+		glColor4f(color.x, color.y, color.z, 0.5f);
+		glBegin(GL_LINE_STRIP);
+			for(int i = 0; i < series->size; ++i)
+			{
+				quat = series->GetQuat(i);
+				glVertex3f(i*step, quat.z*y_scale, 0.0f);
+			}
+		glEnd();
+	}
+
+	if(show_w)
+	{
+		color = series->GetColor(4);
+		glColor4f(color.x, color.y, color.z, 0.5f);
+		glBegin(GL_LINE_STRIP);
+			for(int i = 0; i < series->size; ++i)
+			{
+				quat = series->GetQuat(i);
+				glVertex3f(i*step, quat.w*y_scale, 0.0f);
+			}
+		glEnd();
+	}
+
+	glLineWidth(1.0f);
 }
 
 GlChartViewArchive* GlChartView::get_archive()
