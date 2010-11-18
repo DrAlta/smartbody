@@ -266,7 +266,7 @@ void ChannelBufferWindow::refreshMaxSize(fltk::Widget* widget, void* data)
 	{
 		window->chartview->get_archive()->GetSeries(i)->SetMaxSize(window->num_of_frames);
 	}
-	window->chartview->coordinate.SetXSize(window->num_of_frames);
+	window->chartview->coordinate.SetXSize((float)window->num_of_frames);
 }
 
 void ChannelBufferWindow::set_default_values()

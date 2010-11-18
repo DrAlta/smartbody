@@ -1892,7 +1892,7 @@ void FltkViewer::drawEyeLids()
 		SkJoint* eyeLidLowerLeft = character->skeleton_p->search_joint("lower_eyelid_left");
 
 		glPointSize(10);
-		float range = character->getHeight() / 175.0 * 2.0;
+		float range = character->getHeight() / 175.0f * 2.0f;
 		if (eyeLidUpperRight)
 		{
 			const SkJoint* parent = eyeLidUpperRight->parent();
