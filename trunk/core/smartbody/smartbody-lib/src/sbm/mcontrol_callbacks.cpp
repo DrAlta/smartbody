@@ -3304,6 +3304,7 @@ int mcu_gaze_limit_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	gaze <> offset euler <p h r>
 	gaze <> smooth <basis>
 	gaze <> speed <deg-per-sec>
+	gaze <> timehint <sec>
 	gaze <> bias <key> <p h r>
 	gaze <> limit <key> <p h r>
 	gaze <> limit <key> <p-up p-dn h r>
@@ -3368,6 +3369,12 @@ int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 				float sp = args.read_float();
 				gaze_p->set_speed( sp );
+				return( CMD_SUCCESS );
+			}
+			if( strcmp( gaze_cmd, "timehint" ) == 0 )	{
+
+				float sec = args.read_float();
+				gaze_p->set_time_hint( sec );
 				return( CMD_SUCCESS );
 			}
 			if( strcmp( gaze_cmd, "bias" ) == 0 )	{
