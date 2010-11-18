@@ -99,6 +99,27 @@ ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name)
 
 ChannelBufferWindow::~ChannelBufferWindow()
 {
+	clearChannelItem(this);
+}
+
+void ChannelBufferWindow::clearChannelItem(ChannelBufferWindow* window)
+{
+	for(int i = 0; i < window->Channel_item_list.size(); ++i)
+	{
+		delete window->Channel_item_list.get(i).label;
+	}
+	window->Channel_item_list.capacity(0);
+}
+
+void ChannelBufferWindow::initChannelItem(ChannelBufferWindow* window, int num)
+{
+	window->Channel_item_list.capacity(num);
+	window->Channel_item_list.size(num);
+	for(int i = 0; i < num; ++i)
+	{
+		window->Channel_item_list.get(i).label = NULL;
+	}
+
 }
 
 void ChannelBufferWindow::refreshBold(fltk::Widget* widget, void* data)
@@ -349,8 +370,8 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 	SkChannelArray& channels = skeleton->channels();
 	int numChannels = channels.size();
 
-	window->Channel_item_list.capacity(numChannels);
-	window->Channel_item_list.size(numChannels);
+	clearChannelItem(window);
+	initChannelItem(window, numChannels);
 
 	SkJoint* joint = NULL;
 	char str[100];
@@ -395,7 +416,9 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 		item.monitored = false;
 		item.not_in_search = false;
 		item.index = channel_index;
-		item.label = new SrString(str);
+		if(item.label == NULL) 
+			item.label = new SrString(str);
+		else item.label->set(str);
 		channel_index += channelSize;
 	}
 }

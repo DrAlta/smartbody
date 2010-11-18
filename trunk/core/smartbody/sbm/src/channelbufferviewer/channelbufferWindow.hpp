@@ -71,6 +71,8 @@ public:
 	const char* getSelectedCharacterName();
 
 protected:
+	static void clearChannelItem(ChannelBufferWindow* window);
+	static void initChannelItem(ChannelBufferWindow* window, int num);
 	static void loadCharacters(fltk::Choice* character);
 	static void loadControllers(fltk::Choice* controller, fltk::Choice* character);
 	static void loadChannels(ChannelBufferWindow* window);

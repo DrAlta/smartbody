@@ -384,12 +384,11 @@ GlChartViewArchive* GlChartView::get_archive()
 int GlChartView::handle ( int event )
 {
 	//printf("\n%d", event);
+	int y = 0;
 	switch ( event )
 	{ 
 	case fltk::PUSH:
-		{ 
-			translate_event ( e, SrEvent::Push, w(), h(), this );
-		} 
+		translate_event ( e, SrEvent::Push, w(), h(), this );
 		break;
 
 	case fltk::RELEASE:
@@ -398,9 +397,14 @@ int GlChartView::handle ( int event )
 
 	case fltk::DRAG:
 		update_coordinate = false;
+
 	case fltk::MOVE:
         translate_event ( e, SrEvent::Drag, w(), h(), this );
         break;
+
+	case fltk::WHEN_RELEASE:
+		//translate_event ( e, SrEvent::Release, w(), h(), this);
+		break;
 
 	case fltk::KEY:
         break;
@@ -409,7 +413,6 @@ int GlChartView::handle ( int event )
 		break;
 
 	case fltk::SHOW: // Called when the window is de-iconized or when show() is called
-
         show ();
         break;
 
@@ -425,7 +428,7 @@ int GlChartView::handle ( int event )
 void GlChartView::translate_event ( SrEvent& e, SrEvent::Type t, int w, int h, GlChartView* viewer )
  {
    e.init_lmouse ();
-   e.type = t;
+   
    // put coordinates inside [-1,1] with (0,0) in the middle :
    e.mouse.x  = ((float)fltk::event_x())*2.0f / ((float)w) - 1.0f;
    e.mouse.y  = ((float)fltk::event_y())*2.0f / ((float)h) - 1.0f;
@@ -434,6 +437,23 @@ void GlChartView::translate_event ( SrEvent& e, SrEvent::Type t, int w, int h, G
    e.height = h;
    e.mouseCoord.x = (float)fltk::event_x();
    e.mouseCoord.y = (float)fltk::event_y();
+
+   if ( fltk::event_state(fltk::BUTTON1) ) 
+	   e.button1 = 1;
+
+   if ( fltk::event_state(fltk::BUTTON2) ) 
+	   e.button2 = 1;
+
+   if ( fltk::event_state(fltk::BUTTON3) ) 
+	   e.button3 = 1;
+
+
+   if(e.button1 == 0 && e.button2 == 0 && e.button3 == 0) 
+   {
+	   t = SrEvent::Release;
+   }
+
+   e.type = t;
 
    if ( t==SrEvent::Push)
    {
@@ -452,20 +472,14 @@ void GlChartView::translate_event ( SrEvent& e, SrEvent::Type t, int w, int h, G
    }
 
 
-   if ( fltk::event_state(fltk::BUTTON1) ) 
-	   e.button1 = 1;
-   if ( fltk::event_state(fltk::BUTTON2) ) 
-	   e.button2 = 1;
-   if ( fltk::event_state(fltk::BUTTON3) ) 
-	   e.button3 = 1;
-
    if ( fltk::event_state(fltk::ALT)   ) e.alt = 1;
+   else e.alt = 0;
    if ( fltk::event_state(fltk::CTRL)  ) e.ctrl = 1;
-
+   else e.ctrl = 0;
    if ( fltk::event_state(fltk::SHIFT) ) e.shift = 1;
+   else e.shift = 0;
    
    e.key = fltk::event_key();
-
  }
 
 SrVec GlChartView::rotatePoint(SrVec point, SrVec origin, SrVec direction, float angle)
@@ -501,9 +515,9 @@ int GlChartView::mouse_event ( const SrEvent &e )
 {
 	int res=0;
 
-	if ( e.mouse_event() )
+	if ( e.mouse_event())
 	{ 
-		if ( e.type==SrEvent::Drag )
+		if ( e.type == SrEvent::Drag )
 		{ 
 			float dx = e.mousedx() * camera.aspect;
 			float dy = e.mousedy() / camera.aspect;
@@ -516,15 +530,16 @@ int GlChartView::mouse_event ( const SrEvent &e )
 				if(coordinate.y_scale_zoom < 1.0f) 
 				{
 					//coordinate.y_scale_zoom = 1.0f;
-					if(e.lmouse.y > e.mouse.y) coordinate.y_scale_zoom = 0.93f*coordinate.y_scale_zoom;
-					else coordinate.y_scale_zoom = coordinate.y_scale_zoom/0.93f;
+					if(e.lmouse.y > e.mouse.y) 
+						coordinate.y_scale_zoom = 0.93f*coordinate.y_scale_zoom;
+					else 
+						coordinate.y_scale_zoom = coordinate.y_scale_zoom/0.93f;
 					if(coordinate.y_scale_zoom < 0.0001f) coordinate.y_scale_zoom = 0.0001f;
 					coordinate.SetYSize(1.0f/coordinate.y_scale_zoom);
 				}
 				else 
 				{
 					float s = e.mouse.y - e.lmouse.y;
-					//if(e.lmouse.y > e.mouse.y) s = -s;
 					coordinate.y_scale_zoom += s*coordinate.y_scale_zoom;
 					coordinate.SetYSize(1.0f);
 				}
@@ -537,7 +552,7 @@ int GlChartView::mouse_event ( const SrEvent &e )
 				camera.center.y += (e.lmouse.y - e.mouse.y)*coordinate.GetYScale();
 				camera.eye.y += (e.lmouse.y - e.mouse.y)*coordinate.GetYScale();
 			}
-			else if ( e.alt && e.button3 )
+			/*else if ( e.alt && e.button3 )
 			{ 
 				float amount = dx;
 				SrVec cameraPos(camera.eye);
@@ -553,13 +568,10 @@ int GlChartView::mouse_event ( const SrEvent &e )
 				SrVec adjustment = diffVector * distance * amount;
 				cameraPos += adjustment;
 				camera.eye = cameraPos;			
-			}
+			}*/
 			else if ( e.alt && e.button2 )
 			{ 
 				camera.apply_translation_from_mouse_motion ( e.lmouse.x, e.lmouse.y, e.mouse.x, e.mouse.y );
-			}
-			else if (e.alt && e.shift && e.button1)
-			{ 
 			}
 			//rotation with mouse doesn't seem useful in this case?
 			/*else if (e.alt && e.button1) 
@@ -586,6 +598,7 @@ int GlChartView::mouse_event ( const SrEvent &e )
 		}
 		else if ( e.type==SrEvent::Release )
 		{ 
+
 		}
 	}
 
