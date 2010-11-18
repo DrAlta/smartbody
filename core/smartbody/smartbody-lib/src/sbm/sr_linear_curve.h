@@ -82,6 +82,8 @@ class srLinearCurve	{
 			key_p->value = v;
 			key_p->prev = NULL;
 			key_p->next = NULL;
+
+			/* sort by key.time, add after same time */
 			return( insert_key( key_p ) );
 		}
 		
@@ -106,6 +108,12 @@ class srLinearCurve	{
 		}
 
 	protected:
+		
+		double lerp_keys( double t, sr_curve_key_t *fr_p, sr_curve_key_t *to_p )	{
+
+			register double norm = ( t - fr_p->time ) * fr_p->inv_dt;
+			return( fr_p->value + norm * fr_p->dv );
+		}
 		
 		sr_curve_key_t* find_floor_key( double t )	{
 			
@@ -139,9 +147,7 @@ class srLinearCurve	{
 			return( key_p );
 		}
 			
-			
 		int insert_key( sr_curve_key_t *key_p ) {
-			/* sort by key.time, add after same time */
 			
 			if( key_p )	{
 
@@ -160,14 +166,19 @@ class srLinearCurve	{
 			return( CMD_FAILURE );
 		}
 		
+		void update_interval_cache( sr_curve_key_t *key_p, sr_curve_key_t *next_p ) {
+		
+			key_p->dt = next_p->time - key_p->time;
+			key_p->inv_dt = 1.0 / key_p->dt;
+			key_p->dv = next_p->value - key_p->value;
+		}
+		
 		void insert_head( sr_curve_key_t *key_p )	{
 			
 			key_p->next = head_p;
 			
 			if( head_p )	{
-				key_p->dt = head_p->time - key_p->time;
-				key_p->inv_dt = 1.0 / key_p->dt;
-				key_p->dv = head_p->value - key_p->value;
+				update_interval_cache( key_p, head_p );
 			}
 
 			head_p = key_p;
@@ -176,27 +187,16 @@ class srLinearCurve	{
 		
 		void insert_after( sr_curve_key_t *prev_p, sr_curve_key_t *key_p )	{
 			
-			
-			prev_p->dt = key_p->time - prev_p->time;
-			prev_p->inv_dt = 1.0 / prev_p->dt;
-			prev_p->dv = key_p->value - prev_p->value;
+			update_interval_cache( prev_p, key_p );
 
 			sr_curve_key_t *next_p = prev_p->next;
 			if( next_p )	{
-			
-				key_p->dt = next_p->time - key_p->time;
-				key_p->inv_dt = 1.0 / key_p->dt;
-				key_p->dv = next_p->value - key_p->value;
+				update_interval_cache( key_p, next_p );
 			}
 			
 			prev_p->next = key_p;
 			key_p->next = next_p;
 			key_count++;
-		}
-		
-		double lerp_keys( double t, sr_curve_key_t *fr_p, sr_curve_key_t *to_p )	{
-			register double norm = ( t - fr_p->time ) * fr_p->inv_dt;
-			return( fr_p->value + norm * fr_p->dv );
 		}
 		
 	private:
