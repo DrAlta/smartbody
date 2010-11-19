@@ -15,6 +15,7 @@ public:
 	int th;
 	SrCamera camera;
 	bool update_coordinate;
+	bool automatic_scale;
 
 	SrEvent e;
 

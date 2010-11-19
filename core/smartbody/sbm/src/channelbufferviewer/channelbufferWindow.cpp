@@ -119,7 +119,6 @@ void ChannelBufferWindow::initChannelItem(ChannelBufferWindow* window, int num)
 	{
 		window->Channel_item_list.get(i).label = NULL;
 	}
-
 }
 
 void ChannelBufferWindow::refreshBold(fltk::Widget* widget, void* data)
