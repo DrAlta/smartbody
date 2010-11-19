@@ -15,6 +15,7 @@ GlChartView::GlChartView(int x, int y, int w, int h, char* name) : fltk::GlWindo
 	show_y = true;
 	show_z = true;
 	show_w = true;
+	automatic_scale = true;
 }
 
 GlChartView::~GlChartView()
@@ -72,6 +73,7 @@ void GlChartView::init_camera(int type)
 	camera.center.x = coordinate.GetXScale()/2;
 	camera.center.y = 0.0f;
 	camera.center.z = 0.0f;
+	automatic_scale = true;
 	if(type == 0) 
 	{
 		coordinate.y_scale_zoom = 1.0f;
@@ -216,7 +218,7 @@ void GlChartView::draw_series_value(GlChartViewSeries* series)
 			value = series->GetValue(i);
 			if(abs(value) > this->coordinate.GetYSize()) 
 			{
-				coordinate.y_scale_zoom = 1.0f/abs(value);
+				if(automatic_scale) coordinate.y_scale_zoom = 1.0f/abs(value);
 				this->coordinate.SetYSize(abs(value));
 			}
 			glVertex3f(i*step, value*y_scale, 0.0f);
@@ -227,11 +229,12 @@ void GlChartView::draw_series_value(GlChartViewSeries* series)
 
 void GlChartView::draw_series_vec2(GlChartViewSeries* series)
 {
+	
 }
 
 void GlChartView::draw_series_vec3(GlChartViewSeries* series)
 {
-
+	
 }
 
 // not used for now
@@ -270,7 +273,6 @@ void GlChartView::draw_series_euler(GlChartViewSeries* series)
 	{
 		glLineWidth(3.0f);
 	}
-
 
 	if(show_x)
 	{
@@ -335,6 +337,7 @@ void GlChartView::draw_series_quat(GlChartViewSeries* series)
 			}
 		glEnd();
 	}
+
 	if(show_y)
 	{
 		color = series->GetColor(2);
@@ -347,6 +350,7 @@ void GlChartView::draw_series_quat(GlChartViewSeries* series)
 			}
 		glEnd();
 	}
+
 	if(show_z)
 	{
 		color = series->GetColor(3);
@@ -400,6 +404,7 @@ int GlChartView::handle ( int event )
 
 	case fltk::MOVE:
         translate_event ( e, SrEvent::Drag, w(), h(), this );
+		
         break;
 
 	case fltk::WHEN_RELEASE:
@@ -527,6 +532,7 @@ int GlChartView::mouse_event ( const SrEvent &e )
 				//camera.fovy += (dx+dy);//40.0f;
 				//camera.fovy = SR_BOUND ( camera.fovy, 0.001f, srpi );
 
+				automatic_scale = false;
 				if(coordinate.y_scale_zoom < 1.0f) 
 				{
 					//coordinate.y_scale_zoom = 1.0f;
@@ -549,8 +555,8 @@ int GlChartView::mouse_event ( const SrEvent &e )
 				//camera.center.x += (e.lmouse.x - e.mouse.x)*coordinate.GetXScale()/2;
 				//camera.eye.x += (e.lmouse.x - e.mouse.x)*coordinate.GetXScale()/2;
 
-				camera.center.y += (e.lmouse.y - e.mouse.y)*coordinate.GetYScale();
-				camera.eye.y += (e.lmouse.y - e.mouse.y)*coordinate.GetYScale();
+				camera.center.y += (e.lmouse.y - e.mouse.y)*coordinate.y_scale;
+				camera.eye.y += (e.lmouse.y - e.mouse.y)*coordinate.y_scale;
 			}
 			/*else if ( e.alt && e.button3 )
 			{ 
