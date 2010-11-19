@@ -1,5 +1,5 @@
 /*
- *  sr_cmd_seq.h - part of SmartBody-lib
+ *  sr_linear_curve.h - part of SmartBody-lib
  *  Copyright (C) 2008  University of Southern California
  *
  *  SmartBody-lib is free software: you can redistribute it and/or
@@ -28,19 +28,50 @@
 
 class srLinearCurve	{
 
-	typedef struct sr_curve_key_s  {
-		
-		double			time;
-		double			value;
-		
-		double			dt;
-		double			inv_dt;
-		double			dv;
+	private:
 
-		sr_curve_key_s	*prev;
-		sr_curve_key_s	*next;
+	class Key	{
 		
-	} sr_curve_key_t;
+		public:
+		
+			Key( double p, double v ) {
+				param = p;
+				value = v;
+				dp = 0.0; inv_dp = 0.0;
+				dv = 0.0;
+				next_p = NULL;
+			}
+			~Key(void) {}
+
+			void print( int i )	{
+				printf( " key[ %d ]: ( %f, %f )\n", i, param, value );
+			}
+
+			void next( Key *set_p ) { next_p = set_p; }
+
+			Key *next( void ) { return( next_p ); }
+
+			void update( void ) {
+				if( next_p )	{
+					dp = next_p->param - param; inv_dp = 1.0 / dp;
+					dv = next_p->value - value;
+				}
+			}
+
+			double lerp( double t )	{
+				return( value + dv * ( t - param ) * inv_dp );
+			}
+
+			double	param; // ANIMATION: time
+			double	value; // template<> ?
+		
+		private:
+			
+			double	dp, inv_dp;
+			double	dv;
+
+			Key	*next_p;
+	};
 
 	public:
 		srLinearCurve( void )	{
@@ -48,61 +79,46 @@ class srLinearCurve	{
 		}
 
 		~srLinearCurve( void )	{
-			sr_curve_key_t *key_p = head_p;
+			Key *key_p = head_p;
 			while( key_p ) {
-				sr_curve_key_t *tmp_p = key_p;
-				key_p = key_p->next;
+				Key *tmp_p = key_p;
+				key_p = key_p->next();
 				delete tmp_p;
 			}
 			null();
 		}
 
-		void null( void )	{
-			key_count = 0;
-			dirty = false;
-			head_p = NULL;
-			curr_p = NULL;
-		}
-		
 		void print( void )	{
 			
 			printf( "srLinearCurve: KEYS:\n" );
 			int c = 0;
-			sr_curve_key_t *key_p = head_p;
+			Key *key_p = head_p;
 			while( key_p ) {
-				printf( " key[ %d ]: ( %f, %f )\n", c++, key_p->time, key_p->value );
-				key_p = key_p->next;
+				key_p->print( c++ );
+				key_p = key_p->next();
 			}
 		}
 
 		int get_num_keys( void ) { return( key_count ); }
 		
-		int insert( double time, double v )	{
-			
-			sr_curve_key_t *key_p = new sr_curve_key_t;
-			key_p->time = time;
-			key_p->value = v;
-			key_p->prev = NULL;
-			key_p->next = NULL;
-
-			/* sort by key.time, add after same time */
-			return( insert_key( key_p ) );
+		int insert( double p, double v )	{ /* sort by key.time, add after same time */
+			return( insert_key( new Key( p, v ) ) );
 		}
 		
 		double evaluate( double t )	{
 			
-			sr_curve_key_t *floor_p = find_floor_key( t );
+			Key *floor_p = find_floor_key( t );
 			if( floor_p )	{
 			
 				curr_p = floor_p;
-				if( t > curr_p->time )	{
+				if( t > curr_p->param )	{
 				
-					if( curr_p->next ) {
+					if( curr_p->next() ) {
 
 						if( dirty ) {
 							update_intervals();
 						}
-						return( lerp_keys( t, curr_p, curr_p->next ) );
+						return( curr_p->lerp( t ) );
 					}
 				}
 				return( curr_p->value );
@@ -117,19 +133,13 @@ class srLinearCurve	{
 		}
 
 	protected:
-		
-		double lerp_keys( double t, sr_curve_key_t *fr_p, sr_curve_key_t *to_p )	{
 
-			register double norm = ( t - fr_p->time ) * fr_p->inv_dt;
-			return( fr_p->value + norm * fr_p->dv );
-		}
-		
-		sr_curve_key_t* find_floor_key( double t )	{
+		Key* find_floor_key( double t )	{
 			
-			sr_curve_key_t *key_p = curr_p;
+			Key *key_p = curr_p;
 			if( key_p )	{
 			
-				if( t < key_p->time ) {
+				if( t < key_p->param ) {
 					key_p = head_p;
 				}
 			}
@@ -138,33 +148,34 @@ class srLinearCurve	{
 			}
 			if( key_p )	{
 			
-				if( t < key_p->time )	{
+				if( t < key_p->param )	{
 					return( NULL );
 				}
 			}
 			while( key_p )	{
 			
-				if( key_p->next )	{
+				Key *next_p = key_p->next();
+				if( next_p ) {
 				
-					if( t < key_p->next->time )	{
+					if( t < next_p->param )  {
 						return( key_p );
 					}
 					else	{
-						key_p = key_p->next;
+						key_p = next_p;
 					}
 				}
 				else	{
 					return( key_p );
 				}
 			}
-			return( key_p );
+			return( NULL );
 		}
 			
-		int insert_key( sr_curve_key_t *key_p ) {
+		int insert_key( Key *key_p ) {
 			
 			if( key_p )	{
 
-				sr_curve_key_t *floor_p = find_floor_key( key_p->time );
+				Key *floor_p = find_floor_key( key_p->param );
 				if( floor_p )	{
 					
 					insert_after( floor_p, key_p );
@@ -178,64 +189,58 @@ class srLinearCurve	{
 			curr_p = NULL;
 			return( CMD_FAILURE );
 		}
-		
-		void update_interval( sr_curve_key_t *key_p, sr_curve_key_t *next_p ) {
-		
-			key_p->dt = next_p->time - key_p->time;
-			key_p->inv_dt = 1.0 / key_p->dt;
-			key_p->dv = next_p->value - key_p->value;
-		}
-		
+
 		void update_intervals( void )	{
 		
-			sr_curve_key_t *key_p = head_p;
+			int c = 0;
+			Key *key_p = head_p;
 			while( key_p ) {
 			
-				sr_curve_key_t *prev_p = key_p;
-				key_p = key_p->next;
+				Key *prev_p = key_p;
+				key_p = key_p->next();
 				if( key_p ) {
-				
-					update_interval( prev_p, key_p );
+					
+					prev_p->update();
 				}
+				c++;
 			}
 			dirty = false;
-			printf( "UPDATE!\n" );
+			if( c != key_count )	{
+				printf( "srLinearCurve::update_intervals ERR: corruption.\n" );
+			}
 		}
-		
-		void insert_head( sr_curve_key_t *key_p )	{
-			
-			key_p->next = head_p;
-			
-//			if( head_p )	{
-//				update_interval_cache( key_p, head_p );
-//			}
 
+		void increment( void )	{
+			key_count++;
+			dirty = true;
+		}
+		void insert_head( Key *key_p )	{
+			
+			key_p->next( head_p );
 			head_p = key_p;
-			key_count++;
-			dirty = true;
+			increment();
 		}
-		
-		void insert_after( sr_curve_key_t *prev_p, sr_curve_key_t *key_p )	{
+		void insert_after( Key *prev_p, Key *key_p )	{
 			
-//			update_interval_cache( prev_p, key_p );
+			Key *next_p = prev_p->next();
+			prev_p->next( key_p );
+			key_p->next( next_p );
+			increment();
+		}
 
-			sr_curve_key_t *next_p = prev_p->next;
-//			if( next_p )	{
-//				update_interval_cache( key_p, next_p );
-//			}
-			
-			prev_p->next = key_p;
-			key_p->next = next_p;
-			key_count++;
-			dirty = true;
-		}
-		
 	private:
 	
-		int		key_count;
+		void null( void )	{
+			key_count = 0;
+			dirty = false;
+			head_p = NULL;
+			curr_p = NULL;
+		}
+		
+		int 	key_count;
 		bool	dirty;
 		
-		sr_curve_key_t	*head_p;
-		sr_curve_key_t	*curr_p;
+		Key		*head_p;
+		Key		*curr_p;
 };
 #endif
