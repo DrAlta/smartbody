@@ -46,8 +46,8 @@ class srLinearCurve	{
 		srLinearCurve( void )	{
 			null();
 		}
+
 		~srLinearCurve( void )	{
-		
 			sr_curve_key_t *key_p = head_p;
 			while( key_p ) {
 				sr_curve_key_t *tmp_p = key_p;
@@ -56,8 +56,10 @@ class srLinearCurve	{
 			}
 			null();
 		}
+
 		void null( void )	{
 			key_count = 0;
+			dirty = false;
 			head_p = NULL;
 			curr_p = NULL;
 		}
@@ -93,8 +95,15 @@ class srLinearCurve	{
 			if( floor_p )	{
 			
 				curr_p = floor_p;
-				if( curr_p->next ) {
-					return( lerp_keys( t, curr_p, curr_p->next ) );
+				if( t > curr_p->time )	{
+				
+					if( curr_p->next ) {
+
+						if( dirty ) {
+							update_intervals();
+						}
+						return( lerp_keys( t, curr_p, curr_p->next ) );
+					}
 				}
 				return( curr_p->value );
 			}
@@ -119,6 +128,7 @@ class srLinearCurve	{
 			
 			sr_curve_key_t *key_p = curr_p;
 			if( key_p )	{
+			
 				if( t < key_p->time ) {
 					key_p = head_p;
 				}
@@ -127,12 +137,15 @@ class srLinearCurve	{
 				key_p = head_p;
 			}
 			if( key_p )	{
+			
 				if( t < key_p->time )	{
 					return( NULL );
 				}
 			}
 			while( key_p )	{
+			
 				if( key_p->next )	{
+				
 					if( t < key_p->next->time )	{
 						return( key_p );
 					}
@@ -166,42 +179,62 @@ class srLinearCurve	{
 			return( CMD_FAILURE );
 		}
 		
-		void update_interval_cache( sr_curve_key_t *key_p, sr_curve_key_t *next_p ) {
+		void update_interval( sr_curve_key_t *key_p, sr_curve_key_t *next_p ) {
 		
 			key_p->dt = next_p->time - key_p->time;
 			key_p->inv_dt = 1.0 / key_p->dt;
 			key_p->dv = next_p->value - key_p->value;
 		}
 		
+		void update_intervals( void )	{
+		
+			sr_curve_key_t *key_p = head_p;
+			while( key_p ) {
+			
+				sr_curve_key_t *prev_p = key_p;
+				key_p = key_p->next;
+				if( key_p ) {
+				
+					update_interval( prev_p, key_p );
+				}
+			}
+			dirty = false;
+			printf( "UPDATE!\n" );
+		}
+		
 		void insert_head( sr_curve_key_t *key_p )	{
 			
 			key_p->next = head_p;
 			
-			if( head_p )	{
-				update_interval_cache( key_p, head_p );
-			}
+//			if( head_p )	{
+//				update_interval_cache( key_p, head_p );
+//			}
 
 			head_p = key_p;
 			key_count++;
+			dirty = true;
 		}
 		
 		void insert_after( sr_curve_key_t *prev_p, sr_curve_key_t *key_p )	{
 			
-			update_interval_cache( prev_p, key_p );
+//			update_interval_cache( prev_p, key_p );
 
 			sr_curve_key_t *next_p = prev_p->next;
-			if( next_p )	{
-				update_interval_cache( key_p, next_p );
-			}
+//			if( next_p )	{
+//				update_interval_cache( key_p, next_p );
+//			}
 			
 			prev_p->next = key_p;
 			key_p->next = next_p;
 			key_count++;
+			dirty = true;
 		}
 		
 	private:
 	
 		int		key_count;
+		bool	dirty;
+		
 		sr_curve_key_t	*head_p;
 		sr_curve_key_t	*curr_p;
 };
