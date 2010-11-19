@@ -1,3 +1,25 @@
+/*
+ *  me_ct_locomotion.hpp - part of SmartBody-lib's Test Suite
+ *  Copyright (C) 2009  University of Southern California
+ *
+ *  SmartBody-lib is free software: you can redistribute it and/or
+ *  modify it under the terms of the Lesser GNU General Public License
+ *  as published by the Free Software Foundation, version 3 of the
+ *  license.
+ *
+ *  SmartBody-lib is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  Lesser GNU General Public License for more details.
+ *
+ *  You should have received a copy of the Lesser GNU General Public
+ *  License along with SmartBody-lib.  If not, see:
+ *      http://www.gnu.org/licenses/lgpl-3.0.txt
+ *
+ *  CONTRIBUTORS:
+ *      Jingqiao Fu, USC
+ */
+
 #ifndef _CHANNEL_BUFFER_WINDOW_H_
 #define _CHANNEL_BUFFER_WINDOW_H_
 
@@ -19,9 +41,12 @@ class ChannelItem
 {
 public:
 	int index;
+	SrString* name;
 	SrString* label;
+	SkChannel::Type type;
 	bool monitored;
-	bool filtered;
+	bool channel_filtered;
+	bool motion_filtered;
 	bool not_in_search;
 };
 
@@ -46,6 +71,7 @@ public:
 	GlChartView* chartview;
 	fltk::Choice* character;
 	fltk::Choice* controller;
+	fltk::Choice* motion;
 	fltk::Choice* quat;
 	fltk::CheckButton* show_x;
 	fltk::CheckButton* show_y;
@@ -76,7 +102,9 @@ protected:
 	static void loadCharacters(fltk::Choice* character);
 	static void loadControllers(fltk::Choice* controller, fltk::Choice* character);
 	static void loadChannels(ChannelBufferWindow* window);
+	static void loadMotions(fltk::Choice* motion, fltk::Choice* character);
 
+	static void refreshMotionChannels(fltk::Widget* widget, void* data);
 	static void refreshChannelsWidget(ChannelBufferWindow* window);
 	static void refreshMonitoredChannelsWidget(ChannelBufferWindow* window);
 

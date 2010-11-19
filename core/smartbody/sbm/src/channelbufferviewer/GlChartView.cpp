@@ -1,11 +1,36 @@
+/*
+ *  me_ct_locomotion.hpp - part of SmartBody-lib's Test Suite
+ *  Copyright (C) 2009  University of Southern California
+ *
+ *  SmartBody-lib is free software: you can redistribute it and/or
+ *  modify it under the terms of the Lesser GNU General Public License
+ *  as published by the Free Software Foundation, version 3 of the
+ *  license.
+ *
+ *  SmartBody-lib is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  Lesser GNU General Public License for more details.
+ *
+ *  You should have received a copy of the Lesser GNU General Public
+ *  License along with SmartBody-lib.  If not, see:
+ *      http://www.gnu.org/licenses/lgpl-3.0.txt
+ *
+ *  CONTRIBUTORS:
+ *      Jingqiao Fu, USC
+ */
+
 #include "GlChartView.hpp"
-# include <fltk/events.h>
+#include <fltk/events.h>
 #include <SR/sr_gl.h>
+#include <vhcl_log.h>
+#include <fltk/gl.h>
 
 
 GlChartView::GlChartView(int x, int y, int w, int h, char* name) : fltk::GlWindow( x, y, w, h, name ), SrViewer(x, y, w, h, name)
 {
 	initGL(w, h);
+	initFont();
 	init_camera(0);
 	th = 0;
 	//max_buffer_size = 800;
@@ -60,6 +85,20 @@ void GlChartView::initGL(int width, int height)
 	glPointSize ( 1.0 );
 
 	glShadeModel ( GL_SMOOTH );
+}
+
+void GlChartView::initFont()
+{
+	GLuint textureName;	
+	glEnable(GL_TEXTURE_2D);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glGenTextures(0, &textureName);
+
+	if (!label.Create("../../../../data/fonts/font.glf", 0))
+	{
+		if(!label.Create(".font.glf", 0))
+			LOG("GlChartViewCoordinate::InitFont(): Error: Cannot load font file\n");
+	}
 }
 
 void GlChartView::init_camera(int type)
@@ -202,6 +241,7 @@ void GlChartView::set_quat_show_type(int type)
 void GlChartView::draw_series_value(GlChartViewSeries* series)
 {
 	float value = 0.0f;
+	char t_label[50];
 	SrVec color;
 	float step = coordinate.GetXScale()/(series->max_size-1);
 	float y_scale = coordinate.GetYScale();
@@ -212,6 +252,7 @@ void GlChartView::draw_series_value(GlChartViewSeries* series)
 	}
 	color = series->GetColor(1);
 	glColor4f(color.x, color.y, color.z, 0.5f);
+
 	glBegin(GL_LINE_STRIP);
 		for(int i = 0; i < series->size; ++i)
 		{
@@ -224,6 +265,12 @@ void GlChartView::draw_series_value(GlChartViewSeries* series)
 			glVertex3f(i*step, value*y_scale, 0.0f);
 		}
 	glEnd();
+	glEnable(GL_TEXTURE_2D);
+	label.Begin();
+	get_label(t_label, series->title, -1);
+	label.DrawString(t_label, 2.0f, (series->size-1)*step, value*y_scale);
+	glDisable(GL_TEXTURE_2D);
+
 	glLineWidth(1.0f);
 }
 
@@ -263,10 +310,36 @@ void GlChartView::draw_series_3D_euler(GlChartViewSeries* series)
 
 }
 
+void GlChartView::get_label(char* label, SrString& str, int type)
+{
+	label[0] = '\0';
+	switch(type)
+	{
+		case 0:
+			sprintf(label, "X.");
+			break;
+		case 1:
+			sprintf(label, "Y.");
+			break;
+		case 2:
+			sprintf(label, "Z.");
+			break;
+		case 3:
+			sprintf(label, "W.");
+			break;
+		default:
+			break;
+	}
+	strcat(label, &(str.get(0)));
+	label[strlen(label)-3] = '\0';
+
+}
+
 void GlChartView::draw_series_euler(GlChartViewSeries* series)
 {
 	SrVec euler;
 	SrVec color;
+	char t_label[50];
 	float step = coordinate.GetXScale()/(series->max_size-1);
 	float y_scale = coordinate.GetYScale();
 	if(series->bold)
@@ -274,6 +347,7 @@ void GlChartView::draw_series_euler(GlChartViewSeries* series)
 		glLineWidth(3.0f);
 	}
 
+	label.Begin();
 	if(show_x)
 	{
 		color = series->GetColor(1);
@@ -285,6 +359,10 @@ void GlChartView::draw_series_euler(GlChartViewSeries* series)
 				glVertex3f(i*step, euler.x*y_scale, 0.0f);
 			}
 		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		get_label(t_label, series->title, 0);
+		label.DrawString(t_label, 2.0f, (series->size-1)*step, euler.x*y_scale);
+		glDisable(GL_TEXTURE_2D);
 	}
 	if(show_y)
 	{
@@ -297,6 +375,10 @@ void GlChartView::draw_series_euler(GlChartViewSeries* series)
 				glVertex3f(i*step, euler.y*y_scale, 0.0f);
 			}
 		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		get_label(t_label, series->title, 1);
+		label.DrawString(t_label, 2.0f, (series->size-1)*step, euler.y*y_scale);
+		glDisable(GL_TEXTURE_2D);
 	}
 	if(show_z)
 	{
@@ -309,6 +391,10 @@ void GlChartView::draw_series_euler(GlChartViewSeries* series)
 				glVertex3f(i*step, euler.z*y_scale, 0.0f);
 			}
 		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		get_label(t_label, series->title, 2);
+		label.DrawString(t_label, 2.0f, (series->size-1)*step, euler.z*y_scale);
+		glDisable(GL_TEXTURE_2D);
 	}
 	glLineWidth(1.0f);
 }
@@ -317,6 +403,7 @@ void GlChartView::draw_series_quat(GlChartViewSeries* series)
 {
 	SrQuat quat;
 	SrVec color;
+	char t_label[50];
 
 	float step = coordinate.GetXScale()/(series->max_size-1);
 	float y_scale = coordinate.GetYScale();
@@ -324,6 +411,8 @@ void GlChartView::draw_series_quat(GlChartViewSeries* series)
 	{
 		glLineWidth(3.0f);
 	}
+
+	label.Begin();
 
 	if(show_x)
 	{
@@ -336,6 +425,10 @@ void GlChartView::draw_series_quat(GlChartViewSeries* series)
 				glVertex3f(i*step, quat.x*y_scale, 0.0f);
 			}
 		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		get_label(t_label, series->title, 0);
+		label.DrawString(t_label, 2.0f, (series->size-1)*step, quat.x*y_scale);
+		glDisable(GL_TEXTURE_2D);
 	}
 
 	if(show_y)
@@ -349,6 +442,10 @@ void GlChartView::draw_series_quat(GlChartViewSeries* series)
 				glVertex3f(i*step, quat.y*y_scale, 0.0f);
 			}
 		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		get_label(t_label, series->title, 1);
+		label.DrawString(t_label, 2.0f, (series->size-1)*step, quat.y*y_scale);
+		glDisable(GL_TEXTURE_2D);
 	}
 
 	if(show_z)
@@ -362,6 +459,10 @@ void GlChartView::draw_series_quat(GlChartViewSeries* series)
 				glVertex3f(i*step, quat.z*y_scale, 0.0f);
 			}
 		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		get_label(t_label, series->title, 2);
+		label.DrawString(t_label, 2.0f, (series->size-1)*step, quat.z*y_scale);
+		glDisable(GL_TEXTURE_2D);
 	}
 
 	if(show_w)
@@ -375,6 +476,10 @@ void GlChartView::draw_series_quat(GlChartViewSeries* series)
 				glVertex3f(i*step, quat.w*y_scale, 0.0f);
 			}
 		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		get_label(t_label, series->title, 3);
+		label.DrawString(t_label, 2.0f, (series->size-1)*step, quat.w*y_scale);
+		glDisable(GL_TEXTURE_2D);
 	}
 
 	glLineWidth(1.0f);
@@ -529,13 +634,9 @@ int GlChartView::mouse_event ( const SrEvent &e )
 
 			if ( e.alt && e.button3 )
 			{
-				//camera.fovy += (dx+dy);//40.0f;
-				//camera.fovy = SR_BOUND ( camera.fovy, 0.001f, srpi );
-
 				automatic_scale = false;
 				if(coordinate.y_scale_zoom < 1.0f) 
 				{
-					//coordinate.y_scale_zoom = 1.0f;
 					if(e.lmouse.y > e.mouse.y) 
 						coordinate.y_scale_zoom = 0.93f*coordinate.y_scale_zoom;
 					else 
@@ -552,9 +653,6 @@ int GlChartView::mouse_event ( const SrEvent &e )
 			}
 			else if(e.button1 && e.alt)
 			{
-				//camera.center.x += (e.lmouse.x - e.mouse.x)*coordinate.GetXScale()/2;
-				//camera.eye.x += (e.lmouse.x - e.mouse.x)*coordinate.GetXScale()/2;
-
 				camera.center.y += (e.lmouse.y - e.mouse.y)*coordinate.y_scale;
 				camera.eye.y += (e.lmouse.y - e.mouse.y)*coordinate.y_scale;
 			}
@@ -580,7 +678,7 @@ int GlChartView::mouse_event ( const SrEvent &e )
 				camera.apply_translation_from_mouse_motion ( e.lmouse.x, e.lmouse.y, e.mouse.x, e.mouse.y );
 			}
 			//rotation with mouse doesn't seem useful in this case?
-			/*else if (e.alt && e.button1) 
+			/*else if (?????) 
 			{ 
  				float deltaX = -(e.mouseCoord.x - e.origMouse.x) / e.width;
 				float deltaY = -(e.mouseCoord.y -  e.origMouse.y) / e.height;
