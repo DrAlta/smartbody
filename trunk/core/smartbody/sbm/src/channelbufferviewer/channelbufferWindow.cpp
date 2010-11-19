@@ -1,3 +1,25 @@
+/*
+ *  me_ct_locomotion.hpp - part of SmartBody-lib's Test Suite
+ *  Copyright (C) 2009  University of Southern California
+ *
+ *  SmartBody-lib is free software: you can redistribute it and/or
+ *  modify it under the terms of the Lesser GNU General Public License
+ *  as published by the Free Software Foundation, version 3 of the
+ *  license.
+ *
+ *  SmartBody-lib is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  Lesser GNU General Public License for more details.
+ *
+ *  You should have received a copy of the Lesser GNU General Public
+ *  License along with SmartBody-lib.  If not, see:
+ *      http://www.gnu.org/licenses/lgpl-3.0.txt
+ *
+ *  CONTRIBUTORS:
+ *      Jingqiao Fu, USC
+ */
+
 #include "channelbufferWindow.hpp"
 #include <iostream>
 #include <fstream>
@@ -11,11 +33,9 @@ ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name)
 	set_default_values();
 	char value[10];
 	this->begin();
-	// first group: animation name and character name
+
 	Group* firstGroup = new fltk::Group(10, 20, w - 20, h/4 - 20, "");
 	firstGroup->begin();
-	// left part
-
 		character = new fltk::Choice(60, 20, w/8, 20, "Character");
 		loadCharacters(character);
 		character->callback(refreshChannels, this);
@@ -26,6 +46,10 @@ ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name)
 		controller = new fltk::Choice(60, 50, w/4, 20, "Controller");
 		loadControllers(controller, character);
 		controller->callback(refreshControllerChannels, this);
+
+		motion = new fltk::Choice(60, 80, w/4, 20, "Motion");
+		loadMotions(motion, character);
+		motion->callback(refreshMotionChannels, this);
 
 		channel_filter = new fltk::Input(50+w/4+w/16+50, 0, w/4-50, 18, "Channels:");
 		channel_filter->when(fltk::WHEN_CHANGED);
@@ -93,8 +117,6 @@ ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name)
 	secondGroup->end();
 	secondGroup->resizable(chartview);
 	this->resizable(secondGroup);
-
-	//redraw();
 }
 
 ChannelBufferWindow::~ChannelBufferWindow()
@@ -117,7 +139,8 @@ void ChannelBufferWindow::initChannelItem(ChannelBufferWindow* window, int num)
 	window->Channel_item_list.size(num);
 	for(int i = 0; i < num; ++i)
 	{
-		window->Channel_item_list.get(i).label = NULL;
+		window->Channel_item_list.get(i).label = new SrString();
+		window->Channel_item_list.get(i).name = new SrString();
 	}
 }
 
@@ -280,7 +303,6 @@ void ChannelBufferWindow::refreshMaxSize(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	window->num_of_frames = atoi(window->frame_num->value());
-	//window->chartview->set_max_buffer_size(max_buffer_size);
 	int series_count = window->chartview->get_archive()->GetSeriesCount();
 	for(int i = 0; i < series_count; ++i)
 	{
@@ -292,6 +314,18 @@ void ChannelBufferWindow::refreshMaxSize(fltk::Widget* widget, void* data)
 void ChannelBufferWindow::set_default_values()
 {
 	num_of_frames = 800;
+}
+
+void ChannelBufferWindow::loadMotions(fltk::Choice* motion, fltk::Choice* character)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	motion->clear();
+	//if(character->get_item()== NULL) return;
+	motion->add("Any Motion");
+	for (std::map<std::string, SkMotion*>::iterator it = mcu.motion_map.begin(); it != mcu.motion_map.end(); ++it)
+	{
+		motion->add((*it).first.c_str());
+	}
 }
 
 void ChannelBufferWindow::loadCharacters(fltk::Choice* character)
@@ -324,7 +358,6 @@ void ChannelBufferWindow::loadControllers(fltk::Choice* controller, fltk::Choice
 	int ct_num = actor->ct_tree_p->count_controllers();
 	for(int i = 0; i < ct_num; ++i)
 	{
-		//ct = actor->ct_tree_p->controller(i)->name();
 		controller->add(actor->ct_tree_p->controller(i)->name());
 		actor->ct_tree_p->controller(i)->record_buffer_changes(true);
 	}
@@ -337,7 +370,7 @@ void ChannelBufferWindow::refreshChannelsWidget(ChannelBufferWindow* window)
 	for(int i = 0; i < num; ++i)
 	{
 		ChannelItem& item = window->Channel_item_list.get(i);
-		if(!item.filtered && !item.monitored && !item.not_in_search)
+		if(!item.channel_filtered && !item.monitored && !item.not_in_search && !item.motion_filtered)
 		{
 			window->channel_list->add(&(item.label->get(0)));
 		}
@@ -376,7 +409,6 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 	char str[100];
 	int channel_index = 0;
 	char ext[3];
-	int ext_count = 0;
 
 	for (int i = 0; i < numChannels; i++)
 	{
@@ -385,39 +417,21 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 
 		SkChannel& channel = channels[i];
 		int channelSize = channel.size();
-		if(!joint->pos()->frozen(0) && ext_count == 0) 
-		{
-			if(i < numChannels-1 && strcmp(channels.joint(i+1)->name().get_string(), joint->name().get_string()) == 0)
-			{
-				sprintf(ext, "_x");
-				++ext_count;
-			}
-		}
-		else if(!joint->pos()->frozen(1) && ext_count == 1) 
-		{
-			sprintf(ext, "_y");
-			++ext_count;
-		}
-		else if(!joint->pos()->frozen(2) && ext_count == 2) 
-		{
-			sprintf(ext, "_z");
-			++ext_count;
-		}
-		else 
-		{
-			ext[0] = '\0';
-			ext_count = 0;
-		}
+		if(channel.type == SkChannel::Type::XPos) sprintf(ext, "_x");
+		else if(channel.type == SkChannel::Type::YPos) sprintf(ext, "_y");
+		else if(channel.type == SkChannel::Type::ZPos) sprintf(ext, "_z");
+		else ext[0] = '\0';
 
 		sprintf(str, "%s%s (%d)", joint->name().get_string(), ext, channelSize);
 		ChannelItem& item = window->Channel_item_list.get(i);
-		item.filtered = false;
+		item.channel_filtered = false;
+		item.motion_filtered = false;
 		item.monitored = false;
 		item.not_in_search = false;
 		item.index = channel_index;
-		if(item.label == NULL) 
-			item.label = new SrString(str);
-		else item.label->set(str);
+		item.label->set(str);
+		item.name->set(joint->name().get_string());
+		item.type = channel.type;
 		channel_index += channelSize;
 	}
 }
@@ -433,21 +447,64 @@ void ChannelBufferWindow::refreshCharacters(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	loadCharacters(window->character);
-	//loadChannels(window->character, window->channel_list);
+	loadControllers(window->controller, window->character);
+	loadMotions(window->motion, window->character);
 }
 
 void ChannelBufferWindow::refreshControllers(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	loadControllers(window->controller, window->character);
-	//loadChannels(window->character, window->channel_list);
 }
 
 void ChannelBufferWindow::refreshChannels(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	loadChannels(window);
-	//clearMonitoredChannel(window);
+	refreshChannelsWidget(window);
+}
+
+void ChannelBufferWindow::refreshMotionChannels(fltk::Widget* widget, void* data)
+{
+	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	int j = 0;
+	if(strcmp(window->motion->get_item()->label(), "Any Motion") == 0)
+	{
+		for(j = 0; j < window->Channel_item_list.size(); ++j)
+		{
+			window->Channel_item_list.get(j).motion_filtered = false;
+		}
+		refreshChannelsWidget(window);
+		return;
+	}
+	SbmCharacter* actor = mcu.character_map.lookup(window->character->get_item()->label());
+	std::map<std::string, SkMotion*>::iterator motionIter = mcu.motion_map.find(window->motion->get_item()->label());
+	if (motionIter != mcu.motion_map.end())
+	{
+		SkMotion* motion = (*motionIter).second;
+		motion->connect(actor->skeleton_p);
+		SkChannelArray& channels = motion->channels();
+		for(int i = 0; i < window->Channel_item_list.size(); ++i)
+		{
+			window->Channel_item_list.get(i).motion_filtered = true;
+		}
+		for(int i = 0; i < channels.size(); ++i)
+		{
+			if(channels.joint(i) == NULL) continue;
+			const char* name = channels.joint(i)->name().get_string();
+			SkChannel::Type type = channels.get(i).type;
+			for(j = 0; j < window->Channel_item_list.size(); ++j)
+			{
+				if(strcmp(&(window->Channel_item_list.get(j).name->get(0)), name) == 0
+					&& window->Channel_item_list.get(j).type == type)
+				{
+					window->Channel_item_list.get(j).motion_filtered = false;
+					break;
+				}
+			}
+		}
+	}
 	refreshChannelsWidget(window);
 }
 
@@ -459,13 +516,10 @@ void ChannelBufferWindow::refreshControllerChannels(fltk::Widget* widget, void* 
 
 	if(strcmp(window->controller->get_item()->label(), "All controllers") == 0)
 	{
-		//channels->goto_index(i)->show();
-		//window->is_filtered.setall(false);
 		for(int i = 0; i < window->Channel_item_list.size(); ++i)
 		{
-			window->Channel_item_list.get(i).filtered = false;
+			window->Channel_item_list.get(i).channel_filtered = false;
 		}
-		//_loadChannels(window);
 		refreshChannelsWidget(window);
 		return;
 	}
@@ -473,10 +527,9 @@ void ChannelBufferWindow::refreshControllerChannels(fltk::Widget* widget, void* 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SbmCharacter* actor = mcu.character_map.lookup(window->character->get_item()->label());
 	
-	//window->is_filtered.setall(true);
 	for(int i = 0; i < window->Channel_item_list.size(); ++i)
 	{
-		window->Channel_item_list.get(i).filtered = true;
+		window->Channel_item_list.get(i).channel_filtered = true;
 	}
 	
 	int ct_num = actor->ct_tree_p->count_controllers();
@@ -489,13 +542,10 @@ void ChannelBufferWindow::refreshControllerChannels(fltk::Widget* widget, void* 
 			for(int j = 0; j < channelsInUse.size(); ++j)
 			{
 				int index = actor->ct_tree_p->controller(i)->getContextChannel(j);
-				//channels->goto_index(index)->show();
-				window->Channel_item_list.get(index).filtered = false;
-				//window->is_filtered.set(index, false);
+				window->Channel_item_list.get(index).channel_filtered = false;
 			}
 		}
 	}
-	//_loadChannels(window);
 	refreshChannelsWidget(window);
 }
 
@@ -503,7 +553,6 @@ void ChannelBufferWindow::addMonitoredChannel(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	
-	//moveChannels(window, window->channel_list, window->channel_monitor, true, window->buffer_index_channel);
 	for(int i = 0; i < window->channel_list->size(); ++i)
 	{
 		if(window->channel_list->selected(i))

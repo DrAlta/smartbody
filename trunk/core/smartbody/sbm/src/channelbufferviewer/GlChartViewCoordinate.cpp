@@ -1,3 +1,25 @@
+/*
+ *  me_ct_locomotion.hpp - part of SmartBody-lib's Test Suite
+ *  Copyright (C) 2009  University of Southern California
+ *
+ *  SmartBody-lib is free software: you can redistribute it and/or
+ *  modify it under the terms of the Lesser GNU General Public License
+ *  as published by the Free Software Foundation, version 3 of the
+ *  license.
+ *
+ *  SmartBody-lib is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  Lesser GNU General Public License for more details.
+ *
+ *  You should have received a copy of the Lesser GNU General Public
+ *  License along with SmartBody-lib.  If not, see:
+ *      http://www.gnu.org/licenses/lgpl-3.0.txt
+ *
+ *  CONTRIBUTORS:
+ *      Jingqiao Fu, USC
+ */
+
 #include "GlChartViewCoordinate.hpp"
 #include <vhcl_log.h>
 #include <fltk/gl.h>
@@ -76,22 +98,21 @@ void GlChartViewCoordinate::Draw()
 	float y_length = GetYScale()*y_size;
 	float x_length = GetXScale();
 	glColor4f(0.1f, 0.1f, 0.1f, 0.3f);
-	for(int i = y_label_num; i > 0; --i)
-	{
-		glBegin(GL_LINES);
+	glBegin(GL_LINES);
+		for(int i = y_label_num; i > 0; --i)
+		{
 			glVertex3f(1.0f, i*y_length/y_label_num, 0.0f);
 			glVertex3f(x_length, i*y_length/y_label_num, 0.0f);
 			glVertex3f(1.0f, -i*y_length/y_label_num, 0.0f);
 			glVertex3f(x_length, -i*y_length/y_label_num, 0.0f);
-		glEnd();
-	}
-	for(int i = x_label_num; i > 0; --i)
-	{
-		glBegin(GL_LINES);
+
+		}
+		for(int i = x_label_num; i > 0; --i)
+		{
 			glVertex3f(i*x_length/x_label_num, y_length, 0.0f);
 			glVertex3f(i*x_length/x_label_num, -y_length, 0.0f);
-		glEnd();
-	}
+		}
+	glEnd();
 
 	DrawCoordinateLabels();
 
