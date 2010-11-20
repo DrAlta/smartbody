@@ -950,21 +950,20 @@ void prune_schedule( SbmCharacter*   actor,
 				} else if( anim_ct_type == MeCtRawWriter::TYPE ) {
 					const SkChannelArray& ct_channels = anim_source->controller_channels();
 					vector<int> new_channels;  // list of indices to channels in use
-					
+					bool foundChannelMatch = false;
 					const int total_channels = ct_channels.size();
 					for( int i=0; i<total_channels; ++i ) {
 						int index = raw_channels.search( ct_channels.name(i), ct_channels.type(i) );
 						if( index != -1 ) {
-							new_channels.push_back( index );
+							foundChannelMatch = true;
+						} else {
+							raw_channels.add(ct_channels.name(i), ct_channels.type(i));
 						}
 					}
 
-					if( new_channels.empty() ) {
+					if(foundChannelMatch)
+					{
 						in_use = false;
-					} else {
-						for( vector<int>::iterator it = new_channels.begin(); it!=new_channels.end(); ++it ) {
-							raw_channels.add( ct_channels.name(*it), ct_channels.type(*it) );
-						}
 					}
 				} 
 				else if(anim_ct_type == MeCtNavigationCircle::TYPE)
@@ -1854,7 +1853,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			}
 			else
 			{
-				LOG( "SbmCharacter::character_cmd_func ERR: command '%s' not recognized" );
+				LOG( "SbmCharacter::character_cmd_func ERR: command '%s' not recognized", softEyesCommand.c_str());
 				return CMD_NOT_FOUND;
 			}
 			return CMD_SUCCESS;
