@@ -1139,10 +1139,20 @@ void SbmCharacter::reset_viseme_bonebus(double curTime)
 		if (namePatchIter != viseme_name_patch.end())
 		{
 			for (size_t nCount = 0; nCount < namePatchIter->second.size(); nCount++)
-				bonebusCharacter->SetViseme( namePatchIter->second[nCount].c_str(), weight, 0.0 );
+			{
+				if (bonebusCharacter)
+					bonebusCharacter->SetViseme( namePatchIter->second[nCount].c_str(), weight, 0.0 );
+				if (mcuCBHandle::singleton().sbm_character_listener)
+					mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, namePatchIter->second[nCount].c_str(), weight, 0.0 );
+			}
 		}
 		else
-			bonebusCharacter->SetViseme( curveIter->first.c_str(), weight, 0.0 );
+		{
+			if (bonebusCharacter)
+				bonebusCharacter->SetViseme( curveIter->first.c_str(), weight, 0.0 );
+			if (mcuCBHandle::singleton().sbm_character_listener)
+				mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, curveIter->first.c_str(), weight, 0.0 );
+		}
 	}
 }
 
@@ -1167,6 +1177,7 @@ int SbmCharacter::set_viseme( char* viseme,
 
 	for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
 	{
+		bool setCurve = false;
 		if (bonebusCharacter)	// if it is bone bus character
 		{
 			if (!this->is_viseme_curve())
@@ -1179,31 +1190,44 @@ int SbmCharacter::set_viseme( char* viseme,
 				bonebusCharacter->SetViseme( visemeNames[nCount].c_str(), weight, rampin_duration );
 			}
 			else
-			{
-				if (numKeys > 0)
-				{
-					std::map<std::string, MeSpline1D*>::iterator iter = visemeCurve.find(visemeNames[nCount]);
-					if (iter != visemeCurve.end())
-					{
-						visemeCurve.erase(iter);
-					}
-					MeSpline1D* curve = new MeSpline1D();
-					curve->make_smooth(start_time, 0, 0, 0, 0);
-					float timeDelay = this->get_viseme_time_delay();
-					for (int i = 0; i < numKeys; i++)
-					{
-						float weight = curve_info[i*4+1];
-						float inTime = curve_info[i*4+0];
-						curve->make_smooth(start_time+inTime+timeDelay, weight, 0, 0, 0);		
-					}
-					visemeCurve.insert(make_pair(visemeNames[nCount], curve));
-				}
-			}
+				setCurve = true;
 		}
 
 		if ( mcuCBHandle::singleton().sbm_character_listener )
 		{
+			if (!this->is_viseme_curve())
+			{
+				if (curve_info != NULL)
+				{
+					LOG("SbmCharacter::set_viseme WARNING: Now Curve Mode is OFF, Check the char <> viseme command!");
+					return CMD_FAILURE;
+				}
 				mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, visemeNames[nCount].c_str(), weight, rampin_duration );
+			}
+			else
+				setCurve = true;
+		}
+
+		if (setCurve)
+		{
+			if (numKeys > 0)
+			{
+				std::map<std::string, MeSpline1D*>::iterator iter = visemeCurve.find(visemeNames[nCount]);
+				if (iter != visemeCurve.end())
+				{
+					visemeCurve.erase(iter);
+				}
+				MeSpline1D* curve = new MeSpline1D();
+				curve->make_smooth(start_time, 0, 0, 0, 0);
+				float timeDelay = this->get_viseme_time_delay();
+				for (int i = 0; i < numKeys; i++)
+				{
+					float weight = curve_info[i*4+1];
+					float inTime = curve_info[i*4+0];
+					curve->make_smooth(start_time+inTime+timeDelay, weight, 0, 0, 0);		
+				}
+				visemeCurve.insert(make_pair(visemeNames[nCount], curve));
+			}			
 		}
 
 		//if (!bonebusCharacter)	// if it is not going through bone bus
