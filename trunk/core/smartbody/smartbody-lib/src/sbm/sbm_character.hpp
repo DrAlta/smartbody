@@ -39,6 +39,7 @@
 
 #include "sbm_constants.h"
 #include "sbm_speech.hpp"
+#include <sbm/sr_linear_curve.h>
 
 #include <ME/me_ct_scheduler2.h>
 #include <ME/me_ct_periodic_replay.hpp>
@@ -133,7 +134,7 @@ protected:
 	std::map<std::string, std::vector<std::string>> viseme_name_patch;
 
 	// Viseme Curve Info
-	std::map <std::string, MeSpline1D*> visemeCurve;
+	std::map <std::string, srLinearCurve*> visemeCurve;
 	bool			use_viseme_curve;
 	float			time_delay;
 
