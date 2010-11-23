@@ -1130,10 +1130,10 @@ const std::string& SbmCharacter::get_voice_code_backup() const
 
 void SbmCharacter::reset_viseme_bonebus(double curTime)
 {
-	std::map<std::string, MeSpline1D*>::iterator curveIter;
+	std::map<std::string, srLinearCurve*>::iterator curveIter;
 	for (curveIter = visemeCurve.begin(); curveIter != visemeCurve.end(); curveIter++)
 	{
-		float weight = (float)curveIter->second->eval(curTime);
+		float weight = (float)curveIter->second->evaluate(curTime);
 		std::map<std::string, std::vector<std::string>>::iterator namePatchIter;
 		namePatchIter = viseme_name_patch.find(curveIter->first);
 		if (namePatchIter != viseme_name_patch.end())
@@ -1212,19 +1212,19 @@ int SbmCharacter::set_viseme( char* viseme,
 		{
 			if (numKeys > 0)
 			{
-				std::map<std::string, MeSpline1D*>::iterator iter = visemeCurve.find(visemeNames[nCount]);
+				std::map<std::string, srLinearCurve*>::iterator iter = visemeCurve.find(visemeNames[nCount]);
 				if (iter != visemeCurve.end())
 				{
 					visemeCurve.erase(iter);
 				}
-				MeSpline1D* curve = new MeSpline1D();
-				curve->make_smooth(start_time, 0, 0, 0, 0);
+				srLinearCurve* curve = new srLinearCurve();
+				curve->insert(start_time, 0);
 				float timeDelay = this->get_viseme_time_delay();
 				for (int i = 0; i < numKeys; i++)
 				{
 					float weight = curve_info[i*4+1];
 					float inTime = curve_info[i*4+0];
-					curve->make_smooth(start_time+inTime+timeDelay, weight, 0, 0, 0);		
+					curve->insert(start_time+inTime+timeDelay, weight);		
 				}
 				visemeCurve.insert(make_pair(visemeNames[nCount], curve));
 			}			
