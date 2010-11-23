@@ -338,6 +338,7 @@ void Smartbody_dll::RegisterCallbacks()
    mcuCBHandle & mcu = mcuCBHandle::singleton();
 
    mcu.insert( "sbm",   sbm_main_func );
+   mcu.insert( "help",			mcu_help_func );
 
    mcu.insert( "reset", mcu_reset_func );
    mcu.insert( "echo",  mcu_echo_func );
@@ -353,8 +354,14 @@ void Smartbody_dll::RegisterCallbacks()
 
    mcu.insert( "viewer", mcu_viewer_func );
    mcu.insert( "bmlviewer", mcu_bmlviewer_func );
+   mcu.insert( "panimviewer",  mcu_panimationviewer_func);
+   mcu.insert( "cbufviewer", mcu_channelbufferviewer_func);
    mcu.insert( "camera", mcu_camera_func );
+   mcu.insert( "terrain",	mcu_terrain_func );
    mcu.insert( "time",   mcu_time_func );
+   mcu.insert( "tip",	mcu_time_ival_prof_func );
+
+   mcu.insert( "panim",		mcu_panim_keys_func );	
 
    mcu.insert( "load",   mcu_load_func );
    mcu.insert( "pawn",   SbmPawn::pawn_cmd_func );
@@ -366,14 +373,12 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert( "stepturn",  mcu_stepturn_controller_func );
    mcu.insert( "quickdraw", mcu_quickdraw_controller_func );
    mcu.insert( "gaze",      mcu_gaze_controller_func );
+   mcu.insert( "gazelimit",	mcu_gaze_limit_func );
    mcu.insert( "snod",      mcu_snod_controller_func );
    mcu.insert( "lilt",      mcu_lilt_controller_func );
    mcu.insert( "divulge",   mcu_divulge_content_func );
    mcu.insert( "wsp",       mcu_wsp_cmd_func );
    mcu.insert( "create_remote_pawn",	SbmPawn::create_remote_pawn_func );
-   mcu.insert( "resource",	resource_cmd_func );
-   mcu.insert( "syncpolicy",			mcu_syncpolicy_func );
-
 
    mcu.insert( "vrAgentBML",  BML_PROCESSOR::vrAgentBML_cmd_func );
    mcu.insert( "bp",          BML_PROCESSOR::bp_cmd_func );
@@ -386,6 +391,8 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert( "J_L",                 joint_logger::start_stop_func );  // shorthand
    mcu.insert( "locomotion",          locomotion_cmd_func );
    mcu.insert( "loco",                locomotion_cmd_func ); // shorthand
+   mcu.insert( "resource",	resource_cmd_func );
+   mcu.insert( "syncpolicy",			mcu_syncpolicy_func );
    mcu.insert( "check",                mcu_check_func ); // shorthand
 
    mcu.insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands
@@ -412,9 +419,10 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert_test_cmd( "args", test_args_func );
    mcu.insert_test_cmd( "bml",  test_bml_func );
    mcu.insert_test_cmd( "fml",  test_fml_func );
+   mcu.insert_test_cmd( "locomotion", test_locomotion_cmd_func );
+   mcu.insert_test_cmd( "loco",       test_locomotion_cmd_func );  // shorthand
    mcu.insert_test_cmd( "rhet", remote_speech_test);
    mcu.insert_test_cmd( "bone_pos", test_bone_pos_func );
-
 
    mcu.insert( "net", mcu_net_func );
 
