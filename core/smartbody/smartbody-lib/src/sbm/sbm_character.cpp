@@ -1674,8 +1674,8 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			numKeys = args.read_int();			// every key have four floats: time, weight, slope in, slope out
 			if (numKeys <= 0)	
 			{
-				LOG("ERROR: incorrect viseme curve!");
-				return CMD_FAILURE;
+				//LOG("Viseme does not contain any keys..ignoring...");
+				return CMD_SUCCESS;
 			}
 			curveInfo = new float[numKeys * 4];
 			args.read_float_vect(curveInfo, numKeys * 4);
