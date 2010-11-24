@@ -31,7 +31,7 @@ text_speech::~text_speech()
  *  Requests audio for a speech char[] text by agentName.
  *  Returns a unique request identifier.
  */
-RequestId text_speech::requestSpeechAudio( const char* agentName, const DOMNode* node, const char* callbackCmd ){
+RequestId text_speech::requestSpeechAudio( const char* agentName, const std::string voiceCode, const DOMNode* node, const char* callbackCmd ){
 	string encoding= "UTF-8"; //XMLString::transcode(node->getOwnerDocument()->getEncoding()); //XMLStringconverts XML to cString; encoding
 	string version= XMLString::transcode(node->getOwnerDocument()->getXmlVersion ()); //the xml version number
 	string xmlConverted="<?xml version=\"" + version.substr(0,6)+ "\" "; 
@@ -40,12 +40,12 @@ RequestId text_speech::requestSpeechAudio( const char* agentName, const DOMNode*
 	
 	char* text= new char[xmlConverted.length()+1];
 	strcpy(text, xmlConverted.c_str()); 
-	RequestId ret= requestSpeechAudio(agentName, text, callbackCmd );
+	RequestId ret= requestSpeechAudio(agentName, voiceCode, text, callbackCmd );
 	return (ret); //string is converted to char* and sent to other request audio fcn
 }
 
 
-RequestId text_speech::requestSpeechAudio( const char* agentName, std::string text, const char* callbackCmd ){
+RequestId text_speech::requestSpeechAudio( const char* agentName, std::string voiceCode, std::string text, const char* callbackCmd ){
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
     
 	msgNumber++; //to make the message number unique it must not belong to any single object instantiation and thus resides in "lookup" along with other items that must be globally accessable among all text_speech objects

@@ -57,8 +57,8 @@ class AudioFileSpeech : public SpeechInterface
       AudioFileSpeech();
       virtual ~AudioFileSpeech();
 
-      virtual RequestId requestSpeechAudio( const char * agentName, const DOMNode * node, const char * callbackCmd );
-	  virtual RequestId requestSpeechAudio( const char * agentName, std::string text, const char * callbackCmd );
+      virtual RequestId requestSpeechAudio( const char * agentName, const std::string voiceCode, const DOMNode * node, const char * callbackCmd );
+	  virtual RequestId requestSpeechAudio( const char * agentName, const std::string voiceCode, std::string text, const char * callbackCmd );
       virtual const std::vector<VisemeData *> * getVisemes( RequestId requestId );
       virtual char * getSpeechPlayCommand( RequestId requestId, const SbmCharacter * character = NULL );
       virtual char * getSpeechStopCommand( RequestId requestId, const SbmCharacter * character = NULL );

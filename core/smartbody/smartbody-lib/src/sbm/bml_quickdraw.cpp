@@ -20,13 +20,13 @@
  *      Andrew n marshall, USC
  */
 
+#include "vhcl.h"
 #include <iostream>
 #include <sstream>
 #include <string>
 
 #include <xercesc/util/XMLStringTokenizer.hpp>
 
-#include "vhcl.h"
 #include "mcontrol_util.h"
 #include "bml_quickdraw.hpp"
 #include "me_ct_quick_draw.h"
