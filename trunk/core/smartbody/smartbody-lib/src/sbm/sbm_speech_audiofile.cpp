@@ -51,7 +51,7 @@ AudioFileSpeech::~AudioFileSpeech()
 }
 
 
-RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const DOMNode * node, const char * callbackCmd )
+RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const std::string voiceCode, const DOMNode * node, const char * callbackCmd )
 {
    // TODO: Test this function with a variety of XML documents
 
@@ -66,10 +66,11 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const DOM
 
    xml_utils::xmlToString( node, xmlConverted ); //Xml to string recursively searches DOM tree and returns a string of the xml document
 
-   return requestSpeechAudio( agentName, xmlConverted, callbackCmd );
+   return requestSpeechAudio( agentName, voiceCode, xmlConverted, callbackCmd );
 }
+
 /*
-RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::string text, const char * callbackCmd )
+RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::string voiceCode, std::string text, const char * callbackCmd )
 {
 	
     mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -111,7 +112,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 
 
    char fullAudioPath[ _MAX_PATH ];
-   string relativeAudioPath = mcu.speech_audiofile_base_path + agent->get_voice_code();
+   string relativeAudioPath = mcu.speech_audiofile_base_path + voiceCode;
    if ( _fullpath( fullAudioPath, relativeAudioPath.c_str(), _MAX_PATH ) == NULL )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: _fullpath() returned NULL\n" );
@@ -124,7 +125,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 
    // TODO: Should we fail if the .bml file isn't present?
 
-   string bmlFilename = mcu.speech_audiofile_base_path + agent->get_voice_code() + "/" + ref + ".bml";
+   string bmlFilename = mcu.speech_audiofile_base_path + voiceCode + "/" + ref + ".bml";
 //////////////////////////////////
    //ReadVisemeDataBML( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData );
    m_speechRequestInfo[ m_requestIdCounter ].visemeData.clear();
@@ -202,7 +203,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 		   }
 		   else
 		   {
-				rapidxml::xml_node<>* node = bmlnode->first_node("curve");
+				rapidxml::xml_node<>* node = curvesnode->first_node("curve");
 			   while (node)
 			   {
 				  rapidxml::xml_attribute<>* nameAttr = node->first_attribute("name");
@@ -292,8 +293,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 }
 */
 
-
-RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::string text, const char * callbackCmd )
+RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::string voiceCode, std::string text, const char * callbackCmd )
 {
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -338,7 +338,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 
 
    char fullAudioPath[ _MAX_PATH ];
-   string relativeAudioPath = mcu.speech_audiofile_base_path + agent->get_voice_code();
+   string relativeAudioPath = mcu.speech_audiofile_base_path + voiceCode;
    if ( _fullpath( fullAudioPath, relativeAudioPath.c_str(), _MAX_PATH ) == NULL )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: _fullpath() returned NULL\n" );
@@ -351,14 +351,14 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 
    // TODO: Should we fail if the .bml file isn't present?
 
-   string bmlFilename = mcu.speech_audiofile_base_path + agent->get_voice_code() + "/" + ref + ".bml";
+   string bmlFilename = mcu.speech_audiofile_base_path + voiceCode + "/" + ref + ".bml";
 
     mcu.mark("requestSpeechAudio", 4, "lips");
    ReadVisemeDataBML( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData );
    if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlFilename.c_str() );
-      //return 0;
+      return 0;
    }
 
    mcu.mark("requestSpeechAudio", 4, "sync");
@@ -366,7 +366,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    if ( m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.size() == 0 )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlFilename.c_str() );
-      //return 0;
+      return 0;
    }
 
 
@@ -376,7 +376,6 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    mcu.mark("requestSpeechAudio");
    return m_requestIdCounter++;
 }
-
 
 const vector<VisemeData *> * AudioFileSpeech::getVisemes( RequestId requestId )
 {

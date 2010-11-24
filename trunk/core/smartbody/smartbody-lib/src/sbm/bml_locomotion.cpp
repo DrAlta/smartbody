@@ -20,6 +20,7 @@
  *      Andrew n marshall, USC
  */
 
+#include "vhcl.h"
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -27,7 +28,6 @@
 #include <xercesc/util/XMLStringTokenizer.hpp>
 #include <sbm/me_ct_navigation_circle.hpp>
 #include <me/me_ct_raw_writer.hpp>
-#include "vhcl.h"
 
 #include "bml_locomotion.hpp"
 

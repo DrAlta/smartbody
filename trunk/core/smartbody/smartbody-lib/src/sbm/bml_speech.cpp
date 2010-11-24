@@ -165,6 +165,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	SmartBody::SpeechInterface* speech_impl = request->actor->get_speech_impl();
 	// get the backup speech
 	SmartBody::SpeechInterface* speech_impl_backup = request->actor->get_speech_impl_backup();
+
 	if( !speech_impl && speech_impl_backup ) {
 		speech_impl = speech_impl_backup;
 		speech_impl_backup = NULL;
@@ -198,14 +199,25 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	// Found speech implementation.  Making request.
 	RequestId speech_request_id;
 	try {
-		speech_request_id = cur_speech_impl->requestSpeechAudio( request->actorId.c_str(), xml, "bp speech_ready " );
+		speech_request_id = cur_speech_impl->requestSpeechAudio( request->actorId.c_str(), request->actor->get_voice_code(), xml, "bp speech_ready " );
 	} catch (...) {
 		if (cur_speech_impl_backup) {
 			cur_speech_impl = cur_speech_impl_backup;
 			cur_speech_impl_backup = NULL;
-			speech_request_id = cur_speech_impl->requestSpeechAudio( request->actorId.c_str(), xml, "bp speech_ready " );
+			speech_request_id = cur_speech_impl->requestSpeechAudio( request->actorId.c_str(), request->actor->get_voice_code_backup(), xml, "bp speech_ready " );
 		}
-		else throw;
+		else
+			throw BML::ParsingException("No backup speech available");
+	}
+	if (speech_request_id == 0)
+	{
+		if (cur_speech_impl_backup) {
+			cur_speech_impl = cur_speech_impl_backup;
+			cur_speech_impl_backup = NULL;
+			speech_request_id = cur_speech_impl->requestSpeechAudio( request->actorId.c_str(), request->actor->get_voice_code_backup(), xml, "bp speech_ready " );
+		}
+		else 
+			throw BML::ParsingException("No backup speech available");
 	}
 
 	// TODO: SyncPoints of a speech behavior should be grouped under a unique TriggerEvent,
@@ -555,8 +567,10 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 				} else {
 					// speech implementation doesn't appear to support durations.
 					// using 0.1 transition duration (and start transition early)
-					command << "0.1";
-					time -= (time_sec)0.05;
+//					command << "0.1";
+//					time -= (time_sec)0.05;
+					command << "0.0";
+					time -= (time_sec)0.00;
 				}
 				if( LOG_BML_VISEMES ) cout << "command (complete): " << command.str() << endl;
 				sbm_commands.push_back( new SbmCommand( command.str(), time ) );

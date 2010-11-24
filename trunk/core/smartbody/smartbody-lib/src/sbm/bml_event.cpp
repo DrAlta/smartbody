@@ -20,9 +20,10 @@
  *      Andrew n marshall, USC
  */
 
+#include "vhcl.h"
 #include <iostream>
 #include <sstream>
-#include "vhcl.h"
+
 
 #include "bml_event.hpp"
 #include "bml_xml_consts.hpp"

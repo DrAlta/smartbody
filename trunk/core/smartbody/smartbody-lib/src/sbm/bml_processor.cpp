@@ -385,6 +385,8 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				if( behavior_ordinal == 1 ) {
 					// This speech is the first
 					BML::SpeechRequestPtr speechPtr =  parse_bml_speech( child, unique_id, behav_syncs, required, request, mcu );
+					if (!speechPtr)
+						return;
 					SpeechRequestPtr speech_request(speechPtr);
 					if( speech_request ) {
 						behavior = speech_request;

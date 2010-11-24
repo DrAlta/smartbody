@@ -24,11 +24,11 @@
  *      Marcus Thiebaux, USC
  */
 
+#include "vhcl.h"
 # include <stdlib.h>
 # include <SK/sk_motion.h>
 #include <iostream>
 #include <sstream>
-#include "vhcl.h"
 
 using namespace std;
 

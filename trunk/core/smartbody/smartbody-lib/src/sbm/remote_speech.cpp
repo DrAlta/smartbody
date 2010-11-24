@@ -67,7 +67,7 @@ remote_speech::~remote_speech()
  *  Requests audio for a speech char[] text by agentName.
  *  Returns a unique request identifier.
  */
-RequestId remote_speech::requestSpeechAudio( const char* agentName, const DOMNode* node, const char* callbackCmd ){
+RequestId remote_speech::requestSpeechAudio( const char* agentName, const std::string voiceCode, const DOMNode* node, const char* callbackCmd ){
 	//TODO: Test this function with a variety of XML documents
 
 	
@@ -84,13 +84,13 @@ RequestId remote_speech::requestSpeechAudio( const char* agentName, const DOMNod
 	//converts string to char*
 	//char* text= new char[xmlConverted.length()+1];
 	//strcpy(text, xmlConverted.c_str()); 
-	RequestId ret= requestSpeechAudio(agentName, xmlConverted, callbackCmd );
+	RequestId ret= requestSpeechAudio(agentName, voiceCode, xmlConverted, callbackCmd );
 	//delete [] text; text=0;
 	return (ret); //string is converted to char* and sent to other request audio fcn
 }
 
 
-RequestId remote_speech::requestSpeechAudio( const char* agentName, std::string text, const char* callbackCmd ){
+RequestId remote_speech::requestSpeechAudio( const char* agentName, std::string voiceCode, std::string text, const char* callbackCmd ){
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
     
@@ -151,7 +151,7 @@ The timestamp is 20051121_150427 (that is, YYYYMMDD_HHMMSS ), so we can check ol
 		// TODO: Log: Unknown Agent
 		return -1;  // TODO: Define error return value as a constant somewhere (or new exception type).
 	}
-	string command= "speak " + string(agentName) +" "+ myStream.str() + " "+ agent->get_voice_code()+ " "+ soundFile +" "+ textOfUtt;// text; //concatenates the whole command to be sent to Remote speech process
+	string command= "speak " + string(agentName) +" "+ myStream.str() + " " + voiceCode + " "+ soundFile +" "+ textOfUtt;// text; //concatenates the whole command to be sent to Remote speech process
 	//IF REMOTE SPEECH PROCESS SENDS BACK A "SPEECH" tag in the UTTERANCE THIS FILENAME WILL BE CHANGED!!! Go to Recieving Function to see where the Sounfile name might be reset
 	soundLookUp.insert(myStream.str().c_str(),soundFilePtr); //the sound name has to be stored in a globally accessable table in order to be found later  
 	string* agentNamePtr= new string (agentName);
@@ -626,7 +626,7 @@ int remote_speech_test( srArgBuffer& args, mcuCBHandle* mcu_p ) { //Tester funct
 		remote_speech anchor;
 		char *tre= "doctor";
 		char *command= "RemoteSpeechReplyRecieved";
-		anchor.requestSpeechAudio(tre, funNode, command);
+		anchor.requestSpeechAudio(tre, "test", funNode, command);
 	
 		return(CMD_SUCCESS);
 	
