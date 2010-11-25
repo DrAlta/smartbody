@@ -138,7 +138,57 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    bmldoc.parse< rapidxml::parse_declaration_node>(bmlFile.data());
 
    mcu.mark("requestSpeechAudio", 4, "traverse");
-   if (!visemeCurveMode)
+
+   bool useCurveMode = visemeCurveMode;
+   if (useCurveMode)
+   {
+	   rapidxml::xml_node<>* bmlnode = bmldoc.first_node("bml");
+	   if (!bmlnode)
+	   {
+		   LOG( "Could not find <bml> tag in %s.", bmlFilename.c_str());
+	   }
+	   else
+	   {
+		   rapidxml::xml_node<>* curvesnode = bmlnode->first_node("curves");
+		   if (!curvesnode)
+		   {
+			   LOG( "Could not find <curves> tag in %s.", bmlFilename.c_str());
+			   // revert to normal viseme mode if no curves are found
+			   useCurveMode = false;
+		   }
+		   else
+		   {
+			   rapidxml::xml_node<>* node = curvesnode->first_node("curve");
+			   while (node)
+			   {
+				  rapidxml::xml_attribute<>* nameAttr = node->first_attribute("name");
+				  string name = "";
+				  if (nameAttr)
+					  name = nameAttr->value();
+
+				  rapidxml::xml_attribute<>* numKeysAttr = node->first_attribute("num_keys");
+				  string numKeys = "";
+				  if (numKeysAttr)
+					  numKeys = numKeysAttr->value();
+
+				  rapidxml::xml_node<>* keyData = node->first_node();
+				  if (keyData)
+				  {
+					  std::string curveInfo = keyData->value();
+					  m_speechRequestInfo[ m_requestIdCounter ].visemeData.push_back(VisemeData(name.c_str(), atoi(numKeys.c_str()), curveInfo.c_str()));
+
+				  }
+
+				   node = node->next_sibling();
+			   }
+			   // revert to normal viseme mode if no curves are found
+			   if (!node)
+				useCurveMode = false;
+		   }
+	   }
+   }
+
+   if (!useCurveMode)
    {	      
 	   rapidxml::xml_node<>* bmlnode = bmldoc.first_node("bml");
 	   if (!bmlnode)
@@ -189,45 +239,6 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    }
    else
    {
-	   rapidxml::xml_node<>* bmlnode = bmldoc.first_node("bml");
-	   if (!bmlnode)
-	   {
-		   LOG( "Could not find <bml> tag in %s.", bmlFilename.c_str());
-	   }
-	   else
-	   {
-		   rapidxml::xml_node<>* curvesnode = bmlnode->first_node("curves");
-		   if (!curvesnode)
-		   {
-			   LOG( "Could not find <curves> tag in %s.", bmlFilename.c_str());
-		   }
-		   else
-		   {
-				rapidxml::xml_node<>* node = curvesnode->first_node("curve");
-			   while (node)
-			   {
-				  rapidxml::xml_attribute<>* nameAttr = node->first_attribute("name");
-				  string name = "";
-				  if (nameAttr)
-					  name = nameAttr->value();
-
-				  rapidxml::xml_attribute<>* numKeysAttr = node->first_attribute("num_keys");
-				  string numKeys = "";
-				  if (numKeysAttr)
-					  numKeys = numKeysAttr->value();
-
-				  rapidxml::xml_node<>* keyData = node->first_node();
-				  if (keyData)
-				  {
-					  std::string curveInfo = keyData->value();
-					  m_speechRequestInfo[ m_requestIdCounter ].visemeData.push_back(VisemeData(name.c_str(), atoi(numKeys.c_str()), curveInfo.c_str()));
-
-				  }
-
-				   node = node->next_sibling();
-			   }
-		   }
-	   }
    }
 //////////////////////////////////
 
@@ -628,7 +639,34 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
    // TODO: make sure it's "bml"
 
    // <lips viseme="Ih" articulation="1.0" start="0.17" ready="0.17" relax="0.31" end="0.31" />
-   if (!visemeCurveMode)
+   bool useVisemeCurveMode = visemeCurveMode;
+   if (useVisemeCurveMode)
+   {
+	   DOMNodeList* syncCurveList = bml->getElementsByTagName(L"curve");
+	   for (XMLSize_t i = 0; i < syncCurveList->getLength(); i++)
+	   {
+		   DOMElement* e = (DOMElement*)syncCurveList->item(i);
+
+		   char* xmlVisemeName = XMLString::transcode(e->getAttribute(L"name"));
+		   string visemeName = xmlVisemeName;
+		   XMLString::release(&xmlVisemeName);
+
+		   char* xmlNumKeys = XMLString::transcode(e->getAttribute(L"num_keys"));
+		   string numKeys = xmlNumKeys;
+		   XMLString::release(&xmlNumKeys);
+
+		   char* xmlCurveInfo = XMLString::transcode(e->getTextContent());
+		   string curveInfo = xmlCurveInfo;
+		   XMLString::release(&xmlCurveInfo);
+
+		   visemeData.push_back(VisemeData(visemeName.c_str(), atoi(numKeys.c_str()), curveInfo.c_str()));
+	   }
+	   // revert to using normal viseme mode if curves are not found
+	   if (syncCurveList->getLength() == 0)
+		   useVisemeCurveMode = false;
+   }
+   
+   if (!useVisemeCurveMode)
    {
 	   DOMNodeList * syncList = bml->getElementsByTagName( L"lips" );
 	   for ( XMLSize_t i = 0; i < syncList->getLength(); i++ )
@@ -659,31 +697,8 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
 		  string end = xmlEnd;
 		  XMLString::release( &xmlEnd );
 
-
 		  visemeData.push_back( VisemeData( viseme.c_str(), (float)atof( articulation.c_str() ), (float)atof( start.c_str() ) ) );
 		  visemeData.push_back( VisemeData( viseme.c_str(), 0.0f,                                (float)atof( end.c_str() ) ) );
-	   }
-   }
-   else
-   {
-	   DOMNodeList* syncCurveList = bml->getElementsByTagName(L"curve");
-	   for (XMLSize_t i = 0; i < syncCurveList->getLength(); i++)
-	   {
-		   DOMElement* e = (DOMElement*)syncCurveList->item(i);
-
-		   char* xmlVisemeName = XMLString::transcode(e->getAttribute(L"name"));
-		   string visemeName = xmlVisemeName;
-		   XMLString::release(&xmlVisemeName);
-
-		   char* xmlNumKeys = XMLString::transcode(e->getAttribute(L"num_keys"));
-		   string numKeys = xmlNumKeys;
-		   XMLString::release(&xmlNumKeys);
-
-		   char* xmlCurveInfo = XMLString::transcode(e->getTextContent());
-		   string curveInfo = xmlCurveInfo;
-		   XMLString::release(&xmlCurveInfo);
-
-		   visemeData.push_back(VisemeData(visemeName.c_str(), atoi(numKeys.c_str()), curveInfo.c_str()));
 	   }
    }
 }

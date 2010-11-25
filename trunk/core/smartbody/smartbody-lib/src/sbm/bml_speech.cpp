@@ -567,10 +567,9 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 				} else {
 					// speech implementation doesn't appear to support durations.
 					// using 0.1 transition duration (and start transition early)
-//					command << "0.1";
-//					time -= (time_sec)0.05;
-					command << "0.0";
-					time -= (time_sec)0.00;
+					command << "0.1";
+					time -= (time_sec)0.05;
+
 				}
 				if( LOG_BML_VISEMES ) cout << "command (complete): " << command.str() << endl;
 				sbm_commands.push_back( new SbmCommand( command.str(), time ) );
