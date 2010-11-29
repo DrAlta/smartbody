@@ -26,6 +26,8 @@
 #include <stdio.h>
 #include "sbm_constants.h"
 
+#define SR_CURVE_INFINITE_SLOPE		(1000000.0)
+
 class srLinearCurve	{
 
 	private:
@@ -44,7 +46,22 @@ class srLinearCurve	{
 			~Key(void) {}
 
 			void print( int i )	{
-				printf( " key[ %d ]: ( %f, %f )\n", i, param, value );
+#if 1
+				printf( " key[ %d ]: ( %f, %f )\n", 
+					i, param, value
+				);
+#elif 0
+				printf( " key[ %d ]: ( %f, %f ):{ %f, %f, %f }:[ 0x%x ]\n", 
+					i, param, value,
+					dp, inv_dp, dv,
+					next_p
+				);
+#else
+				printf( " key[ %d ]: ( %f, %f ):{ %f }\n", 
+					i, param, value,
+					slope()
+				);
+#endif
 			}
 
 			void next( Key *set_p ) { next_p = set_p; }
@@ -53,9 +70,27 @@ class srLinearCurve	{
 
 			void update( void ) {
 				if( next_p )	{
-					dp = next_p->param - param; inv_dp = 1.0 / dp;
+					dp = next_p->param - param; 
+					if( dp > 0.0 )	{
+						inv_dp = 1.0 / dp;
+					}
+					else	{
+						inv_dp = SR_CURVE_INFINITE_SLOPE;
+					}
 					dv = next_p->value - value;
 				}
+			}
+			void copy_delta( Key *key_p ) {
+				if( key_p )	{
+					dp = key_p->dp; inv_dp = key_p->inv_dp;
+					dv = key_p->dv;
+				}
+			}
+			double slope( void )	{
+				if( dp > 0.0 )	{
+					return( dv * inv_dp );
+				}
+				return( SR_CURVE_INFINITE_SLOPE );
 			}
 
 			double lerp( double t )	{
@@ -105,6 +140,15 @@ class srLinearCurve	{
 			return( insert_key( new Key( p, v ) ) );
 		}
 		
+		void update( void ) { update_intervals(); }
+
+		double get_tail_slope( void )	{
+			if( tail_p )	{
+				return( tail_p->slope() );
+			}
+			return( 0.0 );
+		}
+
 		double evaluate( double t )	{
 			
 			Key *floor_p = find_floor_key( t );
@@ -193,14 +237,19 @@ class srLinearCurve	{
 		void update_intervals( void )	{
 		
 			int c = 0;
+			Key *prev_p = NULL;
 			Key *key_p = head_p;
 			while( key_p ) {
 			
-				Key *prev_p = key_p;
+				Key *tmp_p = prev_p;
+				prev_p = key_p;
 				key_p = key_p->next();
 				if( key_p ) {
-					
 					prev_p->update();
+				}
+				else	{
+					tail_p = prev_p;
+					tail_p->copy_delta( tmp_p );
 				}
 				c++;
 			}
@@ -235,6 +284,7 @@ class srLinearCurve	{
 			dirty = false;
 			head_p = NULL;
 			curr_p = NULL;
+			tail_p = NULL;
 		}
 		
 		int 	key_count;
@@ -242,5 +292,6 @@ class srLinearCurve	{
 		
 		Key		*head_p;
 		Key		*curr_p;
+		Key		*tail_p;
 };
 #endif
