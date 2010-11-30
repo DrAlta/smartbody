@@ -103,6 +103,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	locomotion_ct_analysis( NULL ),
 	locomotion_ct( NULL ),
 	blink_ct_p( NULL ),
+	eyelid_reg_ct_p( NULL ),
 	head_sched_p( CreateSchedulerCt( character_name, "head" ) ),
 	param_sched_p( CreateSchedulerCt( character_name, "param" ) ),
 	face_ct( NULL ),
@@ -130,11 +131,16 @@ SbmCharacter::SbmCharacter( const char* character_name )
 
 //  Destructor
 SbmCharacter::~SbmCharacter( void )	{
+
 	posture_sched_p->unref();
 	motion_sched_p->unref();
 	gaze_sched_p->unref();
+
 	if( blink_ct_p )
 		blink_ct_p->unref();
+	if( eyelid_reg_ct_p )
+		eyelid_reg_ct_p->unref();
+
 	head_sched_p->unref();
 	param_sched_p->unref();
 	if( face_ct )
@@ -307,8 +313,16 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	float height = new_skeleton_p->getCurrentHeight();
 	setHeight(height);
 
+#if ENABLE_NEW_EYELID_REGULATOR
+	eyelid_reg_ct_p = new MeCtEyeLidRegulator();
+	eyelid_reg_ct_p->ref();
+	eyelid_reg_ct_p->init();
+	ostringstream ct_name;
+	ct_name << name << "'s eyelid controller";
+	eyelid_reg_ct_p->name( ct_name.str().c_str() );
+#else
 	init_face_controllers();  // Should I pass in the viseme_motion_map and au_motion_map here so face_ct can be initialized in here?
-
+#endif
 
 	//if (use_locomotion) 
 	{
@@ -347,7 +361,13 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	if (locomotion_ct)
 		ct_tree_p->add_controller( locomotion_ct );
 	ct_tree_p->add_controller( gaze_sched_p );
+
+#if ENABLE_NEW_EYELID_REGULATOR
+	ct_tree_p->add_controller( eyelid_reg_ct_p );
+#else
 	ct_tree_p->add_controller( blink_ct_p );
+#endif
+	
 	ct_tree_p->add_controller( head_sched_p );
 	ct_tree_p->add_controller( param_sched_p );
 	

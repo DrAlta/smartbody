@@ -25,6 +25,40 @@
 
 #include <SK/sk_skeleton.h>
 #include <ME/me_controller.h>
+#include "sr_linear_curve.h"
+
+//////////////////////////////////////////////////////////////////////////////////
+
+class MeCtEyeLidRegulator : public MeController	{ 
+
+	private:
+
+		SkChannelArray		_channels;
+
+	public:
+
+		static const char* type_name;
+
+		MeCtEyeLidRegulator( void );
+		~MeCtEyeLidRegulator( void );
+		
+		void init( void );
+
+	private:
+		float			tmp_period;
+		srLinearCurve	curve;
+		
+		virtual void context_updated( void );
+		virtual void controller_map_updated();
+		virtual void controller_start();
+		virtual bool controller_evaluate ( double t, MeFrameData& frame );
+		virtual SkChannelArray& controller_channels ();
+		virtual double controller_duration ();
+		virtual const char* controller_type () const;
+		virtual void print_state( int tabCount );
+};
+
+//////////////////////////////////////////////////////////////////////////////////
 
 /*
 	char <> softeyes [on|off]
