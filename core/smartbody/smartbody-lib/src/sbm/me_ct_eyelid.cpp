@@ -107,6 +107,7 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 	fbuffer[ R_au_blink_buff_idx ] = blink_val;
 	
 //	if( blink_val > 0.0 ) LOG( "MeCtEyeLidRegulator: %f\n", blink_val );
+	return( true );
 }
 
 SkChannelArray& MeCtEyeLidRegulator::controller_channels( void )	{
