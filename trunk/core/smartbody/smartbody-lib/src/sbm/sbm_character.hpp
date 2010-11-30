@@ -206,7 +206,11 @@ public:
 	MeCtSchedulerClass*	posture_sched_p; // legs / stance / posture
 	MeCtSchedulerClass*	motion_sched_p;  // full body motions
 	MeCtSchedulerClass*	gaze_sched_p;    // back / chest / spine
+
 	MeCtPeriodicReplay* blink_ct_p;      // TODO replace with aperiodic controller
+
+#define ENABLE_NEW_EYELID_REGULATOR 0
+	MeCtEyeLidRegulator* eyelid_reg_ct_p;
 	// TODO: Arms
 	// TODO: Hands
 	MeCtSchedulerClass*	head_sched_p; // neck / head orientation

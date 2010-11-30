@@ -24,6 +24,115 @@
 #include "me_ct_eyelid.h"
 #include <vhcl_log.h>
 
+//////////////////////////////////////////////////////////////////////////////////
+
+const char* MeCtEyeLidRegulator::type_name = "EyeLidRegulator";
+
+MeCtEyeLidRegulator::MeCtEyeLidRegulator( void )	{
+
+}
+
+MeCtEyeLidRegulator::~MeCtEyeLidRegulator( void )	{
+
+}
+
+void MeCtEyeLidRegulator::init( void )	{
+
+	_channels.add( "eyeball_left", SkChannel::Quat );
+	_channels.add( "eyeball_right", SkChannel::Quat );
+	
+	_channels.add( "au_45_left", SkChannel::XPos );
+	_channels.add( "au_45_right", SkChannel::XPos );
+	
+	MeController::init();
+	
+	tmp_period = 6.0;
+	
+	curve.insert( 0.0, 0.0 );
+	curve.insert( 0.05, 1.0 );
+	curve.insert( 0.2, 0.33 );
+	curve.insert( 0.25, 0.0 );
+}
+
+void MeCtEyeLidRegulator::context_updated( void ) {
+}
+
+void MeCtEyeLidRegulator::controller_map_updated( void ) {
+}
+
+void MeCtEyeLidRegulator::controller_start( void )	{
+}
+
+bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
+
+	if( t < 0.0 )	{
+		return( true );
+	}
+
+	float *fbuffer = &( frame.buffer()[0] );
+	int n_chan = _channels.size();
+
+	int L_eye_quat_idx = _context->channels().search( SkJointName( "eyeball_left" ), SkChannel::Quat );
+	int R_eye_quat_idx =  _context->channels().search( SkJointName( "eyeball_right" ), SkChannel::Quat );
+
+	int L_au_blink_idx =  _context->channels().search( SkJointName( "au_45_left" ), SkChannel::XPos );
+	int R_au_blink_idx =  _context->channels().search( SkJointName( "au_45_right" ), SkChannel::XPos );
+
+	int buff_idx = _context->toBufferIndex( L_eye_quat_idx );
+	euler_t L_eye_e = quat_t(
+		fbuffer[ buff_idx ],
+		fbuffer[ buff_idx + 1 ],
+		fbuffer[ buff_idx + 2 ],
+		fbuffer[ buff_idx + 3 ]
+	);
+
+	buff_idx = _context->toBufferIndex( R_eye_quat_idx );
+	euler_t R_eye_e = quat_t(
+		fbuffer[ buff_idx ],
+		fbuffer[ buff_idx + 1 ],
+		fbuffer[ buff_idx + 2 ],
+		fbuffer[ buff_idx + 3 ]
+	);
+
+	int L_au_blink_buff_idx = _context->toBufferIndex( L_au_blink_idx );
+//	float L_au_blink = fbuffer[ L_au_blink_buff_idx ];
+
+	int R_au_blink_buff_idx = _context->toBufferIndex( R_au_blink_idx );
+//	float R_au_blink = fbuffer[ R_au_blink_buff_idx ];
+
+	double interval_time = fmod( (double)t, (double)tmp_period );
+	float blink_val = (float)( curve.evaluate( interval_time ) );
+
+	fbuffer[ L_au_blink_buff_idx ] = blink_val;
+	fbuffer[ R_au_blink_buff_idx ] = blink_val;
+	
+//	if( blink_val > 0.0 ) LOG( "MeCtEyeLidRegulator: %f\n", blink_val );
+}
+
+SkChannelArray& MeCtEyeLidRegulator::controller_channels( void )	{
+	return( _channels );
+}
+
+double MeCtEyeLidRegulator::controller_duration( void ) {
+	return( -1.0 );
+}
+
+const char* MeCtEyeLidRegulator::controller_type( void )	const {
+	return( type_name );
+}
+
+void MeCtEyeLidRegulator::print_state( int tabCount ) {
+
+	LOG("MeCtEyeLidRegulator" );
+
+	const char* str = name();
+	if( str )
+		LOG(" \"%s\"", str );
+
+	LOG("\n" );
+}
+//////////////////////////////////////////////////////////////////////////////////
+
 /*
 	JOINTS:
 	
