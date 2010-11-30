@@ -154,6 +154,17 @@ void SkScene::init ( SkSkeleton* s )
          c->visible ( false );
          g->add ( c ); // starting at FirstCylPos
        }
+
+	  // end effector for bone mode
+	  if (joints[i]->num_children() == 0)
+	  {
+		 SrSnSphere* sphere = new SrSnSphere;
+		 sphere->color(SrColor::white);
+		 sphere->shape().radius = scaleFactor * _cradius * _sfactor * 0.75;
+		 sphere->visible ( false );
+		 sphere->ref();
+         g->add ( sphere ); 	
+	  }
     }
    sphere->unref();
    axis->unref();
