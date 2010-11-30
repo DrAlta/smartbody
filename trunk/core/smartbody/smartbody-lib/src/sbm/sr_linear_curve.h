@@ -46,7 +46,7 @@ class srLinearCurve	{
 			~Key(void) {}
 
 			void print( int i )	{
-#if 1
+#if 0
 				printf( " key[ %d ]: ( %f, %f )\n", 
 					i, param, value
 				);
@@ -125,6 +125,9 @@ class srLinearCurve	{
 
 		void print( void )	{
 			
+			if( dirty ) {
+				update_intervals();
+			}
 			printf( "srLinearCurve: KEYS:\n" );
 			int c = 0;
 			Key *key_p = head_p;
@@ -139,10 +142,12 @@ class srLinearCurve	{
 		int insert( double p, double v )	{ /* sort by key.time, add after same time */
 			return( insert_key( new Key( p, v ) ) );
 		}
-		
-		void update( void ) { update_intervals(); }
 
 		double get_tail_slope( void )	{
+		
+			if( dirty ) {
+				update_intervals();
+			}
 			if( tail_p )	{
 				return( tail_p->slope() );
 			}
