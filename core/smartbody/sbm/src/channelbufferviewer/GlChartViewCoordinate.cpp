@@ -1,5 +1,5 @@
 /*
- *  me_ct_locomotion.hpp - part of SmartBody-lib's Test Suite
+ *  GlChartViewCoordinate.cpp - part of SmartBody-lib's Test Suite
  *  Copyright (C) 2009  University of Southern California
  *
  *  SmartBody-lib is free software: you can redistribute it and/or
@@ -32,6 +32,7 @@ GlChartViewCoordinate::GlChartViewCoordinate()
 	y_scale = 1.0f;
 	y_scale_zoom = 1.0f;
 	x_label_num = 10;
+	default_x_label_num = 10;
 	y_label_num = 10;
 	x_size = 800.0f;
 	y_size = 1.0f;
@@ -50,6 +51,14 @@ void GlChartViewCoordinate::SetYSize(float size)
 void GlChartViewCoordinate::SetXSize(float size)
 {
 	x_size = size;
+	/*for(int i = default_x_label_num; i > 0; --i)
+	{
+		if(x_size/(float)i-(int)(x_size/(float)i) == 0.0f)
+		{
+			x_label_num = i;
+			break;
+		}
+	}*/
 }
 
 void GlChartViewCoordinate::InitFont()
@@ -98,6 +107,7 @@ void GlChartViewCoordinate::Draw()
 	float y_length = GetYScale()*y_size;
 	float x_length = GetXScale();
 	glColor4f(0.1f, 0.1f, 0.1f, 0.3f);
+	float x;
 	glBegin(GL_LINES);
 		for(int i = y_label_num; i > 0; --i)
 		{
@@ -109,19 +119,21 @@ void GlChartViewCoordinate::Draw()
 		}
 		for(int i = x_label_num; i > 0; --i)
 		{
-			glVertex3f(i*x_length/x_label_num, y_length, 0.0f);
-			glVertex3f(i*x_length/x_label_num, -y_length, 0.0f);
+			x = i*x_length/x_label_num;
+			x = x*((int)(i*x_size/x_label_num))/(i*x_size/x_label_num);
+			glVertex3f(x, y_length, 0.0f);
+			glVertex3f(x, -y_length, 0.0f);
 		}
 	glEnd();
 
 	DrawCoordinateLabels();
 
 	glBegin(GL_LINES);
-		glColor4f(1.0f, 0.0f, 0.0f, 0.3f);
+		//glColor4f(1.0f, 0.0f, 0.0f, 0.3f);
 		glVertex3f(0.0f, 0.0f, 0.0f);
 		glVertex3f(x_length, 0.0f, 0.0f);
 
-		glColor4f(0.0f, 1.0f, 0.0f, 0.3f);
+		//glColor4f(0.0f, 1.0f, 0.0f, 0.3f);
 		glVertex3f(0.0f, y_length, 0.0f);
 		glVertex3f(0.0f, -y_length, 0.0f);
 
@@ -186,13 +198,16 @@ void GlChartViewCoordinate::DrawCoordinateLabels()
 		label.DrawString(value, 2.0f, -size.x*2.4f, -i*y_length/y_label_num + 1.5f*size.y/2.0f);
 	}
 
+	float x;
+
 	for(int i = x_label_num; i > 0; --i)
 	{
 		sprintf(value, "%d", (int)(x_size*i/x_label_num));
 		size = GetStringSize(value);
-		label.DrawString(value, 2.0f, i*x_length/x_label_num - size.x/2.0f, -size.y);
+		x = i*x_length/x_label_num;
+		x = x*((int)(i*x_size/x_label_num))/(i*x_size/x_label_num);
+		label.DrawString(value, 2.0f, x - size.x/2.0f, -size.y);
 	}
-
 
 	glDisable(GL_TEXTURE_2D);
 }

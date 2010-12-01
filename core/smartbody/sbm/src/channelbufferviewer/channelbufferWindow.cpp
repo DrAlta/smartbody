@@ -1,5 +1,5 @@
 /*
- *  me_ct_locomotion.hpp - part of SmartBody-lib's Test Suite
+ *  channelbufferWindow.cpp - part of SmartBody-lib's Test Suite
  *  Copyright (C) 2009  University of Southern California
  *
  *  SmartBody-lib is free software: you can redistribute it and/or
@@ -152,9 +152,12 @@ void ChannelBufferWindow::initChannelItem(ChannelBufferWindow* window, int num)
 void ChannelBufferWindow::refreshBold(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
+	for(int i = 0; i < window->chartview->get_archive()->GetSeriesCount(); ++i)
+	{
+		window->chartview->get_archive()->GetSeries(i)->bold = false;
+	}
 	for(int j = 0; j < window->channel_monitor->size(); ++j)
 	{
-		window->chartview->get_archive()->GetSeries(j)->bold = false;
 		if(window->channel_monitor->selected(j))
 		{
 			const char* label = window->channel_monitor->goto_index(j)->label();
@@ -165,7 +168,14 @@ void ChannelBufferWindow::refreshBold(fltk::Widget* widget, void* data)
 				{
 					if(strcmp(&(item.label->get(0)), label) == 0)
 					{
-						window->chartview->get_archive()->GetSeries(j)->bold = true;
+						for(int k = 0; k < window->chartview->get_archive()->GetSeriesCount(); ++k)
+						{
+							if(strcmp(&(window->chartview->get_archive()->GetSeries(k)->title.get(0)), &(item.label->get(0)))==0)
+							{
+								window->chartview->get_archive()->GetSeries(k)->bold = true;
+								break;
+							}
+						}
 					}
 				}
 			}
