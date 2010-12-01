@@ -53,12 +53,19 @@ void MeCtEyeLidRegulator::init( void )	{
 	
 	new_blink = false;
 	
+#if 1
 	blink_period_min = 4.0;
 	blink_period_max = 8.0;
+#else
+	blink_period_min = 14.0;
+	blink_period_max = 18.0;
+#endif
 	
 	blink_period = blink_period_min;
 	prev_blink = 0.0;
 	
+	prev_left_value = 0.0f;
+	prev_right_value = 0.0f;
 	left_value = 0.0f;
 	right_value = 0.0f;
 }
@@ -83,15 +90,13 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 		new_blink = false;
 	}
 	
-	float blink_elapsed = t - prev_blink;
+	double blink_elapsed = t - prev_blink;
 	if( blink_elapsed >= blink_period )	{
-//LOG( "blink! ================================== " );
+//LOG( "blink @ %f", blink_elapsed );
 		blink_elapsed = 0.0;
 		prev_blink = t;
 		float r = (float)rand() / (float)RAND_MAX;
-		blink_period = blink_period_min * r * ( blink_period_max - blink_period_min );
-//		blink_period = blink_period_min;
-//		blink_period = 4.0;
+		blink_period = blink_period_min + r * ( blink_period_max - blink_period_min );
 	}
 
 	float *fbuffer = &( frame.buffer()[0] );
@@ -122,22 +127,20 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 	int L_au_blink_buff_idx = _context->toBufferIndex( L_au_blink_idx );
 	int R_au_blink_buff_idx = _context->toBufferIndex( R_au_blink_idx );
 
-	float blink_val = (float)( curve.evaluate( (double)blink_elapsed ) );
+	float blink_val = (float)( curve.evaluate( blink_elapsed ) );
+
+	prev_left_value = left_value; // for change detection
+	prev_right_value = right_value;
 
 	left_value = blink_val;
 	right_value = blink_val;
 
 
 
-	float L_au_value = fbuffer[ L_au_blink_buff_idx ];
-	float R_au_value = fbuffer[ R_au_blink_buff_idx ];
-
-	left_value_changed = ( left_value != L_au_value );
-	right_value_changed = ( right_value != R_au_value );
-
 	fbuffer[ L_au_blink_buff_idx ] = left_value;
 	fbuffer[ R_au_blink_buff_idx ] = right_value;
-	
+
+//	if( left_value != prev_left_value ) LOG( "MeCtEyeLidRegulator: t:%f v:%f", blink_elapsed, blink_val );
 //	if( blink_val > 0.0 ) LOG( "MeCtEyeLidRegulator: t:%f v:%f", blink_elapsed, blink_val );
 	return( true );
 }
