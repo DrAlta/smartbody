@@ -1285,6 +1285,32 @@ void SbmCharacter::eye_blink_update( const double frame_time )
    // automatic blinking routine using bonebus viseme commands
    mcuCBHandle& mcu = mcuCBHandle::singleton();
 
+#if ENABLE_NEW_EYELID_REGULATOR
+	if( eyelid_reg_ct_p )	{
+
+		bool left_changed;
+		bool right_changed;
+		float left = eyelid_reg_ct_p->get_left( &left_changed );
+		float right = eyelid_reg_ct_p->get_right( &right_changed );
+
+		if ( bonebusCharacter )	{
+			if( left_changed )	{
+				bonebusCharacter->SetViseme( "blink_lf", left, 0.0 );
+			}
+			if( right_changed )	{
+				bonebusCharacter->SetViseme( "blink_rt", right, 0.0 );
+			}
+		}
+		if ( mcu.sbm_character_listener )	{
+			if( left_changed )	{
+				mcu.sbm_character_listener->OnViseme( name, string( "blink_lf" ), left, 0.0 );
+			}
+			if( right_changed )	{
+				mcu.sbm_character_listener->OnViseme( name, string( "blink_rt" ), right, 0.0 );
+			}		
+		}
+	}
+#else
    if ( !eye_blink_closed )
    {
       if ( frame_time - eye_blink_last_time > eye_blink_repeat_time )
@@ -1292,12 +1318,16 @@ void SbmCharacter::eye_blink_update( const double frame_time )
          // close the eyes
          if ( bonebusCharacter )
          {
-            bonebusCharacter->SetViseme( "blink", 0.9f, BLINK_SHUTTING_DURATION );
+//            bonebusCharacter->SetViseme( "blink", 0.9f, BLINK_SHUTTING_DURATION );
+            bonebusCharacter->SetViseme( "blink_rt", 0.9f, BLINK_SHUTTING_DURATION );
+            bonebusCharacter->SetViseme( "blink_lf", 0.9f, BLINK_SHUTTING_DURATION );
          }
 
          if ( mcu.sbm_character_listener )
          {
-            mcu.sbm_character_listener->OnViseme( name, string( "blink" ), 0.9f, BLINK_SHUTTING_DURATION );
+//            mcu.sbm_character_listener->OnViseme( name, string( "blink" ), 0.9f, BLINK_SHUTTING_DURATION );
+            mcu.sbm_character_listener->OnViseme( name, string( "blink_rt" ), 0.9f, BLINK_SHUTTING_DURATION );
+            mcu.sbm_character_listener->OnViseme( name, string( "blink_lf" ), 0.9f, BLINK_SHUTTING_DURATION );
          }
 
          eye_blink_last_time = frame_time;
@@ -1311,12 +1341,16 @@ void SbmCharacter::eye_blink_update( const double frame_time )
          // open the eyes
          if ( bonebusCharacter )
          {
-            bonebusCharacter->SetViseme( "blink", 0, BLINK_OPENING_DURATION );
+//            bonebusCharacter->SetViseme( "blink", 0, BLINK_OPENING_DURATION );
+            bonebusCharacter->SetViseme( "blink_rt", 0, BLINK_OPENING_DURATION );
+            bonebusCharacter->SetViseme( "blink_lf", 0, BLINK_OPENING_DURATION );
          }
 
          if ( mcu.sbm_character_listener )
          {
-            mcu.sbm_character_listener->OnViseme( name, "blink", 0, BLINK_OPENING_DURATION );
+//            mcu.sbm_character_listener->OnViseme( name, "blink", 0, BLINK_OPENING_DURATION );
+            mcu.sbm_character_listener->OnViseme( name, "blink_rt", 0, BLINK_OPENING_DURATION );
+            mcu.sbm_character_listener->OnViseme( name, "blink_lf", 0, BLINK_OPENING_DURATION );
          }
 
          eye_blink_last_time = frame_time;
@@ -1327,6 +1361,7 @@ void SbmCharacter::eye_blink_update( const double frame_time )
          eye_blink_repeat_time = ( fraction * ( BLINK_MAX_REPEAT_DURATION - BLINK_MIN_REPEAT_DURATION ) ) + BLINK_MIN_REPEAT_DURATION;
       }
    }
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1821,6 +1856,17 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				return character->reholster_quickdraw( mcu_p );
 			}
 		}
+	}
+	else
+	if (char_cmd == "blink")
+	{
+#if ENABLE_NEW_EYELID_REGULATOR
+		MeCtEyeLidRegulator *eye_reg_ct = character->eyelid_reg_ct_p;
+		if( eye_reg_ct )	{
+			eye_reg_ct->blink_now();
+		}
+		return( CMD_SUCCESS );
+#endif
 	}
 	else
 	if (char_cmd == "softeyes")

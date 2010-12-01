@@ -44,9 +44,36 @@ class MeCtEyeLidRegulator : public MeController	{
 		
 		void init( void );
 
+		void blink_now( void ) { new_blink = true; }
+
+		float get_left( bool *changed_p = NULL ) { 
+			if( changed_p ) {
+				*changed_p = left_value_changed;
+			}
+			return( left_value ); 
+		}
+		
+		float get_right( bool *changed_p = NULL ) { 
+			if( changed_p ) {
+				*changed_p = right_value_changed;
+			}
+			return( right_value ); 
+		}
+
 	private:
-		float			tmp_period;
 		srLinearCurve	curve;
+		
+		bool	new_blink;
+		
+		double	blink_period_min;
+		double	blink_period_max;
+		double	blink_period;
+		double	prev_blink; // time at last blink
+
+		bool	left_value_changed;
+		bool	right_value_changed;
+		float	left_value;
+		float	right_value;
 		
 		virtual void context_updated( void );
 		virtual void controller_map_updated();
