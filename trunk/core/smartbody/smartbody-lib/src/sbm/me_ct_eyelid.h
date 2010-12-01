@@ -48,14 +48,14 @@ class MeCtEyeLidRegulator : public MeController	{
 
 		float get_left( bool *changed_p = NULL ) { 
 			if( changed_p ) {
-				*changed_p = left_value_changed;
+				*changed_p = ( left_value != prev_left_value );
 			}
 			return( left_value ); 
 		}
 		
 		float get_right( bool *changed_p = NULL ) { 
 			if( changed_p ) {
-				*changed_p = right_value_changed;
+				*changed_p = ( right_value != prev_right_value );
 			}
 			return( right_value ); 
 		}
@@ -70,8 +70,8 @@ class MeCtEyeLidRegulator : public MeController	{
 		double	blink_period;
 		double	prev_blink; // time at last blink
 
-		bool	left_value_changed;
-		bool	right_value_changed;
+		float	prev_left_value;
+		float	prev_right_value;
 		float	left_value;
 		float	right_value;
 		
