@@ -1,5 +1,5 @@
 /*
- *  me_ct_locomotion.hpp - part of SmartBody-lib's Test Suite
+ *  GlChartViewCoordinate.hpp - part of SmartBody-lib's Test Suite
  *  Copyright (C) 2009  University of Southern California
  *
  *  SmartBody-lib is free software: you can redistribute it and/or
@@ -62,6 +62,8 @@ protected:
 	float y_size;
 	int x_label_num;
 	int y_label_num;
+
+	int default_x_label_num;
 
 public:
 	GlChartViewCoordinate();

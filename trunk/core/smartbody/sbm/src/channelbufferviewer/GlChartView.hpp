@@ -1,5 +1,5 @@
 /*
- *  me_ct_locomotion.hpp - part of SmartBody-lib's Test Suite
+ *  GlChartView.hpp - part of SmartBody-lib's Test Suite
  *  Copyright (C) 2009  University of Southern California
  *
  *  SmartBody-lib is free software: you can redistribute it and/or
