@@ -75,6 +75,10 @@ public:
 	
 	//void DrawFonts();
 	void Draw();
+
+	void SetXLabelNum(int num);
+	void SetYLabelNum(int num);
+
 	void SetXSize(float size);
 	void SetYSize(float size);
 	float GetYSize();

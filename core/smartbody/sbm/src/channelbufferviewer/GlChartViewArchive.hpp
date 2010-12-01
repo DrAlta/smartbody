@@ -69,7 +69,8 @@ public:
 	~GlChartViewSeries();
 
 public:
-	void clear();
+	void Clear();
+	void Reset();
 	float GetValue(int index);
 	SrVec2 GetVec2(int index);
 	SrVec GetVec3(int index);
