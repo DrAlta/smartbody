@@ -551,16 +551,21 @@ void mcuCBHandle::update( void )	{
 
 		pawn_p->reset_all_channels();
 
+#if 0
 		// blinking hack...
 		char_p = character_map.lookup( pawn_p->name );
 		if( char_p ) {
 			char_p->eye_blink_update( this->time );
 		}
+#endif
 
 		pawn_p->ct_tree_p->evaluate( time );
 		pawn_p->ct_tree_p->applyBufferToAllSkeletons();
 
+		char_p = character_map.lookup( pawn_p->name );
 		if( char_p ) {
+
+			char_p->eye_blink_update( this->time );
 
 			//char_p->scheduler_p->apply();  // old controller API  See applyBufferToAllSkeletons() above
 			char_p->scene_p->update();

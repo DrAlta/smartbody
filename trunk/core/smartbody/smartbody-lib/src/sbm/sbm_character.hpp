@@ -27,6 +27,10 @@
 #ifndef SBM_CHARACTER_HPP
 #define SBM_CHARACTER_HPP
 
+
+#define ENABLE_NEW_EYELID_REGULATOR ( 0 )
+
+
 #include <float.h>
 #include <iostream>
 #include <string>
@@ -208,8 +212,6 @@ public:
 	MeCtSchedulerClass*	gaze_sched_p;    // back / chest / spine
 
 	MeCtPeriodicReplay* blink_ct_p;      // TODO replace with aperiodic controller
-
-#define ENABLE_NEW_EYELID_REGULATOR 0
 	MeCtEyeLidRegulator* eyelid_reg_ct_p;
 	// TODO: Arms
 	// TODO: Hands
