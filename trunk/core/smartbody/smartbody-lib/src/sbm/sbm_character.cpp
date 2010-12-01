@@ -1665,6 +1665,20 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		}
 		return CMD_SUCCESS;
 	}
+	else if (char_cmd == "controllers")
+	{
+		if (!character)
+			return CMD_FAILURE;
+
+		MeControllerTreeRoot* controllerTree = character->ct_tree_p;
+		int numControllers = controllerTree->count_controllers();
+	
+		for (int c = 0; c < numControllers; c++)
+		{
+			LOG("%s", controllerTree->controller(c)->name());
+		}
+		return CMD_SUCCESS;
+	}
 	else
 	if( char_cmd=="prune" ) {
 		int result = CMD_SUCCESS;
