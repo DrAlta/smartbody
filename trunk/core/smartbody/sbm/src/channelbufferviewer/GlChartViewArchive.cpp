@@ -34,8 +34,14 @@ GlChartViewSeries::GlChartViewSeries()
 
 GlChartViewSeries::~GlChartViewSeries()
 {
-	clear();
+	Clear();
 };
+
+void GlChartViewSeries::Reset()
+{
+	current_ind = -1;
+	size = 0;
+}
 
 void GlChartViewSeries::SetColor(int index, SrVec& color)
 {
@@ -65,14 +71,13 @@ SrVec GlChartViewSeries::GetColor(int index)
 	else return SrVec(0,0,0);
 }
 
-void GlChartViewSeries::clear()
+void GlChartViewSeries::Clear()
 {
 	x.capacity(0);
 	y.capacity(0);
 	z.capacity(0);
 	w.capacity(0);
-	current_ind = -1;
-	size = 0;
+	Reset();
 }
 
 int GlChartViewSeries::GetBufferIndex()
@@ -448,7 +453,7 @@ GlChartViewArchive::~GlChartViewArchive()
 	for(int i = 0; i < num; ++i)
 	{
 		series = series_list.pop();
-		series->clear();
+		series->Clear();
 		delete series;
 	}
 
@@ -479,7 +484,7 @@ void GlChartViewArchive::DeleteSeries(const char* title)
 		series = series_list.get(i);
 		if(strcmp(&(series->title.get(0)), title) == 0)
 		{
-			series->clear();
+			series->Clear();
 			delete series;
 			series_list.remove(i, 1);
 		}
@@ -490,7 +495,7 @@ void GlChartViewArchive::DeleteSeries(int index)
 {
 	GlChartViewSeries* series = NULL;
 	series = series_list.get(index);
-	series->clear();
+	series->Clear();
 	delete series;
 	series_list.remove(index, 1);
 
@@ -503,7 +508,7 @@ void GlChartViewArchive::ClearSeries()
 	for(int i = 0; i < num; ++i)
 	{
 		series = series_list.get(i);
-		series->clear();
+		series->Clear();
 		delete series;
 	}
 	series_list.size(0);
