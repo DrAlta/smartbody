@@ -77,6 +77,7 @@ public:
 	fltk::CheckButton* show_y;
 	fltk::CheckButton* show_z;
 	fltk::CheckButton* show_w;
+	fltk::CheckButton* check_hide_other_channels;
 	fltk::Button* refresh;
 	fltk::Button* freeze;
 	fltk::Button* reset_camera;
@@ -92,9 +93,13 @@ public:
 
 	int num_of_frames;
 	bool is_freezed;
+	bool hide_other_channels;
+
+	int mode; //0: character; 1: controller; 2: motion
 
 public:
 	const char* getSelectedCharacterName();
+	void update();
 
 protected:
 	static void clearChannelItem(ChannelBufferWindow* window);
@@ -107,11 +112,13 @@ protected:
 	static void refreshMotionChannels(fltk::Widget* widget, void* data);
 	static void refreshChannelsWidget(ChannelBufferWindow* window);
 	static void refreshMonitoredChannelsWidget(ChannelBufferWindow* window);
+	static void refreshMaxSize(ChannelBufferWindow* window, int num);
 
 	static void refreshBold(fltk::Widget* widget, void* data);
 	static void refreshCharacters(fltk::Widget* widget, void* data);
 	static void refreshControllers(fltk::Widget* widget, void* data);
 	static void refreshControllerChannels(fltk::Widget* widget, void* data);
+	static void refreshHideOtherChannels(fltk::Widget* widget, void* data);
 	static void refreshChannels(fltk::Widget* widget, void* data);
 	static void refreshMaxSize(fltk::Widget* widget, void* data);
 	static void refreshQuat(fltk::Widget* widget, void* data);
@@ -119,6 +126,7 @@ protected:
 	static void freezeView(fltk::Widget* widget, void* data);
 	static void FilterChannelItem(fltk::Widget* widget, void* data);
 	static void FilterMonitoredChannelItem(fltk::Widget* widget, void* data);
+	static void refreshControllerVisibilities(ChannelBufferWindow* window);
 
 	static void refreshShowX(fltk::Widget* widget, void* data);
 	static void refreshShowY(fltk::Widget* widget, void* data);
@@ -135,6 +143,7 @@ protected:
 	static void FilterItem(ChannelBufferWindow* window, fltk::Browser* list, fltk::Input* filter, bool monitored);
 	static void removeMonitoredChannel(fltk::Widget* widget, void* data);
 	static int get_size(const char* title);
+	static void fillSeriesWithMotionData(ChannelBufferWindow* window, SkMotion* motion, GlChartViewSeries* series, ChannelItem& item);
 };
 
 class ChannelBufferViewerFactory : public BMLViewerFactory

@@ -401,6 +401,41 @@ void GlChartViewSeries::Push(SrQuat& quat)
 	Push(quat.x, quat.y, quat.z, quat.w);
 }
 
+void GlChartViewSeries::SetLast(float x)
+{
+	this->x.set(current_ind, x);
+}
+
+void GlChartViewSeries::SetLast(float x, float y, float z)
+{
+	this->x.set(current_ind, x);
+	this->y.set(current_ind, y);
+	this->z.set(current_ind, z);
+}
+
+void GlChartViewSeries::SetLast(float x, float y, float z, float w)
+{
+	this->x.set(current_ind, x);
+	this->y.set(current_ind, y);
+	this->z.set(current_ind, z);
+	this->w.set(current_ind, w);
+}
+
+void GlChartViewSeries::SetLast(SrVec& quat)
+{
+	this->x.set(current_ind, quat.x);
+	this->y.set(current_ind, quat.y);
+	this->z.set(current_ind, quat.z);
+}
+
+void GlChartViewSeries::SetLast(SrQuat& quat)
+{
+	this->x.set(current_ind, quat.x);
+	this->y.set(current_ind, quat.y);
+	this->z.set(current_ind, quat.z);
+	this->w.set(current_ind, quat.w);
+}
+
 GlChartViewArchive::GlChartViewArchive()
 {
 
@@ -507,6 +542,7 @@ void GlChartViewArchive::Update(SrBuffer<float>& buffer)
 	{
 		series = series_list.get(i);
 		buffer_index = series->GetBufferIndex();
+
 		if(series->data_type >= CHART_DATA_TYPE_VALUE) x = buffer[buffer_index];
 		if(series->data_type >= CHART_DATA_TYPE_VEC2) y = buffer[buffer_index+1];
 		if(series->data_type >= CHART_DATA_TYPE_VEC) z = buffer[buffer_index+2];

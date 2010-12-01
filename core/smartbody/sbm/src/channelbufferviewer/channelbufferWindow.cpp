@@ -47,7 +47,12 @@ ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name)
 		loadControllers(controller, character);
 		controller->callback(refreshControllerChannels, this);
 
-		motion = new fltk::Choice(60, 80, w/4, 20, "Motion");
+		check_hide_other_channels = new fltk::CheckButton(60, 70, 18, 18, "Hide other channels");
+		check_hide_other_channels->callback(refreshHideOtherChannels, this);
+		check_hide_other_channels->state(true);
+		check_hide_other_channels->deactivate();
+
+		motion = new fltk::Choice(60, 100, w/4, 20, "Motion");
 		loadMotions(motion, character);
 		motion->callback(refreshMotionChannels, this);
 
@@ -302,7 +307,18 @@ void ChannelBufferWindow::setXYZVisibility(ChannelBufferWindow* window)
 void ChannelBufferWindow::refreshMaxSize(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
-	window->num_of_frames = atoi(window->frame_num->value());
+	if(window->mode == 2) 
+	{
+		window->num_of_frames = atoi(window->frame_num->value());
+		return;
+	}
+	//window->num_of_frames = atoi(window->frame_num->value());
+	refreshMaxSize(window, atoi(window->frame_num->value()));
+}
+
+void ChannelBufferWindow::refreshMaxSize(ChannelBufferWindow* window, int num)
+{
+	window->num_of_frames = num;
 	int series_count = window->chartview->get_archive()->GetSeriesCount();
 	for(int i = 0; i < series_count; ++i)
 	{
@@ -314,6 +330,8 @@ void ChannelBufferWindow::refreshMaxSize(fltk::Widget* widget, void* data)
 void ChannelBufferWindow::set_default_values()
 {
 	num_of_frames = 800;
+	mode = 2;
+	hide_other_channels = true;
 }
 
 void ChannelBufferWindow::loadMotions(fltk::Choice* motion, fltk::Choice* character)
@@ -321,7 +339,7 @@ void ChannelBufferWindow::loadMotions(fltk::Choice* motion, fltk::Choice* charac
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	motion->clear();
 	//if(character->get_item()== NULL) return;
-	motion->add("Any Motion");
+	motion->add("------");
 	for (std::map<std::string, SkMotion*>::iterator it = mcu.motion_map.begin(); it != mcu.motion_map.end(); ++it)
 	{
 		motion->add((*it).first.c_str());
@@ -367,18 +385,30 @@ void ChannelBufferWindow::refreshChannelsWidget(ChannelBufferWindow* window)
 {
 	window->channel_list->clear();
 	int num = window->Channel_item_list.size();
+	fltk::Color color;
+	color = 45;
 	for(int i = 0; i < num; ++i)
 	{
 		ChannelItem& item = window->Channel_item_list.get(i);
-		if(!item.channel_filtered && !item.monitored && !item.not_in_search && !item.motion_filtered)
+		if(!item.monitored && !item.not_in_search && !item.motion_filtered)
 		{
-			window->channel_list->add(&(item.label->get(0)));
+			if(!item.channel_filtered)
+			{
+				window->channel_list->add(&(item.label->get(0)));
+			}
+			else if(!window->hide_other_channels)
+			{
+				window->channel_list->add(&(item.label->get(0)));
+				window->channel_list->goto_index(window->channel_list->size()-1)->textcolor(color);
+			}
 		}
 	}
 }
 
 void ChannelBufferWindow::refreshMonitoredChannelsWidget(ChannelBufferWindow* window)
 {
+	fltk::Color color;
+	color = 47;
 	window->channel_monitor->clear();
 	int num = window->Channel_item_list.size();
 	for(int i = 0; i < num; ++i)
@@ -387,6 +417,7 @@ void ChannelBufferWindow::refreshMonitoredChannelsWidget(ChannelBufferWindow* wi
 		if(item.monitored && !item.not_in_search)
 		{
 			window->channel_monitor->add(&(item.label->get(0)));
+			if(item.motion_filtered) window->channel_monitor->goto_index(window->channel_monitor->size()-1)->textcolor(color);
 		}
 	}
 }
@@ -469,21 +500,26 @@ void ChannelBufferWindow::refreshMotionChannels(fltk::Widget* widget, void* data
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	int j = 0;
-	if(strcmp(window->motion->get_item()->label(), "Any Motion") == 0)
+	refreshControllerVisibilities(window);
+	if(strcmp(window->motion->get_item()->label(), "------") == 0)
 	{
 		for(j = 0; j < window->Channel_item_list.size(); ++j)
 		{
 			window->Channel_item_list.get(j).motion_filtered = false;
 		}
+		refreshMaxSize(window, atoi(window->frame_num->value()));
 		refreshChannelsWidget(window);
+		//window->controller->activate();
 		return;
 	}
+
 	SbmCharacter* actor = mcu.character_map.lookup(window->character->get_item()->label());
 	std::map<std::string, SkMotion*>::iterator motionIter = mcu.motion_map.find(window->motion->get_item()->label());
 	if (motionIter != mcu.motion_map.end())
 	{
 		SkMotion* motion = (*motionIter).second;
 		motion->connect(actor->skeleton_p);
+		refreshMaxSize(window, motion->frames());
 		SkChannelArray& channels = motion->channels();
 		for(int i = 0; i < window->Channel_item_list.size(); ++i)
 		{
@@ -500,12 +536,41 @@ void ChannelBufferWindow::refreshMotionChannels(fltk::Widget* widget, void* data
 					&& window->Channel_item_list.get(j).type == type)
 				{
 					window->Channel_item_list.get(j).motion_filtered = false;
+					if(window->Channel_item_list.get(j).monitored) fillSeriesWithMotionData(window, motion, NULL, window->Channel_item_list.get(j));
 					break;
 				}
 			}
 		}
 	}
 	refreshChannelsWidget(window);
+	//window->controller->deactivate();
+	//window->check_hide_other_channels->deactivate();
+}
+
+void ChannelBufferWindow::refreshHideOtherChannels(fltk::Widget* widget, void* data)
+{
+	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
+	window->hide_other_channels = !window->hide_other_channels;
+	refreshChannelsWidget(window);
+}
+
+void ChannelBufferWindow::refreshControllerVisibilities(ChannelBufferWindow* window)
+{
+	if(strcmp(window->motion->get_item()->label(), "------") == 0)
+	{
+		window->controller->activate();
+	}
+	else 
+	{
+		window->controller->deactivate();
+		window->check_hide_other_channels->deactivate();
+		return;
+	}
+	if(strcmp(window->controller->get_item()->label(), "All controllers") == 0)
+	{
+		window->check_hide_other_channels->deactivate();
+	}
+	else window->check_hide_other_channels->activate();
 }
 
 void ChannelBufferWindow::refreshControllerChannels(fltk::Widget* widget, void* data)
@@ -514,16 +579,18 @@ void ChannelBufferWindow::refreshControllerChannels(fltk::Widget* widget, void* 
 	if(window->character->get_item() == NULL) return;
 	fltk::Browser* channels = window->channel_list;
 
+	refreshControllerVisibilities(window);
 	if(strcmp(window->controller->get_item()->label(), "All controllers") == 0)
 	{
 		for(int i = 0; i < window->Channel_item_list.size(); ++i)
 		{
 			window->Channel_item_list.get(i).channel_filtered = false;
 		}
+		//window->check_hide_other_channels->deactivate();
 		refreshChannelsWidget(window);
 		return;
 	}
-
+	//window->check_hide_other_channels->activate();
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SbmCharacter* actor = mcu.character_map.lookup(window->character->get_item()->label());
 	
@@ -552,7 +619,21 @@ void ChannelBufferWindow::refreshControllerChannels(fltk::Widget* widget, void* 
 void ChannelBufferWindow::addMonitoredChannel(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
-	
+	GlChartViewSeries* series = NULL;
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	std::map<std::string, SkMotion*>::iterator motionIter;
+	SkMotion* motion = NULL;
+	if(window->mode == 2)
+	{
+		SbmCharacter* actor = mcu.character_map.lookup(window->character->get_item()->label());
+		motionIter = mcu.motion_map.find(window->motion->get_item()->label());
+		if (motionIter != mcu.motion_map.end())
+		{
+			motion = (*motionIter).second;
+			motion->connect(actor->skeleton_p);
+		}
+	}
+
 	for(int i = 0; i < window->channel_list->size(); ++i)
 	{
 		if(window->channel_list->selected(i))
@@ -565,7 +646,12 @@ void ChannelBufferWindow::addMonitoredChannel(fltk::Widget* widget, void* data)
 					item.monitored = true;
 					const char* label = &(item.label->get(0));
 					window->chartview->get_archive()->NewSeries(label, get_size(label), window->Channel_item_list.get(j).index);
-					window->chartview->get_archive()->GetLastSeries()->SetMaxSize(window->num_of_frames);
+					series = window->chartview->get_archive()->GetLastSeries();
+					series->SetMaxSize(window->num_of_frames);
+					if(window->mode == 2)
+					{
+						fillSeriesWithMotionData(window, motion, series, item);
+					}
 					break;
 				}
 			}
@@ -573,6 +659,45 @@ void ChannelBufferWindow::addMonitoredChannel(fltk::Widget* widget, void* data)
 	}
 	refreshChannelsWidget(window);
 	refreshMonitoredChannelsWidget(window);
+}
+
+void ChannelBufferWindow::fillSeriesWithMotionData(ChannelBufferWindow* window, SkMotion* motion, GlChartViewSeries* series, ChannelItem& item)
+{
+	if(motion == NULL || motion->connected_skeleton() == NULL) return;
+	if(series == NULL)
+	{
+		series = window->chartview->get_archive()->GetSeries(&(item.label->get(0)));
+	}
+	float val[4];
+	int index = 0;
+	SkChannelArray& channels = motion->channels();
+	for(index = 0; index < channels.size(); ++index)
+	{
+		const char* name = channels[index].joint->name().get_string();
+		if(strcmp(name, &(item.name->get(0))) == 0 && item.type == channels[index].type)
+		{
+			break;
+		}
+	}
+	if(index == channels.size()) 
+	{
+		series->clear();
+		return;
+	}
+	for(int k = 0; k < window->num_of_frames; ++k)
+	{
+		motion->apply_frame(k);
+		channels[index].get(val);
+		if(series->data_type == 1)
+		{
+			series->Push(val[0]);
+		}
+		else if(series->data_type == 4)
+		{
+			series->Push(val[0], val[1], val[2], val[3]);
+		}
+		
+	}
 }
 
 void ChannelBufferWindow::removeMonitoredChannel(fltk::Widget* widget, void* data)
@@ -647,6 +772,74 @@ void ChannelBufferWindow::hide_bml_viewer()
 void ChannelBufferWindow::show()
 {    
 	Window::show();   
+}
+
+void ChannelBufferWindow::update()
+{
+	if(!is_freezed)
+	{
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		SbmPawn* pawn_p = NULL;
+		//SbmCharacter* char_p = NULL;
+		SbmCharacter* actor = mcu.character_map.lookup(character->get_item()->label());
+		mcu.pawn_map.reset();
+		while(pawn_p = mcu.pawn_map.next())
+		{
+			const char* name = getSelectedCharacterName();
+			if( name != NULL && strcmp(pawn_p->name, name) == 0) break;
+		}
+		//char_p = mcu.character_map.lookup( pawn_p->name );
+		if(pawn_p != NULL)
+		{
+			if(mode != 2)
+			{
+				SrBuffer<float>& buffer = pawn_p->ct_tree_p->getLastFrame().buffer();
+				chartview->get_archive()->Update(buffer);
+			}
+			if(mode == 1)
+			{
+				int buff_counter = 0;
+				int ct_num = actor->ct_tree_p->count_controllers();
+				for(int i = 0; i < ct_num; ++i)
+				{
+					if(strcmp(actor->ct_tree_p->controller(i)->name(), controller->get_item()->label())== 0)
+					{
+						std::vector<float> buff = actor->ct_tree_p->controller(i)->get_buffer_changes();
+						SkChannelArray& channelsInUse = actor->ct_tree_p->controller(i)->controller_channels();
+						for(int j = 0; j < channelsInUse.size(); ++j)
+						{
+							int index = actor->ct_tree_p->controller(i)->getContextChannel(j);
+							if(Channel_item_list.get(index).monitored)
+							{
+								if(Channel_item_list.get(index).type == SkChannel::Type::XPos
+								|| Channel_item_list.get(index).type == SkChannel::Type::YPos
+								|| Channel_item_list.get(index).type == SkChannel::Type::ZPos)
+								{
+									chartview->get_archive()->GetSeries(&(Channel_item_list.get(index).label->get(0)))->SetLast(buff[buff_counter]);
+								}
+								else if(Channel_item_list.get(index).type == SkChannel::Type::Quat) 
+								{
+									chartview->get_archive()->GetSeries(&(Channel_item_list.get(index).label->get(0)))->SetLast(buff[buff_counter], buff[buff_counter+1], buff[buff_counter+2], buff[buff_counter+3]);
+								}
+							}
+							if(Channel_item_list.get(index).type == SkChannel::Type::XPos
+							|| Channel_item_list.get(index).type == SkChannel::Type::YPos
+							|| Channel_item_list.get(index).type == SkChannel::Type::ZPos)
+							{
+								++buff_counter;
+							}
+							else if(Channel_item_list.get(index).type == SkChannel::Type::Quat) 
+							{	
+								buff_counter+= 4;
+							}
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
+	chartview->render();
 }
 
 

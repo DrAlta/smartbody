@@ -28,6 +28,7 @@
 #include <SR/sr_quat.h>
 #include <SR/sr_mat.h>
 #include <SR/sr_array.h>
+//#include <SR/sr_channel_array.h>
 #include <SR/sr_buffer.h>
 #include <SR/sr_string.h>
 #include "string.h"
@@ -83,6 +84,14 @@ public:
 	void Push(SrVec2& quat);
 	void Push(SrVec& quat);
 	void Push(SrQuat& quat);
+
+	void SetLast(float x);
+	void SetLast(float x, float y, float z);
+	void SetLast(float x, float y, float z, float w);
+
+	void SetLast(SrVec& quat);
+	void SetLast(SrQuat& quat);
+
 	void SetMaxSize(int max_size);
 	void SetBufferIndex(int index);
 	void SetColorOnBufferIndex();
