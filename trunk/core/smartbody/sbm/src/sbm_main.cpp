@@ -848,7 +848,8 @@ mcu.mark( "main", 0, "update_sim" );
 mcu.mark( "main", 0, "update_channel_buffer_viewer");
 		if((ChannelBufferWindow*)mcu.channelbufferviewer_p != NULL)
 		{
-			if(!((ChannelBufferWindow*)mcu.channelbufferviewer_p)->is_freezed)
+			((ChannelBufferWindow*)mcu.channelbufferviewer_p)->update();
+			/*if(!((ChannelBufferWindow*)mcu.channelbufferviewer_p)->is_freezed)
 			{
 				SbmPawn* pawn_p = NULL;
 				SbmCharacter* char_p = NULL;
@@ -861,12 +862,15 @@ mcu.mark( "main", 0, "update_channel_buffer_viewer");
 				//char_p = mcu.character_map.lookup( pawn_p->name );
 				if(pawn_p != NULL)
 				{
-					SrBuffer<float>& buffer = pawn_p->ct_tree_p->getLastFrame().buffer();
-					((ChannelBufferWindow*)mcu.channelbufferviewer_p)->chartview->get_archive()->Update(buffer);
+					if(((ChannelBufferWindow*)mcu.channelbufferviewer_p)->mode != 2)
+					{
+						SrBuffer<float>& buffer = pawn_p->ct_tree_p->getLastFrame().buffer();
+						((ChannelBufferWindow*)mcu.channelbufferviewer_p)->chartview->get_archive()->Update(buffer);
+					}
 					
 				}
 			}
-			((ChannelBufferWindow*)mcu.channelbufferviewer_p)->chartview->render();
+			((ChannelBufferWindow*)mcu.channelbufferviewer_p)->chartview->render();*/
 		}
 		
 
