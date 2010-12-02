@@ -2027,6 +2027,16 @@ void FltkViewer::drawPawns()
 		return;
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	// determine the size of the pawns relative to the size of the characters
+	float pawnSize = 1.0;
+	mcu.character_map.reset();
+	while (SbmCharacter* character = mcu.character_map.next())
+	{
+		pawnSize = character->getHeight() / 8.0f;
+		break;
+	}
+
 	srHashMap<SbmPawn>& pawn_map = mcu.pawn_map;
 	pawn_map.reset();
 	SbmPawn* pawn = pawn_map.next();
@@ -2050,11 +2060,8 @@ void FltkViewer::drawPawns()
 		SrSnSphere sphere;
 		glPushMatrix();
 		sphere.shape().center = SrPnt(0, 0, 0);
-		float size = 1.0f;
-		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
-		if (character)
-			size *= character->getHeight() / 200.0f;
-		sphere.shape().radius = size;
+		sphere.shape().radius = pawnSize;
+		sphere.render_mode(srRenderModeLines);
 		SrGlRenderFuncs::render_sphere(&sphere);
 		glEnd();
 		glPopMatrix();
