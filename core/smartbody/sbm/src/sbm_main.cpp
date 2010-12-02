@@ -61,51 +61,6 @@
 //#include "SBMWindow.h"
 #include "CommandWindow.h"
 
-//#include "tip.h"
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
-#if 0
-#include <me/me_spline_1d.hpp>
-void test_1Dspline( void )	{
-	MeSpline1D S;
-
-//	Knot* make_smooth( domain x, range y, range tan, range l_control, range r_control );
-//	Knot* make_cusp( domain x, range y, range l_tan, range l_control, range r_tan, range r_control );
-//	Knot* make_disjoint( domain x, range y, range left_y, range l_tan, range l_control, range r_tan, range r_control );
-// range eval( domain x )
-
-#if 0
-	S.make_disjoint( 0.0, 0.0,  0.0, 0.0, 0.0, 0.0 );
-	S.make_disjoint( 1.0, 1.0,  0.0, 0.0, 0.0, 0.0 );
-	S.make_disjoint( 1.005, 2.0,  0.0, 0.0, 0.0, 0.0 );
-	S.make_disjoint( 2.0, 4.0,  0.0, 0.0, 0.0, 0.0 );
-#elif 1
-	S.make_cusp( 0.0, 0.0,  0.0, 0.0, 0.0, 0.0 );
-	S.make_cusp( 1.0, 1.0,  0.0, 0.0, 0.0, 0.0 );
-	S.make_cusp( 1.0, 2.0,  0.0, 0.0, 0.0, 0.0 );
-	S.make_cusp( 2.0, 4.0,  0.0, 0.0, 0.0, 0.0 );
-#else
-	S.make_smooth( 0.0, 0.0,  0.0, 0.0, 0.0 );
-	S.make_smooth( 1.0, 1.0,  0.0, 0.0, 0.0 );
-	S.make_smooth( 2.0, 4.0,  0.0, 0.0, 0.0 );
-#endif
-
-//	S.update_all_knots();
-	for( int i=0; i<=100; i++ )	{
-		double n = (double)i/100.0;
-		double x = -1.0 + n * 6.0;
-
-		double y = S.eval( x );
-		LOG( " [%d]: { %.12f, %.12f }\n", i, x, y );
-	}
-
-	LOG( " : { %.12f, %.12f }\n", -0.000001, S.eval( -0.000001 ) );
-	LOG( " : { %.12f, %.12f }\n", 3.9999999, S.eval( 3.9999999 ) );
-	LOG( " : { %.12f, %.12f }\n", 4.0000001, S.eval( 4.0000001 ) );
-}
-#endif
-
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define WIN32_LEAN_AND_MEAN

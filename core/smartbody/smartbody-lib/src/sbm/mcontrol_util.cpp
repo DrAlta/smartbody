@@ -550,15 +550,6 @@ void mcuCBHandle::update( void )	{
 	while( pawn_p = pawn_map.next() )	{
 
 		pawn_p->reset_all_channels();
-
-#if 0
-		// blinking hack...
-		char_p = character_map.lookup( pawn_p->name );
-		if( char_p ) {
-			char_p->eye_blink_update( this->time );
-		}
-#endif
-
 		pawn_p->ct_tree_p->evaluate( time );
 		pawn_p->ct_tree_p->applyBufferToAllSkeletons();
 
@@ -566,12 +557,9 @@ void mcuCBHandle::update( void )	{
 		if( char_p ) {
 
 			char_p->eye_blink_update( this->time );
-
-			//char_p->scheduler_p->apply();  // old controller API  See applyBufferToAllSkeletons() above
 			char_p->scene_p->update();
 			char_p->dMesh_p->update();
 
-			//char_p->scheduler_p->evaluate( time );
 			if (char_p->is_viseme_curve())	{		// For bone bus viseme in Curve Mode
 				char_p->reset_viseme_bonebus(time);	
 			}

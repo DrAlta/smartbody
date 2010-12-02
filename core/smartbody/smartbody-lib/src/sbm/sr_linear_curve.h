@@ -46,7 +46,7 @@ class srLinearCurve	{
 			~Key(void) {}
 
 			void print( int i )	{
-#if 0
+#if 1
 				printf( " key[ %d ]: ( %f, %f )\n", 
 					i, param, value
 				);
@@ -299,4 +299,32 @@ class srLinearCurve	{
 		Key		*curr_p;
 		Key		*tail_p;
 };
+#endif
+
+#if 0
+#include <sbm/sr_linear_curve.h>
+void test_linear_curve( void )	{
+	srLinearCurve curve;
+	int i;
+#if 1
+	curve.insert( 2.0, 10.0 ); curve.print();
+	curve.insert( 3.0, 20.0 ); curve.print();
+	curve.insert( 1.0, 0.9 ); curve.print();
+	curve.insert( 0.1, 0.5 ); curve.print();
+	curve.insert( 2.5, 11.0 ); curve.print();
+#endif
+#if 0
+	for( i=0; i<50; i++ )	{
+		curve.insert( (double)( rand()%100 ), (double)i );
+	}
+#endif
+	curve.print();
+#if 0
+	for( i=0; i<100; i++ )	{
+		double s = (double)i * 0.1;
+		double v = curve.evaluate( s );
+		printf( "%f: %f\n", s, v );
+	}
+#endif
+}
 #endif

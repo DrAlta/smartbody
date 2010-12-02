@@ -31,10 +31,6 @@
 
 class MeCtEyeLidRegulator : public MeController	{ 
 
-	private:
-
-		SkChannelArray		_channels;
-
 	public:
 
 		static const char* type_name;
@@ -75,6 +71,8 @@ class MeCtEyeLidRegulator : public MeController	{
 		float	left_value;
 		float	right_value;
 		
+		SkChannelArray		_channels;
+
 		virtual void context_updated( void );
 		virtual void controller_map_updated();
 		virtual void controller_start();
