@@ -97,6 +97,9 @@ public:
 
 	int mode; //0: character; 1: controller; 2: motion
 
+protected:
+	SrString no_motion;
+
 public:
 	const char* getSelectedCharacterName();
 	void update();
@@ -107,7 +110,7 @@ protected:
 	static void loadCharacters(fltk::Choice* character);
 	static void loadControllers(fltk::Choice* controller, fltk::Choice* character);
 	static void loadChannels(ChannelBufferWindow* window);
-	static void loadMotions(fltk::Choice* motion, fltk::Choice* character);
+	static void loadMotions(ChannelBufferWindow* window);
 
 	static void refreshMotionChannels(fltk::Widget* widget, void* data);
 	static void refreshChannelsWidget(ChannelBufferWindow* window);

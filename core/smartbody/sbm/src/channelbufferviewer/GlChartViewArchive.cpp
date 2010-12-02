@@ -57,7 +57,6 @@ SrVec GlChartViewSeries::GetEulerFromQuaternion(SrQuat& quat)
 	euler.x = atan2(2.0f*(quat.w*quat.x+quat.y*quat.z), 1.0f-2.0f*(quat.x*quat.x+quat.y*quat.y))*180.0f/3.14159265f;
 	euler.y = asin(2.0f*(quat.w*quat.y - quat.z*quat.x))*180.0f/3.14159265f;
 	euler.z = atan2(2.0f*(quat.w*quat.z + quat.x*quat.y), 1.0f-2.0f*(quat.y*quat.y+quat.z*quat.z))*180.0f/3.14159265f;
-	//euler.normalize();
 	return euler;
 }
 
@@ -152,49 +151,6 @@ void GlChartViewSeries::SetColorOnBufferIndex(int index)
 	}
 	
 }
-
-/*void GlChartViewSeries::SetColorOnBufferIndex(int index)
-{
-	srand(index);
-	while(true)
-	{
-		color_x.x = (float)(rand()%512)/512.0f;
-		color_x.y = (float)(rand()%512)/512.0f;
-		color_x.z = (float)(rand()%512)/512.0f;
-		if(color_x.x < 0.4f && color_x.y < 0.4f && color_x.z < 0.4f) continue;
-		break;
-	}
-	while(true)
-	{
-		color_y.x = (float)(rand()%512)/512.0f;
-		color_y.y = (float)(rand()%512)/512.0f;
-		color_y.z = (float)(rand()%512)/512.0f;
-		if(color_y.x < 0.4f && color_y.y < 0.4f && color_y.z < 0.4f) continue;
-		SrVec t = color_x-color_y;
-		if(t.len()<0.3f) continue;
-		break;
-	}
-	while(true)
-	{
-		color_z.x = (float)(rand()%512)/512.0f;
-		color_z.y = (float)(rand()%512)/512.0f;
-		color_z.z = (float)(rand()%512)/512.0f;
-		if(color_z.x < 0.4f && color_z.y < 0.4f && color_z.z < 0.4f) continue;
-		SrVec t = color_z-color_x;
-		if(t.len()<0.3f) continue;
-		break;
-	}
-	while(true)
-	{
-		color_w.x = (float)(rand()%512)/512.0f;
-		color_w.y = (float)(rand()%512)/512.0f;
-		color_w.z = (float)(rand()%512)/512.0f;
-		if(color_w.x < 0.4f && color_w.y < 0.4f && color_w.z < 0.4f) continue;
-		SrVec t = color_y-color_w;
-		if(t.len()<0.3f) continue;
-		break;
-	}
-}*/
 
 void GlChartViewSeries::SetBufferIndex(int index)
 {
@@ -359,7 +315,6 @@ void GlChartViewSeries::SetMaxSize(int max)
 		}
 	}
 
-	//r = current_ind - max;
 	else
 	{
 		for(int i = 0; i < max; ++i)
