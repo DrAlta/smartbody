@@ -694,6 +694,7 @@ void ChannelBufferWindow::fillSeriesWithMotionData(ChannelBufferWindow* window, 
 	SkChannelArray& channels = motion->channels();
 	for(index = 0; index < channels.size(); ++index)
 	{
+		if(channels[index].joint == NULL) continue;
 		const char* name = channels[index].joint->name().get_string();
 		if(strcmp(name, &(item.name->get(0))) == 0 && item.type == channels[index].type)
 		{
@@ -712,6 +713,10 @@ void ChannelBufferWindow::fillSeriesWithMotionData(ChannelBufferWindow* window, 
 		if(series->data_type == 1)
 		{
 			series->Push(val[0]);
+		}
+		else if(series->data_type == 3)
+		{
+			series->Push(val[0], val[1], val[2]);
 		}
 		else if(series->data_type == 4)
 		{
