@@ -34,8 +34,6 @@
 #include <string>
 #include <utility>
 #include "math.h"
-//#include "stdlib.h"
-//#include "fltk/gl.h"
 #include "glfont2.h"
 
 using namespace glfont;
@@ -75,7 +73,6 @@ public:
 	float GetXScale();
 	float GetYScale();
 	
-	//void DrawFonts();
 	void Draw();
 
 	void SetXLabelNum(int num);

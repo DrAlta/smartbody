@@ -53,7 +53,7 @@ ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name)
 		check_hide_other_channels->deactivate();
 
 		motion = new fltk::Choice(60, 100, w/4, 20, "Motion");
-		loadMotions(motion, character);
+		loadMotions(this);
 		motion->callback(refreshMotionChannels, this);
 
 		channel_filter = new fltk::Input(50+w/4+w/16+50, 0, w/4-50, 18, "Channels:");
@@ -322,7 +322,6 @@ void ChannelBufferWindow::refreshMaxSize(fltk::Widget* widget, void* data)
 		window->num_of_frames = atoi(window->frame_num->value());
 		return;
 	}
-	//window->num_of_frames = atoi(window->frame_num->value());
 	refreshMaxSize(window, atoi(window->frame_num->value()));
 }
 
@@ -342,17 +341,17 @@ void ChannelBufferWindow::set_default_values()
 	num_of_frames = 800;
 	mode = 1;
 	hide_other_channels = true;
+	no_motion.set("------");
 }
 
-void ChannelBufferWindow::loadMotions(fltk::Choice* motion, fltk::Choice* character)
+void ChannelBufferWindow::loadMotions(ChannelBufferWindow* window)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	motion->clear();
-	//if(character->get_item()== NULL) return;
-	motion->add("------");
+	window->motion->clear();
+	window->motion->add(&(window->no_motion.get(0)));
 	for (std::map<std::string, SkMotion*>::iterator it = mcu.motion_map.begin(); it != mcu.motion_map.end(); ++it)
 	{
-		motion->add((*it).first.c_str());
+		window->motion->add((*it).first.c_str());
 	}
 }
 
@@ -496,7 +495,7 @@ void ChannelBufferWindow::refreshCharacters(fltk::Widget* widget, void* data)
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	loadCharacters(window->character);
 	loadControllers(window->controller, window->character);
-	loadMotions(window->motion, window->character);
+	loadMotions(window);
 }
 
 void ChannelBufferWindow::refreshControllers(fltk::Widget* widget, void* data)
@@ -519,7 +518,7 @@ void ChannelBufferWindow::refreshMotionChannels(fltk::Widget* widget, void* data
 	int j = 0;
 	refreshControllerVisibilities(window);
 	
-	if(strcmp(window->motion->get_item()->label(), "------") == 0)
+	if(strcmp(window->motion->get_item()->label(), &(window->no_motion.get(0))) == 0)
 	{
 		for(j = 0; j < window->Channel_item_list.size(); ++j)
 		{
@@ -577,7 +576,7 @@ void ChannelBufferWindow::refreshHideOtherChannels(fltk::Widget* widget, void* d
 
 void ChannelBufferWindow::refreshControllerVisibilities(ChannelBufferWindow* window)
 {
-	if(strcmp(window->motion->get_item()->label(), "------") == 0)
+	if(strcmp(window->motion->get_item()->label(), &(window->no_motion.get(0))) == 0)
 	{
 		window->controller->activate();
 	}
@@ -607,11 +606,9 @@ void ChannelBufferWindow::refreshControllerChannels(fltk::Widget* widget, void* 
 		{
 			window->Channel_item_list.get(i).channel_filtered = false;
 		}
-		//window->check_hide_other_channels->deactivate();
 		refreshChannelsWidget(window);
 		return;
 	}
-	//window->check_hide_other_channels->activate();
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SbmCharacter* actor = mcu.character_map.lookup(window->character->get_item()->label());
 	
@@ -806,7 +803,6 @@ void ChannelBufferWindow::update()
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		SbmPawn* pawn_p = NULL;
-		//SbmCharacter* char_p = NULL;
 		SbmCharacter* actor = mcu.character_map.lookup(character->get_item()->label());
 		mcu.pawn_map.reset();
 		while(pawn_p = mcu.pawn_map.next())
@@ -814,7 +810,6 @@ void ChannelBufferWindow::update()
 			const char* name = getSelectedCharacterName();
 			if( name != NULL && strcmp(pawn_p->name, name) == 0) break;
 		}
-		//char_p = mcu.character_map.lookup( pawn_p->name );
 		if(pawn_p != NULL)
 		{
 			if(mode != 2)

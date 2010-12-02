@@ -129,11 +129,9 @@ void GlChartViewCoordinate::Draw()
 	DrawCoordinateLabels();
 
 	glBegin(GL_LINES);
-		//glColor4f(1.0f, 0.0f, 0.0f, 0.3f);
 		glVertex3f(0.0f, 0.0f, 0.0f);
 		glVertex3f(x_length, 0.0f, 0.0f);
 
-		//glColor4f(0.0f, 1.0f, 0.0f, 0.3f);
 		glVertex3f(0.0f, y_length, 0.0f);
 		glVertex3f(0.0f, -y_length, 0.0f);
 
@@ -173,11 +171,10 @@ void GlChartViewCoordinate::DrawCoordinateLabels()
 	}
 	float x_length = GetXScale();
 	float y_length = GetYScale()*y_size;
-	//float x, y;
+
 	char value[10];
 	SrVec size;
 
-	//glEnable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
 
 	glColor4f(0.4f, 0.4f, 0.4f, 0.3f);
