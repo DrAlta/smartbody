@@ -1,5 +1,5 @@
 /*
- *  me_ct_tether.cpp - part of SmartBody-lib
+ *  me_ct_eyelid.cpp - part of SmartBody-lib
  *  Copyright (C) 2008  University of Southern California
  *
  *  SmartBody-lib is free software: you can redistribute it and/or
@@ -92,7 +92,7 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 	
 	double blink_elapsed = t - prev_blink;
 	if( blink_elapsed >= blink_period )	{
-//LOG( "blink @ %f", blink_elapsed );
+LOG( "blink @ %f", blink_elapsed );
 		blink_elapsed = 0.0;
 		prev_blink = t;
 		float r = (float)rand() / (float)RAND_MAX;
@@ -104,9 +104,6 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 
 	int L_eye_quat_idx = _context->channels().search( SkJointName( "eyeball_left" ), SkChannel::Quat );
 	int R_eye_quat_idx =  _context->channels().search( SkJointName( "eyeball_right" ), SkChannel::Quat );
-
-	int L_au_blink_idx =  _context->channels().search( SkJointName( "au_45_left" ), SkChannel::XPos );
-	int R_au_blink_idx =  _context->channels().search( SkJointName( "au_45_right" ), SkChannel::XPos );
 
 	int buff_idx = _context->toBufferIndex( L_eye_quat_idx );
 	euler_t L_eye_e = quat_t(
@@ -123,6 +120,9 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 		fbuffer[ buff_idx + 2 ],
 		fbuffer[ buff_idx + 3 ]
 	);
+
+	int L_au_blink_idx =  _context->channels().search( SkJointName( "au_45_left" ), SkChannel::XPos );
+	int R_au_blink_idx =  _context->channels().search( SkJointName( "au_45_right" ), SkChannel::XPos );
 
 	int L_au_blink_buff_idx = _context->toBufferIndex( L_au_blink_idx );
 	int R_au_blink_buff_idx = _context->toBufferIndex( R_au_blink_idx );

@@ -32,7 +32,6 @@
 #include <vhcl_log.h>
 
 #include <SK/sk_skeleton.h>
-#include <ME/me_ct_adshr_envelope.hpp>
 #include <ME/me_ct_blend.hpp>
 #include <ME/me_ct_time_shift_warp.hpp>
 #include "mcontrol_util.h"
@@ -45,15 +44,7 @@ const bool LOG_PRUNE_CMD_TIME                        = false;
 const bool LOG_CONTROLLER_TREE_PRUNING               = false;
 const bool LOG_PRUNE_TRACK_WITHOUT_BLEND_SPLIE_KNOTS = false;
 
-//const bool ENABLE_EYELID_CORRECTIVE_CT = false;
 const bool ENABLE_EYELID_CORRECTIVE_CT = true;
-
-const float BLINK_SHUTTING_DURATION    = 0.05f;
-const float BLINK_OPENING_DURATION     = 0.2f;
-const float BLINK_MIN_REPEAT_DURATION  = 4.0f;  // how long to wait until the next blink
-const float BLINK_MAX_REPEAT_DURATION  = 8.0f;  // will pick a random number between these min/max
-
-
 
 using namespace std;
 
@@ -80,7 +71,41 @@ const char* SbmCharacter::ORIENTATION_TARGET  = "orientation_target";
 /////////////////////////////////////////////////////////////
 //  Method Definitions
 
+#if 0
+// DEPRECATED
+const float BLINK_SHUTTING_DURATION    = 0.05f;
+const float BLINK_OPENING_DURATION     = 0.2f;
+const float BLINK_MIN_REPEAT_DURATION  = 4.0f;  // how long to wait until the next blink
+const float BLINK_MAX_REPEAT_DURATION  = 8.0f;  // will pick a random number between these min/max
+
+void SbmCharacter::init_face_controllers() {
+	// face_ct is actually initialized in init_skeleton to reduce 
+	// because it's initialization depends on the au_motion_map and viseme_motion_map.
+
+	{	// drive the blink via action units
+		MeCtAdshrEnvelope* adshr_ct = new MeCtAdshrEnvelope();
+		ostringstream adshr_name;
+		adshr_name << name << "'s blink envelope";
+		adshr_ct->name( adshr_name.str().c_str() );
+		adshr_ct->envelope( (float)0.9, BLINK_SHUTTING_DURATION, 0, (float)0.9, 0, BLINK_OPENING_DURATION );  // I miss the Java 'f' syntax
+		SkChannelArray blink_channels;
+		blink_channels.add( "au_45_left", SkChannel::XPos );
+		blink_channels.add( "au_45_right", SkChannel::XPos );
+		adshr_ct->init( blink_channels );
+
+		blink_ct_p = new MeCtPeriodicReplay( adshr_ct );  // TODO: Replace with aperiodic controller, with proper min/max durations
+		blink_ct_p->ref();
+		ostringstream replay_name;
+		replay_name << name << "'s blink replay";
+		blink_ct_p->name( replay_name.str().c_str() );
+		blink_ct_p->init( ( BLINK_MIN_REPEAT_DURATION + BLINK_MAX_REPEAT_DURATION ) /2 );  // duration between blinks
+	}
+}
+#endif
+
+
 MeCtSchedulerClass* CreateSchedulerCt( const char* character_name, const char* sched_type_name ) {
+
 	MeCtSchedulerClass* sched_p = new MeCtSchedulerClass();
 	sched_p->active_when_empty( true );
 	string sched_name( character_name );
@@ -88,7 +113,6 @@ MeCtSchedulerClass* CreateSchedulerCt( const char* character_name, const char* s
 	sched_name += sched_type_name;
 	sched_name += " schedule";
 	sched_p->name( sched_name.c_str() );
-
 	return sched_p;
 }
 
@@ -102,7 +126,6 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	gaze_sched_p( CreateSchedulerCt( character_name, "gaze" ) ),
 	locomotion_ct_analysis( NULL ),
 	locomotion_ct( NULL ),
-	blink_ct_p( NULL ),
 	eyelid_reg_ct_p( NULL ),
 	head_sched_p( CreateSchedulerCt( character_name, "head" ) ),
 	param_sched_p( CreateSchedulerCt( character_name, "param" ) ),
@@ -122,10 +145,6 @@ SbmCharacter::SbmCharacter( const char* character_name )
 
 	bonebusCharacter = NULL;
 
-	eye_blink_closed = false;
-	eye_blink_last_time = 0;
-	eye_blink_repeat_time = 0;
-
 	time_delay = 0.0;
 }
 
@@ -136,8 +155,6 @@ SbmCharacter::~SbmCharacter( void )	{
 	motion_sched_p->unref();
 	gaze_sched_p->unref();
 
-	if( blink_ct_p )
-		blink_ct_p->unref();
 	if( eyelid_reg_ct_p )
 		eyelid_reg_ct_p->unref();
 
@@ -313,16 +330,12 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	float height = new_skeleton_p->getCurrentHeight();
 	setHeight(height);
 
-#if ENABLE_NEW_EYELID_REGULATOR
 	eyelid_reg_ct_p = new MeCtEyeLidRegulator();
 	eyelid_reg_ct_p->ref();
 	eyelid_reg_ct_p->init();
 	ostringstream ct_name;
 	ct_name << name << "'s eyelid controller";
 	eyelid_reg_ct_p->name( ct_name.str().c_str() );
-#else
-	init_face_controllers();  // Should I pass in the viseme_motion_map and au_motion_map here so face_ct can be initialized in here?
-#endif
 
 	//if (use_locomotion) 
 	{
@@ -339,7 +352,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	this->au_motion_map     = NULL;
 	if( face_neutral ) {
 		face_neutral->unref();
-		this->face_neutral      = NULL;
+		this->face_neutral      = NULL; // MLT: What is the purpose of this?
 	}
 
 	posture_sched_p->init();
@@ -362,15 +375,10 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		ct_tree_p->add_controller( locomotion_ct );
 	ct_tree_p->add_controller( gaze_sched_p );
 
-#if ENABLE_NEW_EYELID_REGULATOR
 	ct_tree_p->add_controller( eyelid_reg_ct_p );
-#else
-	ct_tree_p->add_controller( blink_ct_p );
-#endif
-	
 	ct_tree_p->add_controller( head_sched_p );
 	ct_tree_p->add_controller( param_sched_p );
-	
+
 		
 	// Face controller and softeyes control
 	if( face_neutral ) {
@@ -527,11 +535,8 @@ int SbmCharacter::init_skeleton() {
 	}
 	const int wo_index = wo_joint_p->index();  // World offest joint index
 	
-
 	// Add channels for locomotion control...
-	
 	{
-		
 		const float max_speed = 1000000;   // TODO: set max speed value to some reasonable value for the current scale
 
 		// 3D vector for current speed and trajectory of the body
@@ -712,30 +717,6 @@ int SbmCharacter::init_skeleton() {
 	return CMD_SUCCESS;
 }
 
-void SbmCharacter::init_face_controllers() {
-	// face_ct is actually initialized in init_skeleton to reduce 
-	// because it's initialization depends on the au_motion_map and viseme_motion_map.
-
-	{	// drive the blink via action units
-		MeCtAdshrEnvelope* adshr_ct = new MeCtAdshrEnvelope();
-		ostringstream adshr_name;
-		adshr_name << name << "'s blink envelope";
-		adshr_ct->name( adshr_name.str().c_str() );
-		adshr_ct->envelope( (float)0.9, BLINK_SHUTTING_DURATION, 0, (float)0.9, 0, BLINK_OPENING_DURATION );  // I miss the Java 'f' syntax
-		SkChannelArray blink_channels;
-		blink_channels.add( "au_45_left", SkChannel::XPos );
-		blink_channels.add( "au_45_right", SkChannel::XPos );
-		adshr_ct->init( blink_channels );
-
-		blink_ct_p = new MeCtPeriodicReplay( adshr_ct );  // TODO: Replace with aperiodic controller, with proper min/max durations
-		blink_ct_p->ref();
-		ostringstream replay_name;
-		replay_name << name << "'s blink replay";
-		blink_ct_p->name( replay_name.str().c_str() );
-		blink_ct_p->init( ( BLINK_MIN_REPEAT_DURATION + BLINK_MAX_REPEAT_DURATION ) /2 );  // duration between blinks
-	}
-}
-
 bool test_ct_for_pruning( MeCtScheduler2::TrackPtr track ) {
 	bool prune_ok = true;
 
@@ -772,14 +753,11 @@ void prune_schedule( SbmCharacter*   actor,
 	typedef MeCtScheduler2::TrackPtr   TrackPtr;
 	typedef MeCtScheduler2::VecOfTrack VecOfTrack;
 
-	
-
 	VecOfTrack tracks = sched->tracks();  // copy of tracks
 	VecOfTrack tracks_to_remove;  // don't remove during iteration
 
 	VecOfTrack::iterator first = tracks.begin();
 	VecOfTrack::iterator it    = tracks.end();
-
 
 	while( it != first ) {
 		// Decrement track iterator (remember, we started at end)
@@ -1111,7 +1089,6 @@ int SbmCharacter::set_speech_impl_backup( SmartBody::SpeechInterface *speech_imp
 	return CMD_SUCCESS;
 }
 
-
 //returns speech implementation if set or NULL if not
 SmartBody::SpeechInterface* SbmCharacter::get_speech_impl() const {
 	return speech_impl;
@@ -1283,9 +1260,8 @@ int SbmCharacter::set_viseme( char* viseme,
 void SbmCharacter::eye_blink_update( const double frame_time )
 {
    // automatic blinking routine using bonebus viseme commands
-   mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-#if ENABLE_NEW_EYELID_REGULATOR
 	if( eyelid_reg_ct_p )	{
 
 		bool left_changed;
@@ -1310,58 +1286,6 @@ void SbmCharacter::eye_blink_update( const double frame_time )
 			}		
 		}
 	}
-#else
-   if ( !eye_blink_closed )
-   {
-      if ( frame_time - eye_blink_last_time > eye_blink_repeat_time )
-      {
-         // close the eyes
-         if ( bonebusCharacter )
-         {
-//            bonebusCharacter->SetViseme( "blink", 0.9f, BLINK_SHUTTING_DURATION );
-            bonebusCharacter->SetViseme( "blink_rt", 0.9f, BLINK_SHUTTING_DURATION );
-            bonebusCharacter->SetViseme( "blink_lf", 0.9f, BLINK_SHUTTING_DURATION );
-         }
-
-         if ( mcu.sbm_character_listener )
-         {
-//            mcu.sbm_character_listener->OnViseme( name, string( "blink" ), 0.9f, BLINK_SHUTTING_DURATION );
-            mcu.sbm_character_listener->OnViseme( name, string( "blink_rt" ), 0.9f, BLINK_SHUTTING_DURATION );
-            mcu.sbm_character_listener->OnViseme( name, string( "blink_lf" ), 0.9f, BLINK_SHUTTING_DURATION );
-         }
-
-         eye_blink_last_time = frame_time;
-         eye_blink_closed = true;
-      }
-   }
-   else
-   {
-      if ( frame_time - eye_blink_last_time > BLINK_SHUTTING_DURATION )
-      {
-         // open the eyes
-         if ( bonebusCharacter )
-         {
-//            bonebusCharacter->SetViseme( "blink", 0, BLINK_OPENING_DURATION );
-            bonebusCharacter->SetViseme( "blink_rt", 0, BLINK_OPENING_DURATION );
-            bonebusCharacter->SetViseme( "blink_lf", 0, BLINK_OPENING_DURATION );
-         }
-
-         if ( mcu.sbm_character_listener )
-         {
-//            mcu.sbm_character_listener->OnViseme( name, "blink", 0, BLINK_OPENING_DURATION );
-            mcu.sbm_character_listener->OnViseme( name, "blink_rt", 0, BLINK_OPENING_DURATION );
-            mcu.sbm_character_listener->OnViseme( name, "blink_lf", 0, BLINK_OPENING_DURATION );
-         }
-
-         eye_blink_last_time = frame_time;
-         eye_blink_closed = false;
-
-         // compute when to close them again
-         double fraction = (double)rand() / (double)RAND_MAX;
-         eye_blink_repeat_time = ( fraction * ( BLINK_MAX_REPEAT_DURATION - BLINK_MIN_REPEAT_DURATION ) ) + BLINK_MIN_REPEAT_DURATION;
-      }
-   }
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1536,7 +1460,6 @@ int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 //		out << "char " << name << " prune";
 //		mcu_p->execute_later( out.str().c_str(), max_blend_dur );
 //	}
-
 
 	return CMD_SUCCESS;
 }

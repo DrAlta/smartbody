@@ -27,10 +27,6 @@
 #ifndef SBM_CHARACTER_HPP
 #define SBM_CHARACTER_HPP
 
-
-#define ENABLE_NEW_EYELID_REGULATOR ( 0 )
-
-
 #include <float.h>
 #include <iostream>
 #include <string>
@@ -46,7 +42,6 @@
 #include <sbm/sr_linear_curve.h>
 
 #include <ME/me_ct_scheduler2.h>
-#include <ME/me_ct_periodic_replay.hpp>
 #include <sbm/me_ct_face.h>
 #include <sbm/me_ct_eyelid.h>
 #include <sbm/me_ct_gaze.h>
@@ -67,13 +62,10 @@
 
 #include "sbm_pawn.hpp"
 
-
 #include <sbm/action_unit.hpp>
 #include <sbm/viseme_map.hpp>
 #include <sbm/general_param_setting.h>
 #include <me/me_spline_1d.hpp>
-
-
 
 class SbmCharacter : public SbmPawn	{
 public:
@@ -115,15 +107,15 @@ protected:
 	SmartBody::SpeechInterface* speech_impl_backup;
 	std::string		           voice_code_backup;
 
-
 	// Evaluation time face data
 	SkMotion*         face_neutral;
 	AUChannelMap      au_channel_map;
 	VisemeMotionMap   viseme_map;
 	MeCtLocomotionAnalysis* locomotion_ct_analysis;
 	
-	MeCtFace*         face_ct;
-	MeCtEyeLid*       eyelid_ct;
+	MeCtEyeLidRegulator*	eyelid_reg_ct_p;
+	MeCtFace*				face_ct;
+	MeCtEyeLid*				eyelid_ct;
 
 	// The term "viseme" in the following variables is a misnomer,
 	// and may also refer to an action unit or other face shape.
@@ -211,8 +203,7 @@ public:
 	MeCtSchedulerClass*	motion_sched_p;  // full body motions
 	MeCtSchedulerClass*	gaze_sched_p;    // back / chest / spine
 
-	MeCtPeriodicReplay* blink_ct_p;      // TODO replace with aperiodic controller
-	MeCtEyeLidRegulator* eyelid_reg_ct_p;
+//	MeCtPeriodicReplay* blink_ct_p; 
 	// TODO: Arms
 	// TODO: Hands
 	MeCtSchedulerClass*	head_sched_p; // neck / head orientation
@@ -222,10 +213,6 @@ public:
 	
 	int set_viseme( char* viseme, float weight , double start_time, float rampin_duration, float* curve_info, int numKeys );
 	void reset_viseme_bonebus(double curTime);
-
-	bool   eye_blink_closed;
-	double eye_blink_last_time;
-	double eye_blink_repeat_time;
 
 	void eye_blink_update( const double frame_time );
 
@@ -322,11 +309,14 @@ protected:
 	 */
 	virtual int init_skeleton();
 
+#if 0
+// DEPRECATED
 	/*!
 	 *  Initialize the controllers that drive the viseme, AU, and face bones
 	 *  Only called when the neutral face pose is defined (used by MeCtFace).
 	 */
 	virtual void init_face_controllers();
+#endif
 
 //	int set_world_offset_cmd( srArgBuffer& args ); // NOT DEFINED
 
