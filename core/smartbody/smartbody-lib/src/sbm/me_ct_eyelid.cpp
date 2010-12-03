@@ -50,6 +50,8 @@ void MeCtEyeLidRegulator::init( void )	{
 	curve.insert( 0.05, 1.0 );
 	curve.insert( 0.2, 0.33 );
 	curve.insert( 0.25, 0.0 );
+//	curve.insert( 0.25, 0.3 );
+//	curve.insert( 2.25, 0.0 );
 	
 	new_blink = false;
 	
@@ -92,7 +94,7 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 	
 	double blink_elapsed = t - prev_blink;
 	if( blink_elapsed >= blink_period )	{
-LOG( "blink @ %f", blink_elapsed );
+//LOG( "blink @ %f", blink_elapsed );
 		blink_elapsed = 0.0;
 		prev_blink = t;
 		float r = (float)rand() / (float)RAND_MAX;
@@ -135,10 +137,10 @@ LOG( "blink @ %f", blink_elapsed );
 	left_value = blink_val;
 	right_value = blink_val;
 
-
-
-	fbuffer[ L_au_blink_buff_idx ] = left_value;
-	fbuffer[ R_au_blink_buff_idx ] = right_value;
+	if (L_au_blink_buff_idx >= 0)
+		fbuffer[ L_au_blink_buff_idx ] = left_value;
+	if (R_au_blink_buff_idx >= 0)
+		fbuffer[ R_au_blink_buff_idx ] = right_value;
 
 //	if( left_value != prev_left_value ) LOG( "MeCtEyeLidRegulator: t:%f v:%f", blink_elapsed, blink_val );
 //	if( blink_val > 0.0 ) LOG( "MeCtEyeLidRegulator: t:%f v:%f", blink_elapsed, blink_val );
