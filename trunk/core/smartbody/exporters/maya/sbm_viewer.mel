@@ -559,7 +559,7 @@ global proc viewerRunButton()
 			{
 				system("echo 0.1 path ME " + "\"" + $skeletonDir + "\""  + " >> " + $seqFile);
 				system("echo 3.1 char " + $character + " init " + $skeletonName + " >> " + $seqFile);
-				system("echo 3.1 set character " +  $character + " world_offset x 0 y 102 h 0" + " >> " + $seqFile);				
+				system("echo 3.1 set character " +  $character + " world_offset x 0 y 0 h 0" + " >> " + $seqFile);				
 			}
 			else
 			{
