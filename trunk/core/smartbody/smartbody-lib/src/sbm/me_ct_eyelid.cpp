@@ -28,6 +28,100 @@
 
 const char* MeCtEyeLidRegulator::type_name = "EyeLidRegulator";
 
+//////////////////////////////////////////////////////////////////////////////////
+
+void MeCtEyeLidRegulator::LidSet::set_angle_range( float fr, float to )	{
+		
+	base_angle = fr;
+	full_angle = to;
+	diff = full_angle - base_angle;
+	inv_diff = 1.0f / diff;
+	set_tightener( tight );
+}
+
+void MeCtEyeLidRegulator::LidSet::set_tightener( float tighten )	{
+	
+	tight = tighten;
+	if( tight > 1.0f ) tight = 1.0f;
+	if( tight < 0.0f ) tight = 0.0f;
+	open_angle = base_angle * ( 1.0f - tight );
+	tight_sweep = open_angle - base_angle;
+	close_sweep = full_angle - open_angle;
+}
+
+void MeCtEyeLidRegulator::LidSet::print( void )	{
+
+	printf( "base_angle: %f\n", base_angle );
+	printf( "full_angle: %f\n", full_angle );
+	printf( "diff      : %f\n", diff );
+	printf( "tight     : %f\n", tight );
+	printf( "open_angle: %f\n", open_angle );
+	printf( "tight_sweep: %f\n", tight_sweep );
+	printf( "close_sweep: %f\n", close_sweep );
+}
+
+float MeCtEyeLidRegulator::LidSet::get_mapped_weight( float in_weight )	{
+
+	float weight = ( tight_sweep + in_weight * close_sweep ) * inv_diff;
+	if( weight < 0.0f ) return( 0.0f );
+	if( weight > 1.0f ) return( 1.0f );
+	return( weight );
+}
+
+void MeCtEyeLidRegulator::test( void )	{
+
+	LidSet lid;
+	lid.set_angle_range( -30.0f, 30.0f );
+
+	printf( "LidSet TEST:\n" );
+	lid.print();
+
+	int i;
+	for( i=0; i<=10; i++ )	{
+		float f = (float)i/10.0f;
+		float w = lid.get_mapped_weight( f );
+		printf( "[%d] f:%f w:%f\n", i, f, w );
+	}
+
+	lid.set_tightener( 0.5 );
+	for( i=0; i<=10; i++ )	{
+		float f = (float)i/10.0f;
+		float w = lid.get_mapped_weight( f );
+		printf( "[%d] f:%f w:%f\n", i, f, w );
+	}
+
+	lid.set_tightener( 1.0 );
+	for( i=0; i<=10; i++ )	{
+		float f = (float)i/10.0f;
+		float w = lid.get_mapped_weight( f );
+		printf( "[%d] f:%f w:%f\n", i, f, w );
+	}
+
+	lid.set_angle_range( -50.0f, 0.0f );
+	lid.set_tightener( 0.0 );
+	for( i=0; i<=10; i++ )	{
+		float f = (float)i/10.0f;
+		float w = lid.get_mapped_weight( f );
+		printf( "[%d] f:%f w:%f\n", i, f, w );
+	}
+
+	lid.set_tightener( 0.5 );
+	for( i=0; i<=10; i++ )	{
+		float f = (float)i/10.0f;
+		float w = lid.get_mapped_weight( f );
+		printf( "[%d] f:%f w:%f\n", i, f, w );
+	}
+
+	lid.set_tightener( 1.0 );
+	for( i=0; i<=10; i++ )	{
+		float f = (float)i/10.0f;
+		float w = lid.get_mapped_weight( f );
+		printf( "[%d] f:%f w:%f\n", i, f, w );
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+
 MeCtEyeLidRegulator::MeCtEyeLidRegulator( void )	{
 
 }
@@ -45,6 +139,9 @@ void MeCtEyeLidRegulator::init( void )	{
 	_channels.add( "au_45_right", SkChannel::XPos );
 	
 	MeController::init();
+	
+	set_upper_angle_range( -30.0f, 20.0f );
+	set_lower_angle_range( 20.0f, 20.0f ); // non existent...
 	
 	curve.insert( 0.0, 0.0 );
 	curve.insert( 0.05, 1.0 );
@@ -66,10 +163,17 @@ void MeCtEyeLidRegulator::init( void )	{
 	blink_period = blink_period_min;
 	prev_blink = 0.0;
 	
-	prev_left_value = 0.0f;
-	prev_right_value = 0.0f;
-	left_value = 0.0f;
-	right_value = 0.0f;
+	prev_UL_value = 0.0f;
+	prev_LL_value = 0.0f;
+	prev_UR_value = 0.0f;
+	prev_LR_value = 0.0f;
+	
+	UL_value = 0.0f;
+	LL_value = 0.0f;
+	UR_value = 0.0f;
+	LR_value = 0.0f;
+	
+//	test();
 }
 
 void MeCtEyeLidRegulator::context_updated( void ) {
@@ -123,27 +227,36 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 		fbuffer[ buff_idx + 3 ]
 	);
 
+	float blink_val = (float)( curve.evaluate( blink_elapsed ) );
+	
+	prev_UL_value = UL_value; // for change detection
+	prev_LL_value = LL_value;
+	prev_UR_value = UR_value;
+	prev_LR_value = LR_value;
+
+	UL_value = UL_set.get_mapped_weight( blink_val );
+//	LL_value = LL_set.get_mapped_weight( blink_val );
+	UR_value = UR_set.get_mapped_weight( blink_val );
+//	LR_value = LR_set.get_mapped_weight( blink_val );
+
+
 	int L_au_blink_idx =  _context->channels().search( SkJointName( "au_45_left" ), SkChannel::XPos );
 	int R_au_blink_idx =  _context->channels().search( SkJointName( "au_45_right" ), SkChannel::XPos );
 
 	int L_au_blink_buff_idx = _context->toBufferIndex( L_au_blink_idx );
 	int R_au_blink_buff_idx = _context->toBufferIndex( R_au_blink_idx );
 
-	float blink_val = (float)( curve.evaluate( blink_elapsed ) );
+	fbuffer[ L_au_blink_buff_idx ] = UL_value;
+//	fbuffer[ LL_au_blink_buff_idx ] = LL_value;
 
-	prev_left_value = left_value; // for change detection
-	prev_right_value = right_value;
+	fbuffer[ R_au_blink_buff_idx ] = UR_value;
+//	fbuffer[ LR_au_blink_buff_idx ] = LR_value;
 
-	left_value = blink_val;
-	right_value = blink_val;
+	if( L_au_blink_buff_idx >= 0 )
+		fbuffer[ L_au_blink_buff_idx ] = UL_value;
+	if( R_au_blink_buff_idx >= 0 )
+		fbuffer[ R_au_blink_buff_idx ] = UR_value;
 
-	if (L_au_blink_buff_idx >= 0)
-		fbuffer[ L_au_blink_buff_idx ] = left_value;
-	if (R_au_blink_buff_idx >= 0)
-		fbuffer[ R_au_blink_buff_idx ] = right_value;
-
-//	if( left_value != prev_left_value ) LOG( "MeCtEyeLidRegulator: t:%f v:%f", blink_elapsed, blink_val );
-//	if( blink_val > 0.0 ) LOG( "MeCtEyeLidRegulator: t:%f v:%f", blink_elapsed, blink_val );
 	return( true );
 }
 

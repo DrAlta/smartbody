@@ -31,7 +31,49 @@
 
 class MeCtEyeLidRegulator : public MeController	{ 
 
+	class LidSet	{
+	
+		public:
+		
+			LidSet( void ) {
+
+				base_angle = 0.0f;
+				full_angle = 0.0f;
+				diff = 0.0f;
+				inv_diff = 0.0f;
+				tight = 0.0f;
+				open_angle = 0.0f;
+				tight_sweep = 0.0f;
+				close_sweep = 0.0f;
+			}
+			~LidSet( void ) {}
+
+			void print( void );
+
+			void set_angle_range( float fr, float to );
+			void set_tightener( float tighten );
+
+			// convert normalized blinking weight (0..1) to output weight with tigthener
+			float get_mapped_weight( float in_weight );
+
+		private:
+
+			float base_angle;
+			float full_angle;
+
+			float diff;
+			float inv_diff;
+
+			float tight;	// Modifier: 0.0: wide; 0.5: neutral; 0.9: squinting
+			float open_angle;
+
+			float tight_sweep;
+			float close_sweep;
+	};
+
 	public:
+	
+		void test( void );
 
 		static const char* type_name;
 
@@ -40,23 +82,45 @@ class MeCtEyeLidRegulator : public MeController	{
 		
 		void init( void );
 
-		void blink_now( void ) { new_blink = true; }
-
-		float get_left( bool *changed_p = NULL ) { 
-			if( changed_p ) {
-				*changed_p = ( left_value != prev_left_value );
-			}
-			return( left_value ); 
+		void set_upper_angle_range( float fr, float to )	{
+			UL_set.set_angle_range( fr, to );
+			UR_set.set_angle_range( fr, to );
 		}
 		
-		float get_right( bool *changed_p = NULL ) { 
+		void set_lower_angle_range( float fr, float to )	{
+			LL_set.set_angle_range( fr, to );
+			LR_set.set_angle_range( fr, to );
+		}
+
+		void set_tightener( float tighten )	{
+			UL_set.set_tightener( tighten );
+			LL_set.set_tightener( tighten );
+			UR_set.set_tightener( tighten );
+			LR_set.set_tightener( tighten );
+		}
+
+		void blink_now( void ) { new_blink = true; }
+
+		float get_upper_left( bool *changed_p = NULL ) { 
 			if( changed_p ) {
-				*changed_p = ( right_value != prev_right_value );
+				*changed_p = ( UL_value != prev_UL_value );
 			}
-			return( right_value ); 
+			return( UL_value ); 
+		}
+		
+		float get_upper_right( bool *changed_p = NULL ) { 
+			if( changed_p ) {
+				*changed_p = ( UR_value != prev_UR_value );
+			}
+			return( UR_value ); 
 		}
 
 	private:
+		LidSet	UL_set;
+		LidSet	LL_set;
+		LidSet	UR_set;
+		LidSet	LR_set;
+		
 		srLinearCurve	curve;
 		
 		bool	new_blink;
@@ -66,10 +130,15 @@ class MeCtEyeLidRegulator : public MeController	{
 		double	blink_period;
 		double	prev_blink; // time at last blink
 
-		float	prev_left_value;
-		float	prev_right_value;
-		float	left_value;
-		float	right_value;
+		float	prev_UL_value;
+		float	prev_LL_value;
+		float	prev_UR_value;
+		float	prev_LR_value;
+		
+		float	UL_value;
+		float	LL_value;
+		float	UR_value;
+		float	LR_value;
 		
 		SkChannelArray		_channels;
 
