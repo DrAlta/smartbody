@@ -30,37 +30,62 @@ const char* MeCtEyeLidRegulator::type_name = "EyeLidRegulator";
 
 //////////////////////////////////////////////////////////////////////////////////
 
-void MeCtEyeLidRegulator::LidSet::set_angle_range( float fr, float to )	{
-		
-	base_angle = fr;
-	full_angle = to;
-	diff = full_angle - base_angle;
-	inv_diff = 1.0f / diff;
-	set_tightener( tight );
-}
-
-void MeCtEyeLidRegulator::LidSet::set_tightener( float tighten )	{
-	
-	tight = tighten;
-	if( tight > 1.0f ) tight = 1.0f;
-	if( tight < 0.0f ) tight = 0.0f;
-	open_angle = base_angle * ( 1.0f - tight );
-	tight_sweep = open_angle - base_angle;
-	close_sweep = full_angle - open_angle;
-}
-
 void MeCtEyeLidRegulator::LidSet::print( void )	{
 
-	printf( "base_angle: %f\n", base_angle );
-	printf( "full_angle: %f\n", full_angle );
-	printf( "diff      : %f\n", diff );
-	printf( "tight     : %f\n", tight );
-	printf( "open_angle: %f\n", open_angle );
+	printf( "dirty      : %d\n", dirty_bit );
+	printf( "base_angle : %f\n", base_angle );
+	printf( "full_angle : %f\n", full_angle );
+	printf( "blink_angle: %f\n", blink_angle );
+	printf( "diff       : %f\n", diff );
+	printf( "lid_tight  : %f\n", lid_tight );
+	printf( "open_angle : %f\n", open_angle );
 	printf( "tight_sweep: %f\n", tight_sweep );
 	printf( "close_sweep: %f\n", close_sweep );
 }
 
+void MeCtEyeLidRegulator::LidSet::set_range( float fr, float to )	{
+		
+	base_angle = fr;
+	full_angle = to;
+	diff = full_angle - base_angle;
+	if( fabs( diff ) > 0.0f )	{
+		inv_diff = 1.0f / diff;
+	}
+	else	{
+		inv_diff = 0.0f;
+	}
+	dirty_bit = true;
+}
+
+void MeCtEyeLidRegulator::LidSet::set_blink( float angle )	{
+		
+	blink_angle = angle;
+	dirty_bit = true;
+}
+
+void MeCtEyeLidRegulator::LidSet::set_tighten( float tighten )	{
+	
+	lid_tight = tighten;
+	if( lid_tight > 1.0f ) lid_tight = 1.0f;
+	if( lid_tight < 0.0f ) lid_tight = 0.0f;
+	dirty_bit = true;
+}
+
+void MeCtEyeLidRegulator::LidSet::set_pitch( float pitch )	{
+
+	eye_pitch = pitch;
+	dirty_bit = true;
+}
+
 float MeCtEyeLidRegulator::LidSet::get_mapped_weight( float in_weight )	{
+
+	if( dirty_bit ) {
+
+		open_angle = base_angle * ( 1.0f - lid_tight ) + eye_pitch;
+		tight_sweep = open_angle - base_angle;
+		close_sweep = blink_angle - open_angle;
+		dirty_bit = false;
+	}
 
 	float weight = ( tight_sweep + in_weight * close_sweep ) * inv_diff;
 	if( weight < 0.0f ) return( 0.0f );
@@ -71,9 +96,14 @@ float MeCtEyeLidRegulator::LidSet::get_mapped_weight( float in_weight )	{
 void MeCtEyeLidRegulator::test( void )	{
 
 	LidSet lid;
-	lid.set_angle_range( -30.0f, 30.0f );
 
 	printf( "LidSet TEST:\n" );
+
+//	lid.set_range( -30.0f, 30.0f );
+//	lid.set_blink( 30.0f );
+	lid.set_range( 30.0f, 0.0f );
+	lid.set_blink( 0.0f );
+	lid.set_pitch( -15.0f );
 	lid.print();
 
 	int i;
@@ -83,36 +113,39 @@ void MeCtEyeLidRegulator::test( void )	{
 		printf( "[%d] f:%f w:%f\n", i, f, w );
 	}
 
-	lid.set_tightener( 0.5 );
+	lid.set_tighten( 0.5 );
 	for( i=0; i<=10; i++ )	{
 		float f = (float)i/10.0f;
 		float w = lid.get_mapped_weight( f );
 		printf( "[%d] f:%f w:%f\n", i, f, w );
 	}
 
-	lid.set_tightener( 1.0 );
+	lid.set_tighten( 1.0 );
 	for( i=0; i<=10; i++ )	{
 		float f = (float)i/10.0f;
 		float w = lid.get_mapped_weight( f );
 		printf( "[%d] f:%f w:%f\n", i, f, w );
 	}
 
-	lid.set_angle_range( -50.0f, 0.0f );
-	lid.set_tightener( 0.0 );
+//	lid.set_range( -50.0f, 0.0f );
+	lid.set_blink( 0.0f );
+	lid.set_tighten( 0.0f );
+	lid.print();
+
 	for( i=0; i<=10; i++ )	{
 		float f = (float)i/10.0f;
 		float w = lid.get_mapped_weight( f );
 		printf( "[%d] f:%f w:%f\n", i, f, w );
 	}
 
-	lid.set_tightener( 0.5 );
+	lid.set_tighten( 0.5 );
 	for( i=0; i<=10; i++ )	{
 		float f = (float)i/10.0f;
 		float w = lid.get_mapped_weight( f );
 		printf( "[%d] f:%f w:%f\n", i, f, w );
 	}
 
-	lid.set_tightener( 1.0 );
+	lid.set_tighten( 1.0 );
 	for( i=0; i<=10; i++ )	{
 		float f = (float)i/10.0f;
 		float w = lid.get_mapped_weight( f );
@@ -130,7 +163,7 @@ MeCtEyeLidRegulator::~MeCtEyeLidRegulator( void )	{
 
 }
 
-void MeCtEyeLidRegulator::init( void )	{
+void MeCtEyeLidRegulator::init( bool tracking_pitch )	{
 
 	_channels.add( "eyeball_left", SkChannel::Quat );
 	_channels.add( "eyeball_right", SkChannel::Quat );
@@ -140,25 +173,19 @@ void MeCtEyeLidRegulator::init( void )	{
 	
 	MeController::init();
 	
-	set_upper_angle_range( -30.0f, 20.0f );
-	set_lower_angle_range( 20.0f, 20.0f ); // non existent...
+	set_upper_range( -30.0f, 20.0f );
+	set_lower_range( 20.0f, 20.0f ); // non existent...
 	
 	curve.insert( 0.0, 0.0 );
 	curve.insert( 0.05, 1.0 );
 	curve.insert( 0.2, 0.33 );
 	curve.insert( 0.25, 0.0 );
-//	curve.insert( 0.25, 0.3 );
-//	curve.insert( 2.25, 0.0 );
 	
+	pitch_tracking = tracking_pitch;
 	new_blink = false;
 	
-#if 1
 	blink_period_min = 4.0;
 	blink_period_max = 8.0;
-#else
-	blink_period_min = 14.0;
-	blink_period_max = 18.0;
-#endif
 	
 	blink_period = blink_period_min;
 	prev_blink = 0.0;
@@ -173,7 +200,7 @@ void MeCtEyeLidRegulator::init( void )	{
 	UR_value = 0.0f;
 	LR_value = 0.0f;
 	
-//	test();
+//						test();
 }
 
 void MeCtEyeLidRegulator::context_updated( void ) {
@@ -208,54 +235,75 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 	float *fbuffer = &( frame.buffer()[0] );
 	int n_chan = _channels.size();
 
-	int L_eye_quat_idx = _context->channels().search( SkJointName( "eyeball_left" ), SkChannel::Quat );
-	int R_eye_quat_idx =  _context->channels().search( SkJointName( "eyeball_right" ), SkChannel::Quat );
+	if( pitch_tracking )	{
+		int L_eye_quat_idx = _context->channels().search( SkJointName( "eyeball_left" ), SkChannel::Quat );
+		int R_eye_quat_idx =  _context->channels().search( SkJointName( "eyeball_right" ), SkChannel::Quat );
 
-	int buff_idx = _context->toBufferIndex( L_eye_quat_idx );
-	euler_t L_eye_e = quat_t(
-		fbuffer[ buff_idx ],
-		fbuffer[ buff_idx + 1 ],
-		fbuffer[ buff_idx + 2 ],
-		fbuffer[ buff_idx + 3 ]
-	);
+		int buff_idx = _context->toBufferIndex( L_eye_quat_idx );
+		euler_t L_eye_e = quat_t(
+			fbuffer[ buff_idx ],
+			fbuffer[ buff_idx + 1 ],
+			fbuffer[ buff_idx + 2 ],
+			fbuffer[ buff_idx + 3 ]
+		);
 
-	buff_idx = _context->toBufferIndex( R_eye_quat_idx );
-	euler_t R_eye_e = quat_t(
-		fbuffer[ buff_idx ],
-		fbuffer[ buff_idx + 1 ],
-		fbuffer[ buff_idx + 2 ],
-		fbuffer[ buff_idx + 3 ]
-	);
+		buff_idx = _context->toBufferIndex( R_eye_quat_idx );
+		euler_t R_eye_e = quat_t(
+			fbuffer[ buff_idx ],
+			fbuffer[ buff_idx + 1 ],
+			fbuffer[ buff_idx + 2 ],
+			fbuffer[ buff_idx + 3 ]
+		);
 
-	float blink_val = (float)( curve.evaluate( blink_elapsed ) );
-	
+		UL_set.set_pitch( (float)( L_eye_e.p() ) );
+		UR_set.set_pitch( (float)( R_eye_e.p() ) );
+#if 0
+		LL_set.set_pitch( (float)( L_eye_e.p() ) );
+		LR_set.set_pitch( (float)( R_eye_e.p() ) );
+#endif
+	}
+
 	prev_UL_value = UL_value; // for change detection
 	prev_LL_value = LL_value;
 	prev_UR_value = UR_value;
 	prev_LR_value = LR_value;
 
-	UL_value = UL_set.get_mapped_weight( blink_val );
-//	LL_value = LL_set.get_mapped_weight( blink_val );
-	UR_value = UR_set.get_mapped_weight( blink_val );
-//	LR_value = LR_set.get_mapped_weight( blink_val );
+	float raw_lid_val = (float)( curve.evaluate( blink_elapsed ) );
+	
+	UL_value = UL_set.get_mapped_weight( raw_lid_val );
+	UR_value = UR_set.get_mapped_weight( raw_lid_val );
+#if 0
+	LL_value = LL_set.get_mapped_weight( raw_lid_val );
+	LR_value = LR_set.get_mapped_weight( raw_lid_val );
+#endif
 
+	int UL_au_blink_idx =  _context->channels().search( SkJointName( "au_45_left" ), SkChannel::XPos );
+	int UR_au_blink_idx =  _context->channels().search( SkJointName( "au_45_right" ), SkChannel::XPos );
 
-	int L_au_blink_idx =  _context->channels().search( SkJointName( "au_45_left" ), SkChannel::XPos );
-	int R_au_blink_idx =  _context->channels().search( SkJointName( "au_45_right" ), SkChannel::XPos );
+	int UL_au_blink_buff_idx = _context->toBufferIndex( UL_au_blink_idx );
+	int UR_au_blink_buff_idx = _context->toBufferIndex( UR_au_blink_idx );
 
-	int L_au_blink_buff_idx = _context->toBufferIndex( L_au_blink_idx );
-	int R_au_blink_buff_idx = _context->toBufferIndex( R_au_blink_idx );
+	if( UL_au_blink_buff_idx >= 0 )	{
+		fbuffer[ UL_au_blink_buff_idx ] = UL_value;
+	}
+	if( UR_au_blink_buff_idx >= 0 )	{
+		fbuffer[ UR_au_blink_buff_idx ] = UR_value;
+	}
 
-	fbuffer[ L_au_blink_buff_idx ] = UL_value;
-//	fbuffer[ LL_au_blink_buff_idx ] = LL_value;
+#if 0
+	int LL_au_blink_idx =  _context->channels().search( SkJointName( "xxxx" ), SkChannel::XPos );
+	int LR_au_blink_idx =  _context->channels().search( SkJointName( "xxxx" ), SkChannel::XPos );
 
-	fbuffer[ R_au_blink_buff_idx ] = UR_value;
-//	fbuffer[ LR_au_blink_buff_idx ] = LR_value;
+	int LL_au_blink_buff_idx = _context->toBufferIndex( LL_au_blink_idx );
+	int LR_au_blink_buff_idx = _context->toBufferIndex( LR_au_blink_idx );
 
-	if( L_au_blink_buff_idx >= 0 )
-		fbuffer[ L_au_blink_buff_idx ] = UL_value;
-	if( R_au_blink_buff_idx >= 0 )
-		fbuffer[ R_au_blink_buff_idx ] = UR_value;
+	if( LL_au_blink_buff_idx >= 0 )	{
+		fbuffer[ LL_au_blink_buff_idx ] = UL_value;
+	}
+	if( LR_au_blink_buff_idx >= 0 )	{
+		fbuffer[ LR_au_blink_buff_idx ] = UR_value;
+	}
+#endif
 
 	return( true );
 }
