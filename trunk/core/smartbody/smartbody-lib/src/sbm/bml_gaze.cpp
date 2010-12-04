@@ -71,6 +71,7 @@ const XMLCh ATTR_PRIORITY_JOINT[] = L"sbm:priority-joint";
 const XMLCh ATTR_PITCH_MIN[]	= L"pitch-min";
 const XMLCh ATTR_PITCH_MAX[]	= L"pitch-max";
 const XMLCh ATTR_FADE_OUT[]		= L"sbm:fade-out";
+const XMLCh ATTR_FADE_IN[]		= L"sbm:fade-in";
 
 ////// XML Direction constants
 // Angular (gaze) and orienting (head)
@@ -96,6 +97,7 @@ namespace BML {
 		float smooth_cervical = MeCtGaze::DEFAULT_SMOOTHING_CERVICAL;
 		float smooth_eyeball  = MeCtGaze::DEFAULT_SMOOTHING_EYEBALL;
 		float fade_out_ival  = -1.0f;
+		float fade_in_ival  = -1.0f;
 
 		/**
 		 *  Contains the possible values for a gaze key
@@ -594,6 +596,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	float gaze_smooth_cervical = BML::Gaze::smooth_cervical;
 	float gaze_smooth_eyeball  = BML::Gaze::smooth_eyeball;
 	float gaze_fade_out_ival   = BML::Gaze::fade_out_ival;
+	float gaze_fade_in_ival    = BML::Gaze::fade_in_ival;
 	float gaze_time_hint = -1.0;
 	
 	std::wstringstream wstrstr;
@@ -761,6 +764,17 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		}
 	}
 
+	const XMLCh* attrFadeIn = elem->getAttribute( ATTR_FADE_IN );
+	if(attrFadeIn != NULL && attrFadeIn[0] != '\0') 
+	{
+		if( !( wistringstream( attrFadeIn ) >> gaze_fade_in_ival ) )
+		{
+			std::stringstream strstr;
+			strstr << "WARNING: Failed to parse fade-in interval attribute \""<< XMLString::transcode(attrFadeIn) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
+			LOG(strstr.str().c_str());
+		}
+	}
+
 	if( LOG_GAZE_PARAMS ) {
 		cout << "DEBUG: Gaze parameters:" << endl
 				<< "\tgaze_speed_head = " << gaze_speed_head << endl
@@ -769,6 +783,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 				<< "\tgaze_smooth_cervical = " << gaze_smooth_cervical << endl
 				<< "\tgaze_smooth_eyeball = " << gaze_smooth_eyeball << endl
 				<< "\tgaze_fade_out_ival = " << gaze_fade_out_ival << endl
+				<< "\tgaze_fade_in_ival = " << gaze_fade_in_ival << endl
 				<< "\tgaze_time_hint = " << gaze_time_hint << endl;
 	}
 
@@ -937,6 +952,12 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		// assuming we are freeing this little angel...
 		// gaze_ct->recurrent = false...
 		gaze_ct->set_fade_out( gaze_fade_out_ival );
+	}
+
+	if( gaze_fade_in_ival >= 0.0f )	{
+		// assuming we are freeing this little angel...
+		// gaze_ct->recurrent = false...
+		gaze_ct->set_fade_in( gaze_fade_in_ival );
 	}
 
 	const XMLCh* id = elem->getAttribute(ATTR_ID);

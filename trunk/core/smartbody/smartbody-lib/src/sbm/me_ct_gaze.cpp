@@ -1010,7 +1010,6 @@ bool MeCtGaze::update_fading( float dt )	{
 		}
 
 		if( fading_mode == FADING_MODE_IN )	{
-
 			if( fade_interval > 0.0 )	{
 				fading_normal = 1.0f - fade_remaining / fade_interval;
 			}
@@ -1036,6 +1035,7 @@ bool MeCtGaze::update_fading( float dt )	{
 				fading_mode = FADING_MODE_OFF;
 //				LOG( "MeCtGaze::update_fading FULL WEIGHT" );
 			}
+
 		}
 		else	{ // if( fading_mode == FADING_MODE_OUT )	{
 
