@@ -36,39 +36,55 @@ class MeCtEyeLidRegulator : public MeController	{
 		public:
 		
 			LidSet( void ) {
-
+				dirty_bit = true;
 				base_angle = 0.0f;
 				full_angle = 0.0f;
+				blink_angle = 0.0f;
 				diff = 0.0f;
 				inv_diff = 0.0f;
-				tight = 0.0f;
+				lid_tight = 0.0f;
 				open_angle = 0.0f;
 				tight_sweep = 0.0f;
 				close_sweep = 0.0f;
+				eye_pitch = 0.0f;
 			}
 			~LidSet( void ) {}
 
 			void print( void );
 
-			void set_angle_range( float fr, float to );
-			void set_tightener( float tighten );
+			// specify normalized range in degrees
+			void set_range( float fr, float to );
+			
+			// specify blink angle in degrees
+			void set_blink( float angle );
+			
+			// modifier: 0.0: wide; 0.5: neutral; 0.9: squinting
+			void set_tighten( float tighten ); 
 
-			// convert normalized blinking weight (0..1) to output weight with tigthener
+			// specify eyeball pitch in degrees
+			void set_pitch( float pitch );
+
+			// convert normalized weight (0..1) to output weight with tigthener/eye-pitch
 			float get_mapped_weight( float in_weight );
 
 		private:
-
+			bool  dirty_bit;
+			
 			float base_angle;
 			float full_angle;
+
+			float blink_angle;
 
 			float diff;
 			float inv_diff;
 
-			float tight;	// Modifier: 0.0: wide; 0.5: neutral; 0.9: squinting
+			float lid_tight;
 			float open_angle;
 
 			float tight_sweep;
 			float close_sweep;
+			
+			float eye_pitch;
 	};
 
 	public:
@@ -80,23 +96,33 @@ class MeCtEyeLidRegulator : public MeController	{
 		MeCtEyeLidRegulator( void );
 		~MeCtEyeLidRegulator( void );
 		
-		void init( void );
+		void init( bool tracking_pitch = false );
 
-		void set_upper_angle_range( float fr, float to )	{
-			UL_set.set_angle_range( fr, to );
-			UR_set.set_angle_range( fr, to );
+		void set_upper_range( float fr, float to )	{
+			UL_set.set_range( fr, to );
+			UR_set.set_range( fr, to );
 		}
 		
-		void set_lower_angle_range( float fr, float to )	{
-			LL_set.set_angle_range( fr, to );
-			LR_set.set_angle_range( fr, to );
+		void set_lower_range( float fr, float to )	{
+			LL_set.set_range( fr, to );
+			LR_set.set_range( fr, to );
 		}
 
-		void set_tightener( float tighten )	{
-			UL_set.set_tightener( tighten );
-			LL_set.set_tightener( tighten );
-			UR_set.set_tightener( tighten );
-			LR_set.set_tightener( tighten );
+		void set_blink_angle( float angle )	{
+			LL_set.set_blink( angle );
+			LR_set.set_blink( angle );
+			UL_set.set_blink( angle );
+			UR_set.set_blink( angle );
+		}
+
+		void set_upper_tighten( float tight )	{
+			UL_set.set_tighten( tight );
+			UR_set.set_tighten( tight );
+		}
+
+		void set_lower_tighten( float tight )	{
+			LL_set.set_tighten( tight );
+			LR_set.set_tighten( tight );
 		}
 
 		void blink_now( void ) { new_blink = true; }
@@ -123,8 +149,12 @@ class MeCtEyeLidRegulator : public MeController	{
 		
 		srLinearCurve	curve;
 		
+		bool	pitch_tracking;
+
+		float	hard_upper_tighten;
+		float	hard_lower_tighten;
+
 		bool	new_blink;
-		
 		double	blink_period_min;
 		double	blink_period_max;
 		double	blink_period;

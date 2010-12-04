@@ -333,6 +333,9 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	eyelid_reg_ct_p = new MeCtEyeLidRegulator();
 	eyelid_reg_ct_p->ref();
 	eyelid_reg_ct_p->init();
+	eyelid_reg_ct_p->set_upper_range( -30.0, 30.0 );
+//	eyelid_reg_ct_p->set_lower_range( 30.0, -30.0 );
+	eyelid_reg_ct_p->set_blink_angle( 30.0 );
 	ostringstream ct_name;
 	ct_name << name << "'s eyelid controller";
 	eyelid_reg_ct_p->name( ct_name.str().c_str() );
@@ -1806,10 +1809,16 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	else
 	if( char_cmd == "squint" )
 	{
-		float magnitude = args.read_float();
+		int n = args.calc_num_tokens();
+		float upper_mag = args.read_float();
+		float lower_mag = upper_mag;
+		if( n > 1 )	{
+			lower_mag = args.read_float();
+		}
 		MeCtEyeLidRegulator *eye_reg_ct = character->eyelid_reg_ct_p;
 		if( eye_reg_ct )	{
-			eye_reg_ct->set_tightener( magnitude );
+			eye_reg_ct->set_upper_tighten( upper_mag );
+			eye_reg_ct->set_lower_tighten( lower_mag );
 		}
 		return( CMD_SUCCESS );
 	}
