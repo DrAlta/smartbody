@@ -1266,8 +1266,8 @@ void SbmCharacter::eye_blink_update( const double frame_time )
 
 		bool left_changed;
 		bool right_changed;
-		float left = eyelid_reg_ct_p->get_left( &left_changed );
-		float right = eyelid_reg_ct_p->get_right( &right_changed );
+		float left = eyelid_reg_ct_p->get_upper_left( &left_changed );
+		float right = eyelid_reg_ct_p->get_upper_right( &right_changed );
 
 		if ( bonebusCharacter )	{
 			if( left_changed )	{
@@ -1795,15 +1795,23 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		}
 	}
 	else
-	if (char_cmd == "blink")
+	if( char_cmd == "blink" )
 	{
-#if ENABLE_NEW_EYELID_REGULATOR
 		MeCtEyeLidRegulator *eye_reg_ct = character->eyelid_reg_ct_p;
 		if( eye_reg_ct )	{
 			eye_reg_ct->blink_now();
 		}
 		return( CMD_SUCCESS );
-#endif
+	}
+	else
+	if( char_cmd == "squint" )
+	{
+		float magnitude = args.read_float();
+		MeCtEyeLidRegulator *eye_reg_ct = character->eyelid_reg_ct_p;
+		if( eye_reg_ct )	{
+			eye_reg_ct->set_tightener( magnitude );
+		}
+		return( CMD_SUCCESS );
 	}
 	else
 	if (char_cmd == "softeyes")
