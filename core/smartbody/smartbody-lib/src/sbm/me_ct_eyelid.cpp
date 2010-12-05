@@ -32,61 +32,75 @@ const char* MeCtEyeLidRegulator::type_name = "EyeLidRegulator";
 
 void MeCtEyeLidRegulator::LidSet::print( void )	{
 
-	printf( "dirty      : %d\n", dirty_bit );
+	if( dirty_bit ) {
+		update();
+	}
 	printf( "base_angle : %f\n", base_angle );
 	printf( "full_angle : %f\n", full_angle );
 	printf( "blink_angle: %f\n", blink_angle );
-	printf( "diff       : %f\n", diff );
+	printf( "diff       : %f: %f\n", diff, inv_diff );
 	printf( "lid_tight  : %f\n", lid_tight );
 	printf( "open_angle : %f\n", open_angle );
 	printf( "tight_sweep: %f\n", tight_sweep );
 	printf( "close_sweep: %f\n", close_sweep );
+	printf( "eye_pitch  : %f\n", eye_pitch );
 }
 
 void MeCtEyeLidRegulator::LidSet::set_range( float fr, float to )	{
 		
-	base_angle = fr;
-	full_angle = to;
-	diff = full_angle - base_angle;
-	if( fabs( diff ) > 0.0f )	{
-		inv_diff = 1.0f / diff;
+	if( ( base_angle != fr )||( full_angle != to ) )	{
+		base_angle = fr;
+		full_angle = to;
+		diff = full_angle - base_angle;
+		if( fabs( diff ) > 0.0f )	{
+			inv_diff = 1.0f / diff;
+		}
+		else	{
+			inv_diff = 0.0f;
+		}
+		dirty_bit = true;
 	}
-	else	{
-		inv_diff = 0.0f;
-	}
-	dirty_bit = true;
 }
 
 void MeCtEyeLidRegulator::LidSet::set_blink( float angle )	{
-		
-	blink_angle = angle;
-	dirty_bit = true;
+	
+	if( blink_angle != angle )	{
+		blink_angle = angle;
+		dirty_bit = true;
+	}
 }
 
 void MeCtEyeLidRegulator::LidSet::set_tighten( float tighten )	{
 	
-	lid_tight = tighten;
-	if( lid_tight > 1.0f ) lid_tight = 1.0f;
-	if( lid_tight < 0.0f ) lid_tight = 0.0f;
-	dirty_bit = true;
+	if( lid_tight != tighten )	{
+		lid_tight = tighten;
+		if( lid_tight > 1.0f ) lid_tight = 1.0f;
+		if( lid_tight < 0.0f ) lid_tight = 0.0f;
+		dirty_bit = true;
+	}
 }
 
 void MeCtEyeLidRegulator::LidSet::set_pitch( float pitch )	{
 
-	eye_pitch = pitch;
-	dirty_bit = true;
+	if( eye_pitch != pitch )	{
+		eye_pitch = pitch;
+		dirty_bit = true;
+	}
+}
+
+void MeCtEyeLidRegulator::LidSet::update( void )	{
+
+	open_angle = base_angle * ( 1.0f - lid_tight ) + eye_pitch;
+	tight_sweep = open_angle - base_angle;
+	close_sweep = blink_angle - open_angle;
+	dirty_bit = false;
 }
 
 float MeCtEyeLidRegulator::LidSet::get_mapped_weight( float in_weight )	{
 
 	if( dirty_bit ) {
-
-		open_angle = base_angle * ( 1.0f - lid_tight ) + eye_pitch;
-		tight_sweep = open_angle - base_angle;
-		close_sweep = blink_angle - open_angle;
-		dirty_bit = false;
+		update();
 	}
-
 	float weight = ( tight_sweep + in_weight * close_sweep ) * inv_diff;
 	if( weight < 0.0f ) return( 0.0f );
 	if( weight > 1.0f ) return( 1.0f );
@@ -182,13 +196,20 @@ void MeCtEyeLidRegulator::init( bool tracking_pitch )	{
 	curve.insert( 0.25, 0.0 );
 	
 	pitch_tracking = tracking_pitch;
+	
+	prev_time = -1.0f;
+	
+	hard_upper_tighten = 1.0f;
+	hard_lower_tighten = 1.0f;
+	soft_upper_tighten = 0.0f;
+	soft_lower_tighten = 0.0f;
+	
 	new_blink = false;
 	
-	blink_period_min = 4.0;
-	blink_period_max = 8.0;
-	
+	blink_period_min = 4.0f;
+	blink_period_max = 8.0f;
 	blink_period = blink_period_min;
-	prev_blink = 0.0;
+	prev_blink = 0.0f;
 	
 	prev_UL_value = 0.0f;
 	prev_LL_value = 0.0f;
@@ -203,6 +224,26 @@ void MeCtEyeLidRegulator::init( bool tracking_pitch )	{
 //						test();
 }
 
+#define SMOOTH_RATE_REF (30.0f)
+
+float MeCtEyeLidRegulator::smooth( float sm, double dt, float soft, float hard )	{
+
+	if( sm > 0.0 )	{
+//		float s = (float)( 0.01 + ( 1.0 - powf( sm, dt * SMOOTH_RATE_REF ) ) * 0.99 );
+		float s = 0.01f + ( 1.0f - powf( sm, (float)dt * SMOOTH_RATE_REF ) ) * 0.99f;
+		return( ( 1.0f - s ) * soft + s * hard );
+	}
+	return( hard );
+}
+
+float MeCtEyeLidRegulator::granular( float in, float min, float max, int grains )	{
+	
+	float diff = ( max - min );
+	float norm = ( in - min )/diff;
+	int i = (int)( (float)grains * norm );
+	return( (float)i * diff / (float)grains );
+}
+
 void MeCtEyeLidRegulator::context_updated( void ) {
 }
 
@@ -213,9 +254,31 @@ void MeCtEyeLidRegulator::controller_start( void )	{
 }
 
 bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
-
+	double dt = 0.01f;
+	
 	if( t < 0.0 )	{
 		return( true );
+	}
+	
+	if( prev_time < 0.0 )	{
+#if 0
+		printf( "0.3333: %f\n", granular( 0.3333, 0.0, 10.0, 100 ) );
+		printf( "0.1999: %f\n", granular( 0.1999, 0.0, 10.0, 100 ) );
+		printf( "0.2500: %f\n", granular( 0.2500, 0.0, 10.0, 100 ) );
+#endif
+#if 0
+		float s = 0.0;
+		float h = 1.0;
+		for( int i=0; i<30; i++ )	{
+			s = smooth( 0.8, 0.1, s, h );
+			printf( "%f\n", s );
+		}
+#endif
+		prev_time = t;
+	}
+	else	{
+		dt = t - prev_time;
+		prev_time = t;
 	}
 	
 	if( new_blink ) {
@@ -270,6 +333,22 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 
 	float raw_lid_val = (float)( curve.evaluate( blink_elapsed ) );
 	
+	soft_upper_tighten = smooth( 0.8f, dt, soft_upper_tighten, hard_upper_tighten );
+	gran_upper_tighten = granular( soft_upper_tighten, 0.0f, 1.0f, 100 );
+#if 0
+	soft_lower_tighten = smooth( 0.8f, dt, soft_lower_tighten, hard_lower_tighten );
+	gran_lower_tighten = granular( soft_lower_tighten, 0.0f, 1.0f, 100 );
+#endif
+	
+//printf( "%f %f %f\n", hard_upper_tighten, soft_upper_tighten, gran_upper_tighten );
+	
+	UL_set.set_tighten( gran_upper_tighten );
+	UR_set.set_tighten( gran_upper_tighten );
+#if 0
+	LL_set.set_tighten( gran_lower_tighten );
+	LR_set.set_tighten( gran_lower_tighten );
+#endif
+
 	UL_value = UL_set.get_mapped_weight( raw_lid_val );
 	UR_value = UR_set.get_mapped_weight( raw_lid_val );
 #if 0

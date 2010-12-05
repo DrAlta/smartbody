@@ -1272,6 +1272,8 @@ void SbmCharacter::eye_blink_update( const double frame_time )
 		float left = eyelid_reg_ct_p->get_upper_left( &left_changed );
 		float right = eyelid_reg_ct_p->get_upper_right( &right_changed );
 
+//		if( left_changed ) LOG( "eye: %f\n", left );
+
 		if ( bonebusCharacter )	{
 			if( left_changed )	{
 				bonebusCharacter->SetViseme( "blink_lf", left, 0.0 );
