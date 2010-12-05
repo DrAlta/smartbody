@@ -68,22 +68,17 @@ class MeCtEyeLidRegulator : public MeController	{
 			float get_mapped_weight( float in_weight );
 
 		private:
+			void update( void );
 			bool  dirty_bit;
-			
 			float base_angle;
 			float full_angle;
-
 			float blink_angle;
-
 			float diff;
 			float inv_diff;
-
 			float lid_tight;
 			float open_angle;
-
 			float tight_sweep;
 			float close_sweep;
-			
 			float eye_pitch;
 	};
 
@@ -116,13 +111,15 @@ class MeCtEyeLidRegulator : public MeController	{
 		}
 
 		void set_upper_tighten( float tight )	{
-			UL_set.set_tighten( tight );
-			UR_set.set_tighten( tight );
+//			UL_set.set_tighten( tight );
+//			UR_set.set_tighten( tight );
+			hard_upper_tighten = tight;
 		}
 
 		void set_lower_tighten( float tight )	{
-			LL_set.set_tighten( tight );
-			LR_set.set_tighten( tight );
+//			LL_set.set_tighten( tight );
+//			LR_set.set_tighten( tight );
+			hard_lower_tighten = tight;
 		}
 
 		void blink_now( void ) { new_blink = true; }
@@ -142,6 +139,9 @@ class MeCtEyeLidRegulator : public MeController	{
 		}
 
 	private:
+		float smooth( float sm, double dt, float soft, float hard );
+		float granular( float in, float min, float max, int grains );
+		
 		LidSet	UL_set;
 		LidSet	LL_set;
 		LidSet	UR_set;
@@ -150,9 +150,14 @@ class MeCtEyeLidRegulator : public MeController	{
 		srLinearCurve	curve;
 		
 		bool	pitch_tracking;
+		double	prev_time;
 
 		float	hard_upper_tighten;
 		float	hard_lower_tighten;
+		float	soft_upper_tighten;
+		float	soft_lower_tighten;
+		float	gran_upper_tighten;
+		float	gran_lower_tighten;
 
 		bool	new_blink;
 		double	blink_period_min;
