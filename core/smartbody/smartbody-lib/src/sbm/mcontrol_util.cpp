@@ -409,7 +409,7 @@ int mcuCBHandle::open_viewer( int width, int height, int px, int py )	{
 void mcuCBHandle::close_viewer( void )	{
 
 	if( viewer_p )	{
-		delete viewer_p;
+		viewer_factory->remove(viewer_p);
 		viewer_p = NULL;
 	}
 	if( camera_p )	{

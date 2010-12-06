@@ -94,6 +94,7 @@ class SrViewerFactory
 		SrViewerFactory();
 		
 		virtual SrViewer* create(int x, int y, int w, int h);
+		virtual void remove(SrViewer* viewer);
 
 };
 

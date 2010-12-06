@@ -77,5 +77,8 @@ SrViewer* SrViewerFactory::create(int x, int y, int w, int h)
 	return new SrViewer(x, y, w, h);
 }
 
+void SrViewerFactory::remove(SrViewer* viewer)
+{
+}
 
 //================================ End of File =================================================
