@@ -335,7 +335,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	eyelid_reg_ct_p->init();
 	eyelid_reg_ct_p->set_upper_range( -30.0, 30.0 );
 //	eyelid_reg_ct_p->set_lower_range( 30.0, -30.0 );
-	eyelid_reg_ct_p->set_blink_angle( 30.0 );
+	eyelid_reg_ct_p->set_close_angle( 30.0 );
 	ostringstream ct_name;
 	ct_name << name << "'s eyelid controller";
 	eyelid_reg_ct_p->name( ct_name.str().c_str() );
@@ -1805,24 +1805,68 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		MeCtEyeLidRegulator *eye_reg_ct = character->eyelid_reg_ct_p;
 		if( eye_reg_ct )	{
 			eye_reg_ct->blink_now();
+			return( CMD_SUCCESS );
 		}
-		return( CMD_SUCCESS );
+		return( CMD_FAILURE );
 	}
 	else
-	if( char_cmd == "squint" )
+	if( char_cmd == "eyelid" )
 	{
-		int n = args.calc_num_tokens();
-		float upper_mag = args.read_float();
-		float lower_mag = upper_mag;
-		if( n > 1 )	{
-			lower_mag = args.read_float();
-		}
+/*
+		eyelid range <upper-min-angle> <upper-max-angle> [<lower-min> <lower-max>]
+		eyelid close <closed-angle>
+		eyelid tight <upper-norm> <lower-norm>
+*/
 		MeCtEyeLidRegulator *eye_reg_ct = character->eyelid_reg_ct_p;
 		if( eye_reg_ct )	{
-			eye_reg_ct->set_upper_tighten( upper_mag );
-			eye_reg_ct->set_lower_tighten( lower_mag );
+
+			string eyelid_cmd  = args.read_token();
+			if( eyelid_cmd.length()==0 ) {
+				LOG("ERROR: Expected eyelid command.");
+				return( CMD_FAILURE );
+			}
+
+			int n = args.calc_num_tokens();
+			if( eyelid_cmd == "range" )
+			{
+				if( n < 2 )	{
+					return( CMD_FAILURE );
+				}
+				float upper_min = args.read_float();
+				float upper_max = args.read_float();
+				eye_reg_ct->set_upper_range( upper_min, upper_max );
+				if( n >= 4 )	{
+					float lower_min = args.read_float();
+					float lower_max = args.read_float();
+					eye_reg_ct->set_lower_range( lower_min, lower_max );
+				}
+				return( CMD_SUCCESS );
+			}
+			else
+			if( eyelid_cmd == "close" )
+			{
+				if( n < 1 ) {
+					return( CMD_FAILURE );
+				}
+				float close_angle = args.read_float();
+				eye_reg_ct->set_close_angle( close_angle );
+				return( CMD_SUCCESS );
+			}
+			else
+			if( eyelid_cmd == "tight" )
+			{
+				if( n < 2 ) {
+					return( CMD_FAILURE );
+				}
+				float upper_mag = args.read_float();
+				float lower_mag = args.read_float();
+				eye_reg_ct->set_upper_tighten( upper_mag );
+				eye_reg_ct->set_lower_tighten( lower_mag );
+				return( CMD_SUCCESS );
+			}
+			return( CMD_NOT_FOUND );
 		}
-		return( CMD_SUCCESS );
+		return( CMD_FAILURE );
 	}
 	else
 	if (char_cmd == "softeyes")

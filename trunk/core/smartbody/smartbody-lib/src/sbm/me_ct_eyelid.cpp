@@ -37,12 +37,12 @@ void MeCtEyeLidRegulator::LidSet::print( void )	{
 	}
 	printf( "base_angle : %f\n", base_angle );
 	printf( "full_angle : %f\n", full_angle );
-	printf( "blink_angle: %f\n", blink_angle );
+	printf( "close_angle: %f\n", close_angle );
 	printf( "diff       : %f: %f\n", diff, inv_diff );
 	printf( "lid_tight  : %f\n", lid_tight );
 	printf( "open_angle : %f\n", open_angle );
 	printf( "tight_sweep: %f\n", tight_sweep );
-	printf( "close_sweep: %f\n", close_sweep );
+	printf( "full_sweep : %f\n", close_sweep );
 	printf( "eye_pitch  : %f\n", eye_pitch );
 }
 
@@ -62,10 +62,10 @@ void MeCtEyeLidRegulator::LidSet::set_range( float fr, float to )	{
 	}
 }
 
-void MeCtEyeLidRegulator::LidSet::set_blink( float angle )	{
+void MeCtEyeLidRegulator::LidSet::set_close( float angle )	{
 	
-	if( blink_angle != angle )	{
-		blink_angle = angle;
+	if( close_angle != angle )	{
+		close_angle = angle;
 		dirty_bit = true;
 	}
 }
@@ -92,7 +92,7 @@ void MeCtEyeLidRegulator::LidSet::update( void )	{
 
 	open_angle = base_angle * ( 1.0f - lid_tight ) + eye_pitch;
 	tight_sweep = open_angle - base_angle;
-	close_sweep = blink_angle - open_angle;
+	close_sweep = close_angle - open_angle;
 	dirty_bit = false;
 }
 
@@ -113,11 +113,11 @@ void MeCtEyeLidRegulator::test( void )	{
 
 	printf( "LidSet TEST:\n" );
 
-//	lid.set_range( -30.0f, 30.0f );
-//	lid.set_blink( 30.0f );
-	lid.set_range( 30.0f, 0.0f );
-	lid.set_blink( 0.0f );
-	lid.set_pitch( -15.0f );
+	lid.set_range( -30.0f, 30.0f );
+//	lid.set_close( 30.0f );
+//	lid.set_range( 30.0f, 0.0f );
+	lid.set_close( 30.0f );
+//	lid.set_pitch( -15.0f );
 	lid.print();
 
 	int i;
@@ -127,22 +127,25 @@ void MeCtEyeLidRegulator::test( void )	{
 		printf( "[%d] f:%f w:%f\n", i, f, w );
 	}
 
-	lid.set_tighten( 0.5 );
+	lid.set_close( 0.0f );
+//	lid.set_tighten( 0.5 );
 	for( i=0; i<=10; i++ )	{
 		float f = (float)i/10.0f;
 		float w = lid.get_mapped_weight( f );
 		printf( "[%d] f:%f w:%f\n", i, f, w );
 	}
 
-	lid.set_tighten( 1.0 );
+	lid.set_close( -30.0f );
+//	lid.set_tighten( 1.0 );
 	for( i=0; i<=10; i++ )	{
 		float f = (float)i/10.0f;
 		float w = lid.get_mapped_weight( f );
 		printf( "[%d] f:%f w:%f\n", i, f, w );
 	}
 
+#if 0
 //	lid.set_range( -50.0f, 0.0f );
-	lid.set_blink( 0.0f );
+	lid.set_close( 0.0f );
 	lid.set_tighten( 0.0f );
 	lid.print();
 
@@ -165,6 +168,7 @@ void MeCtEyeLidRegulator::test( void )	{
 		float w = lid.get_mapped_weight( f );
 		printf( "[%d] f:%f w:%f\n", i, f, w );
 	}
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -187,8 +191,9 @@ void MeCtEyeLidRegulator::init( bool tracking_pitch )	{
 	
 	MeController::init();
 	
-	set_upper_range( -30.0f, 20.0f );
+	set_upper_range( -30.0f, 30.0f );
 	set_lower_range( 20.0f, 20.0f ); // non existent...
+	set_close_angle( 30.0 );
 	
 	curve.insert( 0.0, 0.0 );
 	curve.insert( 0.05, 1.0 );
@@ -199,8 +204,8 @@ void MeCtEyeLidRegulator::init( bool tracking_pitch )	{
 	
 	prev_time = -1.0f;
 	
-	hard_upper_tighten = 1.0f;
-	hard_lower_tighten = 1.0f;
+	hard_upper_tighten = 0.0f;
+	hard_lower_tighten = 0.0f;
 	soft_upper_tighten = 0.0f;
 	soft_lower_tighten = 0.0f;
 	
@@ -221,7 +226,15 @@ void MeCtEyeLidRegulator::init( bool tracking_pitch )	{
 	UR_value = 0.0f;
 	LR_value = 0.0f;
 	
-//						test();
+//	test();
+}
+
+void MeCtEyeLidRegulator::print( void )	{
+
+	UL_set.print();
+//	UR_set.print();
+//	LL_set.print();
+//	LR_set.print();
 }
 
 #define SMOOTH_RATE_REF (30.0f)
@@ -229,7 +242,6 @@ void MeCtEyeLidRegulator::init( bool tracking_pitch )	{
 float MeCtEyeLidRegulator::smooth( float sm, double dt, float soft, float hard )	{
 
 	if( sm > 0.0 )	{
-//		float s = (float)( 0.01 + ( 1.0 - powf( sm, dt * SMOOTH_RATE_REF ) ) * 0.99 );
 		float s = 0.01f + ( 1.0f - powf( sm, (float)dt * SMOOTH_RATE_REF ) ) * 0.99f;
 		return( ( 1.0f - s ) * soft + s * hard );
 	}
@@ -340,8 +352,6 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 	gran_lower_tighten = granular( soft_lower_tighten, 0.0f, 1.0f, 100 );
 #endif
 	
-//printf( "%f %f %f\n", hard_upper_tighten, soft_upper_tighten, gran_upper_tighten );
-	
 	UL_set.set_tighten( gran_upper_tighten );
 	UR_set.set_tighten( gran_upper_tighten );
 #if 0
@@ -351,6 +361,7 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 
 	UL_value = UL_set.get_mapped_weight( raw_lid_val );
 	UR_value = UR_set.get_mapped_weight( raw_lid_val );
+	
 #if 0
 	LL_value = LL_set.get_mapped_weight( raw_lid_val );
 	LR_value = LR_set.get_mapped_weight( raw_lid_val );
