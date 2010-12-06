@@ -2837,4 +2837,15 @@ SrViewer* FltkViewerFactory::create(int x, int y, int w, int h)
 	return s_viewer;
 }
 
+void FltkViewerFactory::remove(SrViewer* viewer)
+{
+	if (viewer && (viewer == s_viewer))
+	{
+		delete viewer;
+		s_viewer = NULL;
+		viewer = NULL;
+	}
+}
+
+
 //================================ End of File =================================================
