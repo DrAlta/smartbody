@@ -1493,7 +1493,37 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		character = mcu_p->character_map.lookup( char_name.c_str() );
 	}
 
-	if( char_cmd=="param") {
+	if( char_cmd=="help") {
+		LOG( "HELP: char <> <command>" );
+		LOG( "  param" );
+		LOG( "  init" );
+		LOG( "  smoothbindmesh" );
+		LOG( "  smoothbindweight" );
+		LOG( "  ctrl" );
+		LOG( "  inspect" );
+		LOG( "  channels" );
+		LOG( "  controllers" );
+		LOG( "  prune" );
+		LOG( "  viseme curveon|curveoff" );
+		LOG( "  viseme timedelay <timedelay>" );
+		LOG( "  viseme <viseme name> <weight> <ramp in>" );
+		LOG( "  viseme <viseme name> curve <number of keys> <curve information>" );
+		LOG( "  viseme curve" );
+		LOG( "  bone" );
+		LOG( "  bonep" );
+		LOG( "  remove" );
+		LOG( "  viewer" );
+		LOG( "  gazefade in|out|print" );
+		LOG( "  reholster" );
+		LOG( "  blink" );
+		LOG( "  eyelid range <min-angle> <max-angle> [<lower-min> <lower-max>]" );
+		LOG( "  eyelid close <closed-angle>" );
+		LOG( "  eyelid tight <upper-norm> <lower-norm>" );
+		LOG( "  softeyes" );
+		return( CMD_SUCCESS );
+	}
+	else
+	if( char_cmd=="param" ) {
 		char* param_name = args.read_token();
 		GeneralParam * new_param = new GeneralParam;
 		new_param->size = args.read_int();
@@ -1630,15 +1660,11 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return result;
 	}
 	else 
-	// Command: char <> viseme curveon
-	//			char <> viseme curveoff
-	//			char <> viseme timedelay <timedelay>
-	//			char <> viseme <viseme name> <weight> <ramp in>
-	//			char <> viseme <viseme name> curve <number of keys> <curve information>
-	// P.S.		1) the time delay function is used to postpone viseme curve which now is a little bit mismatch with the sound
-	//			2) need to modify the curve slope in and out later, now they are always 0
 	if( char_cmd=="viseme" ) {
-        char* viseme = args.read_token();		// viseme name
+	//  1) the time delay function is used to postpone viseme curve which now is a little bit mismatch with the sound
+	//	2) need to modify the curve slope in and out later, now they are always 0
+ 
+		char* viseme = args.read_token();		// viseme name
 		char* next = args.read_token();			// two modes: original add-on or curve
 		float* curveInfo;
 		float weight;
@@ -1812,11 +1838,6 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	else
 	if( char_cmd == "eyelid" )
 	{
-/*
-		eyelid range <upper-min-angle> <upper-max-angle> [<lower-min> <lower-max>]
-		eyelid close <closed-angle>
-		eyelid tight <upper-norm> <lower-norm>
-*/
 		MeCtEyeLidRegulator *eye_reg_ct = character->eyelid_reg_ct_p;
 		if( eye_reg_ct )	{
 
