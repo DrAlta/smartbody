@@ -160,7 +160,7 @@ void SkScene::init ( SkSkeleton* s )
 	  {
 		 SrSnSphere* sphere = new SrSnSphere;
 		 sphere->color(SrColor::white);
-		 sphere->shape().radius = scaleFactor * _cradius * _sfactor * 0.75;
+		 sphere->shape().radius = scaleFactor * _cradius * _sfactor * 0.75f;
 		 sphere->visible ( false );
 		 sphere->ref();
          g->add ( sphere ); 	

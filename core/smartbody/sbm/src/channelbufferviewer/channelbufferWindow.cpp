@@ -464,9 +464,9 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 
 		SkChannel& channel = channels[i];
 		int channelSize = channel.size();
-		if(channel.type == SkChannel::Type::XPos) sprintf(ext, "_x");
-		else if(channel.type == SkChannel::Type::YPos) sprintf(ext, "_y");
-		else if(channel.type == SkChannel::Type::ZPos) sprintf(ext, "_z");
+		if(channel.type == SkChannel::XPos) sprintf(ext, "_x");
+		else if(channel.type == SkChannel::YPos) sprintf(ext, "_y");
+		else if(channel.type == SkChannel::ZPos) sprintf(ext, "_z");
 		else ext[0] = '\0';
 
 		sprintf(str, "%s%s (%d)", joint->name().get_string(), ext, channelSize);
@@ -832,24 +832,24 @@ void ChannelBufferWindow::update()
 							int index = actor->ct_tree_p->controller(i)->getContextChannel(j);
 							if(Channel_item_list.get(index).monitored)
 							{
-								if(Channel_item_list.get(index).type == SkChannel::Type::XPos
-								|| Channel_item_list.get(index).type == SkChannel::Type::YPos
-								|| Channel_item_list.get(index).type == SkChannel::Type::ZPos)
+								if(Channel_item_list.get(index).type == SkChannel::XPos
+								|| Channel_item_list.get(index).type == SkChannel::YPos
+								|| Channel_item_list.get(index).type == SkChannel::ZPos)
 								{
 									chartview->get_archive()->GetSeries(&(Channel_item_list.get(index).label->get(0)))->SetLast(buff[buff_counter]);
 								}
-								else if(Channel_item_list.get(index).type == SkChannel::Type::Quat) 
+								else if(Channel_item_list.get(index).type == SkChannel::Quat) 
 								{
 									chartview->get_archive()->GetSeries(&(Channel_item_list.get(index).label->get(0)))->SetLast(buff[buff_counter], buff[buff_counter+1], buff[buff_counter+2], buff[buff_counter+3]);
 								}
 							}
-							if(Channel_item_list.get(index).type == SkChannel::Type::XPos
-							|| Channel_item_list.get(index).type == SkChannel::Type::YPos
-							|| Channel_item_list.get(index).type == SkChannel::Type::ZPos)
+							if(Channel_item_list.get(index).type == SkChannel::XPos
+							|| Channel_item_list.get(index).type == SkChannel::YPos
+							|| Channel_item_list.get(index).type == SkChannel::ZPos)
 							{
 								++buff_counter;
 							}
-							else if(Channel_item_list.get(index).type == SkChannel::Type::Quat) 
+							else if(Channel_item_list.get(index).type == SkChannel::Quat) 
 							{	
 								buff_counter+= 4;
 							}
