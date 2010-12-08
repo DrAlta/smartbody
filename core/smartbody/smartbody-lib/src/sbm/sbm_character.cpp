@@ -1854,7 +1854,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			if( eyelid_cmd == "pitch" )
 			{
 				if( n > 0 )	{
-					int enable = args.read_int();
+					bool enable = args.read_int() != 0;
 					eye_reg_ct->set_eyeball_tracking( enable );
 				}
 				else	{
