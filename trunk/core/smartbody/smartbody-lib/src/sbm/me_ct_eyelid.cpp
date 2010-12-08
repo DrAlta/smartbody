@@ -374,10 +374,14 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 	int UR_au_blink_buff_idx = _context->toBufferIndex( UR_au_blink_idx );
 
 	if( UL_au_blink_buff_idx >= 0 )	{
-		fbuffer[ UL_au_blink_buff_idx ] = UL_value;
+		if( UL_value != 0.0f )	{
+			fbuffer[ UL_au_blink_buff_idx ] = UL_value;
+		}
 	}
 	if( UR_au_blink_buff_idx >= 0 )	{
-		fbuffer[ UR_au_blink_buff_idx ] = UR_value;
+		if( UR_value != 0.0f )	{
+			fbuffer[ UR_au_blink_buff_idx ] = UR_value;
+		}
 	}
 
 #if 0
@@ -388,13 +392,16 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 	int LR_au_blink_buff_idx = _context->toBufferIndex( LR_au_blink_idx );
 
 	if( LL_au_blink_buff_idx >= 0 )	{
-		fbuffer[ LL_au_blink_buff_idx ] = UL_value;
+		if( LL_value != 0.0f )	{
+			fbuffer[ LL_au_blink_buff_idx ] = LL_value;
+		}
 	}
 	if( LR_au_blink_buff_idx >= 0 )	{
-		fbuffer[ LR_au_blink_buff_idx ] = UR_value;
+		if( LR_value != 0.0f )	{
+			fbuffer[ LR_au_blink_buff_idx ] = LR_value;
+		}
 	}
 #endif
-
 	return( true );
 }
 

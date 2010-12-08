@@ -1473,27 +1473,13 @@ int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 ///////////////////////////////////////////////////////////////////////////
 
 int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
+
 	string char_name = args.read_token();
 	if( char_name.length()==0 ) {
+#if 0
 		LOG("ERROR: Expected character name.");
 		return CMD_FAILURE;
-	}
-
-	string char_cmd  = args.read_token();
-	if( char_cmd.length()==0 ) {
-		LOG("ERROR: Expected character command.");
-		return CMD_FAILURE;
-	}
-
-	bool all_characters = false;
-	SbmCharacter* character = NULL;
-	if( char_name=="*" ) {
-		all_characters = true;
-	} else {
-		character = mcu_p->character_map.lookup( char_name.c_str() );
-	}
-
-	if( char_cmd=="help") {
+#else
 		LOG( "HELP: char <> <command>" );
 		LOG( "  param" );
 		LOG( "  init" );
@@ -1513,16 +1499,33 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		LOG( "  bonep" );
 		LOG( "  remove" );
 		LOG( "  viewer" );
-		LOG( "  gazefade in|out|print" );
+		LOG( "  gazefade in|out [<interval>]" );
+		LOG( "  gazefade print" );
 		LOG( "  reholster" );
 		LOG( "  blink" );
+		LOG( "  eyelid pitch <enable>" );
 		LOG( "  eyelid range <min-angle> <max-angle> [<lower-min> <lower-max>]" );
 		LOG( "  eyelid close <closed-angle>" );
-		LOG( "  eyelid tight <upper-norm> <lower-norm>" );
+		LOG( "  eyelid tight <upper-norm> [<lower-norm>]" );
 		LOG( "  softeyes" );
 		return( CMD_SUCCESS );
+#endif
 	}
-	else
+
+	string char_cmd  = args.read_token();
+	if( char_cmd.length()==0 ) {
+		LOG("ERROR: Expected character command.");
+		return CMD_FAILURE;
+	}
+
+	bool all_characters = false;
+	SbmCharacter* character = NULL;
+	if( char_name=="*" ) {
+		all_characters = true;
+	} else {
+		character = mcu_p->character_map.lookup( char_name.c_str() );
+	}
+
 	if( char_cmd=="param" ) {
 		char* param_name = args.read_token();
 		GeneralParam * new_param = new GeneralParam;
@@ -1848,6 +1851,18 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			}
 
 			int n = args.calc_num_tokens();
+			if( eyelid_cmd == "pitch" )
+			{
+				if( n > 0 )	{
+					int enable = args.read_int();
+					eye_reg_ct->set_eyeball_tracking( enable );
+				}
+				else	{
+
+				}
+				return( CMD_SUCCESS );
+			}
+			else
 			if( eyelid_cmd == "range" )
 			{
 				if( n < 2 )	{
@@ -1876,13 +1891,12 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			else
 			if( eyelid_cmd == "tight" )
 			{
-				if( n < 2 ) {
-					return( CMD_FAILURE );
-				}
 				float upper_mag = args.read_float();
-				float lower_mag = args.read_float();
 				eye_reg_ct->set_upper_tighten( upper_mag );
-				eye_reg_ct->set_lower_tighten( lower_mag );
+				if( n > 1 ) {
+					float lower_mag = args.read_float();
+					eye_reg_ct->set_lower_tighten( lower_mag );
+				}
 				return( CMD_SUCCESS );
 			}
 			return( CMD_NOT_FOUND );
