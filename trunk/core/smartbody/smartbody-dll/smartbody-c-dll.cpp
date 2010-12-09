@@ -33,15 +33,16 @@ public:
    virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass )
    {
 #if 0
-      int hr = 0;
       std::ofstream myfile;
       try
       {
          myfile.open( "example.txt", std::ios_base::in | std::ios_base::out | std::ios_base::app );
          myfile << "loading character: " << name.c_str() << '\n';
+#endif
 
-         hr = m_createCharacterCallback( m_sbmHandle, name.c_str(), objectClass.c_str() );
+         m_createCharacterCallback( m_sbmHandle, name.c_str(), objectClass.c_str() );
 
+#if 0
          myfile << "returned: " << hr << '\n';
          myfile << "finished loading character: " << name.c_str()  << '\n';
       }
@@ -57,15 +58,16 @@ public:
    virtual void OnCharacterDelete( const std::string & name )
    {
 #if 0
-      int hr = 0;
       std::ofstream myfile;
       try
       {
          myfile.open( "example.txt", std::ios_base::in | std::ios_base::out | std::ios_base::app );
          myfile << "deleting character: " << name.c_str() << '\n';
+#endif
 
-         hr = m_deleteCharacterCallback( m_sbmHandle, name.c_str() );
+         m_deleteCharacterCallback( m_sbmHandle, name.c_str() );
 
+#if 0
          myfile << "finished deleting character: " << name.c_str()  << '\n';
       }
       catch ( std::exception & e )
@@ -80,15 +82,16 @@ public:
    virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime )
    {
 #if 0
-      int hr = 0;
       std::ofstream myfile;
       try
       {
          myfile.open( "example.txt", std::ios_base::in | std::ios_base::out | std::ios_base::app );
          myfile << "OnViseme: " << name.c_str() << '\n';
+#endif
 
-         hr = m_viseme( m_sbmHandle, name.c_str(), visemeName.c_str(), weight, blendTime );
+         m_viseme( m_sbmHandle, name.c_str(), visemeName.c_str(), weight, blendTime );
 
+#if 0
          myfile << "returned: " << hr << '\n';
          myfile << "finished OnViseme: " << name.c_str()  << '\n';
       }
