@@ -22,6 +22,11 @@ typedef int (__stdcall *SBM_OnCharacterDeleteCallback)( SBMHANDLE sbmHandle, con
 typedef int (__stdcall *SBM_OnVisemeCallback)( SBMHANDLE sbmHandle, const char * name, const char * visemeName, float weight, float blendTime );
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif 
+
+
 // helper class for receiving individual joint data
 struct SBM_SmartbodyJoint
 {
@@ -71,5 +76,9 @@ SMARTBODY_C_DLL_API int  SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle );
 SMARTBODY_C_DLL_API bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character );
 SMARTBODY_C_DLL_API bool SBM_ReleaseCharacter( SBM_SmartbodyCharacter * character );
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // SMARTBODY_C_DLL_H
