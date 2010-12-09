@@ -210,8 +210,9 @@ public:
 	MeCtSchedulerClass*	param_sched_p; // general parameters
 
 	BoneBusCharacter * bonebusCharacter;
-	
-	int set_viseme( char* viseme, float weight , double start_time, float rampin_duration, float* curve_info, int numKeys );
+
+#define SWITCH_TO_SET_VISEME_FUNC	0
+	int set_viseme( const char* viseme, float weight , double start_time, float rampin_duration, float* curve_info, int numKeys );
 	void reset_viseme_bonebus(double curTime);
 
 	void eye_blink_update( const double frame_time );
@@ -281,7 +282,7 @@ public:
 public:
 	// reset the buffer channel data to be zero before blending
 	// hope we have cleverer way later
-	void reset_viseme_channels();
+//	void reset_viseme_channels();
 
 	// viseme curve related functions
 	bool is_viseme_curve() const {return use_viseme_curve;}

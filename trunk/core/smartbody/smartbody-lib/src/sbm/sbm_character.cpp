@@ -507,6 +507,7 @@ void SbmCharacter::add_bounded_float_channel( const string& name, float lower, f
 	joint_p->pos()->limits( SkJointPos::X, lower, upper );  // Setting upper bound to 2 allows some exageration
 }
 
+/*
 void SbmCharacter::reset_viseme_channels()
 {
 	SkChannelArray& channels = skeleton_p->channels();
@@ -519,6 +520,7 @@ void SbmCharacter::reset_viseme_channels()
 			frameData.buffer()[buffIndex] = 0;
 	}
 }
+*/
 
 int SbmCharacter::init_skeleton() {
 	if( SbmPawn::init_skeleton() != CMD_SUCCESS ) {
@@ -1140,23 +1142,31 @@ void SbmCharacter::reset_viseme_bonebus(double curTime)
 		{
 			for (size_t nCount = 0; nCount < namePatchIter->second.size(); nCount++)
 			{
+#if !SWITCH_TO_SET_VISEME_FUNC
 				if (bonebusCharacter)
 					bonebusCharacter->SetViseme( namePatchIter->second[nCount].c_str(), weight, 0.0 );
 				if (mcuCBHandle::singleton().sbm_character_listener)
 					mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, namePatchIter->second[nCount].c_str(), weight, 0.0 );
+#else
+				set_viseme( namePatchIter->second[nCount].c_str(), weight, 0.0, 0.0, NULL, 0 );
+#endif
 			}
 		}
 		else
 		{
+#if !SWITCH_TO_SET_VISEME_FUNC
 			if (bonebusCharacter)
 				bonebusCharacter->SetViseme( curveIter->first.c_str(), weight, 0.0 );
 			if (mcuCBHandle::singleton().sbm_character_listener)
 				mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, curveIter->first.c_str(), weight, 0.0 );
+#else
+			set_viseme( curveIter->first.c_str(), weight, 0.0, 0.0, NULL, 0 );
+#endif
 		}
 	}
 }
 
-int SbmCharacter::set_viseme( char* viseme,
+int SbmCharacter::set_viseme( const char* viseme,
 							  float weight,
 							  double start_time,
 							  float rampin_duration,
@@ -1269,27 +1279,35 @@ void SbmCharacter::eye_blink_update( const double frame_time )
 
 		bool left_changed;
 		bool right_changed;
-		float left = eyelid_reg_ct_p->get_upper_left( &left_changed );
-		float right = eyelid_reg_ct_p->get_upper_right( &right_changed );
+		float left_weight = eyelid_reg_ct_p->get_upper_left( &left_changed );
+		float right_weight = eyelid_reg_ct_p->get_upper_right( &right_changed );
 
 //		if( left_changed ) LOG( "eye: %f\n", left );
-
+#if !SWITCH_TO_SET_VISEME_FUNC
 		if ( bonebusCharacter )	{
 			if( left_changed )	{
-				bonebusCharacter->SetViseme( "blink_lf", left, 0.0 );
+				bonebusCharacter->SetViseme( "blink_lf", left_weight, 0.0 );
 			}
 			if( right_changed )	{
-				bonebusCharacter->SetViseme( "blink_rt", right, 0.0 );
+				bonebusCharacter->SetViseme( "blink_rt", right_weight, 0.0 );
 			}
 		}
 		if ( mcu.sbm_character_listener )	{
 			if( left_changed )	{
-				mcu.sbm_character_listener->OnViseme( name, string( "blink_lf" ), left, 0.0 );
+				mcu.sbm_character_listener->OnViseme( name, string( "blink_lf" ), left_weight, 0.0 );
 			}
 			if( right_changed )	{
-				mcu.sbm_character_listener->OnViseme( name, string( "blink_rt" ), right, 0.0 );
+				mcu.sbm_character_listener->OnViseme( name, string( "blink_rt" ), right_weight, 0.0 );
 			}		
 		}
+#else
+		if( left_changed )	{
+			set_viseme( "blink_lf", left_weight, 0.0, 0.0, NULL, 0 );
+		}
+		if( right_changed )	{
+			set_viseme( "blink_rt", right_weight, 0.0, 0.0, NULL, 0 );
+		}		
+#endif
 	}
 }
 
