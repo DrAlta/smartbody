@@ -2,243 +2,319 @@
 #include "vhcl.h"
 
 #include "smartbody-c-dll.h"
+
+#include <map>
+#include <fstream>
+#include <ios>
+
 #include "smartbody-dll.h"
 
 
 using std::string;
 
 
-// Experimental interface
-
-SimpleSmartbodyListener* SimpleSmartbodyListener::listener = NULL;
-
-SimpleSmartbodyListener::SimpleSmartbodyListener()
+class SBM_SmartbodyListener : public SmartbodyListener
 {
-	sbm = new Smartbody_dll();
-	sbm->SetListener(this);
+private:
+   SBMHANDLE m_sbmHandle;
+   SBM_OnCreateCharacterCallback m_createCharacterCallback;
+   SBM_OnCharacterDeleteCallback m_deleteCharacterCallback;
+   SBM_OnVisemeCallback m_viseme;
+
+public:
+   SBM_SmartbodyListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCharCallback, SBM_OnCharacterDeleteCallback deleteCharCallback, SBM_OnVisemeCallback visemeCallback )
+   {
+      m_sbmHandle = sbmHandle;
+      m_createCharacterCallback = createCharCallback;
+      m_deleteCharacterCallback = deleteCharCallback;
+      m_viseme = visemeCallback;
+   }
+
+   virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass )
+   {
+#if 0
+      int hr = 0;
+      std::ofstream myfile;
+      try
+      {
+         myfile.open( "example.txt", std::ios_base::in | std::ios_base::out | std::ios_base::app );
+         myfile << "loading character: " << name.c_str() << '\n';
+
+         hr = m_createCharacterCallback( m_sbmHandle, name.c_str(), objectClass.c_str() );
+
+         myfile << "returned: " << hr << '\n';
+         myfile << "finished loading character: " << name.c_str()  << '\n';
+      }
+      catch ( std::exception e )
+      {
+         myfile << "OnCharacterDelete Caught an error: " << e.what() << '\n';
+      }
+
+      myfile.close();
+#endif
+   }
+
+   virtual void OnCharacterDelete( const std::string & name )
+   {
+#if 0
+      int hr = 0;
+      std::ofstream myfile;
+      try
+      {
+         myfile.open( "example.txt", std::ios_base::in | std::ios_base::out | std::ios_base::app );
+         myfile << "deleting character: " << name.c_str() << '\n';
+
+         hr = m_deleteCharacterCallback( m_sbmHandle, name.c_str() );
+
+         myfile << "finished deleting character: " << name.c_str()  << '\n';
+      }
+      catch ( std::exception & e )
+      {
+         myfile << "OnCharacterDelete Caught an error: " << e.what() << '\n';
+      }
+
+      myfile.close();
+#endif
+   }
+
+   virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime )
+   {
+#if 0
+      int hr = 0;
+      std::ofstream myfile;
+      try
+      {
+         myfile.open( "example.txt", std::ios_base::in | std::ios_base::out | std::ios_base::app );
+         myfile << "OnViseme: " << name.c_str() << '\n';
+
+         hr = m_viseme( m_sbmHandle, name.c_str(), visemeName.c_str(), weight, blendTime );
+
+         myfile << "returned: " << hr << '\n';
+         myfile << "finished OnViseme: " << name.c_str()  << '\n';
+      }
+      catch ( std::exception & e )
+      {
+         myfile << "OnViseme Caught an error: " << e.what() << '\n';
+      }
+
+      myfile.close();
+#endif
+   }
+};
+
+
+// prototypes for local functions
+
+bool SBM_HandleExists( SBMHANDLE sbmHandle );
+void SBM_CharToCSbmChar( const SmartbodyCharacter * sbmChar, SBM_SmartbodyCharacter * sbmCChar );
+
+
+std::map< int, Smartbody_dll * > g_smartbodyInstances;
+std::map< int, SBM_SmartbodyCharacter * > g_characters;
+
+
+SMARTBODY_C_DLL_API SBMHANDLE SBM_CreateSBM()
+{
+   int currentSize = g_smartbodyInstances.size();
+   g_smartbodyInstances[ currentSize ] = new Smartbody_dll();
+   return currentSize;
 }
 
-SimpleSmartbodyListener::~SimpleSmartbodyListener()
+
+SMARTBODY_C_DLL_API bool SBM_SetSpeechAudiofileBasePath( SBMHANDLE sbmHandle, const char * basePath )
 {
-	delete sbm;
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+   g_smartbodyInstances[ sbmHandle ]->SetSpeechAudiofileBasePath( basePath );
+   return true;
 }
 
-void SimpleSmartbodyListener::OnCharacterCreate( const std::string & name, const std::string & objectClass )
-{
-	SimpleCharacter c;
-	c.name = name;
-	c.objectClass = objectClass;
-	charactersCreated.push(c);
 
-	// add an entry into the viseme map
-	std::map<std::string, std::queue<SimpleViseme> >::iterator iter = visemes.find(name);
-	if (iter == visemes.end())
-	{
-		visemes.insert( std::pair<std::string, std::queue<SimpleViseme> >(name, std::queue<SimpleViseme>()) );
-	}
+SMARTBODY_C_DLL_API bool SBM_SetFacebone( SBMHANDLE sbmHandle, bool enabled )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+   g_smartbodyInstances[ sbmHandle ]->SetFacebone( enabled );
+   return true;
 }
 
-void SimpleSmartbodyListener::OnCharacterDelete( const std::string & name )
+
+SMARTBODY_C_DLL_API bool SBM_SetProcessId( SBMHANDLE sbmHandle, const char * processId )
 {
-	SimpleCharacter c;
-	c.name = name;
-	charactersDeleted.push(c);
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+   g_smartbodyInstances[ sbmHandle ]->SetProcessId( processId );
+   return true;
 }
 
-void SimpleSmartbodyListener::OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime )
+
+SMARTBODY_C_DLL_API bool SBM_Init( SBMHANDLE sbmHandle )
 {
-	SimpleViseme v;
-	v.name = name;
-	v.visemeName = visemeName;
-	v.weight = weight;
-	v.blendTime = blendTime;
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
 
-	std::map<std::string, std::queue<SimpleViseme> >::iterator iter = visemes.find(name);
-	if (iter == visemes.end())
-	{
-		visemes.insert( std::pair<std::string, std::queue<SimpleViseme> >(name, std::queue<SimpleViseme>()) );
-		iter = visemes.find(name);
-	}
-
-	(*iter).second.push(v);
+   return g_smartbodyInstances[ sbmHandle ]->Init();
 }
 
-bool HasCharacterCreated(std::string& name, std::string& objectClass)
-{
-	if (SimpleSmartbodyListener::listener)
-	{
-		if (SimpleSmartbodyListener::listener->charactersCreated.size() > 0)
-		{
-			SimpleCharacter& character = SimpleSmartbodyListener::listener->charactersCreated.front();
-			name = character.name;
-			objectClass = character.objectClass;
-			SimpleSmartbodyListener::listener->charactersCreated.pop();
-			return true;
-		}
-	}
 
-	return false;
+SMARTBODY_C_DLL_API bool SBM_Shutdown( SBMHANDLE sbmHandle )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+   std::map< int, Smartbody_dll * >::iterator it = g_smartbodyInstances.find( sbmHandle );
+   Smartbody_dll * sbm = g_smartbodyInstances[ sbmHandle ];
+   g_smartbodyInstances.erase( it );
+   bool retVal = sbm->Shutdown();
+   delete sbm;
+   return retVal;
 }
 
-bool HasCharacterDeleted(std::string& name)
+
+SMARTBODY_C_DLL_API bool SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB, SBM_OnCharacterDeleteCallback deleteCB, SBM_OnVisemeCallback visemeCB )
 {
-	if (SimpleSmartbodyListener::listener)
-	{
-		if (SimpleSmartbodyListener::listener->charactersDeleted.size() > 0)
-		{
-			SimpleCharacter& character = SimpleSmartbodyListener::listener->charactersDeleted.front();
-			name = character.name;
-			SimpleSmartbodyListener::listener->charactersDeleted.pop();
-			return true;
-		}
-	}
-	
-	return false;
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+   SBM_SmartbodyListener * listener = new SBM_SmartbodyListener( sbmHandle, createCB, deleteCB, visemeCB );
+   g_smartbodyInstances[ sbmHandle ]->SetListener( listener );
+   return true;
 }
 
-bool HasViseme(const std::string name, std::string& visemeName, float& weight, float& blendTime)
+
+SMARTBODY_C_DLL_API bool SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds )
 {
-	if (SimpleSmartbodyListener::listener)
-	{
-		std::map<std::string, std::queue<SimpleViseme> >::iterator iter = SimpleSmartbodyListener::listener->visemes.find(name);
-		if (iter != SimpleSmartbodyListener::listener->visemes.end())
-		{		
-			SimpleViseme& viseme = (*iter).second.front();
-			visemeName = viseme.visemeName;
-			weight = viseme.weight;
-			blendTime = viseme.blendTime;
-			(*iter).second.pop();
-			return true;
-		}
-	}
-	
-	return false;
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+   return g_smartbodyInstances[ sbmHandle ]->Update( timeInSeconds );
 }
 
-void SetSpeechAudiofileBasePath( const std::string & basePath )
+
+SMARTBODY_C_DLL_API bool SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op, const char * args )
 {
-	if (SimpleSmartbodyListener::listener)
-	{
-		SimpleSmartbodyListener::listener->sbm->SetSpeechAudiofileBasePath(basePath);
-	}
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+#if 0
+   std::ofstream myfile;
+   myfile.open( "example.txt", std::ios_base::in | std::ios_base::out | std::ios_base::app );
+   myfile << op << " " << args << '\n';
+   myfile.close();
+#endif
+
+   return g_smartbodyInstances[ sbmHandle ]->ProcessVHMsgs( op, args );
 }
 
-void SetFacebone( const bool enabled )
+
+SMARTBODY_C_DLL_API int SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle )
 {
-	if (SimpleSmartbodyListener::listener)
-	{
-		SimpleSmartbodyListener::listener->sbm->SetFacebone(enabled);
-	}
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return -1;
+   }
+
+   return g_smartbodyInstances[ sbmHandle ]->GetNumberOfCharacters();
 }
 
-void SetProcessId( const std::string & processId )
-{
-	if (SimpleSmartbodyListener::listener)
-	{
-		SimpleSmartbodyListener::listener->sbm->SetProcessId(processId);
-	}
-}	
 
-void Init()
+SMARTBODY_C_DLL_API bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character )
 {
-	if (!SimpleSmartbodyListener::listener)
-	{
-		SimpleSmartbodyListener::listener = new SimpleSmartbodyListener();
-	}
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
 
-	SimpleSmartbodyListener::listener->sbm->Init();
+   SmartbodyCharacter dllChar = g_smartbodyInstances[ sbmHandle ]->GetCharacter( (string)name );
+
+   SBM_CharToCSbmChar( &dllChar, character );
+
+   return true;
 }
 
-void Shutdown()
+
+SMARTBODY_C_DLL_API bool SBM_ReleaseCharacter( SBM_SmartbodyCharacter * character )
 {
-	if (SimpleSmartbodyListener::listener)
-	{
-		SimpleSmartbodyListener::listener->sbm->Shutdown();
-		delete SimpleSmartbodyListener::listener;
-		SimpleSmartbodyListener::listener = NULL;
-	}	
+   if ( !character )
+   {
+      return false;
+   }
+
+   for ( size_t i = 0; i < character->m_numJoints; i++ )
+   {
+      delete [] character->m_joints[ i ].m_name;
+   }
+
+   delete [] character->m_joints;
+   delete [] character->m_name;
+
+   return true;
 }
 
-bool Update( const double timeInSeconds )
+
+bool SBM_HandleExists( SBMHANDLE sbmHandle )
 {
-	if (SimpleSmartbodyListener::listener)
-	{
-		return SimpleSmartbodyListener::listener->sbm->Update(timeInSeconds);
-	}
-	else
-	{
-		return false;
-	}
+   return g_smartbodyInstances.find( sbmHandle ) != g_smartbodyInstances.end();
 }
 
-bool ProcessVHMsgs( const char * op, const char * args )
-{
-	if (SimpleSmartbodyListener::listener)
-	{
-		return SimpleSmartbodyListener::listener->sbm->ProcessVHMsgs(op, args);
-	}
-	else
-	{
-		return false;
-	}
-}
 
-int GetNumberOfCharacters()
+void SBM_CharToCSbmChar( const ::SmartbodyCharacter * sbmChar, SBM_SmartbodyCharacter * sbmCChar )
 {
-	if (SimpleSmartbodyListener::listener)
-	{
-		return SimpleSmartbodyListener::listener->sbm->GetNumberOfCharacters();
-	}
-	else
-	{
-		return 0;
-	}
-}
+   // copy transformation data
+   sbmCChar->x = sbmChar->x;
+   sbmCChar->y = sbmChar->y;
+   sbmCChar->z = sbmChar->z;
+   sbmCChar->rw = sbmChar->rw;
+   sbmCChar->rx = sbmChar->rx;
+   sbmCChar->ry = sbmChar->ry;
+   sbmCChar->rz = sbmChar->rz;
 
-void GetCharacterInfo(std::string name, float& x, float& y, float& z, float& rw, float& rx, float& ry, float& rz)
-{
-	if (SimpleSmartbodyListener::listener)
-	{
-			SmartbodyCharacter c = SimpleSmartbodyListener::listener->sbm->GetCharacter(name);
-			name = c.m_name;
-			x = c.x;
-			y = c.y;
-			z = c.z;
-			rw = c.rw;
-			rx = c.rx;
-			ry = c.ry;
-			rz = c.rz;
-	}
-}
+   // copy name
+   sbmCChar->m_name = new char[ sbmChar->m_name.length() + 1 ];
+   strcpy( sbmCChar->m_name, sbmChar->m_name.c_str() );
 
-void GetCharacterJointInfo(std::string name, int jointNum, std::string& jointName, float& x, float& y, float& z, float& rw, float& rx, float& ry, float& rz)
-{
-	if (SimpleSmartbodyListener::listener)
-	{
-		SmartbodyCharacter c = SimpleSmartbodyListener::listener->sbm->GetCharacter(name);
-		if ((size_t) jointNum < c.m_joints.size())
-		{
-			SmartbodyJoint& j = c.m_joints[jointNum];
-			jointName = j.m_name;
-			x = j.x;
-			y = j.y;
-			z = j.z;
-			rw = j.rw;
-			rx = j.rx;
-			ry = j.ry;
-			rz = j.rz;
-		}
-	}
-}
+   // copy joint data
+   sbmCChar->m_numJoints = 0;
+   sbmCChar->m_joints = NULL;
 
-int GetNumJoints(std::string name)
-{
-	if (SimpleSmartbodyListener::listener)
-	{
-		return SimpleSmartbodyListener::listener->sbm->GetNumberOfCharacters();
-	}
-	else
-	{
-		return 0;
-	}
+   if ( sbmChar->m_joints.size() > 0 )
+   {
+      sbmCChar->m_numJoints = sbmChar->m_joints.size();
+      sbmCChar->m_joints = new SBM_SmartbodyJoint[ sbmCChar->m_numJoints ];
+
+      for ( size_t i = 0; i < sbmCChar->m_numJoints; i++ )
+      {
+         // copy transformation data
+         sbmCChar->m_joints[ i ].x = sbmChar->m_joints[ i ].x;
+         sbmCChar->m_joints[ i ].y = sbmChar->m_joints[ i ].y;
+         sbmCChar->m_joints[ i ].z = sbmChar->m_joints[ i ].z;
+         sbmCChar->m_joints[ i ].rw = sbmChar->m_joints[ i ].rw;
+         sbmCChar->m_joints[ i ].rx = sbmChar->m_joints[ i ].rx;
+         sbmCChar->m_joints[ i ].ry = sbmChar->m_joints[ i ].ry;
+         sbmCChar->m_joints[ i ].rz = sbmChar->m_joints[ i ].rz;
+
+         // copy name
+         sbmCChar->m_joints[ i ].m_name = new char[ sbmChar->m_joints[ i ].m_name.length() + 1 ];
+         strcpy( sbmCChar->m_joints[ i ].m_name, sbmChar->m_joints[ i ].m_name.c_str() );
+      }
+   }
 }
