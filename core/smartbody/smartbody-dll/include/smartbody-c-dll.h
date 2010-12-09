@@ -12,60 +12,64 @@
 
 #include "vhcl_public.h"
 
-#include "smartbody-dll.h"
+
+typedef intptr_t SBMHANDLE;
 
 
-//--------------------------------------------------------------------------
-// Experimental interface 
-// Can you be called from C# and only uses primitive input/output parameters
-//--------------------------------------------------------------------------
+// Listener callbacks to get Smartbody related notifications
+typedef int (__stdcall *SBM_OnCreateCharacterCallback)( SBMHANDLE sbmHandle, const char * name, const char * objectClass );
+typedef int (__stdcall *SBM_OnCharacterDeleteCallback)( SBMHANDLE sbmHandle, const char * name );
+typedef int (__stdcall *SBM_OnVisemeCallback)( SBMHANDLE sbmHandle, const char * name, const char * visemeName, float weight, float blendTime );
 
-struct SimpleViseme
+
+// helper class for receiving individual joint data
+struct SBM_SmartbodyJoint
 {
-	std::string name;
-	std::string visemeName;
-	float weight;
-	float blendTime;
+   char * m_name;
+   float x;
+   float y;
+   float z;
+   float rw;
+   float rx;
+   float ry;
+   float rz;
 };
 
-struct SimpleCharacter
+
+// helper class for receiving character data including all the joints
+struct SBM_SmartbodyCharacter
 {
-	std::string name;
-	std::string objectClass;
+   char * m_name;
+   float x;
+   float y;
+   float z;
+   float rw;
+   float rx;
+   float ry;
+   float rz;
+   size_t m_numJoints;
+   SBM_SmartbodyJoint * m_joints;
 };
 
-class SimpleSmartbodyListener : public SmartbodyListener
-{
-	public:
-		SimpleSmartbodyListener();
-		~SimpleSmartbodyListener();
 
-		void OnCharacterCreate( const std::string & name, const std::string & objectClass );
-		void OnCharacterDelete( const std::string & name );
-		void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime );
+SMARTBODY_C_DLL_API SBMHANDLE SBM_CreateSBM();
 
-		static SimpleSmartbodyListener* listener;
+SMARTBODY_C_DLL_API bool SBM_SetSpeechAudiofileBasePath( SBMHANDLE sbmHandle, const char * basePath );
+SMARTBODY_C_DLL_API bool SBM_SetFacebone( SBMHANDLE sbmHandle, bool enabled );
+SMARTBODY_C_DLL_API bool SBM_SetProcessId( SBMHANDLE sbmHandle, const char * processId );
 
-		Smartbody_dll* sbm;
+SMARTBODY_C_DLL_API bool SBM_Init( SBMHANDLE sbmHandle );
+SMARTBODY_C_DLL_API bool SBM_Shutdown( SBMHANDLE sbmHandle );
 
-		std::queue<SimpleCharacter> charactersCreated;
-		std::queue<SimpleCharacter> charactersDeleted;
-		std::map<std::string, std::queue<SimpleViseme> > visemes;
-};
+SMARTBODY_C_DLL_API bool SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB, SBM_OnCharacterDeleteCallback deleteCB, SBM_OnVisemeCallback visemeCB );
 
-SMARTBODY_C_DLL_API bool HasCharacterCreated(std::string& name, std::string& objectClass);
-SMARTBODY_C_DLL_API bool HasCharacterDeleted(std::string& name);
-SMARTBODY_C_DLL_API bool HasViseme(const std::string & name, const std::string & visemeName, const float weight, const float blendTime);
-SMARTBODY_C_DLL_API void SetSpeechAudiofileBasePath( const std::string & basePath );
-SMARTBODY_C_DLL_API void SetFacebone( const bool enabled );
-SMARTBODY_C_DLL_API void SetProcessId( const std::string & processId );
-SMARTBODY_C_DLL_API void Init();
-SMARTBODY_C_DLL_API void Shutdown();
-SMARTBODY_C_DLL_API bool Update( const double timeInSeconds );
-SMARTBODY_C_DLL_API bool ProcessVHMsgs( const char * op, const char * args );
-SMARTBODY_C_DLL_API int GetNumberOfCharacters();
-SMARTBODY_C_DLL_API void GetCharacterInfo(std::string name, float& x, float& y, float& z, float& rw, float& rx, float& ry, float& rz);
-SMARTBODY_C_DLL_API void GetCharacterJointInfo(std::string name, int jointNum, std::string& jointName, float& x, float& y, float& z, float& rw, float& rx, float& ry, float& rz);
-SMARTBODY_C_DLL_API int GetNumJoints(std::string name);
+SMARTBODY_C_DLL_API bool SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds );
+
+SMARTBODY_C_DLL_API bool SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op, const char * args );
+
+SMARTBODY_C_DLL_API int  SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle );
+SMARTBODY_C_DLL_API bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character );
+SMARTBODY_C_DLL_API bool SBM_ReleaseCharacter( SBM_SmartbodyCharacter * character );
+
 
 #endif  // SMARTBODY_C_DLL_H
