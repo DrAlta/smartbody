@@ -445,12 +445,12 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		return BehaviorRequestPtr();  // a.k.a., NULL
     }
 
-	const SkJoint* joint = NULL;
+	const SkJoint* target_joint = NULL;
 	if (attrTarget && XMLString::stringLen( attrTarget ))
 	{
-		joint = parse_target( tag, attrTarget, mcu );
+		target_joint = parse_target( tag, attrTarget, mcu );
 	}
-	if (joint == NULL && !gaze_ct) {  // Invalid target.  Assume parse_target(..) printed error.
+	if (target_joint == NULL && !gaze_ct) {  // Invalid target.  Assume parse_target(..) printed error.
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 
@@ -793,7 +793,9 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		gaze_ct->init( low_key_index, high_key_index );
 		gaze_ct->set_task_priority( priority_key_index );
 	}
-	gaze_ct->set_target_joint( 0, 0, 0, const_cast<SkJoint*>(joint) );
+	if( target_joint )	{
+		gaze_ct->set_target_joint( 0, 0, 0, const_cast<SkJoint*>( target_joint ) );
+	}
 	if( gaze_time_hint > 0.0 )	{
 		gaze_ct->set_time_hint( gaze_time_hint );
 	}
