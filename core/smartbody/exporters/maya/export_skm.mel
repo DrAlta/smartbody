@@ -828,26 +828,6 @@ global proc skmExport( string $animDef )
 	print ("Running: proc: skmExport( $animDef=" + $animDef + " ) \n") ;
 
    string $file = `getAttr( $animDef + ".outputFile" )`;
-  
-   // resolve file path according to project root directory
-   string $projectRoot = `workspace -en ""`;
-   $file = substituteAllString($file, "\\", "/");   
-   string $afterSubstitute = substituteAllString($file, "//", "*");  
-   if ($afterSubstitute == $file)
-   {
-     string $absoluteFile = substituteAllString($file, ":", "");
-	 if ($absoluteFile == $file)  $file = $projectRoot + $file;
-   }
-   else
-   {
-     if ($afterSubstitute != $file)
-	 {
-       string $tokens[];
-       int $numTokens = `tokenize $afterSubstitute "*" $tokens`;
-	   $file = $projectRoot + $tokens[$numTokens - 1];
-	 }
-   }
-   $file = `workspace -en $file`;   
    skmExportFile( $file, $animDef );
 }
 
@@ -1478,8 +1458,30 @@ global proc skmUpdateOutput()
       textFieldGrp -edit -text $outputFilePath skmOutputPath;
    }
 
-   $outputFile = $outputFilePath + "/" + $outputFileName;
-   setAttr -type "string" ( $animDef + ".outputFile" ) $outputFile ;
+   $file = $outputFilePath + "/" + $outputFileName;
+   
+   // resolve the file before setting it to the attribute
+   string $projectRoot = `workspace -en ""`;
+   $file = substituteAllString($file, "\\", "/");   
+   string $afterSubstitute = substituteAllString($file, "//", "*");  
+   if ($afterSubstitute == $file)
+   {
+     string $absoluteFile = substituteAllString($file, ":", "");
+	 if ($absoluteFile == $file)  $file = $projectRoot + $file;
+   }
+   else
+   {
+     if ($afterSubstitute != $file)
+	 {
+       string $tokens[];
+       int $numTokens = `tokenize $afterSubstitute "*" $tokens`;
+	   $file = $projectRoot + $tokens[$numTokens - 1];
+	 }
+   }
+   $file = `workspace -en $file`;    
+   // resolve finished   
+	  
+   setAttr -type "string" ( $animDef + ".outputFile" ) $file;
 }
 
 global proc showExportingChannelsInfoPressed()
