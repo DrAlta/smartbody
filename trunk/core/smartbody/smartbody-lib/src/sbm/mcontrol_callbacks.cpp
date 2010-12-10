@@ -3278,7 +3278,7 @@ int mcu_gaze_limit_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 		else if (n == 1 || n == 0)
 		{
-			LOG("To set limits, use: gazelimits <lumbar|thorax|cervical|cranial|optical|back|chest|neck|head|eyes> pitchup pitchdown heading roll");
+			LOG("To set limits, use: gazelimit <lumbar|thorax|cervical|cranial|optical|back|chest|neck|head|eyes> pitchup pitchdown heading roll");
 			int start = 0; 
 			int finish = MeCtGaze::GAZE_KEY_EYES;
 			if (n == 1)

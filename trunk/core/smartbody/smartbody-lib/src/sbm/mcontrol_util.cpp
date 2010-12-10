@@ -561,7 +561,7 @@ void mcuCBHandle::update( void )	{
 			char_p->dMesh_p->update();
 
 			if (char_p->is_viseme_curve())	{		// For bone bus viseme in Curve Mode
-				char_p->reset_viseme_bonebus(time);	
+				char_p->update_viseme_curve(time);	
 			}
 
 			if ( net_bone_updates && char_p->skeleton_p && char_p->bonebusCharacter ) {

@@ -332,7 +332,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 	eyelid_reg_ct_p = new MeCtEyeLidRegulator();
 	eyelid_reg_ct_p->ref();
-	eyelid_reg_ct_p->init();
+	eyelid_reg_ct_p->init(true);
 	eyelid_reg_ct_p->set_upper_range( -30.0, 30.0 );
 //	eyelid_reg_ct_p->set_lower_range( 30.0, -30.0 );
 	eyelid_reg_ct_p->set_close_angle( 30.0 );
@@ -1130,7 +1130,7 @@ const std::string& SbmCharacter::get_voice_code_backup() const
 	return voice_code_backup; //if voice isn't NULL-- no error message; just returns the string
 }
 
-void SbmCharacter::reset_viseme_bonebus(double curTime)
+void SbmCharacter::update_viseme_curve(double curTime)
 {
 	std::map<std::string, srLinearCurve*>::iterator curveIter;
 	for (curveIter = visemeCurve.begin(); curveIter != visemeCurve.end(); curveIter++)
@@ -1166,6 +1166,42 @@ void SbmCharacter::reset_viseme_bonebus(double curTime)
 	}
 }
 
+void SbmCharacter::build_viseme_curve(const char* viseme, float weight, double start_time, float* curve_info, int numKeys)
+{
+	std::vector<std::string> visemeNames;
+	std::map<std::string, std::vector<std::string>>::iterator iter;
+	iter = viseme_name_patch.find(viseme);
+	if (iter != viseme_name_patch.end())
+	{
+		for (size_t nCount = 0; nCount < iter->second.size(); nCount++)
+			visemeNames.push_back(iter->second[nCount]);
+	}
+	else
+		visemeNames.push_back(viseme);
+
+	for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
+	{
+		if (numKeys > 0)
+		{
+			std::map<std::string, srLinearCurve*>::iterator iter = visemeCurve.find(visemeNames[nCount]);
+			if (iter != visemeCurve.end())
+			{
+				visemeCurve.erase(iter);
+			}
+			srLinearCurve* curve = new srLinearCurve();
+			curve->insert(start_time, 0);
+			float timeDelay = this->get_viseme_time_delay();
+			for (int i = 0; i < numKeys; i++)
+			{
+				float weight = curve_info[i*4+1];
+				float inTime = curve_info[i*4+0];
+				curve->insert(start_time+inTime+timeDelay, weight);		
+			}
+			visemeCurve.insert(make_pair(visemeNames[nCount], curve));
+		}		
+	}			
+}
+
 int SbmCharacter::set_viseme( const char* viseme,
 							  float weight,
 							  double start_time,
@@ -1190,54 +1226,12 @@ int SbmCharacter::set_viseme( const char* viseme,
 		bool setCurve = false;
 		if (bonebusCharacter)	// if it is bone bus character
 		{
-			if (!this->is_viseme_curve())
-			{
-				if (curve_info != NULL)
-				{
-					LOG("SbmCharacter::set_viseme WARNING: Now Curve Mode is OFF, Check the char <> viseme command!");
-					return CMD_FAILURE;
-				}
-				bonebusCharacter->SetViseme( visemeNames[nCount].c_str(), weight, rampin_duration );
-			}
-			else
-				setCurve = true;
+			bonebusCharacter->SetViseme( visemeNames[nCount].c_str(), weight, rampin_duration );
 		}
 
 		if ( mcuCBHandle::singleton().sbm_character_listener )
 		{
-			if (!this->is_viseme_curve())
-			{
-				if (curve_info != NULL)
-				{
-					LOG("SbmCharacter::set_viseme WARNING: Now Curve Mode is OFF, Check the char <> viseme command!");
-					return CMD_FAILURE;
-				}
-				mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, visemeNames[nCount].c_str(), weight, rampin_duration );
-			}
-			else
-				setCurve = true;
-		}
-
-		if (setCurve)
-		{
-			if (numKeys > 0)
-			{
-				std::map<std::string, srLinearCurve*>::iterator iter = visemeCurve.find(visemeNames[nCount]);
-				if (iter != visemeCurve.end())
-				{
-					visemeCurve.erase(iter);
-				}
-				srLinearCurve* curve = new srLinearCurve();
-				curve->insert(start_time, 0);
-				float timeDelay = this->get_viseme_time_delay();
-				for (int i = 0; i < numKeys; i++)
-				{
-					float weight = curve_info[i*4+1];
-					float inTime = curve_info[i*4+0];
-					curve->insert(start_time+inTime+timeDelay, weight);		
-				}
-				visemeCurve.insert(make_pair(visemeNames[nCount], curve));
-			}			
+			mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, visemeNames[nCount].c_str(), weight, rampin_duration );
 		}
 
 		//if (!bonebusCharacter)	// if it is not going through bone bus
@@ -1735,7 +1729,13 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		if( all_characters ) {
 			mcu_p->character_map.reset();
 			while( character = mcu_p->character_map.next() ) {
-				character->set_viseme( viseme, weight, mcu_p->time, rampin_duration, curveInfo, numKeys );
+				if (curveInfo == NULL)
+					return character->set_viseme( viseme, weight, mcu_p->time, rampin_duration, curveInfo, numKeys );
+				else
+				{
+					character->build_viseme_curve(viseme, weight,  mcu_p->time, curveInfo, numKeys);
+					return CMD_SUCCESS;
+				}
 			}
 			return CMD_SUCCESS;
 		} else {
@@ -1743,7 +1743,13 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				LOG("ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"%s\".", char_name.c_str());
 				return CMD_FAILURE;  // ignore/out-of-domain? But it's not a standard network message.
 			} else {
-				return character->set_viseme( viseme, weight, mcu_p->time, rampin_duration, curveInfo, numKeys );
+				if (curveInfo == NULL)
+					return character->set_viseme( viseme, weight, mcu_p->time, rampin_duration, curveInfo, numKeys );
+				else
+				{
+					character->build_viseme_curve(viseme, weight,  mcu_p->time, curveInfo, numKeys);
+					return CMD_SUCCESS;
+				}
 			}
 		}
 	} else if( char_cmd=="bone" ) {
@@ -1915,6 +1921,11 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 					float lower_mag = args.read_float();
 					eye_reg_ct->set_lower_tighten( lower_mag );
 				}
+				return( CMD_SUCCESS );
+			}
+			if( eyelid_cmd == "print" )
+			{
+				eye_reg_ct->print();
 				return( CMD_SUCCESS );
 			}
 			return( CMD_NOT_FOUND );
