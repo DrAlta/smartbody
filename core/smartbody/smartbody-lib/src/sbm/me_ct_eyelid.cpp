@@ -35,15 +35,15 @@ void MeCtEyeLidRegulator::LidSet::print( void )	{
 	if( dirty_bit ) {
 		update();
 	}
-	printf( "base_angle : %f\n", base_angle );
-	printf( "full_angle : %f\n", full_angle );
-	printf( "close_angle: %f\n", close_angle );
-	printf( "diff       : %f: %f\n", diff, inv_diff );
-	printf( "lid_tight  : %f\n", lid_tight );
-	printf( "open_angle : %f\n", open_angle );
-	printf( "tight_sweep: %f\n", tight_sweep );
-	printf( "full_sweep : %f\n", close_sweep );
-	printf( "eye_pitch  : %f\n", eye_pitch );
+	LOG( "base_angle : %f", base_angle );
+	LOG( "full_angle : %f", full_angle );
+	LOG( "close_angle: %f", close_angle );
+	LOG( "diff       : %f: %f", diff, inv_diff );
+	LOG( "lid_tight  : %f", lid_tight );
+	LOG( "open_angle : %f", open_angle );
+	LOG( "tight_sweep: %f", tight_sweep );
+	LOG( "full_sweep : %f", close_sweep );
+	LOG( "eye_pitch  : %f", eye_pitch );
 }
 
 void MeCtEyeLidRegulator::LidSet::set_range( float fr, float to )	{
