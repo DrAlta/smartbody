@@ -248,6 +248,72 @@ __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 	v1.normalize();
 	if(scenario->joint_info_list.get(start_index).type == JOINT_TYPE_BALL)
 	{
+		v2 = i_target - pivot;
+		v2.normalize();
+
+		double dot_v = dot(v1, v2);
+		if(dot_v >= 0.9999995000000f) 
+		{
+			if(start_index >= scenario->joint_pos_list.size()-1) return;
+			dot_v = 1.0f;
+			v3 = scenario->joint_pos_list.get(start_index+1);
+			v3 = v3 * mat_inv; // tranverse joint back to its local coordinate
+			v2 = v3 - pivot;
+		}
+		double angle = acos(dot_v);
+
+		r_axis = cross(v2, v1);
+		r_axis.normalize();
+
+		mat.rot(r_axis, (float)-angle);
+	}
+	else if(scenario->joint_info_list.get(start_index).type == JOINT_TYPE_HINGE)
+	{
+		r_axis = scenario->joint_info_list.get(start_index).axis;
+		v = upright_point_to_plane(i_target, r_axis, i_src);
+		v2 = v - pivot;
+		v2.normalize();
+		
+		double dot_v = dot(v1, v2);
+		if(dot_v > 1.0f) dot_v = 1.0f;
+		double angle = acos(dot_v);
+
+		v3 = cross(v1, v2);
+		v3.normalize();
+		if(dot(v3, r_axis) > 0.0f) mat.rot(r_axis, (float)angle);
+		else mat.rot(r_axis, (float)-angle);
+	}
+	
+	
+	q = scenario->joint_quat_list.get(start_index);
+	q = mat * q;
+
+	check_constraint(&q, start_index);
+
+	scenario->joint_quat_list.set(start_index, q);
+	get_limb_section_local_pos(start_index, -1);
+}
+
+/*__forceinline void MeCtIK::rotate(SrVec& src, int start_index)
+{
+	SrVec v1, v2, v3, v4;
+	SrVec v, i_target, i_src;
+	//SrVec axis, r_axis;
+	SrVec r_axis;
+	SrQuat q;
+	SrMat mat, mat_inv;
+	if(start_index == 0) mat_inv = scenario->gmat.inverse();
+	else mat_inv = scenario->joint_global_mat_list.get(start_index-1).inverse();
+	SrVec& pivot = scenario->joint_pos_list.get(start_index);
+	pivot = pivot * mat_inv; // tranverse joint back to its local coordinate
+	i_target = target.get(manipulated_joint_index) * mat_inv;
+	i_src = src * mat_inv;
+
+	//
+	v1 = i_src - pivot;
+	v1.normalize();
+	if(scenario->joint_info_list.get(start_index).type == JOINT_TYPE_BALL)
+	{
 		//compute the axis
 		//v4 = i_target - i_src;
 		//v4.normalize();
@@ -270,13 +336,11 @@ __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 		v2.normalize();
 	}
 	
-	//v1.normalize();
-	//v2.normalize();
 	double dot_v = dot(v1, v2);
 	if(dot_v > 1.0f) dot_v = 1.0f;
 	double angle = acos(dot_v);
 
-	if(dot_v > 0.995f) angle /= 4.0f;
+	//if(dot_v > 0.995f) angle /= 2.0f;
 
 	v3 = cross(v1, v2);
 	v3.normalize();
@@ -290,7 +354,7 @@ __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 
 	scenario->joint_quat_list.set(start_index, q);
 	get_limb_section_local_pos(start_index, -1);
-}
+}*/
 
 __forceinline void MeCtIK::calc_target(SrVec& orientation, SrVec& offset)
 {
