@@ -1278,29 +1278,58 @@ void SbmCharacter::eye_blink_update( const double frame_time )
 
 //		if( left_changed ) LOG( "eye: %f\n", left );
 #if !SWITCH_TO_SET_VISEME_FUNC
-		if ( bonebusCharacter )	{
-			if( left_changed )	{
-				bonebusCharacter->SetViseme( "blink_lf", left_weight, 0.0 );
+		if (is_face_controller_enabled())
+		{
+			if ( bonebusCharacter )	{
+				if( left_changed )	{
+					bonebusCharacter->SetViseme( "blink_lf", left_weight, 0.0 );
+				}
+				if( right_changed )	{
+					bonebusCharacter->SetViseme( "blink_rt", right_weight, 0.0 );
+				}
 			}
-			if( right_changed )	{
-				bonebusCharacter->SetViseme( "blink_rt", right_weight, 0.0 );
+			if ( mcu.sbm_character_listener )	{
+				if( left_changed )	{
+					mcu.sbm_character_listener->OnViseme( name, string( "blink_lf" ), left_weight, 0.0 );
+				}
+				if( right_changed )	{
+					mcu.sbm_character_listener->OnViseme( name, string( "blink_rt" ), right_weight, 0.0 );
+				}		
 			}
 		}
-		if ( mcu.sbm_character_listener )	{
-			if( left_changed )	{
-				mcu.sbm_character_listener->OnViseme( name, string( "blink_lf" ), left_weight, 0.0 );
+		else
+		{
+			// for blendshape characters, use multi-blink viseme
+			// instead of independent left and right blinks
+			if ( bonebusCharacter )	{
+				if( left_changed )	{
+					bonebusCharacter->SetViseme( "blink", left_weight, 0.0 );
+				}
 			}
-			if( right_changed )	{
-				mcu.sbm_character_listener->OnViseme( name, string( "blink_rt" ), right_weight, 0.0 );
-			}		
+			if ( mcu.sbm_character_listener )	{
+				if( left_changed )	{
+					mcu.sbm_character_listener->OnViseme( name, string( "blink_lf" ), left_weight, 0.0 );
+				}
+			}
 		}
 #else
-		if( left_changed )	{
-			set_viseme( "blink_lf", left_weight, 0.0, 0.0, NULL, 0 );
+		if (is_face_controller_enabled())
+		{
+			if( left_changed )	{
+				set_viseme( "blink_lf", left_weight, 0.0, 0.0, NULL, 0 );
+			}
+			if( right_changed )	{
+				set_viseme( "blink_rt", right_weight, 0.0, 0.0, NULL, 0 );
+			}		
 		}
-		if( right_changed )	{
-			set_viseme( "blink_rt", right_weight, 0.0, 0.0, NULL, 0 );
-		}		
+		else
+		{
+			// for blendshape characters, use multi-blink viseme
+			// instead of independent left and right blinks
+			if (left_changed) {
+				set_viseme( "blink", left_weight, 0.0, 0.0, NULL, 0 );
+			}
+		}
 #endif
 	}
 }
