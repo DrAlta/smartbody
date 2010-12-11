@@ -556,12 +556,12 @@ void mcuCBHandle::update( void )	{
 		char_p = character_map.lookup( pawn_p->name );
 		if( char_p ) {
 
-			char_p->eye_blink_update( this->time );
+			char_p->eye_blink_update();
 			char_p->scene_p->update();
 			char_p->dMesh_p->update();
 
 			if (char_p->is_viseme_curve())	{		// For bone bus viseme in Curve Mode
-				char_p->update_viseme_curve(time);	
+				char_p->update_viseme_curve( time );	
 			}
 
 			if ( net_bone_updates && char_p->skeleton_p && char_p->bonebusCharacter ) {

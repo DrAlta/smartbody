@@ -68,6 +68,7 @@
 #include <me/me_spline_1d.hpp>
 
 class SbmCharacter : public SbmPawn	{
+
 public:
 	// Static Constants
 
@@ -120,7 +121,6 @@ protected:
 	// The term "viseme" in the following variables is a misnomer,
 	// and may also refer to an action unit or other face shape.
 	// They are all controlled by the "character .. viseme .." command.
-
 	// Following patch can be removed after the other parts are fullfilled
 	// viseme name patch
 	// in case there's a mis-match between audio file&remote speech viseme name and Bonebus&SBM viseme name
@@ -195,15 +195,12 @@ public:
 	 */
 	const std::string& get_voice_code_backup() const; //returns voice if exists or NULL if not
 
-
-
 	// Prioritized Schedules for behaviors (known as "blocking" in manual animation)
 	// TODO: Rename by body part, rather than controller type
 	MeCtSchedulerClass*	posture_sched_p; // legs / stance / posture
 	MeCtSchedulerClass*	motion_sched_p;  // full body motions
 	MeCtSchedulerClass*	gaze_sched_p;    // back / chest / spine
 
-//	MeCtPeriodicReplay* blink_ct_p; 
 	// TODO: Arms
 	// TODO: Hands
 	MeCtSchedulerClass*	head_sched_p; // neck / head orientation
@@ -211,13 +208,11 @@ public:
 
 	BoneBusCharacter * bonebusCharacter;
 
-#define SWITCH_TO_SET_VISEME_FUNC	1
-//	int set_viseme( const char* viseme, float weight , double start_time, float rampin_duration, float* curve_info, int numKeys );
 	void set_viseme( const char* viseme, float weight , double start_time, float rampin_duration );
 	void update_viseme_curve(double curTime);
 	void build_viseme_curve(const char* viseme, double start_time, float* curve_info, int numKeys);
 
-	void eye_blink_update( const double frame_time );
+	void eye_blink_update( void );
 
 public:
 
@@ -282,9 +277,6 @@ public:
 	AUChannelMap& get_au_channel_map();
 
 public:
-	// reset the buffer channel data to be zero before blending
-	// hope we have cleverer way later
-//	void reset_viseme_channels();
 
 	// viseme curve related functions
 	bool is_viseme_curve() const {return use_viseme_curve;}
@@ -299,8 +291,7 @@ public:
 	float getHeight();
 
 private:
-	int viseme_channel_start_pos;
-	int viseme_channel_end_pos;
+
 	bool softEyes;
 	float _height;
 
@@ -311,17 +302,6 @@ protected:
 	 *   SbmPawn inserts world_offset joint above the existing root.
 	 */
 	virtual int init_skeleton();
-
-#if 0
-// DEPRECATED
-	/*!
-	 *  Initialize the controllers that drive the viseme, AU, and face bones
-	 *  Only called when the neutral face pose is defined (used by MeCtFace).
-	 */
-	virtual void init_face_controllers();
-#endif
-
-//	int set_world_offset_cmd( srArgBuffer& args ); // NOT DEFINED
 
 	/*!
 	 *  Adds a single float channel, bounded by lower and upper limits.
@@ -338,7 +318,6 @@ protected:
 
 	// NOTE: called for A-units and visemes; bound ( 0, 1 )
 	void add_face_channel( const std::string& name, const int wo_index );
-
 };
 
 /////////////////////////////////////////////////////////////
