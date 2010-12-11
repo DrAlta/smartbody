@@ -1148,7 +1148,8 @@ void SbmCharacter::update_viseme_curve(double curTime)
 				if (mcuCBHandle::singleton().sbm_character_listener)
 					mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, namePatchIter->second[nCount].c_str(), weight, 0.0 );
 #else
-				set_viseme( namePatchIter->second[nCount].c_str(), weight, 0.0, 0.0, NULL, 0 );
+//				set_viseme( namePatchIter->second[nCount].c_str(), weight, 0.0, 0.0, NULL, 0 );
+				set_viseme( namePatchIter->second[nCount].c_str(), weight, 0.0, 0.0 );
 #endif
 			}
 		}
@@ -1160,13 +1161,14 @@ void SbmCharacter::update_viseme_curve(double curTime)
 			if (mcuCBHandle::singleton().sbm_character_listener)
 				mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, curveIter->first.c_str(), weight, 0.0 );
 #else
-			set_viseme( curveIter->first.c_str(), weight, 0.0, 0.0, NULL, 0 );
+//			set_viseme( curveIter->first.c_str(), weight, 0.0, 0.0, NULL, 0 );
+			set_viseme( curveIter->first.c_str(), weight, 0.0, 0.0 );
 #endif
 		}
 	}
 }
 
-void SbmCharacter::build_viseme_curve(const char* viseme, float weight, double start_time, float* curve_info, int numKeys)
+void SbmCharacter::build_viseme_curve(const char* viseme, double start_time, float* curve_info, int numKeys)
 {
 	std::vector<std::string> visemeNames;
 	std::map<std::string, std::vector<std::string>>::iterator iter;
@@ -1195,19 +1197,26 @@ void SbmCharacter::build_viseme_curve(const char* viseme, float weight, double s
 			{
 				float weight = curve_info[i*4+1];
 				float inTime = curve_info[i*4+0];
-				curve->insert(start_time+inTime+timeDelay, weight);		
+				curve->insert( start_time + inTime + timeDelay, weight );		
 			}
-			visemeCurve.insert(make_pair(visemeNames[nCount], curve));
+			visemeCurve.insert( make_pair( visemeNames[ nCount ], curve ) );
 		}		
 	}			
 }
 
+#if 0
 int SbmCharacter::set_viseme( const char* viseme,
 							  float weight,
 							  double start_time,
 							  float rampin_duration,
 							  float* curve_info,
 							  int numKeys )
+#else
+void SbmCharacter::set_viseme( const char* viseme,
+							  float weight,
+							  double start_time,
+							  float rampin_duration )
+#endif
 {
     //LOG("Recieved: SbmCharacter(\"%s\")::set_viseme( \"%s\", %f, %f )\n", name, viseme, weight, rampin_duration );
 	std::vector<std::string> visemeNames;
@@ -1254,13 +1263,12 @@ int SbmCharacter::set_viseme( const char* viseme,
 			//				final result inside buffer channel is controlled by the blend curve
 			// Original Add On Mode: viseme in buffer channel keep the same value unless it is being changed at certain time
 			//							which means after modifying channel data to 1.0, you have to reset it to 0.0 later on
-			if (numKeys > 0)	// Curve MODE
-				head_sched_p->schedule(ct, start_time, curve_info, numKeys);
-			else				// Original Add On MODE
+//			if (numKeys > 0)	// Curve MODE
+//				head_sched_p->schedule(ct, start_time, curve_info, numKeys);
+//			else				// Original Add On MODE
 				head_sched_p->schedule( ct, start_time, start_time + ct->controller_duration(), rampin_duration, 0 );
 		}
 	}
-	return CMD_SUCCESS;
 }
 
 
@@ -1312,14 +1320,16 @@ void SbmCharacter::eye_blink_update( const double frame_time )
 				}
 			}
 		}
-#else
+#elif 0
 		if (is_face_controller_enabled())
 		{
 			if( left_changed )	{
-				set_viseme( "blink_lf", left_weight, 0.0, 0.0, NULL, 0 );
+//				set_viseme( "blink_lf", left_weight, 0.0, 0.0, NULL, 0 );
+				set_viseme( "blink_lf", left_weight, 0.0, 0.0 );
 			}
 			if( right_changed )	{
-				set_viseme( "blink_rt", right_weight, 0.0, 0.0, NULL, 0 );
+//				set_viseme( "blink_rt", right_weight, 0.0, 0.0, NULL, 0 );
+				set_viseme( "blink_rt", right_weight, 0.0, 0.0 );
 			}		
 		}
 		else
@@ -1327,8 +1337,23 @@ void SbmCharacter::eye_blink_update( const double frame_time )
 			// for blendshape characters, use multi-blink viseme
 			// instead of independent left and right blinks
 			if (left_changed) {
-				set_viseme( "blink", left_weight, 0.0, 0.0, NULL, 0 );
+//				set_viseme( "blink", left_weight, 0.0, 0.0, NULL, 0 );
+				set_viseme( "blink", left_weight, 0.0, 0.0 );
 			}
+		}
+#else
+		if( left_weight == right_weight )	{ // ensured with float granularity...
+			if( left_changed )	{
+				set_viseme( "blink", left_weight, 0.0, 0.0 );
+			}
+		}
+		else	{
+			if( left_changed )	{
+				set_viseme( "blink_lf", left_weight, 0.0, 0.0 );
+			}
+			if( right_changed )	{
+				set_viseme( "blink_rt", right_weight, 0.0, 0.0 );
+			}		
 		}
 #endif
 	}
@@ -1759,11 +1784,13 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			mcu_p->character_map.reset();
 			while( character = mcu_p->character_map.next() ) {
 				if (curveInfo == NULL)
-					return character->set_viseme( viseme, weight, mcu_p->time, rampin_duration, curveInfo, numKeys );
+				{
+//					return character->set_viseme( viseme, weight, mcu_p->time, rampin_duration, curveInfo, numKeys );
+					character->set_viseme( viseme, weight, mcu_p->time, rampin_duration );
+				}
 				else
 				{
-					character->build_viseme_curve(viseme, weight,  mcu_p->time, curveInfo, numKeys);
-					return CMD_SUCCESS;
+					character->build_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys );
 				}
 			}
 			return CMD_SUCCESS;
@@ -1773,12 +1800,15 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				return CMD_FAILURE;  // ignore/out-of-domain? But it's not a standard network message.
 			} else {
 				if (curveInfo == NULL)
-					return character->set_viseme( viseme, weight, mcu_p->time, rampin_duration, curveInfo, numKeys );
+				{
+//					return character->set_viseme( viseme, weight, mcu_p->time, rampin_duration, curveInfo, numKeys );
+					character->set_viseme( viseme, weight, mcu_p->time, rampin_duration );
+				}
 				else
 				{
-					character->build_viseme_curve(viseme, weight,  mcu_p->time, curveInfo, numKeys);
-					return CMD_SUCCESS;
+					character->build_viseme_curve(viseme, mcu_p->time, curveInfo, numKeys);
 				}
+				return CMD_SUCCESS;
 			}
 		}
 	} else if( char_cmd=="bone" ) {

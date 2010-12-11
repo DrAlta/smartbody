@@ -325,7 +325,8 @@ public:
 	 */
 	TrackPtr schedule( MeController* c, double tin, double tout, float indt, float outdt );
 
-    /** Backwards compatible schedule function: (sans Static/Once track type)
+#if 0
+	/** Backwards compatible schedule function: (sans Static/Once track type)
 	 *
 	 *  Schedule controller c with the given parameters.
      *  c - the controller to be scheduled.
@@ -335,6 +336,7 @@ public:
 	 *	Current Usage for this schedule is for arbitary viseme curve, can be applied to any other blending curve
 	 */	
 	TrackPtr schedule( MeController* c, double tin, float* curve, int numKeys);
+#endif
 
     /** Backwards compatible schedule function: (sans Static/Once track type)
 	 *

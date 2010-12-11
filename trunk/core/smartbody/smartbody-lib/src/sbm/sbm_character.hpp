@@ -212,9 +212,10 @@ public:
 	BoneBusCharacter * bonebusCharacter;
 
 #define SWITCH_TO_SET_VISEME_FUNC	1
-	int set_viseme( const char* viseme, float weight , double start_time, float rampin_duration, float* curve_info, int numKeys );
+//	int set_viseme( const char* viseme, float weight , double start_time, float rampin_duration, float* curve_info, int numKeys );
+	void set_viseme( const char* viseme, float weight , double start_time, float rampin_duration );
 	void update_viseme_curve(double curTime);
-	void build_viseme_curve(const char* viseme, float weight, double start_time, float* curve_info, int numKeys);
+	void build_viseme_curve(const char* viseme, double start_time, float* curve_info, int numKeys);
 
 	void eye_blink_update( const double frame_time );
 
