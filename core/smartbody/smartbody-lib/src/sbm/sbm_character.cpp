@@ -71,39 +71,6 @@ const char* SbmCharacter::ORIENTATION_TARGET  = "orientation_target";
 /////////////////////////////////////////////////////////////
 //  Method Definitions
 
-#if 0
-// DEPRECATED
-const float BLINK_SHUTTING_DURATION    = 0.05f;
-const float BLINK_OPENING_DURATION     = 0.2f;
-const float BLINK_MIN_REPEAT_DURATION  = 4.0f;  // how long to wait until the next blink
-const float BLINK_MAX_REPEAT_DURATION  = 8.0f;  // will pick a random number between these min/max
-
-void SbmCharacter::init_face_controllers() {
-	// face_ct is actually initialized in init_skeleton to reduce 
-	// because it's initialization depends on the au_motion_map and viseme_motion_map.
-
-	{	// drive the blink via action units
-		MeCtAdshrEnvelope* adshr_ct = new MeCtAdshrEnvelope();
-		ostringstream adshr_name;
-		adshr_name << name << "'s blink envelope";
-		adshr_ct->name( adshr_name.str().c_str() );
-		adshr_ct->envelope( (float)0.9, BLINK_SHUTTING_DURATION, 0, (float)0.9, 0, BLINK_OPENING_DURATION );  // I miss the Java 'f' syntax
-		SkChannelArray blink_channels;
-		blink_channels.add( "au_45_left", SkChannel::XPos );
-		blink_channels.add( "au_45_right", SkChannel::XPos );
-		adshr_ct->init( blink_channels );
-
-		blink_ct_p = new MeCtPeriodicReplay( adshr_ct );  // TODO: Replace with aperiodic controller, with proper min/max durations
-		blink_ct_p->ref();
-		ostringstream replay_name;
-		replay_name << name << "'s blink replay";
-		blink_ct_p->name( replay_name.str().c_str() );
-		blink_ct_p->init( ( BLINK_MIN_REPEAT_DURATION + BLINK_MAX_REPEAT_DURATION ) /2 );  // duration between blinks
-	}
-}
-#endif
-
-
 MeCtSchedulerClass* CreateSchedulerCt( const char* character_name, const char* sched_type_name ) {
 
 	MeCtSchedulerClass* sched_p = new MeCtSchedulerClass();
@@ -334,7 +301,6 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	eyelid_reg_ct_p->ref();
 	eyelid_reg_ct_p->init(true);
 	eyelid_reg_ct_p->set_upper_range( -30.0, 30.0 );
-//	eyelid_reg_ct_p->set_lower_range( 30.0, -30.0 );
 	eyelid_reg_ct_p->set_close_angle( 30.0 );
 	ostringstream ct_name;
 	ct_name << name << "'s eyelid controller";
@@ -506,21 +472,6 @@ void SbmCharacter::add_bounded_float_channel( const string& name, float lower, f
 	// Activate channel with lower limit != upper.
 	joint_p->pos()->limits( SkJointPos::X, lower, upper );  // Setting upper bound to 2 allows some exageration
 }
-
-/*
-void SbmCharacter::reset_viseme_channels()
-{
-	SkChannelArray& channels = skeleton_p->channels();
-	MeFrameData& frameData = ct_tree_p->getLastFrame();
-	for (int c = viseme_channel_start_pos; c < viseme_channel_end_pos; c++)
-	{
-		SkChannel& chan = channels[c];
-		int buffIndex = ct_tree_p->toBufferIndex(c);
-		if( buffIndex > -1 )	
-			frameData.buffer()[buffIndex] = 0;
-	}
-}
-*/
 
 int SbmCharacter::init_skeleton() {
 	if( SbmPawn::init_skeleton() != CMD_SUCCESS ) {
@@ -706,18 +657,6 @@ int SbmCharacter::init_skeleton() {
 
 	// Rebuild the active channels to include new joints
 	skeleton_p->make_active_channels();
-
-	// keep record of viseme channel start index
-	if (viseme_start_name != "")
-	{
-		viseme_channel_start_pos = skeleton_p->channels().search(SkJointName(viseme_start_name.c_str()), SkChannel::XPos);
-		viseme_channel_end_pos = viseme_channel_start_pos + visemeChannelCounter;
-	}
-	else	// no map exist
-	{
-		viseme_channel_start_pos = 0;
-		viseme_channel_end_pos = 0;
-	}
 
 	return CMD_SUCCESS;
 }
@@ -1130,40 +1069,24 @@ const std::string& SbmCharacter::get_voice_code_backup() const
 	return voice_code_backup; //if voice isn't NULL-- no error message; just returns the string
 }
 
-void SbmCharacter::update_viseme_curve(double curTime)
+void SbmCharacter::update_viseme_curve( double curTime )
 {
 	std::map<std::string, srLinearCurve*>::iterator curveIter;
 	for (curveIter = visemeCurve.begin(); curveIter != visemeCurve.end(); curveIter++)
 	{
-		float weight = (float)curveIter->second->evaluate(curTime);
+		float weight = (float)curveIter->second->evaluate( curTime );
 		std::map<std::string, std::vector<std::string>>::iterator namePatchIter;
 		namePatchIter = viseme_name_patch.find(curveIter->first);
 		if (namePatchIter != viseme_name_patch.end())
 		{
 			for (size_t nCount = 0; nCount < namePatchIter->second.size(); nCount++)
 			{
-#if !SWITCH_TO_SET_VISEME_FUNC
-				if (bonebusCharacter)
-					bonebusCharacter->SetViseme( namePatchIter->second[nCount].c_str(), weight, 0.0 );
-				if (mcuCBHandle::singleton().sbm_character_listener)
-					mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, namePatchIter->second[nCount].c_str(), weight, 0.0 );
-#else
-//				set_viseme( namePatchIter->second[nCount].c_str(), weight, 0.0, 0.0, NULL, 0 );
 				set_viseme( namePatchIter->second[nCount].c_str(), weight, 0.0, 0.0 );
-#endif
 			}
 		}
 		else
 		{
-#if !SWITCH_TO_SET_VISEME_FUNC
-			if (bonebusCharacter)
-				bonebusCharacter->SetViseme( curveIter->first.c_str(), weight, 0.0 );
-			if (mcuCBHandle::singleton().sbm_character_listener)
-				mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, curveIter->first.c_str(), weight, 0.0 );
-#else
-//			set_viseme( curveIter->first.c_str(), weight, 0.0, 0.0, NULL, 0 );
 			set_viseme( curveIter->first.c_str(), weight, 0.0, 0.0 );
-#endif
 		}
 	}
 }
@@ -1204,19 +1127,10 @@ void SbmCharacter::build_viseme_curve(const char* viseme, double start_time, flo
 	}			
 }
 
-#if 0
-int SbmCharacter::set_viseme( const char* viseme,
-							  float weight,
-							  double start_time,
-							  float rampin_duration,
-							  float* curve_info,
-							  int numKeys )
-#else
 void SbmCharacter::set_viseme( const char* viseme,
 							  float weight,
 							  double start_time,
 							  float rampin_duration )
-#endif
 {
     //LOG("Recieved: SbmCharacter(\"%s\")::set_viseme( \"%s\", %f, %f )\n", name, viseme, weight, rampin_duration );
 	std::vector<std::string> visemeNames;
@@ -1237,42 +1151,32 @@ void SbmCharacter::set_viseme( const char* viseme,
 		{
 			bonebusCharacter->SetViseme( visemeNames[nCount].c_str(), weight, rampin_duration );
 		}
-
 		if ( mcuCBHandle::singleton().sbm_character_listener )
 		{
 			mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, visemeNames[nCount].c_str(), weight, rampin_duration );
 		}
 
-		//if (!bonebusCharacter)	// if it is not going through bone bus
-		{	// Viseme/AU channel activation
-			ostringstream ct_name;
-			ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
+		// Viseme/AU channel activation
+		ostringstream ct_name;
+		ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
 
-			SkChannelArray channels;
-			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
+		SkChannelArray channels;
+		channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
 
-			MeCtRawWriter* ct = new MeCtRawWriter();
-			ct->name( ct_name.str().c_str() );
-			ct->init( channels, true );
-			SrBuffer<float> value;
-			value.size(1);
-			value[0] = (float)weight;
-			ct->set_data(value);
-			// Curve Mode: viseme in buffer channel has to be set to 0.0 at the beginning of frame (temporary solution to the feedback problem)
-			//				local channel is set to 1.0 all the time
-			//				final result inside buffer channel is controlled by the blend curve
-			// Original Add On Mode: viseme in buffer channel keep the same value unless it is being changed at certain time
-			//							which means after modifying channel data to 1.0, you have to reset it to 0.0 later on
-//			if (numKeys > 0)	// Curve MODE
-//				head_sched_p->schedule(ct, start_time, curve_info, numKeys);
-//			else				// Original Add On MODE
-				head_sched_p->schedule( ct, start_time, start_time + ct->controller_duration(), rampin_duration, 0 );
-		}
+		MeCtRawWriter* ct = new MeCtRawWriter();
+		ct->name( ct_name.str().c_str() );
+		ct->init( channels, true );
+		SrBuffer<float> value;
+		value.size(1);
+		value[0] = (float)weight;
+		ct->set_data(value);
+
+		head_sched_p->schedule( ct, start_time, start_time + ct->controller_duration(), rampin_duration, 0 );
 	}
 }
 
 
-void SbmCharacter::eye_blink_update( const double frame_time )
+void SbmCharacter::eye_blink_update( void )
 {
    // automatic blinking routine using bonebus viseme commands
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -1284,64 +1188,6 @@ void SbmCharacter::eye_blink_update( const double frame_time )
 		float left_weight = eyelid_reg_ct_p->get_upper_left( &left_changed );
 		float right_weight = eyelid_reg_ct_p->get_upper_right( &right_changed );
 
-//		if( left_changed ) LOG( "eye: %f\n", left );
-#if !SWITCH_TO_SET_VISEME_FUNC
-		if (is_face_controller_enabled())
-		{
-			if ( bonebusCharacter )	{
-				if( left_changed )	{
-					bonebusCharacter->SetViseme( "blink_lf", left_weight, 0.0 );
-				}
-				if( right_changed )	{
-					bonebusCharacter->SetViseme( "blink_rt", right_weight, 0.0 );
-				}
-			}
-			if ( mcu.sbm_character_listener )	{
-				if( left_changed )	{
-					mcu.sbm_character_listener->OnViseme( name, string( "blink_lf" ), left_weight, 0.0 );
-				}
-				if( right_changed )	{
-					mcu.sbm_character_listener->OnViseme( name, string( "blink_rt" ), right_weight, 0.0 );
-				}		
-			}
-		}
-		else
-		{
-			// for blendshape characters, use multi-blink viseme
-			// instead of independent left and right blinks
-			if ( bonebusCharacter )	{
-				if( left_changed )	{
-					bonebusCharacter->SetViseme( "blink", left_weight, 0.0 );
-				}
-			}
-			if ( mcu.sbm_character_listener )	{
-				if( left_changed )	{
-					mcu.sbm_character_listener->OnViseme( name, string( "blink_lf" ), left_weight, 0.0 );
-				}
-			}
-		}
-#elif 0
-		if (is_face_controller_enabled())
-		{
-			if( left_changed )	{
-//				set_viseme( "blink_lf", left_weight, 0.0, 0.0, NULL, 0 );
-				set_viseme( "blink_lf", left_weight, 0.0, 0.0 );
-			}
-			if( right_changed )	{
-//				set_viseme( "blink_rt", right_weight, 0.0, 0.0, NULL, 0 );
-				set_viseme( "blink_rt", right_weight, 0.0, 0.0 );
-			}		
-		}
-		else
-		{
-			// for blendshape characters, use multi-blink viseme
-			// instead of independent left and right blinks
-			if (left_changed) {
-//				set_viseme( "blink", left_weight, 0.0, 0.0, NULL, 0 );
-				set_viseme( "blink", left_weight, 0.0, 0.0 );
-			}
-		}
-#else
 		if( left_weight == right_weight )	{ // ensured with float granularity...
 			if( left_changed )	{
 				set_viseme( "blink", left_weight, 0.0, 0.0 );
@@ -1355,7 +1201,6 @@ void SbmCharacter::eye_blink_update( const double frame_time )
 				set_viseme( "blink_rt", right_weight, 0.0, 0.0 );
 			}		
 		}
-#endif
 	}
 }
 
@@ -1785,7 +1630,6 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			while( character = mcu_p->character_map.next() ) {
 				if (curveInfo == NULL)
 				{
-//					return character->set_viseme( viseme, weight, mcu_p->time, rampin_duration, curveInfo, numKeys );
 					character->set_viseme( viseme, weight, mcu_p->time, rampin_duration );
 				}
 				else
@@ -1801,7 +1645,6 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			} else {
 				if (curveInfo == NULL)
 				{
-//					return character->set_viseme( viseme, weight, mcu_p->time, rampin_duration, curveInfo, numKeys );
 					character->set_viseme( viseme, weight, mcu_p->time, rampin_duration );
 				}
 				else
