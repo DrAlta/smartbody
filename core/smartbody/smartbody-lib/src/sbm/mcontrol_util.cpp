@@ -567,7 +567,6 @@ void mcuCBHandle::update( void )	{
 			if ( net_bone_updates && char_p->skeleton_p && char_p->bonebusCharacter ) {
 				NetworkSendSkeleton( char_p->bonebusCharacter, char_p->skeleton_p, &param_map );
 
-				// what a lot of hoop jumping...
 				if ( net_world_offset_updates ) {
 
 					const SkJoint * joint = char_p->get_world_offset_joint();

@@ -336,6 +336,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::create_track( MeCtUnary* blending,
 	return track;
 }
 
+#if 0
 // This schedule function define arbitary blending curve
 // numKeys: number of Knots used to define the curve
 // curveInfo: knots information, each knot is composed of four float, time weight slope-in slope-out
@@ -375,7 +376,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 	}
 	return create_track( blendingCt, timingCt, ct );
 }
-
+#endif
 
 MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin, double tout, float indt, float outdt )
 {
