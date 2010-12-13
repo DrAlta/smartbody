@@ -1209,6 +1209,9 @@ global proc skmRenameAnimDef()
       textScrollList -e -append $newAnimName scrollListAnim;
       textScrollList -e -selectItem $newAnimName scrollListAnim;
 
+	  //update the "Output Filename" field
+	  textFieldGrp -e -text ($newAnimName + ".skm") -forceChangeCommand "skmOutputFile";
+	  
       skmUpdateAnimUI();
    }
 }
@@ -1665,12 +1668,12 @@ global proc skmExportGUI()
          setParent skmMainWin;
    frameLayout -label "Export Setup" -borderStyle etchedIn -collapsable false -collapse 0;
       columnLayout -adjustableColumn true;
-         intSliderGrp -label "Frames per Seconds:" -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmFpsUpdate -minValue 1 -value 30 sliderFps; //<- was "skmFps"
-         textFieldGrp -label "Skeleton Root Joint:" -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand skmUpdateSkeletonRoot skmRootField;
-         textFieldGrp -label "Partial Exporting, From Joint:" -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand skmUpdatePartialExportJoint skmPartialExportRootField;
-         textFieldGrp -label "Project Root Directory:" -adjustableColumn 2 -columnAttach 1 "right" 5 -ed false skmProjectRootDir;		 
-         textFieldGrp -label "Output Pathname:" -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand skmUpdateOutput skmOutputPath;
-         textFieldGrp -label "Output Filename:" -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand skmUpdateOutput skmOutputFile;
+         intSliderGrp -label "Frames per Seconds:" -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmFpsUpdate -minValue 1 -value 30 "sliderFps" ; //<- was "skmFps"
+         textFieldGrp -label "Skeleton Root Joint:" -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand skmUpdateSkeletonRoot "skmRootField" ;
+         textFieldGrp -label "Partial Exporting, From Joint:" -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand skmUpdatePartialExportJoint "skmPartialExportRootField" ;
+         textFieldGrp -label "Project Root Directory:" -adjustableColumn 2 -columnAttach 1 "right" 5 -ed false "skmProjectRootDir" ;		 
+         textFieldGrp -label "Output Pathname:" -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand skmUpdateOutput "skmOutputPath" ;
+         textFieldGrp -label "Output Filename:" -adjustableColumn 2 -columnAttach 1 "right" 5 -editable 0 -changeCommand skmUpdateOutput "skmOutputFile" ;
          columnLayout -adjustableColumn true -rowSpacing 2 -columnOffset "both" 10;
             button -label "Browse Output File" -command "fileBrowserDialog -m 4 -fc \"skmFileCb\" -an \"Select\" -om \"SaveAs\"";
             setParent skmMainWin;
