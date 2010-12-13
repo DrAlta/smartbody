@@ -1470,19 +1470,18 @@ global proc skmUpdatePartialExportJoint()
 global proc skmUpdateOutput()
 {
    // outputFile Attribute now is composed of directory name and file name
-
-   string $animDef = skmGetSelectedAnimDefName();
-   string $outputFileName = `textFieldGrp -q -text skmOutputFile`;
-   string $outputFilePath = `textFieldGrp -q -text skmOutputPath`;
-
-   if ( $outputFilePath == "" )
-   {
-      $outputFilePath = `pwd`;
-      textFieldGrp -edit -text $outputFilePath skmOutputPath;
-   }
-
-   $outputFile = $outputFilePath + "/" + $outputFileName;
-   setAttr -type "string" ( $animDef + ".outputFile" ) $outputFile ;
+	string $animDef = skmGetSelectedAnimDefName();
+	string $outputFileName = `textFieldGrp -q -text skmOutputFile`;
+	string $outputFilePath = `textFieldGrp -q -text skmOutputPath`;
+	string $outputFile;
+	
+	if ( $outputFilePath != "" ) {
+	   $outputFile = $outputFilePath + "/" + $outputFileName;
+	}
+	else {
+		$outputFile = $outputFileName ;
+	}
+	setAttr -type "string" ( $animDef + ".outputFile" ) $outputFile ;
 }
 
 global proc showExportingChannelsInfoPressed()
