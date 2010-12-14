@@ -1007,6 +1007,7 @@ void ParameterizedMotionRequest::realize_impl( BmlRequestPtr request, mcuCBHandl
  *  Implemtents BehaviorRequest::unschedule(..),
  *  ramping down the blend curve of the MeController.
  */
+
 void MeControllerRequest::unschedule( mcuCBHandle* mcu,
                                       BmlRequestPtr request,
                                       time_sec duration )

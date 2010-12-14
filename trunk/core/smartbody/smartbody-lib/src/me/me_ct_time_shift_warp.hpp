@@ -24,8 +24,9 @@
 #define ME_TIME_SHIFT_WARP_HPP
 
 #include <ME/me_ct_unary.hpp>
-#include <ME/me_spline_1d.hpp>
+//#include <ME/me_spline_1d.hpp>
 
+#include <sbm/sr_linear_curve.h>
 
 class MeCtTimeShiftWarp : public MeCtUnary {
 public:
@@ -34,14 +35,15 @@ public:
 	static const char* CONTROLLER_TYPE;
 
 protected:
-	MeSpline1D _time_func;
-	
+//	MeSpline1D _time_func;
+	srLinearCurve	_curve;
 
 public:
 	MeCtTimeShiftWarp( MeController* child = NULL );
 	// virtual ~MeCtTimeShiftWarp(); // Default destructor call ~MeCtUnary to delete child
 
-	MeSpline1D& time_func() { return _time_func; }
+//	MeSpline1D& time_func() { return _time_func; }
+	srLinearCurve& get_curve() { return _curve; }
 
     const char* controller_type() const;
 

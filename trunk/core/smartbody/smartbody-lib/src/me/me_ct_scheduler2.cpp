@@ -336,7 +336,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::create_track( MeCtUnary* blending,
 	return track;
 }
 
-#if 0
+#if 1
 // This schedule function define arbitary blending curve
 // numKeys: number of Knots used to define the curve
 // curveInfo: knots information, each knot is composed of four float, time weight slope-in slope-out
@@ -364,11 +364,16 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 	}
 
 	// Configure time mapping
+#if 0
 	MeSpline1D& tMapFunc = timingCt->time_func();
 	/*                      x        y            (l_tan, l_control_len, r_tan, and r_control_len are all zero) */
 	tMapFunc.make_cusp(     tin,     0,            0, 0, 0, 0 );
 	tMapFunc.make_cusp(     tin+dur, dur,          0, 0, 0, 0 );
-
+#else
+	srLinearCurve& time_warp = timingCt->get_curve();
+	time_warp.insert( tin, 0.0 );
+	time_warp.insert( tin + dur, dur );
+#endif
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string timing_name( "timing for " );
 		timing_name += ct_name;
@@ -431,6 +436,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 	}
 
 	// Configure time mapping
+#if 0
 	MeSpline1D& tMapFunc = timingCt->time_func();
 	/*                      x        y            (l_tan, l_control_len, r_tan, and r_control_len are all zero) */
 	tMapFunc.make_cusp(     tin,     0,            0, 0, 0, 0 );
@@ -439,12 +445,20 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 	} else {
 		tMapFunc.make_cusp( MAX_TRACK_DURATION, MAX_TRACK_DURATION-tin,  0, 0, 0, 0 );
 	}
+#else
+	srLinearCurve& time_warp = timingCt->get_curve();
+	time_warp.insert( tin, 0.0 );
+	if( dur_defined ) {
+		time_warp.insert( tout, ct_dur);
+	} else {
+		time_warp.insert( MAX_TRACK_DURATION, MAX_TRACK_DURATION-tin );
+	}
+#endif
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string timing_name( "timing for " );
 		timing_name += ct_name;
 		timingCt->name( timing_name.c_str() );
 	}
-
 
 	return create_track( blendingCt, timingCt, ct );
 }
@@ -566,6 +580,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 	}
 
 	// Configure time mapping
+#if 0
 	MeSpline1D& tMapFunc = timingCt->time_func();
 
 	MeCtMotion* motionController = dynamic_cast<MeCtMotion*>(ct);
@@ -594,9 +609,36 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 			tMapFunc.make_cusp( endAt,		 ct_dur,          0, 0, 0, 0 );
 		}
 	}
-	
-	
-	/*                      x        y            (l_tan, l_control_len, r_tan, and r_control_len are all zero) */
+#else
+	srLinearCurve& time_warp = timingCt->get_curve();
+	MeCtMotion* motionController = dynamic_cast<MeCtMotion*>(ct);
+	if (motionController)
+	{
+		SkMotion* skMotion = motionController->motion();
+		if (!dur_defined ) {
+			time_warp.insert( startAt,	0.0 );
+			time_warp.insert( MAX_TRACK_DURATION, MAX_TRACK_DURATION - startAt );
+		} else {
+			time_warp.insert( startAt,	0.0 );
+			time_warp.insert( readyAt,			skMotion->time_ready() );
+			time_warp.insert( strokeStartAt,	skMotion->time_stroke_start() );
+ 			time_warp.insert( strokeAt,			skMotion->time_stroke_emphasis() );
+			time_warp.insert( strokeEndAt,		skMotion->time_stroke_end() );
+			time_warp.insert( relaxAt,			skMotion->time_relax() );
+			time_warp.insert( endAt,	ct_dur );
+		}
+	}
+	else
+	{
+		MeCtSimpleNod* nod = dynamic_cast<MeCtSimpleNod*>(ct);
+		if (nod)
+		{
+			time_warp.insert( startAt,	0.0 );
+			time_warp.insert( endAt,	ct_dur );
+		}
+	}
+
+#endif
 
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string timing_name( "timing for " );
@@ -661,6 +703,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct1, MeControll
 	}
 
 	// Configure time mapping
+#if 0
 	MeSpline1D& tMapFunc = timingCt->time_func();
 	if (!dur_defined ) 
 	{
@@ -672,6 +715,19 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct1, MeControll
 		tMapFunc.make_cusp( startAt,			0,            0, 0, 0, 0 );
 		tMapFunc.make_cusp( startAt + ct_dur,    ct_dur,          0, 0, 0, 0 );
 	}
+#else
+	srLinearCurve& time_warp = timingCt->get_curve();
+	if (!dur_defined ) 
+	{
+		time_warp.insert( startAt, 0.0 );
+		time_warp.insert( MAX_TRACK_DURATION, MAX_TRACK_DURATION - startAt );
+	} 
+	else 
+	{
+		time_warp.insert( startAt, 0.0 );
+		time_warp.insert( startAt + ct_dur, ct_dur );
+	}
+#endif
 
 	if( ct_name && (ct_name[0]!='\0') ) {
 		std::string timing_name( "timing for " );

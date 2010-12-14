@@ -810,7 +810,8 @@ void prune_schedule( SbmCharacter*   actor,
 
 					double time_offset = time;
 					if( timing_ct ) {
-						time_offset = timing_ct->time_func().eval( time );
+//						time_offset = timing_ct->time_func().eval( time );
+						time_offset = timing_ct->get_curve().evaluate( time );
 					}
 
 					MeCtScheduler2* sched_ct = (MeCtScheduler2*)anim_source;
