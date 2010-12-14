@@ -336,7 +336,6 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::create_track( MeCtUnary* blending,
 	return track;
 }
 
-#if 1
 // This schedule function define arbitary blending curve
 // numKeys: number of Knots used to define the curve
 // curveInfo: knots information, each knot is composed of four float, time weight slope-in slope-out
@@ -347,6 +346,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 
 	const char* ct_name = ct->name();
 
+#if 0
 	MeSpline1D& bCurve = blendingCt->blend_curve();
 	/*                  x           y    (control_tan, l_control_len, and r_control_len are all zero) */
 	for (int i = 0; i < numKeys; i++)
@@ -355,6 +355,15 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 		float inTime = curveInfo[i*4+0];
 		bCurve.make_smooth(tin+inTime, weight, 0, 0, 0);		
 	}
+#else
+	srLinearCurve& blend_curve = blendingCt->get_curve();
+	for (int i = 0; i < numKeys; i++)
+	{
+		float t = curveInfo[i*4+0];
+		float w = curveInfo[i*4+1];
+		blend_curve.insert( tin + t, w );		
+	}
+#endif
 	double dur = curveInfo[(numKeys-1)*4] - tin;
 
 	if( ct_name && (ct_name[0]!='\0') ) {
@@ -364,16 +373,10 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 	}
 
 	// Configure time mapping
-#if 0
-	MeSpline1D& tMapFunc = timingCt->time_func();
-	/*                      x        y            (l_tan, l_control_len, r_tan, and r_control_len are all zero) */
-	tMapFunc.make_cusp(     tin,     0,            0, 0, 0, 0 );
-	tMapFunc.make_cusp(     tin+dur, dur,          0, 0, 0, 0 );
-#else
 	srLinearCurve& time_warp = timingCt->get_curve();
 	time_warp.insert( tin, 0.0 );
 	time_warp.insert( tin + dur, dur );
-#endif
+
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string timing_name( "timing for " );
 		timing_name += ct_name;
@@ -381,7 +384,6 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 	}
 	return create_track( blendingCt, timingCt, ct );
 }
-#endif
 
 MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin, double tout, float indt, float outdt )
 {
@@ -412,6 +414,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 	//if( out_cp_length > 1 )
 	//	out_cp_length = 1;
 
+#if 0
 	MeSpline1D& bCurve = blendingCt->blend_curve();
 	/*                  x           y    (control_tan, l_control_len, and r_control_len are all zero) */
 	if( indt>0 ) {
@@ -428,7 +431,24 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 			bCurve.make_disjoint( tout, 0, 1, 0, 0, 0, 0 );
 		}
 	}
-	// else leave blend fixed at 100% for eternity
+#else
+	srLinearCurve& blend_curve = blendingCt->get_curve();
+	if( indt>0 ) {
+		blend_curve.insert( tin,        0.0 );
+		blend_curve.insert( tin+indt,   1.0 );
+	} else {
+		blend_curve.insert( tin, 1.0 );
+	}
+	if( dur_defined ) {
+		if( outdt > 0 ) {
+			blend_curve.insert( tout - outdt, 1.0 );
+			blend_curve.insert( tout,       0.0 );
+		} else {
+			blend_curve.insert( tout, 0.0 );
+		}
+	}
+#endif
+
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string blend_name( "blending for " );
 		blend_name += ct_name;
@@ -436,16 +456,6 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 	}
 
 	// Configure time mapping
-#if 0
-	MeSpline1D& tMapFunc = timingCt->time_func();
-	/*                      x        y            (l_tan, l_control_len, r_tan, and r_control_len are all zero) */
-	tMapFunc.make_cusp(     tin,     0,            0, 0, 0, 0 );
-	if( dur_defined ) {
-		tMapFunc.make_cusp( tout,    ct_dur,          0, 0, 0, 0 );
-	} else {
-		tMapFunc.make_cusp( MAX_TRACK_DURATION, MAX_TRACK_DURATION-tin,  0, 0, 0, 0 );
-	}
-#else
 	srLinearCurve& time_warp = timingCt->get_curve();
 	time_warp.insert( tin, 0.0 );
 	if( dur_defined ) {
@@ -453,7 +463,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 	} else {
 		time_warp.insert( MAX_TRACK_DURATION, MAX_TRACK_DURATION-tin );
 	}
-#endif
+
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string timing_name( "timing for " );
 		timing_name += ct_name;
@@ -554,6 +564,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 	//if( out_cp_length > 1 )
 	//	out_cp_length = 1;
 
+#if 0
 	MeSpline1D& bCurve = blendingCt->blend_curve();
 	/*                  x           y    (control_tan, l_control_len, and r_control_len are all zero) */
 	if( indt > 0 || (blendStartSecond > blendStartFirst)) {
@@ -572,7 +583,24 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 			bCurve.make_disjoint( endAt, 0, 1, 0, 0, 0, 0 );
 		}
 	}
-	// else leave blend fixed at 100% for eternity
+#else
+	srLinearCurve& blend_curve = blendingCt->get_curve();
+	if( ( indt > 0 ) || ( blendStartSecond > blendStartFirst ) ) {
+		blend_curve.insert( blendStartFirst,   0.0 );
+		blend_curve.insert( blendStartSecond,   1.0 );
+	} else {
+		blend_curve.insert( blendStartFirst, 1.0 );
+	}
+	if( dur_defined ) {
+		if( outdt > 0 ) {
+			blend_curve.insert( relaxAt, 1.0 );
+			blend_curve.insert( endAt,    0.0 );
+		} else {
+			blend_curve.insert( endAt, 0.0 );
+		}
+	}
+#endif
+
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string blend_name( "blending for " );
 		blend_name += ct_name;
@@ -580,36 +608,6 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 	}
 
 	// Configure time mapping
-#if 0
-	MeSpline1D& tMapFunc = timingCt->time_func();
-
-	MeCtMotion* motionController = dynamic_cast<MeCtMotion*>(ct);
-	if (motionController)
-	{
-		SkMotion* skMotion = motionController->motion();
-		if (!dur_defined ) {
-			tMapFunc.make_cusp( startAt,     0,            0, 0, 0, 0 );
-			tMapFunc.make_cusp( MAX_TRACK_DURATION, MAX_TRACK_DURATION - startAt,  0, 0, 0, 0 );
-		} else {
-			tMapFunc.make_cusp( startAt,     0,            0, 0, 0, 0 );
-			tMapFunc.make_cusp( readyAt,    skMotion->time_ready(),          0, 0, 0, 0 );
-			tMapFunc.make_cusp( strokeStartAt,    skMotion->time_stroke_start(),          0, 0, 0, 0 );
- 			tMapFunc.make_cusp( strokeAt,    skMotion->time_stroke_emphasis(),          0, 0, 0, 0 );
-			tMapFunc.make_cusp( strokeEndAt,    skMotion->time_stroke_end(),          0, 0, 0, 0 );
-			tMapFunc.make_cusp( relaxAt,    skMotion->time_relax(),          0, 0, 0, 0 );
-			tMapFunc.make_cusp( endAt,    ct_dur,          0, 0, 0, 0 );
-		}
-	}
-	else
-	{
-		MeCtSimpleNod* nod = dynamic_cast<MeCtSimpleNod*>(ct);
-		if (nod)
-		{
-			tMapFunc.make_cusp( startAt,     0,          0, 0, 0, 0 );
-			tMapFunc.make_cusp( endAt,		 ct_dur,          0, 0, 0, 0 );
-		}
-	}
-#else
 	srLinearCurve& time_warp = timingCt->get_curve();
 	MeCtMotion* motionController = dynamic_cast<MeCtMotion*>(ct);
 	if (motionController)
@@ -638,14 +636,11 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 		}
 	}
 
-#endif
-
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string timing_name( "timing for " );
 		timing_name += ct_name;
 		timingCt->name( timing_name.c_str() );
 	}
-
 
 	return create_track( blendingCt, timingCt, ct );
 }
@@ -679,6 +674,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct1, MeControll
 
 	const char* ct_name = interpolator->name();
 
+#if 0
 	MeSpline1D& bCurve = blendingCt->blend_curve();
 	/*                  x           y    (control_tan, l_control_len, and r_control_len are all zero) */
 	if( indt>0 ) {
@@ -695,7 +691,24 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct1, MeControll
 			bCurve.make_disjoint( startAt + ct_dur, 0, 1, 0, 0, 0, 0 );
 		}
 	}
-	// else leave blend fixed at 100% for eternity
+#else
+	srLinearCurve& blend_curve = blendingCt->get_curve();
+	if( indt>0 ) {
+		blend_curve.insert( startAt,        0.0 );
+		blend_curve.insert( readyAt,		1.0 );
+	} else {
+		blend_curve.insert( startAt, 1.0 );
+	}
+	if( dur_defined ) {
+		if( outdt>0 ) {
+			blend_curve.insert( startAt + ct_dur - outdt,		 1.0 );
+			blend_curve.insert( startAt + ct_dur,				 0.0 );
+		} else {
+			blend_curve.insert( startAt + ct_dur, 0.0 );
+		}
+	}
+#endif
+
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string blend_name( "blending for " );
 		blend_name += ct_name;
@@ -703,19 +716,6 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct1, MeControll
 	}
 
 	// Configure time mapping
-#if 0
-	MeSpline1D& tMapFunc = timingCt->time_func();
-	if (!dur_defined ) 
-	{
-		tMapFunc.make_cusp( startAt,     0,            0, 0, 0, 0 );
-		tMapFunc.make_cusp( MAX_TRACK_DURATION, MAX_TRACK_DURATION - startAt,  0, 0, 0, 0 );
-	} 
-	else 
-	{
-		tMapFunc.make_cusp( startAt,			0,            0, 0, 0, 0 );
-		tMapFunc.make_cusp( startAt + ct_dur,    ct_dur,          0, 0, 0, 0 );
-	}
-#else
 	srLinearCurve& time_warp = timingCt->get_curve();
 	if (!dur_defined ) 
 	{
@@ -727,7 +727,6 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct1, MeControll
 		time_warp.insert( startAt, 0.0 );
 		time_warp.insert( startAt + ct_dur, ct_dur );
 	}
-#endif
 
 	if( ct_name && (ct_name[0]!='\0') ) {
 		std::string timing_name( "timing for " );
