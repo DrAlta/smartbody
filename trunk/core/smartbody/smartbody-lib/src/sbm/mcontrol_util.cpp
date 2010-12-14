@@ -558,12 +558,13 @@ void mcuCBHandle::update( void )	{
 		if( char_p ) {
 
 			char_p->eye_blink_update();
-			char_p->scene_p->update();
-			char_p->dMesh_p->update();
-
+		
 			if (char_p->is_viseme_curve())	{		// For bone bus viseme in Curve Mode
 				char_p->update_viseme_curve( time );	
 			}
+
+			char_p->scene_p->update();
+			char_p->dMesh_p->update();
 
 			if ( net_bone_updates && char_p->skeleton_p && char_p->bonebusCharacter ) {
 				NetworkSendSkeleton( char_p->bonebusCharacter, char_p->skeleton_p, &param_map );
