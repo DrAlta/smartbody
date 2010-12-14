@@ -56,7 +56,6 @@ MeCtLocomotion::MeCtLocomotion() {
 	pre_blended_base_height = 0.0f;
 	r_blended_base_height = 0.0f;
 	style = 0;
-	motion_time = -1.0f;
 	last_time = 0.0f;
 	translation_joint_height = 0.0f;
 	valid = false;
@@ -126,15 +125,6 @@ SkChannelArray& MeCtLocomotion::controller_channels() {
 
 void MeCtLocomotion::get_translation_base_joint_index()
 {
-	/*for(int i = 0 ; i < nonlimb_joint_info.joint_name.size(); ++i)
-	{
-		SkJoint* joint = walking_skeleton->search_joint(nonlimb_joint_info.joint_name.get(i));
-		if(!joint->pos()->frozen(1))
-		{
-			translation_joint_index = i;
-			return;
-		}
-	}*/
 	for(int i = 0 ; i < nonlimb_joint_info.joint_name.size(); ++i)
 	{
 		if(nonlimb_joint_info.joint_name.get(i) == translation_joint_name)
@@ -291,15 +281,6 @@ void MeCtLocomotion::temp_update_for_footprint(MeFrameData& frame)
 		}
 	}
 
-	/*
-
-	navigator.update_world_offset();
-
-	navigator.update_world_mat();
-
-	update_nonlimb_mat_with_global_info();*/
-
-
 }
 
 bool MeCtLocomotion::is_motions_loaded()
@@ -307,18 +288,15 @@ bool MeCtLocomotion::is_motions_loaded()
 	return motions_loaded;
 }
 
-bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
-	// TODO: Update MeController to pass in delta time.
-	// Until then, fake it or compute it ourselves (but there are some gotchas)
-
-	
+bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) 
+{
 	if(!valid) return false;
 	if(!channels_valid ) return false;
 
 	if(!enabled) return false;
 	if(!motions_loaded) return motions_loaded;
 
-	if(anim_global_info.size() < 2) 
+	if(anim_global_info.size() < 2)// if the locomotion is enabled but no walking animation is loaded, update for kinematic footprints
 	{
 		temp_update_for_footprint(frame);
 		return false;
@@ -334,7 +312,8 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 		freeze_delta_time = 0.00f;
 	}
 
-	if(motion_time > 0.0f)
+	// time control for keyboard input, will stop the locomotion if no keyboard input detected in a time
+	/*if(motion_time > 0.0f)
 	{
 		motion_time -= delta_time;
 		if(motion_time < 0.0f) motion_time = 0.0f;
@@ -343,16 +322,13 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	{
 		navigator.set_reached_destination(frame);
 		motion_time = -1.0f;
-	}
+	}*/
+
 	SrBuffer<float>& buffer = frame.buffer(); // convenience reference
 
 	navigator.controller_evaluate(delta_time, frame);
-	//if the character is stopped, locomotion controller will not take computational time.
-	//if(navigator.check_stopped(&limb_list)) 
-		//return true;
 
-	float inc_frame;
-	inc_frame = (float)(delta_time/0.03333333f);
+	float inc_frame = (float)(delta_time/0.03333333f);
 
 	if(navigator.has_destination && navigator.get_destination_count() > navigator.get_curr_destination_index() && navigator.get_curr_destination_index()>=0)
 	{
@@ -364,6 +340,9 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 			else navigator.next_destination(frame);
 		}
 	}
+
+	if(navigator.get_target_local_velocity().len() > 0.0f)
+	int y = 0;
 
 	MeCtLocomotionLimb* limb;
 	if(navigator.get_local_velocity().len() != 0.0f)
@@ -377,10 +356,12 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	}
 	speed_accelerator.set_target_speed(navigator.get_target_local_velocity().len());
 
+
 	update(inc_frame, frame);
 
 	if(ik_enabled) apply_IK(); 
 
+	//balance control
 	balance.update(limb_list, SrVec(0.0f,1.0f,0.0f), &nonlimb_joint_info, navigator.get_orientation_angle(), translation_joint_index, (float)delta_time);
 
 	navigator.post_controller_evaluate(frame, limb_list.get(dominant_limb), reset);
@@ -391,6 +372,8 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) {
 	SrQuat quat;
 	SrQuat quat_buff;
 
+
+	// update joint values in channel buffer
 	for(int i = 0; i < limb_list.size(); ++i)
 	{
 		MeCtLocomotionJointInfo* info = &(limb_list.get(i)->limb_joint_info);
@@ -667,11 +650,11 @@ void MeCtLocomotion::blend_base_joint(MeFrameData& frame, float space_time, int 
 
 }
 
-void MeCtLocomotion::set_motion_time(float time)
+/*void MeCtLocomotion::set_motion_time(float time)
 {
 	navigator.reached_destination = false;
 	motion_time = time;
-}
+}*/
 
 void MeCtLocomotion::set_freeze(bool freeze)
 {
@@ -700,10 +683,16 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 			dominant_limb = determine_dominant_limb();
 			limb_list.get(dominant_limb)->space_time = 0.0f;
 		}
-	}
+		else
+		{
+			for(int i = 0; i < limb_list.size(); ++i)
+			{
+				limb_list.get(i)->direction_planner.reset();
+			}
+		}
+		speed_accelerator.clear_acceleration();
 
-	//if(speed_accelerator.get_target_speed() > speed_accelerator.get_curr_speed() || limb_list.get(dominant_limb)->space_time > 2.0f) 
-	speed_accelerator.update_speed(delta_time);
+	}
 
 	//get current direction
 	limb_list.get(dominant_limb)->direction_planner.update_direction(delta_time, &limb_list.get(dominant_limb)->space_time, 3, true);
@@ -718,16 +707,22 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 	MeCtLocomotionLimbAnim* anim2 = limb_list.get(dominant_limb)->get_walking_list()->get(r_anim2_index_dominant);
 	MeCtLocomotionLimbAnim* blended_anim = &limb_list.get(dominant_limb)->blended_anim;
 
+	// get the ratio of the two animations
+	dom_ratio = limb_list.get(dominant_limb)->direction_planner.get_ratio(anim1, anim2);
+	get_blended_timing_space(blended_anim->get_timing_space(), anim1->get_timing_space(), anim2->get_timing_space(), dom_ratio);
+
+	if(navigator.limb_blending_factor == 0.0f)
+	{
+		speed_accelerator.update_acceleration(limb_list.get(dominant_limb), blended_anim->get_timing_space());
+	}
+
+	//if(speed_accelerator.get_target_speed() > speed_accelerator.get_curr_speed() || limb_list.get(dominant_limb)->space_time > 2.0f) 
+	speed_accelerator.update_speed(delta_time);
+
 	// get current acceleration
 	float acc = speed_accelerator.update(&(limb_list.get(dominant_limb)->direction_planner.get_curr_direction()), limb_list.get(dominant_limb));
 
-	// get the ratio of the two animations
-
 	navigator.update_framerate_accelerator(acc, &limb_list);
-
-	dom_ratio = limb_list.get(dominant_limb)->direction_planner.get_ratio(anim1, anim2);
-
-	get_blended_timing_space(blended_anim->get_timing_space(), anim1->get_timing_space(), anim2->get_timing_space(), dom_ratio);
 
 	//the current frame number is the addition of previous frame number + increased frame num * acceleration
 	frame_num = blended_anim->get_timing_space()->get_virtual_frame(limb_list.get(dominant_limb)->space_time) + inc_frame * navigator.framerate_accelerator;

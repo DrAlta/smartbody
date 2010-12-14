@@ -39,7 +39,6 @@ public:
 								//2: opposite turn and reverse.
 
 	float		curr_ratio;
-	//float		last_space_time;
 
 	float		turning_speed; // in radians
 	float		target_turning_speed; // in radians
@@ -47,9 +46,6 @@ public:
 	SrVec		curr_direction;
 	SrVec		target_direction;
 	bool		direction_inversed;
-	//int			ref_time_num;
-
-	bool		automatic;
 
 public:
 	/** Constructor */
@@ -60,6 +56,7 @@ public:
 
 	float		get_ratio(MeCtLocomotionLimbAnim* anim1, MeCtLocomotionLimbAnim* anim2);
 
+	void		set_target_direction(SrVec& direction);
 	void		set_target_direction(SrVec* direction);
 
 	SrVec		get_target_direction();
@@ -79,8 +76,6 @@ public:
 	SrVec		get_curr_direction();
 
 	void		set_curr_direction(SrVec* direction);
-
-	void		set_automation(bool automatic);
 
 	void		reset();
 

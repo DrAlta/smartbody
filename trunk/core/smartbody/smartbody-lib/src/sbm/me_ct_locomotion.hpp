@@ -62,7 +62,6 @@ public:
 	int style;
 
 protected: // flags
-	
 	bool channels_valid;  // All necessary channels are present
 	bool valid;
 	bool joints_indexed;
@@ -98,8 +97,6 @@ protected:
 
 	SkChannelArray  request_channels;
 
-	//SkSkeleton* _skeleton_ref_p;
-
 	SrArray<MeCtLocomotionAnimGlobalInfo*> anim_global_info;
 
 	int dominant_limb;
@@ -110,14 +107,10 @@ protected:
 	SrArray<SrQuat> joint_quats1;
 	SrArray<SrQuat> joint_quats2;
 
-	double motion_time;
 	double last_time;
 	double delta_time;
 
 	char* base_name;
-	//char* nonlimb_blending_base_name;
-
-
 
 
 protected: // channel initialization related
@@ -140,10 +133,7 @@ public:
 	/** Destructor */
 	virtual ~MeCtLocomotion();
 
-
-
 	const char* controller_type() const;
-
 
 	/**
 	 *  Implements MeController::controller_channels().

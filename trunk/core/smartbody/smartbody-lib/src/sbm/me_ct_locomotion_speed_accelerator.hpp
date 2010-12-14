@@ -73,6 +73,7 @@ public:
 	void		set_acceleration(float acc);
 	void		set_max_acceleration(float max);
 	void		update_acceleration(MeCtLocomotionLimb* limb, MeCtLocomotionTimingSpace* timing_space);
+	void		clear_acceleration();
 
 };
 

@@ -80,6 +80,12 @@ void MeCtLocomotionSpeedAccelerator::update_speed(double time_interval)
 	}
 }
 
+void MeCtLocomotionSpeedAccelerator::clear_acceleration()
+{
+	target_acceleration = 0.0f;
+	acceleration = 0.0f;
+}
+
 float MeCtLocomotionSpeedAccelerator::update(SrVec* direction, MeCtLocomotionLimb* limb)
 {
 	if(direction->iszero()) return 0.0f;
@@ -159,6 +165,7 @@ void MeCtLocomotionSpeedAccelerator::set_max_acceleration(float max)
 void MeCtLocomotionSpeedAccelerator::update_acceleration(MeCtLocomotionLimb* limb, MeCtLocomotionTimingSpace* timing_space)
 {
 	if(proceed_acceleration == false || auto_accelerated == false) return;
+	if(target_speed == 0.0f && curr_speed == 0.0f) return;
 	float length = 0.0f;
 
 	if(target_speed >= curr_speed) 

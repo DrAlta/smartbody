@@ -25,7 +25,15 @@
 /** Constructor */
 MeCtLocomotionRoutine::MeCtLocomotionRoutine() 
 {
-
+	life_time = 0.0f;
+	elapsed_time = 0.0f;
+	direction.set(0.0f, 0.0f, 0.0f);
+	speed = 0.0f;
+	type = ME_CT_LOCOMOTION_ROUTINE_TYPE_UNKNOWN; 
+	global_rps = 0.0f;
+	local_rps = 0.0f;
+	local_angle = 0.0f;
+	SrVec target;
 }
 
 /** Destructor */

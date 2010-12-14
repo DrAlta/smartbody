@@ -165,7 +165,7 @@ void BML::Locomotion::parse_routine(DOMElement* elem, BmlRequestPtr request, int
 {
 	MeCtNavigationCircle* nav_circle = new MeCtNavigationCircle();
 	nav_circle->ref();
-	nav_circle->init( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	nav_circle->init( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1);
 	request->actor->posture_sched_p->create_track( NULL, NULL, nav_circle);
 	nav_circle->unref();
 
@@ -365,9 +365,12 @@ void BML::Locomotion::parse_routine(DOMElement* elem, BmlRequestPtr request, int
 				l_angular_speed = rotation_speed;
 				g_angular_speed = rotation_speed;
 			}
+			
 		}
+
 		child = getNextElement( child );
 	}
 
-	nav_circle->init( pos[0], pos[1], pos[2], g_angular_speed, l_angular_speed, 0, id, 0, 0, 0 );
+
+	nav_circle->init( pos[0], pos[1], pos[2], g_angular_speed, l_angular_speed, 0, id, 0, 0, 0, -1 );
 }

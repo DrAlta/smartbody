@@ -48,8 +48,8 @@ protected:
 
 	//temp, to be deleted=================
 public:
-	SkSkeleton* walking_skeleton;
-	SkSkeleton* standing_skeleton;
+	SkSkeleton*			walking_skeleton;
+	SkSkeleton*			standing_skeleton;
 
 	MeCtLocomotionAnimGlobalInfo* global_info;
 

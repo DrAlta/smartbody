@@ -28,6 +28,7 @@
 #pragma once
 
 //routine types
+#define ME_CT_LOCOMOTION_ROUTINE_TYPE_UNKNOWN	-1
 #define ME_CT_LOCOMOTION_ROUTINE_TYPE_STRAIGHT	0
 #define ME_CT_LOCOMOTION_ROUTINE_TYPE_CIRCULAR	1
 #define ME_CT_LOCOMOTION_ROUTINE_TYPE_TARGET	2
@@ -49,7 +50,8 @@ public:
 	float local_angle;
 	SrVec target;
 	//SrVec start_pos;
-	//double elapsed_time;
+	double life_time;
+	double elapsed_time;
 
 public:
 	float angle;
