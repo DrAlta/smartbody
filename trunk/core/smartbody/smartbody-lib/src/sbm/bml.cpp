@@ -1019,21 +1019,6 @@ void MeControllerRequest::unschedule( mcuCBHandle* mcu,
 			unary_blend_ct->controller_type() == MeCtBlend::CONTROLLER_TYPE )
 		{
 			MeCtBlend* blend = static_cast<MeCtBlend*>(unary_blend_ct);
-#if 0
-			MeSpline1D& spline = blend->blend_curve();
-			
-			MeSpline1D::domain time = mcu->time;
-			MeSpline1D::range  y = spline.eval( time );
-			MeSpline1D::range  slope = -y / duration;
-
-			spline.erase_after( time );
-			if( duration > 0 ) {
-				spline.make_smooth( time, y, slope, 1, 1 );
-				spline.make_smooth( time, 0, slope, 1, 1 );
-			} else {
-				spline.make_disjoint( time, 0, y, 0, 1, 0, 1 );
-			}
-#else
 			srLinearCurve& blend_curve = blend->get_curve();
 			double t = mcu->time;
 			blend_curve.clear_after( t );
@@ -1044,7 +1029,6 @@ void MeControllerRequest::unschedule( mcuCBHandle* mcu,
 			} else {
 				blend_curve.insert( t, 0.0 );
 			}
-#endif
 		}
 	}
 

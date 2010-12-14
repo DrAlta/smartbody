@@ -346,16 +346,6 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 
 	const char* ct_name = ct->name();
 
-#if 0
-	MeSpline1D& bCurve = blendingCt->blend_curve();
-	/*                  x           y    (control_tan, l_control_len, and r_control_len are all zero) */
-	for (int i = 0; i < numKeys; i++)
-	{
-		float weight = curveInfo[i*4+1];
-		float inTime = curveInfo[i*4+0];
-		bCurve.make_smooth(tin+inTime, weight, 0, 0, 0);		
-	}
-#else
 	srLinearCurve& blend_curve = blendingCt->get_curve();
 	for (int i = 0; i < numKeys; i++)
 	{
@@ -363,7 +353,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 		float w = curveInfo[i*4+1];
 		blend_curve.insert( tin + t, w );		
 	}
-#endif
+
 	double dur = curveInfo[(numKeys-1)*4] - tin;
 
 	if( ct_name && (ct_name[0]!='\0') ) {
@@ -397,41 +387,6 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 	const char* ct_name = ct->name();
 
 	// Configure blend curve
-
-	//////////////////////////////////////////////////////
-	//  TODO: Utilize slopes when spline is not linear
-	//// slopes
-	//MeSpline1D::range in_slope = 1/indt;
-	//MeSpline1D::range out_slope = -1/outdt;
-	//// control point lengths
-	//MeSpline1D::range in_cp_length = indt/2;
-	//if( in_cp_length > 1 )
-	//	in_cp_length = 1;
-	//MeSpline1D::range mid_cp_length = (dur-indt-outdt)/2;
-	//if( mid_cp_length > 1 )
-	//	mid_cp_length = 1;
-	//MeSpline1D::range out_cp_length = outdt/2;
-	//if( out_cp_length > 1 )
-	//	out_cp_length = 1;
-
-#if 0
-	MeSpline1D& bCurve = blendingCt->blend_curve();
-	/*                  x           y    (control_tan, l_control_len, and r_control_len are all zero) */
-	if( indt>0 ) {
-		bCurve.make_smooth( tin,        0,   0, 0, 0 );
-		bCurve.make_smooth( tin+indt,   1,   0, 0, 0 );
-	} else {
-		bCurve.make_disjoint( tin, 1, 0, 0, 0, 0, 0 );
-	}
-	if( dur_defined ) {
-		if( outdt>0 ) {
-			bCurve.make_smooth( tout-outdt, 1,   0, 0, 0 );
-			bCurve.make_smooth( tout,       0,   0, 0, 0 );
-		} else {
-			bCurve.make_disjoint( tout, 0, 1, 0, 0, 0, 0 );
-		}
-	}
-#else
 	srLinearCurve& blend_curve = blendingCt->get_curve();
 	if( indt>0 ) {
 		blend_curve.insert( tin,        0.0 );
@@ -447,7 +402,6 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 			blend_curve.insert( tout, 0.0 );
 		}
 	}
-#endif
 
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string blend_name( "blending for " );
@@ -547,43 +501,6 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 
 	
 	// Configure blend curve
-
-	//////////////////////////////////////////////////////
-	//  TODO: Utilize slopes when spline is not linear
-	//// slopes
-	//MeSpline1D::range in_slope = 1/indt;
-	//MeSpline1D::range out_slope = -1/outdt;
-	//// control point lengths
-	//MeSpline1D::range in_cp_length = indt/2;
-	//if( in_cp_length > 1 )
-	//	in_cp_length = 1;
-	//MeSpline1D::range mid_cp_length = (dur-indt-outdt)/2;
-	//if( mid_cp_length > 1 )
-	//	mid_cp_length = 1;
-	//MeSpline1D::range out_cp_length = outdt/2;
-	//if( out_cp_length > 1 )
-	//	out_cp_length = 1;
-
-#if 0
-	MeSpline1D& bCurve = blendingCt->blend_curve();
-	/*                  x           y    (control_tan, l_control_len, and r_control_len are all zero) */
-	if( indt > 0 || (blendStartSecond > blendStartFirst)) {
-		bCurve.make_smooth( blendStartFirst,   0,   0, 0, 0 );
-		//bCurve.make_smooth( startAt,   1,   0, 0, 0 );
-		bCurve.make_smooth( blendStartSecond,   1,   0, 0, 0 );
-	} else {
-		bCurve.make_disjoint( blendStartFirst, 1, 0, 0, 0, 0, 0 );
-	}
-	if( dur_defined ) {
-		if( outdt > 0 ) {
-			bCurve.make_smooth( relaxAt, 1,   0, 0, 0 );
-			//bCurve.make_smooth( endAt,   1,   0, 0, 0 );
-			bCurve.make_smooth( endAt,       0,   0, 0, 0 );
-		} else {
-			bCurve.make_disjoint( endAt, 0, 1, 0, 0, 0, 0 );
-		}
-	}
-#else
 	srLinearCurve& blend_curve = blendingCt->get_curve();
 	if( ( indt > 0 ) || ( blendStartSecond > blendStartFirst ) ) {
 		blend_curve.insert( blendStartFirst,   0.0 );
@@ -599,7 +516,6 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 			blend_curve.insert( endAt, 0.0 );
 		}
 	}
-#endif
 
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string blend_name( "blending for " );
@@ -672,26 +588,6 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct1, MeControll
 	MeCtTimeShiftWarp* timingCt   = new MeCtTimeShiftWarp( interpolator );
 	MeCtBlend*         blendingCt = new MeCtBlend( timingCt );
 
-	const char* ct_name = interpolator->name();
-
-#if 0
-	MeSpline1D& bCurve = blendingCt->blend_curve();
-	/*                  x           y    (control_tan, l_control_len, and r_control_len are all zero) */
-	if( indt>0 ) {
-		bCurve.make_smooth( startAt,        0,   0, 0, 0 );
-		bCurve.make_smooth( readyAt,		1,   0, 0, 0 );
-	} else {
-		bCurve.make_disjoint( startAt, 1, 0, 0, 0, 0, 0 );
-	}
-	if( dur_defined ) {
-		if( outdt>0 ) {
-			bCurve.make_smooth( startAt + ct_dur - outdt,		 1,   0, 0, 0 );
-			bCurve.make_smooth( startAt + ct_dur,				 0,   0, 0, 0 );
-		} else {
-			bCurve.make_disjoint( startAt + ct_dur, 0, 1, 0, 0, 0, 0 );
-		}
-	}
-#else
 	srLinearCurve& blend_curve = blendingCt->get_curve();
 	if( indt>0 ) {
 		blend_curve.insert( startAt,        0.0 );
@@ -707,8 +603,8 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct1, MeControll
 			blend_curve.insert( startAt + ct_dur, 0.0 );
 		}
 	}
-#endif
 
+	const char* ct_name = interpolator->name();
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string blend_name( "blending for " );
 		blend_name += ct_name;

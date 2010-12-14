@@ -28,7 +28,6 @@
 
 #include <ME/me_ct_unary.hpp>
 #include <ME/me_controller_context_proxy.hpp>
-//#include <ME/me_spline_1d.hpp>
 
 #include <sbm/sr_linear_curve.h>
 
@@ -135,7 +134,6 @@ public:
 protected:
 	//////////////////////////////////////////////////////////////////////////
 	//  MeCtBlend Private Data
-//	MeSpline1D     _blend_curve;
 	srLinearCurve	_curve;
 
 	MeCtBlend::Context* const _sub_blend_context;
