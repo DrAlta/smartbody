@@ -152,10 +152,20 @@ std::string PathResource::getType()
 	return type;
 }
 
+void PathResource::setMediaPath(std::string mp)
+{
+	mediaPath = mp;
+}
+
+std::string PathResource::getMediaPath()
+{
+	return mediaPath;
+}
+
 std::string PathResource::dump()
 {
 	std::stringstream stream;
-	stream << "Path: [" << type << "] " << path;
+	stream << "Path: [" << type << "] [media path=" << mediaPath << "] " << path;
 	stream << Resource::dump();
 	return stream.str();
 }

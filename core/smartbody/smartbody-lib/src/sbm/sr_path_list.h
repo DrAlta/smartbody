@@ -27,6 +27,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <sstream>
 
 #include "sbm_constants.h"
 
@@ -59,6 +60,14 @@ class srPathList	{
 			}
 			//delete head;
 		}
+
+		void setPathPrefix(std::string pre) {
+			prefix = pre;
+		}
+		
+		std::string getPathPrefix() {
+			return prefix;
+		}
 		
 		int insert( char *path )	{
 			if( path )	{
@@ -76,30 +85,46 @@ class srPathList	{
 			iterator = head; 
 		}
 		
-		char *next_path( void )	{
+		std::string next_path( void )	{
 			if( iterator )	{
 				iterator = iterator->next;
 				if( iterator )	{
-					return( iterator->path );
+					std::stringstream strstr;
+					// if the path is an absolute path, don't prepend the media path
+					SrString p = iterator->path;
+					std::string mediaPath = getPathPrefix();
+					if (mediaPath.size() > 0 && !p.has_absolute_path())
+						strstr << getPathPrefix() << "\\";
+					strstr << iterator->path;
+
+					SrString candidatePath;
+					candidatePath.make_valid_path(strstr.str().c_str());
+					std::string finalPath = candidatePath;
+					// remove the final '/'
+					finalPath = finalPath.substr(0, finalPath.size() - 1);
+					
+					return( finalPath );
 				}
 			}
-			return( NULL );
+			return( "" );
 		}
 
-		char *next_filename( 
+		std::string next_filename( 
 			char *buffer, 
 			const char *name, 
 			char **path_pp = NULL
 		)	{
-			char *path = next_path();
-			if( path )	{
-				sprintf( buffer, "%s/%s", path, name );
+			std::string path = next_path();
+			if( path.size() > 0 )	{
+				std::stringstream strstr;
+				strstr << path << "/" << name;
 				if( path_pp )	{
-					*path_pp = path;
+					//*path_pp = path;
+					// what to do here?
 				}
-				return( buffer );
+				return( strstr.str() );
 			}
-			return( NULL );
+			return( "" );
 		}
 
 	private:
@@ -107,6 +132,7 @@ class srPathList	{
 		sr_path_link_t *head;
 		sr_path_link_t *tail;
 		sr_path_link_t *iterator;
+		std::string prefix;
 };
 
 //////////////////////////////////////////////////////////////////////////////////

@@ -314,6 +314,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "resource",            resource_cmd_func );
 	mcu.insert( "syncpolicy",          mcu_syncpolicy_func );
 	mcu.insert( "check",			   mcu_check_func);		// check matching between .skm and .sk
+	mcu.insert( "mediapath",		   mcu_mediapath_func);
 	
 	mcu.insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands
 
@@ -613,6 +614,12 @@ int main( int argc, char **argv )	{
 			SrString skmScale = s;
 			skmScale.remove( 0, 10 );
 			mcu.skmScale = atof(skmScale);
+		}
+		else if ( s.search( "-mediapath=" ) == 0 )
+		{
+			std::string mediaPath = s;
+			mediaPath = mediaPath.substr(11);
+			mcu.setMediaPath(mediaPath);
 		}
 		else
 		{

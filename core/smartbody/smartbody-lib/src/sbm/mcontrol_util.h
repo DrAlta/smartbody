@@ -181,7 +181,8 @@ class mcuCBHandle	{
 		
 		srPathList	seq_paths;
 		srPathList	me_paths;
-		srPathList	bp_paths;
+
+		std::string media_path;
 
 		/** Character id for test commands to use when required but not specified. */
 		std::string test_character_default;
@@ -444,6 +445,9 @@ class mcuCBHandle	{
 				if (channelbufferviewer_factory != NULL) delete channelbufferviewer_factory;
 				channelbufferviewer_factory = factory;
 		}
+
+		void setMediaPath(std::string path);
+		std::string getMediaPath();
 
 	protected:
 		FILE* open_sequence_file( const char *seq_name );

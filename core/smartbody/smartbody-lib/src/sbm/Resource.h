@@ -50,11 +50,15 @@ class PathResource : public Resource		// Path resources with type [ME/SEQ] speci
 
 		void setPath(std::string p);
 		std::string getPath();
+
+		void setMediaPath(std::string mp);
+		std::string getMediaPath();
 		
 		std::string dump();
 	protected:
 		std::string path;
 		std::string type;
+		std::string mediaPath;
 };
 
 class CmdResource : public Resource			// Cmd resources
