@@ -244,9 +244,7 @@ namespace BML {
 		 *  Schedules a cancelation / interruption of the behavior
 		 *  at specified time and duration.
 		 */
-		virtual void unschedule( mcuCBHandle* mcu,
-		                         BmlRequestPtr request,
-			                     time_sec duration ) = 0;
+		virtual void unschedule( mcuCBHandle* mcu, BmlRequestPtr request, time_sec duration ) = 0;
 
 		/**
 		 *  Abstract method point for implementing the specific clean-up algorithm.
@@ -309,8 +307,7 @@ namespace BML {
 		 *  Implemtents BehaviorRequest::unschedule(..),
 		 *  ramping down the blend curve of the MeController.
 		 */
-		virtual void unschedule( mcuCBHandle* mcu, BmlRequestPtr request,
-			                     time_sec duration );
+		virtual void unschedule( mcuCBHandle* mcu, BmlRequestPtr request, time_sec duration );
 
 		/**
 		 *  Implemtents BehaviorRequest::cleanup(..),

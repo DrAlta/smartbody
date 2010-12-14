@@ -59,6 +59,7 @@
  *  WARNING: Despite the advanced API, the only implements linear interpolation
  *           for now (time constraints).
  */
+
 class MeSpline1D {
 	///////////////////////////////////////////////////////////////////////
 	//  Nested Types
@@ -316,6 +317,5 @@ operator << ( std::basic_ostream<charT,traits>& out, const MeSpline1D::Knot& kno
 
 	return out;
 }
-
 
 #endif // ME_SPLINE_1D_HPP

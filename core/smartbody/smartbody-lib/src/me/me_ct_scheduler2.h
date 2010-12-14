@@ -325,7 +325,7 @@ public:
 	 */
 	TrackPtr schedule( MeController* c, double tin, double tout, float indt, float outdt );
 
-#if 0
+#if 1
 	/** Backwards compatible schedule function: (sans Static/Once track type)
 	 *
 	 *  Schedule controller c with the given parameters.

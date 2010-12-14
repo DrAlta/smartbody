@@ -119,6 +119,7 @@ class srLinearCurve	{
 				Key *tmp_p = key_p;
 				key_p = key_p->next();
 				delete tmp_p;
+				decrement();
 			}
 			null();
 		}
@@ -142,9 +143,44 @@ class srLinearCurve	{
 		int insert( double p, double v )	{ /* sort by key.time, add after same time */
 			return( insert_key( new Key( p, v ) ) );
 		}
-
-		double get_tail_slope( void )	{
 		
+		void clear_after( double t )	{
+		
+			if( head_p == NULL )	{
+				return;
+			}
+			Key *key_p = head_p;
+			Key *floor_p = find_floor_key( t );
+			if( floor_p )	{
+				key_p = floor_p->next();
+			}
+			if( key_p ) {
+				Key *tmp_p = key_p;
+				key_p = key_p->next();
+				delete tmp_p;
+				decrement();
+			}
+		}
+
+		double get_tail_param( void )	{
+			if( dirty ) {
+				update_intervals();
+			}
+			if( tail_p )	{
+				return( tail_p->param );
+			}
+			return( 0.0 );
+		}
+		double get_tail_value( void )	{
+			if( dirty ) {
+				update_intervals();
+			}
+			if( tail_p )	{
+				return( tail_p->value );
+			}
+			return( 0.0 );
+		}
+		double get_tail_slope( void )	{
 			if( dirty ) {
 				update_intervals();
 			}
@@ -264,6 +300,10 @@ class srLinearCurve	{
 			}
 		}
 
+		void decrement( void )	{
+			key_count--;
+			dirty = true;
+		}
 		void increment( void )	{
 			key_count++;
 			dirty = true;

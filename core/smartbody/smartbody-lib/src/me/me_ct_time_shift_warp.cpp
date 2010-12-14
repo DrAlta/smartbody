@@ -29,7 +29,7 @@
 #include <sstream>
 
 
-typedef MeSpline1D::Knot  Knot;
+//typedef MeSpline1D::Knot  Knot;
 
 
 const char* MeCtTimeShiftWarp::CONTROLLER_TYPE = "MeCtTimeShiftWarp";
@@ -48,18 +48,26 @@ const char* MeCtTimeShiftWarp::controller_type() const {
 }
 
 double MeCtTimeShiftWarp::controller_duration() {
+#if 0
 	MeSpline1D::Knot* knot = _time_func.knot_last();
 	if( knot ) {
 		return knot->get_x();  // greatest valid input time
 	} else {
 		return 0;
 	}
+#else
+	return( _curve.get_tail_param() );
+#endif
 }
 
 bool MeCtTimeShiftWarp::controller_evaluate( double t, MeFrameData & frame ) {
 	if( child() ) {
+#if 0
 		double warpTime = _time_func( t );
 		child()->evaluate( warpTime, frame );
+#else
+		child()->evaluate( _curve.evaluate( t ), frame );
+#endif
 		return true;
 	} else {
 		return false;
@@ -76,6 +84,7 @@ void MeCtTimeShiftWarp::print_state( int tab_count ) {
 	if( name && name[0]!='\0' )
 		out << " \"" << name << "\"";
 
+#if 0
 	// Don't show scientific notation
 	out << fixed << setprecision(2);
 	Knot* knot = _time_func.knot_first();
@@ -87,6 +96,7 @@ void MeCtTimeShiftWarp::print_state( int tab_count ) {
 			knot = knot->get_next();
 		}
 	}
+#endif
 	cout << out.str();
 
 	print_children( tab_count );
