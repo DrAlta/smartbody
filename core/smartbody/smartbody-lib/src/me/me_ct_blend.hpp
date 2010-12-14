@@ -28,8 +28,9 @@
 
 #include <ME/me_ct_unary.hpp>
 #include <ME/me_controller_context_proxy.hpp>
-#include <ME/me_spline_1d.hpp>
+//#include <ME/me_spline_1d.hpp>
 
+#include <sbm/sr_linear_curve.h>
 
 class MeCtBlend : public MeCtUnary  {
 public:
@@ -134,7 +135,9 @@ public:
 protected:
 	//////////////////////////////////////////////////////////////////////////
 	//  MeCtBlend Private Data
-	MeSpline1D     _blend_curve;
+//	MeSpline1D     _blend_curve;
+	srLinearCurve	_curve;
+
 	MeCtBlend::Context* const _sub_blend_context;
 
 	//  Channel index mappings:
@@ -154,7 +157,8 @@ public:
 
 	//virtual void set_child( MeController* child );  // Use init( child )
 
-	MeSpline1D& blend_curve() { return _blend_curve; }
+//	MeSpline1D& blend_curve() { return _blend_curve; }
+	srLinearCurve& get_curve() { return _curve; }
 
 protected:
 	void controller_map_updated();

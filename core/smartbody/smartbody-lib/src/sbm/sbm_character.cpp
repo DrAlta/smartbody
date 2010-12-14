@@ -736,6 +736,7 @@ void prune_schedule( SbmCharacter*   actor,
 				// Determine if the blend is still active,
 				// or will ever be in the future
 
+#if 0
 				MeSpline1D& spline = blend_ct->blend_curve();
 				MeSpline1D::Knot* knot = spline.knot_last();
 				if( knot != NULL ) {
@@ -791,6 +792,64 @@ void prune_schedule( SbmCharacter*   actor,
 					// A spline with no knots evaluates to 0
 					in_use = false;
 				}
+#else
+				srLinearCurve& blend_curve = blend_ct->get_curve();
+				int n = blend_curve.get_num_keys();
+				if( n > 0 )	{
+					double t = blend_curve.get_tail_param();
+					double v = blend_curve.get_tail_value();
+
+					if( LOG_CONTROLLER_TREE_PRUNING )
+						LOG("\tblend_Ct \"%s\": blend curve last knot: t = %f v = %f", blend_ct->name(), t, v );
+					if( t < time ) {
+						flat_blend_curve = true;
+						if( v == 0.0 ) {
+							in_use = false;
+						}
+					} else {
+						LOG("sbm_character.cpp prune_schedule(): ERR: this pruning path not implemented");
+#if 0
+// NOTE: UNUSED CODE PATH...
+						// Has knots beyond current time
+						static const double END_OF_TIME = MeCtScheduler2::MAX_TRACK_DURATION * 0.999;  // Edge of acceptable precision
+
+						// Last knots are far in the future, beyond reasonable values of time
+						MeSpline1D::Knot* prev_knot = knot->get_prev();
+						while( prev_knot!=NULL && prev_knot->get_x()>END_OF_TIME ) {
+							knot = prev_knot;
+							prev_knot = knot->get_prev();
+						}
+
+						if( knot->get_x()>END_OF_TIME || knot->get_left_y() == knot->get_y() ) {
+							// This knot is flat, time to check others...
+							flat_blend_curve = true;
+
+							while( flat_blend_curve && prev_knot!=NULL && prev_knot->get_x() > time ) {
+								flat_blend_curve = prev_knot->get_y()==y && prev_knot->get_left_y()==y;
+								prev_knot = prev_knot->get_prev();
+							}
+							if( flat_blend_curve && prev_knot!=NULL ) {
+								// prev_knot is knot just before time
+								flat_blend_curve = prev_knot->get_y()==y;
+							}
+						}
+						
+						// Only consider the most recent end-of-time knot and its left value
+						y = knot->get_left_y();
+						in_use = flat_blend_curve ? ( y <=0 ) : true;
+#endif
+					}
+				} 
+				else	{
+					if( LOG_PRUNE_TRACK_WITHOUT_BLEND_SPLIE_KNOTS ) {
+						std::stringstream strstr;
+						strstr << "DEBUG: prune_schedule(..): sched \""<<sched->name()<<"\", anim_source \""<<anim_source->name()<<"\": blend_ct without spline knots.";
+						LOG(strstr.str().c_str());
+						blend_ct->print_state(1);  // Prints controller type, name, and blend curve
+					}
+					in_use = false; // A spline with no knots evaluates to 0
+				}
+#endif
 			}
 
 			const char* anim_ct_type = anim_source->controller_type();
@@ -810,7 +869,6 @@ void prune_schedule( SbmCharacter*   actor,
 
 					double time_offset = time;
 					if( timing_ct ) {
-//						time_offset = timing_ct->time_func().eval( time );
 						time_offset = timing_ct->get_curve().evaluate( time );
 					}
 
@@ -1345,11 +1403,16 @@ int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 					float  blend_spline_tanget = -1/blend_out_dur;
 
 					MeCtBlend* blend_ct = (MeCtBlend*)blending_ct;
+#if 0
 					MeSpline1D& spline = blend_ct->blend_curve();
 					// TODO: Don't assume we're starting at 1, may already be less than and already blending out.
 					spline.make_cusp( blend_out_start,1,  0,1, blend_spline_tanget,1 );
 					MeSpline1D::Knot* knot = spline.make_cusp( blend_out_end,  0,  blend_spline_tanget,1, 0,1 );
-
+#else
+					srLinearCurve& blend_curve = blend_ct->get_curve();
+					blend_curve.insert( blend_out_start, 1.0 );
+					blend_curve.insert( blend_out_end, 0.0 );
+#endif
 					// TODO: delete following knots
 
 					if( blend_out_dur > max_blend_dur )

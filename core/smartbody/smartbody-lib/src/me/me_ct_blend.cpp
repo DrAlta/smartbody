@@ -36,7 +36,7 @@
 
 using namespace std;
 
-typedef MeSpline1D::Knot  Knot;
+//typedef MeSpline1D::Knot  Knot;
 
 
 const char* MeCtBlend::CONTROLLER_TYPE = "MeCtBlend";
@@ -379,7 +379,8 @@ bool MeCtBlend::controller_evaluate( double t, MeFrameData & frame ) {
 	if( child() ) {
 		MeEvaluationLogger* logger_p = _context->get_evaluation_logger();
 
-		float a = static_cast<float>( _blend_curve( t ) ); // interpolation alpha
+//		float a = static_cast<float>( _blend_curve( t ) ); // interpolation alpha
+		float a = (float)_curve.evaluate( t ); // interpolation alpha
 		if( a > 0 ) {
 			SkChannelArray& local_channels = _sub_blend_context->_local_channels;  // controller_channels actually gives child's requested channels
 			const int num_channels = local_channels.size();
@@ -624,6 +625,7 @@ void MeCtBlend::print_state( int tab_count ) {
 		out << " \"" << name_str << "\"";
 	}
 
+#if 0
 	Knot* knot = _blend_curve.knot_first();
 	if( knot ) {
 		out  << ":" << endl << indent << "blend_curve: " << *knot;
@@ -633,6 +635,7 @@ void MeCtBlend::print_state( int tab_count ) {
 			knot = knot->get_next();
 		}
 	}
+#endif
 	LOG("%s", out.str().c_str());
 
 	print_children( tab_count );
