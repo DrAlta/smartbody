@@ -1,6 +1,7 @@
 #include "sr_cmd_line.h"
 #include <sstream>
 #include <vhcl_log.h>
+#include "mcontrol_util.h"
 
 srCmdLine::srCmdLine( int len )
 {
@@ -30,7 +31,81 @@ int srCmdLine::pending_cmd(void)
 #ifdef WIN32_LEAN_AND_MEAN	// what's this stands for
 	while( _kbhit() )	{
 		char c = _getch();
-		if (c == '\x0' || c == '\xE0')
+		if (c == '\x09') // tab - use auto completion for commands
+		{
+			// get the current partial command
+			std::string partialCommand(cmd_buffer, buffer_use);
+			// only use tab completion on the first word
+			size_t index = partialCommand.find_first_of(" ");
+			if (index != std::string::npos)
+			{
+				std::cout << c;
+				continue;
+			}
+			// find a match against the current list of commands
+			mcuCBHandle& mcu = mcuCBHandle::singleton();
+			srHashMapBase& map = mcu.cmd_map.getHashMap();
+			int numEntries = map.get_num_entries();
+			map.reset();
+			int numMatches = 0;
+			char* key = NULL;
+			int numChecked = 0;
+			map.next(&key);
+			std::vector<std::string> options;
+			while (key)
+			{
+				bool match = false;
+				std::string keyString = key;
+				numChecked++;
+				if (partialCommand.size() <= keyString.size())
+				{
+					match = true;
+					for (size_t a = 0; a < partialCommand.size() && a < keyString.size(); a++)
+					{
+						if (partialCommand[a] != keyString[a])
+						{
+							match = false;
+							break;
+						}
+					}
+					if (match)
+					{
+						options.push_back(keyString);
+						numMatches++;
+					}
+				}
+				map.next(&key);
+				std::string nextKey = key;
+				if (nextKey == keyString)
+					break; // shouldn't map.next(key) make key == NULL? This doesn't seem to happen.
+			} 
+			if (numMatches == 1)
+			{
+				int numChars = buffer_use;
+				strcpy(cmd_buffer, options[0].c_str());
+				buffer_use =  options[0].size();
+				for (size_t n = numChars; n <  options[0].size(); n++)
+				{
+					std::cout <<  options[0][n];
+				}
+				std::cout << " ";
+				continue;
+			}
+			else if (numMatches > 1)
+			{ // more than one match, show the options on the line below
+				printf("\n");
+				for (size_t x = 0; x < options.size(); x++)
+				{
+					std::cout << options[x] << " ";
+				}
+				printf("\n> ");
+				for (int x = 0; x < buffer_use; x++)
+					std::cout << cmd_buffer[x];
+
+				continue;
+			}
+		}
+		else if (c == '\x0' || c == '\xE0')
 		{
 			char c_next = _getch();
 			if (c_next == '\x48') {
