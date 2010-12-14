@@ -42,6 +42,7 @@ class SrEvent
     enum Type { None,    //!< No event occured.
                 Push,    //!< A mouse button was pushed.
                 Drag,    //!< The mouse moved with a button down.
+				Move,    //!< The mouse was moved without a button being pressed.
                 Release, //!< A mouse button was released.
                 Keyboard //!< A key was pressed.
               };
