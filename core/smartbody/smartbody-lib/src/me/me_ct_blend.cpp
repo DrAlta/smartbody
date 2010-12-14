@@ -379,7 +379,6 @@ bool MeCtBlend::controller_evaluate( double t, MeFrameData & frame ) {
 	if( child() ) {
 		MeEvaluationLogger* logger_p = _context->get_evaluation_logger();
 
-//		float a = static_cast<float>( _blend_curve( t ) ); // interpolation alpha
 		float a = (float)_curve.evaluate( t ); // interpolation alpha
 		if( a > 0 ) {
 			SkChannelArray& local_channels = _sub_blend_context->_local_channels;  // controller_channels actually gives child's requested channels
