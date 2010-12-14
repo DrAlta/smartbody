@@ -26,7 +26,7 @@ namespace rapidxml
         
         //! Loads file into the memory. Data will be automatically destroyed by the destructor.
         //! \param filename Filename to load.
-#if 0 
+#if 1 
 		file(const char *filename)
         {
             using namespace std;
@@ -57,7 +57,7 @@ namespace rapidxml
 					if( len != -1L )	{
 						_lseek( fh, 0L, SEEK_SET );
 						m_data.resize( len + 1 );
-						_read( fh, &m_data.front(), len )
+						_read( fh, &m_data.front(), len );
 						m_data[ len ] = 0;
 					}
 					_close( fh );

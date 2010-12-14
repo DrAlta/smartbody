@@ -122,7 +122,8 @@ mcuCBHandle::mcuCBHandle()
 	channelbufferviewer_factory ( new BMLViewerFactory() ),
 	resource_manager(ResourceManager::getResourceManager()),
 	snapshot_counter( 1 ),
-	delay_behaviors(true)
+	delay_behaviors(true),
+	media_path(".")
 {
 	
 	root_group_p->ref();
@@ -177,11 +178,11 @@ FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
 	_getcwd(CurrentPath, _MAX_PATH);
 
 	seq_paths.reset();
-	char* filename = seq_paths.next_filename( buffer, label );
+	std::string filename = seq_paths.next_filename( buffer, label );
 	//filename = mcn_return_full_filename_func( CurrentPath, filename );
 	
-	while( filename != NULL )	{
-		file_p = fopen( filename, "r" );
+	while(filename.size() > 0)	{
+		file_p = fopen( filename.c_str(), "r" );
 		if( file_p != NULL ) {
 	
 			// add the file resource
@@ -202,8 +203,8 @@ FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
 		seq_paths.reset();
 		filename = seq_paths.next_filename( buffer, label );
 		//filename = mcn_return_full_filename_func( CurrentPath, filename );
-		while( filename )	{
-			if( ( file_p = fopen( filename, "r" ) ) != NULL ) {
+		while( filename.size() > 0 )	{
+			if( ( file_p = fopen( filename.c_str(), "r" ) ) != NULL ) {
 				
 				// add the file resource
 				FileResource* fres = new FileResource();
@@ -1030,5 +1031,19 @@ void mcuCBHandle::NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton 
 	}
 	character->EndSendGeneralParameters();
 }
+
+void mcuCBHandle::setMediaPath(std::string path)
+{
+	media_path = path;
+	// update all the paths with the media path prefix
+	seq_paths.setPathPrefix(media_path);
+	me_paths.setPathPrefix(media_path);
+}
+
+std::string mcuCBHandle::getMediaPath()
+{
+	return media_path;
+}
+
 
 /////////////////////////////////////////////////////////////

@@ -140,6 +140,7 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 		PathResource* pres = new PathResource();
 		pres->setPath(path);
+		pres->setMediaPath(mcu_p->getMediaPath());
 		if( strcmp( path_tok, "seq" ) == 0 )	{
 			
 			pres->setType("seq");
@@ -152,14 +153,6 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		)	{
 			pres->setType("me");
 			mcu_p->me_paths.insert( path );
-		}
-		else
-		if(
-			( strcmp( path_tok, "bp" ) == 0 )||
-			( strcmp( path_tok, "BP" ) == 0 )
-		)	{
-			pres->setType("bp");
-			mcu_p->bp_paths.insert( path );
 		}
 		else	{
 			delete pres;
@@ -4338,4 +4331,31 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
+int mcu_mediapath_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	int num = args.calc_num_tokens();
+	if ( num > 1)
+	{
+		LOG("Use: mediapath <path>");
+		return CMD_FAILURE;
+	}
+	if ( num == 1 )
+	{
+		char* path = args.read_token();
+		if (strcmp(path, "help") == 0)
+		{
+			LOG("Use: mediapath <path>");
+			return CMD_SUCCESS;
+		}
+
+		if (mcu_p)
+		{
+			mcu_p->setMediaPath(path);
+		}
+		return CMD_SUCCESS;
+	}
+
+	LOG("mediapath is '%s'", mcu_p->getMediaPath().c_str());
+	return CMD_SUCCESS;
+}
 
