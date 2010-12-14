@@ -61,6 +61,7 @@ protected:
 	int bi_loco_rot_global_y;                             // Rotational velocity around Y
 	int bi_loco_rot_local_y;                             // Rotational velocity around Y
 	int bi_loco_rot_local_angle;						// Rotation angle
+	int bi_loco_time;									// Life time
 	int bi_id;											 // ID
 	int bi_has_destination;
 	int bi_loco_dest_x, bi_loco_dest_y, bi_loco_dest_z;

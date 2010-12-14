@@ -22,28 +22,23 @@
 
 #include "me_ct_locomotion_limb_direction_planner.hpp"
 
-#include "sbm_character.hpp"
-#include "gwiz_math.h"
-#include "limits.h"
-
 
 const char* MeCtLocomotionLimbDirectionPlanner::TYPE = "MeCtLocomotionLimbDirectionPlanner";
 
 
 /** Constructor */
-MeCtLocomotionLimbDirectionPlanner::MeCtLocomotionLimbDirectionPlanner() {
-
+MeCtLocomotionLimbDirectionPlanner::MeCtLocomotionLimbDirectionPlanner() 
+{
 	curr_ratio = 0.0f;
 	set_turning_speed(4.0f);
 	curr_direction.set(0.0f, 0.0f, 1.0f);
 	target_direction.set(0.0f, 0.0f, 0.0f);
 	turning_mode = 0;
-	//last_space_time = -1.0f;
-	automatic = true;
 }
 
 /** Destructor */
-MeCtLocomotionLimbDirectionPlanner::~MeCtLocomotionLimbDirectionPlanner() {
+MeCtLocomotionLimbDirectionPlanner::~MeCtLocomotionLimbDirectionPlanner() 
+{
 	// Nothing allocated to the heap
 
 }
@@ -51,11 +46,6 @@ MeCtLocomotionLimbDirectionPlanner::~MeCtLocomotionLimbDirectionPlanner() {
 SrVec MeCtLocomotionLimbDirectionPlanner::get_curr_direction()
 {
 	return curr_direction;
-}
-
-void MeCtLocomotionLimbDirectionPlanner::set_automation(bool automatic)
-{
-	this->automatic = automatic;
 }
 
 /*float MeCtLocomotionLimbDirectionPlanner::get_ratio(MeCtLocomotionLimbAnim* anim1, MeCtLocomotionLimbAnim* anim2)
@@ -104,6 +94,12 @@ float MeCtLocomotionLimbDirectionPlanner::get_ratio(MeCtLocomotionLimbAnim* anim
 void MeCtLocomotionLimbDirectionPlanner::reset()
 {
 	curr_direction.set(0.0f, 0.0f, 0.0f);
+	target_direction.set(0.0f, 0.0f, 0.0f);
+}
+
+void MeCtLocomotionLimbDirectionPlanner::set_target_direction(SrVec& direction)
+{
+	set_target_direction(&direction);
 }
 
 void MeCtLocomotionLimbDirectionPlanner::set_target_direction(SrVec* direction)
@@ -164,14 +160,7 @@ void MeCtLocomotionLimbDirectionPlanner::update_anim_mode(MeCtLocomotionLimbAnim
 
 void MeCtLocomotionLimbDirectionPlanner::update_direction(double time_interval, float* space_time, int ref_time_num, bool dominant_limb)
 {
-	if(!automatic) return;
-	//if(last_space_time == -1.0f) last_space_time = *space_time;
 	if(time_interval == 0.0f || curr_direction == target_direction) return;
-
-	//if(*space_time > 1.0f && *space_time < 1.8f)
-	//{
-	//	if(dot(curr_direction-target_direction, target_direction) < 0.0f) return;
-	//}
 
 	SrMat mat;
 	float angle = 0.0f;
@@ -186,7 +175,7 @@ void MeCtLocomotionLimbDirectionPlanner::update_direction(double time_interval, 
 			p = 1;
 		}
 		else if(turning_mode == 0 && dot(target_direction, curr_direction) < 0.0f || turning_mode == 2)
-		{
+		{ 
 			angle = -(float)(turning_speed*time_interval);
 			p = -1;
 		}

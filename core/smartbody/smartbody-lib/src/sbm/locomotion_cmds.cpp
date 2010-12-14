@@ -224,26 +224,27 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	SrVec global_direction;
 	MeCtNavigationCircle* nav_circle = new MeCtNavigationCircle();
 	nav_circle->ref();
-	nav_circle->init( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	nav_circle->init( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1);
 	actor->posture_sched_p->create_track( NULL, NULL, nav_circle);
 	nav_circle->unref();
 	
 	if( arg=="stop" ) {
-		SkChannelArray channels;
+		/*SkChannelArray channels;
 		channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::XPos );
 		channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::YPos );
 		channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::ZPos );
 		channels.add( SkJointName( SbmCharacter::LOCOMOTION_GLOBAL_ROTATION ), SkChannel::YPos );
 		channels.add( SkJointName( SbmCharacter::LOCOMOTION_LOCAL_ROTATION ), SkChannel::YPos );
 		channels.add( SkJointName( SbmCharacter::LOCOMOTION_LOCAL_ROTATION_ANGLE ), SkChannel::YPos );
-		channels.add( SkJointName( SbmCharacter::LOCOMOTION_ID ), SkChannel::YPos );
+		channels.add( SkJointName( SbmCharacter::LOCOMOTION_TIME ), SkChannel::YPos );
+		channels.add( SkJointName( SbmCharacter::LOCOMOTION_ID ), SkChannel::YPos );*/
 
 		float data[] = { 0, 0, 0, 0, 0, 0 };
 
 		float dx = 0.0f, dy = 0.0f, dz = 0.0f, g_angular = 0.0f, l_angular = 0.0f, l_angle = 0.0f;
 		int id = -1;
 
-		nav_circle->init( dx, dy, dz, g_angular, l_angular, 0, id, 0, 0, 0 );
+		nav_circle->init( dx, dy, dz, g_angular, l_angular, 0, id, 0, 0, 0, -1 );
 
 		return CMD_SUCCESS;
 	}
@@ -361,7 +362,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			else if(arg == "time")
 			{
 				time = args.read_float();
-				actor->get_locomotion_ct()->set_motion_time(time);
+				//actor->get_locomotion_ct()->set_motion_time(time);
 			}
 			else 
 			{
@@ -372,7 +373,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			arg = args.read_token();
 		}
 
-		nav_circle->init( direction.x, direction.y, direction.z, rps, lrps, angle, -1, 0, 0, 0 );
+		nav_circle->init( direction.x, direction.y, direction.z, rps, lrps, angle, -1, 0, 0, 0, time );
 
 		return CMD_SUCCESS;
 	}
@@ -415,7 +416,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	else if (arg == "tx" || arg == "tz" || arg == "spd")
 	{
 		SkChannelArray channels;
-		float tx = 0.0f, ty = 0.0f, tz = 0.0f, lrps = 0.0f, rps = 0.0f, spd = 0.0f, angle = 0.0f;
+		float tx = 0.0f, ty = 0.0f, tz = 0.0f, lrps = 0.0f, rps = 0.0f, spd = 0.0f, angle = 0.0f, time = -1.0f;
 		int flagx = 0, flagz = 0;
 		int tx_index=-1, ty_index=-1, tz_index=-1, spd_index = -1;
 		actor->get_locomotion_ct()->get_navigator()->clear_destination_list();
@@ -509,7 +510,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			else angle = acos(dot(orientation, v));
 		}
 
-		nav_circle->init( 0.0f, 0.0f, 0.0f, rps, lrps, angle, -1, 0, 0, 0 );
+		nav_circle->init( 0.0f, 0.0f, 0.0f, rps, lrps, angle, -1, 0, 0, 0, time );
 		return CMD_SUCCESS;
 	}
 	
@@ -610,8 +611,8 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			}
 			arg = args.read_token();
 		}
-		actor->get_locomotion_ct()->set_motion_time(time);
-		nav_circle->init( dx, dy, dz, g_angular, l_angular, l_angle, id, 0, 0, 0);
+		//actor->get_locomotion_ct()->set_motion_time(time);
+		nav_circle->init( dx, dy, dz, g_angular, l_angular, l_angle, id, 0, 0, 0, time);
 
 		return CMD_SUCCESS;
 	}
@@ -620,7 +621,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	else if(arg == "del")
 	{
 		int id = args.read_int();
-		nav_circle->init( 0, 0, 0, 0, 0, 0, id, 0, 0, 0 );
+		nav_circle->init( 0, 0, 0, 0, 0, 0, id, 0, 0, 0, -1);
 		return CMD_SUCCESS;
 	}
 

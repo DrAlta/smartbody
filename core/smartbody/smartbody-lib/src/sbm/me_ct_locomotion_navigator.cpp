@@ -74,8 +74,6 @@ void MeCtLocomotionNavigator::update_framerate_accelerator(float accelerator, Sr
 		}
 		else
 		{
-			if(abs(accelerator-limb_blending_factor) > 0.4f)
-				int y = 0;
 			limb_blending_factor = accelerator;
 			framerate_accelerator = 1.0f;
 		}
@@ -106,6 +104,8 @@ void MeCtLocomotionNavigator::CheckNewRoutine(MeFrameData& frame)
 	routine.global_rps = buffer[bi_loco_rot_global_y];
 	routine.local_rps = buffer[bi_loco_rot_local_y];
 	routine.local_angle = buffer[bi_loco_rot_local_angle];
+	routine.life_time = buffer[bi_loco_time];
+	routine.elapsed_time = 0.0f;
 	routine.angle = 0.0f;
 	if(routine.global_rps == 0.0f) routine.type = ME_CT_LOCOMOTION_ROUTINE_TYPE_STRAIGHT;
 	else routine.type = ME_CT_LOCOMOTION_ROUTINE_TYPE_CIRCULAR;
@@ -236,16 +236,29 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeFrameData
 		}
 		local_rps += routine.local_rps;
 		global_vel += routine.direction * routine.speed;
+
 	}
 
 	for(i = 0; i < routine_stack.size(); ++i)
 	{
 		routine = routine_stack.get(i);
+		if(routine.life_time > 0.0f) 
+		{
+			routine.elapsed_time += delta_time;
+			if(routine.elapsed_time >= routine.life_time)
+			{
+				routine_stack.remove(i);
+				--i;
+				continue;
+			}
+			routine_stack.set(i, routine);
+		}
 		if(routine.local_angle != 0.0f)
 		{
 			routine.angle += local_rps*(float)delta_time;
 			routine_stack.set(i, routine);
 		}
+
 	}
 
 	mat.roty(-pre_orientation_angle);
@@ -345,6 +358,7 @@ void MeCtLocomotionNavigator::update_world_offset(SrVec& displacement)
 	world_pos.x = displacement.x + world_pos.x;
 	world_pos.y = displacement.y + world_pos.y + curr_height_adjustment - prev_height_adjustment;
 	world_pos.z = displacement.z + world_pos.z;
+
 }
 
 void MeCtLocomotionNavigator::update_world_mat()
@@ -401,13 +415,16 @@ void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtL
 		world_offset_data[6] = world_rot.z;
 		worldOffsetWriter->set_data(world_offset_data);
 	}
-	buffer[ bi_world_x ] = world_pos.x;
-	buffer[ bi_world_y ] = world_pos.y;
-	buffer[ bi_world_z ] = world_pos.z;
-	buffer[ bi_world_rot+0 ] = world_rot.w;
-	buffer[ bi_world_rot+1 ] = world_rot.x;
-	buffer[ bi_world_rot+2 ] = world_rot.y;
-	buffer[ bi_world_rot+3 ] = world_rot.z;
+	//else
+	{
+		buffer[ bi_world_x ] = world_pos.x;
+		buffer[ bi_world_y ] = world_pos.y;
+		buffer[ bi_world_z ] = world_pos.z;
+		buffer[ bi_world_rot+0 ] = world_rot.w;
+		buffer[ bi_world_rot+1 ] = world_rot.x;
+		buffer[ bi_world_rot+2 ] = world_rot.y;
+		buffer[ bi_world_rot+3 ] = world_rot.z;
+	}
 
 	MeCtLocomotionRoutine routine;
 	SrVec di;
@@ -448,6 +465,13 @@ void MeCtLocomotionNavigator::post_controller_evaluate(MeFrameData& frame, MeCtL
 	}
 	pre_orientation_angle = orientation_angle;
 	//LOG("\ntarget world pos: (%f, %f, %f)", target_world_pos.x, target_world_pos.y, target_world_pos.z);
+	if(limb_blending_factor == 0.0f)
+	{
+		local_vel.set(0.0f, 0.0f, 0.0f);
+		global_vel.set(0.0f, 0.0f, 0.0f);
+		target_local_vel.set(0.0f, 0.0f, 0.0f);
+		target_global_vel.set(0.0f, 0.0f, 0.0f);
+	}
 }
 
 SkChannelArray& MeCtLocomotionNavigator::controller_channels() {
@@ -490,6 +514,7 @@ bool MeCtLocomotionNavigator::controller_map_updated(MeControllerContext* _conte
 		LOOKUP_BUFFER_INDEX( bi_loco_rot_global_y, bi_loco_rot_global_y );
 		LOOKUP_BUFFER_INDEX( bi_loco_rot_local_y, bi_loco_rot_local_y );
 		LOOKUP_BUFFER_INDEX( bi_loco_rot_local_angle, bi_loco_rot_local_angle );
+		LOOKUP_BUFFER_INDEX( bi_loco_time, bi_loco_time );
 
 		LOOKUP_BUFFER_INDEX( bi_id, bi_id );
 
@@ -526,6 +551,8 @@ int MeCtLocomotionNavigator::controller_channels(SkChannelArray* request_channel
 	AddChannel(request_channels, SbmCharacter::LOCOMOTION_LOCAL_ROTATION, SkChannel::YPos, &bi_loco_rot_local_y);
 
 	AddChannel(request_channels, SbmCharacter::LOCOMOTION_LOCAL_ROTATION_ANGLE, SkChannel::YPos, &bi_loco_rot_local_angle);
+
+	AddChannel(request_channels, SbmCharacter::LOCOMOTION_TIME, SkChannel::YPos, &bi_loco_time);
 
 	//AddChannel(request_channels, SkJointName( "base" ), SkChannel::ZPos, &bi_base_z);
 

@@ -26,6 +26,7 @@
 #define QUAD_SYNC_NONE -1
 #define QUAD_SYNC_TIME 0
 #define QUAD_SYNC_DISTANCE 1
+#define QUAD_SYNC_ANGLE 1
 #define QUAD_SYNC_ACCELERATION 2
 #define QUAD_SYNC_SPEED 3
 
@@ -70,15 +71,25 @@ public:
 	~MeCtLocomotionQuadraticSynchronizer();
 
 public:
+	void set_target_flag(int ind1);
 	void set_target_flag(int ind1, int ind2);
 	void update(float time);
+	void set_target(int ind, float target_value);
 	void update_target(int ind, float target_value);
 	void update_for_time_speed(float time);
 	void update_for_time_distance(float time);
 	void update_for_speed_distance(float time);
 	void update_on_distance(float delta_time);
-	float get_delta_distance();
 	void set_max_acceleration(float value);
+	float get_delta_distance();
+	float get_speed();
+	float get_distance();
+	float get_acceleration();
+	float get_time();
+	float get_target_speed();
+	float get_target_distance();
+	float get_target_time();
+
 };
 
 

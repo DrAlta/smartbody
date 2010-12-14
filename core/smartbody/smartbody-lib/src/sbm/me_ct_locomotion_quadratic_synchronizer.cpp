@@ -49,6 +49,11 @@ MeCtLocomotionQuadraticSynchronizer::~MeCtLocomotionQuadraticSynchronizer()
 	
 }
 
+void MeCtLocomotionQuadraticSynchronizer::set_target_flag(int ind1)
+{
+	set_target_flag(ind1, QUAD_SYNC_NONE);
+}
+
 void MeCtLocomotionQuadraticSynchronizer::set_target_flag(int ind1, int ind2)
 {
 	time_flag = false;
@@ -65,6 +70,26 @@ void MeCtLocomotionQuadraticSynchronizer::set_target_flag(int ind1, int ind2)
 	else printf("MeCtLocomotionQuadraticSynchronizer::set_target_flag(): Error: no valid flag set");
 }
 
+void MeCtLocomotionQuadraticSynchronizer::set_target(int ind, float target_value)
+{
+	if(ind == QUAD_SYNC_DISTANCE)
+	{
+		target_distance = target_value;
+	}
+	else if(ind == QUAD_SYNC_TIME)
+	{
+		target_time = target_value;
+	}
+	if(ind == QUAD_SYNC_SPEED)
+	{
+		target_speed = target_value;
+	}
+	if(ind == QUAD_SYNC_ACCELERATION)
+	{
+		target_acceleration = target_value;
+	}
+}
+
 void MeCtLocomotionQuadraticSynchronizer::update_target(int ind, float target_value)
 {
 	if(ind == QUAD_SYNC_DISTANCE)
@@ -72,17 +97,17 @@ void MeCtLocomotionQuadraticSynchronizer::update_target(int ind, float target_va
 		if(distance_flag == false) printf("MeCtLocomotionQuadraticSynchronizer::update_target(): Error, target not exist");
 		else target_distance = target_value;
 	}
-	if(ind == QUAD_SYNC_TIME)
+	else if(ind == QUAD_SYNC_TIME)
 	{
 		if(time_flag == false) printf("MeCtLocomotionQuadraticSynchronizer::update_target(): Error, target not exist");
 		else target_time = target_value;
 	}
-	if(ind == QUAD_SYNC_SPEED)
+	else if(ind == QUAD_SYNC_SPEED)
 	{
 		if(speed_flag == false) printf("MeCtLocomotionQuadraticSynchronizer::update_target(): Error, target not exist");
 		else target_speed = target_value;
 	}
-	if(ind == QUAD_SYNC_ACCELERATION)
+	else if(ind == QUAD_SYNC_ACCELERATION)
 	{
 		if(acceleration_flag == false) printf("MeCtLocomotionQuadraticSynchronizer::update_target(): Error, target not exist");
 		else target_acceleration = target_value;
@@ -117,8 +142,8 @@ void MeCtLocomotionQuadraticSynchronizer::update_on_distance(float delta_time)
 
 void MeCtLocomotionQuadraticSynchronizer::update_for_time_speed(float delta_time)
 {
-	acceleration = (target_speed - speed)/(target_time - time);
-	time += delta_time;
+	acceleration = (target_speed - speed)/(target_time - delta_time);
+	//time += delta_time;
 	speed += delta_time * acceleration;
 	if(primary_ind == QUAD_SYNC_SPEED)
 	{
@@ -276,7 +301,42 @@ void MeCtLocomotionQuadraticSynchronizer::update_for_speed_distance(float delta_
 	}
 }*/
 
+float MeCtLocomotionQuadraticSynchronizer::get_target_speed()
+{
+	return target_speed;
+}
+
+float MeCtLocomotionQuadraticSynchronizer::get_target_distance()
+{
+	return target_distance;
+}
+
+float MeCtLocomotionQuadraticSynchronizer::get_target_time()
+{
+	return target_time;
+}
+
 float MeCtLocomotionQuadraticSynchronizer::get_delta_distance()
 {
 	return delta_distance;
+}
+
+float MeCtLocomotionQuadraticSynchronizer::get_speed()
+{
+	return speed;
+}
+
+float MeCtLocomotionQuadraticSynchronizer::get_distance()
+{
+	return distance;
+}
+
+float MeCtLocomotionQuadraticSynchronizer::get_time()
+{
+	return time;
+}
+
+float MeCtLocomotionQuadraticSynchronizer::get_acceleration()
+{
+	return acceleration;
 }

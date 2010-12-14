@@ -81,6 +81,8 @@ public:
 
 	static const char* LOCOMOTION_LOCAL_ROTATION_ANGLE;
 
+	static const char* LOCOMOTION_TIME;
+
 	static const char* LOCOMOTION_ID;
 
 	//! Channel name for immediate locomotion speed and trajectory, stored in the joint position channels
