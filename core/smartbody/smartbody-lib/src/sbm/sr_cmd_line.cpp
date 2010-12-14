@@ -33,24 +33,53 @@ int srCmdLine::pending_cmd(void)
 		char c = _getch();
 		if (c == '\x09') // tab - use auto completion for commands
 		{
+			mcuCBHandle& mcu = mcuCBHandle::singleton();
+			srHashMapBase* map = NULL;
 			// get the current partial command
 			std::string partialCommand(cmd_buffer, buffer_use);
+			std::string commandPrefix = "";
 			// only use tab completion on the first word
 			size_t index = partialCommand.find_first_of(" ");
 			if (index != std::string::npos)
 			{
-				std::cout << c;
-				continue;
+				// if the command matches 'set', 'print' or 'test' use those maps
+				std::string firstToken = partialCommand.substr(0, index);
+				if (firstToken == "set")
+				{
+					map = &mcu.set_cmd_map.getHashMap();
+					partialCommand = partialCommand.substr(index + 1);
+					commandPrefix = "set ";
+				}
+				else if (firstToken == "print")
+				{
+					map = &mcu.print_cmd_map.getHashMap();
+					partialCommand = partialCommand.substr(index + 1);
+					commandPrefix = "print ";
+				}
+				else if (firstToken == "test")
+				{
+					map = &mcu.test_cmd_map.getHashMap();
+					partialCommand = partialCommand.substr(index + 1);
+					commandPrefix = "test ";
+				}
+				else
+				{
+					// transform tabs into a space
+					std::cout << " ";
+					continue;
+				}
+				
 			}
+			
 			// find a match against the current list of commands
-			mcuCBHandle& mcu = mcuCBHandle::singleton();
-			srHashMapBase& map = mcu.cmd_map.getHashMap();
-			int numEntries = map.get_num_entries();
-			map.reset();
+			if (!map)
+				map = &mcu.cmd_map.getHashMap();
+			int numEntries = map->get_num_entries();
+			map->reset();
 			int numMatches = 0;
 			char* key = NULL;
 			int numChecked = 0;
-			map.next(&key);
+			map->next(&key);
 			std::vector<std::string> options;
 			while (key)
 			{
@@ -74,7 +103,7 @@ int srCmdLine::pending_cmd(void)
 						numMatches++;
 					}
 				}
-				map.next(&key);
+				map->next(&key);
 				std::string nextKey = key;
 				if (nextKey == keyString)
 					break; // shouldn't map.next(key) make key == NULL? This doesn't seem to happen.
@@ -82,13 +111,13 @@ int srCmdLine::pending_cmd(void)
 			if (numMatches == 1)
 			{
 				int numChars = buffer_use;
-				strcpy(cmd_buffer, options[0].c_str());
-				buffer_use =  options[0].size();
-				for (size_t n = numChars; n <  options[0].size(); n++)
+				std::string final = commandPrefix + options[0] + " ";
+				strcpy(cmd_buffer, final.c_str());
+				buffer_use = final.size();
+				for (size_t n = numChars; n <  final.size(); n++)
 				{
-					std::cout <<  options[0][n];
+					std::cout << final[n];
 				}
-				std::cout << " ";
 				continue;
 			}
 			else if (numMatches > 1)
