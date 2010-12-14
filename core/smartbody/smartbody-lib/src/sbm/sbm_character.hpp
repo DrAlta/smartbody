@@ -211,6 +211,7 @@ public:
 	BoneBusCharacter * bonebusCharacter;
 
 	void set_viseme( const char* viseme, float weight , double start_time, float rampin_duration );
+	void update_viseme( const char* viseme, float weight );
 	void update_viseme_curve(double curTime);
 	void build_viseme_curve(const char* viseme, double start_time, float* curve_info, int numKeys);
 

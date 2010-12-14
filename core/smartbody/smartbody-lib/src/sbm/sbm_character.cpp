@@ -1087,12 +1087,12 @@ void SbmCharacter::update_viseme_curve( double curTime )
 		{
 			for (size_t nCount = 0; nCount < namePatchIter->second.size(); nCount++)
 			{
-				set_viseme( namePatchIter->second[nCount].c_str(), weight, 0.0, 0.0 );
+				update_viseme( namePatchIter->second[nCount].c_str(), weight );
 			}
 		}
 		else
 		{
-			set_viseme( curveIter->first.c_str(), weight, 0.0, 0.0 );
+			update_viseme( curveIter->first.c_str(), weight );
 		}
 	}
 }
@@ -1133,6 +1133,34 @@ void SbmCharacter::build_viseme_curve(const char* viseme, double start_time, flo
 	}			
 }
 
+void SbmCharacter::update_viseme( const char* viseme,
+							  float weight )
+{
+    //LOG("Recieved: SbmCharacter(\"%s\")::set_viseme( \"%s\", %f, %f )\n", name, viseme, weight, rampin_duration );
+	std::vector<std::string> visemeNames;
+	std::map<std::string, std::vector<std::string>>::iterator iter;
+	iter = viseme_name_patch.find(viseme);
+	if (iter != viseme_name_patch.end())
+	{
+		for (size_t nCount = 0; nCount < iter->second.size(); nCount++)
+			visemeNames.push_back(iter->second[nCount]);
+	}
+	else
+		visemeNames.push_back(viseme);
+
+	for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
+	{
+		if (bonebusCharacter)
+		{
+			bonebusCharacter->SetViseme( visemeNames[nCount].c_str(), weight, 0 );
+		}
+		if ( mcuCBHandle::singleton().sbm_character_listener )
+		{
+			mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, visemeNames[nCount].c_str(), weight, 0 );
+		}
+	}
+}
+
 void SbmCharacter::set_viseme( const char* viseme,
 							  float weight,
 							  double start_time,
@@ -1152,7 +1180,6 @@ void SbmCharacter::set_viseme( const char* viseme,
 
 	for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
 	{
-		bool setCurve = false;
 		if (bonebusCharacter)	// if it is bone bus character
 		{
 			bonebusCharacter->SetViseme( visemeNames[nCount].c_str(), weight, rampin_duration );
@@ -1180,8 +1207,6 @@ void SbmCharacter::set_viseme( const char* viseme,
 		head_sched_p->schedule( ct, start_time, start_time + ct->controller_duration(), rampin_duration, 0 );
 	}
 }
-
-
 void SbmCharacter::eye_blink_update( void )
 {
    // automatic blinking routine using bonebus viseme commands
@@ -1196,15 +1221,15 @@ void SbmCharacter::eye_blink_update( void )
 
 		if( left_weight == right_weight )	{ // ensured with float granularity...
 			if( left_changed )	{
-				set_viseme( "blink", left_weight, 0.0, 0.0 );
+				update_viseme( "blink", left_weight );
 			}
 		}
 		else	{
 			if( left_changed )	{
-				set_viseme( "blink_lf", left_weight, 0.0, 0.0 );
+				update_viseme( "blink_lf", left_weight );
 			}
 			if( right_changed )	{
-				set_viseme( "blink_rt", right_weight, 0.0, 0.0 );
+				update_viseme( "blink_rt", right_weight );
 			}		
 		}
 	}
