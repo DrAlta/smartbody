@@ -30,6 +30,9 @@
 #define SBM_REPORT_MEMORY_LEAKS  0
 #define SBM_EMAIL_CRASH_REPORTS  1
 
+#include "fltk/Slider.h"  // before vhcl.h because of LOG enum which conflicts with vhcl::Log
+#include "vhcl.h"
+
 #include <signal.h>
 #include <iostream>
 #include <cstdio>
@@ -57,7 +60,6 @@
 #include <sbm/locomotion_cmds.hpp>
 #include <sbm/resource_cmds.h>
 #include <sbm/time_regulator.h>
-#include <vhcl_log.h>
 //#include "SBMWindow.h"
 #include "CommandWindow.h"
 

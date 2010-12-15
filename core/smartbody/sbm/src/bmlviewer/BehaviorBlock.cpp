@@ -1,4 +1,8 @@
+
+#include "vhcl.h"
+
 #include "BehaviorBlock.h"
+
 
 BehaviorMark::BehaviorMark() : Mark()
 {

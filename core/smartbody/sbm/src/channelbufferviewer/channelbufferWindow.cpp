@@ -20,13 +20,18 @@
  *      Jingqiao Fu, USC
  */
 
+#include "fltk/Slider.h"  // before vhcl.h because of LOG enum which conflicts with vhcl::Log
+#include "vhcl.h"
+
 #include "channelbufferWindow.hpp"
+
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <vhcl_log.h>
-#include <sbm/bml.hpp>
 #include <algorithm>
+
+#include <sbm/bml.hpp>
+
 
 ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name) : Window(w, h, name), BMLViewer(x, y, w, h)
 {

@@ -1,5 +1,9 @@
+
+#include "vhcl.h"
+
 #include "BehaviorEditorWidget.h"
 #include "BehaviorBlock.h"
+
 
 BehaviorEditorWidget::BehaviorEditorWidget(int x, int y, int w, int h, char* name) : EditorWidget(x, y, w, h, name)
 {
