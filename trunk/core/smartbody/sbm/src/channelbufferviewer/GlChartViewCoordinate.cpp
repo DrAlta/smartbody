@@ -20,9 +20,12 @@
  *      Jingqiao Fu, USC
  */
 
+#include "vhcl.h"
+
 #include "GlChartViewCoordinate.hpp"
-#include <vhcl_log.h>
+
 #include <fltk/gl.h>
+
 
 GlChartViewCoordinate::GlChartViewCoordinate()
 {

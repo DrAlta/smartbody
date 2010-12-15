@@ -1,9 +1,15 @@
+
+#include "fltk/Slider.h"  // before vhcl.h because of LOG enum which conflicts with vhcl::Log
+#include "vhcl.h"
+
 #include "BehaviorWindow.h"
-#include <fltk/Group.h>
-#include <fltk/ScrollGroup.h>
+
 #include <iostream>
 #include <vector>
-#include <vhcl_log.h>
+#include <math.h>
+
+#include <fltk/Group.h>
+#include <fltk/ScrollGroup.h>
 
 #include <sbm/mcontrol_util.h>
 #include <me/me_ct_blend.hpp>
@@ -13,9 +19,9 @@
 #include <sbm/text_speech.h>
 #include <sbm/remote_speech.h>
 #include <sbm/behavior_scheduler_fixed.hpp>
-#include <math.h>
 
 using namespace fltk;
+
 
 BehaviorWindow::BehaviorWindow(int x, int y, int w, int h, char* name) : Window(w, h, name), BMLViewer(x, y, w, h)
 {

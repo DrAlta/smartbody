@@ -37,6 +37,7 @@
 
 using std::string;
 using std::vector;
+using namespace bonebus;
 
 
 #define FPS_LIMIT 31

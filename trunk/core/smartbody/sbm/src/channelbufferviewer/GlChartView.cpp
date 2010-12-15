@@ -20,11 +20,14 @@
  *      Jingqiao Fu, USC
  */
 
+#include "vhcl.h"
+
 #include "GlChartView.hpp"
+
 #include <fltk/events.h>
-#include <SR/sr_gl.h>
-#include <vhcl_log.h>
 #include <fltk/gl.h>
+
+#include <SR/sr_gl.h>
 
 
 GlChartView::GlChartView(int x, int y, int w, int h, char* name) : fltk::GlWindow( x, y, w, h, name ), SrViewer(x, y, w, h, name)
