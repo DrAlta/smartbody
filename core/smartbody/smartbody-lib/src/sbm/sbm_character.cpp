@@ -1218,7 +1218,6 @@ void SbmCharacter::set_viseme( const char* viseme,
 
 	for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
 	{
-		LOG("VISEME= %s %f", visemeNames[nCount].c_str(), weight);
 		if (bonebusCharacter)	// if it is bone bus character
 		{
 			bonebusCharacter->SetViseme( visemeNames[nCount].c_str(), weight, rampin_duration );
