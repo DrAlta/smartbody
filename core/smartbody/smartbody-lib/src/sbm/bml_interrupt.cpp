@@ -20,11 +20,12 @@
  *      Andrew n marshall, USC
  */
 
+#include "vhcl.h"
+
 #include <iostream>
 #include <sstream>
 #include <string>
 
-#include "vhcl_log.h"
 #include "mcontrol_util.h"
 #include "bml_processor.hpp"
 #include "bml_interrupt.hpp"

@@ -21,6 +21,7 @@
  *      Ed Fast, USC
  */
 
+#include "vhcl.h"
 
 #include <string>
 #include <iostream>
@@ -36,7 +37,6 @@
 #include <ME/me_ct_interpolator.h>
 
 #include <sbm/mcontrol_util.h>
-#include "vhcl_log.h"
 
 using namespace std;
 

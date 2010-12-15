@@ -23,13 +23,13 @@
  *      Ashok Basawapatna, USC (no longer)
  */
 
+#include "vhcl.h"
+
 #include <stdio.h>
 
 #include <iostream>
 #include <string>
 #include <cstring>
-
-#include <vhcl_log.h>
 
 #include <SK/sk_skeleton.h>
 #include <ME/me_ct_blend.hpp>
@@ -39,6 +39,7 @@
 #include "me_utilities.hpp"
 #include <ME/me_spline_1d.hpp>
 #include <ME/me_ct_interpolator.h>
+
 
 const bool LOG_PRUNE_CMD_TIME                        = false;
 const bool LOG_CONTROLLER_TREE_PRUNING               = false;

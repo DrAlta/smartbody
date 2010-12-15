@@ -19,6 +19,9 @@
  *  CONTRIBUTORS:
  *      Yuyu Xu, USC
  */
+
+#include "vhcl.h"
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -28,7 +31,6 @@
 #include "bml_general_param.hpp"
 #include "sbm/general_param_setting.h"
 #include "bml_xml_consts.hpp"
-#include "vhcl_log.h"
 
 
 ////// XML ATTRIBUTES

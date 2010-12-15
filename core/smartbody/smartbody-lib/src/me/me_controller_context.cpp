@@ -22,6 +22,7 @@
 
 //  ME/me_controller_context
 
+#include "vhcl.h"
 
 #include <ME/me_controller_context.hpp>
 #include "sbm/mcontrol_util.h"

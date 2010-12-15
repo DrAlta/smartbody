@@ -1,3 +1,6 @@
+
+#include "vhcl.h"
+
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
@@ -7,7 +10,6 @@
 #include <sstream>
 #include <float.h>
 #include "time.h"
-#include "vhcl_log.h"
 
 #include "xercesc_utils.hpp"
 #include "text_speech.h"

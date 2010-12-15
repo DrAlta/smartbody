@@ -22,13 +22,14 @@
  *      Ed Fast, USC
  */
 
+#include "vhcl.h"
+
 #include "me_utilities.hpp"
 
 #include <string>
 #include <iostream>
 #include <stdio.h>
 #include <direct.h>
-#include <vhcl_log.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>

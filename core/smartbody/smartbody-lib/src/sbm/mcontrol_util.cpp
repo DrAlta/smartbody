@@ -946,7 +946,7 @@ MeController* mcuCBHandle::lookup_ctrl( const string& ctrl_name, const char* pri
 }
 
 
-void mcuCBHandle::NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton * skeleton, GeneralParamMap * param_map )
+void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, SkSkeleton * skeleton, GeneralParamMap * param_map )
 {
 	if ( character == NULL )
 	{

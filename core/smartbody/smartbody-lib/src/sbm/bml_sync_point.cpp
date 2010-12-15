@@ -21,18 +21,15 @@
  *      Ed Fast, USC
  */
 
+#include "vhcl.h"
+
 #include "bml_sync_point.hpp"
 
-//#include <cstdlib>
-//#include <iostream>
-//#include <algorithm>
+#include <sstream>
 
 #include "bml.hpp"
 #include "bml_exception.hpp"
 #include "bml_xml_consts.hpp"
-#include <sstream>
-#include "vhcl_log.h"
-
 
 
 using namespace std;
