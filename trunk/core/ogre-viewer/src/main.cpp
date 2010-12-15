@@ -629,13 +629,13 @@ class OgreViewerApplication : public ExampleApplication
 
 
 	protected:
-		static void OnClientConnect( string clientName, void * userData )
+		static void OnClientConnect( const string & clientName, void * userData )
 		{
 			printf( "Client Connected! - %s\n", clientName.c_str() );
 		}
 
 
-		static void OnCreateCharacter( const int characterID, const std::string characterType, const std::string characterName, const int skeletonType, void * userData )
+		static void OnCreateCharacter( const int characterID, const std::string & characterType, const std::string & characterName, const int skeletonType, void * userData )
 		{
 			printf( "Character Create! - %d, %s, %s, %d\n", characterID, characterType.c_str(), characterName.c_str(), skeletonType );
 
