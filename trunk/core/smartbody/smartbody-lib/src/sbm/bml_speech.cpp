@@ -556,8 +556,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 		const size_t viseme_count = visemes.size();
 		for( size_t i=0; i<viseme_count; i++ ) { //adds visemes for audio into sequence file
 			VisemeData* v = visemes.at(i);
-			SbmCharacter* char_p = mcu->character_map.lookup(actor_id);
-			if (!char_p->is_viseme_curve())
+			if (!v->isCurveMode())
 			{
 				time_sec time = (time_sec)( v->time() + startAt );
 				command.str( "" );
