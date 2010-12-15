@@ -1078,6 +1078,7 @@ const std::string& SbmCharacter::get_voice_code_backup() const
 void SbmCharacter::update_viseme_curve( double curTime )
 {
 	std::map<std::string, srLinearCurve*>::iterator curveIter;
+	std::vector<std::string> visemesToDelete;
 	for (curveIter = visemeCurve.begin(); curveIter != visemeCurve.end(); curveIter++)
 	{
 		float weight = (float)curveIter->second->evaluate( curTime );
@@ -1093,6 +1094,20 @@ void SbmCharacter::update_viseme_curve( double curTime )
 		else
 		{
 			update_viseme( curveIter->first.c_str(), weight );
+		}
+
+		if (weight == 0 && curveIter->second->get_tail_param() <= curTime)
+		{
+			visemesToDelete.push_back(curveIter->first);
+		}
+	}
+
+	for (size_t x = 0; x < visemesToDelete.size(); x++)
+	{
+		std::map<std::string, srLinearCurve*>::iterator iter = visemeCurve.find(visemesToDelete[x]);
+		if (iter != visemeCurve.end())
+		{
+			visemeCurve.erase(iter);
 		}
 	}
 }
@@ -1134,7 +1149,7 @@ void SbmCharacter::build_viseme_curve(const char* viseme, double start_time, flo
 }
 
 void SbmCharacter::update_viseme( const char* viseme,
-							  float weight )
+								  float weight )
 {
     //LOG("Recieved: SbmCharacter(\"%s\")::set_viseme( \"%s\", %f, %f )\n", name, viseme, weight, rampin_duration );
 	std::vector<std::string> visemeNames;
@@ -1148,6 +1163,8 @@ void SbmCharacter::update_viseme( const char* viseme,
 	else
 		visemeNames.push_back(viseme);
 
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
 	for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
 	{
 		if (bonebusCharacter)
@@ -1157,6 +1174,26 @@ void SbmCharacter::update_viseme( const char* viseme,
 		if ( mcuCBHandle::singleton().sbm_character_listener )
 		{
 			mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, visemeNames[nCount].c_str(), weight, 0 );
+		}
+
+		if (is_face_controller_enabled()) 
+		{
+			// Viseme/AU channel activation
+			ostringstream ct_name;
+			ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
+
+			SkChannelArray channels;
+			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
+
+			MeCtRawWriter* ct = new MeCtRawWriter();
+			ct->name( ct_name.str().c_str() );
+			ct->init( channels, true );
+			SrBuffer<float> value;
+			value.size(1);
+			value[0] = (float)weight;
+			ct->set_data(value);
+
+			head_sched_p->schedule( ct, mcu.time, mcu.time + ct->controller_duration(), 0, 0 );
 		}
 	}
 }
@@ -1180,6 +1217,7 @@ void SbmCharacter::set_viseme( const char* viseme,
 
 	for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
 	{
+		LOG("VISEME= %s %f", visemeNames[nCount].c_str(), weight);
 		if (bonebusCharacter)	// if it is bone bus character
 		{
 			bonebusCharacter->SetViseme( visemeNames[nCount].c_str(), weight, rampin_duration );
@@ -1189,22 +1227,25 @@ void SbmCharacter::set_viseme( const char* viseme,
 			mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, visemeNames[nCount].c_str(), weight, rampin_duration );
 		}
 
-		// Viseme/AU channel activation
-		ostringstream ct_name;
-		ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
+		if (is_face_controller_enabled()) 
+		{
+			// Viseme/AU channel activation
+			ostringstream ct_name;
+			ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
 
-		SkChannelArray channels;
-		channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
+			SkChannelArray channels;
+			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
 
-		MeCtRawWriter* ct = new MeCtRawWriter();
-		ct->name( ct_name.str().c_str() );
-		ct->init( channels, true );
-		SrBuffer<float> value;
-		value.size(1);
-		value[0] = (float)weight;
-		ct->set_data(value);
+			MeCtRawWriter* ct = new MeCtRawWriter();
+			ct->name( ct_name.str().c_str() );
+			ct->init( channels, true );
+			SrBuffer<float> value;
+			value.size(1);
+			value[0] = (float)weight;
+			ct->set_data(value);
 
-		head_sched_p->schedule( ct, start_time, start_time + ct->controller_duration(), rampin_duration, 0 );
+			head_sched_p->schedule( ct, start_time, start_time + ct->controller_duration(), rampin_duration, 0 );
+		}
 	}
 }
 void SbmCharacter::eye_blink_update( void )
