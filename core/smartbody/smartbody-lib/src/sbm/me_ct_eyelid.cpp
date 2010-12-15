@@ -669,56 +669,72 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 	int UR_lid_y_map = _context->toBufferIndex( UR_lid_posy_chan_index );
 #if 1
 	
-	float UL_lid_y = fbuffer[ UL_lid_y_map ];
+	
+	if (UL_lid_y_map >= 0)
+	{
+		float UL_lid_y = fbuffer[ UL_lid_y_map ];
 
-	float UL_correct_posy = lid_weight[ 1 ] * calc_lid_correction( 
-		(float)( L_eye_e.p() ), 
-		eye_pitch_range,
-		UL_lid_y, 
-		upper_lid_range
-	);
-	fbuffer[ UL_lid_y_map ] = UL_correct_posy;
-
-
-	float UR_lid_y = fbuffer[ UR_lid_y_map ];
-
-	float UR_correct_posy = lid_weight[ 1 ] * calc_lid_correction( 
-		(float)( L_eye_e.p() ), 
-		eye_pitch_range,
-		UR_lid_y, 
-		upper_lid_range
-	);
-	fbuffer[ UR_lid_y_map ] = UR_correct_posy;
+		float UL_correct_posy = lid_weight[ 1 ] * calc_lid_correction( 
+			(float)( L_eye_e.p() ), 
+			eye_pitch_range,
+			UL_lid_y, 
+			upper_lid_range
+		);
+		fbuffer[ UL_lid_y_map ] = UL_correct_posy;
+	}
+	
+	if (UR_lid_y_map >= 0)
+	{
+		float UR_lid_y = fbuffer[ UR_lid_y_map ];
+		float UR_correct_posy = lid_weight[ 1 ] * calc_lid_correction( 
+			(float)( L_eye_e.p() ), 
+			eye_pitch_range,
+			UR_lid_y, 
+			upper_lid_range
+		);
+		fbuffer[ UR_lid_y_map ] = UR_correct_posy;
+	}
+	
 #else
-	fbuffer[ UL_lid_y_map ] = 0.0;
-	fbuffer[ UR_lid_y_map ] = 0.0;
+	if (UL_lid_y_map >= 0)
+		fbuffer[ UL_lid_y_map ] = 0.0;
+	if (UR_lid_y_map >= 0)
+		fbuffer[ UR_lid_y_map ] = 0.0;
 #endif
 
 	int LL_lid_y_map = _context->toBufferIndex( LL_lid_posy_chan_index );
 	int LR_lid_y_map = _context->toBufferIndex( LR_lid_posy_chan_index );
 #if 1
-	float LL_lid_y = fbuffer[ LL_lid_y_map ];
 
-	float LL_correct_posy = lid_weight[ 0 ] * calc_lid_correction( 
-		(float)( L_eye_e.p() ), 
-		eye_pitch_range,
-		LL_lid_y, 
-		lower_lid_range
-	);
-	fbuffer[ LL_lid_y_map ] = LL_correct_posy;
+	if (LL_lid_y_map >= 0)
+	{
+		float LL_lid_y = fbuffer[ LL_lid_y_map ];
+		float LL_correct_posy = lid_weight[ 0 ] * calc_lid_correction( 
+			(float)( L_eye_e.p() ), 
+			eye_pitch_range,
+			LL_lid_y, 
+			lower_lid_range
+		);
+		fbuffer[ LL_lid_y_map ] = LL_correct_posy;
+	}
 
-	float LR_lid_y = fbuffer[ LR_lid_y_map ];
-
-	float LR_correct_posy = lid_weight[ 0 ] * calc_lid_correction( 
-		(float)( L_eye_e.p() ), 
-		eye_pitch_range,
-		LL_lid_y, 
-		lower_lid_range
-	);
-	fbuffer[ LR_lid_y_map ] = LR_correct_posy;
+	if (LR_lid_y_map >= 0)
+	{
+		float LR_lid_y = fbuffer[ LR_lid_y_map ];
+		float LR_correct_posy = lid_weight[ 0 ] * calc_lid_correction( 
+			(float)( L_eye_e.p() ), 
+			eye_pitch_range,
+			LR_lid_y, 
+			lower_lid_range
+		);
+		fbuffer[ LR_lid_y_map ] = LR_correct_posy;
+	}
+	
 #else
-	fbuffer[ LL_lid_y_map ] = 0.0;
-	fbuffer[ LR_lid_y_map ] = 0.0;
+	if (LL_lid_y_map >= 0)
+		fbuffer[ LL_lid_y_map ] = 0.0;
+	if (LR_lid_y_map >= 0)
+		fbuffer[ LR_lid_y_map ] = 0.0;
 #endif
 
 	return true;
