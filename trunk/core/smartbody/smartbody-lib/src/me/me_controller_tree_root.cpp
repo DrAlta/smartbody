@@ -22,11 +22,12 @@
  *      Ed Fast, USC
  */
 
+#include "vhcl.h"
+
 #include <list>
 #include <vector>
 #include <iostream>
 #include <algorithm>
-
 
 #include <ME/me_controller_tree_root.hpp>
 #include <ME/me_ct_container.hpp>
@@ -35,7 +36,6 @@
 #include <SK/sk_channel_array.h>
 #include <sbm/ResourceManager.h>
 #include "sbm/mcontrol_util.h"
-#include "vhcl_log.h"
 
 using namespace std;
 

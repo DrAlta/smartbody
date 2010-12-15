@@ -20,10 +20,11 @@
  *      Andrew n marshall, USC
  */
 
+#include "vhcl.h"
+
 #include <iostream>
 #include <sstream>
 #include <string>
-#include "vhcl_log.h"
 
 #include <ME/me_ct_blend.hpp>
 

@@ -20,6 +20,8 @@
  *      Andrew n marshall, USC
  */
 
+#include "vhcl.h"
+
 #include <map>
 
 #include "behavior_scheduler_fixed.hpp"

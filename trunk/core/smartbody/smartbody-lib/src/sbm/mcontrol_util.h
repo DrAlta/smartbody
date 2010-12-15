@@ -138,7 +138,7 @@ class mcuCBHandle	{
 		bool		net_face_bones;
 		bool		use_locomotion;
 		const char* net_host;
-		BoneBusClient bonebus;
+		bonebus::BoneBusClient bonebus;
 		SBMCharacterListener * sbm_character_listener;   // only one listener possible, must be set manually
 		std::string speech_audiofile_base_path;
 		std::string process_id;
@@ -427,7 +427,7 @@ class mcuCBHandle	{
 		SmartBody::AudioFileSpeech* speech_audiofile() { return &_speech_audiofile; }
 		text_speech* speech_text() { return &_speech_text; } // [BMLR]
 
-		void NetworkSendSkeleton( BoneBusCharacter * character, SkSkeleton * skeleton, GeneralParamMap * param_map );
+		void NetworkSendSkeleton( bonebus::BoneBusCharacter * character, SkSkeleton * skeleton, GeneralParamMap * param_map );
 
 		void register_viewer_factory(SrViewerFactory* factory) { 
 				if (viewer_factory != NULL) delete viewer_factory;

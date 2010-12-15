@@ -20,6 +20,8 @@
  *      Jingqiao Fu, USC
  */
 
+#include "vhcl.h"
+
 #include "me_ct_locomotion_terrain.hpp"
 #include "mcontrol_util.h"
 

@@ -208,7 +208,7 @@ public:
 	MeCtSchedulerClass*	head_sched_p; // neck / head orientation
 	MeCtSchedulerClass*	param_sched_p; // general parameters
 
-	BoneBusCharacter * bonebusCharacter;
+	bonebus::BoneBusCharacter * bonebusCharacter;
 
 	void set_viseme( const char* viseme, float weight , double start_time, float rampin_duration );
 	void update_viseme( const char* viseme, float weight );

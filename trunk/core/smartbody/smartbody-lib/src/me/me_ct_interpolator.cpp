@@ -1,5 +1,9 @@
+
+#include "vhcl.h"
+
 #include <ME/me_ct_interpolator.h>
 #include <sbm/mcontrol_util.h>
+
 
 const char* MeCtInterpolator::Context::CONTEXT_TYPE = "MeCtInterpolator::Context";
 const char* MeCtInterpolator::CONTROLLER_TYPE = "MeCtInterpolator";

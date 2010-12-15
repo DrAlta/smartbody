@@ -20,6 +20,8 @@
  *      Andrew n marshall, USC
  */
 
+#include "vhcl.h"
+
 #include <ME/me_ct_container.hpp>
 #include <sbm/mcontrol_util.h>
 

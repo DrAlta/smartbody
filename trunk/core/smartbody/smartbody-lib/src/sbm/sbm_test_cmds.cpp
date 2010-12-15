@@ -20,22 +20,19 @@
  *      Andrew n marshall, USC
  */
 
+#include "vhcl.h"
+
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <vhcl_log.h>
-
 
 #include "sbm_test_cmds.hpp"
 #include "bml.hpp"  // for #define USE_RECIPIENT
 
 
 using namespace std;
-
-
-
 
 
 int sbm_set_test_func( srArgBuffer& args, mcuCBHandle *mcu  ) {

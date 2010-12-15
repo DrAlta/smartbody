@@ -20,12 +20,14 @@
  *      Jingqiao Fu, USC
  */
 
+#include "vhcl.h"
+
 #include "me_ct_locomotion.hpp"
 #include "mcontrol_util.h"
 #include "sbm_character.hpp"
 #include "gwiz_math.h"
 #include "limits.h"
-#include <vhcl_log.h>
+
 #include <iostream>
 #include <string>
 

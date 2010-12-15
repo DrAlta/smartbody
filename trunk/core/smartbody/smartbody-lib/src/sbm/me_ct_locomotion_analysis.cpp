@@ -20,7 +20,7 @@
  *      Jingqiao Fu, USC
  */
 
-#include <vhcl_log.h>
+#include "vhcl.h"
 
 #include "me_ct_locomotion_analysis.hpp"
 

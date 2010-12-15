@@ -20,11 +20,11 @@
  *      Andrew n marshall, USC
  */
 
+#include "vhcl.h"
+
 #include <iostream>
 #include <sstream>
 #include <string>
-
-#include <vhcl_log.h>
 
 #include "bml_face.hpp"
 
