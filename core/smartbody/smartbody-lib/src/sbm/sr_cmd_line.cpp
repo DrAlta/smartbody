@@ -66,6 +66,7 @@ int srCmdLine::pending_cmd(void)
 				{
 					// transform tabs into a space
 					std::cout << " ";
+					cmd_buffer[ buffer_use++ ] = ' ';
 					continue;
 				}
 				
@@ -123,6 +124,8 @@ int srCmdLine::pending_cmd(void)
 			else if (numMatches > 1)
 			{ // more than one match, show the options on the line below
 				printf("\n");
+				// sort the matches
+				std::sort(options.begin(), options.end());
 				for (size_t x = 0; x < options.size(); x++)
 				{
 					std::cout << options[x] << " ";
@@ -131,6 +134,13 @@ int srCmdLine::pending_cmd(void)
 				for (int x = 0; x < buffer_use; x++)
 					std::cout << cmd_buffer[x];
 
+				continue;
+			}
+			else if (numMatches == 0)
+			{
+				// transform tabs into a space
+				std::cout << " ";
+				cmd_buffer[ buffer_use++ ] = ' ';
 				continue;
 			}
 		}
