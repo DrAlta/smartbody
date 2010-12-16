@@ -133,27 +133,16 @@ bool validate_path( path& result, const char* pathname ) {
 }
 
 int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>& map, bool recurse_dirs, ResourceManager* manager, double scale, const char* error_prefix ) {
-	// include the media path in the pathname if applicable
-	path finalPath;
-	std::string rootDir = pathname.root_directory();
-	if (rootDir.size() == 0)
-	{		
-		finalPath = operator/(mcuCBHandle::singleton().getMediaPath(), pathname);
-	}
-	else
-	{
-		finalPath = pathname;
-	}
-	
-	if( !exists( finalPath ) ) {
-		LOG("%s Motion path \"%s\" not found.", error_prefix,  finalPath.native_file_string().c_str());
+		
+	if( !exists( pathname ) ) {
+		LOG("%s Motion path \"%s\" not found.", error_prefix,  pathname.native_file_string().c_str());
 		return CMD_FAILURE;
 	}
 
-	if( is_directory( finalPath ) ) {
+	if( is_directory( pathname ) ) {
 
 		directory_iterator end;
-		for( directory_iterator i( finalPath ); i!=end; ++i ) {
+		for( directory_iterator i( pathname ); i!=end; ++i ) {
 			const path& cur = *i;
 
 			if( is_directory( cur ) ) {
@@ -173,11 +162,11 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 		SkMotion* motion = new SkMotion();
 		motion->ref();
 
-		SrInput in( finalPath.string().c_str(), "rt" );
+		SrInput in( pathname.string().c_str(), "rt" );
 		SrString fullin_string;
 		in.getall( fullin_string );
 		SrInput fullin( (const char *)fullin_string );
-		fullin.filename( finalPath.string().c_str() ); // copy filename for error message
+		fullin.filename( pathname.string().c_str() ); // copy filename for error message
 		
 		if( motion->load( fullin, scale ) ) {
 
@@ -189,23 +178,23 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			std::string filename;
 			MotionResource * motionRes = new MotionResource();
 			motionRes->setType("skm");
-			filename = finalPath.filename().c_str();
+			filename = pathname.filename().c_str();
 			
 			//filename = mcn_return_full_filename_func( CurrentPath, finalPath.string().c_str() );
-			motionRes->setMotionFile( finalPath.string() );
+			motionRes->setMotionFile( pathname.string() );
 			manager->addResource(motionRes);
 
-			string filebase = basename( finalPath );
+			string filebase = basename( pathname );
 			const char* name = motion->name();
 			if( name && _stricmp( filebase.c_str(), name ) ) {
-				LOG("WARNING: Motion name \"%s\" does not equal base of filename '%s'. Using '%s' in posture map.", name, finalPath.native_file_string().c_str(), filebase.c_str());
+				LOG("WARNING: Motion name \"%s\" does not equal base of filename '%s'. Using '%s' in posture map.", name, pathname.native_file_string().c_str(), filebase.c_str());
 				motion->name( filebase.c_str() );
 			}
-			motion->filename( finalPath.native_file_string().c_str() );
+			motion->filename( pathname.native_file_string().c_str() );
 
 			std::map<std::string, SkMotion*>::iterator motionIter = map.find(filebase);
 			if (motionIter != map.end()) {
-				LOG("ERROR: Motion by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), finalPath.native_file_string().c_str());
+				LOG("ERROR: Motion by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
 				motion->unref();
 				return CMD_FAILURE;
 			}
@@ -222,28 +211,16 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 }
 
 int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture*>& map, bool recurse_dirs, ResourceManager* manager, double scale, const char* error_prefix ) {
-	// include the media path in the pathname if applicable
-	path finalPath;
-	std::string rootDir = pathname.root_directory();
-	if (rootDir.size() == 0)
-	{		
-		finalPath = operator/(mcuCBHandle::singleton().getMediaPath(), pathname);
-	}
-	else
-	{
-		finalPath = pathname;
-	}
 	
-	if( !exists( finalPath ) ) {
-		LOG("%s Posture path \"%s\" not found.", error_prefix, finalPath.native_file_string().c_str());
+	if( !exists( pathname ) ) {
+		LOG("%s Posture path \"%s\" not found.", error_prefix, pathname.native_file_string().c_str());
 		return CMD_FAILURE;
 	}
 
-
-	if( is_directory( finalPath ) ) {
+	if( is_directory( pathname ) ) {
 		
 		directory_iterator end;
-		for( directory_iterator i( finalPath ); i!=end; ++i ) {
+		for( directory_iterator i( pathname ); i!=end; ++i ) {
 			const path& cur = *i;
 
 			if( is_directory( cur ) ) {
@@ -261,11 +238,11 @@ int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture
 	} else {
 		SkPosture* posture = new SkPosture();
 		
-		SrInput in( finalPath.string().c_str(), "rt" );
+		SrInput in( pathname.string().c_str(), "rt" );
 		in >> (*posture);
 		if( in.had_error() ) {
 			std::stringstream strstr;
-			strstr << error_prefix << "Failed to load posture \"" << finalPath.string() << "\".";
+			strstr << error_prefix << "Failed to load posture \"" << pathname.string() << "\".";
 			LOG(strstr.str().c_str());
 			posture->unref();
 			return CMD_FAILURE;
@@ -276,24 +253,24 @@ int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture
 			std::string filename;
 			MotionResource * motionRes = new MotionResource();
 			motionRes->setType("skp");
-			filename = mcn_return_full_filename_func( CurrentPath, finalPath.string().c_str() );
+			filename = mcn_return_full_filename_func( CurrentPath, pathname.string().c_str() );
 			motionRes->setMotionFile( filename );
 			manager->addResource(motionRes);
 
-			string filebase = basename( finalPath );
+			string filebase = basename( pathname );
 			const char* name = posture->name();
 			if( name && _stricmp( filebase.c_str(), name ) ) {
 				std::stringstream strstr;
-				strstr << "WARNING: Posture name \"" << name << "\" does not equal base of filename \"" << finalPath.native_file_string() << "\".  Using \"" << filebase << "\" in posture map." << endl;
+				strstr << "WARNING: Posture name \"" << name << "\" does not equal base of filename \"" << pathname.native_file_string() << "\".  Using \"" << filebase << "\" in posture map." << endl;
 				LOG(strstr.str().c_str());
 				posture->name( filebase.c_str() );
 			}
-			posture->filename( finalPath.native_file_string().c_str() );
+			posture->filename( pathname.native_file_string().c_str() );
 
 			std::map<std::string, SkPosture*>::iterator postureIter = map.find(filebase);
 			if (postureIter != map.end()) {
 				std::stringstream strstr;
-				strstr << "ERROR: Posture by name of \"" << filebase << "\" already exists.  Ignoring file \"" << finalPath.native_file_string() << "\"." << endl;
+				strstr << "ERROR: Posture by name of \"" << filebase << "\" already exists.  Ignoring file \"" << pathname.native_file_string() << "\"." << endl;
 				LOG(strstr.str().c_str());
 				return CMD_FAILURE;
 			}
@@ -305,20 +282,45 @@ int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture
 }
 
 int load_me_motions( const char* pathname, std::map<std::string, SkMotion*>& map, bool recurse_dirs, ResourceManager* manager, double scale ) {
-	path motions_path;
+	path motions_path(pathname);
 	
-	if( validate_path( motions_path, pathname ) ) {
-		return load_me_motions_impl( motions_path, map, recurse_dirs, manager, scale, "ERROR: " );
+	path finalPath;
+	// include the media path in the pathname if applicable
+	std::string rootDir = motions_path.root_directory();
+	if (rootDir.size() == 0)
+	{		
+		finalPath = operator/(mcuCBHandle::singleton().getMediaPath(), motions_path);
+	}
+	else
+	{
+		finalPath = pathname;
+	}
+
+	if (1) {
+		return load_me_motions_impl( finalPath, map, recurse_dirs, manager, scale, "ERROR: " );
 	} else {
-		LOG("ERROR: Invalid motion path \"%s\".", pathname);
+		LOG("ERROR: Invalid motion path \"%s\".", finalPath);
 		return CMD_FAILURE;
 	}
 }
 
 int load_me_postures( const char* pathname, std::map<std::string, SkPosture*>& map, bool recurse_dirs, ResourceManager* manager, double scale ) {
-	path posture_path;
-	if( validate_path( posture_path, pathname ) ) {
-		return load_me_postures_impl( posture_path, map, recurse_dirs, manager, scale, "ERROR: " );
+	path posture_path(pathname);
+
+	path finalPath;
+	// include the media path in the pathname if applicable
+	std::string rootDir = posture_path.root_directory();
+	if (rootDir.size() == 0)
+	{		
+		finalPath = operator/(mcuCBHandle::singleton().getMediaPath(), posture_path);
+	}
+	else
+	{
+		finalPath = pathname;
+	}
+
+	if (1) {
+		return load_me_postures_impl( finalPath, map, recurse_dirs, manager, scale, "ERROR: " );
 	} else {
 		LOG("ERROR: Invalid posture path \"%s\".", pathname);
 		return CMD_FAILURE;
