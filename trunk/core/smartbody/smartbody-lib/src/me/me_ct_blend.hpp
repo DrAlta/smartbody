@@ -155,8 +155,7 @@ public:
 
 	//virtual void set_child( MeController* child );  // Use init( child )
 
-//	MeSpline1D& blend_curve() { return _blend_curve; }
-	srLinearCurve& get_curve() { return _curve; }
+	srLinearCurve& get_curve( void ) { return _curve; }
 
 protected:
 	void controller_map_updated();

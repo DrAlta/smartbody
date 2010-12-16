@@ -114,7 +114,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 
 	bonebusCharacter = NULL;
 
-	time_delay = 0.0;
+	viseme_time_offset = 0.0;
 }
 
 //  Destructor
@@ -1076,128 +1076,7 @@ const std::string& SbmCharacter::get_voice_code_backup() const
 	return voice_code_backup; //if voice isn't NULL-- no error message; just returns the string
 }
 
-void SbmCharacter::update_viseme_curve( double curTime )
-{
-	std::map<std::string, srLinearCurve*>::iterator curveIter;
-	std::vector<std::string> visemesToDelete;
-	for (curveIter = visemeCurve.begin(); curveIter != visemeCurve.end(); curveIter++)
-	{
-		float weight = (float)curveIter->second->evaluate( curTime );
-		std::map<std::string, std::vector<std::string>>::iterator namePatchIter;
-		namePatchIter = viseme_name_patch.find(curveIter->first);
-		if (namePatchIter != viseme_name_patch.end())
-		{
-			for (size_t nCount = 0; nCount < namePatchIter->second.size(); nCount++)
-			{
-				update_viseme( namePatchIter->second[nCount].c_str(), weight );
-			}
-		}
-		else
-		{
-			update_viseme( curveIter->first.c_str(), weight );
-		}
-
-		if (weight == 0 && curveIter->second->get_tail_param() <= curTime)
-		{
-			visemesToDelete.push_back(curveIter->first);
-		}
-	}
-
-	for (size_t x = 0; x < visemesToDelete.size(); x++)
-	{
-		std::map<std::string, srLinearCurve*>::iterator iter = visemeCurve.find(visemesToDelete[x]);
-		if (iter != visemeCurve.end())
-		{
-			visemeCurve.erase(iter);
-		}
-	}
-}
-
-void SbmCharacter::build_viseme_curve(const char* viseme, double start_time, float* curve_info, int numKeys)
-{
-	std::vector<std::string> visemeNames;
-	std::map<std::string, std::vector<std::string>>::iterator iter;
-	iter = viseme_name_patch.find(viseme);
-	if (iter != viseme_name_patch.end())
-	{
-		for (size_t nCount = 0; nCount < iter->second.size(); nCount++)
-			visemeNames.push_back(iter->second[nCount]);
-	}
-	else
-		visemeNames.push_back(viseme);
-
-	for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
-	{
-		if (numKeys > 0)
-		{
-			std::map<std::string, srLinearCurve*>::iterator iter = visemeCurve.find(visemeNames[nCount]);
-			if (iter != visemeCurve.end())
-			{
-				visemeCurve.erase(iter);
-			}
-			srLinearCurve* curve = new srLinearCurve();
-			curve->insert(start_time, 0);
-			float timeDelay = this->get_viseme_time_delay();
-			for (int i = 0; i < numKeys; i++)
-			{
-				float weight = curve_info[i*4+1];
-				float inTime = curve_info[i*4+0];
-				curve->insert( start_time + inTime + timeDelay, weight );		
-			}
-			visemeCurve.insert( make_pair( visemeNames[ nCount ], curve ) );
-		}		
-	}			
-}
-
-void SbmCharacter::update_viseme( const char* viseme,
-								  float weight )
-{
-    //LOG("Recieved: SbmCharacter(\"%s\")::set_viseme( \"%s\", %f, %f )\n", name, viseme, weight, rampin_duration );
-	std::vector<std::string> visemeNames;
-	std::map<std::string, std::vector<std::string>>::iterator iter;
-	iter = viseme_name_patch.find(viseme);
-	if (iter != viseme_name_patch.end())
-	{
-		for (size_t nCount = 0; nCount < iter->second.size(); nCount++)
-			visemeNames.push_back(iter->second[nCount]);
-	}
-	else
-		visemeNames.push_back(viseme);
-
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
-	{
-		if (bonebusCharacter)
-		{
-			bonebusCharacter->SetViseme( visemeNames[nCount].c_str(), weight, 0 );
-		}
-		if ( mcuCBHandle::singleton().sbm_character_listener )
-		{
-			mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, visemeNames[nCount].c_str(), weight, 0 );
-		}
-
-		if (is_face_controller_enabled()) 
-		{
-			// Viseme/AU channel activation
-			ostringstream ct_name;
-			ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
-
-			SkChannelArray channels;
-			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
-
-			MeCtChannelWriter* ct = new MeCtChannelWriter();
-			ct->name( ct_name.str().c_str() );
-			ct->init( channels, true );
-			SrBuffer<float> value;
-			value.size(1);
-			value[0] = (float)weight;
-			ct->set_data(value);
-
-			head_sched_p->schedule( ct, mcu.time, mcu.time + ct->controller_duration(), 0, 0 );
-		}
-	}
-}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void SbmCharacter::set_viseme( const char* viseme,
 							  float weight,
@@ -1240,19 +1119,203 @@ void SbmCharacter::set_viseme( const char* viseme,
 			ct->name( ct_name.str().c_str() );
 			ct->init( channels, true );
 			SrBuffer<float> value;
-			value.size(1);
-			value[0] = (float)weight;
+			value.size( 1 );
+			value[ 0 ] = (float)weight;
 			ct->set_data(value);
 
 			head_sched_p->schedule( ct, start_time, start_time + ct->controller_duration(), rampin_duration, 0 );
 		}
 	}
 }
-void SbmCharacter::eye_blink_update( void )
+
+void SbmCharacter::update_viseme( const char* viseme,
+								  float weight )
 {
-   // automatic blinking routine using bonebus viseme commands
+    //LOG("Recieved: SbmCharacter(\"%s\")::set_viseme( \"%s\", %f, %f )\n", name, viseme, weight, rampin_duration );
+	std::vector<std::string> visemeNames;
+	std::map<std::string, std::vector<std::string>>::iterator iter;
+	iter = viseme_name_patch.find(viseme);
+	if (iter != viseme_name_patch.end())
+	{
+		for (size_t nCount = 0; nCount < iter->second.size(); nCount++)
+			visemeNames.push_back(iter->second[nCount]);
+	}
+	else
+		visemeNames.push_back(viseme);
+
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
+	for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
+	{
+		if (bonebusCharacter)
+		{
+			bonebusCharacter->SetViseme( visemeNames[nCount].c_str(), weight, 0 );
+		}
+		if ( mcuCBHandle::singleton().sbm_character_listener )
+		{
+			mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, visemeNames[nCount].c_str(), weight, 0 );
+		}
+
+#if 1
+		if (is_face_controller_enabled()) 
+		{
+			// Viseme/AU channel activation
+			ostringstream ct_name;
+			ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
+
+			SkChannelArray channels;
+			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
+
+			MeCtChannelWriter* ct = new MeCtChannelWriter();
+			ct->name( ct_name.str().c_str() );
+			ct->init( channels, true );
+			SrBuffer<float> value;
+			value.size( 1 );
+			value[ 0 ] = (float)weight;
+			ct->set_data(value);
+
+			head_sched_p->schedule( ct, mcu.time, mcu.time + ct->controller_duration(), 0, 0 );
+		}
+#endif
+	}
+}
+
+void SbmCharacter::set_viseme_curve(
+	const char* viseme, 
+	double start_time, 
+	float* curve_info, 
+	int numKeys, 
+	int numKeyParams 
+) {
+
+	std::vector<std::string> visemeNames;
+	std::map<std::string, std::vector<std::string>>::iterator iter;
+	
+	iter = viseme_name_patch.find(viseme);
+	if (iter != viseme_name_patch.end())
+	{
+		for (size_t nCount = 0; nCount < iter->second.size(); nCount++)
+			visemeNames.push_back(iter->second[nCount]);
+	}
+	else
+		visemeNames.push_back(viseme);
+
+	for( size_t nCount = 0; nCount < visemeNames.size(); nCount++ )
+	{
+		if( numKeys > 0 )
+		{
+			std::map<std::string, srLinearCurve*>::iterator iter = visemeCurveMap.find( visemeNames[ nCount ] );
+			if (iter != visemeCurveMap.end())
+			{
+				visemeCurveMap.erase(iter);
+			}
+
+			ostringstream ct_name;
+			ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
+
+			SkChannelArray channels;
+			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
+
+			MeCtChannelWriter* ct = new MeCtChannelWriter();
+			ct->name( ct_name.str().c_str() );
+			ct->init( channels, true );
+			SrBuffer<float> value;
+			value.size( 1 );
+			value[ 0 ] = 1.0f;
+			ct->set_data(value);
+
+			float timeDelay = this->get_viseme_time_delay();
+			head_sched_p->schedule( ct, start_time + timeDelay, curve_info, numKeys, numKeyParams );
+		}
+	}
+}
+
+void SbmCharacter::build_viseme_curve(
+	const char* viseme, 
+	double start_time, 
+	float* curve_info, 
+	int numKeys, 
+	int numKeyParams 
+) {
+
+	std::vector<std::string> visemeNames;
+	std::map<std::string, std::vector<std::string>>::iterator iter;
+	
+	iter = viseme_name_patch.find(viseme);
+	if (iter != viseme_name_patch.end())
+	{
+		for (size_t nCount = 0; nCount < iter->second.size(); nCount++)
+			visemeNames.push_back(iter->second[nCount]);
+	}
+	else
+		visemeNames.push_back(viseme);
+
+	for( size_t nCount = 0; nCount < visemeNames.size(); nCount++ )
+	{
+		if( numKeys > 0 )
+		{
+			std::map<std::string, srLinearCurve*>::iterator iter = visemeCurveMap.find( visemeNames[ nCount ] );
+			if (iter != visemeCurveMap.end())
+			{
+				visemeCurveMap.erase(iter);
+			}
+
+			srLinearCurve* curve = new srLinearCurve();
+//			curve->insert( start_time, 0 );
+
+			float timeDelay = this->get_viseme_time_delay();
+			for (int i = 0; i < numKeys; i++)
+			{
+				float time = curve_info[ i * numKeyParams + 0 ];
+				float weight = curve_info[ i * numKeyParams + 1 ];
+				curve->insert( start_time + time + timeDelay, weight );
+			}
+			visemeCurveMap.insert( make_pair( visemeNames[ nCount ], curve ) );
+		}
+	}
+}
+
+void SbmCharacter::update_viseme_curve( double curTime )
+{
+	std::map<std::string, srLinearCurve*>::iterator curveIter;
+	std::vector<std::string> visemesToDelete;
+	for (curveIter = visemeCurveMap.begin(); curveIter != visemeCurveMap.end(); curveIter++)
+	{
+
+		float weight = (float)curveIter->second->evaluate( curTime );
+		std::map<std::string, std::vector<std::string>>::iterator namePatchIter;
+		namePatchIter = viseme_name_patch.find(curveIter->first);
+
+		if (namePatchIter != viseme_name_patch.end())
+		{
+			for (size_t nCount = 0; nCount < namePatchIter->second.size(); nCount++)
+			{
+				update_viseme( namePatchIter->second[nCount].c_str(), weight );
+			}
+		}
+		else
+		{
+			update_viseme( curveIter->first.c_str(), weight );
+		}
+
+		if (weight == 0 && curveIter->second->get_tail_param() <= curTime)
+		{
+			visemesToDelete.push_back(curveIter->first);
+		}
+	}
+
+	for (size_t x = 0; x < visemesToDelete.size(); x++)
+	{
+		std::map<std::string, srLinearCurve*>::iterator iter = visemeCurveMap.find(visemesToDelete[x]);
+		if (iter != visemeCurveMap.end())
+		{
+			visemeCurveMap.erase(iter);
+		}
+	}
+}
+
+void SbmCharacter::update_eye_blink( void )
+{
 	if( eyelid_reg_ct_p )	{
 
 		bool left_changed;
@@ -1657,20 +1720,21 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
  
 		char* viseme = args.read_token();		// viseme name
 		char* next = args.read_token();			// two modes: original add-on or curve
-		float* curveInfo;
-		float weight;
-		float rampin_duration;
-		int numKeys;
+		float* curveInfo = NULL;
+		float weight = 0.0;
+		float rampin_duration = 0.0;
+		int numKeys = 0;
+		int numKeyParams = 0;
 
 		// viseme
 		if (_strcmpi(viseme, "curveon") == 0)
 		{
-			character->set_viseme_curve(true);
+			character->set_viseme_curve_mode(true);
 			return CMD_SUCCESS;
 		}
 		else if(_strcmpi(viseme, "curveoff") == 0)
 		{
-			character->set_viseme_curve(false);
+			character->set_viseme_curve_mode(false);
 			return CMD_SUCCESS;
 		}
 		else if(_strcmpi(viseme, "timedelay") == 0)
@@ -1681,61 +1745,71 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		}
 
 		// keyword next to viseme
-		if (_strcmpi(next, "curve") == 0)
+		if( _strcmpi( next, "curve" ) == 0 )
 		{
-			weight = 1.0;
-			rampin_duration = 0.0;
-			numKeys = args.read_int();			// every key have four floats: time, weight, slope in, slope out
-			if (numKeys <= 0)	
+			numKeys = args.read_int();
+			if( numKeys <= 0 )	
 			{
-				//LOG("Viseme does not contain any keys..ignoring...");
-				return CMD_SUCCESS;
+				LOG( "Viseme data is missing" );
+				return CMD_FAILURE;
 			}
-			curveInfo = new float[numKeys * 4];
-			args.read_float_vect(curveInfo, numKeys * 4);
+			int num_remaining = args.calc_num_tokens();
+			numKeyParams = num_remaining / numKeys;
+			if( num_remaining != numKeys * numKeyParams )	{
+				LOG( "Viseme data is malformed" );
+				return CMD_FAILURE;
+			}
+			curveInfo = new float[ num_remaining ];
+			args.read_float_vect( curveInfo, num_remaining );
 		}
 		else
 		{
 			weight = (float)atof(next);
 			rampin_duration = args.read_float();
-			numKeys = 0;
-			curveInfo = NULL;
 		}
 
 		if( all_characters ) {
 			mcu_p->character_map.reset();
-			while( character = mcu_p->character_map.next() ) {
-				if (curveInfo == NULL)
+			while( character = mcu_p->character_map.next() )
+			{
+				if( curveInfo == NULL )
 				{
 					character->set_viseme( viseme, weight, mcu_p->time, rampin_duration );
 				}
 				else
 				{
-					character->build_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys );
+					character->build_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams );
+//					character->set_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams );
 				}
 			}
-			return CMD_SUCCESS;
-		} else {
-			if ( !character ) {
-				LOG("ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"%s\".", char_name.c_str());
-				return CMD_FAILURE;  // ignore/out-of-domain? But it's not a standard network message.
-			} else {
-				if (curveInfo == NULL)
-				{
-					character->set_viseme( viseme, weight, mcu_p->time, rampin_duration );
-				}
-				else
-				{
-					character->build_viseme_curve(viseme, mcu_p->time, curveInfo, numKeys);
-				}
-				return CMD_SUCCESS;
+		} 
+		else
+		if( character ) 
+		{
+			if( curveInfo == NULL )
+			{
+				character->set_viseme( viseme, weight, mcu_p->time, rampin_duration );
+			}
+			else
+			{
+				character->build_viseme_curve(viseme, mcu_p->time, curveInfo, numKeys, numKeyParams );
+//				character->set_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams );
 			}
 		}
-	} else if( char_cmd=="bone" ) {
+		
+		if( curveInfo ) delete [] curveInfo;
+		return CMD_SUCCESS;
+	} 
+	else 
+	if( char_cmd=="bone" ) {
 		return mcu_character_bone_cmd( char_name.c_str(), args, mcu_p );
-	} else if( char_cmd=="bonep" ) {
+	} 
+	else 
+	if( char_cmd=="bonep" ) {
 		return mcu_character_bone_position_cmd( char_name.c_str(), args, mcu_p );
-	} else if( char_cmd=="remove" ) {
+	} 
+	else 
+	if( char_cmd=="remove" ) {
 		return SbmCharacter::remove_from_scene( char_name.c_str() );
 	} else if( char_cmd=="viewer" ) {
 		int mode = args.read_int();

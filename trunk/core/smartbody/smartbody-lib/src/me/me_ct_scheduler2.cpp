@@ -338,9 +338,16 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::create_track( MeCtUnary* blending,
 
 // This schedule function define arbitary blending curve
 // numKeys: number of Knots used to define the curve
-// curveInfo: knots information, each knot is composed of four float, time weight slope-in slope-out
-MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin, float* curveInfo, int numKeys)
-{	
+// curveInfo: knots information, each knot is composed of:
+//	two floats:  time weight
+//	four floats:  time weight slope-in slope-out
+MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( 
+	MeController* ct, 
+	double tin, 
+	float* curveInfo, 
+	int numKeys,
+	int numKeyParams
+){	
 	MeCtTimeShiftWarp* timingCt   = new MeCtTimeShiftWarp( ct );
 	MeCtBlend*         blendingCt = new MeCtBlend( timingCt );
 
@@ -349,12 +356,12 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 	srLinearCurve& blend_curve = blendingCt->get_curve();
 	for (int i = 0; i < numKeys; i++)
 	{
-		float t = curveInfo[i*4+0];
-		float w = curveInfo[i*4+1];
+		float t = curveInfo[ i * numKeyParams + 0 ];
+		float w = curveInfo[ i * numKeyParams + 1 ];
 		blend_curve.insert( tin + t, w );		
 	}
 
-	double dur = curveInfo[(numKeys-1)*4] - tin;
+	double dur = curveInfo[ ( numKeys - 1 ) * numKeyParams ] - tin;
 
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string blend_name( "blending for " );

@@ -187,13 +187,13 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	AudioFileSpeech* audioSpeechImpl = dynamic_cast<AudioFileSpeech*>(cur_speech_impl);
 	if (audioSpeechImpl)
 	{	
-		bool visemeMode = request->actor->is_viseme_curve();
+		bool visemeMode = request->actor->is_viseme_curve_mode();
 		audioSpeechImpl->setVisemeMode(visemeMode);
 	}
 	AudioFileSpeech* audioSpeechImplBackup = dynamic_cast<AudioFileSpeech*>(cur_speech_impl_backup);
 	if (audioSpeechImplBackup)
 	{	
-		bool visemeMode = request->actor->is_viseme_curve();
+		bool visemeMode = request->actor->is_viseme_curve_mode();
 		audioSpeechImplBackup->setVisemeMode(visemeMode);
 	}
 
