@@ -1083,7 +1083,6 @@ void SbmCharacter::set_viseme( const char* viseme,
 							  double start_time,
 							  float rampin_duration )
 {
-    //LOG("Recieved: SbmCharacter(\"%s\")::set_viseme( \"%s\", %f, %f )\n", name, viseme, weight, rampin_duration );
 	std::vector<std::string> visemeNames;
 	std::map<std::string, std::vector<std::string>>::iterator iter;
 	iter = viseme_name_patch.find(viseme);
@@ -1131,7 +1130,6 @@ void SbmCharacter::set_viseme( const char* viseme,
 void SbmCharacter::update_viseme( const char* viseme,
 								  float weight )
 {
-    //LOG("Recieved: SbmCharacter(\"%s\")::set_viseme( \"%s\", %f, %f )\n", name, viseme, weight, rampin_duration );
 	std::vector<std::string> visemeNames;
 	std::map<std::string, std::vector<std::string>>::iterator iter;
 	iter = viseme_name_patch.find(viseme);
@@ -1155,8 +1153,6 @@ void SbmCharacter::update_viseme( const char* viseme,
 		{
 			mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, visemeNames[nCount].c_str(), weight, 0 );
 		}
-
-#if 1
 		if (is_face_controller_enabled()) 
 		{
 			// Viseme/AU channel activation
@@ -1176,7 +1172,35 @@ void SbmCharacter::update_viseme( const char* viseme,
 
 			head_sched_p->schedule( ct, mcu.time, mcu.time + ct->controller_duration(), 0, 0 );
 		}
-#endif
+	}
+}
+
+void SbmCharacter::forward_viseme( const char* viseme,
+								  float weight )
+{
+	std::vector<std::string> visemeNames;
+	std::map<std::string, std::vector<std::string>>::iterator iter;
+	iter = viseme_name_patch.find(viseme);
+	if (iter != viseme_name_patch.end())
+	{
+		for( size_t nCount = 0; nCount < iter->second.size(); nCount++ )
+			visemeNames.push_back( iter->second[ nCount ] );
+	}
+	else
+		visemeNames.push_back( viseme );
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
+	{
+		if (bonebusCharacter)
+		{
+			bonebusCharacter->SetViseme( visemeNames[ nCount ].c_str(), weight, 0 );
+		}
+		if ( mcuCBHandle::singleton().sbm_character_listener )
+		{
+			mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, visemeNames[ nCount ].c_str(), weight, 0 );
+		}
 	}
 }
 
@@ -1226,6 +1250,18 @@ void SbmCharacter::set_viseme_curve(
 
 			float timeDelay = this->get_viseme_time_delay();
 			head_sched_p->schedule( ct, start_time + timeDelay, curve_info, numKeys, numKeyParams );
+
+#if 1 // for forwarding...
+			srLinearCurve* curve = new srLinearCurve();
+			for (int i = 0; i < numKeys; i++)
+			{
+				float time = curve_info[ i * numKeyParams + 0 ];
+				float weight = curve_info[ i * numKeyParams + 1 ];
+				curve->insert( start_time + time + timeDelay, weight );
+			}
+			visemeCurveMap.insert( make_pair( visemeNames[ nCount ], curve ) );
+#endif
+
 		}
 	}
 }
@@ -1275,7 +1311,7 @@ void SbmCharacter::build_viseme_curve(
 	}
 }
 
-void SbmCharacter::update_viseme_curve( double curTime )
+void SbmCharacter::forward_viseme_curves( double curTime )
 {
 	std::map<std::string, srLinearCurve*>::iterator curveIter;
 	std::vector<std::string> visemesToDelete;
@@ -1290,12 +1326,12 @@ void SbmCharacter::update_viseme_curve( double curTime )
 		{
 			for (size_t nCount = 0; nCount < namePatchIter->second.size(); nCount++)
 			{
-				update_viseme( namePatchIter->second[nCount].c_str(), weight );
+				forward_viseme( namePatchIter->second[nCount].c_str(), weight );
 			}
 		}
 		else
 		{
-			update_viseme( curveIter->first.c_str(), weight );
+			forward_viseme( curveIter->first.c_str(), weight );
 		}
 
 		if (weight == 0 && curveIter->second->get_tail_param() <= curTime)
@@ -1314,7 +1350,7 @@ void SbmCharacter::update_viseme_curve( double curTime )
 	}
 }
 
-void SbmCharacter::update_eye_blink( void )
+void SbmCharacter::forward_eye_blink( void )
 {
 	if( eyelid_reg_ct_p )	{
 
@@ -1325,15 +1361,15 @@ void SbmCharacter::update_eye_blink( void )
 
 		if( left_weight == right_weight )	{ // ensured with float granularity...
 			if( left_changed )	{
-				update_viseme( "blink", left_weight );
+				forward_viseme( "blink", left_weight );
 			}
 		}
 		else	{
 			if( left_changed )	{
-				update_viseme( "blink_lf", left_weight );
+				forward_viseme( "blink_lf", left_weight );
 			}
 			if( right_changed )	{
-				update_viseme( "blink_rt", right_weight );
+				forward_viseme( "blink_rt", right_weight );
 			}		
 		}
 	}
@@ -1778,8 +1814,8 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				}
 				else
 				{
-					character->build_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams );
-//					character->set_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams );
+//					character->build_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams );
+					character->set_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams );
 				}
 			}
 		} 
@@ -1792,8 +1828,8 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			}
 			else
 			{
-				character->build_viseme_curve(viseme, mcu_p->time, curveInfo, numKeys, numKeyParams );
-//				character->set_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams );
+//				character->build_viseme_curve(viseme, mcu_p->time, curveInfo, numKeys, numKeyParams );
+				character->set_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams );
 			}
 		}
 		
