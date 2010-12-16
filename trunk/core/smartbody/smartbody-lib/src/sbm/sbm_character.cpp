@@ -896,7 +896,7 @@ void prune_schedule( SbmCharacter*   actor,
 					} else {
 						pose_ct = (MeCtPose*)anim_source;
 					}
-				} else if( anim_ct_type == MeCtRawWriter::TYPE ) {
+				} else if( anim_ct_type == MeCtChannelWriter::TYPE ) {
 					const SkChannelArray& ct_channels = anim_source->controller_channels();
 					vector<int> new_channels;  // list of indices to channels in use
 					bool foundChannelMatch = false;
@@ -1186,7 +1186,7 @@ void SbmCharacter::update_viseme( const char* viseme,
 			SkChannelArray channels;
 			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
 
-			MeCtRawWriter* ct = new MeCtRawWriter();
+			MeCtChannelWriter* ct = new MeCtChannelWriter();
 			ct->name( ct_name.str().c_str() );
 			ct->init( channels, true );
 			SrBuffer<float> value;
@@ -1236,7 +1236,7 @@ void SbmCharacter::set_viseme( const char* viseme,
 			SkChannelArray channels;
 			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
 
-			MeCtRawWriter* ct = new MeCtRawWriter();
+			MeCtChannelWriter* ct = new MeCtChannelWriter();
 			ct->name( ct_name.str().c_str() );
 			ct->init( channels, true );
 			SrBuffer<float> value;

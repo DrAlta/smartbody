@@ -788,7 +788,7 @@ int test_bone_pos_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
 	}
 
 	
-	MeCtRawWriter* boneWriter= new MeCtRawWriter();
+	MeCtChannelWriter* boneWriter= new MeCtChannelWriter();
 	boneWriter->init(_channels, true);
 	//quat_t q = euler_t(50,50,50);
 	float data[3] = { (float)args.read_double(), (float)args.read_double(), (float)args.read_double() };

@@ -29,7 +29,7 @@
 #include <SK/sk_skeleton.h>
 
 #include <ME/me_controller_tree_root.hpp>
-#include <ME/me_ct_raw_writer.hpp>
+#include <ME/me_ct_channel_writer.hpp>
 #include "wsp.h"
 
 #include <map>
@@ -73,7 +73,7 @@ protected:
 	} wo_cache;         // Caches values when setting world offset, because controller may not have been evaluated and skeleton value may not reflect the last call to set_world_offset (HACK-ish)
 	double wo_cache_timestamp;
 
-	MeCtRawWriter*  world_offset_writer_p;
+	MeCtChannelWriter*  world_offset_writer_p;
 
 #if SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK
 	// Map of pending controller clean-up callbacks

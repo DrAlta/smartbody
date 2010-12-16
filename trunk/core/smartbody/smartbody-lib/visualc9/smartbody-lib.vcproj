@@ -275,6 +275,14 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\me\me_ct_channel_writer.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\me\me_ct_channel_writer.hpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\me\me_ct_container.cpp"
 						>
 					</File>
@@ -572,14 +580,6 @@
 					</File>
 					<File
 						RelativePath="..\src\sbm\me_ct_quick_draw.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\me\me_ct_raw_writer.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\me\me_ct_raw_writer.hpp"
 						>
 					</File>
 					<File

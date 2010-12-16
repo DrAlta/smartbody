@@ -92,11 +92,11 @@ BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& un
 		return BehaviorRequestPtr();
 	}
 
-	MeCtRawWriter * rawwriter_ct = new MeCtRawWriter();
+	MeCtChannelWriter * channelWriter = new MeCtChannelWriter();
 	// Name controller with behavior unique_id
 	ostringstream name;
 	name << unique_id;
-	rawwriter_ct->name( name.str().c_str() );
+	channelWriter->name( name.str().c_str() );
 
 	SkChannelArray Param_Channel;
 	Data_Array.size(channel_size);
@@ -125,9 +125,9 @@ BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& un
 		return BehaviorRequestPtr();
 	}
 
-	rawwriter_ct->init(Param_Channel,true);
-	rawwriter_ct->set_data(Data_Array);
+	channelWriter->init(Param_Channel,true);
+	channelWriter->set_data(Data_Array);
 	// assign some (arbitrary) transition duration
-	rawwriter_ct->inoutdt(0.5,0.5);
-	return BehaviorRequestPtr( new MeControllerRequest ( unique_id, localId, rawwriter_ct, request->actor->param_sched_p, behav_syncs ) );
+	channelWriter->inoutdt(0.5,0.5);
+	return BehaviorRequestPtr( new MeControllerRequest ( unique_id, localId, channelWriter, request->actor->param_sched_p, behav_syncs ) );
 }

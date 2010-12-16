@@ -27,7 +27,7 @@
 
 #include <xercesc/util/XMLStringTokenizer.hpp>
 #include <sbm/me_ct_navigation_circle.hpp>
-#include <me/me_ct_raw_writer.hpp>
+#include <me/me_ct_channel_writer.hpp>
 
 #include "bml_locomotion.hpp"
 
