@@ -521,6 +521,8 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 	}
 }
 
+#define ENABLE_DIRECT_VISEME_SCHEDULE	0
+
 void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 {
 	// Get times from SyncPoints
@@ -530,6 +532,9 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	time_sec relaxAt  = behav_syncs.sync_relax()->time();
 	time_sec endAt    = behav_syncs.sync_end()->time();
 
+#if ENABLE_DIRECT_VISEME_SCHEDULE
+	SbmCharacter *actor_p = request->actor;
+#endif
 	const string& actor_id = request->actor->name;
 
 //// SyncPoints should already be set from viseme processing
@@ -560,8 +565,20 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 			if (!v->isCurveMode())
 			{
 				time_sec time = (time_sec)( v->time() + startAt );
+#if ENABLE_DIRECT_VISEME_SCHEDULE
+				float ramp_dur;
+				if( v->duration() > 0 ) {
+					ramp_dur = v->duration();
+				} else {
+					// speech implementation doesn't appear to support durations.
+					// using 0.1 transition duration (and start transition early)
+					ramp_dur = 0.1f;
+					time -= (time_sec)0.05;
+				}
+				actor_p->set_viseme_ramp( v->id(), v->weight(), time, ramp_dur );
+#else
 				command.str( "" );
-				command << "char " << actor_id << " viseme " << v->id() << ' ' << v->weight() << ' ';
+				command << "char " << actor_id << " viseme " << v->id() << " " << v->weight() << " ";
 				if( v->duration() > 0 ) {
 					command << v->duration();
 				} else {
@@ -571,16 +588,28 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 					time -= (time_sec)0.05;
 
 				}
-				if( LOG_BML_VISEMES ) cout << "command (complete): " << command.str() << endl;
 				sbm_commands.push_back( new SbmCommand( command.str(), time ) );
+#endif
+				if( LOG_BML_VISEMES ) cout << "command (complete): " << command.str() << endl;
 			}
 			else
 			{
+#if ENABLE_DIRECT_VISEME_SCHEDULE
+				int n = v->getNumKeys();
+				float *curve_info = new float[ 2 * n ];
+				srArgBuffer curve_string( v->getCurveInfo() );
+				curve_string.read_float_vect( curve_info, 2 * n );
+
+				actor_p->set_viseme_curve( v->id(), v->weight(), curve_info, n, 2 );
+				
+				delete [] curve_info;
+#else
 				command.str( "" );
 				command << "char " << actor_id << " viseme " << v->id() << " curve " << v->getNumKeys() << ' ' << v->getCurveInfo();
 				time_sec time = mcu->time;
-				if( LOG_BML_VISEMES ) cout << "command (complete): " << command.str() << endl;
 				sbm_commands.push_back( new SbmCommand( command.str(), time ) );
+#endif
+				if( LOG_BML_VISEMES ) cout << "command (complete): " << command.str() << endl;
 			}
 
 			////visemes get set a specified time

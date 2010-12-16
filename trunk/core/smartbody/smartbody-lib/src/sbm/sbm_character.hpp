@@ -210,15 +210,16 @@ public:
 
 	bonebus::BoneBusCharacter * bonebusCharacter;
 
-	void set_viseme( const char* viseme, float weight , double start_time, float rampin_duration );
-	void update_viseme( const char* viseme, float weight );
-	void forward_viseme( const char* viseme, float weight );
-
+//	void set_viseme( const char* viseme, float weight , double start_time, float rampin_duration );
+//	void update_viseme( const char* viseme, float weight );
 	void set_viseme_curve( const char* viseme, double start_time, float* curve_info, int numKeys, int numKeyParams );
-	void build_viseme_curve( const char* viseme, double start_time, float* curve_info, int numKeys, int numKeyParams );
+//	void build_viseme_curve( const char* viseme, double start_time, float* curve_info, int numKeys, int numKeyParams );
+	void set_viseme_ramp( const char* viseme, float weight , double start_time, float rampin_duration );
 
-	void forward_viseme_curves( double curTime);
-	void forward_eye_blink( void );
+	void forward_viseme( const char* viseme, float weight );
+	void forward_all_visemes( double curTime);
+//	void forward_viseme_curves( double curTime);
+//	void forward_eye_blink( void );
 
 public:
 
