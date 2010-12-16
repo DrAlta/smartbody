@@ -330,11 +330,12 @@ public:
 	 *  Schedule controller c with the given parameters.
      *  c - the controller to be scheduled.
      *  tin - the time to activate (start) the controller.
-     *  curve - knots' information that define the blending curve.
+     *  curve - key information that defines the blending curve.
      *  numKeys - number of the knots.
+     *  numKeyParams - number of values per key.
 	 *	Current Usage for this schedule is for arbitary viseme curve, can be applied to any other blending curve
 	 */	
-	TrackPtr schedule( MeController* c, double tin, float* curve, int numKeys);
+	TrackPtr schedule( MeController* c, double tin, float* curve, int numKeys, int numKeyParams );
 
     /** Backwards compatible schedule function: (sans Static/Once track type)
 	 *

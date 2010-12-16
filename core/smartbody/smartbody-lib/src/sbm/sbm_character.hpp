@@ -132,9 +132,9 @@ protected:
 	std::map<std::string, std::vector<std::string>> viseme_name_patch;
 
 	// Viseme Curve Info
-	std::map <std::string, srLinearCurve*> visemeCurve;
+	std::map <std::string, srLinearCurve*> visemeCurveMap;
 	bool			use_viseme_curve;
-	float			time_delay;
+	float			viseme_time_offset;
 
 public:
 	//  Methods
@@ -212,10 +212,12 @@ public:
 
 	void set_viseme( const char* viseme, float weight , double start_time, float rampin_duration );
 	void update_viseme( const char* viseme, float weight );
-	void update_viseme_curve(double curTime);
-	void build_viseme_curve(const char* viseme, double start_time, float* curve_info, int numKeys);
 
-	void eye_blink_update( void );
+	void set_viseme_curve( const char* viseme, double start_time, float* curve_info, int numKeys, int numKeyParams );
+	void build_viseme_curve( const char* viseme, double start_time, float* curve_info, int numKeys, int numKeyParams );
+	void update_viseme_curve( double curTime);
+	
+	void update_eye_blink( void );
 
 public:
 
@@ -282,10 +284,10 @@ public:
 public:
 
 	// viseme curve related functions
-	bool is_viseme_curve() const {return use_viseme_curve;}
-	void set_viseme_curve(bool mode) {use_viseme_curve = mode;}
-	void set_viseme_time_delay(float timeDelay) {time_delay = timeDelay;}
-	float get_viseme_time_delay() {return time_delay;}
+	bool is_viseme_curve_mode() const {return use_viseme_curve;}
+	void set_viseme_curve_mode(bool mode) {use_viseme_curve = mode;}
+	void set_viseme_time_delay( float timeDelay ) { viseme_time_offset = timeDelay;}
+	float get_viseme_time_delay() {return viseme_time_offset;}
 
 	void setSoftEyes(bool val);
 	bool isSoftEyes();
