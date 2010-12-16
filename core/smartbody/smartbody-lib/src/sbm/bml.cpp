@@ -1294,7 +1294,6 @@ float VisemeRequest::getRampDown()
 	return rampdown;
 }
 
-
 void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 {
 	// Get times from BehaviorSyncPoints
@@ -1304,9 +1303,33 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	time_sec relaxAt  = behav_syncs.sync_relax()->time();
 	time_sec endAt    = behav_syncs.sync_end()->time();
 
-	const SbmCharacter* actor    = request->actor;
+//	const SbmCharacter* actor    = request->actor;
 	const string&       actor_id = request->actorId; // match string used by request?
 
+#if 1
+	float rampin = rampup;
+	if( rampin < 0.0 )	{
+		rampin = readyAt - startAt;
+	}
+	float rampout = rampdown;
+	if( rampout < 0.0 )	{
+		rampout = endAt - relaxAt;
+	}
+	float curve_A = 0.0f;
+	float curve_B = rampin;
+	float curve_C = relaxAt - startAt;
+	float curve_D = curve_C + rampout;
+	ostringstream cmd;
+	cmd << "char " << actor_id << " viseme " << viseme << " curve 4 ";
+	cmd << curve_A	<< " " << 0.0f		<< " ";
+	cmd << curve_B	<< " " << weight	<< " ";
+	cmd << curve_C	<< " " << weight	<< " ";
+	cmd << curve_D	<< " " << 0.0f;
+
+	VecOfSbmCommand commands;
+   	commands.push_back( new SbmCommand( cmd.str(), (float)startAt ) );
+
+#else
 	ostringstream start_cmd;
 	if( rampup < 0 ) {
 		start_cmd << "char " << actor_id << " viseme " << viseme << ' ' << weight << ' ' << (readyAt-startAt);
@@ -1324,6 +1347,7 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	VecOfSbmCommand commands;
    	commands.push_back( new SbmCommand( start_cmd.str(), (float)startAt ) );
    	commands.push_back( new SbmCommand( stop_cmd.str(), (float)relaxAt ) );
+#endif
 
 	realize_sequence( commands, mcu );
 }

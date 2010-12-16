@@ -1078,6 +1078,7 @@ const std::string& SbmCharacter::get_voice_code_backup() const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#if 0
 void SbmCharacter::set_viseme( const char* viseme,
 							  float weight,
 							  double start_time,
@@ -1126,7 +1127,9 @@ void SbmCharacter::set_viseme( const char* viseme,
 		}
 	}
 }
+#endif
 
+#if 0
 void SbmCharacter::update_viseme( const char* viseme,
 								  float weight )
 {
@@ -1174,35 +1177,7 @@ void SbmCharacter::update_viseme( const char* viseme,
 		}
 	}
 }
-
-void SbmCharacter::forward_viseme( const char* viseme,
-								  float weight )
-{
-	std::vector<std::string> visemeNames;
-	std::map<std::string, std::vector<std::string>>::iterator iter;
-	iter = viseme_name_patch.find(viseme);
-	if (iter != viseme_name_patch.end())
-	{
-		for( size_t nCount = 0; nCount < iter->second.size(); nCount++ )
-			visemeNames.push_back( iter->second[ nCount ] );
-	}
-	else
-		visemeNames.push_back( viseme );
-
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
-	{
-		if (bonebusCharacter)
-		{
-			bonebusCharacter->SetViseme( visemeNames[ nCount ].c_str(), weight, 0 );
-		}
-		if ( mcuCBHandle::singleton().sbm_character_listener )
-		{
-			mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, visemeNames[ nCount ].c_str(), weight, 0 );
-		}
-	}
-}
+#endif
 
 void SbmCharacter::set_viseme_curve(
 	const char* viseme, 
@@ -1261,11 +1236,27 @@ void SbmCharacter::set_viseme_curve(
 			}
 			visemeCurveMap.insert( make_pair( visemeNames[ nCount ], curve ) );
 #endif
-
 		}
 	}
 }
 
+void SbmCharacter::set_viseme_ramp( 
+	const char* viseme,
+	float weight,
+	double start_time,
+	float rampin_duration
+)	{
+
+	float curve_info[ 4 ];
+	curve_info[ 0 ] = 0.0f;
+	curve_info[ 1 ] = 0.0f;
+	curve_info[ 2 ] = rampin_duration;
+	curve_info[ 3 ] = weight;
+	
+	set_viseme_curve( viseme, start_time, curve_info, 2, 2 );
+}
+
+#if 0
 void SbmCharacter::build_viseme_curve(
 	const char* viseme, 
 	double start_time, 
@@ -1310,9 +1301,61 @@ void SbmCharacter::build_viseme_curve(
 		}
 	}
 }
+#endif
 
-void SbmCharacter::forward_viseme_curves( double curTime )
+void SbmCharacter::forward_viseme( const char* viseme,
+								  float weight )
 {
+	std::vector<std::string> visemeNames;
+	std::map<std::string, std::vector<std::string>>::iterator iter;
+	iter = viseme_name_patch.find(viseme);
+	if (iter != viseme_name_patch.end())
+	{
+		for( size_t nCount = 0; nCount < iter->second.size(); nCount++ )
+			visemeNames.push_back( iter->second[ nCount ] );
+	}
+	else
+		visemeNames.push_back( viseme );
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
+	{
+		if (bonebusCharacter)
+		{
+			bonebusCharacter->SetViseme( visemeNames[ nCount ].c_str(), weight, 0 );
+		}
+		if ( mcuCBHandle::singleton().sbm_character_listener )
+		{
+			mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, visemeNames[ nCount ].c_str(), weight, 0 );
+		}
+	}
+}
+
+void SbmCharacter::forward_all_visemes( double curTime )
+{
+	if( eyelid_reg_ct_p )	{
+
+		bool left_changed;
+		bool right_changed;
+		float left_weight = eyelid_reg_ct_p->get_upper_left( &left_changed );
+		float right_weight = eyelid_reg_ct_p->get_upper_right( &right_changed );
+
+		if( left_weight == right_weight )	{ // ensured with float granularity...
+			if( left_changed )	{
+				forward_viseme( "blink", left_weight );
+			}
+		}
+		else	{
+			if( left_changed )	{
+				forward_viseme( "blink_lf", left_weight );
+			}
+			if( right_changed )	{
+				forward_viseme( "blink_rt", right_weight );
+			}		
+		}
+	}
+
 	std::map<std::string, srLinearCurve*>::iterator curveIter;
 	std::vector<std::string> visemesToDelete;
 	for (curveIter = visemeCurveMap.begin(); curveIter != visemeCurveMap.end(); curveIter++)
@@ -1346,31 +1389,6 @@ void SbmCharacter::forward_viseme_curves( double curTime )
 		if (iter != visemeCurveMap.end())
 		{
 			visemeCurveMap.erase(iter);
-		}
-	}
-}
-
-void SbmCharacter::forward_eye_blink( void )
-{
-	if( eyelid_reg_ct_p )	{
-
-		bool left_changed;
-		bool right_changed;
-		float left_weight = eyelid_reg_ct_p->get_upper_left( &left_changed );
-		float right_weight = eyelid_reg_ct_p->get_upper_right( &right_changed );
-
-		if( left_weight == right_weight )	{ // ensured with float granularity...
-			if( left_changed )	{
-				forward_viseme( "blink", left_weight );
-			}
-		}
-		else	{
-			if( left_changed )	{
-				forward_viseme( "blink_lf", left_weight );
-			}
-			if( right_changed )	{
-				forward_viseme( "blink_rt", right_weight );
-			}		
 		}
 	}
 }
@@ -1810,7 +1828,8 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			{
 				if( curveInfo == NULL )
 				{
-					character->set_viseme( viseme, weight, mcu_p->time, rampin_duration );
+//					character->set_viseme( viseme, weight, mcu_p->time, rampin_duration );
+					character->set_viseme_ramp( viseme, weight, mcu_p->time, rampin_duration );
 				}
 				else
 				{
@@ -1824,7 +1843,8 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		{
 			if( curveInfo == NULL )
 			{
-				character->set_viseme( viseme, weight, mcu_p->time, rampin_duration );
+//				character->set_viseme( viseme, weight, mcu_p->time, rampin_duration );
+				character->set_viseme_ramp( viseme, weight, mcu_p->time, rampin_duration );
 			}
 			else
 			{
