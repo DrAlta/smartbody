@@ -169,6 +169,13 @@ SMARTBODY_DLL_API void Smartbody_dll::SetProcessId( const std::string & processI
 }
 
 
+SMARTBODY_DLL_API void Smartbody_dll::SetMediaPath( const std::string & path )
+{
+   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   mcu.setMediaPath( path );
+}
+
+
 SMARTBODY_DLL_API bool Smartbody_dll::Init()
 {
    m_internalListener = new Smartbody_dll_SBMCharacterListener_Internal( this );
