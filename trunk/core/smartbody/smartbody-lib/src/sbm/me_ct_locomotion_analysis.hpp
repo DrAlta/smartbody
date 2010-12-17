@@ -75,10 +75,10 @@ public:
 
 	void init(SkMotion* standing, srPathList &me_paths); //temp hard-coded init for human characters
 
-	void add_locomotion(SkMotion* motion_locomotion, int type, int walking_style);
+	void add_locomotion(SkMotion* motion_locomotion, int type, int walking_style, float translation_scale);
 
 	//void add_locomotion(SkMotion* motion_locomotion, float land_time, float stance_time, float lift_time);
-	void add_locomotion(SkMotion* motion_locomotion, float l_land_time, float l_stance_time, float l_lift_time, float r_land_time, float r_stance_time, float r_lift_time);
+	void add_locomotion(SkMotion* motion_locomotion, float l_land_time, float l_stance_time, float l_lift_time, float r_land_time, float r_stance_time, float r_lift_time, float translation_scale);
 	//void calc_velocity();
 	//void calc_velocity(int index);
 
@@ -89,8 +89,8 @@ public:
 
 	void analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkMotion* walking, SkMotion* standing, char* limb_base, float land_time, float stance_time, float lift_time);
 
-	void analyze_walking_limb(MeCtLocomotionLimb* limb, SkMotion* walking, SkMotion* standing, int walking_style);
-	void analyze_walking_limb(MeCtLocomotionLimb* limb, SkMotion* walking, SkMotion* standing, float land_time, float stance_time, float lift_time, int walking_style);
+	void analyze_walking_limb(MeCtLocomotionLimb* limb, SkMotion* walking, SkMotion* standing, int walking_style, float translation_scale);
+	void analyze_walking_limb(MeCtLocomotionLimb* limb, SkMotion* walking, SkMotion* standing, float land_time, float stance_time, float lift_time, int walking_style, float translation_scale);
 
 	void analyze_standing(MeCtLocomotionLimb* limb, SkMotion* standing);
 
