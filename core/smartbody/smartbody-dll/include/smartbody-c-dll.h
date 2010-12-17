@@ -62,6 +62,7 @@ SMARTBODY_C_DLL_API SBMHANDLE SBM_CreateSBM();
 SMARTBODY_C_DLL_API bool SBM_SetSpeechAudiofileBasePath( SBMHANDLE sbmHandle, const char * basePath );
 SMARTBODY_C_DLL_API bool SBM_SetFacebone( SBMHANDLE sbmHandle, bool enabled );
 SMARTBODY_C_DLL_API bool SBM_SetProcessId( SBMHANDLE sbmHandle, const char * processId );
+SMARTBODY_C_DLL_API bool SBM_SetMediaPath( SBMHANDLE sbmHandle, const char * path );
 
 SMARTBODY_C_DLL_API bool SBM_Init( SBMHANDLE sbmHandle );
 SMARTBODY_C_DLL_API bool SBM_Shutdown( SBMHANDLE sbmHandle );

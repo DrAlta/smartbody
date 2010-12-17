@@ -161,6 +161,18 @@ SMARTBODY_C_DLL_API bool SBM_SetProcessId( SBMHANDLE sbmHandle, const char * pro
 }
 
 
+SMARTBODY_C_DLL_API bool SBM_SetMediaPath( SBMHANDLE sbmHandle, const char * path )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+   g_smartbodyInstances[ sbmHandle ]->SetMediaPath( path );
+   return true;
+}
+
+
 SMARTBODY_C_DLL_API bool SBM_Init( SBMHANDLE sbmHandle )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
