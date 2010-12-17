@@ -187,13 +187,13 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	AudioFileSpeech* audioSpeechImpl = dynamic_cast<AudioFileSpeech*>(cur_speech_impl);
 	if (audioSpeechImpl)
 	{	
-		bool visemeMode = request->actor->is_viseme_curve_mode();
+		bool visemeMode = request->actor->get_viseme_curve_mode();
 		audioSpeechImpl->setVisemeMode(visemeMode);
 	}
 	AudioFileSpeech* audioSpeechImplBackup = dynamic_cast<AudioFileSpeech*>(cur_speech_impl_backup);
 	if (audioSpeechImplBackup)
 	{	
-		bool visemeMode = request->actor->is_viseme_curve_mode();
+		bool visemeMode = request->actor->get_viseme_curve_mode();
 		audioSpeechImplBackup->setVisemeMode(visemeMode);
 	}
 
@@ -521,8 +521,6 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 	}
 }
 
-#define ENABLE_DIRECT_VISEME_SCHEDULE	0
-
 void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 {
 	// Get times from SyncPoints
@@ -533,7 +531,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	time_sec endAt    = behav_syncs.sync_end()->time();
 
 #if ENABLE_DIRECT_VISEME_SCHEDULE
-	SbmCharacter *actor_p = request->actor;
+	SbmCharacter *actor_p = (SbmCharacter*)( request->actor );
 #endif
 	const string& actor_id = request->actor->name;
 
@@ -599,9 +597,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 				float *curve_info = new float[ 2 * n ];
 				srArgBuffer curve_string( v->getCurveInfo() );
 				curve_string.read_float_vect( curve_info, 2 * n );
-
-				actor_p->set_viseme_curve( v->id(), v->weight(), curve_info, n, 2 );
-				
+				actor_p->set_viseme_curve( v->id(), 1.0f, mcu->time, curve_info, n, 2 );
 				delete [] curve_info;
 #else
 				command.str( "" );

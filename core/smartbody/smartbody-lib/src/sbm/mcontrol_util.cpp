@@ -557,7 +557,7 @@ void mcuCBHandle::update( void )	{
 		char_p = character_map.lookup( pawn_p->name );
 		if( char_p ) {
 
-			char_p->forward_all_visemes( time );	
+			char_p->forward_visemes( time );	
 		
 			char_p->scene_p->update();
 			char_p->dMesh_p->update();

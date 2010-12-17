@@ -41,19 +41,30 @@
 #include <ME/me_ct_interpolator.h>
 
 
-const bool LOG_PRUNE_CMD_TIME                        = false;
-const bool LOG_CONTROLLER_TREE_PRUNING               = false;
-const bool LOG_PRUNE_TRACK_WITHOUT_BLEND_SPLIE_KNOTS = false;
+const bool LOG_PRUNE_CMD_TIME							= false;
+const bool LOG_CONTROLLER_TREE_PRUNING					= false;
+const bool LOG_PRUNE_TRACK_WITHOUT_BLEND_SPLIE_KNOTS	= false;
 
-const bool ENABLE_EYELID_CORRECTIVE_CT = true;
+const bool ENABLE_EYELID_CORRECTIVE_CT					= true;
 
 using namespace std;
 
 // Predeclare private functions defined below
 static int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle *mcu_p );
 static int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle *mcu_p );
-static inline bool parse_float_or_error( float& var, const char* str, const string& var_name );
 
+#if 0
+static inline bool parse_float_or_error( float& var, const char* str, const string& var_name );
+//  Private sbm_character functions
+// Because I don't like c style error checking, I'm avoiding srArgBuffer::read_float
+bool parse_float_or_error( float& var, const char* str, const string& var_name ) {
+	if( istringstream( str ) >> var )
+		return true; // no error
+	// else
+	LOG("ERROR: Invalid value for %s: %s", var_name.c_str(), str);
+	return false;
+}
+#endif
 
 /////////////////////////////////////////////////////////////
 //  Static Data
@@ -67,8 +78,6 @@ const char* SbmCharacter::LOCOMOTION_ID = "locomotion_id";
 
 /////////////////////////////////////////////////////////////
 const char* SbmCharacter::ORIENTATION_TARGET  = "orientation_target";
-
-
 
 /////////////////////////////////////////////////////////////
 //  Method Definitions
@@ -102,7 +111,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	eyelid_ct( new MeCtEyeLid() ),
 	face_neutral( NULL ),
 	use_viseme_curve( false ),
-	softEyes( ENABLE_EYELID_CORRECTIVE_CT ),
+	_soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT ),
 	_height(1.0f)
 {
 	posture_sched_p->ref();
@@ -244,11 +253,6 @@ MeCtLocomotionAnalysis* SbmCharacter::get_locomotion_ct_analysis()
 	return this->locomotion_ct_analysis;
 }
 
-AUChannelMap& SbmCharacter::get_au_channel_map()
-{
-	return au_channel_map;
-}
-
 void SbmCharacter::locomotion_ik_enable(bool enable)
 {
 	locomotion_ct->ik_enabled = enable;
@@ -323,7 +327,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	this->au_motion_map     = NULL;
 	if( face_neutral ) {
 		face_neutral->unref();
-		this->face_neutral      = NULL; // MLT: What is the purpose of this?
+		this->face_neutral = NULL; // MLT: What is the purpose of this?
 	}
 
 	posture_sched_p->init();
@@ -469,6 +473,7 @@ void SbmCharacter::add_face_channel( const string& name, const int wo_index ) {
 
 
 void SbmCharacter::add_bounded_float_channel( const string& name, float lower, float upper, const int wo_index ) {
+
 	SkJoint* joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
 	joint_p->name( SkJointName( name.c_str() ) );
 	// Activate channel with lower limit != upper.
@@ -476,6 +481,7 @@ void SbmCharacter::add_bounded_float_channel( const string& name, float lower, f
 }
 
 int SbmCharacter::init_skeleton() {
+
 	if( SbmPawn::init_skeleton() != CMD_SUCCESS ) {
 		return CMD_FAILURE;
 	}
@@ -495,7 +501,7 @@ int SbmCharacter::init_skeleton() {
 	
 	// Add channels for locomotion control...
 	{
-		const float max_speed = 1000000;   // TODO: set max speed value to some reasonable value for the current scale
+		const float max_speed = 1000000.0f;   // TODO: set max speed value to some reasonable value for the current scale
 
 		// 3D vector for current speed and trajectory of the body
 		SkJoint* loc_vector_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
@@ -768,7 +774,7 @@ void prune_schedule( SbmCharacter*   actor,
 							in_use = false;
 						}
 					} else {
-						LOG("sbm_character.cpp prune_schedule(): ERR: this pruning path not implemented");
+						LOG( "sbm_character.cpp prune_schedule(): ERR: this pruning path not implemented" );
 #if 0
 // NOTE: UNUSED CODE PATH...
 						// Has knots beyond current time
@@ -1090,58 +1096,9 @@ const std::string& SbmCharacter::get_voice_code_backup() const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#if 0
-void SbmCharacter::update_viseme( const char* viseme,
-								  float weight )
-{
-	std::vector<std::string> visemeNames;
-	std::map<std::string, std::vector<std::string>>::iterator iter;
-	iter = viseme_name_patch.find(viseme);
-	if (iter != viseme_name_patch.end())
-	{
-		for (size_t nCount = 0; nCount < iter->second.size(); nCount++)
-			visemeNames.push_back(iter->second[nCount]);
-	}
-	else
-		visemeNames.push_back(viseme);
-
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
-	{
-		if (bonebusCharacter)
-		{
-			bonebusCharacter->SetViseme( visemeNames[nCount].c_str(), weight, 0 );
-		}
-		if ( mcuCBHandle::singleton().sbm_character_listener )
-		{
-			mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, visemeNames[nCount].c_str(), weight, 0 );
-		}
-		if (is_face_controller_enabled()) 
-		{
-			// Viseme/AU channel activation
-			ostringstream ct_name;
-			ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
-
-			SkChannelArray channels;
-			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
-
-			MeCtChannelWriter* ct = new MeCtChannelWriter();
-			ct->name( ct_name.str().c_str() );
-			ct->init( channels, true );
-			SrBuffer<float> value;
-			value.size( 1 );
-			value[ 0 ] = (float)weight;
-			ct->set_data(value);
-
-			head_sched_p->schedule( ct, mcu.time, mcu.time + ct->controller_duration(), 0, 0 );
-		}
-	}
-}
-#endif
-
 void SbmCharacter::set_viseme_curve(
 	const char* viseme, 
+	float weight,
 	double start_time, 
 	float* curve_info, 
 	int numKeys, 
@@ -1164,12 +1121,6 @@ void SbmCharacter::set_viseme_curve(
 	{
 		if( numKeys > 0 )
 		{
-			std::map<std::string, srLinearCurve*>::iterator iter = visemeCurveMap.find( visemeNames[ nCount ] );
-			if (iter != visemeCurveMap.end())
-			{
-				visemeCurveMap.erase(iter);
-			}
-
 			float timeDelay = this->get_viseme_time_delay();
 			
 			ostringstream ct_name;
@@ -1183,33 +1134,15 @@ void SbmCharacter::set_viseme_curve(
 			ct->init( channels, true );
 			SrBuffer<float> value;
 			value.size( 1 );
-			value[ 0 ] = 1.0f;
+			value[ 0 ] = weight;
 			ct->set_data(value);
 
 			head_sched_p->schedule( ct, start_time + timeDelay, curve_info, numKeys, numKeyParams );
-
-			/*LOG( "start: %f val: %f ramp: %f weight:%f", 
-				start_time + curve_info[ 0 ],
-				curve_info[ 1 ],
-				curve_info[ 2 ],
-				curve_info[ 3 ]
-			);*/
-
-#if 0 // for forwarding...
-			srLinearCurve* curve = new srLinearCurve();
-			for (int i = 0; i < numKeys; i++)
-			{
-				float time = curve_info[ i * numKeyParams + 0 ];
-				float weight = curve_info[ i * numKeyParams + 1 ];
-				curve->insert( start_time + time + timeDelay, weight );
-			}
-			visemeCurveMap.insert( make_pair( visemeNames[ nCount ], curve ) );
-#endif
 		}
 	}
 }
 
-#if 1
+#if 0
 void SbmCharacter::set_viseme_ramp( const char* viseme,
 							  float weight,
 							  double start_time,
@@ -1245,14 +1178,6 @@ void SbmCharacter::set_viseme_ramp( const char* viseme,
 		ct->set_data(value);
 
 		head_sched_p->schedule( ct, start_time, start_time + ct->controller_duration(), rampin_duration, 0 );
-
-		//LOG( "start: %f ramp: %f", start_time, rampin_duration );
-#if 0 // for forwarding...
-		srLinearCurve* curve = new srLinearCurve();
-		curve->insert( start_time, 0.0f );
-		curve->insert( start_time + rampin_duration, weight );
-		visemeCurveMap.insert( make_pair( visemeNames[ nCount ], curve ) );
-#endif
 	}
 }
 #else
@@ -1264,93 +1189,15 @@ void SbmCharacter::set_viseme_ramp(
 	float rampin_duration
 )	{
 
-	float curve_info[ 4 ];
-	curve_info[ 0 ] = 0.0f;
-	curve_info[ 1 ] = 0.0f;
+	static float curve_info[ 4 ] = {
+		0.0f, 0.0f, 0.0f, 1.0f
+	};
 	curve_info[ 2 ] = rampin_duration;
-	curve_info[ 3 ] = weight;
-	
-	set_viseme_curve( viseme, start_time, curve_info, 2, 2 );
+	set_viseme_curve( viseme, weight, start_time, curve_info, 2, 2 );
 }
 #endif
 
-#if 0
-void SbmCharacter::build_viseme_curve(
-	const char* viseme, 
-	double start_time, 
-	float* curve_info, 
-	int numKeys, 
-	int numKeyParams 
-) {
-
-	std::vector<std::string> visemeNames;
-	std::map<std::string, std::vector<std::string>>::iterator iter;
-	
-	iter = viseme_name_patch.find(viseme);
-	if (iter != viseme_name_patch.end())
-	{
-		for (size_t nCount = 0; nCount < iter->second.size(); nCount++)
-			visemeNames.push_back(iter->second[nCount]);
-	}
-	else
-		visemeNames.push_back(viseme);
-
-	for( size_t nCount = 0; nCount < visemeNames.size(); nCount++ )
-	{
-		if( numKeys > 0 )
-		{
-			std::map<std::string, srLinearCurve*>::iterator iter = visemeCurveMap.find( visemeNames[ nCount ] );
-			if (iter != visemeCurveMap.end())
-			{
-				visemeCurveMap.erase(iter);
-			}
-
-			srLinearCurve* curve = new srLinearCurve();
-//			curve->insert( start_time, 0 );
-
-			float timeDelay = this->get_viseme_time_delay();
-			for (int i = 0; i < numKeys; i++)
-			{
-				float time = curve_info[ i * numKeyParams + 0 ];
-				float weight = curve_info[ i * numKeyParams + 1 ];
-				curve->insert( start_time + time + timeDelay, weight );
-			}
-			visemeCurveMap.insert( make_pair( visemeNames[ nCount ], curve ) );
-		}
-	}
-}
-#endif
-
-void SbmCharacter::forward_viseme( const char* viseme,
-								  float weight )
-{
-	std::vector<std::string> visemeNames;
-	std::map<std::string, std::vector<std::string>>::iterator iter;
-	iter = viseme_name_patch.find(viseme);
-	if (iter != viseme_name_patch.end())
-	{
-		for( size_t nCount = 0; nCount < iter->second.size(); nCount++ )
-			visemeNames.push_back( iter->second[ nCount ] );
-	}
-	else
-		visemeNames.push_back( viseme );
-
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
-	{
-		if (bonebusCharacter)
-		{
-			bonebusCharacter->SetViseme( visemeNames[ nCount ].c_str(), weight, 0 );
-		}
-		if ( mcuCBHandle::singleton().sbm_character_listener )
-		{
-			mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, visemeNames[ nCount ].c_str(), weight, 0 );
-		}
-	}
-}
-
-void SbmCharacter::forward_all_visemes( double curTime )
+void SbmCharacter::forward_visemes( double curTime )
 {
 	SkChannelArray& channels = skeleton_p->channels();
 	MeFrameData& frameData = ct_tree_p->getLastFrame();
@@ -1372,68 +1219,6 @@ void SbmCharacter::forward_all_visemes( double curTime )
 		}
 			
 	}
-
-#if 0
-
-	if( eyelid_reg_ct_p )	{
-
-		bool left_changed;
-		bool right_changed;
-		float left_weight = eyelid_reg_ct_p->get_upper_left( &left_changed );
-		float right_weight = eyelid_reg_ct_p->get_upper_right( &right_changed );
-
-		if( left_weight == right_weight )	{ // ensured with float granularity...
-			if( left_changed )	{
-				forward_viseme( "blink", left_weight );
-			}
-		}
-		else	{
-			if( left_changed )	{
-				forward_viseme( "blink_lf", left_weight );
-			}
-			if( right_changed )	{
-				forward_viseme( "blink_rt", right_weight );
-			}		
-		}
-	}
-
-
-	std::map<std::string, srLinearCurve*>::iterator curveIter;
-	std::vector<std::string> visemesToDelete;
-	for (curveIter = visemeCurveMap.begin(); curveIter != visemeCurveMap.end(); curveIter++)
-	{
-
-		float weight = (float)curveIter->second->evaluate( curTime );
-		std::map<std::string, std::vector<std::string>>::iterator namePatchIter;
-		namePatchIter = viseme_name_patch.find(curveIter->first);
-
-		if (namePatchIter != viseme_name_patch.end())
-		{
-			for (size_t nCount = 0; nCount < namePatchIter->second.size(); nCount++)
-			{
-				forward_viseme( namePatchIter->second[nCount].c_str(), weight );
-			}
-		}
-		else
-		{
-			forward_viseme( curveIter->first.c_str(), weight );
-		}
-
-		if (weight == 0 && curveIter->second->get_tail_param() <= curTime)
-		{
-			visemesToDelete.push_back(curveIter->first);
-		}
-	}
-
-	for (size_t x = 0; x < visemesToDelete.size(); x++)
-	{
-		std::map<std::string, srLinearCurve*>::iterator iter = visemeCurveMap.find(visemesToDelete[x]);
-		if (iter != visemeCurveMap.end())
-		{
-			visemeCurveMap.erase(iter);
-		}
-	}
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1576,17 +1361,11 @@ int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 					float  blend_spline_tanget = -1/blend_out_dur;
 
 					MeCtBlend* blend_ct = (MeCtBlend*)blending_ct;
-#if 0
-					MeSpline1D& spline = blend_ct->blend_curve();
-					// TODO: Don't assume we're starting at 1, may already be less than and already blending out.
-					spline.make_cusp( blend_out_start,1,  0,1, blend_spline_tanget,1 );
-					MeSpline1D::Knot* knot = spline.make_cusp( blend_out_end,  0,  blend_spline_tanget,1, 0,1 );
-#else
 					srLinearCurve& blend_curve = blend_ct->get_curve();
 					blend_curve.insert( blend_out_start, 1.0 );
 					blend_curve.insert( blend_out_end, 0.0 );
-#endif
-					// TODO: delete following knots
+
+	// TODO: delete following knots
 
 					if( blend_out_dur > max_blend_dur )
 						max_blend_dur = blend_out_end;
@@ -1624,10 +1403,6 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 	string char_name = args.read_token();
 	if( char_name.length()==0 ) {
-#if 0
-		LOG("ERROR: Expected character name.");
-		return CMD_FAILURE;
-#else
 		LOG( "HELP: char <> <command>" );
 		LOG( "  param" );
 		LOG( "  init" );
@@ -1657,7 +1432,6 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		LOG( "  eyelid tight <upper-norm> [<lower-norm>]" );
 		LOG( "  softeyes" );
 		return( CMD_SUCCESS );
-#endif
 	}
 
 	string char_cmd  = args.read_token();
@@ -1818,7 +1592,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		char* viseme = args.read_token();		// viseme name
 		char* next = args.read_token();			// two modes: original add-on or curve
 		float* curveInfo = NULL;
-		float weight = 0.0;
+		float weight = 0.0f;
 		float rampin_duration = 0.0;
 		int numKeys = 0;
 		int numKeyParams = 0;
@@ -1844,6 +1618,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		// keyword next to viseme
 		if( _strcmpi( next, "curve" ) == 0 )
 		{
+			weight = 1.0f;
 			numKeys = args.read_int();
 			if( numKeys <= 0 )	
 			{
@@ -1871,13 +1646,11 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			{
 				if( curveInfo == NULL )
 				{
-//					character->set_viseme( viseme, weight, mcu_p->time, rampin_duration );
 					character->set_viseme_ramp( viseme, weight, mcu_p->time, rampin_duration );
 				}
 				else
 				{
-//					character->build_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams );
-					character->set_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams );
+					character->set_viseme_curve( viseme, weight, mcu_p->time, curveInfo, numKeys, numKeyParams );
 				}
 			}
 		} 
@@ -1886,13 +1659,11 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		{
 			if( curveInfo == NULL )
 			{
-//				character->set_viseme( viseme, weight, mcu_p->time, rampin_duration );
 				character->set_viseme_ramp( viseme, weight, mcu_p->time, rampin_duration );
 			}
 			else
 			{
-//				character->build_viseme_curve(viseme, mcu_p->time, curveInfo, numKeys, numKeyParams );
-				character->set_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams );
+				character->set_viseme_curve( viseme, weight, mcu_p->time, curveInfo, numKeys, numKeyParams );
 			}
 		}
 		
@@ -2169,9 +1940,6 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	return CMD_NOT_FOUND;
 }
 
-	
-
-
 int SbmCharacter::remove_from_scene( const char* char_name ) {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
@@ -2352,42 +2120,4 @@ int SbmCharacter::print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	} else {
 		return SbmPawn::print_attribute( character, attribute, args, mcu_p );
 	}
-}
-
-
-///////////////////////////////////////////////////////////////////////////
-//  Private sbm_character functions
-
-// Because I don't like c style error checking, I'm avoiding srArgBuffer::read_float
-bool parse_float_or_error( float& var, const char* str, const string& var_name ) {
-	if( istringstream( str ) >> var )
-		return true; // no error
-	// else
-	LOG("ERROR: Invalid value for %s: %s", var_name.c_str(), str);
-	return false;
-}
-
-void SbmCharacter::setSoftEyes(bool val)
-{
-	softEyes = val;
-	// disable the eyelid controller if available
-	if (eyelid_ct)
-	{
-		eyelid_ct->set_pass_through(!val);
-	}
-}
-
-bool SbmCharacter::isSoftEyes()
-{
-	return softEyes;
-}
-
-void SbmCharacter::setHeight(float height)
-{
-	_height = height;
-}
-
-float SbmCharacter::getHeight()
-{
-	return _height;
 }

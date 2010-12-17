@@ -52,6 +52,7 @@
 const bool LOG_BML_VISEMES	= false;
 const bool LOG_AUDIO		= false;
 
+#define ENABLE_DIRECT_VISEME_SCHEDULE	1
 
 namespace BML {
 	//  Helper Function
