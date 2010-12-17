@@ -34,7 +34,7 @@
 
 using namespace std;
 
-/*int locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
+int locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	// should this function be removed?
 
 	SkMotion* walking1_p = NULL;
@@ -59,15 +59,15 @@ using namespace std;
 		MeCtLocomotionAnalysis analysis;
 		analysis.set_ct(&ct_locomotion);
 		analysis.init(standing_p, mcu_p->me_paths);
-		analysis.add_locomotion(walking1_p, 1, 0);
-		analysis.add_locomotion(walking2_p, 2, 0);
+		analysis.add_locomotion(walking1_p, 1, 0, 1.0f);
+		analysis.add_locomotion(walking2_p, 2, 0, 1.0f);
 		return CMD_SUCCESS;
 	}
 	else
 	{
 		return CMD_FAILURE;
 	}
-}*/
+}
 
 
 int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
