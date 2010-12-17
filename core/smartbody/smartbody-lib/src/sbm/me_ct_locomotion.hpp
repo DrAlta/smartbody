@@ -177,6 +177,9 @@ public:
 
 	void set_motion_time(float time);
 
+	void set_translation_joint_name(const char* name);
+	SrString& get_translation_joint_name();
+
 	void set_freeze(bool freeze);
 
 	void init_skeleton(SkSkeleton* standing, SkSkeleton* walking);

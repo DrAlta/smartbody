@@ -490,6 +490,17 @@ void MeCtLocomotion::set_base_name(const char* name)
 	strcpy(base_name, name);
 }
 
+void MeCtLocomotion::set_translation_joint_name(const char* name)
+{
+	translation_joint_name.set(name);
+	navigator.set_translation_joint_name(translation_joint_name);
+}
+
+SrString& MeCtLocomotion::get_translation_joint_name()
+{
+	return translation_joint_name;
+}
+
 void MeCtLocomotion::set_turning_speed(float radians)
 {
 	for(int i = 0; i < limb_list.size(); ++i)

@@ -253,13 +253,13 @@ int MeCtLocomotionAnalysis::get_translation_base_joint_name(SkSkeleton* skeleton
 	{
 		if(!joint->pos()->frozen(1))
 		{
-			this->_ct_locomotion->translation_joint_name = joint->name().get_string();
+			this->_ct_locomotion->set_translation_joint_name(joint->name().get_string());
 			return i;
 		}
 		joint = joint->child(0);
 	}
 
-	this->_ct_locomotion->translation_joint_name = NULL;
+	this->_ct_locomotion->set_translation_joint_name(NULL);
 	return -1;
 }
 

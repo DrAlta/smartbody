@@ -49,6 +49,8 @@ public:
 	bool has_destination;
 	bool reached_destination;
 
+	SrString translation_joint_name;
+
 	float target_height_adjustment;
 	float curr_height_adjustment;
 	float prev_height_adjustment;
@@ -159,6 +161,8 @@ public:
 	void update_world_mat_offset();
 
 	void set_world_mat(SrMat& mat);
+
+	void set_translation_joint_name(SrString& name);
 
 
 	bool check_stopped(SrArray<MeCtLocomotionLimb*>* limb_list);
