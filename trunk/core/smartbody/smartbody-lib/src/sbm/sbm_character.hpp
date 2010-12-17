@@ -73,52 +73,48 @@ public:
 	// Static Constants
 
 	static const char* LOCOMOTION_ROTATION;
-	
 	//! Channel name for instantaneous locomotion rotation, uses YPos
 	static const char* LOCOMOTION_GLOBAL_ROTATION;
-
 	static const char* LOCOMOTION_LOCAL_ROTATION;
-
 	static const char* LOCOMOTION_LOCAL_ROTATION_ANGLE;
-
 	static const char* LOCOMOTION_TIME;
-
 	static const char* LOCOMOTION_ID;
-
 	//! Channel name for immediate locomotion speed and trajectory, stored in the joint position channels
 	static const char* LOCOMOTION_VELOCITY;
 	
 	//! Channel name for the body orientation target, stored in the joint position channels
 	static const char* ORIENTATION_TARGET;
-
+	
 	MeCtLocomotionClass* locomotion_ct;
 
-		// Face data temporary storage to pass reference into init_skeleton()
-	AUMotionMap*     au_motion_map;
-	VisemeMotionMap* viseme_motion_map;
 	GeneralParamMap*   param_map;
 
-
 protected:
-	// Private Data
 
 	// The implementation to be used for speech (NULL if unset) 
 	SmartBody::SpeechInterface* speech_impl;
 	// The voice code used by the implementation (empty string if unset) 
-	std::string		           voice_code;
+	std::string 			voice_code;
 
 	SmartBody::SpeechInterface* speech_impl_backup;
-	std::string		           voice_code_backup;
+	std::string 			voice_code_backup;
 
 	// Evaluation time face data
-	SkMotion*         face_neutral;
-	AUChannelMap      au_channel_map;
-	VisemeMotionMap   viseme_map;
+	SkMotion*				face_neutral;
+
+	AUChannelMap			au_channel_map;
+	VisemeMotionMap 		viseme_map;
+
 	MeCtLocomotionAnalysis* locomotion_ct_analysis;
 	
 	MeCtEyeLidRegulator*	eyelid_reg_ct_p;
 	MeCtFace*				face_ct;
 	MeCtEyeLid*				eyelid_ct;
+
+
+	// Face data temporary storage to pass reference into init_skeleton()
+	AUMotionMap*			au_motion_map;
+	VisemeMotionMap*		viseme_motion_map;
 
 	// The term "viseme" in the following variables is a misnomer,
 	// and may also refer to an action unit or other face shape.
@@ -132,9 +128,10 @@ protected:
 	std::map<std::string, std::vector<std::string>> viseme_name_patch;
 
 	// Viseme Curve Info
-	std::map <std::string, srLinearCurve*> visemeCurveMap;
-	bool			use_viseme_curve;
-	float			viseme_time_offset;
+	bool	use_viseme_curve;
+	float	viseme_time_offset;
+	int 	viseme_channel_start_pos;
+	int 	viseme_channel_end_pos;
 
 public:
 	//  Methods
@@ -164,7 +161,6 @@ public:
 	 *  Sets the character's backup speech implementation.
 	 */
 	int set_speech_impl_backup(SmartBody::SpeechInterface *speech_impl); //set speech returns CMD_SUCCESS  
-
 
 	/**
 	 *  Gets the character's speech implementation.
@@ -197,31 +193,23 @@ public:
 	 */
 	const std::string& get_voice_code_backup() const; //returns voice if exists or NULL if not
 
+
+	bonebus::BoneBusCharacter * bonebusCharacter;
+
 	// Prioritized Schedules for behaviors (known as "blocking" in manual animation)
 	// TODO: Rename by body part, rather than controller type
 	MeCtSchedulerClass*	posture_sched_p; // legs / stance / posture
 	MeCtSchedulerClass*	motion_sched_p;  // full body motions
 	MeCtSchedulerClass*	gaze_sched_p;    // back / chest / spine
-
 	// TODO: Arms
 	// TODO: Hands
 	MeCtSchedulerClass*	head_sched_p; // neck / head orientation
 	MeCtSchedulerClass*	param_sched_p; // general parameters
 
-	bonebus::BoneBusCharacter * bonebusCharacter;
 
-//	void set_viseme( const char* viseme, float weight , double start_time, float rampin_duration );
-//	void update_viseme( const char* viseme, float weight );
-	void set_viseme_curve( const char* viseme, double start_time, float* curve_info, int numKeys, int numKeyParams );
-//	void build_viseme_curve( const char* viseme, double start_time, float* curve_info, int numKeys, int numKeyParams );
-	void set_viseme_ramp( const char* viseme, float weight , double start_time, float rampin_duration );
-
-	void forward_viseme( const char* viseme, float weight );
-	void forward_all_visemes( double curTime);
-//	void forward_viseme_curves( double curTime);
-//	void forward_eye_blink( void );
-
-public:
+	void set_viseme_curve( const char* viseme, float weight, double start_time, float* curve_info, int numKeys, int numKeyParams );
+	void set_viseme_ramp( const char* viseme, float weight, double start_time, float rampin_duration );
+	void forward_visemes( double curTime);
 
 	void inspect_skeleton( SkJoint* joint_p, int depth = 0 );
 	void inspect_skeleton_local_transform( SkJoint* joint_p, int depth = 0 );
@@ -281,28 +269,32 @@ public:
 	MeCtLocomotionClass* get_locomotion_ct();
 	MeCtLocomotionAnalysis* get_locomotion_ct_analysis();
 
-	AUChannelMap& get_au_channel_map();
 
 public:
 
+	AUChannelMap& get_au_channel_map( void ) { return au_channel_map; }
+	
 	// viseme curve related functions
-	bool is_viseme_curve_mode() const {return use_viseme_curve;}
-	void set_viseme_curve_mode(bool mode) {use_viseme_curve = mode;}
-	void set_viseme_time_delay( float timeDelay ) { viseme_time_offset = timeDelay;}
-	float get_viseme_time_delay() {return viseme_time_offset;}
+	void set_viseme_curve_mode( bool mode )		{ use_viseme_curve = mode; }
+	bool get_viseme_curve_mode( void ) const	{ return( use_viseme_curve ); }
+	void set_viseme_time_delay( float timeDelay ) { viseme_time_offset = timeDelay; }
+	float get_viseme_time_delay( void )			{ return( viseme_time_offset ); }
 
-	void setSoftEyes(bool val);
-	bool isSoftEyes();
+	void setSoftEyes( bool val )	{
+		_soft_eyes_enabled = val;
+		if( eyelid_ct )	{
+			eyelid_ct->set_pass_through(!val);
+		}
+	}
+	bool isSoftEyes( void ) 		{ return( _soft_eyes_enabled ); }
 
-	void setHeight(float height);
-	float getHeight();
+	void setHeight( float height )	{ _height = height; }
+	float getHeight( void ) 		{ return _height; }
 
 private:
 
-	int viseme_channel_start_pos;
-	int viseme_channel_end_pos;
-	bool softEyes;
-	float _height;
+	bool	_soft_eyes_enabled;
+	float	_height;
 
 protected:
 	/*!

@@ -1303,10 +1303,39 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	time_sec relaxAt  = behav_syncs.sync_relax()->time();
 	time_sec endAt    = behav_syncs.sync_end()->time();
 
-//	const SbmCharacter* actor    = request->actor;
+#if ENABLE_DIRECT_VISEME_SCHEDULE
+	SbmCharacter *actor_p = (SbmCharacter*)( request->actor );
+#endif
 	const string&       actor_id = request->actorId; // match string used by request?
 
-#if 0
+#if ENABLE_DIRECT_VISEME_SCHEDULE
+
+	// This is kind of messed up timing:
+	double rampin = rampup;
+	if( rampin < 0.0 )	{
+		rampin = readyAt - startAt;
+	}
+	double rampout = rampdown;
+	if( rampout < 0.0 )	{
+		rampout = endAt - relaxAt;
+	}
+
+	float curve_info[ 8 ];
+	curve_info[ 0 ] = 0.0f;
+	curve_info[ 1 ] = 0.0f;
+
+	curve_info[ 2 ] = (float)rampin;
+	curve_info[ 3 ] = weight;
+
+	curve_info[ 4 ] = relaxAt - startAt;
+	curve_info[ 5 ] = weight;
+
+	curve_info[ 6 ] = curve_info[ 4 ] + (float)rampout;
+	curve_info[ 7 ] = 0.0f;
+
+	actor_p->set_viseme_curve( viseme, 1.0f, startAt, curve_info, 4, 2 );
+
+#elif 0
 	float rampin = rampup;
 	if( rampin < 0.0 )	{
 		rampin = readyAt - startAt;
@@ -1328,6 +1357,7 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 
 	VecOfSbmCommand commands;
    	commands.push_back( new SbmCommand( cmd.str(), (float)startAt ) );
+	realize_sequence( commands, mcu );
 
 #else
 	ostringstream start_cmd;
@@ -1347,7 +1377,6 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	VecOfSbmCommand commands;
    	commands.push_back( new SbmCommand( start_cmd.str(), (float)startAt ) );
    	commands.push_back( new SbmCommand( stop_cmd.str(), (float)relaxAt ) );
-#endif
-
 	realize_sequence( commands, mcu );
+#endif
 }
