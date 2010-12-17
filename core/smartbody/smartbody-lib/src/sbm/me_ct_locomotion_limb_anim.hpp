@@ -44,6 +44,7 @@ protected:
 	SrVec				base_pos;
 	bool				is_blended;
 	MeCtLocomotionTimingSpace timing_space;
+	float				translation_scale;
 	
 
 	//temp, to be deleted=================
@@ -92,11 +93,13 @@ public:
 
 	MeCtLocomotionTimingSpace* get_timing_space();
 
+	void					apply_frame(int frame);
+
 	void					get_frame(float frame, char* limb_base, SrArray<int>* index_buff);
 
 	SrArray<SrQuat>*		get_buffer();
 
-	//int						iterate_set(SkJoint* base, int index, SrArray<SrQuat>* buff);
+	//int					iterate_set(SkJoint* base, int index, SrArray<SrQuat>* buff);
 
 	void					get_displacement(float start_frame, float end_frame);
 
@@ -105,6 +108,8 @@ public:
 	void					estimate_direction(int* count);
 
 	void					set_stride_cycle_length(float length);
+
+	void					set_translation_scale(float scale);
 	//temp function for test, to be deleted......
 	void					print_info();
 

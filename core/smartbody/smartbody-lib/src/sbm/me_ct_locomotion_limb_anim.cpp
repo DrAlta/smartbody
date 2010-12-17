@@ -36,7 +36,7 @@ void clear_buffer(SrArray<SrQuat*>* dest);
 /** Constructor */
 MeCtLocomotionLimbAnim::MeCtLocomotionLimbAnim() 
 {
-
+	translation_scale = 1.0f;
 }
 
 /** Destructor */
@@ -91,9 +91,33 @@ int MeCtLocomotionLimbAnim::get_prev_frame(int frame)
 	return frame -1;
 }
 
+void MeCtLocomotionLimbAnim::set_translation_scale(float scale)
+{
+	translation_scale = scale;
+}
+
 void MeCtLocomotionLimbAnim::set_anim(SkMotion* walking)
 {
 	this->walking = walking;
+}
+
+void MeCtLocomotionLimbAnim::apply_frame(int frame)
+{
+	walking->apply_frame(frame);
+	if(translation_scale != 1.0f)
+	{
+		SkJoint* joint = NULL;
+		float val = 0.0f;
+		for(int i = 0; i < walking_skeleton->joints().size(); ++i)
+		{
+			joint = walking_skeleton->joints().get(i);
+			for(int j = 0; j < 3; ++j)
+			{
+				val = joint->pos()->value(j);
+				if(val != 0.0f) joint->pos()->value(j, val*translation_scale);
+			}
+		}
+	}
 }
 
 //temp function for test, to be deleted......

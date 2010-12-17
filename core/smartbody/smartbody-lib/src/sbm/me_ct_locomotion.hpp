@@ -68,6 +68,7 @@ protected: // flags
 	bool dis_initialized; // limb joint position calculated
 	bool initialized;
 	bool enabled;
+	bool idle;
 
 public:
 	bool motions_loaded;

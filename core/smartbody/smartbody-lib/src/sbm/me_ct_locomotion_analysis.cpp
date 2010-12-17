@@ -443,8 +443,7 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 	//printf("\nend analysis......");
 }
 
-void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkMotion* walking, SkMotion* standing, char* limb_base, SrArray<float>* support_height, 
-								   float ground_height, float height_bound)
+void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkMotion* walking, SkMotion* standing, char* limb_base, SrArray<float>* support_height, float ground_height, float height_bound)
 {
 
 	//printf("\nstart analysis......");
@@ -489,13 +488,7 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 
 	SrVec taxis;
 
-	//base_joint = skeleton->search_joint(this->_ct_locomotion->get_base_name());
-
 	base_joint = skeleton->root();
-
-	// analysis for IK.........................................................................
-
-	// analysis for IK.........................................................................
 
 	for(j = 0; j < anim->get_support_joint_num(); ++j)
 	{
@@ -780,11 +773,12 @@ void MeCtLocomotionAnalysis::add_ref_times(MeCtLocomotionLimbAnim* anim, int* co
 
 }
 
-void MeCtLocomotionAnalysis::analyze_walking_limb(MeCtLocomotionLimb* limb, SkMotion* walking, SkMotion* standing, int walking_style)
+void MeCtLocomotionAnalysis::analyze_walking_limb(MeCtLocomotionLimb* limb, SkMotion* walking, SkMotion* standing, int walking_style, float translation_scale)
 {
 	_limb = limb;
 	MeCtLocomotionLimbAnim* anim = new MeCtLocomotionLimbAnim();
 	anim->style = walking_style;
+	anim->set_translation_scale(translation_scale);
 	anim->init_skeleton(limb->standing_skeleton, limb->walking_skeleton);
 	//anim->set_skeleton_name(skeleton_name);
 	anim->set_support_joint_list(&(limb->support_joint_list));
@@ -795,11 +789,12 @@ void MeCtLocomotionAnalysis::analyze_walking_limb(MeCtLocomotionLimb* limb, SkMo
 }
 
 //temp copy of analyze_walking_limb to enable preset of land time and lift time
-void MeCtLocomotionAnalysis::analyze_walking_limb(MeCtLocomotionLimb* limb, SkMotion* walking, SkMotion* standing, float land_time, float stance_time, float lift_time, int walking_style)
+void MeCtLocomotionAnalysis::analyze_walking_limb(MeCtLocomotionLimb* limb, SkMotion* walking, SkMotion* standing, float land_time, float stance_time, float lift_time, int walking_style, float translation_scale)
 {
 	_limb = limb;
 	MeCtLocomotionLimbAnim* anim = new MeCtLocomotionLimbAnim();
 	anim->style = walking_style;
+	anim->set_translation_scale(translation_scale);
 	anim->init_skeleton(limb->standing_skeleton, limb->walking_skeleton);
 	//anim->set_skeleton_name(skeleton_name);
 	anim->set_support_joint_list(&(limb->support_joint_list));
@@ -834,7 +829,7 @@ void MeCtLocomotionAnalysis::print_info()
 	}
 }
 
-void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, float l_land_time, float l_stance_time, float l_lift_time, float r_land_time, float r_stance_time, float r_lift_time)
+void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, float l_land_time, float l_stance_time, float l_lift_time, float r_land_time, float r_stance_time, float r_lift_time, float translation_scale)
 {
 	MeCtLocomotionLimb* limb = NULL;
 	float lower_bound = 0.0f;
@@ -856,7 +851,7 @@ void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, float l
 			stance_time = r_stance_time;
 		}
 
-		analyze_walking_limb(limb, motion_locomotion, motion_standing, land_time, stance_time, lift_time, 0);
+		analyze_walking_limb(limb, motion_locomotion, motion_standing, land_time, stance_time, lift_time, 0, translation_scale);
 		//limb->print_info();
 		if(i == 0) // let the first limb be the leading limb during analysis process
 		{
@@ -911,7 +906,8 @@ void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, float l
 	}
 }
 
-void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, int type, int walking_style)
+// temp function to setup keytimes for an animation
+void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, int type, int walking_style, float translation_scale)
 {
 	MeCtLocomotionLimb* limb = NULL;
 	float lower_bound = 0.0f;
@@ -999,7 +995,7 @@ void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, int typ
 			lift_time = motion_locomotion->frames() - 1;
 		}
 
-		analyze_walking_limb(limb, motion_locomotion, motion_standing, (float)land_time, (float)stance_time, (float)lift_time, 0);
+		analyze_walking_limb(limb, motion_locomotion, motion_standing, (float)land_time, (float)stance_time, (float)lift_time, 0, translation_scale);
 
 		//limb->print_info();
 		if(i == 0) // let the first limb be the leading limb during analysis process

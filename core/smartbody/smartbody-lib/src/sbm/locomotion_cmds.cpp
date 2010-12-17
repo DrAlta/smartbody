@@ -29,12 +29,12 @@
 #include "me_ct_locomotion.hpp"
 
 #include <sk/sk_channel_array.h>
-#include <me/me_ct_channel_writer.hpp>
+#include <me/me_ct_raw_writer.hpp>
 #include <sbm/me_ct_navigation_circle.hpp>
 
 using namespace std;
 
-int locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
+/*int locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	// should this function be removed?
 
 	SkMotion* walking1_p = NULL;
@@ -67,7 +67,7 @@ int locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	{
 		return CMD_FAILURE;
 	}
-}
+}*/
 
 
 int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
@@ -164,8 +164,16 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			float r_stance_time = args.read_float();
 			float r_lift_time = args.read_float();
 
+			float translation_scale = 1.0f;
+
+			arg = args.read_token();
+			if(arg == "scale")
+			{
+				translation_scale = args.read_float();
+			}
+
 			actor->get_locomotion_ct()->add_locomotion_anim(anim_p);
-			actor->get_locomotion_ct_analysis()->add_locomotion(anim_p, l_land_time, l_stance_time, l_lift_time, r_land_time, r_stance_time, r_lift_time);
+			actor->get_locomotion_ct_analysis()->add_locomotion(anim_p, l_land_time, l_stance_time, l_lift_time, r_land_time, r_stance_time, r_lift_time, translation_scale);
 		}
 		return CMD_SUCCESS;
 	}

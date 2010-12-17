@@ -317,8 +317,6 @@ float MeCtLocomotionTimingSpace::get_lower_bound()
 
 void MeCtLocomotionTimingSpace::clean_ref_time()
 {
-	//_ref_time.capacity(0);
-	//_ref_time_name.capacity(0);
 	this->set_frame_num(0);
 	this->set_lower_bound(0);
 	this->set_mode(1);
@@ -336,10 +334,6 @@ MeCtLocomotionTimingSpace* get_blended_timing_space(MeCtLocomotionTimingSpace* s
 	int next2 = 0;
 	space->set_frame_num(space1->get_frame_num()*weight1 + space2->get_frame_num()*weight2);
 	space->set_lower_bound(space1->get_lower_bound()*weight1 + space2->get_lower_bound()*weight2);
-
-	//printf("\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-	//space1->print_info();
-	//space2->print_info();
 
 	float t1 = space1->get_ref_time(0);
 	float t2 = space2->get_ref_time(0);
