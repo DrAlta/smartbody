@@ -1306,7 +1306,7 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 //	const SbmCharacter* actor    = request->actor;
 	const string&       actor_id = request->actorId; // match string used by request?
 
-#if 1
+#if 0
 	float rampin = rampup;
 	if( rampin < 0.0 )	{
 		rampin = readyAt - startAt;

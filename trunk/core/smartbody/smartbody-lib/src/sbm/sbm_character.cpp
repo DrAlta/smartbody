@@ -1079,57 +1079,6 @@ const std::string& SbmCharacter::get_voice_code_backup() const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #if 0
-void SbmCharacter::set_viseme( const char* viseme,
-							  float weight,
-							  double start_time,
-							  float rampin_duration )
-{
-	std::vector<std::string> visemeNames;
-	std::map<std::string, std::vector<std::string>>::iterator iter;
-	iter = viseme_name_patch.find(viseme);
-	if (iter != viseme_name_patch.end())
-	{
-		for (size_t nCount = 0; nCount < iter->second.size(); nCount++)
-			visemeNames.push_back(iter->second[nCount]);
-	}
-	else
-		visemeNames.push_back(viseme);
-
-	for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
-	{
-		if (bonebusCharacter)	// if it is bone bus character
-		{
-			bonebusCharacter->SetViseme( visemeNames[nCount].c_str(), weight, rampin_duration );
-		}
-		if ( mcuCBHandle::singleton().sbm_character_listener )
-		{
-			mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, visemeNames[nCount].c_str(), weight, rampin_duration );
-		}
-
-		if (is_face_controller_enabled()) 
-		{
-			// Viseme/AU channel activation
-			ostringstream ct_name;
-			ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
-
-			SkChannelArray channels;
-			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
-
-			MeCtChannelWriter* ct = new MeCtChannelWriter();
-			ct->name( ct_name.str().c_str() );
-			ct->init( channels, true );
-			SrBuffer<float> value;
-			value.size( 1 );
-			value[ 0 ] = (float)weight;
-			ct->set_data(value);
-
-			head_sched_p->schedule( ct, start_time, start_time + ct->controller_duration(), rampin_duration, 0 );
-		}
-	}
-}
-#endif
-
-#if 0
 void SbmCharacter::update_viseme( const char* viseme,
 								  float weight )
 {
@@ -1209,22 +1158,33 @@ void SbmCharacter::set_viseme_curve(
 				visemeCurveMap.erase(iter);
 			}
 
-			ostringstream ct_name;
-			ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
-
-			SkChannelArray channels;
-			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
-
-			MeCtChannelWriter* ct = new MeCtChannelWriter();
-			ct->name( ct_name.str().c_str() );
-			ct->init( channels, true );
-			SrBuffer<float> value;
-			value.size( 1 );
-			value[ 0 ] = 1.0f;
-			ct->set_data(value);
-
 			float timeDelay = this->get_viseme_time_delay();
-			head_sched_p->schedule( ct, start_time + timeDelay, curve_info, numKeys, numKeyParams );
+
+			if (is_face_controller_enabled()) 
+			{
+				ostringstream ct_name;
+				ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
+
+				SkChannelArray channels;
+				channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
+
+				MeCtChannelWriter* ct = new MeCtChannelWriter();
+				ct->name( ct_name.str().c_str() );
+				ct->init( channels, true );
+				SrBuffer<float> value;
+				value.size( 1 );
+				value[ 0 ] = 1.0f;
+				ct->set_data(value);
+
+				head_sched_p->schedule( ct, start_time + timeDelay, curve_info, numKeys, numKeyParams );
+			}
+
+			LOG( "start: %f val: %f ramp: %f weight:%f", 
+				start_time + curve_info[ 0 ],
+				curve_info[ 1 ],
+				curve_info[ 2 ],
+				curve_info[ 3 ]
+			);
 
 #if 1 // for forwarding...
 			srLinearCurve* curve = new srLinearCurve();
@@ -1239,6 +1199,56 @@ void SbmCharacter::set_viseme_curve(
 		}
 	}
 }
+
+#if 1
+void SbmCharacter::set_viseme_ramp( const char* viseme,
+							  float weight,
+							  double start_time,
+							  float rampin_duration )
+{
+	std::vector<std::string> visemeNames;
+	std::map<std::string, std::vector<std::string>>::iterator iter;
+	iter = viseme_name_patch.find(viseme);
+	if (iter != viseme_name_patch.end())
+	{
+		for (size_t nCount = 0; nCount < iter->second.size(); nCount++)
+			visemeNames.push_back(iter->second[nCount]);
+	}
+	else
+		visemeNames.push_back(viseme);
+
+	for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
+	{
+		if (is_face_controller_enabled()) 
+		{
+			// Viseme/AU channel activation
+			ostringstream ct_name;
+			ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
+
+			SkChannelArray channels;
+			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
+
+			MeCtChannelWriter* ct = new MeCtChannelWriter();
+			ct->name( ct_name.str().c_str() );
+			ct->init( channels, true );
+			SrBuffer<float> value;
+			value.size( 1 );
+			value[ 0 ] = (float)weight;
+			ct->set_data(value);
+
+			head_sched_p->schedule( ct, start_time, start_time + ct->controller_duration(), rampin_duration, 0 );
+		}
+
+		LOG( "start: %f ramp: %f", start_time, rampin_duration );
+#if 1 // for forwarding...
+		srLinearCurve* curve = new srLinearCurve();
+		curve->insert( start_time, 0.0f );
+		curve->insert( start_time + rampin_duration, weight );
+		visemeCurveMap.insert( make_pair( visemeNames[ nCount ], curve ) );
+#endif
+	}
+}
+#else
 
 void SbmCharacter::set_viseme_ramp( 
 	const char* viseme,
@@ -1255,6 +1265,7 @@ void SbmCharacter::set_viseme_ramp(
 	
 	set_viseme_curve( viseme, start_time, curve_info, 2, 2 );
 }
+#endif
 
 #if 0
 void SbmCharacter::build_viseme_curve(

@@ -139,7 +139,7 @@ public :
 
 	/*! Returns the final keytime of the motion minus the first one.
 	This method requires the motion to not be empty. */
-	float duration () { return _frames.top().keytime-_frames[0].keytime; }
+	float duration () { if (_frames.size() == 0) return 0; return _frames.top().keytime-_frames[0].keytime; }
 
 	/*! Matches the joint names defined in SkMotion and in SkSkeleton,
 	stablishing a direct link between each channel in the motion
