@@ -184,7 +184,6 @@ SMARTBODY_DLL_API bool Smartbody_dll::Init()
 
    mcuCBHandle & mcu = mcuCBHandle::singleton();
    mcu.sbm_character_listener = m_internalListener;
-   SetMediaPath( "../../data/art" );
    SetSpeechAudiofileBasePath( "../../" );
 
    InitVHMsg();
