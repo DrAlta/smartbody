@@ -376,6 +376,11 @@ void MeCtLocomotionNavigator::set_world_mat(SrMat& mat)
 	world_mat = mat;
 }
 
+void MeCtLocomotionNavigator::set_translation_joint_name(SrString& name)
+{
+	translation_joint_name = name;
+}
+
 void MeCtLocomotionNavigator::update_world_mat_rotation()
 {
 	world_mat.roty(get_orientation_angle());
@@ -541,9 +546,9 @@ int MeCtLocomotionNavigator::controller_channels(SkChannelArray* request_channel
 	AddChannel(request_channels, SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::ZPos, &bi_world_z);
 	AddChannel(request_channels, SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::Quat, &bi_world_rot);
 
-	AddChannel(request_channels, SkJointName( "base" ), SkChannel::XPos, &bi_base_x);
-	AddChannel(request_channels, SkJointName( "base" ), SkChannel::YPos, &bi_base_y);
-	AddChannel(request_channels, SkJointName( "base" ), SkChannel::ZPos, &bi_base_z);
+	AddChannel(request_channels, SkJointName( &(translation_joint_name.get(0)) ), SkChannel::XPos, &bi_base_x);
+	AddChannel(request_channels, SkJointName( &(translation_joint_name.get(0)) ), SkChannel::YPos, &bi_base_y);
+	AddChannel(request_channels, SkJointName( &(translation_joint_name.get(0)) ), SkChannel::ZPos, &bi_base_z);
 
 	AddChannel(request_channels, SbmCharacter::LOCOMOTION_VELOCITY, SkChannel::XPos, &bi_loco_vel_x); 
 	AddChannel(request_channels, SbmCharacter::LOCOMOTION_VELOCITY, SkChannel::YPos, &bi_loco_vel_y);
