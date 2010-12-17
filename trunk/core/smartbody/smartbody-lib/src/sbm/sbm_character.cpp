@@ -664,6 +664,18 @@ int SbmCharacter::init_skeleton() {
 	// Rebuild the active channels to include new joints
 	skeleton_p->make_active_channels();
 
+	// keep record of viseme channel start index
+	if (viseme_start_name != "")
+	{
+		viseme_channel_start_pos = skeleton_p->channels().search(SkJointName(viseme_start_name.c_str()), SkChannel::XPos);
+		viseme_channel_end_pos = viseme_channel_start_pos + visemeChannelCounter;
+	}
+	else	// no map exist
+	{
+		viseme_channel_start_pos = 0;
+		viseme_channel_end_pos = 0;
+	}
+
 	return CMD_SUCCESS;
 }
 
@@ -1159,34 +1171,31 @@ void SbmCharacter::set_viseme_curve(
 			}
 
 			float timeDelay = this->get_viseme_time_delay();
+			
+			ostringstream ct_name;
+			ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
 
-			if (is_face_controller_enabled()) 
-			{
-				ostringstream ct_name;
-				ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
+			SkChannelArray channels;
+			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
 
-				SkChannelArray channels;
-				channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
+			MeCtChannelWriter* ct = new MeCtChannelWriter();
+			ct->name( ct_name.str().c_str() );
+			ct->init( channels, true );
+			SrBuffer<float> value;
+			value.size( 1 );
+			value[ 0 ] = 1.0f;
+			ct->set_data(value);
 
-				MeCtChannelWriter* ct = new MeCtChannelWriter();
-				ct->name( ct_name.str().c_str() );
-				ct->init( channels, true );
-				SrBuffer<float> value;
-				value.size( 1 );
-				value[ 0 ] = 1.0f;
-				ct->set_data(value);
+			head_sched_p->schedule( ct, start_time + timeDelay, curve_info, numKeys, numKeyParams );
 
-				head_sched_p->schedule( ct, start_time + timeDelay, curve_info, numKeys, numKeyParams );
-			}
-
-			LOG( "start: %f val: %f ramp: %f weight:%f", 
+			/*LOG( "start: %f val: %f ramp: %f weight:%f", 
 				start_time + curve_info[ 0 ],
 				curve_info[ 1 ],
 				curve_info[ 2 ],
 				curve_info[ 3 ]
-			);
+			);*/
 
-#if 1 // for forwarding...
+#if 0 // for forwarding...
 			srLinearCurve* curve = new srLinearCurve();
 			for (int i = 0; i < numKeys; i++)
 			{
@@ -1219,28 +1228,26 @@ void SbmCharacter::set_viseme_ramp( const char* viseme,
 
 	for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
 	{
-		if (is_face_controller_enabled()) 
-		{
-			// Viseme/AU channel activation
-			ostringstream ct_name;
-			ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
 
-			SkChannelArray channels;
-			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
+		// Viseme/AU channel activation
+		ostringstream ct_name;
+		ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
 
-			MeCtChannelWriter* ct = new MeCtChannelWriter();
-			ct->name( ct_name.str().c_str() );
-			ct->init( channels, true );
-			SrBuffer<float> value;
-			value.size( 1 );
-			value[ 0 ] = (float)weight;
-			ct->set_data(value);
+		SkChannelArray channels;
+		channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
 
-			head_sched_p->schedule( ct, start_time, start_time + ct->controller_duration(), rampin_duration, 0 );
-		}
+		MeCtChannelWriter* ct = new MeCtChannelWriter();
+		ct->name( ct_name.str().c_str() );
+		ct->init( channels, true );
+		SrBuffer<float> value;
+		value.size( 1 );
+		value[ 0 ] = (float)weight;
+		ct->set_data(value);
 
-		LOG( "start: %f ramp: %f", start_time, rampin_duration );
-#if 1 // for forwarding...
+		head_sched_p->schedule( ct, start_time, start_time + ct->controller_duration(), rampin_duration, 0 );
+
+		//LOG( "start: %f ramp: %f", start_time, rampin_duration );
+#if 0 // for forwarding...
 		srLinearCurve* curve = new srLinearCurve();
 		curve->insert( start_time, 0.0f );
 		curve->insert( start_time + rampin_duration, weight );
@@ -1345,6 +1352,29 @@ void SbmCharacter::forward_viseme( const char* viseme,
 
 void SbmCharacter::forward_all_visemes( double curTime )
 {
+	SkChannelArray& channels = skeleton_p->channels();
+	MeFrameData& frameData = ct_tree_p->getLastFrame();
+	for (int c = viseme_channel_start_pos; c < viseme_channel_end_pos; c++)
+	{
+		SkChannel& chan = channels[c];
+		int buffIndex = ct_tree_p->toBufferIndex(c);
+
+		if( buffIndex > -1 )	
+		{
+			if (bonebusCharacter)
+			{
+				bonebusCharacter->SetViseme( channels.name(c).get_string(), frameData.buffer()[buffIndex], 0 );
+			}
+			if ( mcuCBHandle::singleton().sbm_character_listener )
+			{
+				mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, channels.name(c).get_string(), frameData.buffer()[buffIndex], 0 );
+			}
+		}
+			
+	}
+
+#if 0
+
 	if( eyelid_reg_ct_p )	{
 
 		bool left_changed;
@@ -1366,6 +1396,7 @@ void SbmCharacter::forward_all_visemes( double curTime )
 			}		
 		}
 	}
+
 
 	std::map<std::string, srLinearCurve*>::iterator curveIter;
 	std::vector<std::string> visemesToDelete;
@@ -1402,6 +1433,7 @@ void SbmCharacter::forward_all_visemes( double curTime )
 			visemeCurveMap.erase(iter);
 		}
 	}
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////

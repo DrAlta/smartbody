@@ -299,6 +299,8 @@ public:
 
 private:
 
+	int viseme_channel_start_pos;
+	int viseme_channel_end_pos;
 	bool softEyes;
 	float _height;
 
