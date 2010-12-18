@@ -33,7 +33,7 @@
 class MeCtLocomotionIK : public MeCtIK
 {
 protected:
-	MeCtLocomotionTerrain terrain;
+	MeCtLocomotionTerrain* terrain;
 
 public:
 	MeCtLocomotionIK();
@@ -41,7 +41,8 @@ public:
 
 public:
 
-	void MeCtLocomotionIK::calc_target(SrVec& orientation, SrVec& offset);
+	void calc_target(SrVec& orientation, SrVec& offset);
+	void set_terrain(MeCtLocomotionTerrain* terrain);
 
 };
 

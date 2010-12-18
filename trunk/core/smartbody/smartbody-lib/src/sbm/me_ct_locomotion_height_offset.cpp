@@ -95,7 +95,7 @@ void MeCtLocomotionHeightOffset::update_height_offset(SrMat& parent_mat, float b
 		wpos = pos * parent_mat;
 		wpos += limb->ik_offset;
 
-		height[i] = terrain.get_height(wpos.x, wpos.z, normal);
+		height[i] = terrain->get_height(wpos.x, wpos.z, normal);
 
 		limb->ik_terrain_target_normal.set(normal[0], normal[1], normal[2]);
 		
@@ -164,4 +164,9 @@ float MeCtLocomotionHeightOffset::get_height_offset()
 void MeCtLocomotionHeightOffset::set_target_height_offset(float offset)
 {
 	target_height_offset = offset;
+}
+
+void MeCtLocomotionHeightOffset::set_terrain(MeCtLocomotionTerrain* terrain)
+{
+	this->terrain = terrain;
 }

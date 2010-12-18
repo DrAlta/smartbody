@@ -42,7 +42,7 @@ __forceinline void MeCtLocomotionIK::calc_target(SrVec& orientation, SrVec& offs
 	pos += offset;
 
 	float normal[3];
-	float height = terrain.get_height(pos.x, pos.z, normal);
+	float height = terrain->get_height(pos.x, pos.z, normal);
 	
 	SrVec t = cross_point_on_plane(pos, orientation, scenario->plane_normal, scenario->plane_point);
 	if(t.y < height) t.y = height;
@@ -50,4 +50,7 @@ __forceinline void MeCtLocomotionIK::calc_target(SrVec& orientation, SrVec& offs
 
 }
 
-
+void MeCtLocomotionIK::set_terrain(MeCtLocomotionTerrain* terrain)
+{
+	this->terrain = terrain;
+}
