@@ -110,7 +110,6 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	face_ct( NULL ),
 	eyelid_ct( new MeCtEyeLid() ),
 	face_neutral( NULL ),
-	use_viseme_curve( false ),
 	_soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT ),
 	_height(1.0f)
 {
@@ -123,7 +122,12 @@ SbmCharacter::SbmCharacter( const char* character_name )
 
 	bonebusCharacter = NULL;
 
+	use_viseme_curve = false;
 	viseme_time_offset = 0.0;
+	viseme_channel_count = 0;
+	viseme_channel_start_pos = 0;
+	viseme_channel_end_pos = 0;
+	viseme_history_arr = NULL;
 }
 
 //  Destructor
@@ -156,6 +160,11 @@ SbmCharacter::~SbmCharacter( void )	{
        mcuCBHandle::singleton().bonebus.DeleteCharacter( bonebusCharacter );
        bonebusCharacter = NULL;
     }
+	
+	if( viseme_history_arr )	{
+		delete [] viseme_history_arr;
+		viseme_history_arr = NULL;
+	}
 }
 
 int SbmCharacter::init_locomotion_analyzer(const char* skel_file, mcuCBHandle *mcu_p)
@@ -558,7 +567,7 @@ int SbmCharacter::init_skeleton() {
 	}
 
 	std::string viseme_start_name;
-	int visemeChannelCounter = 0;
+	viseme_channel_count = 0;
 
 	{	// Generate AU and viseme activation channels.
 		AUMotionMap::const_iterator i   = au_motion_map->begin();
@@ -579,8 +588,8 @@ int SbmCharacter::init_skeleton() {
 
 					// Create the AU control channel
 					add_face_channel( name, wo_index );
-					if (visemeChannelCounter == 0)	viseme_start_name = name;
-					visemeChannelCounter ++;
+					if (viseme_channel_count == 0)	viseme_start_name = name;
+					viseme_channel_count ++;
 
 					// TODO: Add to au_channel_map (?)
 
@@ -596,8 +605,8 @@ int SbmCharacter::init_skeleton() {
 
 					// Create the AU control channel
 					add_face_channel( name, wo_index );
-					if (visemeChannelCounter == 0)	viseme_start_name = name;
-					visemeChannelCounter ++;
+					if (viseme_channel_count == 0)	viseme_start_name = name;
+					viseme_channel_count ++;
 
 					// Register control channel with face controller
 					if( face_ct )
@@ -611,8 +620,8 @@ int SbmCharacter::init_skeleton() {
 
 					// Create the AU control channel
 					add_face_channel( name, wo_index );
-					if (visemeChannelCounter == 0)	viseme_start_name = name;
-					visemeChannelCounter ++;
+					if (viseme_channel_count == 0)	viseme_start_name = name;
+					viseme_channel_count ++;
 
 					// Register control channel with face controller
 					if( face_ct )
@@ -634,8 +643,8 @@ int SbmCharacter::init_skeleton() {
 
 				// Create the Viseme control channel
 				add_face_channel( id, wo_index );
-				if (visemeChannelCounter == 0)	viseme_start_name = id;
-				visemeChannelCounter ++;
+				if (viseme_channel_count == 0)	viseme_start_name = id;
+				viseme_channel_count ++;
 				
 				// Register control channel with face controller
 				if( face_ct )
@@ -674,12 +683,17 @@ int SbmCharacter::init_skeleton() {
 	if (viseme_start_name != "")
 	{
 		viseme_channel_start_pos = skeleton_p->channels().search(SkJointName(viseme_start_name.c_str()), SkChannel::XPos);
-		viseme_channel_end_pos = viseme_channel_start_pos + visemeChannelCounter;
+		viseme_channel_end_pos = viseme_channel_start_pos + viseme_channel_count;
+		viseme_history_arr = new float[ viseme_channel_count ];
 	}
 	else	// no map exist
 	{
 		viseme_channel_start_pos = 0;
 		viseme_channel_end_pos = 0;
+	}
+
+	for( int i=0; i<viseme_channel_count; i++ ) {
+		viseme_history_arr[ i ] = -1.0;
 	}
 
 	return CMD_SUCCESS;
@@ -1142,46 +1156,6 @@ void SbmCharacter::set_viseme_curve(
 	}
 }
 
-#if 0
-void SbmCharacter::set_viseme_ramp( const char* viseme,
-							  float weight,
-							  double start_time,
-							  float rampin_duration )
-{
-	std::vector<std::string> visemeNames;
-	std::map<std::string, std::vector<std::string>>::iterator iter;
-	iter = viseme_name_patch.find(viseme);
-	if (iter != viseme_name_patch.end())
-	{
-		for (size_t nCount = 0; nCount < iter->second.size(); nCount++)
-			visemeNames.push_back(iter->second[nCount]);
-	}
-	else
-		visemeNames.push_back(viseme);
-
-	for (size_t nCount = 0; nCount < visemeNames.size(); nCount++)
-	{
-
-		// Viseme/AU channel activation
-		ostringstream ct_name;
-		ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
-
-		SkChannelArray channels;
-		channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
-
-		MeCtChannelWriter* ct = new MeCtChannelWriter();
-		ct->name( ct_name.str().c_str() );
-		ct->init( channels, true );
-		SrBuffer<float> value;
-		value.size( 1 );
-		value[ 0 ] = (float)weight;
-		ct->set_data(value);
-
-		head_sched_p->schedule( ct, start_time, start_time + ct->controller_duration(), rampin_duration, 0 );
-	}
-}
-#else
-
 void SbmCharacter::set_viseme_ramp( 
 	const char* viseme,
 	float weight,
@@ -1195,29 +1169,40 @@ void SbmCharacter::set_viseme_ramp(
 	curve_info[ 2 ] = rampin_duration;
 	set_viseme_curve( viseme, weight, start_time, curve_info, 2, 2 );
 }
-#endif
 
 void SbmCharacter::forward_visemes( double curTime )
 {
-	SkChannelArray& channels = skeleton_p->channels();
-	MeFrameData& frameData = ct_tree_p->getLastFrame();
-	for (int c = viseme_channel_start_pos; c < viseme_channel_end_pos; c++)
-	{
-		SkChannel& chan = channels[c];
-		int buffIndex = ct_tree_p->toBufferIndex(c);
+	SBMCharacterListener *listener_p = mcuCBHandle::singleton().sbm_character_listener;
 
-		if( buffIndex > -1 )	
+	if( bonebusCharacter || listener_p )
+	{
+		SkChannelArray& channels = skeleton_p->channels();
+		MeFrameData& frameData = ct_tree_p->getLastFrame();
+		
+		int i = 0;
+		for( int c = viseme_channel_start_pos; c < viseme_channel_end_pos; c++, i++ )
 		{
-			if (bonebusCharacter)
+			SkChannel& chan = channels[c];
+			int buffIndex = ct_tree_p->toBufferIndex(c);
+
+			if( buffIndex > -1 )	
 			{
-				bonebusCharacter->SetViseme( channels.name(c).get_string(), frameData.buffer()[buffIndex], 0 );
-			}
-			if ( mcuCBHandle::singleton().sbm_character_listener )
-			{
-				mcuCBHandle::singleton().sbm_character_listener->OnViseme( name, channels.name(c).get_string(), frameData.buffer()[buffIndex], 0 );
+				float value = frameData.buffer()[ buffIndex ];
+				if( value != viseme_history_arr[ i ] )	{
+				
+					if( bonebusCharacter )
+					{
+						bonebusCharacter->SetViseme( channels.name(c).get_string(), value, 0 );
+					}
+					if( listener_p )
+					{
+						listener_p->OnViseme( name, channels.name(c).get_string(), value, 0 );
+					}
+//		LOG( "viseme: %s %f", channels.name(c).get_string(), value );
+					viseme_history_arr[ i ] = value;
+				}
 			}
 		}
-			
 	}
 }
 
@@ -1399,6 +1384,397 @@ int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 
 ///////////////////////////////////////////////////////////////////////////
 
+int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, mcuCBHandle *mcu_p, bool all_characters ) {
+
+	if( cmd == "smoothbindmesh" ) {
+		char* obj_file = args.read_token();
+		return mcu_character_load_mesh( name, obj_file, mcu_p );
+	} 
+	else 
+	if( cmd == "smoothbindweight" ) {
+		char* skin_file = args.read_token();
+		return mcu_character_load_skinweights( name, skin_file, mcu_p );
+	} 
+	else 
+	if( cmd == "ctrl" ) {
+		return mcu_character_ctrl_cmd( name, args, mcu_p );
+	} 
+	else 
+	if( cmd == "bone" ) {
+		return mcu_character_bone_cmd( name, args, mcu_p );
+	} 
+	else 
+	if( cmd == "bonep" ) {
+		return mcu_character_bone_position_cmd( name, args, mcu_p );
+	} 
+	else 
+	if( cmd == "remove" ) {
+		return SbmCharacter::remove_from_scene( name );
+	} 
+	else 
+	if( cmd == "inspect" ) {
+	
+		if( skeleton_p ) {
+			SkJoint* joint_p = skeleton_p->search_joint( SbmPawn::WORLD_OFFSET_JOINT_NAME );
+			if( joint_p )	{
+				inspect_skeleton( joint_p );
+//				inspect_skeleton_local_transform( joint_p );
+//				inspect_skeleton_world_transform( joint_p );
+			}
+		}
+		return CMD_SUCCESS;
+	}
+	else
+	if( cmd == "channels" ) {
+
+		if( skeleton_p )
+		{
+			if( ct_tree_p ) 
+			{
+				SkChannelArray channels = skeleton_p->channels();
+				int numChannels = channels.size();
+				for (int c = 0; c < numChannels; c++)
+				{
+					std::stringstream strstr;
+					strstr << c << " ";
+					SkJoint* joint = channels.joint(c);
+					if (joint)
+					{
+						strstr << joint->name().get_string() << " ";
+					}
+					SkChannel& channel = channels[c];
+					int channelSize = channel.size();
+					// get the channel index
+					int channelIndex = ct_tree_p->toBufferIndex(c);
+					strstr << channelIndex << " (" << channelSize << ") ";
+					LOG( "%s", strstr.str().c_str() );
+				}
+			}
+		}
+		return CMD_SUCCESS;
+	}
+	else 
+	if( cmd == "controllers" )
+	{
+		if( ct_tree_p )
+		{
+			int n = ct_tree_p->count_controllers();
+			for (int c = 0; c < n; c++)
+			{
+				LOG( "%s", ct_tree_p->controller(c)->name() );
+			}
+		}
+		return CMD_SUCCESS;
+	}
+	else
+	if( cmd == "prune" ) {
+		return( prune_controller_tree( mcu_p ) );
+	}
+	else 
+	if( cmd == "viseme" ) {
+	//  1) the time delay function is used to postpone viseme curve which now is a little bit mismatch with the sound
+	//	2) need to modify the curve slope in and out later, now they are always 0
+ 
+		char* viseme = args.read_token();
+		char* next = args.read_token();
+		float* curveInfo = NULL;
+		float weight = 0.0f;
+		float rampin_duration = 0.0;
+		int numKeys = 0;
+		int numKeyParams = 0;
+
+		// viseme
+		if( _strcmpi( viseme, "curveon" ) == 0 )
+		{
+			set_viseme_curve_mode(true);
+			return CMD_SUCCESS;
+		}
+		else 
+		if( _strcmpi( viseme, "curveoff" ) == 0 )
+		{
+			set_viseme_curve_mode(false);
+			return CMD_SUCCESS;
+		}
+		else
+		if( _strcmpi( viseme, "timedelay" ) == 0 )
+		{
+			float timeDelay = (float)atof( next );
+			set_viseme_time_delay( timeDelay );
+			return CMD_SUCCESS;
+		}
+
+		// keyword next to viseme
+		if( _strcmpi( next, "curve" ) == 0 )
+		{
+			weight = 1.0f;
+			numKeys = args.read_int();
+			if( numKeys <= 0 )	
+			{
+				LOG( "Viseme data is missing" );
+				return CMD_FAILURE;
+			}
+			int num_remaining = args.calc_num_tokens();
+			numKeyParams = num_remaining / numKeys;
+			if( num_remaining != numKeys * numKeyParams )	{
+				LOG( "Viseme data is malformed" );
+				return CMD_FAILURE;
+			}
+			curveInfo = new float[ num_remaining ];
+			args.read_float_vect( curveInfo, num_remaining );
+		}
+		else
+		{
+			weight = (float)atof(next);
+			rampin_duration = args.read_float();
+		}
+
+		if( curveInfo == NULL )
+		{
+			set_viseme_ramp( viseme, weight, mcu_p->time, rampin_duration );
+		}
+		else
+		{
+			set_viseme_curve( viseme, weight, mcu_p->time, curveInfo, numKeys, numKeyParams );
+			delete [] curveInfo;
+		}
+		return CMD_SUCCESS;
+	} 
+	else 
+	if( cmd == "viewer" ) {
+		int mode = args.read_int();
+		switch (mode)
+		{
+			case 0:
+				scene_p->set_visibility(1,0,0,0);
+				dMesh_p->set_visibility(0);
+				break;
+			case 1:
+				scene_p->set_visibility(0,1,0,0);
+				dMesh_p->set_visibility(0);
+				break;
+			case 2:
+				scene_p->set_visibility(0,0,1,0);
+				dMesh_p->set_visibility(0);
+				break;
+			case 3:
+				scene_p->set_visibility(0,0,0,1);
+				dMesh_p->set_visibility(0);
+				break;
+			case 4:
+				scene_p->set_visibility(0,0,0,0);
+				dMesh_p->set_visibility(1);
+				break;
+			default:	
+				break;
+		}
+		return CMD_SUCCESS;
+	} 
+	else 
+	if( cmd == "gazefade" ) {
+
+		string fade_cmd = args.read_token();
+		bool fade_in;
+		bool print_track = false;
+		if( fade_cmd == "in" ) {
+			fade_in = true;
+		}
+		else
+		if( fade_cmd == "out" ) {
+			fade_in = false;
+		}
+		else
+		if( fade_cmd == "print" ) {
+			print_track = true;
+		}
+		else	{
+			return( CMD_NOT_FOUND );
+		}
+		float interval = args.read_float();
+		if( print_track )	{
+			LOG( "char '%s' gaze tracks:", name );
+		}
+		MeCtScheduler2::VecOfTrack track_vec = gaze_sched_p->tracks();
+		int n = track_vec.size();
+		for( int i = 0; i < n; i++ )	{
+			MeCtScheduler2::TrackPtr t_p = track_vec[ i ];
+			MeController* ct_p = t_p->animation_ct();
+			MeCtGaze* gaze_p = dynamic_cast<MeCtGaze*> (ct_p);
+			if( gaze_p )	{	
+				if( print_track )	{
+					LOG( " %s", gaze_p->name() );
+				}
+				else
+				if( fade_in )	{
+					gaze_p->set_fade_in( interval );
+				}
+				else	{
+					gaze_p->set_fade_out( interval );
+				}
+			}
+		}
+		return CMD_SUCCESS;
+	} 
+	else 
+	if( cmd == "reholster" ) {
+		return( reholster_quickdraw( mcu_p ) );
+	}
+	else
+	if( cmd == "blink" )
+	{
+		if( eyelid_reg_ct_p )	{
+			eyelid_reg_ct_p->blink_now();
+			return( CMD_SUCCESS );
+		}
+		return( CMD_FAILURE );
+	}
+	else
+	if( cmd == "eyelid" )
+	{
+		if( eyelid_reg_ct_p )	{
+
+			string eyelid_cmd  = args.read_token();
+			if( eyelid_cmd.length()==0 ) {
+				LOG("ERROR: Expected eyelid command.");
+				return( CMD_FAILURE );
+			}
+
+			int n = args.calc_num_tokens();
+			if( eyelid_cmd == "pitch" )
+			{
+				if( n > 0 )	{
+					bool enable = args.read_int() != 0;
+					eyelid_reg_ct_p->set_eyeball_tracking( enable );
+				}
+				else	{
+
+				}
+				return( CMD_SUCCESS );
+			}
+			else
+			if( eyelid_cmd == "range" )
+			{
+				if( n < 2 )	{
+					return( CMD_FAILURE );
+				}
+				float upper_min = args.read_float();
+				float upper_max = args.read_float();
+				eyelid_reg_ct_p->set_upper_range( upper_min, upper_max );
+				if( n >= 4 )	{
+					float lower_min = args.read_float();
+					float lower_max = args.read_float();
+					eyelid_reg_ct_p->set_lower_range( lower_min, lower_max );
+				}
+				return( CMD_SUCCESS );
+			}
+			else
+			if( eyelid_cmd == "close" )
+			{
+				if( n < 1 ) {
+					return( CMD_FAILURE );
+				}
+				float close_angle = args.read_float();
+				eyelid_reg_ct_p->set_close_angle( close_angle );
+				return( CMD_SUCCESS );
+			}
+			else
+			if( eyelid_cmd == "tight" )
+			{
+				float upper_mag = args.read_float();
+				eyelid_reg_ct_p->set_upper_tighten( upper_mag );
+				if( n > 1 ) {
+					float lower_mag = args.read_float();
+					eyelid_reg_ct_p->set_lower_tighten( lower_mag );
+				}
+				return( CMD_SUCCESS );
+			}
+			if( eyelid_cmd == "print" )
+			{
+				eyelid_reg_ct_p->print();
+				return( CMD_SUCCESS );
+			}
+			return( CMD_NOT_FOUND );
+		}
+		return( CMD_FAILURE );
+	}
+	else
+	if( cmd == "softeyes" )
+	{
+		if( eyelid_ct == NULL )
+		{
+			LOG("ERROR: SbmCharacter::parse_character_command(..): character \"%s\" has no eyelid_ct.", name );
+			return CMD_FAILURE;
+		}
+		
+		if( args.calc_num_tokens() == 0 )
+		{
+			LOG( "softeyes params: %s", isSoftEyes() ? "ENABLED" : "DISABLED" );
+			float lo, up;
+
+			eyelid_ct->get_weight( lo, up );
+			LOG( " eyelid weight: { %f, %f }", lo, up );
+
+			eyelid_ct->get_upper_lid_range( lo, up );
+			LOG( " eyelid upper trans: { %f, %f }", lo, up );
+
+			eyelid_ct->get_lower_lid_range( lo, up );
+			LOG( " eyelid lower trans: { %f, %f }", lo, up );
+
+			eyelid_ct->get_eye_pitch_range( lo, up );
+			LOG( " eyeball pitch: { %f, %f }", lo, up );
+
+			LOG( "commmands:" );
+			LOG( " char <> softeyes [on|off] " );
+			LOG( " char <> softeyes weight <lower> <upper>" );
+			LOG( " char <> softeyes upperlid|lowerlid|eyepitch <lower-lim> <upper-lim>" );
+			return CMD_SUCCESS;
+		}
+
+		std::string softEyesCommand = args.read_token();
+		if( softEyesCommand == "on")
+		{
+			setSoftEyes( true );
+		}
+		else 
+		if( softEyesCommand == "off")
+		{
+			setSoftEyes( false );
+		}
+		else	{
+			
+			float lo = args.read_float();
+			float up = args.read_float();
+			
+			if( softEyesCommand == "weight" )
+			{
+				eyelid_ct->set_weight( lo, up );
+			}
+			else 
+			if( softEyesCommand == "upperlid" )
+			{
+				eyelid_ct->set_upper_lid_range( lo, up );
+			}
+			else 
+			if( softEyesCommand == "lowerlid" )
+			{
+				eyelid_ct->set_lower_lid_range( lo, up );
+			}
+			else 
+			if( softEyesCommand == "eyepitch" )
+			{
+				eyelid_ct->set_eye_pitch_range( lo, up );
+			}
+			else
+			{
+				LOG( "SbmCharacter::parse_character_command ERR: command '%s' not recognized", softEyesCommand.c_str());
+				return CMD_NOT_FOUND;
+			}
+			return CMD_SUCCESS;
+		}
+		return CMD_SUCCESS;
+	}
+	return( CMD_NOT_FOUND );
+}
+
 int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 	string char_name = args.read_token();
@@ -1434,28 +1810,57 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return( CMD_SUCCESS );
 	}
 
-	string char_cmd  = args.read_token();
+	string char_cmd = args.read_token();
 	if( char_cmd.length()==0 ) {
-		LOG("ERROR: Expected character command.");
+		LOG( "SbmCharacter::character_cmd_func: ERR: Expected character command." );
 		return CMD_FAILURE;
 	}
 
 	bool all_characters = false;
 	SbmCharacter* character = NULL;
-	if( char_name=="*" ) {
-		all_characters = true;
-	} else {
-		character = mcu_p->character_map.lookup( char_name.c_str() );
-	}
+	if( char_name == "*" ) {
 
-	if( char_cmd=="param" ) {
+		all_characters = true;
+		mcu_p->character_map.reset();
+		while( character = mcu_p->character_map.next() ) {
+			
+			srArgBuffer copy_args( args.peek_string() );
+			int err = character->parse_character_command( char_cmd, copy_args, mcu_p, true );
+			if( err != CMD_SUCCESS )	{
+				return( err );
+			}
+		}
+		return( CMD_SUCCESS );
+	} 
+
+	character = mcu_p->character_map.lookup( char_name.c_str() );
+	if( character ) {
+	
+		int err = character->parse_character_command( char_cmd, args, mcu_p, false );
+		if( err != CMD_NOT_FOUND )	{
+			return( err );
+		}
+	}
+	
+	// Commands for uninitialized characters:
+	if( char_cmd == "init" ) {
+
+		char* skel_file = args.read_token();
+		char* unreal_class = args.read_token();
+		return(	
+			mcu_character_init( char_name.c_str(), skel_file, unreal_class, mcu_p )
+		);
+	} 
+	else
+	if( char_cmd == "param" ) {
+
 		char* param_name = args.read_token();
 		GeneralParam * new_param = new GeneralParam;
 		new_param->size = args.read_int();
 		
 		if( new_param->size == 0 )
 		{
-			LOG("param_registeration ERR: parameter size not defined!\n");
+			LOG("SbmCharacter::parse_character_command: param_registeration ERR: parameter size not defined!\n");
 			delete new_param;
 			return( CMD_FAILURE );
 		}
@@ -1463,13 +1868,12 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		{
 			if(char_name == new_param->char_names[i])
 			{
-				LOG("param_registeration ERR: parameter redefinition!\n");
-				
+				LOG("SbmCharacter::parse_character_command: param_registeration ERR: parameter redefinition!\n");
 				delete new_param;
-				return( CMD_FAILURE );				
+				return( CMD_FAILURE );	
 			}
 		}
-		new_param->char_names.push_back(char_name);
+		new_param->char_names.push_back( char_name );
 		GeneralParamMap::iterator it; 
 		if( (it = mcu_p->param_map.find(param_name)) != mcu_p->param_map.end())
 		{
@@ -1482,462 +1886,9 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		}
 		return( CMD_SUCCESS );
 	}
-	else
-	if( char_cmd=="init" ) {
-		// Original style creation:
-		char* skel_file = args.read_token();
-		char* unreal_class = args.read_token();
-		return(	
-			mcu_character_init( char_name.c_str(), skel_file, unreal_class, mcu_p )
-		);
-	} 
-	else 
-	if( char_cmd=="smoothbindmesh" ) {
-		char* obj_file = args.read_token();
-		return mcu_character_load_mesh( char_name.c_str(), obj_file, mcu_p );
-	} 
-	else 
-	if( char_cmd=="smoothbindweight" ) {
-		char* skin_file = args.read_token();
-		return mcu_character_load_skinweights( char_name.c_str(), skin_file, mcu_p );
-	} 
-	else 
-	if( char_cmd=="ctrl" ) {
-		return mcu_character_ctrl_cmd( char_name.c_str(), args, mcu_p );
-	} 
-	else 
-	if( char_cmd=="inspect" ) {
-		if( character ) {
-			if( character->skeleton_p ) {
-				SkJoint* joint_p = character->skeleton_p->search_joint( SbmPawn::WORLD_OFFSET_JOINT_NAME );
-				if( joint_p )	{
-					character->inspect_skeleton( joint_p );
-//					inspect_skeleton_local_transform( joint_p );
-//					inspect_skeleton_world_transform( joint_p );
-				}
-			}
-		}
-		return CMD_SUCCESS;
-	}
-	else
-	if( char_cmd=="channels" ) {
-		if( character ) {
-			if( character->skeleton_p ) {
-				MeControllerTreeRoot* controllerTree = character->ct_tree_p;
-
-				SkChannelArray channels = character->skeleton_p->channels();
-				int numChannels = channels.size();
-				for (int c = 0; c < numChannels; c++)
-				{
-					std::stringstream strstr;
-					strstr << c << " ";
-					SkJoint* joint = channels.joint(c);
-					if (joint)
-					{
-						strstr << joint->name().get_string() << " ";
-					}
-					SkChannel& channel = channels[c];
-					int channelSize = channel.size();
-					// get the channel index
-					int channelIndex = controllerTree->toBufferIndex(c);
-					strstr << channelIndex << " (" << channelSize << ") ";
-					LOG("%s", strstr.str().c_str());
-
-				}
-			}
-		}
-		return CMD_SUCCESS;
-	}
-	else if (char_cmd == "controllers")
-	{
-		if (!character)
-			return CMD_FAILURE;
-
-		MeControllerTreeRoot* controllerTree = character->ct_tree_p;
-		int numControllers = controllerTree->count_controllers();
 	
-		for (int c = 0; c < numControllers; c++)
-		{
-			LOG("%s", controllerTree->controller(c)->name());
-		}
-		return CMD_SUCCESS;
-	}
-	else
-	if( char_cmd=="prune" ) {
-		int result = CMD_SUCCESS;
-		if( all_characters ) {
-			mcu_p->character_map.reset();
-			while( character = mcu_p->character_map.next() ) {
-				if( character->prune_controller_tree( mcu_p ) != CMD_SUCCESS ) {
-					LOG("ERROR: Failed to prune controller tree of character \"%s\".", character->name);
-					result = CMD_FAILURE;
-				}
-			}
-		} else if( character ) {
-			int result = character->prune_controller_tree( mcu_p );
-			if( result != CMD_SUCCESS ) {
-				LOG("ERROR: Failed to prune controller tree of character \"%s\".", character->name);
-			}
-		} else {
-			LOG("ERROR: Unknown character  \"%s\"  for prune command.", char_name.c_str());
-			result = CMD_FAILURE;
-		}
-		return result;
-	}
-	else 
-	if( char_cmd=="viseme" ) {
-	//  1) the time delay function is used to postpone viseme curve which now is a little bit mismatch with the sound
-	//	2) need to modify the curve slope in and out later, now they are always 0
- 
-		char* viseme = args.read_token();		// viseme name
-		char* next = args.read_token();			// two modes: original add-on or curve
-		float* curveInfo = NULL;
-		float weight = 0.0f;
-		float rampin_duration = 0.0;
-		int numKeys = 0;
-		int numKeyParams = 0;
-
-		// viseme
-		if (_strcmpi(viseme, "curveon") == 0)
-		{
-			character->set_viseme_curve_mode(true);
-			return CMD_SUCCESS;
-		}
-		else if(_strcmpi(viseme, "curveoff") == 0)
-		{
-			character->set_viseme_curve_mode(false);
-			return CMD_SUCCESS;
-		}
-		else if(_strcmpi(viseme, "timedelay") == 0)
-		{
-			float timeDelay = (float)atof(next);
-			character->set_viseme_time_delay(timeDelay);
-			return CMD_SUCCESS;
-		}
-
-		// keyword next to viseme
-		if( _strcmpi( next, "curve" ) == 0 )
-		{
-			weight = 1.0f;
-			numKeys = args.read_int();
-			if( numKeys <= 0 )	
-			{
-				LOG( "Viseme data is missing" );
-				return CMD_FAILURE;
-			}
-			int num_remaining = args.calc_num_tokens();
-			numKeyParams = num_remaining / numKeys;
-			if( num_remaining != numKeys * numKeyParams )	{
-				LOG( "Viseme data is malformed" );
-				return CMD_FAILURE;
-			}
-			curveInfo = new float[ num_remaining ];
-			args.read_float_vect( curveInfo, num_remaining );
-		}
-		else
-		{
-			weight = (float)atof(next);
-			rampin_duration = args.read_float();
-		}
-
-		if( all_characters ) {
-			mcu_p->character_map.reset();
-			while( character = mcu_p->character_map.next() )
-			{
-				if( curveInfo == NULL )
-				{
-					character->set_viseme_ramp( viseme, weight, mcu_p->time, rampin_duration );
-				}
-				else
-				{
-					character->set_viseme_curve( viseme, weight, mcu_p->time, curveInfo, numKeys, numKeyParams );
-				}
-			}
-		} 
-		else
-		if( character ) 
-		{
-			if( curveInfo == NULL )
-			{
-				character->set_viseme_ramp( viseme, weight, mcu_p->time, rampin_duration );
-			}
-			else
-			{
-				character->set_viseme_curve( viseme, weight, mcu_p->time, curveInfo, numKeys, numKeyParams );
-			}
-		}
-		
-		if( curveInfo ) delete [] curveInfo;
-		return CMD_SUCCESS;
-	} 
-	else 
-	if( char_cmd=="bone" ) {
-		return mcu_character_bone_cmd( char_name.c_str(), args, mcu_p );
-	} 
-	else 
-	if( char_cmd=="bonep" ) {
-		return mcu_character_bone_position_cmd( char_name.c_str(), args, mcu_p );
-	} 
-	else 
-	if( char_cmd=="remove" ) {
-		return SbmCharacter::remove_from_scene( char_name.c_str() );
-	} else if( char_cmd=="viewer" ) {
-		int mode = args.read_int();
-		if (character)
-		{
-			switch (mode)
-			{
-				case 0:
-					character->scene_p->set_visibility(1,0,0,0);
-					character->dMesh_p->set_visibility(0);
-					break;
-				case 1:
-					character->scene_p->set_visibility(0,1,0,0);
-					character->dMesh_p->set_visibility(0);
-					break;
-				case 2:
-					character->scene_p->set_visibility(0,0,1,0);
-					character->dMesh_p->set_visibility(0);
-					break;
-				case 3:
-					character->scene_p->set_visibility(0,0,0,1);
-					character->dMesh_p->set_visibility(0);
-					break;
-				case 4:
-					character->scene_p->set_visibility(0,0,0,0);
-					character->dMesh_p->set_visibility(1);
-					break;
-				default:	
-					break;
-			}
-		}
-		return CMD_SUCCESS;
-	} 
-	else 
-	if( char_cmd=="gazefade" ) {
-
-		string fade_cmd = args.read_token();
-		bool fade_in;
-		bool print_track = false;
-		if( fade_cmd=="in" ) {
-			fade_in = true;
-		}
-		else
-		if( fade_cmd=="out" ) {
-			fade_in = false;
-		}
-		else
-		if( fade_cmd=="print" ) {
-			print_track = true;
-		}
-		else	{
-			return( CMD_NOT_FOUND );
-		}
-		float interval = args.read_float();
-		if( print_track )	{
-			LOG( "char '%s' gaze tracks:", character->name );
-		}
-		MeCtScheduler2::VecOfTrack track_vec = character->gaze_sched_p->tracks();
-		int n = track_vec.size();
-		for( int i = 0; i < n; i++ )	{
-			MeCtScheduler2::TrackPtr t_p = track_vec[ i ];
-			MeController* ct_p = t_p->animation_ct();
-			MeCtGaze* gaze_p = dynamic_cast<MeCtGaze*> (ct_p);
-			if( gaze_p )	{	
-				if( print_track )	{
-					LOG( " %s", gaze_p->name() );
-				}
-				else
-				if( fade_in )	{
-					gaze_p->set_fade_in( interval );
-				}
-				else	{
-					gaze_p->set_fade_out( interval );
-				}
-			}
-		}
-		return CMD_SUCCESS;
-	} 
-	else 
-	if( char_cmd=="reholster" ) {
-		if( all_characters ) {
-			mcu_p->character_map.reset();
-			while( character = mcu_p->character_map.next() ) {
-				character->reholster_quickdraw( mcu_p );
-			}
-			return CMD_SUCCESS;
-		} else {
-			if ( !character ) {
-				LOG("ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"%s\".", char_name.c_str());
-				return CMD_FAILURE;  // ignore/out-of-domain? But it's not a standard network message.
-			} else {
-				return character->reholster_quickdraw( mcu_p );
-			}
-		}
-	}
-	else
-	if( char_cmd == "blink" )
-	{
-		MeCtEyeLidRegulator *eye_reg_ct = character->eyelid_reg_ct_p;
-		if( eye_reg_ct )	{
-			eye_reg_ct->blink_now();
-			return( CMD_SUCCESS );
-		}
-		return( CMD_FAILURE );
-	}
-	else
-	if( char_cmd == "eyelid" )
-	{
-		MeCtEyeLidRegulator *eye_reg_ct = character->eyelid_reg_ct_p;
-		if( eye_reg_ct )	{
-
-			string eyelid_cmd  = args.read_token();
-			if( eyelid_cmd.length()==0 ) {
-				LOG("ERROR: Expected eyelid command.");
-				return( CMD_FAILURE );
-			}
-
-			int n = args.calc_num_tokens();
-			if( eyelid_cmd == "pitch" )
-			{
-				if( n > 0 )	{
-					bool enable = args.read_int() != 0;
-					eye_reg_ct->set_eyeball_tracking( enable );
-				}
-				else	{
-
-				}
-				return( CMD_SUCCESS );
-			}
-			else
-			if( eyelid_cmd == "range" )
-			{
-				if( n < 2 )	{
-					return( CMD_FAILURE );
-				}
-				float upper_min = args.read_float();
-				float upper_max = args.read_float();
-				eye_reg_ct->set_upper_range( upper_min, upper_max );
-				if( n >= 4 )	{
-					float lower_min = args.read_float();
-					float lower_max = args.read_float();
-					eye_reg_ct->set_lower_range( lower_min, lower_max );
-				}
-				return( CMD_SUCCESS );
-			}
-			else
-			if( eyelid_cmd == "close" )
-			{
-				if( n < 1 ) {
-					return( CMD_FAILURE );
-				}
-				float close_angle = args.read_float();
-				eye_reg_ct->set_close_angle( close_angle );
-				return( CMD_SUCCESS );
-			}
-			else
-			if( eyelid_cmd == "tight" )
-			{
-				float upper_mag = args.read_float();
-				eye_reg_ct->set_upper_tighten( upper_mag );
-				if( n > 1 ) {
-					float lower_mag = args.read_float();
-					eye_reg_ct->set_lower_tighten( lower_mag );
-				}
-				return( CMD_SUCCESS );
-			}
-			if( eyelid_cmd == "print" )
-			{
-				eye_reg_ct->print();
-				return( CMD_SUCCESS );
-			}
-			return( CMD_NOT_FOUND );
-		}
-		return( CMD_FAILURE );
-	}
-	else
-	if (char_cmd == "softeyes")
-	{
-		if (!character)
-		{
-			LOG("ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"%s\".", char_name.c_str());
-			return CMD_FAILURE;
-		}
-		MeCtEyeLid *eyelid_ct = character->eyelid_ct;
-		if (!eyelid_ct)
-		{
-			LOG("ERROR: SbmCharacter::character_cmd_func(..): character \"%s\" has no eyelid_ct.", char_name.c_str());
-			return CMD_FAILURE;
-		}
-		
-		if (args.calc_num_tokens() == 0)
-		{
-			LOG( "softeyes params: %s", character->isSoftEyes() ? "ENABLED" : "DISABLED" );
-			float lo, up;
-
-			eyelid_ct->get_weight( lo, up );
-			LOG( " eyelid weight: { %f, %f }", lo, up );
-
-			eyelid_ct->get_upper_lid_range( lo, up );
-			LOG( " eyelid upper trans: { %f, %f }", lo, up );
-
-			eyelid_ct->get_lower_lid_range( lo, up );
-			LOG( " eyelid lower trans: { %f, %f }", lo, up );
-
-			eyelid_ct->get_eye_pitch_range( lo, up );
-			LOG( " eyeball pitch: { %f, %f }", lo, up );
-
-			LOG( "commmands:" );
-			LOG( " char <> softeyes [on|off] " );
-			LOG( " char <> softeyes weight <lower> <upper>" );
-			LOG( " char <> softeyes upperlid|lowerlid|eyepitch <lower-lim> <upper-lim>" );
-			return CMD_SUCCESS;
-		}
-
-		std::string softEyesCommand = args.read_token();
-		if (softEyesCommand == "on")
-		{
-			character->setSoftEyes(true);
-		}
-		else 
-		if (softEyesCommand == "off")
-		{
-			character->setSoftEyes(false);
-		}
-		else	{
-			
-			float lo = args.read_float();
-			float up = args.read_float();
-			
-			if (softEyesCommand == "weight")
-			{
-				eyelid_ct->set_weight( lo, up );
-			}
-			else 
-			if (softEyesCommand == "upperlid")
-			{
-				eyelid_ct->set_upper_lid_range( lo, up );
-			}
-			else 
-			if (softEyesCommand == "lowerlid")
-			{
-				eyelid_ct->set_lower_lid_range( lo, up );
-			}
-			else 
-			if (softEyesCommand == "eyepitch")
-			{
-				eyelid_ct->set_eye_pitch_range( lo, up );
-			}
-			else
-			{
-				LOG( "SbmCharacter::character_cmd_func ERR: command '%s' not recognized", softEyesCommand.c_str());
-				return CMD_NOT_FOUND;
-			}
-			return CMD_SUCCESS;
-		}
-		return CMD_SUCCESS;
-	}
-	return CMD_NOT_FOUND;
+	LOG( "SbmCharacter::character_cmd_func ERR: char '%s' or cmd '%s' NOT FOUND", char_name.c_str(), char_cmd.c_str() );
+	return( CMD_FAILURE );
 }
 
 int SbmCharacter::remove_from_scene( const char* char_name ) {

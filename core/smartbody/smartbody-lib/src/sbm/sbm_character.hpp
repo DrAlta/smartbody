@@ -130,8 +130,10 @@ protected:
 	// Viseme Curve Info
 	bool	use_viseme_curve;
 	float	viseme_time_offset;
+	int 	viseme_channel_count;
 	int 	viseme_channel_start_pos;
 	int 	viseme_channel_end_pos;
+	float	*viseme_history_arr;
 
 public:
 	//  Methods
@@ -235,6 +237,7 @@ public:
 	 *  char <> remove
 	 */
 	static int character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+	int parse_character_command( std::string cmd, srArgBuffer& args, mcuCBHandle *mcu_p, bool all_characters );
 
 	static int character_init_cmd( srArgBuffer& args, mcuCBHandle *mcu_p );
 

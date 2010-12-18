@@ -1327,37 +1327,13 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	curve_info[ 2 ] = (float)rampin;
 	curve_info[ 3 ] = weight;
 
-	curve_info[ 4 ] = relaxAt - startAt;
+	curve_info[ 4 ] = (float)( relaxAt - startAt );
 	curve_info[ 5 ] = weight;
 
 	curve_info[ 6 ] = curve_info[ 4 ] + (float)rampout;
 	curve_info[ 7 ] = 0.0f;
 
 	actor_p->set_viseme_curve( viseme, 1.0f, startAt, curve_info, 4, 2 );
-
-#elif 0
-	float rampin = rampup;
-	if( rampin < 0.0 )	{
-		rampin = readyAt - startAt;
-	}
-	float rampout = rampdown;
-	if( rampout < 0.0 )	{
-		rampout = endAt - relaxAt;
-	}
-	float curve_A = 0.0f;
-	float curve_B = rampin;
-	float curve_C = relaxAt - startAt;
-	float curve_D = curve_C + rampout;
-	ostringstream cmd;
-	cmd << "char " << actor_id << " viseme " << viseme << " curve 4 ";
-	cmd << curve_A	<< " " << 0.0f		<< " ";
-	cmd << curve_B	<< " " << weight	<< " ";
-	cmd << curve_C	<< " " << weight	<< " ";
-	cmd << curve_D	<< " " << 0.0f;
-
-	VecOfSbmCommand commands;
-   	commands.push_back( new SbmCommand( cmd.str(), (float)startAt ) );
-	realize_sequence( commands, mcu );
 
 #else
 	ostringstream start_cmd;
