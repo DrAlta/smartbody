@@ -2020,34 +2020,38 @@ int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return mcu_set_face_viseme_func( args, mcu_p, characterName );
 	} else if( type=="neutral" ) {
 		const string motion_name = args.read_token();
-		if( motion_name.length()==0 ) {
-			LOG("ERROR: Missing motion name.");
-			return CMD_FAILURE;
+
+		FaceMotion* faceMotion = NULL;
+		std::map<std::string, FaceMotion*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
+		if (faceMotionIter == mcu_p->face_map.end())
+		{
+			// face motion mappings for character do not yet exist - create them
+			faceMotion = new FaceMotion();
+			mcu_p->face_map.insert(std::pair<std::string, FaceMotion*>(characterName, faceMotion));
+		}
+		else
+		{
+			faceMotion = (*faceMotionIter).second;
 		}
 
-		std::map<std::string, SkMotion*>::iterator motionIter =  mcu_p->motion_map.find(motion_name);
-		if (motionIter != mcu_p->motion_map.end())
+		if (motion_name.size() > 0)
 		{
-			SkMotion* motion_p = (*motionIter).second;
-
-			FaceMotion* faceMotion = NULL;
-			std::map<std::string, FaceMotion*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
-			if (faceMotionIter == mcu_p->face_map.end())
+			std::map<std::string, SkMotion*>::iterator motionIter =  mcu_p->motion_map.find(motion_name);
+			if (motionIter != mcu_p->motion_map.end())
 			{
-				// face motion mappings for character do not yet exist - create them
-				faceMotion = new FaceMotion();
-				mcu_p->face_map.insert(std::pair<std::string, FaceMotion*>(characterName, faceMotion));
+				SkMotion* motion_p = (*motionIter).second;
+				faceMotion->face_neutral_p = motion_p;
+				return CMD_SUCCESS;
+			} else {
+				LOG("ERROR: Unknown motion \"%s\".", motion_name.c_str());
+				return CMD_FAILURE;
 			}
-			else
-			{
-				faceMotion = (*faceMotionIter).second;
-			}
-
-			faceMotion->face_neutral_p = motion_p;
+		}
+		else
+		{
+			// no motion specified, create the channel without mapping it to a motion
+			faceMotion->face_neutral_p = NULL;
 			return CMD_SUCCESS;
-		} else {
-			LOG("ERROR: Unknown motion \"%s\".", motion_name.c_str());
-			return CMD_FAILURE;
 		}
 	} else {
 		LOG("ERROR: Unknown command \"set face %s.", type.c_str());
@@ -2134,22 +2138,6 @@ int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string cha
 		face_pose_name = token;
 	}
 
-	if( face_pose_name.length()==0 ) {
-		LOG("ERROR: Missing viseme motion name.");
-		return CMD_FAILURE;
-	}
-
-	// Currently we use the first frame of SkMotion because
-	// of limitations in our exports (can't export direct to .skp).
-	// TODO: use .skp and/or convert arbitrary frame number/time to SkPosture
-	std::map<std::string, SkMotion*>::iterator motionIter =  mcu_p->motion_map.find(face_pose_name);
-	if (motionIter == mcu_p->motion_map.end())
-	{
-		LOG("ERROR: Unknown facial pose \"%s\".", face_pose_name.c_str());
-		return CMD_FAILURE;
-	}
-	SkMotion* motion =(*motionIter).second;
-
 	FaceMotion* faceMotion = NULL;
 	std::map<std::string, FaceMotion*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
 	if (faceMotionIter == mcu_p->face_map.end())
@@ -2161,6 +2149,21 @@ int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string cha
 	else
 	{
 		faceMotion = (*faceMotionIter).second;
+	}
+
+	// Currently we use the first frame of SkMotion because
+	// of limitations in our exports (can't export direct to .skp).
+	// TODO: use .skp and/or convert arbitrary frame number/time to SkPosture
+	SkMotion* motion = NULL;
+	if (face_pose_name.length() > 0)
+	{
+		std::map<std::string, SkMotion*>::iterator motionIter =  mcu_p->motion_map.find(face_pose_name);
+		if (motionIter == mcu_p->motion_map.end())
+		{
+			LOG("ERROR: Unknown facial pose \"%s\".", face_pose_name.c_str());
+			return CMD_FAILURE;
+		}
+		motion =(*motionIter).second;
 	}
 
 	AUMotionPtr au;
@@ -2325,35 +2328,36 @@ int mcu_set_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string
 		return CMD_SUCCESS;
 	}
 
-	string motion_name = args.read_token();
-	if( motion_name.length()==0 ) {
-		LOG("ERROR: Missing viseme motion name.");
-		return CMD_FAILURE;
-	}
-
-	// Currently we use the first frame of SkMotion because
-	// of limitations in our exports (can't export direct to .skp).
-	// TODO: use .skp and/or convert arbitrary frame number/time to SkPosture
-	std::map<std::string, SkMotion*>::iterator motionIter = mcu_p->motion_map.find(motion_name);
-	if (motionIter == mcu_p->motion_map.end())
-	{
-		LOG("ERROR: Unknown viseme pose \"%s\".", motion_name.c_str());
-		return CMD_FAILURE;
-	}
-	SkMotion* motion = (*motionIter).second;
-
 	FaceMotion* faceMotion = NULL;
 	std::map<std::string, FaceMotion*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
 	if (faceMotionIter == mcu_p->face_map.end())
 	{
-		// face motion mappings for character do not yet exist
-		LOG("Character %s does not yet have any AU mappings for the face.", characterName.c_str());
-		return CMD_FAILURE;
+		// face motion mappings for character do not yet exist - create them
+		faceMotion = new FaceMotion();
+		mcu_p->face_map.insert(std::pair<std::string, FaceMotion*>(characterName, faceMotion));
 	}
 	else
 	{
 		faceMotion = (*faceMotionIter).second;
 	}
+
+	string motion_name = args.read_token();
+
+	SkMotion* motion = NULL;
+	if (motion_name.length() > 0)
+	{
+			// Currently we use the first frame of SkMotion because
+		// of limitations in our exports (can't export direct to .skp).
+		// TODO: use .skp and/or convert arbitrary frame number/time to SkPosture
+		std::map<std::string, SkMotion*>::iterator motionIter = mcu_p->motion_map.find(motion_name);
+		if (motionIter == mcu_p->motion_map.end())
+		{
+			LOG("ERROR: Unknown viseme pose \"%s\".", motion_name.c_str());
+			return CMD_FAILURE;
+		}
+		motion = (*motionIter).second;
+	}
+
 
 	VisemeMotionMap& viseme_map = faceMotion->viseme_map;
 	VisemeMotionMap::iterator pos = viseme_map.find( viseme );

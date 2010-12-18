@@ -636,7 +636,6 @@ int SbmCharacter::init_skeleton() {
 			const string&    id     = vi->first;
 			SkMotion* motion = vi->second;
 
-			if( motion ) {
 				/* get rid of the "viseme_" prefix */ 
 //				string name = "viseme_";
 //				name += id;
@@ -648,7 +647,8 @@ int SbmCharacter::init_skeleton() {
 				
 				// Register control channel with face controller
 				if( face_ct )
-					face_ct->add_key( id.c_str(), motion );
+					if( motion ) {
+						face_ct->add_key( id.c_str(), motion );
 			}
 		}
 	}
