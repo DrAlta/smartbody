@@ -347,9 +347,29 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
       return 0;
    }
 
-
    char fullAudioPath[ _MAX_PATH ];
-   string relativeAudioPath = mcu.speech_audiofile_base_path + voiceCode;
+   // if an audio path is present, use it
+   bool useAudioPaths = true;
+   mcu.audio_paths.reset();
+   std::string relativeAudioPath = mcu.audio_paths.next_path();
+   if (relativeAudioPath.size() == 0 || relativeAudioPath == mcu.media_path)
+   {
+       relativeAudioPath = mcu.speech_audiofile_base_path + voiceCode;
+	   useAudioPaths = false;
+	   // add a one-time deprecation message
+	   static bool deprecationMessageAudioPath = true;
+	   if (deprecationMessageAudioPath)
+	   {
+		   LOG("No audio path has been specified, so using default: %s.", mcu.speech_audiofile_base_path.c_str());
+		   LOG("Instead, use: path audio <audiopath>.");
+		   deprecationMessageAudioPath = false;
+	   }
+   }
+   else
+   {
+	   relativeAudioPath = relativeAudioPath + "/" + voiceCode;
+   }
+
    if ( _fullpath( fullAudioPath, relativeAudioPath.c_str(), _MAX_PATH ) == NULL )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: _fullpath() returned NULL\n" );
@@ -361,8 +381,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 
 
    // TODO: Should we fail if the .bml file isn't present?
-
-   string bmlFilename = mcu.speech_audiofile_base_path + voiceCode + "/" + ref + ".bml";
+   string bmlFilename = relativeAudioPath + "/" + ref + ".bml";
 
     mcu.mark("requestSpeechAudio", 4, "lips");
    ReadVisemeDataBML( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData );

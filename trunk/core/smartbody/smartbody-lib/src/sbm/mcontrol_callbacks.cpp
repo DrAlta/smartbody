@@ -141,20 +141,24 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		PathResource* pres = new PathResource();
 		pres->setPath(path);
 		pres->setMediaPath(mcu_p->getMediaPath());
-		if( strcmp( path_tok, "seq" ) == 0 )	{
-			
+		if( strcmp( path_tok, "seq" ) == 0 )
+		{	
 			pres->setType("seq");
 			mcu_p->seq_paths.insert( path );
 		}
-		else
-		if(
-			( strcmp( path_tok, "me" ) == 0 )||
-			( strcmp( path_tok, "ME" ) == 0 )
-		)	{
+		else if( (strcmp( path_tok, "me" ) == 0 ) ||
+			   ( strcmp( path_tok, "ME" ) == 0 ))
+		{
 			pres->setType("me");
 			mcu_p->me_paths.insert( path );
 		}
-		else	{
+		else if(strcmp( path_tok, "audio") == 0 )
+		{
+			pres->setType("audio");
+			mcu_p->audio_paths.insert( path );
+		}
+		else
+		{
 			delete pres;
 			LOG( "mcu_filepath_func ERR: token '%s' NOT FOUND\n", path_tok );
 			return( CMD_FAILURE );

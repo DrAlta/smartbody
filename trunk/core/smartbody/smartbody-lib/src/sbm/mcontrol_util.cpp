@@ -1035,6 +1035,7 @@ void mcuCBHandle::setMediaPath(std::string path)
 	// update all the paths with the media path prefix
 	seq_paths.setPathPrefix(media_path);
 	me_paths.setPathPrefix(media_path);
+	audio_paths.setPathPrefix(media_path);
 }
 
 std::string mcuCBHandle::getMediaPath()

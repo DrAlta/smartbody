@@ -504,6 +504,7 @@ int main( int argc, char **argv )	{
 	SrString net_host;
 	vector<string> seq_paths;
 	vector<string> me_paths;
+	vector<string> audio_paths;
 	vector<string> init_seqs;
 	SrString proc_id;
 	
@@ -564,6 +565,17 @@ int main( int argc, char **argv )	{
 				seq_paths.push_back( argv[i] );
 			} else {
 				LOG( "ERROR: Expected directory path to follow -seqpath\n" );
+				// return -1
+			}
+		}
+		else if( s == "-audiopath" )  // -audiopath <dirpath> to specify where audio files (.wav and .bml) should be loaded from
+		{
+			if( ++i < argc ) {
+				LOG( "    Adding audio path '%s'\n", argv[i] );
+
+				audio_paths.push_back( argv[i] );
+			} else {
+				LOG( "ERROR: Expected directory path to follow -audiopath\n" );
 				// return -1
 			}
 		}
@@ -723,6 +735,14 @@ int main( int argc, char **argv )	{
 	{
 		SrString seq_command = SrString( "path seq " ) << (it->c_str());
 		mcu.execute( (char *)(const char *)seq_command );
+	}
+
+	for( it = audio_paths.begin();
+	     it != audio_paths.end();
+		 ++it )
+	{
+		SrString audio_command = SrString( "path audio " ) << (it->c_str());
+		mcu.execute( (char *)(const char *)audio_command );
 	}
 
 	if( init_seqs.empty() ) {

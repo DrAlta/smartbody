@@ -181,6 +181,7 @@ class mcuCBHandle	{
 		
 		srPathList	seq_paths;
 		srPathList	me_paths;
+		srPathList	audio_paths;
 
 		std::string media_path;
 
