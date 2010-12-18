@@ -34,15 +34,24 @@
 
 ###  Using "test bml" command to avoid hard-coding
 ###  message id into sequence file.
-1	test bml character doctor noecho posture LHandOnHip_Motex
+#1	test bml character doctor noecho posture LHandOnHip_Motex
+1	test bml character doctor noecho posture Test_Motex
 1	test bml character elder  noecho posture HandsAtSide_Motex
 
 1	seq default-viewer
 
-#1	set test character doctor
+1	set test character doctor
 1	set test recipient elder
 
 1	test loco char doctor enable
 1	test loco char elder enable
 
+1	char ada init ChrAda.sk SasoBase.Mayor
+1	test loco char ada anim standing HandsAtSide_Motex
+1	test loco char ada anim walking Walk 17 28 4 37 9 23
+1	test loco char ada anim walking Strafe 25 39 1 52 25 27
+1	set character ada world_offset x 35 y 102 h -17
+
+
 1	seq default-dynamics
+

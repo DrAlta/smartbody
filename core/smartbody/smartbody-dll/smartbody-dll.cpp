@@ -151,7 +151,9 @@ SMARTBODY_DLL_API Smartbody_dll::~Smartbody_dll()
 SMARTBODY_DLL_API void Smartbody_dll::SetSpeechAudiofileBasePath( const std::string & basePath )
 {
    mcuCBHandle & mcu = mcuCBHandle::singleton();
-   mcu.speech_audiofile_base_path = basePath;
+   // clear the old audio path list
+   mcu.audio_paths = SrPathList();
+   mcu.audio_paths.insert(basePath);
 }
 
 
