@@ -64,6 +64,8 @@ MeCtLocomotion::MeCtLocomotion() {
 	freezed = false;
 	idle = false;
 	freeze_delta_time = 0.0f;
+	ik.set_terrain(&terrain);
+	height_offset.set_terrain(&terrain);
 }
 
 /** Destructor */
@@ -501,6 +503,11 @@ SrString& MeCtLocomotion::get_translation_joint_name()
 	return translation_joint_name;
 }
 
+MeCtLocomotionTerrain* MeCtLocomotion::get_terrain()
+{
+	return &terrain;
+}
+
 void MeCtLocomotion::set_turning_speed(float radians)
 {
 	for(int i = 0; i < limb_list.size(); ++i)
@@ -906,10 +913,15 @@ SrVec MeCtLocomotion::get_supporting_joint_pos(int joint_index, int limb_index, 
 	float tnormal[3];
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SrVec pos = limb_list.get(limb_index)->pos_buffer.get(2+joint_index);
-	float height = mcu.query_terrain(pos.x, pos.z, tnormal);
+	//float height = mcu.query_terrain(pos.x, pos.z, tnormal);
+
+	float height = terrain.get_height(pos.x, pos.z, tnormal);
 	pos.y = height;
 	SrVec pos1 = limb_list.get(limb_index)->pos_buffer.get(2+joint_index_plus);
-	height = mcu.query_terrain(pos1.x, pos1.z, NULL);
+
+	//height = mcu.query_terrain(pos1.x, pos1.z, NULL);
+	height = terrain.get_height(pos1.x, pos1.z, NULL);
+
 	pos1.y = height;
 	if(joint_index_plus > joint_index) *orientation = pos1-pos;
 	else *orientation = pos-pos1;
@@ -957,7 +969,9 @@ void MeCtLocomotion::apply_IK()
 
 		float normal[3] = {0.0f, 0.0f, 0.0f};
 
-		float height = mcu.query_terrain(pos.x, pos.z, normal);
+		//float height = mcu.query_terrain(pos.x, pos.z, normal);
+
+		float height = terrain.get_height(pos.x, pos.z, normal);
 
 		ik_scenario->ik_offset = limb_list.get(i)->ik_offset;
 		ik_scenario->joint_quat_list = limb_list.get(i)->limb_joint_info.quat;

@@ -128,6 +128,12 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		}
 	}
 
+	if( arg == "ground_height" )
+	{
+		actor->get_locomotion_ct()->get_terrain()->set_ground_height(args.read_float());
+		return CMD_SUCCESS;
+	}
+
 	if(arg == "anim")
 	{
 		std::string type = args.read_token();
@@ -236,7 +242,8 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	actor->posture_sched_p->create_track( NULL, NULL, nav_circle);
 	nav_circle->unref();
 	
-	if( arg=="stop" ) {
+	if( arg=="stop" )
+	{
 		/*SkChannelArray channels;
 		channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::XPos );
 		channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::YPos );

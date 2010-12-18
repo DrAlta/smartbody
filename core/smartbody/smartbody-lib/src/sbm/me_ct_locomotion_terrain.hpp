@@ -29,7 +29,7 @@
 class MeCtLocomotionTerrain
 {
 protected:
-	
+	float ground_height;
 
 public:
 	MeCtLocomotionTerrain();
@@ -37,6 +37,7 @@ public:
 
 public:
 	float get_height(float x, float z, float* normal);
+	void set_ground_height(float height);
 };
 
 

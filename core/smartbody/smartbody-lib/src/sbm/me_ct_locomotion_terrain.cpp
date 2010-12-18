@@ -28,7 +28,7 @@
 
 MeCtLocomotionTerrain::MeCtLocomotionTerrain()
 {
-
+	ground_height = 0.0f;
 }
 
 MeCtLocomotionTerrain::~MeCtLocomotionTerrain()
@@ -38,5 +38,17 @@ MeCtLocomotionTerrain::~MeCtLocomotionTerrain()
 float MeCtLocomotionTerrain::get_height(float x, float z, float* normal)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	if(mcu.height_field_p == NULL)
+	{
+		normal[0] = 0.0f;
+		normal[1] = 1.0f;
+		normal[2] = 0.0f;
+		return ground_height;
+	}
 	return mcu.query_terrain(x, z, normal);
+}
+
+void MeCtLocomotionTerrain::set_ground_height(float height)
+{
+	ground_height = height;
 }

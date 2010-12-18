@@ -48,19 +48,22 @@ protected:
 	SrArray<SrVec> joint_pos_prev;
 	SrArray<SrVec> joint_pos_curr;
 
-	MeCtLocomotionTerrain terrain;
+	MeCtLocomotionTerrain* terrain;
 
 public:
 	MeCtLocomotionHeightOffset();
 	~MeCtLocomotionHeightOffset();
 
 public:
+	
 	void set_limb_list(SrArray<MeCtLocomotionLimb*>* limb_list);
 	void set_translation_base_joint_height(float height);
 	void update_height_offset(SrMat& parent_mat, float base_height_displacement, float time);
 	void update_supporting_joint_orientation();
 	float get_height_offset();
 	void set_target_height_offset(float offset);
+
+	void set_terrain(MeCtLocomotionTerrain* terrain);
 
 };
 

@@ -96,6 +96,8 @@ protected:
 
 	MeCtLocomotionSpeedAccelerator speed_accelerator; // to be moved to MeCtLocomotionLimb
 
+	MeCtLocomotionTerrain terrain;
+
 	SkChannelArray  request_channels;
 
 	SrArray<MeCtLocomotionAnimGlobalInfo*> anim_global_info;
@@ -217,6 +219,8 @@ public:
 	int get_dominant_limb_index();
 
 	void set_valid(bool valid);
+
+	MeCtLocomotionTerrain* get_terrain();
 
 	//temp functions
 	SrVec get_supporting_joint_pos(int joint_index, int limb_index, SrVec* orientation, SrVec* normal);
