@@ -782,13 +782,22 @@ void prune_schedule( SbmCharacter*   actor,
 
 					if( LOG_CONTROLLER_TREE_PRUNING )
 						LOG("\tblend_Ct \"%s\": blend curve last knot: t = %f v = %f", blend_ct->name(), t, v );
-					if( t < time ) {
+					if( t <= time ) {
 						flat_blend_curve = true;
 						if( v == 0.0 ) {
 							in_use = false;
 						}
 					} else {
-						LOG( "sbm_character.cpp prune_schedule(): ERR: this pruning path not implemented" );
+//						LOG( "sbm_character.cpp prune_schedule(): ERR: this pruning path not implemented" );
+						
+						v = blend_curve.evaluate( time );
+						if( v == 0.0 )	{
+							t = blend_curve.get_last_nonzero( time );
+							if( t < time )	{
+								flat_blend_curve = true;
+								in_use = false;
+							}
+						}
 #if 0
 // NOTE: UNUSED CODE PATH...
 						// Has knots beyond current time

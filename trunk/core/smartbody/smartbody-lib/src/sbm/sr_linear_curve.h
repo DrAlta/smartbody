@@ -162,6 +162,28 @@ class srLinearCurve	{
 			}
 		}
 
+		double get_last_nonzero( double after )	{
+			double t = -1.0;
+			
+			if( head_p == NULL )	{
+				return( t );
+			}
+
+			Key *tmp_curr_p = curr_p;
+			Key *floor_p = find_floor_key( after );
+			Key *next_p = floor_p->next();
+
+			while( next_p )	{
+				if( next_p->value != 0.0 )	{
+					t = next_p->param;
+				}
+				next_p = next_p->next();
+			}
+
+			curr_p = tmp_curr_p;
+			return( t );
+		}
+
 		double get_tail_param( void )	{
 			if( dirty ) {
 				update_intervals();
@@ -223,7 +245,6 @@ class srLinearCurve	{
 			
 			Key *key_p = curr_p;
 			if( key_p )	{
-			
 				if( t < key_p->param ) {
 					key_p = head_p;
 				}
@@ -232,7 +253,6 @@ class srLinearCurve	{
 				key_p = head_p;
 			}
 			if( key_p )	{
-			
 				if( t < key_p->param )	{
 					return( NULL );
 				}
