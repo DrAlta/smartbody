@@ -792,7 +792,7 @@ void prune_schedule( SbmCharacter*   actor,
 						
 						v = blend_curve.evaluate( time );
 						if( v == 0.0 )	{
-							t = blend_curve.get_last_nonzero( time );
+							t = blend_curve.get_next_nonzero( time );
 							if( t < time )	{
 								flat_blend_curve = true;
 								in_use = false;

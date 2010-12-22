@@ -162,25 +162,49 @@ class srLinearCurve	{
 			}
 		}
 
+		double get_next_nonzero( double after )	{
+			double t = -1.0;
+			
+			if( head_p == NULL )	{
+				return( t );
+			}
+			Key *tmp_curr_p = curr_p;
+			Key *floor_p = find_floor_key( after );
+			curr_p = tmp_curr_p;
+
+			if( floor_p == NULL )	{
+				return( t );
+			}
+			Key *next_p = floor_p->next();
+			while( next_p )	{
+				if( next_p->value != 0.0 )	{
+					return( next_p->param );
+				}
+				next_p = next_p->next();
+			}
+			return( t );
+		}
+
 		double get_last_nonzero( double after )	{
 			double t = -1.0;
 			
 			if( head_p == NULL )	{
 				return( t );
 			}
-
 			Key *tmp_curr_p = curr_p;
 			Key *floor_p = find_floor_key( after );
-			Key *next_p = floor_p->next();
+			curr_p = tmp_curr_p;
 
+			if( floor_p == NULL )	{
+				return( t );
+			}
+			Key *next_p = floor_p->next();
 			while( next_p )	{
 				if( next_p->value != 0.0 )	{
 					t = next_p->param;
 				}
 				next_p = next_p->next();
 			}
-
-			curr_p = tmp_curr_p;
 			return( t );
 		}
 
