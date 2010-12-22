@@ -20,6 +20,7 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  *      Ed Fast, USC
  *      Andrew n marshall, USC
+ *		Jingqiao Fu, USC
  */
 
 # include <SR/sr_model.h>
@@ -382,6 +383,11 @@ SkJoint* SkSkeleton::_loadj ( SrInput& in, SkJoint* p, SrStringArray& paths, boo
       if ( in.finished() ) return 0; // unexpected EOF
       if ( in.last_token()[0]=='{' ) break;
       if ( in.last_token()[0]=='}' ) return 0; // should never enter here
+	  if ( in.last_token() == "joint" ) //keyword 'joint' should be an indication of the start of a new joint regardless of the unfinished definition of previous one
+	  {
+		name.set("\0");
+		continue;
+	  }
       if ( name.len()>0 ) name << '_';
       name << in.last_token();
     }
