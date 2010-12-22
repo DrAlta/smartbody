@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include "sbm_constants.h"
+#include <vhcl_log.h>
 
 #define SR_CURVE_INFINITE_SLOPE		(1000000.0)
 
@@ -154,7 +155,7 @@ class srLinearCurve	{
 			if( floor_p )	{
 				key_p = floor_p->next();
 			}
-			if( key_p ) {
+			while( key_p ) {
 				Key *tmp_p = key_p;
 				key_p = key_p->next();
 				delete tmp_p;
@@ -163,17 +164,16 @@ class srLinearCurve	{
 		}
 
 		double get_next_nonzero( double after )	{
-			double t = -1.0;
 			
 			if( head_p == NULL )	{
-				return( t );
+				return( -1.0 );
 			}
-			Key *tmp_curr_p = curr_p;
+//			Key *tmp_curr_p = curr_p;
 			Key *floor_p = find_floor_key( after );
-			curr_p = tmp_curr_p;
+//			curr_p = tmp_curr_p;
 
 			if( floor_p == NULL )	{
-				return( t );
+				return( -1.0 );
 			}
 			Key *next_p = floor_p->next();
 			while( next_p )	{
@@ -182,18 +182,18 @@ class srLinearCurve	{
 				}
 				next_p = next_p->next();
 			}
-			return( t );
+			return( -1.0 );
 		}
-
+#if 0
 		double get_last_nonzero( double after )	{
 			double t = -1.0;
 			
 			if( head_p == NULL )	{
 				return( t );
 			}
-			Key *tmp_curr_p = curr_p;
+//			Key *tmp_curr_p = curr_p;
 			Key *floor_p = find_floor_key( after );
-			curr_p = tmp_curr_p;
+//			curr_p = tmp_curr_p;
 
 			if( floor_p == NULL )	{
 				return( t );
@@ -207,6 +207,7 @@ class srLinearCurve	{
 			}
 			return( t );
 		}
+#endif
 
 		double get_tail_param( void )	{
 			if( dirty ) {
@@ -226,6 +227,7 @@ class srLinearCurve	{
 			}
 			return( 0.0 );
 		}
+#if 0
 		double get_tail_slope( void )	{
 			if( dirty ) {
 				update_intervals();
@@ -235,6 +237,7 @@ class srLinearCurve	{
 			}
 			return( 0.0 );
 		}
+#endif
 
 		double evaluate( double t )	{
 			
@@ -340,7 +343,7 @@ class srLinearCurve	{
 			}
 			dirty = false;
 			if( c != key_count )	{
-				printf( "srLinearCurve::update_intervals ERR: corruption.\n" );
+				LOG( "srLinearCurve::update_intervals ERR: corruption: counted %d of %d keys", c, key_count );
 			}
 		}
 
