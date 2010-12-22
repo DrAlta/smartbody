@@ -297,7 +297,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 
    _data->root = new SrSnGroup; // we maintain root pointer always valid
    _data->rendermode = ModeAsIs;
-   _data->charactermode = ModeShowGeometry;
+   _data->charactermode = ModeShowBones;
    _data->pawnmode = ModeNoPawns;
    _data->shadowmode = ModeNoShadows;
    _data->terrainMode = ModeTerrain;
@@ -1653,7 +1653,10 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
 			SrVec diffVector = diff;
 			SrVec adjustment = diffVector * distance * amount;
 			cameraPos += adjustment;
-			_data->camera.eye = cameraPos;			
+			SrVec oldEyePos = _data->camera.eye;
+			_data->camera.eye = cameraPos;
+			SrVec cameraDiff = _data->camera.eye - oldEyePos;
+			_data->camera.center += cameraDiff;
 		}
       else if ( TRANSLATING(e) )
        { _data->camera.apply_translation_from_mouse_motion ( e.lmouse.x, e.lmouse.y, e.mouse.x, e.mouse.y );
