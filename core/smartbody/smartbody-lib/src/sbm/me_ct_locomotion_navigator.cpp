@@ -177,7 +177,7 @@ bool MeCtLocomotionNavigator::controller_evaluate(double delta_time, MeFrameData
 		world_pos.set( data[0], data[1], data[2] );
 		world_rot.set( data[3], data[4], data[5], data[6] );
 	}
-	else
+	//else
 	{
 		world_pos.set( buffer[ bi_world_x ], buffer[ bi_world_y ], buffer[ bi_world_z ] );
 		world_rot.set( buffer[ bi_world_rot ], buffer[ bi_world_rot+1 ], buffer[ bi_world_rot+2 ], buffer[ bi_world_rot+3 ] );
