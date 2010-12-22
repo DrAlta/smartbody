@@ -361,7 +361,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule(
 		blend_curve.insert( tin + t, w );		
 	}
 
-	double dur = curveInfo[ ( numKeys - 1 ) * numKeyParams ] - tin;
+	double dur = curveInfo[ ( numKeys - 1 ) * numKeyParams ];
 
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string blend_name( "blending for " );
