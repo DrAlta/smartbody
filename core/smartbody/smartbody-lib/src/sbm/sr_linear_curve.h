@@ -150,17 +150,26 @@ class srLinearCurve	{
 			if( head_p == NULL )	{
 				return;
 			}
-			Key *key_p = head_p;
+			Key *key_p = NULL;
 			Key *floor_p = find_floor_key( t );
 			if( floor_p )	{
 				key_p = floor_p->next();
+				floor_p->next( NULL );
+			}
+			else	{
+				key_p = head_p;
+				head_p = NULL;
 			}
 			while( key_p ) {
+				if( key_p == curr_p )	{
+					curr_p = NULL;
+				}
 				Key *tmp_p = key_p;
 				key_p = key_p->next();
 				delete tmp_p;
 				decrement();
 			}
+			tail_p = NULL;
 		}
 
 		double get_next_nonzero( double after )	{
