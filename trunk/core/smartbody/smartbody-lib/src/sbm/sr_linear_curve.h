@@ -172,24 +172,54 @@ class srLinearCurve	{
 			tail_p = NULL;
 		}
 
-		double get_next_nonzero( double after )	{
+		double get_next_nonzero_slope( double after )	{
 			
 			if( head_p == NULL )	{
 				return( -1.0 );
 			}
+			Key *key_p = NULL;
+			Key *floor_p = find_floor_key( after );
+			if( floor_p )	{
+				key_p = floor_p->next();
+			}
+			else	{
+				key_p = head_p;
+			}
+			if( dirty ) {
+				update_intervals();
+			}
+			while( key_p )	{
+				if( key_p->slope() != 0.0 )	{
+					return( key_p->param );
+				}
+				key_p = key_p->next();
+			}
+			return( -1.0 );
+		}
+
+		double get_next_nonzero_value( double after )	{
+//		double get_next_nonzero( double after )	{
+			
+			if( head_p == NULL )	{
+				return( -1.0 );
+			}
+			Key *key_p = NULL;
 //			Key *tmp_curr_p = curr_p;
 			Key *floor_p = find_floor_key( after );
 //			curr_p = tmp_curr_p;
-
-			if( floor_p == NULL )	{
-				return( -1.0 );
+			if( floor_p )	{
+//				return( -1.0 );
+				key_p = floor_p->next();
 			}
-			Key *next_p = floor_p->next();
-			while( next_p )	{
-				if( next_p->value != 0.0 )	{
-					return( next_p->param );
+			else	{
+				key_p = head_p;
+			}
+//			Key *key_p = floor_p->next();
+			while( key_p )	{
+				if( key_p->value != 0.0 )	{
+					return( key_p->param );
 				}
-				next_p = next_p->next();
+				key_p = key_p->next();
 			}
 			return( -1.0 );
 		}
@@ -236,7 +266,7 @@ class srLinearCurve	{
 			}
 			return( 0.0 );
 		}
-#if 0
+#if 1
 		double get_tail_slope( void )	{
 			if( dirty ) {
 				update_intervals();

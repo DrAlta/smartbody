@@ -792,10 +792,15 @@ void prune_schedule( SbmCharacter*   actor,
 						
 						v = blend_curve.evaluate( time );
 						if( v == 0.0 )	{
-							t = blend_curve.get_next_nonzero( time );
+							t = blend_curve.get_next_nonzero_value( time );
 							if( t < time )	{
 								flat_blend_curve = true;
 								in_use = false;
+							}
+						}
+						if( !flat_blend_curve )	{
+							if( blend_curve.get_next_nonzero_slope( time ) < 0.0 )	{
+								flat_blend_curve = true;
 							}
 						}
 #if 0
@@ -938,6 +943,7 @@ void prune_schedule( SbmCharacter*   actor,
 						pose_ct = (MeCtPose*)anim_source;
 					}
 				} else if( anim_ct_type == MeCtChannelWriter::TYPE ) {
+#if 1
 					const SkChannelArray& ct_channels = anim_source->controller_channels();
 					vector<int> new_channels;  // list of indices to channels in use
 					bool foundChannelMatch = false;
@@ -955,6 +961,7 @@ void prune_schedule( SbmCharacter*   actor,
 					{
 						in_use = false;
 					}
+#endif
 				} 
 				else if(anim_ct_type == MeCtNavigationCircle::TYPE)
 				{
@@ -1014,6 +1021,7 @@ void prune_schedule( SbmCharacter*   actor,
  *  body motions and partial spine gazes.
  */
 int SbmCharacter::prune_controller_tree( mcuCBHandle* mcu_p ) {
+
 	double time = mcu_p->time;  // current time
 
 	if( LOG_PRUNE_CMD_TIME || LOG_CONTROLLER_TREE_PRUNING )
