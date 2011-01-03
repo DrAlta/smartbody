@@ -103,7 +103,6 @@
 using std::vector;
 using std::string;
 
-
 ///////////////////////////////////////////////////////////////////////////////////
 
 int sbm_main_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{

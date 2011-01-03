@@ -31,6 +31,10 @@
 
 class srLinearCurve	{
 
+	public:
+//		int objective_key_count;
+//		int objective_key_count_max;
+
 	private:
 
 	class Key	{
@@ -112,17 +116,12 @@ class srLinearCurve	{
 	public:
 		srLinearCurve( void )	{
 			null();
+//			objective_key_count = 0;
+//			objective_key_count_max = 0;
 		}
 
 		~srLinearCurve( void )	{
-			Key *key_p = head_p;
-			while( key_p ) {
-				Key *tmp_p = key_p;
-				key_p = key_p->next();
-				delete tmp_p;
-				decrement();
-			}
-			null();
+			clear();
 		}
 
 		void print( void )	{
@@ -130,7 +129,8 @@ class srLinearCurve	{
 			if( dirty ) {
 				update_intervals();
 			}
-			printf( "srLinearCurve: KEYS:\n" );
+//			printf( "srLinearCurve: KEYS: %d of %d (%d)\n", key_count, objective_key_count, objective_key_count_max );
+			printf( "srLinearCurve: KEYS: %d\n", key_count );
 			int c = 0;
 			Key *key_p = head_p;
 			while( key_p ) {
@@ -142,9 +142,23 @@ class srLinearCurve	{
 		int get_num_keys( void ) { return( key_count ); }
 		
 		int insert( double p, double v )	{ /* sort by key.time, add after same time */
+//			objective_key_count++;
+//			if( objective_key_count > objective_key_count_max ) objective_key_count_max = objective_key_count;
 			return( insert_key( new Key( p, v ) ) );
 		}
 		
+		void clear( void )	{
+			Key *key_p = head_p;
+			while( key_p ) {
+				Key *tmp_p = key_p;
+				key_p = key_p->next();
+				delete tmp_p;
+				decrement();
+//				objective_key_count--;
+			}
+			null();
+		}
+
 		void clear_after( double t )	{
 		
 			if( head_p == NULL )	{
@@ -168,6 +182,7 @@ class srLinearCurve	{
 				key_p = key_p->next();
 				delete tmp_p;
 				decrement();
+//				objective_key_count--;
 			}
 			tail_p = NULL;
 		}
@@ -198,23 +213,18 @@ class srLinearCurve	{
 		}
 
 		double get_next_nonzero_value( double after )	{
-//		double get_next_nonzero( double after )	{
 			
 			if( head_p == NULL )	{
 				return( -1.0 );
 			}
 			Key *key_p = NULL;
-//			Key *tmp_curr_p = curr_p;
 			Key *floor_p = find_floor_key( after );
-//			curr_p = tmp_curr_p;
 			if( floor_p )	{
-//				return( -1.0 );
 				key_p = floor_p->next();
 			}
 			else	{
 				key_p = head_p;
 			}
-//			Key *key_p = floor_p->next();
 			while( key_p )	{
 				if( key_p->value != 0.0 )	{
 					return( key_p->param );
@@ -225,24 +235,24 @@ class srLinearCurve	{
 		}
 #if 0
 		double get_last_nonzero( double after )	{
-			double t = -1.0;
 			
 			if( head_p == NULL )	{
-				return( t );
+				return( -1.0 );
 			}
-//			Key *tmp_curr_p = curr_p;
+			Key *key_p = NULL;
 			Key *floor_p = find_floor_key( after );
-//			curr_p = tmp_curr_p;
-
-			if( floor_p == NULL )	{
-				return( t );
+			if( floor_p )	{
+				key_p = floor_p->next();
 			}
-			Key *next_p = floor_p->next();
-			while( next_p )	{
-				if( next_p->value != 0.0 )	{
-					t = next_p->param;
+			else	{
+				key_p = head_p;
+			}
+			double t = -1.0;
+			while( key_p )	{
+				if( key_p->value != 0.0 )	{
+					t = key_p->param;
 				}
-				next_p = next_p->next();
+				key_p = key_p->next();
 			}
 			return( t );
 		}
@@ -266,7 +276,7 @@ class srLinearCurve	{
 			}
 			return( 0.0 );
 		}
-#if 1
+#if 0
 		double get_tail_slope( void )	{
 			if( dirty ) {
 				update_intervals();
@@ -425,6 +435,52 @@ class srLinearCurve	{
 		Key		*curr_p;
 		Key		*tail_p;
 };
+#endif
+
+#if 0
+#include <sbm/sr_linear_curve.h>
+void test_linear_curve( int reps = 1000000 )	{
+
+	srLinearCurve C;
+	for( int i=0; i<reps; i++ )	{
+		int r = rand() % 10;
+		switch( r )	{
+			case 0:
+				C.insert( (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX );
+				break;
+			case 1:
+//				C.clear();
+				C.clear_after( (float)rand() / (float)RAND_MAX );
+				break;
+			case 2:
+				C.clear_after( (float)rand() / (float)RAND_MAX );
+				break;
+			case 3:
+				C.get_next_nonzero_slope( (float)rand() / (float)RAND_MAX );
+				break;
+			case 4:
+				C.get_next_nonzero_value( (float)rand() / (float)RAND_MAX );
+				break;
+			case 5:
+				C.get_last_nonzero( (float)rand() / (float)RAND_MAX );
+				break;
+			case 6:
+				C.get_tail_param();
+				break;
+			case 7:
+				C.get_tail_value();
+				break;
+			case 8:
+				C.get_tail_slope();
+				break;
+			default:	
+				C.evaluate( (float)rand() / (float)RAND_MAX );
+				break;
+		}
+	}
+
+	C.print();
+}
 #endif
 
 #if 0
