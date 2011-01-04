@@ -4,10 +4,10 @@
 0 echo == Beginning: data/sbm-common/scripts/common-init.seq
 
 ###  Assumes current directory is: core/smartbody/sbm/bin
-0	path ME ../../../../data/sbm-common/common-sk
+0	path ME sbm-common/common-sk
 
 0	echo >>> Loading common motions and poses...
-0	load motions -R ../../../../data/sbm-common/common-sk
-0	load poses   -R ../../../../data/sbm-common/common-sk
+0	load motions -R sbm-common/common-sk
+0	load poses   -R sbm-common/common-sk
 
 0 echo == Completed: data/sbm-common/scripts/common-init.seq
