@@ -573,7 +573,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 					ramp_dur = 0.1f;
 					time -= (time_sec)0.05;
 				}
-				actor_p->set_viseme_ramp( v->id(), v->weight(), time, ramp_dur );
+				actor_p->set_viseme_blend_ramp( v->id(), time, v->weight(), ramp_dur );
 #else
 				command.str( "" );
 				command << "char " << actor_id << " viseme " << v->id() << " " << v->weight() << " ";
@@ -597,7 +597,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 				float *curve_info = new float[ 2 * n ];
 				srArgBuffer curve_string( v->getCurveInfo() );
 				curve_string.read_float_vect( curve_info, 2 * n );
-				actor_p->set_viseme_curve( v->id(), 1.0f, mcu->time, curve_info, n, 2 );
+				actor_p->set_viseme_blend_curve( v->id(), mcu->time, 1.0f, curve_info, n, 2 );
 				delete [] curve_info;
 #else
 				command.str( "" );

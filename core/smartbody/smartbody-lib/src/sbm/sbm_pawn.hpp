@@ -30,6 +30,7 @@
 
 #include <ME/me_controller_tree_root.hpp>
 #include <ME/me_ct_channel_writer.hpp>
+#include <ME/me_ct_curve_writer.hpp>
 #include "wsp.h"
 
 #include <map>

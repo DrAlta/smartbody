@@ -1333,7 +1333,7 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	curve_info[ 6 ] = curve_info[ 4 ] + (float)rampout;
 	curve_info[ 7 ] = 0.0f;
 
-	actor_p->set_viseme_curve( viseme, 1.0f, startAt, curve_info, 4, 2 );
+	actor_p->set_viseme_blend_curve( viseme, startAt, 1.0f, curve_info, 4, 2 );
 
 #else
 	ostringstream start_cmd;

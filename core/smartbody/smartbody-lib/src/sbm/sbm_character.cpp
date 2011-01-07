@@ -1129,11 +1129,12 @@ const std::string& SbmCharacter::get_voice_code_backup() const
 
 void SbmCharacter::set_viseme_curve(
 	const char* viseme, 
-	float weight,
 	double start_time, 
 	float* curve_info, 
-	int numKeys, 
-	int numKeyParams 
+	int num_keys, 
+	int num_key_params, 
+	float ramp_in, 
+	float ramp_out 
 ) {
 
 	std::vector<std::string> visemeNames;
@@ -1150,7 +1151,7 @@ void SbmCharacter::set_viseme_curve(
 
 	for( size_t nCount = 0; nCount < visemeNames.size(); nCount++ )
 	{
-		if( numKeys > 0 )
+		if( num_keys > 0 )
 		{
 			float timeDelay = this->get_viseme_time_delay();
 			
@@ -1160,31 +1161,102 @@ void SbmCharacter::set_viseme_curve(
 			SkChannelArray channels;
 			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
 
-			MeCtChannelWriter* ct = new MeCtChannelWriter();
-			ct->name( ct_name.str().c_str() );
-			ct->init( channels, true );
-			SrBuffer<float> value;
-			value.size( 1 );
-			value[ 0 ] = weight;
-			ct->set_data(value);
+			MeCtCurveWriter* ct_p = new MeCtCurveWriter(); // CROP, CROP, true
+			ct_p->name( ct_name.str().c_str() );
+			ct_p->init( channels );
 
-			head_sched_p->schedule( ct, start_time + timeDelay, curve_info, numKeys, numKeyParams );
+			for (int i = 0; i < num_keys; i++)	{
+				float t = curve_info[ i * num_key_params + 0 ];
+				float w = curve_info[ i * num_key_params + 1 ];
+				ct_p->insert_key( 0, t, w );
+			}
+
+			double ct_dur = ct_p->controller_duration();
+			double tin = start_time + timeDelay;
+			double tout = tin + ct_dur;
+			head_sched_p->schedule( ct_p, tin, tout, ramp_in, ramp_out );
 		}
 	}
 }
 
-void SbmCharacter::set_viseme_ramp( 
+void SbmCharacter::set_viseme_trapezoid( 
 	const char* viseme,
-	float weight,
 	double start_time,
+	float weight,
+	float duration,
+	float ramp_in, 
+	float ramp_out 
+)	{
+
+	static float curve_info[ 4 ] = {
+		0.0f, 0.0f, 
+		0.0f, 0.0f
+	};
+	curve_info[ 1 ] = weight;
+	curve_info[ 2 ] = duration;
+	curve_info[ 3 ] = weight;
+	set_viseme_curve( viseme, start_time, curve_info, 1, 2, ramp_in, ramp_out );
+}
+
+void SbmCharacter::set_viseme_blend_curve(
+	const char* viseme, 
+	double start_time, 
+	float weight,
+	float* curve_info, 
+	int num_keys, 
+	int num_key_params
+) {
+
+	std::vector<std::string> visemeNames;
+	std::map<std::string, std::vector<std::string>>::iterator iter;
+	
+	iter = viseme_name_patch.find(viseme);
+	if (iter != viseme_name_patch.end())
+	{
+		for (size_t nCount = 0; nCount < iter->second.size(); nCount++)
+			visemeNames.push_back(iter->second[nCount]);
+	}
+	else
+		visemeNames.push_back(viseme);
+
+	for( size_t nCount = 0; nCount < visemeNames.size(); nCount++ )
+	{
+		if( num_keys > 0 )
+		{
+			float timeDelay = this->get_viseme_time_delay();
+			
+			ostringstream ct_name;
+			ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
+
+			SkChannelArray channels;
+			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
+
+			MeCtChannelWriter* ct_p = new MeCtChannelWriter();
+			ct_p->name( ct_name.str().c_str() );
+			ct_p->init( channels, true );
+			SrBuffer<float> value;
+			value.size( 1 );
+			value[ 0 ] = weight;
+			ct_p->set_data(value);
+
+			head_sched_p->schedule( ct_p, start_time + timeDelay, curve_info, num_keys, num_key_params );
+		}
+	}
+}
+
+void SbmCharacter::set_viseme_blend_ramp( 
+	const char* viseme,
+	double start_time,
+	float weight,
 	float rampin_duration
 )	{
 
 	static float curve_info[ 4 ] = {
-		0.0f, 0.0f, 0.0f, 1.0f
+		0.0f, 0.0f, 
+		0.0f, 1.0f
 	};
 	curve_info[ 2 ] = rampin_duration;
-	set_viseme_curve( viseme, weight, start_time, curve_info, 2, 2 );
+	set_viseme_blend_curve( viseme, start_time, weight, curve_info, 2, 2 );
 }
 
 void SbmCharacter::forward_visemes( double curTime )
@@ -1547,11 +1619,11 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 
 		if( curveInfo == NULL )
 		{
-			set_viseme_ramp( viseme, weight, mcu_p->time, rampin_duration );
+			set_viseme_blend_ramp( viseme, mcu_p->time, weight, rampin_duration );
 		}
 		else
 		{
-			set_viseme_curve( viseme, weight, mcu_p->time, curveInfo, numKeys, numKeyParams );
+			set_viseme_blend_curve( viseme, mcu_p->time, weight, curveInfo, numKeys, numKeyParams );
 			delete [] curveInfo;
 		}
 		return CMD_SUCCESS;
