@@ -140,6 +140,9 @@ class MeCtEyeLidRegulator : public MeController	{
 			return( UR_value ); 
 		}
 
+		// uses the "blink" viseme instead of au_45
+		void set_use_blink_viseme(bool val);
+		bool get_use_blink_viseme();
 	private:
 		float smooth( float sm, double dt, float soft, float hard );
 		float granular( float in, float min, float max, int grains );
@@ -176,6 +179,8 @@ class MeCtEyeLidRegulator : public MeController	{
 		float	LL_value;
 		float	UR_value;
 		float	LR_value;
+		
+		bool  use_blink_viseme;
 		
 		SkChannelArray		_channels;
 

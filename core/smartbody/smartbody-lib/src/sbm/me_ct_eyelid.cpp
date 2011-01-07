@@ -174,6 +174,7 @@ void MeCtEyeLidRegulator::test( void )	{
 //////////////////////////////////////////////////////////////////////////////////
 
 MeCtEyeLidRegulator::MeCtEyeLidRegulator( void )	{
+	set_use_blink_viseme(false);
 
 }
 
@@ -188,7 +189,12 @@ void MeCtEyeLidRegulator::init( bool tracking_pitch )	{
 	
 	_channels.add( "au_45_left", SkChannel::XPos );
 	_channels.add( "au_45_right", SkChannel::XPos );
-	
+	_channels.add( "au_45", SkChannel::XPos );
+	if (get_use_blink_viseme())
+	{
+		_channels.add( "blink", SkChannel::XPos );
+	}
+
 	MeController::init();
 	
 	set_upper_range( -30.0f, 30.0f );
@@ -267,12 +273,12 @@ void MeCtEyeLidRegulator::controller_start( void )	{
 
 bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 	double dt = 0.01f;
-	
-	if( t < 0.0 )	{
+        
+	if( t < 0.0 ) {
 		return( true );
 	}
-	
-	if( prev_time < 0.0 )	{
+
+	if( prev_time < 0.0 ) {
 #if 0
 		printf( "0.3333: %f\n", granular( 0.3333, 0.0, 10.0, 100 ) );
 		printf( "0.1999: %f\n", granular( 0.1999, 0.0, 10.0, 100 ) );
@@ -281,26 +287,25 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 #if 0
 		float s = 0.0;
 		float h = 1.0;
-		for( int i=0; i<30; i++ )	{
-			s = smooth( 0.8, 0.1, s, h );
-			printf( "%f\n", s );
-		}
+		for( int i=0; i<30; i++ ) {
+		s = smooth( 0.8, 0.1, s, h );
+		printf( "%f\n", s );
+	}
 #endif
 		prev_time = t;
-	}
-	else	{
+	} else {
 		dt = t - prev_time;
 		prev_time = t;
 	}
-	
+
 	if( new_blink ) {
 		prev_blink = 0.0;
 		new_blink = false;
 	}
-	
+
 	double blink_elapsed = t - prev_blink;
-	if( blink_elapsed >= blink_period )	{
-//LOG( "blink @ %f", blink_elapsed );
+	if( blink_elapsed >= blink_period ) {
+		//LOG( "blink @ %f", blink_elapsed );
 		blink_elapsed = 0.0;
 		prev_blink = t;
 		float r = (float)rand() / (float)RAND_MAX;
@@ -310,31 +315,31 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 	float *fbuffer = &( frame.buffer()[0] );
 	int n_chan = _channels.size();
 
-	if( pitch_tracking )	{
-		int L_eye_quat_idx = _context->channels().search( SkJointName( "eyeball_left" ), SkChannel::Quat );
-		int R_eye_quat_idx =  _context->channels().search( SkJointName( "eyeball_right" ), SkChannel::Quat );
+	if( pitch_tracking ) {
+	int L_eye_quat_idx = _context->channels().search( SkJointName( "eyeball_left" ), SkChannel::Quat );
+	int R_eye_quat_idx =  _context->channels().search( SkJointName( "eyeball_right" ), SkChannel::Quat );
 
-		int buff_idx = _context->toBufferIndex( L_eye_quat_idx );
-		euler_t L_eye_e = quat_t(
-			fbuffer[ buff_idx ],
-			fbuffer[ buff_idx + 1 ],
-			fbuffer[ buff_idx + 2 ],
-			fbuffer[ buff_idx + 3 ]
-		);
+	int buff_idx = _context->toBufferIndex( L_eye_quat_idx );
+	euler_t L_eye_e = quat_t(
+							fbuffer[ buff_idx ],
+							fbuffer[ buff_idx + 1 ],
+							fbuffer[ buff_idx + 2 ],
+							fbuffer[ buff_idx + 3 ]
+	);
 
-		buff_idx = _context->toBufferIndex( R_eye_quat_idx );
-		euler_t R_eye_e = quat_t(
-			fbuffer[ buff_idx ],
-			fbuffer[ buff_idx + 1 ],
-			fbuffer[ buff_idx + 2 ],
-			fbuffer[ buff_idx + 3 ]
-		);
+	buff_idx = _context->toBufferIndex( R_eye_quat_idx );
+	euler_t R_eye_e = quat_t(
+							fbuffer[ buff_idx ],
+							fbuffer[ buff_idx + 1 ],
+							fbuffer[ buff_idx + 2 ],
+							fbuffer[ buff_idx + 3 ]
+	);
 
-		UL_set.set_pitch( (float)( L_eye_e.p() ) );
-		UR_set.set_pitch( (float)( R_eye_e.p() ) );
+	UL_set.set_pitch( (float)( L_eye_e.p() ) );
+	UR_set.set_pitch( (float)( R_eye_e.p() ) );
 #if 0
-		LL_set.set_pitch( (float)( L_eye_e.p() ) );
-		LR_set.set_pitch( (float)( R_eye_e.p() ) );
+	LL_set.set_pitch( (float)( L_eye_e.p() ) );
+	LR_set.set_pitch( (float)( R_eye_e.p() ) );
 #endif
 	}
 
@@ -344,14 +349,14 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 	prev_LR_value = LR_value;
 
 	float raw_lid_val = (float)( curve.evaluate( blink_elapsed ) );
-	
+
 	soft_upper_tighten = smooth( 0.8f, dt, soft_upper_tighten, hard_upper_tighten );
 	gran_upper_tighten = granular( soft_upper_tighten, 0.0f, 1.0f, 100 );
 #if 0
 	soft_lower_tighten = smooth( 0.8f, dt, soft_lower_tighten, hard_lower_tighten );
 	gran_lower_tighten = granular( soft_lower_tighten, 0.0f, 1.0f, 100 );
 #endif
-	
+
 	UL_set.set_tighten( gran_upper_tighten );
 	UR_set.set_tighten( gran_upper_tighten );
 #if 0
@@ -361,26 +366,47 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 
 	UL_value = UL_set.get_mapped_weight( raw_lid_val );
 	UR_value = UR_set.get_mapped_weight( raw_lid_val );
-	
+
 #if 0
 	LL_value = LL_set.get_mapped_weight( raw_lid_val );
 	LR_value = LR_set.get_mapped_weight( raw_lid_val );
 #endif
 
-	int UL_au_blink_idx =  _context->channels().search( SkJointName( "au_45_left" ), SkChannel::XPos );
-	int UR_au_blink_idx =  _context->channels().search( SkJointName( "au_45_right" ), SkChannel::XPos );
+	bool applied = false;
 
-	int UL_au_blink_buff_idx = _context->toBufferIndex( UL_au_blink_idx );
-	int UR_au_blink_buff_idx = _context->toBufferIndex( UR_au_blink_idx );
-
-	if( UL_au_blink_buff_idx >= 0 )	{
-		if( UL_value != 0.0f )	{
-			fbuffer[ UL_au_blink_buff_idx ] = UL_value;
+	if (get_use_blink_viseme()) {
+		int U_au_blink_idx = _context->channels().search( SkJointName( "blink" ), SkChannel::XPos );
+		int U_au_blink_buff_idx = _context->toBufferIndex( U_au_blink_idx );
+		if( U_au_blink_idx >= 0 )	{
+			fbuffer[ U_au_blink_buff_idx ] = UL_value;
 		}
+		applied = true;
 	}
-	if( UR_au_blink_buff_idx >= 0 )	{
-		if( UR_value != 0.0f )	{
-			fbuffer[ UR_au_blink_buff_idx ] = UR_value;
+
+	// TODO: use safe threshold: abs( diff( a, b ) )
+	if( ( UL_value != 0.0f ) && ( UL_value == UR_value ) ) {
+		int U_au_blink_idx = _context->channels().search( SkJointName( "au_45" ), SkChannel::XPos );
+		int U_au_blink_buff_idx = _context->toBufferIndex( U_au_blink_idx );
+		if( U_au_blink_idx >= 0 )	{
+			fbuffer[ U_au_blink_buff_idx ] = UL_value;
+		}
+		applied = true;
+	}
+
+	if( applied == false ) {
+		if( UL_value != 0.0f ) {
+			int UL_au_blink_idx =  _context->channels().search( SkJointName( "au_45_left" ), SkChannel::XPos );
+			int UL_au_blink_buff_idx = _context->toBufferIndex( UL_au_blink_idx );
+			if( UL_au_blink_buff_idx >= 0 ) {
+				fbuffer[ UL_au_blink_buff_idx ] = UL_value;
+			}
+		}
+		if( UR_value != 0.0f ) {
+			int UR_au_blink_idx =  _context->channels().search( SkJointName( "au_45_right" ), SkChannel::XPos );
+			int UR_au_blink_buff_idx = _context->toBufferIndex( UR_au_blink_idx );
+			if( UR_au_blink_buff_idx >= 0 ) {
+				fbuffer[ UR_au_blink_buff_idx ] = UR_value;
+			}
 		}
 	}
 
@@ -391,15 +417,15 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 	int LL_au_blink_buff_idx = _context->toBufferIndex( LL_au_blink_idx );
 	int LR_au_blink_buff_idx = _context->toBufferIndex( LR_au_blink_idx );
 
-	if( LL_au_blink_buff_idx >= 0 )	{
-		if( LL_value != 0.0f )	{
-			fbuffer[ LL_au_blink_buff_idx ] = LL_value;
-		}
+	if( LL_au_blink_buff_idx >= 0 ) {
+	if( LL_value != 0.0f ) {
+	fbuffer[ LL_au_blink_buff_idx ] = LL_value;
 	}
-	if( LR_au_blink_buff_idx >= 0 )	{
-		if( LR_value != 0.0f )	{
-			fbuffer[ LR_au_blink_buff_idx ] = LR_value;
-		}
+	}
+	if( LR_au_blink_buff_idx >= 0 ) {
+	if( LR_value != 0.0f ) {
+	fbuffer[ LR_au_blink_buff_idx ] = LR_value;
+	}
 	}
 #endif
 	return( true );
@@ -427,6 +453,17 @@ void MeCtEyeLidRegulator::print_state( int tabCount ) {
 
 	LOG("\n" );
 }
+
+void MeCtEyeLidRegulator::set_use_blink_viseme(bool val)
+{
+	use_blink_viseme = val;
+}
+
+bool MeCtEyeLidRegulator::get_use_blink_viseme()
+{
+	return use_blink_viseme;
+}
+
 //////////////////////////////////////////////////////////////////////////////////
 
 /*
@@ -762,4 +799,5 @@ void MeCtEyeLid::print_state( int tabCount ) {
 
 	LOG("\n" );
 }
+
 
