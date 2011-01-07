@@ -47,8 +47,12 @@ class srLinearCurve	{
 				dp = 0.0; inv_dp = 0.0;
 				dv = 0.0;
 				next_p = NULL;
+//				objective_key_count++;
+//				if( objective_key_count > objective_key_count_max ) objective_key_count_max = objective_key_count;
 			}
-			~Key(void) {}
+			~Key(void) {
+//				objective_key_count--;
+			}
 
 			void print( int i )	{
 #if 1
@@ -142,8 +146,6 @@ class srLinearCurve	{
 		int get_num_keys( void ) { return( key_count ); }
 		
 		int insert( double p, double v )	{ /* sort by key.time, add after same time */
-//			objective_key_count++;
-//			if( objective_key_count > objective_key_count_max ) objective_key_count_max = objective_key_count;
 			return( insert_key( new Key( p, v ) ) );
 		}
 		
@@ -154,7 +156,6 @@ class srLinearCurve	{
 				key_p = key_p->next();
 				delete tmp_p;
 				decrement();
-//				objective_key_count--;
 			}
 			null();
 		}
@@ -182,11 +183,78 @@ class srLinearCurve	{
 				key_p = key_p->next();
 				delete tmp_p;
 				decrement();
-//				objective_key_count--;
 			}
 			tail_p = NULL;
 		}
 
+		double get_head_param( void )	{
+			if( head_p )	{
+				return( head_p->param );
+			}
+			return( 0.0 );
+		}
+		double get_head_value( void )	{
+			if( head_p )	{
+				return( head_p->value );
+			}
+			return( 0.0 );
+		}
+		double get_head_slope( void )	{
+			if( head_p )	{
+				return( head_p->slope() );
+			}
+			return( 0.0 );
+		}
+		
+		double get_tail_param( void )	{
+			if( dirty ) {
+				update_intervals();
+			}
+			if( tail_p )	{
+				return( tail_p->param );
+			}
+			return( 0.0 );
+		}
+		double get_tail_value( void )	{
+			if( dirty ) {
+				update_intervals();
+			}
+			if( tail_p )	{
+				return( tail_p->value );
+			}
+			return( 0.0 );
+		}
+		double get_tail_slope( void )	{
+			if( dirty ) {
+				update_intervals();
+			}
+			if( tail_p )	{
+				return( tail_p->slope() );
+			}
+			return( 0.0 );
+		}
+
+		double get_next_nonzero_value( double after )	{
+			
+			if( head_p == NULL )	{
+				return( -1.0 );
+			}
+			Key *key_p = NULL;
+			Key *floor_p = find_floor_key( after );
+			if( floor_p )	{
+				key_p = floor_p->next();
+			}
+			else	{
+				key_p = head_p;
+			}
+			while( key_p )	{
+				if( key_p->value != 0.0 )	{
+					return( key_p->param );
+				}
+				key_p = key_p->next();
+			}
+			return( -1.0 );
+		}
 		double get_next_nonzero_slope( double after )	{
 			
 			if( head_p == NULL )	{
@@ -211,30 +279,8 @@ class srLinearCurve	{
 			}
 			return( -1.0 );
 		}
-
-		double get_next_nonzero_value( double after )	{
-			
-			if( head_p == NULL )	{
-				return( -1.0 );
-			}
-			Key *key_p = NULL;
-			Key *floor_p = find_floor_key( after );
-			if( floor_p )	{
-				key_p = floor_p->next();
-			}
-			else	{
-				key_p = head_p;
-			}
-			while( key_p )	{
-				if( key_p->value != 0.0 )	{
-					return( key_p->param );
-				}
-				key_p = key_p->next();
-			}
-			return( -1.0 );
-		}
 #if 0
-		double get_last_nonzero( double after )	{
+		double get_last_nonzero_param( double after )	{
 			
 			if( head_p == NULL )	{
 				return( -1.0 );
@@ -255,36 +301,6 @@ class srLinearCurve	{
 				key_p = key_p->next();
 			}
 			return( t );
-		}
-#endif
-
-		double get_tail_param( void )	{
-			if( dirty ) {
-				update_intervals();
-			}
-			if( tail_p )	{
-				return( tail_p->param );
-			}
-			return( 0.0 );
-		}
-		double get_tail_value( void )	{
-			if( dirty ) {
-				update_intervals();
-			}
-			if( tail_p )	{
-				return( tail_p->value );
-			}
-			return( 0.0 );
-		}
-#if 0
-		double get_tail_slope( void )	{
-			if( dirty ) {
-				update_intervals();
-			}
-			if( tail_p )	{
-				return( tail_p->slope() );
-			}
-			return( 0.0 );
 		}
 #endif
 

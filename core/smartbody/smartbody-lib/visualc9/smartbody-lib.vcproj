@@ -1615,6 +1615,14 @@
 					RelativePath="..\src\me\me_ct_channel_writer.hpp"
 					>
 				</File>
+				<File
+					RelativePath="..\src\me\me_ct_curve_writer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\me\me_ct_curve_writer.hpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="pose"
