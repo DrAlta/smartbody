@@ -65,7 +65,7 @@
 #include <sbm/action_unit.hpp>
 #include <sbm/viseme_map.hpp>
 #include <sbm/general_param_setting.h>
-#include <me/me_spline_1d.hpp>
+//#include <me/me_spline_1d.hpp>
 
 class SbmCharacter : public SbmPawn	{
 
@@ -208,9 +208,32 @@ public:
 	MeCtSchedulerClass*	head_sched_p; // neck / head orientation
 	MeCtSchedulerClass*	param_sched_p; // general parameters
 
-
-	void set_viseme_curve( const char* viseme, float weight, double start_time, float* curve_info, int numKeys, int numKeyParams );
-	void set_viseme_ramp( const char* viseme, float weight, double start_time, float rampin_duration );
+	void set_viseme_curve( 
+		const char* viseme, 
+		double start_time, 
+		float* curve_info, int num_keys, int num_key_params, 
+		float ramp_in, float ramp_out 
+	);
+	void SbmCharacter::set_viseme_trapezoid( 
+		const char* viseme,
+		double start_time,
+		float weight,
+		float duration,
+		float ramp_in, 
+		float ramp_out 
+	);
+	void set_viseme_blend_curve( 
+		const char* viseme, 
+		double start_time, 
+		float weight, 
+		float* curve_info, int num_keys, int num_key_params 
+	);
+	void set_viseme_blend_ramp( 
+		const char* viseme, 
+		double start_time, 
+		float weight, 
+		float rampin_duration
+	);
 	void forward_visemes( double curTime);
 
 	void inspect_skeleton( SkJoint* joint_p, int depth = 0 );

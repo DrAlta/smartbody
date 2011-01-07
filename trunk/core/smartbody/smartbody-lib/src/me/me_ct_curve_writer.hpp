@@ -54,8 +54,14 @@ class MeCtCurveWriter : public MeController {
 		}
 	
 		void init( SkChannelArray& channels );
+		
+		void insert_key( int curve_index, double t, double v )	{
+			if( curve_index < 0 ) return;
+			if( curve_index >= num_curves ) return;
+			curve_arr[ curve_index ].insert( t, v );
+		}
 
-	protected:
+	private:
 	
 		SkChannelArray  _channels;
 		SrBuffer<float> _data;
@@ -70,7 +76,7 @@ class MeCtCurveWriter : public MeController {
 		bool	write_once;
 		bool	*write_once_arr;
 		
-	private:
+	public:
 		virtual const char* controller_type() const {
 			return( MeCtCurveWriter::TYPE );
 		}
