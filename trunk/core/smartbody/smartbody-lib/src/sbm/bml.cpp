@@ -1320,6 +1320,7 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 		rampout = endAt - relaxAt;
 	}
 
+#if 0
 	float curve_info[ 8 ];
 	curve_info[ 0 ] = 0.0f;
 	curve_info[ 1 ] = 0.0f;
@@ -1334,6 +1335,10 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	curve_info[ 7 ] = 0.0f;
 
 	actor_p->set_viseme_blend_curve( viseme, startAt, 1.0f, curve_info, 4, 2 );
+#else
+	float dur = endAt - startAt;
+	actor_p->set_viseme_trapezoid( viseme, startAt, 1.0f, dur, rampin, rampout );
+#endif
 
 #else
 	ostringstream start_cmd;

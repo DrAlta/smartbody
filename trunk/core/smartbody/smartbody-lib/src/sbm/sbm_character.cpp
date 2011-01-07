@@ -936,13 +936,17 @@ void prune_schedule( SbmCharacter*   actor,
 					} else {
 						motion_ct = anim_source;
 					}
-				} else if( anim_ct_type == MeCtPose::type_name ) {
+				} 
+				else 
+				if( anim_ct_type == MeCtPose::type_name ) {
 					if( pose_ct ) {
 						in_use = false;
 					} else {
 						pose_ct = (MeCtPose*)anim_source;
 					}
-				} else if( anim_ct_type == MeCtChannelWriter::TYPE ) {
+				} 
+				else 
+				if( ( anim_ct_type == MeCtChannelWriter::TYPE )||( anim_ct_type == MeCtCurveWriter::TYPE ) ) {
 #if 1
 					const SkChannelArray& ct_channels = anim_source->controller_channels();
 					vector<int> new_channels;  // list of indices to channels in use
@@ -1624,6 +1628,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		else
 		{
 			set_viseme_blend_curve( viseme, mcu_p->time, weight, curveInfo, numKeys, numKeyParams );
+//			set_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams, 0.1f, 0.1f );
 			delete [] curveInfo;
 		}
 		return CMD_SUCCESS;

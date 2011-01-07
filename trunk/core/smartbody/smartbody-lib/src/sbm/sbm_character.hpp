@@ -214,7 +214,7 @@ public:
 		float* curve_info, int num_keys, int num_key_params, 
 		float ramp_in, float ramp_out 
 	);
-	void SbmCharacter::set_viseme_trapezoid( 
+	void set_viseme_trapezoid( 
 		const char* viseme,
 		double start_time,
 		float weight,
