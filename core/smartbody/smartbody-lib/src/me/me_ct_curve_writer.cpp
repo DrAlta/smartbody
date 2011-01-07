@@ -48,7 +48,7 @@ void MeCtCurveWriter::init( SkChannelArray& channels )	{
 		_local_ch_to_buffer[i] = index;
 		int chan_size = SkChannel::size( _channels.type( i ) );
 		if( chan_size > 1 ) {
-			// ERROR !!!
+			LOG( "MeCtCurveWriter::init ERR: channel '%s' not a scalar", _channels.name( i ) );
 		}
 		index += chan_size;
 	}
@@ -150,7 +150,9 @@ bool MeCtCurveWriter::controller_evaluate( double time, MeFrameData& frame )	{
 					}
 				}
 				else	{ // within bounds
-					frame_buffer[ frame_buffer_index ] = (float)curve_arr[ buff_index ].evaluate( time );
+					float val = (float)curve_arr[ buff_index ].evaluate( time );
+//	printf( "curve bound: %f\n", val );
+					frame_buffer[ frame_buffer_index ] = val;
 					write_once_arr[ i ] = false;
 				}
 			}

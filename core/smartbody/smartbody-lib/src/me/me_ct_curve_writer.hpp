@@ -49,8 +49,17 @@ class MeCtCurveWriter : public MeController {
 			left_bound_mode = left_bound;
 			right_bound_mode = right_bound;
 			write_once = at_least_once;
+			write_once_arr = NULL;
 		}
 		~MeCtCurveWriter( void )	{
+			if( curve_arr ) {
+				delete [] curve_arr;
+				curve_arr = NULL;
+			}
+			if( write_once_arr ) {
+				delete [] write_once_arr;
+				write_once_arr = NULL;
+			}
 		}
 	
 		void init( SkChannelArray& channels );

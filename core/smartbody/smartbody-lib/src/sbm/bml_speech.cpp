@@ -593,12 +593,18 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 			else
 			{
 #if ENABLE_DIRECT_VISEME_SCHEDULE
+
 				int n = v->getNumKeys();
 				float *curve_info = new float[ 2 * n ];
 				srArgBuffer curve_string( v->getCurveInfo() );
 				curve_string.read_float_vect( curve_info, 2 * n );
+#if 0
 				actor_p->set_viseme_blend_curve( v->id(), mcu->time, 1.0f, curve_info, n, 2 );
 				delete [] curve_info;
+#else
+				actor_p->set_viseme_curve( v->id(), mcu->time + startAt, curve_info, n, 2, 0.1f, 0.1f );
+#endif
+
 #else
 				command.str( "" );
 				command << "char " << actor_id << " viseme " << v->id() << " curve " << v->getNumKeys() << ' ' << v->getCurveInfo();
