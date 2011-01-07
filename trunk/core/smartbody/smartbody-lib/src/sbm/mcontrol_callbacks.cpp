@@ -191,6 +191,12 @@ void mcu_preprocess_sequence( srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p, mcuCBHandl
 		srCmdSeq *inline_seq_p = NULL;
 
 		char *tok = args.read_token();
+		if( strcmp( tok, "mediapath" ) == 0 )	{
+			mcu_mediapath_func( args, mcu_p );
+			delete [] cmd;
+			cmd = NULL;
+		}
+		else
 		if( strcmp( tok, "path" ) == 0 )	{
 			mcu_filepath_func( args, mcu_p );
 			delete [] cmd;
@@ -265,7 +271,7 @@ int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	if( mcu_p )	{
 		char *seq_name = args.read_token();
 		char *seq_cmd = args.read_token();
-		std::cout << "SEQUENCE LOADED: " << seq_name << " " << seq_cmd << std::endl;
+		//std::cout << "SEQUENCE LOADED: " << seq_name << " " << seq_cmd << std::endl;
 
 		if( ( strcmp( seq_cmd, "begin" ) == 0 )||( strcmp( seq_cmd, EMPTY_STRING ) == 0 ) )	{
 			int ret = begin_sequence( seq_name, mcu_p );
@@ -2173,12 +2179,18 @@ int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string cha
 		switch( side ) {
 			case UNIFIED:
 				au = new AUMotion( motion );
+				au->reset_type();
+				au->set_bilateral();
 				break;
 			case LEFT:
 				au = new AUMotion( motion, NULL );
+				au->reset_type();
+				au->set_left();
 				break;
 			case RIGHT:
 				au = new AUMotion( NULL, motion );
+				au->reset_type();
+				au->set_right();
 				break;
 			default:
 				// Invalid code.  Throw assert?
@@ -2190,19 +2202,43 @@ int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string cha
 		au = pos->second;  // value half of std::pair
 		switch( side ) {
 			case UNIFIED:
-				if( au->left || au->right )
+				if( au->is_left() || au->is_right() )
 					LOG("WARNING: Overwritting au #%d", unit);
 				au->set( motion );
+				au->reset_type();
+				au->set_bilateral();
 				break;
 			case LEFT:
-				if( au->left )
+				if( au->is_left() || au->is_bilateral())
 					LOG("WARNING: Overwritting au #%d left", unit);
 				au->set( motion, au->right );
+				if (au->is_right())
+				{
+					au->reset_type();
+					au->set_left();
+					au->set_right();
+				}
+				else if (au->is_bilateral())
+				{
+					au->reset_type();
+					au->set_left();
+				}
 				break;
 			case RIGHT:
-				if( au->right )
+				if( au->is_right() )
 					LOG("WARNING: Overwritting au #%d right", unit);
 				au->set( au->left, motion );
+				if (au->is_left())
+				{
+					au->reset_type();
+					au->set_left();
+					au->set_right();
+				}
+				else if (au->is_bilateral())
+				{
+					au->reset_type();
+					au->set_right();
+				}
 				break;
 			default:
 				// Invalid code.  Throw assert?

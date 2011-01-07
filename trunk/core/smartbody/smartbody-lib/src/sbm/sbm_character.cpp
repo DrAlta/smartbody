@@ -314,6 +314,9 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 	eyelid_reg_ct_p = new MeCtEyeLidRegulator();
 	eyelid_reg_ct_p->ref();
+	if (!face_neutral)
+		eyelid_reg_ct_p->set_use_blink_viseme(true);
+
 	eyelid_reg_ct_p->init(true);
 	eyelid_reg_ct_p->set_upper_range( -30.0, 30.0 );
 	eyelid_reg_ct_p->set_close_angle( 30.0 );
@@ -579,54 +582,52 @@ int SbmCharacter::init_skeleton() {
 			id << i->first;
 			AUMotionPtr au( i->second );
 
-			if( au->is_bilateral() ) {
-				if( au->left ) {
-					string name = "au_";
+			if( au->is_left() ) {
+				string name = "au_";
+				//name += id;
+				name += id.str();
+				name += "_left";
+
+				// Create the AU control channel
+				add_face_channel( name, wo_index );
+				if (viseme_channel_count == 0)	viseme_start_name = name;
+				viseme_channel_count ++;
+
+				// TODO: Add to au_channel_map (?)
+
+				// Register control channel with face controller
+				if( face_ct )
+					face_ct->add_key( name.c_str(), au->left.get() );
+			}
+			if( au->is_right()) {
+				string name = "au_";
+				//name += id;
+				name += id.str();
+				name += "_right";
+
+				// Create the AU control channel
+				add_face_channel( name, wo_index );
+				if (viseme_channel_count == 0)	viseme_start_name = name;
+				viseme_channel_count ++;
+
+				// Register control channel with face controller
+				if( face_ct )
+					face_ct->add_key( name.c_str(), au->right.get() );
+			}
+			if (au->is_bilateral())
+			{
+				string name = "au_";
 					//name += id;
 					name += id.str();
-					name += "_left";
 
 					// Create the AU control channel
 					add_face_channel( name, wo_index );
 					if (viseme_channel_count == 0)	viseme_start_name = name;
 					viseme_channel_count ++;
-
-					// TODO: Add to au_channel_map (?)
 
 					// Register control channel with face controller
 					if( face_ct )
 						face_ct->add_key( name.c_str(), au->left.get() );
-				}
-				if( au->right ) {
-					string name = "au_";
-					//name += id;
-					name += id.str();
-					name += "_right";
-
-					// Create the AU control channel
-					add_face_channel( name, wo_index );
-					if (viseme_channel_count == 0)	viseme_start_name = name;
-					viseme_channel_count ++;
-
-					// Register control channel with face controller
-					if( face_ct )
-						face_ct->add_key( name.c_str(), au->right.get() );
-				}
-			} else {
-				if( au->left ) {
-					string name = "au_";
-					//name += id;
-					name += id.str();
-
-					// Create the AU control channel
-					add_face_channel( name, wo_index );
-					if (viseme_channel_count == 0)	viseme_start_name = name;
-					viseme_channel_count ++;
-
-					// Register control channel with face controller
-					if( face_ct )
-						face_ct->add_key( name.c_str(), au->left.get() );
-				}
 			}
 		}
 
@@ -949,7 +950,7 @@ void prune_schedule( SbmCharacter*   actor,
 				if( ( anim_ct_type == MeCtChannelWriter::TYPE )||( anim_ct_type == MeCtCurveWriter::TYPE ) ) {
 #if 1
 					const SkChannelArray& ct_channels = anim_source->controller_channels();
-					vector<int> new_channels;  // list of indices to channels in use
+//					vector<int> new_channels;  // list of indices to channels in use
 					bool foundChannelMatch = false;
 					const int total_channels = ct_channels.size();
 					for( int i=0; i<total_channels; ++i ) {

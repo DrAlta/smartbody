@@ -602,7 +602,8 @@ void BmlRequest::cleanup( Processor* bp, mcuCBHandle* mcu )
 		command += actorId;
 		command += " prune";
 
-		if( mcu->execute_later( command.c_str(), 1 ) != CMD_SUCCESS ) {
+		if( mcu->execute_later( command.c_str(), 0 ) != CMD_SUCCESS ) {
+//		if( mcu->execute_later( command.c_str(), 1 ) != CMD_SUCCESS ) {
 			std::stringstream strstr;
 			strstr << "WARNING: BML::BmlRequest::cleanup(..): msgId=\""<<msgId<<"\": "<<
 				"Failed to execute_later \""<<command<<"\".";

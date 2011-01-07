@@ -44,5 +44,6 @@
 0	set face viseme Th	
 0	set face viseme Z	
 0	set face viseme BMP	
+0	set face viseme blink	
 
 0   echo === Complete: data/sbm-common/scripts/common-init-face.seq

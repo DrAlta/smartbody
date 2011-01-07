@@ -49,7 +49,11 @@ public:
 	ActionUnit( Asset unified ) :
 		left( unified ),
 		right( unified )
-	{}
+	{
+		m_isLeft = false;
+		m_isRight = false;
+		m_isBilateral = true;
+	}
 
 	ActionUnit( Asset left, Asset right ) :
 		left( left ),
@@ -57,7 +61,33 @@ public:
 	{}
 
 	bool is_bilateral() const {
-		return ( left != right );
+		return m_isBilateral;
+	}
+
+	void reset_type() {
+		m_isLeft = false;
+		m_isRight = false;
+		 m_isBilateral = false;
+	}
+
+	void set_left() {
+		m_isLeft = true;
+	}
+
+	void set_bilateral() {
+		m_isBilateral = true;
+	}
+
+	void set_right() {
+		m_isRight = true;
+	}
+
+	bool is_left() const {
+		return m_isLeft;
+	}
+
+	bool is_right() const {
+		return m_isRight;
 	}
 
 	void set( Asset motion ) {
@@ -68,6 +98,11 @@ public:
 		this->left	= left;
 		this->right	= right;
 	}
+
+	protected:
+		bool m_isLeft;
+		bool m_isRight;
+		bool m_isBilateral;
 };
 
 

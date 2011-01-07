@@ -172,13 +172,20 @@ FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
 
 	char buffer[ MAX_FILENAME_LEN ];
 	char label[ MAX_FILENAME_LEN ];
-	sprintf( label, "%s", seq_name );
+
+	// add the .seq extension if necessary
+	std::string candidateSeqName = seq_name;
+	if (candidateSeqName.find(".seq") == std::string::npos)
+	{
+		candidateSeqName.append(".seq");
+	}
+	sprintf( label, "%s", candidateSeqName.c_str());
 	// current path containing .exe
 	char CurrentPath[_MAX_PATH];
 	_getcwd(CurrentPath, _MAX_PATH);
 
 	seq_paths.reset();
-	std::string filename = seq_paths.next_filename( buffer, label );
+	std::string filename = seq_paths.next_filename( buffer, candidateSeqName.c_str() );
 	//filename = mcn_return_full_filename_func( CurrentPath, filename );
 	
 	while(filename.size() > 0)	{
@@ -194,14 +201,14 @@ FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
 			
 			break;
 		}
-		filename = seq_paths.next_filename( buffer, label );
+		filename = seq_paths.next_filename( buffer, candidateSeqName.c_str() );
 		//filename = mcn_return_full_filename_func( CurrentPath, filename );
 	}
 	if( file_p == NULL ) {
 		// Could not find the file as named.  Perhap it excludes the extension	
 		sprintf( label, "%s.seq", seq_name );
 		seq_paths.reset();
-		filename = seq_paths.next_filename( buffer, label );
+		filename = seq_paths.next_filename( buffer, candidateSeqName.c_str() );
 		//filename = mcn_return_full_filename_func( CurrentPath, filename );
 		while( filename.size() > 0 )	{
 			if( ( file_p = fopen( filename.c_str(), "r" ) ) != NULL ) {
@@ -214,7 +221,7 @@ FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
 				resource_manager->addResource(fres);
 				break;
 			}
-			filename = seq_paths.next_filename( buffer, label );
+			filename = seq_paths.next_filename( buffer, candidateSeqName.c_str() );
 			//filename = mcn_return_full_filename_func( CurrentPath, filename );
 		}
 	}
@@ -623,13 +630,13 @@ srCmdSeq* mcuCBHandle::lookup_seq( const char* seq_name ) {
 			fclose( file_p );
 
 			if( err != CMD_SUCCESS ) {
-				fprintf( stderr, "ERROR: mcuCBHandle::lookup_seq(..): '%s' PARSE FAILED\n", seq_name ); 
+				LOG("ERROR: mcuCBHandle::lookup_seq(..): '%s' PARSE FAILED\n", seq_name ); 
 
 				delete seq_p;
 				seq_p = NULL;
 			}
 		} else {
-			fprintf( stderr, "ERROR: mcuCBHandle::lookup_seq(..): '%s' NOT FOUND\n", seq_name ); 
+			LOG("ERROR: mcuCBHandle::lookup_seq(..): '%s' NOT FOUND\n", seq_name ); 
 		}
 	}
 	

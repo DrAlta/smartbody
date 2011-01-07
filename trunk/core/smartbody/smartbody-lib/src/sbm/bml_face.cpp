@@ -46,7 +46,8 @@ using namespace xml_utils;
 
 
 BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
-    const XMLCh* tag      = elem->getTagName();
+
+	const XMLCh* tag      = elem->getTagName();
 
 	std::string localId = "";
 	const XMLCh* id = elem->getAttribute( ATTR_ID);
