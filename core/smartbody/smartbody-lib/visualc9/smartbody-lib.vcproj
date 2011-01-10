@@ -925,6 +925,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\sr_synch_points.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\text_speech.cpp"
 				>
 			</File>

@@ -36,7 +36,11 @@ class MeCtCurveWriter : public MeController {
 			BOUNDARY_CROP,				// do not write
 			BOUNDARY_CLAMP, 			// write boundary value
 			BOUNDARY_EXTRAPOLATE,		// extrapolate boundary slope
-			BOUNDARY_REPEAT 			// loop curve
+			BOUNDARY_REPEAT, 			// loop curve
+			CROP = BOUNDARY_CROP,
+			CLAMP = BOUNDARY_CLAMP,
+			EXTRAPOLATE = BOUNDARY_EXTRAPOLATE,
+			REPEAT = BOUNDARY_REPEAT
 		};
 
 		MeCtCurveWriter( 

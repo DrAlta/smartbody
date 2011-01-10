@@ -604,10 +604,10 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 				curve_string.read_float_vect( curve_info, 2 * n );
 #if 0
 				actor_p->set_viseme_blend_curve( v->id(), mcu->time, 1.0f, curve_info, n, 2 );
-				delete [] curve_info;
 #else
 				actor_p->set_viseme_curve( v->id(), mcu->time + startAt, curve_info, n, 2, 0.1f, 0.1f );
 #endif
+				delete [] curve_info;
 
 #else
 				command.str( "" );
