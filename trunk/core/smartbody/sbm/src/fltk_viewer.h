@@ -31,7 +31,10 @@
 # include <fltk/GlWindow.H>
 # include <sr/sr_viewer.h>
 #include <fltk/Input.h>
+#include <fltk/compat/FL/Fl_Menu_Item.H>
 # include <sr/sr_color.h>
+
+#include "ObjectManipulationHandle.h"
 
 
 class SrQuat;
@@ -125,6 +128,12 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdCharacterShowAxis,
 				   CmdNoPawns,
 				   CmdPawnShowAsSpheres,
+				   CmdCreatePawn,
+				   CmdGazeOnTargetType1,
+				   CmdGazeOnTargetType2,
+				   CmdGazeOnTargetType3,
+				   CmdGazeOnTargetType4,
+				   CmdRemoveAllGazeTarget,
 				   CmdNoTerrain,
 				   CmdTerrainWireframe,
 				   CmdTerrain,
@@ -148,6 +157,9 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
    private : // internal data
 
     FltkViewerData *_data;
+	
+
+	ObjectManipulationHandle _objManipulator; // a hack for testing. 
 
  private:
 	 fltk::Input* off_height_window;
@@ -177,7 +189,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
     void show_menu ();
 
     /*! Activates an option available from the right button mouse menu of the viewer. */
-    void menu_cmd ( MenuCmd c );
+    void menu_cmd ( MenuCmd c, const char* label );
 
     /*! Returns true if the cmd is currently activated. */
     bool menu_cmd_activated ( MenuCmd c );
@@ -248,6 +260,9 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
     /*! Applies an event action to the scene */
     virtual int handle_scene_event ( const SrEvent &e );
 
+    /*! Events related to interactive object movement, rotation, etc */
+	virtual int handle_object_manipulation( const SrEvent& e);
+
    /*! All keyboard events are passed to this method. The SrViewer
        implementation checks if crtl+shift+m is pressed to display
        the mouse menu, crtl+shift+x to exit the application, 
@@ -255,7 +270,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
        otherwise it passes the event to the scene graph. */
     virtual int handle_keyboard ( const SrEvent &e );
 
-	void initGridList();
+	void initGridList();	
 	void drawGrid();
 	void drawEyeBeams();
 	void drawEyeLids();
@@ -280,6 +295,11 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	virtual void label_viewer(const char* str);
 	virtual void show_viewer();
 	virtual void hide_viewer();
+protected:
+	void create_pawn();
+	void set_gaze_target(int itype, const char* targetname);	
+	void update_gaze_submenus();
+	void create_popup_menus();
  };
 
 

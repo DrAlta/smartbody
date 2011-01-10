@@ -145,11 +145,11 @@ void GlChartViewCoordinate::Draw()
 SrVec2 GlChartViewCoordinate::GetStringSize(char* str)
 {
 	SrVec2 size;
-	size.y = (float)label.GetCharHeight(str[0]);
+	size.y = (float)label.GetCharHeightGL(str[0]);
 	int length = strlen(str);
 	for(int i = 0; i < length; ++i)
 	{
-		size.x += (float)label.GetCharWidthA(str[i]);
+		size.x += (float)label.GetCharWidthGL(str[i]);
 	}
 	return size;
 }
@@ -160,7 +160,7 @@ int GlChartViewCoordinate::GetStringWidth(char* str)
 	int width = 0;
 	for(int i = 0; i < length; ++i)
 	{
-		width += label.GetCharWidthA(str[i]);
+		width += label.GetCharWidthGL(str[i]);
 	}
 	return width;
 }

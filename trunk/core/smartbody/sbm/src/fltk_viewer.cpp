@@ -25,9 +25,10 @@
 
 # include <fltk/events.h>
 # include <fltk/gl.h>
+# include <GL/glu.h>
 # include <fltk/run.h>
 # include <fltk/visual.h>
-# include <fltk/compat/FL/Fl_Menu_Item.H>
+//# include <fltk/compat/FL/Fl_Menu_Item.H>
 # include <fltk/draw.h>
 # include <fltk/PopupMenu.h>
 # include <fltk/ColorChooser.H>
@@ -121,13 +122,29 @@ static void menucb ( fltk::Widget* o, void* v )
 		 widget = widget->parent();
 	 FltkViewer* viewer = dynamic_cast<FltkViewer*>(widget);
 	 if (viewer)
-		 viewer->menu_cmd((FltkViewer::MenuCmd)(int)v);
+		 viewer->menu_cmd((FltkViewer::MenuCmd)(int)v,o->label());
  }
 
 # define MCB     ((fltk::Callback*)menucb)
 # define CMD(c)  ((void*)FltkViewer::c)
+const int NUM_GAZE_TYPES = 4;
 
-static Fl_Menu_Item MenuTable[] =
+static char gaze_on_target_menu_name[] = {"&gaze"};
+static char gaze_type_name[NUM_GAZE_TYPES][40] = {"&create EYE gaze","&create EYE NECK gaze","&create EYE CHEST gaze","&create EYE BACK gaze" }; 
+static SrArray<Fl_Menu_Item> gaze_submenus[NUM_GAZE_TYPES];
+
+Fl_Menu_Item GazeMenuTable[] = 
+{
+	{ gaze_type_name[0],   0, MCB, 0 },			
+    { gaze_type_name[1],   0, MCB, 0 },
+    { gaze_type_name[2],   0, MCB, 0 },
+	{ gaze_type_name[3],   0, MCB, 0 },
+	{ "&remove all gazes",   0, MCB, CMD(CmdRemoveAllGazeTarget) },
+	{ 0 }
+};
+
+
+Fl_Menu_Item MenuTable[] =
  { 
    { "&help",       0, MCB, CMD(CmdHelp) },
    { "&view all",   0, MCB, CMD(CmdViewAll) },
@@ -153,9 +170,11 @@ static Fl_Menu_Item MenuTable[] =
          { "&axis",   0, MCB, CMD(CmdCharacterShowAxis),   FL_MENU_RADIO },
          { 0 },
 	{ "&pawns", 0, 0, 0, FL_SUBMENU },
+		 { "&create pawn", 0, MCB, CMD(CmdCreatePawn), FL_MENU_DIVIDER},		 
          { "&no pawns shown", 0, MCB, CMD(CmdNoPawns), FL_MENU_RADIO },
-         { "&show pawns as spheres", 0, MCB, CMD(CmdPawnShowAsSpheres),   FL_MENU_RADIO },
+         { "&show pawns as spheres", 0, MCB, CMD(CmdPawnShowAsSpheres),   FL_MENU_RADIO },        
          { 0 },
+    { gaze_on_target_menu_name, 0, 0, GazeMenuTable, FL_SUBMENU_POINTER },         
     { "p&references", 0, 0, 0, FL_SUBMENU },
          { "&axis",         0, MCB, CMD(CmdAxis),        FL_MENU_TOGGLE },
          { "b&ounding box", 0, MCB, CMD(CmdBoundingBox), FL_MENU_TOGGLE },
@@ -191,6 +210,42 @@ static Fl_Menu_Item MenuTable[] =
          { 0 },
    { 0 }
  };
+
+
+static void get_pawn_submenus(void* user_data,SrArray<Fl_Menu_Item>& menu_list)
+{
+	SrArray<SbmPawn*> pawn_list;
+	ObjectManipulationHandle::get_pawn_list(pawn_list);
+	for (int i=0;i<pawn_list.size();i++)
+	{
+		SbmPawn* pawn = pawn_list[i];
+		//printf("pawn name = %s\n",pawn->name);
+		Fl_Menu_Item temp_pawn = { pawn->name, 0, MCB, user_data } ;
+		menu_list.push(temp_pawn);		
+	}
+
+	Fl_Menu_Item temp = {0};
+	menu_list.push(temp);
+}
+
+
+void FltkViewer::update_gaze_submenus()
+{
+	for (int i=0;i<NUM_GAZE_TYPES;i++)
+	{
+		char menu_label[256];
+		Fl_Menu_Item& gaze_menu = GazeMenuTable[i];	
+		gaze_menu.flags |= FL_SUBMENU_POINTER;
+		SrArray<Fl_Menu_Item>& menu_list = gaze_submenus[i];
+		menu_list = SrArray<Fl_Menu_Item>();
+		int iCmd = FltkViewer::CmdGazeOnTargetType1+i;
+		Fl_Menu_Item select_pawn = { "selected pawn",   0, MCB,((void*)iCmd)  };
+		menu_list.push(select_pawn);			
+		get_pawn_submenus(select_pawn.user_data(),menu_list);
+		const Fl_Menu_Item* pmenu = (const Fl_Menu_Item *)menu_list;
+		gaze_menu.user_data((void*)pmenu);				
+	}
+}
 
 # undef CMD
 # undef MCB
@@ -331,14 +386,8 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->sceneaxis = new SrSnLines;
 
    user_data ( (void*)(this) ); // to be retrieved by the menu callback
-   
-   begin();
-   _data->menubut = new fltk::PopupMenu(0,0,50,50);
-   _data->menubut->type(fltk::PopupMenu::POPUP23);
-   _data->menubut->menu(MenuTable);
-   _data->menubut->textsize(12);
-   _data->helpwin = make_help_window ();
-   end();
+
+   create_popup_menus();   
 
    gridColor[0] = 0.5;
    gridColor[1] = 0.5;
@@ -356,6 +405,18 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    init_foot_print();
 }
 
+void FltkViewer::create_popup_menus()
+{
+	update_gaze_submenus();   
+	begin();
+    _data->menubut = new fltk::PopupMenu(0,0,50,50);
+    _data->menubut->type(fltk::PopupMenu::POPUP23);
+    _data->menubut->menu(MenuTable);   
+    _data->menubut->textsize(12);
+    _data->helpwin = make_help_window ();
+    end();
+}
+
 FltkViewer::~FltkViewer ()
  {
    _data->root->unref ();
@@ -363,7 +424,7 @@ FltkViewer::~FltkViewer ()
    delete _data->scenebox;
    delete _data->sceneaxis;
    delete _data;
- }
+}
 
 SrSn *FltkViewer::root ()
  { 
@@ -387,14 +448,15 @@ void FltkViewer::draw_message ( const char* s )
 
 void FltkViewer::show_menu ()
  { 
-	 set_menu_data (_data->rendermode, _data->charactermode, _data->displayaxis,
+	create_popup_menus();
+	set_menu_data (_data->rendermode, _data->charactermode, _data->displayaxis,
                    _data->boundingbox, _data->statistics);
    _data->menubut->popup();
  }
 
-void FltkViewer::menu_cmd ( MenuCmd s )
+void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
  {
-	 bool applyToCharacter = false;
+	 bool applyToCharacter = false; 
 
    switch ( s )
     { case CmdHelp : _data->helpwin->show(); _data->helpwin->active(); break;
@@ -526,10 +588,23 @@ void FltkViewer::menu_cmd ( MenuCmd s )
 						_data->showaxis = true;
 						applyToCharacter = true;
 						break;
+	  case CmdCreatePawn : 
+						create_pawn();						
+						break;
 	  case CmdNoPawns : _data->pawnmode = ModeNoPawns;
                        break;
 	  case CmdPawnShowAsSpheres  : _data->pawnmode = ModePawnShowAsSpheres;             
                        break;
+	  case CmdGazeOnTargetType1:	
+	  case CmdGazeOnTargetType2:
+	  case CmdGazeOnTargetType3:
+	  case CmdGazeOnTargetType4:
+					   set_gaze_target(s-CmdGazeOnTargetType1,label);
+					   break;
+	  case CmdRemoveAllGazeTarget:
+		               set_gaze_target(-1,NULL);
+					   break;
+      
     }
 	
 	if (applyToCharacter)
@@ -550,6 +625,8 @@ void FltkViewer::menu_cmd ( MenuCmd s )
 
    render ();
  }
+
+
 
 bool FltkViewer::menu_cmd_activated ( MenuCmd c )
  {
@@ -797,6 +874,9 @@ void MakeShadowMatrix( GLfloat points[3][3], GLfloat light[4], GLfloat matrix[4]
 
 /////////////////////////////////////////////////////////////////////////////////////
 
+
+/////////////////////////////////////////////////////////////////////////////////////
+
    
 void FltkViewer::draw() 
  {
@@ -957,6 +1037,10 @@ void FltkViewer::draw()
 	drawDynamics();
 	drawLocomotion();
 	drawPawns();
+
+	//_posControl.Draw();
+	_objManipulator.draw();
+
 
 	_data->fcounter.stop();
 
@@ -1442,20 +1526,29 @@ int FltkViewer::handle ( int event )
    SrEvent &e = _data->event;
    e.type = SrEvent::None;
 
-   translate_keyboard_state();
-
+   translate_keyboard_state();   
+  
    switch ( event )
    { case fltk::PUSH:
        { //SR_TRACE1 ( "Mouse Push : but="<<fltk::event_button()<<" ("<<fltk::event_x()<<", "<<fltk::event_y()<<")" <<" Ctrl:"<<fltk::event_state(FL_CTRL) );
          translate_event ( e, SrEvent::Push, w(), h(), this );
          if ( POPUP_MENU(e) ) { show_menu(); e.type=SrEvent::None; }
+		 // process picking
+		 //printf("Mouse Push\n");
+		
+		
           
        } break;
 
       case fltk::RELEASE:
         //SR_TRACE1 ( "Mouse Release : ("<<fltk::event_x()<<", "<<fltk::event_y()<<") buts: "
-        //             <<(fltk::event_state(fltk::BUTTON1)?1:0)<<" "<<(fltk::event_state(fltk::BUTTON2)?1:0) );
+         //            <<(fltk::event_state(fltk::BUTTON1)?1:0)<<" "<<(fltk::event_state(fltk::BUTTON2)?1:0) );
         translate_event ( e, SrEvent::Release, w(), h(), this);
+		// process picking
+		//if (!e.button1)	
+		//printf("Mouse Release\n");
+		
+		
         break;
 
       case fltk::MOVE:
@@ -1467,6 +1560,8 @@ int FltkViewer::handle ( int event )
         //SR_TRACE2 ( "Mouse Drag : ("<<fltk::event_x()<<", "<<fltk::event_y()<<") buts: "
         //             <<(fltk::event_state(FL_BUTTON1)?1:0)<<" "<<(fltk::event_state(FL_BUTTON2)?1:0) );
         translate_event ( e, SrEvent::Drag, w(), h(), this );
+		
+		
         break;
 
       case fltk::SHORTCUT: // not sure the relationship between a shortcut and keyboard event...
@@ -1577,6 +1672,12 @@ int FltkViewer::handle_event ( const SrEvent &e )
 
       if ( res ) return res;
     }
+   
+   if (e.ctrl && e.mouse_event() )
+   {
+	   res = handle_object_manipulation ( e );
+	   if ( res ) return res;
+   }
 
    if ( e.mouse_event() ) return handle_scene_event ( e );
 
@@ -1587,6 +1688,95 @@ int FltkViewer::handle_event ( const SrEvent &e )
 
    return res; // this point should not be reached
  }
+
+//== Object Manipulation event =======================================================
+
+int FltkViewer::handle_object_manipulation( const SrEvent& e)
+{
+	if (e.type==SrEvent::Push)
+	 {
+		 if (e.button1)
+		 {
+			 _objManipulator.picking(e.mouse.x,e.mouse.y, _data->camera);
+			 return 1;
+		 }
+	 }
+	else if (e.type==SrEvent::Drag)
+	{
+		if (e.button1)// && _posControl.dragging)
+		{			
+			_objManipulator.drag(_data->camera,e.lmouse.x,e.lmouse.y,e.mouse.x,e.mouse.y);			
+		}
+	}
+	else if (e.type==SrEvent::Release)
+	{
+		if (e.button == 1)
+		{			
+			//_posControl.dragging = false;
+		}
+	}
+	return 0;
+}
+
+
+
+void FltkViewer::create_pawn()
+{
+	const char* pawn_name = fltk::input("Input Pawn Name","foo");
+	printf("Pawn Name = %s\n",pawn_name);
+	if (!pawn_name) // no name is input
+		return;
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	char cmd_pawn[256];
+	sprintf(cmd_pawn,"pawn %s init",pawn_name);
+	mcu.execute(cmd_pawn);
+}
+
+void FltkViewer::set_gaze_target(int itype, const char* label)
+{
+	char exe_cmd[256];
+	SbmCharacter* actor = NULL;
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.character_map.reset();
+	for(int i = 0; i <= char_index; ++i)
+	{
+		actor = mcu.character_map.next();
+		//if (actor)
+		//	sprintf(character, "char %s ", actor->name);
+	}	
+
+	if (actor && itype == -1)
+	{
+		sprintf(exe_cmd,"char %s gazefade out 0",actor->name);	
+		mcu.execute(exe_cmd);
+		return;
+	}
+	
+	SbmPawn* pawn = _objManipulator.get_selected_pawn();
+	
+	static char gaze_type[NUM_GAZE_TYPES][20] = { "EYES", "EYES NECK", "EYES CHEST", "EYES BACK" };
+	//if (actor)
+	//	printf("current char %s ", actor->name);
+
+	if (actor)
+	{
+		char pawn_name[30];
+		if (strcmp(label,"selected pawn")==0)
+		{
+			if (pawn)
+				strcpy(pawn_name,pawn->name);
+			else
+			{
+				// handle user error : call set target command without selecting a pawn target.
+			}
+		}
+		else
+			strcpy(pawn_name,label);
+
+		sprintf(exe_cmd,"bml char %s <gaze target=\"%s\" sbm:joint-range=\"%s\"/>",actor->name,pawn_name,gaze_type[itype]);
+		mcu.execute(exe_cmd);
+	}
+}
 
 //== Examiner ==============================================================
 
@@ -2048,7 +2238,7 @@ void FltkViewer::drawPawns()
 	glDisable(GL_LIGHTING);
 	while ( pawn )
 	{
-		if (!pawn->skeleton_p)
+		if (!pawn->skeleton_p) // wouldn't this will go into inf loop ?
 			continue;
 		pawn->skeleton_p->update_global_matrices();
 		SrArray<SkJoint*>& joints = pawn->skeleton_p->get_joint_array();
@@ -2066,6 +2256,7 @@ void FltkViewer::drawPawns()
 		sphere.shape().radius = pawnSize;
 		sphere.render_mode(srRenderModeLines);
 		SrGlRenderFuncs::render_sphere(&sphere);
+			
 		glEnd();
 		glPopMatrix();
 		glPopMatrix();
