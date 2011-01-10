@@ -962,7 +962,7 @@ void prune_schedule( SbmCharacter*   actor,
 						}
 					}
 
-					if(foundChannelMatch)
+					if(foundChannelMatch && anim_ct_type == MeCtChannelWriter::TYPE)
 					{
 						in_use = false;
 					}
@@ -1130,9 +1130,8 @@ const std::string& SbmCharacter::get_voice_code_backup() const
 	return voice_code_backup; //if voice isn't NULL-- no error message; just returns the string
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void SbmCharacter::set_viseme_curve(
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+void SbmCharacter::schedule_viseme_curve(
 	const char* viseme, 
 	double start_time, 
 	float* curve_info, 
@@ -1184,7 +1183,7 @@ void SbmCharacter::set_viseme_curve(
 	}
 }
 
-void SbmCharacter::set_viseme_trapezoid( 
+void SbmCharacter::schedule_viseme_trapezoid( 
 	const char* viseme,
 	double start_time,
 	float weight,
@@ -1200,10 +1199,10 @@ void SbmCharacter::set_viseme_trapezoid(
 	curve_info[ 1 ] = weight;
 	curve_info[ 2 ] = duration;
 	curve_info[ 3 ] = weight;
-	set_viseme_curve( viseme, start_time, curve_info, 1, 2, ramp_in, ramp_out );
+	schedule_viseme_curve( viseme, start_time, curve_info, 2, 2, ramp_in, ramp_out );
 }
 
-void SbmCharacter::set_viseme_blend_curve(
+void SbmCharacter::schedule_viseme_blend_curve(
 	const char* viseme, 
 	double start_time, 
 	float weight,
@@ -1236,6 +1235,21 @@ void SbmCharacter::set_viseme_blend_curve(
 			SkChannelArray channels;
 			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
 
+			MeCtCurveWriter* ct_p = new MeCtCurveWriter(); // CROP, CROP, true
+			ct_p->name( ct_name.str().c_str() );
+			ct_p->init( channels );
+
+			for (int i = 0; i < num_keys; i++)	{
+				float t = curve_info[ i * num_key_params + 0 ];
+				float w = curve_info[ i * num_key_params + 1 ];
+				ct_p->insert_key( 0, t, w );
+			}
+			
+			double ct_dur = ct_p->controller_duration();
+			double tin = start_time + timeDelay;
+			double tout = tin + ct_dur;
+			head_sched_p->schedule( ct_p, tin, tout, 0, 0 );
+			/*
 			MeCtChannelWriter* ct_p = new MeCtChannelWriter();
 			ct_p->name( ct_name.str().c_str() );
 			ct_p->init( channels, true );
@@ -1245,11 +1259,12 @@ void SbmCharacter::set_viseme_blend_curve(
 			ct_p->set_data(value);
 
 			head_sched_p->schedule( ct_p, start_time + timeDelay, curve_info, num_keys, num_key_params );
+			*/
 		}
 	}
 }
 
-void SbmCharacter::set_viseme_blend_ramp( 
+void SbmCharacter::schedule_viseme_blend_ramp( 
 	const char* viseme,
 	double start_time,
 	float weight,
@@ -1261,7 +1276,7 @@ void SbmCharacter::set_viseme_blend_ramp(
 		0.0f, 1.0f
 	};
 	curve_info[ 2 ] = rampin_duration;
-	set_viseme_blend_curve( viseme, start_time, weight, curve_info, 2, 2 );
+	schedule_viseme_blend_curve( viseme, start_time, weight, curve_info, 2, 2 );
 }
 
 void SbmCharacter::forward_visemes( double curTime )
@@ -1565,19 +1580,15 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		return( prune_controller_tree( mcu_p ) );
 	}
 	else 
-	if( cmd == "viseme" ) {
-	//  1) the time delay function is used to postpone viseme curve which now is a little bit mismatch with the sound
-	//	2) need to modify the curve slope in and out later, now they are always 0
- 
+	if( cmd == "viseme" ) { 
 		char* viseme = args.read_token();
 		char* next = args.read_token();
-		float* curveInfo = NULL;
-		float weight = 0.0f;
-		float rampin_duration = 0.0;
-		int numKeys = 0;
-		int numKeyParams = 0;
+//		float* curveInfo = NULL;
+//		float weight = 0.0f;
+//		float rampin_duration = 0.0;
+//		int numKeys = 0;
+//		int numKeyParams = 0;
 
-		// viseme
 		if( _strcmpi( viseme, "curveon" ) == 0 )
 		{
 			set_viseme_curve_mode(true);
@@ -1600,37 +1611,44 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		// keyword next to viseme
 		if( _strcmpi( next, "curve" ) == 0 )
 		{
-			weight = 1.0f;
-			numKeys = args.read_int();
+			int numKeys = args.read_int();
 			if( numKeys <= 0 )	
 			{
 				LOG( "Viseme data is missing" );
 				return CMD_FAILURE;
 			}
 			int num_remaining = args.calc_num_tokens();
-			numKeyParams = num_remaining / numKeys;
+			int numKeyParams = num_remaining / numKeys;
 			if( num_remaining != numKeys * numKeyParams )	{
 				LOG( "Viseme data is malformed" );
 				return CMD_FAILURE;
 			}
-			curveInfo = new float[ num_remaining ];
+			float* curveInfo = new float[ num_remaining ];
 			args.read_float_vect( curveInfo, num_remaining );
-		}
-		else
-		{
-			weight = (float)atof(next);
-			rampin_duration = args.read_float();
-		}
 
-		if( curveInfo == NULL )
+			schedule_viseme_blend_curve( viseme, mcu_p->time, 1.0f, curveInfo, numKeys, numKeyParams );
+			//set_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams, 0.1f, 0.1f );
+			delete [] curveInfo;
+		}
+		else
+		if( _strcmpi( next, "trap" ) == 0 )
 		{
-			set_viseme_blend_ramp( viseme, mcu_p->time, weight, rampin_duration );
+			// trap <weight> <dur> [<ramp-in> <ramp-out>]
+			float weight = args.read_float();
+			float dur = args.read_float();
+			float ramp_in = 0.1f;
+			float ramp_out = 0.1f;
+			if( args.calc_num_tokens() > 0 )
+				ramp_in = args.read_float();
+			if( args.calc_num_tokens() > 0 )
+				ramp_out = args.read_float();
+			schedule_viseme_trapezoid( viseme, mcu_p->time, weight, dur, ramp_in, ramp_out );
 		}
 		else
 		{
-			set_viseme_blend_curve( viseme, mcu_p->time, weight, curveInfo, numKeys, numKeyParams );
-//			set_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams, 0.1f, 0.1f );
-			delete [] curveInfo;
+			float weight = (float)atof(next);
+			float rampin_duration = args.read_float();
+			schedule_viseme_blend_ramp( viseme, mcu_p->time, weight, rampin_duration );
 		}
 		return CMD_SUCCESS;
 	} 
@@ -1887,6 +1905,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		LOG( "  viseme curveon|curveoff" );
 		LOG( "  viseme timedelay <timedelay>" );
 		LOG( "  viseme <viseme name> <weight> <ramp in>" );
+		LOG( "  viseme <viseme name> trap <weight> <dur> [<ramp-in> [<ramp-out>]]" );
 		LOG( "  viseme <viseme name> curve <number of keys> <curve information>" );
 		LOG( "  viseme curve" );
 		LOG( "  bone" );

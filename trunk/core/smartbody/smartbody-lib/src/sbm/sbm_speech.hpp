@@ -53,19 +53,27 @@ namespace SmartBody {
 		int		_numKeys;
 		std::string	_curveInfo;
 		bool _curveMode;
+		bool _trapezoidMode;
+		float _rampin;
+		float _rampout;
 
 	public:
 		VisemeData( const char * id, float weight, float time )
-			: _id( id ), _weight( weight ), _time( time ), _duration( 0 ), _numKeys( 0 ), _curveInfo( "" ), _curveMode(false)
+			: _id( id ), _weight( weight ), _time( time ), _duration( 0 ),  _rampin(0), _rampout(0), _numKeys( 0 ), _curveInfo( "" ), _curveMode(false), _trapezoidMode(false)
 		{
 		}
 		
 		VisemeData( const char * id, float weight, float time, float duration )
-			: _id( id ), _weight( weight ), _time( time ), _duration( duration ), _numKeys( 0 ), _curveInfo( "" ), _curveMode(false)
+			: _id( id ), _weight( weight ), _time( time ), _duration( duration ), _rampin(0), _rampout(0), _numKeys( 0 ), _curveInfo( "" ), _curveMode(false), _trapezoidMode(false)
 		{
 		}
 
 		VisemeData( const char * id, int numKeys, const char * curveInfo );
+
+		VisemeData( const char * id, float weight, float time, float duration, float rampin, float rampout)
+			: _id( id ), _weight( weight ), _time( time ), _duration( duration ), _rampin(rampin), _rampout(rampout), _numKeys( 0 ), _curveInfo( "" ), _trapezoidMode(true), _curveMode(false)
+		{
+		}
 
 		virtual ~VisemeData()
 		{
@@ -84,6 +92,12 @@ namespace SmartBody {
 		/** Return the blend-in duration of the viseme. */
 		float duration() const { return _duration; }
 
+		/** Return the ramp-in of the viseme. */
+		float rampin() const { return _rampin; }
+
+		/** Return the ramp-out duration of the viseme. */
+		float rampout() const { return _rampout; }
+
 		/** Set the audio relative time to trigger this viseme. */
 		void setTime( float time ) { _time = time; }
 
@@ -98,6 +112,9 @@ namespace SmartBody {
 
 		/** Get the viseme Mode. */
 		bool isCurveMode() {return _curveMode;}
+
+		/** Get the viseme Mode. */
+		bool isTrapezoidMode() {return _trapezoidMode;}
 	};
 
 	/**

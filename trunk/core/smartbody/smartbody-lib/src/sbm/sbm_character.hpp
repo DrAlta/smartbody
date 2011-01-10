@@ -208,13 +208,13 @@ public:
 	MeCtSchedulerClass*	head_sched_p; // neck / head orientation
 	MeCtSchedulerClass*	param_sched_p; // general parameters
 
-	void set_viseme_curve( 
+	void schedule_viseme_curve( 
 		const char* viseme, 
 		double start_time, 
 		float* curve_info, int num_keys, int num_key_params, 
 		float ramp_in, float ramp_out 
 	);
-	void set_viseme_trapezoid( 
+	void schedule_viseme_trapezoid( 
 		const char* viseme,
 		double start_time,
 		float weight,
@@ -222,13 +222,13 @@ public:
 		float ramp_in, 
 		float ramp_out 
 	);
-	void set_viseme_blend_curve( 
+	void schedule_viseme_blend_curve( 
 		const char* viseme, 
 		double start_time, 
 		float weight, 
 		float* curve_info, int num_keys, int num_key_params 
 	);
-	void set_viseme_blend_ramp( 
+	void schedule_viseme_blend_ramp( 
 		const char* viseme, 
 		double start_time, 
 		float weight, 

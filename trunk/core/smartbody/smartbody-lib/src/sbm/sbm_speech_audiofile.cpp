@@ -420,8 +420,10 @@ const vector<VisemeData *> * AudioFileSpeech::getVisemes( RequestId requestId )
       for ( size_t i = 0; i < it->second.visemeData.size(); i++ )
       {
          VisemeData & v = it->second.visemeData[ i ];
-		 if (!v.isCurveMode())
+		 if (!v.isCurveMode() && !v.isTrapezoidMode())
 			 visemeCopy->push_back( new VisemeData( v.id(), v.weight(), v.time() ) );
+		 else if (v.isTrapezoidMode())
+			 visemeCopy->push_back( new VisemeData( v.id(), v.weight(), v.time(), v.duration(), v.rampin(), v.rampout() ) );
 		 else
 			 visemeCopy->push_back( new VisemeData( v.id(), v.getNumKeys(), v.getCurveInfo() ));
       }
@@ -715,9 +717,19 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
 		  char * xmlEnd = XMLString::transcode( e->getAttribute( L"end" ) );
 		  string end = xmlEnd;
 		  XMLString::release( &xmlEnd );
+		
+		  float startTime = (float)atof( start.c_str() );
+		  float endTime = (float)atof( end.c_str() );
+		  float readyTime = (float)atof( ready.c_str() );
+		  float relaxTime = (float)atof( relax.c_str() );		  
+		  float rampIn = readyTime - startTime;
+		  float rampOut = endTime - relaxTime;
 
-		  visemeData.push_back( VisemeData( viseme.c_str(), (float)atof( articulation.c_str() ), (float)atof( start.c_str() ) ) );
-		  visemeData.push_back( VisemeData( viseme.c_str(), 0.0f,                                (float)atof( end.c_str() ) ) );
+		  float weight = (float)atof( articulation.c_str());
+
+		  visemeData.push_back(VisemeData(viseme.c_str(), weight, startTime,  endTime - startTime, rampIn, rampOut));
+		  //visemeData.push_back( VisemeData( viseme.c_str(), (float)atof( articulation.c_str() ), (float)atof( start.c_str() ) ) );
+		  //visemeData.push_back( VisemeData( viseme.c_str(), 0.0f,                                (float)atof( end.c_str() ) ) );
 	   }
    }
 }
