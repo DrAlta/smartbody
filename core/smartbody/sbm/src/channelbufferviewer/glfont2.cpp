@@ -169,7 +169,7 @@ void GLFont::GetCharSize (int c, std::pair<int, int> *size)
 	}
 }
 //*******************************************************************
-int GLFont::GetCharWidth (int c)
+int GLFont::GetCharWidthGL (int c)
 {
 	//Make sure in range
 	if (c < header.start_char || c > header.end_char)
@@ -184,7 +184,7 @@ int GLFont::GetCharWidth (int c)
 	}
 }
 //*******************************************************************
-int GLFont::GetCharHeight (int c)
+int GLFont::GetCharHeightGL (int c)
 {
 	//Make sure in range
 	if (c < header.start_char || c > header.end_char)
