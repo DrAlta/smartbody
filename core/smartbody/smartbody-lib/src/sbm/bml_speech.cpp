@@ -575,17 +575,21 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 				}
 				actor_p->set_viseme_blend_ramp( v->id(), time, v->weight(), ramp_dur );
 #else
-				command.str( "" );
-				command << "char " << actor_id << " viseme " << v->id() << " " << v->weight() << " ";
-				if( v->duration() > 0 ) {
-					command << v->duration();
-				} else {
+				float duration = v->duration();
+				if( duration <= 0 ) {
 					// speech implementation doesn't appear to support durations.
 					// using 0.1 transition duration (and start transition early)
-					command << "0.1";
+					duration = .1;
 					time -= (time_sec)0.05;
-
 				}
+				
+				command.str( "" );
+				command << "char " << actor_id << " viseme " << v->id() << " trap " 
+						<< v->weight() << " " 
+						<< duration << " " 
+						<< v->rampin() << " "
+						<< v->rampout() << " ";
+				
 				sbm_commands.push_back( new SbmCommand( command.str(), time ) );
 #endif
 				if( LOG_BML_VISEMES ) cout << "command (complete): " << command.str() << endl;

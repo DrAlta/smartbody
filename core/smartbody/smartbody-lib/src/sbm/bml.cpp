@@ -1342,6 +1342,20 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 #endif
 
 #else
+
+	const SbmCharacter* actor    = request->actor;
+	SbmCharacter* character = mcu->character_map.lookup(actor->name);
+	if (character)
+		character->schedule_viseme_trapezoid( viseme, float(startAt), weight, float(endAt - startAt), float(readyAt - startAt), float(endAt - relaxAt));
+	
+	ostringstream start_cmd;
+	start_cmd << "char " << actor_id << " viseme " << viseme << " trap " 
+						<< weight << " " 
+						<< float(endAt - startAt) << " " 
+						<< float(readyAt - startAt) << " "
+						<< float(endAt - relaxAt) << " ";
+
+/*
 	ostringstream start_cmd;
 	if( rampup < 0 ) {
 		start_cmd << "char " << actor_id << " viseme " << viseme << ' ' << weight << ' ' << (readyAt-startAt);
@@ -1355,10 +1369,12 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	} else {
 		stop_cmd << "char " << actor_id << " viseme " << viseme << ' ' << 0 << ' ' << rampdown;
 	}
-
+*/
 	VecOfSbmCommand commands;
    	commands.push_back( new SbmCommand( start_cmd.str(), (float)startAt ) );
-   	commands.push_back( new SbmCommand( stop_cmd.str(), (float)relaxAt ) );
+  // 	commands.push_back( new SbmCommand( stop_cmd.str(), (float)relaxAt ) );
+
 	realize_sequence( commands, mcu );
+
 #endif
 }
