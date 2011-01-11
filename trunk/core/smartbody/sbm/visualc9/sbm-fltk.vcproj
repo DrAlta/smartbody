@@ -230,6 +230,14 @@
 			<File
 				RelativePath="..\src\fltk_viewer.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						GeneratePreprocessedFile="0"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\src\fltk_viewer.h"
@@ -371,15 +379,15 @@
 				RelativePath="..\src\channelbufferviewer\GlChartViewCoordinate.hpp"
 				>
 			</File>
-			<File
-				RelativePath="..\src\channelbufferviewer\glfont2.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\channelbufferviewer\glfont2.h"
-				>
-			</File>
 		</Filter>
+		<File
+			RelativePath="..\src\glfont2.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\src\glfont2.h"
+			>
+		</File>
 		<File
 			RelativePath="..\src\pic.cpp"
 			>
