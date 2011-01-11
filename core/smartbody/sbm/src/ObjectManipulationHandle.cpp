@@ -1,4 +1,6 @@
 #include "ObjectManipulationHandle.h"
+
+#include "vhcl.h"
 #include <fltk/gl.h>
 #include <GL/glu.h>
 #include <sbm/mcontrol_util.h>
@@ -68,13 +70,13 @@ void ObjectManipulationHandle::picking(float x,float y,SrCamera& cam)
 	glLoadIdentity();
 
 	int cursorX,cursorY;
-	cursorX = (x+1.0)*viewport[2]*0.5;
-	cursorY = (y+1.0)*viewport[3]*0.5;
+	cursorX = int((x+1.0)*viewport[2]*0.5);
+	cursorY = int((y+1.0)*viewport[3]*0.5);
 
 	//gluPickMatrix(cursorX,viewport[3]-cursorY,100,100,viewport);
 	//printf("cursorX = %d, cursorY = %d\n",cursorX,cursorY);
 	gluPickMatrix(cursorX,cursorY,5,5,viewport);
-	ratio = (viewport[2]+0.0) / viewport[3];	
+	ratio = (viewport[2]+0.0f) / viewport[3];	
 	glMultMatrixf ( (const float*)cam.get_perspective_mat(mat) );	
 	glMatrixMode(GL_MODELVIEW);
 
@@ -84,13 +86,23 @@ void ObjectManipulationHandle::picking(float x,float y,SrCamera& cam)
 	SrArray<SbmPawn*> pawn_list;
 	this->get_pawn_list(pawn_list);
 
+	// determine the size of the pawns relative to the size of the characters
+	float pawnSize = 1.0;
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.character_map.reset();
+	while (SbmCharacter* character = mcu.character_map.next())
+	{
+		pawnSize = character->getHeight() / 8.0f;
+		break;
+	}
+
 	for (int i=0;i<pawn_list.size();i++)
 	{
 		SbmPawn* pawn = pawn_list[i];
 		SrVec pawn_pos = PawnPosControl::get_pawn_pos(pawn);
 		glPushName(0xffffffff);
 	    glLoadName(i);
-		PositionControl::drawSphere(pawn_pos,10.0);		
+		PositionControl::drawSphere(pawn_pos, pawnSize);		
 	    glPopName();			
 	}
 

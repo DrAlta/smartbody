@@ -28,13 +28,14 @@
 # ifndef FLTK_VIEWER_H
 # define FLTK_VIEWER_H
 
+#include "fltk/Slider.h"  // before vhcl.h because of LOG enum which conflicts with vhcl::Log
+
 # include <fltk/GlWindow.H>
 # include <sr/sr_viewer.h>
 #include <fltk/Input.h>
-#include <fltk/compat/FL/Fl_Menu_Item.H>
 # include <sr/sr_color.h>
-
 #include "ObjectManipulationHandle.h"
+
 
 
 class SrQuat;

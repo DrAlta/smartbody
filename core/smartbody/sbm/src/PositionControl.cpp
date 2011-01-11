@@ -1,3 +1,6 @@
+#include "PositionControl.h"
+
+#include "vhcl.h"
 #include <fltk/gl.h>
 #include <GL/glu.h>
 #include <sr/sr_plane.h>
@@ -6,7 +9,7 @@
 #include <sr/sr_sn_group.h>
 # include <SR/sr_sa_gl_render.h>
 # include <SR/sr_gl_render_funcs.h>
-#include "PositionControl.h"
+
 
 PositionControl::PositionControl(void)
 {
@@ -19,9 +22,9 @@ PositionControl::PositionControl(void)
 	ss_len=3;
 	opdir = 3;
 
-	colors[3]=SrVec(100.0/255.0, 220.0/255.0, 1.);
+	colors[3]=SrVec(100.0f/255.0f, 220.0f/255.0f, 1.f);
 	colors[0]=SrVec(1,0,0);
-	colors[1]=SrVec(0,154.0/255.0,82.0/255.0);
+	colors[1]=SrVec(0,154.0f/255.0f,82.0f/255.0f);
 	colors[2]=SrVec(0,0,1);
 	worldPt = SrVec(0,170,100);
 }
@@ -88,7 +91,7 @@ void PositionControl::hitOPS()
 
 	SrVec dirx,diry;
 	//ScreenParallelPlane(viewer,center,dirx,diry);
-	float ratio=0.3;//norm(dirx);
+	float ratio=0.3f;//norm(dirx);
 	/*
 	glBegin(GL_QUADS);
 	glVertex3fv(center-s_len*dirx-s_len*diry);
@@ -142,7 +145,7 @@ void PositionControl::draw()
 		SrVec center= getWorldPt();
 		SrVec dirx,diry;
 		//ScreenParallelPlane(viewer,center,dirx,diry);
-		float ratio=0.1;//norm(dirx);
+		float ratio=0.1f;//norm(dirx);
 
 		//Vec3f dirx0,diry0;
 		//ScreenParallelPlane(viewer,p_center0,dirx0,diry0);
@@ -211,7 +214,7 @@ void PositionControl::draw()
 		}else{
 			//draw the tail shadow square
 			glDisable(GL_LIGHTING);
-			glColor3f(.3,.3,.3);
+			glColor3f(.3f,.3f,.3f);
 			//drawShadowSquare(p_center0[0],p_center0[1],p_center0[2],dirx,diry,ss_len,GL_QUADS);
 
 			//draw the moving axis

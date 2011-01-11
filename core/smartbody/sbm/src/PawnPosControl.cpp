@@ -1,3 +1,6 @@
+#include "PawnPosControl.h"
+
+#include "vhcl.h"
 #include <fltk/gl.h>
 #include <GL/glu.h>
 #include <sr/sr_plane.h>
@@ -6,10 +9,8 @@
 #include <sr/sr_sn_group.h>
 # include <SR/sr_sa_gl_render.h>
 # include <SR/sr_gl_render_funcs.h>
-#include "vhcl.h"
 #include "glfont2.h"
 
-#include "PawnPosControl.h"
 
 
 PawnPosControl::PawnPosControl(void) : PositionControl()
@@ -110,12 +111,16 @@ SrVec PawnPosControl::get_pawn_pos(SbmPawn* pawn)
 {
 	SrVec pos;
 	pawn->skeleton_p->update_global_matrices();
-	SrArray<SkJoint*>& joints = pawn->skeleton_p->get_joint_array();		
-	SrMat gmat = joints[0]->gmat();
+	SrArray<SkJoint*>& joints = pawn->skeleton_p->get_joint_array();	
+	if (joints.size() == 0)
+		return SrVec();
+	joints[0]->update_gmat();
+	const SrMat& gmat = joints[0]->gmat();
 	//pos = SrVec(gmat(
 	//pos.set(*gmat.pt(12), *gmat.pt(13), *gmat.pt(14));
 	float x,y,z,h,p,r;
 	pawn->get_world_offset(x,y,z,h,p,r);
+//	pos.x = gmat[12]; pos.y = gmat[13]; pos.z = gmat[14];
 	pos.x = x; pos.y = y; pos.z = z;
 
 	return pos;
@@ -123,6 +128,7 @@ SrVec PawnPosControl::get_pawn_pos(SbmPawn* pawn)
 
 void PawnPosControl::set_pawn_pos(SbmPawn* pawn, SrVec& pos)
 {
+
 	float x,y,z,h,p,r;
 	pawn->get_world_offset(x,y,z,h,p,r);
 	pawn->set_world_offset(pos.x,pos.y,pos.z,h,p,r);
