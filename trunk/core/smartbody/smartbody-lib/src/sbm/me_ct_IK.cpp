@@ -54,7 +54,24 @@ void MeCtIK::update(MeCtIKScenario* scenario)
 	int modified = 0;
 	SrMat inv_end;
 
-	SrQuat before;
+	SrQuat quat;
+	SrMat mat;
+
+	/*for(int i = 0; i < scenario->joint_info_list.size(); ++i)
+	{
+		if(!scenario->joint_info_list.get(i).is_support_joint && scenario->joint_info_list.get(i).type == JOINT_TYPE_HINGE)
+		{
+			quat = scenario->joint_quat_list.get(i);
+			if(quat.angle() <= 0.03f)
+			{
+				mat.rot(scenario->joint_quat_list.get(i).axis(), 0.03f-quat.angle());
+				quat = mat * quat;
+				scenario->joint_quat_list.set(i, quat);
+			}
+		}
+	}*/
+
+	/*SrQuat before;
 	for(int i = 0; i < scenario->joint_info_list.size(); ++i)
 	{
 		if(scenario->joint_info_list.get(i).is_support_joint)
@@ -62,9 +79,11 @@ void MeCtIK::update(MeCtIKScenario* scenario)
 			before = scenario->joint_quat_list.get(i);
 			break;
 		}
-	}
+	}*/
 
 	init();
+
+	unstretch_joints();
 
 	for(int k = 0; k < support_joint_num; ++k)
 	{
@@ -110,6 +129,33 @@ void MeCtIK::update(MeCtIKScenario* scenario)
 	}
 }
 
+__forceinline void MeCtIK::unstretch_joints()
+{
+	SrVec& pivot = scenario->joint_pos_list.get(0);
+	SrVec& i_target = target.get(manipulated_joint_index);
+	SrVec& i_src = scenario->joint_pos_list.get(manipulated_joint_index);
+
+	SrVec v1, v2;
+	SrQuat quat;
+	SrMat mat;
+	v1 = pivot - i_src;
+	v2 = i_target - i_src;
+	if(dot(v1, v2) < 0.0f) return;
+	int i = 0;
+	for(i = 0; i < scenario->joint_info_list.size(); ++i)
+	{
+		quat = scenario->joint_quat_list.get(i);
+		if(!scenario->joint_info_list.get(i).is_support_joint && scenario->joint_info_list.get(i).type == JOINT_TYPE_HINGE )
+		{
+			mat.rot(scenario->joint_quat_list.get(i).axis(), 3.14159265f * v2.len() / v1.len());
+			quat = mat * quat;
+			scenario->joint_quat_list.set(i, quat);
+			break;
+		}
+	}
+	if(i < scenario->joint_info_list.size()) get_limb_section_local_pos(i, -1);
+}
+
 // fast solution for 2 joints
 __forceinline void MeCtIK::adjust_2_joints()
 {
@@ -124,11 +170,11 @@ __forceinline void MeCtIK::adjust()
 	{
 		for(j = start_joint_index; j != manipulated_joint_index; ++j)
 		{
-			if(reach_destination()) 
+			/*if(reach_destination()) 
 			{
 				reach = 1;
 				break;
-			}
+			}*/
 			rotate(scenario->joint_pos_list.get(manipulated_joint_index), j);
 		}
 		if(reach) break;
@@ -147,6 +193,7 @@ int MeCtIK::get_support_joint_num()
 
 __forceinline int MeCtIK::check_constraint(SrQuat* quat, int index)
 {
+	return 0;
 	float angle = quat->angle();
 	int modified = 0;
 	MeCtIKScenarioJointInfo* info = &(scenario->joint_info_list.get(index));
@@ -246,6 +293,8 @@ __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 	//
 	v1 = i_src - pivot;
 	v1.normalize();
+
+
 	if(scenario->joint_info_list.get(start_index).type == JOINT_TYPE_BALL)
 	{
 		v2 = i_target - pivot;
@@ -260,6 +309,7 @@ __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 			v3 = v3 * mat_inv; // tranverse joint back to its local coordinate
 			v2 = v3 - pivot;
 		}
+		else if(dot_v < -1.0f) dot_v = -1.0f;
 		double angle = acos(dot_v);
 
 		r_axis = cross(v2, v1);
@@ -276,9 +326,8 @@ __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 		
 		double dot_v = dot(v1, v2);
 		if(dot_v > 1.0f) dot_v = 1.0f;
+		else if(dot_v < -1.0f) dot_v = -1.0f;
 		double angle = acos(dot_v);
-
-		if(angle < 0.00001f) angle /= 2.0f;
 
 		v3 = cross(v1, v2);
 		v3.normalize();
