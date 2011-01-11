@@ -114,6 +114,8 @@ protected:
 
 	void update_manipulated_joint_pos(int index);
 
+	void unstretch_joints();
+
 };
 
 #endif // ME_CT_IK_HPP
