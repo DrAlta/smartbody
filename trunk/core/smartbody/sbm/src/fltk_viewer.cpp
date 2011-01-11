@@ -21,6 +21,8 @@
  */
 
 # include "fltk_viewer.h"
+#include <fltk/compat/FL/Fl_Menu_Item.H>
+#include "vhcl.h"
 
 
 # include <fltk/events.h>
@@ -62,7 +64,7 @@
 # include <SBM/me_ct_eyelid.h>
 
 #include <sbm/mcontrol_util.h>
-#include "vhcl_log.h"
+
 //#include "Heightfield.h"
 
 ////# define SR_USE_TRACE1  // basic fltk events
@@ -233,7 +235,6 @@ void FltkViewer::update_gaze_submenus()
 {
 	for (int i=0;i<NUM_GAZE_TYPES;i++)
 	{
-		char menu_label[256];
 		Fl_Menu_Item& gaze_menu = GazeMenuTable[i];	
 		gaze_menu.flags |= FL_SUBMENU_POINTER;
 		SrArray<Fl_Menu_Item>& menu_list = gaze_submenus[i];

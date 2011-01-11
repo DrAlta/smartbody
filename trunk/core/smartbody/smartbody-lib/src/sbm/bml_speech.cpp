@@ -579,7 +579,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 				if( duration <= 0 ) {
 					// speech implementation doesn't appear to support durations.
 					// using 0.1 transition duration (and start transition early)
-					duration = .1;
+					duration = .1f;
 					time -= (time_sec)0.05;
 				}
 				

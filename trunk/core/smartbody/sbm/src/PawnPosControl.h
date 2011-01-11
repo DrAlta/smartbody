@@ -1,4 +1,5 @@
 #pragma once
+#include "vhcl.h"
 #include "PositionControl.h"
 #include <sbm/sbm_pawn.hpp>
 #include "glfont2.h"
