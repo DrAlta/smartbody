@@ -45,8 +45,6 @@ class srSynchPoints	{
 
 	public:
 
-#define NULL_SYNCH_POINT (-1)
-	
 		enum synch_point_enum_set	{
 			START,
 			READY,
@@ -68,6 +66,31 @@ class srSynchPoints	{
 			NUM_ERROR_CODES
 		};
 
+		int tag_index( const char *label )	{
+			if( label )	{
+				if( _stricmp( label, "start" ) == 0 )			return( START );
+				if( _stricmp( label, "ready" ) == 0 )			return( READY );
+				if( _stricmp( label, "stroke_start" ) == 0 )	return( STROKE_START );
+				if( _stricmp( label, "stroke" ) == 0 )			return( STROKE );
+				if( _stricmp( label, "stroke_stop" ) == 0 ) 	return( STROKE_STOP );
+				if( _stricmp( label, "relax" ) == 0 )			return( RELAX );
+				if( _stricmp( label, "stop" ) == 0 )			return( STOP );
+			}
+			return( -1 ); // default err
+		}
+
+		const char * tag_label( const int index ) {
+			switch( index )	{
+				case START: 		return( "start" );
+				case READY: 		return( "ready" );
+				case STROKE_START:	return( "stroke_start" );
+				case STROKE:		return( "stroke" );
+				case STROKE_STOP:	return( "stroke_stop" );
+				case RELAX: 		return( "relax" );
+				case STOP:			return( "stop" );
+			}
+			return( "UNKNOWN" ); // default err
+		}
 
 	// CPP cruft:
 		srSynchPoints( void )	{
@@ -135,7 +158,6 @@ class srSynchPoints	{
 				if( t < 0.0 )	{
 					return( true );
 				}
-
 			// check and bump back order of preceding:
 				for( int i = 0; i < tag; i++ )	{
 
@@ -167,9 +189,6 @@ class srSynchPoints	{
 				for( int i = tag-1; i>=0; i-- )	{
 
 					if( valid_time( i ) )	{
-
-//						synch_time_arr[ tag ] = synch_time_arr[ i ] + t; // fails to bump
-//						return( true );
 						return( set_time( tag, synch_time_arr[ i ] + t ) ); // force bump
 					}
 				}
@@ -337,6 +356,7 @@ class srSynchPoints	{
 			}
 			return( -1.0 );
 		}
+#if 0
 		double get_abs_time( int tag, double from_time ) {
 		
 			double t = get_time( tag );
@@ -345,6 +365,7 @@ class srSynchPoints	{
 			}
 			return( from_time + t );
 		}
+#endif
 		double get_interval( int fr_tag, int to_tag )   {
 
 			double f = get_time( fr_tag );
@@ -372,24 +393,25 @@ class srSynchPoints	{
 			if( tag < 0 )	{
 				tag = START;
 			}
+			else	{
+				tag++;
+			}
 			double t = -1.0;
-
 			bool done = false;
 			while( !done )	{
 				if( tag >= NUM_SYNCH_TAGS )	{
 					done = true;
+					tag = -1;
 				}
 				else	{
 					t = get_time( tag );
 					if( t >= 0.0 )	{
 						done = true;
 					}
+					else	{
+						tag++;
+					}
 				}
-			}
-
-			tag++;
-			if( tag >= NUM_SYNCH_TAGS )	{
-				tag = -1;
 			}
 			*tag_p = tag;
 			return( t );
@@ -468,9 +490,17 @@ class srSynchPoints	{
 			
 
 		int get_error( bool print_out )	{
-			if( err_code )	{
+			if( err_code > 0 )	{
 				if( print_out )	{
-					
+					switch( err_code )	{
+						case BAD_TAG: 				LOG( "srSynchPoints ERR: BAD_TAG" ); break;
+						case BUMPED_BACK_TAG:		LOG( "srSynchPoints ERR: BUMPED_BACK_TAG" ); break;
+						case BUMPED_FWD_TAG:		LOG( "srSynchPoints ERR: BUMPED_FWD_TAG" ); break;
+						case NEGATIVE_RAMP:			LOG( "srSynchPoints ERR: NEGATIVE_RAMP" ); break;
+						case UNDEFINED_INTERVAL:	LOG( "srSynchPoints ERR: UNDEFINED_INTERVAL" ); break;
+						case OVERLAPPED_RAMPS: 		LOG( "srSynchPoints ERR: OVERLAPPED_RAMPS" ); break;
+						default: 					LOG( "srSynchPoints ERR: BAD ERR CODE: %d", err_code ); break;
+					}
 				}
 			}
 			return( err_code );
@@ -478,7 +508,6 @@ class srSynchPoints	{
 	private:
 		
 		int err_code;
-//		void print_err( void );
 
 		bool duration_defined;
 		double default_ramp_out;
