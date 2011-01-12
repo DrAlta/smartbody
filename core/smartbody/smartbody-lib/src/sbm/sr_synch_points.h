@@ -27,9 +27,25 @@
 #include <vhcl_log.h>
 #include <sbm/sr_linear_curve.h>
 
+/*
+	srSynchPoints:
+
+	ASSUMPTIONS:
+		Time is a 'double' precision float.
+		Any negative time values are interpreted as undefined.
+		This code uses -1.0, but all negative inputs are equivalent.
+		A negative tag value, or -1, is interpreted as uninitialized.
+		Undefined and uninitialied values are not consdiered errors.
+		If tag >= NUM_SYNCH_TAGS, this is considered an error.
+*/
+
+//////////////////////////////////////////////////////////////////
+
 class srSynchPoints	{
 
 	public:
+
+#define NULL_SYNCH_POINT (-1)
 	
 		enum synch_point_enum_set	{
 			START,
@@ -41,7 +57,19 @@ class srSynchPoints	{
 			STOP,
 			NUM_SYNCH_TAGS
 		};
+		enum error_enum_set	{
+			NO_ERROR_DETECTED,
+			BAD_TAG,
+			BUMPED_BACK_TAG,
+			BUMPED_FWD_TAG,
+			NEGATIVE_RAMP,
+			UNDEFINED_INTERVAL,
+			OVERLAPPED_RAMPS,
+			NUM_ERROR_CODES
+		};
 
+
+	// CPP cruft:
 		srSynchPoints( void )	{
 			init();
 		}
@@ -68,17 +96,24 @@ class srSynchPoints	{
 		~srSynchPoints( void ) {}
 
 	protected:
+
+	// internal maintenance:
+
 		void init( void )	{
 			for( int i=0; i<NUM_SYNCH_TAGS; i++ )	{
 				synch_time_arr[ i ] = -1.0;
 			}
-			stored_ramp_out = 0.0;
+			implied_ramp_out = 0.0;
+			default_ramp_out = -1.0;
 			duration_defined = false;
+			err_code = NO_ERROR_DETECTED;
 		}
+
 		bool valid_tag( int tag )	{
 
 			if( tag < 0 ) return( false );
 			if( tag < NUM_SYNCH_TAGS ) return( true );
+			err_code = BAD_TAG;
 			return( false );
 		}
 		bool valid_time( int tag ) {
@@ -96,28 +131,28 @@ class srSynchPoints	{
 
 			if( valid_tag( tag ) )	{
 			
-				if( t >= 0.0 )	{
-			// check and bump order of preceding:
-					for( int i = 0; i < tag; i++ )	{
+				synch_time_arr[ tag ] = t;
+				if( t < 0.0 )	{
+					return( true );
+				}
 
-						if( valid_time( i ) )	{
-							if( t < get_time( i ) ) {
-								set_time( i, t );
-							}
+			// check and bump back order of preceding:
+				for( int i = 0; i < tag; i++ )	{
+
+					if( valid_time( i ) )	{
+						if( get_time( i ) > t ) {
+							set_time( i, t );
+							err_code = BUMPED_BACK_TAG;
 						}
 					}
 				}
-				
-				synch_time_arr[ tag ] = t;
+			// check and bump forward order of succeeding:
+				for( int i = tag + 1; i < NUM_SYNCH_TAGS; i++ )	{
 
-				if( t >= 0.0 )	{
-			// check and bump order of succeeding:
-					for( int i = tag + 1; i < NUM_SYNCH_TAGS; i++ )	{
-
-						if( valid_time( i ) )	{
-							if( t > get_time( i ) ) {
-								set_time( i, t );
-							}
+					if( valid_time( i ) )	{
+						if( get_time( i ) < t ) {
+							set_time( i, t );
+							err_code = BUMPED_FWD_TAG;
 						}
 					}
 				}
@@ -126,8 +161,29 @@ class srSynchPoints	{
 			return( false );
 		}
 
+		bool set_interval( int tag, double t )	{
+
+			if( valid_tag( tag ) )	{
+				for( int i = tag-1; i>=0; i-- )	{
+
+					if( valid_time( i ) )	{
+
+//						synch_time_arr[ tag ] = synch_time_arr[ i ] + t; // fails to bump
+//						return( true );
+						return( set_time( tag, synch_time_arr[ i ] + t ) ); // force bump
+					}
+				}
+				err_code = UNDEFINED_INTERVAL;
+				return( false );
+			}
+			return( false );
+		}
+
 	public:
-		void set_time( double start, double stop ) {
+
+	// set by explicit time:
+
+		void set_time( double start, double stop = -1.0 ) {
 			init();
 			set_time( START, start );
 			set_time( STOP, stop );
@@ -140,7 +196,7 @@ class srSynchPoints	{
 				set_time( RELAX, stop - ramp );
 				set_time( STOP, stop );
 			}
-			stored_ramp_out = ramp;
+			implied_ramp_out = ramp;
 		}
 		void set_time( double start, double ready, double relax, double stop ) {
 			init();
@@ -149,7 +205,7 @@ class srSynchPoints	{
 			set_time( RELAX, relax );
 			set_time( STOP, stop );
 			if( ( relax >= 0.0 )&&( stop >= 0.0 ) ) {
-				stored_ramp_out = stop - relax;
+				implied_ramp_out = stop - relax;
 			}
 		}
 		void set_time( double start, double ready, double stroke, double relax, double stop ) {
@@ -160,7 +216,7 @@ class srSynchPoints	{
 			set_time( RELAX, relax );
 			set_time( STOP, stop );
 			if( ( relax >= 0.0 )&&( stop >= 0.0 ) ) {
-				stored_ramp_out = stop - relax;
+				implied_ramp_out = stop - relax;
 			}
 		}
 		void set_time( 
@@ -177,27 +233,12 @@ class srSynchPoints	{
 			set_time( RELAX, relax );
 			set_time( STOP, stop );
 			if( ( relax >= 0.0 )&&( stop >= 0.0 ) ) {
-				stored_ramp_out = stop - relax;
+				implied_ramp_out = stop - relax;
 			}
 		}
 
-	protected:
-		bool set_interval( int tag, double t )	{
+	// set by START time and intervals:
 
-			if( valid_tag( tag ) )	{
-				for( int i = tag-1; i>=0; i-- )	{
-
-					if( valid_time( i ) )	{
-
-						synch_time_arr[ tag ] = synch_time_arr[ i ] + t;
-						return( true );
-					}
-				}
-			}
-			return( false );
-		}
-
-	public:
 		void set_interval( double start_at, double start_to_stop )	{
 			set_time( START, start_at );
 			set_interval( STOP, start_to_stop );
@@ -205,12 +246,13 @@ class srSynchPoints	{
 		void set_interval( double start_at, double start_to_stop, double ramp )	{
 			if( ramp < 0.0 )	{
 				ramp = 0.0;
+				err_code = NEGATIVE_RAMP;
 			}
 			set_time( START, start_at );
 			set_interval( READY, ramp );
 			set_interval( RELAX, start_to_stop - 2 * ramp );
 			set_interval( STOP, ramp );
-			stored_ramp_out = ramp;
+			implied_ramp_out = ramp;
 		}
 		void set_interval( double start_at, double start_to_ready, double ready_to_relax, double relax_to_stop )	{
 			set_time( START, start_at );
@@ -218,7 +260,7 @@ class srSynchPoints	{
 			set_interval( RELAX, ready_to_relax );
 			set_interval( STOP, relax_to_stop );
 			if( relax_to_stop > 0.0 )	{
-				stored_ramp_out = relax_to_stop;
+				implied_ramp_out = relax_to_stop;
 			}
 		}
 		void set_interval( 
@@ -234,16 +276,17 @@ class srSynchPoints	{
 			set_interval( RELAX, stroke_to_relax );
 			set_interval( STOP, relax_to_stop );
 			if( relax_to_stop > 0.0 )	{
-				stored_ramp_out = relax_to_stop;
+				implied_ramp_out = relax_to_stop;
 			}
 		}
 		void set_interval( 
 			double start_at, 
 			double start_to_ready, 
-			double ready_to_S_start, 
+			double ready_to_S_start, // S: stroke_
 			double S_start_to_S, 
 			double S_to_S_stop, 
 			int repetitions,
+//			double S_stop_return_to_S_start,
 			double S_stop_to_relax, 
 			double relax_to_stop
 		)	{
@@ -251,22 +294,38 @@ class srSynchPoints	{
 			set_interval( READY, start_to_ready );
 			set_interval( STROKE_START, ready_to_S_start );
 			set_interval( STROKE, S_start_to_S );
+#if 0
+			if( repetitions > 1 ) set_interval( STROKE_STOP, S_stop_return_to_start ); // what a mess
+			double rep_offset = repetitions * ( S_start_to_S + S_to_S_stop );
+#else
 			set_interval( STROKE_STOP, S_to_S_stop );
-			set_interval( RELAX, S_stop_to_relax );
+			double rep_offset = ( 0.0 ); // definition of rep?
+#endif
+			set_interval( RELAX, rep_offset + S_stop_to_relax ); // what if reps == 0?
+
 			set_interval( STOP, relax_to_stop );
 			if( relax_to_stop > 0.0 )	{
-				stored_ramp_out = relax_to_stop;
+				implied_ramp_out = relax_to_stop;
 			}
 		}
 
+	// termination options:
+		void set_stop_interval( double ramp )	{
+			default_ramp_out = ramp;
+		}
 		void set_stop( double at_time, double ramp_out ) {
 			set_time( RELAX, at_time );
 			set_time( STOP, at_time + ramp_out );
 		}
 		void set_stop( double at_time ) {
-			set_stop( at_time, stored_ramp_out );
+			double ramp = default_ramp_out;
+			if( ramp < 0.0 )	{
+				ramp = implied_ramp_out;
+			}
+			set_stop( at_time, ramp );
 		}
 
+	// queries:
 		double get_time( int tag )	{
 
 			if( valid_tag( tag ) )	{
@@ -279,7 +338,7 @@ class srSynchPoints	{
 			return( -1.0 );
 		}
 		double get_abs_time( int tag, double from_time ) {
-
+		
 			double t = get_time( tag );
 			if( t < 0.0 )	{
 				return( -1.0 );
@@ -304,13 +363,46 @@ class srSynchPoints	{
 		double get_duration( void ) {
 			return( get_time( STOP ) );
 		}
+		double get_next( int *tag_p )	{
+
+			if( tag_p == NULL )	{
+				return( -1.0 );
+			}
+			int tag = *tag_p;
+			if( tag < 0 )	{
+				tag = START;
+			}
+			double t = -1.0;
+
+			bool done = false;
+			while( !done )	{
+				if( tag >= NUM_SYNCH_TAGS )	{
+					done = true;
+				}
+				else	{
+					t = get_time( tag );
+					if( t >= 0.0 )	{
+						done = true;
+					}
+				}
+			}
+
+			tag++;
+			if( tag >= NUM_SYNCH_TAGS )	{
+				tag = -1;
+			}
+			*tag_p = tag;
+			return( t );
+		}
 
 		srLinearCurve *get_trapezoid( srLinearCurve *curve_p, double dfl_dur, double dfl_in, double dfl_out ) {
 			
 		// extract ordered data, check and apply defaults:
+
 			double t0 = get_time( START );
 			if( t0 < 0.0 )	{
 				t0 = 0.0;
+				err_code = UNDEFINED_INTERVAL;
 			}
 			double t3 = get_time( STOP );
 			duration_defined = true;
@@ -322,6 +414,7 @@ class srSynchPoints	{
 					t3 = t0 + dfl_dur;
 				}
 			}
+
 			double t1 = get_time( READY );
 			if( t1 < 0.0 )	{
 				if( dfl_in < 0.0 )	{
@@ -338,6 +431,8 @@ class srSynchPoints	{
 					t2 = t3 - dfl_out;
 				}
 			}
+
+		// adjust ramps as needed:
 			if( duration_defined )	{
 				double len = t3 - t0;
 				double ramp_in = t1 - t0;
@@ -348,8 +443,10 @@ class srSynchPoints	{
 					ramp_out = ( 1.0 - ratio ) * len;
 					t1 = t0 + ramp_in;
 					t2 = t3 - ramp_out;
+					err_code = OVERLAPPED_RAMPS;
 				}
 			}
+
 			curve_p->clear();
 			curve_p->insert( t0, 0.0 );
 			curve_p->insert( t1, 1.0 );
@@ -363,31 +460,32 @@ class srSynchPoints	{
 			return( get_trapezoid( curve_p, dfl_dur, dfl_ramp, dfl_ramp ) );
 		}
 		srLinearCurve *new_trapezoid( double dfl_dur, double dfl_in, double dfl_out ) {
-			srLinearCurve *curve_p = new srLinearCurve();
-			return( get_trapezoid( curve_p, dfl_dur, dfl_in, dfl_out ) );
+			return( get_trapezoid( new srLinearCurve(), dfl_dur, dfl_in, dfl_out ) );
 		}
 		srLinearCurve *new_trapezoid( double dfl_dur = 1.0, double dfl_ramp = 0.0 ) {
 			return( new_trapezoid( dfl_dur, dfl_ramp, dfl_ramp ) );
 		}
 			
 
+		int get_error( bool print_out )	{
+			if( err_code )	{
+				if( print_out )	{
+					
+				}
+			}
+			return( err_code );
+		}
 	private:
 		
-		bool duration_defined;
-		double stored_ramp_out;
-//		int stroke_reps = 1;
-/*
-	NO_ERROR
-	BAD_TAG
-	NEGATIVE_INPUT
-	BUMPED_DOWN_TAG
-	BUMPED_UP_TAG
-	OVERLAPPED_RAMPS
-*/
 		int err_code;
 //		void print_err( void );
 
+		bool duration_defined;
+		double default_ramp_out;
+		double implied_ramp_out;
+
+//		int stroke_reps = 1;
+
 		double synch_time_arr[ NUM_SYNCH_TAGS ];
-//		double interval_arr[ NUM_SYNCH_TAGS ];
 };
 #endif
