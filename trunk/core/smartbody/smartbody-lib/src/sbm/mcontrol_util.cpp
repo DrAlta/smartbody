@@ -244,7 +244,8 @@ void mcuCBHandle::clear( void )	{
 		VisemeMotionMap::iterator vis_it = face->viseme_map.begin();
 		VisemeMotionMap::iterator vis_end = face->viseme_map.end();
 		for( ; vis_it != vis_end; ++vis_it ) {
-			vis_it->second->unref();  // unref SkMotion
+			if (vis_it->second)
+				vis_it->second->unref();  // unref SkMotion
 		}
 		face->viseme_map.clear();
 		face->au_motion_map.clear();
