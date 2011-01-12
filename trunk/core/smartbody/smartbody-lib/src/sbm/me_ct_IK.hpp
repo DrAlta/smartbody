@@ -72,7 +72,7 @@ public:
 	~MeCtIK();
 
 public:
-	void update(MeCtIKScenario* scenario);
+	virtual void update(MeCtIKScenario* scenario);
 	SrVec get_target(int index);
 
 protected:

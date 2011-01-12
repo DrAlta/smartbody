@@ -40,6 +40,8 @@
 #include <ME/me_spline_1d.hpp>
 #include <ME/me_ct_interpolator.h>
 
+#define USE_REACH 0
+
 
 const bool LOG_PRUNE_CMD_TIME							= false;
 const bool LOG_CONTROLLER_TREE_PRUNING					= false;
@@ -105,6 +107,11 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	locomotion_ct_analysis( NULL ),
 	locomotion_ct( NULL ),
 	eyelid_reg_ct_p( NULL ),
+#ifdef USE_REACH
+	reach_sched_p( CreateSchedulerCt( character_name, "reach" ) ),
+#else
+	reach_sched_p( NULL ),
+#endif
 	head_sched_p( CreateSchedulerCt( character_name, "head" ) ),
 	param_sched_p( CreateSchedulerCt( character_name, "param" ) ),
 	face_ct( NULL ),
@@ -347,6 +354,9 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	if( locomotion_ct != NULL )
 		locomotion_ct->init();
 	gaze_sched_p->init();
+#ifdef USE_REACH
+	reach_sched_p->init();
+#endif
 
 	// Blink controller before head group (where visemes are controlled)
 	head_sched_p->init();
@@ -360,7 +370,10 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	ct_tree_p->add_controller( motion_sched_p );
 	if (locomotion_ct)
 		ct_tree_p->add_controller( locomotion_ct );
+
 	ct_tree_p->add_controller( gaze_sched_p );
+
+	ct_tree_p->add_controller( reach_sched_p );
 
 	ct_tree_p->add_controller( eyelid_reg_ct_p );
 	ct_tree_p->add_controller( head_sched_p );
@@ -742,6 +755,8 @@ void prune_schedule( SbmCharacter*   actor,
 	VecOfTrack::iterator first = tracks.begin();
 	VecOfTrack::iterator it    = tracks.end();
 
+	bool hasReach = false;
+
 	while( it != first ) {
 		// Decrement track iterator (remember, we started at end)
 		--it;
@@ -931,6 +946,15 @@ void prune_schedule( SbmCharacter*   actor,
 								in_use = true;
 						}
 					}
+				} else if (dynamic_cast<MeCtReach*>(anim_source)) {
+					if (hasReach)
+					{
+						in_use = false;
+					}
+					else
+					{
+						hasReach = true;
+					}
 				} else if( anim_ct_type == MeCtMotion::type_name || anim_ct_type == MeCtQuickDraw::type_name ) {
 					if( motion_ct || pose_ct ) {
 						in_use = false;
@@ -1047,6 +1071,7 @@ int SbmCharacter::prune_controller_tree( mcuCBHandle* mcu_p ) {
 
 	// Traverse the controller tree from highest priority down, most recent to earliest
 	prune_schedule( this, head_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
+	prune_schedule( this, reach_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
 	prune_schedule( this, gaze_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
 	prune_schedule( this, motion_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
 

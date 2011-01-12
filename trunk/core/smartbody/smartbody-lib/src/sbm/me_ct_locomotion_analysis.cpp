@@ -99,6 +99,7 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 	result += limb->add_support_joint("l_ankle");
 	result += limb->add_support_joint("l_forefoot");
 	result += limb->add_support_joint("l_toe");
+	
 	if(result != 0)
 	{
 		_ct_locomotion->set_valid(false);
@@ -119,6 +120,7 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 	result += limb->add_support_joint("r_ankle");
 	result += limb->add_support_joint("r_forefoot");
 	result += limb->add_support_joint("r_toe");
+	
 
 	if(result != 0)
 	{
