@@ -45,6 +45,7 @@
 #include <sbm/me_ct_face.h>
 #include <sbm/me_ct_eyelid.h>
 #include <sbm/me_ct_gaze.h>
+#include <sbm/me_ct_reach.hpp>
 #define MeCtSchedulerClass MeCtScheduler2
 
 #if(1) // Use primary locomotion controller
@@ -204,7 +205,7 @@ public:
 	MeCtSchedulerClass*	motion_sched_p;  // full body motions
 	MeCtSchedulerClass*	gaze_sched_p;    // back / chest / spine
 	// TODO: Arms
-	// TODO: Hands
+	MeCtSchedulerClass*	reach_sched_p; // reaching and grabbing
 	MeCtSchedulerClass*	head_sched_p; // neck / head orientation
 	MeCtSchedulerClass*	param_sched_p; // general parameters
 

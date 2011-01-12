@@ -110,7 +110,7 @@ void MeCtGazeJoint::capture_joint_state( void ) {
 			for( j=0; j<4; j++ )	{
 				M.set( i, j, sr_M.get( i, j ) );
 			}
-		}
+		}		
 		local_pos = M.translation( GWIZ_M_TR );
 		local_rot = M.quat( GWIZ_M_TR );
 

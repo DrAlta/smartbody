@@ -48,6 +48,7 @@
 #include "bml_event.hpp"
 #include "bml_face.hpp"
 #include "bml_gaze.hpp"
+#include "bml_reach.hpp"
 #include "bml_interrupt.hpp"
 #include "bml_speech.hpp"
 #include "bml_locomotion.hpp"
@@ -91,6 +92,7 @@ const XMLCh TAG_ANIMATION[] = L"animation";
 const XMLCh TAG_EVENT[]     = L"event";
 
 const XMLCh TAG_PANIMATION[] = L"panimation";
+const XMLCh TAG_REACH[] = L"sbm:reach";
 
 // XMLStrings (utf-16 character arrays) for parsing vrSpeak's XML
 const XMLCh ATTR_SPEAKER[]      = L"speaker";
@@ -429,6 +431,8 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				behavior = parse_bml_face( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_GAZE )==0 ) {
 				behavior = /*BML::*/parse_bml_gaze( child, unique_id, behav_syncs, required, request, mcu );
+			} else if( XMLString::compareString( tag, TAG_REACH )==0 ) {
+				behavior = /*BML::*/parse_bml_reach( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_EVENT )==0 ) {
 				// DEPRECATED FORM
 				behavior = parse_bml_event( child, unique_id, behav_syncs, required, request, mcu );

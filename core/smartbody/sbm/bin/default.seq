@@ -8,4 +8,4 @@
 ## Or...
 #0   path seq ../../../../data/sbm-test/scripts
 
-0   seq default-init
+0   seq default-test.seq

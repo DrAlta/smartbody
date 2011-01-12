@@ -85,6 +85,7 @@ void MeCtIK::update(MeCtIKScenario* scenario)
 
 	unstretch_joints();
 
+	
 	for(int k = 0; k < support_joint_num; ++k)
 	{
 		if(manipulated_joint_index - start_joint_index == 1) adjust_2_joints();
@@ -127,6 +128,7 @@ void MeCtIK::update(MeCtIKScenario* scenario)
 			calc_target(scenario->ik_orientation, scenario->ik_offset);
 		}
 	}
+	
 }
 
 __forceinline void MeCtIK::unstretch_joints()
@@ -408,13 +410,12 @@ __forceinline void MeCtIK::rotate(SrVec& src, int start_index)
 }*/
 
 __forceinline void MeCtIK::calc_target(SrVec& orientation, SrVec& offset)
-{
+{	
 	orientation.normalize();
 	SrVec pos = scenario->joint_pos_list.get(manipulated_joint_index);
 	pos += offset;
 	SrVec t = cross_point_on_plane(pos, orientation, scenario->plane_normal, scenario->plane_point);
 	target.set(manipulated_joint_index, -(manipulated_joint->support_joint_comp + manipulated_joint->support_joint_height)*orientation + t);
-
 }
 
 __forceinline void MeCtIK::get_next_support_joint()
