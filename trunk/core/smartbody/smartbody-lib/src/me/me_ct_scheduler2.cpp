@@ -399,6 +399,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 		blend_curve.insert( tin,        0.0 );
 		blend_curve.insert( tin+indt,   1.0 );
 	} else {
+		blend_curve.insert( tin, 0.0 );
 		blend_curve.insert( tin, 1.0 );
 	}
 	if( dur_defined ) {
@@ -406,6 +407,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 			blend_curve.insert( tout - outdt, 1.0 );
 			blend_curve.insert( tout,       0.0 );
 		} else {
+			blend_curve.insert( tout, 1.0 );
 			blend_curve.insert( tout, 0.0 );
 		}
 	}

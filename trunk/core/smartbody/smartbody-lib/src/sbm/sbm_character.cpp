@@ -1260,21 +1260,6 @@ void SbmCharacter::schedule_viseme_blend_curve(
 			SkChannelArray channels;
 			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
 
-			MeCtCurveWriter* ct_p = new MeCtCurveWriter(); // CROP, CROP, true
-			ct_p->name( ct_name.str().c_str() );
-			ct_p->init( channels );
-
-			for (int i = 0; i < num_keys; i++)	{
-				float t = curve_info[ i * num_key_params + 0 ];
-				float w = curve_info[ i * num_key_params + 1 ];
-				ct_p->insert_key( 0, t, w );
-			}
-			
-			double ct_dur = ct_p->controller_duration();
-			double tin = start_time + timeDelay;
-			double tout = tin + ct_dur;
-			head_sched_p->schedule( ct_p, tin, tout, 0, 0 );
-			/*
 			MeCtChannelWriter* ct_p = new MeCtChannelWriter();
 			ct_p->name( ct_name.str().c_str() );
 			ct_p->init( channels, true );
@@ -1284,7 +1269,6 @@ void SbmCharacter::schedule_viseme_blend_curve(
 			ct_p->set_data(value);
 
 			head_sched_p->schedule( ct_p, start_time + timeDelay, curve_info, num_keys, num_key_params );
-			*/
 		}
 	}
 }
@@ -1332,7 +1316,6 @@ void SbmCharacter::forward_visemes( double curTime )
 					{
 						listener_p->OnViseme( name, channels.name(c).get_string(), value, 0 );
 					}
-//		LOG( "viseme: %s %f", channels.name(c).get_string(), value );
 					viseme_history_arr[ i ] = value;
 				}
 			}
@@ -1634,6 +1617,15 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		}
 
 		// keyword next to viseme
+		if( _strcmpi( viseme, "clear" ) == 0 ) // removes all head controllers
+		{
+			if (head_sched_p)
+			{
+				std::vector<MeCtScheduler2::TrackPtr> tracks = head_sched_p->tracks();
+				head_sched_p->remove_tracks(tracks);
+			}
+		}
+		else
 		if( _strcmpi( next, "curve" ) == 0 )
 		{
 			int numKeys = args.read_int();
@@ -1651,8 +1643,8 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			float* curveInfo = new float[ num_remaining ];
 			args.read_float_vect( curveInfo, num_remaining );
 
-			schedule_viseme_blend_curve( viseme, mcu_p->time, 1.0f, curveInfo, numKeys, numKeyParams );
-			//set_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams, 0.1f, 0.1f );
+//			schedule_viseme_blend_curve( viseme, mcu_p->time, 1.0f, curveInfo, numKeys, numKeyParams );
+			schedule_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams, 0.1f, 0.1f );
 			delete [] curveInfo;
 		}
 		else
