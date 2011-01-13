@@ -98,6 +98,12 @@ namespace SmartBody {
 		/** Return the ramp-out duration of the viseme. */
 		float rampout() const { return _rampout; }
 
+		/** Sets the ramp-in of the viseme. */
+		void rampin(float val) { _rampin = val; }
+
+		/** Sets the ramp-out duration of the viseme. */
+		void rampout(float val) { _rampout = val; }
+
 		/** Set the audio relative time to trigger this viseme. */
 		void setTime( float time ) { _time = time; }
 

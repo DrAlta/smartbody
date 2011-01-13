@@ -221,47 +221,23 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 				}
 			}
 			if( id ) {
-				singleViseme= new VisemeData(id, 1.0, startTime); //the weight is always made one
+				singleViseme = new VisemeData(id, 1.0, startTime); //the weight is always made one
 
 				if ( visemes->size() > 0 ) 
 				{   
 					VisemeData* prevViseme = visemes->back();
-
-					// Right before adding the current viseme, the previous viseme's id is retrieved, 
-					// a reset viseme is created in order to turn the previous viseme off (weight of 0.0)
-					if ( *( prevViseme->id() ) != '_' ) {
-						// make sure that the new viseme does not come before the last viseme
-						if (prevViseme->time() > startTime) {
+					if (prevViseme->time() > startTime)
+					{
 							LOG("WARNING: Viseme %s has played at time %f comes before previous viseme %s at time %f", singleViseme->id(), singleViseme->time(), prevViseme->id(), prevViseme->time());
-						}
-						blendForward = (startTime - prevViseme->time());
-						if (visemes->size() > 1)
-						{
-							VisemeData* prevPrevViseme = (*visemes)[visemes->size() - 2];
-
-							if (*(prevPrevViseme->id()) != '_')
-							{
-								blendBack = (prevViseme->time() - prevPrevViseme->time());
-							}
-							else
-							{
-								blendBack = blendForward;
-							}
-						}
-						// Change the blend duration of the previous viseme
-						float origVisemeTime = prevViseme->time();
-						prevViseme->setDuration( blendBack );
-						float newVisemeTime = prevViseme->time() - blendBack;
-						if (newVisemeTime < 0)
-							newVisemeTime = 0;
-						prevViseme->setTime(newVisemeTime);
-						
-						// Create and add reset viseme with the same blend duration
-						VisemeData *resetViseme = new VisemeData ( prevViseme->id(), 0.0, origVisemeTime, blendForward );
-						visemes->push_back( resetViseme );
 					}
+					blendForward = (startTime - prevViseme->time());
+					singleViseme->rampin(blendForward);
+					prevViseme->rampout(blendForward);
+					if ( visemes->size() == 1) // set the blend in for the first viseme
+						prevViseme->rampin(prevViseme->rampout());
+					prevViseme->setDuration(prevViseme->rampin() + prevViseme->rampout());
 				}
-				// Add current viseme. It's blend duration will be updated during the next loop.
+		
 				visemes->push_back(singleViseme);
 			} else {
 				LOG("ERROR: remote_speech::extractVisemes(..): <viseme> without type= attribute found... Ignoring");
@@ -275,6 +251,14 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 		visemes=extractVisemes(node->getNextSibling(),visemes);
 	}
 
+	// set the blend out and duration for the last viseme
+	int numVisemes = visemes->size();
+	if (numVisemes > 0)
+	{
+		VisemeData* lastViseme = (*visemes)[numVisemes - 1];
+		lastViseme->rampout(lastViseme->rampin());
+		lastViseme->setDuration(lastViseme->rampin() + lastViseme->rampout());
+	}
 	return (visemes);
 
 }
