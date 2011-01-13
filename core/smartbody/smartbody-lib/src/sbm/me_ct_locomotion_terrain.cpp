@@ -40,9 +40,12 @@ float MeCtLocomotionTerrain::get_height(float x, float z, float* normal)
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if(mcu.height_field_p == NULL)
 	{
-		normal[0] = 0.0f;
-		normal[1] = 1.0f;
-		normal[2] = 0.0f;
+		if(normal != NULL)
+		{
+			normal[0] = 0.0f;
+			normal[1] = 1.0f;
+			normal[2] = 0.0f;
+		}
 		return ground_height;
 	}
 	return mcu.query_terrain(x, z, normal);
