@@ -84,13 +84,13 @@ class MeCtMotion : public MeController
     /*! Defines the maximum and minimum time scales acceptable for this motion. 
         These parameters are used to determine the feasibility of warping the motion
         in order to reach imposed timing constraints. */
-    void warp_limits ( float wmin, float wmax );
+//    void warp_limits ( float wmin, float wmax );
     
     /*! Returns the maximum time warping factor */
-    float maxtwarp () const { return _maxtwarp; }
+//    float maxtwarp () const { return _maxtwarp; }
     
     /*! Returns the minimum time warping factor */
-    float mintwarp () const { return _mintwarp; }
+//    float mintwarp () const { return _mintwarp; }
     
     /*! Set a desired time warping ratio, that will be clamped to the min/max values */
     void twarp ( float tw );
@@ -110,10 +110,10 @@ class MeCtMotion : public MeController
     virtual double controller_duration ();
 
 	/*! Gets the offset from the start of the motion. */
-	virtual double offset () { return _offset; }
+//	virtual double offset () { return _offset; }
 
 	/*! Sets the offset from the start of the motion. */
-	void offset ( double amount );
+//	void offset ( double amount );
 
     /*! Returns the duration of the warped motion, which corresponds to the phase in
         a loop controller with undetermined duration */
