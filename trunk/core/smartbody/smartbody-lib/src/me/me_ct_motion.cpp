@@ -101,7 +101,7 @@ void MeCtMotion::init ( MeCtMotion* other ) {
 		_context->child_channels_updated( this );
 	}
 }
-
+/*
 void MeCtMotion::warp_limits ( float wmin, float wmax ) {
 	if ( wmin<0.0001f ) wmin=0.0001f;
 	if ( wmax>9999.0f ) wmax=9999.0f;
@@ -110,10 +110,11 @@ void MeCtMotion::warp_limits ( float wmin, float wmax ) {
 	_maxtwarp = wmax;
 	twarp ( _twarp );
 }
+*/
 
-void MeCtMotion::offset ( double amount ) {
-	_offset = amount;
-}
+//void MeCtMotion::offset ( double amount ) {
+//	_offset = amount;
+//}
 
 void MeCtMotion::twarp ( float tw ) {
 	// put in/out back to their original values:
@@ -122,8 +123,8 @@ void MeCtMotion::twarp ( float tw ) {
 	float emph = emphasist()*_twarp;
 
 	// check limits:
-	if ( tw<_mintwarp ) tw = _mintwarp;
-	if ( tw>_maxtwarp ) tw = _maxtwarp;
+//	if ( tw<_mintwarp ) tw = _mintwarp;
+//	if ( tw>_maxtwarp ) tw = _maxtwarp;
 	_twarp = tw;
 
 	// update duration:

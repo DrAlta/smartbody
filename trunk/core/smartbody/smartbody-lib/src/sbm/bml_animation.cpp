@@ -88,7 +88,7 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 
 			const char* speedStr = xml_utils::asciiString( elem->getAttribute( BML::ATTR_SPEED ) );
 			if( speedStr[0] != 0 ) {  // speed attribute is not empty
-				motionCt->warp_limits( (float)0.01, 100 );  // override limits
+//				motionCt->warp_limits( (float)0.01, 100 );  // override limits
 				motionCt->twarp( (float) atof( speedStr ) );
 			}
 			delete [] speedStr;

@@ -126,6 +126,7 @@ class srSynchPoints	{
 			for( int i=0; i<NUM_SYNCH_TAGS; i++ )	{
 				synch_time_arr[ i ] = -1.0;
 			}
+			global_offset = 0.0;
 			implied_ramp_out = 0.0;
 			default_ramp_out = -1.0;
 			duration_defined = false;
@@ -200,6 +201,13 @@ class srSynchPoints	{
 
 	public:
 
+		void set_global_offset( double offset )	{
+			global_offset = offset;
+		}
+		double get_global_offset( void )	{
+			return( global_offset );
+		}
+		
 	// set by explicit time:
 
 		void set_time( double start, double stop = -1.0 ) {
@@ -304,8 +312,10 @@ class srSynchPoints	{
 			double ready_to_S_start, // S: stroke_
 			double S_start_to_S, 
 			double S_to_S_stop, 
+#if 0
 			int repetitions,
-//			double S_stop_return_to_S_start,
+			double S_stop_return_to_S_start,
+#endif
 			double S_stop_to_relax, 
 			double relax_to_stop
 		)	{
@@ -316,12 +326,12 @@ class srSynchPoints	{
 #if 0
 			if( repetitions > 1 ) set_interval( STROKE_STOP, S_stop_return_to_start ); // what a mess
 			double rep_offset = repetitions * ( S_start_to_S + S_to_S_stop );
+			double rep_offset = ( 0.0 ); // definition of rep?
+			set_interval( RELAX, rep_offset + S_stop_to_relax ); // what if reps == 0?
 #else
 			set_interval( STROKE_STOP, S_to_S_stop );
-			double rep_offset = ( 0.0 ); // definition of rep?
+			set_interval( RELAX, S_stop_to_relax );
 #endif
-			set_interval( RELAX, rep_offset + S_stop_to_relax ); // what if reps == 0?
-
 			set_interval( STOP, relax_to_stop );
 			if( relax_to_stop > 0.0 )	{
 				implied_ramp_out = relax_to_stop;
@@ -345,27 +355,20 @@ class srSynchPoints	{
 		}
 
 	// queries:
-		double get_time( int tag )	{
+		double get_time( int tag, bool global = false )	{
 
 			if( valid_tag( tag ) )	{
 				double t = synch_time_arr[ tag ];
 				if( t < 0.0 )	{
 					return( -1.0 );
 				}
+				if( global )	{
+					return( global_offset + t );
+				}
 				return( t );
 			}
 			return( -1.0 );
 		}
-#if 0
-		double get_abs_time( int tag, double from_time ) {
-		
-			double t = get_time( tag );
-			if( t < 0.0 )	{
-				return( -1.0 );
-			}
-			return( from_time + t );
-		}
-#endif
 		double get_interval( int fr_tag, int to_tag )   {
 
 			double f = get_time( fr_tag );
@@ -384,7 +387,7 @@ class srSynchPoints	{
 		double get_duration( void ) {
 			return( get_time( STOP ) );
 		}
-		double get_next( int *tag_p )	{
+		double get_next( int *tag_p, bool global = false )	{
 
 			if( tag_p == NULL )	{
 				return( -1.0 );
@@ -404,7 +407,7 @@ class srSynchPoints	{
 					tag = -1;
 				}
 				else	{
-					t = get_time( tag );
+					t = get_time( tag, global );
 					if( t >= 0.0 )	{
 						done = true;
 					}
@@ -488,7 +491,6 @@ class srSynchPoints	{
 			return( new_trapezoid( dfl_dur, dfl_ramp, dfl_ramp ) );
 		}
 			
-
 		int get_error( bool print_out )	{
 			if( err_code > 0 )	{
 				if( print_out )	{
@@ -512,8 +514,7 @@ class srSynchPoints	{
 		bool duration_defined;
 		double default_ramp_out;
 		double implied_ramp_out;
-
-//		int stroke_reps = 1;
+		double global_offset;
 
 		double synch_time_arr[ NUM_SYNCH_TAGS ];
 };

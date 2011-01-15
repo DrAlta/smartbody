@@ -3134,6 +3134,7 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 int mcu_motion_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
+#if 0
 	if( mcu_p ) {
 		char *ctrl_name = args.read_token();
 		char *warp_type = args.read_token(); // dur or speed
@@ -3152,6 +3153,9 @@ int mcu_motion_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			return( CMD_SUCCESS );
 		}
 	}
+#else
+	LOG( "mcu_motion_controller_func ERR: deprecated" );
+#endif
 	return( CMD_FAILURE );
 }
 
