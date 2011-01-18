@@ -917,6 +917,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\sr_linear_curve.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\sr_linear_curve.h"
 				>
 			</File>
