@@ -161,6 +161,7 @@ bool srSynchPoints::set_time( int tag, double t )	{
 	return( false );
 #endif
 }
+
 bool srSynchPoints::set_interval( int tag, double t )	{
 
 #if 1
