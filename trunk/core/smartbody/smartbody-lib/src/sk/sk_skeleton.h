@@ -28,7 +28,7 @@
 # include <SR/sr_string.h>
 # include <SR/sr_hash_table.h>
 # include <SR/sr_shared_class.h>
-
+# include <SR/sr_box.h>
 # include <SK/sk_joint.h>
 # include <SK/sk_channel_array.h>
 # include <SK/sk_posture.h>
@@ -171,7 +171,7 @@ class SkSkeleton : public SrSharedClass
 	SrVec& com () { return _com; };
 	
 	float getCurrentHeight();
-
+	SrBox getBoundingBox();
    private :
     int _loadjdata ( SrInput& in, SkJoint* j, SrStringArray& paths );
     SkJoint* _loadj ( SrInput& in, SkJoint* p, SrStringArray& paths, bool merge );

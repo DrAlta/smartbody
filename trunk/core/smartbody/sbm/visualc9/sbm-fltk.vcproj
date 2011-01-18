@@ -267,6 +267,14 @@
 				RelativePath="..\src\PositionControl.h"
 				>
 			</File>
+			<File
+				RelativePath="..\src\RootWindow.cxx"
+				>
+			</File>
+			<File
+				RelativePath="..\src\RootWindow.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="bmlviewer"

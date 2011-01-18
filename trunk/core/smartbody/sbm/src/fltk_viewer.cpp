@@ -21,7 +21,7 @@
  */
 
 # include "fltk_viewer.h"
-#include <fltk/compat/FL/Fl_Menu_Item.H>
+
 #include "vhcl.h"
 
 
@@ -32,7 +32,6 @@
 # include <fltk/visual.h>
 //# include <fltk/compat/FL/Fl_Menu_Item.H>
 # include <fltk/draw.h>
-# include <fltk/PopupMenu.h>
 # include <fltk/ColorChooser.H>
 # include <fltk/FileChooser.H>
 # include <fltk/Browser.H>
@@ -43,11 +42,9 @@
 # include <SR/sr_line.h>
 # include <SR/sr_plane.h>
 # include <SR/sr_event.h>
-# include <SR/sr_timer.h>
 # include <SR/sr_string.h>
 
 # include <SR/sr_gl.h>
-# include <SR/sr_light.h>
 # include <SR/sr_camera.h>
 # include <SR/sr_trackball.h>
 # include <SR/sr_lines.h>
@@ -58,8 +55,6 @@
 
 # include <SR/sr_sa.h>
 # include <SR/sr_sa_event.h>
-# include <SR/sr_sa_bbox.h>
-# include <SR/sr_sa_gl_render.h>
 # include <SR/sr_gl_render_funcs.h>
 # include <SBM/me_ct_eyelid.h>
 
@@ -120,9 +115,13 @@ fltk::Window* make_help_window ()
 static void menucb ( fltk::Widget* o, void* v ) 
  {
 	 fltk::Widget* widget = o->parent();
-	 while (widget && widget->parent() != NULL)
-		 widget = widget->parent();
-	 FltkViewer* viewer = dynamic_cast<FltkViewer*>(widget);
+	 
+	 FltkViewer* viewer = NULL;
+	 while (!viewer && widget && widget->parent() != NULL)
+	 {
+		widget = widget->parent();
+		viewer = dynamic_cast<FltkViewer*>(widget);
+	 }
 	 if (viewer)
 		 viewer->menu_cmd((FltkViewer::MenuCmd)(int)v,o->label());
  }
@@ -209,6 +208,7 @@ Fl_Menu_Item MenuTable[] =
 		 { "&show selection",   0, MCB, CMD(CmdShowSelection),  FL_MENU_TOGGLE },
 		 { "&show kinematic footprints",   0, MCB, CMD(CmdShowKinematicFootprints),  FL_MENU_TOGGLE },
 		 { "&show locomotion footprints",   0, MCB, CMD(CmdShowLocomotionFootprints),  FL_MENU_TOGGLE },
+		 { "&interactive",   0, MCB, CMD(CmdInteractiveLocomotion),  FL_MENU_TOGGLE },
          { 0 },
    { 0 }
  };
@@ -275,60 +275,6 @@ static void set_menu_data ( FltkViewer::RenderMode r, FltkViewer::CharacterMode 
 
 //================================= Internal Structures =================================
 
-class FltkViewerData
- { public :
-   SrSn*  root;              // contains the user scene
-   FltkViewer::RenderMode rendermode; // render mode
-   FltkViewer::CharacterMode charactermode; // character mode
-   FltkViewer::PawnMode pawnmode; // pawn mode
-   FltkViewer::ShadowMode shadowmode;     // shadow mode
-   FltkViewer::terrainMode terrainMode;     // terrain mode
-   FltkViewer::EyeBeamMode eyeBeamMode;     // eye beam mode
-   FltkViewer::EyeLidMode eyeLidMode;     // eye lid mode
-   FltkViewer::DynamicsMode dynamicsMode;     // dynamics information mode
-   FltkViewer::LocomotionMode locomotionMode;   // locomotion mode
-
-
-   bool iconized;      // to stop processing while the window is iconized
-   bool statistics;    // shows statistics or not
-   bool displayaxis;   // if shows the axis or not
-   bool boundingbox;   // if true will show the bbox of the whole scene
-   bool scene_received_event; // to detect and send a release event to the scene graph
-                              // when the alt key is released but the mouse is pushed
-   bool showgeometry;
-   bool showcollisiongeometry;
-   bool showdeformablegeometry;
-   bool showbones;
-   bool showaxis;
-   bool showmasses;
-
-   bool locomotionenabled;
-   bool showlocomotionall;
-   bool showvelocity;
-   bool showorientation;
-   bool showselection;
-   bool showlocofootprints;
-   bool showkinematicfootprints;
-
-   SrString message;   // user msg to display in the window
-   SrLight light;
-
-   SrTimer    fcounter;   // To count frames and measure frame rate
-   SrEvent    event;      // The translated event from fltk to sr format
-   SrColor    bcolor;     // Background color currently used
-   SrBox      bbox;       // Bounding box of the root, calculated with viewall
-   SrCamera   camera;     // The current camera parameters
-
-   SrSnLines* scenebox;  // contains the bounding box to display, and use in view_all
-   SrSnLines* sceneaxis; // the current axis being displayed
-
-   fltk::PopupMenu* menubut; // the ctrl+shift+m or button3 menu
-   fltk::Window* helpwin;
-
-   SrSaGlRender render_action;
-   SrSaBBox bbox_action;
-
- };
 
 //===================================== FltkViewer =================================
 
@@ -349,12 +295,13 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 
    resizable(this);
 
-   _data = new FltkViewerData;
+   _data = new FltkViewerData();
+   _locoData = new LocomotionData();
 
    _data->root = new SrSnGroup; // we maintain root pointer always valid
    _data->rendermode = ModeAsIs;
    _data->charactermode = ModeShowBones;
-   _data->pawnmode = ModeNoPawns;
+   _data->pawnmode = ModePawnShowAsSpheres;
    _data->shadowmode = ModeNoShadows;
    _data->terrainMode = ModeTerrain;
    _data->eyeBeamMode = ModeNoEyeBeams;
@@ -378,6 +325,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->showselection = false;
    _data->showlocofootprints = false;
    _data->showkinematicfootprints = false;
+   _data->interactiveLocomotion = false;
 
    _data->light.init();
 
@@ -543,6 +491,8 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
                        break;
 	  case CmdShowLocomotionFootprints  : _data->showlocofootprints = !_data->showlocofootprints;
 						if(!_data->showlocofootprints) _data->showlocomotionall = false;
+                       break;
+	  case CmdInteractiveLocomotion  : _data->interactiveLocomotion = !_data->interactiveLocomotion;
                        break;
       case CmdBoundingBox : SR_SWAPB(_data->boundingbox); 
                             if ( _data->boundingbox ) update_bbox();
@@ -1005,14 +955,6 @@ void FltkViewer::draw()
 				_data->render_action.apply ( _data->root );
 			glPopMatrix();
 
-			GLfloat shadow_plane_wall[3][3] = {
-				{ 0.0, 0.0, -gridSize }, 
-				{ 1.0, 0.0, -gridSize }, 
-				{ 1.0, 1.0, -gridSize }
-			};
-
-			MakeShadowMatrix( shadow_plane_wall, shadow_light_pos, shadow_matrix );
-
 			GLdouble plane_eq_floor[ 4 ] = { 0.0, 1.0, 0.0, 0.0 };
 			glClipPlane( GL_CLIP_PLANE0, plane_eq_floor );
 
@@ -1038,6 +980,7 @@ void FltkViewer::draw()
 	drawDynamics();
 	drawLocomotion();
 	drawPawns();
+	drawInteractiveLocomotion();
 
 	//_posControl.Draw();
 	_objManipulator.draw();
@@ -1108,29 +1051,7 @@ static void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h, FltkVie
 
  }
 
-static float rps = 0.7f;
-static int x_flag = 0;
-static int z_flag = 0;
-static int rps_flag = 0;
-static float spd;
-static float x_spd = 7;
-static float z_spd = 70;
-static char t_direction[200];
-static char character[100];
-static int char_index = 0;
-static int kmode = 0;
-static float height_disp = 0.0f;
-static float height_disp_delta = 1.0f;
-static bool height_disp_inc = false;
-static bool height_disp_dec = false;
-static bool upkey = false;
-static bool downkey = false;
-static bool leftkey = false;
-static bool rightkey = false;
-static bool a_key = false;
-static bool d_key = false;
 
-static float off_height_comp = 0.0f;
 
 void FltkViewer::translate_keyboard_state()
 {
@@ -1139,47 +1060,47 @@ void FltkViewer::translate_keyboard_state()
 	cmd[0] = '\0';
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	if(x_flag == 0 && z_flag == 0)
+	if(_locoData->x_flag == 0 && _locoData->z_flag == 0)
 	{
-		rps_flag = 0;
-		z_flag = 1;
-		x_flag = 0;
-		spd = z_spd;
-		sprintf(t_direction, "forward ");
+		_locoData->rps_flag = 0;
+		_locoData->z_flag = 1;
+		_locoData->x_flag = 0;
+		_locoData->spd = _locoData->z_spd;
+		sprintf(_locoData->t_direction, "forward ");
 	}
 
 	SbmCharacter* actor = NULL;
 	mcu.character_map.reset();
-	for(int i = 0; i <= char_index; ++i)
+	for(int i = 0; i <= _locoData->char_index; ++i)
 	{
 		actor = mcu.character_map.next();
 		if (actor)
-			sprintf(character, "char %s ", actor->name);
+			sprintf(_locoData->character, "char %s ", actor->name);
 	}
 
 	sprintf(cmd, "test loco ");
-	strcat(cmd, character);
+	strcat(cmd, _locoData->character);
 
 
 	if(fltk::get_key_state('r'))
 	{
-		height_disp += height_disp_delta;
+		_locoData->height_disp += _locoData->height_disp_delta;
 		//if(height_disp > 0.0f) height_disp = 0.0f;
-		actor->get_locomotion_ct()->set_target_height_displacement(height_disp);
+		actor->get_locomotion_ct()->set_target_height_displacement(_locoData->height_disp);
 	}
 	if(fltk::get_key_state('f'))
 	{
-		height_disp -= height_disp_delta;
+		_locoData->height_disp -= _locoData->height_disp_delta;
 		//if(height_disp < -50.0f) height_disp = -50.0f;
-		actor->get_locomotion_ct()->set_target_height_displacement(height_disp);
+		actor->get_locomotion_ct()->set_target_height_displacement(_locoData->height_disp);
 	}
 	if(fltk::get_key_state('k'))
 	{
-		++off_height_comp;
+		++_locoData->off_height_comp;
 	}
 	if(fltk::get_key_state('m'))
 	{
-		--off_height_comp;
+		--_locoData->off_height_comp;
 	}
 	if(fltk::get_key_state('x'))
 	{
@@ -1187,10 +1108,10 @@ void FltkViewer::translate_keyboard_state()
 		
 		//for(int i = 0; i < mcu.character_map.get_num_entries(); ++i)
 		{
-			++char_index;
-			if(char_index >= mcu.character_map.get_num_entries())
+			++_locoData->char_index;
+			if(_locoData->char_index >= mcu.character_map.get_num_entries())
 			{
-				char_index = 0;
+				_locoData->char_index = 0;
 			}
 			/*mcu.character_map.reset();
 			for(int j = 0; j <= char_index; ++j)
@@ -1244,15 +1165,15 @@ void FltkViewer::translate_keyboard_state()
 
 	if(fltk::get_key_state('w'))
 	{
-		if(z_flag != 0) z_spd += 10;
-		else if(x_flag != 0) x_spd += 1;
+		if(_locoData->z_flag != 0) _locoData->z_spd += 10;
+		else if(_locoData->x_flag != 0) _locoData->x_spd += 1;
 	}
 	if(fltk::get_key_state('s'))
 	{
-		if(z_flag != 0) z_spd -= 10;
-		else if(x_flag != 0) x_spd -= 1;
-		if(z_spd < 0) z_spd = 0;
-		if(x_spd < 0) x_spd = 0;
+		if(_locoData->z_flag != 0) _locoData->z_spd -= 10;
+		else if(_locoData->x_flag != 0) _locoData->x_spd -= 1;
+		if(_locoData->z_spd < 0) _locoData->z_spd = 0;
+		if(_locoData->x_spd < 0) _locoData->x_spd = 0;
 	}
 
 	if(fltk::get_key_state('l'))
@@ -1278,119 +1199,119 @@ void FltkViewer::translate_keyboard_state()
 
 	if(fltk::get_key_state(fltk::UpKey))
 	{
-		if(!upkey)
+		if(!_locoData->upkey)
 		{
-			rps_flag = 0;
-			z_flag = 1;
-			x_flag = 0;
-			spd = z_spd;
-			kmode = 0;
-			sprintf(t_direction, "forward ");
-			upkey = true;
+			_locoData->rps_flag = 0;
+			_locoData->z_flag = 1;
+			_locoData->x_flag = 0;
+			_locoData->spd = _locoData->z_spd;
+			_locoData->kmode = 0;
+			sprintf(_locoData->t_direction, "forward ");
+			_locoData->upkey = true;
 		}
 	}
 	else
 	{
-		upkey = false;
+		_locoData->upkey = false;
 	}
 	if(fltk::get_key_state(fltk::DownKey))
 	{
-		if(!downkey)
+		if(!_locoData->downkey)
 		{
-			z_flag = -1;
-			x_flag = 0;
-			rps_flag = 0;
-			spd = z_spd;
-			kmode = 0;
-			sprintf(t_direction, "backward ");
-			downkey = true;
+			_locoData->z_flag = -1;
+			_locoData->x_flag = 0;
+			_locoData->rps_flag = 0;
+			_locoData->spd = _locoData->z_spd;
+			_locoData->kmode = 0;
+			sprintf(_locoData->t_direction, "backward ");
+			_locoData->downkey = true;
 		}
 	}
 	else
 	{
-		downkey = false;
+		_locoData->downkey = false;
 	}
 	if(fltk::get_key_state(fltk::LeftKey))
 	{
-		if(!leftkey)
+		if(!_locoData->leftkey)
 		{
-			rps_flag = -1;
-			leftkey = true;
+			_locoData->rps_flag = -1;
+			_locoData->leftkey = true;
 		}
 	}
 	else
 	{
-		leftkey = false;
+		_locoData->leftkey = false;
 	}
 	if(fltk::get_key_state(fltk::RightKey))
 	{
-		if(!rightkey)
+		if(!_locoData->rightkey)
 		{
-			rps_flag = 1;
-			rightkey = true;
+			_locoData->rps_flag = 1;
+			_locoData->rightkey = true;
 		}
 	}
 	else
 	{
-		rightkey = false;
+		_locoData->rightkey = false;
 	}
 
 	if(fltk::get_key_state('a'))//speed control
 	{
-		if(!a_key)
+		if(!_locoData->a_key)
 		{
-			x_flag = 1;
-			z_flag = 0;
-			rps_flag = 0;
-			spd = x_spd;
-			sprintf(t_direction, "leftward ");
-			a_key = true;
+			_locoData->x_flag = 1;
+			_locoData->z_flag = 0;
+			_locoData->rps_flag = 0;
+			_locoData->spd = _locoData->x_spd;
+			sprintf(_locoData->t_direction, "leftward ");
+			_locoData->a_key = true;
 		}
 	}
 	else
 	{
-		a_key = false;
+		_locoData->a_key = false;
 	}
 
 	if(fltk::get_key_state('d'))//speed control
 	{
-		if(!d_key)
+		if(!_locoData->d_key)
 		{
-			x_flag = -1;
-			z_flag = 0;
-			rps_flag = 0;
-			spd = x_spd;
-			sprintf(t_direction, "rightward ");
-			d_key = true;
+			_locoData->x_flag = -1;
+			_locoData->z_flag = 0;
+			_locoData->rps_flag = 0;
+			_locoData->spd = _locoData->x_spd;
+			sprintf(_locoData->t_direction, "rightward ");
+			_locoData->d_key = true;
 		}
 	}
 	else
 	{
-		d_key = false;
+		_locoData->d_key = false;
 	}
 
-	if(!rightkey && !leftkey)
+	if(!_locoData->rightkey && !_locoData->leftkey)
 	{
-		rps_flag = 0;
+		_locoData->rps_flag = 0;
 	}
 
-		if(upkey
-		|| downkey
-		|| rightkey
-		|| leftkey
-		|| a_key
-		|| d_key)
+		if(_locoData->upkey
+		|| _locoData->downkey
+		|| _locoData->rightkey
+		|| _locoData->leftkey
+		|| _locoData->a_key
+		|| _locoData->d_key)
 	{
 		locomotion_cmd = true;
 	}
 
 	char tt[200];
 	
-	strcat(cmd, t_direction);
+	strcat(cmd, _locoData->t_direction);
 	//sprintf(tt, "spd %f rps %f time 0.5", spd, rps_flag * rps);
 
-	if(kmode == 0) sprintf(tt, "spd 0 rps %f time 0.7", rps_flag * rps);
-	else sprintf(tt, "spd 0 lrps %f angle 3.14159265 time 1.0", rps_flag * rps);
+	if(_locoData->kmode == 0) sprintf(tt, "spd 0 rps %f time 0.7", _locoData->rps_flag * _locoData->rps);
+	else sprintf(tt, "spd 0 lrps %f angle 3.14159265 time 1.0", _locoData->rps_flag * _locoData->rps);
 
 	if(locomotion_cmd) 
 	{
@@ -1401,7 +1322,7 @@ void FltkViewer::translate_keyboard_state()
 }
 
 
-
+/*
 static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h)
 {
 	e.type = t;
@@ -1411,21 +1332,21 @@ static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h
 	cmd[0] = '\0';
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	if(x_flag == 0 && z_flag == 0)
+	if(_locoData->x_flag == 0 && _locoData->z_flag == 0)
 	{
-		rps_flag = 0;
-		z_flag = 1;
-		x_flag = 0;
-		spd = z_spd;
-		sprintf(t_direction, "forward ");
+		_locoData->rps_flag = 0;
+		_locoData->z_flag = 1;
+		_locoData->x_flag = 0;
+		_locoData->spd = _locoData->z_spd;
+		sprintf(_locoData->t_direction, "forward ");
 	}
 
 	SbmCharacter* actor = NULL;
 	mcu.character_map.reset();
-	for(int i = 0; i <= char_index; ++i)
+	for(int i = 0; i <= _locoData->char_index; ++i)
 	{
 		actor = mcu.character_map.next();
-		sprintf(character, "char %s ", actor->name);
+		sprintf(_locoData->character, "char %s ", actor->name);
 	}
 
 	sprintf(cmd, "test loco ");
@@ -1434,30 +1355,30 @@ static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h
 	switch (e.key)
 	{
 	case fltk::UpKey: //move forward
-		rps_flag = 0;
-		z_flag = 1;
-		x_flag = 0;
-		spd = z_spd;
-		sprintf(t_direction, "forward ");
+		_locoData->rps_flag = 0;
+		_locoData->z_flag = 1;
+		_locoData->x_flag = 0;
+		_locoData->spd = _locoData->z_spd;
+		sprintf(_locoData->t_direction, "forward ");
 		break;
 
     case fltk::DownKey://move back
-		z_flag = -1;
-		x_flag = 0;
-		rps_flag = 0;
-		spd = z_spd;
-		sprintf(t_direction, "backward ");
+		_locoData->z_flag = -1;
+		_locoData->x_flag = 0;
+		_locoData->rps_flag = 0;
+		_locoData->spd = _locoData->z_spd;
+		sprintf(_locoData->t_direction, "backward ");
 		break;
 
 	case fltk::LeftKey://turn left
-		rps_flag = -1;
+		_locoData->rps_flag = -1;
 		break;
 
 	case 'x':
-		++char_index;
-		if(char_index >= mcu.character_map.get_num_entries())
+		++_locoData->char_index;
+		if(_locoData->char_index >= mcu.character_map.get_num_entries())
 		{
-			char_index = 0;
+			_locoData->char_index = 0;
 		}
 		not_locomotion = true;
 		break;
@@ -1516,7 +1437,7 @@ static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h
 		mcu.execute(cmd);
 	}
 }
-
+*/
 
 
 
@@ -1654,6 +1575,7 @@ int FltkViewer::handle ( int event )
          SrPnt pb = plane.intersect ( bray.p1, bray.p2 );
          //sr_out << "pa,pb: " << pa << srspc << pb <<srnl;
          e.pixel_size = (SR_DIST(pa.x,pb.x)+SR_DIST(pa.y,pb.y))/2.0f;
+		 interactivePoint = e.lmousep;
          //sr_out << "pixel_size: " << e.pixel_size <<srnl;
        }
     }
@@ -1699,6 +1621,26 @@ int FltkViewer::handle_object_manipulation( const SrEvent& e)
 		 if (e.button1)
 		 {
 			 _objManipulator.picking(e.mouse.x,e.mouse.y, _data->camera);
+			 /*
+			 // unify the pawn selection and the locomotion selection
+			 SbmPawn* pawn = _objManipulator.get_selected_pawn();
+			 SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
+			 if (character)
+			 {
+				 mcuCBHandle& mcu = mcuCBHandle::singleton();
+				 int index = 0;
+				 mcu.character_map.reset();
+				 while (SbmCharacter* c = mcu.character_map.next())
+				 {
+					 if (character == c)
+					 {
+						 _locoData->char_index = index;
+						 break;
+					 }
+					 index++;
+				 }	
+			 }
+			 */
 			 return 1;
 		 }
 	 }
@@ -1724,7 +1666,6 @@ int FltkViewer::handle_object_manipulation( const SrEvent& e)
 void FltkViewer::create_pawn()
 {
 	const char* pawn_name = fltk::input("Input Pawn Name","foo");
-	printf("Pawn Name = %s\n",pawn_name);
 	if (!pawn_name) // no name is input
 		return;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -1739,7 +1680,7 @@ void FltkViewer::set_gaze_target(int itype, const char* label)
 	SbmCharacter* actor = NULL;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.character_map.reset();
-	for(int i = 0; i <= char_index; ++i)
+	for(int i = 0; i <= _locoData->char_index; ++i)
 	{
 		actor = mcu.character_map.next();
 		//if (actor)
@@ -1828,6 +1769,7 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
 		{
 			_data->camera.fovy += (dx+dy);//40.0f;
 			_data->camera.fovy = SR_BOUND ( _data->camera.fovy, 0.001f, srpi );
+			redraw();
 		}
 		else if ( DOLLYING(e) )
 		{ 
@@ -1848,9 +1790,11 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
 			_data->camera.eye = cameraPos;
 			SrVec cameraDiff = _data->camera.eye - oldEyePos;
 			_data->camera.center += cameraDiff;
+			redraw();
 		}
       else if ( TRANSLATING(e) )
        { _data->camera.apply_translation_from_mouse_motion ( e.lmouse.x, e.lmouse.y, e.mouse.x, e.mouse.y );
+		redraw();
        }
       else if ( ROTATING(e) )
        { 
@@ -1875,6 +1819,7 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
 		camera = rotatePoint(camera, origCenter, dirY, deltaY * float(M_PI));
 
 		_data->camera.eye = camera;
+		redraw();
 	  }
     }
    else if ( e.type==SrEvent::Release )
@@ -2233,13 +2178,16 @@ void FltkViewer::drawPawns()
 
 	srHashMap<SbmPawn>& pawn_map = mcu.pawn_map;
 	pawn_map.reset();
-	SbmPawn* pawn = pawn_map.next();
+	
 
 	glPushAttrib(GL_LIGHTING_BIT);
 	glDisable(GL_LIGHTING);
-	while ( pawn )
+	while ( SbmPawn* pawn = pawn_map.next() )
 	{
 		if (!pawn->skeleton_p) // wouldn't this will go into inf loop ?
+			continue;
+		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
+		if (character)
 			continue;
 		pawn->skeleton_p->update_global_matrices();
 		SrArray<SkJoint*>& joints = pawn->skeleton_p->get_joint_array();
@@ -2261,8 +2209,6 @@ void FltkViewer::drawPawns()
 		glEnd();
 		glPopMatrix();
 		glPopMatrix();
-	
-		pawn = pawn_map.next();
 	}
 	glPopAttrib();
 
@@ -2784,7 +2730,7 @@ void FltkViewer::drawLocomotion()
 		}
 		if(_data->showselection)
 		{
-			if(i == char_index)
+			if(i == _locoData->char_index)
 			{
 				float height = character->getHeight();
 				SrVec color;
@@ -2808,7 +2754,7 @@ void FltkViewer::drawLocomotion()
 		{
 			//int cur_dominant = character->get_locomotion_ct()->get_dominant_limb_index();
 			//if(i == char_index && character->get_locomotion_ct()->limb_list.size()>cur_dominant)
-			if(i == char_index)
+			if(i == _locoData->char_index)
 			{
 				//if(cur_dominant != pre_dominant && character->get_locomotion_ct()->limb_list.get(cur_dominant)->space_time >= 0.0f
 				//	&& character->get_locomotion_ct()->limb_list.get(cur_dominant)->space_time < 1.0f)
@@ -2825,7 +2771,7 @@ void FltkViewer::drawLocomotion()
 					for(int j = 0; j < 3; ++j)
 					{
 						off_height = character->get_locomotion_ct()->limb_list.get(k)->get_off_ground_height(j+2);
-						if(character->get_locomotion_ct()->limb_list.get(0)->walking_list.size() < 2) off_height -= off_height_comp;
+						if(character->get_locomotion_ct()->limb_list.get(0)->walking_list.size() < 2) off_height -= _locoData->off_height_comp;
 						//printf("%f ", off_height);
 						if(off_height > 0.0f) continue;
 						SrVec pos = character->get_locomotion_ct()->get_supporting_joint_pos(j, k, &orientation, &normal);
@@ -2841,7 +2787,7 @@ void FltkViewer::drawLocomotion()
 		if(_data->showlocofootprints)
 		{
 			int cur_dominant = character->get_locomotion_ct()->get_dominant_limb_index();
-			if(i == char_index && character->get_locomotion_ct()->limb_list.size()>cur_dominant)
+			if(i == _locoData->char_index && character->get_locomotion_ct()->limb_list.size()>cur_dominant)
 			{
 				if(cur_dominant != pre_dominant && character->get_locomotion_ct()->limb_list.get(cur_dominant)->space_time >= 0.0f
 					&& character->get_locomotion_ct()->limb_list.get(cur_dominant)->space_time < 1.0f)
@@ -2870,6 +2816,30 @@ void FltkViewer::drawLocomotion()
 			}
 		}
 	}
+}
+
+void FltkViewer::drawInteractiveLocomotion()
+{
+	if (!_data->interactiveLocomotion)
+		return;
+
+	float pawnSize = 1.0;
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.character_map.reset();
+	while (SbmCharacter* character = mcu.character_map.next())
+	{
+		pawnSize = character->getHeight() / 8.0f;
+		break;
+	}
+
+	glPushMatrix();
+	glTranslatef(interactivePoint[0], 0.0, interactivePoint[2]);
+	SrSnSphere sphere;
+	sphere.shape().center = SrPnt(0, 0, 0);
+	sphere.shape().radius = pawnSize;
+	sphere.render_mode(srRenderModeLines);
+	SrGlRenderFuncs::render_sphere(&sphere);
+	glPopMatrix();
 }
 
 void FltkViewer::drawDynamics()
@@ -3015,32 +2985,7 @@ void FltkViewer::drawDynamics()
 	
 
 }
-//== Viewer Factory ========================================================
 
-
-FltkViewer* FltkViewerFactory::s_viewer = NULL;
-
-FltkViewerFactory::FltkViewerFactory()
-{
-	s_viewer = NULL;
-}
-
-SrViewer* FltkViewerFactory::create(int x, int y, int w, int h)
-{
-	if (!s_viewer)
-		s_viewer = new FltkViewer(x, y, w, h);
-	return s_viewer;
-}
-
-void FltkViewerFactory::remove(SrViewer* viewer)
-{
-	if (viewer && (viewer == s_viewer))
-	{
-		delete viewer;
-		s_viewer = NULL;
-		viewer = NULL;
-	}
-}
 
 
 //================================ End of File =================================================
