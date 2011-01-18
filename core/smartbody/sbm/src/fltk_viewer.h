@@ -29,11 +29,18 @@
 # define FLTK_VIEWER_H
 
 #include "fltk/Slider.h"  // before vhcl.h because of LOG enum which conflicts with vhcl::Log
-
+#include <fltk/compat/FL/Fl_Menu_Item.H>
 # include <fltk/GlWindow.H>
 # include <sr/sr_viewer.h>
 #include <fltk/Input.h>
 # include <sr/sr_color.h>
+# include <SR/sr_light.h>
+# include <SR/sr_timer.h>
+# include <SR/sr_sa_gl_render.h>
+# include <SR/sr_sa_bbox.h>
+# include <fltk/PopupMenu.h>
+
+
 #include "ObjectManipulationHandle.h"
 
 
@@ -44,7 +51,9 @@ class SrEvent;
 class SrCamera;
 class SrSn;
 class SrViewer;
+class SrLight;
 class FltkViewerData;
+class LocomotionData;
 
 /*! \class SrViewer sr_viewer.h
     \brief A fltk-opengl viewer
@@ -104,8 +113,8 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 						ModeShowOrientation,
 						ModeShowSelection,
 						ModeShowKinematicFootprints,
-					    ModeShowLocomotionFootprints
-
+					    ModeShowLocomotionFootprints,
+						ModeInteractiveLocomotion
                 };
 
     enum MenuCmd { CmdHelp,
@@ -152,12 +161,14 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdShowOrientation,
 				   CmdShowSelection,
 				   CmdShowKinematicFootprints,
-				   CmdShowLocomotionFootprints
+				   CmdShowLocomotionFootprints,
+				   CmdInteractiveLocomotion
                  };
 
    private : // internal data
 
-    FltkViewerData *_data;
+    FltkViewerData* _data;
+	LocomotionData* _locoData;
 	
 
 	ObjectManipulationHandle _objManipulator; // a hack for testing. 
@@ -225,6 +236,8 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
     void set_camera (const SrCamera &cam);
 
 	FltkViewerData* getData() { return _data; };
+	LocomotionData* getLocomotionData() { return _locoData; };
+	ObjectManipulationHandle& getObjectManipulationHandle() { return _objManipulator; };
 
    public : // virtual methods
 
@@ -277,6 +290,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	void drawEyeLids();
 	void drawDynamics();
 	void drawLocomotion();
+	void drawInteractiveLocomotion();
 	void drawPawns();
 	void drawArrow(SrVec& from, SrVec& to, float width, SrVec& color);
 	void drawCircle(float cx, float cy, float cz, float r, int num_segments, SrVec& color);
@@ -286,38 +300,136 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	void drawKinematicFootprints(int index);
 	void newPrints(bool newprint, int index, SrVec& pos, SrVec& orientation, SrVec& normal, SrVec& color, int side, int type);
 	static void ChangeOffGroundHeight(fltk::Widget* widget, void* data);
+	void create_pawn();
 
 	int gridList;
 	float gridColor[4];
 	float gridHighlightColor[3];
 	float gridSize;
 	float gridStep;
+
+	SrVec interactivePoint;
 	
 	virtual void label_viewer(const char* str);
 	virtual void show_viewer();
 	virtual void hide_viewer();
 protected:
-	void create_pawn();
+	
 	void set_gaze_target(int itype, const char* targetname);	
 	void update_gaze_submenus();
 	void create_popup_menus();
  };
 
 
- class FltkViewerFactory : public SrViewerFactory
- {
-	public:
-		FltkViewerFactory();
+ class FltkViewerData
+ { public :
+   SrSn*  root;              // contains the user scene
+   FltkViewer::RenderMode rendermode; // render mode
+   FltkViewer::CharacterMode charactermode; // character mode
+   FltkViewer::PawnMode pawnmode; // pawn mode
+   FltkViewer::ShadowMode shadowmode;     // shadow mode
+   FltkViewer::terrainMode terrainMode;     // terrain mode
+   FltkViewer::EyeBeamMode eyeBeamMode;     // eye beam mode
+   FltkViewer::EyeLidMode eyeLidMode;     // eye lid mode
+   FltkViewer::DynamicsMode dynamicsMode;     // dynamics information mode
+   FltkViewer::LocomotionMode locomotionMode;   // locomotion mode
 
-		//void setFltkViewer(FltkViewer* viewer);
 
-		virtual SrViewer* create(int x, int y, int w, int h);
-		virtual void remove(SrViewer* viewer);
+   bool iconized;      // to stop processing while the window is iconized
+   bool statistics;    // shows statistics or not
+   bool displayaxis;   // if shows the axis or not
+   bool boundingbox;   // if true will show the bbox of the whole scene
+   bool scene_received_event; // to detect and send a release event to the scene graph
+                              // when the alt key is released but the mouse is pushed
+   bool showgeometry;
+   bool showcollisiongeometry;
+   bool showdeformablegeometry;
+   bool showbones;
+   bool showaxis;
+   bool showmasses;
 
-	private:
-		static FltkViewer* s_viewer;
+   bool locomotionenabled;
+   bool showlocomotionall;
+   bool showvelocity;
+   bool showorientation;
+   bool showselection;
+   bool showlocofootprints;
+   bool showkinematicfootprints;
+   bool interactiveLocomotion;
+
+   SrString message;   // user msg to display in the window
+   SrLight light;
+
+   SrTimer    fcounter;   // To count frames and measure frame rate
+   SrEvent    event;      // The translated event from fltk to sr format
+   SrColor    bcolor;     // Background color currently used
+   SrBox      bbox;       // Bounding box of the root, calculated with viewall
+   SrCamera   camera;     // The current camera parameters
+
+   SrSnLines* scenebox;  // contains the bounding box to display, and use in view_all
+   SrSnLines* sceneaxis; // the current axis being displayed
+
+   fltk::PopupMenu* menubut; // the ctrl+shift+m or button3 menu
+   fltk::Window* helpwin;
+
+   SrSaGlRender render_action;
+   SrSaBBox bbox_action;
 
  };
+
+class LocomotionData
+{
+	public:
+		LocomotionData() 
+		{
+			rps = 0.7f;
+			x_flag = 0;
+			z_flag = 0;
+			rps_flag = 0;
+			spd;
+			x_spd = 7;
+			z_spd = 70;
+			t_direction[200];
+			character[100];
+			char_index = 0;
+			kmode = 0;
+			height_disp = 0.0f;
+			height_disp_delta = 1.0f;
+			height_disp_inc = false;
+			height_disp_dec = false;
+			upkey = false;
+			downkey = false;
+			leftkey = false;
+			rightkey = false;
+			a_key = false;
+			d_key = false;
+
+			off_height_comp = 0.0f;
+		}
+		
+		float rps;
+		int x_flag;
+		int z_flag;
+		int rps_flag;
+		float spd;
+		float x_spd;
+		float z_spd;
+		char t_direction[200];
+		char character[100];
+		int char_index;
+		int kmode;
+		float height_disp;
+		float height_disp_delta;
+		bool height_disp_inc;
+		bool height_disp_dec;
+		bool upkey;
+		bool downkey;
+		bool leftkey;
+		bool rightkey;
+		bool a_key;
+		bool d_key;
+		float off_height_comp;
+};
 
 //================================ End of File =================================================
 

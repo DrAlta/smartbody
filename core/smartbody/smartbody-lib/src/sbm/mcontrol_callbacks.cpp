@@ -425,6 +425,9 @@ int mcu_viewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				int err = mcu_p->open_viewer( width, height, px, py );
 				return( err );
 			}
+			else {
+				mcu_p->viewer_p ->show_viewer();
+			}
 		}		
 		else
 		if( strcmp( view_cmd, "close" ) == 0 )	{
@@ -761,6 +764,18 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			else if (strcmp( cam_cmd, "reset" ) == 0 ) {
 				mcu_p->execute("camera eye 0 166 185");
 				mcu_p->execute("camera center 0 92 0");
+			}
+			else if (strcmp( cam_cmd, "frame" ) == 0 ) {
+				SrBox sceneBox;
+				SrCamera* camera = mcu_p->viewer_p->get_camera();
+				mcu_p->pawn_map.reset();
+				while (SbmPawn* pawn = mcu_p->pawn_map.next())
+				{
+					SrBox box = pawn->skeleton_p->getBoundingBox();
+					sceneBox.extend(box);
+				}
+
+				camera->view_all(sceneBox, camera->fovy);
 			}
 			return( CMD_SUCCESS );
 		}

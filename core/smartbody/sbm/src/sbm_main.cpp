@@ -41,6 +41,7 @@
 #include <fstream>
 
 #include "fltk_viewer.h"
+#include "RootWindow.h"
 #include <bmlviewer/BehaviorWindow.h>
 #include <panimationviewer/PanimationWindow.h>
 #include <channelbufferviewer/channelbufferWindow.hpp>
