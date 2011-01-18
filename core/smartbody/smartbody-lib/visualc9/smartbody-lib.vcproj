@@ -925,6 +925,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\sr_synch_points.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\sr_synch_points.h"
 				>
 			</File>
