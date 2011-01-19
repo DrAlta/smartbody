@@ -41,12 +41,15 @@ SkMotion::SkMotion() :
 	_filename( NULL ),
 	_skeleton( NULL ),
 	_floatbuffer( NULL ),
-	_last_apply_frame( 0 ),
+	_last_apply_frame( 0 )
+#if 0
+	,
 	_time_ready( -1 ),
 	_time_stroke_start( -1 ),
 	_time_stroke_emphasis( -1 ),
 	_time_stroke_end( -1 ),
 	_time_relax( -1 )
+#endif
 {}
 
 SkMotion::~SkMotion()
