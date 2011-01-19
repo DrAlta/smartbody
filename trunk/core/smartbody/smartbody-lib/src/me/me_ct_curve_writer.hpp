@@ -35,12 +35,12 @@ class MeCtCurveWriter : public MeController {
 		enum boundary_mode_enum_set	{
 			BOUNDARY_CROP,				// do not write
 			BOUNDARY_CLAMP, 			// write boundary value
-			BOUNDARY_EXTRAPOLATE,		// extrapolate boundary slope
 			BOUNDARY_REPEAT, 			// loop curve
+			BOUNDARY_EXTRAPOLATE,		// extrapolate boundary slope
 			CROP = BOUNDARY_CROP,
 			CLAMP = BOUNDARY_CLAMP,
-			EXTRAPOLATE = BOUNDARY_EXTRAPOLATE,
-			REPEAT = BOUNDARY_REPEAT
+			REPEAT = BOUNDARY_REPEAT,
+			EXTRAPOLATE = BOUNDARY_EXTRAPOLATE
 		};
 
 		MeCtCurveWriter( 

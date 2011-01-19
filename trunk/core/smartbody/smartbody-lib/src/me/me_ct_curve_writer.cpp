@@ -93,6 +93,15 @@ bool MeCtCurveWriter::controller_evaluate( double time, MeFrameData& frame )	{
 							frame_buffer[ frame_buffer_index ] = (float)curve_arr[ buff_index ].evaluate( time );
 							break;
 
+						case BOUNDARY_REPEAT:
+							{
+								double diff = head_time - time;
+								double dur = tail_time - head_time;
+								double rep_time = head_time + fmod( dur, diff );
+								frame_buffer[ frame_buffer_index ] = (float)curve_arr[ buff_index ].evaluate( rep_time );
+							}
+							break;
+
 						case BOUNDARY_EXTRAPOLATE:
 							{
 								double head_value = curve_arr[ buff_index ].get_head_value();
@@ -100,15 +109,6 @@ bool MeCtCurveWriter::controller_evaluate( double time, MeFrameData& frame )	{
 								double diff = head_time - time;
 								double extrap_value = head_value - slope * diff;
 								frame_buffer[ frame_buffer_index ] = (float)extrap_value;
-							}
-							break;
-
-						case BOUNDARY_REPEAT:
-							{
-								double diff = head_time - time;
-								double dur = tail_time - head_time;
-								double rep_time = head_time + fmod( dur, diff );
-								frame_buffer[ frame_buffer_index ] = (float)curve_arr[ buff_index ].evaluate( rep_time );
 							}
 							break;
 					}
@@ -129,6 +129,15 @@ bool MeCtCurveWriter::controller_evaluate( double time, MeFrameData& frame )	{
 							frame_buffer[ frame_buffer_index ] = (float)curve_arr[ buff_index ].evaluate( time );
 							break;
 
+						case BOUNDARY_REPEAT:
+							{
+								double diff = time - tail_time;
+								double dur = tail_time - head_time;
+								double rep_time = tail_time + fmod( dur, diff );
+								frame_buffer[ frame_buffer_index ] = (float)curve_arr[ buff_index ].evaluate( rep_time );
+							}
+							break;
+
 						case BOUNDARY_EXTRAPOLATE:
 							{
 								double tail_value = curve_arr[ buff_index ].get_tail_value();
@@ -139,14 +148,6 @@ bool MeCtCurveWriter::controller_evaluate( double time, MeFrameData& frame )	{
 							}
 							break;
 
-						case BOUNDARY_REPEAT:
-							{
-								double diff = time - tail_time;
-								double dur = tail_time - head_time;
-								double rep_time = tail_time + fmod( dur, diff );
-								frame_buffer[ frame_buffer_index ] = (float)curve_arr[ buff_index ].evaluate( rep_time );
-							}
-							break;
 					}
 				}
 				else	{ // within bounds

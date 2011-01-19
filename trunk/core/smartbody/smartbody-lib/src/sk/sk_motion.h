@@ -29,6 +29,7 @@
 # include <SR/sr_input.h>
 # include <SR/sr_shared_class.h>
 # include <SK/sk_channel_array.h>
+# include <sbm/sr_synch_points.h>
 
 class SkPosture;
 class SkSkeleton;
@@ -53,12 +54,16 @@ protected :
 	int _last_apply_frame;    // used to speed up playing with monotone time
 
 	// Timing Metadata:
+	srSynchPoints synch_points;
+
 	// Unset times are given a value of -1
+#if 0
 	float _time_ready;
 	float _time_stroke_start;
 	float _time_stroke_emphasis;
 	float _time_stroke_end;
 	float _time_relax;
+#endif
 	SrVec _registerOffset;
 	SrQuat _registerOrientation;
 
@@ -223,7 +228,7 @@ public :
 	4 valid positions, according to the channel type */
 	void change_channel_values ( int f1, int f2, int channel, float mfactor, const float* offset );
 
-
+#if 0
 	float time_ready()
 	{	return _time_ready; }
 	float time_stroke_start()
@@ -234,7 +239,26 @@ public :
 	{	return _time_stroke_end; }
 	float time_relax()
 	{	return _time_relax; }
+#else
 
+	double time_start()
+	{	return synch_points.get_time( srSynchPoints::START ); }
+	double time_ready()
+	{	return synch_points.get_time( srSynchPoints::READY ); }
+	double time_stroke_start()
+	{	return synch_points.get_time( srSynchPoints::STROKE_START ); }
+	double time_stroke_emphasis()
+	{	return synch_points.get_time( srSynchPoints::STROKE ); }
+	double time_stroke_end()
+	{	return synch_points.get_time( srSynchPoints::STROKE_STOP ); }
+	double time_relax()
+	{	return synch_points.get_time( srSynchPoints::RELAX ); }
+	double time_stop()
+	{	return synch_points.get_time( srSynchPoints::STOP ); }
+
+#endif
+
+#if 0
 	void time_ready( float time_ready )
 	{	_time_ready = time_ready;}
 	void time_stroke_start_time( float time_stroke_start )
@@ -245,6 +269,7 @@ public :
 	{	_time_stroke_end = time_stroke_end; }
 	void time_relax(float time_relax )
 	{	_time_relax = time_relax; }
+#endif
 
 	/*! Registers the animation by placing the world offset and orientation into 
 		the _registerOffset and _registerOrientation variables. These values will

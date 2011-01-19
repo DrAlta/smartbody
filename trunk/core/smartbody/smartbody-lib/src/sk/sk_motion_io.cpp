@@ -149,11 +149,11 @@ bool parse_timing_metadata( SrInput& in, SrString name, float& time ) {
 
 bool SkMotion::load ( SrInput& in, double scale ) {
 	//  unset/invalid ready stroke relax times are given a value of -1
-	_time_ready=-1;
-	_time_stroke_start=-1;
-	_time_stroke_emphasis=-1;
-	_time_stroke_end=-1;
-	_time_relax=-1;
+	float _time_ready=-1;
+	float _time_stroke_start=-1;
+	float _time_stroke_emphasis=-1;
+	float _time_stroke_end=-1;
+	float _time_relax=-1;
 
 	in.lowercase_tokens ( false ); // string comparison remains case insensitive
 	in.comment_style ( '#' );
@@ -330,6 +330,12 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 			strstr << "WARNING: SkMotion::load(): File \""<<in.filename()<<"\": Timing Metadata incomplete before end of file (metadata_flags: "<<metadata_flags<<").";
 			LOG(strstr.str().c_str());
 		}
+
+		synch_points.set_time( 
+			keytime( 0 ), _time_ready, 
+			_time_stroke_start, _time_stroke_emphasis, _time_stroke_end,
+			_time_relax, last_keytime()
+		);
 	}
 
 //	bool metadata_valid = true;
