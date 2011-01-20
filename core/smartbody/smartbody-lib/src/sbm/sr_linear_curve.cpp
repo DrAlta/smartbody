@@ -23,8 +23,17 @@
 #include <math.h>
 #include <sbm/sr_linear_curve.h>
 
-#define SR_CURVE_INFINITE_SLOPE		(1000000.0)
+#if ENABLE_OBJ_KEY_CT
+int srLinearCurve::objective_key_count = 0;
+int srLinearCurve::objective_key_count_max = 0;
+#endif
 
+const double srLinearCurve::MAX_SLOPE = 1000000.0;
+const double srLinearCurve::MAX_VALUE = 1000000000.0;
+
+//int G_update_count = 0;
+
+//////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 
 srLinearCurve::Key::Key( double p, double v ) {
@@ -34,7 +43,7 @@ srLinearCurve::Key::Key( double p, double v ) {
 	dp = 0.0; inv_dp = 0.0;
 	dv = 0.0;
 	next_p = NULL;
-#if 0
+#if ENABLE_OBJ_KEY_CT
 	objective_key_count++;
 	if( objective_key_count > objective_key_count_max ) objective_key_count_max = objective_key_count;
 #endif
@@ -60,6 +69,8 @@ void srLinearCurve::Key::print( int i )	{
 #endif
 }
 
+//////////////////////////////////////////////////////////////////
+
 void srLinearCurve::Key::update( void ) {
 
 	if( next_p )	{
@@ -68,12 +79,13 @@ void srLinearCurve::Key::update( void ) {
 		if( dp > 0.0 )	{
 			inv_dp = 1.0 / dp;
 		}
-		else	{
+		else	{ 
+		// ( dp == 0.0 )
 			if( dv < 0.0 )	{
-				inv_dp = -SR_CURVE_INFINITE_SLOPE;
+				inv_dp = -MAX_SLOPE;
 			}
 			else	{
-				inv_dp = SR_CURVE_INFINITE_SLOPE;
+				inv_dp = MAX_SLOPE;
 			}
 		}
 	}
@@ -89,30 +101,35 @@ void srLinearCurve::Key::copy_delta( Key *key_p ) {
 
 double srLinearCurve::Key::slope( void )	{
 
-	if( dp > 0.0 )	{
+	if( dp > 0.0 )	{ // parameter change
 		return( dv * inv_dp );
 	}
+	if( dv > 0.0 )	{ // value change
+		return( MAX_SLOPE );
+	}
 	if( dv < 0.0 )	{
-		return( -SR_CURVE_INFINITE_SLOPE );
+		return( -MAX_SLOPE );
 	}
-	else	{
-		return( SR_CURVE_INFINITE_SLOPE );
-	}
+	return( 0.0 ); // uninitialized
 }
 
 double srLinearCurve::Key::lerp( double t )	{
 
-	return( value + dv * ( t - param ) * inv_dp );
+//	return( value + ( t - param ) * slope() ); // for illustration
+	if( dp > 0.0 )	{
+		return( value + dv * ( t - param ) * inv_dp );
+	}
+	return( value );
 }
 
+//////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 
 void srLinearCurve::print( void )	{
 
-	if( dirty ) {
-		update_intervals();
-	}
-#if 0
+	if( dirty ) update();
+
+#if ENABLE_OBJ_KEY_CT
 	printf( "srLinearCurve: KEYS: %d of %d (%d)\n", key_count, objective_key_count, objective_key_count_max );
 #else
 	printf( "srLinearCurve: KEYS: %d\n", key_count );
@@ -126,6 +143,8 @@ void srLinearCurve::print( void )	{
 	}
 }
 
+//////////////////////////////////////////////////////////////////
+
 void srLinearCurve::clear( void )	{
 	Key *key_p = head_p;
 	while( key_p ) {
@@ -134,7 +153,7 @@ void srLinearCurve::clear( void )	{
 		delete tmp_p;
 		decrement();
 	}
-	null();
+	init();
 }
 
 void srLinearCurve::clear_after( double t )	{
@@ -142,26 +161,21 @@ void srLinearCurve::clear_after( double t )	{
 	if( head_p == NULL )	{
 		return;
 	}
-	Key *key_p = NULL;
 	Key *floor_p = find_floor_key( t );
-	if( floor_p )	{
-		key_p = floor_p->next();
-		floor_p->next( NULL );
+	if( floor_p == NULL )	{
+		clear();
+		return;
 	}
-	else	{
-		key_p = head_p;
-		head_p = NULL;
-	}
-	while( key_p ) {
-		if( key_p == curr_p )	{
-			curr_p = NULL;
-		}
-		Key *tmp_p = key_p;
-		key_p = key_p->next();
+
+	Key *del_p = floor_p->next();
+	floor_p->next( NULL );
+
+	while( del_p ) {
+		Key *tmp_p = del_p;
+		del_p = del_p->next();
 		delete tmp_p;
 		decrement();
 	}
-	tail_p = NULL;
 }
 
 double srLinearCurve::get_head_param( void )	{
@@ -179,6 +193,7 @@ double srLinearCurve::get_head_value( void )	{
 }
 
 double srLinearCurve::get_head_slope( void )	{
+	if( dirty ) update();
 	if( head_p )	{
 		return( head_p->slope() );
 	}
@@ -186,9 +201,7 @@ double srLinearCurve::get_head_slope( void )	{
 }
 
 double srLinearCurve::get_tail_param( void )	{
-	if( dirty ) {
-		update_intervals();
-	}
+	if( dirty ) update();
 	if( tail_p )	{
 		return( tail_p->param );
 	}
@@ -196,9 +209,7 @@ double srLinearCurve::get_tail_param( void )	{
 }
 
 double srLinearCurve::get_tail_value( void )	{
-	if( dirty ) {
-		update_intervals();
-	}
+	if( dirty ) update();
 	if( tail_p )	{
 		return( tail_p->value );
 	}
@@ -206,9 +217,7 @@ double srLinearCurve::get_tail_value( void )	{
 }
 
 double srLinearCurve::get_tail_slope( void )	{
-	if( dirty ) {
-		update_intervals();
-	}
+	if( dirty ) update();
 	if( tail_p )	{
 		return( tail_p->slope() );
 	}
@@ -250,9 +259,6 @@ double srLinearCurve::get_next_nonzero_slope( double after )	{
 	else	{
 		key_p = head_p;
 	}
-	if( dirty ) {
-		update_intervals();
-	}
 	while( key_p )	{
 		if( key_p->slope() != 0.0 )	{
 			return( key_p->param );
@@ -287,192 +293,11 @@ double srLinearCurve::get_last_nonzero_param( double after )	{
 }
 #endif
 
-#if 0
-double srLinearCurve::evaluate( double t )	{
-
-	Key *floor_p = find_floor_key( t );
-	if( floor_p )	{
-
-		curr_p = floor_p;
-		if( t > curr_p->param )	{
-
-			if( curr_p->next() ) {
-
-				if( dirty ) {
-					update_intervals();
-				}
-				return( curr_p->lerp( t ) );
-			}
-		}
-		return( curr_p->value );
-	}
-	if( head_p )	{
-
-		curr_p = head_p;
-		return( curr_p->value );
-	}
-	curr_p = NULL;
-	return( 0.0 );
-}
-#else
-
-double srLinearCurve::head_boundary( double t, bool *cropped_p ) {
-
-	switch( head_bound_mode )	{
-	
-		case CROP:
-			{
-				if( cropped_p ) {
-					*cropped_p = true;
-				}
-				return( 0.0 );
-			}
-		case CLAMP:
-			{
-				return( head_p->value );
-			}
-		case REPEAT:
-			{
-				if( tail_p )	{ 
-					double dur = tail_p->param - head_p->param;
-					if( dur > 0.0 )	{
-						double diff = head_p->param - t;
-						double modulo = fmod( diff, dur );
-						double rep_time;
-						if( modulo > 0.0 )	{
-							rep_time = tail_p->param - modulo;
-						}
-						else	{
-							rep_time = head_p->param;
-						}
-						return( evaluate( rep_time ) );
-					}
-				}
-				return( head_p->value );
-			}
-		case EXTRAPOLATE:
-			{
-				double slope = head_p->slope();
-				if( slope < SR_CURVE_INFINITE_SLOPE )	{
-					if( slope > -SR_CURVE_INFINITE_SLOPE )	{
-						double diff = head_p->param - t;
-						double extrap_value = head_p->value - slope * diff;
-						return( extrap_value );
-					}
-				}
-				if( cropped_p ) {
-					*cropped_p = true;
-				}
-				if( head_p == tail_p )	{
-					return( head_p->value );
-				}
-				return( -slope );
-			}
-		default:
-			LOG( "srLinearCurve::head_boundary ERR: bound-mode %d not recognized", head_bound_mode );
-	}
-	return( 0.0 );
-}
-
-double srLinearCurve::tail_boundary( double t, bool *cropped_p ) {
-
-	switch( tail_bound_mode )	{
-	
-		case CROP:
-			{
-				if( cropped_p ) {
-					*cropped_p = true;
-				}
-				return( 0.0 );
-			}
-		case CLAMP:
-			{
-				return( tail_p->value );
-			}
-		case REPEAT:
-			{
-				double dur = tail_p->param - head_p->param;
-				if( dur > 0.0 )	{
-					double diff = t - tail_p->param;
-					double modulo = fmod( diff, dur );
-					double rep_time = head_p->param + modulo;
-					return( evaluate( rep_time ) );
-				}
-				return( tail_p->value );
-			}
-		case EXTRAPOLATE:
-			{
-				double slope = tail_p->slope();
-				if( slope < SR_CURVE_INFINITE_SLOPE )	{
-					if( slope > -SR_CURVE_INFINITE_SLOPE )	{
-						double diff = t - tail_p->param;
-						double extrap_value = tail_p->value + slope * diff;
-						return( extrap_value );
-					}
-				}
-				if( cropped_p ) {
-					*cropped_p = true;
-				}
-				if( head_p == tail_p )	{
-					return( tail_p->value );
-				}
-				return( slope );
-			}
-		default:
-			LOG( "srLinearCurve::tail_boundary ERR: bound-mode %d not recognized", tail_bound_mode );
-	}
-	return( 0.0 );
-}
-
-double srLinearCurve::evaluate( double t, bool *cropped_p )	{
-
-	if( dirty ) {
-		update_intervals();
-	}
-	if( cropped_p ) {
-		*cropped_p = false;
-	}
-	Key *floor_p = find_floor_key( t );
-	if( floor_p )	{
-
-		curr_p = floor_p;
-		double curr_param = curr_p->param;
-
-		if( tail_bound_mode == REPEAT )	{
-			if( t >= curr_param )	{
-				if( curr_p->next() ) {
-					return( curr_p->lerp( t ) );
-				}
-			}			
-		}
-		else	{
-			if( t == curr_param )	{
-				return( curr_p->value );
-			}
-			if( t > curr_param )	{
-				if( curr_p->next() ) {
-					return( curr_p->lerp( t ) );
-				}
-			}
-		}
-	// at tail or after:
-		return( tail_boundary( t, cropped_p ) );
-	}
-	if( head_p )	{
-	// before head:
-		return( head_boundary( t, cropped_p ) );
-	}
-	curr_p = NULL;
-	if( cropped_p ) {
-		*cropped_p = true;
-	}
-	return( 0.0 );
-}
-#endif
-
 //////////////////////////////////////////////////////////////////
 
 srLinearCurve::Key* srLinearCurve::find_floor_key( double t )	{
+
+	if( dirty ) update();
 
 	Key *key_p = curr_p;
 	if( key_p )	{
@@ -507,6 +332,154 @@ srLinearCurve::Key* srLinearCurve::find_floor_key( double t )	{
 	return( NULL );
 }
 
+double srLinearCurve::head_boundary( double t, bool *cropped_p ) {
+
+	switch( head_bound_mode )	{
+	
+		case CROP:
+			{
+				if( cropped_p ) {
+					*cropped_p = true;
+				}
+				return( 0.0 );
+			}
+		case CLAMP:
+			{
+				return( head_p->value );
+			}
+		case REPEAT:
+			{
+				double dur = tail_p->param - head_p->param;
+				if( dur > 0.0 )	{
+					double modulo = fmod( ( head_p->param - t ), dur );
+					double rep_time;
+					if( modulo > 0.0 )	{
+						rep_time = tail_p->param - modulo;
+					}
+					else	{
+						rep_time = head_p->param;
+					}
+					return( evaluate( rep_time ) );
+				}
+				return( head_p->value );
+			}
+		case EXTRAPOLATE:
+			{
+				if( head_p == tail_p )	{
+					return( head_p->value );
+				}
+				double slope = head_p->slope(); // uninitialized slope returns 0.0 guaranteed
+				if( slope < MAX_SLOPE )	{
+					if( slope > -MAX_SLOPE )	{
+
+						double extrap_val = head_p->value - slope * ( head_p->param - t );
+						return( extrap_val );
+					}
+					if( cropped_p ) *cropped_p = true;
+					return( min_value );
+				}
+				if( cropped_p ) *cropped_p = true;
+				return( max_value );
+			}
+		default:
+			LOG( "srLinearCurve::head_boundary ERR: bound-mode %d not recognized", head_bound_mode );
+	}
+	return( 0.0 );
+}
+
+double srLinearCurve::tail_boundary( double t, bool *cropped_p ) {
+
+	switch( tail_bound_mode )	{
+	
+		case CROP:
+			{
+				if( cropped_p ) {
+					*cropped_p = true;
+				}
+				return( 0.0 );
+			}
+		case CLAMP:
+			{
+				return( tail_p->value );
+			}
+		case REPEAT:
+			{
+				double dur = tail_p->param - head_p->param;
+				if( dur > 0.0 )	{
+					double rep_time = head_p->param + fmod( t - tail_p->param, dur );
+					return( evaluate( rep_time ) );
+				}
+				return( head_p->value );
+			}
+		case EXTRAPOLATE:
+			{
+				if( head_p == tail_p )	{
+					return( head_p->value );
+				}
+				double slope = tail_p->slope(); // uninitialized slope returns 0.0 guaranteed
+				if( slope < MAX_SLOPE )	{
+					if( slope > -MAX_SLOPE )	{
+						
+						double extrap_val = tail_p->value + slope * ( t - tail_p->param );
+						return( extrap_val );
+					}
+					if( cropped_p ) *cropped_p = true;
+					return( min_value );
+				}
+				if( cropped_p ) *cropped_p = true;
+				return( max_value );
+			}
+		default:
+			LOG( "srLinearCurve::tail_boundary ERR: bound-mode %d not recognized", tail_bound_mode );
+	}
+	return( 0.0 );
+}
+
+double srLinearCurve::evaluate( double t, bool *cropped_p )	{
+
+	if( cropped_p ) {
+		*cropped_p = false;
+	}
+	Key *floor_p = find_floor_key( t ); // if defined, ( floor-param <= t )
+	if( floor_p )	{
+
+		curr_p = floor_p; // evaluate() establishes curr = floor
+		double curr_param = curr_p->param;
+
+		if( t > curr_param )	{
+			if( curr_p->next() ) {
+				return( curr_p->lerp( t ) );
+			}
+		}
+		else
+		if( t == curr_param )	{
+			if( tail_bound_mode == REPEAT )	{
+				
+				if( curr_p->next() ) {
+					return( curr_p->lerp( t ) );
+				}
+			}
+			else	{
+				return( curr_p->value );
+			}
+		}
+
+		// after tail, or repeat-tail_bound = head condition:
+		return( tail_boundary( t, cropped_p ) );
+	}
+	if( head_p )	{
+		// before head:
+		return( head_boundary( t, cropped_p ) );
+	}
+	curr_p = NULL;
+	if( cropped_p ) {
+		*cropped_p = true;
+	}
+	return( 0.0 );
+}
+
+//////////////////////////////////////////////////////////////////
+
 int srLinearCurve::insert_key( Key *key_p ) {
 
 	if( key_p )	{
@@ -516,51 +489,14 @@ int srLinearCurve::insert_key( Key *key_p ) {
 
 			insert_after( floor_p, key_p );
 			curr_p = floor_p;
-			return( CMD_SUCCESS );
+			return( false );
 		}
 		insert_head( key_p );
 		curr_p = key_p;
-		return( CMD_SUCCESS );
+		return( false );
 	}
 	curr_p = NULL;
-	return( CMD_FAILURE );
-}
-
-void srLinearCurve::update_intervals( void )	{
-
-	int c = 0;
-	Key *prev_p = NULL;
-	Key *key_p = head_p;
-	while( key_p ) {
-
-		Key *tmp_p = prev_p;
-		prev_p = key_p;
-		key_p = key_p->next();
-		if( key_p ) {
-			prev_p->update();
-		}
-		else	{
-			tail_p = prev_p;
-			tail_p->copy_delta( tmp_p );
-		}
-		c++;
-	}
-	dirty = false;
-	if( c != key_count )	{
-		LOG( "srLinearCurve::update_intervals ERR: corruption: counted %d of %d keys", c, key_count );
-	}
-}
-
-void srLinearCurve::decrement( void )	{
-
-	key_count--;
-	dirty = true;
-}
-
-void srLinearCurve::increment( void )	{
-
-	key_count++;
-	dirty = true;
+	return( true );
 }
 
 void srLinearCurve::insert_head( Key *key_p )	{
@@ -578,56 +514,121 @@ void srLinearCurve::insert_after( Key *prev_p, Key *key_p )	{
 	increment();
 }
 
+void srLinearCurve::decrement( void )	{
+
+	key_count--;
+	dirty = true;
+}
+
+void srLinearCurve::increment( void )	{
+
+	key_count++;
+	dirty = true;
+}
+
+void srLinearCurve::update( void )	{
+
+//G_update_count++;
+
+	curr_p = NULL;
+	tail_p = NULL;
+	int c = 0;
+	Key *prev_p = NULL;
+	Key *key_p = head_p;
+	while( key_p ) {
+
+		Key *tmp_p = prev_p;
+		prev_p = key_p;
+		key_p = key_p->next();
+		
+		if( key_p ) {
+			prev_p->update();
+		}
+		else
+		if( tmp_p ) {
+			prev_p->copy_delta( tmp_p );
+			tail_p = prev_p;
+		}
+		else	{
+			tail_p = head_p;
+		}
+		c++;
+	}
+
+	dirty = false;
+	if( c != key_count )	{
+		LOG( "srLinearCurve::update ERR: corruption: counted %d of %d keys", c, key_count );
+	}
+}
+
+//////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 
 #if 0
+
+void test_eval_linear_curve( srLinearCurve *curve_p ) {
+
+	for( int i=0; i<=20; i++ )	{
+		double t = (double)i * 0.1 - 0.5;
+		bool crop = false;
+		double v = curve_p->evaluate( t, &crop );
+		printf( "%f: %f (%d)\n", t, v, crop );
+	}
+}
+
+void test_run_linear_curve_gamut( srLinearCurve *curve_p ) {
+
+	curve_p->clear();
+	curve_p->print();
+
+	test_eval_linear_curve( curve_p );
+	
+	curve_p->insert( 0.5, 1.0 );
+	curve_p->print();
+
+	test_eval_linear_curve( curve_p );
+
+	curve_p->insert( 1.0, 2.0 );
+//	curve_p->insert( 0.5, 0.5 ); 
+//	curve_p->insert( 0.5, 1.5 );
+//	curve_p->insert( 1.0, 1.0 );
+//	curve_p->insert( 1.0, 3.0 );
+	curve_p->print();
+
+	test_eval_linear_curve( curve_p );
+}
+
 void test_linear_curve( void )	{
 	srLinearCurve curve;
+
+#if 1
+	printf( "CROP:\n" );
+	curve.set_boundary_mode( srLinearCurve::CROP, srLinearCurve::CROP );
+	test_run_linear_curve_gamut( & curve );
+
+	printf( "CLAMP:\n" );
+	curve.set_boundary_mode( srLinearCurve::CLAMP, srLinearCurve::CLAMP );
+	test_run_linear_curve_gamut( & curve );
+
+	printf( "REPEAT:\n" );
+	curve.set_boundary_mode( srLinearCurve::REPEAT, srLinearCurve::REPEAT );
+	test_run_linear_curve_gamut( & curve );
+	
+	printf( "EXTRAPOLATE:\n" );
+	curve.set_boundary_mode( srLinearCurve::EXTRAPOLATE, srLinearCurve::EXTRAPOLATE );
+	test_run_linear_curve_gamut( & curve );
+	
+#else
+
 	double t;
 	double v;
 	bool crop;
 
-//	curve.set_boundary( srLinearCurve::CROP, srLinearCurve::CROP );
-//	curve.set_boundary( srLinearCurve::CLAMP, srLinearCurve::CLAMP );
-//	curve.set_boundary( srLinearCurve::REPEAT, srLinearCurve::REPEAT );
-	curve.set_boundary( srLinearCurve::EXTRAPOLATE, srLinearCurve::EXTRAPOLATE );
+	curve.set_boundary_mode( srLinearCurve::CROP, srLinearCurve::CROP );
+//	curve.set_boundary_mode( srLinearCurve::CLAMP, srLinearCurve::CLAMP );
+//	curve.set_boundary_mode( srLinearCurve::REPEAT, srLinearCurve::REPEAT );
+//	curve.set_boundary_mode( srLinearCurve::EXTRAPOLATE, srLinearCurve::EXTRAPOLATE );
 
-#if 1
-	curve.print();
-
-	int i;
-	for( i=0; i<=30; i++ )	{
-//	while( 0 )	{
-		t = (double)i * 0.1 - 1.0;
-		crop = false;
-		v = curve.evaluate( t, &crop );
-		printf( "%f: %f (%d)\n", t, v, crop );
-	}
-
-	curve.insert( 0.5, 1.0 );
-	curve.print();
-
-	for( i=0; i<=30; i++ )	{
-		t = (double)i * 0.1 - 1.0;
-		crop = false;
-		v = curve.evaluate( t, &crop );
-		printf( "%f: %f (%d)\n", t, v, crop );
-	}
-
-	curve.insert( 1.0, 2.0 );
-//	curve.insert( 0.5, 0.5 ); 
-	curve.insert( 0.5, 1.5 );
-//	curve.insert( 1.0, 1.0 );
-//	curve.insert( 1.0, 3.0 );
-	curve.print();
-
-	for( i=0; i<=30; i++ )	{
-		t = (double)i * 0.1 - 1.0;
-		crop = false;
-		v = curve.evaluate( t, &crop );
-		printf( "%f: %f (%d)\n", t, v, crop );
-	}
-#else
 	curve.insert( 0.5, 1.0 );
 	curve.insert( 1.0, 2.0 );
 	t = 1.0;
@@ -639,21 +640,34 @@ void test_linear_curve( void )	{
 	printf( "%f: %f (%d)\n", t, v, crop );
 #endif
 }
+
 #endif
 
+//////////////////////////////////////////////////////////////////
+
 #if 0
-void test_linear_curve( int reps = 1000000 )	{
+
+void test_linear_curve( void )	{
 
 	srLinearCurve C;
+	bool cropped;
+	int reps = 1000000;
+	
 	for( int i=0; i<reps; i++ )	{
-		int r = rand() % 10;
+		int r = rand() % 32;
 		switch( r )	{
 			case 0:
-				C.insert( (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX );
+				{
+					C.insert( (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX );
+					C.insert( (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX );
+					C.insert( (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX );
+					C.insert( (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX );
+					C.insert( (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX );
+				}
 				break;
 			case 1:
-//				C.clear();
-				C.clear_after( (float)rand() / (float)RAND_MAX );
+				C.clear();
+//				C.clear_after( (float)rand() / (float)RAND_MAX );
 				break;
 			case 2:
 				C.clear_after( (float)rand() / (float)RAND_MAX );
@@ -665,26 +679,37 @@ void test_linear_curve( int reps = 1000000 )	{
 				C.get_next_nonzero_value( (float)rand() / (float)RAND_MAX );
 				break;
 			case 5:
-				C.get_last_nonzero( (float)rand() / (float)RAND_MAX );
+				C.get_head_param();
 				break;
 			case 6:
-				C.get_tail_param();
+				C.get_head_value();
 				break;
 			case 7:
-				C.get_tail_value();
+				C.get_head_param();
 				break;
 			case 8:
+				C.get_tail_param();
+				break;
+			case 9:
+				C.get_tail_value();
+				break;
+			case 10:
 				C.get_tail_slope();
 				break;
-			default:	
-				C.evaluate( (float)rand() / (float)RAND_MAX );
+			case 12:
+				C.set_boundary_mode( rand() % srLinearCurve::NUM_BOUNDARY_MODES, rand() % srLinearCurve::NUM_BOUNDARY_MODES );
+				break;
+			default:
+				C.evaluate( (float)rand() / (float)RAND_MAX, & cropped );
 				break;
 		}
 	}
-
 	C.print();
+	printf( "updates: %d\n", G_update_count );
 }
 #endif
+
+//////////////////////////////////////////////////////////////////
 
 #if 0
 void test_linear_curve( void )	{
