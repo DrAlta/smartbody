@@ -33,8 +33,10 @@ class srLinearCurve	{
 
 	private:
 
-//		int objective_key_count;
-//		int objective_key_count_max;
+#if 0
+	int objective_key_count;
+	int objective_key_count_max;
+#endif
 
 	class Key	{
 		
@@ -42,7 +44,9 @@ class srLinearCurve	{
 		
 			Key( double p, double v );
 			~Key(void) {
-//				objective_key_count--;
+#if 0
+				objective_key_count--;
+#endif
 			}
 
 			void print( int i );
@@ -68,16 +72,32 @@ class srLinearCurve	{
 	};
 
 	public:
+
+		enum boundary_mode_enum_set	{
+			CROP,			// do not write
+			CLAMP, 			// write boundary value
+			REPEAT, 		// loop curve
+			EXTRAPOLATE,	// extrapolate boundary slope
+		};
+
 		srLinearCurve( void )	{
 			null();
-//			objective_key_count = 0;
-//			objective_key_count_max = 0;
+			set_boundary( CLAMP, CLAMP );
+		}
+		srLinearCurve( int head_mode, int tail_mode )	{
+			null();
+			set_boundary( head_mode, tail_mode );
 		}
 		~srLinearCurve( void )	{
 			clear();
 		}
 
 		void print( void );
+
+		void set_boundary( int head_mode, int tail_mode )	{
+			head_bound_mode = head_mode;
+			tail_bound_mode = tail_mode;
+		}
 
 		int get_num_keys( void ) { return( key_count ); }
 		
@@ -100,7 +120,7 @@ class srLinearCurve	{
 		double get_next_nonzero_slope( double after );
 //		double get_last_nonzero_param( double after );
 
-		double evaluate( double t );
+		double evaluate( double t, bool *cropped_p = NULL );
 
 	protected:
 
@@ -111,19 +131,29 @@ class srLinearCurve	{
 		void increment( void );
 		void insert_head( Key *key_p );
 		void insert_after( Key *prev_p, Key *key_p );
+		double head_boundary( double t, bool *cropped_p );
+		double tail_boundary( double t, bool *cropped_p );
 
 	private:
 	
 		void null( void )	{
+#if 0
+			objective_key_count = 0;
+			objective_key_count_max = 0;
+#endif
 			key_count = 0;
 			dirty = false;
 			head_p = NULL;
 			curr_p = NULL;
 			tail_p = NULL;
+			head_bound_mode = 0;
+			tail_bound_mode = 0;
 		}
 		
 		int 	key_count;
 		bool	dirty;
+		int 	head_bound_mode;
+		int 	tail_bound_mode;
 		
 		Key		*head_p;
 		Key		*curr_p;
@@ -131,4 +161,8 @@ class srLinearCurve	{
 };
 
 //////////////////////////////////////////////////////////////////
+#endif
+
+#if 0
+void test_linear_curve( void );
 #endif
