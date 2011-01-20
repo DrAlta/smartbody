@@ -24,8 +24,9 @@
 #define SR_LINEAR_CURVE_H
 
 #include <stdio.h>
-#include "sbm_constants.h"
 #include <vhcl_log.h>
+
+#define ENABLE_OBJ_KEY_CT	0
 
 //////////////////////////////////////////////////////////////////
 
@@ -33,9 +34,9 @@ class srLinearCurve	{
 
 	private:
 
-#if 0
-	int objective_key_count;
-	int objective_key_count_max;
+#if ENABLE_OBJ_KEY_CT
+	static int objective_key_count;
+	static int objective_key_count_max;
 #endif
 
 	class Key	{
@@ -44,7 +45,8 @@ class srLinearCurve	{
 		
 			Key( double p, double v );
 			~Key(void) {
-#if 0
+#if ENABLE_OBJ_KEY_CT
+//				srLinearCurve::objective_key_count--;
 				objective_key_count--;
 #endif
 			}
@@ -72,21 +74,24 @@ class srLinearCurve	{
 	};
 
 	public:
+		static const double MAX_SLOPE;
+		static const double MAX_VALUE;
 
 		enum boundary_mode_enum_set	{
 			CROP,			// do not write
 			CLAMP, 			// write boundary value
-			REPEAT, 		// loop curve
-			EXTRAPOLATE,	// extrapolate boundary slope
+			REPEAT, 		// loop curve, skip tail
+			EXTRAPOLATE,	// extrapolate boundary slope, min/max_value if undefined
+			NUM_BOUNDARY_MODES
 		};
 
-		srLinearCurve( void )	{
+		srLinearCurve( int bound_mode = CLAMP )	{
 			null();
-			set_boundary( CLAMP, CLAMP );
+			set_boundary_mode( bound_mode, bound_mode );
 		}
 		srLinearCurve( int head_mode, int tail_mode )	{
 			null();
-			set_boundary( head_mode, tail_mode );
+			set_boundary_mode( head_mode, tail_mode );
 		}
 		~srLinearCurve( void )	{
 			clear();
@@ -94,9 +99,13 @@ class srLinearCurve	{
 
 		void print( void );
 
-		void set_boundary( int head_mode, int tail_mode )	{
+		void set_boundary_mode( int head_mode, int tail_mode )	{
 			head_bound_mode = head_mode;
 			tail_bound_mode = tail_mode;
+		}
+		void set_output_clamp( double min, double max )	{
+			min_value = min;
+			max_value = max;
 		}
 
 		int get_num_keys( void ) { return( key_count ); }
@@ -107,6 +116,9 @@ class srLinearCurve	{
 		
 		void clear( void );
 		void clear_after( double t );
+
+	// Preferably these should be subsumed by 
+	//	boundary conditions, crop { PRE, POST }, and simple param-range queries.
 
 		double get_head_param( void );
 		double get_head_value( void );
@@ -124,37 +136,43 @@ class srLinearCurve	{
 
 	protected:
 
-		Key* find_floor_key( double t );
 		int insert_key( Key *key_p );
-		void update_intervals( void );
-		void decrement( void );
-		void increment( void );
 		void insert_head( Key *key_p );
 		void insert_after( Key *prev_p, Key *key_p );
+		void decrement( void );
+		void increment( void );
+		void update( void );
+		
+		Key* find_floor_key( double t );
 		double head_boundary( double t, bool *cropped_p );
 		double tail_boundary( double t, bool *cropped_p );
 
 	private:
 	
 		void null( void )	{
-#if 0
-			objective_key_count = 0;
-			objective_key_count_max = 0;
-#endif
+			head_bound_mode = 0;
+			tail_bound_mode = 0;
+			min_value = -MAX_VALUE;
+			max_value = MAX_VALUE;
+			init();
+		}
+		void init( void )	{
 			key_count = 0;
 			dirty = false;
 			head_p = NULL;
 			curr_p = NULL;
 			tail_p = NULL;
-			head_bound_mode = 0;
-			tail_bound_mode = 0;
 		}
 		
-		int 	key_count;
-		bool	dirty;
 		int 	head_bound_mode;
 		int 	tail_bound_mode;
 		
+		double	min_value;
+		double	max_value;
+
+		int 	key_count;
+		bool	dirty;
+
 		Key		*head_p;
 		Key		*curr_p;
 		Key		*tail_p;
