@@ -193,7 +193,7 @@ void MeCtQuickDraw::reset_blend( void ) {
 */
 	if( _gundraw_motion->time_ready() > 0.0 )	{
 		has_gundraw_leadup = true;
-		blend_in = _gundraw_motion->time_ready() / raw_gundraw_scale;
+		blend_in = (float)_gundraw_motion->time_ready() / raw_gundraw_scale;
 	}
 	else	{
 		has_gundraw_leadup = false;
@@ -201,7 +201,7 @@ void MeCtQuickDraw::reset_blend( void ) {
 	}
 
 	if( _holster_motion )	{
-		float relax_interval = _holster_motion->duration() - _holster_motion->time_relax();
+		float relax_interval = (float)_holster_motion->duration() - (float)_holster_motion->time_relax();
 		if( relax_interval > 0.001 )   {
 			has_holster_leadaway = true;
 			blend_out = relax_interval / raw_holster_scale;
