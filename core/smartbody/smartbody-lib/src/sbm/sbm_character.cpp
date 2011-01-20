@@ -1190,9 +1190,9 @@ void SbmCharacter::schedule_viseme_curve(
 			SkChannelArray channels;
 			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
 
-			MeCtCurveWriter* ct_p = new MeCtCurveWriter(); // CROP, CROP, true
+			MeCtCurveWriter* ct_p = new MeCtCurveWriter();
 			ct_p->name( ct_name.str().c_str() );
-			ct_p->init( channels );
+			ct_p->init( channels ); // CROP, CROP, true
 
 			for (int i = 0; i < num_keys; i++)	{
 				float t = curve_info[ i * num_key_params + 0 ];

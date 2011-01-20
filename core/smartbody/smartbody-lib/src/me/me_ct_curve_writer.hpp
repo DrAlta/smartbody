@@ -32,28 +32,11 @@ class MeCtCurveWriter : public MeController {
 
 		static const char* TYPE;
 
-		enum boundary_mode_enum_set	{
-			BOUNDARY_CROP,				// do not write
-			BOUNDARY_CLAMP, 			// write boundary value
-			BOUNDARY_REPEAT, 			// loop curve
-			BOUNDARY_EXTRAPOLATE,		// extrapolate boundary slope
-			CROP = BOUNDARY_CROP,
-			CLAMP = BOUNDARY_CLAMP,
-			REPEAT = BOUNDARY_REPEAT,
-			EXTRAPOLATE = BOUNDARY_EXTRAPOLATE
-		};
-
-		MeCtCurveWriter( 
-			int left_bound = BOUNDARY_CROP, 
-			int right_bound = BOUNDARY_CROP, 
-			bool at_least_once = true 
-		)	{
+		MeCtCurveWriter( void )	{
 			curve_arr = NULL;
 			num_curves = 0;
-			left_bound_mode = left_bound;
-			right_bound_mode = right_bound;
-			write_once = at_least_once;
 			write_once_arr = NULL;
+			tail_bound_mode = 0;
 		}
 		~MeCtCurveWriter( void )	{
 			if( curve_arr ) {
@@ -66,12 +49,21 @@ class MeCtCurveWriter : public MeController {
 			}
 		}
 	
-		void init( SkChannelArray& channels );
+		void init( 
+			SkChannelArray& channels,
+			int left_bound = srLinearCurve::CROP, 
+			int right_bound = srLinearCurve::CROP, 
+			bool at_least_once = true 
+		);
 		
 		void insert_key( int curve_index, double t, double v )	{
 			if( curve_index < 0 ) return;
 			if( curve_index >= num_curves ) return;
 			curve_arr[ curve_index ].insert( t, v );
+		}
+
+		void insert_key( double t, double v )	{
+			curve_arr[ 0 ].insert( t, v );
 		}
 
 	private:
@@ -80,14 +72,10 @@ class MeCtCurveWriter : public MeController {
 		SrBuffer<float> _data;
 		SrBuffer<int>   _local_ch_to_buffer;
 		
-		srLinearCurve	*curve_arr;
 		int 	num_curves;
-		
-		int 	left_bound_mode;
-		int 	right_bound_mode;
-		
-		bool	write_once;
+		srLinearCurve	*curve_arr;
 		bool	*write_once_arr;
+		int 	tail_bound_mode;
 		
 	public:
 		virtual const char* controller_type() const {
