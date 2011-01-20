@@ -27,7 +27,12 @@ const char* MeCtCurveWriter::TYPE = "MeCtCurveWriter";
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void MeCtCurveWriter::init( SkChannelArray& channels )	{
+void MeCtCurveWriter::init( 
+	SkChannelArray& channels,
+	int left_bound , 
+	int right_bound, 
+	bool at_least_once
+)	{
 	
 	_channels.init();
 	_channels.merge( channels );
@@ -37,9 +42,12 @@ void MeCtCurveWriter::init( SkChannelArray& channels )	{
 	num_curves = _channels.floats();
 	curve_arr = new srLinearCurve[ num_curves ];
 	write_once_arr = new bool[ num_curves ];
+
 	for( int i=0; i<num_curves; i++ )	{
-		write_once_arr[ i ] = write_once;
+		curve_arr[ i ].set_boundary_mode( left_bound, right_bound );
+		write_once_arr[ i ] = at_least_once;
 	}
+	tail_bound_mode = right_bound;
 	
 	const int size = _channels.size();
 	_local_ch_to_buffer.size( size );	// ends up being a 1 to 1 mapping...
@@ -76,86 +84,19 @@ bool MeCtCurveWriter::controller_evaluate( double time, MeFrameData& frame )	{
 			int buff_index = _local_ch_to_buffer[i];
 			int frame_buffer_index = frame.toBufferIndex( context_ch );
 
-			int num_keys = curve_arr[ i ].get_num_keys();
-			if( num_keys > 0 ) {
-
-				double head_time = curve_arr[ i ].get_head_param();
-				double tail_time = curve_arr[ i ].get_tail_param();
-
-				if( time < head_time )	 {
-
-					switch( left_bound_mode )	{
-
-						case BOUNDARY_CROP: // no write
-							break;
-
-						case BOUNDARY_CLAMP:
-							frame_buffer[ frame_buffer_index ] = (float)curve_arr[ buff_index ].evaluate( time );
-							break;
-
-						case BOUNDARY_REPEAT:
-							{
-								double diff = head_time - time;
-								double dur = tail_time - head_time;
-								double rep_time = head_time + fmod( dur, diff );
-								frame_buffer[ frame_buffer_index ] = (float)curve_arr[ buff_index ].evaluate( rep_time );
-							}
-							break;
-
-						case BOUNDARY_EXTRAPOLATE:
-							{
-								double head_value = curve_arr[ buff_index ].get_head_value();
-								double slope = curve_arr[ buff_index ].get_head_slope();
-								double diff = head_time - time;
-								double extrap_value = head_value - slope * diff;
-								frame_buffer[ frame_buffer_index ] = (float)extrap_value;
-							}
-							break;
+			bool cropped = false;
+			float val = (float)curve_arr[ buff_index ].evaluate( time, & cropped );
+			if( cropped )	{
+				if( time > curve_arr[ i ].get_tail_param() )	{
+					if( write_once_arr[ i ] )	{
+						frame_buffer[ frame_buffer_index ] = val;
+						write_once_arr[ i ] = false;
 					}
 				}
-				else
-				if( time > tail_time )	{
-
-					switch( right_bound_mode )	{
-
-						case BOUNDARY_CROP:
-							if( write_once_arr[ i ] )	{
-								frame_buffer[ frame_buffer_index ] = (float)curve_arr[ buff_index ].evaluate( time );
-								write_once_arr[ i ] = false;
-							}
-							break;
-
-						case BOUNDARY_CLAMP:
-							frame_buffer[ frame_buffer_index ] = (float)curve_arr[ buff_index ].evaluate( time );
-							break;
-
-						case BOUNDARY_REPEAT:
-							{
-								double diff = time - tail_time;
-								double dur = tail_time - head_time;
-								double rep_time = tail_time + fmod( dur, diff );
-								frame_buffer[ frame_buffer_index ] = (float)curve_arr[ buff_index ].evaluate( rep_time );
-							}
-							break;
-
-						case BOUNDARY_EXTRAPOLATE:
-							{
-								double tail_value = curve_arr[ buff_index ].get_tail_value();
-								double slope = curve_arr[ buff_index ].get_tail_slope();
-								double diff = time - tail_time;
-								double extrap_value = tail_value + slope * diff;
-								frame_buffer[ frame_buffer_index ] = (float)extrap_value;
-							}
-							break;
-
-					}
-				}
-				else	{ // within bounds
-					float val = (float)curve_arr[ buff_index ].evaluate( time );
-//	printf( "curve bound: %f\n", val );
-					frame_buffer[ frame_buffer_index ] = val;
-					write_once_arr[ i ] = false;
-				}
+			}
+			else	{
+				frame_buffer[ frame_buffer_index ] = val;
+				write_once_arr[ i ] = false;
 			}
 		}
 	}
@@ -164,7 +105,7 @@ bool MeCtCurveWriter::controller_evaluate( double time, MeFrameData& frame )	{
 
 double MeCtCurveWriter::controller_duration()	{
 
-	if( right_bound_mode == BOUNDARY_CROP ) {
+	if( tail_bound_mode == srLinearCurve::CROP ) {
 		double max_dur = 0.0;
 		for( int i=0; i<num_curves; i++ )	{
 			double dur = curve_arr[ i ].get_tail_param();
