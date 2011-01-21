@@ -191,10 +191,9 @@ The timestamp is 20051121_150427 (that is, YYYYMMDD_HHMMSS ), so we can check ol
 
 std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<VisemeData*>* visemes){
 	//this is used to recursively search the DOM tree and return a vector containing the visemes and the appropriate viseme resets (before a subsequent viseme is set the previous one must be reset)
-	VisemeData *singleViseme= NULL;
-	float blendForward = 0;
-	float blendBack = 0;
-	float startTime=0;
+	VisemeData* curViseme = NULL;
+	float blendTime = 0.0f;
+	float startTime = 0.0f;
 	if(node->getNodeType()==1){ //node is an element node
 		DOMElement *element= (DOMElement *)node; //instantiate an element using this node
 		//string tag= XMLString::transcode(element->getTagName()); //find the element tag  // Anm replaced with compareString
@@ -221,24 +220,24 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 				}
 			}
 			if( id ) {
-				singleViseme = new VisemeData(id, 1.0, startTime); //the weight is always made one
+				curViseme = new VisemeData(id, 1.0, startTime, 0.0f, 0.0f, 0.0f); //the weight is always made one
 
 				if ( visemes->size() > 0 ) 
 				{   
 					VisemeData* prevViseme = visemes->back();
 					if (prevViseme->time() > startTime)
 					{
-							LOG("WARNING: Viseme %s has played at time %f comes before previous viseme %s at time %f", singleViseme->id(), singleViseme->time(), prevViseme->id(), prevViseme->time());
+							LOG("WARNING: Viseme %s has played at time %f comes before previous viseme %s at time %f", curViseme->id(), curViseme->time(), prevViseme->id(), prevViseme->time());
 					}
-					blendForward = (startTime - prevViseme->time());
-					singleViseme->rampin(blendForward);
-					prevViseme->rampout(blendForward);
-					if ( visemes->size() == 1) // set the blend in for the first viseme
-						prevViseme->rampin(prevViseme->rampout());
+					blendTime = (startTime - prevViseme->time());
+					if (blendTime <= .1f)
+						blendTime = .1f;
+					curViseme->rampin(blendTime);
+					prevViseme->rampout(blendTime);
 					prevViseme->setDuration(prevViseme->rampin() + prevViseme->rampout());
 				}
 		
-				visemes->push_back(singleViseme);
+				visemes->push_back(curViseme);
 			} else {
 				LOG("ERROR: remote_speech::extractVisemes(..): <viseme> without type= attribute found... Ignoring");
 			}
@@ -251,13 +250,27 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 		visemes=extractVisemes(node->getNextSibling(),visemes);
 	}
 
-	// set the blend out and duration for the last viseme
 	int numVisemes = visemes->size();
 	if (numVisemes > 0)
 	{
-		VisemeData* lastViseme = (*visemes)[numVisemes - 1];
-		lastViseme->rampout(lastViseme->rampin());
-		lastViseme->setDuration(lastViseme->rampin() + lastViseme->rampout());
+		if (numVisemes > 1)
+		{
+			// set the blend in duration for the first viseme
+			VisemeData* firstViseme = (*visemes)[0];
+			firstViseme->rampin((*visemes)[0]->rampout());
+			firstViseme->setDuration(firstViseme->rampin() + firstViseme->rampout());
+			// set the blend out duration for the last viseme
+			VisemeData* lastViseme = (*visemes)[numVisemes - 1];
+			lastViseme->rampout(lastViseme->rampin());
+			lastViseme->setDuration(lastViseme->rampin() + lastViseme->rampout());
+		}
+		else
+		{
+			VisemeData* onlyViseme = (*visemes)[0];
+			onlyViseme->setRampin(.1f);
+			onlyViseme->setRampout(.1f);
+			onlyViseme->setDuration(onlyViseme->rampin() + onlyViseme->rampout());
+		}
 	}
 	return (visemes);
 

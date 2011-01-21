@@ -731,9 +731,38 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
 
 		  float weight = (float)atof( articulation.c_str());
 
-		  visemeData.push_back(VisemeData(viseme.c_str(), weight, startTime,  endTime - startTime, rampIn, rampOut));
-		  //visemeData.push_back( VisemeData( viseme.c_str(), (float)atof( articulation.c_str() ), (float)atof( start.c_str() ) ) );
-		  //visemeData.push_back( VisemeData( viseme.c_str(), 0.0f,                                (float)atof( end.c_str() ) ) );
+		  if (visemeData.size() > 0)
+		  {
+			  VisemeData& prevViseme = visemeData.back();
+			  float blendTime = startTime - prevViseme.time();
+			  if (blendTime <= 0.1f)
+				  blendTime = .1f;
+			  prevViseme.setRampout(blendTime);
+			  prevViseme.setDuration(prevViseme.rampin() + prevViseme.rampout());
+			  rampIn = blendTime;
+		  }
+
+			visemeData.push_back(VisemeData(viseme.c_str(), weight, startTime,  endTime - startTime, rampIn, rampOut));
+	   }
+	   if (visemeData.size() > 0)
+	   {
+		   if (visemeData.size() > 1)
+		   {
+			   // set the blend in duration for the first viseme
+				VisemeData& firstViseme = visemeData[0];
+				firstViseme.rampin(firstViseme.rampout());
+				firstViseme.setDuration(firstViseme.rampin() + firstViseme.rampout());
+				// set the blend out duration for the last viseme
+				VisemeData& lastViseme = visemeData[visemeData.size() - 1];
+				lastViseme.rampout(lastViseme.rampin());
+				lastViseme.setDuration(lastViseme.rampin() + lastViseme.rampout());
+		   }
+		   else
+		   {
+			   visemeData[0].setRampin(.1f);
+			   visemeData[0].setRampout(.1f);
+			   visemeData[0].setDuration(visemeData[0].rampin() + visemeData[0].rampout());
+		   }
 	   }
    }
 }
