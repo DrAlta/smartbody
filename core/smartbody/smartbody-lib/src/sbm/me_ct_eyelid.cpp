@@ -316,31 +316,31 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 	int n_chan = _channels.size();
 
 	if( pitch_tracking ) {
-	int L_eye_quat_idx = _context->channels().search( SkJointName( "eyeball_left" ), SkChannel::Quat );
-	int R_eye_quat_idx =  _context->channels().search( SkJointName( "eyeball_right" ), SkChannel::Quat );
+		int L_eye_quat_idx = _context->channels().search( SkJointName( "eyeball_left" ), SkChannel::Quat );
+		int R_eye_quat_idx =  _context->channels().search( SkJointName( "eyeball_right" ), SkChannel::Quat );
 
-	int buff_idx = _context->toBufferIndex( L_eye_quat_idx );
-	euler_t L_eye_e = quat_t(
-							fbuffer[ buff_idx ],
-							fbuffer[ buff_idx + 1 ],
-							fbuffer[ buff_idx + 2 ],
-							fbuffer[ buff_idx + 3 ]
-	);
+		int buff_idx = _context->toBufferIndex( L_eye_quat_idx );
+		euler_t L_eye_e = quat_t(
+								fbuffer[ buff_idx ],
+								fbuffer[ buff_idx + 1 ],
+								fbuffer[ buff_idx + 2 ],
+								fbuffer[ buff_idx + 3 ]
+		);
 
-	buff_idx = _context->toBufferIndex( R_eye_quat_idx );
-	euler_t R_eye_e = quat_t(
-							fbuffer[ buff_idx ],
-							fbuffer[ buff_idx + 1 ],
-							fbuffer[ buff_idx + 2 ],
-							fbuffer[ buff_idx + 3 ]
-	);
+		buff_idx = _context->toBufferIndex( R_eye_quat_idx );
+		euler_t R_eye_e = quat_t(
+								fbuffer[ buff_idx ],
+								fbuffer[ buff_idx + 1 ],
+								fbuffer[ buff_idx + 2 ],
+								fbuffer[ buff_idx + 3 ]
+		);
 
-	UL_set.set_pitch( (float)( L_eye_e.p() ) );
-	UR_set.set_pitch( (float)( R_eye_e.p() ) );
-#if 0
-	LL_set.set_pitch( (float)( L_eye_e.p() ) );
-	LR_set.set_pitch( (float)( R_eye_e.p() ) );
-#endif
+		UL_set.set_pitch( (float)( L_eye_e.p() ) );
+		UR_set.set_pitch( (float)( R_eye_e.p() ) );
+	#if 0
+		LL_set.set_pitch( (float)( L_eye_e.p() ) );
+		LR_set.set_pitch( (float)( R_eye_e.p() ) );
+	#endif
 	}
 
 	prev_UL_value = UL_value; // for change detection

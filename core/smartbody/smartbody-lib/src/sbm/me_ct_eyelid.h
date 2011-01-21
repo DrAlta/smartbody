@@ -97,6 +97,14 @@ class MeCtEyeLidRegulator : public MeController	{
 
 		void set_eyeball_tracking( bool enable )	{
 			pitch_tracking = enable;
+			if (!pitch_tracking) {
+				UL_set.set_pitch( 0.0f );
+				UR_set.set_pitch( 0.0f );
+			#if 0
+				LL_set.set_pitch( 0.0f );
+				LR_set.set_pitch( 0.0f );
+			#endif
+			}
 		}
 
 		void set_upper_range( float fr, float to )	{
