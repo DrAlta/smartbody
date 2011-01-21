@@ -126,6 +126,11 @@ void GlChartView::init_camera(int type)
 		coordinate.y_scale_zoom = 1.0f/180.0f;
 		coordinate.SetYSize(180.0f);
 	}
+	else if (type == 3)
+	{
+		coordinate.y_scale_zoom = 1.0f/180.0f;
+		coordinate.SetYSize(180.0f);
+	}
 }
 
 void GlChartView::reshape(int width, int height)
@@ -221,7 +226,8 @@ void GlChartView::draw_series()
 		{
 			if(quat_shown_type == 0) draw_series_quat(series);
 			else if(quat_shown_type == 1) draw_series_euler(series);
-			else if(quat_shown_type == 2) draw_series_3D_euler(series);
+			//else if(quat_shown_type == 2) draw_series_3D_euler(series);
+			else if (quat_shown_type == 3) draw_series_swingtwist(series);
 		}
 	}
 }
@@ -235,6 +241,11 @@ void GlChartView::set_quat_show_type(int type)
 		coordinate.y_scale_zoom = 1.0f;
 	}
 	else if(type == 1 && coordinate.GetYSize() == 1.0f) 
+	{
+		coordinate.SetYSize(180.0f);
+		coordinate.y_scale_zoom = 1.0f/180.0f;
+	}
+	else if (type == 3 && coordinate.GetYSize() == 1.0f)
 	{
 		coordinate.SetYSize(180.0f);
 		coordinate.y_scale_zoom = 1.0f/180.0f;
@@ -336,6 +347,70 @@ void GlChartView::get_label(char* label, SrString& str, int type)
 	strcat(label, &(str.get(0)));
 	label[strlen(label)-3] = '\0';
 
+}
+
+void GlChartView::draw_series_swingtwist( GlChartViewSeries* series )
+{
+	SrVec euler;
+	SrVec color;
+	char t_label[50];
+	float step = coordinate.GetXScale()/(series->max_size-1);
+	float y_scale = coordinate.GetYScale();
+	if(series->bold)
+	{
+		glLineWidth(3.0f);
+	}
+
+	label.Begin();
+	if(show_x)
+	{
+		color = series->GetColor(1);
+		glColor4f(color.x, color.y, color.z, 0.5f);
+		glBegin(GL_LINE_STRIP);
+		for(int i = 0; i < series->size; ++i)
+		{
+			euler = series->GetSwingTwist(i);
+			glVertex3f(i*step, euler.x*y_scale, 0.0f);
+		}
+		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		get_label(t_label, series->title, 0);
+		label.DrawString(t_label, 2.0f, (series->size-1)*step, euler.x*y_scale);
+		glDisable(GL_TEXTURE_2D);
+	}
+	if(show_y)
+	{
+		color = series->GetColor(2);
+		glColor4f(color.x, color.y, color.z, 0.5f);
+		glBegin(GL_LINE_STRIP);
+		for(int i = 0; i < series->size; ++i)
+		{
+			euler = series->GetSwingTwist(i);
+			glVertex3f(i*step, euler.y*y_scale, 0.0f);
+		}
+		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		get_label(t_label, series->title, 1);
+		label.DrawString(t_label, 2.0f, (series->size-1)*step, euler.y*y_scale);
+		glDisable(GL_TEXTURE_2D);
+	}
+	if(show_z)
+	{
+		color = series->GetColor(3);
+		glColor4f(color.x, color.y, color.z, 0.5f);
+		glBegin(GL_LINE_STRIP);
+		for(int i = 0; i < series->size; ++i)
+		{
+			euler = series->GetSwingTwist(i);
+			glVertex3f(i*step, euler.z*y_scale, 0.0f);
+		}
+		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		get_label(t_label, series->title, 2);
+		label.DrawString(t_label, 2.0f, (series->size-1)*step, euler.z*y_scale);
+		glDisable(GL_TEXTURE_2D);
+	}
+	glLineWidth(1.0f);
 }
 
 void GlChartView::draw_series_euler(GlChartViewSeries* series)
@@ -711,3 +786,4 @@ int GlChartView::mouse_event ( const SrEvent &e )
 
 	return res;
  }
+

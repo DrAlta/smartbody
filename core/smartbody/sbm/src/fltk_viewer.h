@@ -144,6 +144,8 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdGazeOnTargetType3,
 				   CmdGazeOnTargetType4,
 				   CmdRemoveAllGazeTarget,
+				   CmdReachOnTargetRight,
+				   CmdReachOnTargetLeft,
 				   CmdNoTerrain,
 				   CmdTerrainWireframe,
 				   CmdTerrain,
@@ -316,7 +318,8 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 protected:
 	
 	void set_gaze_target(int itype, const char* targetname);	
-	void update_gaze_submenus();
+	void set_reach_target(int itype, const char* targetname);	
+	void update_submenus();
 	void create_popup_menus();
  };
 

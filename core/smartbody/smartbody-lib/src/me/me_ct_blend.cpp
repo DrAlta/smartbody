@@ -553,6 +553,7 @@ bool MeCtBlend::controller_evaluate( double t, MeFrameData & frame ) {
 
 					int parent_index = local_ch_to_parent(i);
 
+
 					if( parent_index >= 0 ) {
 #if( DEBUG_INSPECT_CHANNELS || VALIDATE_BLEND_CHANNEL_REMAP )
 						SkChannel::Type parent_ch_type = _context->channels().type( parent_index );

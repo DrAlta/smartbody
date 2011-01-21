@@ -34,7 +34,7 @@ PawnPosControl::PawnPosControl(void) : PositionControl()
 
 	//label = NULL;	
 	pawn = NULL;
-	init_font();
+	//init_font();
 }
 
 PawnPosControl::~PawnPosControl(void)

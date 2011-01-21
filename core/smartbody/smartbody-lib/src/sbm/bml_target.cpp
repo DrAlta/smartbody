@@ -45,7 +45,7 @@ using namespace xml_utils;
  */
 const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget, mcuCBHandle *mcu ) {
 	// TODO: If the first non-whitespace character is 0..9.-+, then assume it is a coordinate
-	XMLStringTokenizer tokenizer( attrTarget );
+	XMLStringTokenizer tokenizer( attrTarget );	
 	std::stringstream strstr;
 	switch( tokenizer.countTokens() ) {
 		case 1: {

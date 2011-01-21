@@ -1,21 +1,49 @@
 #include "me_ct_reach.hpp"
+#include "me_ct_IK_scenario.hpp"
 #include <assert.h>
 
 const char* MeCtReach::CONTROLLER_TYPE = "Reach";
+const float PI_CONST = 3.14159265358979323846f;
 
-const int  NUM_LIMBS = 4;
-const char limb_chain[][20] = {"r_shoulder", "r_elbow", "r_forearm", "r_wrist"};
-const MeCtLimbJointConstraint limb_constraint[] = { {JOINT_TYPE_BALL, M_PI*0.5f, M_PI*0.5f}, {JOINT_TYPE_BALL, M_PI*0.5f, M_PI*0.5f}, {JOINT_TYPE_HINGE, M_PI*0.7f, M_PI*0.1f}, {JOINT_TYPE_BALL, M_PI*0.5f, M_PI*0.5f}  };
+const int  NUM_LIMBS = 5;
 
-MeCtReach::MeCtReach(void)
+// feng : right now I simply hard coded the joint chains and constraints for the left, right arms.
+// in the future, I think we should integrate the joint constraints into skeleton, so it is easier to set up an IK chain interactively ( by simply select the start, end joints ? )
+const char limb_chain_r[][20] = {"r_shoulder", "r_elbow", "r_forearm", "r_wrist", "r_middle1"};
+const char limb_chain_l[][20] = {"l_shoulder", "l_elbow", "l_forearm", "l_wrist", "l_middle1"};
+
+const MeCtIKJointLimit limb_joint_limit_r[] = { 							
+	{SrVec2(PI_CONST*0.5f, PI_CONST*0.4f), SrVec2(PI_CONST*0.7f,PI_CONST*0.3f),SrVec2(PI_CONST*0.5f,-PI_CONST*0.5f)},											 
+	{SrVec2(PI_CONST*0.01f, PI_CONST*0.01f), SrVec2(PI_CONST*0.8f,PI_CONST*0.05f),SrVec2(PI_CONST*0.01f,-PI_CONST*0.01f)},                                              
+	{SrVec2(PI_CONST*0.01f, PI_CONST*0.01f), SrVec2(PI_CONST*0.01f,PI_CONST*0.01f),SrVec2(PI_CONST*0.2f,-PI_CONST*0.2f)},                                              
+	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.3f,PI_CONST*0.3f),SrVec2(PI_CONST*0.3f,-PI_CONST*0.3f)},                                              
+	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.3f,PI_CONST*0.3f),SrVec2(PI_CONST*0.3f,-PI_CONST*0.3f)},								    
+};
+
+// since the coordinates are flip in the left-arm, all joint limits need to be flipped as well.
+const MeCtIKJointLimit limb_joint_limit_l[] = { 							
+	{SrVec2(PI_CONST*0.4f, PI_CONST*0.5f), SrVec2(PI_CONST*0.3f,PI_CONST*0.7f),SrVec2(PI_CONST*0.5f,-PI_CONST*0.5f)},											 
+	{SrVec2(PI_CONST*0.01f, PI_CONST*0.01f), SrVec2(PI_CONST*0.05f,PI_CONST*0.8f),SrVec2(PI_CONST*0.01f,-PI_CONST*0.01f)},                                              
+	{SrVec2(PI_CONST*0.01f, PI_CONST*0.01f), SrVec2(PI_CONST*0.01f,PI_CONST*0.01f),SrVec2(PI_CONST*0.2f,-PI_CONST*0.2f)},                                              
+	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.3f,PI_CONST*0.3f),SrVec2(PI_CONST*0.3f,-PI_CONST*0.3f)},                                              
+	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.3f,PI_CONST*0.3f),SrVec2(PI_CONST*0.3f,-PI_CONST*0.3f)},								    
+};
+
+MeCtReach::MeCtReach( SkSkeleton* skeleton ) 
 {
 	reach_mode = TARGET_POS;
 	target_pos = SrVec(0.f,150.f,0.f);
+	_skeleton = skeleton;
 	target_joint_ref = NULL;
+	limb_length = 0.0;
+	prev_time = -1.0;
+
+	reach_arm = REACH_RIGHT_ARM;	
 }
 
 MeCtReach::~MeCtReach(void)
 {
+	
 }
 
 SrVec MeCtReach::get_reach_target()
@@ -31,9 +59,7 @@ SrVec MeCtReach::get_reach_target()
 		if( target_joint_ref )	
 		{
 			SrMat sr_M;
-			matrix_t M;
-			int i, j;
-			
+			matrix_t M;			
 			target_joint_ref->update_gmat_up();
 			sr_M = target_joint_ref->gmat();			
 			target = SrVec(sr_M.get(12),sr_M.get(13),sr_M.get(14));			
@@ -57,59 +83,78 @@ void MeCtReach::set_target_joint(SkJoint* target_joint)
 
 void MeCtReach::init()
 {
-	joint_name.size(NUM_LIMBS);
-	joint_constraint.size(NUM_LIMBS);
-	for (int i=0;i<NUM_LIMBS;i++)
-	{
-		joint_name[i] = limb_chain[i];
-		joint_constraint[i] = limb_constraint[i];
-		_channels.add(joint_name[i], SkChannel::Quat);
-		//_channels.add("l_shoulder", SkChannel::Quat);
-	}
+	assert(_skeleton);
+	joint_name.size(NUM_LIMBS);	
+	joint_limit.size(NUM_LIMBS);
+	limb_length = 0.f;
 
+	for (int i=0;i<NUM_LIMBS;i++)
+	{	
+		if (reach_arm == REACH_RIGHT_ARM)
+		{
+			joint_name[i] = limb_chain_r[i];
+			joint_limit[i] = limb_joint_limit_r[i];				
+		}
+		else if (reach_arm == REACH_LEFT_ARM)
+		{
+			joint_name[i] = limb_chain_l[i];
+			joint_limit[i] = limb_joint_limit_l[i];
+		}						
+		// feng : add both the left & right arms in the channel buffers
+		// I am not sure why, but this avoids popping when adding the second arm
+		_channels.add(limb_chain_r[i], SkChannel::Quat);	
+		_channels.add(limb_chain_l[i], SkChannel::Quat);
+	}		
+
+	limb.init(_skeleton);
+	limb.buildJointChain(joint_name,joint_limit);
+	limb_length = limb.computeLimbLength();
+	root_joint_ref = limb.joint_chain[0];
 	MeController::init();
 }
 
 void MeCtReach::controller_map_updated() 
-{
-	// init limbs here
-	SkSkeleton* skeleton;
-	if( _context->channels().size() > 0 )	{
-		skeleton = _context->channels().skeleton();
-	}
-	
-	if (!skeleton)
-		return;
-
-	limb.init(skeleton);
-	limb.buildJointChain(joint_name,joint_constraint);
+{		
 	// set buffer index mapping
 	for (int i=0;i<joint_name.size();i++)
-	{
-		limb.buf_index[i] = _toContextCh[i];
-	}
-	
-
-	//printf("Finish update controller map\n");
+	{		
+		if (reach_arm == REACH_RIGHT_ARM)
+			limb.buf_index[i] = _toContextCh[i*2];
+		else 
+			limb.buf_index[i] = _toContextCh[i*2+1];
+	}	
 }
 
 bool MeCtReach::controller_evaluate( double t, MeFrameData& frame )
-{	
-	// update from frame buffer to joint quat in the limb
-	limb.updateQuat(frame,true);
-	limb.ik.ik_offset = get_reach_target(); // set the target
+{			
+	float dt = 0.001f;
+	if (prev_time == -1.0) // first start
+	{
+		dt = 0.001f;		
+		// for first frame, update from frame buffer to joint quat in the limb
+		// any future IK solving will simply use the joint quat from the previous frame.
+		limb.updateQuat(frame,true);
+	}
+	else
+	{		
+		dt = ((float)(t-prev_time));
+	}
+	prev_time = (float)t;
 
 	MeCtIKScenario* ik_scenario = &limb.ik;
+	
+	ik_scenario->ik_offset = get_reach_target(); // set the target
+	ik_scenario->joint_quat_list = limb.joint_quat;	
 	
 	limb.skeleton->update_global_matrices();
 	SkJoint* chain_root = limb.getChainRoot();
 	ik_scenario->gmat = chain_root->parent()->gmat();
 	
+	ik.setDt(dt);
 	ik.update(ik_scenario);
 	limb.joint_quat = ik_scenario->joint_quat_list;
 	// write results from limb to buffer
 	limb.updateQuat(frame,false);
-
 	return true;
 
 }

@@ -237,6 +237,7 @@ void ChannelBufferWindow::resetCamera(fltk::Widget* widget, void* data)
 	int i = -1;
 	if(strcmp(window->quat->get_item()->label(), "Quaternion") == 0) i = 0;
 	else if(strcmp(window->quat->get_item()->label(), "Euler angle") == 0) i = 1;
+	else if (strcmp(window->quat->get_item()->label(), "Swing twist") == 0) i = 3;
 	window->chartview->init_camera(i);
 	window->chartview->update_coordinate = true;
 }
@@ -281,6 +282,7 @@ void ChannelBufferWindow::refreshQuat(fltk::Widget* widget, void* data)
 
 	if(strcmp(window->quat->get_item()->label(), "Quaternion") == 0) i = 0;
 	else if(strcmp(window->quat->get_item()->label(), "Euler angle") == 0) i = 1;
+	else if (strcmp(window->quat->get_item()->label(), "Swing twist") == 0) i = 3;
 	
 	window->chartview->set_quat_show_type(i);
 	setXYZVisibility(window);
@@ -290,6 +292,7 @@ void ChannelBufferWindow::initQuat()
 {
 	quat->add("Quaternion");
 	quat->add("Euler angle");
+	quat->add("Swing twist");
 	setXYZVisibility(this);
 }
 
@@ -316,6 +319,15 @@ void ChannelBufferWindow::setXYZVisibility(ChannelBufferWindow* window)
 		window->show_z->activate();
 		window->show_w->deactivate();
 		window->show_w->textcolor(color);
+	}
+	else if(strcmp(window->quat->get_item()->label(), "Swing twist") == 0)
+	{
+		color = 47;
+		window->show_x->activate();
+		window->show_y->activate();
+		window->show_z->activate();
+		window->show_w->deactivate();
+		window->show_w->textcolor(color);		
 	}
 }
 

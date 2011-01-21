@@ -129,6 +129,7 @@ static void menucb ( fltk::Widget* o, void* v )
 # define MCB     ((fltk::Callback*)menucb)
 # define CMD(c)  ((void*)FltkViewer::c)
 const int NUM_GAZE_TYPES = 4;
+const int NUM_REACH_TYPES = 2;
 
 static char gaze_on_target_menu_name[] = {"&gaze"};
 static char gaze_type_name[NUM_GAZE_TYPES][40] = {"&create EYE gaze","&create EYE NECK gaze","&create EYE CHEST gaze","&create EYE BACK gaze" }; 
@@ -141,6 +142,17 @@ Fl_Menu_Item GazeMenuTable[] =
     { gaze_type_name[2],   0, MCB, 0 },
 	{ gaze_type_name[3],   0, MCB, 0 },
 	{ "&remove all gazes",   0, MCB, CMD(CmdRemoveAllGazeTarget) },
+	{ 0 }
+};
+
+static char reach_on_target_menu_name[] = {"&reach"};
+static char reach_type_name[NUM_REACH_TYPES][40] = {"&create Right arm reach","&create Left arm reach" }; 
+static SrArray<Fl_Menu_Item> reach_submenus[NUM_REACH_TYPES];
+
+Fl_Menu_Item ReachMenuTable[] = 
+{
+	{ reach_type_name[0],   0, MCB, 0 },			
+	{ reach_type_name[1],   0, MCB, 0 },	
 	{ 0 }
 };
 
@@ -175,7 +187,8 @@ Fl_Menu_Item MenuTable[] =
          { "&no pawns shown", 0, MCB, CMD(CmdNoPawns), FL_MENU_RADIO },
          { "&show pawns as spheres", 0, MCB, CMD(CmdPawnShowAsSpheres),   FL_MENU_RADIO },        
          { 0 },
-    { gaze_on_target_menu_name, 0, 0, GazeMenuTable, FL_SUBMENU_POINTER },         
+    { gaze_on_target_menu_name, 0, 0, GazeMenuTable, FL_SUBMENU_POINTER },   
+	{ reach_on_target_menu_name, 0, 0, ReachMenuTable, FL_SUBMENU_POINTER }, 
     { "p&references", 0, 0, 0, FL_SUBMENU },
          { "&axis",         0, MCB, CMD(CmdAxis),        FL_MENU_TOGGLE },
          { "b&ounding box", 0, MCB, CMD(CmdBoundingBox), FL_MENU_TOGGLE },
@@ -231,7 +244,7 @@ static void get_pawn_submenus(void* user_data,SrArray<Fl_Menu_Item>& menu_list)
 }
 
 
-void FltkViewer::update_gaze_submenus()
+void FltkViewer::update_submenus()
 {
 	for (int i=0;i<NUM_GAZE_TYPES;i++)
 	{
@@ -245,6 +258,20 @@ void FltkViewer::update_gaze_submenus()
 		get_pawn_submenus(select_pawn.user_data(),menu_list);
 		const Fl_Menu_Item* pmenu = (const Fl_Menu_Item *)menu_list;
 		gaze_menu.user_data((void*)pmenu);				
+	}
+
+	for (int i=0;i<NUM_REACH_TYPES;i++)
+	{
+		Fl_Menu_Item& reach_menu = ReachMenuTable[i];	
+		reach_menu.flags |= FL_SUBMENU_POINTER;
+		SrArray<Fl_Menu_Item>& menu_list = reach_submenus[i];
+		menu_list = SrArray<Fl_Menu_Item>();
+		int iCmd = FltkViewer::CmdReachOnTargetRight+i;
+		Fl_Menu_Item select_pawn = { "selected pawn",   0, MCB,((void*)iCmd)  };
+		menu_list.push(select_pawn);			
+		get_pawn_submenus(select_pawn.user_data(),menu_list);
+		const Fl_Menu_Item* pmenu = (const Fl_Menu_Item *)menu_list;
+		reach_menu.user_data((void*)pmenu);				
 	}
 }
 
@@ -356,7 +383,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 
 void FltkViewer::create_popup_menus()
 {
-	update_gaze_submenus();   
+	update_submenus();   
 	begin();
     _data->menubut = new fltk::PopupMenu(0,0,50,50);
     _data->menubut->type(fltk::PopupMenu::POPUP23);
@@ -555,6 +582,10 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 	  case CmdRemoveAllGazeTarget:
 		               set_gaze_target(-1,NULL);
 					   break;
+	  case CmdReachOnTargetRight:	
+	  case CmdReachOnTargetLeft:	 
+		  set_reach_target(s-CmdReachOnTargetRight,label);
+		  break;
       
     }
 	
@@ -1672,6 +1703,40 @@ void FltkViewer::create_pawn()
 	char cmd_pawn[256];
 	sprintf(cmd_pawn,"pawn %s init",pawn_name);
 	mcu.execute(cmd_pawn);
+}
+
+
+void FltkViewer::set_reach_target( int itype, const char* targetname )
+{
+	char exe_cmd[256];
+	SbmCharacter* actor = NULL;
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.character_map.reset();
+	for(int i = 0; i <= _locoData->char_index; ++i)
+	{
+		actor = mcu.character_map.next();		
+	}	
+
+	SbmPawn* pawn = _objManipulator.get_selected_pawn();
+	static char reach_type[NUM_REACH_TYPES][20] = { "right", "left" };	
+	if (actor)
+	{
+		char pawn_name[30];
+		if (strcmp(targetname,"selected pawn")==0)
+		{
+			if (pawn)
+				strcpy(pawn_name,pawn->name);
+			else
+			{
+				// handle user error : call set target command without selecting a pawn target.
+			}
+		}
+		else
+			strcpy(pawn_name,targetname);
+
+		sprintf(exe_cmd,"bml char %s <sbm:reach target=\"%s\" reach-arm=\"%s\"/>",actor->name,pawn_name,reach_type[itype]);
+		mcu.execute_later(exe_cmd,1.0); // delay execution for one second to avoid popping
+	}
 }
 
 void FltkViewer::set_gaze_target(int itype, const char* label)

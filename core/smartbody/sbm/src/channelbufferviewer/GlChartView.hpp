@@ -52,7 +52,7 @@ public:
 	bool show_x; // if show x value when shown as quaternion or euler angle
 	bool show_y; // if show y value when shown as quaternion or euler angle
 	bool show_z; // if show z value when shown as quaternion or euler angle
-	bool show_w; // if show z value when shown as quaternion
+	bool show_w; // if show w value when shown as quaternion
 
 public:
 	GlChartView(int x, int y, int w, int h, char* name);
@@ -90,6 +90,7 @@ protected:
 	void draw_series_vec2(GlChartViewSeries* series);
 	void draw_series_vec3(GlChartViewSeries* series);
 	void draw_series_euler(GlChartViewSeries* series);
+	void draw_series_swingtwist(GlChartViewSeries* series);
 	void draw_series_3D_euler(GlChartViewSeries* series);
 	void draw_series_quat(GlChartViewSeries* series);
 

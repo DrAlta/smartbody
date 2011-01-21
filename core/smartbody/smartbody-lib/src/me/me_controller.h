@@ -219,10 +219,10 @@ public :
     void inoutdt ( float indt, float outdt );
     
     /*! Get the indt time */
-    float indt () const { return _indt; }
+    virtual float indt () const { return _indt; }
 
     /*! Get the outdt time */
-    float outdt () const { return _outdt; }
+    virtual float outdt () const { return _outdt; }
     
     /*! Allocates a buffer (and set zero values) for the channels maintained by the
         derived class, and calls the initialization method of the derived controller.

@@ -520,9 +520,17 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			v.set(tx-world_pos.x, 0.0f, tz-world_pos.z);
 			v.normalize();
 			orientation.normalize();
+
 			if(cross(orientation, v).y > 0.0f)
+			{
+				lrps = -fabs(lrps);
 				angle = -acos(dot(orientation, v));
-			else angle = acos(dot(orientation, v));
+			}
+			else 
+			{
+				lrps = fabs(lrps);
+				angle = acos(dot(orientation, v));
+			}
 		}
 
 		nav_circle->init( 0.0f, 0.0f, 0.0f, rps, lrps, angle, -1, 0, 0, 0, time );

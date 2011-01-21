@@ -60,6 +60,37 @@ SrVec GlChartViewSeries::GetEulerFromQuaternion(SrQuat& quat)
 	return euler;
 }
 
+SrVec GlChartViewSeries::GetSwingTwistFromQuaternion( SrQuat& quat )
+{
+	// feng : add swing twist conversion
+	const float EPSILON6 = 0.0000001f;	
+	
+	SrQuat q;
+	if( quat.w < 0.0 )	{
+		q = SrQuat(-quat.w,-quat.x,-quat.y,-quat.z);
+	}
+	else	{
+		q = quat;
+	}
+
+	float gamma = atan2( q.z, q.w );
+	float beta = atan2( sqrt( q.x*q.x + q.y*q.y ), sqrt( q.z*q.z + q.w*q.w ) );
+	float sinc = 1.0f;
+	if( beta > EPSILON6 )	{
+		sinc = sin( beta )/beta;
+	}
+	float s = sin( gamma );
+	float c = cos( gamma );
+	float sinc2 = 2.0f / sinc;
+	float swing_x = sinc2 * ( c * q.x - s * q.y );
+	float swing_y = sinc2 * ( s * q.x + c * q.y);
+	float twist = 2.0f * gamma;
+	
+	// to degree instead of radian
+	return( SrVec( ( swing_x )* 57.295779513082323f, ( swing_y )* 57.295779513082323f, ( twist )* 57.295779513082323f ) );
+
+}
+
 SrVec GlChartViewSeries::GetColor(int index)
 {
 	if(index == 1) return color_x;
@@ -190,6 +221,14 @@ SrVec GlChartViewSeries::GetEuler(int index)
 	index = CheckIndex(index);
 	SrQuat quat(x.get(index), y.get(index), z.get(index), w.get(index));
 	return GetEulerFromQuaternion(quat);
+}
+
+
+SrVec GlChartViewSeries::GetSwingTwist( int index )
+{
+	index = CheckIndex(index);
+	SrQuat quat(x.get(index), y.get(index), z.get(index), w.get(index));
+	return GetSwingTwistFromQuaternion(quat);
 }
 
 SrQuat GlChartViewSeries::GetQuat(int index)
@@ -395,6 +434,8 @@ void GlChartViewSeries::SetLast(SrQuat& quat)
 	this->z.set(current_ind, quat.z);
 	this->w.set(current_ind, quat.w);
 }
+
+
 
 GlChartViewArchive::GlChartViewArchive()
 {

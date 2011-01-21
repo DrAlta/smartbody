@@ -27,11 +27,14 @@
 #include <ME/me_controller.h>
 #include "me_ct_locomotion_func.hpp"
 
+#include <sr/sr_vec2.h>
+
 #pragma once
 
 #define JOINT_TYPE_UNKNOWN 0
 #define JOINT_TYPE_HINGE 1
 #define JOINT_TYPE_BALL 2
+#define JOINT_TYPE_BALLSOCKET 3
 
 /*#define ORIENTATION_RES_UNCHANGED_LOCAL 0
 #define ORIENTATION_RES_PLANE 1
@@ -42,6 +45,18 @@
 // Not much to say about the use, simply fill out the MeCtIKScenario structure, 
 // call update(MeCtIKScenario* scenario) and pass in the structure. The returned data
 // include joint quaternions, joint positions and global matrices
+
+// more thorough definition of joint angle limits for IK solver
+// joint rotation will be decomposed into swin-twist parameterization.
+// joint angle limits are defined swing ( rotation about x-axis and y-axis ), and twist separately.
+// Each SrVec2(limit_positive, limit_negative) define the joint rotation limits at counter-clockwise and clockwise directions.
+struct MeCtIKJointLimit
+{
+	SrVec2 x_limit;
+	SrVec2 y_limit;
+	SrVec2 twist_limit;	
+};
+
 
 class MeCtIKScenarioJointInfo
 {
@@ -54,9 +69,13 @@ public:
 	float		support_joint_comp; // In case a compensation is needed to maintain a certain distance beyond support_joint_height.
 	union
 	{
-		struct{float max;}ball;
-		struct{float min; float max;}hinge;
+		struct{float max; float twist_max; }ball;
+		struct{float min; float max;}hinge;			
 	}constraint; // the default set is ball joint
+
+	MeCtIKJointLimit joint_limit;
+	float            angular_speed_limit; // limit the bending speed of a joint, in degree/sec
+
 	SrVec		axis; // for hinge joint, the rotation axis in its local coordinate.
 
 public:

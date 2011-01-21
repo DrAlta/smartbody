@@ -100,6 +100,7 @@ SrMat get_lmat(SkJoint* joint, SrQuat* quat)
 	_lmat[12] = joint->offset().x + joint->pos()->value(0);
 	_lmat[13] = joint->offset().y + joint->pos()->value(1);
 	_lmat[14] = joint->offset().z + joint->pos()->value(2);
+	//sr_out << "joint_name : " << joint->name() << "   joint_offset = " << joint->offset() << srnl;
 
    return _lmat;
  }
