@@ -170,11 +170,13 @@ void MeCtLocomotionLimbDirectionPlanner::update_direction(double time_interval, 
 	{
 		vec1 = cross(curr_direction, target_direction);
 		if(turning_mode == 0 && dot(target_direction, curr_direction) >= 0.0f || turning_mode == 1)
+		//if(turning_mode == 0 || turning_mode == 1)
 		{
 			angle = (float)(turning_speed*time_interval);
 			p = 1;
 		}
 		else if(turning_mode == 0 && dot(target_direction, curr_direction) < 0.0f || turning_mode == 2)
+		//else if(turning_mode == 2)
 		{ 
 			angle = -(float)(turning_speed*time_interval);
 			p = -1;

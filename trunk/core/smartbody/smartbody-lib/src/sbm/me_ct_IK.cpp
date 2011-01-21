@@ -488,10 +488,14 @@ __forceinline void MeCtIK::get_limb_section_local_pos(int start_index, int end_i
 	SrVec axis;
 	SrVec ppos;
 	SkJoint* tjoint = scenario->start_joint->sk_joint;
+	
+	
 	for(int i = 0; i < start_index; ++i)
 	{
 		tjoint = tjoint->child(0);
 	}
+	
+	//tjoint = scenario->joint_info_list[start_index].sk_joint;
 
 	if(end_index < 0 || end_index > scenario->joint_info_list.size()-1) end_index = scenario->joint_info_list.size()-1;
 
@@ -522,6 +526,7 @@ __forceinline void MeCtIK::get_limb_section_local_pos(int start_index, int end_i
 		if(tjoint->num_children()>0 && tjoint != scenario->end_joint->sk_joint)
 		{
 			tjoint = tjoint->child(0);
+			//tjoint = scenario->joint_info_list[j].sk_joint;
 		}
 		else break;
 	}

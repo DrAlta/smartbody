@@ -75,6 +75,7 @@ public:
 	SrVec2 GetVec2(int index);
 	SrVec GetVec3(int index);
 	SrVec GetEuler(int index);
+	SrVec GetSwingTwist(int index);
 	SrQuat GetQuat(int index);
 
 	void Push(float x);
@@ -103,6 +104,7 @@ public:
 	SrVec GetColor(int index);
 
 	SrVec GetEulerFromQuaternion(SrQuat& quat);
+	SrVec GetSwingTwistFromQuaternion(SrQuat& quat);
 
 protected:
 	int CheckIndex(int index);

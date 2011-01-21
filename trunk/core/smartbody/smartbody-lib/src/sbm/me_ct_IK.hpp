@@ -76,7 +76,13 @@ public:
 	SrVec get_target(int index);
 
 protected:
-	void adjust();
+	virtual void adjust();		
+
+	virtual void calc_target(SrVec& orientation, SrVec& offset);
+
+	int check_constraint(SrQuat* quat, int index);	
+
+	void rotate(SrVec& src, int start_index);
 
 	void adjust_3_joints();
 
@@ -92,9 +98,7 @@ protected:
 
 	SrVec cross_point_on_plane(SrVec& point, SrVec& line, SrVec& plane_normal, SrVec& plane_point);
 
-	void update_limb_section_local_pos(int start_index);
-
-	void rotate(SrVec& src, int start_index);
+	void update_limb_section_local_pos(int start_index);	
 
 	void get_limb_section_local_pos(int start_index, int end_index);
 	
@@ -102,13 +106,11 @@ protected:
 
 	int reach_destination();
 
-	int check_constraint(SrQuat* quat, int index);
+	
 
 	void get_next_support_joint();
 
-	int get_support_joint_num();
-
-	virtual void calc_target(SrVec& orientation, SrVec& offset);
+	int get_support_joint_num();	
 
 	void get_init_mat_list();
 

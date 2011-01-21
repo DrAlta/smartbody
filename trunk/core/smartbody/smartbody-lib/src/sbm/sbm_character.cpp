@@ -41,6 +41,7 @@
 #include <ME/me_ct_interpolator.h>
 
 #define USE_REACH 0
+//#define USE_REACH_TEST 0
 
 
 const bool LOG_PRUNE_CMD_TIME							= false;
@@ -354,9 +355,12 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	if( locomotion_ct != NULL )
 		locomotion_ct->init();
 	gaze_sched_p->init();
+
 #ifdef USE_REACH
 	reach_sched_p->init();
 #endif
+
+
 
 	// Blink controller before head group (where visemes are controlled)
 	head_sched_p->init();
@@ -487,6 +491,26 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	all_viseme.push_back("fe127_yawn");
 	all_viseme.push_back("fe129_angry");
 	viseme_name_patch.insert(make_pair("ALL",all_viseme));
+
+#ifdef USE_REACH_TEST	
+	// init left and right arm IKs for the character	
+	string r_effector_name, l_effector_name;
+	r_effector_name = std::string(name)+"_right_effector";
+	l_effector_name = std::string(name)+"_left_effector";	
+	// initialize two pawns as end effector
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	char pawnInitCmd[256];
+	sprintf(pawnInitCmd,"pawn %s init",r_effector_name.c_str());
+	mcu.execute(pawnInitCmd);
+	sprintf(pawnInitCmd,"pawn %s init",l_effector_name.c_str());
+	mcu.execute(pawnInitCmd);
+
+	char reachCmd[256];
+	sprintf(reachCmd,"bml char %s <reach target=\"%s\" reach-arm=\"right\" end=\"1000\"/>",name,r_effector_name.c_str());
+	mcu.execute(reachCmd);
+	sprintf(reachCmd,"bml char %s <reach target=\"%s\" reach-arm=\"left\" end=\"1000\"/>",name,l_effector_name.c_str());
+	mcu.execute(reachCmd);
+#endif
 	
 	return( CMD_SUCCESS ); 
 }
@@ -756,6 +780,7 @@ void prune_schedule( SbmCharacter*   actor,
 	VecOfTrack::iterator it    = tracks.end();
 
 	bool hasReach = false;
+	bool hasReachLeft = false, hasReachRight = false;
 
 	while( it != first ) {
 		// Decrement track iterator (remember, we started at end)
@@ -947,13 +972,30 @@ void prune_schedule( SbmCharacter*   actor,
 						}
 					}
 				} else if (dynamic_cast<MeCtReach*>(anim_source)) {
-					if (hasReach)
+					MeCtReach* ct_reach = dynamic_cast<MeCtReach*>(anim_source);
+
+					if (ct_reach->getReachArm() == MeCtReach::REACH_LEFT_ARM)
 					{
-						in_use = false;
+						if (hasReachLeft)
+						{
+							in_use = false;
+						}
+						else
+						{
+							hasReachLeft = true;
+						}
 					}
-					else
+
+					if (ct_reach->getReachArm() == MeCtReach::REACH_RIGHT_ARM)
 					{
-						hasReach = true;
+						if (hasReachRight)
+						{
+							in_use = false;
+						}
+						else
+						{
+							hasReachRight = true;
+						}
 					}
 				} else if( anim_ct_type == MeCtMotion::type_name || anim_ct_type == MeCtQuickDraw::type_name ) {
 					if( motion_ct || pose_ct ) {
