@@ -389,14 +389,25 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 	time_sec last_viseme = TIME_UNSET;  // end of last viseme
 
 	// Process Visemes
-	const vector<VisemeData*>* result_visemes = speech_impl->getVisemes( speech_request_id );
+	vector<VisemeData*>* result_visemes = speech_impl->getVisemes( speech_request_id );
 	if( !result_visemes ) {
 		if (speech_impl_backup) // run the backup speech server if available
 			result_visemes = speech_impl->getVisemes( speech_request_id );
 	}
 
-	if (result_visemes) {
-		visemes = *result_visemes;  // Copy contents
+	if (result_visemes)
+	{
+		//visemes = *result_visemes;  // Copy contents
+		for ( size_t i = 0; i < (*result_visemes).size(); i++ )
+		{
+			VisemeData* v = (*result_visemes)[ i ];
+			if (!v->isCurveMode() && !v->isTrapezoidMode())
+				visemes.push_back( new VisemeData( v->id(), v->weight(), v->time() ) );
+			else if (v->isTrapezoidMode())
+				visemes.push_back( new VisemeData( v->id(), v->weight(), v->time(), v->duration(), v->rampin(), v->rampout() ) );
+			else
+				visemes.push_back( new VisemeData( v->id(), v->getNumKeys(), v->getCurveInfo() ));
+		}
 
 		vector<VisemeData*>::iterator cur = visemes.begin();
 		vector<VisemeData*>::iterator end = visemes.end();

@@ -407,7 +407,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    return m_requestIdCounter++;
 }
 
-const vector<VisemeData *> * AudioFileSpeech::getVisemes( RequestId requestId )
+vector<VisemeData *> * AudioFileSpeech::getVisemes( RequestId requestId )
 {
    // TODO: Change the return type data structure, so that I can simply do this:
    //return m_speechRequestInfo[ requestId ].visemeData
@@ -416,7 +416,7 @@ const vector<VisemeData *> * AudioFileSpeech::getVisemes( RequestId requestId )
    hash_map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
    if ( it != m_speechRequestInfo.end() )
    {
-      vector< VisemeData * > * visemeCopy = new vector< VisemeData * >;
+	      vector< VisemeData * > * visemeCopy = new vector< VisemeData * >;
       for ( size_t i = 0; i < it->second.visemeData.size(); i++ )
       {
          VisemeData & v = it->second.visemeData[ i ];
@@ -723,7 +723,11 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
 		  float readyTime = (float)atof( ready.c_str() );
 		  float relaxTime = (float)atof( relax.c_str() );		  
 		  float rampIn = readyTime - startTime;
+		  if (rampIn <= 0.0f)
+			  rampIn = 0.1f;
 		  float rampOut = endTime - relaxTime;
+		  if (rampOut <= 0.0f)
+			  rampOut = 0.1f;
 
 		  float weight = (float)atof( articulation.c_str());
 

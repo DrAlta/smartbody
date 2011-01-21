@@ -110,6 +110,12 @@ namespace SmartBody {
 		/** Set the blend-in duration of the viseme. */
 		void setDuration( float duration ) { _duration = duration; }
 
+		/** Set the blend-in duration of the viseme. */
+		void setRampout( float rampout ) { _rampout = rampout; }
+
+		/** Set the blend-in duration of the viseme. */
+		void setRampin( float rampin ) { _rampin = rampin; }
+
 		/** Get the number of keys. */
 		int getNumKeys() {return _numKeys;}
 
@@ -177,7 +183,7 @@ namespace SmartBody {
          *  VisemeData instances of when to cancel previous visemes (change
          *  of viseme, and end of words).
          */
-        virtual const std::vector<VisemeData *>* getVisemes( RequestId requestId ) = 0;
+        virtual std::vector<VisemeData *>* getVisemes( RequestId requestId ) = 0;
 
         /**
          *  Returns the sbm command used to play the speech audio.
