@@ -54,27 +54,18 @@ const char * srSynchPoints::tag_label( const int index ) {
 	return( "UNKNOWN" ); // default err
 }
 
-//////////////////////////////////////////////////////////////////
+const char * srSynchPoints::error_label( const int index ) {
 
-srSynchPoints::srSynchPoints( srSynchPoints & source, double alt_offset, double alt_scale )	{
-
-	init();
-	int tag = -1;
-	bool done = false;
-	while( !done  )	{
-		double t = source.get_next( & tag );
-		if( tag < 0 )	{
-			done = true;
-		}
-		else	{
-			set_time( tag, alt_offset + alt_scale * t );
-		}
+	switch( err_code )	{
+		case NO_ERROR_DETECTED: 	return( "NONE" );
+		case BAD_TAG: 				return( "BAD_TAG" );
+		case BUMPED_BACK_TAG:		return( "BUMPED_BACK_TAG" );
+		case BUMPED_FWD_TAG:		return( "BUMPED_FWD_TAG" );
+		case NEGATIVE_RAMP:			return( "NEGATIVE_RAMP" );
+		case UNDEFINED_INTERVAL:	return( "UNDEFINED_INTERVAL" );
+		case OVERLAPPED_RAMPS:		return( "OVERLAPPED_RAMPS" );
 	}
-	double ramp = get_interval_from( RELAX );
-	if( ramp >= 0.0 )	{
-		implied_ramp_out = ramp;
-	}
-	// skipping global_offset and default_ramp_out.
+	return( "UNKNOWN" ); // default err
 }
 
 //////////////////////////////////////////////////////////////////
@@ -116,17 +107,21 @@ bool srSynchPoints::set_time( int tag, double t )	{
 // check and bump back order of preceding:
 	int tmp_tag = tag;
 	double tmp_time = get_prev( & tmp_tag );
-	if( tmp_time > t )	{
-		set_time( tmp_tag, t );
-		err_code = BUMPED_BACK_TAG;
+	if( tmp_time >= 0.0 )	{
+		if( tmp_time > t )	{
+			set_time( tmp_tag, t );
+			err_code = BUMPED_BACK_TAG;
+		}
 	}
 
 // check and bump forward order of succeeding:
 	tmp_tag = tag;
 	tmp_time = get_next( & tmp_tag );
-	if( tmp_time < t )	{
-		set_time( tmp_tag, t );
-		err_code = BUMPED_FWD_TAG;
+	if( tmp_time >= 0.0 )	{
+		if( tmp_time < t )	{
+			set_time( tmp_tag, t );
+			err_code = BUMPED_FWD_TAG;
+		}
 	}
 	return( true );
 #else
@@ -186,6 +181,28 @@ bool srSynchPoints::set_interval( int tag, double t )	{
 #endif
 }
 
+bool srSynchPoints::copy_points( srSynchPoints & source, double alt_offset, double alt_scale )	{
+
+	init();
+	int tag = -1;
+	bool done = false;
+	while( !done  )	{
+		double t = source.get_next( & tag );
+		if( tag < 0 )	{
+			done = true;
+		}
+		else	{
+			set_time( tag, alt_offset + alt_scale * t );
+		}
+	}
+	double ramp = get_interval_from( RELAX );
+	if( ramp >= 0.0 )	{
+		implied_ramp_out = ramp;
+	}
+	// skipping global_offset and default_ramp_out.
+	return( true );
+}
+
 //////////////////////////////////////////////////////////////////
 
 void srSynchPoints::set_time( double start, double stop ) {
@@ -204,7 +221,11 @@ void srSynchPoints::set_time( double start, double stop, double ramp ) {
 		set_time( RELAX, stop - ramp );
 		set_time( STOP, stop );
 	}
-	implied_ramp_out = ramp;
+//	implied_ramp_out = ramp;
+	ramp = get_interval_from( RELAX );
+	if( ramp >= 0.0 )	{
+		implied_ramp_out = ramp;
+	}
 }
 
 void srSynchPoints::set_time( double start, double ready, double relax, double stop ) {
@@ -214,8 +235,12 @@ void srSynchPoints::set_time( double start, double ready, double relax, double s
 	set_time( READY, ready );
 	set_time( RELAX, relax );
 	set_time( STOP, stop );
-	if( ( relax >= 0.0 )&&( stop >= 0.0 ) ) {
-		implied_ramp_out = stop - relax;
+//	if( ( relax >= 0.0 )&&( stop >= 0.0 ) ) {
+//		implied_ramp_out = stop - relax;
+//	}
+	double ramp = get_interval_from( RELAX );
+	if( ramp >= 0.0 )	{
+		implied_ramp_out = ramp;
 	}
 }
 
@@ -233,8 +258,12 @@ void srSynchPoints::set_time(
 	set_time( STROKE, stroke );
 	set_time( RELAX, relax );
 	set_time( STOP, stop );
-	if( ( relax >= 0.0 )&&( stop >= 0.0 ) ) {
-		implied_ramp_out = stop - relax;
+//	if( ( relax >= 0.0 )&&( stop >= 0.0 ) ) {
+//		implied_ramp_out = stop - relax;
+//	}
+	double ramp = get_interval_from( RELAX );
+	if( ramp >= 0.0 )	{
+		implied_ramp_out = ramp;
 	}
 }
 
@@ -252,9 +281,15 @@ void srSynchPoints::set_time(
 	set_time( STROKE_STOP, st_stop );
 	set_time( RELAX, relax );
 	set_time( STOP, stop );
-	if( ( relax >= 0.0 )&&( stop >= 0.0 ) ) {
-		implied_ramp_out = stop - relax;
+//	if( ( relax >= 0.0 )&&( stop >= 0.0 ) ) {
+//		implied_ramp_out = stop - relax;
+//	}
+	double ramp = get_interval_from( RELAX );
+	if( ramp >= 0.0 )	{
+		implied_ramp_out = ramp;
 	}
+	
+//	print();
 }
 
 //////////////////////////////////////////////////////////////////
@@ -541,20 +576,59 @@ srLinearCurve *srSynchPoints::get_trapezoid( srLinearCurve *curve_p, double dfl_
 
 //////////////////////////////////////////////////////////////////
 
+void srSynchPoints::print( void )	{
+
+	for( int i=0; i<NUM_SYNCH_TAGS; i++ )	{
+		if( synch_time_arr[ i ] >= 0.0 )	{
+			LOG( "srSynchPoints: %s: %f", tag_label( i ), synch_time_arr[ i ] );
+		}
+	}
+}
+
+void srSynchPoints::print_error( void )	{
+
+	if( err_code )	{
+		LOG( "srSynchPoints ERR: %s", error_label( err_code ) );
+	}
+	else	{
+		LOG( "srSynchPoints NOTE: NO_ERROR_DETECTED" );
+	}
+}
+
 int srSynchPoints::get_error( bool print_out )	{
 
 	if( err_code > 0 )	{
 		if( print_out )	{
-			switch( err_code )	{
-				case BAD_TAG: 				LOG( "srSynchPoints ERR: BAD_TAG" ); break;
-				case BUMPED_BACK_TAG:		LOG( "srSynchPoints ERR: BUMPED_BACK_TAG" ); break;
-				case BUMPED_FWD_TAG:		LOG( "srSynchPoints ERR: BUMPED_FWD_TAG" ); break;
-				case NEGATIVE_RAMP:			LOG( "srSynchPoints ERR: NEGATIVE_RAMP" ); break;
-				case UNDEFINED_INTERVAL:	LOG( "srSynchPoints ERR: UNDEFINED_INTERVAL" ); break;
-				case OVERLAPPED_RAMPS: 		LOG( "srSynchPoints ERR: OVERLAPPED_RAMPS" ); break;
-				default: 					LOG( "srSynchPoints ERR: BAD ERR CODE: %d", err_code ); break;
-			}
+			print_error();
 		}
 	}
 	return( err_code );
 }
+
+//////////////////////////////////////////////////////////////////
+
+#if 0
+void test_synch_points( void )	{
+	srSynchPoints sp;
+	
+	srLinearCurve *c_p = sp.new_trapezoid();
+	c_p->print();
+
+	c_p = sp.get_trapezoid( c_p, -1.0 );
+	c_p->print();
+
+	sp.set_time( 1.5, 2.5, 0.1 );
+	c_p = sp.get_trapezoid( c_p );
+	c_p->print();
+
+	sp.set_interval( 1.5, 0.1, 1.0, 0.1 );
+	c_p = sp.get_trapezoid( c_p );
+	c_p->print();
+
+	int tag = -1;
+	do	{
+		double t = sp.get_next( & tag );
+		if( t >= 0.0 ) printf( "tag: %s: %f\n", sp.tag_label( tag ), t );
+	} while( tag > -1 );
+}
+#endif

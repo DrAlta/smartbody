@@ -53,9 +53,6 @@ protected :
 	SkChannelArray _channels; // channels
 	int _last_apply_frame;    // used to speed up playing with monotone time
 
-	// Timing Metadata:
-	srSynchPoints synch_points;
-
 	// Unset times are given a value of -1
 #if 0
 	float _time_ready;
@@ -68,6 +65,9 @@ protected :
 	SrQuat _registerOrientation;
 
 public :
+	// Timing Metadata:
+	srSynchPoints synch_points;
+
 	/*! Constructor */
 	SkMotion();
 

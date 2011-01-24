@@ -594,8 +594,8 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 		if( postureIter !=  mcu->pose_map.end()) {
 			SkPosture* posture = (*postureIter).second;
 			MeCtPose* poseCt = new MeCtPose();
-			poseCt->init( *posture );
 			poseCt->name( posture->name() );  // TODO: include BML act and behavior ids
+			poseCt->init( *posture );
 
 			return BehaviorRequestPtr( new PostureRequest( unique_id, localId, poseCt, 1, request->actor, behav_syncs ) );
 		} else {
@@ -605,8 +605,8 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 			{
 				SkMotion* motion = (*motionIter).second;
 				MeCtMotion* motionCt = new MeCtMotion();
-				motionCt->init( motion );
 				motionCt->name( motion->name() );  // TODO: include BML act and behavior ids
+				motionCt->init( motion );
 				motionCt->loop( true );
 
 				PostureRequest * posture_new = new PostureRequest( unique_id, localId, motionCt, 1, request->actor, behav_syncs );

@@ -87,7 +87,8 @@ private :
     float _indt;              // initial period for blending, eg static or prep phase
     float _outdt;             // final period for blending, eg static or retract phase
     float _emphasist;         // time point of "main importance" in the controller
-    bool _active;             // if the controller is still active
+		
+	bool _active;             // if the controller is still active
     double _lastEval;         // time at which the controller was evaluated last
 	double _startTime;		  // time when the controller was started
 	double _stopTime;         // time when the controller was stopped
@@ -96,7 +97,8 @@ private :
 	MePrunePolicy* _prune_policy;  // controller tree pruning policy for this controller
 
 protected :
-    // Fields for new evaluation model
+
+	// Fields for new evaluation model
 
 	/**
 	 *  Pointer to the current evaluation context.
@@ -145,6 +147,9 @@ protected :
 public :
     /*! Destructor is public but pay attention to the use of ref()/unref() */
     virtual ~MeController ();
+
+	srSynchPoints synch_points;
+
 
     const char* name () const { return _name? _name:""; }
     void name ( const char* n ) { sr_string_set ( _name, n ); }

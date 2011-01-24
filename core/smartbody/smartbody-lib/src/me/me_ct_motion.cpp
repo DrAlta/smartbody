@@ -33,7 +33,7 @@ MeCtMotion::MeCtMotion ()
  {
    _motion = 0;
    _play_mode = SkMotion::Linear;
-   _duration = 0;
+//   _duration = 0;
    _twarp = _maxtwarp = _mintwarp = 1.0f;
    _loop = false;
    _last_apply_frame = 0;
@@ -45,9 +45,10 @@ MeCtMotion::~MeCtMotion ()
    if ( _motion ) _motion->unref ();
  }
 
-void MeCtMotion::init ( SkMotion* m ) {
+void MeCtMotion::init( SkMotion* m_p, double time_offset, double time_scale )	{
+
 	if ( _motion ) {
-		if( m == _motion ) {
+		if( m_p == _motion ) {
 			// Minimal init()
 			_last_apply_frame = 0;
 			MeController::init ();
@@ -57,12 +58,12 @@ void MeCtMotion::init ( SkMotion* m ) {
 		_motion->unref();
 	}
 
-	_motion = m;
+	_motion = m_p;
 	_last_apply_frame = 0;
 
 	_motion->ref();
 	_motion->move_keytimes ( 0 ); // make sure motion starts at 0
-	_duration = _motion->duration() / _twarp;
+//	_duration = _motion->duration() / _twarp;
 
 	MeController::init ();
 
@@ -70,8 +71,25 @@ void MeCtMotion::init ( SkMotion* m ) {
 		// Notify _context of channel change.
 		_context->child_channels_updated( this );
 	}
+
+	synch_points.copy_points( m_p->synch_points, 0.0, time_scale );
+#if 1
+	double indt = synch_points.get_interval_to( srSynchPoints::READY );
+	if( indt < 0.0 ) indt = 0.0;
+	double outdt = synch_points.get_interval_from( srSynchPoints::RELAX );
+	if( outdt < 0.0 ) outdt = 0.0;
+	inoutdt( (float)indt, (float)outdt );
+	double emph = synch_points.get_time( srSynchPoints::STROKE );
+	emphasist( (float)emph );
+	twarp( (float)time_scale );
+#endif
 }
 
+void MeCtMotion::init ( SkMotion* m_p ) {
+	init( m_p, 0.0, 1.0 );
+}
+
+#if 0
 void MeCtMotion::init ( MeCtMotion* other ) {
 	clone_parameters( other );
 
@@ -101,6 +119,8 @@ void MeCtMotion::init ( MeCtMotion* other ) {
 		_context->child_channels_updated( this );
 	}
 }
+#endif
+
 /*
 void MeCtMotion::warp_limits ( float wmin, float wmax ) {
 	if ( wmin<0.0001f ) wmin=0.0001f;
@@ -112,7 +132,7 @@ void MeCtMotion::warp_limits ( float wmin, float wmax ) {
 }
 */
 
-//void MeCtMotion::offset ( double amount ) {
+//void MeCtMotion::offset ( double amount ) { 
 //	_offset = amount;
 //}
 
@@ -128,7 +148,7 @@ void MeCtMotion::twarp ( float tw ) {
 	_twarp = tw;
 
 	// update duration:
-	_duration = _motion->duration() / _twarp;
+//	_duration = _motion->duration() / _twarp;
 
 	// update in/out:
 	inoutdt ( in/_twarp, out/_twarp );
@@ -247,12 +267,17 @@ void MeCtMotion::controller_map_updated() {
 bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 
 	bool continuing = true;
+//	double dur = _duration;
+	double dur = phase_duration();
+//	if( dur < 0.0 )	{
+//		LOG( "no-dur: %s", name() );
+//	}
 	if ( _loop ) {
-		double x = t/_duration;
+		double x = t/dur;
 		if ( x>1.0 )
-			t = _duration *( x-int(x) );
+			t = dur *( x-int(x) );
 	} else {
-		continuing = t<_duration;
+		continuing = t < dur;
 	}
 
 	// Controller Context and FrameData set, use the new available buffer
@@ -276,7 +301,8 @@ SkChannelArray& MeCtMotion::controller_channels ()
 
 double MeCtMotion::controller_duration ()
  {
-   return _loop? -1.0:_duration;
+//   return _loop? -1.0:_duration;
+   return _loop? -1.0:phase_duration();
  }
 
 const char* MeCtMotion::controller_type () const
