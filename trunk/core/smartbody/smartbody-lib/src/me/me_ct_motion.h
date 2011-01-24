@@ -42,7 +42,7 @@ class MeCtMotion : public MeController
  { private :
     SkMotion*            _motion;    // the motion,
     SkMotion::InterpType _play_mode; // its play mode
-    double               _duration;  // the time-warped duration
+//    double               _duration;  // the time-warped duration
 	double               _offset;    // time offset of the animation
     float                _maxtwarp;  // max time warping factor allowed to increase the motion speed
     float                _mintwarp;  // min time warping factor allowed to reduce the motion speed
@@ -67,10 +67,11 @@ class MeCtMotion : public MeController
         (SkMotion derives SrSharedClass and has ref/unref methods)
         The keytimes of m are translated to ensure start from zero. 
         MeController::init() is automatically called. */
-    void init ( SkMotion* m );
+    void init ( SkMotion* m_p );
+    void init ( SkMotion* m_p, double time_offset, double time_scale );
 
 	/*! Initialize a controller by cloning another */
-	void init ( MeCtMotion* other );
+//	void init ( MeCtMotion* other );
 
     /*! Returns a pointer to the current motion of this controller */
     SkMotion* motion () { return _motion; }
@@ -96,7 +97,7 @@ class MeCtMotion : public MeController
     void twarp ( float tw );
 
     /*! Returns the current time warping ratio, default is 1 (not warping) */
-    float twarp () const { return _twarp; }
+//    float twarp () const { return _twarp; }
 
     /*! Returns true if to be played in loop, and false otherwise */
     bool loop () const { return _loop; }
@@ -117,7 +118,8 @@ class MeCtMotion : public MeController
 
     /*! Returns the duration of the warped motion, which corresponds to the phase in
         a loop controller with undetermined duration */
-    double phase_duration () { return _duration; }
+//    double phase_duration () { return _duration; }
+    double phase_duration () { return synch_points.get_duration(); }
 
     /*! Output data */
     void output ( SrOutput& out );

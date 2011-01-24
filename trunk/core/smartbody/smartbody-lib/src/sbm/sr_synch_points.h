@@ -68,6 +68,7 @@ class srSynchPoints	{
 
 		int tag_index( const char *label );
 		const char * tag_label( const int index );
+		const char * error_label( const int index );
 
 	// CPP cruft:
 		~srSynchPoints( void ) {}
@@ -94,7 +95,9 @@ class srSynchPoints	{
 		)	{
 			set_time( start, ready, st_start, stroke, st_stop, relax, stop );
 		}
-		srSynchPoints( srSynchPoints & source, double alt_offset = 0.0, double alt_scale = 1.0 );
+		srSynchPoints( srSynchPoints & source, double alt_offset = 0.0, double alt_scale = 1.0 )	{
+			copy_points( source, alt_offset, alt_scale );
+		}
 
 	protected:
 
@@ -114,6 +117,10 @@ class srSynchPoints	{
 			return( global_offset );
 		}
 		
+	// set by copy:
+
+		bool copy_points( srSynchPoints & source, double alt_offset = 0.0, double alt_scale = 1.0 );
+
 	// set by explicit time:
 
 		void set_time( double start, double stop = -1.0 );
@@ -185,7 +192,9 @@ class srSynchPoints	{
 			return( new_trapezoid( dfl_dur, dfl_ramp, dfl_ramp ) );
 		}
 			
-		int get_error( bool print_out );
+		void print( void );
+		void print_error( void );
+		int get_error( bool print_out = false );
 		
 	private:
 		

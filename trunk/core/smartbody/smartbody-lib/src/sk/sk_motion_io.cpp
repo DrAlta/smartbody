@@ -336,6 +336,10 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 			_time_stroke_start, _time_stroke_emphasis, _time_stroke_end,
 			_time_relax, last_keytime()
 		);
+		if( synch_points.get_error() )	{
+			LOG( "SkMotion::load ERR: reading synch points in '%s'", in.filename() );
+			synch_points.print_error();
+		}
 	}
 
 //	bool metadata_valid = true;

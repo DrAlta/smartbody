@@ -61,14 +61,25 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 		std::map<std::string, SkMotion*>::iterator motionIter = mcu->motion_map.find(asciiName);
 		if (motionIter != mcu->motion_map.end())
 		{
+			double twarp = 1.0;
+			const char* speedStr = xml_utils::asciiString( elem->getAttribute( BML::ATTR_SPEED ) );
+			if( speedStr[0] != 0 ) {  // speed attribute is not empty
+//				motionCt->warp_limits( (float)0.01, 100 );  // override limits
+//				motionCt->twarp( (float) atof( speedStr ) );
+				twarp = atof( speedStr );
+			}
+			delete [] speedStr;
+
 			SkMotion* motion = (*motionIter).second;
 			MeCtMotion* motionCt = new MeCtMotion();
-			motionCt->init( motion );
 
 			// Name controller with behavior unique_id
 			ostringstream name;
 			name << unique_id << ' ' << motion->name();
 			motionCt->name( name.str().c_str() );  // TODO: include BML act and behavior ids
+
+			motionCt->init( motion, 0.0, twarp );
+#if 0
 
 			// Copy motion metadata
 			{	float duration = motion->duration();
@@ -85,13 +96,7 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 				if( stroke_emphasis >= 0 )
 					motionCt->emphasist( stroke_emphasis );
 			}
-
-			const char* speedStr = xml_utils::asciiString( elem->getAttribute( BML::ATTR_SPEED ) );
-			if( speedStr[0] != 0 ) {  // speed attribute is not empty
-//				motionCt->warp_limits( (float)0.01, 100 );  // override limits
-				motionCt->twarp( (float) atof( speedStr ) );
-			}
-			delete [] speedStr;
+#endif
 
 			BehaviorRequestPtr behavPtr(new MotionRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs ) );
 			return behavPtr; 
@@ -150,6 +155,7 @@ BML::BehaviorRequestPtr BML::parse_bml_panimation( DOMElement* elem, const std::
 			name << unique_id << ' ' << motion1->name();
 			motion1Ct->name( name.str().c_str() );  // TODO: include BML act and behavior ids
 
+#if 0
 			float duration = motion1->duration();
 			float ready = motion1->time_ready();
 			float indt = (ready >= 0)? ready : motion1Ct->indt();
@@ -163,6 +169,7 @@ BML::BehaviorRequestPtr BML::parse_bml_panimation( DOMElement* elem, const std::
 			float stroke_emphasis = motion1->time_stroke_emphasis();
 			if( stroke_emphasis >= 0 )
 				motion1Ct->emphasist( stroke_emphasis );
+#endif
 		} 
 		else 
 		{
@@ -181,6 +188,7 @@ BML::BehaviorRequestPtr BML::parse_bml_panimation( DOMElement* elem, const std::
 			name << unique_id << ' ' << motion2->name();
 			motion2Ct->name( name.str().c_str() );  // TODO: include BML act and behavior ids
 
+#if 0
 			float duration = motion2->duration();
 			float ready = motion2->time_ready();
 			float indt = (ready >= 0)? ready : motion2Ct->indt();
@@ -194,7 +202,7 @@ BML::BehaviorRequestPtr BML::parse_bml_panimation( DOMElement* elem, const std::
 			float stroke_emphasis = motion2->time_stroke_emphasis();
 			if( stroke_emphasis >= 0 )
 				motion2Ct->emphasist( stroke_emphasis );
-
+#endif
 		}
 		else 
 		{
