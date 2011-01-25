@@ -1210,7 +1210,7 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 		std::stringstream strstr;
 		strstr << "Visemes:\n";
 		float lastTime = 0;
-		const std::vector<SmartBody::VisemeData *>* visemes = audioSpeechInterface->getVisemes(speechRequest->get_speech_request_id());
+		const std::vector<SmartBody::VisemeData *>* visemes = audioSpeechInterface->getVisemes(speechRequest->get_speech_request_id(), NULL);
 		for (unsigned int v = 0; v < visemes->size(); v++)
 		{
 			SmartBody::VisemeData* viseme = (*visemes)[v];

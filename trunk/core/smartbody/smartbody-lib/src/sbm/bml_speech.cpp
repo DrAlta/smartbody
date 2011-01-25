@@ -389,10 +389,10 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 	time_sec last_viseme = TIME_UNSET;  // end of last viseme
 
 	// Process Visemes
-	vector<VisemeData*>* result_visemes = speech_impl->getVisemes( speech_request_id );
+	vector<VisemeData*>* result_visemes = speech_impl->getVisemes( speech_request_id, actor );
 	if( !result_visemes ) {
 		if (speech_impl_backup) // run the backup speech server if available
-			result_visemes = speech_impl->getVisemes( speech_request_id );
+			result_visemes = speech_impl->getVisemes( speech_request_id, NULL );
 	}
 
 	if (result_visemes)
@@ -401,12 +401,19 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 		for ( size_t i = 0; i < (*result_visemes).size(); i++ )
 		{
 			VisemeData* v = (*result_visemes)[ i ];
-			if (!v->isCurveMode() && !v->isTrapezoidMode())
+			if (!v->isCurveMode() && !v->isTrapezoidMode() && !v->isFloatCurveMode())
 				visemes.push_back( new VisemeData( v->id(), v->weight(), v->time() ) );
-			else if (v->isTrapezoidMode())
+			else if (v->isTrapezoidMode() && !v->isFloatCurveMode())
 				visemes.push_back( new VisemeData( v->id(), v->weight(), v->time(), v->duration(), v->rampin(), v->rampout() ) );
-			else
+			else if (!v->isFloatCurveMode())
 				visemes.push_back( new VisemeData( v->id(), v->getNumKeys(), v->getCurveInfo() ));
+			else
+			{
+				VisemeData* vcopy = new VisemeData( v->id(), v->time());
+				vcopy->setFloatCurve(v->getFloatCurve(), v->getNumKeys(), v->getFloatsPerKey());
+				visemes.push_back( vcopy );
+			}
+
 		}
 
 		vector<VisemeData*>::iterator cur = visemes.begin();
@@ -571,7 +578,22 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 		const size_t viseme_count = visemes.size();
 		for( size_t i=0; i<viseme_count; i++ ) { //adds visemes for audio into sequence file
 			VisemeData* v = visemes.at(i);
-			if (!v->isCurveMode())
+			if (v->isFloatCurveMode())
+			{
+				command.str( "" );
+				std::vector<float>& data = v->getFloatCurve();
+				int numKeys = v->getNumKeys();
+				int floatsPerKey = v->getFloatsPerKey();
+				command << "char " << actor_id << " viseme " << v->id() << " curve " << numKeys << ' ';
+				for (int x = 0; x < numKeys; x++)
+				{
+					command << data[x * floatsPerKey] << " " << data[x * floatsPerKey + 1] << " "; 
+				}
+				
+				time_sec time = mcu->time;
+				sbm_commands.push_back( new SbmCommand( command.str(), time ) );
+			}
+			else if (!v->isCurveMode())
 			{
 				time_sec time = (time_sec)( v->time() + startAt );
 #if ENABLE_DIRECT_VISEME_SCHEDULE

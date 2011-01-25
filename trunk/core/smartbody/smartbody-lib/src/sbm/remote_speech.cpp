@@ -53,6 +53,7 @@ const XMLCh* ATTR_TYPE  = L"type";
 const XMLCh* ATTR_START = L"start";
 const XMLCh* TAG_SOUND = L"soundFile"; //this tag is used to rename the soundFile by Remote speech process
 
+#define USE_CURVES_FOR_VISEMES 0
 
 remote_speech::remote_speech( float timeOutInSeconds )
 :	msgNumber( 0 ),
@@ -189,10 +190,11 @@ The timestamp is 20051121_150427 (that is, YYYYMMDD_HHMMSS ), so we can check ol
 	return (msgNumber); //returns the unique message number
 }
 
-std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<VisemeData*>* visemes){
+std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<VisemeData*>* visemes, const SbmCharacter* character) {
 	//this is used to recursively search the DOM tree and return a vector containing the visemes and the appropriate viseme resets (before a subsequent viseme is set the previous one must be reset)
 	VisemeData* curViseme = NULL;
 	float blendTime = 0.0f;
+	float blendIval = 0.0f;
 	float startTime = 0.0f;
 	if(node->getNodeType()==1){ //node is an element node
 		DOMElement *element= (DOMElement *)node; //instantiate an element using this node
@@ -220,8 +222,11 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 				}
 			}
 			if( id ) {
+#if USE_CURVES_FOR_VISEMES
+				curViseme = new VisemeData(id, startTime);
+#else
 				curViseme = new VisemeData(id, 1.0, startTime, 0.0f, 0.0f, 0.0f); //the weight is always made one
-
+#endif
 				if ( visemes->size() > 0 ) 
 				{   
 					VisemeData* prevViseme = visemes->back();
@@ -229,12 +234,48 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 					{
 							LOG("WARNING: Viseme %s has played at time %f comes before previous viseme %s at time %f", curViseme->id(), curViseme->time(), prevViseme->id(), prevViseme->time());
 					}
-					blendTime = (startTime - prevViseme->time());
-					if (blendTime <= .1f)
-						blendTime = .1f;
-					curViseme->rampin(blendTime);
-					prevViseme->rampout(blendTime);
-					prevViseme->setDuration(prevViseme->rampin() + prevViseme->rampout());
+					bool toggle = false;
+
+
+#if USE_CURVES_FOR_VISEMES
+					blendIval = (startTime - prevViseme->time());
+					if (blendIval <= .1f)
+						blendIval = .1f;
+					curViseme->rampin( blendIval * 0.75f );
+					prevViseme->rampout( blendIval * 0.75f );
+					float prev_dur = prevViseme->rampin() + prevViseme->rampout();
+					float prev_time = prevViseme->time();
+
+					std::vector<float> curve_arr;
+					int n = 12;
+					for (int i = 0; i < n; i++)
+					{
+						float f = float(i) / float(n - 1);
+						float t = prev_time + f * prev_dur;
+						float trig = sinf( float(M_PI) * f );
+//						float trig = ( cosf( 2.0 * float(M_PI) * f + float(M_PI) ) + 1.0f ) * 0.5f;
+						curve_arr.push_back(t);
+						curve_arr.push_back(trig);
+					}
+					prevViseme->setFloatCurve( curve_arr, n, 2 );
+#else
+					if (character && !character->isVisemePlateau())
+					{
+						blendTime = (startTime - prevViseme->time());
+						if (blendTime <= .1f)
+							blendTime = .1f;
+						curViseme->rampin(blendTime);
+						prevViseme->rampout(blendTime);
+						prevViseme->setDuration(prevViseme->rampin() + prevViseme->rampout());
+					} else  {
+						blendIval = (startTime - prevViseme->time());
+						if (blendIval <= .1f)
+							blendIval = .1f;
+						curViseme->rampin( blendIval * 0.5f );
+						prevViseme->rampout( blendIval * 0.5f );
+						prevViseme->setDuration( 1.5f * ( prevViseme->rampin() + prevViseme->rampout() ) );
+					}
+#endif
 				}
 		
 				visemes->push_back(curViseme);
@@ -244,10 +285,10 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 		}
 	}
 	if(node->getFirstChild()){ //check children first
-		visemes=extractVisemes(node->getFirstChild(),visemes);
+		visemes=extractVisemes(node->getFirstChild(), visemes, character);
 	}
 	if (node->getNextSibling()){ //then check siblings
-		visemes=extractVisemes(node->getNextSibling(),visemes);
+		visemes=extractVisemes(node->getNextSibling(), visemes, character);
 	}
 
 	int numVisemes = visemes->size();
@@ -277,7 +318,7 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 }
 
 
-std::vector<VisemeData*>* remote_speech::getVisemes( RequestId requestId ){
+std::vector<VisemeData*>* remote_speech::getVisemes( RequestId requestId, const SbmCharacter* character) {
 
 	/**
         *  If the request has been processed, returns the time ordered vector 
@@ -294,7 +335,7 @@ std::vector<VisemeData*>* remote_speech::getVisemes( RequestId requestId ){
 	{
 		DOMNode* docElement= uttLookUp.lookup(Id);  
 		vector<VisemeData *> *visemeVector= new vector<VisemeData *>;  
-		visemeVector= extractVisemes(docElement, visemeVector); //recursively extracts visemes from domdocument
+		visemeVector= extractVisemes(docElement, visemeVector, character); //recursively extracts visemes from domdocument
 		return (visemeVector);
 	}
 	else //if viseme isn't found returns NULL
@@ -576,7 +617,7 @@ int remoteSpeechReady_func(srArgBuffer& args, mcuCBHandle* mcu_p){
 		char* Okay= args.read_token(); // not used*/
 		//////////////////////////////////////////////////////////////////////
 		//DELETE THIS- THIS IS JUST TO TEST THE VISEME FUNCTION!!!
-		vector<VisemeData*>* p= x.getVisemes(reqId);
+		vector<VisemeData*>* p= x.getVisemes(reqId, NULL);
 		for(unsigned int funTimes=0; funTimes<p->size(); funTimes++){
 			VisemeData* vd = p->at(funTimes);
 

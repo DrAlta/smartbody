@@ -384,7 +384,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    string bmlFilename = relativeAudioPath + "/" + ref + ".bml";
 
     mcu.mark("requestSpeechAudio", 4, "lips");
-   ReadVisemeDataBML( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData );
+   ReadVisemeDataBML( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent );
    if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlFilename.c_str() );
@@ -407,7 +407,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    return m_requestIdCounter++;
 }
 
-vector<VisemeData *> * AudioFileSpeech::getVisemes( RequestId requestId )
+vector<VisemeData *> * AudioFileSpeech::getVisemes( RequestId requestId, const SbmCharacter* character )
 {
    // TODO: Change the return type data structure, so that I can simply do this:
    //return m_speechRequestInfo[ requestId ].visemeData
@@ -645,7 +645,7 @@ void AudioFileSpeech::ReadVisemeDataLTF( const char * filename, std::vector< Vis
 }
 
 
-void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< VisemeData > & visemeData )
+void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< VisemeData > & visemeData, const SbmCharacter* character )
 {
    visemeData.clear();
 
@@ -730,32 +730,65 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
 			  rampOut = 0.1f;
 
 		  float weight = (float)atof( articulation.c_str());
+		  VisemeData* curViseme = new VisemeData(viseme.c_str(), weight, startTime,  endTime - startTime, rampIn, rampOut);
 
-		  if (visemeData.size() > 0)
-		  {
+			if (visemeData.size() > 0)
+			{
+			  //VisemeData& prevViseme = visemeData.back();
 			  VisemeData& prevViseme = visemeData.back();
-			  float blendTime = startTime - prevViseme.time();
-			  if (blendTime <= 0.1f)
-				  blendTime = .1f;
-			  prevViseme.setRampout(blendTime);
-			  prevViseme.setDuration(prevViseme.rampin() + prevViseme.rampout());
-			  rampIn = blendTime;
-		  }
+			  //float blendTime = startTime - prevViseme.time();
+			  //if (blendTime <= 0.1f)
+				//  blendTime = .1f;
+			  //prevViseme.setRampout(blendTime);
+			  //prevViseme.setDuration(prevViseme.rampin() + prevViseme.rampout());
+			  //rampIn = blendTime;
+				if (character && !character->isVisemePlateau())
+				{
+					VisemeData& prevViseme = visemeData.back();
+					float blendTime = (startTime - prevViseme.time());
+					if (blendTime <= .1f)
+						blendTime = .1f;
+					curViseme->rampin(blendTime);
+					prevViseme.rampout(blendTime);
+					prevViseme.setDuration(prevViseme.rampin() + prevViseme.rampout());
+				} else  {
+					float blendIval = (startTime - prevViseme.time());
+					if (blendIval <= .1f)
+						blendIval = .1f;
+					curViseme->rampin( blendIval * 0.5f );
+					prevViseme.rampout( blendIval * 0.5f );
+					if (visemeData.size() > 1)
+					{
+						VisemeData& prevPrevViseme = visemeData[visemeData.size() - 2];
+					}
+					prevViseme.setDuration( 1.5f * ( prevViseme.rampin() + prevViseme.rampout() ) );
+				}
+			}
 
-			visemeData.push_back(VisemeData(viseme.c_str(), weight, startTime,  endTime - startTime, rampIn, rampOut));
+			visemeData.push_back((*curViseme));
 	   }
 	   if (visemeData.size() > 0)
 	   {
 		   if (visemeData.size() > 1)
 		   {
-			   // set the blend in duration for the first viseme
-				VisemeData& firstViseme = visemeData[0];
-				firstViseme.rampin(firstViseme.rampout());
-				firstViseme.setDuration(firstViseme.rampin() + firstViseme.rampout());
+				// set the blend in duration for the first viseme
+			   VisemeData& firstViseme = visemeData[0];
 				// set the blend out duration for the last viseme
-				VisemeData& lastViseme = visemeData[visemeData.size() - 1];
-				lastViseme.rampout(lastViseme.rampin());
-				lastViseme.setDuration(lastViseme.rampin() + lastViseme.rampout());
+			   VisemeData& lastViseme = visemeData[visemeData.size() - 1];
+			   if (character && !character->isVisemePlateau())
+			   {
+					firstViseme.rampin(firstViseme.rampout());
+					firstViseme.setDuration(firstViseme.rampin() + firstViseme.rampout());
+					
+					lastViseme.rampout(lastViseme.rampin());
+					lastViseme.setDuration(lastViseme.rampin() + lastViseme.rampout());
+				} else  {
+					firstViseme.rampin(firstViseme.rampout());
+					firstViseme.setDuration(1.5f * (firstViseme.rampin() + firstViseme.rampout()));
+					
+					lastViseme.rampout(lastViseme.rampin());
+					lastViseme.setDuration( 1.5f * ( lastViseme.rampin() + lastViseme.rampout()));
+			   }
 		   }
 		   else
 		   {

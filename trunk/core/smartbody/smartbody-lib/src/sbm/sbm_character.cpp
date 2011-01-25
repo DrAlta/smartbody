@@ -40,7 +40,7 @@
 #include <ME/me_spline_1d.hpp>
 #include <ME/me_ct_interpolator.h>
 
-#define USE_REACH 0
+#define USE_REACH 1
 //#define USE_REACH_TEST 0
 
 
@@ -119,7 +119,8 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	eyelid_ct( new MeCtEyeLid() ),
 	face_neutral( NULL ),
 	_soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT ),
-	_height(1.0f)
+	_height(1.0f), 
+	_visemePlateau(true)
 {
 	posture_sched_p->ref();
 	motion_sched_p->ref();
@@ -1657,6 +1658,29 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			set_viseme_time_delay( timeDelay );
 			return CMD_SUCCESS;
 		}
+		if( _strcmpi( viseme, "plateau" ) == 0 )
+		{
+			if (!next)
+			{
+				LOG("Character %s viseme plateau setting is %s", this->name, this->isVisemePlateau()? "on" : "off");
+				return CMD_SUCCESS;
+			}
+			if (_strcmpi(next, "on") == 0)
+			{
+				this->setVisemePlateau(true);
+				LOG("Character %s viseme plateau setting is now on.", this->name);
+			}
+			else if (_strcmpi(next, "off") == 0)
+			{
+				this->setVisemePlateau(false);
+				LOG("Character %s viseme plateau setting is now off.", this->name);
+			}
+			else
+			{
+				LOG("use: char %s viseme plateau <on|off>", this->name);
+			}
+			return CMD_SUCCESS;
+		}
 
 		// keyword next to viseme
 		if( _strcmpi( viseme, "clear" ) == 0 ) // removes all head controllers
@@ -1967,6 +1991,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		LOG( "  viseme <viseme name> trap <weight> <dur> [<ramp-in> [<ramp-out>]]" );
 		LOG( "  viseme <viseme name> curve <number of keys> <curve information>" );
 		LOG( "  viseme curve" );
+		LOG( "  viseme plateau on|off" );
 		LOG( "  bone" );
 		LOG( "  bonep" );
 		LOG( "  remove" );

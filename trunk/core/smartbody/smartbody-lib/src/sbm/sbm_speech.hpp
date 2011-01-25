@@ -54,24 +54,32 @@ namespace SmartBody {
 		std::string	_curveInfo;
 		bool _curveMode;
 		bool _trapezoidMode;
+		bool _floatCurveMode;
 		float _rampin;
 		float _rampout;
+		std::vector<float> _curveData;
+		int _floatsPerKey;
 
 	public:
 		VisemeData( const char * id, float weight, float time )
-			: _id( id ), _weight( weight ), _time( time ), _duration( 0 ),  _rampin(0), _rampout(0), _numKeys( 0 ), _curveInfo( "" ), _curveMode(false), _trapezoidMode(false)
+			: _id( id ), _weight( weight ), _time( time ), _duration( 0 ),  _rampin(0), _rampout(0), _numKeys( 0 ), _curveInfo( "" ), _curveMode(false), _trapezoidMode(false), _floatCurveMode(false)
 		{
 		}
 		
 		VisemeData( const char * id, float weight, float time, float duration )
-			: _id( id ), _weight( weight ), _time( time ), _duration( duration ), _rampin(0), _rampout(0), _numKeys( 0 ), _curveInfo( "" ), _curveMode(false), _trapezoidMode(false)
+			: _id( id ), _weight( weight ), _time( time ), _duration( duration ), _rampin(0), _rampout(0), _numKeys( 0 ), _curveInfo( "" ), _curveMode(false), _trapezoidMode(false), _floatCurveMode(false)
 		{
 		}
 
 		VisemeData( const char * id, int numKeys, const char * curveInfo );
 
+		VisemeData( const char * id, float startTime)
+			: _id( id ), _weight( 1.0f ), _time( startTime ), _duration( 0.0f ), _rampin(0.0f), _rampout(0.0f),  _numKeys(0), _floatsPerKey(0), _curveMode(false), _trapezoidMode(false), _floatCurveMode(true)
+		{
+		}
+
 		VisemeData( const char * id, float weight, float time, float duration, float rampin, float rampout)
-			: _id( id ), _weight( weight ), _time( time ), _duration( duration ), _rampin(rampin), _rampout(rampout), _numKeys( 0 ), _curveInfo( "" ), _trapezoidMode(true), _curveMode(false)
+			: _id( id ), _weight( weight ), _time( time ), _duration( duration ), _rampin(rampin), _rampout(rampout), _numKeys( 0 ), _curveInfo( "" ), _trapezoidMode(true), _curveMode(false), _floatCurveMode(false)
 		{
 		}
 
@@ -127,6 +135,26 @@ namespace SmartBody {
 
 		/** Get the viseme Mode. */
 		bool isTrapezoidMode() {return _trapezoidMode;}
+
+		/** Get the viseme Mode. */
+		bool isFloatCurveMode() {return _floatCurveMode;}
+
+		void setFloatCurve(std::vector<float>& curve, int numKeys, int floatsPerKey) {
+			_numKeys = numKeys;
+			_floatsPerKey = floatsPerKey;
+			for (int x = 0; x < numKeys; x++)
+			{
+				_curveData.push_back(curve[x * floatsPerKey]);
+				_curveData.push_back(curve[x * floatsPerKey + 1]);
+				for (int y = 2; y < floatsPerKey; y++)
+					_curveData.push_back(0.0f);
+			}
+		}
+
+		/** Get the number of keys. */
+		int getFloatsPerKey() {return _floatsPerKey;}
+
+		std::vector<float>& getFloatCurve() { return _curveData; }
 	};
 
 	/**
@@ -183,7 +211,7 @@ namespace SmartBody {
          *  VisemeData instances of when to cancel previous visemes (change
          *  of viseme, and end of words).
          */
-        virtual std::vector<VisemeData *>* getVisemes( RequestId requestId ) = 0;
+        virtual std::vector<VisemeData *>* getVisemes( RequestId requestId, const SbmCharacter* character ) = 0;
 
         /**
          *  Returns the sbm command used to play the speech audio.
