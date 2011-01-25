@@ -313,7 +313,9 @@ public:
 			eyelid_ct->set_pass_through(!val);
 		}
 	}
-	bool isSoftEyes( void ) 		{ return( _soft_eyes_enabled ); }
+	bool isSoftEyes( void ) const { return _soft_eyes_enabled; }
+	bool isVisemePlateau( void ) const { return _visemePlateau; }
+	void setVisemePlateau( bool val ) { _visemePlateau = val; }
 
 	void setHeight( float height )	{ _height = height; }
 	float getHeight( void ) 		{ return _height; }
@@ -321,6 +323,7 @@ public:
 private:
 
 	bool	_soft_eyes_enabled;
+	bool	_visemePlateau;
 	float	_height;
 
 protected:

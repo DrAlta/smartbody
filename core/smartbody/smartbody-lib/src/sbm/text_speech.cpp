@@ -119,7 +119,7 @@ RequestId text_speech::requestSpeechAudio( const char* agentName, std::string vo
 	return (msgNumber); //returns the unique message number
 }
 
-std::vector<VisemeData*>* text_speech::extractVisemes(DOMNode* node, vector<VisemeData*>* visemes){
+std::vector<VisemeData*>* text_speech::extractVisemes(DOMNode* node, vector<VisemeData*>* visemes, const SbmCharacter* character) {
 	//this is used to recursively search the DOM tree and return a vector containing the visemes and the appropriate viseme resets (before a subsequent viseme is set the previous one must be reset)
 	VisemeData *singleViseme= NULL;
 	float startTime=0;
@@ -163,17 +163,17 @@ std::vector<VisemeData*>* text_speech::extractVisemes(DOMNode* node, vector<Vise
 	}
 
 	if(node->getFirstChild()){ //check children first
-		visemes=extractVisemes(node->getFirstChild(),visemes);
+		visemes=extractVisemes(node->getFirstChild(),visemes, character);
 	}
 	if (node->getNextSibling()){ //then check siblings
-		visemes=extractVisemes(node->getNextSibling(),visemes);
+		visemes=extractVisemes(node->getNextSibling(),visemes, character);
 	}
 
 	return (visemes);
 }
 
 
-std::vector<VisemeData*>* text_speech::getVisemes( RequestId requestId ){
+std::vector<VisemeData*>* text_speech::getVisemes( RequestId requestId, const SbmCharacter* character) {
 
 	/**
         *  If the request has been processed, returns the time ordered vector 
@@ -190,7 +190,7 @@ std::vector<VisemeData*>* text_speech::getVisemes( RequestId requestId ){
 	{
 		DOMNode* docElement= uttLookUp.lookup(Id);  
 		vector<VisemeData *> *visemeVector= new vector<VisemeData *>;  
-		visemeVector= extractVisemes(docElement, visemeVector); //recursively extracts visemes from domdocument
+		visemeVector = extractVisemes(docElement, visemeVector, character); //recursively extracts visemes from domdocument
 		return (visemeVector);
 	}
 	else //if viseme isn't found returns NULL
