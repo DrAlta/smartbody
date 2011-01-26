@@ -23,8 +23,8 @@
 
 #include "vhcl_log.h"
 
-# include <ME/me_ct_motion.h>
-#include "sbm/Event.h"
+#include <ME/me_ct_motion.h>
+#include <sbm/Event.h>
 
 //=================================== MeCtMotion =====================================
 
@@ -373,8 +373,8 @@ void MeCtMotion::checkMotionEvents(double time)
 		MotionEvent* motionEvent = _events.front();
 		if (time >= motionEvent->getTime())
 		{
-			//mcuCBHandle& mcu = mcuCBHandle::singleton();
-			//mcu.handleEvent(motionEvent);
+			EventManager* manager = EventManager::getEventManager();
+			manager->handleEvent(motionEvent, time);
 			std::string type = motionEvent->getType();
 			std::string params = motionEvent->getParameters();
 			LOG("EVENT: %f %s %s", time, type.c_str(), params.c_str());

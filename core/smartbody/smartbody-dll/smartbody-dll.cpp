@@ -5,7 +5,6 @@
 
 #include <windows.h>
 #include <mmsystem.h>
-
 #include "sbm/xercesc_utils.hpp"
 #include "sbm/mcontrol_util.h"
 #include "sbm/mcontrol_callbacks.h"
@@ -407,6 +406,8 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert( "bml",  test_bml_func );
    mcu.insert( "addevent",			   addevent_func );
    mcu.insert( "removeevent",		   removeevent_func );
+   mcu.insert( "registerevent",       registerevent_func );
+   mcu.insert( "unregisterevent",       registerevent_func );
 
    mcu.insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands
 
