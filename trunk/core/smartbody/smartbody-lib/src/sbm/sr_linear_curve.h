@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <vhcl_log.h>
+#include "gwiz_math.h"
 
 #define ENABLE_OBJ_KEY_CT	0
 
@@ -46,7 +47,6 @@ class srLinearCurve	{
 			Key( double p, double v );
 			~Key(void) {
 #if ENABLE_OBJ_KEY_CT
-//				srLinearCurve::objective_key_count--;
 				objective_key_count--;
 #endif
 			}
@@ -179,8 +179,123 @@ class srLinearCurve	{
 };
 
 //////////////////////////////////////////////////////////////////
+
+class srCurveBuilder	{
+
+	private:
+		int num_keys;
+		double in_range_fr, in_range_to;
+		double out_range_fr, out_range_to;
+		
+	public:
+
+		void set_resolution( int num_segs ) {
+			num_keys = num_segs + 1;
+		}
+		void set_input_range( double fr, double to )	{
+			in_range_fr = fr;
+			in_range_to = to;
+		}
+		void set_output_range( double fr, double to )	{
+			out_range_fr = fr;
+			out_range_to = to;
+		}
+
+		srLinearCurve *get_std_hump_curve( srLinearCurve *curve_p, int num_segs )	{
+		
+			set_resolution( num_segs );
+			set_input_range( 0.0, 1.0 );
+			set_output_range( -1.0, 1.0 );
+			return( get_sin_curve( curve_p, 0.0, M_PI ) );
+		}
+		srLinearCurve *get_std_bell_curve( srLinearCurve *curve_p, int num_segs )	{
+		
+			set_resolution( num_segs );
+			set_input_range( 0.0, 1.0 );
+			set_output_range( 0.0, 1.0 );
+			return( get_cos_curve( curve_p, -M_PI, M_PI ) );
+		}
+
+		srLinearCurve *get_sin_curve( srLinearCurve *curve_p, double alpha, double beta )	{
+			if( curve_p )	{
+				curve_p->clear();
+
+				double in_span = in_range_to - in_range_fr;
+				double out_span = out_range_to - out_range_fr;
+				double trig_span = beta - alpha;
+				double denom = 1.0 / (float)( num_keys - 1 );
+
+				for( int i = 0; i<num_keys; i++ )	{
+
+					double tn = (float)i * denom;
+					double t = in_range_fr + tn * in_span;
+					double th = alpha + tn * trig_span;
+//					double s = sin( RAD( th ) );
+					double s = sin( th );
+					double sn = ( s + 1.0 ) * 0.5;
+					double v = out_range_fr + sn * out_span;
+					curve_p->insert( t, v );
+/*
+					double tn = (float)i * denom;
+					curve_p->insert( 
+						in_range_fr + tn * in_span,
+						out_range_fr + ( sin( RAD( alpha + tn * trig_span ) ) + 1.0 ) * 0.5 * out_span
+					);
+*/
+				}
+			}
+			return( curve_p );
+		}
+		srLinearCurve *get_cos_curve( srLinearCurve *curve_p, double alpha, double beta )	{
+			
+			if( curve_p )	{
+				curve_p->clear();
+
+				double in_span = in_range_to - in_range_fr;
+				double out_span = out_range_to - out_range_fr;
+				double trig_span = beta - alpha;
+				double denom = 1.0 / (float)( num_keys - 1 );
+
+				for( int i = 0; i<num_keys; i++ )	{
+
+					double tn = (float)i * denom;
+					double t = in_range_fr + tn * in_span;
+					double th = alpha + tn * trig_span;
+//					double s = cos( RAD( th ) );
+					double s = cos( th );
+					double sn = ( s + 1.0 ) * 0.5;
+					double v = out_range_fr + sn * out_span;
+					curve_p->insert( t, v );
+/*
+					double tn = (float)i * denom;
+					curve_p->insert( 
+						in_range_fr + tn * in_span,
+						out_range_fr + ( cos( RAD( alpha + tn * trig_span ) ) + 1.0 ) * 0.5 * out_span
+					);
+*/
+				}
+			}
+			return( curve_p );
+		}
+
+		srLinearCurve *new_std_hump_curve( int num_segs )	{
+			return( get_std_hump_curve( new srLinearCurve, num_segs ) );
+		}
+		srLinearCurve *new_std_bell_curve( int num_segs )	{
+			return( get_std_bell_curve( new srLinearCurve, num_segs ) );
+		}
+		srLinearCurve *new_sin_curve( double alpha, double beta )	{
+			return( get_sin_curve( new srLinearCurve, alpha, beta ) );
+		}
+		srLinearCurve *new_cos_curve( double alpha, double beta )	{
+			return( get_cos_curve( new srLinearCurve, alpha, beta ) );
+		}
+
+};
+
+//////////////////////////////////////////////////////////////////
 #endif
 
-#if 0
+#if 1
 void test_linear_curve( void );
 #endif
