@@ -564,6 +564,24 @@ void srLinearCurve::update( void )	{
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 
+#if 1
+
+void test_linear_curve( void )	{
+	srLinearCurve curve;
+	srCurveBuilder builder;
+	
+	srLinearCurve *curve_p = builder.get_std_hump_curve( &curve, 10 );
+	if( curve_p )	{
+		curve_p->print();
+	}
+
+	curve_p = builder.get_std_bell_curve( &curve, 10 );
+	if( curve_p )	{
+		curve_p->print();
+	}
+}
+#endif
+
 #if 0
 
 void test_eval_linear_curve( srLinearCurve *curve_p ) {
