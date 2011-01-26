@@ -224,7 +224,6 @@ class mcuCBHandle	{
 		joint_logger::EvaluationLogger* logger_p;
 		ResourceManager*			resource_manager;
 		std::vector<CameraTrack*>	cameraTracking;
-		std::map<std::string, EventHandler*> eventHandlers;
 
 	private:
 		// Constant
@@ -450,8 +449,6 @@ class mcuCBHandle	{
 
 		void setMediaPath(std::string path);
 		std::string getMediaPath();
-
-		void handleEvent(Event* e);
 
 	protected:
 		FILE* open_sequence_file( const char *seq_name );

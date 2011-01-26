@@ -1,6 +1,8 @@
 #ifndef _SBMEVENT_H
 #define _SBMEVENT_H
 
+#include <map>
+
 class Event
 {
 	public:
@@ -30,6 +32,22 @@ class EventHandler
 	protected:
 		std::string m_type;
 		std::string m_action;
+};
+
+class EventManager
+{
+	public:
+		EventManager();
+		~EventManager();
+
+		void handleEvent(Event* e, double time);
+		void addHandler(EventHandler* handle);
+		void removeHandler(std::string type);
+		static EventManager* getEventManager();
+
+	private:
+		static EventManager* _eventManager;
+		std::map<std::string, EventHandler*> eventHandlers;
 };
 
 class MotionEvent : public Event

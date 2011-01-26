@@ -4534,17 +4534,28 @@ int removeevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 int registerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
-	char* tok = args.read_token();
-	if (!tok || strcmp(tok, "help") == 0)
+	char* type = args.read_token();
+	if (!type || strcmp(type, "help") == 0)
 	{
 		LOG("Use: registerevent <eventtype> <action>");
 		return CMD_SUCCESS;
 	}
 
-	
+	char* action = args.read_token();
+
+	EventManager* eventManager = EventManager::getEventManager();
+	EventHandler* handler = new EventHandler();
+	handler->setType(type);
+	handler->setAction(action);
+	eventManager->addHandler(handler);
 
 	return CMD_SUCCESS;
 }
 
+
+int unregisterevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	return CMD_SUCCESS;
+}
 
 
