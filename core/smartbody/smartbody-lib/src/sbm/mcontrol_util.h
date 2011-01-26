@@ -76,7 +76,7 @@ class mcuCBHandle;
 
 #include "joint_logger.hpp"
 #include "ResourceManager.h"
-
+#include "sbm/Event.h"
 #include <sbm/action_unit.hpp>
 #include <sbm/viseme_map.hpp>
 #include <sbm/general_param_setting.h>
@@ -224,6 +224,7 @@ class mcuCBHandle	{
 		joint_logger::EvaluationLogger* logger_p;
 		ResourceManager*			resource_manager;
 		std::vector<CameraTrack*>	cameraTracking;
+		std::map<std::string, EventHandler*> eventHandlers;
 
 	private:
 		// Constant
@@ -449,6 +450,8 @@ class mcuCBHandle	{
 
 		void setMediaPath(std::string path);
 		std::string getMediaPath();
+
+		void handleEvent(Event* e);
 
 	protected:
 		FILE* open_sequence_file( const char *seq_name );

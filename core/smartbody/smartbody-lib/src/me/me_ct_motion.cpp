@@ -21,9 +21,10 @@
  *      Andrew n marshall, USC
  */
 
+#include "vhcl_log.h"
 
 # include <ME/me_ct_motion.h>
-#include <vhcl_log.h>
+#include "sbm/Event.h"
 
 //=================================== MeCtMotion =====================================
 
@@ -81,9 +82,11 @@ void MeCtMotion::init( SkMotion* m_p, double time_offset, double time_scale )	{
 	inoutdt( (float)indt, (float)outdt );
 	double emph = synch_points.get_time( srSynchPoints::STROKE );
 	emphasist( (float)emph );
-	twarp( 1.0 / (float)time_scale );
+	twarp( 1.0f / (float)time_scale );
 	_offset = time_offset;
 #endif
+
+	loadMotionEvents();
 }
 
 void MeCtMotion::init ( SkMotion* m_p ) {
@@ -296,6 +299,9 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 	{
 		frame.channelUpdated(i);
 	}
+
+	checkMotionEvents(t);
+
 	return continuing;
 }
 
@@ -343,5 +349,43 @@ SrBuffer<int>& MeCtMotion::get_context_map()
 {
 	return _mChan_to_buff;
 }
+
+void MeCtMotion::loadMotionEvents()
+{
+	// add the event instances to this controller
+	while (!_events.empty())
+		_events.pop();
+
+	if (_motion)
+	{
+		std::vector<MotionEvent*>& motionEvents = _motion->getMotionEvents();
+		for (size_t x = 0; x < motionEvents.size(); x++)
+		{
+			_events.push(motionEvents[x]);
+		}
+	}
+}
+
+void MeCtMotion::checkMotionEvents(double time)
+{
+	while (!_events.empty())
+	{
+		MotionEvent* motionEvent = _events.front();
+		if (time >= motionEvent->getTime())
+		{
+			//mcuCBHandle& mcu = mcuCBHandle::singleton();
+			//mcu.handleEvent(motionEvent);
+			std::string type = motionEvent->getType();
+			std::string params = motionEvent->getParameters();
+			LOG("EVENT: %f %s %s", time, type.c_str(), params.c_str());
+			_events.pop();
+		}
+		else
+		{
+			return;
+		}
+	}
+}
+
 //======================================= EOF =====================================
 

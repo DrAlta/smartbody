@@ -318,6 +318,9 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "check",			   mcu_check_func);		// check matching between .skm and .sk
 	mcu.insert( "mediapath",		   mcu_mediapath_func);
 	mcu.insert( "bml",				   test_bml_func );
+
+	mcu.insert( "addevent",			   addevent_func );
+	mcu.insert( "removeevent",		   removeevent_func );
 	
 	mcu.insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands
 
