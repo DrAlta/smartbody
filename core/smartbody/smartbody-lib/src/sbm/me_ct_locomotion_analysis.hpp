@@ -24,14 +24,14 @@
 #define ME_CT_LOCOMOTION_ANALYSIS_HPP
 
 #include <ME/me_controller.h>
-#include "me_ct_locomotion.hpp"
+#include "me_ct_locomotion_pawn.hpp"
 #include "me_ct_IK.hpp"
 //#include "sbm_character.hpp"
 #include "sr_path_list.h"
 
 #pragma once
 
-class MeCtLocomotion;
+//class MeCtLocomotionPawn;
 
 class MeCtLocomotionAnalysis{
 public:
@@ -42,7 +42,7 @@ protected:
 	// Data
 	//SrArray<MeCtLocomotionLimb*> limb_list;
 
-	MeCtLocomotion* _ct_locomotion;
+	MeCtLocomotionPawn* _ct_locomotion_pawn;
 
 	MeCtLocomotionLimb*  _limb;
 
@@ -67,11 +67,13 @@ public:
 
 	~MeCtLocomotionAnalysis();
 
+	void set_skeleton(SkSkeleton* walking_skeleton, SkSkeleton* standing_skeleton);
+
 	bool get_standing_initialized();
 
-	void set_ct(MeCtLocomotion* controller);
+	void set_ct_pawn(MeCtLocomotionPawn* controller);
 
-	MeCtLocomotion* get_ct();
+	MeCtLocomotionPawn* get_ct_pawn();
 
 	void init(SkMotion* standing, srPathList &me_paths); //temp hard-coded init for human characters
 

@@ -550,20 +550,20 @@ int MeCtLocomotionNavigator::controller_channels(SkChannelArray* request_channel
 	AddChannel(request_channels, SkJointName( &(translation_joint_name.get(0)) ), SkChannel::YPos, &bi_base_y);
 	AddChannel(request_channels, SkJointName( &(translation_joint_name.get(0)) ), SkChannel::ZPos, &bi_base_z);
 
-	AddChannel(request_channels, SbmCharacter::LOCOMOTION_VELOCITY, SkChannel::XPos, &bi_loco_vel_x); 
-	AddChannel(request_channels, SbmCharacter::LOCOMOTION_VELOCITY, SkChannel::YPos, &bi_loco_vel_y);
-	AddChannel(request_channels, SbmCharacter::LOCOMOTION_VELOCITY, SkChannel::ZPos, &bi_loco_vel_z);
+	AddChannel(request_channels, MeCtLocomotionPawn::LOCOMOTION_VELOCITY, SkChannel::XPos, &bi_loco_vel_x); 
+	AddChannel(request_channels, MeCtLocomotionPawn::LOCOMOTION_VELOCITY, SkChannel::YPos, &bi_loco_vel_y);
+	AddChannel(request_channels, MeCtLocomotionPawn::LOCOMOTION_VELOCITY, SkChannel::ZPos, &bi_loco_vel_z);
 
-	AddChannel(request_channels, SbmCharacter::LOCOMOTION_GLOBAL_ROTATION, SkChannel::YPos, &bi_loco_rot_global_y);
-	AddChannel(request_channels, SbmCharacter::LOCOMOTION_LOCAL_ROTATION, SkChannel::YPos, &bi_loco_rot_local_y);
+	AddChannel(request_channels, MeCtLocomotionPawn::LOCOMOTION_GLOBAL_ROTATION, SkChannel::YPos, &bi_loco_rot_global_y);
+	AddChannel(request_channels, MeCtLocomotionPawn::LOCOMOTION_LOCAL_ROTATION, SkChannel::YPos, &bi_loco_rot_local_y);
 
-	AddChannel(request_channels, SbmCharacter::LOCOMOTION_LOCAL_ROTATION_ANGLE, SkChannel::YPos, &bi_loco_rot_local_angle);
+	AddChannel(request_channels, MeCtLocomotionPawn::LOCOMOTION_LOCAL_ROTATION_ANGLE, SkChannel::YPos, &bi_loco_rot_local_angle);
 
-	AddChannel(request_channels, SbmCharacter::LOCOMOTION_TIME, SkChannel::YPos, &bi_loco_time);
+	AddChannel(request_channels, MeCtLocomotionPawn::LOCOMOTION_TIME, SkChannel::YPos, &bi_loco_time);
 
 	//AddChannel(request_channels, SkJointName( "base" ), SkChannel::ZPos, &bi_base_z);
 
-	AddChannel(request_channels, SbmCharacter::LOCOMOTION_ID, SkChannel::YPos, &bi_id);
+	AddChannel(request_channels, MeCtLocomotionPawn::LOCOMOTION_ID, SkChannel::YPos, &bi_id);
 
 	return routine_channel_num;
 }

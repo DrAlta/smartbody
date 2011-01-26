@@ -36,7 +36,7 @@ const char* MeCtLocomotionAnalysis::TYPE = "MeCtLocomotionAnalysis";
 /** Constructor */
 MeCtLocomotionAnalysis::MeCtLocomotionAnalysis() {
 	//is_valid = true;
-	_ct_locomotion = NULL;
+	_ct_locomotion_pawn = NULL;
 	walking_skeleton = NULL;
 	standing_skeleton = NULL;
 	motion_standing = NULL;
@@ -48,26 +48,32 @@ MeCtLocomotionAnalysis::~MeCtLocomotionAnalysis() {
 	// Nothing allocated to the heap
 }
 
-void MeCtLocomotionAnalysis::set_ct(MeCtLocomotion* controller)
+void MeCtLocomotionAnalysis::set_ct_pawn(MeCtLocomotionPawn* controller)
 {
-	_ct_locomotion = controller;
+	_ct_locomotion_pawn = controller;
 	if (walking_skeleton)
 		walking_skeleton->unref();
-	walking_skeleton = _ct_locomotion->walking_skeleton;
+	walking_skeleton = _ct_locomotion_pawn->walking_skeleton;
 	if (walking_skeleton)
 		walking_skeleton->ref();
 
 	if (standing_skeleton)
 		standing_skeleton->unref();
-	standing_skeleton = _ct_locomotion->standing_skeleton;
+	standing_skeleton = _ct_locomotion_pawn->standing_skeleton;
 	if (standing_skeleton)
 		standing_skeleton->ref();
 }
 
-MeCtLocomotion* MeCtLocomotionAnalysis::get_ct()
+MeCtLocomotionPawn* MeCtLocomotionAnalysis::get_ct_pawn()
 {
-	return _ct_locomotion;
+	return _ct_locomotion_pawn;
 
+}
+
+void MeCtLocomotionAnalysis::set_skeleton(SkSkeleton* walking_skeleton, SkSkeleton* standing_skeleton)
+{
+	this->walking_skeleton = walking_skeleton;
+	this->standing_skeleton = standing_skeleton;
 }
 
 bool MeCtLocomotionAnalysis::get_standing_initialized()
@@ -77,7 +83,7 @@ bool MeCtLocomotionAnalysis::get_standing_initialized()
 
 void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //temp hard-coded init for human characters
 {
-	if(_ct_locomotion == NULL) 
+	if(_ct_locomotion_pawn == NULL) 
 	{
 		LOG("Error: no locomotion controller attached.");
 		return;
@@ -87,13 +93,13 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 	this->motion_standing = standing;
 	const char* base_name = standing_skeleton->root()->name().get_string();
 
-	get_ct()->set_base_name(base_name);
+	get_ct_pawn()->set_base_name(base_name);
 
 	int result = 0;
 
 	MeCtLocomotionLimb* limb = new MeCtLocomotionLimb();
 	limb->init_skeleton(standing_skeleton, walking_skeleton);
-	get_ct()->get_limb_list()->push() = limb;
+	get_ct_pawn()->get_limb_list()->push() = limb;
 	limb->set_skeleton_name("common.sk");
 	result += limb->set_limb_base("l_hip");
 	result += limb->add_support_joint("l_ankle");
@@ -102,7 +108,7 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 	
 	if(result != 0)
 	{
-		_ct_locomotion->set_valid(false);
+		get_ct_pawn()->set_valid(false);
 		return;
 	}
 	limb->set_joint_type(0, JOINT_TYPE_BALL);
@@ -114,7 +120,7 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 	result = 0;
 	limb = new MeCtLocomotionLimb();
 	limb->init_skeleton(standing_skeleton, walking_skeleton);
-	get_ct()->get_limb_list()->push() = limb;
+	get_ct_pawn()->get_limb_list()->push() = limb;
 	limb->set_skeleton_name("common.sk");
 	result += limb->set_limb_base("r_hip");
 	result += limb->add_support_joint("r_ankle");
@@ -124,7 +130,7 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 
 	if(result != 0)
 	{
-		_ct_locomotion->set_valid(false);
+		get_ct_pawn()->set_valid(false);
 		return;
 	}
 	limb->set_joint_type(0, JOINT_TYPE_BALL);
@@ -133,17 +139,17 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 	limb->set_joint_type(3, JOINT_TYPE_HINGE);
 	limb->set_joint_type(4, JOINT_TYPE_HINGE);
 
-	_ct_locomotion->init_nonlimb_joint_info();
+	get_ct_pawn()->init_nonlimb_joint_info();
 
 	limb = NULL;
 
 	MeCtLocomotionAnimGlobalInfo* info = new MeCtLocomotionAnimGlobalInfo();
 	info->speed = 0.0f;
 	info->direction.set(0,0,0);
-	_ct_locomotion->get_anim_global_info()->push() = info;
-	for(int i = 0; i < _ct_locomotion->get_limb_list()->size(); ++i)
+	get_ct_pawn()->get_anim_global_info()->push() = info;
+	for(int i = 0; i < get_ct_pawn()->get_limb_list()->size(); ++i)
 	{
-		limb = _ct_locomotion->get_limb_list()->get(i);
+		limb = get_ct_pawn()->get_limb_list()->get(i);
 		limb->set_height_bound(0.5f);
 		analyze_standing(limb, standing);
 		//analyze_standing(limb, NULL);
@@ -151,9 +157,9 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 	}
 	SkJoint* joint = NULL;
 	SkJoint* tjoint = NULL;
-	for(int i = 0; i < _ct_locomotion->get_limb_list()->size(); ++i)
+	for(int i = 0; i < get_ct_pawn()->get_limb_list()->size(); ++i)
 	{
-		limb = _ct_locomotion->get_limb_list()->get(i);
+		limb = get_ct_pawn()->get_limb_list()->get(i);
 		joint = standing_skeleton->search_joint(limb->limb_base_name);
 		for(int j = 0; j < limb->joint_num; ++j)
 		{
@@ -178,7 +184,7 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 			}
 		}
 	}
-	_ct_locomotion->set_valid(true);
+	get_ct_pawn()->set_valid(true);
 	standing_initialized = true;
 }
 
@@ -255,13 +261,13 @@ int MeCtLocomotionAnalysis::get_translation_base_joint_name(SkSkeleton* skeleton
 	{
 		if(!joint->pos()->frozen(1))
 		{
-			this->_ct_locomotion->set_translation_joint_name(joint->name().get_string());
+			get_ct_pawn()->set_translation_joint_name(joint->name().get_string());
 			return i;
 		}
 		joint = joint->child(0);
 	}
 
-	this->_ct_locomotion->set_translation_joint_name(NULL);
+	get_ct_pawn()->set_translation_joint_name(NULL);
 	return -1;
 }
 
@@ -302,10 +308,10 @@ void MeCtLocomotionAnalysis::analyze_standing_core(MeCtLocomotionLimb* limb, SkS
 
 	int translation_base_joint_index = get_translation_base_joint_name(skeleton);
 
-	joint = skeleton->search_joint(this->_ct_locomotion->translation_joint_name);
+	joint = skeleton->search_joint(get_ct_pawn()->translation_joint_name);
 
 	mat = joint->gmat();
-	this->_ct_locomotion->translation_joint_height = mat.get(13)-ground_height;
+	get_ct_pawn()->translation_joint_height = mat.get(13)-ground_height;
 	//this->_ct_locomotion->translation_joint_height = 103.0f;
 
 }
@@ -810,9 +816,9 @@ void MeCtLocomotionAnalysis::init_blended_anim()
 {
 	MeCtLocomotionLimb* limb = NULL;
 	MeCtLocomotionLimbAnim* anim = NULL;
-	for(int i = 0; i < _ct_locomotion->get_limb_list()->size();++i)
+	for(int i = 0; i < get_ct_pawn()->get_limb_list()->size();++i)
 	{
-		limb = _ct_locomotion->get_limb_list()->get(i);
+		limb = get_ct_pawn()->get_limb_list()->get(i);
 		anim = limb->get_walking_list()->get(0);
 		for(int j = 0; j < anim->get_timing_space()->get_ref_time_num(); ++j)
 		{
@@ -824,9 +830,9 @@ void MeCtLocomotionAnalysis::init_blended_anim()
 void MeCtLocomotionAnalysis::print_info()
 {
 	MeCtLocomotionLimb* limb = NULL;
-	for(int i = 0; i < _ct_locomotion->get_limb_list()->size();++i)
+	for(int i = 0; i < get_ct_pawn()->get_limb_list()->size();++i)
 	{
-		limb = _ct_locomotion->get_limb_list()->get(i);
+		limb = get_ct_pawn()->get_limb_list()->get(i);
 		limb->print_info();
 	}
 }
@@ -837,9 +843,9 @@ void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, float l
 	float lower_bound = 0.0f;
 	int i = 0;
 	float land_time, lift_time, stance_time;
-	for(i = 0; i < _ct_locomotion->get_limb_list()->size();++i)
+	for(i = 0; i < get_ct_pawn()->get_limb_list()->size();++i)
 	{
-		limb = _ct_locomotion->get_limb_list()->get(i);
+		limb = get_ct_pawn()->get_limb_list()->get(i);
 		if(i == 0)
 		{
 			land_time = l_land_time;
@@ -875,9 +881,9 @@ void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, float l
 		count = 0;
 		sum.set(0.0f, 0.0f, 0.0f);
 		t = 0.0f;
-		for(int i = 0; i < _ct_locomotion->get_limb_list()->size();++i)
+		for(int i = 0; i < get_ct_pawn()->get_limb_list()->size();++i)
 		{
-			limb = _ct_locomotion->get_limb_list()->get(i);
+			limb = get_ct_pawn()->get_limb_list()->get(i);
 			vel = limb->walking_list.get(limb->walking_list.size()-1)->get_displacement_list()->get(j);
 			if(!vel->iszero())
 			{
@@ -898,11 +904,11 @@ void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, float l
 	direction /= sum_t;
 	info->speed = direction.len();
 	info->direction = -direction/direction.len();
-	_ct_locomotion->get_anim_global_info()->push() = info;
+	get_ct_pawn()->get_anim_global_info()->push() = info;
 
-	for(int i = 0; i < _ct_locomotion->get_limb_list()->size();++i)
+	for(int i = 0; i < get_ct_pawn()->get_limb_list()->size();++i)
 	{
-		limb = _ct_locomotion->get_limb_list()->get(i);
+		limb = get_ct_pawn()->get_limb_list()->get(i);
 		//limb->walking_list.get(limb->walking_list.size()-1)->direction = -*direction;
 		limb->walking_list.get(limb->walking_list.size()-1)->global_info = info;
 	}
@@ -915,9 +921,9 @@ void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, int typ
 	float lower_bound = 0.0f;
 	int i = 0;
 	int land_time, lift_time, stance_time;
-	for(i = 0; i < _ct_locomotion->get_limb_list()->size();++i)
+	for(i = 0; i < get_ct_pawn()->get_limb_list()->size();++i)
 	{
-		limb = _ct_locomotion->get_limb_list()->get(i);
+		limb = get_ct_pawn()->get_limb_list()->get(i);
 
 		/*if(type == 1) // forward
 		{
@@ -1020,9 +1026,9 @@ void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, int typ
 		count = 0;
 		sum.set(0.0f, 0.0f, 0.0f);
 		t = 0.0f;
-		for(int i = 0; i < _ct_locomotion->get_limb_list()->size();++i)
+		for(int i = 0; i < get_ct_pawn()->get_limb_list()->size();++i)
 		{
-			limb = _ct_locomotion->get_limb_list()->get(i);
+			limb = get_ct_pawn()->get_limb_list()->get(i);
 			vel = limb->walking_list.get(limb->walking_list.size()-1)->get_displacement_list()->get(j);
 			if(!vel->iszero())
 			{
@@ -1043,11 +1049,11 @@ void MeCtLocomotionAnalysis::add_locomotion(SkMotion* motion_locomotion, int typ
 	direction /= sum_t;
 	info->speed = direction.len();
 	info->direction = -direction/direction.len();
-	_ct_locomotion->get_anim_global_info()->push() = info;
+	get_ct_pawn()->get_anim_global_info()->push() = info;
 
-	for(int i = 0; i < _ct_locomotion->get_limb_list()->size();++i)
+	for(int i = 0; i < get_ct_pawn()->get_limb_list()->size();++i)
 	{
-		limb = _ct_locomotion->get_limb_list()->get(i);
+		limb = get_ct_pawn()->get_limb_list()->get(i);
 		//limb->walking_list.get(limb->walking_list.size()-1)->direction = -*direction;
 		limb->walking_list.get(limb->walking_list.size()-1)->global_info = info;
 	}

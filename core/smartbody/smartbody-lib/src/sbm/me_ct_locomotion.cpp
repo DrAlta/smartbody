@@ -1,5 +1,5 @@
 /*
- *  me_ct_locomotion.hpp - part of SmartBody-lib's Motion Engine
+ *  me_ct_locomotion.cpp - part of SmartBody-lib's Motion Engine
  *  Copyright (C) 2009  University of Southern California
  *
  *  SmartBody-lib is free software: you can redistribute it and/or
@@ -66,6 +66,7 @@ MeCtLocomotion::MeCtLocomotion() {
 	freeze_delta_time = 0.0f;
 	ik.set_terrain(&terrain);
 	height_offset.set_terrain(&terrain);
+	analyzer.set_ct_pawn((MeCtLocomotionPawn*)this);
 }
 
 /** Destructor */
@@ -396,20 +397,20 @@ bool MeCtLocomotion::is_channels_valid()
 	return channels_valid;
 }
 
-void MeCtLocomotion::set_valid(bool valid)
+/*void MeCtLocomotion::set_valid(bool valid)
 {
 	this->valid = valid;
-}
+}*/
 
-SrArray<MeCtLocomotionLimb*>* MeCtLocomotion::get_limb_list()
+/*SrArray<MeCtLocomotionLimb*>* MeCtLocomotion::get_limb_list()
 {
 	return &limb_list;
-}
+}*/
 
-SrArray<MeCtLocomotionAnimGlobalInfo*>* MeCtLocomotion::get_anim_global_info()
+/*SrArray<MeCtLocomotionAnimGlobalInfo*>* MeCtLocomotion::get_anim_global_info()
 {
 	return &anim_global_info;
-}
+}*/
 
 void MeCtLocomotion::set_balance_factor(float factor)
 {
@@ -447,7 +448,7 @@ SrVec MeCtLocomotion::get_base_pos()
 	return navigator.get_world_pos()-world_offset_to_base;
 }
 
-void MeCtLocomotion::init_nonlimb_joint_info()
+/*void MeCtLocomotion::init_nonlimb_joint_info()
 {
 	SrArray<char*> limb_base_name;
 	limb_base_name.capacity(limb_list.size());
@@ -471,12 +472,13 @@ void MeCtLocomotion::init_nonlimb_joint_info()
 			nonlimb_joint_info.mat_valid.set(index, 1);
 		}
 	}
-}
+}*/
 
 void MeCtLocomotion::init_skeleton(SkSkeleton* standing, SkSkeleton* walking)
 {
 	walking_skeleton = walking;
 	standing_skeleton = standing;
+	analyzer.set_skeleton(walking_skeleton, standing_skeleton);
 	initialized = true;
 }
 
@@ -485,18 +487,18 @@ const char* MeCtLocomotion::controller_type( void )	const {
 	return TYPE;
 }
 
-void MeCtLocomotion::set_base_name(const char* name)
+/*void MeCtLocomotion::set_base_name(const char* name)
 {
 	if(base_name != NULL) free(base_name);
 	base_name = (char*)malloc(sizeof(char)*(strlen(name)+1));
 	strcpy(base_name, name);
-}
+}*/
 
-void MeCtLocomotion::set_translation_joint_name(const char* name)
+/*void MeCtLocomotion::set_translation_joint_name(const char* name)
 {
 	translation_joint_name.set(name);
 	navigator.set_translation_joint_name(translation_joint_name);
-}
+}*/
 
 SrString& MeCtLocomotion::get_translation_joint_name()
 {
@@ -1209,6 +1211,11 @@ void MeCtLocomotion::update_pos()
 MeCtLocomotionNavigator* MeCtLocomotion::get_navigator()
 {
 	return &navigator;
+}
+
+MeCtLocomotionAnalysis* MeCtLocomotion::get_analyzer()
+{
+	return &analyzer;
 }
 
 void MeCtLocomotion::add_locomotion_anim(SkMotion* anim)

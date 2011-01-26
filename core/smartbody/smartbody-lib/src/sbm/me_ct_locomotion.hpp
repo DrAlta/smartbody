@@ -24,7 +24,8 @@
 #define ME_CT_LOCOMOTION_HPP
 
 #include <ME/me_controller.h>
-
+#include "me_ct_locomotion_pawn.hpp"
+#include "me_ct_locomotion_analysis.hpp"
 #include "me_ct_locomotion_limb.hpp"
 #include "me_ct_locomotion_speed_accelerator.hpp"
 #include "me_ct_locomotion_navigator.hpp"
@@ -39,7 +40,7 @@ class MeCtLocomotionLimb;
 #pragma once
 
 
-class MeCtLocomotion : public MeController {
+class MeCtLocomotion : public MeController, public MeCtLocomotionPawn {
 public:
 	// Public Constants
 	static const char* TYPE;
@@ -54,8 +55,8 @@ public:
 	SrVec pre_world_offset_to_base;
 
 	int translation_joint_index;
-	SrString translation_joint_name;
-	float translation_joint_height;
+	//SrString translation_joint_name;
+	//float translation_joint_height;
 
 	SrVec displacement;
 
@@ -63,7 +64,7 @@ public:
 
 protected: // flags
 	bool channels_valid;  // All necessary channels are present
-	bool valid;
+	//bool valid;
 	bool joints_indexed;
 	bool dis_initialized; // limb joint position calculated
 	bool initialized;
@@ -79,28 +80,20 @@ public:
 	double freeze_delta_time;
 	
 protected:
-	MeCtLocomotionJointInfo nonlimb_joint_info;
+	//MeCtLocomotionJointInfo nonlimb_joint_info;
 	int r_anim1_index;
 	int r_anim2_index;
 	int r_anim1_index_dominant;
 	int r_anim2_index_dominant;
 
 protected:
-	MeCtLocomotionIK ik;
 
-	MeCtLocomotionNavigator navigator;
 
-	MeCtLocomotionHeightOffset height_offset;
-
-	MeCtLocomotionBalance balance;
-
-	MeCtLocomotionSpeedAccelerator speed_accelerator; // to be moved to MeCtLocomotionLimb
-
-	MeCtLocomotionTerrain terrain;
+	MeCtLocomotionAnalysis analyzer;
 
 	SkChannelArray  request_channels;
 
-	SrArray<MeCtLocomotionAnimGlobalInfo*> anim_global_info;
+	//SrArray<MeCtLocomotionAnimGlobalInfo*> anim_global_info;
 
 	int dominant_limb;
 
@@ -113,7 +106,7 @@ protected:
 	double last_time;
 	double delta_time;
 
-	char* base_name;
+	//char* base_name;
 
 
 protected: // channel initialization related
@@ -122,11 +115,11 @@ protected: // channel initialization related
 
 	//temp, to be deleted=================
 public:
-	SkSkeleton* walking_skeleton;
-	SkSkeleton* standing_skeleton;
+	//SkSkeleton* walking_skeleton;
+	//SkSkeleton* standing_skeleton;
 
-	SrArray<MeCtLocomotionLimb*> limb_list; //limbs
-	SrArray<SkMotion*> locomotion_anims;
+	//SrArray<MeCtLocomotionLimb*> limb_list; //limbs
+	//SrArray<SkMotion*> locomotion_anims;
 
 
 public:
@@ -169,17 +162,20 @@ public:
 
 
 public:
+
+	MeCtLocomotionAnalysis* get_analyzer();
+
 	MeCtLocomotionNavigator* get_navigator();
 
 	void add_locomotion_anim(SkMotion* anim);
 
-	SrArray<MeCtLocomotionAnimGlobalInfo*>* get_anim_global_info();
+	//SrArray<MeCtLocomotionAnimGlobalInfo*>* get_anim_global_info();
 
 	SrVec get_facing_vector();
 
 	void set_motion_time(float time);
 
-	void set_translation_joint_name(const char* name);
+	//void set_translation_joint_name(const char* name);
 	SrString& get_translation_joint_name();
 
 	void set_freeze(bool freeze);
@@ -198,13 +194,13 @@ public:
 
 	bool is_channels_valid();
 
-	SrArray<MeCtLocomotionLimb*>* get_limb_list();
+	//SrArray<MeCtLocomotionLimb*>* get_limb_list();
 
-	void init_nonlimb_joint_info();
+	//void init_nonlimb_joint_info();
 
 	void set_target_height_displacement(float displacement);
 
-	void set_base_name(const char* name);
+	//void set_base_name(const char* name);
 
 	void set_enabled(bool enable){enabled = enable;}
 
@@ -218,7 +214,7 @@ public:
 
 	int get_dominant_limb_index();
 
-	void set_valid(bool valid);
+	//void set_valid(bool valid);
 
 	MeCtLocomotionTerrain* get_terrain();
 

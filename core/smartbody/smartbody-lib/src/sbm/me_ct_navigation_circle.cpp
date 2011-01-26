@@ -73,16 +73,16 @@ SkChannelArray& MeCtNavigationCircle::controller_channels() {
 		// Initialize Requested Channels                                                           // Indices
 		request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::Quat );  //  0
 
-		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::XPos ); //  1
-		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::YPos ); //  2
-		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::ZPos ); //  3
+		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_VELOCITY ), SkChannel::XPos ); //  1
+		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_VELOCITY ), SkChannel::YPos ); //  2
+		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_VELOCITY ), SkChannel::ZPos ); //  3
 
-		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_GLOBAL_ROTATION ), SkChannel::YPos ); //  4
-		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_LOCAL_ROTATION ), SkChannel::YPos ); //  5
-		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_LOCAL_ROTATION_ANGLE ), SkChannel::YPos ); //  6
-		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_TIME ), SkChannel::YPos ); //  7
+		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_GLOBAL_ROTATION ), SkChannel::YPos ); //  4
+		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_LOCAL_ROTATION ), SkChannel::YPos ); //  5
+		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_LOCAL_ROTATION_ANGLE ), SkChannel::YPos ); //  6
+		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_TIME ), SkChannel::YPos ); //  7
 
-		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_ID ), SkChannel::YPos ); //  8
+		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_ID ), SkChannel::YPos ); //  8
 	}
 
 	return request_channels;

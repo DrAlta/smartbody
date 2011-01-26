@@ -51,7 +51,6 @@
 #if(1) // Use primary locomotion controller
 #include "me_ct_navigation_circle.hpp"
 #include "me_ct_locomotion.hpp"
-#include "me_ct_locomotion_analysis.hpp"
 #define  MeCtLocomotionClass MeCtLocomotion
 #else
 // "Ghost-walking" implementation, useful for test just the navigation code
@@ -72,22 +71,7 @@ class SbmCharacter : public SbmPawn	{
 
 public:
 	// Static Constants
-
-	static const char* LOCOMOTION_ROTATION;
-	//! Channel name for instantaneous locomotion rotation, uses YPos
-	static const char* LOCOMOTION_GLOBAL_ROTATION;
-	static const char* LOCOMOTION_LOCAL_ROTATION;
-	static const char* LOCOMOTION_LOCAL_ROTATION_ANGLE;
-	static const char* LOCOMOTION_TIME;
-	static const char* LOCOMOTION_ID;
-	//! Channel name for immediate locomotion speed and trajectory, stored in the joint position channels
-	static const char* LOCOMOTION_VELOCITY;
-	
-	//! Channel name for the body orientation target, stored in the joint position channels
-	static const char* ORIENTATION_TARGET;
-	
 	MeCtLocomotionClass* locomotion_ct;
-
 	GeneralParamMap*   param_map;
 
 protected:
@@ -106,7 +90,7 @@ protected:
 	AUChannelMap			au_channel_map;
 	VisemeMotionMap 		viseme_map;
 
-	MeCtLocomotionAnalysis* locomotion_ct_analysis;
+	//MeCtLocomotionAnalysis* locomotion_ct_analysis;
 	
 	MeCtEyeLidRegulator*	eyelid_reg_ct_p;
 	MeCtFace*				face_ct;
@@ -283,7 +267,7 @@ public:
 	 */
 	static int print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
-	int init_locomotion_analyzer(const char* skel_file, mcuCBHandle *mcu_p);
+	int init_locomotion_skeleton(const char* skel_file, mcuCBHandle *mcu_p);
 	void automate_locomotion(bool automate);
 
 	//temp command process.............................
@@ -294,7 +278,6 @@ public:
 	void locomotion_set_turning_mode(int mode);
 	void locomotion_ik_enable(bool enable);
 	MeCtLocomotionClass* get_locomotion_ct();
-	MeCtLocomotionAnalysis* get_locomotion_ct_analysis();
 
 
 public:

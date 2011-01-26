@@ -54,9 +54,9 @@ SkChannelArray& MeCtLocomotionSimple::controller_channels() {
 		request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::ZPos );  //  2
 		request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::Quat );  //  3
 
-		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::XPos ); //  4
-		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::YPos ); //  5
-		request_channels.add( SkJointName( SbmCharacter::LOCOMOTION_VELOCITY ), SkChannel::ZPos ); //  6
+		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_VELOCITY ), SkChannel::XPos ); //  4
+		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_VELOCITY ), SkChannel::YPos ); //  5
+		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_VELOCITY ), SkChannel::ZPos ); //  6
 
 	}
 

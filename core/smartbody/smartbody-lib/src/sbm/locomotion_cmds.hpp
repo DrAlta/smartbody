@@ -24,7 +24,7 @@
 #define LOCOMOTION_CMDS_HPP
 
 #include "mcontrol_util.h"
-#include "me_ct_locomotion_analysis.hpp"
+//#include "me_ct_locomotion_analysis.hpp"
 
 int locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  );
 
