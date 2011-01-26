@@ -67,6 +67,7 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 //				motionCt->warp_limits( (float)0.01, 100 );  // override limits
 //				motionCt->twarp( (float) atof( speedStr ) );
 				twarp = atof( speedStr );
+				if( twarp == 0.0 ) twarp = 1.0;
 			}
 			delete [] speedStr;
 
@@ -78,7 +79,7 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 			name << unique_id << ' ' << motion->name();
 			motionCt->name( name.str().c_str() );  // TODO: include BML act and behavior ids
 
-			motionCt->init( motion, 0.0, twarp );
+			motionCt->init( motion, 0.0, 1.0 / twarp );
 #if 0
 
 			// Copy motion metadata
