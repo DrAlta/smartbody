@@ -97,7 +97,7 @@ class MeCtMotion : public MeController
     void twarp ( float tw );
 
     /*! Returns the current time warping ratio, default is 1 (not warping) */
-//    float twarp () const { return _twarp; }
+    float twarp () const { return _twarp; }
 
     /*! Returns true if to be played in loop, and false otherwise */
     bool loop () const { return _loop; }
@@ -111,10 +111,10 @@ class MeCtMotion : public MeController
     virtual double controller_duration ();
 
 	/*! Gets the offset from the start of the motion. */
-//	virtual double offset () { return _offset; }
+	virtual double offset () { return _offset; }
 
 	/*! Sets the offset from the start of the motion. */
-//	void offset ( double amount );
+	void offset ( double amount );
 
     /*! Returns the duration of the warped motion, which corresponds to the phase in
         a loop controller with undetermined duration */

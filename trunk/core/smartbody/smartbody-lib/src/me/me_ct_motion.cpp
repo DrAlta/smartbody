@@ -72,7 +72,7 @@ void MeCtMotion::init( SkMotion* m_p, double time_offset, double time_scale )	{
 		_context->child_channels_updated( this );
 	}
 
-	synch_points.copy_points( m_p->synch_points, 0.0, time_scale );
+	synch_points.copy_points( m_p->synch_points, time_offset, time_scale );
 #if 1
 	double indt = synch_points.get_interval_to( srSynchPoints::READY );
 	if( indt < 0.0 ) indt = 0.0;
@@ -81,7 +81,8 @@ void MeCtMotion::init( SkMotion* m_p, double time_offset, double time_scale )	{
 	inoutdt( (float)indt, (float)outdt );
 	double emph = synch_points.get_time( srSynchPoints::STROKE );
 	emphasist( (float)emph );
-	twarp( (float)time_scale );
+	twarp( 1.0 / (float)time_scale );
+	_offset = time_offset;
 #endif
 }
 
@@ -281,7 +282,11 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 	}
 
 	// Controller Context and FrameData set, use the new available buffer
-	_motion->apply( float(t)*_twarp + float(_offset),
+	//_motion->apply( float(t)*_twarp + float(_offset),
+	//	            &(frame.buffer()[0]),  // pointer to buffer's float array
+	//				&_mChan_to_buff,
+	//	            _play_mode, &_last_apply_frame );
+	_motion->apply( float(t),
 		            &(frame.buffer()[0]),  // pointer to buffer's float array
 					&_mChan_to_buff,
 		            _play_mode, &_last_apply_frame );

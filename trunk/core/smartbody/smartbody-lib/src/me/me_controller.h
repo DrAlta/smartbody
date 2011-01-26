@@ -150,6 +150,21 @@ public :
 
 	srSynchPoints synch_points;
 
+	double time_start()
+	{	return synch_points.get_time( srSynchPoints::START ); }
+	double time_ready()
+	{	return synch_points.get_time( srSynchPoints::READY ); }
+	double time_stroke_start()
+	{	return synch_points.get_time( srSynchPoints::STROKE_START ); }
+	double time_stroke_emphasis()
+	{	return synch_points.get_time( srSynchPoints::STROKE ); }
+	double time_stroke_end()
+	{	return synch_points.get_time( srSynchPoints::STROKE_STOP ); }
+	double time_relax()
+	{	return synch_points.get_time( srSynchPoints::RELAX ); }
+	double time_stop()
+	{	return synch_points.get_time( srSynchPoints::STOP ); }
+
 
     const char* name () const { return _name? _name:""; }
     void name ( const char* n ) { sr_string_set ( _name, n ); }

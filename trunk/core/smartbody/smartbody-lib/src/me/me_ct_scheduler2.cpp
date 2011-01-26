@@ -542,13 +542,24 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 			time_warp.insert( startAt,	0.0 );
 			time_warp.insert( MAX_TRACK_DURATION, MAX_TRACK_DURATION - startAt );
 		} else {
+			double time_scale = 1.0 / motionController->twarp();
+			double time_offset = motionController->offset();
 			time_warp.insert( startAt,	0.0 );
+
+			//time_warp.insert( readyAt,			motionController->time_ready() );
+			//time_warp.insert( strokeStartAt,	motionController->time_stroke_start() );
+ 			//time_warp.insert( strokeAt,			motionController->time_stroke_emphasis() );
+			//time_warp.insert( strokeEndAt,		motionController->time_stroke_end() );
+			//time_warp.insert( relaxAt,			motionController->time_relax() );
+			//time_warp.insert( endAt,	ct_dur );
+
 			time_warp.insert( readyAt,			skMotion->time_ready() );
 			time_warp.insert( strokeStartAt,	skMotion->time_stroke_start() );
  			time_warp.insert( strokeAt,			skMotion->time_stroke_emphasis() );
 			time_warp.insert( strokeEndAt,		skMotion->time_stroke_end() );
 			time_warp.insert( relaxAt,			skMotion->time_relax() );
-			time_warp.insert( endAt,	ct_dur );
+
+			time_warp.insert( endAt,	skMotion->time_stop() );
 		}
 	}
 	else

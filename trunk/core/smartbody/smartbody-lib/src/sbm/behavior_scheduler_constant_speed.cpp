@@ -330,12 +330,12 @@ BehaviorSchedulerConstantSpeedPtr BML::buildSchedulerForController( MeController
 		BehaviorSchedulerConstantSpeedPtr scheduler( 
 			new BehaviorSchedulerConstantSpeed(
 				/* startTime  */ 0, 
-				/* readyTime  */ time_sec( motion->time_ready() ), 
-				/* strokeStartTime */ time_sec( motion->time_stroke_start() ),
-				/* strokeTime */ time_sec( motion->time_stroke_emphasis() ),
-				/* strokeEndTime */ time_sec( motion->time_stroke_end() ),
-				/* relaxTime  */ time_sec( is_undefined_duration? BehaviorRequest::TEN_MILLION : motion->time_relax() ), 
-				/* endTime    */ time_sec( is_undefined_duration? BehaviorRequest::TEN_MILLION : motion->duration() ),
+				/* readyTime  */ time_sec( motionController->time_ready() ), 
+				/* strokeStartTime */ time_sec( motionController->time_stroke_start() ),
+				/* strokeTime */ time_sec( motionController->time_stroke_emphasis() ),
+				/* strokeEndTime */ time_sec(  motionController->time_stroke_end()  ),
+				/* relaxTime  */ time_sec( is_undefined_duration? BehaviorRequest::TEN_MILLION : motionController->time_relax()  ), 
+				/* endTime    */ time_sec( is_undefined_duration? BehaviorRequest::TEN_MILLION : motionController->time_stop() ),
 				/* speed      */ 1 ) );
 
 		return scheduler;
