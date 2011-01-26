@@ -1632,7 +1632,7 @@ int mcu_character_init(
 
 		if (mcu_p->use_locomotion) 
 		{
-			int locoSuccess = char_p->init_locomotion_analyzer(skel_file, mcu_p);//temp init for analyzer Jingqiao Fu Aug/07/09
+			int locoSuccess = char_p->init_locomotion_skeleton(skel_file, mcu_p);//temp init for locomotion analyzer Jingqiao Fu Aug/07/09
 			if (locoSuccess != CMD_SUCCESS) {
 				LOG("init_character ERR: Failed to init locomotion analyzer\n"); 
 			}

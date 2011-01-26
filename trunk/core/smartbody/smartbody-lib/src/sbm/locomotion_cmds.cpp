@@ -34,10 +34,11 @@
 
 using namespace std;
 
-int locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
+int locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	
+{
 	// should this function be removed?
 
-	SkMotion* walking1_p = NULL;
+/*	SkMotion* walking1_p = NULL;
 	SkMotion* walking2_p = NULL;
 	SkMotion* standing_p = NULL;
 	
@@ -56,8 +57,10 @@ int locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	if(walking1_p && walking2_p && standing_p)
 	{
 		MeCtLocomotion ct_locomotion;
-		MeCtLocomotionAnalysis analysis;
-		analysis.set_ct(&ct_locomotion);
+		//MeCtLocomotionAnalysis analysis;
+		//analysis.set_ct_pawn((MeCtLocomotionPawn*)&ct_locomotion);
+		init_locomotion_skeleton(const char* skel_file, mcuCBHandle *mcu_p)
+		ct_locomotion.init_skeleton();
 		analysis.init(standing_p, mcu_p->me_paths);
 		analysis.add_locomotion(walking1_p, 1, 0, 1.0f);
 		analysis.add_locomotion(walking2_p, 2, 0, 1.0f);
@@ -66,7 +69,8 @@ int locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	else
 	{
 		return CMD_FAILURE;
-	}
+	}*/
+	return CMD_SUCCESS;
 }
 
 
@@ -152,15 +156,15 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		}
 		if(type == "standing")
 		{
-			actor->get_locomotion_ct_analysis()->init(anim_p, mcu_p->me_paths);
-			actor->get_locomotion_ct_analysis()->init_blended_anim();
+			actor->get_locomotion_ct()->get_analyzer()->init(anim_p, mcu_p->me_paths);
+			actor->get_locomotion_ct()->get_analyzer()->init_blended_anim();
 		}
 		else if(type == "walking")
 		{
-			if(!actor->get_locomotion_ct_analysis()->get_standing_initialized())
+			if(!actor->get_locomotion_ct()->get_analyzer()->get_standing_initialized())
 			{
-				actor->get_locomotion_ct_analysis()->init(NULL, mcu_p->me_paths);
-				actor->get_locomotion_ct_analysis()->init_blended_anim();
+				actor->get_locomotion_ct()->get_analyzer()->init(NULL, mcu_p->me_paths);
+				actor->get_locomotion_ct()->get_analyzer()->init_blended_anim();
 			}
 			float l_land_time = args.read_float();
 			float l_stance_time = args.read_float();
@@ -179,7 +183,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			}
 
 			actor->get_locomotion_ct()->add_locomotion_anim(anim_p);
-			actor->get_locomotion_ct_analysis()->add_locomotion(anim_p, l_land_time, l_stance_time, l_lift_time, r_land_time, r_stance_time, r_lift_time, translation_scale);
+			actor->get_locomotion_ct()->get_analyzer()->add_locomotion(anim_p, l_land_time, l_stance_time, l_lift_time, r_land_time, r_stance_time, r_lift_time, translation_scale);
 		}
 		return CMD_SUCCESS;
 	}
@@ -192,15 +196,15 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 
 	if(arg=="enable")
 	{
-		if(!actor->get_locomotion_ct_analysis()->get_standing_initialized())
+		if(!actor->get_locomotion_ct()->get_analyzer()->get_standing_initialized())
 		{
-			actor->get_locomotion_ct_analysis()->init(NULL, mcu_p->me_paths);
+			actor->get_locomotion_ct()->get_analyzer()->init(NULL, mcu_p->me_paths);
 			if(!actor->get_locomotion_ct()->is_valid()) 
 			{
 				LOG("Locomotion not valid, can not be enabled.");
 				return CMD_FAILURE;
 			}
-			actor->get_locomotion_ct_analysis()->init_blended_anim();
+			actor->get_locomotion_ct()->get_analyzer()->init_blended_anim();
 		}
 		actor->get_locomotion_ct()->set_enabled(true);
 		LOG("Locomotion engine has been enabled.");

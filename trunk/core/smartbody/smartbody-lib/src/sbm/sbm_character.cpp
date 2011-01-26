@@ -71,16 +71,6 @@ bool parse_float_or_error( float& var, const char* str, const string& var_name )
 
 /////////////////////////////////////////////////////////////
 //  Static Data
-const char* SbmCharacter::LOCOMOTION_VELOCITY = "locomotion_velocity";
-const char* SbmCharacter::LOCOMOTION_ROTATION = "locomotion_rotation";
-const char* SbmCharacter::LOCOMOTION_GLOBAL_ROTATION = "locomotion_global_rotation";
-const char* SbmCharacter::LOCOMOTION_LOCAL_ROTATION = "locomotion_local_rotation";
-const char* SbmCharacter::LOCOMOTION_LOCAL_ROTATION_ANGLE = "locomotion_local_rotation_angle";
-const char* SbmCharacter::LOCOMOTION_TIME = "locomotion_time";
-const char* SbmCharacter::LOCOMOTION_ID = "locomotion_id";
-
-/////////////////////////////////////////////////////////////
-const char* SbmCharacter::ORIENTATION_TARGET  = "orientation_target";
 
 /////////////////////////////////////////////////////////////
 //  Method Definitions
@@ -105,7 +95,6 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	posture_sched_p( CreateSchedulerCt( character_name, "posture" ) ),
 	motion_sched_p( CreateSchedulerCt( character_name, "motion" ) ),
 	gaze_sched_p( CreateSchedulerCt( character_name, "gaze" ) ),
-	locomotion_ct_analysis( NULL ),
 	locomotion_ct( NULL ),
 	eyelid_reg_ct_p( NULL ),
 #ifdef USE_REACH
@@ -155,8 +144,6 @@ SbmCharacter::~SbmCharacter( void )	{
 		face_ct->unref();
 	eyelid_ct->unref();
 
-	if (locomotion_ct_analysis)
-		delete locomotion_ct_analysis;
 	locomotion_ct->unref();
 		
 	if ( mcuCBHandle::singleton().sbm_character_listener )
@@ -176,76 +163,15 @@ SbmCharacter::~SbmCharacter( void )	{
 	}
 }
 
-int SbmCharacter::init_locomotion_analyzer(const char* skel_file, mcuCBHandle *mcu_p)
+int SbmCharacter::init_locomotion_skeleton(const char* skel_file, mcuCBHandle *mcu_p)
 {
-	/*std::string walkForwardMotion = "Step_WalkForward";
-	std::string strafeMotion = "Step_StrafeRight";
-	std::string standingMotion = "HandsAtSide_Motex_Softened";
-
-	SkMotion* walking1_p = NULL;
-	SkMotion* walking2_p = NULL;
-	SkMotion* standing_p = NULL;
-	
-	std::map<std::string, SkMotion*>::iterator walkIter = mcu_p->motion_map.find(walkForwardMotion);
-	if (walkIter != mcu_p->motion_map.end())
-		walking1_p = (*walkIter).second;
-
-	std::map<std::string, SkMotion*>::iterator strafeIter = mcu_p->motion_map.find(strafeMotion);
-	if (strafeIter != mcu_p->motion_map.end())
-		walking2_p = (*strafeIter).second;
-
-	std::map<std::string, SkMotion*>::iterator standIter = mcu_p->motion_map.find(standingMotion);
-	if (standIter != mcu_p->motion_map.end())
-		standing_p = (*standIter).second;
-
-	// need better error checking here
-	bool motionsNotLoaded = false;
-	if (!walking1_p)
-	{
-		LOG("No %s animation", walkForwardMotion.c_str());
-		motionsNotLoaded = true;
-	}
-	if (!walking2_p)
-	{
-		LOG("No %s animation", strafeMotion.c_str());
-		motionsNotLoaded = true;
-	}
-	if (!standing_p)
-	{
-		LOG("No %s animation", standingMotion.c_str());
-		motionsNotLoaded = true;
-	}
-	if (motionsNotLoaded)
-	{
-		return CMD_FAILURE;
-	}*/
-
 	SkSkeleton* walking_skeleton = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->resource_manager );
 	SkSkeleton* standing_skeleton = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->resource_manager );
 
 	locomotion_ct->init_skeleton(standing_skeleton, walking_skeleton);
-	locomotion_ct_analysis->set_ct(locomotion_ct);
-
-	/*locomotion_ct_analysis->init(standing_p, mcu_p->me_paths);
-	locomotion_ct_analysis->init_blended_anim();
-
-	locomotion_ct->add_locomotion_anim(walking1_p);
-	//locomotion_ct_analysis->add_locomotion(walking1_p, 1, 0);
-	locomotion_ct_analysis->add_locomotion(walking1_p, 29, 45, 6, 1, 17, 33);
-
-	locomotion_ct->add_locomotion_anim(walking2_p);
-	//locomotion_ct_analysis->add_locomotion(walking2_p, 2, 0);
-	locomotion_ct_analysis->add_locomotion(walking2_p, 50, 2, 34, 24, 51, 3);*/
-	
-	//locomotion_ct_analysis->print_info();
 
 	return CMD_SUCCESS;
 }
-
-/*void SbmCharacter::automate_locomotion(bool automate)
-{
-	locomotion_ct->automate = automate;
-}*/
 
 void SbmCharacter::locomotion_reset()
 {
@@ -264,11 +190,6 @@ void SbmCharacter::locomotion_set_turning_speed(float radians)
 MeCtLocomotionClass* SbmCharacter::get_locomotion_ct()
 {
 	return this->locomotion_ct;
-}
-
-MeCtLocomotionAnalysis* SbmCharacter::get_locomotion_ct_analysis()
-{
-	return this->locomotion_ct_analysis;
 }
 
 void SbmCharacter::locomotion_ik_enable(bool enable)
@@ -335,7 +256,6 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 	//if (use_locomotion) 
 	{
-		this->locomotion_ct_analysis = new MeCtLocomotionAnalysis();
 		this->locomotion_ct =  new MeCtLocomotionClass();
 		std::string locomotionname = std::string(name)+ "'s locomotion controller";
 		this->locomotion_ct->name( locomotionname.c_str() );
@@ -555,7 +475,7 @@ int SbmCharacter::init_skeleton() {
 
 		// 3D vector for current speed and trajectory of the body
 		SkJoint* loc_vector_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
-		loc_vector_joint_p->name( SkJointName( LOCOMOTION_VELOCITY ) );
+		loc_vector_joint_p->name( SkJointName( MeCtLocomotionPawn::LOCOMOTION_VELOCITY ) );
 		// Activate positional channels
 		loc_vector_joint_p->pos()->limits( 0, -max_speed, max_speed );
 		loc_vector_joint_p->pos()->limits( 1, -max_speed, max_speed );
@@ -573,11 +493,11 @@ int SbmCharacter::init_skeleton() {
 		SkJoint* l_angular_angle_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
 		SkJoint* time_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
 		SkJoint* id_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
-		g_angular_velocity_joint_p->name( SkJointName( LOCOMOTION_GLOBAL_ROTATION ) );
-		l_angular_velocity_joint_p->name( SkJointName( LOCOMOTION_LOCAL_ROTATION ) );
-		l_angular_angle_joint_p->name( SkJointName( LOCOMOTION_LOCAL_ROTATION_ANGLE ) );
-		time_joint_p->name( SkJointName( LOCOMOTION_TIME ) );
-		id_joint_p->name( SkJointName( LOCOMOTION_ID ) );
+		g_angular_velocity_joint_p->name( SkJointName( MeCtLocomotionPawn::LOCOMOTION_GLOBAL_ROTATION ) );
+		l_angular_velocity_joint_p->name( SkJointName( MeCtLocomotionPawn::LOCOMOTION_LOCAL_ROTATION ) );
+		l_angular_angle_joint_p->name( SkJointName( MeCtLocomotionPawn::LOCOMOTION_LOCAL_ROTATION_ANGLE ) );
+		time_joint_p->name( SkJointName( MeCtLocomotionPawn::LOCOMOTION_TIME ) );
+		id_joint_p->name( SkJointName( MeCtLocomotionPawn::LOCOMOTION_ID ) );
 
 		// Activate positional channels, unlimited
 		g_angular_velocity_joint_p->pos()->limits( 1, false ); // Unlimit YPos
@@ -1970,7 +1890,6 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 	}
 	return( CMD_NOT_FOUND );
 }
-
 int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 	string char_name = args.read_token();
