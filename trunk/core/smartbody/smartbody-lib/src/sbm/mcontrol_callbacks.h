@@ -110,5 +110,9 @@ int mcu_syncpolicy_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 int mcu_mediapath_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+
+int addevent_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int removeevent_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int registerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 //////////////////////////////////////////////////////////////////
 #endif

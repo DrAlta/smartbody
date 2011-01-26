@@ -405,6 +405,8 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert( "check",                mcu_check_func ); // shorthand
    mcu.insert( "mediapath",		   mcu_mediapath_func);
    mcu.insert( "bml",  test_bml_func );
+   mcu.insert( "addevent",			   addevent_func );
+   mcu.insert( "removeevent",		   removeevent_func );
 
    mcu.insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands
 

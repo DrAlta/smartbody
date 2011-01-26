@@ -41,6 +41,7 @@
 #include "mcontrol_callbacks.h"
 #include "sr/sr_model.h"
 #include "sbm_pawn.hpp"
+#include "sbm/Event.h"
 
 using namespace std;
 using namespace WSP;
@@ -4421,4 +4422,129 @@ int mcu_mediapath_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	LOG("mediapath is '%s'", mcu_p->getMediaPath().c_str());
 	return CMD_SUCCESS;
 }
+
+int addevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	char* tok = args.read_token();
+	if (!tok || strcmp(tok, "help") == 0)
+	{
+		LOG("Use: addevent <motion> <time> <event> <parameters> [once]");
+		return CMD_SUCCESS;
+	}
+
+	// find the motion
+	std::string motionName = tok;
+	std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.find(motionName);
+	if (iter == mcu_p->motion_map.end())
+	{
+		LOG("Motion %s not found, no event added.", motionName.c_str());
+		return CMD_FAILURE;
+	}
+
+	SkMotion* motion = (*iter).second;
+	float time = args.read_float();
+	char* type = args.read_token();
+	if (!type)
+	{
+		LOG("Event type was not found, no event added for motion %s.", motionName.c_str());
+		return CMD_FAILURE;
+	}
+
+	char* parameters = args.read_token();
+	char* once = args.read_token();
+	bool isOnce = false;
+	if (strlen(once) > 0 )
+	{
+		if (strcmp(once, "once") == 0)
+		{
+			isOnce = true;
+		}
+		else
+		{
+			LOG("Event option '%s' was not understood, expected 'once'. No event type '%s' with parameters '%s' added for motion %s at time %f.", motionName.c_str(), type, parameters, time);
+			return CMD_FAILURE;
+		}
+	}
+
+	MotionEvent* motionEvent = new MotionEvent();
+	if (isOnce)
+		motionEvent->setIsOnceOnly(true);
+	motionEvent->setTime(time);
+	motionEvent->setType(type);
+	if (parameters)
+		motionEvent->setParameters(parameters);
+	motion->addMotionEvent(motionEvent);
+	LOG("Event '%s/%s' added to motion '%s' at time %f", type, parameters, motionName.c_str(), time);
+		
+	return CMD_SUCCESS;
+}
+
+int removeevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	char* tok = args.read_token();
+	if (!tok || strcmp(tok, "help") == 0)
+	{
+		LOG("Use: removeevent <motion|*>");
+		return CMD_SUCCESS;
+	}
+
+	// find the motion
+	std::string motionName = tok;
+	if (motionName == "*") // clear events in all motions
+	{
+		int numMotions = 0;
+		int numEvents = 0;
+		for (std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.begin();
+			 iter != mcu_p->motion_map.end();
+			 iter++)
+		{
+			SkMotion* motion = (*iter).second;
+			numMotions++;
+			std::vector<MotionEvent*>& motionEvents = motion->getMotionEvents();
+			for (size_t x = 0; x < motionEvents.size(); x++)
+			{
+				delete motionEvents[x];
+				numEvents++;
+			}
+			motionEvents.clear();
+			LOG("%d motion events in %d motions have been removed.", numEvents, numMotions);
+			return CMD_SUCCESS;
+		}
+	}
+
+	std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.find(motionName);
+	if (iter == mcu_p->motion_map.end())
+	{
+		LOG("Motion %s not found, no events removed.", motionName.c_str());
+		return CMD_FAILURE;
+	}
+
+	SkMotion* motion = (*iter).second;
+	std::vector<MotionEvent*>& motionEvents = motion->getMotionEvents();
+	int numEvents = motionEvents.size();
+	for (size_t x = 0; x < motionEvents.size(); x++)
+	{
+		delete motionEvents[x];
+	}
+	motionEvents.clear();
+	LOG("%d motion events removed from motion %s.", numEvents, motion->name());
+		
+	return CMD_SUCCESS;
+}
+
+int registerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	char* tok = args.read_token();
+	if (!tok || strcmp(tok, "help") == 0)
+	{
+		LOG("Use: registerevent <eventtype> <action>");
+		return CMD_SUCCESS;
+	}
+
+	
+
+	return CMD_SUCCESS;
+}
+
+
 

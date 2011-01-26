@@ -205,6 +205,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\Event.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\general_param_setting.h"
 				>
 			</File>

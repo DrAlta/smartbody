@@ -33,6 +33,7 @@
 # include <SK/sk_motion.h>
 
 # include <ME/me_controller.h>
+#include <queue>
 
 /*! This motion controller provides a controller interface to play
     an attached SkMotion. Besides few extra functionality such as
@@ -50,6 +51,7 @@ class MeCtMotion : public MeController
     bool                 _loop;      // if the motion is to be played in loop
     int                  _last_apply_frame; // to optimize shared motion evaluation
 	SrBuffer<int>        _mChan_to_buff; // motion's channels to context's buffer index
+	std::queue<MotionEvent*> _events;
 
    public :
     static const char* type_name;
@@ -131,6 +133,9 @@ class MeCtMotion : public MeController
 	virtual void print_state( int tabCount );
 	
 	SrBuffer<int>& get_context_map();
+
+	void checkMotionEvents(double time);
+	void loadMotionEvents();
 
    private:
 	void map_floats();

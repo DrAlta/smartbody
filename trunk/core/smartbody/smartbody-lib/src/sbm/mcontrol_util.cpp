@@ -42,6 +42,8 @@
 #include "sr/sr_model.h"
 #include "sbm_deformable_mesh.h"
 
+#include <boost/algorithm/string/replace.hpp>
+
 using namespace std;
 using namespace WSP;
 
@@ -1050,6 +1052,21 @@ std::string mcuCBHandle::getMediaPath()
 {
 	return media_path;
 }
+
+void mcuCBHandle::handleEvent(Event* e)
+{
+	// find the appropriate event handler
+	std::map<std::string, EventHandler*>::iterator iter = eventHandlers.find(e->getType());
+	if (iter == eventHandlers.end())
+		return;
+
+	EventHandler* handler = (*iter).second;
+	std::string action = handler->getAction();
+
+	boost::replace_all(action, "$1", e->getParameters());
+	execute((char*) action.c_str());
+}
+
 
 
 /////////////////////////////////////////////////////////////

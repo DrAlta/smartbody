@@ -32,6 +32,8 @@
 # include <SK/sk_motion.h>
 # include <SK/sk_posture.h>
 # include <SK/sk_skeleton.h>
+#include "sbm/Event.h"
+#include <algorithm>
 
 //============================= SkMotion ============================
 
@@ -64,6 +66,9 @@ SkMotion::~SkMotion()
       free( _frames[f].posture );
       _frames[f].posture = NULL;
    }
+
+   for (size_t x = 0; x < _motionEvents.size(); x++)
+	   delete _motionEvents[x];
  }
 
 void SkMotion::init()
@@ -546,3 +551,20 @@ void SkMotion::equalize_frames ( SrArray<SkMotion*> motions )
 */
 
 //============================ End of File ===========================
+
+bool ascendingTime(MotionEvent*& a, MotionEvent*& b)
+{
+	return (a->getTime() < b->getTime());
+}
+
+void SkMotion::addMotionEvent(MotionEvent* motionEvent)
+{
+	_motionEvents.push_back(motionEvent);
+	// make sure that the motion events are ordered by time
+	std::sort(_motionEvents.begin(), _motionEvents.end(), ascendingTime);
+}
+
+std::vector<MotionEvent*>& SkMotion::getMotionEvents()
+{
+	return _motionEvents;
+}
