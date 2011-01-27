@@ -17,6 +17,7 @@ public:
 	~MeCtLimb(void);
 
 	SkJoint* getChainRoot();
+	SkJoint* getChainEndEffector();
 	void init(SkSkeleton* skel);
 	// To-Do : build a tree traversal to find directed path between root node and effector node
 	bool buildJointChain(const char* root_name, const char* effector_name) {}

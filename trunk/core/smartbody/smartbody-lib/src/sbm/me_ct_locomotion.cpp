@@ -402,10 +402,10 @@ bool MeCtLocomotion::is_channels_valid()
 	this->valid = valid;
 }*/
 
-/*SrArray<MeCtLocomotionLimb*>* MeCtLocomotion::get_limb_list()
+SrArray<MeCtLocomotionLimb*>* MeCtLocomotion::get_limb_list()
 {
 	return &limb_list;
-}*/
+}
 
 /*SrArray<MeCtLocomotionAnimGlobalInfo*>* MeCtLocomotion::get_anim_global_info()
 {

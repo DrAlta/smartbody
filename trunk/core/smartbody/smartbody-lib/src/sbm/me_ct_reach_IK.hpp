@@ -22,6 +22,10 @@ protected:
 	virtual void calc_target(SrVec& orientation, SrVec& offset);	
 	int check_joint_limit(SrQuat* quat, int index); // new routine for most detailed joint angle limit constraints
 	void ccdRotate(SrVec& src, int start_index); // use cyclic coordinate descend to find local minimum.	
+	void ccdRotatePositionAndOrientation(SrVec& src, int start_index);
+	void particleIK();
+	void matchSkeleton(SrArray<SrVec>& particleList);
+
 protected: // a hack to get rotation axis re-align	
 	float dt; // for constraining rotation speed
 };

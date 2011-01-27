@@ -64,7 +64,7 @@ void PositionControl::drawSphere(SrVec& pos, float fRadius)
 	SrSnSphere sphere;
 	sphere.shape().center = pos;//SrPnt(0, 0, 0);
 	sphere.shape().radius = fRadius;
-	sphere.render_mode(srRenderModeLines);
+	sphere.render_mode(srRenderModeSmooth);
 	SrGlRenderFuncs::render_sphere(&sphere);
 }
 

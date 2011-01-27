@@ -22,6 +22,15 @@ SkJoint* MeCtLimb::getChainRoot()
 		return NULL;
 }
 
+
+SkJoint* MeCtLimb::getChainEndEffector()
+{
+	if (joint_chain.size() > 0)
+		return joint_chain[joint_chain.size()-1];
+	else
+		return NULL;
+}
+
 void MeCtLimb::updateQuat(MeFrameData& frame, bool bRead)
 {
 	SrBuffer<float>& buffer = frame.buffer();

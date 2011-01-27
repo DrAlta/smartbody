@@ -164,7 +164,9 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdShowSelection,
 				   CmdShowKinematicFootprints,
 				   CmdShowLocomotionFootprints,
-				   CmdInteractiveLocomotion
+				   CmdInteractiveLocomotion,
+				   CmdReachToggleData,
+				   CmdReachToggleIK,
                  };
 
    private : // internal data
@@ -292,10 +294,12 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	void drawEyeLids();
 	void drawDynamics();
 	void drawLocomotion();
+	void drawReach();
 	void drawInteractiveLocomotion();
 	void drawPawns();
 	void drawArrow(SrVec& from, SrVec& to, float width, SrVec& color);
 	void drawCircle(float cx, float cy, float cz, float r, int num_segments, SrVec& color);
+	void drawPoint(float cx, float cy, float cz, float size, SrVec& color);
 	void drawActiveArrow(SrVec& from, SrVec& to, int num, float width, SrVec& color, bool spin);
 	void init_foot_print();
 	//void drawLocomotionFootprints();

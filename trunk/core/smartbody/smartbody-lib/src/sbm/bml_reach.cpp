@@ -35,13 +35,14 @@
 
 #include "mcontrol_util.h"
 #include "me_ct_reach.hpp"
+#include "me_ct_data_driven_reach.hpp"
 
 #include "bml_target.hpp"
 #include "bml_xml_consts.hpp"
 #include "xercesc_utils.hpp"
 
 
-#define TEST_GAZE_LOCOMOTION 1 // set to 1 if want to test gaze+locomotion control when reaching
+#define TEST_GAZE_LOCOMOTION 0 // set to 1 if want to test gaze+locomotion control when reaching
 
 ////// XML Tags
 const XMLCh TAG_DESCRIPTION[] = L"description";
@@ -56,12 +57,27 @@ using namespace std;
 using namespace BML;
 using namespace xml_utils;
 
+static SkMotion* lookUpMotion(mcuCBHandle* mcu_p, const char* motionName)
+{
+	SkMotion* anim_p = NULL;
+	std::map<std::string, SkMotion*>::iterator animIter = mcu_p->motion_map.find(motionName);
+	if (animIter != mcu_p->motion_map.end())
+		anim_p = (*animIter).second;
+
+	return anim_p;
+}
+
 
 BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
 	
 	// attach the skeleton to the reach controller
+#define DATA_DRIVEN_REACH 0
+#if DATA_DRIVEN_REACH
+	MeCtDataDrivenReach* reachCt = new MeCtDataDrivenReach(request->actor->skeleton_p);
+#else
 	MeCtReach* reachCt = new MeCtReach(request->actor->skeleton_p);
+#endif
 
 	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
 	if( !reachCt && (!attrTarget || !XMLString::stringLen( attrTarget ) ) ) {
@@ -102,6 +118,30 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 		localId = XMLString::transcode(id);
 	
 	reachCt->init();
+#if DATA_DRIVEN_REACH
+	//reachCt->addMotion()
+	const int NUM_MOTIONS = 4;
+	const char motionNames[NUM_MOTIONS][100] = { "HandsAtSide_RArm_GestureYou", "LHandOnHip_Arms_GestureWhy", "LHandOnHip_RArm_GestureOffer", "LHandOnHip_RArm_SweepRight" };
+	for (int i=0;i<NUM_MOTIONS;i++)
+	{
+		SkMotion* motion = lookUpMotion(mcu,motionNames[i]);
+		if (!motion)
+		{
+			std::stringstream strstr;
+			strstr << "Motion Name = "<<motionNames[i]<<", motion does not exist.";
+			std::string str = strstr.str();
+			LOG(str.c_str());
+		}
+		else
+		{
+			reachCt->addMotion(motion);
+		}		
+	}
+	// build example database
+	reachCt->buildPoseExamplesFromMotions();	
+#endif
+
+
 	if( target_joint )	{
 		reachCt->set_target_joint(const_cast<SkJoint*>( target_joint ) );
 	}

@@ -104,6 +104,7 @@ public: // User provide data
 	SrVec								ik_offset;			// offset from the current position to the position that is 
 															// used to calculate the target position.
 	SrVec								ik_orientation;		// Orientation of the limb, may not be in the direction of plane normal
+	SrQuat                              ik_quat_orientation; // feng : world orientation ( a 3D rotation ) for the manipulated joint
 	float								ik_compensate_factor; // Compensate for the off-ground height, usually cos(plane_normal, ik_orientation)
 
 public:// User provide data & Returned data

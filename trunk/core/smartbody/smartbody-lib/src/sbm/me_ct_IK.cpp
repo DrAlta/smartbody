@@ -448,6 +448,11 @@ void MeCtIK::init()
 
 	target.capacity(size);
 	target.size(size);
+
+	// feng : add orientation target
+	target_orientation.capacity(size);
+	target_orientation.size(size);
+
 	scenario->joint_pos_list.capacity(size);
 	scenario->joint_pos_list.size(size);
 	scenario->joint_global_mat_list.capacity(size);
