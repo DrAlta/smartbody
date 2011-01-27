@@ -52,6 +52,7 @@ protected:
 	SrMat						end_mat;
 	
 	SrArray<SrVec>				target;
+	SrArray<SrQuat>             target_orientation; // feng : add orientation target
 	float						threshold;
 
 	MeCtIKScenarioJointInfo*	manipulated_joint;
@@ -76,9 +77,11 @@ public:
 	SrVec get_target(int index);
 
 protected:
-	virtual void adjust();		
+	virtual void adjust();			
 
 	virtual void calc_target(SrVec& orientation, SrVec& offset);
+
+	void init();
 
 	int check_constraint(SrQuat* quat, int index);	
 
@@ -100,13 +103,9 @@ protected:
 
 	void update_limb_section_local_pos(int start_index);	
 
-	void get_limb_section_local_pos(int start_index, int end_index);
-	
-	void init();
+	void get_limb_section_local_pos(int start_index, int end_index);	
 
-	int reach_destination();
-
-	
+	int reach_destination();	
 
 	void get_next_support_joint();
 

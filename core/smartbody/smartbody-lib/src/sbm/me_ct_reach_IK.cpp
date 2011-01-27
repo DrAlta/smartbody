@@ -33,14 +33,18 @@ void MeCtReachIK::adjust()
 	}
 }
 
+
+
+
+
 int MeCtReachIK::check_joint_limit( SrQuat* quat, int index )
 {
 	//return 0;	
 	int modified = 0;
 	MeCtIKScenarioJointInfo* info = &(scenario->joint_info_list.get(index));
 
-	// for some reason, the twist axis is aligned with local x-axis, instead of z-axis
-	// therefore we need to do some "shift" version of swingTwist conversion.
+	// feng : for some reason, the twist axis is aligned with local x-axis, instead of z-axis
+	// therefore we need to do the "shifted" version of swingTwist conversion.
 	// so we map x->z, y->x, z->y for computing swing-twist parameteriation.
 	// all of the angle limits are adjust accordingly.
 	{
@@ -67,6 +71,54 @@ int MeCtReachIK::check_joint_limit( SrQuat* quat, int index )
 		quat->set((float)ql.w(),(float)ql.x(),(float)ql.y(),(float)ql.z());
 	}	
 	return modified;
+}
+
+
+
+
+
+
+void MeCtReachIK::ccdRotatePositionAndOrientation( SrVec& src, int start_index )
+{
+	// (feng) To-Do : add orientation constraint in CCD algorithm
+	SrVec v1, v2, v3, v4;
+	SrVec v, i_target, i_src;
+	//SrVec axis, r_axis;	
+	SrVec r_axis, cross_v;
+	SrQuat q;
+	SrMat rot_src, rot_target;
+	SrVec e[3], e_t[3]; // for orientation target
+	SrMat mat, mat_inv;
+
+	MeCtIKScenarioJointInfo* info = &(scenario->joint_info_list.get(start_index));
+	float damping_angle = (float)RAD(info->angular_speed_limit*getDt());
+
+	if(start_index == 0) mat_inv = scenario->gmat.inverse();
+	else mat_inv = scenario->joint_global_mat_list.get(start_index-1).inverse();
+	SrVec& pivot = scenario->joint_pos_list.get(start_index);
+	pivot = pivot * mat_inv; // tranverse joint back to its local coordinate
+	i_target = target.get(manipulated_joint_index) * mat_inv;
+	i_src = src * mat_inv;
+	
+	rot_target = target_orientation.get(manipulated_joint_index).get_mat(rot_target);
+	
+	rot_target = rot_target * mat_inv;
+	rot_src    = scenario->joint_global_mat_list.get(manipulated_joint_index) * mat_inv;
+
+	// remove translation part in the rotation matrix
+	rot_target.setl4(0.f,0.f,0.f,1.f);
+	rot_src.setl4(0.f,0.f,0.f,1.f);	
+
+	// to-do : solve for optimal angles that satisfies both position & orientation constraints
+	
+	
+	
+	q = scenario->joint_quat_list.get(start_index);
+	q = mat * q;
+	check_joint_limit(&q,start_index);
+	scenario->joint_quat_list.set(start_index, q);
+	get_limb_section_local_pos(start_index, -1);
+
 }
 
 
@@ -108,9 +160,9 @@ void MeCtReachIK::ccdRotate(SrVec& src, int start_index)
 // 			v2 = v3 - pivot;
 		}
 		else if(dot_v < -1.0f) dot_v = -1.0f;
-		double angle = acos(dot_v);
 
-		if (angle > damping_angle) angle = damping_angle;
+		double angle = acos(dot_v);
+		//if (angle > damping_angle) angle = damping_angle;		
 
 		r_axis = cross(v2, v1);
 		r_axis.normalize();
@@ -148,6 +200,7 @@ void MeCtReachIK::ccdRotate(SrVec& src, int start_index)
 }
 
 
+#define USE_PARTICLE_IK 0
 void MeCtReachIK::update(MeCtIKScenario* scenario)
 {
 	this->scenario = scenario;
@@ -156,20 +209,29 @@ void MeCtReachIK::update(MeCtIKScenario* scenario)
 
 	SrQuat quat;
 	SrMat mat;	
-	init();
-	//unstretch_joints();
+	init();	
+#if !USE_PARTICLE_IK
 	adjust();	
+#else
+	particleIK();
+#endif
 }
 
 void MeCtReachIK::calc_target(SrVec& orientation, SrVec& offset)
-{
-	SrVec pos = scenario->joint_pos_list.get(manipulated_joint_index);
-	target.set(manipulated_joint_index,offset);
+{	
+	// don't care about incoming parameters, just set the target position & orientation from ik_scenario
+	target.set(manipulated_joint_index,scenario->ik_offset);
+	target_orientation.set(manipulated_joint_index,scenario->ik_quat_orientation);
 }
 
 
-#define INVERT_XZ
-
+// added by feng :
+// Originally I thought all joints use the local Z axis as twist axis, but this is not the case for the smartbody skeleton.
+// For arms, the twist axis is at local "X" axis.
+// For legs, the twist axis is local "Z" axis.
+// So if we want to convert arm joints quaternion into Swing-Twist, we need to invert ( shift ) XZ coordinate so we get correct results.
+// For other limbs like legs, we use the original swing-twist conversion.
+#define INVERT_XZ 
 vector_t MeCtReachIK::quat2SwingTwist( quat_t& quat )
 {
 	const float EPSILON6 = 0.0000001f;
@@ -219,10 +281,6 @@ vector_t MeCtReachIK::quat2SwingTwist( quat_t& quat )
 	gw_float_t swing_y = sinc2 * ( s * q.x() + c * q.y());
 	gw_float_t twist = 2.0 * gamma;
 #endif
-
-// 	if( use_radians )	{
-// 		return( vector_t( swing_x, swing_y, twist ) );
-// 	}
 	return( vector_t( ( swing_x ), ( swing_y ), ( twist ) ) );
 }
 
@@ -239,3 +297,86 @@ quat_t MeCtReachIK::swingTwist2Quat( vector_t& sw )
 	return result;
 }
 
+#if USE_PARTICLE_IK
+// Added by feng 
+// Particle IK : method from "Real-Time Motion Retargeting to Highly Varied User-Created Morphologies"
+// It gives a more "springy" IK solution and may look more natural than CCD sometimes. 
+// However, the result is not nearly as good as traditional CCD when adding the joint angle limits.
+
+void MeCtReachIK::particleIK()
+{
+	// implement a particle based method for IK
+	SrArray<SrVec> particleList; // particle list of the joint chain	
+	particleList = scenario->joint_pos_list;		
+	// compute bone length constraint
+	SrArray<float> constraintList;
+	constraintList.size(particleList.size());
+	for (int i=0;i<particleList.size()-1;i++)
+		constraintList[i] = (particleList[i] - particleList[i+1]).len();
+
+	SrVec targetPos = target.get(manipulated_joint_index);
+
+	const int nMaxIter = 5;
+	int num_particles = particleList.size();
+	for (int iter=0;iter<nMaxIter;iter++)
+	{
+		SrVec dv = targetPos - particleList[num_particles-1];
+		particleList[num_particles-1] += dv;		
+		for (int k=(num_particles-1);k>=2;k--)
+		{
+			dv = particleList[k - 1] - particleList[k];
+			dv *= 0.5f - constraintList[k - 1] / dv.len() * 0.5f;
+			particleList[k] += dv;
+			particleList[k - 1] -= dv;			
+		}
+		dv = particleList[1] - particleList[0];
+		dv *= 1.0f - constraintList[0] / dv.len();
+		particleList[1] += dv;
+	}
+	matchSkeleton(particleList);
+}
+
+void MeCtReachIK::matchSkeleton( SrArray<SrVec>& particleList )
+{
+	SrMat mat,mat_inv;
+	SrVec v, i_target, i_src, v1, v2, r_axis;
+	SrQuat q;
+
+	float damping_angle = 0.05;
+	for (int i=0;i<particleList.size()-1;i++)
+	{
+		int start_index = i;
+		if(start_index == 0) mat_inv = scenario->gmat.inverse();
+		else mat_inv = scenario->joint_global_mat_list.get(start_index-1).inverse();
+
+		SrVec pivot = scenario->joint_pos_list.get(start_index);
+		pivot = pivot * mat_inv; // tranverse joint back to its local coordinate
+		i_target = particleList.get(start_index+1) * mat_inv;
+		i_src = scenario->joint_pos_list.get(start_index+1) * mat_inv;
+
+		v1 = i_src - pivot;
+		v1.normalize();
+		v2 = i_target - pivot;
+		v2.normalize();
+
+		double dot_v = dot(v1, v2);
+		if(dot_v >= 0.9999995000000f) 
+		{			
+			dot_v = 1.0f;			
+		}
+		else if(dot_v < -1.0f) dot_v = -1.0f;
+
+		double angle = acos(dot_v);
+		if (angle > damping_angle) angle = damping_angle;		
+		r_axis = cross(v2, v1);
+		r_axis.normalize();
+		mat.rot(r_axis, (float)-angle);
+
+		q = scenario->joint_quat_list.get(start_index);
+		q = mat * q;
+		check_joint_limit(&q,start_index);
+		scenario->joint_quat_list.set(start_index, q);
+		get_limb_section_local_pos(start_index, -1);
+	}
+}
+#endif

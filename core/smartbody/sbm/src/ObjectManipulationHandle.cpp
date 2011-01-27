@@ -8,6 +8,7 @@
 ObjectManipulationHandle::ObjectManipulationHandle(void)
 {
 	active_control = NULL;
+	bHasPicking = false;
 }
 
 ObjectManipulationHandle::~ObjectManipulationHandle(void)

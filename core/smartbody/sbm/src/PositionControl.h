@@ -25,9 +25,7 @@ public:
 	bool drag(SrCamera& cam, float  fx, float fy, float tx, float ty);
 	void hitOPS();
 	void hitTest();
-
-	static void drawSphere(SrVec& pos, float fRadius = 1.0);
-
+	static void drawSphere(SrVec& pos, float fRadius = 1.0);	
 protected:
 	void drawCenter();		
 };

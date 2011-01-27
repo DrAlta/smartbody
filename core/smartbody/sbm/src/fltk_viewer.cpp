@@ -49,6 +49,7 @@
 # include <SR/sr_trackball.h>
 # include <SR/sr_lines.h>
 # include <SR/sr_color.h>
+# include <SR/sr_points.h>
 
 # include <SR/sr_sn.h>
 # include <SR/sr_sn_group.h>
@@ -57,6 +58,7 @@
 # include <SR/sr_sa_event.h>
 # include <SR/sr_gl_render_funcs.h>
 # include <SBM/me_ct_eyelid.h>
+# include <SBM/me_ct_data_driven_reach.hpp>
 
 #include <sbm/mcontrol_util.h>
 
@@ -150,9 +152,11 @@ static char reach_type_name[NUM_REACH_TYPES][40] = {"&create Right arm reach","&
 static SrArray<Fl_Menu_Item> reach_submenus[NUM_REACH_TYPES];
 
 Fl_Menu_Item ReachMenuTable[] = 
-{
+{	
 	{ reach_type_name[0],   0, MCB, 0 },			
 	{ reach_type_name[1],   0, MCB, 0 },	
+	{ "&reach interpolate", 0, MCB, CMD(CmdReachToggleData),FL_MENU_TOGGLE },
+	{ "&reach IK", 0, MCB, CMD(CmdReachToggleIK),FL_MENU_TOGGLE },
 	{ 0 }
 };
 
@@ -586,7 +590,12 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 	  case CmdReachOnTargetLeft:	 
 		  set_reach_target(s-CmdReachOnTargetRight,label);
 		  break;
-      
+	  case CmdReachToggleData:
+		  MeCtDataDrivenReach::useDataDriven = !MeCtDataDrivenReach::useDataDriven;
+		  break;
+	  case CmdReachToggleIK:
+		  MeCtDataDrivenReach::useIK = !MeCtDataDrivenReach::useIK;
+		  break;      
     }
 	
 	if (applyToCharacter)
@@ -865,6 +874,13 @@ void FltkViewer::draw()
    if ( !visible() ) return;
    if ( !valid() ) init_opengl ( w(), h() ); // valid() is turned on by fltk after draw() returns
 
+   // move picking operations here to avoid interference with cbufviewer
+   if (_objManipulator.hasPicking())
+   {
+	   SrVec2 pick_loc = _objManipulator.getPickLoc();
+	   _objManipulator.picking(pick_loc.x,pick_loc.y, _data->camera);	   
+   }
+
    glViewport ( 0, 0, w(), h() );
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
@@ -1015,6 +1031,8 @@ void FltkViewer::draw()
 
 	//_posControl.Draw();
 	_objManipulator.draw();
+	// feng : debugging draw for reach controller
+	drawReach();
 
 
 	_data->fcounter.stop();
@@ -1651,7 +1669,9 @@ int FltkViewer::handle_object_manipulation( const SrEvent& e)
 	 {
 		 if (e.button1)
 		 {
-			 _objManipulator.picking(e.mouse.x,e.mouse.y, _data->camera);
+			 //_objManipulator.picking(e.mouse.x,e.mouse.y, _data->camera);
+			 //_objManipulator.hasPicking(true);
+			 _objManipulator.setPicking(SrVec2(e.mouse.x, e.mouse.y));
 			 /*
 			 // unify the pawn selection and the locomotion selection
 			 SbmPawn* pawn = _objManipulator.get_selected_pawn();
@@ -2237,7 +2257,7 @@ void FltkViewer::drawPawns()
 	mcu.character_map.reset();
 	while (SbmCharacter* character = mcu.character_map.next())
 	{
-		pawnSize = character->getHeight() / 8.0f;
+		pawnSize = character->getHeight() / 30.0f;
 		break;
 	}
 
@@ -2277,6 +2297,19 @@ void FltkViewer::drawPawns()
 	}
 	glPopAttrib();
 
+}
+
+
+void FltkViewer::drawPoint( float cx, float cy, float cz, float size, SrVec& color )
+{
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND); 
+	glColor4f(color.x, color.y, color.z, 1.0f);
+	glPointSize(5.0);
+	glBegin(GL_POINTS); 
+	glVertex3f(cx, cy, cz);//output vertex 
+	glEnd(); 
+	glDisable(GL_BLEND); 
 }
 
 void FltkViewer::drawCircle(float cx, float cy, float cz, float r, int num_segments, SrVec& color) 
@@ -3051,6 +3084,67 @@ void FltkViewer::drawDynamics()
 
 }
 
+// visualize example data and other relevant information for reach controller
+void FltkViewer::drawReach()
+{	
+	glPushAttrib(GL_LIGHTING_BIT | GL_POINT_BIT);
+	glDisable(GL_LIGHTING);
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SbmCharacter* character = NULL;	
+	// get current character
+	mcu.character_map.reset();
+	for(int i = 0; i <= _locoData->char_index; ++i)
+	{
+		character = mcu.character_map.next();		
+	}	
+
+	if ( character )
+	{
+		MeCtSchedulerClass* reachSched = character->reach_sched_p;
+		MeCtSchedulerClass::VecOfTrack reach_tracks = reachSched->tracks();
+	
+		MeCtDataDrivenReach* reachCt = NULL;
+		MeCtReach* tempCt = NULL;
+		for (unsigned int c = 0; c < reach_tracks.size(); c++)
+		{
+			MeController* controller = reach_tracks[c]->animation_ct();		
+			reachCt = dynamic_cast<MeCtDataDrivenReach*>(controller);
+			//tempCt  = dynamic_cast<MeCtReach*>(controller);
+			if (reachCt)
+				break;
+		}		
+
+		if (!reachCt)
+		{
+			//LOG("No data driven reach controller");
+			return;
+		}
+
+		
+		// draw reach Example data
+		const VecOfPoseExample& exampleData = reachCt->getExamplePoseData();
+		character->skeleton_p->update_global_matrices();
+		//SkJoint* root = character->skeleton_p->root();
+		SkJoint* root = reachCt->getRootJoint();
+		SrMat rootMat;
+		rootMat.translation(root->gmat().get(12),root->gmat().get(13),root->gmat().get(14));
+
+		SrPoints srExamplePts;	
+		srExamplePts.init_with_attributes();
+		for (unsigned int i=0;i<exampleData.size();i++)
+		{
+			const PoseExample& exPose = exampleData[i];
+			SrVec lPos = SrVec((float)exPose.poseParameter[0],(float)exPose.poseParameter[1],(float)exPose.poseParameter[2]);
+			SrVec gPos = lPos*rootMat; // transform to global coordinate
+			//drawCircle(gPos[0],gPos[1],gPos[2],1.0,5,SrVec(1.0,0.0,0.0));			
+			drawPoint(gPos[0],gPos[1],gPos[2],1.5,SrVec(0.0,0.0,1.0));
+			//PositionControl::drawSphere(gPos,1.0f);			
+		}		
+	}
+
+	glPopAttrib();
+	
+}
 
 
 //================================ End of File =================================================

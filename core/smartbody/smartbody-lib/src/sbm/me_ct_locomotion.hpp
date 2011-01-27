@@ -194,7 +194,7 @@ public:
 
 	bool is_channels_valid();
 
-	//SrArray<MeCtLocomotionLimb*>* get_limb_list();
+	SrArray<MeCtLocomotionLimb*>* get_limb_list();
 
 	//void init_nonlimb_joint_info();
 

@@ -45,7 +45,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\src;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost"
+				AdditionalIncludeDirectories="..\src;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;..\..\..\..\lib\ANN"
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -67,7 +67,9 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="ANN.lib"
 				OutputFile="..\lib\Smartbodyd.lib"
+				AdditionalLibraryDirectories="..\..\..\..\lib\ANN"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -999,6 +1001,14 @@
 			<Filter
 				Name="reach"
 				>
+				<File
+					RelativePath="..\src\sbm\me_ct_data_driven_reach.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\me_ct_data_driven_reach.hpp"
+					>
+				</File>
 				<File
 					RelativePath="..\src\sbm\me_ct_limb.cpp"
 					>

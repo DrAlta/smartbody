@@ -5,8 +5,9 @@
 const char* MeCtReach::CONTROLLER_TYPE = "Reach";
 const float PI_CONST = 3.14159265358979323846f;
 
+#define LIMB_ARM 1
+#if LIMB_ARM
 const int  NUM_LIMBS = 5;
-
 // feng : right now I simply hard coded the joint chains and constraints for the left, right arms.
 // in the future, I think we should integrate the joint constraints into skeleton, so it is easier to set up an IK chain interactively ( by simply select the start, end joints ? )
 const char limb_chain_r[][20] = {"r_shoulder", "r_elbow", "r_forearm", "r_wrist", "r_middle1"};
@@ -28,6 +29,31 @@ const MeCtIKJointLimit limb_joint_limit_l[] = {
 	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.3f,PI_CONST*0.3f),SrVec2(PI_CONST*0.3f,-PI_CONST*0.3f)},                                              
 	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.3f,PI_CONST*0.3f),SrVec2(PI_CONST*0.3f,-PI_CONST*0.3f)},								    
 };
+#else
+const int  NUM_LIMBS = 5;
+// feng : right now I simply hard coded the joint chains and constraints for the left, right arms.
+// in the future, I think we should integrate the joint constraints into skeleton, so it is easier to set up an IK chain interactively ( by simply select the start, end joints ? )
+const char limb_chain_r[][20] = {"r_hip", "r_knee", "r_ankle", "r_forefoot", "r_toe"};
+const char limb_chain_l[][20] = {"l_hip", "l_knee", "l_ankle", "l_forefoot", "l_toe"};
+
+const MeCtIKJointLimit limb_joint_limit_r[] = { 							
+	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.3f,PI_CONST*0.7f),SrVec2(PI_CONST*0.3f,-PI_CONST*0.3f)},											 
+	{SrVec2(PI_CONST*0.01f, PI_CONST*0.01f), SrVec2(PI_CONST*0.8f,PI_CONST*0.05f),SrVec2(PI_CONST*0.01f,-PI_CONST*0.01f)},                                              
+	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.3f,PI_CONST*0.3f),SrVec2(PI_CONST*0.2f,-PI_CONST*0.2f)},                                              
+	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.01f,PI_CONST*0.01f),SrVec2(PI_CONST*0.01f,-PI_CONST*0.01f)},                                              
+	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.01f,PI_CONST*0.01f),SrVec2(PI_CONST*0.01f,-PI_CONST*0.01f)},								    
+};
+
+// since the coordinates are flip in the left-arm, all joint limits need to be flipped as well.
+const MeCtIKJointLimit limb_joint_limit_l[] = { 							
+	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.7f,PI_CONST*0.3f),SrVec2(PI_CONST*0.3f,-PI_CONST*0.3f)},											 
+	{SrVec2(PI_CONST*0.01f, PI_CONST*0.01f), SrVec2(PI_CONST*0.05f,PI_CONST*0.8f),SrVec2(PI_CONST*0.01f,-PI_CONST*0.01f)},                                              
+	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.3f,PI_CONST*0.3f),SrVec2(PI_CONST*0.2f,-PI_CONST*0.2f)},                                              
+	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.01f,PI_CONST*0.01f),SrVec2(PI_CONST*0.01f,-PI_CONST*0.01f)},                                              
+	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.01f,PI_CONST*0.01f),SrVec2(PI_CONST*0.01f,-PI_CONST*0.01f)},								    
+};
+
+#endif
 
 MeCtReach::MeCtReach( SkSkeleton* skeleton ) 
 {
@@ -141,9 +167,12 @@ bool MeCtReach::controller_evaluate( double t, MeFrameData& frame )
 	}
 	prev_time = (float)t;
 
+	//limb.updateQuat(frame,true);
+
 	MeCtIKScenario* ik_scenario = &limb.ik;
 	
 	ik_scenario->ik_offset = get_reach_target(); // set the target
+	ik_scenario->ik_quat_orientation = SrQuat(0,0,0,1.0); // set to default rotation for testing
 	ik_scenario->joint_quat_list = limb.joint_quat;	
 	
 	limb.skeleton->update_global_matrices();
