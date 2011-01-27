@@ -1022,6 +1022,7 @@ void MeControllerRequest::unschedule( mcuCBHandle* mcu,
 			MeCtBlend* blend = static_cast<MeCtBlend*>(unary_blend_ct);
 			srLinearCurve& blend_curve = blend->get_curve();
 			double t = mcu->time;
+#if 0
 			blend_curve.clear_after( t );
 			if( duration > 0 ) {
 				double v = blend_curve.evaluate( t );
@@ -1030,6 +1031,12 @@ void MeControllerRequest::unschedule( mcuCBHandle* mcu,
 			} else {
 				blend_curve.insert( t, 0.0 );
 			}
+#else
+			double v = blend_curve.evaluate( t );
+			blend_curve.clear_after( t );
+			blend_curve.insert( t, v );
+			blend_curve.insert( t + duration, 0.0 );
+#endif
 		}
 	}
 
