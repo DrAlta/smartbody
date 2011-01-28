@@ -1,4 +1,5 @@
 #include "me_ct_limb.hpp"
+#include <assert.h>
 
 MeCtLimb::MeCtLimb(void)
 {
@@ -29,6 +30,16 @@ SkJoint* MeCtLimb::getChainEndEffector()
 		return joint_chain[joint_chain.size()-1];
 	else
 		return NULL;
+}
+
+void MeCtLimb::updateQuatToJointChain( SrArray<SrQuat>& joint_quat )
+{
+	assert(joint_quat.size() == joint_chain.size());
+
+	for (int i=0;i<joint_chain.size();i++)
+	{
+		joint_chain[i]->quat()->value(joint_quat[i]);
+	}
 }
 
 void MeCtLimb::updateQuat(MeFrameData& frame, bool bRead)
@@ -102,4 +113,37 @@ float MeCtLimb::computeLimbLength()
 		fLength += joint_chain[i]->offset().len();
 	}
 	return fLength;
+}
+
+void MeCtLimb::updateMotionFrameToJointChain( SkMotion* motion, int frame )
+{
+	const float *fp = motion->posture(frame);
+	SkChannelArray& channels = motion->channels();
+	int inserted;
+	int size = channels.size();
+
+	for (int i=0; i<size; i++ ) {
+		if ( channels[i].joint && hasJoint(channels[i].joint) )
+		{
+			inserted = channels[i].set ( fp );
+		}
+		else
+			inserted = channels[i].size ();
+		fp += inserted;
+	}
+	skeleton->invalidate_global_matrices();
+	
+}
+
+bool MeCtLimb::hasJoint( SkJoint* joint )
+{
+	if (!joint)
+		return false;
+
+	for (int i=0;i<joint_chain.size();i++)
+	{
+		if (joint == joint_chain[i])
+			return true;
+	}
+	return false;
 }

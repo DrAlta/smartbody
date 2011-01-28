@@ -1,6 +1,6 @@
 #pragma once
 #include "me_ct_reach.hpp"
-#include "ANN.h"
+#include <external/ANN/ANN.h>
 
 class PoseExample
 {
@@ -42,6 +42,7 @@ public:
 	void buildResamplePoseData(float fMinDist = 1.0);
 
 	const VecOfPoseExample& getExamplePoseData() const { return examplePoseData; }
+	const VecOfPoseExample& getResamplePoseData() const { return resamplePosedata; }
 	virtual bool controller_evaluate( double t, MeFrameData& frame );
 private:
 	void getPoseExampleFromSkeleton(PoseExample& pose);
@@ -49,7 +50,13 @@ private:
 	void blendPose(SrArray<SrQuat>& blendPoses, SrArray<float>& KNNweights, SrArray<PoseExample*>& KNNPoses);	
 
 	// brute force method to look up nearby examples
-	int  linearKNN(VecOfPoseExample& curList, PoseExample& newData, int nK, SrArray<PoseExample*>& KNN, SrArray<float>& dists);
+	int  linearKNN(VecOfPoseExample& curList, PoseExample& newData, int nK, SrArray<float>& dists, SrArray<PoseExample*>& KNN);
+
+	SrVec randomPointInBox(SrBox& box);
+	void computeWeightFromDists(SrArray<float>& dists, SrArray<float>& outWeights);
+	void generateRandomWeight(int nK, SrArray<float>& outWeights);
+	float Random(float r_min, float r_max);
+	void getPoseParameter(SrArray<double>& para, SkSkeleton* skeleton);
 };
 
 template <class T> 

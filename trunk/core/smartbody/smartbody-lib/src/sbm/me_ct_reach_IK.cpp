@@ -19,8 +19,8 @@ void MeCtReachIK::adjust()
 	int i,j;
 	for(i = 0; i < max_iteration; ++i)
 	{
-		//for(j = start_joint_index; j != manipulated_joint_index; ++j)
-		for(j = manipulated_joint_index-1 ; j >= start_joint_index; j--) 
+		for(j = start_joint_index; j != manipulated_joint_index; ++j)
+		//for(j = manipulated_joint_index-1 ; j >= start_joint_index; j--) 
 		{
 			/*if(reach_destination()) 
 			{

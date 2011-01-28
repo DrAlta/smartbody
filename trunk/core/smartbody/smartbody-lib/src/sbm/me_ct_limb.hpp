@@ -1,6 +1,7 @@
 #pragma once
 #include "me_ct_IK_scenario.hpp"
 #include "gwiz_math.h"
+#include <sk/sk_motion.h>
 
 
 // Contains the joint chains and rotation info for IK
@@ -18,6 +19,7 @@ public:
 
 	SkJoint* getChainRoot();
 	SkJoint* getChainEndEffector();
+	bool hasJoint(SkJoint* joint);
 	void init(SkSkeleton* skel);
 	// To-Do : build a tree traversal to find directed path between root node and effector node
 	bool buildJointChain(const char* root_name, const char* effector_name) {}
@@ -26,4 +28,6 @@ public:
 	bool buildJointChain(SrArray<const char*>& joint_names, SrArray<MeCtIKJointLimit>& joint_limit);
 	float computeLimbLength();
 	void updateQuat(MeFrameData& frame, bool bRead = true);
+	void updateQuatToJointChain(SrArray<SrQuat>& joint_quat);
+	void updateMotionFrameToJointChain(SkMotion* motion, int frame);
 };
