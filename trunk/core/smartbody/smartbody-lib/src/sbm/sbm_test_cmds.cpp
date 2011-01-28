@@ -425,7 +425,8 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 
 		std::map<std::string, SkPosture*>::iterator postureIter = mcu->pose_map.find(posture);
 		if (postureIter == mcu->pose_map.end()) {
-			LOG("WARNING: Unknown posture \"%s\".", posture.c_str());
+			// the pose_map is deprecated - don't show the message
+			//LOG("WARNING: Unknown posture \"%s\".", posture.c_str());
 		}
 
 		ostringstream bml;
