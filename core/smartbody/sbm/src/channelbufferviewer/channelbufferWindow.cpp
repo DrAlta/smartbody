@@ -498,6 +498,9 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 		item.type = channel.type;
 		channel_index += channelSize;
 	}
+
+	
+	
 }
 
 const char* ChannelBufferWindow::getSelectedCharacterName()
@@ -525,7 +528,9 @@ void ChannelBufferWindow::refreshChannels(fltk::Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	loadChannels(window);
+	window->chartview->get_archive()->ClearSeries();
 	refreshChannelsWidget(window);
+	refreshMonitoredChannelsWidget(window);
 }
 
 void ChannelBufferWindow::refreshMotionChannels(fltk::Widget* widget, void* data)
@@ -575,7 +580,8 @@ void ChannelBufferWindow::refreshMotionChannels(fltk::Widget* widget, void* data
 					&& window->Channel_item_list.get(j).type == type)
 				{
 					window->Channel_item_list.get(j).motion_filtered = false;
-					if(window->Channel_item_list.get(j).monitored) fillSeriesWithMotionData(window, motion, NULL, window->Channel_item_list.get(j));
+					if(window->Channel_item_list.get(j).monitored) 
+						fillSeriesWithMotionData(window, motion, NULL, window->Channel_item_list.get(j));
 					break;
 				}
 			}
