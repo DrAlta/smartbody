@@ -67,15 +67,16 @@ MeCtLocomotionLimb::~MeCtLocomotionLimb() {
 		MeCtLocomotionLimbAnim* anim = walking_list.get(x);
 		delete anim;
 	}
-	walking_list.capacity(0);
+	//walking_list.capacity(0);
 
 	for (int x = 0; x < support_joint_list.size(); x++)
 	{
 		delete support_joint_list[x];
 	}
-	support_joint_list.capacity(0);
+	//support_joint_list.capacity(0);
 
-	free(limb_base_name);
+	if (limb_base_name)
+		free(limb_base_name);
 	delete blended_anim.global_info;
 	if (walking_skeleton)
 		this->walking_skeleton->unref();

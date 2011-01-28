@@ -411,7 +411,7 @@ void cleanup( void )	{
 }
 
 void signal_handler(int sig) {
-	std::cout << "SmartBody shutting down after catching signal " << sig << std::endl;
+//	std::cout << "SmartBody shutting down after catching signal " << sig << std::endl;
 
 	// get the current directory
 	char buffer[MAX_PATH];
@@ -443,7 +443,7 @@ void signal_handler(int sig) {
 				if(res)
 					dumpFile << res->dump() << std::endl;
 			}
-			std::cout << "Wrote commands to " << file << std::endl;
+			//std::cout << "Wrote commands to " << file << std::endl;
 
 			dumpFile.close();
 
@@ -706,14 +706,14 @@ int main( int argc, char **argv )	{
 
 	mcu.speech_audiofile_base_path = "../../../../";
 
-/*	(void)signal( SIGABRT, signal_handler );
-	(void)signal( SIGFPE, signal_handler );
-	(void)signal( SIGILL, signal_handler );
-	(void)signal( SIGINT, signal_handler );
-	(void)signal( SIGSEGV, signal_handler );
-	(void)signal( SIGTERM, signal_handler );
-	//(void)signal( SIGBREAK, signal_handler );*/
-	//atexit( exit_callback );
+//	(void)signal( SIGABRT, signal_handler );
+//	(void)signal( SIGFPE, signal_handler );
+//	(void)signal( SIGILL, signal_handler );
+//	(void)signal( SIGINT, signal_handler );
+//	(void)signal( SIGSEGV, signal_handler );
+//	(void)signal( SIGTERM, signal_handler );
+	(void)signal( SIGBREAK, signal_handler );
+//	atexit( exit_callback );
 
 	srCmdLine cmdl;
 	printf("> " );
@@ -847,7 +847,7 @@ mcu.mark( "main", 0, "render" );
 mcu.mark( "main" );
 	}
 
-	cleanup();
+	//cleanup();
 	//vhcl::Log::g_log.RemoveAllListeners();
 	//delete listener;
 //	delete sbmWindow;
