@@ -45,7 +45,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\src;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;..\..\..\..\lib\ANN"
+				AdditionalIncludeDirectories="..\src;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost"
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -67,9 +67,8 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="ANN.lib"
 				OutputFile="..\lib\Smartbodyd.lib"
-				AdditionalLibraryDirectories="..\..\..\..\lib\ANN"
+				AdditionalLibraryDirectories=""
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -1730,6 +1729,118 @@
 				RelativePath="..\src\sr\sr_viewer.h"
 				>
 			</File>
+		</Filter>
+		<Filter
+			Name="external"
+			>
+			<Filter
+				Name="ANN"
+				>
+				<File
+					RelativePath="..\src\external\ANN\ANN.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\ANN.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\ANNperf.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\ANNx.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\bd_fix_rad_search.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\bd_pr_search.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\bd_search.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\bd_tree.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\bd_tree.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\brute.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\kd_dump.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\kd_fix_rad_search.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\kd_fix_rad_search.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\kd_pr_search.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\kd_pr_search.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\kd_search.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\kd_search.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\kd_split.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\kd_split.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\kd_tree.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\kd_tree.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\kd_util.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\kd_util.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\perf.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\pr_queue.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\ANN\pr_queue_k.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

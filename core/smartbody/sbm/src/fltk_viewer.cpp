@@ -3122,12 +3122,12 @@ void FltkViewer::drawReach()
 
 		
 		// draw reach Example data
-		const VecOfPoseExample& exampleData = reachCt->getExamplePoseData();
+		const VecOfPoseExample& exampleData = reachCt->getResamplePoseData();
 		character->skeleton_p->update_global_matrices();
-		//SkJoint* root = character->skeleton_p->root();
-		SkJoint* root = reachCt->getRootJoint();
-		SrMat rootMat;
-		rootMat.translation(root->gmat().get(12),root->gmat().get(13),root->gmat().get(14));
+		SkJoint* root = character->skeleton_p->root();
+		//SkJoint* root = reachCt->getRootJoint();
+		SrMat rootMat = root->gmat();
+		//rootMat.translation(root->gmat().get(12),root->gmat().get(13),root->gmat().get(14));
 
 		SrPoints srExamplePts;	
 		srExamplePts.init_with_attributes();

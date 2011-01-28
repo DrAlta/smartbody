@@ -139,6 +139,7 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 	}
 	// build example database
 	reachCt->buildPoseExamplesFromMotions();	
+	reachCt->buildResamplePoseData(5.0f);
 #endif
 
 
