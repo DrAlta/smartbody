@@ -540,7 +540,7 @@ void mcuCBHandle::update( void )	{
 #endif
 			int err = execute( cmd );
 			if( err != CMD_SUCCESS )	{
-				printf( "mcuCBHandle::update ERR: execute FAILED: '%s'\n", cmd );
+				LOG( "mcuCBHandle::update ERR: execute FAILED: '%s'\n", cmd );
 			}
 			delete [] cmd;
 		}

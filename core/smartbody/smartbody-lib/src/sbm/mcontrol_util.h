@@ -363,7 +363,7 @@ class mcuCBHandle	{
 			resource->setChildrenLimit(resource_manager->getLimit());	// assuming the limit of total resources( path, motion, file, command) is the same with the limit of children ( command resource only) number
 			resource->setCommand(strstr.str());
 			resource->setTime(time);
-			resource_manager->addResource(resource);
+			resource_manager->addCommandResource(resource);
 			
 			return( cmd_map.execute( key, args, this ) ); 
 		}
@@ -375,7 +375,7 @@ class mcuCBHandle	{
 			resource->setChildrenLimit(resource_manager->getLimit());	// assuming the limit of total resources( path, motion, file, command) is the same with the limit of children ( command resource only) number
 			resource->setCommand(strstr.str());
 			resource->setTime(time);
-			resource_manager->addResource(resource);
+			resource_manager->addCommandResource(resource);
 
             srArgBuffer args( strArgs );
 			return( cmd_map.execute( key, args, this ) ); 
@@ -386,7 +386,7 @@ class mcuCBHandle	{
 			resource->setChildrenLimit(resource_manager->getLimit());	// assuming the limit of total resources( path, motion, file, command) is the same with the limit of children ( command resource only) number
 			resource->setCommand(cmd);
 			resource->setTime(time);
-			resource_manager->addResource(resource);
+			resource_manager->addCommandResource(resource);
 
 			// check to see if this is a sequence command
 			// if so, save the command id

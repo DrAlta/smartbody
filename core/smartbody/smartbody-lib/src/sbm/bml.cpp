@@ -701,6 +701,51 @@ bool BmlRequest::registerBehavior( const std::wstring& id, BehaviorRequestPtr be
 //}
 
 
+float BmlRequest::parseSyncOffset(const std::wstring& notation, std::wstring& key, std::wstring& parent)
+{
+	size_t parentPos = notation.find(L":");
+	if (parentPos != std::wstring::npos)
+	{
+		parent = notation.substr(0, parentPos);
+	}
+
+	bool isOffset = false;
+	bool isPositive = true;
+	size_t pos = notation.find(L"+");
+	if (pos == wstring::npos)
+	{
+		pos = notation.find(L"-");
+		if (pos != wstring::npos)
+		{
+			isPositive = false;
+			isOffset = true;
+		}
+		else
+		{
+			pos = notation.size();
+		}
+	}
+	else
+	{
+		isOffset = true;
+	}
+
+	if (!isOffset)
+	{
+		key = notation;
+		//boost::trim(key);
+		return 0;
+	}
+
+	float offset = 0;
+	wistringstream floatconverter(notation.substr(pos + 1));
+	floatconverter >> offset;
+	if (!isPositive)
+		offset *= -1.0;
+
+	key = notation.substr(0, pos);
+	return offset;
+}
 
 SyncPointPtr BmlRequest::getSyncByReference( const std::wstring& notation ) {
 	typedef wstring::size_type size_type;

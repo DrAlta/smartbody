@@ -145,6 +145,7 @@ namespace BML {
 
 	protected:
 		friend class Processor;
+		float parseSyncOffset(const std::wstring& notation, std::wstring& key, std::wstring& parent);
 	};
 
 	//  Structure to keep track of a scheduled SBM command

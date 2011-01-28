@@ -25,19 +25,21 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 	}
 	
 	int numResources = mcu_p->resource_manager->getNumResources();
+	int numCommandResources = mcu_p->resource_manager->getNumCommandResources();
+	int numControllerResources = mcu_p->resource_manager->getNumControllerResources();
 
 	if(arg=="command")
 	{
-		int resourceLimit = numResources;
+		int resourceLimit = numCommandResources;
 		if (args.calc_num_tokens() > 0)
 		{
 			resourceLimit = args.read_int();
-			if (resourceLimit < 0 || resourceLimit > numResources)
-				resourceLimit = numResources;
+			if (resourceLimit < 0 || resourceLimit > numCommandResources)
+				resourceLimit = numCommandResources;
 		}
-		for (int r = numResources - resourceLimit; r < numResources; r++)
+		for (int r = numCommandResources - resourceLimit; r < numCommandResources; r++)
 		{
-			CmdResource * res = dynamic_cast<CmdResource  *>(mcu_p->resource_manager->getResource(r));
+			CmdResource* res =mcu_p->resource_manager->getCommandResource(r);
 			if(res)
 				LOG("%s", res->dump().c_str());
 		}		
@@ -80,13 +82,20 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 	}
 	if(arg == "controller")
 	{
-		for (int r = 0; r < numResources; r++)
+		int resourceLimit = numControllerResources;
+		if (args.calc_num_tokens() > 0)
 		{
-			ControllerResource * res = dynamic_cast<ControllerResource  *>(mcu_p->resource_manager->getResource(r));
+			resourceLimit = args.read_int();
+			if (resourceLimit < 0 || resourceLimit > numControllerResources)
+				resourceLimit = numControllerResources;
+		}
+		for (int r = numControllerResources - resourceLimit; r < numControllerResources; r++)
+		{
+			ControllerResource* res =mcu_p->resource_manager->getControllerResource(r);
 			if(res)
 				LOG("%s", res->dump().c_str());
-		}				
-		return CMD_SUCCESS;		
+		}		
+		return CMD_SUCCESS;
 	}
 
 	if(arg == "limit")

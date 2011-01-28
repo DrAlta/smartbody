@@ -62,6 +62,37 @@ void ResourceManager::addResource(Resource* r)
 	}
 }
 
+void ResourceManager::addCommandResource(CmdResource* cmd)
+{
+	if (cur_cmd_parent.size() > 0)
+	{
+		cur_cmd_parent.top()->addChild(cmd);
+		last_resource = cmd;
+	}
+	else
+	{
+		while(resources.size() >= resource_limit)
+		{
+			Resource* last = commandResources.front();
+			commandResources.pop_front();
+			delete last;
+		}
+		commandResources.push_back(cmd);
+		last_resource = cmd;
+	}
+}
+
+void ResourceManager::addControllerResource(ControllerResource* r)
+{
+		if(controllerResources.size() >= resource_limit)
+		{
+			ControllerResource* last = controllerResources.front();
+			controllerResources.pop_front();
+			delete last;
+		}
+		controllerResources.push_back(r);
+}
+
 void ResourceManager::removeParent()
 {
 	if (cur_cmd_parent.size() > 0)
@@ -74,13 +105,48 @@ int ResourceManager::getNumResources()
 	return resources.size();
 }
 
+int ResourceManager::getNumCommandResources()
+{
+	return commandResources.size();
+}
+
+int ResourceManager::getNumControllerResources()
+{
+	return controllerResources.size();
+}
+
 Resource* ResourceManager::getResource(unsigned int index)
 {
 	std::list<Resource *>::iterator iter= resources.begin();
 	for(unsigned int i = 0 ; i < index; i++)
 	{
 		iter ++;
-		if(iter == resources.end())	return NULL;
+		if (iter == resources.end())
+			return NULL;
+	}
+	return *iter;
+}
+
+CmdResource* ResourceManager::getCommandResource(unsigned int index)
+{
+	std::list<CmdResource *>::iterator iter= commandResources.begin();
+	for (unsigned int i = 0 ; i < index; i++)
+	{
+		iter ++;
+		if(iter == commandResources.end())
+			return NULL;
+	}
+	return *iter;
+}
+
+ControllerResource* ResourceManager::getControllerResource(unsigned int index)
+{
+	std::list<ControllerResource *>::iterator iter= controllerResources.begin();
+	for (unsigned int i = 0 ; i < index; i++)
+	{
+		iter ++;
+		if(iter == controllerResources.end())
+			return NULL;
 	}
 	return *iter;
 }
@@ -101,7 +167,7 @@ void ResourceManager::cleanup()
 		delete manager;
 	manager = NULL;
 }
-void ResourceManager::addParent(Resource* parent)
+void ResourceManager::addParent(CmdResource* parent)
 {
 	cur_cmd_parent.push(parent);
 }
