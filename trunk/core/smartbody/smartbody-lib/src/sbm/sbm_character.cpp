@@ -243,16 +243,18 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	setHeight(height);
 
 	eyelid_reg_ct_p = new MeCtEyeLidRegulator();
-	eyelid_reg_ct_p->ref();
-	if (!face_neutral)
-		eyelid_reg_ct_p->set_use_blink_viseme(true);
+	if( eyelid_reg_ct_p )	{
+		eyelid_reg_ct_p->ref();
+		if (!face_neutral)
+			eyelid_reg_ct_p->set_use_blink_viseme( true );
 
-	eyelid_reg_ct_p->init(true);
-	eyelid_reg_ct_p->set_upper_range( -30.0, 30.0 );
-	eyelid_reg_ct_p->set_close_angle( 30.0 );
-	ostringstream ct_name;
-	ct_name << name << "'s eyelid controller";
-	eyelid_reg_ct_p->name( ct_name.str().c_str() );
+		eyelid_reg_ct_p->init(true);
+		eyelid_reg_ct_p->set_upper_range( -30.0, 30.0 );
+		eyelid_reg_ct_p->set_close_angle( 30.0 );
+		ostringstream ct_name;
+		ct_name << name << "'s eyelid controller";
+		eyelid_reg_ct_p->name( ct_name.str().c_str() );
+	}
 
 	//if (use_locomotion) 
 	{
@@ -300,7 +302,9 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 	ct_tree_p->add_controller( reach_sched_p );
 
-	ct_tree_p->add_controller( eyelid_reg_ct_p );
+	if( eyelid_reg_ct_p )
+		ct_tree_p->add_controller( eyelid_reg_ct_p );
+
 	ct_tree_p->add_controller( head_sched_p );
 	ct_tree_p->add_controller( param_sched_p );
 
@@ -1750,8 +1754,16 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 
 			string eyelid_cmd  = args.read_token();
 			if( eyelid_cmd.length()==0 ) {
-				LOG("ERROR: Expected eyelid command.");
-				return( CMD_FAILURE );
+
+				LOG( "char <> eyelid <command>:" );
+				LOG( " eyelid print" );
+				LOG( " eyelid pitch 0|1" );
+				LOG( " eyelid range <upper-min> <upper-max> [<lower-min> <lower-max>]" );
+				LOG( " eyelid close <closed-angle>" );
+				LOG( " eyelid tight <upper-weight> [<lower-weight>]" );
+
+//				eyelid_reg_ct_p->test();
+				return( CMD_SUCCESS );
 			}
 
 			int n = args.calc_num_tokens();
@@ -1762,7 +1774,10 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 					eyelid_reg_ct_p->set_eyeball_tracking( enable );
 				}
 				else	{
-
+					LOG( "MeCtEyeLidRegulator: pitch tracking %s", 
+						eyelid_reg_ct_p->get_eyeball_tracking() ?
+						"ENABLED" : "DISABLED"
+					);
 				}
 				return( CMD_SUCCESS );
 			}
