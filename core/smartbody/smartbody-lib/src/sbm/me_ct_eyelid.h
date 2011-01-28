@@ -31,6 +31,8 @@
 
 class MeCtEyeLidRegulator : public MeController	{ 
 
+	private:
+
 	class LidSet	{
 	
 		public:
@@ -95,26 +97,31 @@ class MeCtEyeLidRegulator : public MeController	{
 
 		void print( void );
 
+		bool get_eyeball_tracking( void ) { return( pitch_tracking ); }
 		void set_eyeball_tracking( bool enable )	{
 			pitch_tracking = enable;
 			if (!pitch_tracking) {
 				UL_set.set_pitch( 0.0f );
 				UR_set.set_pitch( 0.0f );
-			#if 0
+#if 0
 				LL_set.set_pitch( 0.0f );
 				LR_set.set_pitch( 0.0f );
-			#endif
+#endif
 			}
 		}
 
 		void set_upper_range( float fr, float to )	{
-			UL_set.set_range( fr, to );
-			UR_set.set_range( fr, to );
+			float mn = min( fr, to );
+			float mx = max( fr, to );
+			UL_set.set_range( mn, mx );
+			UR_set.set_range( mn, mx );
 		}
 		
 		void set_lower_range( float fr, float to )	{
-			LL_set.set_range( fr, to );
-			LR_set.set_range( fr, to );
+			float mn = min( fr, to );
+			float mx = max( fr, to );
+			LL_set.set_range( mx, mn );
+			LR_set.set_range( mx, mn );
 		}
 
 		void set_close_angle( float angle )	{
@@ -151,7 +158,17 @@ class MeCtEyeLidRegulator : public MeController	{
 		// uses the "blink" viseme instead of au_45
 		void set_use_blink_viseme(bool val);
 		bool get_use_blink_viseme();
+
 	private:
+		float min( float a, float b )	{
+			if( a < b ) return( a );
+			return( b );
+		}
+		float max( float a, float b )	{
+			if( a > b ) return( a );
+			return( b );
+		}
+
 		float smooth( float sm, double dt, float soft, float hard );
 		float granular( float in, float min, float max, int grains );
 		

@@ -108,11 +108,35 @@ float MeCtEyeLidRegulator::LidSet::get_mapped_weight( float in_weight )	{
 }
 
 void MeCtEyeLidRegulator::test( void )	{
+	int i;
 
 	LidSet lid;
 
 	printf( "LidSet TEST:\n" );
 
+	lid.set_range( -30.0f, 30.0f );
+	lid.set_close( 30.0f );
+	lid.set_tighten( 0.0f );
+	lid.set_pitch( 0.0f );
+
+	for( i=0; i<=10; i++ )	{
+		float f = (float)i/10.0f;
+		float w = lid.get_mapped_weight( f );
+		printf( "[%d] f:%f w:%f\n", i, f, w );
+	}
+
+	lid.set_tighten( 0.5f );
+	for( i=0; i<=10; i++ )	{
+		float f = (float)i/10.0f;
+		
+		lid.set_range( -30.0f + f * 30.0f, 30.0f );
+		
+		float w = lid.get_mapped_weight( 0.5 );
+		printf( "[%d] f:%f w:%f\n", i, f, w );
+	}
+
+
+#if 0
 	lid.set_range( -30.0f, 30.0f );
 //	lid.set_close( 30.0f );
 //	lid.set_range( 30.0f, 0.0f );
@@ -120,7 +144,6 @@ void MeCtEyeLidRegulator::test( void )	{
 //	lid.set_pitch( -15.0f );
 	lid.print();
 
-	int i;
 	for( i=0; i<=10; i++ )	{
 		float f = (float)i/10.0f;
 		float w = lid.get_mapped_weight( f );
@@ -142,6 +165,7 @@ void MeCtEyeLidRegulator::test( void )	{
 		float w = lid.get_mapped_weight( f );
 		printf( "[%d] f:%f w:%f\n", i, f, w );
 	}
+#endif
 
 #if 0
 //	lid.set_range( -50.0f, 0.0f );
