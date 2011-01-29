@@ -40,6 +40,7 @@ void MeCtLimb::updateQuatToJointChain( SrArray<SrQuat>& joint_quat )
 	{
 		joint_chain[i]->quat()->value(joint_quat[i]);
 	}
+	skeleton->invalidate_global_matrices();
 }
 
 void MeCtLimb::updateQuat(MeFrameData& frame, bool bRead)

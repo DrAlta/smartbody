@@ -67,6 +67,8 @@
 #include <sbm/general_param_setting.h>
 //#include <me/me_spline_1d.hpp>
 
+
+
 class SbmCharacter : public SbmPawn	{
 
 public:
@@ -75,6 +77,8 @@ public:
 	GeneralParamMap*   param_map;
 
 protected:
+	// reach motion database for example-based IK reaching
+	MotionDataSet      reachMotionData;
 
 	// The implementation to be used for speech (NULL if unset) 
 	SmartBody::SpeechInterface* speech_impl;
@@ -281,6 +285,9 @@ public:
 
 
 public:
+
+	bool addReachMotion(SkMotion* motion);
+	MotionDataSet& getReachMotionDataSet() { return reachMotionData;}
 
 	AUChannelMap& get_au_channel_map( void ) { return au_channel_map; }
 	

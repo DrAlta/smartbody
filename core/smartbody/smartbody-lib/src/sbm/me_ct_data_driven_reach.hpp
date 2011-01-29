@@ -1,5 +1,6 @@
 #pragma once
 #include "me_ct_reach.hpp"
+#include "sr/sr_box.h"
 #include <external/ANN/ANN.h>
 
 class PoseExample
@@ -13,7 +14,29 @@ public:
 	PoseExample& operator=(const PoseExample& rhs);
 };
 
+
 typedef std::vector<PoseExample> VecOfPoseExample;
+
+class PoseExampleSet
+{
+protected:	
+	VecOfPoseExample poseData;		
+	ANNpointArray dataPts; // data points	
+	ANNkd_tree* kdTree; // search structure
+public:
+	PoseExampleSet();
+	~PoseExampleSet();	
+
+	const VecOfPoseExample& PoseData() const { return poseData; }
+
+	void buildKDTree();
+	void kdTreeKNN(const SrArray<double>& parameter, SrArray<float>& dists, SrArray<PoseExample*>& KNN, int nK);
+	int linearKNN(const SrArray<double>& parameter, SrArray<float>& dists, SrArray<PoseExample*>& KNN, int nK);	
+
+	bool addPose(const PoseExample& poseEx, float fMinDist = -1.f);
+	SrBox computeBBox();
+	void clearData();
+};
 
 // MeCtDataDrivenReach improves the IK result by interpolating the example motions 
 // Based on end-effector position ( or any other designated pose parameters ), a pose is predicted from examples
@@ -23,44 +46,36 @@ class MeCtDataDrivenReach :
 	public MeCtReach
 {
 protected:
-	SrArray<SkMotion*> motionData; // training motions to improve IK results
-	VecOfPoseExample examplePoseData; // extracted example poses from training motions		
-	VecOfPoseExample resamplePosedata;
-	// for KNN search
-	ANNkd_tree* kdTree; // search structure
-	ANNpointArray dataPts; // data points		
+	MotionDataSet motionData; // training motions to improve IK results
+	PoseExampleSet examplePoseData; // extracted example poses from training motions			
+	PoseExampleSet resampledPosedata;		
 public:
 	// a hack for debugging only
-	static bool useDataDriven;
-	static bool useIK;
+	bool useDataDriven;
+	bool useIK;
 public:
 	MeCtDataDrivenReach(SkSkeleton* sk);
 	~MeCtDataDrivenReach(void);
+	const PoseExampleSet& ResampledPosedata() const { return resampledPosedata; }
+	const PoseExampleSet& ExamplePoseData() const { return examplePoseData; }	
 
-	void addMotion(SkMotion* motion);
-	void buildPoseExamplesFromMotions(); 
-	void buildResamplePoseData(float fMinDist = 1.0);
-
-	const VecOfPoseExample& getExamplePoseData() const { return examplePoseData; }
-	const VecOfPoseExample& getResamplePoseData() const { return resamplePosedata; }
+	void updateExamplesFromMotions(MotionDataSet& inMotionSet, bool rebuild = false, float minDist = 5.0);	
+	void buildResamplePoseData(int nExamples, float fMinDist = 1.0);
 	virtual bool controller_evaluate( double t, MeFrameData& frame );
 private:
-	void getPoseExampleFromSkeleton(PoseExample& pose);
-	void findKNNPoseExamples(SrArray<double>& parameter, SrArray<float>& KNNweights, SrArray<PoseExample*>& KNNPoses, int nK);
-	void blendPose(SrArray<SrQuat>& blendPoses, SrArray<float>& KNNweights, SrArray<PoseExample*>& KNNPoses);	
-
-	// brute force method to look up nearby examples
-	int  linearKNN(VecOfPoseExample& curList, PoseExample& newData, int nK, SrArray<float>& dists, SrArray<PoseExample*>& KNN);
-
-	SrVec randomPointInBox(SrBox& box);
-	void computeWeightFromDists(SrArray<float>& dists, SrArray<float>& outWeights);
-	void generateRandomWeight(int nK, SrArray<float>& outWeights);
-	float Random(float r_min, float r_max);
 	void getPoseParameter(SrArray<double>& para, SkSkeleton* skeleton);
+	void getPoseExampleFromSkeleton(PoseExample& pose);		
+	
+	static void blendPose(SrArray<SrQuat>& blendPoses, SrArray<float>& KNNweights, SrArray<PoseExample*>& KNNPoses);		
+	static void computeWeightFromDists(SrArray<float>& dists, SrArray<float>& outWeights);
+	static void generateRandomWeight(int nK, SrArray<float>& outWeights);
+	static float Random(float r_min, float r_max);
+	static SrVec randomPointInBox(SrBox& box);	
+	static SrVec getWorldPos(SkJoint* joint);
 };
 
 template <class T> 
-void Plus(SrArray<T>& A, SrArray<T>& B, SrArray<T>& Out, double ratio)
+void Plus(const SrArray<T>& A, const SrArray<T>& B, SrArray<T>& Out, double ratio)
 {
 	assert(A.size() == B.size());
 	Out.size(A.size());
@@ -80,7 +95,7 @@ T Norm2(SrArray<T>& Out)
 };
 
 template <class T>
-T Dist(SrArray<T>& A, SrArray<T>& B)
+T Dist(const SrArray<T>& A, const SrArray<T>& B)
 {
 	SrArray<T> diff;
 	Plus(A,B,diff,-1.0);

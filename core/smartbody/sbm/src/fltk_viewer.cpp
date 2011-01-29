@@ -437,6 +437,7 @@ void FltkViewer::show_menu ()
 void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
  {
 	 bool applyToCharacter = false; 
+	 MeCtDataDrivenReach* reachCt = getCurrentCharacterReachController();
 
    switch ( s )
     { case CmdHelp : _data->helpwin->show(); _data->helpwin->active(); break;
@@ -591,10 +592,16 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 		  set_reach_target(s-CmdReachOnTargetRight,label);
 		  break;
 	  case CmdReachToggleData:
-		  MeCtDataDrivenReach::useDataDriven = !MeCtDataDrivenReach::useDataDriven;
+		  if (reachCt)
+		  {
+			  reachCt->useDataDriven = !reachCt->useDataDriven;
+		  }		  
 		  break;
 	  case CmdReachToggleIK:
-		  MeCtDataDrivenReach::useIK = !MeCtDataDrivenReach::useIK;
+		  if (reachCt)
+		  {
+			  reachCt->useIK = !reachCt->useIK;
+		  }	
 		  break;      
     }
 	
@@ -3079,16 +3086,11 @@ void FltkViewer::drawDynamics()
 		glPopMatrix();
 		character = character_map.next();
 	}
-
-	
-
 }
 
-// visualize example data and other relevant information for reach controller
-void FltkViewer::drawReach()
-{	
-	glPushAttrib(GL_LIGHTING_BIT | GL_POINT_BIT);
-	glDisable(GL_LIGHTING);
+
+SbmCharacter* FltkViewer::getCurrentCharacter()
+{
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SbmCharacter* character = NULL;	
 	// get current character
@@ -3096,14 +3098,21 @@ void FltkViewer::drawReach()
 	for(int i = 0; i <= _locoData->char_index; ++i)
 	{
 		character = mcu.character_map.next();		
-	}	
+	}
+	return character;
+}
 
+
+MeCtDataDrivenReach* FltkViewer::getCurrentCharacterReachController()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SbmCharacter* character = getCurrentCharacter();
+
+	MeCtDataDrivenReach* reachCt = NULL;
 	if ( character )
 	{
 		MeCtSchedulerClass* reachSched = character->reach_sched_p;
-		MeCtSchedulerClass::VecOfTrack reach_tracks = reachSched->tracks();
-	
-		MeCtDataDrivenReach* reachCt = NULL;
+		MeCtSchedulerClass::VecOfTrack reach_tracks = reachSched->tracks();		
 		MeCtReach* tempCt = NULL;
 		for (unsigned int c = 0; c < reach_tracks.size(); c++)
 		{
@@ -3113,16 +3122,25 @@ void FltkViewer::drawReach()
 			if (reachCt)
 				break;
 		}		
+	}
+	return reachCt;
 
-		if (!reachCt)
-		{
-			//LOG("No data driven reach controller");
-			return;
-		}
+}
 
-		
+// visualize example data and other relevant information for reach controller
+void FltkViewer::drawReach()
+{	
+	
+	glPushAttrib(GL_LIGHTING_BIT | GL_POINT_BIT);
+	glDisable(GL_LIGHTING);
+	
+	MeCtDataDrivenReach* reachCt = getCurrentCharacterReachController();
+	SbmCharacter* character = getCurrentCharacter();
+	if (reachCt)
+	{	
 		// draw reach Example data
-		const VecOfPoseExample& exampleData = reachCt->getResamplePoseData();
+		const VecOfPoseExample& exampleData = reachCt->ExamplePoseData().PoseData();
+		const VecOfPoseExample& resampledData = reachCt->ResampledPosedata().PoseData();
 		character->skeleton_p->update_global_matrices();
 		SkJoint* root = character->skeleton_p->root();
 		//SkJoint* root = reachCt->getRootJoint();
@@ -3140,9 +3158,20 @@ void FltkViewer::drawReach()
 			drawPoint(gPos[0],gPos[1],gPos[2],1.5,SrVec(0.0,0.0,1.0));
 			//PositionControl::drawSphere(gPos,1.0f);			
 		}		
+
+		for (unsigned int i=0;i<resampledData.size();i++)
+		{
+			const PoseExample& exPose = resampledData[i];
+			SrVec lPos = SrVec((float)exPose.poseParameter[0],(float)exPose.poseParameter[1],(float)exPose.poseParameter[2]);
+			SrVec gPos = lPos*rootMat; // transform to global coordinate
+			//drawCircle(gPos[0],gPos[1],gPos[2],1.0,5,SrVec(1.0,0.0,0.0));			
+			drawPoint(gPos[0],gPos[1],gPos[2],1.5,SrVec(1.0,0.0,1.0));
+			//PositionControl::drawSphere(gPos,1.0f);			
+		}	
 	}
 
 	glPopAttrib();
+	
 	
 }
 

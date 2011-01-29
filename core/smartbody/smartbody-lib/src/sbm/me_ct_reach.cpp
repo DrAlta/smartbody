@@ -15,19 +15,19 @@ const char limb_chain_l[][20] = {"l_shoulder", "l_elbow", "l_forearm", "l_wrist"
 
 const MeCtIKJointLimit limb_joint_limit_r[] = { 							
 	{SrVec2(PI_CONST*0.5f, PI_CONST*0.4f), SrVec2(PI_CONST*0.7f,PI_CONST*0.3f),SrVec2(PI_CONST*0.5f,-PI_CONST*0.5f)},											 
-	{SrVec2(PI_CONST*0.01f, PI_CONST*0.01f), SrVec2(PI_CONST*0.8f,PI_CONST*0.05f),SrVec2(PI_CONST*0.01f,-PI_CONST*0.01f)},                                              
-	{SrVec2(PI_CONST*0.01f, PI_CONST*0.01f), SrVec2(PI_CONST*0.01f,PI_CONST*0.01f),SrVec2(PI_CONST*0.2f,-PI_CONST*0.2f)},                                              
-	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.3f,PI_CONST*0.3f),SrVec2(PI_CONST*0.3f,-PI_CONST*0.3f)},                                              
-	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.3f,PI_CONST*0.3f),SrVec2(PI_CONST*0.3f,-PI_CONST*0.3f)},								    
+	{SrVec2(PI_CONST*0.01f, PI_CONST*0.01f), SrVec2(PI_CONST*0.8f,PI_CONST*0.05f),SrVec2(PI_CONST*0.1f,-PI_CONST*0.1f)},                                              
+	{SrVec2(PI_CONST*0.01f, PI_CONST*0.01f), SrVec2(PI_CONST*0.01f,PI_CONST*0.01f),SrVec2(PI_CONST*0.01f,-PI_CONST*0.01f)},                                              
+	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.3f,PI_CONST*0.3f),SrVec2(PI_CONST*0.01f,-PI_CONST*0.01f)},                                              
+	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.3f,PI_CONST*0.3f),SrVec2(PI_CONST*0.01f,-PI_CONST*0.01f)},								    
 };
 
 // since the coordinates are flip in the left-arm, all joint limits need to be flipped as well.
 const MeCtIKJointLimit limb_joint_limit_l[] = { 							
 	{SrVec2(PI_CONST*0.4f, PI_CONST*0.5f), SrVec2(PI_CONST*0.3f,PI_CONST*0.7f),SrVec2(PI_CONST*0.5f,-PI_CONST*0.5f)},											 
-	{SrVec2(PI_CONST*0.01f, PI_CONST*0.01f), SrVec2(PI_CONST*0.05f,PI_CONST*0.8f),SrVec2(PI_CONST*0.01f,-PI_CONST*0.01f)},                                              
-	{SrVec2(PI_CONST*0.01f, PI_CONST*0.01f), SrVec2(PI_CONST*0.01f,PI_CONST*0.01f),SrVec2(PI_CONST*0.2f,-PI_CONST*0.2f)},                                              
-	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.3f,PI_CONST*0.3f),SrVec2(PI_CONST*0.3f,-PI_CONST*0.3f)},                                              
-	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.3f,PI_CONST*0.3f),SrVec2(PI_CONST*0.3f,-PI_CONST*0.3f)},								    
+	{SrVec2(PI_CONST*0.01f, PI_CONST*0.01f), SrVec2(PI_CONST*0.05f,PI_CONST*0.8f),SrVec2(PI_CONST*0.1f,-PI_CONST*0.1f)},                                              
+	{SrVec2(PI_CONST*0.01f, PI_CONST*0.01f), SrVec2(PI_CONST*0.01f,PI_CONST*0.01f),SrVec2(PI_CONST*0.01f,-PI_CONST*0.01f)},                                              
+	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.3f,PI_CONST*0.3f),SrVec2(PI_CONST*0.01f,-PI_CONST*0.01f)},                                              
+	{SrVec2(PI_CONST*0.3f, PI_CONST*0.3f), SrVec2(PI_CONST*0.3f,PI_CONST*0.3f),SrVec2(PI_CONST*0.01f,-PI_CONST*0.01f)},								    
 };
 #else
 const int  NUM_LIMBS = 5;
