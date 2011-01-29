@@ -2204,3 +2204,13 @@ int SbmCharacter::print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return SbmPawn::print_attribute( character, attribute, args, mcu_p );
 	}
 }
+
+bool SbmCharacter::addReachMotion( SkMotion* motion )
+{
+	if (reachMotionData.find(motion) == reachMotionData.end()) 
+	{
+		reachMotionData.insert(motion);
+		return true;
+	}
+	return false;
+}

@@ -49,7 +49,7 @@ MeCtIKScenarioJointInfo::MeCtIKScenarioJointInfo()
 	is_support_joint = 0;
 	support_joint_height = 0.0f;
 	support_joint_comp = 0.0f;
-	angular_speed_limit = 5.f;
+	angular_speed_limit = 120.f;
 	memset(&constraint, 0, sizeof(constraint));
 	axis.set(0,0,0);
 

@@ -43,8 +43,6 @@
 
 #include "ObjectManipulationHandle.h"
 
-
-
 class SrQuat;
 class SrVec;
 class SrEvent;
@@ -54,6 +52,8 @@ class SrViewer;
 class SrLight;
 class FltkViewerData;
 class LocomotionData;
+class SbmCharacter;
+class MeCtDataDrivenReach;
 
 /*! \class SrViewer sr_viewer.h
     \brief A fltk-opengl viewer
@@ -325,6 +325,8 @@ protected:
 	void set_reach_target(int itype, const char* targetname);	
 	void update_submenus();
 	void create_popup_menus();
+	MeCtDataDrivenReach* getCurrentCharacterReachController();
+	SbmCharacter*        getCurrentCharacter();
  };
 
 

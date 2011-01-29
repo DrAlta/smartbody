@@ -5,6 +5,8 @@
 #include "me_ct_reach_IK.hpp"
 #include "gwiz_math.h"
 
+typedef std::set<SkMotion*> MotionDataSet;
+
 class MeCtReach : public MeController
 {
 private:
@@ -25,7 +27,7 @@ protected:
 	MeCtLimb             limb;
 	float                limb_length;	
 	SrArray<const char*> joint_name;	
-	SrArray<MeCtIKJointLimit>        joint_limit;
+	SrArray<MeCtIKJointLimit> joint_limit;
 	float 			_duration;
 	SkChannelArray	_channels;
 	SrVec   		target_pos;

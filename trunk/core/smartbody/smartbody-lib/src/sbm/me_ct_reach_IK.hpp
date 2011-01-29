@@ -17,6 +17,8 @@ public:
 	float getDt() const { return dt; }
 	void setDt(float val) { dt = val; }
 
+	static SrQuat dampQuat(const SrQuat& prevQuat, const SrQuat& nextQuat, float damping_angle);
+
 protected:
 	virtual void adjust();		
 	virtual void calc_target(SrVec& orientation, SrVec& offset);	
@@ -28,4 +30,5 @@ protected:
 
 protected: // a hack to get rotation axis re-align	
 	float dt; // for constraining rotation speed
+	SrArray<SrQuat> cur_quatList;
 };

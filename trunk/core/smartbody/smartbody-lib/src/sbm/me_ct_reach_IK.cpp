@@ -13,23 +13,44 @@ MeCtReachIK::~MeCtReachIK(void)
 {
 }
 
+
+SrQuat MeCtReachIK::dampQuat( const SrQuat& prevQuat, const SrQuat& nextQuat, float damping_angle )
+{
+	SrQuat diff = prevQuat.inverse()*nextQuat;	
+	diff.normalize();
+	float angle = diff.angle() > damping_angle ? damping_angle : diff.angle();
+	diff.set(diff.axis(),angle);
+	SrQuat newQuat = prevQuat*diff;
+	newQuat.normalize();
+	return newQuat;
+}
+
 void MeCtReachIK::adjust()
 {
 	int reach = 0;
-	int i,j;
+	int i,j;	
 	for(i = 0; i < max_iteration; ++i)
 	{
-		for(j = start_joint_index; j != manipulated_joint_index; ++j)
-		//for(j = manipulated_joint_index-1 ; j >= start_joint_index; j--) 
+		//for(j = start_joint_index; j != manipulated_joint_index; ++j)
+		for(j = manipulated_joint_index-1 ; j >= start_joint_index; j--) 
 		{
 			/*if(reach_destination()) 
 			{
 				reach = 1;
 				break;
-			}*/
+			}*/			
 			ccdRotate(scenario->joint_pos_list.get(manipulated_joint_index), j);
 		}
 		if(reach) break;
+	}
+
+	// damping
+
+	for (int i=0;i<scenario->joint_quat_list.size();i++)
+	{
+		MeCtIKScenarioJointInfo* info = &(scenario->joint_info_list.get(i));
+		float damping_angle = (float)RAD(info->angular_speed_limit*getDt());
+		scenario->joint_quat_list[i] = dampQuat(cur_quatList[i],scenario->joint_quat_list[i],damping_angle);		
 	}
 }
 
@@ -130,10 +151,6 @@ void MeCtReachIK::ccdRotate(SrVec& src, int start_index)
 	SrVec r_axis;
 	SrQuat q;
 	SrMat mat, mat_inv;
-
-	MeCtIKScenarioJointInfo* info = &(scenario->joint_info_list.get(start_index));
-    float damping_angle = (float)RAD(info->angular_speed_limit*getDt());
-
 	if(start_index == 0) mat_inv = scenario->gmat.inverse();
 	else mat_inv = scenario->joint_global_mat_list.get(start_index-1).inverse();
 	SrVec& pivot = scenario->joint_pos_list.get(start_index);
@@ -144,6 +161,8 @@ void MeCtReachIK::ccdRotate(SrVec& src, int start_index)
 	v1 = i_src - pivot;
 	v1.normalize();
 
+	MeCtIKScenarioJointInfo* info = &(scenario->joint_info_list.get(start_index));
+	float damping_angle = (float)RAD(info->angular_speed_limit*getDt());
 
 	if(scenario->joint_info_list.get(start_index).type == JOINT_TYPE_BALL)
 	{
@@ -155,38 +174,16 @@ void MeCtReachIK::ccdRotate(SrVec& src, int start_index)
 		{
 			if(start_index >= scenario->joint_pos_list.size()-1) return;
 			dot_v = 1.0f;
-// 			v3 = scenario->joint_pos_list.get(start_index+1);
-// 			v3 = v3 * mat_inv; // tranverse joint back to its local coordinate
-// 			v2 = v3 - pivot;
 		}
 		else if(dot_v < -1.0f) dot_v = -1.0f;
 
 		double angle = acos(dot_v);
-		//if (angle > damping_angle) angle = damping_angle;		
+		if (angle > damping_angle) angle = damping_angle;		
 
 		r_axis = cross(v2, v1);
 		r_axis.normalize();
 
 		mat.rot(r_axis, (float)-angle);
-	}
-	else if(scenario->joint_info_list.get(start_index).type == JOINT_TYPE_HINGE)
-	{
-		r_axis = scenario->joint_info_list.get(start_index).axis;
-		v = upright_point_to_plane(i_target, r_axis, i_src);
-		v2 = v - pivot;
-		v2.normalize();
-		
-		double dot_v = dot(v1, v2);
-		if(dot_v > 1.0f) dot_v = 1.0f;
-		else if(dot_v < -1.0f) dot_v = -1.0f;
-		double angle = acos(dot_v);
-
-		if (angle > damping_angle) angle = damping_angle;
-
-		v3 = cross(v1, v2);
-		v3.normalize();
-		if(dot(v3, r_axis) > 0.0f) mat.rot(r_axis, (float)angle);
-		else mat.rot(r_axis, (float)-angle);
 	}
 	
 	
@@ -210,6 +207,8 @@ void MeCtReachIK::update(MeCtIKScenario* scenario)
 	SrQuat quat;
 	SrMat mat;	
 	init();	
+
+	cur_quatList = scenario->joint_quat_list;
 #if !USE_PARTICLE_IK
 	adjust();	
 #else

@@ -2,12 +2,10 @@
 #include <sstream>
 #include <algorithm>
 #include <time.h>
+#include <boost/foreach.hpp>
 #include "me_ct_data_driven_reach.hpp"
 
-bool MeCtDataDrivenReach::useDataDriven = true;
-bool MeCtDataDrivenReach::useIK = true;
-
-
+using namespace boost;
 
 PoseExample& PoseExample::operator=( const PoseExample& rhs )
 {
@@ -16,20 +14,167 @@ PoseExample& PoseExample::operator=( const PoseExample& rhs )
 	return *this;
 }
 
+/************************************************************************/
+/* Pose Example Set with KD-tree based KNN search                       */
+/************************************************************************/
+
+#define FREE_DATA(data) if (data) delete data; data=NULL;
+#define FREE_DATA_ARRAY(data) if (data) delete [] data; data=NULL;
+
+
+PoseExampleSet::PoseExampleSet()
+{
+	kdTree = NULL;
+	dataPts = NULL;
+
+}
+
+PoseExampleSet::~PoseExampleSet()
+{
+	FREE_DATA(kdTree);
+	//FREE_DATA_ARRAY(dataPts);
+	if (dataPts)
+	{
+		annDeallocPts(dataPts);
+	}
+}
+
+bool PoseExampleSet::addPose( const PoseExample& poseEx, float fMinDist )
+{
+	SrArray<float> dists;
+	SrArray<PoseExample*> KNN;
+	if (fMinDist <= 0.f) // just add the pose
+	{
+		poseData.push_back(poseEx);	
+		return true;
+	}
+	else
+	{
+		int nK = linearKNN(poseEx.poseParameter,dists,KNN,1); // find closest pose data in parameter space
+		if (dists[0] > fMinDist)
+		{
+			poseData.push_back(poseEx);
+			return true;
+		}
+	}
+	return false;
+}
+
+
+int PoseExampleSet::linearKNN( const SrArray<double>& parameter, SrArray<float>& dists, SrArray<PoseExample*>& KNN, int nK )
+{
+	KNN.size(nK+1);
+	dists.size(nK+1);
+	dists.setall(1e10);
+	int nCurK = 0;
+	for (int i=0;i<poseData.size();i++)
+	{
+		PoseExample& curEx = poseData[i];
+		double dist = sqrt(Dist(curEx.poseParameter,parameter));
+		int k;
+		for (k=nCurK;k>0;k--)
+		{
+			if (dists[k-1] > dist)
+			{
+				dists[k] = dists[k-1]; // shift large value out
+				KNN[k] = KNN[k-1];
+			}
+			else 
+				break;
+		}		
+		dists[k] = dist;
+		KNN[k]  = &poseData[i];
+		if (nCurK < nK)
+			nCurK++;
+	}
+	dists.pop();
+	KNN.pop();
+	return nCurK; 	
+}
+
+
+void PoseExampleSet::kdTreeKNN( const SrArray<double>& parameter, SrArray<float>& dists, SrArray<PoseExample*>& KNN, int nK )
+{	
+	dists.size(nK);
+	KNN.size(nK);		
+	ANNidxArray nnIdx;
+	ANNdistArray nnDists;
+	nnIdx = new ANNidx[nK];
+	nnDists = new ANNdist[nK];
+
+	const double* paraData = (const double*)(parameter);
+	kdTree->annkSearch((double*)paraData,nK,nnIdx,nnDists);
+
+	float weightSum = 0.f;
+	for (int i=0;i<nK;i++)
+	{
+		int index = nnIdx[i];				
+		KNN[i] = &poseData[index];
+		dists[i] = nnDists[i];
+	}
+	//computeWeightFromDists(distList,KNNweights);
+
+	// clean up memory
+	delete [] nnIdx;
+	delete [] dists;
+}
+
+void PoseExampleSet::buildKDTree()
+{
+	FREE_DATA(kdTree);
+	if (dataPts)
+	{
+		annDeallocPts(dataPts);
+	}
+	
+	// build KD-tree for KNN search
+	int nPts = poseData.size(); // actual number of data points
+	int dim = 3;	
+	dataPts = annAllocPts(nPts, dim); // allocate data points	
+	for (int i=0;i<nPts;i++)
+	{
+		memcpy(dataPts[i],(const double*)(poseData[i].poseParameter),sizeof(ANNcoord)*dim);
+	}	
+	kdTree = new ANNkd_tree( // build search structure
+		dataPts, // the data points
+		nPts, // number of points
+		dim); // dimension of space	 
+}
+
+void PoseExampleSet::clearData()
+{
+	FREE_DATA(kdTree);
+	if (dataPts)
+	{
+		annDeallocPts(dataPts);
+	}
+	poseData.clear();
+}
+
+SrBox PoseExampleSet::computeBBox()
+{
+	SrBox BBox;
+	for (int i=0;i<poseData.size();i++)
+	{
+		PoseExample& ex = poseData[i];
+		SrVec pt = SrVec(ex.poseParameter[0],ex.poseParameter[1],ex.poseParameter[2]);
+		BBox.extend(pt);
+	}
+	return BBox;
+}
+
+/************************************************************************/
+/* Exampled-Based IK Solver                                             */
+/************************************************************************/
 
 MeCtDataDrivenReach::MeCtDataDrivenReach(SkSkeleton* sk) : MeCtReach(sk)
 {
+	useDataDriven = true;
+	useIK = true;
 }
 
 MeCtDataDrivenReach::~MeCtDataDrivenReach(void)
 {
-}
-
-void MeCtDataDrivenReach::addMotion( SkMotion* motion )
-{
-	if (!motion)
-		return;
-	motionData.push(motion);
 }
 
 
@@ -49,36 +194,6 @@ void MeCtDataDrivenReach::blendPose( SrArray<SrQuat>& blendPoses, SrArray<float>
 			blendPoses[k] = slerp( blendPoses[k], pose->jointQuat[k], w2/weightSum );
 		}
 	}
-}
-
-int MeCtDataDrivenReach::linearKNN(VecOfPoseExample& curList, PoseExample& newData, int nK,  SrArray<float>& distList, SrArray<PoseExample*>& KNN )
-{
-	KNN.size(nK+1);
-	distList.size(nK+1);
-	distList.setall(1e10);
-	int nCurK = 0;
-	for (int i=0;i<curList.size();i++)
-	{
-		PoseExample& curEx = curList[i];
-		double dist = sqrt(Dist(curEx.poseParameter,newData.poseParameter));
-		int k;
-		for (k=nCurK;k>0;k--)
-		{
-			if (distList[k-1] > dist)
-			{
-				distList[k] = distList[k-1]; // shift large value out
-			}
-			else 
-				break;
-		}		
-		distList[k] = dist;
-		KNN[k]  = &curEx;
-		if (nCurK < nK)
-			nCurK++;
-	}
-	distList.pop();
-	KNN.pop();
-	return nCurK; 	
 }
 
 void MeCtDataDrivenReach::generateRandomWeight( int nK, SrArray<float>& outWeights )
@@ -119,31 +234,6 @@ void MeCtDataDrivenReach::computeWeightFromDists( SrArray<float>& dists, SrArray
 	//LOG(strstr.str().c_str());
 }
 
-void MeCtDataDrivenReach::findKNNPoseExamples(SrArray<double>& parameter, SrArray<float>& KNNweights, SrArray<PoseExample*>& KNNPoses, int nK )
-{
-	SrArray<float> distList;
-	distList.size(nK);
-	KNNweights.size(nK);
-	KNNPoses.size(nK);		
-	ANNidxArray nnIdx;
-	ANNdistArray dists;
-	nnIdx = new ANNidx[nK];
-	dists = new ANNdist[nK];
-
-	
-	const double* paraData = (const double*)(parameter);
-	kdTree->annkSearch((double*)paraData,nK,nnIdx,dists);
-
-	float weightSum = 0.f;
-	for (int i=0;i<nK;i++)
-	{
-		int index = nnIdx[i];		
-		distList[i] = dists[i];
-		KNNPoses[i] = &examplePoseData[index];
-	}
-	computeWeightFromDists(distList,KNNweights);
-}
-
 bool MeCtDataDrivenReach::controller_evaluate( double t, MeFrameData& frame )
 {
 	float dt = 0.001f;
@@ -160,36 +250,67 @@ bool MeCtDataDrivenReach::controller_evaluate( double t, MeFrameData& frame )
 	}
 	prev_time = (float)t;	
 
+	_skeleton->update_global_matrices();
+	SrVec targetPos = get_reach_target();
+// 	SrVec curPos    = getWorldPos(limb.getChainEndEffector());
+// 
+// 	const float reachSpeed = 0.1f;
+// 	SrVec targetDir = (targetPos - curPos); targetDir.normalize();
+	SrVec nextTarget= targetPos;//curPos + targetDir*reachSpeed;
+
+	float fRatio = 1.0f;
+	// save a copy of initial joint quat angles before any modification
+	SrArray<SrQuat> cur_quat_list = limb.joint_quat;
 	
 	if (useDataDriven)
 	{
-		_skeleton->update_global_matrices();
+		
 		const SrMat& rootMat = _skeleton->root()->gmat();
 		//SrMat rootMat;
 		//rootMat.translation(getRootJoint()->gmat().get(12),getRootJoint()->gmat().get(13),getRootJoint()->gmat().get(14));
 		SrMat rootInv = rootMat.inverse();
-		SrVec targetPos = get_reach_target()*rootInv; // get target position to find KNN
+		SrVec targetPos = nextTarget*rootInv;//get_reach_target()*rootInv; // get target position to find KNN
 		// find KNN and corresponding distance to determine the blending weights
 		SrArray<double> targetParameter;
 		targetParameter.size(3);
 
-		int nK = 1; // nearby examples should be (parameter dim + 1)
+		int nK = 6; // nearby examples should be (parameter dim + 1)
 		SrArray<float> KNNWeight;
+		SrArray<float> KNNDist;
 		SrArray<PoseExample*> KNNPoses;
 
 		for (int i=0;i<3;i++)
 			targetParameter[i] = targetPos[i];
 
-		findKNNPoseExamples(targetParameter,KNNWeight,KNNPoses,nK);
-		blendPose(limb.joint_quat,KNNWeight,KNNPoses);
-	}
-	// solve CCD IK
+		//findKNNPoseExamples(targetParameter,KNNWeight,KNNPoses,nK);
+		/*
+		resampledPosedata.kdTreeKNN(targetParameter,KNNDist,KNNPoses,nK);
+		computeWeightFromDists(KNNDist,KNNWeight);
+		SrArray<SrQuat> blendQuat;
+		blendPose(blendQuat,KNNWeight,KNNPoses);
 
+		// damped blending		
+		for (int i=0;i<blendQuat.size();i++)
+		{
+			MeCtIKScenarioJointInfo* info = &(limb.ik.joint_info_list.get(i));
+			float damping_angle = (float)RAD(info->angular_speed_limit*dt);
+			limb.joint_quat[i] = MeCtReachIK::dampQuat(limb.joint_quat[i],blendQuat[i],damping_angle);
+// 			SrQuat diff = limb.joint_quat[i].inverse()*blendQuat[i];	
+// 			diff.normalize();
+// 			float angle = diff.angle() > damping_angle ? damping_angle : diff.angle();
+// 			diff.set(diff.axis(),angle);
+// 			limb.joint_quat[i] = limb.joint_quat[i]*diff;
+// 			limb.joint_quat[i].normalize();					   
+		}		
+		*/
+	}
+
+	// solve CCD IK
 	if (useIK)
 	{
 		MeCtIKScenario* ik_scenario = &limb.ik;
 
-		ik_scenario->ik_offset = get_reach_target(); // set the target
+		ik_scenario->ik_offset = nextTarget; // set the target
 		ik_scenario->ik_quat_orientation = SrQuat(0,0,0,1.0); // set to default rotation for testing
 		ik_scenario->joint_quat_list = limb.joint_quat;	
 
@@ -199,43 +320,56 @@ bool MeCtDataDrivenReach::controller_evaluate( double t, MeFrameData& frame )
 
 		ik.setDt(dt);
 		ik.update(ik_scenario);
-		limb.joint_quat = ik_scenario->joint_quat_list;
+		//limb.joint_quat = ik_scenario->joint_quat_list;
+		for (int i=0;i<ik_scenario->joint_quat_list.size();i++)
+		{
+			MeCtIKScenarioJointInfo* info = &(limb.ik.joint_info_list.get(i));
+			float damping_angle = (float)RAD(info->angular_speed_limit*dt);
+			limb.joint_quat[i] = MeCtReachIK::dampQuat(cur_quat_list[i],ik_scenario->joint_quat_list[i],damping_angle);
+		}
 	}
-	
-
 	// write results from limb to buffer
 	limb.updateQuat(frame,false);
 	return true;
 }
 
-void MeCtDataDrivenReach::buildResamplePoseData( float fMinDist /*= 1.0*/ )
+void MeCtDataDrivenReach::updateExamplesFromMotions( MotionDataSet& inMotionSet, bool rebuild /*= false*/, float minDist /*= 5.0*/ )
 {
-	// build a more densely sampled, but more evenly spaced example space
-	/*			
-	for (int i=0;i<examplePoseData.size();i++)
-	{
-		SrArray<PoseExample*> KNN;
-		SrArray<float> dists;	
-		int nK = linearKNN(resamplePosedata,examplePoseData[i],1,dists,KNN);
-		if (dists[0] > fMinDist)
-		{
-			resamplePosedata.push_back(examplePoseData[i]);
-		}			
+	if (rebuild) 
+	{		
+		motionData.clear();
+		examplePoseData.clearData();
 	}
 
-	
-	// infer the bounding box from resample pose data
-	SrBox BBox;
-	for (int i=0;i<resamplePosedata.size();i++)
+	BOOST_FOREACH(SkMotion* motion, inMotionSet)
 	{
-		PoseExample& ex = resamplePosedata[i];
-		SrVec pt = SrVec(ex.poseParameter[0],ex.poseParameter[1],ex.poseParameter[2]);
-		BBox.extend(pt);
-	}
+		if (motionData.find(motion) != motionData.end())
+			continue; // we do not process example motions that are already used for this controller instance
+		
+		motion->connect(_skeleton);
+		for (int j=0;j<motion->frames();j++)
+		{
+			PoseExample poseEx;			
+			limb.updateMotionFrameToJointChain(motion,j);
+			_skeleton->update_global_matrices();				
+			getPoseExampleFromSkeleton(poseEx);	
+			examplePoseData.addPose(poseEx,minDist);
+			//resamplePosedata.addPose(po)
+		}
+		motion->disconnect();		
+		motionData.insert(motion);
+	}	
+	examplePoseData.buildKDTree();
+}
+
+void MeCtDataDrivenReach::buildResamplePoseData( int nExamples, float fMinDist /*= 1.0*/ )
+{
+	// infer the bounding box from resample pose data
+	SrBox BBox = examplePoseData.computeBBox();
 
 	int nCount = 0;
-	int nSamples = 300;
-	int nKNN = 4;
+	int nSamples = nExamples;
+	int nKNN = 6;
 	PoseExample dummy;
 	dummy.poseParameter.size(3);
 	// sampling new poses inside the bounding box by interpolating current pose data randomly
@@ -247,61 +381,24 @@ void MeCtDataDrivenReach::buildResamplePoseData( float fMinDist /*= 1.0*/ )
 		for (int i=0;i<3;i++)
 			dummy.poseParameter[i] = pt[i];
 
-		// find 
+		// find nearby samples for blending
 		SrArray<PoseExample*> KNN;
-		SrArray<float> dists, weights;	
-		linearKNN(resamplePosedata,dummy,nKNN,dists,KNN);		
-		//computeWeightFromDists(dists,weights);		
+		SrArray<float> dists, weights;			
+		examplePoseData.linearKNN(dummy.poseParameter,dists,KNN,nKNN);		
 		generateRandomWeight(nKNN,weights);
 		blendPose(blendQuats,weights,KNN);
+
 		limb.updateQuatToJointChain(blendQuats);
-	}	
-	examplePoseData = resamplePosedata;
-	*/
-	// build KD-tree for KNN search
-	int nPts = examplePoseData.size(); // actual number of data points
-	int dim = 3;	
-	dataPts = annAllocPts(nPts, dim); // allocate data points	
-	for (int i=0;i<nPts;i++)
-	{
-		memcpy(dataPts[i],(const double*)(examplePoseData[i].poseParameter),sizeof(ANNcoord)*dim);
+		_skeleton->update_global_matrices();		
+		getPoseParameter(dummy.poseParameter,_skeleton);		
+		dummy.jointQuat = blendQuats;
+
+		// naive adding samples
+		resampledPosedata.addPose(dummy,fMinDist);
+		nCount++;
 	}	
 
-	kdTree = new ANNkd_tree( // build search structure
-		dataPts, // the data points
-		nPts, // number of points
-		dim); // dimension of space	 
-}
-
-void MeCtDataDrivenReach::buildPoseExamplesFromMotions()
-{
-	// ensure we have a skeleton
-	assert(_skeleton);
-	int nExamples = 0;
-	// get total number of frames 
-	for (int i=0;i<motionData.size();i++)
-		nExamples += motionData[i]->frames();
-	
-	//examplePoseData.capacity(nExamples);
-	//examplePoseData.size(nExamples);
-
-	int poseIndex = 0;
-	for (int i=0;i<motionData.size();i++)
-	{
-		SkMotion* motion = motionData[i];
-		motion->connect(_skeleton);
-		for (int j=0;j<motion->frames();j++)
-		{
-			PoseExample poseEx;
-			//motion->apply_frame(j);
-			limb.updateMotionFrameToJointChain(motion,j);
-			_skeleton->update_global_matrices();
-			examplePoseData.push_back(PoseExample());			
-			getPoseExampleFromSkeleton(examplePoseData[poseIndex]);			
-			poseIndex++;
-		}
-		motion->disconnect();
-	}		
+	resampledPosedata.buildKDTree();	
 }
 
 void MeCtDataDrivenReach::getPoseExampleFromSkeleton( PoseExample& pose )
@@ -323,15 +420,20 @@ void MeCtDataDrivenReach::getPoseExampleFromSkeleton( PoseExample& pose )
 }
 
 
+SrVec MeCtDataDrivenReach::getWorldPos( SkJoint* joint )
+{
+	const SrMat& endMat = joint->gmat();
+	return SrVec(endMat.get(12), endMat.get(13), endMat.get(14));
+}
+
 
 void MeCtDataDrivenReach::getPoseParameter( SrArray<double>& para, SkSkeleton* skeleton )
-{
-	const SrMat& endMat = limb.getChainEndEffector()->gmat();
+{	
 	const SrMat& rootMat = _skeleton->root()->gmat();//limb.getChainRoot()->gmat();//_skeleton->root()->gmat();
 	SrMat rootInv = rootMat.inverse();
 	//rootInv.translation(rootMat.get(12),rootMat.get(13),rootMat.get(14));
 	//rootInv.invert();
-	SrVec endGlobal = SrVec(endMat.get(12), endMat.get(13), endMat.get(14));
+	SrVec endGlobal = getWorldPos(limb.getChainEndEffector());
 	SrVec endLocal = endGlobal*rootInv;
 	int nSize = 3;
 	if (para.size() != nSize)

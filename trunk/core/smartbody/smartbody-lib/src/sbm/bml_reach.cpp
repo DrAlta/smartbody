@@ -68,16 +68,71 @@ static SkMotion* lookUpMotion(mcuCBHandle* mcu_p, const char* motionName)
 }
 
 
+static void buildReachCtExamples(mcuCBHandle* mcu_p, MeCtDataDrivenReach* reachCt)
+{
+	const int NUM_MOTIONS = 4;
+	const char motionNames[NUM_MOTIONS][100] = { "HandsAtSide_RArm_GestureYou", "LHandOnHip_Arms_GestureWhy", "LHandOnHip_RArm_GestureOffer", "LHandOnHip_RArm_SweepRight" };
+	MotionDataSet motionData;
+	for (int i=0;i<NUM_MOTIONS;i++)
+	{
+		SkMotion* motion = lookUpMotion(mcu_p,motionNames[i]);
+		if (!motion)
+		{
+			std::stringstream strstr;
+			strstr << "Motion Name = "<<motionNames[i]<<", motion does not exist.";
+			std::string str = strstr.str();
+			LOG(str.c_str());
+		}
+		else
+		{
+			motionData.insert(motion);
+			//reachCt->addMotion(motion);
+		}		
+	}
+	// build example database
+	reachCt->updateExamplesFromMotions(motionData,true,5.f);
+	reachCt->buildResamplePoseData(500,5.f);
+	
+	//reachCt->buildPoseExamplesFromMotions();	
+	//reachCt->buildResamplePoseData(5.0f);
+}
+
+
 BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
+
+	
 	
 	// attach the skeleton to the reach controller
 #define DATA_DRIVEN_REACH 0
 #if DATA_DRIVEN_REACH
-	MeCtDataDrivenReach* reachCt = new MeCtDataDrivenReach(request->actor->skeleton_p);
+	MeCtDataDrivenReach* reachCt = NULL;//new MeCtDataDrivenReach(request->actor->skeleton_p);
 #else
-	MeCtReach* reachCt = new MeCtReach(request->actor->skeleton_p);
+	MeCtReach* reachCt = NULL; //new MeCtReach(request->actor->skeleton_p);
 #endif
+
+
+	const XMLCh* attrHandle = elem->getAttribute( ATTR_HANDLE );
+	std::string handle = "";
+	if( attrHandle && XMLString::stringLen( attrHandle ) ) {
+		handle = asciiString(attrHandle);
+		// look for a gaze controller with that handle
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		const SbmCharacter* character = request->actor;
+		if (character)
+		{
+			MeControllerTreeRoot* controllerTree = character->ct_tree_p;
+			MeController* controller = controllerTree->findControllerByHandle(handle);
+
+#if DATA_DRIVEN_REACH
+			reachCt = dynamic_cast<MeCtDataDrivenReach*>(controller);
+#else
+			reachCt = dynamic_cast<MeCtReach*>(controller);
+#endif
+
+		}
+	}
+	
 
 	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
 	if( !reachCt && (!attrTarget || !XMLString::stringLen( attrTarget ) ) ) {
@@ -90,15 +145,18 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 
 	const XMLCh* attrReachArm = NULL;
 	attrReachArm = elem->getAttribute( ATTR_REACH_ARM );
-	if( attrReachArm && *attrReachArm != 0 ) 
+	MeCtReach::ReachArm reachArm = MeCtReach::REACH_RIGHT_ARM;
+	if( !reachCt && attrReachArm && *attrReachArm != 0 ) 
 	{
 		if( XMLString::compareIString( attrReachArm, L"left" )==0 ) 
 		{
-			reachCt->setReachArm(MeCtReach::REACH_LEFT_ARM);
+			//reachCt->setReachArm(MeCtReach::REACH_LEFT_ARM);
+			reachArm = MeCtReach::REACH_LEFT_ARM;
 		}
 		else if( XMLString::compareIString( attrReachArm, L"right" )==0 )
 		{
-			reachCt->setReachArm(MeCtReach::REACH_RIGHT_ARM);
+			//reachCt->setReachArm(MeCtReach::REACH_RIGHT_ARM);
+			reachArm = MeCtReach::REACH_RIGHT_ARM;
 		}
 	}
 
@@ -116,30 +174,26 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 	std::string localId;
 	if (id)
 		localId = XMLString::transcode(id);
+
+	if (!reachCt)
+	{
+#if DATA_DRIVEN_REACH
+		reachCt = new MeCtDataDrivenReach(request->actor->skeleton_p);
+#else
+		reachCt = new MeCtReach(request->actor->skeleton_p);
+#endif
+		reachCt->setReachArm(reachArm);
+		reachCt->init();
+
+#if DATA_DRIVEN_REACH
+		buildReachCtExamples(mcu,reachCt);
+#endif
+	}
 	
-	reachCt->init();
+	
 #if DATA_DRIVEN_REACH
 	//reachCt->addMotion()
-	const int NUM_MOTIONS = 4;
-	const char motionNames[NUM_MOTIONS][100] = { "HandsAtSide_RArm_GestureYou", "LHandOnHip_Arms_GestureWhy", "LHandOnHip_RArm_GestureOffer", "LHandOnHip_RArm_SweepRight" };
-	for (int i=0;i<NUM_MOTIONS;i++)
-	{
-		SkMotion* motion = lookUpMotion(mcu,motionNames[i]);
-		if (!motion)
-		{
-			std::stringstream strstr;
-			strstr << "Motion Name = "<<motionNames[i]<<", motion does not exist.";
-			std::string str = strstr.str();
-			LOG(str.c_str());
-		}
-		else
-		{
-			reachCt->addMotion(motion);
-		}		
-	}
-	// build example database
-	reachCt->buildPoseExamplesFromMotions();	
-	reachCt->buildResamplePoseData(5.0f);
+	
 #endif
 
 

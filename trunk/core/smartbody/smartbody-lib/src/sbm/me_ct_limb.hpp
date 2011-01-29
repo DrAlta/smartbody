@@ -5,8 +5,10 @@
 
 
 // Contains the joint chains and rotation info for IK
+
 class MeCtLimb
 {		
+	
 public:
 	SkSkeleton* skeleton;
 	MeCtIKScenario ik;	
