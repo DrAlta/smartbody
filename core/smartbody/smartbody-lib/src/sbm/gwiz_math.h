@@ -23,16 +23,14 @@
 #ifndef GWIZ_MATH_H
 #define GWIZ_MATH_H
 
+// "Gee Whiz!" 
+// Vector geometry wizard...
 
 ////////////////////////////////
 #include <math.h>
 #include <stdio.h>
 
-#define GWIZ_version	"Version 4.1 : June 21, 2001"
-
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
+#define GWIZ_version	"Version 5.0 : Jan 29, 2011"
 
 #ifdef GWIZ_32BIT
 typedef float gw_float_t;
@@ -50,58 +48,70 @@ typedef quat_t		quaternion_t;
 typedef euler_t		eulerPHR_t;
 typedef matrix_t	matrix4x4_t;
 
-class spline_t;
-typedef spline_t	gwizUtil;
+#ifndef M_PI
+#define M_PI	GWIZ::pi()
+#endif
 
-enum gwiz_math_enumeration_set    {
-	GWIZ_UNKNOWN, 
-	GWIZ_M_TR, 
-	GWIZ_M_TRS, 
-	GWIZ_M_TRSH, 
-	GWIZ_M_PTRSH
-};
-
-inline double RAD( double d ) { return( d * 0.017453292519943295 ); }
-inline double DEG( double r ) { return( r * 57.295779513082323 ); }
+#ifndef RAD 
+#define RAD 	GWIZ::rad
+#endif
+#ifndef DEG
+#define DEG 	GWIZ::deg
+#endif
 
 ////////////////////////////////
 
-#if 0
-
-#define SAFE_ARC_TRIG_THRESHHOLD  0.999999999
-
-class gwiz_util {
+class GWIZ {
 	
 	public:
-		safe_asin( float ) {
-			if( c >= SAFE_ARC_TRIG_THRESHHOLD ) c = SAFE_ARC_TRIG_THRESHHOLD;
-			else
-			if( c <= -SAFE_ARC_TRIG_THRESHHOLD ) c = -SAFE_ARC_TRIG_THRESHHOLD;
-			return( asin( c ) );
-		}
-		safe_acos( float ) {
-			if( c >= SAFE_ARC_TRIG_THRESHHOLD ) c = SAFE_ARC_TRIG_THRESHHOLD;
-			else
-			if( c <= -SAFE_ARC_TRIG_THRESHHOLD ) c = -SAFE_ARC_TRIG_THRESHHOLD;
-			return( acos( c ) );
-		}
-//		safe_atan( float ) {}
+	
+		enum math_enum_set    {
+			COMP_UNKNOWN, 
+			COMP_M_TR, 
+			COMP_M_TRS, 
+			COMP_M_TRSH, 
+			COMP_M_PTRSH
+		};
+
+		static gw_float_t pi( void ) { return( 3.14159265358979323846 ); }
+
+		static gw_float_t rad( gw_float_t deg ) { return( deg * 0.017453292519943295 ); }
+		static gw_float_t deg( gw_float_t rad ) { return( rad * 57.295779513082323 ); }
+
+		static gw_float_t safe_arc_threshold( void ) { return( 0.999999999 ); }
+		
+		static gw_float_t safe_asin( gw_float_t s );
+		static gw_float_t safe_acos( gw_float_t c );
+		static gw_float_t safe_atan( gw_float_t t );
+		
+		static gw_float_t epsilon4( void )	{ return( 0.00001 ); }
+		static gw_float_t epsilon5( void )	{ return( 0.000001 ); } /* one millionth */
+		static gw_float_t epsilon6( void )	{ return( 0.0000001 ); }
+		static gw_float_t epsilon7( void )	{ return( 0.00000001 ); }
+		static gw_float_t epsilon8( void )	{ return( 0.000000001 ); } /* one billionth */
+		static gw_float_t epsilon9( void )	{ return( 0.0000000001 ); }
+		static gw_float_t epsilon10( void ) { return( 0.00000000001 ); }
+		static gw_float_t epsilon11( void ) { return( 0.000000000001 ); } /* one trillionth */
 };
-#endif
 
 ////////////////////////////////
 
 class vector_t {
 
     public:
+#if 1
 		void print( void ) const { printf( " vector_t:\n  %f %f %f\n", X, Y, Z ); }
-	//	void print( void ) const { printf( " vector_t:\n  %.12f %.12f %.12f\n", X, Y, Z ); }
+#else
+		void print( void ) const { printf( " vector_t:\n  %.12f %.12f %.12f\n", X, Y, Z ); }
+#endif
 
 	// CONSTRUCT
         inline vector_t( void )
             { X = 0.0; Y = 0.0; Z = 0.0; }
         inline vector_t( gw_float_t x_in, gw_float_t y_in, gw_float_t z_in )
             { X = x_in; Y = y_in; Z = z_in; }
+        inline vector_t( const vector_t & v_in )
+            { X = v_in.x(); Y = v_in.y(); Z = v_in.z(); }
 
 	// WRITE
 		inline void x( gw_float_t x_in ) { X = x_in; }
@@ -135,8 +145,11 @@ class vector_t {
         vector_t& normalize( void );
 
 		inline vector_t lerp( gw_float_t s, const vector_t& v ) const 
-//			{ return( (*this) * ( 1.0 - s ) + v * s ); }
+#if 0
+			{ return( (*this) * ( 1.0 - s ) + v * s ); }
+#else
 			{ return( (*this) + ( v - (*this) ) * s ); }
+#endif
 		inline vector_t& lerp( gw_float_t s, const vector_t& v0, const vector_t& v1 ) 
 			{ return( (*this) = v0.lerp( s, v1 ) ); }
 		
@@ -178,14 +191,20 @@ class vector_t {
 class vector4_t: public vector_t {
 
     public:
+#if 1
 		void print( void ) const { printf( " vector4_t:\n  %f %f %f %f\n", x(), y(), z(), W ); }
-	//	void print( void ) const { printf( " vector4_t:\n  %.12f %.12f %.12f %.12f\n", x(), y(), z(), W ); }
+#else
+		void print( void ) const { printf( " vector4_t:\n  %.12f %.12f %.12f %.12f\n", x(), y(), z(), W ); }
+#endif
 
 	// CONSTRUCT
         inline vector4_t( void ): vector_t()
             { W = 0.0; }
         inline vector4_t( gw_float_t x_in, gw_float_t y_in, gw_float_t z_in, gw_float_t w_in )
 			: vector_t( x_in, y_in, z_in )
+            { W = w_in; }
+        inline vector4_t( const vector_t & v_in, gw_float_t w_in )
+			: vector_t( v_in )
             { W = w_in; }
 
 	// WRITE
@@ -211,8 +230,11 @@ class vector4_t: public vector_t {
 class quat_t {
 
     public:
+#if 1
 		void print( void ) const { printf( " quat_t:\n  %f %f %f %f\n", W, X, Y, Z ); }
-	//	void print( void ) const { printf( " quat_t:\n  %.12f %.12f %.12f %.12f\n", W, X, Y, Z ); }
+#else
+		void print( void ) const { printf( " quat_t:\n  %.12f %.12f %.12f %.12f\n", W, X, Y, Z ); }
+#endif
 
 	// CONSTRUCT
         inline quat_t( void )
@@ -238,13 +260,14 @@ class quat_t {
         inline gw_float_t y( void ) const { return( Y ); }
         inline gw_float_t z( void ) const { return( Z ); }
 
+#if 0
 		inline bool non_identity( void ) const 
 			{ return( W < 0.999999999 ); }
+#endif
 		inline vector_t axisangle( void ) const // Axis-Angle: Same as Exponential Map
 			{ return( axis() * radians() ); }
-		inline gw_float_t radians( void ) const // NOTE: vulnerable to badly normalized W
-//			{ return( 2.0 * acos( W ) ); }
-			{ return( 2.0 * acos( W * 0.999999999 ) ); }
+		inline gw_float_t radians( void ) const
+			{ return( 2.0 * GWIZ::safe_acos( W ) ); }
 		inline gw_float_t degrees( void ) const 
 			{ return( DEG( radians() ) ); }
 		inline vector_t axis( void ) const 
@@ -288,6 +311,9 @@ class quat_t {
 			{ return( (*this) = (*this) * s ); }
 		inline quat_t& operator /= ( gw_float_t d ) 
 			{ return( (*this) = (*this) / d ); }
+
+		inline quat_t& operator *= ( quat_t q ) 
+			{ return( (*this) = (*this) * q ); }
 
 	// PIPELINE
 		/*
@@ -369,8 +395,11 @@ class euler_t {
 	//   concatenation: [ Heading * Pitch * Roll ] == [ Y * X * Z ]
 	
     public:
+#if 1
 		void print( void ) const { printf( " euler_t:\n  %f %f %f\n", X, Y, Z ); }
-	//	void print( void ) const { printf( " euler_t:\n  %.12f %.12f %.12f\n", X, Y, Z ); }
+#else
+		void print( void ) const { printf( " euler_t:\n  %.12f %.12f %.12f\n", X, Y, Z ); }
+#endif
 
 	// CONSTRUCT
         inline euler_t( void )
@@ -419,10 +448,14 @@ class euler_t {
 			{ return( quat_t(*this) * s ); }
 		inline euler_t operator / ( gw_float_t d ) const 
 			{ gw_float_t inv = 1.0 / d; return( (*this) * inv ); }
+
 		inline euler_t& operator *= ( gw_float_t s ) 
 			{ return( (*this) = (*this) * s ); }
 		inline euler_t& operator /= ( gw_float_t d ) 
 			{ return( (*this) = (*this) / d ); }
+
+		inline euler_t& operator *= ( euler_t e ) 
+			{ return( (*this) = (*this) * e ); }
 
 	// PIPELINE
 		matrix_t operator * ( const matrix_t& R ) const;
@@ -480,18 +513,22 @@ class matrix_t {
 	// WRITE
 		inline matrix_t& set( int c, int r, gw_float_t f ) 
 			{ M[ c ][ r ] = f; return( *this ); }
+
 		inline matrix_t& col( int i, gw_float_t a, gw_float_t b, gw_float_t c, gw_float_t d ) 
 			{ M[i][0] = a; M[i][1] = b; M[i][2] = c; M[i][3] = d; return( *this ); }
 		inline matrix_t& row( int i, gw_float_t a, gw_float_t b, gw_float_t c, gw_float_t d ) 
 			{ M[0][i] = a; M[1][i] = b; M[2][i] = c; M[3][i] = d; return( *this ); }
+
 		inline matrix_t& col( int i, const vector_t& v, gw_float_t f ) 
 			{ M[i][0] = v.x(); M[i][1] = v.y(); M[i][2] = v.z(); M[i][3] = f; return( *this ); }
 		inline matrix_t& row( int i, const vector_t& v, gw_float_t f ) 
 			{ M[0][i] = v.x(); M[1][i] = v.y(); M[2][i] = v.z(); M[3][i] = f; return( *this ); }
+
 		inline matrix_t& col( int i, const vector4_t& v ) 
 			{ M[i][0] = v.x(); M[i][1] = v.y(); M[i][2] = v.z(); M[i][3] = v.w(); return( *this ); }
 		inline matrix_t& row( int i, const vector4_t& v ) 
 			{ M[0][i] = v.x(); M[1][i] = v.y(); M[2][i] = v.z(); M[3][i] = v.w(); return( *this ); }
+
 		inline matrix_t& set( const gw_float_t M_array[ 4 ][ 4 ] ) { 
 			for( int i=0;i<4;i++ )	{
 				M[i][0] = M_array[i][0]; 
@@ -661,15 +698,15 @@ class matrix_t {
 			euler_t*	Euler, 
 			vector_t*	Shearing, 
 			vector_t*	Scaling, 
-			int composition_flag = GWIZ_UNKNOWN
+			int composition_flag = GWIZ::COMP_UNKNOWN
 		) const;
 
-		vector4_t	perspective	( int composition_flag = GWIZ_UNKNOWN ) const;
-		vector_t	translation	( int composition_flag = GWIZ_UNKNOWN ) const;
-		quat_t		quat		( int composition_flag = GWIZ_UNKNOWN ) const;
-		euler_t		euler		( int composition_flag = GWIZ_UNKNOWN ) const;
-		vector_t	shearing	( int composition_flag = GWIZ_UNKNOWN ) const;
-		vector_t	scaling		( int composition_flag = GWIZ_UNKNOWN ) const;
+		vector4_t	perspective	( int composition_flag = GWIZ::COMP_UNKNOWN ) const;
+		vector_t	translation	( int composition_flag = GWIZ::COMP_UNKNOWN ) const;
+		quat_t		quat		( int composition_flag = GWIZ::COMP_UNKNOWN ) const;
+		euler_t		euler		( int composition_flag = GWIZ::COMP_UNKNOWN ) const;
+		vector_t	shearing	( int composition_flag = GWIZ::COMP_UNKNOWN ) const;
+		vector_t	scaling		( int composition_flag = GWIZ::COMP_UNKNOWN ) const;
 
 	// VECTOR TRANSFORM
 		inline vector_t operator * ( const vector_t& v ) const { 

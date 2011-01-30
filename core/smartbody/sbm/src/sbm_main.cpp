@@ -468,6 +468,7 @@ class SBMCrashCallback : public vhcl::Crash::CrashCallback
 
 
 ///////////////////////////////////////////////////////////////////////////////////
+
 int main( int argc, char **argv )	{
 
 #if SBM_REPORT_MEMORY_LEAKS

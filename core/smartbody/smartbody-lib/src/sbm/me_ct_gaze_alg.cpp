@@ -171,15 +171,15 @@ LOG( "-- --\n" );
 		}
 
 		vector_t axis = Fd.cross( RX );
-		gw_float_t angle = DEG( gwiz_safe_acos( Fd.normal().dot( RX.normal() ) ) );
+		gw_float_t angle = DEG( GWIZ::safe_acos( Fd.normal().dot( RX.normal() ) ) );
 		return( quat_t( angle, axis ) );
 	}
 
 	// rho: angle from RX to X-tangent-plane
-	gw_float_t rho = DEG( gwiz_safe_acos( r / d ) );
+	gw_float_t rho = DEG( GWIZ::safe_acos( r / d ) );
 
 	// gamma: angle from RX to RT
-	gw_float_t gamma = DEG( gwiz_safe_acos( RX.normal().dot( RT.normal() ) ) );
+	gw_float_t gamma = DEG( GWIZ::safe_acos( RX.normal().dot( RT.normal() ) ) );
 
 	// Aaxis: axis perpendicular to RX and RT
 	vector_t Aaxis = RT.cross( RX );
@@ -202,7 +202,7 @@ LOG( "-- --\n" );
 		alpha = gamma - rho;
 	}
 #elif 0
-	gw_float_t kappa = DEG( gwiz_safe_acos( Fd.normal().dot( RX.normal() ) ) );
+	gw_float_t kappa = DEG( GWIZ::safe_acos( Fd.normal().dot( RX.normal() ) ) );
 	gw_float_t alpha;
 	if( heading_only && ( kappa > 90.0 ) )	{
 		alpha = gamma + rho;
@@ -221,7 +221,7 @@ LOG( "-- --\n" );
 
 	// beta: rotation to align new forward with new tangent
 
-	gw_float_t beta = DEG( gwiz_safe_acos( newF.normal().dot( ( X - newT ).normal() ) ) );
+	gw_float_t beta = DEG( GWIZ::safe_acos( newF.normal().dot( ( X - newT ).normal() ) ) );
 	if( beta > 0.0 )	{
 
 		// Baxis: axis to which beta is implicitly applied

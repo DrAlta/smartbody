@@ -27,8 +27,6 @@
 
 //////////////////////////////////////////////////////////////////////////
 
-gw_float_t gwiz_safe_acos( gw_float_t c );
-
 quat_t rotation_ray_to_target_orient(
 	quat_t Q,     // target orientation
 	vector_t Fd,  // forward ray direction

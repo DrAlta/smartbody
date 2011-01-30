@@ -22,40 +22,28 @@
 
 #include "gwiz_math.h"
 
-#ifndef ftan
-#define ftan(x) (float)tan((double)(x))
-#endif
-
 ////////////////////////////////
-// CONSTANTS
+// SAFE TRIGONOMETRY:
 
-#define EPSILON11			0.000000000001		/* one trillionth */
-#define EPSILON10			0.00000000001
-#define EPSILON9			0.0000000001
-#define EPSILON8			0.000000001			/* one billionth */
-#define EPSILON7			0.00000001
-#define EPSILON6			0.0000001
-#define EPSILON5			0.000001			/* one millionth */
-#define EPSILON4			0.00001
-
-#define SAFE_ARC_TRIG_THRESHHOLD  0.999999999
-
-////////////////////////////////
-
-gw_float_t gwiz_safe_acos( gw_float_t c )	{
-	
-	if( c >= SAFE_ARC_TRIG_THRESHHOLD ) c = SAFE_ARC_TRIG_THRESHHOLD;
+gw_float_t GWIZ::safe_asin( gw_float_t s ) {
+	if( s >= GWIZ::safe_arc_threshold() ) s = GWIZ::safe_arc_threshold();
 	else
-	if( c <= -SAFE_ARC_TRIG_THRESHHOLD ) c = -SAFE_ARC_TRIG_THRESHHOLD;
+	if( s <= -GWIZ::safe_arc_threshold() ) s = -GWIZ::safe_arc_threshold();
+	return( asin( s ) );
+}
+
+gw_float_t GWIZ::safe_acos( gw_float_t c ) {
+	if( c >= GWIZ::safe_arc_threshold() ) c = GWIZ::safe_arc_threshold();
+	else
+	if( c <= -GWIZ::safe_arc_threshold() ) c = -GWIZ::safe_arc_threshold();
 	return( acos( c ) );
 }
 
-gw_float_t gwiz_safe_asin( gw_float_t s )	{
-	
-	if( s >= SAFE_ARC_TRIG_THRESHHOLD ) s = SAFE_ARC_TRIG_THRESHHOLD;
+gw_float_t GWIZ::safe_atan( gw_float_t t ) {
+	if( t >= GWIZ::safe_arc_threshold() ) t = GWIZ::safe_arc_threshold();
 	else
-	if( s <= -SAFE_ARC_TRIG_THRESHHOLD ) s = -SAFE_ARC_TRIG_THRESHHOLD;
-	return( asin( s ) );
+	if( t <= -GWIZ::safe_arc_threshold() ) t = -GWIZ::safe_arc_threshold();
+	return( atan( t ) );
 }
 
 ////////////////////////////////
@@ -128,7 +116,7 @@ inline int inverse4x4( gw_float_t M_out[4][4], const gw_float_t M_in[4][4] )	{
 		gw_float_t det3 = determinant3x3( a2, a3, a4, b2, b3, b4, c2, c3, c4 );
 		
 		gw_float_t det4x4 = M_in[0][0] * det0 - M_in[0][1] * det1 + M_in[0][2] * det2 - M_in[0][3] * det3;
-		if( fabs( det4x4 ) < EPSILON8 ) {
+		if( fabs( det4x4 ) < GWIZ::epsilon8() ) {
 			printf("inverse4x4 ERR: non-singular matrix\n");
 			return( 0 );
 		}
@@ -178,7 +166,7 @@ inline int invert4x4( gw_float_t M[4][4] )	{
 		gw_float_t det3 = determinant3x3( a2, a3, a4, b2, b3, b4, c2, c3, c4 );
 
 		gw_float_t det4x4 = M[0][0] * det0 - M[0][1] * det1 + M[0][2] * det2 - M[0][3] * det3;
-		if( fabs( det4x4 ) < EPSILON8 ) {
+		if( fabs( det4x4 ) < GWIZ::epsilon8() ) {
 			printf("invert4x4 ERR: non-singular matrix\n");
 			return( 0 );
 		}
@@ -242,7 +230,7 @@ inline quat_t quatFrom4x4( const gw_float_t M[4][4] )   {
     register gw_float_t ww, xx, yy, rcp, qx, qy, qz, qw;
     
 		ww = 0.25*( 1.0 + M[0][0] + M[1][1] + M[2][2] );
-		if( ww > EPSILON6 ) {
+		if( ww > GWIZ::epsilon6() ) {
 			qw = sqrt( ww );
 			rcp = 1.0 / ( 4.0*qw );
 			qx = ( M[1][2] - M[2][1] )*rcp;
@@ -252,7 +240,7 @@ inline quat_t quatFrom4x4( const gw_float_t M[4][4] )   {
 		else	{
 			qw = 0.0;
 			xx = -0.5*( M[1][1] + M[2][2] );
-			if( xx > EPSILON6 )	{
+			if( xx > GWIZ::epsilon6() )	{
 				qx = sqrt( xx );
 				rcp = 1.0 / ( 2.0*qx );
 				qy = M[0][1]*rcp;
@@ -261,7 +249,7 @@ inline quat_t quatFrom4x4( const gw_float_t M[4][4] )   {
 			else    {
 				qx = 0.0;
 				yy = 0.5*( 1 - M[2][2] );
-				if( yy > EPSILON6 ) {
+				if( yy > GWIZ::epsilon6() ) {
 					qy = sqrt( yy );
 					qz = M[1][2] / ( 2.0*qy );
 				}
@@ -280,7 +268,7 @@ inline quat_t quatFrom3x3( const vector_t col[3] )	{
     register gw_float_t ww, xx, yy, rcp, qx, qy, qz, qw;
 	
 		ww = 0.25*( 1.0 + col[0].x() + col[1].y() + col[2].z() );
-		if( ww > EPSILON6 ) {
+		if( ww > GWIZ::epsilon6() ) {
 			qw = sqrt( ww );
 			rcp = 1.0 / ( 4.0*qw );
 			qx = ( col[1].z() - col[2].y() )*rcp;
@@ -290,7 +278,7 @@ inline quat_t quatFrom3x3( const vector_t col[3] )	{
 		else	{
 			qw = 0.0;
 			xx = -0.5*( col[1].y() + col[2].z() );
-			if( xx > EPSILON6 )	{
+			if( xx > GWIZ::epsilon6() )	{
 				qx = sqrt( xx );
 				rcp = 1.0 / ( 2.0*qx );
 				qy = col[0].y()*rcp;
@@ -299,7 +287,7 @@ inline quat_t quatFrom3x3( const vector_t col[3] )	{
 			else    {
 				qx = 0.0;
 				yy = 0.5*( 1 - col[2].z() );
-				if( yy > EPSILON6 ) {
+				if( yy > GWIZ::epsilon6() ) {
 					qy = sqrt( yy );
 					qz = col[1].z() / ( 2.0*qy );
 				}
@@ -320,8 +308,8 @@ inline euler_t eulerFrom4x4( const gw_float_t M[4][4] )	{
 	register gw_float_t ex_rad, ey_rad, ez_rad;
 
 		gw_float_t s = -M[2][1];
-        ex_rad = gwiz_safe_asin( s );
-		if( ( 1.0 - fabs( s ) ) > EPSILON6 )	{
+        ex_rad = GWIZ::safe_asin( s );
+		if( ( 1.0 - fabs( s ) ) > GWIZ::epsilon6() )	{
 			ey_rad = atan2( M[2][0], M[2][2] );
 			ez_rad = atan2( M[0][1], M[1][1] );
 		}
@@ -336,8 +324,8 @@ inline euler_t eulerFrom3x3( const vector_t col[3] )	{
 	register gw_float_t ex_rad, ey_rad, ez_rad;
 
 		gw_float_t s = -col[2].y();
-        ex_rad = gwiz_safe_asin( s );
-		if( ( 1.0 - fabs( s ) ) > EPSILON6 )	{
+        ex_rad = GWIZ::safe_asin( s );
+		if( ( 1.0 - fabs( s ) ) > GWIZ::epsilon6() )	{
 			ey_rad = atan2( col[2].x(), col[2].z() );
   			ez_rad = atan2( col[0].y(), col[1].y() );
 		}
@@ -358,9 +346,9 @@ inline euler_t eulerFromQuat( const quat_t& q )	{
 	register gw_float_t wy = q.w() * q.y(); 
 	register gw_float_t ex_rad, ey_rad, ez_rad;
 
-		gw_float_t s = -( 2.0 - EPSILON6 ) * ( q.y() * q.z() - q.w() * q.x() );
-		ex_rad = gwiz_safe_asin( s );
-		if( ( 1.0 - fabs( s ) ) > EPSILON6 )	{
+		gw_float_t s = -( 2.0 - GWIZ::epsilon6() ) * ( q.y() * q.z() - q.w() * q.x() );
+		ex_rad = GWIZ::safe_asin( s );
+		if( ( 1.0 - fabs( s ) ) > GWIZ::epsilon6() )	{
 			ey_rad = atan2( 2.0*( xz + wy ), 1.0 - 2.0*( xx + yy ) );
 			ez_rad = atan2( 2.0*( q.x() * q.y() + q.w() * q.z() ), 1.0 - 2.0*( zz + xx ) );
 		}
@@ -392,9 +380,9 @@ inline quat_t interpolateQuat( gw_float_t t, const quat_t& q0, const quat_t& q_t
 		}
 #endif
 
-		if( ( 1.0 + co ) > EPSILON6 )	{
-			if( ( 1.0 - co ) > EPSILON6 )   {
-				gw_float_t om = gwiz_safe_acos( co );
+		if( ( 1.0 + co ) > GWIZ::epsilon6() )	{
+			if( ( 1.0 - co ) > GWIZ::epsilon6() )   {
+				gw_float_t om = GWIZ::safe_acos( co );
 				gw_float_t rs = 1.0/sin( om );
 				s0 = sin( ( 1.0 - t )*om )*rs;
 				s1 = sin( t*om )*rs;
@@ -459,7 +447,7 @@ inline int decompose4x4General( const gw_float_t M[4][4], vector4_t* P, vector_t
 	register int i, j;
 	
 	/* Test for degeneracy. */
-		if( fabs( M[3][3] ) < EPSILON8 )	{
+		if( fabs( M[3][3] ) < GWIZ::epsilon8() )	{
 			printf( "decompose4x4General NOTIFY: degenerate matrix: M[3][3] == 0.0\n" );
 			return( 0 );
 		}
@@ -472,7 +460,7 @@ inline int decompose4x4General( const gw_float_t M[4][4], vector4_t* P, vector_t
 			M_tmp[i][3] = M[i][3];
 		}
 
-		if( flag == GWIZ_UNKNOWN )	{
+		if( flag == GWIZ::COMP_UNKNOWN )	{
 
 		/* Normalize the matrix. */
 			gw_float_t inv_m33 = 1.0/M[3][3];
@@ -482,7 +470,7 @@ inline int decompose4x4General( const gw_float_t M[4][4], vector4_t* P, vector_t
 		
 		/* Test for singularity. */
 			gw_float_t det = determinant4x4( M_tmp );
-			if( fabs( det ) < EPSILON8 )	{
+			if( fabs( det ) < GWIZ::epsilon8() )	{
 				printf( "decompose4x4General ERR: singular matrix: determinant4x4( M ) == 0.0\n" );
 				return( 0 );
 			}
@@ -491,9 +479,9 @@ inline int decompose4x4General( const gw_float_t M[4][4], vector4_t* P, vector_t
 	// PERSPECTIVE TRACE
 		if( P )	{
 			if( 
-				fabs( M_tmp[0][3] ) > EPSILON6 || 
-				fabs( M_tmp[1][3] ) > EPSILON6 ||
-				fabs( M_tmp[2][3] ) > EPSILON6 
+				fabs( M_tmp[0][3] ) > GWIZ::epsilon6() || 
+				fabs( M_tmp[1][3] ) > GWIZ::epsilon6() ||
+				fabs( M_tmp[2][3] ) > GWIZ::epsilon6() 
 				) {
 
 				matrix_t pmat;
@@ -542,12 +530,12 @@ inline int decompose4x4General( const gw_float_t M[4][4], vector4_t* P, vector_t
 			printf( "X-Z cos: %f\n", col[0].normal().dot( col[2].normal() ) );
 			printf( "Y-Z cos: %f\n", col[1].normal().dot( col[2].normal() ) );
 
-			printf( "X-Y angle: %f\n", DEG( gwiz_safe_acos( col[0].normal().dot( col[1].normal() ) ) ) );
-			printf( "X-Z angle: %f\n", DEG( gwiz_safe_acos( col[0].normal().dot( col[2].normal() ) ) ) );
-			printf( "Y-Z angle: %f\n", DEG( gwiz_safe_acos( col[1].normal().dot( col[2].normal() ) ) ) );
+			printf( "X-Y angle: %f\n", DEG( GWIZ::safe_acos( col[0].normal().dot( col[1].normal() ) ) ) );
+			printf( "X-Z angle: %f\n", DEG( GWIZ::safe_acos( col[0].normal().dot( col[2].normal() ) ) ) );
+			printf( "Y-Z angle: %f\n", DEG( GWIZ::safe_acos( col[1].normal().dot( col[2].normal() ) ) ) );
 #endif
 
-			if( flag != GWIZ_M_TR )	{
+			if( flag != GWIZ::COMP_M_TR )	{
 				
 				gw_float_t Sh_xy = 1.0;
 				gw_float_t Sh_xz = 1.0;
@@ -559,7 +547,7 @@ inline int decompose4x4General( const gw_float_t M[4][4], vector4_t* P, vector_t
 					col[0] /= Sc_x;
 				
 			/* Compute XY shear factor and make 2nd col orthogonal to 1st. */
-				if( flag != GWIZ_M_TRS )	{
+				if( flag != GWIZ::COMP_M_TRS )	{
 					Sh_xy = col[0].dot( col[1] );
 					if( Sh_xy != 0.0 )
 						col[1] = col[1] - col[0] * Sh_xy;
@@ -569,12 +557,12 @@ inline int decompose4x4General( const gw_float_t M[4][4], vector4_t* P, vector_t
 				Sc_y = col[1].length();
 				if( Sc_y != 1.0 )	{
 					col[1] /= Sc_y;
-					if( flag != GWIZ_M_TRS )
+					if( flag != GWIZ::COMP_M_TRS )
 						Sh_xy /= Sc_y;
 				}
 	
 			/* Compute XZ and YZ shears, orthogonalize 3rd col. */
-				if( flag != GWIZ_M_TRS )	{
+				if( flag != GWIZ::COMP_M_TRS )	{
 					Sh_xz = col[0].dot( col[2] );
 					if( Sh_xz != 0.0 )
 						col[2] = col[2] - col[0] * Sh_xz;
@@ -603,14 +591,14 @@ inline int decompose4x4General( const gw_float_t M[4][4], vector4_t* P, vector_t
 		 */
 		 
 #if 0
-			printf( "X-Y angle: %f\n", DEG( gwiz_safe_acos( col[0].dot( col[1] ) ) ) );
-			printf( "X-Z angle: %f\n", DEG( gwiz_safe_acos( col[0].dot( col[2] ) ) ) );
-			printf( "Y-Z angle: %f\n", DEG( gwiz_safe_acos( col[1].dot( col[2] ) ) ) );
+			printf( "X-Y angle: %f\n", DEG( GWIZ::safe_acos( col[0].dot( col[1] ) ) ) );
+			printf( "X-Z angle: %f\n", DEG( GWIZ::safe_acos( col[0].dot( col[2] ) ) ) );
+			printf( "Y-Z angle: %f\n", DEG( GWIZ::safe_acos( col[1].dot( col[2] ) ) ) );
 #endif
 		 
 			if( Sc || Q || E )	{
 
-				if( flag != GWIZ_M_TR )	{
+				if( flag != GWIZ::COMP_M_TR )	{
 				
 					if( Sc_z != 1.0 )	{
 						col[2] /= Sc_z;
@@ -685,7 +673,7 @@ inline int decompose4x4TRS( const gw_float_t M[4][4], vector_t* T, quat_t* Q, eu
 vector_t vector_t::normal( void ) const	{
 	register gw_float_t len = length();
 
-		if( len < EPSILON6 )
+		if( len < GWIZ::epsilon6() )
 			return( vector_t( 1.0, 0.0, 0.0 ) );
 		return( (*this) / len );
 }
@@ -693,7 +681,7 @@ vector_t vector_t::normal( void ) const	{
 vector_t& vector_t::normalize( void )	{
 	register gw_float_t len = length();
 
-		if( len < EPSILON6 )
+		if( len < GWIZ::epsilon6() )
 			return( (*this) = vector_t( 1.0, 0.0, 0.0 ) );
 		return( (*this) /= len );
 }
@@ -703,7 +691,7 @@ vector_t& vector_t::normalize( void )	{
 quat_t::quat_t( const vector_t& axis_angle )	{
 
 	gw_float_t rad = axis_angle.length();
-	if( rad < EPSILON6 )	{
+	if( rad < GWIZ::epsilon6() )	{
 		*this = quat_t();
 	}
 	else	{
@@ -745,7 +733,7 @@ quat_t::quat_t( gw_float_t swing_x, gw_float_t swing_y, gw_float_t twist, int us
 
 quat_t::quat_t( const vector_t& z_axis, const vector_t& y_axis_approx )	{
 
-	*this = matrixFromZY( z_axis, y_axis_approx ).quat( GWIZ_M_TR );
+	*this = matrixFromZY( z_axis, y_axis_approx ).quat( GWIZ::COMP_M_TR );
 }
 
 quat_t::quat_t( const euler_t& e ) {
@@ -759,12 +747,12 @@ quat_t::quat_t( const euler_t& e ) {
 vector_t quat_t::swingtwist( int use_radians ) const	{
 
 	if( use_radians )	{
-		if( ( W < EPSILON6 )&&( Z < EPSILON6 ) )	{
+		if( ( W < GWIZ::epsilon6() )&&( Z < GWIZ::epsilon6() ) )	{
 			return( vector_t( M_PI, 0.0, 0.0 ) );
 		}
 	}
 	else	{
-		if( ( W < EPSILON4 )&&( Z < EPSILON4 ) )	{
+		if( ( W < GWIZ::epsilon4() )&&( Z < GWIZ::epsilon4() ) )	{
 			return( vector_t( 180.0, 0.0, 0.0 ) );
 		}
 	}
@@ -780,7 +768,7 @@ vector_t quat_t::swingtwist( int use_radians ) const	{
 	gw_float_t gamma = atan2( q.Z, q.W );
 	gw_float_t beta = atan2( sqrt( q.X*q.X + q.Y*q.Y ), sqrt( q.Z*q.Z + q.W*q.W ) );
 	gw_float_t sinc = 1.0;
-	if( beta > EPSILON6 )	{
+	if( beta > GWIZ::epsilon6() )	{
 		sinc = sin( beta )/beta;
 	}
 	gw_float_t s = sin( gamma );
@@ -800,12 +788,12 @@ quat_t& quat_t::normalize( void )	{
 	register gw_float_t len = sqrt( W*W + X*X + Y*Y + Z*Z );
 
 #if 0
-		if( len < EPSILON6 )
+		if( len < GWIZ::epsilon6() )
 			return( (*this) = quat_t( 1.0, 0.0, 0.0, 0.0 ) );
 		gw_float_t inv_len = 1.0/len;
 		return( (*this) = quat_t( W * inv_len, X * inv_len, Y * inv_len, Z * inv_len ) );
 #else
-		if( len < EPSILON6 )	{
+		if( len < GWIZ::epsilon6() )	{
 			W = 1.0; X = 0.0; Y = 0.0; Z = 0.0;
 		}
 		else	{
@@ -817,8 +805,11 @@ quat_t& quat_t::normalize( void )	{
 }
 
 quat_t quat_t::lerp( gw_float_t s, const quat_t& q ) const {
+#if 1
 		return( interpolateQuat( s, *this, q.shortest( *this ) ) );
-//		return( interpolateQuat( s, *this, q ) );
+#else
+		return( interpolateQuat( s, *this, q ) );
+#endif
 }
 
 matrix_t quat_t::operator * ( const matrix_t& R ) const {
@@ -842,10 +833,10 @@ euler_t::euler_t( const vector_t& z_axis, gw_float_t roll_deg )	{
 	vector_t norm = z_axis.normal();
 		
 		gw_float_t s = -norm.y();
-		ex_rad = gwiz_safe_asin( s );
+		ex_rad = GWIZ::safe_asin( s );
 		X = DEG( ex_rad );
 
-		if( ( 1.0 - fabs( s ) ) > EPSILON6 )	{
+		if( ( 1.0 - fabs( s ) ) > GWIZ::epsilon6() )	{
 			ey_rad = atan2( -norm.z(), norm.x() );
 			Y = DEG( ey_rad ) + 90.0;
 			Z = roll_deg;
@@ -858,7 +849,7 @@ euler_t::euler_t( const vector_t& z_axis, gw_float_t roll_deg )	{
 
 euler_t::euler_t( const vector_t& z_axis, const vector_t& y_axis_approx )	{
 
-	*this = matrixFromZY( z_axis, y_axis_approx ).euler( GWIZ_M_TR );
+	*this = matrixFromZY( z_axis, y_axis_approx ).euler( GWIZ::COMP_M_TR );
 }
 
 euler_t::euler_t( const quat_t& q )	{ 
@@ -951,8 +942,8 @@ matrix_t& matrix_t::frustum( const vector_t& B_L_dir, const vector_t& R_T_dir, g
 }
 
 matrix_t& matrix_t::frustum( gw_float_t fovy, gw_float_t aspect, gw_float_t near, gw_float_t far )	{
-		gw_float_t T = near*ftan( RAD( fovy*0.5 ) );
-		gw_float_t R = aspect*T;
+		gw_float_t T = near * tan( RAD( fovy * 0.5 ) );
+		gw_float_t R = aspect * T;
 		return( frustum( -R, R, -T, T, near, far ) );
 }
 
@@ -1000,16 +991,16 @@ matrix_t& matrix_t::lineator( const vector_t& x, const vector_t& y, const vector
 
 int matrix_t::decompose( vector4_t* P, vector_t* T, quat_t* Q, euler_t * E, vector_t* Sh, vector_t* Sc, int flag ) const	{
 
-		if( flag == GWIZ_M_TR )	{
-			if( T ) *T = translation( GWIZ_M_TR );
+		if( flag == GWIZ::COMP_M_TR )	{
+			if( T ) *T = translation( GWIZ::COMP_M_TR );
 			if( Q || E )	{
-				quat_t q = quat( GWIZ_M_TR );
+				quat_t q = quat( GWIZ::COMP_M_TR );
 				if( Q ) *Q = q;
 				if( E ) *E = q;
 			}
 			return( 1 );
 		}
-		if( flag == GWIZ_M_TRS )	{
+		if( flag == GWIZ::COMP_M_TRS )	{
 			return( decompose4x4TRS( M, T, Q, E, Sc ) );
 		}
 		return( decompose4x4General( M, P, T, Q, E, Sh, Sc, flag ) );
@@ -1026,7 +1017,7 @@ vector4_t matrix_t::perspective( int flag ) const	{
 
 vector_t matrix_t::translation( int flag ) const	{
 
-		if( flag == GWIZ_UNKNOWN )	{
+		if( flag == GWIZ::COMP_UNKNOWN )	{
 			vector_t T;
 			decompose( 0x0, &T, 0x0, 0x0, 0x0, 0x0, flag );
 			return( T );
@@ -1036,11 +1027,11 @@ vector_t matrix_t::translation( int flag ) const	{
 
 quat_t matrix_t::quat( int flag ) const	{
 
-		if( flag == GWIZ_M_TR )	{
+		if( flag == GWIZ::COMP_M_TR )	{
 			return( quatFrom4x4( M ) );
 		}
 		quat_t Q;
-		if( flag == GWIZ_M_TRS )
+		if( flag == GWIZ::COMP_M_TRS )
 			decompose4x4TRS( M, 0x0, &Q, 0x0, 0x0 );
 		else
 			decompose( 0x0, 0x0, &Q, 0x0, 0x0, 0x0, flag );
@@ -1049,11 +1040,11 @@ quat_t matrix_t::quat( int flag ) const	{
 
 euler_t matrix_t::euler( int flag ) const	{
 
-		if( flag == GWIZ_M_TR )	{
+		if( flag == GWIZ::COMP_M_TR )	{
 			return( eulerFrom4x4( M ) );
 		}
 		euler_t E;
-		if( flag == GWIZ_M_TRS )
+		if( flag == GWIZ::COMP_M_TRS )
 			decompose4x4TRS( M, 0x0, 0x0, &E, 0x0 );
 		else
 			decompose( 0x0, 0x0, 0x0, &E, 0x0, 0x0, flag );
@@ -1097,11 +1088,11 @@ void read_gwiz_composition( vector_t T, euler_t E, vector_t S )	{
 		& e, 
 		NULL, 
 		& s, 
-//		GWIZ_UNKNOWN 
-//		GWIZ_M_PTRSH 
-//		GWIZ_M_TRSH 
-		GWIZ_M_TRS 
-//		GWIZ_M_TR 
+//		GWIZ::COMP_UNKNOWN 
+//		GWIZ::COMP_M_PTRSH 
+//		GWIZ::COMP_M_TRSH 
+		GWIZ::COMP_M_TRS 
+//		GWIZ::COMP_M_TR 
 	);
 	
 	printf( "\n" );
@@ -1112,10 +1103,10 @@ void read_gwiz_composition( vector_t T, euler_t E, vector_t S )	{
 	printf( "q: %f { %f %f %f }\n", q.degrees(), a.x(), a.y(), a.z() );
 
 	// quat:
-	// GWIZ_M_TR: 46.0 { 0.08 0.97 0.20 }
+	// COMP_M_TR: 46.0 { 0.08 0.97 0.20 }
 	
 	// euler:
-	// GWIZ_M_TR: 45 0 10
+	// COMP_M_TR: 45 0 10
 	
 	printf( "\n" );
 	printf( "e: %f %f %f\n", e.y(), e.x(), e.z() );
@@ -1126,7 +1117,7 @@ void read_gwiz_composition( vector_t T, euler_t E, vector_t S )	{
 	printf( "Q: %f { %f %f %f }\n", Q.degrees(), A.x(), A.y(), A.z() );
 	
 	// euler->quat:
-	// GWIZ_M_TR: OK: 46.0 { 0.08 0.97 0.20 }
+	// COMP_M_TR: OK: 46.0 { 0.08 0.97 0.20 }
 	
 	printf( "\n" );
 	printf( "s: %f %f %f\n", s.x(), s.y(), s.z() );

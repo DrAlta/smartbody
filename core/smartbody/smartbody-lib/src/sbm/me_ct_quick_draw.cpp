@@ -29,8 +29,6 @@
 #define DFL_CTRL_TIME_INDT		( 0.3f )
 #define DFL_CTRL_TIME_OUTDT		( 0.3f )
 
-gw_float_t gwiz_safe_acos( gw_float_t c );
-
 //////////////////////////////////////////////////////////////////////////////////
 
 const char* MeCtQuickDraw::type_name = "QuickDraw";
@@ -298,8 +296,8 @@ MeCtQuickDraw::joint_state_t MeCtQuickDraw::capture_joint_state( SkJoint *joint_
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		state.local_pos = M.translation( GWIZ_M_TR );
-		state.local_rot = M.quat( GWIZ_M_TR );
+		state.local_pos = M.translation( GWIZ::COMP_M_TR );
+		state.local_rot = M.quat( GWIZ::COMP_M_TR );
 
 		sr_M = joint_p->gmat();
 		for( i=0; i<4; i++ )	{
@@ -307,8 +305,8 @@ MeCtQuickDraw::joint_state_t MeCtQuickDraw::capture_joint_state( SkJoint *joint_
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		state.world_pos = M.translation( GWIZ_M_TR );
-		state.world_rot = M.quat( GWIZ_M_TR );
+		state.world_pos = M.translation( GWIZ::COMP_M_TR );
+		state.world_rot = M.quat( GWIZ::COMP_M_TR );
 
 		SkJoint* parent_p = joint_p->parent();
 		if( parent_p )	{
@@ -319,8 +317,8 @@ MeCtQuickDraw::joint_state_t MeCtQuickDraw::capture_joint_state( SkJoint *joint_
 					M.set( i, j, sr_M.get( i, j ) );
 				}
 			}
-			state.parent_pos = M.translation( GWIZ_M_TR );
-			state.parent_rot = M.quat( GWIZ_M_TR );
+			state.parent_pos = M.translation( GWIZ::COMP_M_TR );
+			state.parent_rot = M.quat( GWIZ::COMP_M_TR );
 		}
 		else	{
 			const char *name = joint_p->name();
@@ -334,7 +332,7 @@ quat_t MeCtQuickDraw::rotation_to_target( vector_t l_forward_dir, vector_t w_tar
 
 	vector_t l_target_dir_n = ( -state_p->parent_rot ) * ( w_target_pos - state_p->world_pos ).normal();
 
-	gw_float_t angle = DEG( gwiz_safe_acos( l_forward_dir.dot( l_target_dir_n ) ) );
+	gw_float_t angle = DEG( GWIZ::safe_acos( l_forward_dir.dot( l_target_dir_n ) ) );
 	vector_t axis = l_forward_dir.cross( l_target_dir_n ).normal();
 
 	return( quat_t( angle, axis ) );
@@ -381,8 +379,8 @@ vector_t MeCtQuickDraw::world_target_point( void )	{
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		vector_t pos = M.translation( GWIZ_M_TR );
-		quat_t rot = M.quat( GWIZ_M_TR );
+		vector_t pos = M.translation( GWIZ::COMP_M_TR );
+		quat_t rot = M.quat( GWIZ::COMP_M_TR );
 		return( pos + rot * point_target_pos );
 	}
 	return( point_target_pos );
