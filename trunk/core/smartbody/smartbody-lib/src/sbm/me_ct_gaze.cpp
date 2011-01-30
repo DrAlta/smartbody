@@ -463,8 +463,8 @@ LOG( "CALC: joint: %s\n", joint_label( priority_joint ) );
 			M.set( i, j, sr_M.get( i, j ) );
 		}
 	}
-	vector_t w_joint_pos = M.translation( GWIZ_M_TR );
-	quat_t w_joint_rot = M.quat( GWIZ_M_TR );
+	vector_t w_joint_pos = M.translation( GWIZ::COMP_M_TR );
+	quat_t w_joint_rot = M.quat( GWIZ::COMP_M_TR );
 
 	if( target_mode == TARGET_POINT )	{
 		vector_t w_tgt_pos = world_target_point();
@@ -566,8 +566,8 @@ void MeCtGaze::inspect_skeleton_local_transform_down( SkJoint* joint_p, int dept
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		vector_t pos = M.translation( GWIZ_M_TR );
-		euler_t rot = M.euler( GWIZ_M_TR );
+		vector_t pos = M.translation( GWIZ::COMP_M_TR );
+		euler_t rot = M.euler( GWIZ::COMP_M_TR );
 
 		char indent[ 256 ];
 		for( c=0; c<depth; c++ ) { indent[ c ] = ' '; }
@@ -599,8 +599,8 @@ void MeCtGaze::inspect_skeleton_world_transform_down( SkJoint* joint_p, int dept
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		vector_t pos = M.translation( GWIZ_M_TR );
-		euler_t rot = M.euler( GWIZ_M_TR );
+		vector_t pos = M.translation( GWIZ::COMP_M_TR );
+		euler_t rot = M.euler( GWIZ::COMP_M_TR );
 
 		char indent[ 256 ];
 		for( c=0; c<depth; c++ ) { indent[ c ] = ' '; }
@@ -631,8 +631,8 @@ void MeCtGaze::inspect_skeleton_local_transform_up( SkJoint* joint_p, int depth 
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		vector_t pos = M.translation( GWIZ_M_TR );
-		euler_t rot = M.euler( GWIZ_M_TR );
+		vector_t pos = M.translation( GWIZ::COMP_M_TR );
+		euler_t rot = M.euler( GWIZ::COMP_M_TR );
 
 		char indent[ 256 ];
 		for( c=0; c<depth; c++ ) { indent[ c ] = ' '; }
@@ -828,8 +828,8 @@ vector_t MeCtGaze::world_target_point( void )	{
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		vector_t pos = M.translation( GWIZ_M_TR );
-		quat_t rot = M.quat( GWIZ_M_TR );
+		vector_t pos = M.translation( GWIZ::COMP_M_TR );
+		quat_t rot = M.quat( GWIZ::COMP_M_TR );
 		return( pos + rot * point_target_pos );
 	}
 	return( point_target_pos );
@@ -855,7 +855,7 @@ quat_t MeCtGaze::world_target_orient( void )	{
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		quat_t rot = M.quat( GWIZ_M_TR );
+		quat_t rot = M.quat( GWIZ::COMP_M_TR );
 		return( rot * orient_target_rot );
 	}
 	return( orient_target_rot );

@@ -141,8 +141,8 @@ MeCtTether::joint_state_t MeCtTether::capture_joint_state( SkJoint *joint_p ) {
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		state.local_pos = M.translation( GWIZ_M_TR );
-		state.local_rot = M.quat( GWIZ_M_TR );
+		state.local_pos = M.translation( GWIZ::COMP_M_TR );
+		state.local_rot = M.quat( GWIZ::COMP_M_TR );
 
 		sr_M = joint_p->gmat();
 		for( i=0; i<4; i++ )	{
@@ -150,8 +150,8 @@ MeCtTether::joint_state_t MeCtTether::capture_joint_state( SkJoint *joint_p ) {
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		state.world_pos = M.translation( GWIZ_M_TR );
-		state.world_rot = M.quat( GWIZ_M_TR );
+		state.world_pos = M.translation( GWIZ::COMP_M_TR );
+		state.world_rot = M.quat( GWIZ::COMP_M_TR );
 	}
 	return( state );
 }

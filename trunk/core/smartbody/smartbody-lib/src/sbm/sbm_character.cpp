@@ -1319,8 +1319,8 @@ void SbmCharacter::inspect_skeleton_local_transform( SkJoint* joint_p, int depth
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		vector_t pos = M.translation( GWIZ_M_TR );
-		euler_t rot = M.euler( GWIZ_M_TR );
+		vector_t pos = M.translation( GWIZ::COMP_M_TR );
+		euler_t rot = M.euler( GWIZ::COMP_M_TR );
 
 		for( j=0; j<depth; j++ ) { LOG( " " ); }
 		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
@@ -1350,8 +1350,8 @@ void SbmCharacter::inspect_skeleton_world_transform( SkJoint* joint_p, int depth
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		vector_t pos = M.translation( GWIZ_M_TR );
-		euler_t rot = M.euler( GWIZ_M_TR );
+		vector_t pos = M.translation( GWIZ::COMP_M_TR );
+		euler_t rot = M.euler( GWIZ::COMP_M_TR );
 
 		for( j=0; j<depth; j++ ) { LOG( " " ); }
 		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
@@ -1427,14 +1427,13 @@ int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 					double blend_out_start = now + qdraw_ct->get_holster_duration();
 					float  blend_out_dur   = qdraw_ct->outdt();
 					double blend_out_end   = blend_out_start + blend_out_dur;
-					float  blend_spline_tanget = -1/blend_out_dur;
+//					float  blend_spline_tanget = -1/blend_out_dur;
 
 					MeCtBlend* blend_ct = (MeCtBlend*)blending_ct;
 					srLinearCurve& blend_curve = blend_ct->get_curve();
+					blend_curve.clear_after( blend_out_start );
 					blend_curve.insert( blend_out_start, 1.0 );
 					blend_curve.insert( blend_out_end, 0.0 );
-
-	// TODO: delete following knots
 
 					if( blend_out_dur > max_blend_dur )
 						max_blend_dur = blend_out_end;

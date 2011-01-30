@@ -332,8 +332,8 @@ void MeCtSimpleGazeJoint::capture_joint_state( void ) {
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		local_pos = M.translation( GWIZ_M_TR );
-		local_rot = M.quat( GWIZ_M_TR );
+		local_pos = M.translation( GWIZ::COMP_M_TR );
+		local_rot = M.quat( GWIZ::COMP_M_TR );
 
 		sr_M = joint_p->gmat();
 		for( i=0; i<4; i++ )	{
@@ -341,8 +341,8 @@ void MeCtSimpleGazeJoint::capture_joint_state( void ) {
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		world_pos = M.translation( GWIZ_M_TR );
-		world_rot = M.quat( GWIZ_M_TR );
+		world_pos = M.translation( GWIZ::COMP_M_TR );
+		world_rot = M.quat( GWIZ::COMP_M_TR );
 
 		SkJoint* parent_p = joint_p->parent();
 		if( parent_p )	{
@@ -353,8 +353,8 @@ void MeCtSimpleGazeJoint::capture_joint_state( void ) {
 					M.set( i, j, sr_M.get( i, j ) );
 				}
 			}
-			parent_pos = M.translation( GWIZ_M_TR );
-			parent_rot = M.quat( GWIZ_M_TR );
+			parent_pos = M.translation( GWIZ::COMP_M_TR );
+			parent_rot = M.quat( GWIZ::COMP_M_TR );
 		}
 		else	{
 			const char *name = joint_p->name();
@@ -744,8 +744,8 @@ void MeCtSimpleGaze::inspect_skeleton_local_transform( SkJoint* joint_p, int dep
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		vector_t pos = M.translation( GWIZ_M_TR );
-		euler_t rot = M.euler( GWIZ_M_TR );
+		vector_t pos = M.translation( GWIZ::COMP_M_TR );
+		euler_t rot = M.euler( GWIZ::COMP_M_TR );
 
 		for( j=0; j<depth; j++ ) { LOG( " " ); }
 		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
@@ -775,8 +775,8 @@ void MeCtSimpleGaze::inspect_skeleton_world_transform( SkJoint* joint_p, int dep
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		vector_t pos = M.translation( GWIZ_M_TR );
-		euler_t rot = M.euler( GWIZ_M_TR );
+		vector_t pos = M.translation( GWIZ::COMP_M_TR );
+		euler_t rot = M.euler( GWIZ::COMP_M_TR );
 
 		for( j=0; j<depth; j++ ) { LOG( " " ); }
 		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
@@ -844,8 +844,8 @@ vector_t MeCtSimpleGaze::world_target_point( void )	{
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		vector_t pos = M.translation( GWIZ_M_TR );
-		quat_t rot = M.quat( GWIZ_M_TR );
+		vector_t pos = M.translation( GWIZ::COMP_M_TR );
+		quat_t rot = M.quat( GWIZ::COMP_M_TR );
 		return( pos + rot * point_target_pos );
 	}
 	return( point_target_pos );
@@ -866,7 +866,7 @@ quat_t MeCtSimpleGaze::world_target_orient( void )	{
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		quat_t rot = M.quat( GWIZ_M_TR );
+		quat_t rot = M.quat( GWIZ::COMP_M_TR );
 		return( rot * orient_target_rot );
 	}
 	return( orient_target_rot );
