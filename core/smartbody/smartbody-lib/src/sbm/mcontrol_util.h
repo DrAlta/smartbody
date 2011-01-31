@@ -356,6 +356,8 @@ class mcuCBHandle	{
 
 		srCmdSeq* lookup_seq( const char* );
 
+		SkMotion* lookUpMotion(const char* motionName);
+
 		int execute( const char *key, srArgBuffer& args ) { 
 			std::stringstream strstr;
 			strstr << key << " " << args.peek_string();

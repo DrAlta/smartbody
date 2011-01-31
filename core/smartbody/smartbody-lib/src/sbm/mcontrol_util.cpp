@@ -1053,6 +1053,14 @@ std::string mcuCBHandle::getMediaPath()
 	return media_path;
 }
 
+SkMotion* mcuCBHandle::lookUpMotion( const char* motionName )
+{
+	SkMotion* anim_p = NULL;
+	std::map<std::string, SkMotion*>::iterator animIter = motion_map.find(motionName);
+	if (animIter != motion_map.end())
+		anim_p = (*animIter).second;
+	return anim_p;
+}
 
 
 

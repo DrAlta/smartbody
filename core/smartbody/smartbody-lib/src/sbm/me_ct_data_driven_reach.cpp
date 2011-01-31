@@ -95,6 +95,9 @@ int PoseExampleSet::linearKNN( const vector<double>& parameter, vector<float>& d
 
 void PoseExampleSet::kdTreeKNN( const vector<double>& parameter, vector<float>& dists, vector<PoseExample*>& KNN, int nK )
 {	
+	if (poseData.size() == 0)
+		return;
+
 	dists.resize(nK);
 	KNN.resize(nK);		
 	ANNidxArray nnIdx;
@@ -121,6 +124,9 @@ void PoseExampleSet::kdTreeKNN( const vector<double>& parameter, vector<float>& 
 
 void PoseExampleSet::buildKDTree()
 {
+	if (poseData.size() == 0)
+		return;
+
 	FREE_DATA(kdTree);
 	if (dataPts)
 	{
@@ -180,6 +186,9 @@ MeCtDataDrivenReach::~MeCtDataDrivenReach(void)
 
 void MeCtDataDrivenReach::blendPose( vector<SrQuat>& blendPoses, vector<float>& KNNweights, vector<PoseExample*>& KNNPoses )
 {
+	if (KNNPoses.size() == 0)
+		return;
+
 	blendPoses = KNNPoses[0]->jointQuat;
 	float weightSum = KNNweights[0];
 	float w1,w2;	
@@ -293,7 +302,7 @@ bool MeCtDataDrivenReach::controller_evaluate( double t, MeFrameData& frame )
 		for (int i=0;i<blendQuat.size();i++)
 		{
 			MeCtIKScenarioJointInfo* info = &(limb.ik.joint_info_list.get(i));
-			float damping_angle = (float)RAD(info->angular_speed_limit*dt);
+			float damping_angle = (float)RAD(info->angular_speed_limit*dt)*0.5f;
 			limb.joint_quat[i] = MeCtReachIK::dampQuat(limb.joint_quat[i],blendQuat[i],damping_angle);		   
 		}	
 		
@@ -328,7 +337,7 @@ bool MeCtDataDrivenReach::controller_evaluate( double t, MeFrameData& frame )
 	return true;
 }
 
-void MeCtDataDrivenReach::updateExamplesFromMotions( MotionDataSet& inMotionSet, bool rebuild /*= false*/, float minDist /*= 5.0*/ )
+void MeCtDataDrivenReach::updateExamplesFromMotions(const MotionDataSet& inMotionSet, bool rebuild /*= false*/, float minDist /*= 5.0*/ )
 {
 	if (rebuild) 
 	{		
@@ -361,8 +370,10 @@ void MeCtDataDrivenReach::updateExamplesFromMotions( MotionDataSet& inMotionSet,
 void MeCtDataDrivenReach::buildResamplePoseData( int nExamples, float fMinDist /*= 1.0*/ )
 {
 	// infer the bounding box from resample pose data
-	SrBox BBox = examplePoseData.computeBBox();
+	if (examplePoseData.PoseData().size() == 0)
+		return;
 
+	SrBox BBox = examplePoseData.computeBBox();
 	int nCount = 0;
 	int nSamples = nExamples;
 	int nKNN = 6;

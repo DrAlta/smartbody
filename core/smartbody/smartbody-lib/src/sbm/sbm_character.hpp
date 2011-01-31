@@ -287,7 +287,7 @@ public:
 public:
 
 	bool addReachMotion(SkMotion* motion);
-	MotionDataSet& getReachMotionDataSet() { return reachMotionData;}
+	const MotionDataSet& getReachMotionDataSet() const { return reachMotionData;}
 
 	AUChannelMap& get_au_channel_map( void ) { return au_channel_map; }
 	
