@@ -3,19 +3,24 @@
 #include "sr/sr_box.h"
 #include <external/ANN/ANN.h>
 
+
+class PoseExample;
+typedef std::vector<PoseExample> VecOfPoseExample;
+typedef std::vector<SrQuat> VecOfSrQuat;
+typedef std::vector<double> VecOfDouble;
+
+using namespace std;
+
 class PoseExample
 {
 public:
-	SrArray<SrQuat> jointQuat; // joint configuration
-	SrArray<double> poseParameter; // parameter for searching KNN, use end effector position by default
+	VecOfSrQuat jointQuat; // joint configuration
+	VecOfDouble poseParameter; // parameter for searching KNN, use end effector position by default
 public:
 	PoseExample() {};
 	~PoseExample() {};
 	PoseExample& operator=(const PoseExample& rhs);
 };
-
-
-typedef std::vector<PoseExample> VecOfPoseExample;
 
 class PoseExampleSet
 {
@@ -30,8 +35,8 @@ public:
 	const VecOfPoseExample& PoseData() const { return poseData; }
 
 	void buildKDTree();
-	void kdTreeKNN(const SrArray<double>& parameter, SrArray<float>& dists, SrArray<PoseExample*>& KNN, int nK);
-	int linearKNN(const SrArray<double>& parameter, SrArray<float>& dists, SrArray<PoseExample*>& KNN, int nK);	
+	void kdTreeKNN(const vector<double>& parameter, vector<float>& dists, vector<PoseExample*>& KNN, int nK);
+	int linearKNN(const vector<double>& parameter, vector<float>& dists, vector<PoseExample*>& KNN, int nK);	
 
 	bool addPose(const PoseExample& poseEx, float fMinDist = -1.f);
 	SrBox computeBBox();
@@ -63,22 +68,21 @@ public:
 	void buildResamplePoseData(int nExamples, float fMinDist = 1.0);
 	virtual bool controller_evaluate( double t, MeFrameData& frame );
 private:
-	void getPoseParameter(SrArray<double>& para, SkSkeleton* skeleton);
+	void getPoseParameter(vector<double>& para, SkSkeleton* skeleton);
 	void getPoseExampleFromSkeleton(PoseExample& pose);		
 	
-	static void blendPose(SrArray<SrQuat>& blendPoses, SrArray<float>& KNNweights, SrArray<PoseExample*>& KNNPoses);		
-	static void computeWeightFromDists(SrArray<float>& dists, SrArray<float>& outWeights);
-	static void generateRandomWeight(int nK, SrArray<float>& outWeights);
+	static void blendPose(vector<SrQuat>& blendPoses, vector<float>& KNNweights, vector<PoseExample*>& KNNPoses);		
+	static void computeWeightFromDists(vector<float>& dists, vector<float>& outWeights);
+	static void generateRandomWeight(int nK, vector<float>& outWeights);
 	static float Random(float r_min, float r_max);
 	static SrVec randomPointInBox(SrBox& box);	
 	static SrVec getWorldPos(SkJoint* joint);
 };
 
-template <class T> 
-void Plus(const SrArray<T>& A, const SrArray<T>& B, SrArray<T>& Out, double ratio)
+template <class T> void Plus(const vector<T>& A, const vector<T>& B, vector<T>& Out, double ratio)
 {
 	assert(A.size() == B.size());
-	Out.size(A.size());
+	Out.resize(A.size());
 	for (int i=0;i<A.size();i++)
 	{
 		Out[i] = A[i] + B[i]*ratio;		
@@ -86,7 +90,7 @@ void Plus(const SrArray<T>& A, const SrArray<T>& B, SrArray<T>& Out, double rati
 }
 
 template <class T>
-T Norm2(SrArray<T>& Out)
+T Norm2(vector<T>& Out)
 {
 	T norm = 0.0;
 	for (int i=0;i<Out.size();i++)
@@ -95,11 +99,34 @@ T Norm2(SrArray<T>& Out)
 };
 
 template <class T>
-T Dist(const SrArray<T>& A, const SrArray<T>& B)
+T Dist(const vector<T>& A, const vector<T>& B)
 {
-	SrArray<T> diff;
+	vector<T> diff;
 	Plus(A,B,diff,-1.0);
 	return Norm2(diff);
+}
+
+template <class T>
+void VecToSrArray(const std::vector<T>& inVec, SrArray<T>& outArray)
+{
+	if (inVec.size() == 0)
+		return;
+
+	outArray.capacity(inVec.size());
+	outArray.size(inVec.size());
+	for (int i=0;i<inVec.size();i++)
+		outArray[i] = inVec[i];
+}
+
+template <class T>
+void SrArrayToVec(const SrArray<T>& inArray, std::vector<T>& outVec)
+{
+	if (inArray.size() == 0)
+		return;
+
+	outVec.resize(inArray.size());
+	for (int i=0;i<outVec.size();i++)
+		outVec[i] = inArray[i];
 }
 
 
