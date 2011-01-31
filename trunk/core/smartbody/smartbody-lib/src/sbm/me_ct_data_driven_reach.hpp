@@ -64,7 +64,7 @@ public:
 	const PoseExampleSet& ResampledPosedata() const { return resampledPosedata; }
 	const PoseExampleSet& ExamplePoseData() const { return examplePoseData; }	
 
-	void updateExamplesFromMotions(MotionDataSet& inMotionSet, bool rebuild = false, float minDist = 5.0);	
+	void updateExamplesFromMotions(const MotionDataSet& inMotionSet, bool rebuild = false, float minDist = 5.0);	
 	void buildResamplePoseData(int nExamples, float fMinDist = 1.0);
 	virtual bool controller_evaluate( double t, MeFrameData& frame );
 private:
@@ -83,7 +83,7 @@ template <class T> void Plus(const vector<T>& A, const vector<T>& B, vector<T>& 
 {
 	assert(A.size() == B.size());
 	Out.resize(A.size());
-	for (int i=0;i<A.size();i++)
+	for (unsigned int i=0;i<A.size();i++)
 	{
 		Out[i] = A[i] + B[i]*ratio;		
 	}
@@ -93,7 +93,7 @@ template <class T>
 T Norm2(vector<T>& Out)
 {
 	T norm = 0.0;
-	for (int i=0;i<Out.size();i++)
+	for (unsigned int i=0;i<Out.size();i++)
 		norm += Out[i]*Out[i];
 	return norm;
 };
@@ -114,7 +114,7 @@ void VecToSrArray(const std::vector<T>& inVec, SrArray<T>& outArray)
 
 	outArray.capacity(inVec.size());
 	outArray.size(inVec.size());
-	for (int i=0;i<inVec.size();i++)
+	for (unsigned int i=0;i<inVec.size();i++)
 		outArray[i] = inVec[i];
 }
 
@@ -125,7 +125,7 @@ void SrArrayToVec(const SrArray<T>& inArray, std::vector<T>& outVec)
 		return;
 
 	outVec.resize(inArray.size());
-	for (int i=0;i<outVec.size();i++)
+	for (unsigned int i=0;i<outVec.size();i++)
 		outVec[i] = inArray[i];
 }
 

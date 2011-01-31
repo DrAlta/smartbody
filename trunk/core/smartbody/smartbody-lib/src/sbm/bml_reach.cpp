@@ -52,21 +52,14 @@ const XMLCh DTYPE_SBM[]  = L"ICT.SBM";
 
 ////// XML ATTRIBUTES
 const XMLCh ATTR_REACH_ARM[] = L"reach-arm";
+const XMLCh ATTR_USE_EXAMPLE[] = L"use-example";
+const XMLCh ATTR_BUILD_EXAMPLE[] = L"build-example";
+const XMLCh ATTR_EXAMPLE_DIST[] = L"example-dist"; // minimal distances between pose examples
+const XMLCh ATTR_RESAMPLE_SIZE[] = L"resample-size"; // minimal distances between pose examples
 
 using namespace std;
 using namespace BML;
 using namespace xml_utils;
-
-static SkMotion* lookUpMotion(mcuCBHandle* mcu_p, const char* motionName)
-{
-	SkMotion* anim_p = NULL;
-	std::map<std::string, SkMotion*>::iterator animIter = mcu_p->motion_map.find(motionName);
-	if (animIter != mcu_p->motion_map.end())
-		anim_p = (*animIter).second;
-
-	return anim_p;
-}
-
 
 static void buildReachCtExamples(mcuCBHandle* mcu_p, MeCtDataDrivenReach* reachCt)
 {
@@ -75,7 +68,7 @@ static void buildReachCtExamples(mcuCBHandle* mcu_p, MeCtDataDrivenReach* reachC
 	MotionDataSet motionData;
 	for (int i=0;i<NUM_MOTIONS;i++)
 	{
-		SkMotion* motion = lookUpMotion(mcu_p,motionNames[i]);
+		SkMotion* motion = mcu_p->lookUpMotion(motionNames[i]);
 		if (!motion)
 		{
 			std::stringstream strstr;
@@ -101,16 +94,15 @@ static void buildReachCtExamples(mcuCBHandle* mcu_p, MeCtDataDrivenReach* reachC
 BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
 
-	
+	std::wstringstream wstrstr;	
 	
 	// attach the skeleton to the reach controller
-#define DATA_DRIVEN_REACH 0
+#define DATA_DRIVEN_REACH 1
 #if DATA_DRIVEN_REACH
 	MeCtDataDrivenReach* reachCt = NULL;//new MeCtDataDrivenReach(request->actor->skeleton_p);
 #else
 	MeCtReach* reachCt = NULL; //new MeCtReach(request->actor->skeleton_p);
 #endif
-
 
 	const XMLCh* attrHandle = elem->getAttribute( ATTR_HANDLE );
 	std::string handle = "";
@@ -131,13 +123,17 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 #endif
 
 		}
+
+		if (!reachCt)
+		{
+			LOG("Handle : %s, controller not found.",handle.c_str());
+		}
 	}
 	
 
 	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
-	if( !reachCt && (!attrTarget || !XMLString::stringLen( attrTarget ) ) ) {
-		std::wstringstream wstrstr;
-        wstrstr << "WARNING: BML::parse_bml_gaze(): <"<<tag<<"> BML tag missing "<<ATTR_TARGET<<"= attribute.";
+	if( !reachCt && (!attrTarget || !XMLString::stringLen( attrTarget ) ) ) {		
+        wstrstr << "WARNING: BML::parse_bml_reach(): <"<<tag<<"> BML tag missing "<<ATTR_TARGET<<"= attribute.";
 		std::string str = convertWStringToString(wstrstr.str());
 		LOG(str.c_str());
 		return BehaviorRequestPtr();  // a.k.a., NULL
@@ -183,17 +179,76 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 		reachCt = new MeCtReach(request->actor->skeleton_p);
 #endif
 		reachCt->setReachArm(reachArm);
+		reachCt->handle(handle);
 		reachCt->init();
 
-#if DATA_DRIVEN_REACH
-		buildReachCtExamples(mcu,reachCt);
-#endif
+// #if DATA_DRIVEN_REACH
+// 		buildReachCtExamples(mcu,reachCt);
+// #endif
 	}
 	
 	
-#if DATA_DRIVEN_REACH
-	//reachCt->addMotion()
+#if DATA_DRIVEN_REACH	
 	
+	const XMLCh* attrUseExample = NULL;
+	attrUseExample = elem->getAttribute(ATTR_USE_EXAMPLE);
+	if( attrUseExample && XMLString::stringLen( attrUseExample ) ) 
+	{
+		if( XMLString::compareIString( attrUseExample, L"true" )==0 ) 
+		{			
+			LOG("Use Example = 'true'");
+			reachCt->useDataDriven = true;
+		}
+		else if( XMLString::compareIString( attrUseExample, L"false" )==0 )
+		{			
+			LOG("Use Example = 'false'");
+			reachCt->useDataDriven = false;
+		}
+	}	
+
+	const XMLCh* attrBuildExample = NULL;
+	attrBuildExample = elem->getAttribute( ATTR_BUILD_EXAMPLE );
+	if (attrBuildExample && XMLString::stringLen( attrBuildExample ))
+	{
+		float minExampleDist = 5.f; // default minimal distance between examples, for more uniform sampling of poses
+		int   resampleSize = 0; // default : no resample
+		const XMLCh* attrExampleDist = NULL;
+		const XMLCh* attrResampleSize = NULL;
+		attrExampleDist = elem->getAttribute(ATTR_EXAMPLE_DIST);
+		attrResampleSize = elem->getAttribute(ATTR_RESAMPLE_SIZE);
+
+		if( attrExampleDist && XMLString::stringLen(attrExampleDist)>0 ) {
+			if( !( wistringstream( attrExampleDist ) >> minExampleDist ) ) {
+				wstrstr << "WARNING: BML::parse_bml_reach(): Expected float for example-dist attribute \"" << attrExampleDist << "\"." << endl;
+			}
+		} else {
+			wstrstr << "WARNING: BML::parse_bml_reach(): Found build-example attribute, but no example-dist attribute.  Assuming example-dist " << minExampleDist << "\"." << endl;
+		}
+
+		if( attrResampleSize && XMLString::stringLen(attrResampleSize)>0 ) {
+			if( !( wistringstream( attrResampleSize ) >> resampleSize ) ) {
+				wstrstr << "WARNING: BML::parse_bml_reach(): Expected float for resample-size attribute \"" << attrResampleSize << "\"." << endl;
+			}
+		} else {
+			wstrstr << "WARNING: BML::parse_bml_reach(): Found build-example attribute, but no resample-size attribute.  Assuming resample-size " << resampleSize << "\"." << endl;
+		}
+		const MotionDataSet& motionData = request->actor->getReachMotionDataSet();
+		
+		if( XMLString::compareIString( attrBuildExample, L"rebuild" )==0 ) // clean up current example data, and rebuild example pose data
+		{
+			reachCt->updateExamplesFromMotions(motionData,true,minExampleDist);	
+			reachCt->buildResamplePoseData(resampleSize,minExampleDist);
+		}
+		else if ( XMLString::compareIString( attrBuildExample, L"update" )==0 ) // use current example data, and add new examples from motion set ( if any )
+		{
+			reachCt->updateExamplesFromMotions(motionData,false,minExampleDist);
+			reachCt->buildResamplePoseData(0,minExampleDist); // just rebuild the KD-tree for resample poses
+		}
+		else if ( XMLString::compareIString( attrBuildExample, L"resample" )==0) // resampling current example data by adding interpolated examples
+		{
+			reachCt->buildResamplePoseData(resampleSize,minExampleDist);
+		}		
+	}		
 #endif
 
 

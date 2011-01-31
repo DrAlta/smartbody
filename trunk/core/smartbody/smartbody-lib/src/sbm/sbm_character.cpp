@@ -1379,6 +1379,8 @@ int SbmCharacter::print_controller_schedules() {
 		gaze_sched_p->print_state( 0 );
 		LOG("HEAD Schedule:");
 		head_sched_p->print_state( 0 );
+		LOG("REACH Schedule:");
+		reach_sched_p->print_state( 0 );
 		// Print Face?
 
 		return CMD_SUCCESS;
@@ -1901,6 +1903,28 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			return CMD_SUCCESS;
 		}
 		return CMD_SUCCESS;
+	}
+	else if ( cmd == "reachmotion" )
+	{
+		string reach_cmd = args.read_token();
+		string motion_name = args.read_token();
+		bool print_track = false;
+		if (reach_cmd == "add")
+		{			
+			SkMotion* motion = mcu_p->lookUpMotion(motion_name.c_str());
+			//LOG("SbmCharacter::parse_character_command LOG: add motion name : %s ", motion_name.c_str());
+			if (motion)
+			{
+				addReachMotion(motion);
+				return CMD_SUCCESS;
+			}
+			else
+			{
+				LOG( "SbmCharacter::parse_character_command ERR: motion '%s' not found", motion_name.c_str());
+				return CMD_NOT_FOUND;
+			}
+		}
+		return CMD_FAILURE;
 	}
 	return( CMD_NOT_FOUND );
 }
