@@ -86,6 +86,7 @@ class CharacterPawn(Pawn):
 		self.__TypeStr = "CharacterPawn"		
 		self.__TypeSbm = "char"
 		self.__BmlQueue = []
+		self.__CommandQueue = []
 		self.InitSkeleton()
 		
 		taskMgr.add(self.__StepBML, "Char" + self.GetName() + "_BmlLoop")
@@ -100,6 +101,9 @@ class CharacterPawn(Pawn):
 				msg = self.__BmlQueue.pop(0)
 				# TODO USE VRSPEAK INSTEAD OF TEST BML
 				self.Scene.SendSbmCommand("test bml char " + self.GetName() + " " + msg)
+			while(len(self.__CommandQueue) > 0):
+				msg = self.__CommandQueue.pop(0)
+				self.Scene.SendSbmCommand(msg)
 				
 		if (task != None):
 			return task.cont
@@ -114,6 +118,16 @@ class CharacterPawn(Pawn):
 			return
 	
 		self.__BmlQueue.append(bmlString)
+		
+	def Command(self, commandString):
+		""" Adds a command the command queue. Will be sent out once the charater registers with SmartBody
+			or right away if the character is already registered """
+		
+		if (not self.IsValid()):
+			print("Trying to send command for an invalid CharacterPawn: " + self.GetName())
+			return
+	
+		self.__CommandQueue.append(commandString)	
 	
 	def SetSpeechArgs(self, args):
 		""" Set arguments specific to this character that are sent to a speech synthesizer """

@@ -102,9 +102,9 @@ class Pawn(NodePath, DirectObject):
 		
 		newPos = self.getPos(render)
 		posDelta = (newPos - self.__LastPos).length()
-		hDelta = abs(self.getH(render) - self.__LastHpr.getX())
+		hDelta = abs(self.getH(render) - self.__LastHpr.getZ())
 		pDelta = abs(self.getP(render) - self.__LastHpr.getY())
-		rDelta = abs(self.getR(render) - self.__LastHpr.getZ())
+		rDelta = abs(self.getR(render) - self.__LastHpr.getX())
 		
 		if ((posDelta > 3 or hDelta > 1 or pDelta > 1 or rDelta > 1) and self.IsRegistered()):
 			self.__LastPos = newPos

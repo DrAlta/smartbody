@@ -60,11 +60,19 @@ class Init(DirectObject):
 	def __init__(self):
 		self.BMLR = PandaBMLR()
 
+		
 		base.disableMouse()
 		base.camera.setPosHpr(0, 340, 140, 180, -7, 0)
 		
 		self.George = CharacterPawn(self.BMLR, "George", "CADIA.George")
 		self.George.setPos(0, 0, 102)
+
+		# set up locomotion
+		self.George.Command("test locomotion initialize")
+		self.George.Command("test loco char George anim standing HandsAtSide_Motex")
+		self.George.Command("test loco char George anim walking Walk 17 28 4 37 9 23")
+		self.George.Command("test loco char George anim walking Strafe 25 39 1 52 25 27")
+		self.George.Command("test loco char George enable")
 		#self.George.BML('<body posture="HoldWrist_Motex_FrontLow" />')
 		self.George.BML('<body posture="HandsAtSide_Motex" />')
 		self.George.BML('<speech id="sid">Thanks <mark time="0.3"/>for <mark time="0.6"/>trying <mark name="markbeat" time="1"/>BML Realizer!</speech>'
