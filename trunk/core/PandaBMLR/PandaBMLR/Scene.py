@@ -81,7 +81,8 @@ class Scene:
 			if (character != None):
 				for rotation in boneData:
 					# 0 = BoneID, 1-4 = q.wxyz
-					character.SetJointQuat(rotation[0], Converter.Unreal2Panda_Quat(Vec4(rotation[1], rotation[2], rotation[3], rotation[4])))
+					#character.SetJointQuat(rotation[0], Converter.Unreal2Panda_Quat(Vec4(rotation[1], rotation[2], rotation[3], rotation[4])))
+					character.SetJointQuat(rotation[0], Converter.Sbm2Panda_Quat(Vec4(rotation[2], rotation[3], rotation[4], rotation[1])))
 		except:
 			print("Error parsing UDP packet")
 			print sys.exc_info()
@@ -94,7 +95,8 @@ class Scene:
 			if (character != None):
 				for pos in boneData:
 					# 0 = BoneID, 1-3 = xyz
-					character.SetJointPos(pos[0], Converter.Unreal2Panda_Pos(Vec3(pos[1], pos[2], pos[3]))) 
+					#character.SetJointPos(pos[0], Converter.Unreal2Panda_Pos(Vec3(pos[1], pos[2], pos[3]))) 
+					character.SetJointPos(pos[0], Converter.Sbm2Panda_Pos(Vec3(pos[1], pos[2], pos[3]))) 
 		except:
 			print("Error parsing UDP packet")
 			print sys.exc_info()
@@ -181,7 +183,8 @@ class Scene:
 
 				if (char != None):
 					if (not self.IgnorePawnPosRot(char)):						
-						char.setPos(Converter.Unreal2Panda_Pos(Vec3(x, y, z)))
+						#char.setPos(Converter.Unreal2Panda_Pos(Vec3(x, y, z)))
+						char.setPos(Converter.Sbm2Panda_Pos(Vec3(x, y, z)))
 		
 		elif (command == "SetActorRot"):
 			if (len(arguments) > 4):

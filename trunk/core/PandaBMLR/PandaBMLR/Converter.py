@@ -61,19 +61,18 @@ def Unreal2Panda_Pos(vec3):
 	""" Transforms a Position from Unreal's coordinate system to a Position in Panda's coordinate system """
 
 	return Vec3(vec3.getY(), vec3.getX(), vec3.getZ())	
-	#return Vec3(-vec3.getX(), vec3.getZ(), vec3.getY())
 
 def Unreal2Panda_Quat(quat):
 	""" Transforms a Quaternion from Unreal's coordinate system to a Quaternion in Panda's coordinate system """
 
 	#Quat(rotation[1], -rotation[2], rotation[4], rotation[3])
-	return Quat(quat.getX(), -quat.getY(), quat.getW(), quat.getZ())
+#	return Quat(quat.getX(), -quat.getY(), quat.getW(), quat.getZ())
+	return Quat(quat.getY(), quat.getX(), -quat.getZ(), quat.getW())
 
 
 ## Sbm 2 Panda
 def Sbm2Panda_Pos(vec3):
 	""" Transforms a Position from SmartBody's coordinate system to a Position in Panda3D's coordinate system """
-	
 	return Vec3(-vec3.getX(), vec3.getZ(), vec3.getY())	
 
 
@@ -81,7 +80,7 @@ def Sbm2Panda_Pos(vec3):
 def Sbm2Panda_Quat(quat):
 	# x y z w
 	# i j k r
-	return Quat(quat.getW(), quat.getY(), quat.getX(), quat.getZ())
+	return Quat(quat.getW(), quat.getX(), -quat.getZ(), quat.getY())
 
 
 ## Panda 2 Sbm
@@ -92,6 +91,6 @@ def Panda2Sbm_Pos(vec3):
 
 def Panda2Sbm_Hpr(vec3):
 	""" Transforms a Hpr from Panda3D's coordinate system to a Position in SmartBody's coordinate system """
-	return Vec3(vec3.getX(), -vec3.getY(), vec3.getZ())
+	return Vec3(vec3.getZ(), vec3.getY(), vec3.getX())
 
 
