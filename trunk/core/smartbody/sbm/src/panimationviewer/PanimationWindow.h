@@ -9,18 +9,18 @@
 #include <fltk/ValueSlider.h>
 #include <fltk/TextDisplay.h>
 #include <fltk/MultiLineOutput.h>
-#include <sbm/BMLViewer.h>
+#include <sbm/GenericViewer.h>
 #include "ParamAnimEditorWidget.h"
 
-class PanimationWindow : public fltk::Window, public BMLViewer
+class PanimationWindow : public fltk::Window, public GenericViewer
 {
 	public:
 		PanimationWindow(int x, int y, int w, int h, char* name);
 		~PanimationWindow();
 
 		virtual void label_viewer(std::string name);
-		virtual void show_bml_viewer();
-		virtual void hide_bml_viewer();
+		virtual void show_viewer();
+		virtual void hide_viewer();
 		void draw();
 		void updateGUI();
 		void updateCorrespondenceMarks();
@@ -53,12 +53,12 @@ class PanimationWindow : public fltk::Window, public BMLViewer
 		nle::NonLinearEditorModel* nleModel;
 };
 
- class PanimationViewerFactory : public BMLViewerFactory
+ class PanimationViewerFactory : public GenericViewerFactory
  {
 	public:
 		PanimationViewerFactory();
 
-		virtual BMLViewer* create(int x, int y, int w, int h);
-		virtual void destroy(BMLViewer* viewer);
+		virtual GenericViewer* create(int x, int y, int w, int h);
+		virtual void destroy(GenericViewer* viewer);
  };
 #endif

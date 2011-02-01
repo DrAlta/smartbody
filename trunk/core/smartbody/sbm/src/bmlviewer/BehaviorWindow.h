@@ -12,9 +12,9 @@
 #include "BehaviorBlock.h"
 #include <sbm/bml_speech.hpp>
 #include <sbm/bml_event.hpp>
-#include <sbm/BMLViewer.h>
+#include <sbm/GenericViewer.h>
 
-class BehaviorWindow : public fltk::Window, public BMLViewer
+class BehaviorWindow : public fltk::Window, public GenericViewer
 {
 	public:
 		BehaviorWindow(int x, int y, int w, int h, char* name);
@@ -23,8 +23,8 @@ class BehaviorWindow : public fltk::Window, public BMLViewer
 		static void OnRequest(BML::BmlRequest* request, void* data);
 
 		virtual void label_viewer(std::string name);
-		virtual void show_bml_viewer();
-		virtual void hide_bml_viewer();
+		virtual void show_viewer();
+		virtual void hide_viewer();
 		
 		int handle(int event);
         void show();      
@@ -74,12 +74,12 @@ class BehaviorWindow : public fltk::Window, public BMLViewer
 		nle::NonLinearEditorModel* nleModel;
 };
 
- class BehaviorViewerFactory : public BMLViewerFactory
+ class BehaviorViewerFactory : public GenericViewerFactory
  {
 	public:
 		BehaviorViewerFactory();
 
-		virtual BMLViewer* create(int x, int y, int w, int h);
-		virtual void destroy(BMLViewer* viewer);
+		virtual GenericViewer* create(int x, int y, int w, int h);
+		virtual void destroy(GenericViewer* viewer);
  };
 #endif

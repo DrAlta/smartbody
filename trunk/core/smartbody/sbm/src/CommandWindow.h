@@ -53,6 +53,7 @@ that is distributed: */
 #include <fltk/Button.h>
 #include <fltk/MenuBar.h>
 #include <fltk/Choice.h>
+#include <fltk/TabGroup.h>
 #include <fltk/TextBuffer.h>
 #include <fltk/TextEditor.h>
 #include <fltk/TextDisplay.h>
@@ -74,8 +75,6 @@ public:
 	CommandWindow(int, int, int, int, const char*);
 	~CommandWindow();
 
-	static CommandWindow* getCommandWindow();
-
 	int width;
 	int height;
 	char printout[1024];
@@ -84,13 +83,16 @@ public:
 	const char* getHistoryItem(int location);
 	void clearHistory();
 
+	static CommandWindow* getCommandWindow(Widget* w);
+
 	virtual void OnMessage( const std::string & message );
 
-	fltk::TextBuffer *EditorTextBuffer;
-	fltk::TextEditor *textEditor;
+	fltk::TextBuffer *textBuffer[2];
+	fltk::TextEditor *textEditor[2];
 	fltk::TextBuffer *DisplayTextBuffer;
 	fltk::TextDisplay *textDisplay;
 	fltk::MenuBar* menubar;
+	fltk::TabGroup* tabGroup;
 
 	static void testCB();
 	static void upcb(int key, fltk::TextEditor* te);
@@ -112,7 +114,6 @@ private:
 	std::vector<std::string> historyItems;
 	int when;
 	char curDir[256];
-	static CommandWindow* s_window;
 
 }
 ;

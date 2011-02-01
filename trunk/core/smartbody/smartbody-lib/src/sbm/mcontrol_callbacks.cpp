@@ -491,14 +491,14 @@ int mcu_bmlviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		else
 		if( strcmp( bmlview_cmd, "show" ) == 0 )	{
 			if( mcu_p->bmlviewer_p )	{
-				mcu_p->bmlviewer_p->show_bml_viewer();
+				mcu_p->bmlviewer_p->show_viewer();
 				return( CMD_SUCCESS );
 			}
 		}
 		else
 		if( strcmp( bmlview_cmd, "hide" ) == 0 )	{
 			if( mcu_p->bmlviewer_p )	{
-				mcu_p->bmlviewer_p->hide_bml_viewer();
+				mcu_p->bmlviewer_p->hide_viewer();
 				return( CMD_SUCCESS );
 			}
 		}
@@ -541,14 +541,14 @@ int mcu_panimationviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		else
 		if( strcmp( panimview_cmd, "show" ) == 0 )	{
 			if( mcu_p->panimationviewer_p )	{
-				mcu_p->panimationviewer_p->show_bml_viewer();
+				mcu_p->panimationviewer_p->show_viewer();
 				return( CMD_SUCCESS );
 			}
 		}
 		else
 		if( strcmp( panimview_cmd, "hide" ) == 0 )	{
 			if( mcu_p->panimationviewer_p )	{
-				mcu_p->panimationviewer_p->hide_bml_viewer();
+				mcu_p->panimationviewer_p->hide_viewer();
 				return( CMD_SUCCESS );
 			}
 		}
@@ -584,14 +584,14 @@ int mcu_channelbufferviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		else
 		if( strcmp( cbufferview_cmd, "show" ) == 0 )	{
 			if( mcu_p->channelbufferviewer_p )	{
-				mcu_p->channelbufferviewer_p->show_bml_viewer();
+				mcu_p->channelbufferviewer_p->show_viewer();
 				return( CMD_SUCCESS );
 			}
 		}
 		else
 		if( strcmp( cbufferview_cmd, "hide" ) == 0 )	{
 			if( mcu_p->channelbufferviewer_p )	{
-				mcu_p->channelbufferviewer_p->hide_bml_viewer();
+				mcu_p->channelbufferviewer_p->hide_viewer();
 				return( CMD_SUCCESS );
 			}
 		}
