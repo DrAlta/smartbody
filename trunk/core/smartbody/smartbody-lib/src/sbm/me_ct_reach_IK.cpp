@@ -1,6 +1,4 @@
 #include "me_ct_reach_IK.hpp"
-
-
 #include <SR/sr_alg.h>
 
 
@@ -178,7 +176,7 @@ void MeCtReachIK::ccdRotate(SrVec& src, int start_index)
 		else if(dot_v < -1.0f) dot_v = -1.0f;
 
 		double angle = acos(dot_v);
-		if (angle > damping_angle) angle = damping_angle;		
+		//if (angle > damping_angle) angle = damping_angle;		
 
 		r_axis = cross(v2, v1);
 		r_axis.normalize();

@@ -90,6 +90,10 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
                       ModePawnShowAsSpheres,
                     };
 
+	enum ReachRenderMode { ModeShowExamples,
+			               ModeNoExamples,
+	};
+
 	enum terrainMode { ModeNoTerrain,
 					   ModeTerrainWireframe,
 					   ModeTerrain,
@@ -167,6 +171,8 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdInteractiveLocomotion,
 				   CmdReachToggleData,
 				   CmdReachToggleIK,
+				   CmdReachShowExamples,
+				   CmdReachNoExamples,
                  };
 
    private : // internal data
@@ -342,6 +348,7 @@ protected:
    FltkViewer::EyeLidMode eyeLidMode;     // eye lid mode
    FltkViewer::DynamicsMode dynamicsMode;     // dynamics information mode
    FltkViewer::LocomotionMode locomotionMode;   // locomotion mode
+   FltkViewer::ReachRenderMode reachRenderMode;
 
 
    bool iconized;      // to stop processing while the window is iconized

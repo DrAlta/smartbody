@@ -295,6 +295,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "stepturn",		mcu_stepturn_controller_func );
 	mcu.insert( "quickdraw",	mcu_quickdraw_controller_func );
 	mcu.insert( "gaze",			mcu_gaze_controller_func );
+	mcu.insert( "reach",		mcu_reach_controller_func );
 	mcu.insert( "gazelimit",	mcu_gaze_limit_func );
 	mcu.insert( "snod",			mcu_snod_controller_func );
 	mcu.insert( "lilt",			mcu_lilt_controller_func );

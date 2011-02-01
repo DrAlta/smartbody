@@ -1734,7 +1734,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			}
 		}
 		return CMD_SUCCESS;
-	} 
+	} 	
 	else 
 	if( cmd == "reholster" ) {
 		return( reholster_quickdraw( mcu_p ) );

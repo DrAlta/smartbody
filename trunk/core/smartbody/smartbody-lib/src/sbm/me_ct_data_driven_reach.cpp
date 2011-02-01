@@ -283,7 +283,7 @@ bool MeCtDataDrivenReach::controller_evaluate( double t, MeFrameData& frame )
 		vector<double> targetParameter;
 		targetParameter.resize(3);
 
-		int nK = 8; // nearby examples should be (parameter dim + 1)
+		int nK = 6; // nearby examples should be (parameter dim + 1)
 		vector<float> KNNWeight;
 		vector<float> KNNDist;
 		vector<PoseExample*> KNNPoses;
@@ -302,7 +302,7 @@ bool MeCtDataDrivenReach::controller_evaluate( double t, MeFrameData& frame )
 		for (int i=0;i<blendQuat.size();i++)
 		{
 			MeCtIKScenarioJointInfo* info = &(limb.ik.joint_info_list.get(i));
-			float damping_angle = (float)RAD(info->angular_speed_limit*dt)*0.5f;
+			float damping_angle = (float)RAD(info->angular_speed_limit*dt)*0.7f;
 			limb.joint_quat[i] = MeCtReachIK::dampQuat(limb.joint_quat[i],blendQuat[i],damping_angle);		   
 		}	
 		
@@ -329,7 +329,7 @@ bool MeCtDataDrivenReach::controller_evaluate( double t, MeFrameData& frame )
 		{
 			MeCtIKScenarioJointInfo* info = &(limb.ik.joint_info_list.get(i));
 			float damping_angle = (float)RAD(info->angular_speed_limit*dt);
-			limb.joint_quat[i] = MeCtReachIK::dampQuat(limb.joint_quat[i],ik_scenario->joint_quat_list[i],damping_angle);
+			limb.joint_quat[i] = MeCtReachIK::dampQuat(cur_quat_list[i],ik_scenario->joint_quat_list[i],damping_angle);
 		}
 	}
 	// write results from limb to buffer
