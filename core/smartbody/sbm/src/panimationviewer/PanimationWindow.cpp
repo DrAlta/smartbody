@@ -14,7 +14,7 @@
 #include "ParamAnimBlock.h"
 
 
-PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Window(w, h, name), BMLViewer(x, y, w, h)
+PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Window(w, h, name), GenericViewer(x, y, w, h)
 {
 	this->begin();
 	// first group: animation name and character name
@@ -110,14 +110,14 @@ void PanimationWindow::label_viewer(std::string name)
 	this->label(strdup(name.c_str()));
 }
 
-void PanimationWindow::show_bml_viewer()
+void PanimationWindow::show_viewer()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	this->show();
 }
 
-void PanimationWindow::hide_bml_viewer()
+void PanimationWindow::hide_viewer()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.bml_processor.registerRequestCallback(NULL, NULL);
@@ -478,13 +478,13 @@ PanimationViewerFactory::PanimationViewerFactory()
 {
 }
 
-BMLViewer* PanimationViewerFactory::create(int x, int y, int w, int h)
+GenericViewer* PanimationViewerFactory::create(int x, int y, int w, int h)
 {
 	PanimationWindow* panimationWindow = new PanimationWindow(x, y, w, h, "Parameterized Animation");
 	return panimationWindow;
 }
 
-void PanimationViewerFactory::destroy(BMLViewer* viewer)
+void PanimationViewerFactory::destroy(GenericViewer* viewer)
 {
 	delete viewer;
 }

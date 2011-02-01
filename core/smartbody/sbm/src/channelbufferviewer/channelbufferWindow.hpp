@@ -32,7 +32,7 @@
 #include <fltk/Group.h>
 #include <fltk/Input.h>
 
-#include <sbm/BMLViewer.h>
+#include <sbm/GenericViewer.h>
 
 #include <sbm/mcontrol_util.h>
 #include "GlChartView.hpp"
@@ -51,18 +51,18 @@ public:
 };
 
 
-class ChannelBufferWindow : public BMLViewer, public fltk::Window 
+class ChannelBufferWindow : public GenericViewer, public fltk::Window 
 {
 public:
 	ChannelBufferWindow(int x, int y, int w, int h, char* name);
 	~ChannelBufferWindow();
 
 	virtual void label_viewer(std::string name);
-	virtual void show_bml_viewer();
-	virtual void hide_bml_viewer();
+	virtual void show_viewer();
+	virtual void hide_viewer();
 	void draw();
+	int handle(int event) { return Window::handle(event); }   
 	void updateGUI();
-	void updateCorrespondenceMarks();
 	void show();  
 
 	void generateBML(fltk::Widget* widget, void* data);
@@ -149,12 +149,12 @@ protected:
 	static void fillSeriesWithMotionData(ChannelBufferWindow* window, SkMotion* motion, GlChartViewSeries* series, ChannelItem& item);
 };
 
-class ChannelBufferViewerFactory : public BMLViewerFactory
+class ChannelBufferViewerFactory : public GenericViewerFactory
 {
 public:
 	ChannelBufferViewerFactory();
 
-	virtual BMLViewer* create(int x, int y, int w, int h);
-	virtual void destroy(BMLViewer* viewer);
+	virtual GenericViewer* create(int x, int y, int w, int h);
+	virtual void destroy(GenericViewer* viewer);
 };
 #endif

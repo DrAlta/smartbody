@@ -198,14 +198,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\BMLViewer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\BMLViewer.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\sbm\Event.cpp"
 				>
 			</File>
@@ -215,6 +207,14 @@
 			</File>
 			<File
 				RelativePath="..\src\sbm\general_param_setting.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\GenericViewer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\GenericViewer.h"
 				>
 			</File>
 			<File

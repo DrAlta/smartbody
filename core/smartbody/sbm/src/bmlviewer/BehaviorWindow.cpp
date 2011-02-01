@@ -23,7 +23,7 @@
 using namespace fltk;
 
 
-BehaviorWindow::BehaviorWindow(int x, int y, int w, int h, char* name) : Window(w, h, name), BMLViewer(x, y, w, h)
+BehaviorWindow::BehaviorWindow(int x, int y, int w, int h, char* name) : Window(w, h, name), GenericViewer(x, y, w, h)
 {
 	this->begin();
 
@@ -103,7 +103,7 @@ void BehaviorWindow::label_viewer(std::string name)
 	this->label(strdup(name.c_str()));
 }
 
-void BehaviorWindow::show_bml_viewer()
+void BehaviorWindow::show_viewer()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.bml_processor.registerRequestCallback(OnRequest, this);
@@ -114,7 +114,7 @@ void BehaviorWindow::show_bml_viewer()
 	this->redraw();
 }
 
-void BehaviorWindow::hide_bml_viewer()
+void BehaviorWindow::hide_viewer()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.bml_processor.registerRequestCallback(NULL, NULL);
@@ -1641,13 +1641,13 @@ BehaviorViewerFactory::BehaviorViewerFactory()
 {
 }
 
-BMLViewer* BehaviorViewerFactory::create(int x, int y, int w, int h)
+GenericViewer* BehaviorViewerFactory::create(int x, int y, int w, int h)
 {
 	BehaviorWindow* behaviorWindow = new BehaviorWindow(x, y, w, h, "Behavior Requests");
 	return behaviorWindow;
 }
 
-void BehaviorViewerFactory::destroy(BMLViewer* viewer)
+void BehaviorViewerFactory::destroy(GenericViewer* viewer)
 {
 	delete viewer;
 }

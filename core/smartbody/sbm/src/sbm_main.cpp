@@ -65,8 +65,9 @@
 #include "CommandWindow.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
 #include <sbm/sr_cmd_line.h>
 
 #ifdef WIN32
@@ -277,7 +278,9 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "viewer",		mcu_viewer_func );
 	mcu.insert( "bmlviewer",    mcu_bmlviewer_func);
 	mcu.insert( "panimviewer",  mcu_panimationviewer_func);
-	mcu.insert( "cbufviewer",	mcu_channelbufferviewer_func);
+	mcu.insert( "cbufviewer",	mcu_channelbufferviewer_func); // deprecated
+	mcu.insert( "dataviewer",	mcu_channelbufferviewer_func);
+
 	mcu.insert( "camera",		mcu_camera_func );
 	mcu.insert( "terrain",		mcu_terrain_func );
 	mcu.insert( "time",			mcu_time_func );
@@ -494,9 +497,6 @@ int main( int argc, char **argv )	{
 	vhcl::Crash::AddCrashCallback( new SBMCrashCallback() );
 #endif
 
-//	SBMWindow* sbmWindow = new SBMWindow(100, 100, 640, 480, "SmartBody");
-//	sbmWindow->show();
-//	CommandWindow* commandWindow = new CobmWindow->getCommandWindow();
 	//CommandWindow* commandWindow = new CommandWindow(100, 100, 640, 480, "Commands");
 	//commandWindow->show();
 	//vhcl::Log::g_log.AddListener(commandWindow);
@@ -505,6 +505,7 @@ int main( int argc, char **argv )	{
 	// register the log listener
 	vhcl::Log::StdoutListener* listener = new vhcl::Log::StdoutListener();
 	vhcl::Log::g_log.AddListener(listener);
+
 
 	int err;
 	SrString net_host;

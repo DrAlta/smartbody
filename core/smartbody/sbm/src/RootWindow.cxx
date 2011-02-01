@@ -13,11 +13,13 @@
 #include <boost/algorithm/string/replace.hpp>
 #include "sbm/sbm_audio.h"
 #include <fstream>
+#include "CommandWindow.h"
 
 using namespace fltk;
 
 RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(x, y, w, h), DoubleBufferWindow(x, y, w, h, name)
 {
+	commandWindow = NULL;
 	this->begin();
 
 	menubar = new MenuBar(0, 0, w, 30); 
@@ -54,7 +56,7 @@ RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Settings/Internal Audio", 0, AudioCB, this, NULL);
 	menubar->add("&Window/Data Viewer", 0, LaunchDataViewerCB,this, NULL);
 	menubar->add("&Window/BML Viewer", 0, LaunchBMLViewerCB, this, NULL);
-	//menubar->add("&Window/Command Console", 0, LaunchConsoleCB, this, NULL);
+//	menubar->add("&Window/Command Window", 0, LaunchConsoleCB, this, NULL);
 	menubar->add("&Scripts/Reload Scripts", 0, ReloadScriptsCB, this, NULL);
 	menubar->add("&Scripts/Set Script Folder", 0, SetScriptDirCB, this, MENU_DIVIDER);
 
@@ -117,6 +119,8 @@ RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 
 RootWindow::~RootWindow() {
 	delete fltkViewer;
+	if (commandWindow)
+		delete commandWindow;
 }
 
 
@@ -215,9 +219,15 @@ void RootWindow::LaunchDataViewerCB(Widget* widget, void* data)
 
 void RootWindow::LaunchConsoleCB(Widget* widget, void* data)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute("commandviewer open");
-	mcu.execute("commandviewer show");
+	// console doesn't receive commands - why?
+	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	if (!rootWindow->commandWindow)
+	{
+		rootWindow->commandWindow = new CommandWindow(150, 150, 640, 480, "Commands");
+		vhcl::Log::g_log.AddListener(rootWindow->commandWindow);
+	}
+
+	rootWindow->commandWindow->show();
 }
 
 void RootWindow::StartCB(Widget* widget, void* data)

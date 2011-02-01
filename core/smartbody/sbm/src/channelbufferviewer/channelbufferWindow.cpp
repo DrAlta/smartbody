@@ -33,7 +33,7 @@
 #include <sbm/bml.hpp>
 
 
-ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name) : Window(w, h, name), BMLViewer(x, y, w, h)
+ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name) : Window(w, h, name), GenericViewer(x, y, w, h)
 {
 	set_default_values();
 	char value[10];
@@ -801,14 +801,14 @@ void ChannelBufferWindow::label_viewer(std::string name)
 	this->label(strdup(name.c_str()));
 }
 
-void ChannelBufferWindow::show_bml_viewer()
+void ChannelBufferWindow::show_viewer()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	this->show();
 }
 
-void ChannelBufferWindow::hide_bml_viewer()
+void ChannelBufferWindow::hide_viewer()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.bml_processor.registerRequestCallback(NULL, NULL);
@@ -891,13 +891,13 @@ ChannelBufferViewerFactory::ChannelBufferViewerFactory()
 {
 }
 
-BMLViewer* ChannelBufferViewerFactory::create(int x, int y, int w, int h)
+GenericViewer* ChannelBufferViewerFactory::create(int x, int y, int w, int h)
 {
 	ChannelBufferWindow* channelbufferWindow = new ChannelBufferWindow(x, y, w, h, "Channel Buffer");
 	return channelbufferWindow;
 }
 
-void ChannelBufferViewerFactory::destroy(BMLViewer* viewer)
+void ChannelBufferViewerFactory::destroy(GenericViewer* viewer)
 {
 	delete viewer;
 }

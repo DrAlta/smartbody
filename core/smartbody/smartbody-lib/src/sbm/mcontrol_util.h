@@ -43,7 +43,7 @@ class mcuCBHandle;
 
 #include "bonebus.h"
 
-#include <sbm/BMLViewer.h>
+#include <sbm/GenericViewer.h>
 #include <SR/sr_viewer.h>
 #include <SR/sr_camera.h>
 #include <ME/me_ct_pose.h>
@@ -169,12 +169,12 @@ class mcuCBHandle	{
 
 		SrViewerFactory *viewer_factory;
 		SrViewer	*viewer_p;
-		BMLViewer	*bmlviewer_p;
-		BMLViewer	*panimationviewer_p;
-		BMLViewer	*channelbufferviewer_p;
-		BMLViewerFactory *bmlviewer_factory;
-		BMLViewerFactory *panimationviewer_factory;
-		BMLViewerFactory *channelbufferviewer_factory;
+		GenericViewer	*bmlviewer_p;
+		GenericViewer	*panimationviewer_p;
+		GenericViewer	*channelbufferviewer_p;
+		GenericViewerFactory *bmlviewer_factory;
+		GenericViewerFactory *panimationviewer_factory;
+		GenericViewerFactory *channelbufferviewer_factory;
 		SrCamera	*camera_p;
 		SrSnGroup	*root_group_p;
 		
@@ -437,15 +437,15 @@ class mcuCBHandle	{
 				if (viewer_factory != NULL) delete viewer_factory;
 				viewer_factory = factory;
 		}
-		void register_bmlviewer_factory(BMLViewerFactory* factory) { 
+		void register_bmlviewer_factory(GenericViewerFactory* factory) { 
 				if (bmlviewer_factory != NULL) delete bmlviewer_factory;
 				bmlviewer_factory = factory;
 		}
-		void register_panimationviewer_factory(BMLViewerFactory* factory) { 
+		void register_panimationviewer_factory(GenericViewerFactory* factory) { 
 				if (panimationviewer_factory != NULL) delete panimationviewer_factory;
 				panimationviewer_factory = factory;
 		}
-		void register_channelbufferviewer_factory(BMLViewerFactory* factory) { 
+		void register_channelbufferviewer_factory(GenericViewerFactory* factory) { 
 				if (channelbufferviewer_factory != NULL) delete channelbufferviewer_factory;
 				channelbufferviewer_factory = factory;
 		}

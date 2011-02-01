@@ -8,7 +8,8 @@
 #include <fltk/FloatInput.h>
 #include <fltk/Output.h>
 #include "fltk_viewer.h"
-# include <sr/sr_viewer.h>
+#include <sr/sr_viewer.h>
+#include "CommandWindow.h"
 
 class SbmCharacter;
 
@@ -32,6 +33,7 @@ class  RootWindow : public SrViewer, public fltk::DoubleBufferWindow
 		SbmCharacter* getSelectedCharacter();
 
 		FltkViewer* fltkViewer;
+		CommandWindow* commandWindow;
 		fltk::MenuBar* menubar;
 		fltk::Button* buttonPlay;
 		fltk::Button* buttonStop;

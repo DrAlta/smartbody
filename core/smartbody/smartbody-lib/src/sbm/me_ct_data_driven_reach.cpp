@@ -67,7 +67,7 @@ int PoseExampleSet::linearKNN( const vector<double>& parameter, vector<float>& d
 	dists.resize(nK+1);
 	dists.assign(dists.size(),1e10);
 	int nCurK = 0;
-	for (int i=0;i<poseData.size();i++)
+	for (size_t i=0;i<poseData.size();i++)
 	{
 		PoseExample& curEx = poseData[i];
 		double dist = sqrt(Dist(curEx.poseParameter,parameter));
@@ -82,7 +82,7 @@ int PoseExampleSet::linearKNN( const vector<double>& parameter, vector<float>& d
 			else 
 				break;
 		}		
-		dists[k] = dist;
+		dists[k] = float(dist);
 		KNN[k]  = &poseData[i];
 		if (nCurK < nK)
 			nCurK++;
@@ -113,7 +113,7 @@ void PoseExampleSet::kdTreeKNN( const vector<double>& parameter, vector<float>& 
 	{
 		int index = nnIdx[i];				
 		KNN[i] = &poseData[index];
-		dists[i] = nnDists[i];
+		dists[i] = float(nnDists[i]);
 	}
 	//computeWeightFromDists(distList,KNNweights);
 
@@ -160,10 +160,10 @@ void PoseExampleSet::clearData()
 SrBox PoseExampleSet::computeBBox()
 {
 	SrBox BBox;
-	for (int i=0;i<poseData.size();i++)
+	for (size_t i=0;i<poseData.size();i++)
 	{
 		PoseExample& ex = poseData[i];
-		SrVec pt = SrVec(ex.poseParameter[0],ex.poseParameter[1],ex.poseParameter[2]);
+		SrVec pt = SrVec(float(ex.poseParameter[0]),float(ex.poseParameter[1]),float(ex.poseParameter[2]));
 		BBox.extend(pt);
 	}
 	return BBox;
@@ -192,13 +192,13 @@ void MeCtDataDrivenReach::blendPose( vector<SrQuat>& blendPoses, vector<float>& 
 	blendPoses = KNNPoses[0]->jointQuat;
 	float weightSum = KNNweights[0];
 	float w1,w2;	
-	for (int i=1;i<KNNweights.size();i++)
+	for (size_t i=1;i<KNNweights.size();i++)
 	{
 		w1 = weightSum;
 		w2 = KNNweights[i];
 		weightSum += w2;
 		PoseExample* pose = KNNPoses[i];
-		for (int k=0;k<blendPoses.size();k++)
+		for (size_t k=0;k<blendPoses.size();k++)
 		{
 			blendPoses[k] = slerp( blendPoses[k], pose->jointQuat[k], w2/weightSum );
 		}
@@ -207,7 +207,7 @@ void MeCtDataDrivenReach::blendPose( vector<SrQuat>& blendPoses, vector<float>& 
 
 void MeCtDataDrivenReach::generateRandomWeight( int nK, vector<float>& outWeights )
 {
-	float delta = 0.1;
+	float delta = 0.1f;
 	outWeights.resize(nK);
 	float weightSum = 0.0;
 	for (int i=0;i<nK-1;i++)
@@ -227,7 +227,7 @@ void MeCtDataDrivenReach::computeWeightFromDists( vector<float>& dists, vector<f
 	float weightSum = 0.f;
 	for (int i=0;i<nK;i++)
 	{
-		float weight = 1.0/dists[i] - 1.0/dists[nK-1];
+		float weight = 1.0f/dists[i] - 1.0f/dists[nK-1];
 		weightSum += weight;
 		outWeights[i] = weight;
 	}
@@ -299,7 +299,7 @@ bool MeCtDataDrivenReach::controller_evaluate( double t, MeFrameData& frame )
 		blendPose(blendQuat,KNNWeight,KNNPoses);
 
 		// damped blending		
-		for (int i=0;i<blendQuat.size();i++)
+		for (size_t i=0;i<blendQuat.size();i++)
 		{
 			MeCtIKScenarioJointInfo* info = &(limb.ik.joint_info_list.get(i));
 			float damping_angle = (float)RAD(info->angular_speed_limit*dt)*0.7f;
@@ -380,7 +380,7 @@ void MeCtDataDrivenReach::buildResamplePoseData( int nExamples, float fMinDist /
 	PoseExample dummy;
 	dummy.poseParameter.resize(3);
 	// sampling new poses inside the bounding box by interpolating current pose data randomly
-	srand(time(NULL));
+	srand(int(time(NULL)));
 	vector<SrQuat> blendQuats;
 	while (nCount < nSamples)
 	{

@@ -119,9 +119,9 @@ mcuCBHandle::mcuCBHandle()
 	queued_cmds( 0 ),
 	use_locomotion( false ),
 	viewer_factory ( new SrViewerFactory() ),
-	bmlviewer_factory ( new BMLViewerFactory() ),
-	panimationviewer_factory ( new BMLViewerFactory() ),
-	channelbufferviewer_factory ( new BMLViewerFactory() ),
+	bmlviewer_factory ( new GenericViewerFactory() ),
+	panimationviewer_factory ( new GenericViewerFactory() ),
+	channelbufferviewer_factory ( new GenericViewerFactory() ),
 	resource_manager(ResourceManager::getResourceManager()),
 	snapshot_counter( 1 ),
 	delay_behaviors(true),
@@ -434,7 +434,7 @@ int mcuCBHandle::open_bml_viewer( int width, int height, int px, int py )	{
 	if( bmlviewer_p == NULL )	{
 		bmlviewer_p = bmlviewer_factory->create( px, py, width, height );
 		bmlviewer_p->label_viewer( "SBM BML Viewer" );
-		bmlviewer_p->show_bml_viewer();
+		bmlviewer_p->show_viewer();
 		
 		return( CMD_SUCCESS );
 	}
@@ -454,7 +454,7 @@ int mcuCBHandle::open_panimation_viewer( int width, int height, int px, int py )
 	if( panimationviewer_p == NULL )	{
 		panimationviewer_p = panimationviewer_factory->create( px, py, width, height );
 		panimationviewer_p->label_viewer( "Parameterized Animation Viewer" );
-		panimationviewer_p->show_bml_viewer();
+		panimationviewer_p->show_viewer();
 		
 		return( CMD_SUCCESS );
 	}
@@ -474,7 +474,7 @@ int mcuCBHandle::open_channelbuffer_viewer( int width, int height, int px, int p
 	if( channelbufferviewer_p == NULL )	{
 		channelbufferviewer_p = channelbufferviewer_factory->create( px, py, width, height );
 		channelbufferviewer_p->label_viewer( "Channel Buffer Viewer" );
-		channelbufferviewer_p->show_bml_viewer();
+		channelbufferviewer_p->show_viewer();
 		
 		return( CMD_SUCCESS );
 	}
