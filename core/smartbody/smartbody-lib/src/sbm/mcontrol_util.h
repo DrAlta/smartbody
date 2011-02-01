@@ -54,6 +54,7 @@ class mcuCBHandle;
 #include "me_ct_gaze.h"
 #include "me_ct_tether.h"
 #include "me_ct_eyelid.h"
+#include "me_ct_data_driven_reach.hpp"
 
 #include "sbm_constants.h"
 

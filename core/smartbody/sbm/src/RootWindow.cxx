@@ -39,9 +39,10 @@ RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Character/Locomotion/Velocity", 0, VelocityCB, this, NULL);
 	menubar->add("&View/Pawns", 0, ShowPawns, this, NULL);
 	menubar->add("&View/Shadows", 0, ShadowsCB, this, NULL);
+	menubar->add("&View/Reach Pose Examples", 0, ShowPoseExamples, this, NULL);	
 	menubar->add("&View/Terrain/Shaded", 0, TerrainShadedCB, this, NULL);
 	menubar->add("&View/Terrain/Wireframe", 0, TerrainWireframeCB, this, NULL);
-	menubar->add("&View/Terrain/No Terrain", 0, TerrainNoneCB, this, NULL);
+	menubar->add("&View/Terrain/No Terrain", 0, TerrainNoneCB, this, NULL);	
 	menubar->add("&Create/Character...", 0, CreateCharacterCB, this, NULL);
 	menubar->add("&Create/Pawn...", 0, CreatePawnCB, this, NULL);
 	menubar->add("&Create/Terrain...", 0, CreateTerrainCB, this, NULL);
@@ -748,6 +749,14 @@ void RootWindow::VelocityCB(fltk::Widget* w, void* data)
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowVelocity, NULL);
 }
 
+void RootWindow::ShowPoseExamples( fltk::Widget* w, void* data )
+{
+	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	if (rootWindow->fltkViewer->getData()->reachRenderMode != FltkViewer::ModeShowExamples)
+		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdReachShowExamples, NULL);
+	else
+		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdReachNoExamples, NULL);
+}
 //== Viewer Factory ========================================================
 SrViewer* FltkViewerFactory::s_viewer = NULL;
 

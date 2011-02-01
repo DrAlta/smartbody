@@ -154,9 +154,11 @@ static SrArray<Fl_Menu_Item> reach_submenus[NUM_REACH_TYPES];
 Fl_Menu_Item ReachMenuTable[] = 
 {	
 	{ reach_type_name[0],   0, MCB, 0 },			
-	{ reach_type_name[1],   0, MCB, 0 },	
-	{ "&reach interpolate", 0, MCB, CMD(CmdReachToggleData),FL_MENU_TOGGLE },
-	{ "&reach IK", 0, MCB, CMD(CmdReachToggleIK),FL_MENU_TOGGLE },
+	{ reach_type_name[1],   0, MCB, 0 },		
+	{ "&show pose examples", 0, MCB, CMD(CmdReachShowExamples), 0 },
+	{ "&no pose examples", 0, MCB, CMD(CmdReachNoExamples), 0 },
+	{ "&toggle reach interpolate", 0, MCB, CMD(CmdReachToggleData),FL_MENU_TOGGLE },
+	{ "&toggle reach IK", 0, MCB, CMD(CmdReachToggleIK),FL_MENU_TOGGLE },
 	{ 0 }
 };
 
@@ -339,6 +341,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->eyeLidMode = ModeNoEyeLids;
    _data->dynamicsMode = ModeNoDynamics;
    _data->locomotionMode = ModeEnableLocomotion;
+   _data->reachRenderMode = ModeShowExamples;
 
    _data->iconized    = false;
    _data->statistics  = false;
@@ -602,8 +605,14 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 		  {
 			  reachCt->useIK = !reachCt->useIK;
 		  }	
-		  break;      
-    }
+		  break;  
+	  case CmdReachShowExamples:
+		  _data->reachRenderMode = ModeShowExamples;
+		  break;
+	  case CmdReachNoExamples:
+		  _data->reachRenderMode = ModeNoExamples;
+		  break;
+	}
 	
 	if (applyToCharacter)
 	{
@@ -3130,6 +3139,8 @@ MeCtDataDrivenReach* FltkViewer::getCurrentCharacterReachController()
 // visualize example data and other relevant information for reach controller
 void FltkViewer::drawReach()
 {	
+	if (_data->reachRenderMode == ModeNoExamples)
+		return;
 	
 	glPushAttrib(GL_LIGHTING_BIT | GL_POINT_BIT);
 	glDisable(GL_LIGHTING);

@@ -171,6 +171,7 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 	if (id)
 		localId = XMLString::transcode(id);
 
+	bool bCreateNewController = false;
 	if (!reachCt)
 	{
 #if DATA_DRIVEN_REACH
@@ -181,6 +182,7 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 		reachCt->setReachArm(reachArm);
 		reachCt->handle(handle);
 		reachCt->init();
+		bCreateNewController = true;
 
 // #if DATA_DRIVEN_REACH
 // 		buildReachCtExamples(mcu,reachCt);
@@ -206,6 +208,8 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 		}
 	}	
 
+	// feng : pre-processing steps should not be in the BML scripts. Thus this part is commented for now, and will be removed later.
+	/*	
 	const XMLCh* attrBuildExample = NULL;
 	attrBuildExample = elem->getAttribute( ATTR_BUILD_EXAMPLE );
 	if (attrBuildExample && XMLString::stringLen( attrBuildExample ))
@@ -248,7 +252,8 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 		{
 			reachCt->buildResamplePoseData(resampleSize,minExampleDist);
 		}		
-	}		
+	}	
+	*/
 #endif
 
 
@@ -263,19 +268,21 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
  	if( isTimeSet( syncPtr.sync()->offset) ) {
  		//reachCt->set_duration(syncPtr.sync()->offset);	
  	}
-	
-	boost::shared_ptr<MeControllerRequest> ct_request( new MeControllerRequest( unique_id, localId, reachCt, request->actor->reach_sched_p, behav_syncs ) );
-	ct_request->set_persistent( true );
-	BehaviorSyncPoints::iterator start =behav_syncs.sync_start();
-	BML::NamedSyncPointPtr syncStartPtr = (*start);
 
+	boost::shared_ptr<MeControllerRequest> ct_request;
+	ct_request.reset();
+	if (bCreateNewController)
+	{
+		ct_request.reset( new MeControllerRequest( unique_id, localId, reachCt, request->actor->reach_sched_p, behav_syncs ) );
+		ct_request->set_persistent( true );
+	}	
 	
+	BehaviorSyncPoints::iterator start =behav_syncs.sync_start();
+	BML::NamedSyncPointPtr syncStartPtr = (*start);	
 	float startTime = 0.f;
 	if( isTimeSet( syncStartPtr.sync()->offset) ) {		
 		startTime = syncStartPtr.sync()->offset;
 	}	
-
-
 
 #if TEST_GAZE_LOCOMOTION
 	// make the character gaze at the target

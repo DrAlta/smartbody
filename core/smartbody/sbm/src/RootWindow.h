@@ -71,6 +71,7 @@ class  RootWindow : public SrViewer, public fltk::DoubleBufferWindow
 		static void TerrainWireframeCB(fltk::Widget* w, void* data);
 		static void TerrainNoneCB(fltk::Widget* w, void* data);
 		static void ShowPawns(fltk::Widget* w, void* data);
+		static void ShowPoseExamples(fltk::Widget* w, void* data);
 		static void ModeDynamicsCOMCB(fltk::Widget* w, void* data);
 		static void ModeDynamicsSupportPolygonCB(fltk::Widget* w, void* data);
 		static void ModeDynamicsMassesCB(fltk::Widget* w, void* data);
