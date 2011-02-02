@@ -94,6 +94,26 @@ int MeCtLocomotionLimb::get_descendant_num(SkJoint* joint)
 	return num;
 }
 
+void MeCtLocomotionLimb::set_space_time(float space_time)
+{
+	if(this->space_time < 2.0f && space_time > 2.0f) 
+	{
+		//add the sound play message here // jingqiao 2/1/2011
+		//add the sound play message here // jingqiao 2/1/2011
+	}
+	this->space_time = space_time;
+}
+
+float MeCtLocomotionLimb::get_space_time()
+{
+	return space_time;
+}
+
+float* MeCtLocomotionLimb::get_space_time_pt()
+{
+	return &space_time;
+}
+
 int MeCtLocomotionLimb::get_support_joint_num()
 {
 	return support_joint_list.size();
