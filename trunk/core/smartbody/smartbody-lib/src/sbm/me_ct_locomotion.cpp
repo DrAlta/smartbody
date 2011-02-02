@@ -635,7 +635,7 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 		if(speed_accelerator.get_target_speed() != 0.0f)
 		{
 			dominant_limb = determine_dominant_limb();
-			limb_list.get(dominant_limb)->space_time = 0.0f;
+			limb_list.get(dominant_limb)->set_space_time(0.0f);
 		}
 		else
 		{
@@ -650,7 +650,7 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 	}
 
 	//get current direction
-	limb_list.get(dominant_limb)->direction_planner.update_direction(delta_time, &limb_list.get(dominant_limb)->space_time, 3, true);
+	limb_list.get(dominant_limb)->direction_planner.update_direction(delta_time, limb_list.get(dominant_limb)->get_space_time_pt(), 3, true);
 
 	// set r_anim1_index_dominant amd r_anim2_index_dominant
 	get_anim_indices(dominant_limb, limb_list.get(dominant_limb)->direction_planner.get_curr_direction(), &r_anim1_index_dominant, &r_anim2_index_dominant);
@@ -678,18 +678,18 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 	navigator.update_framerate_accelerator(acc, &limb_list);
 
 	//the current frame number is the addition of previous frame number + increased frame num * acceleration
-	frame_num = blended_anim->get_timing_space()->get_virtual_frame(limb_list.get(dominant_limb)->space_time) + inc_frame * navigator.framerate_accelerator;
+	frame_num = blended_anim->get_timing_space()->get_virtual_frame(limb_list.get(dominant_limb)->get_space_time()) + inc_frame * navigator.framerate_accelerator;
 	frame_num = blended_anim->get_timing_space()->get_normalized_frame(frame_num); // in case new frame number is beyond the range. 
 
 	//space time was computed with current frame number
 	if(navigator.limb_blending_factor != 0.0f) 
-		limb_list.get(dominant_limb)->space_time = blended_anim->get_timing_space()->get_space_value(frame_num);
+		limb_list.get(dominant_limb)->set_space_time(blended_anim->get_timing_space()->get_space_value(frame_num));
 	
 	// update the current orientation of dominant limb
 	navigator.update_facing(limb_list.get(dominant_limb), true);
 
 	// blend the two animations
-	limb_list.get(dominant_limb)->blend_anim(limb_list.get(dominant_limb)->space_time, r_anim1_index_dominant, r_anim2_index_dominant, dom_ratio, &(limb_list.get(dominant_limb)->limb_joint_info.joint_index));
+	limb_list.get(dominant_limb)->blend_anim(limb_list.get(dominant_limb)->get_space_time(), r_anim1_index_dominant, r_anim2_index_dominant, dom_ratio, &(limb_list.get(dominant_limb)->limb_joint_info.joint_index));
 
 	// update acceleration based on current timing space and space time.
 	speed_accelerator.update_acceleration(limb_list.get(dominant_limb), blended_anim->get_timing_space());
@@ -710,25 +710,25 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 			get_blended_timing_space(blended_anim->get_timing_space(), anim1->get_timing_space(), anim2->get_timing_space(), dom_ratio);
 			
 			if(navigator.limb_blending_factor != 0.0f) 
-				limb_list.get(i)->space_time = blended_anim->get_timing_space()->get_space_value(frame_num);
+				limb_list.get(i)->set_space_time(blended_anim->get_timing_space()->get_space_value(frame_num));
 			
 			//compute the direction and orientation based on the real timing space
-			limb_list.get(i)->direction_planner.update_direction(delta_time, &limb_list.get(i)->space_time, blended_anim->get_timing_space()->get_ref_time_num(), false);
+			limb_list.get(i)->direction_planner.update_direction(delta_time, limb_list.get(i)->get_space_time_pt(), blended_anim->get_timing_space()->get_ref_time_num(), false);
 			get_anim_indices(i, limb_list.get(i)->direction_planner.get_curr_direction(), &r_anim1_index, &r_anim2_index);
 			anim1 = limb_list.get(i)->get_walking_list()->get(r_anim1_index);
 			anim2 = limb_list.get(i)->get_walking_list()->get(r_anim2_index);
 			ratio = limb_list.get(i)->direction_planner.get_ratio(anim1, anim2);
 			get_blended_timing_space(blended_anim->get_timing_space(), anim1->get_timing_space(), anim2->get_timing_space(), ratio);
 			navigator.update_facing(limb_list.get(i), false);
-			limb_list.get(i)->blend_anim(limb_list.get(i)->space_time, r_anim1_index, r_anim2_index, ratio, &(limb_list.get(i)->limb_joint_info.joint_index));
+			limb_list.get(i)->blend_anim(limb_list.get(i)->get_space_time(), r_anim1_index, r_anim2_index, ratio, &(limb_list.get(i)->limb_joint_info.joint_index));
 		}
 	}
 
 	//blend non-limb joints
 	anim1 = limb_list.get(0)->get_walking_list()->get(r_anim1_index_dominant);
 	anim2 = limb_list.get(0)->get_walking_list()->get(r_anim2_index_dominant);
-	get_frame(locomotion_anims.get(r_anim1_index_dominant - 1), walking_skeleton, anim1->get_timing_space()->get_virtual_frame(limb_list.get(0)->space_time), base_name, &joint_quats1, &t_joint_quats1, &t_joint_quats2, &(nonlimb_joint_info.joint_index));
-	get_frame(locomotion_anims.get(r_anim2_index_dominant - 1), walking_skeleton, anim2->get_timing_space()->get_virtual_frame(limb_list.get(0)->space_time), base_name, &joint_quats2, &t_joint_quats1, &t_joint_quats2, &(nonlimb_joint_info.joint_index));
+	get_frame(locomotion_anims.get(r_anim1_index_dominant - 1), walking_skeleton, anim1->get_timing_space()->get_virtual_frame(limb_list.get(0)->get_space_time()), base_name, &joint_quats1, &t_joint_quats1, &t_joint_quats2, &(nonlimb_joint_info.joint_index));
+	get_frame(locomotion_anims.get(r_anim2_index_dominant - 1), walking_skeleton, anim2->get_timing_space()->get_virtual_frame(limb_list.get(0)->get_space_time()), base_name, &joint_quats2, &t_joint_quats1, &t_joint_quats2, &(nonlimb_joint_info.joint_index));
 	get_blended_quat_buffer(&(nonlimb_joint_info.quat), &joint_quats1, &joint_quats2, dom_ratio);
 
 	//recompute the dominant limb
@@ -746,9 +746,9 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 		limb_list.get(i)->manipulate_turning(mat);
 	}
 
-	last_time = limb_list.get(dominant_limb)->space_time;
+	last_time = limb_list.get(dominant_limb)->get_space_time();
 
-	blend_base_joint(frame, limb_list.get(0)->space_time, r_anim1_index_dominant, r_anim2_index_dominant, dom_ratio);
+	blend_base_joint(frame, limb_list.get(0)->get_space_time(), r_anim1_index_dominant, r_anim2_index_dominant, dom_ratio);
 
 	update_nonlimb_mat(NULL, NULL, 0);
 
@@ -1062,18 +1062,18 @@ int MeCtLocomotion::determine_dominant_limb_index()
 	float r = -1;
 	for(int i = 0; i < limb_list.size(); ++i)
 	{
-		if(limb_list.get(i)->space_time > 1.0f && limb_list.get(i)->space_time < 2.0f) continue;
-		else if(limb_list.get(i)->space_time <= 1.0f) 
+		if(limb_list.get(i)->get_space_time() > 1.0f && limb_list.get(i)->get_space_time() < 2.0f) continue;
+		else if(limb_list.get(i)->get_space_time() <= 1.0f) 
 		{
-			r = 1- limb_list.get(i)->space_time;
+			r = 1- limb_list.get(i)->get_space_time();
 		}
-		else if(limb_list.get(i)->space_time >= 2.0f) 
+		else if(limb_list.get(i)->get_space_time() >= 2.0f) 
 		{
-			r = limb_list.get(i)->space_time - 1;
+			r = limb_list.get(i)->get_space_time() - 1;
 		}
 		if(r < 0.0f) 
 		{
-			LOG("Error: can not determine dominant limb. \n space_time_limb1=%f\nspace_time_limb2=%f", limb_list.get(0)->space_time, limb_list.get(1)->space_time);
+			LOG("Error: can not determine dominant limb. \n space_time_limb1=%f\nspace_time_limb2=%f", limb_list.get(0)->get_space_time(), limb_list.get(1)->get_space_time());
 			r = 0;
 		}
 		if(r > remnant) 
@@ -1138,10 +1138,10 @@ void MeCtLocomotion::update_pos()
 		ratio[i] = 0;
 		dis[i].set(0,0,0);
 		//if(i == dominant_limb)
-		if((limb->space_time >= 2.0f || limb->space_time <= 1.0f))
+		if((limb->get_space_time() >= 2.0f || limb->get_space_time() <= 1.0f))
 		{
-			if(limb->space_time >= 2.0f) ratio[i] = limb->space_time - 2.0f;
-			else if(limb->space_time <= 1.0f) ratio[i] = 1.0f - limb->space_time;
+			if(limb->get_space_time() >= 2.0f) ratio[i] = limb->get_space_time() - 2.0f;
+			else if(limb->get_space_time() <= 1.0f) ratio[i] = 1.0f - limb->get_space_time();
 			//ratio[i] *= ratio[i];
 			SrMat mat;
 
@@ -1178,15 +1178,15 @@ void MeCtLocomotion::update_pos()
 				for(int i = 0; i < 2; ++i)
 				{
 					MeCtLocomotionLimb* limb = limb_list.get(i);
-					if(limb->space_time >= 2.0f || limb->space_time <= 1.0f)
+					if(limb->get_space_time() >= 2.0f || limb->get_space_time() <= 1.0f)
 					{
 						limb->ik_offset += (dis[i]-displacement)/3.0f;
 						limb->ik_offset_record = limb->ik_offset;
 						//printf("\n(%f, %f, %f)", limb->ik_offset.x, limb->ik_offset.y, limb->ik_offset.z);
 					}
-					else if(limb->space_time > 1.0f && limb->space_time <= 1.5f)
+					else if(limb->get_space_time() > 1.0f && limb->get_space_time() <= 1.5f)
 					{
-						limb->ik_offset = limb->ik_offset_record * (1.5f - limb->space_time)*2.0f;
+						limb->ik_offset = limb->ik_offset_record * (1.5f - limb->get_space_time())*2.0f;
 					}
 					else
 						limb->ik_offset.set(0,0,0);

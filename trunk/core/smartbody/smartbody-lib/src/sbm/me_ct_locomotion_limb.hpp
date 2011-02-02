@@ -40,6 +40,7 @@ public:
 protected:
 	// Data
 	float							height_bound;
+	float							space_time;
 	bool							is_valid;  // All necessary channels are present
 
 public:
@@ -72,7 +73,7 @@ public:
 	SrArray<SrVec>					pos_buffer;
 	MeCtLocomotionLimbAnim			blended_anim; // blended run-time animation
 	MeCtLocomotionLimbDirectionPlanner direction_planner; 
-	float							space_time;
+	
 	SrVec							pos;
 	char*							limb_base_name;
 	float							rotation_record;
@@ -88,6 +89,10 @@ public:
 	~MeCtLocomotionLimb();
 
 	MeCtLocomotionLimb(char* name);
+
+	void set_space_time(float space_time);
+	float get_space_time();
+	float* get_space_time_pt();
 
 	void	set_height_bound(float bound);
 	float	get_height_bound();

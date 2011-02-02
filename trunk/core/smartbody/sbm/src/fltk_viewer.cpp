@@ -2903,8 +2903,8 @@ void FltkViewer::drawLocomotion()
 			int cur_dominant = character->get_locomotion_ct()->get_dominant_limb_index();
 			if(i == _locoData->char_index && character->get_locomotion_ct()->limb_list.size()>cur_dominant)
 			{
-				if(cur_dominant != pre_dominant && character->get_locomotion_ct()->limb_list.get(cur_dominant)->space_time >= 0.0f
-					&& character->get_locomotion_ct()->limb_list.get(cur_dominant)->space_time < 1.0f)
+				if(cur_dominant != pre_dominant && character->get_locomotion_ct()->limb_list.get(cur_dominant)->get_space_time() >= 0.0f
+					&& character->get_locomotion_ct()->limb_list.get(cur_dominant)->get_space_time() < 1.0f)
 				{
 					SrMat mat;
 					mat.rot(SrVec(0,1,0), character->get_locomotion_ct()->limb_list.get(cur_dominant)->curr_rotation+character->get_locomotion_ct()->get_navigator()->get_orientation_angle());

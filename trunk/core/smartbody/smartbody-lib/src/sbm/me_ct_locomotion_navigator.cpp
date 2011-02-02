@@ -70,7 +70,7 @@ void MeCtLocomotionNavigator::update_framerate_accelerator(float accelerator, Sr
 			//limb_list.get(dominating_limb)->space_time = 0.0f;
 			for(int i = 0; i < limb_list->size(); ++i)
 			{
-				limb_list->get(i)->space_time = 0.0f;
+				limb_list->get(i)->set_space_time( 0.0f);
 				limb_list->get(i)->direction_planner.reset();
 			}
 		}
@@ -606,13 +606,13 @@ void MeCtLocomotionNavigator::update_facing(MeCtLocomotionLimb* limb, bool domin
 	
 	if(limb_blending_factor_on_stop_t > 0.0f) ratio = limb_blending_factor / limb_blending_factor_on_stop_t;
 
-	if(limb->space_time > 1.0f && limb->space_time <= 1.5f) 
+	if(limb->get_space_time() > 1.0f && limb->get_space_time() <= 1.5f) 
 	{
-		limb->curr_rotation = limb->rotation_record * (1.5f - limb->space_time)*2.0f;
+		limb->curr_rotation = limb->rotation_record * (1.5f - limb->get_space_time())*2.0f;
 
 	}
 
-	else if(limb->space_time >= 2.0f || limb->space_time <= 1.0f)
+	else if(limb->get_space_time() >= 2.0f || limb->get_space_time() <= 1.0f)
 	{
 		float delta_angle = get_turning_angle();
 		
@@ -631,7 +631,7 @@ void MeCtLocomotionNavigator::update_facing(MeCtLocomotionLimb* limb, bool domin
 				orientation_angle += ((int)(-0.5f*orientation_angle/(float)M_PI))*(float)M_PI*2;
 		}
 	}
-	else if(limb->space_time > 1.5f && limb->space_time < 2.0f)
+	else if(limb->get_space_time() > 1.5f && limb->get_space_time() < 2.0f)
 	{
 		limb->curr_rotation -= get_turning_angle();
 		limb->rotation_record = limb->curr_rotation;
@@ -640,7 +640,7 @@ void MeCtLocomotionNavigator::update_facing(MeCtLocomotionLimb* limb, bool domin
 	if(reached_destination)
 		limb->curr_rotation *= ratio;
 
-	if( limb->space_time >= 2.0f || limb->space_time <= 1.0f )
+	if( limb->get_space_time() >= 2.0f || limb->get_space_time() <= 1.0f )
 		limb->rotation_record = limb->curr_rotation;
 
 }
