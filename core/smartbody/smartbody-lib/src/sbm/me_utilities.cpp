@@ -38,6 +38,7 @@
 
 #include "sbm_constants.h"
 #include "gwiz_math.h"
+#include "ParserBVH.h"
 
 using namespace std;
 using namespace boost::filesystem;
@@ -84,17 +85,30 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, Resourc
 #if 0
 	if( !skeleton_p->load( input, path ) )	{ 
 #else
-    //now the "geopath" can be still sent in the load() method as before,
-    //but for extracting the path from a file name, the filename should be
-    //associated with the input, as done here:
-	input.filename(filename.c_str());
-	if( !skeleton_p->load( input, scale ) )	{ 
-#endif
-		LOG("ERROR: load_skeleton(..): Unable to load skeleton file \"%s\".", skel_file);
-		return NULL;
-	}
-	skeleton_p->skfilename(filename.c_str());
 
+	if (filename.find(".bvh") == (filename.size() - 4) || 
+		filename.find(".BVH") == (filename.size() - 4))
+	{
+		fclose(fp);
+		std::ifstream filestream(filename.c_str());
+		SkMotion* motion = new SkMotion();
+		ParserBVH::parse(*skeleton_p, *motion, skel_file, filestream);
+		delete motion;
+		skeleton_p->skfilename(filename.c_str());
+	}
+	else
+	{
+		//now the "geopath" can be still sent in the load() method as before,
+		//but for extracting the path from a file name, the filename should be
+		//associated with the input, as done here:
+		input.filename(filename.c_str());
+		if( !skeleton_p->load( input, scale ) )	{ 
+	#endif
+			LOG("ERROR: load_skeleton(..): Unable to load skeleton file \"%s\".", skel_file);
+			return NULL;
+		}
+		skeleton_p->skfilename(filename.c_str());
+	}
 	char CurrentPath[_MAX_PATH];
 	_getcwd(CurrentPath, _MAX_PATH);
 	char *full_filename = new char[_MAX_PATH];
@@ -106,6 +120,7 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, Resourc
 	
 	// SUCCESS
 	return skeleton_p;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////

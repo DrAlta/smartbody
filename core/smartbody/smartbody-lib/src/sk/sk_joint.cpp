@@ -86,6 +86,13 @@ void SkJoint::offset ( const SrVec& o )
    set_lmat_changed ();
  }
 
+void SkJoint::endEffectorOffset ( const SrVec& o )
+ {
+   if ( o==_endEffectorOffset ) return;
+   _endEffectorOffset=o;
+   set_lmat_changed ();
+ }
+
 void SkJoint::rot_type ( RotType t )
  {
    if ( char(t)==_rtype ) return; // no change required
