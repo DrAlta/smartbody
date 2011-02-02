@@ -3422,12 +3422,12 @@ int mcu_reach_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 		else if (arg == "update")
 		{
-			buildMode == UPDATE;
+			buildMode = UPDATE;
 			arg = args.read_token();
 		}
 		else if (arg == "resample")
 		{
-			buildMode == RESAMPLE;
+			buildMode = RESAMPLE;
 			arg = args.read_token();
 		}
 

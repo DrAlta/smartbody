@@ -26,6 +26,7 @@
 #include "gwiz_math.h"
 #include "limits.h"
 #include <vhcl_log.h>
+#include "sbm/Event.h"
 
 
 const char* MeCtLocomotionLimb::TYPE = "MeCtLocomotionLimb";
@@ -100,6 +101,17 @@ void MeCtLocomotionLimb::set_space_time(float space_time)
 	{
 		//add the sound play message here // jingqiao 2/1/2011
 		//add the sound play message here // jingqiao 2/1/2011
+
+		std::string eventType = "";
+		if (limb_base_name && limb_base_name[0] == 'l')
+			eventType = "footstep_left";
+		else
+			eventType = "footstep_right";
+		MotionEvent motionEvent;
+		motionEvent.setType(eventType);
+
+		EventManager* manager = EventManager::getEventManager();
+		manager->handleEvent(&motionEvent, space_time);
 	}
 	this->space_time = space_time;
 }
