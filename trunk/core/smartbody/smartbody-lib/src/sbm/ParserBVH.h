@@ -46,11 +46,17 @@ that is distributed: */
 #include "sk/sk_skeleton.h"
 #include "sk/sk_motion.h"
 
+struct ChannelInfo
+{
+	int channels[6];
+	int numData;
+};
+
 class ParserBVH
 {
 	public:
 		static void parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, std::ifstream &file, int N1 = -1, int N2 = 2000000);
-
+		static void convertBVHtoSmartBody(int frameNum, SkMotion& motion, ChannelInfo& channelInfo, double data[6], SkMotion::Frame* sbFrame, double frameTime);
 
 };
 
