@@ -52,6 +52,7 @@ RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Camera/Frame All", 0, CameraFrameCB, this, NULL);
 	menubar->add("&Camera/Face Camera", 0, FaceCameraCB, this, NULL);
 	menubar->add("&Camera/Track Character", 0, TrackCharacterCB, this, NULL);
+	menubar->add("&Camera/Rotate Around Selected", 0, RotateSelectedCB, this, NULL);
 	menubar->add("&Settings/Softeyes", 0, SettingsSofteyesToggleCB, this, NULL);
 	menubar->add("&Settings/Internal Audio", 0, AudioCB, this, NULL);
 	menubar->add("&Window/Data Viewer", 0, LaunchDataViewerCB,this, NULL);
@@ -271,6 +272,22 @@ void RootWindow::CameraFrameCB(Widget* widget, void* data)
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.execute("camera frame");
 }
+
+void RootWindow::RotateSelectedCB(Widget* widget, void* data)
+{
+	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	SbmPawn* pawn = rootWindow->fltkViewer->getObjectManipulationHandle().get_selected_pawn();
+	if (!pawn)
+		return;
+
+	SrCamera* camera = mcu.viewer_p->get_camera();
+	float x,y,z,h,p,r;
+	pawn->get_world_offset(x, y, z, h, p, r);
+	camera->center = SrVec(x, y, z);
+}
+
 
 void RootWindow::FaceCameraCB(Widget* widget, void* data)
 {

@@ -58,6 +58,7 @@ class  RootWindow : public SrViewer, public fltk::DoubleBufferWindow
 		static void CameraResetCB(Widget* widget, void* data);
 		static void CameraFrameCB(Widget* widget, void* data);
 		static void FaceCameraCB(Widget* widget, void* data);
+		static void RotateSelectedCB(Widget* widget, void* data);
 		static void RunScriptCB(fltk::Widget* w, void* data);
 		static void ReloadScriptsCB(fltk::Widget* w, void* data);
 		static void SetScriptDirCB(fltk::Widget* w, void* data);

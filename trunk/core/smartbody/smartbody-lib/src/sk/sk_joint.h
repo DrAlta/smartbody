@@ -66,6 +66,7 @@ class SkJoint
     int   _coldetid;       // index used in collision detection
     SkSkeleton* _skeleton; // pointer to the associated skeleton
     SrVec _offset;         // offset from the joint to its children
+	SrVec _endEffectorOffset;         // offset from the joint to its children
     char _rtype;           // one of the RotType enumerator
     SkJointQuat* _quat;    // generic access to the quaternion of any parameterization
     SkJointPos _pos;       // controls the translation parameterization
@@ -74,12 +75,11 @@ class SkJoint
     friend class SkSkeleton;
     friend class SkColdet;
 
-   private:
+ public:
     // constructor sets all dofs to non active, and rotation type as euler
     SkJoint ( SkSkeleton* sk, SkJoint* parent, RotType rtype, int i );
     virtual ~SkJoint ();
 
-   public :
 
     /*! Get a pointer for the attached geometry for visualization,
         or null if no such geometry was loaded. The geometry pointers
@@ -129,6 +129,12 @@ class SkJoint
  
     /*! change the fixed frame translation relative to the parent */
     void offset ( const SrVec& o );
+
+    /*! returns the fixed frame translation relative to the parent */
+    SrVec endEffectoroffset () const { return _endEffectorOffset; }
+ 
+    /*! change the fixed frame translation relative to the parent */
+    void endEffectorOffset ( const SrVec& o );
 
     /*! Access the translation parameterization of the joint. */
     SkJointPos* pos () { return &_pos; }
