@@ -38,13 +38,14 @@ class MotionEvent;
 /*! Maintains a motion defined as a sequence of keyframes, each
 with a time stamp */
 class SkMotion : public SrSharedClass {
-protected :
 
+public:
 	struct Frame { 
 			float keytime; 
 			float* posture; 
 	};
 
+	protected :
 	int _postsize;            // size of each posture
 	SkSkeleton* _skeleton;    // the connected skeleton
 	float* _floatbuffer;      // or the connected buffer
