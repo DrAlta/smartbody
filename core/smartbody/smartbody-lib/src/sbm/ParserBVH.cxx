@@ -47,18 +47,21 @@ that is distributed: */
 #include <cstdlib>
 #include <boost/algorithm/string/trim.hpp>
 #include <map>
+#include "sr/sr_mat.h"
+#include "sr/sr_quat.h"
 
 using namespace std;
 
-enum {XPOSITION, YPOSITION, ZPOSITION, XROTATION, YROTATION, ZROTATION};
+enum {BVHXPOSITION, BVHYPOSITION, BVHZPOSITION, BVHXROTATION, BVHYROTATION, BVHZROTATION};
+enum {ROTXYZ, ROTXZY, ROTYXZ, ROTYZX, ROTZXY, ROTZYX};
 
-void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, std::ifstream &file, int N1, int N2)
+bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, std::ifstream &file, int N1, int N2)
 {
 	// check to make sure we have properly opened the file
 	if (!file.good())
 	{
 		LOG("Could not open file\n");
-		return;
+		return false;
 	}
 	char line[8192];
 	skeleton.name(name.c_str());
@@ -71,12 +74,13 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 	double frameTime = 0;
 	int jointCounter = 0;
 	int foundRoot = 0; // 0 = root not found, 1 = root found, 2 = next joint found
+	int curChannelIndex = 0;
 
 	int postureSize = 0;
-	std::vector<ChannelInfo> channelInfoMap;
+	std::vector<ChannelInfo*> channelInfoMap;
 	std::vector<std::pair<int, int> > bvhIndex;
-	SkChannelArray& skChannels = skeleton.channels(); 
-
+	SkChannelArray& skChannels = skeleton.channels();
+	SkChannelArray motionChannels;
 
 	while(!file.eof() && file.good())
 	{
@@ -96,7 +100,7 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				{
 					LOG("HIERARCHY not found...\n");
 					file.close();
-					return;
+					return false;
 				}
 				break;
 			case 1:	// looking for 'ROOT'
@@ -114,7 +118,7 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 						root->quat()->activate();
 						jointCounter++;
 						root->name(SkJointName(strstr.str().c_str()));
-						skeleton.make_active_channels();
+						//skeleton.make_active_channels();
 						cur = root;
 						state = 2;
 					}
@@ -122,14 +126,14 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					{
 						LOG("ROOT name not found...\n");
 						file.close();
-						return;
+						return false;
 					}
 				}
 				else
 				{
 					LOG("ROOT not found...\n");
 					file.close();
-					return;
+					return false;
 				}
 				break;
 			case 2: // looking for '{'
@@ -143,7 +147,7 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				{
 					LOG("{ not found...\n");
 					file.close();
-					return;
+					return false;
 				}
 				break;
 			case 3: // looking for 'OFFSET'
@@ -169,7 +173,7 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				{
 					LOG("OFFSET not found...\n");
 					file.close();
-					return;
+					return false;
 				}
 				break;
 			case 4: // looking for 'CHANNELS'
@@ -185,8 +189,10 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 						//LOG("Too many channels (%d) found for non-root node at %s, reducing to %d...", numChannels, cur->getName(), numChannels - 3);
 						//cur->setIgnoreChannels(true);
 					}
-					ChannelInfo channelInfo;
-					channelInfo.numData = 0;
+					ChannelInfo* channelInfo = new ChannelInfo();
+					channelInfo->numBVHChannels = 0;
+					channelInfo->order = 0;
+					channelInfo->startingChannelIndex = curChannelIndex;
 					//LOG("Found %d channels...\n", numChannels);
 					bool hasRotation = false;
 					for (int c = 0; c < numChannels; c++)
@@ -194,47 +200,65 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 						str = strtok(NULL, " \t");
 						if (strncmp(str, "Xrotation", strlen("Xrotation")) == 0)
 						{
-							channelInfo.channels[c] = XROTATION;
-							channelInfo.numData++;
+							channelInfo->channels[c] = BVHXROTATION;
+							channelInfo->numBVHChannels++;
+							hasRotation = true;
 						}
 						else if (strncmp(str, "Yrotation", strlen("Yrotation")) == 0)
 						{
-							channelInfo.channels[c] = YROTATION;							
-							channelInfo.numData++;
+							channelInfo->channels[c] = BVHYROTATION;							
+							channelInfo->numBVHChannels++;
+							hasRotation = true;
 						}
 						else if (strncmp(str, "Zrotation", strlen("Zrotation")) == 0)
 						{
-							channelInfo.channels[c] = ZROTATION;							
-							channelInfo.numData++;
+							channelInfo->channels[c] = BVHZROTATION;							
+							channelInfo->numBVHChannels++;
+							hasRotation = true;
 						}
 						else if (strncmp(str, "Xposition", strlen("Xposition")) == 0)
 						{
-							channelInfo.channels[c] = XPOSITION;		
-							skChannels.add(cur, SkChannel::XPos);
-							channelInfo.numData++;
+							channelInfo->channels[c] = BVHXPOSITION;		
+							skChannels.add(cur->name(), SkChannel::XPos);
+							motionChannels.add(cur->name(), SkChannel::XPos);
+							cur->pos()->limits( SkVecLimits::X, false );
+							channelInfo->numBVHChannels++;
+							curChannelIndex++;
 						}
 						else if (strncmp(str, "Yposition", strlen("Yposition")) == 0)
 						{
-							channelInfo.channels[c] = YPOSITION;		
-							skChannels.add(cur, SkChannel::YPos);
-							channelInfo.numData++;
+							channelInfo->channels[c] = BVHYPOSITION;		
+							skChannels.add(cur->name(), SkChannel::YPos);
+							motionChannels.add(cur->name(), SkChannel::YPos);
+							cur->pos()->limits( SkVecLimits::Y, false );
+							channelInfo->numBVHChannels++;
+							curChannelIndex++;
 						}
 						else if (strncmp(str, "Zposition", strlen("Zposition")) == 0)
 						{
-							channelInfo.channels[c] = ZPOSITION;	
-							skChannels.add(cur, SkChannel::ZPos);
-							channelInfo.numData++;
+							channelInfo->channels[c] = BVHZPOSITION;	
+							skChannels.add(cur->name(), SkChannel::ZPos);
+							motionChannels.add(cur->name(), SkChannel::ZPos);
+							cur->pos()->limits( SkVecLimits::Z, false );
+							channelInfo->numBVHChannels++;
+							curChannelIndex++;
 						}
 						else
 						{
 							LOG("Unknown channel: %s...\n", str);;
 							file.close();
+							return false;
 						}
-						if (!hasRotation)
-						{
-							hasRotation = true;
-							skChannels.add(cur, SkChannel::Quat);
-						}
+						
+					}
+
+					if (hasRotation)
+					{
+						// determine the rotation order
+						channelInfo->order = determineRotationOrder(channelInfo->channels, channelInfo->numBVHChannels);
+						skChannels.add(cur->name(), SkChannel::Quat);
+						motionChannels.add(cur->name(), SkChannel::Quat);
+						curChannelIndex += 4;
 					}
 					channelInfoMap.push_back(channelInfo);
 
@@ -250,7 +274,7 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				{
 					LOG("CHANNELS not found...\n");;
 					file.close();
-					return;
+					return false;
 				}
 				break;
 			case 5: // looking for 'JOINT' or 'End Site' or '}' or 'MOTION'
@@ -276,7 +300,7 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					{
 						LOG("ROOT name not found...\n");;
 						file.close();
-						return;
+						return false;
 					}
 				}
 				else if (strncmp(str, "End", strlen("End")) == 0)
@@ -290,7 +314,7 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					{
 						LOG("End site not found...\n");;
 						file.close();
-						return;
+						return false;
 					}
 				}
 				else if (strncmp(str, "}", 1) == 0)
@@ -305,7 +329,7 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					{
 						LOG("} not found...\n");;
 						file.close();
-						return;
+						return false;
 					}
 				}
 				else if (strncmp(str, "MOTION", strlen("MOTION")) == 0)
@@ -316,7 +340,7 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				{
 					LOG("JOINT or End Site not found...\n");;
 					file.close();
-					return;
+					return false;
 				}
 				break;
 			case 6: // looking for 'OFFSET' within end effector
@@ -330,7 +354,7 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					LOG("{ not found for end effector...\n");;
 					cerr << "{ not found for end effector..." << endl;
 					file.close();
-					return;
+					return false;
 				}
 				break;
 			case 7:
@@ -354,7 +378,7 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				{
 					LOG("End effector OFFSET not found...\n");;
 					file.close();
-					return;
+					return false;
 				}
 				break;
 			case 8: // looking for '}' to finish the  end effector
@@ -367,7 +391,7 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				{
 					LOG("} not found for end effector...\n");;
 					file.close();
-					return;
+					return false;
 				}
 				break;
 			case 9: // found 'MOTION', looking for 'Frames'
@@ -383,7 +407,7 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				{
 					LOG("Frames: not found...\n");;
 					file.close();
-					return;
+					return false;
 				}
 				break;
 			case 10: // found 'Frames', looking for 'Frame time:'
@@ -400,30 +424,32 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					const SrArray<SkJoint*>& allJoints = skeleton.joints();
 					for (int j = 0; j < allJoints.size(); j++)
 					{
-						ChannelInfo& channelInfo = channelInfoMap[j];
-						for (int n = 0; n < channelInfo.numData; n++)
+						ChannelInfo* channelInfo = channelInfoMap[j];
+						for (int n = 0; n < channelInfo->numBVHChannels; n++)
 							bvhIndex.push_back(std::pair<int, int>(j, n));
 					}
 					// set up the size of the posture based on the SmartBody skeleton
+					//skChannels.compress();
 					postureSize = skChannels.floats();
+					motion.init(motionChannels);
 				}
 				else
 				{
 					LOG("Frame Time: not found...\n");;
 					file.close();
-					return;
+					return false;
 				}
 				break;
 			case 11: // parsing 
 				// TODO:
-				state = 50;
-				break;
 				curFrame++;
 				if( (curFrame <= N2) && (curFrame >= N1))
 				{
 					if (curFrame < numFrames)
 					{
-						SkMotion::Frame* sbFrame = new SkMotion::Frame();
+						motion.insert_frame(curFrame, float(frameTime) * float(curFrame));
+
+						float* posture = motion.posture(curFrame);
 						
 						int index = 0;
 						str = strtok(line, " \t");
@@ -434,6 +460,12 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 						{
 							double val = atof(str);
 							int channelNum;
+							
+							if (index >= bvhIndex.size())
+							{
+								LOG("Data on frame %d at position %d exceeds channel size of %d.", curFrame, index, bvhIndex.size());
+								break;
+							}
 
 							std::pair<int, int>& pair = bvhIndex[index];
 							SkJoint* j = skeleton.joints()[pair.first];
@@ -453,8 +485,8 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 										index -= 3;
 									}
 									// TODO: Add data to SkMotion
-									ChannelInfo& channelInfo = channelInfoMap[oldJoint->index()];
-									ParserBVH::convertBVHtoSmartBody(curFrame, motion, channelInfo, frames, sbFrame, curFrame * frameTime);
+									ChannelInfo* channelInfo = channelInfoMap[oldJoint->index()];
+									ParserBVH::convertBVHtoSmartBody(motion, channelInfo, frames, posture, curFrame * frameTime);
 								}
 
 								for (int x = 0; x < 6; x++)
@@ -481,8 +513,8 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 						if (oldJoint != NULL)
 						{
 							// convert the BVH frame into the appropriate SmartBody frame
-							ChannelInfo& channelInfo = channelInfoMap[oldJoint->index()];
-							ParserBVH::convertBVHtoSmartBody(curFrame, motion, channelInfo, frames, sbFrame, curFrame * frameTime);
+							ChannelInfo* channelInfo = channelInfoMap[oldJoint->index()];
+							ParserBVH::convertBVHtoSmartBody(motion, channelInfo, frames, posture, curFrame * frameTime);
 						}
 						state = 11;
 					}
@@ -502,27 +534,167 @@ void ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				file.close();
 				//skeleton.recalculateJointList();
 				//skeleton.calculateMatrices(0);	
-				skChannels.compress();
-				return;
+				motion.compress();
+				return true;
 			default:
 				LOG("State %d not expected.");
 				file.close();
-				return;
+				return false;
 		}
 	}
-	return;
+
+	return true;
 }
 
-void ParserBVH::convertBVHtoSmartBody(int frameNum, SkMotion& motion, ChannelInfo& channelInfo, double data[6], SkMotion::Frame* sbFrame, double frameTime)
+void ParserBVH::convertBVHtoSmartBody(SkMotion& motion, ChannelInfo* channelInfo, double data[6], float* posture, double frameTime)
 {
-	for (int c = 0; c < 6; c++)
+	SrVec rot(0.0f, 0.0f, 0.0f);
+
+	int skChannelOffset = 0;
+	bool hasRotation = false;
+
+	for (int c = 0; c < channelInfo->numBVHChannels; c++)
 	{
-		if (channelInfo.channels[c] == XPOSITION ||
-			channelInfo.channels[c] == YPOSITION ||
-			channelInfo.channels[c] == ZPOSITION)
+		if (channelInfo->channels[c] == BVHXPOSITION ||
+			channelInfo->channels[c] == BVHYPOSITION ||
+			channelInfo->channels[c] == BVHZPOSITION)
 		{
+			if (motion.posture_size() <= channelInfo->startingChannelIndex + skChannelOffset)
+				std::cout << "WARNING!" << std::endl;
+			posture[channelInfo->startingChannelIndex + skChannelOffset] = float(data[c]);
+			skChannelOffset++;
+		}
+		else if (channelInfo->channels[c] == BVHXROTATION)
+		{
+			rot.x = float(data[c]) * float(M_PI) / 180.0f;
+			hasRotation = true;
+		}
+		else if (channelInfo->channels[c] == BVHYROTATION)
+		{
+			rot.y = float(data[c]) * float(M_PI) / 180.0f;
+			hasRotation = true;
+		}
+		else if (channelInfo->channels[c] == BVHZROTATION)
+		{
+			rot.z = float(data[c]) * float(M_PI) / 180.0f;
+			hasRotation = true;
 		}
 	}
-	motion.insert_frame(frameNum, float(frameTime));
+	if (hasRotation)
+	{
+		SrMat xrot;
+		xrot.rotx(rot.x);
+		SrMat yrot;
+		yrot.roty(rot.y);
+		SrMat zrot;
+		zrot.rotz(rot.z);
 
+		SrMat matrix;
+		if (channelInfo->order == ROTXYZ)
+		{
+			matrix = zrot * yrot * xrot;
+		}
+		else if (channelInfo->order == ROTXZY)
+		{
+			matrix = yrot * zrot * xrot;
+		}
+		else if (channelInfo->order == ROTYXZ)
+		{
+			matrix = zrot * xrot * yrot;
+		}
+		else if (channelInfo->order == ROTYZX)
+		{
+			matrix = xrot * zrot * yrot;
+		}
+		else if (channelInfo->order == ROTZXY)
+		{
+			matrix = yrot * xrot * zrot;
+		}
+		else if (channelInfo->order == ROTZYX)
+		{
+			matrix = xrot * yrot * zrot;
+		}
+
+		SrQuat quat(matrix);
+
+		if (motion.posture_size() <= channelInfo->startingChannelIndex + skChannelOffset + 3)
+			LOG("WARNING! CHANNEL ASSIGNMENT AS POSITION %d EXCEEDS CHANNEL SIZE %d. EXPECT CRASH ON DEALLOCATION OF SKMOTION.",  (channelInfo->startingChannelIndex + skChannelOffset + 3), motion.posture_size());
+
+		posture[channelInfo->startingChannelIndex + skChannelOffset] = quat.w;
+		posture[channelInfo->startingChannelIndex + skChannelOffset + 1] = quat.x;
+		posture[channelInfo->startingChannelIndex + skChannelOffset + 2] = quat.y;
+		posture[channelInfo->startingChannelIndex + skChannelOffset + 3] = quat.z;
+		skChannelOffset += 3;
+	}
+}
+
+int ParserBVH::determineRotationOrder(int bvhChannels[6], int numBVHChannels)
+{
+	int index = 0;
+	if (numBVHChannels > 3)
+		index = 3;
+
+	int order = -1;
+
+	if (bvhChannels[index] == BVHXROTATION)
+	{
+		if (numBVHChannels > index + 1)
+		{
+			if (bvhChannels[index + 1] == BVHYROTATION)
+			{
+				order = ROTXYZ;
+			}
+			else
+			{
+				order = ROTXZY;
+			}
+		}
+		else
+		{
+			order = ROTXYZ;
+		}
+	}
+	else if (bvhChannels[index] == BVHYROTATION)
+	{
+		if (numBVHChannels > index + 1)
+		{
+			if (bvhChannels[index + 1] == BVHXROTATION)
+			{
+				order = ROTYXZ;
+			}
+			else
+			{
+				order = ROTYZX;
+			}
+		}
+		else
+		{
+			order = ROTYXZ;
+		}
+	}
+	else if (bvhChannels[index] == BVHZROTATION)
+	{
+		if (numBVHChannels > index + 1)
+		{
+			if (bvhChannels[index + 1] == BVHXROTATION)
+			{
+				order = ROTZXY;
+			}
+			else
+			{
+				order = ROTZYX;
+			}
+		}
+		else
+		{
+			order = ROTZXY;
+		}
+	}
+
+	if (order == -1)
+	{
+		order = ROTXYZ;	
+	}
+
+	return order;
 }

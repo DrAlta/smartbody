@@ -29,6 +29,7 @@
 
 # include <SK/sk_channel.h>
 # include <SK/sk_joint_name.h>
+#include <string>
 
 class SkPosture;
 
@@ -85,6 +86,8 @@ public :
 
 	/*! Same as add(ch.joint,ch.type) */
 	void add ( SkChannel ch ) { _add(ch.joint,SkJointName(),ch.type,false); }
+
+	void changeChannelName(std::string oldName, std::string newName);
 
 	/*! Inserts a channel in the array at given position. The joint is
 		set as null and can be 'connected' later */
