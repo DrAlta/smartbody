@@ -55,7 +55,7 @@ using namespace std;
 enum {BVHXPOSITION, BVHYPOSITION, BVHZPOSITION, BVHXROTATION, BVHYROTATION, BVHZROTATION};
 enum {ROTXYZ, ROTXZY, ROTYXZ, ROTYZX, ROTZXY, ROTZYX};
 
-bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, std::ifstream &file, int N1, int N2)
+bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, std::ifstream &file, float scale, int N1, int N2)
 {
 	// check to make sure we have properly opened the file
 	if (!file.good())
@@ -165,7 +165,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					y = atof(str);
 					str = strtok(NULL, " \t");
 					z = atof(str);
-					cur->offset(SrVec(float(x), float(y), float(z)));
+					cur->offset(SrVec(float(x) * scale, float(y) * scale, float(z) * scale));
 					//cout << "Found offset of " << x << " " << y << " " << z << " " << endl;
 					state = 4;
 				}
@@ -368,7 +368,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					y = atof(str);
 					str = strtok(NULL, " \t");
 					z = atof(str);
-					cur->endEffectorOffset(SrVec(float(x), float(y), float(z)));
+					cur->endEffectorOffset(SrVec(float(x) * scale, float(y)* scale, float(z) * scale));
 					//cur->setEndEffector(true);
 					//LOG("Found end effector at %s", cur->getName());
 					//cout << "Found end effector offset of " << x << " " << y << " " << z << " " << endl;
@@ -461,7 +461,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 							double val = atof(str);
 							int channelNum;
 							
-							if (index >= bvhIndex.size())
+							if ((size_t)index >= bvhIndex.size())
 							{
 								LOG("Data on frame %d at position %d exceeds channel size of %d.", curFrame, index, bvhIndex.size());
 								break;
@@ -486,7 +486,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 									}
 									// TODO: Add data to SkMotion
 									ChannelInfo* channelInfo = channelInfoMap[oldJoint->index()];
-									ParserBVH::convertBVHtoSmartBody(motion, channelInfo, frames, posture, curFrame * frameTime);
+									ParserBVH::convertBVHtoSmartBody(motion, channelInfo, frames, posture, curFrame * frameTime, scale);
 								}
 
 								for (int x = 0; x < 6; x++)
@@ -514,7 +514,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 						{
 							// convert the BVH frame into the appropriate SmartBody frame
 							ChannelInfo* channelInfo = channelInfoMap[oldJoint->index()];
-							ParserBVH::convertBVHtoSmartBody(motion, channelInfo, frames, posture, curFrame * frameTime);
+							ParserBVH::convertBVHtoSmartBody(motion, channelInfo, frames, posture, curFrame * frameTime, scale);
 						}
 						state = 11;
 					}
@@ -546,7 +546,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 	return true;
 }
 
-void ParserBVH::convertBVHtoSmartBody(SkMotion& motion, ChannelInfo* channelInfo, double data[6], float* posture, double frameTime)
+void ParserBVH::convertBVHtoSmartBody(SkMotion& motion, ChannelInfo* channelInfo, double data[6], float* posture, double frameTime, float scale)
 {
 	SrVec rot(0.0f, 0.0f, 0.0f);
 
@@ -561,7 +561,7 @@ void ParserBVH::convertBVHtoSmartBody(SkMotion& motion, ChannelInfo* channelInfo
 		{
 			if (motion.posture_size() <= channelInfo->startingChannelIndex + skChannelOffset)
 				std::cout << "WARNING!" << std::endl;
-			posture[channelInfo->startingChannelIndex + skChannelOffset] = float(data[c]);
+			posture[channelInfo->startingChannelIndex + skChannelOffset] = float(data[c]) * scale;
 			skChannelOffset++;
 		}
 		else if (channelInfo->channels[c] == BVHXROTATION)
