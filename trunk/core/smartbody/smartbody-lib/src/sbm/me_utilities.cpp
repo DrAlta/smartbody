@@ -92,7 +92,7 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, Resourc
 		fclose(fp);
 		std::ifstream filestream(filename.c_str());
 		SkMotion* motion = new SkMotion();
-		ParserBVH::parse(*skeleton_p, *motion, skel_file, filestream);
+		ParserBVH::parse(*skeleton_p, *motion, skel_file, filestream, float(scale));
 		delete motion;
 		skeleton_p->skfilename(filename.c_str());
 	}
@@ -195,7 +195,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			std::ifstream filestream( pathname.string().c_str() );
 			
 			SkSkeleton skeleton;
-			parseSuccessful = ParserBVH::parse(skeleton, *motion, pathname.string(), filestream);
+			parseSuccessful = ParserBVH::parse(skeleton, *motion, pathname.string(), filestream, float(scale));
 
 			int numChannels = motion->channels().size();
 			for (int c = 0; c < numChannels; c++)
