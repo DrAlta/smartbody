@@ -505,5 +505,31 @@ int SkChannelArray::HashTable::insert ( int jname, char ctype, srword pos )
     }
  }
 
+void SkChannelArray::changeChannelName(std::string oldName, std::string newName)
+{
+	bool channelFound = false;
+	for (int c = 0; c < _channels.size(); c++)
+	{
+		if (oldName == _channels[c].name.get_string())
+		{
+			_channels[c].name = SkJointName(newName.c_str());
+			channelFound = true;
+		}
+	}
+
+	if (channelFound)
+	{
+		if ( _htable )
+		{
+			delete _htable;
+			_htable=0;
+		}
+	}
+
+	rebuild_hash_table();
+}
+
+
+
 //============================ End of File ============================
 

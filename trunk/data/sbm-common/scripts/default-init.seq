@@ -60,3 +60,8 @@
 1	test loco char elder enable
 
 1	seq default-dynamics
+
+1 registerevent footstep_left "PlaySound c:\users\shapiro\smartbody\trunk\data\sounds\footstep1.wav foo"
+1 registerevent footstep_right "PlaySound c:\users\shapiro\smartbody\trunk\data\sounds\footstep2.wav foo"
+
+1 char foo init sneaky_edited.bvh foo

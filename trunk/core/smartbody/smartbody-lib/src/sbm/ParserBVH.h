@@ -49,14 +49,17 @@ that is distributed: */
 struct ChannelInfo
 {
 	int channels[6];
-	int numData;
+	int numBVHChannels;
+	int order;
+	int startingChannelIndex;
 };
 
 class ParserBVH
 {
 	public:
-		static void parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, std::ifstream &file, int N1 = -1, int N2 = 2000000);
-		static void convertBVHtoSmartBody(int frameNum, SkMotion& motion, ChannelInfo& channelInfo, double data[6], SkMotion::Frame* sbFrame, double frameTime);
+		static bool parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, std::ifstream &file, int N1 = -1, int N2 = 2000000);
+		static void convertBVHtoSmartBody(SkMotion& motion, ChannelInfo* channelInfo, double data[6], float* posture, double frameTime);
+		static int determineRotationOrder(int bvhChannels[6], int numBVHChannels);
 
 };
 

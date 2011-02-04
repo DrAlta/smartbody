@@ -165,26 +165,48 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 					load_me_motions_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
 			} else {
 				string ext = extension( cur );
-				if( _stricmp( ext.c_str(), MOTION_EXT )==0 ) {
+				if( _stricmp( ext.c_str(), MOTION_EXT ) == 0 || _stricmp( ext.c_str(), ".bvh" ) == 0) {
 					load_me_motions_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
-				} else if( DEBUG_LOAD_PATHS ) {
+				} 
+				else if( DEBUG_LOAD_PATHS ) {
 					LOG("DEBUG: load_me_motion_impl(): Skipping \"%s\".  Extension \"%s\" does not match MOTION_EXT.", cur.string(), ext);
 				}
 			}
 		}
 	} else {
 
+		std::string ext = extension( pathname );
 		SkMotion* motion = new SkMotion();
 		motion->ref();
+		bool parseSuccessful = false;
 
-		SrInput in( pathname.string().c_str(), "rt" );
-		SrString fullin_string;
-		in.getall( fullin_string );
-		SrInput fullin( (const char *)fullin_string );
-		fullin.filename( pathname.string().c_str() ); // copy filename for error message
-		
-		if( motion->load( fullin, scale ) ) {
+		if (ext == ".skm")
+		{
+			SrInput in( pathname.string().c_str(), "rt" );
+			SrString fullin_string;
+			in.getall( fullin_string );
+			SrInput fullin( (const char *)fullin_string );
+			fullin.filename( pathname.string().c_str() ); // copy filename for error message
+			
+			parseSuccessful = motion->load( fullin, scale );
+		}
+		else if (ext == ".bvh")
+		{
+			std::ifstream filestream( pathname.string().c_str() );
+			
+			SkSkeleton skeleton;
+			parseSuccessful = ParserBVH::parse(skeleton, *motion, pathname.string(), filestream);
 
+			int numChannels = motion->channels().size();
+			for (int c = 0; c < numChannels; c++)
+			{
+				SkChannel& chan = motion->channels().get(c);
+				int y = 0;
+			}
+		}
+
+		if (parseSuccessful)
+		{
 			// register the motion
 			//motion->registerAnimation();
 
@@ -221,6 +243,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			motion->unref();
 			return CMD_FAILURE;
 		}
+		
 	}
 	return CMD_SUCCESS;
 }
