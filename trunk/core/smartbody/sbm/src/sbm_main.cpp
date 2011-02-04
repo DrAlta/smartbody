@@ -325,7 +325,10 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "addevent",			   addevent_func );
 	mcu.insert( "removeevent",		   removeevent_func );
 	mcu.insert( "registerevent",       registerevent_func );
-	mcu.insert( "unregisterevent",       registerevent_func );
+	mcu.insert( "unregisterevent",     registerevent_func );
+	mcu.insert( "motionmap",			   motionmap_func );
+	mcu.insert( "skeletonmap",			   skeletonmap_func );
+
 	
 	mcu.insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands
 

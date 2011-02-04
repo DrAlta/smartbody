@@ -4669,7 +4669,94 @@ int registerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 int unregisterevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
+	char* type = args.read_token();
+	if (!type || strcmp(type, "help") == 0)
+	{
+		LOG("Use: unregisterevent <eventtype>");
+		return CMD_SUCCESS;
+	}
+
+	EventManager* eventManager = EventManager::getEventManager();
+	eventManager->removeHandler(type);
+
 	return CMD_SUCCESS;
 }
+
+
+int motionmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	char* motion = args.read_token();
+	if (!motion || strcmp(motion, "help") == 0)
+	{
+		LOG("Use: motionmap <motion> <from> <to>");
+		return CMD_SUCCESS;
+	}
+
+	char* from =  args.read_token();
+	if (strlen(from) == 0)
+	{
+		LOG("Use: motionmap <motion> <from> <to>");
+		return CMD_FAILURE;
+	}
+
+	char* to =  args.read_token();
+	if (strlen(to) == 0)
+	{
+		LOG("Use: motionmap <motion> <from> <to>");
+		return CMD_FAILURE;
+	}
+
+	std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.find(motion);
+	if (iter != mcu_p->motion_map.end())
+	{
+		SkMotion* motion = (*iter).second;
+		SkChannelArray& channels = motion->channels();
+		channels.changeChannelName(from, to);
+		LOG("Remapped motion %s: %s -> %s.", motion, from, to);
+	}
+	else
+	{
+		LOG("Could not find motion %s. Cannot remap joint name %s to %s", motion, from, to);
+		return CMD_FAILURE;
+	}
+	return CMD_SUCCESS;
+}
+
+int skeletonmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	char* skeleton = args.read_token();
+	if (!skeleton || strcmp(skeleton, "help") == 0)
+	{
+		LOG("Use: skeletonmap <skeleton> <from> <to>");
+		return CMD_SUCCESS;
+	}
+
+	char* from =  args.read_token();
+	if (strlen(from) == 0)
+	{
+		LOG("Use: skeletonmap <skeleton> <from> <to>");
+		return CMD_FAILURE;
+	}
+
+	char* to =  args.read_token();
+	if (strlen(to) == 0)
+	{
+		LOG("Use: skeletonmap <skeleton> <from> <to>");
+		return CMD_FAILURE;
+	}
+
+	LOG("SKELETONMAP NOT YET SUPPORTED");
+	/*
+	std::map<std::string, SkSkeleton*>::iterator iter = mcu_p->motion_map.find(motion);
+	if (iter != mcu_p->motion_map.end())
+	{
+		SkMotion* motion = (*iter).second;
+		SkChannelArray& channels = motion->channels();
+		channels.changeChannelName(from, to);
+	}
+	*/
+	return CMD_SUCCESS;
+}
+
 
 
