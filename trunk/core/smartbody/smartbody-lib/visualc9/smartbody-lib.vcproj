@@ -198,6 +198,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\BoneMap.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\BoneMap.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\Event.cpp"
 				>
 			</File>

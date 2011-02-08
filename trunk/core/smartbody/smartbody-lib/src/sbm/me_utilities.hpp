@@ -41,6 +41,7 @@
 SkSkeleton* load_skeleton( const char *filename, srPathList &path_list, ResourceManager* manager, double scale = 1.0 );
 
 int load_me_motions( const char* pathname, std::map<std::string, SkMotion*>& map, bool recursive, ResourceManager* manager, double scale = 1.0 );
+int load_me_skeletons( const char* pathname, std::map<std::string, SkSkeleton*>& map, bool recursive, ResourceManager* manager, double scale = 1.0 );
 
 // For Posture scaling, using skmScale for now
 int load_me_postures( const char* pathname, std::map<std::string, SkPosture*>& map, bool recursive, ResourceManager* manager, double scale = 1.0 );

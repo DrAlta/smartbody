@@ -269,6 +269,41 @@ std::string MotionResource::dump()
 	return stream.str();	
 }
 
+SkeletonResource::SkeletonResource()
+{
+}
+
+SkeletonResource::~SkeletonResource()
+{
+}
+
+void SkeletonResource::setSkeletonFile(std::string motion)
+{
+	skeletonFile = motion;
+}
+		
+std::string SkeletonResource::getSkeletonFile()
+{
+	return skeletonFile;
+}
+
+void SkeletonResource::setType(std::string t)
+{
+	type = t;
+}
+		
+std::string SkeletonResource::getType()
+{
+	return type;
+}
+				
+std::string SkeletonResource::dump()
+{
+	std::stringstream stream;
+	stream << "SkeletonFile ["<<type<<"]: " << skeletonFile;
+	stream << Resource::dump();
+	return stream.str();	
+}
 
 ControllerResource::ControllerResource()
 {

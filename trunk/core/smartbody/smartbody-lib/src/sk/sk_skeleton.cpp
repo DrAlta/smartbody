@@ -40,6 +40,34 @@ SkSkeleton::SkSkeleton ()
    _com.set(0, 0, 0);
  }
 
+SkSkeleton::SkSkeleton (SkSkeleton* origSkel)
+{
+	_name = origSkel->name();
+	_skfilename = origSkel->skfilename();
+	_root = new SkJoint(this, 0, origSkel->root()->rot_type(), origSkel->root()->index());
+	copy_joint(_root, origSkel->root());
+	_joints.push() = _root;
+	SkJoint* origParent = origSkel->root();
+	SkJoint* thisParent = _root;
+	create_joints(origParent, thisParent);
+
+	_gmat_uptodate = origSkel->global_matrices_uptodate();
+	_channels = new SkChannelArray;
+	_channels->ref();
+	SkChannelArray& origChannels = origSkel->channels();
+	for (int c = 0; c < origChannels.size(); c++)
+	{
+		SkChannel& origChannel = origChannels.get(c);
+		SkJoint* origJoint = origChannels.joint(c);
+		SkJoint* joint = this->search_joint(origJoint->name().get_string());
+		_channels->add(joint, origChannel.type, true);
+	}
+	_channels->count_floats();
+	_com = origSkel->com();
+
+	compress ();
+}
+
 SkSkeleton::~SkSkeleton ()
  {
    init ();
@@ -208,5 +236,42 @@ SrBox SkSkeleton::getBoundingBox()
 
 	return initialBoundingBox;
 }
+
+
+void SkSkeleton::copy_joint(SkJoint* dest, SkJoint* src)
+{
+	dest->name(src->name());
+	dest->visgeo(src->visgeo());
+	dest->colgeo(src->colgeo());
+
+	SkJointPos* srcPos = src->pos();
+	SkJointPos* destPos = dest->pos();
+	destPos->limits(SkVecLimits::X, srcPos->limits(SkVecLimits::X));
+	destPos->limits(SkVecLimits::Y, srcPos->limits(SkVecLimits::Y));
+	destPos->limits(SkVecLimits::Z, srcPos->limits(SkVecLimits::Z));
+
+	if (src->quat()->active())
+		dest->quat()->activate();
+
+	dest->offset(src->offset());
+	SkJointQuat* srcQuat = src->quat();
+	SkJointQuat* destQuat = dest->quat();
+	destQuat->value(srcQuat->value());
+	
+	dest->mass(src->mass());
+}
+
+void SkSkeleton::create_joints(SkJoint* origParent, SkJoint* parent)
+{
+	for (int i = 0; i < origParent->num_children(); i++)
+	{
+		SkJoint* newJoint = new SkJoint(this, parent, origParent->child(i)->rot_type(), origParent->child(i)->index());
+		_joints.push() = newJoint;
+
+		copy_joint(newJoint, origParent->child(i));
+		create_joints(origParent->child(i), newJoint);
+	}
+}
+
 
 //============================ End of File ============================

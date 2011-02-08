@@ -117,6 +117,7 @@ int removeevent_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int registerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int unregisterevent_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
+int setmap_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int motionmap_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int skeletonmap_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 

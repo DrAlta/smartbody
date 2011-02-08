@@ -81,6 +81,7 @@ class mcuCBHandle;
 #include <sbm/action_unit.hpp>
 #include <sbm/viseme_map.hpp>
 #include <sbm/general_param_setting.h>
+#include "sbm/BoneMap.h"
 
 #include BML_PROCESSOR_INCLUDE
 
@@ -202,6 +203,8 @@ class mcuCBHandle	{
 		std::map<std::string, FaceMotion*> face_map;
 		std::map<std::string, SkPosture*> pose_map;
 		std::map<std::string, SkMotion*> motion_map;
+		std::map<std::string, SkSkeleton*> skeleton_map;
+		std::map<std::string, BoneMap*> boneMaps;
 
 		GeneralParamMap				param_map;			// map that contains the information of shader parameters
 
@@ -350,6 +353,7 @@ class mcuCBHandle	{
 		int vhmsg_send( const char* message );
 
 		int load_motions( const char* pathname, bool recursive );
+		int load_skeletons( const char* pathname, bool recursive );
 		int load_poses( const char* pathname, bool recursive );
 
 

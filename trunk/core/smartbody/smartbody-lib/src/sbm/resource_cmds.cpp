@@ -80,6 +80,17 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 		}				
 		return CMD_SUCCESS;		
 	}
+	if(arg == "skeleton")
+	{
+		for (int r = 0; r < numResources; r++)
+		{
+			SkeletonResource * res = dynamic_cast<SkeletonResource  *>(mcu_p->resource_manager->getResource(r));
+			if(res)
+				LOG("%s", res->dump().c_str());
+
+		}				
+		return CMD_SUCCESS;		
+	}
 	if(arg == "controller")
 	{
 		int resourceLimit = numControllerResources;
