@@ -1714,13 +1714,31 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		if( print_track )	{
 			LOG( "char '%s' gaze tracks:", name );
 		}
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		double curTime = mcu.time;
 		MeCtScheduler2::VecOfTrack track_vec = gaze_sched_p->tracks();
 		int n = track_vec.size();
 		for( int i = 0; i < n; i++ )	{
 			MeCtScheduler2::TrackPtr t_p = track_vec[ i ];
+			MeCtBlend* blend = dynamic_cast<MeCtBlend*>(t_p->blending_ct()); 
 			MeController* ct_p = t_p->animation_ct();
 			MeCtGaze* gaze_p = dynamic_cast<MeCtGaze*> (ct_p);
 			if( gaze_p )	{	
+				if (blend) {
+					// don't fade gaze controllers that are scheduled 
+					// but have not yet been started
+				
+					srLinearCurve& blend_curve = blend->get_curve();
+					int n = blend_curve.get_num_keys();
+					if( n > 0 )	{
+						double h = blend_curve.get_head_param();
+						double v = blend_curve.get_head_value();
+						if (h > curTime) // controller hasn't started yet
+						{
+							continue;
+						}
+					}
+				}
 				if( print_track )	{
 					LOG( " %s", gaze_p->name() );
 				}
