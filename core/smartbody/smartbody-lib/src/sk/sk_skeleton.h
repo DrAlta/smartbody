@@ -66,6 +66,8 @@ class SkSkeleton : public SrSharedClass
     /*! Constructor */
     SkSkeleton ();
 
+	SkSkeleton(SkSkeleton* origSkel);
+
     /*! Destructor is public but pay attention to the use of ref()/unref() */
     virtual ~SkSkeleton ();
 
@@ -172,6 +174,10 @@ class SkSkeleton : public SrSharedClass
 	
 	float getCurrentHeight();
 	SrBox getBoundingBox();
+	
+	void copy_joint(SkJoint* dest, SkJoint* src);
+	void create_joints(SkJoint* origParent, SkJoint* parent);
+
    private :
     int _loadjdata ( SrInput& in, SkJoint* j, SrStringArray& paths );
     SkJoint* _loadj ( SrInput& in, SkJoint* p, SrStringArray& paths, bool merge );

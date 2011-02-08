@@ -1589,7 +1589,24 @@ int mcu_character_init(
 	}
 
 	SbmCharacter *char_p = new SbmCharacter(char_name);
-	SkSkeleton* skeleton_p = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->resource_manager, mcu_p->skScale );
+	SkSkeleton* skeleton_p = NULL;
+	// does the skeleton already exist in the skeleton map?
+	/*
+	std::map<std::string, SkSkeleton*>::iterator skelIter = mcu_p->skeleton_map.find(skel_file);
+	if (skelIter ==  mcu_p->skeleton_map.end())
+	{
+		SkSkeleton* cachedSkeleton = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->resource_manager, mcu_p->skScale );
+		if( !cachedSkeleton ) {
+			LOG( "init_character ERR: Failed to load skeleton \"%s\"\n", skel_file ); 
+			return CMD_FAILURE;
+		}
+		mcu_p->skeleton_map.insert(std::pair<std::string, SkSkeleton*>(skel_file, cachedSkeleton));
+		skelIter = mcu_p->skeleton_map.find(skel_file);
+	}
+
+	skeleton_p = new SkSkeleton((*skelIter).second);
+	*/
+	skeleton_p = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->resource_manager, mcu_p->skScale );
 	if( !skeleton_p ) {
 		LOG( "init_character ERR: Failed to load skeleton \"%s\"\n", skel_file ); 
 		return CMD_FAILURE;
@@ -3789,6 +3806,17 @@ int mcu_load_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				token = args.read_token();
 			}
 			return mcu_p->load_poses( token, recursive);
+		} else if( strcmp( load_cmd, "skeleton" )==0 ||
+		           strcmp( load_cmd, "skeletons" )==0 )
+		{
+			const char* token = args.read_token();
+
+			bool recursive = false;
+			if( strcmp( token, "-R" )==0 ) {
+				recursive = true;
+				token = args.read_token();
+			}
+			return mcu_p->load_skeletons( token, recursive );
 		}
 
 		return( CMD_NOT_FOUND );
@@ -4682,43 +4710,102 @@ int unregisterevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
-
-int motionmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+int setmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
-	char* motion = args.read_token();
-	if (!motion || strcmp(motion, "help") == 0)
+	// set bone mapping on a specifically named map
+	char* mapname = args.read_token();
+	if (!mapname || strcmp(mapname, "help") == 0)
 	{
-		LOG("Use: motionmap <motion> <from> <to>");
+		LOG("Use: setmap <mapname> <from> <to>");
 		return CMD_SUCCESS;
 	}
 
 	char* from =  args.read_token();
 	if (strlen(from) == 0)
 	{
-		LOG("Use: motionmap <motion> <from> <to>");
+		LOG("Use: setmap <mapname> <from> <to>");
 		return CMD_FAILURE;
 	}
 
 	char* to =  args.read_token();
 	if (strlen(to) == 0)
 	{
-		LOG("Use: motionmap <motion> <from> <to>");
+		LOG("Use: setmap <mapname> <from> <to>");
 		return CMD_FAILURE;
 	}
 
-	std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.find(motion);
-	if (iter != mcu_p->motion_map.end())
+	BoneMap* boneMap = NULL;
+	std::map<std::string, BoneMap*>::iterator iter = mcu_p->boneMaps.find(mapname);
+	if (iter != mcu_p->boneMaps.end())
 	{
-		SkMotion* motion = (*iter).second;
-		SkChannelArray& channels = motion->channels();
-		channels.changeChannelName(from, to);
-		LOG("Remapped motion %s: %s -> %s.", motion, from, to);
+		boneMap = (*iter).second;
 	}
 	else
 	{
-		LOG("Could not find motion %s. Cannot remap joint name %s to %s", motion, from, to);
+		boneMap = new BoneMap();
+		mcu_p->boneMaps.insert(std::pair<std::string, BoneMap*>(mapname, boneMap));
+	}
+
+	std::map<std::string, std::string>::iterator iter2 = boneMap->map.find(from);
+	if (iter2 != boneMap->map.end())
+	{
+		(*iter2).second = to;
+	}
+	else
+	{
+		boneMap->map.insert(std::pair<std::string, std::string>(from, to));
+	}
+
+	LOG("Mapping %s -> %s on bone map %s", from, to, mapname);
+	return CMD_SUCCESS;
+}
+
+
+int motionmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	char* motion = args.read_token();
+	if (!motion || strcmp(motion, "help") == 0)
+	{
+		LOG("Use: motionmap <motion> <mapname>");
+		return CMD_SUCCESS;
+	}
+
+	SkMotion* skmotion = NULL;
+	std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.find(motion);
+	if (iter == mcu_p->motion_map.end())
+	{
+		LOG("Cannot find motion name %s.", motion);
 		return CMD_FAILURE;
 	}
+	else
+	{
+		 skmotion = (*iter).second;
+	}
+
+	char* mapname =  args.read_token();
+	if (strlen(mapname) == 0)
+	{
+		LOG("Use: motionmap <motion> <mapname>");
+		return CMD_SUCCESS;
+	}
+
+	// find the bone map name
+	BoneMap* boneMap = NULL;
+	std::map<std::string, BoneMap*>::iterator boneMapIter = mcu_p->boneMaps.find(mapname);
+	if (boneMapIter == mcu_p->boneMaps.end())
+	{
+		LOG("Cannot find bone map name '%s'.", mapname);
+		return CMD_FAILURE;
+	}
+	else
+	{
+		boneMap = (*boneMapIter).second;
+	}
+
+	// apply the map
+	boneMap->apply(skmotion);
+
+	LOG("Applied bone map %s to motion %s.", mapname, motion);
 	return CMD_SUCCESS;
 }
 
@@ -4727,34 +4814,46 @@ int skeletonmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	char* skeleton = args.read_token();
 	if (!skeleton || strcmp(skeleton, "help") == 0)
 	{
-		LOG("Use: skeletonmap <skeleton> <from> <to>");
+		LOG("Use: skeletonmap <skeleton> <mapname>");
 		return CMD_SUCCESS;
 	}
 
-	char* from =  args.read_token();
-	if (strlen(from) == 0)
+	SkSkeleton* skskeleton = NULL;
+	std::map<std::string, SkSkeleton*>::iterator iter = mcu_p->skeleton_map.find(skeleton);
+	if (iter == mcu_p->skeleton_map.end())
 	{
-		LOG("Use: skeletonmap <skeleton> <from> <to>");
+		LOG("Cannot find skeleton named %s.", skeleton);
 		return CMD_FAILURE;
 	}
-
-	char* to =  args.read_token();
-	if (strlen(to) == 0)
+	else
 	{
-		LOG("Use: skeletonmap <skeleton> <from> <to>");
+		 skskeleton = (*iter).second;
+	}
+
+	char* mapname =  args.read_token();
+	if (strlen(mapname) == 0)
+	{
+		LOG("Use: skeletonmap <skeleton> <mapname>");
+		return CMD_SUCCESS;
+	}
+
+	// find the bone map name
+	BoneMap* boneMap = NULL;
+	std::map<std::string, BoneMap*>::iterator boneMapIter = mcu_p->boneMaps.find(mapname);
+	if (boneMapIter == mcu_p->boneMaps.end())
+	{
+		LOG("Cannot find bone map name '%s'.", mapname);
 		return CMD_FAILURE;
 	}
-
-	LOG("SKELETONMAP NOT YET SUPPORTED");
-	/*
-	std::map<std::string, SkSkeleton*>::iterator iter = mcu_p->motion_map.find(motion);
-	if (iter != mcu_p->motion_map.end())
+	else
 	{
-		SkMotion* motion = (*iter).second;
-		SkChannelArray& channels = motion->channels();
-		channels.changeChannelName(from, to);
+		boneMap = (*boneMapIter).second;
 	}
-	*/
+
+	// apply the map
+	boneMap->apply(skskeleton);
+
+	LOG("Applied bone map %s to skeleton %s.", mapname, skeleton);
 	return CMD_SUCCESS;
 }
 

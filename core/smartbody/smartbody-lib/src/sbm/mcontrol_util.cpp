@@ -318,6 +318,15 @@ void mcuCBHandle::clear( void )	{
 		//SkMotion* motion = (*motionIter).second;
 		//motion->unref(); // need to cleanup motions - fix
 	}
+
+	for (std::map<std::string, SkSkeleton*>::iterator skelIter = skeleton_map.begin();
+		 skelIter != skeleton_map.end();
+		 skelIter++)
+	{
+		SkSkeleton* skeleton = (*skelIter).second;
+		delete skeleton;
+	}
+	
 	
 	MeCtPose* pose_ctrl_p;
 	pose_ctrl_map.reset();
@@ -880,6 +889,10 @@ int mcuCBHandle::vhmsg_send( const char* message ) {
 
 int mcuCBHandle::load_motions( const char* pathname, bool recursive ) {
 	return load_me_motions( pathname, motion_map, recursive, resource_manager, skmScale );
+}
+
+int mcuCBHandle::load_skeletons( const char* pathname, bool recursive ) {
+	return load_me_skeletons( pathname, skeleton_map, recursive, resource_manager, skmScale );
 }
 
 int mcuCBHandle::load_poses( const char* pathname, bool recursive ) {

@@ -109,6 +109,25 @@ class MotionResource : public Resource		// General motion file resources with [S
 		std::string motionFile;
 };
 
+class SkeletonResource : public Resource
+{
+	public:
+		SkeletonResource();
+		~SkeletonResource();
+
+		void setSkeletonFile(std::string motion);
+		std::string getSkeletonFile();
+
+		void setType(std::string t);
+		std::string getType();
+		
+		std::string dump();
+
+	protected:
+		std::string type;
+		std::string skeletonFile;
+};
+
 class ControllerResource : public Resource		
 {
 	public:

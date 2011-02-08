@@ -91,9 +91,8 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, Resourc
 	{
 		fclose(fp);
 		std::ifstream filestream(filename.c_str());
-		SkMotion* motion = new SkMotion();
-		ParserBVH::parse(*skeleton_p, *motion, skel_file, filestream, float(scale));
-		delete motion;
+		SkMotion motion;
+		ParserBVH::parse(*skeleton_p, motion, skel_file, filestream, float(scale));
 		skeleton_p->skfilename(filename.c_str());
 	}
 	else
@@ -112,11 +111,11 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, Resourc
 	char CurrentPath[_MAX_PATH];
 	_getcwd(CurrentPath, _MAX_PATH);
 	char *full_filename = new char[_MAX_PATH];
-	MotionResource * motionRes = new MotionResource();
-	motionRes->setType("sk");
+	SkeletonResource * skelRes = new SkeletonResource();
+	skelRes->setType("sk");
 	full_filename = mcn_return_full_filename_func( CurrentPath, filename.c_str() );
-	motionRes->setMotionFile( full_filename );
-	manager->addResource(motionRes);
+	skelRes->setSkeletonFile( full_filename );
+	manager->addResource(skelRes);
 	
 	// SUCCESS
 	return skeleton_p;
@@ -165,7 +164,9 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 					load_me_motions_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
 			} else {
 				string ext = extension( cur );
-				if( _stricmp( ext.c_str(), MOTION_EXT ) == 0 || _stricmp( ext.c_str(), ".bvh" ) == 0) {
+				if( _stricmp( ext.c_str(), MOTION_EXT ) == 0 || 
+					_stricmp( ext.c_str(), ".bvh" ) == 0)
+				{
 					load_me_motions_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
 				} 
 				else if( DEBUG_LOAD_PATHS ) {
@@ -244,6 +245,95 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			return CMD_FAILURE;
 		}
 		
+	}
+	return CMD_SUCCESS;
+}
+
+int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkeleton*>& map, bool recurse_dirs, ResourceManager* manager, double scale, const char* error_prefix ) {
+		
+	if( !exists( pathname ) ) {
+		LOG("%s Motion path \"%s\" not found.", error_prefix,  pathname.native_file_string().c_str());
+		return CMD_FAILURE;
+	}
+
+	if( is_directory( pathname ) ) {
+
+		directory_iterator end;
+		for( directory_iterator i( pathname ); i!=end; ++i ) {
+			const path& cur = *i;
+
+			if( is_directory( cur ) ) {
+				if( recurse_dirs )
+					load_me_skeletons_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
+			} else {
+				string ext = extension( cur );
+				if( _stricmp( ext.c_str(), ".sk" ) == 0 ||
+					_stricmp( ext.c_str(), ".bvh" ) == 0 ||
+					_stricmp( ext.c_str(), ".BVH" ) == 0)
+				{
+					load_me_skeletons_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
+				} 
+				else if( DEBUG_LOAD_PATHS ) {
+					LOG("DEBUG: load_me_skeleton_impl(): Skipping \"%s\".  Extension \"%s\" does not match .sk.", cur.string(), ext);
+				}
+			}
+		}
+	} else {
+
+		std::string ext = extension( pathname );
+		std::string filebase = boost::filesystem::basename(pathname);
+
+		SkSkeleton* skeleton = NULL;
+		if (ext == ".sk")
+		{			
+			skeleton = new SkSkeleton();
+			
+			FILE* fp = fopen( pathname.string().c_str(), "rt" );
+			if (fp)
+			{
+				SrInput input(fp);
+				if( !skeleton->load( input, scale ) )
+				{ 
+					LOG("Problem loading skeleton from file '%s'.", pathname.string().c_str());
+					input.close();
+					delete skeleton;
+					return CMD_FAILURE;
+				}
+				else
+				{
+					map.insert(std::pair<std::string, SkSkeleton*>(filebase + ext, skeleton));
+				}
+			}
+		}
+		else if (ext == ".bvh" || ext == ".BVH")
+		{		
+			std::ifstream filestream(pathname.string().c_str());
+			skeleton = new SkSkeleton();
+			skeleton->skfilename(filebase.c_str());
+			SkMotion motion;
+			bool ok = ParserBVH::parse(*skeleton, motion, filebase, filestream, float(scale));
+			if (ok)
+			{
+				std::map<std::string, SkSkeleton*>::iterator motionIter = map.find(filebase);
+				if (motionIter != map.end()) {
+					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
+					delete skeleton;
+					return CMD_FAILURE;
+				}
+				map.insert(std::pair<std::string, SkSkeleton*>(filebase + ext, skeleton));
+			}
+			else
+			{
+				LOG("Problem loading skeleton from file '%s'.", pathname.string().c_str());
+				return CMD_FAILURE;
+			}
+		}
+		skeleton->skfilename(pathname.string().c_str());
+		ResourceManager* manager = ResourceManager::getResourceManager();
+		SkeletonResource* skelRes = new SkeletonResource();
+		skelRes->setType("skm");
+		skelRes->setSkeletonFile(pathname.string());
+		manager->addResource(skelRes);
 	}
 	return CMD_SUCCESS;
 }
@@ -338,6 +428,29 @@ int load_me_motions( const char* pathname, std::map<std::string, SkMotion*>& map
 		return load_me_motions_impl( finalPath, map, recurse_dirs, manager, scale, "ERROR: " );
 	} else {
 		LOG("ERROR: Invalid motion path \"%s\".", finalPath);
+		return CMD_FAILURE;
+	}
+}
+
+int load_me_skeletons( const char* pathname, std::map<std::string, SkSkeleton*>& map, bool recurse_dirs, ResourceManager* manager, double scale ) {
+	path motions_path(pathname);
+	
+	path finalPath;
+	// include the media path in the pathname if applicable
+	std::string rootDir = motions_path.root_directory();
+	if (rootDir.size() == 0)
+	{		
+		finalPath = operator/(mcuCBHandle::singleton().getMediaPath(), motions_path);
+	}
+	else
+	{
+		finalPath = pathname;
+	}
+
+	if (1) {
+		return load_me_skeletons_impl( finalPath, map, recurse_dirs, manager, scale, "ERROR: " );
+	} else {
+		LOG("ERROR: Invalid skeleton path \"%s\".", finalPath);
 		return CMD_FAILURE;
 	}
 }
