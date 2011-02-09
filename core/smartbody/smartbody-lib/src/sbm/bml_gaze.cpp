@@ -615,7 +615,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	// parse sbm:joint-speed
 	const XMLCh* attrSpeed = elem->getAttribute( ATTR_JOINT_SPEED );
 	if( attrSpeed && XMLString::stringLen( attrSpeed ) ) {
-		if( attrTimeHint )	{
+		if( attrTimeHint &&  XMLString::stringLen( attrTimeHint ))	{
 			std::stringstream strstr;
 			strstr << "WARNING: speed notsupported with time-hint attribute set\""<< XMLString::transcode(attrSpeed) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
 			LOG(strstr.str().c_str());
