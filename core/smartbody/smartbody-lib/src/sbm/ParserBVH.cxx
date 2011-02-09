@@ -530,25 +530,25 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				break;
 			
 			case 50:
-				//LOG("Finished parsing motion with %d frames...", numFrames);
-				file.close();
-				//skeleton.recalculateJointList();
-				//skeleton.calculateMatrices(0);	
-				// by default, bvh files do not contain any sync points.
-				// create some defaults
-				{
-					double duration = double(motion.duration());
-					motion.synch_points.set_time(0.0, duration / 3.0, duration / 2.0, duration * 2.0/3.0, duration);
-					motion.compress();
-				}
-				return true;
+				break;
+			
 			default:
 				LOG("State %d not expected.");
 				file.close();
 				return false;
 		}
 	}
-
+	//LOG("Finished parsing motion with %d frames...", numFrames);
+	file.close();
+	//skeleton.recalculateJointList();
+	//skeleton.calculateMatrices(0);	
+	// by default, bvh files do not contain any sync points.
+	// create some defaults
+	{
+		double duration = double(motion.duration());
+		motion.synch_points.set_time(0.0, duration / 3.0, duration / 2.0, duration * 2.0/3.0, duration);
+		motion.compress();
+	}
 	return true;
 }
 
