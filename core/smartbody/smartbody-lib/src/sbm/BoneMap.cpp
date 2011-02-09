@@ -20,7 +20,7 @@ void BoneMap::apply(SkMotion* motion)
 		iter++)
 	{
 		std::string from = (*iter).first;
-		std::string to = (*iter).first;
+		std::string to = (*iter).second;
 		channels.changeChannelName(from, to);
 	}
 
@@ -28,4 +28,31 @@ void BoneMap::apply(SkMotion* motion)
 
 void BoneMap::apply(SkSkeleton* skeleton)
 {
+	if (!skeleton)
+		return;
+	
+	SrArray<SkJoint*> joints = skeleton->joints();
+	for (int j = 0; j < joints.size(); j++)
+	{
+		for (std::map<std::string, std::string>::iterator iter = map.begin();
+			 iter != map.end();
+			 iter++)
+		{
+			std::string from = (*iter).first;
+			std::string to = (*iter).second;
+			if (joints[j]->name() == from.c_str())
+			{
+				joints[j]->name(SkJointName(to.c_str()));
+			}
+		}
+	}
+	SkChannelArray& channels = skeleton->channels();
+	for (std::map<std::string, std::string>::iterator iter = map.begin();
+		iter != map.end();
+		iter++)
+	{
+		std::string from = (*iter).first;
+		std::string to = (*iter).second;
+		channels.changeChannelName(from, to);
+	}
 }

@@ -3,6 +3,7 @@
 
 #include <map>
 #include "sk/sk_motion.h"
+#include "sk/sk_skeleton.h"
 
 class BoneMap
 {

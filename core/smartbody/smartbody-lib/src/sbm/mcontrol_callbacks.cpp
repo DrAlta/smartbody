@@ -1591,7 +1591,6 @@ int mcu_character_init(
 	SbmCharacter *char_p = new SbmCharacter(char_name);
 	SkSkeleton* skeleton_p = NULL;
 	// does the skeleton already exist in the skeleton map?
-	/*
 	std::map<std::string, SkSkeleton*>::iterator skelIter = mcu_p->skeleton_map.find(skel_file);
 	if (skelIter ==  mcu_p->skeleton_map.end())
 	{
@@ -1605,12 +1604,6 @@ int mcu_character_init(
 	}
 
 	skeleton_p = new SkSkeleton((*skelIter).second);
-	*/
-	skeleton_p = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->resource_manager, mcu_p->skScale );
-	if( !skeleton_p ) {
-		LOG( "init_character ERR: Failed to load skeleton \"%s\"\n", skel_file ); 
-		return CMD_FAILURE;
-	}
 
 	// Only initialize face_neutral if -facebone is enabled
 	SkMotion* face_neutral_p = NULL;

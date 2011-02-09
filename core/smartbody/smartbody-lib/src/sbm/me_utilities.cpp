@@ -292,6 +292,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 			if (fp)
 			{
 				SrInput input(fp);
+				input.filename(pathname.string().c_str());
 				if( !skeleton->load( input, scale ) )
 				{ 
 					LOG("Problem loading skeleton from file '%s'.", pathname.string().c_str());
