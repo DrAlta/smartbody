@@ -34,6 +34,7 @@ class MeCtLocomotionLimb;
 struct MeCtLocomotionJointInfo
 {
 	int joint_num;
+	bool joints_indexed;
 	SrArray<const char*> joint_name;
 	SrArray<int> buff_index;
 	SrArray<int> joint_index;
@@ -46,6 +47,11 @@ struct MeCtLocomotionJointInfo
 	//key frames used to interpolate
 	SrArray<SrQuat> quat_key_frame1;
 	SrArray<SrQuat> quat_key_frame2;
+
+	MeCtLocomotionJointInfo()
+	{
+		joints_indexed = false;
+	}
 
 	int iterate(SkJoint* joint, SrArray<char*>* limb_joint_name)
 	{
@@ -97,6 +103,7 @@ struct MeCtLocomotionJointInfo
 		quat_key_frame2.size(joint_num);
 		buff_index.capacity(joint_num);
 		buff_index.size(joint_num);
+		joints_indexed = false;
 	}
 
 	int get_index_by_name(const char* name)

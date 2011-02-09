@@ -51,7 +51,7 @@ MeCtLocomotion::MeCtLocomotion() {
 	initialized = false;
 	ik_enabled = true;
 	enabled = false;
-	joints_indexed = false;
+	nonlimb_joints_indexed = false;
 	motions_loaded = true;
 	base_name = NULL;
 	locomotion_anims.capacity(0);
@@ -157,22 +157,22 @@ void MeCtLocomotion::iterate_joints(MeCtLocomotionJointInfo* joint_info)
 }
 
 // Implements MeController::context_updated(..).
-void MeCtLocomotion::context_updated() {
+void MeCtLocomotion::context_updated() 
+{
 	if( _context == NULL )
 		channels_valid = false;
 }
 
-void MeCtLocomotion::controller_map_updated() 
+int MeCtLocomotion::check_limb_controller_map_updated()
 {
-	if(!joints_indexed)
+	int index = 0;
+	int k = 0;
+	for(int j = 0; j < limb_list.size(); ++j)
 	{
-		int index = 0;
-		int k = 0;
-		channels_valid = navigator.controller_map_updated(_context, &_toContextCh);
-		for(int j = 0; j < limb_list.size(); ++j)
-		{
-			MeCtLocomotionLimb* limb = limb_list.get(j);
+		MeCtLocomotionLimb* limb = limb_list.get(j);
 
+		if(!limb->limb_joint_info.joints_indexed)
+		{
 			for(int i = 0; i < limb->limb_joint_info.joint_num; ++i)
 			{
 				if(limb->limb_joint_info.quat_valid.get(i) == 0) 
@@ -180,7 +180,7 @@ void MeCtLocomotion::controller_map_updated()
 					limb->limb_joint_info.buff_index.set(i, -1);
 					continue;
 				}
-				index = LOOKUP_BUFFER_INDEX( index,  k+joint_channel_start_ind);
+				index = LOOKUP_BUFFER_INDEX( index,  k+joint_channel_start_ind );
 				if(index < 0)
 				{
 					LOG("\ni=%d failed to look up buffer index", k);
@@ -188,7 +188,22 @@ void MeCtLocomotion::controller_map_updated()
 				limb->limb_joint_info.buff_index.set(i, index);
 				++k;
 			}
+			limb->limb_joint_info.joints_indexed = true;
 		}
+	}
+	return k;
+}
+
+void MeCtLocomotion::controller_map_updated() 
+{
+	int index = 0;
+	int k = 0;
+
+	k = check_limb_controller_map_updated();
+
+	if(!nonlimb_joints_indexed)
+	{
+		channels_valid = navigator.controller_map_updated(_context, &_toContextCh);
 
 		for(int i = 0; i < nonlimb_joint_info.joint_num; ++i)
 		{
@@ -205,7 +220,7 @@ void MeCtLocomotion::controller_map_updated()
 			nonlimb_joint_info.buff_index.set(i, index);
 			++k;
 		}
-		joints_indexed = true;
+		nonlimb_joints_indexed = true;
 	}
 
 }
@@ -289,6 +304,8 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame )
 		temp_update_for_footprint(frame);
 		return false;
 	}
+
+	check_limb_controller_map_updated();
 
 	delta_time = time - last_time;
 
@@ -397,20 +414,10 @@ bool MeCtLocomotion::is_channels_valid()
 	return channels_valid;
 }
 
-/*void MeCtLocomotion::set_valid(bool valid)
-{
-	this->valid = valid;
-}*/
-
 SrArray<MeCtLocomotionLimb*>* MeCtLocomotion::get_limb_list()
 {
 	return &limb_list;
 }
-
-/*SrArray<MeCtLocomotionAnimGlobalInfo*>* MeCtLocomotion::get_anim_global_info()
-{
-	return &anim_global_info;
-}*/
 
 void MeCtLocomotion::set_balance_factor(float factor)
 {
@@ -448,32 +455,6 @@ SrVec MeCtLocomotion::get_base_pos()
 	return navigator.get_world_pos()-world_offset_to_base;
 }
 
-/*void MeCtLocomotion::init_nonlimb_joint_info()
-{
-	SrArray<char*> limb_base_name;
-	limb_base_name.capacity(limb_list.size());
-	limb_base_name.size(limb_list.size());
-	for(int i = 0; i < limb_list.size(); ++i)
-	{
-		limb_base_name.set(i, limb_list.get(i)->get_limb_base_name());
-	}
-	const char* base_name = walking_skeleton->root()->name().get_string();
-	nonlimb_joint_info.Init(walking_skeleton, base_name, &limb_base_name);
-	SkJoint* joint = NULL;
-	int index = -1;
-	for(int i = 0; i < limb_list.size(); ++i)
-	{
-		joint = walking_skeleton->search_joint(limb_list.get(i)->get_limb_base_name());
-		while(true)
-		{
-			joint = joint->parent();
-			if(joint == NULL) break;
-			index = nonlimb_joint_info.get_index_by_name(joint->name().get_string());
-			nonlimb_joint_info.mat_valid.set(index, 1);
-		}
-	}
-}*/
-
 void MeCtLocomotion::init_skeleton(SkSkeleton* standing, SkSkeleton* walking)
 {
 	walking_skeleton = walking;
@@ -486,19 +467,6 @@ const char* MeCtLocomotion::controller_type( void )	const {
 
 	return TYPE;
 }
-
-/*void MeCtLocomotion::set_base_name(const char* name)
-{
-	if(base_name != NULL) free(base_name);
-	base_name = (char*)malloc(sizeof(char)*(strlen(name)+1));
-	strcpy(base_name, name);
-}*/
-
-/*void MeCtLocomotion::set_translation_joint_name(const char* name)
-{
-	translation_joint_name.set(name);
-	navigator.set_translation_joint_name(translation_joint_name);
-}*/
 
 SrString& MeCtLocomotion::get_translation_joint_name()
 {
@@ -655,14 +623,22 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 	// set r_anim1_index_dominant amd r_anim2_index_dominant
 	get_anim_indices(dominant_limb, limb_list.get(dominant_limb)->direction_planner.get_curr_direction(), &r_anim1_index_dominant, &r_anim2_index_dominant);
 
+	if(r_anim1_index_dominant < 0 && r_anim2_index_dominant < 0) return;
 
-	MeCtLocomotionLimbAnim* anim1 = limb_list.get(dominant_limb)->get_walking_list()->get(r_anim1_index_dominant);
-	MeCtLocomotionLimbAnim* anim2 = limb_list.get(dominant_limb)->get_walking_list()->get(r_anim2_index_dominant);
+	MeCtLocomotionLimbAnim* anim1 = NULL;
+	if(r_anim1_index_dominant >= 0) anim1 = limb_list.get(dominant_limb)->get_walking_list()->get(r_anim1_index_dominant);
+	MeCtLocomotionLimbAnim* anim2 = NULL;
+	if(r_anim2_index_dominant >= 0) anim2 = limb_list.get(dominant_limb)->get_walking_list()->get(r_anim2_index_dominant);
 	MeCtLocomotionLimbAnim* blended_anim = &limb_list.get(dominant_limb)->blended_anim;
+
+	MeCtLocomotionTimingSpace* space1 = NULL;
+	if(anim1) space1 = anim1->get_timing_space();
+	MeCtLocomotionTimingSpace* space2 = NULL;
+	if(anim2) space2 = anim2->get_timing_space();
 
 	// get the ratio of the two animations
 	dom_ratio = limb_list.get(dominant_limb)->direction_planner.get_ratio(anim1, anim2);
-	get_blended_timing_space(blended_anim->get_timing_space(), anim1->get_timing_space(), anim2->get_timing_space(), dom_ratio);
+	get_blended_timing_space(blended_anim->get_timing_space(), space1, space2, dom_ratio);
 
 	if(navigator.limb_blending_factor == 0.0f)
 	{
@@ -681,12 +657,15 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 	frame_num = blended_anim->get_timing_space()->get_virtual_frame(limb_list.get(dominant_limb)->get_space_time()) + inc_frame * navigator.framerate_accelerator;
 	frame_num = blended_anim->get_timing_space()->get_normalized_frame(frame_num); // in case new frame number is beyond the range. 
 
+
 	//space time was computed with current frame number
 	if(navigator.limb_blending_factor != 0.0f) 
 		limb_list.get(dominant_limb)->set_space_time(blended_anim->get_timing_space()->get_space_value(frame_num));
 	
 	// update the current orientation of dominant limb
 	navigator.update_facing(limb_list.get(dominant_limb), true);
+
+
 
 	// blend the two animations
 	limb_list.get(dominant_limb)->blend_anim(limb_list.get(dominant_limb)->get_space_time(), r_anim1_index_dominant, r_anim2_index_dominant, dom_ratio, &(limb_list.get(dominant_limb)->limb_joint_info.joint_index));
@@ -1046,8 +1025,8 @@ void MeCtLocomotion::get_anim_indices(int limb_index, SrVec direction, int* anim
 
 	*anim1_index = index1;
 	*anim2_index = index2;
-	limb->get_walking_list()->get(index1)->get_timing_space()->set_mode(mode1);
-	limb->get_walking_list()->get(index2)->get_timing_space()->set_mode(mode2);
+	if(index1 >= 0) limb->get_walking_list()->get(index1)->get_timing_space()->set_mode(mode1);
+	if(index2 >= 0) limb->get_walking_list()->get(index2)->get_timing_space()->set_mode(mode2);
 }
 
 int MeCtLocomotion::determine_dominant_limb_index()

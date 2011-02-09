@@ -73,6 +73,9 @@ public:
 
 	float get_normalized_frame(float frame);
 
+	void copy_to(MeCtLocomotionTimingSpace* space);
+	void copy_from(MeCtLocomotionTimingSpace* space);
+
 	//temp function for test, to be deleted......
 	void print_info();
 

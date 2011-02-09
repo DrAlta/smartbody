@@ -36,7 +36,7 @@ MeCtLocomotionTimingSpace* get_blended_timing_space(MeCtLocomotionTimingSpace* s
 MeCtLocomotionTimingSpace::MeCtLocomotionTimingSpace() {
 
 	frame_num = 0;
-	mode = 1;
+	mode = 0;
 }
 
 /** Destructor */
@@ -322,9 +322,49 @@ void MeCtLocomotionTimingSpace::clean_ref_time()
 	this->set_mode(1);
 }
 
+void MeCtLocomotionTimingSpace::copy_to(MeCtLocomotionTimingSpace* space)
+{
+	if(space == NULL) 
+	{
+		printf("Error, timing space ptr is NULL.Copy can't be finished");
+		return;
+	}
+	// continue.......
+}
+
+void MeCtLocomotionTimingSpace::copy_from(MeCtLocomotionTimingSpace* space)
+{
+	_ref_time.capacity(0);
+	_ref_time_name.capacity(0);
+	set_frame_num(space->get_frame_num());
+	for(int i = 0; i < space->get_ref_time_num(); ++i)
+	{
+		add_ref_time_name(space->get_ref_time_name(i));
+		set_ref_time(i, space->get_ref_time(i));
+	}
+	set_lower_bound(space->get_lower_bound());
+	set_mode(space->get_mode());
+}
+
 MeCtLocomotionTimingSpace* get_blended_timing_space(MeCtLocomotionTimingSpace* space, MeCtLocomotionTimingSpace* space1, MeCtLocomotionTimingSpace* space2, float weight)
 {
 	space->clean_ref_time();
+
+	if(space1 && !space2)
+	{
+		space->copy_from(space1);
+		return space;
+	}
+	else if(!space1 && space2)
+	{
+		space->copy_from(space2);
+		return space;
+	}
+	else if(!space1 && !space2)
+	{
+
+	}
+
 	float weight1 = weight;
 	float weight2 = (1-weight);
 	float s1, s2, t = 0.0f;
