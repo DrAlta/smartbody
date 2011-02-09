@@ -79,10 +79,10 @@ MeCtLocomotionLimb::~MeCtLocomotionLimb() {
 	if (limb_base_name)
 		free(limb_base_name);
 	delete blended_anim.global_info;
-	if (walking_skeleton)
+	/*if (walking_skeleton)
 		this->walking_skeleton->unref();
 	if (standing_skeleton)
-		this->standing_skeleton->unref();
+		this->standing_skeleton->unref();*/
 }
 
 int MeCtLocomotionLimb::get_descendant_num(SkJoint* joint)

@@ -65,7 +65,7 @@ public:
 protected: // flags
 	bool channels_valid;  // All necessary channels are present
 	//bool valid;
-	bool joints_indexed;
+	bool nonlimb_joints_indexed;
 	bool dis_initialized; // limb joint position calculated
 	bool initialized;
 	bool enabled;
@@ -160,6 +160,9 @@ public:
 	 */
 	virtual void controller_map_updated();
 
+
+protected:
+	int check_limb_controller_map_updated();
 
 public:
 

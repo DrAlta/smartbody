@@ -67,27 +67,41 @@ SrVec MeCtLocomotionLimbDirectionPlanner::get_curr_direction()
 
 float MeCtLocomotionLimbDirectionPlanner::get_ratio(MeCtLocomotionLimbAnim* anim1, MeCtLocomotionLimbAnim* anim2)
 {
-	SrVec v1 = anim1->global_info->direction*(float)anim1->get_timing_space()->get_mode();
-	SrVec v2 = anim2->global_info->direction*(float)anim2->get_timing_space()->get_mode();
-	SrVec dir = curr_direction;
-	float len1 = anim1->global_info->displacement;
-	float len2 = anim2->global_info->displacement;
-	dir.normalize();
-	float cos1 = dot(anim1->global_info->direction, dir);
-	float cos2 = dot(anim2->global_info->direction, dir);
 
-	float sin1;
-	float sin2;
-	if(cos1 >= 1.0f)
+	if(anim1 && ! anim2) return 1.0f;
+	else if(!anim1 && anim2) return 0.0f;
+	else if(!anim1 && !anim2) return 0.0f;
+	SrVec dir = curr_direction;
+	dir.normalize();
+
+	SrVec v1(0,0,0);
+	SrVec v2(0,0,0);
+	float len1 = 1.0f, len2 = 1.0f, cos1 = 0.0f, cos2 = 0.0f, sin1 = 1.0f, sin2 = 1.0f;
+
+	if(anim1)
 	{
-		sin1 = 0.0f;
+		v1 = anim1->global_info->direction*(float)anim1->get_timing_space()->get_mode();
+		len1 = anim1->global_info->displacement;
+		cos1 = dot(anim1->global_info->direction, dir);
+		if(cos1 >= 1.0f)
+		{
+			sin1 = 0.0f;
+		}
+		else sin1 = sqrt(1.0f-cos1*cos1)*len1;
 	}
-	else sin1 = sqrt(1.0f-cos1*cos1)*len1;
-	if(cos2 >= 1.0f)
+
+	if(anim2)
 	{
-		sin2 = 0.0f;
+		v2 = anim2->global_info->direction*(float)anim2->get_timing_space()->get_mode();
+		len2 = anim2->global_info->displacement;
+		cos2 = dot(anim2->global_info->direction, dir);
+		if(cos2 >= 1.0f)
+		{
+			sin2 = 0.0f;
+		}
+		else sin2 = sqrt(1.0f-cos2*cos2)*len2;
 	}
-	else sin2 = sqrt(1.0f-cos2*cos2)*len2;
+
 	return sin2/(sin1+sin2);
 }
 

@@ -334,11 +334,13 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			if(arg == "forward")
 			{
 				direction = direction;
+				if(actor->get_locomotion_ct()->get_anim_global_info()->size() < 2) return CMD_FAILURE;
 				spd = actor->get_locomotion_ct()->get_anim_global_info()->get(1)->speed;
 			}
 			else if(arg == "backward")
 			{
 				direction = -direction;
+				if(actor->get_locomotion_ct()->get_anim_global_info()->size() < 2) return CMD_FAILURE;
 				spd = actor->get_locomotion_ct()->get_anim_global_info()->get(1)->speed;
 			}
 
@@ -347,6 +349,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 				//SrVec v(1.0f, 0.0f, 0.0f);
 				mat.roty(3.14159265f*0.5f);
 				direction = direction*mat;
+				if(actor->get_locomotion_ct()->get_anim_global_info()->size() < 3) return CMD_FAILURE;
 				spd = actor->get_locomotion_ct()->get_anim_global_info()->get(2)->speed;
 			}
 
@@ -356,6 +359,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 				mat.roty(3.14159265f*0.5f);
 				direction = direction*mat;
 				direction = - direction;
+				if(actor->get_locomotion_ct()->get_anim_global_info()->size() < 3) return CMD_FAILURE;
 				spd = actor->get_locomotion_ct()->get_anim_global_info()->get(2)->speed;
 			}
 

@@ -88,12 +88,18 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 		LOG("Error: no locomotion controller attached.");
 		return;
 	}
-	if (this->motion_standing)
-		this->motion_standing->unref();
+	//if (this->motion_standing)
+	//	this->motion_standing->unref();
 	this->motion_standing = standing;
 	const char* base_name = standing_skeleton->root()->name().get_string();
 
 	get_ct_pawn()->set_base_name(base_name);
+	int count = get_ct_pawn()->get_limb_list()->size();
+	for(int i = 0; i < count; ++i)
+	{
+		delete get_ct_pawn()->get_limb_list()->pop();
+	}
+	get_ct_pawn()->get_limb_list()->capacity(0);
 
 	int result = 0;
 
@@ -143,7 +149,16 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 
 	limb = NULL;
 
-	MeCtLocomotionAnimGlobalInfo* info = new MeCtLocomotionAnimGlobalInfo();
+	MeCtLocomotionAnimGlobalInfo* info = NULL;
+
+	count = get_ct_pawn()->get_anim_global_info()->size();
+
+	for(int i = 0; i < count; ++i)
+	{
+		delete get_ct_pawn()->get_anim_global_info()->pop();
+	}
+		
+	info = new MeCtLocomotionAnimGlobalInfo();
 	info->speed = 0.0f;
 	info->direction.set(0,0,0);
 	get_ct_pawn()->get_anim_global_info()->push() = info;
