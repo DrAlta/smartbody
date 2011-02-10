@@ -20,14 +20,16 @@
  *      Marcus Thiebaux, USC
  */
 
+#include "vhcl.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <vhcl_log.h>
 
 #include "sbm/time_regulator.h"
 
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
 
 #ifdef WIN32
 #ifndef NOMINMAX
