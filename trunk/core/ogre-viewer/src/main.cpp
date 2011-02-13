@@ -109,7 +109,7 @@ public:
 		if(mKeyboard->isKeyDown(OIS::KC_LEFT))
 			mCamera->yaw(mRotScale);
 
-		if( mKeyboard->isKeyDown(OIS::KC_ESCAPE) || mKeyboard->isKeyDown(OIS::KC_Q) )
+		if( mKeyboard->isKeyDown(OIS::KC_ESCAPE))
 			return false;
 
        	if( mKeyboard->isKeyDown(OIS::KC_F) && mTimeUntilNextToggle <= 0 )
@@ -571,7 +571,7 @@ class OgreViewerApplication : public ExampleApplication
 			skeleton[ 75 ] = "l_ring4";
 			skeleton[ 76 ] = "l_middle1";
 			skeleton[ 77 ] = "l_middle2";
-			skeleton[ 78 ] = ""; // "l_middle3";
+			skeleton[ 78 ] = "l_middle3";
 			skeleton[ 79 ] = "l_middle4";
 			skeleton[ 80 ] = "l_index1";
 			skeleton[ 81 ] = "l_index2";
