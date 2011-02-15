@@ -39,6 +39,7 @@ public:
 	SrVec				direction;		//global direction
 	float				speed;			//global average walking speed of the animation.
 	float				displacement;   //global displacement absolute value
+	float				height_offset;  //global user-defined height offset
 
 public:
 	MeCtLocomotionAnimGlobalInfo();

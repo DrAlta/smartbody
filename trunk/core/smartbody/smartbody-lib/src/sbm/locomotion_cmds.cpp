@@ -166,24 +166,50 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 				actor->get_locomotion_ct()->get_analyzer()->init(NULL, mcu_p->me_paths);
 				actor->get_locomotion_ct()->get_analyzer()->init_blended_anim();
 			}
-			float l_land_time = args.read_float();
-			float l_stance_time = args.read_float();
-			float l_lift_time = args.read_float();
 
-			float r_land_time = args.read_float();
-			float r_stance_time = args.read_float();
-			float r_lift_time = args.read_float();
+			int remainingTokens = args.calc_num_tokens();
+
+			float l_land_time = 0.0f;
+			float l_stance_time = 0.0f;
+			float l_lift_time = 0.0f;
+
+			float r_land_time = 0.0f;
+			float r_stance_time = 0.0f;
+			float r_lift_time = 0.0f;
+
+			if(remainingTokens >= 6)
+			{
+				l_land_time = args.read_float();
+				l_stance_time = args.read_float();
+				l_lift_time = args.read_float();
+
+				r_land_time = args.read_float();
+				r_stance_time = args.read_float();
+				r_lift_time = args.read_float();
+			}
 
 			float translation_scale = 1.0f;
+			float height_offset = 0.0f;
 
-			arg = args.read_token();
-			if(arg == "scale")
+			while(!arg.empty())
 			{
-				translation_scale = args.read_float();
+				arg = args.read_token();
+				if(arg == "scale")
+				{
+					translation_scale = args.read_float();
+				}
+				else if(arg == "height_offset")
+				{
+					height_offset = args.read_float();
+				}
 			}
 
 			actor->get_locomotion_ct()->add_locomotion_anim(anim_p);
-			actor->get_locomotion_ct()->get_analyzer()->add_locomotion(anim_p, l_land_time, l_stance_time, l_lift_time, r_land_time, r_stance_time, r_lift_time, translation_scale);
+
+			if(remainingTokens >= 6)
+				actor->get_locomotion_ct()->get_analyzer()->add_locomotion(anim_p, l_land_time, l_stance_time, l_lift_time, r_land_time, r_stance_time, r_lift_time, translation_scale);
+			else 
+				actor->get_locomotion_ct()->get_analyzer()->add_locomotion(anim_p, 0, 0, translation_scale, height_offset);
 		}
 		return CMD_SUCCESS;
 	}
