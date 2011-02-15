@@ -551,6 +551,7 @@ void MeCtLocomotion::blend_base_joint(MeFrameData& frame, float space_time, int 
 	pheight = base->pos()->value(1);
 	r_blended_base_height += pheight*ratio*(weight);
 
+	r_blended_base_height += anim_global_info.get(anim_index1)->height_offset * weight;
 
 	t_frame1 = (int)frame2;
 	t_frame2 = (int)frame2+1;
@@ -566,6 +567,8 @@ void MeCtLocomotion::blend_base_joint(MeFrameData& frame, float space_time, int 
 	anim2->apply_frame(t_frame2);
 	pheight = base->pos()->value(1);
 	r_blended_base_height += pheight*ratio*(1.0f-weight);
+
+	r_blended_base_height += anim_global_info.get(anim_index2)->height_offset * (1.0f - weight);
 
 	SrBuffer<float>& buffer = frame.buffer();
 
