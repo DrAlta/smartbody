@@ -42,10 +42,10 @@ MeCtLocomotionSpeedAccelerator::MeCtLocomotionSpeedAccelerator() {
 	auto_accelerated = true;
 	speed_limit = 200.0f;
 	frame_interval = 0.03333333f;
-	max_acceleration_pos = 200.0f;
+	max_acceleration_pos = 100.0f;
 	min_acceleration_pos = 0.0f;
 	max_acceleration_neg = -1.0f;
-	min_acceleration_neg = -200.0f;
+	min_acceleration_neg = -10.0f;
 }
 
 /** Destructor */
