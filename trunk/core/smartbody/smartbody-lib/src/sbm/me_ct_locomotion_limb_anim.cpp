@@ -42,9 +42,11 @@ MeCtLocomotionLimbAnim::MeCtLocomotionLimbAnim()
 /** Destructor */
 MeCtLocomotionLimbAnim::~MeCtLocomotionLimbAnim() 
 {
-	// Nothing allocated to the heap
-	for (int x = 0; x < displacement_list.size(); x++)
-		delete displacement_list[x];
+	int count = displacement_list.size();
+	for (int x = 0; x < count; x++)
+	{
+		delete displacement_list.pop();
+	}
 }
 
 int MeCtLocomotionLimbAnim::get_support_joint_num()
