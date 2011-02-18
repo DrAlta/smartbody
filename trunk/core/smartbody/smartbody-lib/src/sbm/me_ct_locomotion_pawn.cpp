@@ -64,13 +64,13 @@ MeCtLocomotionPawn::~MeCtLocomotionPawn()
 	int num = limb_list.size();
 	for (int i = 0; i < num; i++)
 	{
-		MeCtLocomotionLimb* limb = limb_list.get(i);
-		delete limb;
+		delete limb_list.pop();
 	}
 
-	for (int i = 0; i < anim_global_info.size(); i++)
+	num = anim_global_info.size();
+	for (int i = 0; i < num; i++)
 	{
-		delete anim_global_info[i];
+		delete anim_global_info.pop();
 	}
 }
 
