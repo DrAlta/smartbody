@@ -60,19 +60,21 @@ MeCtLocomotionLimb::MeCtLocomotionLimb(char* name)
 }
 
 /** Destructor */
-MeCtLocomotionLimb::~MeCtLocomotionLimb() {
-	// Nothing allocated to the heap
+MeCtLocomotionLimb::~MeCtLocomotionLimb() 
+{
 	limb_base_name = NULL;
-	for (int x = 0; x < walking_list.size(); x++)
+
+	int count = walking_list.size();
+	for (int x = 0; x < count; ++x)
 	{
-		MeCtLocomotionLimbAnim* anim = walking_list.get(x);
-		delete anim;
+		delete walking_list.pop();
 	}
 	//walking_list.capacity(0);
 
-	for (int x = 0; x < support_joint_list.size(); x++)
+	count = support_joint_list.size();
+	for (int x = 0; x < count; ++x)
 	{
-		delete support_joint_list[x];
+		delete support_joint_list.pop();
 	}
 	//support_joint_list.capacity(0);
 
