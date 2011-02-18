@@ -276,9 +276,9 @@ void MeCtLocomotionLimb::blend_standing(MeCtLocomotionLimbAnim* anim, float weig
 void MeCtLocomotionLimb::init_skeleton(SkSkeleton* standing_skeleton, SkSkeleton* walking_skeleton)
 {
 	this->walking_skeleton = walking_skeleton;
-	this->walking_skeleton->ref();
+	//this->walking_skeleton->ref();
 	this->standing_skeleton = standing_skeleton;
-	this->standing_skeleton->ref();
+	//this->standing_skeleton->ref();
 }
 
 SrArray<MeCtLocomotionLimbAnim*>* MeCtLocomotionLimb::get_walking_list()

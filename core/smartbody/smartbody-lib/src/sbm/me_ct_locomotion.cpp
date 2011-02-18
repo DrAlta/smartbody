@@ -73,17 +73,6 @@ MeCtLocomotion::MeCtLocomotion() {
 MeCtLocomotion::~MeCtLocomotion() {
 	// Nothing allocated to the heap
 
-	int num = limb_list.size();
-	for (int i = 0; i < num; i++)
-	{
-		MeCtLocomotionLimb* limb = limb_list.get(i);
-		delete limb;
-	}
-
-	for (int i = 0; i < anim_global_info.size(); i++)
-	{
-		delete anim_global_info[i];
-	}
 }
 
 // Look up the context indices, and check to make sure it isn't -1
