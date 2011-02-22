@@ -31,6 +31,8 @@ using System.Speech.Synthesis;
 using System.Xml;
 using System.IO;
 using System.Threading;
+using System.Runtime.InteropServices;
+
 
 
 
@@ -57,11 +59,24 @@ namespace MsSpeechRelay
         /// <summary>
         /// Message handling server
         /// </summary>
-        public VHMsg.Client vhmsg;
+        public static VHMsg.Client vhmsg;
         /// <summary>
         /// Identifies this program on the message system and to other components in the VH toolkit
         /// </summary>
         public string programName;
+        [DllImport("Kernel32")]
+        public static extern bool SetConsoleCtrlHandler(HandlerRoutine Handler, bool Add);
+        public delegate bool HandlerRoutine(CtrlTypes CtrlType);
+
+        public enum CtrlTypes
+        {
+            CTRL_C_EVENT = 0,
+            CTRL_BREAK_EVENT,
+            CTRL_CLOSE_EVENT,
+            CTRL_LOGOFF_EVENT = 5,
+            CTRL_SHUTDOWN_EVENT
+        }
+
         private bool isInitialized = false;
         private bool isRunning = true;
         /// <summary>
@@ -111,6 +126,16 @@ namespace MsSpeechRelay
         /// </summary>
         public Program()
         {
+        }
+
+        private static bool ConsoleCtrlCheck(CtrlTypes ctrlType)
+        {
+            if (ctrlType == CtrlTypes.CTRL_C_EVENT || ctrlType == CtrlTypes.CTRL_CLOSE_EVENT)
+            {
+                Program.vhmsg.SendMessage("vrProcEnd tts msspeechrelay");
+            }
+            // Put your own handler here
+            return true;
         }
 
         /// <summary>
@@ -537,6 +562,9 @@ namespace MsSpeechRelay
         /// <param name="args">Add any arguments to the function in this variable, remember the position of the arguments though</param>
         public void InitializeAndRun(List<string> args)
         {
+
+            SetConsoleCtrlHandler(new HandlerRoutine(ConsoleCtrlCheck), true);
+
             ParseArguments(args);
             if (!isRunning)
             {
