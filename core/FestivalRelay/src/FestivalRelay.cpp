@@ -421,12 +421,40 @@ void close_activeMQ()
 }
 
 
+BOOL WINAPI ConsoleHandler(DWORD CEvent)
+{
+    char mesg[128];
+
+    switch(CEvent)
+    {
+	case CTRL_C_EVENT:
+	case CTRL_CLOSE_EVENT:
+		vhmsg::ttu_notify2("vrProcEnd", "tts festival");
+        break;    
+	default:
+        break;
+
+    }
+    return TRUE;
+}
+
+
+
 int main(int argc, char **argv)
 {
     
     int heap_size = FESTIVAL_HEAP_SIZE;  
     int load_init_files = 1; // we want the festival init files loaded
     festival_initialize(load_init_files,heap_size);
+
+	if (SetConsoleCtrlHandler((PHANDLER_ROUTINE)ConsoleHandler,TRUE)==FALSE)
+	{
+		// unable to install handler... 
+		// display message to the user
+
+		printf("Unable to install handler for console events!\n");
+		return -1;
+	}
 
 
 	printf( "Festival Text To Speech Engine:\n\n" );
