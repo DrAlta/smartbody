@@ -130,6 +130,15 @@ proc int skMargin( int $fileid, int $depth )
 proc int skWriteSk( string $jname, int $fileid, int $depth, int $showAll, int $useLimits, int $useChannelAttributes )
 {
    // RECURSIVE function
+   
+    //Declare variables
+    int $TransXLimited[] = `transformLimits -query -etx $jname` ;
+    int $TransYLimited[] = `transformLimits -query -ety $jname` ;
+    int $TransZLimited[] = `transformLimits -query -etz $jname` ;
+    float $xTransLimitValues[] = `transformLimits -query -tx $jname` ;
+    float $yTransLimitValues[] = `transformLimits -query -ty $jname` ;
+    float $zTransLimitValues[] = `transformLimits -query -tz $jname` ;
+    int $printLimits = 0 ;
 
 
    //=== Get Children ===
@@ -220,154 +229,156 @@ proc int skWriteSk( string $jname, int $fileid, int $depth, int $showAll, int $u
       $channelAttributeQuat = `getAttr ( $jname + ".SbodyQuat" )`;
    }
 
+    //Print translate X channel: If limits are used, verify that they are correct and write them if not make the channel 'free'
+    if ( $TransXLimited[0] && $TransXLimited[1]) {
+        
+        //Make sure limits do not equal each other
+        $printLimits = 0;
+        if ( ( $xTransLimitValues[0] != $xTransLimitValues[1] ) && ( $useLimits ) ){
+            $printLimits = 1;
+        }
 
-   int $mntmn[] = ( `transformLimits -query -etx $jname` );
-   float $xTransLimitValues[] = ( `transformLimits -query -tx $jname` );
-   float $yTransLimitValues[] = ( `transformLimits -query -ty $jname` );
-   float $zTransLimitValues[] = ( `transformLimits -query -tz $jname` );
-
-   if ( $mntmn[ 0 ] && $mntmn[ 1 ] )
-   {
-      // limits exist
-
-      int $printLimits = 0;
-
-      if ( ( $xTransLimitValues[ 0 ] != $xTransLimitValues[ 1 ] ) && ( $useLimits ) )
-         $printLimits = 1;
-
-      if ( $useChannelAttributes )
-      {
-         if ( $channelAttributePosX )
-         {
-            if ( $printLimits )
-            {
-               skMargin( $fileid, $depth + 1 );
-               fprint $fileid ( "channel XPos 0" + " lim " + $xTransLimitValues[ 0 ] + " " + $xTransLimitValues[ 1 ] + "\r\n" );
+        //Print limit values if channel attributes are used, the channel exists and limits are 
+        //set up. If not leave the channel 'free'.
+        if ( $useChannelAttributes ) {
+            if ( $channelAttributePosX ) {
+                if ( $printLimits ) {
+                    skMargin( $fileid, $depth + 1 );
+                    fprint $fileid ( "channel XPos 0" + " lim " + $xTransLimitValues[ 0 ] + " " + $xTransLimitValues[ 1 ] + "\r\n" );
+                }
+                else {
+                    skMargin( $fileid, $depth + 1 );
+                    fprint $fileid ( "channel XPos 0 free\r\n" );
+                }
             }
-            else
-            {
-               skMargin( $fileid, $depth + 1 );
-               fprint $fileid ( "channel XPos 0 free\r\n" );
+        }
+        else {
+            if ( $showAll ) {
+                skMargin( $fileid, $depth + 1 );
+                fprint $fileid ( "channel XPos 0 free\r\n" );
             }
-         }
-      }
-      else
-      {
-         if ( $showAll )
-         {
-            skMargin( $fileid, $depth + 1 );
-            fprint $fileid ( "channel XPos 0 free\r\n" );
-         }
-      }
-
-
-      $printLimits = 0;
-
-      if ( ( $yTransLimitValues[ 0 ] != $yTransLimitValues[ 1 ] ) && ( $useLimits ) )
-         $printLimits = 1;
-
-      if ( $useChannelAttributes )
-      {
-         if ( $channelAttributePosY )
-         {
-            if ( $printLimits )
-            {
-               skMargin( $fileid, $depth + 1 );
-               fprint $fileid ( "channel YPos 0" + " lim " + $yTransLimitValues[ 0 ] + " " + $yTransLimitValues[ 1 ] + "\r\n" );
+        }
+    }
+    else {
+        if ( $useChannelAttributes ) {
+            if ( $channelAttributePosX ) {
+                   skMargin( $fileid, $depth + 1 );
+                   fprint $fileid ( "channel XPos 0 free\r\n" );
             }
-            else
-            {
-               skMargin( $fileid, $depth + 1 );
-               fprint $fileid ( "channel YPos 0 free\r\n" );
+        }
+        else {
+            if ( $showAll ) {
+                skMargin( $fileid, $depth + 1 );
+                fprint $fileid ( "channel XPos 0 free\r\n" );
             }
-         }
-      }
-      else
-      {
-         if ( $showAll )
-         {
-            skMargin( $fileid, $depth + 1 );
-            fprint $fileid ( "channel YPos 0 free\r\n" );
-         }
-      }
-
-
-      $printLimits = 0;
-
-      if ( ( $zTransLimitValues[ 0 ] != $zTransLimitValues[ 1 ] ) && ( $useLimits ) )
-         $printLimits = 1;
-
-      if ( $useChannelAttributes )
-      {
-         if ( $channelAttributePosY )
-         {
-            if ( $printLimits )
-            {
-               skMargin( $fileid, $depth + 1 );
-               fprint $fileid ( "channel ZPos 0" + " lim " + $zTransLimitValues[ 0 ] + " " + $zTransLimitValues[ 1 ] + "\r\n" );
-            }
-            else
-            {
-               skMargin( $fileid, $depth + 1 );
-               fprint $fileid ( "channel ZPos 0 free\r\n" );
-            }
-         }
-      }
-      else
-      {
-         if ( $showAll )
-         {
-            skMargin( $fileid, $depth + 1 );
-            fprint $fileid ( "channel ZPos 0 free\r\n" );
-         }
-      }
-   }
-   else
-   {
-      if ( $useChannelAttributes )
-      {
-         if ( $channelAttributePosX )
-         {
-            skMargin( $fileid, $depth + 1 );
-            fprint $fileid ( "channel XPos 0 free\r\n" );
-         }
-         if ( $channelAttributePosY )
-         {
-            skMargin( $fileid, $depth + 1 );
-            fprint $fileid ( "channel YPos 0 free\r\n" );
-         }
-         if ( $channelAttributePosZ )
-         {
-            skMargin( $fileid, $depth + 1 );
-            fprint $fileid ( "channel ZPos 0 free\r\n" );
-         }
-      }
-      else
-      {
-         if ( $showAll )
-         {
-            skMargin( $fileid, $depth + 1 );
-            fprint $fileid ( "channel XPos 0 free\r\n" );
-            skMargin( $fileid, $depth + 1 );
-            fprint $fileid ( "channel YPos 0 free\r\n" );
-            skMargin( $fileid, $depth + 1 );
-            fprint $fileid ( "channel ZPos 0 free\r\n" );
-         }
-         else if ( $jname == "base" )
-         {
+            else if ( $jname == "base" ) {
             // HACK - special case for the "base" joint.  Expose the position channels.  Need to find a way to do this through the exporter on a joint by joint basis
+                skMargin( $fileid, $depth + 1 );
+                fprint $fileid ( "channel XPos 0 free\r\n" );
+            }
+        }
+    }
+        
+    //Print translate Y channel: If limits are used, verify that they are correct and write them if not make the channel 'free'
+    if ( $TransYLimited[0] && $TransYLimited[1]) {
 
-            skMargin( $fileid, $depth + 1 );
-            fprint $fileid ( "channel XPos 0 free\r\n" );
-            skMargin( $fileid, $depth + 1 );
-            fprint $fileid ( "channel YPos 0 free\r\n" );
-            skMargin( $fileid, $depth + 1 );
-            fprint $fileid ( "channel ZPos 0 free\r\n" );
-         }
-      }
-   }
+        //Make sure limits do not equal each other
+        $printLimits = 0;
+        if ( ( $yTransLimitValues[0] != $yTransLimitValues[1] ) && ( $useLimits ) ){
+            $printLimits = 1;
+        }
 
+        //Print limit values if channel attributes are used, the channel exists and limits are 
+        //set up. If not leave the channel 'free'.
+        if ( $useChannelAttributes ) {
+            if ( $channelAttributePosY ) {
+                if ( $printLimits ) {
+                    skMargin( $fileid, $depth + 1 );
+                    fprint $fileid ( "channel YPos 0" + " lim " + $yTransLimitValues[ 0 ] + " " + $yTransLimitValues[ 1 ] + "\r\n" );
+                }
+                else {
+                    skMargin( $fileid, $depth + 1 );
+                    fprint $fileid ( "channel YPos 0 free\r\n" );
+                }
+            }
+        }
+        else {
+            if ( $showAll ) {
+                skMargin( $fileid, $depth + 1 );
+                fprint $fileid ( "channel YPos 0 free\r\n" );
+            }
+        }
+    }
+    else {
+        if ( $useChannelAttributes ) {
+            if ( $channelAttributePosY ) {
+                   skMargin( $fileid, $depth + 1 );
+                   fprint $fileid ( "channel YPos 0 free\r\n" );
+            }
+        }
+        else {
+            if ( $showAll ) {
+                skMargin( $fileid, $depth + 1 );
+                fprint $fileid ( "channel YPos 0 free\r\n" );
+            }
+            else if ( $jname == "base" ) {
+            // HACK - special case for the "base" joint.  Expose the position channels.  Need to find a way to do this through the exporter on a joint by joint basis
+                skMargin( $fileid, $depth + 1 );
+                fprint $fileid ( "channel YPos 0 free\r\n" );
+            }
+        }
+    } 
+        
+    //Print translate Z channel: If limits are used, verify that they are correct and write them if not make the channel 'free'
+    if ( $TransZLimited[0] && $TransZLimited[1]) {
 
+        //Make sure limits do not equal each other
+        $printLimits = 0;
+        if ( ( $zTransLimitValues[0] != $zTransLimitValues[1] ) && ( $useLimits ) ){
+            $printLimits = 1;
+        }
+
+        //Print limit values if channel attributes are used, the channel exists and limits are 
+        //set up. If not leave the channel 'free'.
+        if ( $useChannelAttributes ) {
+            if ( $channelAttributePosZ ) {
+                if ( $printLimits ) {
+                    skMargin( $fileid, $depth + 1 );
+                    fprint $fileid ( "channel ZPos 0" + " lim " + $zTransLimitValues[ 0 ] + " " + $zTransLimitValues[ 1 ] + "\r\n" );
+                }
+                else {
+                    skMargin( $fileid, $depth + 1 );
+                    fprint $fileid ( "channel ZPos 0 free\r\n" );
+                }
+            }
+        }
+        else {
+            if ( $showAll ) {
+                skMargin( $fileid, $depth + 1 );
+                fprint $fileid ( "channel ZPos 0 free\r\n" );
+            }
+        }
+    }
+    else {
+        if ( $useChannelAttributes ) {
+            if ( $channelAttributePosY ) {
+                   skMargin( $fileid, $depth + 1 );
+                   fprint $fileid ( "channel ZPos 0 free\r\n" );
+            }
+        }
+        else {
+            if ( $showAll ) {
+                skMargin( $fileid, $depth + 1 );
+                fprint $fileid ( "channel ZPos 0 free\r\n" );
+            }
+            else if ( $jname == "base" ) {
+            // HACK - special case for the "base" joint.  Expose the position channels.  Need to find a way to do this through the exporter on a joint by joint basis
+                skMargin( $fileid, $depth + 1 );
+                fprint $fileid ( "channel ZPos 0 free\r\n" );
+            }
+        }
+    }   
+        
    // Write rotation channel
    if ( $useChannelAttributes )
    {
