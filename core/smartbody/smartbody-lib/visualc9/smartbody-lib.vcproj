@@ -422,6 +422,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\sr_spline_curve.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\sr_synch_points.cpp"
 				>
 			</File>
