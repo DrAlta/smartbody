@@ -51,7 +51,6 @@ typedef matrix_t	matrix4x4_t;
 #ifndef M_PI
 #define M_PI	GWIZ::pi()
 #endif
-
 #ifndef RAD 
 #define RAD 	GWIZ::rad
 #endif
@@ -65,7 +64,7 @@ class GWIZ {
 	
 	public:
 	
-		enum math_enum_set    {
+		enum martrix_enum_set    {
 			COMP_UNKNOWN, 
 			COMP_M_TR, 
 			COMP_M_TRS, 
@@ -73,17 +72,6 @@ class GWIZ {
 			COMP_M_PTRSH
 		};
 
-		static gw_float_t pi( void ) { return( 3.14159265358979323846 ); }
-
-		static gw_float_t rad( gw_float_t deg ) { return( deg * 0.017453292519943295 ); }
-		static gw_float_t deg( gw_float_t rad ) { return( rad * 57.295779513082323 ); }
-
-		static gw_float_t safe_arc_threshold( void ) { return( 0.999999999 ); }
-		
-		static gw_float_t safe_asin( gw_float_t s );
-		static gw_float_t safe_acos( gw_float_t c );
-		static gw_float_t safe_atan( gw_float_t t );
-		
 		static gw_float_t epsilon4( void )	{ return( 0.00001 ); }
 		static gw_float_t epsilon5( void )	{ return( 0.000001 ); } /* one millionth */
 		static gw_float_t epsilon6( void )	{ return( 0.0000001 ); }
@@ -92,6 +80,233 @@ class GWIZ {
 		static gw_float_t epsilon9( void )	{ return( 0.0000000001 ); }
 		static gw_float_t epsilon10( void ) { return( 0.00000000001 ); }
 		static gw_float_t epsilon11( void ) { return( 0.000000000001 ); } /* one trillionth */
+
+		static gw_float_t pi( void ) { return( 3.14159265358979323846 ); }
+		static gw_float_t rad( gw_float_t deg ) { return( deg * 0.017453292519943295 ); }
+		static gw_float_t deg( gw_float_t rad ) { return( rad * 57.295779513082323 ); }
+
+		static gw_float_t safe_arc_threshold( void ) { return( 0.999999999 ); }
+		static gw_float_t safe_asin( gw_float_t s );
+		static gw_float_t safe_acos( gw_float_t c );
+		static gw_float_t safe_atan( gw_float_t t );
+		
+	// spline member-classes
+	
+		class Ctrl_key	{
+
+			public:
+				Ctrl_key( void ) { t = 0.0; v = 0.0; }
+
+				void set( gw_float_t t_set, gw_float_t v_set )	{
+					t = t_set;
+					v = v_set;
+				}
+
+				bool bound_box( gw_float_t t_comp, gw_float_t v_comp, gw_float_t radius ) {
+					return(
+						( fabs( t - t_comp ) < radius )&&( fabs( v - v_comp ) < radius )
+					);
+				}
+				
+				gw_float_t t;
+				gw_float_t v;
+		};
+		
+		class Cardinal_key	{
+
+			public:
+				Cardinal_key( void ) { 
+					t = 0.0; 
+					v = 0.0; 
+					m_in = m_out = 0.0;
+					dt_in = dt_out = 1.0;
+				}
+
+				gw_float_t t;
+				gw_float_t v;
+				gw_float_t m_in, m_out;     // Ah hah! suffix '_in' used for inputs... _lt, _rt
+				gw_float_t dt_in, dt_out;
+
+#if 1
+				inline void simple( 
+					const Ctrl_key k0, 
+					const Ctrl_key k1, 
+					const Ctrl_key k2 
+				)	{
+					t = k1.t;
+					v = k1.v;
+					m_in = ( k2.v - k0.v ) / ( k2.t - k0.t );
+					m_out = m_in;
+					dt_in = 1.0;
+					dt_out = 1.0;
+				}
+#endif
+
+				inline void halting( 
+					const Ctrl_key k0, 
+					const Ctrl_key k1, 
+					const Ctrl_key k2 
+				)	{
+					//	SAME AS: cardinal_key( 1.0, K0, K1, K2 )
+					t = k1.t;
+					v = k1.v;
+					m_in = 0.0;
+					m_out = 0.0;
+					dt_in = k1.t - k0.t;
+					dt_out = k2.t - k1.t;
+				}
+
+				inline void catmullrom( 
+					const Ctrl_key k0, 
+					const Ctrl_key k1, 
+					const Ctrl_key k2 
+				)	{
+					//	SAME AS: cardinal_key( 0.0, K0, K1, K2 )
+					t = k1.t;
+					v = k1.v;
+					m_in = ( k2.v - k0.v ) / ( k2.t - k0.t );
+					m_out = m_in;
+					dt_in = k1.t - k0.t;
+					dt_out = k2.t - k1.t;
+				}
+
+				inline void cardinal( 
+					gw_float_t c,
+					const Ctrl_key k0, 
+					const Ctrl_key k1, 
+					const Ctrl_key k2 
+				)	{
+		//	if( k1.t >= k2.t )
+		//	if( t < k1.t )
+		//	if( t > k2.t )
+		//	etc...
+					t = k1.t;
+					v = k1.v;
+					m_in = ( 1.0 - c ) * ( k2.v - k0.v ) / ( k2.t - k0.t );
+					m_out = m_in;
+					dt_in = k1.t - k0.t;
+					dt_out = k2.t - k1.t;
+				}
+
+				inline void cardinal_alt( 
+					gw_float_t c,
+					const Ctrl_key k0, 
+					const Ctrl_key k1, 
+					const Ctrl_key k2 
+				)	{
+					t = k1.t;
+					v = k1.v;
+					m_in = 0.5 * (
+						( k2.v - k1.v ) / ( k2.t - k1.t ) +
+						( k1.v - k0.v ) / ( k1.t - k0.t )
+					);
+					m_out = m_in;
+					dt_in = k1.t - k0.t;
+					dt_out = k2.t - k1.t;
+				}
+
+				inline void kochanek( 
+					gw_float_t tension, 
+					gw_float_t bias, 
+					gw_float_t continuity, 
+					const Ctrl_key k0, 
+					const Ctrl_key k1, 
+					const Ctrl_key k2
+				)	{
+					t = k1.t;
+					v = k1.v;
+					m_in = 
+						( 1.0 - tension ) * ( 1.0 + bias ) * ( 1.0 + continuity ) * 0.5 * ( k1.v - k0.v ) +
+						( 1.0 - tension ) * ( 1.0 - bias ) * ( 1.0 - continuity ) * 0.5 * ( k2.v - k1.v );
+					m_out = 
+						( 1.0 - tension ) * ( 1.0 + bias ) * ( 1.0 - continuity ) * 0.5 * ( k1.v - k0.v ) +
+						( 1.0 - tension ) * ( 1.0 - bias ) * ( 1.0 + continuity ) * 0.5 * ( k2.v - k1.v );
+					dt_in = k1.t - k0.t;
+					dt_out = k2.t - k1.t;
+				}
+		};
+
+	// spline utilities
+
+		// static inline gw_float_t lerp()
+		// static inline gw_float_t extend()
+		// static inline gw_float_t extend(...)
+
+		static inline gw_float_t bezier( 
+			gw_float_t s, 
+			gw_float_t f0, 
+			gw_float_t f1, 
+			gw_float_t f2, 
+			gw_float_t f3 
+		)	{
+		
+			// 's' is a unit interpolant
+			gw_float_t A = f0 + s * ( f1 - f0 );
+			gw_float_t B = f1 + s * ( f2 - f1 );
+			gw_float_t C = A + s * ( B - A );
+			return( C + s*( ( B + s*( ( f2 + s*( f3 - f2 ) ) - B ) ) - C ) );
+		}
+
+		// static inline gw_float_t ssvwvcc_warp()
+		// static inline gw_float_t ssvwvcc_patch()
+		// static inline gw_float_t ssvwvcc_wpatch()
+
+		static inline gw_float_t hermite_simple( 
+			gw_float_t s, 
+			gw_float_t v1, 
+			gw_float_t v2, 
+			gw_float_t m1, 
+			gw_float_t m2 
+		)	{
+#if 1
+			gw_float_t v = bezier( 
+				s, 
+				v1, 
+				v1 + m1 * 0.333333333, 
+				v2 - m2 * 0.333333333, 
+				v2 
+			);
+#elif 0
+			gw_float_t s_2 = s * s;
+			gw_float_t s_3 = s_2 * s;
+			gw_float_t v = 
+				v1 * ( 2.0 * s_3 - 3.0 * s_2 + 1.0 ) + 
+				m1 * ( s_3 - 2.0 * s_2 + s ) + 
+				v2 * ( -2.0 * s_3 + 3.0 * s_2 ) +
+				m2 * ( s_3 - s_2 );
+#else
+			gw_float_t v = 
+				s * ( 
+					s * ( 
+						s * ( 
+							2.0 * v1 - 2.0 * v2 + m1 + m2 
+						) + 
+						( -3.0 * v1 + 3.0 * v2 - 2.0 * m1 - m2 ) 
+					) + m1 
+				) + v1;
+#endif
+			return( v );
+		}
+
+		static inline gw_float_t hermite( 
+			const gw_float_t t, 
+			const Cardinal_key K1, 
+			const Cardinal_key K2 
+		)	{
+
+		//	if( K1.t >= K2.t )
+		//	if( t < K1.t )
+		//	if( t > K2.t )
+			// normalize interpolant 's'
+			gw_float_t s = ( t - K1.t ) / ( K2.t - K1.t ); 
+			gw_float_t v1 = K1.v;
+			gw_float_t v2 = K2.v;
+			gw_float_t m1 = K1.m_out * K1.dt_out;
+			gw_float_t m2 = K2.m_in * K2.dt_in;
+			return(
+				hermite_simple( s, v1, v2, m1, m2 )
+			);
+		}
 };
 
 ////////////////////////////////
