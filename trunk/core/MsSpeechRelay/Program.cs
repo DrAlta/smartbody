@@ -540,7 +540,20 @@ namespace MsSpeechRelay
                             voiceMap = new Dictionary<string, string>();
                         }
                         voiceMap.Add(src, target);
-                        Console.WriteLine("Notify: VHuman voice: " + src + " mapped to SAPI voice: " + target);
+                        Console.WriteLine("Notify: VHuman voice-name: " + src + " mapped to SAPI voice: " + target);
+                        foreach (InstalledVoice v in ttsServer.GetInstalledVoices())
+                        {
+                            bool flag = false;
+                            if (v.VoiceInfo.Name.Equals(target))
+                            {
+                                flag = true;
+                            }
+                            if (!flag)
+                            {
+                                Console.WriteLine("\nVoice by the name " +target+" is not available. Will use default available voice.");
+                            }
+
+                        }
                         i += 2;
                     }
                     else
