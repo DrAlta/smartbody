@@ -440,6 +440,7 @@ double srLinearCurve::evaluate( double t, bool *cropped_p )	{
 	if( cropped_p ) {
 		*cropped_p = false;
 	}
+	// find_floor_key checks dirty bit update...
 	Key *floor_p = find_floor_key( t ); // if defined, ( floor-param <= t )
 	if( floor_p )	{
 
