@@ -39,6 +39,7 @@
 #include "sbm_constants.h"
 #include "gwiz_math.h"
 #include "ParserBVH.h"
+#include "ParserOpenCOLLADA.h"
 
 using namespace std;
 using namespace boost::filesystem;
@@ -94,6 +95,15 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, Resourc
 		SkMotion motion;
 		ParserBVH::parse(*skeleton_p, motion, skel_file, filestream, float(scale));
 		skeleton_p->skfilename(filename.c_str());
+	}
+	else if (filename.find(".dae") == (filename.size() - 4) || 
+			 filename.find(".DAE") == (filename.size() - 4))
+	{
+		fclose(fp);
+		SkMotion motion;
+		ParserOpenCOLLADA::parse(*skeleton_p, motion, filename, float(scale));
+		skeleton_p->skfilename(filename.c_str());
+		skeleton_p->name(skel_file);
 	}
 	else
 	{
@@ -165,7 +175,8 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			} else {
 				string ext = extension( cur );
 				if( _stricmp( ext.c_str(), MOTION_EXT ) == 0 || 
-					_stricmp( ext.c_str(), ".bvh" ) == 0)
+					_stricmp( ext.c_str(), ".bvh" ) == 0 ||
+					_stricmp( ext.c_str(), ".dae" ) == 0)
 				{
 					load_me_motions_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
 				} 
@@ -204,6 +215,11 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 				SkChannel& chan = motion->channels().get(c);
 				int y = 0;
 			}
+		}
+		else if (ext == ".dae")
+		{			
+			SkSkeleton skeleton;
+			parseSuccessful = ParserOpenCOLLADA::parse(skeleton, *motion, pathname.string(), float(scale));			
 		}
 
 		if (parseSuccessful)
@@ -269,7 +285,9 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 				string ext = extension( cur );
 				if( _stricmp( ext.c_str(), ".sk" ) == 0 ||
 					_stricmp( ext.c_str(), ".bvh" ) == 0 ||
-					_stricmp( ext.c_str(), ".BVH" ) == 0)
+					_stricmp( ext.c_str(), ".BVH" ) == 0 ||
+					_stricmp( ext.c_str(), ".dae" ) == 0 ||
+					_stricmp( ext.c_str(), ".DAE" ) == 0)
 				{
 					load_me_skeletons_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
 				} 
@@ -329,6 +347,30 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 				return CMD_FAILURE;
 			}
 		}
+		else if (ext == ".dae" || ext == ".DAE")
+		{
+			skeleton = new SkSkeleton();
+			skeleton->skfilename(filebase.c_str());
+			skeleton->name(filebase.c_str());
+			SkMotion motion;
+			bool ok = ParserOpenCOLLADA::parse(*skeleton, motion, pathname.string(), float(scale));
+			if (ok)
+			{
+				std::map<std::string, SkSkeleton*>::iterator motionIter = map.find(filebase);
+				if (motionIter != map.end()) {
+					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
+					delete skeleton;
+					return CMD_FAILURE;
+				}
+				map.insert(std::pair<std::string, SkSkeleton*>(filebase + ext, skeleton));
+			}
+			else
+			{
+				LOG("Problem loading skeleton from file '%s'.", pathname.string().c_str());
+				return CMD_FAILURE;
+			}
+		}
+
 		skeleton->skfilename(pathname.string().c_str());
 		ResourceManager* manager = ResourceManager::getResourceManager();
 		SkeletonResource* skelRes = new SkeletonResource();

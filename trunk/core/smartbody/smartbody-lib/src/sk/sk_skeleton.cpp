@@ -59,8 +59,11 @@ SkSkeleton::SkSkeleton (SkSkeleton* origSkel)
 	{
 		SkChannel& origChannel = origChannels.get(c);
 		SkJoint* origJoint = origChannels.joint(c);
-		SkJoint* joint = this->search_joint(origJoint->name().get_string());
-		_channels->add(joint, origChannel.type, true);
+		if (origJoint)
+		{
+			SkJoint* joint = this->search_joint(origJoint->name().get_string());
+			_channels->add(joint, origChannel.type, true);
+		}
 	}
 	_channels->count_floats();
 	_com = origSkel->com();
