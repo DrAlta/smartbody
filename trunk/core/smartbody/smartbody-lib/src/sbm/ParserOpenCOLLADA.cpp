@@ -197,7 +197,8 @@ void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSke
 					xercesc_3_0::DOMNode* sourceIdNode = sourceAttr->getNamedItem(XMLString::transcode("id"));
 					std::string sourceIdAttr = getString(sourceIdNode->getNodeValue());
 					std::string dataName = sourceIdAttr;
-					std::string op = tokenize(sourceIdAttr, "-");
+					size_t pos = sourceIdAttr.find_last_of("-");
+					std::string op = sourceIdAttr.substr(pos + 1);
 					const xercesc_3_0::DOMNodeList* list2 = node2->getChildNodes();
 					for (unsigned int k = 0; k < list2->getLength(); k++)
 					{
@@ -210,11 +211,11 @@ void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSke
 							int counter = atoi(getString(arrayCountNode->getNodeValue()).c_str());
 							std::string arrayString = getString(node3->getTextContent());
 							
-							if (sourceIdAttr == "input")
+							if (op == "input")
 							{
 								timingString.push_back(arrayString);
 							}
-							if (sourceIdAttr == "output")
+							if (op == "output")
 							{
 								dataEntryName.push_back(dataName);
 								frameDataString.push_back(arrayString);
@@ -229,7 +230,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSke
 	if (timingString.size() != dataEntryName.size() || dataEntryName.size() != frameDataString.size())
 		return;
 
-	// first step, handle the ata
+	// first step, handle the data
 	std::vector<std::vector<float>> timing;
 	std::vector<std::vector<float>> frameData;
 	std::vector<std::vector<int>>	frameId;
@@ -258,17 +259,32 @@ void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSke
 		frameData.push_back(data);
 	}
 
+	// get rotation order
+	std::vector<std::string> orderVec;
+	for (size_t i = 0; i < dataEntryName.size(); i++)
+	{
+		if (orderVec.size() == 3)
+			break;
+		std::string fullName = dataEntryName[i];
+		std::string jointName = tokenize(fullName, ".-");
+		size_t found = fullName.find_last_of(".");
+		std::string name = fullName.substr(found + 1);
+		std::string type = tokenize(name, "_-");
+		if (type == "rotateX" || type == "rotateY" || type == "rotateZ")
+			orderVec.push_back(type);
+	}
+
 	// add channels
 	int globalId = 0;
 	SkChannelArray motionChannels;
 	for (size_t i = 0; i < dataEntryName.size(); i++)
 	{
 		std::string fullName = dataEntryName[i];
-		std::string jointName = tokenize(fullName, ".");
+		std::string jointName = tokenize(fullName, ".-");
 		size_t found = fullName.find_last_of(".");
 		std::string name = fullName.substr(found + 1);
-		std::string type = tokenize(name, "_");
-		if (type == "translate" && jointName == "base")
+		std::string type = tokenize(name, "_-");
+		if (type == "translate")
 		{
 			motionChannels.add(SkJointName(jointName.c_str()), SkChannel::XPos);
 			motionChannels.add(SkJointName(jointName.c_str()), SkChannel::YPos);
@@ -295,7 +311,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSke
 			globalId += 1;
 		}
 */
-		if (type == "rotateX")
+		if (type == orderVec[2])
 		{
 			motionChannels.add(SkJointName(jointName.c_str()), SkChannel::Quat);
 			motionChannels.size();
@@ -332,12 +348,12 @@ void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSke
 	for (size_t i = 0; i < dataEntryName.size(); i++)
 	{
 		std::string fullName = dataEntryName[i];
-		std::string jointName = tokenize(fullName, ".");
+		std::string jointName = tokenize(fullName, ".-");
 		size_t found = fullName.find_last_of(".");
 		std::string name = fullName.substr(found + 1);
-		std::string type = tokenize(name, "_");
+		std::string type = tokenize(name, "_-");
 		int size = timing[i].size();
-		if (type == "translate" && jointName == "base")
+		if (type == "translate")
 		{
 			int index = idMap[dataEntryName[i]];
 			for (int j = 0; j < size; j++)
@@ -376,29 +392,27 @@ void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSke
 			}
 		}
 */
-		if (type == "rotateZ")
+		if (type == orderVec[0] || type == orderVec[1] || type == orderVec[2])
 		{
 			for (int j = 0; j < size; j++)
 			{
 				int frame = getFrameNumber(fullTiming, timing[i][j]);
-				euler[frame].z = float(frameData[i][j] * 0.017444444);
+				std::string axis = type.substr(type.length() - 1);
+				if (axis == "Z")
+					euler[frame].z = float(frameData[i][j] * 0.017444444);
+				if (axis == "X")
+					euler[frame].x = float(frameData[i][j] * 0.017444444);
+				if (axis == "Y")
+					euler[frame].y = float(frameData[i][j] * 0.017444444);
 			}
 		}
-		if (type == "rotateY")
-		{
-			for (int j = 0; j < size; j++)
-			{
-				int frame = getFrameNumber(fullTiming, timing[i][j]);
-				euler[frame].y = float(frameData[i][j] * 0.017444444);
-			}
-		}
-		if (type == "rotateX")
+
+		if (type == orderVec[2])
 		{
 			int index = idMap[dataEntryName[i]];
 			for (int j = 0; j < size; j++)
 			{
 				int frame = getFrameNumber(fullTiming, timing[i][j]);
-				euler[frame].x = float(frameData[i][j] * 0.017444444);
 
 				SrMat xrot;
 				xrot.rotx(euler[frame].x);
@@ -406,7 +420,6 @@ void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSke
 				yrot.roty(euler[frame].y);
 				SrMat zrot;
 				zrot.rotz(euler[frame].z);
-
 				SrMat matrix;
 				matrix = xrot * yrot * zrot;
 
