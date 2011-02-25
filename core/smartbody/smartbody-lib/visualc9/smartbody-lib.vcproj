@@ -282,6 +282,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\ParserOpenCOLLADA.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\ParserOpenCOLLADA.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\remote_speech.cpp"
 				>
 			</File>

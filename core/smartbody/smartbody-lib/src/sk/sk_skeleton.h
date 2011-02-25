@@ -121,6 +121,9 @@ class SkSkeleton : public SrSharedClass
     /*! Returns a pointer to the root joint of the skeleton */
     SkJoint* root () const { return _root; }
 
+	/*! Set the root joint pointer */
+	void root(SkJoint* r)	{_root = r;}
+
 	/*! Returns the joint with name n. A hash table is used to perform the search.
         0 is returned in case the joint is not found.
         If the hash table is not up to date, it is automatically re-created. */
