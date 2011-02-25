@@ -75,6 +75,9 @@ class srSplineCurve {
 			}
 		}
 
+		int get_num_keys( void ) { return( key_count ); }
+		int get_num_nodes( void ) { return( node_count ); }
+
 		bool insert( double p, double v )	{
 			return( insert_key( new Key( p, v ) ) );
 		}
@@ -84,7 +87,7 @@ class srSplineCurve {
 				Key *tmp_p = key_p;
 				key_p = key_p->next();
 				delete tmp_p;
-				decrement();
+				decrement_key();
 			}
 			if( key_count != 0 )	{
 				printf( "key_count ERR: %d\n", key_count );
@@ -98,14 +101,12 @@ class srSplineCurve {
 				Node *tmp_p = node_p;
 				node_p = node_p->next();
 				delete tmp_p;
-				node_count--;
-				// decrement_node(); needed?
+				decrement_node();
 			}
 			if( node_count != 0 )	{
 				printf( "node_count ERR: %d\n", node_count );
 			}
 			head_node_p = NULL;
-			dirty = true;
 		}
 
 		double evaluate( double t, bool *cropped_p = NULL ) {
@@ -114,14 +115,14 @@ class srSplineCurve {
 				*cropped_p = false;
 			}
 			Node *node_p = find_floor_node( t );
-//			printf( "EVAL: %f\n", t );
 			if( node_p )	{
-//				node_p->print( 999 );
 				Node *next_p = node_p->next();
 				if( next_p )	{
-					double v = GWIZ::hermite( t, *node_p, *next_p );
-					printf( "  HERMITE: %f\n", v );
-					return( v );
+					return( GWIZ::hermite( t, *node_p, *next_p ) );
+				}
+				if( t < ( node_p->t + GWIZ::epsilon6() ) ) {
+				// capture end node
+					return( node_p->v );
 				}
 			}
 			if( cropped_p ) {
@@ -149,20 +150,28 @@ class srSplineCurve {
 		void insert_head_key( Key *key_p ) {
 			key_p->next( head_key_p );
 			head_key_p = key_p;
-			increment();
+			increment_key();
 		}
 		void insert_after_key( Key *prev_p, Key *key_p ) {
 			Key *next_p = prev_p->next();
 			prev_p->next( key_p );
 			key_p->next( next_p );
-			increment();
+			increment_key();
 		}
-		void decrement( void )	{
+		void decrement_key( void )	{
 			key_count--;
 			dirty = true;
 		}
-		void increment( void )	{
+		void increment_key( void )	{
 			key_count++;
+			dirty = true;
+		}
+		void decrement_node( void )	{
+			node_count--;
+			dirty = true;
+		}
+		void increment_node( void )	{
+			node_count++;
 			dirty = true;
 		}
 		
@@ -177,7 +186,7 @@ class srSplineCurve {
 				Key *key2_p = key1_p->next();
 
 				head_node_p = new Node;
-				node_count = 1;
+				increment_node();
 				Node *node_p = head_node_p;
 				
 				while( node_p ) {
@@ -190,7 +199,7 @@ class srSplineCurve {
 					
 					if( key2_p )	{
 						Node *next_p = new Node;
-						node_count++;
+						increment_node();
 						node_p->next( next_p );
 						node_p = next_p;
 					}
@@ -254,6 +263,54 @@ class srSplineCurve {
 			return( NULL );
 		}
 
+	public:
+
+	// utilities for selecting, editing and display
+	
+		bool probe_bound_box_key( double t, double v, double radius, bool set_edit ) {
+			Key *key_p = head_key_p;
+			while( key_p )	{
+				if( key_p->bound_box( t, v, radius ) )	{
+					if( set_edit )	{
+						curr_edit_key_p = key_p;
+					}
+					return( true );
+				}
+				key_p = key_p->next();
+			}
+			return( false );
+		}
+		
+		void edit_reset( void ) { curr_edit_key_p = head_key_p; }
+		bool edit_next( double t, double v, bool increment )	{
+			if( curr_edit_key_p )	{
+				curr_edit_key_p->set( t, v );
+				dirty = true;
+				if( increment ) {
+					curr_edit_key_p = curr_edit_key_p->next();
+				}
+				return( true );
+			}
+			return( false );
+		}
+		bool edit( double t, double v ) 
+			{ return( edit_next( t, v, false ) ); }
+
+		void query_reset( void ) { curr_query_key_p = head_key_p; }
+		bool query_next( double *t_p, double *v_p, bool increment )	{
+			if( curr_query_key_p )	{
+				if( t_p ) { *t_p = curr_query_key_p->t; }
+				if( v_p ) { *v_p = curr_query_key_p->v; }
+				if( increment ) {
+					curr_query_key_p = curr_query_key_p->next();
+				}
+				return( true );
+			}
+			return( false );
+		}
+		bool query( double *t_p, double *v_p ) 
+			{ return( query_next( t_p, v_p, false ) ); }
+
 	private:
 		void null( void )	{
 			init();
@@ -271,6 +328,10 @@ class srSplineCurve {
 		bool dirty;
 
 		Key *head_key_p;
+//		Key *curr_key_p; // rapid access
+		Key *curr_edit_key_p;
+		Key *curr_query_key_p;
+		
 		Node *head_node_p;
 };
 
