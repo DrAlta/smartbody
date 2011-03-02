@@ -23,8 +23,36 @@
 #ifndef GWIZ_MATH_H
 #define GWIZ_MATH_H
 
-// "Gee Whiz!" 
-// Vector geometry wizard...
+/*
+#include "gwiz.h"
+
+// "Gee Whiz!"
+//    AKA: Jesu H. Chee-ryste! Why isn't this standard?
+// Vector geometry wizard... a precursor to Geometric Algebra: algebraic geometry
+
+	namespace GW	{
+		scalar: scalar_t: gw_float: double // 64-bit precision floating point Real
+		vector: vector_t: 3 floats: a drawable 3D vertex.
+		quat: quat_t
+		euler: euler_t
+		xmat: matrix_t
+		xstack: matrix4_stack
+	}
+	namespace GWC	{
+		screen_t
+		camera_t
+		viewport_t
+	}
+	namespace GWS	{
+		ctrl_key
+		cardinal_key
+		tempordinal
+	}
+	namespace GWIZ	{
+		epsilonX
+		pi
+	}
+*/
 
 ////////////////////////////////
 #include <math.h>
@@ -36,6 +64,12 @@
 typedef float gw_float_t;
 #else
 typedef double gw_float_t;
+#endif
+
+#ifdef GWIZ_32BIT
+typedef float gw_float;
+#else
+typedef double gw_float;
 #endif
 
 class vector_t;
@@ -58,32 +92,15 @@ typedef matrix_t	matrix4x4_t;
 #define DEG 	GWIZ::deg
 #endif
 
-/*
-#include "gwiz.h"
-
-	namespace GW	{
-		scalar_t
-		vector_t
-		quat_t
-		euler_t
-		matrix_t
-	}
-	namespace GWC	{
-		screen_t
-		camera_t
-		viewport_t
-	}
-	namespace GWS	{
-		ctrl_key
-		cardinal_key
-	}
-	namespace GWIZ	{
-		epsilonX
-		pi
-	}
-*/
-
 ////////////////////////////////
+#if 0
+namespace GWIZ_NAMESPACE_TEST {
+	int a;	
+}
+namespace GWIZ_NAMESPACE_TEST {
+	int b;	
+}
+#endif
 
 class GWIZ {
 	
@@ -98,8 +115,8 @@ class GWIZ {
 			COMP_M_PTRSH
 		};
 
-		// precision constants
-		static gw_float_t epsilon4( void )	{ return( 0.00001 ); }
+		// precision constants, typically between 5 and 10:
+		static gw_float_t epsilon4( void )	{ return( 0.00001 ); } // used by vector_t quat_t::swingtwist( deg )
 		static gw_float_t epsilon5( void )	{ return( 0.000001 ); } /* one millionth */
 		static gw_float_t epsilon6( void )	{ return( 0.0000001 ); }
 		static gw_float_t epsilon7( void )	{ return( 0.00000001 ); }
@@ -112,8 +129,7 @@ class GWIZ {
 		static gw_float_t pi( void ) { return( 3.14159265358979323846 ); }
 		static gw_float_t rad( gw_float_t deg ) { return( deg * 0.017453292519943295 ); }
 		static gw_float_t deg( gw_float_t rad ) { return( rad * 57.295779513082323 ); }
-
-		static gw_float_t safe_arc_threshold( void ) { return( 0.999999999 ); }
+		static gw_float_t safe_arc_threshold( void ) { return( 1.0 - epsilon8() ); }
 		static gw_float_t safe_asin( gw_float_t s );
 		static gw_float_t safe_acos( gw_float_t c );
 		static gw_float_t safe_atan( gw_float_t t );
@@ -123,223 +139,95 @@ class GWIZ {
 		class ctrl_key	{
 
 			public:
-				ctrl_key( void ) 
-					{ set( 0.0, 0.0 ); }
-				ctrl_key( gw_float_t t_set, gw_float_t v_set ) 
-					{ set( t_set, v_set ); }
+				ctrl_key( void ) { set( 0.0, 0.0 ); }
+				ctrl_key( gw_float_t p_in, gw_float_t v_in )	{ set( p_in, v_in ); }
 
-				void set( gw_float_t t_set, gw_float_t v_set )	{
-					t = t_set;
-					v = v_set;
-				}
+				void set( gw_float_t p_in, gw_float_t v_in )	{ param = p_in; value = v_in; }
+				gw_float_t p( void ) const { return( param ); }
+				gw_float_t v( void ) const { return( value ); }
 
-				bool bound_box( gw_float_t t_comp, gw_float_t v_comp, gw_float_t radius ) {
-					return(
-						( fabs( t - t_comp ) < radius )&&( fabs( v - v_comp ) < radius )
-					);
-				}
+				// maybe not the correct place for this...
+				// GWIZ gui utils... simple 2D bounds checking: box, circle, rect.
+				bool bound_box( gw_float_t p_comp, gw_float_t v_comp, gw_float_t radius ) const;
 				
-				gw_float_t t;
-				gw_float_t v;
+			private:
+				gw_float_t param, value;
 		};
+
+		class cardinal_key: public ctrl_key	{
 		
-		class cardinal_key	{
+			public:
+
+				cardinal_key( void ) { set( 0.0, 0.0, 0.0, 0.0 ); }
+				cardinal_key( 
+					gw_float_t t_in, gw_float_t v_in,
+					gw_float_t ml_in, gw_float_t mr_in
+				)  { set( t_in, v_in, ml_in, mr_in ); }
+
+				void set( 
+					gw_float_t t_in, gw_float_t v_in,
+					gw_float_t ml_in, gw_float_t mr_in )
+					{ ctrl_key::set( t_in, v_in ); m_lt = ml_in; m_rt = mr_in; }
+
+				gw_float ml( void ) const { return( m_lt ); }
+				gw_float mr( void ) const { return( m_rt ); }
+
+			private:
+				gw_float_t m_lt, m_rt;
+		};
+
+		class tempordinal_key : public cardinal_key	{
 
 			public:
-				cardinal_key( void ) { 
-					t = 0.0; 
-					v = 0.0; 
-					m_in = m_out = 0.0;
-					dt_in = dt_out = 1.0;
-				}
+				tempordinal_key( void ) { set( 0.0, 0.0, 0.0, 0.0, 1.0, 1.0 ); }
+				void set( 
+					gw_float_t t_in, gw_float_t v_in,
+					gw_float_t ml_in, gw_float_t mr_in,
+					gw_float_t dl_in, gw_float_t dr_in )
+					{ cardinal_key::set( t_in, v_in, ml_in, mr_in ); d_lt = dl_in; d_rt = dr_in; }
 
-				gw_float_t t;
-				gw_float_t v;
-				gw_float_t m_in, m_out;     // Ah hah! suffix '_in' used for inputs... _lt, _rt
-				gw_float_t dt_in, dt_out;
+				gw_float dl( void ) const { return( d_lt ); }
+				gw_float dr( void ) const { return( d_rt ); }
 
-#if 1
-				inline void simple( 
-					const ctrl_key k0, 
-					const ctrl_key k1, 
-					const ctrl_key k2 
-				)	{
-					t = k1.t;
-					v = k1.v;
-					m_in = ( k2.v - k0.v ) / ( k2.t - k0.t );
-					m_out = m_in;
-					dt_in = 1.0;
-					dt_out = 1.0;
-				}
-#endif
-				inline void halting(
-					const ctrl_key k0,
-					const ctrl_key k1,
-					const ctrl_key k2
-				)	{
-					cardinal( 1.0, k0, k1, k2 );
-				/*
-					t = k1.t; 
-					v = k1.v;
-					m_in = 0.0; 
-					m_out = 0.0;
-					dt_in = k1.t - k0.t;
-					dt_out = k2.t - k1.t;
-				*/
-				}
+			private:
+				gw_float_t d_lt, d_rt;
+			public:
+			
+				void simple( const ctrl_key& k0, const ctrl_key& k1, const ctrl_key& k2 );
 
-				inline void catmullrom(
-					const ctrl_key k0,
-					const ctrl_key k1,
-					const ctrl_key k2
-				)	{
-					cardinal( 0.0, k0, k1, k2 );
-				/*
-					t = k1.t; v = k1.v;
-					m_in = ( k2.v - k0.v ) / ( k2.t - k0.t );
-					m_out = m_in;
-					dt_in = k1.t - k0.t;
-					dt_out = k2.t - k1.t;
-				*/
-				}
+				void cardinal( gw_float_t c, const ctrl_key& k0, const ctrl_key& k1, const ctrl_key& k2 );
 
-				inline void cardinal(
-					gw_float_t c,
-					const ctrl_key k0,
-					const ctrl_key k1,
-					const ctrl_key k2
-				)	{
-		//	if( k1.t >= k2.t )
-		//	if( t < k1.t )
-		//	if( t > k2.t )
-		//	etc...
-					t = k1.t;
-					v = k1.v;
-					m_in = ( 1.0 - c ) * ( k2.v - k0.v ) / ( k2.t - k0.t );
-					m_out = m_in;
-					dt_in = k1.t - k0.t;
-					dt_out = k2.t - k1.t;
-				}
+				 void halting( const ctrl_key& k0, const ctrl_key& k1, const ctrl_key& k2 ) 
+					{ cardinal( 1.0, k0, k1, k2 ); }
 
-				inline void cardinal_alt(
-					gw_float_t c,
-					const ctrl_key k0,
-					const ctrl_key k1,
-					const ctrl_key k2
-				)	{
-					t = k1.t;
-					v = k1.v;
-					m_in = 0.5 * (
-						( k2.v - k1.v ) / ( k2.t - k1.t ) +
-						( k1.v - k0.v ) / ( k1.t - k0.t )
-					);
-					m_out = m_in;
-					dt_in = k1.t - k0.t;
-					dt_out = k2.t - k1.t;
-				}
+				void catmullrom( const ctrl_key& k0, const ctrl_key& k1, const ctrl_key& k2 )
+					{ cardinal( 0.0, k0, k1, k2 ); }
 
-				inline void kochanek(
-					gw_float_t tension,
-					gw_float_t bias,
-					gw_float_t continuity,
-					const ctrl_key k0,
-					const ctrl_key k1,
-					const ctrl_key k2
-				)	{
-					t = k1.t;
-					v = k1.v;
-					m_in = 
-						( 1.0 - tension ) * ( 1.0 + bias ) * ( 1.0 + continuity ) * 0.5 * ( k1.v - k0.v ) +
-						( 1.0 - tension ) * ( 1.0 - bias ) * ( 1.0 - continuity ) * 0.5 * ( k2.v - k1.v );
-					m_out = 
-						( 1.0 - tension ) * ( 1.0 + bias ) * ( 1.0 - continuity ) * 0.5 * ( k1.v - k0.v ) +
-						( 1.0 - tension ) * ( 1.0 - bias ) * ( 1.0 + continuity ) * 0.5 * ( k2.v - k1.v );
-					dt_in = k1.t - k0.t;
-					dt_out = k2.t - k1.t;
-				}
+				void cardinal_alt( gw_float_t c, const ctrl_key& k0, const ctrl_key& k1, const ctrl_key& k2 );
+
+				void kochbartels(
+					gw_float_t tension, gw_float_t bias, gw_float_t continuity,
+					const ctrl_key& k0, const ctrl_key& k1, const ctrl_key& k2
+				);
 		};
 
 	// spline utilities
 
-		// static inline gw_float_t lerp()
-		// static inline gw_float_t extend()
-		// static inline gw_float_t extend(...)
+		// gw_float_t lerp()
+		// gw_float_t extend()
+		// gw_float_t extend(...)
 
-		static inline gw_float_t bezier(
-			gw_float_t s, // unit interpolant
-			gw_float_t f0,
-			gw_float_t f1,
-			gw_float_t f2,
-			gw_float_t f3
-		)	{
-			// de Casteljau linear recursion
-			gw_float_t A = f0 + s * ( f1 - f0 );
-			gw_float_t B = f1 + s * ( f2 - f1 );
-			gw_float_t C = A + s * ( B - A );
-			return( C + s*( ( B + s*( ( f2 + s*( f3 - f2 ) ) - B ) ) - C ) );
-		}
+		// gw_float_t ssvwvcc_warp()
+		// gw_float_t ssvwvcc_patch()
+		// gw_float_t ssvwvcc_wpatch()
 
-		// static inline gw_float_t ssvwvcc_warp()
-		// static inline gw_float_t ssvwvcc_patch()
-		// static inline gw_float_t ssvwvcc_wpatch()
+		static gw_float_t bezier( gw_float_t s, gw_float_t f0, gw_float_t f1, gw_float_t f2, gw_float_t f3 );
 
-		static inline gw_float_t hermite_simple(
-			gw_float_t s,
-			gw_float_t v1,
-			gw_float_t v2,
-			gw_float_t m1,
-			gw_float_t m2
-		)	{
-#if 1
-			return(
-				bezier(
-					s,
-					v1,
-					v1 + m1 * 0.333333333,
-					v2 - m2 * 0.333333333,
-					v2
-				)
-			);
-#elif 0
-	// equivalents...
-			register gw_float_t s_2 = s * s;
-			register gw_float_t s_3 = s_2 * s;
-			return(
-				v1 * ( 2.0 * s_3 - 3.0 * s_2 + 1.0 ) +
-				m1 * ( s_3 - 2.0 * s_2 + s ) +
-				v2 * ( -2.0 * s_3 + 3.0 * s_2 ) +
-				m2 * ( s_3 - s_2 );
-			);
-#else
-			return(
-				s * (
-					s * (
-						s * ( 2.0 * v1 - 2.0 * v2 + m1 + m2 ) +
-						( -3.0 * v1 + 3.0 * v2 - 2.0 * m1 - m2 )
-					) + m1
-				) + v1
-			);
-#endif
-		}
+		static gw_float_t hermite( gw_float_t s, gw_float_t v1, gw_float_t v2, gw_float_t m1, gw_float_t m2 );
 
-		static inline gw_float_t hermite(
-			const gw_float_t t, 
-			const cardinal_key K1, 
-			const cardinal_key K2 
-		)	{
+		static  gw_float_t hermite( const gw_float_t t, const cardinal_key& K1, const cardinal_key& K2 );
 
-		//	if( K1.t >= K2.t )
-		//	if( t < K1.t )
-		//	if( t > K2.t )
-			gw_float_t s = ( t - K1.t ) / ( K2.t - K1.t ); // normalize parametric interpolant
-			gw_float_t v1 = K1.v;
-			gw_float_t v2 = K2.v;
-			gw_float_t m1 = K1.m_out * K1.dt_out;
-			gw_float_t m2 = K2.m_in * K2.dt_in;
-			return(
-				hermite_simple( s, v1, v2, m1, m2 )
-			);
-		}
+		static gw_float_t hermite( const gw_float_t t, const tempordinal_key& K1, const tempordinal_key& K2 );
 };
 
 ////////////////////////////////
@@ -733,6 +621,7 @@ class matrix_t {
 				printf( " matrix_t:\n" );
 			for( int i=0;i<4;i++ )
 				printf( "  %f %f %f %f\n", M[0][i], M[1][i], M[2][i], M[3][i] );
+			// what about the stack?
 		}
 
 	// CONSTRUCT

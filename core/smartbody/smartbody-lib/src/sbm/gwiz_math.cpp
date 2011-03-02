@@ -22,6 +22,10 @@
 
 #include "gwiz_math.h"
 
+#ifndef abs
+#define abs fabs
+#endif
+
 ////////////////////////////////
 // SAFE TRIGONOMETRY:
 
