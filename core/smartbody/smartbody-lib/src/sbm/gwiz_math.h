@@ -259,7 +259,7 @@ namespace gwiz {
 
 ////////////////////////////////
 
-	// namespace gwiz{} continued:
+	// namespace gwiz{}  continued:
 class vector_t {
 
     public:
