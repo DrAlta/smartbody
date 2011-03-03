@@ -36,12 +36,12 @@ vector_t find_nearest_point_on_line(
 	vector_t N = ( L2 - L1 ).normal();
 	
 	// tangent plane equation:
-	gw_float_t d = -( N.dot( P ) );
+	float_t d = -( N.dot( P ) );
 	
 	// intersect line and plane
-	gw_float_t A = N.dot( L1 ) + d;
-	gw_float_t B = -( N.sqlen() );
-	gw_float_t u = A / B;
+	float_t A = N.dot( L1 ) + d;
+	float_t B = -( N.sqlen() );
+	float_t u = A / B;
 	
 	return( L1 + N * u );
 }
@@ -63,7 +63,7 @@ quat_t rotation_ray_to_target_orient(
 	vector_t Td = Q * Fr; // target direction vector
 	
 	vector_t axis = Fd.cross( Td );
-	gw_float_t angle = DEG( acos( Fd.normal().dot( Td.normal() ) ) );
+	float_t angle = DEG( acos( Fd.normal().dot( Td.normal() ) ) );
 	return( quat_t( angle, axis ) );
 }
 
@@ -74,7 +74,7 @@ quat_t rotation_ray_to_target_point(
 	vector_t R,   			// center of rotation
 	vector_t Fo,  			// forward ray origin
 	vector_t Fd,  			// forward ray direction
-	gw_float_t buffer_ratio, // proportion of buffer zone for pathological case
+	float_t buffer_ratio, // proportion of buffer zone for pathological case
 	int heading_only
 )	{
 	
@@ -99,10 +99,10 @@ LOG( "-- --\n" );
 	}
 	
 	vector_t RX = X - R; // vector from rotation to target
-	gw_float_t d = RX.length(); // distance from rotation to target
+	float_t d = RX.length(); // distance from rotation to target
 
 	vector_t RF = Fo - R; // vector from rotation to forward origin
-	gw_float_t f = RF.length(); // distance from rotation to forward origin
+	float_t f = RF.length(); // distance from rotation to forward origin
 
 	// pathological case:
 	// if target is inside of forward origin radius
@@ -136,8 +136,8 @@ LOG( "-- --\n" );
 
 	// blend pathological case if near forward origin radius:
 	quat_t Qbuffer; // solution for pathological case
-	gw_float_t buffer_lerp = 0.0; // amount of Qbuffer to apply
-	gw_float_t buffer_len = f * buffer_ratio; // length of buffer zone
+	float_t buffer_lerp = 0.0; // amount of Qbuffer to apply
+	float_t buffer_len = f * buffer_ratio; // length of buffer zone
 	
 #if 1
 	// if target is near forward origin radius: 
@@ -162,7 +162,7 @@ LOG( "-- --\n" );
 	vector_t T = find_nearest_point_on_line( R, Fo, Fo + Fd );
 	
 	vector_t RT = T - R; // vector from rotation to forward tangent
-	gw_float_t r = RT.length(); // radius of sphere
+	float_t r = RT.length(); // radius of sphere
 
 	// if radius is tiny
 	if( r < FORWARD_RAY_EPSILON )	{
@@ -173,15 +173,15 @@ LOG( "-- --\n" );
 		}
 
 		vector_t axis = Fd.cross( RX );
-		gw_float_t angle = deg( safe_acos( Fd.normal().dot( RX.normal() ) ) );
+		float_t angle = deg( safe_acos( Fd.normal().dot( RX.normal() ) ) );
 		return( quat_t( angle, axis ) );
 	}
 
 	// rho: angle from RX to X-tangent-plane
-	gw_float_t rho = deg( safe_acos( r / d ) );
+	float_t rho = deg( safe_acos( r / d ) );
 
 	// gamma: angle from RX to RT
-	gw_float_t gamma = deg( safe_acos( RX.normal().dot( RT.normal() ) ) );
+	float_t gamma = deg( safe_acos( RX.normal().dot( RT.normal() ) ) );
 
 	// Aaxis: axis perpendicular to RX and RT
 	vector_t Aaxis = RT.cross( RX );
@@ -196,7 +196,7 @@ LOG( "-- --\n" );
 	
 // patches for flat case (from above pathology)
 #if 0
-	gw_float_t alpha;
+	float_t alpha;
 	if( ( heading_only )&&( Aaxis.y() > 0.0 ) )	{
 		alpha = gamma + rho;
 	}
@@ -204,8 +204,8 @@ LOG( "-- --\n" );
 		alpha = gamma - rho;
 	}
 #elif 0
-	gw_float_t kappa = deg( safe_acos( Fd.normal().dot( RX.normal() ) ) );
-	gw_float_t alpha;
+	float_t kappa = deg( safe_acos( Fd.normal().dot( RX.normal() ) ) );
+	float_t alpha;
 	if( heading_only && ( kappa > 90.0 ) )	{
 		alpha = gamma + rho;
 	}
@@ -213,7 +213,7 @@ LOG( "-- --\n" );
 		alpha = gamma - rho;
 	}
 #else
-	gw_float_t alpha = gamma - rho;
+	float_t alpha = gamma - rho;
 #endif
 
 	quat_t Qalpha( alpha, Aaxis ); // to apply alpha
@@ -223,7 +223,7 @@ LOG( "-- --\n" );
 
 	// beta: rotation to align new forward with new tangent
 
-	gw_float_t beta = deg( safe_acos( newF.normal().dot( ( X - newT ).normal() ) ) );
+	float_t beta = deg( safe_acos( newF.normal().dot( ( X - newT ).normal() ) ) );
 	if( beta > 0.0 )	{
 
 		// Baxis: axis to which beta is implicitly applied
@@ -231,7 +231,7 @@ LOG( "-- --\n" );
 
 		// phi: compare axes to determine sign of beta
 		//  because implicit axis (Baxis) is not used
-		gw_float_t phi = Baxis.normal().dot( ( newT - R ).normal() );
+		float_t phi = Baxis.normal().dot( ( newT - R ).normal() );
 		if( phi < 0.0 ) {
 			beta = -beta;
 		}

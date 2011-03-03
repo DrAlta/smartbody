@@ -38,7 +38,7 @@ quat_t rotation_ray_to_target_point(
 	vector_t R,   			// center of rotation
 	vector_t Fo,  			// forward ray origin
 	vector_t Fd,  			// forward ray direction
-	gw_float_t buffer_ratio = 0.1,	// proportion of buffer zone for pathological case
+	gwiz::float_t buffer_ratio = 0.1,	// proportion of buffer zone for pathological case
 	int heading_only = false
 );
 

@@ -100,7 +100,7 @@ quat_t MeCtGazeJoint::evaluate( float dt, quat_t target_rot, quat_t off_rot, flo
 
 void MeCtGazeJoint::capture_joint_state( void ) {
 	SrMat sr_M;
-	matrix_t M;
+	gwiz::matrix_t M;
 	int i, j;
 
 	if( joint_p )	{
@@ -172,7 +172,7 @@ quat_t MeCtGazeJoint::rotation_to_target( vector_t target_pos )	{
 		vector_t R,   // center of rotation
 		vector_t Fo,  // forward ray origin
 		vector_t Fd,  // forward ray direction
-		gw_float_t buffer_ratio = 0.1,	// proportion of buffer zone for pathological case
+		gwiz::float_t buffer_ratio = 0.1,	// proportion of buffer zone for pathological case
 	)
 	*/
 	
@@ -242,7 +242,7 @@ quat_t MeCtGazeJoint::rotation_to_target( vector_t target_pos )	{
 	vector_t w_forward_dir_n = parent_rot * forward_rot * forward_ref.normal();
 	vector_t target_dir_n = ( target_pos - world_pos ).normal();
 
-	gw_float_t angle = DEG( gwiz::safe_acos( w_forward_dir_n.dot( target_dir_n ) ) );
+	gwiz::float_t angle = DEG( gwiz::safe_acos( w_forward_dir_n.dot( target_dir_n ) ) );
 	vector_t axis = w_forward_dir_n.cross( target_dir_n ).normal();
 
 	return( ( -parent_rot ) * quat_t( angle, axis ) * ( parent_rot ) );
@@ -252,7 +252,7 @@ quat_t MeCtGazeJoint::rotation_to_target( vector_t target_pos )	{
 	vector_t forward_dir_n = forward_rot * forward_ref.normal();
 	vector_t l_target_dir_n = ( -parent_rot ) * ( target_pos - world_pos ).normal();
 
-	gw_float_t angle = DEG( gwiz::safe_acos( forward_dir_n.dot( l_target_dir_n ) ) );
+	gwiz::float_t angle = DEG( gwiz::safe_acos( forward_dir_n.dot( l_target_dir_n ) ) );
 	vector_t axis = forward_dir_n.cross( l_target_dir_n ).normal();
 
 	return( quat_t( angle, axis ) );

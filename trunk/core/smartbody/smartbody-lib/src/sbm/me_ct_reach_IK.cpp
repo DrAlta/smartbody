@@ -252,31 +252,31 @@ vector_t MeCtReachIK::quat2SwingTwist( quat_t& quat )
 	}
 
 #ifdef INVERT_XZ
-	gw_float_t gamma = atan2( q.x(), q.w() );
-	gw_float_t beta = atan2( sqrt( q.z()*q.z() + q.y()*q.y() ), sqrt( q.x()*q.x() + q.w()*q.w() ) );
-	gw_float_t sinc = 1.0;
+	double gamma = atan2( q.x(), q.w() );
+	double beta = atan2( sqrt( q.z()*q.z() + q.y()*q.y() ), sqrt( q.x()*q.x() + q.w()*q.w() ) );
+	double sinc = 1.0;
 	if( beta > EPSILON6 )	{
 		sinc = sin( beta )/beta;
 	}
-	gw_float_t s = sin( gamma );
-	gw_float_t c = cos( gamma );
-	gw_float_t sinc2 = 2.0 / sinc;
-	gw_float_t swing_x = sinc2 * ( c * q.y() - s * q.z());
-	gw_float_t swing_y = sinc2 * ( s * q.y() + c * q.z());
-	gw_float_t twist = 2.0 * gamma;
+	double s = sin( gamma );
+	double c = cos( gamma );
+	double sinc2 = 2.0 / sinc;
+	double swing_x = sinc2 * ( c * q.y() - s * q.z());
+	double swing_y = sinc2 * ( s * q.y() + c * q.z());
+	double twist = 2.0 * gamma;
 #else
-	gw_float_t gamma = atan2( q.z(), q.w() );
-	gw_float_t beta = atan2( sqrt( q.x()*q.x() + q.y()*q.y() ), sqrt( q.z()*q.z() + q.w()*q.w() ) );
-	gw_float_t sinc = 1.0;
+	double gamma = atan2( q.z(), q.w() );
+	double beta = atan2( sqrt( q.x()*q.x() + q.y()*q.y() ), sqrt( q.z()*q.z() + q.w()*q.w() ) );
+	double sinc = 1.0;
 	if( beta > EPSILON6 )	{
 		sinc = sin( beta )/beta;
 	}
-	gw_float_t s = sin( gamma );
-	gw_float_t c = cos( gamma );
-	gw_float_t sinc2 = 2.0 / sinc;
-	gw_float_t swing_x = sinc2 * ( c * q.x() - s * q.y() );
-	gw_float_t swing_y = sinc2 * ( s * q.x() + c * q.y());
-	gw_float_t twist = 2.0 * gamma;
+	double s = sin( gamma );
+	double c = cos( gamma );
+	double sinc2 = 2.0 / sinc;
+	double swing_x = sinc2 * ( c * q.x() - s * q.y() );
+	double swing_y = sinc2 * ( s * q.x() + c * q.y());
+	double twist = 2.0 * gamma;
 #endif
 	return( vector_t( ( swing_x ), ( swing_y ), ( twist ) ) );
 }

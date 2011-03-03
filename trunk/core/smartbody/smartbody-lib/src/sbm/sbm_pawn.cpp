@@ -904,7 +904,7 @@ WSP_ERROR SbmPawn::wsp_position_accessor( const std::string id, const std::strin
 		joint->update_gmat();
 		const SrMat & sr_m = joint->gmat();
 
-		matrix_t m;
+		gwiz::matrix_t m;
 		for ( int i=0; i<4; i++ )
 		{
 			for ( int j=0; j<4; j++ )
@@ -943,7 +943,7 @@ WSP_ERROR SbmPawn::wsp_rotation_accessor( const std::string id, const std::strin
 		joint->update_gmat();
 		const SrMat & sr_m = joint->gmat();
 
-		matrix_t m;
+		gwiz::matrix_t m;
 		for( int i=0; i<4; i++ )
 		{
 			for( int j=0; j<4; j++ )

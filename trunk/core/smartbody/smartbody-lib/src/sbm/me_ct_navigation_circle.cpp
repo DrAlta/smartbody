@@ -153,7 +153,7 @@ void MeCtNavigationCircle::init( float dx, float dy, float dz, float g_angular, 
 		// Read inputs
 		
 		quat_t world_quat( buffer[ bi_world_rot ], buffer[ bi_world_rot+1 ], buffer[ bi_world_rot+2 ], buffer[ bi_world_rot+3 ] );
-		gw_float_t world_roty_deg = euler_t( world_quat ).y();
+		gwiz::float_t world_roty_deg = euler_t( world_quat ).y();
 		euler_t world_roty( 0, world_roty_deg, 0 );
 
 		float delta_radians = radians_per_second * time_delta;

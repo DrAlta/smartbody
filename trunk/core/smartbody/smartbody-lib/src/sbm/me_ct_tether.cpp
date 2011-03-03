@@ -129,7 +129,7 @@ SkJoint* MeCtTether::source_ref_joint( void ) {
 
 MeCtTether::joint_state_t MeCtTether::capture_joint_state( SkJoint *joint_p ) {
 	SrMat sr_M;
-	matrix_t M;
+	gwiz::matrix_t M;
 	int i, j;
 	joint_state_t state;
 
