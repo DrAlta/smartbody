@@ -156,7 +156,7 @@ void MeCtGaze::apply_smooth_keys( void )	{
 void MeCtGaze::set_bias( int key, float p, float h, float r )	{
 	
 	if( ! valid_key( key ) ) return;
-	joint_key_arr[ key ].bias_rot = euler_t( p, h, r );
+	joint_key_arr[ key ].bias_rot = gwiz::euler_t( p, h, r );
 	key_bias_dirty = 1;
 }
 

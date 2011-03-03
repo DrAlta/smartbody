@@ -546,7 +546,7 @@ void print_joint( const SkJoint* joint ) {
 			                             << quat.y << ", "
 			                             << quat.z;
 			// Marcus's mappings
-			euler_t euler( quat_t( quat.w, quat.x, quat.y, quat.z ) );
+			gwiz::euler_t euler( gwiz::quat_t( quat.w, quat.x, quat.y, quat.z ) );
 			cout << "\t(as hpr: " << euler.y() << ", "
 			                      << euler.x() << ", "
 			                      << euler.z() << ")" << endl;

@@ -23,6 +23,8 @@
 
 #include "me_ct_examples.h"
 #include "gwiz_math.h"
+using namespace gwiz;
+
 #include <vhcl_log.h>
 
 #include "sbm_constants.h"

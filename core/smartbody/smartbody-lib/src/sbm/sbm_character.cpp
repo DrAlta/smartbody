@@ -1319,8 +1319,8 @@ void SbmCharacter::inspect_skeleton_local_transform( SkJoint* joint_p, int depth
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		vector_t pos = M.translation( gwiz::COMP_M_TR );
-		euler_t rot = M.euler( gwiz::COMP_M_TR );
+		gwiz::vector_t pos = M.translation( gwiz::COMP_M_TR );
+		gwiz::euler_t rot = M.euler( gwiz::COMP_M_TR );
 
 		for( j=0; j<depth; j++ ) { LOG( " " ); }
 		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 
@@ -1350,8 +1350,8 @@ void SbmCharacter::inspect_skeleton_world_transform( SkJoint* joint_p, int depth
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		vector_t pos = M.translation( gwiz::COMP_M_TR );
-		euler_t rot = M.euler( gwiz::COMP_M_TR );
+		gwiz::vector_t pos = M.translation( gwiz::COMP_M_TR );
+		gwiz::euler_t rot = M.euler( gwiz::COMP_M_TR );
 
 		for( j=0; j<depth; j++ ) { LOG( " " ); }
 		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }\n", 

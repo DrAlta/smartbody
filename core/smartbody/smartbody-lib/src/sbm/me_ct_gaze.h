@@ -64,7 +64,7 @@ class MeCtGazeKey	{
 		
 		int id;
 		
-		euler_t	bias_rot;
+		gwiz::euler_t	bias_rot;
 		float	limit_p_up, limit_p_dn, limit_h, limit_r;
 //		float	task_weight;
 		float	blend_weight;
@@ -339,11 +339,11 @@ class MeCtGaze : public MeController	{
 		char*			ref_joint_str; // deprecate
 		SkJoint*		ref_joint_p; // deprecate
 		
-		vector_t		point_target_pos;
-		quat_t			orient_target_rot;
-		vector_t		point_offset_pos;
-		quat_t			orient_offset_rot;
-		quat_t			offset_rot; // deprecate
+		gwiz::vector_t		point_target_pos;
+		gwiz::quat_t			orient_target_rot;
+		gwiz::vector_t		point_offset_pos;
+		gwiz::quat_t			orient_offset_rot;
+		gwiz::quat_t			offset_rot; // deprecate
 		
 		int 			timing_mode;
 		float 			head_speed;
@@ -391,8 +391,8 @@ class MeCtGaze : public MeController	{
 		SkJoint*	target_ref_joint( void );
 		SkJoint*	offset_ref_joint( void );
 #endif
-		vector_t	world_target_point( void );
-		quat_t		world_target_orient( void );
+		gwiz::vector_t	world_target_point( void );
+		gwiz::quat_t		world_target_orient( void );
 		
 		virtual void controller_start();
 		void controller_start_evaluate();

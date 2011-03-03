@@ -80,7 +80,7 @@ WSP::WSP_ERROR remote_pawn_rotation_update( std::string id, std::string attribut
 		float x, y, z, h, p, r;
 		pawn_p->get_world_offset( x, y, z, h, p, r );
 
-		euler_t e = quat_t( vector_4d.q, vector_4d.x, vector_4d.y, vector_4d.z );
+		gwiz::euler_t e = gwiz::quat_t( vector_4d.q, vector_4d.x, vector_4d.y, vector_4d.z );
 		pawn_p->set_world_offset( x, y, z, (float)e.h(), (float)e.p(), (float)e.r() );
 	}
 	else
@@ -309,7 +309,7 @@ void SbmPawn::set_world_offset( float x, float y, float z,
 	wo_cache.r = roll;
 	wo_cache_timestamp = mcuCBHandle::singleton().time;
 
-	quat_t q = euler_t(pitch,yaw,roll);
+	gwiz::quat_t q = gwiz::euler_t(pitch,yaw,roll);
 	float data[7] = { x, y, z, (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z() };
 	world_offset_writer_p->set_data( data );
 	return;
@@ -332,7 +332,7 @@ void SbmPawn::set_world_offset( float x, float y, float z,
 			break;
 		case SkJoint::TypeQuat: {
 				SkJointQuat* joint_quat = woj->quat();
-				quat_t q = euler_t(pitch,yaw,roll);
+				gwiz::quat_t q = gwiz::euler_t(pitch,yaw,roll);
 				float q_data[4] = { (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z() };
 				joint_quat->value( q_data );
 			}
@@ -375,7 +375,7 @@ void SbmPawn::wo_cache_update() {
 
 	// const_cast because the SrQuat does validation (no const version of value())
 	const SrQuat& quat = (const_cast<SkJoint*>(joint))->quat()->value();
-	euler_t euler( quat_t( quat.w, quat.x, quat.y, quat.z ) );
+	gwiz::euler_t euler( gwiz::quat_t( quat.w, quat.x, quat.y, quat.z ) );
 	// Marcus's mappings
 	float p = (float)euler.x();
 	float h = (float)euler.y();
@@ -913,7 +913,7 @@ WSP_ERROR SbmPawn::wsp_position_accessor( const std::string id, const std::strin
 			}
 		}
 
-		vector_t pos = m.translation( gwiz::COMP_M_TR );
+		gwiz::vector_t pos = m.translation( gwiz::COMP_M_TR );
 
 		value.x = pos.x();
 		value.y = pos.y();
@@ -952,7 +952,7 @@ WSP_ERROR SbmPawn::wsp_rotation_accessor( const std::string id, const std::strin
 			}
 		}
 
-		quat_t quat = m.quat( gwiz::COMP_M_TR );
+		gwiz::quat_t quat = m.quat( gwiz::COMP_M_TR );
 
 		value.x = quat.x();
 		value.y = quat.y();

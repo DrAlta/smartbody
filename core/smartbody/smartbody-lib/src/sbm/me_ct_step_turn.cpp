@@ -23,6 +23,8 @@
 
 #include "sbm_pawn.hpp"
 #include "me_ct_step_turn.h"
+using namespace gwiz;
+
 #include <vhcl_log.h>
 
 //////////////////////////////////////////////////////////////////////////////////

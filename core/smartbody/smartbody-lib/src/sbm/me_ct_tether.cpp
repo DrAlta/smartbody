@@ -22,6 +22,8 @@
  */
 
 #include "gwiz_math.h"
+using namespace gwiz;
+
 #include "me_ct_tether.h"
 #include <vhcl_log.h>
 

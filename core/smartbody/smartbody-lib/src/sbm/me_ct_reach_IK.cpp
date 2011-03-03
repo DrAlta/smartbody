@@ -68,8 +68,8 @@ int MeCtReachIK::check_joint_limit( SrQuat* quat, int index )
 	// all of the angle limits are adjust accordingly.
 	{
 		MeCtIKJointLimit& limit = info->joint_limit;
-		quat_t quat_st = quat_t(quat->w, quat->x, quat->y, quat->z);			
-		vector_t st = quat2SwingTwist(quat_st);//quat_st.swingtwist();
+		gwiz::quat_t quat_st = gwiz::quat_t(quat->w, quat->x, quat->y, quat->z);			
+		gwiz::vector_t st = quat2SwingTwist(quat_st);//quat_st.swingtwist();
 		float sw_y = (float)st.x();
 		float sw_z = (float)st.y();		
 
@@ -86,7 +86,7 @@ int MeCtReachIK::check_joint_limit( SrQuat* quat, int index )
  		if( tw > limit.twist_limit[0] ) tw = limit.twist_limit[0];
  		if( tw < limit.twist_limit[1] ) tw = limit.twist_limit[1];
 		
-		quat_t ql = swingTwist2Quat(vector_t(sw_y, sw_z, tw));//quat_t( sw_x, sw_y, tw);
+		gwiz::quat_t ql = swingTwist2Quat(gwiz::vector_t(sw_y, sw_z, tw));//quat_t( sw_x, sw_y, tw);
 		quat->set((float)ql.w(),(float)ql.x(),(float)ql.y(),(float)ql.z());
 	}	
 	return modified;
@@ -229,21 +229,21 @@ void MeCtReachIK::calc_target(SrVec& orientation, SrVec& offset)
 // So if we want to convert arm joints quaternion into Swing-Twist, we need to invert ( shift ) XZ coordinate so we get correct results.
 // For other limbs like legs, we use the original swing-twist conversion.
 #define INVERT_XZ 
-vector_t MeCtReachIK::quat2SwingTwist( quat_t& quat )
+gwiz::vector_t MeCtReachIK::quat2SwingTwist( gwiz::quat_t& quat )
 {
 	const float EPSILON6 = 0.0000001f;
 
 #ifdef INVERT_XZ	
 	if( ( quat.w() < EPSILON6 )&&( quat.x() < EPSILON6 ) )	{
-		return( vector_t( 0.0, 0.0, M_PI ) );
+		return( gwiz::vector_t( 0.0, 0.0, M_PI ) );
 	}
 #else
 	if( ( quat.w() < EPSILON6 )&&( quat.z() < EPSILON6 ) )	{
-		return( vector_t( M_PI, 0.0, 0.0 ) );
+		return( gwiz::vector_t( M_PI, 0.0, 0.0 ) );
 	}
 #endif
 
-	quat_t q;
+	gwiz::quat_t q;
 	if( quat.w() < 0.0 )	{
 		q = quat.complement();
 	}
@@ -278,11 +278,12 @@ vector_t MeCtReachIK::quat2SwingTwist( quat_t& quat )
 	double swing_y = sinc2 * ( s * q.x() + c * q.y());
 	double twist = 2.0 * gamma;
 #endif
-	return( vector_t( ( swing_x ), ( swing_y ), ( twist ) ) );
+	return( gwiz::vector_t( ( swing_x ), ( swing_y ), ( twist ) ) );
 }
 
-quat_t MeCtReachIK::swingTwist2Quat( vector_t& sw )
+gwiz::quat_t MeCtReachIK::swingTwist2Quat( gwiz::vector_t& sw )
 {
+	using namespace gwiz;
 #ifdef INVERT_XZ
 	quat_t swing = quat_t( vector_t( 0.0, sw.x(), sw.y() ) );	
     quat_t result = swing * quat_t( sw.z(), vector_t( 1.0, 0.0, 0.0 ), 1);

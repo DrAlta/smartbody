@@ -90,12 +90,12 @@ class MeCtQuickDraw : public MeController	{
 		};
 
 		struct joint_state_t	{
-			vector_t	parent_pos; // world coord of immediate parent joint
-			quat_t		parent_rot;
-			vector_t	local_pos;
-			quat_t		local_rot;
-			vector_t	world_pos;
-			quat_t		world_rot;
+			gwiz::vector_t	parent_pos; // world coord of immediate parent joint
+			gwiz::quat_t		parent_rot;
+			gwiz::vector_t	local_pos;
+			gwiz::quat_t		local_rot;
+			gwiz::vector_t	world_pos;
+			gwiz::quat_t		world_rot;
 		};
 
 		SkMotion*            _gundraw_motion; 
@@ -109,14 +109,14 @@ class MeCtQuickDraw : public MeController	{
 		SrBuffer<int>        _arm_chan_indices; // arm channels in raw motion
 
 		SkSkeleton* 	skeleton_ref_p;
-		vector_t		point_target_pos;
+		gwiz::vector_t		point_target_pos;
 		char*			target_ref_joint_str;
 		SkJoint*		target_ref_joint_p;
 
 		float smooth;
 		int start;
 		double prev_time;
-		vector_t prev_w_point;
+		gwiz::vector_t prev_w_point;
 		
 		float curr_motion_dur;
 		float curr_motion_scale;
@@ -144,8 +144,8 @@ class MeCtQuickDraw : public MeController	{
 
 		int draw_mode;
 
-		quat_t   l_final_hand_in_body_rot;
-		quat_t   l_wrist_offset_rot;
+		gwiz::quat_t   l_final_hand_in_body_rot;
+		gwiz::quat_t   l_wrist_offset_rot;
 
 		float * interim_pose_buff_p;
 		
@@ -206,13 +206,13 @@ class MeCtQuickDraw : public MeController	{
 #endif
 
 	private:
-		quat_t get_final_joint_rot( SkMotion* mot_p, char *joint_name );
+		gwiz::quat_t get_final_joint_rot( SkMotion* mot_p, char *joint_name );
 		joint_state_t capture_joint_state( SkJoint *joint_p );
-		quat_t rotation_to_target( vector_t l_forward_dir, vector_t w_target_pos, joint_state_t* state_p );
+		gwiz::quat_t rotation_to_target( gwiz::vector_t l_forward_dir, gwiz::vector_t w_target_pos, joint_state_t* state_p );
 
 		SkJoint*	find_joint( char *joint_str, SkJoint **joint_pp );
 		SkJoint*	target_ref_joint( void );
-		vector_t	world_target_point( void );
+		gwiz::vector_t	world_target_point( void );
 		
 		void reset_blend( void );
 		

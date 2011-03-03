@@ -12,8 +12,8 @@ public:
 	virtual void update(MeCtIKScenario* scenario);
 
 public:
-	static vector_t quat2SwingTwist(quat_t& quat);
-	static quat_t   swingTwist2Quat(vector_t& quat);
+	static gwiz::vector_t quat2SwingTwist(gwiz::quat_t& quat);
+	static gwiz::quat_t   swingTwist2Quat(gwiz::vector_t& quat);
 	float getDt() const { return dt; }
 	void setDt(float val) { dt = val; }
 

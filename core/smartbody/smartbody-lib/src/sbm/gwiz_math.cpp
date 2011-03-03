@@ -20,14 +20,12 @@
  *      Marcus Thiebaux, USC
  */
 
-#define GWIZ_BLOCK_NAMESPACE_PATCH
 #include "gwiz_math.h"
-#undef GWIZ_BLOCK_NAMESPACE_PATCH
 
 //int gwiz::temp_read2( void ) { return( temp_test ); }
 
 using namespace gwiz;
-#define gw_float gwiz::float_t
+#define gw_float	gwiz::float_t // Ubuntu: float_t defined in mathdef.h
 
 //int temp_read2( void ) { return( temp_test ); }
 
@@ -41,6 +39,8 @@ using namespace gwiz;
 // SAFE TRIGONOMETRY:
 
 // need to use gwiz:: prefix to disambiguate definition within gwiz scope
+
+//float_t gwiz::safe_asin( float_t s ) { // OK on Windows
 gwiz::float_t gwiz::safe_asin( float_t s ) {
 
 	if( s >= safe_arc_threshold() ) s = safe_arc_threshold();
@@ -68,6 +68,8 @@ gwiz::float_t gwiz::safe_atan( float_t t ) {
 ////////////////////////////////
 // MATRIX UTILS
 
+//inline float_t determinant2x2(  // OK on Windows
+//	float_t a, gw_float b, 
 inline gw_float determinant2x2( 
 	gw_float a, gw_float b, 
 	gw_float c, gw_float d 
