@@ -20,33 +20,43 @@
  *      Marcus Thiebaux, USC
  */
 
+#define GWIZ_BLOCK_PATCH
 #include "gwiz_math.h"
+#undef GWIZ_BLOCK_PATCH
 
 #ifndef abs
 #define abs fabs
 #endif
 
+using namespace gwiz;
+
+//int temp_read2( void ) { return( temp_test ); }
+
 ////////////////////////////////
 // SAFE TRIGONOMETRY:
 
-gw_float_t GWIZ::safe_asin( gw_float_t s ) {
-	if( s >= GWIZ::safe_arc_threshold() ) s = GWIZ::safe_arc_threshold();
+// need to use gwiz:: prefix to disambiguate definition within gwiz scope
+gw_float_t gwiz::safe_asin( gw_float_t s ) {
+
+	if( s >= safe_arc_threshold() ) s = safe_arc_threshold();
 	else
-	if( s <= -GWIZ::safe_arc_threshold() ) s = -GWIZ::safe_arc_threshold();
+	if( s <= -safe_arc_threshold() ) s = -safe_arc_threshold();
 	return( asin( s ) );
 }
 
-gw_float_t GWIZ::safe_acos( gw_float_t c ) {
-	if( c >= GWIZ::safe_arc_threshold() ) c = GWIZ::safe_arc_threshold();
+gw_float_t gwiz::safe_acos( gw_float_t c ) {
+
+	if( c >= safe_arc_threshold() ) c = safe_arc_threshold();
 	else
-	if( c <= -GWIZ::safe_arc_threshold() ) c = -GWIZ::safe_arc_threshold();
+	if( c <= -safe_arc_threshold() ) c = -safe_arc_threshold();
 	return( acos( c ) );
 }
 
-gw_float_t GWIZ::safe_atan( gw_float_t t ) {
-	if( t >= GWIZ::safe_arc_threshold() ) t = GWIZ::safe_arc_threshold();
+gw_float_t gwiz::safe_atan( gw_float_t t ) {
+
+	if( t >= safe_arc_threshold() ) t = safe_arc_threshold();
 	else
-	if( t <= -GWIZ::safe_arc_threshold() ) t = -GWIZ::safe_arc_threshold();
+	if( t <= -safe_arc_threshold() ) t = -safe_arc_threshold();
 	return( atan( t ) );
 }
 
@@ -120,7 +130,7 @@ inline int inverse4x4( gw_float_t M_out[4][4], const gw_float_t M_in[4][4] )	{
 		gw_float_t det3 = determinant3x3( a2, a3, a4, b2, b3, b4, c2, c3, c4 );
 		
 		gw_float_t det4x4 = M_in[0][0] * det0 - M_in[0][1] * det1 + M_in[0][2] * det2 - M_in[0][3] * det3;
-		if( fabs( det4x4 ) < GWIZ::epsilon8() ) {
+		if( fabs( det4x4 ) < epsilon8() ) {
 			printf("inverse4x4 ERR: non-singular matrix\n");
 			return( 0 );
 		}
@@ -170,7 +180,7 @@ inline int invert4x4( gw_float_t M[4][4] )	{
 		gw_float_t det3 = determinant3x3( a2, a3, a4, b2, b3, b4, c2, c3, c4 );
 
 		gw_float_t det4x4 = M[0][0] * det0 - M[0][1] * det1 + M[0][2] * det2 - M[0][3] * det3;
-		if( fabs( det4x4 ) < GWIZ::epsilon8() ) {
+		if( fabs( det4x4 ) < epsilon8() ) {
 			printf("invert4x4 ERR: non-singular matrix\n");
 			return( 0 );
 		}
@@ -234,7 +244,7 @@ inline quat_t quatFrom4x4( const gw_float_t M[4][4] )   {
     register gw_float_t ww, xx, yy, rcp, qx, qy, qz, qw;
     
 		ww = 0.25*( 1.0 + M[0][0] + M[1][1] + M[2][2] );
-		if( ww > GWIZ::epsilon6() ) {
+		if( ww > epsilon6() ) {
 			qw = sqrt( ww );
 			rcp = 1.0 / ( 4.0*qw );
 			qx = ( M[1][2] - M[2][1] )*rcp;
@@ -244,7 +254,7 @@ inline quat_t quatFrom4x4( const gw_float_t M[4][4] )   {
 		else	{
 			qw = 0.0;
 			xx = -0.5*( M[1][1] + M[2][2] );
-			if( xx > GWIZ::epsilon6() )	{
+			if( xx > epsilon6() )	{
 				qx = sqrt( xx );
 				rcp = 1.0 / ( 2.0*qx );
 				qy = M[0][1]*rcp;
@@ -253,7 +263,7 @@ inline quat_t quatFrom4x4( const gw_float_t M[4][4] )   {
 			else    {
 				qx = 0.0;
 				yy = 0.5*( 1 - M[2][2] );
-				if( yy > GWIZ::epsilon6() ) {
+				if( yy > epsilon6() ) {
 					qy = sqrt( yy );
 					qz = M[1][2] / ( 2.0*qy );
 				}
@@ -272,7 +282,7 @@ inline quat_t quatFrom3x3( const vector_t col[3] )	{
     register gw_float_t ww, xx, yy, rcp, qx, qy, qz, qw;
 	
 		ww = 0.25*( 1.0 + col[0].x() + col[1].y() + col[2].z() );
-		if( ww > GWIZ::epsilon6() ) {
+		if( ww > epsilon6() ) {
 			qw = sqrt( ww );
 			rcp = 1.0 / ( 4.0*qw );
 			qx = ( col[1].z() - col[2].y() )*rcp;
@@ -282,7 +292,7 @@ inline quat_t quatFrom3x3( const vector_t col[3] )	{
 		else	{
 			qw = 0.0;
 			xx = -0.5*( col[1].y() + col[2].z() );
-			if( xx > GWIZ::epsilon6() )	{
+			if( xx > epsilon6() )	{
 				qx = sqrt( xx );
 				rcp = 1.0 / ( 2.0*qx );
 				qy = col[0].y()*rcp;
@@ -291,7 +301,7 @@ inline quat_t quatFrom3x3( const vector_t col[3] )	{
 			else    {
 				qx = 0.0;
 				yy = 0.5*( 1 - col[2].z() );
-				if( yy > GWIZ::epsilon6() ) {
+				if( yy > epsilon6() ) {
 					qy = sqrt( yy );
 					qz = col[1].z() / ( 2.0*qy );
 				}
@@ -312,8 +322,8 @@ inline euler_t eulerFrom4x4( const gw_float_t M[4][4] )	{
 	register gw_float_t ex_rad, ey_rad, ez_rad;
 
 		gw_float_t s = -M[2][1];
-        ex_rad = GWIZ::safe_asin( s );
-		if( ( 1.0 - fabs( s ) ) > GWIZ::epsilon6() )	{
+        ex_rad = safe_asin( s );
+		if( ( 1.0 - fabs( s ) ) > epsilon6() )	{
 			ey_rad = atan2( M[2][0], M[2][2] );
 			ez_rad = atan2( M[0][1], M[1][1] );
 		}
@@ -328,8 +338,8 @@ inline euler_t eulerFrom3x3( const vector_t col[3] )	{
 	register gw_float_t ex_rad, ey_rad, ez_rad;
 
 		gw_float_t s = -col[2].y();
-        ex_rad = GWIZ::safe_asin( s );
-		if( ( 1.0 - fabs( s ) ) > GWIZ::epsilon6() )	{
+        ex_rad = safe_asin( s );
+		if( ( 1.0 - fabs( s ) ) > epsilon6() )	{
 			ey_rad = atan2( col[2].x(), col[2].z() );
   			ez_rad = atan2( col[0].y(), col[1].y() );
 		}
@@ -350,9 +360,9 @@ inline euler_t eulerFromQuat( const quat_t& q )	{
 	register gw_float_t wy = q.w() * q.y(); 
 	register gw_float_t ex_rad, ey_rad, ez_rad;
 
-		gw_float_t s = -( 2.0 - GWIZ::epsilon6() ) * ( q.y() * q.z() - q.w() * q.x() );
-		ex_rad = GWIZ::safe_asin( s );
-		if( ( 1.0 - fabs( s ) ) > GWIZ::epsilon6() )	{
+		gw_float_t s = -( 2.0 - epsilon6() ) * ( q.y() * q.z() - q.w() * q.x() );
+		ex_rad = safe_asin( s );
+		if( ( 1.0 - fabs( s ) ) > epsilon6() )	{
 			ey_rad = atan2( 2.0*( xz + wy ), 1.0 - 2.0*( xx + yy ) );
 			ez_rad = atan2( 2.0*( q.x() * q.y() + q.w() * q.z() ), 1.0 - 2.0*( zz + xx ) );
 		}
@@ -384,9 +394,9 @@ inline quat_t interpolateQuat( gw_float_t t, const quat_t& q0, const quat_t& q_t
 		}
 #endif
 
-		if( ( 1.0 + co ) > GWIZ::epsilon6() )	{
-			if( ( 1.0 - co ) > GWIZ::epsilon6() )   {
-				gw_float_t om = GWIZ::safe_acos( co );
+		if( ( 1.0 + co ) > epsilon6() )	{
+			if( ( 1.0 - co ) > epsilon6() )   {
+				gw_float_t om = safe_acos( co );
 				gw_float_t rs = 1.0/sin( om );
 				s0 = sin( ( 1.0 - t )*om )*rs;
 				s1 = sin( t*om )*rs;
@@ -451,7 +461,7 @@ inline int decompose4x4General( const gw_float_t M[4][4], vector4_t* P, vector_t
 	register int i, j;
 	
 	/* Test for degeneracy. */
-		if( fabs( M[3][3] ) < GWIZ::epsilon8() )	{
+		if( fabs( M[3][3] ) < epsilon8() )	{
 			printf( "decompose4x4General NOTIFY: degenerate matrix: M[3][3] == 0.0\n" );
 			return( 0 );
 		}
@@ -464,7 +474,7 @@ inline int decompose4x4General( const gw_float_t M[4][4], vector4_t* P, vector_t
 			M_tmp[i][3] = M[i][3];
 		}
 
-		if( flag == GWIZ::COMP_UNKNOWN )	{
+		if( flag == COMP_UNKNOWN )	{
 
 		/* Normalize the matrix. */
 			gw_float_t inv_m33 = 1.0/M[3][3];
@@ -474,7 +484,7 @@ inline int decompose4x4General( const gw_float_t M[4][4], vector4_t* P, vector_t
 		
 		/* Test for singularity. */
 			gw_float_t det = determinant4x4( M_tmp );
-			if( fabs( det ) < GWIZ::epsilon8() )	{
+			if( fabs( det ) < epsilon8() )	{
 				printf( "decompose4x4General ERR: singular matrix: determinant4x4( M ) == 0.0\n" );
 				return( 0 );
 			}
@@ -483,9 +493,9 @@ inline int decompose4x4General( const gw_float_t M[4][4], vector4_t* P, vector_t
 	// PERSPECTIVE TRACE
 		if( P )	{
 			if( 
-				fabs( M_tmp[0][3] ) > GWIZ::epsilon6() || 
-				fabs( M_tmp[1][3] ) > GWIZ::epsilon6() ||
-				fabs( M_tmp[2][3] ) > GWIZ::epsilon6() 
+				fabs( M_tmp[0][3] ) > epsilon6() || 
+				fabs( M_tmp[1][3] ) > epsilon6() ||
+				fabs( M_tmp[2][3] ) > epsilon6() 
 				) {
 
 				matrix_t pmat;
@@ -534,12 +544,12 @@ inline int decompose4x4General( const gw_float_t M[4][4], vector4_t* P, vector_t
 			printf( "X-Z cos: %f\n", col[0].normal().dot( col[2].normal() ) );
 			printf( "Y-Z cos: %f\n", col[1].normal().dot( col[2].normal() ) );
 
-			printf( "X-Y angle: %f\n", DEG( GWIZ::safe_acos( col[0].normal().dot( col[1].normal() ) ) ) );
-			printf( "X-Z angle: %f\n", DEG( GWIZ::safe_acos( col[0].normal().dot( col[2].normal() ) ) ) );
-			printf( "Y-Z angle: %f\n", DEG( GWIZ::safe_acos( col[1].normal().dot( col[2].normal() ) ) ) );
+			printf( "X-Y angle: %f\n", DEG( safe_acos( col[0].normal().dot( col[1].normal() ) ) ) );
+			printf( "X-Z angle: %f\n", DEG( safe_acos( col[0].normal().dot( col[2].normal() ) ) ) );
+			printf( "Y-Z angle: %f\n", DEG( safe_acos( col[1].normal().dot( col[2].normal() ) ) ) );
 #endif
 
-			if( flag != GWIZ::COMP_M_TR )	{
+			if( flag != COMP_M_TR )	{
 				
 				gw_float_t Sh_xy = 1.0;
 				gw_float_t Sh_xz = 1.0;
@@ -551,7 +561,7 @@ inline int decompose4x4General( const gw_float_t M[4][4], vector4_t* P, vector_t
 					col[0] /= Sc_x;
 				
 			/* Compute XY shear factor and make 2nd col orthogonal to 1st. */
-				if( flag != GWIZ::COMP_M_TRS )	{
+				if( flag != COMP_M_TRS )	{
 					Sh_xy = col[0].dot( col[1] );
 					if( Sh_xy != 0.0 )
 						col[1] = col[1] - col[0] * Sh_xy;
@@ -561,12 +571,12 @@ inline int decompose4x4General( const gw_float_t M[4][4], vector4_t* P, vector_t
 				Sc_y = col[1].length();
 				if( Sc_y != 1.0 )	{
 					col[1] /= Sc_y;
-					if( flag != GWIZ::COMP_M_TRS )
+					if( flag != COMP_M_TRS )
 						Sh_xy /= Sc_y;
 				}
 	
 			/* Compute XZ and YZ shears, orthogonalize 3rd col. */
-				if( flag != GWIZ::COMP_M_TRS )	{
+				if( flag != COMP_M_TRS )	{
 					Sh_xz = col[0].dot( col[2] );
 					if( Sh_xz != 0.0 )
 						col[2] = col[2] - col[0] * Sh_xz;
@@ -595,14 +605,14 @@ inline int decompose4x4General( const gw_float_t M[4][4], vector4_t* P, vector_t
 		 */
 		 
 #if 0
-			printf( "X-Y angle: %f\n", DEG( GWIZ::safe_acos( col[0].dot( col[1] ) ) ) );
-			printf( "X-Z angle: %f\n", DEG( GWIZ::safe_acos( col[0].dot( col[2] ) ) ) );
-			printf( "Y-Z angle: %f\n", DEG( GWIZ::safe_acos( col[1].dot( col[2] ) ) ) );
+			printf( "X-Y angle: %f\n", DEG( safe_acos( col[0].dot( col[1] ) ) ) );
+			printf( "X-Z angle: %f\n", DEG( safe_acos( col[0].dot( col[2] ) ) ) );
+			printf( "Y-Z angle: %f\n", DEG( safe_acos( col[1].dot( col[2] ) ) ) );
 #endif
 		 
 			if( Sc || Q || E )	{
 
-				if( flag != GWIZ::COMP_M_TR )	{
+				if( flag != COMP_M_TR )	{
 				
 					if( Sc_z != 1.0 )	{
 						col[2] /= Sc_z;
@@ -674,28 +684,28 @@ inline int decompose4x4TRS( const gw_float_t M[4][4], vector_t* T, quat_t* Q, eu
 // CLASS MEMBERS
 ////////////////////////////////
 
-vector_t vector_t::normal( void ) const	{
+vector_t gwiz::vector_t::normal( void ) const	{
 	register gw_float_t len = length();
 
-		if( len < GWIZ::epsilon6() )
+		if( len < epsilon6() )
 			return( vector_t( 1.0, 0.0, 0.0 ) );
 		return( (*this) / len );
 }
 
-vector_t& vector_t::normalize( void )	{
+vector_t& gwiz::vector_t::normalize( void )	{
 	register gw_float_t len = length();
 
-		if( len < GWIZ::epsilon6() )
+		if( len < epsilon6() )
 			return( (*this) = vector_t( 1.0, 0.0, 0.0 ) );
 		return( (*this) /= len );
 }
 
 ////////////////////////////////
 
-quat_t::quat_t( const vector_t& axis_angle )	{
+gwiz::quat_t::quat_t( const vector_t& axis_angle )	{
 
 	gw_float_t rad = axis_angle.length();
-	if( rad < GWIZ::epsilon6() )	{
+	if( rad < epsilon6() )	{
 		*this = quat_t();
 	}
 	else	{
@@ -703,7 +713,7 @@ quat_t::quat_t( const vector_t& axis_angle )	{
 	}
 }
 
-quat_t::quat_t( gw_float_t angle, const vector_t& v, int use_radians )	{
+gwiz::quat_t::quat_t( gw_float_t angle, const vector_t& v, int use_radians )	{
 	gw_float_t rad_2;
 
 	if( use_radians )
@@ -723,7 +733,7 @@ quat_t::quat_t( gw_float_t angle, const vector_t& v, int use_radians )	{
 		*this = quat_t();
 }
 
-quat_t::quat_t( gw_float_t swing_x, gw_float_t swing_y, gw_float_t twist, int use_radians )	{
+gwiz::quat_t::quat_t( gw_float_t swing_x, gw_float_t swing_y, gw_float_t twist, int use_radians )	{
 	
 	quat_t swing;
 	if( use_radians )	{
@@ -735,12 +745,12 @@ quat_t::quat_t( gw_float_t swing_x, gw_float_t swing_y, gw_float_t twist, int us
 	*this = swing * quat_t( twist, vector_t( 0.0, 0.0, 1.0 ), use_radians );	
 }
 
-quat_t::quat_t( const vector_t& z_axis, const vector_t& y_axis_approx )	{
+gwiz::quat_t::quat_t( const vector_t& z_axis, const vector_t& y_axis_approx )	{
 
-	*this = matrixFromZY( z_axis, y_axis_approx ).quat( GWIZ::COMP_M_TR );
+	*this = matrixFromZY( z_axis, y_axis_approx ).quat( COMP_M_TR );
 }
 
-quat_t::quat_t( const euler_t& e ) {
+gwiz::quat_t::quat_t( const euler_t& e ) {
 
 	*this = 
 		quat_t( e.y(), vector_t( 0.0, 1.0, 0.0 ) ) *
@@ -748,15 +758,15 @@ quat_t::quat_t( const euler_t& e ) {
 		quat_t( e.z(), vector_t( 0.0, 0.0, 1.0 ) );
 }
 
-vector_t quat_t::swingtwist( int use_radians ) const	{
+vector_t gwiz::quat_t::swingtwist( int use_radians ) const	{
 
 	if( use_radians )	{
-		if( ( W < GWIZ::epsilon6() )&&( Z < GWIZ::epsilon6() ) )	{
+		if( ( W < epsilon6() )&&( Z < epsilon6() ) )	{
 			return( vector_t( M_PI, 0.0, 0.0 ) );
 		}
 	}
 	else	{
-		if( ( W < GWIZ::epsilon4() )&&( Z < GWIZ::epsilon4() ) )	{
+		if( ( W < epsilon4() )&&( Z < epsilon4() ) )	{
 			return( vector_t( 180.0, 0.0, 0.0 ) );
 		}
 	}
@@ -772,7 +782,7 @@ vector_t quat_t::swingtwist( int use_radians ) const	{
 	gw_float_t gamma = atan2( q.Z, q.W );
 	gw_float_t beta = atan2( sqrt( q.X*q.X + q.Y*q.Y ), sqrt( q.Z*q.Z + q.W*q.W ) );
 	gw_float_t sinc = 1.0;
-	if( beta > GWIZ::epsilon6() )	{
+	if( beta > epsilon6() )	{
 		sinc = sin( beta )/beta;
 	}
 	gw_float_t s = sin( gamma );
@@ -788,16 +798,16 @@ vector_t quat_t::swingtwist( int use_radians ) const	{
 	return( vector_t( DEG( swing_x ), DEG( swing_y ), DEG( twist ) ) );
 }
 
-quat_t& quat_t::normalize( void )	{
+quat_t& gwiz::quat_t::normalize( void )	{
 	register gw_float_t len = sqrt( W*W + X*X + Y*Y + Z*Z );
 
 #if 0
-		if( len < GWIZ::epsilon6() )
+		if( len < epsilon6() )
 			return( (*this) = quat_t( 1.0, 0.0, 0.0, 0.0 ) );
 		gw_float_t inv_len = 1.0/len;
 		return( (*this) = quat_t( W * inv_len, X * inv_len, Y * inv_len, Z * inv_len ) );
 #else
-		if( len < GWIZ::epsilon6() )	{
+		if( len < epsilon6() )	{
 			W = 1.0; X = 0.0; Y = 0.0; Z = 0.0;
 		}
 		else	{
@@ -808,7 +818,7 @@ quat_t& quat_t::normalize( void )	{
 #endif
 }
 
-quat_t quat_t::lerp( gw_float_t s, const quat_t& q ) const {
+quat_t gwiz::quat_t::lerp( gw_float_t s, const quat_t& q ) const {
 #if 1
 		return( interpolateQuat( s, *this, q.shortest( *this ) ) );
 #else
@@ -816,11 +826,11 @@ quat_t quat_t::lerp( gw_float_t s, const quat_t& q ) const {
 #endif
 }
 
-matrix_t quat_t::operator * ( const matrix_t& R ) const {
+matrix_t gwiz::quat_t::operator * ( const matrix_t& R ) const {
 		return( matrix_t( *this ) * R );
 }
 
-vector_t quat_t::operator * ( const vector_t& v ) const { 
+vector_t gwiz::quat_t::operator * ( const vector_t& v ) const { 
 
 	// optimized ?
 	//    q * vector4_t( v, 1.0 ) * -q ;
@@ -832,15 +842,15 @@ vector_t quat_t::operator * ( const vector_t& v ) const {
 
 ////////////////////////////////
 
-euler_t::euler_t( const vector_t& z_axis, gw_float_t roll_deg )	{
+gwiz::euler_t::euler_t( const vector_t& z_axis, gw_float_t roll_deg )	{
 	register gw_float_t ex_rad, ey_rad;
 	vector_t norm = z_axis.normal();
 		
 		gw_float_t s = -norm.y();
-		ex_rad = GWIZ::safe_asin( s );
+		ex_rad = safe_asin( s );
 		X = DEG( ex_rad );
 
-		if( ( 1.0 - fabs( s ) ) > GWIZ::epsilon6() )	{
+		if( ( 1.0 - fabs( s ) ) > epsilon6() )	{
 			ey_rad = atan2( -norm.z(), norm.x() );
 			Y = DEG( ey_rad ) + 90.0;
 			Z = roll_deg;
@@ -851,39 +861,39 @@ euler_t::euler_t( const vector_t& z_axis, gw_float_t roll_deg )	{
 		}
 }
 
-euler_t::euler_t( const vector_t& z_axis, const vector_t& y_axis_approx )	{
+gwiz::euler_t::euler_t( const vector_t& z_axis, const vector_t& y_axis_approx )	{
 
-	*this = matrixFromZY( z_axis, y_axis_approx ).euler( GWIZ::COMP_M_TR );
+	*this = matrixFromZY( z_axis, y_axis_approx ).euler( COMP_M_TR );
 }
 
-euler_t::euler_t( const quat_t& q )	{ 
+gwiz::euler_t::euler_t( const quat_t& q )	{ 
 
 		*this = eulerFromQuat( q );
 }
 
-euler_t euler_t::operator - ( void ) const { 
+euler_t gwiz::euler_t::operator - ( void ) const { 
 
 	// COMPARE: return( matrix_t( *this ).transposition() )
 		return ( -quat_t( *this ) ); 
 }
 
-matrix_t euler_t::operator * ( const matrix_t& R ) const {
+matrix_t gwiz::euler_t::operator * ( const matrix_t& R ) const {
 		return( matrix_t( *this ) * R );
 }
 
-vector_t euler_t::operator * ( const vector_t& v ) const { 
+vector_t gwiz::euler_t::operator * ( const vector_t& v ) const { 
 		return( matrix_t( *this ) * v );
 }
 
 ////////////////////////////////
 
-matrix_t::matrix_t( const quat_t& q )	{
+gwiz::matrix_t::matrix_t( const quat_t& q )	{
 	
 		stack = 0x0;
 		matrix4x4FromQuat( M, q );
 }
 
-matrix_t::matrix_t( const euler_t& e )	{
+gwiz::matrix_t::matrix_t( const euler_t& e )	{
 
 // buggy:
 //		*this = quat_t( e );
@@ -893,7 +903,7 @@ matrix_t::matrix_t( const euler_t& e )	{
 		matrix4x4FromQuat( M, quat_t( e ) );
 }
 
-matrix_t matrix_t::inverse( void )	const {
+matrix_t gwiz::matrix_t::inverse( void )	const {
 	matrix_t tmp;
 		
 		if( inverse4x4( tmp.M, M ) == 0 )	{
@@ -902,7 +912,7 @@ matrix_t matrix_t::inverse( void )	const {
 		return( tmp );
 }
 
-matrix_t& matrix_t::invert( void )	{
+matrix_t& gwiz::matrix_t::invert( void )	{
 		
 		if( invert4x4( M ) == 0 )	{
 			matrix_t tmp;
@@ -913,7 +923,7 @@ matrix_t& matrix_t::invert( void )	{
 
 ////////
 
-matrix_t& matrix_t::frustum( gw_float_t l, gw_float_t r, gw_float_t b, gw_float_t t, gw_float_t n, gw_float_t f )	{
+matrix_t& gwiz::matrix_t::frustum( gw_float_t l, gw_float_t r, gw_float_t b, gw_float_t t, gw_float_t n, gw_float_t f )	{
 		M[0][0] = ( 2.0 * n )/( r - l );
 		M[0][1] = 0.0;
 		M[0][2] = 0.0;
@@ -933,11 +943,11 @@ matrix_t& matrix_t::frustum( gw_float_t l, gw_float_t r, gw_float_t b, gw_float_
 		return( *this );
 }
 
-matrix_t& matrix_t::frustum( const vector_t& L_B_N, const vector_t& R_T_F )	{
+matrix_t& gwiz::matrix_t::frustum( const vector_t& L_B_N, const vector_t& R_T_F )	{
 		return( frustum( L_B_N.x(), R_T_F.x(), L_B_N.y(), R_T_F.y(), L_B_N.z(), R_T_F.z() ) );
 }
 
-matrix_t& matrix_t::frustum( const vector_t& B_L_dir, const vector_t& R_T_dir, gw_float_t near, gw_float_t far )	{
+matrix_t& gwiz::matrix_t::frustum( const vector_t& B_L_dir, const vector_t& R_T_dir, gw_float_t near, gw_float_t far )	{
 		vector_t norm = B_L_dir.normal();
 		vector_t BL = norm * ( -near / norm.z() );
 		norm = R_T_dir.normal();
@@ -945,13 +955,13 @@ matrix_t& matrix_t::frustum( const vector_t& B_L_dir, const vector_t& R_T_dir, g
 		return( frustum( BL.x(), TR.x(), BL.y(), TR.y(), near, far ) );
 }
 
-matrix_t& matrix_t::frustum( gw_float_t fovy, gw_float_t aspect, gw_float_t near, gw_float_t far )	{
+matrix_t& gwiz::matrix_t::frustum( gw_float_t fovy, gw_float_t aspect, gw_float_t near, gw_float_t far )	{
 		gw_float_t T = near * tan( RAD( fovy * 0.5 ) );
 		gw_float_t R = aspect * T;
 		return( frustum( -R, R, -T, T, near, far ) );
 }
 
-matrix_t& matrix_t::translator( const vector_t& t )	{
+matrix_t& gwiz::matrix_t::translator( const vector_t& t )	{
 		identity();
 		M[3][0] = t.x();
 		M[3][1] = t.y();
@@ -959,15 +969,15 @@ matrix_t& matrix_t::translator( const vector_t& t )	{
 		return( *this );
 }
 
-matrix_t& matrix_t::rotator( const quat_t& q )	{
+matrix_t& gwiz::matrix_t::rotator( const quat_t& q )	{
 		return( *this = q );
 }
 
-matrix_t& matrix_t::rotator( const euler_t& e )	{
+matrix_t& gwiz::matrix_t::rotator( const euler_t& e )	{
 		return( *this = e );
 }
 
-matrix_t& matrix_t::shearer( const vector_t& s )	{
+matrix_t& gwiz::matrix_t::shearer( const vector_t& s )	{
 		identity();
 		M[1][0] = s.x();
 		M[2][0] = s.y();
@@ -975,7 +985,7 @@ matrix_t& matrix_t::shearer( const vector_t& s )	{
 		return( *this );
 }
 
-matrix_t& matrix_t::scaler( const vector_t& s )	{
+matrix_t& gwiz::matrix_t::scaler( const vector_t& s )	{
 		identity();
 		M[0][0] = s.x();
 		M[1][1] = s.y();
@@ -983,7 +993,7 @@ matrix_t& matrix_t::scaler( const vector_t& s )	{
 		return( *this );
 }
 
-matrix_t& matrix_t::lineator( const vector_t& x, const vector_t& y, const vector_t& z )	{
+matrix_t& gwiz::matrix_t::lineator( const vector_t& x, const vector_t& y, const vector_t& z )	{
 		identity();
 		col( 0, x, 0.0 );
 		col( 1, y, 0.0 );
@@ -993,18 +1003,18 @@ matrix_t& matrix_t::lineator( const vector_t& x, const vector_t& y, const vector
 
 ////////
 
-int matrix_t::decompose( vector4_t* P, vector_t* T, quat_t* Q, euler_t * E, vector_t* Sh, vector_t* Sc, int flag ) const	{
+int gwiz::matrix_t::decompose( vector4_t* P, vector_t* T, quat_t* Q, euler_t * E, vector_t* Sh, vector_t* Sc, int flag ) const	{
 
-		if( flag == GWIZ::COMP_M_TR )	{
-			if( T ) *T = translation( GWIZ::COMP_M_TR );
+		if( flag == COMP_M_TR )	{
+			if( T ) *T = translation( COMP_M_TR );
 			if( Q || E )	{
-				quat_t q = quat( GWIZ::COMP_M_TR );
+				quat_t q = quat( COMP_M_TR );
 				if( Q ) *Q = q;
 				if( E ) *E = q;
 			}
 			return( 1 );
 		}
-		if( flag == GWIZ::COMP_M_TRS )	{
+		if( flag == COMP_M_TRS )	{
 			return( decompose4x4TRS( M, T, Q, E, Sc ) );
 		}
 		return( decompose4x4General( M, P, T, Q, E, Sh, Sc, flag ) );
@@ -1012,16 +1022,16 @@ int matrix_t::decompose( vector4_t* P, vector_t* T, quat_t* Q, euler_t * E, vect
 
 ////////
 
-vector4_t matrix_t::perspective( int flag ) const	{
+vector4_t gwiz::matrix_t::perspective( int flag ) const	{
 
 		vector4_t P;
 		decompose( &P, 0x0, 0x0, 0x0, 0x0, 0x0, flag );
 		return( P );
 }
 
-vector_t matrix_t::translation( int flag ) const	{
+vector_t gwiz::matrix_t::translation( int flag ) const	{
 
-		if( flag == GWIZ::COMP_UNKNOWN )	{
+		if( flag == COMP_UNKNOWN )	{
 			vector_t T;
 			decompose( 0x0, &T, 0x0, 0x0, 0x0, 0x0, flag );
 			return( T );
@@ -1029,40 +1039,40 @@ vector_t matrix_t::translation( int flag ) const	{
 		return( vector_t( M[3][0], M[3][1], M[3][2] ) );
 }
 
-quat_t matrix_t::quat( int flag ) const	{
+quat_t gwiz::matrix_t::quat( int flag ) const	{
 
-		if( flag == GWIZ::COMP_M_TR )	{
+		if( flag == COMP_M_TR )	{
 			return( quatFrom4x4( M ) );
 		}
 		quat_t Q;
-		if( flag == GWIZ::COMP_M_TRS )
+		if( flag == COMP_M_TRS )
 			decompose4x4TRS( M, 0x0, &Q, 0x0, 0x0 );
 		else
 			decompose( 0x0, 0x0, &Q, 0x0, 0x0, 0x0, flag );
 		return( Q );
 }
 
-euler_t matrix_t::euler( int flag ) const	{
+euler_t gwiz::matrix_t::euler( int flag ) const	{
 
-		if( flag == GWIZ::COMP_M_TR )	{
+		if( flag == COMP_M_TR )	{
 			return( eulerFrom4x4( M ) );
 		}
 		euler_t E;
-		if( flag == GWIZ::COMP_M_TRS )
+		if( flag == COMP_M_TRS )
 			decompose4x4TRS( M, 0x0, 0x0, &E, 0x0 );
 		else
 			decompose( 0x0, 0x0, 0x0, &E, 0x0, 0x0, flag );
 		return( E );
 }
 
-vector_t matrix_t::shearing( int flag ) const	{
+vector_t gwiz::matrix_t::shearing( int flag ) const	{
 
 		vector_t Sh;
 		decompose( 0x0, 0x0, 0x0, 0x0, &Sh, 0x0, flag );
 		return( Sh );
 }
 
-vector_t matrix_t::scaling( int flag ) const	{
+vector_t gwiz::matrix_t::scaling( int flag ) const	{
 
 		vector_t Sc;
 		decompose( 0x0, 0x0, 0x0, 0x0, 0x0, &Sc, flag );
@@ -1092,11 +1102,11 @@ void read_gwiz_composition( vector_t T, euler_t E, vector_t S )	{
 		& e, 
 		NULL, 
 		& s, 
-//		GWIZ::COMP_UNKNOWN 
-//		GWIZ::COMP_M_PTRSH 
-//		GWIZ::COMP_M_TRSH 
-		GWIZ::COMP_M_TRS 
-//		GWIZ::COMP_M_TR 
+//		COMP_UNKNOWN 
+//		COMP_M_PTRSH 
+//		COMP_M_TRSH 
+		COMP_M_TRS 
+//		COMP_M_TR 
 	);
 	
 	printf( "\n" );

@@ -23,6 +23,8 @@
 #include "me_ct_gaze_alg.h"
 #include <vhcl_log.h>
 
+using namespace gwiz;
+
 ///////////////////////////////////////////////////////////////////////////
 
 vector_t find_nearest_point_on_line(
@@ -171,15 +173,15 @@ LOG( "-- --\n" );
 		}
 
 		vector_t axis = Fd.cross( RX );
-		gw_float_t angle = DEG( GWIZ::safe_acos( Fd.normal().dot( RX.normal() ) ) );
+		gw_float_t angle = deg( safe_acos( Fd.normal().dot( RX.normal() ) ) );
 		return( quat_t( angle, axis ) );
 	}
 
 	// rho: angle from RX to X-tangent-plane
-	gw_float_t rho = DEG( GWIZ::safe_acos( r / d ) );
+	gw_float_t rho = deg( safe_acos( r / d ) );
 
 	// gamma: angle from RX to RT
-	gw_float_t gamma = DEG( GWIZ::safe_acos( RX.normal().dot( RT.normal() ) ) );
+	gw_float_t gamma = deg( safe_acos( RX.normal().dot( RT.normal() ) ) );
 
 	// Aaxis: axis perpendicular to RX and RT
 	vector_t Aaxis = RT.cross( RX );
@@ -202,7 +204,7 @@ LOG( "-- --\n" );
 		alpha = gamma - rho;
 	}
 #elif 0
-	gw_float_t kappa = DEG( GWIZ::safe_acos( Fd.normal().dot( RX.normal() ) ) );
+	gw_float_t kappa = deg( safe_acos( Fd.normal().dot( RX.normal() ) ) );
 	gw_float_t alpha;
 	if( heading_only && ( kappa > 90.0 ) )	{
 		alpha = gamma + rho;
@@ -221,7 +223,7 @@ LOG( "-- --\n" );
 
 	// beta: rotation to align new forward with new tangent
 
-	gw_float_t beta = DEG( GWIZ::safe_acos( newF.normal().dot( ( X - newT ).normal() ) ) );
+	gw_float_t beta = deg( safe_acos( newF.normal().dot( ( X - newT ).normal() ) ) );
 	if( beta > 0.0 )	{
 
 		// Baxis: axis to which beta is implicitly applied
