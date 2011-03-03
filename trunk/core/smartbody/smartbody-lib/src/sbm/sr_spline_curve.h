@@ -8,7 +8,7 @@
 class srSplineCurve {
 
 	private:
-	class Key : public GWIZ::ctrl_key	{
+	class Key : public gwiz::ctrl_key	{
 		
 		public:
 			Key( double p, double v ) 
@@ -25,7 +25,7 @@ class srSplineCurve {
 			Key *next_p;
 //			Node *node_p; for link editing
 	};
-	class Node : public GWIZ::tempordinal_key	{
+	class Node : public gwiz::tempordinal_key	{
 		
 		public:
 			Node( void ) {

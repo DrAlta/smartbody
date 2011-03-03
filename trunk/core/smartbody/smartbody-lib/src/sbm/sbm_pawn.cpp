@@ -913,7 +913,7 @@ WSP_ERROR SbmPawn::wsp_position_accessor( const std::string id, const std::strin
 			}
 		}
 
-		vector_t pos = m.translation( GWIZ::COMP_M_TR );
+		vector_t pos = m.translation( gwiz::COMP_M_TR );
 
 		value.x = pos.x();
 		value.y = pos.y();
@@ -952,7 +952,7 @@ WSP_ERROR SbmPawn::wsp_rotation_accessor( const std::string id, const std::strin
 			}
 		}
 
-		quat_t quat = m.quat( GWIZ::COMP_M_TR );
+		quat_t quat = m.quat( gwiz::COMP_M_TR );
 
 		value.x = quat.x();
 		value.y = quat.y();

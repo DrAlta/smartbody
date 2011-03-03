@@ -111,8 +111,8 @@ void MeCtGazeJoint::capture_joint_state( void ) {
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}		
-		local_pos = M.translation( GWIZ::COMP_M_TR );
-		local_rot = M.quat( GWIZ::COMP_M_TR );
+		local_pos = M.translation( gwiz::COMP_M_TR );
+		local_rot = M.quat( gwiz::COMP_M_TR );
 
 		sr_M = joint_p->gmat();
 		for( i=0; i<4; i++ )	{
@@ -120,8 +120,8 @@ void MeCtGazeJoint::capture_joint_state( void ) {
 				M.set( i, j, sr_M.get( i, j ) );
 			}
 		}
-		world_pos = M.translation( GWIZ::COMP_M_TR );
-		world_rot = M.quat( GWIZ::COMP_M_TR );
+		world_pos = M.translation( gwiz::COMP_M_TR );
+		world_rot = M.quat( gwiz::COMP_M_TR );
 
 		SkJoint* parent_p = joint_p->parent();
 		if( parent_p )	{
@@ -132,8 +132,8 @@ void MeCtGazeJoint::capture_joint_state( void ) {
 					M.set( i, j, sr_M.get( i, j ) );
 				}
 			}
-			parent_loc_pos = M.translation( GWIZ::COMP_M_TR );
-			parent_loc_rot = M.quat( GWIZ::COMP_M_TR );
+			parent_loc_pos = M.translation( gwiz::COMP_M_TR );
+			parent_loc_rot = M.quat( gwiz::COMP_M_TR );
 
 			sr_M = parent_p->gmat();
 			for( i=0; i<4; i++ )	{
@@ -141,8 +141,8 @@ void MeCtGazeJoint::capture_joint_state( void ) {
 					M.set( i, j, sr_M.get( i, j ) );
 				}
 			}
-			parent_pos = M.translation( GWIZ::COMP_M_TR );
-			parent_rot = M.quat( GWIZ::COMP_M_TR );
+			parent_pos = M.translation( gwiz::COMP_M_TR );
+			parent_rot = M.quat( gwiz::COMP_M_TR );
 		}
 		else	{
 			const char *name = joint_p->name();
@@ -242,7 +242,7 @@ quat_t MeCtGazeJoint::rotation_to_target( vector_t target_pos )	{
 	vector_t w_forward_dir_n = parent_rot * forward_rot * forward_ref.normal();
 	vector_t target_dir_n = ( target_pos - world_pos ).normal();
 
-	gw_float_t angle = DEG( GWIZ::safe_acos( w_forward_dir_n.dot( target_dir_n ) ) );
+	gw_float_t angle = DEG( gwiz::safe_acos( w_forward_dir_n.dot( target_dir_n ) ) );
 	vector_t axis = w_forward_dir_n.cross( target_dir_n ).normal();
 
 	return( ( -parent_rot ) * quat_t( angle, axis ) * ( parent_rot ) );
@@ -252,7 +252,7 @@ quat_t MeCtGazeJoint::rotation_to_target( vector_t target_pos )	{
 	vector_t forward_dir_n = forward_rot * forward_ref.normal();
 	vector_t l_target_dir_n = ( -parent_rot ) * ( target_pos - world_pos ).normal();
 
-	gw_float_t angle = DEG( GWIZ::safe_acos( forward_dir_n.dot( l_target_dir_n ) ) );
+	gw_float_t angle = DEG( gwiz::safe_acos( forward_dir_n.dot( l_target_dir_n ) ) );
 	vector_t axis = forward_dir_n.cross( l_target_dir_n ).normal();
 
 	return( quat_t( angle, axis ) );
@@ -269,7 +269,7 @@ quat_t MeCtGazeJoint::rotation_to_target( vector_t target_pos )	{
 	vector_t forward_dir_n = forward_rot * forward_ref.normal();
 	vector_t target_dir_n = ( target_pos - world_pos ).normal();
 
-	float angle = (float)DEG( GWIZ::safe_acos( forward_dir_n.dot( target_dir_n ) ) );
+	float angle = (float)DEG( gwiz::safe_acos( forward_dir_n.dot( target_dir_n ) ) );
 	vector_t axis = forward_dir_n.cross( target_dir_n ).normal();
 	
 //	quat_t Q = quat_t( -45.0, vector_t( 0.0, 1.0, 0.0 ) );
@@ -298,7 +298,7 @@ quat_t MeCtGazeJoint::rotation_to_target( vector_t target_pos )	{
 	vector_t forward_dir_n = ( -forward_ph ) * forward_ref.normal();
 	vector_t target_dir_n = ( target_pos - world_pos ).normal();
 
-	float angle = (float)DEG( GWIZ::safe_acos( forward_dir_n.dot( target_dir_n ) ) );
+	float angle = (float)DEG( gwiz::safe_acos( forward_dir_n.dot( target_dir_n ) ) );
 	vector_t axis = forward_dir_n.cross( target_dir_n ).normal();
 	
 	return( ( -parent_rot ) * quat_t( angle, axis ) * forward_roll );

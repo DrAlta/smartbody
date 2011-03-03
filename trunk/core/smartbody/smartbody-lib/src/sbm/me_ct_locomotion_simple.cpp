@@ -17,14 +17,18 @@
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
  *
  *  CONTRIBUTORS:
- *      Andrew n marshall, USC
+ *      
  */
 
 #include "me_ct_locomotion_simple.hpp"
-
 #include "sbm_character.hpp"
-#include "gwiz_math.h"
 #include "limits.h"
+#include "gwiz_math.h"
+
+#define USE_GWIZ_NAMESPACE		0
+#if USE_GWIZ_NAMESPACE
+using namespace gwiz;
+#endif
 
 
 const char* MeCtLocomotionSimple::TYPE = "MeCtLocomotionSimple";
@@ -104,15 +108,29 @@ bool MeCtLocomotionSimple::controller_evaluate( double time, MeFrameData& frame 
 	}
 	last_time = time;
 
-	const vector3_t UP_VECTOR( 0, 1, 0 );
+
+#if USE_GWIZ_NAMESPACE
+	vector3_t test2;
+//	gwiz::vector_t error; 
+#else
+//	vector3_t error; // undefined
+//	gwiz::vector_t error; // conflicts with interim case: #define vector_t gwiz::vector_t
+#endif
+//	gw_vector_t error;
+	vector_t test1;
+	gwiz::vector3_t test0;
+
+	// const vector_t UP_VECTOR( 0, 1, 0 ); // for now, this or:
+	const gwiz::vector3_t UP_VECTOR( 0, 1, 0 );
 
 	if( is_valid ) {
 		SrBuffer<float>& buffer = frame.buffer(); // convenience reference
 
 		// Read inputs
-		vector3_t world_pos( buffer[ bi_world_x ], buffer[ bi_world_y ], buffer[ bi_world_z ] );
+		gwiz::vector3_t world_pos( buffer[ bi_world_x ], buffer[ bi_world_y ], buffer[ bi_world_z ] );
 		quat_t    world_rot( buffer[ bi_world_rot ], buffer[ bi_world_rot+1 ], buffer[ bi_world_rot+2 ], buffer[ bi_world_rot+3 ] );
-		vector3_t loco_vel( buffer[ bi_loco_vel_x ], buffer[ bi_loco_vel_y ], buffer[ bi_loco_vel_z ] );
+
+		gwiz::vector3_t loco_vel( buffer[ bi_loco_vel_x ], buffer[ bi_loco_vel_y ], buffer[ bi_loco_vel_z ] );
 		euler_t   loco_drot( 0, DEG( buffer[ bi_loco_rot_y ] ), 0 );
 
 		// Position Calc

@@ -234,6 +234,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\gwiz_spline.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\Heightfield.cpp"
 				>
 			</File>

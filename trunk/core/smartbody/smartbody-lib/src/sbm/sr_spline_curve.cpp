@@ -24,6 +24,8 @@
 //#include <sbm/sr_spline_curve.h>
 #include "sr_spline_curve.h"
 
+using namespace gwiz;
+
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 
@@ -98,9 +100,9 @@ double srSplineCurve::evaluate( double t, bool *cropped_p ) {
 	if( node_p )	{
 		Node *next_p = node_p->next();
 		if( next_p )	{
-			return( GWIZ::hermite( t, *node_p, *next_p ) );
+			return( hermite( t, *node_p, *next_p ) );
 		}
-		if( t < ( node_p->p() + GWIZ::epsilon8() ) ) {
+		if( t < ( node_p->p() + epsilon8() ) ) {
 			// capture end node
 			return( node_p->v() );
 		}

@@ -234,8 +234,8 @@ void MeCtStepTurn::capture_world_offset_state( void )	{
 						}
 					}
 					
-					world_offset_pos = M.translation( GWIZ::COMP_M_TR );
-					world_offset_rot = M.quat( GWIZ::COMP_M_TR );
+					world_offset_pos = M.translation( gwiz::COMP_M_TR );
+					world_offset_rot = M.quat( gwiz::COMP_M_TR );
 					return;
 				}
 				LOG( "MeCtStepTurn::capture_world_offset_state ERR: '%s' joint is NULL\n", SbmPawn::WORLD_OFFSET_JOINT_NAME );
