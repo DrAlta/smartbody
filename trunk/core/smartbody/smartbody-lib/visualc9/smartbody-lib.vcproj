@@ -414,6 +414,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\sr_curve_builder.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\sr_hash_map.cpp"
 				>
 			</File>

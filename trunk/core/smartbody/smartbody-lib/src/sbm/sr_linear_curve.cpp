@@ -21,7 +21,9 @@
  */
 
 #include <math.h>
-#include <sbm/sr_linear_curve.h>
+//#include <sbm/sr_linear_curve.h>
+#include "sr_linear_curve.h"
+#include "sr_curve_builder.h"
 
 #if ENABLE_OBJ_KEY_CT
 int srLinearCurve::objective_key_count = 0;
@@ -146,6 +148,7 @@ void srLinearCurve::print( void )	{
 //////////////////////////////////////////////////////////////////
 
 void srLinearCurve::clear( void )	{
+
 	Key *key_p = head_p;
 	while( key_p ) {
 		Key *tmp_p = key_p;
@@ -382,7 +385,8 @@ double srLinearCurve::head_boundary( double t, bool *cropped_p ) {
 				return( max_value );
 			}
 		default:
-			LOG( "srLinearCurve::head_boundary ERR: bound-mode %d not recognized", head_bound_mode );
+//			LOG( "srLinearCurve::head_boundary ERR: bound-mode %d not recognized", head_bound_mode );
+			printf( "srLinearCurve::head_boundary ERR: bound-mode %d not recognized\n", head_bound_mode );
 	}
 	return( 0.0 );
 }
@@ -430,7 +434,8 @@ double srLinearCurve::tail_boundary( double t, bool *cropped_p ) {
 				return( max_value );
 			}
 		default:
-			LOG( "srLinearCurve::tail_boundary ERR: bound-mode %d not recognized", tail_bound_mode );
+//			LOG( "srLinearCurve::tail_boundary ERR: bound-mode %d not recognized", tail_bound_mode );
+			printf( "srLinearCurve::tail_boundary ERR: bound-mode %d not recognized\n", tail_bound_mode );
 	}
 	return( 0.0 );
 }
@@ -558,19 +563,20 @@ void srLinearCurve::update( void )	{
 
 	dirty = false;
 	if( c != key_count )	{
-		LOG( "srLinearCurve::update ERR: corruption: counted %d of %d keys", c, key_count );
+//		LOG( "srLinearCurve::update ERR: corruption: counted %d of %d keys", c, key_count );
+		printf( "srLinearCurve::update ERR: corruption: counted %d of %d keys\n", c, key_count );
 	}
 }
 
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 
-#if 1
+#if 0
 
 void test_linear_curve( void )	{
 	srLinearCurve curve;
-	srCurveBuilder builder;
 	
+	srCurveBuilder builder;
 	srLinearCurve *curve_p = builder.get_std_hump_curve( &curve, 10 );
 	if( curve_p )	{
 		curve_p->print();
@@ -580,6 +586,21 @@ void test_linear_curve( void )	{
 	if( curve_p )	{
 		curve_p->print();
 	}
+
+#if 1
+	srSplineCurve spline;
+	spline.insert( 0.0, 2.0 );
+	spline.insert( 1.0, 1.0 );
+	spline.insert( 3.0, 3.5 );
+	spline.insert( 5.0, 3.0 );
+	spline.insert( 6.0, 2.0 );
+	
+	builder.set_input_range( 0.0, 6.0 );
+	curve_p = builder.get_spline_curve( &curve, spline, 10 );
+	if( curve_p )	{
+		curve_p->print();
+	}
+#endif
 }
 #endif
 

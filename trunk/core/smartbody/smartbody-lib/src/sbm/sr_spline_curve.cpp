@@ -90,6 +90,7 @@ void srSplineCurve::clear_nodes( void )	{
 		printf( "node_count ERR: %d\n", node_count );
 	}
 	head_node_p = NULL;
+	tail_node_p = NULL;
 }
 
 double srSplineCurve::evaluate( double t, bool *cropped_p ) {
@@ -155,10 +156,13 @@ void srSplineCurve::update( void ) {
 		Key *key2_p = key1_p->next();
 
 		head_node_p = new Node;
+		tail_node_p = head_node_p;
 		increment_node();
 		Node *node_p = head_node_p;
 
 		while( node_p ) {
+
+			// NOTE:
 			node_p->catmullrom( (*key0_p), (*key1_p), (*key2_p) );
 
 			key0_p = key1_p;
@@ -167,6 +171,7 @@ void srSplineCurve::update( void ) {
 
 			if( key2_p )	{
 				Node *next_p = new Node;
+				tail_node_p = next_p;
 				increment_node();
 				node_p->next( next_p );
 				node_p = next_p;
