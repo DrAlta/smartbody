@@ -46,12 +46,14 @@ class srSplineCurve {
 		bool dirty;
 
 		Key *head_key_p;
+//		Key *tail_key_p; // to query duration
 //		Key *curr_key_p; // rapid local repeat access: to investigate
 		Key *curr_edit_key_p;
 		Key *curr_query_key_p;
 		Node *curr_query_node_p;
 		
 		Node *head_node_p;
+		Node *tail_node_p;
 
 		void null( void )	{
 			init();
@@ -61,7 +63,13 @@ class srSplineCurve {
 			node_count = 0;
 			dirty = false;
 			head_key_p = NULL;
+//			tail_key_p = NULL;
+//			curr_key_p = NULL;
+			curr_edit_key_p = NULL;
+			curr_query_key_p = NULL;
+			curr_query_node_p = NULL;
 			head_node_p = NULL;
+			tail_node_p = NULL;
 		}
 
 	public:
@@ -130,6 +138,18 @@ class srSplineCurve {
 			double *ml_p, double *mr_p, 
 			double *dl_p, double *dr_p
 			) { return( query_next_node( t_p, v_p, ml_p, mr_p, dl_p, dr_p, false ) ); }
+
+		bool query_span( double *t_fr_p, double *t_to_p ) {
+			if( head_node_p )	{
+				if( tail_node_p )	{
+					if( t_fr_p ) *t_fr_p = head_node_p->p();
+					if( t_to_p ) *t_to_p = tail_node_p->p();
+					return( true );
+				}
+				printf( "srSplineCurve ERR: head without tail!\n" );
+			}
+			return( false );
+		}
 };
 
 #endif
