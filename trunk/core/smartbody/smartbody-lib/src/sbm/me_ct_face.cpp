@@ -355,26 +355,26 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 							else
 							if( ch_type == SkChannel::Quat )	{
 
-								quat_t accum_q(
+								gwiz::quat_t accum_q(
 									fbuffer[ base_ch_index ],
 									fbuffer[ base_ch_index + 1 ],
 									fbuffer[ base_ch_index + 2 ],
 									fbuffer[ base_ch_index + 3 ]
 								);
-								quat_t base_q( 
+								gwiz::quat_t base_q( 
 									base_pose_buff_p[ baseBufferIndex ], 
 									base_pose_buff_p[ baseBufferIndex + 1 ], 
 									base_pose_buff_p[ baseBufferIndex + 2 ], 
 									base_pose_buff_p[ baseBufferIndex + 3 ] 
 								);
-								quat_t key_q( 
+								gwiz::quat_t key_q( 
 									key_pose_buff_p[ pose_var_index ], 
 									key_pose_buff_p[ pose_var_index + 1 ], 
 									key_pose_buff_p[ pose_var_index + 2 ], 
 									key_pose_buff_p[ pose_var_index + 3 ] 
 								);
 
-								quat_t result_q = ( ( key_q * -base_q ) * key_weight ) * accum_q;
+								gwiz::quat_t result_q = ( ( key_q * -base_q ) * key_weight ) * accum_q;
 
 								fbuffer[ base_ch_index ] = (float)result_q.w();
 								fbuffer[ base_ch_index + 1 ] = (float)result_q.x();

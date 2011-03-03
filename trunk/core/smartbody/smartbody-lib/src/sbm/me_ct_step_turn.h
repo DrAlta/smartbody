@@ -99,8 +99,8 @@ class MeCtStepTurn : public MeController	{
 		SkSkeleton* 	skeleton_ref_p;
 		float * interim_pose_buff_p;
 		
-		vector_t world_offset_pos; // joint state at controller-start
-		quat_t   world_offset_rot;
+		gwiz::vector_t world_offset_pos; // joint state at controller-start
+		gwiz::quat_t   world_offset_rot;
 		
 		joint_param_index_t world_offset_chan;
 		joint_param_index_t world_offset_idx;

@@ -23,8 +23,6 @@
 #ifndef GWIZ_MATH_H
 #define GWIZ_MATH_H
 
-#define ENABLE_NAMESPACE_PATCH 1
-
 /*
 #include "gwiz.h"
 
@@ -33,10 +31,10 @@
 // Vector geometry wizard... a precursor to Geometric Algebra: algebraic geometry
 
 // NOTES...
-//typedef vector_t	vector3_t;
-//typedef quat_t		quaternion_t;
-//typedef euler_t		eulerPHR_t;
-//typedef matrix_t	matrix4x4_t;
+	typedef vector_t	vector3_t;
+	typedef quat_t		quaternion_t;
+	typedef euler_t		eulerPHR_t;
+	typedef matrix_t	matrix4x4_t;
 
 	namespace gwiz	{
 
@@ -177,8 +175,7 @@ namespace gwiz {
 		public:
 			ctrl_key( void ) { set( 0.0, 0.0 ); }
 			ctrl_key( float_t p_in, float_t v_in )	{ set( p_in, v_in ); }
-	// for kicks (testing)
-	~ctrl_key( void ) { param = 0.0; }
+
 			void set( float_t p_in, float_t v_in )	{ param = p_in; value = v_in; }
 			float_t p( void ) const { return( param ); }
 			float_t v( void ) const { return( value ); }
@@ -259,12 +256,10 @@ namespace gwiz {
 	float_t hermite( const float_t t, const cardinal_key& K1, const cardinal_key& K2 );
 
 	float_t hermite( const float_t t, const tempordinal_key& K1, const tempordinal_key& K2 );
-} // namespace gwiz
 
 ////////////////////////////////
 
-namespace gwiz {
-
+	// namespace gwiz{} continued:
 class vector_t {
 
     public:
@@ -935,17 +930,3 @@ class matrix_t {
 ////////////////////////////////
 #endif //GWIZ_MATH_H
 
-#if ENABLE_NAMESPACE_PATCH
-#ifndef GWIZ_BLOCK_NAMESPACE_PATCH
-
-//#define	float_t	gwiz::float_t	// FAIL on Ubuntu: float_t defined in mathdef.h
-//#define 	gw_float	gwiz::float_t // used locally by bgwiz_math.cpp...
-//#define 	gw_float_t	gwiz::float_t // cleared from ::scope
-
-#define 	vector_t	gwiz::vector_t
-#define 	quat_t		gwiz::quat_t
-#define 	euler_t 	gwiz::euler_t
-//#define 	matrix_t	gwiz::matrix_t // cleared from ::scope
-
-#endif
-#endif

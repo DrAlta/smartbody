@@ -57,42 +57,42 @@ class MeCtGazeJoint	{
 		void init( SkJoint* j_p );
 		void start( void );
 		
-		vector_t	forward_pos;
-		vector_t	forward_ref; // default forward direction
-		quat_t		forward_rot;
+		gwiz::vector_t	forward_pos;
+		gwiz::vector_t	forward_ref; // default forward direction
+		gwiz::quat_t		forward_rot;
 		
-		vector_t	local_pos;
-		quat_t		local_rot;
-		quat_t		prev_local_rot;
+		gwiz::vector_t	local_pos;
+		gwiz::quat_t		local_rot;
+		gwiz::quat_t		prev_local_rot;
 		
-		vector_t	world_pos;
-		quat_t		world_rot;
-		quat_t		prev_world_rot; // to measure absolute speed of head
+		gwiz::vector_t	world_pos;
+		gwiz::quat_t		world_rot;
+		gwiz::quat_t		prev_world_rot; // to measure absolute speed of head
 		float t_elapse;
 	
-		vector_t	parent_loc_pos; // local coord of immediate parent joint
-		quat_t		parent_loc_rot;
+		gwiz::vector_t	parent_loc_pos; // local coord of immediate parent joint
+		gwiz::quat_t		parent_loc_rot;
 
-		vector_t	parent_pos; // world coord of immediate parent joint
-		quat_t		parent_rot;
+		gwiz::vector_t	parent_pos; // world coord of immediate parent joint
+		gwiz::quat_t		parent_rot;
 
-		quat_t	evaluate( float dt, vector_t target_pos, quat_t off_rot, float scale_factor = 1.0 );
-		quat_t	evaluate( float dt, quat_t target_rot, quat_t off_rot, float scale_factor = 1.0 );
+		gwiz::quat_t	evaluate( float dt, gwiz::vector_t target_pos, gwiz::quat_t off_rot, float scale_factor = 1.0 );
+		gwiz::quat_t	evaluate( float dt, gwiz::quat_t target_rot, gwiz::quat_t off_rot, float scale_factor = 1.0 );
 		
 	private:
 		void	capture_joint_state( void );
-		quat_t	rotation_to_target( vector_t target_pos );
-		quat_t	rotation_to_target( quat_t target_rot );
+		gwiz::quat_t	rotation_to_target( gwiz::vector_t target_pos );
+		gwiz::quat_t	rotation_to_target( gwiz::quat_t target_rot );
 		
-//		quat_t	constrain_box( quat_t task_rot );
-//		quat_t	constrain_swing( quat_t task_rot );
-//		quat_t	constrain_quat( quat_t task_rot );
-		quat_t	constrain_ellipse( quat_t task_rot );
+//		gwiz::quat_t	constrain_box( gwiz::quat_t task_rot );
+//		gwiz::quat_t	constrain_swing( gwiz::quat_t task_rot );
+//		gwiz::quat_t	constrain_quat( gwiz::quat_t task_rot );
+		gwiz::quat_t	constrain_ellipse( gwiz::quat_t task_rot );
 		
-		quat_t	constrain_quat_speed( float dt, quat_t task_rot );
-		quat_t	constrain_smooth( float dt, quat_t task_rot );
+		gwiz::quat_t	constrain_quat_speed( float dt, gwiz::quat_t task_rot );
+		gwiz::quat_t	constrain_smooth( float dt, gwiz::quat_t task_rot );
 
-		quat_t	constrain( float dt, quat_t task_rot );
+		gwiz::quat_t	constrain( float dt, gwiz::quat_t task_rot );
 
 		SkJoint* joint_p;
 };

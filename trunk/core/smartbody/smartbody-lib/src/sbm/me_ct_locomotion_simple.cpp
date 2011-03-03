@@ -25,8 +25,7 @@
 #include "limits.h"
 #include "gwiz_math.h"
 
-#define USE_GWIZ_NAMESPACE		0
-#if USE_GWIZ_NAMESPACE
+#if 0
 using namespace gwiz;
 #endif
 
@@ -108,17 +107,6 @@ bool MeCtLocomotionSimple::controller_evaluate( double time, MeFrameData& frame 
 	}
 	last_time = time;
 
-#if USE_GWIZ_NAMESPACE
-	vector3_t test2;
-//	gwiz::vector_t error; 
-#else
-//	vector3_t error; // correct: undefined
-//	gwiz::vector_t error; // conflicts with interim case: #define vector_t gwiz::vector_t
-#endif
-	vector_t test1;
-	gwiz::vector3_t test0;
-
-	// const vector_t UP_VECTOR( 0, 1, 0 ); // for now, this or:
 	const gwiz::vector3_t UP_VECTOR( 0, 1, 0 );
 
 	if( is_valid ) {
@@ -126,17 +114,17 @@ bool MeCtLocomotionSimple::controller_evaluate( double time, MeFrameData& frame 
 
 		// Read inputs
 		gwiz::vector3_t world_pos( buffer[ bi_world_x ], buffer[ bi_world_y ], buffer[ bi_world_z ] );
-		quat_t    world_rot( buffer[ bi_world_rot ], buffer[ bi_world_rot+1 ], buffer[ bi_world_rot+2 ], buffer[ bi_world_rot+3 ] );
+		gwiz::quat_t    world_rot( buffer[ bi_world_rot ], buffer[ bi_world_rot+1 ], buffer[ bi_world_rot+2 ], buffer[ bi_world_rot+3 ] );
 
 		gwiz::vector3_t loco_vel( buffer[ bi_loco_vel_x ], buffer[ bi_loco_vel_y ], buffer[ bi_loco_vel_z ] );
-		euler_t   loco_drot( 0, DEG( buffer[ bi_loco_rot_y ] ), 0 );
+		gwiz::euler_t   loco_drot( 0, DEG( buffer[ bi_loco_rot_y ] ), 0 );
 
 		// Position Calc
 		world_pos += ( loco_vel * time_delta );
 
 		// Rotation Calc
 		loco_drot *= time_delta;
-		world_rot = quat_t( loco_drot ) * world_rot;
+		world_rot = gwiz::quat_t( loco_drot ) * world_rot;
 
 		// Write Results
 		buffer[ bi_world_x ] = (float)world_pos.x();

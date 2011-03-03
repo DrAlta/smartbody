@@ -27,17 +27,17 @@
 
 //////////////////////////////////////////////////////////////////////////
 
-quat_t rotation_ray_to_target_orient(
-	quat_t Q,     // target orientation
-	vector_t Fd,  // forward ray direction
-	vector_t Fr = vector_t( 0.0, 0.0, 1.0 ) // null reference ray direction
+gwiz::quat_t rotation_ray_to_target_orient(
+	gwiz::quat_t Q,     // target orientation
+	gwiz::vector_t Fd,  // forward ray direction
+	gwiz::vector_t Fr = gwiz::vector_t( 0.0, 0.0, 1.0 ) // null reference ray direction
 );
 
-quat_t rotation_ray_to_target_point(
-	vector_t X,   			// target
-	vector_t R,   			// center of rotation
-	vector_t Fo,  			// forward ray origin
-	vector_t Fd,  			// forward ray direction
+gwiz::quat_t rotation_ray_to_target_point(
+	gwiz::vector_t X,   			// target
+	gwiz::vector_t R,   			// center of rotation
+	gwiz::vector_t Fo,  			// forward ray origin
+	gwiz::vector_t Fd,  			// forward ray direction
 	gwiz::float_t buffer_ratio = 0.1,	// proportion of buffer zone for pathological case
 	int heading_only = false
 );

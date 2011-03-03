@@ -38,12 +38,12 @@ class MeCtTether : public MeController	{
 		SkSkeleton* 	    _skeleton_ref_p;
 		
 		struct joint_state_t	{
-//			vector_t	parent_pos; // world coord of immediate parent joint
+//			gwiz::vector_t	parent_pos; // world coord of immediate parent joint
 //			quat_t		parent_rot;
-			vector_t	local_pos;
-			quat_t		local_rot;
-			vector_t	world_pos;
-			quat_t		world_rot;
+			gwiz::vector_t	local_pos;
+			gwiz::quat_t		local_rot;
+			gwiz::vector_t	world_pos;
+			gwiz::quat_t		world_rot;
 		};
 
 	public:
@@ -78,8 +78,8 @@ class MeCtTether : public MeController	{
 		char*		source_ref_joint_str;
 		SkJoint*	source_ref_joint_p;
 
-		vector_t	offset_pos;
-		quat_t		offset_rot;
+		gwiz::vector_t	offset_pos;
+		gwiz::quat_t		offset_rot;
 
 		// callbacks for the base class
 		virtual void context_updated( void );

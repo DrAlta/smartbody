@@ -21,6 +21,8 @@
  */
 
 #include "gwiz_math.h"
+using namespace gwiz;
+
 #include "me_ct_eyelid.h"
 #include <vhcl_log.h>
 

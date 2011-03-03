@@ -4108,7 +4108,7 @@ int mcu_commapi_func( srArgBuffer& args, mcuCBHandle *mcu_p )
          float y = args.read_float();
          float z = args.read_float();
 
-         quat_t q = euler_t( x, y, z );
+         gwiz::quat_t q = gwiz::euler_t( x, y, z );
 
          mcu_p->bonebus.SetCameraRotation( (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z() );
 

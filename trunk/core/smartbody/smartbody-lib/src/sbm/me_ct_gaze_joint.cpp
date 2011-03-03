@@ -22,6 +22,7 @@
 
 #include "me_ct_gaze_joint.h"
 #include "me_ct_gaze_alg.h"
+using namespace gwiz;
 #include <vhcl_log.h>
 
 #include <SR/sr_alg.h>
