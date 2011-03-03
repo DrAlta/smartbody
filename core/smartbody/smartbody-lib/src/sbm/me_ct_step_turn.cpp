@@ -224,7 +224,7 @@ void MeCtStepTurn::capture_world_offset_state( void )	{
 					joint_p->update_gmat_up();
 
 					SrMat sr_M;
-					matrix_t M;
+					gwiz::matrix_t M;
 					int i, j;
 
 					sr_M = joint_p->gmat();

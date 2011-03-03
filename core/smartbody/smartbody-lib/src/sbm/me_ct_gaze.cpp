@@ -23,6 +23,7 @@
  */
 
 #include "me_ct_gaze.h"
+using namespace gwiz;
 #include <vhcl_log.h>
 
 //#define DFL_GAZE_HEAD_SPEED 180.0
@@ -454,7 +455,7 @@ LOG( "CALC: joint: %s\n", joint_label( priority_joint ) );
 	joint_p->update_gmat_up();
 
 	SrMat sr_M;
-	matrix_t M;
+	gwiz::matrix_t M;
 	int i, j;
 	
 	sr_M = joint_p->gmat();
@@ -557,7 +558,7 @@ void MeCtGaze::inspect_skeleton_local_transform_down( SkJoint* joint_p, int dept
 	
 	if( joint_p )	{
 		const char *name = joint_p->name();
-		matrix_t M;
+		gwiz::matrix_t M;
 		int i, j, c;
 
 		SrMat sr_M = joint_p->lmat();
@@ -589,7 +590,7 @@ void MeCtGaze::inspect_skeleton_world_transform_down( SkJoint* joint_p, int dept
 	
 	if( joint_p )	{
 		const char *name = joint_p->name();
-		matrix_t M;
+		gwiz::matrix_t M;
 		int i, j, c;
 
 		joint_p->update_gmat_up();
@@ -622,7 +623,7 @@ void MeCtGaze::inspect_skeleton_local_transform_up( SkJoint* joint_p, int depth 
 	
 	if( joint_p )	{
 		const char *name = joint_p->name();
-		matrix_t M;
+		gwiz::matrix_t M;
 		int i, j, c;
 
 		SrMat sr_M = joint_p->lmat();
@@ -727,11 +728,11 @@ printf( "s2: %f\n", joint_arr[ GAZE_JOINT_SPINE2 ].local_pos.y() );
 printf( "s1: %f\n", joint_arr[ GAZE_JOINT_SPINE1 ].local_pos.y() );
 #endif
 
-	gw_float_t interocular = 
+	float_t interocular = 
 		joint_arr[ GAZE_JOINT_EYE_L ].local_pos.x() - 
 		joint_arr[ GAZE_JOINT_EYE_R ].local_pos.x();
 		
-	gw_float_t height;
+	float_t height;
 	
 	height = 
 		joint_arr[ GAZE_JOINT_EYE_L ].local_pos.y() +
@@ -818,7 +819,7 @@ vector_t MeCtGaze::world_target_point( void )	{
 	SkJoint* joint_p = reference_joint();
 	if( joint_p )	{
 		SrMat sr_M;
-		matrix_t M;
+		gwiz::matrix_t M;
 		int i, j;
 		
 		joint_p->update_gmat_up();
@@ -845,7 +846,7 @@ quat_t MeCtGaze::world_target_orient( void )	{
 	SkJoint* joint_p = reference_joint();
 	if( joint_p )	{
 		SrMat sr_M;
-		matrix_t M;
+		gwiz::matrix_t M;
 		int i, j;
 		
 		joint_p->update_gmat_up();
@@ -958,7 +959,7 @@ void MeCtGaze::controller_start_evaluate( void )	{
 			joint_arr[ GAZE_JOINT_SKULL ].forward_rot;
 		
 		quat_t head_task_rot = ( -body_head_rot ).product( body_task_rot );
-		gw_float_t head_task_deg = head_task_rot.degrees();
+		float_t head_task_deg = head_task_rot.degrees();
 		head_speed = (float)( head_task_deg / head_time );
 //LOG( "MeCtGaze::controller_start TASK: %f deg  %f dps\n", head_task_deg, head_speed );
 	}

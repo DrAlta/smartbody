@@ -1310,7 +1310,7 @@ void SbmCharacter::inspect_skeleton_local_transform( SkJoint* joint_p, int depth
 	
 	if( joint_p )	{
 		const char *name = joint_p->name();
-		matrix_t M;
+		gwiz::matrix_t M;
 		int i, j;
 
 		SrMat sr_M = joint_p->lmat();
@@ -1340,7 +1340,7 @@ void SbmCharacter::inspect_skeleton_world_transform( SkJoint* joint_p, int depth
 	
 	if( joint_p )	{
 		const char *name = joint_p->name();
-		matrix_t M;
+		gwiz::matrix_t M;
 		int i, j;
 
 		joint_p->update_gmat_up();

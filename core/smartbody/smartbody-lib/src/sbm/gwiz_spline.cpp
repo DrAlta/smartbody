@@ -43,27 +43,27 @@ void gwiz::tempordinal_key::simple(
 	const ctrl_key& k1, 
 	const ctrl_key& k2 
 )	{
-	gw_float_t m = ( k2.v() - k0.v() ) / ( k2.p() - k0.p() );
+	float_t m = ( k2.v() - k0.v() ) / ( k2.p() - k0.p() );
 	set( k1.p(), k1.v(), m, m, 1.0, 1.0 );
 }
 
 void gwiz::tempordinal_key::cardinal(
-	gw_float_t c,
+	float_t c,
 	const ctrl_key& k0,
 	const ctrl_key& k1,
 	const ctrl_key& k2
 )	{
-	gw_float_t m = ( 1.0 - c ) * ( k2.v() - k0.v() ) / ( k2.p() - k0.p() );
+	float_t m = ( 1.0 - c ) * ( k2.v() - k0.v() ) / ( k2.p() - k0.p() );
 	set( k1.p(), k1.v(), m, m, k1.p() - k0.p(), k2.p() - k1.p() );
 }
 
 void gwiz::tempordinal_key::cardinal_alt(
-	gw_float_t c,
+	float_t c,
 	const ctrl_key& k0,
 	const ctrl_key& k1,
 	const ctrl_key& k2
 )	{
-	gw_float_t m = 0.5 * (
+	float_t m = 0.5 * (
 		( k2.v() - k1.v() ) / ( k2.p() - k1.p() ) +
 		( k1.v() - k0.v() ) / ( k1.p() - k0.p() )
 	);
@@ -71,19 +71,19 @@ void gwiz::tempordinal_key::cardinal_alt(
 }
 
 void gwiz::tempordinal_key::kochbartels(
-	gw_float_t tension,
-	gw_float_t bias,
-	gw_float_t continuity,
+	float_t tension,
+	float_t bias,
+	float_t continuity,
 	const ctrl_key& k0,
 	const ctrl_key& k1,
 	const ctrl_key& k2
 )	{
-	gw_float_t dv0 = k1.v() - k0.v();
-	gw_float_t dv1 = k2.v() - k1.v();
-	gw_float_t m0 = 
+	float_t dv0 = k1.v() - k0.v();
+	float_t dv1 = k2.v() - k1.v();
+	float_t m0 = 
 		0.5 * ( 1.0 - tension ) * ( 1.0 + bias ) * ( 1.0 + continuity ) * dv0 +
 		0.5 * ( 1.0 - tension ) * ( 1.0 - bias ) * ( 1.0 - continuity ) * dv1;
-	gw_float_t m1 = 
+	float_t m1 = 
 		0.5 * ( 1.0 - tension ) * ( 1.0 + bias ) * ( 1.0 - continuity ) * dv0 +
 		0.5 * ( 1.0 - tension ) * ( 1.0 - bias ) * ( 1.0 + continuity ) * dv1;
 	set( k1.p(), k1.v(), m0, m1, k1.p() - k0.p(), k2.p() - k1.p() );
@@ -91,7 +91,7 @@ void gwiz::tempordinal_key::kochbartels(
 
 ////////////////////////////////
 
-float_t gwiz::bezier(
+gwiz::float_t gwiz::bezier(
 	float_t s, // unit interpolant
 	float_t f0,
 	float_t f1,
@@ -105,12 +105,12 @@ float_t gwiz::bezier(
 	return( C + s*( ( B + s*( ( f2 + s*( f3 - f2 ) ) - B ) ) - C ) );
 }
 
-gw_float_t gwiz::hermite(
-	gw_float_t s,
-	gw_float_t v1,
-	gw_float_t v2,
-	gw_float_t m1,
-	gw_float_t m2
+gwiz::float_t gwiz::hermite(
+	float_t s,
+	float_t v1,
+	float_t v2,
+	float_t m1,
+	float_t m2
 ) {
 #if 1
 		return(
@@ -124,8 +124,8 @@ gw_float_t gwiz::hermite(
 		);
 #elif 0
 	// equivalents...
-		register gw_float_t s_2 = s * s;
-		register gw_float_t s_3 = s_2 * s;
+		register float_t s_2 = s * s;
+		register float_t s_3 = s_2 * s;
 		return(
 			v1 * ( 2.0 * s_3 - 3.0 * s_2 + 1.0 ) +
 			m1 * ( s_3 - 2.0 * s_2 + s ) +
@@ -144,19 +144,19 @@ gw_float_t gwiz::hermite(
 #endif
 }
 
-gw_float_t gwiz::hermite(
-	const gw_float_t t, 
+gwiz::float_t gwiz::hermite(
+	const float_t t, 
 	const cardinal_key& K1, 
 	const cardinal_key& K2 
 )	{
-	gw_float_t s = ( t - K1.p() ) / ( K2.p() - K1.p() );
+	float_t s = ( t - K1.p() ) / ( K2.p() - K1.p() );
 	return(
 		hermite( s, K1.v(), K2.v(), K1.mr(), K2.ml() )
 	);
 }
 
-gw_float_t gwiz::hermite(
-	const gw_float_t t, 
+gwiz::float_t gwiz::hermite(
+	const float_t t, 
 	const tempordinal_key& K1, 
 	const tempordinal_key& K2 
 )	{
@@ -165,10 +165,10 @@ gw_float_t gwiz::hermite(
 //	if( t < K1.t )
 //	if( t >= K2.t )
 
-	gw_float_t s = ( t - K1.p() ) / ( K2.p() - K1.p() ); // normalize parametric interpolant
+	float_t s = ( t - K1.p() ) / ( K2.p() - K1.p() ); // normalize parametric interpolant
 	// FaceFX algorithm from http://www.facefx.com/documentation/2010/W99
-	gw_float_t m1 = K1.mr() * K1.dr();
-	gw_float_t m2 = K2.ml() * K2.dl();
+	float_t m1 = K1.mr() * K1.dr();
+	float_t m2 = K2.ml() * K2.dl();
 	return(
 		hermite( s, K1.v(), K2.v(), m1, m2 )
 	);

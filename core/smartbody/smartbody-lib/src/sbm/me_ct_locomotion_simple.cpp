@@ -108,15 +108,13 @@ bool MeCtLocomotionSimple::controller_evaluate( double time, MeFrameData& frame 
 	}
 	last_time = time;
 
-
 #if USE_GWIZ_NAMESPACE
 	vector3_t test2;
 //	gwiz::vector_t error; 
 #else
-//	vector3_t error; // undefined
+//	vector3_t error; // correct: undefined
 //	gwiz::vector_t error; // conflicts with interim case: #define vector_t gwiz::vector_t
 #endif
-//	gw_vector_t error;
 	vector_t test1;
 	gwiz::vector3_t test0;
 

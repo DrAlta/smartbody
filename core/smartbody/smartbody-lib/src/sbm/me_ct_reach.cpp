@@ -85,7 +85,7 @@ SrVec MeCtReach::get_reach_target()
 		if( target_joint_ref )	
 		{
 			SrMat sr_M;
-			matrix_t M;			
+//			matrix_t M;			
 			target_joint_ref->update_gmat_up();
 			sr_M = target_joint_ref->gmat();			
 			target = SrVec(sr_M.get(12),sr_M.get(13),sr_M.get(14));			
