@@ -166,10 +166,18 @@ gwiz::float_t gwiz::hermite(
 //	if( t >= K2.t )
 
 	float_t s = ( t - K1.p() ) / ( K2.p() - K1.p() ); // normalize parametric interpolant
-	// FaceFX algorithm from http://www.facefx.com/documentation/2010/W99
+	// FaceFX algorithm from 
+	//	http://www.facefx.com/documentation/2010/W99
+
 	float_t m1 = K1.mr() * K1.dr();
 	float_t m2 = K2.ml() * K2.dl();
+
+//	double h = hermite( s, K1.v(), K2.v(), m1, m2 );
+//if( s >= 1.0 ) printf( "herm: s:%.12f\n", s );
+//if( h < 1.001 ) printf( "herm: h:%.12f\n", h );
+
 	return(
+//		h
 		hermite( s, K1.v(), K2.v(), m1, m2 )
 	);
 }

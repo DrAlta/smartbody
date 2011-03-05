@@ -3,50 +3,48 @@
 
 #include "gwiz_math.h"
 
-// class srRapidCurve { srLinearCurve, srSplineCurve }
-
 class srSplineCurve {
 
 	private:
-	class Key : public gwiz::ctrl_key	{
-		
-		public:
-			Key( double p, double v ) 
-			:	ctrl_key( p, v ) {
-				next_p = NULL;
-			}
-			~Key( void )	{}
-			void print( int i ) ;
-			void next( Key *set_p ) { next_p = set_p; }
-			Key *next( void ) { return( next_p ); }
-//			Node *node( void ) { return( node_p ); }
 
-		private:
-			Key *next_p;
-//			Node *node_p; for link editing
-	};
-	class Node : public gwiz::tempordinal_key	{
-		
-		public:
-			Node( void ) {
-				next_p = NULL;
-			}
-			~Node( void )	{}
-			void print( int i );
-			void next( Node *set_p ) { next_p = set_p; }
-			Node *next( void ) { return( next_p ); }
-			
-		private:
-			Node *next_p;
-	};
-
-//	private:
 		int key_count;
 		int node_count;
 		bool dirty;
 
+		class Key : public gwiz::ctrl_key	{
+
+			public:
+				Key( double p, double v ) 
+				:	ctrl_key( p, v ) {
+					next_p = NULL;
+				}
+				~Key( void )	{}
+				void print( int i ) ;
+				void next( Key *set_p ) { next_p = set_p; }
+				Key *next( void ) { return( next_p ); }
+				// Node *node( void ) { return( node_p ); }
+
+			private:
+				Key *next_p;
+				// Node *node_p; for link editing
+		};
+		class Node : public gwiz::tempordinal_key	{
+
+			public:
+				Node( void ) {
+					next_p = NULL;
+				}
+				~Node( void )	{}
+				void print( int i );
+				void next( Node *set_p ) { next_p = set_p; }
+				Node *next( void ) { return( next_p ); }
+
+			private:
+				Node *next_p;
+		};
+
 		Key *head_key_p;
-//		Key *tail_key_p; // to query duration
+//		Key *tail_key_p; // ?
 //		Key *curr_key_p; // rapid local repeat access: to investigate
 		Key *curr_edit_key_p;
 		Key *curr_query_key_p;
@@ -65,11 +63,11 @@ class srSplineCurve {
 			head_key_p = NULL;
 //			tail_key_p = NULL;
 //			curr_key_p = NULL;
+			head_node_p = NULL;
+			tail_node_p = NULL;
 			curr_edit_key_p = NULL;
 			curr_query_key_p = NULL;
 			curr_query_node_p = NULL;
-			head_node_p = NULL;
-			tail_node_p = NULL;
 		}
 
 	public:
@@ -88,10 +86,11 @@ class srSplineCurve {
 			return( insert_key( new Key( p, v ) ) );
 		}
 		void clear( void );
-		void clear_nodes( void );
 		double evaluate( double t, bool *cropped_p = NULL );
 
 	protected:
+
+		void clear_nodes( void );
 
 		bool insert_key( Key *key_p );
 		void insert_head_key( Key *key_p ) ;
@@ -117,6 +116,7 @@ class srSplineCurve {
 			{ return( edit_next( t, v, false ) ); }
 
 		void query_reset( void )	{ 
+			if( dirty ) update();
 			curr_query_key_p = head_key_p; 
 			curr_query_node_p = head_node_p; 
 		}
@@ -140,6 +140,7 @@ class srSplineCurve {
 			) { return( query_next_node( t_p, v_p, ml_p, mr_p, dl_p, dr_p, false ) ); }
 
 		bool query_span( double *t_fr_p, double *t_to_p ) {
+			if( dirty ) update();
 			if( head_node_p )	{
 				if( tail_node_p )	{
 					if( t_fr_p ) *t_fr_p = head_node_p->p();
@@ -151,5 +152,4 @@ class srSplineCurve {
 			return( false );
 		}
 };
-
 #endif

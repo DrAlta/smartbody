@@ -74,6 +74,8 @@ void srSplineCurve::clear( void )	{
 		printf( "key_count ERR: %d\n", key_count );
 	}
 	clear_nodes();
+	curr_edit_key_p = NULL;
+	curr_query_key_p = NULL;
 	init();
 }
 
@@ -91,23 +93,55 @@ void srSplineCurve::clear_nodes( void )	{
 	}
 	head_node_p = NULL;
 	tail_node_p = NULL;
+	curr_query_node_p = NULL;
 }
+
+///////
+#define DEBUG_END_COND	0
+///////
 
 double srSplineCurve::evaluate( double t, bool *cropped_p ) {
 
-	if( dirty ) update();
+	if( dirty ) update(); // always...
 	if( cropped_p ) { *cropped_p = false; }
 	Node *node_p = find_floor_node( t );
+	
 	if( node_p )	{
+
+//double v = node_p->v(); if( v < 0.01 ) printf( "EVAL A: t:%f v:%f\n", t, v );
+
 		Node *next_p = node_p->next();
+
 		if( next_p )	{
-			return( hermite( t, *node_p, *next_p ) );
+			double h = hermite( t, *node_p, *next_p );
+
+//if( h < 0.01 ) printf( "eval: t:%f h:%f\n", t, h );
+			return( h );
 		}
-		if( t < ( node_p->p() + epsilon8() ) ) {
+
+//printf( "-\n" );
+//		double t_node = ( node_p->p() + epsilon8() );
+		double t_node = ( node_p->p() + epsilon4() );
+//		double t_node = node_p->p();
+//		double t_node = node_p->p() + 0.001;
+
+		if( t <= t_node ) {
+
 			// capture end node
-			return( node_p->v() );
+			double v = node_p->v();
+
+//if( v < 0.01 ) printf( "eval: t:%f <end>:%f\n", t, v );
+			return( v );
 		}
+		
+#if DEBUG_END_COND
+printf( "eval: t:%f <drop>: %.12f :(%.12f)\n", t, t_node, t - t_node );
+#endif
 	}
+#if DEBUG_END_COND
+else { printf( "eval: t:%f [crop]\n", t ); }
+#endif
+
 	if( cropped_p ) { *cropped_p = true; }
 	return( 0.0 );
 }
@@ -189,7 +223,7 @@ void srSplineCurve::update( void ) {
 
 srSplineCurve::Key *srSplineCurve::find_floor_key( double t )	{
 
-	// if( dirty ) update(); /* only if it affects search */
+//	if( dirty ) update(); /* only if it affects search */
 	Key *key_p = head_key_p;
 	if( key_p ) {
 		if( t < key_p->p() )	{
@@ -215,9 +249,13 @@ srSplineCurve::Key *srSplineCurve::find_floor_key( double t )	{
 
 srSplineCurve::Node *srSplineCurve::find_floor_node( double t )	{
 
+	if( dirty ) update();
 	Node *node_p = head_node_p;
 	if( node_p ) {
 		if( t < node_p->p() )	{
+#if DEBUG_END_COND
+printf( "find: t:%f -clip-\n", t );
+#endif
 			return( NULL );
 		}
 	}
@@ -225,6 +263,10 @@ srSplineCurve::Node *srSplineCurve::find_floor_node( double t )	{
 		Node *next_p = node_p->next();
 		if( next_p )	{
 			if( t < next_p->p() ) {
+
+//double v = node_p->v(); if( v < 0.01 ) printf( "find A: t:%f v:%f\n", t, v );
+//if( node_p == NULL ) printf( "find: t:%f NULL\n", t );
+
 				return( node_p );
 			}
 			else	{
@@ -232,9 +274,16 @@ srSplineCurve::Node *srSplineCurve::find_floor_node( double t )	{
 			}
 		}
 		else	{
+
+//double v = node_p->v(); if( v < 0.01 ) printf( "find B: t:%f v:%f\n", t, v );
+//if( node_p == NULL ) printf( "find: t:%f NULL\n", t );
+
 			return( node_p );
 		}
 	}
+#if DEBUG_END_COND
+printf( "find: t:%f =drop=\n", t );
+#endif
 	return( NULL );
 }
 
