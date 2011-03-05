@@ -143,6 +143,40 @@ class srCurveBuilder	{
 			return( get_cos_curve( new srLinearCurve, alpha, beta ) );
 		}
 
+		srLinearCurve *get_resample_curve( 
+			srLinearCurve *curve_p, 
+			srLinearCurve& source, 
+			int num_segs,
+			bool auto_span = true
+			)	{
+			
+			set_resolution( num_segs );
+			if( curve_p )	{
+
+				if( auto_span ) {
+					in_range_fr = source.get_head_param();
+					in_range_to = source.get_tail_param();
+				}
+				curve_p->clear();
+				if( num_keys > 0 )	{
+				
+					double in_span = in_range_to - in_range_fr;
+					if( in_span > 0.0 ) {
+					
+						double dt = in_span / (double)num_segs;
+						double t = in_range_fr;
+						for( int i = 0; i< num_keys; i++ ) {
+						
+							double v = source.evaluate( t, NULL );
+							curve_p->insert( t, v );
+							t += dt;
+						}
+					}
+				}
+			}
+			return( curve_p );
+		}
+		
 		srLinearCurve *get_spline_curve( 
 			srLinearCurve *curve_p, 
 			srSplineCurve& spline, 
@@ -164,10 +198,17 @@ class srCurveBuilder	{
 					
 						double dt = in_span / (double)num_segs;
 						double t = in_range_fr;
-//						printf( "fr %f to %f span %f dt %f\n", in_range_fr, in_range_to, in_span, dt );
-						for( int i = 0; i< num_keys; i++ ) {
 						
+//						printf( "fr %f to %f span %f dt %f\n", in_range_fr, in_range_to, in_span, dt );
+
+						for( int i = 0; i< num_keys; i++ ) {
+							
+//							if( t > ( in_range_to - in_span * 0.5 ) ) { 
+//								t = ( in_range_to - in_span * 0.5 );
+//							}
+
 							double v = spline.evaluate( t, NULL );
+//				if( v < 0.01 ) { static int c = 0; printf( "[%d] t:%f v:%f\n", c++, t, v ); }
 							curve_p->insert( t, v );
 //							printf( "insert %f %f\n", t, v );
 							t += dt;
@@ -175,6 +216,7 @@ class srCurveBuilder	{
 					}
 				}
 			}
+//spline.print();
 			return( curve_p );
 		}
 		srLinearCurve *new_spline_curve( srSplineCurve& spline, int num_segs, bool auto_span = true )	{

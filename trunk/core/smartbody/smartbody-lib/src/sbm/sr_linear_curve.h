@@ -34,49 +34,84 @@
 
 class srLinearCurve	{
 
-	private:
-
-#if ENABLE_OBJ_KEY_CT
-	static int objective_key_count;
-	static int objective_key_count_max;
-#endif
-
-	class Key	{
-		
-		public:
-		
-			Key( double p, double v );
-			~Key(void) {
-#if ENABLE_OBJ_KEY_CT
-				objective_key_count--;
-#endif
-			}
-
-			void print( int i );
-
-			void next( Key *set_p ) { next_p = set_p; }
-			Key *next( void ) { return( next_p ); }
-
-			void update( void );
-			void copy_delta( Key *key_p );
-
-			double slope( void );
-			double lerp( double t );
-
-			double	param; // ANIMATION: time
-			double	value; // template<> ?
-		
-		private:
-			
-			double	dp, inv_dp;
-			double	dv;
-
-			Key	*next_p;
-	};
-
 	public:
 		static const double MAX_SLOPE;
 		static const double MAX_VALUE;
+
+	private:
+
+#if ENABLE_OBJ_KEY_CT
+		static int objective_key_count;
+		static int objective_key_count_max;
+#endif
+
+		int 	head_bound_mode;
+		int 	tail_bound_mode;
+		
+		double	min_value;
+		double	max_value;
+
+		int 	key_count;
+		bool	dirty;
+
+		class Key	{
+
+			public:
+
+				Key( double p, double v );
+				~Key(void) {
+#if ENABLE_OBJ_KEY_CT
+					objective_key_count--;
+#endif
+				}
+
+				void print( int i );
+
+				void next( Key *set_p ) { next_p = set_p; }
+				Key *next( void ) { return( next_p ); }
+
+				void update( void );
+				void copy_delta( Key *key_p );
+
+				double slope( void );
+				double lerp( double t );
+
+				double	param; // ANIMATION: time
+				double	value; // template<> ?
+
+			private:
+
+				double	dp, inv_dp;
+				double	dv;
+
+				Key	*next_p;
+		};
+
+		Key		*head_p;
+		Key		*curr_p;
+		Key 	*curr_query_p;
+		Key		*tail_p;
+
+		void null( void )	{
+			head_bound_mode = 0;
+			tail_bound_mode = 0;
+			min_value = -MAX_VALUE;
+			max_value = MAX_VALUE;
+			init();
+		}
+		void init( void )	{
+			key_count = 0;
+			dirty = false;
+			head_p = NULL;
+			tail_p = NULL;
+			reset();
+		}
+		void reset( void )	{
+			curr_p = NULL;
+			curr_query_p = NULL;
+		}
+		
+	public:
 
 		enum boundary_mode_enum_set	{
 			CROP,			// do not write
@@ -142,46 +177,41 @@ class srLinearCurve	{
 		void insert_after( Key *prev_p, Key *key_p );
 		void decrement( void );
 		void increment( void );
+		
 		void update( void );
 		
 		Key* find_floor_key( double t );
 		double head_boundary( double t, bool *cropped_p );
 		double tail_boundary( double t, bool *cropped_p );
 
-	private:
-	
-		void null( void )	{
-			head_bound_mode = 0;
-			tail_bound_mode = 0;
-			min_value = -MAX_VALUE;
-			max_value = MAX_VALUE;
-			init();
-		}
-		void init( void )	{
-			key_count = 0;
-			dirty = false;
-			head_p = NULL;
-			curr_p = NULL;
-			tail_p = NULL;
-		}
-		
-		int 	head_bound_mode;
-		int 	tail_bound_mode;
-		
-		double	min_value;
-		double	max_value;
+	public:
 
-		int 	key_count;
-		bool	dirty;
+		void query_reset( void )	{ 
+			if( dirty ) update();
+			curr_query_p = head_p; 
+		}
+		bool query_next( 
+			double *t_p, double *v_p, 
+			bool increment 
+			)	{
 
-		Key		*head_p;
-		Key		*curr_p;
-		Key		*tail_p;
+			if( curr_query_p )	{
+//				if( t_p ) { *t_p = curr_query_p->p(); } // from gwiz::ctrl_key
+//				if( v_p ) { *v_p = curr_query_p->v(); }
+				if( t_p ) { *t_p = curr_query_p->param; }
+				if( v_p ) { *v_p = curr_query_p->value; }
+				if( increment ) {
+					curr_query_p = curr_query_p->next();
+				}
+				return( true );
+			}
+			return( false );
+		}
 };
 
 //////////////////////////////////////////////////////////////////
 #endif
 
-#if 0
+#if 1
 void test_linear_curve( void );
 #endif

@@ -536,6 +536,7 @@ void srLinearCurve::update( void )	{
 
 //G_update_count++;
 
+	reset();
 	curr_p = NULL;
 	tail_p = NULL;
 	int c = 0;
@@ -571,7 +572,7 @@ void srLinearCurve::update( void )	{
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 
-#if 0
+#if 1
 
 void test_linear_curve( void )	{
 	srLinearCurve curve;
@@ -587,7 +588,7 @@ void test_linear_curve( void )	{
 		curve_p->print();
 	}
 
-#if 1
+#if 0
 	srSplineCurve spline;
 	spline.insert( 0.0, 2.0 );
 	spline.insert( 1.0, 1.0 );
