@@ -145,7 +145,7 @@ gwiz::float_t gwiz::hermite(
 }
 
 gwiz::float_t gwiz::hermite(
-	const float_t t, 
+	float_t t, 
 	const cardinal_key& K1, 
 	const cardinal_key& K2 
 )	{
@@ -156,7 +156,7 @@ gwiz::float_t gwiz::hermite(
 }
 
 gwiz::float_t gwiz::hermite(
-	const float_t t, 
+	float_t t, 
 	const tempordinal_key& K1, 
 	const tempordinal_key& K2 
 )	{
