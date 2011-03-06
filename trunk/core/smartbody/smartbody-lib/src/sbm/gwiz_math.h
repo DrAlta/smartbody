@@ -153,7 +153,7 @@ namespace gwiz {
 	float_t safe_acos( float_t c );
 	float_t safe_atan( float_t t );
 
-#if 0
+#if 1
   // Ubuntu warning suppression
  	static double use_warn_suppress(void)	{
 		static double x = use_warn_suppress(); // use once
@@ -240,26 +240,67 @@ namespace gwiz {
 	};
 
   // spline utilities
-
-	// ctrl_key lerp()
-	// ctrl_key extend()
-	// ctrl_key extend(...)
-
+	// TODO: ctrl_key lerp()
 	// float_t ssvvcc_warp()
 	// float_t ssvvcc_patch()
 	// float_t ssvvcc_wpatch()
 
+	static float_t ssvvcc_extend( float_t f0, float_t f1, float_t f2 )	{
+		return( f2 + 2.0 * ( f2 - f1 ) + ( f0 - f1 ) );
+	}
+
+	static ctrl_key ssvvcc_extend( 
+		float_t t0, float_t f0, 
+		float_t t1, float_t f1, 
+		float_t t2, float_t f2 
+		)	{
+		return( 
+			ctrl_key( 
+				t2 + ( t2 - t1 ), 
+				f2 + 
+				2.0 * ( f2 - f1 ) + 
+				( f0 - f1 ) * ( 
+					( t2 - t1 )/( t1 - t0 ) 
+				)
+			)
+		);
+	}
+
+	static ctrl_key ssvvcc_extend( 
+		const ctrl_key& k0, const ctrl_key& k1, const ctrl_key& k2 
+		)	{
+#if 1
+		return( 
+			ssvvcc_extend(
+				k0.p(), k0.v(),
+				k1.p(), k1.v(),
+				k2.p(), k2.v()
+			)
+		);
+#else
+		float_t t0 = k0.p(); float_t f0 = k0.v();
+		float_t t1 = k1.p(); float_t f1 = k1.v();
+		float_t t2 = k2.p(); float_t f2 = k2.v();
+		
+		float_t t = t2 + ( t2 - t1 );
+		float_t v = 
+			f2 + 
+			2.0 * ( f2 - f1 ) + 
+			( f0 - f1 ) * ( 
+			  ( t2 - t1 )/( t1 - t0 ) 
+			);
+		return( ctrl_key( t, v ) );
+#endif
+	}
+
 	float_t bezier( float_t s, float_t f0, float_t f1, float_t f2, float_t f3 );
-
 	float_t hermite( float_t s, float_t v1, float_t v2, float_t m1, float_t m2 );
-
-	float_t hermite( const float_t t, const cardinal_key& K1, const cardinal_key& K2 );
-
-	float_t hermite( const float_t t, const tempordinal_key& K1, const tempordinal_key& K2 );
+	float_t hermite( float_t t, const cardinal_key& K1, const cardinal_key& K2 );
+	float_t hermite( float_t t, const tempordinal_key& K1, const tempordinal_key& K2 );
 
 ////////////////////////////////
 
-	// namespace gwiz{}  continued:
+	// namespace gwiz{} continued:
 class vector_t {
 
     public:

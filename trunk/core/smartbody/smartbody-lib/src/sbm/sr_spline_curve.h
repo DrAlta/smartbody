@@ -44,7 +44,7 @@ class srSplineCurve {
 		};
 
 		Key *head_key_p;
-//		Key *tail_key_p; // ?
+		Key *tail_key_p;
 //		Key *curr_key_p; // rapid local repeat access: to investigate
 		Key *curr_edit_key_p;
 		Key *curr_query_key_p;
@@ -61,7 +61,7 @@ class srSplineCurve {
 			node_count = 0;
 			dirty = false;
 			head_key_p = NULL;
-//			tail_key_p = NULL;
+			tail_key_p = NULL;
 //			curr_key_p = NULL;
 			head_node_p = NULL;
 			tail_node_p = NULL;
@@ -108,8 +108,31 @@ class srSplineCurve {
 
 	public:
 
+		enum extend_enum_set    {
+			EXTEND_REPEAT, 
+			EXTEND_MIRROR, 
+			EXTEND_DECEL, 
+			EXTEND_ACCEL
+		};
+
 	// utilities for selecting, editing and display
-		bool probe_bbox_key( double t, double v, double radius, bool set_qu = true, bool set_ed = false );
+
+		bool query_span( double *t_fr_p, double *t_to_p );
+		
+		bool edit_head( double t, double v );
+		bool edit_tail( double t, double v );
+
+		bool extend_head( int method = 0 );
+		bool extend_tail( int method = 0 );
+
+		// probe: -1 if nothing, otherwise index (compare to get_num_keys/nodes)
+		int probe_bbox_key( double t, double v, double radius, bool set_qu = true, bool set_ed = false );
+		int probe_bbox_node( 
+			double t, double v, 
+			double radius, 
+			bool set_qu = true, 
+			bool set_key_qu = false, bool set_key_ed = false );
+		
 		void edit_reset( void ) { curr_edit_key_p = head_key_p; }
 		bool edit_next( double t, double v, bool increment );
 		bool edit( double t, double v ) 
@@ -138,18 +161,5 @@ class srSplineCurve {
 			double *ml_p, double *mr_p, 
 			double *dl_p, double *dr_p
 			) { return( query_next_node( t_p, v_p, ml_p, mr_p, dl_p, dr_p, false ) ); }
-
-		bool query_span( double *t_fr_p, double *t_to_p ) {
-			if( dirty ) update();
-			if( head_node_p )	{
-				if( tail_node_p )	{
-					if( t_fr_p ) *t_fr_p = head_node_p->p();
-					if( t_to_p ) *t_to_p = tail_node_p->p();
-					return( true );
-				}
-				printf( "srSplineCurve ERR: head without tail!\n" );
-			}
-			return( false );
-		}
 };
 #endif
