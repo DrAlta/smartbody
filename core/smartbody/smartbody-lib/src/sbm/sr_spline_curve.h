@@ -5,11 +5,30 @@
 
 class srSplineCurve {
 
+	public:
+		enum algorithm_enum_set    {
+			ALG_SIMPLE, 
+			ALG_HALTING, 
+			ALG_CATMULL, 
+			ALG_CARDINAL_C, 
+			ALG_CARDINAL_ALT_C, 
+			ALG_KBARTELS_TBC, 
+			NUM_ALG_MODES
+		};
+		enum extend_enum_set    {
+			EXTEND_REPEAT, 
+			EXTEND_MIRROR, 
+			EXTEND_DECEL, // DECELERATE: CONVERGE
+			EXTEND_ACCEL, // ACCELERATE: EXTRAPOLATE
+			NUM_EXTEND_MODES
+		};
+
 	private:
 
 		int key_count;
 		int node_count;
 		bool dirty;
+		int algorithm;
 
 		class Key : public gwiz::ctrl_key	{
 
@@ -22,11 +41,10 @@ class srSplineCurve {
 				void print( int i ) ;
 				void next( Key *set_p ) { next_p = set_p; }
 				Key *next( void ) { return( next_p ); }
-				// Node *node( void ) { return( node_p ); }
 
 			private:
 				Key *next_p;
-				// Node *node_p; for link editing
+				// Node *node_p; for link editing... maybe not here
 		};
 		class Node : public gwiz::tempordinal_key	{
 
@@ -38,9 +56,12 @@ class srSplineCurve {
 				void print( int i );
 				void next( Node *set_p ) { next_p = set_p; }
 				Node *next( void ) { return( next_p ); }
+				// void keyref( Key *k_p ) { ref_key_p = k_p; }
+				// Key *keyref( void ) { return( ref_key_p ); }
 
 			private:
 				Node *next_p;
+				// Key *ref_key_p; // if necessary.
 		};
 
 		Key *head_key_p;
@@ -60,6 +81,7 @@ class srSplineCurve {
 			key_count = 0;
 			node_count = 0;
 			dirty = false;
+			algorithm = ALG_CATMULL;
 			head_key_p = NULL;
 			tail_key_p = NULL;
 //			curr_key_p = NULL;
@@ -86,6 +108,8 @@ class srSplineCurve {
 			return( insert_key( new Key( p, v ) ) );
 		}
 		void clear( void );
+
+		void set_alg( int alg ) { algorithm = alg; }
 		double evaluate( double t, bool *cropped_p = NULL );
 
 	protected:
@@ -107,14 +131,6 @@ class srSplineCurve {
 		Node *find_floor_node( double t );
 
 	public:
-
-		enum extend_enum_set    {
-			EXTEND_REPEAT, 
-			EXTEND_MIRROR, 
-			EXTEND_DECEL, 
-			EXTEND_ACCEL
-		};
-
 	// utilities for selecting, editing and display
 
 		bool query_span( double *t_fr_p, double *t_to_p );
@@ -125,41 +141,40 @@ class srSplineCurve {
 		bool extend_head( int method = 0 );
 		bool extend_tail( int method = 0 );
 
-		// probe: -1 if nothing, otherwise index (compare to get_num_keys/nodes)
-		int probe_bbox_key( double t, double v, double radius, bool set_qu = true, bool set_ed = false );
+	// probe: -1 if nothing, otherwise index (compare to get_num_keys/nodes)
+	// optionally set edit and query pointers
+	
+		int probe_bbox_key( 
+			double t, double v, 
+			double radius, 
+			bool set_qu = true, bool set_ed = false,
+			bool skip_head = false
+			);
 		int probe_bbox_node( 
 			double t, double v, 
 			double radius, 
 			bool set_qu = true, 
-			bool set_key_qu = false, bool set_key_ed = false );
-		
+			bool set_key_qu = false, bool set_key_ed = false
+			);
+	
+	// iterate/access
 		void edit_reset( void ) { curr_edit_key_p = head_key_p; }
-		bool edit_next( double t, double v, bool increment );
-		bool edit( double t, double v ) 
-			{ return( edit_next( t, v, false ) ); }
+		bool edit( double t, double v, bool increment = false );
 
 		void query_reset( void )	{ 
 			if( dirty ) update();
 			curr_query_key_p = head_key_p; 
 			curr_query_node_p = head_node_p; 
 		}
-		bool query_next_key( 
+		bool query_key( 
 			double *t_p, double *v_p, 
-			bool increment 
+			bool increment = false
 			);
-		bool query_next_node( 
+		bool query_node( 
 			double *t_p, double *v_p, 
 			double *ml_p, double *mr_p, 
 			double *dl_p, double *dr_p, 
-			bool increment 
+			bool increment = false
 			);
-
-		bool query_key( double *t_p, double *v_p ) 
-			{ return( query_next_key( t_p, v_p, false ) ); }
-		bool query_node(
-			double *t_p, double *v_p, 
-			double *ml_p, double *mr_p, 
-			double *dl_p, double *dr_p
-			) { return( query_next_node( t_p, v_p, ml_p, mr_p, dl_p, dr_p, false ) ); }
 };
 #endif

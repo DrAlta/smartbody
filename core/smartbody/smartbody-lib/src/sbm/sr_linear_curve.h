@@ -35,6 +35,14 @@
 class srLinearCurve	{
 
 	public:
+		enum boundary_mode_enum_set	{
+			CROP,			// do not write
+			CLAMP, 			// write boundary value
+			REPEAT, 		// loop curve, skip tail
+			EXTRAPOLATE,	// extrapolate boundary slope, min/max_value if undefined
+			NUM_BOUNDARY_MODES
+		};
+
 		static const double MAX_SLOPE;
 		static const double MAX_VALUE;
 
@@ -112,14 +120,6 @@ class srLinearCurve	{
 		}
 		
 	public:
-
-		enum boundary_mode_enum_set	{
-			CROP,			// do not write
-			CLAMP, 			// write boundary value
-			REPEAT, 		// loop curve, skip tail
-			EXTRAPOLATE,	// extrapolate boundary slope, min/max_value if undefined
-			NUM_BOUNDARY_MODES
-		};
 
 		srLinearCurve( int bound_mode = CLAMP )	{
 			null();

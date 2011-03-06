@@ -43,6 +43,9 @@ void gwiz::tempordinal_key::simple(
 	const ctrl_key& k1, 
 	const ctrl_key& k2 
 )	{
+
+	// SAFETY: if( ( k2.p() - k0.p() ) < epsilon8() )...
+
 	float_t m = ( k2.v() - k0.v() ) / ( k2.p() - k0.p() );
 	set( k1.p(), k1.v(), m, m, 1.0, 1.0 );
 }
@@ -53,6 +56,9 @@ void gwiz::tempordinal_key::cardinal(
 	const ctrl_key& k1,
 	const ctrl_key& k2
 )	{
+
+	// SAFETY: if( ( k2.p() - k0.p() ) < epsilon8() )...
+
 	float_t m = ( 1.0 - c ) * ( k2.v() - k0.v() ) / ( k2.p() - k0.p() );
 	set( k1.p(), k1.v(), m, m, k1.p() - k0.p(), k2.p() - k1.p() );
 }
@@ -63,6 +69,11 @@ void gwiz::tempordinal_key::cardinal_alt(
 	const ctrl_key& k1,
 	const ctrl_key& k2
 )	{
+
+	// SAFETY:
+	//	if( ( k2.p() - k1.p() ) < epsilon8() )...
+	//	if( ( k2.p() - k0.p() ) < epsilon8() )...
+
 	float_t m = 0.5 * (
 		( k2.v() - k1.v() ) / ( k2.p() - k1.p() ) +
 		( k1.v() - k0.v() ) / ( k1.p() - k0.p() )
@@ -87,6 +98,45 @@ void gwiz::tempordinal_key::kochbartels(
 		0.5 * ( 1.0 - tension ) * ( 1.0 + bias ) * ( 1.0 - continuity ) * dv0 +
 		0.5 * ( 1.0 - tension ) * ( 1.0 - bias ) * ( 1.0 + continuity ) * dv1;
 	set( k1.p(), k1.v(), m0, m1, k1.p() - k0.p(), k2.p() - k1.p() );
+}
+
+////////////////////////////////
+
+gwiz::float_t gwiz::ssvvcc_extend( float_t f0, float_t f1, float_t f2 )	{
+	return( f2 + 2.0 * ( f2 - f1 ) + ( f0 - f1 ) );
+}
+
+gwiz::ctrl_key gwiz::ssvvcc_extend( 
+	float_t t0, float_t f0, 
+	float_t t1, float_t f1, 
+	float_t t2, float_t f2 
+	)	{
+	
+	// SAFETY: if( ( t1 - t0 ) < epsilon8() )...
+
+	return( 
+		ctrl_key( 
+			t2 + ( t2 - t1 ), 
+			f2 + 
+			2.0 * ( f2 - f1 ) + 
+			( f0 - f1 ) * ( 
+				( t2 - t1 )/( t1 - t0 ) 
+			)
+		)
+	);
+}
+
+gwiz::ctrl_key gwiz::ssvvcc_extend( 
+	const ctrl_key& k0, const ctrl_key& k1, const ctrl_key& k2 
+	)	{
+
+	return( 
+		ssvvcc_extend(
+			k0.p(), k0.v(),
+			k1.p(), k1.v(),
+			k2.p(), k2.v()
+		)
+	);
 }
 
 ////////////////////////////////
@@ -149,7 +199,12 @@ gwiz::float_t gwiz::hermite(
 	const cardinal_key& K1, 
 	const cardinal_key& K2 
 )	{
-	float_t s = ( t - K1.p() ) / ( K2.p() - K1.p() );
+
+	float_t dp = K2.p() - K1.p();
+	if( dp < 0.0 ) { return( K1.v() ); }
+	if( dp < epsilon8() ) { return( K1.v() ); }
+
+	float_t s = ( t - K1.p() ) / dp;
 	return(
 		hermite( s, K1.v(), K2.v(), K1.mr(), K2.ml() )
 	);
@@ -161,14 +216,17 @@ gwiz::float_t gwiz::hermite(
 	const tempordinal_key& K2 
 )	{
 
-//	if( K1.t >= K2.t )
+	// SAFETY: 
+	float_t dp = K2.p() - K1.p();
+	if( dp < 0.0 ) { return( K1.v() ); }
+	if( dp < epsilon8() ) { return( K1.v() ); }
 //	if( t < K1.t )
 //	if( t >= K2.t )
 
-	float_t s = ( t - K1.p() ) / ( K2.p() - K1.p() ); // normalize parametric interpolant
+	float_t s = ( t - K1.p() ) / dp; // normalize parametric interpolant
+
 	// FaceFX algorithm from 
 	//	http://www.facefx.com/documentation/2010/W99
-
 	float_t m1 = K1.mr() * K1.dr();
 	float_t m2 = K2.ml() * K2.dl();
 
