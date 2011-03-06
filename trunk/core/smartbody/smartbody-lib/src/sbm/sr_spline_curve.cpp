@@ -105,24 +105,14 @@ double srSplineCurve::evaluate( double t, bool *cropped_p ) {
 	Node *node_p = find_floor_node( t );
 	
 	if( node_p )	{
-
-//double v = node_p->v(); if( v < 0.01 ) printf( "EVAL A: t:%f v:%f\n", t, v );
-
 		Node *next_p = node_p->next();
 
 		if( next_p )	{
-			double h = hermite( t, *node_p, *next_p );
-
-//if( h < 0.01 ) printf( "eval: t:%f h:%f\n", t, h );
-			return( h );
+			return( hermite( t, *node_p, *next_p ) );
 		}
-
 		if( t <= ( node_p->p() + epsilon4() ) ) {
 			// capture end node
-			double v = node_p->v();
-
-//if( v < 0.01 ) printf( "eval: t:%f <end>:%f\n", t, v );
-			return( v );
+			return( node_p->v() );
 		}
 		
 #if DEBUG_END_COND
@@ -180,7 +170,7 @@ void srSplineCurve::update( void ) {
 
 	// build cardinal keys from scratch...
 	clear_nodes();
-	if( key_count >= 3 ) { // at least 2 nodes to register an interval, with default esp8()
+	if( key_count >= 3 ) { // at least 2 nodes to register an interval, with default eps8()
 
 		Key *key0_p = head_key_p;
 		Key *key1_p = head_key_p->next();
@@ -193,9 +183,29 @@ void srSplineCurve::update( void ) {
 
 		while( node_p ) {
 
-	// NOTE:
-			node_p->catmullrom( (*key0_p), (*key1_p), (*key2_p) );
-
+			if( algorithm == ALG_SIMPLE )	{
+				node_p->simple( (*key0_p), (*key1_p), (*key2_p) );
+			}
+			else
+			if( algorithm == ALG_HALTING )	{
+				node_p->halting( (*key0_p), (*key1_p), (*key2_p) );
+			}
+			else
+			if( algorithm == ALG_CATMULL )	{
+				node_p->catmullrom( (*key0_p), (*key1_p), (*key2_p) );
+			}
+			else
+			if( algorithm == ALG_CARDINAL_C )	{
+				node_p->cardinal( 0.5, (*key0_p), (*key1_p), (*key2_p) );
+			}
+			else
+			if( algorithm == ALG_CARDINAL_ALT_C )	{
+				node_p->cardinal_alt( 0.5, (*key0_p), (*key1_p), (*key2_p) );
+			}
+			else	{
+				node_p->kochbartels( 0.0, 0.0, 0.0, (*key0_p), (*key1_p), (*key2_p) );
+			}
+			
 			key0_p = key1_p;
 			key1_p = key2_p;
 			key2_p = key2_p->next();
@@ -261,10 +271,6 @@ printf( "find: t:%f -clip-\n", t );
 		Node *next_p = node_p->next();
 		if( next_p )	{
 			if( t < next_p->p() ) {
-
-//double v = node_p->v(); if( v < 0.01 ) printf( "find A: t:%f v:%f\n", t, v );
-//if( node_p == NULL ) printf( "find: t:%f NULL\n", t );
-
 				return( node_p );
 			}
 			else	{
@@ -272,10 +278,6 @@ printf( "find: t:%f -clip-\n", t );
 			}
 		}
 		else	{
-
-//double v = node_p->v(); if( v < 0.01 ) printf( "find B: t:%f v:%f\n", t, v );
-//if( node_p == NULL ) printf( "find: t:%f NULL\n", t );
-
 			return( node_p );
 		}
 	}
@@ -408,10 +410,21 @@ bool srSplineCurve::extend_tail( int method )	{
 
 //////////////////////////////////////////////////////////////////
 
-int srSplineCurve::probe_bbox_key( double t, double v, double radius, bool set_qu, bool set_ed ) {
+int srSplineCurve::probe_bbox_key( 
+	double t, double v, 
+	double radius, 
+	bool set_qu, bool set_ed,
+	bool skip_head
+) {
 
 	int c = 0;
 	Key *key_p = head_key_p;
+	if( skip_head ) {
+		if( head_key_p )	{
+			key_p = head_key_p->next();
+			c++;
+		}
+	}
 	while( key_p )	{
 		if( key_p->bound_box( t, v, radius ) )	{
 			if( set_qu )	{
@@ -432,38 +445,39 @@ int srSplineCurve::probe_bbox_node(
 	double t, double v, 
 	double radius, 
 	bool set_qu, 
-	bool set_key_qu, bool set_key_ed 
+	bool set_key_qu, bool set_key_ed
 )	{
 
-	if( set_key_qu )	{
+	// prime the pump
+	if( set_key_qu || set_key_ed )	{
 		if( set_key_ed )	{
 			edit_reset();
 		}
-		probe_bbox_key( t, v, radius, set_key_qu, set_key_ed );
+		probe_bbox_key( t, v, radius, set_key_qu, set_key_ed, true );
 	}
 
-	int c = 0;
+	int node_c = 0;
 	Node *node_p = head_node_p;
 	while( node_p )	{
 		if( node_p->bound_box( t, v, radius ) )	{
 			if( set_qu )	{
 				curr_query_node_p = node_p;
 			}
-			if( set_key_qu )	{
-				int key_ret = probe_bbox_key( t, v, radius, set_key_qu, set_key_ed );
-				if( key_ret != ( c + 1 ) )	{
-					printf( "srSplineCurve::probe_bbox_node ERR: key[%d] -/-> node[%d]\n", key_ret, c );
+			if( set_key_qu || set_key_ed )	{
+				int key_c = probe_bbox_key( t, v, radius, set_key_qu, set_key_ed, true );
+				if( key_c != ( node_c + 1 ) )	{
+					printf( "srSplineCurve::probe_bbox_node ERR: key[%d] -/-> node[%d]\n", key_c, node_c );
 				}
 			}
-			return( c );
+			return( node_c );
 		}
 		node_p = node_p->next();
-		c++;
+		node_c++;
 	}
 	return( -1 );
 }
 
-bool srSplineCurve::edit_next( double t, double v, bool increment )	{
+bool srSplineCurve::edit( double t, double v, bool increment )	{
 
 	if( curr_edit_key_p )	{
 		curr_edit_key_p->set( t, v );
@@ -476,7 +490,7 @@ bool srSplineCurve::edit_next( double t, double v, bool increment )	{
 	return( false );
 }
 
-bool srSplineCurve::query_next_key( 
+bool srSplineCurve::query_key( 
 	double *t_p, double *v_p, 
 	bool increment 
 )	{
@@ -492,7 +506,7 @@ bool srSplineCurve::query_next_key(
 	return( false );
 }
 
-bool srSplineCurve::query_next_node( 
+bool srSplineCurve::query_node( 
 	double *t_p, double *v_p, 
 	double *ml_p, double *mr_p, 
 	double *dl_p, double *dr_p, 

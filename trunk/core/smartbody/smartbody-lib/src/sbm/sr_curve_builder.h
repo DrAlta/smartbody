@@ -199,24 +199,15 @@ class srCurveBuilder	{
 						double dt = in_span / (double)num_segs;
 						double t = in_range_fr;
 						
-//						printf( "fr %f to %f span %f dt %f\n", in_range_fr, in_range_to, in_span, dt );
-
 						for( int i = 0; i< num_keys; i++ ) {
 							
-//							if( t > ( in_range_to - in_span * 0.5 ) ) { 
-//								t = ( in_range_to - in_span * 0.5 );
-//							}
-
 							double v = spline.evaluate( t, NULL );
-//				if( v < 0.01 ) { static int c = 0; printf( "[%d] t:%f v:%f\n", c++, t, v ); }
 							curve_p->insert( t, v );
-//							printf( "insert %f %f\n", t, v );
 							t += dt;
 						}
 					}
 				}
 			}
-//spline.print();
 			return( curve_p );
 		}
 		srLinearCurve *new_spline_curve( srSplineCurve& spline, int num_segs, bool auto_span = true )	{
