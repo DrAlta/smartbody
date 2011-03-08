@@ -401,7 +401,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	all_viseme.push_back("Th");
 	all_viseme.push_back("Z");
 	// new added visemes: here viseme needs a better name, because following is really facial expressions
-	all_viseme.push_back("base");
+	//all_viseme.push_back("base"); // Removed by A. Shapiro 3/8/11 - was causing a conflict with joint name 'base'
 	all_viseme.push_back("base_lower_face");
 	all_viseme.push_back("base_upper_face");
 	all_viseme.push_back("fe103_effort");
