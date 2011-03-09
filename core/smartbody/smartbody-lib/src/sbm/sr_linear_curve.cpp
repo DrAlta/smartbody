@@ -20,6 +20,8 @@
  *      Marcus Thiebaux, USC
  */
 
+#include "lin_win.h"
+
 #include <math.h>
 //#include <sbm/sr_linear_curve.h>
 #include "sr_linear_curve.h"
@@ -36,6 +38,28 @@ const double srLinearCurve::MAX_VALUE = 1000000000.0;
 //int G_update_count = 0;
 
 //////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+const char *srLinearCurve::mode_label( const int index ) {
+
+	switch( index )	{
+		case CROP: 			return( "crop" );
+		case CLAMP: 		return( "clamp" );
+		case REPEAT:		return( "repeat" );
+		case EXTRAPOLATE:	return( "extrap" );
+	}
+	return( "UNKNOWN" ); // default err
+}
+
+int srLinearCurve::mode_index( const char *label )	{
+
+	if( LinWin_strcmp( label, "crop" ) == 0 ) return( CROP );
+	if( LinWin_strcmp( label, "clamp" ) == 0 ) return( CLAMP );
+	if( LinWin_strcmp( label, "repeat" ) == 0 ) return( REPEAT );
+	if( LinWin_strncmp( label, "extrapolate", 6 ) == 0 ) return( EXTRAPOLATE );
+	return( -1 );
+}
+
 //////////////////////////////////////////////////////////////////
 
 srLinearCurve::Key::Key( double p, double v ) {

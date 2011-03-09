@@ -60,7 +60,49 @@ void gwiz::tempordinal_key::cardinal(
 	// SAFETY: if( ( k2.p() - k0.p() ) < epsilon8() )...
 
 	float_t m = ( 1.0 - c ) * ( k2.v() - k0.v() ) / ( k2.p() - k0.p() );
+
 	set( k1.p(), k1.v(), m, m, k1.p() - k0.p(), k2.p() - k1.p() );
+
+#if 0
+	// clamping m experiment:
+	float_t lim = 4.0;
+	float_t local_lim = lim - k1.v();
+	float py = ml() * dl();
+	if( py > local_lim )	{
+	
+	}
+	
+	float_t tan_dif = local_lim - ml() * dl();
+	if( tan_dif > 0.0 ) {
+
+		m = tan_dif / local_lim;
+//		m = ;
+	}
+	else	{
+		tan_dif = local_lim - mr() * dr();
+		if( tan_dif > 0.0 ) {
+		
+			m = tan_dif / local_lim;
+		}
+	}
+
+/*
+	float_t tan_dif = k1.v() + ml() * dl();
+	float_t v_dif = v_lim - k1.v();
+	if( tan_dif > v_lim )	{
+
+		m = tan_dif / v_dif;
+	}
+	else	{
+		tan_dif = k1.v() + mr() * dr();
+		if( tan_dif > v_lim )	{
+
+			m = tan_dif / v_dif;
+		}
+	}
+*/
+	set( k1.p(), k1.v(), m, m, k1.p() - k0.p(), k2.p() - k1.p() );
+#endif
 }
 
 void gwiz::tempordinal_key::cardinal_alt(

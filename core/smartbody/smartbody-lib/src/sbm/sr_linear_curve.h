@@ -43,6 +43,9 @@ class srLinearCurve	{
 			NUM_BOUNDARY_MODES
 		};
 
+		static const char *mode_label( const int index );
+		static int mode_index( const char *label );
+
 		static const double MAX_SLOPE;
 		static const double MAX_VALUE;
 

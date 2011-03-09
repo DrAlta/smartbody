@@ -254,6 +254,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\lin_win.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\lin_win.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\locomotion_cmds.cpp"
 				>
 			</File>

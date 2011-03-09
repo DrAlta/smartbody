@@ -20,6 +20,8 @@
  *      Marcus Thiebaux, USC
  */
 
+#include "lin_win.h"
+
 #include <math.h>
 //#include <sbm/sr_spline_curve.h>
 #include "sr_spline_curve.h"
@@ -27,6 +29,53 @@
 using namespace gwiz;
 
 //////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+const char *srSplineCurve::algorithm_label( const int index ) {
+
+	switch( index )	{
+		case ALG_SIMPLE: 			return( "simple" );
+		case ALG_HALTING: 			return( "halting" );
+		case ALG_CATMULL:			return( "catmull" );
+		case ALG_CARDINAL_C:		return( "cardinal" );
+		case ALG_CARDINAL_ALT_C:	return( "cardinal_alt" );
+		case ALG_KBARTELS_TBC:		return( "kbartels" );
+	}
+	return( "UNKNOWN" ); // default err
+}
+
+const char *srSplineCurve::extend_label( const int index ) {
+
+	switch( index )	{
+		case EXTEND_REPEAT: 	return( "repeat" );
+		case EXTEND_MIRROR: 	return( "reflect" );
+		case EXTEND_DECEL:		return( "decel" );
+		case EXTEND_ACCEL:		return( "accel" );
+	}
+	return( "UNKNOWN" ); // default err
+}
+
+int srSplineCurve::algorithm_index( const char *label ) {
+
+	if( LinWin_strcmp( label, "simple" ) == 0 ) return( ALG_SIMPLE );
+	if( LinWin_strcmp( label, "halting" ) == 0 ) return( ALG_HALTING );
+	if( LinWin_strcmp( label, "catmull" ) == 0 ) return( ALG_CATMULL );
+	if( LinWin_strcmp( label, "cardinal" ) == 0 ) return( ALG_CARDINAL_C );
+	if( LinWin_strcmp( label, "cardinal_alt" ) == 0 ) return( ALG_CARDINAL_ALT_C );
+	if( LinWin_strcmp( label, "kbartels" ) == 0 ) return( ALG_KBARTELS_TBC );
+	return( -1 );
+}
+
+
+int srSplineCurve::extend_index( const char *label ) {
+
+	if( LinWin_strcmp( label, "repeat" ) == 0 ) return( EXTEND_REPEAT );
+	if( LinWin_strcmp( label, "mirror" ) == 0 ) return( EXTEND_MIRROR );
+	if( LinWin_strncmp( label, "decelerate", 5 ) == 0 ) return( EXTEND_DECEL );
+	if( LinWin_strncmp( label, "accelerate", 5 ) == 0 ) return( EXTEND_ACCEL );
+	return( -1 );
+}
+
 //////////////////////////////////////////////////////////////////
 
 void srSplineCurve::Key::print( int i ) {
@@ -329,13 +378,13 @@ bool srSplineCurve::extend_head( int method )	{
 			Key *k1_p = head_key_p->next();
 			if( k1_p )	{
 
-				if( method == EXTEND_REPEAT )	{
-					return( edit_head( k1_p->p(), k1_p->v() ) );
-				}
-
 				Key *k2_p = k1_p->next();
 				if( k2_p->next() )	{
 
+					if( method == EXTEND_REPEAT )	{
+						double new_p = k1_p->p() - ( k2_p->p() - k1_p->p() );
+						return( edit_head( new_p, k1_p->v() ) );
+					}
 					if( method == EXTEND_MIRROR )	{
 						double new_p = k1_p->p() - ( k2_p->p() - k1_p->p() );
 						double new_v = k1_p->v() - ( k2_p->v() - k1_p->v() );
@@ -385,7 +434,8 @@ bool srSplineCurve::extend_tail( int method )	{
 						}
 						
 						if( method == EXTEND_REPEAT )	{
-							return( edit_tail( k2_p->p(), k2_p->v() ) );
+							double new_p = k2_p->p() + ( k2_p->p() - k1_p->p() );
+							return( edit_tail( new_p, k2_p->v() ) );
 						}
 						if( method == EXTEND_MIRROR )	{
 							double new_p = k2_p->p() + ( k2_p->p() - k1_p->p() );

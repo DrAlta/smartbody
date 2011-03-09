@@ -23,6 +23,11 @@ class srSplineCurve {
 			NUM_EXTEND_MODES
 		};
 
+		static const char * algorithm_label( const int index );
+		static const char * extend_label( const int index );
+		static int algorithm_index( const char *label );
+		static int extend_index( const char *label );
+		
 	private:
 
 		int key_count;
