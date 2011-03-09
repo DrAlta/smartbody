@@ -421,6 +421,8 @@ void cleanup( void )	{
 void signal_handler(int sig) {
 //	std::cout << "SmartBody shutting down after catching signal " << sig << std::endl;
 
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.vhmsg_send( "vrProcEnd sbm" );
 	// get the current directory
 	char buffer[MAX_PATH];
 	::GetCurrentDirectory(MAX_PATH, buffer);
