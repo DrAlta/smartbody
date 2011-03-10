@@ -201,7 +201,8 @@ void MeCtEyeLidRegulator::test( void )	{
 
 MeCtEyeLidRegulator::MeCtEyeLidRegulator( void )	{
 	set_use_blink_viseme(false);
-
+	upper_lid_smooth = 0.9;
+	lower_lid_smooth = 0.9;
 }
 
 MeCtEyeLidRegulator::~MeCtEyeLidRegulator( void )	{
@@ -390,8 +391,12 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 	LR_set.set_tighten( gran_lower_tighten );
 #endif
 
-	UL_value = UL_set.get_mapped_weight( raw_lid_val );
-	UR_value = UR_set.get_mapped_weight( raw_lid_val );
+//	UL_value = UL_set.get_mapped_weight( raw_lid_val );
+//	UR_value = UR_set.get_mapped_weight( raw_lid_val );
+	float hard_UL_val = UL_set.get_mapped_weight( raw_lid_val );
+	float hard_UR_val = UR_set.get_mapped_weight( raw_lid_val );
+	UL_value = smooth( 0.3f, dt, UL_value, hard_UL_val );
+	UR_value = smooth( 0.3f, dt, UR_value, hard_UR_val );
 
 #if 0
 	LL_value = LL_set.get_mapped_weight( raw_lid_val );
