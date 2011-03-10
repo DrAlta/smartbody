@@ -376,10 +376,10 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 
 	float raw_lid_val = (float)( curve.evaluate( blink_elapsed ) );
 
-	soft_upper_tighten = smooth( 0.8f, dt, soft_upper_tighten, hard_upper_tighten );
+	soft_upper_tighten = smooth( upper_lid_smooth, dt, soft_upper_tighten, hard_upper_tighten );
 	gran_upper_tighten = granular( soft_upper_tighten, 0.0f, 1.0f, 100 );
 #if 0
-	soft_lower_tighten = smooth( 0.8f, dt, soft_lower_tighten, hard_lower_tighten );
+	soft_lower_tighten = smooth( lower_lid_smooth, dt, soft_lower_tighten, hard_lower_tighten );
 	gran_lower_tighten = granular( soft_lower_tighten, 0.0f, 1.0f, 100 );
 #endif
 
