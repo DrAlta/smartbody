@@ -139,6 +139,11 @@ class MeCtEyeLidRegulator : public MeController	{
 			hard_lower_tighten = tight;
 		}
 
+		void set_smooth( float upper, float lower )	{
+			upper_lid_smooth = upper;
+			lower_lid_smooth = lower;
+		}
+
 		void blink_now( void ) { new_blink = true; }
 
 		float get_upper_left( bool *changed_p = NULL ) { 
@@ -181,6 +186,9 @@ class MeCtEyeLidRegulator : public MeController	{
 		
 		bool	pitch_tracking;
 		double	prev_time;
+
+		float	upper_lid_smooth;
+		float	lower_lid_smooth;
 
 		float	hard_upper_tighten;
 		float	hard_lower_tighten;
