@@ -1780,6 +1780,8 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 				LOG( " eyelid range <upper-min> <upper-max> [<lower-min> <lower-max>]" );
 				LOG( " eyelid close <closed-angle>" );
 				LOG( " eyelid tight <upper-weight> [<lower-weight>]" );
+				LOG( " eyelid delay <upper-delay> [<upper-delay>]" );
+
 
 //				eyelid_reg_ct_p->test();
 				return( CMD_SUCCESS );
@@ -1834,6 +1836,16 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 				if( n > 1 ) {
 					float lower_mag = args.read_float();
 					eyelid_reg_ct_p->set_lower_tighten( lower_mag );
+				}
+				return( CMD_SUCCESS );
+			}
+			if( eyelid_cmd == "delay" )
+			{
+				float upper_delay = args.read_float();
+				eyelid_reg_ct_p->set_upper_delay( upper_delay );
+				if( n > 1 ) {
+					float lower_delay = args.read_float();
+					eyelid_reg_ct_p->set_lower_delay( lower_delay );
 				}
 				return( CMD_SUCCESS );
 			}
@@ -1898,7 +1910,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			{
 				eyelid_ct->set_weight( lo, up );
 			}
-			else 
+			else
 			if( softEyesCommand == "upperlid" )
 			{
 				eyelid_ct->set_upper_lid_range( lo, up );

@@ -139,6 +139,16 @@ class MeCtEyeLidRegulator : public MeController	{
 			hard_lower_tighten = tight;
 		}
 
+		void set_upper_delay( float upper_delay)
+		{
+			upper_lid_delay = upper_delay;
+		}
+
+		void set_lower_delay( float lower_delay)
+		{
+			lower_lid_delay = lower_delay;
+		}
+
 		void set_smooth( float upper, float lower )	{
 			upper_lid_smooth = upper;
 			lower_lid_smooth = lower;
@@ -189,6 +199,9 @@ class MeCtEyeLidRegulator : public MeController	{
 
 		float	upper_lid_smooth;
 		float	lower_lid_smooth;
+
+		float	upper_lid_delay;
+		float	lower_lid_delay;
 
 		float	hard_upper_tighten;
 		float	hard_lower_tighten;
@@ -248,7 +261,7 @@ class MeCtEyeLid : public MeController	{
 		float	upper_lid_range[ 2 ];
 		float	lower_lid_range[ 2 ];
 		float	eye_pitch_range[ 2 ];
-		
+	
 		float min( float a, float b )	{
 			if( a < b ) return( a );
 			return( b );
@@ -303,6 +316,7 @@ class MeCtEyeLid : public MeController	{
 			lo = eye_pitch_range[ 0 ];
 			up = eye_pitch_range[ 1 ];
 		}
+		
 		
 	private:
 		float	calc_lid_correction( 
