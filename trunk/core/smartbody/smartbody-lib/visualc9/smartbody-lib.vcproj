@@ -68,7 +68,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="..\lib\Smartbodyd.lib"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="..\..\clapack\lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
