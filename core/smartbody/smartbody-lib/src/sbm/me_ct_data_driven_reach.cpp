@@ -269,7 +269,8 @@ bool MeCtDataDrivenReach::controller_evaluate( double t, MeFrameData& frame )
 
 	float fRatio = 1.0f;
 	// save a copy of initial joint quat angles before any modification
-	SrArray<SrQuat> cur_quat_list = limb.joint_quat;
+	SrArray<SrQuat> cur_quat_list;
+	VecToSrArray(limb.joint_quat,cur_quat_list);
 	
 	if (useDataDriven)
 	{
@@ -304,9 +305,7 @@ bool MeCtDataDrivenReach::controller_evaluate( double t, MeFrameData& frame )
 			MeCtIKScenarioJointInfo* info = &(limb.ik.joint_info_list.get(i));
 			float damping_angle = (float)RAD(info->angular_speed_limit*dt)*0.7f;
 			limb.joint_quat[i] = MeCtReachIK::dampQuat(limb.joint_quat[i],blendQuat[i],damping_angle);		   
-		}	
-		
-		
+		}			
 	}
 
 	// solve CCD IK
@@ -316,7 +315,8 @@ bool MeCtDataDrivenReach::controller_evaluate( double t, MeFrameData& frame )
 
 		ik_scenario->ik_offset = nextTarget; // set the target
 		ik_scenario->ik_quat_orientation = SrQuat(0,0,0,1.0); // set to default rotation for testing
-		ik_scenario->joint_quat_list = limb.joint_quat;	
+		//ik_scenario->joint_quat_list = limb.joint_quat;	
+		VecToSrArray(limb.joint_quat,ik_scenario->joint_quat_list);
 
 		limb.skeleton->update_global_matrices();
 		SkJoint* chain_root = limb.getChainRoot();
@@ -364,7 +364,7 @@ void MeCtDataDrivenReach::updateExamplesFromMotions(const MotionDataSet& inMotio
 		motion->disconnect();		
 		motionData.insert(motion);
 	}	
-	examplePoseData.buildKDTree();
+	//examplePoseData.buildKDTree();
 }
 
 void MeCtDataDrivenReach::buildResamplePoseData( int nExamples, float fMinDist /*= 1.0*/ )
@@ -413,13 +413,13 @@ void MeCtDataDrivenReach::buildResamplePoseData( int nExamples, float fMinDist /
 void MeCtDataDrivenReach::getPoseExampleFromSkeleton( PoseExample& pose )
 {
 	// get current skeleton configuration and save it as pose
-	SrArray<SkJoint*>& limbJoints = limb.joint_chain;		
+	vector<SkJoint*>& limbJoints = limb.joint_chain;		
 	pose.jointQuat.resize(limbJoints.size());	
 	pose.poseParameter.resize(3);
 	// use end effector's local position as parameter		
 	getPoseParameter(pose.poseParameter,_skeleton);
 	// get joint quat 
-	for (int i=0;i<limbJoints.size();i++)
+	for (unsigned int i=0;i<limbJoints.size();i++)
 	{
 		pose.jointQuat[i] = limbJoints[i]->quat()->value();
 	}		

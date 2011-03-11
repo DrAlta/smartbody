@@ -1,6 +1,7 @@
 #pragma once
 #include "me_ct_reach.hpp"
 #include "sr/sr_box.h"
+#include <assert.h>
 #include <external/ANN/ANN.h>
 
 
@@ -8,6 +9,7 @@ class PoseExample;
 typedef std::vector<PoseExample> VecOfPoseExample;
 typedef std::vector<SrQuat> VecOfSrQuat;
 typedef std::vector<double> VecOfDouble;
+typedef std::vector<int>    VecOfInt;
 
 using namespace std;
 
@@ -67,14 +69,15 @@ public:
 	void updateExamplesFromMotions(const MotionDataSet& inMotionSet, bool rebuild = false, float minDist = 5.0);	
 	void buildResamplePoseData(int nExamples, float fMinDist = 1.0);
 	virtual bool controller_evaluate( double t, MeFrameData& frame );
+
+	static float Random(float r_min, float r_max);
 private:
 	void getPoseParameter(vector<double>& para, SkSkeleton* skeleton);
 	void getPoseExampleFromSkeleton(PoseExample& pose);		
 	
 	static void blendPose(vector<SrQuat>& blendPoses, vector<float>& KNNweights, vector<PoseExample*>& KNNPoses);		
 	static void computeWeightFromDists(vector<float>& dists, vector<float>& outWeights);
-	static void generateRandomWeight(int nK, vector<float>& outWeights);
-	static float Random(float r_min, float r_max);
+	static void generateRandomWeight(int nK, vector<float>& outWeights);	
 	static SrVec randomPointInBox(SrBox& box);	
 	static SrVec getWorldPos(SkJoint* joint);
 };
@@ -88,6 +91,28 @@ template <class T> void Plus(const vector<T>& A, const vector<T>& B, vector<T>& 
 		Out[i] = A[i] + B[i]*ratio;		
 	}
 }
+
+template <class T, class S> void pairToVec(const vector<pair<T,S>>& A, vector<T>& outT, vector<S>& outS)
+{
+	outT.resize(A.size());
+	outS.resize(A.size());
+	for (int i=0;i<A.size();i++)
+	{
+		outT[i] = A[i].first;
+		outS[i] = A[i].second;
+	}
+}
+template <class T, class S> void vecToPair(vector<T>& vecT, vector<S>& vecS, vector<pair<T,S>>& outVec)
+{
+	int numElem = vecT.size() < vecS.size() ? vecT.size() : vecS.size();
+	outVec.resize(numElem);
+	for (int i=0;i<outVec.size();i++)
+	{
+		outVec[i].first = vecT[i];
+		outVec[i].second = vecS[i];
+	}
+}
+
 
 template <class T>
 T Norm2(vector<T>& Out)
@@ -106,28 +131,7 @@ T Dist(const vector<T>& A, const vector<T>& B)
 	return Norm2(diff);
 }
 
-template <class T>
-void VecToSrArray(const std::vector<T>& inVec, SrArray<T>& outArray)
-{
-	if (inVec.size() == 0)
-		return;
 
-	outArray.capacity(inVec.size());
-	outArray.size(inVec.size());
-	for (unsigned int i=0;i<inVec.size();i++)
-		outArray[i] = inVec[i];
-}
-
-template <class T>
-void SrArrayToVec(const SrArray<T>& inArray, std::vector<T>& outVec)
-{
-	if (inArray.size() == 0)
-		return;
-
-	outVec.resize(inArray.size());
-	for (unsigned int i=0;i<outVec.size();i++)
-		outVec[i] = inArray[i];
-}
 
 
 

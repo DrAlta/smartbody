@@ -1,4 +1,4 @@
-/*
+ /*
  *  me_ct_IK.hpp - part of SmartBody-lib's Motion Engine
  *  Copyright (C) 2009  University of Southern California
  *

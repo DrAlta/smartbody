@@ -120,13 +120,14 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\src;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost"
+				AdditionalIncludeDirectories="..\src;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\atlas;..\..\..\..\lib\boost"
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				PrecompiledHeaderFile=""
 				AssemblerOutput="4"
 				WarningLevel="3"
+				WarnAsError="false"
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4355"
 			/>
@@ -144,6 +145,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="..\lib\Smartbody.lib"
+				AdditionalLibraryDirectories="..\..\clapack\lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -1068,6 +1070,78 @@
 					RelativePath="..\src\sbm\me_ct_reach_IK.hpp"
 					>
 				</File>
+				<Filter
+					Name="Constraint"
+					>
+					<File
+						RelativePath="..\src\sbm\me_ct_constraint.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_constraint.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_jacobian_IK.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_jacobian_IK.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_ublas.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_ublas.hpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="BodyReach"
+					>
+					<File
+						RelativePath="..\src\sbm\me_ct_data_interpolation.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_data_interpolation.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_example_body_reach.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_example_body_reach.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_motion_example.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_motion_example.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_motion_parameter.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_motion_parameter.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_motion_timewarp.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_motion_timewarp.hpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="blend"
@@ -1131,6 +1205,22 @@
 			</File>
 			<File
 				RelativePath="..\src\sbm\bml_animation.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\bml_bodyreach.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\bml_bodyreach.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\bml_constraint.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\bml_constraint.hpp"
 				>
 			</File>
 			<File

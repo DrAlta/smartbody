@@ -11,7 +11,6 @@ MeCtReachIK::~MeCtReachIK(void)
 {
 }
 
-
 SrQuat MeCtReachIK::dampQuat( const SrQuat& prevQuat, const SrQuat& nextQuat, float damping_angle )
 {
 	SrQuat diff = prevQuat.inverse()*nextQuat;	
@@ -29,8 +28,8 @@ void MeCtReachIK::adjust()
 	int i,j;	
 	for(i = 0; i < max_iteration; ++i)
 	{
-		//for(j = start_joint_index; j != manipulated_joint_index; ++j)
-		for(j = manipulated_joint_index-1 ; j >= start_joint_index; j--) 
+		for(j = start_joint_index; j != manipulated_joint_index; ++j)
+		//for(j = manipulated_joint_index-1 ; j >= start_joint_index; j--) 
 		{
 			/*if(reach_destination()) 
 			{
@@ -47,7 +46,7 @@ void MeCtReachIK::adjust()
 	for (int i=0;i<scenario->joint_quat_list.size();i++)
 	{
 		MeCtIKScenarioJointInfo* info = &(scenario->joint_info_list.get(i));
-		float damping_angle = (float)RAD(info->angular_speed_limit*getDt());
+		float damping_angle = 10.f;//(float)RAD(info->angular_speed_limit*getDt());
 		scenario->joint_quat_list[i] = dampQuat(cur_quatList[i],scenario->joint_quat_list[i],damping_angle);		
 	}
 }
@@ -332,6 +331,13 @@ void MeCtReachIK::particleIK()
 		particleList[1] += dv;
 	}
 	matchSkeleton(particleList);
+
+	for (int i=0;i<scenario->joint_quat_list.size();i++)
+	{
+		MeCtIKScenarioJointInfo* info = &(scenario->joint_info_list.get(i));
+		float damping_angle = (float)RAD(info->angular_speed_limit*getDt());
+		scenario->joint_quat_list[i] = dampQuat(cur_quatList[i],scenario->joint_quat_list[i],damping_angle);		
+	}
 }
 
 void MeCtReachIK::matchSkeleton( SrArray<SrVec>& particleList )
@@ -340,7 +346,6 @@ void MeCtReachIK::matchSkeleton( SrArray<SrVec>& particleList )
 	SrVec v, i_target, i_src, v1, v2, r_axis;
 	SrQuat q;
 
-	float damping_angle = 0.05;
 	for (int i=0;i<particleList.size()-1;i++)
 	{
 		int start_index = i;
@@ -365,6 +370,9 @@ void MeCtReachIK::matchSkeleton( SrArray<SrVec>& particleList )
 		else if(dot_v < -1.0f) dot_v = -1.0f;
 
 		double angle = acos(dot_v);
+		MeCtIKScenarioJointInfo* info = &(scenario->joint_info_list.get(i));
+		float damping_angle = (float)RAD(info->angular_speed_limit*getDt());
+
 		if (angle > damping_angle) angle = damping_angle;		
 		r_axis = cross(v2, v1);
 		r_axis.normalize();
