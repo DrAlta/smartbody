@@ -41,7 +41,7 @@ RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Character/Locomotion/Velocity", 0, VelocityCB, this, NULL);
 	menubar->add("&View/Pawns", 0, ShowPawns, this, NULL);
 	menubar->add("&View/Shadows", 0, ShadowsCB, this, NULL);
-	menubar->add("&View/Reach Pose Examples", 0, ShowPoseExamples, this, NULL);	
+	//menubar->add("&View/Reach Pose Examples", 0, ShowPoseExamples, this, NULL);	
 	menubar->add("&View/Terrain/Shaded", 0, TerrainShadedCB, this, NULL);
 	menubar->add("&View/Terrain/Wireframe", 0, TerrainWireframeCB, this, NULL);
 	menubar->add("&View/Terrain/No Terrain", 0, TerrainNoneCB, this, NULL);	

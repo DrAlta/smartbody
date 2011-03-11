@@ -1,5 +1,5 @@
 /*
-*  me_ct_reach.h - part of Motion Engine and SmartBody-lib
+*  me_ct_constraint.h - part of Motion Engine and SmartBody-lib
 *  Copyright (C) 2008  University of Southern California
 *
 *  SmartBody-lib is free software: you can redistribute it and/or
@@ -24,46 +24,45 @@
 #include <SK/sk_skeleton.h>
 #include <ME/me_controller.h>
 #include "me_ct_limb.hpp"
-#include "me_ct_reach_IK.hpp"
+#include "me_ct_jacobian_IK.hpp"
 #include "gwiz_math.h"
 
 typedef std::set<SkMotion*> MotionDataSet;
 
-class MeCtReach : public MeController
+
+class MeCtConstraint : public MeController
 {
 private:
 	static const char* CONTROLLER_TYPE;
-
-public:
-	enum ReachMode { TARGET_POS = 1, TARGET_JOINT_POS };	
-	enum ReachArm { REACH_LEFT_ARM = 1, REACH_RIGHT_ARM };
-
 public:	
-	MeCtReach(SkSkeleton* skeleton);
-	~MeCtReach(void);
+	static bool useBalance, useReferenceJoint, useIKConstraint;
 
-protected:
-	ReachMode            reach_mode;
-	ReachArm             reach_arm;	
-	MeCtReachIK          ik;
-	MeCtLimb             limb;
-	float                limb_length;	
-	SrArray<const char*> joint_name;	
-	SrArray<MeCtIKJointLimit> joint_limit;
+	enum ConstraintFadeMode	{
+		FADING_MODE_OFF = 0,
+		FADING_MODE_IN,
+		FADING_MODE_OUT
+	};
+public:	
+	MeCtConstraint(SkSkeleton* skeleton);
+	~MeCtConstraint(void);
+
+protected:	
+	MeCtJacobianIK       ik;
+	MeCtIKTreeScenario   ik_scenario;
+	SkSkeleton*     _skeleton;
 	float 			_duration;
 	SkChannelArray	_channels;
-	SrVec   		target_pos;
 	SkJoint        *target_joint_ref;
-	SkJoint        *root_joint_ref; // root of target chain	
-	SkSkeleton*     _skeleton;
+	std::vector<SkJoint*> targetJointList;
+		
 	float           prev_time; // to get dt
+	float           blendWeight;
+	float           fadeRemainTime, fadeInterval;
+	ConstraintFadeMode fadeMode;
 
-
-public:	
-	void set_target_pos(SrVec& target_pos);
-	void set_target_joint(SkJoint* target_joint);	
-
+public:			
 	void init ();
+	bool addJointEndEffectorPair(SkJoint* targetJoint, const char* effectorName);
 	virtual void controller_map_updated();
 	virtual void controller_start();	
 	virtual bool controller_evaluate( double t, MeFrameData& frame );
@@ -71,13 +70,13 @@ public:
 	virtual double controller_duration()			{ return( (double)_duration ); }
 	void set_duration(float duration) { _duration = duration; }
 	virtual const char* controller_type() const		{ return( CONTROLLER_TYPE ); }
-	virtual void print_state( int tabs );	
+	virtual void print_state( int tabs );
 
-	void setReachArm(MeCtReach::ReachArm val) { reach_arm = val; }
-	MeCtReach::ReachArm getReachArm() { return reach_arm; }
-	float getLimbLength() const { return limb_length; }
-	SkJoint* getRootJoint() const { return root_joint_ref; }
+	void setFadeIn(float interval);
+	void setFadeOut(float interval);
+	bool updateFading(float dt);
 
 protected:
-	SrVec get_reach_target();
+	SrVec get_reach_target(SkJoint* joint);
+	void  updateChannelBuffer(MeFrameData& frame, std::vector<SrQuat>& quatList, bool bRead = false);
 };

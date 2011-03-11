@@ -46,6 +46,8 @@
 #include <sbm/me_ct_eyelid.h>
 #include <sbm/me_ct_gaze.h>
 #include <sbm/me_ct_reach.hpp>
+#include <sbm/me_ct_constraint.hpp>
+#include <sbm/me_ct_example_body_reach.hpp>
 #define MeCtSchedulerClass MeCtScheduler2
 
 #if(1) // Use primary locomotion controller

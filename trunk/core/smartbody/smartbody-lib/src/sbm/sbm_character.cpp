@@ -705,6 +705,8 @@ void prune_schedule( SbmCharacter*   actor,
 	VecOfTrack::iterator it    = tracks.end();
 
 	bool hasReach = false;
+	bool hasConstraint = false;
+	bool hasBodyReach = false;
 	bool hasReachLeft = false, hasReachRight = false;
 
 	while( it != first ) {
@@ -922,7 +924,30 @@ void prune_schedule( SbmCharacter*   actor,
 							hasReachRight = true;
 						}
 					}
-				} else if( anim_ct_type == MeCtMotion::type_name || anim_ct_type == MeCtQuickDraw::type_name ) {
+				} 
+				else if (dynamic_cast<MeCtConstraint*>(anim_source)) {
+					MeCtConstraint* ct_constraint = dynamic_cast<MeCtConstraint*>(anim_source);
+					if (hasConstraint)
+					{
+						in_use = false;
+					}
+					else
+					{
+						hasConstraint = true;
+					}
+				}
+				else if (dynamic_cast<MeCtExampleBodyReach*>(anim_source)) {
+					MeCtExampleBodyReach* ct_bodyReach = dynamic_cast<MeCtExampleBodyReach*>(anim_source);
+					if (hasBodyReach)
+					{
+						in_use = false;
+					}
+					else
+					{
+						hasBodyReach = true;
+					}
+				}
+				else if( anim_ct_type == MeCtMotion::type_name || anim_ct_type == MeCtQuickDraw::type_name ) {
 					if( motion_ct || pose_ct ) {
 						in_use = false;
 					} else {

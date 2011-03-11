@@ -36,7 +36,7 @@ void MeCtLimb::updateQuatToJointChain( SrArray<SrQuat>& joint_quat )
 {
 	assert(joint_quat.size() == joint_chain.size());
 
-	for (int i=0;i<joint_chain.size();i++)
+	for (unsigned int i=0;i<joint_chain.size();i++)
 	{
 		joint_chain[i]->quat()->value(joint_quat[i]);
 	}
@@ -47,7 +47,7 @@ void MeCtLimb::updateQuat(MeFrameData& frame, bool bRead)
 {
 	SrBuffer<float>& buffer = frame.buffer();
 
-	for (int i=0;i<buf_index.size();i++)
+	for (unsigned int i=0;i<buf_index.size();i++)
 	{
 		int index = frame.toBufferIndex(buf_index[i]);
 		if (bRead)
@@ -72,20 +72,26 @@ void MeCtLimb::updateQuat(MeFrameData& frame, bool bRead)
 
 bool MeCtLimb::buildJointChain(SrArray<const char*>& joint_names, SrArray<MeCtIKJointLimit>& joint_limit)
 {
-	joint_chain.capacity(joint_names.size());
-	joint_chain.size(joint_names.size());
-
 	// initialize joint chain list
-	for (int i=0;i<joint_names.size();i++)
+	joint_chain_limit.clear();
+	joint_chain.clear();
+	joint_quat.clear();
+	buf_index.clear();
+	for (unsigned int i=0;i<joint_names.size();i++)
 	{
 		SkJoint* joint = skeleton->search_joint(joint_names[i]);
 		if (!joint)
-			return false;
-				
-		joint_chain[i] = joint;		
+		{					
+			//return false;
+			continue;
+		}
+		//joint->rot_type(SkJoint::TypeSwingTwist);
+		joint_chain.push_back(joint);
+		joint_chain_limit.push_back(joint_limit[i]);
+		//joint_chain[i] = joint;		
 	}	
-	buf_index.size(joint_chain.size());
-	joint_quat.size(joint_chain.size());
+	buf_index.resize(joint_chain.size());
+	joint_quat.resize(joint_chain.size());
 
 	// initialize MeCtIKScenario
 	ik.joint_info_list.size(joint_chain.size());
@@ -97,11 +103,12 @@ bool MeCtLimb::buildJointChain(SrArray<const char*>& joint_names, SrArray<MeCtIK
 		joint_info.type = JOINT_TYPE_BALL;			
 		joint_quat[i] = SrQuat(0,0,0,1.0);			
 		joint_info.is_support_joint = 0;	
-		joint_info.joint_limit = joint_limit[i];
+		joint_info.joint_limit = joint_chain_limit[i];
 	}
 	ik.start_joint = &ik.joint_info_list[0];
 	ik.end_joint   = &ik.joint_info_list[joint_chain.size()-1];
-	ik.joint_quat_list = joint_quat;
+	//ik.joint_quat_list = joint_quat;
+	VecToSrArray(joint_quat,ik.joint_quat_list);
 
 	return true;	
 }
@@ -109,7 +116,7 @@ bool MeCtLimb::buildJointChain(SrArray<const char*>& joint_names, SrArray<MeCtIK
 float MeCtLimb::computeLimbLength()
 {
 	float fLength = 0.f;
-	for (int i=0;i<joint_chain.size()-1;i++)
+	for (unsigned int i=0;i<joint_chain.size()-1;i++)
 	{
 		fLength += joint_chain[i]->offset().len();
 	}
@@ -123,7 +130,7 @@ void MeCtLimb::updateMotionFrameToJointChain( SkMotion* motion, int frame )
 	int inserted;
 	int size = channels.size();
 
-	for (int i=0; i<size; i++ ) {
+	for (unsigned int i=0; i<size; i++ ) {
 		if ( channels[i].joint && hasJoint(channels[i].joint) )
 		{
 			inserted = channels[i].set ( fp );
@@ -141,7 +148,7 @@ bool MeCtLimb::hasJoint( SkJoint* joint )
 	if (!joint)
 		return false;
 
-	for (int i=0;i<joint_chain.size();i++)
+	for (unsigned int i=0;i<joint_chain.size();i++)
 	{
 		if (joint == joint_chain[i])
 			return true;

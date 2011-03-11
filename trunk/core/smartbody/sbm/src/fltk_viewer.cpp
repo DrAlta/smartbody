@@ -59,6 +59,8 @@
 # include <SR/sr_gl_render_funcs.h>
 # include <SBM/me_ct_eyelid.h>
 # include <SBM/me_ct_data_driven_reach.hpp>
+# include <SBM/me_ct_example_body_reach.hpp>
+# include <SBM/me_ct_constraint.hpp>
 
 #include <sbm/mcontrol_util.h>
 
@@ -157,6 +159,7 @@ Fl_Menu_Item ReachMenuTable[] =
 	{ reach_type_name[1],   0, MCB, 0 },		
 	{ "&show pose examples", 0, MCB, CMD(CmdReachShowExamples), 0 },
 	{ "&no pose examples", 0, MCB, CMD(CmdReachNoExamples), 0 },
+	//{ "&toggle IK constraint", 0, MCB, CMD(CmdExampleReachToggleIK),FL_MENU_TOGGLE },
 	{ "&toggle reach interpolate", 0, MCB, CMD(CmdReachToggleData),FL_MENU_TOGGLE },
 	{ "&toggle reach IK", 0, MCB, CMD(CmdReachToggleIK),FL_MENU_TOGGLE },
 	{ 0 }
@@ -193,8 +196,13 @@ Fl_Menu_Item MenuTable[] =
          { "&no pawns shown", 0, MCB, CMD(CmdNoPawns), FL_MENU_RADIO },
          { "&show pawns as spheres", 0, MCB, CMD(CmdPawnShowAsSpheres),   FL_MENU_RADIO },        
          { 0 },
+    { "&constraint", 0, 0, 0, FL_SUBMENU },
+	     { "&use IK constraint", 0, MCB, CMD(CmdConstraintToggleIK), FL_MENU_TOGGLE},	
+		 //{ "&use balance", 0, MCB, CMD(CmdConstraintToggleBalance), FL_MENU_TOGGLE},		 
+		 { "&use reference joints", 0, MCB, CMD(CmdConstraintToggleReferencePose), FL_MENU_TOGGLE },		     
+		 { 0 },    
     { gaze_on_target_menu_name, 0, 0, GazeMenuTable, FL_SUBMENU_POINTER },   
-	{ reach_on_target_menu_name, 0, 0, ReachMenuTable, FL_SUBMENU_POINTER }, 
+	//{ reach_on_target_menu_name, 0, 0, ReachMenuTable, FL_SUBMENU_POINTER }, 
     { "p&references", 0, 0, 0, FL_SUBMENU },
          { "&axis",         0, MCB, CMD(CmdAxis),        FL_MENU_TOGGLE },
          { "b&ounding box", 0, MCB, CMD(CmdBoundingBox), FL_MENU_TOGGLE },
@@ -266,19 +274,19 @@ void FltkViewer::update_submenus()
 		gaze_menu.user_data((void*)pmenu);				
 	}
 
-	for (int i=0;i<NUM_REACH_TYPES;i++)
-	{
-		Fl_Menu_Item& reach_menu = ReachMenuTable[i];	
-		reach_menu.flags |= FL_SUBMENU_POINTER;
-		SrArray<Fl_Menu_Item>& menu_list = reach_submenus[i];
-		menu_list = SrArray<Fl_Menu_Item>();
-		int iCmd = FltkViewer::CmdReachOnTargetRight+i;
-		Fl_Menu_Item select_pawn = { "selected pawn",   0, MCB,((void*)iCmd)  };
-		menu_list.push(select_pawn);			
-		get_pawn_submenus(select_pawn.user_data(),menu_list);
-		const Fl_Menu_Item* pmenu = (const Fl_Menu_Item *)menu_list;
-		reach_menu.user_data((void*)pmenu);				
-	}
+// 	for (int i=0;i<NUM_REACH_TYPES;i++)
+// 	{
+// 		Fl_Menu_Item& reach_menu = ReachMenuTable[i];	
+// 		reach_menu.flags |= FL_SUBMENU_POINTER;
+// 		SrArray<Fl_Menu_Item>& menu_list = reach_submenus[i];
+// 		menu_list = SrArray<Fl_Menu_Item>();
+// 		int iCmd = FltkViewer::CmdReachOnTargetRight+i;
+// 		Fl_Menu_Item select_pawn = { "selected pawn",   0, MCB,((void*)iCmd)  };
+// 		menu_list.push(select_pawn);			
+// 		get_pawn_submenus(select_pawn.user_data(),menu_list);
+// 		const Fl_Menu_Item* pmenu = (const Fl_Menu_Item *)menu_list;
+// 		reach_menu.user_data((void*)pmenu);				
+// 	}
 }
 
 # undef CMD
@@ -441,6 +449,7 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
  {
 	 bool applyToCharacter = false; 
 	 MeCtDataDrivenReach* reachCt = getCurrentCharacterReachController();
+	 MeCtExampleBodyReach* bodyReachCt = getCurrentCharacterBodyReachController();
 
    switch ( s )
     { case CmdHelp : _data->helpwin->show(); _data->helpwin->active(); break;
@@ -612,6 +621,44 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 	  case CmdReachNoExamples:
 		  _data->reachRenderMode = ModeNoExamples;
 		  break;
+	  case CmdExampleReachToggleIK:
+		  if (bodyReachCt)
+		  {
+			  bodyReachCt->useIKConstraint = !bodyReachCt->useIKConstraint;
+		  }	
+		  break;  
+
+// 	  case CmdConstraintToggleIK:
+// 		  if (bodyReachCt)
+// 		  {
+// 			  //bodyReachCt->useDataDriven = !reachCt->useDataDriven;
+// 			  //bodyReachCt->useBalance = !bodyReachCt->useBalance;
+// 			  if (bodyReachCt->useIKConstraint)
+// 			  {
+// 				  //bodyReachCt->useIKConstraint = false;
+// 				  bodyReachCt->setFadeOut(2.0);
+// 			  }
+// 			  else
+// 			  {
+// 				  bodyReachCt->useIKConstraint = true;
+// 				  bodyReachCt->setFadeIn(2.0);
+// 			  }
+// 		  }
+// 		  break; 
+// 	  case CmdConstraintToggleBalance:
+// 		  if (bodyReachCt)
+// 		  {
+// 			  //bodyReachCt->useDataDriven = !reachCt->useDataDriven;
+// 			  bodyReachCt->useBalance = !bodyReachCt->useBalance;			 
+// 		  }		  
+// 		  break;
+// 	  case CmdConstraintToggleReferencePose:
+// 		  if (bodyReachCt)
+// 		  {
+// 			  //reachCt->useIK = !reachCt->useIK;
+// 			  bodyReachCt->useReferenceJoint = !bodyReachCt->useReferenceJoint;
+// 		  }	
+// 		  break; 
 	}
 	
 	if (applyToCharacter)
@@ -1153,6 +1200,28 @@ void FltkViewer::translate_keyboard_state()
 		//if(height_disp > 0.0f) height_disp = 0.0f;
 		actor->get_locomotion_ct()->set_target_height_displacement(_locoData->height_disp);
 	}
+
+	if (fltk::get_key_state('c'))
+	{
+		LOG("push x");
+// 		MeCtConstraint* bodyReachCt = getCurrentCharacterBodyReachController();
+// 		if (bodyReachCt)
+// 		{
+// 			//bodyReachCt->useDataDriven = !reachCt->useDataDriven;
+// 			//bodyReachCt->useBalance = !bodyReachCt->useBalance;
+// 			if (bodyReachCt->useIKConstraint)
+// 			{
+// 				//bodyReachCt->useIKConstraint = false;
+// 				bodyReachCt->setFadeOut(0.5);
+// 			}
+// 			else
+// 			{
+// 				bodyReachCt->useIKConstraint = true;
+// 				bodyReachCt->setFadeIn(0.5);
+// 			}
+// 		}
+	}
+
 	if(fltk::get_key_state('f'))
 	{
 		_locoData->height_disp -= _locoData->height_disp_delta;
@@ -1169,8 +1238,7 @@ void FltkViewer::translate_keyboard_state()
 	}
 	if(fltk::get_key_state('x'))
 	{
-		SbmCharacter* actor = NULL;
-		
+		SbmCharacter* actor = NULL;		
 		//for(int i = 0; i < mcu.character_map.get_num_entries(); ++i)
 		{
 			++_locoData->char_index;
@@ -3112,6 +3180,31 @@ SbmCharacter* FltkViewer::getCurrentCharacter()
 }
 
 
+MeCtExampleBodyReach* FltkViewer::getCurrentCharacterBodyReachController()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SbmCharacter* character = getCurrentCharacter();
+
+	MeCtExampleBodyReach* reachCt = NULL;
+	if ( character )
+	{
+		MeCtSchedulerClass* reachSched = character->reach_sched_p;
+		MeCtSchedulerClass::VecOfTrack reach_tracks = reachSched->tracks();		
+		MeCtReach* tempCt = NULL;
+		for (unsigned int c = 0; c < reach_tracks.size(); c++)
+		{
+			MeController* controller = reach_tracks[c]->animation_ct();		
+			//reachCt = dynamic_cast<MeCtConstraint*>(controller);
+			reachCt = dynamic_cast<MeCtExampleBodyReach*>(controller);
+			//tempCt  = dynamic_cast<MeCtReach*>(controller);
+			if (reachCt)
+				break;
+		}		
+	}
+	return reachCt;
+}
+
+
 MeCtDataDrivenReach* FltkViewer::getCurrentCharacterReachController()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -3145,40 +3238,63 @@ void FltkViewer::drawReach()
 	glPushAttrib(GL_LIGHTING_BIT | GL_POINT_BIT);
 	glDisable(GL_LIGHTING);
 	
-	MeCtDataDrivenReach* reachCt = getCurrentCharacterReachController();
+	//MeCtDataDrivenReach* reachCt = getCurrentCharacterReachController();
+
+	MeCtExampleBodyReach* reachCt = getCurrentCharacterBodyReachController();
+	
 	SbmCharacter* character = getCurrentCharacter();
 	if (reachCt)
 	{	
 		// draw reach Example data
+		/*
 		const VecOfPoseExample& exampleData = reachCt->ExamplePoseData().PoseData();
 		const VecOfPoseExample& resampledData = reachCt->ResampledPosedata().PoseData();
 		character->skeleton_p->update_global_matrices();
 		SkJoint* root = character->skeleton_p->root();
 		//SkJoint* root = reachCt->getRootJoint();
 		SrMat rootMat = root->gmat();
+		*/
 		//rootMat.translation(root->gmat().get(12),root->gmat().get(13),root->gmat().get(14));
+		const std::vector<SrVec>& exampleData = reachCt->examplePts;
+		const std::vector<SrVec>& resampleData = reachCt->resamplePts;
 
 		SrPoints srExamplePts;	
 		srExamplePts.init_with_attributes();
 		for (unsigned int i=0;i<exampleData.size();i++)
 		{
-			const PoseExample& exPose = exampleData[i];
-			SrVec lPos = SrVec((float)exPose.poseParameter[0],(float)exPose.poseParameter[1],(float)exPose.poseParameter[2]);
-			SrVec gPos = lPos*rootMat; // transform to global coordinate
+			//const PoseExample& exPose = exampleData[i];
+			SrVec lPos = exampleData[i];//SrVec((float)exPose.poseParameter[0],(float)exPose.poseParameter[1],(float)exPose.poseParameter[2]);
+			SrVec gPos = lPos;//*rootMat; // transform to global coordinate
 			//drawCircle(gPos[0],gPos[1],gPos[2],1.0,5,SrVec(1.0,0.0,0.0));			
-			drawPoint(gPos[0],gPos[1],gPos[2],1.5,SrVec(0.0,0.0,1.0));
-			//PositionControl::drawSphere(gPos,1.0f);			
-		}		
-
-		for (unsigned int i=0;i<resampledData.size();i++)
-		{
-			const PoseExample& exPose = resampledData[i];
-			SrVec lPos = SrVec((float)exPose.poseParameter[0],(float)exPose.poseParameter[1],(float)exPose.poseParameter[2]);
-			SrVec gPos = lPos*rootMat; // transform to global coordinate
-			//drawCircle(gPos[0],gPos[1],gPos[2],1.0,5,SrVec(1.0,0.0,0.0));			
-			drawPoint(gPos[0],gPos[1],gPos[2],1.5,SrVec(1.0,0.0,1.0));
+			//drawPoint(gPos[0],gPos[1],gPos[2],5.0,SrVec(0.0,0.0,1.0));
+			SrSnSphere sphere;			
+			sphere.shape().center = SrPnt(gPos[0], gPos[1], gPos[2]);
+			sphere.shape().radius = 3.0;
+			sphere.color(SrColor(0.f,0.f,1.f));
+			sphere.render_mode(srRenderModeLines);
+			SrGlRenderFuncs::render_sphere(&sphere);
 			//PositionControl::drawSphere(gPos,1.0f);			
 		}	
+
+// 		SrVec reachTraj = reachCt->curReachTrajectory;
+// 
+// 		SrSnSphere sphere;			
+// 		sphere.shape().center = SrPnt(reachTraj[0], reachTraj[1], reachTraj[2]);
+// 		sphere.shape().radius = 3.0;
+// 		sphere.color(SrColor(0.f,1.f,1.f));
+// 		sphere.render_mode(srRenderModeLines);
+// 		SrGlRenderFuncs::render_sphere(&sphere);
+
+		
+		for (unsigned int i=0;i<resampleData.size();i++)
+		{			
+			SrVec lPos = resampleData[i];
+			SrVec gPos = lPos; // transform to global coordinate
+			//drawCircle(gPos[0],gPos[1],gPos[2],1.0,5,SrVec(1.0,0.0,0.0));			
+			drawPoint(gPos[0],gPos[1],gPos[2],1.5,SrVec(0.0,1.0,0.0));
+			//PositionControl::drawSphere(gPos,1.0f);			
+		}	
+		
 	}
 
 	glPopAttrib();

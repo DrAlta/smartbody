@@ -10,6 +10,8 @@ const float PI_CONST = 3.14159265358979323846f;
 const int  NUM_LIMBS = 5;
 // feng : right now I simply hard coded the joint chains and constraints for the left, right arms.
 // in the future, I think we should integrate the joint constraints into skeleton, so it is easier to set up an IK chain interactively ( by simply select the start, end joints ? )
+// const char limb_chain_r[][20] = {"r_shoulder", "r_elbow", "r_forearm", "r_wrist", "r_middle1"};
+// const char limb_chain_l[][20] = {"l_shoulder", "l_elbow", "l_forearm", "l_wrist", "l_middle1"};
 const char limb_chain_r[][20] = {"r_shoulder", "r_elbow", "r_forearm", "r_wrist", "r_middle1"};
 const char limb_chain_l[][20] = {"l_shoulder", "l_elbow", "l_forearm", "l_wrist", "l_middle1"};
 
@@ -173,7 +175,8 @@ bool MeCtReach::controller_evaluate( double t, MeFrameData& frame )
 	
 	ik_scenario->ik_offset = get_reach_target(); // set the target
 	ik_scenario->ik_quat_orientation = SrQuat(0,0,0,1.0); // set to default rotation for testing
-	ik_scenario->joint_quat_list = limb.joint_quat;	
+	//ik_scenario->joint_quat_list = limb.joint_quat;	
+	VecToSrArray(limb.joint_quat,ik_scenario->joint_quat_list);
 	
 	limb.skeleton->update_global_matrices();
 	SkJoint* chain_root = limb.getChainRoot();
@@ -181,7 +184,8 @@ bool MeCtReach::controller_evaluate( double t, MeFrameData& frame )
 	
 	ik.setDt(dt);
 	ik.update(ik_scenario);
-	limb.joint_quat = ik_scenario->joint_quat_list;
+	//limb.joint_quat = ik_scenario->joint_quat_list;
+	SrArrayToVec(ik_scenario->joint_quat_list,limb.joint_quat);
 	// write results from limb to buffer
 	limb.updateQuat(frame,false);
 	return true;

@@ -97,7 +97,7 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 	std::wstringstream wstrstr;	
 	
 	// attach the skeleton to the reach controller
-#define DATA_DRIVEN_REACH 1
+#define DATA_DRIVEN_REACH 0
 #if DATA_DRIVEN_REACH
 	MeCtDataDrivenReach* reachCt = NULL;//new MeCtDataDrivenReach(request->actor->skeleton_p);
 #else

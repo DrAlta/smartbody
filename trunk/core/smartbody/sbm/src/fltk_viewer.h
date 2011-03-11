@@ -54,6 +54,8 @@ class FltkViewerData;
 class LocomotionData;
 class SbmCharacter;
 class MeCtDataDrivenReach;
+class MeCtConstraint;
+class MeCtExampleBodyReach;
 
 /*! \class SrViewer sr_viewer.h
     \brief A fltk-opengl viewer
@@ -173,6 +175,10 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdReachToggleIK,
 				   CmdReachShowExamples,
 				   CmdReachNoExamples,
+				   CmdConstraintToggleIK,
+				   CmdConstraintToggleBalance,
+				   CmdConstraintToggleReferencePose,
+				   CmdExampleReachToggleIK,
                  };
 
    private : // internal data
@@ -332,6 +338,7 @@ protected:
 	void update_submenus();
 	void create_popup_menus();
 	MeCtDataDrivenReach* getCurrentCharacterReachController();
+	MeCtExampleBodyReach* getCurrentCharacterBodyReachController();
 	SbmCharacter*        getCurrentCharacter();
  };
 

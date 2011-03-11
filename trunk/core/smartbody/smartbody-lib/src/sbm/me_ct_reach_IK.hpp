@@ -18,7 +18,6 @@ public:
 	void setDt(float val) { dt = val; }
 
 	static SrQuat dampQuat(const SrQuat& prevQuat, const SrQuat& nextQuat, float damping_angle);
-
 protected:
 	virtual void adjust();		
 	virtual void calc_target(SrVec& orientation, SrVec& offset);	
@@ -26,6 +25,7 @@ protected:
 	void ccdRotate(SrVec& src, int start_index); // use cyclic coordinate descend to find local minimum.	
 	void ccdRotatePositionAndOrientation(SrVec& src, int start_index);
 	void particleIK();
+	
 	void matchSkeleton(SrArray<SrVec>& particleList);
 
 protected: // a hack to get rotation axis re-align	
