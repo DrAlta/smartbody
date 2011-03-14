@@ -373,88 +373,88 @@ bool srSplineCurve::edit_tail( double t, double v )	{
 
 bool srSplineCurve::extend_head( int method )	{
 
-		if( head_key_p )	{
+	if( head_key_p )	{
 
-			Key *k1_p = head_key_p->next();
-			if( k1_p )	{
+		Key *k1_p = head_key_p->next();
+		if( k1_p )	{
 
-				Key *k2_p = k1_p->next();
-				if( k2_p->next() )	{
+			Key *k2_p = k1_p->next();
+			if( k2_p )	{
 
-					if( method == EXTEND_REPEAT )	{
-						double new_p = k1_p->p() - ( k2_p->p() - k1_p->p() );
-						return( edit_head( new_p, k1_p->v() ) );
-					}
-					if( method == EXTEND_MIRROR )	{
-						double new_p = k1_p->p() - ( k2_p->p() - k1_p->p() );
-						double new_v = k1_p->v() - ( k2_p->v() - k1_p->v() );
-						return( edit_head( new_p, new_v ) );
-					}
-					if( method == EXTEND_DECEL )	{
-						double new_p = k1_p->p() - ( k2_p->p() - k1_p->p() );
-						double new_v = k1_p->v() + ( k2_p->v() - k1_p->v() );
-						return( edit_head( new_p, new_v ) );
-					}
+				if( method == EXTEND_REPEAT )	{
+					double new_p = k1_p->p() - ( k2_p->p() - k1_p->p() );
+					return( edit_head( new_p, k1_p->v() ) );
+				}
+				if( method == EXTEND_MIRROR )	{
+					double new_p = k1_p->p() - ( k2_p->p() - k1_p->p() );
+					double new_v = k1_p->v() - ( k2_p->v() - k1_p->v() );
+					return( edit_head( new_p, new_v ) );
+				}
+				if( method == EXTEND_DECEL )	{
+					double new_p = k1_p->p() - ( k2_p->p() - k1_p->p() );
+					double new_v = k1_p->v() + ( k2_p->v() - k1_p->v() );
+					return( edit_head( new_p, new_v ) );
+				}
 
-					Key *k3_p = k2_p->next();
-					if( k3_p )	{
+				Key *k3_p = k2_p->next();
+				if( k3_p )	{
 
-						// EXTEND_ACCEL
-						ctrl_key new_head = gwiz::ssvvcc_extend( *k3_p, *k2_p, *k1_p );
-						return( edit_head( new_head.p(), new_head.v() ) );
-					}
+					// EXTEND_ACCEL
+					ctrl_key new_head = gwiz::ssvvcc_extend( *k3_p, *k2_p, *k1_p );
+					return( edit_head( new_head.p(), new_head.v() ) );
 				}
 			}
 		}
+	}
 	return( false );
 }
 
 bool srSplineCurve::extend_tail( int method )	{
 
-		if( tail_key_p )	{
+	if( tail_key_p )	{
 
-			Key *k0_p = head_key_p;
-			if( k0_p )	{
+		Key *k0_p = head_key_p;
+		if( k0_p )	{
 
-				Key *k1_p = k0_p->next();
-				if( k1_p )	{
+			Key *k1_p = k0_p->next();
+			if( k1_p )	{
 
-					Key *k2_p = k1_p->next();
-					if( k2_p )	{
+				Key *k2_p = k1_p->next();
+				if( k2_p )	{
 
-						Key *next_p = k2_p->next();
-						while( next_p != tail_key_p ) {
-							k0_p = k1_p;
-							k1_p = k2_p;
-							k2_p = next_p;
-							next_p = next_p->next();
-							if( next_p == NULL )	{
-								printf( "srSplineCurve::extend_tail ERR: tail NOT FOUND!\n" );
-							}
+					Key *next_p = k2_p->next();
+					while( next_p != tail_key_p ) {
+						k0_p = k1_p;
+						k1_p = k2_p;
+						k2_p = next_p;
+						next_p = next_p->next();
+						if( next_p == NULL )	{
+							printf( "srSplineCurve::extend_tail ERR: tail NOT FOUND!\n" );
 						}
-						
-						if( method == EXTEND_REPEAT )	{
-							double new_p = k2_p->p() + ( k2_p->p() - k1_p->p() );
-							return( edit_tail( new_p, k2_p->v() ) );
-						}
-						if( method == EXTEND_MIRROR )	{
-							double new_p = k2_p->p() + ( k2_p->p() - k1_p->p() );
-							double new_v = k2_p->v() + ( k2_p->v() - k1_p->v() );
-							return( edit_tail( new_p, new_v ) );
-						}
-						if( method == EXTEND_DECEL )	{
-							double new_p = k2_p->p() + ( k2_p->p() - k1_p->p() );
-							double new_v = k2_p->v() - ( k2_p->v() - k1_p->v() );
-							return( edit_tail( new_p, new_v ) );
-						}
-						
-						// EXTEND_ACCEL
-						ctrl_key new_tail = gwiz::ssvvcc_extend( *k0_p, *k1_p, *k2_p );
-						return( edit_tail( new_tail.p(), new_tail.v() ) );
 					}
+					
+					if( method == EXTEND_REPEAT )	{
+						double new_p = k2_p->p() + ( k2_p->p() - k1_p->p() );
+						return( edit_tail( new_p, k2_p->v() ) );
+					}
+					if( method == EXTEND_MIRROR )	{
+						double new_p = k2_p->p() + ( k2_p->p() - k1_p->p() );
+						double new_v = k2_p->v() + ( k2_p->v() - k1_p->v() );
+						return( edit_tail( new_p, new_v ) );
+					}
+					if( method == EXTEND_DECEL )	{
+						double new_p = k2_p->p() + ( k2_p->p() - k1_p->p() );
+						double new_v = k2_p->v() - ( k2_p->v() - k1_p->v() );
+						return( edit_tail( new_p, new_v ) );
+					}
+					
+					// EXTEND_ACCEL
+					ctrl_key new_tail = gwiz::ssvvcc_extend( *k0_p, *k1_p, *k2_p );
+					return( edit_tail( new_tail.p(), new_tail.v() ) );
 				}
 			}
 		}
+	}
 	return( false );
 }
 
