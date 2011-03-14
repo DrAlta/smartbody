@@ -39,6 +39,7 @@
 #include "me_utilities.hpp"
 #include <ME/me_spline_1d.hpp>
 #include <ME/me_ct_interpolator.h>
+#include "sr_curve_builder.h"
 
 #define USE_REACH 1
 //#define USE_REACH_TEST 0
@@ -1186,10 +1187,42 @@ void SbmCharacter::schedule_viseme_curve(
 			ct_p->name( ct_name.str().c_str() );
 			ct_p->init( channels ); // CROP, CROP, true
 
-			for (int i = 0; i < num_keys; i++)	{
-				float t = curve_info[ i * num_key_params + 0 ];
-				float w = curve_info[ i * num_key_params + 1 ];
-				ct_p->insert_key( 0, t, w );
+			if (num_keys <= 2)
+			{
+				for (int i = 0; i < num_keys; i++)	{
+					float t = curve_info[ i * num_key_params + 0 ];
+					float w = curve_info[ i * num_key_params + 1 ];
+					ct_p->insert_key( t, w );
+				}
+			}
+			else
+			{
+				srSplineCurve spline;
+				spline.set_alg( srSplineCurve::ALG_HALTING );
+				for (int i = 0; i < num_keys; i++)	{
+					float t = curve_info[ i * num_key_params + 0 ];
+					float w = curve_info[ i * num_key_params + 1 ];
+					if (i == 0)
+						spline.insert(t - .001, w);
+					spline.insert( t, w );
+					if (i == num_keys - 1)
+						spline.insert(t + .001, w);
+
+				}
+			
+				spline.extend_head();
+				spline.extend_tail();
+				
+				srCurveBuilder builder;
+				srLinearCurve linear;
+				int num_segs = 100;
+				builder.get_spline_curve( &linear, spline, num_segs, true );
+
+				linear.query_reset();
+				double t, v;
+				while( linear.query_next( &t, &v, true ) )	{
+					ct_p->insert_key( t, v );
+				}
 			}
 
 			double ct_dur = ct_p->controller_duration();
