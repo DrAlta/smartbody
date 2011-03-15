@@ -324,6 +324,9 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "bml",				   test_bml_func );
 	mcu.insert( "addevent",			   addevent_func );
 	mcu.insert( "removeevent",		   removeevent_func );
+	mcu.insert( "enableevents",	       enableevents_func );
+	mcu.insert( "disableevents",	   disableevents_func );
+	mcu.insert( "removeevent",		   removeevent_func );
 	mcu.insert( "registerevent",       registerevent_func );
 	mcu.insert( "unregisterevent",     registerevent_func );
 	mcu.insert( "setmap",			   setmap_func );

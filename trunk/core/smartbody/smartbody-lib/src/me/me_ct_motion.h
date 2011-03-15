@@ -52,6 +52,7 @@ class MeCtMotion : public MeController
     int                  _last_apply_frame; // to optimize shared motion evaluation
 	SrBuffer<int>        _mChan_to_buff; // motion's channels to context's buffer index
 	std::queue<MotionEvent*> _events;
+	int					 _lastCycle;
 
    public :
     static const char* type_name;
