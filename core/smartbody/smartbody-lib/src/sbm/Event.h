@@ -61,9 +61,13 @@ class MotionEvent : public Event
 		void setIsOnceOnly(bool val) { m_isOnce = val; }
 		bool getIsOnceOnly() { return m_isOnce; }
 
+		bool isEnabled() { return m_enabled; }
+		void setEnabled(bool val) { m_enabled = val; }
+
 	protected:
 		double m_time;
 		bool m_isOnce;
+		bool m_enabled;
 };
 
 #endif

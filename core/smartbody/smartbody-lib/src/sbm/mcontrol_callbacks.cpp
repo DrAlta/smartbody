@@ -4667,6 +4667,109 @@ int removeevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
+int disableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	char* tok = args.read_token();
+	if (!tok || strcmp(tok, "help") == 0)
+	{
+		LOG("Use: disableevents <motion|*>");
+		return CMD_SUCCESS;
+	}
+
+	// find the motion
+	std::string motionName = tok;
+	if (motionName == "*") // clear events in all motions
+	{
+		int numMotions = 0;
+		int numEvents = 0;
+		for (std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.begin();
+			 iter != mcu_p->motion_map.end();
+			 iter++)
+		{
+			SkMotion* motion = (*iter).second;
+			numMotions++;
+			std::vector<MotionEvent*>& motionEvents = motion->getMotionEvents();
+			for (size_t x = 0; x < motionEvents.size(); x++)
+			{
+				motionEvents[x]->setEnabled(false);
+				numEvents++;
+			}
+			LOG("%d motion events in %d motions have been disabled.", numEvents, numMotions);
+			return CMD_SUCCESS;
+		}
+	}
+
+	std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.find(motionName);
+	if (iter == mcu_p->motion_map.end())
+	{
+		LOG("Motion %s not found, no events disabled.", motionName.c_str());
+		return CMD_FAILURE;
+	}
+
+	SkMotion* motion = (*iter).second;
+	std::vector<MotionEvent*>& motionEvents = motion->getMotionEvents();
+	int numEvents = motionEvents.size();
+	for (size_t x = 0; x < motionEvents.size(); x++)
+	{
+		motionEvents[x]->setEnabled(false);
+	}
+	LOG("%d motion events have been disabled from motion %s.", numEvents, motion->name());
+		
+	return CMD_SUCCESS;
+}
+
+int enableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	char* tok = args.read_token();
+	if (!tok || strcmp(tok, "help") == 0)
+	{
+		LOG("Use: enableevents <motion|*>");
+		return CMD_SUCCESS;
+	}
+
+	// find the motion
+	std::string motionName = tok;
+	if (motionName == "*") // clear events in all motions
+	{
+		int numMotions = 0;
+		int numEvents = 0;
+		for (std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.begin();
+			 iter != mcu_p->motion_map.end();
+			 iter++)
+		{
+			SkMotion* motion = (*iter).second;
+			numMotions++;
+			std::vector<MotionEvent*>& motionEvents = motion->getMotionEvents();
+			for (size_t x = 0; x < motionEvents.size(); x++)
+			{
+				motionEvents[x]->setEnabled(true);
+				numEvents++;
+			}
+			LOG("%d motion events in %d motions have been enabled.", numEvents, numMotions);
+			return CMD_SUCCESS;
+		}
+	}
+
+	std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.find(motionName);
+	if (iter == mcu_p->motion_map.end())
+	{
+		LOG("Motion %s not found, no events enabled.", motionName.c_str());
+		return CMD_FAILURE;
+	}
+
+	SkMotion* motion = (*iter).second;
+	std::vector<MotionEvent*>& motionEvents = motion->getMotionEvents();
+	int numEvents = motionEvents.size();
+	for (size_t x = 0; x < motionEvents.size(); x++)
+	{
+		motionEvents[x]->setEnabled(true);
+	}
+	LOG("%d motion events have been enabled from motion %s.", numEvents, motion->name());
+		
+	return CMD_SUCCESS;
+}
+
+
 int registerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
 	char* type = args.read_token();

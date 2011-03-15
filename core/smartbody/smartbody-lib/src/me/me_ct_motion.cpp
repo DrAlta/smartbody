@@ -86,6 +86,7 @@ void MeCtMotion::init( SkMotion* m_p, double time_offset, double time_scale )	{
 	_offset = time_offset;
 #endif
 
+	_lastCycle = -1;
 	loadMotionEvents();
 }
 
@@ -278,8 +279,16 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 //	}
 	if ( _loop ) {
 		double x = t/dur;
-		if ( x>1.0 )
-			t = dur *( x-int(x) );
+		int cycleNum = int(x);
+		if ( x > 1.0 )
+		{
+			t = dur *( x - cycleNum );
+			if (cycleNum != _lastCycle)
+			{
+				loadMotionEvents(); // reload any motion events during loop
+				_lastCycle = cycleNum;
+			}
+		}
 	} else {
 		continuing = t < dur;
 	}
@@ -371,13 +380,13 @@ void MeCtMotion::checkMotionEvents(double time)
 	while (!_events.empty())
 	{
 		MotionEvent* motionEvent = _events.front();
-		if (time >= motionEvent->getTime())
+		if (motionEvent->isEnabled() && time >= motionEvent->getTime())
 		{
 			EventManager* manager = EventManager::getEventManager();
 			manager->handleEvent(motionEvent, time);
 			std::string type = motionEvent->getType();
 			std::string params = motionEvent->getParameters();
-			LOG("EVENT: %f %s %s", time, type.c_str(), params.c_str());
+			//LOG("EVENT: %f %s %s", time, type.c_str(), params.c_str());
 			_events.pop();
 		}
 		else
