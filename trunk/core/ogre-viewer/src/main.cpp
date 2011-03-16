@@ -179,8 +179,8 @@ public:
 		{
 			mSceneMgr->getSceneNode("world_scene_ft")->setVisible(false);
 			mSceneMgr->getSceneNode("world_scene_cm")->setVisible(false);
-			mSceneMgr->getSceneNode("plane_node")->setVisible(true); 
-		    mSceneMgr->getSceneNode("world_scene_vh")->setVisible(false);
+			mSceneMgr->getSceneNode("plane_node")->setVisible(false); 
+		    mSceneMgr->getSceneNode("world_scene_vh")->setVisible(true);
 		}
 		if(mKeyboard->isKeyDown(OIS::KC_2))
 		{
@@ -200,8 +200,8 @@ public:
 		{
 			mSceneMgr->getSceneNode("world_scene_ft")->setVisible(false);
 			mSceneMgr->getSceneNode("world_scene_cm")->setVisible(false);
-			mSceneMgr->getSceneNode("plane_node")->setVisible(false);
-			mSceneMgr->getSceneNode("world_scene_vh")->setVisible(true);
+			mSceneMgr->getSceneNode("plane_node")->setVisible(true);
+			mSceneMgr->getSceneNode("world_scene_vh")->setVisible(false);
 		}
 
 
@@ -473,6 +473,7 @@ class OgreViewerApplication : public ExampleApplication
 			pPlaneEnt->setMaterialName( "Rockwall" );
 			pPlaneEnt->setCastShadows( false );
 			mSceneMgr->getRootSceneNode()->createChildSceneNode("plane_node", Vector3( 0, 0, 0 ) )->attachObject( pPlaneEnt );
+			mSceneMgr->getSceneNode("plane_node")->setVisible(false);
 
 			// adding diagnostic scene to measure in feet
 			sceneNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("world_scene_ft");
@@ -490,7 +491,7 @@ class OgreViewerApplication : public ExampleApplication
 			sceneNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("world_scene_vh");
 			sceneEntity = mSceneMgr->createEntity("world_entity_vh","vh_basic_level.mesh");
 			sceneNode->attachObject(sceneEntity);
-			sceneNode->setVisible(false);
+			sceneNode->setVisible(true);
 
 
 			skeleton[ 0 ] = ""; // unused
