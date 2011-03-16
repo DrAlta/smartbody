@@ -216,7 +216,7 @@ void MeCtEyeLidRegulator::init( bool tracking_pitch )	{
 	
 	_channels.add( "au_45_left", SkChannel::XPos );
 	_channels.add( "au_45_right", SkChannel::XPos );
-	_channels.add( "au_45", SkChannel::XPos );
+	//_channels.add( "au_45", SkChannel::XPos );
 	if (get_use_blink_viseme())
 	{
 		_channels.add( "blink", SkChannel::XPos );
@@ -420,15 +420,17 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 		applied = true;
 	}
 
+	/*
 	// TODO: use safe threshold: abs( diff( a, b ) )
 	if( ( UL_value != 0.0f ) && ( UL_value == UR_value ) ) {
 		int U_au_blink_idx = _context->channels().search( SkJointName( "au_45" ), SkChannel::XPos );
 		int U_au_blink_buff_idx = _context->toBufferIndex( U_au_blink_idx );
 		if( U_au_blink_idx >= 0 )	{
 			fbuffer[ U_au_blink_buff_idx ] = UL_value;
-		}
+		} 
 		applied = true;
 	}
+	*/
 
 	if( applied == false ) {
 		if( UL_value != 0.0f ) {
