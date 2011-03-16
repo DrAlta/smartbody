@@ -52,6 +52,7 @@
 //New Modifications to better use XML structure of input message
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/framework/MemBufInputSource.hpp>
+#include <xercesc/framework/MemBufFormatTarget.hpp>
 #include <xercesc/dom/DOMErrorHandler.hpp>
 #include <xercesc/util/XMLString.hpp>
 #include <algorithm>
@@ -124,20 +125,20 @@ void cleanString(std::string &message)
 	/// If it's a space string, we want to leave the last whitespace
 	while ( message.find_last_of(" ") == message.length() - 1  && message.length() > 1)
 	{
-		fprintf(stderr,"Debug: Reducing length by 1 to remove whitespace at end\n");
+		//fprintf(stderr,"Debug: Reducing length by 1 to remove whitespace at end\n");
 		message.resize( message.length() - 1 );
 	}
 
 	unsigned int pos;
 	while ( (pos = message.find("  ")) != std::string::npos )
 	{
-		fprintf(stderr,"Debug: replacing 2 whitespaces at %d(%s) with 1 whitespace\n",pos, message.substr(pos,2).c_str());
+		//fprintf(stderr,"Debug: replacing 2 whitespaces at %d(%s) with 1 whitespace\n",pos, message.substr(pos,2).c_str());
 		message.replace( pos, 2, " " );
 	}
 
-	while ( message.find_first_of(" ") == 0 )
-	{
-		fprintf(stderr,"Debug: Cleaning initial whitespace %s\n",message[0]);
+	while (( message.find_first_of(" ") == 0 ) && (message.length() > 1))
+	{		
+		//fprintf(stderr,"Debug: Cleaning initial whitespace %s\n",message[0]);
 		message = message.substr(1);
 	}
 }
@@ -205,28 +206,59 @@ std::string storeXMLMetaData( const std::string & txt)
 				   if (node->getNodeType() && node->getNodeType() == DOMNode::ELEMENT_NODE)
 				   {
 					   DOMElement *element = dynamic_cast<DOMElement*>( node );
+
+
+					   //print the DOM to a memory terminal 
+						DOMLSSerializer* theSerializer2 = DOMImplementation::getImplementation()->createLSSerializer();
+						XMLFormatTarget *myFormatTarget2 = new MemBufFormatTarget();
+						DOMLSOutput* myLSOutput2 = DOMImplementation::getImplementation()->createLSOutput();
+						myLSOutput2->setByteStream( myFormatTarget2 );
+
+						// serialize a DOMNode to an internal memory buffer
+						theSerializer2->write(element, myLSOutput2);
+
+						// print the final bml code to the terminal
+						string output =
+						(char*)  ((MemBufFormatTarget*)myFormatTarget2)->getRawBuffer();		
+					   
+
 					   XMLCh *mark = (XMLCh*)element->getAttribute(XMLString::transcode("name"));
 					   XMLCh *speech = NULL;
 					   DOMNode *speechNode = element->getFirstChild();
+					   
+
+
 					   if ( speechNode == NULL ) 
 					   {
-						   speechNode = element->getNextSibling();
+						   speechNode = element->getNextSibling();		
 					   }
-					   if ( speechNode->getNodeType() == DOMNode::TEXT_NODE )
+					   if ( (speechNode !=NULL) && ( speechNode->getNodeType() == DOMNode::TEXT_NODE ) )
 					   {
 						   speech = (XMLCh*)speechNode->getNodeValue();
-					   }
+					   }					   					   
+
+
+
 					   /// Get the timing tag as a string
 					   char * t1, *t2;
 					   std::string markString(t1 = XMLString::transcode(mark));
-					   std::string speechString(t2 = (speech)?XMLString::transcode(speech): " ");
+					   std::string speechString;
+
+					   if(speechNode !=NULL)
+					   {
+						   t2 = (speech)?XMLString::transcode(speech): " ";
+						   speechString = t2;
+					   }
+					   else
+						   speechString = "";
+						   
 					   XMLString::release(&t1);
 					   XMLString::release(&t2);
 
-					   if( markString == "" || speechString == "" )
+					   if( !strcmp(markString.c_str(),"") || !strcmp(speechString.c_str(),"") )
 					   {
 						   /// Null strings tend to cause problems with later code sections
-						   if ( speechString == "" ) speechString = " ";
+						   if ( !strcmp(speechString.c_str(),"") ) speechString = " ";
 					   }
 					   else
 					   {
