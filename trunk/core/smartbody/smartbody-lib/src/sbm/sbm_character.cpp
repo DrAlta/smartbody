@@ -1609,6 +1609,73 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		}
 		return CMD_SUCCESS;
 	}
+	else 
+	if (cmd == "requests")
+	{
+		BML::Processor& bp = mcu_p->bml_processor;
+		for (std::map<std::string, BML::BmlRequestPtr >::iterator iter = bp.getBMLRequestMap().begin();
+			 iter != bp.getBMLRequestMap().end();
+			 iter++)
+		{
+			if (all_characters)
+			{
+				LOG("%s", (*iter).second->requestId.c_str());
+			}
+			else
+			{			
+				// make sure the requests is for this character
+				std::string requestWithName = (*iter).second->requestId;
+				std::string charName = this->name;
+				charName.append("|");
+				int index = requestWithName.find(charName);
+				if (index == 0)
+				{
+					LOG("%s", (*iter).second->requestId.c_str());
+				}
+			}
+		}
+		return CMD_SUCCESS;
+	}
+	if (cmd == "interrupt")
+	{
+		int numRequestsInterrupted = 0;
+		BML::Processor& bp = mcu_p->bml_processor;
+		for (std::map<std::string, BML::BmlRequestPtr >::iterator iter = bp.getBMLRequestMap().begin();
+			 iter != bp.getBMLRequestMap().end();
+			 iter++)
+		{
+			std::string requestWithName = (*iter).second->requestId;
+			if (all_characters)
+			{
+				int pipeLocation = requestWithName.find("|");
+				std::string charName = requestWithName.substr(0, pipeLocation);
+				std::string request = requestWithName.substr(pipeLocation + 1);
+				std::stringstream strstr;
+				strstr << "bp interrupt " << charName << " " << request << " .5"; 
+				mcu_p->execute((char*) strstr.str().c_str());
+				numRequestsInterrupted++;
+			}
+			else
+			{			
+				// make sure the requests is for this character
+				
+				std::string charName = this->name;
+				charName.append("|");
+				int index = requestWithName.find(charName);
+				if (index == 0)
+				{
+					std::string request = requestWithName.substr(charName.size());
+					std::stringstream strstr;
+					strstr << "bp interrupt " << this->name << " " << request << " .5"; 
+					mcu_p->execute((char*) strstr.str().c_str());
+					numRequestsInterrupted++;
+				}
+			}
+			LOG("%d requests interrupted on character %s.", numRequestsInterrupted, this->name);
+			return CMD_SUCCESS;
+		}
+		return CMD_SUCCESS;
+	}
 	else
 	if( cmd == "prune" ) {
 		return( prune_controller_tree( mcu_p ) );

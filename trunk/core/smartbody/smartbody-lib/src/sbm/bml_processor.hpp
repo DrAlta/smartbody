@@ -84,8 +84,8 @@ namespace BML {
 
 		// Private Data
 		HandlerBase*       xmlErrorHandler;
-		MapOfBmlRequest    bml_requests;    // indexed by buildRequestId(..) string
 		MapOfSpeechRequest speeches; // indexed by buildSpeechKey(..) string
+		MapOfBmlRequest    bml_requests;    // indexed by buildRequestId(..) string
 
 		bool auto_print_controllers;
 		bool auto_print_sequence;
@@ -164,8 +164,10 @@ namespace BML {
 		 */
 		int bml_end( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu );
 
-
-
+		/**
+		* Returns a map of all BML requests to the BML request objects.
+		*/
+		MapOfBmlRequest& getBMLRequestMap();
 
 		///////////////////////////////////////////////////////////////////////
 		//  Static Command and Message Hooks
@@ -207,6 +209,9 @@ namespace BML {
 
 		void (*requestcb)(BmlRequest* request, void* data);
 		void* requestData;
+
+
+		
 
 		
 
