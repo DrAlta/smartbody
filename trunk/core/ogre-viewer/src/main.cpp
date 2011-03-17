@@ -48,6 +48,61 @@ SceneNode * mSceneNode;
 std::string skeleton[ 114 ];
 
 
+class LocomotionData
+{
+	public:
+		LocomotionData() 
+		{
+			rps = 0.7f;
+			x_flag = 0;
+			z_flag = 0;
+			rps_flag = 0;
+			spd;
+			x_spd = 7;
+			z_spd = 70;
+			t_direction[200];
+			character[100];
+			char_index = 0;
+			kmode = 0;
+			height_disp = 0.0f;
+			height_disp_delta = 1.0f;
+			height_disp_inc = false;
+			height_disp_dec = false;
+			upkey = false;
+			downkey = false;
+			leftkey = false;
+			rightkey = false;
+			a_key = false;
+			d_key = false;
+
+			off_height_comp = 0.0f;
+		}
+		
+		float rps;
+		int x_flag;
+		int z_flag;
+		int rps_flag;
+		float spd;
+		float x_spd;
+		float z_spd;
+		char t_direction[200];
+		char character[100];
+		int char_index;
+		int kmode;
+		float height_disp;
+		float height_disp_delta;
+		bool height_disp_inc;
+		bool height_disp_dec;
+		bool upkey;
+		bool downkey;
+		bool leftkey;
+		bool rightkey;
+		bool a_key;
+		bool d_key;
+		float off_height_comp;
+};
+
+
 // Event handler to animate
 class SkeletalAnimationFrameListener : public ExampleFrameListener
 {
@@ -56,6 +111,8 @@ private:
 	BoneBusServer * m_bonebus;
 
 	bool m_ogreMouseEnabled;
+
+	LocomotionData * m_locoData;
 
 	
 protected:
@@ -69,6 +126,7 @@ public:
 		m_bonebus = bonebus;
 		mQuit = false;
 		m_ogreMouseEnabled = true;
+		m_locoData = new LocomotionData();
 
 
 		// turn off mouse look by default
@@ -82,8 +140,186 @@ public:
 	}
 
 
+	void CharacterLocomotion( OIS::Keyboard * pkKeyboard )
+	{
+		bool locomotion_cmd = false;
+		char cmd[300];
+		cmd[0] = '\0';
+
+
+		if(m_locoData->x_flag == 0 && m_locoData->z_flag == 0)
+		{
+			m_locoData->rps_flag = 0;
+			m_locoData->z_flag = 1;
+			m_locoData->x_flag = 0;
+			m_locoData->spd = m_locoData->z_spd;
+			sprintf(m_locoData->t_direction, "forward ");
+		}
+
+		/*mcuCBHandle& mcu = mcuCBHandle::singleton();
+		SbmCharacter* actor = NULL;
+		mcu.character_map.reset();
+		for(int i = 0; i <= m_locoData->char_index; ++i)
+		{
+			actor = mcu.character_map.next();
+			if (actor)
+				sprintf(m_locoData->character, "char %s ", actor->name);
+		}*/
+
+		sprintf(cmd, "test loco ");
+		//strcat(cmd, m_locoData->character);
+
+		if(pkKeyboard->isKeyDown(OIS::KC_C))
+		{
+			if(m_locoData->z_flag != 0) m_locoData->z_spd += 10;
+			else if(m_locoData->x_flag != 0) m_locoData->x_spd += 1;
+		}
+		if(pkKeyboard->isKeyDown(OIS::KC_V))
+		{
+			if(m_locoData->z_flag != 0) m_locoData->z_spd -= 10;
+			else if(m_locoData->x_flag != 0) m_locoData->x_spd -= 1;
+			if(m_locoData->z_spd < 0) m_locoData->z_spd = 0;
+			if(m_locoData->x_spd < 0) m_locoData->x_spd = 0;
+		}
+
+		//direction control
+
+		if( pkKeyboard->isKeyDown(OIS::KC_T))
+		{
+			if(!m_locoData->upkey)
+			{
+				m_locoData->rps_flag = 0;
+				m_locoData->z_flag = 1;
+				m_locoData->x_flag = 0;
+				m_locoData->spd = m_locoData->z_spd;
+				m_locoData->kmode = 0;
+				sprintf(m_locoData->t_direction, "forward ");
+				m_locoData->upkey = true;
+			}
+		}
+		else
+		{
+			m_locoData->upkey = false;
+		}
+		if( pkKeyboard->isKeyDown(OIS::KC_G))
+		{
+			if(!m_locoData->downkey)
+			{
+				m_locoData->z_flag = -1;
+				m_locoData->x_flag = 0;
+				m_locoData->rps_flag = 0;
+				m_locoData->spd = m_locoData->z_spd;
+				m_locoData->kmode = 0;
+				sprintf(m_locoData->t_direction, "backward ");
+				m_locoData->downkey = true;
+			}
+		}
+		else
+		{
+			m_locoData->downkey = false;
+		}
+		if(pkKeyboard->isKeyDown(OIS::KC_F))
+		{
+			if(!m_locoData->leftkey)
+			{
+				m_locoData->rps_flag = -1;
+				m_locoData->leftkey = true;
+			}
+		}
+		else
+		{
+			m_locoData->leftkey = false;
+		}
+		if( pkKeyboard->isKeyDown(OIS::KC_H))
+		{
+			if(!m_locoData->rightkey)
+			{
+				m_locoData->rps_flag = 1;
+				m_locoData->rightkey = true;
+			}
+		}
+		else
+		{
+			m_locoData->rightkey = false;
+		}
+
+		if( pkKeyboard->isKeyDown(OIS::KC_Y))//speed control
+		{
+			if(!m_locoData->a_key)
+			{
+				m_locoData->x_flag = 1;
+				m_locoData->z_flag = 0;
+				m_locoData->rps_flag = 0;
+				m_locoData->spd = m_locoData->x_spd;
+				sprintf(m_locoData->t_direction, "leftward ");
+				m_locoData->a_key = true;
+			}
+		}
+		else
+		{
+			m_locoData->a_key = false;
+		}
+
+		if( pkKeyboard->isKeyDown(OIS::KC_R))//speed control
+		{
+			if(!m_locoData->d_key)
+			{
+				m_locoData->x_flag = -1;
+				m_locoData->z_flag = 0;
+				m_locoData->rps_flag = 0;
+				m_locoData->spd = m_locoData->x_spd;
+				sprintf(m_locoData->t_direction, "rightward ");
+				m_locoData->d_key = true;
+			}
+		}
+		else
+		{
+			m_locoData->d_key = false;
+		}
+
+		if(!m_locoData->rightkey && !m_locoData->leftkey)
+		{
+			m_locoData->rps_flag = 0;
+		}
+
+			if(m_locoData->upkey
+			|| m_locoData->downkey
+			|| m_locoData->rightkey
+			|| m_locoData->leftkey
+			|| m_locoData->a_key
+			|| m_locoData->d_key)
+		{
+			locomotion_cmd = true;
+		}		
+
+		char tt[200];
+		strcat(cmd, "char brad ");
+		strcat(cmd, m_locoData->t_direction);
+		//sprintf(tt, "spd %f rps %f time 0.5", spd, rps_flag * rps);
+
+		if(m_locoData->kmode == 0) sprintf(tt, "spd 0 rps %f time 0.1", m_locoData->rps_flag * m_locoData->rps);
+		else sprintf(tt, "spd 0 lrps %f angle 3.14159265 time 1.0", m_locoData->rps_flag * m_locoData->rps);
+
+		if(locomotion_cmd) 
+		{
+			strcat(cmd, tt);
+			//printf("\n%s", cmd);
+			//mcu.execute(cmd);
+			vhmsg::ttu_notify2( "sbm", cmd );
+			FILE* fp = fopen("c:\\data\\command.txt", "w+");
+			fprintf(fp, cmd);
+			fclose(fp);
+		}
+	}
+
+
+
+
+
+
 	bool processUnbufferedKeyInput(const FrameEvent& evt)
 	{
+		CharacterLocomotion(mKeyboard);
 
 		if(mKeyboard->isKeyDown(OIS::KC_A))
 			mTranslateVector.x = -mMoveScale;	// Move camera left
@@ -119,7 +355,7 @@ public:
 			mTimeUntilNextToggle = 1;
 		}
 
-		if( mKeyboard->isKeyDown(OIS::KC_T) && mTimeUntilNextToggle <= 0 )
+		if( mKeyboard->isKeyDown(OIS::KC_M) && mTimeUntilNextToggle <= 0 )
 		{
 			switch(mFiltering)
 			{
@@ -153,7 +389,7 @@ public:
 			mDebugText = "Saved: " + ss.str();
 		}
 
-		if(mKeyboard->isKeyDown(OIS::KC_R) && mTimeUntilNextToggle <=0)
+		if(mKeyboard->isKeyDown(OIS::KC_N) && mTimeUntilNextToggle <=0)
 		{
 			mSceneDetailIndex = (mSceneDetailIndex+1)%3 ;
 			switch(mSceneDetailIndex) {
@@ -1087,6 +1323,12 @@ class OgreViewerApplication : public ExampleApplication
 
 		BoneBusServer  m_bonebus;
 };
+
+
+
+
+
+
 
 
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
