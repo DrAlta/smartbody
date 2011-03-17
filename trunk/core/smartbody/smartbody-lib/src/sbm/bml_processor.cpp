@@ -79,7 +79,7 @@ const XMLCh TAG_ACT[]		= L"act";
 const XMLCh TAG_BML[]       = L"bml";
 const XMLCh TAG_BODY[]      = L"body";
 const XMLCh TAG_REQUIRED[]  = L"required";
-#if BMLR_BML2ANIM
+#ifdef BMLR_BML2ANIM
 const XMLCh TAG_POSTURE[]   = L"posture"; // [BMLR] For bml2anim postures
 #endif
 const XMLCh TAG_HEAD[]      = L"head";
@@ -456,16 +456,16 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				behavior = parse_bml_locomotion( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_INTERRUPT )==0 ) {
 				behavior = parse_bml_interrupt( child, unique_id, behav_syncs, required, request, mcu );
-#if BMLR_BML2ANIM
+#ifdef BMLR_BML2ANIM
 			// [BMLR]  Note that this brace closes out the if statement above
 			}
 
 			// [BMLR]
 			if (behavior == NULL) {
 				// [BMLR] support for bml to animations
-				behavior = parse_bml_to_anim(child, behav_syncs, request, mcu);
+				behavior = parse_bml_to_anim(child, unique_id, behav_syncs, required, request, mcu);
 				if( behavior != NULL )
-					request->addBehavior( behavior );
+					request->registerBehavior( id, behavior );
 				else
 					wcerr<<"WARNING: BodyPlannerImpl: <"<<tag<<"> BML tag unrecognized or unsupported."<<endl;
 			}
@@ -780,7 +780,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
     }
 }
 
-#if BMLR_BML2ANIM
+#ifdef BMLR_BML2ANIM
 // [BMLR] Reads the bml2anim.xml file placed in the mepath directory and maps bml elements that are not supported 
 // by motion controllers to animations
 // for example: 
@@ -789,13 +789,13 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 // It then reads the file and finds this line:
 // <gesture type="beat">CrossedArms_RArm_LowBeat</gesture>
 // and plays the CrossedArms_RArm_LowBeat.skm animation
-BehaviorRequest* BML::Processor::parse_bml_to_anim( DOMElement* elem, BehaviorSyncPoints& behav_syncs, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BML::BehaviorRequestPtr BML::Processor::parse_bml_to_anim( DOMElement* elem, std::string& unique_id,  BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
 
 	if (bml2animText.empty())
 	{			
-		char* dir;
+		std::string dir;
 
-		while (dir = mcu->me_paths.next_path())
+		while ((dir = mcu->me_paths.next_path()) != "")
 		{
 			std::string filename = "";
 			filename.append(dir);
@@ -862,19 +862,20 @@ BehaviorRequest* BML::Processor::parse_bml_to_anim( DOMElement* elem, BehaviorSy
 					if( XMLString::compareString( elem->getTagName(), TAG_POSTURE )==0 || XMLString::compareString( elem->getTagName(), TAG_BODY)==0 ) {
 						string posture = "<body posture=\"" + string(XMLString::transcode(animNode->getTextContent())) + "\" />";
 						DOMElement* e = xml_utils::parseMessageXml(Prser, (char*)posture.c_str())->getDocumentElement();
-						return parse_bml_body(e, behav_syncs, request, mcu);
+						return parse_bml_body(e, unique_id, behav_syncs, required, request, mcu);
+						//behavior = parse_bml_body( child, unique_id, behav_syncs, required, request, mcu );
 					}
 					else {
 						string animation = "<animation name=\"" + string(XMLString::transcode(animNode->getTextContent())) + "\" />";
 						DOMElement* e = xml_utils::parseMessageXml(Prser, (char*)animation.c_str())->getDocumentElement();
-						return parse_bml_animation(e, behav_syncs, request, mcu);
+						return parse_bml_animation(e, unique_id, behav_syncs, required, request, mcu);
 					}
 				}
 			}
 			animNode = animNode->getNextSibling();
 		}
 	}
-	return NULL;
+	return BehaviorRequestPtr();
 }
 #endif  // BMLR_BML2ANIM
 
@@ -1008,6 +1009,11 @@ int BML::Processor::bml_end( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
 	return CMD_SUCCESS;
 }
 
+
+MapOfBmlRequest& BML::Processor::getBMLRequestMap()
+{
+	return bml_requests;
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
