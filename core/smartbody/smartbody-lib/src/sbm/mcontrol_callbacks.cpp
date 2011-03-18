@@ -4139,6 +4139,7 @@ int mcu_vrKillComponent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
            _stricmp( command, "all" ) == 0 )
       {
 	      mcu_p->loop = false;
+		  mcu_p->vhmsg_send( "vrProcEnd sbm" );
 	      return CMD_SUCCESS;
       }
    }
