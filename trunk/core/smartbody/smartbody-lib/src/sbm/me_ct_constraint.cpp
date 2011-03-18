@@ -61,7 +61,7 @@ void MeCtConstraint::init()
 
 	const IKTreeNodeList& nodeList = ik_scenario.ikTreeNodes;	
 	
-	for (int i=0;i<nodeList.size();i++)
+	for (size_t i=0;i<nodeList.size();i++)
 	{
 		SkJoint* joint = nodeList[i]->joint;
 		_channels.add(joint->name().get_string(), SkChannel::Quat);
@@ -108,7 +108,7 @@ bool MeCtConstraint::controller_evaluate( double t, MeFrameData& frame )
 	prev_time = (float)t;
 
 	assert(ik_scenario.ikEndEffectors.size() == targetJointList.size());
-	for (int i=0;i<targetJointList.size();i++)
+	for (size_t i=0;i<targetJointList.size();i++)
 	{
 		ik_scenario.ikEndEffectors[i]->targetPos = get_reach_target(targetJointList[i]);
 	}
@@ -127,7 +127,7 @@ bool MeCtConstraint::controller_evaluate( double t, MeFrameData& frame )
 		{
 			ik.update(&ik_scenario);
 			ik_scenario.ikInitQuatList = ik_scenario.ikQuatList;
-			for (int i=0;i<ik_scenario.ikQuatList.size();i++)
+			for (size_t i=0;i<ik_scenario.ikQuatList.size();i++)
 			{
 				SrQuat qEval = ik_scenario.ikQuatList[i];
 				SrQuat qInit = ik_scenario.ikRefQuatList[i];
@@ -212,7 +212,7 @@ bool MeCtConstraint::updateFading( float dt )
 
 		if (fadeMode == FADING_MODE_IN)
 		{			
-			float fadeNormal = 1.0 - fadeRemainTime/fadeInterval;
+			float fadeNormal = 1.0f - fadeRemainTime/fadeInterval;
 			blendWeight = fadeNormal;
 			if (blendWeight > 1.0 - FADE_EPSILON)
 			{

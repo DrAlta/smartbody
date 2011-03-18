@@ -223,7 +223,7 @@ int MeCtIKTreeScenario::findIKTreeNodeInList( const char* jointName, IKTreeNodeL
 
 void MeCtIKTreeScenario::clearNodes()
 {
-	for (int i=0;i<ikTreeNodes.size();i++)
+	for (size_t i=0;i<ikTreeNodes.size();i++)
 	{
 		MeCtIKTreeNode* node = ikTreeNodes[i];
 		delete node;

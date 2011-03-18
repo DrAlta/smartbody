@@ -61,7 +61,7 @@ void MeCtExampleBodyReach::setReachTarget( SrVec& reachPos )
 		VecOfDouble acutualReachTarget;
 		interpMotion->getExampleParameter(acutualReachTarget);
 		for (int i=0;i<3;i++)
-			reachError[i] = reachPos[i] - acutualReachTarget[i];
+			reachError[i] = reachPos[i] - (float)acutualReachTarget[i];
 		
 	}	
 }
@@ -95,20 +95,20 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 		curPercentTime = interpMotion->motionPercent(reachTime);
 		if (curPercentTime < prevPercentTime) // loop back to beginning
 		{
-			curReachOffset = reachError*curPercentTime;
+			curReachOffset = reachError*(float)curPercentTime;
 			ikScenario.ikInitQuatList = outMotionFrame.jointQuat;
 		}
 		else
 		{
 			double deltaPercent = (curPercentTime-prevPercentTime);
 			double ratio = 1.0/(1.0-prevPercentTime);
-			curReachOffset += (reachError - curReachOffset)*ratio*deltaPercent;
+			curReachOffset += (reachError - curReachOffset)*(float)ratio*(float)deltaPercent;
 		}
 
 		VecOfDouble curReachPos;
 		motionParameter->getPoseParameter(outMotionFrame,curReachPos);
 		for (int i=0;i<3;i++)
-			curReachTrajectory[i] = curReachPos[i] + curReachOffset[i];
+			curReachTrajectory[i] = (float)curReachPos[i] + curReachOffset[i];
 		du = interpMotion->getRefDeltaTime(reachTime,dt);
 	}
 
@@ -132,7 +132,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	}	
 	
 	prevPercentTime = curPercentTime;	
-	reachTime += du; // add the reference delta time
+	reachTime += (float)du; // add the reference delta time
 	updateChannelBuffer(frame,outMotionFrame);
 	return true;
 }
@@ -152,7 +152,7 @@ void MeCtExampleBodyReach::init()
 	for (int i=0;i<3;i++)
 		_channels.add(rootJoint->name().get_string(), (SkChannel::Type)(SkChannel::XPos+i));
 	
-	for (int i=0;i<nodeList.size();i++)
+	for (size_t i=0;i<nodeList.size();i++)
 	{
 		SkJoint* joint = nodeList[i]->joint;
 		affectedJoints.push_back(joint);	
@@ -188,7 +188,7 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 		// add the example parameter for visualization purpose
 		SrVec reachPos;
 		for (int i=0;i<3;i++)
-			reachPos[i] = ex->parameter[i];
+			reachPos[i] = (float)ex->parameter[i];
 		examplePts.push_back(reachPos);		
 		motionExamples.addMotionExample(ex);
 	}	
@@ -200,12 +200,12 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 	dataInterpolator->init(&motionExamples);
 	dataInterpolator->buildInterpolator();	
 	
-	for (int i=0;i<resampleData->size();i++)
+	for (size_t i=0;i<resampleData->size();i++)
 	{
 		InterpolationExample* ex = (*resampleData)[i];
 		SrVec reachPos;
 		for (int k=0;k<3;k++)
-			reachPos[k] = ex->parameter[k];
+			reachPos[k] = (float)ex->parameter[k];
 		resamplePts.push_back(reachPos);
 	}
 
@@ -231,7 +231,7 @@ ResampleMotion* MeCtExampleBodyReach::createInterpMotion()
 
 void MeCtExampleBodyReach::getParameter(VecOfSrQuat& quatList, float time, VecOfDouble& outPara )
 {	
-	for (int i=0;i<affectedJoints.size();i++)
+	for (size_t i=0;i<affectedJoints.size();i++)
 	{
 		SkJoint* joint = affectedJoints[i];
 		joint->quat()->value(quatList[i]);

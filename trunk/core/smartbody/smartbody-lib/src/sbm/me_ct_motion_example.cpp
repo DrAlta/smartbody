@@ -45,7 +45,7 @@ double BodyMotion::getRefDeltaTime( float u, float dt )
 
 double BodyMotion::motionPercent( float time )
 {
-	float rt = timeWarp->timeWarp(time);
+	double rt = timeWarp->timeWarp(time);
 	return timeWarp->invTimeWarp(rt)/timeWarp->refTimeLength();
 }
 
@@ -55,14 +55,14 @@ double BodyMotion::getMotionFrame( float time, SkSkeleton* skel, const vector<Sk
 	// This is a hack to apply the motion on a skeleton, and then get the quat values directly.
 
 	motion->connect(skel);	
-	float rt = timeWarp->timeWarp(time);
-	motion->apply(rt);	
+	double rt = timeWarp->timeWarp(time);
+	motion->apply((float)rt);	
 	motion->disconnect();
 
 	if (outMotionFrame.jointQuat.size() != affectedJoints.size())
 		outMotionFrame.jointQuat.resize(affectedJoints.size());
 
-	for (int i=0;i<affectedJoints.size();i++)
+	for (size_t i=0;i<affectedJoints.size();i++)
 		outMotionFrame.jointQuat[i] = affectedJoints[i]->quat()->value();
 	
 	outMotionFrame.rootPos.set(skel->root()->child(0)->pos()->value());
@@ -72,9 +72,9 @@ double BodyMotion::getMotionFrame( float time, SkSkeleton* skel, const vector<Sk
 double BodyMotion::motionDuration(DurationType durType)
 {
 	double motionTime = 0.0;
-	if (durType == DurationType::DURATION_REF)
+	if (durType == DURATION_REF)
 		motionTime = timeWarp->refTimeLength();
-	else if (durType == DurationType::DURATION_ACTUAL)
+	else if (durType == DURATION_ACTUAL)
 		motionTime = timeWarp->actualTimeLength();		
 
 	return motionTime;
@@ -110,7 +110,7 @@ double ResampleMotion::motionDuration(DurationType durType)
 {
 	double motionTime = 0.0;
 	VecOfBodyMotionPtr& motions = *motionDataRef;
-	for (int i=0;i<weight.size();i++)
+	for (size_t i=0;i<weight.size();i++)
 	{
 		int idx = weight[i].first;
 		float w = weight[i].second;
@@ -128,7 +128,7 @@ void ResampleMotion::getExampleParameter( VecOfDouble& outPara )
 double ResampleMotion::motionPercent( float time )
 {
 	double timePercent = 0.0;
-	for (int i=0;i<weight.size();i++)
+	for (size_t i=0;i<weight.size();i++)
 	{		
 		float w = weight[i].second;		
 		int idx = weight[i].first;
@@ -141,7 +141,7 @@ double ResampleMotion::motionPercent( float time )
 double ResampleMotion::getRefDeltaTime( float u, float dt )
 {
 	double du = 0.0;
-	for (int i=0;i<weight.size();i++)
+	for (size_t i=0;i<weight.size();i++)
 	{		
 		float w = weight[i].second;		
 		int idx = weight[i].first;
@@ -228,7 +228,7 @@ int ParameterBoundingBox::gridHashing( const VecOfDouble& inPara, double cellSiz
 		localPara[i] = inPara[i] - minParameter[i];
 		gridSize[i] = floor((maxParameter[i]-minParameter[i])/cellSize) + 1;
 		intPara[i] = static_cast<int>(localPara[i]/cellSize);
-		nHash *= gridSize[i];
+		nHash *= (int)gridSize[i];
 		nHash += intPara[i];		
 	}
 
@@ -244,7 +244,7 @@ int ParameterBoundingBox::gridHashing( const VecOfDouble& inPara, double cellSiz
 			int tempPara = intPara[l];
 			int bit = idx/powNum -1;
 
-			adjHash[k] *= gridSize[l];			
+			adjHash[k] *= (int)gridSize[l];			
 			tempPara += bit;
 			idx = idx%powNum;
 			powNum /= 3;				
@@ -293,7 +293,7 @@ double MotionExampleSet::blendMotion( float time, const VecOfInterpWeight& blend
 
 MotionExampleSet::~MotionExampleSet()
 {
-	for (int i=0;i<motionExamples.size();i++)
+	for (size_t i=0;i<motionExamples.size();i++)
 	{
 		// feng : need to figure out why we can not delete the base pointer "BodyMotionInterface".
 		MotionExample* ex = motionExamples[i];
@@ -328,7 +328,7 @@ double MotionExampleSet::blendMotionFunc( float time, SkSkeleton* skel, const ve
 	newTime = ex->getMotionFrame(time,skel,joints,outMotionFrame);			
 	BodyMotionFrame tempFrame;
 	float w1,w2;	
-	for (int i=1;i<blendWeight.size();i++)
+	for (size_t i=1;i<blendWeight.size();i++)
 	{
 		w1 = weightSum;
 		w2 = blendWeight[i].second;
@@ -342,7 +342,7 @@ double MotionExampleSet::blendMotionFunc( float time, SkSkeleton* skel, const ve
 
 		newTime = motions[idx]->getMotionFrame(time,skel,joints,tempFrame)*weight + newTime*oneMinusWeight;
 
-		for (int k=0;k<outMotionFrame.jointQuat.size();k++)
+		for (size_t k=0;k<outMotionFrame.jointQuat.size();k++)
 		{
 			outMotionFrame.jointQuat[k] = slerp( outMotionFrame.jointQuat[k], tempFrame.jointQuat[k], weight );
 			outMotionFrame.jointQuat[k].normalize();
