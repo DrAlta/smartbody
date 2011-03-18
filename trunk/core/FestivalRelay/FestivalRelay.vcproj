@@ -25,7 +25,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="cd ..\..\lib\speech_tools&#x0D;&#x0A;nmake /nologo /FVCMakefile&#x0D;&#x0A;cd ..\festival&#x0D;&#x0A;nmake /nologo /FVCMakefile&#x0D;&#x0A;cd ..\..\core\FestivalRelay&#x0D;&#x0A;"
+				CommandLine=""
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\lib\festival\src\include;..\..\lib\speech_tools\include;..\..\lib\festival\src\modules\VHDuration;&quot;..\..\lib\xerces-c\include&quot;;&quot;..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\lib\vhcl\include"
+				AdditionalIncludeDirectories="..\..\lib\festival\festival\src\include;..\..\lib\festival\speech_tools\include;..\..\lib\festival\festival\src\modules\VHDuration;&quot;..\..\lib\xerces-c\include&quot;;&quot;..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\lib\vhcl\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;SYSTEM_IS_WIN32"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -66,7 +66,7 @@
 				AdditionalDependencies="libFestival.lib libestbase.lib libestools.lib libeststring.lib Ws2_32.lib winmm.lib vhcl_d.lib xerces-c_3D.lib vhmsg_d.lib pthreadVSE2.lib activemq-cppd.lib"
 				OutputFile="$(OutDir)\$(ProjectName)d.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\lib\festival\src\lib;..\..\lib\speech_tools\lib;..\..\lib\vhcl\lib;&quot;..\..\lib\vhmsg\vhmsg-c\lib&quot;;&quot;..\..\lib\xerces-c\lib&quot;;..\..\lib\pthreads\lib;&quot;..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;"
+				AdditionalLibraryDirectories="..\..\lib\festival\festival\src\lib;..\..\lib\festival\speech_tools\lib;..\..\lib\vhcl\lib;&quot;..\..\lib\vhmsg\vhmsg-c\lib&quot;;&quot;..\..\lib\xerces-c\lib&quot;;..\..\lib\pthreads\lib;&quot;..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -104,7 +104,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="cd ..\..\lib\speech_tools&#x0D;&#x0A;nmake /nologo /FVCMakefile&#x0D;&#x0A;cd ..\festival&#x0D;&#x0A;nmake /nologo /FVCMakefile&#x0D;&#x0A;cd ..\..\core\FestivalRelay&#x0D;&#x0A;"
+				CommandLine=""
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -122,7 +122,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\..\lib\festival\src\include;..\..\lib\speech_tools\include;..\..\lib\festival\src\modules\VHDuration;&quot;..\..\lib\xerces-c\include&quot;;&quot;..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\lib\vhcl\include"
+				AdditionalIncludeDirectories="..\..\lib\festival\festival\src\include;..\..\lib\festival\speech_tools\include;..\..\lib\festival\festival\src\modules\VHDuration;&quot;..\..\lib\xerces-c\include&quot;;&quot;..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\lib\vhcl\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;SYSTEM_IS_WIN32"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -145,7 +145,7 @@
 				LinkLibraryDependencies="false"
 				AdditionalDependencies="libFestival.lib libestbase.lib libestools.lib libeststring.lib Ws2_32.lib winmm.lib xerces-c_3.lib vhcl.lib vhmsg.lib pthreadVSE2.lib activemq-cpp.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\lib\festival\src\lib;..\..\lib\speech_tools\lib;&quot;..\..\lib\xerces-c\lib&quot;;..\..\lib\vhcl\lib;&quot;..\..\lib\vhmsg\vhmsg-c\lib&quot;;&quot;..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;..\..\lib\pthreads\lib"
+				AdditionalLibraryDirectories="..\..\lib\festival\festival\src\lib;..\..\lib\festival\speech_tools\lib;&quot;..\..\lib\xerces-c\lib&quot;;..\..\lib\vhcl\lib;&quot;..\..\lib\vhmsg\vhmsg-c\lib&quot;;&quot;..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;..\..\lib\pthreads\lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="0"
