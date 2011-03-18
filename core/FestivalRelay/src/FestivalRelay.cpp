@@ -38,6 +38,8 @@
 /* 																		 */
 /*=======================================================================*/
 
+#include "vhcl.h"
+
 #include <xercesc/util/XMLUTF8Transcoder.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/util/XMLString.hpp>
@@ -57,7 +59,6 @@
 #include <xercesc/util/XMLString.hpp>
 #include <algorithm>
 #include <direct.h>
-#include "vhcl.h"
 #include "vhmsg-tt.h"
 #include <festival.h>
 #include <VHDuration.h>
@@ -455,7 +456,7 @@ void close_activeMQ()
 
 BOOL WINAPI ConsoleHandler(DWORD CEvent)
 {
-    char mesg[128];
+    //char mesg[128];
 
     switch(CEvent)
     {
