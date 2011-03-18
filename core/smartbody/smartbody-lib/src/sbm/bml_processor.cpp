@@ -794,6 +794,7 @@ BML::BehaviorRequestPtr BML::Processor::parse_bml_to_anim( DOMElement* elem, std
 	if (bml2animText.empty())
 	{			
 		std::string dir;
+		mcu->me_paths.reset();
 
 		while ((dir = mcu->me_paths.next_path()) != "")
 		{
@@ -818,7 +819,7 @@ BML::BehaviorRequestPtr BML::Processor::parse_bml_to_anim( DOMElement* elem, std
 			else
 				LOG("Unable to open bml2anim.xml in mepath");			
 		}
-		mcu->me_paths.reset();
+		
 	}
 
 	if (bml2animText.length() > 0) {
