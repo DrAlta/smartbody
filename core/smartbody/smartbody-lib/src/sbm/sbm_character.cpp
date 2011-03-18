@@ -1198,8 +1198,11 @@ void SbmCharacter::schedule_viseme_curve(
 			}
 			else
 			{
-				srSplineCurve spline;
-				spline.set_alg( srSplineCurve::ALG_HALTING );
+//				srSplineCurve spline( srSplineCurve::INSERT_NODES );
+				srSplineCurve spline( srSplineCurve::INSERT_KEYS );
+				spline.set_extensions( srSplineCurve::EXTEND_DECEL, srSplineCurve::EXTEND_DECEL );
+				spline.set_algorithm( srSplineCurve::ALG_HALTING );
+
 				for (int i = 0; i < num_keys; i++)	{
 					float t = curve_info[ i * num_key_params + 0 ];
 					float w = curve_info[ i * num_key_params + 1 ];
@@ -1210,13 +1213,16 @@ void SbmCharacter::schedule_viseme_curve(
 						spline.insert(t + .001, w);
 
 				}
-			
-				spline.extend_head();
-				spline.extend_tail();
-				
+				spline.apply_extensions();
+
+#define LINEAR_SPLINE_SEGS_PER_SEC 30
+				double fr, to;
+				spline.query_span( &fr, &to );
+				int num_segs = ( to - fr ) * LINEAR_SPLINE_SEGS_PER_SEC;
+
+				// CT must handle the build internally...
 				srCurveBuilder builder;
 				srLinearCurve linear;
-				int num_segs = 100;
 				builder.get_spline_curve( &linear, spline, num_segs, true );
 
 				linear.query_reset();
