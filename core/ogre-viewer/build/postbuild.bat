@@ -5,6 +5,10 @@ echo Running Postbuild.bat
 @REM Configure for a VHuman project directory
 set OGRE_HOME=..\..\..\lib\OgreSDK
 
+set FINAL_BIN=..\..\..\bin\ogre-viewer\bin\%1%
+set MEDIA_FOLDER=..\..\..\bin\ogre-viewer\media
+
+
 @REM Initialize variables according to build type
 if (%1)==(DEBUG) goto DEBUG_VARS
 goto RELEASE_VARS
@@ -40,6 +44,14 @@ for %%F in (%OGRE_FILES%) do echo %%F && COPY %OGRE_BIN%\%%F %BIN_DIR%
 @REM expand "%DXSDK_DIR%\Redist\JUN2008_d3dx9_38_x86.cab" -F:d3dx9_38.dll %BIN_DIR%
 
 call copy_media.bat SHARE %BIN_DIR%
+
+if not exist %FINAL_BIN% mkdir %FINAL_BIN%
+copy %BIN_DIR%\*.* %FINAL_BIN%
+
+if not exist %MEDIA_FOLDER%  mkdir %MEDIA_FOLDER%
+copy ..\media\*.* %MEDIA_FOLDER%
+
+
 @goto END
 
 :ERROR
