@@ -33,7 +33,7 @@
 	<gesture type="chop" trajectory="small" armdirection="right" posture="CrossedArms" hand="right">CrossedArms_RArm_SoftRight</gesture>
 	<gesture type="chop" trajectory="small" posture="CrossedArms" hand="right">CrossedArms_RArm_SoftChop</gesture>
 	<gesture type="sweep" armdirection="right" posture="CrossedArms" hand="right">CrossedArms_RArm_SweepRight</gesture>
-	<gesture type="emphasis" posture="Crossed" hand="right">Crossed_RArm_Emphasis</gesture>
+	<gesture type="emphasis" posture="Crossed" hand="right">CrossedArms_RArm_Emphasis</gesture>
 
 	<!-- HandsAtSide -->
 	<gesture type="chop" posture="HandsAtSide" hand="both">HandsAtSide_Arms_Chop</gesture>
@@ -41,7 +41,7 @@
 	<gesture type="stop" posture="HandsAtSide" hand="both">HandsAtSide_Arms_GestureStop</gesture>
 	<gesture type="why" posture="HandsAtSide" hand="both">HandsAtSide_Arms_GestureWhy</gesture>
 	<gesture type="ohwell" posture="HandsAtSide" hand="both">HandsAtSide_Arms_OhWell</gesture>
-	<gesture type="sweep" posture="HandsAtSide" hand="both">HandsAtSide_Arms_Sweep</gesture>
+	<gesture type="sweep" posture="HandsAtSide" hand="both">HandsAtSide_Arms_Sweep_2</gesture>
 	<gesture type="dismiss" posture="HandsAtSide" hand="left">HandsAtSide_LArm_Dismiss</gesture>
 	<gesture type="indicate" armdirection="left" posture="HandsAtSide" hand="left">HandsAtSide_LArm_IndicateLeft</gesture>	
 	<gesture type="chop" posture="HandsAtSide" hand="right">HandsAtSide_RArm_Chop</gesture>
