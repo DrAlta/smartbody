@@ -157,7 +157,8 @@ class srLinearCurve	{
 		void clear_after( double t );
 
 	// Preferably these should be subsumed by 
-	//	boundary conditions, crop { PRE, POST }, and simple param-range queries.
+	//	boundary conditions, crop { PRE, POST }, 
+	//	and simple param-range queries.
 
 		double get_head_param( void );
 		double get_head_value( void );
