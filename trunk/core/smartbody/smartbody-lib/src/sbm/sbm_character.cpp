@@ -1198,20 +1198,19 @@ void SbmCharacter::schedule_viseme_curve(
 			}
 			else
 			{
-//				srSplineCurve spline( srSplineCurve::INSERT_NODES );
-				srSplineCurve spline( srSplineCurve::INSERT_KEYS );
+				srSplineCurve spline( srSplineCurve::INSERT_NODES );
+//				srSplineCurve spline( srSplineCurve::INSERT_KEYS );
 				spline.set_extensions( srSplineCurve::EXTEND_DECEL, srSplineCurve::EXTEND_DECEL );
 				spline.set_algorithm( srSplineCurve::ALG_HALTING );
 
 				for (int i = 0; i < num_keys; i++)	{
+
 					float t = curve_info[ i * num_key_params + 0 ];
 					float w = curve_info[ i * num_key_params + 1 ];
-					if (i == 0)
-						spline.insert(t - .001, w);
-					spline.insert( t, w );
-					if (i == num_keys - 1)
-						spline.insert(t + .001, w);
 
+//					if (i == 0) spline.insert(t - .001, w);
+					spline.insert( t, w );
+//					if (i == num_keys - 1) spline.insert(t + .001, w);
 				}
 				spline.apply_extensions();
 
