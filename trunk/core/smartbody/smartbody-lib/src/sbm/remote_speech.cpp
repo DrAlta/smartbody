@@ -196,6 +196,7 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 	float blendTime = 0.0f;
 	float blendIval = 0.0f;
 	float startTime = 0.0f;
+	float magnitude = character->get_viseme_magnitude();
 	if(node->getNodeType()==1){ //node is an element node
 		DOMElement *element= (DOMElement *)node; //instantiate an element using this node
 		//string tag= XMLString::transcode(element->getTagName()); //find the element tag  // Anm replaced with compareString
@@ -225,7 +226,7 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 #if USE_CURVES_FOR_VISEMES
 				curViseme = new VisemeData(id, startTime);
 #else
-				curViseme = new VisemeData(id, 1.0, startTime, 0.0f, 0.0f, 0.0f); //the weight is always made one
+				curViseme = new VisemeData(id, 1.0 * magnitude, startTime, 0.0f, 0.0f, 0.0f); //the weight is always made one
 #endif
 				if ( visemes->size() > 0 ) 
 				{   

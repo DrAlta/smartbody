@@ -121,6 +121,7 @@ protected:
 	// Viseme Curve Info
 	bool	use_viseme_curve;
 	float	viseme_time_offset;
+	float	viseme_magnitude;
 	int 	viseme_channel_count;
 	int 	viseme_channel_start_pos;
 	int 	viseme_channel_end_pos;
@@ -297,7 +298,9 @@ public:
 	void set_viseme_curve_mode( bool mode )		{ use_viseme_curve = mode; }
 	bool get_viseme_curve_mode( void ) const	{ return( use_viseme_curve ); }
 	void set_viseme_time_delay( float timeDelay ) { viseme_time_offset = timeDelay; }
-	float get_viseme_time_delay( void )			{ return( viseme_time_offset ); }
+	float get_viseme_time_delay( void ) const	{ return( viseme_time_offset ); }
+	void set_viseme_magnitude( float magnitude ) { viseme_magnitude = magnitude; }
+	float get_viseme_magnitude( void ) const		{ return( viseme_magnitude ); }
 
 	void setSoftEyes( bool val )	{
 		_soft_eyes_enabled = val;
