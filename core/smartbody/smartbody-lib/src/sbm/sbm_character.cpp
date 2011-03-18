@@ -123,6 +123,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 
 	use_viseme_curve = false;
 	viseme_time_offset = 0.0;
+	viseme_magnitude = 1.0;
 	viseme_channel_count = 0;
 	viseme_channel_start_pos = 0;
 	viseme_channel_end_pos = 0;
@@ -1708,6 +1709,12 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			set_viseme_time_delay( timeDelay );
 			return CMD_SUCCESS;
 		}
+		if( _strcmpi( viseme, "magnitude" ) == 0 )
+		{
+			float magnitude = (float)atof( next );
+			set_viseme_magnitude( magnitude );
+			return CMD_SUCCESS;
+		}
 		if( _strcmpi( viseme, "plateau" ) == 0 )
 		{
 			if (!next)
@@ -2099,6 +2106,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		LOG( "  prune" );
 		LOG( "  viseme curveon|curveoff" );
 		LOG( "  viseme timedelay <timedelay>" );
+		LOG( "  viseme magnitude <amount>" );
 		LOG( "  viseme <viseme name> <weight> <ramp in>" );
 		LOG( "  viseme <viseme name> trap <weight> <dur> [<ramp-in> [<ramp-out>]]" );
 		LOG( "  viseme <viseme name> curve <number of keys> <curve information>" );

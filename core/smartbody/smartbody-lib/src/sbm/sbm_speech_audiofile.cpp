@@ -729,7 +729,8 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
 		  if (rampOut <= 0.0f)
 			  rampOut = 0.1f;
 
-		  float weight = (float)atof( articulation.c_str());
+		  float weight = (float) atof( articulation.c_str());
+		  weight *= character->get_viseme_magnitude();
 		  VisemeData* curViseme = new VisemeData(viseme.c_str(), weight, startTime,  endTime - startTime, rampIn, rampOut);
 
 			if (visemeData.size() > 0)
