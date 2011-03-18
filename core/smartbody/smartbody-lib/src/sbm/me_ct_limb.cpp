@@ -77,7 +77,7 @@ bool MeCtLimb::buildJointChain(SrArray<const char*>& joint_names, SrArray<MeCtIK
 	joint_chain.clear();
 	joint_quat.clear();
 	buf_index.clear();
-	for (unsigned int i=0;i<joint_names.size();i++)
+	for (int i=0;i<joint_names.size();i++)
 	{
 		SkJoint* joint = skeleton->search_joint(joint_names[i]);
 		if (!joint)
@@ -95,7 +95,7 @@ bool MeCtLimb::buildJointChain(SrArray<const char*>& joint_names, SrArray<MeCtIK
 
 	// initialize MeCtIKScenario
 	ik.joint_info_list.size(joint_chain.size());
-	for (int i=0;i<joint_chain.size();i++)
+	for (size_t i=0;i<joint_chain.size();i++)
 	{	
 		ik.joint_info_list[i] = MeCtIKScenarioJointInfo();
 		MeCtIKScenarioJointInfo& joint_info = ik.joint_info_list[i];
@@ -130,7 +130,7 @@ void MeCtLimb::updateMotionFrameToJointChain( SkMotion* motion, int frame )
 	int inserted;
 	int size = channels.size();
 
-	for (unsigned int i=0; i<size; i++ ) {
+	for (int i=0; i<size; i++ ) {
 		if ( channels[i].joint && hasJoint(channels[i].joint) )
 		{
 			inserted = channels[i].set ( fp );

@@ -21,13 +21,13 @@ double SimpleTimeWarp::timeWarp( double u )
 	//if (u > refDuration)
 	//	u = refDuration - GWIZ::epsilon10();
 
-	float mu = floatMod(u,refDuration);
+	double mu = floatMod(u,refDuration);
 	return mu*slope;
 }
 
 double SimpleTimeWarp::invTimeWarp( double t )
 {
-	float mt = floatMod(t,targetDuration);
+	double mt = floatMod(t,targetDuration);
 	return mt*invSlope;
 }
 
