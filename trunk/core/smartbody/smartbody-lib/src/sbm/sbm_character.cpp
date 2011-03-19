@@ -105,6 +105,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 #endif
 	head_sched_p( CreateSchedulerCt( character_name, "head" ) ),
 	param_sched_p( CreateSchedulerCt( character_name, "param" ) ),
+	param_animation_ct( NULL ),
 	face_ct( NULL ),
 	eyelid_ct( new MeCtEyeLid() ),
 	face_neutral( NULL ),
@@ -147,7 +148,8 @@ SbmCharacter::~SbmCharacter( void )	{
 	eyelid_ct->unref();
 
 	locomotion_ct->unref();
-		
+	param_animation_ct->unref();
+
 	if ( mcuCBHandle::singleton().sbm_character_listener )
 	{
 		mcuCBHandle::singleton().sbm_character_listener->OnCharacterDelete( name );
@@ -225,7 +227,8 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
                         VisemeMotionMap* viseme_motion_map,
 						GeneralParamMap* param_map,
                         const char* unreal_class,
-						bool use_locomotion)
+						bool use_locomotion,
+						bool use_param_animation)
 {
 	// Store pointers for access via init_skeleton()
 	if( face_neutral ) {
@@ -258,6 +261,14 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		eyelid_reg_ct_p->name( ct_name.str().c_str() );
 	}
 
+	if (use_param_animation)
+	{
+		this->param_animation_ct = new MeCtParamAnimation(this, world_offset_writer_p);
+		std::string paramAnimationName = std::string(name)+ "'s param animation controller";
+		this->param_animation_ct->name(paramAnimationName.c_str());
+		this->param_animation_ct->ref();
+	}
+
 	//if (use_locomotion) 
 	{
 		this->locomotion_ct =  new MeCtLocomotionClass();
@@ -266,7 +277,6 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		locomotion_ct->get_navigator()->setWordOffsetController(world_offset_writer_p);
 		locomotion_ct->ref();
 	}
-
 	// Clear pointer data no longer used after this point in initialization.
 	this->viseme_motion_map = NULL;
 	this->au_motion_map     = NULL;
@@ -297,8 +307,13 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	// Add Prioritized Schedule Controllers to the Controller Tree
 	ct_tree_p->add_controller( posture_sched_p );
 	ct_tree_p->add_controller( motion_sched_p );
+	
 	if (locomotion_ct)
 		ct_tree_p->add_controller( locomotion_ct );
+
+	if (param_animation_ct)
+		ct_tree_p->add_controller(param_animation_ct);
+
 
 	ct_tree_p->add_controller( gaze_sched_p );
 
@@ -336,6 +351,14 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 			ct_tree_p->add_controller( eyelid_ct );
 		}
 	}
+
+	// motion player
+	motionplayer_ct = new MeCtMotionPlayer(this);
+	std::string mpName(name);
+	mpName += "'s motion player";
+	motionplayer_ct->name(mpName.c_str());
+	motionplayer_ct->setActive(false);
+	ct_tree_p->add_controller(motionplayer_ct);
 
 	bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( name, unreal_class, mcuCBHandle::singleton().net_face_bones );
 
@@ -1230,7 +1253,6 @@ void SbmCharacter::schedule_viseme_curve(
 					ct_p->insert_key( t, v );
 				}
 			}
-
 			double ct_dur = ct_p->controller_duration();
 			double tin = start_time + timeDelay;
 			double tout = tin + ct_dur;

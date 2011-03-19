@@ -16,6 +16,10 @@ void GenericViewer::hide_viewer()
 {
 }
 
+void GenericViewer::update_viewer()
+{
+}
+
 GenericViewerFactory::GenericViewerFactory()
 {
 }

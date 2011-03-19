@@ -369,7 +369,7 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert( "time",   mcu_time_func );
    mcu.insert( "tip",	mcu_time_ival_prof_func );
 
-   mcu.insert( "panim",		mcu_panim_keys_func );	
+   mcu.insert( "panim",		mcu_panim_cmd_func );	
 
    mcu.insert( "load",   mcu_load_func );
    mcu.insert( "pawn",   SbmPawn::pawn_cmd_func );

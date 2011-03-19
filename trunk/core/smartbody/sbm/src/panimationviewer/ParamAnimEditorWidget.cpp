@@ -1,3 +1,25 @@
+/*
+ *  ParamAnimEditorWidget.cpp - part of SmartBody-lib's Test Suite
+ *  Copyright (C) 2009  University of Southern California
+ *
+ *  SmartBody-lib is free software: you can redistribute it and/or
+ *  modify it under the terms of the Lesser GNU General Public License
+ *  as published by the Free Software Foundation, version 3 of the
+ *  license.
+ *
+ *  SmartBody-lib is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  Lesser GNU General Public License for more details.
+ *
+ *  You should have received a copy of the Lesser GNU General Public
+ *  License along with SmartBody-lib.  If not, see:
+ *      http://www.gnu.org/licenses/lgpl-3.0.txt
+ *
+ *  CONTRIBUTORS:
+ *      Yuyu Xu, USC
+ */
+
 #include "ParamAnimEditorWidget.h"
 #include "ParamAnimBlock.h"
 
@@ -67,6 +89,7 @@ void ParamAnimEditorWidget::drawMark(nle::Block* block, nle::Mark* mark, int tra
 
 		// connect to the attached correspondance mark
 		// get the position of the other mark
+		/*
 		CorrespondenceMark* attached = cMark->getAttachedMark();
 		if (attached)
 		{
@@ -74,6 +97,7 @@ void ParamAnimEditorWidget::drawMark(nle::Block* block, nle::Mark* mark, int tra
 			attached->getBounds(abounds[0], abounds[1], abounds[2], abounds[3]);
 			fltk::drawline(bounds[0], bounds[1], abounds[0], abounds[1]);
 		}
+		*/
 	}
 }
 

@@ -1,12 +1,40 @@
+/*
+ *  me_ct_interpolator.h - part of Motion Engine and SmartBody-lib
+ *  Copyright (C) 2008  University of Southern California
+ *
+ *  SmartBody-lib is free software: you can redistribute it and/or
+ *  modify it under the terms of the Lesser GNU General Public License
+ *  as published by the Free Software Foundation, version 3 of the
+ *  license.
+ *
+ *  SmartBody-lib is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  Lesser GNU General Public License for more details.
+ *
+ *  You should have received a copy of the Lesser GNU General Public
+ *  License along with SmartBody-lib.  If not, see:
+ *      http://www.gnu.org/licenses/lgpl-3.0.txt
+ *
+ *  CONTRIBUTORS:
+ *      Yuyu Xu, USC
+ */
+
 #ifndef _ME_CT_INTERPOLATOR_H_
 #define _ME_CT_INTERPOLATOR_H_
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
 
 #include <Me/me_ct_container.hpp>
 #include <ME/me_ct_motion.h>
 #include <map>
+#include <string>
+#include <ME/me_spline_1d.hpp>
+#include <sbm/sbm_character.hpp>
+#include <sbm/mcontrol_util.h>
 
-// This controller takes two motions and blend them according to key time
-// Should only hold two controllers
 class MeCtInterpolator : public MeCtContainer
 {
 public:
@@ -27,15 +55,39 @@ public:
 
 public:
 	// constructor
-	MeCtInterpolator(MeController* child1 = NULL, MeController* child2 = NULL, float weight = 1.0, bool loop = false);
+	MeCtInterpolator(MeController* child1 = NULL, MeController* child2 = NULL, double time = 0.0, double w = 0.0, bool loop = false, std::string controllerName = "");
 	~MeCtInterpolator();
 
 	// child accessor
 	MeController* child(size_t n);
+	int child(std::string name);
 
-	// set and get param value (blending weight)
-	float getParamValue() {return _paramValue;}
-	void setParamValue(float weight) {_paramValue = weight;}
+	double getWeight();
+	void setWeight(float w);
+
+	bool getLoop();
+	void setLoop(bool l);
+
+	bool getNewLoop();
+	void setNewLoop(bool l);
+
+	bool getNewCycle(int index);
+
+	void setReverseWeight(bool rW)	{reverseWeight = rW;}
+	bool getReverseWeight()			{return reverseWeight;}
+
+	double getStartTime() {return startTime;}
+	void setStartTime(double time) {startTime = time;}
+
+	std::vector<double>& getKey(int index);
+
+	double phaseDuration();
+	int getNumLoops()	{return numLoops;}
+
+	void initKeys();
+	double getDuration(int index);
+	void initDuration();
+	void updateChildren(int index, MeController* newController);	// replace child[index] with new controller
 
 	// callbacks for the base class
 	virtual void controller_map_updated();
@@ -45,24 +97,29 @@ public:
 	virtual const char* controller_type() const {return CONTROLLER_TYPE;}
 
 private:
-	// Key Info Init
-	void initKeys();
-	// Duration init, has to happen after init keys
-	void initDuration();
+	void getTiming(double t, double& t1, double& t2);
+	void adjustStartTime(double origW, double newW);
+	void getFrame(int index, double t, SrBuffer<float>& buffer);
 
 private:
+	bool loop;					// loop mode flag
+	bool newLoop;				// new loop flag
+	int numLoops;				// number of loops
+	bool newCycle1;				// whether child1 is in a new cycle
+	bool newCycle2;				// wheter child2 is in a new cycle
 
-	bool _loop;
-	double _duration;
-	MeController* _child1;
-	MeController* _child2;
-	float _paramValue;
-	
-	// key time infomations, matching key info, ascending order
-	std::vector<double> _key1;				// key frame numbers for motion1, these got passed in
-	std::vector<double> _key2;				// key frame numbers for motion2, these got passed in
+	bool reverseWeight;			
 
-	SkChannelArray _channels;
+	double startTime;			// start time of new loop
+	double duration;			// duration of this controller
+
+	double weight;				// weight of child1
+	std::vector<double> key1;	// key times for child1
+	std::vector<double> key2;	// key times for child2
+
+	SkChannelArray channels;	// channels for this controller
+	MeController* child1;		// child1 controller
+	MeController* child2;		// child2 controller
 };
 
 #endif

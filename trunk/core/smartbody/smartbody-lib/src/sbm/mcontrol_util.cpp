@@ -93,8 +93,6 @@ mcuCBHandle::mcuCBHandle()
 	timer_p( NULL ),
 	time( 0.0 ),
 	time_dt( 0.0 ),
-	is_fixed_weight( true ),
-	panim_weight( 0.0 ),
 	internal_profiler_p( NULL ),
 	external_profiler_p( NULL ),
 	profiler_p( NULL ),
@@ -118,6 +116,7 @@ mcuCBHandle::mcuCBHandle()
 	test_recipient_default( "ALL" ),
 	queued_cmds( 0 ),
 	use_locomotion( false ),
+	use_param_animation( false ),
 	viewer_factory ( new SrViewerFactory() ),
 	bmlviewer_factory ( new GenericViewerFactory() ),
 	panimationviewer_factory ( new GenericViewerFactory() ),
@@ -577,7 +576,7 @@ void mcuCBHandle::update( void )	{
 		if( char_p ) {
 
 			char_p->forward_visemes( time );	
-		
+
 			char_p->scene_p->update();
 			char_p->dMesh_p->update();
 
@@ -608,6 +607,9 @@ void mcuCBHandle::update( void )	{
 		}  // end of char_p processing
 	} // end of loop
 
+	if (panimationviewer_p)
+		panimationviewer_p->update_viewer();
+
 	// update any tracked cameras
 	for (size_t x = 0; x < this->cameraTracking.size(); x++)
 	{
@@ -617,7 +619,10 @@ void mcuCBHandle::update( void )	{
 		joint->update_gmat();
 		const SrMat& jointGmat = joint->gmat();
 		SrVec jointLoc(jointGmat[12], jointGmat[13], jointGmat[14]);
-		SrVec cameraLoc = jointLoc + this->cameraTracking[x]->jointToCamera;
+		SrVec newJointLoc = jointLoc;
+		if (fabs(jointGmat[13] - this->cameraTracking[x]->yPos) < this->cameraTracking[x]->threshold)
+			newJointLoc.y = (float)this->cameraTracking[x]->yPos;
+		SrVec cameraLoc = newJointLoc + this->cameraTracking[x]->jointToCamera;
 		this->camera_p->eye.set(cameraLoc.x, cameraLoc.y, cameraLoc.z);
 		SrVec targetLoc = cameraLoc - this->cameraTracking[x]->targetToCamera;
 		this->camera_p->center.set( targetLoc.x, targetLoc.y, targetLoc.z);
@@ -1075,7 +1080,35 @@ SkMotion* mcuCBHandle::lookUpMotion( const char* motionName )
 	return anim_p;
 }
 
+PAStateData* mcuCBHandle::lookUpPAState(std::string stateName)
+{
+	for (size_t i = 0; i < param_anim_states.size(); i++)
+	{
+		if (param_anim_states[i]->stateName == stateName)
+			return param_anim_states[i];
+	}
+	return NULL;
+}
 
+void mcuCBHandle::addPAState(PAStateData* state)
+{
+	if (!lookUpPAState(state->stateName))
+		param_anim_states.push_back(state);
+}
 
+PATransitionData* mcuCBHandle::lookUpPATransition(std::string fromStateName, std::string toStateName)
+{
+	for (size_t i = 0; i < param_anim_transitions.size(); i++)
+	{
+		if (param_anim_transitions[i]->fromState->stateName == fromStateName && param_anim_transitions[i]->toState->stateName == toStateName)
+			return param_anim_transitions[i];
+	}
+	return NULL;	
+}
 
+void mcuCBHandle::addPATransition(PATransitionData* transition)
+{
+	if (!lookUpPATransition(transition->fromState->stateName, transition->toState->stateName))
+		param_anim_transitions.push_back(transition);
+}
 /////////////////////////////////////////////////////////////

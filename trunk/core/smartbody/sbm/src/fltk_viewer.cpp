@@ -235,6 +235,7 @@ Fl_Menu_Item MenuTable[] =
 		 { "&show selection",   0, MCB, CMD(CmdShowSelection),  FL_MENU_TOGGLE },
 		 { "&show kinematic footprints",   0, MCB, CMD(CmdShowKinematicFootprints),  FL_MENU_TOGGLE },
 		 { "&show locomotion footprints",   0, MCB, CMD(CmdShowLocomotionFootprints),  FL_MENU_TOGGLE },
+		 { "&show trajectory", 0, MCB, CMD(CmdShowTrajectory), FL_MENU_TOGGLE },
 		 { "&interactive",   0, MCB, CMD(CmdInteractiveLocomotion),  FL_MENU_TOGGLE },
          { 0 },
    { 0 }
@@ -368,6 +369,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->showlocofootprints = false;
    _data->showkinematicfootprints = false;
    _data->interactiveLocomotion = false;
+   _data->showtrajectory = false;
 
    _data->light.init();
 
@@ -536,6 +538,9 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 	  case CmdShowLocomotionFootprints  : _data->showlocofootprints = !_data->showlocofootprints;
 						if(!_data->showlocofootprints) _data->showlocomotionall = false;
                        break;
+	  case CmdShowTrajectory : _data->showtrajectory = !_data->showtrajectory;
+						if (!_data->showtrajectory) _data->showtrajectory = false;
+					   break;
 	  case CmdInteractiveLocomotion  : _data->interactiveLocomotion = !_data->interactiveLocomotion;
                        break;
       case CmdBoundingBox : SR_SWAPB(_data->boundingbox); 
@@ -710,6 +715,7 @@ bool FltkViewer::menu_cmd_activated ( MenuCmd c )
 	  case CmdShowOrientation : return _data->showorientation? true:false;
 	  case CmdShowSelection : return _data->showselection? true:false;
 	  case CmdShowKinematicFootprints : return _data->showkinematicfootprints? true:false;
+	  case CmdShowTrajectory : return _data->showtrajectory ? true:false;
 	  case CmdShowLocomotionFootprints : return _data->showlocofootprints? true:false;
       case CmdAxis        : return _data->displayaxis? true:false;
       case CmdBoundingBox : return _data->boundingbox? true:false;
@@ -2996,6 +3002,34 @@ void FltkViewer::drawLocomotion()
 				}
 				drawKinematicFootprints(1);
 			}
+		}
+		if (_data->showtrajectory)
+		{
+			if (!character->param_animation_ct)
+				return;
+			std::string baseJointName = character->param_animation_ct->getBaseJointName();
+			SkJoint* baseJ = character->skeleton_p->search_joint(baseJointName.c_str());
+			if (!baseJ) return;
+			character->skeleton_p->update_global_matrices();
+			SrMat baseGM = baseJ->gmat();
+			SrVec baseVec = SrVec(baseGM.get(12), baseGM.get(13), baseGM.get(14));
+			if (character->trajectoryBuffer.size() >= SbmCharacter::trajectoryLength)
+				character->trajectoryBuffer.pop_front();
+			character->trajectoryBuffer.push_back(baseVec);
+			std::list<SrVec>::iterator iter = character->trajectoryBuffer.begin();
+			glColor3f(1.0f, 1.0f, 0.0f);
+			glBegin(GL_LINES);
+			for (; iter != character->trajectoryBuffer.end(); iter++)
+			{
+				std::list<SrVec>::iterator iter1 = iter;
+				iter1++;
+				if (iter1 != character->trajectoryBuffer.end())
+				{
+					glVertex3f(iter->x, 0.0, iter->z);
+					glVertex3f(iter1->x, 0.0, iter1->z);
+				}
+			}
+			glEnd();
 		}
 	}
 }

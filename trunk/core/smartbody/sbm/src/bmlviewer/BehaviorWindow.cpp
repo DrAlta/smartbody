@@ -121,6 +121,10 @@ void BehaviorWindow::hide_viewer()
 	this->hide();
 }
 
+void BehaviorWindow::update_viewer()
+{
+}
+
 int BehaviorWindow::handle(int event)
 {
 	return  Window::handle(event);

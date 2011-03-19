@@ -48,6 +48,7 @@ void MeCtChannelWriter::init( SkChannelArray& channels, bool continuous )
 	_channels.rebuild_hash_table();
 
 	_data.size( _channels.floats() );
+	_data.setall(0.0);
 
 	const int size = _channels.size();
 	_local_ch_to_buffer.size( size );

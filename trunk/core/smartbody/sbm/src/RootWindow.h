@@ -48,6 +48,7 @@ class  RootWindow : public SrViewer, public fltk::DoubleBufferWindow
 		static void RunCB(Widget* widget, void* data);
 		static void LaunchBMLViewerCB(Widget* widget, void* data);
 		static void LaunchDataViewerCB(Widget* widget, void* data);
+		static void LaunchParamAnimViewerCB(Widget* widget, void* data);
 		static void LaunchConsoleCB(Widget* widget, void* data);
 		static void StartCB(Widget* widget, void* data);
 		static void StopCB(Widget* widget, void* data);
@@ -87,6 +88,7 @@ class  RootWindow : public SrViewer, public fltk::DoubleBufferWindow
 		static void KinematicFootstepsCB(fltk::Widget* w, void* data);
 		static void LocomotionFootstepsCB(fltk::Widget* w, void* data);
 		static void VelocityCB(fltk::Widget* w, void* data);
+		static void TrajectoryCB(fltk::Widget* w, void* data);
 };
 
 class FltkViewerFactory : public SrViewerFactory

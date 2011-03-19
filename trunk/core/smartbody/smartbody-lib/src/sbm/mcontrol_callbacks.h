@@ -55,7 +55,14 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_terrain_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_panim_keys_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+
+// panimation commands
+int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_panim_test_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_motion_player_func(srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_panim_schedule_func(std::string motion1, std::string charName, bool loop, mcuCBHandle *mcu_p);
+int mcu_panim_schedule_func(std::string motion1, std::string motion2, std::string characterName, float weight, bool loop, mcuCBHandle *mcu_p);
+
 //int mcu_character_func( srArgBuffer& args, mcuCBHandle *mcu_p );  // Old version... See SbmCharacter::character_cmd_func
 
 int mcu_character_init( const char* char_name, const char *skel_file, const char *unreal_class, mcuCBHandle *mcu_p );

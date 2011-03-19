@@ -67,11 +67,20 @@
 #include <sbm/action_unit.hpp>
 #include <sbm/viseme_map.hpp>
 #include <sbm/general_param_setting.h>
-//#include <me/me_spline_1d.hpp>
 
+#include <sbm/me_ct_param_animation.h>
+
+//#include <me/me_spline_1d.hpp>
+class MeCtMotionPlayer;
+class MeCtPAnimation;
+class MeCtParamAnimation;
 
 
 class SbmCharacter : public SbmPawn	{
+
+public:
+	std::list<SrVec> trajectoryBuffer;
+	static const int trajectoryLength = 1000;
 
 public:
 	// Static Constants
@@ -138,7 +147,8 @@ public:
 			  VisemeMotionMap* viseme_map,
 			  GeneralParamMap* param_map,
 			  const char* unreal_class,
-			  bool use_locomotion );
+			  bool use_locomotion,
+			  bool use_param_animation);
 
 	//* Overrides SbmPawn::prune_controller_tree()
 	virtual int prune_controller_tree( mcuCBHandle *mcu_p );
@@ -199,6 +209,9 @@ public:
 	MeCtSchedulerClass*	reach_sched_p; // reaching and grabbing
 	MeCtSchedulerClass*	head_sched_p; // neck / head orientation
 	MeCtSchedulerClass*	param_sched_p; // general parameters
+
+	MeCtParamAnimation* param_animation_ct;
+	MeCtMotionPlayer* motionplayer_ct;
 
 	void schedule_viseme_curve( 
 		const char* viseme, 

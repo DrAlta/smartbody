@@ -533,7 +533,7 @@ int mcu_panimationviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					int err = mcu_p->open_panimation_viewer( width, height, px, py );
 					return( err );
 				} else {
-					int err = mcu_p->open_panimation_viewer( 800, 600, 50, 50 );
+					int err = mcu_p->open_panimation_viewer( 800, 700, 50, 50 );
 					return( err );
 				}
 			}
@@ -602,44 +602,284 @@ int mcu_channelbufferviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return( CMD_FAILURE );
 }
 
-// panim <motion name> keys <key size> <keys>
-// keys should be in ascending order
-int mcu_panim_keys_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+
+
+std::string tokenize( std::string& str,
+					  const std::string& delimiters = " ",
+					  int mode = 1 )
+{
+	// Skip delimiters at beginning.
+	std::string::size_type lastPos = str.find_first_not_of(delimiters, 0);
+	// Find first "non-delimiter".
+	std::string::size_type pos     = str.find_first_of(delimiters, lastPos);
+
+	if (std::string::npos != pos || std::string::npos != lastPos)
+	{
+		// Found a token, add it to the vector.
+		std::string return_string = str.substr(lastPos, pos - lastPos);
+		std::string::size_type lastPos = str.find_first_not_of(delimiters, pos);
+		if (mode == 1)
+		{
+			if (std::string::npos == lastPos)	str = "";
+			else								str = str.substr(lastPos, str.size() - lastPos);
+		}
+		return return_string;
+	}
+	else
+		return "";
+}
+
+/**
+	panim state <state-name> cycle <cycle> <number of motions> <motion1> <motion2>... <motionN> <number of keys per motion> <keys for motion1> <keys for motion2> <keys for motion3>
+	panim state <state-name> parameter <type> <number of motions that have parameters> <motion1> <parameter1> <motion2> <parameter2>
+	panim schedule char <char-name> state <state-name> loop <loop> <weight list>
+	panim update char <char-name> state <weight list>
+	panim transition fromstate <state-name> tostate <state-name> <motion-name1 in first state> <2 keys for motion-name1> <motion-name2 in second state> <2 keys for motion-name2>
+**/
+double parseMotionParameters(std::string m, std::string parameter, double min, double max)
+{
+	std::string charName = tokenize(parameter, "|");
+	SbmCharacter* character = mcuCBHandle::singleton().character_map.lookup(charName);
+	int type = 0;
+	if (parameter == "speed1")
+		type = 0;
+	if (parameter == "speed2")
+		type = 1;
+	if (parameter == "angular1")
+		type = 2;
+	if (parameter == "angular2")
+		type = 3;
+	if (!character) return -9999;
+	MotionParameters* mParam = new MotionParameters(mcuCBHandle::singleton().lookUpMotion(m.c_str()), character);
+	mParam->setFrameId(min, max);
+	return mParam->getParameter(type);
+}
+
+int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
 	if (mcu_p)
 	{
-		char* motionName = args.read_token();
-		char* nextToken = args.read_token();
-
-		if (strcmp(motionName, "") != 0)
+		std::string operation = args.read_token();
+		if (operation == "enable")
 		{
-			if (strcmp(nextToken, "keys") == 0)
+			mcu_p->use_param_animation = true;
+			LOG("Parameterized Animation Enabled!");
+			return CMD_SUCCESS;
+		}
+		if (operation == "state")
+		{
+			std::string stateName = args.read_token();
+			PAStateData* newState = new PAStateData(stateName);
+			std::string nextString = args.read_token();
+			if (nextString == "cycle")
 			{
-				std::vector<double> keyContainer;
-				int keySize = atoi(args.read_token());
-				for (int i = 0; i < keySize; i++)
+				std::string cycle = args.read_token();
+				if (cycle == "true")
+					newState->cycle = true;
+				if (cycle == "false")
+					newState->cycle = false;
+				int numMotions = args.read_int();
+				for (int i = 0; i < numMotions; i++)
 				{
-					keyContainer.push_back(atof(args.read_token()));
-					// check whether is ascending order
-					if (i != 0)
-						if (keyContainer[i] < keyContainer[i - 1])
-						{
-							LOG("WARNING: The input key array should be in ascending order!");
-							return CMD_FAILURE;
-						}
+					std::string motionName = args.read_token();
+					std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.find(motionName);
+					if (iter == mcu_p->motion_map.end())
+						return CMD_FAILURE;
+					newState->motions.push_back(iter->second);
 				}
-				mcu_p->panim_key_map.insert(std::make_pair(motionName, keyContainer));
+				int numKeys = args.read_int();
+				for (int i = 0; i < numMotions; i++)
+				{
+					std::vector<double> keysForOneMotion;
+					if (numKeys == 0)
+					{
+						keysForOneMotion.push_back(0.0);
+						keysForOneMotion.push_back(newState->motions[i]->duration());
+					}
+					else
+					{
+						for (int j = 0; j < numKeys; j++)
+						{
+							double key = args.read_double();
+							keysForOneMotion.push_back(key);
+						}
+						for (int j = 0; j < numKeys - 1; j++)
+						{
+							if (keysForOneMotion[j] > keysForOneMotion[j + 1])
+								keysForOneMotion[j + 1] += newState->motions[i]->duration();
+						}
+					}
+					newState->keys.push_back(keysForOneMotion);
+				}
+				for (int i = 0; i < numMotions; i++)
+				{
+					if (i == 0)
+						newState->weights.push_back(1.0);
+					else
+						newState->weights.push_back(0.0);
+				}
+				mcu_p->addPAState(newState);
+			}
+			else if (nextString == "parameter")
+			{
+				PAStateData* state = mcu_p->lookUpPAState(stateName);
+				if (!state) return CMD_FAILURE;
+				std::string type = args.read_token();
+				if (type == "1D") state->paramManager->setType(0);
+				else if (type == "2D") state->paramManager->setType(1);
+				else return CMD_FAILURE;
+				int num = args.read_int();
+				for (int i = 0; i < num; i++)
+				{
+					std::string m = args.read_token();
+					if (type == "1D")
+					{
+						std::string parameter = args.read_token();
+						int motionId = state->getMotionId(m);
+						if (motionId < 0) return CMD_FAILURE;
+						double param = parseMotionParameters(m, parameter, state->keys[motionId][0], state->keys[motionId][state->getNumKeys() - 1]);
+						if (param < -9000) param = atof(parameter.c_str());
+						state->paramManager->addParameter(m, param);
+					}
+					else if (type == "2D")
+					{
+						std::string parameterX = args.read_token();
+						std::string parameterY = args.read_token();
+						double paramX = parseMotionParameters(m, parameterX, state->keys[state->getMotionId(m)][0], state->keys[state->getMotionId(m)][state->getNumKeys() - 1]);
+						double paramY = parseMotionParameters(m, parameterY, state->keys[state->getMotionId(m)][0], state->keys[state->getMotionId(m)][state->getNumKeys() - 1]);
+						if (paramX < -9000) paramX = atof(parameterX.c_str());
+						if (paramY < -9000) paramY = atof(parameterY.c_str());
+						state->paramManager->addParameter(m, paramX, paramY);
+					}
+				}
+			}
+			else
+				return CMD_FAILURE;
+		}
+		else if (operation == "schedule" || operation == "unschedule" || operation == "update" || operation == "basename")
+		{
+			std::string charString = args.read_token();
+			if (charString != "char")
+				return CMD_FAILURE;
+			SbmCharacter* character = mcu_p->character_map.lookup(args.read_token());
+			if (!character)
+				return CMD_FAILURE;
+			if (!character->param_animation_ct)
+			{
+				LOG("Parameterized Animation Not Enabled!");
+				return CMD_SUCCESS;
+			}
+
+			if (operation == "schedule")
+			{
+				std::string stateString = args.read_token();
+				if (stateString != "state")
+					return CMD_FAILURE;
+				std::string stateName = args.read_token();
+				PAStateData* state = mcu_p->lookUpPAState(stateName);
+				if (!state)
+					return CMD_FAILURE;
+				std::string loopString = args.read_token();
+				if (loopString != "loop")
+					return CMD_FAILURE;
+				std::string loop = args.read_token();
+				bool l = true;
+				if (loop == "true") l = true;
+				if (loop == "false") l = false;
+				int numWeights = args.calc_num_tokens();
+				if (numWeights > 0)
+				{
+					for (int i = 0; i < state->getNumMotions(); i++)
+						state->weights[i] = args.read_double();
+				}
+				character->param_animation_ct->schedule(state, l);
+			}
+
+			if (operation == "unschedule")
+				character->param_animation_ct->unschedule();
+
+			if (operation == "update")
+			{
+				std::vector<double> w;
+				for (int i = 0; i < character->param_animation_ct->getNumWeights(); i++)
+					w.push_back(args.read_double());
+				character->param_animation_ct->updateWeights(w);
+			}
+
+			if (operation == "basename")
+				character->param_animation_ct->setBaseJointName(args.read_token());
+		}
+		else if (operation == "transition")
+		{
+			PATransitionData* newTransition = new PATransitionData();
+			std::string fromStateString = args.read_token();
+			if (fromStateString != "fromstate")
+				return CMD_FAILURE;
+			PAStateData* fromState = mcu_p->lookUpPAState(args.read_token());
+			if (!fromState)
+				return CMD_FAILURE;
+			newTransition->fromState = fromState;
+			std::string toStateString = args.read_token();
+			if (toStateString != "tostate")
+				return CMD_FAILURE;
+			PAStateData* toState = mcu_p->lookUpPAState(args.read_token());
+			if (!toState)
+				return CMD_FAILURE;
+			newTransition->toState = toState;
+			if (args.calc_num_tokens() == 2)
+			{
+				newTransition->fromMotionName = args.read_token();
+				newTransition->easeOutStart = mcu_p->lookUpMotion(newTransition->fromMotionName.c_str())->duration() - defaultTransition;
+				newTransition->easeOutEnd = mcu_p->lookUpMotion(newTransition->fromMotionName.c_str())->duration();
+				newTransition->toMotionName = args.read_token();
+				newTransition->easeInStart = 0.0;
+				newTransition->easeInEnd = defaultTransition;
 			}
 			else
 			{
-				LOG("WARNING: Missing Motion Name!");
-				return CMD_FAILURE;		
+				newTransition->fromMotionName = args.read_token();
+				newTransition->easeOutStart = args.read_double();
+				newTransition->easeOutEnd = args.read_double();
+				newTransition->toMotionName = args.read_token();
+				newTransition->easeInStart = args.read_double();
+				newTransition->easeInEnd = args.read_double();
+				mcu_p->addPATransition(newTransition);
 			}
+			fromState->toStates.push_back(toState);
+			toState->fromStates.push_back(fromState);
 		}
 		else
+		{
+			LOG("mcu_panim_cmd_func ERR: operation not valid.");
 			return CMD_FAILURE;
+		}
 	}
 	return CMD_SUCCESS;
+}
+
+int mcu_motion_player_func(srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	if (mcu_p)
+	{
+		std::string charName = args.read_token();
+		SbmCharacter* character = mcu_p->character_map.lookup(charName.c_str());
+		if (character)
+		{
+			std::string next = args.read_token();
+			if (next == "on")
+				character->motionplayer_ct->setActive(true);
+			else if (next == "off")
+				character->motionplayer_ct->setActive(false);
+			else
+			{
+				int frameNumber = args.read_int();
+				character->motionplayer_ct->init(next, frameNumber);
+			}
+			return CMD_SUCCESS;
+		}
+		return CMD_FAILURE;
+	}
+	return CMD_FAILURE;
 }
 
 /////////////////////////////////////////////////////////////
@@ -745,6 +985,8 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				SrVec jointPos(jointMat[12], jointMat[13], jointMat[14]);
 				CameraTrack* cameraTrack = new CameraTrack();
 				cameraTrack->joint = joint;
+				cameraTrack->yPos = jointMat[13];
+				cameraTrack->threshold = 100.0;
 				SrCamera cam;
 				cameraTrack->jointToCamera = mcu_p->viewer_p->get_camera()->eye - jointPos;
 				LOG("Vector from joint to target is %f %f %f", cameraTrack->jointToCamera.x, cameraTrack->jointToCamera.y, cameraTrack->jointToCamera.z);
@@ -1294,32 +1536,6 @@ std::string nodeStr(const XMLCh* s)
 	return str;
 }
 
-std::string tokenize( std::string& str,
-					  const std::string& delimiters = " ",
-					  int mode = 1 )
-{
-	// Skip delimiters at beginning.
-	std::string::size_type lastPos = str.find_first_not_of(delimiters, 0);
-	// Find first "non-delimiter".
-	std::string::size_type pos     = str.find_first_of(delimiters, lastPos);
-
-	if (std::string::npos != pos || std::string::npos != lastPos)
-	{
-		// Found a token, add it to the vector.
-		std::string return_string = str.substr(lastPos, pos - lastPos);
-		std::string::size_type lastPos = str.find_first_not_of(delimiters, pos);
-		if (mode == 1)
-		{
-			if (std::string::npos == lastPos)	str = "";
-			else								str = str.substr(lastPos, str.size() - lastPos);
-		}
-		return return_string;
-	}
-	else
-		return "";
-}
-
-
 void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, mcuCBHandle* mcu_p)
 {
 	SbmCharacter* char_p = mcu_p->character_map.lookup( char_name );
@@ -1638,7 +1854,7 @@ int mcu_character_init(
 		}
 	}
 
-	err = char_p->init( skeleton_p, face_neutral_p, auMotionMap, visemeMotionMap, &mcu_p->param_map, unreal_class, mcu_p->use_locomotion );
+	err = char_p->init( skeleton_p, face_neutral_p, auMotionMap, visemeMotionMap, &mcu_p->param_map, unreal_class, mcu_p->use_locomotion, mcu_p->use_param_animation );
 	if( err == CMD_SUCCESS ) {
 
 		if (mcu_p->use_locomotion) 

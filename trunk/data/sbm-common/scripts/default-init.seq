@@ -12,6 +12,7 @@
 0	test locomotion initialize
 0	seq init-general-parameters
 0   seq init-common-face
+#0	panim enable
 
 ###  Common-sk assets are centered on the pelvis,
 ###  placed 102 units above the ground plane.
@@ -53,10 +54,12 @@
 
 1	seq default-viewer
 
-#1	set test character doctor
+1	set test character doctor
 1	set test recipient elder
 
 1	test loco char doctor enable
 1	test loco char elder enable
 
 1	seq default-dynamics
+1	seq param-animation-init
+
