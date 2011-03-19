@@ -59,6 +59,7 @@ class mcuCBHandle;
 #include "sbm_constants.h"
 
 #include <ME/me_ct_scheduler2.h>
+#include <sbm/me_ct_motion_player.h>
 
 #include "sr_hash_map.h"
 #include "sr_cmd_map.h"
@@ -82,6 +83,10 @@ class mcuCBHandle;
 #include <sbm/viseme_map.hpp>
 #include <sbm/general_param_setting.h>
 #include "sbm/BoneMap.h"
+
+#include <me/me_ct_interpolator.h>
+#include <sbm/me_ct_param_animation_utilities.h>
+#include <sbm/me_ct_param_animation_data.h>
 
 #include BML_PROCESSOR_INCLUDE
 
@@ -110,6 +115,8 @@ class CameraTrack
 		SkJoint* joint;
 		SrVec jointToCamera;
 		SrVec targetToCamera;
+		double yPos;
+		double threshold;
 };
 
 class FaceMotion
@@ -139,6 +146,7 @@ class mcuCBHandle	{
 		bool		net_world_offset_updates;
 		bool		net_face_bones;
 		bool		use_locomotion;
+		bool		use_param_animation;
 		const char* net_host;
 		bonebus::BoneBusClient bonebus;
 		SBMCharacterListener * sbm_character_listener;   // only one listener possible, must be set manually
@@ -150,10 +158,8 @@ class mcuCBHandle	{
 		double		skScale;
 		double		skmScale;
 
-		// parameterized animation engine paramters
-		bool		is_fixed_weight;
-		float		panim_weight;
-		std::map<std::string, std::vector<double>>	panim_key_map;
+		std::vector<PAStateData*>					param_anim_states;
+		std::vector<PATransitionData*>				param_anim_transitions;
 
 		TimeRegulator	*internal_timer_p;
 		TimeRegulator	*external_timer_p;
@@ -362,6 +368,11 @@ class mcuCBHandle	{
 		srCmdSeq* lookup_seq( const char* );
 
 		SkMotion* lookUpMotion(const char* motionName);
+
+		PAStateData* lookUpPAState(std::string stateName);
+		void addPAState(PAStateData* state);
+		PATransitionData* lookUpPATransition(std::string fromStateName, std::string toStateName);
+		void addPATransition(PATransitionData* transition);
 
 		int execute( const char *key, srArgBuffer& args ) { 
 			std::stringstream strstr;

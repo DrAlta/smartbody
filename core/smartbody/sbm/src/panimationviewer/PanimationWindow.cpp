@@ -1,90 +1,92 @@
+/*
+ *  PanimationWindow.cpp - part of SmartBody-lib's Test Suite
+ *  Copyright (C) 2009  University of Southern California
+ *
+ *  SmartBody-lib is free software: you can redistribute it and/or
+ *  modify it under the terms of the Lesser GNU General Public License
+ *  as published by the Free Software Foundation, version 3 of the
+ *  license.
+ *
+ *  SmartBody-lib is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  Lesser GNU General Public License for more details.
+ *
+ *  You should have received a copy of the Lesser GNU General Public
+ *  License along with SmartBody-lib.  If not, see:
+ *      http://www.gnu.org/licenses/lgpl-3.0.txt
+ *
+ *  CONTRIBUTORS:
+ *      Yuyu Xu, USC
+ */
 
-#include "fltk/Slider.h"  // before vhcl.h because of LOG enum which conflicts with vhcl::Log
-#include "vhcl.h"
 
 #include "PanimationWindow.h"
+#include "ParamAnimBlock.h"
+#include "vhcl.h"
+#include <sbm/mcontrol_util.h>
+#include <sbm/bml.hpp>
 
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <algorithm>
 
-#include <sbm/mcontrol_util.h>
-#include <sbm/bml.hpp>
-#include "ParamAnimBlock.h"
-
-
 PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Window(w, h, name), GenericViewer(x, y, w, h)
 {
 	this->begin();
-	// first group: animation name and character name
-	Group* firstGroup = new fltk::Group(10, 20, w - 20, h/2 - 20, "Animations");
-	firstGroup->begin();
-		// left part
-		anim1 = new fltk::Input(100, 20, 200, 20, "Animation1 ");
-		anim1->when(fltk::WHEN_ENTER_KEY);
-		anim1->callback(ChangeAnimation1, this);
-		anim2 = new fltk::Input(100, 50, 200, 20, "Animation2 ");
-		anim2->when(fltk::WHEN_ENTER_KEY);
-		anim2->callback(ChangeAnimation2, this);
-		character = new fltk::Input(100, 80, 200, 20, "Character ");
-		character->callback(ChangeCharacter, this);
-		blendingSlider = new fltk::ValueSlider(50, 110, 250, 20, "Blending Weight");
-		blendingSlider->minimum(0.0);
-		blendingSlider->maximum(1.0);
-		blendingSlider->callback(weightChanged, this);
-		runAnimation = new fltk::Button(150, 150, 100, 30, "RUN");
-		runAnimation->callback(generateBML, this);
+		int tabGroupX = 10;
+		int tabGroupY = 10;
+		int tabGroupW = w - 20;
+		int tabGroupH = 3 * h / 4 - 10;
+		int childGroupX = 0;
+		int childGroupY = 2 * yDis;
+		int childGroupW = tabGroupW;
+		int childGroupH = tabGroupH - 2 * yDis;
 
-		// right part
-		Group* firstInnerGroup = new fltk::Group(w/2, 20, w/2 - 30, h/2 - 50, "BML Info");
-		firstInnerGroup->begin();
-			textXML = new fltk::TextDisplay(0, 0, w/2 - 30, h/2 - 50);
-			textXML->color(fltk::WHITE);
-			textXML->textcolor(BLACK);
-			bufferXML = new fltk::TextBuffer();
-			textXML->buffer(bufferXML);
-			textXML->wrap_mode(true, 0);
-		firstInnerGroup->end();
-		firstInnerGroup->resizable(textXML);
-	firstGroup->end();
-	firstGroup->box(fltk::BORDER_FRAME);
-	firstGroup->box(fltk::BORDER_BOX);
-	firstGroup->label("Animation and Character Setting");
+		motionPlayerMode = new CheckButton(10, 3 * h / 4 + 10, 200, 20, "Motion Player Mode");
+		motionPlayerMode->state(false);
+		motionPlayerMode->callback(changeMotionPlayerMode, this);
+		characterList = new Choice(300, 3 * h / 4 + 10, 200, 20, "Character List");
+		loadCharacters(characterList);
+		refresh = new Button(550, 3 * h / 4 + 10, 100, 20, "Refresh");
+		refresh->callback(refreshUI, this);
+		resetCharacter = new Button(670, 3 * h / 4 + 10, 100, 20, "Reset");
+		resetCharacter->callback(reset, this);
+		textDisplay = new TextDisplay(10, 3 * h / 4 + 40, w - 120, h / 4 - 60);
+		textDisplay->color(fltk::WHITE);
+		textDisplay->textcolor(fltk::BLUE);
+		textBuffer = new fltk::TextBuffer();
+		textDisplay->buffer(textBuffer);
+		textDisplay->wrap_mode(true, 0);
+		this->resizable(textDisplay);
+		clearHistoryButton = new fltk::Button(w - 100, h - 30, 80, 20, "Clear");
+		clearHistoryButton->callback(clearTextDisplay, this);
 
-	// second group: animation correspondence marks
-	Group* secondGroup = new fltk::Group(10, h/2 + 20, w - 20, h/2 - 20, "Animations");
-		widgetParamAnim = new ParamAnimEditorWidget(10, h/2 + 80, w - 20, h/2 - 80, "Paramaterized Animation");
-		addCorrespondenceMark = new fltk::Button(20, h/2 + 30, 100, 20, "Add Mark");
-		addCorrespondenceMark->callback(addCorrespondenceMarkCb, this);
-		delCorrespondenceMark = new fltk::Button(130, h/2 + 30, 100, 20, "Delete Mark");
-		delCorrespondenceMark->callback(delCorrespondenceMarkCb, this);
-		updateCorrespondence = new fltk::Button(240, h/2 + 30, 150, 20, "Update Correspondence");
-		updateCorrespondence->callback(updateCorrespondenceCb, this);
-	secondGroup->end();
-	secondGroup->resizable(widgetParamAnim);
-	secondGroup->box(fltk::BORDER_FRAME);
-	secondGroup->box(fltk::BORDER_BOX);
-	secondGroup->label("Correspondence Mark Editor");
-	this->resizable(firstGroup);
-	this->resizable(secondGroup);
-	this->x(x);
-	this->y(y);
-
-
-	nleModel = new nle::NonLinearEditorModel();
-	widgetParamAnim->setModel(nleModel);
-
-	// For this paramterized animation engine, there would be only two track for now
-	ParamAnimTrack* track1 = new ParamAnimTrack();
-	track1->setName("Animation1");
-	nleModel->addTrack(track1);
-
-	ParamAnimTrack* track2 = new ParamAnimTrack();
-	track2->setName("Animation2");
-	nleModel->addTrack(track2);
-
+		tabGroup = new TabGroup(tabGroupX, tabGroupY, tabGroupW, tabGroupH);
+		tabGroup->begin();
+			stateEditor = new PAStateEditor(childGroupX, childGroupY, childGroupW, childGroupH, this);
+			tabGroup->add(stateEditor);
+			transitionEditor = new PATransitionEditor(childGroupX, childGroupY, childGroupW, childGroupH, this);
+			tabGroup->add(transitionEditor);
+			scriptEditor = new PAScriptEditor(childGroupX, childGroupY, childGroupW, childGroupH, this);
+			tabGroup->add(scriptEditor);
+			runTimeEditor = new PARunTimeEditor(childGroupX, childGroupY, childGroupW, childGroupH, this);
+			tabGroup->add(runTimeEditor);	
+		tabGroup->end();
+		tabGroup->resizable(stateEditor);
+		tabGroup->resizable(transitionEditor);
+		tabGroup->resizable(scriptEditor);
+		tabGroup->resizable(runTimeEditor);
+	this->end();
+	this->resizable(tabGroup);
 	redraw();
+
+//	tabGroup->selected_child(stateEditor);
+//	tabGroup->selected_child(transitionEditor);
+	tabGroup->selected_child(scriptEditor);
+//	tabGroup->selected_child(runTimeEditor);
+	lastCommand = "";
 }
 
 
@@ -94,15 +96,8 @@ PanimationWindow::~PanimationWindow()
 
 void PanimationWindow::draw()
 {
-    nle::NonLinearEditorModel* model = widgetParamAnim->getModel();
-    if (model)
-		updateGUI();
-    
-    Window::draw();   
-}
-
-void PanimationWindow::updateGUI()
-{
+	motionPlayerUpdate();
+	Window::draw();   
 }
 
 void PanimationWindow::label_viewer(std::string name)
@@ -124,28 +119,87 @@ void PanimationWindow::hide_viewer()
 	this->hide();
 }
 
+void PanimationWindow::update_viewer()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	std::string charName = characterList->child(characterList->value())->label();
+	SbmCharacter* character = mcu.character_map.lookup(charName.c_str());
+	if (!character)
+		return;
+
+	if (tabGroup->value() == 2)
+		scriptEditor->update();
+	if (tabGroup->value() == 3)
+		runTimeEditor->update();
+}
+
 void PanimationWindow::show()
 {    
     Window::show();   
 }
 
-void PanimationWindow::generateBML(fltk::Widget* widget, void* data)
+void PanimationWindow::motionPlayerUpdate()
 {
-	PanimationWindow* window = (PanimationWindow*) data;
-
-	std::string anim1 = window->anim1->text();
-	std::string anim2 = window->anim2->text();
-	std::string character = window->character->text();
-	float blendingWeight = (float)window->blendingSlider->value();
-
-	// generate animation
-	std::ostringstream cmd;
-	cmd << "test bml char " << character << " <sbm:panimation anim1=\"" << anim1 << "\" anim2=\"" << anim2 << "\" sbm:value=\"" << blendingWeight << "\" loop=\"true\"/>";
-
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.panim_weight = blendingWeight;
-	mcu.is_fixed_weight = false;
-	BML::SbmCommand* command = new BML::SbmCommand(cmd.str(), (float)mcu.time);
+	if (motionPlayerMode->state())
+	{
+		std::string charName = characterList->child(characterList->value())->label();
+		std::string motionName = "";
+		std::stringstream command;
+		double time = 0.0;
+		if (tabGroup->value() == 0)
+			getSelectedMarkInfo(stateEditor->stateEditorNleModel, motionName, time);
+		if (tabGroup->value() == 1)
+			getSelectedMarkInfo(transitionEditor->transitionEditorNleModel, motionName, time);
+		if (motionName != "")
+		{
+			std::map<std::string, SkMotion*>::iterator iter = mcu.motion_map.find(motionName);
+			if (time > iter->second->duration())
+				time -= iter->second->duration();
+			double delta = iter->second->duration() / double(iter->second->frames() - 1);
+			int frameNumber = int(time / delta);
+			command << "motionplayer " << charName << " " << motionName << " " << frameNumber;
+			execCmd(this, command.str(), 0);
+		}
+	}
+}
+
+void PanimationWindow::getSelectedMarkInfo(nle::NonLinearEditorModel* model, std::string& blockName, double& time)
+{
+	for (int i = 0; i < model->getNumTracks(); i++)
+	{
+		nle::Track* track = model->getTrack(i);
+		nle::Block* block = track->getBlock(0);
+		for (int j = 0; j < block->getNumMarks(); j++)
+		{
+			nle::Mark* mark = block->getMark(j);
+			if (mark->isSelected())
+			{
+				blockName = block->getName();
+				time = mark->getStartTime();
+				break;
+			}
+		}
+		if (blockName != "")
+			break;
+	}
+}
+
+bool PanimationWindow::checkCommand(std::string command)
+{
+	if (lastCommand == command)
+		return false;
+	else
+		lastCommand = command;
+	return true;
+}
+
+void PanimationWindow::execCmd(PanimationWindow* window, std::string cmd, double tOffset)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	TextDisplay* display = window->textDisplay;
+	BML::SbmCommand* command = new BML::SbmCommand(cmd, (float)(mcu.time + tOffset));
 	bool success = true;
 	srCmdSeq *seq = new srCmdSeq(); //sequence that holds the commands
 	if( command != NULL ) 
@@ -163,156 +217,46 @@ void PanimationWindow::generateBML(fltk::Widget* widget, void* data)
 	if( success )
 	{
 		if( mcu.execute_seq(seq) != CMD_SUCCESS ) 
-		{
-			std::stringstream strstr;
-			strstr << "ERROR: PanimationWindow::generateBML: Failed to execute sequence.";
-			LOG(strstr.str().c_str());
-			window->textXML->buffer()->replace(0, window->textXML->buffer()->length(), strstr.str().c_str());
-		}
+			LOG("ERROR: PanimationWindow::generateBML: Failed to execute sequence.");
 		else
-			window->textXML->buffer()->replace(0, window->textXML->buffer()->length(), cmd.str().c_str());
-		window->textXML->relayout();
-		window->textXML->redraw();
+		{
+			bool shouldAppend = window->checkCommand(cmd);
+			if (shouldAppend)
+			{
+				display->insert(cmd.c_str());
+				display->insert("\n");
+			}
+		}
+		display->relayout();
+		display->redraw();
+		display->show_insert_position();
 	}
 }
 
-void PanimationWindow::weightChanged(fltk::Widget* widget, void* data)
+void PanimationWindow::addTimeMark(nle::NonLinearEditorModel* model)
 {
-	PanimationWindow* window = (PanimationWindow*) data;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.panim_weight = (float)window->blendingSlider->value();
-}
-
-void PanimationWindow::ChangeAnimation1(fltk::Widget* widget, void* data)
-{
-	PanimationWindow* window = (PanimationWindow*) data;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	nle::Track* track = window->nleModel->getTrack(0);
-	track->removeAllBlocks();
-
-	const char* motionName = window->anim1->value();
-	if (motionName == NULL)
+	for (int i = 0; i < model->getNumTracks(); i++)
 	{
-		nle::Track* track = window->nleModel->getTrack(0);
-		window->updateGUI();
-		window->redraw();
-		return;
-	}
-
-	std::map<std::string, SkMotion*>::iterator iter = mcu.motion_map.find(motionName);
-	if (iter != mcu.motion_map.end())
-	{
-		SkMotion* motion = (*iter).second;
-		ParamAnimBlock* block1 = new ParamAnimBlock();
-		block1->setName(motionName);
-		block1->setStartTime(0);
-		block1->setEndTime(motion->duration());
-		nle::Track* track = window->nleModel->getTrack(0);
-		track->addBlock(block1);
-
-		window->updateCorrespondenceMarks();
-
-		window->updateGUI();
-		window->redraw();
-		return;
-	}
-	else
-	{
-		nle::Track* track = window->nleModel->getTrack(0);
-		window->updateGUI();
-		window->redraw();
-		return;
+		nle::Block* block = model->getTrack(i)->getBlock(0);
+		CorrespondenceMark* toAddMark = new CorrespondenceMark();
+		toAddMark->setStartTime(0.0);
+		toAddMark->setEndTime(toAddMark->getStartTime());
+		toAddMark->setColor(fltk::RED);
+		char buff[256];
+		sprintf(buff, "%6.2f", toAddMark->getStartTime());
+		toAddMark->setName(buff);
+		toAddMark->setShowName(true);
+		if (block)
+			block->addMark(toAddMark);
 	}
 }
 
-void PanimationWindow::ChangeAnimation2(fltk::Widget* widget, void* data)
-{
-	PanimationWindow* window = (PanimationWindow*) data;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	nle::Track* track = window->nleModel->getTrack(1);
-	track->removeAllBlocks();
-
-	const char* motionName = window->anim2->value();
-	if (motionName == NULL)
-	{
-		nle::Track* track = window->nleModel->getTrack(1);
-		window->updateGUI();
-		window->redraw();
-		return;
-	}
-
-	std::map<std::string, SkMotion*>::iterator iter = mcu.motion_map.find(motionName);
-	if (iter != mcu.motion_map.end())
-	{
-		SkMotion* motion = (*iter).second;
-		ParamAnimBlock* block1 = new ParamAnimBlock();
-		block1->setName(motionName);
-		block1->setStartTime(0);
-		block1->setEndTime(motion->duration());
-		nle::Track* track = window->nleModel->getTrack(1);
-		track->addBlock(block1);
-
-		window->updateCorrespondenceMarks();
-
-		window->updateGUI();
-		window->redraw();
-		return;
-	}
-	else
-	{
-		nle::Track* track = window->nleModel->getTrack(1);
-		window->updateGUI();
-		window->redraw();
-		return;
-	}
-}
-
-
-void PanimationWindow::addCorrespondenceMarkCb(fltk::Widget* widget, void* data)
-{
-	PanimationWindow* window = (PanimationWindow*) data;
-	nle::Track* track1 = window->nleModel->getTrack(0);
-	nle::Block* block1 = NULL;
-	if (track1->getNumBlocks() > 0)
-		block1 = window->nleModel->getTrack(0)->getBlock(0);
-	nle::Track* track2 = window->nleModel->getTrack(1);
-	nle::Block* block2 = NULL;
-	if (track2->getNumBlocks() > 0)
-		block2 = window->nleModel->getTrack(1)->getBlock(0);
-	CorrespondenceMark* toAddMark1 = new CorrespondenceMark();
-	toAddMark1->setStartTime(0.0);
-	toAddMark1->setEndTime(toAddMark1->getStartTime());
-	toAddMark1->setColor(fltk::RED);
-	char buff[256];
-	sprintf(buff, "%6.2f", toAddMark1->getStartTime());
-	toAddMark1->setName(buff);
-	toAddMark1->setShowName(true);
-	if (block1)
-		block1->addMark(toAddMark1);
-
-	CorrespondenceMark* toAddMark2 = new CorrespondenceMark();
-	toAddMark2->setStartTime(0.0);
-	toAddMark2->setEndTime(toAddMark2->getStartTime());
-	toAddMark2->setColor(fltk::RED);
-	sprintf(buff, "%6.2f", toAddMark2->getStartTime());
-	toAddMark2->setName(buff);
-	toAddMark2->setShowName(true);
-	if (block2)
-		block2->addMark(toAddMark2);
-
-	window->updateGUI();
-	window->redraw();
-}
-
-void PanimationWindow::delCorrespondenceMarkCb(fltk::Widget* widget, void* data)
+void PanimationWindow::removeTimeMark(nle::NonLinearEditorModel* model)
 {
 	CorrespondenceMark* attachedMark = NULL;
-	PanimationWindow* window = (PanimationWindow*) data;
-	for (int t = 0; t < window->nleModel->getNumTracks(); t++)
+	for (int t = 0; t < model->getNumTracks(); t++)
 	{
-		nle::Track* track = window->nleModel->getTrack(t);
+		nle::Track* track = model->getTrack(t);
 		for (int b = 0; b < track->getNumBlocks(); b++)
 		{
 			nle::Block* block = track->getBlock(b);
@@ -329,150 +273,96 @@ void PanimationWindow::delCorrespondenceMarkCb(fltk::Widget* widget, void* data)
 			}
 		}
 	}
-	window->updateGUI();
-	window->redraw();
 }
 
-void PanimationWindow::updateCorrespondenceCb(fltk::Widget* widget, void* data)
+void PanimationWindow::addTimeMarkToBlock(nle::Block* block, double t)
+{
+	CorrespondenceMark* mark = new CorrespondenceMark();
+	mark->setStartTime(t);
+	mark->setEndTime(mark->getStartTime());
+	mark->setColor(fltk::RED);
+	char buff[256];
+	sprintf(buff, "%6.2f", mark->getStartTime());
+	mark->setName(buff);
+	mark->setShowName(true);
+	block->addMark(mark);	
+}
+
+std::vector<std::string> PanimationWindow::tokenize(const std::string& str,const std::string& delimiters)
+{
+	std::vector<string> tokens;
+    	
+	// skip delimiters at beginning.
+	std::string::size_type lastPos = str.find_first_not_of(delimiters, 0);
+	
+	// find first "non-delimiter".
+	std::string::size_type pos = str.find_first_of(delimiters, lastPos);
+
+	while (std::string::npos != pos || std::string::npos != lastPos)
+	{
+    	// found a token, add it to the vector.
+    	tokens.push_back(str.substr(lastPos, pos - lastPos));
+	
+    	// skip delimiters.  Note the "not_of"
+    	lastPos = str.find_first_not_of(delimiters, pos);
+	
+    	// find next "non-delimiter"
+    	pos = str.find_first_of(delimiters, lastPos);
+	}
+
+	return tokens;
+}
+
+void PanimationWindow::refreshUI(fltk::Widget* widget, void* data)
 {
 	PanimationWindow* window = (PanimationWindow*) data;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	nle::Track* track1 = window->nleModel->getTrack(0);
-	nle::Block* block1 = NULL;
-	if (track1->getNumBlocks() > 0)
-		block1 = window->nleModel->getTrack(0)->getBlock(0);
-	nle::Track* track2 = window->nleModel->getTrack(1);
-	nle::Block* block2 = NULL;
-	if (track2->getNumBlocks() > 0)
-		block2 = window->nleModel->getTrack(1)->getBlock(0);
-
-
-	std::map<std::string, SkMotion*>::iterator iter;
-	std::map<std::string, std::vector<double>>::iterator iter1;
-	if (block1)
-	{
-		std::string animName1 = window->anim1->value();
-		iter = mcu.motion_map.find(animName1);
-		iter1 = mcu.panim_key_map.find(animName1);
-		if (iter != mcu.motion_map.end())
-		{
-			std::vector<double> key1;
-			for (int m1 = 0; m1 < block1->getNumMarks(); m1++)
-			{
-				nle::Mark* mark1 = block1->getMark(m1);
-				key1.push_back(mark1->getStartTime());
-			}
-			sort(key1.begin(), key1.end());
-			if (iter1 != mcu.panim_key_map.end())
-				iter1->second = key1;
-			else
-				mcu.panim_key_map.insert(std::make_pair(animName1, key1));
-		}
-	}
-
-	if (block2)
-	{
-		std::string animName2 = window->anim2->value();
-		iter = mcu.motion_map.find(animName2);
-		iter1 = mcu.panim_key_map.find(animName2);
-		if (iter != mcu.motion_map.end())
-		{
-			std::vector<double> key2;
-			for (int m2 = 0; m2 < block2->getNumMarks(); m2++)
-			{
-				nle::Mark* mark2 = block2->getMark(m2);
-				key2.push_back(mark2->getStartTime());
-			}
-			sort(key2.begin(), key2.end());
-			if (iter1 != mcu.panim_key_map.end())
-				iter1->second = key2;
-			else
-				mcu.panim_key_map.insert(std::make_pair(animName2, key2));
-		}
-	}
-	// connect the correspondence points
-	window->updateCorrespondenceMarks();
-	window->updateGUI();
-	window->redraw();
+	if (window->tabGroup->value() == 0)
+		window->stateEditor->refresh();
+	if (window->tabGroup->value() == 2)
+		window->scriptEditor->refresh();
 }
 
-void PanimationWindow::updateCorrespondenceMarks()
+void PanimationWindow::changeMotionPlayerMode(fltk::Widget* widget, void* data)
+{
+	PanimationWindow* window = (PanimationWindow*) data;
+	std::string charName = window->characterList->child(window->characterList->value())->label();
+	std::stringstream command;
+	if (window->motionPlayerMode->state())
+		command << "motionplayer " << charName << " on";
+	else
+		command << "motionplayer " << charName << " off";
+	execCmd(window, command.str(), 0);
+}
+
+void PanimationWindow::loadCharacters(fltk::Choice* characterList)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	std::vector<CorrespondenceMark*> marks1;
-	std::vector<CorrespondenceMark*> marks2;
-
-	nle::Track* track1 = this->nleModel->getTrack(0);
-	if (track1->getNumBlocks() > 0)
-	{
-		nle::Block* block1 = track1->getBlock(0);
-		block1->removeAllMarks();
-		std::string animName1 = this->anim1->value();
-		std::map<std::string, std::vector<double>>::iterator iter1 = mcu.panim_key_map.find(animName1);
-
-		if (iter1 != mcu.panim_key_map.end())
-		{
-			std::vector<double>& keys = (*iter1).second;
-			for (size_t k = 0; k < keys.size(); k++)
-			{
-				CorrespondenceMark* mark = new CorrespondenceMark();
-				mark->setStartTime(keys[k]);
-				mark->setEndTime(mark->getStartTime());
-				mark->setColor(fltk::RED);
-				char buff[256];
-				sprintf(buff, "%6.2f", mark->getStartTime());
-				mark->setName(buff);
-				mark->setShowName(true);
-				block1->addMark(mark);
-				marks1.push_back(mark);
-			}
-		}
-	}
-
-	nle::Track* track2 = this->nleModel->getTrack(1);
-	if (track2->getNumBlocks() > 0)
-	{
-		nle::Block* block2 = track2->getBlock(0);
-		block2->removeAllMarks();
-		std::string animName2 = this->anim2->value();
-		std::map<std::string, std::vector<double>>::iterator iter2 = mcu.panim_key_map.find(animName2);\
-		if (iter2 != mcu.panim_key_map.end())
-		{
-			std::vector<double>& keys = (*iter2).second;
-			for (size_t k = 0; k < keys.size(); k++)
-			{
-				CorrespondenceMark* mark = new CorrespondenceMark();
-				mark->setStartTime(keys[k]);
-				mark->setEndTime(mark->getStartTime());
-				mark->setColor(fltk::RED);
-				char buff[256];
-				sprintf(buff, "%6.2f", mark->getStartTime());
-				mark->setName(buff);
-				mark->setShowName(true);
-				block2->addMark(mark);
-				marks2.push_back(mark);
-			}
-		}
-	}
-
-	// connect the correspondence points
-	if (marks1.size() == marks2.size())
-	{
-		for (size_t m = 0; m < marks1.size(); m++)
-		{
-			marks1[m]->attach(marks2[m]);
-			marks2[m]->attach(marks1[m]);
-		}
-	}
-
+	SbmCharacter* char_p;
+	mcu.character_map.reset();
+	while(char_p = mcu.character_map.next())
+		characterList->add(char_p->name);
 }
 
-void PanimationWindow::ChangeCharacter(fltk::Widget* widget, void* data)
+void PanimationWindow::clearTextDisplay(fltk::Widget* widget, void* data)
 {
+	PanimationWindow* window = (PanimationWindow*) data;
+	window->textDisplay->buffer()->remove(0, window->textDisplay->buffer()->length());
+	window->textDisplay->relayout();
+	window->textDisplay->redraw();
 }
 
+
+void PanimationWindow::reset(fltk::Widget* widget, void* data)
+{	
+	PanimationWindow* window = (PanimationWindow*) data;
+	std::string charName = window->characterList->child(window->characterList->value())->label();
+	std::stringstream command;
+	command << "panim unschedule char " << charName;
+	execCmd(window, command.str());
+	std::stringstream resetPosCommand;
+	resetPosCommand << "set char " << charName << " world_offset x 0 z 0 h 0 p 0 r 0";
+	execCmd(window, resetPosCommand.str());
+}
 
 PanimationViewerFactory::PanimationViewerFactory()
 {

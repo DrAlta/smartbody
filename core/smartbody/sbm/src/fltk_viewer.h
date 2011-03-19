@@ -171,6 +171,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdShowKinematicFootprints,
 				   CmdShowLocomotionFootprints,
 				   CmdInteractiveLocomotion,
+				   CmdShowTrajectory,
 				   CmdReachToggleData,
 				   CmdReachToggleIK,
 				   CmdReachShowExamples,
@@ -185,7 +186,6 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 
     FltkViewerData* _data;
 	LocomotionData* _locoData;
-	
 
 	ObjectManipulationHandle _objManipulator; // a hack for testing. 
 
@@ -378,6 +378,7 @@ protected:
    bool showselection;
    bool showlocofootprints;
    bool showkinematicfootprints;
+   bool showtrajectory;
    bool interactiveLocomotion;
 
    SrString message;   // user msg to display in the window
@@ -453,7 +454,6 @@ class LocomotionData
 		bool d_key;
 		float off_height_comp;
 };
-
 //================================ End of File =================================================
 
 # endif // FLTK_VIEWER_H

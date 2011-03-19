@@ -363,6 +363,7 @@ Track::Track()
 {
 	setSelected(false);
     setActive(true);
+	model = NULL;
 }
 
 Track::~Track()
@@ -371,6 +372,16 @@ Track::~Track()
 	{
 		delete blocks[b];
 	}
+}
+
+void Track::setModel(NonLinearEditorModel* m)
+{
+	model = m;
+}
+
+NonLinearEditorModel* Track::getModel()
+{
+	return model;
 }
 
 std::string Track::getName()
@@ -387,6 +398,8 @@ void Track::addBlock(Block* block)
 {
 	blocks.push_back(block);
 	block->setTrack(this);
+	if (this->getModel())
+		this->getModel()->setModelChanged(true);
 }
 
 int Track::getNumBlocks()
@@ -421,6 +434,8 @@ void Track::removeBlock(int num)
 			Block* block = *iter;
 			blocks.erase(iter);
 			delete block;
+			if (this->getModel())
+				this->getModel()->setModelChanged(true);
 			return;
 		}
 		counter++;
@@ -439,6 +454,8 @@ void Track::removeBlock(std::string name)
 			Block* block = *iter;
 			blocks.erase(iter);
 			delete block;
+			if (this->getModel())
+				this->getModel()->setModelChanged(true);
 			return;
 		}
 		counter++;
@@ -457,6 +474,8 @@ void Track::removeBlock(Block* block)
 			Block* block = *iter;
 			blocks.erase(iter);
 			delete block;
+			if (this->getModel())
+				this->getModel()->setModelChanged(true);
 			return;
 		}
 		counter++;
@@ -523,6 +542,8 @@ void Track::removeAllBlocks()
 	{
 		this->removeBlock(b);
 	}
+	if (this->getModel())
+		this->getModel()->setModelChanged(true);
 }
 
 Block* Track::getBlock(double time)
@@ -607,6 +628,8 @@ void NonLinearEditorModel::setName(std::string modelName)
 void NonLinearEditorModel::addTrack(Track* track)
 {
 	tracks.push_back(track);
+	track->setModel(this);
+	setModelChanged(true);
 }
 
 int NonLinearEditorModel::getNumTracks()
@@ -655,6 +678,7 @@ void NonLinearEditorModel::removeTrack(unsigned int num)
 			Track* track = *iter;
 			tracks.erase(iter);
 			delete track;
+			setModelChanged(true);
 			return;
 		}
 		counter++;
@@ -691,6 +715,7 @@ void NonLinearEditorModel::removeTrack(Track* track)
 			Track* track = *iter;
 			tracks.erase(iter);
 			delete track;
+			setModelChanged(true);
 			return;
 		}
 		counter++;
@@ -1013,6 +1038,21 @@ void NonLinearEditorModel::clearContexts()
 	}
 	contexts.clear();
 	
+}
+
+void NonLinearEditorModel::update()
+{
+	// update the model's end time
+	double maxTime = -1.0;
+	for (int t = 0; t < getNumTracks(); t++)
+	{
+		Track* track = getTrack(t);
+		double blockTime = track->getLastBlockTime();
+		if (blockTime > maxTime)
+			maxTime = blockTime;
+	}
+
+	this->setEndTime(maxTime);
 }
 
 

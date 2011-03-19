@@ -11,6 +11,7 @@ class GenericViewer
 		virtual void label_viewer(std::string name);
 		virtual void show_viewer();
 		virtual void hide_viewer();
+		virtual void update_viewer();
 
 };
 

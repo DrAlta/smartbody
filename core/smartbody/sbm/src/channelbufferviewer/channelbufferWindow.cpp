@@ -815,6 +815,10 @@ void ChannelBufferWindow::hide_viewer()
 	this->hide();
 }
 
+void ChannelBufferWindow::update_viewer()
+{
+}
+
 void ChannelBufferWindow::show()
 {    
 	Window::show();   

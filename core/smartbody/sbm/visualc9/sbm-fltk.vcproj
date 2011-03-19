@@ -352,6 +352,38 @@
 				RelativePath="..\src\panimationviewer\ParamAnimEditorWidget.h"
 				>
 			</File>
+			<File
+				RelativePath="..\src\panimationviewer\ParamAnimRunTimeEditor.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\panimationviewer\ParamAnimRunTimeEditor.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\panimationviewer\ParamAnimScriptEditor.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\panimationviewer\ParamAnimScriptEditor.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\panimationviewer\ParamAnimStateEditor.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\panimationviewer\ParamAnimStateEditor.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\panimationviewer\ParamAnimTransitionEditor.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\panimationviewer\ParamAnimTransitionEditor.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="channelbufferviewer"

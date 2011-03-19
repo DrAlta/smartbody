@@ -601,7 +601,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct1, MeControll
 	double indt  = readyAt - startAt;
 	double outdt = endAt - relaxAt;
 
-	MeCtInterpolator* interpolator = new MeCtInterpolator(ct1, ct2, value, loop);
+	MeCtInterpolator* interpolator = new MeCtInterpolator(ct1, ct2, mcu.time, double(value), loop);
 	double ct_dur = interpolator->controller_duration();
 	bool dur_defined = (ct_dur >= 0);
 

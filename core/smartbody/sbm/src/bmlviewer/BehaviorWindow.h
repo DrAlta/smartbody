@@ -25,7 +25,7 @@ class BehaviorWindow : public fltk::Window, public GenericViewer
 		virtual void label_viewer(std::string name);
 		virtual void show_viewer();
 		virtual void hide_viewer();
-		
+		virtual	void update_viewer();
 		int handle(int event);
         void show();      
         void draw();

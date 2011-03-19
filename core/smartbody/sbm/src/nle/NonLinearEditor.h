@@ -110,12 +110,16 @@ class Block
 
 };
 
+class NonLinearEditorModel;
+
 class Track
 {
 	public:
 		Track();
 		~Track();
 
+		void setModel(NonLinearEditorModel* model);
+		NonLinearEditorModel* getModel();
 		virtual std::string getName();
 		virtual void setName(std::string name);
 		virtual void addBlock(Block* block);
@@ -149,7 +153,8 @@ class Track
 		std::vector<Block*> blocks;
 		bool selected;
 		int bounds[4];
-        bool active;  
+        bool active; 
+		NonLinearEditorModel* model;
 };
 
 class NonLinearEditorModel
@@ -190,6 +195,8 @@ class NonLinearEditorModel
 		std::vector<std::pair<std::string, std::vector<Track*> > >& getContexts();
 		std::vector<Track*>& getContext(std::string name);
 		void clearContexts();
+
+		void update();
 
 	protected:
 		std::vector<Track*> tracks;

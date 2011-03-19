@@ -39,6 +39,7 @@ RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Character/Locomotion/Kinematic Footsteps", 0, KinematicFootstepsCB, this, NULL);
 	menubar->add("&View/Character/Locomotion/Locomotion Footsteps", 0, LocomotionFootstepsCB, this, NULL);
 	menubar->add("&View/Character/Locomotion/Velocity", 0, VelocityCB, this, NULL);
+	menubar->add("&View/Character/Locomotion/Trajectory", 0, TrajectoryCB, this, NULL);
 	menubar->add("&View/Pawns", 0, ShowPawns, this, NULL);
 	menubar->add("&View/Shadows", 0, ShadowsCB, this, NULL);
 	//menubar->add("&View/Reach Pose Examples", 0, ShowPoseExamples, this, NULL);	
@@ -57,6 +58,7 @@ RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Settings/Internal Audio", 0, AudioCB, this, NULL);
 	menubar->add("&Window/Data Viewer", 0, LaunchDataViewerCB,this, NULL);
 	menubar->add("&Window/BML Viewer", 0, LaunchBMLViewerCB, this, NULL);
+	menubar->add("&Window/Parameterized Animation Viewer", 0, LaunchParamAnimViewerCB, this, NULL);
 //	menubar->add("&Window/Command Window", 0, LaunchConsoleCB, this, NULL);
 	menubar->add("&Scripts/Reload Scripts", 0, ReloadScriptsCB, this, NULL);
 	menubar->add("&Scripts/Set Script Folder", 0, SetScriptDirCB, this, MENU_DIVIDER);
@@ -209,6 +211,13 @@ void RootWindow::LaunchBMLViewerCB(Widget* widget, void* data)
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.execute("bmlviewer open");
 	mcu.execute("bmlviewer show");
+}
+
+void RootWindow::LaunchParamAnimViewerCB(Widget* widget, void* data)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.execute("panimviewer open");
+	mcu.execute("panimviewer show");	
 }
 
 void RootWindow::LaunchDataViewerCB(Widget* widget, void* data)
@@ -762,6 +771,12 @@ void RootWindow::KinematicFootstepsCB(fltk::Widget* w, void* data)
 {
 	RootWindow* rootWindow = static_cast<RootWindow*>(data);
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowKinematicFootprints, NULL);
+}
+
+void RootWindow::TrajectoryCB(fltk::Widget* w, void* data)
+{
+	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowTrajectory, NULL);	
 }
 
 void RootWindow::LocomotionFootstepsCB(fltk::Widget* w, void* data)

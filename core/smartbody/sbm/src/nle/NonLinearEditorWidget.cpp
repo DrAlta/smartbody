@@ -43,6 +43,11 @@ void EditorWidget::setup()
 	if (!model)
 		return;
 
+	if (model->isModelChanged())
+	{
+		model->update();
+	}
+
 	int currentTrackLocation = padding + timeWindowHeight;
 	for (int t = 0; t < model->getNumTracks(); t++)
 	{
@@ -202,6 +207,8 @@ void EditorWidget::setup()
 	double modelTimeSpan = modelEnd - modelStart;
 	double ratioStart = sliderStartTime / modelTimeSpan;
 	double ratioEnd = sliderEndTime / modelTimeSpan;
+	if (ratioEnd > 1.0)
+		ratioEnd = 1.0;
 	sliderLeft = int(ratioStart * double(timeWindowWidth)) + timeWindowLeft;
 	sliderRight = int(ratioEnd* double(timeWindowWidth)) + timeWindowLeft;
 	this->setTimeSliderBounds(sliderLeft, timeWindowTop, sliderRight - sliderLeft, timeWindowHeight);
@@ -300,7 +307,7 @@ void EditorWidget::draw()
 			}
 		}
 	}
-
+	
 	// show the mouse hit targets
 	if (false)
 	{
@@ -348,9 +355,6 @@ void EditorWidget::draw()
 		fltk::drawtext(buff, float(this->convertTimeToPosition(t)), float(bounds[1]) +  5.0f * float(bounds[3]) / 6.0f);
 		
 	}
-
-
-
 }
 
 void EditorWidget::drawBackground()
@@ -398,11 +402,8 @@ void EditorWidget::drawTicks()
 			fltk::drawtext(buff, float(timePos) - float(textW) / 2.0f, float(top) + float(this->h()) - float(textH));
 		}
 		counter++;
-		cur += tickAmount;
-		
+		cur += tickAmount;	
 	}
-
-
 }
 
 void EditorWidget::drawTimeWindow()
@@ -432,17 +433,14 @@ void EditorWidget::drawTimeWindow()
 	fltk::setcolor(fltk::BLACK);
 	fltk::strokerect(timerec);
 
-	
-
-
 	// draw the time label
-	char buff[128];
+/*	char buff[128];
 	sprintf(buff, "%6.2f", this->getViewableTimeStart());
 	fltk::drawtext(buff, float(bounds[0]), float((bounds[1] + (bounds[1] + bounds[3])) / 2 + 5) - 10);
 	sprintf(buff, "%6.2f", this->getViewableTimeEnd());
-
 	fltk::drawtext(buff, float(bounds[0] + bounds[2]), float((bounds[1] + (bounds[1] + bounds[3])) / 2 + 5) - 10);
-	}
+	*/
+}
 
 void EditorWidget::drawTrack(nle::Track* track, int trackNum)
 {
@@ -850,6 +848,8 @@ int EditorWidget::handle(int event)
 					{
 						newEndTime = this->getModel()->getEndTime();
 						newStartTime = newEndTime - (this->getViewableTimeEnd() - this->getViewableTimeStart());
+						if (newStartTime < 0.0)
+							newStartTime = 0.0;
 					}
 					
 					this->setViewableTimeStart(newStartTime);
@@ -914,14 +914,24 @@ int EditorWidget::handle(int event)
                     // make sure that the block doesn't go beyond the beginning
                     double startTime = selectedMark->getStartTime() + timeDiff;
                     double endTime = selectedMark->getEndTime() + timeDiff;
-					if (startTime >= 0 && endTime <= selectedMark->getBlock()->getEndTime())
+					if (startTime >= selectedMark->getBlock()->getStartTime() && endTime <= selectedMark->getBlock()->getEndTime())
                     {
                         selectedMark->setStartTime(startTime);
                         selectedMark->setEndTime(endTime);
 						char buff[256];
 						sprintf(buff, "%6.2f", selectedMark->getStartTime());
 						selectedMark->setName(buff);
-                    }              
+                    }       
+					if (startTime < selectedMark->getBlock()->getStartTime())
+					{
+						selectedMark->setStartTime(selectedMark->getBlock()->getStartTime());
+						selectedMark->setEndTime(selectedMark->getBlock()->getStartTime());
+					}
+					if (startTime > selectedMark->getBlock()->getEndTime())
+					{
+						selectedMark->setStartTime(selectedMark->getBlock()->getEndTime());
+						selectedMark->setEndTime(selectedMark->getBlock()->getEndTime());
+					}
                         
                     // reset the mouse position
                     clickPositionX = mousex;
