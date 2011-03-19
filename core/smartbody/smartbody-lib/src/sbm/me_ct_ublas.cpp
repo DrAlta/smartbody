@@ -12,10 +12,6 @@
 
 #include <time.h>
 
-#pragma comment(lib,"blas.lib")
-#pragma comment(lib,"libf2c.lib")
-#pragma comment(lib,"lapack.lib")
-
 namespace lapack = boost::numeric::bindings::lapack;
 namespace blas   = boost::numeric::bindings::blas;
 namespace ublas  = boost::numeric::ublas;
