@@ -1217,7 +1217,7 @@ void SbmCharacter::schedule_viseme_curve(
 #define LINEAR_SPLINE_SEGS_PER_SEC 30
 				double fr, to;
 				spline.query_span( &fr, &to );
-				int num_segs = ( to - fr ) * LINEAR_SPLINE_SEGS_PER_SEC;
+				int num_segs = (int)( ( to - fr ) * LINEAR_SPLINE_SEGS_PER_SEC );
 
 				// CT must handle the build internally...
 				srCurveBuilder builder;
