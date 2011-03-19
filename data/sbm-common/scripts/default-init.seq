@@ -61,5 +61,5 @@
 1	test loco char elder enable
 
 1	seq default-dynamics
-1	seq param-animation-init
+1	seq init-param-animation
 

@@ -15,7 +15,7 @@
 ##
 0 panim state UtahStopToWalk cycle false 1 ChrUtah_Idle001_ToWalk001 0 
 0 panim state UtahWalkToStop cycle false 1 ChrUtah_Walk001_ToIdle001 0 
-0 panim state UtahLocomotion cycle true 5 ChrUtah_Walk001 ChrUtah_Jog001 ChrUtah_Run001 ChrUtah_WalkInCircleLeft001 ChrUtah_WalkInCircleRight001 4 0 0.781967 1.39713 2.13333 0 0.481967 0.899522 1.6 0 0.422951 0.760766 1.33333 0 0.831148 1.37321 2.13333 0 0.851675 1.28708 2.13333 
-0 panim state UtahLocomotion parameter 2D 5 ChrUtah_Walk001 doctor|speed1 doctor|angular1 ChrUtah_Jog001 doctor|speed1 doctor|angular1 ChrUtah_Run001 doctor|speed1 doctor|angular1 ChrUtah_WalkInCircleLeft001 doctor|speed2 doctor|angular1 ChrUtah_WalkInCircleRight001 doctor|speed2 doctor|angular1 
+0 panim state UtahLocomotion cycle true 6 ChrUtah_Walk001 ChrUtah_Jog001 ChrUtah_Run001 ChrUtah_WalkInCircleLeft001 ChrUtah_WalkInCircleRight001 ChrUtah_RunInCircleLeft001 4 0 0.801639 1.3377 2.13333 0 0.506557 0.914754 1.6 0 0.427869 0.757377 1.33333 0 0.840984 1.35246 2.13333 0 0.821311 1.26393 2.13333 0 0.422951 0.786885 1.33333 
+0 panim state UtahLocomotion parameter 2D 6 ChrUtah_Walk001 doctor|speed1 doctor|angular1 ChrUtah_Jog001 doctor|speed1 doctor|angular1 ChrUtah_Run001 doctor|speed1 doctor|angular1 ChrUtah_WalkInCircleLeft001 doctor|speed2 doctor|angular1 ChrUtah_WalkInCircleRight001 doctor|speed2 doctor|angular1 ChrUtah_RunInCircleLeft001 doctor|speed2 doctor|angular1
 0 panim transition fromstate UtahLocomotion tostate UtahWalkToStop ChrUtah_Walk001 1.34754 1.92295 ChrUtah_Walk001_ToIdle001 0.270492 1.05246 
 0 panim transition fromstate UtahStopToWalk tostate UtahLocomotion ChrUtah_Idle001_ToWalk001 0.895082 1.36721 ChrUtah_Walk001 0.290164 0.801639 
