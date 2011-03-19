@@ -114,6 +114,9 @@ XERCES_CPP_NAMESPACE_USE
 bool done = false;
 extern SpeechRequestData xmlMetaData;
 
+
+const char * FESTIVAL_RELAY_LIB_DIR = "..\\..\\lib\\festival\\festival\\lib";
+
 string cache_directory = "..\\..\\data\\cache\\festival\\";
 
 
@@ -475,7 +478,8 @@ BOOL WINAPI ConsoleHandler(DWORD CEvent)
 
 int main(int argc, char **argv)
 {
-    
+    festival_libdir = FESTIVAL_RELAY_LIB_DIR;
+
     int heap_size = FESTIVAL_HEAP_SIZE;  
     int load_init_files = 1; // we want the festival init files loaded
     festival_initialize(load_init_files,heap_size);
