@@ -94,7 +94,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="postbuild.bat "
+				CommandLine="postbuild.bat DEBUG"
 			/>
 		</Configuration>
 		<Configuration
@@ -175,7 +175,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="postbuild.bat &quot;$(ConfigurationName)&quot;"
+				CommandLine="postbuild.bat"
 			/>
 		</Configuration>
 	</Configurations>
