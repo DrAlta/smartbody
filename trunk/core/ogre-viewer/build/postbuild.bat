@@ -5,10 +5,6 @@ echo Running Postbuild.bat
 @REM Configure for a VHuman project directory
 set OGRE_HOME=..\..\..\lib\OgreSDK
 
-set FINAL_BIN=..\..\..\bin\ogre-viewer\bin\%1%
-set MEDIA_FOLDER=..\..\..\bin\ogre-viewer\media
-
-
 @REM Initialize variables according to build type
 if (%1)==(DEBUG) goto DEBUG_VARS
 goto RELEASE_VARS
@@ -23,6 +19,8 @@ copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll %BIN_DIR%
+set FINAL_BIN_DIR=..\..\..\bin\ogre-viewer\bin\win32
+set FINAL_MEDIA_FOLDER=..\..\..\bin\ogre-viewer\media
 goto COPY
 
 :DEBUG_VARS
@@ -35,6 +33,8 @@ copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll %BIN_DIR%
+set FINAL_BIN_DIR=..\..\..\bin\ogre-viewer\bin\win32_debug
+set FINAL_MEDIA_FOLDER=..\..\..\bin\ogre-viewer\media
 goto COPY
 
 :COPY
@@ -45,11 +45,11 @@ for %%F in (%OGRE_FILES%) do echo %%F && COPY %OGRE_BIN%\%%F %BIN_DIR%
 
 call copy_media.bat SHARE %BIN_DIR%
 
-if not exist %FINAL_BIN% mkdir %FINAL_BIN%
-copy %BIN_DIR%\*.* %FINAL_BIN%
+if not exist %FINAL_BIN_DIR% mkdir %FINAL_BIN_DIR%
+copy %BIN_DIR%\*.* %FINAL_BIN_DIR%
 
-if not exist %MEDIA_FOLDER%  mkdir %MEDIA_FOLDER%
-copy ..\media\*.* %MEDIA_FOLDER%
+if not exist %FINAL_MEDIA_FOLDER%  mkdir %FINAL_MEDIA_FOLDER%
+copy ..\media\*.* %FINAL_MEDIA_FOLDER%
 
 
 @goto END
