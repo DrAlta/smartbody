@@ -25,6 +25,7 @@
 
 #include <ME/me_controller.h>
 #include <sbm/sr_linear_curve.h>
+#include <sbm/sr_curve_builder.h>
 
 class MeCtCurveWriter : public MeController {
 
@@ -61,9 +62,23 @@ class MeCtCurveWriter : public MeController {
 			if( curve_index >= num_curves ) return;
 			curve_arr[ curve_index ].insert( t, v );
 		}
-
 		void insert_key( double t, double v )	{
 			curve_arr[ 0 ].insert( t, v );
+		}
+
+		void insert_spline( int curve_index, srSplineCurve& spline, double segments_per_sec )	{
+			if( curve_index < 0 ) return;
+			if( curve_index >= num_curves ) return;
+
+			double fr, to;
+			spline.query_span( &fr, &to );
+			int num_segs = (int)( ( to - fr ) * segments_per_sec );
+
+			srCurveBuilder builder;
+			builder.get_spline_curve( curve_arr + curve_index, spline, num_segs, true );
+		}
+		void insert_spline( srSplineCurve& spline, double segments_per_sec )	{
+			insert_spline( 0, spline, segments_per_sec );
 		}
 
 	private:

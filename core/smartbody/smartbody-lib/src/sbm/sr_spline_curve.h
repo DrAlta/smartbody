@@ -7,6 +7,7 @@ class srSplineCurve {
 
 	public:
 		enum algorithm_enum_set    {
+//			ALG_LINEAR, 
 			ALG_SIMPLE, 
 			ALG_HALTING, 
 			ALG_CATMULL, 
@@ -50,7 +51,7 @@ class srSplineCurve {
 		bool auto_extensions;
 
 //		int head_bound_mode; // one should and must dream
-//		int stail_bound_mode;
+//		int tail_bound_mode;
 		int algorithm;
 
 		class Key : public gwiz::ctrl_key	{
@@ -94,8 +95,8 @@ class srSplineCurve {
 		Node *head_node_p;
 		Node *tail_node_p;
 
-//		Key *curr_key_p; // rapid local repeat access: to investigate
-//		Key *curr_node_p; // rapid local repeat access: to investigate
+//		Key *curr_key_p; // rapid local repeat access: needed?
+//		Key *curr_eval_node_p; // rapid local repeat access: to investigate
 		Key *curr_edit_key_p;
 		Key *curr_query_key_p;
 		Node *curr_query_node_p;
@@ -186,6 +187,7 @@ class srSplineCurve {
 		bool extend_head( void );
 		bool extend_tail( void );
 
+		void update_key_order( void );
 		void update( void );
 
 	public:

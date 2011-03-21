@@ -1237,12 +1237,16 @@ void SbmCharacter::schedule_viseme_curve(
 				}
 				spline.apply_extensions();
 
-#define LINEAR_SPLINE_SEGS_PER_SEC 30
+#define LINEAR_SPLINE_SEGS_PER_SEC 30.0
+#if 1
+				ct_p->insert_spline( spline, LINEAR_SPLINE_SEGS_PER_SEC );
+#else
 				double fr, to;
 				spline.query_span( &fr, &to );
 				int num_segs = (int)( ( to - fr ) * LINEAR_SPLINE_SEGS_PER_SEC );
 
-				// CT must handle the build internally...
+				// MeCtCurveWriter: ct_p must handle the build internally...
+				// ct_p->sample_spline( int curve_index, spline, num_segs, true );
 				srCurveBuilder builder;
 				srLinearCurve linear;
 				builder.get_spline_curve( &linear, spline, num_segs, true );
@@ -1252,6 +1256,7 @@ void SbmCharacter::schedule_viseme_curve(
 				while( linear.query_next( &t, &v, true ) )	{
 					ct_p->insert_key( t, v );
 				}
+#endif
 			}
 			double ct_dur = ct_p->controller_duration();
 			double tin = start_time + timeDelay;

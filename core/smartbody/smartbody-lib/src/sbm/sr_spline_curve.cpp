@@ -132,7 +132,7 @@ void srSplineCurve::print( void )	{
 		node_p = node_p->next();
 	}
 
-	if( dirty ) printf( "DIRTY!\n" );
+	if( dirty ) printf( " DIRTY!\n" );
 	printf( " ALG: %s\n", algorithm_label( algorithm ) );
 	printf( " INS: %s\n", insert_label( insert_mode ) );
 	printf( " INS: tail %s\n", insert_tail ? "TRUE" : "FALSE" );
@@ -193,44 +193,74 @@ void srSplineCurve::clear_nodes( void )	{
 
 //////////////////////////////////////////////////////////////////
 
+#define DEBUG_INSERT_COND	0
+
 bool srSplineCurve::insert( double p, double v )	{
 
+//	if( dirty ) update();
 	if( insert_mode == INSERT_NODES )	{
 
+		if( dirty ) update();
+
 		if( key_count == 0 )	{
-// printf( "inserting head key\n" );
+
+			// first key:
+#if DEBUG_INSERT_COND
+			printf( "# prepend head: %f %f\n", p - 1.0, v );
+#endif
 			bool ret = insert_key( new Key( p - 1.0, v ) );
 			if( ret == false ) return( ret );
 			insert_tail = true;
 		}
+		else
+		if( insert_tail == false )	{ 
 
-		if( insert_tail == false )	{
+			// Has been updated since last insert
+			if( head_node_p && tail_node_p )	{
 
-// printf( "appending tail key\n" );
-/////////////////////////////////
-/*
-	 NO!!
-	 this requires that insertions are time-sequential !! <<<<<<<<<
-	   * when is an insertion/edit needed? 
-	
-	  --> what about the auto-inserted head-key? 
-	      * Must check the min time. 
-	      * delete head or tail?
-*/
+				if( p > tail_node_p->keyref()->p() )	{
 
-#if 0
-			if( p < head_key_p->p() ) {}
-			else {}
-
-			if( p > tail_key_p->p() ) {}
-			else {}
+					// beyond the tail node:
+#if DEBUG_INSERT_COND
+					printf( "# EDIT tail: %f %f\n", p, v );
+					printf( "# REQ append: %f %f\n", p + 1.0, v );
 #endif
+					insert_tail = true;
+					return( edit_tail( p, v ) );
+				}
+				else
+				if( p < head_node_p->keyref()->p() )	{
 
-			insert_tail = true;
-			return( edit_tail( p, v ) );
+					// before the head node:
+#if DEBUG_INSERT_COND
+					printf( "# EDIT head: %f %f\n", p, v );
+#endif
+					if( edit_head( p, v ) )	{
+#if DEBUG_INSERT_COND
+						printf( "# INSERT new head: %f %f\n", p - 1.0, v );
+#endif
+						return( insert_key( new Key( p - 1.0, v ) ) );
+					}
+					return( false );
+				}
+#if DEBUG_INSERT_COND
+				printf( "# pass through\n" );
+#endif
+			}
+			else	{
+				printf( "srSplineCurve::insert WARN: head:%d tail:%d\n", 
+					(int)(head_node_p!=NULL), (int)(tail_node_p!=NULL) );
+			}
+		}
+		else	{
+#if DEBUG_INSERT_COND
+			printf( "# fall through...\n" );
+#endif
 		}
 	}
-
+#if DEBUG_INSERT_COND
+	printf( "# INSERT: %f %f\n", p, v );
+#endif
 	return( insert_key( new Key( p, v ) ) );
 }
 
@@ -254,6 +284,7 @@ double srSplineCurve::evaluate( double t, bool *cropped_p ) {
 
 	if( dirty ) update(); // always...
 	if( cropped_p ) { *cropped_p = false; }
+
 	Node *node_p = find_floor_node( t );
 	
 	if( node_p )	{
@@ -622,17 +653,121 @@ bool srSplineCurve::extend_tail( void )	{
 	return( false );
 }
 
+#define COALESCE_THRESH 0.1
+
+void srSplineCurve::update_key_order( void )	{
+
+	if( head_key_p )	{
+		double t_prev = head_key_p->p();
+		Key *key_p = head_key_p->next();
+		
+		bool collision = false;
+		bool disorder = false;
+
+		while( key_p )	{
+
+			double t = key_p->p();
+
+			if( fabs( t - t_prev ) < COALESCE_THRESH )	{ // COLLISION!
+			
+				collision = true;
+			}
+			if( t_prev >= ( t - COALESCE_THRESH ) )	 { // REORDER!
+			
+				disorder = true;
+			}
+
+			t_prev = t;
+			key_p = key_p->next();
+		}
+#if 0
+		if( collision && reorder ) printf( "coll && reorder\n" );
+		else
+		if( collision ) printf( "coll\n" );
+		else
+		if( disorder ) printf( "disorder\n" );
+#elif 1
+		if( collision || disorder ) {
+			// enforce order by shuffling up/dn based on curr_edit_key_p?
+			// when is curr_edit_key_p set?
+			// ever by the auto-extend?
+		}
+#elif 1
+		if( disorder )	{
+			
+			Key *edit_p = curr_edit_key_p;
+			Key *query_p = curr_query_key_p;
+			key_p = head_key_p;
+			tail_key_p = key_p;
+			
+			curr_edit_key_p = NULL;
+			curr_query_key_p = NULL;
+			head_key_p = NULL;
+//			key_count = 0;
+//			clear();
+//			clear_nodes();
+
+			while( key_p )	{
+
+				Key *new_p = new Key( key_p->p(), key_p->v() );
+				if( key_p == edit_p )	{
+					curr_edit_key_p = new_p;
+				}
+				if( key_p == query_p )	{
+					curr_query_key_p = new_p;
+				}
+				insert_key( new_p );
+				tail_key_p = new_p;
+				
+				Key *tmp_p = key_p;
+				key_p = key_p->next();
+				delete tmp_p;
+				decrement_key();
+			}
+
+/*
+	curr_query_node_p = NULL;
+			Node *n_query_p = curr_query_node_p;
+			
+			Node *node_p = head_node_p;
+			
+			while( node_p )	{
+				Node *tmp_p = node_p;
+				node_p = node_p->next();
+				delete tmp_p;
+				decrement_node();
+			}
+*/
+//			clear_nodes();
+//			dirty = true;
+		}
+#endif
+	}
+}
+
 void srSplineCurve::update( void ) {
+
+// TODO:
+	// Can we now re-order its keys, since it will scratch build the node arr?
+	// Coalescent time stamps: policy not implemented, may return INF/undefined...
+	//  - bump up and down? via edit()?
+	//  - nodes only? Let the head/tail fly?
+	// bumping back requires prev() pointers.
+	// reordering breaks the APP selection hot-node.
 
 	if( insert_tail )	{
 		build_tail();
 	}
+#if 0
+	update_key_order();
+#endif
 	if( auto_extensions ) {
 		apply_extensions();
 	}
 
 	// build cardinal nodes from scratch...
 	clear_nodes();
+	// >>> possible to simply re-use?
 
 	tail_key_p = head_key_p;
 	if( key_count > 1 ) {
