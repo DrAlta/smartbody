@@ -52,6 +52,7 @@ class SrViewer;
 class SrLight;
 class FltkViewerData;
 class LocomotionData;
+class PALocomotionData;
 class SbmCharacter;
 class MeCtDataDrivenReach;
 class MeCtConstraint;
@@ -186,6 +187,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 
     FltkViewerData* _data;
 	LocomotionData* _locoData;
+	PALocomotionData* _paLocoData;
 
 	ObjectManipulationHandle _objManipulator; // a hack for testing. 
 
@@ -453,6 +455,18 @@ class LocomotionData
 		bool a_key;
 		bool d_key;
 		float off_height_comp;
+};
+
+class PALocomotionData
+{
+	public:
+		PALocomotionData();
+		~PALocomotionData();
+	float w;	// angular velocity
+	float v;	// velocity
+	SbmCharacter* character;
+	bool starting;
+	bool stopping;
 };
 //================================ End of File =================================================
 

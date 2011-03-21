@@ -71,7 +71,7 @@ ParameterManager::~ParameterManager()
 	state = NULL;
 }
 
-void ParameterManager::setWeight(double x)
+bool ParameterManager::setWeight(double x)
 {
 	double left = -9999.0;
 	double right = 9999.0;
@@ -98,6 +98,7 @@ void ParameterManager::setWeight(double x)
 	{
 		int id = state->getMotionId(leftMotion);
 		state->weights[id] = 1.0;
+		return true;
 	}
 	else
 	{
@@ -108,11 +109,13 @@ void ParameterManager::setWeight(double x)
 		{
 			state->weights[leftId] = 1 - weight;
 			state->weights[rightId] = weight;
+			return true;
 		}
 	}
+	return false;
 }
 
-void ParameterManager::setWeight(double x, double y)
+bool ParameterManager::setWeight(double x, double y)
 {
 	SrVec pt = SrVec((float)x, (float)y, 0);
 	for (int i = 0; i < getNumTriangles(); i++)
@@ -129,8 +132,60 @@ void ParameterManager::setWeight(double x, double y)
 			for (int i = 0; i < state->getNumMotions(); i++)
 				state->weights[i] = 0.0;
 			getWeight(pt, v1, v2, v3, state->weights[id1], state->weights[id2], state->weights[id3]);
-			break;
+			return true;
 		}
+	}
+	return false;
+}
+
+
+void ParameterManager::getParameter(float& x)
+{
+	x = 0.0f;
+	for (int i = 0; i < getNumParameters(); i++)
+	{
+		int id = state->getMotionId(motionNames[i]);
+		x += (float)state->weights[id] * parameters[i].x;
+	}
+}
+
+void ParameterManager::getParameter(float& x, float& y)
+{
+	std::vector<int> indices;
+	for (int i = 0; i < state->getNumMotions(); i++)
+	{
+		if (state->weights[i] > 0.0)
+			indices.push_back(i);
+	}
+	if (indices.size() == 0)
+		return;
+	else if (indices.size() == 1)
+	{
+		int id = state->paramManager->getMotionId(state->motions[indices[0]]->name());
+		if (id >= 0)
+		{
+			x = state->paramManager->getVec(id).x;
+			y = state->paramManager->getVec(id).y;
+		}
+		else
+			return;
+	}
+	else
+	{
+		std::vector<SrVec> vecs;
+		for (size_t i = 0; i < indices.size(); i++)
+		{
+			int id = state->paramManager->getMotionId(state->motions[indices[i]]->name());
+			if (id >= 0)
+				vecs.push_back(state->paramManager->getVec(id));
+			else
+				return;
+		}
+		SrVec vec;
+		for (size_t i = 0; i < indices.size(); i++)
+			vec = vec + vecs[i] * (float)state->weights[indices[i]];
+		x = vec.x;
+		y = vec.y;
 	}
 }
 
