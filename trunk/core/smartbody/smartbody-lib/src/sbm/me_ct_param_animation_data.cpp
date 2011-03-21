@@ -73,25 +73,23 @@ ParameterManager::~ParameterManager()
 
 void ParameterManager::setWeight(double x)
 {
-	if (parameterMaps.size() == 0) return;
-	std::map<std::string, SrVec>::iterator iter = parameterMaps.begin();
 	double left = -9999.0;
 	double right = 9999.0;
 	std::string leftMotion = "";
 	std::string rightMotion = "";
-	for (; iter != parameterMaps.end(); iter++)
+	for (int i = 0; i < getNumParameters(); i++)
 	{
-		if (iter->second.x <= x)
-			if (iter->second.x >= left)	
+		if (parameters[i].x <= x)
+			if (parameters[i].x >= left)	
 			{
-				left = iter->second.x;
-				leftMotion = iter->first;
+				left = parameters[i].x;
+				leftMotion = motionNames[i];
 			}
-		if (iter->second.x >= x)
-			if (iter->second.x <= right) 
+		if (parameters[i].x >= x)
+			if (parameters[i].x <= right) 
 			{
-				right = iter->second.x;
-				rightMotion = iter->first;
+				right = parameters[i].x;
+				rightMotion = motionNames[i];
 			}
 	}
 	for (int i = 0; i < state->getNumMotions(); i++)
@@ -117,41 +115,22 @@ void ParameterManager::setWeight(double x)
 void ParameterManager::setWeight(double x, double y)
 {
 	SrVec pt = SrVec((float)x, (float)y, 0);
-	std::map<std::string, SrVec>::iterator iter = parameterMaps.begin();
-	std::vector<SrVec> vecContainer;
-	std::vector<std::string> nameContainer;
-	for (; iter != parameterMaps.end(); iter++)
+	for (int i = 0; i < getNumTriangles(); i++)
 	{
-		vecContainer.push_back(iter->second);
-		nameContainer.push_back(iter->first);
-	}
-
-	bool toBreak = false;
-	for (size_t i = 0; i < vecContainer.size(); i++)
-	{
-		for (size_t j = i + 1; j < vecContainer.size(); j++)
+		SrVec v1 = triangles[i].triangle.a;
+		SrVec v2 = triangles[i].triangle.b;
+		SrVec v3 = triangles[i].triangle.c;
+		int id1 = state->getMotionId(triangles[i].motion1);
+		int id2 = state->getMotionId(triangles[i].motion2);
+		int id3 = state->getMotionId(triangles[i].motion3);
+		bool in = insideTriangle(pt, v1, v2, v3);
+		if (in)
 		{
-			for (size_t k = j + 1; k < vecContainer.size(); k++)
-			{
-				SrVec v1 = vecContainer[i];
-				SrVec v2 = vecContainer[j];
-				SrVec v3 = vecContainer[k];
-				int id1 = state->getMotionId(nameContainer[i]);
-				int id2 = state->getMotionId(nameContainer[j]);
-				int id3 = state->getMotionId(nameContainer[k]);
-				bool in = insideTriangle(pt, v1, v2, v3);
-				if (in)
-				{
-					for (int i = 0; i < state->getNumMotions(); i++)
-						state->weights[i] = 0.0;
-					getWeight(pt, v1, v2, v3, state->weights[id1], state->weights[id2], state->weights[id3]);
-					toBreak = true;
-					break;
-				}
-			}
-			if (toBreak)	break;
+			for (int i = 0; i < state->getNumMotions(); i++)
+				state->weights[i] = 0.0;
+			getWeight(pt, v1, v2, v3, state->weights[id1], state->weights[id2], state->weights[id3]);
+			break;
 		}
-		if (toBreak)	break;
 	}
 }
 
@@ -159,7 +138,8 @@ void ParameterManager::addParameter(std::string motion, double x)
 {
 	SrVec vec;
 	vec.x = (float)x;
-	parameterMaps.insert(std::make_pair(motion, vec));
+	motionNames.push_back(motion);
+	parameters.push_back(vec);
 	type = 0;
 }
 
@@ -168,8 +148,23 @@ void ParameterManager::addParameter(std::string motion, double x, double y)
 	SrVec vec;
 	vec.x = (float)x;
 	vec.y = (float)y;
-	parameterMaps.insert(std::make_pair(motion, vec));
+	motionNames.push_back(motion);
+	parameters.push_back(vec);
 	type = 1;
+}
+
+
+void ParameterManager::addTriangle(std::string motion1, std::string motion2, std::string motion3)
+{
+	TriangleInfo tInfo;
+	SrVec v1 = getVec(motion1);
+	SrVec v2 = getVec(motion2);
+	SrVec v3 = getVec(motion3);
+	tInfo.triangle = SrTriangle(v1, v2, v3);
+	tInfo.motion1 = motion1;
+	tInfo.motion2 = motion2;
+	tInfo.motion3 = motion3;
+	triangles.push_back(tInfo);
 }
 
 int ParameterManager::getType()
@@ -184,71 +179,84 @@ void ParameterManager::setType(int typ)
 
 int ParameterManager::getNumParameters()
 {
-	return parameterMaps.size();
+	return parameters.size();
 }
 
-std::string ParameterManager::getMinVec(int type)
+int ParameterManager::getMinVecX()
 {
 	float min = 9999;
-	std::string ret = "";
-	std::map<std::string, SrVec>::iterator iter = parameterMaps.begin();
-	for (; iter != parameterMaps.end(); iter++)
+	int ret = -1;
+	for (int i = 0; i < getNumParameters(); i++)
 	{
-		if (type == 0)
-			if (iter->second.x < min)
-			{
-				min = iter->second.x;
-				ret = iter->first;
-			}
-		if (type == 1)
-			if (iter->second.y < min)
-			{
-				min = iter->second.y;
-				ret = iter->first;
-			}
+		if (parameters[i].x < min)
+		{
+			min = parameters[i].x;
+			ret = i;
+		}
 	}
 	return ret;
 }
 
-std::string ParameterManager::getMaxVec(int type)
+int ParameterManager::getMinVecY()
+{
+	float min = 9999;
+	int ret = -1;
+	for (int i = 0; i < getNumParameters(); i++)
+	{
+		if (parameters[i].y < min)
+		{
+			min = parameters[i].y;
+			ret = i;
+		}
+	}
+	return ret;
+}
+
+int ParameterManager::getMaxVecX()
 {
 	float max = -9999;
-	std::string ret = "";
-	std::map<std::string, SrVec>::iterator iter = parameterMaps.begin();
-	for (; iter != parameterMaps.end(); iter++)
+	int ret = -1;
+	for (int i = 0; i < getNumParameters(); i++)
 	{
-		if (type == 0)
-			if (iter->second.x > max)
-			{
-				max = iter->second.x;
-				ret = iter->first;
-			}
-		if (type == 1)
-			if (iter->second.y > max)
-			{
-				max = iter->second.y;
-				ret = iter->first;
-			}
+		if (parameters[i].x > max)
+		{
+			max = parameters[i].x;
+			ret = i;
+		}
+	}
+	return ret;
+}
+
+int ParameterManager::getMaxVecY()
+{
+	float max = -9999;
+	int ret = -1;
+	for (int i = 0; i < getNumParameters(); i++)
+	{
+		if (parameters[i].y > max)
+		{
+			max = parameters[i].y;
+			ret = i;
+		}
 	}
 	return ret;
 }
 
 SrVec ParameterManager::getVec(std::string motion)
 {
-	if (motion == "")
-		return SrVec();
-	else
-		return parameterMaps[motion];
+	for (int i = 0; i < getNumParameters(); i++)
+	{
+		if (motionNames[i] == motion)
+			return parameters[i];
+	}
+	return SrVec();
 }
 
 SrVec ParameterManager::getVec(int id)
 {
 	if (id < 0 || id > getNumParameters())
 		return SrVec();
-	std::map<std::string, SrVec>::iterator iter = parameterMaps.begin();
-	for (int i = 0; i < id; i++)
-		iter++;
-	return iter->second;
+	return parameters[id];
 }
 
 SrVec ParameterManager::getPrevVec()
@@ -265,10 +273,27 @@ std::string ParameterManager::getMotionName(int id)
 {
 	if (id < 0 || id > getNumParameters())
 		return "";
-	std::map<std::string, SrVec>::iterator iter = parameterMaps.begin();
-	for (int i = 0; i < id; i++)
-		iter++;
-	return iter->first;	
+	return motionNames[id];	
+}
+
+int ParameterManager::getMotionId(std::string name)
+{
+	for (int i = 0; i < getNumParameters(); i++)
+	{
+		if (motionNames[i] == name)
+			return i;
+	}
+	return -1;
+}
+
+int ParameterManager::getNumTriangles()
+{
+	return triangles.size();
+}
+
+SrTriangle& ParameterManager::getTriangle(int id)
+{
+	return triangles[id].triangle;
 }
 
 bool ParameterManager::insideTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3)

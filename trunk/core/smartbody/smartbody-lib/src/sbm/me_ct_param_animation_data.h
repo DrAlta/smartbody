@@ -25,6 +25,7 @@
 #define _ME_CT_PARAM_ANIMATION_DATA_H_
 #include "me_ct_param_animation_utilities.h"
 #include <sbm/sbm_character.hpp>
+#include <sr/sr_triangle.h>
 
 class ParameterManager;
 class PAStateData
@@ -60,6 +61,14 @@ class PATransitionData
 		double easeInEnd;
 };
 
+struct TriangleInfo
+{
+	SrTriangle triangle;
+	std::string motion1;
+	std::string motion2;
+	std::string motion3;
+};
+
 class ParameterManager
 {
 	public:
@@ -70,17 +79,24 @@ class ParameterManager
 		void setWeight(double x, double y);
 		void addParameter(std::string motion, double x);
 		void addParameter(std::string motion, double x, double y);
+		void addTriangle(std::string motion1, std::string motion2, std::string motion3);
 		int getType();
 		void setType(int typ);
 
 		int getNumParameters();
-		std::string getMinVec(int type);
-		std::string getMaxVec(int type);
+		int getMinVecX();
+		int getMinVecY();
+		int getMaxVecX();
+		int getMaxVecY();
 		SrVec getVec(std::string motion);
 		SrVec getVec(int id);
 		SrVec getPrevVec();
 		void setPrevVec(SrVec& vec);
 		std::string getMotionName(int id);
+		int getMotionId(std::string name);
+
+		int getNumTriangles();
+		SrTriangle& getTriangle(int id);
 
 	private:
 		bool insideTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3);
@@ -89,8 +105,10 @@ class ParameterManager
 	private:
 		int type;
 		PAStateData* state;
-		std::map<std::string, SrVec> parameterMaps;
+		std::vector<std::string> motionNames;
+		std::vector<SrVec> parameters;
 		SrVec previousParam;
+		std::vector<TriangleInfo> triangles;
 };
 
 class MotionParameters

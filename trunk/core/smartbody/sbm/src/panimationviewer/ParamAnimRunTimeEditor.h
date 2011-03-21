@@ -42,6 +42,7 @@ class ParameterVisualization : public fltk::Group
 
 	private:
 		void getBound(int ptX, int ptY, int& x, int& y, int& w, int& h);
+		void getActualPixel(SrVec vec, int& x, int& y);
 
 	private:
 		static const int pad = 5;

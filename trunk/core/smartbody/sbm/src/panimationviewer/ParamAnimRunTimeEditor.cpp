@@ -72,26 +72,18 @@ void ParameterVisualization::draw()
 	}
 
 	// draw lines connecting parameters
-	for (int i = 0; i < state->paramManager->getNumParameters(); i++)
+	for (int i = 0; i < state->paramManager->getNumTriangles(); i++)
 	{
-		SrVec vec = state->paramManager->getVec(i);
-		int x = 0;
-		if (fabs(scaleX) > 0.0001)
-			x = int(vec.x / scaleX);
-		int y = 0;
-		if (fabs(scaleY) > 0.0001)
-			y = int(vec.y / scaleY);
-		for (int j = i; j < state->paramManager->getNumParameters(); j++)
-		{
-			SrVec vec1 = state->paramManager->getVec(j);
-			int x1 = 0;
-			if (fabs(scaleX) > 0.0001)
-				x1 = int(vec1.x / scaleX);
-			int y1 = 0;
-			if (fabs(scaleY) > 0.0001)
-				y1 = int(vec1.y / scaleY);
-			fltk::drawline(centerX + x, centerY - y, centerX + x1, centerY - y1);
-		}
+		SrVec vec1 = state->paramManager->getTriangle(i).a;
+		SrVec vec2 = state->paramManager->getTriangle(i).b;
+		SrVec vec3 = state->paramManager->getTriangle(i).c;
+		int x1, y1, x2, y2, x3, y3;
+		getActualPixel(vec1, x1, y1);
+		getActualPixel(vec2, x2, y2);
+		getActualPixel(vec3, x3, y3);
+		fltk::drawline(x1, y1, x2, y2);
+		fltk::drawline(x1, y1, x3, y3);
+		fltk::drawline(x3, y3, x2, y2);
 	}
 
 	// draw parameters info
@@ -146,14 +138,14 @@ void ParameterVisualization::setup()
 	width = w();
 	height = h();
 
-	SrVec vec = state->paramManager->getVec(state->paramManager->getMaxVec(0));
+	SrVec vec = state->paramManager->getVec(state->paramManager->getMaxVecX());
 	float maxX = vec.x;
-	vec = state->paramManager->getVec(state->paramManager->getMinVec(0));
+	vec = state->paramManager->getVec(state->paramManager->getMinVecX());
 	float minX = vec.x;
 	if (fabs(maxX) < fabs(minX)) maxX = minX;
-	vec = state->paramManager->getVec(state->paramManager->getMaxVec(1));
+	vec = state->paramManager->getVec(state->paramManager->getMaxVecY());
 	float maxY = vec.y;
-	vec = state->paramManager->getVec(state->paramManager->getMinVec(1));
+	vec = state->paramManager->getVec(state->paramManager->getMinVecY());
 	float minY = vec.y;
 	if (fabs(maxY) < fabs(minY)) maxY = minY;
 	scaleX = fabs(maxX * 3 / (float)width);
@@ -180,6 +172,16 @@ void ParameterVisualization::getBound(int ptX, int ptY, int& x, int& y, int& w, 
 	y = ptY - pad;
 	w = 2 * pad;
 	h = 2 * pad;
+}
+
+void ParameterVisualization::getActualPixel(SrVec vec, int& x, int& y)
+{
+	if (fabs(scaleX) > 0.0001)
+		x = int(vec.x / scaleX);
+	x = centerX + x;
+	if (fabs(scaleY) > 0.0001)
+		y = int(vec.y / scaleY);
+	y = centerY - y;
 }
 
 void ParameterVisualization::setSlider(int x, int y)
@@ -215,8 +217,8 @@ ParameterWindow::ParameterWindow(int x, int y, int w, int h, char* name, PAState
 		int type = state->paramManager->getType();
 		if (type == 0)
 		{
-			double min = state->paramManager->getVec(state->paramManager->getMinVec(0)).x;
-			double max = state->paramManager->getVec(state->paramManager->getMaxVec(0)).x;
+			double min = state->paramManager->getVec(state->paramManager->getMinVecX()).x;
+			double max = state->paramManager->getVec(state->paramManager->getMaxVecX()).x;
 			xAxis = new fltk::ValueSlider(4 * xDis, h - 4 * yDis, w - 5 * xDis, 2 * yDis, "X");
 			xAxis->minimum(min);
 			xAxis->maximum(max);
@@ -229,10 +231,10 @@ ParameterWindow::ParameterWindow(int x, int y, int w, int h, char* name, PAState
 		}
 		if (type == 1)
 		{
-			double minX = state->paramManager->getVec(state->paramManager->getMinVec(0)).x;
-			double maxX = state->paramManager->getVec(state->paramManager->getMaxVec(0)).x;
-			double minY = state->paramManager->getVec(state->paramManager->getMinVec(1)).y;
-			double maxY = state->paramManager->getVec(state->paramManager->getMaxVec(1)).y;
+			double minX = state->paramManager->getVec(state->paramManager->getMinVecX()).x;
+			double maxX = state->paramManager->getVec(state->paramManager->getMaxVecX()).x;
+			double minY = state->paramManager->getVec(state->paramManager->getMinVecY()).y;
+			double maxY = state->paramManager->getVec(state->paramManager->getMaxVecY()).y;
 			xAxis = new fltk::ValueSlider(4 * xDis, h - 4 * yDis, w - 5 * xDis, 2 * yDis, "X");
 			xAxis->minimum(minX);
 			xAxis->maximum(maxX);
