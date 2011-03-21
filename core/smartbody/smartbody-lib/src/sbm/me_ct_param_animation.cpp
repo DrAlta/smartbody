@@ -161,6 +161,14 @@ void MeCtParamAnimation::updateWeights(std::vector<double> w)
 		transitionManager->update();
 }
 
+void MeCtParamAnimation::updateWeights()
+{
+	if (curStateModule == NULL)
+		return;
+	std::vector<double> w = curStateModule->data->weights;
+	updateWeights(w);
+}
+
 int MeCtParamAnimation::getNumWeights()
 {
 	if (curStateModule)

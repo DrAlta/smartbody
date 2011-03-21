@@ -75,8 +75,10 @@ class ParameterManager
 		ParameterManager(PAStateData* s);
 		~ParameterManager();
 
-		void setWeight(double x);
-		void setWeight(double x, double y);
+		bool setWeight(double x);
+		bool setWeight(double x, double y);
+		void getParameter(float& x);
+		void getParameter(float& x, float& y);
 		void addParameter(std::string motion, double x);
 		void addParameter(std::string motion, double x, double y);
 		void addTriangle(std::string motion1, std::string motion2, std::string motion3);

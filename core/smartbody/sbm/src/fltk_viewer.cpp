@@ -339,6 +339,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 
    _data = new FltkViewerData();
    _locoData = new LocomotionData();
+   _paLocoData = new PALocomotionData();
 
    _data->root = new SrSnGroup; // we maintain root pointer always valid
    _data->rendermode = ModeAsIs;
@@ -1174,6 +1175,9 @@ static void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h, FltkVie
 void FltkViewer::translate_keyboard_state()
 {
 	bool locomotion_cmd = false;
+	bool paLocomotionCmd = false;
+	float prevV = _paLocoData->v;
+	float prevW = _paLocoData->w;
 	char cmd[300];
 	cmd[0] = '\0';
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -1252,6 +1256,13 @@ void FltkViewer::translate_keyboard_state()
 			{
 				_locoData->char_index = 0;
 			}
+			mcu.character_map.reset();
+			for(int i = 0; i <= _locoData->char_index; ++i)
+			{
+				actor = mcu.character_map.next();
+				_paLocoData->character = actor;
+			}
+
 			/*mcu.character_map.reset();
 			for(int j = 0; j <= char_index; ++j)
 			{
@@ -1335,7 +1346,9 @@ void FltkViewer::translate_keyboard_state()
 	}
 
 	//direction control
-
+	PAStateData* state = NULL;
+	if (_paLocoData->character->param_animation_ct)
+		state = _paLocoData->character->param_animation_ct->getCurrentPAStateData();
 	if(fltk::get_key_state(fltk::UpKey))
 	{
 		if(!_locoData->upkey)
@@ -1347,6 +1360,19 @@ void FltkViewer::translate_keyboard_state()
 			_locoData->kmode = 0;
 			sprintf(_locoData->t_direction, "forward ");
 			_locoData->upkey = true;
+		}
+		if (mcu.use_param_animation)
+		{
+			if (fltk::event_state(fltk::ALT))
+				_paLocoData->starting = true;
+			else
+				_paLocoData->starting = false;
+			if (!_paLocoData->starting)
+				if (_paLocoData->v < -9990 && state)
+					state->paramManager->getParameter(_paLocoData->v, _paLocoData->w);
+				else
+					_paLocoData->v += 10;
+			paLocomotionCmd = true;
 		}
 	}
 	else
@@ -1365,6 +1391,19 @@ void FltkViewer::translate_keyboard_state()
 			sprintf(_locoData->t_direction, "backward ");
 			_locoData->downkey = true;
 		}
+		if (mcu.use_param_animation)
+		{
+			if (fltk::event_state(fltk::ALT))
+				_paLocoData->stopping = true;
+			else
+				_paLocoData->stopping = false;
+			if (!_paLocoData->stopping)
+				if (_paLocoData->v < -9990 && state)
+					state->paramManager->getParameter(_paLocoData->v, _paLocoData->w);
+				else
+					_paLocoData->v -= 10;
+			paLocomotionCmd = true;
+		}
 	}
 	else
 	{
@@ -1377,6 +1416,18 @@ void FltkViewer::translate_keyboard_state()
 			_locoData->rps_flag = -1;
 			_locoData->leftkey = true;
 		}
+		if (mcu.use_param_animation)
+		{
+			if (_paLocoData->stopping)
+				_paLocoData->stopping = false;
+			if (_paLocoData->starting)
+				_paLocoData->starting = false;
+			if (_paLocoData->w < -9990 && state)
+				state->paramManager->getParameter(_paLocoData->v, _paLocoData->w);
+			else
+				_paLocoData->w += 10;
+			paLocomotionCmd = true;
+		}
 	}
 	else
 	{
@@ -1388,6 +1439,18 @@ void FltkViewer::translate_keyboard_state()
 		{
 			_locoData->rps_flag = 1;
 			_locoData->rightkey = true;
+		}
+		if (mcu.use_param_animation)
+		{
+			if (_paLocoData->stopping)
+				_paLocoData->stopping = false;
+			if (_paLocoData->starting)
+				_paLocoData->starting = false;
+			if (_paLocoData->w < -9990 && state)
+				state->paramManager->getParameter(_paLocoData->v, _paLocoData->w);
+			else
+				_paLocoData->w -= 10;
+			paLocomotionCmd = true;
 		}
 	}
 	else
@@ -1452,11 +1515,44 @@ void FltkViewer::translate_keyboard_state()
 	if(_locoData->kmode == 0) sprintf(tt, "spd 0 rps %f time 0.7", _locoData->rps_flag * _locoData->rps);
 	else sprintf(tt, "spd 0 lrps %f angle 3.14159265 time 1.0", _locoData->rps_flag * _locoData->rps);
 
+	if (mcu.use_param_animation) locomotion_cmd = false;
 	if(locomotion_cmd) 
 	{
 		strcat(cmd, tt);
 		//printf("\n%s", cmd);
 		mcu.execute(cmd);
+	}
+	if (paLocomotionCmd)
+	{
+		if (_paLocoData->starting && state == NULL)
+		{
+			std::stringstream command1;
+			command1 << "panim schedule char " << _paLocoData->character->name << " state UtahStopToWalk loop false";
+			std::stringstream command2;
+			command2 << "panim schedule char " << _paLocoData->character->name << " state UtahLocomotion loop true";
+			mcu.execute((char*)command1.str().c_str());
+			mcu.execute((char*)command2.str().c_str());
+		}
+		else if (_paLocoData->stopping && state != NULL)
+		{
+			std::stringstream command;
+			command << "panim schedule char " << _paLocoData->character->name << " state UtahWalkToStop loop false";
+			mcu.execute((char*)command.str().c_str());
+		}
+		else
+		{
+			if (state)
+			{
+				bool success = state->paramManager->setWeight(_paLocoData->v, _paLocoData->w);
+				if (!success)
+				{
+					_paLocoData->v = prevV;
+					_paLocoData->w = prevW;
+				}
+//				LOG("PALocomotion Parameters-> velocity: %f, angular velocity: %f", _paLocoData->v, _paLocoData->w);
+				_paLocoData->character->param_animation_ct->updateWeights();
+			}
+		}
 	}
 }
 
@@ -3336,5 +3432,18 @@ void FltkViewer::drawReach()
 	
 }
 
+PALocomotionData::PALocomotionData()
+{
+	w = -9999;
+	v = -9999;
+	mcuCBHandle::singleton().character_map.reset();
+	character = mcuCBHandle::singleton().character_map.next();
+	starting = false;
+	stopping = false;
+}
 
+
+PALocomotionData::~PALocomotionData()
+{
+}
 //================================ End of File =================================================

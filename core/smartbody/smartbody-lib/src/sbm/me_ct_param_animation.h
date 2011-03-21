@@ -80,6 +80,7 @@ class MeCtParamAnimation : public MeCtContainer
 		void schedule(PAStateData* state, bool l);
 		void unschedule();
 		void updateWeights(std::vector<double> w);
+		void updateWeights();
 		
 		int getNumWeights();
 		std::string getCurrentStateName();
