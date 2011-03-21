@@ -348,7 +348,7 @@ public:
 		if( mKeyboard->isKeyDown(OIS::KC_ESCAPE))
 			return false;
 
-       	if( mKeyboard->isKeyDown(OIS::KC_F) && mTimeUntilNextToggle <= 0 )
+       	if( mKeyboard->isKeyDown(OIS::KC_Z) && mTimeUntilNextToggle <= 0 )
 		{
 			mStatsOn = !mStatsOn;
 			showDebugOverlay(mStatsOn);
