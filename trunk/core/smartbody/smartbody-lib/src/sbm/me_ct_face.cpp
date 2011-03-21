@@ -311,9 +311,9 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 		int weight_index = _kChan_to_buff[ c++ ];
 		if( weight_index >= 0 )	{
 			float key_weight = fbuffer[ weight_index ];
-			if( fabs( key_weight ) > 0.0 )	{
+			if( fabs( key_weight ) > 0.01 )	{
 			
-//				LOG( "Face: '%s'\n", key_pose_p->name() );
+//				LOG( "Face: '%s': %f\n", key_pose_p->name(), key_weight );
 			
 				float* key_pose_buff_p = key_pose_p->posture( 0 );
 				int numKeyChannels = key_pose_p->channels().size();
