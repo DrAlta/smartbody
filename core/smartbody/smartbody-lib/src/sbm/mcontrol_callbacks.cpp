@@ -753,6 +753,19 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					}
 				}
 			}
+			else if (nextString == "triangle")
+			{
+				PAStateData* state = mcu_p->lookUpPAState(stateName);
+				if (!state) return CMD_FAILURE;
+				int numTriangles = args.read_int();
+				for (int i = 0; i < numTriangles; i++)
+				{
+					std::string motion1 = args.read_token();
+					std::string motion2 = args.read_token();
+					std::string motion3 = args.read_token();
+					state->paramManager->addTriangle(motion1, motion2, motion3);
+				}
+			}
 			else
 				return CMD_FAILURE;
 		}
