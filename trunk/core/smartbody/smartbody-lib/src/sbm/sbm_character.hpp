@@ -302,6 +302,8 @@ public:
 
 public:
 
+	int		_numSteeringGoals;
+
 	bool addReachMotion(SkMotion* motion);
 	const MotionDataSet& getReachMotionDataSet() const { return reachMotionData;}
 
