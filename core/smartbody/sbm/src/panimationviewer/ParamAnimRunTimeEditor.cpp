@@ -23,7 +23,8 @@
 #include "ParamAnimRunTimeEditor.h"
 #include <sbm/mcontrol_util.h>
 
-ParameterVisualization::ParameterVisualization(int x, int y, int w, int h, char* name, PAStateData* s, ParameterWindow* window) : fltk::Group(x, y, w, h, name), state(s), paramWindow(window)
+
+ParameterVisualization::ParameterVisualization(int x, int y, int w, int h, char* name, PAStateData* s, ParameterGroup* group) : fltk::Group(x, y, w, h, name), state(s), paramGroup(group)
 {
 	paramX = -9999;
 	paramY = -9999;
@@ -37,6 +38,8 @@ ParameterVisualization::~ParameterVisualization()
 void ParameterVisualization::draw()
 {
 	fltk::Group::draw();
+
+	setup();
 
 	// draw axis
 	fltk::setcolor(fltk::BLACK);
@@ -189,34 +192,35 @@ void ParameterVisualization::setSlider(int x, int y)
 	state->paramManager->setPrevVec(SrVec((float)x, (float)y, 0));
 	double valueX = (x - centerX) * scaleX;
 	double valueY = (centerY - y) * scaleY;
-	if (valueX <= paramWindow->xAxis->minimum()) valueX = paramWindow->xAxis->minimum();
-	if (valueX >= paramWindow->xAxis->maximum()) valueX = paramWindow->xAxis->maximum();
-	paramWindow->xAxis->value((float)valueX);
-	if (paramWindow->yAxis)
+	if (valueX <= paramGroup->xAxis->minimum()) valueX = paramGroup->xAxis->minimum();
+	if (valueX >= paramGroup->xAxis->maximum()) valueX = paramGroup->xAxis->maximum();
+	paramGroup->xAxis->value((float)valueX);
+	if (paramGroup->yAxis)
 	{
-		if (valueY <= paramWindow->yAxis->minimum()) valueY = paramWindow->yAxis->minimum();
-		if (valueY >= paramWindow->yAxis->maximum()) valueY = paramWindow->yAxis->maximum();
+		if (valueY <= paramGroup->yAxis->minimum()) valueY = paramGroup->yAxis->minimum();
+		if (valueY >= paramGroup->yAxis->maximum()) valueY = paramGroup->yAxis->maximum();
 		state->paramManager->setWeight((float)valueX, (float)valueY);
-		paramWindow->yAxis->value((float)valueY);
+		paramGroup->yAxis->value((float)valueY);
 	}
 	else
 		state->paramManager->setWeight((float)valueX);
-	paramWindow->updateWeight();
+	paramGroup->updateWeight();
 	paramX = x;
 	paramY = y;
 	redraw();
 }
 
-ParameterWindow::ParameterWindow(int x, int y, int w, int h, char* name, PAStateData* s, PanimationWindow* window, bool ex) : fltk::Window(x, y, w, h, name), state(s), paWindow(window), exec(ex)
+ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateData* s, PanimationWindow* window, bool ex) : fltk::Group(x, y, w, h, name), state(s), paWindow(window), exec(ex)
 {
-	this->label(state->stateName.c_str());
+	this->label(s->stateName.c_str());
 	this->begin();
 		paramVisualization = new ParameterVisualization(4 * xDis, yDis, w - 5 * xDis, h - 5 * yDis, "", s, this);
-		this->add(paramVisualization);
+		//this->add(paramVisualization);
 		this->resizable(paramVisualization);
 		int type = state->paramManager->getType();
 		if (type == 0)
 		{
+			yAxis = NULL;
 			double min = state->paramManager->getVec(state->paramManager->getMinVecX()).x;
 			double max = state->paramManager->getVec(state->paramManager->getMaxVecX()).x;
 			xAxis = new fltk::ValueSlider(4 * xDis, h - 4 * yDis, w - 5 * xDis, 2 * yDis, "X");
@@ -227,7 +231,6 @@ ParameterWindow::ParameterWindow(int x, int y, int w, int h, char* name, PAState
 			double actualValue = state->paramManager->getPrevVec().x;
 			if (actualValue <= max && actualValue >= min)
 				paramVisualization->setSlider(int(actualValue), 0);
-			yAxis = NULL;
 		}
 		if (type == 1)
 		{
@@ -254,32 +257,38 @@ ParameterWindow::ParameterWindow(int x, int y, int w, int h, char* name, PAState
 	
 }
 
-ParameterWindow::~ParameterWindow()
+void ParameterGroup::resize(int x, int y, int w, int h)
+{
+	Group::resize(x, y, w, h);
+}
+
+
+ParameterGroup::~ParameterGroup()
 {
 }
 
-void ParameterWindow::updateXAxisValue(fltk::Widget* widget, void* data)
+void ParameterGroup::updateXAxisValue(fltk::Widget* widget, void* data)
 {
-	ParameterWindow* window = (ParameterWindow*) data;
-	double w = window->xAxis->value();
-	window->state->paramManager->setWeight(w);
-	if (window->exec)
-		window->updateWeight();
-	window->paramVisualization->setParam((float)w, 0);
+	ParameterGroup* group = (ParameterGroup*) data;
+	double w = group->xAxis->value();
+	group->state->paramManager->setWeight(w);
+	if (group->exec)
+		group->updateWeight();
+	group->paramVisualization->setParam((float)w, 0);
 }
 
-void ParameterWindow::updateAxisValue(fltk::Widget* widget, void* data)
+void ParameterGroup::updateAxisValue(fltk::Widget* widget, void* data)
 {
-	ParameterWindow* window = (ParameterWindow*) data;
-	double x = window->xAxis->value();
-	double y = window->yAxis->value();
-	window->state->paramManager->setWeight(x, y);
-	if (window->exec)
-		window->updateWeight();
-	window->paramVisualization->setParam((float)x, (float)y);
+	ParameterGroup* group = (ParameterGroup*) data;
+	double x = group->xAxis->value();
+	double y = group->yAxis->value();
+	group->state->paramManager->setWeight(x, y);
+	if (group->exec)
+		group->updateWeight();
+	group->paramVisualization->setParam((float)x, (float)y);
 }
 
-void ParameterWindow::updateWeight()
+void ParameterGroup::updateWeight()
 {
 	std::string charName = paWindow->characterList->child(paWindow->characterList->value())->label();
 	std::stringstream command;
@@ -295,17 +304,22 @@ PARunTimeEditor::PARunTimeEditor(int x, int y, int w, int h, PanimationWindow* w
 	this->label("Run Time Editor");
 	this->begin();
 		currentCycleState = new fltk::Output(2 * xDis + 100, yDis, 100, 2 * yDis, "Current State");
-		nextCycleStates = new fltk::Browser(2 * xDis, 5 * yDis, w / 2 - 4 * xDis, h / 2, "Next State");
+		nextCycleStates = new fltk::Browser(2 * xDis, 5 * yDis, w / 2 - 4 * xDis, h / 4, "Next State");
 		nextCycleStates->callback(updateTransitionStates, this);
-		availableTransitions = new fltk::Browser(w / 2 + 2 * xDis, 5 * yDis, w / 2 - 4 * xDis, h / 2, "Available Transitions");
+
+	
+		availableTransitions = new fltk::Browser(w / 2 + 2 * xDis, 5 * yDis, w / 2 - 4 * xDis, h / 4, "Available Transitions");
 		availableTransitions->callback(updateNonCycleState, this);
 		availableTransitions->when(fltk::WHEN_ENTER_KEY_ALWAYS);
-		runNextState = new fltk::Button(2 * xDis, h / 2 + 6 * yDis, 100, 2 * yDis, "Run");
+		runNextState = new fltk::Button(2 * xDis, h / 4 + 6 * yDis, 100, 2 * yDis, "Run");
 		runNextState->callback(run, this);
+		parameterGroup = new fltk::Group(2 * xDis, h / 4 + 9 * yDis, w - 2 * xDis, 3 * h / 4 - 10 * yDis);
+		parameterGroup->box(fltk::UP_BOX);
 	this->end();
+	this->resizable(parameterGroup);
 	initializeRunTimeEditor();
-	nonCycleParamWindow = NULL;
-	cycleParamWindow = NULL;
+	nonCycleParamGroup = NULL;
+	cycleParamGroup = NULL;
 }
 
 PARunTimeEditor::~PARunTimeEditor()
@@ -398,8 +412,6 @@ void PARunTimeEditor::initializeRunTimeEditor()
 void PARunTimeEditor::updateNonCycleState(fltk::Widget* widget, void* data)
 {
 	PARunTimeEditor* editor = (PARunTimeEditor*) data;
-	if (editor->nonCycleParamWindow != NULL)
-		delete editor->nonCycleParamWindow;
 
 	std::string nonCycleState;
 	for (int i = 0; i < editor->availableTransitions->size(); i++)
@@ -409,8 +421,22 @@ void PARunTimeEditor::updateNonCycleState(fltk::Widget* widget, void* data)
 	}
 	if (mcuCBHandle::singleton().lookUpPAState(nonCycleState)->paramManager->getNumParameters() > 0)
 	{
-		editor->nonCycleParamWindow = new ParameterWindow(100, 100, 400, 300, "Parameter Window", mcuCBHandle::singleton().lookUpPAState(nonCycleState), editor->paWindow);
-		editor->nonCycleParamWindow->show();
+		if (editor->nonCycleParamGroup)
+		{
+			editor->parameterGroup->remove(editor->nonCycleParamGroup);
+			delete editor->nonCycleParamGroup;
+			editor->nonCycleParamGroup = NULL;
+		}
+		if (editor->cycleParamGroup)
+		{
+			editor->parameterGroup->remove(editor->cycleParamGroup);
+			delete editor->cycleParamGroup;
+			editor->cycleParamGroup = NULL;
+		}
+
+		editor->nonCycleParamGroup = new ParameterGroup(0, 0, editor->parameterGroup->w(), editor->parameterGroup->h(), "", mcuCBHandle::singleton().lookUpPAState(nonCycleState), editor->paWindow);
+		editor->parameterGroup->add(editor->nonCycleParamGroup);
+		editor->nonCycleParamGroup->show();
 	}
 }
 
@@ -512,18 +538,23 @@ void PARunTimeEditor::run(fltk::Widget* widget, void* data)
 		command2 << "panim schedule char " << charName << " state " << nextCycleState << " loop true";
 		editor->paWindow->execCmd(editor->paWindow, command2.str(), timeoffset);
 	}
-
-	if (editor->cycleParamWindow)
-		delete editor->cycleParamWindow;
-	editor->cycleParamWindow = NULL;
 	
 	if (nextCycleState == "Idle" || nextCycleState == "") return;
 	if (mcuCBHandle::singleton().lookUpPAState(nextCycleState)->paramManager->getNumParameters() > 0)
 	{
-		editor->cycleParamWindow = new ParameterWindow(100, 100, 400, 300, "Parameter Window", mcuCBHandle::singleton().lookUpPAState(nextCycleState), editor->paWindow, true);
-		editor->cycleParamWindow->show();
+		if (editor->cycleParamGroup)
+		{
+			editor->parameterGroup->remove(editor->cycleParamGroup);
+			delete editor->cycleParamGroup;
+		}
+		if (editor->nonCycleParamGroup)
+		{
+			editor->parameterGroup->remove(editor->nonCycleParamGroup);
+			delete editor->nonCycleParamGroup;
+			editor->nonCycleParamGroup = NULL;
+		}
+		editor->cycleParamGroup = new ParameterGroup(0, 0, editor->parameterGroup->w(), editor->parameterGroup->h(), "", mcuCBHandle::singleton().lookUpPAState(nextCycleState), editor->paWindow, true);
+		editor->parameterGroup->add(editor->cycleParamGroup);
+		editor->cycleParamGroup->show();
 	}
-	if (editor->nonCycleParamWindow)
-		delete editor->nonCycleParamWindow;
-	editor->nonCycleParamWindow = NULL;
 }
