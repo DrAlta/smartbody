@@ -129,26 +129,36 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	viseme_channel_start_pos = 0;
 	viseme_channel_end_pos = 0;
 	viseme_history_arr = NULL;
+
+	_numSteeringGoals = 0;
 }
 
 //  Destructor
 SbmCharacter::~SbmCharacter( void )	{
 
-	posture_sched_p->unref();
-	motion_sched_p->unref();
-	gaze_sched_p->unref();
+	if (posture_sched_p)
+		posture_sched_p->unref();
+	if (motion_sched_p)
+		motion_sched_p->unref();
+	if (gaze_sched_p)
+		gaze_sched_p->unref();
 
 	if( eyelid_reg_ct_p )
 		eyelid_reg_ct_p->unref();
 
-	head_sched_p->unref();
-	param_sched_p->unref();
+	if (head_sched_p)
+		head_sched_p->unref();
+	if (param_sched_p)
+		param_sched_p->unref();
 	if( face_ct )
 		face_ct->unref();
-	eyelid_ct->unref();
+	if (eyelid_ct)
+		eyelid_ct->unref();
 
-	locomotion_ct->unref();
-	param_animation_ct->unref();
+	if (locomotion_ct)
+		locomotion_ct->unref();
+	if (param_animation_ct)
+		param_animation_ct->unref();
 
 	if ( mcuCBHandle::singleton().sbm_character_listener )
 	{
