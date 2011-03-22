@@ -84,8 +84,8 @@ PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Win
 
 //	tabGroup->selected_child(stateEditor);
 //	tabGroup->selected_child(transitionEditor);
-	tabGroup->selected_child(scriptEditor);
-//	tabGroup->selected_child(runTimeEditor);
+//	tabGroup->selected_child(scriptEditor);
+	tabGroup->selected_child(runTimeEditor);
 	lastCommand = "";
 }
 

@@ -26,11 +26,11 @@
 #include "PanimationWindow.h"
 
 class PanimationWindow;
-class ParameterWindow;
+class ParameterGroup;
 class ParameterVisualization : public fltk::Group
 {
 	public:
-		ParameterVisualization(int x, int y, int w, int h, char* name, PAStateData* s, ParameterWindow* window);
+		ParameterVisualization(int x, int y, int w, int h, char* name, PAStateData* s, ParameterGroup* window);
 		~ParameterVisualization();
 
 		virtual void draw();
@@ -58,14 +58,16 @@ class ParameterVisualization : public fltk::Group
 		int paramX;
 		int paramY;
 		PAStateData* state;
-		ParameterWindow* paramWindow;
+		ParameterGroup* paramGroup;
 };
 
-class ParameterWindow : public fltk::Window
+class ParameterGroup : public fltk::Group
 {
 	public:
-		ParameterWindow(int x, int y, int w, int h, char* name, PAStateData* s, PanimationWindow* window, bool ex = false);
-		~ParameterWindow();
+		ParameterGroup(int x, int y, int w, int h, char* name, PAStateData* s, PanimationWindow* window, bool ex = false);
+		~ParameterGroup();
+
+		virtual void resize(int x, int y, int w, int h);
 
 		static void updateXAxisValue(fltk::Widget* widget, void* data);
 		static void updateAxisValue(fltk::Widget* widget, void* data);
@@ -94,8 +96,9 @@ class PARunTimeEditor : public fltk::Group
 		fltk::Button*		runNextState;
 		std::string			prevCycleState;
 
-		ParameterWindow*	nonCycleParamWindow;
-		ParameterWindow*	cycleParamWindow;
+		fltk::Group*		parameterGroup;
+		ParameterGroup*		nonCycleParamGroup;
+		ParameterGroup*		cycleParamGroup;
 	public:
 		void update();
 		void updateRunTimeStates(std::string currentState);
