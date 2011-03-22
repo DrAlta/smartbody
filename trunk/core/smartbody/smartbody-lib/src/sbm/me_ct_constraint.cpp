@@ -7,15 +7,59 @@ using namespace gwiz;
 
 const char* MeCtConstraint::CONTROLLER_TYPE = "Constraint";
 
-bool MeCtConstraint::useBalance = false;
-bool MeCtConstraint::useReferenceJoint = true;
-bool MeCtConstraint::useIKConstraint = false;
+bool MeCtConstraint::useIKConstraint = true;
+
+EffectorJointConstraint::EffectorJointConstraint()
+{
+	rotOffset = SrQuat();
+	posOffset = SrVec();
+}
+
+EffectorJointConstraint& EffectorJointConstraint::operator=( const EffectorJointConstraint& rhs )
+{
+	//node = rhs.node;
+	efffectorName = rhs.efffectorName;
+	rootName    = rhs.rootName;
+	targetJoint = rhs.targetJoint;
+	rotOffset = rhs.rotOffset;//SrQuat(SrVec(0,1,0),M_PI);
+	posOffset = rhs.posOffset;
+	return *this;
+}
+
+SrQuat EffectorJointConstraint::getRotConstraint()
+{
+	SrQuat target;		
+	if( targetJoint )	
+	{
+		SrMat sr_M;		
+		targetJoint->update_gmat_up();
+		sr_M = targetJoint->gmat();			
+		target = SrQuat(sr_M)*rotOffset;///rotOffset*SrQuat(sr_M);//SrQuat(sr_M)*rotOffset;//rotOffset*SrQuat(sr_M);		
+	}
+	return target;
+}
+
+SrVec EffectorJointConstraint::getPosConstraint()
+{
+	SrVec target;		
+	if( targetJoint )	
+	{
+		SrMat sr_M;
+		matrix_t M;			
+		targetJoint->update_gmat_up();
+		sr_M = targetJoint->gmat();			
+		target = SrVec(sr_M.get(12),sr_M.get(13),sr_M.get(14)) + posOffset*SrQuat(sr_M);			
+	}
+	return target;
+}
+
 
 MeCtConstraint::MeCtConstraint( SkSkeleton* skeleton ) 
 {
 	_skeleton = skeleton;
 	prev_time = -1.0;
 	blendWeight = 0.0;
+	
 }
 
 MeCtConstraint::~MeCtConstraint(void)
@@ -48,36 +92,25 @@ void MeCtConstraint::updateChannelBuffer(MeFrameData& frame, std::vector<SrQuat>
 }
 
 
-void MeCtConstraint::init()
+void MeCtConstraint::init(const char* rootJointName)
 {
 	assert(_skeleton);	
 	// root is "world_offset", so we use root->child to get the base joint.
-	SkJoint* rootJoint = _skeleton->root()->child(0);//_skeleton->search_joint("base"); // test for now
+	SkJoint* rootJoint = _skeleton->search_joint(rootJointName);//_skeleton->root()->child(0);//_skeleton->search_joint("l_acromioclavicular");//_skeleton->root()->child(0);//_skeleton->search_joint("l_acromioclavicular");//_skeleton->root()->child(0);//_skeleton->search_joint("base"); // test for now
+	if (!rootJoint)
+		rootJoint = _skeleton->root()->child(0); // use base joint by default
 
 	ik_scenario.buildIKTreeFromJointRoot(rootJoint);
-	int numConstraint = 1;
-	//ik_scenario.ikEndEffectors.resize(numConstraint);
-	//ik_scenario.ikTargetPos.resize(numConstraint);	
+	ik_scenario.ikPosEffectors = &posConstraint;
+	ik_scenario.ikRotEffectors = &rotConstraint;
 
-	const IKTreeNodeList& nodeList = ik_scenario.ikTreeNodes;	
-	
-	for (size_t i=0;i<nodeList.size();i++)
+	const IKTreeNodeList& nodeList = ik_scenario.ikTreeNodes;		
+	for (unsigned int i=0;i<nodeList.size();i++)
 	{
 		SkJoint* joint = nodeList[i]->joint;
-		_channels.add(joint->name().get_string(), SkChannel::Quat);
-	}
-	//ik_scenario.ikEndEffectors[0] = ik_scenario.findIKTreeNode("r_wrist"); // test for now
- 	//ik_scenario.ikEndEffectors[1] = ik_scenario.findIKTreeNode("l_wrist");
-  	//ik_scenario.ikEndEffectors[1] = ik_scenario.findIKTreeNode("r_toe"); // test for now
-  	//ik_scenario.ikEndEffectors[3] = ik_scenario.findIKTreeNode("l_toe");
-
-// 	for (int i=1;i<numConstraint;i++)
-// 	{
-// 		const SrMat& gmat = ik_scenario.ikEndEffectors[i]->joint->gmat();
-// 		ik_scenario.ikEndEffectors[i]->targetPos = SrVec(gmat.get(12),gmat.get(13),gmat.get(14));
-// 	}
-
- 	MeController::init();
+		_channels.add(joint->name().get_string(), SkChannel::Quat);	
+	}	
+	MeController::init();
 }
 
 void MeCtConstraint::controller_map_updated() 
@@ -90,51 +123,83 @@ bool MeCtConstraint::controller_evaluate( double t, MeFrameData& frame )
 	SrTimer time;
 	time.start();
 	float dt = 0.001f;
+	std::vector<SrQuat> tempQuatList; tempQuatList.resize(ik_scenario.ikTreeNodes.size());
 	if (prev_time == -1.0) // first start
 	{
 		dt = 0.001f;		
 		// for first frame, update from frame buffer to joint quat in the limb
 		// any future IK solving will simply use the joint quat from the previous frame.
 		//limb.updateQuat(frame,true);
-		updateChannelBuffer(frame,ik_scenario.ikInitQuatList,true);			
+		updateChannelBuffer(frame,tempQuatList,true);			
+		ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_INIT);
+		ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_PREVREF);
 	}
 	else
 	{		
 		dt = ((float)(t-prev_time));
 	}
 
-	updateChannelBuffer(frame,ik_scenario.ikRefQuatList,true);	
+	updateChannelBuffer(frame,tempQuatList,true);
+	ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_REF);
 			
 	prev_time = (float)t;
 
-	assert(ik_scenario.ikEndEffectors.size() == targetJointList.size());
-	for (size_t i=0;i<targetJointList.size();i++)
+	//assert(ik_scenario.ikEndEffectors.size() == targetJointList.size());
+// 	for (int i=0;i<targetJointList.size();i++)
+// 	{
+// 		ik_scenario.ikEndEffectors[i]->targetPos = get_reach_target(targetJointList[i]);
+// 	}
+
+	ConstraintMap::iterator ci;
+
+	//for (unsigned int i=0;i<rotConstraint.size();i++)
+	for (ci = rotConstraint.begin(); ci != rotConstraint.end(); ci++)
 	{
-		ik_scenario.ikEndEffectors[i]->targetPos = get_reach_target(targetJointList[i]);
+		EffectorConstraint* cons = ci->second;//rotConstraint[i];
+		MeCtIKTreeNode* node = ik_scenario.findIKTreeNode(cons->efffectorName.c_str());
+		node->targetDir = cons->getRotConstraint();
 	}
 
-	ik_scenario.ikTreeRoot->joint->parent()->update_gmat(); // update world offset global transformation
-	ik_scenario.ikGlobalMat = ik_scenario.ikTreeRoot->joint->parent()->gmat();
-	ik_scenario.ikUseBalance = useBalance;
-	ik_scenario.ikUseReference = useReferenceJoint;
-	ik.setDt(dt);
+	for (ci = posConstraint.begin(); ci != posConstraint.end(); ci++)
+	{
+		EffectorConstraint* cons = ci->second;//posConstraint[i];
+		MeCtIKTreeNode* node = ik_scenario.findIKTreeNode(cons->efffectorName.c_str());
+		node->targetPos = cons->getPosConstraint();
+	}	
 
-	updateFading(dt);
-	//for (int i=0;i<4;i++)	
-	std::vector<SrQuat> tempQuatList; tempQuatList.resize(ik_scenario.ikInitQuatList.size());
-	if (useIKConstraint && ik_scenario.ikEndEffectors.size() != 0)	
+	_skeleton->update_global_matrices();
+	//ik_scenario.ikTreeRoot->joint->parent()->update_gmat_up(); // update world offset global transformation
+	ik_scenario.ikGlobalMat = ik_scenario.ikTreeRoot->joint->parent()->gmat();		
+	ik.setDt(dt);
+	updateFading(dt);	
+
+	if (useIKConstraint) //&& ik_scenario.ikEndEffectors.size() != 0)	
 	{
 		{
-			ik.update(&ik_scenario);
-			ik_scenario.ikInitQuatList = ik_scenario.ikQuatList;
-			for (size_t i=0;i<ik_scenario.ikQuatList.size();i++)
+			for (int i=0;i<1;i++)
 			{
-				SrQuat qEval = ik_scenario.ikQuatList[i];
-				SrQuat qInit = ik_scenario.ikRefQuatList[i];
-				ik_scenario.ikRefQuatList[i] = slerp(qInit,qEval,blendWeight);				
+				//printf("IK Iteration %d\n",i);
+				ik.update(&ik_scenario);
+				//ik_scenario.updateGlobalMat();
+				ik_scenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);
+			}
+			
+			//ik_scenario.ikInitQuatList = ik_scenario.ikQuatList;
+			ik_scenario.getTreeNodeQuat(tempQuatList,QUAT_CUR);			
+			for (unsigned int i=0;i<ik_scenario.ikTreeNodes.size();i++)
+			{
+				MeCtIKTreeNode* node = ik_scenario.ikTreeNodes[i];
+				SrQuat qEval = node->getQuat(QUAT_CUR);//ik_scenario.ikQuatList[i];
+				SrQuat qInit = node->getQuat(QUAT_REF);
+				qEval.normalize();
+				qInit.normalize();
+				tempQuatList[i] = slerp(qInit,qEval,blendWeight);	
+				//tempQuatList[i].normalize();
+				//node->setQuat(tempQuatList[i],QUAT_INIT);
 			}			
 		}
-		updateChannelBuffer(frame,ik_scenario.ikRefQuatList);
+		updateChannelBuffer(frame,tempQuatList);
+		//ik_scenario.copyTreeNodeQuat(QUAT_REF,QUAT_PREVREF);
 	}
 	//printf("Time = %f\n",time.t());	
 	return true;
@@ -149,38 +214,48 @@ void MeCtConstraint::print_state(int tabs)
 {
 }
 
-
-SrVec MeCtConstraint::get_reach_target(SkJoint* joint)
-{
-	SrVec target;	
-	if( joint )	
-	{
-		SrMat sr_M;
-		matrix_t M;			
-		joint->update_gmat_up();
-		sr_M = joint->gmat();			
-		target = SrVec(sr_M.get(12),sr_M.get(13),sr_M.get(14));			
-	}
-	return target;
-}
-
-bool MeCtConstraint::addJointEndEffectorPair( SkJoint* targetJoint, const char* effectorName )
+bool MeCtConstraint::addEffectorJointPair( SkJoint* targetJoint, const char* effectorName, const char* effectorRootName, const SrVec& posOffset, const SrQuat& rotOffset, ConstraintType cType )
 {
 	MeCtIKTreeNode* node = ik_scenario.findIKTreeNode(effectorName);
 	if (!node)
 		return false;
 
-	assert(ik_scenario.ikEndEffectors.size() == targetJointList.size());
+	// separate position & rotation constraint
+	//ConstraintList& jEffectorList = (cType == CONSTRAINT_ROT) ? rotConstraint : posConstraint;
+	ConstraintMap& jEffectorMap = (cType == CONSTRAINT_ROT) ? rotConstraint : posConstraint;
+	//VecOfString& effectorList  = (cType == CONSTRAINT_ROT) ? ik_scenario.ikRotEffectors : ik_scenario.ikPosEffectors;
 
-	int idx = MeCtIKTreeScenario::findIKTreeNodeInList(effectorName,ik_scenario.ikEndEffectors);
-	if (idx != -1)
+	std::string str = effectorName;
+	//assert(jEffectorList.size() == effectorList.size());
+	//std::find()
+
+	//int idx = distance(effectorList.begin(), find(effectorList.begin(),effectorList.end(),str));
+	//int idx = //MeCtIKTreeScenario::findIKTreeNodeInList(effectorName,effectorList);
+	ConstraintMap::iterator ci = jEffectorMap.find(str);
+	if (ci != jEffectorMap.end())//idx != effectorList.size())
 	{
-		targetJointList[idx] = targetJoint;
+		//jEffectorList[idx].targetJoint = targetJoint;	
+		//EffectorJointConstraint& cons = jEffectorList[idx];
+		EffectorJointConstraint* cons = dynamic_cast<EffectorJointConstraint*>((*ci).second);
+		cons->targetJoint = targetJoint;
+		cons->rootName = effectorRootName;
+		cons->posOffset = posOffset;
+		cons->rotOffset = rotOffset;
+		
 	}
 	else // add effector-joint pair
 	{
-		ik_scenario.ikEndEffectors.push_back(node);
-		targetJointList.push_back(targetJoint);
+		// initialize constraint
+		EffectorJointConstraint* cons = new EffectorJointConstraint();
+		//constraint.node = node;
+		cons->efffectorName = effectorName;
+		cons->targetJoint = targetJoint;
+		cons->rootName = effectorRootName;
+		cons->posOffset = posOffset;
+		cons->rotOffset = rotOffset;
+		jEffectorMap[str] = cons;
+		//effectorList.push_back(effectorName);
+		//jEffectorList.push_back(cons);		
 	}
 	return true;
 }
@@ -212,7 +287,7 @@ bool MeCtConstraint::updateFading( float dt )
 
 		if (fadeMode == FADING_MODE_IN)
 		{			
-			float fadeNormal = 1.0f - fadeRemainTime/fadeInterval;
+			float fadeNormal = 1.f - (float)fadeRemainTime/fadeInterval;
 			blendWeight = fadeNormal;
 			if (blendWeight > 1.0 - FADE_EPSILON)
 			{
@@ -235,3 +310,4 @@ bool MeCtConstraint::updateFading( float dt )
 	}
 	return finishFadeOut;
 }
+

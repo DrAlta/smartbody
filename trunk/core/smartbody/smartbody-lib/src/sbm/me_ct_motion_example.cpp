@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <time.h>
 #include <boost/foreach.hpp>
+#include <sr/sr_euler.h>
 #include "me_ct_motion_example.hpp"
 #include "me_ct_motion_parameter.h"
 #include "me_ct_ublas.hpp"
@@ -54,18 +55,38 @@ double BodyMotion::getMotionFrame( float time, SkSkeleton* skel, const vector<Sk
 	// Because the SkMotion stored its joint quats in an indirect way, it is not straightforward to grab corresponding quats we need.
 	// This is a hack to apply the motion on a skeleton, and then get the quat values directly.
 
+	SrVec rootOffset = SrVec();
+	
 	motion->connect(skel);	
 	double rt = timeWarp->timeWarp(time);
+	// get root position
+	motion->apply(0.f);
+	SrQuat tempQ = skel->root()->child(0)->quat()->value();
+	SrMat src, mat;
+	src = tempQ.get_mat(src);
+	float rx, ry, rz;
+	const int rotType = 132;
+	sr_euler_angles(rotType, src, rx, ry, rz);
+	rx = 0.0;
+	rz = 0.0;
+	sr_euler_mat(rotType, mat, rx, ry, rz);
+	SrQuat quatP = SrQuat(mat);
+	rootOffset.set(skel->root()->child(0)->pos()->value());	
+
 	motion->apply((float)rt);	
 	motion->disconnect();
 
 	if (outMotionFrame.jointQuat.size() != affectedJoints.size())
 		outMotionFrame.jointQuat.resize(affectedJoints.size());
 
-	for (size_t i=0;i<affectedJoints.size();i++)
+	for (unsigned int i=0;i<affectedJoints.size();i++)
 		outMotionFrame.jointQuat[i] = affectedJoints[i]->quat()->value();
+
+	// root orientation
+	outMotionFrame.jointQuat[0] = quatP.inverse()*outMotionFrame.jointQuat[0];
 	
 	outMotionFrame.rootPos.set(skel->root()->child(0)->pos()->value());
+	outMotionFrame.rootPos = (outMotionFrame.rootPos - rootOffset)*quatP.inverse();
 	return timeWarp->invTimeWarp(rt);
 }
 
@@ -110,7 +131,7 @@ double ResampleMotion::motionDuration(DurationType durType)
 {
 	double motionTime = 0.0;
 	VecOfBodyMotionPtr& motions = *motionDataRef;
-	for (size_t i=0;i<weight.size();i++)
+	for (unsigned int i=0;i<weight.size();i++)
 	{
 		int idx = weight[i].first;
 		float w = weight[i].second;
@@ -128,7 +149,7 @@ void ResampleMotion::getExampleParameter( VecOfDouble& outPara )
 double ResampleMotion::motionPercent( float time )
 {
 	double timePercent = 0.0;
-	for (size_t i=0;i<weight.size();i++)
+	for (unsigned int i=0;i<weight.size();i++)
 	{		
 		float w = weight[i].second;		
 		int idx = weight[i].first;
@@ -141,7 +162,7 @@ double ResampleMotion::motionPercent( float time )
 double ResampleMotion::getRefDeltaTime( float u, float dt )
 {
 	double du = 0.0;
-	for (size_t i=0;i<weight.size();i++)
+	for (unsigned int i=0;i<weight.size();i++)
 	{		
 		float w = weight[i].second;		
 		int idx = weight[i].first;
@@ -293,7 +314,7 @@ double MotionExampleSet::blendMotion( float time, const VecOfInterpWeight& blend
 
 MotionExampleSet::~MotionExampleSet()
 {
-	for (size_t i=0;i<motionExamples.size();i++)
+	for (unsigned int i=0;i<motionExamples.size();i++)
 	{
 		// feng : need to figure out why we can not delete the base pointer "BodyMotionInterface".
 		MotionExample* ex = motionExamples[i];
@@ -328,7 +349,7 @@ double MotionExampleSet::blendMotionFunc( float time, SkSkeleton* skel, const ve
 	newTime = ex->getMotionFrame(time,skel,joints,outMotionFrame);			
 	BodyMotionFrame tempFrame;
 	float w1,w2;	
-	for (size_t i=1;i<blendWeight.size();i++)
+	for (unsigned int i=1;i<blendWeight.size();i++)
 	{
 		w1 = weightSum;
 		w2 = blendWeight[i].second;
@@ -342,7 +363,7 @@ double MotionExampleSet::blendMotionFunc( float time, SkSkeleton* skel, const ve
 
 		newTime = motions[idx]->getMotionFrame(time,skel,joints,tempFrame)*weight + newTime*oneMinusWeight;
 
-		for (size_t k=0;k<outMotionFrame.jointQuat.size();k++)
+		for (unsigned int k=0;k<outMotionFrame.jointQuat.size();k++)
 		{
 			outMotionFrame.jointQuat[k] = slerp( outMotionFrame.jointQuat[k], tempFrame.jointQuat[k], weight );
 			outMotionFrame.jointQuat[k].normalize();

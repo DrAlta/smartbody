@@ -49,6 +49,9 @@ const XMLCh TAG_DESCRIPTION[] = L"description";
 const XMLCh DTYPE_SBM[]  = L"ICT.SBM";
 
 ////// XML ATTRIBUTES
+const XMLCh ATTR_REACH_VELOCITY[] = L"sbm:reach-velocity";
+const XMLCh ATTR_APEX_DURATION[] = L"sbm:apex-duration";
+
 
 
 using namespace std;
@@ -104,6 +107,30 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 
+	const XMLCh* attrApexDuration = elem->getAttribute( ATTR_APEX_DURATION );
+	float apexDuration = -1.f;
+	if(attrApexDuration != NULL && attrApexDuration[0] != '\0') 
+	{
+		if( !( wistringstream( attrApexDuration ) >> apexDuration) )
+		{
+			std::stringstream strstr;
+			strstr << "WARNING: Failed to parse apex-duration interval attribute \""<< XMLString::transcode(attrApexDuration) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
+			LOG(strstr.str().c_str());
+		}
+	}
+
+	const XMLCh* attrReachVelocity = elem->getAttribute( ATTR_REACH_VELOCITY );
+	float reachVelocity = -1.f;
+	if(attrReachVelocity != NULL && attrReachVelocity[0] != '\0') 
+	{
+		if( !( wistringstream( attrReachVelocity ) >> reachVelocity) )
+		{
+			std::stringstream strstr;
+			strstr << "WARNING: Failed to parse reach-velocity interval attribute \""<< XMLString::transcode(attrReachVelocity) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
+			LOG(strstr.str().c_str());
+		}
+	}
+
 	const XMLCh* id = elem->getAttribute(ATTR_ID);
 	std::string localId;
 	if (id)
@@ -115,10 +142,19 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		bodyReachCt = new MeCtExampleBodyReach(request->actor->skeleton_p);		
 		bodyReachCt->handle(handle);
 		bodyReachCt->init();		
+		bodyReachCt->reachVelocity = reachVelocity > 0 ? reachVelocity : 50.f;
+		bodyReachCt->reachCompleteDuration = apexDuration > 0 ? apexDuration : 2.f;
+
 		const MotionDataSet& motionData = request->actor->getReachMotionDataSet();
 		bodyReachCt->updateMotionExamples(motionData);
 		bCreateNewController = true;
 	}
+
+	if (reachVelocity > 0)
+		bodyReachCt->reachVelocity = reachVelocity;
+	if (apexDuration > 0)
+		bodyReachCt->reachCompleteDuration = apexDuration;
+
 
 	if( target_joint )	{
 		SrVec reachPos = target_joint->gmat().get_translation();

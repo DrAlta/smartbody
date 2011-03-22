@@ -35,7 +35,7 @@ public:
 	enum DurationType { DURATION_ACTUAL = 0, DURATION_REF };
 	MotionParameter* motionParameterFunc;
 public:
-	virtual void getMotionParameter(VecOfDouble& outPara);
+	virtual void getMotionParameter(VecOfDouble& outPara);	
 	virtual double getMotionFrame(float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame) = 0;
 	virtual double motionDuration(DurationType durType) = 0;
 	virtual double motionPercent(float time) = 0; // compute how much percentage of time has elapsed until the motion reach its end

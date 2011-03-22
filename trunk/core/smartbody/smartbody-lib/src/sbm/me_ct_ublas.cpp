@@ -53,6 +53,14 @@ bool MeCtUBLAS::linearLeastSquare( const dMatrix& A, const dMatrix& B, dMatrix& 
 	return true;
 }
 
+bool MeCtUBLAS::matrixSVD( const dMatrix& A, dVector& S, dMatrix& U, dMatrix& V )
+{
+	dMatrix M(A);
+	lapack::gesvd(M,S,U,V);
+	
+	return true;
+}
+
 /************************************************************************/
 /* MeCtMath Routines                                                    */
 /************************************************************************/

@@ -261,12 +261,16 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 		reachCt->set_target_joint(const_cast<SkJoint*>( target_joint ) );
 	}
 
-	BehaviorSyncPoints::iterator end = behav_syncs.sync_end();	
-	
-	BML::NamedSyncPointPtr syncPtr = (*end);
-	
- 	if( isTimeSet( syncPtr.sync()->offset) ) {
+	BehaviorSyncPoints::iterator start =behav_syncs.sync_start();
+	BML::NamedSyncPointPtr syncStartPtr = (*start);	
+
+	BehaviorSyncPoints::iterator end = behav_syncs.sync_end();		
+	BML::NamedSyncPointPtr syncPtr = (*end);	
+
+		
+ 	if( isTimeSet( syncPtr.sync()->offset) && isTimeSet( syncStartPtr.sync()->offset)) {
  		//reachCt->set_duration(syncPtr.sync()->offset);	
+		reachCt->set_duration(syncPtr.sync()->offset - syncStartPtr.sync()->offset);
  	}
 
 	boost::shared_ptr<MeControllerRequest> ct_request;
@@ -276,13 +280,11 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 		ct_request.reset( new MeControllerRequest( unique_id, localId, reachCt, request->actor->reach_sched_p, behav_syncs ) );
 		ct_request->set_persistent( true );
 	}	
-	
-	BehaviorSyncPoints::iterator start =behav_syncs.sync_start();
-	BML::NamedSyncPointPtr syncStartPtr = (*start);	
-	float startTime = 0.f;
-	if( isTimeSet( syncStartPtr.sync()->offset) ) {		
-		startTime = syncStartPtr.sync()->offset;
-	}	
+
+// 	
+// 	if( isTimeSet( syncStartPtr.sync()->offset) ) {		
+// 		startTime = syncStartPtr.sync()->offset;
+// 	}	
 
 #if TEST_GAZE_LOCOMOTION
 	// make the character gaze at the target

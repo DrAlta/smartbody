@@ -181,6 +181,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdConstraintToggleBalance,
 				   CmdConstraintToggleReferencePose,
 				   CmdExampleReachToggleIK,
+				   CmdExampleReachToggleInterpolation,
                  };
 
    private : // internal data

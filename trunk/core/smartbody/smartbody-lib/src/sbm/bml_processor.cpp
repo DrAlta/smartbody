@@ -437,7 +437,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				behavior = /*BML::*/parse_bml_reach( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_CONSTRAINT )==0 ) {
 				behavior = /*BML::*/parse_bml_constraint( child, unique_id, behav_syncs, required, request, mcu );
-#if 0 // disable bodyreach until it is fully workable
+#if 1 // disable bodyreach until it is fully workable
 			} else if( XMLString::compareString( tag, TAG_BODYREACH )==0 ) {
 				behavior = /*BML::*/parse_bml_bodyreach( child, unique_id, behav_syncs, required, request, mcu );
 #endif

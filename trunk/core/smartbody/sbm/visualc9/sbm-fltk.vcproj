@@ -51,7 +51,7 @@
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				WarnAsError="true"
+				WarnAsError="false"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -274,6 +274,14 @@
 			</File>
 			<File
 				RelativePath="..\src\RootWindow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\RotationControl.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\RotationControl.h"
 				>
 			</File>
 		</Filter>

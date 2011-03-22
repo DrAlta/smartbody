@@ -7,13 +7,25 @@
 
 using namespace boost;
 
+
+
+EffectorConstantConstraint& EffectorConstantConstraint::operator=( const EffectorConstantConstraint& rhs )
+{
+	efffectorName = rhs.efffectorName;
+	rootName    = rhs.rootName;	
+	targetPos = rhs.targetPos;//SrQuat(SrVec(0,1,0),M_PI);
+	targetRot = rhs.targetRot;
+	return *this;
+
+}
+
 /************************************************************************/
 /* Exampled-Based Reach Controller                                      */
 /************************************************************************/
 
 const char* MeCtExampleBodyReach::CONTROLLER_TYPE = "BodyReach";
 
-const char* endEffectorName = "r_wrist_tip"; // a hard coded hack
+const char* endEffectorName = "r_wrist"; // a hard coded hack
 
 MeCtExampleBodyReach::MeCtExampleBodyReach( SkSkeleton* sk )
 {
@@ -21,16 +33,20 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( SkSkeleton* sk )
 	prev_time = -1.0;
 	dataInterpolator = NULL;
 	refMotion = NULL;
-	reachTime = 0.0;
-	reachRefTime = 0.0;
-
-	useIKConstraint = false;
-
+	reachTime = 0.0;	
+	useIKConstraint = true;
+	useInterpolation = true;
 	reachEndEffector = skeletonRef->search_joint(endEffectorName);	
+
+	curReachState = REACH_START;
+	
+
 	reachTargetJoint = NULL;
 	interpMotion = NULL;
 	motionParameter = NULL;
 
+	reachVelocity = 50.f;
+	reachCompleteDuration = 2.0f;
 	curPercentTime = 0.0;
 	prevPercentTime = 0.0;
 }
@@ -43,27 +59,39 @@ MeCtExampleBodyReach::~MeCtExampleBodyReach( void )
 	FREE_DATA(motionParameter);
 }
 
+void MeCtExampleBodyReach::setReachTargetJoint( SkJoint* val )
+{
+	reachTargetJoint = val;	
+}
+
 // compute the blending weights based on reach position
 void MeCtExampleBodyReach::setReachTarget( SrVec& reachPos )
 {
 	vector<double> para; para.resize(3);
 	for (int i=0;i<3;i++)
 		para[i] = reachPos[i];
-	if (dataInterpolator && interpMotion)
-	{
-		dataInterpolator->predictInterpWeights(para,interpMotion->weight);	
- 		//for (int i=0;i<interpMotion->weight.size();i++)
- 		//	printf("w %d = %f, ",interpMotion->weight[i].first,interpMotion->weight[i].second);
- 		//printf("\n");
-		//if (interpMotion->weight[0].second == 0.f)
-		//	printf("w0 = %f, w1 = %f\n",interpMotion->weight[0].second,interpMotion->weight[1].second);
 
+	SrVec currentTarget = reachEndEffector->gmat().get_translation();
+	if (dataInterpolator && interpMotion && useInterpolation)
+	{			
 		VecOfDouble acutualReachTarget;
-		interpMotion->getExampleParameter(acutualReachTarget);
+		if (curReachState == REACH_START || curReachState == REACH_COMPLETE)
+		{
+			dataInterpolator->predictInterpWeights(para,interpMotion->weight);	 	
+			interpMotion->getExampleParameter(acutualReachTarget);	
+		}
+		else if (curReachState == REACH_RETURN || curReachState == REACH_IDLE)
+		// this is a hack to get the initial hand position
+		{			
+			motionParameter->getMotionFrameParameter(interpMotion,0.f,acutualReachTarget);
+		}
+
 		for (int i=0;i<3;i++)
-			reachError[i] = reachPos[i] - (float)acutualReachTarget[i];
-		
+			currentTarget[i] = (float)acutualReachTarget[i];
 	}	
+	// By default, the reach error is the offset we need to move the end effector to the target
+	// If we have an interpolated motion, then the error is simply the difference to the desired target.
+	reachError = reachPos - currentTarget;	
 }
 
 bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
@@ -74,42 +102,120 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	{
 		dt = 0.001f;		
 		// for first frame, update from frame buffer to joint quat in the limb
-		// any future IK solving will simply use the joint quat from the previous frame.		
+		// any future IK solving will simply use the joint quat from the previous frame.
+		updateChannelBuffer(frame,currentMotionFrame,true);
+		curEffectorPos = getCurrentHandPos(currentMotionFrame);		
+		curReachState = REACH_RETURN;
 	}
 	else
 	{		
 		dt = ((float)(t-prev_time));
 	}
 	prev_time = (float)t;		
-	BodyMotionFrame outMotionFrame;	
 
+	updateChannelBuffer(frame,currentMotionFrame,true);
+
+
+	// To-Do (Wei-Wen) : these run-time steps seem more convoluted than it should be. 
+	// For the things we want to achieve ( moving the hand to the target, stay there for some time, then return to the original location )
+	// there seems to be better and more compact ways to handle them. For now things work fine, but later I should re-organize these parts
+	// for better code maintainence in the future.
 	if (reachTargetJoint)
 	{
-		SrVec reachPos = reachTargetJoint->gmat().get_translation();
-		setReachTarget(reachPos);
-	}	
-	
-	if (interpMotion)
-	{
-		interpMotion->getMotionFrame(reachTime,skeletonRef,affectedJoints,outMotionFrame);
-		curPercentTime = interpMotion->motionPercent(reachTime);
-		if (curPercentTime < prevPercentTime) // loop back to beginning
-		{
-			curReachOffset = reachError*(float)curPercentTime;
-			ikScenario.ikInitQuatList = outMotionFrame.jointQuat;
-		}
-		else
-		{
-			double deltaPercent = (curPercentTime-prevPercentTime);
-			double ratio = 1.0/(1.0-prevPercentTime);
-			curReachOffset += (reachError - curReachOffset)*(float)ratio*(float)deltaPercent;
+		SrVec newReachTarget = reachTargetJoint->gmat().get_translation();
+
+		if ( (newReachTarget - reachTarget).norm() > 0.01 ) // interrupt and reset reach state if the reach target is moved
+		{				
+			if (curReachState == REACH_IDLE)
+			{
+				curReachState = REACH_START;
+				curReachIKOffset = SrVec();
+				reachTime = 0.f;
+			}	
+			reachTarget = newReachTarget;				
 		}
 
-		VecOfDouble curReachPos;
-		motionParameter->getPoseParameter(outMotionFrame,curReachPos);
-		for (int i=0;i<3;i++)
-			curReachTrajectory[i] = (float)curReachPos[i] + curReachOffset[i];
+		if (curReachState == REACH_START || curReachState == REACH_COMPLETE)
+		{
+			ikTarget = reachTarget;		
+		}
+		else if (curReachState == REACH_RETURN)
+		{
+			if (interpMotion && useInterpolation)
+			{
+				VecOfDouble initPos;
+				motionParameter->getMotionFrameParameter(interpMotion,0.f,initPos);
+				for (int i=0;i<3;i++)
+					returnTarget[i] = (float)initPos[i];
+			}
+			else
+			{
+				returnTarget = getCurrentHandPos(currentMotionFrame);
+			}
+			ikTarget = returnTarget;
+		}
+
+		setReachTarget(ikTarget);
+	}	
+	
+	bool interpHasReach = false;	
+	if (interpMotion && useInterpolation)
+	{		
+		interpMotion->getMotionFrame(reachTime,skeletonRef,affectedJoints,currentMotionFrame);
+		curPercentTime = interpMotion->motionPercent(reachTime);		
+		{
+			double deltaPercent = fabs(curPercentTime-prevPercentTime);
+			double timeRemain = 1.0;
+			if (curReachState == REACH_START) 
+				timeRemain = 1.0 - prevPercentTime;
+			else if (curReachState == REACH_RETURN)
+				timeRemain = prevPercentTime;
+
+			if (timeRemain <= 0.05 || curReachState == REACH_COMPLETE || curReachState == REACH_IDLE)
+				interpHasReach = true;
+
+			double ratio = 0.0;
+			if (timeRemain > 0.0)
+			    ratio = 1.0/timeRemain;
+
+			SrVec interpPos = getCurrentHandPos(currentMotionFrame);
+			
+			if ( curReachState == REACH_COMPLETE )
+			// use normal IK to compute the hand movement after touching the object
+			{				
+				SrVec offset = (ikTarget - curEffectorPos);
+				if (offset.norm() > reachVelocity*dt)
+				{
+					offset.normalize();
+					offset = offset*reachVelocity*dt;
+				}
+				//offset.normalize();					
+				curReachIKTrajectory = curEffectorPos + offset;// + offset;//curReachOffset;					
+				curReachIKOffset += (reachError - curReachIKOffset);
+			}
+			else
+			{
+				curReachIKOffset += (reachError - curReachIKOffset)*(float)ratio*(float)deltaPercent;				
+				{
+					curEffectorPos = 	interpPos;
+					curReachIKTrajectory = curEffectorPos + curReachIKOffset;
+				}				
+			}			
+		}		
 		du = interpMotion->getRefDeltaTime(reachTime,dt);
+	}
+	else // we don't have any data, so just infer the hand trajectory directly
+	{
+		 // assuming some constant hand moving speed
+		SrVec reachDir = ikTarget - curEffectorPos;	
+		{
+			if (reachDir.norm() > reachVelocity*dt)
+			{
+				reachDir.normalize();
+				reachDir = reachDir*reachVelocity*dt;
+			}			
+			curReachIKTrajectory = curEffectorPos + reachDir;
+		}			
 	}
 
 	static bool bInit = false;
@@ -117,24 +223,79 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	if (useIKConstraint)
 	{
 		if (!bInit)
-		{
-			ikScenario.ikInitQuatList = outMotionFrame.jointQuat;
+		{			
+			ikScenario.setTreeNodeQuat(currentMotionFrame.jointQuat,QUAT_INIT);
 			bInit = true;
+		}		
+		EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>(reachPosConstraint[reachEndEffector->name().get_string()]);
+		cons->targetPos = curReachIKTrajectory;
+		if (useInterpolation) // use more damping if we are interpolating from the motion
+		{
+			ik.dampJ = 150.0;
+			ik.refDampRatio = 0.1;	
+			cons->rootName = "";
+		}
+		else
+		{
+			ik.dampJ = 150.0;
+			ik.refDampRatio = 0.1;
+			cons->rootName = "";
 		}
 
-		ikScenario.ikEndEffectors[0]->targetPos = curReachTrajectory;
-		ikScenario.ikRefQuatList = outMotionFrame.jointQuat;
+		skeletonRef->invalidate_global_matrices();
+		skeletonRef->update_global_matrices();
+		ikScenario.ikGlobalMat = ikScenario.ikTreeRoot->joint->parent()->gmat();		
+		ikScenario.setTreeNodeQuat(currentMotionFrame.jointQuat,QUAT_REF);
 		ik.setDt(dt);
-		ik.update(&ikScenario);
-		ikScenario.ikInitQuatList = ikScenario.ikQuatList;
-		outMotionFrame.jointQuat = ikScenario.ikQuatList;
-		//sr_out << "joint quat = " << ikScenario.ikQuatList[2] << srnl;
+		ik.update(&ikScenario);		
+		ikScenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);
+		ikScenario.getTreeNodeQuat(currentMotionFrame.jointQuat,QUAT_CUR);	
+		
 	}	
-	
+
+	curEffectorPos = getCurrentHandPos(currentMotionFrame);
+
+	bool ikHasReach = useInterpolation ? false : (curEffectorPos - ikTarget).norm() < 2.0;
+	if ( ikHasReach || interpHasReach)
+	{
+		if (curReachState == REACH_START)
+		{
+			// after touch the object, stay there for a pre-defined duration
+			// the hand can still move around during this period
+			curReachState = REACH_COMPLETE;
+			reachCompleteTime = 0.0;
+		}
+		else if (curReachState == REACH_COMPLETE && reachCompleteTime >= reachCompleteDuration)
+		{			
+			curReachState = REACH_RETURN;			
+		}
+		else if (curReachState == REACH_RETURN)
+		{
+			// stay idle in the current place
+			curReachState = REACH_IDLE;
+		}
+	}
+
 	prevPercentTime = curPercentTime;	
-	reachTime += (float)du; // add the reference delta time
-	updateChannelBuffer(frame,outMotionFrame);
+	reachCompleteTime += dt;
+
+	if (curReachState == REACH_RETURN || curReachState == REACH_START)
+		reachTime += (float)du; // add the reference delta time
+	updateChannelBuffer(frame,currentMotionFrame);
+	
 	return true;
+}
+
+
+
+SrVec MeCtExampleBodyReach::getCurrentHandPos( BodyMotionFrame& motionFrame )
+{
+	SrVec handPos;
+	VecOfDouble curReachPara;
+	motionParameter->getPoseParameter(currentMotionFrame,curReachPara);
+	for (int i=0;i<3;i++)
+		handPos[i] = (float)curReachPara[i];
+	return handPos;
 }
 
 void MeCtExampleBodyReach::init()
@@ -144,20 +305,30 @@ void MeCtExampleBodyReach::init()
 	SkJoint* rootJoint = skeletonRef->root()->child(0);
 	ikScenario.buildIKTreeFromJointRoot(rootJoint);
 	MeCtIKTreeNode* endNode = ikScenario.findIKTreeNode(reachEndEffector->name().get_string());
-	ikScenario.ikEndEffectors.push_back(endNode);
+	//ikScenario.ikEndEffectors.push_back(endNode);
 
-	affectedJoints.clear();	
-	const IKTreeNodeList& nodeList = ikScenario.ikTreeNodes;
+	EffectorConstantConstraint* cons = new EffectorConstantConstraint();
+	cons->efffectorName = endEffectorName;
+	cons->rootName = "";//"r_shoulder";//rootJoint->name().get_string();	
+	reachPosConstraint[cons->efffectorName] = cons;
+
+	ikScenario.ikPosEffectors = &reachPosConstraint;
+	ikScenario.ikRotEffectors = &reachRotConstraint;
 	
+	const IKTreeNodeList& nodeList = ikScenario.ikTreeNodes;
+	currentMotionFrame.jointQuat.resize(nodeList.size());
+
 	for (int i=0;i<3;i++)
 		_channels.add(rootJoint->name().get_string(), (SkChannel::Type)(SkChannel::XPos+i));
 	
-	for (size_t i=0;i<nodeList.size();i++)
+	affectedJoints.clear();	
+	for (unsigned int i=0;i<nodeList.size();i++)
 	{
 		SkJoint* joint = nodeList[i]->joint;
 		affectedJoints.push_back(joint);	
 		_channels.add(joint->name().get_string(), SkChannel::Quat);		
-	}	
+	}		
+
 	motionParameter = new ReachMotionParameter(skeletonRef,affectedJoints,reachEndEffector);
 	motionExamples.initMotionExampleSet(motionParameter);	
 	MeController::init();	
@@ -165,6 +336,9 @@ void MeCtExampleBodyReach::init()
 
 void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSet )
 {	
+	if (inMotionSet.size() == 0)
+		return;
+
 	BOOST_FOREACH(SkMotion* motion, inMotionSet)
 	{
 		if (motionData.find(motion) != motionData.end())
@@ -176,8 +350,7 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 		ex->motion = motion;
 		ex->timeWarp = new SimpleTimeWarp(refMotion->duration(),motion->duration());
 		ex->motionParameterFunc = motionParameter;
-		ex->getMotionParameter(ex->parameter);
-		
+		ex->getMotionParameter(ex->parameter);		
 		// set initial index & weight for the motion example
 		// by default, the index should be this motion & weight should be 1
 		InterpWeight w;
@@ -200,7 +373,7 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 	dataInterpolator->init(&motionExamples);
 	dataInterpolator->buildInterpolator();	
 	
-	for (size_t i=0;i<resampleData->size();i++)
+	for (unsigned int i=0;i<resampleData->size();i++)
 	{
 		InterpolationExample* ex = (*resampleData)[i];
 		SrVec reachPos;
@@ -216,7 +389,7 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 
 DataInterpolator* MeCtExampleBodyReach::createInterpolator()
 {	
-	KNNInterpolator* interpolator = new KNNInterpolator(3000,8.f);
+	KNNInterpolator* interpolator = new KNNInterpolator(500,8.f);
 	resampleData = &interpolator->resampleData;
 	interpExampleData = interpolator->getInterpExamples();
 	return interpolator;
@@ -229,22 +402,6 @@ ResampleMotion* MeCtExampleBodyReach::createInterpMotion()
 	return ex;
 }
 
-void MeCtExampleBodyReach::getParameter(VecOfSrQuat& quatList, float time, VecOfDouble& outPara )
-{	
-	for (size_t i=0;i<affectedJoints.size();i++)
-	{
-		SkJoint* joint = affectedJoints[i];
-		joint->quat()->value(quatList[i]);
-	}		
-	skeletonRef->invalidate_global_matrices();
-	skeletonRef->update_global_matrices();
-
-	SrVec endPos = reachEndEffector->gmat().get_translation();
-	examplePts.push_back(endPos);
-	outPara.resize(3);
-	for (int i=0;i<3;i++)
-		outPara[i] = endPos[i];
-}
 
 void MeCtExampleBodyReach::updateChannelBuffer( MeFrameData& frame, BodyMotionFrame& motionFrame, bool bRead /*= false*/ )
 {

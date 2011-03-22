@@ -145,7 +145,7 @@ SrVec SrQuat::axis () const
 
 float SrQuat::angle () const
  {
-   return 2.0f * acosf ( w );
+   return 2.0f * acosf ( w );	 	 
  }
 
 void SrQuat::normalize ()

@@ -28,8 +28,8 @@ void MeCtReachIK::adjust()
 	int i,j;	
 	for(i = 0; i < max_iteration; ++i)
 	{
-		for(j = start_joint_index; j != manipulated_joint_index; ++j)
-		//for(j = manipulated_joint_index-1 ; j >= start_joint_index; j--) 
+		//for(j = start_joint_index; j != manipulated_joint_index; ++j)
+		for(j = manipulated_joint_index-1 ; j >= start_joint_index; j--) 
 		{
 			/*if(reach_destination()) 
 			{
@@ -46,7 +46,7 @@ void MeCtReachIK::adjust()
 	for (int i=0;i<scenario->joint_quat_list.size();i++)
 	{
 		MeCtIKScenarioJointInfo* info = &(scenario->joint_info_list.get(i));
-		float damping_angle = 10.f;//(float)RAD(info->angular_speed_limit*getDt());
+		float damping_angle = (float)RAD(info->angular_speed_limit*getDt());
 		scenario->joint_quat_list[i] = dampQuat(cur_quatList[i],scenario->joint_quat_list[i],damping_angle);		
 	}
 }

@@ -27,7 +27,7 @@ void ReachMotionParameter::getPoseParameter( const BodyMotionFrame& frame, VecOf
 	for (int i=0;i<3;i++)
 		skeletonRef->root()->child(0)->pos()->value(i,frame.rootPos[i]);
 
-	for (size_t i=0;i<affectedJoints.size();i++)
+	for (unsigned int i=0;i<affectedJoints.size();i++)
 	{
 		SkJoint* joint = affectedJoints[i];
 		joint->quat()->value(frame.jointQuat[i]);
@@ -43,7 +43,12 @@ void ReachMotionParameter::getPoseParameter( const BodyMotionFrame& frame, VecOf
 void ReachMotionParameter::getMotionParameter(BodyMotionInterface* motion, VecOfDouble& outPara )
 {
 	double timeRef = motion->motionDuration(BodyMotionInterface::DURATION_REF)*0.999;
+	getMotionFrameParameter(motion,(float)timeRef,outPara);	
+}
+
+void ReachMotionParameter::getMotionFrameParameter( BodyMotionInterface* motion, float refTime, VecOfDouble& outPara )
+{
 	BodyMotionFrame tempFrame;
-	motion->getMotionFrame((float)timeRef,skeletonRef,affectedJoints,tempFrame);
+	motion->getMotionFrame((float)refTime,skeletonRef,affectedJoints,tempFrame);
 	getPoseParameter(tempFrame,outPara);	
 }

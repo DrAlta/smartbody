@@ -12,6 +12,7 @@ public:
 	~MotionParameter(void);
 
 	virtual void getPoseParameter(const BodyMotionFrame& frame, VecOfDouble& outPara) = 0;
+	virtual void getMotionFrameParameter(BodyMotionInterface* motion, float refTime, VecOfDouble& outPara) = 0;
 	virtual void getMotionParameter(BodyMotionInterface* motion, VecOfDouble& outPara) = 0;
 };
 
@@ -26,4 +27,5 @@ public:
 
 	virtual void getPoseParameter(const BodyMotionFrame& frame, VecOfDouble& outPara);
 	virtual void getMotionParameter(BodyMotionInterface* motion, VecOfDouble& outPara);
+	virtual void getMotionFrameParameter(BodyMotionInterface* motion, float refTime, VecOfDouble& outPara);
 };

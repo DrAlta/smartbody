@@ -12,6 +12,7 @@ namespace MeCtUBLAS
 {	
 	bool inverseMatrix(const dMatrix& mat, dMatrix& inv);
 	bool linearLeastSquare(const dMatrix& A, const dMatrix& B, dMatrix& sol);
+	bool matrixSVD(const dMatrix& A, dVector& S, dMatrix& U, dMatrix& V); // perform singular value decomposition
 	void matrixMatMult(const dMatrix& mat1, const dMatrix& mat2, dMatrix& mat3);
 	void matrixVecMult(const dMatrix& mat1, const dVector& vin, dVector& vout);	
 };

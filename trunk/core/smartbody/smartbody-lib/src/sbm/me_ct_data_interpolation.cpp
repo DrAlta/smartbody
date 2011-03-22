@@ -78,7 +78,7 @@ double RBFInterpolator::RBFValue(const VecOfDouble& p1,const VecOfDouble& p2 )
 {
 	VecOfDouble diff;
 	Plus(p1,p2,diff,-1.0);
-	double r = sqrtf((float)Norm2(diff));
+	double r = sqrt(Norm2(diff));
 	//return exp(-(r*r)*0.0005);
 	if (r==0.0)
 		return r;
@@ -167,7 +167,7 @@ bool KNNInterpolator::buildInterpolator()
 		linearKNN(exampleSet->getExamples(),ex->parameter,numKNN,ex->weight); 		
  		generateRandomWeight(ex->weight.size(),weights);
 		// copy the weights to VecOfInterpWeight
-		for (size_t i=0;i<ex->weight.size();i++)
+		for (unsigned int i=0;i<ex->weight.size();i++)
 			ex->weight[i].second = weights[i];
 
 		ex->getExampleParameter(ex->parameter);
@@ -180,7 +180,7 @@ bool KNNInterpolator::buildInterpolator()
 
 	// put together example data & resample data
 	finalExampleData = resampleData;
-	for (size_t i=0;i<interpExamples.size();i++)	
+	for (unsigned int i=0;i<interpExamples.size();i++)	
 		finalExampleData.push_back(interpExamples[i]);
 
 	// build Kd-Tree
@@ -223,12 +223,12 @@ void KNNInterpolator::predictInterpWeights( const VecOfDouble& para, VecOfInterp
 	std::map<int,float> finalWeight;
 	
 	float weightSum = 0.f;
-	for (size_t i=0;i<tempWeight.size();i++)
+	for (unsigned int i=0;i<tempWeight.size();i++)
 	{
 		InterpWeight& tempW = tempWeight[i];
 		InterpolationExample* ex = finalExampleData[tempW.first];
 		VecOfInterpWeight& realW = ex->weight;
-		for (size_t k=0;k<realW.size();k++)
+		for (unsigned int k=0;k<realW.size();k++)
 		{
 			int index = realW[k].first;
 			float w   = realW[k].second*tempW.second;
@@ -316,7 +316,7 @@ void KNNInterpolator::generateDistWeights( vector<float>& dists, vector<float>& 
 	strstr << std::endl;
 }
 
-int KNNInterpolator::closestExampleInHash(const vector<double>& inPara, int nKNN, VecOfInterpWeight& outWeight)
+int KNNInterpolator::closestExampleInHash(const vector<double>& inPara, unsigned int nKNN, VecOfInterpWeight& outWeight)
 {
 	ParameterBoundingBox& bbox = gridBox;//exampleSet->getParameterBBox();
 	VecOfInt adjHash;
@@ -324,7 +324,7 @@ int KNNInterpolator::closestExampleInHash(const vector<double>& inPara, int nKNN
 	int iHash = bbox.gridHashing(inPara,minDist,adjHash);	
 	//adjHash.push_back(iHash);
 	bool bCorrectHash = false;
- 	for (size_t i=0;i<adjHash.size();i++)
+ 	for (unsigned int i=0;i<adjHash.size();i++)
  	{
  		int idx = adjHash[i];
 		if (iHash == idx)
@@ -334,15 +334,18 @@ int KNNInterpolator::closestExampleInHash(const vector<double>& inPara, int nKNN
  	}
 	if (!bCorrectHash)
 		printf("Incorrect hash number !\n");
-	if (exList.size() >= (size_t)nKNN)
+	if (exList.size() >= nKNN)
 		linearKNN(exList,inPara,nKNN,outWeight);
 
 	return iHash;
 }
 
 
-int KNNInterpolator::kdTreeKNN( ANNkd_tree* kdTree, const vector<double>& inPara, int nKNN, VecOfInterpWeight& outWeight )
+int KNNInterpolator::kdTreeKNN( ANNkd_tree* kdTree, const vector<double>& inPara, int numKNN, VecOfInterpWeight& outWeight )
 {	
+	int nPts = kdTree->nPoints();
+	int nKNN = nPts > numKNN ? numKNN : nPts;	
+
 	outWeight.resize(nKNN);
 	
 	ANNidxArray nnIdx;
@@ -367,9 +370,12 @@ int KNNInterpolator::kdTreeKNN( ANNkd_tree* kdTree, const vector<double>& inPara
 	return nKNN;
 }
 
-int KNNInterpolator::linearKNN( const VecOfInterpExample& sampleList, const vector<double>& inPara, int nK, 
+int KNNInterpolator::linearKNN( const VecOfInterpExample& sampleList, const vector<double>& inPara, int nKNN, 
 								 VecOfInterpWeight& outWeight )
 {	
+	unsigned int uKNN = (unsigned int) nKNN;
+	int nK = uKNN < sampleList.size() ? uKNN : sampleList.size();
+
 	outWeight.resize(nK+1);	
 	outWeight.assign(outWeight.size(),InterpWeight(-1,1e10));
 	int nCurK = 0;

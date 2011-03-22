@@ -17,8 +17,7 @@
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
  *
  *  CONTRIBUTORS:
- *      Andrew n marshall, USC
- *      Ed Fast, USC
+ *      Wei-Wen Feng, USC
  */
 
 #include "vhcl.h"
@@ -30,6 +29,7 @@
 
 #include <sr/sr_vec.h>
 #include <sr/sr_alg.h>
+#include "gwiz_math.h"
 
 #include "bml_constraint.hpp"
 
@@ -50,9 +50,21 @@ const XMLCh TAG_DESCRIPTION[] = L"description";
 const XMLCh DTYPE_SBM[]  = L"ICT.SBM";
 
 ////// XML ATTRIBUTES
+const XMLCh ATTR_ROOT[] = L"sbm:root-joint";
 const XMLCh ATTR_EFFECTOR[] = L"effector";
+const XMLCh ATTR_CONSTRAINT_TYPE[] = L"sbm:constraint-type";
+const XMLCh ATTR_EFFECTOR_ROOT[] = L"sbm:effector-root";
 const XMLCh ATTR_FADE_OUT[]		= L"sbm:fade-out";
 const XMLCh ATTR_FADE_IN[]		= L"sbm:fade-in";
+
+const XMLCh ATTR_OFFSET_ROTX[]        = L"rot-x";
+const XMLCh ATTR_OFFSET_ROTY[]      = L"rot-y";
+const XMLCh ATTR_OFFSET_ROTZ[]         = L"rot-z";
+//const XMLCh ATTR_OFFSET_POS[]         = L"offset-pos";
+
+const XMLCh ATTR_X[]     = L"pos-x";
+const XMLCh ATTR_Y[]     = L"pos-y";
+const XMLCh ATTR_Z[]     = L"pos-z";
 
 
 using namespace std;
@@ -112,9 +124,95 @@ BehaviorRequestPtr BML::parse_bml_constraint( DOMElement* elem, const std::strin
 		effectorName = asciiString(attrEffector);
 	}
 
+	const XMLCh* attrEffectorRoot = NULL;
+	const char* effectorRootName = "";
+	attrEffectorRoot = elem->getAttribute(ATTR_EFFECTOR_ROOT);	
+	if( attrEffector && XMLString::stringLen( attrEffectorRoot ) ) 
+	{
+		effectorRootName = asciiString(attrEffectorRoot);
+	}
+
+	const XMLCh* attrRootJoint = NULL;
+	const char* rootJointName = NULL;
+	attrRootJoint = elem->getAttribute(ATTR_ROOT);	
+	if( attrEffector && XMLString::stringLen( attrRootJoint ) ) 
+	{
+		rootJointName = asciiString(attrRootJoint);
+	}
+
+	const XMLCh* attrConstraintType = NULL;
+	const char* typeName = NULL;
+	attrConstraintType = elem->getAttribute(ATTR_CONSTRAINT_TYPE);	
+	if( attrConstraintType && XMLString::stringLen( attrConstraintType ) ) 
+	{
+		typeName = asciiString(attrConstraintType);
+	}
+
 	if (target_joint == NULL && !constraintCt) {  // Invalid target.  Assume parse_target(..) printed error.
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
+
+	// get offset rotation
+	SrVec posOffset = SrVec(0.f,0.f,0.f);
+	SrQuat rotOffset = SrQuat();
+	float rotX = 0.f, rotY = 0.f, rotZ = 0.f;
+	const XMLCh* value = elem->getAttribute( ATTR_OFFSET_ROTX );
+	if( value!=NULL && value[0]!='\0' ) {
+		if( !( wistringstream( value ) >> rotX ) ) {
+			std::stringstream strstr;
+			strstr << "WARNING: Failed to parse pitch attribute \""<<XMLString::transcode(value)<<"\" of <"<<XMLString::transcode( elem->getTagName() )<<" .../> element.";
+			LOG(strstr.str().c_str());
+		}
+	}
+
+	//euler_t e = euler_t()
+	value = elem->getAttribute( ATTR_OFFSET_ROTY );
+	if( value!=NULL && value[0]!='\0' ) {
+		if( !( wistringstream( value ) >> rotY ) ) {
+			std::stringstream strstr;
+			strstr << "WARNING: Failed to parse heading attribute \""<<XMLString::transcode(value)<<"\" of <"<<XMLString::transcode( elem->getTagName() )<<" .../> element." << endl;
+			LOG(strstr.str().c_str());
+		}
+	}
+
+	value = elem->getAttribute( ATTR_OFFSET_ROTZ );
+	if( value!=NULL && value[0]!='\0' ) {
+		if( !( wistringstream( value ) >> rotZ ) ) {
+			std::stringstream strstr;
+			strstr << "WARNING: Failed to parse roll attribute \""<<XMLString::transcode(value)<<"\" of <"<<XMLString::transcode( elem->getTagName() )<<" .../> element." << endl;
+			LOG(strstr.str().c_str());
+		}
+	}
+
+	XMLCh* token;
+	//if(XMLString::compareIString( tag, ATTR_OFFSET_POS )==0)
+	{		
+		const XMLCh* attrTarget[3];		
+		attrTarget[0] = elem->getAttribute( ATTR_X );
+		attrTarget[1] = elem->getAttribute( ATTR_Y );
+		attrTarget[2] = elem->getAttribute( ATTR_Z );
+		
+		wistringstream in;		
+		for(int i = 0; i < 3; ++i)
+		{
+			XMLStringTokenizer tokenizer( attrTarget[i] );
+			switch( tokenizer.countTokens() ) 
+			{
+			case 1:
+				token = tokenizer.nextToken();
+				in.clear();
+				in.str( token );
+				in.seekg(0);
+				in >> posOffset[i];
+				break;
+			default:
+				break;
+			}
+		}				
+	}	
+
+	gwiz::quat_t q = gwiz::quat_t(gwiz::euler_t( rotX, rotY, rotZ ));
+	rotOffset = SrQuat((float)q.w(),(float)q.x(),(float)q.y(),(float)q.z());	
 
 	float fadeOutTime = -1.0;
 	float fadeInTime = -1.0;
@@ -150,13 +248,22 @@ BehaviorRequestPtr BML::parse_bml_constraint( DOMElement* elem, const std::strin
 	{
 		constraintCt = new MeCtConstraint(request->actor->skeleton_p);		
 		constraintCt->handle(handle);
-		constraintCt->init();
+		constraintCt->init(rootJointName);
 		bCreateNewController = true;
 	}
 
 	if( target_joint && effectorName)	{
 		//constraintCt->set_target_joint(const_cast<SkJoint*>( target_joint ) );
-		constraintCt->addJointEndEffectorPair(const_cast<SkJoint*>(target_joint),effectorName);
+		MeCtConstraint::ConstraintType cType = MeCtConstraint::CONSTRAINT_POS;
+		if (typeName)
+		{
+			if (strcmp(typeName,"pos") == 0)
+				cType = MeCtConstraint::CONSTRAINT_POS;
+			else if (strcmp(typeName,"rot") == 0)
+				cType = MeCtConstraint::CONSTRAINT_ROT;
+		}
+		
+		constraintCt->addEffectorJointPair(const_cast<SkJoint*>(target_joint),effectorName,effectorRootName,posOffset,rotOffset,cType);
 	}
 
 	if (fadeInTime >= 0.0)

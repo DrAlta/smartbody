@@ -64,7 +64,7 @@ protected:
 
 	// both KNN methods return the indices of KNN samples ( in InterpWeight.first ), and store distances in the InterpWeight.second
 	// further processing is needed to infer the blending weights from distances
-	int  closestExampleInHash(const vector<double>& inPara, int nKNN, VecOfInterpWeight& outWeight);
+	int  closestExampleInHash(const vector<double>& inPara, unsigned int nKNN, VecOfInterpWeight& outWeight);
 	int  linearKNN(const VecOfInterpExample& sampleList, const vector<double>& inPara, 
 		           int nKNN, VecOfInterpWeight& outWeight);
 	int  kdTreeKNN(ANNkd_tree* kdTree, const vector<double>& inPara,

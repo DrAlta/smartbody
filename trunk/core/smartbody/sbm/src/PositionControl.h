@@ -1,32 +1,65 @@
 #pragma once
+#include <vector>
 #include <SR/sr_vec.h>
 #include <SR/sr_vec2.h>
 #include <SR/sr_camera.h>
 
-class PositionControl
+class ObjectControl
 {
-protected:
-	bool active;	
-	int opdir;
-	float base,r,len,s_len,ss_len;
-	SrVec colors[4];
+protected:	
+	float base,r,len,s_len,ss_len;			
 	SrVec worldPt;
+	SrVec prevPt;
+	SrQuat worldRot;
 public:
 	bool dragging;
+	bool active;
+
+	ObjectControl();
+	~ObjectControl();
+
+	void setColor(const SrVec &color);
+	virtual SrVec getWorldPt(); // get world position ( from the attached object ? )
+	virtual void setWorldPt(SrVec& newPt);
+	virtual SrQuat getWorldRot();
+	virtual void setWorldRot(SrQuat& newRot);
+	
+
+	virtual bool drag(SrCamera& cam, float  fx, float fy, float tx, float ty) = 0;
+	virtual void draw(SrCamera& cam) = 0; 
+
+	virtual void hitOPS(SrCamera& cam) {};	
+	virtual void identify(std::vector<int>& path) {} ;
+
+public:
+	// utility functions
+	void screenParallelPlane(SrCamera& cam,const SrVec &center,SrVec &dirx,SrVec &diry);
+	SrVec worldToScreen(const SrCamera& cam, const SrVec& pos);
+	SrVec worldToEye(const SrCamera& cam, const SrVec& pos);
+	SrVec screenToWorld(const SrCamera& cam, const SrVec& win);
+	SrVec mouseToWorld(SrCamera& cam, float fx, float fy, float tx, float ty);
+};
+
+
+
+class PositionControl : public ObjectControl
+{
+protected:	
+	int opdir;	
+	SrVec colors[4];
 public:
 	PositionControl(void);
 	~PositionControl(void);
 
-	virtual SrVec getWorldPt(); // get world position ( from the attached object ? )
-	virtual void setWorldPt(SrVec& newPt);
-	virtual void draw(); 
-	
-	void setColor(const SrVec &color);
-	bool drag(SrCamera& cam, float  fx, float fy, float tx, float ty);
-	void hitOPS();
-	void hitTest();
-	static void drawSphere(SrVec& pos, float fRadius = 1.0);	
+	virtual void draw(SrCamera& cam);
+	virtual bool drag(SrCamera& cam, float  fx, float fy, float tx, float ty);
+	virtual void hitOPS(SrCamera& cam);	
+	virtual void identify(std::vector<int>& path);
+
+	static void drawSphere(SrVec& pos, float fRadius = 1.0);
+	void drawShadowSquare(float x,float y,float z,SrVec& dirx,SrVec& diry,float sz,unsigned int mode);	
 protected:
 	void drawCenter();		
+	void resetColor();
 };
 
