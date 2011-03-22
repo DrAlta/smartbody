@@ -153,6 +153,8 @@ void MeCtParamAnimation::updateWeights(std::vector<double> w)
 {
 	if (curStateModule == NULL)
 		return;
+	if (curStateModule->data->getNumMotions() != w.size())
+		return;
 	curStateModule->timeManager->updateWeights(w);
 	curStateModule->interpolator->weights = w;
 	curStateModule->woManager->weights = w;

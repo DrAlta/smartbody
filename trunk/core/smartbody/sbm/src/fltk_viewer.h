@@ -467,6 +467,8 @@ class PALocomotionData
 	SbmCharacter* character;
 	bool starting;
 	bool stopping;
+	float linearVelocityIncrement;
+	float angularVelocityIncrement;
 };
 //================================ End of File =================================================
 

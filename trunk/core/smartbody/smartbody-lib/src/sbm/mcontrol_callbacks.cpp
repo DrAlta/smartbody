@@ -814,9 +814,12 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			if (operation == "update")
 			{
 				std::vector<double> w;
-				for (int i = 0; i < character->param_animation_ct->getNumWeights(); i++)
-					w.push_back(args.read_double());
-				character->param_animation_ct->updateWeights(w);
+				if (args.calc_num_tokens() == character->param_animation_ct->getNumWeights())
+				{
+					for (int i = 0; i < character->param_animation_ct->getNumWeights(); i++)
+						w.push_back(args.read_double());
+					character->param_animation_ct->updateWeights(w);
+				}
 			}
 
 			if (operation == "basename")

@@ -1347,8 +1347,9 @@ void FltkViewer::translate_keyboard_state()
 
 	//direction control
 	PAStateData* state = NULL;
-	if (_paLocoData->character->param_animation_ct)
-		state = _paLocoData->character->param_animation_ct->getCurrentPAStateData();
+	if (_paLocoData->character)
+		if (_paLocoData->character->param_animation_ct)
+			state = _paLocoData->character->param_animation_ct->getCurrentPAStateData();
 	if(fltk::get_key_state(fltk::UpKey))
 	{
 		if(!_locoData->upkey)
@@ -1371,7 +1372,7 @@ void FltkViewer::translate_keyboard_state()
 				if (_paLocoData->v < -9990 && state)
 					state->paramManager->getParameter(_paLocoData->v, _paLocoData->w);
 				else
-					_paLocoData->v += 10;
+					_paLocoData->v += _paLocoData->linearVelocityIncrement;
 			paLocomotionCmd = true;
 		}
 	}
@@ -1401,7 +1402,7 @@ void FltkViewer::translate_keyboard_state()
 				if (_paLocoData->v < -9990 && state)
 					state->paramManager->getParameter(_paLocoData->v, _paLocoData->w);
 				else
-					_paLocoData->v -= 10;
+					_paLocoData->v -= _paLocoData->linearVelocityIncrement;
 			paLocomotionCmd = true;
 		}
 	}
@@ -1425,7 +1426,7 @@ void FltkViewer::translate_keyboard_state()
 			if (_paLocoData->w < -9990 && state)
 				state->paramManager->getParameter(_paLocoData->v, _paLocoData->w);
 			else
-				_paLocoData->w += 10;
+				_paLocoData->w += _paLocoData->angularVelocityIncrement;
 			paLocomotionCmd = true;
 		}
 	}
@@ -1449,7 +1450,7 @@ void FltkViewer::translate_keyboard_state()
 			if (_paLocoData->w < -9990 && state)
 				state->paramManager->getParameter(_paLocoData->v, _paLocoData->w);
 			else
-				_paLocoData->w -= 10;
+				_paLocoData->w -= _paLocoData->angularVelocityIncrement;
 			paLocomotionCmd = true;
 		}
 	}
@@ -3440,6 +3441,8 @@ PALocomotionData::PALocomotionData()
 	character = mcuCBHandle::singleton().character_map.next();
 	starting = false;
 	stopping = false;
+	linearVelocityIncrement = 10.0f;
+	angularVelocityIncrement = 20.0f;
 }
 
 
