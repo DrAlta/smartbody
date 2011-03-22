@@ -65,6 +65,7 @@ MeCtReach::MeCtReach( SkSkeleton* skeleton )
 	target_joint_ref = NULL;
 	limb_length = 0.0;
 	prev_time = -1.0;
+	//_duration = 10.0;
 
 	reach_arm = REACH_RIGHT_ARM;	
 }

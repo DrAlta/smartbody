@@ -165,6 +165,16 @@ Fl_Menu_Item ReachMenuTable[] =
 	{ 0 }
 };
 
+static char body_reach_menu_name[] = {"&body reach"};
+Fl_Menu_Item BodyReachMenuTable[] = 
+{		
+	{ "&show pose examples", 0, MCB, CMD(CmdReachShowExamples), 0 },
+	{ "&no pose examples", 0, MCB, CMD(CmdReachNoExamples), 0 },
+	//{ "&toggle IK constraint", 0, MCB, CMD(CmdExampleReachToggleIK),FL_MENU_TOGGLE },
+	{ "&toggle use examples", 0, MCB, CMD(CmdExampleReachToggleInterpolation),FL_MENU_TOGGLE },	
+	{ 0 }
+};
+
 
 Fl_Menu_Item MenuTable[] =
  { 
@@ -202,7 +212,8 @@ Fl_Menu_Item MenuTable[] =
 		 { "&use reference joints", 0, MCB, CMD(CmdConstraintToggleReferencePose), FL_MENU_TOGGLE },		     
 		 { 0 },    
     { gaze_on_target_menu_name, 0, 0, GazeMenuTable, FL_SUBMENU_POINTER },   
-	//{ reach_on_target_menu_name, 0, 0, ReachMenuTable, FL_SUBMENU_POINTER }, 
+	{ reach_on_target_menu_name, 0, 0, ReachMenuTable, FL_SUBMENU_POINTER }, 
+	{ body_reach_menu_name, 0, 0, BodyReachMenuTable, FL_SUBMENU_POINTER }, 
     { "p&references", 0, 0, 0, FL_SUBMENU },
          { "&axis",         0, MCB, CMD(CmdAxis),        FL_MENU_TOGGLE },
          { "b&ounding box", 0, MCB, CMD(CmdBoundingBox), FL_MENU_TOGGLE },
@@ -633,6 +644,13 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 			  bodyReachCt->useIKConstraint = !bodyReachCt->useIKConstraint;
 		  }	
 		  break;  
+
+	  case CmdExampleReachToggleInterpolation:
+		  if (bodyReachCt)
+		  {
+			  bodyReachCt->useInterpolation = !bodyReachCt->useInterpolation;
+		  }	
+		  break; 
 
 // 	  case CmdConstraintToggleIK:
 // 		  if (bodyReachCt)
@@ -1100,7 +1118,7 @@ void FltkViewer::draw()
 	drawInteractiveLocomotion();
 
 	//_posControl.Draw();
-	_objManipulator.draw();
+	_objManipulator.draw(cam);
 	// feng : debugging draw for reach controller
 	drawReach();
 
@@ -1837,6 +1855,12 @@ int FltkViewer::handle_event ( const SrEvent &e )
 	   res = handle_object_manipulation ( e );
 	   if ( res ) return res;
    }
+   if (e.shift && e.mouse_event() )
+   {
+	   res = handle_object_manipulation ( e );
+	   if ( res ) return res;
+   }
+
 
    if ( e.mouse_event() ) return handle_scene_event ( e );
 
@@ -1859,6 +1883,10 @@ int FltkViewer::handle_object_manipulation( const SrEvent& e)
 			 //_objManipulator.picking(e.mouse.x,e.mouse.y, _data->camera);
 			 //_objManipulator.hasPicking(true);
 			 _objManipulator.setPicking(SrVec2(e.mouse.x, e.mouse.y));
+			 if (e.ctrl)
+				 _objManipulator.setPickingType(ObjectManipulationHandle::CONTROL_POS);
+			 else if (e.shift)
+				 _objManipulator.setPickingType(ObjectManipulationHandle::CONTROL_ROT);
 			 /*
 			 // unify the pawn selection and the locomotion selection
 			 SbmPawn* pawn = _objManipulator.get_selected_pawn();

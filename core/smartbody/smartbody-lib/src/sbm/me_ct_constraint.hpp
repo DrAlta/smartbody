@@ -21,6 +21,7 @@
 */
 
 #pragma once
+#include <map>
 #include <SK/sk_skeleton.h>
 #include <ME/me_controller.h>
 #include "me_ct_limb.hpp"
@@ -29,19 +30,44 @@
 
 typedef std::set<SkMotion*> MotionDataSet;
 
+class EffectorJointConstraint : public EffectorConstraint
+{
+public:	
+	SkJoint*        targetJoint;	
+	SrQuat          rotOffset;
+	SrVec           posOffset;	
+public:
+	EffectorJointConstraint();
+	~EffectorJointConstraint() {}
+
+	EffectorJointConstraint& operator=(const EffectorJointConstraint& rhs);
+
+	virtual SrVec getPosConstraint();
+	virtual SrQuat getRotConstraint();
+};
+
+typedef std::vector<EffectorJointConstraint> ConstraintList;
 
 class MeCtConstraint : public MeController
 {
 private:
 	static const char* CONTROLLER_TYPE;
 public:	
-	static bool useBalance, useReferenceJoint, useIKConstraint;
+	static bool useIKConstraint;
 
 	enum ConstraintFadeMode	{
 		FADING_MODE_OFF = 0,
 		FADING_MODE_IN,
 		FADING_MODE_OUT
 	};
+
+	enum ConstraintType
+	{
+		CONSTRAINT_POS = 0,
+		CONSTRAINT_ROT,
+		NUM_OF_CONSTRAINT
+	};
+
 public:	
 	MeCtConstraint(SkSkeleton* skeleton);
 	~MeCtConstraint(void);
@@ -54,6 +80,11 @@ protected:
 	SkChannelArray	_channels;
 	SkJoint        *target_joint_ref;
 	std::vector<SkJoint*> targetJointList;
+	//ConstraintList  rotConstraint;
+	//ConstraintList  posConstraint;
+
+	ConstraintMap   rotConstraint;
+	ConstraintMap   posConstraint;
 		
 	float           prev_time; // to get dt
 	float           blendWeight;
@@ -61,8 +92,8 @@ protected:
 	ConstraintFadeMode fadeMode;
 
 public:			
-	void init ();
-	bool addJointEndEffectorPair(SkJoint* targetJoint, const char* effectorName);
+	void init (const char* rootName);
+	bool addEffectorJointPair(SkJoint* targetJoint, const char* effectorName, const char* effectorRootName, const SrVec& posOffset , const SrQuat& rotOffset , ConstraintType cType = CONSTRAINT_POS);
 	virtual void controller_map_updated();
 	virtual void controller_start();	
 	virtual bool controller_evaluate( double t, MeFrameData& frame );
@@ -77,6 +108,6 @@ public:
 	bool updateFading(float dt);
 
 protected:
-	SrVec get_reach_target(SkJoint* joint);
+	
 	void  updateChannelBuffer(MeFrameData& frame, std::vector<SrQuat>& quatList, bool bRead = false);
 };

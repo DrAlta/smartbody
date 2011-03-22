@@ -177,6 +177,7 @@ class SrMat
     void translation ( const SrVec &v ) { translation(v.x,v.y,v.z); }
 
 	SrVec get_translation() const { return SrVec(e[12],e[13],e[14]); } 
+	void get_double(double mat[16]) { for (int i=0;i<16;i++) mat[i] = e[i]; }
 
     /*! Pre-multiplies SrMat with a translation matrix constructed with the 
         vector v. The multiplication is optimized considering that SrMat has

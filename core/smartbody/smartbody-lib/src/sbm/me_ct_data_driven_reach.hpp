@@ -96,7 +96,7 @@ template <class T, class S> void pairToVec(const vector<pair<T,S>>& A, vector<T>
 {
 	outT.resize(A.size());
 	outS.resize(A.size());
-	for (size_t i=0;i<A.size();i++)
+	for (unsigned int i=0;i<A.size();i++)
 	{
 		outT[i] = A[i].first;
 		outS[i] = A[i].second;
@@ -106,7 +106,7 @@ template <class T, class S> void vecToPair(vector<T>& vecT, vector<S>& vecS, vec
 {
 	int numElem = vecT.size() < vecS.size() ? vecT.size() : vecS.size();
 	outVec.resize(numElem);
-	for (size_t i=0;i<outVec.size();i++)
+	for (unsigned int i=0;i<outVec.size();i++)
 	{
 		outVec[i].first = vecT[i];
 		outVec[i].second = vecS[i];

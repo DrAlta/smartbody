@@ -51,6 +51,7 @@
 				RuntimeLibrary="3"
 				PrecompiledHeaderFile=""
 				WarningLevel="3"
+				WarnAsError="true"
 				DebugInformationFormat="4"
 				DisableSpecificWarnings="4355"
 			/>
@@ -1073,6 +1074,14 @@
 				<Filter
 					Name="Constraint"
 					>
+					<File
+						RelativePath="..\src\sbm\me_ct_ccd_IK.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_ccd_IK.hpp"
+						>
+					</File>
 					<File
 						RelativePath="..\src\sbm\me_ct_constraint.cpp"
 						>

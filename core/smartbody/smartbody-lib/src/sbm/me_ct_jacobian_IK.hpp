@@ -1,44 +1,75 @@
 #pragma once
+#include <map>
 #include "me_ct_IK_scenario.hpp"
 #include "gwiz_math.h"
 #include "me_ct_ublas.hpp"
 
+enum NodeQuatType { QUAT_INIT = 0, QUAT_REF, QUAT_PREVREF, QUAT_CUR, QUAT_DUMMY, QUAT_SIZE };
+enum ConstraintType { CONSTRAINT_POS = 0, CONSTRAINT_ROT };
 class MeCtIKTreeNode
 {
 public:
 	int              nodeIdx;
 	int              nodeLevel;
+	std::string      nodeName;
 	MeCtIKTreeNode   *parent, *child, *brother;
 
-	SrVec            targetPos; // for end effector
+	SrVec            targetPos; // target pos is a global position constraint for this end effector joint
+	SrQuat           targetDir; // target dir is a global rotation constraint ( parameterized as quaternion )
 	SkJoint          *joint;	
 	MeCtIKJointLimit jointLimit;
-	SrVec            jointOffset;
+	SrVec            jointOffset;	
 	SrMat            gmat;	
+	SrQuat           nodeQuat[QUAT_SIZE];
 	float            mass;
 
 	MeCtIKTreeNode();
 	~MeCtIKTreeNode();
 	SrVec getCoMPos(); 
+	SrVec getParentGlobalPos();
+	SrVec getGlobalPos();
+	SrQuat& getQuat(NodeQuatType type = QUAT_CUR);
+	bool setQuat(const SrQuat& q, NodeQuatType type = QUAT_CUR);
 };
 
+
 typedef std::vector<MeCtIKTreeNode*> IKTreeNodeList;
+typedef std::vector<std::string> VecOfString;
+
+class EffectorConstraint
+{
+public:
+	std::string     efffectorName;
+	std::string     rootName; // root of influence for this constraint	
+public:
+	EffectorConstraint() {}
+	~EffectorConstraint() {}
+
+	virtual SrVec getPosConstraint() = 0;
+	virtual SrQuat getRotConstraint() = 0;
+};
+
+typedef std::map<std::string,EffectorConstraint*> ConstraintMap;
 
 class MeCtIKTreeScenario
 {
+
 public:	
 	SkSkeleton*                  ikSkeleton;
 	IKTreeNodeList               ikTreeNodes;
 	MeCtIKTreeNode*              ikTreeRoot; // contains the tree structure for IK tree ( which may contain multiple end effectors/IK chains )	
-	IKTreeNodeList               ikEndEffectors;	
-	
-	SrMat                        ikGlobalMat;
-	std::vector<SrQuat>          ikQuatList; // current quat list
-	std::vector<SrQuat>          ikInitQuatList; // initial quat before solving IK
-	std::vector<SrQuat>          ikRefQuatList;  // reference quat list
+	//IKTreeNodeList               ikEndEffectors;
 
+	//IKTreeNodeList               ikPosEffectors; // positional constraint
+	//IKTreeNodeList               ikRotEffectors; // rotational constraint
+	//VecOfString                  ikPosEffectors;
+	//VecOfString                  ikRotEffectors;
+	ConstraintMap*               ikRotEffectors;
+	ConstraintMap*               ikPosEffectors;
+
+	
+	SrMat                        ikGlobalMat;	
 	IKTreeNodeList               ikJointLimitNodes; // joints that violate joint limits	
-	bool                         ikUseBalance, ikUseReference;
 
 public:
 	MeCtIKTreeScenario();
@@ -46,8 +77,12 @@ public:
 public:	
 	void buildIKTreeFromJointRoot(SkJoint* root);	
 	void updateQuat(const dVector& dTheta);
+	void copyTreeNodeQuat(NodeQuatType typeFrom, NodeQuatType typeTo);
+	void setTreeNodeQuat(const std::vector<SrQuat>& inQuatList,NodeQuatType type);
+	void getTreeNodeQuat(std::vector<SrQuat>& inQuatList, NodeQuatType type);
+
 	void updateJointLimit();
-	void updateGlobalMat();
+	void updateGlobalMat();		
 	MeCtIKTreeNode* findIKTreeNode(const char* jointName);	
 	static int findIKTreeNodeInList(const char* jointName, IKTreeNodeList& nodeList);	
 protected:
@@ -58,8 +93,19 @@ protected:
 	static bool checkJointLimit(const SrQuat& q, const MeCtIKJointLimit& limit, const SrQuat& qInit, SrVec& jointOffset); 
 };
 
+class MeCtIKInterface
+{
+protected:
+	float dt; 
+public:
+	virtual void update(MeCtIKTreeScenario* scenario) = 0;
+	float getDt() const { return dt; }
+	void setDt(float val) { dt = val; }	
+};
+
+
 // a full-body IK solver based on Jacobian pseudo-inverse
-class MeCtJacobianIK	
+class MeCtJacobianIK : public MeCtIKInterface	
 {	
 protected:
 	dMatrix matJ, matJnull, matJInv; // Jacobian associated with end effector
@@ -69,8 +115,12 @@ protected:
 
 	dMatrix matJbal, matJbalInv, matJAux, matJAuxInv; // Jacobian for balance control
 	dVector dThetaAux,dSbal, dSref, dSAux;
+
+	MeCtIKTreeScenario* ikScenario;
 	
-	double  dampJ; // damping constant	
+public:
+	double  dampJ, refDampRatio; // damping constant	
+	bool    ikUseBalance, ikUseReference;
 public:
 	MeCtJacobianIK(void);
 	~MeCtJacobianIK(void);
