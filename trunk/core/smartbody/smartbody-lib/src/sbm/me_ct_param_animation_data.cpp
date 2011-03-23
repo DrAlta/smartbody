@@ -502,7 +502,12 @@ double MotionParameters::getAccAngularSpeed()
 		const SrMat& destMat = joint->gmat();
 		sr_euler_angles(rotType, destMat, rx, ry, rz);
 		float destRotY = ry;
-		diffRotY += (destRotY - srcRotY);
+		float diff;
+		if (destRotY * srcRotY < 0 && fabs(destRotY) > 1.0f)
+			diff = - destRotY - srcRotY;
+		else
+			diff = destRotY - srcRotY;
+		diffRotY += diff;
 	}
 	double accAngularSpd = double(diffRotY / motion->duration());
 	return accAngularSpd;
