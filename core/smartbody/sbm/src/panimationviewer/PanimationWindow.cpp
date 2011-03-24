@@ -131,6 +131,7 @@ void PanimationWindow::update_viewer()
 		scriptEditor->update();
 	if (tabGroup->value() == 3)
 		runTimeEditor->update();
+		
 }
 
 void PanimationWindow::show()
