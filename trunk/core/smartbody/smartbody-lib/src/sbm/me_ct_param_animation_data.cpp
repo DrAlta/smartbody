@@ -183,10 +183,12 @@ bool ParameterManager::setWeight(double x, double y)
 			triangleId = i;
 		}
 	}
-	for (int i = 0; i < state->getNumMotions(); i++)
-		state->weights[i] = 0.0;
+
 	if (triangleId >= 0)
 	{
+		for (int i = 0; i < state->getNumMotions(); i++)
+			state->weights[i] = 0.0;
+
 		SrVec v1 = triangles[triangleId].triangle.a;
 		SrVec v2 = triangles[triangleId].triangle.b;
 		SrVec v3 = triangles[triangleId].triangle.c;

@@ -181,8 +181,15 @@ void ParameterVisualization::getActualPixel(float paramX, float paramY, int& x, 
 	y = centerY - y;
 }
 
+void ParameterVisualization::getActualParam(float& paramX, float& paramY, int x, int y)
+{
+	paramX = (x - centerX) * scaleX;
+	paramY = (centerY - y) * scaleY;
+}
+
+
 // set the parameter location on the screen
-void ParameterVisualization::setParam(int x, int y)
+void ParameterVisualization::setPoint(int x, int y)
 {
 	paramX = x;
 	paramY = y;
@@ -192,20 +199,19 @@ void ParameterVisualization::setParam(int x, int y)
 // given mouse position on the screen, set the parameter and slider (slider shows the value of parameter)
 void ParameterVisualization::setSlider(int x, int y)
 {
-	double valueX = (x - centerX) * scaleX;
-	double valueY = (centerY - y) * scaleY;
-	paramGroup->xAxis->value((float)valueX);
-	if (paramGroup->yAxis)
-	{
-		state->paramManager->setWeight((float)valueX, (float)valueY);
-		paramGroup->yAxis->value((float)valueY);
-	}
-	else
-		state->paramManager->setWeight((float)valueX);
+	float valueX, valueY;
+	getActualParam(valueX, valueY, x, y);
+	if (state->paramManager->getType() == 0)
+		state->paramManager->setWeight(valueX);
+	if (state->paramManager->getType() == 1)
+		state->paramManager->setWeight(valueX, valueY);
 	paramGroup->updateWeight();
 	float actualParamX, actualParamY;
 	state->paramManager->getParameter(actualParamX, actualParamY);
 	this->getActualPixel(actualParamX, actualParamY, paramX, paramY);
+	paramGroup->xAxis->value(actualParamX);
+	if (paramGroup->yAxis)
+		paramGroup->yAxis->value(actualParamY);
 	redraw();
 }
 
@@ -277,7 +283,7 @@ void ParameterGroup::updateXAxisValue(fltk::Widget* widget, void* data)
 		group->updateWeight();
 	int x, y;
 	group->paramVisualization->getActualPixel(float(w), 0.0f, x, y);
-	group->paramVisualization->setSlider(x, y);
+	group->paramVisualization->setPoint(x, y);
 }
 
 void ParameterGroup::updateAxisValue(fltk::Widget* widget, void* data)
@@ -290,7 +296,7 @@ void ParameterGroup::updateAxisValue(fltk::Widget* widget, void* data)
 		group->updateWeight();
 	int pixelX, pixelY;
 	group->paramVisualization->getActualPixel(float(x), float(y), pixelX, pixelY);
-	group->paramVisualization->setSlider(pixelX, pixelY);
+	group->paramVisualization->setPoint(pixelX, pixelY);
 }
 
 void ParameterGroup::updateWeight()
@@ -360,7 +366,7 @@ void PARunTimeEditor::update()
 				state->paramManager->getParameter(x, y);
 				int actualPixelX, actualPixelY;
 				paramGroup->paramVisualization->getActualPixel(x, y, actualPixelX, actualPixelY);
-				paramGroup->paramVisualization->setParam(actualPixelX, actualPixelY);
+				paramGroup->paramVisualization->setPoint(actualPixelX, actualPixelY);
 			}
 		}
 	}
@@ -566,16 +572,4 @@ void PARunTimeEditor::run(fltk::Widget* widget, void* data)
 	}
 	
 	if (nextCycleState == "Idle" || nextCycleState == "") return;
-	if (mcuCBHandle::singleton().lookUpPAState(nextCycleState)->paramManager->getNumParameters() > 0)
-	{
-		if (editor->paramGroup)
-		{
-			editor->parameterGroup->remove(editor->paramGroup);
-			delete editor->paramGroup;
-			editor->paramGroup = NULL;
-		}
-		editor->paramGroup = new ParameterGroup(0, 0, editor->parameterGroup->w(), editor->parameterGroup->h(), "", mcuCBHandle::singleton().lookUpPAState(nextCycleState), editor->paWindow, true);
-		editor->parameterGroup->add(editor->paramGroup);
-		editor->paramGroup->show();
-	}
 }

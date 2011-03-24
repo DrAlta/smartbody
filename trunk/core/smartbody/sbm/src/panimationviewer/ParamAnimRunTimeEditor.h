@@ -39,7 +39,8 @@ class ParameterVisualization : public fltk::Group
 		virtual void resize(int x, int y, int w, int h);
 		void setSlider(int x, int y);
 		void getActualPixel(float paramX, float paramY, int& x, int& y);
-		void setParam(int x, int y);
+		void getActualParam(float& paramX, float& paramY, int x, int y);
+		void setPoint(int x, int y);
 
 	private:
 		void getBound(int ptX, int ptY, int& x, int& y, int& w, int& h);
