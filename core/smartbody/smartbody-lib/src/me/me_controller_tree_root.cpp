@@ -225,7 +225,7 @@ public:
 
 	// Implement MeControllerContext
     SkChannelArray& channels() {
-#ifdef DEBUG
+#if 0
 		if( _state!=State::VALID )
 			LOG("ERROR: MeControllerTreeRoot::channels() called while invalid");
 #endif

@@ -181,14 +181,17 @@ bool ParameterManager::setWeight(double x, double y)
 	}
 	for (int i = 0; i < state->getNumMotions(); i++)
 		state->weights[i] = 0.0;
-	SrVec v1 = triangles[triangleId].triangle.a;
-	SrVec v2 = triangles[triangleId].triangle.b;
-	SrVec v3 = triangles[triangleId].triangle.c;
-	int id1 = state->getMotionId(triangles[triangleId].motion1);
-	int id2 = state->getMotionId(triangles[triangleId].motion2);
-	int id3 = state->getMotionId(triangles[triangleId].motion3);
-	getWeight(param, v1, v2, v3, state->weights[id1], state->weights[id2], state->weights[id3]);
-	setPrevVec(param);
+	if (triangleId >= 0)
+	{
+		SrVec v1 = triangles[triangleId].triangle.a;
+		SrVec v2 = triangles[triangleId].triangle.b;
+		SrVec v3 = triangles[triangleId].triangle.c;
+		int id1 = state->getMotionId(triangles[triangleId].motion1);
+		int id2 = state->getMotionId(triangles[triangleId].motion2);
+		int id3 = state->getMotionId(triangles[triangleId].motion3);
+		getWeight(param, v1, v2, v3, state->weights[id1], state->weights[id2], state->weights[id3]);
+		setPrevVec(param);
+	}
 	return true;
 }
 
