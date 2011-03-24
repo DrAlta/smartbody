@@ -107,7 +107,7 @@ SrVec ObjectControl::worldToScreen( const SrCamera& cam, const SrVec& pos )
 
 	gluProject(pos.x,pos.y,pos.z,modelView,projection,viewport,&winX,&winY,&winZ);
 
-	return SrVec(winX,winY,winZ);	
+	return SrVec((float)winX,(float)winY,(float)winZ);	
 }
 
 SrVec ObjectControl::screenToWorld( const SrCamera& cam, const SrVec& win )
@@ -121,7 +121,7 @@ SrVec ObjectControl::screenToWorld( const SrCamera& cam, const SrVec& win )
 	glGetIntegerv(GL_VIEWPORT,viewport);
 
 	gluUnProject(win.x,win.y,win.z,modelView,projection,viewport,&posX,&posY,&posZ);
-	return SrVec(posX,posY,posZ);
+	return SrVec((float)posX,(float)posY,(float)posZ);
 }
 
 SrVec ObjectControl::mouseToWorld( SrCamera& cam, float fx, float fy, float tx, float ty )
@@ -499,7 +499,7 @@ bool PositionControl::drag(SrCamera& cam,  float fx, float fy, float tx, float t
 		d3[opdir]=a*w/(alpha-w);
 		*/
 		//beta*h/(1+b*h)
-		float beta=2.*p*n/(n-p);
+		float beta=2.0f*p*n/(n-p);
 		float b=(n+p)/(n-p);
 		inc[opdir]=w/(beta-b*w);	
 		//printf("opdir = %d  ", opdir);
@@ -514,9 +514,9 @@ bool PositionControl::drag(SrCamera& cam,  float fx, float fy, float tx, float t
 
 void PositionControl::resetColor()
 {
-	colors[3]=SrVec(100.0/255.0, 220.0/255.0, 1.);
+	colors[3]=SrVec(100.0f/255.0f, 220.0f/255.0f, 1.0f);
 	colors[0]=SrVec(1,0,0);
-	colors[1]=SrVec(0,154.0/255.0,82.0/255.0);
+	colors[1]=SrVec(0,154.0f/255.0f,82.0f/255.0f);
 	colors[2]=SrVec(0,0,1);
 
 	if (0<=opdir && opdir<=3)

@@ -29,7 +29,7 @@ RotationControl::RotationControl(void) : ObjectControl()
 	seg=100;
 	circle.resize(seg);
 	for (int i=0;i<seg;i++)
-		circle[i]=SrVec2(cos(2.0*M_PI/seg*i),sin(2.0*M_PI/seg*i));
+		circle[i]=SrVec2(cos(2.0f*(float)M_PI/seg*i),sin(2.0f*(float)M_PI/seg*i));
 }
 
 RotationControl::~RotationControl(void)
@@ -135,21 +135,21 @@ void RotationControl::draw(SrCamera& cam)
 			//		circle_copy[i]=pm->r_matrix*(radius[1]*ratio*(Vec3f(0,circle[i][0],circle[i][1])));
 			circle_copy[i]=(radius[1]*ratio*(SrVec(0,circle[i][0],circle[i][1])))*m;
 		glColor3fv(colors[0]);	
-		glLineWidth(lineWidth[0]);
+		glLineWidth((GLfloat)lineWidth[0]);
 		drawVisibleCircle(circle_copy,SrVec(0,0,0),nm);
 
 		for (int i=0;i<seg;i++)
 			//		circle_copy[i]=pm->r_matrix*(radius[1]*ratio*(Vec3f(circle[i][1],0,circle[i][0])));
 			circle_copy[i]=(radius[1]*ratio*(SrVec(circle[i][1],0,circle[i][0])))*m;
 		glColor3fv(colors[1]);
-		glLineWidth(lineWidth[1]);
+		glLineWidth((GLfloat)lineWidth[1]);
 		drawVisibleCircle(circle_copy,SrVec(0,0,0),nm);
 
 		for (int i=0;i<seg;i++)
 			//		circle_copy[i]=pm->r_matrix*(radius[1]*ratio*(Vec3f(circle[i][0],circle[i][1],0)));
 			circle_copy[i]=(radius[1]*ratio*(SrVec(circle[i][0],circle[i][1],0)))*m;
 		glColor3fv(colors[2]);
-		glLineWidth(lineWidth[2]);
+		glLineWidth((GLfloat)lineWidth[2]);
 		drawVisibleCircle(circle_copy,SrVec(0,0,0),nm);
 
 		glLineWidth(1.0); // reset to default			
@@ -185,16 +185,16 @@ bool RotationControl::drag(SrCamera& cam,  float fx, float fy, float tx, float t
 	GLint viewport[4];
 	glGetIntegerv(GL_VIEWPORT,viewport);
 	
-	fx = ((fx+1.0)*viewport[2]*0.5);
-	fy = ((fy+1.0)*viewport[3]*0.5);
+	fx = ((fx+1.0f)*viewport[2]*0.5f);
+	fy = ((fy+1.0f)*viewport[3]*0.5f);
 
-	tx = ((tx+1.0)*viewport[2]*0.5);
-	ty = ((ty+1.0)*viewport[3]*0.5);
+	tx = ((tx+1.0f)*viewport[2]*0.5f);
+	ty = ((ty+1.0f)*viewport[3]*0.5f);
 
 	if (opdir<3){
 		float min_f_d=1e10,min_t_d=1e10;
 		int min_f_id,min_t_id;
-		int sx,sy;
+		//int sx,sy;
 		SrVec cr;
 		for (int i=0;i<seg;i++){
 			if (opdir==0)
@@ -221,7 +221,7 @@ bool RotationControl::drag(SrCamera& cam,  float fx, float fy, float tx, float t
 		SrVec axis=SrVec(0,0,0);
 		axis[opdir]=1;
 		SrQuat quatOffset;
-		float angle = 2.*M_PI/seg*(min_t_id-min_f_id);
+		float angle = 2.0f*(float)M_PI/seg*(min_t_id-min_f_id);
 		quatOffset.set(axis,angle);
 		SrQuat newRot = getWorldRot()*quatOffset;
 		setWorldRot(newRot);
@@ -236,9 +236,9 @@ bool RotationControl::drag(SrCamera& cam,  float fx, float fy, float tx, float t
 void RotationControl::resetColor()
 {
 	colors[0]=SrVec(1,0,0);
-	colors[1]=SrVec(0,154.0/255.0,82.0/255.0);
+	colors[1]=SrVec(0,154.0f/255.0f,82.0f/255.0f);
 	colors[2]=SrVec(0,0,1);
-	colors[3]=SrVec(100.0/255.0, 220.0/255.0, 1.);
+	colors[3]=SrVec(100.0f/255.0f, 220.0f/255.0f, 1.);
 	colors[4]=SrVec(0.5,0.5,0.5);
 
 	if (0<=opdir && opdir<=3)
@@ -259,15 +259,15 @@ void RotationControl::drawVisibleCircle( std::vector<SrVec> &cl,SrVec &center,Sr
 	
 
 	if (dot((cl[i]-center),n)>=0){
-		while(dot((cl[i]-center),n)>=0 && ct<circle.size()){
+		while(dot((cl[i]-center),n)>=0 && (size_t)ct<circle.size()){
 			i=(i==0)?cl.size()-1:i-1;
 			ct++;
 		}
-		i=(i<cl.size()-1)?i+1:0;
+		i=((size_t)i<cl.size()-1)?i+1:0;
 	}
 	else{
 		while(dot(cl[i]-center,n)<0)
-			i=(i<cl.size()-1)?i+1:0;
+			i=((size_t)i<cl.size()-1)?i+1:0;
 	}
 	
 
@@ -279,9 +279,9 @@ void RotationControl::drawVisibleCircle( std::vector<SrVec> &cl,SrVec &center,Sr
 
 	ct=0;
 	glBegin(GL_LINE_STRIP);
-	while(dot((cl[i]-center),n)>=0 && ct<=circle.size()){
+	while(dot((cl[i]-center),n)>=0 && (size_t)ct<=circle.size()){
 		glVertex3fv(cl[i]);
-		i=(i<cl.size()-1)?i+1:0;
+		i=((size_t)i<cl.size()-1)?i+1:0;
 		ct++;
 	}	
 	glEnd();	
