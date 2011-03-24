@@ -238,7 +238,7 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 			xAxis->minimum(minX);
 			xAxis->maximum(maxX);
 			xAxis->callback(updateAxisValue, this);
-			yAxis = new fltk::ValueSlider(xDis, yDis, 2 * xDis, h - 5 * yDis, "Y");
+			yAxis = new fltk::ValueSlider(xDis, yDis, 3 * xDis, h - 5 * yDis, "Y");
 			yAxis->minimum(minY);
 			yAxis->maximum(maxY);
 			yAxis->callback(updateAxisValue, this);
