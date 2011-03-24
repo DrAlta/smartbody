@@ -37,12 +37,12 @@ class ParameterVisualization : public fltk::Group
 		virtual int handle(int event);
 		virtual void setup();
 		virtual void resize(int x, int y, int w, int h);
-		void setParam(float x, float y);
 		void setSlider(int x, int y);
+		void getActualPixel(float paramX, float paramY, int& x, int& y);
+		void setParam(int x, int y);
 
 	private:
 		void getBound(int ptX, int ptY, int& x, int& y, int& w, int& h);
-		void getActualPixel(SrVec vec, int& x, int& y);
 
 	private:
 		static const int pad = 5;
@@ -97,8 +97,8 @@ class PARunTimeEditor : public fltk::Group
 		std::string			prevCycleState;
 
 		fltk::Group*		parameterGroup;
-		ParameterGroup*		nonCycleParamGroup;
-		ParameterGroup*		cycleParamGroup;
+		ParameterGroup*		paramGroup;
+
 	public:
 		void update();
 		void updateRunTimeStates(std::string currentState);
