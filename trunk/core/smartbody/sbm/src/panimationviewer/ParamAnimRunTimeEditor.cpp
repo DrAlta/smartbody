@@ -81,9 +81,9 @@ void ParameterVisualization::draw()
 		SrVec vec2 = state->paramManager->getTriangle(i).b;
 		SrVec vec3 = state->paramManager->getTriangle(i).c;
 		int x1, y1, x2, y2, x3, y3;
-		getActualPixel(vec1, x1, y1);
-		getActualPixel(vec2, x2, y2);
-		getActualPixel(vec3, x3, y3);
+		getActualPixel(vec1.x, vec1.y, x1, y1);
+		getActualPixel(vec2.x, vec2.y, x2, y2);
+		getActualPixel(vec3.x, vec3.y, x3, y3);
 		fltk::drawline(x1, y1, x2, y2);
 		fltk::drawline(x1, y1, x3, y3);
 		fltk::drawline(x3, y3, x2, y2);
@@ -162,13 +162,6 @@ void ParameterVisualization::resize(int x, int y, int w, int h)
 	redraw();
 }
 
-void ParameterVisualization::setParam(float x, float y)
-{
-	paramX = centerX + int(x / scaleX);
-	paramY = centerY - int(y / scaleY);
-	redraw();
-}
-
 void ParameterVisualization::getBound(int ptX, int ptY, int& x, int& y, int& w, int& h)
 {
 	x = ptX - pad;
@@ -177,16 +170,26 @@ void ParameterVisualization::getBound(int ptX, int ptY, int& x, int& y, int& w, 
 	h = 2 * pad;
 }
 
-void ParameterVisualization::getActualPixel(SrVec vec, int& x, int& y)
+// input actual parameter, returning pixel on the screen
+void ParameterVisualization::getActualPixel(float paramX, float paramY, int& x, int& y)
 {
 	if (fabs(scaleX) > 0.0001)
-		x = int(vec.x / scaleX);
+		x = int(paramX / scaleX);
 	x = centerX + x;
 	if (fabs(scaleY) > 0.0001)
-		y = int(vec.y / scaleY);
+		y = int(paramY / scaleY);
 	y = centerY - y;
 }
 
+// set the parameter location on the screen
+void ParameterVisualization::setParam(int x, int y)
+{
+	paramX = x;
+	paramY = y;
+	redraw();
+}
+
+// given mouse position on the screen, set the parameter and slider (slider shows the value of parameter)
 void ParameterVisualization::setSlider(int x, int y)
 {
 	double valueX = (x - centerX) * scaleX;
@@ -200,10 +203,9 @@ void ParameterVisualization::setSlider(int x, int y)
 	else
 		state->paramManager->setWeight((float)valueX);
 	paramGroup->updateWeight();
-	float newX, newY;
-	state->paramManager->getParameter(newX, newY);
-	paramX = int(centerX + newX / scaleX);
-	paramY = int(centerY - newY / scaleY);
+	float actualParamX, actualParamY;
+	state->paramManager->getParameter(actualParamX, actualParamY);
+	this->getActualPixel(actualParamX, actualParamY, paramX, paramY);
 	redraw();
 }
 
@@ -225,8 +227,11 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 			xAxis->maximum(max);
 			xAxis->value(min);
 			xAxis->callback(updateXAxisValue, this);
-			double actualValue = state->paramManager->getPrevVec().x;
-			paramVisualization->setSlider(int(actualValue), 0);
+			float actualValue;
+			s->paramManager->getParameter(actualValue);
+			int actualX, actualY;
+			paramVisualization->getActualPixel(actualValue, 0.0f, actualX, actualY);
+			paramVisualization->setSlider(actualX, actualY);
 		}
 		if (type == 1)
 		{
@@ -243,9 +248,11 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 			yAxis->maximum(maxY);
 			yAxis->callback(updateAxisValue, this);
 			yAxis->set_vertical();
-			double actualValueX = state->paramManager->getPrevVec().x;
-			double actualValueY = state->paramManager->getPrevVec().y;
-			paramVisualization->setSlider((int)actualValueX, (int)actualValueY);
+			float actualValueX, actualValueY;
+			s->paramManager->getParameter(actualValueX, actualValueY);
+			int actualX, actualY;
+			paramVisualization->getActualPixel(actualValueX, actualValueY, actualX, actualY);
+			paramVisualization->setSlider(actualX, actualY);
 		}
 	this->end();
 	
@@ -268,7 +275,9 @@ void ParameterGroup::updateXAxisValue(fltk::Widget* widget, void* data)
 	group->state->paramManager->setWeight(w);
 	if (group->exec)
 		group->updateWeight();
-	group->paramVisualization->setParam((float)w, 0);
+	int x, y;
+	group->paramVisualization->getActualPixel(float(w), 0.0f, x, y);
+	group->paramVisualization->setSlider(x, y);
 }
 
 void ParameterGroup::updateAxisValue(fltk::Widget* widget, void* data)
@@ -279,11 +288,15 @@ void ParameterGroup::updateAxisValue(fltk::Widget* widget, void* data)
 	group->state->paramManager->setWeight(x, y);
 	if (group->exec)
 		group->updateWeight();
-	group->paramVisualization->setParam((float)x, (float)y);
+	int pixelX, pixelY;
+	group->paramVisualization->getActualPixel(float(x), float(y), pixelX, pixelY);
+	group->paramVisualization->setSlider(pixelX, pixelY);
 }
 
 void ParameterGroup::updateWeight()
 {
+	if (!state->cycle)
+		return;
 	std::string charName = paWindow->characterList->child(paWindow->characterList->value())->label();
 	std::stringstream command;
 	command << "panim update char " << charName;
@@ -311,9 +324,8 @@ PARunTimeEditor::PARunTimeEditor(int x, int y, int w, int h, PanimationWindow* w
 		parameterGroup->box(fltk::UP_BOX);
 	this->end();
 	this->resizable(parameterGroup);
+	paramGroup = NULL;
 	initializeRunTimeEditor();
-	nonCycleParamGroup = NULL;
-	cycleParamGroup = NULL;
 }
 
 PARunTimeEditor::~PARunTimeEditor()
@@ -335,6 +347,22 @@ void PARunTimeEditor::update()
 		updateRunTimeStates(currentState);
 		prevCycleState = currentState;
 		currentCycleState->value(currentState.c_str());
+	}
+
+	if (paramGroup)
+	{
+		PAStateData* state = character->param_animation_ct->getCurrentPAStateData();
+		if (state)
+		{
+			if (state->cycle)
+			{
+				float x, y;
+				state->paramManager->getParameter(x, y);
+				int actualPixelX, actualPixelY;
+				paramGroup->paramVisualization->getActualPixel(x, y, actualPixelX, actualPixelY);
+				paramGroup->paramVisualization->setParam(actualPixelX, actualPixelY);
+			}
+		}
 	}
 }
 
@@ -370,6 +398,18 @@ void PARunTimeEditor::updateRunTimeStates(std::string currentState)
 		nextCycleStates->select(i, false);
 	availableTransitions->clear();
 
+	if (paramGroup)
+	{
+		parameterGroup->remove(paramGroup);
+		delete paramGroup;
+		paramGroup = NULL;
+	}
+	if (stateData)
+	{
+		paramGroup = new ParameterGroup(0, 0, parameterGroup->w(), parameterGroup->h(), "", stateData, paWindow);
+		parameterGroup->add(paramGroup);
+		paramGroup->show();
+	}
 }
 
 void PARunTimeEditor::addItem(fltk::Browser* browser, std::string item)
@@ -414,22 +454,15 @@ void PARunTimeEditor::updateNonCycleState(fltk::Widget* widget, void* data)
 	}
 	if (mcuCBHandle::singleton().lookUpPAState(nonCycleState)->paramManager->getNumParameters() > 0)
 	{
-		if (editor->nonCycleParamGroup)
+		if (editor->paramGroup)
 		{
-			editor->parameterGroup->remove(editor->nonCycleParamGroup);
-			delete editor->nonCycleParamGroup;
-			editor->nonCycleParamGroup = NULL;
+			editor->parameterGroup->remove(editor->paramGroup);
+			delete editor->paramGroup;
+			editor->paramGroup = NULL;
 		}
-		if (editor->cycleParamGroup)
-		{
-			editor->parameterGroup->remove(editor->cycleParamGroup);
-			delete editor->cycleParamGroup;
-			editor->cycleParamGroup = NULL;
-		}
-
-		editor->nonCycleParamGroup = new ParameterGroup(0, 0, editor->parameterGroup->w(), editor->parameterGroup->h(), "", mcuCBHandle::singleton().lookUpPAState(nonCycleState), editor->paWindow);
-		editor->parameterGroup->add(editor->nonCycleParamGroup);
-		editor->nonCycleParamGroup->show();
+		editor->paramGroup = new ParameterGroup(0, 0, editor->parameterGroup->w(), editor->parameterGroup->h(), "", mcuCBHandle::singleton().lookUpPAState(nonCycleState), editor->paWindow);
+		editor->parameterGroup->add(editor->paramGroup);
+		editor->paramGroup->show();
 	}
 }
 
@@ -535,19 +568,14 @@ void PARunTimeEditor::run(fltk::Widget* widget, void* data)
 	if (nextCycleState == "Idle" || nextCycleState == "") return;
 	if (mcuCBHandle::singleton().lookUpPAState(nextCycleState)->paramManager->getNumParameters() > 0)
 	{
-		if (editor->cycleParamGroup)
+		if (editor->paramGroup)
 		{
-			editor->parameterGroup->remove(editor->cycleParamGroup);
-			delete editor->cycleParamGroup;
+			editor->parameterGroup->remove(editor->paramGroup);
+			delete editor->paramGroup;
+			editor->paramGroup = NULL;
 		}
-		if (editor->nonCycleParamGroup)
-		{
-			editor->parameterGroup->remove(editor->nonCycleParamGroup);
-			delete editor->nonCycleParamGroup;
-			editor->nonCycleParamGroup = NULL;
-		}
-		editor->cycleParamGroup = new ParameterGroup(0, 0, editor->parameterGroup->w(), editor->parameterGroup->h(), "", mcuCBHandle::singleton().lookUpPAState(nextCycleState), editor->paWindow, true);
-		editor->parameterGroup->add(editor->cycleParamGroup);
-		editor->cycleParamGroup->show();
+		editor->paramGroup = new ParameterGroup(0, 0, editor->parameterGroup->w(), editor->parameterGroup->h(), "", mcuCBHandle::singleton().lookUpPAState(nextCycleState), editor->paWindow, true);
+		editor->parameterGroup->add(editor->paramGroup);
+		editor->paramGroup->show();
 	}
 }

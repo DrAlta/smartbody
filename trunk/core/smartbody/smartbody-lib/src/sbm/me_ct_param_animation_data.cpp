@@ -73,6 +73,8 @@ ParameterManager::~ParameterManager()
 
 bool ParameterManager::setWeight(double x)
 {
+	if (type == 1)
+		return false;
 	double left = -9999.0;
 	double right = 9999.0;
 	std::string leftMotion = "";
@@ -127,6 +129,8 @@ bool ParameterManager::setWeight(double x)
 
 bool ParameterManager::setWeight(double x, double y)
 {
+	if (type == 0)
+		return false;
 	SrVec pt = SrVec((float)x, (float)y, 0);
 	for (int i = 0; i < getNumTriangles(); i++)
 	{
