@@ -253,6 +253,10 @@ void SkSkeleton::copy_joint(SkJoint* dest, SkJoint* src)
 	destPos->limits(SkVecLimits::Y, srcPos->limits(SkVecLimits::Y));
 	destPos->limits(SkVecLimits::Z, srcPos->limits(SkVecLimits::Z));
 
+	destPos->lower_limit(SkVecLimits::X, srcPos->lower_limit(SkVecLimits::X));
+	destPos->lower_limit(SkVecLimits::Y, srcPos->lower_limit(SkVecLimits::Y));
+	destPos->lower_limit(SkVecLimits::Z, srcPos->lower_limit(SkVecLimits::Z));
+
 	if (src->quat()->active())
 		dest->quat()->activate();
 
