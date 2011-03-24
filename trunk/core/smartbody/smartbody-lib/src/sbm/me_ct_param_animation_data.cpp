@@ -98,7 +98,7 @@ bool ParameterManager::setWeight(double x)
 	{
 		int id = state->getMotionId(leftMotion);
 		state->weights[id] = 1.0;
-		return true;
+		setPrevVec(SrVec((float)x, 0.0f, 0.0f));
 	}
 	else
 	{
@@ -109,10 +109,20 @@ bool ParameterManager::setWeight(double x)
 		{
 			state->weights[leftId] = 1 - weight;
 			state->weights[rightId] = weight;
-			return true;
+			setPrevVec(SrVec((float)x, 0.0, 0.0));
+		}
+		if (leftId >=0 && rightId < 0)
+		{
+			state->weights[leftId] = 1.0;
+			setPrevVec(SrVec((float)left, 0.0, 0.0));
+		}
+		if (rightId >=0 && leftId < 0)
+		{
+			state->weights[rightId] = 1.0;
+			setPrevVec(SrVec((float)right, 0.0, 0.0));
 		}
 	}
-	return false;
+	return true;
 }
 
 bool ParameterManager::setWeight(double x, double y)
@@ -132,10 +142,54 @@ bool ParameterManager::setWeight(double x, double y)
 			for (int i = 0; i < state->getNumMotions(); i++)
 				state->weights[i] = 0.0;
 			getWeight(pt, v1, v2, v3, state->weights[id1], state->weights[id2], state->weights[id3]);
+			setPrevVec(pt);
 			return true;
 		}
 	}
-	return false;
+
+	// find the nearest dist
+	SrVec param;
+	float minDist = 9999;
+	int triangleId = -1;
+	for (int i = 0; i < getNumTriangles(); i++)
+	{
+		SrVec v1 = triangles[i].triangle.a;
+		SrVec v2 = triangles[i].triangle.b;
+		SrVec v3 = triangles[i].triangle.c;
+		SrVec vec;
+		float dist = getMinimumDist(pt, v1, v2, vec);
+		if (dist <= minDist)
+		{
+			minDist = dist;
+			param = vec;
+			triangleId = i;
+		}
+		dist = getMinimumDist(pt, v3, v2, vec);
+		if (dist <= minDist)
+		{
+			minDist = dist;
+			param = vec;
+			triangleId = i;
+		}
+		dist = getMinimumDist(pt, v1, v3, vec);
+		if (dist <= minDist)
+		{
+			minDist = dist;
+			param = vec;
+			triangleId = i;
+		}
+	}
+	for (int i = 0; i < state->getNumMotions(); i++)
+		state->weights[i] = 0.0;
+	SrVec v1 = triangles[triangleId].triangle.a;
+	SrVec v2 = triangles[triangleId].triangle.b;
+	SrVec v3 = triangles[triangleId].triangle.c;
+	int id1 = state->getMotionId(triangles[triangleId].motion1);
+	int id2 = state->getMotionId(triangles[triangleId].motion2);
+	int id3 = state->getMotionId(triangles[triangleId].motion3);
+	getWeight(param, v1, v2, v3, state->weights[id1], state->weights[id2], state->weights[id3]);
+	setPrevVec(param);
+	return true;
 }
 
 
@@ -349,6 +403,27 @@ int ParameterManager::getNumTriangles()
 SrTriangle& ParameterManager::getTriangle(int id)
 {
 	return triangles[id].triangle;
+}
+
+float ParameterManager::getMinimumDist(SrVec& c, SrVec& a, SrVec& b, SrVec& minimumPt)
+{
+	SrVec ab = b - a;
+	SrVec ac = c - a;
+	float f = dot(ab, ac);
+	float d = dot(ab, ab);
+	if (f < 0)
+	{
+		minimumPt = a;
+		return dist(c, a);
+	}
+	if (f > d)
+	{
+		minimumPt = b;
+		return dist(c, b);
+	}
+	f = f / d;
+	minimumPt = a + f * ab;
+	return dist(c, minimumPt);
 }
 
 bool ParameterManager::insideTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3)

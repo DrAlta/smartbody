@@ -189,24 +189,21 @@ void ParameterVisualization::getActualPixel(SrVec vec, int& x, int& y)
 
 void ParameterVisualization::setSlider(int x, int y)
 {
-	state->paramManager->setPrevVec(SrVec((float)x, (float)y, 0));
 	double valueX = (x - centerX) * scaleX;
 	double valueY = (centerY - y) * scaleY;
-	if (valueX <= paramGroup->xAxis->minimum()) valueX = paramGroup->xAxis->minimum();
-	if (valueX >= paramGroup->xAxis->maximum()) valueX = paramGroup->xAxis->maximum();
 	paramGroup->xAxis->value((float)valueX);
 	if (paramGroup->yAxis)
 	{
-		if (valueY <= paramGroup->yAxis->minimum()) valueY = paramGroup->yAxis->minimum();
-		if (valueY >= paramGroup->yAxis->maximum()) valueY = paramGroup->yAxis->maximum();
 		state->paramManager->setWeight((float)valueX, (float)valueY);
 		paramGroup->yAxis->value((float)valueY);
 	}
 	else
 		state->paramManager->setWeight((float)valueX);
 	paramGroup->updateWeight();
-	paramX = x;
-	paramY = y;
+	float newX, newY;
+	state->paramManager->getParameter(newX, newY);
+	paramX = int(centerX + newX / scaleX);
+	paramY = int(centerY - newY / scaleY);
 	redraw();
 }
 
@@ -229,8 +226,7 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 			xAxis->value(min);
 			xAxis->callback(updateXAxisValue, this);
 			double actualValue = state->paramManager->getPrevVec().x;
-			if (actualValue <= max && actualValue >= min)
-				paramVisualization->setSlider(int(actualValue), 0);
+			paramVisualization->setSlider(int(actualValue), 0);
 		}
 		if (type == 1)
 		{
@@ -249,9 +245,7 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 			yAxis->set_vertical();
 			double actualValueX = state->paramManager->getPrevVec().x;
 			double actualValueY = state->paramManager->getPrevVec().y;
-			if (actualValueX <= maxX && actualValueX >= minX
-				&& actualValueY <= maxY && actualValueY >= minY)
-				paramVisualization->setSlider((int)actualValueX, (int)actualValueY);
+			paramVisualization->setSlider((int)actualValueX, (int)actualValueY);
 		}
 	this->end();
 	
@@ -342,7 +336,6 @@ void PARunTimeEditor::update()
 		prevCycleState = currentState;
 		currentCycleState->value(currentState.c_str());
 	}
-
 }
 
 void PARunTimeEditor::updateRunTimeStates(std::string currentState)

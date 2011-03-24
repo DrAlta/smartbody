@@ -100,6 +100,8 @@ class ParameterManager
 		int getNumTriangles();
 		SrTriangle& getTriangle(int id);
 
+		float getMinimumDist(SrVec& pt, SrVec& a, SrVec& b, SrVec& minimumPt);
+
 	private:
 		bool insideTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3);
 		void getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, double& w1, double& w2, double& w3);
