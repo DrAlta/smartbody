@@ -234,10 +234,13 @@ void PanimationWindow::execCmd(PanimationWindow* window, std::string cmd, double
 	}
 }
 
-void PanimationWindow::addTimeMark(nle::NonLinearEditorModel* model)
+void PanimationWindow::addTimeMark(nle::NonLinearEditorModel* model, bool selective)
 {
 	for (int i = 0; i < model->getNumTracks(); i++)
 	{
+		if (selective && !model->getTrack(i)->isSelected())
+			continue;
+
 		nle::Block* block = model->getTrack(i)->getBlock(0);
 		CorrespondenceMark* toAddMark = new CorrespondenceMark();
 		toAddMark->setStartTime(0.0);

@@ -845,8 +845,8 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			if (args.calc_num_tokens() == 2)
 			{
 				newTransition->fromMotionName = args.read_token();
-				newTransition->easeOutStart = mcu_p->lookUpMotion(newTransition->fromMotionName.c_str())->duration() - defaultTransition;
-				newTransition->easeOutEnd = mcu_p->lookUpMotion(newTransition->fromMotionName.c_str())->duration();
+				newTransition->easeOutStart.push_back(mcu_p->lookUpMotion(newTransition->fromMotionName.c_str())->duration() - defaultTransition);
+				newTransition->easeOutEnd.push_back(mcu_p->lookUpMotion(newTransition->fromMotionName.c_str())->duration());
 				newTransition->toMotionName = args.read_token();
 				newTransition->easeInStart = 0.0;
 				newTransition->easeInEnd = defaultTransition;
@@ -854,8 +854,12 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			else
 			{
 				newTransition->fromMotionName = args.read_token();
-				newTransition->easeOutStart = args.read_double();
-				newTransition->easeOutEnd = args.read_double();
+				int numOfEaseOut = args.read_int();
+				for (int i = 0; i < numOfEaseOut; i++)
+				{
+					newTransition->easeOutStart.push_back(args.read_double());
+					newTransition->easeOutEnd.push_back(args.read_double());
+				}
 				newTransition->toMotionName = args.read_token();
 				newTransition->easeInStart = args.read_double();
 				newTransition->easeInEnd = args.read_double();

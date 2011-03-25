@@ -633,6 +633,7 @@ void PAStateModule::evaluate(double timeStep, SrBuffer<float>& buffer)
 		active = false;
 }
 
+
 PATransitionManager::PATransitionManager()
 {
 	blendingMode = true;
@@ -645,6 +646,20 @@ PATransitionManager::PATransitionManager()
 	localTime = 0.0;
 	s1 = 0.0;
 	e1 += defaultTransition;
+	s2 = 0.0;
+	e2 += defaultTransition;
+}
+
+PATransitionManager::PATransitionManager(double easeOutStart)
+{
+	blendingMode = false;
+	active = true;
+	data = NULL;
+	curve = new srLinearCurve();
+	duration = defaultTransition;
+	localTime = 0.0;
+	s1 = easeOutStart;
+	e1 = s1 + defaultTransition;
 	s2 = 0.0;
 	e2 += defaultTransition;
 }
@@ -671,6 +686,16 @@ PATransitionManager::~PATransitionManager()
 */
 void PATransitionManager::align(PAStateModule* current, PAStateModule* next)
 {
+	int numEaseOut = getNumEaseOut();
+	for (int i = 0; i < numEaseOut; i++)
+	{
+		if (fabs(current->timeManager->localTime - easeOutStarts[i]) < mcuCBHandle::singleton().time_dt)
+		{
+			s1 = easeOutStarts[i];
+			e1 = easeOutEnds[i];
+		}
+	}
+
 	if (fabs(current->timeManager->localTime - s1) < mcuCBHandle::singleton().time_dt)
 	{
 		next->active = true;
@@ -707,13 +732,17 @@ void PATransitionManager::update()
 			id = i;
 		}
 	}
-	if (data->easeOutStart < fromKey[0])
+	
+	for (int i = 0; i < data->getNumEaseOut(); i++)
 	{
-		data->easeOutStart += data->fromState->motions[id]->duration();
-		data->easeOutEnd += data->fromState->motions[id]->duration();
+		if (data->easeOutStart[i] < fromKey[0])
+		{
+			data->easeOutStart[i] += data->fromState->motions[id]->duration();
+			data->easeOutEnd[i] += data->fromState->motions[id]->duration();
+		}
+		easeOutStarts.push_back(getTime(data->easeOutStart[i], fromKey, data->fromState->keys, data->fromState->weights));
+		easeOutEnds.push_back(getTime(data->easeOutEnd[i], fromKey, data->fromState->keys, data->fromState->weights));
 	}
-	s1 = getTime(data->easeOutStart, fromKey, data->fromState->keys, data->fromState->weights);
-	e1 = getTime(data->easeOutEnd, fromKey, data->fromState->keys, data->fromState->weights);
 
 	std::vector<double> toKey;
 	for (int i = 0; i < data->toState->getNumMotions(); i++)
@@ -740,6 +769,14 @@ double PATransitionManager::getSlope()
 {
 	double slope = (s1 - e1) / (s2 - e2);
 	return slope;
+}
+
+int PATransitionManager::getNumEaseOut()
+{
+	if (easeOutStarts.size() != easeOutEnds.size())
+		return -1;
+	else
+		return easeOutStarts.size();
 }
 
 void PATransitionManager::bufferBlending(SrBuffer<float>& buffer, SrBuffer<float>& buffer1, SrBuffer<float>& buffer2, double w, MeControllerContext* _context)
