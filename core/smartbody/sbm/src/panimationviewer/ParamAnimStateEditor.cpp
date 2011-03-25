@@ -327,10 +327,11 @@ void PAStateEditor::updateStateTimeMark(fltk::Widget* widget, void* data)
 		for (int i = 0; i < editor->stateEditorNleModel->getNumTracks(); i++)
 		{
 			nle::Block* block = editor->stateEditorNleModel->getTrack(i)->getBlock(0);
+			currentState->keys[i].clear();
 			for (int j = 0; j < numOfMarks; j++)
 			{
 				double keyTime = block->getMark(j)->getStartTime();
-				currentState->keys[i][j] = keyTime;
+				currentState->keys[i].push_back(keyTime);
 			}
 		}
 		editor->updateCorrespondenceMarks(currentState);
