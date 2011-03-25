@@ -69,7 +69,7 @@ class PanimationWindow : public fltk::Window, public GenericViewer
 		bool checkCommand(std::string command);
 		static void execCmd(PanimationWindow* window, std::string command, double tOffset = 0.0);
 		std::vector<std::string> tokenize(const std::string& str,const std::string& delimiters);
-		void addTimeMark(nle::NonLinearEditorModel* model);
+		void addTimeMark(nle::NonLinearEditorModel* model, bool selective = false);
 		void removeTimeMark(nle::NonLinearEditorModel* model); 
 		void addTimeMarkToBlock(nle::Block* block, double t);
 

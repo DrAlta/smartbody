@@ -55,10 +55,13 @@ class PATransitionData
 		PAStateData* toState;
 		std::string fromMotionName;
 		std::string toMotionName;
-		double easeOutStart;
-		double easeOutEnd;
+		std::vector<double> easeOutStart;
+		std::vector<double> easeOutEnd;
 		double easeInStart;
 		double easeInEnd;
+		
+	public:
+		int getNumEaseOut();
 };
 
 struct TriangleInfo

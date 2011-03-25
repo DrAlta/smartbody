@@ -58,7 +58,10 @@ int PAStateData::getMotionId(std::string motion)
 	return -1;
 }
 
-
+int PATransitionData::getNumEaseOut()
+{
+	return easeOutStart.size();
+}
 
 ParameterManager::ParameterManager(PAStateData* s)
 {

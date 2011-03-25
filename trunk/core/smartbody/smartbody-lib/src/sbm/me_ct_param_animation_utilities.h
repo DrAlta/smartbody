@@ -163,6 +163,8 @@ class PATransitionManager
 		srLinearCurve* curve;
 		double duration;
 		double localTime;
+		std::vector<double> easeOutStarts;
+		std::vector<double> easeOutEnds;
 		double s1;
 		double e1;
 		double s2;
@@ -170,6 +172,7 @@ class PATransitionManager
 		
 	public:
 		PATransitionManager();
+		PATransitionManager(double easeOutStart);
 		PATransitionManager(PATransitionData* transitionData);
 		~PATransitionManager();
 
@@ -177,6 +180,7 @@ class PATransitionManager
 		void blending(SrBuffer<float>& buffer, SrBuffer<float>&buffer1, SrBuffer<float>&buffer2, SrMat& mat, SrMat& mat1, SrMat& mat2, double timeStep, MeControllerContext* context);
 		void update();
 		double getSlope();
+		int getNumEaseOut();
 
 		static void bufferBlending(SrBuffer<float>& buffer, SrBuffer<float>& buffer1, SrBuffer<float>& buffer2, double w, MeControllerContext* context);
 

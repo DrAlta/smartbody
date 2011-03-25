@@ -247,7 +247,7 @@ void PATransitionEditor::changeAnimForTransition(fltk::Widget* widget, void* dat
 void PATransitionEditor::addTransitionTimeMark(fltk::Widget* widget, void* data)
 {
 	PATransitionEditor* editor = (PATransitionEditor*) data;
-	editor->paWindow->addTimeMark(editor->transitionEditorNleModel);
+	editor->paWindow->addTimeMark(editor->transitionEditorNleModel, true);
 	editor->transitionTimeMarkWidget->setup();
 	editor->paWindow->redraw();
 }
@@ -297,13 +297,18 @@ void PATransitionEditor::updateTransitionTimeMark(fltk::Widget* widget, void* da
 		transition->fromMotionName = block1->getName();
 		if (block1->getNumMarks() == 0)	
 		{
-			transition->easeOutStart = mcuCBHandle::singleton().lookUpMotion(transition->fromMotionName.c_str())->duration() - defaultTransition;
-			transition->easeOutEnd = mcuCBHandle::singleton().lookUpMotion(transition->fromMotionName.c_str())->duration();
+			transition->easeOutStart.push_back(mcuCBHandle::singleton().lookUpMotion(transition->fromMotionName.c_str())->duration() - defaultTransition);
+			transition->easeOutEnd.push_back(mcuCBHandle::singleton().lookUpMotion(transition->fromMotionName.c_str())->duration());
 		}
 		else
 		{
-			transition->easeOutStart = block1->getMark(0)->getStartTime();
-			transition->easeOutEnd = block1->getMark(1)->getStartTime();	
+			transition->easeOutStart.clear();
+			transition->easeOutEnd.clear();
+			for (int i = 0; i < block1->getNumMarks() / 2; i++)
+			{
+				transition->easeOutStart.push_back(block1->getMark(i * 2 + 0)->getStartTime());
+				transition->easeOutEnd.push_back(block1->getMark(i * 2 + 1)->getStartTime());	
+			}
 		}
 		transition->toMotionName = block2->getName();
 		if (block2->getNumMarks() == 0)
@@ -356,7 +361,9 @@ void PATransitionEditor::createNewTransition(fltk::Widget* widget, void* data)
 		for (int i = 0; i < editor->animForTransition1->size(); i++)
 			if (editor->animForTransition1->selected(i))
 				createTransitionCommand << editor->animForTransition1->goto_index(i)->label() << " ";
-		createTransitionCommand << transition->easeOutStart << " " << transition->easeOutEnd << " ";
+		createTransitionCommand << transition->getNumEaseOut() << " ";
+		for (int i = 0; i < transition->getNumEaseOut(); i++)
+			createTransitionCommand << transition->easeOutStart[i] << " " << transition->easeOutEnd[i] << " ";
 		
 		for (int i = 0; i < editor->animForTransition2->size(); i++)
 			if (editor->animForTransition2->selected(i))
@@ -398,8 +405,11 @@ void PATransitionEditor::changeTransitionList(fltk::Widget* widget, void* data)
 	std::map<std::string, SkMotion*>::iterator iter = mcu.motion_map.find(transition->fromMotionName);
 	block1->setStartTime(0);
 	block1->setEndTime(iter->second->duration());
-	editor->paWindow->addTimeMarkToBlock(block1, transition->easeOutStart);
-	editor->paWindow->addTimeMarkToBlock(block1, transition->easeOutEnd);
+	for (int i = 0; i < transition->getNumEaseOut(); i++)
+	{
+		editor->paWindow->addTimeMarkToBlock(block1, transition->easeOutStart[i]);
+		editor->paWindow->addTimeMarkToBlock(block1, transition->easeOutEnd[i]);
+	}
 	block2->removeAllMarks();
 	block2->setName(transition->toMotionName);
 	iter = mcu.motion_map.find(transition->toMotionName);

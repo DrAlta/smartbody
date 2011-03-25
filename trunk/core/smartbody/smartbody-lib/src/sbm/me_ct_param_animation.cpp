@@ -238,7 +238,8 @@ void MeCtParamAnimation::autoScheduling(double time)
 		nextStateModule->active = false;
 		if (!data)
 		{
-			transitionManager = new PATransitionManager();			
+			transitionManager = new PATransitionManager(curStateModule->timeManager->getDuration() - defaultTransition);		
+	//		transitionManager = new PATransitionManager();
 #if PrintPADebugInfo
 		LOG("State %s being scheduled.[ACTIVE]", curStateModule->data->stateName.c_str());
 #endif
