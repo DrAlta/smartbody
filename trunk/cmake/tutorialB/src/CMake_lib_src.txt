@@ -1,8 +1,0 @@
-set( GWIZ_LIB_SRC
-
-	gwiz_gui.cpp
-	gwiz_math.cpp
-	gwiz_spline.cpp
-	lin_win.cpp
-	sgi_ogl_font.cpp
-)
