@@ -1,5 +1,0 @@
-set( 
-	EXAMPLE_LIB_SRC
-	lib_a.c
-	lib_b.c
-)
