@@ -216,7 +216,7 @@ bool MeCtExampleBodyReach::updateInterpolation(float dt, BodyMotionFrame& outFra
 		}		
 	    interpPos = getCurrentHandPos(interpMotionFrame);
 	}		
-	du = interpMotion->getRefDeltaTime(reachTime,dt);	
+	du = (float)interpMotion->getRefDeltaTime(reachTime,dt);	
 	outFrame = interpMotionFrame;
 
 	return interpHasReach;
