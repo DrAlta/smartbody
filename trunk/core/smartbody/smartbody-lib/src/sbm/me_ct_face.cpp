@@ -35,6 +35,7 @@ MeCtFace::MeCtFace( void )	{
    _duration = -1.0;
    _base_pose_p = NULL;
    _skeleton_ref_p = NULL;
+   _useVisemeClamping = true;
 }
 
 MeCtFace::~MeCtFace( void )	{
@@ -305,13 +306,38 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 
 	int c = 0;
 	SkMotion* key_pose_p;
-	_key_pose_map.reset();
 
+	float totalWeight = 0.0f;
+	if (isVisemeClamping())
+	{
+		_key_pose_map.reset();
+		while( key_pose_p = _key_pose_map.next() )
+		{
+			int weight_index = _kChan_to_buff[ c++ ];
+			if( weight_index >= 0 )
+			{
+				float key_weight = fbuffer[ weight_index ];
+				if( fabs( key_weight ) > 0.01 )
+				{
+					totalWeight += key_weight;
+				}
+			}
+		}
+		if (totalWeight <= 1.0f)
+			totalWeight = 1.0f;
+	}
+
+
+	c = 0;
+	_key_pose_map.reset();
 	while( key_pose_p = _key_pose_map.next() )	{
 		int weight_index = _kChan_to_buff[ c++ ];
 		if( weight_index >= 0 )	{
 			float key_weight = fbuffer[ weight_index ];
 			if( fabs( key_weight ) > 0.01 )	{
+				float adjustedWeight = key_weight;
+				if (isVisemeClamping())
+					adjustedWeight /= totalWeight;
 			
 //				LOG( "Face: '%s': %f\n", key_pose_p->name(), key_weight );
 			
@@ -349,8 +375,9 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 								( ch_type == SkChannel::YPos ) ||
 								( ch_type == SkChannel::ZPos )
 							)	{
+
 								fbuffer[ base_ch_index ] += 
-									( key_pose_buff_p[ pose_var_index ] - base_pose_buff_p[ baseBufferIndex ] ) * key_weight;
+									( key_pose_buff_p[ pose_var_index ] - base_pose_buff_p[ baseBufferIndex ] ) * adjustedWeight;
 							}
 							else
 							if( ch_type == SkChannel::Quat )	{
@@ -374,7 +401,7 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 									key_pose_buff_p[ pose_var_index + 3 ] 
 								);
 
-								gwiz::quat_t result_q = ( ( key_q * -base_q ) * key_weight ) * accum_q;
+								gwiz::quat_t result_q = ( ( key_q * -base_q ) * adjustedWeight ) * accum_q;
 
 								fbuffer[ base_ch_index ] = (float)result_q.w();
 								fbuffer[ base_ch_index + 1 ] = (float)result_q.x();
@@ -416,6 +443,16 @@ void MeCtFace::print_state( int tabCount ) {
 		LOG(" \"%s\"", str );
 
 	LOG("\n" );
+}
+
+void MeCtFace::setVisemeClamping(bool val)
+{
+	_useVisemeClamping = val;
+}
+
+bool MeCtFace::isVisemeClamping()
+{
+	return _useVisemeClamping;
 }
 
 //////////////////////////////////////////////////////////////////////////////////
