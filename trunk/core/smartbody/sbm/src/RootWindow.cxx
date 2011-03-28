@@ -1,4 +1,7 @@
 
+#include "fltk/Slider.h"  // before vhcl.h because of LOG enum which conflicts with vhcl::Log
+#include "vhcl.h"
+
 #include "RootWindow.h"
 
 #include <fltk/PackedGroup.h>
