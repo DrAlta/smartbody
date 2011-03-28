@@ -164,9 +164,10 @@ PositionControl::~PositionControl(void)
 {
 }
 
-void PositionControl::drawSphere(SrVec& pos, float fRadius)
+void PositionControl::drawSphere(SrVec& pos, float fRadius, SrVec& color)
 {
-	glColor3f(1.0, 0.0, 0.0);
+	//glColor3f(1.0, 0.0, 0.0);
+	glColor3f(color[0],color[1],color[2]);
 	SrSnSphere sphere;
 	sphere.shape().center = pos;//SrPnt(0, 0, 0);
 	sphere.shape().radius = fRadius;

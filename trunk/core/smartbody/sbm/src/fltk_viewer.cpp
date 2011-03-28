@@ -3435,14 +3435,31 @@ void FltkViewer::drawReach()
 			//PositionControl::drawSphere(gPos,1.0f);			
 		}	
 
-// 		SrVec reachTraj = reachCt->curReachTrajectory;
-// 
+		SrVec reachTraj = reachCt->curReachIKTrajectory;
+
 // 		SrSnSphere sphere;			
 // 		sphere.shape().center = SrPnt(reachTraj[0], reachTraj[1], reachTraj[2]);
 // 		sphere.shape().radius = 3.0;
 // 		sphere.color(SrColor(0.f,1.f,1.f));
 // 		sphere.render_mode(srRenderModeLines);
 // 		SrGlRenderFuncs::render_sphere(&sphere);
+
+		PositionControl::drawSphere(reachTraj,3.0,SrVec(0,1,1));
+
+
+
+		SrVec ikTraj = reachCt->ikTarget;
+// 		sphere.shape().center = SrPnt(ikTraj[0], ikTraj[1], ikTraj[2]);
+// 		sphere.shape().radius = 3.0;
+// 		sphere.color(SrColor(0.f,1.f,0.f));
+// 		sphere.render_mode(srRenderModeLines);
+// 		SrGlRenderFuncs::render_sphere(&sphere);
+		PositionControl::drawSphere(ikTraj,3.0,SrVec(0,1,0));
+
+		PositionControl::drawSphere(reachCt->interpPos,3.0,SrVec(1,0,1));
+		PositionControl::drawSphere(reachCt->curEffectorPos,3.0,SrVec(1,0,0));
+		PositionControl::drawSphere(reachCt->ikRoot,4.0,SrVec(0,0,0));
+		//PositionControl::drawSphere(reachCt->curEffectorPos,3.0,SrVec(0,0,1));
 
 		
 		for (unsigned int i=0;i<resampleData.size();i++)

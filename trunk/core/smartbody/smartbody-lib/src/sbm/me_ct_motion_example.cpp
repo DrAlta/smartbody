@@ -101,6 +101,12 @@ double BodyMotion::motionDuration(DurationType durType)
 	return motionTime;
 }
 
+double BodyMotion::strokeEmphasisTime()
+{
+	double emphTime = (motion->time_stroke_end()+motion->time_stroke_emphasis())*0.5f;	
+	return timeWarp->invTimeWarp(emphTime);
+}
+
 /************************************************************************/
 /* Motion Example                                                       */
 /************************************************************************/
@@ -137,6 +143,21 @@ double ResampleMotion::motionDuration(DurationType durType)
 		float w = weight[i].second;
 		BodyMotionInterface* motion = motions[idx];
 		motionTime += motion->motionDuration(durType)*w;
+	}
+	return motionTime;
+}
+
+
+double ResampleMotion::strokeEmphasisTime()
+{
+	double motionTime = 0.0;
+	VecOfBodyMotionPtr& motions = *motionDataRef;
+	for (unsigned int i=0;i<weight.size();i++)
+	{
+		int idx = weight[i].first;
+		float w = weight[i].second;
+		BodyMotionInterface* motion = motions[idx];
+		motionTime += motion->strokeEmphasisTime()*w;
 	}
 	return motionTime;
 }
@@ -373,3 +394,16 @@ double MotionExampleSet::blendMotionFunc( float time, SkSkeleton* skel, const ve
 	return newTime;
 }
 
+void MotionExampleSet::blendMotionFrame( BodyMotionFrame& startFrame, BodyMotionFrame& endFrame, float weight, BodyMotionFrame& outFrame )
+{
+	BodyMotionFrame tempFrame;
+	float oneMinusWeight = 1.f - weight;
+	tempFrame = startFrame;
+	tempFrame.rootPos = startFrame.rootPos*oneMinusWeight + endFrame.rootPos*weight;
+	for (int i=0;i<tempFrame.jointQuat.size();i++)
+	{
+		tempFrame.jointQuat[i] = slerp(startFrame.jointQuat[i],endFrame.jointQuat[i],weight);
+		tempFrame.jointQuat[i].normalize();
+	}
+	outFrame = tempFrame;	
+}

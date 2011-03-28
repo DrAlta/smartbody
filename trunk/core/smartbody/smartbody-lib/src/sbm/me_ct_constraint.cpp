@@ -167,15 +167,18 @@ bool MeCtConstraint::controller_evaluate( double t, MeFrameData& frame )
 		node->targetPos = cons->getPosConstraint();
 	}	
 
+
 	_skeleton->update_global_matrices();
-	//ik_scenario.ikTreeRoot->joint->parent()->update_gmat_up(); // update world offset global transformation
-	ik_scenario.ikGlobalMat = ik_scenario.ikTreeRoot->joint->parent()->gmat();		
+	//ik_scenario.ikTreeRoot->joint->parent()->update_gmat_up(); // update world offset global transformation	
+	ik_scenario.ikGlobalMat = ik_scenario.ikTreeRoot->joint->parent()->gmat();	
+	
 	ik.setDt(dt);
 	updateFading(dt);	
 
 	if (useIKConstraint) //&& ik_scenario.ikEndEffectors.size() != 0)	
 	{
 		{
+			//sr_out << "global offset mat = " << ik_scenario.ikGlobalMat << srnl;
 			for (int i=0;i<1;i++)
 			{
 				//printf("IK Iteration %d\n",i);

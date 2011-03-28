@@ -179,7 +179,7 @@ int MeCtIKTreeScenario::traverseJoint(SkJoint* joint, MeCtIKTreeNode* jointNode,
 		if (prevNode)
 			prevNode->brother = childNode;
 
-		if (strcmp(child->name().get_string(),"skullbase")==0)// || 
+		if (strcmp(child->name().get_string(),"spine4")==0)// || 
 			//strcmp(child->name().get_string(),"l_wrist")==0 ||
 			//strcmp(child->name().get_string(),"r_wrist")==0 )
 		{
@@ -203,7 +203,13 @@ void MeCtIKTreeScenario::updateQuat( const dVector& dTheta )
 	{
 		SrVec axisAngle = SrVec((float)dTheta(i*3),(float)dTheta(i*3+1),(float)dTheta(i*3+2));
 		MeCtIKTreeNode* node = ikTreeNodes[i];
-		SrQuat newQuat = SrQuat(axisAngle)*node->getQuat(QUAT_INIT);//ikInitQuatList[i]; // read from initQuat
+		SrQuat newQuat = SrQuat(axisAngle)*node->getQuat(QUAT_CUR);//ikInitQuatList[i]; // read from initQuat
+// 		float diffNorm = sqrtf(newQuat.x*newQuat.x + newQuat.y*newQuat.y + newQuat.z*newQuat.z + newQuat.w*newQuat.w);
+// 		if (diffNorm > 1.f)
+// 		{
+// 			//sr_out << "incorrect quat = " << diff << srnl;
+// 			printf("incorrect quat = %f %f %f %f, norm = %f\n",newQuat.w,newQuat.x,newQuat.y,newQuat.z,diffNorm);
+// 		}
 		newQuat.normalize();
 		node->setQuat(newQuat,QUAT_CUR);
 		//ikQuatList[i] = newQuat; // write to quat		
@@ -293,7 +299,7 @@ void MeCtIKTreeScenario::copyTreeNodeQuat( NodeQuatType typeFrom, NodeQuatType t
 
 MeCtJacobianIK::MeCtJacobianIK(void)
 {
-	dampJ = 180.0;
+	dampJ = 150.0;
 	refDampRatio = 0.01;
 	ikUseBalance = false;
 	ikUseReference = true;
@@ -335,42 +341,39 @@ void MeCtJacobianIK::update( MeCtIKTreeScenario* scenario )
 	{
 		updateReferenceJointJacobian(scenario);	
 		//solveDLS(matJnull,dSref,0.01,dThetaAux,matJrefInv);
-		dTheta += dThetaAux;		
-		scenario->updateQuat(dTheta);	
+		//dTheta += dThetaAux;		
+		scenario->updateQuat(dThetaAux);	
 	}
 }
 
 bool MeCtJacobianIK::updateReferenceJointJacobian( MeCtIKTreeScenario* s )
 {	
 	dSref = ublas::zero_vector<double>(s->ikTreeNodes.size()*3);
+	dThetaAux.resize(dSref.size());
 
-	float maxRotOffset = 0.2f;
+	float maxRotOffset = 0.1f;
 	for (unsigned int i=0;i<s->ikTreeNodes.size();i++)
 	{
 		MeCtIKTreeNode* endNode = s->ikTreeNodes[i];		
-		SrQuat nodeQuat = endNode->getQuat(QUAT_INIT);//s->ikQuatList[endNode->nodeIdx];
-		SrQuat refQuat = endNode->getQuat(QUAT_REF);//s->ikRefQuatList[endNode->nodeIdx];		
-// 		if (std::find(s->ikEndEffectors.begin(),s->ikEndEffectors.end(),endNode) !=  s->ikEndEffectors.end())
-// 		{
-// 			refQuat = endNode->getQuat(NodeQuatType::QUAT_CUR);
-// 		}
+		SrQuat nodeQuat = endNode->getQuat(QUAT_CUR);//s->ikQuatList[endNode->nodeIdx];
+		SrQuat refQuat = endNode->getQuat(QUAT_REF);//s->ikRefQuatList[endNode->nodeIdx];	
 		SrQuat diff = refQuat*nodeQuat.inverse();
-		diff.normalize();
+
+		diff.normalize(); // make sure it is a unit quaternion
 		SrVec axis;
 		float angle;
 		diff.get(axis,angle);
-		SrVec offset = axis*angle;
+		SrVec offset = axis*angle*0.9f;
+// 		if (offset.len() > maxRotOffset)
+// 		{
+// 			offset.normalize();
+// 			offset = offset*maxRotOffset;
+// 		}			
 
-		if (offset.len() > maxRotOffset)
-		{
-			offset.normalize();
-			offset = offset*maxRotOffset;
-		}	
-		
 		float weight = (float)(endNode->nodeLevel + 1);
 		for (int k=0;k<3;k++)
 		{			
-			dSref(i*3+k) = offset[k];//axis[k]*angle;//*0.9;
+			dSref(i*3+k) = offset[k];	
 		}
 	}
 	matrixVecMult(matJnull,dSref,dThetaAux);	
@@ -390,7 +393,7 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 	// plus rotation
 	dS.resize(s->ikPosEffectors->size()*3 + s->ikRotEffectors->size()*3);
 	
-	float maxOffset = 4.0f;
+	float maxOffset = 10.0f;
 	ConstraintMap::iterator ci;
 	int posCount = 0;
 	// fill in entries for positional constraint
@@ -400,9 +403,10 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 		EffectorConstraint* cons = ci->second;
 		MeCtIKTreeNode* endNode = s->findIKTreeNode(cons->efffectorName.c_str());
 		const SrMat& endMat = endNode->gmat;
-		SrVec endPos = SrVec(endMat.get(12),endMat.get(13),endMat.get(14));
+		SrVec endPos = endMat.get_translation();
 		SrVec offset = cons->getPosConstraint() - endPos;			
-		SrVec targetPos;			
+		SrVec targetPos;	
+		//sr_out << "effector offset = " << srnl;
 		if (offset.len() > maxOffset)
 		{
 			offset.normalize();
@@ -417,11 +421,17 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 		dS[posCount*3+2] = targetPos[2];		
 		
 		MeCtIKTreeNode* node = endNode->parent;
-		float fRatio = 1.f/(float)(endNode->nodeLevel + 1);
+		//float fRatio = 1.f/(float)(endNode->nodeLevel + 1);
 		bool bStop = false;
 		while(node && node->parent && !bStop) // no root node
 		{
 			int idx = node->nodeIdx;			
+			float nodeWeight = 1.f;//((float)node->nodeLevel+endNode->nodeLevel)/(endNode->nodeLevel*2.f);
+			if (node->nodeName == "r_acromioclavicular" || node->nodeName == "r_forearm") 
+				nodeWeight = 0.f;
+// 			if (node->nodeName == "r_forearm")
+// 				nodeWeight = 0.9;
+
 			const SrMat& nodeMat = node->gmat;
 			SrMat parentMat; 
 			if (node->parent)
@@ -433,21 +443,22 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 			SrVec axis[3];
 			for (int k=0;k<3;k++)
 			{				
-				axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2));
+				axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2));				
 				SrVec jVec = cross(axis[k],endPos-nodePos);
-				matJ(posCount*3+0,idx*3+k) = jVec[0];
-				matJ(posCount*3+1,idx*3+k) = jVec[1];	
-				matJ(posCount*3+2,idx*3+k) = jVec[2];							
+				matJ(posCount*3+0,idx*3+k) = jVec[0]*nodeWeight;
+				matJ(posCount*3+1,idx*3+k) = jVec[1]*nodeWeight;	
+				matJ(posCount*3+2,idx*3+k) = jVec[2]*nodeWeight;							
 			}		
 			if (node->nodeName == cons->rootName)
 				bStop = true;
+			
 			node = node->parent;
 		}
 		posCount++;
 	}
 
 	// fill in entries for rotational constraint
-	float maxRotOffset = 0.2f;
+	float maxRotOffset = 0.3f;
 	int offset_idx = s->ikPosEffectors->size()*3;
 	int rotCount = 0;
 	
