@@ -67,6 +67,7 @@ class MeCtFace : public MeController	{
 		SrBuffer<bool>			_include_chan_flag; // key channels to exclude from calculation
 		std::map<std::string, std::vector<int> > _visemeChannelMap;
 		std::vector<int> _baseChannelToBufferIndex;
+		bool				_useVisemeClamping;
 		
 	public:
 		static const char* type_name;
@@ -86,6 +87,9 @@ class MeCtFace : public MeController	{
 		void finish_adding( void );
 
 		virtual double controller_duration ();
+
+		void setVisemeClamping(bool val);
+		bool isVisemeClamping();
 
 	private:
 

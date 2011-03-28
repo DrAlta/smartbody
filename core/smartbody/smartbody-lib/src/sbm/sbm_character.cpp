@@ -24,6 +24,7 @@
  */
 
 #include "vhcl.h"
+#include "sbm_character.hpp"
 
 #include <stdio.h>
 
@@ -1724,6 +1725,30 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		return( prune_controller_tree( mcu_p ) );
 	}
 	else 
+	if( cmd == "clampvisemes" ) {
+		if (!this->face_ct)
+		{
+			LOG("Face controller not present for character %s. Command disabled.", this->name);
+			return CMD_SUCCESS;
+		}
+		char* next = args.read_token();
+		if (_strcmpi(next, "on") == 0)
+		{
+			this->face_ct->setVisemeClamping(true);
+			LOG("Character %s viseme plateau setting is now on.", this->name);
+		}
+		else if (_strcmpi(next, "off") == 0)
+		{
+			this->face_ct->setVisemeClamping(false);
+			LOG("Character %s viseme plateau setting is now off.", this->name);
+		}
+		else
+		{
+			LOG("Character %s viseme clamping is %s", this->name, this->face_ct->isVisemeClamping()? "on" : "off");
+			return CMD_SUCCESS;
+		}
+	}
+	else 
 	if( cmd == "viseme" ) { 
 		char* viseme = args.read_token();
 		char* next = args.read_token();
@@ -2154,6 +2179,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		LOG( "  viseme <viseme name> curve <number of keys> <curve information>" );
 		LOG( "  viseme curve" );
 		LOG( "  viseme plateau on|off" );
+		LOG( "  clampvisemes on|off" );
 		LOG( "  bone" );
 		LOG( "  bonep" );
 		LOG( "  remove" );
