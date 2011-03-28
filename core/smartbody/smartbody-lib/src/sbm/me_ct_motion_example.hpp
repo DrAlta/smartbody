@@ -37,6 +37,8 @@ public:
 public:
 	virtual void getMotionParameter(VecOfDouble& outPara);	
 	virtual double getMotionFrame(float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame) = 0;
+
+	virtual double strokeEmphasisTime() = 0;
 	virtual double motionDuration(DurationType durType) = 0;
 	virtual double motionPercent(float time) = 0; // compute how much percentage of time has elapsed until the motion reach its end
 	virtual double getRefDeltaTime(float u, float dt) = 0; // return the du in reference time frame based on current ref time & current acutual dt
@@ -50,6 +52,7 @@ public:
 public:
 	BodyMotion();
 	virtual ~BodyMotion();
+	virtual double strokeEmphasisTime();
 	virtual double getMotionFrame(float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame);
 	virtual double motionDuration(DurationType durType);	
 	virtual double motionPercent(float time);
@@ -99,6 +102,8 @@ public:
 public:
 	ResampleMotion(VecOfBodyMotionPtr* motionRef);
 	virtual ~ResampleMotion() {}
+
+	virtual double strokeEmphasisTime();
 	virtual double getMotionFrame(float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame);
 	virtual double motionDuration(DurationType durType);	
 	virtual void getExampleParameter(VecOfDouble& outPara);
@@ -158,6 +163,8 @@ public:
 public:
 	static double blendMotionFunc(float time, SkSkeleton* skel, const vector<SkJoint*>& joints, const VecOfBodyMotionPtr& motions, 
 		                        const VecOfInterpWeight& blendWeight, BodyMotionFrame& outMotionFrame);
+	// blend start frame to end frame based on blend weight
+	static void   blendMotionFrame( BodyMotionFrame& startFrame,  BodyMotionFrame& endFrame, float weight, BodyMotionFrame& outFrame);	
 };
 
 

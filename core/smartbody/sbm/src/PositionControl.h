@@ -56,7 +56,7 @@ public:
 	virtual void hitOPS(SrCamera& cam);	
 	virtual void identify(std::vector<int>& path);
 
-	static void drawSphere(SrVec& pos, float fRadius = 1.0);
+	static void drawSphere(SrVec& pos, float fRadius = 1.0, SrVec& color = SrVec(1.f,0,0));
 	void drawShadowSquare(float x,float y,float z,SrVec& dirx,SrVec& diry,float sz,unsigned int mode);	
 protected:
 	void drawCenter();		

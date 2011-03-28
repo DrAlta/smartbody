@@ -325,9 +325,9 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		ct_tree_p->add_controller(param_animation_ct);
 
 
-	ct_tree_p->add_controller( gaze_sched_p );
+	ct_tree_p->add_controller( gaze_sched_p );	
 
-	ct_tree_p->add_controller( reach_sched_p );
+	ct_tree_p->add_controller( reach_sched_p );	
 
 	if( eyelid_reg_ct_p )
 		ct_tree_p->add_controller( eyelid_reg_ct_p );

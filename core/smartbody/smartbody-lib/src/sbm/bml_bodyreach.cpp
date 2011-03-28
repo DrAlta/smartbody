@@ -49,8 +49,11 @@ const XMLCh TAG_DESCRIPTION[] = L"description";
 const XMLCh DTYPE_SBM[]  = L"ICT.SBM";
 
 ////// XML ATTRIBUTES
+const XMLCh ATTR_EFFECTOR[] = L"effector";
+const XMLCh ATTR_TARGET_POS[] = L"sbm:target-pos";
 const XMLCh ATTR_REACH_VELOCITY[] = L"sbm:reach-velocity";
-const XMLCh ATTR_APEX_DURATION[] = L"sbm:apex-duration";
+const XMLCh ATTR_REACH_FINISH[] = L"sbm:reach-finish";
+//const XMLCh ATTR_APEX_DURATION[] = L"sbm:apex-duration";
 
 
 
@@ -86,38 +89,89 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 			LOG("Handle : %s, controller not found.",handle.c_str());
 		}
 	}
+
+	const XMLCh* attrReachFinish = NULL;
+	attrReachFinish = elem->getAttribute(ATTR_REACH_FINISH);
+	if( attrReachFinish && XMLString::stringLen( attrReachFinish ) ) 
+	{
+		if( XMLString::compareIString( attrReachFinish, L"true" )==0 ) 
+		{			
+			LOG("Finish reaching = 'true'");
+			bodyReachCt->setFinishReaching(true);
+		}
+		else if( XMLString::compareIString( attrReachFinish, L"false" )==0 )
+		{			
+			LOG("Finish reaching = 'false'");
+			bodyReachCt->setFinishReaching(false);
+		}
+	}	
 	
 
-	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
-	if( !bodyReachCt && (!attrTarget || !XMLString::stringLen( attrTarget ) ) ) {		
-        wstrstr << "WARNING: BML::parse_bml_reach(): <"<<tag<<"> BML tag missing "<<ATTR_TARGET<<"= attribute.";
-		std::string str = convertWStringToString(wstrstr.str());
-		LOG(str.c_str());
-		return BehaviorRequestPtr();  // a.k.a., NULL
-    }
+	
+// 	if( !bodyReachCt && (!attrTarget || !XMLString::stringLen( attrTarget ) ) ) {		
+//         wstrstr << "WARNING: BML::parse_bml_reach(): <"<<tag<<"> BML tag missing "<<ATTR_TARGET<<"= attribute.";
+// 		std::string str = convertWStringToString(wstrstr.str());
+// 		LOG(str.c_str());
+// 		return BehaviorRequestPtr();  // a.k.a., NULL
+//     }
 
+	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
 	const SkJoint* target_joint = NULL;
 	if (attrTarget && XMLString::stringLen( attrTarget ))
 	{
-		target_joint = parse_target( tag, attrTarget, mcu );
-		
+		target_joint = parse_target( tag, attrTarget, mcu );		
 	}
 
-	if (target_joint == NULL && !bodyReachCt) {  // Invalid target.  Assume parse_target(..) printed error.
+	const XMLCh* attrEffector = NULL;
+	const char* effectorName = NULL;
+	attrEffector = elem->getAttribute(ATTR_EFFECTOR);	
+	SkJoint* effectorJoint = NULL;
+	if( attrEffector && XMLString::stringLen( attrEffector ) ) 
+	{
+		effectorName = asciiString(attrEffector);
+		effectorJoint = request->actor->skeleton_p->search_joint(effectorName);		
+	}
+
+	SrVec targetPos = SrVec();
+
+	XMLCh* token;
+	const XMLCh* attrTargetPos = elem->getAttribute( ATTR_TARGET_POS );		
+	if (attrTargetPos && XMLString::stringLen( attrTargetPos ))
+	{
+		wistringstream in;		
+		XMLStringTokenizer tokenizer( attrTargetPos );
+		if (tokenizer.countTokens() == 3)
+		{
+			for (int i=0;i<3;i++)
+			{
+				token = tokenizer.nextToken();
+				in.clear();
+				in.str( token );
+				in.seekg(0);
+				in >> targetPos[i];
+			}
+		}								
+	}
+
+// 	if (target_joint == NULL && !bodyReachCt) {  // Invalid target.  Assume parse_target(..) printed error.
+// 		return BehaviorRequestPtr();  // a.k.a., NULL
+// 	}
+
+	if (effectorJoint == NULL && !bodyReachCt) {  // Invalid target.  Assume parse_target(..) printed error.
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 
-	const XMLCh* attrApexDuration = elem->getAttribute( ATTR_APEX_DURATION );
-	float apexDuration = -1.f;
-	if(attrApexDuration != NULL && attrApexDuration[0] != '\0') 
-	{
-		if( !( wistringstream( attrApexDuration ) >> apexDuration) )
-		{
-			std::stringstream strstr;
-			strstr << "WARNING: Failed to parse apex-duration interval attribute \""<< XMLString::transcode(attrApexDuration) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
-			LOG(strstr.str().c_str());
-		}
-	}
+// 	const XMLCh* attrApexDuration = elem->getAttribute( ATTR_APEX_DURATION );
+// 	float apexDuration = -1.f;
+// 	if(attrApexDuration != NULL && attrApexDuration[0] != '\0') 
+// 	{
+// 		if( !( wistringstream( attrApexDuration ) >> apexDuration) )
+// 		{
+// 			std::stringstream strstr;
+// 			strstr << "WARNING: Failed to parse apex-duration interval attribute \""<< XMLString::transcode(attrApexDuration) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
+// 			LOG(strstr.str().c_str());
+// 		}
+// 	}
 
 	const XMLCh* attrReachVelocity = elem->getAttribute( ATTR_REACH_VELOCITY );
 	float reachVelocity = -1.f;
@@ -139,11 +193,11 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	bool bCreateNewController = false;
 	if (!bodyReachCt)
 	{
-		bodyReachCt = new MeCtExampleBodyReach(request->actor->skeleton_p);		
+		bodyReachCt = new MeCtExampleBodyReach(request->actor->skeleton_p, effectorJoint);		
 		bodyReachCt->handle(handle);
 		bodyReachCt->init();		
-		bodyReachCt->reachVelocity = reachVelocity > 0 ? reachVelocity : 50.f;
-		bodyReachCt->reachCompleteDuration = apexDuration > 0 ? apexDuration : 2.f;
+		bodyReachCt->reachVelocity = reachVelocity > 0 ? reachVelocity : 80.f;
+		//bodyReachCt->reachCompleteDuration = apexDuration > 0 ? apexDuration : 2.f;
 
 		const MotionDataSet& motionData = request->actor->getReachMotionDataSet();
 		bodyReachCt->updateMotionExamples(motionData);
@@ -152,14 +206,18 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 
 	if (reachVelocity > 0)
 		bodyReachCt->reachVelocity = reachVelocity;
-	if (apexDuration > 0)
-		bodyReachCt->reachCompleteDuration = apexDuration;
+// 	if (apexDuration > 0)
+// 		bodyReachCt->reachCompleteDuration = apexDuration;
 
 
 	if( target_joint )	{
 		SrVec reachPos = target_joint->gmat().get_translation();
-		bodyReachCt->setReachTarget(reachPos);	
+		//bodyReachCt->setReachTarget(reachPos);	
 		bodyReachCt->setReachTargetJoint(const_cast<SkJoint*>(target_joint));
+	}
+	else if (attrTargetPos && XMLString::stringLen( attrTargetPos ))
+	{
+		bodyReachCt->setReachTargetPos(targetPos);
 	}
 
 	boost::shared_ptr<MeControllerRequest> ct_request;

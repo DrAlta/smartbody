@@ -6,6 +6,7 @@
 
 using namespace std;
 
+// used when we want exact control for an end effector
 class EffectorConstantConstraint : public EffectorConstraint
 {
 public:		
@@ -31,6 +32,7 @@ public:
 protected:
 	SkSkeleton*           skeletonRef;	
 	SkJoint*              reachTargetJoint;		
+	SrVec                 reachTargetPos;
 	vector<SkJoint*>      affectedJoints; // list of joints that are affected by motion interpolation & IK. 
 	                                      // set to the full skeleton by default ( excluding fingers & face bones ).
 
@@ -47,21 +49,22 @@ protected:
 	vector<InterpolationExample*>* interpExampleData;
 	vector<InterpolationExample*>* resampleData;
 	
+
 	float                 reachTime; // local time for the reach motion	
 	float                 reachCompleteTime; 
 	float                 prev_time; // to get dt		
-	double                prevPercentTime, curPercentTime;
+	double                prevPercentTime, curPercentTime;	
 
-	
-
-	SrVec                 reachError, reachTarget, returnTarget, ikTarget;
+	bool                  finishReaching;
+	SrVec                 reachError, reachTarget, returnTarget;
 	ReachState            curReachState;
-	SrVec                 curReachIKOffset, curEffectorPos;
+	SrVec                 curReachIKOffset;
 	
 	SkJoint*              reachEndEffector;
 	ConstraintMap         reachPosConstraint;
 	ConstraintMap         reachRotConstraint;
-	BodyMotionFrame       currentMotionFrame, prevMotionFrame;
+	BodyMotionFrame       ikMotionFrame, idleMotionFrame, interpMotionFrame;
+	BodyMotionFrame       interpStartFrame;
 
 	MeCtJacobianIK        ik;
 	MeCtIKTreeScenario    ikScenario;
@@ -74,13 +77,13 @@ public:
 	// these data are exposed directly for visualization/UI purpose
 	vector<SrVec>         examplePts;
 	vector<SrVec>         resamplePts;
-	SrVec                 curReachIKTrajectory;
+	SrVec                 curReachIKTrajectory, ikTarget, interpPos, curEffectorPos, currentInterpTarget, ikRoot;
 	float                 reachVelocity, reachCompleteDuration;
 
-	bool                  useIKConstraint, useInterpolation;
+	bool                  useIKConstraint, useInterpolation, useTargetJoint;
 
 public:
-	MeCtExampleBodyReach(SkSkeleton* sk);
+	MeCtExampleBodyReach(SkSkeleton* sk, SkJoint* effectorJoint);
 	~MeCtExampleBodyReach(void);	
 
 	virtual void controller_map_updated();
@@ -92,9 +95,19 @@ public:
 	void set_duration(float duration) { _duration = duration; }
 	virtual const char* controller_type() const		{ return( CONTROLLER_TYPE ); }
 	virtual void print_state( int tabs );
-	
-	void setReachTarget(SrVec& reachPos);
+
+	void findReachTarget(SrVec& reachTarget, SrVec& reachError);
+
+	// return du
+	bool updateInterpolation(float dt, BodyMotionFrame& outFrame, float& du); 
+	void updateIK(SrVec& rTrajectory, BodyMotionFrame& refFrame, BodyMotionFrame& outFrame);
+	void updateState();
+
+
 	void setReachTargetJoint(SkJoint* val); 
+	void setReachTargetPos(SrVec& targetPos);
+	void setEndEffector(SkJoint* effector);
+	void setFinishReaching(bool isFinish) { finishReaching = isFinish; }
 	void init();
 
 	void updateMotionExamples(const MotionDataSet& inMotionSet);
