@@ -400,7 +400,7 @@ void MotionExampleSet::blendMotionFrame( BodyMotionFrame& startFrame, BodyMotion
 	float oneMinusWeight = 1.f - weight;
 	tempFrame = startFrame;
 	tempFrame.rootPos = startFrame.rootPos*oneMinusWeight + endFrame.rootPos*weight;
-	for (int i=0;i<tempFrame.jointQuat.size();i++)
+	for (unsigned int i=0;i<tempFrame.jointQuat.size();i++)
 	{
 		tempFrame.jointQuat[i] = slerp(startFrame.jointQuat[i],endFrame.jointQuat[i],weight);
 		tempFrame.jointQuat[i].normalize();
