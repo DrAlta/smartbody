@@ -64,7 +64,6 @@ that is distributed: */
 #include <cstdlib>
 #include <string>
 #include <vector>
-#include "vhcl_log.h"
 
 #define MAXHISTORYSIZE 10
 
