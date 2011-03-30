@@ -20,7 +20,6 @@
  *      Marcelo Kallmann, USC (currently at UC Merced)
  */
 
-#include "fltk/Slider.h"  // before vhcl.h because of LOG enum which conflicts with vhcl::Log
 #include "vhcl.h"
 
 # include "fltk_viewer.h"

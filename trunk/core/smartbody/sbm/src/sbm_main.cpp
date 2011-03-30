@@ -30,7 +30,6 @@
 #define SBM_REPORT_MEMORY_LEAKS  0
 #define SBM_EMAIL_CRASH_REPORTS  1
 
-#include "fltk/Slider.h"  // before vhcl.h because of LOG enum which conflicts with vhcl::Log
 #include "vhcl.h"
 
 #include <signal.h>

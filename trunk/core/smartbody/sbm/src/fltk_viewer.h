@@ -28,7 +28,7 @@
 # ifndef FLTK_VIEWER_H
 # define FLTK_VIEWER_H
 
-#include "fltk/Slider.h"  // before vhcl.h because of LOG enum which conflicts with vhcl::Log
+#include "fltk/Slider.h"
 #include <fltk/compat/FL/Fl_Menu_Item.H>
 # include <fltk/GlWindow.H>
 # include <sr/sr_viewer.h>

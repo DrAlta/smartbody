@@ -39,7 +39,6 @@ that is distributed: */
 		Paco Abad (fjabad@dsic.upv.es)
 **********************************************************/
 
-#include "fltk/Slider.h"  // before vhcl.h because of LOG enum which conflicts with vhcl::Log
 #include "vhcl.h"
 
 #include "CommandWindow.h"
