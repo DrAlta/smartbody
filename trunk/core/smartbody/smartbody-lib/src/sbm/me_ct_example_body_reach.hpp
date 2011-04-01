@@ -1,5 +1,6 @@
 #pragma once
 #include "me_ct_data_interpolation.h"
+//#include "me_ct_barycentric_interpolation.h"
 #include "me_ct_motion_parameter.h"
 #include "me_ct_jacobian_IK.hpp"
 #include "me_ct_constraint.hpp"
@@ -23,16 +24,16 @@ public:
 };
 
 class MeCtExampleBodyReach :
-	public MeController
+	public MeController, public FadingControl
 {
 private:
 	static const char* CONTROLLER_TYPE;
 public:
 	enum ReachState { REACH_START = 0, REACH_COMPLETE, REACH_RETURN, REACH_IDLE };
 protected:
-	SkSkeleton*           skeletonRef;	
+	SkSkeleton*           skeletonCopy, *skeletonRef;	
 	SkJoint*              reachTargetJoint;		
-	SrVec                 reachTargetPos;
+	SrVec                 reachTargetPos;	
 	vector<SkJoint*>      affectedJoints; // list of joints that are affected by motion interpolation & IK. 
 	                                      // set to the full skeleton by default ( excluding fingers & face bones ).
 
@@ -44,8 +45,8 @@ protected:
 	// for motion interpolation
 	MotionParameter*      motionParameter;		
 	DataInterpolator*     dataInterpolator;
-	ResampleMotion*       interpMotion; // pointer to motion interface for generating motion example
-	VecOfInterpWeight     blendWeight;
+	//BarycentricInterpolator* testDataInterpolator;
+	ResampleMotion*       interpMotion; // pointer to motion interface for generating motion example	
 	vector<InterpolationExample*>* interpExampleData;
 	vector<InterpolationExample*>* resampleData;
 	
@@ -63,7 +64,7 @@ protected:
 	SkJoint*              reachEndEffector;
 	ConstraintMap         reachPosConstraint;
 	ConstraintMap         reachRotConstraint;
-	BodyMotionFrame       ikMotionFrame, idleMotionFrame, interpMotionFrame;
+	BodyMotionFrame       inputMotionFrame,ikMotionFrame, idleMotionFrame, interpMotionFrame, initMotionFrame;
 	BodyMotionFrame       interpStartFrame;
 
 	MeCtJacobianIK        ik;
@@ -74,12 +75,15 @@ protected:
 	SkChannelArray	_channels;
 
 public:
-	// these data are exposed directly for visualization/UI purpose
+	// these data are exposed directly for visualization/UI purpose	
+	int                   simplexIndex;
+	//VecOfSimplex          simplexList;
 	vector<SrVec>         examplePts;
 	vector<SrVec>         resamplePts;
+	
+	// parameters and intermediate variables for debug/visualization
 	SrVec                 curReachIKTrajectory, ikTarget, interpPos, curEffectorPos, currentInterpTarget, ikRoot;
 	float                 reachVelocity, reachCompleteDuration;
-
 	bool                  useIKConstraint, useInterpolation, useTargetJoint;
 
 public:
@@ -96,9 +100,8 @@ public:
 	virtual const char* controller_type() const		{ return( CONTROLLER_TYPE ); }
 	virtual void print_state( int tabs );
 
-	void findReachTarget(SrVec& reachTarget, SrVec& reachError);
 
-	// return du
+	void findReachTarget(SrVec& reachTarget, SrVec& reachError);	
 	bool updateInterpolation(float dt, BodyMotionFrame& outFrame, float& du); 
 	void updateIK(SrVec& rTrajectory, BodyMotionFrame& refFrame, BodyMotionFrame& outFrame);
 	void updateState();
@@ -112,6 +115,7 @@ public:
 
 	void updateMotionExamples(const MotionDataSet& inMotionSet);
 protected:	
+	void updateSkeletonCopy();
 	void updateChannelBuffer(MeFrameData& frame, BodyMotionFrame& motionFrame, bool bRead = false);
 	SrVec getCurrentHandPos(BodyMotionFrame& motionFrame);
 	DataInterpolator* createInterpolator();

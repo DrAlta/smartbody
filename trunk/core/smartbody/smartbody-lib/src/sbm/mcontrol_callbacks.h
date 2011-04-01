@@ -94,6 +94,7 @@ int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_snod_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_lilt_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_reach_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_bodyreach_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_load_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 int mcu_net_func( srArgBuffer& args, mcuCBHandle *mcu_p );

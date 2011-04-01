@@ -17,7 +17,7 @@ BodyMotionFrame& BodyMotionFrame::operator=( const BodyMotionFrame& rhs )
 	return *this;
 }
 
-void BodyMotionInterface::getMotionParameter( VecOfDouble& outPara )
+void BodyMotionInterface::getMotionParameter( dVector& outPara )
 {
 	motionParameterFunc->getMotionParameter(this,outPara);
 }
@@ -111,7 +111,7 @@ double BodyMotion::strokeEmphasisTime()
 /* Motion Example                                                       */
 /************************************************************************/
 
-void MotionExample::getExampleParameter( VecOfDouble& outPara )
+void MotionExample::getExampleParameter( dVector& outPara )
 {
 	this->getMotionParameter(outPara);
 }
@@ -162,7 +162,7 @@ double ResampleMotion::strokeEmphasisTime()
 	return motionTime;
 }
 
-void ResampleMotion::getExampleParameter( VecOfDouble& outPara )
+void ResampleMotion::getExampleParameter( dVector& outPara )
 {
 	this->getMotionParameter(outPara);
 }
@@ -231,7 +231,7 @@ void ParameterBoundingBox::initBBox( int nD )
 	isInit = true;	
 }
 
-void ParameterBoundingBox::extendBBox( const VecOfDouble& inPara )
+void ParameterBoundingBox::extendBBox( const dVector& inPara )
 {
 	// check for dimension
 	if (!isInit)
@@ -247,7 +247,7 @@ void ParameterBoundingBox::extendBBox( const VecOfDouble& inPara )
 	}	
 }
 
-void ParameterBoundingBox::randomPointInBox( VecOfDouble& outPara )
+void ParameterBoundingBox::randomPointInBox( dVector& outPara )
 {
 	outPara.resize(numDim);
 	for (int i=0;i<numDim;i++)
@@ -257,11 +257,11 @@ void ParameterBoundingBox::randomPointInBox( VecOfDouble& outPara )
 	}
 }
 
-int ParameterBoundingBox::gridHashing( const VecOfDouble& inPara, double cellSize, VecOfInt& adjHash )
+int ParameterBoundingBox::gridHashing( const dVector& inPara, double cellSize, VecOfInt& adjHash )
 {
 	int nHash = 0;
 
-	VecOfDouble localPara(numDim);
+	dVector localPara(numDim);
 	VecOfDouble gridSize(numDim);
 	VecOfInt    intPara(numDim);
 

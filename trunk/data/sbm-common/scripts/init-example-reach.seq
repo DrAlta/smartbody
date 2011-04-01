@@ -1,0 +1,56 @@
+0 echo |--------------------------------------------------|
+0 echo |  data/sbm-common/scripts/init-example-reach.seq  |
+0 echo |--------------------------------------------------|
+
+#1 char doctor reachmotion add HandsAtSide_RArm_GestureYou
+#1 char doctor reachmotion add LHandOnHip_Arms_GestureWhy
+#1 char doctor reachmotion add LHandOnHip_RArm_GestureOffer
+#1 char doctor reachmotion add LHandOnHip_RArm_SweepRight
+
+
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachRtHigh
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachRtMidHigh
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachRtMidLow
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachLfLow
+
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachLfHigh
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachLfMidHigh
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachLfMidLow
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachRtLow
+
+
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachMiddleHigh
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachMiddleMidHigh
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachMiddleMidLow
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachMiddleLow
+
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachClose_Lf
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachClose_Rt
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachClose_MiddleHigh
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachClose_MiddleLow
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachClose_MiddleMidHigh
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachClose_MiddleMidLow
+
+
+
+
+
+1 bml char doctor <sbm:bodyreach sbm:handle="rdoctor" effector="r_index3" sbm:fade-in="1.0"/>
+2 bodyreach char doctor build
+
+1 pawn foo init
+1 set pawn foo world_offset x 30 y 150 z 40
+
+3 bml char doctor <sbm:bodyreach sbm:handle="rdoctor" effector="r_index3" target="foo"/>
+
+
+
+
+
+
+
+
+
+
+
+

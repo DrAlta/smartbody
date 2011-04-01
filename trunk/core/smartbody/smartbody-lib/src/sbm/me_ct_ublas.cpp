@@ -61,6 +61,30 @@ bool MeCtUBLAS::matrixSVD( const dMatrix& A, dVector& S, dMatrix& U, dMatrix& V 
 	return true;
 }
 
+double MeCtUBLAS::matrixDeterminant( const dMatrix& mat )
+{
+	double det = 1.0; 
+
+	dMatrix mLu(mat); 
+	ublas::permutation_matrix<std::size_t> pivots(mat.size1() ); 
+
+	int is_singular = lu_factorize(mLu, pivots); 
+
+	if (!is_singular) 
+	{ 
+		for (std::size_t i=0; i < pivots.size(); ++i) 
+		{ 
+			if (pivots(i) != i) 
+				det *= -1.0; 
+
+			det *= mLu(i,i); 
+		} 
+	} 
+	else 
+		det = 0.0; 
+
+	return det;
+}
 /************************************************************************/
 /* MeCtMath Routines                                                    */
 /************************************************************************/

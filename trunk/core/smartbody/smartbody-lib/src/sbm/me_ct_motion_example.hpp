@@ -1,6 +1,7 @@
 #pragma once
 #include "me_ct_data_driven_reach.hpp"
 #include "me_ct_motion_timewarp.hpp"
+#include "me_ct_ublas.hpp"
 
 using namespace std;
 
@@ -35,7 +36,7 @@ public:
 	enum DurationType { DURATION_ACTUAL = 0, DURATION_REF };
 	MotionParameter* motionParameterFunc;
 public:
-	virtual void getMotionParameter(VecOfDouble& outPara);	
+	virtual void getMotionParameter(dVector& outPara);	
 	virtual double getMotionFrame(float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame) = 0;
 
 	virtual double strokeEmphasisTime() = 0;
@@ -66,11 +67,11 @@ class InterpolationExample
 {
 public:	
 	VecOfInterpWeight weight;
-	VecOfDouble parameter;
+	dVector           parameter;
 public:
 	InterpolationExample() {}
 	virtual ~InterpolationExample() {}	
-	virtual void getExampleParameter(VecOfDouble& outPara) = 0;
+	virtual void getExampleParameter(dVector& outPara) = 0;
 };
 
 // axis aligned bounding box of any dimension
@@ -80,17 +81,17 @@ public:
 	bool        isInit;
 	int         numDim;
 	
-	VecOfDouble minParameter, maxParameter;
+	dVector     minParameter, maxParameter;
 public:
 	ParameterBoundingBox();
 	ParameterBoundingBox(int nD);
 	ParameterBoundingBox(ParameterBoundingBox& bBox);
 	~ParameterBoundingBox() {}
 	void scaleBBox(double scaleRatio);
-	void extendBBox(const VecOfDouble& inPara);
-	void randomPointInBox(VecOfDouble& outPara);
+	void extendBBox(const dVector& inPara);
+	void randomPointInBox(dVector& outPara);
 	// return the integer hash value based on input parameter value
-	int  gridHashing(const VecOfDouble& inPara, double cellSize, VecOfInt& adjHash );
+	int  gridHashing(const dVector& inPara, double cellSize, VecOfInt& adjHash );
 protected:
 	void initBBox(int nD);
 };
@@ -106,7 +107,7 @@ public:
 	virtual double strokeEmphasisTime();
 	virtual double getMotionFrame(float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame);
 	virtual double motionDuration(DurationType durType);	
-	virtual void getExampleParameter(VecOfDouble& outPara);
+	virtual void getExampleParameter(dVector& outPara);
 	virtual double motionPercent(float time);
 	virtual double getRefDeltaTime(float u, float dt);
 };
@@ -116,7 +117,7 @@ class MotionExample : public InterpolationExample, public BodyMotion
 public:	
 	MotionExample() {}
 	virtual ~MotionExample() {}	
-	virtual void getExampleParameter(VecOfDouble& outPara);		
+	virtual void getExampleParameter(dVector& outPara);		
 };
 
 /************************************************************************/

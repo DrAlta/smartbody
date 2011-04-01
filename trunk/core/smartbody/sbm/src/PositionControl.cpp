@@ -167,12 +167,14 @@ PositionControl::~PositionControl(void)
 void PositionControl::drawSphere(SrVec& pos, float fRadius, SrVec& color)
 {
 	//glColor3f(1.0, 0.0, 0.0);
+	glEnable(GL_LIGHTING);
 	glColor3f(color[0],color[1],color[2]);
 	SrSnSphere sphere;
 	sphere.shape().center = pos;//SrPnt(0, 0, 0);
 	sphere.shape().radius = fRadius;
 	sphere.render_mode(srRenderModeSmooth);
 	SrGlRenderFuncs::render_sphere(&sphere);
+	glDisable(GL_LIGHTING);
 }
 
 void PositionControl::identify( std::vector<int>& path )

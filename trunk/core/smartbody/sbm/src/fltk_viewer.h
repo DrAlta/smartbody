@@ -312,6 +312,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	void drawReach();
 	void drawInteractiveLocomotion();
 	void drawPawns();
+	void drawTetra(SrVec vtxPos[4], SrVec& color);
 	void drawArrow(SrVec& from, SrVec& to, float width, SrVec& color);
 	void drawCircle(float cx, float cy, float cz, float r, int num_segments, SrVec& color);
 	void drawPoint(float cx, float cy, float cz, float size, SrVec& color);
