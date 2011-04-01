@@ -216,21 +216,16 @@ void MeCtIKTreeScenario::updateQuat( const dVector& dTheta )
 	}
 }
 
-void MeCtIKTreeScenario::updateGlobalMat()
-{	
-	updateNodeGlobalMat(ikTreeRoot);	
-}
-
 // feng : this part seems redundant to sk_skeleton. but since a typical skeleton 
 // contains much more bones like facial bones & fingers, it makes more sense to just update the nodes we are using for IK.
-void MeCtIKTreeScenario::updateNodeGlobalMat( MeCtIKTreeNode* jointNode )
+void MeCtIKTreeScenario::updateNodeGlobalMat( MeCtIKTreeNode* jointNode, NodeQuatType quatType )
 {
 	SrMat pmat = ikGlobalMat;
 	int idx = jointNode->nodeIdx;
 	if (jointNode->parent)
 		pmat = jointNode->parent->gmat;
 
-	jointNode->gmat = get_lmat(jointNode->joint,&jointNode->getQuat(QUAT_INIT))*pmat;
+	jointNode->gmat = get_lmat(jointNode->joint,&jointNode->getQuat(quatType))*pmat;
 	if (jointNode->brother)
 		updateNodeGlobalMat(jointNode->brother);
 	if (jointNode->child)
@@ -313,7 +308,7 @@ void MeCtJacobianIK::update( MeCtIKTreeScenario* scenario )
 {
 	ikScenario = scenario;
 
-	scenario->updateGlobalMat();
+	scenario->updateNodeGlobalMat(scenario->ikTreeRoot);
 	// solve for initial jacobian	
 	computeJacobian(scenario);		
 	solveDLS(matJ,dS,dampJ,dTheta, matJInv);

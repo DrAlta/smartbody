@@ -1075,14 +1075,6 @@
 					Name="Constraint"
 					>
 					<File
-						RelativePath="..\src\sbm\me_ct_ccd_IK.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_ccd_IK.hpp"
-						>
-					</File>
-					<File
 						RelativePath="..\src\sbm\me_ct_constraint.cpp"
 						>
 					</File>
@@ -1090,64 +1082,16 @@
 						RelativePath="..\src\sbm\me_ct_constraint.hpp"
 						>
 					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_jacobian_IK.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_jacobian_IK.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_ublas.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_ublas.hpp"
-						>
-					</File>
 				</Filter>
 				<Filter
 					Name="BodyReach"
 					>
-					<File
-						RelativePath="..\src\sbm\me_ct_data_interpolation.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_data_interpolation.h"
-						>
-					</File>
 					<File
 						RelativePath="..\src\sbm\me_ct_example_body_reach.cpp"
 						>
 					</File>
 					<File
 						RelativePath="..\src\sbm\me_ct_example_body_reach.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_motion_example.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_motion_example.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_motion_parameter.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_motion_parameter.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_motion_timewarp.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\sbm\me_ct_motion_timewarp.hpp"
 						>
 					</File>
 				</Filter>
@@ -1203,6 +1147,86 @@
 					RelativePath="..\src\sbm\me_ct_motion_player.h"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="general"
+				>
+				<Filter
+					Name="MotionInterpolation"
+					>
+					<File
+						RelativePath="..\src\sbm\me_ct_barycentric_interpolation.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_barycentric_interpolation.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_data_interpolation.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_data_interpolation.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_motion_example.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_motion_example.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_motion_parameter.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_motion_parameter.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_motion_timewarp.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_motion_timewarp.hpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="IK"
+					>
+					<File
+						RelativePath="..\src\sbm\me_ct_ccd_IK.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_ccd_IK.hpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_jacobian_IK.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_jacobian_IK.hpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="ublas"
+					>
+					<File
+						RelativePath="..\src\sbm\me_ct_ublas.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_ublas.hpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -2025,6 +2049,22 @@
 				</File>
 				<File
 					RelativePath="..\src\external\ANN\pr_queue_k.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="TetGen"
+				>
+				<File
+					RelativePath="..\src\external\tetgen\predicates.cxx"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\tetgen\tetgen.cxx"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\tetgen\tetgen.h"
 					>
 				</File>
 			</Filter>

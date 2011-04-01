@@ -53,13 +53,72 @@ SrVec EffectorJointConstraint::getPosConstraint()
 	return target;
 }
 
+/************************************************************************/
+/*  Generic Fading Control                                              */
+/************************************************************************/
 
-MeCtConstraint::MeCtConstraint( SkSkeleton* skeleton ) 
+FadingControl::FadingControl()
+{
+	blendWeight = 0.0;
+}
+
+bool FadingControl::updateFading( float dt )
+{
+	const float FADE_EPSILON = 0.001f;
+	bool finishFadeOut = false;
+	if (fadeMode)
+	{
+		fadeRemainTime -= dt;
+		if (fadeRemainTime <= 0.0)
+			fadeRemainTime = 0.0;
+
+		if (fadeMode == FADING_MODE_IN)
+		{			
+			float fadeNormal = 1.f - (float)fadeRemainTime/fadeInterval;
+			blendWeight = fadeNormal;
+			if (blendWeight > 1.0 - FADE_EPSILON)
+			{
+				blendWeight = 1.0;
+				fadeMode = FADING_MODE_OFF;
+			}						
+		}
+		else
+		{
+			float fadeNormal = fadeRemainTime/fadeInterval;
+			blendWeight = fadeNormal;
+			if (blendWeight < FADE_EPSILON)
+			{
+				blendWeight = 0.0;
+				fadeMode = FADING_MODE_OFF;
+				finishFadeOut = true;
+				//useIKConstraint = false;
+			}	
+		}
+	}
+	return finishFadeOut;
+}
+
+
+void FadingControl::setFadeIn( float interval )
+{
+	fadeInterval = interval;
+	fadeRemainTime = interval;
+	fadeMode = FADING_MODE_IN;
+	//useIKConstraint = true;
+}
+
+void FadingControl::setFadeOut( float interval )
+{
+	fadeInterval = interval;
+	fadeRemainTime = interval;
+	fadeMode = FADING_MODE_OUT;
+}
+
+
+MeCtConstraint::MeCtConstraint( SkSkeleton* skeleton )  : FadingControl()
 {
 	_skeleton = skeleton;
-	prev_time = -1.0;
-	blendWeight = 0.0;
-	
+	prev_time = -1.0;	
 }
 
 MeCtConstraint::~MeCtConstraint(void)
@@ -173,7 +232,12 @@ bool MeCtConstraint::controller_evaluate( double t, MeFrameData& frame )
 	ik_scenario.ikGlobalMat = ik_scenario.ikTreeRoot->joint->parent()->gmat();	
 	
 	ik.setDt(dt);
-	updateFading(dt);	
+	if (fadeMode == FADING_MODE_IN)
+		useIKConstraint = true;
+
+	bool finishFadeOut = updateFading(dt);	
+	if (finishFadeOut)
+		useIKConstraint = false;
 
 	if (useIKConstraint) //&& ik_scenario.ikEndEffectors.size() != 0)	
 	{
@@ -206,7 +270,6 @@ bool MeCtConstraint::controller_evaluate( double t, MeFrameData& frame )
 	}
 	//printf("Time = %f\n",time.t());	
 	return true;
-
 }
 
 void MeCtConstraint::controller_start()
@@ -263,54 +326,6 @@ bool MeCtConstraint::addEffectorJointPair( SkJoint* targetJoint, const char* eff
 	return true;
 }
 
-void MeCtConstraint::setFadeIn( float interval )
-{
-	fadeInterval = interval;
-	fadeRemainTime = interval;
-	fadeMode = FADING_MODE_IN;
-	useIKConstraint = true;
-}
 
-void MeCtConstraint::setFadeOut( float interval )
-{
-	fadeInterval = interval;
-	fadeRemainTime = interval;
-	fadeMode = FADING_MODE_OUT;
-}
 
-bool MeCtConstraint::updateFading( float dt )
-{
-	const float FADE_EPSILON = 0.001f;
-	bool finishFadeOut = false;
-	if (fadeMode)
-	{
-		fadeRemainTime -= dt;
-		if (fadeRemainTime <= 0.0)
-			fadeRemainTime = 0.0;
-
-		if (fadeMode == FADING_MODE_IN)
-		{			
-			float fadeNormal = 1.f - (float)fadeRemainTime/fadeInterval;
-			blendWeight = fadeNormal;
-			if (blendWeight > 1.0 - FADE_EPSILON)
-			{
-				blendWeight = 1.0;
-				fadeMode = FADING_MODE_OFF;
-			}						
-		}
-		else
-		{
-			float fadeNormal = fadeRemainTime/fadeInterval;
-			blendWeight = fadeNormal;
-			if (blendWeight < FADE_EPSILON)
-			{
-				blendWeight = 0.0;
-				fadeMode = FADING_MODE_OFF;
-				finishFadeOut = true;
-				useIKConstraint = false;
-			}	
-		}
-	}
-	return finishFadeOut;
-}
 

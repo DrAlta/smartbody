@@ -11,6 +11,34 @@ MotionParameter::~MotionParameter(void)
 
 }
 
+SkJoint* MotionParameter::getMotionFrameJoint( const BodyMotionFrame& frame, const char* jointName )
+{
+	SkJoint* outJoint = NULL;
+
+	SrVec oldRootPos;
+	VecOfSrQuat oldJointQuat;
+	oldJointQuat.resize(affectedJoints.size());
+	for (int i=0;i<3;i++)
+	{
+		oldRootPos[i] = skeletonRef->root()->child(0)->pos()->value(i);
+		skeletonRef->root()->child(0)->pos()->value(i,frame.rootPos[i]);
+	}		
+	skeletonRef->invalidate_global_matrices();
+	skeletonRef->update_global_matrices();
+	for (unsigned int i=0;i<affectedJoints.size();i++)
+	{
+		SkJoint* joint = affectedJoints[i];				
+		joint->quat()->value(frame.jointQuat[i]);
+		joint->update_lmat();
+
+		if (strcmp(joint->name().get_string(),jointName) == 0)
+			outJoint = joint;
+	}			
+	skeletonRef->invalidate_global_matrices();
+	skeletonRef->update_global_matrices();
+	return outJoint;
+}
+
 ReachMotionParameter::ReachMotionParameter( SkSkeleton* skel, std::vector<SkJoint*>& joints, SkJoint* rjoint ) : MotionParameter(skel,joints)
 {
 	reachJoint = rjoint;	
@@ -21,39 +49,27 @@ ReachMotionParameter::~ReachMotionParameter()
 
 }
 
-void ReachMotionParameter::getPoseParameter( const BodyMotionFrame& frame, VecOfDouble& outPara )
+void ReachMotionParameter::getPoseParameter( const BodyMotionFrame& frame, dVector& outPara )
 {
-	// set root 	
-	for (int i=0;i<3;i++)
-	{
-		skeletonRef->root()->child(0)->pos()->value(i,frame.rootPos[i]);
-	}
-
-	for (unsigned int i=0;i<affectedJoints.size();i++)
-	{
-		SkJoint* joint = affectedJoints[i];
-		joint->quat()->value(frame.jointQuat[i]);
-		joint->update_lmat();
-	}			
-	skeletonRef->invalidate_global_matrices();
-	//skeletonRef->update_global_matrices();
-	reachJoint->update_lmat();
-	reachJoint->update_gmat_up();
+	// set root 		
+	SkJoint* rJoint = getMotionFrameJoint(frame,reachJoint->name().get_string());	
+	rJoint->update_lmat();
+	rJoint->update_gmat_up();
 	//printf("reach joint name = %s\n",reachJoint->name().get_string());
-	SrVec endPos = reachJoint->gmat().get_translation();
+	SrVec endPos = rJoint->gmat().get_translation();
 	outPara.resize(3);
 	for (int i=0;i<3;i++)
-		outPara[i] = endPos[i];
+		outPara[i] = endPos[i];	
 }
 
-void ReachMotionParameter::getMotionParameter(BodyMotionInterface* motion, VecOfDouble& outPara )
+void ReachMotionParameter::getMotionParameter(BodyMotionInterface* motion, dVector& outPara )
 {
 	double timeRef = motion->strokeEmphasisTime();//motion->motionDuration(BodyMotionInterface::DURATION_REF)*0.999;
 	//printf("timeRef = %f\n",timeRef);
 	getMotionFrameParameter(motion,(float)timeRef,outPara);	
 }
 
-void ReachMotionParameter::getMotionFrameParameter( BodyMotionInterface* motion, float refTime, VecOfDouble& outPara )
+void ReachMotionParameter::getMotionFrameParameter( BodyMotionInterface* motion, float refTime, dVector& outPara )
 {
 	BodyMotionFrame tempFrame;
 	motion->getMotionFrame((float)refTime,skeletonRef,affectedJoints,tempFrame);

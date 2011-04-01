@@ -48,19 +48,35 @@ public:
 
 typedef std::vector<EffectorJointConstraint> ConstraintList;
 
-class MeCtConstraint : public MeController
+class FadingControl
+{
+public:
+	enum FadingControlMode	{
+		FADING_MODE_OFF = 0,
+		FADING_MODE_IN,
+		FADING_MODE_OUT
+	};
+protected:
+	float             fadeRemainTime, fadeInterval;
+	float             blendWeight;
+	FadingControlMode fadeMode;
+public:
+	FadingControl();
+	~FadingControl() {}
+	void setFadeIn(float interval);
+	void setFadeOut(float interval);
+	bool updateFading(float dt);
+};
+
+
+class MeCtConstraint : public MeController, public FadingControl
 {
 private:
 	static const char* CONTROLLER_TYPE;
 public:	
 	static bool useIKConstraint;
 
-	enum ConstraintFadeMode	{
-		FADING_MODE_OFF = 0,
-		FADING_MODE_IN,
-		FADING_MODE_OUT
-	};
-
+	
 	enum ConstraintType
 	{
 		CONSTRAINT_POS = 0,
@@ -87,10 +103,6 @@ protected:
 	ConstraintMap   posConstraint;
 		
 	float           prev_time; // to get dt
-	float           blendWeight;
-	float           fadeRemainTime, fadeInterval;
-	ConstraintFadeMode fadeMode;
-
 public:			
 	void init (const char* rootName);
 	bool addEffectorJointPair(SkJoint* targetJoint, const char* effectorName, const char* effectorRootName, const SrVec& posOffset , const SrQuat& rotOffset , ConstraintType cType = CONSTRAINT_POS);
@@ -101,13 +113,8 @@ public:
 	virtual double controller_duration()			{ return( (double)_duration ); }
 	void set_duration(float duration) { _duration = duration; }
 	virtual const char* controller_type() const		{ return( CONTROLLER_TYPE ); }
-	virtual void print_state( int tabs );
+	virtual void print_state( int tabs );	
 
-	void setFadeIn(float interval);
-	void setFadeOut(float interval);
-	bool updateFading(float dt);
-
-protected:
-	
+protected:	
 	void  updateChannelBuffer(MeFrameData& frame, std::vector<SrQuat>& quatList, bool bRead = false);
 };

@@ -15,9 +15,14 @@ namespace MeCtUBLAS
 	bool matrixSVD(const dMatrix& A, dVector& S, dMatrix& U, dMatrix& V); // perform singular value decomposition
 	void matrixMatMult(const dMatrix& mat1, const dMatrix& mat2, dMatrix& mat3);
 	void matrixVecMult(const dMatrix& mat1, const dVector& vin, dVector& vout);	
+	double matrixDeterminant(const dMatrix& mat);
 };
 
 namespace MeCtMath
 {
 	float Random(float r_min, float r_max);
+	template <typename T> int sgn(T val)
+	{
+		return (val > T(0)) - (val < T(0));
+	}
 }

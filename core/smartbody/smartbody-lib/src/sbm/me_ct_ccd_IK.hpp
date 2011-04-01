@@ -18,4 +18,6 @@ public:
 	static gwiz::quat_t   swingTwist2Quat(gwiz::vector_t& quat);
 protected:
 	void CCDRotate(MeCtIKTreeNode* startNode, MeCtIKTreeNode* endEffector);
+	// sort constraint list according to the end effector node level, so we process the higher level effector first.
+	void sortConstraint(ConstraintMap* conMap, VecOfConstraintPtr& sortConList);
 };

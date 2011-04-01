@@ -11,9 +11,10 @@ public:
 	MotionParameter(SkSkeleton* skel, std::vector<SkJoint*>& joints);
 	~MotionParameter(void);
 
-	virtual void getPoseParameter(const BodyMotionFrame& frame, VecOfDouble& outPara) = 0;
-	virtual void getMotionFrameParameter(BodyMotionInterface* motion, float refTime, VecOfDouble& outPara) = 0;
-	virtual void getMotionParameter(BodyMotionInterface* motion, VecOfDouble& outPara) = 0;
+	virtual void getPoseParameter(const BodyMotionFrame& frame, dVector& outPara) = 0;
+	virtual void getMotionFrameParameter(BodyMotionInterface* motion, float refTime, dVector& outPara) = 0;
+	virtual void getMotionParameter(BodyMotionInterface* motion, dVector& outPara) = 0;
+	virtual SkJoint* getMotionFrameJoint(const BodyMotionFrame& frame, const char* jointName);
 };
 
 
@@ -25,7 +26,7 @@ public:
 	ReachMotionParameter(SkSkeleton* skel, std::vector<SkJoint*>& joints, SkJoint* rjoint);
 	~ReachMotionParameter();
 
-	virtual void getPoseParameter(const BodyMotionFrame& frame, VecOfDouble& outPara);
-	virtual void getMotionParameter(BodyMotionInterface* motion, VecOfDouble& outPara);
-	virtual void getMotionFrameParameter(BodyMotionInterface* motion, float refTime, VecOfDouble& outPara);
+	virtual void getPoseParameter(const BodyMotionFrame& frame, dVector& outPara);
+	virtual void getMotionParameter(BodyMotionInterface* motion, dVector& outPara);
+	virtual void getMotionFrameParameter(BodyMotionInterface* motion, float refTime, dVector& outPara);	
 };

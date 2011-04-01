@@ -3716,6 +3716,96 @@ int mcu_reach_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 }
 
 /*
+reach <> 
+*/
+
+int mcu_bodyreach_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	if (mcu_p)
+	{
+		string arg = args.read_token();
+		SbmCharacter* actor = NULL;
+		if( arg=="character" || arg=="char" ) {
+			string name = args.read_token();
+			actor = mcu_p->character_map.lookup( name );
+			if( actor == NULL ) {
+				LOG("ERROR: Could not find character \"%s\".", name.c_str());
+				return CMD_FAILURE;
+			}
+
+			arg = args.read_token();
+		} else {
+			if( mcu_p->test_character_default.empty() ) {
+				LOG("ERROR: No character specified, and no default set.");
+				return CMD_FAILURE;
+			}
+			actor = mcu_p->character_map.lookup( mcu_p->test_character_default );
+			if( actor == NULL ) {
+				LOG("ERROR: Could not find default character \"%s\".", mcu_p->test_character_default.c_str());
+				return CMD_FAILURE;
+			}
+		}
+
+
+		// gets the first track in the scheduler
+		// To-Do : Should provide some ways to grab a specific track ( right or left hand )
+		MeCtExampleBodyReach* reachCt = NULL;
+		MeCtSchedulerClass* reachSched = actor->reach_sched_p;
+		MeCtSchedulerClass::VecOfTrack reach_tracks = reachSched->tracks();		
+		MeCtReach* tempCt = NULL;
+		for (unsigned int c = 0; c < reach_tracks.size(); c++)
+		{
+			MeController* controller = reach_tracks[c]->animation_ct();		
+			reachCt = dynamic_cast<MeCtExampleBodyReach*>(controller);			
+			if (reachCt)
+				break;
+		}	
+
+		if (!reachCt)
+		{
+			LOG("ERROR: Could not find reach controller.");
+			return CMD_FAILURE;
+		}
+
+		int resampleSize = 0;
+		float minDist = 5.f;
+		
+		enum { BUILD = 0};
+		int buildMode = BUILD;		
+		if( arg == "build" )
+		{			
+			buildMode = BUILD;
+			arg = args.read_token();
+		}		
+
+// 		while( !arg.empty() ) 
+// 		{
+// 			if (arg == "resample-size")
+// 			{
+// 				resampleSize = args.read_int();
+// 			}
+// 			else if (arg == "sample-dist")
+// 			{
+// 				minDist = args.read_float();
+// 			}
+// 			arg = args.read_token();
+// 		}
+		bool bSuccess = false;
+		switch(buildMode)
+		{
+		case BUILD:			
+			reachCt->updateMotionExamples(actor->getReachMotionDataSet());
+			bSuccess = true;
+			break;		
+		}
+
+		if (bSuccess)
+			return (CMD_SUCCESS);
+	}
+	return (CMD_FAILURE);
+}
+
+/*
 	gaze <> target point <x y z>
 	gaze <> target euler <p h r>
 	gaze <> offset euler <p h r>

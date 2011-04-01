@@ -50,6 +50,7 @@ public:
 };
 
 typedef std::map<std::string,EffectorConstraint*> ConstraintMap;
+typedef std::vector<EffectorConstraint*> VecOfConstraintPtr;
 
 class MeCtIKTreeScenario
 {
@@ -58,19 +59,11 @@ public:
 	SkSkeleton*                  ikSkeleton;
 	IKTreeNodeList               ikTreeNodes;
 	MeCtIKTreeNode*              ikTreeRoot; // contains the tree structure for IK tree ( which may contain multiple end effectors/IK chains )	
-	//IKTreeNodeList               ikEndEffectors;
-
-	//IKTreeNodeList               ikPosEffectors; // positional constraint
-	//IKTreeNodeList               ikRotEffectors; // rotational constraint
-	//VecOfString                  ikPosEffectors;
-	//VecOfString                  ikRotEffectors;
-	ConstraintMap*               ikRotEffectors;
-	ConstraintMap*               ikPosEffectors;
-
 	
+	ConstraintMap*               ikRotEffectors;
+	ConstraintMap*               ikPosEffectors;	
 	SrMat                        ikGlobalMat;	
 	IKTreeNodeList               ikJointLimitNodes; // joints that violate joint limits	
-
 public:
 	MeCtIKTreeScenario();
 	~MeCtIKTreeScenario();
@@ -81,14 +74,13 @@ public:
 	void setTreeNodeQuat(const std::vector<SrQuat>& inQuatList,NodeQuatType type);
 	void getTreeNodeQuat(std::vector<SrQuat>& inQuatList, NodeQuatType type);
 
-	void updateJointLimit();
-	void updateGlobalMat();		
+	void updateJointLimit();	
+	void updateNodeGlobalMat(MeCtIKTreeNode* jointNode, NodeQuatType quatType = QUAT_INIT);	
 	MeCtIKTreeNode* findIKTreeNode(const char* jointName);	
 	static int findIKTreeNodeInList(const char* jointName, IKTreeNodeList& nodeList);	
 protected:
 	void clearNodes();
-	int traverseJoint(SkJoint* joint, MeCtIKTreeNode* jointNode, std::vector<MeCtIKTreeNode*>& nodeList);	
-	void updateNodeGlobalMat(MeCtIKTreeNode* jointNode);	
+	int traverseJoint(SkJoint* joint, MeCtIKTreeNode* jointNode, std::vector<MeCtIKTreeNode*>& nodeList);		
 	// return axis-angle rotation offset to move joint rotation back.
 	static bool checkJointLimit(const SrQuat& q, const MeCtIKJointLimit& limit, const SrQuat& qInit, SrVec& jointOffset); 
 };

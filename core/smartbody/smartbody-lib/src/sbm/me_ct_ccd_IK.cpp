@@ -1,5 +1,5 @@
 #include "me_ct_ccd_IK.hpp"
-
+#include <algorithm>
 
 MeCtCCDIK::MeCtCCDIK( void )
 {
@@ -11,9 +11,50 @@ MeCtCCDIK::~MeCtCCDIK( void )
 {
 
 }
-void MeCtCCDIK::CCDRotate(MeCtIKTreeNode* startNode, MeCtIKTreeNode* endEffector )
+
+typedef std::pair<std::string,int> StrIntPair;
+typedef std::vector<StrIntPair> StrIntList;
+
+static bool strIntComp(StrIntPair& p1, StrIntPair& p2)
 {
-	/*
+	return (p1.second < p2.second);
+}
+
+void MeCtCCDIK::update( MeCtIKTreeScenario* scenario )
+{
+	
+	
+	
+}
+
+void MeCtCCDIK::sortConstraint( ConstraintMap* conMap, VecOfConstraintPtr& sortConList )
+{
+	StrIntList sortList;
+	ConstraintMap::iterator vi = conMap->begin();
+	for (vi  = conMap->begin();
+		vi != conMap->end();
+		vi++)
+	{
+		//conList.push_back(vi->second);
+		EffectorConstraint* con = vi->second;
+		MeCtIKTreeNode* node = ikScenario->findIKTreeNode(con->efffectorName.c_str());		
+		StrIntPair sip;
+		sip.first = con->efffectorName;
+		sip.second = node->nodeLevel;
+		sortList.push_back(sip);
+	}
+	std::sort(sortList.begin(),sortList.end(),strIntComp);
+
+	sortConList.clear();
+	for (int i=0;sortList.size();i++)
+	{
+		EffectorConstraint* con = (*conMap)[sortList[i].first];
+		sortConList.push_back(con);
+	}
+}
+
+void MeCtCCDIK::CCDRotate(MeCtIKTreeNode* startNode, MeCtIKTreeNode* endEffector )
+{	
 	SrVec targetPos = endEffector->targetPos;
 
 	SrVec v1, v2, v3, v4;
@@ -50,15 +91,11 @@ void MeCtCCDIK::CCDRotate(MeCtIKTreeNode* startNode, MeCtIKTreeNode* endEffector
 		rotAxis.normalize();
 		mat.rot(rotAxis, (float)-angle);
 	}
-
-	//q = startNode->
-	//q = mat * q;
-
-	check_joint_limit(&q,start_index);
-
-	scenario->joint_quat_list.set(start_index, q);
-	get_limb_section_local_pos(start_index, -1);
-	*/
+	
+	q = startNode->getQuat(QUAT_CUR);
+	q = mat * q;
+	startNode->setQuat(q,QUAT_CUR);
+	ikScenario->updateNodeGlobalMat(startNode,QUAT_CUR);	
 }
 
 

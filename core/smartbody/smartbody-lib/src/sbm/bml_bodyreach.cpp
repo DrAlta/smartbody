@@ -53,6 +53,8 @@ const XMLCh ATTR_EFFECTOR[] = L"effector";
 const XMLCh ATTR_TARGET_POS[] = L"sbm:target-pos";
 const XMLCh ATTR_REACH_VELOCITY[] = L"sbm:reach-velocity";
 const XMLCh ATTR_REACH_FINISH[] = L"sbm:reach-finish";
+const XMLCh ATTR_FADE_OUT[]		= L"sbm:fade-out";
+const XMLCh ATTR_FADE_IN[]		= L"sbm:fade-in";
 //const XMLCh ATTR_APEX_DURATION[] = L"sbm:apex-duration";
 
 
@@ -185,6 +187,30 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		}
 	}
 
+	float fadeOutTime = -1.0;
+	float fadeInTime = -1.0;
+	const XMLCh* attrFadeOut = elem->getAttribute( ATTR_FADE_OUT );
+	if(attrFadeOut != NULL && attrFadeOut[0] != '\0') 
+	{
+		if( !( wistringstream( attrFadeOut ) >> fadeOutTime ) )
+		{
+			std::stringstream strstr;
+			strstr << "WARNING: Failed to parse fade-out interval attribute \""<< XMLString::transcode(attrFadeOut) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
+			LOG(strstr.str().c_str());
+		}
+	}
+
+	const XMLCh* attrFadeIn = elem->getAttribute( ATTR_FADE_IN );
+	if(attrFadeIn != NULL && attrFadeIn[0] != '\0') 
+	{
+		if( !( wistringstream( attrFadeIn ) >> fadeInTime ) )
+		{
+			std::stringstream strstr;
+			strstr << "WARNING: Failed to parse fade-in interval attribute \""<< XMLString::transcode(attrFadeIn) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
+			LOG(strstr.str().c_str());
+		}
+	}
+
 	const XMLCh* id = elem->getAttribute(ATTR_ID);
 	std::string localId;
 	if (id)
@@ -199,8 +225,8 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		bodyReachCt->reachVelocity = reachVelocity > 0 ? reachVelocity : 80.f;
 		//bodyReachCt->reachCompleteDuration = apexDuration > 0 ? apexDuration : 2.f;
 
-		const MotionDataSet& motionData = request->actor->getReachMotionDataSet();
-		bodyReachCt->updateMotionExamples(motionData);
+		//const MotionDataSet& motionData = request->actor->getReachMotionDataSet();
+		//bodyReachCt->updateMotionExamples(motionData);
 		bCreateNewController = true;
 	}
 
@@ -219,6 +245,12 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	{
 		bodyReachCt->setReachTargetPos(targetPos);
 	}
+
+	if (fadeInTime >= 0.0)
+		bodyReachCt->setFadeIn(fadeInTime);
+
+	if (fadeOutTime >= 0.0)
+		bodyReachCt->setFadeOut(fadeOutTime);
 
 	boost::shared_ptr<MeControllerRequest> ct_request;
 	ct_request.reset();

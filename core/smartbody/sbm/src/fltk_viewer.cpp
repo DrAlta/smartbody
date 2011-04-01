@@ -1228,26 +1228,15 @@ void FltkViewer::translate_keyboard_state()
 		actor->get_locomotion_ct()->set_target_height_displacement(_locoData->height_disp);
 	}
 
-	if (fltk::get_key_state('c'))
-	{
-		LOG("push x");
-// 		MeCtConstraint* bodyReachCt = getCurrentCharacterBodyReachController();
+// 	if (fltk::get_key_state('c'))
+// 	{
+// 		LOG("push c");
+//  		MeCtExampleBodyReach* bodyReachCt = getCurrentCharacterBodyReachController();
 // 		if (bodyReachCt)
 // 		{
-// 			//bodyReachCt->useDataDriven = !reachCt->useDataDriven;
-// 			//bodyReachCt->useBalance = !bodyReachCt->useBalance;
-// 			if (bodyReachCt->useIKConstraint)
-// 			{
-// 				//bodyReachCt->useIKConstraint = false;
-// 				bodyReachCt->setFadeOut(0.5);
-// 			}
-// 			else
-// 			{
-// 				bodyReachCt->useIKConstraint = true;
-// 				bodyReachCt->setFadeIn(0.5);
-// 			}
+// 			bodyReachCt->simplexIndex = (bodyReachCt->simplexIndex + 1)%bodyReachCt->simplexList.size();
 // 		}
-	}
+// 	}
 
 	if(fltk::get_key_state('f'))
 	{
@@ -2250,6 +2239,7 @@ void FltkViewer::drawEyeBeams()
 
 	while ( character )
 	{
+		character->skeleton_p->invalidate_global_matrices();
 		character->skeleton_p->update_global_matrices();
 		SkJoint* eyeRight = character->skeleton_p->search_joint("eyeball_right");
 		float eyebeamLength = 100 * character->getHeight() / 175.0f;
@@ -2525,6 +2515,23 @@ void FltkViewer::drawPoint( float cx, float cy, float cz, float size, SrVec& col
 	glEnd(); 
 	glDisable(GL_BLEND); 
 }
+
+void FltkViewer::drawTetra( SrVec vtxPos[4], SrVec& color )
+{
+	// draw a wireframe tetrahedron
+	static int edgeIdx[6][2] = { {0,1}, {0,2}, {0,3}, {1,2}, {1,3}, {2,3} };
+	glColor4f(color.x,color.y,color.z,1.f);
+	glBegin(GL_LINES);
+	for (int i=0;i<6;i++)
+	{
+		SrVec& p1 = vtxPos[edgeIdx[i][0]];
+		SrVec& p2 = vtxPos[edgeIdx[i][1]];
+		glVertex3f(p1.x,p1.y,p1.z);
+		glVertex3f(p2.x,p2.y,p2.z);
+	}
+	glEnd();	
+}
+
 
 void FltkViewer::drawCircle(float cx, float cy, float cz, float r, int num_segments, SrVec& color) 
 { 
@@ -3407,14 +3414,16 @@ void FltkViewer::drawReach()
 		/*
 		const VecOfPoseExample& exampleData = reachCt->ExamplePoseData().PoseData();
 		const VecOfPoseExample& resampledData = reachCt->ResampledPosedata().PoseData();
-		character->skeleton_p->update_global_matrices();
-		SkJoint* root = character->skeleton_p->root();
-		//SkJoint* root = reachCt->getRootJoint();
-		SrMat rootMat = root->gmat();
+		character->skeleton_p->update_global_matrices();		
+		//SkJoint* root = reachCt->getRootJoint();		
 		*/
+
+		SkJoint* root = character->skeleton_p->root();
+		SrMat rootMat = root->gmat();
 		//rootMat.translation(root->gmat().get(12),root->gmat().get(13),root->gmat().get(14));
 		const std::vector<SrVec>& exampleData = reachCt->examplePts;
 		const std::vector<SrVec>& resampleData = reachCt->resamplePts;
+		
 
 		SrPoints srExamplePts;	
 		srExamplePts.init_with_attributes();
@@ -3422,7 +3431,7 @@ void FltkViewer::drawReach()
 		{
 			//const PoseExample& exPose = exampleData[i];
 			SrVec lPos = exampleData[i];//SrVec((float)exPose.poseParameter[0],(float)exPose.poseParameter[1],(float)exPose.poseParameter[2]);
-			SrVec gPos = lPos;//*rootMat; // transform to global coordinate
+			SrVec gPos = lPos*rootMat; // transform to global coordinate
 			//drawCircle(gPos[0],gPos[1],gPos[2],1.0,5,SrVec(1.0,0.0,0.0));			
 			//drawPoint(gPos[0],gPos[1],gPos[2],5.0,SrVec(0.0,0.0,1.0));
 			SrSnSphere sphere;			
@@ -3434,42 +3443,41 @@ void FltkViewer::drawReach()
 			//PositionControl::drawSphere(gPos,1.0f);			
 		}	
 
-		SrVec reachTraj = reachCt->curReachIKTrajectory;
-
-// 		SrSnSphere sphere;			
-// 		sphere.shape().center = SrPnt(reachTraj[0], reachTraj[1], reachTraj[2]);
-// 		sphere.shape().radius = 3.0;
-// 		sphere.color(SrColor(0.f,1.f,1.f));
-// 		sphere.render_mode(srRenderModeLines);
-// 		SrGlRenderFuncs::render_sphere(&sphere);
-
-		PositionControl::drawSphere(reachTraj,3.0,SrVec(0,1,1));
-
-
-
-		SrVec ikTraj = reachCt->ikTarget;
-// 		sphere.shape().center = SrPnt(ikTraj[0], ikTraj[1], ikTraj[2]);
-// 		sphere.shape().radius = 3.0;
-// 		sphere.color(SrColor(0.f,1.f,0.f));
-// 		sphere.render_mode(srRenderModeLines);
-// 		SrGlRenderFuncs::render_sphere(&sphere);
-		PositionControl::drawSphere(ikTraj,3.0,SrVec(0,1,0));
-
-		PositionControl::drawSphere(reachCt->interpPos,3.0,SrVec(1,0,1));
-		PositionControl::drawSphere(reachCt->curEffectorPos,3.0,SrVec(1,0,0));
-		PositionControl::drawSphere(reachCt->ikRoot,4.0,SrVec(0,0,0));
-		//PositionControl::drawSphere(reachCt->curEffectorPos,3.0,SrVec(0,0,1));
+	    // tetra hedron rendering, disabled for now.
+		//const VecOfSimplex& simplexList = reachCt->simplexList;
+// 		SrVec tetraVtx[4];
+// 		for (unsigned int i=0;i<simplexList.size();i++)
+// 		{
+// 			if (i != reachCt->simplexIndex )
+// 				continue;
+// 			const Simplex& sp = simplexList[i];
+// 			for (int k=0;k<4;k++)
+// 			{
+// 				tetraVtx[k] = exampleData[sp.vertexIndices[k]];//*rootMat;
+// 				//tetraVtx[k].z *= 3.f;
+// 				tetraVtx[k] = tetraVtx[k]*rootMat;
+// 			}
+// 
+// 			drawTetra(tetraVtx,SrVec(1,0,0));
+// 		}
 
 		
 		for (unsigned int i=0;i<resampleData.size();i++)
 		{			
 			SrVec lPos = resampleData[i];
-			SrVec gPos = lPos; // transform to global coordinate
+			SrVec gPos = lPos*rootMat; // transform to global coordinate
 			//drawCircle(gPos[0],gPos[1],gPos[2],1.0,5,SrVec(1.0,0.0,0.0));			
 			drawPoint(gPos[0],gPos[1],gPos[2],1.5,SrVec(0.0,1.0,0.0));
 			//PositionControl::drawSphere(gPos,1.0f);			
 		}	
 		
+		SrVec reachTraj = reachCt->curReachIKTrajectory;
+		PositionControl::drawSphere(reachTraj,3.0,SrVec(0,1,1));
+		SrVec ikTraj = reachCt->ikTarget;
+		PositionControl::drawSphere(ikTraj,3.0,SrVec(0,1,0));
+		PositionControl::drawSphere(reachCt->interpPos,3.0,SrVec(1,0,1));
+		PositionControl::drawSphere(reachCt->curEffectorPos,3.0,SrVec(1,0,0));
+		PositionControl::drawSphere(reachCt->ikRoot,4.0,SrVec(0,0,0));					
 	}
 
 	glPopAttrib();

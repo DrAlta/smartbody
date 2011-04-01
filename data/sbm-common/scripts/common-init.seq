@@ -7,6 +7,7 @@
 0	path ME ../../../../data/sbm-common/common-sk
 
 0	echo >>> Loading common motions and poses...
+0	load motions -R ../../../../data/sample_reach
 0	load motions -R ../../../../data/sbm-common/common-sk
 0	load skeletons -R ../../../../data/sbm-common/common-sk
 0	load poses   -R ../../../../data/sbm-common/common-sk
