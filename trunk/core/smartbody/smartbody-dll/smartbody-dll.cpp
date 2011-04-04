@@ -93,10 +93,10 @@ int sbm_main_func( srArgBuffer & args, mcuCBHandle * mcu_p )
    switch( result )
    {
       case CMD_NOT_FOUND:
-         fprintf( stdout, "SBM ERR: command NOT FOUND: '%s %s'\n> ", token, args_raw );
+         LOG( "SBM ERR: command NOT FOUND: '%s %s'> ", token, args_raw );
          break;
       case CMD_FAILURE:
-         fprintf( stdout, "SBM ERR: command FAILED: '%s %s'\n> ", token, args_raw );
+         LOG( "SBM ERR: command FAILED: '%s %s'> ", token, args_raw );
          break;
       case CMD_SUCCESS:
          break;
@@ -111,7 +111,7 @@ int sbm_main_func( srArgBuffer & args, mcuCBHandle * mcu_p )
 // static function taken from sbm_main.cpp
 int mcu_echo_func( srArgBuffer & args, mcuCBHandle * mcu_p )
 {
-   fprintf( stdout, "%s\n> ", args.read_remainder_raw() );
+   LOG( args.read_remainder_raw() );
 
    return CMD_SUCCESS;
 }
