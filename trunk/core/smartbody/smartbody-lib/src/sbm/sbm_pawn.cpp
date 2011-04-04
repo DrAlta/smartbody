@@ -25,6 +25,7 @@
 #include "vhcl.h"
 
 #include "sbm_pawn.hpp"
+#include <sbm/gpu/SbmDeformableMeshGPU.h>
 
 #include <string.h>
 #include <iostream>
@@ -111,7 +112,8 @@ SbmPawn::SbmPawn( const char * name )
 
 	skeleton_p( NULL ),
 	scene_p( new SkScene() ),
-	dMesh_p( new DeformableMesh() ),
+	//dMesh_p( new DeformableMesh() ),
+	dMesh_p( new SbmDeformableMeshGPU() ),
 	ct_tree_p( MeControllerTreeRoot::create() ),
 	world_offset_writer_p( new MeCtChannelWriter() ),
 	wo_cache_timestamp( -std::numeric_limits<float>::max() )

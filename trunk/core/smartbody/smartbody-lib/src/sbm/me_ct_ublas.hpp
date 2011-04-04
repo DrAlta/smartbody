@@ -2,10 +2,25 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
-
 using namespace boost::numeric;
 typedef boost::numeric::ublas::matrix<double, boost::numeric::ublas::column_major> dMatrix;
 typedef boost::numeric::ublas::vector<double> dVector;
+
+template <class T>
+struct ublasT
+{
+	typedef boost::numeric::ublas::vector<T> VecT;
+	typedef boost::numeric::ublas::matrix<T, boost::numeric::ublas::column_major> MatT;		
+};
+
+template <class T>
+T* getPtr(boost::numeric::ublas::vector<T>& vec) { return &(vec.data()[0]); }
+template <class T>
+T* getPtr(boost::numeric::ublas::matrix<T, boost::numeric::ublas::column_major>& mat) { return &(mat.data()[0]); }
+
+
+
+
 
 // some linear algebra routines based on boost numeric binding and Lapack
 namespace MeCtUBLAS	

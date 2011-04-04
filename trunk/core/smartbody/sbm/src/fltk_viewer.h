@@ -28,6 +28,8 @@
 # ifndef FLTK_VIEWER_H
 # define FLTK_VIEWER_H
 
+//#define USE_GLEW 1
+#include <sbm/GPU/SbmShader.h>
 #include "fltk/Slider.h"
 #include <fltk/compat/FL/Fl_Menu_Item.H>
 # include <fltk/GlWindow.H>

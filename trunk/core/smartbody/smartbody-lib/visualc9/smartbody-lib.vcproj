@@ -121,7 +121,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\src;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\atlas;..\..\..\..\lib\boost"
+				AdditionalIncludeDirectories="..\src;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost"
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -500,6 +500,82 @@
 				RelativePath="..\src\sbm\xercesc_utils.hpp"
 				>
 			</File>
+			<Filter
+				Name="GPU"
+				>
+				<File
+					RelativePath="..\src\sbm\GPU\SbmDeformableMeshGPU.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\GPU\SbmDeformableMeshGPU.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\GPU\SbmShader.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\GPU\SbmShader.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\GPU\TBOData.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\GPU\TBOData.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\GPU\VBOData.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\GPU\VBOData.h"
+					>
+				</File>
+				<Filter
+					Name="gfx"
+					>
+					<File
+						RelativePath="..\src\sbm\GPU\gfx\mat2.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\GPU\gfx\mat3.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\GPU\gfx\mat4.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\GPU\gfx\vec2.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\GPU\gfx\vec3.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\GPU\gfx\vec4.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="shaderFiles"
+					>
+					<File
+						RelativePath="..\src\sbm\GPU\shaderFiles\fs_skin_render.frag"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\GPU\shaderFiles\vs_skin_pos.vert"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="controllers"
@@ -2065,6 +2141,22 @@
 				</File>
 				<File
 					RelativePath="..\src\external\tetgen\tetgen.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="glew"
+				>
+				<File
+					RelativePath="..\src\external\glew\glew.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\glew\glew.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\glew\wglew.h"
 					>
 				</File>
 			</Filter>

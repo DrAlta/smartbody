@@ -308,10 +308,10 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	interpPos = getCurrentHandPos(interpMotionFrame);
 		
 	// update interpolated motion using IK constraint
-// 	if (useIKConstraint)
-// 	{
-// 		updateIK(curReachIKTrajectory,interpMotionFrame,ikMotionFrame);					
-// 	}	
+	if (useIKConstraint)
+	{
+		updateIK(curReachIKTrajectory,interpMotionFrame,ikMotionFrame);					
+	}	
 
 	ikRoot = ikScenario.ikTreeRoot->joint->parent()->gmat().get_translation();//gmat.get_translation();
 
@@ -397,7 +397,7 @@ void MeCtExampleBodyReach::init()
 
 	EffectorConstantConstraint* cons = new EffectorConstantConstraint();
 	cons->efffectorName = reachEndEffector->name().get_string();
-	cons->rootName ="r_shoulder";//rootJoint->name().get_string();	
+	cons->rootName = "";//"r_shoulder";//rootJoint->name().get_string();	
 
 	EffectorConstantConstraint* lFoot = new EffectorConstantConstraint();
 	lFoot->efffectorName = lFootName;

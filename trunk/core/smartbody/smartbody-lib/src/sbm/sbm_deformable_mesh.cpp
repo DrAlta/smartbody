@@ -21,6 +21,7 @@ void DeformableMesh::update()
 {
 	if (!binding)	return;
 	skeleton->update_global_matrices();
+	int maxJoint = -1;
 	for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
 	{
 		SkinWeight* skinWeight = skinWeights[skinCounter];
@@ -41,8 +42,11 @@ void DeformableMesh::update()
 				for (int i = 0; i < numVertices; i++)
 				{
 					int numOfInfJoints = skinWeight->numInfJoints[i];
-					SrVec& skinLocalVec = dMeshStatic->shape().V[i];
+					if (numOfInfJoints > maxJoint)
+						maxJoint = numOfInfJoints;
+					SrVec& skinLocalVec = dMeshStatic->shape().V[i];					
 					SrVec finalVec;
+					//printf("Vtx bind pose = \n");
 					for (int j = 0; j < numOfInfJoints; j++)
 					{
 						const SkJoint* curJoint = skinWeight->infJoint[skinWeight->jointNameIndex[globalCounter]];
@@ -51,7 +55,7 @@ void DeformableMesh::update()
 						SrMat& invBMat = skinWeight->bindPoseMat[skinWeight->jointNameIndex[globalCounter]];	
 						double jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
 						globalCounter ++;
-						finalVec = finalVec + (float(jointWeight) * (skinLocalVec * invBMat * gMat));
+						finalVec = finalVec + (float(jointWeight) * (skinLocalVec * invBMat * gMat));						
 					}
 					dMeshDynamic->shape().V[i] = finalVec;
 				}
@@ -61,6 +65,8 @@ void DeformableMesh::update()
 				continue;
 		}
 	}
+
+	//printf("Max Influence Joints = %d\n",maxJoint);
 }
 
 SkinWeight* DeformableMesh::getSkinWeight(std::string skinSourceName)

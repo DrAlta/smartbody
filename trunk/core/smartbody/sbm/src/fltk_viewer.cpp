@@ -20,10 +20,9 @@
  *      Marcelo Kallmann, USC (currently at UC Merced)
  */
 
+
 #include "vhcl.h"
-
 # include "fltk_viewer.h"
-
 # include <fltk/events.h>
 # include <fltk/gl.h>
 # include <GL/glu.h>
@@ -62,6 +61,7 @@
 # include <SBM/me_ct_constraint.hpp>
 
 #include <sbm/mcontrol_util.h>
+//#include <sbm/SbmShader.h>
 
 //#include "Heightfield.h"
 
@@ -959,8 +959,12 @@ void MakeShadowMatrix( GLfloat points[3][3], GLfloat light[4], GLfloat matrix[4]
 void FltkViewer::draw() 
  {
    if ( !visible() ) return;
-   if ( !valid() ) init_opengl ( w(), h() ); // valid() is turned on by fltk after draw() returns
-
+   if ( !valid() ) 
+   {
+	   init_opengl ( w(), h() ); // valid() is turned on by fltk after draw() returns
+	   bool hasShaderSupport = SbmShaderManager::initGLExtension();
+	   SbmShaderManager::singleton().buildShaders();
+   }   
    // move picking operations here to avoid interference with cbufviewer
    if (_objManipulator.hasPicking())
    {
