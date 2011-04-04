@@ -19,8 +19,7 @@ namespace ublas  = boost::numeric::ublas;
 void MeCtUBLAS::matrixMatMult(const dMatrix& mat1, const dMatrix& mat2, dMatrix& mat3)
 {
 	if (mat3.size1() != mat1.size1() || mat3.size2() != mat2.size2())
-		mat3.resize(mat1.size1(),mat2.size2());
-
+		mat3.resize(mat1.size1(),mat2.size2());	
 	blas::gemm(mat1,mat2,mat3);	
 }
 

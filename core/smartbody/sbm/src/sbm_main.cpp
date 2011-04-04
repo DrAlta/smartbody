@@ -506,6 +506,11 @@ int main( int argc, char **argv )	{
 	vhcl::Crash::AddCrashCallback( new SBMCrashCallback() );
 #endif
 
+	
+
+	// init glew to use OpenGL extension
+	//bool hasShaderSupport = SbmShader::initShader();
+
 	//CommandWindow* commandWindow = new CommandWindow(100, 100, 640, 480, "Commands");
 	//commandWindow->show();
 	//vhcl::Log::g_log.AddListener(commandWindow);
