@@ -88,9 +88,6 @@ class MeCtFace : public MeController	{
 
 		virtual double controller_duration ();
 
-		void setVisemeClamping(bool val);
-		bool isVisemeClamping();
-
 	private:
 
 		// callbacks for the base class
