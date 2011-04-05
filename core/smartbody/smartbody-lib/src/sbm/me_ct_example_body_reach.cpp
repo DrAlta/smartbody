@@ -42,6 +42,7 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( SkSkeleton* sk, SkJoint* effectorJoi
 	prev_time = -1.0;
 	dataInterpolator = NULL;
 	refMotion = NULL;
+	_duration = -1.0f;
 	reachTime = 0.0;	
 	useIKConstraint = true;
 	useInterpolation = true;
@@ -250,7 +251,8 @@ bool MeCtExampleBodyReach::updateInterpolation(float dt, BodyMotionFrame& outFra
 
 bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 {
-	mcuCBHandle::singleton().mark("main",0,"A");
+	//mcuCBHandle::singleton().mark("main",0,"A");
+	//LOG("example reach running\n");
 	float dt = 0.001f;
 	float du = 0.0;
 	if (prev_time == -1.0) // first start
@@ -335,7 +337,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	MotionExampleSet::blendMotionFrame(inputMotionFrame,ikMotionFrame,blendWeight,outMotionFrame);
 
 	updateChannelBuffer(frame,outMotionFrame);
-	mcuCBHandle::singleton().mark("main",0,"B");
+	//mcuCBHandle::singleton().mark("main",0,"B");
 	return true;
 }
 
