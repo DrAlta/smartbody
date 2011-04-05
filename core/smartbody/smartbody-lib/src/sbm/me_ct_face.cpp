@@ -307,27 +307,6 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 	int c = 0;
 	SkMotion* key_pose_p;
 
-	float totalWeight = 0.0f;
-	if (isVisemeClamping())
-	{
-		_key_pose_map.reset();
-		while( key_pose_p = _key_pose_map.next() )
-		{
-			int weight_index = _kChan_to_buff[ c++ ];
-			if( weight_index >= 0 )
-			{
-				float key_weight = fbuffer[ weight_index ];
-				if( fabs( key_weight ) > 0.01 )
-				{
-					totalWeight += key_weight;
-				}
-			}
-		}
-		if (totalWeight <= 1.0f)
-			totalWeight = 1.0f;
-	}
-
-
 	c = 0;
 	_key_pose_map.reset();
 	while( key_pose_p = _key_pose_map.next() )	{
@@ -336,8 +315,6 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 			float key_weight = fbuffer[ weight_index ];
 			if( fabs( key_weight ) > 0.01 )	{
 				float adjustedWeight = key_weight;
-				if (isVisemeClamping())
-					adjustedWeight /= totalWeight;
 			
 //				LOG( "Face: '%s': %f\n", key_pose_p->name(), key_weight );
 			
@@ -443,16 +420,6 @@ void MeCtFace::print_state( int tabCount ) {
 		LOG(" \"%s\"", str );
 
 	LOG("\n" );
-}
-
-void MeCtFace::setVisemeClamping(bool val)
-{
-	_useVisemeClamping = val;
-}
-
-bool MeCtFace::isVisemeClamping()
-{
-	return _useVisemeClamping;
 }
 
 //////////////////////////////////////////////////////////////////////////////////
