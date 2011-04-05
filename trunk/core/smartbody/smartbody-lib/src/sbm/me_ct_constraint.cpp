@@ -101,6 +101,9 @@ bool FadingControl::updateFading( float dt )
 
 void FadingControl::setFadeIn( float interval )
 {
+	if (blendWeight == 1.0 && fadeMode == FADING_MODE_OFF)
+		return;
+
 	fadeInterval = interval;
 	fadeRemainTime = interval;
 	fadeMode = FADING_MODE_IN;
@@ -109,6 +112,9 @@ void FadingControl::setFadeIn( float interval )
 
 void FadingControl::setFadeOut( float interval )
 {
+	if (blendWeight == 0.0 && fadeMode == FADING_MODE_OFF)
+		return;
+
 	fadeInterval = interval;
 	fadeRemainTime = interval;
 	fadeMode = FADING_MODE_OUT;

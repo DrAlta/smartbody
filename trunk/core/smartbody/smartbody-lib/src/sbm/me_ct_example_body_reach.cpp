@@ -90,6 +90,9 @@ void MeCtExampleBodyReach::findReachTarget( SrVec& rTarget, SrVec& rError )
 {
 	//if (reachTargetJoint)
 	{
+		if (reachTargetJoint)
+			reachTargetJoint->update_gmat_up();
+
 		SrVec newReachTarget = (reachTargetJoint && useTargetJoint) ? reachTargetJoint->gmat().get_translation() : reachTargetPos;
 		if ( (newReachTarget - reachTarget).norm() > 0.01 ) // interrupt and reset reach state if the reach target is moved
 		{				
@@ -174,9 +177,10 @@ void MeCtExampleBodyReach::updateIK( SrVec& rTrajectory, BodyMotionFrame& refFra
 // 	rfoot->targetPos = motionParameter->getMotionFrameJoint(idleMotionFrame,rFootName.c_str())->gmat().get_translation();	
 
 
-	skeletonCopy->invalidate_global_matrices();
-	skeletonCopy->update_global_matrices();
-	ikScenario.ikGlobalMat = ikScenario.ikTreeRoot->joint->parent()->gmat();	
+	skeletonRef->invalidate_global_matrices();
+	skeletonRef->update_global_matrices();
+	const char* rootName = ikScenario.ikTreeRoot->joint->parent()->name().get_string();
+	ikScenario.ikGlobalMat = skeletonRef->search_joint(rootName)->gmat();//ikScenario.ikTreeRoot->joint->parent()->gmat();	
 	ikScenario.setTreeNodeQuat(refFrame.jointQuat,QUAT_REF);							
 	//ik.setDt(dt);
 	ik.maxOffset = ikMaxOffset;
@@ -338,6 +342,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	bool finishFadeOut = updateFading(dt);
 	BodyMotionFrame outMotionFrame;
 	MotionExampleSet::blendMotionFrame(inputMotionFrame,ikMotionFrame,blendWeight,outMotionFrame);
+	//outMotionFrame = ikMotionFrame;
 
 	updateChannelBuffer(frame,outMotionFrame);
 	//mcuCBHandle::singleton().mark("main",0,"B");
@@ -402,7 +407,7 @@ void MeCtExampleBodyReach::init()
 {
 	assert(skeletonRef);	
 	// root is "world_offset", so we use root->child to get the base joint.
-	SkJoint* rootJoint = skeletonRef->root()->child(0);	
+	SkJoint* rootJoint = skeletonCopy->root()->child(0);//skeletonRef->root()->child(0);	
 	ikScenario.buildIKTreeFromJointRoot(rootJoint);
 	MeCtIKTreeNode* endNode = ikScenario.findIKTreeNode(reachEndEffector->name().get_string());
 	//ikScenario.ikEndEffectors.push_back(endNode);
