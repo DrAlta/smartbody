@@ -179,6 +179,8 @@ void MeCtExampleBodyReach::updateIK( SrVec& rTrajectory, BodyMotionFrame& refFra
 	ikScenario.ikGlobalMat = ikScenario.ikTreeRoot->joint->parent()->gmat();	
 	ikScenario.setTreeNodeQuat(refFrame.jointQuat,QUAT_REF);							
 	//ik.setDt(dt);
+	ik.maxOffset = ikMaxOffset;
+	ik.dampJ = ikDamp;
 	ik.refDampRatio = 0.1;
 	for (int i=0;i<1;i++)
 	{
@@ -312,6 +314,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	// update interpolated motion using IK constraint
 	if (useIKConstraint)
 	{
+		ikMaxOffset = reachVelocity*dt;
 		updateIK(curReachIKTrajectory,interpMotionFrame,ikMotionFrame);					
 	}	
 
@@ -320,7 +323,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	// hand position after solving IK
 	curEffectorPos = getCurrentHandPos(ikMotionFrame);
 
-	bool ikHasReach = (useInterpolation && dataInterpolator) ? false : (curEffectorPos - ikTarget).norm() < 2.0;
+	bool ikHasReach = (useInterpolation && dataInterpolator) ? false : (curEffectorPos - ikTarget).norm() < ikReachRegion;
 	if ( ikHasReach || interpHasReach)
 	{
 		updateState();		
@@ -388,6 +391,13 @@ SrVec MeCtExampleBodyReach::getCurrentHandPos( BodyMotionFrame& motionFrame )
 	return handPos;
 }
 
+void MeCtExampleBodyReach::setEndEffectorRoot( const char* rootName )
+{
+	EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>(reachPosConstraint[reachEndEffector->name().get_string()]);
+	if (skeletonRef->search_joint(rootName) != NULL)
+		cons->rootName = rootName;
+}
+
 void MeCtExampleBodyReach::init()
 {
 	assert(skeletonRef);	
@@ -399,7 +409,7 @@ void MeCtExampleBodyReach::init()
 
 	EffectorConstantConstraint* cons = new EffectorConstantConstraint();
 	cons->efffectorName = reachEndEffector->name().get_string();
-	cons->rootName = "";//"r_shoulder";//rootJoint->name().get_string();	
+	cons->rootName = "r_sternoclavicular";//"r_shoulder";//rootJoint->name().get_string();	
 
 	EffectorConstantConstraint* lFoot = new EffectorConstantConstraint();
 	lFoot->efffectorName = lFootName;
@@ -435,7 +445,15 @@ void MeCtExampleBodyReach::init()
 
 	SkJoint* copyEffector = skeletonCopy->linear_search_joint(reachEndEffector->name().get_string());
 	motionParameter = new ReachMotionParameter(skeletonCopy,affectedJoints,copyEffector);
-	motionExamples.initMotionExampleSet(motionParameter);	
+	motionExamples.initMotionExampleSet(motionParameter);
+
+	// initialize all parameters according to scale	
+	ikReachRegion = characterHeight*0.02f;	
+	reachVelocity = characterHeight*0.5f;
+
+	ikDamp        = ikReachRegion*ikReachRegion*15.0;//characterHeight*0.1f;
+	
+
 	MeController::init();	
 }
 

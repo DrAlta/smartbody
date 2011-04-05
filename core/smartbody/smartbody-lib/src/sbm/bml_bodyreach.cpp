@@ -50,6 +50,7 @@ const XMLCh DTYPE_SBM[]  = L"ICT.SBM";
 
 ////// XML ATTRIBUTES
 const XMLCh ATTR_EFFECTOR[] = L"effector";
+const XMLCh ATTR_ROOT[] = L"sbm:root";
 const XMLCh ATTR_TARGET_POS[] = L"sbm:target-pos";
 const XMLCh ATTR_REACH_VELOCITY[] = L"sbm:reach-velocity";
 const XMLCh ATTR_REACH_FINISH[] = L"sbm:reach-finish";
@@ -132,6 +133,14 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	{
 		effectorName = asciiString(attrEffector);
 		effectorJoint = request->actor->skeleton_p->search_joint(effectorName);		
+	}
+
+	const XMLCh* attrRoot = NULL;
+	const char* rootName = NULL;
+	attrRoot = elem->getAttribute(ATTR_ROOT);		
+	if( attrRoot && XMLString::stringLen( attrRoot ) ) 
+	{
+		rootName = asciiString(attrRoot);			
 	}
 
 	SrVec targetPos = SrVec();
@@ -217,12 +226,18 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		localId = XMLString::transcode(id);
 
 	bool bCreateNewController = false;
+	
 	if (!bodyReachCt)
 	{
 		bodyReachCt = new MeCtExampleBodyReach(request->actor->skeleton_p, effectorJoint);		
 		bodyReachCt->handle(handle);
+		SbmCharacter* chr = const_cast<SbmCharacter*>(request->actor);
+		float characterHeight = chr->getHeight();
+		bodyReachCt->characterHeight = characterHeight;
+
 		bodyReachCt->init();		
-		bodyReachCt->reachVelocity = reachVelocity > 0 ? reachVelocity : 80.f;
+		if (reachVelocity > 0)
+			bodyReachCt->reachVelocity = reachVelocity;
 		//bodyReachCt->reachCompleteDuration = apexDuration > 0 ? apexDuration : 2.f;
 
 		//const MotionDataSet& motionData = request->actor->getReachMotionDataSet();
@@ -234,6 +249,11 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		bodyReachCt->reachVelocity = reachVelocity;
 // 	if (apexDuration > 0)
 // 		bodyReachCt->reachCompleteDuration = apexDuration;
+
+	if (rootName)
+	{
+		bodyReachCt->setEndEffectorRoot(rootName);
+	}
 
 
 	if( target_joint )	{

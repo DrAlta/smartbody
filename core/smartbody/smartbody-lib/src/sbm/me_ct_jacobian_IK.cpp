@@ -295,6 +295,7 @@ void MeCtIKTreeScenario::copyTreeNodeQuat( NodeQuatType typeFrom, NodeQuatType t
 MeCtJacobianIK::MeCtJacobianIK(void)
 {
 	dampJ = 150.0;
+	maxOffset = 10.0f;
 	refDampRatio = 0.01;
 	ikUseBalance = false;
 	ikUseReference = true;
@@ -359,11 +360,11 @@ bool MeCtJacobianIK::updateReferenceJointJacobian( MeCtIKTreeScenario* s )
 		float angle;
 		diff.get(axis,angle);
 		SrVec offset = axis*angle*0.9f;
-// 		if (offset.len() > maxRotOffset)
-// 		{
-// 			offset.normalize();
-// 			offset = offset*maxRotOffset;
-// 		}			
+		if (offset.len() > maxRotOffset)
+		{
+			offset.normalize();
+			offset = offset*maxRotOffset;
+		}			
 
 		float weight = (float)(endNode->nodeLevel + 1);
 		for (int k=0;k<3;k++)
@@ -388,7 +389,7 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 	// plus rotation
 	dS.resize(s->ikPosEffectors->size()*3 + s->ikRotEffectors->size()*3);
 	
-	float maxOffset = 10.0f;
+	
 	ConstraintMap::iterator ci;
 	int posCount = 0;
 	// fill in entries for positional constraint

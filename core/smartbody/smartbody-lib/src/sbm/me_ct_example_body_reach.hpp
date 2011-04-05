@@ -67,6 +67,8 @@ protected:
 	BodyMotionFrame       inputMotionFrame,ikMotionFrame, idleMotionFrame, interpMotionFrame, initMotionFrame;
 	BodyMotionFrame       interpStartFrame;
 
+	double                ikDamp;
+	float                 ikReachRegion, ikMaxOffset;
 	MeCtJacobianIK        ik;
 	MeCtIKTreeScenario    ikScenario;
 	
@@ -84,6 +86,7 @@ public:
 	// parameters and intermediate variables for debug/visualization
 	SrVec                 curReachIKTrajectory, ikTarget, interpPos, curEffectorPos, currentInterpTarget, ikRoot;
 	float                 reachVelocity, reachCompleteDuration;
+	float                 characterHeight;
 	bool                  useIKConstraint, useInterpolation, useTargetJoint;
 
 public:
@@ -109,7 +112,7 @@ public:
 
 	void setReachTargetJoint(SkJoint* val); 
 	void setReachTargetPos(SrVec& targetPos);
-	void setEndEffector(SkJoint* effector);
+	void setEndEffectorRoot(const char* rootName);	
 	void setFinishReaching(bool isFinish) { finishReaching = isFinish; }
 	void init();
 
