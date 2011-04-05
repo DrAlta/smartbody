@@ -412,6 +412,8 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert( "unregisterevent",       registerevent_func );
    mcu.insert( "motionmap",		   motionmap_func );
    mcu.insert( "skeletonmap",		   skeletonmap_func );
+   mcu.insert( "characters",		   showcharacters_func );
+   mcu.insert( "pawns",			   showpawns_func );
 
 
    mcu.insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands

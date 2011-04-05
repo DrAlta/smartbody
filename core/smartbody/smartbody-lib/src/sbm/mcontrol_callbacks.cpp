@@ -5281,4 +5281,32 @@ int skeletonmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 }
 
 
+int showcharacters_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	SbmCharacter* character = NULL;
+	mcu_p->character_map.reset();
+	while ((character = mcu_p->character_map.next()) != NULL)
+	{
+		LOG("%s", character->name);
+	}
+
+	return CMD_SUCCESS;
+}
+
+
+int showpawns_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	SbmPawn* pawn = NULL;
+	mcu_p->pawn_map.reset();
+	while ((pawn = mcu_p->pawn_map.next()) != NULL)
+	{
+		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
+		if (!character)
+			LOG("%s", pawn->name);
+	}
+
+	return CMD_SUCCESS;
+}
+
+
 
