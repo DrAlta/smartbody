@@ -119,6 +119,7 @@ MeCtConstraint::MeCtConstraint( SkSkeleton* skeleton )  : FadingControl()
 {
 	_skeleton = skeleton;
 	prev_time = -1.0;	
+	_duration = -1.0f;
 }
 
 MeCtConstraint::~MeCtConstraint(void)
