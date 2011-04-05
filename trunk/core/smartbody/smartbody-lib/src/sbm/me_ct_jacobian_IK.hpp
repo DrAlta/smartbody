@@ -112,6 +112,7 @@ protected:
 	
 public:
 	double  dampJ, refDampRatio; // damping constant	
+	float  maxOffset;
 	bool    ikUseBalance, ikUseReference;
 public:
 	MeCtJacobianIK(void);
