@@ -113,6 +113,8 @@ public:
 
 	void set_base_name(const char* name);
 
+	MeCtLocomotionSpeedAccelerator* get_speed_accelerator();
+
 };
 
 #endif // ME_CT_LOCOMOTION_PAWN_HPP
