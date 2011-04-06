@@ -469,6 +469,7 @@ class PALocomotionData
 	float w;	// angular velocity
 	float v;	// velocity
 	SbmCharacter* character;
+	bool jumping;
 	bool starting;
 	bool stopping;
 	float linearVelocityIncrement;

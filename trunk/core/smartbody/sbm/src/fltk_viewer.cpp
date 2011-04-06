@@ -1468,6 +1468,11 @@ void FltkViewer::translate_keyboard_state()
 	{
 		_locoData->rightkey = false;
 	}
+	if (fltk::get_key_state(fltk::SpaceKey))
+	{
+		_paLocoData->jumping = true;
+		paLocomotionCmd = true;
+	}
 
 	if(fltk::get_key_state('a'))//speed control
 	{
@@ -1549,6 +1554,16 @@ void FltkViewer::translate_keyboard_state()
 			std::stringstream command;
 			command << "panim schedule char " << _paLocoData->character->name << " state UtahWalkToStop loop false";
 			mcu.execute((char*)command.str().c_str());
+		}
+		else if (_paLocoData->jumping && state != NULL)
+		{
+			std::stringstream command1;
+			command1 << "panim schedule char " << _paLocoData->character->name << " state UtahJump loop false";
+			mcu.execute((char*)command1.str().c_str());	
+			std::stringstream command2;
+			command2 << "panim schedule char " << _paLocoData->character->name << " state UtahLocomotion loop true";
+			mcu.execute((char*)command2.str().c_str());
+			_paLocoData->jumping = false;
 		}
 		else
 		{
@@ -3497,6 +3512,7 @@ PALocomotionData::PALocomotionData()
 	character = mcuCBHandle::singleton().character_map.next();
 	starting = false;
 	stopping = false;
+	jumping = false;
 	linearVelocityIncrement = 10.0f;
 	angularVelocityIncrement = 20.0f;
 }
