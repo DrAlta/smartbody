@@ -40,6 +40,7 @@
 #include "me_utilities.hpp"
 #include "wsp.h"
 #include "sr/sr_model.h"
+#include "sbm/gpu/SbmShader.h"
 #include "sbm_deformable_mesh.h"
 
 #include <boost/algorithm/string/replace.hpp>
@@ -87,7 +88,7 @@ mcuCBHandle* mcuCBHandle::_singleton = NULL;
 
 mcuCBHandle::mcuCBHandle()
 :	loop( true ),
-	vhmsg_enabled( false ),
+	vhmsg_enabled( false ),	
 	internal_timer_p( NULL ),
 	external_timer_p( NULL ),
 	timer_p( NULL ),
@@ -126,6 +127,7 @@ mcuCBHandle::mcuCBHandle()
 	delay_behaviors(true),
 	media_path(".")
 {
+
 	
 	root_group_p->ref();
 	logger_p->ref();
@@ -408,7 +410,7 @@ void mcuCBHandle::clear( void )	{
 
 /////////////////////////////////////////////////////////////
 
-int mcuCBHandle::open_viewer( int width, int height, int px, int py )	{
+int mcuCBHandle::open_viewer( int width, int height, int px, int py )	{	
 	
 	if( viewer_p == NULL )	{
 		viewer_p = viewer_factory->create( px, py, width, height );
@@ -420,6 +422,7 @@ int mcuCBHandle::open_viewer( int width, int height, int px, int py )	{
 		if( root_group_p )	{
 			viewer_p->root( root_group_p );
 		}
+		SbmShaderManager::singleton().setViewer(viewer_p);
 		return( CMD_SUCCESS );
 	}
 	return( CMD_FAILURE );
@@ -430,6 +433,7 @@ void mcuCBHandle::close_viewer( void )	{
 	if( viewer_p )	{
 		viewer_factory->remove(viewer_p);
 		viewer_p = NULL;
+		SbmShaderManager::singleton().setViewer(NULL);
 	}
 	if( camera_p )	{
 		delete camera_p;
@@ -521,7 +525,6 @@ int mcuCBHandle::remove_scene( SrSnGroup *scene_p )	{
 
 void mcuCBHandle::update( void )	{
 
-
 #if 0
 	static int c = 3;
 	if( c )	{
@@ -533,6 +536,8 @@ void mcuCBHandle::update( void )	{
 	srCmdSeq* seq_p;
 	char *seq_name = NULL;
 	active_seq_map.reset();
+
+
 
 	while( seq_p = active_seq_map.next( & seq_name ) )	{
 
@@ -563,6 +568,18 @@ void mcuCBHandle::update( void )	{
 #endif
 	}
 
+	SbmShaderManager& ssm = SbmShaderManager::singleton();
+	bool hasOpenGL        = ssm.initOpenGL();
+	bool hasShaderSupport = false;
+
+	// init OpenGL extension
+	if (hasOpenGL)
+		hasShaderSupport = ssm.initGLExtension();
+	// update the shader map
+	if (hasShaderSupport)
+		ssm.buildShaders();
+	
+
 	SbmPawn* pawn_p;
 	SbmCharacter* char_p;
 	pawn_map.reset();
@@ -576,9 +593,8 @@ void mcuCBHandle::update( void )	{
 		if( char_p ) {
 
 			char_p->forward_visemes( time );	
-
-			char_p->scene_p->update();
-			char_p->dMesh_p->update();
+			char_p->scene_p->update();	
+			//char_p->dMesh_p->update();
 
 			if ( net_bone_updates && char_p->skeleton_p && char_p->bonebusCharacter ) {
 				NetworkSendSkeleton( char_p->bonebusCharacter, char_p->skeleton_p, &param_map );
@@ -627,7 +643,7 @@ void mcuCBHandle::update( void )	{
 		SrVec targetLoc = cameraLoc - this->cameraTracking[x]->targetToCamera;
 		this->camera_p->center.set( targetLoc.x, targetLoc.y, targetLoc.z);
 		this->viewer_p->set_camera(*( this->camera_p ));
-	}
+	}	
 }
 
 srCmdSeq* mcuCBHandle::lookup_seq( const char* seq_name ) {

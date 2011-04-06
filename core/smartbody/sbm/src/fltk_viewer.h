@@ -337,6 +337,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	virtual void label_viewer(const char* str);
 	virtual void show_viewer();
 	virtual void hide_viewer();
+	virtual void makeGLContext();
 protected:
 	
 	void set_gaze_target(int itype, const char* targetname);	
@@ -345,6 +346,7 @@ protected:
 	void create_popup_menus();
 	MeCtDataDrivenReach* getCurrentCharacterReachController();
 	MeCtExampleBodyReach* getCurrentCharacterBodyReachController();
+	MeCtConstraint*    getCurrentCharacterConstraintController();
 	SbmCharacter*        getCurrentCharacter();
  };
 

@@ -78,6 +78,10 @@ class SrViewer
         will have no effect. */
     virtual void render ();
 
+	// feng : since we need access to OpenGL context before any shader call, 
+	// this hack ensure that we have a valid gl context ( from fltkViewer or other render GUI ) before any GPGPU calls
+	virtual void makeGLContext() {}
+
 	virtual void label_viewer(const char* str);
 
     virtual SrCamera* get_camera();

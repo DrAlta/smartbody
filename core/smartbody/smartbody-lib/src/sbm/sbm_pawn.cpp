@@ -144,7 +144,7 @@ int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 		ct_tree_p->add_skeleton( skeleton_p->name(), skeleton_p );
 	}
 	scene_p->init( skeleton_p );  // if skeleton_p == NULL, the scene is cleared
-	dMesh_p->skeleton = new_skeleton_p;
+	dMesh_p->skeleton = new_skeleton_p;		
 
 	// Name the controllers
 	string ct_name( name );
