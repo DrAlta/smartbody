@@ -3,7 +3,7 @@
 
 SkMotion
 
-name "Brad_WalkForward"
+name "Walk"
 
 channels 115
 base XPos
