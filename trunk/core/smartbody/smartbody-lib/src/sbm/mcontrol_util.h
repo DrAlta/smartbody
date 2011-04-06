@@ -152,7 +152,7 @@ class mcuCBHandle	{
 		SBMCharacterListener * sbm_character_listener;   // only one listener possible, must be set manually
 		std::string speech_audiofile_base_path;
 		std::string process_id;
-		bool		play_internal_audio;
+		bool		play_internal_audio;		
 		
 		// scale factor (used for SmartBody to handle unit convert, both sk and skm)
 		double		skScale;

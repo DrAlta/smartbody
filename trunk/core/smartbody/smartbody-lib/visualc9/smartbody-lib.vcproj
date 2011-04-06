@@ -68,6 +68,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="glu32.lib"
 				OutputFile="..\lib\Smartbodyd.lib"
 				AdditionalLibraryDirectories="..\..\clapack\lib"
 			/>
@@ -145,6 +146,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="glu32.lib"
 				OutputFile="..\lib\Smartbody.lib"
 				AdditionalLibraryDirectories="..\..\clapack\lib"
 			/>

@@ -179,9 +179,9 @@ int MeCtIKTreeScenario::traverseJoint(SkJoint* joint, MeCtIKTreeNode* jointNode,
 		if (prevNode)
 			prevNode->brother = childNode;
 
-		if (strcmp(child->name().get_string(),"spine4")==0)// || 
-			//strcmp(child->name().get_string(),"l_wrist")==0 ||
-			//strcmp(child->name().get_string(),"r_wrist")==0 )
+		if ( strcmp(child->name().get_string(),"spine4")==0)// || 
+// 			strcmp(child->name().get_string(),"l_wrist")==0 ||
+// 			strcmp(child->name().get_string(),"r_wrist")==0 )
 		{
 			nNodes += 1; // don't traverse their children
 		}

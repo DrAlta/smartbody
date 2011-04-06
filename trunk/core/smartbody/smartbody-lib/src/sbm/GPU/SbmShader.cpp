@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <direct.h>
 
 /************************************************************************/
 /* Shader program class                                                 */
@@ -50,22 +51,26 @@ void SbmShaderProgram::buildShader()
 		loadShader(fsID,fsFilename.c_str());
 	}
 
-	printShaderInfoLog(vsID);
+	//printShaderInfoLog(vsID);
 	programID = glCreateProgram();
 	glAttachShader(programID,vsID);
 	glAttachShader(programID,fsID);
 	glLinkProgram(programID);
 	printProgramInfoLog(programID);
 	isBuilt = true;
+	//printOglError("linkProgram");
 }
 
 
 void SbmShaderProgram::loadShader(GLuint sID,  const char* shaderFileName )
 {
 	char *vs = NULL;	
+	char curDir[256];
+	_getcwd(curDir,sizeof(curDir));
 	vs = textFileRead(shaderFileName);	
 	if (!vs) return;
 	const char * vv = vs;
+	//printf("shader source = %s\n",vv);
 	glShaderSource(sID, 1, &vv,NULL);
 	free(vs);
 	glCompileShader(sID);	
@@ -126,15 +131,38 @@ void SbmShaderProgram::printProgramInfoLog( GLuint obj )
 		free(infoLog);
 	}
 }
+
+void SbmShaderProgram::printOglError(const char* tag)
+{
+	GLenum glErr;
+	int    retCode = 0;
+
+	glErr = glGetError();
+	while (glErr != GL_NO_ERROR)
+	{
+		printf("glError %s: %s\n", tag,gluErrorString(glErr));
+		retCode = 1;
+		glErr = glGetError();
+	}
+}
 /************************************************************************/
 /* Shader Manager                                                       */
 /************************************************************************/
-
-bool SbmShaderManager::shaderInit = false;
 SbmShaderManager* SbmShaderManager::_singleton = NULL;
 
 SbmShaderManager::SbmShaderManager(void)
 {
+	viewer = NULL;
+	shaderInit = false;
+}
+
+void SbmShaderManager::setViewer( SrViewer* vw )
+{
+	if (vw == NULL)
+	{
+		shaderInit = false;		
+	}
+	viewer = vw;	
 }
 
 SbmShaderManager::~SbmShaderManager(void)
@@ -149,11 +177,23 @@ SbmShaderManager::~SbmShaderManager(void)
 	}
 }
 
+bool SbmShaderManager::initOpenGL()
+{
+	if (!viewer)
+		return false;
+	viewer->makeGLContext();
+	return true;
+}
+
 bool SbmShaderManager::initGLExtension()
 {	
 	if (shaderInit) // already initialize glew
 		return true;
 
+	if (!viewer)
+		return false;
+
+	//viewer->makeGLContext();
 	glewInit();
 	if (glewIsSupported("GL_VERSION_2_0"))
 	{
@@ -183,7 +223,7 @@ void SbmShaderManager::addShader( const char* entryName,const char* vsName, cons
 }
 
 void SbmShaderManager::buildShaders()
-{
+{	
 	std::map<std::string,SbmShaderProgram*>::iterator vi;
 	for ( vi  = shaderMap.begin();
 		  vi != shaderMap.end();

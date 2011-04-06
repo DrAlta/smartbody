@@ -463,6 +463,7 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 	 bool applyToCharacter = false; 
 	 MeCtDataDrivenReach* reachCt = getCurrentCharacterReachController();
 	 MeCtExampleBodyReach* bodyReachCt = getCurrentCharacterBodyReachController();
+	 MeCtConstraint* constraintCt = getCurrentCharacterConstraintController();
 
    switch ( s )
     { case CmdHelp : _data->helpwin->show(); _data->helpwin->active(); break;
@@ -651,23 +652,23 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 		  }	
 		  break; 
 
-// 	  case CmdConstraintToggleIK:
-// 		  if (bodyReachCt)
-// 		  {
-// 			  //bodyReachCt->useDataDriven = !reachCt->useDataDriven;
-// 			  //bodyReachCt->useBalance = !bodyReachCt->useBalance;
-// 			  if (bodyReachCt->useIKConstraint)
-// 			  {
-// 				  //bodyReachCt->useIKConstraint = false;
-// 				  bodyReachCt->setFadeOut(2.0);
-// 			  }
-// 			  else
-// 			  {
-// 				  bodyReachCt->useIKConstraint = true;
-// 				  bodyReachCt->setFadeIn(2.0);
-// 			  }
-// 		  }
-// 		  break; 
+	  case CmdConstraintToggleIK:
+		  if (constraintCt)
+		  {
+			  //bodyReachCt->useDataDriven = !reachCt->useDataDriven;
+			  //bodyReachCt->useBalance = !bodyReachCt->useBalance;
+			  if (constraintCt->useIKConstraint)
+			  {
+				  //bodyReachCt->useIKConstraint = false;
+				  constraintCt->setFadeOut(2.0);
+			  }
+			  else
+			  {
+				  constraintCt->useIKConstraint = true;
+				  constraintCt->setFadeIn(2.0);
+			  }
+		  }
+		  break; 
 // 	  case CmdConstraintToggleBalance:
 // 		  if (bodyReachCt)
 // 		  {
@@ -957,15 +958,21 @@ void MakeShadowMatrix( GLfloat points[3][3], GLfloat light[4], GLfloat matrix[4]
 
    
 void FltkViewer::draw() 
- {
+{
+   //static bool hasShaderSupport = false;
+   
    if ( !visible() ) return;
    if ( !valid() ) 
    {
 	   init_opengl ( w(), h() ); // valid() is turned on by fltk after draw() returns
-	   bool hasShaderSupport = SbmShaderManager::initGLExtension();
-	   SbmShaderManager::singleton().buildShaders();
+	   //hasShaderSupport = SbmShaderManager::initGLExtension();	   
    }   
+//    if (hasShaderSupport)
+//    {
+// 	   SbmShaderManager::singleton().buildShaders();
+//    }
    // move picking operations here to avoid interference with cbufviewer
+
    if (_objManipulator.hasPicking())
    {
 	   SrVec2 pick_loc = _objManipulator.getPickLoc();
@@ -973,7 +980,7 @@ void FltkViewer::draw()
    }
 
    glViewport ( 0, 0, w(), h() );
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+   mcuCBHandle& mcu = mcuCBHandle::singleton();  
 
    SrLight &light = _data->light;
    SrCamera &cam  = _data->camera;
@@ -1033,6 +1040,29 @@ void FltkViewer::draw()
 	glDisable( GL_COLOR_MATERIAL );
 
    //----- Render user scene -------------------------------------------
+
+	// update deformable mesh
+	bool updateSim = mcu.update_timer();
+	mcu.pawn_map.reset();
+	//if (updateSim)
+	{
+		SbmPawn* pawn_p = NULL;
+		while( pawn_p = mcu.pawn_map.next() )	{
+
+			//pawn_p->reset_all_channels();
+			//pawn_p->ct_tree_p->evaluate( time );
+			//pawn_p->ct_tree_p->applyBufferToAllSkeletons();
+
+			SbmCharacter* char_p = mcu.character_map.lookup( pawn_p->name );
+			if( char_p ) {
+
+				//char_p->forward_visemes( time );	
+				//char_p->scene_p->update();	
+				char_p->dMesh_p->update();
+			}
+		}
+	}
+	
 
 	_data->fcounter.start();
 	if ( _data->displayaxis ) _data->render_action.apply ( _data->sceneaxis );
@@ -3410,7 +3440,29 @@ MeCtDataDrivenReach* FltkViewer::getCurrentCharacterReachController()
 		}		
 	}
 	return reachCt;
+}
 
+MeCtConstraint* FltkViewer::getCurrentCharacterConstraintController()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SbmCharacter* character = getCurrentCharacter();
+
+	MeCtConstraint* reachCt = NULL;
+	if ( character )
+	{
+		MeCtSchedulerClass* reachSched = character->reach_sched_p;
+		MeCtSchedulerClass::VecOfTrack reach_tracks = reachSched->tracks();		
+		MeCtReach* tempCt = NULL;
+		for (unsigned int c = 0; c < reach_tracks.size(); c++)
+		{
+			MeController* controller = reach_tracks[c]->animation_ct();		
+			reachCt = dynamic_cast<MeCtConstraint*>(controller);
+			//tempCt  = dynamic_cast<MeCtReach*>(controller);
+			if (reachCt)
+				break;
+		}		
+	}
+	return reachCt;
 }
 
 // visualize example data and other relevant information for reach controller
@@ -3502,6 +3554,11 @@ void FltkViewer::drawReach()
 	glPopAttrib();
 	
 	
+}
+
+void FltkViewer::makeGLContext()
+{
+	make_current();
 }
 
 PALocomotionData::PALocomotionData()
