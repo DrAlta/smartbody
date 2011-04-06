@@ -127,3 +127,8 @@ void MeCtLocomotionPawn::set_base_name(const char* name)
 	base_name = (char*)malloc(sizeof(char)*(strlen(name)+1));
 	strcpy(base_name, name);
 }
+
+MeCtLocomotionSpeedAccelerator* MeCtLocomotionPawn::get_speed_accelerator()
+{
+	return &speed_accelerator;
+}

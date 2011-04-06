@@ -345,6 +345,18 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		local = true;
 	}
 
+	if( arg == "max_acc_start" )
+	{
+		actor->get_locomotion_ct()->get_speed_accelerator()->set_max_acceleration(abs(args.read_float()));
+		return CMD_SUCCESS;
+	}
+
+	if( arg == "max_acc_stop" )
+	{
+		actor->get_locomotion_ct()->get_speed_accelerator()->set_max_acceleration(-abs(args.read_float()));
+		return CMD_SUCCESS;
+	}
+
 	if( arg == "forward" || arg == "backward" || arg == "leftward" || arg == "rightward")
 	{
 		float spd = 0.0f;
