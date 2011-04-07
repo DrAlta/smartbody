@@ -54,14 +54,17 @@ double BodyMotion::getMotionFrame( float time, SkSkeleton* skel, const vector<Sk
 {
 	// Because the SkMotion stored its joint quats in an indirect way, it is not straightforward to grab corresponding quats we need.
 	// This is a hack to apply the motion on a skeleton, and then get the quat values directly.
+	if (affectedJoints.size() == 0)
+		return -1.0;
 
 	SrVec rootOffset = SrVec();
 	
+	SkJoint* rootJoint = affectedJoints[0];
 	motion->connect(skel);	
 	double rt = timeWarp->timeWarp(time);
 	// get root position
 	motion->apply(0.f);
-	SrQuat tempQ = skel->root()->child(0)->quat()->value();
+	SrQuat tempQ = rootJoint->quat()->value();
 	SrMat src, mat;
 	src = tempQ.get_mat(src);
 	float rx, ry, rz;
@@ -71,7 +74,7 @@ double BodyMotion::getMotionFrame( float time, SkSkeleton* skel, const vector<Sk
 	rz = 0.0;
 	sr_euler_mat(rotType, mat, rx, ry, rz);
 	SrQuat quatP = SrQuat(mat);
-	rootOffset.set(skel->root()->child(0)->pos()->value());	
+	rootOffset.set(rootJoint->pos()->value());	
 
 	motion->apply((float)rt);	
 	motion->disconnect();
@@ -80,12 +83,19 @@ double BodyMotion::getMotionFrame( float time, SkSkeleton* skel, const vector<Sk
 		outMotionFrame.jointQuat.resize(affectedJoints.size());
 
 	for (unsigned int i=0;i<affectedJoints.size();i++)
-		outMotionFrame.jointQuat[i] = affectedJoints[i]->quat()->value();
+	{
+		SkJoint* joint = affectedJoints[i];
+		SrQuat jointQuat = SrQuat();
+		if (joint->quat()->active())
+			jointQuat = affectedJoints[i]->quat()->value();	
+
+		outMotionFrame.jointQuat[i] = jointQuat;			
+	}
 
 	// root orientation
 	outMotionFrame.jointQuat[0] = quatP.inverse()*outMotionFrame.jointQuat[0];
 	
-	outMotionFrame.rootPos.set(skel->root()->child(0)->pos()->value());
+	outMotionFrame.rootPos.set(rootJoint->pos()->value());
 	outMotionFrame.rootPos = (outMotionFrame.rootPos - rootOffset)*quatP.inverse();
 	return timeWarp->invTimeWarp(rt);
 }
