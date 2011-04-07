@@ -71,7 +71,7 @@ void ResourceManager::addCommandResource(CmdResource* cmd)
 	}
 	else
 	{
-		while(resources.size() >= resource_limit)
+		while(commandResources.size() >= resource_limit)
 		{
 			Resource* last = commandResources.front();
 			commandResources.pop_front();
