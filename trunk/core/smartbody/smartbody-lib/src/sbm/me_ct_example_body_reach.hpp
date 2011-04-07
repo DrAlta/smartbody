@@ -56,7 +56,7 @@ protected:
 	float                 prev_time; // to get dt		
 	double                prevPercentTime, curPercentTime;	
 
-	bool                  finishReaching;
+	bool                  finishReaching, startReaching;
 	SrVec                 reachError, reachTarget, returnTarget;
 	ReachState            curReachState;
 	SrVec                 curReachIKOffset;
