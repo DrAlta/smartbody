@@ -47,6 +47,8 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( SkSkeleton* sk, SkJoint* effectorJoi
 	useIKConstraint = true;
 	useInterpolation = true;
 	useTargetJoint   = true;
+
+	startReaching = false;
 	reachEndEffector = effectorJoint;
 	//skeletonRef->search_joint(endEffectorName);	
 
@@ -55,6 +57,7 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( SkSkeleton* sk, SkJoint* effectorJoi
 	interpMotion = NULL;
 	motionParameter = NULL;
 
+	reachTarget = SrVec();
 	reachVelocity = 50.f;
 	reachCompleteDuration = 0.3f;
 	curPercentTime = 0.0;
@@ -75,7 +78,8 @@ MeCtExampleBodyReach::~MeCtExampleBodyReach( void )
 void MeCtExampleBodyReach::setReachTargetJoint( SkJoint* val )
 {
 	reachTargetJoint = val;	
-	useTargetJoint = true;
+	useTargetJoint = true;	
+	startReaching = true;
 }
 
 
@@ -83,6 +87,7 @@ void MeCtExampleBodyReach::setReachTargetPos( SrVec& targetPos )
 {
 	reachTargetPos = targetPos;
 	useTargetJoint = false;
+	startReaching = true;
 }
 
 
@@ -94,7 +99,8 @@ void MeCtExampleBodyReach::findReachTarget( SrVec& rTarget, SrVec& rError )
 			reachTargetJoint->update_gmat_up();
 
 		SrVec newReachTarget = (reachTargetJoint && useTargetJoint) ? reachTargetJoint->gmat().get_translation() : reachTargetPos;
-		if ( (newReachTarget - reachTarget).norm() > 0.01 ) // interrupt and reset reach state if the reach target is moved
+		//if ( (newReachTarget - reachTarget).norm() > 0.001 ) // interrupt and reset reach state if the reach target is moved
+		if (startReaching)
 		{				
 			if (curReachState == REACH_IDLE)
 			{
@@ -103,6 +109,7 @@ void MeCtExampleBodyReach::findReachTarget( SrVec& rTarget, SrVec& rError )
 				reachTime = 0.f;
 			}				
 			reachTarget = newReachTarget;				
+			startReaching = false;
 		}
 
 		if (curReachState == REACH_START || curReachState == REACH_COMPLETE)
@@ -270,7 +277,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 		initMotionFrame = idleMotionFrame;
 		curEffectorPos = getCurrentHandPos(idleMotionFrame);			
 		curReachState = REACH_IDLE;
-		reachTarget = (reachTargetJoint && useTargetJoint) ? reachTargetJoint->gmat().get_translation() : reachTargetPos;;
+		//reachTarget = (reachTargetJoint && useTargetJoint) ? reachTargetJoint->gmat().get_translation() : reachTargetPos;;
 	}
 	else
 	{		
@@ -328,7 +335,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	curEffectorPos = getCurrentHandPos(ikMotionFrame);
 
 	bool ikHasReach = (useInterpolation && dataInterpolator) ? false : (curEffectorPos - ikTarget).norm() < ikReachRegion;
-	if ( ikHasReach || interpHasReach)
+	if ( ikHasReach || interpHasReach || finishReaching )
 	{
 		updateState();		
 	}	
@@ -352,7 +359,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 
 
 void MeCtExampleBodyReach::updateState()
-{
+{	
 	if (curReachState == REACH_START)
 	{
 		// after touch the object, stay there for a pre-defined duration
@@ -364,7 +371,7 @@ void MeCtExampleBodyReach::updateState()
 		//useTargetJoint = false;
 		finishReaching = false;
 	}
-	else if (curReachState == REACH_COMPLETE && reachCompleteTime >= reachCompleteDuration)//&& finishReaching)//&& reachCompleteTime >= reachCompleteDuration)
+	else if (curReachState == REACH_COMPLETE && finishReaching)//&& reachCompleteTime >= reachCompleteDuration)
 	{			
 		curReachState = REACH_RETURN;	
 		curPercentTime = 0.0;			
@@ -407,7 +414,7 @@ void MeCtExampleBodyReach::init()
 {
 	assert(skeletonRef);	
 	// root is "world_offset", so we use root->child to get the base joint.
-	SkJoint* rootJoint = skeletonCopy->root()->child(0);//skeletonRef->root()->child(0);	
+	SkJoint* rootJoint = skeletonRef->root()->child(0);//skeletonCopy->root()->child(0);//skeletonRef->root()->child(0);	
 	ikScenario.buildIKTreeFromJointRoot(rootJoint);
 	MeCtIKTreeNode* endNode = ikScenario.findIKTreeNode(reachEndEffector->name().get_string());
 	//ikScenario.ikEndEffectors.push_back(endNode);
