@@ -131,6 +131,9 @@ bool SbmDeformableMeshGPU::initBuffer()
 	// feng : the CPU version of deformable mesh consists of some mesh segments, with their corresponding bone weights loosely stored.
 	// this is very bad for GPU processing. Thus I reorganize the data into a single array, to avoid redundancy in memory storage.
 
+	if (skinWeights.size() == 0)
+		return false;
+
 	int nTotalVtxs=0, nTotalTris = 0, nTotalBones = 0;
 	std::map<std::string,int> boneIdxMap;
 
@@ -256,7 +259,6 @@ bool SbmDeformableMeshGPU::initBuffer()
 void SbmDeformableMeshGPU::update()
 {	
 #define USE_GPU_TRANSFORM 0
-
 #if USE_GPU_TRANSFORM
 	if (!binding)	return; 
 
