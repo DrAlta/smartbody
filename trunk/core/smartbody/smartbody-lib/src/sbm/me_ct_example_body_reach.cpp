@@ -410,11 +410,35 @@ void MeCtExampleBodyReach::setEndEffectorRoot( const char* rootName )
 		cons->rootName = rootName;
 }
 
+
+SkJoint* MeCtExampleBodyReach::findRootJoint( SkSkeleton* sk )
+{
+	SkJoint* rootJoint = sk->root()->child(0); // skip world offset
+	bool bStop = false;
+	while (!bStop)
+	{
+		SkJoint* child = rootJoint->child(0);
+		SkJointPos* skRootPos = rootJoint->pos();
+		SkJointPos* skPos = child->pos();
+		bool rootFrozen = (skRootPos->frozen(0) && skRootPos->frozen(1) && skRootPos->frozen(2));
+		bool childFrozen = (skPos->frozen(0) && skPos->frozen(1) && skPos->frozen(2));
+		if (childFrozen && !rootFrozen)
+		{
+			bStop = true;
+		}
+		else
+		{
+			rootJoint = child;
+		}
+	}
+	return rootJoint;
+}
+
 void MeCtExampleBodyReach::init()
 {
 	assert(skeletonRef);	
 	// root is "world_offset", so we use root->child to get the base joint.
-	SkJoint* rootJoint = skeletonRef->root()->child(0);//skeletonCopy->root()->child(0);//skeletonRef->root()->child(0);	
+	SkJoint* rootJoint = findRootJoint(skeletonRef);//skeletonRef->root()->child(0);//skeletonCopy->root()->child(0);//skeletonRef->root()->child(0);	
 	ikScenario.buildIKTreeFromJointRoot(rootJoint);
 	MeCtIKTreeNode* endNode = ikScenario.findIKTreeNode(reachEndEffector->name().get_string());
 	//ikScenario.ikEndEffectors.push_back(endNode);
@@ -450,6 +474,7 @@ void MeCtExampleBodyReach::init()
 	{
 		MeCtIKTreeNode* node = nodeList[i];
 		SkJoint* joint = skeletonCopy->linear_search_joint(node->nodeName.c_str());
+		SkJointQuat* skQuat = joint->quat();		
 		affectedJoints.push_back(joint);	
 		_channels.add(joint->name().get_string(), SkChannel::Quat);		
 	}		
@@ -594,27 +619,31 @@ void MeCtExampleBodyReach::updateChannelBuffer( MeFrameData& frame, BodyMotionFr
 	{
 		SrQuat& quat = motionFrame.jointQuat[i];		
 		int index = frame.toBufferIndex(_toContextCh[count++]);	
-		//printf("buffer index = %d\n",index);
-		if (bRead)
+		//printf("buffer index = %d\n",index);		
+		if (index == -1)
 		{
-			quat.w = buffer[index] ;
-			quat.x = buffer[index + 1] ;
-			quat.y = buffer[index + 2] ;
-			quat.z = buffer[index + 3] ;			
+			if (bRead)
+			{
+				quat = SrQuat();
+			}
 		}
 		else
 		{
-// 			if (i >= motionFrame.jointQuat.size() - 33)
-// 				continue;
-// 			if (i==32)
-// 				continue;
-
-			buffer[index] = quat.w;
-			buffer[index + 1] = quat.x;
-			buffer[index + 2] = quat.y;
-			buffer[index + 3] = quat.z;
-			//frame.channelUpdated( count );
-		}		
+			if (bRead)
+			{
+				quat.w = buffer[index] ;
+				quat.x = buffer[index + 1] ;
+				quat.y = buffer[index + 2] ;
+				quat.z = buffer[index + 3] ;			
+			}
+			else
+			{
+				buffer[index] = quat.w;
+				buffer[index + 1] = quat.x;
+				buffer[index + 2] = quat.y;
+				buffer[index + 3] = quat.z;			
+			}
+		}				
 	}
 }
 

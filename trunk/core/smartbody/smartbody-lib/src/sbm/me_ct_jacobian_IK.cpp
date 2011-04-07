@@ -20,6 +20,7 @@ MeCtIKTreeNode::MeCtIKTreeNode()
 	parent = NULL;
 	child = NULL;
 	brother = NULL;
+	active = true;
 
 	// a temporary hack for testing
 	// To-Do : we should provide a way to let user indicate the joint limits parameters via input script or file
@@ -424,6 +425,8 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 			int idx = node->nodeIdx;			
 			float nodeWeight = 1.f;//((float)node->nodeLevel+endNode->nodeLevel)/(endNode->nodeLevel*2.f);
 			if (node->nodeName == "r_acromioclavicular" || node->nodeName == "r_forearm") 
+				nodeWeight = 0.f;
+			if (!node->active)
 				nodeWeight = 0.f;
 // 			if (node->nodeName == "r_forearm")
 // 				nodeWeight = 0.9;
