@@ -121,6 +121,7 @@ protected:
 	void updateSkeletonCopy();
 	void updateChannelBuffer(MeFrameData& frame, BodyMotionFrame& motionFrame, bool bRead = false);
 	SrVec getCurrentHandPos(BodyMotionFrame& motionFrame);
+	SkJoint* findRootJoint(SkSkeleton* sk);
 	DataInterpolator* createInterpolator();
 	ResampleMotion*   createInterpMotion();
 };
