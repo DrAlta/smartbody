@@ -25,25 +25,96 @@
 #define XERCESC_UTILS_HPP
 
 #include <string>
-
+#include <sstream>
+#include "vhcl.h"
 
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/util/XMLString.hpp>
-
 #include <xercesc/sax/HandlerBase.hpp>
-
 #include <xercesc/sax/SAXException.hpp>
 
 #include <boost/shared_ptr.hpp>
 
-
-
 XERCES_CPP_NAMESPACE_USE
 
-
 namespace xml_utils {
+
+////////////
+	// recent additions for clean parsing:
+
+	// patches for rampant wstring_t
+	// Only if necessary
+	std::string xml_w2s( std::wstring w );
+	std::wstring xml_s2w( std::string s );
+
+	// memory managed transcode
+	bool xml_translate( std::string *str_p, const XMLCh* xml_str );
+	
+	std::string xml_translate_string( const XMLCh* xml_str, std::string dfl = "" );
+	std::wstring xml_translate_wide( const XMLCh* xml_str, std::string dfl = "" );
+
+	double xml_translate_double( const XMLCh* xml_str, double dfl = 0.0 );
+	float xml_translate_float( const XMLCh* xml_str, float dfl = 0.0f );
+	int xml_translate_int( const XMLCh* xml_str, int dfl = 0 );
+
+	// reverse transcode with requisite release
+	// Try to minimize use...
+	static XMLCh* xmlch_translate( std::string s ) {
+		return( XMLString::transcode( s.c_str() ) );
+	}
+	static void xmlch_release( XMLCh ** xml_ch_pp )	{
+		XMLString::release( xml_ch_pp );
+	}
+	
+	// detailed error message
+	void xml_parse_error( const XMLCh* attr, DOMElement* elem );
+
+	// parse: extract/translate attribute value
+	bool xml_parse_string( 
+		std::string *str_p, 
+		const XMLCh* attr, 
+		DOMElement* elem,
+		bool verbose = false
+	);
+	
+	bool xml_parse_double( 
+		double *d_p,
+		const XMLCh* attr, 
+		DOMElement* elem,
+		bool verbose = false
+	);
+
+	bool xml_parse_float( 
+		float *f_p,
+		const XMLCh* attr, 
+		DOMElement* elem,
+		bool verbose = false
+	);
+
+	bool xml_parse_int( 
+		int *i_p,
+		const XMLCh* attr, 
+		DOMElement* elem,
+		bool verbose = false
+	);
+
+	// parse: shorthand
+	std::string 
+	xml_parse_string( const XMLCh* A, DOMElement* E, std::string dfl = "", bool v = false );
+
+	double 
+	xml_parse_double( const XMLCh* A, DOMElement* E, double dfl = 0.0, bool v = false );
+
+	float 
+	xml_parse_float( const XMLCh* A, DOMElement* E, float dfl = 0.0f, bool v = false );
+
+	int 
+	xml_parse_int( const XMLCh* A, DOMElement* E, int dfl = 0, bool v = false );
+
+	// end of recent additions... Apr 2011
+////////////
 
 	//  Get first child DOMElement
 	DOMElement* getFirstChildElement( const DOMNode* node );
@@ -87,6 +158,5 @@ namespace xml_utils {
 };
 
 std::string convertWStringToString(std::wstring w);
-
 
 #endif  //  XERCESC_UTILS_HPP
