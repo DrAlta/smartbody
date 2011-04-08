@@ -25,6 +25,8 @@
 #include <sbm/mcontrol_util.h>
 #include <sr/sr_euler.h>
 
+
+const double timeThreshold = 0.02;
 PATimeManager::PATimeManager(std::vector<SkMotion*> m, std::vector<std::vector<double>> k, std::vector<double> w)
 {
 	motions = m;
@@ -689,14 +691,14 @@ void PATransitionManager::align(PAStateModule* current, PAStateModule* next)
 	int numEaseOut = getNumEaseOut();
 	for (int i = 0; i < numEaseOut; i++)
 	{
-		if (fabs(current->timeManager->localTime - easeOutStarts[i]) < mcuCBHandle::singleton().time_dt)
+		if (fabs(current->timeManager->localTime - easeOutStarts[i]) < timeThreshold)
 		{
 			s1 = easeOutStarts[i];
 			e1 = easeOutEnds[i];
 		}
 	}
 
-	if (fabs(current->timeManager->localTime - s1) < mcuCBHandle::singleton().time_dt)
+	if (fabs(current->timeManager->localTime - s1) < timeThreshold)
 	{
 		next->active = true;
 		blendingMode = true;
