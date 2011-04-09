@@ -1,7 +1,7 @@
 
-uniform vec3 diffuseColor = vec3(1,1,1)*0.8;//vec3(255.f,252.f,181.f)/255.f*vec3(0.8,0.8,0.8)*0.8;
-uniform vec3 specularColor = vec3(101.f, 101.f, 101.f)/255.f ;
-uniform vec3 ambient = vec3(0,0,0);//(vec3(255 + 127, 241, 0 + 2)/255.f)*(vec3(0.2,0.2,0.2));
+const vec3 diffuseColor = vec3(1,1,1)*0.8;//vec3(255.f,252.f,181.f)/255.f*vec3(0.8,0.8,0.8)*0.8;
+const vec3 specularColor = vec3(101.0/255.0, 101.0/255.0, 101.0/255.0);
+const vec3 ambient = vec3(0,0,0);//(vec3(255 + 127, 241, 0 + 2)/255.f)*(vec3(0.2,0.2,0.2));
 varying vec3 normal,lightDir,halfVector;
 
 void main (void)

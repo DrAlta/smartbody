@@ -8,26 +8,28 @@ varying vec3 normal,lightDir,halfVector;
 //fetch transformation matrix
 mat3 GetTransformation(float id)
 {
+	int idx = int(id);
 	mat3 rot;
 	for (int i=0;i<3;i++)
 	{		
 		for (int j=0;j<3;j++)
-			rot[j][i] = texelFetchBuffer(Transform,(int)(id*16+i*4+j)).x;		
+			rot[j][i] = texelFetchBuffer(Transform,(idx*16+i*4+j)).x;		
 	}	
 	return rot;
 }
 
 vec3 GetTranslation(float id)
 {
+	int idx = int(id);
 	vec3 tran;
-	tran[0] = texelFetchBuffer(Transform,(int)(id*16+12)).x;
-	tran[1] = texelFetchBuffer(Transform,(int)(id*16+13)).x;
-	tran[2] = texelFetchBuffer(Transform,(int)(id*16+14)).x;
+	tran[0] = texelFetchBuffer(Transform,(idx*16+12)).x;
+	tran[1] = texelFetchBuffer(Transform,(idx*16+13)).x;
+	tran[2] = texelFetchBuffer(Transform,(idx*16+14)).x;
 	return tran;	
 }
 vec3 TransformPos(vec3 position, vec4 boneid, vec4 boneweight)
 {
-	vec3 pos = 0;
+	vec3 pos = vec3(0,0,0);
 	mat3 tempT;	
 	vec3 tempt;	
 	for (int i=0;i<4;i++)
