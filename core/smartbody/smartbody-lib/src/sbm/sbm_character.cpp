@@ -743,6 +743,7 @@ void prune_schedule( SbmCharacter*   actor,
 	bool hasConstraint = false;
 	bool hasBodyReach = false;
 	bool hasReachLeft = false, hasReachRight = false;
+	bool finishedBlending = false;
 
 	while( it != first ) {
 		// Decrement track iterator (remember, we started at end)
@@ -801,6 +802,11 @@ void prune_schedule( SbmCharacter*   actor,
 								in_use = false;
 							}
 						}
+						if (v < 1.0 && sched == posture_sched_p)
+						{  // special case handling for postures
+							finishedBlending = false;
+						}
+
 						if( !flat_blend_curve )	{
 							if( blend_curve.get_next_nonzero_slope( time ) < 0.0 )	{
 								flat_blend_curve = true;
@@ -1046,7 +1052,13 @@ void prune_schedule( SbmCharacter*   actor,
 				LOG("\t- Pruned (no anim ct)!!");
 		}
 
+		if (sched == posture_sched_p && !finishedBlending)
+		{ // make sure that we don't remove old postures before the new postures have finished blending in
+			in_use = true;
+		}
+
 		if( !in_use && test_ct_for_pruning( track ) ) {
+
 			// insert at front, because we are iterating end->begin
 			// and we prefer the final list order matches order within schedule
 			tracks_to_remove.insert( tracks_to_remove.begin(), track );
