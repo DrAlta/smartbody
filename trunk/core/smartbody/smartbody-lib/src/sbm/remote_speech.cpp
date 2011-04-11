@@ -196,7 +196,6 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 	float blendTime = 0.0f;
 	float blendIval = 0.0f;
 	float startTime = 0.0f;
-	float magnitude = character->get_viseme_magnitude();
 	if(node->getNodeType()==1){ //node is an element node
 		DOMElement *element= (DOMElement *)node; //instantiate an element using this node
 		//string tag= XMLString::transcode(element->getTagName()); //find the element tag  // Anm replaced with compareString
@@ -226,14 +225,17 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 #if USE_CURVES_FOR_VISEMES
 				curViseme = new VisemeData(id, startTime);
 #else
-				curViseme = new VisemeData(id, 1.0f * magnitude, startTime, 0.0f, 0.0f, 0.0f); //the weight is always made one
+				curViseme = new VisemeData(id, 1.0, startTime, 0.0f, 0.0f, 0.0f); //the weight is always made one
 #endif
 				if ( visemes->size() > 0 ) 
 				{   
 					VisemeData* prevViseme = visemes->back();
 					if (prevViseme->time() > startTime)
 					{
-							LOG("WARNING: Viseme %s has played at time %f comes before previous viseme %s at time %f", curViseme->id(), curViseme->time(), prevViseme->id(), prevViseme->time());
+							LOG("WARNING: Viseme %s has played at time %f comes before previous viseme %s at time %f. Reassigning start time to previous time.", curViseme->id(), curViseme->time(), prevViseme->id(), prevViseme->time());
+							// set the start time to the same time as the previous viseme
+							curViseme->setTime(prevViseme->time());
+							startTime = prevViseme->time();
 					}
 					bool toggle = false;
 
@@ -275,6 +277,10 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 						curViseme->rampin( blendIval * 0.5f );
 						prevViseme->rampout( blendIval * 0.5f );
 						prevViseme->setDuration( 1.5f * ( prevViseme->rampin() + prevViseme->rampout() ) );
+						//if (strcmp(id, "Th") == 0)
+						//	std::cout << "CurViseme  " << id << " rampin = " << curViseme->rampin() << std::endl;
+						//if (strcmp(prevViseme->id(), "Th") == 0)
+						//	std::cout << "PrevViseme " << id << " rampin = " << prevViseme->rampin() << " duration = " << prevViseme->duration() << " rampout = " << prevViseme->rampout() << std::endl;
 					}
 #endif
 				}
@@ -305,6 +311,8 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 			VisemeData* lastViseme = (*visemes)[numVisemes - 1];
 			lastViseme->rampout(lastViseme->rampin());
 			lastViseme->setDuration(lastViseme->rampin() + lastViseme->rampout());
+			//if (strcmp(lastViseme->id(), "Th") == 0)
+			//	std::cout << "PrevViseme " << lastViseme->id() << " rampin = " << lastViseme->rampin() << " duration = " << lastViseme->duration() << " rampout = " << lastViseme->rampout() << std::endl;
 		}
 		else
 		{
