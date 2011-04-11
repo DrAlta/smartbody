@@ -330,11 +330,15 @@ public:
 	void setHeight( float height )	{ _height = height; }
 	float getHeight( void ) 		{ return _height; }
 
+	void setMinVisemeTime(float minTime);
+	float getMinVisemeTime() const;
+
 private:
 
 	bool	_soft_eyes_enabled;
 	bool	_visemePlateau;
 	float	_height;
+	float	_minVisemeTime;
 
 protected:
 	/*!
