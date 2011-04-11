@@ -305,6 +305,7 @@ public:
 	int		_numSteeringGoals;
 
 	bool addReachMotion(SkMotion* motion);
+	SkMotion* getReachMotion(int index);
 	const MotionDataSet& getReachMotionDataSet() const { return reachMotionData;}
 
 	AUChannelMap& get_au_channel_map( void ) { return au_channel_map; }

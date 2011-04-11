@@ -2135,11 +2135,11 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 	}
 	else if ( cmd == "reachmotion" )
 	{
-		string reach_cmd = args.read_token();
-		string motion_name = args.read_token();
+		string reach_cmd = args.read_token();		
 		bool print_track = false;
 		if (reach_cmd == "add")
 		{			
+			string motion_name = args.read_token();
 			SkMotion* motion = mcu_p->lookUpMotion(motion_name.c_str());
 			//LOG("SbmCharacter::parse_character_command LOG: add motion name : %s ", motion_name.c_str());
 			if (motion)
@@ -2152,6 +2152,19 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 				LOG( "SbmCharacter::parse_character_command ERR: motion '%s' not found", motion_name.c_str());
 				return CMD_NOT_FOUND;
 			}
+		}
+		else if (reach_cmd == "play")
+		{
+			int motion_num = args.read_int();
+			SkMotion* motion = getReachMotion(motion_num);
+			if (motion)
+			{
+				//motion->name()
+				char cmd[256];
+				sprintf(cmd,"bml char %s <body posture=\"%s\"/>",name,motion->name());
+				mcuCBHandle::singleton().execute(cmd);
+			}			
+			return CMD_SUCCESS;
 		}
 		return CMD_FAILURE;
 	}
@@ -2468,6 +2481,21 @@ bool SbmCharacter::addReachMotion( SkMotion* motion )
 		return true;
 	}
 	return false;
+}
+
+SkMotion* SbmCharacter::getReachMotion( int index )
+{
+	MotionDataSet::iterator vi;
+	int icount = 0;
+	for (vi  = reachMotionData.begin();
+		 vi != reachMotionData.end();
+		 vi++)
+	{
+		if (icount == index)
+			return *vi;
+		icount++;
+	}
+	return NULL;
 }
 
 void SbmCharacter::setMinVisemeTime(float minTime)

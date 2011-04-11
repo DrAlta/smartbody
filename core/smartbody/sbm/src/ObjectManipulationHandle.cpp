@@ -94,7 +94,7 @@ void ObjectManipulationHandle::picking(float x,float y,SrCamera& cam)
 	mcu.character_map.reset();
 	while (SbmCharacter* character = mcu.character_map.next())
 	{
-		pawnSize = character->getHeight() / 8.0f;
+		pawnSize = character->getHeight() / 30.0f;
 		break;
 	}
 

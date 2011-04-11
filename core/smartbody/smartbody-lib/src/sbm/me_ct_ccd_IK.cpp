@@ -22,40 +22,54 @@ static bool strIntComp(StrIntPair& p1, StrIntPair& p2)
 
 void MeCtCCDIK::update( MeCtIKTreeScenario* scenario )
 {
-	
-	
-	
+	ikScenario = scenario;
+	VecOfConstraintPtr sortCons;
+	// only deal with position constraint in CCD IK
+	sortConstraint(scenario->ikPosEffectors,sortCons);
+	scenario->updateNodeGlobalMat(scenario->ikTreeRoot,QUAT_CUR);	
+
+	for (int k=0;k<15;k++)
+	{
+		//printf("iteration = %d\n",k);
+		for (unsigned int i=0;i<scenario->ikTreeNodes.size();i++)
+			scenario->ikTreeNodes[i]->lock = false;
+		scenario->updateNodeGlobalMat(scenario->ikTreeRoot,QUAT_CUR);
+		for (unsigned int i=0;i<sortCons.size();i++)
+		{
+			EffectorConstraint* con = sortCons[i];
+			MeCtIKTreeNode* root = scenario->findIKTreeNode(con->rootName.c_str());
+			if (!root)
+				root = scenario->ikTreeRoot;	
+			CCDUpdate(root,con);
+		}	
+	}	
 }
 
-void MeCtCCDIK::sortConstraint( ConstraintMap* conMap, VecOfConstraintPtr& sortConList )
+void MeCtCCDIK::CCDUpdate( MeCtIKTreeNode* startNode, EffectorConstraint* con )
 {
-	StrIntList sortList;
-	ConstraintMap::iterator vi = conMap->begin();
-	for (vi  = conMap->begin();
-		vi != conMap->end();
-		vi++)
-	{
-		//conList.push_back(vi->second);
-		EffectorConstraint* con = vi->second;
-		MeCtIKTreeNode* node = ikScenario->findIKTreeNode(con->efffectorName.c_str());		
-		StrIntPair sip;
-		sip.first = con->efffectorName;
-		sip.second = node->nodeLevel;
-		sortList.push_back(sip);
-	}
-	std::sort(sortList.begin(),sortList.end(),strIntComp);
-
-	sortConList.clear();
-	for (int i=0;sortList.size();i++)
-	{
-		EffectorConstraint* con = (*conMap)[sortList[i].first];
-		sortConList.push_back(con);
-	}
+	//printf("CCD Update\n");
+	MeCtIKTreeNode* endEffector = ikScenario->findIKTreeNode(con->efffectorName.c_str());
+	MeCtIKTreeNode* pNode = endEffector->parent;
+	while (pNode != startNode)
+	{		
+		if (!pNode->lock)
+		//LOG("node name = %s\n",pNode->nodeName.c_str());
+		{
+			CCDIteration(pNode,con);
+			pNode->lock = true;
+		}		
+		pNode = pNode->parent;
+	}	
 }
 
-void MeCtCCDIK::CCDRotate(MeCtIKTreeNode* startNode, MeCtIKTreeNode* endEffector )
+void MeCtCCDIK::CCDIteration(MeCtIKTreeNode* startNode, EffectorConstraint* con )
 {	
-	SrVec targetPos = endEffector->targetPos;
+	SrVec targetPos = con->getPosConstraint();
+	//LOG("target pos = %s")
+	//sr_out << "targetPos = " << targetPos << srnl;
+	MeCtIKTreeNode* endEffector = ikScenario->findIKTreeNode(con->efffectorName.c_str());
+	if (!endEffector)
+		return;
 
 	SrVec v1, v2, v3, v4;
 	SrVec v, lTarget, lEndPos, lSrc;
@@ -67,8 +81,8 @@ void MeCtCCDIK::CCDRotate(MeCtIKTreeNode* startNode, MeCtIKTreeNode* endEffector
 	else matInv = startNode->parent->gmat.inverse();
 
 	lSrc = startNode->gmat.get_translation()*matInv;	
-	lTarget = endEffector->targetPos*matInv;
-	lEndPos = endEffector->gmat.get_translation()* matInv;
+	lTarget = targetPos*matInv;
+	lEndPos = endEffector->gmat.get_translation()*matInv;
 
 	// assuming ball-socket joints
 	{
@@ -87,6 +101,7 @@ void MeCtCCDIK::CCDRotate(MeCtIKTreeNode* startNode, MeCtIKTreeNode* endEffector
 		else if(dot_v < -1.0f) dot_v = -1.0f;
 
 		double angle = acos(dot_v);
+		//printf("angle = %f\n",angle);
 		rotAxis = cross(v2, v1);
 		rotAxis.normalize();
 		mat.rot(rotAxis, (float)-angle);
@@ -170,5 +185,33 @@ gwiz::quat_t MeCtCCDIK::swingTwist2Quat( gwiz::vector_t& sw )
 #endif
 
 	return result;
+}
+
+void MeCtCCDIK::sortConstraint( ConstraintMap* conMap, VecOfConstraintPtr& sortConList )
+{
+	StrIntList sortList;
+	ConstraintMap::iterator vi = conMap->begin();
+	for (vi  = conMap->begin();
+		vi != conMap->end();
+		vi++)
+	{
+		//conList.push_back(vi->second);
+		EffectorConstraint* con = vi->second;
+		MeCtIKTreeNode* node = ikScenario->findIKTreeNode(con->efffectorName.c_str());		
+		StrIntPair sip;
+		sip.first = con->efffectorName;
+		sip.second = node->nodeLevel;
+		sortList.push_back(sip);
+	}
+	std::sort(sortList.begin(),sortList.end(),strIntComp);
+
+	sortConList.clear();
+
+	for (unsigned int i=0;i<sortList.size();i++)
+	{
+		std::string key = sortList[i].first;
+		EffectorConstraint* con = (*conMap)[key];
+		sortConList.push_back(con);		
+	}
 }
 
