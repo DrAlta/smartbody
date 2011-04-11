@@ -3479,6 +3479,7 @@ void FltkViewer::drawReach()
 	MeCtExampleBodyReach* reachCt = getCurrentCharacterBodyReachController();
 	
 	SbmCharacter* character = getCurrentCharacter();
+	float sphereSize = character->getHeight() / 50.0f;	
 	if (reachCt)
 	{	
 		// draw reach Example data
@@ -3507,7 +3508,7 @@ void FltkViewer::drawReach()
 			//drawPoint(gPos[0],gPos[1],gPos[2],5.0,SrVec(0.0,0.0,1.0));
 			SrSnSphere sphere;			
 			sphere.shape().center = SrPnt(gPos[0], gPos[1], gPos[2]);
-			sphere.shape().radius = 3.0;
+			sphere.shape().radius = sphereSize;
 			sphere.color(SrColor(0.f,0.f,1.f));
 			sphere.render_mode(srRenderModeLines);
 			SrGlRenderFuncs::render_sphere(&sphere);
@@ -3543,12 +3544,12 @@ void FltkViewer::drawReach()
 		}	
 		
 		SrVec reachTraj = reachCt->curReachIKTrajectory;
-		PositionControl::drawSphere(reachTraj,3.0,SrVec(0,1,1));
+		PositionControl::drawSphere(reachTraj,sphereSize,SrVec(0,1,1));
 		SrVec ikTraj = reachCt->ikTarget;
-		PositionControl::drawSphere(ikTraj,3.0,SrVec(0,1,0));
-		PositionControl::drawSphere(reachCt->interpPos,3.0,SrVec(1,0,1));
-		PositionControl::drawSphere(reachCt->curEffectorPos,3.0,SrVec(1,0,0));
-		PositionControl::drawSphere(reachCt->ikRoot,4.0,SrVec(0,0,0));					
+		//PositionControl::drawSphere(ikTraj,sphereSize,SrVec(0,1,0));
+		PositionControl::drawSphere(reachCt->interpPos,sphereSize,SrVec(1,0,1));
+		PositionControl::drawSphere(reachCt->curEffectorPos,sphereSize,SrVec(1,0,0));
+		PositionControl::drawSphere(reachCt->ikFootTarget,sphereSize,SrVec(0,0,0));					
 	}
 
 	glPopAttrib();

@@ -17,7 +17,9 @@ public:
 	static gwiz::vector_t quat2SwingTwist(gwiz::quat_t& quat);
 	static gwiz::quat_t   swingTwist2Quat(gwiz::vector_t& quat);
 protected:
-	void CCDRotate(MeCtIKTreeNode* startNode, MeCtIKTreeNode* endEffector);
+	void CCDUpdate(MeCtIKTreeNode* startNode, EffectorConstraint* con);
+	// perform a single rotation based on startNode and endEffector
+	void CCDIteration(MeCtIKTreeNode* startNode, EffectorConstraint* con);
 	// sort constraint list according to the end effector node level, so we process the higher level effector first.
 	void sortConstraint(ConstraintMap* conMap, VecOfConstraintPtr& sortConList);
 };

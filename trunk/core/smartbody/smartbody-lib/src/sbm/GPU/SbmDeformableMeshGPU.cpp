@@ -258,7 +258,7 @@ bool SbmDeformableMeshGPU::initBuffer()
 
 void SbmDeformableMeshGPU::update()
 {	
-#define USE_GPU_TRANSFORM 0
+#define USE_GPU_TRANSFORM 1
 #if USE_GPU_TRANSFORM
 	if (!binding)	return; 
 

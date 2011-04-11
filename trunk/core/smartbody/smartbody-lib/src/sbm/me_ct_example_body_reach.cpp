@@ -27,10 +27,10 @@ EffectorConstantConstraint& EffectorConstantConstraint::operator=( const Effecto
 
 const char* MeCtExampleBodyReach::CONTROLLER_TYPE = "BodyReach";
 
-const std::string lFootName = "l_forefoot";
-const std::string rFootName = "r_forefoot";
+#define USE_FOOT_IK 0
 
-//const char* endEffectorName = "r_wrist"; // a hard coded hack
+const std::string lFootName[] = {"l_forefoot", "l_ankle" };
+const std::string rFootName[] = {"r_forefoot", "r_ankle" };
 
 MeCtExampleBodyReach::MeCtExampleBodyReach( SkSkeleton* sk, SkJoint* effectorJoint )
 {	
@@ -45,7 +45,7 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( SkSkeleton* sk, SkJoint* effectorJoi
 	_duration = -1.0f;
 	reachTime = 0.0;	
 	useIKConstraint = true;
-	useInterpolation = true;
+	useInterpolation = false;
 	useTargetJoint   = true;
 
 	interactiveReach = false;
@@ -104,7 +104,7 @@ void MeCtExampleBodyReach::findReachTarget( SrVec& rTarget, SrVec& rError )
 		bool changeReachTarget = (newReachTarget - reachTarget).norm() > 0.001 ;
 		if (changeReachTarget || startReaching)
 		{				
-			if (curReachState == REACH_IDLE && startReaching)
+			if (curReachState == REACH_IDLE)// && startReaching)
 			{
 				curReachState = REACH_START;
 				curReachIKOffset = SrVec();
@@ -159,6 +159,8 @@ void MeCtExampleBodyReach::findReachTarget( SrVec& rTarget, SrVec& rError )
 				double refDuration = interpMotion->motionDuration(BodyMotionInterface::DURATION_REF);			
 				motionParameter->getMotionFrameParameter(interpMotion,(float)refDuration*0.999f,acutualReachTarget);			
 			}
+			double refDuration = interpMotion->motionDuration(BodyMotionInterface::DURATION_REF);	
+			interpMotion->getMotionFrame((float)refDuration*0.999f,skeletonCopy,affectedJoints,idleMotionFrame);
 			for (int i=0;i<3;i++)
 				currentInterpTarget[i] = (float)acutualReachTarget[i];		
 		}			
@@ -177,36 +179,46 @@ void MeCtExampleBodyReach::updateIK( SrVec& rTrajectory, BodyMotionFrame& refFra
 	}		
 	
 	EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>(reachPosConstraint[reachEndEffector->name().get_string()]);
-	cons->targetPos = rTrajectory;
-
-// 	EffectorConstantConstraint* lfoot = dynamic_cast<EffectorConstantConstraint*>(reachPosConstraint[lFootName]);
-// 	lfoot->targetPos = motionParameter->getMotionFrameJoint(idleMotionFrame,lFootName.c_str())->gmat().get_translation();
-// 
-// 	EffectorConstantConstraint* rfoot = dynamic_cast<EffectorConstantConstraint*>(reachPosConstraint[rFootName]);
-// 	rfoot->targetPos = motionParameter->getMotionFrameJoint(idleMotionFrame,rFootName.c_str())->gmat().get_translation();	
-
-
+	cons->targetPos = rTrajectory;	
+	
 	skeletonRef->invalidate_global_matrices();
 	skeletonRef->update_global_matrices();
 	const char* rootName = ikScenario.ikTreeRoot->joint->parent()->name().get_string();
 	ikScenario.ikGlobalMat = skeletonRef->search_joint(rootName)->gmat();//ikScenario.ikTreeRoot->joint->parent()->gmat();	
-	ikScenario.setTreeNodeQuat(refFrame.jointQuat,QUAT_REF);							
-	//ik.setDt(dt);
+	ikScenario.ikTreeRootPos = refFrame.rootPos;
+	ikScenario.setTreeNodeQuat(refFrame.jointQuat,QUAT_REF);								
+
+	ikScenario.ikPosEffectors = &reachPosConstraint;
 	ik.maxOffset = ikMaxOffset;
 	ik.dampJ = ikDamp;
 	ik.refDampRatio = 0.1;
-	for (int i=0;i<1;i++)
+ 	for (int i=0;i<1;i++)
+ 	{
+ 		ik.update(&ikScenario);		
+ 		ikScenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);		
+ 	}
+
+#if USE_FOOT_IK
+	for (int i=0;i<2;i++)
 	{
-		ik.update(&ikScenario);		
-		ikScenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);		
-	}
-	ikScenario.getTreeNodeQuat(outFrame.jointQuat,QUAT_CUR);	
+		EffectorConstantConstraint* lfoot = dynamic_cast<EffectorConstantConstraint*>(leftFootConstraint[lFootName[i]]);
+		lfoot->targetPos = motionParameter->getMotionFrameJoint(idleMotionFrame,lFootName[i].c_str())->gmat().get_translation();
+		EffectorConstantConstraint* rfoot = dynamic_cast<EffectorConstantConstraint*>(rightFootConstraint[rFootName[i]]);
+		rfoot->targetPos = motionParameter->getMotionFrameJoint(idleMotionFrame,rFootName[i].c_str())->gmat().get_translation();	
+	} 			
+	ikScenario.ikPosEffectors = &leftFootConstraint;
+	ikCCD.update(&ikScenario);
+ 	ikScenario.ikPosEffectors = &rightFootConstraint;
+ 	ikCCD.update(&ikScenario);	
+	ikScenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);
+#endif
+	ikScenario.getTreeNodeQuat(outFrame.jointQuat,QUAT_CUR); 	
 }
 
 bool MeCtExampleBodyReach::updateInterpolation(float dt, BodyMotionFrame& outFrame, float& du)
 {
 	bool interpHasReach = false;	
-	interpMotion->getMotionFrame(reachTime,skeletonCopy,affectedJoints,interpMotionFrame);			
+	interpMotion->getMotionFrame(reachTime,skeletonCopy,affectedJoints,interpMotionFrame);		
 	{			
 		double strokTime = interpMotion->strokeEmphasisTime();
 		double refDuration = interpMotion->motionDuration(BodyMotionInterface::DURATION_REF);
@@ -331,7 +343,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 		updateIK(curReachIKTrajectory,interpMotionFrame,ikMotionFrame);					
 	}	
 
-	ikRoot = ikScenario.ikTreeRoot->joint->parent()->gmat().get_translation();//gmat.get_translation();
+	//ikFootTarget = leftFootConstraint[lFootName]->getPosConstraint();//ikScenario.ikTreeRoot->joint->parent()->gmat().get_translation();//gmat.get_translation();
 
 	// hand position after solving IK
 	curEffectorPos = getCurrentHandPos(ikMotionFrame);
@@ -441,24 +453,34 @@ void MeCtExampleBodyReach::init()
 {
 	assert(skeletonRef);	
 	// root is "world_offset", so we use root->child to get the base joint.
-	SkJoint* rootJoint = findRootJoint(skeletonRef);//skeletonRef->root()->child(0);//skeletonCopy->root()->child(0);//skeletonRef->root()->child(0);	
+	SkJoint* rootJoint = findRootJoint(skeletonCopy);//findRootJoint(skeletonRef);//skeletonRef->root()->child(0);//skeletonCopy->root()->child(0);//skeletonRef->root()->child(0);	
 	ikScenario.buildIKTreeFromJointRoot(rootJoint);
-	MeCtIKTreeNode* endNode = ikScenario.findIKTreeNode(reachEndEffector->name().get_string());
-	//ikScenario.ikEndEffectors.push_back(endNode);
+	ikCCDScenario.buildIKTreeFromJointRoot(rootJoint);
+	
 
 	EffectorConstantConstraint* cons = new EffectorConstantConstraint();
 	cons->efffectorName = reachEndEffector->name().get_string();
-	cons->rootName = "r_sternoclavicular";//"r_shoulder";//rootJoint->name().get_string();	
-
-	EffectorConstantConstraint* lFoot = new EffectorConstantConstraint();
-	lFoot->efffectorName = lFootName;
-	lFoot->rootName = "";
-
-	EffectorConstantConstraint* rFoot = new EffectorConstantConstraint();
-	rFoot->efffectorName = rFootName;
-	rFoot->rootName = "";
-
+	cons->rootName = "r_sternoclavicular";//"r_shoulder";//rootJoint->name().get_string();		
 	reachPosConstraint[cons->efffectorName] = cons;
+
+	
+	// setup foot constraint
+#if USE_FOOT_IK
+	for (int i=0;i<2;i++)
+	{
+		EffectorConstantConstraint* lFoot = new EffectorConstantConstraint();
+		lFoot->efffectorName = lFootName[i];
+		lFoot->rootName = "";
+		leftFootConstraint[lFoot->efffectorName] = lFoot;
+
+		EffectorConstantConstraint* rFoot = new EffectorConstantConstraint();
+		rFoot->efffectorName = rFootName[i];
+		rFoot->rootName = "";
+		rightFootConstraint[rFoot->efffectorName] = rFoot;
+	}	
+#endif
+	
+	
 // 	reachPosConstraint[lFoot->efffectorName] = lFoot;
 // 	reachPosConstraint[rFoot->efffectorName] = rFoot;
 
@@ -568,8 +590,9 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 	if (interpMotion && dataInterpolator)
 		dataInterpolator->predictInterpWeights(para,interpMotion->weight);
 
-	if (curReachState != REACH_IDLE)
-		curReachState = REACH_IDLE;
+// 	if (curReachState != REACH_IDLE)
+// 		curReachState = REACH_IDLE;
+	useInterpolation = true;
 }
 
 DataInterpolator* MeCtExampleBodyReach::createInterpolator()

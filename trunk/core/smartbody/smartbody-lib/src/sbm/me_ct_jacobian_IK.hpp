@@ -15,6 +15,7 @@ public:
 	MeCtIKTreeNode   *parent, *child, *brother;
 
 	bool             active;
+	bool             lock;
 	SrVec            targetPos; // target pos is a global position constraint for this end effector joint
 	SrQuat           targetDir; // target dir is a global rotation constraint ( parameterized as quaternion )
 	SkJoint          *joint;	
@@ -60,6 +61,7 @@ public:
 	SkSkeleton*                  ikSkeleton;
 	IKTreeNodeList               ikTreeNodes;
 	MeCtIKTreeNode*              ikTreeRoot; // contains the tree structure for IK tree ( which may contain multiple end effectors/IK chains )	
+	SrVec                        ikTreeRootPos;
 	
 	ConstraintMap*               ikRotEffectors;
 	ConstraintMap*               ikPosEffectors;	
@@ -84,6 +86,7 @@ protected:
 	int traverseJoint(SkJoint* joint, MeCtIKTreeNode* jointNode, std::vector<MeCtIKTreeNode*>& nodeList);		
 	// return axis-angle rotation offset to move joint rotation back.
 	static bool checkJointLimit(const SrQuat& q, const MeCtIKJointLimit& limit, const SrQuat& qInit, SrVec& jointOffset); 
+	SrMat getLocalMat(const SkJoint* joint, const SrQuat& q, const SrVec& pos);
 };
 
 class MeCtIKInterface

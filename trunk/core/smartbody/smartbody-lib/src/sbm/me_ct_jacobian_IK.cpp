@@ -21,6 +21,7 @@ MeCtIKTreeNode::MeCtIKTreeNode()
 	child = NULL;
 	brother = NULL;
 	active = true;
+	lock   = false;
 
 	// a temporary hack for testing
 	// To-Do : we should provide a way to let user indicate the joint limits parameters via input script or file
@@ -80,6 +81,7 @@ SrVec MeCtIKTreeNode::getGlobalPos()
 MeCtIKTreeScenario::MeCtIKTreeScenario()
 {
 	ikTreeRoot = NULL;	
+	ikTreeRootPos = SrVec(0,0,0);
 }
 
 MeCtIKTreeScenario::~MeCtIKTreeScenario()
@@ -226,11 +228,15 @@ void MeCtIKTreeScenario::updateNodeGlobalMat( MeCtIKTreeNode* jointNode, NodeQua
 	if (jointNode->parent)
 		pmat = jointNode->parent->gmat;
 
-	jointNode->gmat = get_lmat(jointNode->joint,&jointNode->getQuat(quatType))*pmat;
+	SrVec pos = SrVec(0,0,0);
+	if (jointNode == ikTreeRoot)
+		pos = ikTreeRootPos;
+
+	jointNode->gmat = getLocalMat(jointNode->joint,jointNode->getQuat(quatType),pos)*pmat;
 	if (jointNode->brother)
-		updateNodeGlobalMat(jointNode->brother);
+		updateNodeGlobalMat(jointNode->brother, quatType);
 	if (jointNode->child)
-		updateNodeGlobalMat(jointNode->child);
+		updateNodeGlobalMat(jointNode->child, quatType);
 	
 }
 
@@ -287,6 +293,17 @@ void MeCtIKTreeScenario::copyTreeNodeQuat( NodeQuatType typeFrom, NodeQuatType t
 		node->setQuat(node->getQuat(typeFrom),typeTo);
 	}
 }
+
+SrMat MeCtIKTreeScenario::getLocalMat( const SkJoint* joint, const SrQuat& q, const SrVec& pos )
+{
+	SrMat lMat;
+	lMat = q.get_mat(lMat);
+	lMat[12] = joint->offset().x + pos.x;
+	lMat[13] = joint->offset().y + pos.y;
+	lMat[14] = joint->offset().z + pos.z;
+	return lMat;
+}
+
 /************************************************************************/
 /* Jacobian based IK                                                    */
 /************************************************************************/
@@ -360,7 +377,7 @@ bool MeCtJacobianIK::updateReferenceJointJacobian( MeCtIKTreeScenario* s )
 		SrVec axis;
 		float angle;
 		diff.get(axis,angle);
-		SrVec offset = axis*angle*0.9f;
+		SrVec offset = axis*angle;//*0.9f;
 		if (offset.len() > maxRotOffset)
 		{
 			offset.normalize();

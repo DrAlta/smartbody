@@ -3,6 +3,7 @@
 //#include "me_ct_barycentric_interpolation.h"
 #include "me_ct_motion_parameter.h"
 #include "me_ct_jacobian_IK.hpp"
+#include "me_ct_ccd_IK.hpp"
 #include "me_ct_constraint.hpp"
 
 using namespace std;
@@ -64,13 +65,16 @@ protected:
 	SkJoint*              reachEndEffector;
 	ConstraintMap         reachPosConstraint;
 	ConstraintMap         reachRotConstraint;
+	ConstraintMap         leftFootConstraint, rightFootConstraint;
+
 	BodyMotionFrame       inputMotionFrame,ikMotionFrame, idleMotionFrame, interpMotionFrame, initMotionFrame;
 	BodyMotionFrame       interpStartFrame;
 
 	double                ikDamp;
 	float                 ikReachRegion, ikMaxOffset;
 	MeCtJacobianIK        ik;
-	MeCtIKTreeScenario    ikScenario;
+	MeCtCCDIK             ikCCD;
+	MeCtIKTreeScenario    ikScenario, ikCCDScenario;
 	
 
 	float 			_duration;
@@ -84,7 +88,7 @@ public:
 	vector<SrVec>         resamplePts;
 	
 	// parameters and intermediate variables for debug/visualization
-	SrVec                 curReachIKTrajectory, ikTarget, interpPos, curEffectorPos, currentInterpTarget, ikRoot;
+	SrVec                 curReachIKTrajectory, ikTarget, interpPos, curEffectorPos, currentInterpTarget, ikFootTarget;
 	float                 reachVelocity, reachCompleteDuration;
 	float                 characterHeight;
 	bool                  useIKConstraint, useInterpolation, useTargetJoint;
