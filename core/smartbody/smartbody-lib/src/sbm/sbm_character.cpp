@@ -130,6 +130,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	viseme_channel_start_pos = 0;
 	viseme_channel_end_pos = 0;
 	viseme_history_arr = NULL;
+	_minVisemeTime = 0.0f;
 
 	_numSteeringGoals = 0;
 }
@@ -1793,6 +1794,18 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			return CMD_SUCCESS;
 		}
 
+		if( _strcmpi( viseme, "minvisemetime" ) == 0 )
+		{
+			if (!next)
+			{
+				LOG("Character %s min viseme time is %f", this->name, this->getMinVisemeTime());
+				return CMD_SUCCESS;
+			}
+			float minTime = (float)atof( next );
+			setMinVisemeTime( minTime );
+			return CMD_SUCCESS;
+		}
+
 		// keyword next to viseme
 		if( _strcmpi( viseme, "clear" ) == 0 ) // removes all head controllers
 		{
@@ -2167,6 +2180,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		LOG( "  viseme curve" );
 		LOG( "  viseme plateau on|off" );
 		LOG( "  clampvisemes on|off" );
+		LOG( "  minvisemetime <amount>" );
 		LOG( "  bone" );
 		LOG( "  bonep" );
 		LOG( "  remove" );
@@ -2454,4 +2468,14 @@ bool SbmCharacter::addReachMotion( SkMotion* motion )
 		return true;
 	}
 	return false;
+}
+
+void SbmCharacter::setMinVisemeTime(float minTime)
+{
+	_minVisemeTime = minTime;
+}
+
+float SbmCharacter::getMinVisemeTime() const
+{
+	return _minVisemeTime;
 }

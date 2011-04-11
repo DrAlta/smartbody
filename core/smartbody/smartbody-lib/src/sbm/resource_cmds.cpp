@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <string>
-
+#include <boost/regex.hpp>
 #include "resource_cmds.h"
 
 
@@ -20,7 +20,7 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 	std::string arg = args.read_token();
 	if( arg.empty() || arg=="help" ) {
 		LOG("Syntax:");
-		LOG("\t resource [command <max>|path <exprmatch>|file <exprmatch>|motion <exprmatch>|controller <exprmatch>|limit]");
+		LOG("\t resource [command <max> <exprmatch>|path <exprmatch>|file <exprmatch>|motion <exprmatch>|controller <max> <exprmatch>|limit]");
 		return CMD_SUCCESS;
 	}
 	
@@ -30,17 +30,30 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 
 	if(arg=="command")
 	{
-		int resourceLimit = numCommandResources;
+		int resourceLimit = 100; // only show the last 100 commands
 		if (args.calc_num_tokens() > 0)
 		{
 			resourceLimit = args.read_int();
 			if (resourceLimit < 0 || resourceLimit > numCommandResources)
 				resourceLimit = numCommandResources;
 		}
+		std::string match = "";
+		if (args.calc_num_tokens() > 0)
+		{
+			match = args.read_token();
+		}
+		boost::regex pattern(match, boost::regex_constants::icase|boost::regex_constants::perl);
 		for (int r = numCommandResources - resourceLimit; r < numCommandResources; r++)
 		{
 			CmdResource* res =mcu_p->resource_manager->getCommandResource(r);
-			if(res)
+			if(!res)
+				continue;
+			bool foundMatch = true;
+			if (match.size() > 0)
+			{
+				foundMatch = boost::regex_search (res->getCommand(), pattern, boost::regex_constants::format_perl);
+			}
+			if(foundMatch)
 				LOG("%s", res->dump().c_str());
 		}		
 		return CMD_SUCCESS;
@@ -49,10 +62,22 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 	if(arg=="path")
 	{
 		std::string match = "";
+		if (args.calc_num_tokens() > 0)
+		{
+			match = args.read_token();
+		}
+		boost::regex pattern(match, boost::regex_constants::icase|boost::regex_constants::perl);
 		for (int r = 0; r < numResources; r++)
 		{
 			PathResource * res = dynamic_cast<PathResource  *>(mcu_p->resource_manager->getResource(r));
-			if(res)
+			if(!res)
+				continue;
+			bool foundMatch = true;
+			if (match.size() > 0)
+			{
+				foundMatch = boost::regex_search (res->getPath(), pattern, boost::regex_constants::format_perl);
+			}
+			if(foundMatch)
 				LOG("%s", res->dump().c_str());
 		}		
 		return CMD_SUCCESS;
@@ -60,10 +85,23 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 
 	if(arg=="file")
 	{
+		std::string match = "";
+		if (args.calc_num_tokens() > 0)
+		{
+			match = args.read_token();
+		}
+		boost::regex pattern(match, boost::regex_constants::icase|boost::regex_constants::perl);
 		for (int r = 0; r < numResources; r++)
 		{
 			FileResource * res = dynamic_cast<FileResource  *>(mcu_p->resource_manager->getResource(r));
-			if(res)
+			if (!res)
+				continue;
+			bool foundMatch = true;
+			if (match.size() > 0)
+			{
+				foundMatch = boost::regex_search (res->getFilePath(), pattern, boost::regex_constants::format_perl);
+			}
+			if(foundMatch)
 				LOG("%s", res->dump().c_str());
 		}				
 		return CMD_SUCCESS;
@@ -71,10 +109,24 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 
 	if(arg == "motion")
 	{
+		std::string match = "";
+		if (args.calc_num_tokens() > 0)
+		{
+			match = args.read_token();
+		}
+		
+		boost::regex pattern(match, boost::regex_constants::icase|boost::regex_constants::perl);
 		for (int r = 0; r < numResources; r++)
 		{
 			MotionResource * res = dynamic_cast<MotionResource  *>(mcu_p->resource_manager->getResource(r));
-			if(res)
+			if (!res)
+				continue;
+			bool foundMatch = true;
+			if (match.size() > 0)
+			{
+				foundMatch = boost::regex_search (res->getMotionFile(), pattern, boost::regex_constants::format_perl);
+			}
+			if(foundMatch)
 				LOG("%s", res->dump().c_str());
 
 		}				
@@ -82,10 +134,23 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 	}
 	if(arg == "skeleton")
 	{
+		std::string match = "";
+		if (args.calc_num_tokens() > 0)
+		{
+			match = args.read_token();
+		}
+		boost::regex pattern(match, boost::regex_constants::icase|boost::regex_constants::perl);
 		for (int r = 0; r < numResources; r++)
 		{
 			SkeletonResource * res = dynamic_cast<SkeletonResource  *>(mcu_p->resource_manager->getResource(r));
-			if(res)
+			if (!res)
+				continue;
+			bool foundMatch = true;
+			if (match.size() > 0)
+			{
+				foundMatch = boost::regex_search (res->getSkeletonFile(), pattern, boost::regex_constants::format_perl);
+			}
+			if(foundMatch)
 				LOG("%s", res->dump().c_str());
 
 		}				
@@ -93,17 +158,30 @@ int resource_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 	}
 	if(arg == "controller")
 	{
-		int resourceLimit = numControllerResources;
+		int resourceLimit = 100;
 		if (args.calc_num_tokens() > 0)
 		{
 			resourceLimit = args.read_int();
 			if (resourceLimit < 0 || resourceLimit > numControllerResources)
 				resourceLimit = numControllerResources;
 		}
+		std::string match = "";
+		if (args.calc_num_tokens() > 0)
+		{
+			match = args.read_token();
+		}
+		boost::regex pattern(match, boost::regex_constants::icase|boost::regex_constants::perl);
 		for (int r = numControllerResources - resourceLimit; r < numControllerResources; r++)
 		{
 			ControllerResource* res =mcu_p->resource_manager->getControllerResource(r);
-			if(res)
+			if (!res)
+				continue;
+			bool foundMatch = true;
+			if (match.size() > 0)
+			{
+				foundMatch = boost::regex_search (res->getControllerName(), pattern, boost::regex_constants::format_perl);
+			}
+			if(foundMatch)
 				LOG("%s", res->dump().c_str());
 		}		
 		return CMD_SUCCESS;

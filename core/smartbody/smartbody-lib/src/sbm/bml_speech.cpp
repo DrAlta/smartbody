@@ -401,6 +401,9 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 		for ( size_t i = 0; i < (*result_visemes).size(); i++ )
 		{
 			VisemeData* v = (*result_visemes)[ i ];
+			// drop any visemes that don't exceed the viseme threshold
+			if (v->duration() < actor->getMinVisemeTime())
+				continue;
 			if (!v->isCurveMode() && !v->isTrapezoidMode() && !v->isFloatCurveMode())
 				visemes.push_back( new VisemeData( v->id(), v->weight(), v->time() ) );
 			else if (v->isTrapezoidMode() && !v->isFloatCurveMode())
