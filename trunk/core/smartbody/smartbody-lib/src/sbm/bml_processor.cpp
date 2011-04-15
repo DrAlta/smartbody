@@ -828,6 +828,12 @@ BML::BehaviorRequestPtr BML::Processor::parse_bml_to_anim( DOMElement* elem, std
 
 		// find the correct animation
 		DOMDocument* textXml = xml_utils::parseMessageXml( Prser, (char*)bml2animText.c_str() );
+      if (textXml == NULL)
+      {
+         LOG("BML::Processor::parse_bml_to_anim ERR: textXml is NULL!");
+         return BehaviorRequestPtr();
+      }
+
 		DOMNode* animNode = textXml->getFirstChild()->getFirstChild();
 		bool sameAttrs = true;
 		std::string userValue;
