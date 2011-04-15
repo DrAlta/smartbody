@@ -268,7 +268,10 @@ void SkSkeleton::copy_joint(SkJoint* dest, SkJoint* src)
 	SkJointQuat* srcQuat = src->quat();
 	SkJointQuat* destQuat = dest->quat();
 	destQuat->value(srcQuat->value());
-	
+	destQuat->prerot(srcQuat->prerot());
+	destQuat->postrot(srcQuat->postrot());
+	destQuat->orientation(srcQuat->orientation());
+
 	dest->mass(src->mass());
 }
 

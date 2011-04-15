@@ -33,13 +33,17 @@ class ParserOpenCOLLADA
 {
 	public:
 		static bool parse(SkSkeleton& skeleton, SkMotion& motion, std::string fileName, float scale);
-		static void parseNode(SkSkeleton& skeleton, SkMotion& motion, xercesc_3_0::DOMNode* node, float scale);
-		static void parseLibraryVisualScenes(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale);
-		static void parseJoints(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, SkJoint* parent = NULL);
-		static void parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale);
-		static int getFrameNumber(std::vector<float>& timing, float currentTime);
+		static xercesc_3_0::DOMNode* getNode(std::string nodeName, xercesc_3_0::DOMNode* node);
+		static void parseLibraryVisualScenes(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order);
+		static void parseJoints(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, SkJoint* parent = NULL);
+		static void parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order);
+		static void animationPostProcess(SkSkeleton& skeleton, SkMotion& motion);
+
+	private:
+		static int getMotionChannelId(SkChannelArray& channels, std::string sourceName);
 		static std::string getString(const XMLCh* s);
 		static std::string tokenize(std::string& str,const std::string& delimiters = " ", int mode = 1);
+		static int getRotationOrder(std::vector<std::string> orderVec);
 };
 
 #endif

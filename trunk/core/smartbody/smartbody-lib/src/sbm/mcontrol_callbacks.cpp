@@ -42,6 +42,7 @@
 #include "sr/sr_model.h"
 #include "sbm_pawn.hpp"
 #include "sbm/Event.h"
+#include "sbm/ParserOpenCOLLADA.h"
 
 using namespace std;
 using namespace WSP;
@@ -4853,6 +4854,32 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			LOG("mcu_check_func ERR: Character %s NOT EXIST!", charName);
 			return CMD_FAILURE;
 		}
+	}
+	return CMD_SUCCESS;
+}
+
+
+// command: adjustmotion <motion name> <character name>
+// this command adjust the motion with character skeleton's prerotation for once
+int mcu_adjust_motion_function( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	if (mcu_p)
+	{
+		std::string motionName = args.read_token();
+		std::string charName = args.read_token();
+		SkMotion* motion = mcu_p->lookUpMotion(motionName.c_str());
+		if (!motion)
+		{
+			LOG("mcu_adjust_motion_function ERR: motion %s not found!", motionName.c_str());
+			return CMD_FAILURE;
+		}
+		SbmCharacter* character = mcu_p->character_map.lookup(charName.c_str());
+		if (!character)
+		{
+			LOG("mcu_adjust_motion_function ERR: character %s not found!", charName.c_str());
+			return CMD_FAILURE;
+		}
+		ParserOpenCOLLADA::animationPostProcess(*character->skeleton_p, *motion);
 	}
 	return CMD_SUCCESS;
 }

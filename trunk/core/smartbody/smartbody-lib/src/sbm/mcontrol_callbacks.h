@@ -117,7 +117,7 @@ int mcu_syncpolicy_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 // examine the motion for specific skeleton
 int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-
+int mcu_adjust_motion_function( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_mediapath_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 int addevent_func( srArgBuffer& args, mcuCBHandle *mcu_p );
