@@ -44,6 +44,7 @@ class SkJointQuat
     struct PrePost { SrQuat pre, post; };
     PrePost* _prepost; // frame adjustment rotations, important: only for the derived classes.
     friend class SkJoint;
+	SrQuat _jorientation; // now 
 
    public :
 
@@ -108,16 +109,20 @@ class SkJointQuat
         note: quat.w is 1 if no rotation */
     const SrQuat& postrot () const { return _prepost? _prepost->post:SrQuat::null; }
 
+	void orientation(const SrQuat& q);
+
+	const SrQuat& orientation();
+
    protected :
 
-    /*! Returns true if the quat class is up to date in relation to the derived class,
-        otherwise (false returned) it means the quat was changed not trought the derived class. */
-    bool dersync () { return _dersync? true:false; }
-    
     /*! This method is to be called by derived classes whenever a new rotation
         is available to be retrieved with method get_quat(). It also notifies 
         the associated joint that its local matrix requires to be changed. */
     void ask_new ();
+
+    /*! Returns true if the quat class is up to date in relation to the derived class,
+        otherwise (false returned) it means the quat was changed not trought the derived class. */
+    bool dersync () { return _dersync? true:false; }
     
     /*! Ask to the derived class a new quaternion (the implementation here does nothing). */
     virtual void get_quat ( SrQuat& q ) const;

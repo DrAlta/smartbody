@@ -49,6 +49,7 @@ void SkJointQuat::value ( const SrQuat& q )
    _dersync = 0;
    _quat = q;
    _joint->set_lmat_changed(); // let joint and skeleton know there was a change
+   ask_new ();
  }
 
 void SkJointQuat::value ( const float* f )
@@ -58,16 +59,19 @@ void SkJointQuat::value ( const float* f )
    _dersync = 0;
    _quat.set ( f );
    _joint->set_lmat_changed(); // let joint and skeleton know there was a change
+   ask_new ();
  }
 
 const SrQuat& SkJointQuat::value ()
  {
    if ( _asknew )
     { get_quat ( _quat );
-      if ( _prepost ) { _quat = _prepost->pre * _quat * _prepost->post; }
+      if ( _prepost ) 
+		  _quat = _jorientation * _prepost->pre * _quat * _prepost->post;
+	  else
+		  _quat = _jorientation * _quat;
       _asknew = 0;
     }
-
    return _quat;
  }
 
@@ -130,5 +134,17 @@ void SkJointQuat::ask_new ()
 void SkJointQuat::get_quat ( SrQuat& q ) const
  {
  }
+
+
+void SkJointQuat::orientation(const SrQuat& q)
+{
+	_jorientation = q;
+	ask_new ();
+}
+
+const SrQuat& SkJointQuat::orientation()
+{
+	return _jorientation;
+}
  
 //============================ End of File ============================

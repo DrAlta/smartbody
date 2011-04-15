@@ -22,6 +22,8 @@
 
 #include "ParserOpenCOLLADA.h"
 #include "sr/sr_euler.h"
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
 
 
 bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::string fileName, float scale)
@@ -47,9 +49,24 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 
 	try 
 	{
+		int order;
 		parser->parse(fileName.c_str());
 		xercesc_3_0::DOMDocument* doc = parser->getDocument();
-		parseNode(skeleton, motion, doc, scale);
+		xercesc_3_0::DOMNode* skNode = getNode("library_visual_scenes", doc);
+		if (!skNode)
+		{
+			LOG("ParserOpenCOLLADA::parse ERR: no skeleton info contained in this file");
+			return false;
+		}
+		parseLibraryVisualScenes(skNode, skeleton, motion, scale, order);
+		xercesc_3_0::DOMNode* skmNode = getNode("library_animations", doc);
+		if (!skmNode)
+		{
+		//	LOG("ParserOpenCOLLADA::parse WARNING: no motion info contained in this file");
+			return true;
+		}
+		parseLibraryAnimations(skmNode, skeleton, motion, scale, order);
+	//	animationPostProcess(skeleton, motion);
 	}
 	catch (const XMLException& toCatch) 
 	{
@@ -74,30 +91,27 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 	return true;
 }
 
-void ParserOpenCOLLADA::parseNode(SkSkeleton& skeleton, SkMotion& motion, xercesc_3_0::DOMNode* node, float scale)
+xercesc_3_0::DOMNode* ParserOpenCOLLADA::getNode(std::string nodeName, xercesc_3_0::DOMNode* node)
 {
 	int type = node->getNodeType();
 	std::string name = getString(node->getNodeName());
 	std::string value = getString(node->getNodeValue());
-	if (name == "library_visual_scenes" && node->getNodeType() ==  xercesc_3_0::DOMNode::ELEMENT_NODE)
+	if (name == nodeName && node->getNodeType() ==  xercesc_3_0::DOMNode::ELEMENT_NODE)
+		return node;
+
+
+	xercesc_3_0::DOMNode* child = NULL;
+	const xercesc_3_0::DOMNodeList* list = node->getChildNodes();
+	for (unsigned int c = 0; c < list->getLength(); c++)
 	{
-		parseLibraryVisualScenes(node, skeleton, motion, scale);
-		skeleton.make_active_channels();
-		skeleton.compress();
+		child = getNode(nodeName, list->item(c));
+		if (child)
+			break;
 	}
-
-	if (name == "library_animations" && node->getNodeType() ==  xercesc_3_0::DOMNode::ELEMENT_NODE)
-		parseLibraryAnimations(node, skeleton, motion, scale);
-
-	if (node->hasChildNodes())
-	{
-		  const xercesc_3_0::DOMNodeList* list = node->getChildNodes();
-		  for (unsigned int c = 0; c < list->getLength(); c++)
-				parseNode(skeleton, motion, list->item(c), scale);
-	}	
+	return child;
 }
 
-void ParserOpenCOLLADA::parseLibraryVisualScenes(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale)
+void ParserOpenCOLLADA::parseLibraryVisualScenes(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order)
 {
 	const xercesc_3_0::DOMNodeList* list1 = node->getChildNodes();
 	for (unsigned int c = 0; c < list1->getLength(); c++)
@@ -105,11 +119,11 @@ void ParserOpenCOLLADA::parseLibraryVisualScenes(xercesc_3_0::DOMNode* node, SkS
 		xercesc_3_0::DOMNode* node1 = list1->item(c);
 		std::string nodeName = getString(node1->getNodeName());
 		if (nodeName == "visual_scene")
-			parseJoints(node1, skeleton, motion, scale, NULL);
+			parseJoints(node1, skeleton, motion, scale, order, NULL);
 	}
 }
 
-void ParserOpenCOLLADA::parseJoints(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, SkJoint* parent)
+void ParserOpenCOLLADA::parseJoints(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, SkJoint* parent)
 {
 	const xercesc_3_0::DOMNodeList* list = node->getChildNodes();
 	for (unsigned int i = 0; i < list->getLength(); i++)
@@ -138,6 +152,17 @@ void ParserOpenCOLLADA::parseJoints(xercesc_3_0::DOMNode* node, SkSkeleton& skel
 				joint->pos()->limits(SkVecLimits::X, false);
 				joint->pos()->limits(SkVecLimits::Y, false);
 				joint->pos()->limits(SkVecLimits::Z, false);
+				skeleton.channels().add(joint->name(), SkChannel::Quat);
+				joint->quat()->activate();
+				float rotx = 0.0f;
+				float roty = 0.0f;
+				float rotz = 0.0f;
+				float jorientx = 0.0f;
+				float jorienty = 0.0f;
+				float jorientz = 0.0f;
+				SrVec offset;
+
+				std::vector<std::string> orderVec;
 
 				if (parent == NULL)
 					skeleton.root(joint);
@@ -150,28 +175,74 @@ void ParserOpenCOLLADA::parseJoints(xercesc_3_0::DOMNode* node, SkSkeleton& skel
 					if (infoNodeName == "translate")
 					{
 						std::string offsetString = getString(infoNode->getTextContent());
-						SrVec offset;
 						offset.x = (float)atof(tokenize(offsetString).c_str()) * scale;
 						offset.y = (float)atof(tokenize(offsetString).c_str()) * scale;
 						offset.z = (float)atof(tokenize(offsetString).c_str()) * scale;
-						joint->offset(offset);
+					}
+					if (infoNodeName == "rotate")
+					{
+						xercesc_3_0::DOMNamedNodeMap* rotateAttr = infoNode->getAttributes();
+						xercesc_3_0::DOMNode* sidNode = rotateAttr->getNamedItem(XMLString::transcode("sid"));
+						std::string sidAttr = getString(sidNode->getNodeValue());
+
+						if (sidAttr.substr(0, 11) == "jointOrient")
+						{
+							std::string jointOrientationString = getString(infoNode->getTextContent());
+							float finalValue;
+							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
+								finalValue = (float)atof(tokenize(jointOrientationString).c_str());
+							if (sidAttr == "jointOrientX") jorientx = finalValue;
+							if (sidAttr == "jointOrientY") jorienty = finalValue;
+							if (sidAttr == "jointOrientZ") jorientz = finalValue;
+							orderVec.push_back(sidAttr.substr(11, 1));
+						}
+						if (sidAttr.substr(0, 6) == "rotate")
+						{
+							std::string rotationString = getString(infoNode->getTextContent());
+							float finalValue;
+							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
+								finalValue = (float)atof(tokenize(rotationString).c_str());
+							if (sidAttr == "rotateX") rotx = finalValue;
+							if (sidAttr == "rotateY") roty = finalValue;
+							if (sidAttr == "rotateZ") rotz = finalValue;
+						}
 					}
 				}
-				parseJoints(list->item(i), skeleton, motion, scale, joint);
+				order = getRotationOrder(orderVec);
+				if (order == -1)
+					LOG("ParserOpenCOLLADA::parseJoints ERR: check the file!");
+
+				SrMat rotMat;
+				rotx *= float(M_PI) / 180.0f;
+				roty *= float(M_PI) / 180.0f;
+				rotz *= float(M_PI) / 180.0f;
+				sr_euler_mat(order, rotMat, rotx, roty, rotz);
+				SrMat jorientMat;
+				jorientx *= float(M_PI) / 180.0f;
+				jorienty *= float(M_PI) / 180.0f;
+				jorientz *= float(M_PI) / 180.0f;
+				sr_euler_mat(order, jorientMat, jorientx, jorienty, jorientz);
+				joint->offset(offset);
+				SrMat finalRotMat = rotMat;
+				SrQuat quat = SrQuat(rotMat);
+				SkJointQuat* jointQuat = joint->quat();
+				jointQuat->prerot(quat);
+				SrQuat jorientQ = SrQuat(jorientMat);
+				jointQuat->orientation(jorientQ);
+				parseJoints(list->item(i), skeleton, motion, scale, order, joint);
 			}
 			else
-				parseJoints(list->item(i), skeleton, motion, scale, parent);
+				parseJoints(list->item(i), skeleton, motion, scale, order, parent);
 		}
 	}
 }
 
-
-void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale)
+void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order)
 {
-	std::vector<std::string> timingString;
-	std::vector<std::string> dataEntryName;
-	std::vector<std::string> frameDataString;
-	std::map<std::string, int> idMap;
+	SkChannelArray& skChannels = skeleton.channels();
+	motion.init(skChannels);
+	SkChannelArray& motionChannels = motion.channels();
+	bool initFrames = true;
 
 	const xercesc_3_0::DOMNodeList* list = node->getChildNodes();
 	for (unsigned int i = 0; i < list->getLength(); i++)
@@ -196,7 +267,6 @@ void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSke
 					xercesc_3_0::DOMNamedNodeMap* sourceAttr = node2->getAttributes();
 					xercesc_3_0::DOMNode* sourceIdNode = sourceAttr->getNamedItem(XMLString::transcode("id"));
 					std::string sourceIdAttr = getString(sourceIdNode->getNodeValue());
-					std::string dataName = sourceIdAttr;
 					size_t pos = sourceIdAttr.find_last_of("-");
 					std::string op = sourceIdAttr.substr(pos + 1);
 					const xercesc_3_0::DOMNodeList* list2 = node2->getChildNodes();
@@ -210,15 +280,31 @@ void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSke
 							xercesc_3_0::DOMNode* arrayCountNode = arrayAttr->getNamedItem(XMLString::transcode("count"));
 							int counter = atoi(getString(arrayCountNode->getNodeValue()).c_str());
 							std::string arrayString = getString(node3->getTextContent());
-							
-							if (op == "input")
+						
+							if (initFrames && op == "input")
 							{
-								timingString.push_back(arrayString);
+								for (int frameCt = 0; frameCt < counter; frameCt++)
+								{
+									motion.insert_frame(frameCt, (float)atof(tokenize(arrayString).c_str()));
+									for (int postureCt = 0; postureCt < motion.posture_size(); postureCt++)
+										motion.posture(frameCt)[postureCt] = 0.0f;
+								}
+								initFrames = false;
 							}
+
 							if (op == "output")
 							{
-								dataEntryName.push_back(dataName);
-								frameDataString.push_back(arrayString);
+								int channelId = getMotionChannelId(motionChannels, sourceIdAttr);
+								if (channelId >= 0)
+								{
+									int stride = counter / motion.frames();
+									for (int frameCt = 0; frameCt < motion.frames(); frameCt++)
+										for (int strideCt = 0; strideCt < stride; strideCt++)
+										{
+											float v = (float)atof(tokenize(arrayString).c_str());
+											motion.posture(frameCt)[channelId + strideCt] = v * scale;
+										}
+								}
 							}
 						}
 					}
@@ -227,231 +313,143 @@ void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSke
 			}
 		}
 	}
-	if (timingString.size() != dataEntryName.size() || dataEntryName.size() != frameDataString.size())
-		return;
-
-	// first step, handle the data
-	std::vector<std::vector<float>> timing;
-	std::vector<std::vector<float>> frameData;
-	std::vector<std::vector<int>>	frameId;
-
-	for (size_t i = 0; i < timingString.size(); i++)
+	// now transfer the motion euler data to quaternion data
+	std::vector<int> quatIndices;
+	for (int i = 0; i < motionChannels.size(); i++)
 	{
-		std::vector<float> timingData;
-		std::string value = tokenize(timingString[i]);
-		while (value != "")
+		SkChannel& chan = motionChannels[i];
+		if (chan.type == SkChannel::Quat)
 		{
-			timingData.push_back(float(atof(value.c_str())));
-			value = tokenize(timingString[i]);
-		}
-		timing.push_back(timingData);
-	}
-
-	for (size_t i = 0; i < frameDataString.size(); i++)
-	{
-		std::vector<float> data;
-		std::string value = tokenize(frameDataString[i]);
-		while (value != "")
-		{
-			data.push_back(float(atof(value.c_str())));
-			value = tokenize(frameDataString[i]);
-		}
-		frameData.push_back(data);
-	}
-
-	// get rotation order
-	std::vector<std::string> orderVec;
-	for (size_t i = 0; i < dataEntryName.size(); i++)
-	{
-		if (orderVec.size() == 3)
-			break;
-		std::string fullName = dataEntryName[i];
-		std::string jointName = tokenize(fullName, ".-");
-		size_t found = fullName.find_last_of(".");
-		std::string name = fullName.substr(found + 1);
-		std::string type = tokenize(name, "_-");
-		if (type == "rotateX" || type == "rotateY" || type == "rotateZ")
-			orderVec.push_back(type);
-	}
-
-	// add channels
-	int globalId = 0;
-	SkChannelArray motionChannels;
-	for (size_t i = 0; i < dataEntryName.size(); i++)
-	{
-		std::string fullName = dataEntryName[i];
-		std::string jointName = tokenize(fullName, ".-");
-		size_t found = fullName.find_last_of(".");
-		std::string name = fullName.substr(found + 1);
-		std::string type = tokenize(name, "_-");
-		if (type == "translate")
-		{
-			motionChannels.add(SkJointName(jointName.c_str()), SkChannel::XPos);
-			motionChannels.add(SkJointName(jointName.c_str()), SkChannel::YPos);
-			motionChannels.add(SkJointName(jointName.c_str()), SkChannel::ZPos);
-			idMap.insert(std::make_pair(dataEntryName[i], globalId));
-			globalId += 3;
-		}
-/*		if (type == "translateX")
-		{
-			motionChannels.add(SkJointName(jointName.c_str()), SkChannel::XPos);
-			idMap.insert(std::make_pair(dataEntryName[i], globalId));
-			globalId += 1;
-		}
-		if (type == "translateY")
-		{
-			motionChannels.add(SkJointName(jointName.c_str()), SkChannel::YPos);
-			idMap.insert(std::make_pair(dataEntryName[i], globalId));
-			globalId += 1;
-		}
-		if (type == "translateZ")
-		{
-			motionChannels.add(SkJointName(jointName.c_str()), SkChannel::ZPos);
-			idMap.insert(std::make_pair(dataEntryName[i], globalId));
-			globalId += 1;
-		}
-*/
-		if (type == orderVec[2])
-		{
-			motionChannels.add(SkJointName(jointName.c_str()), SkChannel::Quat);
-			motionChannels.size();
-			idMap.insert(std::make_pair(dataEntryName[i], globalId));
-			globalId += 4;
+			int id = motionChannels.float_position(i);
+			quatIndices.push_back(id);
 		}
 	}
-	motion.init(motionChannels);
-
-	// add frames
-	int numberFrame = 0;
-	std::vector<float> fullTiming;
-	for (size_t i = 0; i < timing.size(); i++)
-		if (numberFrame < (int)timing[i].size())	
+	for (int frameCt = 0; frameCt < motion.frames(); frameCt++)
+		for (size_t i = 0; i < quatIndices.size(); i++)
 		{
-			numberFrame = timing[i].size();
-			fullTiming = timing[i];
+			int quatId = quatIndices[i];
+			float rotx = motion.posture(frameCt)[quatId + 0] / scale;
+			float roty = motion.posture(frameCt)[quatId + 1] / scale;
+			float rotz = motion.posture(frameCt)[quatId + 2] / scale;
+			rotx *= float(M_PI) / 180.0f;
+			roty *= float(M_PI) / 180.0f;
+			rotz *= float(M_PI) / 180.0f;
+			SrMat mat;
+			sr_euler_mat(order, mat, rotx, roty, rotz);
+			SrQuat quat = SrQuat(mat);
+			motion.posture(frameCt)[quatId + 0] = quat.w;
+			motion.posture(frameCt)[quatId + 1] = quat.x;
+			motion.posture(frameCt)[quatId + 2] = quat.y;
+			motion.posture(frameCt)[quatId + 3] = quat.z;
 		}
-
-	for (size_t i = 0; i < fullTiming.size(); i++)
-		motion.insert_frame(i, fullTiming[i]);
-
-	for (int i = 0; i < motion.frames(); i++)
-		for (int j = 0; j < motion.posture_size(); j++)
-			motion.posture(i)[j] = 0.0;
-
-	// add data
-	std::vector<SrVec> euler;
-	for (int i = 0; i < numberFrame; i++)
-	{
-		SrVec angle;
-		euler.push_back(angle);
-	}
-	for (size_t i = 0; i < dataEntryName.size(); i++)
-	{
-		std::string fullName = dataEntryName[i];
-		std::string jointName = tokenize(fullName, ".-");
-		size_t found = fullName.find_last_of(".");
-		std::string name = fullName.substr(found + 1);
-		std::string type = tokenize(name, "_-");
-		int size = timing[i].size();
-		if (type == "translate")
-		{
-			int index = idMap[dataEntryName[i]];
-			for (int j = 0; j < size; j++)
-			{
-				int frame = getFrameNumber(fullTiming, timing[i][j]);
-				motion.posture(frame)[index + 0] = frameData[i][j * 3 + 0] * scale;
-				motion.posture(frame)[index + 1] = frameData[i][j * 3 + 1] * scale;
-				motion.posture(frame)[index + 2] = frameData[i][j * 3 + 2] * scale;
-			}
-		}
-/*		if (type == "translateX")
-		{
-			int index = idMap[dataEntryName[i]];
-			for (int j = 0; j < size; j++)
-			{
-				int frame = getFrameNumber(fullTiming, timing[i][j]);
-				motion.posture(frame)[index] = frameData[i][j];
-			}
-		}
-		if (type == "translateY")
-		{
-			int index = idMap[dataEntryName[i]];
-			for (int j = 0; j < size; j++)
-			{
-				int frame = getFrameNumber(fullTiming, timing[i][j]);
-				motion.posture(frame)[index] = frameData[i][j];
-			}
-		}
-		if (type == "translateZ")
-		{
-			int index = idMap[dataEntryName[i]];
-			for (int j = 0; j < size; j++)
-			{
-				int frame = getFrameNumber(fullTiming, timing[i][j]);
-				motion.posture(frame)[index] = frameData[i][j];
-			}
-		}
-*/
-		if (type == orderVec[0] || type == orderVec[1] || type == orderVec[2])
-		{
-			for (int j = 0; j < size; j++)
-			{
-				int frame = getFrameNumber(fullTiming, timing[i][j]);
-				std::string axis = type.substr(type.length() - 1);
-				if (axis == "Z")
-					euler[frame].z = float(frameData[i][j] * 0.017444444);
-				if (axis == "X")
-					euler[frame].x = float(frameData[i][j] * 0.017444444);
-				if (axis == "Y")
-					euler[frame].y = float(frameData[i][j] * 0.017444444);
-			}
-		}
-
-		if (type == orderVec[2])
-		{
-			int index = idMap[dataEntryName[i]];
-			for (int j = 0; j < size; j++)
-			{
-				int frame = getFrameNumber(fullTiming, timing[i][j]);
-
-				SrMat xrot;
-				xrot.rotx(euler[frame].x);
-				SrMat yrot;
-				yrot.roty(euler[frame].y);
-				SrMat zrot;
-				zrot.rotz(euler[frame].z);
-				SrMat matrix;
-				matrix = xrot * yrot * zrot;
-
-				SrQuat quat = SrQuat(matrix);
-				motion.posture(frame)[index + 0] = quat.w;
-				motion.posture(frame)[index + 1] = quat.x;
-				motion.posture(frame)[index + 2] = quat.y;
-				motion.posture(frame)[index + 3] = quat.z;
-
-			}
-			for (int j = 0; j < numberFrame; j++)
-			{
-				SrVec emptyVec;
-				euler[j] = emptyVec;
-			}
-		}
-	}
 
 	double duration = double(motion.duration());
 	motion.synch_points.set_time(0.0, duration / 3.0, duration / 2.0, duration * 2.0/3.0, duration);
 	motion.compress();
 }
 
-int ParserOpenCOLLADA::getFrameNumber(std::vector<float>& timing, float currentTime)
+void ParserOpenCOLLADA::animationPostProcess(SkSkeleton& skeleton, SkMotion& motion)
 {
-	for (size_t i = 0; i < timing.size(); i++)
+	SkChannelArray& motionChannels = motion.channels();
+	int numChannel = motionChannels.size(); 
+	for (int i = 0; i < motion.frames(); i++)
 	{
-		float diff = fabs(currentTime - timing[i]);
-		if (diff < 0.00001)
-			return int(i);
+		int chanIndex = 0;
+		for (int j = 0; j < numChannel; j++)
+		{
+			SkChannel& chan = motionChannels[j];
+			std::string chanName = motionChannels.name(j);
+			SkChannel::Type chanType = chan.type;
+			SkJoint* joint = skeleton.search_joint(chanName.c_str());
+			
+			if (chanType == SkChannel::XPos)
+			{
+				if (joint)
+					motion.posture(i)[chanIndex] -= joint->offset().x;
+				chanIndex++;
+			}
+			if (chanType == SkChannel::YPos)
+			{
+				if (joint)
+					motion.posture(i)[chanIndex] -= joint->offset().y;
+				chanIndex++;
+			}
+			if (chanType == SkChannel::ZPos)
+			{
+				if (joint)
+					motion.posture(i)[chanIndex] -= joint->offset().z;
+				chanIndex++;
+			}
+			if (chanType == SkChannel::Quat)
+			{
+				SrQuat globalQuat = SrQuat(motion.posture(i)[chanIndex], motion.posture(i)[chanIndex + 1], motion.posture(i)[chanIndex + 2], motion.posture(i)[chanIndex + 3]);
+				SrQuat preQuat = joint->quat()->prerot();
+				SrQuat localQuat = preQuat.inverse() * globalQuat;
+				motion.posture(i)[chanIndex] = localQuat.w;
+				motion.posture(i)[chanIndex + 1] = localQuat.x;
+				motion.posture(i)[chanIndex + 2] = localQuat.y;
+				motion.posture(i)[chanIndex + 3] = localQuat.z;
+				chanIndex += 4;
+			}
+
+		}
 	}
-	return -1;
+}
+
+int ParserOpenCOLLADA::getMotionChannelId(SkChannelArray& mChannels, std::string sourceName)
+{
+	int id = -1;
+	int dataId = -1;
+	SkJointName jName = SkJointName(tokenize(sourceName, ".").c_str());
+	SkChannel::Type chanType;
+	
+	if (sourceName.find("translate") != std::string::npos)
+	{
+		chanType = SkChannel::XPos;
+		id = mChannels.search(jName, chanType);
+		dataId = mChannels.float_position(id);
+	}
+	else if (sourceName.find("translateX") != std::string::npos)
+	{
+		chanType = SkChannel::XPos;
+		id = mChannels.search(jName, chanType);
+		dataId = mChannels.float_position(id);
+	}
+	else if (sourceName.find("translateY") != std::string::npos)
+	{
+		chanType = SkChannel::YPos;
+		id = mChannels.search(jName, chanType);
+		dataId = mChannels.float_position(id);
+	}
+	else if (sourceName.find("translateZ") != std::string::npos)
+	{
+		chanType = SkChannel::ZPos;
+		id = mChannels.search(jName, chanType);
+		dataId = mChannels.float_position(id);
+	}
+	else if (sourceName.find("rotateX") != std::string::npos)
+	{
+		chanType = SkChannel::Quat;
+		id = mChannels.search(jName, chanType);
+		dataId = mChannels.float_position(id);
+	}
+	else if (sourceName.find("rotateY") != std::string::npos)
+	{
+		chanType = SkChannel::Quat;
+		id = mChannels.search(jName, chanType);
+		dataId = mChannels.float_position(id);
+		if (id >= 0)
+			dataId += 1;
+	}
+	else if (sourceName.find("rotateZ") != std::string::npos)
+	{
+		chanType = SkChannel::Quat;
+		id = mChannels.search(jName, chanType);
+		dataId = mChannels.float_position(id);
+		if (id >= 0)
+			dataId += 2;
+	}
+	return dataId;
 }
 
 std::string ParserOpenCOLLADA::getString(const XMLCh* s)
@@ -460,7 +458,6 @@ std::string ParserOpenCOLLADA::getString(const XMLCh* s)
 	std::string str = XMLString::transcode(s);
 	return str;
 }
-
 
 std::string ParserOpenCOLLADA::tokenize(std::string& str, const std::string& delimiters, int mode)
 {
@@ -484,3 +481,23 @@ std::string ParserOpenCOLLADA::tokenize(std::string& str, const std::string& del
 	else
 		return "";
 }
+
+int ParserOpenCOLLADA::getRotationOrder(std::vector<std::string> orderVec)
+{
+	if (orderVec.size() == 3)
+	{
+		if (orderVec[0] == "X" && orderVec[1] == "Y" && orderVec[2] == "Z")
+			return 321;
+		if (orderVec[0] == "X" && orderVec[1] == "Z" && orderVec[2] == "Y")
+			return 231;
+		if (orderVec[0] == "Y" && orderVec[1] == "X" && orderVec[2] == "Z")
+			return 213;
+		if (orderVec[0] == "Y" && orderVec[1] == "Z" && orderVec[2] == "X")
+			return 132;
+		if (orderVec[0] == "Z" && orderVec[1] == "X" && orderVec[2] == "Y")
+			return 213;
+		if (orderVec[0] == "Z" && orderVec[1] == "Y" && orderVec[2] == "X")
+			return 123;
+	}
+	return -1;
+} 
