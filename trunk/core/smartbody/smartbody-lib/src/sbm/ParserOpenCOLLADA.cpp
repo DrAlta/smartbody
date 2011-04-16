@@ -26,7 +26,7 @@
 #include <boost/filesystem/convenience.hpp>
 
 
-bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::string fileName, float scale)
+bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::string pathName, float scale)
 {
 	try 
 	{
@@ -50,7 +50,10 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 	try 
 	{
 		int order;
-		parser->parse(fileName.c_str());
+		std::string filebasename = boost::filesystem::basename(pathName);
+		motion.name(filebasename.c_str());
+		skeleton.name(filebasename.c_str());
+		parser->parse(pathName.c_str());
 		xercesc_3_0::DOMDocument* doc = parser->getDocument();
 		xercesc_3_0::DOMNode* skNode = getNode("library_visual_scenes", doc);
 		if (!skNode)
