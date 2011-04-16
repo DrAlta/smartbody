@@ -484,6 +484,18 @@ int main(int argc, char **argv)
     int load_init_files = 1; // we want the festival init files loaded
     festival_initialize(load_init_files,heap_size);
 
+
+	// check if commandline request to hide the console is present
+	for(int i=0; i<argc; ++i)
+	{
+		if(!strcmp(argv[i],"-hideConsole"))
+		{
+			HWND hWnd = GetConsoleWindow();
+			ShowWindow( hWnd, SW_HIDE );
+
+		}
+	}
+
 	if (SetConsoleCtrlHandler((PHANDLER_ROUTINE)ConsoleHandler,TRUE)==FALSE)
 	{
 		// unable to install handler... 
