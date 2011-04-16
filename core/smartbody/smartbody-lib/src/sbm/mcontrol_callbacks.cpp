@@ -4096,8 +4096,8 @@ int mcu_sched_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 	load ME | content <me-file>
 	load motion <file-path> [-R]
+	load skeleton <file-path> [-R]
 	load pose <file-path> [-R]
-	
 */
 
 int mcu_load_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
