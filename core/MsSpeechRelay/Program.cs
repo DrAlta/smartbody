@@ -121,6 +121,12 @@ namespace MsSpeechRelay
 
         private Dictionary<string, string> voiceMap = null;
 
+        [DllImport("user32.dll")]
+        public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
         /// <summary>
         /// No constructor level initialization needed
         /// </summary>
@@ -531,6 +537,19 @@ namespace MsSpeechRelay
                         Console.WriteLine("Error: No path specified, defaulting to: \"" + temporaryAudioPlayerPath + "\". See -h/--help for command details");
                     }
                 }
+                else if(s=="-hide_GUI")
+                {
+                    if (i + 1 < args.Count)
+                    {
+                        string value = args[i + 1];
+                        if (value.Trim().Equals("true"))
+                        {
+                            HideGUI();
+                        }
+
+                    }
+
+                }
                 else if (s == "-m" || s == "--map")
                 {
                     if (i + 2 < args.Count)
@@ -569,6 +588,15 @@ namespace MsSpeechRelay
                 
             }
         }
+
+
+        public void HideGUI()
+        {
+            IntPtr hWnd = FindWindow(null, Console.Title);
+            ShowWindow(hWnd, 0);
+        }
+
+
 
         /// <summary>
         /// Initialize the program
