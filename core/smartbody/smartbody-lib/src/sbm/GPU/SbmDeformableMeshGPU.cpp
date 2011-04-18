@@ -7,6 +7,81 @@ const char* FSName = "fs_skin_render.frag";
 const std::string shaderName = "MeshSkin";
 bool SbmDeformableMeshGPU::initShader = false;
 
+std::string shaderVS = 
+"#extension GL_EXT_gpu_shader4 : enable \n\
+uniform samplerBuffer Transform; \n\
+attribute vec4 BoneID1,BoneID2;   \n\
+attribute vec4 BoneWeight1,BoneWeight2;\n \
+varying vec3 normal,lightDir,halfVector;\n \
+mat3 GetTransformation(float id)\n \
+{ \n\
+	int idx = int(id);\n \
+	mat3 rot;\n  \
+	for (int i=0;i<3;i++)\n \
+	{ \n  \
+		for (int j=0;j<3;j++)\n \
+			rot[j][i] = texelFetchBuffer(Transform,(idx*16+i*4+j)).x;\n		\
+	}\n	\
+	return rot;\n \
+}\n \
+vec3 GetTranslation(float id)\n \
+{\n  \
+	int idx = int(id);\n \
+	vec3 tran;\n \
+	tran[0] = texelFetchBuffer(Transform,(idx*16+12)).x;\n \
+	tran[1] = texelFetchBuffer(Transform,(idx*16+13)).x;\n \
+	tran[2] = texelFetchBuffer(Transform,(idx*16+14)).x;\n \
+	return tran;\n	\
+}\n  \
+vec3 TransformPos(vec3 position, vec4 boneid, vec4 boneweight)\n \
+{\n \
+	vec3 pos = vec3(0,0,0);\n \
+	mat3 tempT;\n	 \
+	vec3 tempt;\n	 \
+	for (int i=0;i<4;i++)\n \
+	{\n \
+		tempT = GetTransformation(boneid[i]);\n \
+		tempt = GetTranslation(boneid[i]);\n \
+		pos += (position*tempT+tempt)*boneweight[i];\n  \
+	}\n \
+	return pos;\n \
+}\n \
+void main()\n \
+{\n	\
+	// the following three lines provide the same result\n \
+	vec3 pos = vec3(gl_Vertex.xyz);\n \
+	vec3 tranPos = TransformPos(pos,BoneID1,BoneWeight1) + TransformPos(pos,BoneID2,BoneWeight2);\n \
+	gl_Position = gl_ModelViewProjectionMatrix*vec4(tranPos,1.0);//gl_Vertex;//vec4(pos,1.0);\n\
+	lightDir = normalize(vec3(gl_LightSource[0].position));\n\
+	halfVector = normalize(gl_LightSource[0].halfVector.xyz);\n\
+	normal = normalize(gl_NormalMatrix * gl_Normal);\n\
+}\n";
+
+std::string shaderFS =
+"const vec3 diffuseColor = vec3(1,1,1)*0.8;//vec3(255.f,252.f,181.f)/255.f*vec3(0.8,0.8,0.8)*0.8;\n\
+const vec3 specularColor = vec3(101.0/255.0, 101.0/255.0, 101.0/255.0);\n\
+const vec3 ambient = vec3(0,0,0);//(vec3(255 + 127, 241, 0 + 2)/255.f)*(vec3(0.2,0.2,0.2));\n\
+varying vec3 normal,lightDir,halfVector;\n\
+void main (void)\n\
+{  \n\
+	vec3 n,halfV;\n\
+	float NdotL,NdotHV;\n\
+	/* The ambient term will always be present */\n\
+	vec4 color = vec4(ambient,1.0);\n\
+	/* a fragment shader can't write a varying variable, hence we need\n\
+	a new variable to store the normalized interpolated normal */\n\
+	n = normalize(normal);\n\
+	/* compute the dot product between normal and ldir */\n\
+	NdotL = max(dot(n,lightDir),0.0);\n\
+	if (NdotL > 0.0) {\n\
+		color += vec4(diffuseColor*NdotL,0);\n\
+		halfV = normalize(halfVector);\n\
+		NdotHV = max(dot(n,halfV),0.0);\n\
+		color += vec4(specularColor*pow(NdotHV, 30.0),0);\n\
+	}\n\
+	gl_FragColor = color;//vec4(diffuseColor*lambertTerm,1.f);\n\
+}";
+
 SbmDeformableMeshGPU::SbmDeformableMeshGPU(void)
 {
 	useGPU = false;
@@ -122,7 +197,8 @@ void SbmDeformableMeshGPU::initShaderProgram()
 	std::string fsPathName = ShaderDir;
 	fsPathName += FSName;
 	//shaderProgram.initShaderProgram(vsPathName.c_str(),NULL);	
-	SbmShaderManager::singleton().addShader(shaderName.c_str(),vsPathName.c_str(),fsPathName.c_str());
+	//SbmShaderManager::singleton().addShader(shaderName.c_str(),vsPathName.c_str(),fsPathName.c_str());
+	SbmShaderManager::singleton().addShader(shaderName.c_str(),shaderVS.c_str(),shaderFS.c_str(),false);
 	initShader = true;
 }
 
