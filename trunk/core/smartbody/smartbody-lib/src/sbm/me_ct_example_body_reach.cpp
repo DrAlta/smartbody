@@ -186,13 +186,14 @@ void MeCtExampleBodyReach::updateIK( SrVec& rTrajectory, BodyMotionFrame& refFra
 	const char* rootName = ikScenario.ikTreeRoot->joint->parent()->name().get_string();
 	ikScenario.ikGlobalMat = skeletonRef->search_joint(rootName)->gmat();//ikScenario.ikTreeRoot->joint->parent()->gmat();	
 	ikScenario.ikTreeRootPos = refFrame.rootPos;
-	ikScenario.setTreeNodeQuat(refFrame.jointQuat,QUAT_REF);								
+	ikScenario.setTreeNodeQuat(refFrame.jointQuat,QUAT_REF);		
+	//ikScenario.setTreeNodeQuat(idleMotionFrame.jointQuat,QUAT_REF);	
 
 	ikScenario.ikPosEffectors = &reachPosConstraint;
 	ik.maxOffset = ikMaxOffset;
 	ik.dampJ = ikDamp;
 	ik.refDampRatio = 0.1;
- 	for (int i=0;i<1;i++)
+ 	for (int i=0;i<2;i++)
  	{
  		ik.update(&ikScenario);		
  		ikScenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);		
@@ -247,18 +248,20 @@ bool MeCtExampleBodyReach::updateInterpolation(float dt, BodyMotionFrame& outFra
 		if ( curReachState == REACH_COMPLETE )
 			// use normal IK to compute the hand movement after touching the object
 		{				
-			SrVec offset = (ikTarget - curEffectorPos);
+			SrVec offset = (ikTarget - curReachIKTrajectory);
+			//offset.y = 0.0;
+			curOffsetDir = offset;
 			float offsetLength = offset.norm();				
 			if (offset.norm() > reachVelocity*dt)
 			{
 				offset.normalize();
 				offset = offset*reachVelocity*dt;
-			}
+			}						
 			float morphWeight = offsetLength > 0.f ? (offset.norm()+reachVelocity*dt)/(offsetLength+reachVelocity*dt) : 1.f;
 			BodyMotionFrame morphFrame;				
 			MotionExampleSet::blendMotionFrame(interpStartFrame,interpMotionFrame,morphWeight,morphFrame);				
 			curReachIKOffset = (ikTarget - interpPos);
-			curReachIKTrajectory = curEffectorPos + offset;
+			curReachIKTrajectory = curReachIKTrajectory + offset;//curEffectorPos + offset;
 			interpStartFrame = morphFrame;
 			interpMotionFrame = morphFrame;				
 		}
@@ -357,7 +360,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	prevPercentTime = curPercentTime;	
 	reachCompleteTime += dt;
 	if (curReachState == REACH_RETURN || curReachState == REACH_START)
-		reachTime += du*0.5f; // add the reference delta time
+		reachTime += du; // add the reference delta time
 
 	// blending the input frame with ikFrame based on current fading
 	bool finishFadeOut = updateFading(dt);
@@ -512,7 +515,7 @@ void MeCtExampleBodyReach::init()
 	// initialize all parameters according to scale	
 	ikReachRegion = characterHeight*0.02f;	
 	reachVelocity = characterHeight*0.5f;
-	ikDamp        = ikReachRegion*ikReachRegion*15.0;//characterHeight*0.1f;
+	ikDamp        = ikReachRegion*ikReachRegion*10.0;//characterHeight*0.1f;
 	
 
 	MeController::init();	
@@ -597,7 +600,7 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 
 DataInterpolator* MeCtExampleBodyReach::createInterpolator()
 {	
-	KNNInterpolator* interpolator = new KNNInterpolator(3000,4.f);
+	KNNInterpolator* interpolator = new KNNInterpolator(1000,ikReachRegion*5.f);
 	resampleData = &interpolator->resampleData;
 	interpExampleData = interpolator->getInterpExamples();
 	return interpolator;

@@ -89,6 +89,7 @@ public:
 	
 	// parameters and intermediate variables for debug/visualization
 	SrVec                 curReachIKTrajectory, ikTarget, interpPos, curEffectorPos, currentInterpTarget, ikFootTarget;
+	SrVec                 curOffsetDir;
 	float                 reachVelocity, reachCompleteDuration;
 	float                 characterHeight;
 	bool                  useIKConstraint, useInterpolation, useTargetJoint;
