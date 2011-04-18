@@ -3549,7 +3549,13 @@ void FltkViewer::drawReach()
 		//PositionControl::drawSphere(ikTraj,sphereSize,SrVec(0,1,0));
 		PositionControl::drawSphere(reachCt->interpPos,sphereSize,SrVec(1,0,1));
 		PositionControl::drawSphere(reachCt->curEffectorPos,sphereSize,SrVec(1,0,0));
-		PositionControl::drawSphere(reachCt->ikFootTarget,sphereSize,SrVec(0,0,0));					
+		PositionControl::drawSphere(reachCt->ikFootTarget,sphereSize,SrVec(0,0,0));	
+
+		glColor3f(1.0, 0.0, 0.0);
+		glBegin(GL_LINES);
+		glVertex3f(reachCt->curEffectorPos.x,reachCt->curEffectorPos.y,reachCt->curEffectorPos.z);
+		glVertex3f(ikTraj.x,ikTraj.y,ikTraj.z);
+		glEnd();
 	}
 
 	glPopAttrib();

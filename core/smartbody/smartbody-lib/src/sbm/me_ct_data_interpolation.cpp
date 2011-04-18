@@ -133,7 +133,7 @@ KNNInterpolator::KNNInterpolator( int numResample /*= 500*/, float sampleDist /*
 {
 	minDist = sampleDist;
 	resampleSize = numResample;
-	numKNN  = 4;
+	numKNN  = 8;
 	kdTree = NULL;
 	dataPts = NULL;
 }

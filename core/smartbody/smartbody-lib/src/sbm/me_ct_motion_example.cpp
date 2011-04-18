@@ -93,10 +93,10 @@ double BodyMotion::getMotionFrame( float time, SkSkeleton* skel, const vector<Sk
 	}
 
 	// root orientation
-	outMotionFrame.jointQuat[0] = quatP.inverse()*outMotionFrame.jointQuat[0];
+	//outMotionFrame.jointQuat[0] = quatP.inverse()*outMotionFrame.jointQuat[0];
 	
 	outMotionFrame.rootPos.set(rootJoint->pos()->value());
-	outMotionFrame.rootPos = (outMotionFrame.rootPos - rootOffset)*quatP.inverse();
+	//outMotionFrame.rootPos = (outMotionFrame.rootPos - rootOffset)*quatP.inverse();
 	return timeWarp->invTimeWarp(rt);
 }
 
