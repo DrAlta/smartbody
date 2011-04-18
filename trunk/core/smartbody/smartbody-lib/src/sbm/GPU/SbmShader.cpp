@@ -31,24 +31,47 @@ void SbmShaderProgram::initShaderProgram( const char* vsName, const char* fsName
 {
 	// we can initialize the shader name first, before there is a opengl context
 	if (vsName)
+	{
 		vsFilename = vsName;
+		char *vs = NULL;		
+		vs = textFileRead(vsName);	
+		if (vs)
+			vsShaderStr = vs;		
+		free(vs);	
+
+	}
 	if (fsName)
-		fsFilename = fsName;	
+	{
+		fsFilename = fsName;
+		char *fs = NULL;		
+		fs = textFileRead(fsName);	
+		if (fs)
+			fsShaderStr = fs;		
+		free(fs);	
+	}
 }
 
+void SbmShaderProgram::initShaderProgramStr( const char* shaderVS, const char* shaderFS )
+{
+	if (shaderVS)
+		vsShaderStr = shaderVS;
+	if (shaderFS)
+		fsShaderStr = shaderFS;
+}
 
 void SbmShaderProgram::buildShader()
 {
 	// build the shader after there is an opengl context
-	if (vsFilename.size() > 0)
+	if (vsShaderStr.size() > 0)
 	{
 		vsID = glCreateShader(GL_VERTEX_SHADER);
-		loadShader(vsID,vsFilename.c_str());
-	}
-	if (fsFilename.size() > 0)
+		loadShaderStr(vsID,vsShaderStr.c_str());
+	}	
+	
+	if (fsShaderStr.size() > 0)
 	{
 		fsID = glCreateShader(GL_FRAGMENT_SHADER);
-		loadShader(fsID,fsFilename.c_str());
+		loadShaderStr(fsID,fsShaderStr.c_str());
 	}
 
 	//printShaderInfoLog(vsID);
@@ -64,17 +87,21 @@ void SbmShaderProgram::buildShader()
 
 void SbmShaderProgram::loadShader(GLuint sID,  const char* shaderFileName )
 {
-	char *vs = NULL;	
-	char curDir[256];
-	_getcwd(curDir,sizeof(curDir));
+	char *vs = NULL;		
 	vs = textFileRead(shaderFileName);	
 	if (!vs) return;
-	const char * vv = vs;
-	//printf("shader source = %s\n",vv);
-	glShaderSource(sID, 1, &vv,NULL);
-	free(vs);
-	glCompileShader(sID);	
+	const char* vv = vs;
+	loadShaderStr(sID,vv);
+	free(vs);	
 }
+
+
+void SbmShaderProgram::loadShaderStr( GLuint sID, const char* shaderStr )
+{		
+	glShaderSource(sID, 1, &shaderStr,NULL);	
+	glCompileShader(sID);
+}
+
 
 char * SbmShaderProgram::textFileRead(const char *fn )
 {
@@ -208,7 +235,7 @@ bool SbmShaderManager::initGLExtension()
 	}	
 }
 
-void SbmShaderManager::addShader( const char* entryName,const char* vsName, const char* fsName )
+void SbmShaderManager::addShader( const char* entryName,const char* vsName, const char* fsName, bool shaderFile )
 {
 	std::string keyName = entryName;
 	if (shaderMap.find(keyName) != shaderMap.end())
@@ -218,7 +245,12 @@ void SbmShaderManager::addShader( const char* entryName,const char* vsName, cons
 	}
 	
     SbmShaderProgram* program = new SbmShaderProgram();
-	program->initShaderProgram(vsName,fsName);
+	if (shaderFile)
+		program->initShaderProgram(vsName,fsName);
+	else
+	{		
+		program->initShaderProgramStr(vsName,fsName);
+	}
 	shaderMap[keyName] = program;
 }
 

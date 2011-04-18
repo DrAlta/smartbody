@@ -10,11 +10,13 @@ class SbmShaderProgram
 protected:
 	GLuint     vsID, fsID, programID;
 	std::string     vsFilename, fsFilename;
+	std::string     vsShaderStr, fsShaderStr;
 	bool       isBuilt;
 public:
 	SbmShaderProgram();
 	~SbmShaderProgram();		
 	void initShaderProgram(const char* vsName, const char* fsName);		
+	void initShaderProgramStr(const char* shaderVS, const char* shaderFS);	
 	GLuint getShaderProgram() { return programID; }
 
 	void buildShader();
@@ -25,7 +27,8 @@ public:
 	static void printProgramInfoLog(GLuint obj);
 	static void printOglError(const char* tag);
 protected:
-	void loadShader(GLuint sID, const char* shaderFileName);		
+	void loadShader(GLuint sID, const char* shaderFileName);
+	void loadShaderStr(GLuint sID, const char* shaderStr);
 };
 
 
@@ -58,7 +61,7 @@ public:
 	bool initOpenGL();
 	bool initGLExtension();	
 	void setViewer(SrViewer* vw);	
-	void addShader(const char* entryName,const char* vsName, const char* fsName);
+	void addShader(const char* entryName,const char* vsName, const char* fsName, bool shaderFile = true);
 	SbmShaderProgram* getShader(const char* entryName);
 	void buildShaders();
 };
