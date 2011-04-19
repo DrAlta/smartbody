@@ -595,6 +595,7 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 
 // 	if (curReachState != REACH_IDLE)
 // 		curReachState = REACH_IDLE;
+	curReachState = REACH_RETURN;
 	useInterpolation = true;
 }
 
