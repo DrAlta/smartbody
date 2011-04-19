@@ -229,7 +229,7 @@ bool SbmShaderManager::initGLExtension()
 		return true;
 	}
 	else {
-		printf("OpenGL 2.0 not supported\n");
+		//printf("OpenGL 2.0 not supported\n");
 		//exit(1);
 		return false;
 	}	
