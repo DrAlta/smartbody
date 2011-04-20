@@ -558,6 +558,16 @@ SrMat operator + ( const SrMat &m1, const SrMat &m2 )
    return mat;
  }
 
+
+SrMat SrMat::get_rotation() const
+{
+	SrMat rotMat = *this;
+	rotMat[12] = 0.f;
+	rotMat[13] = 0.f;
+	rotMat[14] = 0.f;
+	return rotMat;
+}
+
 SrMat operator - ( const SrMat &m1, const SrMat &m2 )
  {
    SrMat mat(SrMat::NotInitialized);

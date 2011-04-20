@@ -1,5 +1,15 @@
 #include "SbmDeformableMeshGPU.h"
 #include <string>
+#include <set>
+#include <algorithm>
+
+typedef std::pair<int,float> IntFloatPair;
+
+static bool intFloatComp(IntFloatPair& p1, IntFloatPair& p2)
+{
+	return (p1.second > p2.second);
+}
+
 
 const char* ShaderDir = "../../smartbody-lib/src/sbm/GPU/shaderFiles/";
 const char* VSName = "vs_skin_pos.vert";
@@ -12,7 +22,8 @@ std::string shaderVS =
 uniform samplerBuffer Transform; \n\
 attribute vec4 BoneID1,BoneID2;   \n\
 attribute vec4 BoneWeight1,BoneWeight2;\n \
-varying vec3 normal,lightDir,halfVector;\n \
+varying vec3 normal,lightDir[2],halfVector[2];\n\
+varying float dist[2];\n\
 mat3 GetTransformation(float id)\n \
 { \n\
 	int idx = int(id);\n \
@@ -33,53 +44,65 @@ vec3 GetTranslation(float id)\n \
 	tran[2] = texelFetchBuffer(Transform,(idx*16+14)).x;\n \
 	return tran;\n	\
 }\n  \
-vec3 TransformPos(vec3 position, vec4 boneid, vec4 boneweight)\n \
-{\n \
-	vec3 pos = vec3(0,0,0);\n \
-	mat3 tempT;\n	 \
-	vec3 tempt;\n	 \
-	for (int i=0;i<4;i++)\n \
-	{\n \
-		tempT = GetTransformation(boneid[i]);\n \
-		tempt = GetTranslation(boneid[i]);\n \
-		pos += (position*tempT+tempt)*boneweight[i];\n  \
-	}\n \
-	return pos;\n \
-}\n \
+mat3 TransformPos(vec3 position, vec3 normal, vec4 boneid, vec4 boneweight)\n\
+{\n\
+	vec3 pos = vec3(0,0,0);\n\
+	vec3 n = vec3(0,0,0);\n\
+	mat3 tempT;\n\
+	vec3 tempt;\n\
+	for (int i=0;i<4;i++)\n\
+	{\n\
+		tempT = GetTransformation(boneid[i]);\n\
+		tempt = GetTranslation(boneid[i]);\n\
+		pos += (position*tempT+tempt)*boneweight[i]; 		\n\
+		n   += (normal*tempT)*boneweight[i];\n\
+	}	\n\
+	mat3 result;\n\
+	result[0] = pos;\n\
+	result[1] = n;\n\
+	return result;\n\
+}\n\
 void main()\n \
 {\n	\
 	// the following three lines provide the same result\n \
 	vec3 pos = vec3(gl_Vertex.xyz);\n \
-	vec3 tranPos = TransformPos(pos,BoneID1,BoneWeight1) + TransformPos(pos,BoneID2,BoneWeight2);\n \
-	gl_Position = gl_ModelViewProjectionMatrix*vec4(tranPos,1.0);//gl_Vertex;//vec4(pos,1.0);\n\
-	lightDir = normalize(vec3(gl_LightSource[0].position));\n\
-	halfVector = normalize(gl_LightSource[0].halfVector.xyz);\n\
-	normal = normalize(gl_NormalMatrix * gl_Normal);\n\
+	mat3 skin = TransformPos(pos,gl_Normal,BoneID1,BoneWeight1) + TransformPos(pos,gl_Normal,BoneID2,BoneWeight2);\n\
+	gl_Position = gl_ModelViewProjectionMatrix*vec4(skin[0],1.0);\n\
+	lightDir[0] = normalize(vec3(gl_LightSource[0].position));\n\
+	halfVector[0] = normalize(gl_LightSource[0].halfVector.xyz);\n\
+	dist[0] = 0.0;\n\
+	vec3 posDir = vec3(gl_LightSource[1].position - gl_ModelViewMatrix * vec4(skin[0],1.0));\n\
+	dist[1] = length(posDir);\n\
+	lightDir[1] = normalize(posDir);\n\
+	halfVector[1] = normalize(gl_LightSource[1].halfVector.xyz);\n\
+	normal = normalize(gl_NormalMatrix * skin[1]);\n\
 }\n";
 
 std::string shaderFS =
-"const vec3 diffuseColor = vec3(1,1,1)*0.8;//vec3(255.f,252.f,181.f)/255.f*vec3(0.8,0.8,0.8)*0.8;\n\
+"const vec3 diffuseColor = vec3(1,1,1)*0.6;//vec3(255.f,252.f,181.f)/255.f*vec3(0.8,0.8,0.8)*0.8;\n\
 const vec3 specularColor = vec3(101.0/255.0, 101.0/255.0, 101.0/255.0);\n\
-const vec3 ambient = vec3(0,0,0);//(vec3(255 + 127, 241, 0 + 2)/255.f)*(vec3(0.2,0.2,0.2));\n\
-varying vec3 normal,lightDir,halfVector;\n\
+const vec3 ambient = vec3(0.0,0.0,0.0);//(vec3(255 + 127, 241, 0 + 2)/255.f)*(vec3(0.2,0.2,0.2));\n\
+varying vec3 normal,lightDir[2],halfVector[2];\n\
+varying float dist[2];\n\
 void main (void)\n\
 {  \n\
 	vec3 n,halfV;\n\
 	float NdotL,NdotHV;\n\
-	/* The ambient term will always be present */\n\
-	vec4 color = vec4(ambient,1.0);\n\
-	/* a fragment shader can't write a varying variable, hence we need\n\
-	a new variable to store the normalized interpolated normal */\n\
-	n = normalize(normal);\n\
-	/* compute the dot product between normal and ldir */\n\
-	NdotL = max(dot(n,lightDir),0.0);\n\
-	if (NdotL > 0.0) {\n\
-		color += vec4(diffuseColor*NdotL,0);\n\
-		halfV = normalize(halfVector);\n\
-		NdotHV = max(dot(n,halfV),0.0);\n\
-		color += vec4(specularColor*pow(NdotHV, 30.0),0);\n\
+	float att;\n\
+	vec4 color = vec4(ambient,1.0);	\n\
+	n = normalize(normal);	\n\
+	for (int i=0;i<2;i++)\n\
+	{\n\
+		att = 1.0/(gl_LightSource[i].constantAttenuation + gl_LightSource[i].linearAttenuation * dist[i] + gl_LightSource[i].quadraticAttenuation * dist[i] * dist[i]);	\n\
+		NdotL = max(dot(n,lightDir[i]),0.0);\n\
+		if (NdotL > 0.0) {\n\
+			color += vec4(diffuseColor*NdotL,0)*att;\n\
+			halfV = normalize(halfVector[i]);\n\
+			NdotHV = max(dot(n,halfV),0.0);\n\
+			color += vec4(specularColor*pow(NdotHV, 30.0),0)*att;			\n\
+		}   \n\
 	}\n\
-	gl_FragColor = color;//vec4(diffuseColor*lambertTerm,1.f);\n\
+	gl_FragColor = color;\n\
 }";
 
 SbmDeformableMeshGPU::SbmDeformableMeshGPU(void)
@@ -212,8 +235,12 @@ bool SbmDeformableMeshGPU::initBuffer()
 
 	int nTotalVtxs=0, nTotalTris = 0, nTotalBones = 0;
 	std::map<std::string,int> boneIdxMap;
+	std::vector<std::set<int>> vtxNormalIdxMap;
+	std::map<int,int> normalNewVtxIdxMap;
+	std::map<int,std::vector<int>> vtxNewVtxIdxMap;
 
 	boneJointList.clear();
+	int iFaceIdxOffset = 0, iNormalIdxOffset = 0;
 	for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
 	{
 		SkinWeight* skinWeight = skinWeights[skinCounter];		
@@ -224,8 +251,14 @@ bool SbmDeformableMeshGPU::initBuffer()
 		{
 			SrSnModel* dMeshStatic = dMeshStatic_p[pos];
 			SrSnModel* dMeshDynamic = dMeshDynamic_p[pos];
-			nTotalVtxs += dMeshStatic->shape().V.size();					
-			nTotalTris += dMeshStatic->shape().F.size();
+			int nVtx = dMeshStatic->shape().V.size();	
+			int nFace = dMeshStatic->shape().F.size();
+			int nNormal = dMeshStatic->shape().N.size();
+			for (int i=0;i<nVtx;i++)
+				vtxNormalIdxMap.push_back(std::set<int>());
+
+			nTotalVtxs += nVtx;				
+			nTotalTris += nFace;
 			for (unsigned int k=0;k<skinWeight->infJointName.size();k++)
 			{
 				std::string& jointName = skinWeight->infJointName[k];
@@ -237,15 +270,55 @@ bool SbmDeformableMeshGPU::initBuffer()
 					bindPoseMatList.push_back(skinWeight->bindPoseMat[k]);
 				}
 			}
+			int numTris = dMeshStatic->shape().F.size();
+			for (int i=0; i < numTris ; i++)
+			{
+				SrModel::Face& faceIdx = dMeshStatic->shape().F[i];				
+				SrModel::Face& nIdx = dMeshStatic->shape().Fn[i];
+				vtxNormalIdxMap[faceIdx.a + iFaceIdxOffset].insert(nIdx.a+iNormalIdxOffset);
+				vtxNormalIdxMap[faceIdx.b + iFaceIdxOffset].insert(nIdx.b+iNormalIdxOffset);
+				vtxNormalIdxMap[faceIdx.c + iFaceIdxOffset].insert(nIdx.c+iNormalIdxOffset);
+			}
+			iFaceIdxOffset += nVtx;
+			iNormalIdxOffset += nNormal;
 		}			
 	}
+
+	if (nTotalVtxs == 0 || nTotalTris ==0)
+		return false;
+
+	//printf("orig vtxs = %d\n",nTotalVtxs);
+
+	for (unsigned int i=0;i<vtxNormalIdxMap.size();i++)
+	{
+		std::set<int>& idxMap = vtxNormalIdxMap[i];
+		if (idxMap.size() > 1)
+		{
+			vtxNewVtxIdxMap[i] = std::vector<int>();
+			std::set<int>::iterator si = idxMap.begin();
+			si++;
+			for ( ;
+				  si != idxMap.end();
+				  si++)
+			{
+				vtxNewVtxIdxMap[i].push_back(nTotalVtxs);
+				normalNewVtxIdxMap[*si] = nTotalVtxs;
+				nTotalVtxs++;
+			}
+		}
+	}
+
+	//printf("new vtxs = %d\n",nTotalVtxs);
+
 	// temporary storage 
 	ublas::vector<Vec3f> posBuffer(nTotalVtxs), normalBuffer(nTotalVtxs);
 	ublas::vector<Vec3i> triBuffer(nTotalTris);
 	ublas::vector<Vec4f> boneID1(nTotalVtxs),boneID2(nTotalVtxs),weight1(nTotalVtxs),weight2(nTotalVtxs);
 	transformBuffer.resize(nTotalBones);
 	
-	int iVtx = 0, iFace = 0, iFaceIdxOffset = 0;
+	int iVtx = 0, iFace = 0;
+	iFaceIdxOffset = 0;
+	iNormalIdxOffset = 0;
 	for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
 	{
 		SkinWeight* skinWeight = skinWeights[skinCounter];		
@@ -258,6 +331,7 @@ bool SbmDeformableMeshGPU::initBuffer()
 			SrSnModel* dMeshDynamic = dMeshDynamic_p[pos];
 			dMeshDynamic->visible(false);
 			int numVertices = dMeshStatic->shape().V.size();
+			int numNormals = dMeshStatic->shape().N.size();
 			for (int i = 0; i < numVertices; i++)
 			{
 				int numOfInfJoints = skinWeight->numInfJoints[i];				
@@ -269,22 +343,56 @@ bool SbmDeformableMeshGPU::initBuffer()
 				boneID2(iVtx) = Vec4f(0,0,0,0);
 				weight1(iVtx) = Vec4f(0,0,0,0);
 				weight2(iVtx) = Vec4f(0,0,0,0);
+				
+				std::vector<IntFloatPair> weightList;
+// 				if (numOfInfJoints > 8)
+// 					printf("vtx %d : \n",iVtx);
 				for (int j = 0; j < numOfInfJoints; j++)
 				{
 					const std::string curJointName = skinWeight->infJointName[skinWeight->jointNameIndex[globalCounter]];					
 					float jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
 					int    jointIndex  = boneIdxMap[curJointName];
+// 					if (numOfInfJoints > 8)
+// 						printf("w = %d : %f\n",jointIndex,jointWeight);
+					weightList.push_back(IntFloatPair(jointIndex,jointWeight));							
+					globalCounter ++;									
+				}
+				std::sort(weightList.begin(),weightList.end(),intFloatComp);				
+				int numWeight = numOfInfJoints > 8 ? 8 : numOfInfJoints;
+				float weightSum = 0.f;
+				for (int j=0;j<numWeight;j++)
+				{
+					IntFloatPair& w = weightList[j];
+					weightSum += w.second;
 					if ( j < 4)
 					{
-						boneID1(iVtx)[j] = (float)jointIndex;
-						weight1(iVtx)[j] = jointWeight;
+						boneID1(iVtx)[j] = (float)w.first;
+						weight1(iVtx)[j] = w.second;
 					}
 					else if (j < 8)
 					{
-						boneID2(iVtx)[j-4] = (float)jointIndex;
-						weight2(iVtx)[j-4] = jointWeight;
-					}			
-					globalCounter ++;									
+						boneID2(iVtx)[j-4] = (float)w.first;
+						weight2(iVtx)[j-4] = w.second;
+					}	
+				}
+				for (int j=0;j<4;j++)
+				{
+					weight1(iVtx)[j] /= weightSum;
+					weight2(iVtx)[j] /= weightSum;
+				}	
+				
+				if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())
+				{
+					std::vector<int>& idxMap = vtxNewVtxIdxMap[iVtx];
+					// copy related vtx components 
+					for (unsigned int k=0;k<idxMap.size();k++)
+					{
+						posBuffer(idxMap[k]) = posBuffer(iVtx);
+						boneID1(idxMap[k]) = boneID1(iVtx);
+						boneID2(idxMap[k]) = boneID2(iVtx);
+						weight1(idxMap[k]) = weight1(iVtx);
+						weight2(idxMap[k]) = weight2(iVtx);
+					}
 				}
 				iVtx++;
 			}
@@ -293,21 +401,26 @@ bool SbmDeformableMeshGPU::initBuffer()
 			for (int i=0; i < numTris ; i++)
 			{
 				SrModel::Face& faceIdx = dMeshStatic->shape().F[i];
-				SrModel::Face& nIdx = dMeshStatic->shape().Fn[i];
-				triBuffer(iFace) = Vec3i(faceIdx.a+iFaceIdxOffset,faceIdx.b+iFaceIdxOffset,faceIdx.c+iFaceIdxOffset);	
-				SrVec nvec;
-				nvec = dMeshStatic->shape().N[nIdx.a];
-				normalBuffer(faceIdx.a+iFaceIdxOffset) = Vec3f(nvec.x,nvec.y,nvec.z);
+				SrModel::Face& normalIdx = dMeshStatic->shape().Fn[i];
+				int fIdx[3] = { faceIdx.a, faceIdx.b, faceIdx.c};
+				int nIdx[3] = { normalIdx.a, normalIdx.b, normalIdx.c};
 
-				nvec = dMeshStatic->shape().N[nIdx.b];
-				normalBuffer(faceIdx.b+iFaceIdxOffset) = Vec3f(nvec.x,nvec.y,nvec.z);
+				for (int k=0;k<3;k++)
+				{
+					SrVec nvec;
+					nvec = dMeshStatic->shape().N[nIdx[k]];
+					int newIdx = nIdx[k] + iNormalIdxOffset;
+					int vIdx = fIdx[k] + iFaceIdxOffset;
+					if (normalNewVtxIdxMap.find(newIdx) != normalNewVtxIdxMap.end())
+						vIdx = normalNewVtxIdxMap[newIdx];
 
-				nvec = dMeshStatic->shape().N[nIdx.c];
-				normalBuffer(faceIdx.c+iFaceIdxOffset) = Vec3f(nvec.x,nvec.y,nvec.z);
-
+					normalBuffer(vIdx) = Vec3f(nvec.x,nvec.y,nvec.z);
+					triBuffer(iFace)[k] = vIdx;
+				}			
 				iFace++;
 			}
 			iFaceIdxOffset += numVertices;
+			iNormalIdxOffset += numNormals;
 		}			
 	}	
 

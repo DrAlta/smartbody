@@ -437,6 +437,9 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 		MeCtIKTreeNode* node = endNode->parent;
 		//float fRatio = 1.f/(float)(endNode->nodeLevel + 1);
 		bool bStop = false;
+		if (endNode->nodeName == cons->rootName)
+			bStop = true;
+
 		while(node && node->parent && !bStop) // no root node
 		{
 			int idx = node->nodeIdx;			
@@ -499,9 +502,6 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 		dS[offset_idx+rotCount*3] = targetRot[0];
 		dS[offset_idx+rotCount*3+1] = targetRot[1];
 		dS[offset_idx+rotCount*3+2] = targetRot[2];
-
-// 		sr_out << "axis = " << quatOffset.axis() << srnl;
-// 		sr_out << "angle = " << quatOffset.angle() << srnl;
 
 		MeCtIKTreeNode* node = endNode->parent;
 		float fRatio = 1.f/(float)(endNode->nodeLevel + 1);

@@ -2510,7 +2510,7 @@ void FltkViewer::drawPawns()
 	mcu.character_map.reset();
 	while (SbmCharacter* character = mcu.character_map.next())
 	{
-		pawnSize = character->getHeight() / 30.0f;
+		pawnSize = 7.f;//character->getHeight() / 30.0f;
 		break;
 	}
 
@@ -3516,7 +3516,7 @@ void FltkViewer::drawReach()
 		}	
 
 	    // tetra hedron rendering, disabled for now.
-		//const VecOfSimplex& simplexList = reachCt->simplexList;
+// 		const VecOfSimplex& simplexList = reachCt->simplexList;
 // 		SrVec tetraVtx[4];
 // 		for (unsigned int i=0;i<simplexList.size();i++)
 // 		{

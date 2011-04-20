@@ -31,12 +31,57 @@ BarycentricInterpolator::~BarycentricInterpolator()
 
 }
 
-bool BarycentricInterpolator::pointInsideSimplex( dVector& pt, Simplex& tet )
+int BarycentricInterpolator::getPointSimplexIndex(const dVector& pt )
+{	
+	for (unsigned int i=0;i<simplexList.size();i++)
+	{
+		VecOfInterpWeight w;
+		if (pointInsideSimplex(pt,simplexList[i],w))
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+bool BarycentricInterpolator::simplexCoordinate( const dVector& pt, Simplex& tet, VecOfInterpWeight& weight )
+{
+	int numDim  = tet.numDim;
+	int numElem = numDim + 1;
+	dMatrix mat(numDim,numDim), invMat(numDim,numDim);	
+	InterpolationExample* ex0 = interpExamples[tet.vertexIndices[numDim]];	
+	
+	for (int i=0;i<numDim;i++)
+	{
+		int vtxIdx = tet.vertexIndices[i];
+		InterpolationExample* ex = interpExamples[vtxIdx];	
+		column(mat,i) = ex->parameter - ex0->parameter;
+		
+	}
+	MeCtUBLAS::inverseMatrix(mat,invMat);
+	dVector w;
+	MeCtUBLAS::matrixVecMult(invMat,(pt-ex0->parameter),w);
+	weight.resize(numElem);
+	double wEnd = 1.0;
+	for (int i=0;i<numDim;i++)
+	{
+		int vtxIdx = tet.vertexIndices[i];
+		weight[i].first = vtxIdx;
+		weight[i].second = (float)w[i];
+		wEnd -= w[i];
+	}
+	weight[numDim].first = tet.vertexIndices[numDim];
+	weight[numDim].second = (float)wEnd;		
+
+	return true;
+}
+
+bool BarycentricInterpolator::pointInsideSimplex(const dVector& pt, Simplex& tet, VecOfInterpWeight& weight )
 {	
 	int numDim  = tet.numDim;
 	int numElem = numDim + 1;
 	assert(numElem == tet.vertexIndices.size());
-	double prevDet = 0.0;
+	double prevDet = 0.0, totalDet;
 	dMatrix mat(numElem,numElem);
 	dVector v(numElem);
 	v[numDim] = 1.0;
@@ -48,6 +93,7 @@ bool BarycentricInterpolator::pointInsideSimplex( dVector& pt, Simplex& tet )
 		row(mat,i) = v;
 	}
 	prevDet = MeCtUBLAS::matrixDeterminant(mat);
+	totalDet = prevDet;
 
 	if (prevDet == 0.0)
 		return false; // degenerate case
@@ -55,6 +101,7 @@ bool BarycentricInterpolator::pointInsideSimplex( dVector& pt, Simplex& tet )
 	dVector tempRow, ptRow;
 	ptRow = v;
 	subrange(ptRow,0,numDim) = pt;
+	weight.resize(numElem);
 	for (int i=0;i<numElem;i++)
 	{
 		double curDet;
@@ -63,6 +110,9 @@ bool BarycentricInterpolator::pointInsideSimplex( dVector& pt, Simplex& tet )
 		curDet = MeCtUBLAS::matrixDeterminant(mat);
 		if (MeCtMath::sgn(curDet) != MeCtMath::sgn(prevDet))
 			return false;
+
+		weight[i].first = tet.vertexIndices[i];
+		weight[i].second = (float)(curDet/totalDet);
 
 		prevDet = curDet;
 		row(mat,i) = tempRow;
@@ -105,5 +155,10 @@ bool BarycentricInterpolator::buildInterpolator()
 
 void BarycentricInterpolator::predictInterpWeights( const dVector& para, VecOfInterpWeight& blendWeights )
 {
-
+	int index = getPointSimplexIndex(para);
+	if (index != -1)
+	{
+		Simplex& sip = simplexList[index];
+		simplexCoordinate(para,sip,blendWeights);
+	}
 }

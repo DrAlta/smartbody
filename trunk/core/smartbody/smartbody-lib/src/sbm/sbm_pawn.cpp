@@ -430,7 +430,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			return CMD_FAILURE;
 		}
 		// Options
-		double loc[3] = { 0, 0, 0 };
+		float loc[3] = { 0, 0, 0 };
 
 		bool has_geom = false;
 		const char* geom_str = NULL;
@@ -440,7 +440,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			string option = args.read_token();
 			// TODO: Make the following option case insensitive
 			if( option == "loc" ) {
-				args.read_double_vect( loc, 3 );
+				args.read_float_vect( loc, 3 );
 			} else if( option=="geom" ) {
 				geom_str = args.read_token();
 				has_geom = true;
@@ -455,10 +455,9 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				strstr << "WARNING: Unrecognized pawn init option \"" << option << "\"." << endl;
 				LOG(strstr.str().c_str());
 			}
-		}
+		}		
 
 		pawn_p = new SbmPawn( pawn_name.c_str() );
-
 		SkSkeleton* skeleton = new SkSkeleton();
 		skeleton->ref();
 		string skel_name = pawn_name+"-skel";
@@ -479,7 +478,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			skeleton->unref();
 			return err;
 		}
-
+		
 		err = mcu_p->pawn_map.insert( pawn_name.c_str(), pawn_p );
 		if( err != CMD_SUCCESS )	{
 			std::stringstream strstr;
@@ -504,7 +503,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		// [BMLR] Send notification to the renderer that a pawn was created.
 		// NOTE: This is sent both for characters AND pawns
 		mcu_p->bonebus.SendCreatePawn( pawn_name.c_str(), loc[ 0 ], loc[ 1 ], loc[ 2 ] );
-
+		pawn_p->set_world_offset(loc[0],loc[1],loc[2],0,0,0);
 
 		return CMD_SUCCESS;
 	} else if( pawn_cmd=="prune" ) {  // Prunes the controller trees of unused/overwritten controllers

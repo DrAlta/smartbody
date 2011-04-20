@@ -28,6 +28,7 @@ public:
 	BodyMotionFrame() {};
 	virtual ~BodyMotionFrame() {};
 	BodyMotionFrame& operator=(const BodyMotionFrame& rhs);
+	void setMotionPose(float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints,SkMotion* motion);
 };
 
 class BodyMotionInterface

@@ -74,7 +74,7 @@ void SbmShaderProgram::buildShader()
 		loadShaderStr(fsID,fsShaderStr.c_str());
 	}
 
-	//printShaderInfoLog(vsID);
+	printShaderInfoLog(vsID);
 	programID = glCreateProgram();
 	glAttachShader(programID,vsID);
 	glAttachShader(programID,fsID);

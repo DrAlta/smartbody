@@ -101,6 +101,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	eyelid_reg_ct_p( NULL ),
 #ifdef USE_REACH
 	reach_sched_p( CreateSchedulerCt( character_name, "reach" ) ),
+	grab_sched_p( CreateSchedulerCt( character_name, "grab" ) ),
 #else
 	reach_sched_p( NULL ),
 #endif
@@ -307,6 +308,8 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	reach_sched_p->init();
 #endif
 
+	grab_sched_p->init();
+
 
 
 	// Blink controller before head group (where visemes are controlled)
@@ -327,6 +330,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		ct_tree_p->add_controller(param_animation_ct);
 
 	ct_tree_p->add_controller( reach_sched_p );	
+	ct_tree_p->add_controller( grab_sched_p );
 	
 	ct_tree_p->add_controller( gaze_sched_p );			
 
@@ -1112,6 +1116,7 @@ int SbmCharacter::prune_controller_tree( mcuCBHandle* mcu_p ) {
 	// Traverse the controller tree from highest priority down, most recent to earliest
 	prune_schedule( this, head_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
 	prune_schedule( this, reach_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
+	prune_schedule( this, grab_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
 	prune_schedule( this, gaze_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
 	prune_schedule( this, motion_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
 
@@ -1494,6 +1499,8 @@ int SbmCharacter::print_controller_schedules() {
 		LOG("HEAD Schedule:");
 		head_sched_p->print_state( 0 );
 		LOG("REACH Schedule:");
+		reach_sched_p->print_state( 0 );
+		LOG("Grab Schedule:");
 		reach_sched_p->print_state( 0 );
 		// Print Face?
 
@@ -2145,6 +2152,28 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			if (motion)
 			{
 				addReachMotion(motion);
+				return CMD_SUCCESS;
+			}
+			else
+			{
+				LOG( "SbmCharacter::parse_character_command ERR: motion '%s' not found", motion_name.c_str());
+				return CMD_NOT_FOUND;
+			}
+		}
+
+		else if (reach_cmd == "grabhand" || reach_cmd == "reachhand")
+		{
+			string motion_name = args.read_token();
+			SkMotion* motion = mcu_p->lookUpMotion(motion_name.c_str());
+			//LOG("SbmCharacter::parse_character_command LOG: add motion name : %s ", motion_name.c_str());
+			if (motion)
+			{
+				//addReachMotion(motion);
+				if (reach_cmd == "grabhand")
+					this->grabHandData.insert(motion);
+				else if (reach_cmd == "reachhand")
+					this->reachHandData.insert(motion);
+
 				return CMD_SUCCESS;
 			}
 			else
