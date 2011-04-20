@@ -306,6 +306,8 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 	}
 	_prev_time = t;
 
+//dt = 0.0125f;
+
 	float angle_deg = 0;
 	if (t <= (double) _duration)
 	{
@@ -320,6 +322,12 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 	float angle_deg_per_joint = angle_deg / (float)channels_size;
 
 	float smooth_lerp = (float)(0.01 + ( 1.0 - powf( _smooth, dt * 30.0f /*SMOOTH_RATE_REF*/ ) ) * 0.99);
+
+#if 0
+static double prev_dt = 0.1;
+printf( "sm:%f fps:%f dtsm:%f dif:%f\n", _smooth, 1.0/dt, smooth_lerp, dt - prev_dt );
+prev_dt = dt;
+#endif
 
 	for( int local_channel_index=0;
 			local_channel_index<channels_size;
@@ -373,12 +381,39 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 				);
 			}
 		}
-		
+
+#if 1
+		Q_out.lerp( 
+				smooth_lerp, 
+				Q_in
+			);
+#elif 1
+		Q_out.lerp( 
+				smooth_lerp, 
+				Q_out,
+				Q_in
+			);
+#elif 1
 		Q_out.lerp( 
 				smooth_lerp, 
 				Q_in,
 				Q_out
 			);
+#else
+		Q_out = Q_in;
+#endif
+
+#if 0
+if( local_channel_index == 2 )	{
+	static double prev_in = 0.0;
+	static double prev_out = 0.0;
+	double delt_dps = ( Q_out.degrees() - prev_out )/dt;
+	if( abs( delt_dps ) > 3.0 )
+		printf( "d-in:%f d-out:%f d-dps:%f out:%f\n", Q_in.degrees() - prev_in, Q_out.degrees() - prev_out, delt_dps, Q_out.degrees() );
+	prev_in = Q_in.degrees();
+	prev_out = Q_out.degrees();
+}
+#endif
 
 		buff[ index + 0 ] = (float) Q_out.w();
 		buff[ index + 1 ] = (float) Q_out.x();
