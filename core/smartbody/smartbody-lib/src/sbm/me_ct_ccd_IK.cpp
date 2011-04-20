@@ -28,7 +28,7 @@ void MeCtCCDIK::update( MeCtIKTreeScenario* scenario )
 	sortConstraint(scenario->ikPosEffectors,sortCons);
 	scenario->updateNodeGlobalMat(scenario->ikTreeRoot,QUAT_CUR);	
 
-	for (int k=0;k<15;k++)
+	for (int k=0;k<10;k++)
 	{
 		//printf("iteration = %d\n",k);
 		for (unsigned int i=0;i<scenario->ikTreeNodes.size();i++)

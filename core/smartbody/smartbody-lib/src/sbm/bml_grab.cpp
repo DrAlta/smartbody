@@ -30,10 +30,10 @@
 #include <sr/sr_vec.h>
 #include <sr/sr_alg.h>
 
-#include "bml_bodyreach.hpp"
+#include "bml_grab.hpp"
 
 #include "mcontrol_util.h"
-#include "me_ct_example_body_reach.hpp"
+#include "me_ct_hand.hpp"
 
 #include "bml_target.hpp"
 #include "bml_xml_consts.hpp"
@@ -49,11 +49,10 @@ const XMLCh TAG_DESCRIPTION[] = L"description";
 const XMLCh DTYPE_SBM[]  = L"ICT.SBM";
 
 ////// XML ATTRIBUTES
-const XMLCh ATTR_EFFECTOR[] = L"effector";
-const XMLCh ATTR_ROOT[] = L"sbm:root";
+const XMLCh ATTR_WRIST[] = L"sbm:wrist";
 const XMLCh ATTR_TARGET_POS[] = L"sbm:target-pos";
-const XMLCh ATTR_REACH_VELOCITY[] = L"sbm:reach-velocity";
-const XMLCh ATTR_REACH_FINISH[] = L"sbm:reach-finish";
+const XMLCh ATTR_GRAB_VELOCITY[] = L"sbm:grab-velocity";
+const XMLCh ATTR_GRAB_FINISH[] = L"sbm:grab-finish";
 const XMLCh ATTR_FADE_OUT[]		= L"sbm:fade-out";
 const XMLCh ATTR_FADE_IN[]		= L"sbm:fade-in";
 //const XMLCh ATTR_APEX_DURATION[] = L"sbm:apex-duration";
@@ -65,12 +64,12 @@ using namespace BML;
 using namespace xml_utils;
 
 
-BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
+BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
 
 	std::wstringstream wstrstr;	
 
-	MeCtExampleBodyReach* bodyReachCt = NULL; 
+	MeCtHand* handCt = NULL; 
 
 	const XMLCh* attrHandle = elem->getAttribute( ATTR_HANDLE );
 	std::string handle = "";
@@ -84,21 +83,14 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 			MeControllerTreeRoot* controllerTree = character->ct_tree_p;
 			MeController* controller = controllerTree->findControllerByHandle(handle);
 
-			bodyReachCt = dynamic_cast<MeCtExampleBodyReach*>(controller);
+			handCt = dynamic_cast<MeCtHand*>(controller);
 		}
 
-		if (!bodyReachCt)
+		if (!handCt)
 		{
 			LOG("Handle : %s, controller not found.",handle.c_str());
 		}
 	}
-
-// 	if( !bodyReachCt && (!attrTarget || !XMLString::stringLen( attrTarget ) ) ) {		
-//         wstrstr << "WARNING: BML::parse_bml_reach(): <"<<tag<<"> BML tag missing "<<ATTR_TARGET<<"= attribute.";
-// 		std::string str = convertWStringToString(wstrstr.str());
-// 		LOG(str.c_str());
-// 		return BehaviorRequestPtr();  // a.k.a., NULL
-//     }
 
 	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
 	const SkJoint* target_joint = NULL;
@@ -107,22 +99,14 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		target_joint = parse_target( tag, attrTarget, mcu );		
 	}
 
-	const XMLCh* attrEffector = NULL;
-	const char* effectorName = NULL;
-	attrEffector = elem->getAttribute(ATTR_EFFECTOR);	
-	SkJoint* effectorJoint = NULL;
-	if( attrEffector && XMLString::stringLen( attrEffector ) ) 
+	const XMLCh* attrWrist = NULL;
+	const char* wristName = NULL;
+	attrWrist = elem->getAttribute(ATTR_WRIST);	
+	SkJoint* wristJoint = NULL;
+	if( attrWrist && XMLString::stringLen( attrWrist ) ) 
 	{
-		effectorName = asciiString(attrEffector);
-		effectorJoint = request->actor->skeleton_p->search_joint(effectorName);		
-	}
-
-	const XMLCh* attrRoot = NULL;
-	const char* rootName = NULL;
-	attrRoot = elem->getAttribute(ATTR_ROOT);		
-	if( attrRoot && XMLString::stringLen( attrRoot ) ) 
-	{
-		rootName = asciiString(attrRoot);			
+		wristName = asciiString(attrWrist);			
+		wristJoint = request->actor->skeleton_p->search_joint(wristName);		
 	}
 
 	SrVec targetPos = SrVec();
@@ -146,34 +130,18 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		}								
 	}
 
-// 	if (target_joint == NULL && !bodyReachCt) {  // Invalid target.  Assume parse_target(..) printed error.
-// 		return BehaviorRequestPtr();  // a.k.a., NULL
-// 	}
-
-	if (effectorJoint == NULL && !bodyReachCt) {  // Invalid target.  Assume parse_target(..) printed error.
+	if (wristJoint == NULL && !handCt) {  // Invalid target.  Assume parse_target(..) printed error.
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 
-// 	const XMLCh* attrApexDuration = elem->getAttribute( ATTR_APEX_DURATION );
-// 	float apexDuration = -1.f;
-// 	if(attrApexDuration != NULL && attrApexDuration[0] != '\0') 
-// 	{
-// 		if( !( wistringstream( attrApexDuration ) >> apexDuration) )
-// 		{
-// 			std::stringstream strstr;
-// 			strstr << "WARNING: Failed to parse apex-duration interval attribute \""<< XMLString::transcode(attrApexDuration) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
-// 			LOG(strstr.str().c_str());
-// 		}
-// 	}
-
-	const XMLCh* attrReachVelocity = elem->getAttribute( ATTR_REACH_VELOCITY );
-	float reachVelocity = -1.f;
-	if(attrReachVelocity != NULL && attrReachVelocity[0] != '\0') 
+	const XMLCh* attrGrabVelocity = elem->getAttribute( ATTR_GRAB_VELOCITY );
+	float grabVelocity = -1.f;
+	if(attrGrabVelocity != NULL && attrGrabVelocity[0] != '\0') 
 	{
-		if( !( wistringstream( attrReachVelocity ) >> reachVelocity) )
+		if( !( wistringstream( attrGrabVelocity ) >> grabVelocity) )
 		{
 			std::stringstream strstr;
-			strstr << "WARNING: Failed to parse reach-velocity interval attribute \""<< XMLString::transcode(attrReachVelocity) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
+			strstr << "WARNING: Failed to parse grab-velocity interval attribute \""<< XMLString::transcode(attrGrabVelocity) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
 			LOG(strstr.str().c_str());
 		}
 	}
@@ -209,72 +177,60 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 
 	bool bCreateNewController = false;
 	
-	if (!bodyReachCt)
+	if (!handCt)
 	{
-		bodyReachCt = new MeCtExampleBodyReach(request->actor->skeleton_p, effectorJoint);		
-		bodyReachCt->handle(handle);
+		handCt = new MeCtHand(request->actor->skeleton_p, wristJoint);		
+		handCt->handle(handle);
 		SbmCharacter* chr = const_cast<SbmCharacter*>(request->actor);
-		float characterHeight = chr->getHeight();
-		bodyReachCt->characterHeight = characterHeight;
+		//float characterHeight = chr->getHeight();
+		//handCt->characterHeight = characterHeight;
 
-		bodyReachCt->init();		
-		if (reachVelocity > 0)
-			bodyReachCt->reachVelocity = reachVelocity;
-		//bodyReachCt->reachCompleteDuration = apexDuration > 0 ? apexDuration : 2.f;
-
-		//const MotionDataSet& motionData = request->actor->getReachMotionDataSet();
-		//bodyReachCt->updateMotionExamples(motionData);
+		handCt->init(chr->getReachHandData(),chr->getGrabHandData());		
+		if (grabVelocity > 0)
+			handCt->grabVelocity = grabVelocity;		
 		bCreateNewController = true;
 	}
 
-	const XMLCh* attrReachFinish = NULL;
-	attrReachFinish = elem->getAttribute(ATTR_REACH_FINISH);
-	if( attrReachFinish && XMLString::stringLen( attrReachFinish ) ) 
+	const XMLCh* attrGrabFinish = NULL;
+	attrGrabFinish = elem->getAttribute(ATTR_GRAB_FINISH);
+	if( attrGrabFinish && XMLString::stringLen( attrGrabFinish ) ) 
 	{
-		if( XMLString::compareIString( attrReachFinish, L"true" )==0 ) 
+		if( XMLString::compareIString( attrGrabFinish, L"true" )==0 ) 
 		{			
 			LOG("Finish reaching = 'true'");
-			bodyReachCt->setFinishReaching(true);
+			handCt->setGrabState(MeCtHand::GRAB_RETURN);
 		}
-		else if( XMLString::compareIString( attrReachFinish, L"false" )==0 )
+		else if( XMLString::compareIString( attrGrabFinish, L"false" )==0 )
 		{			
 			LOG("Finish reaching = 'false'");
-			bodyReachCt->setFinishReaching(false);
+			handCt->setGrabState(MeCtHand::GRAB_START);
 		}
 	}	
 
-	if (reachVelocity > 0)
-		bodyReachCt->reachVelocity = reachVelocity;
-// 	if (apexDuration > 0)
-// 		bodyReachCt->reachCompleteDuration = apexDuration;
-
-	if (rootName)
-	{
-		bodyReachCt->setEndEffectorRoot(rootName);
-	}
-
+	if (grabVelocity > 0)
+		handCt->grabVelocity = grabVelocity;
 
 	if( target_joint )	{
-		SrVec reachPos = target_joint->gmat().get_translation();
+		SrVec grabPos = target_joint->gmat().get_translation();
 		//bodyReachCt->setReachTarget(reachPos);	
-		bodyReachCt->setReachTargetJoint(const_cast<SkJoint*>(target_joint));
+		handCt->setGrabTargetPos(grabPos);
 	}
 	else if (attrTargetPos && XMLString::stringLen( attrTargetPos ))
 	{
-		bodyReachCt->setReachTargetPos(targetPos);
+		handCt->setGrabTargetPos(targetPos);
 	}
 
 	if (fadeInTime >= 0.0)
-		bodyReachCt->setFadeIn(fadeInTime);
+		handCt->setFadeIn(fadeInTime);
 
 	if (fadeOutTime >= 0.0)
-		bodyReachCt->setFadeOut(fadeOutTime);
+		handCt->setFadeOut(fadeOutTime);
 
 	boost::shared_ptr<MeControllerRequest> ct_request;
 	ct_request.reset();
 	if (bCreateNewController)
 	{
-		ct_request.reset( new MeControllerRequest( unique_id, localId, bodyReachCt, request->actor->reach_sched_p, behav_syncs ) );
+		ct_request.reset( new MeControllerRequest( unique_id, localId, handCt, request->actor->grab_sched_p, behav_syncs ) );
 		ct_request->set_persistent( true );
 	}		
 

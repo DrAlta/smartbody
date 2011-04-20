@@ -1,6 +1,6 @@
 #pragma once
 #include "me_ct_data_interpolation.h"
-//#include "me_ct_barycentric_interpolation.h"
+#include "me_ct_barycentric_interpolation.h"
 #include "me_ct_motion_parameter.h"
 #include "me_ct_jacobian_IK.hpp"
 #include "me_ct_ccd_IK.hpp"
@@ -46,7 +46,7 @@ protected:
 	// for motion interpolation
 	MotionParameter*      motionParameter;		
 	DataInterpolator*     dataInterpolator;
-	//BarycentricInterpolator* testDataInterpolator;
+	BarycentricInterpolator* testDataInterpolator;
 	ResampleMotion*       interpMotion; // pointer to motion interface for generating motion example	
 	vector<InterpolationExample*>* interpExampleData;
 	vector<InterpolationExample*>* resampleData;
@@ -65,6 +65,7 @@ protected:
 	SkJoint*              reachEndEffector;
 	ConstraintMap         reachPosConstraint;
 	ConstraintMap         reachRotConstraint;
+
 	ConstraintMap         leftFootConstraint, rightFootConstraint;
 
 	BodyMotionFrame       inputMotionFrame,ikMotionFrame, idleMotionFrame, interpMotionFrame, initMotionFrame;
@@ -83,7 +84,7 @@ protected:
 public:
 	// these data are exposed directly for visualization/UI purpose	
 	int                   simplexIndex;
-	//VecOfSimplex          simplexList;
+	VecOfSimplex          simplexList;
 	vector<SrVec>         examplePts;
 	vector<SrVec>         resamplePts;
 	

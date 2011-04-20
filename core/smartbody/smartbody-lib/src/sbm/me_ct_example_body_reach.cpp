@@ -95,11 +95,13 @@ void MeCtExampleBodyReach::setReachTargetPos( SrVec& targetPos )
 void MeCtExampleBodyReach::findReachTarget( SrVec& rTarget, SrVec& rError )
 {
 	//if (reachTargetJoint)
+	SrVec offset = SrVec(7,8,0);
 	{
 		if (reachTargetJoint)
 			reachTargetJoint->update_gmat_up();
 
 		SrVec newReachTarget = (reachTargetJoint && useTargetJoint) ? reachTargetJoint->gmat().get_translation() : reachTargetPos;
+		//newReachTarget += offset*reachEndEffector->gmat().get_rotation();
 		//if ( (newReachTarget - reachTarget).norm() > 0.001 ) // interrupt and reset reach state if the reach target is moved
 		bool changeReachTarget = (newReachTarget - reachTarget).norm() > 0.001 ;
 		if (changeReachTarget || startReaching)
@@ -146,6 +148,9 @@ void MeCtExampleBodyReach::findReachTarget( SrVec& rTarget, SrVec& rError )
 		if (dataInterpolator && interpMotion && useInterpolation)
 		{			
 			dVector acutualReachTarget;
+
+			//simplexIndex = testDataInterpolator->getPointSimplexIndex(para);
+
 			if (curReachState == REACH_START || curReachState == REACH_COMPLETE)
 			{
 				// compute the new interpolation weight based on current target
@@ -314,7 +319,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 
 	bool interpHasReach = false;
 	if (interpMotion && useInterpolation)
-	{		
+	{	
 		interpHasReach = updateInterpolation(dt,interpMotionFrame,du);
 		ikMotionFrame = interpMotionFrame;
 	}	
@@ -328,8 +333,6 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 				reachDir.normalize();
 				reachDir = reachDir*reachVelocity*dt;
 			}		
-// 			sr_out << "reachDir = " << reachDir << srnl;
-// 			sr_out << "currentPos = " << curEffectorPos << srnl;
 			curReachIKTrajectory = curEffectorPos + reachDir;
 		}			
 		interpMotionFrame = idleMotionFrame;
@@ -466,7 +469,16 @@ void MeCtExampleBodyReach::init()
 	cons->rootName = "r_sternoclavicular";//"r_shoulder";//rootJoint->name().get_string();		
 	reachPosConstraint[cons->efffectorName] = cons;
 
+	// if there is a child
 	
+// 	if (reachEndEffector->child(0))
+// 	{
+// 		EffectorJointConstraint* rotCons = new EffectorJointConstraint();
+// 		rotCons->targetJoint = reachEndEffector->parent();
+// 		rotCons->efffectorName = reachEndEffector->child(0)->name().get_string();
+// 		rotCons->rootName = "r_wrist";//"r_shoulder";//rootJoint->name().get_string();		
+// 		reachRotConstraint[cons->efffectorName] = rotCons;
+// 	}	
 	// setup foot constraint
 #if USE_FOOT_IK
 	for (int i=0;i<2;i++)
@@ -481,8 +493,7 @@ void MeCtExampleBodyReach::init()
 		rFoot->rootName = "";
 		rightFootConstraint[rFoot->efffectorName] = rFoot;
 	}	
-#endif
-	
+#endif	
 	
 // 	reachPosConstraint[lFoot->efffectorName] = lFoot;
 // 	reachPosConstraint[rFoot->efffectorName] = rFoot;
@@ -506,7 +517,6 @@ void MeCtExampleBodyReach::init()
 		affectedJoints.push_back(joint);	
 		_channels.add(joint->name().get_string(), SkChannel::Quat);		
 	}		
-	
 
 	SkJoint* copyEffector = skeletonCopy->linear_search_joint(reachEndEffector->name().get_string());
 	motionParameter = new ReachMotionParameter(skeletonCopy,affectedJoints,copyEffector);
@@ -515,9 +525,7 @@ void MeCtExampleBodyReach::init()
 	// initialize all parameters according to scale	
 	ikReachRegion = characterHeight*0.02f;	
 	reachVelocity = characterHeight*0.5f;
-	ikDamp        = ikReachRegion*ikReachRegion*10.0;//characterHeight*0.1f;
-	
-
+	ikDamp        = ikReachRegion*ikReachRegion*14.0;//characterHeight*0.1f;
 	MeController::init();	
 }
 
@@ -537,7 +545,8 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 			continue; // we do not process example motions that are already used for this controller instance
 		if (!refMotion)
 			refMotion = motion;
-
+		
+		motionData.insert(motion);
 		MotionExample* ex = new MotionExample();
 		ex->motion = motion;
 		ex->timeWarp = new SimpleTimeWarp(refMotion->duration(),motion->duration());
@@ -565,13 +574,14 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 	dataInterpolator->init(&motionExamples);
 	dataInterpolator->buildInterpolator();	
 
-	/*
+	
 	testDataInterpolator = new BarycentricInterpolator();
 	testDataInterpolator->init(&motionExamples);
 	testDataInterpolator->buildInterpolator();
-	simplexList = testDataInterpolator->simplexList;
-	*/
-	
+
+	// test barycentric interpolator
+	//dataInterpolator = testDataInterpolator;
+	simplexList = testDataInterpolator->simplexList;	
 	
 	for (unsigned int i=0;i<resampleData->size();i++)
 	{
@@ -601,7 +611,7 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 
 DataInterpolator* MeCtExampleBodyReach::createInterpolator()
 {	
-	KNNInterpolator* interpolator = new KNNInterpolator(1000,ikReachRegion*5.f);
+	KNNInterpolator* interpolator = new KNNInterpolator(5000,ikReachRegion*1.f);
 	resampleData = &interpolator->resampleData;
 	interpExampleData = interpolator->getInterpExamples();
 	return interpolator;

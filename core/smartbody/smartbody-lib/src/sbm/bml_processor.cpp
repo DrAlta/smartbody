@@ -51,6 +51,7 @@
 #include "bml_reach.hpp"
 #include "bml_constraint.hpp"
 #include "bml_bodyreach.hpp"
+#include "bml_grab.hpp"
 #include "bml_interrupt.hpp"
 #include "bml_speech.hpp"
 #include "bml_locomotion.hpp"
@@ -439,6 +440,8 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				behavior = /*BML::*/parse_bml_constraint( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_BODYREACH )==0 ) {
 				behavior = /*BML::*/parse_bml_bodyreach( child, unique_id, behav_syncs, required, request, mcu );
+			} else if( XMLString::compareString( tag, TAG_GRAB )==0 ) {
+				behavior = /*BML::*/parse_bml_grab( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_EVENT )==0 ) {
 				// DEPRECATED FORM
 				behavior = parse_bml_event( child, unique_id, behav_syncs, required, request, mcu );

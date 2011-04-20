@@ -29,6 +29,8 @@ public:
 	virtual bool buildInterpolator();
 	virtual void predictInterpWeights(const dVector& para, VecOfInterpWeight& blendWeights);
 	virtual void drawInterpolator() {} // debugging information
+	int getPointSimplexIndex(const dVector& pt);
 protected:
-	bool pointInsideSimplex(dVector& pt, Simplex& tet);
+	bool pointInsideSimplex(const dVector& pt, Simplex& tet, VecOfInterpWeight& weight);
+	bool simplexCoordinate(const dVector& pt, Simplex& tet, VecOfInterpWeight& weight);
 };

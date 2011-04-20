@@ -1173,6 +1173,18 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="Hand"
+					>
+					<File
+						RelativePath="..\src\sbm\me_ct_hand.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_hand.hpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="blend"
@@ -1408,6 +1420,14 @@
 			</File>
 			<File
 				RelativePath="..\src\sbm\bml_general_param.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\bml_grab.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\bml_grab.hpp"
 				>
 			</File>
 			<File

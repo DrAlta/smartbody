@@ -91,6 +91,9 @@ protected:
 	// reach motion database for example-based IK reaching
 	MotionDataSet      reachMotionData;
 
+	MotionDataSet      reachHandData;
+	MotionDataSet      grabHandData;
+
 	// The implementation to be used for speech (NULL if unset) 
 	SmartBody::SpeechInterface* speech_impl;
 	// The voice code used by the implementation (empty string if unset) 
@@ -206,7 +209,8 @@ public:
 	MeCtSchedulerClass*	motion_sched_p;  // full body motions
 	MeCtSchedulerClass*	gaze_sched_p;    // back / chest / spine
 	// TODO: Arms
-	MeCtSchedulerClass*	reach_sched_p; // reaching and grabbing
+	MeCtSchedulerClass*	reach_sched_p; // reaching
+	MeCtSchedulerClass*	grab_sched_p; // grabbing (temp)
 	MeCtSchedulerClass*	head_sched_p; // neck / head orientation
 	MeCtSchedulerClass*	param_sched_p; // general parameters
 
@@ -307,6 +311,8 @@ public:
 	bool addReachMotion(SkMotion* motion);
 	SkMotion* getReachMotion(int index);
 	const MotionDataSet& getReachMotionDataSet() const { return reachMotionData;}
+	const MotionDataSet& getGrabHandData() const { return grabHandData;}
+	const MotionDataSet& getReachHandData() const { return reachHandData;}
 
 	AUChannelMap& get_au_channel_map( void ) { return au_channel_map; }
 	

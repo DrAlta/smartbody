@@ -17,6 +17,28 @@ BodyMotionFrame& BodyMotionFrame::operator=( const BodyMotionFrame& rhs )
 	return *this;
 }
 
+void BodyMotionFrame::setMotionPose( float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints,SkMotion* motion )
+{
+	SkJoint* rootJoint = affectedJoints[0];
+	motion->connect(skel);	
+	motion->apply((float)time);	
+	motion->disconnect();
+
+	if (jointQuat.size() != affectedJoints.size())
+		jointQuat.resize(affectedJoints.size());
+
+	for (unsigned int i=0;i<affectedJoints.size();i++)
+	{
+		SkJoint* joint = affectedJoints[i];
+		SrQuat jq = SrQuat();
+		if (joint->quat()->active())
+			jq = affectedJoints[i]->quat()->value();	
+
+		jointQuat[i] = jq;			
+	}	
+	rootPos.set(rootJoint->pos()->value());
+}
+
 void BodyMotionInterface::getMotionParameter( dVector& outPara )
 {
 	motionParameterFunc->getMotionParameter(this,outPara);
@@ -93,10 +115,9 @@ double BodyMotion::getMotionFrame( float time, SkSkeleton* skel, const vector<Sk
 	}
 
 	// root orientation
-	//outMotionFrame.jointQuat[0] = quatP.inverse()*outMotionFrame.jointQuat[0];
-	
+	outMotionFrame.jointQuat[0] = quatP.inverse()*outMotionFrame.jointQuat[0];	
 	outMotionFrame.rootPos.set(rootJoint->pos()->value());
-	//outMotionFrame.rootPos = (outMotionFrame.rootPos - rootOffset)*quatP.inverse();
+	outMotionFrame.rootPos = (outMotionFrame.rootPos - rootOffset)*quatP.inverse();
 	return timeWarp->invTimeWarp(rt);
 }
 
