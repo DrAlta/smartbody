@@ -306,8 +306,6 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 	}
 	_prev_time = t;
 
-//dt = 0.0125f;
-
 	float angle_deg = 0;
 	if (t <= (double) _duration)
 	{
@@ -329,6 +327,7 @@ printf( "sm:%f fps:%f dtsm:%f dif:%f\n", _smooth, 1.0/dt, smooth_lerp, dt - prev
 prev_dt = dt;
 #endif
 
+//double deg_sum = 0.0;
 	for( int local_channel_index=0;
 			local_channel_index<channels_size;
 			++local_channel_index )
@@ -387,7 +386,7 @@ prev_dt = dt;
 				smooth_lerp, 
 				Q_in
 			);
-#elif 1
+#elif 0
 		Q_out.lerp( 
 				smooth_lerp, 
 				Q_out,
@@ -422,8 +421,13 @@ if( local_channel_index == 2 )	{
 
 		// Mark channel changed
 		frame.channelUpdated( context_channel_index );
+
+//euler_t E_out = Q_out;
+//deg_sum += E_out.p();
 	}
-	
+
+//printf( "mag: %f deg: %f out: %f\n", _magnitude, angle_deg, deg_sum );
+
 	return( TRUE );
 }
 		

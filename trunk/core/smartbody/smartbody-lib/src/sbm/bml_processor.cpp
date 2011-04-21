@@ -656,26 +656,32 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
         } else if( XMLString::compareIString( attrType, L"orient" )==0 ) {
             type = BML::HEAD_ORIENT;
         }
-        switch( type ) {
+
+#define DFL_NOD_REPS		1
+#define DFL_NOD_AMOUNT		0.5f
+#define DFL_NOD_VELOCITY	1.0f
+#define DFL_NOD_SMOOTH		0.5f
+
+		switch( type ) {
             case BML::HEAD_NOD:
             case BML::HEAD_SHAKE: {
                 const XMLCh* attrRepeats = elem->getAttribute( ATTR_REPEATS );
-                float repeats = 1;  // default to one complete cycle
+                float repeats = DFL_NOD_REPS;  // default to one complete cycle
                 if( attrRepeats && *attrRepeats != 0 )
                     repeats = xml_utils::xcstof( attrRepeats );
 
                 const XMLCh* attrAmount = elem->getAttribute( ATTR_AMOUNT );
-                float amount = 0.5;  // default to a moderate amount.  Range 0.0 to 1.0
+                float amount = DFL_NOD_AMOUNT;  // default to a moderate amount.  Range 0.0 to 1.0
                 if( attrAmount && *attrAmount != 0 )
                     amount = xml_utils::xcstof( attrAmount );
 
                 const XMLCh* attrVelocity = elem->getAttribute( ATTR_VELOCITY );
-                float velocity = 1;  // default to one cycle per second
+                float velocity = DFL_NOD_VELOCITY;  // default to one cycle per second
                 if( attrVelocity && *attrVelocity != 0 )
                     velocity = xml_utils::xcstof( attrVelocity );
 
 				const XMLCh* attrSmooth = elem->getAttribute( ATTR_SMOOTH );
-                float smooth = .5;  
+                float smooth = DFL_NOD_SMOOTH;  
                 if( attrSmooth && *attrSmooth != 0 )
                     smooth = xml_utils::xcstof( attrSmooth );
 

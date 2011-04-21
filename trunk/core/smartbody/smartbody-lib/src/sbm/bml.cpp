@@ -1173,15 +1173,18 @@ NodRequest::NodRequest( const std::string& unique_id, const std::string& local, 
         extent = 1;
     else if( extent < -1 )
         extent = -1;
-    
+
+#define DFL_NOD_REF_DEG		30.0f
+#define DFL_SHAKE_REF_DEG	45.0f
+
     nod->init();
     //  TODO: Set a controller name
     switch( type ) {
         case VERTICAL:
-            nod->set_nod( (float)endTime, extent*60.0f, repeats, true, smooth );  // TODO: adjust offset to not look so high
+            nod->set_nod( (float)endTime, extent*DFL_NOD_REF_DEG, repeats, true, smooth );  // TODO: adjust offset to not look so high
             break;
         case HORIZONTAL:
-            nod->set_nod( (float)endTime, extent*90.0f, repeats, false, smooth );
+            nod->set_nod( (float)endTime, extent*DFL_SHAKE_REF_DEG, repeats, false, smooth );
             break;
         default:
             clog << "WARNING: NodRequest::NodRequest(..): Unknown nod type=" << type << endl;
