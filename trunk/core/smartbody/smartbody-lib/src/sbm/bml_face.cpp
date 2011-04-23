@@ -110,22 +110,21 @@ BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& uni
 					std::string visemeNameString;
 					int sideSignal = 0;
 					if (XMLString::compareIString( attrSide, L"left" )==0)	sideSignal = 1;
-					if (XMLString::compareIString( attrSide, L"right" )==0)	sideSignal = 1;
-					if (attrSide && *attrSide != 0)
+					else if (XMLString::compareIString( attrSide, L"right" )==0)	sideSignal = 1;
+					else if (XMLString::compareIString( attrSide, L"both" )==0)	sideSignal = 0;
+					else	
 					{
-						if (sideSignal)
-							visemeNameString = "au_" + auString + "_" + visemeSide;
-						else
-						{
-							std::wstringstream wstrstr;
-							wstrstr << "WARNING: BML::parse_bml_face(): Please check the side specification input";
-							LOG(convertWStringToString(wstrstr.str()).c_str());
-							return BehaviorRequestPtr();
-						}
+						std::wstringstream wstrstr;
+						wstrstr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_SIDE<<"=\""<<attrSide<<"\" />: Illegal attribute value.";
+						LOG(convertWStringToString(wstrstr.str()).c_str());
+						return BehaviorRequestPtr();  // a.k.a., NULL				
 					}
+
+					if (sideSignal)
+						visemeNameString = "au_" + auString + "_" + visemeSide;
 					else
 						visemeNameString = "au_" + auString;
-
+						
 					char* visemeName = new char [visemeNameString.size()+1];
 					strcpy (visemeName, visemeNameString.c_str());
 					viseme->setVisemeName(visemeName);

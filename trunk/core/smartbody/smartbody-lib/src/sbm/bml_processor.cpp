@@ -79,6 +79,7 @@ const double SQROOT_2 = 1.4142135623730950488016887242097;
 const XMLCh TAG_ACT[]		= L"act";
 const XMLCh TAG_BML[]       = L"bml";
 const XMLCh TAG_BODY[]      = L"body";
+const XMLCh TAG_TORSO[]      = L"torso";
 const XMLCh TAG_REQUIRED[]  = L"required";
 #ifdef BMLR_BML2ANIM
 const XMLCh TAG_POSTURE[]   = L"posture"; // [BMLR] For bml2anim postures
@@ -234,6 +235,7 @@ BML::Processor::Processor()
 	auto_print_sequence( false ),
 	log_syncpoints( false ),
 	warn_unknown_agents( true ),
+	bml_feedback( false ),
 	ct_speed_min( CONTROLLER_SPEED_MIN_DEFAULT ),
 	ct_speed_max( CONTROLLER_SPEED_MAX_DEFAULT ),
 	requestcb(NULL)
@@ -375,6 +377,17 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 			parseBehaviorGroup( child, request, mcu, behavior_ordinal, true );
 		} else {
 			const XMLCh* id  = child->getAttribute( ATTR_ID );
+			if (bml_feedback)
+			{
+				if (XMLString::compareString( id, XMLString::transcode("") )==0)
+				{
+					std::stringstream newIdStr;
+					newIdStr << "default" << idCounter;
+					child->setAttribute(ATTR_ID, XMLString::transcode(newIdStr.str().c_str()));
+					id = XMLString::transcode(newIdStr.str().c_str());
+					idCounter++;
+				}
+			}
 			string unique_id = request->buildUniqueBehaviorId( tag, id, ++behavior_ordinal );
 
 			// Load SyncPoint references
@@ -427,6 +440,8 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 			} else if( XMLString::compareString( tag, TAG_SBM_PANIMATION )==0 ) {
 				behavior = parse_bml_panimation( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_BODY )==0 ) {
+				behavior = parse_bml_body( child, unique_id, behav_syncs, required, request, mcu );
+			} else if( XMLString::compareString( tag, TAG_TORSO )==0 ) {
 				behavior = parse_bml_body( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_HEAD )==0 ) {
 				behavior = parse_bml_head( child, unique_id, behav_syncs, required, request, mcu );
@@ -482,6 +497,31 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 			if( behavior != NULL ) {
 				behavior->required = required;
 				request->registerBehavior( id, behavior );
+				if (bml_feedback)
+				{
+					for (int i = 0; i < 7; i++)
+					{
+						BehaviorSyncPoints feedbackSyncStart;
+						//bml char doctor <animation name="LHandOnHip_RArm_SweepRight"/>
+						std::stringstream msg;
+						std::string localId = XMLString::transcode(id);
+						std::string option;
+						if (i == 0) option = "start";
+						if (i == 1) option = "ready";
+						if (i == 2) option = "stroke_start";
+						if (i == 3) option = "stroke";
+						if (i == 4) option = "stroke_end";
+						if (i == 5) option = "relax";
+						if (i == 6) option = "end";
+						msg << "<sbm:event message=\"sbm echo " << option << "\" stroke=\"" << localId << ":" << option << "\"/>";
+						std::string newId = unique_id + "_" + option;
+						DOMElement* textXml = xml_utils::parseMessageXml( mcu->bml_processor.xmlParser.get(),  msg.str().c_str())->getDocumentElement();
+						feedbackSyncStart.parseStandardSyncPoints( textXml, request, newId );
+						BehaviorRequestPtr startRequestBehavior = parse_bml_event(textXml, newId, feedbackSyncStart, required, request, mcu);
+						startRequestBehavior->required = false;
+						request->registerBehavior( L"", startRequestBehavior );
+					}
+				}
 			} else if( required ) {
 				char* ascii_tag = XMLString::transcode( tag );
 
@@ -1341,7 +1381,14 @@ int BML::Processor::bp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 		}
 
 		return bp.interrupt( actor, performance_id, duration, mcu );
-    } else {
+	} else if( command == "feedback" ) {
+		std::string flag = args.read_token();
+		if (flag == "on")
+			bp.set_bml_feedback(true);
+		else
+			bp.set_bml_feedback(false);
+		return CMD_SUCCESS;
+	} else {
         return CMD_NOT_FOUND;
     }
 }
