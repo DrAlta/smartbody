@@ -48,7 +48,7 @@ namespace BML {
 	const float CONTROLLER_SPEED_MIN_DEFAULT = 0.25;
 	const float CONTROLLER_SPEED_MAX_DEFAULT = 4;
 
-
+	static int idCounter;
 	class Processor {
 	private:
 
@@ -91,6 +91,7 @@ namespace BML {
 		bool auto_print_sequence;
 		bool log_syncpoints;
 		bool warn_unknown_agents;
+		bool bml_feedback;
 #ifdef BMLR_BML2ANIM
 		std::string bml2animText; // [BMLR] Stores the bml 2 animation mapping file
 #endif
@@ -109,6 +110,10 @@ namespace BML {
 		void registerRequestCallback(void (*requestcb)(BmlRequest* request, void* data), void* data);
 
 		void reset();
+
+		void set_bml_feedback( bool value ) {
+			bml_feedback = value;
+		}
 
 		bool get_auto_print_controllers() {
 			return auto_print_controllers;
