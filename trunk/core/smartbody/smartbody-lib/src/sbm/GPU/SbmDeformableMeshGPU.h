@@ -29,4 +29,5 @@ protected:
 	static void initShaderProgram();
 	void skinTransformGPU();
 	void updateTransformBuffer();
+	void drawVBO();
 };

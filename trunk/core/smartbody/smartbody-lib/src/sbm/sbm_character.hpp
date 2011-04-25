@@ -209,6 +209,7 @@ public:
 	MeCtSchedulerClass*	motion_sched_p;  // full body motions
 	MeCtSchedulerClass*	gaze_sched_p;    // back / chest / spine
 	// TODO: Arms
+	MeCtSchedulerClass* constraint_sched_p;
 	MeCtSchedulerClass*	reach_sched_p; // reaching
 	MeCtSchedulerClass*	grab_sched_p; // grabbing (temp)
 	MeCtSchedulerClass*	head_sched_p; // neck / head orientation

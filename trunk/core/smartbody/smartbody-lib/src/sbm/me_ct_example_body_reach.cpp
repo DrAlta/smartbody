@@ -50,6 +50,7 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( SkSkeleton* sk, SkJoint* effectorJoi
 
 	interactiveReach = false;
 	startReaching = false;
+	finishReaching = false;
 	reachEndEffector = effectorJoint;
 	//skeletonRef->search_joint(endEffectorName);	
 
@@ -89,6 +90,32 @@ void MeCtExampleBodyReach::setReachTargetPos( SrVec& targetPos )
 	reachTargetPos = targetPos;
 	useTargetJoint = false;
 	startReaching = true;
+}
+
+bool MeCtExampleBodyReach::addHandConstraint( SkJoint* targetJoint, const char* effectorName )
+{
+	MeCtIKTreeNode* node = ikScenario.findIKTreeNode(effectorName);
+	if (!node)
+		return false;
+
+	std::string str = effectorName;		
+	ConstraintMap::iterator ci = handConstraint.find(str);
+	if (ci != handConstraint.end())//idx != effectorList.size())
+	{
+		//jEffectorList[idx].targetJoint = targetJoint;	
+		//EffectorJointConstraint& cons = jEffectorList[idx];
+		EffectorJointConstraint* cons = dynamic_cast<EffectorJointConstraint*>((*ci).second);
+		cons->targetJoint = targetJoint;
+	}
+	else // add effector-joint pair
+	{
+		// initialize constraint
+		EffectorJointConstraint* cons = new EffectorJointConstraint();		
+		cons->efffectorName = effectorName;
+		cons->targetJoint = targetJoint;
+		handConstraint[str] = cons;		
+	}
+	return true;
 }
 
 
@@ -371,6 +398,19 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	MotionExampleSet::blendMotionFrame(inputMotionFrame,ikMotionFrame,blendWeight,outMotionFrame);
 	//outMotionFrame = ikMotionFrame;
 
+	ConstraintMap::iterator si;
+	for ( si  = handConstraint.begin();
+		  si != handConstraint.end();
+		  si++)
+	{	
+		EffectorJointConstraint* cons = dynamic_cast<EffectorJointConstraint*>(si->second);//rotConstraint[i];
+		SrVec targetPos = motionParameter->getMotionFrameJoint(outMotionFrame,cons->efffectorName.c_str())->gmat().get_translation();
+		for (int k=0;k<3;k++)
+			cons->targetJoint->pos()->value(k,targetPos[k]);
+		//cons->efffectorName		
+		cons->targetJoint->update_gmat();
+	}
+
 	updateChannelBuffer(frame,outMotionFrame);
 	//mcuCBHandle::singleton().mark("main",0,"B");
 	return true;
@@ -577,7 +617,7 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 	
 	testDataInterpolator = new BarycentricInterpolator();
 	testDataInterpolator->init(&motionExamples);
-	testDataInterpolator->buildInterpolator();
+	//testDataInterpolator->buildInterpolator();
 
 	// test barycentric interpolator
 	//dataInterpolator = testDataInterpolator;
@@ -606,12 +646,13 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 // 	if (curReachState != REACH_IDLE)
 // 		curReachState = REACH_IDLE;
 	curReachState = REACH_RETURN;
+	finishReaching = false;
 	useInterpolation = true;
 }
 
 DataInterpolator* MeCtExampleBodyReach::createInterpolator()
 {	
-	KNNInterpolator* interpolator = new KNNInterpolator(5000,ikReachRegion*1.f);
+	KNNInterpolator* interpolator = new KNNInterpolator(2000,ikReachRegion*3.f);
 	resampleData = &interpolator->resampleData;
 	interpExampleData = interpolator->getInterpExamples();
 	return interpolator;

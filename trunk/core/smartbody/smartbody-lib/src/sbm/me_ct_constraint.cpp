@@ -137,23 +137,34 @@ void MeCtConstraint::updateChannelBuffer(MeFrameData& frame, std::vector<SrQuat>
 {
 	SrBuffer<float>& buffer = frame.buffer();
 	int count = 0;
+
 	BOOST_FOREACH(SrQuat& quat, quatList)
 	{
-		int index = frame.toBufferIndex(_toContextCh[count++]);		
-		if (bRead)
+		int index = frame.toBufferIndex(_toContextCh[count++]);	
+		if (index == -1)
 		{
-			quat.w = buffer[index] ;
-			quat.x = buffer[index + 1] ;
-			quat.y = buffer[index + 2] ;
-			quat.z = buffer[index + 3] ;			
+			if (bRead)
+			{
+				quat = SrQuat();
+			}
 		}
 		else
 		{
-			buffer[index] = quat.w;
-			buffer[index + 1] = quat.x;
-			buffer[index + 2] = quat.y;
-			buffer[index + 3] = quat.z;
-		}		
+			if (bRead)
+			{
+				quat.w = buffer[index] ;
+				quat.x = buffer[index + 1] ;
+				quat.y = buffer[index + 2] ;
+				quat.z = buffer[index + 3] ;			
+			}
+			else
+			{
+				buffer[index] = quat.w;
+				buffer[index + 1] = quat.x;
+				buffer[index + 2] = quat.y;
+				buffer[index + 3] = quat.z;
+			}
+		}				
 	}	
 }
 
@@ -170,12 +181,18 @@ void MeCtConstraint::init(const char* rootJointName)
 	ik_scenario.ikPosEffectors = &posConstraint;
 	ik_scenario.ikRotEffectors = &rotConstraint;
 
-	const IKTreeNodeList& nodeList = ik_scenario.ikTreeNodes;		
+	const IKTreeNodeList& nodeList = ik_scenario.ikTreeNodes;	
+
+// 	for (int i=0;i<3;i++)
+// 		_channels.add(rootJoint->name().get_string(), (SkChannel::Type)(SkChannel::XPos+i));
 	for (unsigned int i=0;i<nodeList.size();i++)
 	{
 		SkJoint* joint = nodeList[i]->joint;
 		_channels.add(joint->name().get_string(), SkChannel::Quat);	
 	}	
+
+	double ikReachRegion = characterHeight*0.02f;		
+	ikDamp        = ikReachRegion*ikReachRegion*14.0;
 	MeController::init();
 }
 
@@ -235,8 +252,11 @@ bool MeCtConstraint::controller_evaluate( double t, MeFrameData& frame )
 
 
 	_skeleton->update_global_matrices();
-	//ik_scenario.ikTreeRoot->joint->parent()->update_gmat_up(); // update world offset global transformation	
-	ik_scenario.ikGlobalMat = ik_scenario.ikTreeRoot->joint->parent()->gmat();	
+	ik_scenario.ikTreeRoot->joint->parent()->update_gmat_up(); // update world offset global transformation	
+	ik_scenario.ikGlobalMat = ik_scenario.ikTreeRoot->joint->parent()->gmat();
+	for (int i=0;i<3;i++)
+		ik_scenario.ikTreeRootPos[i] = ik_scenario.ikTreeRoot->joint->pos()->value(i);
+
 	
 	ik.setDt(dt);
 	if (fadeMode == FADING_MODE_IN)
@@ -250,6 +270,8 @@ bool MeCtConstraint::controller_evaluate( double t, MeFrameData& frame )
 	{
 		{
 			//sr_out << "global offset mat = " << ik_scenario.ikGlobalMat << srnl;
+			ik.dampJ = ikDamp;
+			ik.refDampRatio = 0.01;
 			for (int i=0;i<1;i++)
 			{
 				//printf("IK Iteration %d\n",i);

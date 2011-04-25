@@ -65,8 +65,9 @@ protected:
 	SkJoint*              reachEndEffector;
 	ConstraintMap         reachPosConstraint;
 	ConstraintMap         reachRotConstraint;
+	ConstraintMap         leftFootConstraint, rightFootConstraint;	
 
-	ConstraintMap         leftFootConstraint, rightFootConstraint;
+	ConstraintMap         handConstraint;
 
 	BodyMotionFrame       inputMotionFrame,ikMotionFrame, idleMotionFrame, interpMotionFrame, initMotionFrame;
 	BodyMotionFrame       interpStartFrame;
@@ -115,6 +116,8 @@ public:
 	void updateIK(SrVec& rTrajectory, BodyMotionFrame& refFrame, BodyMotionFrame& outFrame);
 	void updateState();
 
+
+	bool addHandConstraint(SkJoint* targetJoint, const char* effectorName);
 
 	void setReachTargetJoint(SkJoint* val); 
 	void setReachTargetPos(SrVec& targetPos);
