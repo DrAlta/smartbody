@@ -103,6 +103,9 @@ protected:
 	ConstraintMap   posConstraint;
 		
 	float           prev_time; // to get dt
+public:
+	float           characterHeight;
+	double          ikDamp;
 public:			
 	void init (const char* rootName);
 	bool addEffectorJointPair(SkJoint* targetJoint, const char* effectorName, const char* effectorRootName, const SrVec& posOffset , const SrQuat& rotOffset , ConstraintType cType = CONSTRAINT_POS);

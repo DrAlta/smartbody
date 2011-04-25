@@ -2510,7 +2510,7 @@ void FltkViewer::drawPawns()
 	mcu.character_map.reset();
 	while (SbmCharacter* character = mcu.character_map.next())
 	{
-		pawnSize = 7.f;//character->getHeight() / 30.0f;
+		pawnSize = character->getHeight()/ 30.0f;
 		break;
 	}
 
@@ -3450,7 +3450,7 @@ MeCtConstraint* FltkViewer::getCurrentCharacterConstraintController()
 	MeCtConstraint* reachCt = NULL;
 	if ( character )
 	{
-		MeCtSchedulerClass* reachSched = character->reach_sched_p;
+		MeCtSchedulerClass* reachSched = character->constraint_sched_p;
 		MeCtSchedulerClass::VecOfTrack reach_tracks = reachSched->tracks();		
 		MeCtReach* tempCt = NULL;
 		for (unsigned int c = 0; c < reach_tracks.size(); c++)

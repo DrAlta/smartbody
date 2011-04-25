@@ -100,6 +100,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	locomotion_ct( NULL ),
 	eyelid_reg_ct_p( NULL ),
 #ifdef USE_REACH
+	constraint_sched_p( CreateSchedulerCt( character_name, "constraint" ) ),
 	reach_sched_p( CreateSchedulerCt( character_name, "reach" ) ),
 	grab_sched_p( CreateSchedulerCt( character_name, "grab" ) ),
 #else
@@ -306,10 +307,9 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 #ifdef USE_REACH
 	reach_sched_p->init();
-#endif
-
 	grab_sched_p->init();
-
+	constraint_sched_p->init();
+#endif
 
 
 	// Blink controller before head group (where visemes are controlled)
@@ -332,7 +332,8 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	ct_tree_p->add_controller( reach_sched_p );	
 	ct_tree_p->add_controller( grab_sched_p );
 	
-	ct_tree_p->add_controller( gaze_sched_p );			
+	ct_tree_p->add_controller( gaze_sched_p );		
+	ct_tree_p->add_controller( constraint_sched_p );	
 
 	if( eyelid_reg_ct_p )
 		ct_tree_p->add_controller( eyelid_reg_ct_p );
@@ -1118,6 +1119,7 @@ int SbmCharacter::prune_controller_tree( mcuCBHandle* mcu_p ) {
 	prune_schedule( this, reach_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
 	prune_schedule( this, grab_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
 	prune_schedule( this, gaze_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
+	prune_schedule( this, constraint_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
 	prune_schedule( this, motion_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
 
 	// For the posture track, ignore prior controllers, as they should never be used to mark a posture as unused
