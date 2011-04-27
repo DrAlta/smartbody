@@ -28,17 +28,17 @@ fi
 echo ""
 
 if [ "$configFlag" = "1" ]; then
-  if [ $1 = "-edit" ]; then
+  if [ "$1" = "-edit" ]; then
     source ./src/testMenu.sh 
-  elif [ $1 = "-update" ]; then
+  elif [ "$1" = "-update" ]; then
     shift
     source ./src/testCreateCases.sh -update $@
-  elif [ $1 = "-create" ]; then
+  elif [ "$1" = "-create" ]; then
     shift
     source ./src/testCreateCases.sh -create $@
-  elif [ $1 = "-print" ]; then
+  elif [ "$1" = "-print" ]; then
     source ./src/testListCases.sh
-  elif [ $1 = "-delete" ]; then
+  elif [ "$1" = "-delete" ]; then
     @shift
     source testDeleteCases.sh $@
   else
