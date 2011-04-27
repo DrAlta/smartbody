@@ -62,6 +62,7 @@
 #include <sbm/time_regulator.h>
 //#include "SBMWindow.h"
 #include "CommandWindow.h"
+#include <boost/algorithm/string/replace.hpp>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef WIN32_LEAN_AND_MEAN
@@ -203,9 +204,14 @@ int mcu_snapshot_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return( CMD_SUCCESS );
 }
 
-int mcu_echo_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
+int mcu_echo_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
+{
+	std::stringstream timeStr;
+	timeStr << mcu_p->time;
+	std::string echoStr = args.read_remainder_raw();
+	boost::replace_all(echoStr, "$time", timeStr.str());
 	
-    LOG("%s ", args.read_remainder_raw() );
+    LOG("%s ", echoStr.c_str() );
 	return( CMD_SUCCESS );
 }
 
