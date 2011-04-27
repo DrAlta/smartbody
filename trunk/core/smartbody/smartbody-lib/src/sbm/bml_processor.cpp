@@ -513,7 +513,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 						if (i == 4) option = "stroke_end";
 						if (i == 5) option = "relax";
 						if (i == 6) option = "end";
-						msg << "<sbm:event message=\"sbm echo " << option << "\" stroke=\"" << localId << ":" << option << "\"/>";
+						msg << "<sbm:event message=\"sbm echo " << localId << " " << option << " $time" << "\" stroke=\"" << localId << ":" << option << "\"/>";
 						std::string newId = unique_id + "_" + option;
 						DOMElement* textXml = xml_utils::parseMessageXml( mcu->bml_processor.xmlParser.get(),  msg.str().c_str())->getDocumentElement();
 						feedbackSyncStart.parseStandardSyncPoints( textXml, request, newId );
