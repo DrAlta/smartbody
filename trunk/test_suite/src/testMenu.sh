@@ -39,7 +39,7 @@ do
            updateCases="$@"
            echo $updateCases
          fi
-         source testCreateCases.sh update $updateCases         
+         source ./testCreateCases.sh -update $updateCases         
          ;;
     "1") echo -n "Enter seq files' path(seperate by space): "
          if [ $numInput = 0 ]; then    
@@ -48,7 +48,7 @@ do
            createCases="$@"
            echo $createCases
          fi
-         source testCreateCases.sh create $createCases
+         source ./testCreateCases.sh -create $createCases
          ;;
     "2") echo -n "Enter cases' name to be run: "
          if [ $numInput = 0 ]; then     
@@ -57,7 +57,7 @@ do
            runCases="$@"
            echo $runCases
          fi
-         source testRunCases.sh "$runCases"
+         source ./testRunCases.sh "$runCases"
          ;;
     "3") echo -n "Enter cases' name to be deleted(seperate by space): "
          if [ $numInput = 0 ]; then       
@@ -66,9 +66,9 @@ do
            deleteCases="$@"
            echo $deleteCases
          fi
-         source testDeleteCases.sh $deleteCases
+         source ./testDeleteCases.sh $deleteCases
          ;;
-    "4") source testListCases.sh 
+    "4") source ./testListCases.sh 
          ;;
     "5") exitFlag=1
          ;;

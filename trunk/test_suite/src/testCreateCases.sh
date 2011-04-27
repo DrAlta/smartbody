@@ -8,7 +8,7 @@ processMode=$1
 while [ $# -gt 1 ]
 do
   cd $BASEDIR
-  if [ $processMode = "create" ]; then
+  if [ $processMode = "-create" ]; then
 	  if [ -e "$2" ]; then
 	    echo "*  $2 found!"
 	    caseName=`basename $2`
@@ -38,7 +38,7 @@ do
 	  fi     
   fi
   
-  if [ $processMode = "update" ]; then
+  if [ $processMode = "-update" ]; then
     folderName=$2
     cd $INPUTDIR
     if [ ! -d "$2" ]; then 

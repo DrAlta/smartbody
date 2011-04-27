@@ -27,15 +27,21 @@ else
 fi
 echo ""
 
-echo -n "Press any key to continue..."
-read -n 1 -s
-
 if [ "$configFlag" = "1" ]; then
-  if [ $# -eq 0 ]; then
-    source ./src/testMenu.sh 2
+  if [ $1 = "-edit" ]; then
+    source ./src/testMenu.sh 
+  elif [ $1 = "-update" ]; then
+    shift
+    source ./src/testCreateCases.sh -update $@
+  elif [ $1 = "-create" ]; then
+    shift
+    source ./src/testCreateCases.sh -create $@
+  elif [ $1 = "-print" ]; then
+    source ./src/testListCases.sh
+  elif [ $1 = "-delete" ]; then
+    @shift
+    source testDeleteCases.sh $@
   else
-    if [ $1 = "edit" ]; then
-      source ./src/testMenu.sh
-    fi
+    source ./src/testRunCases.sh $1
   fi
 fi
