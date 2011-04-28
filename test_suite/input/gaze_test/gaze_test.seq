@@ -51,9 +51,9 @@
 2.1 char doctor ctrl G1 begin
 4 gaze G1 target point 100 200 -40
 5 camera eye    160 150 0
-5 snapshot 600 600
+5 snapshot
 6 gaze G1 target point 100 170 -40
-7 snapshot 600 600
+7 snapshot
 8 gaze G1 target point 100 100 -40
-9 snapshot 600 600
+9 snapshot
 10 quit

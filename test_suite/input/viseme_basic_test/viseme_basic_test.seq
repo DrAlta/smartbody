@@ -39,59 +39,59 @@
 3	set pawn camera world_offset x 0 y 166 z 185
 
 4	char BillFord viseme Ao 1 1
-5	snapshot 600 600
+5	snapshot
 5	char BillFord viseme Ao 0 1
 
 6	char BillFord viseme D 1 1
-7	snapshot 600 600
+7	snapshot
 7	char BillFord viseme D 0 1
 
 8	char BillFord viseme EE 1 1
-9	snapshot 600 600
+9	snapshot
 9	char BillFord viseme EE 0 1
 
 10	char BillFord viseme Er 1 1
-11	snapshot 600 600
+11	snapshot
 11	char BillFord viseme Er 0 1
 
 12	char BillFord viseme f 1 1
-13	snapshot 600 600
+13	snapshot
 13	char BillFord viseme f 0 1
 
 14	char BillFord viseme j 1 1
-15	snapshot 600 600
+15	snapshot
 15	char BillFord viseme j 0 1
 
 16	char BillFord viseme KG 1 1
-17	snapshot 600 600
+17	snapshot
 17	char BillFord viseme KG 0 1
 
 18	char BillFord viseme Ih 1 1
-19	snapshot 600 600
+19	snapshot
 19	char BillFord viseme Ih 0 1
 
 20	char BillFord viseme NG 1 1
-21	snapshot 600 600
+21	snapshot
 21	char BillFord viseme NG 0 1
 
 22	char BillFord viseme oh 1 1
-23	snapshot 600 600
+23	snapshot
 23	char BillFord viseme oh 0 1
 
 24	char BillFord viseme OO 1 1
-25	snapshot 600 600
+25	snapshot
 25	char BillFord viseme OO 0 1
 
 26	char BillFord viseme R 1 1
-27	snapshot 600 600
+27	snapshot
 27	char BillFord viseme R 0 1
 
 28	char BillFord viseme Th 1 1
-29	snapshot 600 600
+29	snapshot
 29	char BillFord viseme Th 0 1
 
 30	char BillFord viseme Z 1 1
-31	snapshot 600 600
+31	snapshot
 31	char BillFord viseme Z 0 1
 
 32	quit

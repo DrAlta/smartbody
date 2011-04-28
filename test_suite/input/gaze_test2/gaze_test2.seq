@@ -61,15 +61,15 @@ test bml
 <sbm:optical  heading="5" pitch="5" roll="5" blend="1.0" /></gaze>
 end
 
-3 snapshot 600 600
+3 snapshot
 4 test bml <gaze target="elder:base"> </gaze>
-5 snapshot 600 600
+5 snapshot
 6 test bml <gaze target="elder:spine1"> </gaze>
-7 snapshot 600 600
+7 snapshot
 8 test bml <gaze target="elder:spine2"> </gaze>
-9 snapshot 600 600
+9 snapshot
 10 test bml <gaze target="elder:spine3"> </gaze>
-11 snapshot 600 600
+11 snapshot
 12 test bml <gaze target="elder:spine4"> </gaze>
-13 snapshot 600 600
+13 snapshot
 14 quit
