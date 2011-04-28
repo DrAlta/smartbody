@@ -32,7 +32,16 @@ if [ "$configFlag" = "1" ]; then
     source ./src/testMenu.sh 
   elif [ "$1" = "-update" ]; then
     shift
-    source ./src/testCreateCases.sh -update $@
+	if [ $# = 0 ]; then
+	  inputString=""
+	  for file in `ls $INPUTDIR`
+	  do
+		inputString="${inputString} $file"
+	  done
+	  source ./src/testCreateCases.sh -update $inputString
+	else
+	  source ./src/testCreateCases.sh -update $@
+	fi
   elif [ "$1" = "-create" ]; then
     shift
     source ./src/testCreateCases.sh -create $@

@@ -11,6 +11,7 @@
 # ---- Using virtual timing
 0	time sleepfps 0
 0	time simfps 60
+0	time reset
 
 # ---- Setting characters and default posture
 #  Common-sk assets are centered on the pelvis,
