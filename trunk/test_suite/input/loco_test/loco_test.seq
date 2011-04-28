@@ -49,12 +49,12 @@
 # ---- Testing loco
 1.1 camera eye    160 150 500
 1.1 test loco char doctor dx 60
-4 snapshot 600 600
+4 snapshot
 4.1 test loco char doctor dz 90
-5 snapshot 600 600
+5 snapshot
 5.1 test loco char doctor dz 90 rps 1.5
-7 snapshot 600 600
+7 snapshot
 7.1 test loco char doctor stop
 8.1 test loco char doctor dz 90 lrps 1
-9 snapshot 600 600
+9 snapshot
 10 quit

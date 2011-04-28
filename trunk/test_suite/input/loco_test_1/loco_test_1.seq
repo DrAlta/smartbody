@@ -49,11 +49,11 @@
 # ---- Testing loco
 1.1 camera eye    160 150 500
 1.1 test loco char doctor forward spd 60 lrps 1 angle 3.14
-4 snapshot 600 600
+4 snapshot
 5.5 test loco char doctor stop
 7 test loco char doctor forward spd 110 lrps 2
-9 snapshot 600 600
+9 snapshot
 9.1 test loco char doctor stop
 11 test loco char doctor forward spd 80 rps 1
-12 snapshot 600 600
+12 snapshot
 14 quit

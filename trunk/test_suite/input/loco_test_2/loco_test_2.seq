@@ -51,13 +51,13 @@
 
 1.1 camera eye    180 100 -700
 1.1 test loco char doctor backward spd 60 lrps 1 angle 3.14
-4 snapshot 600 600
+4 snapshot
 5.5 test loco char doctor stop
 7 test loco char doctor tx 200 tz 300 spd 30
-9 snapshot 600 600
+9 snapshot
 11 test loco char doctor dx -100 dz 0 spd 80 lrps 1
-13 snapshot 600 600
+13 snapshot
 14 test loco char doctor stop
 15.5 test loco char doctor forward spd 100 rps 1
-19 snapshot 600 600
+19 snapshot
 25 quit

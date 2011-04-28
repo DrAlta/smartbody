@@ -163,6 +163,12 @@ int mcu_snapshot_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
 	if( mcu_p )
 	{
+		RootWindow* rootWindow = dynamic_cast<RootWindow*> (mcu_p->viewer_p);
+		if (!rootWindow)
+		{
+			LOG("Viewer doesn't exist!");
+			return CMD_FAILURE;
+		}
 		int windowHeight = args.read_int();
 		int windowWidth = args.read_int();
 		int offsetHeight = args.read_int();
@@ -170,8 +176,8 @@ int mcu_snapshot_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 		string output_file = args.read_token();
 
-		if( windowHeight == 0 )		windowHeight = 600;							// default window size
-		if( windowWidth == 0 )		windowWidth = 400;
+		if( windowHeight == 0 )		windowHeight = rootWindow->fltkViewer->h();							// default window size
+		if( windowWidth == 0 )		windowWidth = rootWindow->fltkViewer->w();
 		if( output_file == "" )		
 		{
 			std::stringstream output_file_os;

@@ -55,7 +55,7 @@
 	</gaze>
 	end
 
-3	snapshot 600 600
+3	snapshot
 
 4	begin
 	test bml
@@ -70,7 +70,7 @@
 	</gaze>
 	end
 
-5	snapshot 600 600
+5	snapshot
 
 6	begin
 	test bml
@@ -93,7 +93,7 @@
 	</gaze>
 	end
 
-9	snapshot 600 600
+9	snapshot
 
 10	begin
 	test bml
@@ -103,7 +103,7 @@
 	</gaze>
 	end
 
-11	snapshot 600 600
+11	snapshot
 
 12	begin
 	test bml
@@ -113,6 +113,6 @@
 	</gaze>
 	end
 
-13	snapshot 600 600
+13	snapshot
 
 14	quit
