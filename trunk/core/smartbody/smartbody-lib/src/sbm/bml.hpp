@@ -372,6 +372,8 @@ namespace BML {
 
 		PostureRequest( const std::string& unique_id, const std::string& localId, MeController* pose, time_sec transitionDuration, const SbmCharacter* actor,
 			            const BehaviorSyncPoints& behav_syncs );
+
+		virtual BehaviorSpan getBehaviorSpan();
 	};
 
 	class SequenceRequest : public BehaviorRequest {
