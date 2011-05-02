@@ -117,6 +117,17 @@ int main( int argc, char ** argv )
    bool loop = true;
    while ( loop )
    {
+
+	   static bool once = false;
+	   if (!once)
+	   {
+		   for (int i = 1; i < argc; i++)
+		   {
+			   sbm->ProcessVHMsgs("sbm", argv[i]);
+		   }
+		   once = true;
+	   }  
+
       sbm->Update( get_time() );
       vhmsg::ttu_poll();
 

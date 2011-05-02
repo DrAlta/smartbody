@@ -471,7 +471,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			float size = 1.0;
 			if (size_str)
 			{
-				size = atof(size_str);
+				size = (float)atof(size_str);
 			}
 
 			if (strcmp(geom_str,"sphere") == 0)
@@ -486,7 +486,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			}
 			else if (strcmp(geom_str,"capsule") == 0)
 			{
-				SbmColObject* colObj = new SbmColCapsule(size*1.5,size*0.5f);
+				SbmColObject* colObj = new SbmColCapsule(size*1.5f,size*0.5f);
 				pawn_p->colObj_p = colObj;
 			}	
 			else
