@@ -158,7 +158,10 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	//boost::shared_ptr<MeControllerRequest> ct_request( new MeControllerRequest( unique_id, gaze_ct, request->actor->gaze_sched_p, behav_syncs ) );
 	//ct_request->set_persistent( true );
 	//return ct_request;
-	return BehaviorRequestPtr();
+	boost::shared_ptr<MeControllerRequest> ct_request;
+	ct_request.reset();
+	return ct_request;
+	//return BehaviorRequestPtr();
 }
 
 void BML::Locomotion::parse_routine(DOMElement* elem, BmlRequestPtr request, int type, int id)

@@ -399,7 +399,7 @@ void mcuCBHandle::clear( void )	{
 		logger_p = NULL;
 	}
 
-	close_viewer();
+	//close_viewer();
 
 	if ( net_host )
 		bonebus.CloseConnection();
@@ -588,6 +588,11 @@ void mcuCBHandle::update( void )	{
 		pawn_p->reset_all_channels();
 		pawn_p->ct_tree_p->evaluate( time );
 		pawn_p->ct_tree_p->applyBufferToAllSkeletons();
+
+		if (pawn_p->colObj_p)
+		{
+			pawn_p->colObj_p->updateTransform(pawn_p->skeleton_p->joints()[0]->gmat());
+		}
 
 		char_p = character_map.lookup( pawn_p->name );
 		if( char_p ) {

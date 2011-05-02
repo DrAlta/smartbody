@@ -36,6 +36,7 @@
 # include <fltk/ToggleItem.H>
 # include <SR/sr_box.h>
 # include <SR/sr_sphere.h>
+# include <SR/sr_cylinder.h>
 # include <SR/sr_quat.h>
 # include <SR/sr_line.h>
 # include <SR/sr_plane.h>
@@ -59,6 +60,7 @@
 # include <SBM/me_ct_data_driven_reach.hpp>
 # include <SBM/me_ct_example_body_reach.hpp>
 # include <SBM/me_ct_constraint.hpp>
+# include <SBM/Collision/SbmColObject.h>
 
 #include <sbm/mcontrol_util.h>
 //#include <sbm/SbmShader.h>
@@ -2517,9 +2519,6 @@ void FltkViewer::drawPawns()
 	srHashMap<SbmPawn>& pawn_map = mcu.pawn_map;
 	pawn_map.reset();
 	
-
-	glPushAttrib(GL_LIGHTING_BIT);
-	glDisable(GL_LIGHTING);
 	while ( SbmPawn* pawn = pawn_map.next() )
 	{
 		if (!pawn->skeleton_p) // wouldn't this will go into inf loop ?
@@ -2528,27 +2527,39 @@ void FltkViewer::drawPawns()
 		if (character)
 			continue;
 		pawn->skeleton_p->update_global_matrices();
-		SrArray<SkJoint*>& joints = pawn->skeleton_p->get_joint_array();
-		
-		
-		glColor3f(1.0f, 1.0f, 0.0f);
+		SrArray<SkJoint*>& joints = pawn->skeleton_p->get_joint_array();		
+		//glColor3f(1.0f, 1.0f, 0.0f);
 		SrMat gmat = joints[0]->gmat();
+		if (pawn->colObj_p)
+		{
+			pawn->colObj_p->updateTransform(gmat);
+			drawColObject(pawn->colObj_p);
+		}
+		else
+		{
+			// draw default sphere
+			glPushAttrib(GL_LIGHTING_BIT);
+			glDisable(GL_LIGHTING);
+			glPushMatrix();
+			glMultMatrixf((const float*) gmat);
+			glColor3f(1.0, 0.0, 0.0);
+			SrSnSphere sphere;
+			glPushMatrix();
+			sphere.shape().center = SrPnt(0, 0, 0);
+			sphere.shape().radius = pawnSize;
+			sphere.render_mode(srRenderModeLines);
+			SrGlRenderFuncs::render_sphere(&sphere);
+			glEnd();
+			glPopMatrix();
+			glPopMatrix();
+			glPopAttrib();
+		}
 		
-		glPushMatrix();
-		glMultMatrixf((const float*) gmat);
-		glColor3f(1.0, 0.0, 0.0);
-		SrSnSphere sphere;
-		glPushMatrix();
-		sphere.shape().center = SrPnt(0, 0, 0);
-		sphere.shape().radius = pawnSize;
-		sphere.render_mode(srRenderModeLines);
-		SrGlRenderFuncs::render_sphere(&sphere);
+
 			
-		glEnd();
-		glPopMatrix();
-		glPopMatrix();
+		
 	}
-	glPopAttrib();
+	
 
 }
 
@@ -3542,6 +3553,21 @@ void FltkViewer::drawReach()
 			drawPoint(gPos[0],gPos[1],gPos[2],1.5,SrVec(0.0,1.0,0.0));
 			//PositionControl::drawSphere(gPos,1.0f);			
 		}	
+
+		if (reachCt->posPlanner && reachCt->posPlanner->path())
+		{
+			if (reachCt->posPlanner->path())
+			{
+				SrSnLines pathLines;			
+				reachCt->posPlanner->draw_path(*reachCt->posPlanner->path(),pathLines.shape());
+				pathLines.color(SrColor(1,0,0,1));
+				SrGlRenderFuncs::render_lines(&pathLines);		
+			}
+
+			SrSnBox box;
+			box.shape() = reachCt->posPlanner->cman()->SkPosBound();
+			//SrGlRenderFuncs::render_box(&box);
+		}
 		
 		SrVec reachTraj = reachCt->curReachIKTrajectory;
 		PositionControl::drawSphere(reachTraj,sphereSize,SrVec(0,1,1));
@@ -3566,6 +3592,58 @@ void FltkViewer::drawReach()
 void FltkViewer::makeGLContext()
 {
 	make_current();
+}
+
+void FltkViewer::drawColObject( SbmColObject* colObj )
+{
+	glEnable(GL_LIGHTING);
+	glPushMatrix();
+	SrMat gMat = colObj->worldState.gmat();
+	glMultMatrixf((const float*) gMat);
+	if (dynamic_cast<SbmColSphere*>(colObj))
+	{
+		// draw sphere
+		SbmColSphere* sph = dynamic_cast<SbmColSphere*>(colObj);
+		SrSnSphere sphere;					
+		sphere.shape().radius = sph->radius;
+		sphere.color(SrColor(1.f,0.f,0.f));
+		sphere.render_mode(srRenderModeSmooth);
+		SrGlRenderFuncs::render_sphere(&sphere);		
+	}
+	else if (dynamic_cast<SbmColBox*>(colObj))
+	{
+		SbmColBox* box = dynamic_cast<SbmColBox*>(colObj);
+		SrSnBox sbox;					
+		sbox.shape().a = -box->extent;
+		sbox.shape().b = box->extent;
+		sbox.color(SrColor(1.f,0.f,0.f));
+		sbox.render_mode(srRenderModeSmooth);
+		SrGlRenderFuncs::render_box(&sbox);
+
+	}
+	else if (dynamic_cast<SbmColCapsule*>(colObj))
+	{
+		SbmColCapsule* cap = dynamic_cast<SbmColCapsule*>(colObj);
+		// render two end cap
+		SrSnSphere sphere;				
+		sphere.shape().center = SrVec(0,-cap->extent,0);
+		sphere.shape().radius = cap->radius;
+		sphere.color(SrColor(1.f,0.f,0.f));
+		sphere.render_mode(srRenderModeSmooth);
+		SrGlRenderFuncs::render_sphere(&sphere);
+
+		sphere.shape().center = SrVec(0,cap->extent,0);
+		SrGlRenderFuncs::render_sphere(&sphere);
+
+		SrSnCylinder cyc;
+		cyc.shape().a = SrVec(0,-cap->extent,0);
+		cyc.shape().b = SrVec(0,cap->extent,0);
+		cyc.shape().radius = cap->radius;
+		cyc.color(SrColor(1.f,0.f,0.f));
+		cyc.render_mode(srRenderModeSmooth);
+		SrGlRenderFuncs::render_cylinder(&cyc);
+	}
+	glPopMatrix();	
 }
 
 PALocomotionData::PALocomotionData()

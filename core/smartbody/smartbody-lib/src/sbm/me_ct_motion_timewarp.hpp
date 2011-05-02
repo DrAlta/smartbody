@@ -14,7 +14,7 @@ class MotionTimeWarpFunc // motion time warp function interface, each motion sho
 {
 public:
 	MotionTimeWarpFunc() {}
-	~MotionTimeWarpFunc() {}
+	virtual ~MotionTimeWarpFunc() {}
 
 public:
 	// t : actual time
@@ -36,7 +36,7 @@ protected:
 	double slope, invSlope;
 public:
 	SimpleTimeWarp(double refLen, double targetLen);	
-	~SimpleTimeWarp();
+	virtual ~SimpleTimeWarp() {} ;
 	virtual double timeWarp(double u) ;
 	virtual double invTimeWarp(double t) ;
 	virtual double timeSlope(double u) { return slope; }

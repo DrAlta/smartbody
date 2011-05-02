@@ -62,7 +62,7 @@ protected:
 	FadingControlMode fadeMode;
 public:
 	FadingControl();
-	~FadingControl() {}
+	virtual ~FadingControl() {}
 	void setFadeIn(float interval);
 	void setFadeOut(float interval);
 	bool updateFading(float dt);

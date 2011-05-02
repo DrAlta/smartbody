@@ -140,12 +140,23 @@ SbmCharacter::SbmCharacter( const char* character_name )
 //  Destructor
 SbmCharacter::~SbmCharacter( void )	{
 
+	printf("delete character %s\n",this->name);
+
 	if (posture_sched_p)
 		posture_sched_p->unref();
 	if (motion_sched_p)
 		motion_sched_p->unref();
 	if (gaze_sched_p)
 		gaze_sched_p->unref();
+
+	if (reach_sched_p)
+		reach_sched_p->unref();
+
+	if (grab_sched_p)
+		grab_sched_p->unref();
+
+	if (constraint_sched_p)
+		constraint_sched_p->unref();
 
 	if( eyelid_reg_ct_p )
 		eyelid_reg_ct_p->unref();
@@ -1503,7 +1514,7 @@ int SbmCharacter::print_controller_schedules() {
 		LOG("REACH Schedule:");
 		reach_sched_p->print_state( 0 );
 		LOG("Grab Schedule:");
-		reach_sched_p->print_state( 0 );
+		grab_sched_p->print_state( 0 );
 		// Print Face?
 
 		return CMD_SUCCESS;

@@ -496,6 +496,7 @@ class SBMCrashCallback : public vhcl::Crash::CrashCallback
 
 ///////////////////////////////////////////////////////////////////////////////////
 
+
 int main( int argc, char **argv )	{
 
 #if SBM_REPORT_MEMORY_LEAKS
@@ -520,6 +521,8 @@ int main( int argc, char **argv )	{
 	vhcl::Crash::AddCrashCallback( new SBMCrashCallback() );
 #endif
 
+	
+	
 	
 
 	// init glew to use OpenGL extension
@@ -876,9 +879,8 @@ mcu.mark( "main", 0, "render" );
 		mcu.render();
 	
 mcu.mark( "main" );
-	}
-
-	//cleanup();
+	}	
+	cleanup();
 	//vhcl::Log::g_log.RemoveAllListeners();
 	//delete listener;
 //	delete sbmWindow;

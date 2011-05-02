@@ -4,32 +4,11 @@
 #include "me_ct_ccd_IK.hpp"
 #include "me_ct_constraint.hpp"
 
+#include <SR/planner/sk_pos_cfg.h>
+
 using namespace std;
 
-// basic interface for the object to be grabbed
-class GrabObject
-{
-public:
-	virtual SrVec getCentroid() = 0; // get the center of the object
-	virtual bool  isCollided(const SrVec& inPos) = 0; // check if a point is inside the object	
-	virtual bool isCollided(const SrVec& p1, const SrVec& p2) = 0;
-	virtual bool isCollided(std::vector<SrVec>& lineSeg) = 0;
-};
 
-class GrabSphere : public GrabObject
-{
-protected:
-	float radius;
-	SrVec center;
-public:
-	GrabSphere() {};
-	~GrabSphere() {};
-	void setSphere(const SrVec& pt, const float r);
-	virtual SrVec getCentroid(); // get the center of the object
-	virtual bool  isCollided(const SrVec& inPos); // check if a point is inside the object	
-	virtual bool isCollided(const SrVec& p1, const SrVec& p2);
-	virtual bool isCollided(std::vector<SrVec>& lineSeg);
-};
 
 class FingerChain
 {
@@ -71,7 +50,7 @@ protected:
 
 	MeCtIKTreeScenario    ikScenario;
 	MeCtJacobianIK        ik;
-	GrabObject*           grabTarget;           
+	ColObject*           grabTarget;           
 public:
 	float                 grabVelocity;
 

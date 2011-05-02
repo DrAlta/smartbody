@@ -27,6 +27,7 @@
 
 #include <SK/sk_scene.h>
 #include <SK/sk_skeleton.h>
+#include <Sbm/Collision/SbmColObject.h>
 
 #include <ME/me_controller_tree_root.hpp>
 #include <ME/me_ct_channel_writer.hpp>
@@ -86,6 +87,7 @@ public:  // TODO - properly encapsulate / privatize the following
 	SkSkeleton*		skeleton_p;  // MAY BE NULL!!!
 	SkScene*		scene_p;	 // Skeleton Scene and Rigid Mesh		
 	DeformableMesh*	dMesh_p;	 // Deformable Mesh using smooth skinning
+	SbmColObject*   colObj_p;
 
 	// Temporarily, until there is a unified multi-skeleton controller tree
 	MeControllerTreeRoot	*ct_tree_p;

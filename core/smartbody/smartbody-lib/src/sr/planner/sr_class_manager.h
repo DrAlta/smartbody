@@ -1,24 +1,3 @@
-/*
- *  sr_Class_manager.h - part of Motion Engine and SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmarBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcelo Kallmann, USC (currently UC Merced)
- */
 
 # ifndef SR_CLASS_MANAGER_H
 # define SR_CLASS_MANAGER_H
@@ -33,10 +12,11 @@
 class SrClassManagerBase : public SrSharedClass
  { protected :
     virtual ~SrClassManagerBase() {};
+
    public : // callbacks
     virtual void* alloc ()=0;
     virtual void* alloc ( const void* obj )=0;
-    virtual void sr_free ( void* obj )=0;
+    virtual void free ( void* obj )=0;
     virtual void output ( SrOutput& o, const void* obj ) { }
     virtual void input ( SrInput& i, void* obj ) { }
     virtual int compare ( const void* obj1, const void* obj2 ) { return 0; }
@@ -48,7 +28,7 @@ class MyData
  { public :
     MyData ();
     MyData ( const MyData& d );
-    virtual ~MyData ();
+   ~MyData ();
     friend SrOutput& operator<< ( SrOutput& out, const MyData& d );
     friend SrInput& operator>> ( SrInput& inp, MyData& d );
     friend int sr_compare ( const MyData* d1, const MyData* d2 );
@@ -56,16 +36,15 @@ class MyData
  
 template <class X>
 class SrClassManager : public SrClassManagerBase
- { 
- protected :
+ { protected :
     virtual ~SrClassManager<X> () {}
 
- public :
+   public :
     virtual void* alloc () { return (void*) new X; }
 
     virtual void* alloc ( const void* obj ) { return (void*) new X(*((X*)obj)); }
 
-    virtual void sr_free ( void* obj ) { delete (X*) obj; }
+    virtual void free ( void* obj ) { delete (X*) obj; }
 
     virtual void output ( SrOutput& o, const void* obj ) { o<<*((const X*)obj); }
 

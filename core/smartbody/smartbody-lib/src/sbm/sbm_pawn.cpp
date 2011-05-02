@@ -121,9 +121,9 @@ SbmPawn::SbmPawn( const char * name )
 	strcpy( this->name, name );
 	//skeleton_p->ref();
 	scene_p->ref();
-
 	ct_tree_p->ref();
 
+	colObj_p = NULL;
 	// world_offset_writer_p, applies external inputs to the skeleton,
 	//   and therefore needs to evaluate before other controllers
 	world_offset_writer_p->ref();
@@ -465,10 +465,38 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		// Init channels
 		skeleton->make_active_channels();
 
+		// default geometry
 		if( has_geom ) {
-			LOG("WARNING: SbmPawn geometry not implemented.  Ignoring options.");
-		}
+			//LOG("WARNING: SbmPawn geometry not implemented.  Ignoring options.");
+			float size = 1.0;
+			if (size_str)
+			{
+				size = atof(size_str);
+			}
 
+			if (strcmp(geom_str,"sphere") == 0)
+			{
+				SbmColObject* colObj = new SbmColSphere(size);
+				pawn_p->colObj_p = colObj;
+			}
+			else if (strcmp(geom_str,"box") == 0)
+			{
+				SbmColObject* colObj = new SbmColBox(SrVec(size,size,size));
+				pawn_p->colObj_p = colObj;
+			}
+			else if (strcmp(geom_str,"capsule") == 0)
+			{
+				SbmColObject* colObj = new SbmColCapsule(size*1.5,size*0.5f);
+				pawn_p->colObj_p = colObj;
+			}	
+			else
+			{
+				// set default shape as sphere
+				SbmColObject* colObj = new SbmColSphere(size);
+				pawn_p->colObj_p = colObj;
+			}
+		}
+		
 		int err = pawn_p->init( skeleton );
 		if( err != CMD_SUCCESS ) {
 			std::stringstream strstr;		

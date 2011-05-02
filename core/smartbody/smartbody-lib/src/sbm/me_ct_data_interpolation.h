@@ -10,7 +10,7 @@ protected:
 	ExampleSet* exampleSet;
 public:
 	DataInterpolator() {}
-	~DataInterpolator() {}
+	virtual ~DataInterpolator();
 	virtual void init(ExampleSet* exSet);
 	virtual bool buildInterpolator() = 0;
 	virtual void predictInterpWeights(const dVector& para, VecOfInterpWeight& blendWeights) = 0;
@@ -28,7 +28,7 @@ protected:
 	dMatrix rbfMatrix, linearMatrix; // prediction matrix for RBF regression
 public:
 	RBFInterpolator();
-	~RBFInterpolator();
+	virtual ~RBFInterpolator();
 
 	virtual bool buildInterpolator();
 	virtual void predictInterpWeights(const dVector& para, VecOfInterpWeight& blendWeights);
@@ -54,7 +54,7 @@ public: // temp set it to public for debug
 	std::map<int,VecOfInterpExample> exampleHash; 
 public:
 	KNNInterpolator(int numResample = 500, float sampleDist = 5.f);
-	~KNNInterpolator();		
+	virtual ~KNNInterpolator();		
 
 	virtual bool buildInterpolator();
 	virtual void predictInterpWeights(const dVector& para, VecOfInterpWeight& blendWeights);	

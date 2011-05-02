@@ -8,46 +8,7 @@
 
 using namespace boost;
 
-void GrabSphere::setSphere( const SrVec& pt, const float r )
-{
-	center = pt;
-	radius = r;
-}
 
-SrVec GrabSphere::getCentroid()
-{
-	return center;
-}
-
-bool GrabSphere::isCollided( const SrVec& inPos )
-{
-	return (inPos-center).norm() < radius;
-}
-
-bool GrabSphere::isCollided( const SrVec& p1, const SrVec& p2 )
-{
-	// at least one point inside the sphere
-	if ( (center-p1).norm() < radius || (p2-center).norm() < radius)
-		return true;
-
-	SrVec p2p1 = p2-p1;
-	SrVec p3p1 = center-p1;
-	float u = dot(p2p1,p3p1)/dot(p2p1,p2p1);
-	if (u > 0.f && u < 1.f && (p1+p2p1*u-center).norm() < radius)
-		return true;
-
-	return false;
-}
-
-bool GrabSphere::isCollided( std::vector<SrVec>& lineSeg )
-{
-	for (unsigned int i=0;i<lineSeg.size()-1;i++)
-	{
-		if (isCollided(lineSeg[i],lineSeg[i+1]))
-			return true;
-	}
-	return false;
-}
 
 /************************************************************************/
 /* FingerChain                                                          */
@@ -117,7 +78,7 @@ void MeCtHand::setGrabState( GrabState state )
 void MeCtHand::setGrabTargetPos( SrVec& targetPos )
 {
 	static float radius = 7.f;
-	GrabSphere* sphTarget = dynamic_cast<GrabSphere*>(grabTarget);
+	ColSphere* sphTarget = dynamic_cast<ColSphere*>(grabTarget);
 	if (sphTarget)
 	{
 		sphTarget->setSphere(targetPos,radius);
@@ -167,7 +128,7 @@ void MeCtHand::init(const MotionDataSet& reachPose, const MotionDataSet& grabPos
 	{
 		getPinchFrame(targetFrame,SrVec(-8,-6,0));
 	}
-	grabTarget = new GrabSphere(); // hard coded to sphere for now		
+	grabTarget = new ColSphere(); // hard coded to sphere for now		
 }
 
 void MeCtHand::getPinchFrame( BodyMotionFrame& pinchFrame, SrVec& wristOffset )

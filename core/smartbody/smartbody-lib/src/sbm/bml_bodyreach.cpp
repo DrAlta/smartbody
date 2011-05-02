@@ -58,6 +58,7 @@ const XMLCh ATTR_REACH_VELOCITY[] = L"sbm:reach-velocity";
 const XMLCh ATTR_REACH_FINISH[] = L"sbm:reach-finish";
 const XMLCh ATTR_FADE_OUT[]		= L"sbm:fade-out";
 const XMLCh ATTR_FADE_IN[]		= L"sbm:fade-in";
+const XMLCh ATTR_OBSTACLE[] = L"sbm:obstacle";
 //const XMLCh ATTR_APEX_DURATION[] = L"sbm:apex-duration";
 
 
@@ -65,6 +66,28 @@ const XMLCh ATTR_FADE_IN[]		= L"sbm:fade-in";
 using namespace std;
 using namespace BML;
 using namespace xml_utils;
+
+static const SbmPawn* parse_pawn( const XMLCh* tagname, const XMLCh* attrTarget, mcuCBHandle *mcu ) {
+	// TODO: If the first non-whitespace character is 0..9.-+, then assume it is a coordinate
+	XMLStringTokenizer tokenizer( attrTarget );	
+	std::stringstream strstr;
+	// One token is an object id
+	const char * ascii_object_id = xml_utils::asciiString(tokenizer.nextToken());
+	string object_id = ascii_object_id;
+	delete [] ascii_object_id;
+	string bone_id;
+	SbmPawn* target;
+
+	// TODO: Revisit the target syntax.
+	// Currently, we use "object_id:bone_id", but this is probably not sufficient
+	// Target is a pawn, look at world offset
+	target = mcu->pawn_map.lookup( object_id.c_str() );
+	if( target ) 
+	{
+		return target;	   
+	}			
+	return NULL;
+}
 
 
 BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
@@ -117,6 +140,15 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	{
 		effectorName = asciiString(attrEffector);
 		effectorJoint = request->actor->skeleton_p->search_joint(effectorName);		
+	}
+
+	const XMLCh* attrObstracle = elem->getAttribute( ATTR_OBSTACLE );
+	const char* obstacleName = NULL;
+	const SbmPawn* obstacle_pawn = NULL;
+	if (attrObstracle && XMLString::stringLen( attrObstracle ))
+	{
+		obstacleName = asciiString(attrObstracle);
+		obstacle_pawn = parse_pawn( tag, attrObstracle, mcu );		
 	}
 
 	const XMLCh* attrConsJoint = NULL;
@@ -289,6 +321,13 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	{
 		bodyReachCt->addHandConstraint(const_cast<SkJoint*>(consTarget),consJointName);
 	}
+
+	if (obstacle_pawn && obstacleName)
+	{
+		if (obstacle_pawn->colObj_p)
+			bodyReachCt->addObstacle(obstacleName, obstacle_pawn->colObj_p);
+	}
+
 
 	if (fadeInTime >= 0.0)
 		bodyReachCt->setFadeIn(fadeInTime);

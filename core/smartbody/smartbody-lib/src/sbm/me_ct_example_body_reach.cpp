@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <time.h>
 #include <boost/foreach.hpp>
+#include <SR/sr_timer.h>
 #include "mcontrol_util.h"
 #include "me_ct_example_body_reach.hpp"
 #include "me_ct_barycentric_interpolation.h"
@@ -28,6 +29,7 @@ EffectorConstantConstraint& EffectorConstantConstraint::operator=( const Effecto
 const char* MeCtExampleBodyReach::CONTROLLER_TYPE = "BodyReach";
 
 #define USE_FOOT_IK 0
+#define AVOID_OBSTACLE 0
 
 const std::string lFootName[] = {"l_forefoot", "l_ankle" };
 const std::string rFootName[] = {"r_forefoot", "r_ankle" };
@@ -41,6 +43,8 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( SkSkeleton* sk, SkJoint* effectorJoi
 	skeletonRef  = sk;
 	prev_time = -1.0;
 	dataInterpolator = NULL;
+	testDataInterpolator =NULL;
+
 	refMotion = NULL;
 	_duration = -1.0f;
 	reachTime = 0.0;	
@@ -48,6 +52,7 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( SkSkeleton* sk, SkJoint* effectorJoi
 	useInterpolation = false;
 	useTargetJoint   = true;
 
+	
 	interactiveReach = false;
 	startReaching = false;
 	finishReaching = false;
@@ -61,11 +66,13 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( SkSkeleton* sk, SkJoint* effectorJoi
 
 	reachTarget = SrVec();
 	reachVelocity = 50.f;
-	reachCompleteDuration = 0.3f;
+	reachCompleteDuration = 1.0f;
 	curPercentTime = 0.0;
 	prevPercentTime = 0.0;
 
 	simplexIndex = 0;
+	obstacleScale = 7.f;
+	posPlanner = NULL;
 }
 
 MeCtExampleBodyReach::~MeCtExampleBodyReach( void )
@@ -74,7 +81,7 @@ MeCtExampleBodyReach::~MeCtExampleBodyReach( void )
 	FREE_DATA(dataInterpolator);
 	FREE_DATA(interpMotion);
 	FREE_DATA(motionParameter);
-	FREE_DATA(skeletonCopy);
+	FREE_DATA(skeletonCopy);	
 }
 
 void MeCtExampleBodyReach::setReachTargetJoint( SkJoint* val )
@@ -167,7 +174,10 @@ void MeCtExampleBodyReach::findReachTarget( SrVec& rTarget, SrVec& rError )
 
 		// determine the error offset between interpolation result & actual target
 		skeletonRef->update_global_matrices();
-		SrVec localTarget = rTarget*skeletonRef->root()->gmat().inverse();
+
+		const char* rootName = ikScenario.ikTreeRoot->joint->parent()->name().get_string();
+		SrMat gmat = skeletonRef->root()->gmat();//skeletonRef->search_joint(rootName)->gmat();
+		SrVec localTarget = rTarget*gmat.inverse();
 		dVector para; para.resize(3);
 		for (int i=0;i<3;i++)
 			para[i] = localTarget[i];		
@@ -279,16 +289,41 @@ bool MeCtExampleBodyReach::updateInterpolation(float dt, BodyMotionFrame& outFra
 		interpPos = getCurrentHandPos(interpMotionFrame);			
 		if ( curReachState == REACH_COMPLETE )
 			// use normal IK to compute the hand movement after touching the object
-		{				
-			SrVec offset = (ikTarget - curReachIKTrajectory);
-			//offset.y = 0.0;
-			curOffsetDir = offset;
-			float offsetLength = offset.norm();				
-			if (offset.norm() > reachVelocity*dt)
+		{			
+			float offsetLength = (ikTarget - curReachIKTrajectory).norm();
+			float reachStep = reachVelocity*dt;
+			SrVec offset;
+
+#if AVOID_OBSTACLE
+			static float interpLen = 0.f;
+			bool pathUpdate = updatePlannerPath(curReachIKTrajectory,ikTarget);
+			SkPosPath* path = posPlanner->path();
+			SrVec newPos = curReachIKTrajectory;
+			float pathStep = planStep;
+			if (pathUpdate)
+				interpLen = 0.f;
+
+			if (path->len() > reachStep && interpLen < path->len())
+			{
+				interpLen += reachStep;
+				//printf("long path\n");				
+				path->interp(interpLen,cfgPath);
+				newPos = *cfgPath;
+			}	
+			else if (offsetLength < reachStep)
+			{
+				newPos = ikTarget;
+			}
+			offset = newPos - curReachIKTrajectory;
+#else			
+			offset = (ikTarget - curReachIKTrajectory);			
+			curOffsetDir = offset;					
+			if (offset.norm() > reachStep)
 			{
 				offset.normalize();
-				offset = offset*reachVelocity*dt;
-			}						
+				offset = offset*reachStep;
+			}
+#endif
 			float morphWeight = offsetLength > 0.f ? (offset.norm()+reachVelocity*dt)/(offsetLength+reachVelocity*dt) : 1.f;
 			BodyMotionFrame morphFrame;				
 			MotionExampleSet::blendMotionFrame(interpStartFrame,interpMotionFrame,morphWeight,morphFrame);				
@@ -390,7 +425,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	prevPercentTime = curPercentTime;	
 	reachCompleteTime += dt;
 	if (curReachState == REACH_RETURN || curReachState == REACH_START)
-		reachTime += du; // add the reference delta time
+		reachTime += du*0.5f; // add the reference delta time
 
 	// blending the input frame with ikFrame based on current fading
 	bool finishFadeOut = updateFading(dt);
@@ -560,12 +595,23 @@ void MeCtExampleBodyReach::init()
 
 	SkJoint* copyEffector = skeletonCopy->linear_search_joint(reachEndEffector->name().get_string());
 	motionParameter = new ReachMotionParameter(skeletonCopy,affectedJoints,copyEffector);
-	motionExamples.initMotionExampleSet(motionParameter);
+	motionExamples.initMotionExampleSet(motionParameter);	
+
 
 	// initialize all parameters according to scale	
 	ikReachRegion = characterHeight*0.02f;	
-	reachVelocity = characterHeight*0.5f;
+	reachVelocity = characterHeight*0.3f;
 	ikDamp        = ikReachRegion*ikReachRegion*14.0;//characterHeight*0.1f;
+
+	// initialize position planning
+#if AVOID_OBSTACLE
+	posPlanner = new SkPosPlanner();
+	planStep = reachVelocity*0.1f;
+	planNumTries = 1;
+	planError = ikReachRegion;
+	obstacleScale = characterHeight/30.f*1.2;
+#endif
+
 	MeController::init();	
 }
 
@@ -575,9 +621,21 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 		return;
 
 	// set world offset to zero
+	
+	
+	const char* rootName = ikScenario.ikTreeRoot->joint->parent()->name().get_string();
+	SkJoint* root = skeletonRef->search_joint(rootName);
+	if (root)
+	{
+		root->quat()->value(SrQuat());
+	}
 	skeletonCopy->root()->quat()->value(SrQuat());
 	for (int i=0;i<3;i++)
+	{
 		skeletonCopy->root()->pos()->value(i,0.f);
+		root->pos()->value(i,0.f);
+	}
+
 
 	BOOST_FOREACH(SkMotion* motion, inMotionSet)
 	{
@@ -615,13 +673,13 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 	dataInterpolator->buildInterpolator();	
 
 	
-	testDataInterpolator = new BarycentricInterpolator();
-	testDataInterpolator->init(&motionExamples);
+	//testDataInterpolator = new BarycentricInterpolator();
+	//testDataInterpolator->init(&motionExamples);
 	//testDataInterpolator->buildInterpolator();
 
 	// test barycentric interpolator
 	//dataInterpolator = testDataInterpolator;
-	simplexList = testDataInterpolator->simplexList;	
+	//simplexList = testDataInterpolator->simplexList;	
 	
 	for (unsigned int i=0;i<resampleData->size();i++)
 	{
@@ -630,6 +688,7 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 		for (int k=0;k<3;k++)
 			reachPos[k] = (float)ex->parameter[k];
 		resamplePts.push_back(reachPos);
+		paraBound.extend(reachPos);
 	}
 
 	if (interpMotion)
@@ -643,6 +702,15 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 	if (interpMotion && dataInterpolator)
 		dataInterpolator->predictInterpWeights(para,interpMotion->weight);
 
+	// update example set
+#if AVOID_OBSTACLE
+	sr_out << "para bound = " << paraBound << srnl;
+	posPlanner->init(paraBound);
+	cfgStart = posPlanner->cman()->alloc();
+	cfgEnd   = posPlanner->cman()->alloc();
+	cfgPath  = posPlanner->cman()->alloc();
+#endif
+
 // 	if (curReachState != REACH_IDLE)
 // 		curReachState = REACH_IDLE;
 	curReachState = REACH_RETURN;
@@ -650,9 +718,89 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 	useInterpolation = true;
 }
 
+void MeCtExampleBodyReach::addObstacle(const char* name,  SbmColObject* objCol )
+{	
+#if AVOID_OBSTACLE
+	std::string obsName = name;		
+	if (obstacleMap.find(obsName) == obstacleMap.end())
+	{		
+		obstacleMap[obsName] = objCol;
+
+		VecOfSbmColObj& colList = posPlanner->cman()->ColObstacles();
+		colList.push_back(objCol);
+	}	
+#endif
+	//printf("size of obstacle map = %d\n",obstacleMap.size());
+}
+
+bool MeCtExampleBodyReach::updatePlannerPath( SrVec& curPos, SrVec& targetPos )
+{
+	static SrVec prevTarget;
+	skeletonRef->invalidate_global_matrices();
+	skeletonRef->update_global_matrices();
+	const char* rootName = ikScenario.ikTreeRoot->joint->parent()->name().get_string();
+	SrMat gMat = skeletonRef->root()->gmat();//search_joint(rootName)->gmat();
+	SrMat gMatInv = gMat.inverse();
+
+	// update bounding box for sampling
+	std::map<std::string, SbmColObject*>::iterator mi;
+	SrBox& posBox = posPlanner->cman()->SkPosBound();//paraBound.a
+	posBox.a = paraBound.a*gMat;
+	posBox.b = paraBound.b*gMat;
+
+	bool obstacleChange = false;
+	for ( mi  = obstacleMap.begin();
+		  mi != obstacleMap.end();
+		  mi++)
+	{
+		SbmColObject* colObj = mi->second;
+		if (colObj->isUpdate)
+		{	
+			colObj->isUpdate = false;
+			obstacleChange = true;
+		}				
+	}
+
+	bool replan = (prevTarget != targetPos || obstacleChange );
+	if (replan || !posPlanner->solved())
+	{
+		(SrVec&)*cfgStart = curPos;
+		(SrVec&)*cfgEnd   = targetPos;
+
+		prevTarget = targetPos;
+
+		posPlanner->start(cfgStart,cfgEnd);
+		SrTimer timer;
+		timer.start();
+		static float realTime = 0.03f;
+		int nSteps = 0;
+		while ( !posPlanner->solved() )
+		{
+			posPlanner->update ( planStep, planNumTries, planError );
+			nSteps++;
+			if ( timer.t() > realTime )
+				break; 
+		}
+		//printf("nSteps = %d\n",nSteps);
+
+		if (posPlanner->solved())
+		{
+			posPlanner->path()->smooth_ends ( planError );
+			posPlanner->path()->smooth_init ( planError );
+			SrTimer timer2;
+			timer2.start();
+			while ( timer2.t() < realTime*0.1f )
+			//for (int i=0;i<50;i++)
+				posPlanner->path()->smooth_step();
+		}
+		return true;
+	}	
+	return false;
+}
+
 DataInterpolator* MeCtExampleBodyReach::createInterpolator()
 {	
-	KNNInterpolator* interpolator = new KNNInterpolator(2000,ikReachRegion*3.f);
+	KNNInterpolator* interpolator = new KNNInterpolator(500,ikReachRegion*3.f);
 	resampleData = &interpolator->resampleData;
 	interpExampleData = interpolator->getInterpExamples();
 	return interpolator;

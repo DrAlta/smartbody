@@ -9,7 +9,7 @@ public:
 	std::vector<SkJoint*> affectedJoints;
 public:
 	MotionParameter(SkSkeleton* skel, std::vector<SkJoint*>& joints);
-	~MotionParameter(void);
+	virtual ~MotionParameter(void);
 
 	virtual void getPoseParameter(const BodyMotionFrame& frame, dVector& outPara) = 0;
 	virtual void getMotionFrameParameter(BodyMotionInterface* motion, float refTime, dVector& outPara) = 0;
@@ -24,7 +24,7 @@ protected:
 	SkJoint* reachJoint;
 public:
 	ReachMotionParameter(SkSkeleton* skel, std::vector<SkJoint*>& joints, SkJoint* rjoint);
-	~ReachMotionParameter();
+	virtual ~ReachMotionParameter();
 
 	virtual void getPoseParameter(const BodyMotionFrame& frame, dVector& outPara);
 	virtual void getMotionParameter(BodyMotionInterface* motion, dVector& outPara);

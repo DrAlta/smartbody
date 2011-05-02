@@ -11,6 +11,10 @@ void DataInterpolator::init( ExampleSet* exSet )
 	exampleSet     = exSet;
 }
 
+DataInterpolator::~DataInterpolator()
+{
+	//printf("delete Data interpolator\n");
+}
 /************************************************************************/
 /* RBF Interpolator                                                     */
 /************************************************************************/
@@ -140,7 +144,12 @@ KNNInterpolator::KNNInterpolator( int numResample /*= 500*/, float sampleDist /*
 
 KNNInterpolator::~KNNInterpolator()
 {
-
+	//printf("delete KNN interpolator\n");
+	for (unsigned int i=0;i<resampleData.size();i++)
+	{
+		delete resampleData[i];
+	}
+	resampleData.clear();
 }
 
 bool KNNInterpolator::buildInterpolator()

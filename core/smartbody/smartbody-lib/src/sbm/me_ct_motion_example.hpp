@@ -37,6 +37,8 @@ public:
 	enum DurationType { DURATION_ACTUAL = 0, DURATION_REF };
 	MotionParameter* motionParameterFunc;
 public:
+	virtual ~BodyMotionInterface() {}
+public:
 	virtual void getMotionParameter(dVector& outPara);	
 	virtual double getMotionFrame(float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame) = 0;
 
@@ -150,6 +152,7 @@ protected:
 	vector<SkJoint*>   affectedJoints; // joints that will be affected by this motion set
 	VecOfBodyMotionPtr motionData;	
 	vector<MotionExample*> motionExamples;
+	vector<InterpolationExample*> resampleExamples;
 	MotionParameter*       motionParameterFunc;
 public:
 	MotionExampleSet() {}
