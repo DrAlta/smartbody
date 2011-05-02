@@ -440,7 +440,10 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 		end_command << "send vrAgentBML " << actorId << " " << msgId << " end complete";
 #endif
 		if( span.persistent )
+		{
 			end_command << " persistent";
+		}
+
 
 		if( cleanup_seq->insert( (float)end_time, (char*)(end_command.str().c_str()) )!=CMD_SUCCESS ) {
 			std::stringstream strstr;
@@ -1220,6 +1223,17 @@ PostureRequest::PostureRequest( const std::string& unique_id, const std::string&
     scheduler->relaxTime = scheduler->endTime - transitionDuration;
 
 	set_scheduler( scheduler );
+}
+
+BehaviorSpan PostureRequest::getBehaviorSpan()
+{
+	BehaviorSpan span = MeControllerRequest::getBehaviorSpan();
+
+	// remove any timings past the ready time, since postures have no 'end'
+	if (span.end > this->behav_syncs.sync_ready()->time())
+		span.end = this->behav_syncs.sync_ready()->time();
+
+	return span;
 }
 
 // SequenceRequest
