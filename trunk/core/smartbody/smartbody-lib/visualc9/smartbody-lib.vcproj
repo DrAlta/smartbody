@@ -578,6 +578,18 @@
 					</File>
 				</Filter>
 			</Filter>
+			<Filter
+				Name="Collision"
+				>
+				<File
+					RelativePath="..\src\sbm\Collision\SbmColObject.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\Collision\SbmColObject.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="controllers"
@@ -1747,6 +1759,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sr\sr_heap.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sr\sr_input.cpp"
 				>
 			</File>
@@ -1864,6 +1880,14 @@
 			</File>
 			<File
 				RelativePath="..\src\sr\sr_quat.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sr\sr_random.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sr\sr_random.h"
 				>
 			</File>
 			<File
@@ -2038,6 +2062,74 @@
 				RelativePath="..\src\sr\sr_viewer.h"
 				>
 			</File>
+			<Filter
+				Name="planner"
+				>
+				<File
+					RelativePath="..\src\sr\planner\sr_cfg_manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sr\planner\sr_cfg_manager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sr\planner\sr_cfg_path.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sr\planner\sr_cfg_path.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sr\planner\sr_cfg_planner.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sr\planner\sr_cfg_planner.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sr\planner\sr_cfg_planner_lazy.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sr\planner\sr_cfg_tree.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sr\planner\sr_cfg_tree.h"
+					>
+				</File>
+				<Filter
+					Name="PositionPlanner"
+					>
+					<File
+						RelativePath="..\src\sr\planner\sk_pos_cfg.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sr\planner\sk_pos_cfg.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sr\planner\sk_pos_cfg_manager.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sr\planner\sk_pos_cfg_manager.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sr\planner\sk_pos_planner.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sr\planner\sk_pos_planner.h"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="external"

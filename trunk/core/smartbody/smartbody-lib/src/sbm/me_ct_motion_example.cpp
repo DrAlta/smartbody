@@ -8,6 +8,14 @@
 #include "me_ct_motion_parameter.h"
 #include "me_ct_ublas.hpp"
 
+#ifdef _DEBUG
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#define new DEBUG_NEW
+#endif
+
 using namespace boost;
 
 BodyMotionFrame& BodyMotionFrame::operator=( const BodyMotionFrame& rhs )
@@ -134,7 +142,7 @@ double BodyMotion::motionDuration(DurationType durType)
 
 double BodyMotion::strokeEmphasisTime()
 {
-	double emphTime = (motion->time_stroke_end()+motion->time_stroke_emphasis())*0.5f;	
+	double emphTime = motion->time_stroke_emphasis();//(motion->time_stroke_end()+motion->time_stroke_emphasis())*0.5f;	
 	return timeWarp->invTimeWarp(emphTime);
 }
 

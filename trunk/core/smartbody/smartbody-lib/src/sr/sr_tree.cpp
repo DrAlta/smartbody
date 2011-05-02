@@ -276,7 +276,7 @@ void SrTreeBase::init ()
        }
       
       // 3. delete and update _cur
-      _man->free ( _cur );
+      _man->sr_free ( _cur );
       _cur = curp;
     }
     
@@ -367,7 +367,7 @@ SrTreeNode *SrTreeBase::insert ( SrTreeNode *key )
 SrTreeNode *SrTreeBase::insert_or_del ( SrTreeNode *key )
  {
    if ( !insert(key) )
-    { _man->free ( key );
+    { _man->sr_free ( key );
       return 0;
     }
    return key;
@@ -423,7 +423,7 @@ SrTreeNode *SrTreeBase::extract ( SrTreeNode *z )
 void SrTreeBase::remove ( SrTreeNode* z )
  {
    extract ( z );
-   _man->free ( z );
+   _man->sr_free ( z );
  }
 
 SrTreeNode* SrTreeBase::search_and_extract ( const SrTreeNode* key )

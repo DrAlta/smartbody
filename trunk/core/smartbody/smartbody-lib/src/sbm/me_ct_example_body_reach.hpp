@@ -6,6 +6,10 @@
 #include "me_ct_ccd_IK.hpp"
 #include "me_ct_constraint.hpp"
 
+#include <SR/planner/sk_pos_planner.h>
+#include <SBM/Collision/SbmColObject.h>
+
+
 using namespace std;
 
 // used when we want exact control for an end effector
@@ -77,7 +81,13 @@ protected:
 	MeCtJacobianIK        ik;
 	MeCtCCDIK             ikCCD;
 	MeCtIKTreeScenario    ikScenario, ikCCDScenario;
+	SrBox                 paraBound;
+	SkPosCfg              *cfgStart, *cfgEnd, *cfgPath;
 	
+	
+	std::map<std::string, SbmColObject*> obstacleMap;
+	float obstacleScale, planStep, planError;
+	int   planNumTries;
 
 	float 			_duration;
 	SkChannelArray	_channels;
@@ -88,7 +98,8 @@ public:
 	VecOfSimplex          simplexList;
 	vector<SrVec>         examplePts;
 	vector<SrVec>         resamplePts;
-	
+	SkPosPlanner*         posPlanner;
+
 	// parameters and intermediate variables for debug/visualization
 	SrVec                 curReachIKTrajectory, ikTarget, interpPos, curEffectorPos, currentInterpTarget, ikFootTarget;
 	SrVec                 curOffsetDir;
@@ -98,7 +109,9 @@ public:
 
 public:
 	MeCtExampleBodyReach(SkSkeleton* sk, SkJoint* effectorJoint);
-	~MeCtExampleBodyReach(void);	
+	virtual ~MeCtExampleBodyReach(void);	
+
+	void addObstacle(const char* name, SbmColObject* colObj);
 
 	virtual void controller_map_updated();
 	virtual void controller_start();	
@@ -127,6 +140,7 @@ public:
 
 	void updateMotionExamples(const MotionDataSet& inMotionSet);
 protected:	
+	bool updatePlannerPath(SrVec& curPos, SrVec& targetPos);
 	void updateSkeletonCopy();
 	void updateChannelBuffer(MeFrameData& frame, BodyMotionFrame& motionFrame, bool bRead = false);
 	SrVec getCurrentHandPos(BodyMotionFrame& motionFrame);
