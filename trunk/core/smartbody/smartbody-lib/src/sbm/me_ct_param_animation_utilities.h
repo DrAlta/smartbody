@@ -144,10 +144,11 @@ class PAStateModule
 		
 		bool loop;
 		bool active;
+		bool playNow;
 		PAStateData* data;
 		
 	public:
-		PAStateModule(PAStateData* stateData, bool l = true);
+		PAStateModule(PAStateData* stateData, bool l = true, bool pn = false);
 		~PAStateModule();
 		void evaluate(double timeStep, SrBuffer<float>& buffer);
 };

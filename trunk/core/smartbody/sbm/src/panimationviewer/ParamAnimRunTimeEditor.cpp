@@ -307,6 +307,8 @@ void ParameterGroup::updateWeight()
 	std::stringstream command;
 	command << "panim update char " << charName;
 	int wNumber = state->getNumMotions();
+	if (wNumber == 1)
+		state->weights[0] = 1.0;
 	for (int j = 0; j < wNumber; j++)
 		command << " " << state->weights[j];
 	paWindow->execCmd(paWindow, command.str());
@@ -560,14 +562,14 @@ void PARunTimeEditor::run(fltk::Widget* widget, void* data)
 	if (transitionState != "")
 	{
 		std::stringstream command1;
-		command1 << "panim schedule char " << charName << " state " << transitionState << " loop false";
+		command1 << "panim schedule char " << charName << " state " << transitionState << " loop false playnow false";
 		editor->paWindow->execCmd(editor->paWindow, command1.str(), timeoffset);
 		timeoffset += 0.1;
 	}
 	if (nextCycleState != "Idle" && nextCycleState != "")
 	{
 		std::stringstream command2;
-		command2 << "panim schedule char " << charName << " state " << nextCycleState << " loop true";
+		command2 << "panim schedule char " << charName << " state " << nextCycleState << " loop true playnow false";
 		editor->paWindow->execCmd(editor->paWindow, command2.str(), timeoffset);
 	}
 	
