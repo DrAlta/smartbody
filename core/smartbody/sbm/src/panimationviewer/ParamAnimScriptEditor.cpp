@@ -182,7 +182,7 @@ void PAScriptEditor::run(fltk::Widget* widget, void* data)
 		if (i != 0)
 			offset += iter1->second;
 		std::stringstream command;
-		command << "panim schedule char " << charName << " state " << stateName << " loop " << loopString;
+		command << "panim schedule char " << charName << " state " << stateName << " loop " << loopString <<  " playnow false";
 		PAStateData* state = mcuCBHandle::singleton().lookUpPAState(stateName);
 		int wNumber = state->getNumMotions();
 		for (int j = 0; j < wNumber; j++)

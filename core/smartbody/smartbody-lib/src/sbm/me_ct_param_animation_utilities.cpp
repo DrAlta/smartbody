@@ -597,7 +597,7 @@ std::vector<SrMat> PAWoManager::getBaseMats(std::vector<double> times, std::vect
 	return mats;
 }
 
-PAStateModule::PAStateModule(PAStateData* stateData, bool l)
+PAStateModule::PAStateModule(PAStateData* stateData, bool l, bool pn)
 {
 	timeManager = new PATimeManager(stateData->motions, stateData->keys, stateData->weights);
 	interpolator = new PAInterpolator(stateData->motions, stateData->weights);
@@ -605,6 +605,7 @@ PAStateModule::PAStateModule(PAStateData* stateData, bool l)
 	data = stateData;
 	loop = l;
 	active = false;
+	playNow = pn;
 }
 
 PAStateModule::~PAStateModule()

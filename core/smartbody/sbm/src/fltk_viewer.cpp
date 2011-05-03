@@ -1575,25 +1575,25 @@ void FltkViewer::translate_keyboard_state()
 		if (_paLocoData->starting && state == NULL)
 		{
 			std::stringstream command1;
-			command1 << "panim schedule char " << _paLocoData->character->name << " state UtahStopToWalk loop false";
+			command1 << "panim schedule char " << _paLocoData->character->name << " state UtahStopToWalk loop false playnow false";
 			std::stringstream command2;
-			command2 << "panim schedule char " << _paLocoData->character->name << " state UtahLocomotion loop true";
+			command2 << "panim schedule char " << _paLocoData->character->name << " state UtahLocomotion loop true playnow false";
 			mcu.execute((char*)command1.str().c_str());
 			mcu.execute((char*)command2.str().c_str());
 		}
 		else if (_paLocoData->stopping && state != NULL)
 		{
 			std::stringstream command;
-			command << "panim schedule char " << _paLocoData->character->name << " state UtahWalkToStop loop false";
+			command << "panim schedule char " << _paLocoData->character->name << " state UtahWalkToStop loop false playnow false";
 			mcu.execute((char*)command.str().c_str());
 		}
 		else if (_paLocoData->jumping && state != NULL)
 		{
 			std::stringstream command1;
-			command1 << "panim schedule char " << _paLocoData->character->name << " state UtahJump loop false";
+			command1 << "panim schedule char " << _paLocoData->character->name << " state UtahJump loop false playnow false";
 			mcu.execute((char*)command1.str().c_str());	
 			std::stringstream command2;
-			command2 << "panim schedule char " << _paLocoData->character->name << " state UtahLocomotion loop true";
+			command2 << "panim schedule char " << _paLocoData->character->name << " state UtahLocomotion loop true playnow false";
 			mcu.execute((char*)command2.str().c_str());
 			_paLocoData->jumping = false;
 		}

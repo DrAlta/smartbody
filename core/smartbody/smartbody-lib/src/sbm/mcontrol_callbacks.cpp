@@ -800,13 +800,22 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				bool l = true;
 				if (loop == "true") l = true;
 				if (loop == "false") l = false;
+				std::string playNowString = args.read_token();
+				if (playNowString != "playnow")
+					return CMD_FAILURE;
+				bool pn = false;
+				std::string playNow = args.read_token();
+				if (playNow == "true") pn = true;
+				else if (playNow == "false") pn = false;
+				else 
+					return CMD_FAILURE;
 				int numWeights = args.calc_num_tokens();
 				if (numWeights > 0)
 				{
 					for (int i = 0; i < state->getNumMotions(); i++)
 						state->weights[i] = args.read_double();
 				}
-				character->param_animation_ct->schedule(state, l);
+				character->param_animation_ct->schedule(state, l, pn);
 			}
 
 			if (operation == "unschedule")

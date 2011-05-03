@@ -40,6 +40,7 @@ struct ScheduleUnit
 	PAStateData* data;
 	double time;
 	bool loop;
+	bool playNow;
 };
 /*
 	MeCtParamAnimation's task:	schedule in states
@@ -77,7 +78,7 @@ class MeCtParamAnimation : public MeCtContainer
 		void setBaseJointName(std::string name);
 		std::string getBaseJointName();
 		
-		void schedule(PAStateData* state, bool l);
+		void schedule(PAStateData* state, bool l, bool pn = false);
 		void unschedule();
 		void updateWeights(std::vector<double> w);
 		void updateWeights();
@@ -89,7 +90,7 @@ class MeCtParamAnimation : public MeCtContainer
 
 	private:
 		void autoScheduling(double time);
-		PAStateModule* createStateModule(PAStateData* state, bool l);
+		PAStateModule* createStateModule(PAStateData* state, bool l, bool pn = false);
 		void reset();
 		void updateWo(SrMat&mat, MeCtChannelWriter* wo, SrBuffer<float>& buffer);
 		void controllerEaseOut(double t);
