@@ -168,7 +168,7 @@ MeCtScheduler2::Track::~Track() {
 		_timing_ct = NULL;
 	}
 	if( _animation_ct ) {
-		printf("delete track animation ct = %s\n",_animation_ct->name());
+		//printf("delete track animation ct = %s\n",_animation_ct->name());
 		_animation_ct->unref();
 		_animation_ct = NULL;
 	}
@@ -292,7 +292,7 @@ MeCtScheduler2::MeCtScheduler2 ()
 
 MeCtScheduler2::~MeCtScheduler2 () {
 
-	printf("delete scheduler %s\n",this->name());
+//	printf("delete scheduler %s\n",this->name());
    stop (mcuCBHandle::singleton().time);
    _sub_sched_context->unref();
    //clear();

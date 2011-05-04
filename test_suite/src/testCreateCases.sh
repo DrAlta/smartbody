@@ -65,7 +65,7 @@ do
   done
   rm $caseName  
   
-  if [ $processMode = "create" ]; then
+  if [ "$processMode" = "create" ]; then
     cd $INPUTDIR/$folderName
     scriptName="${folderName}.sh"
     touch $scriptName
