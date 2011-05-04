@@ -472,10 +472,10 @@ void ParameterManager::getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, dou
 	w3 = area1 / totalArea;
 }
 
-MotionParameters::MotionParameters(SkMotion* m, SbmCharacter* c, std::string j)
+MotionParameters::MotionParameters(SkMotion* m, SkSkeleton* skel, std::string j)
 {
 	motion = m;
-	skeleton = new SkSkeleton(c->skeleton_p);
+	skeleton = new SkSkeleton(skel);
 	motion->connect(skeleton);
 	if (j == "")
 	{
