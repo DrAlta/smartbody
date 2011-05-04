@@ -1848,6 +1848,7 @@ int mcu_character_init(
 			LOG( "init_character ERR: Failed to load skeleton \"%s\"\n", skel_file ); 
 			return CMD_FAILURE;
 		}
+		cachedSkeleton->ref();
 		mcu_p->skeleton_map.insert(std::pair<std::string, SkSkeleton*>(skel_file, cachedSkeleton));
 		skelIter = mcu_p->skeleton_map.find(skel_file);
 	}
