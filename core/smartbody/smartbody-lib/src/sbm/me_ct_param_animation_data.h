@@ -121,7 +121,7 @@ class ParameterManager
 class MotionParameters
 {
 	public:
-		MotionParameters(SkMotion* m, SbmCharacter* c, std::string jName = "");
+		MotionParameters(SkMotion* m, SkSkeleton* skel, std::string jName = "");
 		~MotionParameters();
 
 		void setFrameId(int min, int max);

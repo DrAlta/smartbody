@@ -639,8 +639,11 @@ std::string tokenize( std::string& str,
 **/
 double parseMotionParameters(std::string m, std::string parameter, double min, double max)
 {
-	std::string charName = tokenize(parameter, "|");
-	SbmCharacter* character = mcuCBHandle::singleton().character_map.lookup(charName);
+	std::string skeletonName = tokenize(parameter, "|");
+	std::map<std::string, SkSkeleton*>::iterator iter = mcuCBHandle::singleton().skeleton_map.find(skeletonName);
+	SkSkeleton* sk = NULL;
+	if (iter != mcuCBHandle::singleton().skeleton_map.end())
+		sk = iter->second;
 	int type = 0;
 	if (parameter == "speed1")
 		type = 0;
@@ -650,8 +653,8 @@ double parseMotionParameters(std::string m, std::string parameter, double min, d
 		type = 2;
 	if (parameter == "angular2")
 		type = 3;
-	if (!character) return -9999;
-	MotionParameters* mParam = new MotionParameters(mcuCBHandle::singleton().lookUpMotion(m.c_str()), character);
+	if (!sk) return -9999;
+	MotionParameters* mParam = new MotionParameters(mcuCBHandle::singleton().lookUpMotion(m.c_str()), sk);
 	mParam->setFrameId(min, max);
 	return mParam->getParameter(type);
 }
