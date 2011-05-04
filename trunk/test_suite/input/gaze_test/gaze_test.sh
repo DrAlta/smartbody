@@ -1,5 +1,5 @@
 #!/bin/bash
-SBMINPUT="-noninteractive -mediapath=$MEDIAPATH -seqpath $MEDIAPATH/../test_suite/input/gaze_test -seq gaze_test.seq"
+SBMINPUT="-noninteractive -seqpath ../../../../test_suite/input/gaze_test -seq gaze_test.seq"
 OPTION_1=IMG
 THRESHOLD_1=3000
 OPTION_2=IMG
