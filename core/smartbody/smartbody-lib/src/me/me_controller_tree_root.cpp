@@ -304,7 +304,9 @@ public:
 
 	void clear() {
 		// Remove controllers
-		_controllers.clear(); // yay for smart pointers
+		// commented out by Shapiro 5/4/11 - need to investigate why this causes a crash in release mode
+//		_controllers.clear(); // yay for smart pointers
+
 
 		// Remove skeletons
 		if( _skeleton )  // only one in this implementation
