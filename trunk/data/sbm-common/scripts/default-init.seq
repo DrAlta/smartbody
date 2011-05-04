@@ -51,3 +51,14 @@
 1	seq default-dynamics
 1	seq init-param-animation
 
+2 char doctor smoothbindweight ../../../../data/mesh/doctor/Doctor.xml
+2 char doctor smoothbindmesh ../../../../data/mesh/doctor/faceShape.obj
+2 char doctor smoothbindmesh ../../../../data/mesh/doctor/left_handShape.obj
+2 char doctor smoothbindmesh ../../../../data/mesh/doctor/pantsShape.obj
+2 char doctor smoothbindmesh ../../../../data/mesh/doctor/polySurfaceShape10.obj
+2 char doctor smoothbindmesh ../../../../data/mesh/doctor/right_handShape.obj
+2 char doctor smoothbindmesh ../../../../data/mesh/doctor/shirtShape.obj
+
+2 char elder smoothbindweight ../../../../data/mesh/elder/Elder.xml
+2 char elder smoothbindmesh ../../../../data/mesh/elder/Mayor2Shape.obj
+

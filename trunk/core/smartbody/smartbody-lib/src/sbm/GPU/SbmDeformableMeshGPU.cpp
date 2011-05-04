@@ -235,9 +235,9 @@ bool SbmDeformableMeshGPU::initBuffer()
 
 	int nTotalVtxs=0, nTotalTris = 0, nTotalBones = 0;
 	std::map<std::string,int> boneIdxMap;
-	std::vector<std::set<int>> vtxNormalIdxMap;
+	std::vector<std::set<int> > vtxNormalIdxMap;
 	std::map<int,int> normalNewVtxIdxMap;
-	std::map<int,std::vector<int>> vtxNewVtxIdxMap;
+	std::map<int,std::vector<int> > vtxNewVtxIdxMap;
 
 	boneJointList.clear();
 	int iFaceIdxOffset = 0, iNormalIdxOffset = 0;

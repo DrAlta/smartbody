@@ -61,7 +61,7 @@ RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Window/Data Viewer", 0, LaunchDataViewerCB,this, NULL);
 	menubar->add("&Window/BML Viewer", 0, LaunchBMLViewerCB, this, NULL);
 	menubar->add("&Window/Parameterized Animation Viewer", 0, LaunchParamAnimViewerCB, this, NULL);
-//	menubar->add("&Window/Command Window", 0, LaunchConsoleCB, this, NULL);
+	menubar->add("&Window/Command Window", 0, LaunchConsoleCB, this, NULL);
 	menubar->add("&Scripts/Reload Scripts", 0, ReloadScriptsCB, this, NULL);
 	menubar->add("&Scripts/Set Script Folder", 0, SetScriptDirCB, this, MENU_DIVIDER);
 

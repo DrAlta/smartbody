@@ -139,7 +139,6 @@ int main( int argc, char ** argv )
          printf( "Character %s: %5.2f %5.2f %5.2f\n", c.m_name.c_str(), c.x, c.y, c.z );
       }
 
-
       if ( _kbhit() && _getch() == 'q' )
          loop = false;
    }

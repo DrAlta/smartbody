@@ -60,7 +60,7 @@ using namespace std;
 void updateDisplay(int pos, int nInserted, int nDeleted,int b, const char* d, void* v);
 
 //creating FLTK multiline editor to connect to the interpreter
-CommandWindow::CommandWindow(int x,int y,int w,int h, const char* s) : Window(x, y, w, h, s)
+CommandWindow::CommandWindow(int x,int y,int w,int h, const char* s) : GenericViewer(x, y, w, h), Window(x, y, w, h, s)
 {
        curDir[0] = '\0';
 
@@ -434,4 +434,19 @@ void CommandWindow::freeHistorySpace()
 	{
 		historyLocation -= count;
 	}
+}
+
+CommandViewerFactory::CommandViewerFactory()
+{
+}
+
+GenericViewer* CommandViewerFactory::create(int x, int y, int w, int h)
+{
+	CommandWindow* commandWindow = new CommandWindow(x, y, w, h, "Command");
+	return commandWindow;
+}
+
+void CommandViewerFactory::destroy(GenericViewer* viewer)
+{
+	delete viewer;
 }

@@ -182,6 +182,7 @@ class mcuCBHandle	{
 		GenericViewerFactory *bmlviewer_factory;
 		GenericViewerFactory *panimationviewer_factory;
 		GenericViewerFactory *channelbufferviewer_factory;
+		GenericViewerFactory *commandviewer_factory;
 		SrCamera	*camera_p;
 		SrSnGroup	*root_group_p;
 		
@@ -238,6 +239,8 @@ class mcuCBHandle	{
 	private:
 		// Constant
 		static mcuCBHandle* _singleton;
+
+                bool _interactive;
 
 		//  Constructor
 		mcuCBHandle( void );
@@ -465,8 +468,17 @@ class mcuCBHandle	{
 				channelbufferviewer_factory = factory;
 		}
 
+		void register_commandviewer_factory(GenericViewerFactory* factory) { 
+				if (commandviewer_factory != NULL) delete commandviewer_factory;
+				commandviewer_factory = factory;
+		}
+		
+
 		void setMediaPath(std::string path);
 		std::string getMediaPath();
+
+                void setInteractive(bool val);
+                bool getInteractive();
 
 	protected:
 		FILE* open_sequence_file( const char *seq_name );

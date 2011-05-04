@@ -52,7 +52,7 @@ do
   fi
   
   cd $SBMBIN
-  ./$SBMEXE -seq $caseName -facebone
+  ./$SBMEXE -noninteractive -seq $caseName -facebone
 	
 	imgNum=0  
   for image in *.ppm

@@ -40,7 +40,7 @@
 #include "me_utilities.hpp"
 #include "wsp.h"
 #include "sr/sr_model.h"
-#include "sbm/gpu/SbmShader.h"
+#include "sbm/GPU/SbmShader.h"
 #include "sbm_deformable_mesh.h"
 
 #include <boost/algorithm/string/replace.hpp>
@@ -122,10 +122,12 @@ mcuCBHandle::mcuCBHandle()
 	bmlviewer_factory ( new GenericViewerFactory() ),
 	panimationviewer_factory ( new GenericViewerFactory() ),
 	channelbufferviewer_factory ( new GenericViewerFactory() ),
+	commandviewer_factory ( new GenericViewerFactory() ),
 	resource_manager(ResourceManager::getResourceManager()),
 	snapshot_counter( 1 ),
 	delay_behaviors(true),
-	media_path(".")
+        media_path("."),
+        _interactive(true)
 {
 
 	
@@ -1131,5 +1133,15 @@ void mcuCBHandle::addPATransition(PATransitionData* transition)
 {
 	if (!lookUpPATransition(transition->fromState->stateName, transition->toState->stateName))
 		param_anim_transitions.push_back(transition);
+}
+
+void mcuCBHandle::setInteractive(bool val)
+{
+    _interactive = val;
+}
+
+bool mcuCBHandle::getInteractive()
+{
+    return _interactive;
 }
 /////////////////////////////////////////////////////////////
