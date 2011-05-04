@@ -64,11 +64,12 @@ that is distributed: */
 #include <cstdlib>
 #include <string>
 #include <vector>
+#include <sbm/GenericViewer.h>
 
 #define MAXHISTORYSIZE 10
 
 
-class CommandWindow : public fltk::Window, public vhcl::Log::Listener
+class CommandWindow : public GenericViewer, public fltk::Window, public vhcl::Log::Listener
 {
 public:
 	CommandWindow(int, int, int, int, const char*);
@@ -117,5 +118,15 @@ private:
 }
 ;
 
+
+class CommandViewerFactory : public GenericViewerFactory
+{
+public:
+	CommandViewerFactory();
+
+	virtual GenericViewer* create(int x, int y, int w, int h);
+	virtual void destroy(GenericViewer* viewer);
+};
 #endif
+
 

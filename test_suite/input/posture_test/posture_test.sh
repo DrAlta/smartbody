@@ -1,5 +1,5 @@
 #!/bin/sh
-SBMINPUT="-seqpath ../../../../test_suite/input/posture_test -seq posture_test.seq"
+SBMINPUT="-noninteractive -seqpath ../../../../test_suite/input/posture_test -seq posture_test.seq"
 OPTION_1=IMG
 THRESHOLD_1=3000
 OPTION_2=IMG

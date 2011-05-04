@@ -1074,6 +1074,12 @@ MapOfBmlRequest& BML::Processor::getBMLRequestMap()
 //  Static Command and Message Hooks
 
 int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
+
+	// show the message
+#if 0
+	LOG(args.peek_string());
+#endif
+
 	Processor& bp = mcu->bml_processor;
 
 	const char   *character_id     = args.read_token();

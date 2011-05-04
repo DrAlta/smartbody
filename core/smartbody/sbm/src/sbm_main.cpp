@@ -120,7 +120,8 @@ int sbm_main_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	}
 
 	const char* args_raw = args.read_remainder_raw();
-	int result = mcu_p->execute( token, srArgBuffer( args_raw ) );
+	srArgBuffer argsRawBuff(args_raw);
+	int result = mcu_p->execute( token, argsRawBuff );
 	switch( result ) {
 		case CMD_NOT_FOUND:
 			LOG("SBM ERR: command NOT FOUND: '%s %s' ", token, args_raw );
@@ -163,12 +164,6 @@ int mcu_snapshot_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
 	if( mcu_p )
 	{
-		RootWindow* rootWindow = dynamic_cast<RootWindow*> (mcu_p->viewer_p);
-		if (!rootWindow)
-		{
-			LOG("Viewer doesn't exist!");
-			return CMD_FAILURE;
-		}
 		int windowHeight = args.read_int();
 		int windowWidth = args.read_int();
 		int offsetHeight = args.read_int();
@@ -176,8 +171,8 @@ int mcu_snapshot_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 		string output_file = args.read_token();
 
-		if( windowHeight == 0 )		windowHeight = rootWindow->fltkViewer->h();							// default window size
-		if( windowWidth == 0 )		windowWidth = rootWindow->fltkViewer->w();
+		if( windowHeight == 0 )		windowHeight = 600;							// default window size
+		if( windowWidth == 0 )		windowWidth = 400;
 		if( output_file == "" )		
 		{
 			std::stringstream output_file_os;
@@ -441,8 +436,13 @@ void signal_handler(int sig) {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu.vhmsg_send( "vrProcEnd sbm" );
 	// get the current directory
+#ifdef WIN32
 	char buffer[MAX_PATH];
 	::GetCurrentDirectory(MAX_PATH, buffer);
+#else
+	char buffer[PATH_MAX];
+	getcwd(buffer, PATH_MAX);
+#endif
 
 	// dump to an available file in the current directory
 	int counter = 1;
@@ -674,6 +674,10 @@ int main( int argc, char **argv )	{
 			mediaPath = mediaPath.substr(11);
 			mcu.setMediaPath(mediaPath);
 		}
+                else if ( s.search ("-noninteractive") == 0)
+                {
+                       mcu.setInteractive(false);
+                }
 		else
 		{
 			LOG( "ERROR: Unrecognized command line argument: \"%s\"\n", (const char*)s );
@@ -746,7 +750,9 @@ int main( int argc, char **argv )	{
 //	(void)signal( SIGINT, signal_handler );
 //	(void)signal( SIGSEGV, signal_handler );
 //	(void)signal( SIGTERM, signal_handler );
+#ifdef WIN32
 	(void)signal( SIGBREAK, signal_handler );
+#endif
 //	atexit( exit_callback );
 
 	srCmdLine cmdl;
@@ -802,7 +808,8 @@ int main( int argc, char **argv )	{
 #endif
 
 	// Notify world SBM is ready to receive messages
-	mcu_vrAllCall_func( srArgBuffer(""), &mcu );
+	srArgBuffer argBuff("");
+	mcu_vrAllCall_func( argBuff, &mcu );
 
 	timer.start();
 	while( mcu.loop )	{
@@ -837,7 +844,7 @@ mcu.mark( "main", 0, "bonebus" );
 		}
 
 mcu.mark( "main", 0, "pending_cmd" );
-		if( cmdl.pending_cmd() )	{
+                if( mcu.getInteractive() && cmdl.pending_cmd() )	{
 			char *cmd = cmdl.read_cmd();
 			if( strlen( cmd ) )	{
 				switch( int ret = mcu.execute( cmd ) ) {

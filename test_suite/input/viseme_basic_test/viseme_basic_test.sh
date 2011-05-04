@@ -1,5 +1,5 @@
 #!/bin/sh
-SBMINPUT="-seqpath ../../../../test_suite/input/viseme_basic_test -seq viseme_basic_test.seq -facebone"
+SBMINPUT="-noninteractive -seqpath ../../../../test_suite/input/viseme_basic_test -seq viseme_basic_test.seq -facebone"
 OPTION_1=IMG
 THRESHOLD_1=3000
 OPTION_2=IMG
