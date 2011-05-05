@@ -22,7 +22,7 @@
 
 #include "ParamAnimRunTimeEditor.h"
 #include <sbm/mcontrol_util.h>
-
+#include <sbm/me_ct_param_animation_data.h>
 
 ParameterVisualization::ParameterVisualization(int x, int y, int w, int h, char* name, PAStateData* s, ParameterGroup* group) : fltk::Group(x, y, w, h, name), state(s), paramGroup(group)
 {
@@ -175,9 +175,13 @@ void ParameterVisualization::getActualPixel(float paramX, float paramY, int& x, 
 {
 	if (fabs(scaleX) > 0.0001)
 		x = int(paramX / scaleX);
+	else
+		x = int(paramX);
 	x = centerX + x;
 	if (fabs(scaleY) > 0.0001)
 		y = int(paramY / scaleY);
+	else
+		y = int(paramY);
 	y = centerY - y;
 }
 
@@ -235,7 +239,8 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 			xAxis->callback(updateXAxisValue, this);
 			float actualValue;
 			s->paramManager->getParameter(actualValue);
-			int actualX, actualY;
+			int actualX = 0;
+			int actualY = 0;
 			paramVisualization->getActualPixel(actualValue, 0.0f, actualX, actualY);
 			paramVisualization->setSlider(actualX, actualY);
 		}
@@ -256,7 +261,8 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 			yAxis->set_vertical();
 			float actualValueX, actualValueY;
 			s->paramManager->getParameter(actualValueX, actualValueY);
-			int actualX, actualY;
+			int actualX = 0;
+			int actualY = 0;
 			paramVisualization->getActualPixel(actualValueX, actualValueY, actualX, actualY);
 			paramVisualization->setSlider(actualX, actualY);
 		}
@@ -349,7 +355,6 @@ void PARunTimeEditor::update()
 	if (!character->param_animation_ct)
 		return;
 	std::string currentState = character->param_animation_ct->getCurrentStateName();
-	if (currentState == "") currentState = "Idle";
 	if (prevCycleState != currentState)
 	{
 		updateRunTimeStates(currentState);
@@ -366,7 +371,8 @@ void PARunTimeEditor::update()
 			{
 				float x, y;
 				state->paramManager->getParameter(x, y);
-				int actualPixelX, actualPixelY;
+				int actualPixelX = 0;
+				int actualPixelY = 0;
 				paramGroup->paramVisualization->getActualPixel(x, y, actualPixelX, actualPixelY);
 				paramGroup->paramVisualization->setPoint(actualPixelX, actualPixelY);
 			}
@@ -379,11 +385,15 @@ void PARunTimeEditor::updateRunTimeStates(std::string currentState)
 	nextCycleStates->clear();
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	PAStateData* stateData = mcu.lookUpPAState(currentState);
+
 	if (stateData)
 		if (!stateData->cycle)
 			return;
 
-	if (currentState == "Idle")
+	if (currentState == "")
+		return;
+
+	if (currentState == PseudoIdleState)
 	{
 		for (size_t i = 0; i < mcu.param_anim_states.size(); i++)
 		{
@@ -396,7 +406,7 @@ void PARunTimeEditor::updateRunTimeStates(std::string currentState)
 		for (size_t i = 0; i < stateData->toStates.size(); i++)
 		{
 			if (stateData->toStates[i]->toStates.size() == 0)
-				addItem(nextCycleStates, "Idle");
+				addItem(nextCycleStates, PseudoIdleState);
 			else
 				for (size_t j = 0; j < stateData->toStates[i]->toStates.size(); j++)
 					addItem(nextCycleStates, stateData->toStates[i]->toStates[j]->stateName.c_str());
@@ -438,10 +448,7 @@ void PARunTimeEditor::initializeRunTimeEditor()
 	{
 		if (character->param_animation_ct == NULL)
 			return;
-		if (character->param_animation_ct->getCurrentStateName() == "")
-			currentCycleState->value("Idle");
-		else
-			currentCycleState->value(character->param_animation_ct->getCurrentStateName().c_str());
+		currentCycleState->value(character->param_animation_ct->getCurrentStateName().c_str());
 
 		nextCycleStates->clear();
 		availableTransitions->clear();
@@ -490,7 +497,7 @@ void PARunTimeEditor::updateTransitionStates(fltk::Widget* widget, void* data)
 	{
 		bool fromHit = false;
 		bool toHit = false;
-		if (currentState == "Idle")
+		if (currentState == PseudoIdleState)
 		{
 			if (mcu.param_anim_states[i]->fromStates.size() == 0)
 			{
@@ -504,7 +511,7 @@ void PARunTimeEditor::updateTransitionStates(fltk::Widget* widget, void* data)
 				}
 			}
 		}
-		else if (nextState == "Idle")
+		else if (nextState == PseudoIdleState)
 		{
 			if (mcu.param_anim_states[i]->toStates.size() == 0)
 			{
@@ -566,12 +573,12 @@ void PARunTimeEditor::run(fltk::Widget* widget, void* data)
 		editor->paWindow->execCmd(editor->paWindow, command1.str(), timeoffset);
 		timeoffset += 0.1;
 	}
-	if (nextCycleState != "Idle" && nextCycleState != "")
+	if (nextCycleState != PseudoIdleState && nextCycleState != "")
 	{
 		std::stringstream command2;
 		command2 << "panim schedule char " << charName << " state " << nextCycleState << " loop true playnow false";
 		editor->paWindow->execCmd(editor->paWindow, command2.str(), timeoffset);
 	}
 	
-	if (nextCycleState == "Idle" || nextCycleState == "") return;
+	if (nextCycleState == PseudoIdleState || nextCycleState == "") return;
 }

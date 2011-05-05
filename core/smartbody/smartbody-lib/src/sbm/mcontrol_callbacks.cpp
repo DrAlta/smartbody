@@ -640,10 +640,17 @@ std::string tokenize( std::string& str,
 double parseMotionParameters(std::string m, std::string parameter, double min, double max)
 {
 	std::string skeletonName = tokenize(parameter, "|");
-	std::map<std::string, SkSkeleton*>::iterator iter = mcuCBHandle::singleton().skeleton_map.find(skeletonName);
 	SkSkeleton* sk = NULL;
-	if (iter != mcuCBHandle::singleton().skeleton_map.end())
-		sk = iter->second;
+
+	if (parameter != "")
+	{
+		std::map<std::string, SkSkeleton*>::iterator iter = mcuCBHandle::singleton().skeleton_map.find(skeletonName);
+		if (iter != mcuCBHandle::singleton().skeleton_map.end())
+			sk = iter->second;
+		else
+			LOG("parseMotionParameters ERR: skeleton %s not found! Parameter won't be setup properly", skeletonName.c_str());
+	}
+
 	int type = 0;
 	if (parameter == "speed1")
 		type = 0;

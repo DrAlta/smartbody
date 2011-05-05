@@ -61,6 +61,7 @@
 # include <SBM/me_ct_example_body_reach.hpp>
 # include <SBM/me_ct_constraint.hpp>
 # include <SBM/Collision/SbmColObject.h>
+# include <SBM/me_ct_param_animation_data.h>
 
 #include <sbm/mcontrol_util.h>
 //#include <sbm/SbmShader.h>
@@ -1572,7 +1573,7 @@ void FltkViewer::translate_keyboard_state()
 	}
 	if (paLocomotionCmd)
 	{
-		if (_paLocoData->starting && state == NULL)
+		if (_paLocoData->starting && state->stateName == PseudoIdleState)
 		{
 			std::stringstream command1;
 			command1 << "panim schedule char " << _paLocoData->character->name << " state UtahStopToWalk loop false playnow false";
@@ -1581,13 +1582,13 @@ void FltkViewer::translate_keyboard_state()
 			mcu.execute((char*)command1.str().c_str());
 			mcu.execute((char*)command2.str().c_str());
 		}
-		else if (_paLocoData->stopping && state != NULL)
+		else if (_paLocoData->stopping && state->stateName == "UtahLocomotion")
 		{
 			std::stringstream command;
 			command << "panim schedule char " << _paLocoData->character->name << " state UtahWalkToStop loop false playnow false";
 			mcu.execute((char*)command.str().c_str());
 		}
-		else if (_paLocoData->jumping && state != NULL)
+		else if (_paLocoData->jumping && state->stateName == "UtahLocomotion")
 		{
 			std::stringstream command1;
 			command1 << "panim schedule char " << _paLocoData->character->name << " state UtahJump loop false playnow false";

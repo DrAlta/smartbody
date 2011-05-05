@@ -467,9 +467,19 @@ void ParameterManager::getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, dou
 	SrVec cross3 = cross(ptToV3, ptToV1);
 	double area3 = cross3.len();
 	double totalArea = area1 + area2 + area3;
-	w1 = area2 / totalArea;
-	w2 = area3 / totalArea;
-	w3 = area1 / totalArea;
+	if (totalArea == 0)
+	{
+		w1 = 1.0;
+		w2 = 0.0;
+		w3 = 0.0;
+		LOG("ParameterManager::getWeight Warning: parameters not set correctly, check the initalization.");
+	}
+	else
+	{
+		w1 = area2 / totalArea;
+		w2 = area3 / totalArea;
+		w3 = area1 / totalArea;
+	}
 }
 
 MotionParameters::MotionParameters(SkMotion* m, SkSkeleton* skel, std::string j)
