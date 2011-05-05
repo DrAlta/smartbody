@@ -13,7 +13,6 @@
 0 panim transition fromstate UtahMoving tostate UtahStopping Utah_Walk 1 0.23331 0.76666 Utah_WalkToStop 0.26664 0.76666
 
 ##
-0 panim state UtahIdle cycle true 1 LHandOnHip_Motex 0
 0 panim state UtahStopToWalk cycle false 1 ChrUtah_Idle001_ToWalk001 0 
 0 panim state UtahWalkToStop cycle false 1 ChrUtah_Walk001_ToIdle001 0 
 0 panim state UtahJump cycle false 1 ChrUtah_WalkJumpWalk01 0 

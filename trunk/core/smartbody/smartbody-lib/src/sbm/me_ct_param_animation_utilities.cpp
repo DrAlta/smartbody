@@ -26,7 +26,11 @@
 #include <sr/sr_euler.h>
 
 
-const double timeThreshold = 0.02;
+const double timeThreshold = 0.05;
+PATimeManager::PATimeManager()
+{
+}
+
 PATimeManager::PATimeManager(std::vector<SkMotion*> m, std::vector<std::vector<double>> k, std::vector<double> w)
 {
 	motions = m;
@@ -161,6 +165,10 @@ void PATimeManager::getParallelTimes(double time, std::vector<double>& times)
 		double t = keys[i][section] + (keys[i][section + 1] - keys[i][section]) * (time - key[section]) / (key[section + 1] - key[section]);
 		times.push_back(t);
 	}
+}
+
+PAMotions::PAMotions()
+{
 }
 
 PAMotions::PAMotions(std::vector<SkMotion*> m, std::vector<double> w)
@@ -309,6 +317,9 @@ void PAMotions::getProcessedMat(SrMat& dest, SrMat& src)
 	dest.set(13, src.get(13));
 }
 
+PAInterpolator::PAInterpolator()
+{
+}
 
 PAInterpolator::PAInterpolator(std::vector<SkMotion*> m, std::vector<double> w) : PAMotions(m, w)
 {
@@ -426,6 +437,10 @@ void PAInterpolator::handleBaseMatForBuffer(SrBuffer<float>& buffer)
 	SrMat processedBaseMat;
 	getProcessedMat(processedBaseMat, baseMat);
 	setBufferByBaseMat(processedBaseMat, buffer);
+}
+
+PAWoManager::PAWoManager()
+{
 }
 
 PAWoManager::PAWoManager(std::vector<SkMotion*> m, std::vector<double> w) : PAMotions(m, w)
@@ -602,6 +617,7 @@ PAStateModule::PAStateModule(PAStateData* stateData, bool l, bool pn)
 	timeManager = new PATimeManager(stateData->motions, stateData->keys, stateData->weights);
 	interpolator = new PAInterpolator(stateData->motions, stateData->weights);
 	woManager = new PAWoManager(stateData->motions, stateData->weights);
+
 	data = stateData;
 	loop = l;
 	active = false;
@@ -636,6 +652,19 @@ void PAStateModule::evaluate(double timeStep, SrBuffer<float>& buffer)
 		active = false;
 }
 
+
+PseudoPAStateModule::PseudoPAStateModule() : PAStateModule(new PAStateData(PseudoIdleState))
+{
+}
+
+PseudoPAStateModule::~PseudoPAStateModule()
+{
+}
+
+void PseudoPAStateModule::evaluate(double timeStep, SrBuffer<float>& buffer)
+{
+	if (!active) active = true;
+}
 
 PATransitionManager::PATransitionManager()
 {
@@ -726,6 +755,9 @@ void PATransitionManager::update()
 {
 	std::vector<double> fromKey;
 	int id;
+	if (!data)
+		return;
+
 	for (int i = 0; i < data->fromState->getNumMotions(); i++)
 	{
 		std::string motionName = data->fromState->motions[i]->name();

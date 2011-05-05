@@ -54,6 +54,7 @@ class PATimeManager
 		double localTime;						
 
 	public:
+		PATimeManager();
 		PATimeManager(std::vector<SkMotion*> m, std::vector<std::vector<double>> k, std::vector<double> w);
 		~PATimeManager();
 
@@ -85,6 +86,7 @@ class PAMotions
 		JointChannelId baseBuffId;
 
 	public:
+		PAMotions();
 		PAMotions(std::vector<SkMotion*> m, std::vector<double> w);
 		~PAMotions();
 
@@ -110,6 +112,7 @@ class PAWoManager : public PAMotions
 		SrMat baseTransformMat;
 
 	public:
+		PAWoManager();
 		PAWoManager(std::vector<SkMotion*> m, std::vector<double> w);
 		~PAWoManager();
 
@@ -124,6 +127,7 @@ class PAWoManager : public PAMotions
 class PAInterpolator : public PAMotions
 {
 	public:
+		PAInterpolator();
 		PAInterpolator(std::vector<SkMotion*> m, std::vector<double> w);
 		~PAInterpolator();
 
@@ -150,6 +154,15 @@ class PAStateModule
 	public:
 		PAStateModule(PAStateData* stateData, bool l = true, bool pn = false);
 		~PAStateModule();
+		virtual void evaluate(double timeStep, SrBuffer<float>& buffer);
+};
+
+class PseudoPAStateModule : public PAStateModule
+{
+	public:
+		PseudoPAStateModule();
+		~PseudoPAStateModule();
+
 		void evaluate(double timeStep, SrBuffer<float>& buffer);
 };
 

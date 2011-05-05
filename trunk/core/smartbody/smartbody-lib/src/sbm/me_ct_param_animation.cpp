@@ -67,6 +67,16 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 	autoScheduling(t);
 	controllerBlending->updateBuffer(frame.buffer());
 
+	//--make sure there is always a pseudo idle state running in the system
+	if (!curStateModule && !nextStateModule)
+		schedule(NULL, true, true);
+	if (curStateModule)
+	{
+		if (curStateModule->data->stateName != PseudoIdleState && nextStateModule == NULL && !curStateModule->loop)
+			schedule(NULL, true);
+	}
+	//------
+
 	if (transitionManager)
 	{
 		if (curStateModule == NULL || nextStateModule == NULL)
@@ -234,15 +244,23 @@ void MeCtParamAnimation::autoScheduling(double time)
 	{
 		if (transitionManager)
 			delete transitionManager;
-		PATransitionData* data = mcuCBHandle::singleton().lookUpPATransition(curStateModule->data->stateName, nextUnit.data->stateName);
+		PATransitionData* data = NULL;
+		if (nextUnit.data)
+			data = mcuCBHandle::singleton().lookUpPATransition(curStateModule->data->stateName, nextUnit.data->stateName);
 		nextStateModule = createStateModule(nextUnit.data, nextUnit.loop, nextUnit.playNow);
 		nextStateModule->active = false;
 		if (!data)
 		{
-			if (nextStateModule->playNow)
+			PseudoPAStateModule* pseudo = dynamic_cast<PseudoPAStateModule*> (curStateModule);
+			if (pseudo)
 				transitionManager = new PATransitionManager();
 			else
-				transitionManager = new PATransitionManager(curStateModule->timeManager->getDuration() - defaultTransition);		
+			{
+				if (nextStateModule->playNow)
+					transitionManager = new PATransitionManager();
+				else
+					transitionManager = new PATransitionManager(curStateModule->timeManager->getDuration() - defaultTransition);	
+			}
 #if PrintPADebugInfo
 		LOG("State %s being scheduled.[ACTIVE]", curStateModule->data->stateName.c_str());
 #endif
@@ -261,7 +279,11 @@ void MeCtParamAnimation::autoScheduling(double time)
 
 PAStateModule* MeCtParamAnimation::createStateModule(PAStateData* stateData, bool l, bool pn)
 {
-	PAStateModule* module = new PAStateModule(stateData, l, pn);
+	PAStateModule* module = NULL;
+	if (stateData)
+		module = new PAStateModule(stateData, l, pn);
+	else
+		module = new PseudoPAStateModule();
 	if (_context)
 	{
 		module->interpolator->setMotionContextMaps(_context);

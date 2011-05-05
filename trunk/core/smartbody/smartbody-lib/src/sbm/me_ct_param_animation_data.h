@@ -27,6 +27,7 @@
 #include <sbm/sbm_character.hpp>
 #include <sr/sr_triangle.h>
 
+const std::string PseudoIdleState = "PseudoIdle";
 class ParameterManager;
 class PAStateData
 {
