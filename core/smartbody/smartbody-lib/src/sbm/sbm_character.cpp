@@ -2174,7 +2174,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			}
 		}
 
-		else if (reach_cmd == "grabhand" || reach_cmd == "reachhand")
+		else if (reach_cmd == "grabhand" || reach_cmd == "reachhand" || reach_cmd == "releasehand")
 		{
 			string motion_name = args.read_token();
 			SkMotion* motion = mcu_p->lookUpMotion(motion_name.c_str());
@@ -2186,6 +2186,8 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 					this->grabHandData.insert(motion);
 				else if (reach_cmd == "reachhand")
 					this->reachHandData.insert(motion);
+				else if (reach_cmd == "releasehand")
+					this->releaseHandData.insert(motion);
 
 				return CMD_SUCCESS;
 			}

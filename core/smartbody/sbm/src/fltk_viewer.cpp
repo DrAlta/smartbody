@@ -3555,24 +3555,56 @@ void FltkViewer::drawReach()
 			//PositionControl::drawSphere(gPos,1.0f);			
 		}	
 
-		if (reachCt->posPlanner && reachCt->posPlanner->path())
+// 		if (reachCt->posPlanner && reachCt->posPlanner->path())
+// 		{
+// 			if (reachCt->posPlanner->path())
+// 			{
+// 				SrSnLines pathLines;			
+// 				reachCt->posPlanner->draw_path(*reachCt->posPlanner->path(),pathLines.shape());
+// 				pathLines.color(SrColor(1,0,0,1));
+// 				SrGlRenderFuncs::render_lines(&pathLines);		
+// 			}
+// 
+// 			SrSnBox box;
+// 			box.shape() = reachCt->posPlanner->cman()->SkPosBound();
+// 			//SrGlRenderFuncs::render_box(&box);
+// 		}
+
+		if (reachCt->blendPlanner)
 		{
-			if (reachCt->posPlanner->path())
+			if (reachCt->blendPlanner->path())
 			{
 				SrSnLines pathLines;			
-				reachCt->posPlanner->draw_path(*reachCt->posPlanner->path(),pathLines.shape());
+				reachCt->blendPlanner->draw_path(*reachCt->blendPlanner->path(),pathLines.shape());
 				pathLines.color(SrColor(1,0,0,1));
 				SrGlRenderFuncs::render_lines(&pathLines);		
-			}
+			}	
 
-			SrSnBox box;
-			box.shape() = reachCt->posPlanner->cman()->SkPosBound();
-			//SrGlRenderFuncs::render_box(&box);
+			if (reachCt->blendPlanner->cman())
+			{
+				SrSnLines tree1;
+				reachCt->blendPlanner->draw_edges(tree1.shape(),0);
+
+				SrSnLines tree2;
+				reachCt->blendPlanner->draw_edges(tree2.shape(),1);
+				SrGlRenderFuncs::render_lines(&tree1);
+				SrGlRenderFuncs::render_lines(&tree2);
+			}			
 		}
-		
+
+
+
+
+		if (reachCt->blendPlanner && reachCt->blendPlanner->cman())
+		{
+			std::vector<CollisionJoint>& colJointList = reachCt->blendPlanner->cman()->colJoints;
+			for (unsigned int i=0;i<colJointList.size();i++)
+				drawColObject(colJointList[i].colGeo);
+		}
+
 		SrVec reachTraj = reachCt->curReachIKTrajectory;
 		PositionControl::drawSphere(reachTraj,sphereSize,SrVec(0,1,1));
-		SrVec ikTraj = reachCt->ikTarget;
+		SrVec ikTraj = reachCt->getIKTarget();
 		//PositionControl::drawSphere(ikTraj,sphereSize,SrVec(0,1,0));
 		PositionControl::drawSphere(reachCt->interpPos,sphereSize,SrVec(1,0,1));
 		PositionControl::drawSphere(reachCt->curEffectorPos,sphereSize,SrVec(1,0,0));
@@ -3627,18 +3659,18 @@ void FltkViewer::drawColObject( SbmColObject* colObj )
 		SbmColCapsule* cap = dynamic_cast<SbmColCapsule*>(colObj);
 		// render two end cap
 		SrSnSphere sphere;				
-		sphere.shape().center = SrVec(0,-cap->extent,0);
+		sphere.shape().center = cap->endPts[0];//SrVec(0,-cap->extent,0);
 		sphere.shape().radius = cap->radius;
 		sphere.color(SrColor(1.f,0.f,0.f));
 		sphere.render_mode(srRenderModeSmooth);
 		SrGlRenderFuncs::render_sphere(&sphere);
 
-		sphere.shape().center = SrVec(0,cap->extent,0);
+		sphere.shape().center = cap->endPts[1];//SrVec(0,cap->extent,0);
 		SrGlRenderFuncs::render_sphere(&sphere);
 
 		SrSnCylinder cyc;
-		cyc.shape().a = SrVec(0,-cap->extent,0);
-		cyc.shape().b = SrVec(0,cap->extent,0);
+		cyc.shape().a = cap->endPts[0];//SrVec(0,-cap->extent,0);
+		cyc.shape().b = cap->endPts[1];//SrVec(0,cap->extent,0);
 		cyc.shape().radius = cap->radius;
 		cyc.color(SrColor(1.f,0.f,0.f));
 		cyc.render_mode(srRenderModeSmooth);

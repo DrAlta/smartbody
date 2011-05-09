@@ -18,7 +18,7 @@ public:
 class SbmColObject
 {
 public:
-	SbmRigidTransform worldState;		
+	SbmRigidTransform worldState;			
 	bool              isUpdate;
 public:
 	SbmColObject(void);
@@ -26,7 +26,9 @@ public:
 	virtual ~SbmColObject(void);
 	virtual SrVec getCenter();	
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f) = 0; // check if a point is inside the object	
-	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2) { return false; }; // check if a line segment is intersect with the object
+	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f) { return false; }; // check if a line segment is intersect with the object
+	// estimate the hand position and orientation
+	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot) = 0;
 };
 
 class SbmColSphere : public SbmColObject
@@ -37,7 +39,8 @@ public:
 	SbmColSphere(float r) { radius = r; }
 	virtual ~SbmColSphere();
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f);	
-	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2);
+	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f);
+	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot);
 };
 
 class SbmColBox : public SbmColObject
@@ -48,7 +51,8 @@ public:
 	SbmColBox(const SrVec& ext);
 	virtual ~SbmColBox();
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f);	
-	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2);
+	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f);
+	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot);
 };
 
 // assuming the length is along local y-axis
@@ -59,10 +63,19 @@ public:
 	SrVec endPts[2];
 public:
 	SbmColCapsule(float length, float radius);
+	SbmColCapsule(const SrVec& p1, const SrVec& p2, float radius);
 	virtual ~SbmColCapsule();
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f);	
-	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2);
+	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f);
+	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot);
 };
 
+typedef std::vector<SbmColObject*> VecOfSbmColObj;
 
+
+class SbmCollisionUtil
+{
+public:
+	static bool checkCollision(SbmColObject* obj1, SbmColObject* obj2);
+};
 

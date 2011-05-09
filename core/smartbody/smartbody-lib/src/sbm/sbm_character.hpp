@@ -93,6 +93,7 @@ protected:
 
 	MotionDataSet      reachHandData;
 	MotionDataSet      grabHandData;
+	MotionDataSet      releaseHandData;
 
 	// The implementation to be used for speech (NULL if unset) 
 	SmartBody::SpeechInterface* speech_impl;
@@ -312,8 +313,11 @@ public:
 	bool addReachMotion(SkMotion* motion);
 	SkMotion* getReachMotion(int index);
 	const MotionDataSet& getReachMotionDataSet() const { return reachMotionData;}
+
 	const MotionDataSet& getGrabHandData() const { return grabHandData;}
 	const MotionDataSet& getReachHandData() const { return reachHandData;}
+	const MotionDataSet& getReleaseHandData() const { return releaseHandData;}
+	
 
 	AUChannelMap& get_au_channel_map( void ) { return au_channel_map; }
 	

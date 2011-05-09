@@ -21,7 +21,9 @@ public:
 	FingerChain() { isLock = false; fingerTip = NULL; fingerTarget = SrVec(); }
 	~FingerChain() {}
 	void init(MeCtIKTreeNode* figTip);	
+	void unlockChain();
 	void getLineSeg(std::vector<SrVec>& lineSeg);
+	void testCollision(SbmColObject* colObj);
 };
 
 
@@ -32,7 +34,7 @@ private:
 	static const char* CONTROLLER_TYPE;
 public:
 	enum FingerID { F_THUMB = 0, F_INDEX, F_MIDDLE, F_RING, F_PINKY, F_NUM_FINGERS };
-	enum GrabState { GRAB_START, GRAB_RETURN };
+	enum GrabState { GRAB_START, GRAB_REACH, GRAB_FINISH, GRAB_RETURN };
 protected:
 	SkSkeleton*     skeletonRef;
 	SkSkeleton*     skeletonCopy;
@@ -40,7 +42,7 @@ protected:
 	float 			_duration, prevTime;
 	SkChannelArray	_channels;	
 	GrabState             currentGrabState;
-	BodyMotionFrame       restFrame, currentFrame, targetFrame;	
+	BodyMotionFrame       releaseFrame, grabFrame, reachFrame, currentFrame, tempFrame;	
 	
 	vector<FingerChain>   fingerChains;
 	vector<SkJoint*>      affectedJoints;
@@ -50,7 +52,7 @@ protected:
 
 	MeCtIKTreeScenario    ikScenario;
 	MeCtJacobianIK        ik;
-	ColObject*           grabTarget;           
+	SbmColObject*         grabTarget;           
 public:
 	float                 grabVelocity;
 
@@ -58,7 +60,7 @@ public:
 	MeCtHand(SkSkeleton* sk, SkJoint* wrist);
 	~MeCtHand(void);	
 
-	void init(const MotionDataSet& reachPose, const MotionDataSet& grabPose);
+	void init(const MotionDataSet& reachPose, const MotionDataSet& grabPose, const MotionDataSet& releasePose);
 
 public:
 	virtual void controller_map_updated();
@@ -72,13 +74,14 @@ public:
 	virtual void print_state( int tabs );
 	
 	void setGrabState(GrabState state);
-	void setGrabTargetPos(SrVec& targetPos);
+	void setGrabTargetObject(SbmColObject* targetObj);
 protected:
 	void solveIK(float dt);
 	void updateChannelBuffer(MeFrameData& frame, BodyMotionFrame& handMotionFrame, bool bRead = false);
 	void getPinchFrame(BodyMotionFrame& pinchFrame, SrVec& wristOffset);
 	FingerID findFingerID(const char* jointName);
 	void updateFingerChains( BodyMotionFrame& targetMotionFrame, float maxAngDelta);
+	BodyMotionFrame& findTargetFrame(GrabState state);
 };
 
 

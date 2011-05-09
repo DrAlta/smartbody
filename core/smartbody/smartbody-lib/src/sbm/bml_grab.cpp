@@ -50,9 +50,9 @@ const XMLCh DTYPE_SBM[]  = L"ICT.SBM";
 
 ////// XML ATTRIBUTES
 const XMLCh ATTR_WRIST[] = L"sbm:wrist";
-const XMLCh ATTR_TARGET_POS[] = L"sbm:target-pos";
+//const XMLCh ATTR_TARGET_POS[] = L"sbm:target-pos";
 const XMLCh ATTR_GRAB_VELOCITY[] = L"sbm:grab-velocity";
-const XMLCh ATTR_GRAB_FINISH[] = L"sbm:grab-finish";
+const XMLCh ATTR_GRAB_STATE[] = L"sbm:grab-state";
 const XMLCh ATTR_FADE_OUT[]		= L"sbm:fade-out";
 const XMLCh ATTR_FADE_IN[]		= L"sbm:fade-in";
 //const XMLCh ATTR_APEX_DURATION[] = L"sbm:apex-duration";
@@ -93,10 +93,10 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 	}
 
 	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
-	const SkJoint* target_joint = NULL;
+	const SbmPawn* target_pawn = NULL;
 	if (attrTarget && XMLString::stringLen( attrTarget ))
 	{
-		target_joint = parse_target( tag, attrTarget, mcu );		
+		target_pawn = parse_target_pawn( tag, attrTarget, mcu );		
 	}
 
 	const XMLCh* attrWrist = NULL;
@@ -111,24 +111,24 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 
 	SrVec targetPos = SrVec();
 
-	XMLCh* token;
-	const XMLCh* attrTargetPos = elem->getAttribute( ATTR_TARGET_POS );		
-	if (attrTargetPos && XMLString::stringLen( attrTargetPos ))
-	{
-		wistringstream in;		
-		XMLStringTokenizer tokenizer( attrTargetPos );
-		if (tokenizer.countTokens() == 3)
-		{
-			for (int i=0;i<3;i++)
-			{
-				token = tokenizer.nextToken();
-				in.clear();
-				in.str( token );
-				in.seekg(0);
-				in >> targetPos[i];
-			}
-		}								
-	}
+// 	XMLCh* token;
+// 	const XMLCh* attrTargetPos = elem->getAttribute( ATTR_TARGET_POS );		
+// 	if (attrTargetPos && XMLString::stringLen( attrTargetPos ))
+// 	{
+// 		wistringstream in;		
+// 		XMLStringTokenizer tokenizer( attrTargetPos );
+// 		if (tokenizer.countTokens() == 3)
+// 		{
+// 			for (int i=0;i<3;i++)
+// 			{
+// 				token = tokenizer.nextToken();
+// 				in.clear();
+// 				in.str( token );
+// 				in.seekg(0);
+// 				in >> targetPos[i];
+// 			}
+// 		}								
+// 	}
 
 	if (wristJoint == NULL && !handCt) {  // Invalid target.  Assume parse_target(..) printed error.
 		return BehaviorRequestPtr();  // a.k.a., NULL
@@ -185,40 +185,51 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 		//float characterHeight = chr->getHeight();
 		//handCt->characterHeight = characterHeight;
 
-		handCt->init(chr->getReachHandData(),chr->getGrabHandData());		
+		handCt->init(chr->getReachHandData(),chr->getGrabHandData(),chr->getReleaseHandData());		
 		if (grabVelocity > 0)
 			handCt->grabVelocity = grabVelocity;		
 		bCreateNewController = true;
 	}
 
-	const XMLCh* attrGrabFinish = NULL;
-	attrGrabFinish = elem->getAttribute(ATTR_GRAB_FINISH);
-	if( attrGrabFinish && XMLString::stringLen( attrGrabFinish ) ) 
+	const XMLCh* attrGrabState = NULL;
+	attrGrabState = elem->getAttribute(ATTR_GRAB_STATE);
+	if( attrGrabState && XMLString::stringLen( attrGrabState ) ) 
 	{
-		if( XMLString::compareIString( attrGrabFinish, L"true" )==0 ) 
+		if( XMLString::compareIString( attrGrabState, L"start" )==0 ) 
 		{			
-			LOG("Finish reaching = 'true'");
-			handCt->setGrabState(MeCtHand::GRAB_RETURN);
-		}
-		else if( XMLString::compareIString( attrGrabFinish, L"false" )==0 )
-		{			
-			LOG("Finish reaching = 'false'");
+			//printf("grab state = 'start'");
 			handCt->setGrabState(MeCtHand::GRAB_START);
+		}
+		else if( XMLString::compareIString( attrGrabState, L"reach" )==0 )
+		{			
+			//printf("grab state = 'reach'");
+			handCt->setGrabState(MeCtHand::GRAB_REACH);
+		}
+		else if( XMLString::compareIString( attrGrabState, L"finish" )==0 )
+		{			
+			//printf("grab state = 'finish'");
+			handCt->setGrabState(MeCtHand::GRAB_FINISH);
+		}
+		else if( XMLString::compareIString( attrGrabState, L"return" )==0 )
+		{			
+			//printf("grab state = 'return'");
+			handCt->setGrabState(MeCtHand::GRAB_RETURN);
 		}
 	}	
 
 	if (grabVelocity > 0)
 		handCt->grabVelocity = grabVelocity;
 
-	if( target_joint )	{
-		SrVec grabPos = target_joint->gmat().get_translation();
+	if( target_pawn && target_pawn->colObj_p)	{
+		//SrVec grabPos = target_joint->gmat().get_translation();
+		handCt->setGrabTargetObject(target_pawn->colObj_p);
 		//bodyReachCt->setReachTarget(reachPos);	
-		handCt->setGrabTargetPos(grabPos);
+		//handCt->setGrabTargetPos(grabPos);
 	}
-	else if (attrTargetPos && XMLString::stringLen( attrTargetPos ))
-	{
-		handCt->setGrabTargetPos(targetPos);
-	}
+// 	else if (attrTargetPos && XMLString::stringLen( attrTargetPos ))
+// 	{
+// 		handCt->setGrabTargetPos(targetPos);
+// 	}
 
 	if (fadeInTime >= 0.0)
 		handCt->setFadeIn(fadeInTime);

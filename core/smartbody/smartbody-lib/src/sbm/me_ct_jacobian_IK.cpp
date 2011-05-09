@@ -509,6 +509,12 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 		while(node && node->parent && !bStop) // no root node
 		{
 			int idx = node->nodeIdx;
+			float nodeWeight = 1.f;
+			if (node->nodeName == "r_acromioclavicular" || node->nodeName == "r_forearm") 
+				nodeWeight = 0.f;
+			if (!node->active)
+				nodeWeight = 0.f;
+
 			const SrMat& nodeMat = node->gmat;
 			SrMat parentMat; 
 			if (node->parent)
@@ -520,9 +526,9 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 			for (int k=0;k<3;k++)
 			{				
 				axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2));
-				matJ(offset_idx+rotCount*3+0,idx*3+k) = axis[k][0];	
-				matJ(offset_idx+rotCount*3+1,idx*3+k) = axis[k][1];	
-				matJ(offset_idx+rotCount*3+2,idx*3+k) = axis[k][2];						
+				matJ(offset_idx+rotCount*3+0,idx*3+k) = axis[k][0]*nodeWeight;	
+				matJ(offset_idx+rotCount*3+1,idx*3+k) = axis[k][1]*nodeWeight;	
+				matJ(offset_idx+rotCount*3+2,idx*3+k) = axis[k][2]*nodeWeight;						
 			}		
 			if (node->nodeName == cons->rootName)
 				bStop = true;

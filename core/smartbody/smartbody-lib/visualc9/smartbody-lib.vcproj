@@ -2129,6 +2129,34 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="BlendPlanner"
+					>
+					<File
+						RelativePath="..\src\sr\planner\sk_blend_cfg.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sr\planner\sk_blend_cfg.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sr\planner\sk_blend_cfg_manager.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sr\planner\sk_blend_cfg_manager.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sr\planner\sk_blend_planner.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sr\planner\sk_blend_planner.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter

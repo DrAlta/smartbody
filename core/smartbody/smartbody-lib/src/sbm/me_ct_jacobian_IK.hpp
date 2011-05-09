@@ -40,7 +40,7 @@ typedef std::vector<std::string> VecOfString;
 
 class EffectorConstraint
 {
-public:
+public:	
 	std::string     efffectorName;
 	std::string     rootName; // root of influence for this constraint		
 public:
