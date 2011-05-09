@@ -35,6 +35,7 @@
 #include "mcontrol_util.h"
 #include "me_utilities.hpp"
 #include "sr/sr_model.h"
+#include "sr/sr_euler.h"
 
 
 
@@ -297,6 +298,15 @@ void SbmPawn::get_world_offset( float& x, float& y, float& z,
 	pitch = wo_cache.p;
 	roll = wo_cache.r;
 	return;
+}
+
+void SbmPawn::setWorldOffset( const SrMat& newWorld )
+{	
+	SrQuat quat = SrQuat(newWorld);
+	gwiz::quat_t q = gwiz::quat_t(quat.w,quat.x,quat.y,quat.z);
+	gwiz::euler_t e = gwiz::euler_t(q);	
+	SrVec tran = newWorld.get_translation();
+	set_world_offset(tran[0],tran[1],tran[2],(float)e.h(),(float)e.p(),(float)e.r());	
 }
 
 void SbmPawn::set_world_offset( float x, float y, float z,

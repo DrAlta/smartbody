@@ -108,7 +108,7 @@ void SkScene::init ( SkSkeleton* s )
    sphere->ref();
 
    axis = new SrSnLines; // shared axis
-   axis->shape().push_axis ( SrVec::null, _axislen, 3, "xyz"/*let*/, false/*rule*/ );
+   axis->shape().push_axis ( SrVec::null, _axislen*scaleFactor, 3, "xyz"/*let*/, false/*rule*/ );
    axis->ref();
 
    add ( g );

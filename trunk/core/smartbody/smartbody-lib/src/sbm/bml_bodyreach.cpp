@@ -56,6 +56,7 @@ const XMLCh ATTR_CONS_TARGET[] = L"sbm:cons-target";
 const XMLCh ATTR_TARGET_POS[] = L"sbm:target-pos";
 const XMLCh ATTR_REACH_VELOCITY[] = L"sbm:reach-velocity";
 const XMLCh ATTR_REACH_FINISH[] = L"sbm:reach-finish";
+const XMLCh ATTR_REACH_ACTION[] = L"sbm:action";
 const XMLCh ATTR_FADE_OUT[]		= L"sbm:fade-out";
 const XMLCh ATTR_FADE_IN[]		= L"sbm:fade-in";
 const XMLCh ATTR_OBSTACLE[] = L"sbm:obstacle";
@@ -66,29 +67,6 @@ const XMLCh ATTR_OBSTACLE[] = L"sbm:obstacle";
 using namespace std;
 using namespace BML;
 using namespace xml_utils;
-
-static const SbmPawn* parse_pawn( const XMLCh* tagname, const XMLCh* attrTarget, mcuCBHandle *mcu ) {
-	// TODO: If the first non-whitespace character is 0..9.-+, then assume it is a coordinate
-	XMLStringTokenizer tokenizer( attrTarget );	
-	std::stringstream strstr;
-	// One token is an object id
-	const char * ascii_object_id = xml_utils::asciiString(tokenizer.nextToken());
-	string object_id = ascii_object_id;
-	delete [] ascii_object_id;
-	string bone_id;
-	SbmPawn* target;
-
-	// TODO: Revisit the target syntax.
-	// Currently, we use "object_id:bone_id", but this is probably not sufficient
-	// Target is a pawn, look at world offset
-	target = mcu->pawn_map.lookup( object_id.c_str() );
-	if( target ) 
-	{
-		return target;	   
-	}			
-	return NULL;
-}
-
 
 BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
@@ -126,10 +104,11 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 //     }
 
 	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
-	const SkJoint* target_joint = NULL;
+	const SbmPawn* targetPawn = NULL;
 	if (attrTarget && XMLString::stringLen( attrTarget ))
 	{
-		target_joint = parse_target( tag, attrTarget, mcu );		
+		//target_joint = parse_target( tag, attrTarget, mcu );		
+		targetPawn = parse_target_pawn(tag,attrTarget,mcu);
 	}
 
 	const XMLCh* attrEffector = NULL;
@@ -148,7 +127,7 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	if (attrObstracle && XMLString::stringLen( attrObstracle ))
 	{
 		obstacleName = asciiString(attrObstracle);
-		obstacle_pawn = parse_pawn( tag, attrObstracle, mcu );		
+		obstacle_pawn = parse_target_pawn( tag, attrObstracle, mcu );		
 	}
 
 	const XMLCh* attrConsJoint = NULL;
@@ -264,7 +243,7 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	
 	if (!bodyReachCt)
 	{
-		bodyReachCt = new MeCtExampleBodyReach(request->actor->skeleton_p, effectorJoint);		
+		bodyReachCt = new MeCtExampleBodyReach(request->actor->name,request->actor->skeleton_p, effectorJoint);		
 		bodyReachCt->handle(handle);
 		SbmCharacter* chr = const_cast<SbmCharacter*>(request->actor);
 		float characterHeight = chr->getHeight();
@@ -279,6 +258,24 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		//bodyReachCt->updateMotionExamples(motionData);
 		bCreateNewController = true;
 	}
+
+	const XMLCh* attrReachAction = NULL;
+	attrReachAction = elem->getAttribute(ATTR_REACH_ACTION);
+	if( attrReachAction && XMLString::stringLen( attrReachAction ) ) 
+	{
+		if( XMLString::compareIString( attrReachAction, L"pick-up" )==0 ) 
+		{					
+			bodyReachCt->setGrabState(MeCtExampleBodyReach::PICK_UP_OBJECT);
+		}
+		else if( XMLString::compareIString( attrReachAction, L"touch" )==0 )
+		{				
+			bodyReachCt->setGrabState(MeCtExampleBodyReach::TOUCH_OBJECT);
+		}
+		else if( XMLString::compareIString( attrReachAction, L"put-down" )==0 )
+		{			
+			bodyReachCt->setGrabState(MeCtExampleBodyReach::PUT_DOWN_OBJECT);
+		}
+	}	
 
 	const XMLCh* attrReachFinish = NULL;
 	attrReachFinish = elem->getAttribute(ATTR_REACH_FINISH);
@@ -307,10 +304,8 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	}
 
 
-	if( target_joint )	{
-		SrVec reachPos = target_joint->gmat().get_translation();
-		//bodyReachCt->setReachTarget(reachPos);	
-		bodyReachCt->setReachTargetJoint(const_cast<SkJoint*>(target_joint));
+	if( targetPawn )	{		
+		bodyReachCt->setReachTargetPawn(const_cast<SbmPawn*>(targetPawn));
 	}
 	else if (attrTargetPos && XMLString::stringLen( attrTargetPos ))
 	{

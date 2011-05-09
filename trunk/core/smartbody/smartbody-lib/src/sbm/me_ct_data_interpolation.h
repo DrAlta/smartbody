@@ -57,9 +57,10 @@ public:
 	virtual ~KNNInterpolator();		
 
 	virtual bool buildInterpolator();
-	virtual void predictInterpWeights(const dVector& para, VecOfInterpWeight& blendWeights);	
-protected:
+	virtual void predictInterpWeights(const dVector& para, VecOfInterpWeight& blendWeights);
 	static void generateRandomWeight(int nK, vector<float>& outWeights);
+
+protected:	
 	static void generateDistWeights(vector<float>& dists, vector<float>& outWeights);	
 	bool addResample(InterpolationExample* ex);
 

@@ -149,3 +149,25 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 	}  // end switch( tokenizer.countTokens() )
 }
 
+const SbmPawn* BML::parse_target_pawn( const XMLCh* tagname, const XMLCh* attrTarget, mcuCBHandle *mcu )
+{
+	// TODO: If the first non-whitespace character is 0..9.-+, then assume it is a coordinate
+	XMLStringTokenizer tokenizer( attrTarget );	
+	std::stringstream strstr;
+	// One token is an object id
+	const char * ascii_object_id = xml_utils::asciiString(tokenizer.nextToken());
+	string object_id = ascii_object_id;
+	delete [] ascii_object_id;
+	string bone_id;
+	SbmPawn* target;
+
+	// TODO: Revisit the target syntax.
+	// Currently, we use "object_id:bone_id", but this is probably not sufficient
+	// Target is a pawn, look at world offset
+	target = mcu->pawn_map.lookup( object_id.c_str() );
+	if( target ) 
+	{
+		return target;	   
+	}			
+	return NULL;
+}

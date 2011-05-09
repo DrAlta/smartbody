@@ -7,6 +7,7 @@
 #include "mcontrol_util.h"
 #include "me_ct_example_body_reach.hpp"
 #include "me_ct_barycentric_interpolation.h"
+#include "sbm/Event.h"
 
 using namespace boost;
 
@@ -30,15 +31,17 @@ const char* MeCtExampleBodyReach::CONTROLLER_TYPE = "BodyReach";
 
 #define USE_FOOT_IK 0
 #define AVOID_OBSTACLE 0
+#define AVOID_OBSTACLE_BLEND 0
 
 const std::string lFootName[] = {"l_forefoot", "l_ankle" };
 const std::string rFootName[] = {"r_forefoot", "r_ankle" };
 
-MeCtExampleBodyReach::MeCtExampleBodyReach( SkSkeleton* sk, SkJoint* effectorJoint )
+MeCtExampleBodyReach::MeCtExampleBodyReach(std::string charName, SkSkeleton* sk, SkJoint* effectorJoint )
 {	
 	// here we create a copy of skeleton as an intermediate structure.
 	// this will make it much easier to grab a key-frame from a SkMotion.
 	// we use the "copy" of original skeleton to avoid corrupting the channel data by these internal operations.
+	characterName = charName;
 	skeletonCopy = new SkSkeleton(sk); 
 	skeletonRef  = sk;
 	prev_time = -1.0;
@@ -50,29 +53,34 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( SkSkeleton* sk, SkJoint* effectorJoi
 	reachTime = 0.0;	
 	useIKConstraint = true;
 	useInterpolation = false;
-	useTargetJoint   = true;
+	useTargetPawn   = true;
 
 	
 	interactiveReach = false;
 	startReaching = false;
 	finishReaching = false;
+	sendGrabMsg = false;
 	reachEndEffector = effectorJoint;
 	//skeletonRef->search_joint(endEffectorName);	
 
 	curReachState = REACH_START;
-	reachTargetJoint = NULL;
+	curGrabState  = TOUCH_OBJECT;
+	//reachTargetJoint = NULL;
+	reachTargetPawn = NULL;
+	attachedPawn = NULL;
 	interpMotion = NULL;
 	motionParameter = NULL;
 
 	reachTarget = SrVec();
 	reachVelocity = 50.f;
-	reachCompleteDuration = 1.0f;
+	reachCompleteDuration = 0.6f;
 	curPercentTime = 0.0;
 	prevPercentTime = 0.0;
 
 	simplexIndex = 0;
 	obstacleScale = 7.f;
 	posPlanner = NULL;
+	blendPlanner = NULL;
 }
 
 MeCtExampleBodyReach::~MeCtExampleBodyReach( void )
@@ -84,18 +92,17 @@ MeCtExampleBodyReach::~MeCtExampleBodyReach( void )
 	FREE_DATA(skeletonCopy);	
 }
 
-void MeCtExampleBodyReach::setReachTargetJoint( SkJoint* val )
+void MeCtExampleBodyReach::setReachTargetPawn( SbmPawn* targetPawn )
 {
-	reachTargetJoint = val;	
-	useTargetJoint = true;	
-	startReaching = true;
+	reachTargetPawn = targetPawn;	
+	useTargetPawn = true;	
+	startReaching = true;	
 }
-
 
 void MeCtExampleBodyReach::setReachTargetPos( SrVec& targetPos )
 {
 	reachTargetPos = targetPos;
-	useTargetJoint = false;
+	useTargetPawn = false;
 	startReaching = true;
 }
 
@@ -126,15 +133,21 @@ bool MeCtExampleBodyReach::addHandConstraint( SkJoint* targetJoint, const char* 
 }
 
 
-void MeCtExampleBodyReach::findReachTarget( SrVec& rTarget, SrVec& rError )
+void MeCtExampleBodyReach::findReachTarget( SrVec& rTarget, SrVec& rError, double time )
 {
 	//if (reachTargetJoint)
-	SrVec offset = SrVec(7,8,0);
+	SrVec offset = SrVec(0.07f,0.06f,0.f);
 	{
-		if (reachTargetJoint)
-			reachTargetJoint->update_gmat_up();
+		//if (reachTargetJoint)
+		//	reachTargetJoint->update_gmat_up();
+		if (reachTargetPawn)
+		{
+			SkJoint* root = const_cast<SkJoint*>(reachTargetPawn->get_world_offset_joint());
+			root->update_gmat_up();
+			//reachTargetPawn->get_world_offset_joint();
+		}
 
-		SrVec newReachTarget = (reachTargetJoint && useTargetJoint) ? reachTargetJoint->gmat().get_translation() : reachTargetPos;
+		SrVec newReachTarget = (reachTargetPawn && useTargetPawn) ? reachTargetPawn->get_world_offset_joint()->gmat().get_translation() : reachTargetPos;
 		//newReachTarget += offset*reachEndEffector->gmat().get_rotation();
 		//if ( (newReachTarget - reachTarget).norm() > 0.001 ) // interrupt and reset reach state if the reach target is moved
 		bool changeReachTarget = (newReachTarget - reachTarget).norm() > 0.001 ;
@@ -144,7 +157,9 @@ void MeCtExampleBodyReach::findReachTarget( SrVec& rTarget, SrVec& rError )
 			{
 				curReachState = REACH_START;
 				curReachIKOffset = SrVec();
-				reachTime = 0.f;
+				ikOffset = SrVec();
+				reachTime = 0.f;	
+				sendGrabMsg = false;
 			}				
 			reachTarget = newReachTarget;				
 			startReaching = false;
@@ -163,7 +178,7 @@ void MeCtExampleBodyReach::findReachTarget( SrVec& rTarget, SrVec& rError )
 				interpMotion->getMotionFrame(0.f,skeletonCopy,affectedJoints,initMotionFrame);
 				motionParameter->getMotionFrameParameter(interpMotion,(float)refDuration*0.999f,initPos);
 				for (int i=0;i<3;i++)
-					returnTarget[i] = (float)initPos[i];				
+					returnTarget[i] = (float)initPos[i];						
 			}
 			else
 			{
@@ -182,6 +197,8 @@ void MeCtExampleBodyReach::findReachTarget( SrVec& rTarget, SrVec& rError )
 		for (int i=0;i<3;i++)
 			para[i] = localTarget[i];		
 		currentInterpTarget = reachEndEffector->gmat().get_translation();
+
+		ikRotTarget = SrQuat(0,0,0,0);
 		if (dataInterpolator && interpMotion && useInterpolation)
 		{			
 			dVector acutualReachTarget;
@@ -192,21 +209,45 @@ void MeCtExampleBodyReach::findReachTarget( SrVec& rTarget, SrVec& rError )
 			{
 				// compute the new interpolation weight based on current target
 				dataInterpolator->predictInterpWeights(para,interpMotion->weight);	
-				double refTime = interpMotion->strokeEmphasisTime();							
+				double refTime = interpMotion->strokeEmphasisTime();											
 				motionParameter->getMotionFrameParameter(interpMotion,(float)refTime,acutualReachTarget);	
+				
+				if ( curGrabState == PICK_UP_OBJECT && reachTargetPawn && reachTargetPawn->colObj_p)
+				{
+					BodyMotionFrame interpFrame;
+					interpMotion->getMotionFrame((float)refTime,skeletonCopy,affectedJoints,interpFrame);
+					SkJoint* handJoint = motionParameter->getMotionFrameJoint(interpFrame,reachEndEffector->name().get_string());
+					SkJoint* handParentJoint = motionParameter->getMotionFrameJoint(interpFrame,reachEndEffector->parent()->name().get_string());
+					SkJoint* handChildJoint = motionParameter->getMotionFrameJoint(interpFrame,reachEndEffector->child(0)->name().get_string());
+
+					SrQuat naturalRot = SrQuat(handJoint->gmat());
+					SrQuat parentChild = SrQuat(handParentJoint->gmat());//slerp(SrQuat(handParentJoint->gmat()),SrQuat(handChildJoint->gmat()),0.5f);
+					SrVec newTarget;					
+					reachTargetPawn->colObj_p->estimateHandPosture(parentChild,newTarget,ikRotTarget);
+					ikOffset = newTarget - rTarget;
+					ikRotError = naturalRot.inverse()*ikRotTarget;
+				}
 			}
 			else if (curReachState == REACH_RETURN || curReachState == REACH_IDLE)				
 			{	
 				// when generating the return motion, use the same weight for reaching.
-				double refDuration = interpMotion->motionDuration(BodyMotionInterface::DURATION_REF);			
-				motionParameter->getMotionFrameParameter(interpMotion,(float)refDuration*0.999f,acutualReachTarget);			
+				double refDuration = interpMotion->motionDuration(BodyMotionInterface::DURATION_REF)*0.999;			
+				motionParameter->getMotionFrameParameter(interpMotion,(float)refDuration,acutualReachTarget);	
+				ikOffset = SrVec(0,0,0);
+// 				BodyMotionFrame interpFrame;
+// 				interpMotion->getMotionFrame(refDuration,skeletonCopy,affectedJoints,interpFrame);
+// 				SkJoint* handJoint = motionParameter->getMotionFrameJoint(interpFrame,reachEndEffector->name().get_string());				
+// 				ikRotTarget = SrQuat(handJoint->gmat());
+				//ikRotError = ;
 			}
 			double refDuration = interpMotion->motionDuration(BodyMotionInterface::DURATION_REF);	
 			interpMotion->getMotionFrame((float)refDuration*0.999f,skeletonCopy,affectedJoints,idleMotionFrame);
 			for (int i=0;i<3;i++)
 				currentInterpTarget[i] = (float)acutualReachTarget[i];		
 		}			
-		rError = rTarget - currentInterpTarget;	
+		rError = rTarget + ikOffset - currentInterpTarget;	
+
+		//sr_out << "rError = " << rError << srnl;
 	}		
 }
 
@@ -232,6 +273,20 @@ void MeCtExampleBodyReach::updateIK( SrVec& rTrajectory, BodyMotionFrame& refFra
 	//ikScenario.setTreeNodeQuat(idleMotionFrame.jointQuat,QUAT_REF);	
 
 	ikScenario.ikPosEffectors = &reachPosConstraint;
+
+// 	if (ikRotTarget == SrQuat(0,0,0,0))
+// 	{
+// 		ikScenario.ikRotEffectors = &reachNoRotConstraint;
+// 	}
+// 	else
+	{
+		EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>(reachRotConstraint[reachEndEffector->name().get_string()]);		
+		cons->targetRot = ikRotTrajectory;//ikRotTarget;//motionParameter->getMotionFrameJoint(interpMotionFrame,reachEndEffector->name().get_string())->gmat();//ikRotTarget;	
+		//ikScenario.ikRotEffectors = &reachRotConstraint;
+		ikScenario.ikRotEffectors = &reachNoRotConstraint;
+	}
+
+
 	ik.maxOffset = ikMaxOffset;
 	ik.dampJ = ikDamp;
 	ik.refDampRatio = 0.1;
@@ -258,17 +313,34 @@ void MeCtExampleBodyReach::updateIK( SrVec& rTrajectory, BodyMotionFrame& refFra
 	ikScenario.getTreeNodeQuat(outFrame.jointQuat,QUAT_CUR); 	
 }
 
-bool MeCtExampleBodyReach::updateInterpolation(float dt, BodyMotionFrame& outFrame, float& du)
+bool MeCtExampleBodyReach::updateInterpolation(float time, float dt, BodyMotionFrame& outFrame, float& du)
 {
-	bool interpHasReach = false;	
+	bool interpHasReach = false;		
 	interpMotion->getMotionFrame(reachTime,skeletonCopy,affectedJoints,interpMotionFrame);		
 	{			
 		double strokTime = interpMotion->strokeEmphasisTime();
 		double refDuration = interpMotion->motionDuration(BodyMotionInterface::DURATION_REF);
 
+		// set ik rot target :
 		if (curReachState == REACH_START)
 		{
-			curPercentTime = reachTime/strokTime;				
+			curPercentTime = reachTime/strokTime;	
+			// start morph hand to reach pose
+			
+			if (!attachedPawn && reachTargetPawn && curGrabState == PICK_UP_OBJECT && curPercentTime > 0.8 && !sendGrabMsg)
+			{
+				sendGrabMsg = true;
+				std::string eventType = "reach";		
+				MotionEvent motionEvent;
+				motionEvent.setType(eventType);		
+				std::string cmd;
+				std::string targetName = reachTargetPawn->name;
+				cmd = "bml char " + characterName + " <sbm:grab sbm:handle=\"" + characterName + "_gc\" sbm:wrist=\"r_wrist\" sbm:grab-state=\"start\" target=\"" + targetName  + "\"/>";
+				cout << "reach target cmd = " << cmd << endl;
+				motionEvent.setParameters(cmd);
+				EventManager* manager = EventManager::getEventManager();		
+				manager->handleEvent(&motionEvent,time);	
+			}	
 		}
 		else if (curReachState == REACH_RETURN)
 		{
@@ -286,17 +358,30 @@ bool MeCtExampleBodyReach::updateInterpolation(float dt, BodyMotionFrame& outFra
 		double ratio = 0.0;			
 		if (timeRemain > 0.f)
 			ratio = 1.0/timeRemain;
-		interpPos = getCurrentHandPos(interpMotionFrame);			
+		interpPos = getCurrentHandPos(interpMotionFrame);
+
+		SkJoint* handJoint = motionParameter->getMotionFrameJoint(interpMotionFrame,reachEndEffector->name().get_string());		
+		SrQuat interpRot = SrQuat(handJoint->gmat());
+
+		if (curReachState == REACH_START)
+		{
+			ikRotTrajectory = interpRot*slerp(SrQuat(),ikRotError,(float)curPercentTime);
+		}
+		else if (curReachState == REACH_RETURN)
+		{
+			ikRotTrajectory = interpRot*slerp(ikRotError,SrQuat(),(float)curPercentTime);
+		}
+
 		if ( curReachState == REACH_COMPLETE )
 			// use normal IK to compute the hand movement after touching the object
 		{			
-			float offsetLength = (ikTarget - curReachIKTrajectory).norm();
+			float offsetLength = (getIKTarget() - curReachIKTrajectory).norm();
 			float reachStep = reachVelocity*dt;
 			SrVec offset;
 
 #if AVOID_OBSTACLE
 			static float interpLen = 0.f;
-			bool pathUpdate = updatePlannerPath(curReachIKTrajectory,ikTarget);
+			bool pathUpdate = updatePlannerPath(curReachIKTrajectory,getIKTarget());
 			SkPosPath* path = posPlanner->path();
 			SrVec newPos = curReachIKTrajectory;
 			float pathStep = planStep;
@@ -312,29 +397,68 @@ bool MeCtExampleBodyReach::updateInterpolation(float dt, BodyMotionFrame& outFra
 			}	
 			else if (offsetLength < reachStep)
 			{
-				newPos = ikTarget;
+				newPos = getIKTarget();
 			}
 			offset = newPos - curReachIKTrajectory;
-#else			
-			offset = (ikTarget - curReachIKTrajectory);			
+#endif		
+
+#if AVOID_OBSTACLE_BLEND
+			static float interpLen = 0.f;
+
+			VecOfInterpWeight curweight;
+			float refTime;
+			if (cfgBlendPath->weight.size() == 0)
+			{
+				curweight = interpMotion->weight;
+				refTime = reachTime;
+			}
+			else
+			{
+				curweight = cfgBlendPath->weight;
+				refTime = cfgBlendPath->refTime;
+			}
+
+			bool pathUpdate = updatePlannerBlendPath(curweight,refTime,interpMotion->weight,reachTime);
+			SkBlendPath* path = blendPlanner->path();
+			SrVec newPos = curReachIKTrajectory;
+			float pathStep = planStep;
+			if (pathUpdate)
+				interpLen = 0.f;
+
+			
+			interpLen += reachStep;
+			if (interpLen > path->len())
+				interpLen = path->len();
+
+			//if (path->len() > 0.f)
+			{
+				path->interp(interpLen,cfgBlendPath);	
+				cfgBlendPath->apply();
+				interpStartFrame = cfgBlendPath->blendPose;
+				interpMotionFrame = cfgBlendPath->blendPose;
+			}
+#else		
+			offset = (getIKTarget() - curReachIKTrajectory);			
 			curOffsetDir = offset;					
 			if (offset.norm() > reachStep)
 			{
 				offset.normalize();
 				offset = offset*reachStep;
 			}
-#endif
 			float morphWeight = offsetLength > 0.f ? (offset.norm()+reachVelocity*dt)/(offsetLength+reachVelocity*dt) : 1.f;
 			BodyMotionFrame morphFrame;				
 			MotionExampleSet::blendMotionFrame(interpStartFrame,interpMotionFrame,morphWeight,morphFrame);				
-			curReachIKOffset = (ikTarget - interpPos);
+			curReachIKOffset = (getIKTarget() - interpPos);
 			curReachIKTrajectory = curReachIKTrajectory + offset;//curEffectorPos + offset;
 			interpStartFrame = morphFrame;
-			interpMotionFrame = morphFrame;				
+			interpMotionFrame = morphFrame;	
+#endif
+						
 		}
 		else
 		{
 			curReachIKOffset += (reachError - curReachIKOffset)*(float)ratio*(float)deltaPercent;
+
 			float normOffset = curReachIKOffset.norm();
 			curReachIKTrajectory = interpPos + curReachIKOffset;								
 		}		
@@ -376,19 +500,27 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	// there seems to be better and more compact ways to handle them. For now I just separated the steps into some ugly functions, but later I should 
 	// re-organize these parts ( maybe as a state machine ? ) for better code maintenance in the future.
 
+	if (attachedPawn)
+	{
+		SrMat effectorWorld = motionParameter->getMotionFrameJoint(ikMotionFrame,reachEndEffector->name().get_string())->gmat();
+		SrMat newWorld = pawnAttachMat*effectorWorld;
+		attachedPawn->setWorldOffset(newWorld);	
+		//reachTargetPawn = NULL;
+	}
+
 	updateSkeletonCopy();	
-	findReachTarget(ikTarget,reachError);
+	findReachTarget(ikTarget,reachError,t);
 
 	bool interpHasReach = false;
 	if (interpMotion && useInterpolation)
 	{	
-		interpHasReach = updateInterpolation(dt,interpMotionFrame,du);
+		interpHasReach = updateInterpolation((float)t,dt,interpMotionFrame,du);
 		ikMotionFrame = interpMotionFrame;
 	}	
 	else // we don't have any data, so just infer the hand trajectory directly
 	{
 		 // assuming some constant hand moving speed
-		SrVec reachDir = ikTarget - curEffectorPos;	
+		SrVec reachDir = getIKTarget() - curEffectorPos;	
 		{
 			if (reachDir.norm() > reachVelocity*dt)
 			{
@@ -416,10 +548,21 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	// hand position after solving IK
 	curEffectorPos = getCurrentHandPos(ikMotionFrame);
 
-	bool ikHasReach = (useInterpolation && dataInterpolator) ? false : (curEffectorPos - ikTarget).norm() < ikReachRegion;
+	std::map<std::string, SbmColObject*>::iterator mi;
+	for ( mi  = jointColliderMap.begin();
+		  mi != jointColliderMap.end();
+		  mi++)
+	{
+		SbmColObject* col = mi->second;
+		std::string jointName = mi->first;
+		col->updateTransform(motionParameter->getMotionFrameJoint(ikMotionFrame,jointName.c_str())->gmat());
+	}
+		
+
+	bool ikHasReach = (useInterpolation && dataInterpolator) ? false : (curEffectorPos - getIKTarget()).norm() < ikReachRegion;
 	if ( ikHasReach || interpHasReach || finishReaching )
 	{
-		updateState();		
+		updateState(t);		
 	}	
 
 	prevPercentTime = curPercentTime;	
@@ -453,13 +596,51 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 
 
 
-void MeCtExampleBodyReach::updateState()
+void MeCtExampleBodyReach::updateState(double time)
 {	
 	bool reachIsFinish = interactiveReach ? reachCompleteTime >= reachCompleteDuration : finishReaching;
 	if (curReachState == REACH_START)
 	{
 		// after touch the object, stay there for a pre-defined duration
 		// the hand can still move around during this period
+		if (!attachedPawn && reachTargetPawn && curGrabState == PICK_UP_OBJECT)
+		{
+			std::string eventType = "reach";		
+			MotionEvent motionEvent;
+			motionEvent.setType(eventType);		
+			std::string cmd;
+			std::string targetName = reachTargetPawn->name;
+			cmd = "bml char " + characterName + " <sbm:grab sbm:handle=\"" + characterName + "_gc\" sbm:wrist=\"r_wrist\" sbm:grab-state=\"reach\" target=\"" + targetName  + "\"/>";
+			cout << "reach target cmd = " << cmd << endl;
+			motionEvent.setParameters(cmd);
+			EventManager* manager = EventManager::getEventManager();		
+			manager->handleEvent(&motionEvent,time);	
+
+			// object attachedment
+			attachedPawn = reachTargetPawn;
+			SrMat pawnWorld = attachedPawn->get_world_offset_joint()->gmat();
+			SrMat effectorWorld = motionParameter->getMotionFrameJoint(ikMotionFrame,reachEndEffector->name().get_string())->gmat();
+			pawnAttachMat = pawnWorld*effectorWorld.inverse();
+			reachTargetPawn = NULL;
+			reachTargetPos = ikTarget;//effectorWorld.get_translation();	
+		}	
+		else if (attachedPawn && curGrabState == PUT_DOWN_OBJECT)
+		{
+			std::string eventType = "reach";		
+			MotionEvent motionEvent;
+			motionEvent.setType(eventType);		
+			std::string cmd;
+			cmd = "bml char " + characterName + " <sbm:grab sbm:handle=\"" + characterName + "_gc\" sbm:grab-state=\"finish\"/>";
+			cout << "reach finish cmd = " << cmd << endl;
+			//printf("reach finish cmd = %s\n",cmd);
+			motionEvent.setParameters(cmd);
+			EventManager* manager = EventManager::getEventManager();		
+			manager->handleEvent(&motionEvent,time);
+
+			attachedPawn = NULL;
+			pawnAttachMat = SrMat();
+		}
+
 		curReachState = REACH_COMPLETE;
 		interpStartFrame = interpMotionFrame;
 		reachCompleteTime = 0.0;
@@ -468,10 +649,27 @@ void MeCtExampleBodyReach::updateState()
 		finishReaching = false;
 	}
 	else if (curReachState == REACH_COMPLETE && reachIsFinish)//reachCompleteTime >= reachCompleteDuration)
-	{			
+	{		
 		curReachState = REACH_RETURN;	
 		curPercentTime = 0.0;			
 		finishReaching = false;
+
+		if (curGrabState == PUT_DOWN_OBJECT)
+		{
+			std::string eventType = "reach";		
+			MotionEvent motionEvent;
+			motionEvent.setType(eventType);		
+			std::string cmd;
+			cmd = "bml char " + characterName + " <sbm:grab sbm:handle=\"" + characterName + "_gc\" sbm:grab-state=\"return\"/>";
+			cout << "reach finish cmd = " << cmd << endl;
+			//printf("reach finish cmd = %s\n",cmd);
+			motionEvent.setParameters(cmd);
+			EventManager* manager = EventManager::getEventManager();		
+			manager->handleEvent(&motionEvent,time);
+
+			attachedPawn = NULL;
+			pawnAttachMat = SrMat();
+		}
 	}
 	else if (curReachState == REACH_RETURN)
 	{
@@ -546,14 +744,13 @@ void MeCtExampleBodyReach::init()
 
 	// if there is a child
 	
-// 	if (reachEndEffector->child(0))
-// 	{
-// 		EffectorJointConstraint* rotCons = new EffectorJointConstraint();
-// 		rotCons->targetJoint = reachEndEffector->parent();
-// 		rotCons->efffectorName = reachEndEffector->child(0)->name().get_string();
-// 		rotCons->rootName = "r_wrist";//"r_shoulder";//rootJoint->name().get_string();		
-// 		reachRotConstraint[cons->efffectorName] = rotCons;
-// 	}	
+	if (reachEndEffector->child(0))
+	{
+		EffectorConstantConstraint* rotCons = new EffectorConstantConstraint();				
+		rotCons->efffectorName = reachEndEffector->name().get_string();//->child(0)->name().get_string();
+		rotCons->rootName = "r_sternoclavicular";//"r_shoulder";//rootJoint->name().get_string();		
+		reachRotConstraint[cons->efffectorName] = rotCons;
+	}	
 	// setup foot constraint
 #if USE_FOOT_IK
 	for (int i=0;i<2;i++)
@@ -610,6 +807,13 @@ void MeCtExampleBodyReach::init()
 	planNumTries = 1;
 	planError = ikReachRegion;
 	obstacleScale = characterHeight/30.f*1.2;
+#endif
+
+#if AVOID_OBSTACLE_BLEND
+	blendPlanner = new SkBlendPlanner();
+	planStep = reachVelocity*0.3f;
+	planNumTries = 1;
+	planError = ikReachRegion;
 #endif
 
 	MeController::init();	
@@ -694,6 +898,7 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 	if (interpMotion)
 		delete interpMotion;
 	interpMotion = createInterpMotion();
+	blendPlannerMotion = createInterpMotion();
 
 	// initialize the interpolation weights
 	dVector para; para.resize(3);
@@ -709,6 +914,33 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 	cfgStart = posPlanner->cman()->alloc();
 	cfgEnd   = posPlanner->cman()->alloc();
 	cfgPath  = posPlanner->cman()->alloc();
+#endif
+
+#if AVOID_OBSTACLE_BLEND
+	printf("init blend planner\n");
+	blendPlanner->init(motionParameter,blendPlannerMotion,refMotion->duration());
+	cfgBlendStart = blendPlanner->cman()->alloc();
+	cfgBlendEnd   = blendPlanner->cman()->alloc();
+	cfgBlendPath  = blendPlanner->cman()->alloc();
+
+	// hard coded joint collider
+	const std::string elbowName = "r_elbow";
+	SkJoint* elbow = skeletonCopy->search_joint(elbowName.c_str());
+	SbmColCapsule* cap = new SbmColCapsule(SrVec(0,0,0),elbow->child(0)->offset()+elbow->child(0)->child(0)->offset(),0.02f);
+	jointColliderMap[elbowName] = cap;
+	CollisionJoint colJoint;
+	colJoint.joint = elbow;
+	colJoint.colGeo = cap;
+	blendPlanner->cman()->colJoints.push_back(colJoint);
+
+	const std::string fingerName = "r_middle1";
+	SkJoint* middle = skeletonCopy->search_joint(fingerName.c_str());
+	SbmColSphere* sph = new SbmColSphere(0.06f);
+	jointColliderMap[fingerName] = sph;
+	CollisionJoint colJointFinger;
+	colJointFinger.joint = middle;
+	colJointFinger.colGeo = sph;
+	blendPlanner->cman()->colJoints.push_back(colJointFinger);
 #endif
 
 // 	if (curReachState != REACH_IDLE)
@@ -730,7 +962,116 @@ void MeCtExampleBodyReach::addObstacle(const char* name,  SbmColObject* objCol )
 		colList.push_back(objCol);
 	}	
 #endif
+
+#if AVOID_OBSTACLE_BLEND
+	std::string obsName = name;		
+	if (obstacleMap.find(obsName) == obstacleMap.end())
+	{		
+		obstacleMap[obsName] = objCol;
+
+		VecOfSbmColObj& colList = blendPlanner->cman()->ColObstacles();
+		colList.push_back(objCol);
+	}
+	//printf("size of planner obstacle list = %d\n",blendPlanner->cman()->ColObstacles().size());
+#endif
 	//printf("size of obstacle map = %d\n",obstacleMap.size());
+}
+
+
+bool MeCtExampleBodyReach::updatePlannerBlendPath( VecOfInterpWeight& curWeight, float curRefTime, VecOfInterpWeight& targetWeight, float targetRefTime )
+{
+	static VecOfInterpWeight prevTarget;
+	static float prevTargetTime;
+
+	// update bounding box for sampling
+	std::map<std::string, SbmColObject*>::iterator mi;
+	bool obstacleChange = false;
+	for ( mi  = obstacleMap.begin();
+		mi != obstacleMap.end();
+		mi++)
+	{
+		SbmColObject* colObj = mi->second;
+		if (colObj->isUpdate)
+		{	
+			colObj->isUpdate = false;
+			obstacleChange = true;
+		}				
+	}
+
+	//printf("updatePlannerPath::planner obstalce size = %d\n",blendPlanner->cman()->colObstacles.size());
+// 	printf("curW = ");
+// 	for (int i=0;i<curWeight.size();i++)
+// 		printf("%f ",curWeight[i].second);
+// 	printf("\n");
+// 
+// 	printf("targetW = ");
+// 	for (int i=0;i<targetWeight.size();i++)
+// 		printf("%f ",targetWeight[i].second);
+// 	printf("\n");
+
+	static float realTime = 0.03f;
+	bool pathUpdate = false;
+	bool replan = (prevTarget != targetWeight || prevTargetTime != targetRefTime || obstacleChange );
+	if (replan || !blendPlanner->solved())
+	{
+		if (replan)
+		{
+			cfgBlendStart->weight = curWeight;
+			cfgBlendEnd->weight = targetWeight;
+
+			cfgBlendStart->refTime = curRefTime;
+			cfgBlendEnd->refTime = targetRefTime;
+
+			cfgBlendStart->updateReachPt();
+			cfgBlendEnd->updateReachPt();
+
+			prevTarget = targetWeight;
+			prevTargetTime = targetRefTime;
+			blendPlanner->start(cfgBlendStart,cfgBlendEnd);
+		}
+		
+		SrTimer timer;
+		timer.start();		
+		int nSteps = 0;
+		while ( !blendPlanner->solved() )
+		{
+			blendPlanner->update ( planStep, planNumTries, planError );
+			nSteps++;
+			if ( timer.t() > realTime*0.8 )
+				break; 
+		}
+		//printf("nSteps = %d\n",nSteps);	
+		if (blendPlanner->solved())
+		{
+			//printf("Path solved\n");
+			//printf("Path size = %d\n",blendPlanner->path()->size());
+			blendPlanner->path()->smooth_ends ( planError );
+			blendPlanner->path()->smooth_init ( planError );
+			SrTimer timer2;
+			timer2.start();
+			while ( timer2.t() < realTime*0.3 )
+				//for (int i=0;i<50;i++)
+				blendPlanner->path()->smooth_step();		
+		}
+
+		if (blendPlanner->solved())
+			pathUpdate = true;
+	}	
+
+// 	if (blendPlanner->solved())
+// 	{
+// 		//printf("Path solved\n");
+// 		//printf("Path size = %d\n",blendPlanner->path()->size());		
+// 		SrTimer timer2;
+// 		timer2.start();
+// 		while ( timer2.t() < realTime )
+// 			//for (int i=0;i<50;i++)
+// 			blendPlanner->path()->smooth_step();		
+// 	}
+
+	
+
+	return pathUpdate;	
 }
 
 bool MeCtExampleBodyReach::updatePlannerPath( SrVec& curPos, SrVec& targetPos )
@@ -888,4 +1229,9 @@ void MeCtExampleBodyReach::controller_start()
 void MeCtExampleBodyReach::controller_map_updated()
 {
 
+}
+
+SrVec MeCtExampleBodyReach::getIKTarget()
+{
+	return ikTarget+ikOffset;
 }

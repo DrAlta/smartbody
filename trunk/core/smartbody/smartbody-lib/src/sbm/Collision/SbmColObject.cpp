@@ -64,22 +64,30 @@ SbmColSphere::~SbmColSphere()
 
 }
 
-bool SbmColSphere::isIntersect( const SrVec& gPos1, const SrVec& gPos2 )
+bool SbmColSphere::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offset)
 {
 	SrVec p1 = worldState.globalToLocal(gPos1);
 	SrVec p2 = worldState.globalToLocal(gPos2);
 
-	if ( (p1).norm() < radius || (p2).norm() < radius)
+	if ( (p1).norm() < radius || (p2).norm() < radius + offset )
 		return true;
 
 	SrVec p2p1 = p2-p1;
 	SrVec p3p1 = -p1;
 	float u = dot(p2p1,p3p1)/dot(p2p1,p2p1);
-	if (u > 0.f && u < 1.f && (p1+p2p1*u).norm() < radius)
+	if (u > 0.f && u < 1.f && (p1+p2p1*u).norm() < radius + offset)
 		return true;
 
 	return false;
 }
+
+bool SbmColSphere::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot )
+{
+	outHandPos = getCenter() + SrVec(0,radius*1.5f,0)*naturalRot;
+	outHandRot = naturalRot;
+	return true;
+}
+
 /************************************************************************/
 /* Box collider                                                         */
 /************************************************************************/
@@ -106,13 +114,13 @@ bool SbmColBox::isInside( const SrVec& gPos, float offset )
 	return false;
 }
 
-bool SbmColBox::isIntersect( const SrVec& gPos1, const SrVec& gPos2 )
+bool SbmColBox::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offset)
 {
 	SrVec p1 = worldState.globalToLocal(gPos1);
 	SrVec p2 = worldState.globalToLocal(gPos2);
 
 	SrVec d = (p2 - p1)*0.5f;    
-	SrVec e = extent;    
+	SrVec e = extent + SrVec(offset,offset,offset);    
 	SrVec c = p1 + d ;    
 	SrVec ad = d; 	ad.abs();
 	// Returns same vector with all components positive    
@@ -124,6 +132,38 @@ bool SbmColBox::isIntersect( const SrVec& gPos1, const SrVec& gPos2 )
 	if (fabsf(d[0] * c[1] - d[1] * c[0]) > e[0] * ad[1] + e[1] * ad[0] + gwiz::epsilon10())        return false;                
 	return true;
 }
+
+bool SbmColBox::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot )
+{
+	
+	SrVec yAxis = SrVec(0,1,0);
+	yAxis = yAxis*naturalRot;
+	SrVec ly = yAxis*worldState.rot.inverse();//worldState.globalToLocal(yAxis);
+	SrVec axis[6] = {SrVec(1,0,0), SrVec(0,1,0), SrVec(0,0,1),SrVec(-1,0,0), SrVec(0,-1,0), SrVec(0,0,-1) };
+	SrVec graspAxis;
+	float minAngle = 100.f;	
+	float objSize = -1;
+	for (int i=0;i<6;i++)
+	{
+		float rotAngle = acosf(dot(ly,axis[i]));
+		if (rotAngle < minAngle)
+		{
+			minAngle = rotAngle;
+			graspAxis = axis[i];
+			objSize = extent[i%3];//dot(graspAxis,extent);
+		}		
+	}
+	//sr_out << "minAngle = " << minAngle << "  , grasp axis = " << graspAxis << srnl;
+	graspAxis = graspAxis*worldState.rot;
+	SrVec rotAxis = cross(yAxis,graspAxis); rotAxis.normalize();
+	SrQuat alignRot = SrQuat(rotAxis,minAngle);
+	
+	outHandRot = alignRot*naturalRot;
+	outHandPos = getCenter() + SrVec(0,objSize*1.8f,0)*outHandRot;
+	
+	return true;
+}
+
 /************************************************************************/
 /* Capsule collider                                                     */
 /************************************************************************/
@@ -151,12 +191,80 @@ static float findPointDistOnLineSegment(const SrVec& Point, SrVec e[2], SrVec& c
 	return fPointDist;
 }
 
+static float findLineSegmentDistOnLineSegment(SrVec e1[2], SrVec e2[2], SrVec& closePt)
+{		
+	SrVec u = e1[1]-e1[0];
+	SrVec v = e2[1]-e2[0];
+	SrVec w0 = e1[0]-e2[0];
+	float a = dot(u,u);
+	float b = dot(u,v);
+	float c = dot(v,v);
+	float d = dot(u,w0);
+	float e = dot(v,w0);
+
+	float sd,td;
+
+	sd = td = (a*c-b*b);	
+	float sc = (b*e - c*d);
+	float tc = (a*e - b*d);
+
+	if (sc < 0.0) {       // sc < 0 => the s=0 edge is visible
+        sc = 0.0;
+        tc = e;
+        td = c;
+    }
+    else if (sc > sd) {  // sc > 1 => the s=1 edge is visible
+            sc = sd;
+            tc = e + b;
+            td = c;
+    }
+    
+
+    if (tc < 0.0) {           // tc < 0 => the t=0 edge is visible
+        tc = 0.0;
+        // recompute sc for this edge
+        if (-d < 0.0)
+            sc = 0.0;
+        else if (-d > a)
+            sc = sd;
+        else {
+            sc = -d;
+            sd = a;
+        }
+    }
+    else if (tc > td) {      // tc > 1 => the t=1 edge is visible
+        tc = td;
+        // recompute sc for this edge
+        if ((-d + b) < 0.0)
+            sc = 0;
+        else if ((-d + b) > a)
+            sc = sd;
+        else {
+            sc = (-d + b);
+            sd = a;
+        }
+    }
+
+	float so = sc/sd;
+	float to = tc/td;
+	float dline = (w0 + u*so - v*to).norm();	
+	return dline;
+}
+
 SbmColCapsule::SbmColCapsule( float len, float r )
 {
 	extent = len*0.5f;
 	radius = r;
 	endPts[0] = SrVec(0,-extent,0);
 	endPts[1]   = SrVec(0,extent,0);
+}
+
+SbmColCapsule::SbmColCapsule( const SrVec& p1, const SrVec& p2, float r )
+{
+	extent = (p2-p1).norm()*0.5f;
+	endPts[0] = p1;
+	endPts[1] = p2;
+	radius = r;
 }
 
 SbmColCapsule::~SbmColCapsule()
@@ -168,42 +276,72 @@ bool SbmColCapsule::isInside( const SrVec& gPos, float offset)
 {
 	SrVec lpos = worldState.globalToLocal(gPos);
 	SrVec cPts;
-	float dist = findPointDistOnLineSegment(lpos,endPts,cPts);
+	float dist = findPointDistOnLineSegment(lpos,endPts,cPts);	
 	if (dist < radius + offset )
+	{		
 		return true;
+	}
 	return false;
 }
 
-bool SbmColCapsule::isIntersect( const SrVec& gPos1, const SrVec& gPos2 )
+bool SbmColCapsule::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offset)
 {
-	SrVec p1 = worldState.globalToLocal(gPos1);
-	SrVec p2 = worldState.globalToLocal(gPos2);
+	SrVec lpos[2];
 	SrVec cpt;
-	float dp1 = findPointDistOnLineSegment(p1,endPts,cpt);	
-	float dp2 = findPointDistOnLineSegment(p2,endPts,cpt);	
+	lpos[0] = worldState.globalToLocal(gPos1);
+	lpos[1] = worldState.globalToLocal(gPos2);
 	
-	SrVec u = p2-p1;
-	SrVec v = endPts[1] - endPts[0];
-	SrVec w0 = p1 - endPts[0];
-	float a = dot(u,u);
-	float b = dot(u,v);
-	float c = dot(v,v);
-	float d = dot(v,w0);
-	float e = dot(u,w0);
-	
-	float det = (a*c-b*b);
-	if (det == 0) 
+	float dist = findLineSegmentDistOnLineSegment(lpos,endPts,cpt);
+
+	//printf("test capsule intersection\n");
+	//printf("dist=%f\n",dist);
+	if (dist < offset + radius)
 	{
-		if (dp1 < radius || dp2 < radius)
-			return true;
-		else
-			return false;	
+		//printf("intersect dist=%f\n",dist);
+		return true;
 	}
-
-	float sc = (b*e - c*d)/det;
-	float tc = (a*e - b*d)/det;
-	float dline = (w0 + u*sc - v*tc).norm();
-
-
 	return false;
+}
+
+bool SbmColCapsule::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot )
+{
+	SrVec capAxis = (endPts[1]-endPts[0]); capAxis.normalize();
+	capAxis = capAxis*worldState.rot;
+	SrVec handAxis = SrVec(0,1,0)*naturalRot; handAxis.normalize();
+	SrVec handXAxis = SrVec(-1,0,0)*naturalRot;	
+	SrVec orienAxis = cross(handXAxis,capAxis); orienAxis.normalize();	
+
+	SrVec crossHand = cross(handAxis,orienAxis); crossHand.normalize();
+	if (dot(crossHand,handXAxis) < 0.0 && dot(handAxis,orienAxis) < 0.7)
+		orienAxis = -orienAxis;
+
+	SrQuat rot = SrQuat(handAxis,orienAxis);
+	outHandRot = rot*naturalRot;//naturalRot*rot;
+	outHandPos = getCenter() + SrVec(0,radius*1.5f,0)*outHandRot;
+	return true;
+}
+
+bool SbmCollisionUtil::checkCollision( SbmColObject* obj1, SbmColObject* obj2 )
+{
+	if (dynamic_cast<SbmColSphere*>(obj1))
+	{
+		SbmColSphere* sph = dynamic_cast<SbmColSphere*>(obj1);
+		return obj2->isInside(obj1->worldState.tran,sph->radius);
+	}
+	else if (dynamic_cast<SbmColCapsule*>(obj1))
+	{
+		SbmColCapsule* cap = dynamic_cast<SbmColCapsule*>(obj1);
+		SrVec g1,g2;
+		g1 = cap->endPts[0]*cap->worldState.gmat();
+		g2 = cap->endPts[1]*cap->worldState.gmat();
+		return obj2->isIntersect(g1,g2,cap->radius);		
+	}
+	else if (dynamic_cast<SbmColBox*>(obj1))
+	{
+		return false;
+	}
+	else
+	{
+		return false;
+	}
 }

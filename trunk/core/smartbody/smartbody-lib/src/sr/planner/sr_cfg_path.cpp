@@ -197,7 +197,7 @@ void SrCfgPathBase::interp ( float t, srcfg* c )
 
    if ( i==_buffer.size() ) // may happen because of imprecisions
     { i--; t=1; }
-   else
+   else if (t>0.f && dt>0.f)
     { t -= d; t /= dt; if ( t>1 ) t=1; }
 
    _interp_start = i-1;

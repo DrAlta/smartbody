@@ -113,6 +113,8 @@ public:
 
 	void get_world_offset( float& x, float& y, float& z,
 		                   float& yaw, float& pitch, float& roll );
+
+	void setWorldOffset(const SrMat& newWorld);
 	void set_world_offset( float x, float y, float z,
 		                   float yaw, float pitch, float roll );
 
