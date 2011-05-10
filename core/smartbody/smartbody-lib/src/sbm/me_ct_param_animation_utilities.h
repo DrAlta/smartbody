@@ -34,7 +34,7 @@
 #define MultiBlending 1
 #define LoopHandle 0
 const int rotType = 132;
-const double defaultTransition = 0.1;
+const double defaultTransition = 0.5;
 
 struct JointChannelId 
 {
