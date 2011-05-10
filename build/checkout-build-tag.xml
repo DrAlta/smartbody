@@ -339,14 +339,14 @@ ${build.svn.revisions}
         <concat destfile="${build.log.file}" force="yes" append="yes">
 ------------------
 
-${build.svn.checkout.output}
+${build.svn.output}
 
         </concat>
 
         <concat destfile="${build.log.file}" force="yes" append="yes">
 ------------------
 
-${build.svn.output}
+${build.svn.export.output}
 
         </concat>
 
