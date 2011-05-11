@@ -26,7 +26,7 @@
 #include <sr/sr_euler.h>
 
 
-const double timeThreshold = 0.05;
+const double timeThreshold = 0.01;
 PATimeManager::PATimeManager()
 {
 }
@@ -67,6 +67,7 @@ int PATimeManager::getNumMotions()
 void PATimeManager::updateLocalTimes(double time)
 {
 	localTime = time;
+	prevLocalTime = localTime;
 	getParallelTimes(localTime, localTimes);
 	setMotionTimes();
 }
@@ -77,6 +78,7 @@ bool PATimeManager::step(double timeStep)
 	bool notReachDuration = true;
 	std::vector<double> prevMotionTimes = motionTimes;
 
+	prevLocalTime = localTime;
 	double newLocalTime = localTime + timeStep;
 	while (newLocalTime > key[key.size() - 1])
 	{
@@ -130,6 +132,7 @@ void PATimeManager::setLocalTime()
 	localTime = 0.0;
 	for (int i = 0; i < getNumWeights(); i++)
 		localTime += weights[i] * localTimes[i];
+	prevLocalTime = localTime;
 }
 
 void PATimeManager::setMotionTimes()
@@ -721,14 +724,16 @@ void PATransitionManager::align(PAStateModule* current, PAStateModule* next)
 	int numEaseOut = getNumEaseOut();
 	for (int i = 0; i < numEaseOut; i++)
 	{
-		if (fabs(current->timeManager->localTime - easeOutStarts[i]) < timeThreshold)
+		if (current->timeManager->prevLocalTime <= easeOutStarts[i] && current->timeManager->localTime >= easeOutStarts[i]) 
+	//		(fabs(current->timeManager->localTime - easeOutStarts[i]) < timeThreshold)
 		{
 			s1 = easeOutStarts[i];
 			e1 = easeOutEnds[i];
 		}
 	}
-
-	if (fabs(current->timeManager->localTime - s1) < timeThreshold)
+	
+	if (current->timeManager->prevLocalTime <= s1 && current->timeManager->localTime >= s1)
+//	if (fabs(current->timeManager->localTime - s1) < timeThreshold)
 	{
 		next->active = true;
 		blendingMode = true;
