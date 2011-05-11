@@ -45,6 +45,7 @@ PAStateData::PAStateData(std::string name)
 
 PAStateData::~PAStateData()
 {
+	delete paramManager;
 }
 
 int PAStateData::getNumMotions()
@@ -510,6 +511,7 @@ MotionParameters::MotionParameters(SkMotion* m, SkSkeleton* skel, std::string j)
 {
 	motion = m;
 	skeleton = new SkSkeleton(skel);
+	skeleton->ref();
 	motion->connect(skeleton);
 	if (j == "")
 	{
@@ -525,6 +527,8 @@ MotionParameters::MotionParameters(SkMotion* m, SkSkeleton* skel, std::string j)
 MotionParameters::~MotionParameters()
 {
 	motion->disconnect();
+	if (skeleton)
+		skeleton->unref();
 }
 
 

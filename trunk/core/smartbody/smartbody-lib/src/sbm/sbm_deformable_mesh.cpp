@@ -9,11 +9,12 @@ DeformableMesh::DeformableMesh()
 {
 	binding = false;
 	skeleton = new SkSkeleton();
+	skeleton->ref();
 }
 
 DeformableMesh::~DeformableMesh() 
 {
-	delete skeleton;
+	skeleton->unref();
 }
 
 

@@ -329,6 +329,25 @@ void mcuCBHandle::clear( void )	{
 		SkSkeleton* skeleton = (*skelIter).second;
 		delete skeleton;
 	}
+
+	// remove the parameterized animation states
+	for (std::vector<PAStateData*>::iterator iter = param_anim_states.begin();
+	     iter != param_anim_states.end();
+	     iter++)
+	{
+		delete (*iter);
+	}
+	param_anim_states.clear();
+
+	// remove the transition maps
+	for (std::vector<PATransitionData*>::iterator iter = param_anim_transitions.begin();
+	     iter != param_anim_transitions.end();
+	     iter++)
+	{
+		delete (*iter);
+	}
+	param_anim_transitions.clear();
+
 	
 	
 	MeCtPose* pose_ctrl_p;
