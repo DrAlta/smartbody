@@ -148,7 +148,10 @@ std::string MeCtParamAnimation::getBaseJointName()
 void MeCtParamAnimation::schedule(PAStateData* stateData, bool l, bool pn)
 {
 	ScheduleUnit unit;
-	unit.data = stateData;
+	if (stateData)
+		unit.data = new PAStateData(stateData);
+	else
+		unit.data = NULL;
 	unit.loop = l;
 	unit.playNow = pn;
 	unit.time = mcuCBHandle::singleton().time;

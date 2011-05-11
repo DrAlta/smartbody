@@ -23,6 +23,19 @@
 #include "me_ct_param_animation_data.h"
 #include <sr/sr_euler.h>
 
+
+PAStateData::PAStateData(PAStateData* data)
+{
+	stateName = data->stateName;
+	motions = data->motions;
+	keys = data->keys;
+	weights = data->weights;
+	fromStates = data->fromStates;
+	toStates = data->toStates;
+	cycle = data->cycle;
+	paramManager = new ParameterManager(data->paramManager);
+}
+
 PAStateData::PAStateData(std::string name)
 {
 	stateName = name;
@@ -61,6 +74,17 @@ int PAStateData::getMotionId(std::string motion)
 int PATransitionData::getNumEaseOut()
 {
 	return easeOutStart.size();
+}
+
+
+ParameterManager::ParameterManager(ParameterManager* pm)
+{
+	state = pm->getState();
+	type = pm->getType();
+	motionNames = pm->getMotionNames();
+	parameters = pm->getParameters();
+	triangles = pm->getTriangles();
+	previousParam = pm->getPreviousParam();
 }
 
 ParameterManager::ParameterManager(PAStateData* s)
