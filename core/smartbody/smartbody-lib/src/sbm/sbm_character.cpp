@@ -801,14 +801,18 @@ void prune_schedule( SbmCharacter*   actor,
 					double t = blend_curve.get_tail_param();
 					double v = blend_curve.get_tail_value();
 
+
 					if( LOG_CONTROLLER_TREE_PRUNING )
 						LOG("\tblend_Ct \"%s\": blend curve last knot: t = %f v = %f", blend_ct->name(), t, v );
-					if( t <= time ) {
+					if( t <= time )
+					{
 						flat_blend_curve = true;
 						if( v == 0.0 ) {
 							in_use = false;
 						}
-					} else {
+					} 
+					else 
+					{
 //						LOG( "sbm_character.cpp prune_schedule(): ERR: this pruning path not implemented" );
 						
 						v = blend_curve.evaluate( time );
@@ -1006,8 +1010,33 @@ void prune_schedule( SbmCharacter*   actor,
 					}
 				}
 				else if( anim_ct_type == MeCtMotion::type_name || anim_ct_type == MeCtQuickDraw::type_name ) {
-					if( motion_ct || pose_ct ) {
-						in_use = false;
+					if( motion_ct || pose_ct )
+					{
+						// if a motion is already present, other animations should be pruned
+						// however, if the other tracks consist of animations that are not yet scheduled to be played,
+						// then don't prune them
+						//
+						// Check to see if the motion is scheduled for the future
+						srLinearCurve& blend_curve = blend_ct->get_curve();
+						int n = blend_curve.get_num_keys();
+						if( n > 0 )
+						{
+							double timeBegin = blend_curve.get_head_param();
+							double valueBegin = blend_curve.get_head_value();
+							// motions that haven't been started yet shouldn't be pruned
+							if (timeBegin > time && valueBegin == 0.0)
+							{ 
+								in_use = true;
+							}
+							else
+							{
+								motion_ct = anim_source;
+							}
+						}
+						else
+						{
+							motion_ct = anim_source;
+						}
 					} else {
 						motion_ct = anim_source;
 					}

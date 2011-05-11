@@ -843,9 +843,9 @@ void PATransitionManager::bufferBlending(SrBuffer<float>& buffer, SrBuffer<float
 		}
 		if (channels[i].type == SkChannel::Quat)
 		{
-			float* v1 = new float[4];
-			float* v2 = new float[4];
-			float* v = new float[4];
+			float v1[4];
+			float v2[4];
+			float v[4];
 			for (int j = 0; j < 4; j++)
 			{
 				v1[j] = buffer1[_context->toBufferIndex(i) + j];
