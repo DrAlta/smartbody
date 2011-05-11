@@ -42,6 +42,7 @@ class PAStateData
 		ParameterManager* paramManager;
 
 	public:
+		PAStateData(PAStateData* data);
 		PAStateData(std::string name);
 		~PAStateData();
 		int getNumMotions();
@@ -76,6 +77,7 @@ struct TriangleInfo
 class ParameterManager
 {
 	public:
+		ParameterManager(ParameterManager* pm);
 		ParameterManager(PAStateData* s);
 		~ParameterManager();
 
@@ -105,6 +107,13 @@ class ParameterManager
 		SrTriangle& getTriangle(int id);
 
 		float getMinimumDist(SrVec& pt, SrVec& a, SrVec& b, SrVec& minimumPt);
+
+		// access data
+		PAStateData* getState() {return state;}
+		std::vector<std::string>& getMotionNames() {return motionNames;}
+		std::vector<SrVec>& getParameters() {return parameters;}
+		std::vector<TriangleInfo>& getTriangles() {return triangles;}
+		SrVec&	getPreviousParam() {return previousParam;}
 
 	private:
 		bool insideTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3);

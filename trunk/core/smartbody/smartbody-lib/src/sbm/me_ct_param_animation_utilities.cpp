@@ -629,6 +629,9 @@ PAStateModule::PAStateModule(PAStateData* stateData, bool l, bool pn)
 
 PAStateModule::~PAStateModule()
 {
+	
+	if (data)
+		delete data;
 	data = NULL;
 	if (timeManager)
 		delete timeManager;
