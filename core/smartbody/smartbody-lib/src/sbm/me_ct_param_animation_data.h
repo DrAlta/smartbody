@@ -74,6 +74,18 @@ struct TriangleInfo
 	std::string motion3;
 };
 
+struct TetrahedronInfo
+{
+	SrVec v1;
+	SrVec v2;
+	SrVec v3;
+	SrVec v4;
+	std::string motion1;
+	std::string motion2;
+	std::string motion3;
+	std::string motion4;
+};
+
 class ParameterManager
 {
 	public:
@@ -83,11 +95,16 @@ class ParameterManager
 
 		bool setWeight(double x);
 		bool setWeight(double x, double y);
+		bool setWeight(double x, double y, double z);
 		void getParameter(float& x);
 		void getParameter(float& x, float& y);
+		void getParameter(float& x, float& y, float& z);
 		void addParameter(std::string motion, double x);
 		void addParameter(std::string motion, double x, double y);
+		void addParameter(std::string motion, double x, double y, double z);
 		void addTriangle(std::string motion1, std::string motion2, std::string motion3);
+		void addTetrahedron(std::string motion1, std::string motion2, std::string motion3, std::string motion4);
+		void buildTetrahedron();
 		int getType();
 		void setType(int typ);
 
@@ -105,19 +122,19 @@ class ParameterManager
 
 		int getNumTriangles();
 		SrTriangle& getTriangle(int id);
-
-		float getMinimumDist(SrVec& pt, SrVec& a, SrVec& b, SrVec& minimumPt);
+		float getMinimumDist(SrVec& pt, SrVec& a, SrVec& b, SrVec& minimumPt);		
 
 		// access data
 		PAStateData* getState() {return state;}
 		std::vector<std::string>& getMotionNames() {return motionNames;}
 		std::vector<SrVec>& getParameters() {return parameters;}
 		std::vector<TriangleInfo>& getTriangles() {return triangles;}
-		SrVec&	getPreviousParam() {return previousParam;}
+		std::vector<TetrahedronInfo> & getTetrahedrons() {return tetrahedrons;}
 
 	private:
 		bool insideTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3);
 		void getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, double& w1, double& w2, double& w3);
+		void getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, SrVec& v4, double& w1, double& w2, double& w3, double& w4);
 
 	private:
 		int type;
@@ -126,6 +143,7 @@ class ParameterManager
 		std::vector<SrVec> parameters;
 		SrVec previousParam;
 		std::vector<TriangleInfo> triangles;
+		std::vector<TetrahedronInfo> tetrahedrons;
 };
 
 class MotionParameters

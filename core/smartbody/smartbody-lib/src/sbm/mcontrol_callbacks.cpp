@@ -738,6 +738,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				std::string type = args.read_token();
 				if (type == "1D") state->paramManager->setType(0);
 				else if (type == "2D") state->paramManager->setType(1);
+				else if (type == "3D") state->paramManager->setType(2);
 				else return CMD_FAILURE;
 				int num = args.read_int();
 				for (int i = 0; i < num; i++)
@@ -762,7 +763,20 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 						if (paramY < -9000) paramY = atof(parameterY.c_str());
 						state->paramManager->addParameter(m, paramX, paramY);
 					}
+					else if (type == "3D")
+					{
+						double param[3];
+						for (int pc = 0; pc < 3; pc++)
+						{
+							std::string para = args.read_token();
+							param[pc] = parseMotionParameters(m, para, state->keys[state->getMotionId(m)][0], state->keys[state->getMotionId(m)][state->getNumKeys() - 1]);
+							if (param[pc] < -9000) param[pc] = atof(para.c_str());
+						}
+						state->paramManager->addParameter(m, param[0], param[1], param[2]);
+					}
 				}
+				if (type == "3D")
+					state->paramManager->buildTetrahedron();
 			}
 			else if (nextString == "triangle")
 			{

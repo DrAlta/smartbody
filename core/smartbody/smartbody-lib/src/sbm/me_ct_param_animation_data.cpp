@@ -22,6 +22,10 @@
 
 #include "me_ct_param_animation_data.h"
 #include <sr/sr_euler.h>
+#include <sbm/me_ct_ublas.hpp>
+#include <external/tetgen/tetgen.h>
+#include <boost/numeric/ublas/matrix_proxy.hpp>
+#include <boost/numeric/ublas/vector_proxy.hpp>
 
 
 PAStateData::PAStateData(PAStateData* data)
@@ -85,7 +89,8 @@ ParameterManager::ParameterManager(ParameterManager* pm)
 	motionNames = pm->getMotionNames();
 	parameters = pm->getParameters();
 	triangles = pm->getTriangles();
-	previousParam = pm->getPreviousParam();
+	previousParam = pm->getPrevVec();
+	tetrahedrons = pm->getTetrahedrons();
 }
 
 ParameterManager::ParameterManager(PAStateData* s)
@@ -101,7 +106,7 @@ ParameterManager::~ParameterManager()
 
 bool ParameterManager::setWeight(double x)
 {
-	if (type == 1)
+	if (type != 0)
 		return false;
 	double left = -9999.0;
 	double right = 9999.0;
@@ -157,7 +162,7 @@ bool ParameterManager::setWeight(double x)
 
 bool ParameterManager::setWeight(double x, double y)
 {
-	if (type == 0)
+	if (type != 1)
 		return false;
 	SrVec pt = SrVec((float)x, (float)y, 0);
 	for (int i = 0; i < getNumTriangles(); i++)
@@ -229,6 +234,42 @@ bool ParameterManager::setWeight(double x, double y)
 	return true;
 }
 
+bool ParameterManager::setWeight(double x, double y, double z)
+{
+	if (type != 2)
+		return false;
+
+	SrVec pt = SrVec((float)x, (float)y, (float)z);
+	for (unsigned int i = 0; i < tetrahedrons.size(); i++)
+	{
+		SrVec v1 = tetrahedrons[i].v1;
+		SrVec v2 = tetrahedrons[i].v2;
+		SrVec v3 = tetrahedrons[i].v3;
+		SrVec v4 = tetrahedrons[i].v4;
+		int id1 = state->getMotionId(tetrahedrons[i].motion1);
+		int id2 = state->getMotionId(tetrahedrons[i].motion2);
+		int id3 = state->getMotionId(tetrahedrons[i].motion3);
+		int id4 = state->getMotionId(tetrahedrons[i].motion4);
+		double w1 = 0.0;	
+		double w2 = 0.0;
+		double w3 = 0.0;
+		double w4 = 0.0;
+		getWeight(pt, v1, v2, v3, v4, w1, w2, w3, w4);
+		setPrevVec(pt);
+		if (w1 >= 0 && w2 >= 0 && w3 >= 0 && w4 >= 0)
+		{
+	//		std::cout << state->motions[id1]->name() << " " << state->motions[id2]->name() << " " << state->motions[id3]->name() << " " << state->motions[id4]->name() << std::endl;
+			for (int i = 0; i < state->getNumMotions(); i++)
+				state->weights[i] = 0.0;
+
+			state->weights[id1] = w1;
+			state->weights[id2] = w2;
+			state->weights[id3] = w3;
+			state->weights[id4] = w4;
+		} 
+	}
+	return true;
+}
 
 void ParameterManager::getParameter(float& x)
 {
@@ -280,6 +321,11 @@ void ParameterManager::getParameter(float& x, float& y)
 	}
 }
 
+void ParameterManager::getParameter(float& x, float& y, float& z)
+{
+
+}
+
 void ParameterManager::addParameter(std::string motion, double x)
 {
 	SrVec vec;
@@ -299,6 +345,16 @@ void ParameterManager::addParameter(std::string motion, double x, double y)
 	type = 1;
 }
 
+void ParameterManager::addParameter(std::string motion, double x, double y, double z)
+{
+	SrVec vec;
+	vec.x = (float)x;
+	vec.y = (float)y;
+	vec.z = (float)z;
+	motionNames.push_back(motion);
+	parameters.push_back(vec);
+	type = 2;
+}
 
 void ParameterManager::addTriangle(std::string motion1, std::string motion2, std::string motion3)
 {
@@ -311,6 +367,47 @@ void ParameterManager::addTriangle(std::string motion1, std::string motion2, std
 	tInfo.motion2 = motion2;
 	tInfo.motion3 = motion3;
 	triangles.push_back(tInfo);
+}
+
+void ParameterManager::addTetrahedron(std::string motion1, std::string motion2, std::string motion3, std::string motion4)
+{
+	TetrahedronInfo tetraInfo;
+	tetraInfo.v1 = getVec(motion1);
+	tetraInfo.v2 = getVec(motion2);
+	tetraInfo.v3 = getVec(motion3);
+	tetraInfo.v4 = getVec(motion4);
+	tetraInfo.motion1 = motion1;
+	tetraInfo.motion2 = motion2;
+	tetraInfo.motion3 = motion3;
+	tetraInfo.motion4 = motion4;
+	tetrahedrons.push_back(tetraInfo);
+}
+
+void ParameterManager::buildTetrahedron()
+{
+	tetgenio ptIn, tetOut;
+	// initialize input points
+	ptIn.numberofpoints = parameters.size();
+	ptIn.pointlist = new REAL[parameters.size() * 3];
+	for (unsigned int i = 0; i < parameters.size(); i++)
+	{
+		ptIn.pointlist[i*3+0] = parameters[i].x;
+		ptIn.pointlist[i*3+1] = parameters[i].y;
+		ptIn.pointlist[i*3+2] = parameters[i].z;		
+	}
+	tetrahedralize("V",&ptIn,&tetOut);
+//	std::cout << "Built Tetrahedron:" << std::endl;
+	for (int i = 0; i < tetOut.numberoftetrahedra; i++)
+	{
+		std::string motions[4];
+		for (int k = 0;k < tetOut.numberofcorners; k++)
+		{
+			int id = tetOut.tetrahedronlist[i * tetOut.numberofcorners + k];
+			motions[k] = motionNames[id];
+		}
+//		std::cout << "[" << i << "]: " << motions[0] << ", " << motions[1] << ", " << motions[2] << ", " << motions[3] << std::endl; 
+		addTetrahedron(motions[0], motions[1], motions[2], motions[3]);
+	}
 }
 
 int ParameterManager::getType()
@@ -505,6 +602,32 @@ void ParameterManager::getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, dou
 		w2 = area3 / totalArea;
 		w3 = area1 / totalArea;
 	}
+}
+
+void ParameterManager::getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, SrVec& v4, double& w1, double& w2, double& w3, double& w4)
+{
+	dMatrix mat(3, 3);
+	mat(0, 0) = v1.x - v4.x;
+	mat(0, 1) = v2.x - v4.x;
+	mat(0, 2) = v3.x - v4.x;
+	mat(1, 0) = v1.y - v4.y;
+	mat(1, 1) = v2.y - v4.y;
+	mat(1, 2) = v3.y - v4.y;
+	mat(2, 0) = v1.z - v4.z;
+	mat(2, 1) = v2.z - v4.z;
+	mat(2, 2) = v3.z - v4.z;
+	dMatrix invMat(3, 3);
+	MeCtUBLAS::inverseMatrix(mat,invMat);
+	dVector vecIn(3);
+	dVector vecOut(3);
+	vecIn(0) = pt.x - v4.x;
+	vecIn(1) = pt.y - v4.y;
+	vecIn(2) = pt.z - v4.z;
+	MeCtUBLAS::matrixVecMult(invMat, vecIn, vecOut);
+	w1 = vecOut(0);
+	w2 = vecOut(1);
+	w3 = vecOut(2);
+	w4 = 1 - vecOut(0) - vecOut(1) - vecOut(2);
 }
 
 MotionParameters::MotionParameters(SkMotion* m, SkSkeleton* skel, std::string j)

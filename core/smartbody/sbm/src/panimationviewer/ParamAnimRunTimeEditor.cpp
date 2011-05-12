@@ -223,13 +223,13 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 {
 	this->label(s->stateName.c_str());
 	this->begin();
-		paramVisualization = new ParameterVisualization(4 * xDis, yDis, w - 5 * xDis, h - 5 * yDis, "", s, this);
-		//this->add(paramVisualization);
-		this->resizable(paramVisualization);
 		int type = state->paramManager->getType();
 		if (type == 0)
 		{
+			paramVisualization = new ParameterVisualization(4 * xDis, yDis, w - 5 * xDis, h - 5 * yDis, "", s, this);
+			this->resizable(paramVisualization);
 			yAxis = NULL;
+			zAxis = NULL;
 			double min = state->paramManager->getVec(state->paramManager->getMinVecX()).x;
 			double max = state->paramManager->getVec(state->paramManager->getMaxVecX()).x;
 			xAxis = new fltk::ValueSlider(4 * xDis, h - 4 * yDis, w - 5 * xDis, 2 * yDis, "X");
@@ -246,6 +246,8 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 		}
 		if (type == 1)
 		{
+			paramVisualization = new ParameterVisualization(4 * xDis, yDis, w - 5 * xDis, h - 5 * yDis, "", s, this);
+			this->resizable(paramVisualization);
 			double minX = state->paramManager->getVec(state->paramManager->getMinVecX()).x;
 			double maxX = state->paramManager->getVec(state->paramManager->getMaxVecX()).x;
 			double minY = state->paramManager->getVec(state->paramManager->getMinVecY()).y;
@@ -253,11 +255,11 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 			xAxis = new fltk::ValueSlider(4 * xDis, h - 4 * yDis, w - 5 * xDis, 2 * yDis, "X");
 			xAxis->minimum(minX);
 			xAxis->maximum(maxX);
-			xAxis->callback(updateAxisValue, this);
+			xAxis->callback(updateXYAxisValue, this);
 			yAxis = new fltk::ValueSlider(xDis, yDis, 3 * xDis, h - 5 * yDis, "Y");
 			yAxis->minimum(minY);
 			yAxis->maximum(maxY);
-			yAxis->callback(updateAxisValue, this);
+			yAxis->callback(updateXYAxisValue, this);
 			yAxis->set_vertical();
 			float actualValueX, actualValueY;
 			s->paramManager->getParameter(actualValueX, actualValueY);
@@ -265,6 +267,26 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 			int actualY = 0;
 			paramVisualization->getActualPixel(actualValueX, actualValueY, actualX, actualY);
 			paramVisualization->setSlider(actualX, actualY);
+		}
+		if (type == 2)
+		{
+			paramVisualization = NULL;
+			double minX = state->paramManager->getVec(state->paramManager->getMinVecX()).x;
+			double maxX = state->paramManager->getVec(state->paramManager->getMaxVecX()).x;
+			double minY = state->paramManager->getVec(state->paramManager->getMinVecY()).y;
+			double maxY = state->paramManager->getVec(state->paramManager->getMaxVecY()).y;
+			xAxis = new fltk::ValueSlider(4 * xDis, yDis, w - 5 * xDis, 2 * yDis, "X");
+			xAxis->minimum(minX);
+			xAxis->maximum(maxX);
+			xAxis->callback(updateXYZAxisValue, this);
+			yAxis = new fltk::ValueSlider(4 * xDis, 4 * yDis, w - 5 * xDis, 2 * yDis, "Y");
+			yAxis->minimum(minY);
+			yAxis->maximum(maxY);
+			yAxis->callback(updateXYZAxisValue, this);
+			zAxis = new fltk::ValueSlider(4 * xDis, 7 * yDis, w - 5 * xDis, 2 * yDis, "Z");
+			zAxis->minimum(-90);
+			zAxis->maximum(90);
+			zAxis->callback(updateXYZAxisValue, this);
 		}
 	this->end();
 	
@@ -292,7 +314,7 @@ void ParameterGroup::updateXAxisValue(fltk::Widget* widget, void* data)
 	group->paramVisualization->setPoint(x, y);
 }
 
-void ParameterGroup::updateAxisValue(fltk::Widget* widget, void* data)
+void ParameterGroup::updateXYAxisValue(fltk::Widget* widget, void* data)
 {
 	ParameterGroup* group = (ParameterGroup*) data;
 	double x = group->xAxis->value();
@@ -303,6 +325,17 @@ void ParameterGroup::updateAxisValue(fltk::Widget* widget, void* data)
 	int pixelX, pixelY;
 	group->paramVisualization->getActualPixel(float(x), float(y), pixelX, pixelY);
 	group->paramVisualization->setPoint(pixelX, pixelY);
+}
+
+void ParameterGroup::updateXYZAxisValue(fltk::Widget* widget, void* data)
+{
+	ParameterGroup* group = (ParameterGroup*) data;
+	double x = group->xAxis->value();
+	double y = group->yAxis->value();
+	double z = group->zAxis->value();
+	group->state->paramManager->setWeight(x, y, z);
+//	if (group->exec)
+	group->updateWeight();
 }
 
 void ParameterGroup::updateWeight()
@@ -373,8 +406,11 @@ void PARunTimeEditor::update()
 				state->paramManager->getParameter(x, y);
 				int actualPixelX = 0;
 				int actualPixelY = 0;
-				paramGroup->paramVisualization->getActualPixel(x, y, actualPixelX, actualPixelY);
-				paramGroup->paramVisualization->setPoint(actualPixelX, actualPixelY);
+				if (paramGroup->paramVisualization)
+				{
+					paramGroup->paramVisualization->getActualPixel(x, y, actualPixelX, actualPixelY);
+					paramGroup->paramVisualization->setPoint(actualPixelX, actualPixelY);
+				}
 			}
 		}
 	}

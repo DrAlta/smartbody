@@ -699,7 +699,7 @@ PATransitionManager::PATransitionManager(double easeOutStart)
 	s1 = easeOutStart;
 	e1 = s1 + defaultTransition;
 	s2 = 0.0;
-	e2 += defaultTransition;
+	e2 = s2 + defaultTransition;
 }
 
 PATransitionManager::PATransitionManager(PATransitionData* transitionData)
@@ -724,19 +724,27 @@ PATransitionManager::~PATransitionManager()
 */
 void PATransitionManager::align(PAStateModule* current, PAStateModule* next)
 {
+	bool hasPresetData = true;
 	int numEaseOut = getNumEaseOut();
+	if (numEaseOut == 0)
+		hasPresetData = false;
+	bool found = false;
 	for (int i = 0; i < numEaseOut; i++)
 	{
 		if (current->timeManager->prevLocalTime <= easeOutStarts[i] && current->timeManager->localTime >= easeOutStarts[i]) 
-	//		(fabs(current->timeManager->localTime - easeOutStarts[i]) < timeThreshold)
 		{
 			s1 = easeOutStarts[i];
 			e1 = easeOutEnds[i];
+			found = true;
+			break;
 		}
 	}
-	
-	if (current->timeManager->prevLocalTime <= s1 && current->timeManager->localTime >= s1)
-//	if (fabs(current->timeManager->localTime - s1) < timeThreshold)
+	 
+	if (!hasPresetData)
+		if (current->timeManager->prevLocalTime <= s1 && current->timeManager->localTime >= s1)
+			found = true;
+	if (found)
+//	if (current->timeManager->prevLocalTime <= s1 && current->timeManager->localTime >= s1)
 	{
 		next->active = true;
 		blendingMode = true;
