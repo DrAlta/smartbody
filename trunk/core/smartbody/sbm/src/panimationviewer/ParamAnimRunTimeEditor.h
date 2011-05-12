@@ -71,7 +71,8 @@ class ParameterGroup : public fltk::Group
 		virtual void resize(int x, int y, int w, int h);
 
 		static void updateXAxisValue(fltk::Widget* widget, void* data);
-		static void updateAxisValue(fltk::Widget* widget, void* data);
+		static void updateXYAxisValue(fltk::Widget* widget, void* data);
+		static void updateXYZAxisValue(fltk::Widget* widget, void* data);
 		void updateWeight();
 
 	public:
@@ -81,6 +82,7 @@ class ParameterGroup : public fltk::Group
 		bool exec;
 		fltk::ValueSlider* xAxis;
 		fltk::ValueSlider* yAxis;
+		fltk::ValueSlider* zAxis;
 };
 
 class PARunTimeEditor : public fltk::Group
