@@ -89,7 +89,7 @@ struct TetrahedronInfo
 class ParameterManager
 {
 	public:
-		ParameterManager(ParameterManager* pm);
+		ParameterManager(ParameterManager* pm, PAStateData* s);
 		ParameterManager(PAStateData* s);
 		~ParameterManager();
 

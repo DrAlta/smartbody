@@ -37,7 +37,7 @@ PAStateData::PAStateData(PAStateData* data)
 	fromStates = data->fromStates;
 	toStates = data->toStates;
 	cycle = data->cycle;
-	paramManager = new ParameterManager(data->paramManager);
+	paramManager = new ParameterManager(data->paramManager, this);
 }
 
 PAStateData::PAStateData(std::string name)
@@ -82,9 +82,9 @@ int PATransitionData::getNumEaseOut()
 }
 
 
-ParameterManager::ParameterManager(ParameterManager* pm)
+ParameterManager::ParameterManager(ParameterManager* pm, PAStateData* s)
 {
-	state = pm->getState();
+	state = s;
 	type = pm->getType();
 	motionNames = pm->getMotionNames();
 	parameters = pm->getParameters();

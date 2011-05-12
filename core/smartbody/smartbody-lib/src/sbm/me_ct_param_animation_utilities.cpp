@@ -688,18 +688,18 @@ PATransitionManager::PATransitionManager()
 	e2 += defaultTransition;
 }
 
-PATransitionManager::PATransitionManager(double easeOutStart)
+PATransitionManager::PATransitionManager(double easeOutStart, double dur)
 {
 	blendingMode = false;
 	active = true;
 	data = NULL;
 	curve = new srLinearCurve();
-	duration = defaultTransition;
+	duration = dur;
 	localTime = 0.0;
 	s1 = easeOutStart;
-	e1 = s1 + defaultTransition;
+	e1 = s1 + dur;
 	s2 = 0.0;
-	e2 = s2 + defaultTransition;
+	e2 = s2 + dur;
 }
 
 PATransitionManager::PATransitionManager(PATransitionData* transitionData)
@@ -710,6 +710,8 @@ PATransitionManager::PATransitionManager(PATransitionData* transitionData)
 	blendingMode = false;
 	active = true;
 	curve = new srLinearCurve();
+	s1 = -1.0;
+	e1 = -1.0;
 }
 
 PATransitionManager::~PATransitionManager()
@@ -724,27 +726,18 @@ PATransitionManager::~PATransitionManager()
 */
 void PATransitionManager::align(PAStateModule* current, PAStateModule* next)
 {
-	bool hasPresetData = true;
 	int numEaseOut = getNumEaseOut();
-	if (numEaseOut == 0)
-		hasPresetData = false;
-	bool found = false;
 	for (int i = 0; i < numEaseOut; i++)
 	{
 		if (current->timeManager->prevLocalTime <= easeOutStarts[i] && current->timeManager->localTime >= easeOutStarts[i]) 
 		{
 			s1 = easeOutStarts[i];
 			e1 = easeOutEnds[i];
-			found = true;
 			break;
 		}
 	}
-	 
-	if (!hasPresetData)
-		if (current->timeManager->prevLocalTime <= s1 && current->timeManager->localTime >= s1)
-			found = true;
-	if (found)
-//	if (current->timeManager->prevLocalTime <= s1 && current->timeManager->localTime >= s1)
+
+	if (current->timeManager->prevLocalTime <= s1 && current->timeManager->localTime >= s1)
 	{
 		next->active = true;
 		blendingMode = true;

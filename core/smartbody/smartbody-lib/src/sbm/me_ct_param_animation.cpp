@@ -262,7 +262,13 @@ void MeCtParamAnimation::autoScheduling(double time)
 				if (nextStateModule->playNow)
 					transitionManager = new PATransitionManager();
 				else
-					transitionManager = new PATransitionManager(curStateModule->timeManager->getDuration() - defaultTransition);	
+				{
+					// check to see if the current local time cannot afford the defaultTransition time
+					double actualTransitionTime = defaultTransition;
+					if (curStateModule->timeManager->localTime >= (curStateModule->timeManager->getDuration() - defaultTransition))
+						actualTransitionTime = curStateModule->timeManager->getDuration() - curStateModule->timeManager->localTime;
+					transitionManager = new PATransitionManager(curStateModule->timeManager->getDuration() - actualTransitionTime, actualTransitionTime);	
+				}
 			}
 #if PrintPADebugInfo
 		LOG("State %s being scheduled.[ACTIVE]", curStateModule->data->stateName.c_str());
