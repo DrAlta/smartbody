@@ -1408,7 +1408,11 @@ void FltkViewer::translate_keyboard_state()
 		if (mcu.use_param_animation)
 		{
 			if (fltk::event_state(fltk::ALT))
+			{
 				_paLocoData->starting = true;
+				_paLocoData->stopping = false;
+				_paLocoData->jumping = false;
+			}
 			else
 				_paLocoData->starting = false;
 			if (!_paLocoData->starting)
@@ -1438,7 +1442,11 @@ void FltkViewer::translate_keyboard_state()
 		if (mcu.use_param_animation)
 		{
 			if (fltk::event_state(fltk::ALT))
+			{
 				_paLocoData->stopping = true;
+				_paLocoData->jumping = false;
+				_paLocoData->starting = false;
+			}
 			else
 				_paLocoData->stopping = false;
 			if (!_paLocoData->stopping)
@@ -1504,6 +1512,8 @@ void FltkViewer::translate_keyboard_state()
 	if (fltk::get_key_state(fltk::SpaceKey))
 	{
 		_paLocoData->jumping = true;
+		_paLocoData->starting = false;
+		_paLocoData->stopping = false;
 		paLocomotionCmd = true;
 	}
 
@@ -1610,8 +1620,12 @@ void FltkViewer::translate_keyboard_state()
 					_paLocoData->v = prevV;
 					_paLocoData->w = prevW;
 				}
+				std::stringstream command2;
+				command2 << "panim update char " << _paLocoData->character->name << " ";
+				for (int i = 0; i < state->getNumMotions(); i++)
+					command2 << state->weights[i] << " ";
+				mcu.execute((char*)command2.str().c_str());
 //				LOG("PALocomotion Parameters-> velocity: %f, angular velocity: %f", _paLocoData->v, _paLocoData->w);
-				_paLocoData->character->param_animation_ct->updateWeights();
 			}
 		}
 	}
