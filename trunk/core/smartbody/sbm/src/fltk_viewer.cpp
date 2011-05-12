@@ -1594,7 +1594,9 @@ void FltkViewer::translate_keyboard_state()
 			command1 << "panim schedule char " << _paLocoData->character->name << " state UtahJump loop false playnow false";
 			mcu.execute((char*)command1.str().c_str());	
 			std::stringstream command2;
-			command2 << "panim schedule char " << _paLocoData->character->name << " state UtahLocomotion loop true playnow false";
+			command2 << "panim schedule char " << _paLocoData->character->name << " state UtahLocomotion loop true playnow false ";
+			for (int i = 0; i < state->getNumMotions(); i++)
+				command2 << state->weights[i] << " ";
 			mcu.execute((char*)command2.str().c_str());
 			_paLocoData->jumping = false;
 		}

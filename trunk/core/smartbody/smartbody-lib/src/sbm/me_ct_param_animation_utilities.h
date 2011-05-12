@@ -187,7 +187,7 @@ class PATransitionManager
 		
 	public:
 		PATransitionManager();
-		PATransitionManager(double easeOutStart);
+		PATransitionManager(double easeOutStart, double duration);
 		PATransitionManager(PATransitionData* transitionData);
 		~PATransitionManager();
 
