@@ -93,7 +93,9 @@ class Pawn(NodePath, DirectObject):
 		self.__InitPlate()
 		self.__LastPos = self.getPos(render)
 		self.__LastHpr = self.getHpr(render)
-		
+		self.__NotValidMessage = False
+		self.__NotRegisteredMessage = False
+
 		messenger.send("UpdateHud")
 		taskMgr.add(self.Step, "Pawn" + self.GetName() + "_Loop")
 		
@@ -106,7 +108,8 @@ class Pawn(NodePath, DirectObject):
 		pDelta = abs(self.getP(render) - self.__LastHpr.getY())
 		rDelta = abs(self.getR(render) - self.__LastHpr.getX())
 		
-		if ((posDelta > 3 or hDelta > 1 or pDelta > 1 or rDelta > 1) and self.IsRegistered()):
+#		if ((posDelta > 3 or hDelta > 1 or pDelta > 1 or rDelta > 1) and self.IsRegistered()):
+		if (True):
 			self.__LastPos = newPos
 			self.__LastHpr = self.getHpr(render)
 			self.RegisterPosHpr()
@@ -232,8 +235,12 @@ class Pawn(NodePath, DirectObject):
 			that the pawn is initialized in SB"""
 			
 		if (not self.IsValid()):
-			print("Trying to register an invalid Pawn: " + self.__Name)
+			if (not self.__NotValidMessage):
+				print("Trying to register an invalid Pawn: " + self.__Name)
+				self.__NotValidMessage = True
 			return
+			
+		self.__NotValidMessage = False
 		
 		if (not self.__Registered):
 			self.Scene.SendSbmCommand("pawn " + self.GetName() + " init")
@@ -243,12 +250,18 @@ class Pawn(NodePath, DirectObject):
 		
 	def RegisterPosHpr(self):
 		if (not self.IsValid()):
-			print("Trying to register position of an invalid " + self.__TypeStr + ": " + self.GetName())
+			if (not self.__NotValidMessage):
+				print("Trying to register position of an invalid " + self.__TypeStr + ": " + self.GetName())
+				self.__NotValidMessage = True
 			return
 		
+		self.__NotValidMessage = False
 		if (not self.IsRegistered()):
-			print("Trying to register position of an unregistered " + self.__TypeStr + ": " + self.GetName())
+			if (not self.__NotRegisteredMessage):
+				print("Trying to register position of an unregistered " + self.__TypeStr + ": " + self.GetName())
+				self.__NotRegisteredMessage = True
 			return
+		self.__NotRegisteredMessage = False
 		
 		pos = Pos2Str(Panda2Sbm_Pos(self.getPos(render)))
 		hpr = Hpr2Str(Panda2Sbm_Hpr(self.getHpr(render)))
