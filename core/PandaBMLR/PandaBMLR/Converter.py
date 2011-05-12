@@ -91,6 +91,6 @@ def Panda2Sbm_Pos(vec3):
 
 def Panda2Sbm_Hpr(vec3):
 	""" Transforms a Hpr from Panda3D's coordinate system to a Position in SmartBody's coordinate system """
-	return Vec3(vec3.getZ(), vec3.getY(), vec3.getX())
+	return Vec3(vec3.getX(), vec3.getY(), vec3.getZ())
 
 
