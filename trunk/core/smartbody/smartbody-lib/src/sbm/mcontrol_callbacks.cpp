@@ -5487,11 +5487,21 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			std::string type = args.read_token();
 			if (type == "example")
 			{
+				if (!mcu_p->use_param_animation)
+				{
+					LOG("Parameterized Animation Engine not enabled!");
+					return CMD_FAILURE;
+				}
 				mcu_p->steering_use_procedural = false;
 				return CMD_SUCCESS;
 			}
 			if (type == "procedural")
 			{
+				if (!mcu_p->use_locomotion)
+				{
+					LOG("Procedural Locomotion not enabled!");
+					return CMD_FAILURE;
+				}
 				mcu_p->steering_use_procedural = true;
 				return CMD_SUCCESS;
 			}
