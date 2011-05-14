@@ -78,6 +78,7 @@ class MeCtParamAnimation : public MeCtContainer
 		void setBaseJointName(std::string name);
 		std::string getBaseJointName();
 		
+		void dumpScheduling();
 		void schedule(PAStateData* state, bool l, bool pn = false);
 		void unschedule();
 		void updateWeights(std::vector<double> w);

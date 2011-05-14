@@ -28,8 +28,10 @@
 #include <xercesc/util/XMLStringTokenizer.hpp>
 #include <sbm/me_ct_navigation_circle.hpp>
 #include <me/me_ct_channel_writer.hpp>
+#include <sbm/me_ct_param_animation.h>
 
 #include "bml_locomotion.hpp"
+#include "bml_event.hpp"
 
 #include "mcontrol_util.h"
 #include "me_ct_locomotion.hpp"
@@ -155,13 +157,81 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	child = getFirstChildElement( elem );
 
 	Locomotion::parse_routine(child, request, type, id);
-	//boost::shared_ptr<MeControllerRequest> ct_request( new MeControllerRequest( unique_id, gaze_ct, request->actor->gaze_sched_p, behav_syncs ) );
-	//ct_request->set_persistent( true );
-	//return ct_request;
-	boost::shared_ptr<MeControllerRequest> ct_request;
-	ct_request.reset();
-	return ct_request;
-	//return BehaviorRequestPtr();
+	//-------------starting  from here, it's BML Spec 1.0
+	std::string localId;
+	if (attrID)
+		localId = XMLString::transcode(attrID);
+	std::stringstream command;
+	SbmCharacter* c = mcu->character_map.lookup(request->actor->name);
+	const XMLCh* locotype = elem->getAttribute(L"sbm:type");
+	if (XMLString::compareIString(locotype, L"") != 0)
+	{
+		std::string typeString = XMLString::transcode(locotype);
+		if (typeString == "procedural")
+		{
+			mcu->steering_use_procedural = true;
+			c->steeringAgent->desiredSpeed = 1.6f;
+		}
+		else if (typeString == "example")
+			mcu->steering_use_procedural = false;
+		else
+			return BehaviorRequestPtr();
+	}
+	const XMLCh* proximity = elem->getAttribute(L"proximity");
+	if (XMLString::compareIString(proximity, L"") != 0)
+		c->steeringAgent->distThreshold = (float)atof(XMLString::transcode(proximity)) * 100.0f;
+	const XMLCh* manner = elem->getAttribute(L"manner");
+	if (XMLString::compareIString(manner, L"") != 0)
+	{
+		if (mcu->steering_use_procedural)
+		{
+			LOG("This mode does not support Procedural Locomotion currently!");
+			return BehaviorRequestPtr();
+		}
+		std::string mannerString = XMLString::transcode(manner);
+		if (mannerString == "walk")
+			c->steeringAgent->desiredSpeed = 1.6f;
+		else if (mannerString == "jog")
+			c->steeringAgent->desiredSpeed = 2.5f;
+		else if (mannerString == "run")
+			c->steeringAgent->desiredSpeed = 3.5f;
+		else 
+			return BehaviorRequestPtr();
+		// also has to update state weight
+		PAStateData* locoData = mcu->lookUpPAState("UtahLocomotion");
+		if (locoData)
+			locoData->paramManager->setWeight(c->steeringAgent->desiredSpeed * 100.0f, 0.0);
+	}
+	const XMLCh* facingAngle = elem->getAttribute(L"facing");
+	if (XMLString::compareIString(facingAngle, L"") != 0)
+	{
+		std::stringstream command;
+		command << "steer facing " << c->name << " " << (float)atof(XMLString::transcode(facingAngle));
+		srCmdSeq *seq = new srCmdSeq(); //sequence that holds the startup feedback
+		seq->insert(float(mcu->time + mcu->time_dt), command.str().c_str());
+		mcu->execute_seq(seq);
+	//	c->steeringAgent->facingAngle = (float)atof(XMLString::transcode(facingAngle));
+	}
+	const XMLCh* following = elem->getAttribute(L"sbm:follow");
+	if (XMLString::compareIString(following, L"") != 0)
+	{
+		std::string character = XMLString::transcode(following);
+		SbmCharacter* followingC = mcu->character_map.lookup(character.c_str());
+		if (!followingC)
+			c->steeringAgent->setTargetAgent(NULL);
+		c->steeringAgent->setTargetAgent(followingC);
+	}
+	const XMLCh* target = elem->getAttribute(L"target");
+	if (XMLString::compareIString(target, L"") != 0)
+	{
+		XMLStringTokenizer tokenizer(target);
+		if (tokenizer.countTokens() != 2)
+			return BehaviorRequestPtr();
+		XMLCh* x = tokenizer.nextToken();
+		XMLCh* z = tokenizer.nextToken();
+		command << "sbm steer move " << c->name << " " << XMLString::transcode(x) << " 0 " << XMLString::transcode(z);
+	}
+	return BehaviorRequestPtr( new EventRequest(unique_id, localId, command.str().c_str(), behav_syncs, ""));
 }
 
 void BML::Locomotion::parse_routine(DOMElement* elem, BmlRequestPtr request, int type, int id)
@@ -376,4 +446,57 @@ void BML::Locomotion::parse_routine(DOMElement* elem, BmlRequestPtr request, int
 
 
 	nav_circle->init( pos[0], pos[1], pos[2], g_angular_speed, l_angular_speed, 0, id, 0, 0, 0, -1 );
+}
+
+BehaviorRequestPtr BML::parse_bml_example_locomotion( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu )
+{
+	const XMLCh* id = elem->getAttribute(ATTR_ID);
+	std::string localId;
+	if (id)
+		localId = XMLString::transcode(id);
+	SbmCharacter* c = mcu->character_map.lookup(request->actor->name);
+	if (!c->param_animation_ct)
+	{
+		LOG("Parameterized Animation not enabled!");
+		return BehaviorRequestPtr();
+	}
+	const XMLCh* forwardSpd = elem->getAttribute(L"spd");
+	const XMLCh* turningSpd = elem->getAttribute(L"rps");
+	double spd = 0.0;
+	double rps = 0.0;
+	if (forwardSpd)
+		spd = atof(XMLString::transcode(forwardSpd));
+	if (turningSpd)
+		rps = atof(XMLString::transcode(turningSpd));
+
+	if (spd == 0 && rps == 0)
+	{
+		if (c->param_animation_ct->getCurrentStateName() == "UtahLocomotion")
+		{
+			std::stringstream command;
+			command << "panim schedule char " << c->name;
+			command << " state UtahWalkToStop loop false playnow false";	
+			mcu->execute((char*) command.str().c_str());
+		}
+	}
+	if (c->param_animation_ct->getCurrentPAStateData() == NULL)
+	{
+		std::stringstream command;
+		command << "panim schedule char " << c->name;
+		command << " state UtahStopToWalk loop false playnow false";
+		mcu->execute((char*) command.str().c_str());
+		std::stringstream command1;
+		command1 << "panim schedule char " << c->name;
+		command1 << " state UtahLocomotion loop true playnow false";
+		mcu->execute((char*) command1.str().c_str());
+	}
+	else
+	{
+		if (c->param_animation_ct->getCurrentStateName() == "UtahLocomotion")
+		{
+			c->param_animation_ct->getCurrentPAStateData()->paramManager->setWeight(spd, rps);
+			c->param_animation_ct->updateWeights();			
+		}
+	}
+	return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));
 }

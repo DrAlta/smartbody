@@ -118,6 +118,7 @@ mcuCBHandle::mcuCBHandle()
 	queued_cmds( 0 ),
 	use_locomotion( false ),
 	use_param_animation( false ),
+	steering_use_procedural( true ),
 	viewer_factory ( new SrViewerFactory() ),
 	bmlviewer_factory ( new GenericViewerFactory() ),
 	panimationviewer_factory ( new GenericViewerFactory() ),
@@ -126,8 +127,9 @@ mcuCBHandle::mcuCBHandle()
 	resource_manager(ResourceManager::getResourceManager()),
 	snapshot_counter( 1 ),
 	delay_behaviors(true),
-        media_path("."),
-        _interactive(true)
+	media_path("."),
+	_interactive(true),
+	steerEngine(NULL)
 {
 
 	
@@ -419,6 +421,8 @@ void mcuCBHandle::clear( void )	{
 		logger_p->unref();
 		logger_p = NULL;
 	}
+	if (steerEngine)
+		delete steerEngine;
 
 	//close_viewer();
 
@@ -553,6 +557,25 @@ void mcuCBHandle::update( void )	{
 		c--;
 	}
 #endif
+
+	// updating steering engine
+	if (steerEngine)
+	{
+		if (!this->steerEngine->isDone())
+		{
+			if (this->steerEngine->getStartTime() == 0.0f)
+				this->steerEngine->setStartTime(float(this->time));
+	
+			SbmCharacter* character;
+			character_map.reset();
+			while (character = character_map.next())
+				character->steeringAgent->evaluate();
+
+			bool running = this->steerEngine->_engine->update(false, true, float(this->time) - this->steerEngine->getStartTime());
+			if (!running)
+				this->steerEngine->setDone(true);
+		}
+	}
 
 	srCmdSeq* seq_p;
 	char *seq_name = NULL;

@@ -346,9 +346,9 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "setmap",			   setmap_func );
 	mcu.insert( "motionmap",		   motionmap_func );
 	mcu.insert( "skeletonmap",		   skeletonmap_func );
+	mcu.insert( "steer",			   mcu_steer_func);	
 	mcu.insert( "characters",		   showcharacters_func );
 	mcu.insert( "pawns",			   showpawns_func );
-	
 	mcu.insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands
 
 	mcu.insert_set_cmd( "bp",             BML_PROCESSOR::set_func );

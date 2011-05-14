@@ -30,7 +30,7 @@
 
 //#define USE_GLEW 1
 #include <sbm/GPU/SbmShader.h>
-#include "fltk/Slider.h"
+#include <fltk/Slider.h>
 #include <fltk/compat/FL/Fl_Menu_Item.H>
 # include <fltk/GlWindow.H>
 # include <sr/sr_viewer.h>
@@ -86,6 +86,11 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 					  ModeShadows
                 };
 
+	enum SteerMode {  ModeNoSteer,
+					  ModeSteerCharactersGoalsOnly,
+					  ModeSteerAll,
+                };
+
 	enum CharacterMode { ModeShowGeometry,
                       ModeShowCollisionGeometry,
                       ModeShowBones,
@@ -139,6 +144,9 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
                    CmdAxis,
 				   CmdNoShadows,
 				   CmdShadows,
+				   CmdNoSteer,
+				   CmdSteerCharactersGoalsOnly,
+				   CmdSteerAll,
                    CmdBoundingBox,
                    CmdStatistics,
 				   CmdCharacterShowGeometry,
@@ -191,8 +199,8 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 
     FltkViewerData* _data;
 	LocomotionData* _locoData;
+	float _arrowTime;
 	PALocomotionData* _paLocoData;
-
 	ObjectManipulationHandle _objManipulator; // a hack for testing. 
 
  private:
@@ -315,6 +323,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	void drawReach();
 	void drawInteractiveLocomotion();
 	void drawPawns();
+	void drawSteeringInfo();
 	void drawColObject(SbmColObject* colObj);
 	void drawTetra(SrVec vtxPos[4], SrVec& color);
 	void drawArrow(SrVec& from, SrVec& to, float width, SrVec& color);
@@ -366,6 +375,7 @@ protected:
    FltkViewer::DynamicsMode dynamicsMode;     // dynamics information mode
    FltkViewer::LocomotionMode locomotionMode;   // locomotion mode
    FltkViewer::ReachRenderMode reachRenderMode;
+   FltkViewer::SteerMode steerMode;
 
 
    bool iconized;      // to stop processing while the window is iconized

@@ -51,7 +51,7 @@ class PATimeManager
 		std::vector<double> motionTimes;		//actual motion times get from localTimes
 		std::vector<double> timeDiffs;			//time steps from last evaluation to this evaluation, get from motionTimes
 		std::vector<double> key;				//key get from keys and current weights
-		double localTime;		
+		double localTime;
 		double prevLocalTime;
 
 	public:

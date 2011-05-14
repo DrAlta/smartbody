@@ -45,7 +45,7 @@ MeCtLocomotionSpeedAccelerator::MeCtLocomotionSpeedAccelerator() {
 	max_acceleration_pos = 100.0f;
 	min_acceleration_pos = 0.0f;
 	max_acceleration_neg = -1.0f;
-	min_acceleration_neg = -10.0f;
+	min_acceleration_neg = -50.0f;
 }
 
 /** Destructor */

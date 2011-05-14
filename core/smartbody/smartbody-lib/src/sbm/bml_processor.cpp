@@ -470,6 +470,8 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				LOG("ERROR: BML::Processor::parseBML(): <speech> BML tag must be first behavior (TEMPORARY HACK).");
 			} else if( XMLString::compareString( tag, TAG_LOCOTMOTION )==0 ) {
 				behavior = parse_bml_locomotion( child, unique_id, behav_syncs, required, request, mcu );
+			} else if( XMLString::compareString( tag, TAG_EXAMPLE_LOCOMOTION )==0 ) {
+				behavior = parse_bml_example_locomotion( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_INTERRUPT )==0 ) {
 				behavior = parse_bml_interrupt( child, unique_id, behav_syncs, required, request, mcu );
 #ifdef BMLR_BML2ANIM

@@ -111,6 +111,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	param_animation_ct( NULL ),
 	face_ct( NULL ),
 	eyelid_ct( new MeCtEyeLid() ),
+	motionplayer_ct( NULL ),
 	face_neutral( NULL ),
 	_soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT ),
 	_height(1.0f), 
@@ -124,6 +125,8 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	eyelid_ct->ref();
 
 	bonebusCharacter = NULL;
+	steeringAgent = NULL;
+	_numSteeringGoal = 0;
 
 	use_viseme_curve = false;
 	viseme_time_offset = 0.0;
@@ -133,8 +136,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	viseme_channel_end_pos = 0;
 	viseme_history_arr = NULL;
 	_minVisemeTime = 0.0f;
-
-	_numSteeringGoals = 0;
+	_numSteeringGoal = 0;
 }
 
 //  Destructor
@@ -174,6 +176,8 @@ SbmCharacter::~SbmCharacter( void )	{
 		locomotion_ct->unref();
 	if (param_animation_ct)
 		param_animation_ct->unref();
+	if (motionplayer_ct)
+		motionplayer_ct->unref();
 
 	if ( mcuCBHandle::singleton().sbm_character_listener )
 	{
@@ -190,6 +194,8 @@ SbmCharacter::~SbmCharacter( void )	{
 		delete [] viseme_history_arr;
 		viseme_history_arr = NULL;
 	}
+
+	delete steeringAgent;
 }
 
 int SbmCharacter::init_locomotion_skeleton(const char* skel_file, mcuCBHandle *mcu_p)
@@ -381,11 +387,14 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 	// motion player
 	motionplayer_ct = new MeCtMotionPlayer(this);
+	motionplayer_ct->ref();
 	std::string mpName(name);
 	mpName += "'s motion player";
 	motionplayer_ct->name(mpName.c_str());
 	motionplayer_ct->setActive(false);
 	ct_tree_p->add_controller(motionplayer_ct);
+
+	steeringAgent = new SteeringAgent(this);
 
 	bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( name, unreal_class, mcuCBHandle::singleton().net_face_bones );
 
@@ -2202,7 +2211,6 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 				return CMD_NOT_FOUND;
 			}
 		}
-
 		else if (reach_cmd == "grabhand" || reach_cmd == "reachhand" || reach_cmd == "releasehand")
 		{
 			string motion_name = args.read_token();
