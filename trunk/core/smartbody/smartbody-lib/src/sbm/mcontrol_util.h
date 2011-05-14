@@ -88,6 +88,8 @@ class mcuCBHandle;
 #include <sbm/me_ct_param_animation_utilities.h>
 #include <sbm/me_ct_param_animation_data.h>
 
+#include <sbm/SteerSuiteEngineDriver.h>
+
 #include BML_PROCESSOR_INCLUDE
 
 
@@ -147,6 +149,7 @@ class mcuCBHandle	{
 		bool		net_face_bones;
 		bool		use_locomotion;
 		bool		use_param_animation;
+		bool		steering_use_procedural;
 		const char* net_host;
 		bonebus::BoneBusClient bonebus;
 		SBMCharacterListener * sbm_character_listener;   // only one listener possible, must be set manually
@@ -228,6 +231,7 @@ class mcuCBHandle	{
 
 		srHashMap <SbmPawn>			pawn_map;
 		srHashMap <SbmCharacter>	character_map;
+		std::map<std::string, SteerLib::ObstacleInterface*> obstacle_map;
 
 		BML_PROCESSOR				bml_processor;
 		WSP::Manager*				theWSP;
@@ -235,6 +239,8 @@ class mcuCBHandle	{
 		joint_logger::EvaluationLogger* logger_p;
 		ResourceManager*			resource_manager;
 		std::vector<CameraTrack*>	cameraTracking;
+
+		SteerSuiteEngineDriver*		steerEngine;
 
 	private:
 		// Constant

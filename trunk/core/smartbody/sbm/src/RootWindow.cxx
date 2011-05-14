@@ -1,6 +1,5 @@
 
 #include "vhcl.h"
-
 #include "RootWindow.h"
 
 #include <fltk/PackedGroup.h>
@@ -48,6 +47,9 @@ RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Terrain/Shaded", 0, TerrainShadedCB, this, NULL);
 	menubar->add("&View/Terrain/Wireframe", 0, TerrainWireframeCB, this, NULL);
 	menubar->add("&View/Terrain/No Terrain", 0, TerrainNoneCB, this, NULL);	
+	menubar->add("&View/Steer/Characters and Goals", 0, SteeringCharactersCB, this, NULL);
+	menubar->add("&View/Steer/All Steering", 0, SteeringAllCB, this, NULL);
+	menubar->add("&View/Steer/No Steering", 0, SteeringNoneCB, this, NULL);	
 	menubar->add("&Create/Character...", 0, CreateCharacterCB, this, NULL);
 	menubar->add("&Create/Pawn...", 0, CreatePawnCB, this, NULL);
 	menubar->add("&Create/Terrain...", 0, CreateTerrainCB, this, NULL);
@@ -779,6 +781,24 @@ void RootWindow::TrajectoryCB(fltk::Widget* w, void* data)
 {
 	RootWindow* rootWindow = static_cast<RootWindow*>(data);
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowTrajectory, NULL);	
+}
+
+void RootWindow::SteeringCharactersCB(fltk::Widget* w, void* data)
+{
+	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdSteerCharactersGoalsOnly, NULL);	
+}
+
+void RootWindow::SteeringAllCB(fltk::Widget* w, void* data)
+{
+	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdSteerAll, NULL);	
+}
+
+void RootWindow::SteeringNoneCB(fltk::Widget* w, void* data)
+{
+	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoSteer, NULL);	
 }
 
 void RootWindow::LocomotionFootstepsCB(fltk::Widget* w, void* data)

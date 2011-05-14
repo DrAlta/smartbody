@@ -135,6 +135,8 @@ class ParameterManager
 		bool insideTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3);
 		void getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, double& w1, double& w2, double& w3);
 		void getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, SrVec& v4, double& w1, double& w2, double& w3, double& w4);
+		SrVec closestPtPointTriangle(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3);
+		int PointOutsideOfPlane(SrVec p, SrVec a, SrVec b, SrVec c);
 
 	private:
 		int type;

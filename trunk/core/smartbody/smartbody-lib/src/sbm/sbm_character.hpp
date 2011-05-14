@@ -69,18 +69,21 @@
 #include <sbm/general_param_setting.h>
 
 #include <sbm/me_ct_param_animation.h>
+#include "SteeringAgent.h"
 
 //#include <me/me_spline_1d.hpp>
 class MeCtMotionPlayer;
 class MeCtPAnimation;
 class MeCtParamAnimation;
-
+class SteeringAgent;
 
 class SbmCharacter : public SbmPawn	{
 
 public:
 	std::list<SrVec> trajectoryBuffer;
 	static const int trajectoryLength = 1000;
+	SteeringAgent* steeringAgent;
+	int	_numSteeringGoal;
 
 public:
 	// Static Constants
@@ -305,11 +308,7 @@ public:
 	void locomotion_ik_enable(bool enable);
 	MeCtLocomotionClass* get_locomotion_ct();
 
-
 public:
-
-	int		_numSteeringGoals;
-
 	bool addReachMotion(SkMotion* motion);
 	SkMotion* getReachMotion(int index);
 	const MotionDataSet& getReachMotionDataSet() const { return reachMotionData;}

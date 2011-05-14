@@ -43,6 +43,7 @@
 #include "sbm_pawn.hpp"
 #include "sbm/Event.h"
 #include "sbm/ParserOpenCOLLADA.h"
+#include "SteeringAgent.h"
 
 using namespace std;
 using namespace WSP;
@@ -641,7 +642,6 @@ double parseMotionParameters(std::string m, std::string parameter, double min, d
 {
 	std::string skeletonName = tokenize(parameter, "|");
 	SkSkeleton* sk = NULL;
-
 	if (parameter != "")
 	{
 		std::map<std::string, SkSkeleton*>::iterator iter = mcuCBHandle::singleton().skeleton_map.find(skeletonName);
@@ -650,7 +650,6 @@ double parseMotionParameters(std::string m, std::string parameter, double min, d
 		else
 			LOG("parseMotionParameters ERR: skeleton %s not found! Parameter won't be setup properly", skeletonName.c_str());
 	}
-
 	int type = 0;
 	if (parameter == "speed1")
 		type = 0;
@@ -775,8 +774,8 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 						state->paramManager->addParameter(m, param[0], param[1], param[2]);
 					}
 				}
-				if (type == "3D")
-					state->paramManager->buildTetrahedron();
+//				if (type == "3D")
+//					state->paramManager->buildTetrahedron();
 			}
 			else if (nextString == "triangle")
 			{
@@ -790,6 +789,20 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					std::string motion3 = args.read_token();
 					state->paramManager->addTriangle(motion1, motion2, motion3);
 				}
+			}
+			else if (nextString == "tetrahedron")
+			{
+				PAStateData* state = mcu_p->lookUpPAState(stateName);
+				if (!state) return CMD_FAILURE;
+				int numTetrahedrons = args.read_int();
+				for (int i = 0; i < numTetrahedrons; i++)
+				{
+					std::string motion1 = args.read_token();
+					std::string motion2 = args.read_token();
+					std::string motion3 = args.read_token();
+					std::string motion4 = args.read_token();
+					state->paramManager->addTetrahedron(motion1, motion2, motion3, motion4);
+				}				
 			}
 			else
 				return CMD_FAILURE;
@@ -5341,6 +5354,162 @@ int skeletonmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
+int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	if ( mcu_p )
+	{
+		std::string command = args.read_token();
+		if (command == "help")
+		{
+			LOG("Use: steer <start|stop>");
+			LOG("     steer move <character> <x> <y> <z>");
+			return CMD_SUCCESS;
+		}
+		else if (command == "start")
+		{
+			if (mcu_p->steerEngine)
+			{
+				delete mcu_p->steerEngine;
+			}
+			mcu_p->steerEngine = new SteerSuiteEngineDriver();
+			SteerLib::SimulationOptions* steerOptions = new SteerLib::SimulationOptions();
+			steerOptions->moduleOptionsDatabase["testCasePlayer"]["testcase"] = "3-way-confusion-1.xml";
+			steerOptions->moduleOptionsDatabase["testCasePlayer"]["ai"] = "pprAI";
+			steerOptions->engineOptions.startupModules.insert("testCasePlayer");
+			steerOptions->engineOptions.testCaseSearchPath = "..\\..\\..\\..\\core\\steersuite-1.3\\testcases\\";
+			steerOptions->engineOptions.moduleSearchPath = "..\\..\\..\\..\\core\\smartbody\\sbm\\bin\\";
+			LOG("INIT STEERSIM");
+			mcu_p->steerEngine->init(steerOptions);
+			LOG("LOADING STEERSIM");
+			mcu_p->steerEngine->loadSimulation();
+
+			// create an agent based on the current characters and positions
+			SteerLib::ModuleInterface* pprAIModule = mcu_p->steerEngine->_engine->getModule("pprAI");
+			mcu_p->character_map.reset();
+			SbmCharacter* character = NULL;
+			while( character = mcu_p->character_map.next() )
+			{
+				float x, y, z;
+				float yaw, pitch, roll;
+				character->get_world_offset(x, y, z, yaw, pitch, roll);
+				SteerLib::AgentInitialConditions initialConditions;
+				initialConditions.position = Util::Point( x / 100.0f, 0.0f, z / 100.0f );
+				Util::Vector orientation = Util::rotateInXZPlane(Util::Vector(0.0f, 0.0f, 1.0f), yaw * float(M_PI) / 180.0f);
+				initialConditions.direction = orientation;
+				initialConditions.radius = 0.4f;
+				initialConditions.speed = 0.0f;
+				initialConditions.goals.clear();
+				initialConditions.name = character->name;
+				SteerLib::AgentInterface* agent = mcu_p->steerEngine->_engine->createAgent( initialConditions, pprAIModule );
+				character->steeringAgent->setAgent(agent);
+				agent->reset(initialConditions, dynamic_cast<SteerLib::EngineInterface*>(pprAIModule));
+			}
+			LOG("STARTING STEERSIM");
+			mcu_p->steerEngine->startSimulation();
+			mcu_p->steerEngine->setStartTime(0.0f);
+			return CMD_SUCCESS;
+		}
+		else if (command == "stop")
+		{
+			if (mcu_p->steerEngine)
+			{
+				mcu_p->steerEngine->stopSimulation();
+				mcu_p->steerEngine->unloadSimulation();
+				mcu_p->steerEngine->finish();
+				delete mcu_p->steerEngine;
+				mcu_p->steerEngine = NULL;
+
+				mcu_p->character_map.reset();
+				SbmCharacter* character = NULL;
+				while( character = mcu_p->character_map.next() )
+					character->steeringAgent->setAgent(NULL);
+			}
+		  return CMD_SUCCESS;
+		}
+		else if (command == "move")
+		{
+			int num = args.calc_num_tokens();
+			if (num < 4)
+			{
+				LOG("Syntax: steer move <character> <x> <y> <z>");
+				return CMD_FAILURE;
+			}
+			if (mcu_p->steerEngine)
+			{
+				std::string characterName = args.read_token();
+				SbmCharacter* character = mcu_p->character_map.lookup(characterName.c_str());
+				if (character)
+				{
+					float x, y, z;
+					std::string xpos = args.read_token();
+					x = float(atof(xpos.c_str()));
+					std::string ypos = args.read_token();
+					y = float(atof(ypos.c_str()));
+					std::string zpos = args.read_token();
+					z = float(atof(zpos.c_str()));
+
+					character->steeringAgent->getAgent()->clearGoals();
+					SteerLib::AgentGoalInfo goal;
+					goal.desiredSpeed = character->steeringAgent->desiredSpeed;
+					goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
+					goal.targetIsRandom = false;
+					goal.targetLocation = Util::Point(x / 100.0f, character->getHeight() / 200.0f, z / 100.0f);
+					character->steeringAgent->getAgent()->addGoal(goal);
+				}
+			}
+			return CMD_SUCCESS;
+		}
+		else if (command == "proximity")
+		{
+			std::string characterName = args.read_token();
+			SbmCharacter* character = mcu_p->character_map.lookup(characterName.c_str());
+			if (character)
+			{
+				character->steeringAgent->distThreshold = (float)args.read_double() * 100.0f;
+				return CMD_SUCCESS;
+			}
+		}
+		else if (command == "speed")
+		{
+			std::string characterName = args.read_token();
+			SbmCharacter* character = mcu_p->character_map.lookup(characterName.c_str());
+			if (character)
+			{
+				if (!mcu_p->steering_use_procedural)
+				{
+					character->steeringAgent->desiredSpeed = (float)args.read_double();
+					return CMD_SUCCESS;
+				}
+			}		
+		}
+		else if (command == "type")
+		{
+			std::string type = args.read_token();
+			if (type == "example")
+			{
+				mcu_p->steering_use_procedural = false;
+				return CMD_SUCCESS;
+			}
+			if (type == "procedural")
+			{
+				mcu_p->steering_use_procedural = true;
+				return CMD_SUCCESS;
+			}
+		}
+		else if (command == "facing")
+		{
+			std::string characterName = args.read_token();
+			SbmCharacter* character = mcu_p->character_map.lookup(characterName.c_str());
+			if (character)
+			{
+				character->steeringAgent->facingAngle = (float)args.read_double();
+				return CMD_SUCCESS;
+			}				
+		}
+	}
+	return CMD_FAILURE;
+}
+
 
 int showcharacters_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
@@ -5350,7 +5519,6 @@ int showcharacters_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	{
 		LOG("%s", character->name);
 	}
-
 	return CMD_SUCCESS;
 }
 
@@ -5368,6 +5536,4 @@ int showpawns_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 	return CMD_SUCCESS;
 }
-
-
 

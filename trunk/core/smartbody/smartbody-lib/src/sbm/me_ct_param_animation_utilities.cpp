@@ -25,8 +25,7 @@
 #include <sbm/mcontrol_util.h>
 #include <sr/sr_euler.h>
 
-
-const double timeThreshold = 0.01;
+const double timeThreshold = 0.05;
 PATimeManager::PATimeManager()
 {
 }
@@ -629,9 +628,6 @@ PAStateModule::PAStateModule(PAStateData* stateData, bool l, bool pn)
 
 PAStateModule::~PAStateModule()
 {
-	
-	if (data)
-		delete data;
 	data = NULL;
 	if (timeManager)
 		delete timeManager;
@@ -699,7 +695,12 @@ PATransitionManager::PATransitionManager(double easeOutStart, double dur)
 	s1 = easeOutStart;
 	e1 = s1 + dur;
 	s2 = 0.0;
+	// possible bug spot, although for now, the result seems better
+#if 0
 	e2 = s2 + dur;
+#else
+	e2 += dur;
+#endif
 }
 
 PATransitionManager::PATransitionManager(PATransitionData* transitionData)
@@ -726,6 +727,31 @@ PATransitionManager::~PATransitionManager()
 */
 void PATransitionManager::align(PAStateModule* current, PAStateModule* next)
 {
+
+	// possible bug spot, although for now, the result seems better
+#if 1
+	int numEaseOut = getNumEaseOut();
+	for (int i = 0; i < numEaseOut; i++)
+	{
+		if (fabs(current->timeManager->localTime - easeOutStarts[i]) < timeThreshold)
+		{
+			s1 = easeOutStarts[i];
+			e1 = easeOutEnds[i];
+		}
+	}
+
+	if (fabs(current->timeManager->localTime - s1) < timeThreshold)
+	{
+		next->active = true;
+		blendingMode = true;
+		curve->insert(0.0, 1.0);
+		curve->insert(duration, 0.0);
+#if PrintPADebugInfo
+		LOG("State %s being scheduled.[ACTIVE]", next->data->stateName.c_str());
+#endif
+	}
+#else
+
 	int numEaseOut = getNumEaseOut();
 	for (int i = 0; i < numEaseOut; i++)
 	{
@@ -747,6 +773,7 @@ void PATransitionManager::align(PAStateModule* current, PAStateModule* next)
 		LOG("State %s being scheduled.[ACTIVE]", next->data->stateName.c_str());
 #endif
 	}
+#endif
 }
 
 void PATransitionManager::blending(SrBuffer<float>& buffer, SrBuffer<float>&buffer1, SrBuffer<float>&buffer2, SrMat& mat, SrMat& mat1, SrMat& mat2, double timeStep, MeControllerContext* _context)
@@ -762,6 +789,8 @@ void PATransitionManager::blending(SrBuffer<float>& buffer, SrBuffer<float>&buff
 
 void PATransitionManager::update()
 {
+	if (data == NULL)
+		return;
 	std::vector<double> fromKey;
 	int id;
 	if (!data)

@@ -267,7 +267,7 @@ Knot* MeSpline1D::make_knot( domain x, range y, update_knot_algo& update_knot ) 
 		} else {
 			knot = (*i).second;
 			if( knot->get_x()<(x+EPSILON) ) {
-				// Matching x ± EPSILON:
+				// Matching x ?EPSILON:
 				// Neighbors don't change
 				//  TODO: update x.
 				update_knot( knot );

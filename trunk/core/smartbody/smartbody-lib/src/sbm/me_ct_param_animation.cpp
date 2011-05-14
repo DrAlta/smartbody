@@ -145,13 +145,22 @@ std::string MeCtParamAnimation::getBaseJointName()
 	return baseJointName;
 }
 
+void MeCtParamAnimation::dumpScheduling()
+{
+	if (curStateModule)
+		LOG("Current State: %s", curStateModule->data->stateName.c_str());
+	if (nextStateModule)
+		LOG("Next State: %s", nextStateModule->data->stateName.c_str());
+	LOG("Number of states to be scheduled: %d", waitingList.size());
+	std::list<ScheduleUnit>::iterator iter = waitingList.begin();
+	for (; iter != waitingList.end(); iter++)
+		LOG("* %s", iter->data->stateName.c_str());
+}
+
 void MeCtParamAnimation::schedule(PAStateData* stateData, bool l, bool pn)
 {
 	ScheduleUnit unit;
-	if (stateData)
-		unit.data = new PAStateData(stateData);
-	else
-		unit.data = NULL;
+	unit.data = stateData;
 	unit.loop = l;
 	unit.playNow = pn;
 	unit.time = mcuCBHandle::singleton().time;
@@ -169,6 +178,18 @@ void MeCtParamAnimation::updateWeights(std::vector<double> w)
 		return;
 	if (curStateModule->data->getNumMotions() != w.size())
 		return;
+
+
+	double wCheck = 0.0;
+	for (size_t i = 0; i < w.size(); i++)
+		wCheck += w[i];
+	if (fabs(wCheck - 1.0) > 0.1)
+	{
+		for (size_t i = 0; i < w.size(); i++)
+			if (i == 0) w[i] = 1.0;
+			else		w[i] = 0.0;
+	}
+
 	curStateModule->timeManager->updateWeights(w);
 	curStateModule->interpolator->weights = w;
 	curStateModule->woManager->weights = w;
@@ -268,6 +289,7 @@ void MeCtParamAnimation::autoScheduling(double time)
 					if (curStateModule->timeManager->localTime >= (curStateModule->timeManager->getDuration() - defaultTransition))
 						actualTransitionTime = curStateModule->timeManager->getDuration() - curStateModule->timeManager->localTime;
 					transitionManager = new PATransitionManager(curStateModule->timeManager->getDuration() - actualTransitionTime, actualTransitionTime);	
+//					transitionManager = new PATransitionManager(curStateModule->timeManager->getDuration() - defaultTransition);					
 				}
 			}
 #if PrintPADebugInfo

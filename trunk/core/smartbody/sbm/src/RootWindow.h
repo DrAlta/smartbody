@@ -89,6 +89,9 @@ class  RootWindow : public SrViewer, public fltk::DoubleBufferWindow
 		static void LocomotionFootstepsCB(fltk::Widget* w, void* data);
 		static void VelocityCB(fltk::Widget* w, void* data);
 		static void TrajectoryCB(fltk::Widget* w, void* data);
+		static void SteeringCharactersCB(fltk::Widget* w, void* data);
+		static void SteeringAllCB(fltk::Widget* w, void* data);
+		static void SteeringNoneCB(fltk::Widget* w, void* data);
 };
 
 class FltkViewerFactory : public SrViewerFactory

@@ -27,19 +27,6 @@
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
 
-
-PAStateData::PAStateData(PAStateData* data)
-{
-	stateName = data->stateName;
-	motions = data->motions;
-	keys = data->keys;
-	weights = data->weights;
-	fromStates = data->fromStates;
-	toStates = data->toStates;
-	cycle = data->cycle;
-	paramManager = new ParameterManager(data->paramManager, this);
-}
-
 PAStateData::PAStateData(std::string name)
 {
 	stateName = name;
@@ -80,7 +67,6 @@ int PATransitionData::getNumEaseOut()
 {
 	return easeOutStart.size();
 }
-
 
 ParameterManager::ParameterManager(ParameterManager* pm, PAStateData* s)
 {
@@ -238,7 +224,6 @@ bool ParameterManager::setWeight(double x, double y, double z)
 {
 	if (type != 2)
 		return false;
-
 	SrVec pt = SrVec((float)x, (float)y, (float)z);
 	for (unsigned int i = 0; i < tetrahedrons.size(); i++)
 	{
@@ -266,7 +251,105 @@ bool ParameterManager::setWeight(double x, double y, double z)
 			state->weights[id2] = w2;
 			state->weights[id3] = w3;
 			state->weights[id4] = w4;
+			return true;
 		} 
+	}
+
+	// if it's not inside any tetrahedron, find the most close one
+	// refer to <Real-Time Collision Detection>
+	int id = -1;
+	float min = 99999;
+	SrVec param;
+
+	for (unsigned int i = 0; i < tetrahedrons.size(); i++)
+	{
+		float bestSqDist = 9999;
+		SrVec a = tetrahedrons[i].v1;
+		SrVec b = tetrahedrons[i].v2;
+		SrVec c = tetrahedrons[i].v3;
+		SrVec d = tetrahedrons[i].v4;
+		SrVec closestPt = a;
+
+		if (PointOutsideOfPlane(pt, a, b, c))
+		{
+			SrVec q = closestPtPointTriangle(pt, a, b, c);
+			float sqDist = dot(q - pt, q - pt);
+			if (sqDist < bestSqDist)
+			{
+				bestSqDist = sqDist;
+				closestPt = q;
+			}
+		}
+		if (PointOutsideOfPlane(pt, a, c, d))
+		{
+			SrVec q = closestPtPointTriangle(pt, a, c, d);
+			float sqDist = dot(q - pt, q - pt);
+			if (sqDist < bestSqDist)
+			{
+				bestSqDist = sqDist;
+				closestPt = q;
+			}
+		}
+		if (PointOutsideOfPlane(pt, a, d, b))
+		{
+			SrVec q = closestPtPointTriangle(pt, a, d, b);
+			float sqDist = dot(q - pt, q - pt);
+			if (sqDist < bestSqDist)
+			{
+				bestSqDist = sqDist;
+				closestPt = q;
+			}
+		}
+		if (PointOutsideOfPlane(pt, b, d, c))
+		{
+			SrVec q = closestPtPointTriangle(pt, b, d, c);
+			float sqDist = dot(q - pt, q - pt);
+			if (sqDist < bestSqDist)
+			{
+				bestSqDist = sqDist;
+				closestPt = q;
+			}
+		}
+
+		if (bestSqDist <= min)
+		{
+			param = closestPt;
+			id = i;
+			min = bestSqDist;
+		}
+	}
+
+	if (id >= 0)
+	{
+		SrVec v1 = tetrahedrons[id].v1;
+		SrVec v2 = tetrahedrons[id].v2;
+		SrVec v3 = tetrahedrons[id].v3;
+		SrVec v4 = tetrahedrons[id].v4;
+		int id1 = state->getMotionId(tetrahedrons[id].motion1);
+		int id2 = state->getMotionId(tetrahedrons[id].motion2);
+		int id3 = state->getMotionId(tetrahedrons[id].motion3);
+		int id4 = state->getMotionId(tetrahedrons[id].motion3);
+		double w1 = 0.0;	
+		double w2 = 0.0;
+		double w3 = 0.0;
+		double w4 = 0.0;
+		getWeight(param, v1, v2, v3, v4, w1, w2, w3, w4);
+		setPrevVec(param);
+		if (w1 >= 0 && w2 >= 0 && w3 >= 0 && w4 >= 0)
+		{
+	//		std::cout << state->motions[id1]->name() << " " << state->motions[id2]->name() << " " << state->motions[id3]->name() << " " << state->motions[id4]->name() << std::endl;
+			for (int i = 0; i < state->getNumMotions(); i++)
+				state->weights[i] = 0.0;
+			state->weights[id1] = w1;
+			state->weights[id2] = w2;
+			state->weights[id3] = w3;
+			state->weights[id4] = w4;
+			return true;
+		}
+		else
+		{
+			LOG("Not inside tetrahedron.");
+		}
 	}
 	return true;
 }
@@ -628,6 +711,62 @@ void ParameterManager::getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, SrV
 	w2 = vecOut(1);
 	w3 = vecOut(2);
 	w4 = 1 - vecOut(0) - vecOut(1) - vecOut(2);
+	if (fabs(w1) <= 0.00001)	w1 = 0.0;
+	if (fabs(w2) <= 0.00001)	w2 = 0.0;
+	if (fabs(w3) <= 0.00001)	w3 = 0.0;
+	if (fabs(w4) <= 0.00001)	w4 = 0.0;
+}
+
+
+SrVec ParameterManager::closestPtPointTriangle(SrVec& p, SrVec& a, SrVec& b, SrVec& c)
+{
+	SrVec ab = b - a;
+	SrVec ac = c - a;
+	SrVec ap = p - a;
+	float d1 = dot(ab, ap);
+	float d2 = dot(ac, ap);
+	if (d1 <= 0.0f && d2 <= 0.0f) return a;
+	
+	SrVec bp = p - b;
+	float d3 = dot(ab, bp);
+	float d4 = dot(ac, bp);
+	if (d3 >= 0.0f && d4 <= d3) return b;
+
+	float vc = d1 * d4 - d3 * d2;
+	if (vc <= 0.0f && d1 >= 0.0f && d3 <= 0.0f)
+	{
+		float v = d1 / (d1 - d3);
+		return a + v * ab;
+	}
+
+	SrVec cp = p - c;
+	float d5 = dot(ab, cp);
+	float d6 = dot(ac, cp);
+	if (d6 >= 0.0f && d5 <= d6) return c;
+
+	float vb = d5 * d2 - d1 * d6;
+	if (vb <= 0.0f && d2 >= 0.0f && d6 <= 0.0f)
+	{
+		float w = d2 / (d2 - d6);
+		return a + w * ac;
+	}
+
+	float va = d3 * d6 - d5 * d4;
+	if (va <= 0.0f && (d4 - d3) >= 0.0f && (d5 - d6) >= 0.0f)
+	{
+		float w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+		return b + w * (c - b);
+	}
+
+	float denom = 1.0f / (va + vb + vc);
+	float v = vb * denom;
+	float w = vc * denom;
+	return a + ab * v + ac * w;
+}
+
+int ParameterManager::PointOutsideOfPlane(SrVec p, SrVec a, SrVec b, SrVec c)
+{
+	return dot(p - a, cross(b - a, c - a)) >= 0.0f;
 }
 
 MotionParameters::MotionParameters(SkMotion* m, SkSkeleton* skel, std::string j)

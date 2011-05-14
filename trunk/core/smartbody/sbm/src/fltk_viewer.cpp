@@ -20,7 +20,6 @@
  *      Marcelo Kallmann, USC (currently at UC Merced)
  */
 
-
 #include "vhcl.h"
 # include "fltk_viewer.h"
 # include <fltk/events.h>
@@ -62,6 +61,11 @@
 # include <SBM/me_ct_constraint.hpp>
 # include <SBM/Collision/SbmColObject.h>
 # include <SBM/me_ct_param_animation_data.h>
+
+# include <SBM/me_ct_param_animation_data.h>
+# include <SBM/Collision/SbmColObject.h>
+# include <SBM/me_ct_param_animation_data.h>
+
 
 #include <sbm/mcontrol_util.h>
 //#include <sbm/SbmShader.h>
@@ -177,7 +181,6 @@ Fl_Menu_Item BodyReachMenuTable[] =
 	{ 0 }
 };
 
-
 Fl_Menu_Item MenuTable[] =
  { 
    { "&help",       0, MCB, CMD(CmdHelp) },
@@ -215,8 +218,7 @@ Fl_Menu_Item MenuTable[] =
 		 { 0 },    
     { gaze_on_target_menu_name, 0, 0, GazeMenuTable, FL_SUBMENU_POINTER },   
 	{ reach_on_target_menu_name, 0, 0, ReachMenuTable, FL_SUBMENU_POINTER }, 
-	{ body_reach_menu_name, 0, 0, BodyReachMenuTable, FL_SUBMENU_POINTER }, 
-    { "p&references", 0, 0, 0, FL_SUBMENU },
+	{ body_reach_menu_name, 0, 0, BodyReachMenuTable, FL_SUBMENU_POINTER },     { "p&references", 0, 0, 0, FL_SUBMENU },
          { "&axis",         0, MCB, CMD(CmdAxis),        FL_MENU_TOGGLE },
          { "b&ounding box", 0, MCB, CMD(CmdBoundingBox), FL_MENU_TOGGLE },
          { "&statistics",   0, MCB, CMD(CmdStatistics),  FL_MENU_TOGGLE },
@@ -365,6 +367,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->dynamicsMode = ModeNoDynamics;
    _data->locomotionMode = ModeEnableLocomotion;
    _data->reachRenderMode = ModeShowExamples;
+   _data->steerMode = ModeNoSteer;
 
    _data->iconized    = false;
    _data->statistics  = false;
@@ -408,6 +411,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 //   gridSize = 400.0;
 //   gridStep = 50.0;
    gridList = -1;
+   _arrowTime = 0.0f;
 
    init_foot_print();
 }
@@ -648,7 +652,16 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 		  }	
 		  break;  
 
-	  case CmdExampleReachToggleInterpolation:
+	   case CmdNoSteer: 
+		   _data->steerMode = ModeNoSteer;
+		   break;
+	   case CmdSteerAll: 
+		   _data->steerMode = ModeSteerAll;
+		   break;
+	   case CmdSteerCharactersGoalsOnly:
+			_data->steerMode = ModeSteerCharactersGoalsOnly;
+		 break;
+  		case CmdExampleReachToggleInterpolation:
 		  if (bodyReachCt)
 		  {
 			  bodyReachCt->useInterpolation = !bodyReachCt->useInterpolation;
@@ -978,13 +991,12 @@ void FltkViewer::draw()
 
    if (_objManipulator.hasPicking())
    {
-	   SrVec2 pick_loc = _objManipulator.getPickLoc();
-	   _objManipulator.picking(pick_loc.x,pick_loc.y, _data->camera);	   
+		SrVec2 pick_loc = _objManipulator.getPickLoc();
+		_objManipulator.picking(pick_loc.x,pick_loc.y, _data->camera);	   
    }
 
+   mcuCBHandle& mcu = mcuCBHandle::singleton();
    glViewport ( 0, 0, w(), h() );
-   mcuCBHandle& mcu = mcuCBHandle::singleton();  
-
    SrLight &light = _data->light;
    SrCamera &cam  = _data->camera;
    SrMat mat ( SrMat::NotInitialized );
@@ -1157,6 +1169,7 @@ void FltkViewer::draw()
 	_objManipulator.draw(cam);
 	// feng : debugging draw for reach controller
 	drawReach();
+	drawSteeringInfo();
 
 
 	_data->fcounter.stop();
@@ -1574,7 +1587,8 @@ void FltkViewer::translate_keyboard_state()
 	if(_locoData->kmode == 0) sprintf(tt, "spd 0 rps %f time 0.7", _locoData->rps_flag * _locoData->rps);
 	else sprintf(tt, "spd 0 lrps %f angle 3.14159265 time 1.0", _locoData->rps_flag * _locoData->rps);
 
-	if (mcu.use_param_animation) locomotion_cmd = false;
+	if (mcu.use_param_animation)
+		locomotion_cmd = false;
 	if(locomotion_cmd) 
 	{
 		strcat(cmd, tt);
@@ -1767,9 +1781,31 @@ int FltkViewer::handle ( int event )
          if ( POPUP_MENU(e) ) { show_menu(); e.type=SrEvent::None; }
 		 // process picking
 		 //printf("Mouse Push\n");
-		
-		
-          
+
+		 if (e.button1)
+		 {
+			 _objManipulator.picking(e.mouse.x, e.mouse.y, _data->camera);
+			 SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
+			 if (selectedPawn)
+			 {
+				SbmCharacter* isCharacter = dynamic_cast<SbmCharacter*> (selectedPawn);
+				if (isCharacter)
+					_paLocoData->character = isCharacter;
+			 }
+		 }
+		 if (mcuCBHandle::singleton().steerEngine && e.button3 && !e.alt)
+		 {
+			_paLocoData->character->steeringAgent->setTargetAgent(NULL);
+			SrVec p1;
+			SrVec p2;
+			_data->camera.get_ray(e.mouse.x, e.mouse.y, p1, p2);
+			SrPlane ground(SrVec(0,0,0), SrVec(0, 1, 0));
+			SrVec dest = ground.intersect(p1, p2);
+			dest.y = _paLocoData->character->getHeight() / 100.0f;
+			std::stringstream command;
+			command << "steer move " << _paLocoData->character->name << " " << dest.x << " " << dest.y << " " << dest.z;
+			mcuCBHandle::singleton().execute((char*)command.str().c_str());
+		}
        } break;
 
       case fltk::RELEASE:
@@ -1911,12 +1947,12 @@ int FltkViewer::handle_event ( const SrEvent &e )
 	   res = handle_object_manipulation ( e );
 	   if ( res ) return res;
    }
+
    if (e.shift && e.mouse_event() )
    {
 	   res = handle_object_manipulation ( e );
 	   if ( res ) return res;
    }
-
 
    if ( e.mouse_event() ) return handle_scene_event ( e );
 
@@ -1963,8 +1999,21 @@ int FltkViewer::handle_object_manipulation( const SrEvent& e)
 				 }	
 			 }
 			 */
-			 return 1;
 		 }
+		 if (e.button3 && e.shift)
+		 {
+			_objManipulator.setPicking(SrVec2(e.mouse.x, e.mouse.y));
+			_objManipulator.picking(e.mouse.x, e.mouse.y, _data->camera);
+			SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
+			if (selectedPawn)
+				if (selectedPawn->name != _paLocoData->character->name)
+				{
+					SbmCharacter* selectedCharacter = dynamic_cast<SbmCharacter*> (selectedPawn);
+					if (selectedCharacter)
+						_paLocoData->character->steeringAgent->setTargetAgent(selectedCharacter);
+				}
+		 }
+		return 1;
 	 }
 	else if (e.type==SrEvent::Drag)
 	{
@@ -2642,7 +2691,7 @@ void FltkViewer::drawCircle(float cx, float cy, float cz, float r, int num_segme
 	glDisable(GL_BLEND); 
 }
 static float spin_angle = 0.0f;
-static float time = 0.0f;
+
 void FltkViewer::drawActiveArrow(SrVec& from, SrVec& to, int num, float width, SrVec& color, bool spin)
 {
 	spin_angle += 0.02f;
@@ -2654,7 +2703,7 @@ void FltkViewer::drawActiveArrow(SrVec& from, SrVec& to, int num, float width, S
 	float acc = -80.0f;
 	float latency = 0.10f;
 	
-	time += 0.01666f;
+	_arrowTime += 0.01666f;
 
 	SrVec p[6];
 	p[5] = to;
@@ -2701,7 +2750,7 @@ void FltkViewer::drawActiveArrow(SrVec& from, SrVec& to, int num, float width, S
 		p[3] -= di;
 		p[4] -= di;
 		p[5] -= di;
-		t_time = time+latency*i;
+		t_time = _arrowTime + latency*i;
 		t_speed = speed+acc*t_time;
 		if(abs(t_speed) > abs(speed))
 		{
@@ -2747,7 +2796,7 @@ void FltkViewer::drawActiveArrow(SrVec& from, SrVec& to, int num, float width, S
 		glVertex3f(p[3].x, p[3].y, p[3].z);
 		glVertex3f(p[4].x, p[4].y, p[4].z);
 	}
-	time = s_time;
+	_arrowTime = s_time;
 	glEnd();
 	glDisable(GL_BLEND); 
 }
@@ -3560,8 +3609,7 @@ void FltkViewer::drawReach()
 // 
 // 			drawTetra(tetraVtx,SrVec(1,0,0));
 // 		}
-
-		
+	
 		for (unsigned int i=0;i<resampleData.size();i++)
 		{			
 			SrVec lPos = resampleData[i];
@@ -3570,7 +3618,6 @@ void FltkViewer::drawReach()
 			drawPoint(gPos[0],gPos[1],gPos[2],1.5,SrVec(0.0,1.0,0.0));
 			//PositionControl::drawSphere(gPos,1.0f);			
 		}	
-
 // 		if (reachCt->posPlanner && reachCt->posPlanner->path())
 // 		{
 // 			if (reachCt->posPlanner->path())
@@ -3695,6 +3742,45 @@ void FltkViewer::drawColObject( SbmColObject* colObj )
 	glPopMatrix();	
 }
 
+
+void FltkViewer::drawSteeringInfo()
+{
+	if (_data->steerMode == ModeNoSteer)
+		return;
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	if (!mcu.steerEngine || !mcu.steerEngine->_engine)
+		return;
+
+	glPushAttrib(GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT);
+	glPushMatrix();
+	glScalef(100.0f, 100.0f, 100.0f);
+
+	const std::vector<SteerLib::AgentInterface*>& agents = mcu.steerEngine->_engine->getAgents();
+	for (size_t x = 0; x < agents.size(); x++)
+	{
+		mcu.steerEngine->_engine->selectAgent(agents[x]);
+		agents[x]->draw();
+	}
+
+	const std::set<SteerLib::ObstacleInterface*>& obstacles = mcu.steerEngine->_engine->getObstacles();
+	for (std::set<SteerLib::ObstacleInterface*>::const_iterator iter = obstacles.begin();
+		iter != obstacles.end();
+		iter++)
+	{
+		(*iter)->draw();
+	}
+	
+
+	if (_data->steerMode == ModeSteerAll)
+	{
+		mcu.steerEngine->_engine->getSpatialDatabase()->draw();
+	}
+
+	glPopMatrix();
+	glPopAttrib();
+
+}
+
 PALocomotionData::PALocomotionData()
 {
 	w = -9999;
@@ -3707,7 +3793,6 @@ PALocomotionData::PALocomotionData()
 	linearVelocityIncrement = 10.0f;
 	angularVelocityIncrement = 20.0f;
 }
-
 
 PALocomotionData::~PALocomotionData()
 {
