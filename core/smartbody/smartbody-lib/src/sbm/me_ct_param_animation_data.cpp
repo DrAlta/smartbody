@@ -240,9 +240,9 @@ bool ParameterManager::setWeight(double x, double y, double z)
 		double w3 = 0.0;
 		double w4 = 0.0;
 		getWeight(pt, v1, v2, v3, v4, w1, w2, w3, w4);
-		setPrevVec(pt);
 		if (w1 >= 0 && w2 >= 0 && w3 >= 0 && w4 >= 0)
 		{
+			setPrevVec(pt);
 	//		std::cout << state->motions[id1]->name() << " " << state->motions[id2]->name() << " " << state->motions[id3]->name() << " " << state->motions[id4]->name() << std::endl;
 			for (int i = 0; i < state->getNumMotions(); i++)
 				state->weights[i] = 0.0;
@@ -328,15 +328,15 @@ bool ParameterManager::setWeight(double x, double y, double z)
 		int id1 = state->getMotionId(tetrahedrons[id].motion1);
 		int id2 = state->getMotionId(tetrahedrons[id].motion2);
 		int id3 = state->getMotionId(tetrahedrons[id].motion3);
-		int id4 = state->getMotionId(tetrahedrons[id].motion3);
+		int id4 = state->getMotionId(tetrahedrons[id].motion4);
 		double w1 = 0.0;	
 		double w2 = 0.0;
 		double w3 = 0.0;
 		double w4 = 0.0;
 		getWeight(param, v1, v2, v3, v4, w1, w2, w3, w4);
-		setPrevVec(param);
 		if (w1 >= 0 && w2 >= 0 && w3 >= 0 && w4 >= 0)
 		{
+			setPrevVec(param);
 	//		std::cout << state->motions[id1]->name() << " " << state->motions[id2]->name() << " " << state->motions[id3]->name() << " " << state->motions[id4]->name() << std::endl;
 			for (int i = 0; i < state->getNumMotions(); i++)
 				state->weights[i] = 0.0;
@@ -351,7 +351,7 @@ bool ParameterManager::setWeight(double x, double y, double z)
 			LOG("Not inside tetrahedron.");
 		}
 	}
-	return true;
+	return false;
 }
 
 void ParameterManager::getParameter(float& x)
@@ -711,10 +711,14 @@ void ParameterManager::getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, SrV
 	w2 = vecOut(1);
 	w3 = vecOut(2);
 	w4 = 1 - vecOut(0) - vecOut(1) - vecOut(2);
-	if (fabs(w1) <= 0.00001)	w1 = 0.0;
-	if (fabs(w2) <= 0.00001)	w2 = 0.0;
-	if (fabs(w3) <= 0.00001)	w3 = 0.0;
-	if (fabs(w4) <= 0.00001)	w4 = 0.0;
+	if (fabs(w1) <= 0.00001)	
+		w1 = 0.0;
+	if (fabs(w2) <= 0.00001)	
+		w2 = 0.0;
+	if (fabs(w3) <= 0.00001)	
+		w3 = 0.0;
+	if (fabs(w4) <= 0.00001)	
+		w4 = 0.0;
 }
 
 
@@ -815,9 +819,9 @@ double MotionParameters::getParameter(int type)
 	if (type == 1)
 		return getAccSpeed();
 	if (type == 2)
-		return getAvgAngularSpeed() * 200;
+		return getAvgAngularSpeed() * 100;
 	if (type == 3)
-		return getAccAngularSpeed() * 200;
+		return getAccAngularSpeed() * 100;
 	return -1.0;
 }
 

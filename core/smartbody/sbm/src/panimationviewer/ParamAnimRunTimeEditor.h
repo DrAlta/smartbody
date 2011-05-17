@@ -24,9 +24,44 @@
 #define _PARAM_ANIM_RUN_TIME_EDITOR_H_
 
 #include "PanimationWindow.h"
+#include <fltk/GlWindow.h>
+#include <SR/sr_gl.h>
+#include <SR/sr_light.h>
+#include <SR/sr_camera.h>
+#include <SR/sr_event.h>
 
 class PanimationWindow;
 class ParameterGroup;
+
+class Parameter3DVisualization : public fltk::GlWindow
+{
+	public:
+		Parameter3DVisualization(int x, int y, int w, int h, char* name, PAStateData* s, ParameterGroup* window);
+		~Parameter3DVisualization();
+
+		virtual void draw();
+		virtual int handle(int event);
+		void init_opengl();
+		void translate_event(SrEvent& e, SrEvent::Type t, int w, int h, Parameter3DVisualization* viewer);
+		void mouse_event(SrEvent& e);
+
+		// user data
+		void drawTetrahedrons();
+		void drawGrid();
+		void drawParameter();
+
+	public:
+		SrCamera cam;
+		SrEvent e;
+		float gridSize;
+		float gridStep;
+		float floorHeight;
+
+	private:
+		PAStateData* state;
+		ParameterGroup* paramGroup;
+};
+
 class ParameterVisualization : public fltk::Group
 {
 	public:
@@ -79,6 +114,7 @@ class ParameterGroup : public fltk::Group
 		PanimationWindow* paWindow;
 		PAStateData* state;
 		ParameterVisualization* paramVisualization;
+		Parameter3DVisualization* param3DVisualization;
 		bool exec;
 		fltk::ValueSlider* xAxis;
 		fltk::ValueSlider* yAxis;
