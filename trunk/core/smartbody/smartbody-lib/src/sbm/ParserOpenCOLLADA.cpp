@@ -136,10 +136,14 @@ void ParserOpenCOLLADA::parseJoints(xercesc_3_0::DOMNode* node, SkSkeleton& skel
 		if (nodeName == "node")
 		{
 			xercesc_3_0::DOMNamedNodeMap* childAttr = childNode->getAttributes();
-			xercesc_3_0::DOMNode* typeNode = childAttr->getNamedItem(XMLString::transcode("type"));
-			std::string typeAttr = getString(typeNode->getNodeValue());
 			xercesc_3_0::DOMNode* nameNode = childAttr->getNamedItem(XMLString::transcode("name"));
-			std::string nameAttr = getString(nameNode->getNodeValue());
+			std::string nameAttr = "";
+			if (nameNode)
+				nameAttr = getString(nameNode->getNodeValue());
+			xercesc_3_0::DOMNode* typeNode = childAttr->getNamedItem(XMLString::transcode("type"));
+			std::string typeAttr = "";
+			if (typeNode)
+				typeAttr = getString(typeNode->getNodeValue());
 			if (typeAttr == "JOINT")
 			{
 				int index = -1;
@@ -197,7 +201,8 @@ void ParserOpenCOLLADA::parseJoints(xercesc_3_0::DOMNode* node, SkSkeleton& skel
 							if (sidAttr == "jointOrientX") jorientx = finalValue;
 							if (sidAttr == "jointOrientY") jorienty = finalValue;
 							if (sidAttr == "jointOrientZ") jorientz = finalValue;
-							orderVec.push_back(sidAttr.substr(11, 1));
+							if (orderVec.size() != 3)
+								orderVec.push_back(sidAttr.substr(11, 1));
 						}
 						if (sidAttr.substr(0, 6) == "rotate")
 						{
@@ -208,12 +213,14 @@ void ParserOpenCOLLADA::parseJoints(xercesc_3_0::DOMNode* node, SkSkeleton& skel
 							if (sidAttr == "rotateX") rotx = finalValue;
 							if (sidAttr == "rotateY") roty = finalValue;
 							if (sidAttr == "rotateZ") rotz = finalValue;
+							if (orderVec.size() != 3)
+								orderVec.push_back(sidAttr.substr(6, 1));
 						}
 					}
 				}
 				order = getRotationOrder(orderVec);
 				if (order == -1)
-					LOG("ParserOpenCOLLADA::parseJoints ERR: check the file!");
+					LOG("ParserOpenCOLLADA::parseJoints ERR: rotation info not correct in the file");
 
 				SrMat rotMat;
 				rotx *= float(M_PI) / 180.0f;
