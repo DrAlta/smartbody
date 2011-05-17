@@ -535,7 +535,7 @@ int mcu_panimationviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					int err = mcu_p->open_panimation_viewer( width, height, px, py );
 					return( err );
 				} else {
-					int err = mcu_p->open_panimation_viewer( 800, 700, 50, 50 );
+					int err = mcu_p->open_panimation_viewer( 800, 1000, 50, 50 );
 					return( err );
 				}
 			}

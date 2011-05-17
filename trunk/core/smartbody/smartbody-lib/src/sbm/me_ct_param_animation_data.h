@@ -122,7 +122,7 @@ class ParameterManager
 
 		int getNumTriangles();
 		SrTriangle& getTriangle(int id);
-		float getMinimumDist(SrVec& pt, SrVec& a, SrVec& b, SrVec& minimumPt);		
+		float getMinimumDist(SrVec& pt, SrVec& a, SrVec& b, SrVec& minimumPt);
 
 		// access data
 		PAStateData* getState() {return state;}
