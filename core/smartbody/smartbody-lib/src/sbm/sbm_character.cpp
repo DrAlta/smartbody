@@ -807,6 +807,16 @@ void prune_schedule( SbmCharacter*   actor,
 				srLinearCurve& blend_curve = blend_ct->get_curve();
 				int n = blend_curve.get_num_keys();
 				if( n > 0 )	{
+
+					double timeBegin = blend_curve.get_head_param();
+					double valueBegin = blend_curve.get_head_value();
+					// motions that haven't been started yet shouldn't be pruned
+					if (timeBegin > time && valueBegin == 0.0)
+					{ 
+						// skip this track since it hasn't started yet
+						continue;
+					}
+
 					double t = blend_curve.get_tail_param();
 					double v = blend_curve.get_tail_value();
 
