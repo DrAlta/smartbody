@@ -10,10 +10,21 @@ public:
 	SrQuat rot;
 	SrVec  tran;
 public:
+	SbmRigidTransform() {}
+	SbmRigidTransform(const SrQuat& q, const SrVec& t) { rot = q; tran = t;}
 	SrVec localToGlobal(const SrVec& vLocal);
 	SrVec globalToLocal(const SrVec& vGlobal);
 	SrMat gmat();	
+	void  gmat(const SrMat& inMat);
+	void  add(const SbmRigidTransform& delta);
+	static SbmRigidTransform diff(const SbmRigidTransform& r1, const SbmRigidTransform& r2);
+	static SbmRigidTransform blend(SbmRigidTransform& r1, SbmRigidTransform& r2, float weight );
+	static float             dist(const SbmRigidTransform& r1, const SbmRigidTransform& r2);
+
+	SbmRigidTransform& operator= (const SbmRigidTransform& rt);
 };
+
+typedef SbmRigidTransform SRT;
 
 class SbmColObject
 {

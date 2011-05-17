@@ -1561,7 +1561,7 @@ int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 ///////////////////////////////////////////////////////////////////
 
-int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHandle *mcu_p)
+int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHandle *mcu_p, const char* option)
 {
 	SbmCharacter* char_p = mcu_p->character_map.lookup( char_name );
 	if( !char_p )	
@@ -1569,12 +1569,27 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 		LOG( "mcu_character_load_mesh ERR: SbmCharacter '%s' NOT FOUND\n", char_name ); 
 		return( CMD_FAILURE );
 	}
+	float factor = 1.f;
+	if (option)
+	{
+		if (strcmp(option,"-m") == 0)
+		{
+			factor = 0.01f;
+		}
+	}
+
 	SrModel* objModel = new SrModel();
 	if (!objModel->import_obj(obj_file))
 	{
 		LOG( "mcu_character_load_mesh ERR\n" );
 		return( CMD_FAILURE );
 	}
+
+	for (int i=0;i<objModel->V.size();i++)
+	{
+		objModel->V[i] *= factor;
+	}
+	
 	
 	SrSnModel* srSnModelDynamic = new SrSnModel();
 	SrSnModel* srSnModelStatic = new SrSnModel();

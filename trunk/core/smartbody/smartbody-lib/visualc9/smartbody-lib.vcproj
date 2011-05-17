@@ -1200,6 +1200,14 @@
 						RelativePath="..\src\sbm\me_ct_example_body_reach.hpp"
 						>
 					</File>
+					<File
+						RelativePath="..\src\sbm\MeCtBodyReachState.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\MeCtBodyReachState.h"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="Hand"

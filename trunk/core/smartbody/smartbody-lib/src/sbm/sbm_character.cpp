@@ -1655,7 +1655,8 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 
 	if( cmd == "smoothbindmesh" ) {
 		char* obj_file = args.read_token();
-		return mcu_character_load_mesh( name, obj_file, mcu_p );
+		char* option = args.read_token();
+		return mcu_character_load_mesh( name, obj_file, mcu_p, option );
 	} 
 	else 
 	if( cmd == "smoothbindweight" ) {
