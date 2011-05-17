@@ -57,6 +57,7 @@
 # include <SR/sr_gl_render_funcs.h>
 # include <SBM/me_ct_eyelid.h>
 # include <SBM/me_ct_data_driven_reach.hpp>
+# include <SBM/MeCtBodyReachState.h>
 # include <SBM/me_ct_example_body_reach.hpp>
 # include <SBM/me_ct_constraint.hpp>
 # include <SBM/Collision/SbmColObject.h>
@@ -645,14 +646,7 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 	  case CmdReachNoExamples:
 		  _data->reachRenderMode = ModeNoExamples;
 		  break;
-	  case CmdExampleReachToggleIK:
-		  if (bodyReachCt)
-		  {
-			  bodyReachCt->useIKConstraint = !bodyReachCt->useIKConstraint;
-		  }	
-		  break;  
-
-	   case CmdNoSteer: 
+	  case CmdNoSteer: 
 		   _data->steerMode = ModeNoSteer;
 		   break;
 	   case CmdSteerAll: 
@@ -661,12 +655,18 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 	   case CmdSteerCharactersGoalsOnly:
 			_data->steerMode = ModeSteerCharactersGoalsOnly;
 		 break;
-  		case CmdExampleReachToggleInterpolation:
-		  if (bodyReachCt)
-		  {
-			  bodyReachCt->useInterpolation = !bodyReachCt->useInterpolation;
-		  }	
-		  break; 
+// 	   case CmdExampleReachToggleIK:
+// 		   if (bodyReachCt)
+// 		   {
+// 			   bodyReachCt->useIKConstraint = !bodyReachCt->useIKConstraint;
+// 		   }	
+// 		   break;  
+//   		case CmdExampleReachToggleInterpolation:
+// 		  if (bodyReachCt)
+// 		  {
+// 			  bodyReachCt->useInterpolation = !bodyReachCt->useInterpolation;
+// 		  }	
+// 		  break; 
 
 	  case CmdConstraintToggleIK:
 		  if (constraintCt)
@@ -3566,7 +3566,10 @@ void FltkViewer::drawReach()
 		character->skeleton_p->update_global_matrices();		
 		//SkJoint* root = reachCt->getRootJoint();		
 		*/
-
+		ReachStateData* rd = reachCt->reachData;
+		if (!rd)
+			return;
+		
 		SkJoint* root = character->skeleton_p->root();
 		SrMat rootMat = root->gmat();
 		//rootMat.translation(root->gmat().get(12),root->gmat().get(13),root->gmat().get(14));
@@ -3633,51 +3636,51 @@ void FltkViewer::drawReach()
 // 			//SrGlRenderFuncs::render_box(&box);
 // 		}
 
-		if (reachCt->blendPlanner)
-		{
-			if (reachCt->blendPlanner->path())
-			{
-				SrSnLines pathLines;			
-				reachCt->blendPlanner->draw_path(*reachCt->blendPlanner->path(),pathLines.shape());
-				pathLines.color(SrColor(1,0,0,1));
-				SrGlRenderFuncs::render_lines(&pathLines);		
-			}	
+// 		if (reachCt->blendPlanner)
+// 		{
+// 			if (reachCt->blendPlanner->path())
+// 			{
+// 				SrSnLines pathLines;			
+// 				reachCt->blendPlanner->draw_path(*reachCt->blendPlanner->path(),pathLines.shape());
+// 				pathLines.color(SrColor(1,0,0,1));
+// 				SrGlRenderFuncs::render_lines(&pathLines);		
+// 			}	
+// 
+// 			if (reachCt->blendPlanner->cman())
+// 			{
+// 				SrSnLines tree1;
+// 				reachCt->blendPlanner->draw_edges(tree1.shape(),0);
+// 
+// 				SrSnLines tree2;
+// 				reachCt->blendPlanner->draw_edges(tree2.shape(),1);
+// 				SrGlRenderFuncs::render_lines(&tree1);
+// 				SrGlRenderFuncs::render_lines(&tree2);
+// 			}			
+// 		}
+// 
+// 
+// 
+// 
+// 		if (reachCt->blendPlanner && reachCt->blendPlanner->cman())
+// 		{
+// 			std::vector<CollisionJoint>& colJointList = reachCt->blendPlanner->cman()->colJoints;
+// 			for (unsigned int i=0;i<colJointList.size();i++)
+// 				drawColObject(colJointList[i].colGeo);
+// 		}
 
-			if (reachCt->blendPlanner->cman())
-			{
-				SrSnLines tree1;
-				reachCt->blendPlanner->draw_edges(tree1.shape(),0);
+		EffectorState& es = rd->effectorState;
+// 		SrVec reachTraj = es.curState.tran;
+// 		PositionControl::drawSphere(reachTraj,sphereSize,SrVec(0,1,1));
+		SrVec ikTraj = es.curTargetState.tran;		
+		PositionControl::drawSphere(ikTraj,sphereSize,SrVec(1,0,1));
+		SrVec ikTarget = es.targetState.tran;
+		
 
-				SrSnLines tree2;
-				reachCt->blendPlanner->draw_edges(tree2.shape(),1);
-				SrGlRenderFuncs::render_lines(&tree1);
-				SrGlRenderFuncs::render_lines(&tree2);
-			}			
-		}
-
-
-
-
-		if (reachCt->blendPlanner && reachCt->blendPlanner->cman())
-		{
-			std::vector<CollisionJoint>& colJointList = reachCt->blendPlanner->cman()->colJoints;
-			for (unsigned int i=0;i<colJointList.size();i++)
-				drawColObject(colJointList[i].colGeo);
-		}
-
-		SrVec reachTraj = reachCt->curReachIKTrajectory;
-		PositionControl::drawSphere(reachTraj,sphereSize,SrVec(0,1,1));
-		SrVec ikTraj = reachCt->getIKTarget();
-		//PositionControl::drawSphere(ikTraj,sphereSize,SrVec(0,1,0));
-		PositionControl::drawSphere(reachCt->interpPos,sphereSize,SrVec(1,0,1));
-		PositionControl::drawSphere(reachCt->curEffectorPos,sphereSize,SrVec(1,0,0));
-		PositionControl::drawSphere(reachCt->ikFootTarget,sphereSize,SrVec(0,0,0));	
-
-		glColor3f(1.0, 0.0, 0.0);
-		glBegin(GL_LINES);
-		glVertex3f(reachCt->curEffectorPos.x,reachCt->curEffectorPos.y,reachCt->curEffectorPos.z);
-		glVertex3f(ikTraj.x,ikTraj.y,ikTraj.z);
-		glEnd();
+// 		glColor3f(1.0, 0.0, 0.0);
+// 		glBegin(GL_LINES);
+// 		glVertex3f(reachTraj.x,reachTraj.y,reachTraj.z);
+// 		glVertex3f(ikTarget.x,ikTarget.y,ikTarget.z);
+// 		glEnd();
 	}
 
 	glPopAttrib();

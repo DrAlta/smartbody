@@ -19,6 +19,49 @@ SrMat SbmRigidTransform::gmat()
 	return mat;
 }
 
+void SbmRigidTransform::gmat(const SrMat& inMat )
+{
+	tran = inMat.get_translation();
+	rot  = SrQuat(inMat);
+}
+
+SbmRigidTransform SbmRigidTransform::diff( const SbmRigidTransform& r1, const SbmRigidTransform& r2 )
+{
+	SbmRigidTransform rout;
+	rout.tran = r2.tran - r1.tran;
+	rout.rot  = r1.rot.inverse()*r2.rot;	
+	rout.rot.normalize();
+	return rout;
+}
+
+SbmRigidTransform SbmRigidTransform::blend( SbmRigidTransform& r1, SbmRigidTransform& r2, float weight )
+{
+	SbmRigidTransform rout;
+	rout.tran = r1.tran*(1.f-weight) + r2.tran*weight;
+	rout.rot  = slerp( r1.rot, r2.rot, weight );
+	rout.rot.normalize();
+	return rout;
+}
+
+SbmRigidTransform& SbmRigidTransform::operator=( const SbmRigidTransform& rt )
+{
+	tran = rt.tran;
+	rot  = rt.rot;
+	return *this;
+}
+
+float SbmRigidTransform::dist( const SbmRigidTransform& r1, const SbmRigidTransform& r2 )
+{
+	SbmRigidTransform diffT = diff(r1,r2);
+	return diffT.tran.norm();
+}
+
+void SbmRigidTransform::add( const SbmRigidTransform& delta )
+{
+	tran = tran + delta.tran;//curEffectorPos + offset;
+	rot  = rot*delta.rot;//rotOffset;
+	rot.normalize();
+}
 
 SbmColObject::SbmColObject(void)
 {

@@ -251,7 +251,9 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 
 		bodyReachCt->init();		
 		if (reachVelocity > 0)
-			bodyReachCt->reachVelocity = reachVelocity;
+		{
+			bodyReachCt->setLinearVelocity(reachVelocity);
+		}
 		//bodyReachCt->reachCompleteDuration = apexDuration > 0 ? apexDuration : 2.f;
 
 		//const MotionDataSet& motionData = request->actor->getReachMotionDataSet();
@@ -294,7 +296,10 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	}	
 
 	if (reachVelocity > 0)
-		bodyReachCt->reachVelocity = reachVelocity;
+	{
+		bodyReachCt->setLinearVelocity(reachVelocity);
+		//printf("reach velocity = %f\n",bodyReachCt->reachVelocity);
+	}
 // 	if (apexDuration > 0)
 // 		bodyReachCt->reachCompleteDuration = apexDuration;
 
@@ -312,16 +317,16 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		bodyReachCt->setReachTargetPos(targetPos);
 	}
 
-	if (consTarget && consJointName)
-	{
-		bodyReachCt->addHandConstraint(const_cast<SkJoint*>(consTarget),consJointName);
-	}
+// 	if (consTarget && consJointName)
+// 	{
+// 		bodyReachCt->addHandConstraint(const_cast<SkJoint*>(consTarget),consJointName);
+// 	}
 
-	if (obstacle_pawn && obstacleName)
-	{
-		if (obstacle_pawn->colObj_p)
-			bodyReachCt->addObstacle(obstacleName, obstacle_pawn->colObj_p);
-	}
+// 	if (obstacle_pawn && obstacleName)
+// 	{
+// 		if (obstacle_pawn->colObj_p)
+// 			bodyReachCt->addObstacle(obstacleName, obstacle_pawn->colObj_p);
+// 	}
 
 
 	if (fadeInTime >= 0.0)
