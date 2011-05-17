@@ -10,8 +10,9 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	target = NULL;
 	scootCurve = new srLinearCurve();
 
+	scootAccel = 5.0f;	// should be exposed
 	locoSpdGain = 70.0f;
-	paLocoAngleGain = 4.0f;
+	paLocoAngleGain = 2.0f;
 	scootThreshold = 0.02f;	
 	paLocoScootGain = 1.0f;
 	locoScootGain = 2.0f;
@@ -275,8 +276,8 @@ void SteeringAgent::evaluate()
 #if UseTransition
 			scootCurve->insert(mcu.time + transition, scootValue);
 #else
-			addOnTurning = scootValue;
-		//	addOnTurning = steeringCommand.scoot * 9.0f;
+		//	addOnTurning = scootValue;
+			addOnTurning = steeringCommand.scoot * 3.0f;
 #endif
 		}
 #if UseTransition
@@ -312,14 +313,14 @@ void SteeringAgent::evaluate()
 				newSpeed = curSpeed;
 				if (steeringCommand.aimForTargetDirection)
 				{
-					angleDiff += addOnTurning;
+			//		angleDiff += addOnTurning;
 					curTurningAngle = angleDiff * paLocoAngleGain;
 				}
 				else
 					curTurningAngle = steeringCommand.turningAmount / 60.0f;
 				curSpeed *= 100.0f;
-				curState->paramManager->setWeight(curSpeed, curTurningAngle);
-			//	curState->paramManager->setWeight(curSpeed, curTurningAngle, addOnTurning);
+			//	curState->paramManager->setWeight(curSpeed, curTurningAngle);
+				curState->paramManager->setWeight(curSpeed, curTurningAngle, addOnTurning);
 				character->param_animation_ct->updateWeights();
 			}
 		if (curState)

@@ -27,6 +27,7 @@ class SteeringAgent
 		srLinearCurve* scootCurve;
 
 	public:
+		float scootAccel;
 		float locoSpdGain;
 		float paLocoAngleGain;
 		float scootThreshold;	

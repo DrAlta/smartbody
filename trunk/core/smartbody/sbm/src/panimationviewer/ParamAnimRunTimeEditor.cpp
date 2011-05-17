@@ -836,6 +836,7 @@ void PARunTimeEditor::update()
 					paramGroup->xAxis->value(vec.x);
 					paramGroup->yAxis->value(vec.y);
 					paramGroup->zAxis->value(vec.z);
+					paramGroup->param3DVisualization->redraw();
 				}
 			}
 		}
