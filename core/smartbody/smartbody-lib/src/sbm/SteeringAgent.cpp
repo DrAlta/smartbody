@@ -100,7 +100,7 @@ void SteeringAgent::evaluate()
 			strstr << character->name;
 			strstr << " stop";
 			mcu.execute((char*)strstr.str().c_str());
-			if (facingAngle >= 0)
+			if (fabs(facingAngle) <= 180)
 			{
 				float diff = facingAngle - yaw;
 				normalizeAngle(diff);
@@ -115,10 +115,15 @@ void SteeringAgent::evaluate()
 					strstr << " leftward spd 0.0 rps " << turn;
 					mcu.execute((char*)strstr.str().c_str());	
 				}
+				else
+					character->_reachTarget = true;
 			}
+			else
+				character->_reachTarget = true;
 		}
 		else
 		{
+			character->_reachTarget = false;
 			if (fabs(steeringCommand.scoot) > scootThreshold)
 			{
 #if DebugInfo
@@ -219,6 +224,7 @@ void SteeringAgent::evaluate()
 		if (curState)
 			if (curState->stateName == PseudoIdleState && numGoals != 0 && nextStateName == "")
 			{
+				character->_reachTarget = false;
 				float targetAngle = atan2(goalQueue.front().targetLocation.x * 100.0f - x, goalQueue.front().targetLocation.z * 100.0f - z) * (180.0f/float(M_PI));
 				normalizeAngle(targetAngle);
 				float diff = targetAngle - yaw;
@@ -376,7 +382,11 @@ void SteeringAgent::evaluate()
 							facingAdjustPhase = true;
 						}
 					}
+					else
+						character->_reachTarget = true;
 				}
+				else
+					character->_reachTarget = true;
 			}
 		}
 	}

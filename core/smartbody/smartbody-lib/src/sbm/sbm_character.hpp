@@ -84,6 +84,7 @@ public:
 	static const int trajectoryLength = 1000;
 	SteeringAgent* steeringAgent;
 	int	_numSteeringGoal;
+	bool _reachTarget;
 
 public:
 	// Static Constants
