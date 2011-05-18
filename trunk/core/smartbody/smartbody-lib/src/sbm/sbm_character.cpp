@@ -127,6 +127,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	bonebusCharacter = NULL;
 	steeringAgent = NULL;
 	_numSteeringGoal = 0;
+	_reachTarget = false;
 
 	use_viseme_curve = false;
 	viseme_time_offset = 0.0;
@@ -136,7 +137,6 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	viseme_channel_end_pos = 0;
 	viseme_history_arr = NULL;
 	_minVisemeTime = 0.0f;
-	_numSteeringGoal = 0;
 }
 
 //  Destructor
