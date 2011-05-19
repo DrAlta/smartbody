@@ -3556,6 +3556,8 @@ void FltkViewer::drawReach()
 	MeCtExampleBodyReach* reachCt = getCurrentCharacterBodyReachController();
 	
 	SbmCharacter* character = getCurrentCharacter();
+	if (!character)
+		return;
 	float sphereSize = character->getHeight() / 50.0f;	
 	if (reachCt)
 	{	
