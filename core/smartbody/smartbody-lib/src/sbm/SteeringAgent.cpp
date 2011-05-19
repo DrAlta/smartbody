@@ -89,7 +89,7 @@ void SteeringAgent::evaluate()
 	{
 		if (!character->locomotion_ct)
 		{
-			LOG("Locomotion engine not enabled!");
+//			LOG("Locomotion engine not enabled!");
 			return;
 		}
 		float speed = steeringCommand.targetSpeed * locoSpdGain;
@@ -193,7 +193,7 @@ void SteeringAgent::evaluate()
 	{
 		if (!character->param_animation_ct)
 		{
-			LOG("Locomotion engine not enabled!");
+//			LOG("Locomotion engine not enabled!");
 			return;
 		}
 		PAStateData* curState =  character->param_animation_ct->getCurrentPAStateData();
