@@ -252,7 +252,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSke
 	SkChannelArray& skChannels = skeleton.channels();
 	motion.init(skChannels);
 	SkChannelArray& motionChannels = motion.channels();
-	bool initFrames = true;
+	SkChannelArray channelsForAdjusting;
 
 	const xercesc_3_0::DOMNodeList* list = node->getChildNodes();
 	for (unsigned int i = 0; i < list->getLength(); i++)
@@ -263,9 +263,27 @@ void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSke
 		{
 			xercesc_3_0::DOMNamedNodeMap* animationAttr = node1->getAttributes();
 			xercesc_3_0::DOMNode* idNode = animationAttr->getNamedItem(XMLString::transcode("id"));
-			std::string idAttr = getString(idNode->getNodeValue());
-			std::string jointName = tokenize(idAttr, ".");
+			std::string idAttr = getString(idNode->getNodeValue()); // these three variables have no use
+			std::string jointName = tokenize(idAttr, ".-");	
 			std::string channelType = tokenize(idAttr, "_");
+			int numTimeInput = -1;
+			if (channelType == "rotateX" || channelType == "rotateY" || channelType == "rotateZ")
+			{
+				if (channelsForAdjusting.search(SkJointName(jointName.c_str()), SkChannel::Quat) < 0)
+					channelsForAdjusting.add(SkJointName(jointName.c_str()), SkChannel::Quat);
+			}
+			if (channelType == "translate")
+			{
+				channelsForAdjusting.add(SkJointName(jointName.c_str()), SkChannel::XPos);
+				channelsForAdjusting.add(SkJointName(jointName.c_str()), SkChannel::YPos);
+				channelsForAdjusting.add(SkJointName(jointName.c_str()), SkChannel::ZPos);
+			}
+			if (channelType == "translateX")
+				channelsForAdjusting.add(SkJointName(jointName.c_str()), SkChannel::XPos);
+			if (channelType == "translateY")
+				channelsForAdjusting.add(SkJointName(jointName.c_str()), SkChannel::YPos);
+			if (channelType == "translateZ")
+				channelsForAdjusting.add(SkJointName(jointName.c_str()), SkChannel::ZPos);
 			
 			const xercesc_3_0::DOMNodeList* list1 = node1->getChildNodes();
 			for (unsigned int j = 0; j < list1->getLength(); j++)
@@ -291,15 +309,33 @@ void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSke
 							int counter = atoi(getString(arrayCountNode->getNodeValue()).c_str());
 							std::string arrayString = getString(node3->getTextContent());
 						
-							if (initFrames && op == "input")
+							if (op == "input")
 							{
-								for (int frameCt = 0; frameCt < counter; frameCt++)
+								numTimeInput = counter;
+								if (motion.frames() == 0)
 								{
-									motion.insert_frame(frameCt, (float)atof(tokenize(arrayString).c_str()));
-									for (int postureCt = 0; postureCt < motion.posture_size(); postureCt++)
-										motion.posture(frameCt)[postureCt] = 0.0f;
+									for (int frameCt = 0; frameCt < counter; frameCt++)
+									{
+										motion.insert_frame(frameCt, (float)atof(tokenize(arrayString).c_str()));
+										for (int postureCt = 0; postureCt < motion.posture_size(); postureCt++)
+											motion.posture(frameCt)[postureCt] = 0.0f;
+									}
 								}
-								initFrames = false;
+/*								if (motion.frames() < counter)
+								{
+									for (int frameCt = 0; frameCt < counter; frameCt++)
+									{
+										float k = (float)atof(tokenize(arrayString).c_str());
+										float keyTime = motion.keytime(frameCt);
+										if (keyTime > k)
+										{
+											bool flag = motion.insert_frame(frameCt, k);
+											for (int postureCt = 0; postureCt < motion.posture_size(); postureCt++)
+												motion.posture(frameCt)[postureCt] = 0.0f;
+										}
+									}
+								}
+*/
 							}
 
 							if (op == "output")
@@ -307,7 +343,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSke
 								int channelId = getMotionChannelId(motionChannels, sourceIdAttr);
 								if (channelId >= 0)
 								{
-									int stride = counter / motion.frames();
+									int stride = counter / numTimeInput;
 									for (int frameCt = 0; frameCt < motion.frames(); frameCt++)
 										for (int strideCt = 0; strideCt < stride; strideCt++)
 										{
@@ -356,50 +392,58 @@ void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSke
 	double duration = double(motion.duration());
 	motion.synch_points.set_time(0.0, duration / 3.0, duration / 2.0, duration * 2.0/3.0, duration);
 	motion.compress();
+	// now there's adjust for the channels by default
+	animationPostProcessByChannels(skeleton, motion, channelsForAdjusting);
 }
 
 void ParserOpenCOLLADA::animationPostProcess(SkSkeleton& skeleton, SkMotion& motion)
 {
-	SkChannelArray& motionChannels = motion.channels();
+	ParserOpenCOLLADA::animationPostProcessByChannels(skeleton, motion, motion.channels());
+}
+
+void ParserOpenCOLLADA::animationPostProcessByChannels(SkSkeleton& skeleton, SkMotion& motion, SkChannelArray& motionChannels)
+{
 	int numChannel = motionChannels.size(); 
 	for (int i = 0; i < motion.frames(); i++)
 	{
-		int chanIndex = 0;
 		for (int j = 0; j < numChannel; j++)
 		{
 			SkChannel& chan = motionChannels[j];
 			std::string chanName = motionChannels.name(j);
 			SkChannel::Type chanType = chan.type;
 			SkJoint* joint = skeleton.search_joint(chanName.c_str());
-			
+			if (!joint)
+				continue;
+
+			int id = motion.channels().search(SkJointName(chanName.c_str()), chanType);
+			int dataId = motion.channels().float_position(id);
+			if (dataId < 0)
+				continue;
+
 			if (chanType == SkChannel::XPos)
 			{
-				if (joint)
-					motion.posture(i)[chanIndex] -= joint->offset().x;
-				chanIndex++;
+				float v = motion.posture(i)[dataId];
+				motion.posture(i)[dataId] = v - joint->offset().x;
 			}
 			if (chanType == SkChannel::YPos)
 			{
-				if (joint)
-					motion.posture(i)[chanIndex] -= joint->offset().y;
-				chanIndex++;
+				float v = motion.posture(i)[dataId];
+				motion.posture(i)[dataId] = v - joint->offset().y;
 			}
 			if (chanType == SkChannel::ZPos)
 			{
-				if (joint)
-					motion.posture(i)[chanIndex] -= joint->offset().z;
-				chanIndex++;
+				float v = motion.posture(i)[dataId];
+				motion.posture(i)[dataId] = v - joint->offset().z;
 			}
 			if (chanType == SkChannel::Quat)
 			{
-				SrQuat globalQuat = SrQuat(motion.posture(i)[chanIndex], motion.posture(i)[chanIndex + 1], motion.posture(i)[chanIndex + 2], motion.posture(i)[chanIndex + 3]);
+				SrQuat globalQuat = SrQuat(motion.posture(i)[dataId], motion.posture(i)[dataId + 1], motion.posture(i)[dataId + 2], motion.posture(i)[dataId + 3]);
 				SrQuat preQuat = joint->quat()->prerot();
 				SrQuat localQuat = preQuat.inverse() * globalQuat;
-				motion.posture(i)[chanIndex] = localQuat.w;
-				motion.posture(i)[chanIndex + 1] = localQuat.x;
-				motion.posture(i)[chanIndex + 2] = localQuat.y;
-				motion.posture(i)[chanIndex + 3] = localQuat.z;
-				chanIndex += 4;
+				motion.posture(i)[dataId] = localQuat.w;
+				motion.posture(i)[dataId + 1] = localQuat.x;
+				motion.posture(i)[dataId + 2] = localQuat.y;
+				motion.posture(i)[dataId + 3] = localQuat.z;
 			}
 
 		}
