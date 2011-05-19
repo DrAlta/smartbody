@@ -38,6 +38,7 @@ class ParserOpenCOLLADA
 		static void parseJoints(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, SkJoint* parent = NULL);
 		static void parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order);
 		static void animationPostProcess(SkSkeleton& skeleton, SkMotion& motion);
+		static void animationPostProcessByChannels(SkSkeleton& skeleton, SkMotion& motion, SkChannelArray& channels);
 
 	private:
 		static int getMotionChannelId(SkChannelArray& channels, std::string sourceName);
