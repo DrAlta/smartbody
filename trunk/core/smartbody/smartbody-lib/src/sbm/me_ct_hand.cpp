@@ -54,7 +54,7 @@ void FingerChain::testCollision( SbmColObject* colObj )
 
 	for (unsigned int i=1;i<lineSeg.size();i++)
 	{
-		bool isIntersect = colObj->isIntersect(lineSeg[i-1],lineSeg[i],1.f);
+		bool isIntersect = colObj->isIntersect(lineSeg[i-1],lineSeg[i],0.001f);
 		if (isIntersect)
 		{
 			fingerNodes[i]->lock = true;
