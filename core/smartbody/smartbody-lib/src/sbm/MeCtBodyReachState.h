@@ -28,7 +28,7 @@ public:
 	virtual void reachReturnAction(ReachStateData* rd) {};
 	virtual SRT getHandTargetStateOffset(ReachStateData* rd, SRT& naturalState);
 	virtual bool pickUpNewPawn(ReachStateData* rd) { return false; }
-protected:
+
 	void sendReachEvent(std::string cmd, float time = 0.0);	
 };
 
@@ -66,8 +66,8 @@ public:
 public:
 	EffectorState();
 	~EffectorState() {}
-	void attachPawnTarget(ReachTarget& target);
-	void releasePawn();
+	void attachPawnTarget(ReachStateData* rd);
+	void releasePawn(ReachStateData* rd);
 	void updateAttachedPawn();
 };
 
@@ -87,6 +87,7 @@ public:
 	float           autoReturnTime;
 	bool            startReach, endReach;
 	bool            useExample;	
+	bool            locomotionComplete;
 
 	// for pick-up/put-down action
 	ReachHandAction* curHandAction;
@@ -95,6 +96,7 @@ public:
 	ResampleMotion* interpMotion;
 	MotionParameter* motionParameter;
 	DataInterpolator* dataInterpolator;
+	MeCtExampleBodyReach* reachControl;
 public:
 	float linearVel, angularVel;
 	float reachRegion;
@@ -107,6 +109,7 @@ public:
 	SRT getBlendPoseState(SrVec paraPos, float refTime);
 	SRT getPoseState(BodyMotionFrame& frame);
 	bool useInterpolation();	
+	float XZDistanceToTarget();
 };
 
 class ReachStateInterface
@@ -134,6 +137,16 @@ public:
 	virtual std::string nextState(ReachStateData* rd);	
 	virtual std::string curStateName() { return "Idle"; }
 };
+
+class ReachStateMove : public ReachStateInterface
+{
+public:
+	virtual void update(ReachStateData* rd);
+	virtual void updateEffectorTargetState(ReachStateData* rd);
+	virtual std::string nextState(ReachStateData* rd);	
+	virtual std::string curStateName() { return "Move"; }
+};
+
 
 
 class ReachStateStart : public ReachStateInterface

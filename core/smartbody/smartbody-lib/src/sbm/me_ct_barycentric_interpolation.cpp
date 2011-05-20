@@ -18,6 +18,21 @@ Simplex& Simplex::operator=( const Simplex& rhs )
 	return *this;	
 }
 
+void Simplex::getSubSimplex( std::vector<Simplex>& outSimpList )
+{
+	outSimpList.clear();
+	for (unsigned int i=0;i<vertexIndices.size();i++)
+	{
+		Simplex subSim;
+		subSim.numDim = numDim-1;
+		for (int k=0;k<numDim;k++)
+		{
+			int vidx = (i+k)%vertexIndices.size();
+			subSim.vertexIndices[k] = vidx;							 
+		}
+		outSimpList.push_back(subSim);
+	}
+}
 /************************************************************************/
 /* Barycentric Interpolator                                             */
 /************************************************************************/
@@ -124,7 +139,7 @@ bool BarycentricInterpolator::buildInterpolator()
 {
 	tetgenio ptIn, tetOut;
 	// initialize input points
-	ptIn.numberofpoints = interpExamples.size();
+	ptIn.numberofpoints = interpExamples.size();	
 	ptIn.pointlist = new REAL[interpExamples.size()*3];
 	for (unsigned int i=0;i<interpExamples.size();i++)
 	{
@@ -161,4 +176,9 @@ void BarycentricInterpolator::predictInterpWeights( const dVector& para, VecOfIn
 		Simplex& sip = simplexList[index];
 		simplexCoordinate(para,sip,blendWeights);
 	}
+}
+
+float BarycentricInterpolator::distToSimplex( const dVector& pt, Simplex& simp )
+{
+	return 1.f;	
 }

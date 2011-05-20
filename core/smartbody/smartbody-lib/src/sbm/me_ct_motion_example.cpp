@@ -123,9 +123,9 @@ double BodyMotion::getMotionFrame( float time, SkSkeleton* skel, const vector<Sk
 	}
 
 	// root orientation
-	outMotionFrame.jointQuat[0] = quatP.inverse()*outMotionFrame.jointQuat[0];	
+	//outMotionFrame.jointQuat[0] = quatP.inverse()*outMotionFrame.jointQuat[0];	
 	outMotionFrame.rootPos.set(rootJoint->pos()->value());
-	outMotionFrame.rootPos = (outMotionFrame.rootPos - rootOffset)*quatP.inverse();
+	//outMotionFrame.rootPos = (outMotionFrame.rootPos - rootOffset)*quatP.inverse();
 	return timeWarp->invTimeWarp(rt);
 }
 
@@ -142,7 +142,7 @@ double BodyMotion::motionDuration(DurationType durType)
 
 double BodyMotion::strokeEmphasisTime()
 {
-	double emphTime = motion->time_stroke_emphasis();//(motion->time_stroke_end()+motion->time_stroke_emphasis())*0.5f;	
+	double emphTime = (motion->time_stroke_end()+motion->time_stroke_emphasis())*0.5f;//motion->time_stroke_emphasis();//(motion->time_stroke_end()+motion->time_stroke_emphasis())*0.5f;	
 	return timeWarp->invTimeWarp(emphTime);
 }
 
