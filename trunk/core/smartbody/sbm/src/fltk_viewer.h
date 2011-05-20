@@ -152,6 +152,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdCharacterShowGeometry,
 				   CmdCharacterShowCollisionGeometry,
 				   CmdCharacterShowDeformableGeometry,
+				   CmdCharacterShowDeformableGeometryGPU,
 				   CmdCharacterShowBones,
 				   CmdCharacterShowAxis,
 				   CmdNoPawns,

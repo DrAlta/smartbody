@@ -6,6 +6,8 @@
 
 class SbmDeformableMeshGPU : public DeformableMesh
 {
+public:
+	static bool useGPUDeformableMesh;
 protected:
 	static bool initShader;
 	bool useGPU;
