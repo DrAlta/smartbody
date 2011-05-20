@@ -1,5 +1,6 @@
 #include "MeCtBodyReachState.h"
 #include "sbm/Event.h"
+#include <boost/lexical_cast.hpp>
 
 /************************************************************************/
 /* Effector State                                                       */
@@ -9,8 +10,9 @@ EffectorState::EffectorState()
 	attachedPawn = NULL;
 }
 
-void EffectorState::attachPawnTarget( ReachTarget& target )
+void EffectorState::attachPawnTarget( ReachStateData* rd )
 {
+	ReachTarget& target = rd->reachTarget;
 	if (target.getTargetPawn())
 	{
 		attachedPawn = target.getTargetPawn();
@@ -18,14 +20,25 @@ void EffectorState::attachPawnTarget( ReachTarget& target )
 
 		target.setTargetState(target.getTargetState());
 		//SRT newTarget; newTarget.gmat(attachedPawn->get_world_offset_joint()->gmat());
-		//target.setTargetState(newTarget);
+		//target.setTargetState(newTarget); 
+		std::string charName = rd->charName;
+		std::string targetName = attachedPawn->name;
+		std::string cmd;
+		//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:source-joint=\"" + rd->effectorState.effectorName + "\" sbm:attach-pawn=\"" + targetName + "\"/>";
+		cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:source-joint=\"" + "r_wrist" + "\" sbm:attach-pawn=\"" + targetName + "\"/>";
+		rd->curHandAction->sendReachEvent(cmd);
 	}
 }
 
-void EffectorState::releasePawn()
+void EffectorState::releasePawn(ReachStateData* rd)
 {
 	attachedPawn = NULL;
 	attachMat = SrMat();
+
+	std::string charName = rd->charName;	
+	std::string cmd;
+	cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:release-pawn=\"true\"/>";
+	rd->curHandAction->sendReachEvent(cmd);
 }
 
 void EffectorState::updateAttachedPawn()
@@ -36,7 +49,6 @@ void EffectorState::updateAttachedPawn()
  		SrMat newWorld = attachMat*effectorWorld;
  		attachedPawn->setWorldOffset(newWorld);	 		
  	}
-
 }
 /************************************************************************/
 /* Reach Target                                                         */
@@ -147,7 +159,9 @@ void ReachHandPickUpAction::reachCompleteAction( ReachStateData* rd )
 	cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:wrist=\"r_wrist\" sbm:grab-state=\"reach\" target=\"" + targetName  + "\"/>";
 	sendReachEvent(cmd);
 	// object attachedment
-	rd->effectorState.attachPawnTarget(rtarget);
+	rd->effectorState.attachPawnTarget(rd);
+	// send attachment to hand controller
+	
 }
 
 SRT ReachHandPickUpAction::getHandTargetStateOffset( ReachStateData* rd, SRT& naturalState )
@@ -178,7 +192,7 @@ void ReachHandPickUpAction::reachNewTargetAction( ReachStateData* rd )
 	std::string charName = rd->charName;
 	cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:grab-state=\"finish\"/>";
 	sendReachEvent(cmd);
-	rd->effectorState.releasePawn();
+	rd->effectorState.releasePawn(rd);
 }
 /************************************************************************/
 /* Reach Hand Put-Down Action                                           */
@@ -189,7 +203,7 @@ void ReachHandPutDownAction::reachCompleteAction( ReachStateData* rd )
 	std::string charName = rd->charName;
 	cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:grab-state=\"finish\"/>";
 	sendReachEvent(cmd);
-	rd->effectorState.releasePawn();
+	rd->effectorState.releasePawn(rd);
 }
 
 void ReachHandPutDownAction::reachReturnAction( ReachStateData* rd )
@@ -198,7 +212,7 @@ void ReachHandPutDownAction::reachReturnAction( ReachStateData* rd )
 	std::string charName = rd->charName;
 	cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:grab-state=\"return\"/>";
 	sendReachEvent(cmd);	
-	rd->effectorState.releasePawn();
+	rd->effectorState.releasePawn(rd);
 }
 
 SRT ReachHandPutDownAction::getHandTargetStateOffset( ReachStateData* rd, SRT& naturalState )
@@ -214,7 +228,7 @@ ReachStateData::ReachStateData()
 	curTime = 0.f;
 	curRefTime = 0.f;
 	dt = du = 0.f;
-	startReach = endReach = useExample = false;
+	startReach = endReach = useExample = locomotionComplete = false;
 	autoReturnTime = -1.f;
 
 	interpMotion = NULL;
@@ -231,7 +245,7 @@ void ReachStateData::updateReachState(const SrMat& worldOffset, BodyMotionFrame&
 	gmat = worldOffset;
 	curMotionFrame = motionFrame;
 	effectorState.curState = getPoseState(motionFrame);
-	effectorState.updateAttachedPawn();
+	//effectorState.updateAttachedPawn();
 }
 
 void ReachStateData::updateBlendWeight( SrVec paraPos )
@@ -271,6 +285,13 @@ bool ReachStateData::useInterpolation()
 	return (interpMotion && useExample);
 }
 
+float ReachStateData::XZDistanceToTarget()
+{
+	SrVec targetXZ = reachTarget.getTargetState().tran; targetXZ.y = 0.f;
+	SrVec curXZ = effectorState.curState.tran; curXZ.y = 0.f;
+	float dist = (targetXZ - curXZ).norm();
+	return dist;
+}
 /************************************************************************/
 /* Reach State Interface                                                */
 /************************************************************************/
@@ -385,6 +406,7 @@ bool ReachStateInterface::interpTargetReached( ReachStateData* rd )
 void ReachStateIdle::updateEffectorTargetState( ReachStateData* rd )
 {
 	ReachStateInterface::updateReturnToIdle(rd);	
+	rd->effectorState.curTargetState = rd->effectorState.targetState;
 }
 
 void ReachStateIdle::update( ReachStateData* rd )
@@ -398,7 +420,23 @@ std::string ReachStateIdle::nextState( ReachStateData* rd )
 	if (rd->startReach)
 	{		
 		rd->curRefTime = 0.f;
-		nextStateName = "Start";
+		// test the distance to the target
+		SrVec targetXZ = rd->reachTarget.getTargetState().tran; targetXZ.y = 0.f;
+		float dist = rd->XZDistanceToTarget();
+		if (dist > 90.f) 
+		{	
+			// if the target is far away, move the character first
+			std::string cmd;
+			std::string charName = rd->charName;			
+			cmd = "bml char " + charName + " <locomotion target=\"" + boost::lexical_cast<std::string>(targetXZ.x) + " " + boost::lexical_cast<std::string>(targetXZ.z) + "\" proximity=\"1.5\"/>";
+			rd->curHandAction->sendReachEvent(cmd);
+			rd->reachControl->setFadeOut(0.5f);
+			nextStateName = "Move";
+		}
+		else // otherwise do the reach directly
+		{
+			nextStateName = "Start";
+		}		
 	}
 	return nextStateName;
 }
@@ -443,6 +481,35 @@ std::string ReachStateStart::nextState( ReachStateData* rd )
 	return nextStateName;
 }
 
+/************************************************************************/
+/* Reach State Move                                                     */
+/************************************************************************/
+std::string ReachStateMove::nextState( ReachStateData* rd )
+{
+	std::string nextStateName = "Move";
+	static float prevDist = 0.f;
+	float curDist = rd->XZDistanceToTarget();
+	//printf("locomotion = %d, dist = %f\n",rd->locomotionComplete,curDist);
+	if (rd->locomotionComplete && curDist < 90.f && fabs(curDist-prevDist) < 0.01f)
+	{
+		//printf("trasition to start !!\n");
+		rd->reachControl->setFadeIn(0.5f);
+		nextStateName = "Start";
+	}
+	prevDist = curDist;
+	return nextStateName;
+}
+
+void ReachStateMove::update( ReachStateData* rd )
+{
+	ReachStateInterface::updateReturnToIdle(rd);	
+	rd->effectorState.curTargetState = rd->effectorState.targetState;
+}
+
+void ReachStateMove::updateEffectorTargetState( ReachStateData* rd )
+{
+	ReachStateInterface::updateMotionIK(rd);	
+}
 /************************************************************************/
 /* Reach State Complete                                                 */
 /************************************************************************/

@@ -51,6 +51,9 @@ const XMLCh DTYPE_SBM[]  = L"ICT.SBM";
 ////// XML ATTRIBUTES
 const XMLCh ATTR_WRIST[] = L"sbm:wrist";
 //const XMLCh ATTR_TARGET_POS[] = L"sbm:target-pos";
+const XMLCh ATTR_SOURCE_JOINT[] = L"sbm:source-joint";
+const XMLCh ATTR_ATTACH_PAWN[] = L"sbm:attach-pawn";
+const XMLCh ATTR_RELEASE_PAWN[] = L"sbm:release-pawn";
 const XMLCh ATTR_GRAB_VELOCITY[] = L"sbm:grab-velocity";
 const XMLCh ATTR_GRAB_STATE[] = L"sbm:grab-state";
 const XMLCh ATTR_FADE_OUT[]		= L"sbm:fade-out";
@@ -107,6 +110,21 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 	{
 		wristName = asciiString(attrWrist);			
 		wristJoint = request->actor->skeleton_p->search_joint(wristName);		
+	}
+
+	const XMLCh* attrSourceJoint = NULL;
+	const char* sourceJointName = NULL;
+	attrSourceJoint = elem->getAttribute(ATTR_SOURCE_JOINT);		
+	if( attrSourceJoint && XMLString::stringLen( attrSourceJoint ) ) 
+	{
+		sourceJointName = asciiString(attrSourceJoint);						
+	}
+
+	const XMLCh* attrAttachPawn = elem->getAttribute( ATTR_ATTACH_PAWN );
+	const SbmPawn* attachPawn = NULL;
+	if (attrAttachPawn && XMLString::stringLen( attrAttachPawn ))
+	{
+		attachPawn = parse_target_pawn( tag, attrAttachPawn, mcu );		
 	}
 
 	SrVec targetPos = SrVec();
@@ -217,19 +235,30 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 		}
 	}	
 
+	const XMLCh* attrReleasePawn = NULL;
+	attrReleasePawn = elem->getAttribute(ATTR_RELEASE_PAWN);
+	if( attrReleasePawn && XMLString::stringLen( attrReleasePawn ) ) 
+	{
+		if( XMLString::compareIString( attrReleasePawn, L"true" )==0 ) 
+		{			
+			//printf("grab state = 'start'");
+			handCt->releasePawn();
+		}
+	}
+
 	if (grabVelocity > 0)
 		handCt->grabVelocity = grabVelocity;
 
-	if( target_pawn && target_pawn->colObj_p)	{
-		//SrVec grabPos = target_joint->gmat().get_translation();
-		handCt->setGrabTargetObject(target_pawn->colObj_p);
-		//bodyReachCt->setReachTarget(reachPos);	
-		//handCt->setGrabTargetPos(grabPos);
+	if( target_pawn && target_pawn->colObj_p)	{		
+		handCt->setGrabTargetObject(target_pawn->colObj_p);		
 	}
-// 	else if (attrTargetPos && XMLString::stringLen( attrTargetPos ))
-// 	{
-// 		handCt->setGrabTargetPos(targetPos);
-// 	}
+
+	if (attachPawn && sourceJointName)
+	{
+		std::string jointName = sourceJointName;
+		SbmPawn* pawn = const_cast<SbmPawn*>(attachPawn);
+		handCt->attachPawnTarget(pawn,jointName);
+	}
 
 	if (fadeInTime >= 0.0)
 		handCt->setFadeIn(fadeInTime);

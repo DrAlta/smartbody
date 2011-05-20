@@ -11,6 +11,7 @@ public:
 	VecOfInt vertexIndices;
 public:
 	Simplex& operator=(const Simplex& rhs);	
+	void getSubSimplex(std::vector<Simplex>& outSimpList);
 };
 
 typedef std::vector<Simplex> VecOfSimplex;
@@ -33,4 +34,5 @@ public:
 protected:
 	bool pointInsideSimplex(const dVector& pt, Simplex& tet, VecOfInterpWeight& weight);
 	bool simplexCoordinate(const dVector& pt, Simplex& tet, VecOfInterpWeight& weight);
+	float distToSimplex(const dVector& pt, Simplex& simp);
 };

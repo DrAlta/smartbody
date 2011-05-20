@@ -54,7 +54,7 @@ void FingerChain::testCollision( SbmColObject* colObj )
 
 	for (unsigned int i=1;i<lineSeg.size();i++)
 	{
-		bool isIntersect = colObj->isIntersect(lineSeg[i-1],lineSeg[i],0.005f);
+		bool isIntersect = colObj->isIntersect(lineSeg[i-1],lineSeg[i],1.f);
 		if (isIntersect)
 		{
 			fingerNodes[i]->lock = true;
@@ -78,6 +78,7 @@ MeCtHand::MeCtHand( SkSkeleton* sk, SkJoint* wrist)
 		wristJoint = wrist;//skeletonCopy->search_joint(wrist->name().get_string());
 	}	
 	grabTarget = NULL;
+	attachedPawn = NULL;
 	currentGrabState = GRAB_RETURN;
 	grabVelocity = 7.f;
 	_duration = -1.f;
@@ -87,6 +88,35 @@ MeCtHand::MeCtHand( SkSkeleton* sk, SkJoint* wrist)
 MeCtHand::~MeCtHand( void )
 {
 	
+}
+
+void MeCtHand::attachPawnTarget( SbmPawn* pawn, std::string jointName )
+{	
+	SkJoint* attachJoint = skeletonRef->search_joint(jointName.c_str());
+	if (!attachJoint)
+		return;
+	//printf("attach pawn\n");
+	attachJointName = jointName;
+	attachedPawn = pawn;
+	attachMat = attachedPawn->get_world_offset_joint()->gmat()*attachJoint->gmat().inverse();		
+}
+
+void MeCtHand::releasePawn()
+{
+	attachedPawn = NULL;
+	attachMat = SrMat();
+	attachJointName = "";
+}
+
+void MeCtHand::updateAttachedPawn()
+{
+	SkJoint* attachJoint = skeletonRef->search_joint(attachJointName.c_str());
+	if (!attachJoint || !attachedPawn)
+		return;
+	//printf("update pawn\n");
+	SrMat effectorWorld = attachJoint->gmat();// motionParameter->getMotionFrameJoint(ikMotionFrame,reachEndEffector->name().get_string())->gmat();
+	SrMat newWorld = attachMat*effectorWorld;
+	attachedPawn->setWorldOffset(newWorld);
 }
 
 void MeCtHand::setGrabState( GrabState state )
@@ -247,6 +277,7 @@ bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 
 	skeletonRef->invalidate_global_matrices();
 	skeletonRef->update_global_matrices();
+	updateAttachedPawn();	
 	const char* rootName = ikScenario.ikTreeRoot->joint->parent()->name().get_string();
 	ikScenario.ikGlobalMat = skeletonRef->search_joint(rootName)->gmat();
 	ikScenario.updateNodeGlobalMat(ikScenario.ikTreeRoot,QUAT_CUR);
@@ -375,3 +406,4 @@ MeCtHand::FingerID MeCtHand::findFingerID( const char* jointName )
 	}
 	return MeCtHand::F_THUMB;
 }
+

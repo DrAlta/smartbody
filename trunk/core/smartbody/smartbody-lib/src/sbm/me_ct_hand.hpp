@@ -52,7 +52,12 @@ protected:
 
 	MeCtIKTreeScenario    ikScenario;
 	MeCtJacobianIK        ik;
-	SbmColObject*         grabTarget;           
+	SbmColObject*         grabTarget; 
+
+	std::string           attachJointName;
+	SbmPawn*              attachedPawn;
+	SrMat                 attachMat;
+
 public:
 	float                 grabVelocity;
 
@@ -75,6 +80,10 @@ public:
 	
 	void setGrabState(GrabState state);
 	void setGrabTargetObject(SbmColObject* targetObj);
+
+	void attachPawnTarget(SbmPawn* pawn, std::string jointName);
+	void releasePawn();
+	void updateAttachedPawn();
 protected:
 	void solveIK(float dt);
 	void updateChannelBuffer(MeFrameData& frame, BodyMotionFrame& handMotionFrame, bool bRead = false);

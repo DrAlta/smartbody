@@ -121,7 +121,7 @@ static bool process_line ( const SrString& line,
    if ( in.last_token()=="v" ) // v x y z [w]
     { //SR_TRACE1 ( "v" );
       m.V.push();
-      in >> m.V.top();
+      in >> m.V.top();	 
     }
    else if ( in.last_token()=="vn" ) // vn i j k
     { //SR_TRACE1 ( "vn" );

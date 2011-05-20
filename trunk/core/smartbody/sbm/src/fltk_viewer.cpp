@@ -2578,7 +2578,7 @@ void FltkViewer::drawPawns()
 	mcu.character_map.reset();
 	while (SbmCharacter* character = mcu.character_map.next())
 	{
-		pawnSize = character->getHeight()/ 30.0f;
+		pawnSize = 5.f;//character->getHeight()/ 30.0f;
 		break;
 	}
 

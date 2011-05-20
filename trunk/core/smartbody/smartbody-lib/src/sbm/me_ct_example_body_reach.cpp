@@ -32,7 +32,7 @@ EffectorConstantConstraint& EffectorConstantConstraint::operator=( const Effecto
 const char* MeCtExampleBodyReach::CONTROLLER_TYPE = "BodyReach";
 
 #define USE_FOOT_IK 0
-#define USE_PICK_UP 0
+#define USE_PICK_UP 1
 #define AVOID_OBSTACLE 0
 #define AVOID_OBSTACLE_BLEND 0
 
@@ -192,6 +192,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	}
 	prev_time = (float)t;	
 
+	SbmCharacter* curCharacter = mcuCBHandle::singleton().character_map.lookup(characterName.c_str());
 	updateChannelBuffer(frame,inputMotionFrame,true);
 	updateSkeletonCopy();	
 
@@ -201,6 +202,10 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	reachData->dt = dt;	
 	reachData->curHandAction = handActionTable[curGrabState];	
 	reachData->updateReachState(skeletonRef->search_joint(rootName)->gmat(),ikMotionFrame);
+	if (curCharacter)
+	{
+		reachData->locomotionComplete = curCharacter->_reachTarget;
+	}
 	//cout << "curState = " << curState->curStateName() << endl;
 	curState->updateEffectorTargetState(reachData);	
 	//cout << "refTime = " << reachData->curRefTime << endl;
@@ -321,7 +326,8 @@ void MeCtExampleBodyReach::init()
 	ikDamp        = ikReachRegion*ikReachRegion*14.0;//characterHeight*0.1f;
 
 	reachData = new ReachStateData();
-	reachData->autoReturnTime = -1.0f;//reachCompleteDuration;
+	reachData->reachControl = this;
+	reachData->autoReturnTime = reachCompleteDuration;
 	reachData->charName = characterName;
 	reachData->reachRegion = ikReachRegion;
 	reachData->angularVel = 10.0f;
@@ -337,6 +343,7 @@ void MeCtExampleBodyReach::init()
 	
 	stateTable["Idle"] = new ReachStateIdle();
 	stateTable["Start"] = new ReachStateStart();
+	stateTable["Move"] = new ReachStateMove();
 	stateTable["Complete"] = new ReachStateComplete();
 	stateTable["NewTarget"] = new ReachStateNewTarget();
 	stateTable["Return"] = new ReachStateReturn();
@@ -428,7 +435,7 @@ void MeCtExampleBodyReach::updateMotionExamples( const MotionDataSet& inMotionSe
 
 DataInterpolator* MeCtExampleBodyReach::createInterpolator()
 {	
-	KNNInterpolator* interpolator = new KNNInterpolator(500,ikReachRegion*3.f);
+	KNNInterpolator* interpolator = new KNNInterpolator(3000,ikReachRegion*1.f);
 	resampleData = &interpolator->resampleData;
 	interpExampleData = interpolator->getInterpExamples();
 	return interpolator;
