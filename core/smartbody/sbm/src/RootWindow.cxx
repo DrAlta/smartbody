@@ -30,6 +30,7 @@ RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Character/Bones", 0, ModeBonesCB, this, NULL);
 	menubar->add("&View/Character/Geometry", 0, ModeGeometryCB, this, NULL);
 	menubar->add("&View/Character/Deformable Geometry", 0, ModeDeformableGeometryCB, this, NULL);
+	menubar->add("&View/Character/GPU Deformable Geometry", 0, ModeGPUDeformableGeometryCB, this, NULL);
 	menubar->add("&View/Character/Axis", 0, ModeAxisCB, this, NULL);
 	menubar->add("&View/Character/Show Selected", 0, ShowSelectedCB, this, NULL);
 	menubar->add("&View/Character/Eyebeams", 0, ModeEyebeamsCB, this, NULL);
@@ -589,6 +590,12 @@ void RootWindow::ModeDeformableGeometryCB(fltk::Widget* w, void* data)
 {
 	RootWindow* rootWindow = static_cast<RootWindow*>(data);
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdCharacterShowDeformableGeometry, NULL);
+}
+
+void RootWindow::ModeGPUDeformableGeometryCB(fltk::Widget* w, void* data)
+{
+	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdCharacterShowDeformableGeometryGPU, NULL);
 }
 
 void RootWindow::ModeAxisCB(fltk::Widget* w, void* data)

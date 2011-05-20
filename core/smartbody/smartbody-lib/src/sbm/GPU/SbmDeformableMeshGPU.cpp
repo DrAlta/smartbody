@@ -16,6 +16,7 @@ const char* VSName = "vs_skin_pos.vert";
 const char* FSName = "fs_skin_render.frag";
 const std::string shaderName = "MeshSkin";
 bool SbmDeformableMeshGPU::initShader = false;
+bool SbmDeformableMeshGPU::useGPUDeformableMesh = true;
 
 std::string shaderVS = 
 "#extension GL_EXT_gpu_shader4 : enable \n\
@@ -447,8 +448,14 @@ bool SbmDeformableMeshGPU::initBuffer()
 
 void SbmDeformableMeshGPU::update()
 {	
-#define USE_GPU_TRANSFORM 1
-#if USE_GPU_TRANSFORM
+//#define USE_GPU_TRANSFORM 1
+//#if USE_GPU_TRANSFORM
+	if (!useGPUDeformableMesh)
+	{
+		DeformableMesh::update();
+		return;
+	}
+
 	if (!binding)	return; 
 
 	if (!initShader)
@@ -481,9 +488,9 @@ void SbmDeformableMeshGPU::update()
 		skeleton->update_global_matrices();
 		skinTransformGPU();
 	}
-#else
-	DeformableMesh::update();
-#endif
+//#else
+	
+//#endif
 }
 
 void SbmDeformableMeshGPU::updateTransformBuffer()

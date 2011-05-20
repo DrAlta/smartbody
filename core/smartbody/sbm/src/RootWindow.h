@@ -67,6 +67,7 @@ class  RootWindow : public SrViewer, public fltk::DoubleBufferWindow
 		static void ModeBonesCB(fltk::Widget* w, void* data);
 		static void ModeGeometryCB(fltk::Widget* w, void* data);
 		static void ModeDeformableGeometryCB(fltk::Widget* w, void* data);
+		static void ModeGPUDeformableGeometryCB(fltk::Widget* w, void* data);
 		static void ModeAxisCB(fltk::Widget* w, void* data);
 		static void ModeEyebeamsCB(fltk::Widget* w, void* data);
 		static void ModeEyelidCalibrationCB(fltk::Widget* w, void* data);
@@ -91,7 +92,7 @@ class  RootWindow : public SrViewer, public fltk::DoubleBufferWindow
 		static void TrajectoryCB(fltk::Widget* w, void* data);
 		static void SteeringCharactersCB(fltk::Widget* w, void* data);
 		static void SteeringAllCB(fltk::Widget* w, void* data);
-		static void SteeringNoneCB(fltk::Widget* w, void* data);
+		static void SteeringNoneCB(fltk::Widget* w, void* data);		
 };
 
 class FltkViewerFactory : public SrViewerFactory

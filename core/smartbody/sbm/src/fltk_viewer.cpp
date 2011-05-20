@@ -66,6 +66,7 @@
 # include <SBM/me_ct_param_animation_data.h>
 # include <SBM/Collision/SbmColObject.h>
 # include <SBM/me_ct_param_animation_data.h>
+# include <SBM/GPU/SbmDeformableMeshGPU.h>
 
 
 #include <sbm/mcontrol_util.h>
@@ -204,6 +205,7 @@ Fl_Menu_Item MenuTable[] =
          { "&geometry", 0, MCB, CMD(CmdCharacterShowGeometry), FL_MENU_RADIO },
          { "&collision geometry", 0, MCB, CMD(CmdCharacterShowCollisionGeometry),   FL_MENU_RADIO },
          { "&deformable geometry", 0, MCB, CMD(CmdCharacterShowDeformableGeometry),   FL_MENU_RADIO },
+		 { "&gpu deformable geometry", 0, MCB, CMD(CmdCharacterShowDeformableGeometryGPU),   FL_MENU_RADIO },
          { "&bones",   0, MCB, CMD(CmdCharacterShowBones),   FL_MENU_RADIO },
          { "&axis",   0, MCB, CMD(CmdCharacterShowAxis),   FL_MENU_RADIO },
          { 0 },
@@ -585,6 +587,16 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 						applyToCharacter = true;
 						break;
 	  case CmdCharacterShowDeformableGeometry: 
+		                 SbmDeformableMeshGPU::useGPUDeformableMesh = false;
+						_data->showgeometry = false;
+						_data->showcollisiongeometry = false;
+						_data->showdeformablegeometry = true;
+						_data->showbones = false;
+						_data->showaxis = false;
+						applyToCharacter = true;
+						break;
+	  case CmdCharacterShowDeformableGeometryGPU: 
+						SbmDeformableMeshGPU::useGPUDeformableMesh = true;
 						_data->showgeometry = false;
 						_data->showcollisiongeometry = false;
 						_data->showdeformablegeometry = true;
