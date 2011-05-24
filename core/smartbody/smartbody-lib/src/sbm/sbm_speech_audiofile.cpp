@@ -351,7 +351,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    // if an audio path is present, use it
    bool useAudioPaths = true;
    mcu.audio_paths.reset();
-   std::string relativeAudioPath = mcu.audio_paths.next_path();
+    std::string relativeAudioPath = mcu.audio_paths.next_path();
    if (relativeAudioPath.size() == 0 || relativeAudioPath == mcu.media_path)
    {
        relativeAudioPath = mcu.speech_audiofile_base_path + voiceCode;
@@ -381,7 +381,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 
 
    // TODO: Should we fail if the .bml file isn't present?
-   string bmlFilename = relativeAudioPath + "/" + ref + ".bml";
+   string bmlFilename = std::string(fullAudioPath) + "/" + ref + ".bml";
 
     mcu.mark("requestSpeechAudio", 4, "lips");
    ReadVisemeDataBML( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent );

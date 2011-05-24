@@ -1618,7 +1618,7 @@ std::string nodeStr(const XMLCh* s)
 	return str;
 }
 
-void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, mcuCBHandle* mcu_p)
+void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, const char* prefix, mcuCBHandle* mcu_p)
 {
 	SbmCharacter* char_p = mcu_p->character_map.lookup( char_name );
 	const xercesc_3_0::DOMNodeList* list = node->getChildNodes();
@@ -1687,7 +1687,18 @@ void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, 
 									while (content != "")
 									{
 										if ( sourceId == bindJointName && realNodeName == "Name_array")
+										{
+											if (prefix)
+											{
+												int index = content.find_first_of(prefix);
+												if (index == 0)
+												{
+													int prefixSize = strlen(prefix);
+													content = content.substr(prefixSize, content.size() - prefixSize + 1);
+												}
+											}
 											skinWeight->infJointName.push_back(content);
+										}
 										if ( sourceId == bindWeightName && realNodeName == "float_array")
 											skinWeight->bindWeight.push_back((float)atof(content.c_str()));
 										if ( sourceId == bindPoseMatName && realNodeName == "float_array")
@@ -1796,7 +1807,7 @@ void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, 
 	}
 }
 
-void parseNode(xercesc_3_0::DOMNode* node, const char* char_name, mcuCBHandle* mcu_p)
+void parseNode(xercesc_3_0::DOMNode* node, const char* char_name, const char* prefix, mcuCBHandle* mcu_p)
 {
 	int type = node->getNodeType();
 	std::string name = nodeStr(node->getNodeName());
@@ -1805,20 +1816,20 @@ void parseNode(xercesc_3_0::DOMNode* node, const char* char_name, mcuCBHandle* m
 
 	if (name == "library_controllers" && node->getNodeType() ==  xercesc_3_0::DOMNode::ELEMENT_NODE)
 	{
-		  parseLibraryControllers(node, char_name, mcu_p);
+		  parseLibraryControllers(node, char_name, prefix, mcu_p);
 	}
 	if (node->hasChildNodes())
 	{
 		  const xercesc_3_0::DOMNodeList* list = node->getChildNodes();
 		  for (unsigned int c = 0; c < list->getLength(); c++)
 		  {
-				parseNode(list->item(c), char_name, mcu_p);
+				parseNode(list->item(c), char_name, prefix, mcu_p);
 		  }
 	}
 }
 
 
-int mcu_character_load_skinweights( const char* char_name, const char* skin_file, mcuCBHandle* mcu_p )
+int mcu_character_load_skinweights( const char* char_name, const char* skin_file, const char* prefix, mcuCBHandle* mcu_p )
 {
 	try 
 	{
@@ -1843,7 +1854,7 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 	{
 		parser->parse(skin_file);
 		xercesc_3_0::DOMDocument* doc = parser->getDocument();
-		parseNode(doc, char_name, mcu_p);
+		parseNode(doc, char_name, prefix, mcu_p);
 	}
 	catch (const XMLException& toCatch) 
 	{
@@ -5562,3 +5573,54 @@ int showpawns_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
+
+int syncpoint_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	std::string motionStr = args.read_token();
+
+	if (motionStr == "")
+	{
+		LOG("Usage: syncpoint <motion>");
+		LOG("Usage: syncpoint <motion> <start> <ready> <strokestart> <stroke> <strokeend> <relax> <end>");
+	}
+	
+	std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.find(motionStr);
+	if (iter != mcu_p->motion_map.end())
+	{
+		SkMotion* motion = (*iter).second;
+		int num = args.calc_num_tokens();
+		if (num == 0)
+		{
+			// show the current sync point timings
+			double start = motion->time_start();
+			double ready = motion->time_ready();
+			double strokeStart = motion->time_stroke_start();
+			double stroke = motion->time_stroke_emphasis();
+			double strokeEnd = motion->time_stroke_end();
+			double relax = motion->time_relax();
+			double end = motion->time_stop();
+			LOG("%f %f %f %f %f %f %f", start, ready, strokeStart, stroke, strokeEnd, relax, end);
+			return CMD_SUCCESS;
+		}
+		else if (num != 7)
+		{
+			LOG("Usage: syncpoint <motion> <start> <ready> <strokestart> <stroke> <strokeend> <relax> <end>");
+			return CMD_FAILURE;
+		}
+		else
+		{
+			double start = args.read_float();
+			double ready = args.read_float();
+			double strokeStart = args.read_float();
+			double stroke = args.read_float();
+			double strokeEnd = args.read_float();
+			double relax = args.read_float();
+			double end = args.read_float();
+			motion->synch_points.set_time(start, ready, strokeStart, stroke, strokeEnd, relax, end);
+			return CMD_SUCCESS;
+		}
+
+	}
+
+	return CMD_SUCCESS;
+}
