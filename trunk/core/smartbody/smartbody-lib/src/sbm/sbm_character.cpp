@@ -1661,7 +1661,13 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 	else 
 	if( cmd == "smoothbindweight" ) {
 		char* skin_file = args.read_token();
-		return mcu_character_load_skinweights( name, skin_file, mcu_p );
+		char* option = args.read_token();
+		char* prefix = NULL;
+		if (option)
+		{
+			prefix = args.read_token();
+		}
+		return mcu_character_load_skinweights( name, skin_file, prefix, mcu_p );
 	} 
 	else 
 	if( cmd == "ctrl" ) {
