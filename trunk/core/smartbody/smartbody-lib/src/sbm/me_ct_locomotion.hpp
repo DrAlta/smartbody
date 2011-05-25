@@ -34,6 +34,7 @@
 #include "me_ct_locomotion_height_offset.hpp"
 #include "me_ct_locomotion_IK.hpp"
 #include "me_ct_locomotion_balance.hpp"
+#include "me_ct_navigation_circle.hpp"
 
 class MeCtLocomotionLimb;
 
@@ -90,6 +91,7 @@ protected:
 
 
 	MeCtLocomotionAnalysis analyzer;
+	MeCtNavigationCircle navigation_circle;
 
 	SkChannelArray  request_channels;
 
@@ -169,6 +171,8 @@ public:
 	MeCtLocomotionAnalysis* get_analyzer();
 
 	MeCtLocomotionNavigator* get_navigator();
+
+	MeCtNavigationCircle* get_navigation_circle();
 
 	void add_locomotion_anim(SkMotion* anim);
 

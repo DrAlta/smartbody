@@ -67,6 +67,8 @@ MeCtLocomotion::MeCtLocomotion() {
 	ik.set_terrain(&terrain);
 	height_offset.set_terrain(&terrain);
 	analyzer.set_ct_pawn((MeCtLocomotionPawn*)this);
+
+	navigation_circle.init();
 }
 
 /** Destructor */
@@ -150,6 +152,8 @@ void MeCtLocomotion::context_updated()
 {
 	if( _context == NULL )
 		channels_valid = false;
+	else
+		navigation_circle.setContext(_context);
 }
 
 int MeCtLocomotion::check_limb_controller_map_updated()
@@ -282,6 +286,8 @@ bool MeCtLocomotion::is_motions_loaded()
 
 bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame ) 
 {
+	navigation_circle.controller_evaluate(time, frame);
+
 	if(!valid) return false;
 	if(!channels_valid ) return false;
 
@@ -1182,6 +1188,11 @@ void MeCtLocomotion::update_pos()
 MeCtLocomotionNavigator* MeCtLocomotion::get_navigator()
 {
 	return &navigator;
+}
+
+MeCtNavigationCircle* MeCtLocomotion::get_navigation_circle()
+{
+	return &navigation_circle;
 }
 
 MeCtLocomotionAnalysis* MeCtLocomotion::get_analyzer()

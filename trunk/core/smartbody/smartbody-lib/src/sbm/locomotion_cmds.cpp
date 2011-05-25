@@ -266,11 +266,10 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	if(actor->get_locomotion_ct()->get_anim_global_info()->size() == 0) return CMD_FAILURE;
 	bool local = false;
 	SrVec global_direction;
-	MeCtNavigationCircle* nav_circle = new MeCtNavigationCircle();
-	nav_circle->ref();
-	nav_circle->init( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1);
-	actor->posture_sched_p->create_track( NULL, NULL, nav_circle);
-	nav_circle->unref();
+	MeCtNavigationCircle* nav_circle = actor->get_locomotion_ct()->get_navigation_circle();
+	//MeCtNavigationCircle* nav_circle = new MeCtNavigationCircle();
+	nav_circle->set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1);
+//	actor->posture_sched_p->create_track( NULL, NULL, nav_circle);
 	
 	if( arg=="stop" )
 	{
@@ -289,7 +288,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 		float dx = 0.0f, dy = 0.0f, dz = 0.0f, g_angular = 0.0f, l_angular = 0.0f, l_angle = 0.0f;
 		int id = -1;
 
-		nav_circle->init( dx, dy, dz, g_angular, l_angular, 0, id, 0, 0, 0, -1 );
+		nav_circle->set( dx, dy, dz, g_angular, l_angular, 0, id, 0, 0, 0, -1 );
 
 		return CMD_SUCCESS;
 	}
@@ -434,7 +433,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			arg = args.read_token();
 		}
 
-		nav_circle->init( direction.x, direction.y, direction.z, rps, lrps, angle, -1, 0, 0, 0, time );
+		nav_circle->set( direction.x, direction.y, direction.z, rps, lrps, angle, -1, 0, 0, 0, time );
 
 		return CMD_SUCCESS;
 	}
@@ -579,7 +578,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			}
 		}
 
-		nav_circle->init( 0.0f, 0.0f, 0.0f, rps, lrps, angle, -1, 0, 0, 0, time );
+		nav_circle->set( 0.0f, 0.0f, 0.0f, rps, lrps, angle, -1, 0, 0, 0, time );
 		return CMD_SUCCESS;
 	}
 	
@@ -681,7 +680,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			arg = args.read_token();
 		}
 		//actor->get_locomotion_ct()->set_motion_time(time);
-		nav_circle->init( dx, dy, dz, g_angular, l_angular, l_angle, id, 0, 0, 0, time);
+		nav_circle->set( dx, dy, dz, g_angular, l_angular, l_angle, id, 0, 0, 0, time);
 
 		return CMD_SUCCESS;
 	}
@@ -690,7 +689,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	else if(arg == "del")
 	{
 		int id = args.read_int();
-		nav_circle->init( 0, 0, 0, 0, 0, 0, id, 0, 0, 0, -1);
+		nav_circle->set( 0, 0, 0, 0, 0, 0, id, 0, 0, 0, -1);
 		return CMD_SUCCESS;
 	}
 
