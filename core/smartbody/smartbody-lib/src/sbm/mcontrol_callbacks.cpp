@@ -4788,7 +4788,7 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 		SbmCharacter* character = mcu_p->character_map.lookup(charName);
 		SkMotion* motion;
-		std::map<std::string, SkMotion*>::iterator motionIter = mcu_p->motion_map.find(motionName);
+  		std::map<std::string, SkMotion*>::iterator motionIter = mcu_p->motion_map.find(motionName);
 		if (motionIter != mcu_p->motion_map.end())
 			motion = motionIter->second;
 		else
@@ -4807,6 +4807,7 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			{
 				chanSize = mChanSize;
 				LOG("Channels in motion %s's channel matching %s's skeleton are preceeded with '+'", motionName, charName);
+				LOG("Motion has %d frames duration %f", motion->frames(), motion->duration());
 				LOG("motion %s's Channel Info:", motionName);
 			}
 			if (mode == 2)
