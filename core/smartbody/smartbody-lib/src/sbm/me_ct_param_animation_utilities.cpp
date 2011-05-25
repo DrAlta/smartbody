@@ -696,7 +696,7 @@ PATransitionManager::PATransitionManager(double easeOutStart, double dur)
 	e1 = s1 + dur;
 	s2 = 0.0;
 	// possible bug spot, although for now, the result seems better
-#if 0
+#if 1
 	e2 = s2 + dur;
 #else
 	e2 += dur;
