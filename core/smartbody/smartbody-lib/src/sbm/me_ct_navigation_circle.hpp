@@ -81,14 +81,13 @@ public:
 	/**
 	 *  Initializes the controller.
 	 */
-	void initByRadiansPerSecond( float forward_vel, float radians_per_sec );
+	void init();
 
-	void init( float dx, float dy, float dz, float g_angular, float l_angular, float l_angle, int id, int has_destination, float tx, float tz, float time);
-	/**
-	 *  Initializes the controller.
-	 */
-	void initByRadius( float forward_vel, float radius );
+	void set( float dx, float dy, float dz, float g_angular, float l_angular, float l_angle, int id, int has_destination, float tx, float tz, float time);
+	void setRadiansPerSecond( float forward_vel, float radians_per_sec );
+	void setRadius( float forward_vel, float radius );
 
+	void setContext(MeControllerContext* context);
 	/**
 	 *  Implements MeController::controller_channels().
 	 */

@@ -238,7 +238,7 @@ void BML::Locomotion::parse_routine(DOMElement* elem, BmlRequestPtr request, int
 {
 	MeCtNavigationCircle* nav_circle = new MeCtNavigationCircle();
 	nav_circle->ref();
-	nav_circle->init( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1);
+	nav_circle->set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1);
 	request->actor->posture_sched_p->create_track( NULL, NULL, nav_circle);
 	nav_circle->unref();
 
@@ -445,7 +445,7 @@ void BML::Locomotion::parse_routine(DOMElement* elem, BmlRequestPtr request, int
 	}
 
 
-	nav_circle->init( pos[0], pos[1], pos[2], g_angular_speed, l_angular_speed, 0, id, 0, 0, 0, -1 );
+	nav_circle->set( pos[0], pos[1], pos[2], g_angular_speed, l_angular_speed, 0, id, 0, 0, 0, -1 );
 }
 
 BehaviorRequestPtr BML::parse_bml_example_locomotion( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu )

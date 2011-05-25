@@ -39,20 +39,16 @@ MeCtNavigationCircle::MeCtNavigationCircle()
 	bi_world_rot(-1), bi_loco_vel_x(-1), bi_loco_vel_y(-1), bi_loco_vel_z(-1), bi_loco_rot_global_y(-1), bi_loco_rot_local_y(-1), bi_loco_rot_local_angle(-1), bi_id(-1), bi_loco_time(-1)
 {}
 
-void MeCtNavigationCircle::initByRadius( float forward_velocity, float radius ) {
+void MeCtNavigationCircle::setRadius( float forward_velocity, float radius ) {
 	this->forward_velocity   = forward_velocity;
 	this->radians_per_second = forward_velocity / radius;
 //	this->radius             = radius;
-
-	MeController::init();
 }
 
-void MeCtNavigationCircle::initByRadiansPerSecond( float forward_velocity, float radians_per_second ) {
+void MeCtNavigationCircle::setRadiansPerSecond( float forward_velocity, float radians_per_second ) {
 	this->forward_velocity   = forward_velocity;
 	this->radians_per_second = radians_per_second;
 //	this->radius             = forward_velocity / radians_per_second;
-
-	MeController::init();
 }
 
 const char* MeCtNavigationCircle::controller_type() const {
@@ -69,22 +65,6 @@ void MeCtNavigationCircle::context_updated() {
 
 // Implements MeController::controller_channels().
 SkChannelArray& MeCtNavigationCircle::controller_channels() {
-	if( request_channels.size() == 0 ) {
-		// Initialize Requested Channels                                                           // Indices
-		request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::Quat );  //  0
-
-		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_VELOCITY ), SkChannel::XPos ); //  1
-		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_VELOCITY ), SkChannel::YPos ); //  2
-		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_VELOCITY ), SkChannel::ZPos ); //  3
-
-		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_GLOBAL_ROTATION ), SkChannel::YPos ); //  4
-		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_LOCAL_ROTATION ), SkChannel::YPos ); //  5
-		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_LOCAL_ROTATION_ANGLE ), SkChannel::YPos ); //  6
-		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_TIME ), SkChannel::YPos ); //  7
-
-		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_ID ), SkChannel::YPos ); //  8
-	}
-
 	return request_channels;
 }
 
@@ -120,7 +100,25 @@ double MeCtNavigationCircle::controller_duration() {
 	return -1;
 }
 
-void MeCtNavigationCircle::init( float dx, float dy, float dz, float g_angular, float l_angular, float l_angle, int id, int has_destination, float tx, float tz, float time)
+void MeCtNavigationCircle::init()
+{
+	// Initialize Requested Channels                                                           // Indices
+	request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::Quat );  //  0
+
+	request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_VELOCITY ), SkChannel::XPos ); //  1
+	request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_VELOCITY ), SkChannel::YPos ); //  2
+	request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_VELOCITY ), SkChannel::ZPos ); //  3
+
+	request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_GLOBAL_ROTATION ), SkChannel::YPos ); //  4
+	request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_LOCAL_ROTATION ), SkChannel::YPos ); //  5
+	request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_LOCAL_ROTATION_ANGLE ), SkChannel::YPos ); //  6
+	request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_TIME ), SkChannel::YPos ); //  7
+
+	request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_ID ), SkChannel::YPos ); //  8
+}
+
+
+void MeCtNavigationCircle::set( float dx, float dy, float dz, float g_angular, float l_angular, float l_angle, int id, int has_destination, float tx, float tz, float time)
 {
 	new_routine = true;
 	velocity.x = dx;
@@ -177,6 +175,12 @@ void MeCtNavigationCircle::init( float dx, float dy, float dz, float g_angular, 
 }*/
 
 bool MeCtNavigationCircle::controller_evaluate( double time, MeFrameData& frame ) {
+	if (!is_valid)
+	{
+		remap();
+		controller_map_updated();
+	}
+
 	if( is_valid ) 
 	{
 		SrBuffer<float>& buffer = frame.buffer(); // convenience reference
@@ -211,4 +215,9 @@ bool MeCtNavigationCircle::controller_evaluate( double time, MeFrameData& frame 
 void MeCtNavigationCircle::print_state( int tab_count ) {
 	// TODO
 	MeController::print_state( tab_count );
+}
+
+void MeCtNavigationCircle::setContext(MeControllerContext* context)
+{
+	_context = context;
 }
