@@ -390,7 +390,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSke
 		}
 
 	double duration = double(motion.duration());
-	motion.synch_points.set_time(0.0, duration / 3.0, duration / 2.0, duration * 2.0/3.0, duration);
+	motion.synch_points.set_time(0.0, duration / 3.0, duration / 2.0, duration / 2.0, duration / 2.0, duration * 2.0/3.0, duration);
 	motion.compress();
 	// now there's adjust for the channels by default
 	animationPostProcessByChannels(skeleton, motion, channelsForAdjusting);
