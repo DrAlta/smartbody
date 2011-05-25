@@ -297,7 +297,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		this->param_animation_ct = new MeCtParamAnimation(this, world_offset_writer_p);
 		std::string paramAnimationName = std::string(name)+ "'s param animation controller";
 		this->param_animation_ct->name(paramAnimationName.c_str());
-		this->param_animation_ct->ref();
+		//this->param_animation_ct->ref();
 	}
 
 	//if (use_locomotion) 
@@ -306,7 +306,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		std::string locomotionname = std::string(name)+ "'s locomotion controller";
 		this->locomotion_ct->name( locomotionname.c_str() );
 		locomotion_ct->get_navigator()->setWordOffsetController(world_offset_writer_p);
-		locomotion_ct->ref();
+	//	locomotion_ct->ref();
 	}
 	// Clear pointer data no longer used after this point in initialization.
 	this->viseme_motion_map = NULL;
@@ -387,7 +387,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 	// motion player
 	motionplayer_ct = new MeCtMotionPlayer(this);
-	motionplayer_ct->ref();
+//	motionplayer_ct->ref();
 	std::string mpName(name);
 	mpName += "'s motion player";
 	motionplayer_ct->name(mpName.c_str());
@@ -620,7 +620,7 @@ int SbmCharacter::init_skeleton() {
 
 				// Register control channel with face controller
 				if( face_ct )
-					face_ct->add_key( name.c_str(), au->left.get() );
+					face_ct->add_key( name.c_str(), au->left );
 			}
 			if( au->is_right()) {
 				string name = "au_";
@@ -635,7 +635,7 @@ int SbmCharacter::init_skeleton() {
 
 				// Register control channel with face controller
 				if( face_ct )
-					face_ct->add_key( name.c_str(), au->right.get() );
+					face_ct->add_key( name.c_str(), au->right );
 			}
 			if (au->is_bilateral())
 			{
@@ -650,7 +650,7 @@ int SbmCharacter::init_skeleton() {
 
 					// Register control channel with face controller
 					if( face_ct )
-						face_ct->add_key( name.c_str(), au->left.get() );
+						face_ct->add_key( name.c_str(), au->left );
 			}
 		}
 

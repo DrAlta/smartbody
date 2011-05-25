@@ -1614,7 +1614,9 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 std::string nodeStr(const XMLCh* s)
 {
 	if (!s)	return "";
-	std::string str = XMLString::transcode(s);
+	char* ch = XMLString::transcode(s);
+	std::string str = ch;
+	delete ch;
 	return str;
 }
 
@@ -2383,6 +2385,8 @@ int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			{
 				SkMotion* motion_p = (*motionIter).second;
 				faceMotion->face_neutral_p = motion_p;
+				faceMotion->face_neutral_p->ref();
+
 				return CMD_SUCCESS;
 			} else {
 				LOG("ERROR: Unknown motion \"%s\".", motion_name.c_str());
@@ -2735,8 +2739,11 @@ int mcu_set_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string
 	VisemeMotionMap::iterator pos = viseme_map.find( viseme );
 	if( pos != viseme_map.end() ) {
 		LOG("WARNING: Overwriting viseme \"%s\" motion mapping.", viseme.c_str());
+		if ((*pos).second)
+			(*pos).second->unref();
 	}
 	viseme_map.insert( make_pair( viseme, motion ) );
+	motion->ref();
 	
 	return CMD_SUCCESS;
 }

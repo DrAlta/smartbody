@@ -110,7 +110,6 @@ protected:
 	// Evaluation time face data
 	SkMotion*				face_neutral;
 
-	AUChannelMap			au_channel_map;
 	VisemeMotionMap 		viseme_map;
 
 	//MeCtLocomotionAnalysis* locomotion_ct_analysis;
@@ -317,10 +316,7 @@ public:
 	const MotionDataSet& getGrabHandData() const { return grabHandData;}
 	const MotionDataSet& getReachHandData() const { return reachHandData;}
 	const MotionDataSet& getReleaseHandData() const { return releaseHandData;}
-	
-
-	AUChannelMap& get_au_channel_map( void ) { return au_channel_map; }
-	
+		
 	// viseme curve related functions
 	void set_viseme_curve_mode( bool mode )		{ use_viseme_curve = mode; }
 	bool get_viseme_curve_mode( void ) const	{ return( use_viseme_curve ); }
