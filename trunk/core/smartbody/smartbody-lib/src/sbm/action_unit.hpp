@@ -40,25 +40,42 @@
  *  The unit number is not stored internally.  It can be found
  *  in the ActionUnitMap as a std::pair< int, ActionUnit >.
  */
-template< typename Asset >
 class ActionUnit : public SrSharedClass {
 public:
-	Asset left;
-	Asset right;
+	SkMotion* left;
+	SkMotion* right;
 
-	ActionUnit( Asset unified ) :
+	ActionUnit( SkMotion* unified ) :
 		left( unified ),
 		right( unified )
 	{
+		if (left)
+			left->ref();
+		if (right)
+			right->ref();
 		m_isLeft = false;
 		m_isRight = false;
 		m_isBilateral = true;
 	}
 
-	ActionUnit( Asset left, Asset right ) :
+	ActionUnit( SkMotion* left, SkMotion* right ) :
 		left( left ),
 		right( right )
-	{}
+	{
+		
+		if (left)
+			left->ref();
+		if (right)
+			right->ref();
+	}
+
+	~ActionUnit()
+	{
+		if (left)
+			left->unref();
+		if (right)
+			right->unref();
+	}
 
 	bool is_bilateral() const {
 		return m_isBilateral;
@@ -90,13 +107,19 @@ public:
 		return m_isRight;
 	}
 
-	void set( Asset motion ) {
+	void set( SkMotion* motion ) {
 		set( motion, motion );
 	}
 
-	void set( Asset left, Asset right ) {
-		this->left	= left;
-		this->right	= right;
+	void set( SkMotion* l, SkMotion* r ) {
+		if (left)
+			left->unref();
+		if (right)
+			right->unref();
+		left	= l;
+		left->ref();
+		right	= r;
+		right->ref();
 	}
 
 	protected:
@@ -112,21 +135,9 @@ public:
  *
  *  Use in the mcuCBHandle.
  */
-typedef ActionUnit< boost::intrusive_ptr< SkMotion > >	AUMotion;
+typedef ActionUnit										AUMotion;
 typedef boost::intrusive_ptr< AUMotion >				AUMotionPtr;
 typedef std::map< int, AUMotionPtr >					AUMotionMap;
-
-
-/**
- *  An action unit with SkChannel components.
- *
- *  Use in the SbmCharacter.
- */
-
-// TODO: Extend to support left/right variants
-typedef ActionUnit< boost::shared_ptr< SkChannel > >	AUChannel;
-typedef boost::intrusive_ptr< AUChannel >				AUChannelPtr;
-typedef std::map< int, AUChannelPtr >					AUChannelMap;
 
 
 #endif // SBM_ActionUnit_HPP
