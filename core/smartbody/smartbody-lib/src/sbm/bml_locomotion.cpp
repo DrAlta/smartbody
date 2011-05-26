@@ -156,7 +156,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	
 	child = getFirstChildElement( elem );
 
-	Locomotion::parse_routine(child, request, type, id);
+//	Locomotion::parse_routine(child, request, type, id);
 	//-------------starting  from here, it's BML Spec 1.0
 	std::string localId;
 	if (attrID)
