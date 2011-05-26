@@ -48,8 +48,8 @@ if [ "$configFlag" = "1" ]; then
   elif [ "$1" = "-print" ]; then
     source ./src/testListCases.sh
   elif [ "$1" = "-delete" ]; then
-    @shift
-    source testDeleteCases.sh $@
+    shift
+    source ./src/testDeleteCases.sh $@
   else
     source ./src/testRunCases.sh $1
   fi
