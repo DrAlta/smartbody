@@ -581,6 +581,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 		const size_t viseme_count = visemes.size();
 		for( size_t i=0; i<viseme_count; i++ ) { //adds visemes for audio into sequence file
 			VisemeData* v = visemes.at(i);
+			time_sec time = (time_sec)( v->time() + startAt );
 			if (v->isFloatCurveMode())
 			{
 				command.str( "" );
@@ -592,13 +593,10 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 				{
 					command << data[x * floatsPerKey] << " " << data[x * floatsPerKey + 1] << " "; 
 				}
-				
-				time_sec time = mcu->time;
 				sbm_commands.push_back( new SbmCommand( command.str(), time ) );
 			}
 			else if (!v->isCurveMode())
 			{
-				time_sec time = (time_sec)( v->time() + startAt );
 #if ENABLE_DIRECT_VISEME_SCHEDULE
 				float ramp_dur;
 				if( v->duration() > 0 ) {
@@ -648,7 +646,6 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 #else
 				command.str( "" );
 				command << "char " << actor_id << " viseme " << v->id() << " curve " << v->getNumKeys() << ' ' << v->getCurveInfo();
-				time_sec time = mcu->time;
 				sbm_commands.push_back( new SbmCommand( command.str(), time ) );
 #endif
 				if( LOG_BML_VISEMES ) cout << "command (complete): " << command.str() << endl;
@@ -659,7 +656,6 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 			//	strstr << "WARNING: BodyPlannerImpl::realizeRequest(..): msgId=\""<<bpMsg.msgId<<"\": "<<
 			//		"Failed to insert viseme \""<<v->id()<<"\" @ "<<time<<endl;
 			//}
-			time_sec time = v->time();
 			if( LOG_BML_VISEMES ) {
 				ostringstream echo;
 				echo << "echo LOG_BML_VISEMES:\t" << time << ":\t" << command.str();
