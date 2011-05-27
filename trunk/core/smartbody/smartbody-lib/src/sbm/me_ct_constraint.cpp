@@ -60,6 +60,8 @@ SrVec EffectorJointConstraint::getPosConstraint()
 FadingControl::FadingControl()
 {
 	blendWeight = 0.0;
+	prev_time = -1.0;
+	restart = false;
 }
 
 bool FadingControl::updateFading( float dt )
@@ -118,6 +120,25 @@ void FadingControl::setFadeOut( float interval )
 	fadeInterval = interval;
 	fadeRemainTime = interval;
 	fadeMode = FADING_MODE_OUT;
+}
+
+void FadingControl::controlRestart()
+{
+	restart = true;
+}
+
+void FadingControl::updateDt( float curTime )
+{
+	if (restart)
+	{
+		dt = 0.001f;
+		restart = false;
+	}
+	else
+	{
+		dt = curTime - prev_time;
+	}	
+	prev_time = curTime;
 }
 
 
@@ -203,24 +224,23 @@ void MeCtConstraint::controller_map_updated()
 
 bool MeCtConstraint::controller_evaluate( double t, MeFrameData& frame )
 {	
-	SrTimer time;
-	time.start();
-	float dt = 0.001f;
+	//SrTimer time;
+	//time.start();
+	//float dt = 0.001f;
 	std::vector<SrQuat> tempQuatList; tempQuatList.resize(ik_scenario.ikTreeNodes.size());
 	if (prev_time == -1.0) // first start
-	{
-		dt = 0.001f;		
+	{		
 		// for first frame, update from frame buffer to joint quat in the limb
-		// any future IK solving will simply use the joint quat from the previous frame.
-		//limb.updateQuat(frame,true);
+		// any future IK solving will simply use the joint quat from the previous frame.		
 		updateChannelBuffer(frame,tempQuatList,true);			
 		ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_INIT);
 		ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_PREVREF);
 	}
-	else
-	{		
-		dt = ((float)(t-prev_time));
-	}
+	updateDt((float)t);
+// 	else
+// 	{		
+// 		dt = ((float)(t-prev_time));
+// 	}
 
 	updateChannelBuffer(frame,tempQuatList,true);
 	ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_REF);
@@ -303,6 +323,7 @@ bool MeCtConstraint::controller_evaluate( double t, MeFrameData& frame )
 
 void MeCtConstraint::controller_start()
 {
+	controlRestart();
 }
 
 void MeCtConstraint::print_state(int tabs)

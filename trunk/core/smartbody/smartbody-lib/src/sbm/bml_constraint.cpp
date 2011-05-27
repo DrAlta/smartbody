@@ -246,7 +246,10 @@ BehaviorRequestPtr BML::parse_bml_constraint( DOMElement* elem, const std::strin
 	bool bCreateNewController = false;
 	if (!constraintCt)
 	{
-		constraintCt = new MeCtConstraint(request->actor->skeleton_p);		
+		constraintCt = new MeCtConstraint(request->actor->skeleton_p);	
+		SbmCharacter* chr = const_cast<SbmCharacter*>(request->actor);
+		float characterHeight = chr->getHeight();
+		constraintCt->characterHeight = characterHeight;
 		constraintCt->handle(handle);
 		constraintCt->init(rootJointName);
 		bCreateNewController = true;

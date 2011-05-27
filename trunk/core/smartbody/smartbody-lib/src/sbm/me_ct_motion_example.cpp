@@ -142,7 +142,7 @@ double BodyMotion::motionDuration(DurationType durType)
 
 double BodyMotion::strokeEmphasisTime()
 {
-	double emphTime = motion->time_stroke_emphasis();////(motion->time_stroke_end()+motion->time_stroke_emphasis())*0.5f;//motion->time_stroke_emphasis();//(motion->time_stroke_end()+motion->time_stroke_emphasis())*0.5f;	
+	double emphTime = (motion->time_stroke_end()+motion->time_stroke_emphasis())*0.5f;//motion->time_stroke_emphasis();//motion->time_stroke_emphasis();//(motion->time_stroke_end()+motion->time_stroke_emphasis())*0.5f;	
 	return timeWarp->invTimeWarp(emphTime);
 }
 

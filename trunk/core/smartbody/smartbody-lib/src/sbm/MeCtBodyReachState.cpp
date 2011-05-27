@@ -227,6 +227,7 @@ ReachStateData::ReachStateData()
 {
 	curTime = 0.f;
 	curRefTime = 0.f;
+	stateTime = 0.f;
 	dt = du = 0.f;
 	startReach = endReach = useExample = locomotionComplete = false;
 	autoReturnTime = -1.f;
@@ -423,18 +424,21 @@ std::string ReachStateIdle::nextState( ReachStateData* rd )
 		// test the distance to the target
 		SrVec targetXZ = rd->reachTarget.getTargetState().tran; targetXZ.y = 0.f;
 		float dist = rd->XZDistanceToTarget();
-		if (dist > 90.f) 
+		if (dist > rd->characterHeight*0.5f) 
 		{	
 			// if the target is far away, move the character first
+			//printf("idle to walk\n");
 			std::string cmd;
 			std::string charName = rd->charName;			
-			cmd = "bml char " + charName + " <locomotion target=\"" + boost::lexical_cast<std::string>(targetXZ.x) + " " + boost::lexical_cast<std::string>(targetXZ.z) + "\" proximity=\"1.5\"/>";
-			rd->curHandAction->sendReachEvent(cmd);
-			rd->reachControl->setFadeOut(0.5f);
+			cmd = "bml char " + charName + " <locomotion target=\"" + boost::lexical_cast<std::string>(targetXZ.x) + " " + 
+				   boost::lexical_cast<std::string>(targetXZ.z) + "\" proximity=\"" +  boost::lexical_cast<std::string>(rd->characterHeight*0.8f*0.01f) +"\"/>";
+			rd->curHandAction->sendReachEvent(cmd);			
 			nextStateName = "Move";
 		}
 		else // otherwise do the reach directly
 		{
+			//printf("idle to start\n");
+			rd->reachControl->setFadeIn(0.5f);
 			nextStateName = "Start";
 		}		
 	}
@@ -474,9 +478,17 @@ std::string ReachStateStart::nextState( ReachStateData* rd )
 	std::string nextStateName = "Start";
 	if (interpTargetReached(rd))
 	{
-		rd->curHandAction->reachCompleteAction(rd);
-		rd->startReach = false;
-		nextStateName = "Complete";
+		//if (ikTargetReached(rd))
+		{
+			rd->curHandAction->reachCompleteAction(rd);
+			rd->startReach = false;
+			nextStateName = "Complete";
+		}
+// 		else
+// 		{
+// 			rd->startReach = false;
+// 			nextStateName = "Return";
+// 		}		
 	}
 	return nextStateName;
 }
@@ -489,12 +501,24 @@ std::string ReachStateMove::nextState( ReachStateData* rd )
 	std::string nextStateName = "Move";
 	static float prevDist = 0.f;
 	float curDist = rd->XZDistanceToTarget();
+	
+	if (rd->stateTime < 0.5f)
+		return nextStateName;
+	//if (!rd->locomotionComplete)
 	//printf("locomotion = %d, dist = %f\n",rd->locomotionComplete,curDist);
-	if (rd->locomotionComplete && curDist < 90.f && fabs(curDist-prevDist) < 0.01f)
+	if (rd->locomotionComplete && fabs(curDist-prevDist) < rd->characterHeight*0.001f)
 	{
-		//printf("trasition to start !!\n");
-		rd->reachControl->setFadeIn(0.5f);
-		nextStateName = "Start";
+		if (curDist < rd->characterHeight*0.5f)
+		{
+			rd->reachControl->setFadeIn(0.5f);
+			nextStateName = "Start";
+		}
+		else
+		{
+			LOG("Reach Controller State : [MOVE], Can not reach target\n");
+			nextStateName = "Idle";
+			rd->startReach = false;
+		}		
 	}
 	prevDist = curDist;
 	return nextStateName;
@@ -516,7 +540,8 @@ void ReachStateMove::updateEffectorTargetState( ReachStateData* rd )
 void ReachStateComplete::updateEffectorTargetState( ReachStateData* rd )
 {
 	ReachStateInterface::updateReachToTarget(rd);
-	rd->curRefTime = (float)rd->interpMotion->strokeEmphasisTime();
+	if (rd->useInterpolation())
+		rd->curRefTime = (float)rd->interpMotion->strokeEmphasisTime();
 }
 
 void ReachStateComplete::update( ReachStateData* rd )
@@ -551,7 +576,8 @@ std::string ReachStateComplete::nextState( ReachStateData* rd )
 void ReachStateNewTarget::updateEffectorTargetState( ReachStateData* rd )
 {
 	ReachStateInterface::updateReachToTarget(rd);
-	rd->curRefTime = (float)rd->interpMotion->strokeEmphasisTime();
+	if (rd->useInterpolation())
+		rd->curRefTime = (float)rd->interpMotion->strokeEmphasisTime();
 }
 
 void ReachStateNewTarget::update( ReachStateData* rd )
@@ -600,6 +626,7 @@ std::string ReachStateReturn::nextState( ReachStateData* rd )
 		rd->startReach = false;
 		rd->endReach = false;
 		nextStateName = "Idle";
+		//rd->reachControl->setFadeOut(0.5f);
 	}
 	return nextStateName;
 }

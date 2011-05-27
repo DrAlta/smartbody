@@ -2631,14 +2631,8 @@ void FltkViewer::drawPawns()
 			glPopMatrix();
 			glPopMatrix();
 			glPopAttrib();
-		}
-		
-
-			
-		
+		}		
 	}
-	
-
 }
 
 
@@ -3600,6 +3594,7 @@ void FltkViewer::drawReach()
 			SrVec gPos = lPos*rootMat; // transform to global coordinate
 			//drawCircle(gPos[0],gPos[1],gPos[2],1.0,5,SrVec(1.0,0.0,0.0));			
 			//drawPoint(gPos[0],gPos[1],gPos[2],5.0,SrVec(0.0,0.0,1.0));
+			glColor3f(0.0, 0.0, 1.0);
 			SrSnSphere sphere;			
 			sphere.shape().center = SrPnt(gPos[0], gPos[1], gPos[2]);
 			sphere.shape().radius = sphereSize;

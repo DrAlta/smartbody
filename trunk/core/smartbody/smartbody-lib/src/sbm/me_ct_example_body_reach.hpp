@@ -37,7 +37,7 @@ class MeCtExampleBodyReach :
 private:
 	static const char* CONTROLLER_TYPE;
 public:	
-	enum GrabStateID { PICK_UP_OBJECT = 0, TOUCH_OBJECT, PUT_DOWN_OBJECT };
+	enum HandActionState { PICK_UP_OBJECT = 0, TOUCH_OBJECT, PUT_DOWN_OBJECT };
 protected:
 	std::string           characterName;
 	SkSkeleton*           skeletonCopy, *skeletonRef;
@@ -56,16 +56,16 @@ protected:
 	                                      // set to the full skeleton by default ( excluding fingers & face bones ).
 
 	std::map<std::string,ReachStateInterface*> stateTable;
-	std::map<GrabStateID,ReachHandAction*>     handActionTable;
+	std::map<HandActionState,ReachHandAction*>     handActionTable;
 	
-	ReachStateInterface*  curState;
-	
-	GrabStateID           curGrabState;
+	ReachStateInterface*  curReachState;	
+	HandActionState       curHandActionState;
 
 	float                 reachCompleteTime; 
-	float                 prev_time; // to get dt
+	//float                 prev_time; // to get dt
 	bool                  interactiveReach;	
-		
+	bool                  footIKFix;
+	
 	SkJoint*              reachEndEffector;
 	ConstraintMap         reachPosConstraint;
 	ConstraintMap         reachRotConstraint;
@@ -102,7 +102,7 @@ public:
 	MeCtExampleBodyReach(std::string charName, SkSkeleton* sk, SkJoint* effectorJoint);
 	virtual ~MeCtExampleBodyReach(void);	
 
-	void setGrabState(GrabStateID newState);
+	void setHandActionState(HandActionState newState);
 	void setLinearVelocity(float vel);
 
 	virtual void controller_map_updated();
@@ -121,6 +121,7 @@ public:
 	void setReachTargetPos(SrVec& targetPos);
 	void setEndEffectorRoot(const char* rootName);	
 	void setFinishReaching(bool isFinish);
+	void setFootIK(bool useIK);
 	void init();
 
 	void updateMotionExamples(const MotionDataSet& inMotionSet);

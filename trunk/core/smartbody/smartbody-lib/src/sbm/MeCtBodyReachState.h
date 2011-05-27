@@ -76,6 +76,7 @@ class ReachStateData
 public:
 	std::string     charName; // character name
 	float           curTime, dt;
+	float           stateTime; // how much time has been in a state 
 	float           curRefTime, du;	
 	SrMat           gmat;
 	// reference motion frames ( as motion interpolation output, or IK reference pose )
@@ -85,6 +86,7 @@ public:
 	ReachTarget     reachTarget;	
 	// flags for state transition
 	float           autoReturnTime;
+	float           characterHeight;
 	bool            startReach, endReach;
 	bool            useExample;	
 	bool            locomotionComplete;

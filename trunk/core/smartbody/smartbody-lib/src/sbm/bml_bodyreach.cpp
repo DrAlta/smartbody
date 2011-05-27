@@ -56,6 +56,7 @@ const XMLCh ATTR_CONS_TARGET[] = L"sbm:cons-target";
 const XMLCh ATTR_TARGET_POS[] = L"sbm:target-pos";
 const XMLCh ATTR_REACH_VELOCITY[] = L"sbm:reach-velocity";
 const XMLCh ATTR_REACH_FINISH[] = L"sbm:reach-finish";
+const XMLCh ATTR_FOOT_IK[] = L"sbm:foot-ik";
 const XMLCh ATTR_REACH_ACTION[] = L"sbm:action";
 const XMLCh ATTR_FADE_OUT[]		= L"sbm:fade-out";
 const XMLCh ATTR_FADE_IN[]		= L"sbm:fade-in";
@@ -267,15 +268,15 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	{
 		if( XMLString::compareIString( attrReachAction, L"pick-up" )==0 ) 
 		{					
-			bodyReachCt->setGrabState(MeCtExampleBodyReach::PICK_UP_OBJECT);
+			bodyReachCt->setHandActionState(MeCtExampleBodyReach::PICK_UP_OBJECT);
 		}
 		else if( XMLString::compareIString( attrReachAction, L"touch" )==0 )
 		{				
-			bodyReachCt->setGrabState(MeCtExampleBodyReach::TOUCH_OBJECT);
+			bodyReachCt->setHandActionState(MeCtExampleBodyReach::TOUCH_OBJECT);
 		}
 		else if( XMLString::compareIString( attrReachAction, L"put-down" )==0 )
 		{			
-			bodyReachCt->setGrabState(MeCtExampleBodyReach::PUT_DOWN_OBJECT);
+			bodyReachCt->setHandActionState(MeCtExampleBodyReach::PUT_DOWN_OBJECT);
 		}
 	}	
 
@@ -285,23 +286,33 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	{
 		if( XMLString::compareIString( attrReachFinish, L"true" )==0 ) 
 		{			
-			LOG("Finish reaching = 'true'");
 			bodyReachCt->setFinishReaching(true);
 		}
 		else if( XMLString::compareIString( attrReachFinish, L"false" )==0 )
 		{			
-			LOG("Finish reaching = 'false'");
 			bodyReachCt->setFinishReaching(false);
+		}
+	}	
+
+	const XMLCh* attrFootIK = NULL;
+	attrFootIK = elem->getAttribute(ATTR_FOOT_IK);
+	if( attrFootIK && XMLString::stringLen( attrFootIK ) ) 
+	{
+		if( XMLString::compareIString( attrFootIK, L"true" )==0 ) 
+		{		
+			LOG("Foot IK = true");
+			bodyReachCt->setFootIK(true);
+		}
+		else if( XMLString::compareIString( attrFootIK, L"false" )==0 )
+		{			
+			bodyReachCt->setFootIK(false);
 		}
 	}	
 
 	if (reachVelocity > 0)
 	{
-		bodyReachCt->setLinearVelocity(reachVelocity);
-		//printf("reach velocity = %f\n",bodyReachCt->reachVelocity);
+		bodyReachCt->setLinearVelocity(reachVelocity);		
 	}
-// 	if (apexDuration > 0)
-// 		bodyReachCt->reachCompleteDuration = apexDuration;
 
 	if (rootName)
 	{
@@ -337,7 +348,7 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 
 	boost::shared_ptr<MeControllerRequest> ct_request;
 	ct_request.reset();
-	if (bCreateNewController)
+	//if (bCreateNewController)
 	{
 		ct_request.reset( new MeControllerRequest( unique_id, localId, bodyReachCt, request->actor->reach_sched_p, behav_syncs ) );
 		ct_request->set_persistent( true );
