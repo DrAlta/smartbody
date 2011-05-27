@@ -81,8 +81,7 @@ MeCtHand::MeCtHand( SkSkeleton* sk, SkJoint* wrist)
 	attachedPawn = NULL;
 	currentGrabState = GRAB_RETURN;
 	grabVelocity = 7.f;
-	_duration = -1.f;
-	prevTime = -1.f;
+	_duration = -1.f;	
 }
 
 MeCtHand::~MeCtHand( void )
@@ -244,18 +243,14 @@ BodyMotionFrame& MeCtHand::findTargetFrame( GrabState state )
 
 bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 {	
-	float dt = 0.001f;
+	//float dt = 0.001f;
 	float du = 0.0;
-	if (prevTime == -1.f) // first start
+	if (prev_time == -1.f) // first start
 	{
-		dt = 0.001f;
+		//dt = 0.001f;
 		updateChannelBuffer(frame,currentFrame,true);
 	}
-	else
-	{		
-		dt = ((float)(t-prevTime));
-	}
-	prevTime = (float)t;	
+	updateDt((float)t);
 
 	static bool bInit = false;
 	if (!bInit)

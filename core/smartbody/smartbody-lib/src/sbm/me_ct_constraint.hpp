@@ -59,13 +59,18 @@ public:
 protected:
 	float             fadeRemainTime, fadeInterval;
 	float             blendWeight;
+	float             prev_time, cur_time, dt;
+	bool              restart;	
 	FadingControlMode fadeMode;
 public:
 	FadingControl();
-	virtual ~FadingControl() {}
+	virtual ~FadingControl() {}	
 	void setFadeIn(float interval);
 	void setFadeOut(float interval);
 	bool updateFading(float dt);
+
+	void controlRestart();
+	void updateDt(float curTime);
 };
 
 
@@ -101,8 +106,7 @@ protected:
 
 	ConstraintMap   rotConstraint;
 	ConstraintMap   posConstraint;
-		
-	float           prev_time; // to get dt
+
 public:
 	float           characterHeight;
 	double          ikDamp;

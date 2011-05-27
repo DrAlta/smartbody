@@ -2208,6 +2208,33 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		}
 		return CMD_SUCCESS;
 	}
+	else if ( cmd == "handmotion")
+	{
+		string hand_cmd = args.read_token();	
+		if (hand_cmd == "grabhand" || hand_cmd == "reachhand" || hand_cmd == "releasehand")
+		{
+			string motion_name = args.read_token();
+			SkMotion* motion = mcu_p->lookUpMotion(motion_name.c_str());
+			//LOG("SbmCharacter::parse_character_command LOG: add motion name : %s ", motion_name.c_str());
+			if (motion)
+			{
+				//addReachMotion(motion);
+				if (hand_cmd == "grabhand")
+					this->grabHandData.insert(motion);
+				else if (hand_cmd == "reachhand")
+					this->reachHandData.insert(motion);
+				else if (hand_cmd == "releasehand")
+					this->releaseHandData.insert(motion);
+
+				return CMD_SUCCESS;
+			}
+			else
+			{
+				LOG( "SbmCharacter::parse_character_command ERR: motion '%s' not found", motion_name.c_str());
+				return CMD_NOT_FOUND;
+			}
+		}
+	}
 	else if ( cmd == "reachmotion" )
 	{
 		string reach_cmd = args.read_token();		
@@ -2228,29 +2255,37 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 				return CMD_NOT_FOUND;
 			}
 		}
-		else if (reach_cmd == "grabhand" || reach_cmd == "reachhand" || reach_cmd == "releasehand")
+		else if (reach_cmd == "list")
 		{
-			string motion_name = args.read_token();
-			SkMotion* motion = mcu_p->lookUpMotion(motion_name.c_str());
-			//LOG("SbmCharacter::parse_character_command LOG: add motion name : %s ", motion_name.c_str());
-			if (motion)
+			int motion_num = this->reachMotionData.size();
+			//SkMotion* motion = getReachMotion(motion_num);
+			for (int c = 0; c < motion_num; c++)
 			{
-				//addReachMotion(motion);
-				if (reach_cmd == "grabhand")
-					this->grabHandData.insert(motion);
-				else if (reach_cmd == "reachhand")
-					this->reachHandData.insert(motion);
-				else if (reach_cmd == "releasehand")
-					this->releaseHandData.insert(motion);
-
-				return CMD_SUCCESS;
+				LOG( "%s", getReachMotion(c)->name() );
 			}
-			else
-			{
-				LOG( "SbmCharacter::parse_character_command ERR: motion '%s' not found", motion_name.c_str());
-				return CMD_NOT_FOUND;
-			}
+			return CMD_SUCCESS;
 		}
+		else if (reach_cmd == "build")
+		{
+			MeCtExampleBodyReach* reachCt = NULL;
+			MeCtSchedulerClass* reachSched = this->reach_sched_p;
+			MeCtSchedulerClass::VecOfTrack reach_tracks = reachSched->tracks();		
+			MeCtReach* tempCt = NULL;
+			for (unsigned int c = 0; c < reach_tracks.size(); c++)
+			{
+				MeController* controller = reach_tracks[c]->animation_ct();		
+				reachCt = dynamic_cast<MeCtExampleBodyReach*>(controller);			
+				if (reachCt)
+					break;
+			}
+			if (!reachCt)
+			{
+				LOG("ERROR: Could not find reach controller for char %s.",this->name);
+				return CMD_FAILURE;
+			}
+			reachCt->updateMotionExamples(getReachMotionDataSet());
+			return (CMD_SUCCESS);
+		}			
 		else if (reach_cmd == "play")
 		{
 			int motion_num = args.read_int();

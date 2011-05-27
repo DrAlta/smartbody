@@ -1015,7 +1015,7 @@ void MeControllerRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu 
 			schedule_ct->schedule( anim_ct, behav_syncs);
 		}
 		else
-		{
+		{			
 			schedule_ct->schedule( anim_ct, (double)startAt, (double)endAt, (float)indt, (float)outdt );
 		}
 	}

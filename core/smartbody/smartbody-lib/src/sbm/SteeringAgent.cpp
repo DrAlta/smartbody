@@ -62,6 +62,7 @@ void SteeringAgent::evaluate()
 
 	//---given goal, check if reach already
 	bool reachTarget = false;
+	
 	const std::queue<SteerLib::AgentGoalInfo>& goalQueue = pprAgent->getLandmarkQueue();
 	if (goalQueue.size() > 0)
 	{
@@ -83,6 +84,8 @@ void SteeringAgent::evaluate()
 	float angleDiff = angleGlobal - yaw;
 	normalizeAngle(angleDiff);
 	float newSpeed = desiredSpeed;
+
+	//printf("num Goals = %d\n",numGoals);
 
 	//---update for locomotion_ct
 	if (mcu.steering_use_procedural)
@@ -397,6 +400,8 @@ void SteeringAgent::evaluate()
 	pprAgent->updateAgentState(newPosition, newOrientation, newSpeed);
 	pprAgent->updateAI((float)mcu.time, (float)mcu.time_dt, int(mcu.time / mcu.time_dt));
 	character->_numSteeringGoal = numGoals;
+
+	//printf("Reach target = %d, num of goals = %d\n",character->_reachTarget,character->_numSteeringGoal);
 }
 
 void SteeringAgent::setAgent(SteerLib::AgentInterface* a)

@@ -30,7 +30,7 @@
 class mcuCBHandle;
 
 namespace BML {
-	const XMLCh TAG_BODYREACH[]      = L"sbm:bodyreach";
+	const XMLCh TAG_BODYREACH[]      = L"sbm:reach";
 
 
 	BML::BehaviorRequestPtr parse_bml_bodyreach( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );

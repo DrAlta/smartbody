@@ -39,7 +39,7 @@ protected:
 	SkSkeleton*     skeletonRef;
 	SkSkeleton*     skeletonCopy;
 	SkJoint*        wristJoint;
-	float 			_duration, prevTime;
+	float 			_duration;
 	SkChannelArray	_channels;	
 	GrabState             currentGrabState;
 	BodyMotionFrame       releaseFrame, grabFrame, reachFrame, currentFrame, tempFrame;	

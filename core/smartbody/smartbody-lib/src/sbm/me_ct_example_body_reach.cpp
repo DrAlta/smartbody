@@ -39,7 +39,7 @@ const char* MeCtExampleBodyReach::CONTROLLER_TYPE = "BodyReach";
 const std::string lFootName[] = {"l_forefoot", "l_ankle" };
 const std::string rFootName[] = {"r_forefoot", "r_ankle" };
 
-MeCtExampleBodyReach::MeCtExampleBodyReach(std::string charName, SkSkeleton* sk, SkJoint* effectorJoint )
+MeCtExampleBodyReach::MeCtExampleBodyReach(std::string charName, SkSkeleton* sk, SkJoint* effectorJoint ) : FadingControl()
 {	
 	// here we create a copy of skeleton as an intermediate structure.
 	// this will make it much easier to grab a key-frame from a SkMotion.
@@ -47,7 +47,7 @@ MeCtExampleBodyReach::MeCtExampleBodyReach(std::string charName, SkSkeleton* sk,
 	characterName = charName;
 	skeletonCopy = new SkSkeleton(sk); 
 	skeletonRef  = sk;
-	prev_time = -1.0;
+
 	dataInterpolator = NULL;
 	
 	refMotion = NULL;
@@ -55,12 +55,13 @@ MeCtExampleBodyReach::MeCtExampleBodyReach(std::string charName, SkSkeleton* sk,
 	
 	
 	interactiveReach = false;
+	footIKFix = false;
 	reachEndEffector = effectorJoint;
 		
-	curGrabState  = TOUCH_OBJECT;		
+	curHandActionState  = TOUCH_OBJECT;		
 	interpMotion = NULL;
 	motionParameter = NULL;
-	curState = NULL;
+	curReachState = NULL;
 
 	defaultVelocity = 50.f;
 	reachCompleteDuration = 0.5f;		
@@ -71,9 +72,9 @@ ReachStateInterface* MeCtExampleBodyReach::getState( std::string stateName )
 	return stateTable[stateName];
 }
 
-void MeCtExampleBodyReach::setGrabState( GrabStateID newState )
+void MeCtExampleBodyReach::setHandActionState( HandActionState newState )
 {
-	curGrabState = newState;	
+	curHandActionState = newState;	
 }
 
 MeCtExampleBodyReach::~MeCtExampleBodyReach( void )
@@ -88,6 +89,11 @@ MeCtExampleBodyReach::~MeCtExampleBodyReach( void )
 void MeCtExampleBodyReach::setFinishReaching( bool isFinish )
 {
 	reachData->endReach = isFinish;
+}
+
+void MeCtExampleBodyReach::setFootIK( bool useIK )
+{
+	footIKFix = useIK;
 }
 
 void MeCtExampleBodyReach::setLinearVelocity( float vel )
@@ -136,11 +142,11 @@ void MeCtExampleBodyReach::solveIK( ReachStateData* rd, BodyMotionFrame& outFram
 	{
 		EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>(reachRotConstraint[reachEndEffector->name().get_string()]);		
 		cons->targetRot = estate.curTargetState.rot;//ikRotTrajectory;//ikRotTarget;//motionParameter->getMotionFrameJoint(interpMotionFrame,reachEndEffector->name().get_string())->gmat();//ikRotTarget;	
-#if USE_PICK_UP
-		ikScenario.ikRotEffectors = &reachRotConstraint;
-#else
-		ikScenario.ikRotEffectors = &reachNoRotConstraint;
-#endif
+		
+		if (rd->curHandAction == handActionTable[PICK_UP_OBJECT] || rd->curHandAction == handActionTable[PUT_DOWN_OBJECT])
+			ikScenario.ikRotEffectors = &reachRotConstraint;
+		else if (rd->curHandAction == handActionTable[TOUCH_OBJECT])
+			ikScenario.ikRotEffectors = &reachNoRotConstraint;
 	}
 
 	//sr_out << "target pos = " << estate.curTargetState.tran << " , target rot = " << estate.curTargetState.rot << srnl;
@@ -153,46 +159,56 @@ void MeCtExampleBodyReach::solveIK( ReachStateData* rd, BodyMotionFrame& outFram
 		ikScenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);		
 	}
 
-#if USE_FOOT_IK
-	for (int i=0;i<2;i++)
+    if (footIKFix)
 	{
-		EffectorConstantConstraint* lfoot = dynamic_cast<EffectorConstantConstraint*>(leftFootConstraint[lFootName[i]]);
-		lfoot->targetPos = motionParameter->getMotionFrameJoint(idleMotionFrame,lFootName[i].c_str())->gmat().get_translation();
-		EffectorConstantConstraint* rfoot = dynamic_cast<EffectorConstantConstraint*>(rightFootConstraint[rFootName[i]]);
-		rfoot->targetPos = motionParameter->getMotionFrameJoint(idleMotionFrame,rFootName[i].c_str())->gmat().get_translation();	
-	} 			
-	ikScenario.ikPosEffectors = &leftFootConstraint;
-	ikCCD.update(&ikScenario);
-	ikScenario.ikPosEffectors = &rightFootConstraint;
-	ikCCD.update(&ikScenario);	
-	ikScenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);
-#endif
+		for (int i=0;i<2;i++)
+		{
+			EffectorConstantConstraint* lfoot = dynamic_cast<EffectorConstantConstraint*>(leftFootConstraint[lFootName[i]]);
+			lfoot->targetPos = motionParameter->getMotionFrameJoint(idleMotionFrame,lFootName[i].c_str())->gmat().get_translation();
+			EffectorConstantConstraint* rfoot = dynamic_cast<EffectorConstantConstraint*>(rightFootConstraint[rFootName[i]]);
+			rfoot->targetPos = motionParameter->getMotionFrameJoint(idleMotionFrame,rFootName[i].c_str())->gmat().get_translation();	
+		} 			
+		ikScenario.ikPosEffectors = &leftFootConstraint;
+		ikCCD.update(&ikScenario);
+		ikScenario.ikPosEffectors = &rightFootConstraint;
+		ikCCD.update(&ikScenario);	
+		ikScenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);
+	}
+
 	outFrame = refFrame;
 	ikScenario.getTreeNodeQuat(outFrame.jointQuat,QUAT_CUR); 	
 }
 
 bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 {
-	float dt = 0.001f;
+	//float dt = 0.001f;
 	float du = 0.0;
 	if (prev_time == -1.0) // first start
 	{
-		dt = 0.001f;		
+		//dt = 0.001f;		
 		// for first frame, update from frame buffer to joint quat in the limb
 		// any future IK solving will simply use the joint quat from the previous frame.
 		updateChannelBuffer(frame,idleMotionFrame,true);
 		reachData->idleRefFrame = reachData->currentRefFrame = reachData->targetRefFrame = idleMotionFrame;
-		curState = getState("Idle");
-		ikMotionFrame = idleMotionFrame;
-		
-	}
-	else
-	{		
-		dt = ((float)(t-prev_time));
-	}
-	prev_time = (float)t;	
+		curReachState = getState("Idle");
+		ikMotionFrame = idleMotionFrame;		
+	}	
+
+	updateDt((float)t);
+	
+// 	if (restart)
+// 	{
+// 		dt = 0.001f;
+// 		restart = false;
+// 	}
+// 	else
+// 	{		
+// 		dt = ((float)(t-prev_time));
+// 	}
+// 	prev_time = (float)t;	
 
 	SbmCharacter* curCharacter = mcuCBHandle::singleton().character_map.lookup(characterName.c_str());
+	skeletonRef->update_global_matrices();
 	updateChannelBuffer(frame,inputMotionFrame,true);
 	updateSkeletonCopy();	
 
@@ -200,22 +216,26 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	const char* rootName = ikScenario.ikTreeRoot->joint->parent()->name().get_string();
 	reachData->curTime = (float)t;
 	reachData->dt = dt;	
-	reachData->curHandAction = handActionTable[curGrabState];	
+	reachData->stateTime += dt;
+	reachData->curHandAction = handActionTable[curHandActionState];	
 	reachData->updateReachState(skeletonRef->search_joint(rootName)->gmat(),ikMotionFrame);
 	if (curCharacter)
 	{
 		reachData->locomotionComplete = curCharacter->_reachTarget;
 	}
-	//cout << "curState = " << curState->curStateName() << endl;
-	curState->updateEffectorTargetState(reachData);	
-	//cout << "refTime = " << reachData->curRefTime << endl;
-	curState->update(reachData);
-	//sr_out << "para target= " << reachData->effectorState.paraTarget << srnl;
-	//sr_out << "pose = " << reachData->currentRefFrame.jointQuat[0] << srnl;
-	//sr_out << "state offset = " << reachData->effectorState.grabStateError.tran << srnl;
-	//sr_out << "cur target pos = " << reachData->effectorState.curTargetState.tran << srnl;
-	curState = getState(curState->nextState(reachData));
 
+	curReachState->updateEffectorTargetState(reachData);		
+	curReachState->update(reachData);	
+
+	ReachStateInterface* nextState = getState(curReachState->nextState(reachData));
+
+	if (nextState != curReachState)
+	{
+		printf("cur State = %s\n",nextState->curStateName().c_str());
+		reachData->stateTime = 0.f;
+		curReachState = nextState;
+	}
+	
 	ikMaxOffset = defaultVelocity*3.f*dt;
 	solveIK(reachData,ikMotionFrame);
 	// blending the input frame with ikFrame based on current fading
@@ -280,7 +300,7 @@ void MeCtExampleBodyReach::init()
 		reachRotConstraint[cons->efffectorName] = rotCons;
 	}	
 	// setup foot constraint
-#if USE_FOOT_IK
+
 	for (int i=0;i<2;i++)
 	{
 		EffectorConstantConstraint* lFoot = new EffectorConstantConstraint();
@@ -293,7 +313,6 @@ void MeCtExampleBodyReach::init()
 		rFoot->rootName = "";
 		rightFootConstraint[rFoot->efffectorName] = rFoot;
 	}	
-#endif	
 
 	ikScenario.ikPosEffectors = &reachPosConstraint;
 	ikScenario.ikRotEffectors = &reachRotConstraint;
@@ -325,9 +344,12 @@ void MeCtExampleBodyReach::init()
 	defaultVelocity = characterHeight*0.3f;
 	ikDamp        = ikReachRegion*ikReachRegion*14.0;//characterHeight*0.1f;
 
+	SbmCharacter* curCharacter = mcuCBHandle::singleton().character_map.lookup(characterName.c_str());
+	
 	reachData = new ReachStateData();
+	reachData->characterHeight = characterHeight;
 	reachData->reachControl = this;
-	reachData->autoReturnTime = reachCompleteDuration;
+	reachData->autoReturnTime = -1.f;//reachCompleteDuration;
 	reachData->charName = characterName;
 	reachData->reachRegion = ikReachRegion;
 	reachData->angularVel = 10.0f;
@@ -516,7 +538,8 @@ void MeCtExampleBodyReach::print_state( int tabs )
 
 void MeCtExampleBodyReach::controller_start()
 {
-
+	//restart = true;
+	controlRestart();
 }
 
 void MeCtExampleBodyReach::controller_map_updated()
