@@ -76,11 +76,13 @@
 2 set pawn foo2 world_offset x -200 y 120 z 100
 2 pawn foo3 init
 2 set pawn foo3 world_offset x 300 y 120 z -200
+2 pawn hand1 init
 2 bml char doctor <sbm:reach sbm:handle="rdoctor" effector="r_middle1"/>
 2.5 bml char doctor <sbm:reach sbm:handle="rdoctor" sbm:foot-ik="true"/>
 3 char doctor reachmotion build
 5 bml char doctor <sbm:reach sbm:handle="rdoctor" target="foo" sbm:fade-in="1.0"/>
 7 bml char doctor <gaze target="foo2"/>
-9 bml char doctor <sbm:constraint sbm:handle="cdoctor" effector="r_middle1" target="foo" sbm:fade-in="0.5"/>
+7.1 bml char doctor <sbm:reach sbm:handle="rdoctor" sbm:cons-joint="r_middle1" sbm:cons-target="hand1"/>
+9 bml char doctor <sbm:constraint sbm:handle="cdoctor" effector="r_middle1" target="hand1" sbm:fade-in="0.5"/>
 12 bml char doctor <gaze target="foo3"/>
 

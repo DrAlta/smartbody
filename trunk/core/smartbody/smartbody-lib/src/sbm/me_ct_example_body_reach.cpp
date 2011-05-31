@@ -101,6 +101,30 @@ void MeCtExampleBodyReach::setLinearVelocity( float vel )
 	reachData->linearVel = vel;
 }
 
+bool MeCtExampleBodyReach::addHandConstraint( SkJoint* targetJoint, const char* effectorName )
+{
+	MeCtIKTreeNode* node = ikScenario.findIKTreeNode(effectorName);
+	if (!node || !targetJoint)
+		return false;
+
+	std::string str = effectorName;		
+	ConstraintMap::iterator ci = handConstraint.find(str);
+	if (ci != handConstraint.end())
+	{		
+		EffectorJointConstraint* cons = dynamic_cast<EffectorJointConstraint*>((*ci).second);
+		cons->targetJoint = targetJoint;
+	}
+	else // add effector-joint pair
+	{
+		// initialize constraint
+		EffectorJointConstraint* cons = new EffectorJointConstraint();		
+		cons->efffectorName = effectorName;
+		cons->targetJoint = targetJoint;
+		handConstraint[str] = cons;		
+	}
+	return true;
+}
+
 void MeCtExampleBodyReach::setReachTargetPawn( SbmPawn* targetPawn )
 {
 	//reachTargetPawn = targetPawn;	
@@ -196,17 +220,6 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 
 	updateDt((float)t);
 	
-// 	if (restart)
-// 	{
-// 		dt = 0.001f;
-// 		restart = false;
-// 	}
-// 	else
-// 	{		
-// 		dt = ((float)(t-prev_time));
-// 	}
-// 	prev_time = (float)t;	
-
 	SbmCharacter* curCharacter = mcuCBHandle::singleton().character_map.lookup(characterName.c_str());
 	skeletonRef->update_global_matrices();
 	updateChannelBuffer(frame,inputMotionFrame,true);
@@ -231,17 +244,32 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 
 	if (nextState != curReachState)
 	{
-		printf("cur State = %s\n",nextState->curStateName().c_str());
+		//printf("cur State = %s\n",nextState->curStateName().c_str());
 		reachData->stateTime = 0.f;
 		curReachState = nextState;
 	}
 	
 	ikMaxOffset = defaultVelocity*3.f*dt;
 	solveIK(reachData,ikMotionFrame);
+
 	// blending the input frame with ikFrame based on current fading
 	bool finishFadeOut = updateFading(dt);
 	BodyMotionFrame outMotionFrame;
 	MotionExampleSet::blendMotionFrame(inputMotionFrame,ikMotionFrame,blendWeight,outMotionFrame);	
+
+	ConstraintMap::iterator si;
+	for ( si  = handConstraint.begin();
+		si != handConstraint.end();
+		si++)
+	{	
+		EffectorJointConstraint* cons = dynamic_cast<EffectorJointConstraint*>(si->second);//rotConstraint[i];
+		SrVec targetPos = motionParameter->getMotionFrameJoint(outMotionFrame,cons->efffectorName.c_str())->gmat().get_translation();
+		for (int k=0;k<3;k++)
+			cons->targetJoint->pos()->value(k,targetPos[k]);
+		//cons->efffectorName		
+		cons->targetJoint->update_gmat();
+	}
+
 	updateChannelBuffer(frame,outMotionFrame);
 
 	return true;
@@ -498,7 +526,7 @@ void MeCtExampleBodyReach::updateChannelBuffer( MeFrameData& frame, BodyMotionFr
 
 	if (motionFrame.jointQuat.size() != affectedJoints.size())
 		motionFrame.jointQuat.resize(affectedJoints.size());
-	//BOOST_FOREACH(SrQuat& quat, motionFrame.jointQuat)
+
 	for (unsigned int i=0;i<motionFrame.jointQuat.size();i++)
 	{
 		SrQuat& quat = motionFrame.jointQuat[i];		

@@ -117,6 +117,7 @@ public:
 
 	
 	void solveIK(ReachStateData* rd, BodyMotionFrame& outFrame );
+	bool addHandConstraint(SkJoint* targetJoint, const char* effectorName);
 	void setReachTargetPawn(SbmPawn* targetPawn);	
 	void setReachTargetPos(SrVec& targetPos);
 	void setEndEffectorRoot(const char* rootName);	
