@@ -285,7 +285,7 @@ BehaviorRequestPtr BML::parse_bml_constraint( DOMElement* elem, const std::strin
 
 	boost::shared_ptr<MeControllerRequest> ct_request;
 	ct_request.reset();
-	if (bCreateNewController)
+	//if (bCreateNewController)
 	{
 		ct_request.reset( new MeControllerRequest( unique_id, localId, constraintCt, request->actor->constraint_sched_p, behav_syncs ) );
 		ct_request->set_persistent( true );

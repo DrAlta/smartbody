@@ -626,7 +626,7 @@ std::string ReachStateReturn::nextState( ReachStateData* rd )
 		rd->startReach = false;
 		rd->endReach = false;
 		nextStateName = "Idle";
-		//rd->reachControl->setFadeOut(0.5f);
+		rd->reachControl->setFadeOut(0.5f);
 	}
 	return nextStateName;
 }

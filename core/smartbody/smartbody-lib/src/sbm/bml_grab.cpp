@@ -68,12 +68,10 @@ using namespace xml_utils;
 
 
 BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
-    const XMLCh* tag      = elem->getTagName();
-
+    
+	const XMLCh* tag      = elem->getTagName();
 	std::wstringstream wstrstr;	
-
 	MeCtHand* handCt = NULL; 
-
 	const XMLCh* attrHandle = elem->getAttribute( ATTR_HANDLE );
 	std::string handle = "";
 	if( attrHandle && XMLString::stringLen( attrHandle ) ) {
@@ -127,27 +125,6 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 		attachPawn = parse_target_pawn( tag, attrAttachPawn, mcu );		
 	}
 
-	SrVec targetPos = SrVec();
-
-// 	XMLCh* token;
-// 	const XMLCh* attrTargetPos = elem->getAttribute( ATTR_TARGET_POS );		
-// 	if (attrTargetPos && XMLString::stringLen( attrTargetPos ))
-// 	{
-// 		wistringstream in;		
-// 		XMLStringTokenizer tokenizer( attrTargetPos );
-// 		if (tokenizer.countTokens() == 3)
-// 		{
-// 			for (int i=0;i<3;i++)
-// 			{
-// 				token = tokenizer.nextToken();
-// 				in.clear();
-// 				in.str( token );
-// 				in.seekg(0);
-// 				in >> targetPos[i];
-// 			}
-// 		}								
-// 	}
-
 	if (wristJoint == NULL && !handCt) {  // Invalid target.  Assume parse_target(..) printed error.
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
@@ -200,9 +177,7 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 		handCt = new MeCtHand(request->actor->skeleton_p, wristJoint);		
 		handCt->handle(handle);
 		SbmCharacter* chr = const_cast<SbmCharacter*>(request->actor);
-		//float characterHeight = chr->getHeight();
-		//handCt->characterHeight = characterHeight;
-
+		
 		handCt->init(chr->getReachHandData(),chr->getGrabHandData(),chr->getReleaseHandData());		
 		if (grabVelocity > 0)
 			handCt->grabVelocity = grabVelocity;		
@@ -215,22 +190,18 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 	{
 		if( XMLString::compareIString( attrGrabState, L"start" )==0 ) 
 		{			
-			//printf("grab state = 'start'");
 			handCt->setGrabState(MeCtHand::GRAB_START);
 		}
 		else if( XMLString::compareIString( attrGrabState, L"reach" )==0 )
 		{			
-			//printf("grab state = 'reach'");
 			handCt->setGrabState(MeCtHand::GRAB_REACH);
 		}
 		else if( XMLString::compareIString( attrGrabState, L"finish" )==0 )
 		{			
-			//printf("grab state = 'finish'");
 			handCt->setGrabState(MeCtHand::GRAB_FINISH);
 		}
 		else if( XMLString::compareIString( attrGrabState, L"return" )==0 )
 		{			
-			//printf("grab state = 'return'");
 			handCt->setGrabState(MeCtHand::GRAB_RETURN);
 		}
 	}	
@@ -241,7 +212,6 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 	{
 		if( XMLString::compareIString( attrReleasePawn, L"true" )==0 ) 
 		{			
-			//printf("grab state = 'start'");
 			handCt->releasePawn();
 		}
 	}
@@ -268,11 +238,10 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 
 	boost::shared_ptr<MeControllerRequest> ct_request;
 	ct_request.reset();
-	if (bCreateNewController)
+	//if (bCreateNewController)
 	{
 		ct_request.reset( new MeControllerRequest( unique_id, localId, handCt, request->actor->grab_sched_p, behav_syncs ) );
 		ct_request->set_persistent( true );
-	}		
-
+	}	
 	return ct_request;
 }

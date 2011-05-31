@@ -187,18 +187,6 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 
-// 	const XMLCh* attrApexDuration = elem->getAttribute( ATTR_APEX_DURATION );
-// 	float apexDuration = -1.f;
-// 	if(attrApexDuration != NULL && attrApexDuration[0] != '\0') 
-// 	{
-// 		if( !( wistringstream( attrApexDuration ) >> apexDuration) )
-// 		{
-// 			std::stringstream strstr;
-// 			strstr << "WARNING: Failed to parse apex-duration interval attribute \""<< XMLString::transcode(attrApexDuration) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
-// 			LOG(strstr.str().c_str());
-// 		}
-// 	}
-
 	const XMLCh* attrReachVelocity = elem->getAttribute( ATTR_REACH_VELOCITY );
 	float reachVelocity = -1.f;
 	if(attrReachVelocity != NULL && attrReachVelocity[0] != '\0') 
@@ -328,10 +316,10 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		bodyReachCt->setReachTargetPos(targetPos);
 	}
 
-// 	if (consTarget && consJointName)
-// 	{
-// 		bodyReachCt->addHandConstraint(const_cast<SkJoint*>(consTarget),consJointName);
-// 	}
+	if (consTarget && consJointName)
+	{
+		bodyReachCt->addHandConstraint(const_cast<SkJoint*>(consTarget),consJointName);
+	}
 
 // 	if (obstacle_pawn && obstacleName)
 // 	{
