@@ -123,6 +123,8 @@ RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 
 	ReloadScriptsCB(NULL, this);
 
+	characterCreator = NULL;
+
 }
 
 RootWindow::~RootWindow() {
@@ -722,7 +724,23 @@ void RootWindow::AudioCB(fltk::Widget* w, void* data)
 
 void RootWindow::CreateCharacterCB(fltk::Widget* w, void* data)
 {
-	fltk::alert("Not yet implemented.");
+	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	// get a list of existing skeletons
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	std::vector<std::string> skeletons;
+	for (std::map<std::string, SkSkeleton*>::iterator iter = mcu.skeleton_map.begin(); 
+		 iter != mcu.skeleton_map.end();
+		 iter++)
+	{
+		skeletons.push_back((*iter).first);
+	}
+
+	if (!rootWindow->characterCreator)
+		rootWindow->characterCreator = new CharacterCreatorWindow(rootWindow->x() + 20, rootWindow->y() + 20, 400, 450, "Create a Character");
+
+	rootWindow->characterCreator->setSkeletons(skeletons);
+
+	rootWindow->characterCreator->show();
 }
 
 void RootWindow::CreatePawnCB(fltk::Widget* w, void* data)

@@ -10,6 +10,7 @@
 #include "fltk_viewer.h"
 #include <sr/sr_viewer.h>
 #include "CommandWindow.h"
+#include "CharacterCreatorWindow.h"
 
 class SbmCharacter;
 
@@ -38,6 +39,7 @@ class  RootWindow : public SrViewer, public fltk::DoubleBufferWindow
 		fltk::Button* buttonPlay;
 		fltk::Button* buttonStop;
 		fltk::Button* buttonPlaybackStepForward;
+		CharacterCreatorWindow* characterCreator;
 
 		fltk::Input *inputTimeStep;
 
