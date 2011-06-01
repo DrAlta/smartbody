@@ -132,6 +132,11 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 						ModeInteractiveLocomotion
                 };
 
+	enum GridMode { 
+						ModeShowGrid,
+						ModeNoGrid
+                };
+
     enum MenuCmd { CmdHelp,
                    CmdViewAll,
                    CmdBackground,
@@ -144,6 +149,8 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
                    CmdAxis,
 				   CmdNoShadows,
 				   CmdShadows,
+				   CmdGrid,
+				   CmdNoGrid,
 				   CmdNoSteer,
 				   CmdSteerCharactersGoalsOnly,
 				   CmdSteerAll,
@@ -377,6 +384,7 @@ protected:
    FltkViewer::LocomotionMode locomotionMode;   // locomotion mode
    FltkViewer::ReachRenderMode reachRenderMode;
    FltkViewer::SteerMode steerMode;
+	FltkViewer::GridMode gridMode;
 
 
    bool iconized;      // to stop processing while the window is iconized

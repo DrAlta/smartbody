@@ -44,6 +44,7 @@ RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Character/Locomotion/Trajectory", 0, TrajectoryCB, this, NULL);
 	menubar->add("&View/Pawns", 0, ShowPawns, this, NULL);
 	menubar->add("&View/Shadows", 0, ShadowsCB, this, NULL);
+	menubar->add("&View/Grid", 0, GridCB, this, NULL);
 	//menubar->add("&View/Reach Pose Examples", 0, ShowPoseExamples, this, NULL);	
 	menubar->add("&View/Terrain/Shaded", 0, TerrainShadedCB, this, NULL);
 	menubar->add("&View/Terrain/Wireframe", 0, TerrainWireframeCB, this, NULL);
@@ -836,6 +837,15 @@ void RootWindow::VelocityCB(fltk::Widget* w, void* data)
 {
 	RootWindow* rootWindow = static_cast<RootWindow*>(data);
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowVelocity, NULL);
+}
+
+void RootWindow::GridCB(fltk::Widget* w, void* data)
+{
+	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	if (rootWindow->fltkViewer->getData()->gridMode != FltkViewer::ModeShowGrid)
+		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdGrid, NULL);
+	else
+		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoGrid, NULL);
 }
 
 void RootWindow::ShowPoseExamples( fltk::Widget* w, void* data )
