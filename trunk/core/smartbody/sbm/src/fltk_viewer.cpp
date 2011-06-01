@@ -371,6 +371,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->locomotionMode = ModeEnableLocomotion;
    _data->reachRenderMode = ModeShowExamples;
    _data->steerMode = ModeNoSteer;
+   _data->gridMode = ModeShowGrid;
 
    _data->iconized    = false;
    _data->statistics  = false;
@@ -506,6 +507,12 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
                        break;
       case CmdNoShadows : _data->shadowmode = ModeNoShadows;
                        break;
+	  case CmdGrid: 
+					   _data->gridMode = ModeShowGrid;
+					   break;
+	  case CmdNoGrid: 
+					   _data->gridMode = ModeNoGrid;
+					   break;
 	  case CmdNoTerrain  : _data->terrainMode = ModeNoTerrain;             
                        break;
       case CmdTerrainWireframe : _data->terrainMode = ModeTerrainWireframe;
@@ -988,7 +995,7 @@ void MakeShadowMatrix( GLfloat points[3][3], GLfloat light[4], GLfloat matrix[4]
 void FltkViewer::draw() 
 {
    //static bool hasShaderSupport = false;
-   
+  /* 
    if ( !visible() ) return;
    if ( !valid() ) 
    {
@@ -1095,6 +1102,7 @@ void FltkViewer::draw()
 	if ( _data->displayaxis ) _data->render_action.apply ( _data->sceneaxis );
 	if ( _data->boundingbox ) _data->render_action.apply ( _data->scenebox );
 
+
 	if( _data->root )	{
 
 		_data->render_action.apply ( _data->root );
@@ -1182,7 +1190,7 @@ void FltkViewer::draw()
 	// feng : debugging draw for reach controller
 	drawReach();
 	drawSteeringInfo();
-
+*/
 
 	_data->fcounter.stop();
 
@@ -2299,6 +2307,8 @@ void FltkViewer::initGridList()
 
 void FltkViewer::drawGrid()
 {
+	if (_data->gridMode == ModeNoGrid)
+		return;
 //	if( gridList != -1 )	{
 //		glCallList( gridList );
 //		return;
@@ -3164,7 +3174,9 @@ void FltkViewer::drawLocomotion()
 	{
 		character = mcu.character_map.next();
 		//if(!character->get_locomotion_ct()->is_valid()) continue;
-		SrVec arrow_start = character->get_locomotion_ct()->get_base_pos();
+		float x, y, z, yaw, pitch, roll;
+		character->get_world_offset(x, y, z, yaw, pitch, roll);
+		SrVec arrow_start(x, y, z);
 		SrVec arrow_end;
 		if(_data->showvelocity)
 		{
@@ -3185,10 +3197,11 @@ void FltkViewer::drawLocomotion()
 			{
 				float height = character->getHeight();
 				SrVec color;
-				float base_height = character->get_locomotion_ct()->translation_joint_height;
+				//float base_height = character->get_locomotion_ct()->translation_joint_height;
+				float base_height = character->getHeight() / 2.0f;
 				arrow_end = arrow_start;
 				arrow_end.y += height - base_height;
-				arrow_start.y += height - base_height + 30.0f;
+				arrow_start.y += height - base_height + 30.0f * character->getHeight() / 200.0f;
 				if(character->get_locomotion_ct()->is_enabled())
 				{
 					if(character->get_locomotion_ct()->get_limb_list()->get(0)->walking_list.size() < 2)
