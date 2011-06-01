@@ -229,6 +229,14 @@
 			Name="viewer"
 			>
 			<File
+				RelativePath="..\src\CharacterCreatorWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\CharacterCreatorWindow.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\fltk_viewer.cpp"
 				>
 				<FileConfiguration
