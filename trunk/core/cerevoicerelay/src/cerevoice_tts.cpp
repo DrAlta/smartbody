@@ -118,7 +118,8 @@ void cleanString(std::string &message)
 
 	while ( message.find_first_of(" ") == 0 )
 	{
-		fprintf(stderr,"Debug: Cleaning initial whitespace %s\n",message[0]);
+		//quick fix but there seems to be some problem with fprintf
+		//fprintf(stderr,"Debug: Cleaning initial whitespace %s\n",message[0]);
 		message = message.substr(1);
 	}
 }
@@ -690,6 +691,141 @@ std::string cerevoice_tts::addUselTag(std::string text)
 	return tempText;
 }
 
+std::string CreateMarkTimeStamps(std::string text)
+{
+	std::string tempText = text;
+	std::string markUp = "";
+	int i = 0;
+	while (tempText!= "")
+	{
+		std::string temp = tempText;
+		temp = temp.substr(0, tempText.find_first_of(" "));
+
+		char number[256];
+		sprintf(number, "%d", i);
+		markUp = markUp.append("<mark name=\"T");
+		markUp = markUp.append(number);
+		markUp = markUp.append("\" />");
+		markUp = markUp.append(temp + "\n\n");
+		sprintf(number, "%d", ++i);
+		markUp = markUp.append("<mark name=\"T");
+		markUp = markUp.append(number);
+		markUp = markUp.append("\" />\n\n");
+		++i;
+		if (tempText.size() > temp.size())
+		{
+			tempText = tempText.substr(temp.size() + 1);
+		}
+		else
+		{
+			tempText = "";
+		}
+	}
+	return markUp;
+}
+
+std::string TransformTextWithTimes(std::string txt)
+{
+	//std::string text_string = "";
+
+	//#define _PARSER_DEBUG_MESSAGES_ON
+   std::stringstream txtstream;
+
+   /// Start an XML parser to parse the message we have received
+   XMLPlatformUtils::Initialize();
+   XercesDOMParser *parser = new XercesDOMParser();
+
+   std::string truncatedTxt = txt.substr(txt.find_first_of(">")+1);
+   char * message = (char*)truncatedTxt.c_str();
+
+   std::string actualText = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+#ifdef _PARSER_DEBUG_MESSAGES_ON
+   fprintf(stderr, "Debug: Parsing message \"%s\"\n",message);
+#endif
+   /// Set up a parser for XML message in memory - code sourced from unknown online reference for Xerces XML library
+   MemBufInputSource memIS((const XMLByte*)message, strlen(message), "XMLBuffer");
+   parser->parse(memIS);
+   DOMDocument *doc = parser->getDocument();
+   if ( doc )
+   {
+	   DOMElement *root = doc->getDocumentElement();
+
+	   if ( root ) 
+	   {
+		   /// Get all nodes which have the "mark" tag, from these we can extract the timing tags, and speech text
+		   DOMNodeList *messageList = root->getElementsByTagName(XMLString::transcode("speech"));
+		   if ( messageList && messageList->getLength() > 0)
+		   {
+			   DOMElement *speechElement = dynamic_cast<DOMElement*>(messageList->item(0));
+			   char *speechID = XMLString::transcode(speechElement->getAttribute(XMLString::transcode("id")));
+
+			   actualText = actualText.append("<speech id=\"" + std::string(speechID) + "\" ref=\"" + XMLString::transcode(speechElement->getAttribute(X("ref"))) + "\" type=\"" + XMLString::transcode(speechElement->getAttribute(X("type"))) + "\">\n\n");
+			   XMLString::release(&speechID);
+		   }
+		   else if ( !strcmp( XMLString::transcode( root->getNodeName() ), "speech") ) {
+			   /// Else, the message might contain only the speech tag, in which case the above code will fail, so we need a fallback
+			   DOMElement *speechElement = root;
+			   char *speechID = XMLString::transcode(speechElement->getAttribute(XMLString::transcode("id")));
+			   char *text = XMLString::transcode(speechElement->getTextContent());
+
+			   std::string textContent = CreateMarkTimeStamps(text);
+			   /*if (!speechID)
+			   {
+				   speechID = "sp1";
+			   }*/
+			   //hard coding sp1
+			   speechID = "sp1";
+			   //XMLString::transcode(speechElement->getAttribute(X("type"))) 
+			   actualText = actualText.append("<speech id=\"" + std::string(speechID) + "\" ref=\"" + XMLString::transcode(speechElement->getAttribute(X("ref"))) + "\" type=\"" + "application/ssml+xml" + "\">\n\n");
+			   actualText = actualText.append(textContent);
+			   actualText = actualText.append("</speech>");
+			   //XMLString::release(&speechID);
+		   }
+	   }
+   }
+   return actualText;
+}
+
+////Aded by Apar Suri
+////Added to remove the , and . from the code so that the issue with the time is resolved. 
+////Apparently cerevoice API does not handle . and , properly in a sentence
+//std::string replacePausePunctuationsFromText(std::string text_string) {
+//	  std::string::size_type pos = 0;
+//
+//	  for (pos = 0; pos < text_string.length(); ++pos)
+//	  {
+//		  if (text_string.at(pos)==',' || text_string.at(pos)=='.' || text_string.at(pos)=='?' || text_string.at(pos)=='!')
+//		  {
+//			  text_string.replace(pos, 1, "");
+//		  }
+//	  }
+//	  
+//	 /* while ( (pos = text_string.find(",", pos)) !=std:: string::npos ) {
+//		  text_string.replace( pos, 1, "");
+//        pos++;
+//	  }
+//
+//	  pos = 0;
+//	  while ( (pos = text_string.find(".", pos)) !=std:: string::npos ) {
+//		  text_string.replace( pos, 1, "");
+//        pos++;
+//	  }
+//
+//	  pos = 0;
+//	  while ( (pos = text_string.find("?", pos)) !=std:: string::npos ) {
+//		  text_string.replace( pos, 1, "");
+//        pos++;
+//	  }
+//
+//	  pos = 0;
+//	  while ( (pos = text_string.find("!", pos)) !=std:: string::npos ) {
+//		  text_string.replace( pos, 1, "");
+//        pos++;
+//	  }*/
+//
+//	  return text_string;
+//}
+
 std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_name, const char * player_file_name, std::string voice_id )
 {
    char * result = "";
@@ -738,6 +874,29 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
 	  //Replacing . and , with "" so because there seems to be a bug in CPRCPMOD_spurt_synth while synthesizing multiple spurts
 	  //Apparently a time of 0.0 and 0.1 seems to be added just after the , or .
 	  std::string text_string = removeXMLTagsAndNewLines( text, xmlMetaData);
+
+	  if (xmlMetaData.tags.size() <= 0 )
+	  {
+		  //text_string = text;
+		  text_string =  TransformTextWithTimes(text);
+		  text_string = removeXMLTagsAndNewLines(text_string, xmlMetaData);
+	  }
+
+	 /* if (xmlMetaData.tags.size() <= 0)
+	  {
+		  std::vector<std::string> words;
+		  int numberOfWords = findNumberOfWords(text_string, words);
+		  xmlMetaData.speechIdentifier = "sp1";
+		  xmlMetaData.tags.clear();
+		  xmlMetaData.words.clear();
+		  
+		  for (int wordTimingIndex = 0; wordTimingIndex < numberOfWords * 2; ++wordTimingIndex)
+		  {
+			  std::string timeStamp = "T" + wordTimingIndex;
+			  xmlMetaData.tags.push_back(timeStamp);
+			  xmlMetaData.words.push_back(words.at(wordTimingIndex));
+		  }
+	  }*/
 	  //commenting replacing pause punctuations
 	  //text_string = replacePausePunctuationsFromText(text_string);
 
