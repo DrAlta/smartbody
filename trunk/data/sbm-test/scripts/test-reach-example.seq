@@ -59,6 +59,7 @@
 1 char doctor handmotion grabhand ChrHarmony_Relax001_HandGraspSmSphere_Grasp
 1 char doctor handmotion reachhand ChrHarmony_Relax001_HandGraspSmSphere_Reach
 1 char doctor handmotion releasehand ChrHarmony_Relax001_HandGraspSmSphere_Release
+2 char doctor reachmotion build
 
 # ---- Setting Camera Parameters
 # * Assumes doctor scaled character standing near the origin, as is about 200 units tall
@@ -79,10 +80,9 @@
 2 pawn foo4 init
 2 set pawn foo4 world_offset x -10 y 70 z -0
 2 bml char doctor <sbm:reach sbm:handle="rdoctor" effector="r_middle1"/>
-3 char doctor reachmotion build
 5 bml char doctor <sbm:reach sbm:handle="rdoctor" target="foo" sbm:fade-in="1.0"/>
 7 bml char doctor <sbm:reach sbm:handle="rdoctor" target="foo2"/>
 9 bml char doctor <sbm:reach sbm:handle="rdoctor" sbm:reach-finish="true"/>
 11 bml char doctor <sbm:reach sbm:handle="rdoctor" target="foo3"/>
-13 bml char doctor <sbm:reach sbm:handle="rdoctor" target="foo4"/>
-15 bml char doctor <sbm:reach sbm:handle="rdoctor" sbm:reach-finish="true"/>
+15 bml char doctor <sbm:reach sbm:handle="rdoctor" target="foo4"/>
+18 bml char doctor <sbm:reach sbm:handle="rdoctor" sbm:reach-finish="true"/>

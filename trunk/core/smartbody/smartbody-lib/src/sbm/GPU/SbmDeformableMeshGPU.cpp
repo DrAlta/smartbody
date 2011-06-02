@@ -500,6 +500,9 @@ void SbmDeformableMeshGPU::updateTransformBuffer()
 
 	for (unsigned int i=0;i<boneJointList.size();i++)
 	{
-		transformBuffer(i) = bindPoseMatList[i]*boneJointList[i]->gmat();		
+		SkJoint* joint = boneJointList[i];
+		if (!joint)
+			continue;
+		transformBuffer(i) = bindPoseMatList[i]*joint->gmat();		
 	}
 }

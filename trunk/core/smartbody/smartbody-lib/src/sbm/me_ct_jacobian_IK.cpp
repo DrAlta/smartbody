@@ -488,7 +488,7 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 		MeCtIKTreeNode* endNode = s->findIKTreeNode(cons->efffectorName.c_str());
 		const SrMat& endMat = endNode->gmat;	
 		SrVec targetRot;
-		SrQuat quatOffset = cons->getRotConstraint()*SrQuat(endNode->parent->gmat.inverse());		
+		SrQuat quatOffset = cons->getRotConstraint()*SrQuat(endNode->gmat.inverse());//SrQuat(endNode->parent->gmat.inverse());		
 		quatOffset.normalize();
 		//sr_out << "Quat Offset = " << quatOffset << srnl;
 		float angle = quatOffset.angle();				

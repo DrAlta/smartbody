@@ -27,18 +27,29 @@ void EffectorState::attachPawnTarget( ReachStateData* rd )
 		//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:source-joint=\"" + rd->effectorState.effectorName + "\" sbm:attach-pawn=\"" + targetName + "\"/>";
 		cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:source-joint=\"" + "r_wrist" + "\" sbm:attach-pawn=\"" + targetName + "\"/>";
 		rd->curHandAction->sendReachEvent(cmd);
+
+		//LOG("pawn %s is attached.",targetName.c_str());
+		cmd = "pawn " + targetName + " physics off";
+		rd->curHandAction->sendReachEvent(cmd);
 	}
 }
 
 void EffectorState::releasePawn(ReachStateData* rd)
 {
-	attachedPawn = NULL;
-	attachMat = SrMat();
-
 	std::string charName = rd->charName;	
 	std::string cmd;
 	cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:release-pawn=\"true\"/>";
 	rd->curHandAction->sendReachEvent(cmd);
+
+
+	std::string targetName = "";
+	if (attachedPawn)
+		targetName = attachedPawn->name;
+	cmd = "pawn " + targetName + " physics on";
+	rd->curHandAction->sendReachEvent(cmd);
+
+	attachedPawn = NULL;
+	attachMat = SrMat();
 }
 
 void EffectorState::updateAttachedPawn()
@@ -228,6 +239,7 @@ ReachStateData::ReachStateData()
 	curTime = 0.f;
 	curRefTime = 0.f;
 	stateTime = 0.f;
+	blendWeight = 0.f;
 	dt = du = 0.f;
 	startReach = endReach = useExample = locomotionComplete = false;
 	autoReturnTime = -1.f;
@@ -300,14 +312,15 @@ float ReachStateData::XZDistanceToTarget()
 void ReachStateInterface::updateReturnToIdle( ReachStateData* rd )
 {
 	// only change effector target state, no change on para blend weight	
-	EffectorState& estate = rd->effectorState;
-	estate.targetState = rd->getPoseState(rd->idleRefFrame);
+	EffectorState& estate = rd->effectorState;	
 	if (rd->useInterpolation())
 	{
 		float rtime = (float)rd->interpMotion->motionDuration(BodyMotionInterface::DURATION_REF)*0.999f;
-		rd->getInterpFrame(rtime,rd->targetRefFrame);
-		estate.targetState = rd->getPoseState(rd->targetRefFrame);
+		BodyMotionFrame targetRefFrame;
+		//rd->getInterpFrame(rtime,rd->targetRefFrame);		
+		rd->targetRefFrame = rd->idleRefFrame;		
 	}	
+	estate.targetState = rd->getPoseState(rd->idleRefFrame);
 }
 
 void ReachStateInterface::updateReachToTarget( ReachStateData* rd )
@@ -366,8 +379,9 @@ void ReachStateInterface::updateMotionInterp( ReachStateData* rd )
 	}
 	EffectorState& estate = rd->effectorState;
 	SRT stateOffset = SRT::diff(rd->getPoseState(rd->currentRefFrame),estate.curTargetState);
-	BodyMotionFrame outFrame;
-	rd->getInterpFrame(rd->curRefTime,outFrame);
+	BodyMotionFrame outFrame,interpFrame;
+	rd->getInterpFrame(rd->curRefTime,interpFrame);
+	MotionExampleSet::blendMotionFrame(interpFrame,rd->idleRefFrame,rd->blendWeight,outFrame);
 	SRT interpState = rd->getPoseState(outFrame);	
 	SRT stateError = SRT::diff(rd->getPoseState(rd->targetRefFrame),estate.targetState);	
 
@@ -384,7 +398,7 @@ void ReachStateInterface::updateMotionInterp( ReachStateData* rd )
 	rd->currentRefFrame = outFrame;	
 
 	rd->du = (float)interpMotion->getRefDeltaTime(rd->curRefTime,rd->dt);
-	rd->curRefTime += rd->du*0.7f;
+	rd->curRefTime += rd->du;
 }
 
 bool ReachStateInterface::ikTargetReached( ReachStateData* rd )
@@ -471,6 +485,7 @@ void ReachStateStart::update( ReachStateData* rd )
 		rd->curHandAction->reachPreCompleteAction(rd); 
 		rd->startReach = false;
 	}
+	rd->blendWeight = max(0.f,(1.f - curStatePercentTime(rd,rd->curRefTime)*4.f));
 }
 
 std::string ReachStateStart::nextState( ReachStateData* rd )
@@ -616,6 +631,7 @@ float ReachStateReturn::curStatePercentTime( ReachStateData* rd, float refTime )
 void ReachStateReturn::update( ReachStateData* rd )
 {
 	ReachStateInterface::updateMotionInterp(rd);
+	rd->blendWeight = curStatePercentTime(rd,rd->curRefTime);	
 }
 
 std::string ReachStateReturn::nextState( ReachStateData* rd )
@@ -625,8 +641,9 @@ std::string ReachStateReturn::nextState( ReachStateData* rd )
 	{
 		rd->startReach = false;
 		rd->endReach = false;
-		nextStateName = "Idle";
-		rd->reachControl->setFadeOut(0.5f);
+		rd->reachControl->setFadeOut(0.5);
+		rd->blendWeight = 0.f;
+		nextStateName = "Idle";		
 	}
 	return nextStateName;
 }

@@ -60,11 +60,7 @@
 # include <SBM/MeCtBodyReachState.h>
 # include <SBM/me_ct_example_body_reach.hpp>
 # include <SBM/me_ct_constraint.hpp>
-# include <SBM/Collision/SbmColObject.h>
-# include <SBM/me_ct_param_animation_data.h>
-
-# include <SBM/me_ct_param_animation_data.h>
-# include <SBM/Collision/SbmColObject.h>
+# include <SBM/Physics/SbmColObject.h>
 # include <SBM/me_ct_param_animation_data.h>
 # include <SBM/GPU/SbmDeformableMeshGPU.h>
 
@@ -157,29 +153,11 @@ Fl_Menu_Item GazeMenuTable[] =
 	{ 0 }
 };
 
-static char reach_on_target_menu_name[] = {"&reach"};
-static char reach_type_name[NUM_REACH_TYPES][40] = {"&create Right arm reach","&create Left arm reach" }; 
-static SrArray<Fl_Menu_Item> reach_submenus[NUM_REACH_TYPES];
-
-Fl_Menu_Item ReachMenuTable[] = 
-{	
-	{ reach_type_name[0],   0, MCB, 0 },			
-	{ reach_type_name[1],   0, MCB, 0 },		
-	{ "&show pose examples", 0, MCB, CMD(CmdReachShowExamples), 0 },
-	{ "&no pose examples", 0, MCB, CMD(CmdReachNoExamples), 0 },
-	//{ "&toggle IK constraint", 0, MCB, CMD(CmdExampleReachToggleIK),FL_MENU_TOGGLE },
-	{ "&toggle reach interpolate", 0, MCB, CMD(CmdReachToggleData),FL_MENU_TOGGLE },
-	{ "&toggle reach IK", 0, MCB, CMD(CmdReachToggleIK),FL_MENU_TOGGLE },
-	{ 0 }
-};
-
-static char body_reach_menu_name[] = {"&body reach"};
+static char body_reach_menu_name[] = {"&reach"};
 Fl_Menu_Item BodyReachMenuTable[] = 
 {		
 	{ "&show pose examples", 0, MCB, CMD(CmdReachShowExamples), 0 },
-	{ "&no pose examples", 0, MCB, CMD(CmdReachNoExamples), 0 },
-	//{ "&toggle IK constraint", 0, MCB, CMD(CmdExampleReachToggleIK),FL_MENU_TOGGLE },
-	{ "&toggle use examples", 0, MCB, CMD(CmdExampleReachToggleInterpolation),FL_MENU_TOGGLE },	
+	{ "&no pose examples", 0, MCB, CMD(CmdReachNoExamples), 0 },	
 	{ 0 }
 };
 
@@ -219,9 +197,9 @@ Fl_Menu_Item MenuTable[] =
 		 //{ "&use balance", 0, MCB, CMD(CmdConstraintToggleBalance), FL_MENU_TOGGLE},		 
 		 { "&use reference joints", 0, MCB, CMD(CmdConstraintToggleReferencePose), FL_MENU_TOGGLE },		     
 		 { 0 },    
-    { gaze_on_target_menu_name, 0, 0, GazeMenuTable, FL_SUBMENU_POINTER },   
-	{ reach_on_target_menu_name, 0, 0, ReachMenuTable, FL_SUBMENU_POINTER }, 
-	{ body_reach_menu_name, 0, 0, BodyReachMenuTable, FL_SUBMENU_POINTER },     { "p&references", 0, 0, 0, FL_SUBMENU },
+    { gaze_on_target_menu_name, 0, 0, GazeMenuTable, FL_SUBMENU_POINTER }, 	
+	{ body_reach_menu_name, 0, 0, BodyReachMenuTable, FL_SUBMENU_POINTER },     
+    { "p&references", 0, 0, 0, FL_SUBMENU },
          { "&axis",         0, MCB, CMD(CmdAxis),        FL_MENU_TOGGLE },
          { "b&ounding box", 0, MCB, CMD(CmdBoundingBox), FL_MENU_TOGGLE },
          { "&statistics",   0, MCB, CMD(CmdStatistics),  FL_MENU_TOGGLE },
@@ -292,20 +270,6 @@ void FltkViewer::update_submenus()
 		const Fl_Menu_Item* pmenu = (const Fl_Menu_Item *)menu_list;
 		gaze_menu.user_data((void*)pmenu);				
 	}
-
-// 	for (int i=0;i<NUM_REACH_TYPES;i++)
-// 	{
-// 		Fl_Menu_Item& reach_menu = ReachMenuTable[i];	
-// 		reach_menu.flags |= FL_SUBMENU_POINTER;
-// 		SrArray<Fl_Menu_Item>& menu_list = reach_submenus[i];
-// 		menu_list = SrArray<Fl_Menu_Item>();
-// 		int iCmd = FltkViewer::CmdReachOnTargetRight+i;
-// 		Fl_Menu_Item select_pawn = { "selected pawn",   0, MCB,((void*)iCmd)  };
-// 		menu_list.push(select_pawn);			
-// 		get_pawn_submenus(select_pawn.user_data(),menu_list);
-// 		const Fl_Menu_Item* pmenu = (const Fl_Menu_Item *)menu_list;
-// 		reach_menu.user_data((void*)pmenu);				
-// 	}
 }
 
 # undef CMD
@@ -369,7 +333,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->eyeLidMode = ModeNoEyeLids;
    _data->dynamicsMode = ModeNoDynamics;
    _data->locomotionMode = ModeEnableLocomotion;
-   _data->reachRenderMode = ModeShowExamples;
+   _data->reachRenderMode = ModeNoExamples;
    _data->steerMode = ModeNoSteer;
    _data->gridMode = ModeShowGrid;
 
@@ -410,8 +374,8 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    gridHighlightColor[0] = .0;
    gridHighlightColor[1] = .0;
    gridHighlightColor[2] = .0;
-   gridSize = 200.0;
-   gridStep = 20.0;
+   gridSize = 500.0;
+   gridStep = 10.0;
 //   gridSize = 400.0;
 //   gridStep = 50.0;
    gridList = -1;
@@ -642,23 +606,7 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 					   break;
 	  case CmdRemoveAllGazeTarget:
 		               set_gaze_target(-1,NULL);
-					   break;
-	  case CmdReachOnTargetRight:	
-	  case CmdReachOnTargetLeft:	 
-		  set_reach_target(s-CmdReachOnTargetRight,label);
-		  break;
-	  case CmdReachToggleData:
-		  if (reachCt)
-		  {
-			  reachCt->useDataDriven = !reachCt->useDataDriven;
-		  }		  
-		  break;
-	  case CmdReachToggleIK:
-		  if (reachCt)
-		  {
-			  reachCt->useIK = !reachCt->useIK;
-		  }	
-		  break;  
+					   break;	  
 	  case CmdReachShowExamples:
 		  _data->reachRenderMode = ModeShowExamples;
 		  break;
@@ -674,19 +622,6 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 	   case CmdSteerCharactersGoalsOnly:
 			_data->steerMode = ModeSteerCharactersGoalsOnly;
 		 break;
-// 	   case CmdExampleReachToggleIK:
-// 		   if (bodyReachCt)
-// 		   {
-// 			   bodyReachCt->useIKConstraint = !bodyReachCt->useIKConstraint;
-// 		   }	
-// 		   break;  
-//   		case CmdExampleReachToggleInterpolation:
-// 		  if (bodyReachCt)
-// 		  {
-// 			  bodyReachCt->useInterpolation = !bodyReachCt->useInterpolation;
-// 		  }	
-// 		  break; 
-
 	  case CmdConstraintToggleIK:
 		  if (constraintCt)
 		  {
@@ -703,21 +638,7 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 				  constraintCt->setFadeIn(2.0);
 			  }
 		  }
-		  break; 
-// 	  case CmdConstraintToggleBalance:
-// 		  if (bodyReachCt)
-// 		  {
-// 			  //bodyReachCt->useDataDriven = !reachCt->useDataDriven;
-// 			  bodyReachCt->useBalance = !bodyReachCt->useBalance;			 
-// 		  }		  
-// 		  break;
-// 	  case CmdConstraintToggleReferencePose:
-// 		  if (bodyReachCt)
-// 		  {
-// 			  //reachCt->useIK = !reachCt->useIK;
-// 			  bodyReachCt->useReferenceJoint = !bodyReachCt->useReferenceJoint;
-// 		  }	
-// 		  break; 
+		  break;
 	}
 	
 	if (applyToCharacter)
@@ -2314,7 +2235,7 @@ void FltkViewer::drawGrid()
 //		return;
 //	}
 
-	GLfloat floor_height = 0.5f;
+	GLfloat floor_height = 0.0f;
 
 	glPushAttrib(GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT);
 	bool colorChanged = false;
@@ -2618,10 +2539,12 @@ void FltkViewer::drawPawns()
 		SrArray<SkJoint*>& joints = pawn->skeleton_p->get_joint_array();		
 		//glColor3f(1.0f, 1.0f, 0.0f);
 		SrMat gmat = joints[0]->gmat();
+		
 		if (pawn->colObj_p)
 		{
-			pawn->colObj_p->updateTransform(gmat);
-			drawColObject(pawn->colObj_p);
+			//pawn->colObj_p->updateTransform(gmat);
+			//gmat = pawn->colObj_p->worldState.gmat();
+			drawColObject(pawn->colObj_p,gmat);
 		}
 		else
 		{
@@ -3590,12 +3513,16 @@ void FltkViewer::drawReach()
 		ReachStateData* rd = reachCt->reachData;
 		if (!rd)
 			return;
+
+		MeCtReachEngine* re = reachCt->getReachEngine();
+		if (!re)
+			return;
 		
 		SkJoint* root = character->skeleton_p->root();
 		SrMat rootMat = root->gmat();
 		//rootMat.translation(root->gmat().get(12),root->gmat().get(13),root->gmat().get(14));
-		const std::vector<SrVec>& exampleData = reachCt->examplePts;
-		const std::vector<SrVec>& resampleData = reachCt->resamplePts;
+		const std::vector<SrVec>& exampleData = re->examplePts;
+		const std::vector<SrVec>& resampleData = re->resamplePts;
 		
 
 		SrPoints srExamplePts;	
@@ -3715,25 +3642,26 @@ void FltkViewer::makeGLContext()
 	make_current();
 }
 
-void FltkViewer::drawColObject( SbmColObject* colObj )
+void FltkViewer::drawColObject( SbmGeomObject* colObj, SrMat& gmat )
 {
 	glEnable(GL_LIGHTING);
 	glPushMatrix();
-	SrMat gMat = colObj->worldState.gmat();
+	//SrMat gMat = colObj->worldState.gmat();
+	SrMat gMat = gmat;
 	glMultMatrixf((const float*) gMat);
-	if (dynamic_cast<SbmColSphere*>(colObj))
+	if (dynamic_cast<SbmGeomSphere*>(colObj))
 	{
 		// draw sphere
-		SbmColSphere* sph = dynamic_cast<SbmColSphere*>(colObj);
+		SbmGeomSphere* sph = dynamic_cast<SbmGeomSphere*>(colObj);
 		SrSnSphere sphere;					
 		sphere.shape().radius = sph->radius;
 		sphere.color(SrColor(1.f,0.f,0.f));
 		sphere.render_mode(srRenderModeSmooth);
 		SrGlRenderFuncs::render_sphere(&sphere);		
 	}
-	else if (dynamic_cast<SbmColBox*>(colObj))
+	else if (dynamic_cast<SbmGeomBox*>(colObj))
 	{
-		SbmColBox* box = dynamic_cast<SbmColBox*>(colObj);
+		SbmGeomBox* box = dynamic_cast<SbmGeomBox*>(colObj);
 		SrSnBox sbox;					
 		sbox.shape().a = -box->extent;
 		sbox.shape().b = box->extent;
@@ -3742,9 +3670,9 @@ void FltkViewer::drawColObject( SbmColObject* colObj )
 		SrGlRenderFuncs::render_box(&sbox);
 
 	}
-	else if (dynamic_cast<SbmColCapsule*>(colObj))
+	else if (dynamic_cast<SbmGeomCapsule*>(colObj))
 	{
-		SbmColCapsule* cap = dynamic_cast<SbmColCapsule*>(colObj);
+		SbmGeomCapsule* cap = dynamic_cast<SbmGeomCapsule*>(colObj);
 		// render two end cap
 		SrSnSphere sphere;				
 		sphere.shape().center = cap->endPts[0];//SrVec(0,-cap->extent,0);

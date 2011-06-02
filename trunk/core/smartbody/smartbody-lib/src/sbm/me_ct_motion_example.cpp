@@ -163,6 +163,10 @@ void MotionExample::getExampleParameter( dVector& outPara )
 ResampleMotion::ResampleMotion( VecOfBodyMotionPtr* motionRef )
 {
 	motionDataRef = motionRef;
+	weight.resize(1);
+	InterpWeight& w = this->weight[0];
+	w.first = 0;
+	w.second = 1.f;
 }
 
 

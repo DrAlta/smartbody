@@ -45,7 +45,7 @@ void FingerChain::getLineSeg( std::vector<SrVec>& lineSeg )
 	}
 }
 
-void FingerChain::testCollision( SbmColObject* colObj )
+void FingerChain::testCollision( SbmGeomObject* colObj )
 {
 	std::vector<SrVec> lineSeg;
 	getLineSeg(lineSeg);
@@ -116,6 +116,7 @@ void MeCtHand::updateAttachedPawn()
 	SrMat effectorWorld = attachJoint->gmat();// motionParameter->getMotionFrameJoint(ikMotionFrame,reachEndEffector->name().get_string())->gmat();
 	SrMat newWorld = attachMat*effectorWorld;
 	attachedPawn->setWorldOffset(newWorld);
+	attachedPawn->updateToColObject();
 }
 
 void MeCtHand::setGrabState( GrabState state )
@@ -132,7 +133,7 @@ void MeCtHand::setGrabState( GrabState state )
 	currentGrabState = state;
 }
 
-void MeCtHand::setGrabTargetObject( SbmColObject* targetObj )
+void MeCtHand::setGrabTargetObject( SbmGeomObject* targetObj )
 {	
 	grabTarget = targetObj;
 	//setGrabState(GRAB_START);	

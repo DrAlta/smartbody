@@ -53,7 +53,9 @@ void PawnControl::set_pawn_pos(SbmPawn* pawn, SrVec& pos)
 
 	float x,y,z,h,p,r;
 	pawn->get_world_offset(x,y,z,h,p,r);
+	//printf("h = %f, p = %f, r = %f\n",h,p,r);
 	pawn->set_world_offset(pos.x,pos.y,pos.z,h,p,r);
+	pawn->updateToColObject();
 }
 
 SrQuat PawnControl::get_pawn_rot( SbmPawn* pawn )
@@ -76,6 +78,7 @@ void PawnControl::set_pawn_rot( SbmPawn* pawn, SrQuat& quat )
 	gwiz::quat_t q = gwiz::quat_t(quat.w,quat.x,quat.y,quat.z);
 	gwiz::euler_t e = gwiz::euler_t(q);
 	pawn->set_world_offset(x,y,z,(float)e.h(),(float)e.p(),(float)e.r());	
+	pawn->updateToColObject();
 }
 /************************************************************************/
 /* Pawn Pos Control                                                     */

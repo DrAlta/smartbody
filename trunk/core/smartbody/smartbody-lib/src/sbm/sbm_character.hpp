@@ -48,6 +48,8 @@
 #include <sbm/me_ct_reach.hpp>
 #include <sbm/me_ct_constraint.hpp>
 #include <sbm/me_ct_example_body_reach.hpp>
+#include <sbm/me_ct_hand.hpp>
+#include <sbm/MeCtReachEngine.h>
 #define MeCtSchedulerClass MeCtScheduler2
 
 #if(1) // Use primary locomotion controller
@@ -221,6 +223,7 @@ public:
 
 	MeCtParamAnimation* param_animation_ct;
 	MeCtMotionPlayer* motionplayer_ct;
+	MeCtReachEngine*      reachEngine;
 
 	void schedule_viseme_curve( 
 		const char* viseme, 
