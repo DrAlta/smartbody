@@ -6,7 +6,7 @@
 # include "sr_cfg_planner.h"
 # include <SR/sr_vec.h>
 # include <vector>
-#include <SBM/Collision/SbmColObject.h>
+#include <SBM/Physics/SbmColObject.h>
 #include <SBM/me_ct_motion_example.hpp>
 
 //=================================== SkPosCfg =====================================

@@ -42,6 +42,7 @@
 #include "sr/sr_model.h"
 #include "sbm/GPU/SbmShader.h"
 #include "sbm_deformable_mesh.h"
+#include "sbm/Physics/SbmPhysicsSimODE.h"
 
 #include <boost/algorithm/string/replace.hpp>
 
@@ -118,6 +119,7 @@ mcuCBHandle::mcuCBHandle()
 	queued_cmds( 0 ),
 	use_locomotion( false ),
 	use_param_animation( false ),
+	updatePhysics( false ),
 	steering_use_procedural( true ),
 	viewer_factory ( new SrViewerFactory() ),
 	bmlviewer_factory ( new GenericViewerFactory() ),
@@ -130,6 +132,7 @@ mcuCBHandle::mcuCBHandle()
 	media_path("."),
 	_interactive(true),
 	steerEngine(NULL)
+	//physicsEngine(NULL)
 {
 
 	
@@ -144,6 +147,8 @@ mcuCBHandle::mcuCBHandle()
 
 	// initialize the default face motion mappings
 	face_map["_default_"] = new FaceMotion();
+	physicsEngine = new SbmPhysicsSimODE();
+	physicsEngine->initSimulation();
 }
 
 /////////////////////////////////////////////////////////////
@@ -577,6 +582,22 @@ void mcuCBHandle::update( void )	{
 		}
 	}
 
+	if (physicsEngine && updatePhysics)
+	{
+		//printf("time step = %f\n",time_dt);
+		static float timeStep = 0.01f;
+// 		static float dt = timeStep*0.03f;
+// 		static float elapseTime = 0.f;		
+// 		elapseTime += time_dt;
+// 		if (elapseTime >= dt)		
+		{
+			//printf("elapse time = %f\n",elapseTime);
+			physicsEngine->updateSimulation(timeStep);
+			//elapseTime -= dt;
+			//curDt -= dt;
+		}		
+	}
+
 	srCmdSeq* seq_p;
 	char *seq_name = NULL;
 	active_seq_map.reset();
@@ -633,9 +654,14 @@ void mcuCBHandle::update( void )	{
 		pawn_p->ct_tree_p->evaluate( time );
 		pawn_p->ct_tree_p->applyBufferToAllSkeletons();
 
-		if (pawn_p->colObj_p)
+
+		if (pawn_p->hasPhysicsSim() && updatePhysics)
 		{
-			pawn_p->colObj_p->updateTransform(pawn_p->skeleton_p->joints()[0]->gmat());
+			pawn_p->updateFromColObject();
+		}
+		else
+		{			
+			pawn_p->updateToColObject();
 		}
 
 		char_p = character_map.lookup( pawn_p->name );

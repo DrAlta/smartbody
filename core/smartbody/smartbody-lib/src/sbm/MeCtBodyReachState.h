@@ -78,9 +78,10 @@ public:
 	float           curTime, dt;
 	float           stateTime; // how much time has been in a state 
 	float           curRefTime, du;	
+	float           blendWeight;
 	SrMat           gmat;
 	// reference motion frames ( as motion interpolation output, or IK reference pose )
-	BodyMotionFrame idleRefFrame, targetRefFrame, currentRefFrame;	
+	BodyMotionFrame idleRefFrame, targetRefFrame, currentRefFrame;		
 	BodyMotionFrame curMotionFrame; 
 	EffectorState   effectorState;
 	ReachTarget     reachTarget;	

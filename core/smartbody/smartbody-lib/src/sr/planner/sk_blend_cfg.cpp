@@ -64,8 +64,8 @@ bool SkBlendCfg::valid ()
 		colJ.colGeo->updateTransform(moJoint->gmat());
 		for (unsigned int j=0;j<_cman->colObstacles.size();j++)
 		{
-			SbmColObject* obs = _cman->colObstacles[j];
-			bool isIntersect = SbmCollisionUtil::checkCollision(colJ.colGeo,obs);
+			SbmGeomObject* obs = _cman->colObstacles[j];
+			bool isIntersect = SbmCollisionUtil::checkIntersection(colJ.colGeo,obs);
 			if (isIntersect)
 				return false;
 		}		

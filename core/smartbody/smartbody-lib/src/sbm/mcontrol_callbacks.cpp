@@ -665,6 +665,31 @@ double parseMotionParameters(std::string m, std::string parameter, double min, d
 	return mParam->getParameter(type);
 }
 
+int mcu_physics_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	if (mcu_p)
+	{
+		std::string operation = args.read_token();
+		if (operation == "enable")
+		{
+			mcu_p->updatePhysics = true;			
+			return CMD_SUCCESS;
+		}
+		else if (operation == "disable")
+		{
+			mcu_p->updatePhysics = false;			
+			return CMD_SUCCESS;
+		}
+		else if (operation == "gravity")
+		{
+			float gravity = args.read_float();
+			if (gravity > 0.f)
+				mcu_p->physicsEngine->setGravity(gravity);		
+		}
+	}
+	return CMD_SUCCESS;
+}
+
 int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
 	if (mcu_p)
@@ -1614,13 +1639,11 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 std::string nodeStr(const XMLCh* s)
 {
 	if (!s)	return "";
-	char* ch = XMLString::transcode(s);
-	std::string str = ch;
-	delete ch;
+	std::string str = XMLString::transcode(s);
 	return str;
 }
 
-void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, const char* prefix, mcuCBHandle* mcu_p)
+void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, float scaleFactor, std::string jointPrefix, mcuCBHandle* mcu_p)
 {
 	SbmCharacter* char_p = mcu_p->character_map.lookup( char_name );
 	const xercesc_3_0::DOMNodeList* list = node->getChildNodes();
@@ -1668,8 +1691,10 @@ void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, 
 								float* bindShapeMat = new float[16];
 								for (int i = 0; i < 16; i++)
 									bindShapeMat[i] = (float)atof(tokenize(tokenBlock).c_str());
+								
 								skinWeight->bindShapeMat.set(bindShapeMat);
 								skinWeight->bindShapeMat.transpose();
+								skinWeight->bindShapeMat.setl4(skinWeight->bindShapeMat.get_translation()*scaleFactor);
 							}
 							if (childNameOfSkin == "source")
 							{
@@ -1690,16 +1715,14 @@ void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, 
 									{
 										if ( sourceId == bindJointName && realNodeName == "Name_array")
 										{
-											if (prefix)
+											std::string jointName = content;
+											// check if the joint name start with the pre-fix and remove the prefix
+											if (content.compare(0, jointPrefix.size(), jointPrefix) == 0)
 											{
-												int index = content.find_first_of(prefix);
-												if (index == 0)
-												{
-													int prefixSize = strlen(prefix);
-													content = content.substr(prefixSize, content.size() - prefixSize + 1);
-												}
+												jointName.erase(0, jointPrefix.size());
 											}
-											skinWeight->infJointName.push_back(content);
+											//cout << "joint name = " << jointName << endl;
+											skinWeight->infJointName.push_back(jointName);
 										}
 										if ( sourceId == bindWeightName && realNodeName == "float_array")
 											skinWeight->bindWeight.push_back((float)atof(content.c_str()));
@@ -1710,8 +1733,10 @@ void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, 
 											if (matCounter == 16)
 											{
 												matCounter = 0;
-												newMat->set(bindPosMat);
+												newMat->set(bindPosMat);													
 												newMat->transpose();
+												SrVec newTran = newMat->get_translation()*scaleFactor;
+												newMat->setl4(newTran);
 												skinWeight->bindPoseMat.push_back(*newMat);
 											}
 										}
@@ -1809,7 +1834,7 @@ void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, 
 	}
 }
 
-void parseNode(xercesc_3_0::DOMNode* node, const char* char_name, const char* prefix, mcuCBHandle* mcu_p)
+void parseNode(xercesc_3_0::DOMNode* node, const char* char_name, float scaleFactor, std::string jointNamePrefix, mcuCBHandle* mcu_p)
 {
 	int type = node->getNodeType();
 	std::string name = nodeStr(node->getNodeName());
@@ -1818,20 +1843,20 @@ void parseNode(xercesc_3_0::DOMNode* node, const char* char_name, const char* pr
 
 	if (name == "library_controllers" && node->getNodeType() ==  xercesc_3_0::DOMNode::ELEMENT_NODE)
 	{
-		  parseLibraryControllers(node, char_name, prefix, mcu_p);
+		  parseLibraryControllers(node, char_name, scaleFactor, jointNamePrefix, mcu_p);
 	}
 	if (node->hasChildNodes())
 	{
 		  const xercesc_3_0::DOMNodeList* list = node->getChildNodes();
 		  for (unsigned int c = 0; c < list->getLength(); c++)
 		  {
-				parseNode(list->item(c), char_name, prefix, mcu_p);
+				parseNode(list->item(c), char_name, scaleFactor, jointNamePrefix, mcu_p);
 		  }
 	}
 }
 
 
-int mcu_character_load_skinweights( const char* char_name, const char* skin_file, const char* prefix, mcuCBHandle* mcu_p )
+int mcu_character_load_skinweights( const char* char_name, const char* skin_file, mcuCBHandle* mcu_p, float scaleFactor, const char* prefix )
 {
 	try 
 	{
@@ -1851,12 +1876,16 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 
 	ErrorHandler* errHandler = (ErrorHandler*) new HandlerBase();
 	parser->setErrorHandler(errHandler);
+	
+	std::string jointNamePrefix;
+	if (prefix)
+		jointNamePrefix = prefix;
 
 	try 
 	{
 		parser->parse(skin_file);
 		xercesc_3_0::DOMDocument* doc = parser->getDocument();
-		parseNode(doc, char_name, prefix, mcu_p);
+		parseNode(doc, char_name, scaleFactor, jointNamePrefix, mcu_p);
 	}
 	catch (const XMLException& toCatch) 
 	{
@@ -2385,8 +2414,6 @@ int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			{
 				SkMotion* motion_p = (*motionIter).second;
 				faceMotion->face_neutral_p = motion_p;
-				faceMotion->face_neutral_p->ref();
-
 				return CMD_SUCCESS;
 			} else {
 				LOG("ERROR: Unknown motion \"%s\".", motion_name.c_str());
@@ -2739,8 +2766,6 @@ int mcu_set_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string
 	VisemeMotionMap::iterator pos = viseme_map.find( viseme );
 	if( pos != viseme_map.end() ) {
 		LOG("WARNING: Overwriting viseme \"%s\" motion mapping.", viseme.c_str());
-		if ((*pos).second)
-			(*pos).second->unref();
 	}
 	viseme_map.insert( make_pair( viseme, motion ) );
 	if (motion)
@@ -3798,96 +3823,6 @@ int mcu_reach_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 }
 
 /*
-reach <> 
-*/
-
-int mcu_bodyreach_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )
-{
-	if (mcu_p)
-	{
-		string arg = args.read_token();
-		SbmCharacter* actor = NULL;
-		if( arg=="character" || arg=="char" ) {
-			string name = args.read_token();
-			actor = mcu_p->character_map.lookup( name );
-			if( actor == NULL ) {
-				LOG("ERROR: Could not find character \"%s\".", name.c_str());
-				return CMD_FAILURE;
-			}
-
-			arg = args.read_token();
-		} else {
-			if( mcu_p->test_character_default.empty() ) {
-				LOG("ERROR: No character specified, and no default set.");
-				return CMD_FAILURE;
-			}
-			actor = mcu_p->character_map.lookup( mcu_p->test_character_default );
-			if( actor == NULL ) {
-				LOG("ERROR: Could not find default character \"%s\".", mcu_p->test_character_default.c_str());
-				return CMD_FAILURE;
-			}
-		}
-
-
-		// gets the first track in the scheduler
-		// To-Do : Should provide some ways to grab a specific track ( right or left hand )
-		MeCtExampleBodyReach* reachCt = NULL;
-		MeCtSchedulerClass* reachSched = actor->reach_sched_p;
-		MeCtSchedulerClass::VecOfTrack reach_tracks = reachSched->tracks();		
-		MeCtReach* tempCt = NULL;
-		for (unsigned int c = 0; c < reach_tracks.size(); c++)
-		{
-			MeController* controller = reach_tracks[c]->animation_ct();		
-			reachCt = dynamic_cast<MeCtExampleBodyReach*>(controller);			
-			if (reachCt)
-				break;
-		}	
-
-		if (!reachCt)
-		{
-			LOG("ERROR: Could not find reach controller.");
-			return CMD_FAILURE;
-		}
-
-		int resampleSize = 0;
-		float minDist = 5.f;
-		
-		enum { BUILD = 0};
-		int buildMode = BUILD;		
-		if( arg == "build" )
-		{			
-			buildMode = BUILD;
-			arg = args.read_token();
-		}		
-
-// 		while( !arg.empty() ) 
-// 		{
-// 			if (arg == "resample-size")
-// 			{
-// 				resampleSize = args.read_int();
-// 			}
-// 			else if (arg == "sample-dist")
-// 			{
-// 				minDist = args.read_float();
-// 			}
-// 			arg = args.read_token();
-// 		}
-		bool bSuccess = false;
-		switch(buildMode)
-		{
-		case BUILD:			
-			reachCt->updateMotionExamples(actor->getReachMotionDataSet());
-			bSuccess = true;
-			break;		
-		}
-
-		if (bSuccess)
-			return (CMD_SUCCESS);
-	}
-	return (CMD_FAILURE);
-}
-
-/*
 	gaze <> target point <x y z>
 	gaze <> target euler <p h r>
 	gaze <> offset euler <p h r>
@@ -4789,7 +4724,7 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 		SbmCharacter* character = mcu_p->character_map.lookup(charName);
 		SkMotion* motion;
-  		std::map<std::string, SkMotion*>::iterator motionIter = mcu_p->motion_map.find(motionName);
+		std::map<std::string, SkMotion*>::iterator motionIter = mcu_p->motion_map.find(motionName);
 		if (motionIter != mcu_p->motion_map.end())
 			motion = motionIter->second;
 		else
@@ -4808,7 +4743,6 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			{
 				chanSize = mChanSize;
 				LOG("Channels in motion %s's channel matching %s's skeleton are preceeded with '+'", motionName, charName);
-				LOG("Motion has %d frames duration %f", motion->frames(), motion->duration());
 				LOG("motion %s's Channel Info:", motionName);
 			}
 			if (mode == 2)
@@ -5582,7 +5516,6 @@ int showpawns_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
-
 int syncpoint_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
 	std::string motionStr = args.read_token();
@@ -5592,7 +5525,7 @@ int syncpoint_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		LOG("Usage: syncpoint <motion>");
 		LOG("Usage: syncpoint <motion> <start> <ready> <strokestart> <stroke> <strokeend> <relax> <end>");
 	}
-	
+
 	std::map<std::string, SkMotion*>::iterator iter = mcu_p->motion_map.find(motionStr);
 	if (iter != mcu_p->motion_map.end())
 	{

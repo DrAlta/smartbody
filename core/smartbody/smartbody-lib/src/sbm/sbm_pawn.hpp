@@ -27,7 +27,7 @@
 
 #include <SK/sk_scene.h>
 #include <SK/sk_skeleton.h>
-#include <Sbm/Collision/SbmColObject.h>
+#include <Sbm/Physics/SbmColObject.h>
 
 #include <ME/me_controller_tree_root.hpp>
 #include <ME/me_ct_channel_writer.hpp>
@@ -38,6 +38,7 @@
 
 #include "sbm_constants.h"
 #include "sbm_deformable_mesh.h"
+#include "sbm/Physics/SbmPhysicsSim.h"
 
 // Declare classes used (avoid circular references)
 class mcuCBHandle;
@@ -87,7 +88,8 @@ public:  // TODO - properly encapsulate / privatize the following
 	SkSkeleton*		skeleton_p;  // MAY BE NULL!!!
 	SkScene*		scene_p;	 // Skeleton Scene and Rigid Mesh		
 	DeformableMesh*	dMesh_p;	 // Deformable Mesh using smooth skinning
-	SbmColObject*   colObj_p;
+	SbmGeomObject*  colObj_p;
+	SbmPhysicsObj*  phyObj_p;
 
 	// Temporarily, until there is a unified multi-skeleton controller tree
 	MeControllerTreeRoot	*ct_tree_p;
@@ -100,7 +102,15 @@ public:
 
 	virtual int init( SkSkeleton* skeleton_p );
 
+	void updateFromColObject();
+	void updateToColObject();
+
 	bool is_initialized();
+	bool initGeomObj(const char* geomType, float size);
+	void initPhysicsObj();
+	void removePhysicsObj();
+	void setPhysicsSim(bool enable);
+	bool hasPhysicsSim();
 
 	virtual int prune_controller_tree();  // removes unused or overwritten controllers
 	virtual void remove_from_scene();
@@ -135,8 +145,7 @@ protected:
 	 *
 	 *   SbmPawn inserts world_offset joint above the existing root.
 	 */
-	virtual int init_skeleton();
-
+	virtual int init_skeleton();	
 
 	void wo_cache_update();
 

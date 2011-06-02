@@ -112,6 +112,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	face_ct( NULL ),
 	eyelid_ct( new MeCtEyeLid() ),
 	motionplayer_ct( NULL ),
+	reachEngine( NULL ),
 	face_neutral( NULL ),
 	_soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT ),
 	_height(1.0f), 
@@ -178,6 +179,8 @@ SbmCharacter::~SbmCharacter( void )	{
 		param_animation_ct->unref();
 	if (motionplayer_ct)
 		motionplayer_ct->unref();
+	if (reachEngine)
+		delete reachEngine;
 
 	if ( mcuCBHandle::singleton().sbm_character_listener )
 	{
@@ -300,6 +303,12 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		//this->param_animation_ct->ref();
 	}
 
+	// init reach engine
+	{
+		SkJoint* effector = this->skeleton_p->search_joint("r_middle1");
+		this->reachEngine = new MeCtReachEngine(this,this->skeleton_p,effector);
+		reachEngine->init();
+	}
 	//if (use_locomotion) 
 	{
 		this->locomotion_ct =  new MeCtLocomotionClass();
@@ -768,6 +777,7 @@ void prune_schedule( SbmCharacter*   actor,
 	bool hasReach = false;
 	bool hasConstraint = false;
 	bool hasBodyReach = false;
+	bool hasHand = false;
 	bool hasReachLeft = false, hasReachRight = false;
 	bool finishedBlending = false;
 
@@ -1017,10 +1027,22 @@ void prune_schedule( SbmCharacter*   actor,
 						hasConstraint = true;
 					}
 				}
+				else if (dynamic_cast<MeCtHand*>(anim_source)) {
+					MeCtHand* ct_hand = dynamic_cast<MeCtHand*>(anim_source);
+					if (hasHand)
+					{
+						in_use = false;
+					}
+					else
+					{
+						hasHand = true;
+					}
+				}
 				else if (dynamic_cast<MeCtExampleBodyReach*>(anim_source)) {
 					MeCtExampleBodyReach* ct_bodyReach = dynamic_cast<MeCtExampleBodyReach*>(anim_source);
 					if (hasBodyReach)
 					{
+						//LOG("Prune Reach Controller!\n");
 						in_use = false;
 					}
 					else
@@ -1662,12 +1684,24 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 	if( cmd == "smoothbindweight" ) {
 		char* skin_file = args.read_token();
 		char* option = args.read_token();
-		char* prefix = NULL;
-		if (option)
+		char* prefixName = NULL;
+		float scaleFactor = 1.f;
+
+		while (strcmp(option,EMPTY_STRING) != 0)
 		{
-			prefix = args.read_token();
+			if (option && strcmp(option,"-prefix") == 0)
+			{
+				prefixName = args.read_token();
+			}
+			else if (strcmp(option,"-m") == 0)
+			{
+				scaleFactor = 0.01f;
+			}
+			option = args.read_token();
 		}
-		return mcu_character_load_skinweights( name, skin_file, prefix, mcu_p );
+		
+		//printf("prefix name = %s\n",prefixName);
+		return mcu_character_load_skinweights( name, skin_file, mcu_p, scaleFactor,prefixName);
 	} 
 	else 
 	if( cmd == "ctrl" ) {
@@ -2267,23 +2301,13 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		}
 		else if (reach_cmd == "build")
 		{
-			MeCtExampleBodyReach* reachCt = NULL;
-			MeCtSchedulerClass* reachSched = this->reach_sched_p;
-			MeCtSchedulerClass::VecOfTrack reach_tracks = reachSched->tracks();		
-			MeCtReach* tempCt = NULL;
-			for (unsigned int c = 0; c < reach_tracks.size(); c++)
+			//MeCtExampleBodyReach* reachCt = NULL;
+			if (!reachEngine)
 			{
-				MeController* controller = reach_tracks[c]->animation_ct();		
-				reachCt = dynamic_cast<MeCtExampleBodyReach*>(controller);			
-				if (reachCt)
-					break;
-			}
-			if (!reachCt)
-			{
-				LOG("ERROR: Could not find reach controller for char %s.",this->name);
-				return CMD_FAILURE;
-			}
-			reachCt->updateMotionExamples(getReachMotionDataSet());
+				LOG("character %s, reach engine is not initialized.", this->name);
+			    return CMD_FAILURE;
+			}			
+			reachEngine->updateMotionExamples(getReachMotionDataSet());
 			return (CMD_SUCCESS);
 		}			
 		else if (reach_cmd == "play")

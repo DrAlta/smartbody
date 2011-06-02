@@ -6,7 +6,7 @@
 # include "sr_cfg_planner.h"
 # include <SR/sr_vec.h>
 # include <vector>
-#include <SBM/Collision/SbmColObject.h>
+#include <SBM/Physics/SbmColObject.h>
 
 // basic interface for the object to be grabbed
 class ColObject
@@ -36,7 +36,7 @@ public:
 
 typedef std::vector<ColObject*> VecOfColObj;
 
-typedef std::vector<SbmColObject*> VecOfSbmColObj;
+typedef std::vector<SbmGeomObject*> VecOfSbmColObj;
 
 //=================================== SkPosCfg =====================================
 

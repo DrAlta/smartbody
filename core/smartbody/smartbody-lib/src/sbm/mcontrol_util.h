@@ -89,6 +89,7 @@ class mcuCBHandle;
 #include <sbm/me_ct_param_animation_data.h>
 
 #include <sbm/SteerSuiteEngineDriver.h>
+#include <sbm/Physics/SbmPhysicsSim.h>
 
 #include BML_PROCESSOR_INCLUDE
 
@@ -149,6 +150,7 @@ class mcuCBHandle	{
 		bool		net_face_bones;
 		bool		use_locomotion;
 		bool		use_param_animation;
+		bool        updatePhysics;
 		bool		steering_use_procedural;
 		const char* net_host;
 		bonebus::BoneBusClient bonebus;
@@ -230,8 +232,7 @@ class mcuCBHandle	{
 		srHashMap <MeController>	controller_map;
 
 		srHashMap <SbmPawn>			pawn_map;
-		srHashMap <SbmCharacter>	character_map;
-		std::map<std::string, SteerLib::ObstacleInterface*> obstacle_map;
+		srHashMap <SbmCharacter>	character_map;		
 
 		BML_PROCESSOR				bml_processor;
 		WSP::Manager*				theWSP;
@@ -241,6 +242,7 @@ class mcuCBHandle	{
 		std::vector<CameraTrack*>	cameraTracking;
 
 		SteerSuiteEngineDriver*		steerEngine;
+		SbmPhysicsSim*              physicsEngine;
 
 	private:
 		// Constant
@@ -267,7 +269,7 @@ class mcuCBHandle	{
 			if( _singleton )
 				delete _singleton;
 			_singleton = NULL;
-		}
+		}		
 
 		void reset();
 

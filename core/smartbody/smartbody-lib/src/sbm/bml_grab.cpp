@@ -50,7 +50,6 @@ const XMLCh DTYPE_SBM[]  = L"ICT.SBM";
 
 ////// XML ATTRIBUTES
 const XMLCh ATTR_WRIST[] = L"sbm:wrist";
-//const XMLCh ATTR_TARGET_POS[] = L"sbm:target-pos";
 const XMLCh ATTR_SOURCE_JOINT[] = L"sbm:source-joint";
 const XMLCh ATTR_ATTACH_PAWN[] = L"sbm:attach-pawn";
 const XMLCh ATTR_RELEASE_PAWN[] = L"sbm:release-pawn";
@@ -58,9 +57,6 @@ const XMLCh ATTR_GRAB_VELOCITY[] = L"sbm:grab-velocity";
 const XMLCh ATTR_GRAB_STATE[] = L"sbm:grab-state";
 const XMLCh ATTR_FADE_OUT[]		= L"sbm:fade-out";
 const XMLCh ATTR_FADE_IN[]		= L"sbm:fade-in";
-//const XMLCh ATTR_APEX_DURATION[] = L"sbm:apex-duration";
-
-
 
 using namespace std;
 using namespace BML;

@@ -23,7 +23,7 @@ public:
 	void init(MeCtIKTreeNode* figTip);	
 	void unlockChain();
 	void getLineSeg(std::vector<SrVec>& lineSeg);
-	void testCollision(SbmColObject* colObj);
+	void testCollision(SbmGeomObject* colObj);
 };
 
 
@@ -52,7 +52,7 @@ protected:
 
 	MeCtIKTreeScenario    ikScenario;
 	MeCtJacobianIK        ik;
-	SbmColObject*         grabTarget; 
+	SbmGeomObject*         grabTarget; 
 
 	std::string           attachJointName;
 	SbmPawn*              attachedPawn;
@@ -79,7 +79,7 @@ public:
 	virtual void print_state( int tabs );
 	
 	void setGrabState(GrabState state);
-	void setGrabTargetObject(SbmColObject* targetObj);
+	void setGrabTargetObject(SbmGeomObject* targetObj);
 
 	void attachPawnTarget(SbmPawn* pawn, std::string jointName);
 	void releasePawn();

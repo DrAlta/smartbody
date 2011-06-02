@@ -45,7 +45,7 @@
 
 #include "ObjectManipulationHandle.h"
 
-class SbmColObject;
+class SbmGeomObject;
 class SrQuat;
 class SrVec;
 class SrEvent;
@@ -170,8 +170,6 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdGazeOnTargetType3,
 				   CmdGazeOnTargetType4,
 				   CmdRemoveAllGazeTarget,
-				   CmdReachOnTargetRight,
-				   CmdReachOnTargetLeft,
 				   CmdNoTerrain,
 				   CmdTerrainWireframe,
 				   CmdTerrain,
@@ -191,16 +189,12 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdShowKinematicFootprints,
 				   CmdShowLocomotionFootprints,
 				   CmdInteractiveLocomotion,
-				   CmdShowTrajectory,
-				   CmdReachToggleData,
-				   CmdReachToggleIK,
+				   CmdShowTrajectory,				  
 				   CmdReachShowExamples,
 				   CmdReachNoExamples,
 				   CmdConstraintToggleIK,
 				   CmdConstraintToggleBalance,
-				   CmdConstraintToggleReferencePose,
-				   CmdExampleReachToggleIK,
-				   CmdExampleReachToggleInterpolation,
+				   CmdConstraintToggleReferencePose,				   
                  };
 
    private : // internal data
@@ -332,7 +326,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	void drawInteractiveLocomotion();
 	void drawPawns();
 	void drawSteeringInfo();
-	void drawColObject(SbmColObject* colObj);
+	void drawColObject(SbmGeomObject* colObj, SrMat& gmat);
 	void drawTetra(SrVec vtxPos[4], SrVec& color);
 	void drawArrow(SrVec& from, SrVec& to, float width, SrVec& color);
 	void drawCircle(float cx, float cy, float cz, float r, int num_segments, SrVec& color);

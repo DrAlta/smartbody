@@ -41,10 +41,11 @@ typedef std::vector<std::string> VecOfString;
 class EffectorConstraint
 {
 public:	
+	float           constraintWeight; // 
 	std::string     efffectorName;
 	std::string     rootName; // root of influence for this constraint		
 public:
-	EffectorConstraint() {}
+	EffectorConstraint() { constraintWeight = 1.f; }
 	~EffectorConstraint() {}	
 	virtual SrVec getPosConstraint() = 0;
 	virtual SrQuat getRotConstraint() = 0;

@@ -49,12 +49,13 @@ const XMLCh TAG_DESCRIPTION[] = L"description";
 const XMLCh DTYPE_SBM[]  = L"ICT.SBM";
 
 ////// XML ATTRIBUTES
-const XMLCh ATTR_EFFECTOR[] = L"effector";
-const XMLCh ATTR_ROOT[] = L"sbm:root";
+//const XMLCh ATTR_EFFECTOR[] = L"effector";
+//const XMLCh ATTR_ROOT[] = L"sbm:root";
 const XMLCh ATTR_CONS_JOINT[] = L"sbm:cons-joint";
 const XMLCh ATTR_CONS_TARGET[] = L"sbm:cons-target";
 const XMLCh ATTR_TARGET_POS[] = L"sbm:target-pos";
 const XMLCh ATTR_REACH_VELOCITY[] = L"sbm:reach-velocity";
+const XMLCh ATTR_REACH_DURATION[] = L"sbm:reach-duration";
 const XMLCh ATTR_REACH_FINISH[] = L"sbm:reach-finish";
 const XMLCh ATTR_FOOT_IK[] = L"sbm:foot-ik";
 const XMLCh ATTR_REACH_ACTION[] = L"sbm:action";
@@ -75,6 +76,14 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	std::wstringstream wstrstr;	
 
 	MeCtExampleBodyReach* bodyReachCt = NULL; 
+
+	MeCtReachEngine* re = request->actor->reachEngine;
+
+	if (!re)
+	{
+		LOG("Character : %s, reach engine is not initialized.",request->actor->name);
+		return BehaviorRequestPtr();
+	}
 
 	const XMLCh* attrHandle = elem->getAttribute( ATTR_HANDLE );
 	std::string handle = "";
@@ -112,15 +121,15 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		targetPawn = parse_target_pawn(tag,attrTarget,mcu);
 	}
 
-	const XMLCh* attrEffector = NULL;
-	const char* effectorName = NULL;
-	attrEffector = elem->getAttribute(ATTR_EFFECTOR);	
-	SkJoint* effectorJoint = NULL;
-	if( attrEffector && XMLString::stringLen( attrEffector ) ) 
-	{
-		effectorName = asciiString(attrEffector);
-		effectorJoint = request->actor->skeleton_p->search_joint(effectorName);		
-	}
+// 	const XMLCh* attrEffector = NULL;
+// 	const char* effectorName = NULL;
+// 	attrEffector = elem->getAttribute(ATTR_EFFECTOR);	
+// 	SkJoint* effectorJoint = NULL;
+// 	if( attrEffector && XMLString::stringLen( attrEffector ) ) 
+// 	{
+// 		effectorName = asciiString(attrEffector);
+// 		effectorJoint = request->actor->skeleton_p->search_joint(effectorName);		
+// 	}
 
 	const XMLCh* attrObstracle = elem->getAttribute( ATTR_OBSTACLE );
 	const char* obstacleName = NULL;
@@ -150,13 +159,13 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		consTarget = parse_target(tag,attrConsTarget,mcu);
 	}
 
-	const XMLCh* attrRoot = NULL;
-	const char* rootName = NULL;
-	attrRoot = elem->getAttribute(ATTR_ROOT);		
-	if( attrRoot && XMLString::stringLen( attrRoot ) ) 
-	{
-		rootName = asciiString(attrRoot);			
-	}
+// 	const XMLCh* attrRoot = NULL;
+// 	const char* rootName = NULL;
+// 	attrRoot = elem->getAttribute(ATTR_ROOT);		
+// 	if( attrRoot && XMLString::stringLen( attrRoot ) ) 
+// 	{
+// 		rootName = asciiString(attrRoot);			
+// 	}
 
 	SrVec targetPos = SrVec();
 
@@ -179,12 +188,25 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		}								
 	}
 
-// 	if (target_joint == NULL && !bodyReachCt) {  // Invalid target.  Assume parse_target(..) printed error.
+// 	if (effectorJoint == NULL && !bodyReachCt) {  // Invalid target.  Assume parse_target(..) printed error.
 // 		return BehaviorRequestPtr();  // a.k.a., NULL
 // 	}
 
-	if (effectorJoint == NULL && !bodyReachCt) {  // Invalid target.  Assume parse_target(..) printed error.
-		return BehaviorRequestPtr();  // a.k.a., NULL
+	const XMLCh* attrReachDuration = elem->getAttribute( ATTR_REACH_DURATION );
+	float reachDuration = -1.f;
+	bool hasReachDuration = false;
+	if(attrReachDuration != NULL && attrReachDuration[0] != '\0') 
+	{
+		if( !( wistringstream( attrReachDuration ) >> reachDuration) )
+		{
+			std::stringstream strstr;
+			strstr << "WARNING: Failed to parse reach-duration interval attribute \""<< XMLString::transcode(attrReachDuration) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
+			LOG(strstr.str().c_str());
+		}
+		else
+		{
+			hasReachDuration = true;
+		}
 	}
 
 	const XMLCh* attrReachVelocity = elem->getAttribute( ATTR_REACH_VELOCITY );
@@ -197,31 +219,31 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 			strstr << "WARNING: Failed to parse reach-velocity interval attribute \""<< XMLString::transcode(attrReachVelocity) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
 			LOG(strstr.str().c_str());
 		}
-	}
+	}	
 
-	float fadeOutTime = -1.0;
-	float fadeInTime = -1.0;
-	const XMLCh* attrFadeOut = elem->getAttribute( ATTR_FADE_OUT );
-	if(attrFadeOut != NULL && attrFadeOut[0] != '\0') 
-	{
-		if( !( wistringstream( attrFadeOut ) >> fadeOutTime ) )
-		{
-			std::stringstream strstr;
-			strstr << "WARNING: Failed to parse fade-out interval attribute \""<< XMLString::transcode(attrFadeOut) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
-			LOG(strstr.str().c_str());
-		}
-	}
-
-	const XMLCh* attrFadeIn = elem->getAttribute( ATTR_FADE_IN );
-	if(attrFadeIn != NULL && attrFadeIn[0] != '\0') 
-	{
-		if( !( wistringstream( attrFadeIn ) >> fadeInTime ) )
-		{
-			std::stringstream strstr;
-			strstr << "WARNING: Failed to parse fade-in interval attribute \""<< XMLString::transcode(attrFadeIn) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
-			LOG(strstr.str().c_str());
-		}
-	}
+	float fadeOutTime = -1.f;
+	float fadeInTime = -1.f;
+// 	const XMLCh* attrFadeOut = elem->getAttribute( ATTR_FADE_OUT );
+// 	if(attrFadeOut != NULL && attrFadeOut[0] != '\0') 
+// 	{
+// 		if( !( wistringstream( attrFadeOut ) >> fadeOutTime ) )
+// 		{
+// 			std::stringstream strstr;
+// 			strstr << "WARNING: Failed to parse fade-out interval attribute \""<< XMLString::transcode(attrFadeOut) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
+// 			LOG(strstr.str().c_str());
+// 		}
+// 	}
+// 
+// 	const XMLCh* attrFadeIn = elem->getAttribute( ATTR_FADE_IN );
+// 	if(attrFadeIn != NULL && attrFadeIn[0] != '\0') 
+// 	{
+// 		if( !( wistringstream( attrFadeIn ) >> fadeInTime ) )
+// 		{
+// 			std::stringstream strstr;
+// 			strstr << "WARNING: Failed to parse fade-in interval attribute \""<< XMLString::transcode(attrFadeIn) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
+// 			LOG(strstr.str().c_str());
+// 		}
+// 	}
 
 	const XMLCh* id = elem->getAttribute(ATTR_ID);
 	std::string localId;
@@ -230,24 +252,25 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 
 	bool bCreateNewController = false;
 	
+	
 	if (!bodyReachCt)
 	{
-		bodyReachCt = new MeCtExampleBodyReach(request->actor->name,request->actor->skeleton_p, effectorJoint);		
+		bodyReachCt = new MeCtExampleBodyReach(re);
 		bodyReachCt->handle(handle);
-		SbmCharacter* chr = const_cast<SbmCharacter*>(request->actor);
-		float characterHeight = chr->getHeight();
-		bodyReachCt->characterHeight = characterHeight;
-
-		bodyReachCt->init();		
-		if (reachVelocity > 0)
-		{
-			bodyReachCt->setLinearVelocity(reachVelocity);
-		}
-		//bodyReachCt->reachCompleteDuration = apexDuration > 0 ? apexDuration : 2.f;
-
-		//const MotionDataSet& motionData = request->actor->getReachMotionDataSet();
-		//bodyReachCt->updateMotionExamples(motionData);
-		bCreateNewController = true;
+		bodyReachCt->init();
+		bCreateNewController = true;		
+// 		bodyReachCt = new MeCtExampleBodyReach(request->actor->name,request->actor->skeleton_p, effectorJoint);		
+// 		
+// 		SbmCharacter* chr = const_cast<SbmCharacter*>(request->actor);
+// 		float characterHeight = chr->getHeight();
+// 		bodyReachCt->characterHeight = characterHeight;
+// 
+// 		bodyReachCt->init();		
+// 		if (reachVelocity > 0)
+// 		{
+// 			bodyReachCt->setLinearVelocity(reachVelocity);
+// 		}		
+// 		
 	}
 
 	const XMLCh* attrReachAction = NULL;
@@ -256,15 +279,15 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	{
 		if( XMLString::compareIString( attrReachAction, L"pick-up" )==0 ) 
 		{					
-			bodyReachCt->setHandActionState(MeCtExampleBodyReach::PICK_UP_OBJECT);
+			bodyReachCt->setHandActionState(MeCtReachEngine::PICK_UP_OBJECT);
 		}
 		else if( XMLString::compareIString( attrReachAction, L"touch" )==0 )
 		{				
-			bodyReachCt->setHandActionState(MeCtExampleBodyReach::TOUCH_OBJECT);
+			bodyReachCt->setHandActionState(MeCtReachEngine::TOUCH_OBJECT);
 		}
 		else if( XMLString::compareIString( attrReachAction, L"put-down" )==0 )
 		{			
-			bodyReachCt->setHandActionState(MeCtExampleBodyReach::PUT_DOWN_OBJECT);
+			bodyReachCt->setHandActionState(MeCtReachEngine::PUT_DOWN_OBJECT);
 		}
 	}	
 
@@ -302,10 +325,10 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		bodyReachCt->setLinearVelocity(reachVelocity);		
 	}
 
-	if (rootName)
-	{
-		bodyReachCt->setEndEffectorRoot(rootName);
-	}
+// 	if (rootName)
+// 	{
+// 		bodyReachCt->setEndEffectorRoot(rootName);
+// 	}	
 
 
 	if( targetPawn )	{		
@@ -320,12 +343,17 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	{
 		bodyReachCt->addHandConstraint(const_cast<SkJoint*>(consTarget),consJointName);
 	}
-
+	
 // 	if (obstacle_pawn && obstacleName)
 // 	{
 // 		if (obstacle_pawn->colObj_p)
 // 			bodyReachCt->addObstacle(obstacleName, obstacle_pawn->colObj_p);
 // 	}
+
+	if (hasReachDuration)
+	{
+		bodyReachCt->setReachCompleteDuration(reachDuration);		
+	}
 
 
 	if (fadeInTime >= 0.0)

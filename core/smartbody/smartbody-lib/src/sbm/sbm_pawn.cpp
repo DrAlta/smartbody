@@ -125,6 +125,7 @@ SbmPawn::SbmPawn( const char * name )
 	ct_tree_p->ref();
 
 	colObj_p = NULL;
+	phyObj_p = NULL;
 	// world_offset_writer_p, applies external inputs to the skeleton,
 	//   and therefore needs to evaluate before other controllers
 	world_offset_writer_p->ref();
@@ -144,6 +145,12 @@ int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 		}
 		ct_tree_p->add_skeleton( skeleton_p->name(), skeleton_p );
 	}
+
+// 	if (colObj_p)
+// 	{
+// 		initPhysicsObj();
+// 	}
+
 	scene_p->init( skeleton_p );  // if skeleton_p == NULL, the scene is cleared
 	dMesh_p->skeleton = new_skeleton_p;		
 
@@ -154,6 +161,8 @@ int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 
 	return CMD_SUCCESS;
 }
+
+
 
 int SbmPawn::init_skeleton() {
 	// Verifiy the joint name is not already in use.
@@ -278,6 +287,11 @@ SbmPawn::~SbmPawn()	{
 		skeleton_p->unref();
 	ct_tree_p->unref();
     delete [] name;
+
+	if (colObj_p)
+		delete colObj_p;
+	if (phyObj_p)
+		delete phyObj_p;
 }
 
 
@@ -285,6 +299,7 @@ SbmPawn::~SbmPawn()	{
 const SkJoint* SbmPawn::get_joint( const char* joint_name ) const {
 	return skeleton_p->search_joint( joint_name );
 }
+
 
 void SbmPawn::get_world_offset( float& x, float& y, float& z,
 								 float& yaw, float& pitch, float& roll ) {
@@ -306,7 +321,7 @@ void SbmPawn::setWorldOffset( const SrMat& newWorld )
 	gwiz::quat_t q = gwiz::quat_t(quat.w,quat.x,quat.y,quat.z);
 	gwiz::euler_t e = gwiz::euler_t(q);	
 	SrVec tran = newWorld.get_translation();
-	set_world_offset(tran[0],tran[1],tran[2],(float)e.h(),(float)e.p(),(float)e.r());	
+	set_world_offset(tran[0],tran[1],tran[2],(float)e.h(),(float)e.p(),(float)e.r());		
 }
 
 void SbmPawn::set_world_offset( float x, float y, float z,
@@ -475,38 +490,6 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		// Init channels
 		skeleton->make_active_channels();
 
-		// default geometry
-		if( has_geom ) {
-			//LOG("WARNING: SbmPawn geometry not implemented.  Ignoring options.");
-			float size = 1.0;
-			if (size_str)
-			{
-				size = (float)atof(size_str);
-			}
-
-			if (strcmp(geom_str,"sphere") == 0)
-			{
-				SbmColObject* colObj = new SbmColSphere(size);
-				pawn_p->colObj_p = colObj;
-			}
-			else if (strcmp(geom_str,"box") == 0)
-			{
-				SbmColObject* colObj = new SbmColBox(SrVec(size,size,size));
-				pawn_p->colObj_p = colObj;
-			}
-			else if (strcmp(geom_str,"capsule") == 0)
-			{
-				SbmColObject* colObj = new SbmColCapsule(size*1.5f,size*0.5f);
-				pawn_p->colObj_p = colObj;
-			}	
-			else
-			{
-				// set default shape as sphere
-				SbmColObject* colObj = new SbmColSphere(size);
-				pawn_p->colObj_p = colObj;
-			}
-		}
-		
 		int err = pawn_p->init( skeleton );
 		if( err != CMD_SUCCESS ) {
 			std::stringstream strstr;		
@@ -516,6 +499,22 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			skeleton->unref();
 			return err;
 		}
+
+		// setting up geometry and physics 
+		if( has_geom ) {
+			//LOG("WARNING: SbmPawn geometry not implemented.  Ignoring options.");
+			float size = 1.0;
+			if (size_str)
+			{
+				size = (float)atof(size_str);
+			}
+			pawn_p->initGeomObj(geom_str,size);
+		}
+		// 		else // default null geom object
+		// 		{
+		// 			SbmGeomObject* colObj = new SbmGeomNullObject();
+		// 			pawn_p->colObj_p = colObj;
+		// 		}
 		
 		err = mcu_p->pawn_map.insert( pawn_name.c_str(), pawn_p );
 		if( err != CMD_SUCCESS )	{
@@ -537,11 +536,18 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			return err;
 		}
 
-
+		if (pawn_p->colObj_p)
+		{
+			pawn_p->setWorldOffset(pawn_p->colObj_p->worldState.gmat());
+		}
 		// [BMLR] Send notification to the renderer that a pawn was created.
 		// NOTE: This is sent both for characters AND pawns
 		mcu_p->bonebus.SendCreatePawn( pawn_name.c_str(), loc[ 0 ], loc[ 1 ], loc[ 2 ] );
-		pawn_p->set_world_offset(loc[0],loc[1],loc[2],0,0,0);
+		float x,y,z,h,p,r;
+		pawn_p->get_world_offset(x,y,z,h,p,r);
+		//printf("h = %f, p = %f, r = %f\n",h,p,r);	
+		pawn_p->set_world_offset(loc[0],loc[1],loc[2],h,p,r);	
+		pawn_p->wo_cache_update();
 
 		return CMD_SUCCESS;
 	} else if( pawn_cmd=="prune" ) {  // Prunes the controller trees of unused/overwritten controllers
@@ -583,7 +589,75 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			LOG(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
-	} else {
+	} 	
+	else if (pawn_cmd=="setshape")
+	{
+		if (!pawn_p)
+		{
+			std::stringstream strstr;
+			strstr << "ERROR: Pawn \""<<pawn_name<<"\" not found.";
+			LOG(strstr.str().c_str());
+			return CMD_FAILURE;
+		}
+		const char *geom_str, *size_str, *color_str;		
+		bool has_geom = false;
+		while( args.calc_num_tokens() > 0 ) {
+			string option = args.read_token();
+			// TODO: Make the following option case insensitive
+			if( option=="geom" ) {
+				geom_str = args.read_token();
+				has_geom = true;
+			} else if( option=="size" ) {
+				size_str = args.read_token();
+				has_geom = true;
+			} else if( option=="color" ) {
+				color_str = args.read_token();
+				has_geom = true;
+			} else {
+				std::stringstream strstr;
+				strstr << "WARNING: Unrecognized pawn setshape option \"" << option << "\"." << endl;
+				LOG(strstr.str().c_str());
+			}
+		}	
+
+		if (has_geom)
+		{
+			float size = 1.f;
+			if (size_str)
+			{
+				size = (float)atof(size_str);
+			}
+			pawn_p->initGeomObj(geom_str,size);
+			return CMD_SUCCESS;
+		}
+		else
+		{
+			LOG("Pawn %s, fail to setshape. Incorrect parameters.",pawn_name);
+			return CMD_FAILURE;
+		}
+	}
+	else if (pawn_cmd=="physics")
+	{
+		string option = args.read_token();
+		if (!pawn_p)
+			return CMD_FAILURE;
+
+		if (option == "on" || option == "ON")
+		{
+			pawn_p->setPhysicsSim(true);
+			return CMD_SUCCESS;
+		}
+		else if (option == "off" || option == "OFF")
+		{
+			pawn_p->setPhysicsSim(false);
+			return CMD_SUCCESS;
+		}		
+		else
+		{
+			return CMD_FAILURE;
+		}
+	}
+	else {
 		return CMD_NOT_FOUND;
 	}
 }
@@ -679,7 +753,7 @@ int SbmPawn::set_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& args,
 		editableJoint->mass(mass);
 		//LOG("Set joint '%s' on character '%s' to mass '%f'.", jointName.c_str(), pawn->name, mass);
 		return CMD_SUCCESS;
-	} 
+	} 	
 	else 
 	{
 		LOG("ERROR: SbmPawn::set_cmd_func(..): Unknown attribute \"%s\".", attribute);
@@ -1005,6 +1079,119 @@ WSP_ERROR SbmPawn::wsp_rotation_accessor( const std::string id, const std::strin
 	{
 		return WSP::not_found_error( "no joint" );
 	}
+}
+
+bool SbmPawn::initGeomObj( const char* geomType, float size )
+{
+	SbmGeomObject* colObj = NULL;
+	if (strcmp(geomType,"sphere") == 0)
+	{
+		colObj = new SbmGeomSphere(size);		
+	}
+	else if (strcmp(geomType,"box") == 0)
+	{
+		colObj = new SbmGeomBox(SrVec(size,size,size));		
+	}
+	else if (strcmp(geomType,"capsule") == 0)
+	{
+		SrVec pos[2];
+		float capLen = size*1.5f;
+		pos[0] = SrVec(0,-capLen*0.5f,0);
+		pos[1] = SrVec(0,capLen*0.5f,0);
+		//SbmColObject* colObj = new SbmColCapsule(size*1.5f,size*0.5f);
+		colObj = new SbmGeomCapsule(pos[0],pos[1],size*0.5f);		
+	}	
+	else if (strcmp(geomType,"null") == 0)
+	{
+		if (phyObj_p) // remove physics
+		{
+			removePhysicsObj();
+		}
+
+		if (colObj_p) // remove geometry
+		{
+			delete colObj_p;
+			colObj_p = NULL;
+		}
+		return true;
+	}
+	else
+	{
+		LOG("Can not create pawn geometry. Undefined geom type : %s\n",geomType);
+		return false;
+	}
+
+	if (phyObj_p) // remove physics
+	{
+		removePhysicsObj();
+	}
+
+	if (colObj_p) // remove geometry
+	{
+		delete colObj_p;
+		colObj_p = NULL;
+	}
+	colObj_p = colObj;
+	updateToColObject();
+	initPhysicsObj();
+	return true;
+}
+
+void SbmPawn::initPhysicsObj()
+{	
+	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
+	if (!phySim)
+		return;
+	//printf("init physics obj\n");
+	phyObj_p = phySim->createPhyObj();
+	phyObj_p->initGeometry(colObj_p,1.f);	
+	phySim->addPhysicsObj(phyObj_p);
+}
+
+void SbmPawn::removePhysicsObj()
+{
+	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
+	if (!phySim || !phyObj_p)
+		return;
+	phySim->removePhysicsObj(phyObj_p);
+	delete phyObj_p;
+	phyObj_p = NULL;
+}
+
+void SbmPawn::updateFromColObject()
+{
+	if (colObj_p)
+	{
+		setWorldOffset(colObj_p->worldState.gmat());
+	}
+}
+
+void SbmPawn::updateToColObject()
+{
+	if (colObj_p)
+	{
+		colObj_p->worldState.gmat(get_world_offset_joint()->gmat());
+		if (phyObj_p)
+		{
+			phyObj_p->updateSimObj();			
+		}
+	}
+}
+
+void SbmPawn::setPhysicsSim( bool enable )
+{
+	if (!phyObj_p)
+		return;
+
+	phyObj_p->setPhysicsSim(enable);	
+}
+
+bool SbmPawn::hasPhysicsSim()
+{
+	if (!phyObj_p)
+		return false;
+	
+	return phyObj_p->hasPhysicsSim();
 }
 
 
