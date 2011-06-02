@@ -1,17 +1,17 @@
 #include "SbmColObject.h"
 #include <sbm/gwiz_math.h>
 
-SrVec SbmRigidTransform::localToGlobal( const SrVec& vLocal )
+SrVec SbmTransform::localToGlobal( const SrVec& vLocal )
 {
 	return vLocal*rot + tran;	
 }
 
-SrVec SbmRigidTransform::globalToLocal( const SrVec& vGlobal )
+SrVec SbmTransform::globalToLocal( const SrVec& vGlobal )
 {
 	return (vGlobal-tran)*rot.inverse();
 }
 
-SrMat SbmRigidTransform::gmat()
+SrMat SbmTransform::gmat()
 {
 	SrMat mat;
 	mat = rot.get_mat(mat);
@@ -19,66 +19,66 @@ SrMat SbmRigidTransform::gmat()
 	return mat;
 }
 
-void SbmRigidTransform::gmat(const SrMat& inMat )
+void SbmTransform::gmat(const SrMat& inMat )
 {
 	tran = inMat.get_translation();
 	rot  = SrQuat(inMat);
 }
 
-SbmRigidTransform SbmRigidTransform::diff( const SbmRigidTransform& r1, const SbmRigidTransform& r2 )
+SbmTransform SbmTransform::diff( const SbmTransform& r1, const SbmTransform& r2 )
 {
-	SbmRigidTransform rout;
+	SbmTransform rout;
 	rout.tran = r2.tran - r1.tran;
 	rout.rot  = r1.rot.inverse()*r2.rot;	
 	rout.rot.normalize();
 	return rout;
 }
 
-SbmRigidTransform SbmRigidTransform::blend( SbmRigidTransform& r1, SbmRigidTransform& r2, float weight )
+SbmTransform SbmTransform::blend( SbmTransform& r1, SbmTransform& r2, float weight )
 {
-	SbmRigidTransform rout;
+	SbmTransform rout;
 	rout.tran = r1.tran*(1.f-weight) + r2.tran*weight;
 	rout.rot  = slerp( r1.rot, r2.rot, weight );
 	rout.rot.normalize();
 	return rout;
 }
 
-SbmRigidTransform& SbmRigidTransform::operator=( const SbmRigidTransform& rt )
+SbmTransform& SbmTransform::operator=( const SbmTransform& rt )
 {
 	tran = rt.tran;
 	rot  = rt.rot;
 	return *this;
 }
 
-float SbmRigidTransform::dist( const SbmRigidTransform& r1, const SbmRigidTransform& r2 )
+float SbmTransform::dist( const SbmTransform& r1, const SbmTransform& r2 )
 {
-	SbmRigidTransform diffT = diff(r1,r2);
+	SbmTransform diffT = diff(r1,r2);
 	return diffT.tran.norm();
 }
 
-void SbmRigidTransform::add( const SbmRigidTransform& delta )
+void SbmTransform::add( const SbmTransform& delta )
 {
 	tran = tran + delta.tran;//curEffectorPos + offset;
 	rot  = rot*delta.rot;//rotOffset;
 	rot.normalize();
 }
 
-SbmColObject::SbmColObject(void)
+SbmGeomObject::SbmGeomObject(void)
 {
 	isUpdate = false;	
 }
 
-SbmColObject::~SbmColObject(void)
+SbmGeomObject::~SbmGeomObject(void)
 {
 	
 }
 
-SrVec SbmColObject::getCenter()
+SrVec SbmGeomObject::getCenter()
 {
 	return worldState.tran;
 }
 
-void SbmColObject::updateTransform( const SrMat& newState )
+void SbmGeomObject::updateTransform( const SrMat& newState )
 {
 	SrQuat newQuat = SrQuat(newState);
 	SrVec newPos = newState.get_translation();
@@ -90,11 +90,16 @@ void SbmColObject::updateTransform( const SrMat& newState )
 	}	
 }
 
+bool SbmGeomNullObject::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot )
+{
+	outHandPos = getCenter(); outHandRot = naturalRot; return false;
+}
+
 /************************************************************************/
 /* Sphere collider                                                      */
 /************************************************************************/
 
-bool SbmColSphere::isInside( const SrVec& gPos, float offset )
+bool SbmGeomSphere::isInside( const SrVec& gPos, float offset )
 {
 	SrVec lpos = worldState.globalToLocal(gPos);
 	if (lpos.norm() < radius + offset)
@@ -102,12 +107,12 @@ bool SbmColSphere::isInside( const SrVec& gPos, float offset )
 	return false;
 }
 
-SbmColSphere::~SbmColSphere()
+SbmGeomSphere::~SbmGeomSphere()
 {
 
 }
 
-bool SbmColSphere::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offset)
+bool SbmGeomSphere::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offset)
 {
 	SrVec p1 = worldState.globalToLocal(gPos1);
 	SrVec p2 = worldState.globalToLocal(gPos2);
@@ -124,7 +129,7 @@ bool SbmColSphere::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float of
 	return false;
 }
 
-bool SbmColSphere::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot )
+bool SbmGeomSphere::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot )
 {
 	outHandPos = getCenter() + SrVec(0,radius*1.5f,0)*naturalRot;
 	outHandRot = naturalRot;
@@ -135,17 +140,17 @@ bool SbmColSphere::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHand
 /* Box collider                                                         */
 /************************************************************************/
 
-SbmColBox::SbmColBox( const SrVec& ext )
+SbmGeomBox::SbmGeomBox( const SrVec& ext )
 {
 	extent = ext;	
 }
 
-SbmColBox::~SbmColBox()
+SbmGeomBox::~SbmGeomBox()
 {
 
 }
 
-bool SbmColBox::isInside( const SrVec& gPos, float offset )
+bool SbmGeomBox::isInside( const SrVec& gPos, float offset )
 {
 	SrVec lpos = worldState.globalToLocal(gPos);
 	
@@ -157,7 +162,7 @@ bool SbmColBox::isInside( const SrVec& gPos, float offset )
 	return false;
 }
 
-bool SbmColBox::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offset)
+bool SbmGeomBox::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offset)
 {
 	SrVec p1 = worldState.globalToLocal(gPos1);
 	SrVec p2 = worldState.globalToLocal(gPos2);
@@ -176,7 +181,7 @@ bool SbmColBox::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offse
 	return true;
 }
 
-bool SbmColBox::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot )
+bool SbmGeomBox::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot )
 {
 	
 	SrVec yAxis = SrVec(0,1,0);
@@ -294,28 +299,36 @@ static float findLineSegmentDistOnLineSegment(SrVec e1[2], SrVec e2[2], SrVec& c
 	return dline;
 }
 
-SbmColCapsule::SbmColCapsule( float len, float r )
+SbmGeomCapsule::SbmGeomCapsule( float len, float r )
 {
 	extent = len*0.5f;
 	radius = r;
-	endPts[0] = SrVec(0,-extent,0);
-	endPts[1]   = SrVec(0,extent,0);
+	endPts[0] = SrVec(0,0,-extent);
+	endPts[1]   = SrVec(0,0,extent);
 }
 
-SbmColCapsule::SbmColCapsule( const SrVec& p1, const SrVec& p2, float r )
+SbmGeomCapsule::SbmGeomCapsule( const SrVec& p1, const SrVec& p2, float r )
 {
 	extent = (p2-p1).norm()*0.5f;
-	endPts[0] = p1;
-	endPts[1] = p2;
+	SrVec zAxis = SrVec(0,0,1);
+	SrVec capAxis = (p2-p1); capAxis.normalize();
+	SrVec pos = (p2+p1)*0.5f;
+	SrQuat rot = SrQuat(zAxis,capAxis);
+
+	worldState.rot = rot;
+	worldState.tran = pos;
+
+	endPts[0] = SrVec(0,0,-extent);
+	endPts[1] = SrVec(0,0,extent);
 	radius = r;
 }
 
-SbmColCapsule::~SbmColCapsule()
+SbmGeomCapsule::~SbmGeomCapsule()
 {
 
 }
 
-bool SbmColCapsule::isInside( const SrVec& gPos, float offset)
+bool SbmGeomCapsule::isInside( const SrVec& gPos, float offset)
 {
 	SrVec lpos = worldState.globalToLocal(gPos);
 	SrVec cPts;
@@ -327,7 +340,7 @@ bool SbmColCapsule::isInside( const SrVec& gPos, float offset)
 	return false;
 }
 
-bool SbmColCapsule::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offset)
+bool SbmGeomCapsule::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offset)
 {
 	SrVec lpos[2];
 	SrVec cpt;
@@ -346,7 +359,7 @@ bool SbmColCapsule::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float o
 	return false;
 }
 
-bool SbmColCapsule::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot )
+bool SbmGeomCapsule::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot )
 {
 	SrVec capAxis = (endPts[1]-endPts[0]); capAxis.normalize();
 	capAxis = capAxis*worldState.rot;
@@ -364,22 +377,22 @@ bool SbmColCapsule::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHan
 	return true;
 }
 
-bool SbmCollisionUtil::checkCollision( SbmColObject* obj1, SbmColObject* obj2 )
+bool SbmCollisionUtil::checkIntersection( SbmGeomObject* obj1, SbmGeomObject* obj2 )
 {
-	if (dynamic_cast<SbmColSphere*>(obj1))
+	if (dynamic_cast<SbmGeomSphere*>(obj1))
 	{
-		SbmColSphere* sph = dynamic_cast<SbmColSphere*>(obj1);
+		SbmGeomSphere* sph = dynamic_cast<SbmGeomSphere*>(obj1);
 		return obj2->isInside(obj1->worldState.tran,sph->radius);
 	}
-	else if (dynamic_cast<SbmColCapsule*>(obj1))
+	else if (dynamic_cast<SbmGeomCapsule*>(obj1))
 	{
-		SbmColCapsule* cap = dynamic_cast<SbmColCapsule*>(obj1);
+		SbmGeomCapsule* cap = dynamic_cast<SbmGeomCapsule*>(obj1);
 		SrVec g1,g2;
 		g1 = cap->endPts[0]*cap->worldState.gmat();
 		g2 = cap->endPts[1]*cap->worldState.gmat();
 		return obj2->isIntersect(g1,g2,cap->radius);		
 	}
-	else if (dynamic_cast<SbmColBox*>(obj1))
+	else if (dynamic_cast<SbmGeomBox*>(obj1))
 	{
 		return false;
 	}

@@ -4,37 +4,37 @@
 #include <SR/sr_vec.h>
 #include <vector>
 
-class SbmRigidTransform
+class SbmTransform
 {
 public:
 	SrQuat rot;
 	SrVec  tran;
 public:
-	SbmRigidTransform() {}
-	SbmRigidTransform(const SrQuat& q, const SrVec& t) { rot = q; tran = t;}
+	SbmTransform() {}
+	SbmTransform(const SrQuat& q, const SrVec& t) { rot = q; tran = t;}
 	SrVec localToGlobal(const SrVec& vLocal);
 	SrVec globalToLocal(const SrVec& vGlobal);
 	SrMat gmat();	
 	void  gmat(const SrMat& inMat);
-	void  add(const SbmRigidTransform& delta);
-	static SbmRigidTransform diff(const SbmRigidTransform& r1, const SbmRigidTransform& r2);
-	static SbmRigidTransform blend(SbmRigidTransform& r1, SbmRigidTransform& r2, float weight );
-	static float             dist(const SbmRigidTransform& r1, const SbmRigidTransform& r2);
+	void  add(const SbmTransform& delta);
+	static SbmTransform diff(const SbmTransform& r1, const SbmTransform& r2);
+	static SbmTransform blend(SbmTransform& r1, SbmTransform& r2, float weight );
+	static float             dist(const SbmTransform& r1, const SbmTransform& r2);
 
-	SbmRigidTransform& operator= (const SbmRigidTransform& rt);
+	SbmTransform& operator= (const SbmTransform& rt);
 };
 
-typedef SbmRigidTransform SRT;
+typedef SbmTransform SRT;
 
-class SbmColObject
+class SbmGeomObject
 {
 public:
-	SbmRigidTransform worldState;			
-	bool              isUpdate;
+	SbmTransform worldState;			
+	bool         isUpdate;
 public:
-	SbmColObject(void);
+	SbmGeomObject(void);
 	void updateTransform(const SrMat& newState);
-	virtual ~SbmColObject(void);
+	virtual ~SbmGeomObject(void);
 	virtual SrVec getCenter();	
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f) = 0; // check if a point is inside the object	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f) { return false; }; // check if a line segment is intersect with the object
@@ -42,51 +42,61 @@ public:
 	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot) = 0;
 };
 
-class SbmColSphere : public SbmColObject
+// a default null object with no geometry
+class SbmGeomNullObject : public SbmGeomObject
+{
+public:
+	SbmGeomNullObject() {}
+	~SbmGeomNullObject() {}
+	virtual bool isInside(const SrVec& gPos, float offset = 0.f) { return false;}
+	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot);
+};
+
+class SbmGeomSphere : public SbmGeomObject
 {
 public:
 	float radius;
 public:
-	SbmColSphere(float r) { radius = r; }
-	virtual ~SbmColSphere();
+	SbmGeomSphere(float r) { radius = r; }
+	virtual ~SbmGeomSphere();
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f);	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f);
 	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot);
 };
 
-class SbmColBox : public SbmColObject
+class SbmGeomBox : public SbmGeomObject
 {
 public:
 	SrVec extent;
 public:
-	SbmColBox(const SrVec& ext);
-	virtual ~SbmColBox();
+	SbmGeomBox(const SrVec& ext);
+	virtual ~SbmGeomBox();
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f);	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f);
 	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot);
 };
 
 // assuming the length is along local y-axis
-class SbmColCapsule : public SbmColObject
+class SbmGeomCapsule : public SbmGeomObject
 {
 public:
 	float extent, radius;	
 	SrVec endPts[2];
 public:
-	SbmColCapsule(float length, float radius);
-	SbmColCapsule(const SrVec& p1, const SrVec& p2, float radius);
-	virtual ~SbmColCapsule();
+	SbmGeomCapsule(float length, float radius);
+	SbmGeomCapsule(const SrVec& p1, const SrVec& p2, float radius);
+	virtual ~SbmGeomCapsule();
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f);	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f);
 	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot);
 };
 
-typedef std::vector<SbmColObject*> VecOfSbmColObj;
+typedef std::vector<SbmGeomObject*> VecOfSbmColObj;
 
 
 class SbmCollisionUtil
 {
 public:
-	static bool checkCollision(SbmColObject* obj1, SbmColObject* obj2);
+	static bool checkIntersection(SbmGeomObject* obj1, SbmGeomObject* obj2);
 };
 
