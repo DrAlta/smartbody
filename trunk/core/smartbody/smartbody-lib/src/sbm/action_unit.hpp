@@ -117,9 +117,11 @@ public:
 		if (right)
 			right->unref();
 		left	= l;
-		left->ref();
+		if (left)
+			left->ref();
 		right	= r;
-		right->ref();
+		if (right)
+			right->ref();
 	}
 
 	protected:

@@ -995,7 +995,7 @@ void MakeShadowMatrix( GLfloat points[3][3], GLfloat light[4], GLfloat matrix[4]
 void FltkViewer::draw() 
 {
    //static bool hasShaderSupport = false;
-  /* 
+ 
    if ( !visible() ) return;
    if ( !valid() ) 
    {
@@ -1190,7 +1190,7 @@ void FltkViewer::draw()
 	// feng : debugging draw for reach controller
 	drawReach();
 	drawSteeringInfo();
-*/
+
 
 	_data->fcounter.stop();
 
