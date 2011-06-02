@@ -2743,7 +2743,8 @@ int mcu_set_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string
 			(*pos).second->unref();
 	}
 	viseme_map.insert( make_pair( viseme, motion ) );
-	motion->ref();
+	if (motion)
+		motion->ref();
 	
 	return CMD_SUCCESS;
 }

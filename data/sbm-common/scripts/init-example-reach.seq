@@ -32,16 +32,14 @@
 1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachClose_MiddleMidLow
 
 
+1 bml char doctor <sbm:reach sbm:handle="rdoctor" effector="r_index3"/>
 
-
-
-1 bml char doctor <sbm:bodyreach sbm:handle="rdoctor" effector="r_index3" sbm:fade-in="1.0"/>
-2 bodyreach char doctor build
+5 char doctor reachmotion build
 
 1 pawn foo init
 1 set pawn foo world_offset x 30 y 150 z 40
 
-3 bml char doctor <sbm:bodyreach sbm:handle="rdoctor" effector="r_index3" target="foo"/>
+6 bml char doctor <sbm:reach sbm:handle="rdoctor" effector="r_index3" target="foo"/>
 
 
 

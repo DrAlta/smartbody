@@ -12,7 +12,7 @@
 0	test locomotion initialize
 0	seq init-general-parameters
 0   seq init-common-face
-#0	panim enable
+0	panim enable
 
 ###  Common-sk assets are centered on the pelvis,
 ###  placed 102 units above the ground plane.
@@ -50,6 +50,7 @@
 
 1	seq default-dynamics
 1	seq init-param-animation
+2	seq init-example-reach
 
 2 char doctor smoothbindweight ../../../../data/mesh/doctor/Doctor.xml
 2 char doctor smoothbindmesh ../../../../data/mesh/doctor/faceShape.obj
@@ -61,4 +62,27 @@
 
 2 char elder smoothbindweight ../../../../data/mesh/elder/Elder.xml
 2 char elder smoothbindmesh ../../../../data/mesh/elder/Mayor2Shape.obj
+
+1	char brad init common.sk Brad
+1	set character brad world_offset x 135 y 102 h -17
+1	set character brad voice remote brad
+1	test loco char brad anim standing HandsAtSide_Motex
+1	test loco char brad anim walking Walk 17 28 4 37 9 23
+1	test loco char brad anim walking Strafe 25 39 1 52 25 27
+2	bml char brad <body posture="HandsAtSide_Motex"/>
+2	test loco char brad enable
+
+2 char brad smoothbindweight ../../../../data/mesh/Brad/Brad.xml
+2 char brad smoothbindmesh ../../../../data/mesh/Brad/Face1Shape.obj
+2 char brad smoothbindmesh ../../../../data/mesh/Brad/BeltShape.obj
+2 char brad smoothbindmesh ../../../../data/mesh/Brad/EyesShape.obj
+2 char brad smoothbindmesh ../../../../data/mesh/Brad/HandsShape.obj
+2 char brad smoothbindmesh ../../../../data/mesh/Brad/InnerMouthShape.obj
+2 char brad smoothbindmesh ../../../../data/mesh/Brad/PantsShape.obj
+2 char brad smoothbindmesh ../../../../data/mesh/Brad/ShirtShape.obj
+2 char brad smoothbindmesh ../../../../data/mesh/Brad/ShoesShape.obj
+2 char brad smoothbindmesh ../../../../data/mesh/Brad/UpperTeethShape.obj
+
+
+
 
