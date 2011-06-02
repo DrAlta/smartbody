@@ -57,7 +57,6 @@ extern "C" {
  *   DEBUGMSG just prints out a message
  */
 
-#define dNODEBUG 1 
 #ifndef dNODEBUG
 #  if defined(__STDC__) && __STDC_VERSION__ >= 199901L
 #    define __FUNCTION__ __func__
