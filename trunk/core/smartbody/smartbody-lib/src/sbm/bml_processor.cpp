@@ -48,6 +48,7 @@
 #include "bml_event.hpp"
 #include "bml_face.hpp"
 #include "bml_gaze.hpp"
+#include "bml_saccade.hpp"
 #include "bml_reach.hpp"
 #include "bml_constraint.hpp"
 #include "bml_bodyreach.hpp"
@@ -449,6 +450,8 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				behavior = parse_bml_face( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_GAZE )==0 ) {
 				behavior = /*BML::*/parse_bml_gaze( child, unique_id, behav_syncs, required, request, mcu );
+			} else if( XMLString::compareString( tag, TAG_SACCADE )==0 ) {
+				behavior = /*BML::*/parse_bml_saccade( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_REACH )==0 ) {
 				behavior = /*BML::*/parse_bml_reach( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, TAG_CONSTRAINT )==0 ) {
