@@ -4755,8 +4755,18 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			for (int i = 0; i < chanSize; i++)
 			{				
 				std::stringstream outputInfo;
-				if (mode == 1)	chan = mChanArray[i];
-				if (mode == 2)	chan = skelChanArray[i];
+				std::string channelName = "";
+				if (mode == 1)
+				{
+					chan = mChanArray[i];
+					channelName = mChanArray.name(i).get_string();
+				}
+				if (mode == 2)
+				{
+					chan = skelChanArray[i];
+					channelName = skelChanArray.name(i).get_string();
+				}
+
 				if (!chan.joint)
 				{
 					LOG("  %d: (No mathing joint)", i);
@@ -5212,14 +5222,18 @@ int setmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		mcu_p->boneMaps.insert(std::pair<std::string, BoneMap*>(mapname, boneMap));
 	}
 
-	std::map<std::string, std::string>::iterator iter2 = boneMap->map.find(from);
-	if (iter2 != boneMap->map.end())
+	bool found = false;
+	for (size_t x = 0; x < boneMap->map.size(); x++)
 	{
-		(*iter2).second = to;
+		if (from == boneMap->map[x].first)
+		{
+			boneMap->map[x].second = to;
+			found = true;
+		}
 	}
-	else
+	if (!found)
 	{
-		boneMap->map.insert(std::pair<std::string, std::string>(from, to));
+		boneMap->map.push_back(std::pair<std::string, std::string>(from, to));
 	}
 
 	LOG("Mapping %s -> %s on bone map %s", from, to, mapname);

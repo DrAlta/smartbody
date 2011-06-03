@@ -14,7 +14,7 @@ class BoneMap
 		void apply(SkMotion* motion);
 		void apply(SkSkeleton* skeleton);
 
-		std::map<std::string, std::string> map;
+		std::vector<std::pair<std::string, std::string> > map;
 };
 
 #endif

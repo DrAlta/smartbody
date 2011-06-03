@@ -15,7 +15,7 @@ void BoneMap::apply(SkMotion* motion)
 		return;
 	
 	SkChannelArray& channels = motion->channels();
-	for (std::map<std::string, std::string>::iterator iter = map.begin();
+	for (std::vector<std::pair<std::string, std::string> >::iterator iter = map.begin();
 		iter != map.end();
 		iter++)
 	{
@@ -34,7 +34,7 @@ void BoneMap::apply(SkSkeleton* skeleton)
 	SrArray<SkJoint*> joints = skeleton->joints();
 	for (int j = 0; j < joints.size(); j++)
 	{
-		for (std::map<std::string, std::string>::iterator iter = map.begin();
+		for (std::vector<std::pair<std::string, std::string> >::iterator iter = map.begin();
 			 iter != map.end();
 			 iter++)
 		{
@@ -47,7 +47,7 @@ void BoneMap::apply(SkSkeleton* skeleton)
 		}
 	}
 	SkChannelArray& channels = skeleton->channels();
-	for (std::map<std::string, std::string>::iterator iter = map.begin();
+	for (std::vector<std::pair<std::string, std::string> >::iterator iter = map.begin();
 		iter != map.end();
 		iter++)
 	{

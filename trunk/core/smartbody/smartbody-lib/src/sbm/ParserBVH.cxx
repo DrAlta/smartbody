@@ -112,6 +112,10 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					{
 						std::string trimmedname = str;
 						boost::trim(trimmedname);
+						// if there is a namespace, eliminate it
+						int pos = trimmedname.find_first_of(":");
+						if (pos != std::string::npos)
+							trimmedname = trimmedname.substr(pos + 1, trimmedname.size() - pos + 1);
 						std::stringstream strstr;
 						strstr << trimmedname;
 						SkJoint* root = skeleton.add_joint(SkJoint::TypeQuat);
@@ -286,6 +290,10 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					{
 						std::string trimmedname = str;
 						boost::trim(trimmedname);
+						// if there is a namespace, eliminate it
+						int pos = trimmedname.find_first_of(":");
+						if (pos != std::string::npos)
+							trimmedname = trimmedname.substr(pos + 1, trimmedname.size() - pos + 1);
 						SkJoint* parent = stack.top();
 						SkJoint* joint = skeleton.add_joint(SkJoint::TypeQuat, parent->index());
 						joint->quat()->activate();
@@ -431,7 +439,21 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					// set up the size of the posture based on the SmartBody skeleton
 					//skChannels.compress();
 					postureSize = skChannels.floats();
+
+					for (int m = 0; m < motionChannels.size(); m++)
+					{
+						SkJointName name = motionChannels.name(m);
+						std::string n = name.get_string();
+						int y = 0;
+					}
 					motion.init(motionChannels);
+
+					for (int m = 0; m < motion.channels().size(); m++)
+					{
+						SkJointName name = motion.channels().name(m);
+						std::string n = name.get_string();
+						int y = 0;
+					}
 				}
 				else
 				{
