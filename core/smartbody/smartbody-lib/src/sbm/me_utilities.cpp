@@ -201,6 +201,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			fullin.filename( pathname.string().c_str() ); // copy filename for error message
 			
 			parseSuccessful = motion->load( fullin, scale );
+
 		}
 		else if (ext == ".bvh")
 		{
@@ -209,12 +210,6 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			SkSkeleton skeleton;
 			parseSuccessful = ParserBVH::parse(skeleton, *motion, pathname.string(), filestream, float(scale));
 
-			int numChannels = motion->channels().size();
-			for (int c = 0; c < numChannels; c++)
-			{
-				SkChannel& chan = motion->channels().get(c);
-				int y = 0;
-			}
 		}
 		else if (ext == ".dae")
 		{			

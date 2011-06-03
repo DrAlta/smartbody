@@ -449,7 +449,7 @@ LOG( "CALC: joint: %s\n", joint_label( priority_joint ) );
 	char *joint_str = joint_label( priority_joint );
 	SkJoint* joint_p = skeleton_ref_p->search_joint( joint_str );
 	if( !joint_p ) {
-		fprintf( stderr, "MeCtGaze::calc_real_angle_to_target ERR: joint '%s' NOT FOUND in skeleton\n", joint_str );
+		LOG("MeCtGaze::calc_real_angle_to_target ERR: joint '%s' NOT FOUND in skeleton\n", joint_str );
 		return( false );
 	}
 	joint_p->update_gmat_up();
@@ -656,7 +656,7 @@ void MeCtGaze::update_skeleton_gmat( void )	{
 			joint_p->update_gmat_up();
 		}
 		else	{
-			fprintf( stderr, "MeCtGaze::update_skeleton_gmat ERR: joint 'skullbase' NOT FOUND in skeleton\n" );
+//			LOG("MeCtGaze::update_skeleton_gmat ERR: joint 'skullbase' NOT FOUND in skeleton" );
 		}
 
 		joint_p = skeleton_ref_p->search_joint( "eyeball_left" );
@@ -664,7 +664,7 @@ void MeCtGaze::update_skeleton_gmat( void )	{
 			joint_p->update_gmat_up();
 		}
 		else	{
-			fprintf( stderr, "MeCtGaze::update_skeleton_gmat ERR: joint 'eyeball_left' NOT FOUND in skeleton\n" );
+//			LOG("MeCtGaze::update_skeleton_gmat ERR: joint 'eyeball_left' NOT FOUND in skeleton" );
 		}
 
 		joint_p = skeleton_ref_p->search_joint( "eyeball_right" );
@@ -672,11 +672,11 @@ void MeCtGaze::update_skeleton_gmat( void )	{
 			joint_p->update_gmat_up();
 		}
 		else	{
-			fprintf( stderr, "MeCtGaze::update_skeleton_gmat ERR: joint 'eyeball_right' NOT FOUND in skeleton\n" );
+//			LOG("MeCtGaze::update_skeleton_gmat ERR: joint 'eyeball_right' NOT FOUND in skeleton" );
 		}
 	}
 	else	{
-		fprintf( stderr, "MeCtGaze::update_skeleton_gmat ERR: skeleton NOT FOUND\n" );
+		LOG("MeCtGaze::update_skeleton_gmat ERR: skeleton NOT FOUND" );
 	}
 }
 
@@ -796,13 +796,13 @@ SkJoint* MeCtGaze::reference_joint( void )	{
 			if( skeleton_ref_p )	{
 				ref_joint_p = skeleton_ref_p->search_joint( ref_joint_str );
 				if( ref_joint_p == NULL )	{
-					fprintf( stderr, "MeCtGaze::reference_joint ERR: joint '%s' NOT FOUND in skeleton\n", ref_joint_str );
+					LOG("MeCtGaze::reference_joint ERR: joint '%s' NOT FOUND in skeleton", ref_joint_str );
 					free( ref_joint_str );
 					ref_joint_str = NULL;
 				}
 			}
 			else	{
-				fprintf( stderr, "MeCtGaze::reference_joint ERR: skeleton NOT FOUND\n" );
+				LOG("MeCtGaze::reference_joint ERR: skeleton NOT FOUND" );
 			}
 		}
 	}
@@ -903,13 +903,13 @@ void MeCtGaze::controller_start_evaluate( void )	{
 		int context_index = _toContextCh[ i ];
 		if( context_index < 0 ) {
 			joint_arr[ i ].active = 0;
-			fprintf( stderr, "MeCtGaze:: ERR: '%s' NOT FOUND in skeleton\n", joint_label( i ) );
+			LOG("MeCtGaze:: ERR: '%s' NOT FOUND in skeleton", joint_label( i ) );
 		} 
 		else {
 			SkJoint* joint_p = _context->channels().joint( context_index );
 			if( !joint_p )	{
 				joint_arr[ i ].active = 0;
-				fprintf( stderr, "MeCtGaze:: ERR: joint( %d ): '%s' NOT FOUND in skeleton\n", context_index, joint_label( i ) );
+				LOG("MeCtGaze:: ERR: joint( %d ): '%s' NOT FOUND in skeleton", context_index, joint_label( i ) );
 			} 
 			else {
 				joint_arr[ i ].init( joint_p );
