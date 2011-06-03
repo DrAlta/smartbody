@@ -62,6 +62,8 @@
 #include "vhmsg-tt.h"
 #include <festival.h>
 #include <VHDuration.h>
+#include <sstream>
+#include <string>
 
 
 
@@ -321,6 +323,103 @@ void removeTabsFromString(string &spoken_text)
 	}
 }
 
+std::string CreateMarkTimeStamps(std::string text)
+{
+	std::string tempText = text;
+	std::string markUp = "";
+	int i = 0;
+	while (tempText!= "")
+	{
+		std::string temp = tempText;
+		temp = temp.substr(0, tempText.find_first_of(" "));
+
+		char number[256];
+		sprintf_s(number, "%d", i);
+		markUp = markUp.append("<mark name=\"T");
+		markUp = markUp.append(number);
+		markUp = markUp.append("\" />");
+		markUp = markUp.append(temp + "\n\n");
+		sprintf_s(number, "%d", ++i);
+		markUp = markUp.append("<mark name=\"T");
+		markUp = markUp.append(number);
+		markUp = markUp.append("\" />\n\n");
+		++i;
+		if (tempText.size() > temp.size())
+		{
+			tempText = tempText.substr(temp.size() + 1);
+		}
+		else
+		{
+			tempText = "";
+		}
+	}
+	return markUp;
+}
+
+
+std::string TransformTextWithTimes(std::string txt)
+{
+	//std::string text_string = "";
+
+	//#define _PARSER_DEBUG_MESSAGES_ON
+   std::stringstream txtstream;
+
+   /// Start an XML parser to parse the message we have received
+   XMLPlatformUtils::Initialize();
+   XercesDOMParser *parser = new XercesDOMParser();
+
+   std::string truncatedTxt = txt.substr(txt.find_first_of(">")+1);
+   char * message = (char*)truncatedTxt.c_str();
+
+   std::string actualText = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+#ifdef _PARSER_DEBUG_MESSAGES_ON
+   fprintf(stderr, "Debug: Parsing message \"%s\"\n",message);
+#endif
+   /// Set up a parser for XML message in memory - code sourced from unknown online reference for Xerces XML library
+   MemBufInputSource memIS((const XMLByte*)message, strlen(message), "XMLBuffer");
+   parser->parse(memIS);
+   DOMDocument *doc = parser->getDocument();
+   if ( doc )
+   {
+	   DOMElement *root = doc->getDocumentElement();
+
+	   if ( root ) 
+	   {
+		   /// Get all nodes which have the "mark" tag, from these we can extract the timing tags, and speech text
+		   DOMNodeList *messageList = root->getElementsByTagName(XMLString::transcode("speech"));
+		   if ( messageList && messageList->getLength() > 0)
+		   {
+			   DOMElement *speechElement = dynamic_cast<DOMElement*>(messageList->item(0));
+			   char *speechID = XMLString::transcode(speechElement->getAttribute(XMLString::transcode("id")));
+
+			   actualText = actualText.append("<speech id=\"" + std::string(speechID) + "\" ref=\"" + XMLString::transcode(speechElement->getAttribute(X("ref"))) + "\" type=\"" + XMLString::transcode(speechElement->getAttribute(X("type"))) + "\">\n\n");
+			   XMLString::release(&speechID);
+		   }
+		   else if ( !strcmp( XMLString::transcode( root->getNodeName() ), "speech") ) {
+			   /// Else, the message might contain only the speech tag, in which case the above code will fail, so we need a fallback
+			   DOMElement *speechElement = root;
+			   char *speechID = XMLString::transcode(speechElement->getAttribute(XMLString::transcode("id")));
+			   char *text = XMLString::transcode(speechElement->getTextContent());
+
+			   std::string textContent = CreateMarkTimeStamps(text);
+			   /*if (!speechID)
+			   {
+				   speechID = "sp1";
+			   }*/
+			   //hard coding sp1
+			   speechID = "sp1";
+			   //XMLString::transcode(speechElement->getAttribute(X("type"))) 
+			   actualText = actualText.append("<speech id=\"" + std::string(speechID) + "\" ref=\"" + XMLString::transcode(speechElement->getAttribute(X("ref"))) + "\" type=\"" + "application/ssml+xml" + "\">\n\n");
+			   actualText = actualText.append(textContent);
+			   actualText = actualText.append("</speech>");
+			   //XMLString::release(&speechID);
+		   }
+	   }
+   }
+   return actualText;
+}
+
+
 // generate the sound file for the specified text
 std::string generateReply(const char * utterance,const char * soundFileName)
 {
@@ -328,6 +427,23 @@ std::string generateReply(const char * utterance,const char * soundFileName)
 	EST_Wave wave;
 
 	string spoken_text = storeXMLMetaData( utterance );
+	//printf("done first time\n");
+	if (!spoken_text.compare("") && spoken_text != "")
+	{
+		puts(spoken_text.append("\n").c_str());
+	}
+
+	if (xmlMetaData.tags.size() <= 0)
+	{
+		spoken_text = TransformTextWithTimes(utterance);
+		//printf("done transforming\n");
+		if (!spoken_text.compare("") && spoken_text != "")
+		{
+			puts(spoken_text.append("\n").c_str());
+		}
+		spoken_text = storeXMLMetaData(spoken_text);
+		//printf("done second time\n");
+	}
 
 	removeTabsFromString(spoken_text);
 
