@@ -71,12 +71,14 @@
 #include <sbm/general_param_setting.h>
 
 #include <sbm/me_ct_param_animation.h>
+#include <sbm/me_ct_saccade.h>
 #include "SteeringAgent.h"
 
 //#include <me/me_spline_1d.hpp>
 class MeCtMotionPlayer;
 class MeCtPAnimation;
 class MeCtParamAnimation;
+class MeCtSaccade;
 class SteeringAgent;
 
 class SbmCharacter : public SbmPawn	{
@@ -222,8 +224,9 @@ public:
 	MeCtSchedulerClass*	param_sched_p; // general parameters
 
 	MeCtParamAnimation* param_animation_ct;
-	MeCtMotionPlayer* motionplayer_ct;
-	MeCtReachEngine*      reachEngine;
+	MeCtMotionPlayer*	motionplayer_ct;
+	MeCtSaccade*		saccade_ct;
+	MeCtReachEngine*	reachEngine;
 
 	void schedule_viseme_curve( 
 		const char* viseme, 

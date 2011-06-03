@@ -151,7 +151,6 @@ SbmCharacter::~SbmCharacter( void )	{
 		motion_sched_p->unref();
 	if (gaze_sched_p)
 		gaze_sched_p->unref();
-
 	if (reach_sched_p)
 		reach_sched_p->unref();
 
@@ -179,6 +178,8 @@ SbmCharacter::~SbmCharacter( void )	{
 		param_animation_ct->unref();
 	if (motionplayer_ct)
 		motionplayer_ct->unref();
+	if (saccade_ct)
+		saccade_ct->unref();
 	if (reachEngine)
 		delete reachEngine;
 
@@ -300,7 +301,6 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		this->param_animation_ct = new MeCtParamAnimation(this, world_offset_writer_p);
 		std::string paramAnimationName = std::string(name)+ "'s param animation controller";
 		this->param_animation_ct->name(paramAnimationName.c_str());
-		//this->param_animation_ct->ref();
 	}
 
 	// init reach engine
@@ -315,8 +315,15 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		std::string locomotionname = std::string(name)+ "'s locomotion controller";
 		this->locomotion_ct->name( locomotionname.c_str() );
 		locomotion_ct->get_navigator()->setWordOffsetController(world_offset_writer_p);
-	//	locomotion_ct->ref();
 	}
+	
+	{
+		this->saccade_ct = new MeCtSaccade(this->skeleton_p);
+		std::string saccadeCtName = std::string(name)+ "'s eye saccade controller";
+		this->saccade_ct->name(saccadeCtName.c_str());
+
+	}
+
 	// Clear pointer data no longer used after this point in initialization.
 	this->viseme_motion_map = NULL;
 	this->au_motion_map     = NULL;
@@ -358,7 +365,8 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	ct_tree_p->add_controller( reach_sched_p );	
 	ct_tree_p->add_controller( grab_sched_p );
 	
-	ct_tree_p->add_controller( gaze_sched_p );		
+	ct_tree_p->add_controller( gaze_sched_p );	
+	ct_tree_p->add_controller( saccade_ct );
 	ct_tree_p->add_controller( constraint_sched_p );	
 
 	if( eyelid_reg_ct_p )
