@@ -44,6 +44,7 @@ class MeCtSaccade : public MeController
 		SkSkeleton* 	_skeleton;
 		int				_idL;
 		int				_idR;
+		int				_idNeck;
 		bool			_initialized;
 		bool			_valid;
 

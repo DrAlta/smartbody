@@ -129,6 +129,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	steeringAgent = NULL;
 	_numSteeringGoal = 0;
 	_reachTarget = false;
+	_lastReachStatus = true;
 
 	use_viseme_curve = false;
 	viseme_time_offset = 0.0;
