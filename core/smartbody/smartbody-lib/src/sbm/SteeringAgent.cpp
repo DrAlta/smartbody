@@ -37,6 +37,7 @@ void SteeringAgent::evaluate()
 	if (!pprAgent)
 		return;
 
+	character->_lastReachStatus = character->_reachTarget;
 	// get current world offset position
 	float x, y, z;
 	float yaw, pitch, roll;
@@ -409,6 +410,17 @@ void SteeringAgent::evaluate()
 	character->_numSteeringGoal = numGoals;
 
 	//printf("Reach target = %d, num of goals = %d\n",character->_reachTarget,character->_numSteeringGoal);
+	//---
+	if (!character->_lastReachStatus && character->_reachTarget)
+	{
+		std::string eventType = "locomotion";		
+		MotionEvent motionEvent;
+		motionEvent.setType(eventType);			
+		std::string param = std::string(character->name) + " success";
+		motionEvent.setParameters(param);
+		EventManager* manager = EventManager::getEventManager();		
+		manager->handleEvent(&motionEvent, mcu.time);
+	}
 }
 
 void SteeringAgent::setAgent(SteerLib::AgentInterface* a)

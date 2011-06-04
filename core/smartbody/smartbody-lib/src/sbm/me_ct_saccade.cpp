@@ -30,6 +30,8 @@ using namespace gwiz;
 const char* MeCtSaccade::CONTROLLER_TYPE = "Saccade";
 const char* eyeballL = "eyeball_left";
 const char* eyeballR = "eyeball_right";
+const char* neck = "spine5";
+#define GAZE_SACCADE 1
 
 MeCtSaccade::MeCtSaccade(SkSkeleton* skel) : MeController()
 {
@@ -40,6 +42,7 @@ MeCtSaccade::MeCtSaccade(SkSkeleton* skel) : MeController()
 	_initialized = false;
 	_idL = -1;
 	_idR = -1;
+	_idNeck = -1;
 	_prevTime = 0.0;
 
 	_dur = 0.0f;
@@ -126,10 +129,21 @@ void MeCtSaccade::processing(double t, MeFrameData& frame)
 						frame.buffer()[_idR + 2],
 						frame.buffer()[_idR + 3] );
 
+	SrQuat QNeck = SrQuat(	frame.buffer()[_idNeck + 0],
+							frame.buffer()[_idNeck + 1],
+							frame.buffer()[_idNeck + 2],
+							frame.buffer()[_idNeck + 3] );
+
+	//--- process
 	SrQuat temp(_lastFixedRotation);
 	SrQuat actualRot = temp * rotation;
 	SrQuat outQL = QL * actualRot;
 	SrQuat outQR = outQL;
+
+	SrQuat temp1 = SrQuat(actualRot);
+	SrQuat unit;
+	SrQuat neckRotate = slerp(temp1, unit, 0.93f);
+	SrQuat outQNeck = QNeck * neckRotate;
 
 	//---
 	frame.buffer()[_idL + 0] = outQL.w;
@@ -141,6 +155,13 @@ void MeCtSaccade::processing(double t, MeFrameData& frame)
 	frame.buffer()[_idR + 1] = outQR.x;
 	frame.buffer()[_idR + 2] = outQR.y;
 	frame.buffer()[_idR + 3] = outQR.z;
+
+#if GAZE_SACCADE
+	frame.buffer()[_idNeck + 0] = outQNeck.w;
+	frame.buffer()[_idNeck + 1] = outQNeck.x;
+	frame.buffer()[_idNeck + 2] = outQNeck.y;
+	frame.buffer()[_idNeck + 3] = outQNeck.z;
+#endif
 }
 
 float MeCtSaccade::floatRandom(float min, float max)
@@ -271,7 +292,9 @@ void MeCtSaccade::init(MeFrameData& frame)
 		_idL = frame.toBufferIndex(idL);
 		int idR = _context->channels().search(SkJointName(eyeballR), SkChannel::Quat);
 		_idR = frame.toBufferIndex(idR);
-		if (_idL < 0 || _idR < 0)
+		int idNeck = _context->channels().search(SkJointName(neck), SkChannel::Quat);
+		_idNeck = frame.toBufferIndex(idNeck);
+		if (_idL < 0 || _idR < 0 || _idNeck < 0)
 			LOG("MeCtSaccade::initBufferIndex ERR: channel id not correct!");
 
 		_initialized = true;

@@ -89,6 +89,7 @@ public:
 	SteeringAgent* steeringAgent;
 	int	_numSteeringGoal;
 	bool _reachTarget;
+	bool _lastReachStatus;
 
 public:
 	// Static Constants
