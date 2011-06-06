@@ -42,11 +42,40 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 {
 	MeCtSaccade* saccade_ct = request->actor->saccade_ct;
 	saccade_ct->setValid(true);
+	saccade_ct->setUseModel(true);	
 	const XMLCh* id = elem->getAttribute(ATTR_ID);
 	std::string localId;
 	if (id)
 		localId = XMLString::transcode(id);
 	
+	float duration = 0.03f;
+	float magnitude = 3.0f;
+	float direction = 45.0f;
+	const XMLCh* dur = elem->getAttribute(L"duration");
+	if (XMLString::compareIString(dur, L"") != 0)
+	{
+		saccade_ct->setUseModel(false);
+		duration = (float)atof(XMLString::transcode(dur));
+	}
+	const XMLCh* mag = elem->getAttribute(L"magnitude");
+	if (XMLString::compareIString(mag, L"") != 0)
+	{
+		saccade_ct->setUseModel(false);
+		magnitude = (float)atof(XMLString::transcode(mag));
+	}
+	const XMLCh* dir = elem->getAttribute(L"direction");
+	if (XMLString::compareIString(dir, L"") != 0)
+	{
+		saccade_ct->setUseModel(false);
+		direction = (float)atof(XMLString::transcode(dir));
+	}
+	if (!saccade_ct->getUseModel())
+	{
+		saccade_ct->spawnOnce(direction, magnitude, duration);
+		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));
+	}
+
+	//-----
 	const XMLCh* bMode = elem->getAttribute(L"mode");
 	if (XMLString::compareIString(bMode, L"") != 0)
 	{
@@ -55,6 +84,8 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 			saccade_ct->setBehaviorMode(MeCtSaccade::Talking);
 		else if (bModeString == "listen")
 			saccade_ct->setBehaviorMode(MeCtSaccade::Listening);
+		else if (bModeString == "think")
+			saccade_ct->setBehaviorMode(MeCtSaccade::Thinking);
 		else
 		{
 			LOG("BML::parse_bml_saccade ERR: this mode not recognized");
@@ -71,6 +102,8 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 			saccade_ct->setTalkingAngleLimit(angle);
 		if (mode == MeCtSaccade::Listening)
 			saccade_ct->setListeningAngleLimit(angle);
+		if (mode == MeCtSaccade::Thinking)
+			saccade_ct->setThinkingAngleLimit(angle);
 	}
 
 	const XMLCh* finishFlag = elem->getAttribute(L"finish");
@@ -85,5 +118,6 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 			return BehaviorRequestPtr();
 		}
 	}
+
 	return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));
 }

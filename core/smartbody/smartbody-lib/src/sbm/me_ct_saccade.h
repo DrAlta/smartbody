@@ -34,7 +34,7 @@ class MeCtSaccade : public MeController
 		static const char* CONTROLLER_TYPE;
 		
 		enum IntervalMode {Mutual, Away};
-		enum BehaviorMode {Talking, Listening};
+		enum BehaviorMode {Talking, Listening, Thinking};
 
 	private:
 		double			_prevTime;
@@ -44,9 +44,9 @@ class MeCtSaccade : public MeController
 		SkSkeleton* 	_skeleton;
 		int				_idL;
 		int				_idR;
-		int				_idNeck;
 		bool			_initialized;
 		bool			_valid;
+		bool			_useModel;
 
 		// saccade information
 		float			_time;
@@ -70,12 +70,23 @@ class MeCtSaccade : public MeController
 		float			_percentBin225;
 		float			_percentBin270;
 		float			_percentBin315;
+		float			_thinkingPercentBin0;
+		float			_thinkingPercentBin45;
+		float			_thinkingPercentBin90;
+		float			_thinkingPercentBin135;
+		float			_thinkingPercentBin180;
+		float			_thinkingPercentBin225;
+		float			_thinkingPercentBin270;
+		float			_thinkingPercentBin315;
 		// magnitude stat
 		float			_highestFrequency;
 		float			_talkingLimit;
 		float			_listeningLimit;
+		float			_thinkingLimit;
 		// interval stat
-		float			_percentMutual;
+		float			_listeningPercentMutual;
+		float			_talkingPercentMutual;
+		float			_thinkingPercentMutual;
 		float			_talkingMutualMean;
 		float			_talkingMutualVariant;
 		float			_talkingAwayMean;
@@ -84,6 +95,9 @@ class MeCtSaccade : public MeController
 		float			_listeningMutualVariant;
 		float			_listeningAwayMean;
 		float			_listeningAwayVariant;
+		float			_thinkingMean;
+		float			_thinkingVariant;
+		float			_minInterval;
 		// duration stat
 		float			_intercept;
 		float			_slope;
@@ -99,8 +113,13 @@ class MeCtSaccade : public MeController
 		float getTalkingAngleLimit()		{return _talkingLimit;}
 		void setListeningAngleLimit(float v){_listeningLimit = v;}
 		float getListeningAngleLimit()		{return _listeningLimit;}
+		void setThinkingAngleLimit(float v)	{_thinkingLimit = v;}
+		float getThinkingAngleLimit()		{return _thinkingLimit;}
 		void setBehaviorMode(BehaviorMode m){_behaviorMode = m;}
 		BehaviorMode getBehaviorMode()		{return _behaviorMode;}
+		bool getUseModel()					{return _useModel;}
+		void setUseModel(bool v)			{_useModel = v;}
+		void spawnOnce(float dir, float amplitude, float dur);
 
 	private:
 		void spawning(double t);
