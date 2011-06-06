@@ -30,19 +30,17 @@ using namespace gwiz;
 const char* MeCtSaccade::CONTROLLER_TYPE = "Saccade";
 const char* eyeballL = "eyeball_left";
 const char* eyeballR = "eyeball_right";
-const char* neck = "spine5";
-#define GAZE_SACCADE 1
 
 MeCtSaccade::MeCtSaccade(SkSkeleton* skel) : MeController()
 {
 	_skeleton = skel;
 	skel->ref();
 
+	_useModel = true;
 	_valid = false;
 	_initialized = false;
 	_idL = -1;
 	_idR = -1;
-	_idNeck = -1;
 	_prevTime = 0.0;
 
 	_dur = 0.0f;
@@ -52,8 +50,10 @@ MeCtSaccade::MeCtSaccade(SkSkeleton* skel) : MeController()
 	_behaviorMode = Listening;//											expose
 
 
-	// saccade statistics
-	_percentBin0 = 15.54f;	// unit: percentage
+	//--- saccade statistics
+	// direction stat
+	// percentage for listening and talking
+	_percentBin0 = 15.54f;				// unit: percentage
 	_percentBin45 = 6.46f;
 	_percentBin90 = 17.69f;
 	_percentBin135 = 7.44f;
@@ -61,12 +61,31 @@ MeCtSaccade::MeCtSaccade(SkSkeleton* skel) : MeController()
 	_percentBin225 = 7.89f;
 	_percentBin270 = 20.38f;
 	_percentBin315 = 7.79f;
+	// percentage for thinking
+	_thinkingPercentBin0 = 5.46f;		// unit: percentage
+	_thinkingPercentBin45 = 10.54f;
+	_thinkingPercentBin90 = 24.69f;
+	_thinkingPercentBin135 = 6.44f;
+	_thinkingPercentBin180 = 6.89f;
+	_thinkingPercentBin225 = 12.80f;
+	_thinkingPercentBin270 = 26.38f;
+	_thinkingPercentBin315 = 6.79f;
+
+	// magnitude stat
 	_highestFrequency = 15.0f;	// unit: percentage
 //	_talkingLimit =	27.5f;		// unit: degree
 //	_listeningLimit = 22.7f;
-	_talkingLimit =	8.0;		// unit: degree							expose
-	_listeningLimit = 7.0f;		//										expose
-	_percentMutual = 60.0f;
+	_talkingLimit =	5.0f;			// unit: degree							expose
+	_listeningLimit = 4.0f;			//										expose
+	_thinkingLimit = _talkingLimit;	// make up data
+
+	// inter-saccadic interval stat
+	_listeningPercentMutual = 75.0f;		// mutual gaze or gaze away
+	_talkingPercentMutual = 41.0f;
+	_thinkingPercentMutual = _talkingPercentMutual;
+	_minInterval = 0.001f;
+	
+	// duration stat
 	_intercept = 0.025f;		// unit: sec
 	_slope = 0.0024f;		// unit: sec/degree
 
@@ -78,6 +97,21 @@ MeCtSaccade::~MeCtSaccade()
 	_skeleton->unref();
 }
 
+void MeCtSaccade::spawnOnce(float dir, float amplitude, float dur)
+{
+	_direction = dir;
+	_magnitude = amplitude;
+	_dur = dur;
+
+	SrVec vec1 = SrVec(0, 0, 1);
+	float direction = (_direction - 90.0f) * (float)M_PI / 180.0f;		// 90.0f here is for adjustment
+	SrVec vec2 = SrVec(sin(direction), cos(direction), 0);
+	_axis = cross(vec1, vec2);
+	_lastFixedRotation = _fixedRotation;
+	_fixedRotation = SrQuat(_axis, _magnitude * (float)M_PI / 180.0f);
+	_time = (float)mcuCBHandle::singleton().time;
+}
+
 void MeCtSaccade::spawning(double t)
 {
 	float time = float(t);
@@ -86,18 +120,25 @@ void MeCtSaccade::spawning(double t)
 		_rotation = 0.0f;
 		_direction = directionRandom();			// degree
 		_magnitude = magnitudeRandom();			// degree
-		_dur = duration(_magnitude);			// sec
-		float interval = intervalRandom();		// sec
-		_time = time + interval;
 
 		SrVec vec1 = SrVec(0, 0, 1);
-		float direction = _direction * (float)M_PI / 180.0f;
+		float direction = (_direction - 90.0f) * (float)M_PI / 180.0f;		// 90.0f here is for adjustment
 		SrVec vec2 = SrVec(sin(direction), cos(direction), 0);
 		_axis = cross(vec1, vec2);
 		_lastFixedRotation = _fixedRotation;
 		_fixedRotation = SrQuat(_axis, _magnitude * (float)M_PI / 180.0f);
+
+		SrQuat actualRotation = _fixedRotation * _lastFixedRotation.inverse();
+		float angle = actualRotation.angle() * 180.0f / (float)M_PI;
+	
+
+	//	_dur = duration(_magnitude);			// sec
+		_dur = duration(angle);
+		float interval = intervalRandom();		// sec
+		_time = time + interval;
+
 #if 0
-		LOG("--Next Saccade happens at %f, magnitude=%f, duration=%f, interval=%f, direction=%f", _time, _magnitude, _dur, interval, direction *  180.0f / (float)M_PI);
+		LOG("--Next Saccade happens at %f, turning angle=%f, duration=%f, interval=%f, direction=%f", _time, actualRotation.angle(), _dur, interval, _direction);
 #endif
 	}
 	if (_time == -1.0f)
@@ -112,11 +153,15 @@ void MeCtSaccade::processing(double t, MeFrameData& frame)
 	if (_time == -1.0f)
 		return;
 
+	if ((t > (_time + _dur)) && !_useModel)
+		_lastFixedRotation = SrQuat();
 	SrQuat rotation = _lastFixedRotation;
 	if (t >= _time && t <= (_time + _dur))
 	{
 		float r = (time - _time) / _dur;
-		rotation = slerp(_lastFixedRotation, _fixedRotation, 1 - r);
+	//	float y = 1 - r;
+		float y = 1 - sqrt(1 - (r - 1) * (r - 1));
+		rotation = slerp(_lastFixedRotation, _fixedRotation, y);
 	}
 	//---
 	SrQuat QL = SrQuat( frame.buffer()[_idL + 0],
@@ -129,21 +174,11 @@ void MeCtSaccade::processing(double t, MeFrameData& frame)
 						frame.buffer()[_idR + 2],
 						frame.buffer()[_idR + 3] );
 
-	SrQuat QNeck = SrQuat(	frame.buffer()[_idNeck + 0],
-							frame.buffer()[_idNeck + 1],
-							frame.buffer()[_idNeck + 2],
-							frame.buffer()[_idNeck + 3] );
-
 	//--- process
 	SrQuat temp(_lastFixedRotation);
 	SrQuat actualRot = temp * rotation;
 	SrQuat outQL = QL * actualRot;
 	SrQuat outQR = outQL;
-
-	SrQuat temp1 = SrQuat(actualRot);
-	SrQuat unit;
-	SrQuat neckRotate = slerp(temp1, unit, 0.93f);
-	SrQuat outQNeck = QNeck * neckRotate;
 
 	//---
 	frame.buffer()[_idL + 0] = outQL.w;
@@ -155,13 +190,6 @@ void MeCtSaccade::processing(double t, MeFrameData& frame)
 	frame.buffer()[_idR + 1] = outQR.x;
 	frame.buffer()[_idR + 2] = outQR.y;
 	frame.buffer()[_idR + 3] = outQR.z;
-
-#if GAZE_SACCADE
-	frame.buffer()[_idNeck + 0] = outQNeck.w;
-	frame.buffer()[_idNeck + 1] = outQNeck.x;
-	frame.buffer()[_idNeck + 2] = outQNeck.y;
-	frame.buffer()[_idNeck + 3] = outQNeck.z;
-#endif
 }
 
 float MeCtSaccade::floatRandom(float min, float max)
@@ -197,34 +225,49 @@ float MeCtSaccade::gaussianRandom(float mean, float variant)
 
 float MeCtSaccade::directionRandom()
 {
-	float bound0 = _percentBin0;
-	float bound45 = _percentBin0 + _percentBin45;
-	float bound90 = bound45 + _percentBin90;
-	float bound135 = bound90 + _percentBin135;
-	float bound180 = bound135 + _percentBin180;
-	float bound225 = bound180 + _percentBin225;
-	float bound270 = bound225 + _percentBin270;
-	float bound315 = bound270 + _percentBin315;
+	float bound0, bound45, bound90, bound135, bound180, bound225, bound270, bound315;
+	if (_behaviorMode == Talking || _behaviorMode == Listening)
+	{
+		bound0 = _percentBin0;
+		bound45 = bound0 + _percentBin45;
+		bound90 = bound45 + _percentBin90;
+		bound135 = bound90 + _percentBin135;
+		bound180 = bound135 + _percentBin180;
+		bound225 = bound180 + _percentBin225;
+		bound270 = bound225 + _percentBin270;
+		bound315 = bound270 + _percentBin315;
+	}
+	if (_behaviorMode == Thinking)
+	{
+		bound0 = _thinkingPercentBin0;
+		bound45 = bound0 + _thinkingPercentBin45;
+		bound90 = bound45 + _thinkingPercentBin90;
+		bound135 = bound90 + _thinkingPercentBin135;
+		bound180 = bound135 + _thinkingPercentBin180;
+		bound225 = bound180 + _thinkingPercentBin225;
+		bound270 = bound225 + _thinkingPercentBin270;
+		bound315 = bound270 + _thinkingPercentBin315;	
+	}
 
+	float dir = 0.0f;
 	float binIndex = floatRandom(0.0f, 100.0f);
 	if (binIndex >= 0.0f && binIndex <= bound0)
-		return 0.0f;
+		dir = 0.0f;
 	if (binIndex >= bound0 && binIndex <= bound45)
-		return 45.0f;
+		dir = 45.0f;
 	if (binIndex >= bound45 && binIndex <= bound90)
-		return 90.0f;
+		dir = 90.0f;
 	if (binIndex >= bound90 && binIndex <= bound135)
-		return 135.0f;
+		dir = 135.0f;
 	if (binIndex >= bound135 && binIndex <= bound180)
-		return 180.0f;
+		dir = 180.0f;
 	if (binIndex >= bound180 && binIndex <= bound225)
-		return 225.0f;
+		dir = 225.0f;
 	if (binIndex >= bound225 && binIndex <= bound270)
-		return 270.0f;
+		dir = 270.0f;
 	if (binIndex >= bound270 && binIndex <= bound315)
-		return 315.0f;
-	
-	return -1.0f;
+		dir = 315.0f;
+	return dir;
 }
 
 float MeCtSaccade::magnitudeRandom()
@@ -236,14 +279,15 @@ float MeCtSaccade::magnitudeRandom()
 		limit = _talkingLimit;
 	if (_behaviorMode == Listening)
 		limit = _listeningLimit;
-
+	if (_behaviorMode == Thinking)
+		limit = _thinkingLimit;
 
 	// below is adhoc
 	// direction 0 and 180 is moving up and down, it should have a limit
-	if (_direction == 0.0f || _direction == 180.0f)		
-		limit *= 0.333f;
-	if (_direction == 45.0f || _direction == 315.0f || _direction == 225.0f || _direction == 135.0f)
-		limit *= 0.5f;
+	if (_direction == 90.0f || _direction == 270.0f)		
+		limit *= 0.3f;
+	if (_direction == 45.0f || _direction == 135.0f || _direction == 225.0f || _direction == 315.0f)
+		limit *= 0.35f;
 
 	if (a > limit)
 		a = limit;
@@ -253,13 +297,20 @@ float MeCtSaccade::magnitudeRandom()
 float MeCtSaccade::intervalRandom()
 {
 	float f = floatRandom(0.0f, 100.0f);
-	if (f >= 0.0f && f <= _percentMutual)
+	float mutualPercent = 0.0f;
+	if (_behaviorMode == Listening)
+		mutualPercent = _listeningPercentMutual;
+	if (_behaviorMode == Talking)
+		mutualPercent = _talkingPercentMutual;
+	if (_behaviorMode == Thinking)
+		mutualPercent = _thinkingPercentMutual;
+
+	if (f >= 0.0f && f <= mutualPercent)
 		_intervalMode = Mutual;
 	else
 		_intervalMode = Away;
-	
 	float interval = -1.0f;
-	while (interval < 0)
+	while (interval < _minInterval)
 	{
 		if (_intervalMode == Mutual && _behaviorMode == Talking)
 			interval = gaussianRandom(_talkingMutualMean, _talkingMutualVariant);
@@ -269,6 +320,8 @@ float MeCtSaccade::intervalRandom()
 			interval = gaussianRandom(_listeningMutualMean, _listeningMutualVariant);
 		if (_intervalMode == Away && _behaviorMode == Listening)
 			interval = gaussianRandom(_listeningAwayMean, _listeningAwayVariant);
+		if (_behaviorMode == Thinking)
+			interval = gaussianRandom(_thinkingMean, _thinkingVariant);
 	}
 	return interval;
 }
@@ -292,9 +345,7 @@ void MeCtSaccade::init(MeFrameData& frame)
 		_idL = frame.toBufferIndex(idL);
 		int idR = _context->channels().search(SkJointName(eyeballR), SkChannel::Quat);
 		_idR = frame.toBufferIndex(idR);
-		int idNeck = _context->channels().search(SkJointName(neck), SkChannel::Quat);
-		_idNeck = frame.toBufferIndex(idNeck);
-		if (_idL < 0 || _idR < 0 || _idNeck < 0)
+		if (_idL < 0 || _idR < 0)
 			LOG("MeCtSaccade::initBufferIndex ERR: channel id not correct!");
 
 		_initialized = true;
@@ -309,6 +360,9 @@ void MeCtSaccade::init(MeFrameData& frame)
 	_listeningMutualVariant = 47.1f * (float)_dt;
 	_listeningAwayMean = 13.0f * (float)_dt;
 	_listeningAwayVariant = 7.1f * (float)_dt;
+	// below data is made up
+	_thinkingMean = 180.0f * (float)_dt;
+	_thinkingVariant = 47.0f * (float)_dt;
 }
 
 bool MeCtSaccade::controller_evaluate(double t, MeFrameData& frame)
@@ -324,7 +378,8 @@ bool MeCtSaccade::controller_evaluate(double t, MeFrameData& frame)
 	init(frame);
 	if (_valid)
 	{
-		spawning(t);
+		if (_useModel)
+			spawning(t);
 		processing(t, frame);
 	}
 	return true;
