@@ -106,10 +106,11 @@ public:
 	void updateToColObject();
 
 	bool is_initialized();
-	bool initGeomObj(const char* geomType, float size);
+	bool initGeomObj(const char* geomType, float size, const char* meshName = NULL);
 	void initPhysicsObj();
 	void removePhysicsObj();
 	void setPhysicsSim(bool enable);
+	void setCollision(bool enable);
 	bool hasPhysicsSim();
 
 	virtual int prune_controller_tree();  // removes unused or overwritten controllers

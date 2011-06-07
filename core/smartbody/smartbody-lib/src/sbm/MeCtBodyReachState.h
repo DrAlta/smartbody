@@ -6,13 +6,16 @@ class ReachTarget
 public:
 	SRT      targetState;
 	SbmPawn* targetPawn;
-	bool     useTargetPawn;
+	SkJoint* targetJoint;
+	bool     useTargetPawn, useTargetJoint;
 public:
 	ReachTarget();
 	~ReachTarget() {}
 	bool targetIsPawn();
+	bool targetIsJoint();
 	void setTargetState(SRT& ts);
 	void setTargetPawn(SbmPawn* tpawn);
+	void setTargetJoint(SkJoint* tjoint);
 	SRT getTargetState(); // the return state is based on target's state
 	SRT getGrabTargetState(SRT& naturalState); 
 	SbmPawn* getTargetPawn();

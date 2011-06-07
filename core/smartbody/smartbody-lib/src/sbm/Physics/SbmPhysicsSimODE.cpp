@@ -9,12 +9,19 @@ SbmPhysicsObjODE::SbmPhysicsObjODE()
 {
 	bodyID = 0;
 	geomID = 0;
+	meshdataID = 0;
 }
 
 SbmPhysicsObjODE::~SbmPhysicsObjODE()
 {
-	dBodyDestroy(bodyID);
+// 	SbmPhysicsSimODE* odeSim = SbmPhysicsSimODE::getODESim();
+// 	if (odeSim)
+// 	{
+// 		dSpaceRemove(odeSim->getSpaceID(),geomID);	
+// 	}
 	dGeomDestroy(geomID);
+	dGeomTriMeshDataDestroy(meshdataID);	
+	dBodyDestroy(bodyID);	
 }
 
 void SbmPhysicsObjODE::setPhysicsSim( bool bSim )
@@ -127,6 +134,23 @@ void SbmPhysicsObjODE::createODEGeometry( SbmGeomObject* obj, float mass )
 		//dMassSetCapsuleTotal(&odeMass,(dReal)mass,3,(dReal)cap->radius,(dReal)cap->extent);
 		dMassSetCapsule(&odeMass,(dReal)mass,3,(dReal)cap->radius,(dReal)cap->extent);
 	}
+	else if (dynamic_cast<SbmGeomTriMesh*>(obj))
+	{
+		SbmGeomTriMesh* tri = dynamic_cast<SbmGeomTriMesh*>(obj);
+		SrModel* model = tri->geoMesh;
+		//model->invert_faces();
+		SrBox bbox;		
+		model->get_bounding_box(bbox);		
+		meshdataID = dGeomTriMeshDataCreate();
+		//dGeomTriMeshDataBuildSimple(meshdataID,(const dReal*)(&model->V[0]),model->V.size(),(const dTriIndex*)(&model->F[0]),model->F.size()*3);
+		dGeomTriMeshDataBuildSingle(meshdataID,(const dReal*)(&model->V[0]),3*sizeof(float),model->V.size(),(const dTriIndex*)(&model->F[0]),model->F.size()*3,3*sizeof(int));
+		geomID = dCreateTriMesh(odeSim->getSpaceID(),meshdataID,NULL,NULL,NULL);		
+		dMassSetTrimesh(&odeMass,(dReal)mass,geomID);		
+		if (dMassCheck(&odeMass) != 1) // set the default mass to its bounding box
+			dMassSetBox(&odeMass,(dReal)mass,bbox.size().x*0.5f,bbox.size().y*0.5f,bbox.size().z*0.5f);		
+		//dGeomSetPosition(geomID,-odeMass.c[0], -odeMass.c[1], -odeMass.c[2]);
+		dMassTranslate( &odeMass, -odeMass.c[0], -odeMass.c[1], -odeMass.c[2]);		
+	}
 	else // no geoemtry
 	{
 		//dMassSetZero(&odeMass);			
@@ -148,7 +172,7 @@ SbmPhysicsSimODE::~SbmPhysicsSimODE(void)
 
 void SbmPhysicsSimODE::nearCallBack(void *data, dGeomID o1, dGeomID o2)
 {
-	const int N = 10;
+	const int N = 40;
 	SbmPhysicsSimODE* phyODE = static_cast<SbmPhysicsSimODE*>(data);
 	if (!phyODE)
 		return;
@@ -165,8 +189,8 @@ void SbmPhysicsSimODE::nearCallBack(void *data, dGeomID o1, dGeomID o2)
 	int n =  dCollide(o1,o2,N,&contact[0].geom,sizeof(dContact));
 	for (int i = 0; i < n; i++) {
 		contact[i].surface.mode = dContactBounce | dContactApprox1;		
-		contact[i].surface.bounce     = 0.2f; // (0.0~1.0) restitution parameter
-		contact[i].surface.mu = 0.005f;//1000.f;
+		contact[i].surface.bounce     = 0.1f; // (0.0~1.0) restitution parameter
+		contact[i].surface.mu = 500.f;//1000.f;
 		//contact[i].surface.mu2 = 3000.f;
 		//contact[i].surface.soft_cfm = 0.01f;
 		//contact[i].surface.soft_erp = 0.0001f;
@@ -186,7 +210,8 @@ void SbmPhysicsSimODE::initSimulation()
 	dWorldSetLinearDamping(worldID,0.01f);
 	dWorldSetAngularDamping(worldID,0.01f);
 
-	spaceID = dHashSpaceCreate(0);
+	//spaceID = dHashSpaceCreate(0);
+	spaceID = dSimpleSpaceCreate(0);
 
 	groundID = dCreatePlane(spaceID,0,1,0,1.0f); // create a plane at y = 0
 
@@ -197,9 +222,10 @@ void SbmPhysicsSimODE::initSimulation()
 
 void SbmPhysicsSimODE::updateSimulation( float timeStep )
 {	
-	dSpaceCollide(spaceID,this,SbmPhysicsSimODE::nearCallBack);
-	//dWorldStep(worldID,timeStep);
-	dWorldQuickStep(worldID,timeStep);	
+	dSpaceCollide(spaceID,this,SbmPhysicsSimODE::nearCallBack);		
+	dWorldStep(worldID,timeStep);
+	//dWorldStepFast1(worldID,timeStep,10);
+	//dWorldQuickStep(worldID,timeStep);	
 	dJointGroupEmpty(contactGroupID);
 
 	std::for_each(physicsObjList.begin(),physicsObjList.end(),std::mem_fun(&SbmPhysicsObj::updateColObj));
@@ -221,6 +247,7 @@ void SbmPhysicsSimODE::removePhysicsObj( SbmPhysicsObj* obj )
 	SbmPhysicsObjList::iterator li = std::find(physicsObjList.begin(),physicsObjList.end(),obj);
 	if (li != physicsObjList.end())
 		physicsObjList.erase(li);
+
 }
 
 void SbmPhysicsSimODE::setGravity( float gravity )

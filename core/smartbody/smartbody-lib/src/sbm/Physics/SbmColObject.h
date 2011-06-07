@@ -2,6 +2,7 @@
 #include <SR/sr_mat.h>
 #include <SR/sr_quat.h>
 #include <SR/sr_vec.h>
+#include <SR/sr_model.h>
 #include <vector>
 
 class SbmTransform
@@ -89,6 +90,20 @@ public:
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f);	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f);
 	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot);
+};
+
+// this is a adapting interface to integrate SrModel tri-mesh into physical simulation framework
+class SbmGeomTriMesh : public SbmGeomObject
+{
+public:
+	SrModel* geoMesh;
+public:
+	SbmGeomTriMesh(SrModel* model) { geoMesh = model;  }
+	virtual ~SbmGeomTriMesh() { }
+	// no operations for now
+	virtual bool  isInside(const SrVec& gPos, float offset = 0.f) { return false; }
+	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f) { return false; }
+	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot) { return false;}
 };
 
 typedef std::vector<SbmGeomObject*> VecOfSbmColObj;

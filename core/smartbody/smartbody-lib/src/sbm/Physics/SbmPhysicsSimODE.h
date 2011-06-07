@@ -9,6 +9,7 @@ protected:
 	dBodyID bodyID;
 	dGeomID geomID;
 	dMass   odeMass;
+	dTriMeshDataID meshdataID; // optional mesh data ID
 public:
 	SbmPhysicsObjODE();
 	~SbmPhysicsObjODE();
@@ -17,7 +18,7 @@ public:
 	virtual void updateSimObj();
 	virtual void setPhysicsSim(bool bSim);	
 	virtual void setCollisionSim(bool bCol);
-	virtual void initGeometry(SbmGeomObject* obj, float mass);
+	virtual void initGeometry(SbmGeomObject* obj, float density);
 	virtual unsigned long  getID() { return (unsigned long)bodyID; }	
 protected:
 	void createODEGeometry(SbmGeomObject* obj, float mass);

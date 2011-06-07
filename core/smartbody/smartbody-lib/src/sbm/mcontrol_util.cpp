@@ -669,6 +669,7 @@ void mcuCBHandle::update( void )	{
 
 			char_p->forward_visemes( time );	
 			char_p->scene_p->update();	
+			char_p->updateJointPhyObjs();
 			//char_p->dMesh_p->update();
 
 			if ( net_bone_updates && char_p->skeleton_p && char_p->bonebusCharacter ) {

@@ -67,9 +67,13 @@ void EffectorState::updateAttachedPawn()
 SRT ReachTarget::getTargetState()
 {
 	SRT st = targetState;
-	if (useTargetPawn && targetPawn)
+	if (targetIsPawn())
 	{
 		st.gmat(targetPawn->get_world_offset_joint()->gmat());
+	}
+	else if (targetIsJoint())
+	{
+		st.gmat(targetJoint->gmat());
 	}
 	return st;	
 }
@@ -77,6 +81,11 @@ SRT ReachTarget::getTargetState()
 bool ReachTarget::targetIsPawn()
 {
 	return (useTargetPawn && targetPawn);
+}
+
+bool ReachTarget::targetIsJoint()
+{
+	return (useTargetJoint && targetJoint);
 }
 
 SbmPawn* ReachTarget::getTargetPawn()
@@ -111,15 +120,26 @@ void ReachTarget::setTargetState( SRT& ts )
 {
 	targetState = ts;
 	targetPawn = NULL;
+	targetJoint = NULL;
 	useTargetPawn = false;
+	useTargetJoint = false;
 }
 
 void ReachTarget::setTargetPawn( SbmPawn* tpawn )
 {
 	targetPawn = tpawn;
 	useTargetPawn = true;
+	useTargetJoint = false;
+	targetJoint = NULL;
 }
 
+void ReachTarget::setTargetJoint( SkJoint* tjoint )
+{
+	targetJoint = tjoint;
+	useTargetJoint = true;
+	useTargetPawn = false;
+	targetPawn = NULL;
+}
 /************************************************************************/
 /* Reach Hand Action                                                    */
 /************************************************************************/
@@ -435,17 +455,23 @@ std::string ReachStateIdle::nextState( ReachStateData* rd )
 	if (rd->startReach)
 	{		
 		rd->curRefTime = 0.f;
-		// test the distance to the target
-		SrVec targetXZ = rd->reachTarget.getTargetState().tran; targetXZ.y = 0.f;
-		float dist = rd->XZDistanceToTarget();
+		// test the distance to the target		
+		float dist = rd->XZDistanceToTarget();		
 		if (dist > rd->characterHeight*0.5f) 
 		{	
 			// if the target is far away, move the character first
 			//printf("idle to walk\n");
 			std::string cmd;
 			std::string charName = rd->charName;			
+			SrVec targetXZ = rd->reachTarget.getTargetState().tran; targetXZ.y = 0.f;
+			SrVec curXZ = rd->effectorState.curState.tran; curXZ.y = 0.f;
+			SrVec dir = targetXZ - curXZ; dir.normalize();
+			float facing = ((float)acos(dot(dir,SrVec(0,0,1))))*180.f/(float)M_PI;
+			if (dot(cross(dir,curXZ),SrVec(0,1,0)) < 0.f)
+				facing = -facing;
+			//LOG("facing = %f\n",facing);
 			cmd = "bml char " + charName + " <locomotion target=\"" + boost::lexical_cast<std::string>(targetXZ.x) + " " + 
-				   boost::lexical_cast<std::string>(targetXZ.z) + "\" proximity=\"" +  boost::lexical_cast<std::string>(rd->characterHeight*0.8f*0.01f) +"\"/>";
+				   boost::lexical_cast<std::string>(targetXZ.z) +"\"/>"; //"\" facing=\"" + boost::lexical_cast<std::string>(facing) +"\"/>";//"\" proximity=\"" +  boost::lexical_cast<std::string>(rd->characterHeight*0.8f*0.01f) +"\"/>";
 			rd->curHandAction->sendReachEvent(cmd);			
 			nextStateName = "Move";
 		}

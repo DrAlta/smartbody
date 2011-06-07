@@ -139,6 +139,10 @@ protected:
 	// in this way, au_1 can control both au_1_left and au_1_right
 	std::map<std::string, std::vector<std::string>> viseme_name_patch;
 
+	// associate each joint with a physics object
+	// currently, we assume the vis-geo as the geometry ( or an capsule to the child if vis-geo is not available )
+	std::map<std::string, SbmPhysicsObj*> jointPhyObjMap; 	
+
 	// Viseme Curve Info
 	bool	use_viseme_curve;
 	float	viseme_time_offset;
@@ -323,6 +327,9 @@ public:
 	const MotionDataSet& getGrabHandData() const { return grabHandData;}
 	const MotionDataSet& getReachHandData() const { return reachHandData;}
 	const MotionDataSet& getReleaseHandData() const { return releaseHandData;}
+	void buildJointPhyObjs();
+	void updateJointPhyObjs();
+	void setJointPhyCollision(bool useCollision);
 		
 	// viseme curve related functions
 	void set_viseme_curve_mode( bool mode )		{ use_viseme_curve = mode; }

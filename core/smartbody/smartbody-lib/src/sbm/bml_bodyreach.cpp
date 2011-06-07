@@ -54,6 +54,7 @@ const XMLCh DTYPE_SBM[]  = L"ICT.SBM";
 const XMLCh ATTR_CONS_JOINT[] = L"sbm:cons-joint";
 const XMLCh ATTR_CONS_TARGET[] = L"sbm:cons-target";
 const XMLCh ATTR_TARGET_POS[] = L"sbm:target-pos";
+//const XMLCh ATTR_TARGET_PAWN[] = L"sbm:target-pawn";
 const XMLCh ATTR_REACH_VELOCITY[] = L"sbm:reach-velocity";
 const XMLCh ATTR_REACH_DURATION[] = L"sbm:reach-duration";
 const XMLCh ATTR_REACH_FINISH[] = L"sbm:reach-finish";
@@ -113,13 +114,24 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 // 		return BehaviorRequestPtr();  // a.k.a., NULL
 //     }
 
-	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
+	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET);
 	const SbmPawn* targetPawn = NULL;
+	const SkJoint* targetJoint = NULL;
 	if (attrTarget && XMLString::stringLen( attrTarget ))
 	{
 		//target_joint = parse_target( tag, attrTarget, mcu );		
 		targetPawn = parse_target_pawn(tag,attrTarget,mcu);
+		if (!targetPawn)
+			targetJoint = parse_target(tag,attrTarget,mcu);
 	}
+
+// 	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
+// 	const SkJoint* targetJoint = NULL;
+// 	if (attrTarget && XMLString::stringLen( attrTarget ))
+// 	{
+// 		targetJoint = parse_target( tag, attrTarget, mcu );		
+// 		//targetPawn = parse_target_pawn(tag,attrTarget,mcu);
+// 	}
 
 // 	const XMLCh* attrEffector = NULL;
 // 	const char* effectorName = NULL;
@@ -333,6 +345,10 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 
 	if( targetPawn )	{		
 		bodyReachCt->setReachTargetPawn(const_cast<SbmPawn*>(targetPawn));
+	}
+	else if (targetJoint)
+	{
+		bodyReachCt->setReachTargetJoint(const_cast<SkJoint*>(targetJoint));
 	}
 	else if (attrTargetPos && XMLString::stringLen( attrTargetPos ))
 	{

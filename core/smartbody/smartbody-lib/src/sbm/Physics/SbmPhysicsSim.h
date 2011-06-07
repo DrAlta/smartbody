@@ -19,7 +19,7 @@ public:
 	virtual void updateSimObj() = 0; // read sim data from colObj
 	virtual void setPhysicsSim(bool bSim) = 0;
 	virtual void setCollisionSim(bool bCol) = 0;	
-	virtual void initGeometry(SbmGeomObject* obj, float mass ) = 0;
+	virtual void initGeometry(SbmGeomObject* obj, float density ) = 0;
 	bool         hasPhysicsSim() { return bHasPhysicsSim; }
 	bool         hasCollisionSim() { return bHasCollisionSim; }
 	virtual unsigned long getID() = 0;
@@ -34,7 +34,7 @@ public:
 	SbmPhysicsSim(void);
 	~SbmPhysicsSim(void);	
 	virtual void initSimulation() = 0;
-	virtual void setGravity(float gravity) = 0;
+	virtual void setGravity(float gravity) = 0;	
 	virtual void addPhysicsObj(SbmPhysicsObj* obj) = 0;
 	virtual void removePhysicsObj(SbmPhysicsObj* obj) = 0;
 	virtual void updateSimulation(float timeStep) = 0;
