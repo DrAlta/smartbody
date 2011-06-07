@@ -129,7 +129,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	steeringAgent = NULL;
 	_numSteeringGoal = 0;
 	_reachTarget = false;
-	_lastReachStatus = true;
+	_lastReachStatus = true;	
 
 	use_viseme_curve = false;
 	viseme_time_offset = 0.0;
@@ -257,6 +257,68 @@ void SbmCharacter::locomotion_set_turning_mode(int mode)
 	}
 }
 
+void SbmCharacter::updateJointPhyObjs()
+{
+	const SrArray<SkJoint*>& joints = skeleton_p->joints();	
+	for (int i=0;i<joints.size();i++)
+	{
+		SkJoint* curJoint = joints[i];
+		std::string jointName = curJoint->name().get_string();
+		if (jointPhyObjMap.find(jointName) != jointPhyObjMap.end())
+		{
+			SbmPhysicsObj* phyObj = jointPhyObjMap[jointName];
+			phyObj->getColObj()->updateTransform(curJoint->gmat());
+			phyObj->updateSimObj();
+		}
+	}	
+}
+
+void SbmCharacter::setJointPhyCollision( bool useCollision )
+{
+	if (jointPhyObjMap.size() == 0)
+	{
+		buildJointPhyObjs();
+	}
+	const SrArray<SkJoint*>& joints = skeleton_p->joints();		
+	for (int i=0;i<joints.size();i++)
+	{
+		SkJoint* curJoint = joints[i];
+		std::string jointName = curJoint->name().get_string();
+		if (jointPhyObjMap.find(jointName) != jointPhyObjMap.end())
+		{
+			SbmPhysicsObj* phyObj = jointPhyObjMap[jointName];
+			phyObj->setCollisionSim(useCollision);
+		}
+	}	
+}
+
+void SbmCharacter::buildJointPhyObjs()
+{
+	const SrArray<SkJoint*>& joints = skeleton_p->joints();
+	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
+	if (!phySim)
+		return;
+	//printf("init physics obj\n");	
+	for (int i=0;i<joints.size();i++)
+	{
+		SkJoint* curJoint = joints[i];
+		std::string jointName = curJoint->name().get_string();
+		if (curJoint->visgeo())
+		{
+			SbmGeomObject* jointGeom = new SbmGeomTriMesh(curJoint->visgeo());			
+			SbmPhysicsObj* jointPhy = phySim->createPhyObj();
+			jointPhy->initGeometry(jointGeom,1.f);	
+			jointPhy->setPhysicsSim(false);
+			phySim->addPhysicsObj(jointPhy);
+			jointPhyObjMap[jointName] = jointPhy;
+		}
+		else // use procedural capsule geometry
+		{
+
+		}
+	}
+}
+
 int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 					    SkMotion* face_neutral,
                         AUMotionMap* au_motion_map,
@@ -307,8 +369,16 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	// init reach engine
 	{
 		SkJoint* effector = this->skeleton_p->search_joint("r_middle1");
-		this->reachEngine = new MeCtReachEngine(this,this->skeleton_p,effector);
-		reachEngine->init();
+		if (effector)
+		{
+			this->reachEngine = new MeCtReachEngine(this,this->skeleton_p,effector);
+			reachEngine->init();
+		}
+		else
+		{
+			reachEngine = NULL;
+		}
+		
 	}
 	//if (use_locomotion) 
 	{
@@ -515,6 +585,8 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	sprintf(reachCmd,"bml char %s <reach target=\"%s\" reach-arm=\"left\" end=\"1000\"/>",name,l_effector_name.c_str());
 	mcu.execute(reachCmd);
 #endif
+
+	//buildJointPhyObjs();
 	
 	return( CMD_SUCCESS ); 
 }
@@ -2251,6 +2323,25 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		}
 		return CMD_SUCCESS;
 	}
+	else if ( cmd == "collision")
+	{
+		string phyCmd = args.read_token();
+		if (phyCmd == "on" || phyCmd == "ON")
+		{
+			this->setJointPhyCollision(true);
+			return CMD_SUCCESS;
+		}
+		else if (phyCmd == "off" || phyCmd == "OFF")
+		{
+			this->setJointPhyCollision(false);
+			return CMD_SUCCESS;
+		}
+		else
+		{
+			LOG( "SbmCharacter::parse_character_command ERR: incorrect parameter for collision = %s",phyCmd.c_str());
+			return CMD_FAILURE;
+		}
+	}
 	else if ( cmd == "handmotion")
 	{
 		string hand_cmd = args.read_token();	
@@ -2274,7 +2365,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			else
 			{
 				LOG( "SbmCharacter::parse_character_command ERR: motion '%s' not found", motion_name.c_str());
-				return CMD_NOT_FOUND;
+				return CMD_FAILURE;
 			}
 		}
 	}

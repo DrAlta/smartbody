@@ -74,6 +74,13 @@ void MeCtExampleBodyReach::setReachTargetPawn( SbmPawn* targetPawn )
 	reachData->startReach = true;	
 }
 
+void MeCtExampleBodyReach::setReachTargetJoint( SkJoint* targetJoint )
+{
+	ReachTarget& t = reachData->reachTarget;
+	t.setTargetJoint(targetJoint);
+	reachData->startReach = true;	
+}
+
 void MeCtExampleBodyReach::setReachTargetPos( SrVec& targetPos )
 {
 	ReachTarget& t = reachData->reachTarget;
@@ -107,10 +114,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 			cons->targetJoint->pos()->value(k,targetPos[k]);		
 		cons->targetJoint->update_gmat();
 	}
-
-
 	updateChannelBuffer(frame,outMotionFrame);
-
 	return true;
 }
 

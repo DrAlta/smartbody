@@ -935,6 +935,9 @@ void FltkViewer::draw()
 		_objManipulator.picking(pick_loc.x,pick_loc.y, _data->camera);	   
    }
 
+   
+
+
    mcuCBHandle& mcu = mcuCBHandle::singleton();
    glViewport ( 0, 0, w(), h() );
    SrLight &light = _data->light;
@@ -1723,18 +1726,60 @@ int FltkViewer::handle ( int event )
 		 // process picking
 		 //printf("Mouse Push\n");
 
+		 char exe_cmd[256];
 		 if (e.button1)
 		 {
-			 _objManipulator.picking(e.mouse.x, e.mouse.y, _data->camera);
-			 SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
-			 if (selectedPawn)
+			 if (fltk::event_clicks())
 			 {
-				SbmCharacter* isCharacter = dynamic_cast<SbmCharacter*> (selectedPawn);
-				if (isCharacter)
-					_paLocoData->character = isCharacter;
+				 // pick-up object
+				 makeGLContext();
+				 std::vector<int> hitList;
+				 SbmCharacter* curChar = getCurrentCharacter();		
+				 SbmPawn* selectedPawn = _objManipulator.getPickingPawn(e.mouse.x, e.mouse.y, _data->camera, hitList);
+				 if (selectedPawn && curChar)
+				 {
+					 //std::string cmd;
+					 //cmd = "bml char " + curChar->name + " <sbm:reach sbm:handle=\"r" + curChar->name + "\" action=\"pick-up\" target=\""+ selectedPawn->name + "\" />";
+					 sprintf(exe_cmd,"bml char %s <sbm:reach sbm:handle=\"r%s\" sbm:reach-duration=\"0.5\" sbm:action=\"pick-up\" target=\"%s\"/>",curChar->name,curChar->name,selectedPawn->name);
+					 mcuCBHandle& mcu = mcuCBHandle::singleton();
+					 mcu.execute(exe_cmd);
+				 }
 			 }
+			 else
+			 {				 			 
+				 makeGLContext();
+				 _objManipulator.picking(e.mouse.x, e.mouse.y, _data->camera);
+				 SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
+				 if (selectedPawn)
+				 {
+					 SbmCharacter* isCharacter = dynamic_cast<SbmCharacter*> (selectedPawn);
+					 if (isCharacter)
+						 _paLocoData->character = isCharacter;
+				 }
+			 }			 
 		 }
-		 if (mcuCBHandle::singleton().steerEngine && e.button3 && !e.alt)
+
+		 if (e.button3 && fltk::event_clicks())
+		 {
+			 // put-down object
+			 SbmCharacter* curChar = getCurrentCharacter();			 
+			 SrVec p1;
+			 SrVec p2;
+			 
+			 if (curChar)
+			 {
+				 _data->camera.get_ray(e.mouse.x, e.mouse.y, p1, p2);
+				 SrPlane ground(SrVec(0,curChar->getHeight()*0.0f,0), SrVec(0, 1, 0));
+				 SrVec dest = ground.intersect(p1, p2);
+				 dest.y = curChar->getHeight()*0.6f;
+				 sprintf(exe_cmd,"bml char %s <sbm:reach sbm:handle=\"r%s\" sbm:action=\"put-down\" sbm:target-pos=\"%f %f %f\"/>",curChar->name,curChar->name,dest.x,dest.y,dest.z);
+				 mcuCBHandle& mcu = mcuCBHandle::singleton();
+				 mcu.execute(exe_cmd);	 
+			 }
+
+			
+		 }
+		 else if (mcuCBHandle::singleton().steerEngine && e.button3 && !e.alt)
 		 {
 			_paLocoData->character->steeringAgent->setTargetAgent(NULL);
 			SrVec p1;
@@ -1746,7 +1791,7 @@ int FltkViewer::handle ( int event )
 			std::stringstream command;
 			command << "steer move " << _paLocoData->character->name << " " << dest.x << " " << dest.y << " " << dest.z;
 			mcuCBHandle::singleton().execute((char*)command.str().c_str());
-		}
+		 }
        } break;
 
       case fltk::RELEASE:
@@ -1874,7 +1919,7 @@ int FltkViewer::handle ( int event )
 
 int FltkViewer::handle_event ( const SrEvent &e )
  {
-   int res=0;
+   int res=0;   
 
    if ( e.alt && e.mouse_event() )
     { 
@@ -3691,6 +3736,18 @@ void FltkViewer::drawColObject( SbmGeomObject* colObj, SrMat& gmat )
 		cyc.color(SrColor(1.f,0.f,0.f));
 		cyc.render_mode(srRenderModeSmooth);
 		SrGlRenderFuncs::render_cylinder(&cyc);
+	}
+	else if (dynamic_cast<SbmGeomTriMesh*>(colObj))
+	{
+		SbmGeomTriMesh* mesh = dynamic_cast<SbmGeomTriMesh*>(colObj);
+		if (mesh->geoMesh)
+		{
+			SrSnModel model;
+			model.shape(*mesh->geoMesh);
+			model.color(SrColor(1.f,0.f,0.f));
+			model.render_mode(srRenderModeSmooth);
+			SrGlRenderFuncs::render_model(&model);
+		}
 	}
 	glPopMatrix();	
 }

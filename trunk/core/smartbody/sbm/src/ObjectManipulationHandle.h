@@ -27,6 +27,7 @@ public:
 	PawnControl* get_active_control() { return active_control; }
 	SbmPawn* get_selected_pawn();
 
+	SbmPawn* getPickingPawn(float x, float y, SrCamera& cam, std::vector<int>& hitNames);
 	void picking(float x,float y,SrCamera& cam);
 	void drag(SrCamera& cam,  float fx, float fy, float tx, float ty);
 	void draw(SrCamera& cam);

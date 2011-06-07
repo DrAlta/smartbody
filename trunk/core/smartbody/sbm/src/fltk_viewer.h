@@ -326,7 +326,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	void drawInteractiveLocomotion();
 	void drawPawns();
 	void drawSteeringInfo();
-	void drawColObject(SbmGeomObject* colObj, SrMat& gmat);
+	static void drawColObject(SbmGeomObject* colObj, SrMat& gmat);
 	void drawTetra(SrVec vtxPos[4], SrVec& color);
 	void drawArrow(SrVec& from, SrVec& to, float width, SrVec& color);
 	void drawCircle(float cx, float cy, float cz, float r, int num_segments, SrVec& color);

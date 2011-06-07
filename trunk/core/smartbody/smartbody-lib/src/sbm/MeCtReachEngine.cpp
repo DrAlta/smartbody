@@ -324,17 +324,23 @@ SkJoint* MeCtReachEngine::findRootJoint( SkSkeleton* sk )
 	while (!bStop)
 	{
 		SkJoint* child = rootJoint->child(0);
-		SkJointPos* skRootPos = rootJoint->pos();
+		SkJointPos* skRootPos = rootJoint->pos();		
 		SkJointPos* skPos = child->pos();
 		bool rootFrozen = (skRootPos->frozen(0) && skRootPos->frozen(1) && skRootPos->frozen(2));
 		bool childFrozen = (skPos->frozen(0) && skPos->frozen(1) && skPos->frozen(2));
-		if (childFrozen && !rootFrozen)
+		if (!rootFrozen) // find the top joint (excluding world offset) that has both translation + rotation
 		{
 			bStop = true;
 		}
-		else
+		else if (child)
 		{
 			rootJoint = child;
+		}
+		else
+		{
+			// error ? 
+			rootJoint = sk->root()->child(0);
+			bStop = true;
 		}
 	}
 	return rootJoint;

@@ -103,14 +103,15 @@ void SteeringAgent::evaluate()
 
 		float speed = steeringCommand.targetSpeed * locoSpdGain;
 		if (numGoals == 0)
-		{
+		{			
 			if (character->_reachTarget)
-				return;
+				return;					
 			std::stringstream strstr;
 			strstr << "test loco char ";
 			strstr << character->name;
 			strstr << " stop";
 			mcu.execute((char*)strstr.str().c_str());
+			MeCtLocomotionNavigator* nav = character->locomotion_ct->get_navigator();
 			if (fabs(facingAngle) <= 180)
 			{
 				float diff = facingAngle - yaw;
@@ -126,11 +127,17 @@ void SteeringAgent::evaluate()
 					strstr << " leftward spd 0.0 rps " << turn;
 					mcu.execute((char*)strstr.str().c_str());	
 				}
-				else
+				else if (nav->limb_blending_factor < 0.1)
+				{
+					//LOG("character reach target\n");							
 					character->_reachTarget = true;
+				}
 			}
-			else
+			else if (nav->limb_blending_factor < 0.1)
+			{
+				//LOG("character reach target, facing angle >=180\n");				
 				character->_reachTarget = true;
+			}
 		}
 		else
 		{

@@ -459,6 +459,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 		bool has_geom = false;
 		const char* geom_str = NULL;
+		const char* file_str = NULL;
 		const char* size_str = NULL;
 		const char* color_str = NULL;
 		while( args.calc_num_tokens() > 0 ) {
@@ -469,6 +470,10 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			} else if( option=="geom" ) {
 				geom_str = args.read_token();
 				has_geom = true;
+			} else if (option == "file")
+			{
+				file_str = args.read_token();
+				has_geom = true;			
 			} else if( option=="size" ) {
 				size_str = args.read_token();
 				has_geom = true;
@@ -501,14 +506,14 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		}
 
 		// setting up geometry and physics 
-		if( has_geom ) {
+		if( has_geom && geom_str ) {
 			//LOG("WARNING: SbmPawn geometry not implemented.  Ignoring options.");
 			float size = 1.0;
 			if (size_str)
 			{
 				size = (float)atof(size_str);
 			}
-			pawn_p->initGeomObj(geom_str,size);
+			pawn_p->initGeomObj(geom_str,size,file_str);
 		}
 		// 		else // default null geom object
 		// 		{
@@ -599,8 +604,9 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			LOG(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
-		const char *geom_str, *size_str, *color_str;		
+		const char *geom_str = NULL, *size_str = NULL, *color_str = NULL, *file_str = NULL;		
 		bool has_geom = false;
+		float size = 1.f;
 		while( args.calc_num_tokens() > 0 ) {
 			string option = args.read_token();
 			// TODO: Make the following option case insensitive
@@ -608,8 +614,12 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				geom_str = args.read_token();
 				has_geom = true;
 			} else if( option=="size" ) {
-				size_str = args.read_token();
+				//size_str = args.read_token();
+				size = args.read_float();
 				has_geom = true;
+			} else if (option=="file" ) {
+				file_str = args.read_token();
+				has_geom = true;			
 			} else if( option=="color" ) {
 				color_str = args.read_token();
 				has_geom = true;
@@ -621,13 +631,8 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		}	
 
 		if (has_geom)
-		{
-			float size = 1.f;
-			if (size_str)
-			{
-				size = (float)atof(size_str);
-			}
-			pawn_p->initGeomObj(geom_str,size);
+		{			
+			pawn_p->initGeomObj(geom_str,size,file_str);
 			return CMD_SUCCESS;
 		}
 		else
@@ -635,27 +640,38 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			LOG("Pawn %s, fail to setshape. Incorrect parameters.",pawn_name);
 			return CMD_FAILURE;
 		}
-	}
-	else if (pawn_cmd=="physics")
+	}	
+	else if (pawn_cmd=="physics" || pawn_cmd == "collision")
 	{
 		string option = args.read_token();
 		if (!pawn_p)
 			return CMD_FAILURE;
 
+		bool turnOn = false;
 		if (option == "on" || option == "ON")
-		{
-			pawn_p->setPhysicsSim(true);
-			return CMD_SUCCESS;
+		{			
+			turnOn = true;			
 		}
 		else if (option == "off" || option == "OFF")
 		{
-			pawn_p->setPhysicsSim(false);
-			return CMD_SUCCESS;
+			turnOn = false;			
 		}		
 		else
 		{
 			return CMD_FAILURE;
 		}
+
+		if (pawn_cmd == "physics")
+		{
+			pawn_p->setPhysicsSim(turnOn);
+			return CMD_SUCCESS;
+		}
+		else if (pawn_cmd == "collision")
+		{
+			pawn_p->setCollision(turnOn);			
+			return CMD_SUCCESS;
+		}
+		return CMD_FAILURE;
 	}
 	else {
 		return CMD_NOT_FOUND;
@@ -1081,7 +1097,7 @@ WSP_ERROR SbmPawn::wsp_rotation_accessor( const std::string id, const std::strin
 	}
 }
 
-bool SbmPawn::initGeomObj( const char* geomType, float size )
+bool SbmPawn::initGeomObj( const char* geomType, float size, const char* meshName  )
 {
 	SbmGeomObject* colObj = NULL;
 	if (strcmp(geomType,"sphere") == 0)
@@ -1101,6 +1117,20 @@ bool SbmPawn::initGeomObj( const char* geomType, float size )
 		//SbmColObject* colObj = new SbmColCapsule(size*1.5f,size*0.5f);
 		colObj = new SbmGeomCapsule(pos[0],pos[1],size*0.5f);		
 	}	
+	else if (strcmp(geomType,"mesh") == 0)
+	{
+		SrModel* model = NULL;
+		bool hasObjModel = false;
+		if (meshName)
+		{
+			model = new SrModel();
+			hasObjModel = model->import_obj(meshName);
+		}
+		if (model && hasObjModel)
+		{
+			colObj = new SbmGeomTriMesh(model);
+		}	
+	}
 	else if (strcmp(geomType,"null") == 0)
 	{
 		if (phyObj_p) // remove physics
@@ -1194,6 +1224,13 @@ bool SbmPawn::hasPhysicsSim()
 	return phyObj_p->hasPhysicsSim();
 }
 
+void SbmPawn::setCollision( bool enable )
+{
+	if (!phyObj_p)
+		return;
+
+	phyObj_p->setCollisionSim(enable);
+}
 
 ///////////////////////////////////////////////////////////////////////////
 //  Private sbm_pawn functions
