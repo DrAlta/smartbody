@@ -83,6 +83,10 @@
 2 char brad smoothbindmesh ../../../../data/mesh/Brad/ShoesShape.obj
 2 char brad smoothbindmesh ../../../../data/mesh/Brad/UpperTeethShape.obj
 
+2 bml char doctor <saccade mode="listen"/>
+2 bml char elder <saccade mode="listen"/>
+2 bml char brad <saccade mode="listen"/>
+
 
 
 

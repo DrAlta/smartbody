@@ -374,8 +374,8 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    gridHighlightColor[0] = .0;
    gridHighlightColor[1] = .0;
    gridHighlightColor[2] = .0;
-   gridSize = 500.0;
-   gridStep = 10.0;
+   gridSize = 200.0;
+   gridStep = 20.0;
 //   gridSize = 400.0;
 //   gridStep = 50.0;
    gridList = -1;
