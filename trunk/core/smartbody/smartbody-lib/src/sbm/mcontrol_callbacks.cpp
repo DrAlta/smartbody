@@ -44,6 +44,8 @@
 #include "sbm/Event.h"
 #include "sbm/ParserOpenCOLLADA.h"
 #include "SteeringAgent.h"
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
 
 using namespace std;
 using namespace WSP;
@@ -1603,36 +1605,73 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 		}
 	}
 
-	SrModel* objModel = new SrModel();
-	if (!objModel->import_obj(obj_file))
+	// Here, detect which type of file it is
+	std::string ext = boost::filesystem2::extension(obj_file);
+	std::string file = boost::filesystem::basename(obj_file);
+	std::vector<SrModel*> meshModelVec;
+	if (ext == ".obj" || ext == ".OBJ")
 	{
-		LOG( "mcu_character_load_mesh ERR\n" );
-		return( CMD_FAILURE );
+		SrModel* objModel = new SrModel();
+		if (!objModel->import_obj(obj_file))
+		{
+			LOG( "mcu_character_load_mesh ERR\n" );
+			return( CMD_FAILURE );
+		}
+		meshModelVec.push_back(objModel);
 	}
+	if (ext == ".dae" || ext == ".DAE" || ext == ".xml" || ext == ".XML")
+	{
+		xercesc_3_0::DOMNode* geometryNode = ParserOpenCOLLADA::getNode("library_geometries", obj_file);
+		if (geometryNode)
+			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, meshModelVec, 1.0f);
 
-	for (int i=0;i<objModel->V.size();i++)
+		// below code is to adjust the mesh if there's orientation in the joints. potential bug too because here only detect the first joint
+		SkSkeleton* skel = char_p->skeleton_p;
+		SkJoint* firstJ = skel->root()->child(0);
+		if (firstJ)
+		{
+			SrQuat orient = skel->root()->child(0)->quat()->orientation();
+			SrMat rotMat;
+			orient.get_mat(rotMat);
+			for (unsigned int i = 0; i < meshModelVec.size(); i++)
+			{
+				for (int j = 0; j < meshModelVec[i]->V.size(); j++)
+				{
+					SrVec pt = SrVec(meshModelVec[i]->V[j].x, meshModelVec[i]->V[j].y, meshModelVec[i]->V[j].z);
+					SrVec ptp = pt * rotMat;
+					meshModelVec[i]->V[j].x = ptp.x;
+					meshModelVec[i]->V[j].y = ptp.y;
+					meshModelVec[i]->V[j].z = ptp.z;
+				}
+				for (int j = 0; j < meshModelVec[i]->N.size(); j++)
+				{
+					SrVec pt = SrVec(meshModelVec[i]->N[j].x, meshModelVec[i]->N[j].y, meshModelVec[i]->N[j].z);
+					SrVec ptp = pt * rotMat;
+					meshModelVec[i]->N[j].x = ptp.x;
+					meshModelVec[i]->N[j].y = ptp.y;
+					meshModelVec[i]->N[j].z = ptp.z;
+				}	
+			}
+		}
+	}	
+	for (unsigned int i = 0; i < meshModelVec.size(); i++)
 	{
-		objModel->V[i] *= factor;
+		for (int j = 0; j < meshModelVec[i]->V.size(); j++)
+		{
+			meshModelVec[i]->V[j] *= factor;
+		}
+		SrSnModel* srSnModelDynamic = new SrSnModel();
+		SrSnModel* srSnModelStatic = new SrSnModel();
+		srSnModelDynamic->shape(*meshModelVec[i]);
+		srSnModelStatic->shape(*meshModelVec[i]);
+		srSnModelDynamic->changed(true);
+		srSnModelDynamic->visible(false);
+		srSnModelStatic->shape().name = meshModelVec[i]->name;
+		srSnModelDynamic->shape().name = meshModelVec[i]->name;
+		char_p->dMesh_p->dMeshDynamic_p.push_back(srSnModelDynamic);
+		char_p->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
+		mcu_p->root_group_p->add(srSnModelDynamic);	
 	}
-	
-	
-	SrSnModel* srSnModelDynamic = new SrSnModel();
-	SrSnModel* srSnModelStatic = new SrSnModel();
-	srSnModelDynamic->shape(*objModel);
-	srSnModelStatic->shape(*objModel);
-	srSnModelDynamic->changed(true);
-	srSnModelDynamic->visible(false);
-	const int char_max = 128;
-	char file[char_max];
-	char drive[char_max];
-	char dir[char_max];
-	char ext[char_max];
-	_splitpath(obj_file, drive, dir, file, ext);
-	srSnModelStatic->shape().name = std::string(file).c_str();
-	srSnModelDynamic->shape().name = std::string(file).c_str();
-	char_p->dMesh_p->dMeshDynamic_p.push_back(srSnModelDynamic);
-	char_p->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
-	mcu_p->root_group_p->add(srSnModelDynamic);
 	return( CMD_SUCCESS );
 }
 
@@ -1834,28 +1873,6 @@ void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, 
 	}
 }
 
-void parseNode(xercesc_3_0::DOMNode* node, const char* char_name, float scaleFactor, std::string jointNamePrefix, mcuCBHandle* mcu_p)
-{
-	int type = node->getNodeType();
-	std::string name = nodeStr(node->getNodeName());
-	std::string value = nodeStr(node->getNodeValue());
-	    
-
-	if (name == "library_controllers" && node->getNodeType() ==  xercesc_3_0::DOMNode::ELEMENT_NODE)
-	{
-		  parseLibraryControllers(node, char_name, scaleFactor, jointNamePrefix, mcu_p);
-	}
-	if (node->hasChildNodes())
-	{
-		  const xercesc_3_0::DOMNodeList* list = node->getChildNodes();
-		  for (unsigned int c = 0; c < list->getLength(); c++)
-		  {
-				parseNode(list->item(c), char_name, scaleFactor, jointNamePrefix, mcu_p);
-		  }
-	}
-}
-
-
 int mcu_character_load_skinweights( const char* char_name, const char* skin_file, mcuCBHandle* mcu_p, float scaleFactor, const char* prefix )
 {
 	try 
@@ -1885,7 +1902,13 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 	{
 		parser->parse(skin_file);
 		xercesc_3_0::DOMDocument* doc = parser->getDocument();
-		parseNode(doc, char_name, scaleFactor, jointNamePrefix, mcu_p);
+		xercesc_3_0::DOMNode* controllerNode = ParserOpenCOLLADA::getNode("library_controllers", doc);
+		if (!controllerNode)
+		{
+			LOG("mcu_character_load_skinweights ERR: no binding info contained");
+			return CMD_FAILURE;
+		}
+		parseLibraryControllers(controllerNode, char_name, scaleFactor, jointNamePrefix, mcu_p);
 	}
 	catch (const XMLException& toCatch) 
 	{
