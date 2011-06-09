@@ -802,7 +802,8 @@ void SrModel::smooth ( float crease_angle )
        }
     }
 
-   remove_redundant_normals ();
+ //  the following function is too slow, so being commented out at this point. would come back later
+ //  remove_redundant_normals ();
    
    compress ();
  }

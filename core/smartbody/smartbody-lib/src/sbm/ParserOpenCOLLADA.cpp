@@ -24,7 +24,9 @@
 #include "sr/sr_euler.h"
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
-
+#include <algorithm>
+#include <cctype>
+#include <string>
 
 bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::string pathName, float scale)
 {
@@ -112,6 +114,57 @@ xercesc_3_0::DOMNode* ParserOpenCOLLADA::getNode(std::string nodeName, xercesc_3
 			break;
 	}
 	return child;
+}
+
+xercesc_3_0::DOMNode* ParserOpenCOLLADA::getNode(std::string nodeName, std::string fileName)
+{
+	try 
+	{
+		XMLPlatformUtils::Initialize();
+	}
+	catch (const XMLException& toCatch) 
+	{
+		char* message = XMLString::transcode(toCatch.getMessage());
+		std::cout << "Error during initialization! :\n" << message << "\n";
+		XMLString::release(&message);
+		return NULL;
+	}
+
+	XercesDOMParser* parser = new XercesDOMParser();
+	parser->setValidationScheme(XercesDOMParser::Val_Always);
+	parser->setDoNamespaces(true);    // optional
+
+	ErrorHandler* errHandler = (ErrorHandler*) new HandlerBase();
+	parser->setErrorHandler(errHandler);
+
+	try 
+	{
+		std::string filebasename = boost::filesystem::basename(fileName);
+		parser->parse(fileName.c_str());
+		xercesc_3_0::DOMDocument* doc = parser->getDocument();
+		return getNode(nodeName, doc);
+	}
+	catch (const XMLException& toCatch) 
+	{
+		char* message = XMLString::transcode(toCatch.getMessage());
+		std::cout << "Exception message is: \n" << message << "\n";
+		XMLString::release(&message);
+		return NULL;
+	}
+	catch (const DOMException& toCatch) {
+		char* message = XMLString::transcode(toCatch.msg);
+		std::cout << "Exception message is: \n" << message << "\n";
+		XMLString::release(&message);
+		return NULL;
+	}
+		catch (...) {
+		std::cout << "Unexpected Exception \n" ;
+		return NULL;
+	}
+
+	delete parser;
+	delete errHandler;
+	return NULL;
 }
 
 void ParserOpenCOLLADA::parseLibraryVisualScenes(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order)
@@ -555,3 +608,320 @@ int ParserOpenCOLLADA::getRotationOrder(std::vector<std::string> orderVec)
 	}
 	return -1;
 } 
+
+std::string ParserOpenCOLLADA::getGeometryType(std::string idString)
+{
+	size_t found = idString.find("position");
+	if (found != string::npos)
+		return "positions";
+	found = idString.find("normal");
+	if (found != string::npos)
+		return "normals";
+	found = idString.find("uv");
+	if (found != string::npos)
+		return "texcoords";
+	found = idString.find("map");
+	if (found != string::npos)
+		return "texcoords";
+
+	LOG("ParserOpenCOLLADA::getGeometryType ERR!");	
+	return "";
+}
+
+void ParserOpenCOLLADA::parseLibraryGeometries(xercesc_3_0::DOMNode* node, std::vector<SrModel*>& meshModelVec, float scale)
+{
+	const xercesc_3_0::DOMNodeList* list = node->getChildNodes();
+	for (unsigned int c = 0; c < list->getLength(); c++)
+	{
+		xercesc_3_0::DOMNode* node = list->item(c);
+		std::string nodeName = getString(node->getNodeName());
+		if (nodeName == "geometry")
+		{
+			SrModel* newModel = new SrModel();
+			xercesc_3_0::DOMNamedNodeMap* nodeAttr = node->getAttributes();
+			xercesc_3_0::DOMNode* nameNode = nodeAttr->getNamedItem(XMLString::transcode("name"));
+			std::string nameAttr = "";
+			if (nameNode)
+				nameAttr = getString(nameNode->getNodeValue());
+			newModel->name = SrString(nameAttr.c_str());
+			xercesc_3_0::DOMNode* meshNode = ParserOpenCOLLADA::getNode("mesh", node);
+			if (!meshNode)	continue;
+			for (unsigned int c1 = 0; c1 < meshNode->getChildNodes()->getLength(); c1++)
+			{
+				xercesc_3_0::DOMNode* node1 = meshNode->getChildNodes()->item(c1);
+				std::string nodeName1 = getString(node1->getNodeName());
+				if (nodeName1 == "source")
+				{
+					xercesc_3_0::DOMNamedNodeMap* sourceAttr = node1->getAttributes();
+					xercesc_3_0::DOMNode* idNode = sourceAttr->getNamedItem(XMLString::transcode("id"));
+					std::string idString = getString(idNode->getNodeValue());
+					size_t pos = idString.find_last_of("-");
+					std::string tempString = idString.substr(pos + 1);
+					idString = tempString;
+					std::transform(idString.begin(), idString.end(), idString.begin(), tolower);
+					std::string idType = getGeometryType(idString);
+					// below is a faster way to parse all the data, have potential bug
+					xercesc_3_0::DOMNode* floatNode = ParserOpenCOLLADA::getNode("float_array", node1);
+					xercesc_3_0::DOMNamedNodeMap* floatNodeAttr = floatNode->getAttributes();
+					xercesc_3_0::DOMNode* countNode = floatNodeAttr->getNamedItem(XMLString::transcode("count"));
+					int count = atoi(getString(countNode->getNodeValue()).c_str());
+					if (idType == "positions")
+						count /= 3;
+					if (idType == "normals")
+						count /= 3;
+					if (idType == "texcoords")
+						count /= 2;
+					std::string floatString = getString(floatNode->getTextContent());
+					for (int i = 0; i < count; i++)
+					{
+						if (idType == "positions")
+						{
+							newModel->V.push();
+							newModel->V.top().x = (float)atof(tokenize(floatString).c_str());
+							newModel->V.top().y = (float)atof(tokenize(floatString).c_str());
+							newModel->V.top().z = (float)atof(tokenize(floatString).c_str());
+						}
+						if (idType == "normals")
+						{
+							newModel->N.push();
+							newModel->N.top().x = (float)atof(tokenize(floatString).c_str());
+							newModel->N.top().y = (float)atof(tokenize(floatString).c_str());
+							newModel->N.top().z = (float)atof(tokenize(floatString).c_str());
+						}
+						if (idType == "texcoords")
+						{
+							newModel->T.push();
+							newModel->T.top().x = (float)atof(tokenize(floatString).c_str());
+							newModel->T.top().y = (float)atof(tokenize(floatString).c_str());
+						}
+					}
+				}
+				if (nodeName1 == "triangles" || nodeName1 == "polylist")
+				{
+					xercesc_3_0::DOMNamedNodeMap* nodeAttr1 = node1->getAttributes();
+					xercesc_3_0::DOMNode* countNode = nodeAttr1->getNamedItem(XMLString::transcode("count"));
+					int count = atoi(getString(countNode->getNodeValue()).c_str());
+					std::vector<std::string> inputs;
+					int numInput = 0;
+					std::vector<int> vcountList;
+					for (unsigned int c2 = 0; c2 < node1->getChildNodes()->getLength(); c2++)
+					{
+						xercesc_3_0::DOMNode* inputNode = node1->getChildNodes()->item(c2);
+						if (XMLString::compareString(inputNode->getNodeName(), L"input") == 0)
+						{
+							xercesc_3_0::DOMNamedNodeMap* inputNodeAttr = inputNode->getAttributes();
+							xercesc_3_0::DOMNode* semanticNode = inputNodeAttr->getNamedItem(XMLString::transcode("semantic"));
+							inputs.push_back(getString(semanticNode->getNodeValue()));
+							numInput++;
+						}
+						if (XMLString::compareString(inputNode->getNodeName(), L"vcount") == 0)
+						{
+							std::string vcountString = getString(inputNode->getTextContent());
+							for (int i = 0; i < count; i++)
+								vcountList.push_back(atoi(tokenize(vcountString).c_str()));
+						}
+					}
+					if (vcountList.size() == 0)
+					{
+						for (int i = 0; i < count; i++)
+							vcountList.push_back(3);
+					}
+					xercesc_3_0::DOMNode* pNode = ParserOpenCOLLADA::getNode("p", node1);
+					std::string pString = getString(pNode->getTextContent());
+					// below code has potential bug because input order maybe different
+					for (int i = 0; i < count; i++)
+					{
+						if (numInput == 1)
+						{
+							if (inputs[0] == "VERTEX")
+							{
+								if (vcountList[i] == 3)
+								{
+									newModel->F.push();
+									newModel->F.top().a = atoi(tokenize(pString).c_str());
+									newModel->F.top().b = atoi(tokenize(pString).c_str());
+									newModel->F.top().c = atoi(tokenize(pString).c_str());
+								}
+								if (vcountList[i] == 4)
+								{
+									newModel->F.push();
+									int a = atoi(tokenize(pString).c_str());
+									int b = atoi(tokenize(pString).c_str());
+									int c = atoi(tokenize(pString).c_str());
+									int d = atoi(tokenize(pString).c_str());
+									newModel->F.top().a = a;
+									newModel->F.top().b = b;
+									newModel->F.top().c = c;
+									newModel->F.push();
+									newModel->F.top().a = a;
+									newModel->F.top().b = c;
+									newModel->F.top().c = d;
+								}
+							}
+							else
+								LOG("ParserOpenCOLLADA::parseLibraryGeometries ERR!");
+						}
+						if (numInput == 2)
+						{
+							if (inputs[0] == "VERTEX" && inputs[1] == "TEXCOORD")
+							{
+								if (vcountList[i] == 3)
+								{
+									newModel->F.push();
+									newModel->Ft.push();
+									newModel->F.top().a = atoi(tokenize(pString).c_str());
+									newModel->Ft.top().a = atoi(tokenize(pString).c_str());
+									newModel->F.top().b = atoi(tokenize(pString).c_str());
+									newModel->Ft.top().b = atoi(tokenize(pString).c_str());
+									newModel->F.top().c = atoi(tokenize(pString).c_str());
+									newModel->Ft.top().c = atoi(tokenize(pString).c_str());	
+								}
+								if (vcountList[i] == 4)
+								{
+									int a = atoi(tokenize(pString).c_str());
+									int a1 = atoi(tokenize(pString).c_str());
+									int b = atoi(tokenize(pString).c_str());
+									int b1 = atoi(tokenize(pString).c_str()); 
+									int c = atoi(tokenize(pString).c_str());
+									int c1 = atoi(tokenize(pString).c_str());
+									int d = atoi(tokenize(pString).c_str());
+									int d1 = atoi(tokenize(pString).c_str()); 
+									newModel->F.push();
+									newModel->Ft.push();
+									newModel->F.top().a = a;
+									newModel->Ft.top().a = a1;
+									newModel->F.top().b = b;
+									newModel->Ft.top().b = b1;
+									newModel->F.top().c = c;
+									newModel->Ft.top().c = c1;	
+
+									newModel->F.push();
+									newModel->Ft.push();
+									newModel->F.top().a = a;
+									newModel->Ft.top().a = a1;
+									newModel->F.top().b = c;
+									newModel->Ft.top().b = c1;
+									newModel->F.top().c = d;
+									newModel->Ft.top().c = d1;
+								}
+							}
+							else if (inputs[0] == "VERTEX" && inputs[1] == "NORMAL")
+							{
+								if (vcountList[i] == 3)
+								{
+									newModel->F.push();
+									newModel->Fn.push();
+									newModel->F.top().a = atoi(tokenize(pString).c_str());
+									newModel->Fn.top().a = atoi(tokenize(pString).c_str());
+									newModel->F.top().b = atoi(tokenize(pString).c_str());
+									newModel->Fn.top().b = atoi(tokenize(pString).c_str());
+									newModel->F.top().c = atoi(tokenize(pString).c_str());
+									newModel->Fn.top().c = atoi(tokenize(pString).c_str());
+								}
+								if (vcountList[i] == 4)
+								{
+									int a = atoi(tokenize(pString).c_str());
+									int a1 = atoi(tokenize(pString).c_str());
+									int b = atoi(tokenize(pString).c_str());
+									int b1 = atoi(tokenize(pString).c_str()); 
+									int c = atoi(tokenize(pString).c_str());
+									int c1 = atoi(tokenize(pString).c_str());
+									int d = atoi(tokenize(pString).c_str());
+									int d1 = atoi(tokenize(pString).c_str()); 
+									newModel->F.push();
+									newModel->Fn.push();
+									newModel->F.top().a = a;
+									newModel->Fn.top().a = a1;
+									newModel->F.top().b = b;
+									newModel->Fn.top().b = b1;
+									newModel->F.top().c = c;
+									newModel->Fn.top().c = c1;
+
+									newModel->F.push();
+									newModel->Fn.push();
+									newModel->F.top().a = a;
+									newModel->Fn.top().a = a1;
+									newModel->F.top().b = c;
+									newModel->Fn.top().b = c1;
+									newModel->F.top().c = d;
+									newModel->Fn.top().c = d1;
+								}
+							}
+							else
+								LOG("ParserOpenCOLLADA::parseLibraryGeometries ERR!");
+						} 
+						if (numInput == 3)
+						{
+							if (inputs[0] == "VERTEX" && inputs[1] == "NORMAL" && inputs[2] == "TEXCOORD")
+							{
+								if (vcountList[i] == 3)
+								{
+									newModel->F.push();
+									newModel->Fn.push();
+									newModel->Ft.push();
+									newModel->F.top().a = atoi(tokenize(pString).c_str());
+									newModel->Fn.top().a = atoi(tokenize(pString).c_str());
+									newModel->Ft.top().a = atoi(tokenize(pString).c_str());
+									newModel->F.top().b = atoi(tokenize(pString).c_str());
+									newModel->Fn.top().b = atoi(tokenize(pString).c_str());
+									newModel->Ft.top().b = atoi(tokenize(pString).c_str());
+									newModel->F.top().c = atoi(tokenize(pString).c_str());
+									newModel->Fn.top().c = atoi(tokenize(pString).c_str());
+									newModel->Ft.top().c = atoi(tokenize(pString).c_str());	
+								}
+								if (vcountList[i] == 4)
+								{
+									int a = atoi(tokenize(pString).c_str());
+									int a1 = atoi(tokenize(pString).c_str());
+									int a2 = atoi(tokenize(pString).c_str());
+									int b = atoi(tokenize(pString).c_str());
+									int b1 = atoi(tokenize(pString).c_str()); 
+									int b2 = atoi(tokenize(pString).c_str()); 
+									int c = atoi(tokenize(pString).c_str());
+									int c1 = atoi(tokenize(pString).c_str());
+									int c2 = atoi(tokenize(pString).c_str());
+									int d = atoi(tokenize(pString).c_str());
+									int d1 = atoi(tokenize(pString).c_str()); 
+									int d2 = atoi(tokenize(pString).c_str()); 
+
+									newModel->F.push();
+									newModel->Fn.push();
+									newModel->Ft.push();
+									newModel->F.top().a = a;
+									newModel->Fn.top().a = a1;
+									newModel->Ft.top().a = a2;
+									newModel->F.top().b = b;
+									newModel->Fn.top().b = b1;
+									newModel->Ft.top().b = b2;
+									newModel->F.top().c = c;
+									newModel->Fn.top().c = c1;
+									newModel->Ft.top().c = c2;	
+
+									newModel->F.push();
+									newModel->Fn.push();
+									newModel->Ft.push();
+									newModel->F.top().a = a;
+									newModel->Fn.top().a = a1;
+									newModel->Ft.top().a = a2;
+									newModel->F.top().b = c;
+									newModel->Fn.top().b = c1;
+									newModel->Ft.top().b = c2;
+									newModel->F.top().c = d;
+									newModel->Fn.top().c = d1;
+									newModel->Ft.top().c = d2;	
+								}
+							}
+							else
+								LOG("ParserOpenCOLLADA::parseLibraryGeometries ERR!");
+						}
+					}				
+				}
+			}
+			newModel->validate();
+			newModel->remove_redundant_materials();
+//			newModel->remove_redundant_normals();
+			newModel->compress();
+			meshModelVec.push_back(newModel);
+		}
+	}	
+}
