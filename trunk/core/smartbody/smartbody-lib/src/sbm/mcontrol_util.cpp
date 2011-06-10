@@ -325,8 +325,8 @@ void mcuCBHandle::clear( void )	{
 		 motionIter != motion_map.end();
 		 motionIter++)
 	{
-		SkMotion* motion = (*motionIter).second;
-		motion->unref(); // need to cleanup motions - fix
+		//SkMotion* motion = (*motionIter).second;
+		//motion->unref(); // need to cleanup motions - fix
 	}
 
 	for (std::map<std::string, SkSkeleton*>::iterator skelIter = skeleton_map.begin();
