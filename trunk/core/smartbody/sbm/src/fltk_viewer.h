@@ -344,6 +344,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	float gridHighlightColor[3];
 	float gridSize;
 	float gridStep;
+	float gridHeight;
 
 	SrVec interactivePoint;
 	
