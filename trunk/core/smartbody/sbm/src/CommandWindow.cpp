@@ -113,11 +113,11 @@ CommandWindow::CommandWindow(int x,int y,int w,int h, const char* s) : GenericVi
 		textEditor[i]->textcolor(fltk::BLACK);
 		textBuffer[i] = new TextBuffer();
 		textEditor[i]->buffer(textBuffer[i]); 
-		textEditor[i]->add_key_binding(fltk::UpKey, fltk::event_state(), (TextEditor::Key_Func) upcb);
-		textEditor[i]->add_key_binding(fltk::DownKey, fltk::event_state(), (TextEditor::Key_Func) downcb);
+		textEditor[i]->add_key_binding(fltk::UpKey, TEXT_EDITOR_ANY_STATE, (TextEditor::Key_Func) upcb);
+		textEditor[i]->add_key_binding(fltk::DownKey, TEXT_EDITOR_ANY_STATE, (TextEditor::Key_Func) downcb);
 
-		textEditor[i]->add_key_binding(fltk::TabKey,fltk::event_state(), (TextEditor::Key_Func) tabcb);
-		textEditor[i]->add_key_binding(fltk::ReturnKey,fltk::event_state(), (TextEditor::Key_Func) entercb);
+		textEditor[i]->add_key_binding(fltk::TabKey, TEXT_EDITOR_ANY_STATE, (TextEditor::Key_Func) tabcb);
+		textEditor[i]->add_key_binding(fltk::ReturnKey, TEXT_EDITOR_ANY_STATE, (TextEditor::Key_Func) entercb);
 		textEditor[i]->add_key_binding('u', CTRL | SHIFT, (TextEditor::Key_Func) ctrlUcb);
 		textEditor[i]->add_key_binding('u', CTRL, (TextEditor::Key_Func) ctrlUcb);
 	}
