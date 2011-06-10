@@ -376,8 +376,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    gridHighlightColor[2] = .0;
    gridSize = 200.0;
    gridStep = 20.0;
-//   gridSize = 400.0;
-//   gridStep = 50.0;
+   gridHeight = 0.0;
    gridList = -1;
    _arrowTime = 0.0f;
 
@@ -1097,11 +1096,7 @@ void FltkViewer::draw()
 		}
 	}
 
-   // draw the grid
-	//   if (gridList == -1)
-	//	   initGridList();
-	   drawGrid();
-
+	drawGrid();
 	drawEyeBeams();
 	drawEyeLids();
 	drawDynamics();
@@ -2275,13 +2270,8 @@ void FltkViewer::drawGrid()
 {
 	if (_data->gridMode == ModeNoGrid)
 		return;
-//	if( gridList != -1 )	{
-//		glCallList( gridList );
-//		return;
-//	}
 
-	GLfloat floor_height = 0.0f;
-
+	
 	glPushAttrib(GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT);
 	bool colorChanged = false;
 	glDisable(GL_LIGHTING);
@@ -2294,42 +2284,65 @@ void FltkViewer::drawGrid()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
 	glLineWidth(1);
-//	glLineStipple(1, 0xAAAA);
-	glBegin(GL_LINES);
-	for (float x = -gridSize; x <= gridSize; x += gridStep)
+
+	if ( gridList != -1 )	{
+		glCallList( gridList );
+	} 
+	else
 	{
-		if (x == 0.0) {
-			colorChanged = true;
-			glColor4f(gridHighlightColor[0], gridHighlightColor[1], gridHighlightColor[2], 1.0f);
+		glDeleteLists(gridList, 1);
+		gridList = glGenLists(1);
+		if ( gridList == GL_INVALID_VALUE || gridList == GL_INVALID_OPERATION)
+			return;
+		glNewList(gridList, GL_COMPILE);
+			
+
+		//	glLineStipple(1, 0xAAAA);
+		glBegin(GL_LINES);
+		for (float x = -gridSize; x <= gridSize; x += gridStep)
+		{
+			if (x == 0.0) {
+				colorChanged = true;
+				glColor4f(gridHighlightColor[0], gridHighlightColor[1], gridHighlightColor[2], 1.0f);
+			}
+			glVertex3f(x, gridHeight, -gridSize);
+			glVertex3f(x, gridHeight, gridSize);
+			
+			if (colorChanged) {
+				colorChanged = false;
+				glColor4f(gridColor[0], gridColor[1], gridColor[2], gridColor[3]);
+			}
+
 		}
-		glVertex3f(x, floor_height, -gridSize);
-		glVertex3f(x, floor_height, gridSize);
-		
-		if (colorChanged) {
-			colorChanged = false;
-			glColor4f(gridColor[0], gridColor[1], gridColor[2], gridColor[3]);
+		for (float x = -gridSize; x <= gridSize; x += gridStep)
+		{
+			if (x == 0) {
+				colorChanged = true;
+				glColor4f(gridHighlightColor[0], gridHighlightColor[1], gridHighlightColor[2], 1.0f );
+			}
+			glVertex3f(-gridSize, gridHeight, x);
+			glVertex3f(gridSize, gridHeight, x);
+			if (colorChanged) {
+				colorChanged = false;
+				glColor4f(gridColor[0], gridColor[1], gridColor[2], gridColor[3]);
+			}
 		}
 
-	}
-	for (float x = -gridSize; x <= gridSize; x += gridStep)
-	{
-		if (x == 0) {
-			colorChanged = true;
-			glColor4f(gridHighlightColor[0], gridHighlightColor[1], gridHighlightColor[2], 1.0f );
-		}
-		glVertex3f(-gridSize, floor_height, x);
-		glVertex3f(gridSize, floor_height, x);
-		if (colorChanged) {
-			colorChanged = false;
-			glColor4f(gridColor[0], gridColor[1], gridColor[2], gridColor[3]);
-		}
+		glEndList();
+
 	}
 
-	glEnd();
 	glDisable(GL_BLEND);
 //	glDisable(GL_LINE_STIPPLE);
 
 	glPopAttrib();
+
+
+	
+
+
+	glEnd();
+
 }
 
 void FltkViewer::drawEyeBeams()

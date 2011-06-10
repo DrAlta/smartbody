@@ -44,7 +44,10 @@ RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Character/Locomotion/Trajectory", 0, TrajectoryCB, this, NULL);
 	menubar->add("&View/Pawns", 0, ShowPawns, this, NULL);
 	menubar->add("&View/Shadows", 0, ShadowsCB, this, NULL);
-	menubar->add("&View/Grid", 0, GridCB, this, NULL);
+	menubar->add("&View/Grid/Toggle", 0, GridCB, this, NULL);
+	menubar->add("&View/Grid/Grid Size", 0, GridSizeCB, this, NULL);
+	menubar->add("&View/Grid/Grid Step", 0, GridStepCB, this, NULL);
+	menubar->add("&View/Grid/Grid Height", 0, GridHeightCB, this, NULL);
 	//menubar->add("&View/Reach Pose Examples", 0, ShowPoseExamples, this, NULL);	
 	menubar->add("&View/Terrain/Shaded", 0, TerrainShadedCB, this, NULL);
 	menubar->add("&View/Terrain/Wireframe", 0, TerrainWireframeCB, this, NULL);
@@ -847,6 +850,49 @@ void RootWindow::GridCB(fltk::Widget* w, void* data)
 	else
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoGrid, NULL);
 }
+
+void RootWindow::GridSizeCB(fltk::Widget* w, void* data)
+{
+	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+
+	std::stringstream strstr;
+	strstr << rootWindow->fltkViewer->gridSize;
+	const char* gridSizeStr = fltk::input("Grid Size", strstr.str().c_str());
+	float gsize = (float) atof(gridSizeStr);
+	rootWindow->fltkViewer->gridSize = gsize;
+	glDeleteLists(rootWindow->fltkViewer->gridList, 1);
+	rootWindow->fltkViewer->gridList = -1;
+	rootWindow->fltkViewer->redraw();
+}
+
+void RootWindow::GridStepCB(fltk::Widget* w, void* data)
+{
+	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+
+	std::stringstream strstr;
+	strstr << rootWindow->fltkViewer->gridStep;
+	const char* gridStepStr = fltk::input("Grid Step", strstr.str().c_str());
+	float gstep = (float) atoi(gridStepStr);
+	rootWindow->fltkViewer->gridStep = gstep;
+	glDeleteLists(rootWindow->fltkViewer->gridList, 1);
+	rootWindow->fltkViewer->gridList = -1;
+	rootWindow->fltkViewer->redraw();
+}
+
+void RootWindow::GridHeightCB(fltk::Widget* w, void* data)
+{
+	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+
+	std::stringstream strstr;
+	strstr << rootWindow->fltkViewer->gridHeight;
+	const char* gridHeightStr = fltk::input("Grid Height", strstr.str().c_str());
+	float gheight = (float) atoi(gridHeightStr);
+	rootWindow->fltkViewer->gridHeight = gheight;
+	glDeleteLists(rootWindow->fltkViewer->gridList, 1);
+	rootWindow->fltkViewer->gridList = -1;
+	rootWindow->fltkViewer->redraw();
+}
+
 
 void RootWindow::ShowPoseExamples( fltk::Widget* w, void* data )
 {

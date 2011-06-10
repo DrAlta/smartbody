@@ -96,6 +96,9 @@ class  RootWindow : public SrViewer, public fltk::DoubleBufferWindow
 		static void SteeringAllCB(fltk::Widget* w, void* data);
 		static void SteeringNoneCB(fltk::Widget* w, void* data);	
 		static void GridCB(fltk::Widget* w, void* data);	
+		static void GridSizeCB(fltk::Widget* w, void* data);	
+		static void GridStepCB(fltk::Widget* w, void* data);	
+		static void GridHeightCB(fltk::Widget* w, void* data);
 };
 
 class FltkViewerFactory : public SrViewerFactory
