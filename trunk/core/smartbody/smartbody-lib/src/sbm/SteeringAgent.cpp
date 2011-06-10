@@ -2,7 +2,6 @@
 #include <sbm/mcontrol_util.h>
 #include <sbm/me_ct_param_animation_data.h>
 #define DebugInfo 0
-#define UseTransition 0
 
 SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 {
@@ -14,7 +13,7 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	locoSpdGain = 70.0f;
 	paLocoAngleGain = 2.0f;
 	scootThreshold = 0.02f;	
-	paLocoScootGain = 1.0f;
+	paLocoScootGain = 9.0f;
 	locoScootGain = 2.0f;
 	distThreshold = 150.0f;	// exposed, centimeter
 	transition = 0.20f;
@@ -306,17 +305,9 @@ void SteeringAgent::evaluate()
 			float scootValue = atan2(steeringCommand.scoot, steeringCommand.targetSpeed) * (180.0f / float(M_PI));
 			normalizeAngle(scootValue);
 			scootValue *= -paLocoScootGain;
-#if UseTransition
-			scootCurve->insert(mcu.time + transition, scootValue);
-#else
 		//	addOnTurning = scootValue;
-			addOnTurning = steeringCommand.scoot * 3.0f;
-#endif
+			addOnTurning = steeringCommand.scoot * paLocoScootGain;
 		}
-#if UseTransition
-		else
-			scootCurve->insert(mcu.time + transition, 0.0);
-#endif
 		// update locomotion
 		float curSpeed = 0.0f;
 		float curTurningAngle = 0.0f;
