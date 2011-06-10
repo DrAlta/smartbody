@@ -183,6 +183,12 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	const XMLCh* acceleration = elem->getAttribute(L"sbm:accel");
 	if (XMLString::compareIString(acceleration, L"") != 0)
 		c->steeringAgent->acceleration = (float)atof(XMLString::transcode(acceleration));
+	const XMLCh* scootAcceleration = elem->getAttribute(L"sbm:scootaccel");
+	if (XMLString::compareIString(scootAcceleration, L"") != 0)
+		c->steeringAgent->scootAcceleration = (float)atof(XMLString::transcode(scootAcceleration));
+	const XMLCh* angleAcceleration = elem->getAttribute(L"sbm:angleaccel");
+	if (XMLString::compareIString(angleAcceleration, L"") != 0)
+		c->steeringAgent->angleAcceleration = (float)atof(XMLString::transcode(angleAcceleration));
 	const XMLCh* manner = elem->getAttribute(L"manner");
 	if (XMLString::compareIString(manner, L"") != 0)
 	{

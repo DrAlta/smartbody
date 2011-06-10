@@ -39,6 +39,8 @@ class SteeringAgent
 		float facingAngle;
 		float facingAngleThreshold;
 		float acceleration;
+		float scootAcceleration;
+		float angleAcceleration;
 		bool facingAdjustPhase;
 };
 
