@@ -312,14 +312,14 @@ void SteeringAgent::evaluate()
 			if (curState->stateName == "UtahLocomotion" && numGoals != 0)
 			{
 				curState->paramManager->getParameter(curSpeed, curTurningAngle, curScoot);
-			//	if (fabs(steeringCommand.scoot) > scootThreshold)
-			//	{
+				if (steeringCommand.scoot != 0.0)
+				{
 					float addOnScoot = steeringCommand.scoot * paLocoScootGain;
 					if (curScoot < addOnScoot)
 						curScoot += scootAcceleration * 100.0f / 60.0f;
-					else if (curScoot > addOnScoot)
+					else
 						curScoot -= scootAcceleration * 100.0f / 60.0f;
-			//	}
+				}
 				curSpeed = curSpeed / 100.0f;
 				if (steeringCommand.aimForTargetSpeed)
 				{
@@ -341,7 +341,6 @@ void SteeringAgent::evaluate()
 					curSpeed += acceleration * 100.0f / 60.0f;
 				if (steeringCommand.aimForTargetDirection)
 				{
-			//		angleDiff += addOnTurning;
 					float addOnTurning = angleDiff * paLocoAngleGain;
 					if (curTurningAngle < addOnTurning)
 						curTurningAngle += angleAcceleration * 100.0f / 60.0f;
