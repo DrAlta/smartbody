@@ -180,6 +180,9 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	const XMLCh* proximity = elem->getAttribute(L"proximity");
 	if (XMLString::compareIString(proximity, L"") != 0)
 		c->steeringAgent->distThreshold = (float)atof(XMLString::transcode(proximity)) * 100.0f;
+	const XMLCh* acceleration = elem->getAttribute(L"sbm:accel");
+	if (XMLString::compareIString(acceleration, L"") != 0)
+		c->steeringAgent->acceleration = (float)atof(XMLString::transcode(acceleration));
 	const XMLCh* manner = elem->getAttribute(L"manner");
 	if (XMLString::compareIString(manner, L"") != 0)
 	{
@@ -190,7 +193,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		}
 		std::string mannerString = XMLString::transcode(manner);
 		if (mannerString == "walk")
-			c->steeringAgent->desiredSpeed = 1.6f;
+			c->steeringAgent->desiredSpeed = 1.2f;
 		else if (mannerString == "jog")
 			c->steeringAgent->desiredSpeed = 2.5f;
 		else if (mannerString == "run")

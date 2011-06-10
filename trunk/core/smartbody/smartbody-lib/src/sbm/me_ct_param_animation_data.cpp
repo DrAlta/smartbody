@@ -97,9 +97,9 @@ bool ParameterManager::setWeight(double x)
 	if (type != 0)
 		return false;
 
-	double xDiff = fabs(previousParam.x - x);
-	if (xDiff > changeLimit)
-		x = (previousParam.x + x) * 0.5;
+	//double xDiff = fabs(previousParam.x - x);
+	//if (xDiff > changeLimit)
+	//	x = (previousParam.x + x) * 0.5;
 	double left = -9999.0;
 	double right = 9999.0;
 	std::string leftMotion = "";
@@ -157,12 +157,12 @@ bool ParameterManager::setWeight(double x, double y)
 	if (type != 1)
 		return false;
 	
-	double xDiff = fabs(previousParam.x - x);
-	if (xDiff > changeLimit)
-		x = (previousParam.x + x) * 0.5;
-	double yDiff = fabs(previousParam.y - y);
-	if (yDiff > changeLimit)
-		y = (previousParam.y + y) * 0.5;
+	//double xDiff = fabs(previousParam.x - x);
+	//if (xDiff > changeLimit)
+	//	x = (previousParam.x + x) * 0.5;
+	//double yDiff = fabs(previousParam.y - y);
+	//if (yDiff > changeLimit)
+	//	y = (previousParam.y + y) * 0.5;
 
 	SrVec pt = SrVec((float)x, (float)y, 0);
 	for (int i = 0; i < getNumTriangles(); i++)
@@ -240,16 +240,16 @@ bool ParameterManager::setWeight(double x, double y, double z)
 		return false;
 
 	// parameter sudden change detect
-	double zDiff = fabs(previousParam.z - z);
-	if (zDiff > changeLimit)
-		z = (previousParam.z + z) * 0.5;
-	
-	double xDiff = fabs(previousParam.x - x);
-	if (xDiff > changeLimit)
-		x = (previousParam.x + x) * 0.5;
-	double yDiff = fabs(previousParam.y - y);
-	if (yDiff > changeLimit)
-		y = (previousParam.y + y) * 0.5;
+	//double zDiff = fabs(previousParam.z - z);
+	//if (zDiff > changeLimit)
+	//	z = (previousParam.z + z) * 0.5;
+	//
+	//double xDiff = fabs(previousParam.x - x);
+	//if (xDiff > changeLimit)
+	//	x = (previousParam.x + x) * 0.5;
+	//double yDiff = fabs(previousParam.y - y);
+	//if (yDiff > changeLimit)
+	//	y = (previousParam.y + y) * 0.5;
 
 
 	SrVec pt = SrVec((float)x, (float)y, (float)z);
@@ -434,7 +434,44 @@ void ParameterManager::getParameter(float& x, float& y)
 
 void ParameterManager::getParameter(float& x, float& y, float& z)
 {
-
+	std::vector<int> indices;
+	for (int i = 0; i < state->getNumMotions(); i++)
+	{
+		if (state->weights[i] > 0.0)
+			indices.push_back(i);
+	}
+	if (indices.size() == 0)
+		return;
+	else if (indices.size() == 1)
+	{
+		int id = state->paramManager->getMotionId(state->motions[indices[0]]->name());
+		if (id >= 0)
+		{
+			x = state->paramManager->getVec(id).x;
+			y = state->paramManager->getVec(id).y;
+			z = state->paramManager->getVec(id).z;
+		}
+		else
+			return;
+	}
+	else
+	{
+		std::vector<SrVec> vecs;
+		for (size_t i = 0; i < indices.size(); i++)
+		{
+			int id = state->paramManager->getMotionId(state->motions[indices[i]]->name());
+			if (id >= 0)
+				vecs.push_back(state->paramManager->getVec(id));
+			else
+				return;
+		}
+		SrVec vec;
+		for (size_t i = 0; i < indices.size(); i++)
+			vec = vec + vecs[i] * (float)state->weights[indices[i]];
+		x = vec.x;
+		y = vec.y;
+		z = vec.z;
+	}
 }
 
 void ParameterManager::addParameter(std::string motion, double x)

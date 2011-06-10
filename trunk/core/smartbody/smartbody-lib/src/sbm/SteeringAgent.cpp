@@ -22,6 +22,7 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	facingAngle = -200.0f;
 	facingAngleThreshold = 10;	//angle
 	facingAdjustPhase = false;
+	acceleration = 0.02f;	// exposed, meter/s^2
 }
 
 SteeringAgent::~SteeringAgent()
@@ -286,6 +287,14 @@ void SteeringAgent::evaluate()
 						mcu.execute((char*) command.str().c_str());
 					}				
 				}
+				PAStateData* locoState = mcu.lookUpPAState("UtahLocomotion");
+				for (int i = 0; i < locoState->getNumMotions(); i++)
+				{
+					if (i == 0)
+						locoState->weights[i] = 1.0;
+					else
+						locoState->weights[i] = 0.0;
+				}
 				std::stringstream command1;
 				command1 << "panim schedule char " << character->name;
 				command1 << " state UtahLocomotion loop true playnow false";
@@ -321,20 +330,19 @@ void SteeringAgent::evaluate()
 					// target speed is the desired speed for the character
 					if (curSpeed < steeringCommand.targetSpeed)
 					{
-						curSpeed += steeringCommand.acceleration * 100.0f/ 60.0f;
+						curSpeed += acceleration * 100.0f / 60.0f;
 						if (curSpeed > steeringCommand.targetSpeed)
 							curSpeed = steeringCommand.targetSpeed;
 					}
 					else
 					{
-						curSpeed -= steeringCommand.acceleration * 100.0f/ 60.0f;
+						curSpeed -= acceleration * 100.0f / 60.0f;
 						if (curSpeed < steeringCommand.targetSpeed)
 							curSpeed = steeringCommand.targetSpeed;
 					}
 				}
 				else
-					curSpeed += steeringCommand.acceleration / 60.0f;
-				newSpeed = curSpeed;
+					curSpeed += acceleration * 100.0f / 60.0f;
 				if (steeringCommand.aimForTargetDirection)
 				{
 			//		angleDiff += addOnTurning;
@@ -342,6 +350,7 @@ void SteeringAgent::evaluate()
 				}
 				else
 					curTurningAngle = steeringCommand.turningAmount / 60.0f;
+				newSpeed = curSpeed;
 				curSpeed *= 100.0f;
 			//	curState->paramManager->setWeight(curSpeed, curTurningAngle);
 				curState->paramManager->setWeight(curSpeed, curTurningAngle, addOnTurning);
