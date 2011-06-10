@@ -12,6 +12,54 @@
 
 using std::string;
 
+// MESSAGE LOGGING ////////////////////////////////
+LogMessageCallback LogMessageFunc = NULL;
+
+class LogMessageListener : public vhcl::Log::Listener
+{
+public:
+   LogMessageListener() {}
+   ~LogMessageListener() {}
+
+   virtual void OnMessage( const std::string & message )
+   {
+      int messageType = 0;
+      if (message.find("WARNING") != std::string::npos)
+      {
+         messageType = 2;
+      }
+      else if (message.find("ERROR") != std::string::npos)
+      {
+         messageType = 1;
+      }
+      SBM_LogMessage(message.c_str(), messageType);
+   }
+};
+LogMessageListener* g_pLogMessageListener = NULL;
+
+SMARTBODY_C_DLL_API bool SBM_SetLogMessageCallback(LogMessageCallback cb)
+{
+   LogMessageFunc = cb;
+
+   if (g_pLogMessageListener == NULL)
+   {
+      g_pLogMessageListener = new LogMessageListener();
+      vhcl::Log::g_log.AddListener(g_pLogMessageListener);
+      return true;
+   }
+
+   return false;
+}
+
+SMARTBODY_C_DLL_API void SBM_LogMessage(const char* message, int messageType)
+{
+   // 0 = normal, 1 = error, 2 = warning
+   if (LogMessageFunc)
+   {
+      LogMessageFunc(message, messageType);
+   }
+}
+// END MESSAGE LOGGING ////////////////////////////////
 
 class SBM_SmartbodyListener : public SmartbodyListener
 {
@@ -196,6 +244,15 @@ SMARTBODY_C_DLL_API bool SBM_Shutdown( SBMHANDLE sbmHandle )
    g_smartbodyInstances.erase( it );
    bool retVal = sbm->Shutdown();
    delete sbm;
+
+   // release the logger
+   if (g_pLogMessageListener)
+   {
+      vhcl::Log::g_log.RemoveListener(g_pLogMessageListener);
+      delete g_pLogMessageListener;
+      g_pLogMessageListener = NULL;
+   }
+
    return retVal;
 }
 
