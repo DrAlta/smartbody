@@ -22,6 +22,8 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	facingAngleThreshold = 10;	//angle
 	facingAdjustPhase = false;
 	acceleration = 0.02f;	// exposed, meter/s^2
+	scootAcceleration = 4.0f;
+	angleAcceleration = 4.0f;
 }
 
 SteeringAgent::~SteeringAgent()
@@ -218,6 +220,7 @@ void SteeringAgent::evaluate()
 		std::string curStateName = character->param_animation_ct->getCurrentStateName();
 		std::string nextStateName = character->param_animation_ct->getNextStateName();
 
+		// end locomotion
 		if (reachTarget)
 		{
 			if (curStateName == "UtahLocomotion" || nextStateName == "UtahLocomotion"
@@ -238,6 +241,7 @@ void SteeringAgent::evaluate()
 			}
 //			character->param_animation_ct->dumpScheduling();
 		}
+
 		// start locomotion
 		if (curState)
 			if (curState->stateName == PseudoIdleState && numGoals != 0 && nextStateName == "")
@@ -299,22 +303,23 @@ void SteeringAgent::evaluate()
 				command1 << " state UtahLocomotion loop true playnow false";
 				mcu.execute((char*) command1.str().c_str());
 			}	
-		float addOnTurning = (float)scootCurve->evaluate(mcu.time);
-		if (fabs(steeringCommand.scoot) > scootThreshold)
-		{
-			float scootValue = atan2(steeringCommand.scoot, steeringCommand.targetSpeed) * (180.0f / float(M_PI));
-			normalizeAngle(scootValue);
-			scootValue *= -paLocoScootGain;
-		//	addOnTurning = scootValue;
-			addOnTurning = steeringCommand.scoot * paLocoScootGain;
-		}
+
 		// update locomotion
 		float curSpeed = 0.0f;
 		float curTurningAngle = 0.0f;
+		float curScoot = 0.0f;
 		if (curState)
 			if (curState->stateName == "UtahLocomotion" && numGoals != 0)
 			{
-				curState->paramManager->getParameter(curSpeed, curTurningAngle);
+				curState->paramManager->getParameter(curSpeed, curTurningAngle, curScoot);
+			//	if (fabs(steeringCommand.scoot) > scootThreshold)
+			//	{
+					float addOnScoot = steeringCommand.scoot * paLocoScootGain;
+					if (curScoot < addOnScoot)
+						curScoot += scootAcceleration * 100.0f / 60.0f;
+					else if (curScoot > addOnScoot)
+						curScoot -= scootAcceleration * 100.0f / 60.0f;
+			//	}
 				curSpeed = curSpeed / 100.0f;
 				if (steeringCommand.aimForTargetSpeed)
 				{
@@ -337,16 +342,22 @@ void SteeringAgent::evaluate()
 				if (steeringCommand.aimForTargetDirection)
 				{
 			//		angleDiff += addOnTurning;
-					curTurningAngle = angleDiff * paLocoAngleGain;
+					float addOnTurning = angleDiff * paLocoAngleGain;
+					if (curTurningAngle < addOnTurning)
+						curTurningAngle += angleAcceleration * 100.0f / 60.0f;
+					else if (curTurningAngle > addOnTurning)
+						curTurningAngle -= angleAcceleration * 100.0f / 60.0f;
 				}
 				else
 					curTurningAngle = steeringCommand.turningAmount / 60.0f;
 				newSpeed = curSpeed;
 				curSpeed *= 100.0f;
 			//	curState->paramManager->setWeight(curSpeed, curTurningAngle);
-				curState->paramManager->setWeight(curSpeed, curTurningAngle, addOnTurning);
+				curState->paramManager->setWeight(curSpeed, curTurningAngle, curScoot);
 				character->param_animation_ct->updateWeights();
 			}
+
+		// adjust for facing
 		if (curState)
 		{
 			if (curState->stateName == PseudoIdleState && numGoals == 0 && nextStateName == "")
