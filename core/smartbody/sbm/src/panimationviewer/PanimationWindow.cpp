@@ -228,7 +228,7 @@ void PanimationWindow::execCmd(PanimationWindow* window, std::string cmd, double
 				display->insert("\n");
 			}
 		}
-		display->relayout();
+		display->relayout();		
 		display->redraw();
 		display->show_insert_position();
 	}

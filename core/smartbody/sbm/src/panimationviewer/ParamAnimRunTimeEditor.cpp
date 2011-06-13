@@ -636,7 +636,7 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 		int type = state->paramManager->getType();
 		if (type == 0)
 		{
-			paramVisualization = new ParameterVisualization(4 * xDis, yDis, w - 5 * xDis, h - 5 * yDis, "", s, this);
+			paramVisualization = new ParameterVisualization(4 * xDis, yDis, w - 5 * xDis, h - 5 * yDis, "", s, this);			
 			this->resizable(paramVisualization);
 			yAxis = NULL;
 			zAxis = NULL;

@@ -23,33 +23,35 @@ public:
 
 class ReachHandAction
 {
-public:
-	// action interface, do nothing by default
-	virtual void reachPreCompleteAction(ReachStateData* rd) {};
-	virtual void reachCompleteAction(ReachStateData* rd) {};	
-	virtual void reachNewTargetAction(ReachStateData* rd) {};
-	virtual void reachReturnAction(ReachStateData* rd) {};
+public:	
+	virtual void reachPreCompleteAction(ReachStateData* rd) ;
+	virtual void reachCompleteAction(ReachStateData* rd) ;	
+	virtual void reachNewTargetAction(ReachStateData* rd) ;
+	virtual void reachReturnAction(ReachStateData* rd) ;
 	virtual SRT getHandTargetStateOffset(ReachStateData* rd, SRT& naturalState);
-	virtual bool pickUpNewPawn(ReachStateData* rd) { return false; }
+	virtual bool isPickingUpNewPawn(ReachStateData* rd) ;
 
 	void sendReachEvent(std::string cmd, float time = 0.0);	
+public:
+	void pickUpAttachedPawn(ReachStateData* rd);
+	void putDownAttachedPawn(ReachStateData* rd);
 };
 
 class ReachHandPickUpAction : public ReachHandAction
 {
-public:
-	// action interface, do nothing by default
-	virtual void reachPreCompleteAction(ReachStateData* rd);
+public:	
+	//virtual void reachPreCompleteAction(ReachStateData* rd);
 	virtual void reachCompleteAction(ReachStateData* rd);		
 	virtual void reachNewTargetAction(ReachStateData* rd);
-	virtual SRT getHandTargetStateOffset(ReachStateData* rd, SRT& naturalState);
-	virtual bool pickUpNewPawn(ReachStateData* rd);
+	virtual void reachReturnAction(ReachStateData* rd) {} ; // do nothing when return
+	//virtual SRT getHandTargetStateOffset(ReachStateData* rd, SRT& naturalState);
+	//virtual bool pickUpNewPawn(ReachStateData* rd);
 };
 
 class ReachHandPutDownAction : public ReachHandAction
 {
-public:
-	// action interface, do nothing by default	
+public:	
+	virtual void reachPreCompleteAction(ReachStateData* rd) {}; // do nothing when moving toward target
 	virtual void reachCompleteAction(ReachStateData* rd);	
 	virtual void reachReturnAction(ReachStateData* rd);	
 	virtual SRT getHandTargetStateOffset(ReachStateData* rd, SRT& naturalState);
@@ -64,13 +66,13 @@ public:
 	SRT grabStateError;
 	SrVec paraTarget;
 
-	SbmPawn* attachedPawn;
+	SbmPawn* attachedPawn;	
 	SrMat    attachMat;
 public:
 	EffectorState();
 	~EffectorState() {}
-	void attachPawnTarget(ReachStateData* rd);
-	void releasePawn(ReachStateData* rd);
+	void setAttachedPawn(ReachStateData* rd);
+	void removeAttachedPawn(ReachStateData* rd);
 	void updateAttachedPawn();
 };
 
@@ -94,6 +96,7 @@ public:
 	bool            startReach, endReach;
 	bool            useExample;	
 	bool            locomotionComplete;
+	bool            newTarget;
 
 	// for pick-up/put-down action
 	ReachHandAction* curHandAction;
@@ -170,6 +173,7 @@ class ReachStateComplete : public ReachStateInterface
 protected:
 	float completeTime;
 public:
+	ReachStateComplete() { completeTime = 0.f; }
 	virtual void update(ReachStateData* rd);
 	virtual void updateEffectorTargetState(ReachStateData* rd);	
 	virtual std::string nextState(ReachStateData* rd);	
@@ -183,6 +187,16 @@ public:
 	virtual void updateEffectorTargetState(ReachStateData* rd);	
 	virtual std::string nextState(ReachStateData* rd);
 	virtual std::string curStateName() { return "NewTarget"; }
+};
+
+class ReachStatePreReturn : public ReachStateComplete
+{
+public:
+	ReachStatePreReturn() : ReachStateComplete() {}
+	virtual void update(ReachStateData* rd);
+	virtual void updateEffectorTargetState(ReachStateData* rd) {} // do nothing
+	virtual std::string nextState(ReachStateData* rd);	
+	virtual std::string curStateName() { return "PreReturn"; }
 };
 
 class ReachStateReturn : public ReachStateInterface
