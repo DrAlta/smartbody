@@ -146,6 +146,7 @@ void MeCtReachEngine::init()
 	stateTable["Move"] = new ReachStateMove();
 	stateTable["Complete"] = new ReachStateComplete();
 	stateTable["NewTarget"] = new ReachStateNewTarget();
+	stateTable["PreReturn"] = new ReachStatePreReturn();
 	stateTable["Return"] = new ReachStateReturn();
 
 	handActionTable[PICK_UP_OBJECT] = new ReachHandPickUpAction();
@@ -235,11 +236,12 @@ void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet )
 
 bool MeCtReachEngine::hasEffectorRotConstraint( ReachStateData* rd )
 {	
-	if (rd->curHandAction == handActionTable[PICK_UP_OBJECT] || rd->curHandAction == handActionTable[PUT_DOWN_OBJECT])
-		return true;
-	else if (rd->curHandAction == handActionTable[TOUCH_OBJECT])
-		return false;
-	return false;
+// 	if (rd->curHandAction == handActionTable[PICK_UP_OBJECT] || rd->curHandAction == handActionTable[PUT_DOWN_OBJECT])
+// 		return true;
+// 	else if (rd->curHandAction == handActionTable[TOUCH_OBJECT])
+// 		return false;
+// 	return false;
+	return true;
 }
 
 void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
@@ -397,7 +399,7 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 
 	if (nextState != curReachState)
 	{
-		//printf("cur State = %s\n",nextState->curStateName().c_str());
+		printf("cur State = %s\n",nextState->curStateName().c_str());
 		reachData->stateTime = 0.f;
 		curReachState = nextState;
 	}

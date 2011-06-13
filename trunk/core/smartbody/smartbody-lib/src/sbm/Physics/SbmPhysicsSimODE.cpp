@@ -223,9 +223,9 @@ void SbmPhysicsSimODE::initSimulation()
 void SbmPhysicsSimODE::updateSimulation( float timeStep )
 {	
 	dSpaceCollide(spaceID,this,SbmPhysicsSimODE::nearCallBack);		
-	dWorldStep(worldID,timeStep);
+	//dWorldStep(worldID,timeStep);
 	//dWorldStepFast1(worldID,timeStep,10);
-	//dWorldQuickStep(worldID,timeStep);	
+	dWorldQuickStep(worldID,timeStep);	
 	dJointGroupEmpty(contactGroupID);
 
 	std::for_each(physicsObjList.begin(),physicsObjList.end(),std::mem_fun(&SbmPhysicsObj::updateColObj));
