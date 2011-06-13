@@ -65,7 +65,7 @@ bool ReachTarget::targetIsJoint()
 
 SbmPawn* ReachTarget::getTargetPawn()
 {
-	if (useTargetPawn && targetPawn && targetPawn->colObj_p)
+	if (useTargetPawn && targetPawn)// && targetPawn->colObj_p)
 	{
 		return targetPawn;
 	}
@@ -219,7 +219,7 @@ void ReachHandAction::pickUpAttachedPawn( ReachStateData* rd )
 void ReachHandAction::putDownAttachedPawn( ReachStateData* rd )
 {
 	SbmPawn* attachedPawn = rd->effectorState.attachedPawn;
-	if (!attachedPawn)
+	if (!attachedPawn || !attachedPawn->colObj_p)
 		return;
 
 	std::string charName = rd->charName;	

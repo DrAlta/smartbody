@@ -2579,7 +2579,7 @@ void FltkViewer::drawPawns()
 	mcu.character_map.reset();
 	while (SbmCharacter* character = mcu.character_map.next())
 	{
-		pawnSize = 5.f;//character->getHeight()/ 30.0f;
+		pawnSize = character->getHeight()/ 30.0f;
 		break;
 	}
 
@@ -2588,7 +2588,7 @@ void FltkViewer::drawPawns()
 	
 	while ( SbmPawn* pawn = pawn_map.next() )
 	{
-		if (!pawn->skeleton_p) // wouldn't this will go into inf loop ?
+		if (!pawn->skeleton_p) 
 			continue;
 		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
 		if (character)
