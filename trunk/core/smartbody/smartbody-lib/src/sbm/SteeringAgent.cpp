@@ -9,21 +9,20 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	target = NULL;
 	scootCurve = new srLinearCurve();
 
-	scootAccel = 5.0f;	// should be exposed
 	locoSpdGain = 70.0f;
 	paLocoAngleGain = 2.0f;
 	scootThreshold = 0.02f;	
 	paLocoScootGain = 9.0f;
 	locoScootGain = 2.0f;
-	distThreshold = 150.0f;	// exposed, centimeter
+	distThreshold = 150.0f;			// exposed, centimeter
 	transition = 0.20f;
-	desiredSpeed = 1.0f;	// exposed, meter
+	desiredSpeed = 1.0f;			// exposed, meter
 	facingAngle = -200.0f;
-	facingAngleThreshold = 10;	//angle
+	facingAngleThreshold = 10;		//angle
 	facingAdjustPhase = false;
-	acceleration = 0.02f;	// exposed, meter/s^2
-	scootAcceleration = 4.0f;
-	angleAcceleration = 4.0f;
+	acceleration = 0.02f;			// exposed, meter/s^2
+	scootAcceleration = 200.0f;		// exposed, unit unknown
+	angleAcceleration = 300.0f;		// exposed, unit unknown
 }
 
 SteeringAgent::~SteeringAgent()
@@ -88,8 +87,6 @@ void SteeringAgent::evaluate()
 	normalizeAngle(angleDiff);
 	float newSpeed = desiredSpeed;
 
-	//printf("num Goals = %d\n",numGoals);
-
 	//---update for locomotion_ct
 	if (mcu.steering_use_procedural)
 	{
@@ -131,13 +128,11 @@ void SteeringAgent::evaluate()
 				}
 				else if (nav->limb_blending_factor < 0.1)
 				{
-					//LOG("character reach target\n");							
 					character->_reachTarget = true;
 				}
 			}
 			else if (nav->limb_blending_factor < 0.1)
 			{
-				//LOG("character reach target, facing angle >=180\n");				
 				character->_reachTarget = true;
 			}
 		}
@@ -160,50 +155,30 @@ void SteeringAgent::evaluate()
 			}
 			else
 			{
-#if 0
-				if (speed == 0.0f)
+				if (steeringCommand.aimForTargetDirection)
 				{
+					float spd = 1.0f;
 					std::stringstream strstr;
 					strstr << "test loco char ";
 					strstr << character->name;
-					strstr << " stop";
+
+					strstr << " forward spd " << speed << " rps ";
+					if (angleDiff < 0)
+					 strstr << spd << " ";
+					else
+					 strstr << -spd << " ";
+					strstr << "angle " << angleDiff * M_PI/180.0;
 					mcu.execute((char*)strstr.str().c_str());
 				}
 				else
-#endif
 				{
-					if (steeringCommand.aimForTargetDirection)
-					{
-						float spd = 1.0f;
-						std::stringstream strstr;
-						strstr << "test loco char ";
-						strstr << character->name;
-
-						strstr << " forward spd " << speed << " rps ";
-						if (angleDiff < 0)
-						 strstr << spd << " ";
-						else
-						 strstr << -spd << " ";
-						strstr << "angle " << angleDiff * M_PI/180.0;
-						mcu.execute((char*)strstr.str().c_str());
-					}
-					else
-					{
-						float turningScale = float(M_PI);
-						float turningAmount = float(M_PI);
-						std::stringstream strstr;
-						strstr << "test loco char ";
-						strstr << character->name;
-						strstr << " forward spd " << speed;
-						//<< " rps ";						
-						//strstr << turningScale * steeringCommand.turningAmount;
-						//strstr << " angle ";
-						//if (steeringCommand.turningAmount < 0)
-						//	strstr << -1.0f * turningAmount;
-						//else
-						//	strstr << turningAmount;
-						mcu.execute((char*)strstr.str().c_str());
-					}
+					float turningScale = float(M_PI);
+					float turningAmount = float(M_PI);
+					std::stringstream strstr;
+					strstr << "test loco char ";
+					strstr << character->name;
+					strstr << " forward spd " << speed;
+					mcu.execute((char*)strstr.str().c_str());
 				}
 			}
 		}
@@ -312,13 +287,31 @@ void SteeringAgent::evaluate()
 			if (curState->stateName == "UtahLocomotion" && numGoals != 0)
 			{
 				curState->paramManager->getParameter(curSpeed, curTurningAngle, curScoot);
+				float addOnScoot = steeringCommand.scoot * paLocoScootGain;
 				if (steeringCommand.scoot != 0.0)
 				{
-					float addOnScoot = steeringCommand.scoot * paLocoScootGain;
 					if (curScoot < addOnScoot)
-						curScoot += scootAcceleration * 100.0f / 60.0f;
+						curScoot += scootAcceleration / 60.0f;
 					else
-						curScoot -= scootAcceleration * 100.0f / 60.0f;
+						curScoot -= scootAcceleration / 60.0f;
+				}
+				else
+				{
+					if (fabs(curScoot) < scootThreshold)
+						curScoot = 0.0f;
+					else
+					{
+						if (curScoot > 0.0f)
+						{
+							curScoot -= scootAcceleration / 60.0f;
+							if (curScoot < 0.0)	curScoot = 0.0;
+						}
+						else
+						{
+							curScoot += scootAcceleration / 60.0f;
+							if (curScoot > 0.0)	curScoot = 0.0;
+						}
+					}
 				}
 				curSpeed = curSpeed / 100.0f;
 				if (steeringCommand.aimForTargetSpeed)
@@ -343,9 +336,9 @@ void SteeringAgent::evaluate()
 				{
 					float addOnTurning = angleDiff * paLocoAngleGain;
 					if (curTurningAngle < addOnTurning)
-						curTurningAngle += angleAcceleration * 100.0f / 60.0f;
+						curTurningAngle += angleAcceleration / 60.0f;
 					else if (curTurningAngle > addOnTurning)
-						curTurningAngle -= angleAcceleration * 100.0f / 60.0f;
+						curTurningAngle -= angleAcceleration / 60.0f;
 				}
 				else
 					curTurningAngle = steeringCommand.turningAmount / 60.0f;
@@ -427,7 +420,7 @@ void SteeringAgent::evaluate()
 	character->_numSteeringGoal = numGoals;
 
 	//printf("Reach target = %d, num of goals = %d\n",character->_reachTarget,character->_numSteeringGoal);
-	//---
+	//---Event handler
 	if (!character->_lastReachStatus && character->_reachTarget)
 	{
 		std::string eventType = "locomotion";		
