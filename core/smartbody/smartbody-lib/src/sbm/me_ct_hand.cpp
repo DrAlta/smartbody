@@ -49,7 +49,7 @@ void FingerChain::testCollision( SbmGeomObject* colObj )
 {
 	std::vector<SrVec> lineSeg;
 	getLineSeg(lineSeg);
-	if (lineSeg.size() < 2)
+	if (lineSeg.size() < 2 || !colObj)
 		return; // no line
 
 	for (unsigned int i=1;i<lineSeg.size();i++)
