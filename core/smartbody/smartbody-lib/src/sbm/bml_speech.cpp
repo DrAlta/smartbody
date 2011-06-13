@@ -671,7 +671,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 		if( LOG_AUDIO || LOG_BML_VISEMES )
 			cout << "DEBUG: BodyPlannerImpl::realizeRequest(..): scheduling request->audioPlay: " << audioPlay << endl;
 		// schedule for later
-		sbm_commands.push_back( new SbmCommand( audioPlay, startAt ) );
+		sbm_commands.push_back( new SbmCommand( audioPlay, startAt + request->actor->get_viseme_sound_delay() ) );
 		//if( seq->insert( (float)(audioOffset<0? 0: audioOffset), audioPlay.c_str() ) != CMD_SUCCESS ) {
 		//	LOG( "ERROR: BodyPlannerImpl::realizeRequest: insert audio trigger into seq FAILED, msgId=%s\n", bpMsg.msgId ); 
 		//}
@@ -695,7 +695,7 @@ void BML::SpeechRequest::unschedule( mcuCBHandle* mcu,
 	mcu->execute_later( cmd.str().c_str(), 0 );
 
 	if( !audioStop.empty() )
-		mcu->execute_later( audioStop.c_str() );
+		mcu->execute_later( audioStop.c_str(), request->actor->get_viseme_sound_delay() );
 	else
 		LOG("WARNING: SpeechRequest::unschedule(): unique_id \"%s\": Missing audioStop.", unique_id.c_str());
 }

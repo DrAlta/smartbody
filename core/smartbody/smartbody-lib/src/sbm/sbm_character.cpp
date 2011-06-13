@@ -133,6 +133,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 
 	use_viseme_curve = false;
 	viseme_time_offset = 0.0;
+	viseme_sound_offset = 0.0;
 	viseme_magnitude = 1.0;
 	viseme_channel_count = 0;
 	viseme_channel_start_pos = 0;
@@ -1952,6 +1953,12 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		{
 			float timeDelay = (float)atof( next );
 			set_viseme_time_delay( timeDelay );
+			return CMD_SUCCESS;
+		}
+		if( _strcmpi( viseme, "sounddelay" ) == 0 )
+		{
+			float soundDelay = (float)atof( next );
+			set_viseme_sound_delay( soundDelay );
 			return CMD_SUCCESS;
 		}
 		if( _strcmpi( viseme, "magnitude" ) == 0 )
