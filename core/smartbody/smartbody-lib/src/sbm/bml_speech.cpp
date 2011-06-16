@@ -387,6 +387,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 	time_sec first_open  = TIME_UNSET;  // start of first non-neutral viseme
 	time_sec last_open   = TIME_UNSET;  // end of last non-neutral viseme
 	time_sec last_viseme = TIME_UNSET;  // end of last viseme
+	time_sec longest_viseme = TIME_UNSET;
 
 	// Process Visemes
 	vector<VisemeData*>* result_visemes = speech_impl->getVisemes( speech_request_id, actor );
@@ -442,6 +443,10 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 				last_open = v->time() + v->duration();
 			}
 			last_viseme = v->time() + v->duration();
+			if ( !isTimeSet(longest_viseme))
+				longest_viseme = v->duration();
+			else if (longest_viseme < v->duration())
+				longest_viseme = v->duration();
 		}
 	} else {
 
@@ -452,6 +457,9 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 			LOG(strstr.str().c_str());
 		}
 	}
+
+	if (last_open < longest_viseme) // ensures that curve mode will send bml:end at the proper time
+		last_open = longest_viseme;
 
 	time_sec start_time = now; // TODO: sync to prior behaviors
 

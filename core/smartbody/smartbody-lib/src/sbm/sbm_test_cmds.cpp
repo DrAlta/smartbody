@@ -571,12 +571,19 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 		int speech_type = PLAIN_TEXT;
 
 		string speech = args.read_token();
+		string refTag = "";
 		if( speech=="text" ) {
 			speech_type = PLAIN_TEXT;
 			speech = args.read_remainder_raw();
 		} else if( speech=="ssml" ) {
 			speech_type = SSML;
 			speech = args.read_remainder_raw();
+		} else if ( speech =="ref")
+		{
+			string refName = args.read_token();								
+			refTag = " ref=\"" + refName + "\" ";
+			speech = "";
+
 		} else {
 			speech = speech+" "+args.read_remainder_raw();
 		}
@@ -584,14 +591,14 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 		string speech_tag;
 		switch( speech_type ) {
 			case PLAIN_TEXT:
-				speech_tag = "<speech type=\"text/plain\">";
+				speech_tag = "<speech type=\"text/plain\"" + refTag + ">";
 				break;
 			case SSML:
-				speech_tag = "<speech type=\"application/ssml+xml\">";
+				speech_tag = "<speech type=\"application/ssml+xml\"" + refTag + ">";
 				break;
 			default:
 				LOG("INTERNAL ERROR: BML::Processor::test_bml_func(..): Invalid speech_type: %d", speech_type);
-		}
+		}		
 
 		ostringstream bml;
 		bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"

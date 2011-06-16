@@ -5,7 +5,7 @@
 
 typedef std::pair<int,float> IntFloatPair;
 
-static bool intFloatComp(IntFloatPair& p1, IntFloatPair& p2)
+static bool intFloatComp(const IntFloatPair& p1, const IntFloatPair& p2)
 {
 	return (p1.second > p2.second);
 }
@@ -19,7 +19,8 @@ bool SbmDeformableMeshGPU::initShader = false;
 bool SbmDeformableMeshGPU::useGPUDeformableMesh = true;
 
 std::string shaderVS = 
-"#extension GL_EXT_gpu_shader4 : enable \n\
+"#version 120 \n\
+#extension GL_EXT_gpu_shader4 : require \n\
 uniform samplerBuffer Transform; \n\
 attribute vec4 BoneID1,BoneID2;   \n\
 attribute vec4 BoneWeight1,BoneWeight2;\n \
@@ -31,8 +32,8 @@ mat3 GetTransformation(float id)\n \
 	mat3 rot;\n  \
 	for (int i=0;i<3;i++)\n \
 	{ \n  \
-		for (int j=0;j<3;j++)\n \
-			rot[j][i] = texelFetchBuffer(Transform,(idx*16+i*4+j)).x;\n		\
+		//for (int j=0;j<3;j++)\n \
+			//rot[j][i] = texelFetchBuffer(Transform,(idx*16+i*4+j),0).x;\n		\
 	}\n	\
 	return rot;\n \
 }\n \
@@ -40,9 +41,9 @@ vec3 GetTranslation(float id)\n \
 {\n  \
 	int idx = int(id);\n \
 	vec3 tran;\n \
-	tran[0] = texelFetchBuffer(Transform,(idx*16+12)).x;\n \
-	tran[1] = texelFetchBuffer(Transform,(idx*16+13)).x;\n \
-	tran[2] = texelFetchBuffer(Transform,(idx*16+14)).x;\n \
+	//tran[0] = texelFetchBuffer(Transform,(idx*16+12)).x;\n \
+    //tran[1] = texelFetchBuffer(Transform,(idx*16+13)).x;\n \
+	//tran[2] = texelFetchBuffer(Transform,(idx*16+14)).x;\n \
 	return tran;\n	\
 }\n  \
 mat3 TransformPos(vec3 position, vec3 normal, vec4 boneid, vec4 boneweight)\n\
@@ -225,6 +226,7 @@ void SbmDeformableMeshGPU::initShaderProgram()
 	SbmShaderManager::singleton().addShader(shaderName.c_str(),shaderVS.c_str(),shaderFS.c_str(),false);
 	initShader = true;
 }
+
 
 bool SbmDeformableMeshGPU::initBuffer()
 {
@@ -430,19 +432,19 @@ bool SbmDeformableMeshGPU::initBuffer()
 	// initial GPU buffer memory
 
 	// Vertex Buffer Object	
-	VBOPos = new VBOVec3f("RestPos",VERTEX_POSITION,posBuffer);	
-	VBONormal  =  new VBOVec3f("Normal",VERTEX_VBONORMAL, normalBuffer);
-	VBOWeight1 = new VBOVec4f("Weight1",VERTEX_BONE_WEIGHT_1,weight1);
-	VBOWeight2 = new VBOVec4f("Weight2",VERTEX_BONE_WEIGHT_2,weight2);
-	VBOOutPos  = new VBOVec3f("OutPos",VERTEX_POSITION,posBuffer);
-	VBOTri     = new VBOVec3i("TriIdx",GL_ELEMENT_ARRAY_BUFFER,triBuffer);
-	VBOBoneID1 = new VBOVec4f("BoneID1",VERTEX_BONE_ID_1,boneID1);
-	VBOBoneID2 = new VBOVec4f("BoneID2",VERTEX_BONE_ID_2,boneID2);
+	VBOPos = new VBOVec3f((char*)"RestPos",VERTEX_POSITION,posBuffer);		
+	VBONormal  =  new VBOVec3f((char*)"Normal",VERTEX_VBONORMAL, normalBuffer);
+	VBOWeight1 = new VBOVec4f((char*)"Weight1",VERTEX_BONE_WEIGHT_1,weight1);
+	VBOWeight2 = new VBOVec4f((char*)"Weight2",VERTEX_BONE_WEIGHT_2,weight2);
+	VBOOutPos  = new VBOVec3f((char*)"OutPos",VERTEX_POSITION,posBuffer);
+	VBOTri     = new VBOVec3i((char*)"TriIdx",GL_ELEMENT_ARRAY_BUFFER,triBuffer);
+	VBOBoneID1 = new VBOVec4f((char*)"BoneID1",VERTEX_BONE_ID_1,boneID1);
+	VBOBoneID2 = new VBOVec4f((char*)"BoneID2",VERTEX_BONE_ID_2,boneID2);
 	
 
 	// Texture Buffer Object
 	int tranSize = boneJointList.size()*16;
-	TBOTran    = new TBOData("BoneTran",tranSize); 
+	TBOTran    = new TBOData((char*)"BoneTran",tranSize); 
 	return true;
 }
 

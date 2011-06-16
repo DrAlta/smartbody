@@ -17,7 +17,8 @@ void EffectorState::setAttachedPawn( ReachStateData* rd )
 	{
 		attachedPawn = target.getTargetPawn();
 		attachMat = attachedPawn->get_world_offset_joint()->gmat()*curState.gmat().inverse();	
-		target.setTargetState(target.getTargetState());			
+		SRT state = target.getTargetState();
+		target.setTargetState(state);
 	}
 }
 
@@ -233,6 +234,10 @@ void ReachHandAction::putDownAttachedPawn( ReachStateData* rd )
 	rd->curHandAction->sendReachEvent(cmd);
 }
 
+void ReachHandAction::reachPreReturnAction( ReachStateData* rd )
+{
+	ReachHandAction::reachNewTargetAction(rd);
+}
 /************************************************************************/
 /* Reach Hand Pick-Up Action                                            */
 /************************************************************************/
@@ -662,7 +667,8 @@ std::string ReachStateComplete::nextState( ReachStateData* rd )
 	
 	if (toNextState)
 	{
-		rd->curHandAction->reachNewTargetAction(rd);
+		//rd->curHandAction->reachNewTargetAction(rd);
+		rd->curHandAction->reachPreReturnAction(rd);
 		rd->endReach = false;		
 		completeTime = 0.f; // reset complete time
 		nextStateName = "PreReturn";

@@ -162,6 +162,7 @@ class mcuCBHandle	{
 		// scale factor (used for SmartBody to handle unit convert, both sk and skm)
 		double		skScale;
 		double		skmScale;
+		double      physicsTime;
 
 		std::vector<PAStateData*>					param_anim_states;
 		std::vector<PATransitionData*>				param_anim_transitions;
@@ -384,6 +385,8 @@ class mcuCBHandle	{
 		void addPAState(PAStateData* state);
 		PATransitionData* lookUpPATransition(std::string fromStateName, std::string toStateName);
 		void addPATransition(PATransitionData* transition);
+		void setPhysicsEngine(bool start);
+
 
 		int execute( const char *key, srArgBuffer& args ) { 
 			std::stringstream strstr;

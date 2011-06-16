@@ -1,4 +1,5 @@
-#include <stdio.h>
+#include <cstring>
+#include <cstdio>
 #include "VBOData.h"
 
 
@@ -46,11 +47,13 @@ void VBOData::Update()
 		if (m_iVBO_ID<=0)
 			// Get A Valid Name
 			glGenBuffers( 1, &m_iVBO_ID);
+		    
 		if (data_Vec3f){
-			glBindBuffer( GL_ARRAY_BUFFER, m_iVBO_ID );
+			glBindBuffer( GL_ARRAY_BUFFER, m_iVBO_ID );			
 			glBufferData( GL_ARRAY_BUFFER, data_Vec3f->size()*3*sizeof(float),
-				getPtr(*data_Vec3f), GL_STATIC_DRAW );
+				getPtr(*data_Vec3f), GL_STATIC_DRAW );			
 			//printf("VBO vtx dim = %d\n",data_Vec3f->dim(0));
+			
 			glBindBuffer( GL_ARRAY_BUFFER, 0);
 		}else if (data_Vec3i){
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,m_iVBO_ID);

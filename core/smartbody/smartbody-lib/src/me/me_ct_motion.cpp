@@ -379,7 +379,7 @@ void MeCtMotion::checkMotionEvents(double time)
 {
 	while (!_events.empty())
 	{
-		MotionEvent* motionEvent = _events.front();
+		MotionEvent* motionEvent = _events.front();		
 		if (motionEvent->isEnabled() && time >= motionEvent->getTime())
 		{
 			EventManager* manager = EventManager::getEventManager();

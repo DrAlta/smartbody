@@ -102,9 +102,7 @@ void SteeringAgent::evaluate()
 
 		float speed = steeringCommand.targetSpeed * locoSpdGain;
 		if (numGoals == 0)
-		{			
-			if (character->_reachTarget)
-				return;					
+		{				
 			std::stringstream strstr;
 			strstr << "test loco char ";
 			strstr << character->name;

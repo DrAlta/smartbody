@@ -583,17 +583,14 @@ void mcuCBHandle::update( void )	{
 	}
 
 	if (physicsEngine && updatePhysics)
-	{
-		//printf("time step = %f\n",time_dt);
-		static float timeStep = 0.01f;
-// 		static float dt = timeStep*0.03f;
-// 		static float elapseTime = 0.f;		
-// 		elapseTime += time_dt;
-// 		if (elapseTime >= dt)		
+	{		
+		static float dt = 0.005f;//timeStep*0.03f;
+		//elapseTime += time_dt;
+		while (physicsTime < this->time)		
 		{
 			//printf("elapse time = %f\n",elapseTime);
-			physicsEngine->updateSimulation(timeStep);
-			//elapseTime -= dt;
+			physicsEngine->updateSimulation(dt);
+			physicsTime += dt;
 			//curDt -= dt;
 		}		
 	}
@@ -662,6 +659,7 @@ void mcuCBHandle::update( void )	{
 		else
 		{			
 			pawn_p->updateToColObject();
+			pawn_p->updateToSteeringSpaceObject();
 		}
 
 		char_p = character_map.lookup( pawn_p->name );
@@ -1212,5 +1210,18 @@ void mcuCBHandle::setInteractive(bool val)
 bool mcuCBHandle::getInteractive()
 {
     return _interactive;
+}
+
+void mcuCBHandle::setPhysicsEngine( bool start )
+{
+	if (start)
+	{
+		physicsTime = time;
+		updatePhysics = true;
+	}
+	else
+	{
+		updatePhysics = false;
+	}
 }
 /////////////////////////////////////////////////////////////

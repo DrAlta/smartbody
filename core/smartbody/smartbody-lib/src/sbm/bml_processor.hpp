@@ -114,6 +114,9 @@ namespace BML {
 		void set_bml_feedback( bool value ) {
 			bml_feedback = value;
 		}
+		bool get_bml_feedback( ) {
+			return bml_feedback;
+		}
 
 		bool get_auto_print_controllers() {
 			return auto_print_controllers;

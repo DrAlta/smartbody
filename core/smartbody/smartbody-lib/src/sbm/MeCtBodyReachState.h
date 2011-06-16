@@ -26,6 +26,7 @@ class ReachHandAction
 public:	
 	virtual void reachPreCompleteAction(ReachStateData* rd) ;
 	virtual void reachCompleteAction(ReachStateData* rd) ;	
+	virtual void reachPreReturnAction(ReachStateData* rd);
 	virtual void reachNewTargetAction(ReachStateData* rd) ;
 	virtual void reachReturnAction(ReachStateData* rd) ;
 	virtual SRT getHandTargetStateOffset(ReachStateData* rd, SRT& naturalState);
@@ -43,6 +44,7 @@ public:
 	//virtual void reachPreCompleteAction(ReachStateData* rd);
 	virtual void reachCompleteAction(ReachStateData* rd);		
 	virtual void reachNewTargetAction(ReachStateData* rd);
+	virtual void reachPreReturnAction(ReachStateData* rd) {} ;
 	virtual void reachReturnAction(ReachStateData* rd) {} ; // do nothing when return
 	//virtual SRT getHandTargetStateOffset(ReachStateData* rd, SRT& naturalState);
 	//virtual bool pickUpNewPawn(ReachStateData* rd);

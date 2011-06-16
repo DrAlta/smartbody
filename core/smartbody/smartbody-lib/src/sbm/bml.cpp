@@ -380,6 +380,20 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 	// (Separate sequence to ensure it occurs before all behavior sequence events)
 	srCmdSeq *start_seq = new srCmdSeq(); //sequence that holds the startup feedback
 	{
+		if (bp->get_bml_feedback())
+		{
+			// send the feedback message for the start of the bml
+			std::stringstream strstr;
+			strstr << "sbm triggerevent bmlstatus \"" << request->msgId << " bml:start " << now << "\"";
+			if (start_seq->insert( (float) now, strstr.str().c_str()) != CMD_SUCCESS)
+			{
+				std::stringstream strstr;
+					strstr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
+							  "Failed to insert feedback \"" << strstr.str() <<"\" command.";
+					LOG(strstr.str().c_str());
+			}
+		}
+
 
 	    ostringstream start_command;
 #if USE_RECIPIENT
@@ -438,6 +452,20 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 		end_command << "send vrAgentBML " << actorId << " " << recipientId << " " << msgId << " end complete";
 #else
 		end_command << "send vrAgentBML " << actorId << " " << msgId << " end complete";
+
+		if (bp->get_bml_feedback())
+		{
+			// send the feedback message for the end of the bml
+			std::stringstream strstr;
+			strstr << "sbm triggerevent bmlstatus \"" << request->msgId << " bml:end " << end_time << "\"";
+			if (cleanup_seq->insert( (float) end_time, strstr.str().c_str()) != CMD_SUCCESS)
+			{
+				std::stringstream strstr;
+					strstr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
+							  "Failed to insert feedback \"" << strstr.str() <<"\" command.";
+					LOG(strstr.str().c_str());
+			}
+		}
 #endif
 		if( span.persistent )
 		{
@@ -1372,6 +1400,14 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	time_sec strokeAt = behav_syncs.sync_stroke()->time();
 	time_sec relaxAt  = behav_syncs.sync_relax()->time();
 	time_sec endAt    = behav_syncs.sync_end()->time();
+
+	if (rampup > 0 || rampdown > 0 && 
+		startAt == readyAt && 
+		relaxAt == endAt)
+	{
+		readyAt += rampup;
+		relaxAt = endAt - rampdown;
+	}
 
 #if ENABLE_DIRECT_VISEME_SCHEDULE
 	SbmCharacter *actor_p = (SbmCharacter*)( request->actor );

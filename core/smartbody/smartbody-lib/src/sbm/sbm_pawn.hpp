@@ -24,10 +24,12 @@
 
 #ifndef SBM_PAWN_HPP
 #define SBM_PAWN_HPP
+#include "vhcl.h"
 
 #include <SK/sk_scene.h>
 #include <SK/sk_skeleton.h>
 #include <Sbm/Physics/SbmColObject.h>
+#include <sbm/SteerSuiteEngineDriver.h>
 
 #include <ME/me_controller_tree_root.hpp>
 #include <ME/me_ct_channel_writer.hpp>
@@ -39,7 +41,6 @@
 #include "sbm_constants.h"
 #include "sbm_deformable_mesh.h"
 #include "sbm/Physics/SbmPhysicsSim.h"
-
 // Declare classes used (avoid circular references)
 class mcuCBHandle;
 class srArgBuffer;
@@ -90,6 +91,13 @@ public:  // TODO - properly encapsulate / privatize the following
 	DeformableMesh*	dMesh_p;	 // Deformable Mesh using smooth skinning
 	SbmGeomObject*  colObj_p;
 	SbmPhysicsObj*  phyObj_p;
+	SteerLib::ObstacleInterface* steeringSpaceObj_p;
+	float			steeringSpaceObjSize;
+	
+	
+	//		float scale = 0.5f;
+//		SteerLib::BoxObstacle* box = new SteerLib::BoxObstacle(x / 100.0f - scale, x / 100.0f + scale, y / 100.0f - scale, y / 100.0f + scale, z / 100.0f - scale, z / 100.0f + scale);
+//		mcuCBHandle::singleton().steerEngine->_engine->addObstacle(box);
 
 	// Temporarily, until there is a unified multi-skeleton controller tree
 	MeControllerTreeRoot	*ct_tree_p;
@@ -104,6 +112,8 @@ public:
 
 	void updateFromColObject();
 	void updateToColObject();
+	void updateToSteeringSpaceObject();
+	void initSteeringSpaceObject();
 
 	bool is_initialized();
 	bool initGeomObj(const char* geomType, float size, const char* meshName = NULL);

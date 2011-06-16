@@ -53,7 +53,7 @@ class EventManager
 class MotionEvent : public Event
 {
 	public:
-		MotionEvent() : Event(), m_time(0.0), m_isOnce(false) {};
+		MotionEvent() : Event(), m_time(0.0), m_isOnce(false), m_enabled(true) {};
 		~MotionEvent() {};
 
 		void setTime(double time) { m_time = time; }

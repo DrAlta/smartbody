@@ -1,4 +1,7 @@
 #include "TBOData.h"
+#include "SbmShader.h"
+#include <cstring>
+#include <cstdio>
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
@@ -49,21 +52,21 @@ void TBOData::CreateTBO( float* pData, int Size )
 	glGenBuffers( 1, &m_iTBO_ID);
 	glBindBuffer( GL_TEXTURE_BUFFER_EXT, m_iTBO_ID);	
 	glBufferData( GL_TEXTURE_BUFFER_EXT, size_tex_data, pData, GL_DYNAMIC_DRAW);
-	glBindBuffer( GL_TEXTURE_BUFFER_EXT, 0);
+	glBindBuffer( GL_TEXTURE_BUFFER_EXT, 0);	
 }
 
 
 void TBOData::CreateTexture( int iWidth, int iHeight, int nChan )
-{
+{	
 	glGenTextures(1,&m_iTex_ID);
-	glBindTexture(GL_TEXTURE_BUFFER_EXT, m_iTex_ID);
+	glBindTexture(GL_TEXTURE_BUFFER_EXT, m_iTex_ID);	
 
 	if (nChan == 1)
 		glTexBufferEXT(GL_TEXTURE_BUFFER_EXT, GL_LUMINANCE32F_ARB , m_iTBO_ID); 	
 	else if (nChan == 4)
 		glTexBufferEXT(GL_TEXTURE_BUFFER_EXT, GL_RGBA32F_ARB, m_iTBO_ID);	
 
-	glBindBuffer(GL_TEXTURE_BUFFER_EXT, 0);
+	glBindBuffer(GL_TEXTURE_BUFFER, 0);
 
 	m_nWidth = iWidth;
 	m_nHeight = iHeight;
