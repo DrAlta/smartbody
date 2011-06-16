@@ -337,6 +337,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "adjustmotion",		   mcu_adjust_motion_function);
 	mcu.insert( "mediapath",		   mcu_mediapath_func);
 	mcu.insert( "bml",				   test_bml_func );
+	mcu.insert( "triggerevent",		   triggerevent_func );
 	mcu.insert( "addevent",			   addevent_func );
 	mcu.insert( "removeevent",		   removeevent_func );
 	mcu.insert( "enableevents",	       enableevents_func );

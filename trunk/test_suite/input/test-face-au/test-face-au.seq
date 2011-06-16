@@ -1,0 +1,148 @@
+### Assumes current directory is: core/smartbody/sbm/bin
+### Simple Template Seq Script
+### Assumes this seq script is put under ../smartbody/test_suite directory
+
+# ---- Loading data/sbm-common assets
+0	path seq ../../../../data/sbm-common/scripts
+0	path ME ../../../../data/sbm-common/common-sk
+0	path ME ../../../../test_suite/input/viseme_basic_test/data
+0	echo >>> Loading common motions and poses...
+0	load motions -R ../../../../data/sbm-common/common-sk
+0	load poses   -R ../../../../data/sbm-common/common-sk
+
+# ---- Using virtual timing
+0	time sleepfps 0
+0	time simfps 60
+0	time reset
+
+# ---- Setting characters and default posture
+1	seq init-common-face
+3	char BillFord init BillFord.sk
+3	set character BillFord world_offset x 0 y 102 h 0
+3	char BillFord smoothbindmesh ../../../../test_suite/input/viseme_basic_test/data/headShape.obj
+3	char BillFord smoothbindmesh ../../../../test_suite/input/viseme_basic_test/data/L_eyeballShape.obj
+3	char BillFord smoothbindmesh ../../../../test_suite/input/viseme_basic_test/data/R_eyeballShape.obj
+3	char BillFord smoothbindmesh ../../../../test_suite/input/viseme_basic_test/data/TongueShape.obj
+3	char BillFord smoothbindmesh ../../../../test_suite/input/viseme_basic_test/data/UpperTeethShape.obj
+3	char BillFord smoothbindmesh ../../../../test_suite/input/viseme_basic_test/data/LowerTeethShape.obj
+3	char BillFord smoothbindweight ../../../../test_suite/input/viseme_basic_test/data/BillFord.xml
+3	set test character BillFord
+3	char BillFord viewer 4
+
+
+# ---- Setting Camera Parameters
+# * Assumes doctor scaled character standing near the origin, as is about 200 units tall
+3	viewer open   600 600  400 50
+3	camera eye    0 180 60
+3	camera center 0 160 0
+3	pawn camera init loc 0 166 185
+3	set pawn camera world_offset x 0 y 166 z 185
+
+4	bml char BillFord <face type="FACS" au="1" amount="1"/>
+4.3 snapshot
+5	bml char BillFord <face type="FACS" au="2" amount="1"/>
+5.3 snapshot
+6	bml char BillFord <face type="FACS" au="4" amount="1"/>
+6.3 snapshot
+
+7	bml char BillFord <face type="FACS" au="5" amount="1"/>
+7.3 snapshot
+8	bml char BillFord <face type="FACS" au="5" side="left" amount="1"/>
+8.3 snapshot
+9	bml char BillFord <face type="FACS" au="5" side="right" amount="1"/>
+9.3 snapshot
+
+10	bml char BillFord <face type="FACS" au="6" amount="1"/>
+10.3 snapshot
+11	bml char BillFord <face type="FACS" au="6" side="left" amount="1"/>
+11.3 snapshot
+12	bml char BillFord <face type="FACS" au="6" side="right" amount="1"/>
+12.3 snapshot
+
+13	bml char BillFord <face type="FACS" au="7" amount="1"/>
+13.3 snapshot
+14	bml char BillFord <face type="FACS" au="7" side="left" amount="1"/>
+14.3 snapshot
+15	bml char BillFord <face type="FACS" au="7" side="right" amount="1"/>
+15.3 snapshot
+
+16	bml char BillFord <face type="FACS" au="9" amount="1"/>
+16.3 snapshot
+17	bml char BillFord <face type="FACS" au="9" side="left" amount="1"/>
+17.3 snapshot
+18	bml char BillFord <face type="FACS" au="9" side="right" amount="1"/>
+18.3 snapshot
+
+19	bml char BillFord <face type="FACS" au="10" amount="1"/>
+19.3 snapshot
+20	bml char BillFord <face type="FACS" au="10" side="left" amount="1"/>
+20.3 snapshot
+21	bml char BillFord <face type="FACS" au="10" side="right" amount="1"/>
+21.3 snapshot
+
+22	bml char BillFord <face type="FACS" au="12" amount="1"/>
+22.3 snapshot
+23	bml char BillFord <face type="FACS" au="12" side="left" amount="1"/>
+23.3 snapshot
+24	bml char BillFord <face type="FACS" au="12" side="right" amount="1"/
+24.3 snapshot
+
+25	bml char BillFord <face type="FACS" au="15" amount="1"/>
+25.3 snapshot
+26	bml char BillFord <face type="FACS" au="15" side="left" amount="1"/>
+26.3 snapshot
+27	bml char BillFord <face type="FACS" au="15" side="right" amount="1"/>
+27.3 snapshot
+
+28	bml char BillFord <face type="FACS" au="20" amount="1"/>
+28.3 snapshot
+29	bml char BillFord <face type="FACS" au="20" side="left" amount="1"/>
+29.3 snapshot
+30	bml char BillFord <face type="FACS" au="20" side="right" amount="1"/>
+30.3 snapshot
+
+
+31	bml char BillFord <face type="FACS" au="23" amount="1"/>
+31.3 snapshot
+32	bml char BillFord <face type="FACS" au="23" side="left" amount="1"/>
+32.3 snapshot
+33	bml char BillFord <face type="FACS" au="23" side="right" amount="1"/>
+33.3 snapshot
+
+34	bml char BillFord <face type="FACS" au="25" amount="1"/>
+34.3 snapshot
+35	bml char BillFord <face type="FACS" au="25" side="left" amount="1"/>
+35.3 snapshot
+36	bml char BillFord <face type="FACS" au="25" side="right" amount="1"/>
+36.3 snapshot
+
+
+37  bml char BillFord <face type="FACS" au="26" amount="1"/>
+37.3 snapshot
+38	bml char BillFord <face type="FACS" au="26" side="left" amount="1"/>
+38.3 snapshot
+39	bml char BillFord <face type="FACS" au="26" side="right" amount="1"/>
+39.3 snapshot
+
+40	bml char BillFord <face type="FACS" au="27" amount="1"/>
+40.3 snapshot
+41	bml char BillFord <face type="FACS" au="27" side="left" amount="1"/>
+41.3 snapshot
+42	bml char BillFord <face type="FACS" au="27" side="right" amount="1"/>
+42.3 snapshot
+
+43  bml char BillFord <face type="FACS" au="38" amount="1"/>
+43.3 snapshot
+44	bml char BillFord <face type="FACS" au="38" side="left" amount="1"/>
+44.3 snapshot
+45	bml char BillFord <face type="FACS" au="38" side="right" amount="1"/>
+45.3 snapshot
+
+46	bml char BillFord <face type="FACS" au="39" amount="1"/>
+46.3 snapshot
+47	bml char BillFord <face type="FACS" au="39" side="left" amount="1"/>
+47.3 snapshot
+48	bml char BillFord <face type="FACS" au="39" side="right" amount="1"/>
+48.3 snapshot
+
+49  quit

@@ -674,12 +674,12 @@ int mcu_physics_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		std::string operation = args.read_token();
 		if (operation == "enable")
 		{
-			mcu_p->updatePhysics = true;			
+			mcu_p->setPhysicsEngine(true);			
 			return CMD_SUCCESS;
 		}
 		else if (operation == "disable")
 		{
-			mcu_p->updatePhysics = false;			
+			mcu_p->setPhysicsEngine(false);			
 			return CMD_SUCCESS;
 		}
 		else if (operation == "gravity")
@@ -4961,6 +4961,27 @@ int mcu_mediapath_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
+int triggerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	char* eventType = args.read_token();
+	if (!eventType || strcmp(eventType, "help") == 0)
+	{
+		LOG("Use: triggerevent <event> <parameters>");
+		return CMD_SUCCESS;
+	}
+
+	char* params = args.read_token();
+
+	EventManager* eventManager = EventManager::getEventManager();
+	std::string parameters = params;
+	Event e;
+	e.setType(eventType);
+	e.setParameters(parameters);
+	eventManager->handleEvent(&e, mcu_p->time);
+		
+	return CMD_SUCCESS;
+}
+
 int addevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
 	char* tok = args.read_token();
@@ -5385,7 +5406,16 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			steerOptions->engineOptions.testCaseSearchPath = "..\\..\\..\\..\\core\\smartbody\\steersuite-1.3\\testcases\\";
 			steerOptions->engineOptions.moduleSearchPath = "..\\..\\..\\..\\core\\smartbody\\sbm\\bin\\";
 			LOG("INIT STEERSIM");
-			mcu_p->steerEngine->init(steerOptions);
+			try {
+				mcu_p->steerEngine->init(steerOptions);
+			} catch (exception& e) {
+				LOG("Problem starting steering engine: %s", e.what()); 
+				delete mcu_p->steerEngine;
+				mcu_p->steerEngine = NULL;
+				delete steerOptions;
+				return CMD_FAILURE;
+			}
+
 			LOG("LOADING STEERSIM");
 			mcu_p->steerEngine->loadSimulation();
 

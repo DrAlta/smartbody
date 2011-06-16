@@ -126,6 +126,8 @@ SbmPawn::SbmPawn( const char * name )
 
 	colObj_p = NULL;
 	phyObj_p = NULL;
+	steeringSpaceObj_p = NULL;
+	steeringSpaceObjSize = 20.0f;
 	// world_offset_writer_p, applies external inputs to the skeleton,
 	//   and therefore needs to evaluate before other controllers
 	world_offset_writer_p->ref();
@@ -251,6 +253,20 @@ void SbmPawn::remove_from_scene() {
 	if( scene_p != NULL )
 		mcu.remove_scene( scene_p );
 	mcu.pawn_map.remove( name );
+	// remove the connected steering object for steering space
+	if (steeringSpaceObj_p)
+	{
+		if (mcu.steerEngine)
+		{
+			if (mcu.steerEngine->_engine)
+			{
+				mcu.steerEngine->_engine->removeObstacle(steeringSpaceObj_p);
+				mcu.steerEngine->_engine->getSpatialDatabase()->removeObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
+			}
+		}
+		delete steeringSpaceObj_p;
+		steeringSpaceObj_p = NULL;
+	}
 }
 
 #if SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK
@@ -292,6 +308,18 @@ SbmPawn::~SbmPawn()	{
 		delete colObj_p;
 	if (phyObj_p)
 		delete phyObj_p;
+	if (steeringSpaceObj_p)
+	{
+		if (mcuCBHandle::singleton().steerEngine)
+		{
+			if (mcuCBHandle::singleton().steerEngine->_engine)
+			{
+				mcuCBHandle::singleton().steerEngine->_engine->removeObstacle(steeringSpaceObj_p);
+				mcuCBHandle::singleton().steerEngine->_engine->getSpatialDatabase()->removeObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
+			}
+		}
+		delete steeringSpaceObj_p;
+	}
 }
 
 
@@ -515,6 +543,15 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			}
 			pawn_p->initGeomObj(geom_str,size,file_str);
 		}
+		if (pawn_p->colObj_p)
+		{
+			if (strcmp(geom_str, "box") == 0)
+			{
+				if (size_str)
+					pawn_p->steeringSpaceObjSize = (float)atof(size_str);
+				pawn_p->initSteeringSpaceObject();
+			}
+		}
 		// 		else // default null geom object
 		// 		{
 		// 			SbmGeomObject* colObj = new SbmGeomNullObject();
@@ -631,8 +668,11 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		}	
 
 		if (has_geom)
-		{			
+		{	
 			pawn_p->initGeomObj(geom_str,size,file_str);
+			// init steering space
+			pawn_p->steeringSpaceObjSize = size;
+			pawn_p->initSteeringSpaceObject();
 			return CMD_SUCCESS;
 		}
 		else
@@ -1206,6 +1246,40 @@ void SbmPawn::updateToColObject()
 			phyObj_p->updateSimObj();			
 		}
 	}
+}
+
+void SbmPawn::updateToSteeringSpaceObject()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	if (!mcu.steerEngine)	return;
+	if (!mcu.steerEngine->_engine)	return;
+	if (steeringSpaceObj_p)
+		initSteeringSpaceObject();
+}
+
+void SbmPawn::initSteeringSpaceObject()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	if (!mcu.steerEngine)	return;
+	if (!mcu.steerEngine->_engine)	return;
+	if (steeringSpaceObj_p)
+	{
+		mcu.steerEngine->_engine->removeObstacle(steeringSpaceObj_p);
+		mcu.steerEngine->_engine->getSpatialDatabase()->removeObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
+		delete steeringSpaceObj_p;
+		steeringSpaceObj_p = NULL;
+	}
+	float x, y, z, h, p, r;
+	this->get_world_offset(x, y, z, h, p, r);	
+	float xmin = (x - steeringSpaceObjSize) / 100.0f;
+	float xmax = (x + steeringSpaceObjSize) / 100.0f;
+	float ymin = (y - steeringSpaceObjSize) / 100.0f;
+	float ymax = (y + steeringSpaceObjSize) / 100.0f;
+	float zmin = (z - steeringSpaceObjSize) / 100.0f;
+	float zmax = (z + steeringSpaceObjSize) / 100.0f;
+	steeringSpaceObj_p = new SteerLib::BoxObstacle(xmin, xmax, ymin, ymax, zmin, zmax);
+	mcu.steerEngine->_engine->addObstacle(steeringSpaceObj_p);
+	mcu.steerEngine->_engine->getSpatialDatabase()->addObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());	
 }
 
 void SbmPawn::setPhysicsSim( bool enable )

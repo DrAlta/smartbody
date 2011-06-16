@@ -34,8 +34,6 @@ using System.Threading;
 using System.Runtime.InteropServices;
 
 
-
-
 /**
  * MsSpeech Relay
  * Uses the Microsoft SAPI to generate audio for SmartBody
@@ -621,7 +619,16 @@ namespace MsSpeechRelay
             /// 
             using (vhmsg = new VHMsg.Client())
             {
-                vhmsg.OpenConnection();
+                try 
+                {
+                    vhmsg.OpenConnection();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    throw e;
+                }
+                
                 Console.WriteLine( "VHMSG_SERVER: {0}", vhmsg.Server );
                 Console.WriteLine( "VHMSG_SCOPE: {0}", vhmsg.Scope );
 
@@ -823,7 +830,19 @@ namespace MsSpeechRelay
         {
             Program main = new Program();
             List<string> commandLineArguments = new List<string>(args);
-            main.InitializeAndRun(commandLineArguments);
+            try 
+            {
+                main.InitializeAndRun(commandLineArguments);
+            }
+            catch
+            {
+                Console.WriteLine("Speech relay can not be started");
+               // Console.WriteLine(e.Message);
+                Console.WriteLine("Press any key to continue..");
+                Console.ReadKey();
+                
+            }
+            
         }
     }
 }
