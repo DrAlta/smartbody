@@ -127,7 +127,9 @@ SbmPawn::SbmPawn( const char * name )
 	colObj_p = NULL;
 	phyObj_p = NULL;
 	steeringSpaceObj_p = NULL;
-	steeringSpaceObjSize = 20.0f;
+	steeringSpaceObjSize.x = 20.0f;
+	steeringSpaceObjSize.y = 20.0f;
+	steeringSpaceObjSize.z = 20.0f;
 	// world_offset_writer_p, applies external inputs to the skeleton,
 	//   and therefore needs to evaluate before other controllers
 	world_offset_writer_p->ref();
@@ -490,6 +492,8 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		const char* file_str = NULL;
 		const char* size_str = NULL;
 		const char* color_str = NULL;
+		bool setRec = false;
+		SrVec rec;
 		while( args.calc_num_tokens() > 0 ) {
 			string option = args.read_token();
 			// TODO: Make the following option case insensitive
@@ -507,6 +511,12 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				has_geom = true;
 			} else if( option=="color" ) {
 				color_str = args.read_token();
+				has_geom = true;
+			} else if( option=="rec" ) {
+				setRec = true;
+				rec.x = args.read_float();
+				rec.y = args.read_float();
+				rec.z = args.read_float();
 				has_geom = true;
 			} else {
 				std::stringstream strstr;
@@ -547,8 +557,12 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		{
 			if (strcmp(geom_str, "box") == 0)
 			{
-				if (size_str)
-					pawn_p->steeringSpaceObjSize = (float)atof(size_str);
+				pawn_p->steeringSpaceObjSize = rec;
+				if (!setRec)
+				{
+					float size = (float)atof(size_str);
+					pawn_p->steeringSpaceObjSize = SrVec(size, size, size);
+				}
 				pawn_p->initSteeringSpaceObject();
 			}
 		}
@@ -641,7 +655,8 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			LOG(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
-		const char *geom_str = NULL, *size_str = NULL, *color_str = NULL, *file_str = NULL;		
+		const char *geom_str = NULL, *size_str = NULL, *color_str = NULL, *file_str = NULL;	
+		bool setRec = false;
 		bool has_geom = false;
 		float size = 1.f;
 		while( args.calc_num_tokens() > 0 ) {
@@ -660,6 +675,12 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			} else if( option=="color" ) {
 				color_str = args.read_token();
 				has_geom = true;
+			} else if( option=="rec" ) {
+				setRec = true;
+				pawn_p->steeringSpaceObjSize.x = args.read_float();
+				pawn_p->steeringSpaceObjSize.y = args.read_float();
+				pawn_p->steeringSpaceObjSize.z = args.read_float();
+				has_geom = true;
 			} else {
 				std::stringstream strstr;
 				strstr << "WARNING: Unrecognized pawn setshape option \"" << option << "\"." << endl;
@@ -671,7 +692,8 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		{	
 			pawn_p->initGeomObj(geom_str,size,file_str);
 			// init steering space
-			pawn_p->steeringSpaceObjSize = size;
+			if (!setRec)
+				pawn_p->steeringSpaceObjSize = SrVec(size, size, size);
 			pawn_p->initSteeringSpaceObject();
 			return CMD_SUCCESS;
 		}
@@ -1271,12 +1293,12 @@ void SbmPawn::initSteeringSpaceObject()
 	}
 	float x, y, z, h, p, r;
 	this->get_world_offset(x, y, z, h, p, r);	
-	float xmin = (x - steeringSpaceObjSize) / 100.0f;
-	float xmax = (x + steeringSpaceObjSize) / 100.0f;
-	float ymin = (y - steeringSpaceObjSize) / 100.0f;
-	float ymax = (y + steeringSpaceObjSize) / 100.0f;
-	float zmin = (z - steeringSpaceObjSize) / 100.0f;
-	float zmax = (z + steeringSpaceObjSize) / 100.0f;
+	float xmin = (x - steeringSpaceObjSize.x) / 100.0f;
+	float xmax = (x + steeringSpaceObjSize.x) / 100.0f;
+	float ymin = (y - steeringSpaceObjSize.y) / 100.0f;
+	float ymax = (y + steeringSpaceObjSize.y) / 100.0f;
+	float zmin = (z - steeringSpaceObjSize.y) / 100.0f;
+	float zmax = (z + steeringSpaceObjSize.y) / 100.0f;
 	steeringSpaceObj_p = new SteerLib::BoxObstacle(xmin, xmax, ymin, ymax, zmin, zmax);
 	mcu.steerEngine->_engine->addObstacle(steeringSpaceObj_p);
 	mcu.steerEngine->_engine->getSpatialDatabase()->addObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());	

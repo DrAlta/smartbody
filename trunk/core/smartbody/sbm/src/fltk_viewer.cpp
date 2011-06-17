@@ -3762,7 +3762,8 @@ void FltkViewer::drawColObject( SbmGeomObject* colObj, SrMat& gmat )
 			SrGlRenderFuncs::render_model(&model);
 		}
 	}
-	glPopMatrix();	
+	glPopMatrix();
+	glDisable(GL_LIGHTING);
 }
 
 
@@ -3778,12 +3779,12 @@ void FltkViewer::drawSteeringInfo()
 	glPushMatrix();
 	glScalef(100.0f, 100.0f, 100.0f);
 
-	const std::vector<SteerLib::AgentInterface*>& agents = mcu.steerEngine->_engine->getAgents();
-	for (size_t x = 0; x < agents.size(); x++)
-	{
-		mcu.steerEngine->_engine->selectAgent(agents[x]);
-		agents[x]->draw();
-	}
+	//const std::vector<SteerLib::AgentInterface*>& agents = mcu.steerEngine->_engine->getAgents();
+	//for (size_t x = 0; x < agents.size(); x++)
+	//{
+	//	mcu.steerEngine->_engine->selectAgent(agents[x]);
+	//	agents[x]->draw();
+	//}
 
 	const std::set<SteerLib::ObstacleInterface*>& obstacles = mcu.steerEngine->_engine->getObstacles();
 	for (std::set<SteerLib::ObstacleInterface*>::const_iterator iter = obstacles.begin();

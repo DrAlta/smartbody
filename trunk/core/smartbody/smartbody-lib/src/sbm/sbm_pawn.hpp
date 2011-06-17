@@ -92,7 +92,7 @@ public:  // TODO - properly encapsulate / privatize the following
 	SbmGeomObject*  colObj_p;
 	SbmPhysicsObj*  phyObj_p;
 	SteerLib::ObstacleInterface* steeringSpaceObj_p;
-	float			steeringSpaceObjSize;
+	SrVec			steeringSpaceObjSize;
 	
 	
 	//		float scale = 0.5f;
