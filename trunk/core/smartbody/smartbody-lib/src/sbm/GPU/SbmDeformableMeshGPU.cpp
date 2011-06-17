@@ -32,8 +32,8 @@ mat3 GetTransformation(float id)\n \
 	mat3 rot;\n  \
 	for (int i=0;i<3;i++)\n \
 	{ \n  \
-		//for (int j=0;j<3;j++)\n \
-			//rot[j][i] = texelFetchBuffer(Transform,(idx*16+i*4+j),0).x;\n		\
+		for (int j=0;j<3;j++)\n \
+			rot[j][i] = texelFetchBuffer(Transform,(idx*16+i*4+j)).x;\n		\
 	}\n	\
 	return rot;\n \
 }\n \
@@ -41,9 +41,9 @@ vec3 GetTranslation(float id)\n \
 {\n  \
 	int idx = int(id);\n \
 	vec3 tran;\n \
-	//tran[0] = texelFetchBuffer(Transform,(idx*16+12)).x;\n \
-    //tran[1] = texelFetchBuffer(Transform,(idx*16+13)).x;\n \
-	//tran[2] = texelFetchBuffer(Transform,(idx*16+14)).x;\n \
+	tran[0] = texelFetchBuffer(Transform,(idx*16+12)).x;\n \
+    tran[1] = texelFetchBuffer(Transform,(idx*16+13)).x;\n \
+	tran[2] = texelFetchBuffer(Transform,(idx*16+14)).x;\n \
 	return tran;\n	\
 }\n  \
 mat3 TransformPos(vec3 position, vec3 normal, vec4 boneid, vec4 boneweight)\n\
