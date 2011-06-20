@@ -234,11 +234,37 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	if (XMLString::compareIString(target, L"") != 0)
 	{
 		XMLStringTokenizer tokenizer(target);
-		if (tokenizer.countTokens() != 2)
-			return BehaviorRequestPtr();
-		XMLCh* x = tokenizer.nextToken();
-		XMLCh* z = tokenizer.nextToken();
-		command << "sbm steer move " << c->name << " " << XMLString::transcode(x) << " 0 " << XMLString::transcode(z);
+		if (tokenizer.countTokens() ==  2)
+		{
+			XMLCh* x = tokenizer.nextToken();
+			XMLCh* z = tokenizer.nextToken();
+			command << "sbm steer move " << c->name << " " << XMLString::transcode(x) << " 0 " << XMLString::transcode(z);
+		}
+		else if (tokenizer.countTokens() == 1)
+		{
+			// is the target a character/pawn?
+			XMLCh* xmlStr = tokenizer.nextToken();
+			std::string name = XMLString::transcode(xmlStr);
+			SbmPawn* pawn = mcu->pawn_map.lookup(name.c_str());
+			if (pawn)
+			{
+				// get the world offset x & z
+				float x, y, z, yaw, pitch, roll;
+				pawn->get_world_offset(x, y, z, yaw, pitch, roll);
+				command << "sbm steer move " << c->name << " " << x << " 0 " << z;
+			}
+			else
+			{
+				LOG("Cannot move %s to unknown locomotion target: %s", c->name, name.c_str());
+				return BehaviorRequestPtr();
+			}
+		}
+		else
+		{
+			LOG("Need a  locomotion target.");
+				return BehaviorRequestPtr();
+		}
+		
 	}
 	return BehaviorRequestPtr( new EventRequest(unique_id, localId, command.str().c_str(), behav_syncs, ""));
 }
