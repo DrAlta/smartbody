@@ -1,5 +1,5 @@
 #!/bin/bash
-SBMINPUT="-seqpath ../../../../test_suite/input/test-speech-remote -seq test-speech-remote.seq -facebone"
+SBMINPUT="-seqpath ../../../../test_suite/input/test-speech-remote -seq test-speech-remote.seq -facebone -audio"
 OPTION_1=IMG
 THRESHOLD_1=500
 OPTION_2=IMG
