@@ -367,6 +367,18 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 					   seq_id, echo, send ) )
 		return CMD_FAILURE;
 
+
+	
+	if (char_id != "*" )
+	{
+		SbmCharacter* character = mcu->character_map.lookup(char_id.c_str());
+		if (!character)
+		{
+			LOG("No character named '%s'.", char_id.c_str());
+			return CMD_FAILURE; // short circuit requests that do not map to a character that exists in this sbm instance
+		}
+	}
+
 	if( arg=="" || arg=="help") {
 		print_test_bml_help();
 		return CMD_SUCCESS;
