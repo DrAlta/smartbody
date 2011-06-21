@@ -29,6 +29,37 @@
 
 const double changeLimit = 20;
 
+PAStateData::PAStateData(PAStateData* data)
+{
+	stateName = data->stateName;
+	for (unsigned int i = 0; i < data->motions.size(); i++)
+	{
+		motions.push_back(data->motions[i]);
+		data->motions[i]->ref();
+	}
+
+	for (unsigned int i = 0; i < data->keys.size(); i++)
+	{
+		std::vector<double> tempVec;
+		for (unsigned int j = 0; j <data->keys[i].size(); j++)
+			tempVec.push_back(data->keys[i][j]);
+		keys.push_back(tempVec);
+	}
+
+	for (unsigned int i = 0; i < data->weights.size(); i++)
+		weights.push_back(data->weights[i]);
+
+	for (unsigned int i = 0; i < data->toStates.size(); i++)
+		toStates.push_back(data->toStates[i]);
+
+	for (unsigned int i = 0; i < data->fromStates.size(); i++)
+		fromStates.push_back(data->fromStates[i]);
+	
+	cycle = data->cycle;
+	paramManager = new ParameterManager(data->paramManager, this);
+}
+
+
 PAStateData::PAStateData(std::string name)
 {
 	stateName = name;
@@ -74,11 +105,15 @@ ParameterManager::ParameterManager(ParameterManager* pm, PAStateData* s)
 {
 	state = s;
 	type = pm->getType();
-	motionNames = pm->getMotionNames();
-	parameters = pm->getParameters();
-	triangles = pm->getTriangles();
-	previousParam = pm->getPrevVec();
-	tetrahedrons = pm->getTetrahedrons();
+	for (unsigned int i = 0; i < pm->getMotionNames().size(); i++)
+		motionNames.push_back(pm->getMotionNames()[i]);
+	for (unsigned int i = 0; i < pm->getParameters().size(); i++)
+		parameters.push_back(pm->getParameters()[i]);
+
+	for (unsigned int i = 0; i < pm->getTriangles().size(); i++)
+		triangles.push_back(pm->getTriangles()[i]);
+	for (unsigned int i = 0; i < pm->getTetrahedrons().size(); i++)
+		tetrahedrons.push_back(pm->getTetrahedrons()[i]);
 }
 
 ParameterManager::ParameterManager(PAStateData* s)
