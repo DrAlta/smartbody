@@ -264,6 +264,8 @@ void SteeringAgent::evaluate()
 					}				
 				}
 				PAStateData* locoState = mcu.lookUpPAState("UtahLocomotion");
+				if (!locoState)
+					return;
 				for (int i = 0; i < locoState->getNumMotions(); i++)
 				{
 					if (i == 0)

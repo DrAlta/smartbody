@@ -459,7 +459,10 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 	}
 
 	if (last_open < longest_viseme) // ensures that curve mode will send bml:end at the proper time
+	{
 		last_open = longest_viseme;
+		last_viseme = longest_viseme;
+	}
 
 	time_sec start_time = now; // TODO: sync to prior behaviors
 
