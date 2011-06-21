@@ -62,6 +62,7 @@ FadingControl::FadingControl()
 	blendWeight = 0.0;
 	prev_time = -1.0;
 	restart = false;
+	fadeMode = FADING_MODE_OFF;
 }
 
 bool FadingControl::updateFading( float dt )

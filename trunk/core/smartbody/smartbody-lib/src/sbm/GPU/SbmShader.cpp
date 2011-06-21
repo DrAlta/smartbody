@@ -222,9 +222,9 @@ bool SbmShaderManager::initGLExtension()
 
 	//viewer->makeGLContext();
 	glewInit();
-	if (glewIsSupported("GL_VERSION_3_0"))
+	if (glewIsSupported("GL_VERSION_3_1"))
 	{
-		printf("Ready for OpenGL 3.0\n");
+		printf("Ready for OpenGL 3.1\n");
 		shaderInit = true;
 		return true;
 	}

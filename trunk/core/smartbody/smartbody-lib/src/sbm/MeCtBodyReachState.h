@@ -98,6 +98,7 @@ public:
 	bool            startReach, endReach;
 	bool            useExample;	
 	bool            locomotionComplete;
+	bool            hasSteering;
 	bool            newTarget;
 
 	// for pick-up/put-down action
@@ -195,7 +196,7 @@ class ReachStatePreReturn : public ReachStateComplete
 {
 public:
 	ReachStatePreReturn() : ReachStateComplete() {}
-	virtual void update(ReachStateData* rd);
+	virtual void update(ReachStateData* rd) {}
 	virtual void updateEffectorTargetState(ReachStateData* rd) {} // do nothing
 	virtual std::string nextState(ReachStateData* rd);	
 	virtual std::string curStateName() { return "PreReturn"; }

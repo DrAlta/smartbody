@@ -24,8 +24,8 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( MeCtReachEngine* re )
 {
 	reachEngine = re;
 	reachData = re->getReachData();
-	reachData->reachControl = this;
-	_duration = -1.f;
+	reachData->reachControl = this;			
+	_duration = -1.f;	
 }
 
 MeCtExampleBodyReach::~MeCtExampleBodyReach( void )
@@ -94,13 +94,16 @@ void MeCtExampleBodyReach::setReachTargetPos( SrVec& targetPos )
 bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 {	
 	updateDt((float)t);	
-	updateChannelBuffer(frame,inputMotionFrame,true);
+	updateChannelBuffer(frame,inputMotionFrame,true);	
 	reachEngine->updateReach((float)t,dt,inputMotionFrame);
 
 	// blending the input frame with ikFrame based on current fading
 	bool finishFadeOut = updateFading(dt);
+	reachEngine->fadingWeight = blendWeight;
+	//printf("blend weight = %f\n",blendWeight);
 	BodyMotionFrame outMotionFrame;
 	MotionExampleSet::blendMotionFrame(inputMotionFrame,reachEngine->outputMotion(),blendWeight,outMotionFrame);	
+
 
 	ConstraintMap& handConstraint = reachEngine->getHandConstraint();
 	ConstraintMap::iterator si;
@@ -133,6 +136,8 @@ void MeCtExampleBodyReach::init()
 		affectedJoints.push_back(joint);
 		_channels.add(joint->name().get_string(), SkChannel::Quat);		
 	}		
+	blendWeight = reachEngine->fadingWeight;
+	LOG("init blend weight = %f\n",blendWeight);
 	MeController::init();	
 }
 
