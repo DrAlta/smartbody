@@ -620,7 +620,7 @@ PAStateModule::PAStateModule(PAStateData* stateData, bool l, bool pn)
 	interpolator = new PAInterpolator(stateData->motions, stateData->weights);
 	woManager = new PAWoManager(stateData->motions, stateData->weights);
 
-	data = stateData;
+	data = new PAStateData(stateData);
 	loop = l;
 	active = false;
 	playNow = pn;
@@ -628,6 +628,8 @@ PAStateModule::PAStateModule(PAStateData* stateData, bool l, bool pn)
 
 PAStateModule::~PAStateModule()
 {
+	if (data)
+		delete data;
 	data = NULL;
 	if (timeManager)
 		delete timeManager;

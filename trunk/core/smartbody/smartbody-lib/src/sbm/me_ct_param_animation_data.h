@@ -41,7 +41,7 @@ class PAStateData
 		bool cycle;
 		ParameterManager* paramManager;
 
-	public:
+public:
 		PAStateData(PAStateData* data);
 		PAStateData(std::string name);
 		~PAStateData();
