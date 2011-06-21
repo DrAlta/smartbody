@@ -36,6 +36,7 @@ MeCtReachEngine::MeCtReachEngine( SbmCharacter* sbmChar, SkSkeleton* sk, SkJoint
 	refMotion = NULL;
 
 	reachCompleteDuration = -1.0;
+	fadingWeight = 0.f;
 	
 	footIKFix = false;
 	initStart = true;
@@ -388,9 +389,13 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 	reachData->curHandAction = handActionTable[curHandActionState];	
 	reachData->updateReachState(skeletonRef->search_joint(rootName)->gmat(),ikMotionFrame);
 	if (curCharacter)
-	{
-		reachData->locomotionComplete = curCharacter->_reachTarget;
+	{		
+		reachData->locomotionComplete = curCharacter->_reachTarget;		
 	}
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	reachData->hasSteering = (mcu.steerEngine != NULL);
+	
 
 	curReachState->updateEffectorTargetState(reachData);		
 	curReachState->update(reachData);	

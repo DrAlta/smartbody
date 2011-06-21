@@ -73,7 +73,6 @@ public:
 	void updateDt(float curTime);
 };
 
-
 class MeCtConstraint : public MeController, public FadingControl
 {
 private:

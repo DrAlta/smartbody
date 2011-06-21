@@ -1,5 +1,6 @@
 #include "MeCtBodyReachState.h"
 #include "sbm/Event.h"
+#include "sbm/mcontrol_util.h"
 #include <boost/lexical_cast.hpp>
 
 /************************************************************************/
@@ -330,7 +331,7 @@ ReachStateData::ReachStateData()
 	stateTime = 0.f;
 	blendWeight = 0.f;
 	dt = du = 0.f;
-	startReach = endReach = useExample = locomotionComplete = newTarget = false;
+	startReach = endReach = useExample = locomotionComplete = newTarget = hasSteering = false;
 	autoReturnTime = -1.f;
 
 	interpMotion = NULL;
@@ -480,7 +481,7 @@ void ReachStateInterface::updateMotionInterp( ReachStateData* rd )
 	float weight = 1.f;
 	if (deltaPercent < remain && remain != 0.f)
 		weight = deltaPercent /remain;
-
+	
 	SRT delta = SRT::blend(stateOffset,stateError,weight);
 	interpState.add(delta);
 	estate.curTargetState = interpState;
@@ -541,7 +542,8 @@ std::string ReachStateIdle::nextState( ReachStateData* rd )
 			//LOG("facing = %f\n",facing);
 			cmd = "bml char " + charName + " <locomotion target=\"" + boost::lexical_cast<std::string>(targetXZ.x) + " " + 
 				   boost::lexical_cast<std::string>(targetXZ.z) +"\"/>"; //"\" facing=\"" + boost::lexical_cast<std::string>(facing) +"\"/>";//"\" proximity=\"" +  boost::lexical_cast<std::string>(rd->characterHeight*0.8f*0.01f) +"\"/>";
-			rd->curHandAction->sendReachEvent(cmd);			
+			//rd->curHandAction->sendReachEvent(cmd);			
+			mcuCBHandle::singleton().execute(const_cast<char*>(cmd.c_str()));
 			nextStateName = "Move";
 		}
 		else // otherwise do the reach directly
@@ -630,6 +632,13 @@ std::string ReachStateMove::nextState( ReachStateData* rd )
 			rd->startReach = false;
 		}		
 	}
+	else if (!rd->hasSteering)
+	{
+		// whenever there is no steering, just proceed with start
+		rd->reachControl->setFadeIn(0.5f);
+		nextStateName = "Start";
+	}
+
 	prevDist = curDist;
 	return nextStateName;
 }
@@ -657,27 +666,30 @@ void ReachStateComplete::updateEffectorTargetState( ReachStateData* rd )
 void ReachStateComplete::update( ReachStateData* rd )
 {
 	ReachStateInterface::updateMotionIK(rd);
-	completeTime += rd->dt;
+	//completeTime += rd->dt;
 }
 
 std::string ReachStateComplete::nextState( ReachStateData* rd )
 {
 	std::string nextStateName = "Complete";
-	bool toNextState = rd->autoReturnTime > 0.f ? rd->autoReturnTime < completeTime : rd->endReach;
+	bool toNextState = rd->autoReturnTime > 0.f ? rd->autoReturnTime < rd->stateTime : rd->endReach;
+
+	if (rd->endReach)
+		toNextState = true;
 	
 	if (toNextState)
 	{
 		//rd->curHandAction->reachNewTargetAction(rd);
 		rd->curHandAction->reachPreReturnAction(rd);
 		rd->endReach = false;		
-		completeTime = 0.f; // reset complete time
+		//completeTime = 0.f; // reset complete time
 		nextStateName = "PreReturn";
 	}
 	else if (rd->curHandAction->isPickingUpNewPawn(rd))
 	{
 		rd->curHandAction->reachNewTargetAction(rd);
 		rd->newTarget = true;
-		completeTime = 0.f;		
+		//completeTime = 0.f;		
 		nextStateName = "PreReturn";//"NewTarget";
 	}
 	return nextStateName;
@@ -705,6 +717,12 @@ std::string ReachStateNewTarget::nextState( ReachStateData* rd )
 		rd->startReach = false;
 		nextStateName = "Complete";
 	}
+	else if (rd->endReach)
+	{
+		rd->startReach = false;
+		nextStateName = "PreReturn";
+	}
+
 	return nextStateName;
 }
 
@@ -714,7 +732,7 @@ std::string ReachStateNewTarget::nextState( ReachStateData* rd )
 std::string ReachStatePreReturn::nextState( ReachStateData* rd )
 {
 	std::string nextStateName = "PreReturn";
-	bool toNextState = completeTime > 0.3;
+	bool toNextState = rd->stateTime > 0.3;
 	if (toNextState)
 	{
 		completeTime = 0.f; // reset complete time
@@ -732,10 +750,7 @@ std::string ReachStatePreReturn::nextState( ReachStateData* rd )
 	return nextStateName;
 }
 
-void ReachStatePreReturn::update( ReachStateData* rd )
-{
-	completeTime += rd->dt;
-}
+
 /************************************************************************/
 /* Reach State Return                                                   */
 /************************************************************************/
@@ -756,8 +771,10 @@ float ReachStateReturn::curStatePercentTime( ReachStateData* rd, float refTime )
 
 void ReachStateReturn::update( ReachStateData* rd )
 {
+	//LOG("curRefTime = %f\n",rd->curRefTime);
 	ReachStateInterface::updateMotionInterp(rd);
 	rd->blendWeight = curStatePercentTime(rd,rd->curRefTime);	
+	//LOG("Blend weight = %f\n",rd->blendWeight);
 }
 
 std::string ReachStateReturn::nextState( ReachStateData* rd )

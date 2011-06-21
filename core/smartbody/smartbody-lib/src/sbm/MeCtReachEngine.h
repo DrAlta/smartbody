@@ -64,6 +64,7 @@ protected:
 	double                ikDamp;
 	float                 ikReachRegion, ikMaxOffset, ikDefaultVelocity;
 	float                 reachCompleteDuration;
+	
 	MeCtJacobianIK        ik;
 	MeCtCCDIK             ikCCD;
 	MeCtIKTreeScenario    ikScenario, ikCCDScenario;
@@ -71,6 +72,7 @@ protected:
 public:
 	vector<SrVec>         examplePts,resamplePts;
 	HandActionState       curHandActionState;
+	float                 fadingWeight;
 	bool                  footIKFix;
 
 public:
