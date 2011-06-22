@@ -1919,7 +1919,6 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 				}
 			}
 			LOG("%d requests interrupted on character %s.", numRequestsInterrupted, this->name);
-			return CMD_SUCCESS;
 		}
 		return CMD_SUCCESS;
 	}
