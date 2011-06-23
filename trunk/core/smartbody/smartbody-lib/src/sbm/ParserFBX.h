@@ -23,14 +23,18 @@
 #ifndef _PARSER_FBX_H_
 #define _PARSER_FBX_H_
 
-#define ALLOW_FBX_PARSER 0
+#define ENABLE_FBX_PARSER  0
 
-#if ALLOW_FBX_PARSER
-#include <fbxsdk.h>
+#if ENABLE_FBX_PARSER
+
+#include <map>
+
+#include "fbxsdk.h"
+
 #include "sk/sk_skeleton.h"
 #include "sk/sk_motion.h"
 #include "mcontrol_util.h"
-#include <map>
+
 
 class ParserFBX
 {
@@ -118,6 +122,7 @@ class ParserFBX
          SkMotion& motion, float scale, int& order, const FBxMetaData& metaData);
       static bool HasSmartbodyChannel(KFbxNode* pNode, const char* pChannelName, bool& out_ChannelValue);
 };
-#endif
+
+#endif  // ENABLE_FBX_PARSER
 
 #endif // _PARSER_FBX_H_

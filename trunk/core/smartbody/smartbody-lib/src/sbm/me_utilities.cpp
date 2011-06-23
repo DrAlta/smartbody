@@ -106,16 +106,16 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, Resourc
 		skeleton_p->skfilename(filename.c_str());
 		skeleton_p->name(skel_file);
 	}
-#if ALLOW_FBX_PARSER
-   else if (filename.find(".fbx") == (filename.size() - 4) || 
+#if ENABLE_FBX_PARSER
+	else if (filename.find(".fbx") == (filename.size() - 4) || 
 			 filename.find(".FBX") == (filename.size() - 4))
-   {
-      fclose(fp);
+	{
+		fclose(fp);
 		SkMotion motion;
 		ParserFBX::parse(*skeleton_p, motion, filename, float(scale));
 		skeleton_p->skfilename(filename.c_str());
 		skeleton_p->name(skel_file);
-   }
+	}
 #endif
 	else
 	{
@@ -186,13 +186,13 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 					load_me_motions_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
 			} else {
 				string ext = extension( cur );
-#if ALLOW_FBX_PARSER
+#if ENABLE_FBX_PARSER
 				if( _stricmp( ext.c_str(), MOTION_EXT ) == 0 || 
 					_stricmp( ext.c_str(), ".bvh" ) == 0 ||
 					_stricmp( ext.c_str(), ".dae" ) == 0 ||
-               _stricmp( ext.c_str(), ".fbx" ) == 0)
+					_stricmp( ext.c_str(), ".fbx" ) == 0)
 #else
-            if( _stricmp( ext.c_str(), MOTION_EXT ) == 0 || 
+				if( _stricmp( ext.c_str(), MOTION_EXT ) == 0 || 
 					_stricmp( ext.c_str(), ".bvh" ) == 0 ||
 					_stricmp( ext.c_str(), ".dae" ) == 0)
 #endif
@@ -235,12 +235,12 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			SkSkeleton skeleton;
 			parseSuccessful = ParserOpenCOLLADA::parse(skeleton, *motion, pathname.string(), float(scale));			
 		}
-#if ALLOW_FBX_PARSER
-      else if (ext == ".fbx")
-      {
-         SkSkeleton skeleton;
-         parseSuccessful = ParserFBX::parse(skeleton, *motion, pathname.string(), float(scale));	
-      }
+#if ENABLE_FBX_PARSER
+		else if (ext == ".fbx")
+		{
+			SkSkeleton skeleton;
+			parseSuccessful = ParserFBX::parse(skeleton, *motion, pathname.string(), float(scale));	
+		}
 #endif
 
 		if (parseSuccessful)
@@ -304,16 +304,16 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 					load_me_skeletons_impl( cur, map, recurse_dirs, manager, scale, "WARNING: " );
 			} else {
 				string ext = extension( cur );
-#if ALLOW_FBX_PARSER
+#if ENABLE_FBX_PARSER
 				if( _stricmp( ext.c_str(), ".sk" ) == 0 ||
 					_stricmp( ext.c_str(), ".bvh" ) == 0 ||
 					_stricmp( ext.c_str(), ".BVH" ) == 0 ||
 					_stricmp( ext.c_str(), ".dae" ) == 0 ||
 					_stricmp( ext.c_str(), ".DAE" ) == 0 ||
-               _stricmp( ext.c_str(), ".fbx" ) == 0 ||
-               _stricmp( ext.c_str(), ".FBX" ) == 0)
+					_stricmp( ext.c_str(), ".fbx" ) == 0 ||
+					_stricmp( ext.c_str(), ".FBX" ) == 0)
 #else
-            if( _stricmp( ext.c_str(), ".sk" ) == 0 ||
+				if( _stricmp( ext.c_str(), ".sk" ) == 0 ||
 					_stricmp( ext.c_str(), ".bvh" ) == 0 ||
 					_stricmp( ext.c_str(), ".BVH" ) == 0 ||
 					_stricmp( ext.c_str(), ".dae" ) == 0 ||
@@ -401,10 +401,10 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 				return CMD_FAILURE;
 			}
 		}
-#if ALLOW_FBX_PARSER
-      else if (ext == ".fbx" || ext == ".FBX")
-      {
-         skeleton = new SkSkeleton();
+#if ENABLE_FBX_PARSER
+		else if (ext == ".fbx" || ext == ".FBX")
+		{
+			skeleton = new SkSkeleton();
 			skeleton->skfilename(filebase.c_str());
 			skeleton->name(filebase.c_str());
 			SkMotion motion;
@@ -424,7 +424,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 				LOG("Problem loading skeleton from file '%s'.", pathname.string().c_str());
 				return CMD_FAILURE;
 			}
-      }
+		}
 #endif
 
 		skeleton->skfilename(pathname.string().c_str());
