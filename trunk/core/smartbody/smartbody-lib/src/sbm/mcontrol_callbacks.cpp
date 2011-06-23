@@ -46,6 +46,7 @@
 #include "SteeringAgent.h"
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include "ParserFbx.h"
 
 using namespace std;
 using namespace WSP;
@@ -1875,6 +1876,18 @@ void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, 
 
 int mcu_character_load_skinweights( const char* char_name, const char* skin_file, mcuCBHandle* mcu_p, float scaleFactor, const char* prefix )
 {
+   std::string jointNamePrefix;
+	if (prefix)
+		jointNamePrefix = prefix;
+
+#if ALLOW_FBX_PARSER
+   //if (strstr(skin_file, ".fbx") || strstr(skin_file, ".FBX"))
+   //{
+   //   ParserFBX::parseSkin(skin_file, char_name, scaleFactor, jointNamePrefix, mcu_p);
+   //   return( CMD_SUCCESS );
+   //}
+#endif
+
 	try 
 	{
 		XMLPlatformUtils::Initialize();
@@ -1894,10 +1907,6 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 	ErrorHandler* errHandler = (ErrorHandler*) new HandlerBase();
 	parser->setErrorHandler(errHandler);
 	
-	std::string jointNamePrefix;
-	if (prefix)
-		jointNamePrefix = prefix;
-
 	try 
 	{
 		parser->parse(skin_file);
