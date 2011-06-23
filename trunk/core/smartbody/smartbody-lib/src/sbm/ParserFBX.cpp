@@ -814,4 +814,8 @@ bool ParserFBX::HasSmartbodyChannel(KFbxNode* pNode, const char* pChannelName, b
    return false;
 }
 
+#else
+
+int g_parser_fbx_cpp____unused = 0;  // to prevent warning
+
 #endif  // ENABLE_FBX_PARSER
