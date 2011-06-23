@@ -20,13 +20,19 @@
  *      Adam Reilly, USC
  */
 
+#include "vhcl.h"
+
 #include "ParserFBX.h"
 
-#if ALLOW_FBX_PARSER
-#include "sr/sr_euler.h"
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/convenience.hpp>
+#if ENABLE_FBX_PARSER
+
 #include <iostream>
+
+#include "boost/filesystem/operations.hpp"
+#include "boost/filesystem/convenience.hpp"
+
+#include "sr/sr_euler.h"
+
 
 bool ParserFBX::parse(SkSkeleton& skeleton, SkMotion& motion, const std::string& fileName, float scale)
 {
@@ -808,4 +814,4 @@ bool ParserFBX::HasSmartbodyChannel(KFbxNode* pNode, const char* pChannelName, b
    return false;
 }
 
-#endif
+#endif  // ENABLE_FBX_PARSER

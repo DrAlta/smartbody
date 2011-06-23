@@ -299,6 +299,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\ParserFBX.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\ParserFBX.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\ParserOpenCOLLADA.cpp"
 				>
 			</File>
