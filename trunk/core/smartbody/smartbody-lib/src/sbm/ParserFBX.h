@@ -23,9 +23,8 @@
 #ifndef _PARSER_FBX_H_
 #define _PARSER_FBX_H_
 
-#define ENABLE_FBX_PARSER  0
 
-#if ENABLE_FBX_PARSER
+#if ENABLE_FBX_PARSER   // defined in the project settings
 
 #include <map>
 
@@ -38,13 +37,13 @@
 
 class ParserFBX
 {
-	public:
+   public:
       // main function to be called to parse an fbx file. Parses skeleton and animations
-		static bool parse(SkSkeleton& skeleton, SkMotion& motion, const std::string& fileName, float scale);
+      static bool parse(SkSkeleton& skeleton, SkMotion& motion, const std::string& fileName, float scale);
 
       // parses skin info
       static bool parseSkin(const std::string& fileName, const char* char_name, float scaleFactor, std::string& jointPrefix, mcuCBHandle* mcu_p);
-	private:
+   private:
       // struct that stores animation data until it is converted into the sbm structs
       struct FBXAnimData
       {
@@ -90,7 +89,7 @@ class ParserFBX
 
       // shuts down the fbx sdk
       static void Shutdown(KFbxSdkManager* pSdkManager, KFbxImporter* pImporter);
-      
+
       // skin parsing functions
       static void parseSkinRecursive(KFbxNode* pNode, const char* char_name, float scaleFactor,
          std::string& jointPrefix, mcuCBHandle* mcu_p, SbmCharacter* char_p, std::vector<SrModel*>& meshModelVec);

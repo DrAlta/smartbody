@@ -24,7 +24,7 @@
 
 #include "ParserFBX.h"
 
-#if ENABLE_FBX_PARSER
+#if ENABLE_FBX_PARSER   // defined in the project settings
 
 #include <iostream>
 
@@ -46,8 +46,8 @@ bool ParserFBX::parse(SkSkeleton& skeleton, SkMotion& motion, const std::string&
 
    // save the name of the skeleton/anim
    std::string filebasename = boost::filesystem::basename(fileName);
-	motion.name(filebasename.c_str());
-	skeleton.name(filebasename.c_str());
+   motion.name(filebasename.c_str());
+   skeleton.name(filebasename.c_str());
    int order = -1;
 
    KFbxNode* pRootNode = pScene->GetRootNode();
@@ -95,35 +95,35 @@ bool ParserFBX::parseSkin(const std::string& fileName, const char* char_name, fl
        }
 
       // cache the joint names for each skin weight
-	   /*for (size_t x = 0; x < char_p->dMesh_p->skinWeights.size(); x++)
-	   {
-		   SkinWeight* skinWeight = char_p->dMesh_p->skinWeights[x];
-		   for (size_t j = 0; j < skinWeight->infJointName.size(); j++)
-		   {
-			   std::string& jointName = skinWeight->infJointName[j];
-			   SkJoint* curJoint = char_p->skeleton_p->search_joint(jointName.c_str());
-			   skinWeight->infJoint.push_back(curJoint); // NOTE: If joints are added/removed during runtime, this list will contain stale data
-		   }
-	   }*/
+      /*for (size_t x = 0; x < char_p->dMesh_p->skinWeights.size(); x++)
+      {
+         SkinWeight* skinWeight = char_p->dMesh_p->skinWeights[x];
+         for (size_t j = 0; j < skinWeight->infJointName.size(); j++)
+         {
+            std::string& jointName = skinWeight->infJointName[j];
+            SkJoint* curJoint = char_p->skeleton_p->search_joint(jointName.c_str());
+            skinWeight->infJoint.push_back(curJoint); // NOTE: If joints are added/removed during runtime, this list will contain stale data
+         }
+      }*/
 
       for (unsigned int i = 0; i < meshModelVec.size(); i++)
-	   {
-		   for (int j = 0; j < meshModelVec[i]->V.size(); j++)
-		   {
-			   meshModelVec[i]->V[j] *= scaleFactor;
-		   }
-		   SrSnModel* srSnModelDynamic = new SrSnModel();
-		   SrSnModel* srSnModelStatic = new SrSnModel();
-		   srSnModelDynamic->shape(*meshModelVec[i]);
-		   srSnModelStatic->shape(*meshModelVec[i]);
-		   srSnModelDynamic->changed(true);
-		   srSnModelDynamic->visible(false);
-		   srSnModelStatic->shape().name = meshModelVec[i]->name;
-		   srSnModelDynamic->shape().name = meshModelVec[i]->name;
-		   char_p->dMesh_p->dMeshDynamic_p.push_back(srSnModelDynamic);
-		   char_p->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
-		   mcu_p->root_group_p->add(srSnModelDynamic);	
-	   }
+      {
+         for (int j = 0; j < meshModelVec[i]->V.size(); j++)
+         {
+            meshModelVec[i]->V[j] *= scaleFactor;
+         }
+         SrSnModel* srSnModelDynamic = new SrSnModel();
+         SrSnModel* srSnModelStatic = new SrSnModel();
+         srSnModelDynamic->shape(*meshModelVec[i]);
+         srSnModelStatic->shape(*meshModelVec[i]);
+         srSnModelDynamic->changed(true);
+         srSnModelDynamic->visible(false);
+         srSnModelStatic->shape().name = meshModelVec[i]->name;
+         srSnModelDynamic->shape().name = meshModelVec[i]->name;
+         char_p->dMesh_p->dMeshDynamic_p.push_back(srSnModelDynamic);
+         char_p->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
+         mcu_p->root_group_p->add(srSnModelDynamic);	
+      }
    }
    else
    {
@@ -148,7 +148,7 @@ void ParserFBX::parseSkinRecursive(KFbxNode* pNode, const char* char_name, float
       SrPnt pnt;   
 
       SkinWeight* skinWeight = new SkinWeight();
-		skinWeight->sourceMesh = pMeshName;
+      skinWeight->sourceMesh = pMeshName;
 
       int ClusterCount = pSkin->GetClusterCount();
       for (int j = 0; j < ClusterCount; ++j)
@@ -316,7 +316,7 @@ void ParserFBX::parseSkinRecursive(KFbxNode* pNode, const char* char_name, float
 
       if (char_p)
       {
-			//char_p->dMesh_p->skinWeights.push_back(skinWeight);
+         //char_p->dMesh_p->skinWeights.push_back(skinWeight);
       }
    }
 
@@ -408,7 +408,7 @@ void ParserFBX::parseJoints(KFbxNode* pNode, SkSkeleton& skeleton, SkMotion& mot
 SkJoint* ParserFBX::createJoint(KFbxNode* pNode, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, SkJoint* parent)
 {
    int index = -1;
-	if (parent != NULL)	
+   if (parent != NULL)	
    {
       index = parent->index();
    }
@@ -416,10 +416,10 @@ SkJoint* ParserFBX::createJoint(KFbxNode* pNode, SkSkeleton& skeleton, SkMotion&
    // get joint name
    std::string nameAttr = pNode->GetName();
    SkJoint* joint = skeleton.add_joint(SkJoint::TypeQuat, index);
-	joint->quat()->activate();
-	joint->name(SkJointName(nameAttr.c_str()));
+   joint->quat()->activate();
+   joint->name(SkJointName(nameAttr.c_str()));
 
-	// setup skeleton channels	
+   // setup skeleton channels	
    bool bHasChannelProperty = false;
    if (HasSmartbodyChannel(pNode, "SbodyPosX", bHasChannelProperty) && bHasChannelProperty)
    {
@@ -445,14 +445,14 @@ SkJoint* ParserFBX::createJoint(KFbxNode* pNode, SkSkeleton& skeleton, SkMotion&
       joint->quat()->activate();
    }
 
-	SrVec offset, rot, jointRot;
+   SrVec offset, rot, jointRot;
 
-	if (parent == NULL)
-		skeleton.root(joint);
+   if (parent == NULL)
+      skeleton.root(joint);
 
    order = 123;//getRotationOrder(orderVec);
    if (order == -1)
-		LOG("ParserFBX::parseJoints ERR: rotation info not correct in the file");
+      LOG("ParserFBX::parseJoints ERR: rotation info not correct in the file");
 
    // get local position
    fbxDouble3 translation = pNode->LclTranslation.Get();
@@ -472,7 +472,7 @@ SkJoint* ParserFBX::createJoint(KFbxNode* pNode, SkSkeleton& skeleton, SkMotion&
 
    // convert from euler angles to mat
    SrMat rotMat, jorientMat;
-	sr_euler_mat(order, rotMat, rot.x, rot.y, rot.z);
+   sr_euler_mat(order, rotMat, rot.x, rot.y, rot.z);
    sr_euler_mat(order, jorientMat, jointRot.x, jointRot.y, jointRot.z);
    //SrMat finalRotMat = rotMat;
 
@@ -731,7 +731,7 @@ void ParserFBX::ConvertfbxAnimToSBM(const std::vector<FBXAnimData*>& fbxAnimData
             fbxAnimData[j+4]->keyFrameDataFrame[i] * DEG_TO_RAD, fbxAnimData[j+5]->keyFrameDataFrame[i] * DEG_TO_RAD);
          
          // convert the mat to a quat
-			quat = SrQuat(mat);
+         quat = SrQuat(mat);
 
          // set the rotation
          motion.posture(i)[floatIndex+3] = quat.w;
@@ -775,7 +775,7 @@ void ParserFBX::ConvertfbxAnimToSBM(const std::vector<FBXAnimData*>& fbxAnimData
                fbxAnimData[j+1]->keyFrameDataFrame[i] * DEG_TO_RAD, fbxAnimData[j+2]->keyFrameDataFrame[i] * DEG_TO_RAD);
             
             // convert the mat to a quat
-			   quat = SrQuat(mat);
+            quat = SrQuat(mat);
 
             // set the rotation
             motion.posture(i)[floatIndex] = quat.w;
