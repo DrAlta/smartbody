@@ -120,7 +120,7 @@ mcuCBHandle::mcuCBHandle()
 	use_locomotion( false ),
 	use_param_animation( false ),
 	updatePhysics( false ),
-	steering_use_procedural( true ),
+	locomotion_type( Basic ),
 	viewer_factory ( new SrViewerFactory() ),
 	bmlviewer_factory ( new GenericViewerFactory() ),
 	panimationviewer_factory ( new GenericViewerFactory() ),

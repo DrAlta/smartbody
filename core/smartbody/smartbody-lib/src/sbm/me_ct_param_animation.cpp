@@ -298,7 +298,7 @@ void MeCtParamAnimation::autoScheduling(double time)
 		}
 		else
 		{
-			transitionManager = new PATransitionManager(data);
+			transitionManager = new PATransitionManager(data, curStateModule->data, nextStateModule->data);
 			nextStateModule->timeManager->updateLocalTimes(transitionManager->s2);
 #if PrintPADebugInfo
 		LOG("State %s being scheduled.[NOT ACTIVE]", nextStateModule->data->stateName.c_str());

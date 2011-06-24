@@ -142,6 +142,7 @@ class mcuCBHandle	{
 		unsigned int				queued_cmds;
 
 	public:
+		enum LocomotionType {Basic, Example, Procedural};
 		// Data
 		bool		loop;
 		bool		vhmsg_enabled;
@@ -151,7 +152,6 @@ class mcuCBHandle	{
 		bool		use_locomotion;
 		bool		use_param_animation;
 		bool        updatePhysics;
-		bool		steering_use_procedural;
 		const char* net_host;
 		bonebus::BoneBusClient bonebus;
 		SBMCharacterListener * sbm_character_listener;   // only one listener possible, must be set manually
@@ -166,6 +166,7 @@ class mcuCBHandle	{
 
 		std::vector<PAStateData*>					param_anim_states;
 		std::vector<PATransitionData*>				param_anim_transitions;
+		LocomotionType								locomotion_type;
 
 		TimeRegulator	*internal_timer_p;
 		TimeRegulator	*external_timer_p;

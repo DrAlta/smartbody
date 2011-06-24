@@ -3,7 +3,6 @@
 
 #include <sbm/sbm_character.hpp>
 #include <sbm/SteerSuiteEngineDriver.h>
-#include <sbm/sr_linear_curve.h>
 
 class SteeringAgent
 {
@@ -19,22 +18,29 @@ class SteeringAgent
 
 	private:
 		void normalizeAngle(float& angle);
+		inline float cmToM(float v)		{return (v / 100.0f);}
+		inline float mToCm(float v)		{return (v * 100.0f);}
+		inline float degToRad(float v)	{return (v * float(M_PI) / 180.0f);}
+		inline float radToDeg(float v)	{return (v * 180.0f / float(M_PI));}
 
 	private:
 		SteerLib::AgentInterface* agent;
 		SbmCharacter* character;
 		SbmCharacter* target;
-		srLinearCurve* scootCurve;
 
 	public:
-		float scootAccel;
+		// basic param
+		float basicLocoAngleGain;
+		float basicLocoScootGain;
+		// procedural param
 		float locoSpdGain;
-		float paLocoAngleGain;
-		float scootThreshold;	
-		float paLocoScootGain;
 		float locoScootGain;
-		float distThreshold;	// centimeter
-		float transition;
+		// example param
+		float paLocoAngleGain;	
+		float paLocoScootGain;
+		// global param
+		float scootThreshold;
+		float distThreshold;	
 		float desiredSpeed;
 		float facingAngle;
 		float facingAngleThreshold;

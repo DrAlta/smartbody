@@ -169,11 +169,13 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		std::string typeString = XMLString::transcode(locotype);
 		if (typeString == "procedural")
 		{
-			mcu->steering_use_procedural = true;
+			mcu->locomotion_type = mcu->Procedural;
 			c->steeringAgent->desiredSpeed = 1.6f;
 		}
 		else if (typeString == "example")
-			mcu->steering_use_procedural = false;
+			mcu->locomotion_type = mcu->Example;
+		else if (typeString == "basic")
+			mcu->locomotion_type = mcu->Basic;
 		else
 			return BehaviorRequestPtr();
 	}
@@ -192,7 +194,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	const XMLCh* manner = elem->getAttribute(L"manner");
 	if (XMLString::compareIString(manner, L"") != 0)
 	{
-		if (mcu->steering_use_procedural)
+		if (mcu->locomotion_type == mcu->Procedural)
 		{
 			LOG("This mode does not support Procedural Locomotion currently!");
 			return BehaviorRequestPtr();

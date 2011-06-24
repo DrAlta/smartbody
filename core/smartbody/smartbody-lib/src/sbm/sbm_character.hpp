@@ -72,6 +72,7 @@
 
 #include <sbm/me_ct_param_animation.h>
 #include <sbm/me_ct_saccade.h>
+#include <sbm/me_ct_basic_locomotion.h>
 #include "SteeringAgent.h"
 
 //#include <me/me_spline_1d.hpp>
@@ -80,6 +81,7 @@ class MeCtPAnimation;
 class MeCtParamAnimation;
 class MeCtSaccade;
 class SteeringAgent;
+class MeCtBasicLocomotion;
 
 class SbmCharacter : public SbmPawn	{
 
@@ -233,6 +235,7 @@ public:
 	MeCtMotionPlayer*	motionplayer_ct;
 	MeCtSaccade*		saccade_ct;
 	MeCtReachEngine*	reachEngine;
+	MeCtBasicLocomotion*	basic_locomotion_ct;
 
 	void schedule_viseme_curve( 
 		const char* viseme, 

@@ -620,6 +620,7 @@ PAStateModule::PAStateModule(PAStateData* stateData, bool l, bool pn)
 	interpolator = new PAInterpolator(stateData->motions, stateData->weights);
 	woManager = new PAWoManager(stateData->motions, stateData->weights);
 
+//	data = stateData;
 	data = new PAStateData(stateData);
 	loop = l;
 	active = false;
@@ -628,6 +629,7 @@ PAStateModule::PAStateModule(PAStateData* stateData, bool l, bool pn)
 
 PAStateModule::~PAStateModule()
 {
+//	data = NULL;
 	if (data)
 		delete data;
 	data = NULL;
@@ -705,9 +707,9 @@ PATransitionManager::PATransitionManager(double easeOutStart, double dur)
 #endif
 }
 
-PATransitionManager::PATransitionManager(PATransitionData* transitionData)
+PATransitionManager::PATransitionManager(PATransitionData* transitionData, PAStateData* from, PAStateData* to)
 {
-	data = transitionData;
+	data = new PATransitionData(transitionData, from, to);
 	update();
 	localTime = 0.0;
 	blendingMode = false;
@@ -719,6 +721,8 @@ PATransitionManager::PATransitionManager(PATransitionData* transitionData)
 
 PATransitionManager::~PATransitionManager()
 {
+	if (data)
+		delete data;
 	data = NULL;
 }
 

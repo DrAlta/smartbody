@@ -5449,6 +5449,15 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				character->steeringAgent->setAgent(agent);
 				agent->reset(initialConditions, dynamic_cast<SteerLib::EngineInterface*>(pprAIModule));
 			}
+			// adding obstacles to the steering space
+			mcu_p->pawn_map.reset();
+			SbmPawn* pawn = NULL;
+			while (pawn = mcu_p->pawn_map.next())
+			{
+				if (pawn->colObj_p)
+					pawn->initSteeringSpaceObject();
+			}
+
 			LOG("STARTING STEERSIM");
 			mcu_p->steerEngine->startSimulation();
 			mcu_p->steerEngine->setStartTime(0.0f);
@@ -5468,6 +5477,17 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				SbmCharacter* character = NULL;
 				while( character = mcu_p->character_map.next() )
 					character->steeringAgent->setAgent(NULL);
+
+				mcu_p->pawn_map.reset();
+				SbmPawn* pawn = NULL;
+				while (pawn = mcu_p->pawn_map.next())
+				{
+					if (pawn->steeringSpaceObj_p)
+					{
+						delete pawn->steeringSpaceObj_p;
+						pawn->steeringSpaceObj_p = NULL;
+					}
+				}
 			}
 		  return CMD_SUCCESS;
 		}
@@ -5498,7 +5518,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					goal.desiredSpeed = character->steeringAgent->desiredSpeed;
 					goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
 					goal.targetIsRandom = false;
-					goal.targetLocation = Util::Point(x / 100.0f, character->getHeight() / 200.0f, z / 100.0f);
+					goal.targetLocation = Util::Point(x / 100.0f, 0.0f, z / 100.0f);
 					character->steeringAgent->getAgent()->addGoal(goal);
 				}
 			}
@@ -5520,7 +5540,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			SbmCharacter* character = mcu_p->character_map.lookup(characterName.c_str());
 			if (character)
 			{
-				if (!mcu_p->steering_use_procedural)
+				if (mcu_p->locomotion_type != mcu_p->Procedural)
 				{
 					character->steeringAgent->desiredSpeed = (float)args.read_double();
 					return CMD_SUCCESS;
@@ -5537,7 +5557,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					LOG("Parameterized Animation Engine not enabled!");
 					return CMD_FAILURE;
 				}
-				mcu_p->steering_use_procedural = false;
+				mcu_p->locomotion_type = mcu_p->Example;
 				return CMD_SUCCESS;
 			}
 			if (type == "procedural")
@@ -5547,7 +5567,12 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					LOG("Procedural Locomotion not enabled!");
 					return CMD_FAILURE;
 				}
-				mcu_p->steering_use_procedural = true;
+				mcu_p->locomotion_type = mcu_p->Procedural;
+				return CMD_SUCCESS;
+			}
+			if (type == "basic")
+			{
+				mcu_p->locomotion_type = mcu_p->Basic;
 				return CMD_SUCCESS;
 			}
 		}

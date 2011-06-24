@@ -29,6 +29,10 @@
 
 const std::string PseudoIdleState = "PseudoIdle";
 class ParameterManager;
+
+//There are PAStateData stored inside mcu.
+//Everytime PAStateModule is created, it would copy the data from mcu.param_animation_states. 
+//toStates and fromStates are just pointers and they are not that useful
 class PAStateData
 {
 	public:
@@ -36,7 +40,7 @@ class PAStateData
 		std::vector<SkMotion*> motions;
 		std::vector<std::vector<double>> keys;
 		std::vector<double> weights;
-		std::vector<PAStateData*> toStates;
+		std::vector<PAStateData*> toStates;				
 		std::vector<PAStateData*> fromStates;
 		bool cycle;
 		ParameterManager* paramManager;
@@ -50,8 +54,16 @@ public:
 		int getMotionId(std::string motion);
 };
 
+//There are PATransitionData stored inside mcu
+//Everytime PATransitionManager is created, it would copy the data from mcu.param_animation_transitions.
+//fromState and toState are just pointers and they have to be changed when PATransitionManager is created.
 class PATransitionData
 {
+	public:
+		PATransitionData();
+		PATransitionData(PATransitionData* data, PAStateData* from, PAStateData* to);
+		~PATransitionData();
+
 	public:
 		PAStateData* fromState;
 		PAStateData* toState;

@@ -367,6 +367,10 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		this->param_animation_ct->name(paramAnimationName.c_str());
 	}
 
+	this->basic_locomotion_ct = new MeCtBasicLocomotion(this);
+	std::string bLocoName = std::string(name)+ "'s basic locomotion controller";
+	this->basic_locomotion_ct->name(bLocoName.c_str());
+
 	// init reach engine
 	{
 		SkJoint* effector = this->skeleton_p->search_joint("r_middle1");
@@ -427,12 +431,14 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	// Add Prioritized Schedule Controllers to the Controller Tree
 	ct_tree_p->add_controller( posture_sched_p );
 	ct_tree_p->add_controller( motion_sched_p );
-	
+
 	if (locomotion_ct)
 		ct_tree_p->add_controller( locomotion_ct );
 
 	if (param_animation_ct)
 		ct_tree_p->add_controller(param_animation_ct);
+
+	ct_tree_p->add_controller(basic_locomotion_ct);
 
 	ct_tree_p->add_controller( reach_sched_p );	
 	ct_tree_p->add_controller( grab_sched_p );
