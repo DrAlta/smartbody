@@ -1547,6 +1547,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="basiclocomotion"
+				>
+				<File
+					RelativePath="..\src\sbm\me_ct_basic_locomotion.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\me_ct_basic_locomotion.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="BML"

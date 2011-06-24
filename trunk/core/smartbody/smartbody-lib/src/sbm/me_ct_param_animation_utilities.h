@@ -188,7 +188,7 @@ class PATransitionManager
 	public:
 		PATransitionManager();
 		PATransitionManager(double easeOutStart, double duration);
-		PATransitionManager(PATransitionData* transitionData);
+		PATransitionManager(PATransitionData* transitionData, PAStateData* from, PAStateData* to);
 		~PATransitionManager();
 
 		void align(PAStateModule* current, PAStateModule* next);

@@ -96,6 +96,31 @@ int PAStateData::getMotionId(std::string motion)
 	return -1;
 }
 
+
+PATransitionData::PATransitionData()
+{
+}
+
+PATransitionData::PATransitionData(PATransitionData* data, PAStateData* from, PAStateData* to)
+{
+	this->fromState = from;
+	this->toState = to;
+	this->fromMotionName = data->fromMotionName;
+	this->toMotionName = data->toMotionName;
+	for (unsigned int i = 0; i < data->easeOutStart.size(); i++)
+		this->easeOutStart.push_back(data->easeOutStart[i]);
+	for (unsigned int i = 0; i < data->easeOutEnd.size(); i++)
+		this->easeOutEnd.push_back(data->easeOutEnd[i]);
+	this->easeInStart = data->easeInStart;
+	this->easeInEnd = data->easeInEnd;
+}
+
+PATransitionData::~PATransitionData()
+{
+	fromState = NULL;
+	toState = NULL;
+}
+
 int PATransitionData::getNumEaseOut()
 {
 	return easeOutStart.size();
