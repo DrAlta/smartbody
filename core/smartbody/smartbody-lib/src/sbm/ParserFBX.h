@@ -44,7 +44,7 @@ class ParserFBX
       // parses skin info
       static bool parseSkin(const std::string& fileName, const char* char_name, float scaleFactor, std::string& jointPrefix, mcuCBHandle* mcu_p);
    private:
-      // struct that stores animation data until it is converted into the sbm structs
+      // stores animation data until it is converted into the sbm structs
       struct FBXAnimData
       {
          std::string channelName; // i.e. l_elbow Quat
@@ -54,7 +54,7 @@ class ParserFBX
       };
 
       // stores data specific to sbm animations that we manually parse out of the fbx
-      struct FBxMetaData
+      struct FBXMetaData
       {
          fbxDouble1 readyTime;
          fbxDouble1 strokeStart;
@@ -62,8 +62,8 @@ class ParserFBX
          fbxDouble1 strokeTime;
          fbxDouble1 relaxTime;
 
-         FBxMetaData() { readyTime = strokeStart = emphasisTime = strokeTime = relaxTime = 0; }
-         FBxMetaData operator *=(fbxDouble1 value)
+         FBXMetaData() { readyTime = strokeStart = emphasisTime = strokeTime = relaxTime = 0; }
+         FBXMetaData operator *=(fbxDouble1 value)
          {
             readyTime *= value;
             strokeStart *= value;
@@ -73,7 +73,7 @@ class ParserFBX
             return *this;
          }
 
-         FBxMetaData operator -=(fbxDouble1 value)
+         FBXMetaData operator -=(fbxDouble1 value)
          {
             readyTime -= value;
             strokeStart -= value;
@@ -93,24 +93,24 @@ class ParserFBX
       // skin parsing functions
       static void parseSkinRecursive(KFbxNode* pNode, const char* char_name, float scaleFactor,
          std::string& jointPrefix, mcuCBHandle* mcu_p, SbmCharacter* char_p, std::vector<SrModel*>& meshModelVec);
+      static void parseGeometry(KFbxMesh* pMesh, SrModel* objModel, std::vector<SrModel*>& meshModelVec);
 
       // joint parsing functions
       static void parseJoints(KFbxNode* pNode, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order,
-         FBxMetaData& metaData, SkJoint* parent = NULL);
+         FBXMetaData& metaData, SkJoint* parent = NULL);
       static SkJoint* createJoint(KFbxNode* pNode, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, SkJoint* parent);
-      static void parseLibraryAnimations(KFbxNode* pNode, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order);
       static void animationPostProcessByChannels(SkSkeleton& skeleton, SkMotion& motion, SkChannelArray& channels);
 
       // meta data parsing functions
-      static void ParseMetaData(KFbxNode* pNode, FBxMetaData& out_metaData);
+      static void parseMetaData(KFbxNode* pNode, FBXMetaData& out_metaData);
 
       // animation parsing functions
-      static void ParseKeyData(const KFbxAnimCurve* pCurve, const SkChannel::Type type, const std::string& jointName,
+      static void parseKeyData(const KFbxAnimCurve* pCurve, const SkChannel::Type type, const std::string& jointName,
          SkMotion& motion, std::vector<FBXAnimData*>& fbxAnimData);
-      static void AddAnimation(KFbxScene* pScene, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, const FBxMetaData& metaData);
-      static void AddAnimationRecursive(KFbxAnimStack* pAnimStack, KFbxNode* pNode,/*, FBXFrame * pFrame*/SkSkeleton& skeleton,
+      static void parseAnimation(KFbxScene* pScene, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, const FBXMetaData& metaData);
+      static void parseAnimationRecursive(KFbxAnimStack* pAnimStack, KFbxNode* pNode,/*, FBXFrame * pFrame*/SkSkeleton& skeleton,
          SkMotion& motion,float scale, int& order, std::vector<FBXAnimData*>& fbxAnimData);
-      static void AddAnimationRecursive(KFbxAnimLayer* pAnimLayer, KFbxNode* pNode, std::string &takeName,
+      static void parseAnimationRecursive(KFbxAnimLayer* pAnimLayer, KFbxNode* pNode, std::string &takeName,
          SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::vector<FBXAnimData*>& fbxAnimData);
 
       // utility functions
@@ -118,7 +118,7 @@ class ParserFBX
       static void ConvertKFbxVector4ToSrPnt(const KFbxVector4& fbx, SrPnt& sbm);
       static void ConvertKFbxVector2ToSrPnt2(const KFbxVector2& fbx, SrPnt2& sbm);
       static void ConvertfbxAnimToSBM(const std::vector<FBXAnimData*>& fbxAnimData, SkSkeleton& skeleton, 
-         SkMotion& motion, float scale, int& order, const FBxMetaData& metaData);
+         SkMotion& motion, float scale, int& order, const FBXMetaData& metaData);
       static bool HasSmartbodyChannel(KFbxNode* pNode, const char* pChannelName, bool& out_ChannelValue);
 };
 

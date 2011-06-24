@@ -1881,11 +1881,11 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 		jointNamePrefix = prefix;
 
 #if ENABLE_FBX_PARSER
-   //if (strstr(skin_file, ".fbx") || strstr(skin_file, ".FBX"))
-   //{
-   //   ParserFBX::parseSkin(skin_file, char_name, scaleFactor, jointNamePrefix, mcu_p);
-   //   return( CMD_SUCCESS );
-   //}
+   if (strstr(skin_file, ".fbx") || strstr(skin_file, ".FBX"))
+   {
+      ParserFBX::parseSkin(skin_file, char_name, scaleFactor, jointNamePrefix, mcu_p);
+      return( CMD_SUCCESS );
+   }
 #endif
 
 	try 

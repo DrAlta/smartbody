@@ -29,305 +29,12 @@
 #include <iostream>
 
 #include "boost/filesystem/operations.hpp"
+// starts up the fbx sdk
 #include "boost/filesystem/convenience.hpp"
 
 #include "sr/sr_euler.h"
 
 
-bool ParserFBX::parse(SkSkeleton& skeleton, SkMotion& motion, const std::string& fileName, float scale)
-{
-   KFbxSdkManager* pSdkManager;
-   KFbxImporter* pImporter;
-   KFbxScene* pScene;
-   if (!Init(&pSdkManager, &pImporter, &pScene, fileName))
-   {
-      return false;
-   }
-
-   // save the name of the skeleton/anim
-   std::string filebasename = boost::filesystem::basename(fileName);
-   motion.name(filebasename.c_str());
-   skeleton.name(filebasename.c_str());
-   int order = -1;
-
-   KFbxNode* pRootNode = pScene->GetRootNode();
-
-   if(pRootNode) 
-   {
-       FBxMetaData metaData;
-       for (int i = 0; i < pRootNode->GetChildCount(); i++)
-       {
-          parseJoints(pRootNode->GetChild(i), skeleton, motion, scale, order, metaData, NULL);
-          //parseSkinRecursive(pRootNode->GetChild(i), "", 1.0f, std::string(""), NULL, NULL);
-       }
-
-       // go through all the animation data and add it
-       AddAnimation(pScene, skeleton, motion, scale, order, metaData);
-   }
-   else
-   {
-      LOG("Failed to load fbx: %s\n", filebasename.c_str());
-      return false;
-   }
-          
-   Shutdown(pSdkManager, pImporter);
-   return true;
-}
-
-bool ParserFBX::parseSkin(const std::string& fileName, const char* char_name, float scaleFactor, std::string& jointPrefix, mcuCBHandle* mcu_p)
-{
-   KFbxSdkManager* pSdkManager;
-   KFbxImporter* pImporter;
-   KFbxScene* pScene;
-   if (!Init(&pSdkManager, &pImporter, &pScene, fileName))
-   {
-      return false;
-   }
-
-   KFbxNode* pRootNode = pScene->GetRootNode();
-   if(pRootNode) 
-   {
-       SbmCharacter* char_p = mcu_p->character_map.lookup( char_name );
-       std::vector<SrModel*> meshModelVec;
-       for (int i = 0; i < pRootNode->GetChildCount(); i++)
-       {
-          parseSkinRecursive(pRootNode->GetChild(i), char_name, scaleFactor, jointPrefix, mcu_p, char_p, meshModelVec);
-       }
-
-      // cache the joint names for each skin weight
-      /*for (size_t x = 0; x < char_p->dMesh_p->skinWeights.size(); x++)
-      {
-         SkinWeight* skinWeight = char_p->dMesh_p->skinWeights[x];
-         for (size_t j = 0; j < skinWeight->infJointName.size(); j++)
-         {
-            std::string& jointName = skinWeight->infJointName[j];
-            SkJoint* curJoint = char_p->skeleton_p->search_joint(jointName.c_str());
-            skinWeight->infJoint.push_back(curJoint); // NOTE: If joints are added/removed during runtime, this list will contain stale data
-         }
-      }*/
-
-      for (unsigned int i = 0; i < meshModelVec.size(); i++)
-      {
-         for (int j = 0; j < meshModelVec[i]->V.size(); j++)
-         {
-            meshModelVec[i]->V[j] *= scaleFactor;
-         }
-         SrSnModel* srSnModelDynamic = new SrSnModel();
-         SrSnModel* srSnModelStatic = new SrSnModel();
-         srSnModelDynamic->shape(*meshModelVec[i]);
-         srSnModelStatic->shape(*meshModelVec[i]);
-         srSnModelDynamic->changed(true);
-         srSnModelDynamic->visible(false);
-         srSnModelStatic->shape().name = meshModelVec[i]->name;
-         srSnModelDynamic->shape().name = meshModelVec[i]->name;
-         char_p->dMesh_p->dMeshDynamic_p.push_back(srSnModelDynamic);
-         char_p->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
-         mcu_p->root_group_p->add(srSnModelDynamic);	
-      }
-   }
-   else
-   {
-      LOG("No root node found in %s", fileName.c_str());
-   }
-
-   Shutdown(pSdkManager, pImporter);
-   return true;
-}
-
-void ParserFBX::parseSkinRecursive(KFbxNode* pNode, const char* char_name, float scaleFactor,
-                                   std::string& jointPrefix, mcuCBHandle* mcu_p, SbmCharacter* char_p, std::vector<SrModel*>& meshModelVec)
-{
-   if (pNode->GetNodeAttribute()->GetAttributeType() == KFbxNodeAttribute::eMESH)
-   {
-      KFbxMesh* pMesh = (KFbxMesh*)pNode->GetNodeAttribute();
-      KFbxSkin* pSkin = (KFbxSkin*)pMesh->GetDeformer(0, KFbxDeformer::eSKIN);
-
-      const char* pMeshName = pMesh->GetName();
-      //const char* pSkinName = pSkin->GetName();
-      KFbxXMatrix transformMatrix;
-      SrPnt pnt;   
-
-      SkinWeight* skinWeight = new SkinWeight();
-      skinWeight->sourceMesh = pMeshName;
-
-      int ClusterCount = pSkin->GetClusterCount();
-      for (int j = 0; j < ClusterCount; ++j)
-      {
-         KFbxCluster* pCluster = pSkin->GetCluster(j);
-         KFbxNode* pBone = pCluster->GetLink();
-
-         // get the transform
-         pCluster->GetTransformMatrix(transformMatrix);
-
-         // convert to smartbody format
-         double* matBuffer = new double[16];
-         for (int i = 0; i < 4; ++i)
-         {
-            KFbxVector4 col = transformMatrix.GetColumn(i);
-            matBuffer[i * 4] = col.GetAt(0);
-            matBuffer[i * 4 + 1] = col.GetAt(1);
-            matBuffer[i * 4 + 2] = col.GetAt(2);
-            matBuffer[i * 4 + 3] = col.GetAt(3);
-         }
-         skinWeight->bindShapeMat.set(matBuffer);
-         SrMat sbmMatrix(matBuffer);
-         skinWeight->bindPoseMat.push_back(sbmMatrix);
-
-         //const char* pClusterName = pCluster->GetName();
-         const char* pBoneName = pBone->GetName();
-
-         skinWeight->infJointName.push_back(pBoneName);
-
-         //SrModel* objModel = new SrModel();
-         // set up the drawing data that will be used in the viewer
-         //objModel->name = pMeshName;
-
-         //SkJoint* joint = char_p->skeleton_p->search_joint(pBoneName);
-         //if (joint)
-         {
-            skinWeight->jointNameIndex.push_back(1/*joint->index()*/);
-            skinWeight->weightIndex.push_back(1/*joint->index()*/);
-         }
-         
-         int AffectedVertexCount = pCluster->GetControlPointIndicesCount();
-         for (int k = 0; k < AffectedVertexCount; ++k) 
-         {         
-            int AffectedVertexIndex = pCluster->GetControlPointIndices()[k];
-            //skinWeight->numInfJoints.push_back(AffectedVertexIndex);
-
-            float Weight = (float)pCluster->GetControlPointWeights()[k]; 
-            skinWeight->bindWeight.push_back(Weight);
-
-            // get the vertex associated with this index
-            /*KFbxVector4 vertex = pMesh->GetControlPointAt(AffectedVertexIndex);
-            ConvertKFbxVector4ToSrPnt(vertex, pnt);
-            objModel->V.push(pnt);
-
-            // get the vertex normal associated with this index
-            KFbxVector4 normal = pMesh->GetElementNormal()->GetDirectArray().GetAt(k);
-            ConvertKFbxVector4ToSrPnt(normal, pnt);
-            objModel->N.push(pnt);*/
-
-            //pMesh->GetElementPolygonGroup()->GetDirectArray().GetAt(k);
-            //objModel->F.push();
-         }
-
-         //int NumVertices = pMesh->GetControlPointsCount();
-         //for (int k = 0; k < NumVertices; ++k)
-         //{
-         //   
-         //}
-        
-         //for (int k = 0; k < pMesh->GetElementNormal()->GetDirectArray().GetCount(); ++k)
-         //{
-         //   // get the vertex normal associated with this index
-         //   KFbxVector4 normal = pMesh->GetElementNormal()->GetDirectArray().GetAt(k);
-         //   ConvertKFbxVector4ToSrPnt(normal, pnt);
-         //   objModel->N.push(pnt);
-         //}
-
-         //meshModelVec.push_back(objModel);
-      } 
-
-                  // set up the drawing data that will be used in the viewer
-                  SrModel* objModel = new SrModel();
-                  objModel->name = pMeshName;
-
-                  KFbxVector4* pControlPoints = pMesh->GetControlPoints();
-                  int nNumControlPoints = pMesh->GetControlPointsCount();
-                  for (int i = 0; i < nNumControlPoints; ++i)
-                  {
-                     ConvertKFbxVector4ToSrPnt(pControlPoints[i], pnt);
-                     objModel->V.push(pnt);
-                  }
-
-                  KFbxLayerElementArrayTemplate<KFbxVector4>* normals;
-                  bool retVal = pMesh->GetNormals(&normals);
-                  for (int i = 0; i < normals->GetCount(); ++i)
-                  {
-                     ConvertKFbxVector4ToSrPnt((*normals)[i], pnt);
-                     objModel->N.push(pnt);
-                  }
-
-                  int nPolygonCount = pMesh->GetPolygonCount();
-                  for (int i = 0; i < nPolygonCount; ++i)
-                  {
-                     int nPolygonSize = pMesh->GetPolygonSize(i);
-                     SrModel::Face face;
-                     for (int j = 0; j < nPolygonSize; j++)
-                     {
-                        int nControlPointIndex = pMesh->GetPolygonVertex(i, j);
-
-                        KFbxVector4 normal;
-                        pMesh->GetPolygonVertexNormal(i, nControlPointIndex, normal);
-                        ConvertKFbxVector4ToSrPnt(normal, pnt);
-                        objModel->N.push(pnt);
-
-                        //KFbxVector2 uvs;
-                        //pMesh->GetPolygonVertexUV(i, nControlPointIndex, "", uvs);
-                        //SrPnt2 pnt2;
-                        //ConvertKFbxVector2ToSrPnt2(uvs, pnt2);
-                        //objModel->T.push(pnt2);
-
-                        int nUVIndex = pMesh->GetTextureUVIndex(i, j);
-
-
-                        face.a = nControlPointIndex; face.b = nUVIndex; face.c = max(nControlPointIndex - 1, 0);
-                        //face.set(nControlPointIndex, nControlPointIndex, nControlPointIndex);
-                        objModel->F.push(face);
-                     }
-                  }
-      
-                  /*KFbxLayerElementArrayTemplate<int>* normalIndices = new KFbxLayerElementArrayTemplate<int>(eINTEGER1);
-                  bool succeeded = pMesh->GetNormalsIndices(&normalIndices);
-                  if (succeeded)
-                  {
-                     int count = min(normalIndices->GetCount(), objModel->F.size());
-                     for (int i = 0; i < count; i++)
-                     {
-                        objModel->F[i].c = (*normalIndices)[i];
-                     }
-                  }*/
-                  
-
-                  /*int nNumNormals = pMesh->GetElementNormalCount();
-                  for (int i = 0; i < nNumNormals; ++i)
-                  {
-                     KFbxGeometryElementNormal* pElementNormal = pMesh->GetElementNormal(i);
-                     int directArrayCount = pElementNormal->GetDirectArray().GetCount();
-                     for (int j = 0; j < pElementNormal->GetDirectArray().GetCount(); ++j)
-                     {
-                        ConvertKFbxVector4ToSrPnt(pElementNormal->GetDirectArray().GetAt(j), pnt);
-                        objModel->N.push(pnt);
-                     }
-                  }*/
-
-               //pMesh->GetNormalsIndices(
-                  
-
-                  meshModelVec.push_back(objModel);
-
-      //int layerCount = pMesh->GetLayerCount();
-      //for (int i = 0; i < layerCount; i++)
-      //{
-      //   KFbxLayer* pLayer = pMesh->GetLayer(i);
-      //   pLayer->GetNormals(
-      //}
-
-      if (char_p)
-      {
-         //char_p->dMesh_p->skinWeights.push_back(skinWeight);
-      }
-   }
-
-   for (int i = 0; i < pNode->GetChildCount(); i++)
-   {
-        // iterate on the children of this node
-        parseSkinRecursive(pNode->GetChild(i), char_name, scaleFactor, jointPrefix, mcu_p, char_p, meshModelVec);
-   }
-}
-
-// starts up the fbx sdk
 bool ParserFBX::Init(KFbxSdkManager** pSdkManager, KFbxImporter** pImporter, KFbxScene** pScene, const std::string& fileName)
 {
    // Initialize the sdk manager. This object handles all our memory management.
@@ -380,8 +87,273 @@ void ParserFBX::Shutdown(KFbxSdkManager* pSdkManager, KFbxImporter* pImporter)
    pSdkManager->Destroy();
 }
 
+bool ParserFBX::parse(SkSkeleton& skeleton, SkMotion& motion, const std::string& fileName, float scale)
+{
+   KFbxSdkManager* pSdkManager;
+   KFbxImporter* pImporter;
+   KFbxScene* pScene;
+   if (!Init(&pSdkManager, &pImporter, &pScene, fileName))
+   {
+      return false;
+   }
 
-void ParserFBX::parseJoints(KFbxNode* pNode, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, FBxMetaData& metaData, SkJoint* parent)
+   // save the name of the skeleton/anim
+   std::string filebasename = boost::filesystem::basename(fileName);
+   motion.name(filebasename.c_str());
+   skeleton.name(filebasename.c_str());
+   int order = -1;
+
+   KFbxNode* pRootNode = pScene->GetRootNode();
+
+   if(pRootNode) 
+   {
+       FBXMetaData metaData;
+       for (int i = 0; i < pRootNode->GetChildCount(); i++)
+       {
+          parseJoints(pRootNode->GetChild(i), skeleton, motion, scale, order, metaData, NULL);
+          //parseSkinRecursive(pRootNode->GetChild(i), "", 1.0f, std::string(""), NULL, NULL);
+       }
+
+       // go through all the animation data and add it
+       parseAnimation(pScene, skeleton, motion, scale, order, metaData);
+   }
+   else
+   {
+      LOG("Failed to load fbx: %s\n", filebasename.c_str());
+      return false;
+   }
+          
+   Shutdown(pSdkManager, pImporter);
+   return true;
+}
+
+bool ParserFBX::parseSkin(const std::string& fileName, const char* char_name, float scaleFactor, std::string& jointPrefix, mcuCBHandle* mcu_p)
+{
+   KFbxSdkManager* pSdkManager;
+   KFbxImporter* pImporter;
+   KFbxScene* pScene;
+   if (!Init(&pSdkManager, &pImporter, &pScene, fileName))
+   {
+      return false;
+   }
+
+   KFbxNode* pRootNode = pScene->GetRootNode();
+   if(pRootNode) 
+   {
+       SbmCharacter* char_p = mcu_p->character_map.lookup( char_name );
+       std::vector<SrModel*> meshModelVec;
+       //FBXSkinData fbxSkinData;
+       for (int i = 0; i < pRootNode->GetChildCount(); i++)
+       {
+          parseSkinRecursive(pRootNode->GetChild(i), char_name, scaleFactor, jointPrefix, mcu_p, char_p, meshModelVec);
+       }
+         
+      // cache the joint names for each skin weight
+      for (size_t x = 0; x < char_p->dMesh_p->skinWeights.size(); x++)
+      {
+         SkinWeight* skinWeight = char_p->dMesh_p->skinWeights[x];
+         for (size_t j = 0; j < skinWeight->infJointName.size(); j++)
+         {
+            std::string& jointName = skinWeight->infJointName[j];
+            SkJoint* curJoint = char_p->skeleton_p->search_joint(jointName.c_str());
+            skinWeight->infJoint.push_back(curJoint); // NOTE: If joints are added/removed during runtime, this list will contain stale data
+         }
+      }
+
+      for (unsigned int i = 0; i < meshModelVec.size(); i++)
+      {
+         for (int j = 0; j < meshModelVec[i]->V.size(); j++)
+         {
+            meshModelVec[i]->V[j] *= scaleFactor;
+         }
+         SrSnModel* srSnModelDynamic = new SrSnModel();
+         SrSnModel* srSnModelStatic = new SrSnModel();
+         srSnModelDynamic->shape(*meshModelVec[i]);
+         srSnModelStatic->shape(*meshModelVec[i]);
+         srSnModelDynamic->changed(true);
+         srSnModelDynamic->visible(false);
+         srSnModelStatic->shape().name = meshModelVec[i]->name;
+         srSnModelDynamic->shape().name = meshModelVec[i]->name;
+         char_p->dMesh_p->dMeshDynamic_p.push_back(srSnModelDynamic);
+         char_p->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
+         mcu_p->root_group_p->add(srSnModelDynamic);	
+      }
+   }
+   else
+   {
+      LOG("No root node found in %s", fileName.c_str());
+   }
+
+   Shutdown(pSdkManager, pImporter);
+   return true;
+}
+
+void ParserFBX::parseSkinRecursive(KFbxNode* pNode, const char* char_name, float scaleFactor,
+                                   std::string& jointPrefix, mcuCBHandle* mcu_p, SbmCharacter* char_p,
+                                   std::vector<SrModel*>& meshModelVec)
+{
+   if (pNode->GetNodeAttribute()->GetAttributeType() == KFbxNodeAttribute::eMESH)
+   {
+      KFbxMesh* pMesh = (KFbxMesh*)pNode->GetNodeAttribute();
+      KFbxSkin* pSkin = (KFbxSkin*)pMesh->GetDeformer(0, KFbxDeformer::eSKIN);
+
+      const char* pMeshName = pMesh->GetName();
+      KFbxXMatrix transformMatrix;
+      SrPnt pnt;   
+      int accumulatedAffectedVertices = 0;
+
+      SkinWeight* skinWeight = new SkinWeight();
+      skinWeight->sourceMesh = pMeshName;
+
+      // map key = vertex index
+      // map value = vector of pairs
+      //    -pair first = index into the jointNameIndex array in SkinWeight
+      //    -pair second = index into the weightIndex array in SkinWeight
+      std::map<int, std::vector<std::pair<int, int>>> vertexToIndexMap;
+
+      int weightIndexer = 0;
+      int ClusterCount = pSkin->GetClusterCount();
+      for (int j = 0; j < ClusterCount; ++j)
+      {
+         KFbxCluster* pCluster = pSkin->GetCluster(j);
+         KFbxNode* pBone = pCluster->GetLink();
+
+         // get the transform
+         //pCluster->GetTransformMatrix(transformMatrix);
+         pCluster->GetTransformLinkMatrix(transformMatrix);
+
+         // convert to smartbody format
+         double* matBuffer = new double[16];
+         for (int i = 0; i < 4; ++i)
+         {
+            KFbxVector4 row = transformMatrix.GetRow(i);
+            matBuffer[i * 4] = row.GetAt(0);
+            matBuffer[i * 4 + 1] = row.GetAt(1);
+            matBuffer[i * 4 + 2] = row.GetAt(2);
+            matBuffer[i * 4 + 3] = row.GetAt(3);
+         }
+
+         matBuffer[12] *= -1;
+         matBuffer[13] *= -1;
+         matBuffer[14] *= -1;
+
+         skinWeight->bindShapeMat.set(matBuffer);
+         SrMat sbmMatrix(matBuffer);
+         skinWeight->bindPoseMat.push_back(sbmMatrix);
+
+         const char* pBoneName = pBone->GetName();
+         skinWeight->infJointName.push_back(pBoneName);
+
+         int AffectedVertexCount = pCluster->GetControlPointIndicesCount(); 
+         for (int k = 0; k < AffectedVertexCount; ++k, ++weightIndexer) 
+         {         
+            int AffectedVertexIndex = pCluster->GetControlPointIndices()[k];
+
+            // map the vertex index to the weight and the joint that influences it
+            vertexToIndexMap[AffectedVertexIndex].push_back(std::pair<int, int>(j, accumulatedAffectedVertices + k));
+
+            float Weight = (float)pCluster->GetControlPointWeights()[k]; 
+            skinWeight->bindWeight.push_back(Weight);
+         }
+
+         // update the offset 
+         accumulatedAffectedVertices += AffectedVertexCount;
+      } 
+
+      // convert all the stored index data from vertexToIndexMap to the SkinWeight class
+      SrModel* objModel = new SrModel();
+      std::map<int, std::vector<std::pair<int, int>>>::iterator it;
+      for (it = vertexToIndexMap.begin(); it != vertexToIndexMap.end(); it++)
+      {
+         // use the map key (index into the vertex buffer) to find the vertex position
+         KFbxVector4 vertex = pMesh->GetControlPointAt(it->first);
+         ConvertKFbxVector4ToSrPnt(vertex, pnt);
+         objModel->V.push(pnt);
+         
+         skinWeight->numInfJoints.push_back(it->second.size());
+         for (unsigned int k = 0; k < it->second.size(); k++)
+         {
+            skinWeight->jointNameIndex.push_back(it->second[k].first);
+            skinWeight->weightIndex.push_back(it->second[k].second);
+         }
+      }
+
+      // build the face list
+      parseGeometry(pMesh, objModel, meshModelVec);
+
+      if (char_p)
+      {
+         char_p->dMesh_p->skinWeights.push_back(skinWeight);
+      }
+   }
+
+   for (int i = 0; i < pNode->GetChildCount(); i++)
+   {
+        // iterate on the children of this node
+        parseSkinRecursive(pNode->GetChild(i), char_name, scaleFactor, jointPrefix, mcu_p, char_p, meshModelVec);
+   }
+}
+
+void ParserFBX::parseGeometry(KFbxMesh* pMesh, SrModel* objModel, std::vector<SrModel*>& meshModelVec)
+{
+   // set up the drawing data that will be used in the viewer
+   //SrModel* objModel = new SrModel();
+   objModel->name = pMesh->GetName();
+   SrModel::Face face;
+   SrPnt pnt; SrPnt2 pnt2;
+   KFbxVector4 normal;
+   KFbxVector2 uv;
+
+   // for each polygon
+   int nPolygonCount = pMesh->GetPolygonCount();
+   for (int i = 0; i < nPolygonCount; ++i)
+   {
+      int nPolygonSize = pMesh->GetPolygonSize(i);
+      std::vector<int> savedVertexIndices;
+
+      KStringList uvSetNames;
+      pMesh->GetUVSetNames(uvSetNames);
+
+      for (int j = 0; j < nPolygonSize; j++)
+      {
+         // get the vertex index
+         int nControlPointIndex = pMesh->GetPolygonVertex(i, j);
+
+         // get the normal of this vertex
+         pMesh->GetPolygonVertexNormal(i, nControlPointIndex, normal);
+         ConvertKFbxVector4ToSrPnt(normal, pnt);
+         objModel->N.push(pnt);
+
+         // get the uv of this vertex
+         //int nUVIndex = pMesh->GetTextureUVIndex(i, j);
+         //pMesh->GetPolygonVertexUV(i, j, uvSetNames[0], uv);
+         //ConvertKFbxVector2ToSrPnt2(uv, pnt2);
+         //objModel->T.push(pnt2);
+
+         savedVertexIndices.push_back(nControlPointIndex);   
+      }
+
+      // create the faces based off the vertices
+      if (savedVertexIndices.size() == 3 || savedVertexIndices.size() > 4)
+      {
+         face.set(savedVertexIndices[0], savedVertexIndices[1], savedVertexIndices[2]);
+         objModel->F.push(face);
+      }
+      else if (savedVertexIndices.size() == 4)
+      {
+         // make 2 triangles from the 4 verts
+         face.set(savedVertexIndices[0], savedVertexIndices[1], savedVertexIndices[2]);
+         objModel->F.push(face);
+         face.set(savedVertexIndices[0], savedVertexIndices[2], savedVertexIndices[3]);
+         objModel->F.push(face);
+      }  
+   }
+
+   objModel->smooth();
+   meshModelVec.push_back(objModel);
+}
+
+void ParserFBX::parseJoints(KFbxNode* pNode, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, FBXMetaData& metaData, SkJoint* parent)
 {
    SkJoint* joint = parent;
    if (pNode->GetNodeAttribute()->GetAttributeType() == KFbxNodeAttribute::eSKELETON)
@@ -395,7 +367,7 @@ void ParserFBX::parseJoints(KFbxNode* pNode, SkSkeleton& skeleton, SkMotion& mot
    KFbxProperty prop = pNode->FindProperty("rdyTime");
    if (prop.IsValid())
    {
-      ParseMetaData(pNode, metaData);
+      parseMetaData(pNode, metaData);
    }
 
    for (int i = 0; i < pNode->GetChildCount(); i++)
@@ -486,7 +458,7 @@ SkJoint* ParserFBX::createJoint(KFbxNode* pNode, SkSkeleton& skeleton, SkMotion&
    return joint;
 }
 
-void ParserFBX::ParseMetaData(KFbxNode* pNode, FBxMetaData& out_metaData)
+void ParserFBX::parseMetaData(KFbxNode* pNode, FBXMetaData& out_metaData)
 {
    //KFbxNode* smartbodyNode = pRootNode->FindChild("AnimDef_ChrBillFord_IdleSeated01");
    KFbxProperty prop;
@@ -526,7 +498,7 @@ void ParserFBX::ParseMetaData(KFbxNode* pNode, FBxMetaData& out_metaData)
    out_metaData *= oneOverThirty;
 }
 
-void ParserFBX::AddAnimation(KFbxScene* pScene, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, const FBxMetaData& metaData)
+void ParserFBX::parseAnimation(KFbxScene* pScene, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, const FBXMetaData& metaData)
 {
    KFbxNode* rootNode = pScene->GetRootNode();
 
@@ -540,7 +512,7 @@ void ParserFBX::AddAnimation(KFbxScene* pScene, SkSkeleton& skeleton, SkMotion& 
 
       KTimeSpan timeSpan = pAnimStack->GetLocalTimeSpan();
 
-      AddAnimationRecursive(pAnimStack, rootNode, skeleton, motion, scale, order, fbxAnimData);
+      parseAnimationRecursive(pAnimStack, rootNode, skeleton, motion, scale, order, fbxAnimData);
       ConvertfbxAnimToSBM(fbxAnimData, skeleton, motion, scale, order, metaData);
 
       // start fresh for new anim
@@ -552,7 +524,7 @@ void ParserFBX::AddAnimation(KFbxScene* pScene, SkSkeleton& skeleton, SkMotion& 
    }
 } 
 
-void ParserFBX::AddAnimationRecursive(KFbxAnimStack* pAnimStack, KFbxNode* pNode, SkSkeleton& skeleton, SkMotion& motion,
+void ParserFBX::parseAnimationRecursive(KFbxAnimStack* pAnimStack, KFbxNode* pNode, SkSkeleton& skeleton, SkMotion& motion,
                                       float scale, int& order, std::vector<FBXAnimData*>& fbxAnimData)
 {
    int nbAnimLayers = pAnimStack->GetMemberCount(FBX_TYPE(KFbxAnimLayer));
@@ -563,11 +535,11 @@ void ParserFBX::AddAnimationRecursive(KFbxAnimStack* pAnimStack, KFbxNode* pNode
       // layers hold animcurves so go through each layers set of curves
       KFbxAnimLayer* pAnimLayer = pAnimStack->GetMember(FBX_TYPE(KFbxAnimLayer), layerNo);
 
-      AddAnimationRecursive(pAnimLayer, pNode, takeName, skeleton, motion, scale, order, fbxAnimData);
+      parseAnimationRecursive(pAnimLayer, pNode, takeName, skeleton, motion, scale, order, fbxAnimData);
    }
 }
 
-void ParserFBX::ParseKeyData(const KFbxAnimCurve* pCurve, const SkChannel::Type type, const std::string& jointName,
+void ParserFBX::parseKeyData(const KFbxAnimCurve* pCurve, const SkChannel::Type type, const std::string& jointName,
                              SkMotion& motion, std::vector<FBXAnimData*>& fbxAnimData)
 {
    if (!pCurve)
@@ -598,7 +570,7 @@ void ParserFBX::ParseKeyData(const KFbxAnimCurve* pCurve, const SkChannel::Type 
    fbxAnimData.push_back(pNewAnimData);
 }
 
-void ParserFBX::AddAnimationRecursive(KFbxAnimLayer* pAnimLayer, KFbxNode* pNode, std::string &takeName, SkSkeleton& skeleton,
+void ParserFBX::parseAnimationRecursive(KFbxAnimLayer* pAnimLayer, KFbxNode* pNode, std::string &takeName, SkSkeleton& skeleton,
                                       SkMotion& motion, float scale, int& order, std::vector<FBXAnimData*>& fbxAnimData)
 {
    // get the joint name
@@ -611,42 +583,42 @@ void ParserFBX::AddAnimationRecursive(KFbxAnimLayer* pAnimLayer, KFbxNode* pNode
    {
       // x pos data
       pCurve = pNode->LclTranslation.GetCurve<KFbxAnimCurve>(pAnimLayer, KFCURVENODE_T_X);
-      ParseKeyData(pCurve, SkChannel::XPos, jointName, motion, fbxAnimData);
+      parseKeyData(pCurve, SkChannel::XPos, jointName, motion, fbxAnimData);
    }
 
    if (HasSmartbodyChannel(pNode, "SbodyPosY", bHasChannelProperty) && bHasChannelProperty)
    {
        // y pos data
       pCurve = pNode->LclTranslation.GetCurve<KFbxAnimCurve>(pAnimLayer, KFCURVENODE_T_Y);
-      ParseKeyData(pCurve, SkChannel::YPos, jointName, motion, fbxAnimData);
+      parseKeyData(pCurve, SkChannel::YPos, jointName, motion, fbxAnimData);
    }
 
    if (HasSmartbodyChannel(pNode, "SbodyPosZ", bHasChannelProperty) && bHasChannelProperty)
    {
        // z pos data
       pCurve = pNode->LclTranslation.GetCurve<KFbxAnimCurve>(pAnimLayer, KFCURVENODE_T_Z);
-      ParseKeyData(pCurve, SkChannel::ZPos, jointName, motion, fbxAnimData);
+      parseKeyData(pCurve, SkChannel::ZPos, jointName, motion, fbxAnimData);
    }
 
    if (HasSmartbodyChannel(pNode, "SbodyQuat", bHasChannelProperty) && bHasChannelProperty)
    {
         // x rot data
       pCurve = pNode->LclRotation.GetCurve<KFbxAnimCurve>(pAnimLayer, KFCURVENODE_R_X);
-      ParseKeyData(pCurve, SkChannel::XRot, jointName, motion, fbxAnimData);
+      parseKeyData(pCurve, SkChannel::XRot, jointName, motion, fbxAnimData);
 
       // y rot data
       pCurve = pNode->LclRotation.GetCurve<KFbxAnimCurve>(pAnimLayer, KFCURVENODE_R_Y);
-      ParseKeyData(pCurve, SkChannel::YRot, jointName, motion, fbxAnimData);
+      parseKeyData(pCurve, SkChannel::YRot, jointName, motion, fbxAnimData);
 
       // z rot data
       pCurve = pNode->LclRotation.GetCurve<KFbxAnimCurve>(pAnimLayer, KFCURVENODE_R_Z);
-      ParseKeyData(pCurve, SkChannel::ZRot, jointName, motion, fbxAnimData);
+      parseKeyData(pCurve, SkChannel::ZRot, jointName, motion, fbxAnimData);
    }
     
    int childCount = pNode->GetChildCount();
    for (int i = 0; i < childCount; i++)
    {
-      AddAnimationRecursive(pAnimLayer, pNode->GetChild(i), takeName, skeleton, motion, scale, order, fbxAnimData);
+      parseAnimationRecursive(pAnimLayer, pNode->GetChild(i), takeName, skeleton, motion, scale, order, fbxAnimData);
    }
 }
 
@@ -671,7 +643,7 @@ void ParserFBX::ConvertKFbxVector2ToSrPnt2(const KFbxVector2& fbx, SrPnt2& sbm)
 }
 
 void ParserFBX::ConvertfbxAnimToSBM(const std::vector<FBXAnimData*>& fbxAnimData, SkSkeleton& skeleton,
-                                    SkMotion& motion, float scale, int& order, const FBxMetaData& metaData)
+                                    SkMotion& motion, float scale, int& order, const FBXMetaData& metaData)
 {
    if (fbxAnimData.empty())
    {
