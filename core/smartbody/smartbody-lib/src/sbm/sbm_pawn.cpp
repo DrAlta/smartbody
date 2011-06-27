@@ -1297,8 +1297,8 @@ void SbmPawn::initSteeringSpaceObject()
 	float xmax = (x + steeringSpaceObjSize.x) / 100.0f;
 	float ymin = (y - steeringSpaceObjSize.y) / 100.0f;
 	float ymax = (y + steeringSpaceObjSize.y) / 100.0f;
-	float zmin = (z - steeringSpaceObjSize.y) / 100.0f;
-	float zmax = (z + steeringSpaceObjSize.y) / 100.0f;
+	float zmin = (z - steeringSpaceObjSize.z) / 100.0f;
+	float zmax = (z + steeringSpaceObjSize.z) / 100.0f;
 	steeringSpaceObj_p = new SteerLib::BoxObstacle(xmin, xmax, ymin, ymax, zmin, zmax);
 	mcu.steerEngine->_engine->addObstacle(steeringSpaceObj_p);
 	mcu.steerEngine->_engine->getSpatialDatabase()->addObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());	

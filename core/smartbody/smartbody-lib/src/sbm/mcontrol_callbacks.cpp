@@ -5409,11 +5409,13 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			}
 			mcu_p->steerEngine = new SteerSuiteEngineDriver();
 			SteerLib::SimulationOptions* steerOptions = new SteerLib::SimulationOptions();
-			steerOptions->moduleOptionsDatabase["testCasePlayer"]["testcase"] = "3-way-confusion-1.xml";
+			steerOptions->moduleOptionsDatabase["testCasePlayer"]["testcase"] = "3-way-confusion-1-test.xml";
 			steerOptions->moduleOptionsDatabase["testCasePlayer"]["ai"] = "pprAI";
 			steerOptions->engineOptions.startupModules.insert("testCasePlayer");
 			steerOptions->engineOptions.testCaseSearchPath = "..\\..\\..\\..\\core\\smartbody\\steersuite-1.3\\testcases\\";
 			steerOptions->engineOptions.moduleSearchPath = "..\\..\\..\\..\\core\\smartbody\\sbm\\bin\\";
+			steerOptions->gridDatabaseOptions.gridSizeX = 100;
+			steerOptions->gridDatabaseOptions.gridSizeZ = 100;
 			LOG("INIT STEERSIM");
 			try {
 				mcu_p->steerEngine->init(steerOptions);
