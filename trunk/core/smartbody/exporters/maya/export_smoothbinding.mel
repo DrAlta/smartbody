@@ -93,8 +93,8 @@ global proc smoothBindingExportFunc()
 			
 			
 			// post export process - get rid of material files
-			if (`filetest -e ($exportDir + "/" + $meshName + ".mtl")`)
-				sysFile -delete ($exportDir + "/" + $meshName + ".mtl");
+			//if (`filetest -e ($exportDir + "/" + $meshName + ".mtl")`)
+				//sysFile -delete ($exportDir + "/" + $meshName + ".mtl");
 		}
 		print ("Exporting OBJ Finished!\n");
 		
