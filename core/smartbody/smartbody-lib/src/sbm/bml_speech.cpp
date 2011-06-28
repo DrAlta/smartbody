@@ -470,8 +470,11 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 		last_viseme = longest_viseme;
 	}
 
-	time_sec start_time = sp_start->time + offset;
-
+	time_sec start_time = now + offset;
+	if (isTimeSet(sp_start->time))
+		start_time = sp_start->time + offset;
+	else
+		sp_start->time = start_time;
 	//  Set core sync_point times
 	
 	if( isTimeSet( last_viseme ) ) {
