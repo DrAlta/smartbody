@@ -413,6 +413,7 @@ void BehaviorSyncPoints::validate() {
 			if( it == end ) {
 				out << endl << "\tAll SyncPoint::time are unset";
 				valid = false;
+				return;
 			}
 		}
 
