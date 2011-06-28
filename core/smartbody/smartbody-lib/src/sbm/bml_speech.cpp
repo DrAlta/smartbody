@@ -362,8 +362,13 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 	SyncPointPtr sp_relax( behav_syncs.sync_relax()->sync() );
 	SyncPointPtr sp_end( behav_syncs.sync_end()->sync() );
 
-	string warning_context = string( "Behavior \"" ) + unique_id + "\"";
+		string warning_context = string( "Behavior \"" ) + unique_id + "\"";
 	behav_syncs.applyParentTimes( warning_context );
+
+	
+	time_sec offset = 0;
+	if (isTimeSet(sp_start->time))
+		offset = sp_start->time - now;
 
 	BmlRequestPtr       request  = trigger->request.lock();
 	const SbmCharacter* actor    = request->actor;
@@ -402,6 +407,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 		for ( size_t i = 0; i < (*result_visemes).size(); i++ )
 		{
 			VisemeData* v = (*result_visemes)[ i ];
+
 			// drop any visemes that don't exceed the viseme threshold
 			if (v->duration() < actor->getMinVisemeTime())
 				continue;
@@ -464,10 +470,10 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 		last_viseme = longest_viseme;
 	}
 
-	time_sec start_time = now; // TODO: sync to prior behaviors
+	time_sec start_time = sp_start->time + offset;
 
 	//  Set core sync_point times
-	sp_start->time = start_time;
+	
 	if( isTimeSet( last_viseme ) ) {
 		last_viseme += start_time;
 
