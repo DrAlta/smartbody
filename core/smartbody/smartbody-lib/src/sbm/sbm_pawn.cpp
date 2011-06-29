@@ -1284,13 +1284,6 @@ void SbmPawn::initSteeringSpaceObject()
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (!mcu.steerEngine)	return;
 	if (!mcu.steerEngine->_engine)	return;
-	if (steeringSpaceObj_p)
-	{
-		mcu.steerEngine->_engine->removeObstacle(steeringSpaceObj_p);
-		mcu.steerEngine->_engine->getSpatialDatabase()->removeObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
-		delete steeringSpaceObj_p;
-		steeringSpaceObj_p = NULL;
-	}
 	float x, y, z, h, p, r;
 	this->get_world_offset(x, y, z, h, p, r);	
 	float xmin = (x - steeringSpaceObjSize.x) / 100.0f;
@@ -1299,9 +1292,34 @@ void SbmPawn::initSteeringSpaceObject()
 	float ymax = (y + steeringSpaceObjSize.y) / 100.0f;
 	float zmin = (z - steeringSpaceObjSize.z) / 100.0f;
 	float zmax = (z + steeringSpaceObjSize.z) / 100.0f;
-	steeringSpaceObj_p = new SteerLib::BoxObstacle(xmin, xmax, ymin, ymax, zmin, zmax);
-	mcu.steerEngine->_engine->addObstacle(steeringSpaceObj_p);
-	mcu.steerEngine->_engine->getSpatialDatabase()->addObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());	
+
+	if (steeringSpaceObj_p)
+	{
+		const Util::AxisAlignedBox& box = steeringSpaceObj_p->getBounds();
+		if (fabs(box.xmax - xmax) < .0001 ||
+			fabs(box.xmin - xmin) < .0001 ||
+			fabs(box.ymax - ymax) < .0001 ||
+			fabs(box.ymin - ymin) < .0001 ||
+			fabs(box.zmax - zmax) < .0001 ||
+			fabs(box.zmin - zmin) < .0001)
+		{
+			mcu.steerEngine->_engine->getSpatialDatabase()->removeObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
+			Util::AxisAlignedBox& mutableBox = const_cast<Util::AxisAlignedBox&>(box);
+			mutableBox.xmax = xmax;
+			mutableBox.xmin = xmin;
+			mutableBox.ymax = ymax;
+			mutableBox.ymin = ymin;
+			mutableBox.zmax = zmax;
+			mutableBox.zmin = zmin;
+			mcu.steerEngine->_engine->getSpatialDatabase()->addObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
+		}
+	}
+	else
+	{
+		steeringSpaceObj_p = new SteerLib::BoxObstacle(xmin, xmax, ymin, ymax, zmin, zmax);
+		mcu.steerEngine->_engine->addObstacle(steeringSpaceObj_p);
+		mcu.steerEngine->_engine->getSpatialDatabase()->addObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());	
+	}
 }
 
 void SbmPawn::setPhysicsSim( bool enable )
