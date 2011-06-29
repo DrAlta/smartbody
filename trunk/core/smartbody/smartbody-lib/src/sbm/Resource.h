@@ -8,7 +8,7 @@ class Resource
 {
 	public:
 		Resource();
-		~Resource();
+		virtual ~Resource();
 
 		void addChild(Resource* resource);
 		int getNumChildren();
