@@ -525,7 +525,8 @@ std::string ReachStateIdle::nextState( ReachStateData* rd )
 	if (rd->startReach)
 	{		
 		rd->curRefTime = 0.f;
-		// test the distance to the target		
+		// test the distance to the target	
+#ifdef LOCOMOTION_REACH
 		float dist = rd->XZDistanceToTarget();		
 		if (dist > rd->characterHeight*0.5f) 
 		{	
@@ -547,6 +548,7 @@ std::string ReachStateIdle::nextState( ReachStateData* rd )
 			nextStateName = "Move";
 		}
 		else // otherwise do the reach directly
+#endif
 		{
 			//printf("idle to start\n");
 			rd->reachControl->setFadeIn(0.5f);
@@ -601,6 +603,10 @@ std::string ReachStateStart::nextState( ReachStateData* rd )
 // 			rd->startReach = false;
 // 			nextStateName = "Return";
 // 		}		
+	}
+	else if (rd->endReach)
+	{
+		nextStateName = "Return";
 	}
 	return nextStateName;
 }
