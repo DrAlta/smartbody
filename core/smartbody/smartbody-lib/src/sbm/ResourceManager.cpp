@@ -44,36 +44,25 @@ ResourceManager::~ResourceManager()
 
 void ResourceManager::addResource(Resource* r)
 {
-	CmdResource* cmd = dynamic_cast<CmdResource*>(r);
+		CmdResource* cmd = dynamic_cast<CmdResource*>(r);
 	if (cmd)
 	{
-		if (cur_cmd_parent.size() > 0)
-		{
-			cur_cmd_parent.top()->addChild(r);
-			last_resource = cmd;
-		}
-		else
-		{
-			while(resources.size() >= resource_limit)
-			{
-				Resource* last = resources.front();
-				resources.pop_front();
-				delete last;
-			}
-			resources.push_back(r);
-			last_resource = cmd;
-		}
+		addCommandResource(cmd);
+		return;
 	}
-	else
+	ControllerResource* ctrl = dynamic_cast<ControllerResource*>(r);
+	if (ctrl)
 	{
-		if(resources.size() >= resource_limit)
-		{
-			Resource* last = resources.front();
-			resources.pop_front();
-			delete last;
-		}
-		resources.push_back(r);
+		addControllerResource(ctrl);
+		return;
 	}
+	if(resources.size() >= resource_limit)
+	{
+		Resource* last = resources.front();
+		resources.pop_front();
+		delete last;
+	}
+	resources.push_back(r);
 }
 
 void ResourceManager::addCommandResource(CmdResource* cmd)
@@ -87,7 +76,7 @@ void ResourceManager::addCommandResource(CmdResource* cmd)
 	{
 		while(commandResources.size() >= resource_limit)
 		{
-			Resource* last = commandResources.front();
+			CmdResource* last = commandResources.front();
 			commandResources.pop_front();
 			delete last;
 		}
