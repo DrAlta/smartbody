@@ -25,23 +25,40 @@
 
 const char* MeCtBasicLocomotion::_type_name = "BasicLocomotion";
 
-MeCtBasicLocomotion::MeCtBasicLocomotion(SbmCharacter* c) : character(c)
+MeCtBasicLocomotion::MeCtBasicLocomotion(SbmCharacter* c) :  MeController(), 
+															 character(c)
 {
 	scootSpd = 0.0f;	//	unit: centermeter/sec
 	movingSpd = 0.0f;	//	unit: centermeter/sec
 	turningSpd = 0.0f;	//	unit: deg/sec
 	_valid = false;
+	_lastTime = -1.0;
 }
 
 MeCtBasicLocomotion::~MeCtBasicLocomotion()
 {
 }
 
+void MeCtBasicLocomotion::init()
+{
+	_lastTime = -1.0;
+	MeController::init();
+}
+
 bool MeCtBasicLocomotion::controller_evaluate(double t, MeFrameData& frame)
 {
 	float dt = 1.0f / 60.0f;
+	if (_lastTime > 0.0)
+	{
+		dt = float(t - _lastTime);
+	}
+	if (dt < .016f) // update no faster than 60 fps
+		return true;
+	_lastTime = t;
 	if (character && _valid)
 	{
+		if (scootSpd == 0.0f && movingSpd == 0.0f && turningSpd == 0.0f)
+			return true;
 		float x, y, z, yaw, pitch, roll;
 		character->get_world_offset(x, y, z, yaw, pitch, roll);
 
