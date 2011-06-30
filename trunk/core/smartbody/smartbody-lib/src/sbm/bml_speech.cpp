@@ -472,7 +472,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 
 	time_sec start_time = now + offset;
 	if (isTimeSet(sp_start->time))
-		start_time = sp_start->time + offset;
+		start_time = sp_start->time;
 	else
 		sp_start->time = start_time;
 	//  Set core sync_point times
@@ -507,7 +507,6 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 		sp_relax->time        = start_time;
 		sp_end->time          = start_time;
 	}
-
 
 	// Process Word Break SyncPoints
 	MapOfSyncPoint::iterator wb_it  = wbToSync.begin();
