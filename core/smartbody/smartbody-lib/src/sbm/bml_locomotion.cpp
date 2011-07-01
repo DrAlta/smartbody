@@ -223,6 +223,15 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		mcu->execute_seq(seq);
 	//	c->steeringAgent->facingAngle = (float)atof(XMLString::transcode(facingAngle));
 	}
+	else
+	{
+		std::stringstream command;
+		command << "steer facing " << c->name << " " << "-200"; // set facing to fabs() > 180 to avoid preserving old facing values
+		srCmdSeq *seq = new srCmdSeq(); //sequence that holds the startup feedback
+		seq->insert(float(mcu->time + mcu->time_dt), command.str().c_str());
+		mcu->execute_seq(seq);
+	//	c->steeringAgent->facingAngle = (float)atof(XMLString::transcode(facingAngle));
+	}
 	const XMLCh* following = elem->getAttribute(L"sbm:follow");
 	if (XMLString::compareIString(following, L"") != 0)
 	{
