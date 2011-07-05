@@ -5,7 +5,7 @@
 # ---- Loading data/sbm-common assets
 0	path seq ../../../../data/sbm-common/scripts
 0	path ME ../../../../data/sbm-common/common-sk
-0	path ME ../../../../test_suite/input/speech_test/data
+0	path ME ../../../../test_suite/input/test-speech-audiofile/data
 0   path audio ../../../../data/sbm-test/speech_audio/
 0	echo >>> Loading common motions and poses...
 0	load motions -R ../../../../data/sbm-common/common-sk
@@ -21,13 +21,13 @@
 1	seq init-common-face
 2	char doctor init common.sk SasoBase.SasoDoctorPerez
 2	set character doctor world_offset x 0 y 102 h 0
-2	char doctor smoothbindweight ../../../../test_suite/input/speech_test/data/doctor.xml
-2	char doctor smoothbindmesh ../../../../test_suite/input/speech_test/data/faceShape.obj
-2	char doctor smoothbindmesh ../../../../test_suite/input/speech_test/data/left_handShape.obj
-2	char doctor smoothbindmesh ../../../../test_suite/input/speech_test/data/pantsShape.obj
-2	char doctor smoothbindmesh ../../../../test_suite/input/speech_test/data/right_handShape.obj
-2	char doctor smoothbindmesh ../../../../test_suite/input/speech_test/data/polySurfaceShape10.obj
-2	char doctor smoothbindmesh ../../../../test_suite/input/speech_test/data/shirtShape.obj
+2	char doctor smoothbindweight ../../../../test_suite/input/test-speech-audiofile/data/doctor.xml
+2	char doctor smoothbindmesh ../../../../test_suite/input/test-speech-audiofile/data/faceShape.obj
+2	char doctor smoothbindmesh ../../../../test_suite/input/test-speech-audiofile/data/left_handShape.obj
+2	char doctor smoothbindmesh ../../../../test_suite/input/test-speech-audiofile/data/pantsShape.obj
+2	char doctor smoothbindmesh ../../../../test_suite/input/test-speech-audiofile/data/right_handShape.obj
+2	char doctor smoothbindmesh ../../../../test_suite/input/test-speech-audiofile/data/polySurfaceShape10.obj
+2	char doctor smoothbindmesh ../../../../test_suite/input/test-speech-audiofile/data/shirtShape.obj
 2	set test character doctor
 2	test bml character doctor noecho posture LHandOnHip_Motex
 2	char doctor viewer 4
