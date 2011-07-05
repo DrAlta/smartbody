@@ -1,11 +1,11 @@
 #!/bin/sh
 SBMINPUT="-noninteractive -seqpath ../../../../test_suite/input/loco_test_1 -seq loco_test_1.seq -facebone"
 OPTION_1=IMG
-THRESHOLD_1=3000
+THRESHOLD_1=500
 OPTION_2=IMG
-THRESHOLD_2=3000
+THRESHOLD_2=500
 OPTION_3=IMG
-THRESHOLD_3=3000
+THRESHOLD_3=500
 NUMOFCOMP=3
 
 SBMBIN=$1

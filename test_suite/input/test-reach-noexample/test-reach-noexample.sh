@@ -1,9 +1,9 @@
 #!/bin/sh
 SBMINPUT="-seqpath ../../../../test_suite/input/test-reach-noexample -seq test-reach-noexample.seq -facebone"
 OPTION_1=IMG
-THRESHOLD_1=3000
+THRESHOLD_1=500
 OPTION_2=IMG
-THRESHOLD_2=3000
+THRESHOLD_2=500
 NUMOFCOMP=2
 
 SBMBIN=$1
