@@ -1,3 +1,5 @@
+
+
 #pragma once
 #include "me_ct_data_interpolation.h"
 #include "me_ct_barycentric_interpolation.h"
@@ -6,12 +8,12 @@
 #include "me_ct_ccd_IK.hpp"
 #include "me_ct_constraint.hpp"
 
-#include <SR/planner/sk_pos_planner.h>
-#include <SR/planner/sk_blend_planner.h>
-#include <SBM/Physics/SbmColObject.h>
-#include <SBM/sbm_pawn.hpp>
+#include <sr/planner/sk_pos_planner.h>
+#include <sr/planner/sk_blend_planner.h>
+#include <sbm/Physics/SbmColObject.h>
+#include <sbm/sbm_pawn.hpp>
 
-#include <SBM/MeCtReachEngine.h>
+#include <sbm/MeCtReachEngine.h>
 
 class ReachStateData;
 class ReachStateInterface;
@@ -53,7 +55,7 @@ public:
 
 	MeCtReachEngine* getReachEngine() const { return reachEngine; }	
 	void set_duration(float duration) { _duration = duration; }
-	
+
 	void setHandActionState(MeCtReachEngine::HandActionState newState);
 	void setLinearVelocity(float vel);
 	void setReachCompleteDuration(float duration);	

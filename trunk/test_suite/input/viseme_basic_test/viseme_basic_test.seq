@@ -26,7 +26,6 @@
 3	char BillFord smoothbindmesh ../../../../data/mesh/BillFord/LowerTeethShapeDeformed.obj
 3	char BillFord smoothbindweight ../../../../data/mesh/BillFord/BillFord.xml
 3	set test character BillFord
-3	char BillFord viewer 4
 
 
 # ---- Setting Camera Parameters
@@ -36,6 +35,7 @@
 3	camera center 0 160 0
 3	pawn camera init loc 0 166 185
 3	set pawn camera world_offset x 0 y 166 z 185
+3	char BillFord viewer 4
 
 4	char BillFord viseme Ao 1 1
 5	snapshot

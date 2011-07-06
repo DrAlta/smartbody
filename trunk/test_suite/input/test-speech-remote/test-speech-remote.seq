@@ -21,13 +21,13 @@
 1	seq init-common-face
 2	char doctor init common.sk SasoBase.SasoDoctorPerez
 2	set character doctor world_offset x 0 y 102 h 0
-2	char doctor smoothbindweight ../../../../test_suite/input/test-speech-audiofile/data/doctor.xml
-2	char doctor smoothbindmesh ../../../../test_suite/input/test-speech-audiofile/data/faceShape.obj
-2	char doctor smoothbindmesh ../../../../test_suite/input/test-speech-audiofile/data/left_handShape.obj
-2	char doctor smoothbindmesh ../../../../test_suite/input/test-speech-audiofile/data/pantsShape.obj
-2	char doctor smoothbindmesh ../../../../test_suite/input/test-speech-audiofile/data/right_handShape.obj
-2	char doctor smoothbindmesh ../../../../test_suite/input/test-speech-audiofile/data/polySurfaceShape10.obj
-2	char doctor smoothbindmesh ../../../../test_suite/input/test-speech-audiofile/data/shirtShape.obj
+2 char doctor smoothbindweight ../../../../data/mesh/doctor/Doctor.xml
+2 char doctor smoothbindmesh ../../../../data/mesh/doctor/faceShape.obj
+2 char doctor smoothbindmesh ../../../../data/mesh/doctor/left_handShape.obj
+2 char doctor smoothbindmesh ../../../../data/mesh/doctor/pantsShape.obj
+2 char doctor smoothbindmesh ../../../../data/mesh/doctor/polySurfaceShape10.obj
+2 char doctor smoothbindmesh ../../../../data/mesh/doctor/right_handShape.obj
+2 char doctor smoothbindmesh ../../../../data/mesh/doctor/shirtShape.obj
 2	set test character doctor
 2	test bml character doctor noecho posture LHandOnHip_Motex
 2	set character doctor voice remote M021

@@ -50,7 +50,7 @@ void ReachMotionParameter::getPoseParameter( const BodyMotionFrame& frame, dVect
 	rJoint->update_gmat_up();
 	skeletonRef->update_global_matrices();
 	//printf("reach joint name = %s\n",reachJoint->name().get_string());
-	SrVec endPos = rJoint->gmat().get_translation();
+	SrVec endPos = rJoint->gmat().get_translation()*skeletonRef->root()->gmat().inverse();;
 	outPara.resize(3);
 	for (int i=0;i<3;i++)
 		outPara[i] = endPos[i];	
