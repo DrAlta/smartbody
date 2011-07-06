@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <time.h>
 #include <boost/foreach.hpp>
-#include <SR/sr_timer.h>
+#include <sr/sr_timer.h>
 #include "mcontrol_util.h"
 #include "me_ct_example_body_reach.hpp"
 #include "me_ct_barycentric_interpolation.h"
@@ -70,6 +70,8 @@ void MeCtExampleBodyReach::setReachTargetPawn( SbmPawn* targetPawn )
 {
 	//reachTargetPawn = targetPawn;	
 	ReachTarget& t = reachData->reachTarget;
+	EffectorState& estate = reachData->effectorState;
+
 	t.setTargetPawn(targetPawn);	
 	reachData->startReach = true;	
 }

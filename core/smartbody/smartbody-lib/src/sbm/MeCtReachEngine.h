@@ -5,7 +5,7 @@
 #include "me_ct_jacobian_IK.hpp"
 #include "me_ct_ccd_IK.hpp"
 #include "me_ct_constraint.hpp"
-#include <SBM/sbm_pawn.hpp>
+#include <sbm/sbm_pawn.hpp>
 
 class SbmCharacter;
 class ReachStateData;
@@ -48,7 +48,7 @@ protected:
 	std::map<std::string,ReachStateInterface*> stateTable;
 	std::map<HandActionState,ReachHandAction*> handActionTable;
 	ReachStateInterface*  curReachState;	
-	
+
 
 	SkJoint*              reachEndEffector;
 	ConstraintMap         reachPosConstraint;
@@ -64,7 +64,7 @@ protected:
 	double                ikDamp;
 	float                 ikReachRegion, ikMaxOffset, ikDefaultVelocity;
 	float                 reachCompleteDuration;
-	
+
 	MeCtJacobianIK        ik;
 	MeCtCCDIK             ikCCD;
 	MeCtIKTreeScenario    ikScenario, ikCCDScenario;

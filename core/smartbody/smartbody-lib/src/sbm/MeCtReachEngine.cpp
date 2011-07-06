@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <time.h>
 #include <boost/foreach.hpp>
-#include <SR/sr_timer.h>
+#include <sr/sr_timer.h>
 #include "MeCtReachEngine.h"
 #include "mcontrol_util.h"
 #include "me_ct_barycentric_interpolation.h"
@@ -37,7 +37,7 @@ MeCtReachEngine::MeCtReachEngine( SbmCharacter* sbmChar, SkSkeleton* sk, SkJoint
 
 	reachCompleteDuration = -1.0;
 	fadingWeight = 0.f;
-	
+
 	footIKFix = false;
 	initStart = true;
 	reachEndEffector = effector;
@@ -100,8 +100,8 @@ void MeCtReachEngine::init()
 	inputMotionFrame.jointQuat.resize(nodeList.size());
 	ikMotionFrame.jointQuat.reserve(nodeList.size());
 
-// 	for (int i=0;i<3;i++)
-// 		_channels.add(rootJoint->name().get_string(), (SkChannel::Type)(SkChannel::XPos+i));
+	// 	for (int i=0;i<3;i++)
+	// 		_channels.add(rootJoint->name().get_string(), (SkChannel::Type)(SkChannel::XPos+i));
 
 	affectedJoints.clear();	
 	for (unsigned int i=0;i<nodeList.size();i++)
@@ -208,14 +208,19 @@ void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet )
 	dataInterpolator->init(&motionExamples);
 	dataInterpolator->buildInterpolator();		
 
-	for (unsigned int i=0;i<resampleData->size();i++)
+	if (resampleData)
 	{
-		InterpolationExample* ex = (*resampleData)[i];
-		SrVec reachPos;
-		for (int k=0;k<3;k++)
-			reachPos[k] = (float)ex->parameter[k];
-		resamplePts.push_back(reachPos);		
+		for (unsigned int i=0;i<resampleData->size();i++)
+		{
+			InterpolationExample* ex = (*resampleData)[i];
+			SrVec reachPos;
+			for (int k=0;k<3;k++)
+				reachPos[k] = (float)ex->parameter[k];
+			resamplePts.push_back(reachPos);		
+		}
 	}
+
+
 
 	if (interpMotion)
 		delete interpMotion;
@@ -237,11 +242,11 @@ void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet )
 
 bool MeCtReachEngine::hasEffectorRotConstraint( ReachStateData* rd )
 {	
-// 	if (rd->curHandAction == handActionTable[PICK_UP_OBJECT] || rd->curHandAction == handActionTable[PUT_DOWN_OBJECT])
-// 		return true;
-// 	else if (rd->curHandAction == handActionTable[TOUCH_OBJECT])
-// 		return false;
-// 	return false;
+	// 	if (rd->curHandAction == handActionTable[PICK_UP_OBJECT] || rd->curHandAction == handActionTable[PUT_DOWN_OBJECT])
+	// 		return true;
+	// 	else if (rd->curHandAction == handActionTable[TOUCH_OBJECT])
+	// 		return false;
+	// 	return false;
 	return true;
 }
 
@@ -352,7 +357,9 @@ SkJoint* MeCtReachEngine::findRootJoint( SkSkeleton* sk )
 DataInterpolator* MeCtReachEngine::createInterpolator()
 {
 	KNNInterpolator* interpolator = new KNNInterpolator(3000,ikReachRegion*1.f);
-	resampleData = &interpolator->resampleData;
+	resampleData = &interpolator->resampleData;		
+	// 	InverseInterpolation* interpolator = new InverseInterpolation();
+	// 	resampleData = NULL;
 	interpExampleData = interpolator->getInterpExamples();
 	return interpolator;
 }
@@ -394,8 +401,8 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 	}
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	reachData->hasSteering = (mcu.steerEngine != NULL);
-	
+	reachData->hasSteering = false;//(!mcu.steerEngine->());
+
 
 	curReachState->updateEffectorTargetState(reachData);		
 	curReachState->update(reachData);	
@@ -404,13 +411,14 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 
 	if (nextState != curReachState)
 	{
-		printf("cur State = %s\n",nextState->curStateName().c_str());
+		//printf("cur State = %s\n",nextState->curStateName().c_str());
 		reachData->stateTime = 0.f;
 		curReachState = nextState;
 	}
 
 	ikMaxOffset = ikDefaultVelocity*3.f*dt;
 	solveIK(reachData,ikMotionFrame);	
+	//ikMotionFrame = reachData->currentRefFrame;
 }
 
 bool MeCtReachEngine::addHandConstraint( SkJoint* targetJoint, const char* effectorName )
