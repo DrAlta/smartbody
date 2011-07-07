@@ -205,7 +205,12 @@ void PPRAgent::updateAI(float timeStamp, float dt, unsigned int frameNumber)
 	// initialize some vars for this update step
 	// todo, this should eventually be removed after addressing the small issue with _currentFrameNumber.
 	_currentTimeStamp = timeStamp;
-	_currentFrameNumber = frameNumber-1; // starting at 0 just because we didn't want to remove this while trying to reliably get a new chunk of code in.  TODO, change this later if it seems OK and appropriate...
+	if (frameNumber >= 1) {
+		_currentFrameNumber = frameNumber-1; // starting at 0 just because we didn't want to remove this while trying to reliably get a new chunk of code in.  TODO, change this later if it seems OK and appropriate...
+	}
+	else {
+		_currentFrameNumber = 0;
+	}
 	_dt = dt;
 
 
@@ -534,14 +539,14 @@ void PPRAgent::runShortTermPlanningPhase()
 		{
 			float dummyt;
 			SpatialDatabaseItemPtr dummyObject;
-			unsigned int localTargetIndex = closestPathNode;
+			int localTargetIndex = (int)closestPathNode;
 			unsigned int furthestTargetIndex = min(_midTermPathSize-1, closestPathNode + PED_FURTHEST_LOCAL_TARGET_DISTANCE);
 			unsigned int localTargetCellID = _midTermPath[localTargetIndex];
 			gSpatialDatabase->getLocationFromIndex( localTargetCellID, _localTargetLocation );
 			Ray lineOfSightTest1, lineOfSightTest2;
 			lineOfSightTest1.initWithUnitInterval(_position + _radius*_rightSide, _localTargetLocation - (_position + _radius*_rightSide));
 			lineOfSightTest2.initWithUnitInterval(_position - _radius*_rightSide, _localTargetLocation - (_position - _radius*_rightSide));
-			while ( (localTargetIndex <= furthestTargetIndex)
+			while ( (localTargetIndex <= (int)furthestTargetIndex)
 				&& (!gSpatialDatabase->trace(lineOfSightTest1,dummyt, dummyObject, dynamic_cast<SpatialDatabaseItemPtr>(this),true))
 				&& (!gSpatialDatabase->trace(lineOfSightTest2,dummyt, dummyObject, dynamic_cast<SpatialDatabaseItemPtr>(this),true)))
 			{
@@ -552,7 +557,7 @@ void PPRAgent::runShortTermPlanningPhase()
 				lineOfSightTest2.initWithUnitInterval(_position - _radius*_rightSide, _localTargetLocation - (_position - _radius*_rightSide));
 			}
 			localTargetIndex--; // the last node we found was actually NOT visible, so backtrack by one.
-			if (localTargetIndex >= closestPathNode) {
+			if (localTargetIndex >= (int)closestPathNode) {
 				// if localTargetIndex is valid
 				localTargetCellID = _midTermPath[localTargetIndex];
 				gSpatialDatabase->getLocationFromIndex( localTargetCellID, _localTargetLocation );
@@ -1120,7 +1125,7 @@ void PPRAgent::runReactivePhase()
 			_finalSteeringCommand.aimForTargetDirection = true;
 			_finalSteeringCommand.turningAmount = PED_CORNERING_TURN_RATE;
 			_finalSteeringCommand.aimForTargetSpeed = true;
-			_finalSteeringCommand.targetSpeed = 0.0f;
+			_finalSteeringCommand.targetSpeed = PED_TYPICAL_SPEED_FACTOR * _currentGoal.desiredSpeed; //0.0f;	
 			if ((feelers.t_left < PED_COMFORT_ZONE) && (!(feelers.t_right < PED_COMFORT_ZONE))) {
 				_finalSteeringCommand.scoot = 0.5f * _maxForce;
 			}
@@ -1262,20 +1267,23 @@ void PPRAgent::runReactivePhase()
 					//Vector dirToOtherGuy = normalize(p->position() - _position);
 					float my_time = INFINITY, his_time = INFINITY;
 					intersectTwoRays2D(position(), forward(), my_time, p->position(), p->forward(), his_time);
-					if (his_time < my_time) {
+					if (his_time < my_time && p->velocity().length() != 0) {
 						//if (isSelected()) cerr << "REACTION: one agent, he'll go in front of me, so I'll wait\n";
 						float tempVelocity = dot(forward(),p->velocity());
 						_finalSteeringCommand.targetSpeed = min(_finalSteeringCommand.targetSpeed, PED_SLOWER_SPEED_FACTOR * tempVelocity);
 					}
 					else {
 						//if (isSelected()) cerr << "REACTION: one agent, I'm in front of him, so I'll go.\n";
-						if ((feelers.object_right) && (feelers.object_front==NULL)) {
+						if (!(feelers.object_right)){
+							_finalSteeringCommand.aimForTargetDirection = false;
+							_finalSteeringCommand.turningAmount = PED_TYPICAL_AVOIDANCE_TURN_RATE;
+						}
+						if (!(feelers.object_left)) {
 							_finalSteeringCommand.aimForTargetDirection = false;
 							_finalSteeringCommand.turningAmount = -PED_TYPICAL_AVOIDANCE_TURN_RATE;
 						}
 						else {
-							_finalSteeringCommand.aimForTargetDirection = false;
-							_finalSteeringCommand.turningAmount = PED_TYPICAL_AVOIDANCE_TURN_RATE;
+							// just keep straight
 						}
 						_finalSteeringCommand.targetSpeed = (comfortZoneViolated) ? PED_SLOWER_SPEED_FACTOR * _currentGoal.desiredSpeed : PED_TYPICAL_SPEED_FACTOR * _currentGoal.desiredSpeed;
 					}
@@ -1393,7 +1401,23 @@ void PPRAgent::runReactivePhase()
 					intersectTwoRays2D(position(), forward(), my_time, p->position(), p->forward(), his_time);
 
 					// choose target speed based on agent
-					if (my_time < his_time) {
+					if (my_time < 0.0f) {
+						// if we unfortunately enter the collision already, just walk towards the target
+					}
+					else if (p->velocity().length() == 0) {
+						if (!feelers.object_front) {
+							// if there is no obstacle in front, just keep forward
+						}
+						if (obstacle == feelers.object_right) {
+							_finalSteeringCommand.aimForTargetDirection = false;
+							_finalSteeringCommand.turningAmount = -PED_TYPICAL_AVOIDANCE_TURN_RATE;
+						}
+						else {
+							_finalSteeringCommand.aimForTargetDirection = false;
+							_finalSteeringCommand.turningAmount = PED_TYPICAL_AVOIDANCE_TURN_RATE;
+						}
+					}
+					else if (my_time < his_time) {
 						//if (isSelected()) cerr << "REACTION: a static obstacle and an non-oncoming agent, I'm in front of him, so I'll go.\n";
 						_finalSteeringCommand.targetSpeed = PED_SLIGHTLY_FASTER_SPEED_FACTOR * _currentGoal.desiredSpeed;
 					}
@@ -1989,7 +2013,7 @@ void PPRAgent::drawPlannedPath()
 	// draw a marker on the closest node you are to the mid-term path (computed from short-term planning)
 	Point closestNodeOnPath;
 	gSpatialDatabase->getLocationFromIndex(_midTermPath[__closestPathNode],closestNodeOnPath);
-	DrawLib::drawHighlight(closestNodeOnPath, Vector(1.0f, 0.0f, 0.0f), 0.5f, gBlue);
+	//DrawLib::drawHighlight(closestNodeOnPath, Vector(1.0f, 0.0f, 0.0f), 0.5f, gBlue);
 	//drawXZCircle(0.30f, closestNodeOnPath, gBlue, 10);
 
 #endif  // #ifndef IGNORE_PLANNING
@@ -2029,7 +2053,8 @@ void PPRAgent::draw()
 		DrawLib::drawAgentDisc(_position, _forward, _radius, gDarkYellow); 
 	}
 	else if (_steeringState == STEERING_STATE_TURN_TOWARDS_TARGET) {
-		DrawLib::drawAgentDisc(_position, _forward, _radius, gBlue); 
+		//DrawLib::drawAgentDisc(_position, _forward, _radius, gBlue); 
+		DrawLib::drawStar(_position, _forward, _radius, gBlue);
 	}
 	else if (_steeringState == STEERING_STATE_COOPERATE_WITH_CROWD) {
 		DrawLib::drawAgentDisc(_position, _forward, _radius, gGreen); 

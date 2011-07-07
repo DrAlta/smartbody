@@ -76,7 +76,7 @@
 
 // scaling factor to determine how "far" each agent looks ahead based on its current direction
 #define PED_PREDICTIVE_ANTICIPATION_FACTOR  5.0f
-#define PED_REACTIVE_ANTICIPATION_FACTOR 1.1f
+#define PED_REACTIVE_ANTICIPATION_FACTOR 1.1f //0.7f
 
 // factor that determines the strength of cooperative crowd forces
 #define PED_CROWD_INFLUENCE_FACTOR 0.3f
@@ -103,7 +103,7 @@
 #define PED_SCOOT_RATE 0.4f
 
 // threshold distance for when to consider that a goal target is reached.
-#define PED_REACHED_TARGET_DISTANCE_THRESHOLD 0.5f
+#define PED_REACHED_TARGET_DISTANCE_THRESHOLD 0.2f //0.5f
 
 // padding distance (in meters) that is added to collision queries, to give characters some natural space.
 #define PED_DYNAMIC_COLLISION_PADDING 0.2f
