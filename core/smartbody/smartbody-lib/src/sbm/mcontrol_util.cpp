@@ -663,6 +663,10 @@ void mcuCBHandle::update( void )	{
 		}
 
 		char_p = character_map.lookup( pawn_p->name );
+		if (!char_p)
+		{
+			NetworkSendSkeleton( pawn_p->bonebusCharacter, pawn_p->skeleton_p, &param_map );
+		}
 		if( char_p ) {
 
 			char_p->forward_visemes( time );	
