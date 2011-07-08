@@ -47,6 +47,8 @@ class MeCtBasicLocomotion : public MeController
 		void setTurningSpd(float v) {turningSpd = v;}
 		float getTurningSpd() {return turningSpd;}
 		void setValid(bool v) {_valid = v;}
+		void setDesiredHeading(float v) {desiredHeading = v;}
+		float getDesiredHeading() {return desiredHeading;}
 
 	private:
 		bool _valid;
@@ -56,6 +58,7 @@ class MeCtBasicLocomotion : public MeController
 		SkChannelArray _channels;
 		SbmCharacter* character;
 		double _lastTime;
+		float desiredHeading;
 };
 
 #endif

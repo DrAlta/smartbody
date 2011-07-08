@@ -1206,6 +1206,25 @@ void mcuCBHandle::addPATransition(PATransitionData* transition)
 		param_anim_transitions.push_back(transition);
 }
 
+bool mcuCBHandle::checkExamples()
+{
+	PAStateData* locomotion = lookUpPAState("UtahLocomotion");
+	PAStateData* staringLeft = lookUpPAState("UtahStartingLeft");
+	PAStateData* staringRight = lookUpPAState("UtahStartingRight");
+	PAStateData* starting = lookUpPAState("UtahStopToWalk");
+	PAStateData* stopping = lookUpPAState("UtahWalkToStop");
+	PAStateData* idleLeft = lookUpPAState("UtahIdleTurnLeft");
+	PAStateData* idleRight = lookUpPAState("UtahIdleTurnRight");
+	PAStateData* step = lookUpPAState("UtahStep");
+
+	if (!locomotion || !staringLeft || !staringRight || !starting || !stopping || !idleLeft || !idleRight || !step)
+	{
+		LOG("SteeringAgent::checkExamples() Failure: Missing animation states needed for steerting with example based locomotion!");
+		return false;
+	}
+	return true;
+}
+
 void mcuCBHandle::setInteractive(bool val)
 {
     _interactive = val;

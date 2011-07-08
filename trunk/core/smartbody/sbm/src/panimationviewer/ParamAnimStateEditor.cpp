@@ -188,7 +188,7 @@ void PAStateEditor::createNewState(fltk::Widget* widget, void* data)
 	int numMotion = editor->stateEditorNleModel->getNumTracks();
 	int cycleWindow = fltk::ask("This is a Cycle State?");
 	std::string cycle = "true";
-	if (cycleWindow == 0) cycle = "false";
+	if (cycleWindow == 1) cycle = "false";
 	createStateCommand << "panim state " << stateName << " cycle " << cycle << " " << numMotion << " ";
 	for (int i = 0; i < numMotion; i++)
 		createStateCommand << editor->stateEditorNleModel->getTrack(i)->getName() << " ";

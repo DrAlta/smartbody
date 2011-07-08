@@ -88,6 +88,8 @@ class MeCtParamAnimation : public MeCtContainer
 		std::string getCurrentStateName();
 		std::string getNextStateName();
 		PAStateData* getCurrentPAStateData();
+		bool hasPAState(std::string stateName);
+		bool isIdle();
 
 	private:
 		void autoScheduling(double time);

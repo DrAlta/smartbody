@@ -238,6 +238,33 @@ PAStateData* MeCtParamAnimation::getCurrentPAStateData()
 		return NULL;
 }
 
+bool MeCtParamAnimation::hasPAState(std::string name)
+{
+	if (getCurrentStateName() == name)
+		return true;
+	if (getNextStateName() == name)
+		return true;
+	std::list<ScheduleUnit>::iterator iter = waitingList.begin();
+	for (; iter!= waitingList.end(); iter++)
+	{
+		if (iter->data)
+			if (iter->data->stateName == name)
+				return true;
+	}
+	return false;
+}
+
+bool MeCtParamAnimation::isIdle()
+{
+	if (getCurrentStateName() != PseudoIdleState)
+		return false;
+	if (getNextStateName() != "")
+		return false;
+	if (waitingList.size() != 0)
+		return false;
+	return true;
+}
+
 void MeCtParamAnimation::autoScheduling(double time)
 {
 	if (waitingList.size() == 0)
