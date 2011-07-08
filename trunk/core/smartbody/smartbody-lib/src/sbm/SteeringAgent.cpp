@@ -100,28 +100,6 @@ void SteeringAgent::evaluate()
 	character->_reachTarget = false;
 	character->_numSteeringGoal = goalQueue.size();
 
-	//---given goal, check if reach already
-	bool reachTarget = false;
-	if (goalQueue.size() > 0)
-	{
-		float dist = sqrt((x - mToCm(goalQueue.front().targetLocation.x)) * (x - mToCm(goalQueue.front().targetLocation.x)) + 
-						  (y - mToCm(goalQueue.front().targetLocation.y)) * (y - mToCm(goalQueue.front().targetLocation.y)) + 
-						  (z - mToCm(goalQueue.front().targetLocation.z)) * (z - mToCm(goalQueue.front().targetLocation.z)));
-
-		if (dist < distThreshold)
-			character->steeringAgent->getAgent()->clearGoals();
-	}
-	int numGoals = goalQueue.size();
-	if (numGoals == 0 && character->_numSteeringGoal > 0)
-		reachTarget = true;
-
-	const SteerLib::SteeringCommand & steeringCommand = pprAgent->getSteeringCommand();
-	float angleGlobal = radToDeg(atan2(steeringCommand.targetDirection.x, steeringCommand.targetDirection.z));
-	normalizeAngle(angleGlobal);
-	normalizeAngle(yaw);
-	float angleDiff = angleGlobal - yaw;
-	normalizeAngle(angleDiff);
-
 	// Evaluate
 	float newSpeed = desiredSpeed;
 	// Meat Hook Locomotion Evaluation
