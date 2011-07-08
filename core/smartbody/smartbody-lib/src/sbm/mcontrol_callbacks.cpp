@@ -662,6 +662,10 @@ double parseMotionParameters(std::string m, std::string parameter, double min, d
 		type = 2;
 	if (parameter == "angular2")
 		type = 3;
+	if (parameter == "transitionx")
+		type = 4;
+	if (parameter == "transitiony")
+		type = 5;
 	if (!sk) return -9999;
 	MotionParameters* mParam = new MotionParameters(mcuCBHandle::singleton().lookUpMotion(m.c_str()), sk);
 	mParam->setFrameId(min, max);
@@ -5414,8 +5418,10 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			steerOptions->engineOptions.startupModules.insert("testCasePlayer");
 			steerOptions->engineOptions.testCaseSearchPath = "..\\..\\..\\..\\core\\smartbody\\steersuite-1.3\\testcases\\";
 			steerOptions->engineOptions.moduleSearchPath = "..\\..\\..\\..\\core\\smartbody\\sbm\\bin\\";
-			steerOptions->gridDatabaseOptions.gridSizeX = 100;
-			steerOptions->gridDatabaseOptions.gridSizeZ = 100;
+			steerOptions->gridDatabaseOptions.gridSizeX = 35;
+			steerOptions->gridDatabaseOptions.gridSizeZ = 35;
+			steerOptions->gridDatabaseOptions.numGridCellsX = 70;
+			steerOptions->gridDatabaseOptions.numGridCellsZ = 70;
 			LOG("INIT STEERSIM");
 			try {
 				mcu_p->steerEngine->init(steerOptions);
@@ -5443,7 +5449,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				initialConditions.position = Util::Point( x / 100.0f, 0.0f, z / 100.0f );
 				Util::Vector orientation = Util::rotateInXZPlane(Util::Vector(0.0f, 0.0f, 1.0f), yaw * float(M_PI) / 180.0f);
 				initialConditions.direction = orientation;
-				initialConditions.radius = 0.4f;
+				initialConditions.radius = 0.3f;
 				initialConditions.speed = 0.0f;
 				initialConditions.goals.clear();
 				initialConditions.name = character->name;
@@ -5559,7 +5565,10 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					LOG("Parameterized Animation Engine not enabled!");
 					return CMD_FAILURE;
 				}
-				mcu_p->locomotion_type = mcu_p->Example;
+				if (mcu_p->checkExamples())
+					mcu_p->locomotion_type = mcu_p->Example;
+				else
+					mcu_p->locomotion_type = mcu_p->Basic;
 				return CMD_SUCCESS;
 			}
 			if (type == "procedural")

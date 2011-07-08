@@ -175,6 +175,8 @@ class MotionParameters
 		double getAccSpeed();
 		double getAvgAngularSpeed();
 		double getAccAngularSpeed();
+		double getTransitionX();
+		double getTransitionY();
 
 	private:
 		int minFrameId;

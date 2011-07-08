@@ -1,3 +1,26 @@
+/*
+ *  SteeringAgent.h - part of Motion Engine and SmartBody-lib
+ *  Copyright (C) 2011  University of Southern California
+ *
+ *  SmartBody-lib is free software: you can redistribute it and/or
+ *  modify it under the terms of the Lesser GNU General Public License
+ *  as published by the Free Software Foundation, version 3 of the
+ *  license.
+ *
+ *  SmartBody-lib is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  Lesser GNU General Public License for more details.
+ *
+ *  You should have received a copy of the Lesser GNU General Public
+ *  License along with SmartBody-lib.  If not, see:
+ *      http://www.gnu.org/licenses/lgpl-3.0.txt
+ *
+ *  CONTRIBUTORS:
+ *      Yuyu Xu, USC
+ */
+
+
 #ifndef _STEERINGAGENT_H_
 #define _STEERINGAGENT_H_
 
@@ -23,10 +46,15 @@ class SteeringAgent
 		inline float degToRad(float v)	{return (v * float(M_PI) / 180.0f);}
 		inline float radToDeg(float v)	{return (v * 180.0f / float(M_PI));}
 
+		float evaluateBasicLoco(float x, float y, float z, float yaw);
+		float evaluateProceduralLoco(float x, float y, float z, float yaw);
+		float evaluateExampleLoco(float x, float y, float z, float yaw);
+
 	private:
 		SteerLib::AgentInterface* agent;
 		SbmCharacter* character;
 		SbmCharacter* target;
+		float dt;
 
 	public:
 		// basic param
@@ -41,13 +69,25 @@ class SteeringAgent
 		// global param
 		float scootThreshold;
 		float distThreshold;	
+		float distDownThreshold;
 		float desiredSpeed;
 		float facingAngle;
 		float facingAngleThreshold;
 		float acceleration;
 		float scootAcceleration;
 		float angleAcceleration;
-		bool facingAdjustPhase;
+		SrVec targetLoc;
+		bool stepAdjust;
+
+		//----------------------------
+		// WJ added start
+		// basic param
+		Util::Vector forward;
+		Util::Vector rightSide;
+		float currentSpeed;
+		Util::Vector velocity;
+		// WJ added end
+		//----------------------------
 };
 
 #endif

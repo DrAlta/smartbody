@@ -62,13 +62,15 @@ bool MeCtBasicLocomotion::controller_evaluate(double t, MeFrameData& frame)
 		float x, y, z, yaw, pitch, roll;
 		character->get_world_offset(x, y, z, yaw, pitch, roll);
 
-		yaw += turningSpd * dt;
+		//yaw += turningSpd * dt;
+		yaw = getDesiredHeading();
+
 		float movingDist = movingSpd * dt;
 		x += movingDist * sin(yaw * (float)M_PI / 180.0f);
 		z += movingDist * cos(yaw * (float)M_PI / 180.0f);
-		float scootDist = -scootSpd * dt;
-		x += scootDist * cos(yaw * (float)M_PI / 180.0f);
-		z += scootDist * sin(yaw * (float)M_PI / 180.0f);
+		//float scootDist = -scootSpd * dt;
+		//x += scootDist * cos(yaw * (float)M_PI / 180.0f);
+		//z += scootDist * sin(yaw * (float)M_PI / 180.0f);
 		character->set_world_offset(x, y, z, yaw, pitch, roll);
 	}
 	return true;

@@ -386,6 +386,7 @@ class mcuCBHandle	{
 		void addPAState(PAStateData* state);
 		PATransitionData* lookUpPATransition(std::string fromStateName, std::string toStateName);
 		void addPATransition(PATransitionData* transition);
+		bool checkExamples();
 		void setPhysicsEngine(bool start);
 
 

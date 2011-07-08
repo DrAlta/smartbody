@@ -947,6 +947,10 @@ double MotionParameters::getParameter(int type)
 		return getAvgAngularSpeed() * 100;
 	if (type == 3)
 		return getAccAngularSpeed() * 100;
+	if (type == 4)
+		return getTransitionX();
+	if (type == 5)
+		return getTransitionY();
 	return -1.0;
 }
 
@@ -1029,3 +1033,38 @@ double MotionParameters::getAccAngularSpeed()
 	return accAngularSpd;
 }
 
+double MotionParameters::getTransitionX()
+{
+	motion->apply_frame(minFrameId);
+	skeleton->update_global_matrices();
+	const SrMat& srcMat = joint->gmat();
+	SrVec srcPnt = SrVec(srcMat.get(12), srcMat.get(13), srcMat.get(14));
+	float rx, ry, rz;
+	sr_euler_angles(rotType, srcMat, rx, ry, rz);
+	motion->apply_frame(maxFrameId);
+	skeleton->update_global_matrices();
+	const SrMat& destMat = joint->gmat();
+	SrVec destPnt = SrVec(destMat.get(12), destMat.get(13), destMat.get(14));
+	SrVec transitionVec = destPnt - srcPnt;
+	SrVec heading = SrVec(sin(ry - 1.57f), 0, cos(ry - 1.57f));
+	double x = dot(transitionVec, heading);
+	return x;
+}
+
+double MotionParameters::getTransitionY()
+{
+	motion->apply_frame(minFrameId);
+	skeleton->update_global_matrices();
+	const SrMat& srcMat = joint->gmat();
+	SrVec srcPnt = SrVec(srcMat.get(12), srcMat.get(13), srcMat.get(14));
+	float rx, ry, rz;
+	sr_euler_angles(rotType, srcMat, rx, ry, rz);
+	motion->apply_frame(maxFrameId);
+	skeleton->update_global_matrices();
+	const SrMat& destMat = joint->gmat();
+	SrVec destPnt = SrVec(destMat.get(12), destMat.get(13), destMat.get(14));
+	SrVec transitionVec = destPnt - srcPnt;
+	SrVec heading = SrVec(sin(ry), 0, cos(ry));
+	double y = dot(transitionVec, heading);
+	return y;
+}
