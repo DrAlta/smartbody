@@ -217,7 +217,7 @@ public:
 	const std::string& get_voice_code_backup() const; //returns voice if exists or NULL if not
 
 
-	bonebus::BoneBusCharacter * bonebusCharacter;
+	
 
 	// Prioritized Schedules for behaviors (known as "blocking" in manual animation)
 	// TODO: Rename by body part, rather than controller type

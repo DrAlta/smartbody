@@ -119,6 +119,8 @@ SbmPawn::SbmPawn( const char * name )
 	world_offset_writer_p( new MeCtChannelWriter() ),
 	wo_cache_timestamp( -std::numeric_limits<float>::max() )
 {
+	
+	bonebusCharacter = NULL;
 	strcpy( this->name, name );
 	//skeleton_p->ref();
 	scene_p->ref();
@@ -295,6 +297,18 @@ void SbmPawn::exec_controller_cleanup( MeController* ct, mcuCBHandle* mcu_p ) {
 
 //  Destructor
 SbmPawn::~SbmPawn()	{
+
+	if ( mcuCBHandle::singleton().sbm_character_listener )
+	{
+		mcuCBHandle::singleton().sbm_character_listener->OnCharacterDelete( name );
+	}
+
+    if ( bonebusCharacter )
+    {
+       mcuCBHandle::singleton().bonebus.DeleteCharacter( bonebusCharacter );
+       bonebusCharacter = NULL;
+    }
+
 	if ( world_offset_writer_p )
 		world_offset_writer_p->unref();
 
@@ -604,6 +618,13 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		//printf("h = %f, p = %f, r = %f\n",h,p,r);	
 		pawn_p->set_world_offset(loc[0],loc[1],loc[2],h,p,r);	
 		pawn_p->wo_cache_update();
+
+		pawn_p->bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( pawn_name.c_str(), "pawn", false );
+
+		if ( mcuCBHandle::singleton().sbm_character_listener )
+		{
+			mcuCBHandle::singleton().sbm_character_listener->OnCharacterCreate( pawn_name, "pawn" );
+		}
 
 		return CMD_SUCCESS;
 	} else if( pawn_cmd=="prune" ) {  // Prunes the controller trees of unused/overwritten controllers

@@ -35,6 +35,7 @@
 #include <ME/me_ct_channel_writer.hpp>
 #include <ME/me_ct_curve_writer.hpp>
 #include "wsp.h"
+#include "bonebus.h"
 
 #include <map>
 
@@ -101,6 +102,7 @@ public:  // TODO - properly encapsulate / privatize the following
 
 	// Temporarily, until there is a unified multi-skeleton controller tree
 	MeControllerTreeRoot	*ct_tree_p;
+	bonebus::BoneBusCharacter * bonebusCharacter;
 
 public:
 	
