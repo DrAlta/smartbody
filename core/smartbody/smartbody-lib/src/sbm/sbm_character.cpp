@@ -125,7 +125,6 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	param_sched_p->ref();
 	eyelid_ct->ref();
 
-	bonebusCharacter = NULL;
 	steeringAgent = NULL;
 	_numSteeringGoal = 0;
 	_reachTarget = false;
@@ -184,17 +183,6 @@ SbmCharacter::~SbmCharacter( void )	{
 		saccade_ct->unref();
 	if (reachEngine)
 		delete reachEngine;
-
-	if ( mcuCBHandle::singleton().sbm_character_listener )
-	{
-		mcuCBHandle::singleton().sbm_character_listener->OnCharacterDelete( name );
-	}
-
-    if ( bonebusCharacter )
-    {
-       mcuCBHandle::singleton().bonebus.DeleteCharacter( bonebusCharacter );
-       bonebusCharacter = NULL;
-    }
 	
 	if( viseme_history_arr )	{
 		delete [] viseme_history_arr;
