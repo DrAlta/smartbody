@@ -131,7 +131,8 @@ mcuCBHandle::mcuCBHandle()
 	delay_behaviors(true),
 	media_path("."),
 	_interactive(true),
-	steerEngine(NULL)
+	steerEngine(NULL),
+	sendPawnUpdates(false)
 	//physicsEngine(NULL)
 {
 
@@ -665,7 +666,8 @@ void mcuCBHandle::update( void )	{
 		char_p = character_map.lookup( pawn_p->name );
 		if (!char_p)
 		{
-			NetworkSendSkeleton( pawn_p->bonebusCharacter, pawn_p->skeleton_p, &param_map );
+			if (sendPawnUpdates)
+				NetworkSendSkeleton( pawn_p->bonebusCharacter, pawn_p->skeleton_p, &param_map );
 		}
 		if( char_p ) {
 

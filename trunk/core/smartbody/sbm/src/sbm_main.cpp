@@ -352,7 +352,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "pawns",			   showpawns_func );
 	mcu.insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands
 	mcu.insert( "syncpoint",		   syncpoint_func);
-
+	mcu.insert( "pawnbonebus",		   pawnbonebus_func);
 
 	mcu.insert_set_cmd( "bp",             BML_PROCESSOR::set_func );
 	mcu.insert_set_cmd( "pawn",           SbmPawn::set_cmd_func );
