@@ -418,6 +418,7 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert( "characters",		   showcharacters_func );
    mcu.insert( "pawns",			   showpawns_func );
    mcu.insert( "syncpoint",		   syncpoint_func);
+   mcu.insert( "pawnbonebus",		   pawnbonebus_func);
    mcu.insert( "steer",			   mcu_steer_func);	
 
    mcu.insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands

@@ -5678,3 +5678,29 @@ int syncpoint_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 	return CMD_SUCCESS;
 }
+
+int pawnbonebus_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+		std::string next = args.read_token();
+		if (next == "")
+		{
+			LOG("Pawn bonebus is %s", mcu_p->sendPawnUpdates? "on" : "off");
+			return CMD_SUCCESS;
+		}
+
+		if (next == "on")
+		{
+			mcu_p->sendPawnUpdates = true;
+			return CMD_SUCCESS;
+		}
+		else if (next == "off")
+		{
+			mcu_p->sendPawnUpdates = false;
+			return CMD_SUCCESS;
+		}
+		else
+		{
+			LOG("Usage: pawnbonebus <on|off>");
+			return CMD_FAILURE;
+		}
+}

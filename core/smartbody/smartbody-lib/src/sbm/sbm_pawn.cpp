@@ -305,7 +305,9 @@ SbmPawn::~SbmPawn()	{
 
     if ( bonebusCharacter )
     {
-       mcuCBHandle::singleton().bonebus.DeleteCharacter( bonebusCharacter );
+	   mcuCBHandle& mcu = mcuCBHandle::singleton();
+	   if (mcu.sendPawnUpdates)
+		   mcuCBHandle::singleton().bonebus.DeleteCharacter( bonebusCharacter );
        bonebusCharacter = NULL;
     }
 
@@ -619,7 +621,8 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		pawn_p->set_world_offset(loc[0],loc[1],loc[2],h,p,r);	
 		pawn_p->wo_cache_update();
 
-		pawn_p->bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( pawn_name.c_str(), "pawn", false );
+		if (mcu_p->sendPawnUpdates)
+			pawn_p->bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( pawn_name.c_str(), "pawn", false );
 
 		if ( mcuCBHandle::singleton().sbm_character_listener )
 		{
