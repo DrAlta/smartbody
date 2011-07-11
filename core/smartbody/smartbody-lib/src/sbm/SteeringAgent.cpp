@@ -605,6 +605,8 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 				mcu.execute((char*) command1.str().c_str());	
 			}
 		}
+		else
+			character->_reachTarget = true;
 	}
 	else if (character->param_animation_ct->isIdle())
 		character->_reachTarget = true;

@@ -556,11 +556,11 @@ std::string ReachStateIdle::nextState( ReachStateData* rd )
 			SrVec dir = targetXZ - curXZ; dir.normalize();			
 			SrVec steerTarget = curXZ + dir*(dist - rd->characterHeight*0.3f);
 			float facing = ((float)acos(dot(dir,SrVec(0,0,1))))*180.f/(float)M_PI;
-			if (dot(cross(dir,curXZ),SrVec(0,1,0)) < 0.f)
-				facing = -facing;
+ 			if (dot(cross(dir,SrVec(0,0,1)),SrVec(0,1,0)) > 0.f)
+ 				facing = -facing;
 			//LOG("facing = %f\n",facing);
 			cmd = "bml char " + charName + " <locomotion target=\"" + boost::lexical_cast<std::string>(steerTarget.x) + " " + 
-				boost::lexical_cast<std::string>(steerTarget.z) + "\"/>";//"\" facing=\"" + boost::lexical_cast<std::string>(facing) +"\"/>";//"\" proximity=\"" +  boost::lexical_cast<std::string>(rd->characterHeight*0.8f*0.01f) +"\"/>";
+				boost::lexical_cast<std::string>(steerTarget.z) + "\" facing=\"" + boost::lexical_cast<std::string>(facing) +"\"/>";//"\" proximity=\"" +  boost::lexical_cast<std::string>(rd->characterHeight*0.8f*0.01f) +"\"/>";
 			//rd->curHandAction->sendReachEvent(cmd);			
 			mcuCBHandle::singleton().execute(const_cast<char*>(cmd.c_str()));
 			nextStateName = "Move";
