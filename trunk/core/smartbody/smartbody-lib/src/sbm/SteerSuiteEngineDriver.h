@@ -20,6 +20,7 @@ public:
 	void setDone(bool val);
 	void setStartTime(float time);
 	float getStartTime();
+	bool isInitialized();
 
 	/// @name The EngineControllerInterface
 	/// @brief The CommandLineEngineDriver does not support any of the engine controls.

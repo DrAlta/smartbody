@@ -31,6 +31,19 @@
 1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachClose_MiddleMidHigh
 1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachClose_MiddleMidLow
 
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachBehind_High1
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachBehind_High2
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachBehind_Low1
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachBehind_Low1
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachBehind_MidHigh1
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachBehind_MidHigh2
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachBehind_MidLow1
+1 char doctor reachmotion add ChrHarmony_Relax001_ArmReachBehind_MidLow1
+
+1 char doctor handmotion grabhand ChrHarmony_Relax001_HandGraspSmSphere_Grasp
+1 char doctor handmotion reachhand ChrHarmony_Relax001_HandGraspSmSphere_Reach
+1 char doctor handmotion releasehand ChrHarmony_Relax001_HandGraspSmSphere_Release
+
 2 char doctor reachmotion build
 
 2 registerevent reach "$1"

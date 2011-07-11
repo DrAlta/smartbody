@@ -541,10 +541,11 @@ std::string ReachStateIdle::nextState( ReachStateData* rd )
 	if (rd->startReach)
 	{		
 		rd->curRefTime = 0.f;
-		// test the distance to the target		
+		// test the distance to the target	
+#define LOCOMOTION_REACH
 #ifdef LOCOMOTION_REACH
 		float dist = rd->XZDistanceToTarget();		
-		if (dist > rd->characterHeight*0.5f) 
+		if (dist > rd->characterHeight*0.4f) 
 		{	
 			// if the target is far away, move the character first
 			//printf("idle to walk\n");
@@ -552,13 +553,14 @@ std::string ReachStateIdle::nextState( ReachStateData* rd )
 			std::string charName = rd->charName;			
 			SrVec targetXZ = rd->reachTarget.getTargetState().tran; targetXZ.y = 0.f;
 			SrVec curXZ = rd->effectorState.curState.tran; curXZ.y = 0.f;
-			SrVec dir = targetXZ - curXZ; dir.normalize();
+			SrVec dir = targetXZ - curXZ; dir.normalize();			
+			SrVec steerTarget = curXZ + dir*(dist - rd->characterHeight*0.3f);
 			float facing = ((float)acos(dot(dir,SrVec(0,0,1))))*180.f/(float)M_PI;
 			if (dot(cross(dir,curXZ),SrVec(0,1,0)) < 0.f)
 				facing = -facing;
 			//LOG("facing = %f\n",facing);
-			cmd = "bml char " + charName + " <locomotion target=\"" + boost::lexical_cast<std::string>(targetXZ.x) + " " + 
-				boost::lexical_cast<std::string>(targetXZ.z) +"\"/>"; //"\" facing=\"" + boost::lexical_cast<std::string>(facing) +"\"/>";//"\" proximity=\"" +  boost::lexical_cast<std::string>(rd->characterHeight*0.8f*0.01f) +"\"/>";
+			cmd = "bml char " + charName + " <locomotion target=\"" + boost::lexical_cast<std::string>(steerTarget.x) + " " + 
+				boost::lexical_cast<std::string>(steerTarget.z) + "\"/>";//"\" facing=\"" + boost::lexical_cast<std::string>(facing) +"\"/>";//"\" proximity=\"" +  boost::lexical_cast<std::string>(rd->characterHeight*0.8f*0.01f) +"\"/>";
 			//rd->curHandAction->sendReachEvent(cmd);			
 			mcuCBHandle::singleton().execute(const_cast<char*>(cmd.c_str()));
 			nextStateName = "Move";
@@ -636,7 +638,7 @@ std::string ReachStateMove::nextState( ReachStateData* rd )
 		return nextStateName;
 	//if (!rd->locomotionComplete)
 	//printf("locomotion = %d, dist = %f\n",rd->locomotionComplete,curDist);
-	if (rd->locomotionComplete && fabs(curDist-prevDist) < rd->characterHeight*0.001f)
+	if (rd->locomotionComplete)// && fabs(curDist-prevDist) < rd->characterHeight*0.001f)
 	{
 		if (curDist < rd->characterHeight*0.5f)
 		{

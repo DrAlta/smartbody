@@ -206,14 +206,14 @@ void SbmPhysicsSimODE::initSimulation()
 
 	worldID = dWorldCreate();
 	//dWorldSetAutoDisableFlag(worldID,1);
-	dWorldSetGravity(worldID,0.f,-9.8f,0.f);
+	dWorldSetGravity(worldID,0.f,-980.f,0.f);
 	dWorldSetLinearDamping(worldID,0.01f);
 	dWorldSetAngularDamping(worldID,0.01f);
 
 	//spaceID = dHashSpaceCreate(0);
 	spaceID = dSimpleSpaceCreate(0);
 
-	groundID = dCreatePlane(spaceID,0,1,0,1.0f); // create a plane at y = 0
+	groundID = dCreatePlane(spaceID,0,1,0,0.0f); // create a plane at y = 0
 
 	contactGroupID = dJointGroupCreate(0);
 
