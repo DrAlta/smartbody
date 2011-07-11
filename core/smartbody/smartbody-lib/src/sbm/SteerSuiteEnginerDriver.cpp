@@ -47,6 +47,10 @@ float SteerSuiteEngineDriver::getStartTime()
 	return _startTime;
 }
 
+bool SteerSuiteEngineDriver::isInitialized()
+{
+	return _alreadyInitialized;
+}
 
 //
 // init()

@@ -139,7 +139,7 @@ void MeCtExampleBodyReach::init()
 		_channels.add(joint->name().get_string(), SkChannel::Quat);		
 	}		
 	blendWeight = reachEngine->fadingWeight;
-	LOG("init blend weight = %f\n",blendWeight);
+	//LOG("init blend weight = %f\n",blendWeight);
 	MeController::init();	
 }
 

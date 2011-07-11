@@ -1735,12 +1735,12 @@ int FltkViewer::handle ( int event )
 				 {
 					 //std::string cmd;
 					 //cmd = "bml char " + curChar->name + " <sbm:reach sbm:handle=\"r" + curChar->name + "\" action=\"pick-up\" target=\""+ selectedPawn->name + "\" />";
-					 sprintf(exe_cmd,"bml char %s <sbm:reach sbm:handle=\"r%s\" sbm:reach-duration=\"0.5\" sbm:action=\"touch\" target=\"%s\"/>",curChar->name,curChar->name,selectedPawn->name);
+					 sprintf(exe_cmd,"bml char %s <sbm:reach sbm:handle=\"r%s\" sbm:reach-duration=\"0.5\" sbm:action=\"pick-up\" target=\"%s\"/>",curChar->name,curChar->name,selectedPawn->name);
 					 mcuCBHandle& mcu = mcuCBHandle::singleton();
 					 mcu.execute(exe_cmd);
 				 }
 			 }
-			 else
+			 else 
 			 {				 			 
 				 makeGLContext();
 				 _objManipulator.picking(e.mouse.x, e.mouse.y, _data->camera);

@@ -397,12 +397,11 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 	reachData->updateReachState(skeletonRef->search_joint(rootName)->gmat(),ikMotionFrame);
 	if (curCharacter)
 	{		
-		reachData->locomotionComplete = curCharacter->_reachTarget;		
+		reachData->locomotionComplete = (curCharacter->_reachTarget && !curCharacter->_lastReachStatus);		
 	}
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	reachData->hasSteering = false;//(!mcu.steerEngine->());
-
+	reachData->hasSteering = (mcu.steerEngine->isInitialized());
 
 	curReachState->updateEffectorTargetState(reachData);		
 	curReachState->update(reachData);	
