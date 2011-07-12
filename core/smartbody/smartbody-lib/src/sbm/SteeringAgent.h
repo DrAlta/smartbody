@@ -50,6 +50,8 @@ class SteeringAgent
 		float evaluateProceduralLoco(float x, float y, float z, float yaw);
 		float evaluateExampleLoco(float x, float y, float z, float yaw);
 
+		float evaluateSteppingLoco(float x, float y, float z, float yaw);
+
 	private:
 		SteerLib::AgentInterface* agent;
 		SbmCharacter* character;
@@ -88,6 +90,11 @@ class SteeringAgent
 		Util::Vector velocity;
 		// WJ added end
 		//----------------------------
+
+		// stepping param
+		float stepTargetX;
+		float stepTargetZ;
+		bool steppingMode;
 };
 
 #endif
