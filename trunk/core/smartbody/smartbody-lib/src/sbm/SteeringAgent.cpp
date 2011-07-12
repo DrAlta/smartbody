@@ -57,6 +57,10 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	rightSide = rightSideInXZPlane(forward);
 	currentSpeed = 1.0f;
 	velocity = forward * currentSpeed;
+
+	stepTargetX = 0.0f;
+	stepTargetZ = 0.0f;
+	steppingMode = false;
 }
 
 SteeringAgent::~SteeringAgent()
@@ -66,6 +70,15 @@ SteeringAgent::~SteeringAgent()
 void SteeringAgent::evaluate()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	//---get current world offset position
+	float x, y, z;
+	float yaw, pitch, roll;
+	character->get_world_offset(x, y, z, yaw, pitch, roll);
+
+	// TODO: better place for below code (step approach the target)
+	if (steppingMode)
+		evaluateSteppingLoco(x, y, z, yaw);
+
 	if (!agent)
 		return;
 	PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
@@ -73,10 +86,6 @@ void SteeringAgent::evaluate()
 		return;
 
 	// Prepare Data
-	//---get current world offset position
-	float x, y, z;
-	float yaw, pitch, roll;
-	character->get_world_offset(x, y, z, yaw, pitch, roll);
 	//---if there is a target, update the goal
 	if (target)
 	{
@@ -742,4 +751,38 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			character->param_animation_ct->updateWeights();
 		}
 	return newSpeed;
+}
+
+float SteeringAgent::evaluateSteppingLoco(float x, float y, float z, float yaw)
+{
+	if (!character->param_animation_ct)
+		return .0f;
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	float dist = sqrt((x - stepTargetX) * (x - stepTargetX) + (z - stepTargetZ) * (z - stepTargetZ));	
+	SrVec agentToTargetVec;
+	agentToTargetVec.x = stepTargetX - x;
+	agentToTargetVec.y = 0.0f;
+	agentToTargetVec.z = stepTargetZ - z;
+	if (character->param_animation_ct->isIdle() && (dist > 20.0f))
+	{
+		SrVec heading = SrVec(sin(degToRad(yaw)), 0, cos(degToRad(yaw)));
+		float offsety = dot(agentToTargetVec, heading);
+		SrVec verticalHeading = SrVec(sin(degToRad(yaw - 90)), 0, cos(degToRad(yaw - 90)));
+		float offsetx = dot(agentToTargetVec, verticalHeading);
+		if (!character->param_animation_ct->hasPAState("UtahStep"))
+		{
+			PAStateData* stepState = mcu.lookUpPAState("UtahStep");
+			stepState->paramManager->setWeight(offsetx, offsety);
+			std::stringstream command;
+			command << "panim schedule char " << character->name;			
+			command << " state UtahStep loop false playnow false ";
+			for (int i = 0; i < stepState->getNumMotions(); i++)
+				command << stepState->weights[i] << " ";
+			mcu.execute((char*) command.str().c_str());
+		}	
+	}
+	if (dist < 20.0f)
+		steppingMode = false;
+
+	return 0.0f;
 }

@@ -157,12 +157,21 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	child = getFirstChildElement( elem );
 
 //	Locomotion::parse_routine(child, request, type, id);
-	//-------------starting  from here, it's BML Spec 1.0
+
+	//-------------starting  from here, it's BML Spec 1.0 + SBM Extension
 	std::string localId;
 	if (attrID)
 		localId = XMLString::transcode(attrID);
 	std::stringstream command;
 	SbmCharacter* c = mcu->character_map.lookup(request->actor->name);
+
+	c->steeringAgent->steppingMode = false;
+	bool stepMode = false;
+	bool stepTargetMode = false;
+	std::string stepDirection = "";
+	float stepTargetX = 0.0f;
+	float stepTargetZ = 0.0f;
+
 	const XMLCh* locotype = elem->getAttribute(L"sbm:type");
 	if (XMLString::compareIString(locotype, L"") != 0)
 	{
@@ -206,6 +215,8 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			c->steeringAgent->desiredSpeed = 2.5f;
 		else if (mannerString == "run")
 			c->steeringAgent->desiredSpeed = 3.5f;
+		else if (mannerString == "sbm:step")
+			stepMode = true;
 		else 
 			return BehaviorRequestPtr();
 		// also has to update state weight
@@ -245,29 +256,51 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	if (XMLString::compareIString(target, L"") != 0)
 	{
 		XMLStringTokenizer tokenizer(target);
-		if (tokenizer.countTokens() ==  2)
+		if (tokenizer.countTokens() == 2)
 		{
-			XMLCh* x = tokenizer.nextToken();
-			XMLCh* z = tokenizer.nextToken();
-			command << "sbm steer move " << c->name << " " << XMLString::transcode(x) << " 0 " << XMLString::transcode(z);
+			float x = (float)atof(XMLString::transcode(tokenizer.nextToken()));
+			float z = (float)atof(XMLString::transcode(tokenizer.nextToken()));
+			if (stepMode)
+			{
+				stepTargetX = x;
+				stepTargetZ = z;
+				stepTargetMode = true;
+			}
+			else
+				command << "sbm steer move " << c->name << " " << x << " 0 " << z;
 		}
 		else if (tokenizer.countTokens() == 1)
 		{
 			// is the target a character/pawn?
 			XMLCh* xmlStr = tokenizer.nextToken();
 			std::string name = XMLString::transcode(xmlStr);
-			SbmPawn* pawn = mcu->pawn_map.lookup(name.c_str());
-			if (pawn)
+			if ((name == "forward" || name == "backward" || name == "left" || name == "right") && stepMode)
 			{
-				// get the world offset x & z
-				float x, y, z, yaw, pitch, roll;
-				pawn->get_world_offset(x, y, z, yaw, pitch, roll);
-				command << "sbm steer move " << c->name << " " << x << " 0 " << z;
+				stepTargetMode = false;
+				stepDirection = name;
 			}
 			else
 			{
-				LOG("Cannot move %s to unknown locomotion target: %s", c->name, name.c_str());
-				return BehaviorRequestPtr();
+				SbmPawn* pawn = mcu->pawn_map.lookup(name.c_str());
+				if (pawn)
+				{
+					// get the world offset x & z
+					float x, y, z, yaw, pitch, roll;
+					pawn->get_world_offset(x, y, z, yaw, pitch, roll);
+					if (stepMode)
+					{
+						stepTargetMode = true;
+						stepTargetX = x;
+						stepTargetZ = z;
+					}
+					else
+						command << "sbm steer move " << c->name << " " << x << " 0 " << z;
+				}
+				else
+				{
+					LOG("Cannot move %s to unknown locomotion target: %s", c->name, name.c_str());
+					return BehaviorRequestPtr();
+				}
 			}
 		}
 		else
@@ -276,6 +309,48 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 				return BehaviorRequestPtr();
 		}
 		
+	}
+
+	// step mode attributes
+	int numSteps = 1;
+	const XMLCh* stepCount = elem->getAttribute(L"sbm:numsteps");
+	if (XMLString::compareIString(stepCount, L"") != 0)
+		numSteps = atoi(XMLString::transcode(stepCount));
+	// execute steps
+	if (stepMode)
+	{
+		if (!c->param_animation_ct)
+		{
+			LOG("Parameterized Animation Engine not setup, cannot use step control.");
+			return BehaviorRequestPtr();
+		}
+		if (c->param_animation_ct->hasPAState("UtahStep") || !c->param_animation_ct->isIdle())
+			return BehaviorRequestPtr();
+		c->steeringAgent->stepAdjust = false;
+		if (stepTargetMode)		// given target
+		{
+			c->steeringAgent->steppingMode = true;
+			c->steeringAgent->stepTargetX = stepTargetX;
+			c->steeringAgent->stepTargetZ = stepTargetZ;
+		}
+		else					// given direction and number of steps
+		{
+			for (int i = 0; i < numSteps; i++)
+			{
+				std::stringstream command;
+				command << "panim schedule char " << c->name;
+				command << " state UtahStep loop false playnow false ";
+				if (stepDirection == "forward")
+					command << "0 0 1 0 0 0 0";
+				if (stepDirection == "backward")
+					command << "0 1 0 0 0 0 0";
+				if (stepDirection == "left")
+					command << "0 0 0 0 0 0 1";
+				if (stepDirection == "right")
+					command << "0 0 0 1 0 0 0";
+				mcu->execute((char*)command.str().c_str());
+			}
+		}
 	}
 	return BehaviorRequestPtr( new EventRequest(unique_id, localId, command.str().c_str(), behav_syncs, ""));
 }
