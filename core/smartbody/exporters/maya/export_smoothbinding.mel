@@ -91,10 +91,6 @@ global proc smoothBindingExportFunc()
 			select $objList[$i];
 			file -op "groups=1;ptgroups=1;materials=1;smoothing=1;normals=1" -typ "OBJexport" -pr -es ($exportDir + "/" + $meshName);
 			
-			
-			// post export process - get rid of material files
-			//if (`filetest -e ($exportDir + "/" + $meshName + ".mtl")`)
-				//sysFile -delete ($exportDir + "/" + $meshName + ".mtl");
 		}
 		print ("Exporting OBJ Finished!\n");
 		
