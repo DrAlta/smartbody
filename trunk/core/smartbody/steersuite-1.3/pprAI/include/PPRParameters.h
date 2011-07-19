@@ -37,12 +37,13 @@
 #define PED_TYPICAL_SPEED_FACTOR         1.0f
 #define PED_SLIGHTLY_SLOWER_SPEED_FACTOR 0.77f
 #define PED_SLOWER_SPEED_FACTOR          0.5f
+#define PED_VERY_SLOWER_SPEED_FACTOR     0.2f
 
 
 // TODO: the exact values for turning rates may have to tweaked again 
-#define PED_CORNERING_TURN_RATE 1.9f
+#define PED_CORNERING_TURN_RATE 1.9f//4.0f
 #define PED_ADJUSTMENT_TURN_RATE 0.16f
-#define PED_FASTER_AVOIDANCE_TURN_RATE 0.55f
+#define PED_FASTER_AVOIDANCE_TURN_RATE 0.55f//0.26f
 #define PED_TYPICAL_AVOIDANCE_TURN_RATE 0.26f
 
 

@@ -136,6 +136,8 @@ public:
 	const std::queue<SteerLib::AgentGoalInfo>& getLandmarkQueue() { return _landmarkQueue; }
 
 	void updateAgentState(const Util::Point & newPosition,  const Util::Vector & newOrientation, float newSpeed);
+	void updateDesiredForward(const Util::Vector & desiredForward) {_desiredForward = desiredForward;};
+	void updateMagnifiedDesiredForward(const Util::Vector & magnifiedDesiredForward) {_magnifiedDesiredForward = magnifiedDesiredForward;}
 
 protected:
 	//========================
@@ -232,6 +234,9 @@ protected:
 	Util::Point _position;
 	Util::Vector _forward;
 	Util::Vector _rightSide;
+	// for debugging use
+	Util::Vector _desiredForward;
+	Util::Vector _magnifiedDesiredForward;
 
 	// PHYSICS STATE of the agent
 	Util::Vector _velocity;
