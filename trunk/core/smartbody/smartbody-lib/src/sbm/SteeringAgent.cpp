@@ -44,7 +44,7 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 
 	scootThreshold = 0.02f;	
 	distThreshold = 150.0f;			// exposed, unit: centimeter
-	distDownThreshold = 15.0f;
+	distDownThreshold = 100.0f;
 
 	desiredSpeed = 1.0f;			// exposed, unit: meter/sec
 	facingAngle = -200.0f;			// exposed, unit: deg
