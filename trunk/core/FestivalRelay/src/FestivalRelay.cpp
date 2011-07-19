@@ -116,8 +116,8 @@ XERCES_CPP_NAMESPACE_USE
 bool done = false;
 extern SpeechRequestData xmlMetaData;
 
-
-const char * FESTIVAL_RELAY_LIB_DIR = "..\\..\\lib\\festival\\festival\\lib";
+std::string festivalLibDir = "";
+//const char * FESTIVAL_RELAY_LIB_DIR = "..\\..\\lib\\festival\\festival\\lib";
 
 string cache_directory = "..\\..\\data\\cache\\festival\\";
 
@@ -300,7 +300,7 @@ std::string storeXMLMetaData( const std::string & txt)
 	   return actualText;
    }
    else {
-	   fprintf(stderr, "Error: Unable to instantiate DOM Xml parser, exiting \n");
+	   //fprintf(stderr, "Error: Unable to instantiate DOM Xml parser, exiting \n");
 	   return "";
    }
 }
@@ -594,23 +594,74 @@ BOOL WINAPI ConsoleHandler(DWORD CEvent)
 
 int main(int argc, char **argv)
 {
-    festival_libdir = FESTIVAL_RELAY_LIB_DIR;
+	std::string scriptFile = "";
+	std::string voice = "voice_rab_diphone";
+	std::string festivalLibDir = "..\\..\\lib\\festival\\festival\\lib";
+
+	for(int i=1; i<argc; ++i)
+	{
+		printf("%s\n", argv[i]);
+		if(!strcmp(argv[i],"-hideConsole"))
+		{
+			HWND hWnd = GetConsoleWindow();
+			ShowWindow( hWnd, SW_HIDE );
+		}
+		else if (!strcmp(argv[i], "-script"))
+		{
+			if (argc > i + 1)
+			{
+				scriptFile = argv[i + 1];
+				i++;
+			}
+			else
+			{
+				printf("Use: -script <scriptfile>");
+			}
+		}
+		else if (!strcmp(argv[i], "-voice"))
+		{
+			if (argc > i + 1)
+			{
+				voice = argv[i + 1];
+				i++;
+			}
+			else
+			{
+				printf("Use: -voice <voice>");
+			}
+		}
+		else if (!strcmp(argv[i], "-festivalLibDir"))
+		{
+			if (argc > i + 1)
+			{
+				festivalLibDir = argv[i + 1];
+				i++;
+			}
+			else
+			{
+				printf("Use: -festivalLibDir <dir>");
+			}
+		}
+		else if (!strcmp(argv[i], "-cacheDir"))
+		{
+			if (argc > i + 1)
+			{
+				cache_directory = argv[i + 1];
+				i++;
+			}
+			else
+			{
+				printf("Use: -cacheDir <dir>");
+			}
+		}
+	}
+
+	festival_libdir = festivalLibDir.c_str();
 
     int heap_size = FESTIVAL_HEAP_SIZE;  
     int load_init_files = 1; // we want the festival init files loaded
     festival_initialize(load_init_files,heap_size);
 
-
-	// check if commandline request to hide the console is present
-	for(int i=0; i<argc; ++i)
-	{
-		if(!strcmp(argv[i],"-hideConsole"))
-		{
-			HWND hWnd = GetConsoleWindow();
-			ShowWindow( hWnd, SW_HIDE );
-
-		}
-	}
 
 	if (SetConsoleCtrlHandler((PHANDLER_ROUTINE)ConsoleHandler,TRUE)==FALSE)
 	{
@@ -625,14 +676,56 @@ int main(int argc, char **argv)
 	printf( "Festival Text To Speech Engine:\n\n" );
 	printf( "Initializing....\n");
 	printf( "Hooking up VH Module\n");
-	// setting the duration method to be used by festival
-	festival_eval_command("(Parameter.set `Duration_Method Duration_Default)");
-	// this command hooks our virtual human method such that every time an utterance is synthesized, our method is called on it
-	// in order to generate the virtual human message (RemoteSpeechReply)
-	festival_eval_command("(set! after_synth_hooks (list Duration_VirtualHuman))");
-	// setting duration stretch parameter
-	festival_eval_command("(Parameter.set 'Duration_Stretch 0.8)");
-	festival_eval_command("(set! voice_default 'voice_rab_diphone)");
+
+	std::vector<std::string> festivalCommands;
+	bool scriptFileRead = false;
+	if (scriptFile != "")
+	{
+		std::ifstream scriptStream(scriptFile.c_str());
+		if (!scriptStream.good())
+		{
+			printf("Cannot open script file: %s. Using default Festival commands instead.\n"); 
+		}
+		else
+		{
+			char line[4096];
+			while(!scriptStream.eof() && scriptStream.good())
+			{
+				scriptStream.getline(line, 4096, '\n');
+				festivalCommands.push_back(line);
+			}
+			scriptStream.close();
+			scriptFileRead = true;
+		}
+	}
+
+	printf("Festival lib directory (use -festivalLibDir): %s\n", festivalLibDir.c_str());
+	printf("Cache directory (use -festivalLibDir)       : %s\n", cache_directory.c_str());
+	printf("Voice (use -voice)                          : %s\n", voice.c_str());
+	printf("Script (use -script)                        : %s\n", scriptFile.c_str());
+
+	if (!scriptFileRead)
+	{
+		printf("Running default Festival commands\n\n", voice.c_str());
+		// setting the duration method to be used by festival
+		festivalCommands.push_back("(Parameter.set `Duration_Method Duration_Default)");
+		// this command hooks our virtual human method such that every time an utterance is synthesized, our method is called on it
+		// in order to generate the virtual human message (RemoteSpeechReply)
+		festivalCommands.push_back("(set! after_synth_hooks (list Duration_VirtualHuman))");
+		// setting duration stretch parameter
+		festivalCommands.push_back("(Parameter.set 'Duration_Stretch 0.8)");
+		std::stringstream strstr;
+		strstr << "(set! voice_default '" << voice << ")";
+		festivalCommands.push_back(strstr.str());
+	}
+
+	printf("\n");
+	for (size_t x = 0; x < festivalCommands.size(); x++)
+	{
+		printf("%s\n", festivalCommands[x].c_str());
+		festival_eval_command(festivalCommands[x].c_str());
+	}
+	printf("\n");
 
 	
 	printf( "Starting ActiveMQ\n");
