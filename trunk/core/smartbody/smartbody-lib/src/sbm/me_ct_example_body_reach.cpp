@@ -31,7 +31,7 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMa
 	isMoving = false;
 	startReach = false;
 	endReach = false;
-	autoReturnDuration = 0.01;
+	autoReturnDuration = 0.01f;
 	defaultReachType = -1;
 	//addDefaultAttributeFloat("reach.autoReturnDuration",0.01f,&autoReturnDuration);
 	//addDefaultAttributeBool("reach.footIK",true,&footIKFix);
