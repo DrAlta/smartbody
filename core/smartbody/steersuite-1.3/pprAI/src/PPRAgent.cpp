@@ -58,6 +58,8 @@ void PPRAgent::reset(const SteerLib::AgentInitialConditions & initialConditions,
 	_currentSpeed = initialConditions.speed;
 	AxisAlignedBox newBounds(_position.x-_radius, _position.x+_radius, 0.0f, 0.0f, _position.z-_radius, _position.z+_radius);
 
+	_desiredForward = _forward;
+	_magnifiedDesiredForward = _desiredForward;
 
 	if (!_enabled) {
 		gSpatialDatabase->addObject( dynamic_cast<SpatialDatabaseItemPtr>(this), newBounds);
@@ -885,7 +887,7 @@ void PPRAgent::runPredictivePhase()
 //		_steeringState = STEERING_STATE_COOPERATE_WITH_CROWD;
 //	}
 //	else 
-	if ( (dot(directionToLocalTarget,forward()) < PED_WRONG_DIRECTION_DOT_PRODUCT_THRESHOLD) || ((dot(directionToLocalTarget,forward()) < PED_SAME_DIRECTION_DOT_PRODUCT_THRESHOLD) && (_steeringState == STEERING_STATE_TURN_TOWARDS_TARGET))) {
+	if ( (dot(directionToLocalTarget,forward()) < 0.3f) || ((dot(directionToLocalTarget,forward()) < 0.5f) && (_steeringState == STEERING_STATE_TURN_TOWARDS_TARGET))) {
 		// if we are not following a space-time path, then we should be facing our local target.
 		// in this case, we are not... so change the state to turn towards the target.
 		_steeringState = STEERING_STATE_TURN_TOWARDS_TARGET;
@@ -1274,16 +1276,21 @@ void PPRAgent::runReactivePhase()
 					}
 					else {
 						//if (isSelected()) cerr << "REACTION: one agent, I'm in front of him, so I'll go.\n";
-						if (!(feelers.object_right)){
+						if (!(feelers.object_right)) {
 							_finalSteeringCommand.aimForTargetDirection = false;
 							_finalSteeringCommand.turningAmount = PED_TYPICAL_AVOIDANCE_TURN_RATE;
 						}
-						if (!(feelers.object_left)) {
+						else if (!(feelers.object_left)) {
 							_finalSteeringCommand.aimForTargetDirection = false;
 							_finalSteeringCommand.turningAmount = -PED_TYPICAL_AVOIDANCE_TURN_RATE;
 						}
-						else {
+						else if (!(feelers.object_front)) {
+							_finalSteeringCommand.aimForTargetDirection = false;
 							// just keep straight
+						}
+						else { // there are all obstacles in three directions, just turn right largely 
+							_finalSteeringCommand.aimForTargetDirection = false;
+							_finalSteeringCommand.turningAmount = PED_FASTER_AVOIDANCE_TURN_RATE;
 						}
 						_finalSteeringCommand.targetSpeed = (comfortZoneViolated) ? PED_SLOWER_SPEED_FACTOR * _currentGoal.desiredSpeed : PED_TYPICAL_SPEED_FACTOR * _currentGoal.desiredSpeed;
 					}
@@ -1335,13 +1342,13 @@ void PPRAgent::runReactivePhase()
 					//if (isSelected()) cerr << "REACTION: just static obstacles... I should steer left.\n";
 					_finalSteeringCommand.aimForTargetDirection = false;
 					_finalSteeringCommand.turningAmount = (comfortZoneViolated) ? -PED_FASTER_AVOIDANCE_TURN_RATE : -PED_TYPICAL_AVOIDANCE_TURN_RATE;
-					_finalSteeringCommand.targetSpeed = PED_TYPICAL_SPEED_FACTOR * _currentGoal.desiredSpeed;
+					_finalSteeringCommand.targetSpeed = PED_VERY_SLOWER_SPEED_FACTOR * _currentGoal.desiredSpeed;
 				}
 				else if ((feelers.t_right >= feelers.t_front) && (feelers.t_front > feelers.t_left)) {
 					//if (isSelected()) cerr << "REACTION: just static obstacles... I should steer right.\n";
 					_finalSteeringCommand.aimForTargetDirection = false;
 					_finalSteeringCommand.turningAmount = (comfortZoneViolated) ? PED_FASTER_AVOIDANCE_TURN_RATE : PED_TYPICAL_AVOIDANCE_TURN_RATE;
-					_finalSteeringCommand.targetSpeed = PED_TYPICAL_SPEED_FACTOR * _currentGoal.desiredSpeed;
+					_finalSteeringCommand.targetSpeed = PED_VERY_SLOWER_SPEED_FACTOR * _currentGoal.desiredSpeed;
 				}
 				else {
 					// in this case, t_front was not correctly in-between t_right and t_left
@@ -1364,7 +1371,7 @@ void PPRAgent::runReactivePhase()
 						// TODO: is there something more intelligent to do?
 						_finalSteeringCommand.aimForTargetDirection = true;
 						_finalSteeringCommand.turningAmount = PED_FASTER_AVOIDANCE_TURN_RATE;
-						_finalSteeringCommand.targetSpeed = PED_SLOWER_SPEED_FACTOR * _currentGoal.desiredSpeed;
+						_finalSteeringCommand.targetSpeed = PED_VERY_SLOWER_SPEED_FACTOR * _currentGoal.desiredSpeed;
 					}
 				}
 			}
@@ -1379,7 +1386,21 @@ void PPRAgent::runReactivePhase()
 				if ( dot(p->forward(), _forward) < PED_ONCOMING_REACTION_THRESHOLD ) {
 					if (obstacle == feelers.object_right) {
 						//if (isSelected()) cerr << "REACTION: a static obstacle and an oncoming agent... I'll just wait for him to go around me.\n";
-						_finalSteeringCommand.targetSpeed = 0.0f;
+						if(p->velocity().length() == 0) {
+							if (!feelers.object_front) {
+								// if there is no obstacle in front, just keep forward
+							}
+							if (obstacle == feelers.object_right) {
+								_finalSteeringCommand.aimForTargetDirection = false;
+								_finalSteeringCommand.turningAmount = -PED_TYPICAL_AVOIDANCE_TURN_RATE;
+							}
+							else {
+								_finalSteeringCommand.aimForTargetDirection = false;
+								_finalSteeringCommand.turningAmount = PED_TYPICAL_AVOIDANCE_TURN_RATE;
+							}
+						}
+						else
+							_finalSteeringCommand.targetSpeed = 0.0f;
 					}
 					else if (obstacle == feelers.object_left) {
 						//if (isSelected()) cerr << "REACTION: a static obstacle and an oncoming agent... I'll go around them on the right\n";
@@ -1961,7 +1982,6 @@ void PPRAgent::updateAgentState(const Util::Point & newPosition,  const Util::Ve
 
 }
 
-
 //
 // drawPlannedPath()
 //
@@ -2092,6 +2112,11 @@ void PPRAgent::draw()
 	DrawLib::drawLine(__myLSideRay.pos + verticalOffset, __myLSideRay.pos + verticalOffset + (__myLSideRay.dir * __myLSideRay.maxt));
 
 	//DrawLib::drawLine(_position, _position+(__plannedSteeringForce), gGreen);
+	DrawLib::glColor(gGreen);
+	DrawLib::drawLine(_position, _position + _desiredForward * 3.0f);
+	DrawLib::glColor(gYellow);
+	DrawLib::drawLine(_position, _position + _magnifiedDesiredForward * 3.0f);
+
 
 	if (__hitSomething) {
 		if (__front) DrawLib::drawStar(__hitPosFront + 2*verticalOffset, Vector(1.0f, 0.0f, 0.0f), 0.10f, gRed);

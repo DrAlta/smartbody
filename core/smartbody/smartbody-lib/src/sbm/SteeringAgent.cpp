@@ -25,7 +25,7 @@
 #include <sbm/mcontrol_util.h>
 #include <sbm/me_ct_param_animation_data.h>
 #define DebugInfo 0
-#define FastStart 0
+#define FastStart 1
 
 SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 {
@@ -44,7 +44,7 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 
 	scootThreshold = 0.02f;	
 	distThreshold = 150.0f;			// exposed, unit: centimeter
-	distDownThreshold = 100.0f;
+	distDownThreshold = 15.0f;
 
 	desiredSpeed = 1.0f;			// exposed, unit: meter/sec
 	facingAngle = -200.0f;			// exposed, unit: deg
@@ -86,6 +86,17 @@ void SteeringAgent::evaluate()
 	if (!pprAgent)
 		return;
 
+	const std::queue<SteerLib::AgentGoalInfo>& goalQueue = pprAgent->getLandmarkQueue();
+	int numGoals = goalQueue.size();
+	if (numGoals == 0) {
+		newSpeed = 0.0f;
+	}
+	// Update Steering Engine (position, orientation, scalar speed)
+	Util::Point newPosition(x / 100.0f, 0.0f, z / 100.0f);
+	Util::Vector newOrientation = Util::rotateInXZPlane(Util::Vector(0.0f, 0.0f, 1.0f), yaw * float(M_PI) / 180.0f);
+	pprAgent->updateAgentState(newPosition, newOrientation, newSpeed);
+	pprAgent->updateAI((float)mcu.time, dt, (unsigned int)(mcu.time / dt));
+
 	// Prepare Data
 	//---if there is a target, update the goal
 	if (target)
@@ -105,13 +116,12 @@ void SteeringAgent::evaluate()
 			agent->addGoal(goal);
 		}
 	}
-	const std::queue<SteerLib::AgentGoalInfo>& goalQueue = pprAgent->getLandmarkQueue();
 	character->_lastReachStatus = character->_reachTarget;
 	character->_reachTarget = false;
 	character->_numSteeringGoal = goalQueue.size();
 
 	// Evaluate
-	float newSpeed = desiredSpeed;
+	//float newSpeed = desiredSpeed;
 	// Meat Hook Locomotion Evaluation
 	if (mcu.locomotion_type == mcu.Basic)
 	{
@@ -136,12 +146,6 @@ void SteeringAgent::evaluate()
 			return;
 		newSpeed = evaluateExampleLoco(x, y, z, yaw);
 	}
-
-	// Update Steering Engine (position, orientation, scalar speed)
-	Util::Point newPosition(x / 100.0f, 0.0f, z / 100.0f);
-	Util::Vector newOrientation = Util::rotateInXZPlane(Util::Vector(0.0f, 0.0f, 1.0f), yaw * float(M_PI) / 180.0f);
-	pprAgent->updateAgentState(newPosition, newOrientation, newSpeed);
-	pprAgent->updateAI((float)mcu.time, dt, (unsigned int)(mcu.time / dt));
 
 	// Event Handler
 	if (!character->_lastReachStatus && character->_reachTarget)
@@ -479,11 +483,61 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 	const std::queue<SteerLib::AgentGoalInfo>& goalQueue = pprAgent->getLandmarkQueue();
 	const SteerLib::SteeringCommand & steeringCommand = pprAgent->getSteeringCommand();
 
-	float angleGlobal = radToDeg(atan2(steeringCommand.targetDirection.x, steeringCommand.targetDirection.z));
-	normalizeAngle(angleGlobal);
-	normalizeAngle(yaw);
-	float angleDiff = angleGlobal - yaw;
-	normalizeAngle(angleDiff);
+	//*** IMPORTANT: use the example-based animation to update the steering agent
+	forward = pprAgent->forward();
+	rightSide = rightSideInXZPlane(forward);
+
+	//--------------------------------------------------------
+	// WJ added start
+	// TODO: define/initialize these vars properly:
+	float ped_max_turning_rate = PED_MAX_TURNING_RATE * 20.0f;
+
+	//Util::Vector totalSteeringForce;
+	Util::Vector newForward;
+
+	//
+	// choose the new orientation of the agent
+	//
+	if (!steeringCommand.aimForTargetDirection) {
+		// simple turning case "turn left" or "turn right"
+		newForward = forward + ped_max_turning_rate * steeringCommand.turningAmount * rightSide;
+	}
+	else {
+		// turn to face "targetDirection" - magnitude of targetDirection doesn't matter
+		float initialDot = dot(steeringCommand.targetDirection, rightSide);
+		float turningRate = (initialDot > 0.0f) ? ped_max_turning_rate : -ped_max_turning_rate;  // positive rate is right-turn
+		newForward = forward + turningRate * fabsf(steeringCommand.turningAmount) * rightSide;
+		float newDot = dot(steeringCommand.targetDirection, rightSideInXZPlane(newForward)); // dot with the new side vector
+		if (initialDot*newDot <= 0.0f) {
+			// if the two dot products are different signs, that means we turned too much, so just set the new forward to the goal vector.
+			// NOTE that above condition is less than **OR EQUALS TO** - that is because initialDot will be zero when the agent is 
+			// pointing already in the exact correct direction.  If we used strictly less than, the pedestrian oscillates between a 
+			// small offset direction and the actual target direction.
+
+			//
+			// TODO: known bug here: if agent is facing exactly opposite its goal, it completely flips around because of this condition.
+			//   ironically, because of the equals sign above...
+			//   proper solution is to add extra conditions that verify the original direction of forward was not opposite of targetDirection.
+			//
+			// WJ: need to change here
+			newForward = Util::Vector(steeringCommand.targetDirection.x, 0.0f, steeringCommand.targetDirection.z);
+
+		}
+		//*** remove the gradually change of turning
+		//*** let the animation system try its best to achieve this turning angle
+		//newForward = Util::Vector(steeringCommand.targetDirection.x, 0.0f, steeringCommand.targetDirection.z);
+	}
+
+	//
+	// set the orientation
+	//
+	newForward = normalize(newForward);
+	forward = newForward;
+	rightSide = rightSideInXZPlane(newForward);
+
+	pprAgent->updateDesiredForward(forward);
+	// WJ added end
+	//---------------------------------------------------------------------------
 
 	bool reachTarget = false;
 	float agentToTargetDist = 0.0f;
@@ -701,7 +755,6 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 	float curSpeed = 0.0f;
 	float curTurningAngle = 0.0f;
 	float curScoot = 0.0f;
-	float newSpeed = desiredSpeed;
 	if (curState)
 		if (curState->stateName == "UtahLocomotion" && numGoals != 0)
 		{
@@ -750,16 +803,19 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			}
 			else
 				curSpeed += acceleration * dt;
-			if (steeringCommand.aimForTargetDirection)
-			{
-				float addOnTurning = angleDiff * paLocoAngleGain;
-				if (curTurningAngle < addOnTurning)
-					curTurningAngle += angleAcceleration * dt;
-				else if (curTurningAngle > addOnTurning)
-					curTurningAngle -= angleAcceleration * dt;
-			}
-			else
-				curTurningAngle = steeringCommand.turningAmount * dt;
+
+			float angleGlobal = radToDeg(atan2(forward.x, forward.z));
+			normalizeAngle(angleGlobal);
+			normalizeAngle(yaw);
+			float angleDiff = angleGlobal - yaw;
+			normalizeAngle(angleDiff);
+			float addOnTurning = angleDiff * paLocoAngleGain;
+			if (curTurningAngle < addOnTurning)
+				curTurningAngle += angleAcceleration * dt;
+			else if (curTurningAngle > addOnTurning)
+				curTurningAngle -= angleAcceleration * dt;
+
+			// update locomotion state
 			newSpeed = curSpeed;
 			curSpeed = mToCm(curSpeed);
 			curState->paramManager->setWeight(curSpeed, curTurningAngle, curScoot);

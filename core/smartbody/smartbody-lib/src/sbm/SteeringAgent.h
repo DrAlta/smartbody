@@ -95,6 +95,8 @@ class SteeringAgent
 		float stepTargetX;
 		float stepTargetZ;
 		bool steppingMode;
+
+		float newSpeed;
 };
 
 #endif
