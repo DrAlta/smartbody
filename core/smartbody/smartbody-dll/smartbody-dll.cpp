@@ -370,6 +370,7 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert( "tip",	mcu_time_ival_prof_func );
 
    mcu.insert( "panim",		mcu_panim_cmd_func );	
+   mcu.insert( "mirror",       mcu_motion_mirror_cmd_func);
 
    mcu.insert( "load",   mcu_load_func );
    mcu.insert( "pawn",   SbmPawn::pawn_cmd_func );
