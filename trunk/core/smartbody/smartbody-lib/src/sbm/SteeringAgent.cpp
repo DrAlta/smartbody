@@ -25,6 +25,7 @@
 #include <sbm/mcontrol_util.h>
 #include <sbm/me_ct_param_animation_data.h>
 #define DebugInfo 0
+#define FastStart 0
 
 SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 {
@@ -140,7 +141,7 @@ void SteeringAgent::evaluate()
 	Util::Point newPosition(x / 100.0f, 0.0f, z / 100.0f);
 	Util::Vector newOrientation = Util::rotateInXZPlane(Util::Vector(0.0f, 0.0f, 1.0f), yaw * float(M_PI) / 180.0f);
 	pprAgent->updateAgentState(newPosition, newOrientation, newSpeed);
-	pprAgent->updateAI((float)mcu.time, (float)mcu.time_dt, (unsigned int)(mcu.time / mcu.time_dt));
+	pprAgent->updateAI((float)mcu.time, dt, (unsigned int)(mcu.time / dt));
 
 	// Event Handler
 	if (!character->_lastReachStatus && character->_reachTarget)
@@ -621,6 +622,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 		character->_reachTarget = true;
 
 	//---start locomotion
+#if !FastStart	// starting with angle transition
 	if (curState)
 		if (curState->stateName == PseudoIdleState && numGoals != 0 && nextStateName == "")
 		{
@@ -681,6 +683,19 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			command1 << " state UtahLocomotion loop true playnow false";
 			mcu.execute((char*) command1.str().c_str());
 		}	
+#else	// starting without transition
+	if (curState)
+		if (curState->stateName == PseudoIdleState && numGoals != 0 && nextStateName == "")
+		{
+			PAStateData* locoState = mcu.lookUpPAState("UtahLocomotion");
+			locoState->paramManager->setWeight(0, 0, 0);
+			std::stringstream command;
+			command << "panim schedule char " << character->name;
+			command << " state UtahLocomotion loop true playnow true";
+			mcu.execute((char*) command.str().c_str());
+		}
+#endif
+
 
 	//---update locomotion
 	float curSpeed = 0.0f;
