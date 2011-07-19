@@ -1736,7 +1736,7 @@ int FltkViewer::handle ( int event )
 					 //std::string cmd;
 					 //cmd = "bml char " + curChar->name + " <sbm:reach sbm:handle=\"r" + curChar->name + "\" action=\"pick-up\" target=\""+ selectedPawn->name + "\" />";
 //					 sprintf(exe_cmd,"bml char %s <sbm:reach sbm:handle=\"r%s\" sbm:reach-duration=\"0.5\" sbm:action=\"pick-up\" target=\"%s\"/>",curChar->name,curChar->name,selectedPawn->name);
-					 sprintf(exe_cmd,"bml char %s <sbm:reach sbm:reach-duration=\"0.5\" sbm:action=\"pick-up\" target=\"%s\" sbm:foot-ik=\"true\"/>",curChar->name,selectedPawn->name);
+					 sprintf(exe_cmd,"bml char %s <sbm:reach sbm:handle=\"r%s\" sbm:reach-duration=\"0.01\" sbm:action=\"pick-up\" target=\"%s\"/>",curChar->name,curChar->name,selectedPawn->name);
 					 mcuCBHandle& mcu = mcuCBHandle::singleton();
 					 mcu.execute(exe_cmd);
 				 }
@@ -1769,7 +1769,7 @@ int FltkViewer::handle ( int event )
 				 SrVec dest = ground.intersect(p1, p2);
 				 dest.y = curChar->getHeight()*0.6f;
 				 //sprintf(exe_cmd,"bml char %s <sbm:reach sbm:handle=\"r%s\" sbm:action=\"put-down\" sbm:target-pos=\"%f %f %f\"/>",curChar->name,curChar->name,dest.x,dest.y,dest.z);
-				 sprintf(exe_cmd,"bml char %s <sbm:reach sbm:action=\"put-down\" sbm:target-pos=\"%f %f %f\" sbm:foot-ik=\"true\"/>",curChar->name,dest.x,dest.y,dest.z);
+				 sprintf(exe_cmd,"bml char %s <sbm:reach sbm:handle=\"r%s\" sbm:action=\"put-down\" sbm:target-pos=\"%f %f %f\"/>",curChar->name,curChar->name,dest.x,dest.y,dest.z);
 				 mcuCBHandle& mcu = mcuCBHandle::singleton();
 				 mcu.execute(exe_cmd);	 
 			 }
@@ -3570,12 +3570,12 @@ void FltkViewer::drawReach()
 		character->skeleton_p->update_global_matrices();		
 		//SkJoint* root = reachCt->getRootJoint();		
 		*/
-		ReachStateData* rd = reachCt->reachData;
-		if (!rd)
+		MeCtReachEngine* re = reachCt->getReachEngine();
+		ReachStateData* rd = re->getReachData();
+		if (!re)
 			return;
 
-		MeCtReachEngine* re = reachCt->getReachEngine();
-		if (!re)
+		if (!rd)
 			return;
 		
 		SkJoint* root = character->skeleton_p->root();
@@ -3583,10 +3583,10 @@ void FltkViewer::drawReach()
 		//rootMat.translation(root->gmat().get(12),root->gmat().get(13),root->gmat().get(14));
 		const std::vector<SrVec>& exampleData = re->examplePts;
 		const std::vector<SrVec>& resampleData = re->resamplePts;
-		
+		//OG("Root Mat = ")			
 
-		SrPoints srExamplePts;	
-		srExamplePts.init_with_attributes();
+		//SrPoints srExamplePts;	
+		//srExamplePts.init_with_attributes();
 		for (unsigned int i=0;i<exampleData.size();i++)
 		{
 			//const PoseExample& exPose = exampleData[i];

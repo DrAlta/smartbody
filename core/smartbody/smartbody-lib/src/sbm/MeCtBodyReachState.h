@@ -11,6 +11,7 @@ public:
 public:
 	ReachTarget();
 	~ReachTarget() {}
+	ReachTarget& operator= (const ReachTarget& rt);
 	bool targetIsPawn();
 	bool targetIsJoint();
 	void setTargetState(SRT& ts);
@@ -19,44 +20,6 @@ public:
 	SRT getTargetState(); // the return state is based on target's state
 	SRT getGrabTargetState(SRT& naturalState); 
 	SbmPawn* getTargetPawn();
-};
-
-class ReachHandAction
-{
-public:	
-	virtual void reachPreCompleteAction(ReachStateData* rd) ;
-	virtual void reachCompleteAction(ReachStateData* rd) ;	
-	virtual void reachPreReturnAction(ReachStateData* rd);
-	virtual void reachNewTargetAction(ReachStateData* rd) ;
-	virtual void reachReturnAction(ReachStateData* rd) ;
-	virtual SRT getHandTargetStateOffset(ReachStateData* rd, SRT& naturalState);
-	virtual bool isPickingUpNewPawn(ReachStateData* rd) ;
-
-	void sendReachEvent(std::string cmd, float time = 0.0);	
-public:
-	void pickUpAttachedPawn(ReachStateData* rd);
-	void putDownAttachedPawn(ReachStateData* rd);
-};
-
-class ReachHandPickUpAction : public ReachHandAction
-{
-public:	
-	//virtual void reachPreCompleteAction(ReachStateData* rd);
-	virtual void reachCompleteAction(ReachStateData* rd);		
-	virtual void reachNewTargetAction(ReachStateData* rd);
-	virtual void reachPreReturnAction(ReachStateData* rd) {} ;
-	virtual void reachReturnAction(ReachStateData* rd); // do nothing when return
-	//virtual SRT getHandTargetStateOffset(ReachStateData* rd, SRT& naturalState);
-	//virtual bool pickUpNewPawn(ReachStateData* rd);
-};
-
-class ReachHandPutDownAction : public ReachHandAction
-{
-public:	
-	virtual void reachPreCompleteAction(ReachStateData* rd) {}; // do nothing when moving toward target
-	virtual void reachCompleteAction(ReachStateData* rd);	
-	virtual void reachReturnAction(ReachStateData* rd);	
-	virtual SRT getHandTargetStateOffset(ReachStateData* rd, SRT& naturalState);
 };
 
 class EffectorState 
@@ -74,14 +37,52 @@ public:
 	EffectorState();
 	~EffectorState() {}
 	void setAttachedPawn(ReachStateData* rd);
-	void removeAttachedPawn(ReachStateData* rd);
-	void updateAttachedPawn();
+	void removeAttachedPawn(ReachStateData* rd);	
+};
+
+class ReachHandAction // dafault hand behavior for "Touch"
+{
+public:	
+	virtual void reachPreCompleteAction(ReachStateData* rd) ;
+	virtual void reachCompleteAction(ReachStateData* rd) ;	
+	virtual void reachPreReturnAction(ReachStateData* rd);
+	virtual void reachNewTargetAction(ReachStateData* rd) ;
+	virtual void reachReturnAction(ReachStateData* rd) ;
+	virtual SRT getHandTargetStateOffset(ReachStateData* rd, SRT& naturalState);
+	virtual bool isPickingUpNewPawn(ReachStateData* rd) ;
+
+	void sendReachEvent(std::string cmd, float time = 0.0);	
+public:
+	void pickUpAttachedPawn(ReachStateData* rd);
+	void putDownAttachedPawn(ReachStateData* rd);
+protected:
+	std::string generateGrabCmd(std::string charName, std::string targetName, std::string grabState, int type);
+	std::string generateAttachCmd(std::string charName, std::string targetName, int type);
+};
+
+class ReachHandPickUpAction : public ReachHandAction 
+{
+public:		
+	virtual void reachCompleteAction(ReachStateData* rd);		
+	virtual void reachNewTargetAction(ReachStateData* rd);
+	virtual void reachPreReturnAction(ReachStateData* rd) {} ;
+	virtual void reachReturnAction(ReachStateData* rd); // do nothing when return	
+};
+
+class ReachHandPutDownAction : public ReachHandAction
+{
+public:	
+	virtual void reachPreCompleteAction(ReachStateData* rd) {}; // do nothing when moving toward target
+	virtual void reachCompleteAction(ReachStateData* rd);	
+	virtual void reachReturnAction(ReachStateData* rd);	
+	virtual SRT getHandTargetStateOffset(ReachStateData* rd, SRT& naturalState);
 };
 
 class ReachStateData
 {
-public:
+public:	
 	std::string     charName; // character name
+	int             reachType;
 	float           curTime, dt;
 	float           stateTime; // how much time has been in a state 
 	float           curRefTime, du;	
@@ -110,7 +111,7 @@ public:
 	DataInterpolator* dataInterpolator;
 	MeCtExampleBodyReach* reachControl;
 public:
-	float linearVel, angularVel;
+	float linearVel;
 	float reachRegion;
 public:	
 	ReachStateData();
@@ -121,7 +122,7 @@ public:
 	SRT getBlendPoseState(SrVec paraPos, float refTime);
 	SRT getPoseState(BodyMotionFrame& frame);
 	bool useInterpolation();	
-	float XZDistanceToTarget();
+	float XZDistanceToTarget(SrVec& pos);
 };
 
 class ReachStateInterface
@@ -149,17 +150,6 @@ public:
 	virtual std::string nextState(ReachStateData* rd);	
 	virtual std::string curStateName() { return "Idle"; }
 };
-
-class ReachStateMove : public ReachStateInterface
-{
-public:
-	virtual void update(ReachStateData* rd);
-	virtual void updateEffectorTargetState(ReachStateData* rd);
-	virtual std::string nextState(ReachStateData* rd);	
-	virtual std::string curStateName() { return "Move"; }
-};
-
-
 
 class ReachStateStart : public ReachStateInterface
 {

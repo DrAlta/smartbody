@@ -27,7 +27,8 @@
 #include "me_ct_reach_IK.hpp"
 #include "gwiz_math.h"
 
-typedef std::set<SkMotion*> MotionDataSet;
+typedef std::pair<int,SkMotion*> TagMotion; // pair the motion with a tag
+typedef std::set<TagMotion> MotionDataSet;
 
 class MeCtReach : public MeController
 {

@@ -346,6 +346,7 @@ void MeCtDataDrivenReach::updateExamplesFromMotions(const MotionDataSet& inMotio
 		resampledPosedata.clearData();
 	}
 
+	/*
 	BOOST_FOREACH(SkMotion* motion, inMotionSet)
 	{
 		if (motionData.find(motion) != motionData.end())
@@ -362,8 +363,9 @@ void MeCtDataDrivenReach::updateExamplesFromMotions(const MotionDataSet& inMotio
 			resampledPosedata.addPose(poseEx,minDist);
 		}
 		motion->disconnect();		
-		motionData.insert(motion);
+		//motionData.insert(motion);
 	}	
+	*/
 	//examplePoseData.buildKDTree();
 }
 

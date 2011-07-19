@@ -145,6 +145,8 @@ protected:
 	// currently, we assume the vis-geo as the geometry ( or an capsule to the child if vis-geo is not available )
 	std::map<std::string, SbmPhysicsObj*> jointPhyObjMap; 	
 
+	ReachEngineMap reachEngineMap;
+
 	// Viseme Curve Info
 	bool	use_viseme_curve;
 	float	viseme_time_offset;
@@ -324,13 +326,14 @@ public:
 	MeCtLocomotionClass* get_locomotion_ct();
 
 public:
-	bool addReachMotion(SkMotion* motion);
+	bool addReachMotion(int tag, SkMotion* motion);
 	SkMotion* getReachMotion(int index);
 	const MotionDataSet& getReachMotionDataSet() const { return reachMotionData;}
 
 	const MotionDataSet& getGrabHandData() const { return grabHandData;}
 	const MotionDataSet& getReachHandData() const { return reachHandData;}
 	const MotionDataSet& getReleaseHandData() const { return releaseHandData;}
+	std::map<int,MeCtReachEngine*>& getReachEngineMap() { return reachEngineMap; }
 	void buildJointPhyObjs();
 	void updateJointPhyObjs();
 	void setJointPhyCollision(bool useCollision);
@@ -357,6 +360,7 @@ public:
 
 	void setHeight( float height )	{ _height = height; }
 	float getHeight( void ) 		{ return _height; }
+	SrVec getFacingDirection() ;
 
 	void setMinVisemeTime(float minTime);
 	float getMinVisemeTime() const;

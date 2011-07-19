@@ -360,19 +360,37 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	this->basic_locomotion_ct->name(bLocoName.c_str());
 
 	// init reach engine
+	// init reach engine
 	{
 		SkJoint* effector = this->skeleton_p->search_joint("r_middle1");
 		if (effector)
 		{
-			this->reachEngine = new MeCtReachEngine(this,this->skeleton_p,effector);
-			reachEngine->init();
-		}
-		else
+			MeCtReachEngine* rengine = new MeCtReachEngine(this,this->skeleton_p);
+			rengine->init(MeCtReachEngine::RIGHT_ARM,effector);
+			this->reachEngineMap[MeCtReachEngine::RIGHT_ARM] = rengine;		
+		}	
+
+		SkJoint* leftEffector = this->skeleton_p->search_joint("l_middle1");
+		if (leftEffector)
 		{
-			reachEngine = NULL;
-		}
-		
+			MeCtReachEngine* rengine = new MeCtReachEngine(this,this->skeleton_p);
+			rengine->init(MeCtReachEngine::LEFT_ARM,leftEffector);
+			this->reachEngineMap[MeCtReachEngine::LEFT_ARM] = rengine;		
+		}	
 	}
+// 	{
+// 		SkJoint* effector = this->skeleton_p->search_joint("r_middle1");
+// 		if (effector)
+// 		{
+// 			this->reachEngine = new MeCtReachEngine(this,this->skeleton_p,effector);
+// 			reachEngine->init();
+// 		}
+// 		else
+// 		{
+// 			reachEngine = NULL;
+// 		}
+// 		
+// 	}
 	//if (use_locomotion) 
 	{
 		this->locomotion_ct =  new MeCtLocomotionClass();
@@ -2348,17 +2366,22 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		if (hand_cmd == "grabhand" || hand_cmd == "reachhand" || hand_cmd == "releasehand")
 		{
 			string motion_name = args.read_token();
+			string tagName = args.read_token();
 			SkMotion* motion = mcu_p->lookUpMotion(motion_name.c_str());
 			//LOG("SbmCharacter::parse_character_command LOG: add motion name : %s ", motion_name.c_str());
+			int reachType = MeCtReachEngine::getReachType(tagName);//
+			if (reachType == -1)
+				reachType = MeCtReachEngine::RIGHT_ARM;
 			if (motion)
 			{
 				//addReachMotion(motion);
+				TagMotion tagMotion = TagMotion(reachType,motion);
 				if (hand_cmd == "grabhand")
-					this->grabHandData.insert(motion);
+					this->grabHandData.insert(tagMotion);
 				else if (hand_cmd == "reachhand")
-					this->reachHandData.insert(motion);
+					this->reachHandData.insert(tagMotion);
 				else if (hand_cmd == "releasehand")
-					this->releaseHandData.insert(motion);
+					this->releaseHandData.insert(tagMotion);
 
 				return CMD_SUCCESS;
 			}
@@ -2375,12 +2398,17 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		bool print_track = false;
 		if (reach_cmd == "add")
 		{			
-			string motion_name = args.read_token();
+			string motion_name = args.read_token();		
+			string tagName = args.read_token();
+			int reachType = MeCtReachEngine::getReachType(tagName);//
+			if (reachType == -1)
+				reachType = MeCtReachEngine::RIGHT_ARM;
 			SkMotion* motion = mcu_p->lookUpMotion(motion_name.c_str());
 			//LOG("SbmCharacter::parse_character_command LOG: add motion name : %s ", motion_name.c_str());
 			if (motion)
 			{
-				addReachMotion(motion);
+				// assume the right hand motion and mirror the left hand motion
+				addReachMotion(reachType,motion);
 				return CMD_SUCCESS;
 			}
 			else
@@ -2400,14 +2428,23 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			return CMD_SUCCESS;
 		}
 		else if (reach_cmd == "build")
-		{
-			//MeCtExampleBodyReach* reachCt = NULL;
-			if (!reachEngine)
+		{			
+			if (reachEngineMap.size() == 0)
 			{
 				LOG("character %s, reach engine is not initialized.", this->name);
-			    return CMD_FAILURE;
-			}			
-			reachEngine->updateMotionExamples(getReachMotionDataSet());
+				return CMD_FAILURE;
+			}				
+			ReachEngineMap::iterator mi;
+			for ( mi  = reachEngineMap.begin();
+				mi != reachEngineMap.end();
+				mi++)
+			{
+				MeCtReachEngine* re = mi->second;
+				if (re)
+				{
+					re->updateMotionExamples(getReachMotionDataSet());
+				}
+			}
 			return (CMD_SUCCESS);
 		}			
 		else if (reach_cmd == "play")
@@ -2418,7 +2455,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			{
 				//motion->name()
 				char cmd[256];
-				sprintf(cmd,"bml char %s <body posture=\"%s\"/>",name,motion->name());
+				sprintf_s(cmd,"bml char %s <body posture=\"%s\"/>",name,motion->name());
 				mcuCBHandle::singleton().execute(cmd);
 			}			
 			return CMD_SUCCESS;
@@ -2730,11 +2767,13 @@ int SbmCharacter::print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	}
 }
 
-bool SbmCharacter::addReachMotion( SkMotion* motion )
+bool SbmCharacter::addReachMotion( int tag, SkMotion* motion )
 {
-	if (reachMotionData.find(motion) == reachMotionData.end()) 
+	TagMotion tagMotion = TagMotion(tag, motion);
+	if (reachMotionData.find(tagMotion) == reachMotionData.end()) 
 	{
-		reachMotionData.insert(motion);
+
+		reachMotionData.insert(tagMotion);
 		return true;
 	}
 	return false;
@@ -2749,7 +2788,7 @@ SkMotion* SbmCharacter::getReachMotion( int index )
 		 vi++)
 	{
 		if (icount == index)
-			return *vi;
+			return vi->second;
 		icount++;
 	}
 	return NULL;
@@ -2763,4 +2802,16 @@ void SbmCharacter::setMinVisemeTime(float minTime)
 float SbmCharacter::getMinVisemeTime() const
 {
 	return _minVisemeTime;
+}
+
+SrVec SbmCharacter::getFacingDirection()
+{
+	float x,y,z,h,p,r;
+	get_world_offset(x,y,z,h,p,r);		
+	SrMat mat;
+	mat.roty(h*(float)M_PI/180.f);
+	SrVec charDir(0.0, 0.0, 1.0f);
+	charDir = charDir*mat;
+	charDir.normalize();
+	return charDir;
 }

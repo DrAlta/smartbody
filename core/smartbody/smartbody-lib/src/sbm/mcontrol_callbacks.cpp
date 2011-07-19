@@ -672,6 +672,28 @@ double parseMotionParameters(std::string m, std::string parameter, double min, d
 	return mParam->getParameter(type);
 }
 
+int mcu_motion_mirror_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p )
+{
+	if (mcu_p)
+	{
+		std::string refMotionName = args.read_token();
+		SkMotion* refMotion = mcu_p->lookUpMotion(refMotionName.c_str());
+		if (refMotion)
+		{
+			std::map<std::string, SkMotion*>& map = mcu_p->motion_map;
+			SkMotion* mirrorMotion = refMotion->buildMirrorMotion();
+			std::string mirrorMotionName = args.read_token();
+			if (mirrorMotionName == EMPTY_STRING)
+				mirrorMotionName = refMotionName + "_mirror";
+			mirrorMotion->name(mirrorMotionName.c_str());
+			map.insert(std::pair<std::string, SkMotion*>(mirrorMotionName, mirrorMotion));
+			return CMD_SUCCESS;
+		}		
+	}
+	return CMD_SUCCESS;
+}
+
+
 int mcu_physics_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
 	if (mcu_p)

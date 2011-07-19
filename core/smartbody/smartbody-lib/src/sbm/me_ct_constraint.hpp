@@ -28,7 +28,7 @@
 #include "me_ct_jacobian_IK.hpp"
 #include "gwiz_math.h"
 
-typedef std::set<SkMotion*> MotionDataSet;
+//typedef std::set<SkMotion*> MotionDataSet;
 
 class EffectorJointConstraint : public EffectorConstraint
 {

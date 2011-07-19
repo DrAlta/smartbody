@@ -64,6 +64,7 @@ int mcu_panim_schedule_func(std::string motion1, std::string charName, bool loop
 int mcu_panim_schedule_func(std::string motion1, std::string motion2, std::string characterName, float weight, bool loop, mcuCBHandle *mcu_p);
 
 int mcu_physics_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_motion_mirror_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 
 //int mcu_character_func( srArgBuffer& args, mcuCBHandle *mcu_p );  // Old version... See SbmCharacter::character_cmd_func
 

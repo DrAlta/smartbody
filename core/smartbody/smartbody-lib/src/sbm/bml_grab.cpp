@@ -55,6 +55,7 @@ const XMLCh ATTR_ATTACH_PAWN[] = L"sbm:attach-pawn";
 const XMLCh ATTR_RELEASE_PAWN[] = L"sbm:release-pawn";
 const XMLCh ATTR_GRAB_VELOCITY[] = L"sbm:grab-velocity";
 const XMLCh ATTR_GRAB_STATE[] = L"sbm:grab-state";
+const XMLCh ATTR_GRAB_TYPE[] = L"sbm:grab-type";
 const XMLCh ATTR_FADE_OUT[]		= L"sbm:fade-out";
 const XMLCh ATTR_FADE_IN[]		= L"sbm:fade-in";
 
@@ -161,6 +162,8 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 		}
 	}
 
+	std::string grabType = xml_parse_string(ATTR_GRAB_TYPE,elem,"right",false);
+
 	const XMLCh* id = elem->getAttribute(ATTR_ID);
 	std::string localId;
 	if (id)
@@ -174,7 +177,7 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 		handCt->handle(handle);
 		SbmCharacter* chr = const_cast<SbmCharacter*>(request->actor);
 		
-		handCt->init(chr->getReachHandData(),chr->getGrabHandData(),chr->getReleaseHandData());		
+		handCt->init(grabType,chr->getReachHandData(),chr->getGrabHandData(),chr->getReleaseHandData());		
 		if (grabVelocity > 0)
 			handCt->grabVelocity = grabVelocity;		
 		bCreateNewController = true;

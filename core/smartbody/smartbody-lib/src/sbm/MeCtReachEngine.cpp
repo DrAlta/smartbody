@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <time.h>
 #include <boost/foreach.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 #include <sr/sr_timer.h>
 #include "MeCtReachEngine.h"
 #include "mcontrol_util.h"
@@ -27,7 +28,9 @@ EffectorConstantConstraint& EffectorConstantConstraint::operator=( const Effecto
 const std::string lFootName[] = {"l_forefoot", "l_ankle" };
 const std::string rFootName[] = {"r_forefoot", "r_ankle" };
 
-MeCtReachEngine::MeCtReachEngine( SbmCharacter* sbmChar, SkSkeleton* sk, SkJoint* effector )
+std::string MeCtReachEngine::ReachTypeTag[REACH_TYPE_SIZE] = { "Right", "Left" };
+
+MeCtReachEngine::MeCtReachEngine( SbmCharacter* sbmChar, SkSkeleton* sk)
 {
 	character = sbmChar;
 	skeletonCopy = new SkSkeleton(sk); 
@@ -36,11 +39,10 @@ MeCtReachEngine::MeCtReachEngine( SbmCharacter* sbmChar, SkSkeleton* sk, SkJoint
 	refMotion = NULL;
 
 	reachCompleteDuration = -1.0;
-	fadingWeight = 0.f;
-
+	fadingWeight = 0.f;	
 	footIKFix = false;
 	initStart = true;
-	reachEndEffector = effector;
+	reachEndEffector = NULL;
 	curHandActionState  = TOUCH_OBJECT;		
 	interpMotion = NULL;
 	motionParameter = NULL;
@@ -56,29 +58,33 @@ MeCtReachEngine::~MeCtReachEngine( void )
 	FREE_DATA(skeletonCopy);	
 }
 
-void MeCtReachEngine::init()
+void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
 {
 	assert(skeletonRef);	
 	assert(character);
 	// root is "world_offset", so we use root->child to get the base joint.
+	reachType = rtype;
+	reachEndEffector = effectorJoint;
 	SkJoint* rootJoint = findRootJoint(skeletonCopy);//findRootJoint(skeletonRef);//skeletonRef->root()->child(0);//skeletonCopy->root()->child(0);//skeletonRef->root()->child(0);	
 	ikScenario.buildIKTreeFromJointRoot(rootJoint);
 	ikCCDScenario.buildIKTreeFromJointRoot(rootJoint);	
 
 	EffectorConstantConstraint* cons = new EffectorConstantConstraint();
 	cons->efffectorName = reachEndEffector->name().get_string();
-	cons->rootName = "r_sternoclavicular";//"r_shoulder";//rootJoint->name().get_string();		
+	std::string consRootName = "r_sternoclavicular";
+	if (reachType == LEFT_ARM)
+		consRootName = "l_sternoclavicular";
+	cons->rootName = consRootName;
 	reachPosConstraint[cons->efffectorName] = cons;
 	// if there is a child	
 	if (reachEndEffector->child(0))
 	{
 		EffectorConstantConstraint* rotCons = new EffectorConstantConstraint();				
-		rotCons->efffectorName = reachEndEffector->name().get_string();//->child(0)->name().get_string();
-		rotCons->rootName = "r_sternoclavicular";//"r_shoulder";//rootJoint->name().get_string();		
+		rotCons->efffectorName = reachEndEffector->name().get_string();
+		rotCons->rootName = consRootName;
 		reachRotConstraint[cons->efffectorName] = rotCons;
 	}	
 	// setup foot constraint
-
 	for (int i=0;i<2;i++)
 	{
 		EffectorConstantConstraint* lFoot = new EffectorConstantConstraint();
@@ -100,17 +106,13 @@ void MeCtReachEngine::init()
 	inputMotionFrame.jointQuat.resize(nodeList.size());
 	ikMotionFrame.jointQuat.reserve(nodeList.size());
 
-	// 	for (int i=0;i<3;i++)
-	// 		_channels.add(rootJoint->name().get_string(), (SkChannel::Type)(SkChannel::XPos+i));
-
 	affectedJoints.clear();	
 	for (unsigned int i=0;i<nodeList.size();i++)
 	{
 		MeCtIKTreeNode* node = nodeList[i];
-		SkJoint* joint = skeletonCopy->linear_search_joint(node->nodeName.c_str());
+		SkJoint* joint = skeletonCopy->linear_search_joint(node->nodeName.c_str());		
 		SkJointQuat* skQuat = joint->quat();		
-		affectedJoints.push_back(joint);	
-		//_channels.add(joint->name().get_string(), SkChannel::Quat);		
+		affectedJoints.push_back(joint);			
 	}		
 
 	SkJoint* copyEffector = skeletonCopy->linear_search_joint(reachEndEffector->name().get_string());
@@ -126,16 +128,14 @@ void MeCtReachEngine::init()
 	SbmCharacter* curCharacter = character;
 
 	reachData = new ReachStateData();
-	reachData->characterHeight = characterHeight;
-	//reachData->reachControl = this;
-	reachData->autoReturnTime = reachCompleteDuration;
+	reachData->characterHeight = characterHeight;		
 	reachData->charName = character->name;
-	reachData->reachRegion = ikReachRegion;
-	reachData->angularVel = 10.0f;
+	reachData->reachRegion = ikReachRegion;	
 	reachData->linearVel = ikDefaultVelocity*0.5f;
 	reachData->curRefTime = 0.f;
 	reachData->motionParameter = motionParameter;
 	reachData->idleRefFrame = reachData->currentRefFrame = reachData->targetRefFrame = idleMotionFrame;	
+	reachData->reachType = reachType;
 
 	EffectorState& estate = reachData->effectorState;
 	estate.effectorName = reachEndEffector->name().get_string();
@@ -144,7 +144,7 @@ void MeCtReachEngine::init()
 
 	stateTable["Idle"] = new ReachStateIdle();
 	stateTable["Start"] = new ReachStateStart();
-	stateTable["Move"] = new ReachStateMove();
+	//stateTable["Move"] = new ReachStateMove();
 	stateTable["Complete"] = new ReachStateComplete();
 	stateTable["NewTarget"] = new ReachStateNewTarget();
 	stateTable["PreReturn"] = new ReachStatePreReturn();
@@ -153,6 +153,8 @@ void MeCtReachEngine::init()
 	handActionTable[PICK_UP_OBJECT] = new ReachHandPickUpAction();
 	handActionTable[TOUCH_OBJECT] = new ReachHandAction(); // default hand action
 	handActionTable[PUT_DOWN_OBJECT] = new ReachHandPutDownAction();
+
+	curReachState = getState("Idle");
 }
 
 void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet )
@@ -174,14 +176,18 @@ void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet )
 		root->pos()->value(i,0.f);
 	}
 
-	BOOST_FOREACH(SkMotion* motion, inMotionSet)
+	BOOST_FOREACH(TagMotion tagMotion, inMotionSet)
 	{
-		if (motionData.find(motion) != motionData.end())
+		if (tagMotion.first != reachType) // only process motion with correct tag 
+			continue;
+
+		SkMotion* motion = tagMotion.second;
+		if (motionData.find(tagMotion) != motionData.end())
 			continue; // we do not process example motions that are already used for this controller instance
 		if (!refMotion)
 			refMotion = motion;
 
-		motionData.insert(motion);
+		motionData.insert(tagMotion);
 		MotionExample* ex = new MotionExample();
 		ex->motion = motion;
 		ex->timeWarp = new SimpleTimeWarp(refMotion->duration(),motion->duration());
@@ -401,7 +407,7 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 	}
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	reachData->hasSteering = (mcu.steerEngine->isInitialized());
+	//reachData->hasSteering = (mcu.steerEngine.isInitialized());
 
 	curReachState->updateEffectorTargetState(reachData);		
 	curReachState->update(reachData);	
@@ -410,7 +416,7 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 
 	if (nextState != curReachState)
 	{
-		//printf("cur State = %s\n",nextState->curStateName().c_str());
+		//printf("engine type = %s,  cur State = %s\n",this->getReachTypeTag().c_str(), nextState->curStateName().c_str());
 		reachData->stateTime = 0.f;
 		curReachState = nextState;
 	}
@@ -442,4 +448,19 @@ bool MeCtReachEngine::addHandConstraint( SkJoint* targetJoint, const char* effec
 		handConstraint[str] = cons;		
 	}
 	return true;
+}
+
+std::string MeCtReachEngine::getReachTypeTag()
+{
+	return ReachTypeTag[reachType];
+}
+
+int MeCtReachEngine::getReachType( std::string tag )
+{
+	for (int i=0;i<REACH_TYPE_SIZE;i++)
+	{
+		if (boost::iequals(tag,ReachTypeTag[i]))
+			return i;
+	}
+	return -1;
 }
