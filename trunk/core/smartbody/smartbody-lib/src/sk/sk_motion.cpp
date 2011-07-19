@@ -34,6 +34,10 @@
 # include <SK/sk_skeleton.h>
 #include "sbm/Event.h"
 #include <algorithm>
+#include <sbm/gwiz_math.h>
+#include <boost/algorithm/string.hpp>
+
+using namespace gwiz;
 
 //============================= SkMotion ============================
 
@@ -97,6 +101,68 @@ void SkMotion::compress()
    _frames.compress ();
    _channels.compress ();
  }
+
+SkMotion* SkMotion::buildMirrorMotion()
+{	
+	SkChannelArray& mchan_arr = this->channels();
+	SkMotion *mirror_p = new SkMotion;
+	mirror_p->synch_points = srSynchPoints(synch_points);
+	mirror_p->init( mchan_arr );
+	int num_f = this->frames();
+	for (int i = 0; i < num_f; i++)
+	{
+		mirror_p->insert_frame( i, this->keytime( i ) );
+		float *ref_p = this->posture( i );
+		float *new_p = mirror_p->posture( i );
+		// go through each channel, and flip the channel value when necessary
+		for (int k=0;k<mchan_arr.size();k++)
+		{
+			SkChannel& chan = mchan_arr[k];
+			std::string jointName = mchan_arr.name(k).get_string();
+			int index = mchan_arr.float_position(k);
+			if (chan.type == SkChannel::XPos)
+			{
+				new_p[index] = -ref_p[index]; // flip x-translation
+			}
+			else if (chan.type == SkChannel::Quat)
+			{
+				// flip rotation for y,z axis
+				euler_t ref_e = quat_t( ref_p[ index ], ref_p[ index + 1 ], ref_p[ index + 2 ], ref_p[ index + 3 ] );
+				quat_t new_q = euler_t( ref_e.x(), -ref_e.y(), -ref_e.z() );
+				new_p[ index + 0 ] = (float)new_q.w();
+				new_p[ index + 1 ] = (float)new_q.x();
+				new_p[ index + 2 ] = (float)new_q.y();
+				new_p[ index + 3 ] = (float)new_q.z();
+			}
+			else
+			{
+				for (int n=0;n<chan.size();n++)
+					new_p[index+n] = ref_p[index+n];
+			}
+		}
+		for (int k=0;k<mchan_arr.size();k++)
+		{
+			SkChannel& chan = mchan_arr[k];
+			std::string jointName = mchan_arr.name(k).get_string();
+			int index = mchan_arr.float_position(k);
+			if (boost::algorithm::starts_with(jointName,"l_"))
+			{
+				std::string jointNameRight = jointName;
+				jointNameRight[0] = 'r';  // get the mirror joint name
+				int rjointIndex = mchan_arr.search( SkJointName( jointNameRight.c_str() ), chan.type );
+				if (rjointIndex < 0)
+					continue;
+				int rindex = mchan_arr.float_position(rjointIndex);				
+				// swap left and right channels
+				for (int n=0;n<chan.size();n++)
+				{
+					std::swap(new_p[rindex+n],new_p[index+n]);
+				}
+			}
+		}				
+	}
+	return mirror_p;
+}
 
 bool SkMotion::create_from_postures ( const SrArray<SkPosture*>& keypost, 
                                       const SrArray<float>& keytime )

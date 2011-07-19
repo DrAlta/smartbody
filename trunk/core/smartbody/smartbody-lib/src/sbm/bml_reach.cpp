@@ -78,13 +78,13 @@ static void buildReachCtExamples(mcuCBHandle* mcu_p, MeCtDataDrivenReach* reachC
 		}
 		else
 		{
-			motionData.insert(motion);
+			//motionData.insert(motion);
 			//reachCt->addMotion(motion);
 		}		
 	}
 	// build example database
-	reachCt->updateExamplesFromMotions(motionData,true,5.f);
-	reachCt->buildResamplePoseData(1500,5.f);
+	//reachCt->updateExamplesFromMotions(motionData,true,5.f);
+	//reachCt->buildResamplePoseData(1500,5.f);
 	
 	//reachCt->buildPoseExamplesFromMotions();	
 	//reachCt->buildResamplePoseData(5.0f);

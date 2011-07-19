@@ -57,6 +57,7 @@ const XMLCh ATTR_TARGET_POS[] = L"sbm:target-pos";
 //const XMLCh ATTR_TARGET_PAWN[] = L"sbm:target-pawn";
 const XMLCh ATTR_REACH_VELOCITY[] = L"sbm:reach-velocity";
 const XMLCh ATTR_REACH_DURATION[] = L"sbm:reach-duration";
+const XMLCh ATTR_REACH_TYPE[] = L"sbm:reach-type";
 const XMLCh ATTR_REACH_FINISH[] = L"sbm:reach-finish";
 const XMLCh ATTR_FOOT_IK[] = L"sbm:foot-ik";
 const XMLCh ATTR_REACH_ACTION[] = L"sbm:action";
@@ -78,11 +79,12 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 
 	MeCtExampleBodyReach* bodyReachCt = NULL; 
 
-	MeCtReachEngine* re = request->actor->reachEngine;
+	SbmCharacter* curCharacter = const_cast<SbmCharacter*>(request->actor);
 
-	if (!re)
+	std::map<int,MeCtReachEngine*>& reMap = curCharacter->getReachEngineMap();
+	if (reMap.size() == 0)
 	{
-		LOG("Character : %s, reach engine is not initialized.",request->actor->name);
+		LOG("Character : %s, no reach engine initialized.",request->actor->name);
 		return BehaviorRequestPtr();
 	}
 
@@ -221,6 +223,8 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		}
 	}
 
+	std::string reachType = xml_parse_string(ATTR_REACH_TYPE,elem,"none",false);
+
 	const XMLCh* attrReachVelocity = elem->getAttribute( ATTR_REACH_VELOCITY );
 	float reachVelocity = -1.f;
 	if(attrReachVelocity != NULL && attrReachVelocity[0] != '\0') 
@@ -266,24 +270,14 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	
 	
 	if (!bodyReachCt)
-	{
-		bodyReachCt = new MeCtExampleBodyReach(re);
+	{		
+		bodyReachCt = new MeCtExampleBodyReach(curCharacter->getReachEngineMap());
 		bodyReachCt->handle(handle);
-		bodyReachCt->init();
+		bodyReachCt->init(curCharacter);
 		bCreateNewController = true;		
-// 		bodyReachCt = new MeCtExampleBodyReach(request->actor->name,request->actor->skeleton_p, effectorJoint);		
-// 		
-// 		SbmCharacter* chr = const_cast<SbmCharacter*>(request->actor);
-// 		float characterHeight = chr->getHeight();
-// 		bodyReachCt->characterHeight = characterHeight;
-// 
-// 		bodyReachCt->init();		
-// 		if (reachVelocity > 0)
-// 		{
-// 			bodyReachCt->setLinearVelocity(reachVelocity);
-// 		}		
-// 		
 	}
+
+	bodyReachCt->setDefaultReachType(reachType);
 
 	const XMLCh* attrReachAction = NULL;
 	attrReachAction = elem->getAttribute(ATTR_REACH_ACTION);

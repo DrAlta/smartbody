@@ -4,7 +4,7 @@
 #include "me_ct_ccd_IK.hpp"
 #include "me_ct_constraint.hpp"
 
-#include <SR/planner/sk_pos_cfg.h>
+#include <sr/planner/sk_pos_cfg.h>
 
 using namespace std;
 
@@ -43,10 +43,10 @@ protected:
 	SkChannelArray	_channels;	
 	GrabState             currentGrabState;
 	BodyMotionFrame       releaseFrame, grabFrame, reachFrame, currentFrame, tempFrame;	
-	
+
 	vector<FingerChain>   fingerChains;
 	vector<SkJoint*>      affectedJoints;
-	
+
 	ConstraintMap         handPosConstraint;
 	ConstraintMap         handRotConstraint;
 
@@ -65,7 +65,7 @@ public:
 	MeCtHand(SkSkeleton* sk, SkJoint* wrist);
 	~MeCtHand(void);	
 
-	void init(const MotionDataSet& reachPose, const MotionDataSet& grabPose, const MotionDataSet& releasePose);
+	void init(std::string grabType, const MotionDataSet& reachPose, const MotionDataSet& grabPose, const MotionDataSet& releasePose);
 
 public:
 	virtual void controller_map_updated();
@@ -77,7 +77,7 @@ public:
 	void set_duration(float duration) { _duration = duration; }
 	virtual const char* controller_type() const		{ return( CONTROLLER_TYPE ); }
 	virtual void print_state( int tabs );
-	
+
 	void setGrabState(GrabState state);
 	void setGrabTargetObject(SbmGeomObject* targetObj);
 
@@ -91,6 +91,7 @@ protected:
 	FingerID findFingerID(const char* jointName);
 	void updateFingerChains( BodyMotionFrame& targetMotionFrame, float maxAngDelta);
 	BodyMotionFrame& findTargetFrame(GrabState state);
+	SkMotion* findTagSkMotion(int tag, const MotionDataSet& motionSet);
 };
 
 

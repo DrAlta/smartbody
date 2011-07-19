@@ -22,6 +22,8 @@ class ReachHandAction;
 using namespace std;
 // used when we want exact control for an end effector
 
+typedef std::map<int,MeCtReachEngine*> ReachEngineMap; 
+
 class MeCtExampleBodyReach :
 	public MeController, public FadingControl
 {
@@ -29,20 +31,27 @@ private:
 	static const char* CONTROLLER_TYPE;
 public:	
 	//enum HandActionState { PICK_UP_OBJECT = 0, TOUCH_OBJECT, PUT_DOWN_OBJECT };
-protected:
-	MeCtReachEngine*      reachEngine;	
+
+protected:	
+	int                   defaultReachType;
+	ReachEngineMap        reachEngineMap;
+	MeCtReachEngine*      currentReachEngine;
 	std::string           characterName;		
-	bool                  footIKFix;
+	bool                  footIKFix;	
+	bool                  isMoving;
+	bool                  startReach;
+	bool                  endReach;
+	float                 autoReturnDuration;
 	vector<SkJoint*>      affectedJoints;		
 	BodyMotionFrame       inputMotionFrame;		
 	float 			      _duration;
 	SkChannelArray	      _channels;
 
 public:	
-	ReachStateData*       reachData;		
+	ReachStateData*       currentReachData;		
 
 public:	
-	MeCtExampleBodyReach(MeCtReachEngine* re);
+	MeCtExampleBodyReach(std::map<int,MeCtReachEngine*>& reMap);
 	virtual ~MeCtExampleBodyReach(void);		
 	virtual void controller_map_updated();
 	virtual void controller_start();	
@@ -53,7 +62,7 @@ public:
 	virtual const char* controller_type() const		{ return( CONTROLLER_TYPE ); }
 	virtual void print_state( int tabs );
 
-	MeCtReachEngine* getReachEngine() const { return reachEngine; }	
+	MeCtReachEngine* getReachEngine() const { return currentReachEngine; }	
 	void set_duration(float duration) { _duration = duration; }
 
 	void setHandActionState(MeCtReachEngine::HandActionState newState);
@@ -65,9 +74,13 @@ public:
 	void setReachTargetPos(SrVec& targetPos);
 	void setFinishReaching(bool isFinish);
 	void setFootIK(bool useIK);
-	void init();	
+	void setDefaultReachType(std::string reachTypeName);
+	void init(SbmPawn* pawn);	
 protected:			
-	void updateChannelBuffer(MeFrameData& frame, BodyMotionFrame& motionFrame, bool bRead = false);			
+	void updateChannelBuffer(MeFrameData& frame, BodyMotionFrame& motionFrame, bool bRead = false);
+	bool updateLocomotion(); // return true if locomotion is finished
+	void updateReachType(SrVec& targetPos); // update the correct reach engine 
+	void setNewReachEngine(MeCtReachEngine* newReachEngine);
 };
 
 

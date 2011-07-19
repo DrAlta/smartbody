@@ -52,11 +52,12 @@ void FingerChain::testCollision( SbmGeomObject* colObj )
 	if (lineSeg.size() < 2 || !colObj)
 		return; // no line
 
+	//printf("line seg size = %d\n",lineSeg.size());
 	for (unsigned int i=1;i<lineSeg.size();i++)
 	{
 		bool isIntersect = colObj->isIntersect(lineSeg[i-1],lineSeg[i],0.001f);
 		if (isIntersect)
-		{
+		{			
 			fingerNodes[i]->lock = true;
 			isLock = true;
 		}
@@ -80,13 +81,13 @@ MeCtHand::MeCtHand( SkSkeleton* sk, SkJoint* wrist)
 	grabTarget = NULL;
 	attachedPawn = NULL;
 	currentGrabState = GRAB_RETURN;
-	grabVelocity = 7.f;
+	grabVelocity = 15.f;
 	_duration = -1.f;	
 }
 
 MeCtHand::~MeCtHand( void )
 {
-	
+
 }
 
 void MeCtHand::attachPawnTarget( SbmPawn* pawn, std::string jointName )
@@ -139,8 +140,26 @@ void MeCtHand::setGrabTargetObject( SbmGeomObject* targetObj )
 	//setGrabState(GRAB_START);	
 }
 
-void MeCtHand::init(const MotionDataSet& reachPose, const MotionDataSet& grabPose, const MotionDataSet& releasePose)
+SkMotion* MeCtHand::findTagSkMotion( int tag, const MotionDataSet& motionSet )
 {
+	MotionDataSet::const_iterator vi;
+	for ( vi  = motionSet.begin();
+		vi != motionSet.end();
+		vi++)
+	{
+		TagMotion tagMotion = *vi;
+		if (tagMotion.first == tag)
+			return tagMotion.second;
+	}
+	return NULL;
+}
+
+void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const MotionDataSet& grabPose, const MotionDataSet& releasePose)
+{
+	int type = MeCtReachEngine::getReachType(grabType);
+	if (type == -1)
+		type = MeCtReachEngine::RIGHT_ARM;
+
 	ikScenario.buildIKTreeFromJointRoot(wristJoint);
 	fingerChains.resize(MeCtHand::F_NUM_FINGERS);
 	for (unsigned int i=0;i<ikScenario.ikTreeNodes.size();i++)
@@ -149,6 +168,7 @@ void MeCtHand::init(const MotionDataSet& reachPose, const MotionDataSet& grabPos
 		if (!node->child)
 		{
 			FingerID fID = findFingerID(node->nodeName.c_str());
+			//LOG("finger name = %s\n",node->nodeName.c_str());
 			FingerChain& fchain = fingerChains[fID];
 			fchain.init(node);			
 			// add constraint
@@ -174,17 +194,22 @@ void MeCtHand::init(const MotionDataSet& reachPose, const MotionDataSet& grabPos
 		affectedJoints.push_back(joint);	
 		_channels.add(joint->name().get_string(), SkChannel::Quat);		
 	}	
-	if (grabPose.size() > 0 && reachPose.size() > 0 && releasePose.size() > 0)
+	SkMotion *releaseHand, *grabHand, *reachHand;
+	releaseHand = findTagSkMotion(type,releasePose);
+	grabHand = findTagSkMotion(type,grabPose);
+	reachHand = findTagSkMotion(type,reachPose);
+
+	if (releaseHand && grabHand && reachHand)
 	{
 		//printf("set example hand pose\n");
-		releaseFrame.setMotionPose(0.f,skeletonCopy,affectedJoints,*releasePose.begin());
-		grabFrame.setMotionPose(0.f,skeletonCopy,affectedJoints,*grabPose.begin());
-		reachFrame.setMotionPose(0.f,skeletonCopy,affectedJoints,*reachPose.begin());
+		releaseFrame.setMotionPose(0.f,skeletonCopy,affectedJoints,releaseHand);
+		grabFrame.setMotionPose(0.f,skeletonCopy,affectedJoints,grabHand);
+		reachFrame.setMotionPose(0.f,skeletonCopy,affectedJoints,reachHand);
 	}
 	else
 	{
-		//printf("procedurally generate hand pose\n");
-		getPinchFrame(grabFrame,SrVec(-8,-6,0));
+		SrVec vec(-8,-6,0);
+		getPinchFrame(grabFrame,vec);
 	}
 	grabTarget = NULL;//new ColSphere(); // hard coded to sphere for now		
 }
@@ -261,7 +286,7 @@ bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 		bInit = true;
 	}
 
-	
+
 	updateChannelBuffer(frame,tempFrame,true);
 
 	currentFrame.jointQuat[0] = tempFrame.jointQuat[0];
@@ -287,14 +312,14 @@ bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 		{
 			fig.testCollision(grabTarget); // test collision
 		}
-// 		std::vector<SrVec> chainSeg;
-// 		fig.getLineSeg(chainSeg);
-// 		if (!fig.isLock && currentGrabState == GRAB_START && grabTarget->isCollided(chainSeg))		
-// 		{			
-// 			fig.isLock = true;				
-// 		}		
+		// 		std::vector<SrVec> chainSeg;
+		// 		fig.getLineSeg(chainSeg);
+		// 		if (!fig.isLock && currentGrabState == GRAB_START && grabTarget->isCollided(chainSeg))		
+		// 		{			
+		// 			fig.isLock = true;				
+		// 		}		
 	}
-	
+
 	//BodyMotionFrame outMotionFrame = curTargetFrame;
 	ikScenario.getTreeNodeQuat(currentFrame.jointQuat,QUAT_CUR);
 	updateChannelBuffer(frame,currentFrame);
@@ -307,8 +332,8 @@ void MeCtHand::updateFingerChains( BodyMotionFrame& targetMotionFrame, float max
 	{
 		FingerChain& fig = fingerChains[i];		
 		bool bStop = false;
-// 		if (fig.isLock)
-// 			continue;
+		// 		if (fig.isLock)
+		// 			continue;
 		for (unsigned int k=0;k<fig.fingerNodes.size() && !bStop;k++)
 		{			
 			MeCtIKTreeNode* node = fig.fingerNodes[k];
@@ -402,4 +427,3 @@ MeCtHand::FingerID MeCtHand::findFingerID( const char* jointName )
 	}
 	return MeCtHand::F_THUMB;
 }
-

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <time.h>
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 #include <sr/sr_timer.h>
 #include "mcontrol_util.h"
 #include "me_ct_example_body_reach.hpp"
@@ -20,12 +21,38 @@ using namespace boost;
 
 const char* MeCtExampleBodyReach::CONTROLLER_TYPE = "BodyReach";
 
-MeCtExampleBodyReach::MeCtExampleBodyReach( MeCtReachEngine* re )
-{
-	reachEngine = re;
-	reachData = re->getReachData();
-	reachData->reachControl = this;			
+MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMap ) 
+{		
+	currentReachData = NULL;
+	currentReachEngine = NULL;
+
 	_duration = -1.f;	
+	footIKFix = true;
+	isMoving = false;
+	startReach = false;
+	endReach = false;
+	autoReturnDuration = 0.01;
+	defaultReachType = -1;
+	//addDefaultAttributeFloat("reach.autoReturnDuration",0.01f,&autoReturnDuration);
+	//addDefaultAttributeBool("reach.footIK",true,&footIKFix);
+
+	reachEngineMap = reMap;
+	ReachEngineMap::iterator mi;
+	for (mi  = reachEngineMap.begin();
+		mi != reachEngineMap.end();
+		mi++)
+	{
+		MeCtReachEngine* re = mi->second;
+		if (re)
+		{
+			re->getReachData()->reachControl = this;
+		}
+	}
+	if (reachEngineMap.size() > 0)
+	{
+		currentReachEngine = reachEngineMap[MeCtReachEngine::RIGHT_ARM];
+		currentReachData = currentReachEngine->getReachData();
+	}	
 }
 
 MeCtExampleBodyReach::~MeCtExampleBodyReach( void )
@@ -33,88 +60,234 @@ MeCtExampleBodyReach::~MeCtExampleBodyReach( void )
 
 }
 
+void MeCtExampleBodyReach::setDefaultReachType( std::string reachTypeName )
+{
+	defaultReachType = MeCtReachEngine::getReachType(reachTypeName);	
+}
+
 void MeCtExampleBodyReach::setHandActionState( MeCtReachEngine::HandActionState newState )
 {
 	//curHandActionState = newState;	
-	reachEngine->curHandActionState = newState;
+	currentReachEngine->curHandActionState = newState;
 }
 
 
 void MeCtExampleBodyReach::setReachCompleteDuration( float duration )
 {
-	reachData->autoReturnTime = duration;
+	//reachData->autoReturnTime = duration;
+	autoReturnDuration = duration;
 }
 
 void MeCtExampleBodyReach::setFinishReaching( bool isFinish )
 {
-	reachData->endReach = isFinish;
+	//currentReachData->endReach = isFinish;
+	endReach = isFinish;
 }
 
 void MeCtExampleBodyReach::setFootIK( bool useIK )
 {
-	reachEngine->footIKFix = useIK;
-	//footIKFix = useIK;
+	//reachEngine->footIKFix = useIK;
+	footIKFix = useIK;
 }
 
 void MeCtExampleBodyReach::setLinearVelocity( float vel )
 {
-	reachData->linearVel = vel;
+	currentReachData->linearVel = vel;
 }
 
 bool MeCtExampleBodyReach::addHandConstraint( SkJoint* targetJoint, const char* effectorName )
 {
-	return reachEngine->addHandConstraint(targetJoint,effectorName);
+	return currentReachEngine->addHandConstraint(targetJoint,effectorName);
 }
 
 void MeCtExampleBodyReach::setReachTargetPawn( SbmPawn* targetPawn )
 {
 	//reachTargetPawn = targetPawn;	
-	ReachTarget& t = reachData->reachTarget;
-	EffectorState& estate = reachData->effectorState;
+	ReachTarget& t = currentReachData->reachTarget;
+	EffectorState& estate = currentReachData->effectorState;
 
 	t.setTargetPawn(targetPawn);	
-	reachData->startReach = true;	
+	//currentReachData->startReach = true;	
+	startReach = true;
 }
 
 void MeCtExampleBodyReach::setReachTargetJoint( SkJoint* targetJoint )
 {
-	ReachTarget& t = reachData->reachTarget;
+	ReachTarget& t = currentReachData->reachTarget;
 	t.setTargetJoint(targetJoint);
-	reachData->startReach = true;	
+	startReach = true;
+	//currentReachData->startReach = true;	
 }
 
 void MeCtExampleBodyReach::setReachTargetPos( SrVec& targetPos )
 {
-	ReachTarget& t = reachData->reachTarget;
+	ReachTarget& t = currentReachData->reachTarget;
 	SRT ts;
 	ts.tran = targetPos;
 	ts.rot = t.targetState.rot;
 	t.setTargetState(ts);
-	reachData->startReach = true;	
+	//currentReachData->startReach = true;	
+	startReach = true;
+}
+
+bool MeCtExampleBodyReach::updateLocomotion()
+{	
+	// we only move the character when it is idle
+	if (currentReachEngine->getCurrentState()->curStateName() != "Idle")
+		return true;
+
+	float x,y,z,h,p,r;
+	SbmCharacter* character = currentReachEngine->getCharacter();
+	character->get_world_offset(x,y,z,h,p,r);	
+	SrVec curPos = SrVec(x,y,z);
+
+	SrVec targetXZ = currentReachData->reachTarget.getTargetState().tran; targetXZ.y = 0.f;
+	float dist = currentReachData->XZDistanceToTarget(SrVec(x,y,z));		
+	if (dist > character->getHeight()*0.35f && !isMoving && startReach)//currentReachData->startReach) 
+	{	
+		// if the target is far away, move the character first
+		//printf("idle to walk\n");
+		std::string cmd;
+		std::string charName = character->name;		
+		SrVec curXZ = curPos; curXZ.y = 0.f;
+		SrVec targetDir = targetXZ - curXZ; targetDir.normalize();					
+		SrVec steerTarget = curXZ + targetDir*(dist - character->getHeight()*0.2f);
+		float facing = ((float)acos(dot(targetDir,SrVec(0,0,1))))*180.f/(float)M_PI;
+		if (dot(cross(targetDir,SrVec(0,0,1)),SrVec(0,1,0)) > 0.f)
+			facing = -facing;
+		//LOG("facing = %f\n",facing);
+		cmd = "bml char " + charName + " <locomotion target=\"" + boost::lexical_cast<std::string>(steerTarget.x) + " " + 
+			boost::lexical_cast<std::string>(steerTarget.z) + "\"/>";//+ "\" facing=\"" + boost::lexical_cast<std::string>(facing) +"\"/>";//"\" proximity=\"" +  boost::lexical_cast<std::string>(rd->characterHeight*0.8f*0.01f) +"\"/>";
+		//rd->curHandAction->sendReachEvent(cmd);			
+		mcuCBHandle::singleton().execute(const_cast<char*>(cmd.c_str()));
+		isMoving = true;
+		//currentReachData->startReach = false;
+		startReach = false;
+		return false;
+	}
+	else if (!isMoving && startReach)//currentReachData->startReach) // the object is already close to character, no need to move
+	{		
+		//LOG("reach in place\n");
+		updateReachType(targetXZ);
+		//setFadeIn(0.5f);
+		return true;
+	}
+
+	if (isMoving && character->_reachTarget && !character->_lastReachStatus) // character is moving and has reached the target
+	{
+		if (dist < character->getHeight()*0.25f)
+		{			
+			// choose the correct hand
+			//LOG("reach after locomotion\n");
+			updateReachType(targetXZ);
+			//currentReachData->startReach = true;
+			startReach = true;
+			isMoving = false;
+			//setFadeIn(0.5f);
+			return true;
+		}
+		else
+		{
+			LOG("[Reach Controller] Warning : Locomotion can not reach the target\n");
+			//currentReachData->startReach = false;
+			startReach = false;
+			isMoving = false;
+			return true;
+		}					
+	}
+	return false;
+}
+
+void MeCtExampleBodyReach::updateReachType(SrVec& targetPos)
+{
+	if (currentReachEngine->curHandActionState == MeCtReachEngine::PUT_DOWN_OBJECT) // always putdown the object with current hand
+		return;
+
+	float x,y,z,h,p,r;
+	SbmCharacter* character = currentReachEngine->getCharacter();
+	character->get_world_offset(x,y,z,h,p,r);
+	SrVec targetDir = SrVec(targetPos.x - x, 0, targetPos.z - z); targetDir.normalize();
+	SrVec charDir = character->getFacingDirection(); 
+
+
+	MeCtReachEngine* newEngine = currentReachEngine;	
+	SrVec crossDir = cross(targetDir,charDir);
+	//sr_out << "update reach type, target dir = " << targetDir << "   charDir = " << charDir << "   crossDir = " << crossDir << srnl;
+	if (dot(crossDir,SrVec(0,1,0)) > 0 && reachEngineMap.find(MeCtReachEngine::RIGHT_ARM) != reachEngineMap.end() ) // right hand
+	{
+		newEngine = reachEngineMap[MeCtReachEngine::RIGHT_ARM];
+	}
+	else if (reachEngineMap.find(MeCtReachEngine::LEFT_ARM) != reachEngineMap.end())
+	{
+		newEngine = reachEngineMap[MeCtReachEngine::LEFT_ARM];
+	}
+	setNewReachEngine(newEngine);	
+}
+
+
+void MeCtExampleBodyReach::setNewReachEngine( MeCtReachEngine* newEngine )
+{
+	if (newEngine == currentReachEngine) // no need to change if it is already the current engine
+		return;
+
+	ReachStateData* newData = newEngine->getReachData();
+	newData->reachTarget = currentReachData->reachTarget;
+	newData->startReach  = currentReachData->startReach;
+	newData->endReach = currentReachData->endReach;
+	newEngine->curHandActionState = currentReachEngine->curHandActionState;	
+	newEngine->fadingWeight       = currentReachEngine->fadingWeight;
+	currentReachEngine = newEngine;
+	currentReachData   = newData;	
 }
 
 bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 {	
+	//updateDefaultVariables(frame);
 	updateDt((float)t);	
 	updateChannelBuffer(frame,inputMotionFrame,true);	
-	reachEngine->updateReach((float)t,dt,inputMotionFrame);
+
+	// add logic to steer the character if it is too far away
+
+	bool canReach = updateLocomotion();
+	if (defaultReachType != -1 && reachEngineMap.find(defaultReachType) != reachEngineMap.end())
+	{
+		MeCtReachEngine* newEngine = reachEngineMap[defaultReachType];
+		setNewReachEngine(newEngine);
+		//setFadeIn(0.5f);
+	}
+	// update control parameters
+	currentReachEngine->fadingWeight = blendWeight;
+	currentReachData->autoReturnTime = autoReturnDuration;	
+	currentReachEngine->footIKFix    = footIKFix;
+	//if (canReach)
+	if (startReach)
+	{
+		currentReachData->startReach     = startReach;
+		startReach = false;
+	}
+	if (endReach)
+	{
+		currentReachData->endReach = endReach;
+		endReach = false;
+	}
+	currentReachEngine->updateReach((float)t,dt,inputMotionFrame);
+
+	//startReach = currentReachData->startReach;
 
 	// blending the input frame with ikFrame based on current fading
 	bool finishFadeOut = updateFading(dt);
-	reachEngine->fadingWeight = blendWeight;
 	//printf("blend weight = %f\n",blendWeight);
 	BodyMotionFrame outMotionFrame;
-	MotionExampleSet::blendMotionFrame(inputMotionFrame,reachEngine->outputMotion(),blendWeight,outMotionFrame);	
+	MotionExampleSet::blendMotionFrame(inputMotionFrame,currentReachEngine->outputMotion(),blendWeight,outMotionFrame);	
 
-
-	ConstraintMap& handConstraint = reachEngine->getHandConstraint();
+	ConstraintMap& handConstraint = currentReachEngine->getHandConstraint();
 	ConstraintMap::iterator si;
 	for ( si  = handConstraint.begin();
 		si != handConstraint.end();
 		si++)
 	{	
 		EffectorJointConstraint* cons = dynamic_cast<EffectorJointConstraint*>(si->second);//rotConstraint[i];
-		SrVec targetPos = reachEngine->getMotionParameter()->getMotionFrameJoint(outMotionFrame,cons->efffectorName.c_str())->gmat().get_translation();
+		SrVec targetPos = currentReachEngine->getMotionParameter()->getMotionFrameJoint(outMotionFrame,cons->efffectorName.c_str())->gmat().get_translation();
 		for (int k=0;k<3;k++)
 			cons->targetJoint->pos()->value(k,targetPos[k]);		
 		cons->targetJoint->update_gmat();
@@ -123,9 +296,9 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	return true;
 }
 
-void MeCtExampleBodyReach::init()
+void MeCtExampleBodyReach::init(SbmPawn* pawn)
 {	
-	IKTreeNodeList& nodeList = reachEngine->ikTreeNodes();
+	IKTreeNodeList& nodeList = currentReachEngine->ikTreeNodes();
 	MeCtIKTreeNode* rootNode = nodeList[0];
 	for (int i=0;i<3;i++)
 		_channels.add(rootNode->joint->name(), (SkChannel::Type)(SkChannel::XPos+i));
@@ -138,8 +311,8 @@ void MeCtExampleBodyReach::init()
 		affectedJoints.push_back(joint);
 		_channels.add(joint->name().get_string(), SkChannel::Quat);		
 	}		
-	blendWeight = reachEngine->fadingWeight;
-	//LOG("init blend weight = %f\n",blendWeight);
+	blendWeight = currentReachEngine->fadingWeight;
+	//LOG("init blend weight = %f\n",blendWeight);	
 	MeController::init();	
 }
 
@@ -211,4 +384,5 @@ void MeCtExampleBodyReach::controller_map_updated()
 {
 
 }
+
 

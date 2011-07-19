@@ -29,7 +29,10 @@ class MeCtReachEngine
 {
 public:
 	enum HandActionState { PICK_UP_OBJECT = 0, TOUCH_OBJECT, PUT_DOWN_OBJECT };
+	enum { RIGHT_ARM = 0, LEFT_ARM, REACH_TYPE_SIZE };
+	static std::string ReachTypeTag[REACH_TYPE_SIZE];
 protected:
+	int           reachType;
 	SbmCharacter* character;
 	SkSkeleton*   skeletonCopy, *skeletonRef;
 	MotionDataSet         motionData;
@@ -62,8 +65,7 @@ protected:
 
 	bool                  initStart;
 	double                ikDamp;
-	float                 ikReachRegion, ikMaxOffset, ikDefaultVelocity;
-	float                 reachCompleteDuration;
+	float                 ikReachRegion, ikMaxOffset, ikDefaultVelocity;	
 
 	MeCtJacobianIK        ik;
 	MeCtCCDIK             ikCCD;
@@ -73,22 +75,28 @@ public:
 	vector<SrVec>         examplePts,resamplePts;
 	HandActionState       curHandActionState;
 	float                 fadingWeight;
+	float                 reachCompleteDuration;
 	bool                  footIKFix;
 
 public:
-	MeCtReachEngine(SbmCharacter* sbmChar, SkSkeleton* sk, SkJoint* effector);
+	MeCtReachEngine(SbmCharacter* sbmChar, SkSkeleton* sk);
 	virtual ~MeCtReachEngine(void);
+	std::string     getReachTypeTag();
+	ReachStateInterface* getCurrentState() { return curReachState; }
+	SbmCharacter*   getCharacter() { return character; }
 	ReachStateData* getReachData() { return reachData; }
 	MotionParameter* getMotionParameter() { return motionParameter; }
 	BodyMotionFrame& outputMotion() { return ikMotionFrame; }
 	IKTreeNodeList& ikTreeNodes() { return ikScenario.ikTreeNodes; }
 	ConstraintMap&  getHandConstraint() { return handConstraint; }
-	bool addHandConstraint(SkJoint* targetJoint, const char* effectorName);
 
+
+	bool addHandConstraint(SkJoint* targetJoint, const char* effectorName);
 	void updateReach(float t, float dt, BodyMotionFrame& inputFrame);
-	void init();
+	void init(int rtype, SkJoint* effectorJoint);
 	void updateMotionExamples(const MotionDataSet& inMotionSet);
 	void solveIK(ReachStateData* rd, BodyMotionFrame& outFrame );
+	static int getReachType(std::string tag);
 protected:
 	void updateSkeletonCopy();
 	ReachStateInterface* getState(std::string stateName);

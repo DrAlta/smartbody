@@ -299,6 +299,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "tip",			mcu_time_ival_prof_func );
 
 	mcu.insert( "panim",		mcu_panim_cmd_func );	
+	mcu.insert( "mirror",       mcu_motion_mirror_cmd_func);
 	mcu.insert( "physics",		mcu_physics_cmd_func );	
 	mcu.insert( "motionplayer", mcu_motion_player_func);
 
