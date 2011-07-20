@@ -5444,7 +5444,9 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		{
 			if (mcu_p->steerEngine)
 			{
-				delete mcu_p->steerEngine;
+				LOG("STEERSIM ALREADY STARTED");
+				return CMD_SUCCESS;
+				//delete mcu_p->steerEngine;
 			}
 			mcu_p->steerEngine = new SteerSuiteEngineDriver();
 			SteerLib::SimulationOptions* steerOptions = new SteerLib::SimulationOptions();
