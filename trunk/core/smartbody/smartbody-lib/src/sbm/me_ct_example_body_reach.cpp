@@ -27,11 +27,11 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMa
 	currentReachEngine = NULL;
 
 	_duration = -1.f;	
-	footIKFix = true;
+	footIKFix = false;
 	isMoving = false;
 	startReach = false;
 	endReach = false;
-	autoReturnDuration = 0.01f;
+	autoReturnDuration = -1.f;//0.01f;
 	defaultReachType = -1;
 	//addDefaultAttributeFloat("reach.autoReturnDuration",0.01f,&autoReturnDuration);
 	//addDefaultAttributeBool("reach.footIK",true,&footIKFix);
@@ -212,14 +212,18 @@ void MeCtExampleBodyReach::updateReachType(SrVec& targetPos)
 
 	MeCtReachEngine* newEngine = currentReachEngine;	
 	SrVec crossDir = cross(targetDir,charDir);
-	//sr_out << "update reach type, target dir = " << targetDir << "   charDir = " << charDir << "   crossDir = " << crossDir << srnl;
-	if (dot(crossDir,SrVec(0,1,0)) > 0 && reachEngineMap.find(MeCtReachEngine::RIGHT_ARM) != reachEngineMap.end() ) // right hand
+
+	if (dot(crossDir,SrVec(0,1,0)) > 0 && isValidReachEngine(MeCtReachEngine::RIGHT_ARM)) // right hand
 	{
-		newEngine = reachEngineMap[MeCtReachEngine::RIGHT_ARM];
-	}
-	else if (reachEngineMap.find(MeCtReachEngine::LEFT_ARM) != reachEngineMap.end())
+		MeCtReachEngine* re = reachEngineMap[MeCtReachEngine::RIGHT_ARM];
+		if (re->isValid())
+			newEngine = reachEngineMap[MeCtReachEngine::RIGHT_ARM];
+	}	
+	else if (isValidReachEngine(MeCtReachEngine::LEFT_ARM))
 	{
-		newEngine = reachEngineMap[MeCtReachEngine::LEFT_ARM];
+		MeCtReachEngine* re = reachEngineMap[MeCtReachEngine::LEFT_ARM];
+		if (re->isValid())
+			newEngine = reachEngineMap[MeCtReachEngine::LEFT_ARM];
 	}
 	setNewReachEngine(newEngine);	
 }
@@ -283,8 +287,8 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	ConstraintMap& handConstraint = currentReachEngine->getHandConstraint();
 	ConstraintMap::iterator si;
 	for ( si  = handConstraint.begin();
-		si != handConstraint.end();
-		si++)
+		  si != handConstraint.end();
+		  si++)
 	{	
 		EffectorJointConstraint* cons = dynamic_cast<EffectorJointConstraint*>(si->second);//rotConstraint[i];
 		SrVec targetPos = currentReachEngine->getMotionParameter()->getMotionFrameJoint(outMotionFrame,cons->efffectorName.c_str())->gmat().get_translation();
@@ -385,4 +389,13 @@ void MeCtExampleBodyReach::controller_map_updated()
 
 }
 
+bool MeCtExampleBodyReach::isValidReachEngine( int reachType )
+{
+	if (reachEngineMap.find(reachType) != reachEngineMap.end())
+		return false;
+
+	//MeCtReachEngine* re = reachEngineMap[reachType];
+	//return re->isValid();
+	return true;
+}
 

@@ -32,6 +32,7 @@ public:
 	enum { RIGHT_ARM = 0, LEFT_ARM, REACH_TYPE_SIZE };
 	static std::string ReachTypeTag[REACH_TYPE_SIZE];
 protected:
+	bool          valid;
 	int           reachType;
 	SbmCharacter* character;
 	SkSkeleton*   skeletonCopy, *skeletonRef;
@@ -91,6 +92,7 @@ public:
 	ConstraintMap&  getHandConstraint() { return handConstraint; }
 
 
+	bool isValid() { return valid; }
 	bool addHandConstraint(SkJoint* targetJoint, const char* effectorName);
 	void updateReach(float t, float dt, BodyMotionFrame& inputFrame);
 	void init(int rtype, SkJoint* effectorJoint);

@@ -81,6 +81,7 @@ protected:
 	bool updateLocomotion(); // return true if locomotion is finished
 	void updateReachType(SrVec& targetPos); // update the correct reach engine 
 	void setNewReachEngine(MeCtReachEngine* newReachEngine);
+	bool isValidReachEngine(int reachType);
 };
 
 

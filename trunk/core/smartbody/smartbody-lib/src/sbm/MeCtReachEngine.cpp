@@ -38,6 +38,8 @@ MeCtReachEngine::MeCtReachEngine( SbmCharacter* sbmChar, SkSkeleton* sk)
 	dataInterpolator = NULL;
 	refMotion = NULL;
 
+	valid = false;
+
 	reachCompleteDuration = -1.0;
 	fadingWeight = 0.f;	
 	footIKFix = false;
@@ -116,14 +118,15 @@ void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
 	}		
 
 	SkJoint* copyEffector = skeletonCopy->linear_search_joint(reachEndEffector->name().get_string());
-	motionParameter = new ReachMotionParameter(skeletonCopy,affectedJoints,copyEffector);
+	SkJoint* copyRoot = skeletonCopy->linear_search_joint(rootJoint->parent()->name().get_string());
+	motionParameter = new ReachMotionParameter(skeletonCopy,affectedJoints,copyEffector,copyRoot);
 	motionExamples.initMotionExampleSet(motionParameter);	
 
 	// initialize all parameters according to scale	
 	float characterHeight = character->getHeight();
 	ikReachRegion = characterHeight*0.02f;	
 	ikDefaultVelocity = characterHeight*0.3f;
-	ikDamp        = ikReachRegion*ikReachRegion*14.0;//characterHeight*0.1f;
+	ikDamp        = ikReachRegion*ikReachRegion*20.0;//characterHeight*0.1f;
 
 	SbmCharacter* curCharacter = character;
 
@@ -207,6 +210,12 @@ void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet )
 		motionExamples.addMotionExample(ex);
 	}	
 
+	if (motionExamples.getExamples().empty()) // no examples
+	{
+		//valid = false;
+		return;
+	}
+
 	if (dataInterpolator)
 		delete dataInterpolator;
 
@@ -225,8 +234,6 @@ void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet )
 			resamplePts.push_back(reachPos);		
 		}
 	}
-
-
 
 	if (interpMotion)
 		delete interpMotion;
@@ -334,6 +341,7 @@ ReachStateInterface* MeCtReachEngine::getState( std::string stateName )
 SkJoint* MeCtReachEngine::findRootJoint( SkSkeleton* sk )
 {
 	SkJoint* rootJoint = sk->root()->child(0); // skip world offset
+	//LOG("ReachEngine Root Name = %s\n",rootJoint->name().get_string());
 	bool bStop = false;
 	while (!bStop)
 	{
