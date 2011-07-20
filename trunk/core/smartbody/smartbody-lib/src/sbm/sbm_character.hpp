@@ -157,6 +157,8 @@ protected:
 	int 	viseme_channel_end_pos;
 	float	*viseme_history_arr;
 
+	std::string _classType;
+
 public:
 	//  Methods
 	SbmCharacter( const char * char_name );
@@ -167,7 +169,7 @@ public:
 	          AUMotionMap* fac_map,
 			  VisemeMotionMap* viseme_map,
 			  GeneralParamMap* param_map,
-			  const char* unreal_class,
+			  const char* classType,
 			  bool use_locomotion,
 			  bool use_param_animation);
 
@@ -364,6 +366,9 @@ public:
 
 	void setMinVisemeTime(float minTime);
 	float getMinVisemeTime() const;
+
+	std::string getClassType();
+	void setClassType(std::string classType);
 
 private:
 

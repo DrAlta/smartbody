@@ -101,6 +101,7 @@ int mcu_load_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 int mcu_net_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_net_reset( srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_net_check( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 int mcu_play_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_stop_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p );

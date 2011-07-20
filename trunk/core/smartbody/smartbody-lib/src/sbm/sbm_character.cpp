@@ -128,7 +128,8 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	steeringAgent = NULL;
 	_numSteeringGoal = 0;
 	_reachTarget = false;
-	_lastReachStatus = true;	
+	_lastReachStatus = true;
+	_classType = "";
 
 	use_viseme_curve = false;
 	viseme_time_offset = 0.0;
@@ -313,7 +314,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
                         AUMotionMap* au_motion_map,
                         VisemeMotionMap* viseme_motion_map,
 						GeneralParamMap* param_map,
-                        const char* unreal_class,
+                        const char* classType,
 						bool use_locomotion,
 						bool use_param_animation)
 {
@@ -331,6 +332,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		return( init_result ); 
 	}
 
+	setClassType(classType);
 	float height = new_skeleton_p->getCurrentHeight();
 	setHeight(height);
 
@@ -497,11 +499,11 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 	steeringAgent = new SteeringAgent(this);
 
-	bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( name, unreal_class, mcuCBHandle::singleton().net_face_bones );
+	bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( name, classType, mcuCBHandle::singleton().net_face_bones );
 
 	if ( mcuCBHandle::singleton().sbm_character_listener )
 	{
-		mcuCBHandle::singleton().sbm_character_listener->OnCharacterCreate( name, unreal_class );
+		mcuCBHandle::singleton().sbm_character_listener->OnCharacterCreate( name, classType );
 	}
 
 	// This needs to be tested
@@ -2803,6 +2805,17 @@ float SbmCharacter::getMinVisemeTime() const
 {
 	return _minVisemeTime;
 }
+
+std::string SbmCharacter::getClassType()
+{
+	return _classType;
+}
+
+void SbmCharacter::setClassType(std::string classType)
+{
+	_classType = classType;
+}
+
 
 SrVec SbmCharacter::getFacingDirection()
 {

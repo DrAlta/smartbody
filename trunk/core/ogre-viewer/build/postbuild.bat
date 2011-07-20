@@ -30,13 +30,19 @@ copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL\activemq-cpp.dll %BIN_DIR%
 
-if not exist ..\media\OgreSDK\media\packs   mkdir ..\media\OgreSDK\media\packs
-if not exist ..\media\OgreSDK\media\models  mkdir ..\media\OgreSDK\media\models
-copy /Y %OGRE_HOME%\media\packs\OgreCore.zip  ..\media\OgreSDK\media\packs
-copy /Y %OGRE_HOME%\media\models\cube.mesh    ..\media\OgreSDK\media\models
-copy /Y %OGRE_HOME%\media\models\sphere.mesh  ..\media\OgreSDK\media\models
+if not exist ..\media\packs   mkdir ..\media\packs
+if not exist ..\media\models  mkdir ..\media\models
+copy /Y %OGRE_HOME%\media\packs\cubemap.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\packs\cubemapsJS.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\packs\dragon.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\packs\fresneldemo.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\packs\ogretestmap.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\packs\skybox.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\packs\OgreCore.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\models\cube.mesh    ..\media\models
+copy /Y %OGRE_HOME%\media\models\sphere.mesh  ..\media\models
 
-copy /Y ..\media\resources.cfg  %BIN_DIR%
+copy /Y %OGRE_BIN%\resources.cfg  %BIN_DIR%
 
 xcopy /Y /Q /E /I /D %BIN_DIR% %FINAL_BIN_DIR%
 xcopy /Y /Q /E /I /D ..\media %FINAL_MEDIA_DIR%
@@ -64,13 +70,19 @@ copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL\activemq-cppd.dll %BIN_DIR%
 
-if not exist ..\media\OgreSDK\media\packs   mkdir ..\media\OgreSDK\media\packs
-if not exist ..\media\OgreSDK\media\models  mkdir ..\media\OgreSDK\media\models
-copy /Y %OGRE_HOME%\media\packs\OgreCore.zip  ..\media\OgreSDK\media\packs
-copy /Y %OGRE_HOME%\media\models\cube.mesh    ..\media\OgreSDK\media\models
-copy /Y %OGRE_HOME%\media\models\sphere.mesh  ..\media\OgreSDK\media\models
+if not exist ..\media\packs   mkdir ..\media\packs
+if not exist ..\media\models  mkdir ..\media\models
+copy /Y %OGRE_HOME%\media\packs\cubemap.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\packs\cubemapsJS.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\packs\dragon.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\packs\fresneldemo.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\packs\ogretestmap.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\packs\skybox.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\packs\OgreCore.zip  ..\media\packs
+copy /Y %OGRE_HOME%\media\models\cube.mesh    ..\media\models
+copy /Y %OGRE_HOME%\media\models\sphere.mesh  ..\media\models
 
-copy /Y ..\media\resources.cfg  %BIN_DIR%
+copy /Y %OGRE_BIN%\resources.cfg  %BIN_DIR%
 
 xcopy /Y /Q /E /I /D %BIN_DIR% %FINAL_BIN_DIR%
 xcopy /Y /Q /E /I /D ..\media %FINAL_MEDIA_DIR%
