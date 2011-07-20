@@ -4237,6 +4237,19 @@ int mcu_net_reset( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	else
 		return (CMD_FAILURE);
 }
+
+int mcu_net_check( srArgBuffer& args, mcuCBHandle *mcu_p ) {
+
+	if (!mcu_p->bonebus.IsOpen())
+	{
+		if (!mcu_p->net_host)
+			mcu_p->net_host = "localhost";
+		return mcu_net_reset(args, mcu_p);
+	}
+	else
+		return CMD_SUCCESS;
+}
+
 /*
 
    net boneupdates <0|1>

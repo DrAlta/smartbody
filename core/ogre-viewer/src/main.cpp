@@ -6,7 +6,7 @@
 *  modify it under the terms of the Lesser GNU General Public License
 *  as published by the Free Software Foundation, version 3 of the
 *  license.
-*
+*s
 *  SmartBody is distributed in the hope that it will be useful,
 *  but WITHOUT ANY WARRANTY; without even the implied warranty of
 *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -26,14 +26,15 @@
 
 #include "vhcl.h"
 #include <windows.h>
-#include <map>
-#include <string>
-#include "Ogre.h"
-#include "OgreTagPoint.h"
-#include "ExampleApplication.h"
 #include "bonebus.h"
 #include "vhmsg-tt.h"
 
+#include <Ogre.h>
+#include <OgreTagPoint.h>
+#include <ExampleApplication.h>
+
+#include <map>
+#include <string>
 
 using std::string;
 using std::vector;
@@ -45,63 +46,7 @@ using namespace bonebus;
 Entity * ent;
 SceneNode * mSceneNode;
 
-std::string skeleton[ 114 ];
-
-
-class LocomotionData
-{
-	public:
-		LocomotionData() 
-		{
-			rps = 0.7f;
-			x_flag = 0;
-			z_flag = 0;
-			rps_flag = 0;
-			spd;
-			x_spd = 7;
-			z_spd = 70;
-			t_direction[200];
-			character[100];
-			char_index = 0;
-			kmode = 0;
-			height_disp = 0.0f;
-			height_disp_delta = 1.0f;
-			height_disp_inc = false;
-			height_disp_dec = false;
-			upkey = false;
-			downkey = false;
-			leftkey = false;
-			rightkey = false;
-			a_key = false;
-			d_key = false;
-
-			off_height_comp = 0.0f;
-		}
-		
-		float rps;
-		int x_flag;
-		int z_flag;
-		int rps_flag;
-		float spd;
-		float x_spd;
-		float z_spd;
-		char t_direction[200];
-		char character[100];
-		int char_index;
-		int kmode;
-		float height_disp;
-		float height_disp_delta;
-		bool height_disp_inc;
-		bool height_disp_dec;
-		bool upkey;
-		bool downkey;
-		bool leftkey;
-		bool rightkey;
-		bool a_key;
-		bool d_key;
-		float off_height_comp;
-};
-
+std::string skeleton[ 115 ];
 
 // Event handler to animate
 class SkeletalAnimationFrameListener : public ExampleFrameListener
@@ -111,22 +56,18 @@ private:
 	BoneBusServer * m_bonebus;
 
 	bool m_ogreMouseEnabled;
-
-	LocomotionData * m_locoData;
-
 	
 protected:
 	bool mQuit;
 
 public:
-	SkeletalAnimationFrameListener(RenderWindow * win, Camera * cam, const std::string & debugText, SceneManager * mgr, BoneBusServer * bonebus ) : ExampleFrameListener( win, cam )
+	SkeletalAnimationFrameListener(RenderWindow * win, Camera * cam, const std::string & debugText, SceneManager * mgr, BoneBusServer * bonebus) : ExampleFrameListener( win, cam )
 	{
 		mDebugText = debugText;
 		mSceneMgr = mgr;
 		m_bonebus = bonebus;
 		mQuit = false;
 		m_ogreMouseEnabled = true;
-		m_locoData = new LocomotionData();
 
 
 		// turn off mouse look by default
@@ -139,188 +80,8 @@ public:
 		rw->setActive( true );
 	}
 
-
-	void CharacterLocomotion( OIS::Keyboard * pkKeyboard )
-	{
-		bool locomotion_cmd = false;
-		char cmd[300];
-		cmd[0] = '\0';
-
-
-		if(m_locoData->x_flag == 0 && m_locoData->z_flag == 0)
-		{
-			m_locoData->rps_flag = 0;
-			m_locoData->z_flag = 1;
-			m_locoData->x_flag = 0;
-			m_locoData->spd = m_locoData->z_spd;
-			sprintf(m_locoData->t_direction, "forward ");
-		}
-
-		/*mcuCBHandle& mcu = mcuCBHandle::singleton();
-		SbmCharacter* actor = NULL;
-		mcu.character_map.reset();
-		for(int i = 0; i <= m_locoData->char_index; ++i)
-		{
-			actor = mcu.character_map.next();
-			if (actor)
-				sprintf(m_locoData->character, "char %s ", actor->name);
-		}*/
-
-		sprintf(cmd, "test loco ");
-		//strcat(cmd, m_locoData->character);
-
-		if(pkKeyboard->isKeyDown(OIS::KC_C))
-		{
-			if(m_locoData->z_flag != 0) m_locoData->z_spd += 10;
-			else if(m_locoData->x_flag != 0) m_locoData->x_spd += 1;
-		}
-		if(pkKeyboard->isKeyDown(OIS::KC_V))
-		{
-			if(m_locoData->z_flag != 0) m_locoData->z_spd -= 10;
-			else if(m_locoData->x_flag != 0) m_locoData->x_spd -= 1;
-			if(m_locoData->z_spd < 0) m_locoData->z_spd = 0;
-			if(m_locoData->x_spd < 0) m_locoData->x_spd = 0;
-		}
-
-		//direction control
-
-		if( pkKeyboard->isKeyDown(OIS::KC_T))
-		{
-			if(!m_locoData->upkey)
-			{
-				m_locoData->rps_flag = 0;
-				m_locoData->z_flag = 1;
-				m_locoData->x_flag = 0;
-				m_locoData->spd = m_locoData->z_spd;
-				m_locoData->kmode = 0;
-				sprintf(m_locoData->t_direction, "forward ");
-				m_locoData->upkey = true;
-			}
-		}
-		else
-		{
-			m_locoData->upkey = false;
-		}
-		if( pkKeyboard->isKeyDown(OIS::KC_G))
-		{
-			if(!m_locoData->downkey)
-			{
-				m_locoData->z_flag = -1;
-				m_locoData->x_flag = 0;
-				m_locoData->rps_flag = 0;
-				m_locoData->spd = m_locoData->z_spd;
-				m_locoData->kmode = 0;
-				sprintf(m_locoData->t_direction, "backward ");
-				m_locoData->downkey = true;
-			}
-		}
-		else
-		{
-			m_locoData->downkey = false;
-		}
-		if(pkKeyboard->isKeyDown(OIS::KC_F))
-		{
-			if(!m_locoData->leftkey)
-			{
-				m_locoData->rps_flag = -1;
-				m_locoData->leftkey = true;
-			}
-		}
-		else
-		{
-			m_locoData->leftkey = false;
-		}
-		if( pkKeyboard->isKeyDown(OIS::KC_H))
-		{
-			if(!m_locoData->rightkey)
-			{
-				m_locoData->rps_flag = 1;
-				m_locoData->rightkey = true;
-			}
-		}
-		else
-		{
-			m_locoData->rightkey = false;
-		}
-
-		if( pkKeyboard->isKeyDown(OIS::KC_Y))//speed control
-		{
-			if(!m_locoData->a_key)
-			{
-				m_locoData->x_flag = 1;
-				m_locoData->z_flag = 0;
-				m_locoData->rps_flag = 0;
-				m_locoData->spd = m_locoData->x_spd;
-				sprintf(m_locoData->t_direction, "leftward ");
-				m_locoData->a_key = true;
-			}
-		}
-		else
-		{
-			m_locoData->a_key = false;
-		}
-
-		if( pkKeyboard->isKeyDown(OIS::KC_R))//speed control
-		{
-			if(!m_locoData->d_key)
-			{
-				m_locoData->x_flag = -1;
-				m_locoData->z_flag = 0;
-				m_locoData->rps_flag = 0;
-				m_locoData->spd = m_locoData->x_spd;
-				sprintf(m_locoData->t_direction, "rightward ");
-				m_locoData->d_key = true;
-			}
-		}
-		else
-		{
-			m_locoData->d_key = false;
-		}
-
-		if(!m_locoData->rightkey && !m_locoData->leftkey)
-		{
-			m_locoData->rps_flag = 0;
-		}
-
-			if(m_locoData->upkey
-			|| m_locoData->downkey
-			|| m_locoData->rightkey
-			|| m_locoData->leftkey
-			|| m_locoData->a_key
-			|| m_locoData->d_key)
-		{
-			locomotion_cmd = true;
-		}		
-
-		char tt[200];
-		strcat(cmd, "char brad ");
-		strcat(cmd, m_locoData->t_direction);
-		//sprintf(tt, "spd %f rps %f time 0.5", spd, rps_flag * rps);
-
-		if(m_locoData->kmode == 0) sprintf(tt, "spd 0 rps %f time 0.1", m_locoData->rps_flag * m_locoData->rps);
-		else sprintf(tt, "spd 0 lrps %f angle 3.14159265 time 1.0", m_locoData->rps_flag * m_locoData->rps);
-
-		if(locomotion_cmd) 
-		{
-			strcat(cmd, tt);
-			//printf("\n%s", cmd);
-			//mcu.execute(cmd);
-			vhmsg::ttu_notify2( "sbm", cmd );
-			FILE* fp = fopen("c:\\data\\command.txt", "w+");
-			fprintf(fp, cmd);
-			fclose(fp);
-		}
-	}
-
-
-
-
-
-
 	bool processUnbufferedKeyInput(const FrameEvent& evt)
 	{
-		CharacterLocomotion(mKeyboard);
-
 		if(mKeyboard->isKeyDown(OIS::KC_A))
 			mTranslateVector.x = -mMoveScale;	// Move camera left
 
@@ -333,10 +94,10 @@ public:
 		if(mKeyboard->isKeyDown(OIS::KC_DOWN) || mKeyboard->isKeyDown(OIS::KC_S) )
 			mTranslateVector.z = mMoveScale;	// Move camera backward
 
-		if(mKeyboard->isKeyDown(OIS::KC_PGUP))
+		if(mKeyboard->isKeyDown(OIS::KC_PGUP) || mKeyboard->isKeyDown(OIS::KC_Q) )
 			mTranslateVector.y = mMoveScale;	// Move camera up
 
-		if(mKeyboard->isKeyDown(OIS::KC_PGDOWN))
+		if(mKeyboard->isKeyDown(OIS::KC_PGDOWN) || mKeyboard->isKeyDown(OIS::KC_E) )
 			mTranslateVector.y = -mMoveScale;	// Move camera down
 
 		if(mKeyboard->isKeyDown(OIS::KC_RIGHT))
@@ -408,7 +169,6 @@ public:
 			if (!displayCameraDetails)
 				mDebugText = "";
 		}
-
 
 		// display appropriate scenes
 		if(mKeyboard->isKeyDown(OIS::KC_1))
@@ -489,14 +249,14 @@ public:
 
 		m_bonebus->Update();
 
+		
 		//Limiting the frames per second as otherwise it takes up entire CPU
 		// Setting it to 30, but in effect it comes up to 60 due to granularity issues
 		Ogre::Root::getSingleton().setFrameSmoothingPeriod(0);
 		Ogre::Real ttW;
-		ttW = 1000.0 / FPS_LIMIT - 1000.0 * evt.timeSinceLastFrame;
+		ttW = 1000.0f / FPS_LIMIT - 1000.0f * evt.timeSinceLastFrame;
 		if (ttW > 0)
-			Sleep(ttW); 
-		
+			Sleep(ttW);
 
 		return true;
 	}
@@ -589,8 +349,14 @@ class OgreViewerApplication : public ExampleApplication
 		//used in 'OnBonePosition' function to add up with the deltas.
 		std::map<int,std::map<string,Ogre::Vector3>> characterInitBonePosMap;
 
+		std::map<std::string, std::vector<int>*> m_lastPosTimes;
+		std::map<std::string, std::vector<int>*> m_lastRotTimes;
+		
 	public:
-		OgreViewerApplication() {}
+		OgreViewerApplication()
+		{
+	
+		}
 
 	protected:
 
@@ -603,19 +369,18 @@ class OgreViewerApplication : public ExampleApplication
 			vhmsg::ttu_close();
 		}
 
-		// Just override the mandatory create scene method
-		void createScene()
+		void createDefaultScene()
 		{
 			mSceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_MODULATIVE );
 			mSceneMgr->setShadowTextureSize( 4048 );
-			mSceneMgr->setShadowColour( ColourValue( 0.3, 0.3, 0.3 ) );
+			mSceneMgr->setShadowColour( ColourValue( 0.3f, 0.3f, 0.3f ) );
 
 			// Setup animation default
 			Animation::setDefaultInterpolationMode( Animation::IM_LINEAR );
 			Animation::setDefaultRotationInterpolationMode( Animation::RIM_LINEAR );
 
 			// Set ambient light
-			mSceneMgr->setAmbientLight( ColourValue( 0.2, 0.2, 0.2 ) );
+			mSceneMgr->setAmbientLight( ColourValue( 0.2f, 0.2f, 0.2f ) );
 			//mSceneMgr->setAmbientLight( ColourValue::Black );
 			
 
@@ -630,7 +395,7 @@ class OgreViewerApplication : public ExampleApplication
 
                   l = mSceneMgr->createLight( "WhiteLight" );
                   l->setType( Light::LT_SPOTLIGHT );
-                  l->setPosition( -150, 450, 200 );
+                  l->setPosition( -150.0f, 450.0f, 200.0f );
                   l->setCastShadows( true );
                   l->setPowerScale( 1.0 );
                   
@@ -638,8 +403,8 @@ class OgreViewerApplication : public ExampleApplication
                   //dir = Vector3( 15, 50, 0 );
                   dir.normalise();
                   l->setDirection( dir );
-                  l->setDiffuseColour( 1.24, 1.22, 1.15 );
-                  l->setSpecularColour(0.8, 0.8, 0.9);
+                  l->setDiffuseColour( 1.24f, 1.22f, 1.15f );
+                  l->setSpecularColour(0.8f, 0.8f, 0.9f);
 
                   Light * mR_FillLight;
                   mR_FillLight = mSceneMgr->createLight("R_FillLight");
@@ -649,34 +414,32 @@ class OgreViewerApplication : public ExampleApplication
                   dir = -mR_FillLight->getPosition();
                   dir.normalise();
                   mR_FillLight->setDirection(dir);
-                  mR_FillLight->setDiffuseColour(0.32, 0.37, 0.4);
-                  mR_FillLight->setSpecularColour(0.32, 0.37, 0.4);
+                  mR_FillLight->setDiffuseColour(0.32f, 0.37f, 0.4f);
+                  mR_FillLight->setSpecularColour(0.32f, 0.37f, 0.4f);
 
                   Light * mL_FillLight;
                   mL_FillLight = mSceneMgr->createLight("L_FillLight");
                   mL_FillLight->setType(Light::LT_SPOTLIGHT);
-                  mL_FillLight->setPosition(-1500,100,-100);
-                  mL_FillLight->setSpotlightRange(Degree(30), Degree(50));
+                  mL_FillLight->setPosition(-1500.0f,100.0f,-100.0f);
+                  mL_FillLight->setSpotlightRange(Degree(30.0f), Degree(50.0f));
                   dir = -mL_FillLight->getPosition();
                   dir.normalise();
                   mL_FillLight->setDirection(dir);
-                  mL_FillLight->setDiffuseColour(0.45, 0.42, 0.40);
-                  mL_FillLight->setSpecularColour(0.45, 0.42, 0.40);
+                  mL_FillLight->setDiffuseColour(0.45f, 0.42f, 0.40f);
+                  mL_FillLight->setSpecularColour(0.45f, 0.42f, 0.40f);
 
                   Light * mBounceLight;
                   mBounceLight = mSceneMgr->createLight("BounceLight");
                   mBounceLight->setType(Light::LT_SPOTLIGHT);
-                  mBounceLight->setPosition(-50,-500,400);
-                  mBounceLight->setSpotlightRange(Degree(30), Degree(50));
+                  mBounceLight->setPosition(-50.0f,-500.0f,400.0f);
+                  mBounceLight->setSpotlightRange(Degree(30.0f), Degree(50.0f));
                   dir = -mBounceLight->getPosition();
                   dir.normalise();
                   mBounceLight->setDirection(dir);
-                  mBounceLight->setDiffuseColour(0.37, 0.37, 0.36);
-                  mBounceLight->setSpecularColour(0.37, 0.37, 0.36);
+                  mBounceLight->setDiffuseColour(0.37f, 0.37f, 0.36f);
+                  mBounceLight->setSpecularColour(0.37f, 0.37f, 0.36f);
                   
       #endif
-
-
 
 			// Position the camera
 			mCamera->setPosition( 0, 140, 225 );
@@ -728,7 +491,13 @@ class OgreViewerApplication : public ExampleApplication
 			sceneEntity = mSceneMgr->createEntity("world_entity_vh","vh_basic_level.mesh");
 			sceneNode->attachObject(sceneEntity);
 			sceneNode->setVisible(true);
+		}
 
+		// Just override the mandatory create scene method
+		void createScene()
+		{
+
+			createDefaultScene();
 
 			skeleton[ 0 ] = ""; // unused
 			skeleton[ 1 ] = ""; //"skeleton";
@@ -844,16 +613,19 @@ class OgreViewerApplication : public ExampleApplication
 			skeleton[ 111 ] = "r_thumb2";
 			skeleton[ 112 ] = "r_thumb3";
 			skeleton[ 113 ] = "r_thumb4";
-
-
+			
 			m_bonebus.SetOnClientConnectCallback( OnClientConnect, this );
 			m_bonebus.SetOnCreateCharacterFunc( OnCreateCharacter, this );
 			m_bonebus.SetOnDeleteCharacterFunc( OnDeleteCharacter, this );
+			m_bonebus.SetOnUpdateCharacterFunc( OnUpdateCharacter, this );
 			m_bonebus.SetOnSetCharacterPositionFunc( OnSetCharacterPosition, this );
 			m_bonebus.SetOnSetCharacterRotationFunc( OnSetCharacterRotation, this );
 			m_bonebus.SetOnBoneRotationsFunc( OnBoneRotations, this );
 			m_bonebus.SetOnBonePositionsFunc( OnBonePositions, this );
 			m_bonebus.OpenConnection();
+
+			// ask SmartBody to connect to this server if it hasn't already done so
+			vhmsg::ttu_notify2("sbm", "net_check");
 		}
 
 
@@ -868,19 +640,25 @@ class OgreViewerApplication : public ExampleApplication
 	protected:
 		static void OnClientConnect( const string & clientName, void * userData )
 		{
-			printf( "Client Connected! - %s\n", clientName.c_str() );
+			//printf( "Client Connected! - %s\n", clientName.c_str() );
 		}
 
 
 		static void OnCreateCharacter( const int characterID, const std::string & characterType, const std::string & characterName, const int skeletonType, void * userData )
 		{
-			printf( "Character Create! - %d, %s, %s, %d\n", characterID, characterType.c_str(), characterName.c_str(), skeletonType );
+			//printf( "Character Create! - %d, %s, %s, %d\n", characterID, characterType.c_str(), characterName.c_str(), skeletonType );
 
 			OgreViewerApplication * app = (OgreViewerApplication *)userData;
 
 			char charIdStr[ 16 ];
 			_itoa( characterID, charIdStr, 10 );
 			Entity * ent;
+
+			if (app->mSceneMgr->hasEntity(charIdStr))
+			{
+				// id exists - remove it before creating the character again
+				OnDeleteCharacter(characterID, userData);
+			}
 
 			try
 			{
@@ -905,12 +683,26 @@ class OgreViewerApplication : public ExampleApplication
 
 			if (ent == NULL)
 			{
-				printf( "Unable to create character %s", characterName);
+				//printf( "Unable to create character %s", characterName);
 				return;
 			}
 
-			Ogre::Skeleton * skel = ent->getSkeleton();
-			
+			std::vector<int>* lastPosTimes = new std::vector<int>();
+			lastPosTimes->resize(115);
+			std::vector<int>* lastRotTimes = new std::vector<int>();
+			lastRotTimes->resize(115);
+			for (int x = 0; x < 115; x++)
+			{
+				(*lastPosTimes)[x] = -1;
+				(*lastRotTimes)[x] = -1;
+			}
+			app->m_lastPosTimes[charIdStr] = lastPosTimes;
+			app->m_lastRotTimes[charIdStr] = lastRotTimes;
+
+			Ogre::Skeleton* skel = NULL;
+
+			skel = ent->getSkeleton();
+		
 			//Number of the skeleton's bones 
 			int count = skel->getNumBones(); 
 			Ogre::Bone * bone = NULL;
@@ -919,181 +711,39 @@ class OgreViewerApplication : public ExampleApplication
 			std::map<string,Ogre::Vector3> cachedInitialBonePositions;
 
 			//Iterate each bone in skeleton
-			for(int i = 0; i < count; i++) 
-			{ 
-				bone = skel->getBone(i);
-				//Store initial bone position against bone name
-				cachedInitialBonePositions[bone->getName().c_str()] = bone->getInitialPosition();
-			} 
+			Ogre::Skeleton::BoneIterator boneIter = skel->getBoneIterator();
+			while (boneIter.hasMoreElements())
+			{
+				Ogre::Bone* bone = boneIter.getNext();
+				cachedInitialBonePositions[bone->getName()] = bone->getInitialPosition();
+			}
 
 			//Store the map containing the initial bone position using charachter ID
 			app->characterInitBonePosMap[characterID] = cachedInitialBonePositions;
-
-
-	#if 0
-			// testing - create new see-through material
-			{
-				static bool doctor_alpha_once = false;
-				if ( !doctor_alpha_once )
-				{
-					doctor_alpha_once = true;
-
-					MaterialPtr mat = MaterialManager::getSingleton().create("doctor-alpha", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-					Pass* pass = mat->getTechnique(0)->getPass(0);
-					TextureUnitState* tex = pass->createTextureUnitState();
-					//tex->setColourOperationEx(LBX_SOURCE1, LBS_MANUAL, LBS_CURRENT, ColourValue( 0, 0, 0, 0 ) );
-					//tex->setColourOperationEx(LBX_BLEND_MANUAL, LBS_MANUAL, LBS_CURRENT, ColourValue( 0, 0, 0, 1 ) );
-					//pass->setLightingEnabled(false);
-					//pass->setSceneBlending( SBT_TRANSPARENT_ALPHA );
-					pass->setDepthWriteEnabled(false);
-				}
-			}
-
-			ent->setMaterialName( "doctor-alpha" );
-	#endif
-
-
+			
 
 			// Add entity to the scene node
 			SceneNode * mSceneNode = app->mSceneMgr->getRootSceneNode()->createChildSceneNode( charIdStr );
 			mSceneNode->attachObject( ent );
-
-	#if 0
-			// testing - create geometry for the bones
-			{
-				static bool once = false;
-
-				if ( !once )
-				{
-					once = true;
-
-					MaterialPtr mat = MaterialManager::getSingleton().create("red", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-					Pass* pass = mat->getTechnique(0)->getPass(0);
-					TextureUnitState* tex = pass->createTextureUnitState();
-					tex->setColourOperationEx(LBX_SOURCE1, LBS_MANUAL, LBS_CURRENT, ColourValue( 1, 0, 0, 0.9 ) );
-					//pass->setLightingEnabled(false);
-					//pass->setSceneBlending(SBT_ADD);
-					pass->setSceneBlending(SBF_SOURCE_ALPHA, SBF_ONE_MINUS_SOURCE_ALPHA );
-					//pass->setDepthWriteEnabled(false);
-
-					MaterialPtr mat2 = MaterialManager::getSingleton().create("blue", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-					Pass* pass2 = mat2->getTechnique(0)->getPass(0);
-					TextureUnitState* tex2 = pass2->createTextureUnitState();
-					tex2->setColourOperationEx(LBX_SOURCE1, LBS_MANUAL, LBS_CURRENT, ColourValue(0, 0, 1, 0.9 ) );
-					//pass2->setLightingEnabled(false);
-					//pass2->setSceneBlending(SBT_ADD);
-					pass2->setSceneBlending(SBF_SOURCE_ALPHA, SBF_ONE_MINUS_SOURCE_ALPHA );
-					//pass2->setDepthWriteEnabled(false);
-
-					MaterialPtr mat3 = MaterialManager::getSingleton().create("green", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-					Pass* pass3 = mat3->getTechnique(0)->getPass(0);
-					TextureUnitState* tex3 = pass3->createTextureUnitState();
-					tex3->setColourOperationEx(LBX_SOURCE1, LBS_MANUAL, LBS_CURRENT, ColourValue(0, 1, 0, 0.9 ) );
-					//pass2->setLightingEnabled(false);
-					//pass2->setSceneBlending(SBT_ADD);
-					pass3->setSceneBlending(SBF_SOURCE_ALPHA, SBF_ONE_MINUS_SOURCE_ALPHA );
-					//pass2->setDepthWriteEnabled(false);
-
-					//targetEnt->setMaterialName("targeter");
-				}
-
-
-
-
-				Skeleton* skeleton; 
-				skeleton = ent->getSkeleton(); 
-
-				//Number of the skeleton's bones 
-				int count = skeleton->getNumBones(); 
-
-				//Create Ankle 
-				for(int i=0; i<count; i++) 
-				{ 
-					Entity* e; 
-					e = app->mSceneMgr->createEntity((string)charIdStr + "_PK_#"+StringConverter::toString(i), "Sphere.mesh"); 
-					e->setMaterialName("red"); 
-					TagPoint *test = ent->attachObjectToBone(skeleton->getBone(i)->getName(), e, Quaternion::IDENTITY, Vector3::ZERO); 
-					test->setScale(0.005, 0.005, 0.005); 
-					//mAnkles.push_back(e); 
-
-					e->setVisibilityFlags( 2 );
-				} 
-
-				//Create Bones 
-				for(int i=0; i<count; i++) 
-				{ 
-					Bone* currBone = skeleton->getBone(i); 
-
-					if(currBone->numChildren() > 0) 
-					{ 
-						for(int j=0; j<count; j++) 
-						{ 
-							Bone* currChild = skeleton->getBone(j); 
-
-							if(currBone == currChild->getParent()) 
-							{ 
-								Entity* e; 
-								e = app->mSceneMgr->createEntity((string)charIdStr + "_PB_#"+StringConverter::toString(i)+"."+StringConverter::toString(j), "cube.mesh"); 
-								e->setMaterialName("blue"); 
-
-								Vector3 diff = currBone->getWorldOrientation().Inverse() * (currChild->getWorldPosition() - currBone->getWorldPosition()); 
-								Quaternion orient = Vector3::UNIT_Z.getRotationTo(diff.normalisedCopy()); 
-								Real length = diff.length(); 
-
-								TagPoint *scaleTP = ent->attachObjectToBone(currBone->getName(), e, orient, diff.midPoint(Vector3::ZERO)); 
-
-								Real bone_scale = 0.002; 
-								scaleTP->setScale(bone_scale,bone_scale,length * 0.01); 
-
-								//mBones.push_back(e); 
-
-								e->setVisibilityFlags( 2 );
-							} 
-						} 
-					} 
-				}
-
-
-				for(int i=0; i<count; i++) 
-				{ 
-					Bone* currBone = skeleton->getBone(i); 
-
-					Matrix3 m = currBone->getLocalAxes();
-
-					Entity* e;
-					TagPoint *scaleTP;
-					Quaternion orient;
-
-					e = app->mSceneMgr->createEntity((string)charIdStr + "_AxisX_#"+StringConverter::toString(i)+".", "cube.mesh"); 
-					e->setMaterialName("red"); 
-					orient = Vector3::UNIT_Z.getRotationTo( m.GetColumn( 0 ) );
-					scaleTP = ent->attachObjectToBone(currBone->getName(), e, orient, Vector3::ZERO);
-					scaleTP->setScale( 0.001, 0.001, 0.06 );
-
-					e = app->mSceneMgr->createEntity((string)charIdStr + "_AxisY_#"+StringConverter::toString(i)+".", "cube.mesh"); 
-					e->setMaterialName("green"); 
-					orient = Vector3::UNIT_Z.getRotationTo( m.GetColumn( 1 ) );
-					scaleTP = ent->attachObjectToBone(currBone->getName(), e, orient, Vector3::ZERO);
-					scaleTP->setScale( 0.001, 0.001, 0.06 );
-
-					e = app->mSceneMgr->createEntity((string)charIdStr + "_AxisZ_#"+StringConverter::toString(i)+".", "cube.mesh"); 
-					e->setMaterialName("blue"); 
-					orient = Vector3::UNIT_Z.getRotationTo( m.GetColumn( 2 ) );
-					scaleTP = ent->attachObjectToBone(currBone->getName(), e, orient, Vector3::ZERO);
-					scaleTP->setScale( 0.001, 0.001, 0.06 );
-				}
-
-
-			}
-	#endif
-
-			
 		}
 
 
+		static void OnUpdateCharacter( const int characterID, const std::string & characterType, const std::string & characterName, const int skeletonType, void * userData )
+		{
+			//printf( "Character Update! - %d, %s, %s, %d\n", characterID, characterType.c_str(), characterName.c_str(), skeletonType );
+
+			OgreViewerApplication * app = (OgreViewerApplication *)userData;
+
+			char charIdStr[ 16 ];
+			_itoa( characterID, charIdStr, 10 );
+
+			if (!app->mSceneMgr->hasEntity(charIdStr))
+				OnCreateCharacter(characterID, characterType, characterName, skeletonType, userData);			
+		}
+
 		static void OnDeleteCharacter( const int characterID, void * userData )
 		{
-			printf( "Character Delete! - %d\n", characterID );
+			//printf( "Character Delete! - %d\n", characterID );
 
 			OgreViewerApplication * app = (OgreViewerApplication *)userData;
 
@@ -1105,12 +755,14 @@ class OgreViewerApplication : public ExampleApplication
 			app->mSceneMgr->getRootSceneNode()->removeAndDestroyChild( charIdStr );
 			//Remove initial bone positions for the character
 			app->characterInitBonePosMap.erase(characterID);
+
+		
 		}
 
 
 		static void OnSetCharacterPosition( const int characterID, const float x, const float y, const float z, void * userData )
 		{
-			printf( "Set Character Position! - %d - %5.2f %5.2f %5.2f\n", characterID, x, y, z );
+			//printf( "Set Character Position! - %d - %5.2f %5.2f %5.2f\n", characterID, x, y, z );
 
 			OgreViewerApplication * app = (OgreViewerApplication *)userData;
 
@@ -1132,7 +784,7 @@ class OgreViewerApplication : public ExampleApplication
 
 		static void OnSetCharacterRotation( const int characterID, const float w, const float x, const float y, const float z, void * userData )
 		{
-			printf( "Set Character Rotation! - %d - %5.2f %5.2f %5.2f %5.2f\n", characterID, w, x, y, z );
+			//printf( "Set Character Rotation! - %d - %5.2f %5.2f %5.2f %5.2f\n", characterID, w, x, y, z );
 
 			OgreViewerApplication * app = (OgreViewerApplication *)userData;
 
@@ -1154,7 +806,7 @@ class OgreViewerApplication : public ExampleApplication
 
 		static void OnBoneRotations( const BulkBoneRotations * bulkBoneRotations, void * userData )
 		{
-			printf( "Set Bone Rotations! - %d %d %d\n", bulkBoneRotations->packetId, bulkBoneRotations->charId, bulkBoneRotations->numBoneRotations );
+			//printf( "Set Bone Rotations! - %d %d %d\n", bulkBoneRotations->packetId, bulkBoneRotations->charId, bulkBoneRotations->numBoneRotations );
 
 
 			OgreViewerApplication * app = (OgreViewerApplication *)userData;
@@ -1187,36 +839,50 @@ class OgreViewerApplication : public ExampleApplication
 				return;
 			}
 
-			Ogre::Skeleton * skel = ent->getSkeleton();
+			Ogre::Skeleton* skel = ent->getSkeleton();
+
+			std::map<std::string, std::vector<int>*>::iterator iter = app->m_lastRotTimes.find(charIdStr);
+			if (iter == app->m_lastRotTimes.end())
+				return;
+			std::vector<int>* lastTimes = (*iter).second;
 
 
 			int i;
 			for ( i = 0; i < bulkBoneRotations->numBoneRotations; i++ )
 			{
 				int id = bulkBoneRotations->bones[ i ].boneId;
+				if ((*lastTimes)[i] >= bulkBoneRotations->time)
+				{
+					continue;
+				}
+				(*lastTimes)[i] = bulkBoneRotations->time;
 
 				std::string & boneName = skeleton[ id ];
 
 				if ( boneName == "" )
 					continue;
 
-				Ogre::Bone * bone = skel->getBone( boneName.c_str() );
+				try {
+					Ogre::Bone * bone = skel->getBone( boneName.c_str() );
 
-				if ( bone )
-				{
-					bone->setManuallyControlled( true );
+					if ( bone )
+					{
+						bone->setManuallyControlled( true );
 
-					Quaternion q;
+						Quaternion q;
 
-					q.w = bulkBoneRotations->bones[ i ].rot_w;
-					q.x = bulkBoneRotations->bones[ i ].rot_x;
-					q.y = bulkBoneRotations->bones[ i ].rot_y;
-					q.z = bulkBoneRotations->bones[ i ].rot_z;
+						q.w = bulkBoneRotations->bones[ i ].rot_w;
+						q.x = bulkBoneRotations->bones[ i ].rot_x;
+						q.y = bulkBoneRotations->bones[ i ].rot_y;
+						q.z = bulkBoneRotations->bones[ i ].rot_z;
 
-					bone->setOrientation( q );
+						bone->setOrientation( q );
 
-					//Vector3 v;
-					//v.x = bulkBoneData->bones[ i ].
+						//Vector3 v;
+						//v.x = bulkBoneData->bones[ i ].
+					}
+				} catch (ItemIdentityException&) {
+					printf("Could not find bone name %s", boneName.c_str());
 				}
 			}
 		}
@@ -1224,7 +890,7 @@ class OgreViewerApplication : public ExampleApplication
 
 		static void OnBonePositions( const BulkBonePositions * bulkBonePositions, void * userData )
 		{
-			printf( "Set Bone Positions! - %d %d %d\n", bulkBonePositions->packetId, bulkBonePositions->charId, bulkBonePositions->numBonePositions );
+			//printf( "Set Bone Positions! - %d %d %d\n", bulkBonePositions->packetId, bulkBonePositions->charId, bulkBonePositions->numBonePositions );
 
 
 			OgreViewerApplication * app = (OgreViewerApplication *)userData;
@@ -1250,7 +916,13 @@ class OgreViewerApplication : public ExampleApplication
 				return;
 			}
 
-			Ogre::Skeleton * skel = ent->getSkeleton();
+			Ogre::Skeleton* skel = ent->getSkeleton();
+
+			std::map<std::string, std::vector<int>*>::iterator iter = app->m_lastPosTimes.find(charIdStr);
+			if (iter == app->m_lastPosTimes.end())
+				return;
+			std::vector<int>* lastTimes = (*iter).second;
+
 			//Get map of initial bone positions for the character
 			std::map<string,Ogre::Vector3> cachedInitialBonePositions =
 				app->characterInitBonePosMap[bulkBonePositions->charId];
@@ -1259,32 +931,39 @@ class OgreViewerApplication : public ExampleApplication
 			for ( i = 0; i < bulkBonePositions->numBonePositions; i++ )
 			{
 				int id = bulkBonePositions->bones[ i ].boneId;
+				if ((*lastTimes)[i] >= bulkBonePositions->time)
+				{
+					continue;
+				}
+				(*lastTimes)[i] = bulkBonePositions->time;
 
 				std::string & boneName = skeleton[ id ];
 
 				if ( boneName == "" )
 					continue;
 
-				
+				try {
+					Ogre::Bone * bone = skel->getBone( boneName.c_str() );
 
-				Ogre::Bone * bone = skel->getBone( boneName.c_str() );
+					if ( bone )
+					{
+						bone->setManuallyControlled( true );
+						
+						//Get the initial bone position for the bone using bone name
+						Vector3 initialBonePosition = cachedInitialBonePositions[boneName];
+						Vector3 v;
 
-				if ( bone )
-				{
-					bone->setManuallyControlled( true );
-					
-					//Get the initial bone position for the bone using bone name
-					Vector3 initialBonePosition = cachedInitialBonePositions[boneName];
-					Vector3 v;
+						
+						//Add initial bone position to delta
+						v.x = initialBonePosition.x + bulkBonePositions->bones[ i ].pos_x;
+						v.y = initialBonePosition.y + bulkBonePositions->bones[ i ].pos_y;
+						v.z = initialBonePosition.z + bulkBonePositions->bones[ i ].pos_z;
+						
 
-					
-					//Add initial bone position to delta
-					v.x = initialBonePosition.x + bulkBonePositions->bones[ i ].pos_x;
-					v.y = initialBonePosition.y + bulkBonePositions->bones[ i ].pos_y;
-					v.z = initialBonePosition.z + bulkBonePositions->bones[ i ].pos_z;
-					
-
-					bone->setPosition( v );
+						bone->setPosition( v );
+					}
+				} catch (ItemIdentityException&) {
+					printf("Could not find bone name %s", boneName.c_str());
 				}
 			}
 		}
@@ -1298,7 +977,7 @@ class OgreViewerApplication : public ExampleApplication
 
 		   string sOp = op;
 		   string sArgs = args;
-		   vector< string > splitArgs;
+		   std::vector< string > splitArgs;
 		   vhcl::Tokenize( sArgs, splitArgs );
 
 		   if ( sOp == "vrAllCall" )

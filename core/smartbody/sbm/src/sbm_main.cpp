@@ -326,6 +326,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "vrSpeak",		BML_PROCESSOR::vrSpeak_func );
 
 	mcu.insert( "net_reset",           mcu_net_reset );
+	mcu.insert( "net_check",           mcu_net_check );
 	mcu.insert( "RemoteSpeechReply",   remoteSpeechResult_func );
 	mcu.insert( "RemoteSpeechTimeOut", remoteSpeechTimeOut_func);  // internally routed message
 	mcu.insert( "joint_logger",        joint_logger::start_stop_func );
