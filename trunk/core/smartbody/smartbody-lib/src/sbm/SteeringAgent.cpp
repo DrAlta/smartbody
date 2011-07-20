@@ -44,7 +44,7 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 
 	scootThreshold = 0.02f;	
 	distThreshold = 150.0f;			// exposed, unit: centimeter
-	distDownThreshold = 100.0f;
+	distDownThreshold = 30.0f;
 
 	desiredSpeed = 1.0f;			// exposed, unit: meter/sec
 	facingAngle = -200.0f;			// exposed, unit: deg
@@ -670,10 +670,16 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			}
 		}
 		else
+		{
 			character->_reachTarget = true;
+			facingAngle = -200;
+		}
 	}
 	else if (character->param_animation_ct->isIdle())
 		character->_reachTarget = true;
+
+	if (character->param_animation_ct->isIdle() && (agentToTargetDist < distDownThreshold))
+		stepAdjust = false;
 
 	//---start locomotion
 #if !FastStart	// starting with angle transition
