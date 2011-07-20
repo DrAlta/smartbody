@@ -81,7 +81,9 @@ SRT ReachTarget::getGrabTargetState( SRT& naturalState )
 ReachTarget::ReachTarget()
 {
 	targetPawn = NULL;
+	targetJoint = NULL;
 	useTargetPawn = false;
+	useTargetJoint = false;
 }
 
 void ReachTarget::setTargetState( SRT& ts )

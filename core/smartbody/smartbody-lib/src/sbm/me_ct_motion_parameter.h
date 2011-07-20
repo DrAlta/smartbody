@@ -22,8 +22,9 @@ class ReachMotionParameter : public MotionParameter
 {
 protected:
 	SkJoint* reachJoint;
+	SkJoint* rootJoint;
 public:
-	ReachMotionParameter(SkSkeleton* skel, std::vector<SkJoint*>& joints, SkJoint* rjoint);
+	ReachMotionParameter(SkSkeleton* skel, std::vector<SkJoint*>& joints, SkJoint* rjoint, SkJoint* rootJoint);
 	virtual ~ReachMotionParameter();
 
 	virtual void getPoseParameter(const BodyMotionFrame& frame, dVector& outPara);
