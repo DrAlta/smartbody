@@ -215,15 +215,13 @@ void MeCtExampleBodyReach::updateReachType(SrVec& targetPos)
 
 	if (dot(crossDir,SrVec(0,1,0)) > 0 && isValidReachEngine(MeCtReachEngine::RIGHT_ARM)) // right hand
 	{
-		MeCtReachEngine* re = reachEngineMap[MeCtReachEngine::RIGHT_ARM];
-		if (re->isValid())
-			newEngine = reachEngineMap[MeCtReachEngine::RIGHT_ARM];
+		MeCtReachEngine* re = reachEngineMap[MeCtReachEngine::RIGHT_ARM];		
+		newEngine = reachEngineMap[MeCtReachEngine::RIGHT_ARM];
 	}	
 	else if (isValidReachEngine(MeCtReachEngine::LEFT_ARM))
 	{
-		MeCtReachEngine* re = reachEngineMap[MeCtReachEngine::LEFT_ARM];
-		if (re->isValid())
-			newEngine = reachEngineMap[MeCtReachEngine::LEFT_ARM];
+		MeCtReachEngine* re = reachEngineMap[MeCtReachEngine::LEFT_ARM];		
+		newEngine = reachEngineMap[MeCtReachEngine::LEFT_ARM];
 	}
 	setNewReachEngine(newEngine);	
 }
@@ -392,10 +390,10 @@ void MeCtExampleBodyReach::controller_map_updated()
 bool MeCtExampleBodyReach::isValidReachEngine( int reachType )
 {
 	if (reachEngineMap.find(reachType) != reachEngineMap.end())
-		return false;
+		return true;
 
 	//MeCtReachEngine* re = reachEngineMap[reachType];
 	//return re->isValid();
-	return true;
+	return false;
 }
 
