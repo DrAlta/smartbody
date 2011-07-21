@@ -1426,7 +1426,7 @@ int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 		if( mcu_p->timer_p == NULL )	{
 			LOG( "mcu_time_func NOTICE: %s: TimeRegulator was NOT REGISTERED\n", time_cmd );
-			mcu_p->switch_internal_profiler(); 
+			mcu_p->switch_internal_timer(); 
 		}
 		TimeRegulator *timer_p = mcu_p->timer_p;
 		

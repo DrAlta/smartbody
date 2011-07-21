@@ -318,7 +318,7 @@ SMARTBODY_C_DLL_API bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * nam
       return false;
    }
 
-   SmartbodyCharacter dllChar = g_smartbodyInstances[ sbmHandle ]->GetCharacter( (string)name );
+   SmartbodyCharacter& dllChar = g_smartbodyInstances[ sbmHandle ]->GetCharacter( (string)name );
 
    SBM_CharToCSbmChar( &dllChar, character );
 

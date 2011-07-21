@@ -160,6 +160,11 @@ int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 			return CMD_FAILURE; 
 		}
 		ct_tree_p->add_skeleton( skeleton_p->name(), skeleton_p );
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		if (mcu.sbm_character_listener)
+		{
+			mcu.sbm_character_listener->OnCharacterChanged(name);
+		}
 	}
 
 // 	if (colObj_p)
@@ -546,6 +551,10 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		skeleton->name( skel_name.c_str() );
 		// Init channels
 		skeleton->make_active_channels();
+		if (mcu_p->sbm_character_listener)
+		{
+			mcu_p->sbm_character_listener->OnCharacterChanged(pawn_name);
+		}
 
 		int err = pawn_p->init( skeleton );
 		if( err != CMD_SUCCESS ) {
@@ -997,6 +1006,11 @@ int SbmPawn::create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	skeleton->name( skel_name.c_str() );
 	// Init channels
 	skeleton->make_active_channels();	
+
+	if (mcu_p->sbm_character_listener)
+	{
+		mcu_p->sbm_character_listener->OnCharacterChanged(pawn_and_attribute);
+	}
 
 	int err = pawn_p->init( skeleton );
 
