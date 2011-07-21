@@ -24,7 +24,7 @@
 # include <stdlib.h>
 # include <string.h>
 
-# include <SR/sr_buffer.h>
+# include <sr/sr_buffer.h>
 
 //=== SrBuffer =======================================================================
 

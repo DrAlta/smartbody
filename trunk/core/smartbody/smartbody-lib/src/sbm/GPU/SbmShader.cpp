@@ -3,7 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef WIN32
 #include <direct.h>
+#endif
 
 /************************************************************************/
 /* Shader program class                                                 */
@@ -14,7 +16,7 @@ SbmShaderProgram::SbmShaderProgram()
 	vsID = -1; 
 	fsID = -1;
 	programID = -1;
-	isBuilt = false;
+	isBuilt = false;	
 }
 
 
@@ -176,11 +178,13 @@ void SbmShaderProgram::printOglError(const char* tag)
 /* Shader Manager                                                       */
 /************************************************************************/
 SbmShaderManager* SbmShaderManager::_singleton = NULL;
+int SbmShaderManager::shaderSupport = NO_GPU_SUPPORT;
 
 SbmShaderManager::SbmShaderManager(void)
 {
 	viewer = NULL;
 	shaderInit = false;
+	shaderSupport = NO_GPU_SUPPORT;
 }
 
 void SbmShaderManager::setViewer( SrViewer* vw )
@@ -219,26 +223,32 @@ bool SbmShaderManager::initGLExtension()
 
 	if (!viewer)
 		return false;
+        static int counter = 0;
 
 	//viewer->makeGLContext();
 	glewInit();
-	if (glewIsSupported("GL_VERSION_3_1"))
+    if (glewIsSupported("GL_VERSION_3_0"))
 	{
-		printf("Ready for OpenGL 3.1\n");
+        printf("Ready for OpenGL 3.0\n");
 		shaderInit = true;
+		shaderSupport = SUPPORT_OPENGL_3_0;
 		return true;
 	}
-	else if (glewIsSupported("GL_VERSION_2_0"))
+    else if (glewIsSupported("GL_VERSION_2_0") )
 	{
-		//printf("Ready for OpenGL 2.0\n");
-		shaderInit = false;
-		return false;
+		printf("Ready for OpenGL 2.0, but not for OpenGL 3.0.\n");
+		shaderInit = true; 
+		shaderSupport = SUPPORT_OPENGL_2_0;
+		return true;
 	}
 	else {
-		//printf("OpenGL 2.0 not supported\n");
+		if (counter == 3)
+			printf("OpenGL 3.0 not supported. Please check if the graphics card or driver supported OpenGL 3.0.\n");
 		//exit(1);
+        counter++;
 		return false;
-	}	
+    }
+    //return false;
 }
 
 void SbmShaderManager::addShader( const char* entryName,const char* vsName, const char* fsName, bool shaderFile )

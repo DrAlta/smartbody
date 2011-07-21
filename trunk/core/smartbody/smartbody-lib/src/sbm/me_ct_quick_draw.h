@@ -25,11 +25,11 @@
 
 //////////////////////////////////////////////////////////////////////////////////
 
-#include <SR/sr_hash_table.h>
-#include <SR/sr_buffer.h>
-#include <SK/sk_motion.h>
-#include <SK/sk_skeleton.h>
-#include <ME/me_controller.h>
+#include <sr/sr_hash_table.h>
+#include <sr/sr_buffer.h>
+#include <sk/sk_motion.h>
+#include <sk/sk_skeleton.h>
+#include <me/me_controller.h>
 
 #include "gwiz_math.h"
 
@@ -164,7 +164,7 @@ class MeCtQuickDraw : public MeController	{
     		(SkMotion derives SrSharedClass and has ref/unref methods)
     		The keytimes of m are translated to ensure start from zero. 
     		MeController::init() is automatically called. */
-		void init( SkMotion* mot_p, SkMotion* mot2_p = NULL );
+		void init( SbmPawn* pawn, SkMotion* mot_p, SkMotion* mot2_p = NULL );
 
 		void set_gundraw_duration( float sec );
 		void set_holster_duration( float sec );

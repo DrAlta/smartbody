@@ -7,8 +7,8 @@
 #include <vector>
 #include <math.h>
 
-#include <fltk/Group.h>
-#include <fltk/ScrollGroup.h>
+#include <FL/Fl_Group.H>
+#include <FL/Fl_Scroll.H>
 
 #include <sbm/mcontrol_util.h>
 #include <me/me_ct_blend.hpp>
@@ -18,49 +18,52 @@
 #include <sbm/text_speech.h>
 #include <sbm/remote_speech.h>
 #include <sbm/behavior_scheduler_fixed.hpp>
+#include "sbm/xercesc_utils.hpp"
 
-using namespace fltk;
 
 
-BehaviorWindow::BehaviorWindow(int x, int y, int w, int h, char* name) : Window(w, h, name), GenericViewer(x, y, w, h)
+
+BehaviorWindow::BehaviorWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(w, h, name), GenericViewer(x, y, w, h)
 {
 	this->begin();
 
-	Group* topGroup = new Group(10, 0, w - 10, 30, "Behaviors");
+	Fl_Group* topGroup = new Fl_Group(10, 0, w - 20, 30, "Behaviors");
 	topGroup->begin();
 
-		choiceContexts = new fltk::Choice(100, 0, 200, 20, "Contexts");
+		choiceContexts = new Fl_Choice(100 + topGroup->x(), 0 + topGroup->y(), 200, 20, "Contexts");
 		choiceContexts->callback(ContextCB, this);
-		buttonClear = new fltk::Button(350, 0, 100, 20, "Clear");
+		buttonClear = new Fl_Button(350 + topGroup->x(), 0 + topGroup->y(), 100, 20, "Clear");
 		buttonClear->callback(ClearCB, this);
-		buttonReplay = new fltk::Button(470, 0, 100, 20, "Replay BML");
+		buttonReplay = new Fl_Button(470 + topGroup->x(), 0 + topGroup->y(), 100, 20, "Replay BML");
 		buttonReplay->callback(ReplayCB, this);
-		Group* topSizer = new Group(590, 0, 10, 0);
+		Fl_Group* topSizer = new Fl_Group(590 + topGroup->x(), 0 + topGroup->y(), 10, 0);
 		
 	topGroup->end();
 	topGroup->resizable(topSizer);
  
-	Group* bottomGroup = new Group(0, 30, w - 10, h - 40);
+	Fl_Group* bottomGroup = new Fl_Group(0, 30, w - 20, h - 40);
 	bottomGroup->begin();
 
-		ScrollGroup* leftGroup = new ScrollGroup(0, 0, w - 210, h - 30);
-		leftGroup->type(ScrollGroup::VERTICAL);
+		Fl_Scroll* leftGroup = new Fl_Scroll(0 + bottomGroup->x(), 0 + bottomGroup->y() , bottomGroup->w() - 250, bottomGroup->h());
+		leftGroup->type(Fl_Scroll::VERTICAL_ALWAYS);
 		leftGroup->begin();
 
-			nleWidget = new BehaviorEditorWidget(0, 0, w - 230, h - 40, "");
-			nleWidget->box(fltk::BORDER_BOX);
+			nleWidget = new BehaviorEditorWidget(0 + leftGroup->x(), 20 + leftGroup->y(), leftGroup->w(), leftGroup->h() - 20, (char*)"");		
+			nleWidget->box(FL_BORDER_BOX);	
+			nleWidget->begin();
+			nleWidget->end();
 
 		leftGroup->end();
 		leftGroup->resizable(nleWidget);
 
-		ScrollGroup* rightGroup = new ScrollGroup(w - 210, 0, 200, h - 40, "Behavior Info");
-		rightGroup->type(ScrollGroup::VERTICAL);
-		rightGroup->box(fltk::BORDER_BOX);
+		Fl_Scroll* rightGroup = new Fl_Scroll(bottomGroup->x() + bottomGroup->w() - 250,  20 + bottomGroup->y(), 250, bottomGroup->h() - 20, "Behavior Info");
+		rightGroup->type(Fl_Scroll::VERTICAL);
+		rightGroup->box(FL_BORDER_BOX);
 		rightGroup->begin();
-			textXML = new fltk::TextDisplay(10, 10, 180, rightGroup->h() - 10);
-			textXML->color(fltk::WHITE);
-			textXML->textcolor(BLACK);
-			bufferXML = new fltk::TextBuffer();
+			textXML = new Fl_Text_Editor(rightGroup->x(), rightGroup->y(), rightGroup->w(), rightGroup->h());
+			textXML->color(FL_WHITE);
+			textXML->textcolor(FL_BLACK);
+			bufferXML = new Fl_Text_Buffer();
 			textXML->buffer(bufferXML);
 			textXML->wrap_mode(true, 0);
 
@@ -76,9 +79,6 @@ BehaviorWindow::BehaviorWindow(int x, int y, int w, int h, char* name) : Window(
 
 	this->resizable(bottomGroup);
 
-	this->x(x);
-	this->y(y);
-
 	contextCounter = 0;
 	selectedContext = "";
 
@@ -87,6 +87,7 @@ BehaviorWindow::BehaviorWindow(int x, int y, int w, int h, char* name) : Window(
 	nle::EditorWidget* behaviorEditorWidget = this->getEditorWidget();
 	behaviorEditorWidget->setModel(nleModel);
 
+	this->size_range(800, 480);
 	updateGUI();
 	redraw();
 }
@@ -109,7 +110,6 @@ void BehaviorWindow::show_viewer()
 
 	this->show();
 	this->updateGUI();
-	this->relayout();
 	this->redraw();
 }
 
@@ -126,12 +126,19 @@ void BehaviorWindow::update_viewer()
 
 int BehaviorWindow::handle(int event)
 {
-	return  Window::handle(event);
+	return  Fl_Double_Window::handle(event);
 }
 
 void BehaviorWindow::show()
 {    
-    Window::show();   
+	nleWidget->setup();
+    Fl_Double_Window::show();   
+}
+
+void BehaviorWindow::resize(int x, int y, int w, int h)
+{    
+    Fl_Double_Window::resize(x, y, w, h);   
+	nleWidget->setup();
 }
       
 void BehaviorWindow::draw()
@@ -146,7 +153,7 @@ void BehaviorWindow::draw()
         }
     }
     
-    Window::draw();   
+    Fl_Double_Window::draw();   
 }
 
 nle::EditorWidget* BehaviorWindow::getEditorWidget()
@@ -180,6 +187,9 @@ void BehaviorWindow::updateGUI()
 	if (selectedContext == "" || selectedContext == "-------")
 	{
 		choiceContexts->value(0);
+		textXML->buffer()->remove(0, textXML->buffer()->length());
+		textXML->buffer()->insert(0, "");
+		textXML->redraw();
 	}
 
 	std::string selectedTrackName = "";
@@ -210,25 +220,28 @@ void BehaviorWindow::updateGUI()
 		{   
 			std::string name = block->getName();
 			double startTime = block->getStartTime();
-			double endTime = block->getEndTime();		
-			textXML->buffer()->replace(0, textXML->buffer()->length(), block->getInfo().c_str());
+			double endTime = block->getEndTime();	
+			textXML->buffer()->remove(0, textXML->buffer()->length());
+			textXML->buffer()->insert(0, block->getInfo().c_str());
+			textXML->buffer()->unselect();
+
 			nleWidget->setBlockSelectionChanged(false);
-			textXML->relayout();
 			if (textXML->parent()) 
 			{
-				textXML->parent()->relayout();
 				textXML->parent()->redraw();
 			}
-			else
-			{
-				textXML->redraw();
-			}
+		
+			//textXML->redisplay_range()
+			textXML->redraw();
+			nleWidget->redraw();			
 		}
 		else
 		{
 			textXML->buffer()->remove(0, textXML->buffer()->length());
+			textXML->redraw();
+			nleWidget->redraw();
 		}
-	}
+	}	
 }
 
 
@@ -270,7 +283,7 @@ nle::Track* BehaviorWindow::getSelectedTrack()
     return NULL;
 }
 
-void BehaviorWindow::ClearCB(fltk::Widget* widget, void* data)
+void BehaviorWindow::ClearCB(Fl_Widget* widget, void* data)
 {
 	BehaviorWindow* window = (BehaviorWindow*) data;
 	window->nleWidget->getModel()->clearContexts();
@@ -279,7 +292,7 @@ void BehaviorWindow::ClearCB(fltk::Widget* widget, void* data)
 	window->redraw();
 }
 
-void BehaviorWindow::ReplayCB(fltk::Widget* widget, void* data)
+void BehaviorWindow::ReplayCB(Fl_Widget* widget, void* data)
 {
 	BehaviorWindow* window = (BehaviorWindow*) data;
 
@@ -326,10 +339,10 @@ void BehaviorWindow::ReplayCB(fltk::Widget* widget, void* data)
 
 }
 
-void BehaviorWindow::ContextCB(fltk::Widget* widget, void* data)
+void BehaviorWindow::ContextCB(Fl_Widget* widget, void* data)
 {
 	BehaviorWindow* window = (BehaviorWindow*) data;
-	fltk::Choice* choice = (fltk::Choice*) widget;
+	Fl_Choice* choice = (Fl_Choice*) widget;
 
 	int val = choice->value();
 	if (val < 0)
@@ -344,7 +357,7 @@ void BehaviorWindow::ContextCB(fltk::Widget* widget, void* data)
 		return;
 	}
 
-	fltk::Widget* choiceWidget = choice->child(val);
+	const Fl_Menu_Item* choiceWidget = choice->mvalue();
 
 	std::string contextName = choiceWidget->label();
 	window->nleWidget->getModel()->setContext(contextName);
@@ -397,7 +410,7 @@ void BehaviorWindow::updateBehaviors(BML::BmlRequest* request)
 	requestTrack->addBlock(requestBlock);
 	requestBlock->setStartTime(curTime);
 	requestBlock->setEndTime(curTime + 1);
-	requestBlock->setColor(fltk::GREEN);
+	requestBlock->setColor(FL_GREEN);
 
 	// dump the xml
 	XMLCh tempStr[100];
@@ -406,8 +419,7 @@ void BehaviorWindow::updateBehaviors(BML::BmlRequest* request)
     DOMLSSerializer* theSerializer = ((DOMImplementationLS*)impl)->createLSSerializer();
 	XMLCh* xmlOutput = theSerializer->writeToString(request->doc);
 	theSerializer->release();
-	std::wstring xmlStrWide = xmlOutput;
-	std::string xmlStr(xmlStrWide.begin(), xmlStrWide.end());
+	std::string xmlStr = xml_utils::xml_translate_string(xmlOutput);
 	requestBlock->setInfo(xmlStr);
 
 	std::vector<std::pair<RequestMark*, std::string> > untimedMarks; // marks that have no associated time
@@ -436,7 +448,7 @@ void BehaviorWindow::updateBehaviors(BML::BmlRequest* request)
 				syncPointTime = curTime; // why is this sync point time unset?
 			requestMark->setStartTime(syncPointTime);
 			requestMark->setEndTime(syncPointTime);
-			requestMark->setColor(fltk::RED);
+			requestMark->setColor(FL_RED);
 		}
 		else
 		{
@@ -1043,7 +1055,7 @@ void BehaviorWindow::processControllerRequest(BML::MeControllerRequest* controll
 		track->addBlock(block);
 		block->setStartTime(triggerTime);
 		block->setEndTime(triggerTime + 1);
-	//	block->setColor(fltk::GREEN);
+	//	block->setColor(FL_GREEN);
 		// find the gaze target
 		float x, y, z;
 		SkJoint* joint = gazeController->get_target_joint(x, y, z);
@@ -1158,7 +1170,7 @@ void BehaviorWindow::processControllerRequest(BML::MeControllerRequest* controll
 				// regardless
 				SkMotion* skMotion = motion->motion();
 				duration = skMotion->duration();
-				motionBlock->setColor(fltk::GRAY25);
+				motionBlock->setColor(FL_DARK3);
 
 			}
 			motionBlock->setStartTime(triggerTime);
@@ -1194,7 +1206,7 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 	track->addBlock(block);
 	block->setStartTime(triggerTime);
 	block->setEndTime(triggerTime + 1); // this should be based on sound duration
-	block->setColor(fltk::GREEN);
+	block->setColor(FL_GREEN);
 
 	SmartBody::SpeechInterface* speechInterface = speechRequest->get_speech_interface();
 	char* audioFilename = speechInterface->getSpeechAudioFilename(speechRequest->get_speech_request_id());
@@ -1230,9 +1242,9 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 			strstr << "Id = " << id << std::endl << "Time = " << visemeTime << std::endl << "Weight = " << weight << std::endl << "Duration = " << blendDuration;
 			visemeMark->setInfo(strstr.str());
 			if (weight == 0.0)
-				visemeMark->setColor(fltk::RED);
+				visemeMark->setColor(FL_RED);
 			else if (weight == 1.0)
-				visemeMark->setColor(fltk::GREEN);
+				visemeMark->setColor(FL_GREEN);
 
 			visemeBlock->addMark(visemeMark);
 			if (visemeTime > lastTime)
@@ -1243,8 +1255,8 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 		visemeBlock->setInfo(strstr.str());
 
 
-		stdext::hash_map< SmartBody::RequestId, SmartBody::AudioFileSpeech::SpeechRequestInfo >& speechRequestInfo = audioSpeechInterface->getSpeechRequestInfo();
-		for (stdext::hash_map< SmartBody::RequestId, SmartBody::AudioFileSpeech::SpeechRequestInfo >::iterator iter = speechRequestInfo.begin();
+		std::map< SmartBody::RequestId, SmartBody::AudioFileSpeech::SpeechRequestInfo >& speechRequestInfo = audioSpeechInterface->getSpeechRequestInfo();
+		for (std::map< SmartBody::RequestId, SmartBody::AudioFileSpeech::SpeechRequestInfo >::iterator iter = speechRequestInfo.begin();
 			iter != speechRequestInfo.end();
 			iter++)
 		{
@@ -1262,7 +1274,7 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 			SmartBody::AudioFileSpeech::SpeechRequestInfo& info = (*iter).second;
 			std::stringstream speechTimeStr;
 			speechTimeStr << "Sync Points\n";
-			for(stdext::hash_map< std::string, float >::iterator markerIter = info.timeMarkers.begin();
+			for(std::map< std::string, float >::iterator markerIter = info.timeMarkers.begin();
 				markerIter != info.timeMarkers.end();
 				markerIter++)
 			{
@@ -1324,9 +1336,9 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 					strstr << "Id = " << id << std::endl << "Time = " << visemeTime << std::endl << "Weight = " << weight << std::endl << "Duration = " << blendDuration;
 					visemeMark->setInfo(strstr.str());
 					if (weight == 0.0)
-						visemeMark->setColor(fltk::RED);
+						visemeMark->setColor(FL_RED);
 					else if (weight == 1.0)
-						visemeMark->setColor(fltk::GREEN);
+						visemeMark->setColor(FL_GREEN);
 
 					visemeBlock->addMark(visemeMark);
 					if (visemeTime > lastTime)
@@ -1471,7 +1483,7 @@ void BehaviorWindow::processEventRequest(BML::EventRequest* eventRequest, nle::N
 	eventBlock->setInfo(eventRequest->getMessage());
 	eventBlock->setStartTime(triggerTime);
 	eventBlock->setEndTime(triggerTime + 1);
-	eventBlock->setColor(fltk::WHITE);
+	eventBlock->setColor(FL_WHITE);
 	eventTrack->addBlock(eventBlock);
 	model->addTrack(eventTrack);
 
@@ -1492,7 +1504,7 @@ void BehaviorWindow::processVisemeRequest(BML::VisemeRequest* visemeRequest, nle
 	eventBlock->setName(visemeRequest->getVisemeName());
 	eventBlock->setStartTime(triggerTime + constantSpeedScheduler->startTime);
 	eventBlock->setEndTime(triggerTime + constantSpeedScheduler->endTime);
-	eventBlock->setColor(fltk::WHITE);
+	eventBlock->setColor(FL_WHITE);
 	eventTrack->addBlock(eventBlock);
 	model->addTrack(eventTrack);
 
@@ -1646,7 +1658,7 @@ BehaviorViewerFactory::BehaviorViewerFactory()
 
 GenericViewer* BehaviorViewerFactory::create(int x, int y, int w, int h)
 {
-	BehaviorWindow* behaviorWindow = new BehaviorWindow(x, y, w, h, "Behavior Requests");
+	BehaviorWindow* behaviorWindow = new BehaviorWindow(x, y, w, h, (char*)"Behavior Requests");
 	return behaviorWindow;
 }
 

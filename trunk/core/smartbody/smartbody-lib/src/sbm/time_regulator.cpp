@@ -27,11 +27,11 @@
 
 #include "sbm/time_regulator.h"
 
+#ifdef WIN32
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
 
-#ifdef WIN32
 #ifndef NOMINMAX
 #define NOMINMAX        /* Don't defined min() and max() */
 #endif
@@ -111,6 +111,7 @@ void SBM_sleep_msec( int msec )	{
 	}
 	Sleep( msec );
 #else
+	sleep(msec * 1000);
 	LOG( "SBM_sleep_msec ERR: not implemented" );
 #endif
 }
@@ -136,7 +137,9 @@ double SBM_sleep_wait( double prev_time, double target_dt, bool verbose )	{ // s
 							diff, wait_msec 
 						);
 					}
+					
 					SBM_sleep_msec( wait_msec );
+					
 				}
 				passes++;
 			}

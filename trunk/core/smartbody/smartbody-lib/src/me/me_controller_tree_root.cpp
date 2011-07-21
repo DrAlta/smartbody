@@ -29,13 +29,15 @@
 #include <iostream>
 #include <algorithm>
 
-#include <ME/me_controller_tree_root.hpp>
-#include <ME/me_ct_container.hpp>
+#include <me/me_controller_tree_root.hpp>
+#include <me/me_ct_container.hpp>
 
-#include <SR/sr.h>
-#include <SK/sk_channel_array.h>
+#include <sr/sr.h>
+#include <sk/sk_channel_array.h>
 #include <sbm/ResourceManager.h>
 #include "sbm/mcontrol_util.h"
+#include <sbm/sbm_pawn.hpp>
+
 
 using namespace std;
 
@@ -120,8 +122,9 @@ public:
 
 private:
 	// Private classes for MeControllerTreeRoot
-	friend MeControllerTreeRootImpl;
+	friend class MeControllerTreeRootImpl;
 
+protected:
 	void incrementFrameCount( double time );
 		// defined at bottom of this file (refers to _context members)
 
@@ -184,6 +187,7 @@ protected:
 	MeEvaluationLogger* _logger;
 	set<string>         _logged_joints;
 	set<int>            _logged_channel_indices;
+	SbmPawn*			_pawn;
 
 
 public:
@@ -305,12 +309,22 @@ public:
 	void clear() {
 		// Remove controllers
 		// commented out by Shapiro 5/4/11 - need to investigate why this causes a crash in release mode
-//		_controllers.clear(); // yay for smart pointers
+		//_controllers.clear(); // yay for smart pointers
 
 
 		// Remove skeletons
 		if( _skeleton )  // only one in this implementation
 			remove_skeleton( _skeleton->name() );
+	}
+
+	SbmPawn* getPawn()
+	{
+		return _pawn;
+	}
+
+	void setPawn(SbmPawn* pawn)
+	{
+		_pawn = pawn;
 	}
 
 
@@ -370,7 +384,7 @@ public:
 	 *  Returns count of controllers in the tree.
 	 */
     unsigned int count_controllers() 
-    { return _controllers.size(); }
+    { return ( _controllers.size() ); }
 
     /**
 	 *  Returns a pointer to a controller currently in the tree.
@@ -693,6 +707,7 @@ void TreeRootFrameData::remapBuffers( SkChannelArray& cur, SkChannelArray& prev 
 	_buffer.swap( newBuffer );
 	_map.swap( newMap );
 }
+
 
 
 

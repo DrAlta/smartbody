@@ -27,7 +27,7 @@
  * a sphere
  */
 
-# include <SR/sr_vec.h>
+# include <sr/sr_vec.h>
 
 class SrBox;
 

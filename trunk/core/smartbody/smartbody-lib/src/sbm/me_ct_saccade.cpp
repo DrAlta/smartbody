@@ -34,7 +34,8 @@ const char* eyeballR = "eyeball_right";
 MeCtSaccade::MeCtSaccade(SkSkeleton* skel) : MeController()
 {
 	_skeleton = skel;
-	skel->ref();
+	if (skel)
+		skel->ref();
 
 	_useModel = true;
 	_valid = false;
@@ -90,6 +91,15 @@ MeCtSaccade::MeCtSaccade(SkSkeleton* skel) : MeController()
 	_slope = 0.0024f;		// unit: sec/degree
 
 	srand((unsigned int)time(0));
+
+	//DoubleAttribute* hf = new DoubleAttribute("saccade.talkingLimit");
+	//hf->setDefaultValue(5.0);
+	//hf->setValue(5.0);
+	//_defaultAttributes.push_back(hf);
+	//addDefaultAttributeDouble("saccade.talkingLimit", 5, &_talkingLimit);	
+	addDefaultAttributeFloat("saccade.talkingLimit", 5.f, &_talkingLimit);
+	addDefaultAttributeFloat("saccade.talkingPercentMutual", 41.0f, &_talkingPercentMutual);
+
 }
 
 MeCtSaccade::~MeCtSaccade()
@@ -99,6 +109,8 @@ MeCtSaccade::~MeCtSaccade()
 
 void MeCtSaccade::spawnOnce(float dir, float amplitude, float dur)
 {
+	if ((float)mcuCBHandle::singleton().time < (_time + _dur))
+		return;
 	_direction = dir;
 	_magnitude = amplitude;
 	_dur = dur;
@@ -109,6 +121,7 @@ void MeCtSaccade::spawnOnce(float dir, float amplitude, float dur)
 	_axis = cross(vec1, vec2);
 	_lastFixedRotation = _fixedRotation;
 	_fixedRotation = SrQuat(_axis, _magnitude * (float)M_PI / 180.0f);
+
 	_time = (float)mcuCBHandle::singleton().time;
 }
 
@@ -154,7 +167,10 @@ void MeCtSaccade::processing(double t, MeFrameData& frame)
 		return;
 
 	if ((t > (_time + _dur)) && !_useModel)
+	{
 		_lastFixedRotation = SrQuat();
+		_fixedRotation = SrQuat();
+	}
 	SrQuat rotation = _lastFixedRotation;
 	if (t >= _time && t <= (_time + _dur))
 	{
@@ -334,7 +350,7 @@ float MeCtSaccade::duration(float amplitude)	// amplitude unit: degree
 	return dur;
 }
 
-void MeCtSaccade::init(MeFrameData& frame)
+void MeCtSaccade::initSaccade(MeFrameData& frame)
 {
 	if (!_context)
 		return;
@@ -362,11 +378,11 @@ void MeCtSaccade::init(MeFrameData& frame)
 	_listeningAwayVariant = 7.1f * (float)_dt;
 	// below data is made up
 	_thinkingMean = 180.0f * (float)_dt;
-	_thinkingVariant = 47.0f * (float)_dt;
+	_thinkingVariant = 47.0f * (float)_dt;    
 }
 
 bool MeCtSaccade::controller_evaluate(double t, MeFrameData& frame)
-{
+{	
 	if (_prevTime == 0)
 		_dt = 0.016;
 	else
@@ -375,7 +391,7 @@ bool MeCtSaccade::controller_evaluate(double t, MeFrameData& frame)
 		_prevTime = t;
 	}
 	SrBuffer<float>& buff = frame.buffer();
-	init(frame);
+	initSaccade(frame);
 	if (_valid)
 	{
 		if (_useModel)

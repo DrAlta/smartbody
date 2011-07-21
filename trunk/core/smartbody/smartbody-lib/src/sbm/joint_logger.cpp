@@ -26,7 +26,7 @@
 #include <sstream>
 #include <string>
 
-#include <ME/me_ct_blend.hpp>
+#include <me/me_ct_blend.hpp>
 
 #include "joint_logger.hpp"
 

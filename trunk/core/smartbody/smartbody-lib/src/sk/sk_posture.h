@@ -24,10 +24,10 @@
 # ifndef SK_POSTURE_H
 # define SK_POSTURE_H
 
-# include <SR/sr_vec.h>
-# include <SR/sr_buffer.h>
+# include <sr/sr_vec.h>
+# include <sr/sr_buffer.h>
 
-# include <SK/sk_channel_array.h>
+# include <sk/sk_channel_array.h>
 
 class SkSkeleton;
 

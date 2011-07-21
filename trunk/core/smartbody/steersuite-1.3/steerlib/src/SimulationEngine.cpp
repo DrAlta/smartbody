@@ -651,8 +651,12 @@ SteerLib::ModuleMetaInformation * SimulationEngine::_loadModule(const std::strin
 		// In this case, the module was not built-in.
 #ifdef _WIN32
 		std::string extension = ".dll";
-#else
-		std::string extension = ".o";
+#endif
+#ifdef __linux__
+		std::string extension = ".so";
+#endif
+#ifdef __APPLE__
+		std::string extension = ".dylib";
 #endif
 
 #ifdef _DEBUG
@@ -1178,7 +1182,7 @@ void SimulationEngine::_dumpModuleDataStructures()
 	std::cerr << "------------------\n";
 	std::map<std::string, SteerLib::ModuleMetaInformation*>::iterator i;
 	for (i=_moduleMetaInfoByName.begin(); i!=_moduleMetaInfoByName.end(); ++i) {
-		std::cerr << "  " << (*i).first << " --> " << hex << (unsigned int)(*i).second->module << "\n";
+		std::cerr << "  " << (*i).first << " --> " << hex << (intptr_t)(*i).second->module << "\n";
 	}
 
 	std::cerr << "\n----------------------\n";
@@ -1186,7 +1190,7 @@ void SimulationEngine::_dumpModuleDataStructures()
 	std::cerr << "----------------------\n";
 	std::map<SteerLib::ModuleInterface*, SteerLib::ModuleMetaInformation*>::iterator j;
 	for (j=_moduleMetaInfoByReference.begin(); j!=_moduleMetaInfoByReference.end(); ++j) {
-		std::cerr << "  " << (unsigned int)(*j).first << " --> " << (*j).second->moduleName << "\n";
+		std::cerr << "  " << (intptr_t)(*j).first << " --> " << (*j).second->moduleName << "\n";
 	}
 
 	std::cerr << "\n-------------------\n";

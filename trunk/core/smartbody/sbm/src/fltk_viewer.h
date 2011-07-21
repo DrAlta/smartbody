@@ -30,17 +30,18 @@
 
 //#define USE_GLEW 1
 #include <sbm/GPU/SbmShader.h>
-#include <fltk/Slider.h>
-#include <fltk/compat/FL/Fl_Menu_Item.H>
-# include <fltk/GlWindow.H>
+#include <FL/Fl_Slider.H>
+#include <FL/Fl_Menu_Button.H>
+#include <FL/Fl_Menu_Item.H>
+# include <FL/Fl_Gl_Window.H>
 # include <sr/sr_viewer.h>
-#include <fltk/Input.h>
+#include <FL/Fl_Input.H>
 # include <sr/sr_color.h>
-# include <SR/sr_light.h>
-# include <SR/sr_timer.h>
-# include <SR/sr_sa_gl_render.h>
-# include <SR/sr_sa_bbox.h>
-# include <fltk/PopupMenu.h>
+# include <sr/sr_light.h>
+# include <sr/sr_timer.h>
+# include <sr/sr_sa_gl_render.h>
+# include <sr/sr_sa_bbox.h>
+# include <FL/Fl_Menu.H>
 
 
 #include "ObjectManipulationHandle.h"
@@ -70,7 +71,7 @@ class MeCtExampleBodyReach;
     In all modes, mouse interaction is done together with Ctrl and Shift modifiers.
     A popup menu appears with a right button click or ctrl+shift+m. */
 
-class FltkViewer : public SrViewer, public fltk::GlWindow 
+class FltkViewer : public SrViewer, public Fl_Gl_Window 
  {
    public : // enumerators
 
@@ -92,9 +93,11 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
                 };
 
 	enum CharacterMode { ModeShowGeometry,
-                      ModeShowCollisionGeometry,
-                      ModeShowBones,
-                      ModeShowAxis
+                         ModeShowCollisionGeometry,
+						 ModeShowDeformableGeometry,
+						 ModeShowDeformableGeometryGPU,
+                         ModeShowBones,
+                         ModeShowAxis
                     };
 
 	enum PawnMode {	  ModeNoPawns,
@@ -145,23 +148,20 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
                    CmdSmooth,
                    CmdFlat,
                    CmdLines,
-                   CmdPoints,
-                   CmdAxis,
+                   CmdPoints,                   
 				   CmdNoShadows,
-				   CmdShadows,
-				   CmdGrid,
-				   CmdNoGrid,
-				   CmdNoSteer,
-				   CmdSteerCharactersGoalsOnly,
-				   CmdSteerAll,
-                   CmdBoundingBox,
-                   CmdStatistics,
+				   CmdShadows,	
 				   CmdCharacterShowGeometry,
 				   CmdCharacterShowCollisionGeometry,
 				   CmdCharacterShowDeformableGeometry,
 				   CmdCharacterShowDeformableGeometryGPU,
 				   CmdCharacterShowBones,
-				   CmdCharacterShowAxis,
+				   CmdCharacterShowAxis,				   					   
+				   CmdAxis,	
+				   CmdBoundingBox,
+				   CmdStatistics,
+				   CmdGrid,
+				   CmdNoGrid,				   
 				   CmdNoPawns,
 				   CmdPawnShowAsSpheres,
 				   CmdCreatePawn,
@@ -194,7 +194,10 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 				   CmdReachNoExamples,
 				   CmdConstraintToggleIK,
 				   CmdConstraintToggleBalance,
-				   CmdConstraintToggleReferencePose,				   
+				   CmdConstraintToggleReferencePose,
+				   CmdNoSteer,
+				   CmdSteerCharactersGoalsOnly,
+				   CmdSteerAll,
                  };
 
    private : // internal data
@@ -206,7 +209,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	ObjectManipulationHandle _objManipulator; // a hack for testing. 
 
  private:
-	 fltk::Input* off_height_window;
+	 Fl_Input* off_height_window;
 
    public : //----> public methods 
 
@@ -336,7 +339,7 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	//void drawLocomotionFootprints();
 	void drawKinematicFootprints(int index);
 	void newPrints(bool newprint, int index, SrVec& pos, SrVec& orientation, SrVec& normal, SrVec& color, int side, int type);
-	static void ChangeOffGroundHeight(fltk::Widget* widget, void* data);
+	static void ChangeOffGroundHeight(Fl_Widget* widget, void* data);
 	void create_pawn();
 
 	int gridList;
@@ -344,7 +347,6 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	float gridHighlightColor[3];
 	float gridSize;
 	float gridStep;
-	float gridHeight;
 
 	SrVec interactivePoint;
 	
@@ -352,13 +354,13 @@ class FltkViewer : public SrViewer, public fltk::GlWindow
 	virtual void show_viewer();
 	virtual void hide_viewer();
 	virtual void makeGLContext();
+
 protected:
 	
 	void set_gaze_target(int itype, const char* targetname);	
 	void set_reach_target(int itype, const char* targetname);	
 	void update_submenus();
-	void create_popup_menus();
-	MeCtDataDrivenReach* getCurrentCharacterReachController();
+	void create_popup_menus();	
 	MeCtExampleBodyReach* getCurrentCharacterBodyReachController();
 	MeCtConstraint*    getCurrentCharacterConstraintController();
 	SbmCharacter*        getCurrentCharacter();
@@ -417,8 +419,8 @@ protected:
    SrSnLines* scenebox;  // contains the bounding box to display, and use in view_all
    SrSnLines* sceneaxis; // the current axis being displayed
 
-   fltk::PopupMenu* menubut; // the ctrl+shift+m or button3 menu
-   fltk::Window* helpwin;
+   Fl_Menu_Button* menubut; // the ctrl+shift+m or button3 menu
+   Fl_Window* helpwin;
 
    SrSaGlRender render_action;
    SrSaBBox bbox_action;
@@ -490,6 +492,9 @@ class PALocomotionData
 	bool jumping;
 	bool starting;
 	bool stopping;
+	bool prevJumping;
+	bool prevStarting;
+	bool prevStopping;
 	float linearVelocityIncrement;
 	float angularVelocityIncrement;
 };

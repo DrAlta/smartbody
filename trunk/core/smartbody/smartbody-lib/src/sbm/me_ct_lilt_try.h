@@ -24,8 +24,8 @@
 #ifndef ME_CT_LILT_TRY_H
 #define ME_CT_LILT_TRY_H
 
-#include <SK/sk_skeleton.h>
-#include <ME/me_controller.h>
+#include <sk/sk_skeleton.h>
+#include <me/me_controller.h>
 
 #include "gwiz_math.h"
 
@@ -68,7 +68,7 @@ class MeCtAnkleLilt : public MeController	{
 		MeCtAnkleLilt();
 		virtual ~MeCtAnkleLilt();
 		
-		void init( SkSkeleton* skeleton_p );
+		void init( SbmPawn* pawn, SkSkeleton* skeleton_p );
 		void set_lilt( float dur, float mag, float angle_offset); 
 		
 	private:

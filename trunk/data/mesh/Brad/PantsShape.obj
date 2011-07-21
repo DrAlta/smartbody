@@ -4503,7 +4503,7 @@ s off
 g Pants Brad_Skin CharacterRoot
 usemtl _brad1:brad:Brad_Face
 f 1/1/1 2/2/2 3/3/3
-f 4//4 6//5 5//6
+f 4/4/4 6/4/5 5/6/6
 s 1
 usemtl _brad1:brad:lambert72SG
 f 7/4/7 8/5/8 9/6/9

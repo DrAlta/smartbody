@@ -30,22 +30,15 @@
 #include "mcontrol_util.h"
 #include "bml_xml_consts.hpp"
 
-
-
 using namespace std;
 using namespace BML;
 using namespace xml_utils;
 
-const XMLCh ATTR_ANIM1[] = L"anim1";
-const XMLCh ATTR_ANIM2[] = L"anim2";
-const XMLCh ATTR_LOOP[] = L"loop";
-
 BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
-	//type = BML_MOTION;
 
-	const XMLCh* animName = elem->getAttribute( ATTR_NAME );
+	const XMLCh* animName = elem->getAttribute( BMLDefs::ATTR_NAME );
 
-	const XMLCh* id = elem->getAttribute(ATTR_ID);
+	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
 	if (id)
 	{
@@ -53,7 +46,6 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 	}
 	
 	if( animName != 0 && *animName != 0 )	{
-//	if( animName && XMLString::stringLen( animName ) ) {
 
 		// Look up motion
 		string asciiName( xml_utils::asciiString( animName ) );
@@ -61,15 +53,16 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 		std::map<std::string, SkMotion*>::iterator motionIter = mcu->motion_map.find(asciiName);
 		if (motionIter != mcu->motion_map.end())
 		{
+/*
 			double twarp = 1.0;
-			const char* speedStr = xml_utils::asciiString( elem->getAttribute( BML::ATTR_SPEED ) );
+			const char* speedStr = xml_utils::asciiString( elem->getAttribute( BMLDefs::ATTR_SPEED ) );
 			if( speedStr[0] != 0 ) {  // speed attribute is not empty
-//				motionCt->warp_limits( (float)0.01, 100 );  // override limits
-//				motionCt->twarp( (float) atof( speedStr ) );
 				twarp = atof( speedStr );
 				if( twarp == 0.0 ) twarp = 1.0;
 			}
 			delete [] speedStr;
+*/
+			double twarp = xml_utils::xml_parse_double( BMLDefs::ATTR_SPEED, elem, 1.0 );
 
 			SkMotion* motion = (*motionIter).second;
 			MeCtMotion* motionCt = new MeCtMotion();
@@ -78,26 +71,7 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 			ostringstream name;
 			name << unique_id << ' ' << motion->name();
 			motionCt->name( name.str().c_str() );  // TODO: include BML act and behavior ids
-
-			motionCt->init( motion, 0.0, 1.0 / twarp );
-#if 0
-
-			// Copy motion metadata
-			{	float duration = motion->duration();
-				float ready = motion->time_ready();
-				float indt = (ready >= 0)? ready : motionCt->indt();
-				float relax = motion->time_relax();
-//				float outdt = (relax<0)? motionCt->outdt()
-//									: ( (relax<duration)? duration-relax : 0 );
-				// is outdt an absolute or a relative time? shapiro 5/28/10
-				float outdt = (relax<0)? motionCt->outdt()
-									: ( (relax<duration)? duration - relax : 0 );
-				motionCt->inoutdt( indt, outdt );
-				float stroke_emphasis = motion->time_stroke_emphasis();
-				if( stroke_emphasis >= 0 )
-					motionCt->emphasist( stroke_emphasis );
-			}
-#endif
+			motionCt->init( const_cast<SbmCharacter*>(request->actor), motion, 0.0, 1.0 / twarp );
 
 			BehaviorRequestPtr behavPtr(new MotionRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs ) );
 			return behavPtr; 
@@ -120,11 +94,10 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 
 
 BML::BehaviorRequestPtr BML::parse_bml_panimation( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
-	//type = BML_MOTION;
 
-	const XMLCh* animName1 = elem->getAttribute( ATTR_ANIM1 );
-	const XMLCh* animName2 = elem->getAttribute( ATTR_ANIM2 );
-	const XMLCh* id = elem->getAttribute( ATTR_ID );
+	const XMLCh* animName1 = elem->getAttribute( BMLDefs::ATTR_ANIM1 );
+	const XMLCh* animName2 = elem->getAttribute( BMLDefs::ATTR_ANIM2 );
+	const XMLCh* id = elem->getAttribute( BMLDefs::ATTR_ID );
 	std::string localId;
 	if (id)
 		localId = XMLString::transcode(id);
@@ -150,27 +123,11 @@ BML::BehaviorRequestPtr BML::parse_bml_panimation( DOMElement* elem, const std::
 			SkMotion* motion1 = (*motion1Iter).second;
 			motion1->connect(character->skeleton_p);
 			motion1Ct = new MeCtMotion();
-			motion1Ct->init( motion1 );
+			motion1Ct->init( const_cast<SbmCharacter*>(request->actor), motion1 );
 			// Name controller with behavior unique_id
 			ostringstream name;
 			name << unique_id << ' ' << motion1->name();
 			motion1Ct->name( name.str().c_str() );  // TODO: include BML act and behavior ids
-
-#if 0
-			float duration = motion1->duration();
-			float ready = motion1->time_ready();
-			float indt = (ready >= 0)? ready : motion1Ct->indt();
-			float relax = motion1->time_relax();
-//				float outdt = (relax<0)? motionCt->outdt()
-//									: ( (relax<duration)? duration-relax : 0 );
-			// is outdt an absolute or a relative time? shapiro 5/28/10
-			float outdt = (relax<0)? motion1Ct->outdt()
-								: ( (relax<duration)? duration - relax : 0 );
-			motion1Ct->inoutdt( indt, outdt );
-			float stroke_emphasis = motion1->time_stroke_emphasis();
-			if( stroke_emphasis >= 0 )
-				motion1Ct->emphasist( stroke_emphasis );
-#endif
 		} 
 		else 
 		{
@@ -183,27 +140,11 @@ BML::BehaviorRequestPtr BML::parse_bml_panimation( DOMElement* elem, const std::
 			SkMotion* motion2 = (*motion2Iter).second;
 			motion2->connect(character->skeleton_p);
 			motion2Ct = new MeCtMotion();
-			motion2Ct->init( motion2 );
+			motion2Ct->init( const_cast<SbmCharacter*>(request->actor), motion2 );
 			// Name controller with behavior unique_id
 			ostringstream name;
 			name << unique_id << ' ' << motion2->name();
 			motion2Ct->name( name.str().c_str() );  // TODO: include BML act and behavior ids
-
-#if 0
-			float duration = motion2->duration();
-			float ready = motion2->time_ready();
-			float indt = (ready >= 0)? ready : motion2Ct->indt();
-			float relax = motion2->time_relax();
-//				float outdt = (relax<0)? motionCt->outdt()
-//									: ( (relax<duration)? duration-relax : 0 );
-			// is outdt an absolute or a relative time? shapiro 5/28/10
-			float outdt = (relax<0)? motion2Ct->outdt()
-								: ( (relax<duration)? duration - relax : 0 );
-			motion2Ct->inoutdt( indt, outdt );
-			float stroke_emphasis = motion2->time_stroke_emphasis();
-			if( stroke_emphasis >= 0 )
-				motion2Ct->emphasist( stroke_emphasis );
-#endif
 		}
 		else 
 		{
@@ -214,12 +155,12 @@ BML::BehaviorRequestPtr BML::parse_bml_panimation( DOMElement* elem, const std::
 		// TODO: Check the validation of input parameters here
 		// Initialize the blending weight
 		float value = 1.0;
-		const char* pvalue = xml_utils::asciiString( elem->getAttribute( BML::ATTR_PVALUE ) );
+		const char* pvalue = xml_utils::asciiString( elem->getAttribute( BMLDefs::ATTR_PVALUE ) );
 		if( pvalue[0] != 0 )   // param value is not empty
 			value = (float)atof(pvalue);
 
 		// Initialize the play mode (loop or not)
-		std::string isLoopString = xml_utils::asciiString(elem->getAttribute(ATTR_LOOP));
+		std::string isLoopString = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_LOOP));
 		bool isLoop;
 		if (isLoopString == "true") isLoop = true;
 		else						isLoop = false;

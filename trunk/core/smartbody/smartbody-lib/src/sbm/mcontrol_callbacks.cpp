@@ -28,17 +28,33 @@
  */
 
 #include "vhcl.h"
+#include "mcontrol_callbacks.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream>
 #include <string>
+#include <boost/tokenizer.hpp>
+
+#ifdef WIN32
 #include <direct.h>
+#else
+#include <unistd.h>
+#ifndef _MAX_PATH
+#define _MAX_PATH 1024
+#endif
+#endif
+
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
 
 #include "sbm_audio.h"
 
 #include "me_utilities.hpp"
+
+#if USE_WSP
 #include "wsp.h"
-#include "mcontrol_callbacks.h"
+#endif
+
 #include "sr/sr_model.h"
 #include "sbm_pawn.hpp"
 #include "sbm/Event.h"
@@ -46,10 +62,17 @@
 #include "SteeringAgent.h"
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
-#include "ParserFbx.h"
+#include "ParserFBX.h"
+
+#ifdef USE_GOOGLE_PROFILER
+#include <google/profiler.h>
+#endif
 
 using namespace std;
+
+#if USE_WSP
 using namespace WSP;
+#endif
 
 /////////////////////////////////////////////////////////////
 
@@ -86,7 +109,13 @@ int mcu_help_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 char * mcn_return_full_filename_func( const char * current_path, const char * file_name)
 {
+	boost::filesystem::path fullpath = current_path;
+	fullpath /= std::string(file_name);
+	printf("%s", fullpath.string().c_str());
+	return (char*) fullpath.native_file_string().c_str();
+
 	if( file_name == NULL)	return NULL;
+	printf("CURRENT PATH=%s, file_name=%s", current_path, file_name);
 	char * currentPath = new char[_MAX_PATH];
 	char * fileName = new char[_MAX_PATH];
 	strcpy( currentPath, current_path );
@@ -162,6 +191,11 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 		{
 			pres->setType("audio");
 			mcu_p->audio_paths.insert( path );
+		}
+		else if(strcmp( path_tok, "mesh") == 0 )
+		{
+			pres->setType("mesh");
+			mcu_p->mesh_paths.insert( path );
 		}
 		else
 		{
@@ -538,7 +572,7 @@ int mcu_panimationviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					int err = mcu_p->open_panimation_viewer( width, height, px, py );
 					return( err );
 				} else {
-					int err = mcu_p->open_panimation_viewer( 800, 1000, 50, 50 );
+					int err = mcu_p->open_panimation_viewer( 800, 740, 50, 20 );
 					return( err );
 				}
 			}
@@ -608,6 +642,91 @@ int mcu_channelbufferviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 }
 
 
+int mcu_resourceViewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	if( mcu_p )	{
+		char *resourceViewerCmd = args.read_token();
+		if( strcmp( resourceViewerCmd, "open" ) == 0 )	{
+
+			if( mcu_p->resourceViewer_p == NULL )	{
+				int argc = args.calc_num_tokens();
+				if( argc >= 4 )	{
+
+					int width = args.read_int();
+					int height = args.read_int();
+					int px = args.read_int();
+					int py = args.read_int();
+					int err = mcu_p->openResourceViewer( width, height, px, py );
+					return( err );
+				} else {
+					int err = mcu_p->openResourceViewer( 800, 600, 50, 50 );
+					return( err );
+				}
+			}
+		}
+		else
+			if( strcmp( resourceViewerCmd, "show" ) == 0 )	{
+				if( mcu_p->resourceViewer_p )	{
+					mcu_p->resourceViewer_p->show_viewer();
+					return( CMD_SUCCESS );
+				}
+			}
+			else
+				if( strcmp( resourceViewerCmd, "hide" ) == 0 )	{
+					if( mcu_p->resourceViewer_p )	{
+						mcu_p->resourceViewer_p->hide_viewer();
+						return( CMD_SUCCESS );
+					}
+				}
+				else	{
+					return( CMD_NOT_FOUND );
+				}
+	}
+	return( CMD_FAILURE );
+}
+
+int mcu_faceViewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	if( mcu_p )	{
+		char *faceViewerCmd = args.read_token();
+		if( strcmp( faceViewerCmd, "open" ) == 0 )	{
+
+			if( mcu_p->faceViewer_p == NULL )	{
+				int argc = args.calc_num_tokens();
+				if( argc >= 4 )	{
+
+					int width = args.read_int();
+					int height = args.read_int();
+					int px = args.read_int();
+					int py = args.read_int();
+					int err = mcu_p->openFaceViewer( width, height, px, py );
+					return( err );
+				} else {
+					int err = mcu_p->openFaceViewer( 480, 600, 50, 50 );
+					return( err );
+				}
+			}
+		}
+		else
+			if( strcmp( faceViewerCmd, "show" ) == 0 )	{
+				if( mcu_p->faceViewer_p )	{
+					mcu_p->faceViewer_p->show_viewer();
+					return( CMD_SUCCESS );
+				}
+			}
+			else
+				if( strcmp( faceViewerCmd, "hide" ) == 0 )	{
+					if( mcu_p->faceViewer_p )	{
+						mcu_p->faceViewer_p->hide_viewer();
+						return( CMD_SUCCESS );
+					}
+				}
+				else	{
+					return( CMD_NOT_FOUND );
+				}
+	}
+	return( CMD_FAILURE );
+}
 
 std::string tokenize( std::string& str,
 					  const std::string& delimiters = " ",
@@ -667,9 +786,9 @@ double parseMotionParameters(std::string m, std::string parameter, double min, d
 	if (parameter == "transitiony")
 		type = 5;
 	if (!sk) return -9999;
-	MotionParameters* mParam = new MotionParameters(mcuCBHandle::singleton().lookUpMotion(m.c_str()), sk);
-	mParam->setFrameId(min, max);
-	return mParam->getParameter(type);
+	MotionParameters mParam(mcuCBHandle::singleton().lookUpMotion(m.c_str()), sk);
+	mParam.setFrameId(min, max);
+	return mParam.getParameter(type);
 }
 
 int mcu_motion_mirror_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p )
@@ -750,6 +869,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					if (iter == mcu_p->motion_map.end())
 						return CMD_FAILURE;
 					newState->motions.push_back(iter->second);
+					iter->second->ref();
 				}
 				int numKeys = args.read_int();
 				for (int i = 0; i < numMotions; i++)
@@ -994,7 +1114,7 @@ int mcu_motion_player_func(srArgBuffer& args, mcuCBHandle *mcu_p )
 			else
 			{
 				int frameNumber = args.read_int();
-				character->motionplayer_ct->init(next, frameNumber);
+				character->motionplayer_ct->init(character,next, frameNumber);
 			}
 			return CMD_SUCCESS;
 		}
@@ -1126,8 +1246,8 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				}
 			}
 			else if (strcmp( cam_cmd, "reset" ) == 0 ) {
-				mcu_p->execute("camera eye 0 166 185");
-				mcu_p->execute("camera center 0 92 0");
+				mcu_p->execute((char*)"camera eye 0 166 185");
+				mcu_p->execute((char*)"camera center 0 92 0");
 			}
 			else if (strcmp( cam_cmd, "frame" ) == 0 ) {
 				SrBox sceneBox;
@@ -1170,7 +1290,7 @@ int mcu_terrain_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			}
 			int n = args.calc_num_tokens();
 			if( n == 0 )	{
-				mcu_p->height_field_p->load( "../../../../data/terrain/range1.e.ppm" );
+				mcu_p->height_field_p->load( (char*)"../../../../data/terrain/range1.e.ppm" );
 				mcu_p->height_field_p->set_scale( 5000.0f, 300.0f, 5000.0f );
 				mcu_p->height_field_p->set_auto_origin();
 			}
@@ -1634,7 +1754,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 
 	// Here, detect which type of file it is
 	std::string ext = boost::filesystem2::extension(obj_file);
-	std::string file = boost::filesystem::basename(obj_file);
+	std::string file = boost::filesystem::basename(obj_file);	
 	std::vector<SrModel*> meshModelVec;
 	if (ext == ".obj" || ext == ".OBJ")
 	{
@@ -1648,7 +1768,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 	}
 	if (ext == ".dae" || ext == ".DAE" || ext == ".xml" || ext == ".XML")
 	{
-		xercesc_3_0::DOMNode* geometryNode = ParserOpenCOLLADA::getNode("library_geometries", obj_file);
+		DOMNode* geometryNode = ParserOpenCOLLADA::getNode("library_geometries", obj_file);
 		if (geometryNode)
 			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, meshModelVec, 1.0f);
 
@@ -1699,64 +1819,92 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 		char_p->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
 		mcu_p->root_group_p->add(srSnModelDynamic);	
 	}
+
 	return( CMD_SUCCESS );
 }
 
-std::string nodeStr(const XMLCh* s)
+void nodeStr(const XMLCh* s, std::string& out)
 {
-	if (!s)	return "";
-	std::string str = XMLString::transcode(s);
-	return str;
+	if (!s)
+	{
+		out = "";
+		return;
+	}
+	char* cstr = XMLString::transcode(s);
+
+	out = cstr;
+	delete cstr;
 }
 
-void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, float scaleFactor, std::string jointPrefix, mcuCBHandle* mcu_p)
+void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFactor, std::string jointPrefix, mcuCBHandle* mcu_p)
 {
+	boost::char_separator<char> sep(" ");
+
 	SbmCharacter* char_p = mcu_p->character_map.lookup( char_name );
-	const xercesc_3_0::DOMNodeList* list = node->getChildNodes();
+	const DOMNodeList* list = node->getChildNodes();
 	for (unsigned int c = 0; c < list->getLength(); c++)
 	{
-		xercesc_3_0::DOMNode* node = list->item(c);
+		DOMNode* node = list->item(c);
 		int type = node->getNodeType();
-		std::string name = nodeStr(node->getNodeName());
-		std::string value = nodeStr(node->getNodeValue());
+		std::string name;
+		nodeStr(node->getNodeName(), name);
+		std::string value;
+		nodeStr(node->getNodeValue(), value);
 		if (name == "controller")
 		{
-			xercesc_3_0::DOMNamedNodeMap* attributes = node->getAttributes();
-			xercesc_3_0::DOMNode* idNode = attributes->getNamedItem(XMLString::transcode("id"));
+			DOMNamedNodeMap* attributes = node->getAttributes();
+			DOMNode* idNode = attributes->getNamedItem(XMLString::transcode("id"));
 			if (!idNode)	continue;
-			std::string skinId = nodeStr(idNode->getNodeValue());
+			std::string skinId;
+			nodeStr(idNode->getNodeValue(), skinId);
 			if (node->hasChildNodes())
 			{
-				const xercesc_3_0::DOMNodeList* childrenList = node->getChildNodes();
+				const DOMNodeList* childrenList = node->getChildNodes();
 				for (unsigned int cc = 0; cc < childrenList->getLength(); cc++)
 				{
-					xercesc_3_0::DOMNode* childNode = childrenList->item(cc);
-					std::string childName = nodeStr(childNode->getNodeName());
+					DOMNode* childNode = childrenList->item(cc);
+					std::string childName;
+					nodeStr(childNode->getNodeName(), childName);
 					if (childName == "skin")	// parsing skinning weights
 					{
-						xercesc_3_0::DOMNamedNodeMap* skinAttributes = childNode->getAttributes();			
-						xercesc_3_0::DOMNode* skinNode = skinAttributes->getNamedItem(XMLString::transcode("source"));	
-						std::string skinSource = nodeStr(skinNode->getNodeValue());
+						DOMNamedNodeMap* skinAttributes = childNode->getAttributes();			
+						DOMNode* skinNode = skinAttributes->getNamedItem(XMLString::transcode("source"));	
+						std::string skinSource;
+						nodeStr(skinNode->getNodeValue(), skinSource);
 						skinSource = skinSource.substr(1, skinSource.size() - 1);
 						SkinWeight* skinWeight = new SkinWeight();
 						skinWeight->sourceMesh = skinSource;
 
 						// futhur for children
-						const xercesc_3_0::DOMNodeList* childListOfSkin = childNode->getChildNodes();
+						const DOMNodeList* childListOfSkin = childNode->getChildNodes();
 						for (unsigned int cSkin = 0; cSkin < childListOfSkin->getLength(); cSkin++)
 						{
-							xercesc_3_0::DOMNode* childNodeOfSkin = childListOfSkin->item(cSkin);
-							std::string childNameOfSkin = nodeStr(childNodeOfSkin->getNodeName());
+							DOMNode* childNodeOfSkin = childListOfSkin->item(cSkin);
+							std::string childNameOfSkin;
+							nodeStr(childNodeOfSkin->getNodeName(), childNameOfSkin);
 							std::string bindJointName = skinSource + "-skin-joints";
 							std::string bindWeightName = skinSource + "-skin-weights";
 							std::string bindPoseMatName = skinSource + "-skin-bind_poses";
 
 							if (childNameOfSkin == "bind_shape_matrix")
 							{
-								std::string tokenBlock = nodeStr(childNodeOfSkin->getTextContent());
+								std::string tokenBlock;
+								nodeStr(childNodeOfSkin->getTextContent(), tokenBlock);
 								float* bindShapeMat = new float[16];
-								for (int i = 0; i < 16; i++)
-									bindShapeMat[i] = (float)atof(tokenize(tokenBlock).c_str());
+								
+								boost::tokenizer<boost::char_separator<char> > tokens(tokenBlock, sep);
+								int i = 0;
+								for (boost::tokenizer<boost::char_separator<char> >::iterator it = tokens.begin();
+									 it != tokens.end();
+									 ++it)
+								{
+									bindShapeMat[i] = (float)atof((*it).c_str());
+									i++;
+									if (i >= 16)
+										break;
+							    }
+								//for (int i = 0; i < 16; i++)
+								//	bindShapeMat[i] = (float)atof(tokenize(tokenBlock).c_str());
 								
 								skinWeight->bindShapeMat.set(bindShapeMat);
 								skinWeight->bindShapeMat.transpose();
@@ -1764,26 +1912,32 @@ void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, 
 							}
 							if (childNameOfSkin == "source")
 							{
-								xercesc_3_0::DOMNamedNodeMap* sourceAttributes = childNodeOfSkin->getAttributes();
-								xercesc_3_0::DOMNodeList* realContentNodeList = childNodeOfSkin->getChildNodes();
-								std::string sourceId = nodeStr(sourceAttributes->getNamedItem(XMLString::transcode("id"))->getNodeValue());
+								DOMNamedNodeMap* sourceAttributes = childNodeOfSkin->getAttributes();
+								DOMNodeList* realContentNodeList = childNodeOfSkin->getChildNodes();
+								std::string sourceId;
+								nodeStr(sourceAttributes->getNamedItem(XMLString::transcode("id"))->getNodeValue(), sourceId);
 								for (unsigned int cSource = 0; cSource < realContentNodeList->getLength(); cSource++)
 								{
-									xercesc_3_0::DOMNode* realContentNode = realContentNodeList->item(cSource);
-									std::string realNodeName = nodeStr(realContentNode->getNodeName());		
+									DOMNode* realContentNode = realContentNodeList->item(cSource);
+									std::string realNodeName;
+									nodeStr(realContentNode->getNodeName(), realNodeName);		
 
-									std::string tokenBlock = nodeStr(realContentNode->getTextContent());
-									std::string content = tokenize(tokenBlock);
+									std::string tokenBlock;
+									nodeStr(realContentNode->getTextContent(), tokenBlock);
+									boost::tokenizer<boost::char_separator<char> > tokens(tokenBlock, sep);
 									int matCounter = 0;
 									float* bindPosMat = new float[16];
 									SrMat* newMat = new SrMat();
-									while (content != "")
+
+									for (boost::tokenizer<boost::char_separator<char> >::iterator it = tokens.begin();
+										 it != tokens.end();
+										 ++it)
 									{
 										if ( sourceId == bindJointName && realNodeName == "Name_array")
 										{
-											std::string jointName = content;
+											std::string jointName = (*it);
 											// check if the joint name start with the pre-fix and remove the prefix
-											if (content.compare(0, jointPrefix.size(), jointPrefix) == 0)
+											if ((*it).compare(0, jointPrefix.size(), jointPrefix) == 0)
 											{
 												jointName.erase(0, jointPrefix.size());
 											}
@@ -1791,10 +1945,10 @@ void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, 
 											skinWeight->infJointName.push_back(jointName);
 										}
 										if ( sourceId == bindWeightName && realNodeName == "float_array")
-											skinWeight->bindWeight.push_back((float)atof(content.c_str()));
+											skinWeight->bindWeight.push_back((float)atof((*it).c_str()));
 										if ( sourceId == bindPoseMatName && realNodeName == "float_array")
 										{
-											bindPosMat[matCounter] = (float)atof(content.c_str());
+											bindPosMat[matCounter] = (float)atof((*it).c_str());
 											matCounter ++;
 											if (matCounter == 16)
 											{
@@ -1806,38 +1960,46 @@ void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, 
 												skinWeight->bindPoseMat.push_back(*newMat);
 											}
 										}
-										content = tokenize(tokenBlock);
 									}
 								}								
 							} // end of if (childNameOfSkin == "source")
 							if (childNameOfSkin == "vertex_weights")
 							{
-								xercesc_3_0::DOMNodeList* indexNodeList = childNodeOfSkin->getChildNodes();
+								DOMNodeList* indexNodeList = childNodeOfSkin->getChildNodes();
 								for (unsigned int cVertexWeights = 0; cVertexWeights < indexNodeList->getLength(); cVertexWeights++)
 								{
-									xercesc_3_0::DOMNode* indexNode = indexNodeList->item(cVertexWeights);
-									std::string indexNodeName = nodeStr(indexNode->getNodeName());
-									std::string tokenBlock = nodeStr(indexNode->getTextContent());
-									std::string content = tokenize(tokenBlock);
+									DOMNode* indexNode = indexNodeList->item(cVertexWeights);
+									std::string indexNodeName;
+									nodeStr(indexNode->getNodeName(), indexNodeName);
+									std::string tokenBlock;
+									nodeStr(indexNode->getTextContent(), tokenBlock);
+
+									boost::tokenizer<boost::char_separator<char> > tokens(tokenBlock, sep);
+
 									if (indexNodeName == "vcount")
 									{
-										while (content != "")
+										for (boost::tokenizer<boost::char_separator<char> >::iterator it = tokens.begin();
+											 it != tokens.end();
+										     ++it)
 										{
-											skinWeight->numInfJoints.push_back(atoi(content.c_str()));
-											content = tokenize(tokenBlock);
-										}											
+											skinWeight->numInfJoints.push_back(atoi((*it).c_str()));
+										}
 									}
 									else if (indexNodeName == "v")
 									{
-										while (content != "")
+										for (boost::tokenizer<boost::char_separator<char> >::iterator it = tokens.begin();
+											 it != tokens.end();
+										     ++it)
 										{
-											skinWeight->jointNameIndex.push_back(atoi(content.c_str()));
-											content = tokenize(tokenBlock);
-											skinWeight->weightIndex.push_back(atoi(content.c_str()));
-											content = tokenize(tokenBlock);
-										}											
+											skinWeight->jointNameIndex.push_back(atoi((*it).c_str()));
+											it++;
+											skinWeight->weightIndex.push_back(atoi((*it).c_str()));
+										}
 									}
-									else continue;
+									else
+									{
+										continue;
+									}
 								}
 							}
 						}
@@ -1846,34 +2008,40 @@ void parseLibraryControllers(xercesc_3_0::DOMNode* node, const char* char_name, 
 					} // end of if (childName == "skin")
 					if (childName == "morph")	// parsing morph targets
 					{
-						xercesc_3_0::DOMNamedNodeMap* morphAttributes = childNode->getAttributes();			
-						xercesc_3_0::DOMNode* morphNode = morphAttributes->getNamedItem(XMLString::transcode("source"));	
-						std::string morphName = nodeStr(morphNode->getNodeValue());
+						DOMNamedNodeMap* morphAttributes = childNode->getAttributes();			
+						DOMNode* morphNode = morphAttributes->getNamedItem(XMLString::transcode("source"));	
+						std::string morphName;
+						nodeStr(morphNode->getNodeValue(), morphName);
 						morphName = morphName.substr(1, morphName.size() - 1);
 						std::string morphFullName = morphName + "-morph";
 						
 						// futhur for children
-						const xercesc_3_0::DOMNodeList* childListOfMorph = childNode->getChildNodes();
+						const DOMNodeList* childListOfMorph = childNode->getChildNodes();
 						for (unsigned int cMorph = 0; cMorph < childListOfMorph->getLength(); cMorph++)
 						{
-							xercesc_3_0::DOMNode* childNodeOfMorph = childListOfMorph->item(cMorph);
-							std::string childNameOfMorph = nodeStr(childNodeOfMorph->getNodeName());
+							DOMNode* childNodeOfMorph = childListOfMorph->item(cMorph);
+							std::string childNameOfMorph;
+							nodeStr(childNodeOfMorph->getNodeName(), childNameOfMorph);
 							if (childNameOfMorph == "source")
 							{
-								const xercesc_3_0::DOMNodeList* childListOfSource = childNodeOfMorph->getChildNodes();
+								const DOMNodeList* childListOfSource = childNodeOfMorph->getChildNodes();
 								for (size_t cMorphSource = 0; cMorphSource < childListOfSource->getLength(); cMorphSource++)
 								{
-									xercesc_3_0::DOMNode* childNodeOfSource = childListOfSource->item(cMorphSource);
-									std::string childNameOfSource = nodeStr(childNodeOfSource->getNodeName());
+									DOMNode* childNodeOfSource = childListOfSource->item(cMorphSource);
+									std::string childNameOfSource;
+									nodeStr(childNodeOfSource->getNodeName(), childNameOfSource);
 									if (childNameOfSource == "IDREF_array")
 									{
 										std::vector<std::string> refMesh;
-										std::string tokenBlock = nodeStr(childNodeOfMorph->getTextContent());
-										std::string content = tokenize(tokenBlock, " \n");
-										while (content != "")
+										std::string tokenBlock;
+										nodeStr(childNodeOfMorph->getTextContent(), tokenBlock);
+										boost::char_separator<char> sep2(" \n");
+										boost::tokenizer<boost::char_separator<char> > tokens(tokenBlock, sep2);
+										for (boost::tokenizer<boost::char_separator<char> >::iterator it = tokens.begin();
+											 it != tokens.end();
+											 ++it)
 										{
-											refMesh.push_back(content);
-											content = tokenize(tokenBlock, " \n");
+											refMesh.push_back((*it));
 										}
 										refMesh.push_back(morphName);
 										char_p->dMesh_p->morphTargets.insert(make_pair(morphFullName, refMesh));
@@ -1932,12 +2100,12 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 
 	ErrorHandler* errHandler = (ErrorHandler*) new HandlerBase();
 	parser->setErrorHandler(errHandler);
-	
+
 	try 
 	{
 		parser->parse(skin_file);
-		xercesc_3_0::DOMDocument* doc = parser->getDocument();
-		xercesc_3_0::DOMNode* controllerNode = ParserOpenCOLLADA::getNode("library_controllers", doc);
+		DOMDocument* doc = parser->getDocument();
+		DOMNode* controllerNode = ParserOpenCOLLADA::getNode("library_controllers", doc);
 		if (!controllerNode)
 		{
 			LOG("mcu_character_load_skinweights ERR: no binding info contained");
@@ -2072,6 +2240,7 @@ int mcu_character_init(
 		}
 
 
+#if USE_WSP
 		// register wsp data
 		// first register world_offset position/rotation
 		string wsp_world_offset = vhcl::Format( "%s:world_offset", char_name );
@@ -2085,6 +2254,7 @@ int mcu_character_init(
 		if( err != CMD_SUCCESS )	{
 			LOG( "WARNING: mcu_character_init \"%s\": Failed to register character rotation.\n", char_name ); 
 		}
+#endif
 
 
 		// now register all joints.  wsp data isn't sent out until a request for it is received
@@ -2095,19 +2265,23 @@ int mcu_character_init(
 		{
 			SkJoint * j = joints[ i ];
 
+
+#if USE_WSP
 			string wsp_joint_name = vhcl::Format( "%s:%s", char_name, (const char *)j->name() );
 
 			err = mcu_p->theWSP->register_vector_3d_source( wsp_joint_name, "position", SbmPawn::wsp_position_accessor, char_p );
 			if ( err != CMD_SUCCESS )
 			{
-				LOG( "WARNING: mcu_character_init \"%s\": Failed to register joint \"%s\" position.\n", char_name, wsp_joint_name ); 
+				LOG( "WARNING: mcu_character_init \"%s\": Failed to register joint \"%s\" position.\n", char_name, wsp_joint_name.c_str() ); 
 			}
 
 			err = mcu_p->theWSP->register_vector_4d_source( wsp_joint_name, "rotation", SbmPawn::wsp_rotation_accessor, char_p );
 			if ( err != CMD_SUCCESS )
 			{
-				LOG( "WARNING: mcu_character_init \"%s\": Failed to register joint \"%s\" rotation.\n", char_name, wsp_joint_name ); 
+				LOG( "WARNING: mcu_character_init \"%s\": Failed to register joint \"%s\" rotation.\n", char_name, wsp_joint_name.c_str() ); 
 			}
+#endif
+
 		}
 	}
 
@@ -2735,7 +2909,7 @@ int mcu_print_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string c
 		if( !( unit_iss >> unit )
 			|| ( unit < 1 ) )
 		{
-			LOG("ERROR: Invalid action unit number \"%s\".", unit_str);
+			LOG("ERROR: Invalid action unit number \"%s\".", unit_str.c_str() );
 			return CMD_FAILURE;
 		}
 	}
@@ -2924,7 +3098,7 @@ int init_pose_controller(
 	ctrl_p->ref();
 
 	ctrl_p->name( ctrl_name );
-	ctrl_p->init( *pose_p );
+	ctrl_p->init( NULL, *pose_p );
 	return( CMD_SUCCESS );
 }
 
@@ -2959,7 +3133,7 @@ int init_motion_controller(
 	ctrl_p->ref();
 
 	ctrl_p->name( ctrl_name );
-	ctrl_p->init( mot_p );
+	ctrl_p->init( NULL, mot_p );
 	return( CMD_SUCCESS );
 }
 
@@ -2994,7 +3168,7 @@ int init_stepturn_controller(
 	ctrl_p->ref();
 	
 	ctrl_p->name( ctrl_name );
-	ctrl_p->init( mot_p );
+	ctrl_p->init( NULL, mot_p );
 	return( CMD_SUCCESS );
 }
 
@@ -3041,7 +3215,7 @@ int init_quickdraw_controller(
 	ctrl_p->ref();
 	
 	ctrl_p->name( ctrl_name );
-	ctrl_p->init( mot_p, alt_mot_p );
+	ctrl_p->init( NULL, mot_p, alt_mot_p );
 	return( CMD_SUCCESS );
 }
 
@@ -3078,6 +3252,7 @@ int init_gaze_controller(
 
 	ctrl_p->name( ctrl_name );
 	ctrl_p->init(
+		NULL,
 		MeCtGaze::key_index( strlen( key_fr ) ? key_fr : "back" ),  // WARN: does not handle NULL string
 		MeCtGaze::key_index( strlen( key_to ) ? key_to : ( strlen( key_fr ) ? key_fr : "eyes" ) )
 	);
@@ -3107,7 +3282,7 @@ int init_simple_nod_controller(
 	ctrl_p->ref();
 
 	ctrl_p->name( ctrl_name );
-	ctrl_p->init();
+	ctrl_p->init(NULL);
 	return( CMD_SUCCESS );
 }
 
@@ -3141,7 +3316,7 @@ int init_lilt_controller(
 	}
 	ctrl_p->ref();
 	ctrl_p->name( ctrl_name );
-	ctrl_p->init( char_p->skeleton_p );
+	ctrl_p->init( char_p, char_p->skeleton_p );
 	return( CMD_SUCCESS );
 }
 
@@ -3168,7 +3343,7 @@ int init_eyelid_controller(
 	ctrl_p->ref();
 	
 	ctrl_p->name( ctrl_name );
-	ctrl_p->init();
+	ctrl_p->init(NULL);
 	return( CMD_SUCCESS );
 }
 
@@ -3217,7 +3392,7 @@ int init_scheduler_controller(
 		}
 		sched_p->ref();
 		
-		sched_p->init();
+		sched_p->init(char_p);
 
 		return( CMD_SUCCESS );
 	}
@@ -3769,118 +3944,6 @@ int mcu_gaze_limit_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 /////////////////////////////////////////////////////////////
 
 /*
-reach <> 
-*/
-
-
-int mcu_reach_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )
-{	
-	if (mcu_p)
-	{
-		string arg = args.read_token();
-		SbmCharacter* actor = NULL;
-		if( arg=="character" || arg=="char" ) {
-			string name = args.read_token();
-			actor = mcu_p->character_map.lookup( name );
-			if( actor == NULL ) {
-				LOG("ERROR: Could not find character \"%s\".", name.c_str());
-				return CMD_FAILURE;
-			}
-
-			arg = args.read_token();
-		} else {
-			if( mcu_p->test_character_default.empty() ) {
-				LOG("ERROR: No character specified, and no default set.");
-				return CMD_FAILURE;
-			}
-			actor = mcu_p->character_map.lookup( mcu_p->test_character_default );
-			if( actor == NULL ) {
-				LOG("ERROR: Could not find default character \"%s\".", mcu_p->test_character_default.c_str());
-				return CMD_FAILURE;
-			}
-		}
-
-
-		// gets the first track in the scheduler
-		// To-Do : Should provide some ways to grab a specific track ( right or left hand )
-		MeCtDataDrivenReach* reachCt = NULL;
-		MeCtSchedulerClass* reachSched = actor->reach_sched_p;
-		MeCtSchedulerClass::VecOfTrack reach_tracks = reachSched->tracks();		
-		MeCtReach* tempCt = NULL;
-		for (unsigned int c = 0; c < reach_tracks.size(); c++)
-		{
-			MeController* controller = reach_tracks[c]->animation_ct();		
-			reachCt = dynamic_cast<MeCtDataDrivenReach*>(controller);
-			//tempCt  = dynamic_cast<MeCtReach*>(controller);
-			if (reachCt)
-				break;
-		}	
-
-		if (!reachCt)
-		{
-			LOG("ERROR: Could not find reach controller.");
-			return CMD_FAILURE;
-		}
-
-		int resampleSize = 0;
-		float minDist = 5.f;
-		enum { REBUILD = 1, UPDATE, RESAMPLE};
-		int buildMode = REBUILD;
-		if( arg == "rebuild" )
-		{			
-			buildMode = REBUILD;
-			arg = args.read_token();
-		}
-		else if (arg == "update")
-		{
-			buildMode = UPDATE;
-			arg = args.read_token();
-		}
-		else if (arg == "resample")
-		{
-			buildMode = RESAMPLE;
-			arg = args.read_token();
-		}
-
-		while( !arg.empty() ) 
-		{
-			if (arg == "resample-size")
-			{
-				resampleSize = args.read_int();
-			}
-			else if (arg == "sample-dist")
-			{
-				minDist = args.read_float();
-			}
-			arg = args.read_token();
-		}
-		bool bSuccess = false;
-		switch(buildMode)
-		{
-		case REBUILD:
-			reachCt->updateExamplesFromMotions(actor->getReachMotionDataSet(),true,minDist);
-			reachCt->buildResamplePoseData(resampleSize,minDist);
-			bSuccess = true;
-			break;
-		case UPDATE:
-			reachCt->updateExamplesFromMotions(actor->getReachMotionDataSet(),false,minDist);
-			reachCt->buildResamplePoseData(0,minDist);
-			bSuccess = true;
-			break;
-		case RESAMPLE:			
-			reachCt->buildResamplePoseData(resampleSize,minDist);
-			bSuccess = true;
-			break;
-		}
-
-		if (bSuccess)
-			return (CMD_SUCCESS);
-	}
-
-	return (CMD_FAILURE);
-}
-
-/*
 	gaze <> target point <x y z>
 	gaze <> target euler <p h r>
 	gaze <> offset euler <p h r>
@@ -4227,12 +4290,15 @@ int mcu_load_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 
 int mcu_net_reset( srArgBuffer& args, mcuCBHandle *mcu_p ) {
-	bool ret;
+	bool ret = CMD_SUCCESS;
 	mcu_p->bonebus.CloseConnection();
 	if (mcu_p->net_host)
+	{
 		ret = mcu_p->bonebus.OpenConnection(mcu_p->net_host);
+		mcu_p->bonebus.UpdateAllCharacters();
+	}
 	
-	if (!ret)
+	if (ret)
 		return (CMD_SUCCESS);
 	else
 		return (CMD_FAILURE);
@@ -4249,7 +4315,6 @@ int mcu_net_check( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	else
 		return CMD_SUCCESS;
 }
-
 /*
 
    net boneupdates <0|1>
@@ -4348,10 +4413,16 @@ int mcu_play_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
          if ( !absolutePath )
          {
-            char full[ _MAX_PATH ];
-            if ( _fullpath( full, "..\\..\\..\\..\\..", _MAX_PATH ) != NULL )
+			boost::filesystem::path p( "../../../../.." );
+			boost::filesystem::path abs_p = boost::filesystem::complete( p );
+
+//            char full[ _MAX_PATH ];
+//            if ( _fullpath( full, "..\\..\\..\\..\\..", _MAX_PATH ) != NULL )
+            if ( boost::filesystem2::exists( abs_p ) )
             {
-               soundFile = string( full ) + string( "\\" ) + soundFile;
+//               soundFile = string( full ) + string( "/" ) + soundFile;
+				p  /= soundFile;
+               soundFile = abs_p.string();
             }
          }
 
@@ -4433,12 +4504,25 @@ int mcu_stop_sound_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
          if ( !absolutePath )
          {
+			boost::filesystem::path p( "../../../../.." );
+			boost::filesystem::path abs_p = boost::filesystem::complete( p );
+            if ( boost::filesystem2::exists( abs_p ) )
+            {
+				p  /= soundFile;
+               soundFile = abs_p.string();
+            }
+         }
+
+#if 0
+         if ( !absolutePath )
+         {
             char full[ _MAX_PATH ];
             if ( _fullpath( full, "..\\..\\..\\..\\..", _MAX_PATH ) != NULL )
             {
                soundFile = string( full ) + string( "\\" ) + soundFile;
             }
          }
+#endif
 
          mcu_p->bonebus.SendStopSound( soundFile.c_str() );
 
@@ -4718,7 +4802,9 @@ int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
 
 int mcu_wsp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
+#if USE_WSP
 	mcu_p->theWSP->process_command( args.read_remainder_raw() );
+#endif
 
 	return( CMD_SUCCESS );
 }
@@ -4892,7 +4978,7 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				{
 					int curIndex = channelCounter;
 					SkChannel& channel = mChanArray.get(c);
-					SkJointName& jointName = mChanArray.name(c);
+					SkJointName jointName = mChanArray.name(c);
 					int chanSize = channel.size();
 					int numZeroFrames = 0;
 					int	chanType = channel.type;
@@ -5429,6 +5515,7 @@ int skeletonmap_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
+
 int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
 	if ( mcu_p )
@@ -5442,39 +5529,51 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 		else if (command == "start")
 		{
-			if (mcu_p->steerEngine)
+			if (mcu_p->steerEngine.isInitialized())
 			{
 				LOG("STEERSIM ALREADY STARTED");
 				return CMD_SUCCESS;
-				//delete mcu_p->steerEngine;
 			}
-			mcu_p->steerEngine = new SteerSuiteEngineDriver();
 			SteerLib::SimulationOptions* steerOptions = new SteerLib::SimulationOptions();
 			steerOptions->moduleOptionsDatabase["testCasePlayer"]["testcase"] = "3-way-confusion-1.xml";
-			steerOptions->moduleOptionsDatabase["testCasePlayer"]["ai"] = "pprAI";
+			std::string ai = dynamic_cast<StringAttribute*>( mcu_p->steerEngine.getAttribute("aimodule") )->getValue();
+
+			if (ai == "")
+				return CMD_FAILURE;
+			steerOptions->moduleOptionsDatabase["testCasePlayer"]["ai"] = ai;
 			steerOptions->engineOptions.startupModules.insert("testCasePlayer");
-			steerOptions->engineOptions.testCaseSearchPath = "..\\..\\..\\..\\core\\smartbody\\steersuite-1.3\\testcases\\";
-			steerOptions->engineOptions.moduleSearchPath = "..\\..\\..\\..\\core\\smartbody\\sbm\\bin\\";
+			std::string testCases = dynamic_cast<StringAttribute*>( mcu_p->steerEngine.getAttribute("engineOptions.testCaseSearchPath") )->getValue();
+			steerOptions->engineOptions.testCaseSearchPath = testCases;
+			std::string moduleSearchPath = dynamic_cast<StringAttribute*>( mcu_p->steerEngine.getAttribute("engineOptions.moduleSearchPath") )->getValue();
+			steerOptions->engineOptions.moduleSearchPath = moduleSearchPath;
+			//double gridSizeX = dynamic_cast<DoubleAttribute*>( mcu_p->steerEngine.getAttribute("gridDatabaseOptions.gridSizeX") )->getValue();
+			//double gridSizeZ = dynamic_cast<DoubleAttribute*>( mcu_p->steerEngine.getAttribute("gridDatabaseOptions.gridSizeZ") )->getValue();
+			//steerOptions->gridDatabaseOptions.gridSizeX = float(gridSizeX);
+            //steerOptions->gridDatabaseOptions.gridSizeZ = float(gridSizeZ);
 			steerOptions->gridDatabaseOptions.gridSizeX = 35;
 			steerOptions->gridDatabaseOptions.gridSizeZ = 35;
 			steerOptions->gridDatabaseOptions.numGridCellsX = 70;
 			steerOptions->gridDatabaseOptions.numGridCellsZ = 70;
+
 			LOG("INIT STEERSIM");
 			try {
-				mcu_p->steerEngine->init(steerOptions);
+				mcu_p->steerEngine.init(steerOptions);
 			} catch (exception& e) {
-				LOG("Problem starting steering engine: %s", e.what()); 
-				delete mcu_p->steerEngine;
-				mcu_p->steerEngine = NULL;
+				if (e.what())
+					LOG("Problem starting steering engine: %s", e.what()); 
+				else
+					LOG("Unknown problem starting steering engine: %s", e.what()); 
+
+				mcu_p->steerEngine.finish();
 				delete steerOptions;
 				return CMD_FAILURE;
 			}
 
 			LOG("LOADING STEERSIM");
-			mcu_p->steerEngine->loadSimulation();
+			mcu_p->steerEngine.loadSimulation();
 
 			// create an agent based on the current characters and positions
-			SteerLib::ModuleInterface* pprAIModule = mcu_p->steerEngine->_engine->getModule("pprAI");
+			SteerLib::ModuleInterface* pprAIModule = mcu_p->steerEngine._engine->getModule(ai);
 			mcu_p->character_map.reset();
 			SbmCharacter* character = NULL;
 			while( character = mcu_p->character_map.next() )
@@ -5486,11 +5585,13 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				initialConditions.position = Util::Point( x / 100.0f, 0.0f, z / 100.0f );
 				Util::Vector orientation = Util::rotateInXZPlane(Util::Vector(0.0f, 0.0f, 1.0f), yaw * float(M_PI) / 180.0f);
 				initialConditions.direction = orientation;
-				initialConditions.radius = 0.3f;
+				double initialRadius = dynamic_cast<DoubleAttribute*>( mcu_p->steerEngine.getAttribute("initialConditions.radius") )->getValue();
+				//initialConditions.radius = float(initialRadius);
+				initialConditions.radius = 0.3f;//0.2f;//0.4f;
 				initialConditions.speed = 0.0f;
 				initialConditions.goals.clear();
 				initialConditions.name = character->name;
-				SteerLib::AgentInterface* agent = mcu_p->steerEngine->_engine->createAgent( initialConditions, pprAIModule );
+				SteerLib::AgentInterface* agent = mcu_p->steerEngine._engine->createAgent( initialConditions, pprAIModule );
 				character->steeringAgent->setAgent(agent);
 				agent->reset(initialConditions, dynamic_cast<SteerLib::EngineInterface*>(pprAIModule));
 			}
@@ -5504,19 +5605,17 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			}
 
 			LOG("STARTING STEERSIM");
-			mcu_p->steerEngine->startSimulation();
-			mcu_p->steerEngine->setStartTime(0.0f);
+			mcu_p->steerEngine.startSimulation();
+			mcu_p->steerEngine.setStartTime(0.0f);
 			return CMD_SUCCESS;
 		}
 		else if (command == "stop")
 		{
-			if (mcu_p->steerEngine)
+			if (mcu_p->steerEngine.isInitialized())
 			{
-				mcu_p->steerEngine->stopSimulation();
-				mcu_p->steerEngine->unloadSimulation();
-				mcu_p->steerEngine->finish();
-				delete mcu_p->steerEngine;
-				mcu_p->steerEngine = NULL;
+				mcu_p->steerEngine.stopSimulation();
+				mcu_p->steerEngine.unloadSimulation();
+				mcu_p->steerEngine.finish();
 
 				mcu_p->character_map.reset();
 				SbmCharacter* character = NULL;
@@ -5544,7 +5643,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				LOG("Syntax: steer move <character> <x> <y> <z>");
 				return CMD_FAILURE;
 			}
-			if (mcu_p->steerEngine)
+			if (mcu_p->steerEngine.isInitialized())
 			{
 				std::string characterName = args.read_token();
 				SbmCharacter* character = mcu_p->character_map.lookup(characterName.c_str());
@@ -5634,6 +5733,16 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				return CMD_SUCCESS;
 			}				
 		}
+		else if (command == "test")
+		{
+			std::string characterName = args.read_token();
+			SbmCharacter* character = mcu_p->character_map.lookup(characterName.c_str());
+			if (character)
+			{
+				character->steeringAgent->startParameterTesting();
+				return CMD_SUCCESS;
+			}
+		}
 	}
 	return CMD_FAILURE;
 }
@@ -5716,28 +5825,20 @@ int syncpoint_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
-int pawnbonebus_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+#ifdef USE_GOOGLE_PROFILER
+int startprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
-		std::string next = args.read_token();
-		if (next == "")
-		{
-			LOG("Pawn bonebus is %s", mcu_p->sendPawnUpdates? "on" : "off");
-			return CMD_SUCCESS;
-		}
-
-		if (next == "on")
-		{
-			mcu_p->sendPawnUpdates = true;
-			return CMD_SUCCESS;
-		}
-		else if (next == "off")
-		{
-			mcu_p->sendPawnUpdates = false;
-			return CMD_SUCCESS;
-		}
-		else
-		{
-			LOG("Usage: pawnbonebus <on|off>");
-			return CMD_FAILURE;
-		}
+	LOG("Starting the CPU Profiler...");
+	ProfilerStart("/tmp/smartbodyprofile");
+	return CMD_SUCCESS;
 }
+
+int stopprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	LOG("Stopping the CPU Profiler...");
+	ProfilerStop();
+	return CMD_SUCCESS;
+}
+#endif
+
+

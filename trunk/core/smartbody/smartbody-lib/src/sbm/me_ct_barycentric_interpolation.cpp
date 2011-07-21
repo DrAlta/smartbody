@@ -152,7 +152,7 @@ bool BarycentricInterpolator::buildInterpolator()
 		for (int k=0;k<3;k++)
 			ptIn.pointlist[i*3+k] = posIn[k];		
 	}
-	tetrahedralize("V",&ptIn,&tetOut);
+	tetrahedralize((char*)"V",&ptIn,&tetOut);
 
 	for (int i=0;i<tetOut.numberoftetrahedra;i++)
 	{
@@ -182,3 +182,4 @@ float BarycentricInterpolator::distToSimplex( const dVector& pt, Simplex& simp )
 {
 	return 1.f;	
 }
+

@@ -26,11 +26,14 @@
 # ifndef SR_VEC_H
 # define SR_VEC_H
 
-# include <SR/sr_input.h> 
-# include <SR/sr_output.h> 
+# include <sr/sr_input.h> 
+# include <sr/sr_output.h> 
 
 class SrVec;
 class SrVec2;
+
+float dist2 ( const SrVec& v1, const SrVec& v2 );
+float angle ( const SrVec& v1, const SrVec& v2 ); 
 
 /*! This "point typedef" is used mainly to coherently describe variables,
     making possible to distiguish points from vectors parameters. */

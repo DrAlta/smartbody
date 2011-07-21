@@ -30,7 +30,6 @@
 class mcuCBHandle;
 
 namespace BML {
-	const XMLCh TAG_SACCADE[]      = L"saccade";
 
 	BML::BehaviorRequestPtr parse_bml_saccade( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
 };

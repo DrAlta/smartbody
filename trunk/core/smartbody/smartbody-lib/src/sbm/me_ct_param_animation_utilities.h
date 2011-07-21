@@ -45,7 +45,7 @@ class PATimeManager
 {
 	public:
 		std::vector<SkMotion*> motions;
-		std::vector<std::vector<double>> keys;	//always in ascending order
+		std::vector<std::vector<double> > keys;	//always in ascending order
 		std::vector<double> weights;		
 		std::vector<double> localTimes;			//always in ascending order
 		std::vector<double> motionTimes;		//actual motion times get from localTimes
@@ -56,7 +56,7 @@ class PATimeManager
 
 	public:
 		PATimeManager();
-		PATimeManager(std::vector<SkMotion*> m, std::vector<std::vector<double>> k, std::vector<double> w);
+		PATimeManager(std::vector<SkMotion*> m, std::vector<std::vector<double> > k, std::vector<double> w);
 		~PATimeManager();
 
 		int getNumKeys();
@@ -82,7 +82,7 @@ class PAMotions
 		std::vector<double> weights;
 	
 	protected:
-		std::vector<SrBuffer<int>> motionContextMaps;
+		std::vector<SrBuffer<int> > motionContextMaps;
 		JointChannelId baseChanId;
 		JointChannelId baseBuffId;
 
@@ -200,7 +200,7 @@ class PATransitionManager
 		static void bufferBlending(SrBuffer<float>& buffer, SrBuffer<float>& buffer1, SrBuffer<float>& buffer2, double w, MeControllerContext* context);
 
 	private:
-		double getTime(double time, std::vector<double> key, std::vector<std::vector<double>> keys, std::vector<double> w);
+		double getTime(double time, std::vector<double> key, std::vector<std::vector<double> > keys, std::vector<double> w);
 };
 
 class PAControllerBlending

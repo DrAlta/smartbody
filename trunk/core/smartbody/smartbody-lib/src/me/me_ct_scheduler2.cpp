@@ -28,13 +28,13 @@
 #include <sstream>
 #include <algorithm>
 
-#include <SK/sk_skeleton.h>
+#include <sk/sk_skeleton.h>
 
-#include <ME/me_ct_scheduler2.h>
-#include <ME/me_ct_blend.hpp>
-#include <ME/me_ct_time_shift_warp.hpp>
-#include <ME/me_ct_motion.h>
-#include <ME/me_ct_interpolator.h>
+#include <me/me_ct_scheduler2.h>
+#include <me/me_ct_blend.hpp>
+#include <me/me_ct_time_shift_warp.hpp>
+#include <me/me_ct_motion.h>
+#include <me/me_ct_interpolator.h>
 
 #include <sbm/mcontrol_util.h>
 
@@ -288,11 +288,12 @@ MeCtScheduler2::MeCtScheduler2 ()
 	_sub_sched_context( static_cast<MeCtScheduler2::Context*>( _sub_context) )
 {
    _sub_sched_context->ref();
+   _automatically_remove_tracks = false;
 }
 
 MeCtScheduler2::~MeCtScheduler2 () {
 
-//	printf("delete scheduler %s\n",this->name());
+	printf("delete scheduler %s\n",this->name());
    stop (mcuCBHandle::singleton().time);
    _sub_sched_context->unref();
    //clear();

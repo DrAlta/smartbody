@@ -27,7 +27,7 @@
 # ifndef SR_LINE_H
 # define SR_LINE_H
 
-# include <SR/sr_vec.h>
+# include <sr/sr_vec.h>
 
 class SrBox;
 class SrInput;

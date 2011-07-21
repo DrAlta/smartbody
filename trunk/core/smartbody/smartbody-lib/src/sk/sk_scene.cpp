@@ -21,19 +21,17 @@
  *      Andrew n marshall, USC
  */
  
-# include <SR/sr_lines.h>
-# include <SR/sr_model.h>
-# include <SR/sr_sphere.h>
-# include <SR/sr_cylinder.h>
-# include <SR/sr_sn_matrix.h>
-# include <SR/sr_sn_shape.h>
+# include <sr/sr_lines.h>
+# include <sr/sr_model.h>
+# include <sr/sr_sphere.h>
+# include <sr/sr_cylinder.h>
+# include <sr/sr_sn_matrix.h>
+# include <sr/sr_sn_shape.h>
 
-# include <SK/sk_scene.h>
-# include <SK/sk_skeleton.h>
-# include <SK/sk_joint.h>
+# include <sk/sk_scene.h>
+# include <sk/sk_skeleton.h>
+# include <sk/sk_joint.h>
 
-////# define SR_USE_TRACE1  // 
-//# include <SR/sr_trace.h>
 
 # define DEF_CYL_RADIUS 0.5f
 # define DEF_SPH_FACTOR 1.6f;

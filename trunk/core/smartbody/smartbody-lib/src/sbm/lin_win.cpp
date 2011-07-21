@@ -1,12 +1,12 @@
 #include "lin_win.h"
 
-#include <string.h>
-
 #ifdef WIN32
 
 #else
 
 #endif
+
+#include <string.h>
 
 /////////////////////////////////////////////////////////////////
 

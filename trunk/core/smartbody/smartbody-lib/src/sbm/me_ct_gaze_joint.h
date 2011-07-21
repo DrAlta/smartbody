@@ -23,8 +23,8 @@
 #ifndef ME_CT_GAZE_JOINT_H
 #define ME_CT_GAZE_JOINT_H
 
-#include <SK/sk_skeleton.h>
-#include <ME/me_controller.h>
+#include <sk/sk_skeleton.h>
+#include <me/me_controller.h>
 
 #include "gwiz_math.h"
 

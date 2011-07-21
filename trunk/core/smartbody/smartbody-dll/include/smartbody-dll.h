@@ -2,13 +2,15 @@
 #ifndef SMARTBODY_DLL_H
 #define SMARTBODY_DLL_H
 
-
+#ifdef WIN32
 #ifdef SMARTBODY_DLL_EXPORTS
 #define SMARTBODY_DLL_API __declspec(dllexport)
 #else
 #define SMARTBODY_DLL_API __declspec(dllimport)
 #endif
-
+#else
+#define SMARTBODY_DLL_API 
+#endif
 
 #include "vhcl_public.h"
 #include <queue>
@@ -92,7 +94,7 @@ class Smartbody_dll
       bool InitVHMsg();
       void RegisterCallbacks();
 
-      friend Smartbody_dll_SBMCharacterListener_Internal;
+      friend class Smartbody_dll_SBMCharacterListener_Internal;
 };
 
 #endif  // SMARTBODY_DLL_H

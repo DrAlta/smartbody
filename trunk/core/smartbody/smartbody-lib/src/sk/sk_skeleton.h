@@ -25,13 +25,13 @@
 # ifndef SK_SKELETON_H
 # define SK_SKELETON_H
 
-# include <SR/sr_string.h>
-# include <SR/sr_hash_table.h>
-# include <SR/sr_shared_class.h>
-# include <SR/sr_box.h>
-# include <SK/sk_joint.h>
-# include <SK/sk_channel_array.h>
-# include <SK/sk_posture.h>
+# include <sr/sr_string.h>
+# include <sr/sr_hash_table.h>
+# include <sr/sr_shared_class.h>
+# include <sr/sr_box.h>
+# include <sk/sk_joint.h>
+# include <sk/sk_channel_array.h>
+# include <sk/sk_posture.h>
 
 class SrStringArray;
 class SrVarTable;
@@ -87,7 +87,7 @@ class SkSkeleton : public SrSharedClass
     void init ();
 	
 	/* thiebaux 6/19/2006 */
-	SrArray<SkJoint*> get_joint_array( void ) { return( _joints ); }
+	SrArray<SkJoint*>& get_joint_array( void ) { return( _joints ); }
 
     /*! Adds a joint to the hierarchy. If parentid<0 (the default) the last
         joint in the joint list is used as parent (the joint becomes root

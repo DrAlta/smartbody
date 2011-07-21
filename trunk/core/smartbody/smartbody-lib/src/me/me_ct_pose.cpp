@@ -23,7 +23,7 @@
  */
 
 
-# include <ME/me_ct_pose.h>
+# include <me/me_ct_pose.h>
 #include <vhcl_log.h>
 
 
@@ -58,13 +58,13 @@ void MeCtPose::init_channel_map( void )	{
 		_context->child_channels_updated( this );
 }
 
-void MeCtPose::init ( const SkChannelArray& ca )
+void MeCtPose::init ( SbmPawn* pawn, const SkChannelArray& ca )
 {
 	// use copy operator to get channels:
 	_channels = ca;
 
 	// init base class:
-	MeController::init ();
+	MeController::init (pawn);
 
 	// init _buffer (copied from old controller API's init()
 	_buffer.size( controller_channels().floats() );
@@ -73,13 +73,13 @@ void MeCtPose::init ( const SkChannelArray& ca )
 	init_channel_map();
 }
 
-void MeCtPose::init ( const SkPosture& p )
+void MeCtPose::init ( SbmPawn* pawn, const SkPosture& p )
 {
 	// use copy operator to get a copy of the channels:
 	_channels = *(p.const_channels());
 
 	// init base class:
-	MeController::init ();
+	MeController::init (pawn);
 
 	// init _buffer (copied from old controller API's init()
 	_buffer.size( controller_channels().floats() );
@@ -93,13 +93,13 @@ void MeCtPose::init ( const SkPosture& p )
 	init_channel_map();
 }
 
-void MeCtPose::init ( SkMotion* m, float t )
+void MeCtPose::init ( SbmPawn* pawn, SkMotion* m, float t )
 {
 	// use copy operator to get a copy of the channels:
 	_channels = m->channels();
 
 	// init base class:
-	MeController::init ();
+	MeController::init (pawn);
 
 	// init _buffer (copied from old controller API's init()
 	_buffer.size( controller_channels().floats() );
@@ -115,14 +115,14 @@ void MeCtPose::init ( SkMotion* m, float t )
 	init_channel_map();
 }
 
-void MeCtPose::init( MeCtPose* other ) {
+void MeCtPose::init( SbmPawn* pawn, MeCtPose* other ) {
 	clone_parameters( other );
 
 	// use copy operator to get a copy of the channels:
 	_channels = other->_channels;
 
 	// init base class:
-	MeController::init ();
+	MeController::init (pawn);
 	_buffer.size( controller_channels().floats() );
 	_buffer.setall( 0 );
 
@@ -173,7 +173,7 @@ bool MeCtPose::input ( SrInput& inp, const SrHashTable<SkPosture*>& postures )
    
    SkPosture* p = postures.lookup( pname );
    if( p )
-    { init( *p );
+    { init( NULL, *p );
       return true;
     }
    else

@@ -1,24 +1,26 @@
 #ifndef _ROOTWINDOW_
 #define _ROOTWINDOW_
 
-#include <fltk/DoubleBufferWindow.h>
-#include <fltk/MenuBar.h>
-#include <fltk/Button.h>
-#include <fltk/PackedGroup.h>
-#include <fltk/FloatInput.h>
-#include <fltk/Output.h>
+#include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Menu_Bar.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Pack.H>
+#include <FL/Fl_Float_Input.H>
+#include <FL/Fl_Output.H>
 #include "fltk_viewer.h"
 #include <sr/sr_viewer.h>
 #include "CommandWindow.h"
+#include "bmlcreator/BMLCreatorWindow.h"
 #include "CharacterCreatorWindow.h"
 
 class SbmCharacter;
 
-class  RootWindow : public SrViewer, public fltk::DoubleBufferWindow
+class  BaseWindow : public SrViewer, public Fl_Double_Window
 {
 	public:
-		RootWindow(int x, int y, int w, int h, const char* name);
-		~RootWindow();
+	
+		BaseWindow(int x, int y, int w, int h, const char* name);
+		~BaseWindow();
 
 		virtual void show_viewer();
 		virtual void hide_viewer();	
@@ -35,70 +37,71 @@ class  RootWindow : public SrViewer, public fltk::DoubleBufferWindow
 
 		FltkViewer* fltkViewer;
 		CommandWindow* commandWindow;
-		fltk::MenuBar* menubar;
-		fltk::Button* buttonPlay;
-		fltk::Button* buttonStop;
-		fltk::Button* buttonPlaybackStepForward;
+		BMLCreatorWindow* bmlCreatorWindow;
+		Fl_Menu_Bar* menubar;
+		Fl_Button* buttonPlay;
+		Fl_Button* buttonStop;
+		Fl_Button* buttonPlaybackStepForward;
 		CharacterCreatorWindow* characterCreator;
 
-		fltk::Input *inputTimeStep;
+		Fl_Input *inputTimeStep;
 
 		std::string scriptFolder;
 
-		static void LoadCB(Widget* widget, void* data);
-		static void SaveCB(Widget* widget, void* data);
-		static void RunCB(Widget* widget, void* data);
-		static void LaunchBMLViewerCB(Widget* widget, void* data);
-		static void LaunchDataViewerCB(Widget* widget, void* data);
-		static void LaunchParamAnimViewerCB(Widget* widget, void* data);
-		static void LaunchConsoleCB(Widget* widget, void* data);
-		static void StartCB(Widget* widget, void* data);
-		static void StopCB(Widget* widget, void* data);
-		static void StepCB(Widget* widget, void* data);
-		static void PauseCB(Widget* widget, void* data);
-		static void ResumeCB(Widget* widget, void* data);
-		static void ResetCB(Widget* widget, void* data);
-		static void CameraResetCB(Widget* widget, void* data);
-		static void CameraFrameCB(Widget* widget, void* data);
-		static void FaceCameraCB(Widget* widget, void* data);
-		static void RotateSelectedCB(Widget* widget, void* data);
-		static void RunScriptCB(fltk::Widget* w, void* data);
-		static void ReloadScriptsCB(fltk::Widget* w, void* data);
-		static void SetScriptDirCB(fltk::Widget* w, void* data);
-		static void ShowSelectedCB(fltk::Widget* w, void* data);
-		static void ModeBonesCB(fltk::Widget* w, void* data);
-		static void ModeGeometryCB(fltk::Widget* w, void* data);
-		static void ModeDeformableGeometryCB(fltk::Widget* w, void* data);
-		static void ModeGPUDeformableGeometryCB(fltk::Widget* w, void* data);
-		static void ModeAxisCB(fltk::Widget* w, void* data);
-		static void ModeEyebeamsCB(fltk::Widget* w, void* data);
-		static void ModeEyelidCalibrationCB(fltk::Widget* w, void* data);
-		static void ShadowsCB(fltk::Widget* w, void* data);
-		static void TerrainShadedCB(fltk::Widget* w, void* data);
-		static void TerrainWireframeCB(fltk::Widget* w, void* data);
-		static void TerrainNoneCB(fltk::Widget* w, void* data);
-		static void ShowPawns(fltk::Widget* w, void* data);
-		static void ShowPoseExamples(fltk::Widget* w, void* data);
-		static void ModeDynamicsCOMCB(fltk::Widget* w, void* data);
-		static void ModeDynamicsSupportPolygonCB(fltk::Widget* w, void* data);
-		static void ModeDynamicsMassesCB(fltk::Widget* w, void* data);
-		static void SettingsSofteyesToggleCB(fltk::Widget* w, void* data);
-		static void TrackCharacterCB(fltk::Widget* w, void* data);
-		static void AudioCB(fltk::Widget* w, void* data);
-		static void CreateCharacterCB(fltk::Widget* w, void* data);
-		static void CreatePawnCB(fltk::Widget* w, void* data);
-		static void CreateTerrainCB(fltk::Widget* w, void* data);
-		static void KinematicFootstepsCB(fltk::Widget* w, void* data);
-		static void LocomotionFootstepsCB(fltk::Widget* w, void* data);
-		static void VelocityCB(fltk::Widget* w, void* data);
-		static void TrajectoryCB(fltk::Widget* w, void* data);
-		static void SteeringCharactersCB(fltk::Widget* w, void* data);
-		static void SteeringAllCB(fltk::Widget* w, void* data);
-		static void SteeringNoneCB(fltk::Widget* w, void* data);	
-		static void GridCB(fltk::Widget* w, void* data);	
-		static void GridSizeCB(fltk::Widget* w, void* data);	
-		static void GridStepCB(fltk::Widget* w, void* data);	
-		static void GridHeightCB(fltk::Widget* w, void* data);
+		static void LoadCB(Fl_Widget* widget, void* data);
+		static void SaveCB(Fl_Widget* widget, void* data);
+		static void RunCB(Fl_Widget* widget, void* data);
+		static void LaunchBMLViewerCB(Fl_Widget* widget, void* data);
+		static void LaunchDataViewerCB(Fl_Widget* widget, void* data);
+		static void LaunchParamAnimViewerCB(Fl_Widget* widget, void* data);
+		static void LaunchConsoleCB(Fl_Widget* widget, void* data);
+		static void LaunchBMLCreatorCB(Fl_Widget* widget, void* data);
+		static void LaunchResourceViewerCB(Fl_Widget* widget, void* data);
+		static void LaunchFaceViewerCB(Fl_Widget* widget, void* data);
+		static void StartCB(Fl_Widget* widget, void* data);
+		static void StopCB(Fl_Widget* widget, void* data);
+		static void StepCB(Fl_Widget* widget, void* data);
+		static void PauseCB(Fl_Widget* widget, void* data);
+		static void ResumeCB(Fl_Widget* widget, void* data);
+		static void ResetCB(Fl_Widget* widget, void* data);
+		static void CameraResetCB(Fl_Widget* widget, void* data);
+		static void CameraFrameCB(Fl_Widget* widget, void* data);
+		static void FaceCameraCB(Fl_Widget* widget, void* data);
+		static void RotateSelectedCB(Fl_Widget* widget, void* data);
+		static void RunScriptCB(Fl_Widget* w, void* data);
+		static void ReloadScriptsCB(Fl_Widget* w, void* data);
+		static void SetScriptDirCB(Fl_Widget* w, void* data);
+		static void ShowSelectedCB(Fl_Widget* w, void* data);
+		static void ModeBonesCB(Fl_Widget* w, void* data);
+		static void ModeGeometryCB(Fl_Widget* w, void* data);
+		static void ModeDeformableGeometryCB(Fl_Widget* w, void* data);
+		static void ModeGPUDeformableGeometryCB(Fl_Widget* w, void* data);
+		static void ModeAxisCB(Fl_Widget* w, void* data);
+		static void ModeEyebeamsCB(Fl_Widget* w, void* data);
+		static void ModeEyelidCalibrationCB(Fl_Widget* w, void* data);
+		static void ShadowsCB(Fl_Widget* w, void* data);
+		static void TerrainShadedCB(Fl_Widget* w, void* data);
+		static void TerrainWireframeCB(Fl_Widget* w, void* data);
+		static void TerrainNoneCB(Fl_Widget* w, void* data);
+		static void ShowPawns(Fl_Widget* w, void* data);
+		static void ShowPoseExamples(Fl_Widget* w, void* data);
+		static void ModeDynamicsCOMCB(Fl_Widget* w, void* data);
+		static void ModeDynamicsSupportPolygonCB(Fl_Widget* w, void* data);
+		static void ModeDynamicsMassesCB(Fl_Widget* w, void* data);
+		static void SettingsSofteyesToggleCB(Fl_Widget* w, void* data);
+		static void TrackCharacterCB(Fl_Widget* w, void* data);
+		static void AudioCB(Fl_Widget* w, void* data);
+		static void CreateCharacterCB(Fl_Widget* w, void* data);
+		static void CreatePawnCB(Fl_Widget* w, void* data);
+		static void CreateTerrainCB(Fl_Widget* w, void* data);
+		static void KinematicFootstepsCB(Fl_Widget* w, void* data);
+		static void LocomotionFootstepsCB(Fl_Widget* w, void* data);
+		static void VelocityCB(Fl_Widget* w, void* data);
+		static void TrajectoryCB(Fl_Widget* w, void* data);
+		static void SteeringCharactersCB(Fl_Widget* w, void* data);
+		static void SteeringAllCB(Fl_Widget* w, void* data);
+		static void SteeringNoneCB(Fl_Widget* w, void* data);	
+		static void GridCB(Fl_Widget* w, void* data);	
 };
 
 class FltkViewerFactory : public SrViewerFactory

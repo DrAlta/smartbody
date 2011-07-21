@@ -30,7 +30,6 @@
 class mcuCBHandle;
 
 namespace BML {
-	const XMLCh TAG_GAZE[]      = L"gaze";
 
 	namespace Gaze {
 		int set_gaze_speed( float head, float eyes );

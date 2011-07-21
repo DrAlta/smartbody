@@ -27,8 +27,8 @@
  * A color definition
  */
 
-# include <SR/sr_input.h>
-# include <SR/sr_output.h>
+# include <sr/sr_input.h>
+# include <sr/sr_output.h>
 
 /*! \class SrColor sr_color.h
     \brief specifies a color

@@ -19,11 +19,12 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
 
-# include <SR/sr_string_array.h>
-# include <SR/sr_model.h>
+# include <sr/sr_string_array.h>
+# include <sr/sr_model.h>
+#include <sbm/GPU/SbmTexture.h>
 
 //# define SR_USE_TRACE1    // keyword tracking
-//# include <SR/sr_trace.h>
+//# include <sr/sr_trace.h>
 
 # define GETID(n,A) in>>n; if (n>0) n--; else if (n<0) n+=A.size()
  
@@ -60,14 +61,37 @@ static SrColor read_color ( SrInput& in )
    return c;
  }
 
+static void load_texture(int type, const char* file, const SrStringArray& paths)
+{
+	SrString s;
+	SrInput in;
+	std::string imageFile = file;
+	in.init( fopen(file,"r"));
+	int i = 0;
+	while ( !in.valid() && i < paths.size())
+	{
+		s = paths[i++];
+		s << file;
+		imageFile = s;
+		in.init ( fopen(s,"r") );
+	}
+	if (!in.valid()) return;	
+		
+	SbmTextureManager& texManager = SbmTextureManager::singleton();
+	texManager.loadTexture(type,file,s);	
+}
+
 static void read_materials ( SrArray<SrMaterial>& M,
                              SrStringArray& mnames,
+							 std::map<std::string,std::string>& mtlTexMap,
+							 std::map<std::string,std::string>& mtlTexBumpMap,
                              const SrString& file,
                              const SrStringArray& paths )
  {
    SrString s;
    SrInput in;
 
+   in.lowercase_tokens(false);
    in.init ( fopen(file,"rt") );
    int i=0;
    while ( !in.valid() && i<paths.size() )
@@ -80,11 +104,17 @@ static void read_materials ( SrArray<SrMaterial>& M,
    while ( !in.finished() )
     { in.get_token();
       if ( in.last_token()=="newmtl" )
-       { M.push().init();
-         in.get_token();
+       { 
+	     SrMaterial material;
+		 material.init();
+		 //M.push().init();
+		 M.push(material);        
          //SR_TRACE1 ( "new material: "<<in.last_token() );
-         mnames.push ( in.last_token() );
-       }
+		 SrString matName;
+		 in.getline(matName);
+		 matName.ltrim();
+		 mnames.push ( matName );
+       }	  
       else if ( in.last_token()=="Ka" )
        { M.top().ambient = read_color ( in );
        }
@@ -101,6 +131,31 @@ static void read_materials ( SrArray<SrMaterial>& M,
        { in >> i;
          M.top().shininess = i;
        }
+	  else if ( in.last_token()=="map_Kd") // texture map
+	  {
+		  SrString mapKaName, dotstr, ext;			  
+		  in.get_token(mapKaName);		  		  
+		  in.get_token(dotstr);	
+		  in.get_token(ext);
+		  mapKaName.append(dotstr);
+		  mapKaName.append(ext);
+		  std::string texFile = (const char*) mapKaName;
+		  std::string mtlName = mnames.top();
+		  mtlTexMap[mtlName] = texFile;		  
+	  }
+	  else if ( in.last_token()=="map_bump") // texture map
+	  {
+		  SrString mapBump, dotstr, ext;
+		  //in >> mapKaName;		  		 		  
+		  in.get_token(mapBump);
+		  in.get_token(dotstr);	
+		  in.get_token(ext);
+		  mapBump.append(dotstr);
+		  mapBump.append(ext);
+		  std::string texFile = (const char*) mapBump;
+		  std::string mtlName = mnames.top();
+		  mtlTexBumpMap[mtlName] = texFile;		  
+	  }
       else if ( in.last_token()=="illum" ) // dont know what is this one
        { in >> i;
        }
@@ -111,6 +166,8 @@ static bool process_line ( const SrString& line,
                            SrModel& m,
                            SrStringArray& paths,
                            SrStringArray& mnames,
+						   std::map<std::string,std::string>& mtlTexMap,
+						   std::map<std::string,std::string>& mtlTexBumpMap,
                            int& curmtl )
  {
    SrInput in (line);
@@ -170,8 +227,11 @@ static bool process_line ( const SrString& line,
     }
    else if ( in.last_token()=="usemtl" ) // usemtl name
     { //SR_TRACE1 ( "usemtl" );
-      in.get_token ();
-      curmtl = mnames.lsearch ( in.last_token() );
+      //in.get_token ();
+	  SrString matName;
+	  in.getline(matName);
+	  matName.ltrim();
+      curmtl = mnames.lsearch ( matName );
       //SR_TRACE1 ( "curmtl = " << curmtl << " (" << in.last_token() << ")" );
     }
    else if ( in.last_token()=="mtllib" ) // mtllib file1 file2 ...
@@ -185,7 +245,7 @@ static bool process_line ( const SrString& line,
          token.replace ( "\\", "/" ); // avoid win-unix problems
          //SR_TRACE1 ( "new path: "<<token );
          paths.push ( token );
-         read_materials ( m.M, mnames, file, paths );
+         read_materials ( m.M, mnames, mtlTexMap, mtlTexBumpMap, file, paths );
        }
     }
 
@@ -219,13 +279,27 @@ bool SrModel::import_obj ( const char* file )
 
    SrString line;
    while ( in.getline(line)!=EOF )
-    { if ( !process_line(line,*this,paths,mtlnames,curmtl) ) return false;
+    { if ( !process_line(line,*this,paths,mtlnames,mtlTextureNameMap,mtlNormalTexNameMap,curmtl) ) return false;
     }
 
    validate ();
    remove_redundant_materials ();
 //   remove_redundant_normals ();
    compress ();
+
+   // after remove all redundant materials, load the corresponding textures
+   for (int i=0;i<M.size();i++)
+   {
+	   std::string matName = mtlnames[i];
+	   if (mtlTextureNameMap.find(matName) != mtlTextureNameMap.end())
+	   {
+		   load_texture(SbmTextureManager::TEXTURE_DIFFUSE,mtlTextureNameMap[matName].c_str(),paths);	   
+	   }	
+	   if (mtlNormalTexNameMap.find(matName) != mtlNormalTexNameMap.end())
+	   {
+		   load_texture(SbmTextureManager::TEXTURE_NORMALMAP,mtlNormalTexNameMap[matName].c_str(),paths);	   
+	   }
+   }
 
    //SR_TRACE1("Ok!");
    return true;

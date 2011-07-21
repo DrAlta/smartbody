@@ -25,7 +25,8 @@
 # ifndef SR_HASH_TABLE_H
 # define SR_HASH_TABLE_H
 
-# include <SR/sr_array.h>
+# include <sr/sr_array.h>
+# include <sr/sr_shared_class.h>
 
 #define SR_HASH_TABLE_OVERRIDE	( 0 )
 

@@ -131,6 +131,127 @@ void RBFInterpolator::predictInterpWeights( const dVector& para, VecOfInterpWeig
 }
 
 /************************************************************************/
+/* KNN base Interpolator                                                */
+/************************************************************************/
+
+void KNNBaseInterpolator::generateRandomWeight( int nK, vector<float>& outWeights )
+{
+	float delta = 0.02f;
+	outWeights.resize(nK);
+	float weightSum = 0.0;
+	for (int i=0;i<nK-1;i++)
+	{
+		float w = MeCtMath::Random(std::max(-delta, -delta-weightSum),std::min(1.f+delta,1.f+delta-weightSum));
+		outWeights[i] = w;
+		weightSum += w;
+	}	
+	outWeights[nK-1] = 1.f - weightSum;
+}
+
+void KNNBaseInterpolator::generateDistWeights( vector<float>& dists, vector<float>& outWeights )
+{
+	int nK = dists.size();
+	outWeights.resize(nK);
+
+	float weightSum = 0.f;
+	for (int i=0;i<nK;i++)
+	{
+		float weight = 1.0f/dists[i] - 1.0f/dists[nK-1];
+		weightSum += weight;
+		outWeights[i] = weight;
+	}
+
+	std::stringstream strstr;
+	strstr << "weights = ";		
+	for (int i=0;i<nK;i++)
+	{
+		outWeights[i] /= weightSum;
+		strstr << outWeights[i] << " ,";				
+	}
+	strstr << std::endl;
+}
+
+int KNNBaseInterpolator::kdTreeKNN( ANNkd_tree* kdTree, const dVector& inPara, int numKNN, VecOfInterpWeight& outWeight )
+{	
+	int nPts = kdTree->nPoints();
+	int nKNN = nPts > numKNN ? numKNN : nPts;	
+
+	outWeight.resize(nKNN);
+
+	ANNidxArray nnIdx;
+	ANNdistArray nnDists;
+	nnIdx = new ANNidx[nKNN];
+	nnDists = new ANNdist[nKNN];
+
+	const double* paraData = (const double*)(&inPara[0]);
+	kdTree->annkSearch((double*)paraData,nKNN,nnIdx,nnDists);
+
+	float weightSum = 0.f;
+	for (int i=0;i<nKNN;i++)
+	{
+		int index = nnIdx[i];				
+		outWeight[i].first  = index;
+		outWeight[i].second = float(nnDists[i]);
+	}
+	// clean up memory
+	delete [] nnIdx;
+	delete [] nnDists;
+
+	return nKNN;
+}
+
+void KNNBaseInterpolator::normalizeBlendWeight( VecOfInterpWeight& weight )
+{
+	float weightSum = 0.f;
+	for (unsigned int i=0;i<weight.size();i++)
+	{
+		InterpWeight& w = weight[i];
+		weightSum += w.second;
+	}
+
+	for (unsigned int i=0;i<weight.size();i++)
+	{
+		InterpWeight& w = weight[i];
+		w.second = w.second/weightSum;
+	}
+}
+
+void KNNBaseInterpolator::mapDistWeightToBlendWeight( VecOfInterpExample& exampleList, VecOfInterpWeight& inDistWeight, VecOfInterpWeight& outBlendWeight )
+{
+	std::map<int,float> finalWeight;
+
+	float weightSum = 0.f;
+	for (unsigned int i=0;i<inDistWeight.size();i++)
+	{
+		InterpWeight& tempW = inDistWeight[i];
+		InterpolationExample* ex = exampleList[tempW.first];
+		VecOfInterpWeight& realW = ex->weight;
+		for (unsigned int k=0;k<realW.size();k++)
+		{
+			int index = realW[k].first;
+			float w   = realW[k].second*tempW.second;
+			if (finalWeight.find(index) == finalWeight.end())
+				finalWeight[index] = 0.f;
+			finalWeight[index] += w;
+			weightSum += w;
+		}
+	}
+
+	outBlendWeight.clear();
+	std::map<int,float>::iterator mi;
+	//BOOST_FOREACH(const map_type::value_type&& w, finalWeight)
+	for ( mi  = finalWeight.begin(); 
+		  mi != finalWeight.end();
+		  mi++)
+	{
+		if (mi->second == 0.f)
+			continue;	
+		InterpWeight w = *mi;
+		outBlendWeight.push_back(w);
+	}
+	normalizeBlendWeight(outBlendWeight);
+}
+/************************************************************************/
 /* KNN Interpolator                                                     */
 /************************************************************************/
 KNNInterpolator::KNNInterpolator( int numResample /*= 500*/, float sampleDist /*= 5.f*/ )
@@ -144,6 +265,11 @@ KNNInterpolator::KNNInterpolator( int numResample /*= 500*/, float sampleDist /*
 
 KNNInterpolator::~KNNInterpolator()
 {
+	FREE_DATA(kdTree);
+	if (dataPts)
+	{
+		annDeallocPts(dataPts);
+	}
 	//printf("delete KNN interpolator\n");
 	for (unsigned int i=0;i<resampleData.size();i++)
 	{
@@ -151,6 +277,55 @@ KNNInterpolator::~KNNInterpolator()
 	}
 	resampleData.clear();
 }
+
+void KNNInterpolator::predictInterpWeights( const dVector& para, VecOfInterpWeight& blendWeights )
+{
+	vector<int> KNNIdx;
+	vector<float> KNNDists, KNNWeights;
+	VecOfInterpWeight tempWeight;
+
+	kdTreeKNN(kdTree,para,numKNN,tempWeight);
+	pairToVec(tempWeight,KNNIdx,KNNDists);
+	generateDistWeights(KNNDists,KNNWeights);
+	vecToPair(KNNIdx,KNNWeights,tempWeight);	
+
+	mapDistWeightToBlendWeight(finalExampleData,tempWeight,blendWeights);
+	// map pseudo examples to final weight	
+// 	std::map<int,float> finalWeight;
+// 
+// 	float weightSum = 0.f;
+// 	for (unsigned int i=0;i<tempWeight.size();i++)
+// 	{
+// 		InterpWeight& tempW = tempWeight[i];
+// 		InterpolationExample* ex = finalExampleData[tempW.first];
+// 		VecOfInterpWeight& realW = ex->weight;
+// 		for (unsigned int k=0;k<realW.size();k++)
+// 		{
+// 			int index = realW[k].first;
+// 			float w   = realW[k].second*tempW.second;
+// 			if (finalWeight.find(index) == finalWeight.end())
+// 				finalWeight[index] = 0.f;
+// 			finalWeight[index] += w;
+// 			weightSum += w;
+// 		}
+// 	}	
+// 
+// 	blendWeights.clear();
+// 	std::map<int,float>::iterator mi;
+// 	//BOOST_FOREACH(const map_type::value_type&& w, finalWeight)
+// 	for ( mi  = finalWeight.begin(); 
+// 		mi != finalWeight.end();
+// 		mi++)
+// 	{
+// 		if (mi->second == 0.f)
+// 			continue;
+// 
+// 		InterpWeight w = *mi;
+// 		w.second /= weightSum;
+// 		blendWeights.push_back(w);
+// 	}
+}
+
 
 bool KNNInterpolator::buildInterpolator()
 {	
@@ -163,7 +338,8 @@ bool KNNInterpolator::buildInterpolator()
 	// build resample
 	int nCount = 0;
 	ParameterBoundingBox& BBox = exampleSet->getParameterBBox();
-	gridBox = ParameterBoundingBox(BBox);
+	ParameterBoundingBox bbox(BBox);
+	gridBox = bbox;
 	gridBox.scaleBBox(1.5);
 	InterpolationExample* ex = NULL;
 	while (nCount < resampleSize)
@@ -218,52 +394,6 @@ bool KNNInterpolator::buildInterpolator()
 	return true;
 }
 
-void KNNInterpolator::predictInterpWeights( const dVector& para, VecOfInterpWeight& blendWeights )
-{
-	vector<int> KNNIdx;
-	vector<float> KNNDists, KNNWeights;
-	VecOfInterpWeight tempWeight;
-	
-	kdTreeKNN(kdTree,para,numKNN,tempWeight);
-	pairToVec(tempWeight,KNNIdx,KNNDists);
-	generateDistWeights(KNNDists,KNNWeights);
-	vecToPair(KNNIdx,KNNWeights,tempWeight);	
-
-	// map pseudo examples to final weight	
-	std::map<int,float> finalWeight;
-	
-	float weightSum = 0.f;
-	for (unsigned int i=0;i<tempWeight.size();i++)
-	{
-		InterpWeight& tempW = tempWeight[i];
-		InterpolationExample* ex = finalExampleData[tempW.first];
-		VecOfInterpWeight& realW = ex->weight;
-		for (unsigned int k=0;k<realW.size();k++)
-		{
-			int index = realW[k].first;
-			float w   = realW[k].second*tempW.second;
-			if (finalWeight.find(index) == finalWeight.end())
-				finalWeight[index] = 0.f;
-			finalWeight[index] += w;
-			weightSum += w;
-		}
-	}	
-
-	blendWeights.clear();
-	std::map<int,float>::iterator mi;
-	//BOOST_FOREACH(const map_type::value_type&& w, finalWeight)
-	for ( mi  = finalWeight.begin(); 
-		  mi != finalWeight.end();
-		  mi++)
-	{
-		if (mi->second == 0.f)
-			continue;
-
-		InterpWeight w = *mi;
-		w.second /= weightSum;
-		blendWeights.push_back(w);
-	}
-}
 
 bool KNNInterpolator::addResample( InterpolationExample* ex )
 {	
@@ -287,43 +417,6 @@ bool KNNInterpolator::addResample( InterpolationExample* ex )
 		}
 	}
 	return false;
-}
-
-void KNNInterpolator::generateRandomWeight( int nK, vector<float>& outWeights )
-{
-	float delta = 0.02f;
-	outWeights.resize(nK);
-	float weightSum = 0.0;
-	for (int i=0;i<nK-1;i++)
-	{
-		float w = MeCtMath::Random(std::max(-delta, -delta-weightSum),std::min(1.f+delta,1.f+delta-weightSum));
-		outWeights[i] = w;
-		weightSum += w;
-	}	
-	outWeights[nK-1] = 1.f - weightSum;
-}
-
-void KNNInterpolator::generateDistWeights( vector<float>& dists, vector<float>& outWeights )
-{
-	int nK = dists.size();
-	outWeights.resize(nK);
-
-	float weightSum = 0.f;
-	for (int i=0;i<nK;i++)
-	{
-		float weight = 1.0f/dists[i] - 1.0f/dists[nK-1];
-		weightSum += weight;
-		outWeights[i] = weight;
-	}
-
-	std::stringstream strstr;
-	strstr << "weights = ";		
-	for (int i=0;i<nK;i++)
-	{
-		outWeights[i] /= weightSum;
-		strstr << outWeights[i] << " ,";				
-	}
-	strstr << std::endl;
 }
 
 int KNNInterpolator::closestExampleInHash(const dVector& inPara, unsigned int nKNN, VecOfInterpWeight& outWeight)
@@ -350,38 +443,7 @@ int KNNInterpolator::closestExampleInHash(const dVector& inPara, unsigned int nK
 	return iHash;
 }
 
-
-int KNNInterpolator::kdTreeKNN( ANNkd_tree* kdTree, const dVector& inPara, int numKNN, VecOfInterpWeight& outWeight )
-{	
-	int nPts = kdTree->nPoints();
-	int nKNN = nPts > numKNN ? numKNN : nPts;	
-
-	outWeight.resize(nKNN);
-	
-	ANNidxArray nnIdx;
-	ANNdistArray nnDists;
-	nnIdx = new ANNidx[nKNN];
-	nnDists = new ANNdist[nKNN];
-
-	const double* paraData = (const double*)(&inPara[0]);
-	kdTree->annkSearch((double*)paraData,nKNN,nnIdx,nnDists);
-
-	float weightSum = 0.f;
-	for (int i=0;i<nKNN;i++)
-	{
-		int index = nnIdx[i];				
-		outWeight[i].first  = index;
-		outWeight[i].second = float(nnDists[i]);
-	}
-	// clean up memory
-	delete [] nnIdx;
-	delete [] nnDists;
-	
-	return nKNN;
-}
-
-int KNNInterpolator::linearKNN( const VecOfInterpExample& sampleList, const dVector& inPara, int nKNN, 
-								 VecOfInterpWeight& outWeight )
+int KNNInterpolator::linearKNN( const VecOfInterpExample& sampleList, const dVector& inPara, int nKNN, VecOfInterpWeight& outWeight )
 {	
 	unsigned int uKNN = (unsigned int) nKNN;
 	int nK = uKNN < sampleList.size() ? uKNN : sampleList.size();
@@ -412,3 +474,4 @@ int KNNInterpolator::linearKNN( const VecOfInterpExample& sampleList, const dVec
 	return nCurK; 	
 
 }
+

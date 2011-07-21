@@ -23,14 +23,18 @@
  */
 
 #include "vhcl.h"
-
+#include <sbm/mcontrol_util.h>
 #include "sbm_pawn.hpp"
-#include <sbm/gpu/SbmDeformableMeshGPU.h>
+#include <sbm/GPU/SbmDeformableMeshGPU.h>
 
 #include <string.h>
 #include <iostream>
 
+// added by AShapiro 6/30/11 - not sure why the USE_WSP variable this is not being picked up in mcontrol_util.h
+#define USE_WSP 1
+#if USE_WSP
 #include "wsp.h"
+#endif
 
 #include "mcontrol_util.h"
 #include "me_utilities.hpp"
@@ -40,7 +44,10 @@
 
 
 using namespace std;
+
+#if USE_WSP
 using namespace WSP;
+#endif
 
 // Predeclare private functions defined below
 inline bool parse_float_or_error( float& var, const char* str, const string& var_name );
@@ -48,6 +55,7 @@ inline bool parse_float_or_error( float& var, const char* str, const string& var
 /////////////////////////////////////////////////////////////
 //  WSP Callbacks
 
+#if USE_WSP
 WSP::WSP_ERROR remote_pawn_position_update( std::string id, std::string attribute_name, wsp_vector & vector_3d, void * data, const std::string & data_provider )
 {
 	mcuCBHandle * mcu_p = static_cast< mcuCBHandle * >( data );
@@ -88,7 +96,7 @@ WSP::WSP_ERROR remote_pawn_rotation_update( std::string id, std::string attribut
 	else
 	{
 		std::stringstream strstr;
-		strstr << "ERROR: SbmPawn::remote_pawn_rotation_update: SbmPawn '" << id << "' is NULL, cannot set_world_offset";
+		strstr << "ERROR: SbmPawn::remote_pawn_rotation_update: SbmPawn '" << id << "' is NULL, cannotsbm set_world_offset";
 		LOG(strstr.str().c_str());
 		return not_found_error( "SbmPawn is NULL" );
 	}
@@ -100,6 +108,7 @@ void handle_wsp_error( std::string id, std::string attribute_name, int error, st
 
 	LOG( "error getting id: %s attribute_name: %s. error_code: %d reason: %s\n", id.c_str(), attribute_name.c_str(), error, reason.c_str() );
 }
+#endif
 
 /////////////////////////////////////////////////////////////
 //  SbmPawn Constants
@@ -119,12 +128,11 @@ SbmPawn::SbmPawn( const char * name )
 	world_offset_writer_p( new MeCtChannelWriter() ),
 	wo_cache_timestamp( -std::numeric_limits<float>::max() )
 {
-	
-	bonebusCharacter = NULL;
 	strcpy( this->name, name );
 	//skeleton_p->ref();
 	scene_p->ref();
 	ct_tree_p->ref();
+	ct_tree_p->setPawn(this);
 
 	colObj_p = NULL;
 	phyObj_p = NULL;
@@ -136,6 +144,8 @@ SbmPawn::SbmPawn( const char * name )
 	//   and therefore needs to evaluate before other controllers
 	world_offset_writer_p->ref();
 	ct_tree_p->add_controller( world_offset_writer_p );
+
+	this->createBoolAttribute("physics", false, true, "Basic", 300, false, false, "is the pawn physics enabled");
 }
 
 int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
@@ -158,7 +168,8 @@ int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 // 	}
 
 	scene_p->init( skeleton_p );  // if skeleton_p == NULL, the scene is cleared
-	dMesh_p->skeleton = new_skeleton_p;		
+//	dMesh_p->skeleton = new_skeleton_p;		
+	dMesh_p->setSkeleton(new_skeleton_p);
 
 	// Name the controllers
 	string ct_name( name );
@@ -190,7 +201,7 @@ int SbmPawn::init_skeleton() {
 	skeleton_p->compress();
 
 	init_world_offset_channels();
-	world_offset_writer_p->init( WORLD_OFFSET_CHANNELS_P, true );
+	world_offset_writer_p->init( this, WORLD_OFFSET_CHANNELS_P, true );
 
 	wo_cache.x = 0;
 	wo_cache.y = 0;
@@ -260,12 +271,12 @@ void SbmPawn::remove_from_scene() {
 	// remove the connected steering object for steering space
 	if (steeringSpaceObj_p)
 	{
-		if (mcu.steerEngine)
+		if (mcu.steerEngine.isInitialized())
 		{
-			if (mcu.steerEngine->_engine)
+			if (mcu.steerEngine._engine)
 			{
-				mcu.steerEngine->_engine->removeObstacle(steeringSpaceObj_p);
-				mcu.steerEngine->_engine->getSpatialDatabase()->removeObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
+				mcu.steerEngine._engine->removeObstacle(steeringSpaceObj_p);
+				mcu.steerEngine._engine->getSpatialDatabase()->removeObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
 			}
 		}
 		delete steeringSpaceObj_p;
@@ -297,20 +308,6 @@ void SbmPawn::exec_controller_cleanup( MeController* ct, mcuCBHandle* mcu_p ) {
 
 //  Destructor
 SbmPawn::~SbmPawn()	{
-
-	if ( mcuCBHandle::singleton().sbm_character_listener )
-	{
-		mcuCBHandle::singleton().sbm_character_listener->OnCharacterDelete( name );
-	}
-
-    if ( bonebusCharacter )
-    {
-	   mcuCBHandle& mcu = mcuCBHandle::singleton();
-	   if (mcu.sendPawnUpdates)
-		   mcuCBHandle::singleton().bonebus.DeleteCharacter( bonebusCharacter );
-       bonebusCharacter = NULL;
-    }
-
 	if ( world_offset_writer_p )
 		world_offset_writer_p->unref();
 
@@ -321,19 +318,18 @@ SbmPawn::~SbmPawn()	{
 		skeleton_p->unref();
 	ct_tree_p->unref();
     delete [] name;
-
 	if (colObj_p)
 		delete colObj_p;
 	if (phyObj_p)
 		delete phyObj_p;
 	if (steeringSpaceObj_p)
 	{
-		if (mcuCBHandle::singleton().steerEngine)
+		if (mcuCBHandle::singleton().steerEngine.isInitialized())
 		{
-			if (mcuCBHandle::singleton().steerEngine->_engine)
+			if (mcuCBHandle::singleton().steerEngine._engine)
 			{
-				mcuCBHandle::singleton().steerEngine->_engine->removeObstacle(steeringSpaceObj_p);
-				mcuCBHandle::singleton().steerEngine->_engine->getSpatialDatabase()->removeObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
+				mcuCBHandle::singleton().steerEngine._engine->removeObstacle(steeringSpaceObj_p);
+				mcuCBHandle::singleton().steerEngine._engine->getSpatialDatabase()->removeObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
 			}
 		}
 		delete steeringSpaceObj_p;
@@ -504,12 +500,14 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		float loc[3] = { 0, 0, 0 };
 
 		bool has_geom = false;
-		const char* geom_str = NULL;
-		const char* file_str = NULL;
-		const char* size_str = NULL;
-		const char* color_str = NULL;
+		std::string geom_str = "box";
+		std::string file_str = "";
+		std::string size_str = "";
+		std::string color_str = "red";
+		SrVec size = SrVec(1.f,1.f,1.f);
 		bool setRec = false;
 		SrVec rec;
+		std::string defaultColor = "red";
 		while( args.calc_num_tokens() > 0 ) {
 			string option = args.read_token();
 			// TODO: Make the following option case insensitive
@@ -530,9 +528,9 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				has_geom = true;
 			} else if( option=="rec" ) {
 				setRec = true;
-				rec.x = args.read_float();
-				rec.y = args.read_float();
-				rec.z = args.read_float();
+				size.x = rec.x = args.read_float();
+				size.y = rec.y = args.read_float();
+				size.z = rec.z = args.read_float();
 				has_geom = true;
 			} else {
 				std::stringstream strstr;
@@ -560,23 +558,24 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		}
 
 		// setting up geometry and physics 
-		if( has_geom && geom_str ) {
-			//LOG("WARNING: SbmPawn geometry not implemented.  Ignoring options.");
-			float size = 1.0;
-			if (size_str)
+		if( has_geom && !geom_str.empty() ) {
+			//LOG("WARNING: SbmPawn geometry not implemented.  Ignoring options.");			
+			if (!size_str.empty())
 			{
-				size = (float)atof(size_str);
-			}
-			pawn_p->initGeomObj(geom_str,size,file_str);
+				float uniformSize = (float)atof(size_str.c_str());
+				for (int i=0;i<3;i++)
+					size[i] = uniformSize;
+			}			
+			pawn_p->initGeomObj(geom_str.c_str(),size,color_str.c_str(),file_str.c_str());
 		}
 		if (pawn_p->colObj_p)
 		{
-			if (strcmp(geom_str, "box") == 0)
+			if (geom_str == "box")
 			{
 				pawn_p->steeringSpaceObjSize = rec;
 				if (!setRec)
 				{
-					float size = (float)atof(size_str);
+					float size = (float)atof(size_str.c_str());
 					pawn_p->steeringSpaceObjSize = SrVec(size, size, size);
 				}
 				pawn_p->initSteeringSpaceObject();
@@ -610,7 +609,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 		if (pawn_p->colObj_p)
 		{
-			pawn_p->setWorldOffset(pawn_p->colObj_p->worldState.gmat());
+			pawn_p->setWorldOffset(pawn_p->colObj_p->getWorldState().gmat());
 		}
 		// [BMLR] Send notification to the renderer that a pawn was created.
 		// NOTE: This is sent both for characters AND pawns
@@ -620,14 +619,6 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		//printf("h = %f, p = %f, r = %f\n",h,p,r);	
 		pawn_p->set_world_offset(loc[0],loc[1],loc[2],h,p,r);	
 		pawn_p->wo_cache_update();
-
-		if (mcu_p->sendPawnUpdates)
-			pawn_p->bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( pawn_name.c_str(), "pawn", false );
-
-		if ( mcuCBHandle::singleton().sbm_character_listener )
-		{
-			mcuCBHandle::singleton().sbm_character_listener->OnCharacterCreate( pawn_name, "pawn" );
-		}
 
 		return CMD_SUCCESS;
 	} else if( pawn_cmd=="prune" ) {  // Prunes the controller trees of unused/overwritten controllers
@@ -678,11 +669,11 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			strstr << "ERROR: Pawn \""<<pawn_name<<"\" not found.";
 			LOG(strstr.str().c_str());
 			return CMD_FAILURE;
-		}
-		const char *geom_str = NULL, *size_str = NULL, *color_str = NULL, *file_str = NULL;	
+		}		
+		std::string geom_str = "box", color_str = "red", file_str = "";
 		bool setRec = false;
 		bool has_geom = false;
-		float size = 1.f;
+		SrVec size = SrVec(1.f,1.f,1.f);		
 		while( args.calc_num_tokens() > 0 ) {
 			string option = args.read_token();
 			// TODO: Make the following option case insensitive
@@ -691,8 +682,11 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				has_geom = true;
 			} else if( option=="size" ) {
 				//size_str = args.read_token();
-				size = args.read_float();
+				float uniformSize = args.read_float();
+				for (int i=0;i<3;i++)
+					size[i] = uniformSize;//args.read_float();
 				has_geom = true;
+
 			} else if (option=="file" ) {
 				file_str = args.read_token();
 				has_geom = true;			
@@ -701,9 +695,10 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				has_geom = true;
 			} else if( option=="rec" ) {
 				setRec = true;
-				pawn_p->steeringSpaceObjSize.x = args.read_float();
-				pawn_p->steeringSpaceObjSize.y = args.read_float();
-				pawn_p->steeringSpaceObjSize.z = args.read_float();
+				size[0] = pawn_p->steeringSpaceObjSize.x = args.read_float();
+				size[1] = pawn_p->steeringSpaceObjSize.y = args.read_float();
+				size[2] = pawn_p->steeringSpaceObjSize.z = args.read_float();
+				
 				has_geom = true;
 			} else {
 				std::stringstream strstr;
@@ -713,17 +708,17 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		}	
 
 		if (has_geom)
-		{	
-			pawn_p->initGeomObj(geom_str,size,file_str);
+		{				
+			pawn_p->initGeomObj(geom_str.c_str(),size,color_str.c_str(),file_str.c_str());
 			// init steering space
 			if (!setRec)
-				pawn_p->steeringSpaceObjSize = SrVec(size, size, size);
+				pawn_p->steeringSpaceObjSize = size;//SrVec(size, size, size);
 			pawn_p->initSteeringSpaceObject();
 			return CMD_SUCCESS;
 		}
 		else
 		{
-			LOG("Pawn %s, fail to setshape. Incorrect parameters.",pawn_name);
+			LOG("Pawn %s, fail to setshape. Incorrect parameters.",pawn_name.c_str());
 			return CMD_FAILURE;
 		}
 	}	
@@ -858,7 +853,7 @@ int SbmPawn::set_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& args,
 	} 	
 	else 
 	{
-		LOG("ERROR: SbmPawn::set_cmd_func(..): Unknown attribute \"%s\".", attribute);
+		LOG("ERROR: SbmPawn::set_cmd_func(..): Unknown attribute \"%s\".", attribute.c_str() );
 		return CMD_FAILURE;
 	}
 }
@@ -960,7 +955,7 @@ int SbmPawn::print_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& arg
 			cout << "pawn " << pawn->name << " joint "<<joint_name<<":\t";
 			const SkJoint* joint = pawn->get_joint( joint_name.c_str() );
 			if( joint==NULL ) {
-				LOG("No joint \"%s\".", joint_name);
+				LOG("No joint \"%s\".", joint_name.c_str() );
 			} else {
 				print_joint( joint );
 			}
@@ -970,7 +965,7 @@ int SbmPawn::print_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& arg
 
 		return CMD_SUCCESS;
 	} else {
-		LOG("ERROR: SbmPawn::print_attribute(..): Unknown attribute \"%s\".", attribute);
+		LOG("ERROR: SbmPawn::print_attribute(..): Unknown attribute \"%s\".", attribute.c_str() );
 		return CMD_FAILURE;
 	}
 }
@@ -990,7 +985,7 @@ int SbmPawn::create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	pawn_p = mcu_p->pawn_map.lookup( pawn_and_attribute.c_str() );
 
 	if( pawn_p != NULL ) {
-		LOG("ERROR: Pawn \"%s\" already exists.", pawn_and_attribute);
+		LOG("ERROR: Pawn \"%s\" already exists.", pawn_and_attribute.c_str() );
 		return CMD_FAILURE;
 	}
 
@@ -1006,7 +1001,7 @@ int SbmPawn::create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	int err = pawn_p->init( skeleton );
 
 	if( err != CMD_SUCCESS ) {
-		LOG("ERROR: Unable to initialize SbmPawn \"%s\".", pawn_and_attribute);
+		LOG("ERROR: Unable to initialize SbmPawn \"%s\".", pawn_and_attribute.c_str() );
 		delete pawn_p;
 		skeleton->unref();
 		return err;
@@ -1015,7 +1010,7 @@ int SbmPawn::create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	err = mcu_p->pawn_map.insert( pawn_and_attribute.c_str(), pawn_p );
 
 	if( err != CMD_SUCCESS )	{
-		LOG("ERROR: SbmPawn pawn_map.insert(..) \"%s\" FAILED", pawn_and_attribute);
+		LOG("ERROR: SbmPawn pawn_map.insert(..) \"%s\" FAILED", pawn_and_attribute.c_str() );
 		delete pawn_p;
 		skeleton->unref();
 		return err;
@@ -1024,15 +1019,17 @@ int SbmPawn::create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	err = mcu_p->add_scene( pawn_p->scene_p );
 
 	if( err != CMD_SUCCESS )	{
-		LOG("ERROR: SbmPawn pawn_map.insert(..) \"%s\" FAILED", pawn_and_attribute);
+		LOG("ERROR: SbmPawn pawn_map.insert(..) \"%s\" FAILED", pawn_and_attribute.c_str() );
 		delete pawn_p;
 		skeleton->unref();
 		return err;
 	}
 
 
+#if USE_WSP
 	mcu_p->theWSP->subscribe_vector_3d_interval( pawn_and_attribute, "position", interval, handle_wsp_error, remote_pawn_position_update, mcu_p );
 	mcu_p->theWSP->subscribe_vector_4d_interval( pawn_and_attribute, "rotation", interval, handle_wsp_error, remote_pawn_rotation_update, mcu_p );
+#endif
 
 	return( CMD_SUCCESS );
 }
@@ -1053,16 +1050,20 @@ int SbmPawn::remove_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 	if( pawn_p != NULL ) {
 
+#if USE_WSP
 		mcu_p->theWSP->unsubscribe( pawn_name, "position", 1 );
+#endif
+
 		pawn_p->remove_from_scene();
 
 		return CMD_SUCCESS;
 	} else {
-		LOG("ERROR: Pawn \"%s\" not found.", pawn_name);
+		LOG("ERROR: Pawn \"%s\" not found.", pawn_name.c_str() );
 		return CMD_FAILURE;
 	}
 }
 
+#if USE_WSP
 WSP_ERROR SbmPawn::wsp_world_position_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data )
 {
 	SbmPawn * pawn_p = (SbmPawn *)data;
@@ -1182,26 +1183,29 @@ WSP_ERROR SbmPawn::wsp_rotation_accessor( const std::string id, const std::strin
 		return WSP::not_found_error( "no joint" );
 	}
 }
+#endif
 
-bool SbmPawn::initGeomObj( const char* geomType, float size, const char* meshName  )
+bool SbmPawn::initGeomObj( const char* geomType, SrVec size, const char* color, const char* meshName  )
 {
 	SbmGeomObject* colObj = NULL;
 	if (strcmp(geomType,"sphere") == 0)
 	{
-		colObj = new SbmGeomSphere(size);		
+		colObj = new SbmGeomSphere(size[0]);		
 	}
 	else if (strcmp(geomType,"box") == 0)
 	{
-		colObj = new SbmGeomBox(SrVec(size,size,size));		
+		colObj = new SbmGeomBox(SrVec(size[0],size[1],size[2]));		
 	}
 	else if (strcmp(geomType,"capsule") == 0)
 	{
 		SrVec pos[2];
-		float capLen = size*1.5f;
+		float capLen = size[0]*1.5f;
 		pos[0] = SrVec(0,-capLen*0.5f,0);
 		pos[1] = SrVec(0,capLen*0.5f,0);
+		//pos[0] = SrVec(0,capLen,0);
+		//pos[1] = SrVec(0,capLen*2.f,0);		
 		//SbmColObject* colObj = new SbmColCapsule(size*1.5f,size*0.5f);
-		colObj = new SbmGeomCapsule(pos[0],pos[1],size*0.5f);		
+		colObj = new SbmGeomCapsule(pos[0],pos[1],size[0]*0.5f);		
 	}	
 	else if (strcmp(geomType,"mesh") == 0)
 	{
@@ -1247,6 +1251,8 @@ bool SbmPawn::initGeomObj( const char* geomType, float size, const char* meshNam
 		delete colObj_p;
 		colObj_p = NULL;
 	}
+	if (colObj)
+		colObj->color = color;
 	colObj_p = colObj;
 	updateToColObject();
 	initPhysicsObj();
@@ -1278,7 +1284,8 @@ void SbmPawn::updateFromColObject()
 {
 	if (colObj_p)
 	{
-		setWorldOffset(colObj_p->worldState.gmat());
+		//setWorldOffset(colObj_p->getWorldState().gmat());
+		setWorldOffset(colObj_p->getWorldState().gmat());
 	}
 }
 
@@ -1286,7 +1293,11 @@ void SbmPawn::updateToColObject()
 {
 	if (colObj_p)
 	{
-		colObj_p->worldState.gmat(get_world_offset_joint()->gmat());
+		SRT newWorldState; 
+		newWorldState.gmat(get_world_offset_joint()->gmat());
+		//colObj_p->getWorldState().gmat();
+		colObj_p->setWorldState(newWorldState);
+		//colObj_p->updateGlobalTransform(get_world_offset_joint()->gmat());
 		if (phyObj_p)
 		{
 			phyObj_p->updateSimObj();			
@@ -1297,8 +1308,8 @@ void SbmPawn::updateToColObject()
 void SbmPawn::updateToSteeringSpaceObject()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu.steerEngine)	return;
-	if (!mcu.steerEngine->_engine)	return;
+	if (!mcu.steerEngine.isInitialized())	return;
+	if (!mcu.steerEngine._engine)	return;
 	if (steeringSpaceObj_p)
 		initSteeringSpaceObject();
 }
@@ -1306,8 +1317,9 @@ void SbmPawn::updateToSteeringSpaceObject()
 void SbmPawn::initSteeringSpaceObject()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu.steerEngine)	return;
-	if (!mcu.steerEngine->_engine)	return;
+	if (!mcu.steerEngine.isInitialized())	return;
+	if (!mcu.steerEngine._engine)	return;
+
 	float x, y, z, h, p, r;
 	this->get_world_offset(x, y, z, h, p, r);	
 	float xmin = (x - steeringSpaceObjSize.x) / 100.0f;
@@ -1327,7 +1339,7 @@ void SbmPawn::initSteeringSpaceObject()
 			fabs(box.zmax - zmax) < .0001 ||
 			fabs(box.zmin - zmin) < .0001)
 		{
-			mcu.steerEngine->_engine->getSpatialDatabase()->removeObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
+			mcu.steerEngine._engine->getSpatialDatabase()->removeObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
 			Util::AxisAlignedBox& mutableBox = const_cast<Util::AxisAlignedBox&>(box);
 			mutableBox.xmax = xmax;
 			mutableBox.xmin = xmin;
@@ -1335,15 +1347,27 @@ void SbmPawn::initSteeringSpaceObject()
 			mutableBox.ymin = ymin;
 			mutableBox.zmax = zmax;
 			mutableBox.zmin = zmin;
-			mcu.steerEngine->_engine->getSpatialDatabase()->addObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
+			mcu.steerEngine._engine->getSpatialDatabase()->addObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());
 		}
 	}
 	else
 	{
 		steeringSpaceObj_p = new SteerLib::BoxObstacle(xmin, xmax, ymin, ymax, zmin, zmax);
-		mcu.steerEngine->_engine->addObstacle(steeringSpaceObj_p);
-		mcu.steerEngine->_engine->getSpatialDatabase()->addObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());	
+		mcu.steerEngine._engine->addObstacle(steeringSpaceObj_p);
+		mcu.steerEngine._engine->getSpatialDatabase()->addObject(steeringSpaceObj_p, steeringSpaceObj_p->getBounds());	
 	}
+}
+
+void SbmPawn::clearSteeringGoals()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	if (!mcu.steerEngine.isInitialized())	return;
+	if (!mcu.steerEngine._engine)	return;
+
+	SbmCharacter* character = dynamic_cast<SbmCharacter*> (this);
+	if (!character)	return;
+	if (!character->steeringAgent)	return;
+	character->steeringAgent->getAgent()->clearGoals();
 }
 
 void SbmPawn::setPhysicsSim( bool enable )
@@ -1381,3 +1405,17 @@ bool parse_float_or_error( float& var, const char* str, const string& var_name )
 	LOG("ERROR: Invalid value for %s: %s", var_name.c_str(), str);
 	return false;
 }
+
+void SbmPawn::notify(DSubject* subject)
+{
+	DAttribute* attribute = dynamic_cast<DAttribute*>(subject);
+	if (attribute)
+	{
+		if (attribute->getName() == "physics")
+		{
+			BoolAttribute* physicsAttr = dynamic_cast<BoolAttribute*>(attribute);
+			setPhysicsSim(physicsAttr->getValue());
+		}
+	}
+}
+

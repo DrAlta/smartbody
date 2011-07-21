@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <fltk/Color.h>
+#include <FL/Fl.H>
 
 namespace nle 
 {
@@ -38,8 +38,8 @@ class Mark
 		virtual void setEndTime(double time);
 		virtual double getEndTime();
 
-		void setColor(fltk::Color c);
-		fltk::Color getColor();
+		void setColor(Fl_Color c);
+		Fl_Color getColor();
 
 		void setInfo(std::string str);
 		std::string getInfo();
@@ -51,7 +51,7 @@ class Mark
 		Block* block;
 		bool selected;
 		int bounds[4];
-		fltk::Color color;
+		Fl_Color color;
 		bool showName;
 		std::string info;
 };
@@ -90,8 +90,8 @@ class Block
 		virtual void removeAllMarks();
 		virtual void releaseMark(Mark* mark);
 
-		void setColor(fltk::Color c);
-		fltk::Color getColor();
+		void setColor(Fl_Color c);
+		Fl_Color getColor();
 
 		void setInfo(std::string str);
 		std::string getInfo();
@@ -104,7 +104,7 @@ class Block
 		Track* track;
 		bool selected;
 		int bounds[4];
-		fltk::Color color;
+		Fl_Color color;
 		std::string info;
 		bool showName;
 

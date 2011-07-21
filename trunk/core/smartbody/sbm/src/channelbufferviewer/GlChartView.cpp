@@ -24,13 +24,13 @@
 
 #include "GlChartView.hpp"
 
-#include <fltk/events.h>
-#include <fltk/gl.h>
+#include <FL/Fl.H>
+#include <FL/gl.h>
 
-#include <SR/sr_gl.h>
+#include <sr/sr_gl.h>
 
 
-GlChartView::GlChartView(int x, int y, int w, int h, char* name) : fltk::GlWindow( x, y, w, h, name ), SrViewer(x, y, w, h, name)
+GlChartView::GlChartView(int x, int y, int w, int h, char* name) : Fl_Gl_Window( x, y, w, h, name ), SrViewer(x, y, w, h, name)
 {
 	initGL(w, h);
 	initFont();
@@ -97,11 +97,13 @@ void GlChartView::initFont()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glGenTextures(0, &textureName);
 
+#ifdef WIN32
 	if (!label.Create("../../../../data/fonts/font.glf", 0))
 	{
 		if(!label.Create(".font.glf", 0))
 			LOG("GlChartViewCoordinate::InitFont(): Error: Cannot load font file\n");
 	}
+#endif
 }
 
 void GlChartView::init_camera(int type)
@@ -280,9 +282,11 @@ void GlChartView::draw_series_value(GlChartViewSeries* series)
 		}
 	glEnd();
 	glEnable(GL_TEXTURE_2D);
+#ifdef WIN32
 	label.Begin();
 	get_label(t_label, series->title, -1);
 	label.DrawString(t_label, 2.0f, (series->size-1)*step, value*y_scale);
+#endif
 	glDisable(GL_TEXTURE_2D);
 
 	glLineWidth(1.0f);
@@ -361,7 +365,9 @@ void GlChartView::draw_series_swingtwist( GlChartViewSeries* series )
 		glLineWidth(3.0f);
 	}
 
+#ifdef WIN32
 	label.Begin();
+#endif
 	if(show_x)
 	{
 		color = series->GetColor(1);
@@ -375,7 +381,9 @@ void GlChartView::draw_series_swingtwist( GlChartViewSeries* series )
 		glEnd();
 		glEnable(GL_TEXTURE_2D);
 		get_label(t_label, series->title, 0);
+#ifdef WIN32
 		label.DrawString(t_label, 2.0f, (series->size-1)*step, euler.x*y_scale);
+#endif
 		glDisable(GL_TEXTURE_2D);
 	}
 	if(show_y)
@@ -391,7 +399,9 @@ void GlChartView::draw_series_swingtwist( GlChartViewSeries* series )
 		glEnd();
 		glEnable(GL_TEXTURE_2D);
 		get_label(t_label, series->title, 1);
+#ifdef WIN32
 		label.DrawString(t_label, 2.0f, (series->size-1)*step, euler.y*y_scale);
+#endif
 		glDisable(GL_TEXTURE_2D);
 	}
 	if(show_z)
@@ -407,7 +417,9 @@ void GlChartView::draw_series_swingtwist( GlChartViewSeries* series )
 		glEnd();
 		glEnable(GL_TEXTURE_2D);
 		get_label(t_label, series->title, 2);
+#ifdef WIN32
 		label.DrawString(t_label, 2.0f, (series->size-1)*step, euler.z*y_scale);
+#endif
 		glDisable(GL_TEXTURE_2D);
 	}
 	glLineWidth(1.0f);
@@ -425,7 +437,9 @@ void GlChartView::draw_series_euler(GlChartViewSeries* series)
 		glLineWidth(3.0f);
 	}
 
+#ifdef WIN32
 	label.Begin();
+#endif
 	if(show_x)
 	{
 		color = series->GetColor(1);
@@ -439,7 +453,9 @@ void GlChartView::draw_series_euler(GlChartViewSeries* series)
 		glEnd();
 		glEnable(GL_TEXTURE_2D);
 		get_label(t_label, series->title, 0);
+#ifdef WIN32
 		label.DrawString(t_label, 2.0f, (series->size-1)*step, euler.x*y_scale);
+#endif
 		glDisable(GL_TEXTURE_2D);
 	}
 	if(show_y)
@@ -455,7 +471,9 @@ void GlChartView::draw_series_euler(GlChartViewSeries* series)
 		glEnd();
 		glEnable(GL_TEXTURE_2D);
 		get_label(t_label, series->title, 1);
+#ifdef WIN32
 		label.DrawString(t_label, 2.0f, (series->size-1)*step, euler.y*y_scale);
+#endif
 		glDisable(GL_TEXTURE_2D);
 	}
 	if(show_z)
@@ -471,7 +489,9 @@ void GlChartView::draw_series_euler(GlChartViewSeries* series)
 		glEnd();
 		glEnable(GL_TEXTURE_2D);
 		get_label(t_label, series->title, 2);
+#ifdef WIN32
 		label.DrawString(t_label, 2.0f, (series->size-1)*step, euler.z*y_scale);
+#endif
 		glDisable(GL_TEXTURE_2D);
 	}
 	glLineWidth(1.0f);
@@ -490,7 +510,9 @@ void GlChartView::draw_series_quat(GlChartViewSeries* series)
 		glLineWidth(3.0f);
 	}
 
+#ifdef WIN32
 	label.Begin();
+#endif
 
 	if(show_x)
 	{
@@ -505,7 +527,9 @@ void GlChartView::draw_series_quat(GlChartViewSeries* series)
 		glEnd();
 		glEnable(GL_TEXTURE_2D);
 		get_label(t_label, series->title, 0);
+#ifdef WIN32
 		label.DrawString(t_label, 2.0f, (series->size-1)*step, quat.x*y_scale);
+#endif
 		glDisable(GL_TEXTURE_2D);
 	}
 
@@ -522,7 +546,9 @@ void GlChartView::draw_series_quat(GlChartViewSeries* series)
 		glEnd();
 		glEnable(GL_TEXTURE_2D);
 		get_label(t_label, series->title, 1);
+#ifdef WIN32
 		label.DrawString(t_label, 2.0f, (series->size-1)*step, quat.y*y_scale);
+#endif
 		glDisable(GL_TEXTURE_2D);
 	}
 
@@ -539,7 +565,9 @@ void GlChartView::draw_series_quat(GlChartViewSeries* series)
 		glEnd();
 		glEnable(GL_TEXTURE_2D);
 		get_label(t_label, series->title, 2);
+#ifdef WIN32
 		label.DrawString(t_label, 2.0f, (series->size-1)*step, quat.z*y_scale);
+#endif
 		glDisable(GL_TEXTURE_2D);
 	}
 
@@ -556,7 +584,9 @@ void GlChartView::draw_series_quat(GlChartViewSeries* series)
 		glEnd();
 		glEnable(GL_TEXTURE_2D);
 		get_label(t_label, series->title, 3);
+#ifdef WIN32
 		label.DrawString(t_label, 2.0f, (series->size-1)*step, quat.w*y_scale);
+#endif
 		glDisable(GL_TEXTURE_2D);
 	}
 
@@ -574,33 +604,35 @@ int GlChartView::handle ( int event )
 	int y = 0;
 	switch ( event )
 	{ 
-	case fltk::PUSH:
-		translate_event ( e, SrEvent::Push, w(), h(), this );
+	case FL_PUSH:
+		translate_event ( e, SrEvent::EventPush, w(), h(), this );
 		break;
 
-	case fltk::RELEASE:
-        translate_event ( e, SrEvent::Release, w(), h(), this);
+	case FL_RELEASE:
+		translate_event ( e, SrEvent::EventRelease, w(), h(), this);
 		break;
-
-	case fltk::DRAG:
+	
+// 	case FL_MOVE:
+// 		//SR_TRACE2 ( "Move buts: "<<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
+// 		if ( !Fl::event_state(FL_BUTTON1) && !Fl::event_state(FL_BUTTON2) ) break;
+// 		// otherwise, this is a drag: enter in the drag case.
+// 		// not sure if this is a hack or a feature.
+	case FL_DRAG:
 		update_coordinate = false;
+		translate_event ( e, SrEvent::EventDrag, w(), h(), this );	
+		break;
 
-	case fltk::MOVE:
-        translate_event ( e, SrEvent::Drag, w(), h(), this );
-		
-        break;
-
-	case fltk::WHEN_RELEASE:
+	case FL_WHEN_RELEASE:
 		//translate_event ( e, SrEvent::Release, w(), h(), this);
 		break;
 
-	case fltk::KEY:
+	case FL_KEYBOARD:
         break;
 
-	case fltk::HIDE: // Called when the window is iconized
+	case FL_HIDE: // Called when the window is iconized
 		break;
 
-	case fltk::SHOW: // Called when the window is de-iconized or when show() is called
+	case FL_SHOW: // Called when the window is de-iconized or when show() is called
         show ();
         break;
 
@@ -610,64 +642,66 @@ int GlChartView::handle ( int event )
 
 	mouse_event(e);
 
-	return GlWindow::handle(event);
+	if (event == FL_PUSH)
+		return 1;
+
+	return Fl_Gl_Window::handle(event);
 }
 
-void GlChartView::translate_event ( SrEvent& e, SrEvent::Type t, int w, int h, GlChartView* viewer )
+void GlChartView::translate_event ( SrEvent& e, SrEvent::EventType t, int w, int h, GlChartView* viewer )
  {
    e.init_lmouse ();
    
    // put coordinates inside [-1,1] with (0,0) in the middle :
-   e.mouse.x  = ((float)fltk::event_x())*2.0f / ((float)w) - 1.0f;
-   e.mouse.y  = ((float)fltk::event_y())*2.0f / ((float)h) - 1.0f;
+   e.mouse.x  = ((float)Fl::event_x())*2.0f / ((float)w) - 1.0f;
+   e.mouse.y  = ((float)Fl::event_y())*2.0f / ((float)h) - 1.0f;
    e.mouse.y *= -1.0f;
    e.width = w;
    e.height = h;
-   e.mouseCoord.x = (float)fltk::event_x();
-   e.mouseCoord.y = (float)fltk::event_y();
+   e.mouseCoord.x = (float)Fl::event_x();
+   e.mouseCoord.y = (float)Fl::event_y();
 
-   if ( fltk::event_state(fltk::BUTTON1) ) 
+   if ( Fl::event_state(FL_BUTTON1) ) 
 	   e.button1 = 1;
 
-   if ( fltk::event_state(fltk::BUTTON2) ) 
+   if ( Fl::event_state(FL_BUTTON2) ) 
 	   e.button2 = 1;
 
-   if ( fltk::event_state(fltk::BUTTON3) ) 
+   if ( Fl::event_state(FL_BUTTON3) ) 
 	   e.button3 = 1;
 
 
    if(e.button1 == 0 && e.button2 == 0 && e.button3 == 0) 
    {
-	   t = SrEvent::Release;
+	   t = SrEvent::EventRelease;
    }
 
    e.type = t;
 
-   if ( t==SrEvent::Push)
+   if ( t==SrEvent::EventPush)
    {
-	   e.button = fltk::event_button();
+	   e.button = Fl::event_button();
 	   e.origUp = viewer->camera.up;
 	   e.origEye = viewer->camera.eye;
 	   e.origCenter = viewer->camera.center;
 	   e.origMouse.x = e.mouseCoord.x;
 	   e.origMouse.y = e.mouseCoord.y;
    }
-   else if (t==SrEvent::Release )
+   else if (t==SrEvent::EventRelease )
    {
-	   e.button = fltk::event_button();
+	   e.button = Fl::event_button();
 	   e.origMouse.x = -1;
 	   e.origMouse.y = -1;
    }
 
 
-   if ( fltk::event_state(fltk::ALT)   ) e.alt = 1;
+   if ( Fl::event_state(FL_ALT)   ) e.alt = 1;
    else e.alt = 0;
-   if ( fltk::event_state(fltk::CTRL)  ) e.ctrl = 1;
+   if ( Fl::event_state(FL_CTRL)  ) e.ctrl = 1;
    else e.ctrl = 0;
-   if ( fltk::event_state(fltk::SHIFT) ) e.shift = 1;
-   else e.shift = 0;
-   
-   e.key = fltk::event_key();
+   if ( Fl::event_state(FL_SHIFT) ) e.shift = 1;
+   else e.shift = 0;    
+   e.key = Fl::event_key();
  }
 
 SrVec GlChartView::rotatePoint(SrVec point, SrVec origin, SrVec direction, float angle)
@@ -705,7 +739,7 @@ int GlChartView::mouse_event ( const SrEvent &e )
 
 	if ( e.mouse_event())
 	{ 
-		if ( e.type == SrEvent::Drag )
+		if ( e.type == SrEvent::EventDrag )
 		{ 
 			float dx = e.mousedx() * camera.aspect;
 			float dy = e.mousedy() / camera.aspect;
@@ -778,7 +812,7 @@ int GlChartView::mouse_event ( const SrEvent &e )
 				camera.eye = camera_p;
 			}*/
 		}
-		else if ( e.type==SrEvent::Release )
+		else if ( e.type==SrEvent::EventRelease )
 		{ 
 
 		}

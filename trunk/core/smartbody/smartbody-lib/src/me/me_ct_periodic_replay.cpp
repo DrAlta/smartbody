@@ -22,7 +22,7 @@
  */
 
 #include "vhcl.h"
-#include <ME/me_ct_periodic_replay.hpp>
+#include <me/me_ct_periodic_replay.hpp>
 
 
 #include <cmath>

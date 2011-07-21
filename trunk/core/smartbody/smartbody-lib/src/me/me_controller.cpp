@@ -26,13 +26,16 @@
 #include <iostream>
 #include <sstream>
 
-#include <ME/me_controller.h>
-#include <SR/sr_quat.h>
-#include <SR/sr_euler.h>
-#include <ME/me_prune_policy.hpp>
+#include <me/me_controller.h>
+#include <sr/sr_quat.h>
+#include <sr/sr_euler.h>
+#include <me/me_prune_policy.hpp>
 #include <sbm/ResourceManager.h>
 #include <vhcl_log.h>
+#include <me/me_controller_tree_root.hpp>
+#include <sbm/sbm_pawn.hpp>
 
+#include "sbm/lin_win.h"
 using namespace std;
 
 #define WARN_ON_INVALID_BUFFER_INDEX (1)
@@ -61,8 +64,9 @@ MeController::MeController ()
  	_record_output( NULL ), // for recording poses and motions of immediate local results
 	_startTime(-1),
 	_stopTime(-1),
-	_pass_through(false),
-	_handle("")
+	_initialized(false)
+	//_pass_through(false)
+	//_handle("")
 {
 	_instance_id = instance_count;
 	instance_count ++;
@@ -76,6 +80,9 @@ MeController::MeController ()
 	_record_frame_count = 0;
 	_buffer_changes_toggle = false;
 	_buffer_changes_toggle_reset = true;
+
+	DObject::createBoolAttribute("pass_through", false, true, "Basic", 220, false, false, false, "whether to evaluate this controller");
+	DObject::createStringAttribute("handle", "", true, "Basic", 220, false, false, false, "handle for this controller");
 }
 
 MeController::~MeController () {
@@ -140,12 +147,14 @@ void MeController::remove_all_children() {
 	}
 }
 
-void MeController::init () {
+void MeController::init (SbmPawn* pawn) {
 	_active = false;
 	controller_init ();
 
 	if( _context )
 		_context->child_channels_updated( this );
+
+	updateDefaultVariables(pawn);	
 }
 
 MePrunePolicy* MeController::prune_policy () {
@@ -324,7 +333,7 @@ void MeController::evaluate ( double time, MeFrameData& frame ) {
 		logger->controller_pre_evaluate( time, *_context, *this, frame );
 
 	// Reevaluate controller. Even for the same evaluation time as _lastEval, results may be influenced by differing buffer values
-	if (!_pass_through)
+	if (!is_pass_through())
 		_active = controller_evaluate ( time, frame );
 
 	if (this->is_record_buffer_changes())
@@ -590,61 +599,43 @@ void MeController::record_write( const char *full_prefix ) {
 		filename = _record_full_prefix + recordname + ".bvh";
 		_record_output = new SrOutput( filename.c_str(), "w" );
 
-		if (_record_output->valid())
-		{
-
-			SkSkeleton* skeleton_p = NULL;
-			if( _context->channels().size() > 0 )	{
-				skeleton_p = _context->channels().skeleton();
-			}
-			if( skeleton_p == NULL )	{
-				LOG("MeController::record_write NOTICE: SkSkeleton not available");
-				_record_mode = RECORD_NULL;
-			}
+		SkSkeleton* skeleton_p = NULL;
+		if( _context->channels().size() > 0 )	{
+			skeleton_p = _context->channels().skeleton();
+		}
+		if( skeleton_p == NULL )	{
+			LOG("MeController::record_write NOTICE: SkSkeleton not available");
+			_record_mode = RECORD_NULL;
+		}
+		
+		*_record_output << "HIERARCHY\n";
+		print_bvh_hierarchy( skeleton_p->root(), 0 );
+		*_record_output << "MOTION\n";
+		*_record_output 
+			<< (const char *)"Frames: " 
+			<< (int)_frames->size() 
+			<< srnl;	
 			
-			*_record_output << "HIERARCHY\n";
-			print_bvh_hierarchy( skeleton_p->root(), 0 );
-			*_record_output << "MOTION\n";
-			*_record_output << "Frames: " << _frames->size() << srnl;	
-			*_record_output << "Frame Time: " << _record_dt << srnl;	
-	//		load_bvh_joint_hmap();
-			LOG("MeController::write_record BVH: %s", filename);
-			std::list<FRAME>::iterator iter = _frames->begin();
-			std::list<FRAME>::iterator end  = _frames->end();
-			for(;iter!=end; iter++)
-				*_record_output<<(*iter).c_str()<<srnl;
-		}
-		else
-		{
-			LOG("Could not create file named: '%s'. No data will be recorded.", filename.c_str());
-		}
+		*_record_output << "Frame Time: " << _record_dt << srnl;	
+//		load_bvh_joint_hmap();
+		LOG("MeController::write_record BVH: %s", filename.c_str() );
 	}
 	else
 	if( _record_mode == RECORD_MOTION )	{
 		filename = _record_full_prefix + recordname + ".skm";
 		_record_output = new SrOutput( filename.c_str(), "w" );
-		if (_record_output->valid())
-		{
-			*_record_output << "# SKM Motion Definition - M. Kallmann 2004\n";
-			*_record_output << "# Maya exporter v0.6\n";
-			*_record_output << "# Recorded output from MeController\n\n";
-			*_record_output << "SkMotion\n\n";
-			*_record_output << "name \"" << recordname.c_str() << "\"\n\n";
 
-			SkChannelArray& channels = controller_channels();
-			*_record_output << channels << srnl;
-			*_record_output << "frames " << _frames->size() << srnl;	
+		*_record_output << "# SKM Motion Definition - M. Kallmann 2004\n";
+		*_record_output << "# Maya exporter v0.6\n";
+		*_record_output << "# Recorded output from MeController\n\n";
+		*_record_output << "SkMotion\n\n";
+		*_record_output << "name \"" << recordname.c_str() << "\"\n\n";
 
-			LOG("MeController::write_record SKM: %s", filename);
-			std::list<FRAME>::iterator iter = _frames->begin();
-			std::list<FRAME>::iterator end  = _frames->end();
-			for(;iter!=end; iter++)
-				*_record_output<<(*iter).c_str()<<srnl;
-		}
-		else
-		{
-			LOG("Could not create file named: '%s'. No data will be recorded.", filename.c_str());
-		}
+		SkChannelArray& channels = controller_channels();
+		*_record_output << channels << srnl;
+		*_record_output << "frames " << (int)_frames->size() << srnl;	
+
+		LOG("MeController::write_record SKM: %s", filename.c_str() );
 	}
 	else	{
 		LOG("MeController::init_record NOTICE: POSE not implemented");
@@ -652,7 +643,10 @@ void MeController::record_write( const char *full_prefix ) {
 		_frames->clear();
 		//filename = _record_full_prefix + recordname + ".skp";
 	}
-	
+	std::list<FRAME>::iterator iter = _frames->begin();
+	std::list<FRAME>::iterator end  = _frames->end();
+	for(;iter!=end; iter++)
+		*_record_output<<(*iter).c_str()<<srnl;
 	record_clear();
 	if( _record_output )	{
 		delete _record_output;
@@ -858,4 +852,44 @@ void MeController::print_children( int tab_count ) {
 	}
 }
 
+std::string MeController::handle() const
+{
+	MeController* obj = const_cast<MeController*>(this);
+	std::string hname = obj->getStringAttribute("handle");
+	return hname;
+}
+
+void MeController::handle( std::string handle )
+{
+	DObject::setStringAttribute("handle",handle);
+}
+
+bool MeController::is_pass_through() const
+{
+	MeController* obj = const_cast<MeController*>(this);
+	return obj->getBoolAttribute("pass_through");
+}
+
+void MeController::set_pass_through( bool val )
+{
+	DObject::setBoolAttribute("pass_through",val);
+}
+
+void MeController::updateDefaultVariables(SbmPawn* pawn)
+{
+	// set the default parameters
+	//if (_initialized)
+	//	return;	
+	if (pawn)
+	{		
+		for (unsigned int i=0;i<_defaultAttributes.size();i++)
+		{
+			DAttribute* dattr = _defaultAttributes[i].first;
+			DAttribute* pawnDefaultAttr = pawn->getAttribute(dattr->getName());
+			VariablePointer& varPtr = _defaultAttributes[i].second;
+			varPtr.updateVariableFromAttribute(pawnDefaultAttr);
+		}
+		_initialized = true;
+	}
+}
 //============================ End of File ============================

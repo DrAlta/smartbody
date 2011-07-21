@@ -43,7 +43,7 @@ MeCtAnkleLilt::MeCtAnkleLilt( void ) {
 
 MeCtAnkleLilt::~MeCtAnkleLilt(void){}
 
-void MeCtAnkleLilt::init(SkSkeleton* skeleton_p){ //attaches skeleton and defines each joint that will be altered as a seperate channel
+void MeCtAnkleLilt::init(SbmPawn* pawn,SkSkeleton* skeleton_p){ //attaches skeleton and defines each joint that will be altered as a seperate channel
 	int err = 0;
 	_channels.init(); 
 
@@ -67,7 +67,7 @@ void MeCtAnkleLilt::init(SkSkeleton* skeleton_p){ //attaches skeleton and define
 		_channels.add( lAnkle, SkChannel::Quat );
 		_channels.add( base, SkChannel::YPos);
 	}
-	MeController::init();
+	MeController::init(pawn);
 
 }
 

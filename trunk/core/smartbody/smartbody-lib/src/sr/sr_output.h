@@ -26,7 +26,7 @@
  * Output to file, function, string or stdout */
 
 # include <stdio.h>
-# include <SR/sr.h>
+# include <sr/sr.h>
 
 class SrString;
 

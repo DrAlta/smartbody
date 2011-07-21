@@ -4,8 +4,8 @@
 /** \file sr_set.h 
  * indexed set of pointers */
 
-# include <SR/sr_array.h> 
-# include <SR/sr_class_manager.h> 
+# include <sr/sr_array.h> 
+# include <sr/sr_class_manager.h> 
 
 /*! The simplest way to use a 'Set' by means of void pointers.
     This is a low level management class and there is no
@@ -44,7 +44,7 @@ class SrSetBasic
     bool remove_gaps ( SrArray<int>& newindices );
 
     /*! Returns the number of elements in the Set */
-    int SrSetBasic::elements () const { return _data.size()-_freepos.size(); }
+    int elements () const { return _data.size()-_freepos.size(); }
 
     /*! Returns true if the number of elements is 0, or false otherwise */
     bool empty() const { return elements()==0? true:false; }

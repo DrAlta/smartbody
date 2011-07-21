@@ -14,7 +14,7 @@
 
 namespace lapack = boost::numeric::bindings::lapack;
 namespace blas   = boost::numeric::bindings::blas;
-namespace ublas  = boost::numeric::ublas;
+//namespace ublas  = boost::numeric::ublas;
 
 void MeCtUBLAS::matrixMatMult(const dMatrix& mat1, const dMatrix& mat2, dMatrix& mat3)
 {

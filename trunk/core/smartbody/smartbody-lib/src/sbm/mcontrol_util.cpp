@@ -27,27 +27,44 @@
  *      
  */
 
+#include "lin_win.h"
 #include "vhcl.h"
 #include "mcontrol_util.h"
 
 #include <stdlib.h>
 #include <iostream>
 #include <string>
+
+#ifdef WIN32
 #include <direct.h>
+#else
+#include <unistd.h>
+#ifndef _MAX_PATH
+#define _MAX_PATH 1024
+#endif
+#endif
 
 #include "sbm_audio.h"
 
 #include "me_utilities.hpp"
+
+#if USE_WSP
 #include "wsp.h"
+#endif
+
 #include "sr/sr_model.h"
 #include "sbm/GPU/SbmShader.h"
+#include "sbm/GPU/SbmTexture.h"
 #include "sbm_deformable_mesh.h"
 #include "sbm/Physics/SbmPhysicsSimODE.h"
 
 #include <boost/algorithm/string/replace.hpp>
 
 using namespace std;
+
+#if USE_WSP
 using namespace WSP;
+#endif
 
 const bool LOG_ABORTED_SEQ = false;
 
@@ -95,6 +112,7 @@ mcuCBHandle::mcuCBHandle()
 	timer_p( NULL ),
 	time( 0.0 ),
 	time_dt( 0.0 ),
+	physicsTime(0.0),
 	internal_profiler_p( NULL ),
 	external_profiler_p( NULL ),
 	profiler_p( NULL ),
@@ -104,12 +122,15 @@ mcuCBHandle::mcuCBHandle()
 	net_host( NULL ),
 	sbm_character_listener( NULL ),
 	play_internal_audio( false ),
+	resourceDataChanged( false ),
 	skScale( 1.0 ),
 	skmScale( 1.0 ),
 	viewer_p( NULL ),
 	bmlviewer_p( NULL ),
 	panimationviewer_p( NULL ),
 	channelbufferviewer_p( NULL ),
+	resourceViewer_p( NULL ),
+	faceViewer_p( NULL ),
 	camera_p( NULL ),
 	root_group_p( new SrSnGroup() ),
 	height_field_p( NULL ),
@@ -126,13 +147,13 @@ mcuCBHandle::mcuCBHandle()
 	panimationviewer_factory ( new GenericViewerFactory() ),
 	channelbufferviewer_factory ( new GenericViewerFactory() ),
 	commandviewer_factory ( new GenericViewerFactory() ),
+	resourceViewerFactory ( new GenericViewerFactory() ),
+	faceViewerFactory ( new GenericViewerFactory() ),
 	resource_manager(ResourceManager::getResourceManager()),
 	snapshot_counter( 1 ),
 	delay_behaviors(true),
 	media_path("."),
-	_interactive(true),
-	steerEngine(NULL),
-	sendPawnUpdates(false)
+	_interactive(true)
 	//physicsEngine(NULL)
 {
 
@@ -140,14 +161,18 @@ mcuCBHandle::mcuCBHandle()
 	root_group_p->ref();
 	logger_p->ref();
 
+#if USE_WSP
 	theWSP = WSP::create_manager();
 
 	// TODO: this needs to have a unique name so that multiple sbm
 	// processes will be identified differently
 	theWSP->init( "SMARTBODY" );
+#endif
+
+	createDefaultControllers();
 
 	// initialize the default face motion mappings
-	face_map["_default_"] = new FaceMotion();
+	face_map["_default_"] = new FaceMotion();	
 	physicsEngine = new SbmPhysicsSimODE();
 	physicsEngine->initSimulation();
 }
@@ -171,15 +196,26 @@ void mcuCBHandle::reset( void )	{
 	logger_p = new joint_logger::EvaluationLogger();
 	logger_p->ref();
 
+#if USE_WSP
 	// TODO: this needs to have a unique name so that multiple sbm
 	// processes will be identified differently
 	theWSP->init( "SMARTBODY" );
+#endif
 
 	if ( net_host )
 		bonebus.OpenConnection( net_host );
 }
 
-FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
+ void mcuCBHandle::createDefaultControllers()
+ {
+	 _defaultControllers.push_back(new MeCtEyeLidRegulator());
+	 _defaultControllers.push_back(new MeCtSaccade(NULL));
+	 std::map<int, MeCtReachEngine*> reachMap;
+	 _defaultControllers.push_back(new MeCtExampleBodyReach(reachMap));
+ }
+
+
+ FILE* mcuCBHandle::open_sequence_file( const char *seq_name, std::string& fullPath ) {
 
 	FILE* file_p = NULL;
 
@@ -211,7 +247,7 @@ FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
 			stream << filename;
 			fres->setFilePath(stream.str());
 			resource_manager->addResource(fres);
-			
+			fullPath = filename;			
 			break;
 		}
 		filename = seq_paths.next_filename( buffer, candidateSeqName.c_str() );
@@ -227,11 +263,12 @@ FILE* mcuCBHandle::open_sequence_file( const char *seq_name ) {
 			if( ( file_p = fopen( filename.c_str(), "r" ) ) != NULL ) {
 				
 				// add the file resource
-				FileResource* fres = new FileResource();
+				FileResource* fres = new FileResource();				
 				std::stringstream stream;
 				stream << filename;
 				fres->setFilePath(stream.str());
 				resource_manager->addResource(fres);
+				fullPath = filename;
 				break;
 			}
 			filename = seq_paths.next_filename( buffer, candidateSeqName.c_str() );
@@ -326,8 +363,10 @@ void mcuCBHandle::clear( void )	{
 		 motionIter != motion_map.end();
 		 motionIter++)
 	{
+
 		//SkMotion* motion = (*motionIter).second;
 		//motion->unref(); // need to cleanup motions - fix
+
 	}
 
 	for (std::map<std::string, SkSkeleton*>::iterator skelIter = skeleton_map.begin();
@@ -355,8 +394,6 @@ void mcuCBHandle::clear( void )	{
 		delete (*iter);
 	}
 	param_anim_transitions.clear();
-
-	
 	
 	MeCtPose* pose_ctrl_p;
 	pose_ctrl_map.reset();
@@ -427,16 +464,125 @@ void mcuCBHandle::clear( void )	{
 		logger_p->unref();
 		logger_p = NULL;
 	}
-	if (steerEngine)
-		delete steerEngine;
 
-	//close_viewer();
+	close_viewer();
 
 	if ( net_host )
 		bonebus.CloseConnection();
 
+#if USE_WSP
 	theWSP->shutdown();
+#endif
 
+}
+
+/////////////////////////////////////////////////////////////
+
+std::string mcuCBHandle::cmdl_tab_callback( std::string cmdl_str )	{
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	srHashMapBase* map = NULL;
+
+	// get the current partial command
+	std::string partialCommand( cmdl_str );
+	std::string commandPrefix = "";
+
+	// only use tab completion on the first word
+	size_t index = partialCommand.find_first_of(" ");
+	if( index != std::string::npos )
+	{
+
+		// if the command matches 'set', 'print' or 'test' use those maps
+		std::string firstToken = partialCommand.substr(0, index);
+		if (firstToken == "set")
+		{
+			map = &mcu.set_cmd_map.getHashMap();
+			partialCommand = partialCommand.substr(index + 1);
+			commandPrefix = "set ";
+		}
+		else if (firstToken == "print")
+		{
+			map = &mcu.print_cmd_map.getHashMap();
+			partialCommand = partialCommand.substr(index + 1);
+			commandPrefix = "print ";
+		}
+		else if (firstToken == "test")
+		{
+			map = &mcu.test_cmd_map.getHashMap();
+			partialCommand = partialCommand.substr(index + 1);
+			commandPrefix = "test ";
+		}
+		else
+		{
+			// transform tabs into a space
+			cmdl_str += " ";
+		}
+
+	}
+
+	// find a match against the current list of commands
+
+	if( !map )
+		map = &mcu.cmd_map.getHashMap();
+	int numEntries = map->get_num_entries();
+	map->reset();
+	int numMatches = 0;
+	char* key = NULL;
+	int numChecked = 0;
+	map->next( &key );
+	std::vector<std::string> options;
+
+	while( key )
+	{
+		bool match = false;
+		std::string keyString = key;
+		numChecked++;
+		if( partialCommand.size() <= keyString.size() )
+		{
+			match = true;
+			for( size_t a = 0; a < partialCommand.size() && a < keyString.size(); a++ )
+			{
+				if( partialCommand[ a ] != keyString[ a ] )
+				{
+					match = false;
+					break;
+				}
+			}
+			if( match )
+			{
+				options.push_back( keyString );
+				numMatches++;
+			}
+		}
+		map->next( &key );
+		std::string nextKey = key;
+		if( nextKey == keyString )
+			break; // shouldn't map.next(key) make key == NULL? This doesn't seem to happen.
+	}
+
+	if( numMatches == 1 )
+	{
+		cmdl_str = commandPrefix + options[0] + " ";
+	}
+	else 
+	if (numMatches > 1)
+	{ // more than one match, show the options on the line below
+
+		fprintf( stdout, "\n");
+		std::sort( options.begin(), options.end() );
+		for( size_t x = 0; x < options.size(); x++ )
+		{
+			fprintf( stdout, "%s ", options[x].c_str() );
+		}
+	}
+	else 
+	if( numMatches == 0 )
+	{
+		// transform tabs into a space
+		cmdl_str += " ";
+	}
+
+	return( cmdl_str );
 }
 
 /////////////////////////////////////////////////////////////
@@ -444,6 +590,8 @@ void mcuCBHandle::clear( void )	{
 int mcuCBHandle::open_viewer( int width, int height, int px, int py )	{	
 	
 	if( viewer_p == NULL )	{
+		if (!viewer_factory)
+			return CMD_FAILURE;
 		viewer_p = viewer_factory->create( px, py, width, height );
 		viewer_p->label_viewer( "SBM Viewer" );
 		camera_p = new SrCamera;
@@ -507,7 +655,7 @@ int mcuCBHandle::open_panimation_viewer( int width, int height, int px, int py )
 void mcuCBHandle::close_panimation_viewer( void )
 {
 	if( panimationviewer_p )	{
-		panimationviewer_factory->destroy(bmlviewer_p);
+		panimationviewer_factory->destroy(panimationviewer_p);
 		panimationviewer_p = NULL;
 	}
 }
@@ -527,10 +675,55 @@ int mcuCBHandle::open_channelbuffer_viewer( int width, int height, int px, int p
 void mcuCBHandle::close_channelbuffer_viewer( void )
 {
 	if( channelbufferviewer_p )	{
-		channelbufferviewer_factory->destroy(bmlviewer_p);
+		channelbufferviewer_factory->destroy(channelbufferviewer_p);
 		channelbufferviewer_p = NULL;
 	}
 }
+
+
+int mcuCBHandle::openResourceViewer( int width, int height, int px, int py )
+{
+	if( resourceViewer_p == NULL )	{
+		resourceViewer_p = resourceViewerFactory->create( px, py, width, height );
+		resourceViewer_p->label_viewer( "Resource Viewer" );
+		resourceViewer_p->show_viewer();
+
+		return( CMD_SUCCESS );
+	}
+	return( CMD_FAILURE );
+}
+
+
+void mcuCBHandle::closeResourceViewer( void )
+{
+	if( resourceViewer_p )	{
+		resourceViewerFactory->destroy(resourceViewer_p);
+		resourceViewer_p = NULL;
+	}
+}
+
+int mcuCBHandle::openFaceViewer( int width, int height, int px, int py )
+{
+	if( faceViewer_p == NULL )	{
+		faceViewer_p = faceViewerFactory->create( px, py, width, height );
+		faceViewer_p->label_viewer( "Face Viewer" );
+		faceViewer_p->show_viewer();
+
+		return( CMD_SUCCESS );
+	}
+	return( CMD_FAILURE );
+}
+
+
+void mcuCBHandle::closeFaceViewer( void )
+{
+	if( resourceViewer_p )	{
+		faceViewerFactory->destroy(resourceViewer_p);
+		faceViewer_p = NULL;
+	}
+}
+
+
 
 int mcuCBHandle::add_scene( SrSnGroup *scene_p )	{
 
@@ -565,25 +758,25 @@ void mcuCBHandle::update( void )	{
 #endif
 
 	// updating steering engine
-	if (steerEngine)
+	if (steerEngine.isInitialized())
 	{
-		if (!this->steerEngine->isDone())
+		if (!this->steerEngine.isDone())
 		{
-			if (this->steerEngine->getStartTime() == 0.0f)
-				this->steerEngine->setStartTime(float(this->time));
+			if (this->steerEngine.getStartTime() == 0.0f)
+				this->steerEngine.setStartTime(float(this->time));
 	
 			SbmCharacter* character;
 			character_map.reset();
 			while (character = character_map.next())
 				character->steeringAgent->evaluate();
 
-			bool running = this->steerEngine->_engine->update(false, true, float(this->time) - this->steerEngine->getStartTime());
+			bool running = this->steerEngine._engine->update(false, true, float(this->time) - this->steerEngine.getStartTime());
 			if (!running)
-				this->steerEngine->setDone(true);
+				this->steerEngine.setDone(true);
 		}
 	}
 
-	if (physicsEngine && updatePhysics)
+	if (physicsEngine)// && physicsEngine->getBoolAttribute("enable"))
 	{		
 		static float dt = 0.005f;//timeStep*0.03f;
 		//elapseTime += time_dt;
@@ -618,6 +811,13 @@ void mcuCBHandle::update( void )	{
 			if( err != CMD_SUCCESS )	{
 				LOG( "mcuCBHandle::update ERR: execute FAILED: '%s'\n", cmd );
 			}
+			else
+			{
+				// we assume that every command execution could potentially change the resource data
+				// therefore the data changed flag is set.
+				// This is kind of rough, but should work fine.
+				resourceDataChanged = true; 
+			}
 			delete [] cmd;
 		}
 		if( seq_p->get_count() < 1 )	{
@@ -632,28 +832,35 @@ void mcuCBHandle::update( void )	{
 	}
 
 	SbmShaderManager& ssm = SbmShaderManager::singleton();
+	SbmTextureManager& texm = SbmTextureManager::singleton();
 	bool hasOpenGL        = ssm.initOpenGL();
 	bool hasShaderSupport = false;
 
 	// init OpenGL extension
 	if (hasOpenGL)
-		hasShaderSupport = ssm.initGLExtension();
+	{
+		hasShaderSupport = ssm.initGLExtension();		
+	}
 	// update the shader map
 	if (hasShaderSupport)
+	{
 		ssm.buildShaders();
+		texm.updateTexture();
+	}
 	
 
 	SbmPawn* pawn_p;
 	SbmCharacter* char_p;
 	pawn_map.reset();
+	
+	bool isClosingBoneBus = false;
 	while( pawn_p = pawn_map.next() )	{
 
 		pawn_p->reset_all_channels();
 		pawn_p->ct_tree_p->evaluate( time );
 		pawn_p->ct_tree_p->applyBufferToAllSkeletons();
 
-
-		if (pawn_p->hasPhysicsSim() && updatePhysics)
+		if (pawn_p->hasPhysicsSim() && physicsEngine->getBoolAttribute("enable"))
 		{
 			pawn_p->updateFromColObject();
 		}
@@ -664,11 +871,6 @@ void mcuCBHandle::update( void )	{
 		}
 
 		char_p = character_map.lookup( pawn_p->name );
-		if (!char_p)
-		{
-			if (sendPawnUpdates)
-				NetworkSendSkeleton( pawn_p->bonebusCharacter, pawn_p->skeleton_p, &param_map );
-		}
 		if( char_p ) {
 
 			char_p->forward_visemes( time );	
@@ -698,7 +900,25 @@ void mcuCBHandle::update( void )	{
 
 					char_p->bonebusCharacter->SetPosition( x, y, z, time );
 					char_p->bonebusCharacter->SetRotation( (float)q.w, (float)q.x, (float)q.y, (float)q.z, time );
+
+					if (char_p->bonebusCharacter->GetNumErrors() > 5)
+					{
+						// connection is bad, remove the bonebus character 
+						LOG("BoneBus cannot connect to server. Removing character %s", char_p->name);
+						bool success = bonebus.DeleteCharacter(char_p->bonebusCharacter);
+						char_p->bonebusCharacter = NULL;
+						isClosingBoneBus = true;
+						if (bonebus.GetNumCharacters() == 0)
+						{
+							bonebus.CloseConnection();
+						}
+					}
 				}
+			}
+			else if (!isClosingBoneBus && !char_p->bonebusCharacter && bonebus.IsOpen())
+			{
+				// bonebus was connected after character creation, create it now
+				char_p->bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( char_p->name, char_p->getClassType().c_str(), this->net_face_bones );
 			}
 		}  // end of char_p processing
 	} // end of loop
@@ -736,7 +956,8 @@ srCmdSeq* mcuCBHandle::lookup_seq( const char* seq_name ) {
 	srCmdSeq* seq_p = pending_seq_map.remove( seq_name );
 	if( seq_p == NULL ) {
 		// Sequence not found.  Load new instance from file.
-		FILE* file_p = open_sequence_file( seq_name );
+		std::string fullPath;
+		FILE* file_p = open_sequence_file( seq_name, fullPath );
 		if( file_p ) {
 			seq_p = new srCmdSeq();
 			err = seq_p->read_file( file_p );
@@ -771,8 +992,8 @@ int mcuCBHandle::execute_seq( srCmdSeq* seq_p, const char* seq_id ) {
 	if ( active_seq_map.insert( seq_id, seq_p ) != CMD_SUCCESS ) {
 		LOG("ERROR: mcuCBHandle::execute_seq(..): Failed to insert srCmdSeq \"%s\"into active_seq_map.", seq_id );
 		return CMD_FAILURE;
-	}
-
+	}	
+	resourceDataChanged = true;
 	return CMD_SUCCESS;
 }
 
@@ -786,7 +1007,8 @@ int mcuCBHandle::execute_seq_chain( const vector<string>& seq_names, const char*
 	}
 
 	const string& first_seq_name = *it;  // convenience reference
-	FILE* first_file_p = open_sequence_file( first_seq_name.c_str() );
+	std::string fullPath;
+	FILE* first_file_p = open_sequence_file( first_seq_name.c_str(), fullPath );
 	if( first_file_p == NULL ) {
 		if( error_prefix )
 			LOG("%s Cannot find sequence \"%s\". Aborting seq-chain.", error_prefix, first_seq_name.c_str());
@@ -811,10 +1033,11 @@ int mcuCBHandle::execute_seq_chain( const vector<string>& seq_names, const char*
 	for( ; it != end; ++it ) {
 		const string& next_seq = *it;  // convenience reference
 
-		FILE* file = open_sequence_file( next_seq.c_str() );
+		std::string fullPath;
+		FILE* file = open_sequence_file( next_seq.c_str(), fullPath );
 		if( file == NULL ) {
 			if( error_prefix )
-				LOG("%s Cannot find sequence \"%s\". Aborting seq-chain.", error_prefix, next_seq);
+				LOG("%s Cannot find sequence \"%s\". Aborting seq-chain.", error_prefix, next_seq.c_str() );
 			return CMD_FAILURE;
 		} else {
 			fclose( file );
@@ -913,6 +1136,7 @@ void mcuCBHandle::set_net_host( const char * net_host )
 	// Sets up the network connection for sending bone rotations over to Unreal
 	this->net_host = net_host;
 	bonebus.OpenConnection( net_host );
+	bonebus.UpdateAllCharacters();
 }
 
 void mcuCBHandle::set_process_id( const char * process_id )
@@ -928,7 +1152,7 @@ int mcuCBHandle::vhmsg_send( const char *op, const char* message ) {
 		int err = vhmsg::ttu_notify2( op, message );
 		if( err != vhmsg::TTU_SUCCESS )	{
 			std::stringstream strstr;
-			strstr << "ERROR: mcuCBHandle::vhmsg_send(..): ttu_notify2 failed on message \"" << op << '  ' << message << "\"." << std::endl;
+			strstr << "ERROR: mcuCBHandle::vhmsg_send(..): ttu_notify2 failed on message \"" << op << "  " << message << "\"." << std::endl;
 			LOG(strstr.str().c_str());
 		}
 	} else {
@@ -1013,7 +1237,7 @@ MeController* mcuCBHandle::lookup_ctrl( const string& ctrl_name, const char* pri
 		const string char_name( ctrl_name, 1, index-1 );
 		if( char_name.length() == 0 ) {
 			if( print_error_prefix )
-				LOG("%s Invalid controller name \"%s\".  Empty character name.", print_error_prefix, ctrl_name);
+				LOG("%s Invalid controller name \"%s\".  Empty character name.", print_error_prefix, ctrl_name.c_str() );
 			return NULL;
 		}
 
@@ -1077,6 +1301,7 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 	// Send the bone rotation for each joint in the skeleton
 	const SrArray<SkJoint *> & joints  = skeleton->joints();
 
+	character->IncrementTime();
 	character->StartSendBoneRotations();
 
 	for ( int i = 0; i < joints.size(); i++ )
@@ -1123,7 +1348,7 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 	{
 		SkJoint* j = joints[ i ];
 		// judge whether it is joint for general parameters, usually should have a prefix as "param"
-		string j_name = j->name();
+		string j_name = j->name().get_string();
 		int name_end_pos = j_name.find_first_of("_");
 		string test_prefix = j_name.substr( 0, name_end_pos );
 		if( test_prefix == character->m_name )	
@@ -1160,6 +1385,7 @@ void mcuCBHandle::setMediaPath(std::string path)
 	seq_paths.setPathPrefix(media_path);
 	me_paths.setPathPrefix(media_path);
 	audio_paths.setPathPrefix(media_path);
+	mesh_paths.setPathPrefix(media_path);
 }
 
 std::string mcuCBHandle::getMediaPath()
@@ -1175,6 +1401,14 @@ SkMotion* mcuCBHandle::lookUpMotion( const char* motionName )
 		anim_p = (*animIter).second;
 	return anim_p;
 }
+
+SbmCharacter* mcuCBHandle::lookUpCharacter( const char* charName )
+{
+	character_map.reset();
+	SbmCharacter* curChar = character_map.lookup(charName);
+	return curChar;
+}
+
 
 PAStateData* mcuCBHandle::lookUpPAState(std::string stateName)
 {
@@ -1242,11 +1476,22 @@ void mcuCBHandle::setPhysicsEngine( bool start )
 	if (start)
 	{
 		physicsTime = time;
-		updatePhysics = true;
+		//updatePhysics = true;		
 	}
 	else
 	{
-		updatePhysics = false;
+		//updatePhysics = false;
+	}
+
+	if (physicsEngine)
+	{
+		physicsEngine->setEnable(start);
 	}
 }
+
+std::vector<MeController*>& mcuCBHandle::getDefaultControllers()
+{
+	return _defaultControllers;
+}
+
 /////////////////////////////////////////////////////////////

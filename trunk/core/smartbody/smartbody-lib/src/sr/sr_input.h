@@ -28,7 +28,7 @@
 
 // sr_array.h cannot be included here because of circular references
 # include <stdio.h>
-# include <SR/sr_string.h>
+# include <sr/sr_string.h>
 
 /*! Defines which characters are considered as delimiters. */
 # define SR_INPUT_DELIMITERS "{}[]();,.=+-/^*%:&|!~<>#?@\\\'"

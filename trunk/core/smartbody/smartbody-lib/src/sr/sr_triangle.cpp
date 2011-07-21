@@ -21,8 +21,8 @@
  */
 
 //# include <math.h>
-# include <SR/sr_triangle.h>
-//# include <SR/sr_vec2.h>
+# include <sr/sr_triangle.h>
+//# include <sr/sr_vec2.h>
 
 // ==================== static funcs ====================================
 

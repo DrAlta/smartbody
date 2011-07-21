@@ -19,14 +19,14 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
 
-# include <SR/sr_sn_editor.h>
+# include <sr/sr_sn_editor.h>
 
 //# define SR_USE_TRACE1  // SrSn Const/Dest
 //# define SR_USE_TRACE2  // SrSceneGroup Const/Dest
 //# define SR_USE_TRACE3  // SrSceneGroup children management
 //# define SR_USE_TRACE4  // SrSceneMatrix Const/Dest
 //# define SR_USE_TRACE5  // SrSceneShapeBase Const/Dest
-//# include <SR/sr_trace.h>
+//# include <sr/sr_trace.h>
 
 
 //======================================= SrSnEditor ====================================
@@ -34,7 +34,7 @@
 SrSnEditor::SrSnEditor ( const char* name )
                        :SrSn ( SrSn::TypeEditor, name )
  {
-   SR_TRACE2 ( "Constructor" );
+//   SR_TRACE2 ( "Constructor" );
    _child = 0;
    _helpers = new SrSnGroup;
    _helpers->ref ();
@@ -42,7 +42,7 @@ SrSnEditor::SrSnEditor ( const char* name )
 
 SrSnEditor::~SrSnEditor ()
  {
-   SR_TRACE2 ( "Destructor" );
+//   SR_TRACE2 ( "Destructor" );
    _helpers->unref ();
    child ( 0 );
  }

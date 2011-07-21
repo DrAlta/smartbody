@@ -32,140 +32,116 @@
 
 #include "bml_xml_consts.hpp"
 #include "xercesc_utils.hpp"
-
-
-////// XML ATTRIBUTES
-const XMLCh ATTR_AU[]     = L"au";
-const XMLCh ATTR_AMOUNT[] = L"amount";
-const XMLCh ATTR_SIDE[]   = L"side";	
+#include "BMLDefs.h"
 
 using namespace std;
 using namespace BML;
 using namespace xml_utils;
 
 
-
 BehaviorRequestPtr BML::parse_bml_face( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
 
-	const XMLCh* tag      = elem->getTagName();
+	std::string localId = xml_parse_string( BMLDefs::ATTR_ID, elem );
 
-	std::string localId = "";
-	const XMLCh* id = elem->getAttribute( ATTR_ID);
-//	if (id &&  XMLString::stringLen( id ))
-	if (id &&  *id != 0 )
-		localId = XMLString::transcode(id);
+	float rampup = xml_parse_float( BMLDefs::ATTR_RAMPUP, elem, .25f );
+	float rampdown = xml_parse_float( BMLDefs::ATTR_RAMPDOWN, elem, .25f );
+	float duration = xml_parse_float( BMLDefs::ATTR_DURATION, elem, 1.0 );
 
-	// Viseme transition hack until timing can support multiple sync points
-	const XMLCh* str = elem->getAttribute( L"sbm:rampup" );
-	float rampup = 0;
-	if( str && *str != 0 ) {
-		char* temp = XMLString::transcode(str);
-		rampup =( float(atof(temp)));
+	if( stringICompare(xml_parse_string( BMLDefs::ATTR_TYPE, elem, "", true ), xml_translate_string( BMLDefs::ATTR_FACS )) )	{
+
+		int au = xml_parse_int( BMLDefs::ATTR_AU, elem, -1, true );
+		if( au < 0 ) {
+			return BehaviorRequestPtr();  // a.k.a., NULL
+		}
+		float weight = xml_parse_float( BMLDefs::ATTR_AMOUNT, elem, 0.5f );
+
+		boost::shared_ptr<VisemeRequest> viseme;
+		viseme.reset( new VisemeRequest( unique_id, localId, "_", weight, duration, behav_syncs, rampup, rampdown ) );
+
+		std::string visemeSide = xml_parse_string( BMLDefs::ATTR_SIDE, elem );
+		std::string auString = xml_parse_string( BMLDefs::ATTR_AU, elem );
+		
+		std::string visemeNameString;
+		if( !visemeSide.empty() && !stringICompare(visemeSide,"BOTH") )	{
+			int sideSignal = 0;
+			if( stringICompare(visemeSide, xml_translate_string( BMLDefs::DIR_LEFT )) ) sideSignal = 1;
+			if( stringICompare(visemeSide,xml_translate_string( BMLDefs::DIR_RIGHT )) ) sideSignal = 1;			
+
+			if( sideSignal )
+				visemeNameString = "au_" + auString + "_" + visemeSide;
+			else
+			{
+				LOG( "WARNING: BML::parse_bml_face(): Please check the side specification input" );
+				return BehaviorRequestPtr();
+			}
+			
+		}
+		else	{
+			visemeNameString = "au_" + auString;
+		}
+
+// NOTE: What is this?
+//		char* visemeName = new char [visemeNameString.size()+1];
+//		strcpy( visemeName, visemeNameString.c_str() );
+// ?? leak?
+//		viseme->setVisemeName( visemeName );
+		viseme->setVisemeName( visemeNameString );
+		return viseme;
 	}
 
-	str = elem->getAttribute( L"sbm:rampdown" );
-	float rampdown = 0;
-	if( str && *str != 0 ) {
-		char* temp = XMLString::transcode(str);
-		rampdown =( float(atof(temp)));
-	}
+	return BehaviorRequestPtr();  // NULL
 
-	str = elem->getAttribute( L"sbm:duration" );
-	float duration = 1.0;
-	if( str && *str != 0 ) {
-		char* temp = XMLString::transcode(str);
-		duration =( float(atof(temp)));
-	}
-	
-	const XMLCh* attrType = elem->getAttribute( ATTR_TYPE );
+	// OLD CODE:
+#if 0
+	const XMLCh* attrType = elem->getAttribute( BMLDefs::ATTR_TYPE );
 	if( attrType && *attrType != 0 ) {
-        int type = -1;
 
-        if( XMLString::compareIString( attrType, L"facs" )==0 ) {
-            const XMLCh* attrAu = elem->getAttribute( ATTR_AU );
-            if( attrAu && *attrAu != 0 ) {
-                wistringstream inAu( attrAu );
-                int au;
-                if( inAu >> au ) {
-                    float weight = 0.5f;
-                    const XMLCh* attrAmount = elem->getAttribute( ATTR_AMOUNT );
-                    if( attrAmount && *attrAmount != 0 ) {
-                        if(LOG_BML_VISEMES) LOG( "LOG: BML::parse_bml_face(): FAC has specified weight!\n" );
-                        wistringstream inAmount( attrAmount );
-                        if( !( inAmount >> weight ) )
-						{
-							std::wstringstream wstrstr;
-							wstrstr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_AMOUNT<<"=\""<<attrAmount<<"\" />: Illegal attribute value.";
-							LOG(convertWStringToString(wstrstr.str()).c_str());
-						}	
-                         
-                    }
-                    if(LOG_BML_VISEMES) LOG( "LOG: BML::parse_bml_face(): FAC weight: %f\n", weight );
-					boost::shared_ptr<VisemeRequest> viseme;
-					viseme.reset( new VisemeRequest( unique_id, localId, "_", weight, duration, behav_syncs, rampup, rampdown ) );
-
-					const XMLCh* attrSide = elem->getAttribute( ATTR_SIDE );
-					std::string visemeSide = std::string(XMLString::transcode(attrSide));
-					std::string auString = std::string(XMLString::transcode(attrAu));
-					std::string visemeNameString;
-					int sideSignal = 0;
-					if (XMLString::compareIString( attrSide, L"left" )==0)	sideSignal = 1;
-					else if (XMLString::compareIString( attrSide, L"right" )==0)	sideSignal = 1;
-					else if (XMLString::compareIString( attrSide, L"both" )==0)	sideSignal = 0;
-					else	
-					{
-						std::wstringstream wstrstr;
-						wstrstr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_SIDE<<"=\""<<attrSide<<"\" />: Illegal attribute value.";
-						LOG(convertWStringToString(wstrstr.str()).c_str());
-						return BehaviorRequestPtr();  // a.k.a., NULL				
-					}
-
-					if (sideSignal)
-						visemeNameString = "au_" + auString + "_" + visemeSide;
-					else
-						visemeNameString = "au_" + auString;
-						
-					char* visemeName = new char [visemeNameString.size()+1];
-					strcpy (visemeName, visemeNameString.c_str());
-					viseme->setVisemeName(visemeName);
-					return viseme;
-                } else {
-					std::wstringstream wstrstr;
-                    wstrstr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_AU<<"=\""<<attrAu<<"\" />: Illegal attribute value.";
-					LOG(convertWStringToString(wstrstr.str()).c_str());
-					return BehaviorRequestPtr();  // a.k.a., NULL
-                }
-            } else {
-				std::wstringstream wstrstr;
-                wstrstr << "WARNING: BML::parse_bml_face(): <"<<tag<<"> BML tag missing "<<ATTR_AU<<"= attribute.";
-				LOG(convertWStringToString(wstrstr.str()).c_str());
+		if( XMLString::compareIString( attrType, BMLDefs::ATTR_FACS )==0 ) {
+		
+			int au = xml_parse_int( BMLDefs::ATTR_AU, elem, -1 );
+			if( au < 0 ) {
 				return BehaviorRequestPtr();  // a.k.a., NULL
-            }
-        } else if( XMLString::compareIString( attrType, L"eyebrows" )==0 ) {
-			std::wstringstream wstrstr;
-            wstrstr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unimplemented type.";
-			LOG(convertWStringToString(wstrstr.str()).c_str());
-			return BehaviorRequestPtr();  // a.k.a., NULL
-        } else if( XMLString::compareIString( attrType, L"eyelids" )==0 ) {
-			std::wstringstream wstrstr;
-            wstrstr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unimplemented type.";
-			LOG(convertWStringToString(wstrstr.str()).c_str());
-			return BehaviorRequestPtr();  // a.k.a., NULL
-        } else if( XMLString::compareIString( attrType, L"mouth" )==0 ) {
-			std::wstringstream wstrstr;
-            wstrstr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unimplemented type.";
-			LOG(convertWStringToString(wstrstr.str()).c_str());
-			return BehaviorRequestPtr();  // a.k.a., NULL
-        } else {
-			std::wstringstream wstrstr;
-            wstrstr << "WARNING: BML::parse_bml_face(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unknown type value, ignore command";
-			LOG(convertWStringToString(wstrstr.str()).c_str());
-			return BehaviorRequestPtr();  // a.k.a., NULL
-        }
-    } else {
-		std::wstringstream wstrstr;
-        wstrstr << "WARNING: BML::parse_bml_face(): <"<<tag<<"> BML tag missing "<<ATTR_TYPE<<"= attribute.";
-		LOG(convertWStringToString(wstrstr.str()).c_str());
+			}
+			float weight = xml_parse_float( BMLDefs::ATTR_AMOUNT, elem, 0.5f );
+
+			boost::shared_ptr<VisemeRequest> viseme;
+			viseme.reset( new VisemeRequest( unique_id, localId, "_", weight, duration, behav_syncs, rampup, rampdown ) );
+
+			std::string visemeSide = xml_parse_string( BMLDefs::ATTR_SIDE, elem );
+			std::string auString = xml_parse_string( BMLDefs::ATTR_AU, elem );
+			
+			std::string visemeNameString;
+			int sideSignal = 0;
+			const XMLCh* attrSide = elem->getAttribute( BMLDefs::ATTR_SIDE );
+			if (XMLString::compareIString( attrSide, BML::BMLDefs::DIR_LEFT )==0)	sideSignal = 1;
+			if (XMLString::compareIString( attrSide, BML::BMLDefs::DIR_RIGHT )==0)	sideSignal = 1;
+			if (attrSide && *attrSide != 0)
+			{
+				if( sideSignal )
+					visemeNameString = "au_" + auString + "_" + visemeSide;
+				else
+				{
+					LOG( "WARNING: BML::parse_bml_face(): Please check the side specification input" );
+					return BehaviorRequestPtr();
+				}
+			}
+			else
+				visemeNameString = "au_" + auString;
+
+// NOTE: What is this?
+			char* visemeName = new char [visemeNameString.size()+1];
+			strcpy( visemeName, visemeNameString.c_str() );
+// ?? leak?
+			viseme->setVisemeName( visemeName );
+			return viseme;
+		}
+		else	{
+			// type not recognized...
+		}
 		return BehaviorRequestPtr();  // a.k.a., NULL
-    }
+	}
+	// type not found...
+	return BehaviorRequestPtr();  // a.k.a., NULL
+
+#endif
 }

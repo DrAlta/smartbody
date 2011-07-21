@@ -30,11 +30,13 @@
 #include <limits>
 #include <set>
 
-#include <SR/sr_shared_ptr.hpp>  // uses boost
-#include <SK/sk_skeleton.h>
-#include <SK/sk_channel_array.h>
-#include <ME/me_controller_context.hpp>
-#include <ME/me_evaluation_logger.hpp>
+#include <sr/sr_shared_ptr.hpp>  // uses boost
+#include <sk/sk_skeleton.h>
+#include <sk/sk_channel_array.h>
+#include <me/me_controller_context.hpp>
+#include <me/me_evaluation_logger.hpp>
+
+class SbmPawn;
 
 
 
@@ -105,7 +107,7 @@ public:
 	/**
 	 *  Inserts controller at position, or end if position > countChildren()
 	 */
-    virtual void add_controller( MeController* ct, unsigned int position = std::numeric_limits<unsigned int>::max() ) = 0;
+    virtual void add_controller( MeController* ct, unsigned int position = 9999999 ) = 0;
 
 	/**
 	 *  Public variant of MeControllerContext::remove_controller(..).
@@ -126,7 +128,7 @@ public:
 	/**
 	 *  Returns count of controllers in the tree.
 	 */
-    virtual size_t count_controllers() = 0;
+    virtual unsigned int count_controllers() = 0;
     //{ return _controllers.size(); }
 
     /**
@@ -184,6 +186,9 @@ public:
 	 *  Returns a reference to the currently logged channel indices.
 	 */
 	virtual const std::set<int>& get_logged_channel_indices() const = 0;
+
+	virtual SbmPawn* getPawn() = 0;
+	virtual void setPawn(SbmPawn* pawn) = 0;
 
 #if ME_CONTROLLER_ENABLE_XMLIFY
 	/*! Serialize state (or most of it) to a single XML element for later analysis. */

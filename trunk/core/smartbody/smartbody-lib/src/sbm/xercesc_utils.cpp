@@ -30,7 +30,6 @@
 
 #include <xercesc/framework/MemBufInputSource.hpp>
 
-
 #define USELOG (0)
 
 using namespace std;
@@ -110,21 +109,21 @@ bool xml_utils::xml_parse_string(
 )	{
 
 	if( str_p == NULL ) {
-		LOG( "xml_parse_string ERR: bad str_p" );
+		LOG( "xml_parse_string ERR: NULL str_p" );
 		return( false );
 	}
 	if( attr == NULL ) {
-		LOG( "xml_parse_string ERR: bad XMLCh attribute ptr" );
+		LOG( "xml_parse_string ERR: NULL XMLCh attribute ptr" );
 		return( false );
 	}
 	if( elem == NULL ) {
-		LOG( "xml_parse_string ERR: bad DOMElement ptr" );
+		LOG( "xml_parse_string ERR: NULL DOMElement ptr" );
 		return( false );
 	}
 
 	const XMLCh* value = elem->getAttribute( attr );
 	if( value == NULL ) {
-		LOG( "xml_parse_string ERR: bad value" );
+		LOG( "xml_parse_string ERR: NULL value" );
 		return( false );
 	}
 	if( value[ 0 ] == chNull ) {
@@ -143,7 +142,7 @@ bool xml_utils::xml_parse_double(
  )	{
 
 	if( d_p == NULL )	{
-		LOG( "xml_parse_double ERR: bad d_p" );
+		LOG( "xml_parse_double ERR: NULL d_p" );
 		return( false );
 	}
 
@@ -163,7 +162,7 @@ bool xml_utils::xml_parse_float(
  )	{
 
 	if( f_p == NULL )	{
-		LOG( "xml_parse_double ERR: bad f_p" );
+		LOG( "xml_parse_double ERR: NULL f_p" );
 		return( false );
 	}
 
@@ -183,7 +182,7 @@ bool xml_utils::xml_parse_int(
  )	{
 
 	if( i_p == NULL )	{
-		LOG( "xml_parse_double ERR: bad i_p" );
+		LOG( "xml_parse_double ERR: NULL i_p" );
 		return( false );
 	}
 
@@ -193,6 +192,118 @@ bool xml_utils::xml_parse_int(
 		return( true );
 	}
 	return( false );
+}
+
+/*
+	bool set_aim_offset_param = false;
+	float aim_offset_p = 0.0;
+	float aim_offset_h = 0.0;
+	float aim_offset_r = 0.0;
+	const XMLCh* attrAimOffset = elem->getAttribute( BMLDefs::ATTR_AIM_OFFSET );
+	if( attrAimOffset && *attrAimOffset != 0 ) {
+		char* temp_ascii = XMLString::transcode( attrAimOffset );
+		string parse_buffer( temp_ascii );
+		istringstream parser( parse_buffer );
+		if( !( parser >> aim_offset_p >> aim_offset_h >> aim_offset_r ) ) {
+			std::wstringstream wstrstr;
+			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<< BMLDefs::ATTR_AIM_OFFSET<<"=\""<<attrAimOffset<<"\" is not valid.";
+			std::string str = convertWStringToString(wstrstr.str());
+			LOG(str.c_str());
+		}
+		else	{
+			set_aim_offset_param = true;
+		}
+		XMLString::release( &temp_ascii );
+	}
+*/
+int xml_utils::xml_parse_double( 
+	double *d_arr,
+	int arr_count,
+	const XMLCh* attr, 
+	DOMElement* elem,
+	bool verbose
+)	{
+
+#if 0
+	for( int i = 0; i < arr_count; i++ )	{
+		d_arr[ i ] = 0.0;
+	}
+#endif
+
+	if( d_arr == NULL )	{
+		LOG( "xml_parse_double ERR: NULL d_arr" );
+		return( 0 );
+	}
+
+	string str;
+	if( xml_parse_string( &str, attr, elem, verbose ) )	{
+
+		istringstream parser( str );
+		int i;
+		for( i = 0; i < arr_count; i++ )	{
+			if( !( parser >> d_arr[ i ] ) ) {
+				return( i );
+			}
+		}
+		return( i );
+	}
+	return( 0 );
+}
+
+int xml_utils::xml_parse_float( 
+	float *f_arr,
+	int arr_count,
+	const XMLCh* attr, 
+	DOMElement* elem,
+	bool verbose
+)	{
+
+	if( f_arr == NULL )	{
+		LOG( "xml_parse_float ERR: NULL f_arr" );
+		return( 0 );
+	}
+
+	string str;
+	if( xml_parse_string( &str, attr, elem, verbose ) )	{
+
+		istringstream parser( str );
+		int i;
+		for( i = 0; i < arr_count; i++ )	{
+			if( !( parser >> f_arr[ i ] ) ) {
+				return( i );
+			}
+		}
+		return( i );
+	}
+	return( 0 );
+}
+
+int xml_utils::xml_parse_int( 
+	int *i_arr,
+	int arr_count,
+	const XMLCh* attr, 
+	DOMElement* elem,
+	bool verbose
+)	{
+
+	if( i_arr == NULL )	{
+		LOG( "xml_parse_int ERR: NULL i_arr" );
+		return( 0 );
+	}
+
+	string str;
+	if( xml_parse_string( &str, attr, elem, verbose ) )	{
+
+		istringstream parser( str );
+		int i;
+		for( i = 0; i < arr_count; i++ )	{
+			if( !( parser >> i_arr[ i ] ) ) {
+				return( i );
+			}
+		}
+		return( i );
+	}
+	return( 0 );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////

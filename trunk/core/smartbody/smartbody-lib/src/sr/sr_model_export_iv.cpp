@@ -19,10 +19,10 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
 
-# include <SR/sr_model.h>
+# include <sr/sr_model.h>
 
 //# define SR_USE_TRACE1    // keyword tracking
-//# include <SR/sr_trace.h>
+//# include <sr/sr_trace.h>
 
 
 static void wcolor ( SrColor c, SrOutput& o )

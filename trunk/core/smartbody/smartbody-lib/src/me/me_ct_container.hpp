@@ -23,8 +23,8 @@
 #ifndef ME_CT_CONTAINER_HPP
 #define ME_CT_CONTAINER_HPP
 
-#include <ME/me_controller.h>
-#include <ME/me_controller_context_proxy.hpp>
+#include <me/me_controller.h>
+#include <me/me_controller_context_proxy.hpp>
 
 
 /**
@@ -36,7 +36,7 @@ public:
 	//  Public Inner Classes
 	class Context : public MeControllerContextProxy
 	{
-	friend MeCtContainer;
+	friend class MeCtContainer;
 
 	protected:
 		///////////////////////////////////////////////////////////////

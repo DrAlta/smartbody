@@ -93,7 +93,7 @@ void print_motion( SkMotion* mot_p )	{
 	}
 }
 
-void MeCtQuickDraw::init( SkMotion* mot_p, SkMotion* mot2_p ) {
+void MeCtQuickDraw::init( SbmPawn* pawn, SkMotion* mot_p, SkMotion* mot2_p ) {
 #if 0
 	static char l_arm_labels[ NUM_ARM_JOINTS ][ MAX_JOINT_LABEL_LEN ] = {
 		"l_shoulder", "l_elbow", "l_forearm", "l_wrist"
@@ -108,7 +108,7 @@ void MeCtQuickDraw::init( SkMotion* mot_p, SkMotion* mot2_p ) {
 		if( mot_p == _gundraw_motion ) {
 			// Minimal init()
 			_last_apply_frame = 0;
-			MeController::init ();
+			MeController::init (pawn);
 			return;
 		}
 	}
@@ -173,7 +173,7 @@ void MeCtQuickDraw::init( SkMotion* mot_p, SkMotion* mot2_p ) {
 	
 	reset_blend();
 	
-	MeController::init();
+	MeController::init(pawn);
 
 	if( _context ) {
 		// Notify _context of channel change.
@@ -334,8 +334,8 @@ quat_t MeCtQuickDraw::rotation_to_target( vector_t l_forward_dir, vector_t w_tar
 
 	vector_t l_target_dir_n = ( -state_p->parent_rot ) * ( w_target_pos - state_p->world_pos ).normal();
 
-	float_t rad = safe_acos( l_forward_dir.dot( l_target_dir_n ) );
-	float_t angle = deg( rad );
+	gwiz::float_t rad = safe_acos( l_forward_dir.dot( l_target_dir_n ) );
+	gwiz::float_t angle = deg( rad );
 	vector_t axis = l_forward_dir.cross( l_target_dir_n ).normal();
 
 	return( quat_t( angle, axis ) );
@@ -507,7 +507,7 @@ else	{
 
 	// increment draw_mode, select motion, and set motion_time:
 	float motion_time = 0.0;
-	float_t raw_lerp = 0.0;
+	gwiz::float_t raw_lerp = 0.0;
 	
 
 	if( draw_mode == DRAW_READY )	{
@@ -623,8 +623,8 @@ else	{
 	if( raw_lerp < 0.5 ) raw_lerp = 0.0;
 	else raw_lerp = ( raw_lerp - 0.5 ) * 2.0;
 #endif
-	float_t lerp_power = 2.0;
-	float_t lerp_value = pow( raw_lerp, lerp_power );
+	gwiz::float_t lerp_power = 2.0;
+	gwiz::float_t lerp_value = pow( raw_lerp, lerp_power );
 	
 //	LOG( "mot: %f dur: %f lerp: %f\n", motion_time, curr_play_dur, raw_lerp );
 
@@ -759,7 +759,7 @@ else	{
 //			out_q = quat_t();
 		}
 
-		float_t w, x, y, z;
+		gwiz::float_t w, x, y, z;
 #if 0
 		w = in_q.w();
 		x = in_q.x();

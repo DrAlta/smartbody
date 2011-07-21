@@ -21,9 +21,9 @@
  */
 
 #include "ParamAnimRunTimeEditor.h"
-#include <fltk/gl.h>
+#include <FL/gl.h>
 #include <GL/glu.h>
-#include <fltk/draw.h>
+#include <FL/fl_draw.H>
 #include <sbm/mcontrol_util.h>
 #include <sbm/me_ct_param_animation_data.h>
 
@@ -32,8 +32,8 @@
 # define DOLLYING(e)	(e.alt && e.button3)
 # define TRANSLATING(e)	(e.alt && e.button2)
 
-Parameter3DVisualization::Parameter3DVisualization(int x, int y, int w, int h, char* name, PAStateData* s, ParameterGroup* window) : fltk::GlWindow(x, y, w, h), state(s), paramGroup(window)
-{
+Parameter3DVisualization::Parameter3DVisualization(int x, int y, int w, int h, char* name, PAStateData* s, ParameterGroup* window) : Fl_Gl_Window(x, y, w, h, ""), state(s), paramGroup(window)
+{	
 	cam.center.set(0, 0, 0);
 	cam.eye.set(300, -300, 400);
 	cam.up.set(0, 0, 1);
@@ -48,11 +48,14 @@ Parameter3DVisualization::~Parameter3DVisualization()
 
 void Parameter3DVisualization::draw()
 {
+	//LOG("Para3D Draw()\n");
+
 	if (!visible()) 
 		return;
 	if (!valid()) 
 	{
 		init_opengl();
+		valid(1);
 	}
 
 	//----- Clear Background --------------------------------------------
@@ -127,31 +130,33 @@ int Parameter3DVisualization::handle(int event)
 {
 	switch ( event )
 	{ 
-	case fltk::PUSH:
-		translate_event ( e, SrEvent::Push, w(), h(), this );
+	case FL_PUSH:
+		translate_event ( e, SrEvent::EventPush, w(), h(), this );
 		break;
 
-	case fltk::RELEASE:
-		translate_event ( e, SrEvent::Release, w(), h(), this);
+	case FL_RELEASE:
+		translate_event ( e, SrEvent::EventRelease, w(), h(), this);
 		break;
 
-	case fltk::DRAG:
-
-	case fltk::MOVE:
-		translate_event ( e, SrEvent::Drag, w(), h(), this );
+	case FL_DRAG:
+		translate_event ( e, SrEvent::EventDrag, w(), h(), this );
 		break;
 
-	case fltk::WHEN_RELEASE:
-		//translate_event ( e, SrEvent::Release, w(), h(), this);
+	case FL_MOVE:
+		
 		break;
 
-	case fltk::KEY:
+	case FL_WHEN_RELEASE:
+		//translate_event ( e, SrEvent::EventRelease, w(), h(), this);
 		break;
 
-	case fltk::HIDE: // Called when the window is iconized
+	case FL_KEYBOARD:
 		break;
 
-	case fltk::SHOW: // Called when the window is de-iconized or when show() is called
+	case FL_HIDE: // Called when the window is iconized
+		break;
+
+	case FL_SHOW: // Called when the window is de-iconized or when show() is called
 		show ();
 		break;
 
@@ -161,7 +166,16 @@ int Parameter3DVisualization::handle(int event)
 
 	mouse_event(e);
 
-	return GlWindow::handle(event);
+	if (event == FL_PUSH)
+		return 1;
+
+	return Fl_Gl_Window::handle(event);
+}
+
+void Parameter3DVisualization::resize(int x, int y, int w, int h)
+{
+	Fl_Gl_Window::resize(x, y, w, h);
+	redraw();
 }
 
 void Parameter3DVisualization::init_opengl()
@@ -187,64 +201,64 @@ void Parameter3DVisualization::init_opengl()
 	glEnable ( GL_POINT_SMOOTH );
 	glPointSize ( 2.0 );
 
-	glShadeModel ( GL_SMOOTH );	
+	glShadeModel ( GL_SMOOTH );		
 }
 
-void Parameter3DVisualization::translate_event(SrEvent& e, SrEvent::Type t, int w, int h, Parameter3DVisualization* viewer)
+void Parameter3DVisualization::translate_event(SrEvent& e, SrEvent::EventType t, int w, int h, Parameter3DVisualization* viewer)
 {
 	e.init_lmouse ();
 
 	// put coordinates inside [-1,1] with (0,0) in the middle :
-	e.mouse.x  = ((float)fltk::event_x())*2.0f / ((float)w) - 1.0f;
-	e.mouse.y  = ((float)fltk::event_y())*2.0f / ((float)h) - 1.0f;
+	e.mouse.x  = ((float)Fl::event_x())*2.0f / ((float)w) - 1.0f;
+	e.mouse.y  = ((float)Fl::event_y())*2.0f / ((float)h) - 1.0f;
 	e.mouse.y *= -1.0f;
 	e.width = w;
 	e.height = h;
-	e.mouseCoord.x = (float)fltk::event_x();
-	e.mouseCoord.y = (float)fltk::event_y();
+	e.mouseCoord.x = (float)Fl::event_x();
+	e.mouseCoord.y = (float)Fl::event_y();
 
-	if ( fltk::event_state(fltk::BUTTON1) ) 
+	if ( Fl::event_state(FL_BUTTON1) ) 
 	   e.button1 = 1;
 
-	if ( fltk::event_state(fltk::BUTTON2) ) 
+	if ( Fl::event_state(FL_BUTTON2) ) 
 	   e.button2 = 1;
 
-	if ( fltk::event_state(fltk::BUTTON3) ) 
+	if ( Fl::event_state(FL_BUTTON3) ) 
 	   e.button3 = 1;
 
 
 	if(e.button1 == 0 && e.button2 == 0 && e.button3 == 0) 
 	{
-	   t = SrEvent::Release;
+	   t = SrEvent::EventRelease;
 	}
 
 	e.type = t;
 
-	if ( t==SrEvent::Push)
+	if ( t==SrEvent::EventPush)
 	{
-	   e.button = fltk::event_button();
+	   e.button = Fl::event_button();
 	   e.origUp = viewer->cam.up;
 	   e.origEye = viewer->cam.eye;
 	   e.origCenter = viewer->cam.center;
 	   e.origMouse.x = e.mouseCoord.x;
 	   e.origMouse.y = e.mouseCoord.y;
 	}
-	else if (t==SrEvent::Release )
+	else if (t==SrEvent::EventRelease )
 	{
-	   e.button = fltk::event_button();
+	   e.button = Fl::event_button();
 	   e.origMouse.x = -1;
 	   e.origMouse.y = -1;
 	}
 
 
-	if ( fltk::event_state(fltk::ALT)   ) e.alt = 1;
+	if ( Fl::event_state(FL_ALT)   ) e.alt = 1;
 	else e.alt = 0;
-	if ( fltk::event_state(fltk::CTRL)  ) e.ctrl = 1;
+	if ( Fl::event_state(FL_CTRL)  ) e.ctrl = 1;
 	else e.ctrl = 0;
-	if ( fltk::event_state(fltk::SHIFT) ) e.shift = 1;
+	if ( Fl::event_state(FL_SHIFT) ) e.shift = 1;
 	else e.shift = 0;
 
-	e.key = fltk::event_key();	
+	e.key = Fl::event_key();	
 }
 
 SrVec rotate_point(SrVec point, SrVec origin, SrVec direction, float angle)
@@ -278,7 +292,7 @@ SrVec rotate_point(SrVec point, SrVec origin, SrVec direction, float angle)
 
 void Parameter3DVisualization::mouse_event(SrEvent& e)
 {
-	if ( e.type==SrEvent::Drag )
+	if ( e.type==SrEvent::EventDrag )
 	{ 
 		float dx = e.mousedx() * cam.aspect;
 		float dy = e.mousedy() / cam.aspect;
@@ -426,15 +440,17 @@ void Parameter3DVisualization::drawGrid()
 
 void Parameter3DVisualization::drawParameter()
 {
-	SrVec vec = state->paramManager->getPrevVec();
+	SrVec vec;
+	paramGroup->getCurrentPAStateData()->paramManager->getParameter(vec.x, vec.y, vec.z);
 	glColor3f(1.0f, 0.0f, 0.0f);
-	glPointSize(5.0f);
+	glPointSize(7.0f);
 	glBegin(GL_POINTS);
 		glVertex(vec);
 	glEnd();
 }
 
-ParameterVisualization::ParameterVisualization(int x, int y, int w, int h, char* name, PAStateData* s, ParameterGroup* group) : fltk::Group(x, y, w, h, name), state(s), paramGroup(group)
+
+ParameterVisualization::ParameterVisualization(int x, int y, int w, int h, char* name, PAStateData* s, ParameterGroup* group) : Fl_Group(x, y, w, h, name), state(s), paramGroup(group)
 {
 	paramX = -9999;
 	paramY = -9999;
@@ -447,29 +463,34 @@ ParameterVisualization::~ParameterVisualization()
 
 void ParameterVisualization::draw()
 {
-	fltk::Group::draw();
+	Fl_Group::draw();
 
 	setup();
-
+	int xmin = centerX - width/2;
+	int xmax = centerX + width/2;
+	int ymin = centerY - height/2;
+	int ymax = centerY + height/2;
+	fl_rectf(xmin,ymin,width,height,FL_GRAY); // manually clean up the drawing area
+	
 	// draw axis
-	fltk::setcolor(fltk::BLACK);
-	fltk::drawline(0, centerY, width, centerY);
-	fltk::drawline(centerX, 0, centerX, height);
+	fl_color(FL_BLACK);
+	fl_line(xmin, centerY, xmax, centerY);
+	fl_line(centerX, ymin, centerX, ymax);
 	int recX, recY, recW, recH;
 	getBound(centerX, centerY, recX, recY, recW, recH);	
-	fltk::fillrect(recX, recY, recW, recH);
+	fl_rectf(recX, recY, recW, recH);
 
 	// draw grid
-	fltk::setcolor(fltk::WHITE);
+	fl_color(FL_WHITE);
 	int numLinesX = width / gridSizeX;
 	for (int i = -numLinesX / 2; i <= numLinesX / 2; i++)
-		fltk::drawline(centerX + i * gridSizeX, 0, centerX + i * gridSizeX, height);
+		fl_line(centerX + i * gridSizeX, ymin, centerX + i * gridSizeX, ymax);
 	int numLinesY = height / gridSizeY;
 	for (int i = -numLinesY / 2; i <=  numLinesY / 2; i++)
-		fltk::drawline(0, centerY + i * gridSizeY, width, centerY + i * gridSizeY);
+		fl_line(xmin, centerY + i * gridSizeY, xmax, centerY + i * gridSizeY);
 
 	// draw parameters
-	fltk::setcolor(fltk::GREEN);
+	fl_color(FL_GREEN);
 	for (int i = 0; i < state->paramManager->getNumParameters(); i++)
 	{
 		int recX, recY, recW, recH;
@@ -481,7 +502,7 @@ void ParameterVisualization::draw()
 		if (fabs(scaleY) > 0.0001)
 			y = int(vec.y / scaleY);
 		getBound(centerX + x, centerY - y, recX, recY, recW, recH);
-		fltk::fillrect(recX, recY, recW, recH);
+		fl_rectf(recX, recY, recW, recH);
 	}
 
 	// draw lines connecting parameters
@@ -494,13 +515,13 @@ void ParameterVisualization::draw()
 		getActualPixel(vec1.x, vec1.y, x1, y1);
 		getActualPixel(vec2.x, vec2.y, x2, y2);
 		getActualPixel(vec3.x, vec3.y, x3, y3);
-		fltk::drawline(x1, y1, x2, y2);
-		fltk::drawline(x1, y1, x3, y3);
-		fltk::drawline(x3, y3, x2, y2);
+		fl_line(x1, y1, x2, y2);
+		fl_line(x1, y1, x3, y3);
+		fl_line(x3, y3, x2, y2);
 	}
 
 	// draw parameters info
-	fltk::setcolor(fltk::BLACK);
+	fl_color(FL_BLACK);
 	for (int i = 0; i < state->paramManager->getNumParameters(); i++)
 	{
 		SrVec vec = state->paramManager->getVec(i);
@@ -509,45 +530,53 @@ void ParameterVisualization::draw()
 		char buff[200];
 //		sprintf(buff, "%s(%d,%d)", state->paramManager->getMotionName(i).c_str(), x, y);
 		sprintf(buff, "%s", state->paramManager->getMotionName(i).c_str());
-		fltk::drawtext(buff, float(centerX + x), float(centerY - y));
+		Fl_Font prevFont = fl_font();
+		Fl_Fontsize prevSize = fl_size();
+
+		fl_font(FL_COURIER,12);		
+		fl_draw(buff, centerX + x, centerY - y);
+		// restore the previous font size
+		fl_font(prevFont,prevSize);
 	}
 
 	// draw parameter
-	fltk::setcolor(fltk::RED);
+	fl_color(FL_RED);
 	if (paramX != -9999 && paramY != -9999)
 	{
 		int recX, recY, recW, recH;
 		getBound(paramX, paramY, recX, recY, recW, recH);
-		fltk::fillrect(recX, recY, recW, recH);		
+		fl_rectf(recX, recY, recW, recH);		
 	}
 }
 
 int ParameterVisualization::handle(int event)
 {
-	int mousex = fltk::event_x();
-	int mousey = fltk::event_y();
+	int mousex = Fl::event_x();
+	int mousey = Fl::event_y();
 	switch (event)
 	{
-		case fltk::MOVE:
+		case FL_DRAG:
 		{
-			bool altKeyPressed = (fltk::get_key_state(fltk::LeftAltKey) || fltk::get_key_state(fltk::RightAltKey));
+			bool altKeyPressed = (Fl::event_state(FL_BUTTON1) || Fl::event_state(FL_BUTTON3));
 			if (altKeyPressed)
 			{
 				paramX = mousex;
-				paramY = mousey;
+				paramY = mousey;				
 				setSlider(paramX, paramY);
-				redraw();
+				//redraw();
 				break;
 			}
 		}
 	}
-	return fltk::Group::handle(event);
+	if (event == FL_PUSH)
+		return 1;
+	return Fl_Group::handle(event);
 }
 
 void ParameterVisualization::setup()
 {
-	centerX = w() / 2;
-	centerY = h() / 2;
+	centerX = w() / 2  + x();//paramGroup->x();
+	centerY = h() / 2  + y();//paramGroup->y();
 	width = w();
 	height = h();
 
@@ -567,7 +596,7 @@ void ParameterVisualization::setup()
 
 void ParameterVisualization::resize(int x, int y, int w, int h)
 {
-	fltk::Group::resize(x, y, w, h);
+	Fl_Group::resize(x, y, w, h);
 	setup();
 	redraw();
 }
@@ -629,23 +658,28 @@ void ParameterVisualization::setSlider(int x, int y)
 	redraw();
 }
 
-ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateData* s, PanimationWindow* window, bool ex) : fltk::Group(x, y, w, h, name), state(s), paWindow(window), exec(ex)
+ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateData* s, PanimationWindow* window, bool ex) : Fl_Group(x, y, w, h, name), state(s), paWindow(window), exec(ex)
 {
+	//printf("Create parameter group, x = %d, y = %d\n",x,y);
 	this->label(s->stateName.c_str());
 	this->begin();
 		int type = state->paramManager->getType();
 		if (type == 0)
-		{
-			paramVisualization = new ParameterVisualization(4 * xDis, yDis, w - 5 * xDis, h - 5 * yDis, "", s, this);			
+		{			
+			int paraH =  h - 5 * yDis;
+			paramVisualization = new ParameterVisualization(4 * xDis + x, yDis + y, w - 5 * xDis, paraH, (char*)"", s, this);
+			// since begin() is automatically called by the constructor for Fl_Group
+			paramVisualization->end();
+
 			this->resizable(paramVisualization);
 			yAxis = NULL;
 			zAxis = NULL;
 			double min = state->paramManager->getVec(state->paramManager->getMinVecX()).x;
 			double max = state->paramManager->getVec(state->paramManager->getMaxVecX()).x;
-			xAxis = new fltk::ValueSlider(4 * xDis, h - 4 * yDis, w - 5 * xDis, 2 * yDis, "X");
+			xAxis = new Fl_Value_Slider(4 * xDis + x, h - 4 * yDis + y, w - 5 * xDis, 2 * yDis, "X");
 			xAxis->minimum(min);
-			xAxis->maximum(max);
-			xAxis->value(min);
+			xAxis->maximum(max);			
+			xAxis->type(FL_HORIZONTAL);			
 			xAxis->callback(updateXAxisValue, this);
 			float actualValue;
 			s->paramManager->getParameter(actualValue);
@@ -653,65 +687,70 @@ ParameterGroup::ParameterGroup(int x, int y, int w, int h, char* name, PAStateDa
 			int actualY = 0;
 			paramVisualization->getActualPixel(actualValue, 0.0f, actualX, actualY);
 			paramVisualization->setSlider(actualX, actualY);
-
 			param3DVisualization = NULL;
 		}
 		if (type == 1)
 		{
-			paramVisualization = new ParameterVisualization(4 * xDis, yDis, w - 5 * xDis, h - 5 * yDis, "", s, this);
+			int paraH =  h - 5 * yDis;
+			paramVisualization = new ParameterVisualization(4 * xDis + x, yDis + y, w - 5 * xDis, h - 5 * yDis, (char*)"", s, this);
+			paramVisualization->end();
 			this->resizable(paramVisualization);
 			double minX = state->paramManager->getVec(state->paramManager->getMinVecX()).x;
 			double maxX = state->paramManager->getVec(state->paramManager->getMaxVecX()).x;
 			double minY = state->paramManager->getVec(state->paramManager->getMinVecY()).y;
 			double maxY = state->paramManager->getVec(state->paramManager->getMaxVecY()).y;
-			xAxis = new fltk::ValueSlider(4 * xDis, h - 4 * yDis, w - 5 * xDis, 2 * yDis, "X");
+			xAxis = new Fl_Value_Slider(4 * xDis + x, h - 4 * yDis + y, w - 5 * xDis, 2 * yDis, "X");
 			xAxis->minimum(minX);
 			xAxis->maximum(maxX);
+			xAxis->type(FL_HORIZONTAL);
 			xAxis->callback(updateXYAxisValue, this);
-			yAxis = new fltk::ValueSlider(xDis, yDis, 3 * xDis, h - 5 * yDis, "Y");
+			yAxis = new Fl_Value_Slider(xDis + x, yDis + y, 3 * xDis, h - 5 * yDis, "Y");
 			yAxis->minimum(minY);
 			yAxis->maximum(maxY);
 			yAxis->callback(updateXYAxisValue, this);
-			yAxis->set_vertical();
+			yAxis->type(FL_VERTICAL);
 			float actualValueX, actualValueY;
 			s->paramManager->getParameter(actualValueX, actualValueY);
 			int actualX = 0;
 			int actualY = 0;
 			paramVisualization->getActualPixel(actualValueX, actualValueY, actualX, actualY);
 			paramVisualization->setSlider(actualX, actualY);
-
 			param3DVisualization = NULL;
 		}
 		if (type == 2)
 		{
-			param3DVisualization = new Parameter3DVisualization(4 * xDis, 4 * yDis, w - 5 * xDis, h - 8 * yDis, "", s, this);
-			this->resizable(param3DVisualization);
+			param3DVisualization = new Parameter3DVisualization(4 * xDis + x, 4 * yDis + y, w - 5 * xDis, h - 8 * yDis, (char*)"", s, this);
+			param3DVisualization->end();
+			this->resizable(param3DVisualization);	
 			paramVisualization = NULL;
 			double minX = state->paramManager->getVec(state->paramManager->getMinVecX()).x;
 			double maxX = state->paramManager->getVec(state->paramManager->getMaxVecX()).x;
 			double minY = state->paramManager->getVec(state->paramManager->getMinVecY()).y;
 			double maxY = state->paramManager->getVec(state->paramManager->getMaxVecY()).y;
-			xAxis = new fltk::ValueSlider(4 * xDis, h - 4 * yDis, w - 5 * xDis, 2 * yDis, "X");
+			xAxis = new Fl_Value_Slider(4 * xDis + x, h - 4 * yDis + y, w - 5 * xDis, 2 * yDis, "X");
 			xAxis->minimum(minX);
 			xAxis->maximum(maxX);
+			xAxis->type(FL_HORIZONTAL);
 			xAxis->callback(updateXYZAxisValue, this);
-			yAxis = new fltk::ValueSlider(xDis, yDis, 3 * xDis, h - 5 * yDis, "Y");
+			yAxis = new Fl_Value_Slider(xDis + x, yDis + y, 3 * xDis, h - 5 * yDis, "Y");
 			yAxis->minimum(minY);
 			yAxis->maximum(maxY);
 			yAxis->callback(updateXYZAxisValue, this);
-			yAxis->set_vertical();
-			zAxis = new fltk::ValueSlider(4 * xDis, yDis, w - 5 * xDis, 2 * yDis, "Z");
+			yAxis->type(FL_VERTICAL);
+			zAxis = new Fl_Value_Slider(4 * xDis + x, yDis + y, w - 5 * xDis, 2 * yDis, "Z");
 			zAxis->minimum(-90);	// TODO: remove this hard code part
 			zAxis->maximum(90);
+			zAxis->type(FL_HORIZONTAL);
 			zAxis->callback(updateXYZAxisValue, this);
 		}
-	this->end();
-	
+	this->end();	
+	this->redraw();
+	paWindow->redraw();
 }
 
 void ParameterGroup::resize(int x, int y, int w, int h)
 {
-	Group::resize(x, y, w, h);
+	Fl_Group::resize(x, y, w, h);
 }
 
 
@@ -719,49 +758,50 @@ ParameterGroup::~ParameterGroup()
 {
 }
 
-void ParameterGroup::updateXAxisValue(fltk::Widget* widget, void* data)
+void ParameterGroup::updateXAxisValue(Fl_Widget* widget, void* data)
 {
 	ParameterGroup* group = (ParameterGroup*) data;
+	PAStateData* state = group->getCurrentPAStateData();
 	double w = group->xAxis->value();
-	group->state->paramManager->setWeight(w);
-	if (group->exec)
-		group->updateWeight();
-	int x, y;
-	group->paramVisualization->getActualPixel(float(w), 0.0f, x, y);
-	group->paramVisualization->setPoint(x, y);
+	bool success = false;
+	success = state->paramManager->setWeight(w);
+	if (success)
+		group->getCurrentCharacter()->param_animation_ct->updateWeights();
+	group->redraw();
 }
 
-void ParameterGroup::updateXYAxisValue(fltk::Widget* widget, void* data)
+void ParameterGroup::updateXYAxisValue(Fl_Widget* widget, void* data)
 {
 	ParameterGroup* group = (ParameterGroup*) data;
+	PAStateData* state = group->getCurrentPAStateData();
 	double x = group->xAxis->value();
 	double y = group->yAxis->value();
-	group->state->paramManager->setWeight(x, y);
-	if (group->exec)
-		group->updateWeight();
-	int pixelX, pixelY;
-	group->paramVisualization->getActualPixel(float(x), float(y), pixelX, pixelY);
-	group->paramVisualization->setPoint(pixelX, pixelY);
+	bool success = false;
+	success = state->paramManager->setWeight(x, y);
+	if (success)
+		group->getCurrentCharacter()->param_animation_ct->updateWeights();
+	group->redraw();
 }
 
-void ParameterGroup::updateXYZAxisValue(fltk::Widget* widget, void* data)
-{
+void ParameterGroup::updateXYZAxisValue(Fl_Widget* widget, void* data)
+{		
 	ParameterGroup* group = (ParameterGroup*) data;
+	PAStateData* state = group->getCurrentPAStateData();
 	double x = group->xAxis->value();
 	double y = group->yAxis->value();
 	double z = group->zAxis->value();
 	bool success = false;
-	success = group->state->paramManager->setWeight(x, y, z);
+	success = state->paramManager->setWeight(x, y, z);
 	if (success)
-		group->updateWeight();
-	group->redraw();
+		group->getCurrentCharacter()->param_animation_ct->updateWeights();
+	group->redraw();	
 }
 
 void ParameterGroup::updateWeight()
 {
 	if (!state->cycle)
 		return;
-	std::string charName = paWindow->characterList->child(paWindow->characterList->value())->label();
+	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
 	std::stringstream command;
 	command << "panim update char " << charName;
 	int wNumber = state->getNumMotions();
@@ -772,22 +812,39 @@ void ParameterGroup::updateWeight()
 	paWindow->execCmd(paWindow, command.str());
 }
 
-PARunTimeEditor::PARunTimeEditor(int x, int y, int w, int h, PanimationWindow* window) : fltk::Group(x, y, w, h), paWindow(window)
+PAStateData* ParameterGroup::getCurrentPAStateData()
+{
+	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
+	SbmCharacter* character = mcuCBHandle::singleton().character_map.lookup(charName.c_str());
+	if (!character)
+		return NULL;
+	if (!character->param_animation_ct)
+		return NULL;
+	return character->param_animation_ct->getCurrentPAStateData();
+}
+
+SbmCharacter* ParameterGroup::getCurrentCharacter()
+{
+	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
+	return mcuCBHandle::singleton().character_map.lookup(charName.c_str());	
+}
+
+PARunTimeEditor::PARunTimeEditor(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h), paWindow(window)
 {
 	this->label("Run Time Editor");
 	this->begin();
-		currentCycleState = new fltk::Output(2 * xDis + 100, yDis, 100, 2 * yDis, "Current State");
-		nextCycleStates = new fltk::Browser(2 * xDis, 5 * yDis, w / 2 - 4 * xDis, h / 4, "Next State");
+		currentCycleState = new Fl_Output(2 * xDis + 100 + x, yDis + y, 100, 2 * yDis, "Current State");
+		nextCycleStates = new Fl_Hold_Browser(2 * xDis + x, 5 * yDis + y, w / 2 - 4 * xDis, h / 4, "Next State");
 		nextCycleStates->callback(updateTransitionStates, this);
-
+		
 	
-		availableTransitions = new fltk::Browser(w / 2 + 2 * xDis, 5 * yDis, w / 2 - 4 * xDis, h / 4, "Available Transitions");
+		availableTransitions = new Fl_Hold_Browser(w / 2 + 2 * xDis + x, 5 * yDis + y, w / 2 - 4 * xDis, h / 4, "Available Transitions");
 		availableTransitions->callback(updateNonCycleState, this);
-		availableTransitions->when(fltk::WHEN_ENTER_KEY_ALWAYS);
-		runNextState = new fltk::Button(2 * xDis, h / 4 + 6 * yDis, 100, 2 * yDis, "Run");
+		availableTransitions->when(FL_WHEN_ENTER_KEY_ALWAYS);
+		runNextState = new Fl_Button(2 * xDis + x, h / 4 + 6 * yDis + y, 100, 2 * yDis, "Run");
 		runNextState->callback(run, this);
-		parameterGroup = new fltk::Group(2 * xDis, h / 4 + 9 * yDis, w - 2 * xDis, 3 * h / 4 - 10 * yDis);
-		parameterGroup->box(fltk::UP_BOX);
+		parameterGroup = new Fl_Group(2 * xDis + x , h / 4 + 9 * yDis + y, w - 2 * xDis, 3 * h / 4 - 10 * yDis);
+		parameterGroup->box(FL_UP_BOX);
 	this->end();
 	this->resizable(parameterGroup);
 	paramGroup = NULL;
@@ -800,7 +857,7 @@ PARunTimeEditor::~PARunTimeEditor()
 
 void PARunTimeEditor::update()
 {
-	std::string charName = paWindow->characterList->child(paWindow->characterList->value())->label();
+	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
 	SbmCharacter* character = mcuCBHandle::singleton().character_map.lookup(charName.c_str());
 	if (!character)
 		return;
@@ -812,30 +869,35 @@ void PARunTimeEditor::update()
 		updateRunTimeStates(currentState);
 		prevCycleState = currentState;
 		currentCycleState->value(currentState.c_str());
+		paWindow->redraw();
 	}
 
 	if (paramGroup)
 	{
-		PAStateData* state = character->param_animation_ct->getCurrentPAStateData();
-		if (state)
+		PAStateData* curState = character->param_animation_ct->getCurrentPAStateData();
+		if (!curState)
+			return;
+		if (curState)
 		{
-			if (state->cycle)
+			if (curState->cycle)
 			{
-				float x, y;
-				state->paramManager->getParameter(x, y);
-				int actualPixelX = 0;
-				int actualPixelY = 0;
 				if (paramGroup->paramVisualization)
 				{
+					float x = 0.0f, y = 0.0f;
+					curState->paramManager->getParameter(x, y);
+					int actualPixelX = 0;
+					int actualPixelY = 0;
 					paramGroup->paramVisualization->getActualPixel(x, y, actualPixelX, actualPixelY);
-					paramGroup->paramVisualization->setPoint(actualPixelX, actualPixelY);
+					paramGroup->paramVisualization->setPoint(actualPixelX, actualPixelY);	
+					paramGroup->paramVisualization->redraw();
 				}
 				if (paramGroup->param3DVisualization)
 				{
-					SrVec vec = state->paramManager->getPrevVec();
-					paramGroup->xAxis->value(vec.x);
-					paramGroup->yAxis->value(vec.y);
-					paramGroup->zAxis->value(vec.z);
+					float x = 0.0f, y = 0.0f, z = 0.0f;
+					curState->paramManager->getParameter(x, y, z);
+					paramGroup->xAxis->value(x);
+					paramGroup->yAxis->value(y);
+					paramGroup->zAxis->value(z);
 					paramGroup->param3DVisualization->redraw();
 				}
 			}
@@ -876,7 +938,7 @@ void PARunTimeEditor::updateRunTimeStates(std::string currentState)
 		}
 	}
 	for (int i = 0; i < nextCycleStates->size(); i++)
-		nextCycleStates->select(i, false);
+		nextCycleStates->select(i+1, false);
 	availableTransitions->clear();
 
 	if (paramGroup)
@@ -887,25 +949,30 @@ void PARunTimeEditor::updateRunTimeStates(std::string currentState)
 	}
 	if (stateData)
 	{
-		paramGroup = new ParameterGroup(0, 0, parameterGroup->w(), parameterGroup->h(), "", stateData, paWindow);
+		paramGroup = new ParameterGroup(this->parameterGroup->x(), this->parameterGroup->y(), parameterGroup->w(), parameterGroup->h(), (char*)"", stateData, paWindow);
 		parameterGroup->add(paramGroup);
 		paramGroup->show();
+		paramGroup->redraw();
+		if (paramGroup->param3DVisualization)
+			paramGroup->param3DVisualization->show();
 	}
 }
 
-void PARunTimeEditor::addItem(fltk::Browser* browser, std::string item)
+void PARunTimeEditor::addItem(Fl_Browser* browser, std::string item)
 {
 	for (int i = 0; i < browser->size(); i++)
 	{
-		if (item == browser->goto_index(i)->label())
+		const char* text = browser->text(i+1);		
+		if (item == text)
 			return;
 	}
 	browser->add(item.c_str());
+	const char* newText = browser->text(1);
 }
 
 void PARunTimeEditor::initializeRunTimeEditor()
 {
-	std::string charName = paWindow->characterList->child(paWindow->characterList->value())->label();
+	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
 	SbmCharacter* character = mcuCBHandle::singleton().character_map.lookup(charName.c_str());
 	if (character)
 	{
@@ -920,17 +987,18 @@ void PARunTimeEditor::initializeRunTimeEditor()
 	prevCycleState = "";
 }
 
-void PARunTimeEditor::updateNonCycleState(fltk::Widget* widget, void* data)
+void PARunTimeEditor::updateNonCycleState(Fl_Widget* widget, void* data)
 {
 	PARunTimeEditor* editor = (PARunTimeEditor*) data;
 
 	std::string nonCycleState;
 	for (int i = 0; i < editor->availableTransitions->size(); i++)
 	{
-		if (editor->availableTransitions->goto_index(i)->selected())
-			nonCycleState = editor->availableTransitions->goto_index(i)->label();
+		if (editor->availableTransitions->selected(i+1))
+			nonCycleState = editor->availableTransitions->text(i+1);
 	}
-	if (mcuCBHandle::singleton().lookUpPAState(nonCycleState)->paramManager->getNumParameters() > 0)
+	PAStateData* paStateData = mcuCBHandle::singleton().lookUpPAState(nonCycleState);
+	if (paStateData && paStateData->paramManager->getNumParameters() > 0)
 	{
 		if (editor->paramGroup)
 		{
@@ -938,13 +1006,15 @@ void PARunTimeEditor::updateNonCycleState(fltk::Widget* widget, void* data)
 			delete editor->paramGroup;
 			editor->paramGroup = NULL;
 		}
-		editor->paramGroup = new ParameterGroup(0, 0, editor->parameterGroup->w(), editor->parameterGroup->h(), "", mcuCBHandle::singleton().lookUpPAState(nonCycleState), editor->paWindow);
+		
+		editor->paramGroup = new ParameterGroup(editor->parameterGroup->x(), editor->parameterGroup->y(), editor->parameterGroup->w(), editor->parameterGroup->h(), (char*)"", mcuCBHandle::singleton().lookUpPAState(nonCycleState), editor->paWindow);
 		editor->parameterGroup->add(editor->paramGroup);
 		editor->paramGroup->show();
+		editor->paramGroup->redraw();		
 	}
 }
 
-void PARunTimeEditor::updateTransitionStates(fltk::Widget* widget, void* data)
+void PARunTimeEditor::updateTransitionStates(Fl_Widget* widget, void* data)
 {
 	PARunTimeEditor* editor = (PARunTimeEditor*) data;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -953,8 +1023,8 @@ void PARunTimeEditor::updateTransitionStates(fltk::Widget* widget, void* data)
 	std::string nextState = "";
 	for (int i = 0; i < editor->nextCycleStates->size(); i++)
 	{
-		if (editor->nextCycleStates->goto_index(i)->selected())
-			nextState = editor->nextCycleStates->goto_index(i)->label();
+		if (editor->nextCycleStates->selected(i+1))
+			nextState = editor->nextCycleStates->text(i+1);
 	}
 	for (size_t i = 0; i < mcu.param_anim_states.size(); i++)
 	{
@@ -1009,22 +1079,22 @@ void PARunTimeEditor::updateTransitionStates(fltk::Widget* widget, void* data)
 	}
 }
 
-void PARunTimeEditor::run(fltk::Widget* widget, void* data)
+void PARunTimeEditor::run(Fl_Widget* widget, void* data)
 {
 	PARunTimeEditor* editor = (PARunTimeEditor*) data;
-	std::string charName = editor->paWindow->characterList->child(editor->paWindow->characterList->value())->label();
+	std::string charName = editor->paWindow->characterList->menu()[editor->paWindow->characterList->value()].label();
 	std::string nextCycleState = "";
 	for (int i = 0; i < editor->nextCycleStates->size(); i++)
-		if (editor->nextCycleStates->selected(i))
+		if (editor->nextCycleStates->selected(i+1))
 		{	
-			nextCycleState = editor->nextCycleStates->goto_index(i)->label();
+			nextCycleState = editor->nextCycleStates->text(i+1);
 			break;
 		}
 	std::string transitionState = "";
 	for (int i = 0; i < editor->availableTransitions->size(); i++)
-		if (editor->availableTransitions->selected(i))
+		if (editor->availableTransitions->selected(i+1))
 		{	
-			transitionState = editor->availableTransitions->goto_index(i)->label();
+			transitionState = editor->availableTransitions->text(i+1);
 			break;
 		}
 

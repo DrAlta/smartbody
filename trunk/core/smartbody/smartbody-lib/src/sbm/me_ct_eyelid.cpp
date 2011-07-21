@@ -203,13 +203,20 @@ MeCtEyeLidRegulator::MeCtEyeLidRegulator( void )	{
 	set_use_blink_viseme(false);
 	upper_lid_smooth = 0.9f;
 	lower_lid_smooth = 0.9f;
+
+
+	addDefaultAttributeBool("eyelid.pitch", true);
+	addDefaultAttributeFloat("eyelid.rangeUpperMin", -30.0f);
+	addDefaultAttributeFloat("eyelid.rangeUpperMax", 30.0f);
+	addDefaultAttributeFloat("eyelid.tightWeightUpper", 30.0f);
+	addDefaultAttributeFloat("eyelid.delayUpper", 30.0f);
 }
 
 MeCtEyeLidRegulator::~MeCtEyeLidRegulator( void )	{
 
 }
 
-void MeCtEyeLidRegulator::init( bool tracking_pitch )	{
+void MeCtEyeLidRegulator::init(SbmPawn* pawn,  bool tracking_pitch)	{
 
 	_channels.add( "eyeball_left", SkChannel::Quat );
 	_channels.add( "eyeball_right", SkChannel::Quat );
@@ -222,7 +229,7 @@ void MeCtEyeLidRegulator::init( bool tracking_pitch )	{
 		_channels.add( "blink", SkChannel::XPos );
 	}
 
-	MeController::init();
+	MeController::init(pawn);
 	
 	set_upper_range( -30.0f, 30.0f );
 	set_lower_range( 20.0f, 20.0f ); // non existent...
@@ -503,6 +510,11 @@ bool MeCtEyeLidRegulator::get_use_blink_viseme()
 	return use_blink_viseme;
 }
 
+void MeCtEyeLidRegulator::notify(DSubject* subject)
+{
+	
+}
+
 //////////////////////////////////////////////////////////////////////////////////
 
 /*
@@ -621,7 +633,7 @@ float MeCtEyeLid::calc_lid_correction(
 	return( out_lid_y );
 }
 
-void MeCtEyeLid::init( void ) {
+void MeCtEyeLid::init( SbmPawn* pawn ) {
 	
 	_channels.add( "eyeball_left", SkChannel::Quat );
 	_channels.add( "eyeball_right", SkChannel::Quat );
@@ -632,7 +644,7 @@ void MeCtEyeLid::init( void ) {
 	_channels.add( "lower_eyelid_left", SkChannel::YPos );
 	_channels.add( "lower_eyelid_right", SkChannel::YPos );
 
-	MeController::init();
+	MeController::init(pawn);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////

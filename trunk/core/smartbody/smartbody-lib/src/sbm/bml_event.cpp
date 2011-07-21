@@ -27,9 +27,12 @@
 
 #include "bml_event.hpp"
 #include "bml_xml_consts.hpp"
+#include "BMLDefs.h"
+#include "xercesc_utils.hpp"
 
 using namespace std;
 using namespace BML;
+using namespace xml_utils;
 
 const bool LOG_EVENT_COMMAND = false;
 
@@ -56,10 +59,12 @@ void BML::EventRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 
 		ostringstream echo;
 		echo << "echo DEBUG: EventRequest::realize_impl(): Sending \"" << unique_id << "\" command: " << endl << "\t" << cmd.str();
-		commands.push_back( new SbmCommand( echo.str(), (float)strokeAt ) );
+		string str = echo.str();
+		commands.push_back( new SbmCommand( str, (float)strokeAt ) );
 	}
 
-	commands.push_back( new SbmCommand( cmd.str(), (float)strokeAt ) );
+	string str = cmd.str();
+	commands.push_back( new SbmCommand( str, (float)strokeAt ) );
 
 	realize_sequence( commands, mcu );
 }
@@ -76,17 +81,18 @@ std::string BML::EventRequest::getSyncPointName()
 
 
 BehaviorRequestPtr BML::parse_bml_event( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
-    const XMLCh* tag      = elem->getTagName();
-    const XMLCh* attrMesg = elem->getAttribute( ATTR_MESSAGE );
 
-	const XMLCh* attrStroke = elem->getAttribute(L"stroke");
+    const XMLCh* tag      = elem->getTagName();
+	const XMLCh* attrMesg = elem->getAttribute( BMLDefs::ATTR_MESSAGE );
+
+	const XMLCh* attrStroke = elem->getAttribute( BMLDefs::ATTR_STROKE );
 	std::string spName;
 	if (attrStroke)
 	{
 		spName = XMLString::transcode(attrStroke);
 	}
 
-	const XMLCh* id = elem->getAttribute(ATTR_ID);
+	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
 	if (id)
 	{
@@ -97,10 +103,7 @@ BehaviorRequestPtr BML::parse_bml_event( DOMElement* elem, const std::string& un
 	if( attrMesg && attrMesg[0]!='\0' ) {
         return BehaviorRequestPtr( new EventRequest( unique_id, localId, XMLString::transcode( attrMesg ), behav_syncs, spName ) );
 	} else {
-		// TODO: Use exception?
-		std::wstringstream wstrstr;
-        wstrstr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag missing "<<ATTR_MESSAGE<<"= attribute.  Behavior ignored.";
-		LOG(convertWStringToString(wstrstr.str()).c_str());
+		xml_parse_error( BMLDefs::ATTR_MESSAGE, elem );
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 }

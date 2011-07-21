@@ -24,15 +24,17 @@
 #ifndef _GL_CHART_VIEW_H_
 #define _GL_CHART_VIEW_H_
 
-#include <fltk/GlWindow.H>
-#include <SR/sr_camera.h>
-#include <SR/sr_light.h>
+#include <FL/Fl_Gl_Window.H>
+#include <sr/sr_camera.h>
+#include <sr/sr_light.h>
 #include "GlChartViewCoordinate.hpp"
 #include "GlChartViewArchive.hpp"
 #include <sbm/mcontrol_util.h>
+#ifdef WIN32
 #include "glfont2.h"
+#endif
 
-class GlChartView : public fltk::GlWindow, public SrViewer
+class GlChartView : public Fl_Gl_Window, public SrViewer
 {
 public:
 	int th;
@@ -40,7 +42,9 @@ public:
 	bool update_coordinate;
 	bool automatic_scale;
 
+#ifdef WIN32
 	GLFont label;
+#endif
 
 	SrEvent e;
 
@@ -67,7 +71,7 @@ public:
 public:
 	virtual int handle ( int event );
 
-	void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h, GlChartView* viewer );
+	void translate_event ( SrEvent& e, SrEvent::EventType t, int w, int h, GlChartView* viewer );
 	int mouse_event ( const SrEvent &e );
 	SrVec rotatePoint(SrVec point, SrVec origin, SrVec direction, float angle);
 	void init_camera(int type);

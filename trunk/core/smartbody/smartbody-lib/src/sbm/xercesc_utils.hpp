@@ -100,6 +100,30 @@ namespace xml_utils {
 		bool verbose = false
 	);
 
+	int xml_parse_double( 
+		double *d_arr,
+		int arr_count,
+		const XMLCh* attr, 
+		DOMElement* elem,
+		bool verbose = false
+	);
+
+	int xml_parse_float( 
+		float *f_arr,
+		int arr_count,
+		const XMLCh* attr, 
+		DOMElement* elem,
+		bool verbose = false
+	);
+
+	int xml_parse_int( 
+		int *i_arr,
+		int arr_count,
+		const XMLCh* attr, 
+		DOMElement* elem,
+		bool verbose = false
+	);
+
 	// parse: shorthand
 	std::string 
 	xml_parse_string( const XMLCh* A, DOMElement* E, std::string dfl = "", bool v = false );

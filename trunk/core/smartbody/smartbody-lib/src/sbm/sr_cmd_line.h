@@ -18,48 +18,41 @@
  *
  *  CONTRIBUTORS:
  *      Marcus Thiebaux, USC
- *      Andrew n marshall, USC
- *      Ashok Basawapatna, USC (no longer)
+ *      Ari Shapiro, USC
  */
 
 #ifndef SR_CMD_LINE_H
 #define SR_CMD_LINE_H
 
+#include	<sys/types.h>
 #include	<stdio.h>
 #include    <stdlib.h>
 #include	<string.h>
-#include	<sys/types.h>
 #include	<iostream>
 #include	<list>
-
-#ifdef WIN32
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include	<conio.h>
-#else
-#include	<unistd.h>
-#include	<sys/time.h>
-#define		KR_STDIN_FD		0
-#endif
-
-#include "sbm_constants.h"
 
 ////////////////////////////////////////////////////////////////////
 
 class srCmdLine	{
 	
 	public:
-		srCmdLine( int len = 256 );
+		srCmdLine( void );
 		virtual ~srCmdLine( void );
-		int pending_cmd( void );	
+		
+		int pending_cmd( bool );
+		
+		char *peek_cmd( void );
 		char *read_cmd( void );
+		
+		void test_prompt( void );
 	
 	private:
 		int realloc_buffer( int len );
+
 		char *cmd_buffer;
 		int buffer_len;
 		int buffer_use;
+		int buffer_pos;
 	
 		// storing the cmd lines
 		unsigned int max_cmdlines;

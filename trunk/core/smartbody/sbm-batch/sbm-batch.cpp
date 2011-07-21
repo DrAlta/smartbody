@@ -24,9 +24,13 @@
 #include "vhcl.h"
 
 #include <cstdio>
+
+#ifdef WIN32
 #include <conio.h>
 #include <windows.h>
 #include <mmsystem.h>
+#endif
+
 #include <set>
 #include <iostream>
 
@@ -75,10 +79,21 @@ void tt_client_callback( const char * op, const char * args, void * user_data )
    sbm->ProcessVHMsgs( op, args );
 }
 
+#ifdef WIN32_LEAN_AND_MEAN
+
+#else
+#include <sys/time.h>
+#endif
 
 double get_time()
 {
+#if WIN32
    return( (double)timeGetTime() / 1000.0 );
+#else
+	struct timeval tv;
+	gettimeofday( &tv, NULL );
+	return( tv.tv_sec + ( tv.tv_usec / 1000000.0 ) );
+#endif
 }
 
 
@@ -104,6 +119,9 @@ int main( int argc, char ** argv )
 
 
    printf( "Starting SBM\n" );
+	// register the log listener
+	vhcl::Log::StdoutListener* logListener = new vhcl::Log::StdoutListener();
+	vhcl::Log::g_log.AddListener(logListener);
 
    SBMListener listener;
    sbm = new Smartbody_dll;
@@ -112,8 +130,12 @@ int main( int argc, char ** argv )
    sbm->SetListener( &listener );
 
 
-   printf( "Starting main loop, hit 'q' to quit\n" );
+   printf( "Starting main loop...\n");
+#if WIN32
+	printf("Hit 'q' to quit\n");
+#endif
 
+	bool once = false;
    bool loop = true;
    while ( loop )
    {
@@ -139,8 +161,14 @@ int main( int argc, char ** argv )
          printf( "Character %s: %5.2f %5.2f %5.2f\n", c.m_name.c_str(), c.x, c.y, c.z );
       }
 
+////////////////////////////////////////////////////  00985ttq08ergijefvonad;kfjbv;sdfjv;owourehcv[ vqiiw[fo jws
+#if WIN32
       if ( _kbhit() && _getch() == 'q' )
          loop = false;
+#else
+	loop = true;
+//	loop = false;
+#endif
    }
 
 

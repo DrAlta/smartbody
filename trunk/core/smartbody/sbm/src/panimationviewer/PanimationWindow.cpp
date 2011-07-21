@@ -21,9 +21,10 @@
  */
 
 
+#include "vhcl.h"
 #include "PanimationWindow.h"
 #include "ParamAnimBlock.h"
-#include "vhcl.h"
+
 #include <sbm/mcontrol_util.h>
 #include <sbm/bml.hpp>
 
@@ -32,60 +33,66 @@
 #include <vector>
 #include <algorithm>
 
-PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Window(w, h, name), GenericViewer(x, y, w, h)
+PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(w, h, name), GenericViewer(x, y, w, h)
 {
 	this->begin();
 		int tabGroupX = 10;
-		int tabGroupY = 10;
+		int tabGroupY = 30;
 		int tabGroupW = w - 20;
-		int tabGroupH = 3 * h / 4 - 10;
+		int tabGroupH = 3 * h / 4 - 40;
 		int childGroupX = 0;
-		int childGroupY = 2 * yDis;
-		int childGroupW = tabGroupW;
+		int childGroupY = 2 * yDis ;
+		int childGroupW = tabGroupW- 10;
 		int childGroupH = tabGroupH - 2 * yDis;
 
-		motionPlayerMode = new CheckButton(10, 3 * h / 4 + 10, 200, 20, "Motion Player Mode");
-		motionPlayerMode->state(false);
+		motionPlayerMode = new Fl_Check_Button(10, 3 * h / 4 + 10, 200, 20, "Motion Player Mode");
+		motionPlayerMode->value(0);
 		motionPlayerMode->callback(changeMotionPlayerMode, this);
-		characterList = new Choice(300, 3 * h / 4 + 10, 200, 20, "Character List");
+		characterList = new Fl_Choice(300, 3 * h / 4 + 10, 200, 20, "Character List");
 		loadCharacters(characterList);
-		refresh = new Button(550, 3 * h / 4 + 10, 100, 20, "Refresh");
+		
+		refresh = new Fl_Button(550, 3 * h / 4 + 10, 100, 20, "Refresh");
 		refresh->callback(refreshUI, this);
-		resetCharacter = new Button(670, 3 * h / 4 + 10, 100, 20, "Reset");
+		resetCharacter = new Fl_Button(670, 3 * h / 4 + 10, 100, 20, "Reset");
 		resetCharacter->callback(reset, this);
-		textDisplay = new TextDisplay(10, 3 * h / 4 + 40, w - 120, h / 4 - 60);
-		textDisplay->color(fltk::WHITE);
-		textDisplay->textcolor(fltk::BLUE);
-		textBuffer = new fltk::TextBuffer();
+		textDisplay = new Fl_Text_Display(10, 3 * h / 4 + 40, w - 120, h / 4 - 60);
+		textDisplay->color(FL_WHITE);
+		textDisplay->textcolor(FL_BLUE);
+		textBuffer = new Fl_Text_Buffer();
 		textDisplay->buffer(textBuffer);
-		textDisplay->wrap_mode(true, 0);
+		
+		// for some reason, this line causes fltk 1.3 to slow down significantly when many lines of commands are inserted into display text.				
+		// this does not happen in fltk 2.0. Need to find out the correct way of doing this.
+		//textDisplay->wrap_mode(true, 0);
+
 		this->resizable(textDisplay);
-		clearHistoryButton = new fltk::Button(w - 100, h - 30, 80, 20, "Clear");
+		clearHistoryButton = new Fl_Button(w - 100, h - 90, 80, 20, "Clear");
 		clearHistoryButton->callback(clearTextDisplay, this);
 
-		tabGroup = new TabGroup(tabGroupX, tabGroupY, tabGroupW, tabGroupH);
+		tabGroup = new Fl_Tabs(tabGroupX, tabGroupY, tabGroupW, tabGroupH);
 		tabGroup->begin();
-			stateEditor = new PAStateEditor(childGroupX, childGroupY, childGroupW, childGroupH, this);
-			tabGroup->add(stateEditor);
-			transitionEditor = new PATransitionEditor(childGroupX, childGroupY, childGroupW, childGroupH, this);
-			tabGroup->add(transitionEditor);
-			scriptEditor = new PAScriptEditor(childGroupX, childGroupY, childGroupW, childGroupH, this);
-			tabGroup->add(scriptEditor);
-			runTimeEditor = new PARunTimeEditor(childGroupX, childGroupY, childGroupW, childGroupH, this);
-			tabGroup->add(runTimeEditor);	
+			stateEditor = new PAStateEditor(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, this);
+			stateEditor->begin();
+			stateEditor->end();
+			transitionEditor = new PATransitionEditor(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, this);
+			transitionEditor->begin();
+			transitionEditor->end();
+			scriptEditor = new PAScriptEditor(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, this);
+			scriptEditor->begin();
+			scriptEditor->end();
+			runTimeEditor = new PARunTimeEditor(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, this);
+			runTimeEditor->begin();
+			runTimeEditor->end();
 		tabGroup->end();
-		tabGroup->resizable(stateEditor);
-		tabGroup->resizable(transitionEditor);
-		tabGroup->resizable(scriptEditor);
-		tabGroup->resizable(runTimeEditor);
 	this->end();
 	this->resizable(tabGroup);
+	this->size_range(800, 740);
 	redraw();
 
 //	tabGroup->selected_child(stateEditor);
 //	tabGroup->selected_child(transitionEditor);
 //	tabGroup->selected_child(scriptEditor);
-	tabGroup->selected_child(runTimeEditor);
+	tabGroup->value(runTimeEditor);
 	lastCommand = "";
 }
 
@@ -96,8 +103,8 @@ PanimationWindow::~PanimationWindow()
 
 void PanimationWindow::draw()
 {
-	motionPlayerUpdate();
-	Window::draw();   
+	motionPlayerUpdate();	
+	Fl_Double_Window::draw();   
 }
 
 void PanimationWindow::label_viewer(std::string name)
@@ -122,35 +129,35 @@ void PanimationWindow::hide_viewer()
 void PanimationWindow::update_viewer()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::string charName = characterList->child(characterList->value())->label();
+	std::string charName = characterList->menu()[characterList->value()].label();
 	SbmCharacter* character = mcu.character_map.lookup(charName.c_str());
 	if (!character)
 		return;
 
-	if (tabGroup->value() == 2)
+	if (tabGroup->value() == scriptEditor)
 		scriptEditor->update();
-	if (tabGroup->value() == 3)
+	if (tabGroup->value() ==runTimeEditor)
 		runTimeEditor->update();
 		
 }
 
 void PanimationWindow::show()
 {    
-    Window::show();   
+    Fl_Double_Window::show();   
 }
 
 void PanimationWindow::motionPlayerUpdate()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (motionPlayerMode->state())
+	if (motionPlayerMode->value())
 	{
-		std::string charName = characterList->child(characterList->value())->label();
+		std::string charName = characterList->menu()[characterList->value()].label();
 		std::string motionName = "";
 		std::stringstream command;
 		double time = 0.0;
-		if (tabGroup->value() == 0)
+		if (tabGroup->value() == stateEditor)
 			getSelectedMarkInfo(stateEditor->stateEditorNleModel, motionName, time);
-		if (tabGroup->value() == 1)
+		if (tabGroup->value() == transitionEditor)
 			getSelectedMarkInfo(transitionEditor->transitionEditorNleModel, motionName, time);
 		if (motionName != "")
 		{
@@ -199,7 +206,7 @@ void PanimationWindow::execCmd(PanimationWindow* window, std::string cmd, double
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	TextDisplay* display = window->textDisplay;
+	Fl_Text_Display* display = window->textDisplay;	
 	BML::SbmCommand* command = new BML::SbmCommand(cmd, (float)(mcu.time + tOffset));
 	bool success = true;
 	srCmdSeq *seq = new srCmdSeq(); //sequence that holds the commands
@@ -223,12 +230,11 @@ void PanimationWindow::execCmd(PanimationWindow* window, std::string cmd, double
 		{
 			bool shouldAppend = window->checkCommand(cmd);
 			if (shouldAppend)
-			{
+			{				
 				display->insert(cmd.c_str());
 				display->insert("\n");
 			}
 		}
-		display->relayout();		
 		display->redraw();
 		display->show_insert_position();
 	}
@@ -245,7 +251,7 @@ void PanimationWindow::addTimeMark(nle::NonLinearEditorModel* model, bool select
 		CorrespondenceMark* toAddMark = new CorrespondenceMark();
 		toAddMark->setStartTime(0.0);
 		toAddMark->setEndTime(toAddMark->getStartTime());
-		toAddMark->setColor(fltk::RED);
+		toAddMark->setColor(FL_RED);
 		char buff[256];
 		sprintf(buff, "%6.2f", toAddMark->getStartTime());
 		toAddMark->setName(buff);
@@ -284,7 +290,7 @@ void PanimationWindow::addTimeMarkToBlock(nle::Block* block, double t)
 	CorrespondenceMark* mark = new CorrespondenceMark();
 	mark->setStartTime(t);
 	mark->setEndTime(mark->getStartTime());
-	mark->setColor(fltk::RED);
+	mark->setColor(FL_RED);
 	char buff[256];
 	sprintf(buff, "%6.2f", mark->getStartTime());
 	mark->setName(buff);
@@ -317,49 +323,49 @@ std::vector<std::string> PanimationWindow::tokenize(const std::string& str,const
 	return tokens;
 }
 
-void PanimationWindow::refreshUI(fltk::Widget* widget, void* data)
+void PanimationWindow::refreshUI(Fl_Widget* widget, void* data)
 {
 	PanimationWindow* window = (PanimationWindow*) data;
-	if (window->tabGroup->value() == 0)
+	if (window->tabGroup->value() == window->stateEditor)
 		window->stateEditor->refresh();
-	if (window->tabGroup->value() == 2)
+	if (window->tabGroup->value() == window->scriptEditor)
 		window->scriptEditor->refresh();
 }
 
-void PanimationWindow::changeMotionPlayerMode(fltk::Widget* widget, void* data)
+void PanimationWindow::changeMotionPlayerMode(Fl_Widget* widget, void* data)
 {
 	PanimationWindow* window = (PanimationWindow*) data;
-	std::string charName = window->characterList->child(window->characterList->value())->label();
+	std::string charName = window->characterList->menu()[window->characterList->value()].label();
 	std::stringstream command;
-	if (window->motionPlayerMode->state())
+	if (window->motionPlayerMode->value())
 		command << "motionplayer " << charName << " on";
 	else
 		command << "motionplayer " << charName << " off";
 	execCmd(window, command.str(), 0);
 }
 
-void PanimationWindow::loadCharacters(fltk::Choice* characterList)
+void PanimationWindow::loadCharacters(Fl_Choice* characterList)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SbmCharacter* char_p;
 	mcu.character_map.reset();
 	while(char_p = mcu.character_map.next())
 		characterList->add(char_p->name);
+	characterList->value(0);
 }
 
-void PanimationWindow::clearTextDisplay(fltk::Widget* widget, void* data)
+void PanimationWindow::clearTextDisplay(Fl_Widget* widget, void* data)
 {
 	PanimationWindow* window = (PanimationWindow*) data;
 	window->textDisplay->buffer()->remove(0, window->textDisplay->buffer()->length());
-	window->textDisplay->relayout();
 	window->textDisplay->redraw();
 }
 
 
-void PanimationWindow::reset(fltk::Widget* widget, void* data)
+void PanimationWindow::reset(Fl_Widget* widget, void* data)
 {	
 	PanimationWindow* window = (PanimationWindow*) data;
-	std::string charName = window->characterList->child(window->characterList->value())->label();
+	std::string charName = window->characterList->menu()[window->characterList->value()].label();
 	std::stringstream command;
 	command << "panim unschedule char " << charName;
 	execCmd(window, command.str());
@@ -368,13 +374,28 @@ void PanimationWindow::reset(fltk::Widget* widget, void* data)
 	execCmd(window, resetPosCommand.str());
 }
 
+PanimationWindow* PanimationWindow::getPAnimationWindow( Fl_Widget* w )
+{
+	PanimationWindow* panimWindow = NULL;
+	Fl_Widget* widget = w;
+	while (widget)
+	{
+		panimWindow = dynamic_cast<PanimationWindow*>(widget);
+		if (panimWindow)
+			break;
+		else
+			widget = widget->parent();
+	}
+	return panimWindow;
+}
+
 PanimationViewerFactory::PanimationViewerFactory()
 {
 }
 
 GenericViewer* PanimationViewerFactory::create(int x, int y, int w, int h)
 {
-	PanimationWindow* panimationWindow = new PanimationWindow(x, y, w, h, "Parameterized Animation");
+	PanimationWindow* panimationWindow = new PanimationWindow(x, y, w, h, (char*)"Parameterized Animation");
 	return panimationWindow;
 }
 

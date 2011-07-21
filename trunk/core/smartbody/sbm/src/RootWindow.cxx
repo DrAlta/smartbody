@@ -1,14 +1,11 @@
 
-#include "vhcl.h"
 #include "RootWindow.h"
 
-#include <fltk/PackedGroup.h>
-#include <fltk/AlignGroup.h>
-#include <fltk/BarGroup.h>
-#include <fltk/ask.h>
-#include <fltk/file_chooser.h>
+#include <FL/Fl_Pack.H>
+#include <FL/fl_ask.H>
+#include <FL/Fl_File_Chooser.H>
 #include <sstream>
-#include <fltk/filename.h>
+#include <FL/filename.H>
 #include "sbm/mcontrol_util.h"
 #include "boost/filesystem.hpp"
 #include <boost/algorithm/string/replace.hpp>
@@ -16,15 +13,17 @@
 #include <fstream>
 #include "CommandWindow.h"
 
-using namespace fltk;
 
-RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(x, y, w, h), DoubleBufferWindow(x, y, w, h, name)
+
+BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name)
 {
 	commandWindow = NULL;
+	bmlCreatorWindow = NULL;
 	this->begin();
 
-	menubar = new MenuBar(0, 0, w, 30); 
-	menubar->add("&File/Load...", 0, RootWindow::LoadCB, 0, NULL);
+	menubar = new Fl_Menu_Bar(0, 0, w, 30); 
+	menubar->labelsize(10);
+	menubar->add("&File/Load...", 0, BaseWindow::LoadCB, 0, NULL);
 	menubar->add("&File/Save Configuration...", 0, NULL, 0, NULL);
 	menubar->add("&File/Run Script...", 0, NULL, 0, NULL);
 	menubar->add("&View/Character/Bones", 0, ModeBonesCB, this, NULL);
@@ -44,10 +43,7 @@ RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Character/Locomotion/Trajectory", 0, TrajectoryCB, this, NULL);
 	menubar->add("&View/Pawns", 0, ShowPawns, this, NULL);
 	menubar->add("&View/Shadows", 0, ShadowsCB, this, NULL);
-	menubar->add("&View/Grid/Toggle", 0, GridCB, this, NULL);
-	menubar->add("&View/Grid/Grid Size", 0, GridSizeCB, this, NULL);
-	menubar->add("&View/Grid/Grid Step", 0, GridStepCB, this, NULL);
-	menubar->add("&View/Grid/Grid Height", 0, GridHeightCB, this, NULL);
+	menubar->add("&View/Grid", 0, GridCB, this, NULL);
 	//menubar->add("&View/Reach Pose Examples", 0, ShowPoseExamples, this, NULL);	
 	menubar->add("&View/Terrain/Shaded", 0, TerrainShadedCB, this, NULL);
 	menubar->add("&View/Terrain/Wireframe", 0, TerrainWireframeCB, this, NULL);
@@ -68,12 +64,16 @@ RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Window/Data Viewer", 0, LaunchDataViewerCB,this, NULL);
 	menubar->add("&Window/BML Viewer", 0, LaunchBMLViewerCB, this, NULL);
 	menubar->add("&Window/Parameterized Animation Viewer", 0, LaunchParamAnimViewerCB, this, NULL);
+	menubar->add("&Window/Resource Viewer", 0, LaunchResourceViewerCB, this, NULL);
 	menubar->add("&Window/Command Window", 0, LaunchConsoleCB, this, NULL);
+	menubar->add("&Window/BML Creator", 0, LaunchBMLCreatorCB, this, NULL);
+	menubar->add("&Window/Face Viewer", 0, LaunchFaceViewerCB, this, NULL);
 	menubar->add("&Scripts/Reload Scripts", 0, ReloadScriptsCB, this, NULL);
-	menubar->add("&Scripts/Set Script Folder", 0, SetScriptDirCB, this, MENU_DIVIDER);
+	menubar->add("&Scripts/Set Script Folder", 0, SetScriptDirCB, this, FL_MENU_DIVIDER);
 
 	// disable the commands that are not yet functional
-	fltk::Group* fileMenuOption = dynamic_cast<fltk::Group*>(menubar->child(0));
+	/*
+	Fl_Group* fileMenuOption = dynamic_cast<Fl_Group*>(menubar->child(0));
 	if (fileMenuOption)
 	{
 		for (int c = 0; c < fileMenuOption->children(); c++)
@@ -81,12 +81,13 @@ RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 			fileMenuOption->child(c)->deactivate();
 		}
 	}
+	*/
 
 	
 	int curY= 30;
 
 	/*
-	fltk::PackedGroup* simGroup = new fltk::PackedGroup(10, curY, 75, 25, NULL);
+	Fl_Pack* simGroup = new Fl_Pack(10, curY, 75, 25, NULL);
 	simGroup->begin();
 	int curX = 0;
 
@@ -107,7 +108,7 @@ RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	inputTimeStep->value("0");
 	inputTimeStep->callback(NULL, this);
 	curX += 25;	
-	fltk::Output* spacer = new fltk::Output(curX, 0, 25, 25);
+	Fl_Output* spacer = new Fl_Output(curX, 0, 25, 25);
 	simGroup->end();
 	simGroup->resizable(spacer);
 
@@ -115,7 +116,7 @@ RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	*/
 
 	fltkViewer = new FltkViewer(10, curY, w - 20, h - (curY + 10), NULL);
-	fltkViewer->box(fltk::UP_BOX);
+	fltkViewer->box(FL_UP_BOX);
 
 	this->end();
 
@@ -131,14 +132,14 @@ RootWindow::RootWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 
 }
 
-RootWindow::~RootWindow() {
+BaseWindow::~BaseWindow() {
 	delete fltkViewer;
 	if (commandWindow)
 		delete commandWindow;
 }
 
 
-SbmCharacter* RootWindow::getSelectedCharacter()
+SbmCharacter* BaseWindow::getSelectedCharacter()
 {
 	LocomotionData* locoData = fltkViewer->getLocomotionData();
 	int charIndex = locoData->char_index;
@@ -156,92 +157,105 @@ SbmCharacter* RootWindow::getSelectedCharacter()
 	return NULL;
 }
 
-void RootWindow::show_viewer()
+void BaseWindow::show_viewer()
 {
 	show();
 }
 
-void RootWindow::hide_viewer()
+void BaseWindow::hide_viewer()
 {
 	if (this->shown())
 		this->hide();
 }
 
-void RootWindow::set_camera ( const SrCamera &cam )
+void BaseWindow::set_camera ( const SrCamera &cam )
 {
    fltkViewer->set_camera(cam);
 
 }
 
 
-SrCamera* RootWindow::get_camera()
+SrCamera* BaseWindow::get_camera()
 {
 	return fltkViewer->get_camera();
 }
 
-void RootWindow::render () 
+void BaseWindow::render () 
 { 
-	redraw(); 
+	fltkViewer->redraw();
 } 
 
-void RootWindow::root(SrSn* r)
+void BaseWindow::root(SrSn* r)
 {
 	fltkViewer->root(r);
 }
 
-SrSn* RootWindow::root()
+SrSn* BaseWindow::root()
 {
 	return fltkViewer->root();
 }
 
-void RootWindow::LoadCB(Widget* widget, void* data)
+void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 {
-	int confirm = fltk::ask("This will reset the current session.\nContinue?");
+	int confirm = fl_choice("This will reset the current session.\nContinue?", "yes", "no", NULL);
 	if (!confirm)
 		return;
 
-	const char* seqFile = fltk::file_chooser("Load file:", "*.seq", NULL);
+	const char* seqFile = fl_file_chooser("Load file:", "*.seq", NULL);
 	if (!seqFile)
 		return;
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute("reset");
-
+	mcu.execute((char*)"reset");
 }
 
-void RootWindow::SaveCB(Widget* widget, void* data)
+void BaseWindow::SaveCB(Fl_Widget* widget, void* data)
 {
 }
 
-void RootWindow::RunCB(Widget* widget, void* data)
+void BaseWindow::RunCB(Fl_Widget* widget, void* data)
 {
 }
 
-void RootWindow::LaunchBMLViewerCB(Widget* widget, void* data)
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute("bmlviewer open");
-	mcu.execute("bmlviewer show");
-}
-
-void RootWindow::LaunchParamAnimViewerCB(Widget* widget, void* data)
+void BaseWindow::LaunchBMLViewerCB(Fl_Widget* widget, void* data)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute("panimviewer open");
-	mcu.execute("panimviewer show");	
+	mcu.execute((char*)"bmlviewer open");
+	mcu.execute((char*)"bmlviewer show");
 }
 
-void RootWindow::LaunchDataViewerCB(Widget* widget, void* data)
+void BaseWindow::LaunchParamAnimViewerCB(Fl_Widget* widget, void* data)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute("cbufviewer open");
-	mcu.execute("cbufviewer show");
+	mcu.execute((char*)"panimviewer open");
+	mcu.execute((char*)"panimviewer show");	
 }
 
-void RootWindow::LaunchConsoleCB(Widget* widget, void* data)
+void BaseWindow::LaunchDataViewerCB(Fl_Widget* widget, void* data)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.execute((char*)"cbufviewer open");
+	mcu.execute((char*)"cbufviewer show");
+}
+
+void BaseWindow::LaunchResourceViewerCB( Fl_Widget* widget, void* data )
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.execute((char*)"resourceviewer open");
+	mcu.execute((char*)"resourceviewer show");	
+}
+
+void BaseWindow::LaunchFaceViewerCB( Fl_Widget* widget, void* data )
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.execute((char*)"faceviewer open");
+	mcu.execute((char*)"faceviewer show");	
+}
+
+void BaseWindow::LaunchConsoleCB(Fl_Widget* widget, void* data)
 {
 	// console doesn't receive commands - why?
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (!rootWindow->commandWindow)
 	{
 		rootWindow->commandWindow = new CommandWindow(150, 150, 640, 480, "Commands");
@@ -251,56 +265,76 @@ void RootWindow::LaunchConsoleCB(Widget* widget, void* data)
 	rootWindow->commandWindow->show();
 }
 
-void RootWindow::StartCB(Widget* widget, void* data)
+void BaseWindow::LaunchBMLCreatorCB(Fl_Widget* widget, void* data)
+{
+	// console doesn't receive commands - why?
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	if (!rootWindow->bmlCreatorWindow)
+	{
+		rootWindow->bmlCreatorWindow = new BMLCreatorWindow(150, 150, 800, 600, "BML Commands");
+	}
+
+	rootWindow->bmlCreatorWindow->show();
+}
+
+
+
+
+void BaseWindow::StartCB(Fl_Widget* widget, void* data)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 }
 
-void RootWindow::StopCB(Widget* widget, void* data)
+void BaseWindow::StopCB(Fl_Widget* widget, void* data)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 }
 
-void RootWindow::StepCB(Widget* widget, void* data)
+void BaseWindow::StepCB(Fl_Widget* widget, void* data)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	
 }
 
-void RootWindow::PauseCB(Widget* widget, void* data)
+void BaseWindow::PauseCB(Fl_Widget* widget, void* data)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute("time pause");
+	mcu.execute((char*)"time pause");
 }
 
-void RootWindow::ResetCB(Widget* widget, void* data)
+void BaseWindow::ResetCB(Fl_Widget* widget, void* data)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute("reset");
+	mcu.execute((char*)"reset");
 }
 
-void RootWindow::CameraResetCB(Widget* widget, void* data)
+void BaseWindow::CameraResetCB(Fl_Widget* widget, void* data)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute("camera reset");
+	mcu.execute((char*)"camera reset");
 }
 
-void RootWindow::CameraFrameCB(Widget* widget, void* data)
+void BaseWindow::CameraFrameCB(Fl_Widget* widget, void* data)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute("camera frame");
+	mcu.execute((char*)"camera frame");
 }
 
-void RootWindow::RotateSelectedCB(Widget* widget, void* data)
+void BaseWindow::RotateSelectedCB(Fl_Widget* widget, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
 
 	SbmPawn* pawn = rootWindow->fltkViewer->getObjectManipulationHandle().get_selected_pawn();
 	if (!pawn)
-		return;
+	{
+		pawn = rootWindow->getSelectedCharacter();
+		if (!pawn)
+			return;
+	}
 
 	SrCamera* camera = mcu.viewer_p->get_camera();
 	float x,y,z,h,p,r;
@@ -309,9 +343,9 @@ void RootWindow::RotateSelectedCB(Widget* widget, void* data)
 }
 
 
-void RootWindow::FaceCameraCB(Widget* widget, void* data)
+void BaseWindow::FaceCameraCB(Fl_Widget* widget, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	SbmCharacter* character = rootWindow->getSelectedCharacter();
@@ -362,16 +396,18 @@ void RootWindow::FaceCameraCB(Widget* widget, void* data)
 	}
 }
 
-void RootWindow::RunScriptCB(fltk::Widget* w, void* data)
+void BaseWindow::RunScriptCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	fl_alert("Not implemented");
+	/*
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 
 	// determine which script was selected
-	Widget* widget = w;
+	Fl_Widget* widget = w;
 
 	std::string filename = "";
 
-	Widget* curWidget = widget;
+	Fl_Menu_Bar* curWidget = widget;
 	while (curWidget->parent() != rootWindow->menubar)
 	{
 		filename.insert(0, curWidget->label());
@@ -383,11 +419,12 @@ void RootWindow::RunScriptCB(fltk::Widget* w, void* data)
 	std::string scriptName = scriptPath.string();
 	scriptName.append(filename);
 	rootWindow->runScript(scriptName);
+	*/
 }
 
-void RootWindow::ReloadScriptsCB(fltk::Widget* w, void* data)
+void BaseWindow::ReloadScriptsCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 
 	std::string buff;
 	const boost::filesystem::path& curDir = rootWindow->scriptFolder;
@@ -395,18 +432,18 @@ void RootWindow::ReloadScriptsCB(fltk::Widget* w, void* data)
 	rootWindow->reloadScripts(buff);
 }
 
-void RootWindow::SetScriptDirCB(fltk::Widget* w, void* data)
+void BaseWindow::SetScriptDirCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 
-	const char* directory = fltk::dir_chooser("Select the script folder:", rootWindow->scriptFolder.c_str());
+	const char* directory = fl_dir_chooser("Select the script folder:", rootWindow->scriptFolder.c_str());
 	if (!directory)
 		return;
 
 	rootWindow->scriptFolder = directory;
 }
 
-void RootWindow::runScript(std::string filename)
+void BaseWindow::runScript(std::string filename)
 {
 	std::ifstream file(filename.c_str());
 	if (!file.good())
@@ -414,7 +451,7 @@ void RootWindow::runScript(std::string filename)
 		std::string message = "Filename '";
 		message.append(filename);
 		message.append("' is not a valid file.");
-		fltk::alert(message.c_str());
+		fl_alert(message.c_str());
 		file.close();
 	}
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -449,7 +486,7 @@ void RootWindow::runScript(std::string filename)
 			if (parenPos == std::string::npos)
 				parenPos = lineStr.length() - 1;
 			std::string text = lineStr.substr(inputPos + 7, parenPos - inputPos);
-			const char* response = fltk::input(text.c_str());
+			const char* response = fl_input(text.c_str());
 			std::string responseStr = "";
 			if (response)
 				responseStr = response;
@@ -472,27 +509,27 @@ void RootWindow::runScript(std::string filename)
 	
 }
 
-void RootWindow::reloadScripts(std::string scriptsDir)
+void BaseWindow::reloadScripts(std::string scriptsDir)
 {
+	LOG("Not yet implemented");
+	/*
 	// erase the old scripts menu
-	for (int x = menubar->children() - 1; x >= 0; x--)
+	for (int x = menubar->size() - 1; x >= 0; x--)
 	{
-		Widget* widget = menubar->child(x);
-		if (strcmp(widget->label(), "&Scripts") == 0)
+		if (strcmp( menubar->menu()[x].label(), "&Scripts") == 0)
 		{
-			Group* group = (Group*) widget;
-			for (int x = group->children() - 1; x >= 0; x--)
-				group->remove(x);
+			menubar->value(clear();
 		}
 	}
 
 	// create the new menu
-	menubar->add("Scripts/Reload Scripts", 0, RootWindow::ReloadScriptsCB, this, NULL);
-	menubar->add("Scripts/Set Script Folder", 0, RootWindow::SetScriptDirCB, this, MENU_DIVIDER);
+	menubar->add("Scripts/Reload Scripts", 0, BaseWindow::ReloadScriptsCB, this, NULL);
+	menubar->add("Scripts/Set Script Folder", 0, BaseWindow::SetScriptDirCB, this, FL_MENU_DIVIDER);
 	reloadScriptsByDir(scriptsDir, "");
+	*/
 }
 
-void RootWindow::reloadScriptsByDir(std::string scriptsDir, std::string parentStr)
+void BaseWindow::reloadScriptsByDir(std::string scriptsDir, std::string parentStr)
 {
 #ifdef WIN32
 	// eliminate the current list
@@ -512,7 +549,7 @@ void RootWindow::reloadScriptsByDir(std::string scriptsDir, std::string parentSt
 				// add the name to the root window
 				char entry[512];
 				sprintf(entry, "Scripts/%s%s", parentStr.c_str(), fd.cFileName);
-				menubar->add(entry, 0, RootWindow::RunScriptCB, this, 0);
+				menubar->add(entry, 0, BaseWindow::RunScriptCB, this, 0);
 			}
 			else 
 			{
@@ -533,7 +570,7 @@ void RootWindow::reloadScriptsByDir(std::string scriptsDir, std::string parentSt
 	}
 #else
 	char buff[8192];
-	danceInterp::getDirectoryListing(buff, 8192, (char*) scriptsDir);
+	//danceInterp::getDirectoryListing(buff, 8192, (char*) scriptsDir);
 	char* token = strtok(buff, " ");
 	char scriptName[512];
 	std::vector<std::string> allentries;
@@ -547,8 +584,9 @@ void RootWindow::reloadScriptsByDir(std::string scriptsDir, std::string parentSt
 	for (unsigned int x = 0; x < allentries.size(); x++)
 	{
 		char absfilename[2048];
-		sprintf(absfilename, "%s%s", scriptsDir, allentries[x].c_str());
+		sprintf(absfilename, "%s%s", scriptsDir.c_str(), allentries[x].c_str());
 
+#ifdef __APPL__
 		if (!filename_isdir(absfilename))
 		{
 
@@ -558,8 +596,8 @@ void RootWindow::reloadScriptsByDir(std::string scriptsDir, std::string parentSt
 				scriptName[strlen(allentries[x].c_str()) - 3] = '\0';
 				// add the name to the root window
 				char entry[512];
-				sprintf(entry, "Scripts/%s%s", parentStr, scriptName);
-				dance::rootWindow->menubar->add(entry, 0, RootWindow::runUserScript_cb, 0, 0);
+				sprintf(entry, "Scripts/%s%s", parentStr.c_str(), scriptName);
+				menubar->add(entry, 0, BaseWindow::RunScriptCB, 0, 0);
 			}
 		}
 		else
@@ -568,51 +606,52 @@ void RootWindow::reloadScriptsByDir(std::string scriptsDir, std::string parentSt
 			{
 				// recurse into this directory
 				char newdir[1024];
-				sprintf(newdir, "%s/%s", scriptsDir, allentries[x].c_str());
+				sprintf(newdir, "%s/%s", scriptsDir.c_str(), allentries[x].c_str());
 				char newParentStr[1024];
-				sprintf(newParentStr, "%s%s/", parentStr, allentries[x].c_str());
+				sprintf(newParentStr, "%s%s/", parentStr.c_str(), allentries[x].c_str());
 				reloadScriptsByDir(newdir, newParentStr);
 			}
 		}
+#endif
 
 	}
 
 #endif
 }
 
-void RootWindow::ModeBonesCB(fltk::Widget* w, void* data)
+void BaseWindow::ModeBonesCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdCharacterShowBones, NULL);
 }
 
-void RootWindow::ModeGeometryCB(fltk::Widget* w, void* data)
+void BaseWindow::ModeGeometryCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdCharacterShowGeometry, NULL);
 }
 
-void RootWindow::ModeDeformableGeometryCB(fltk::Widget* w, void* data)
+void BaseWindow::ModeDeformableGeometryCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdCharacterShowDeformableGeometry, NULL);
 }
 
-void RootWindow::ModeGPUDeformableGeometryCB(fltk::Widget* w, void* data)
+void BaseWindow::ModeGPUDeformableGeometryCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdCharacterShowDeformableGeometryGPU, NULL);
 }
 
-void RootWindow::ModeAxisCB(fltk::Widget* w, void* data)
+void BaseWindow::ModeAxisCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdCharacterShowAxis, NULL);
 }
 
-void RootWindow::ModeEyebeamsCB(fltk::Widget* w, void* data)
+void BaseWindow::ModeEyebeamsCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 
 	if (rootWindow->fltkViewer->getData()->eyeBeamMode)
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoEyeBeams, NULL);
@@ -620,85 +659,85 @@ void RootWindow::ModeEyebeamsCB(fltk::Widget* w, void* data)
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdEyeBeams, NULL);
 }
 
-void RootWindow::ModeEyelidCalibrationCB(fltk::Widget* w, void* data)
+void BaseWindow::ModeEyelidCalibrationCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (rootWindow->fltkViewer->getData()->eyeLidMode == FltkViewer::ModeNoEyeLids)
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdEyeLids, NULL);
 	else
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoEyeLids, NULL);
 }
 
-void RootWindow::ShowSelectedCB(fltk::Widget* w, void* data)
+void BaseWindow::ShowSelectedCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowSelection, NULL);
 }
 
-void RootWindow::ShadowsCB(fltk::Widget* w, void* data)
+void BaseWindow::ShadowsCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (rootWindow->fltkViewer->getData()->shadowmode == FltkViewer::ModeNoShadows)
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShadows, NULL);
 	else
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoShadows, NULL);
 }
 
-void RootWindow::TerrainShadedCB(fltk::Widget* w, void* data)
+void BaseWindow::TerrainShadedCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (rootWindow->fltkViewer->getData()->terrainMode != FltkViewer::ModeTerrain)
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdTerrain, NULL);
 }
 
-void RootWindow::TerrainWireframeCB(fltk::Widget* w, void* data)
+void BaseWindow::TerrainWireframeCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (rootWindow->fltkViewer->getData()->terrainMode != FltkViewer::ModeTerrainWireframe)
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdTerrainWireframe, NULL);
 }
-void RootWindow::TerrainNoneCB(fltk::Widget* w, void* data)
+void BaseWindow::TerrainNoneCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (rootWindow->fltkViewer->getData()->terrainMode != FltkViewer::ModeNoTerrain)
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoTerrain, NULL);
 }
 
-void RootWindow::ShowPawns(fltk::Widget* w, void* data)
+void BaseWindow::ShowPawns(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (rootWindow->fltkViewer->getData()->pawnmode != FltkViewer::ModePawnShowAsSpheres)
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdPawnShowAsSpheres, NULL);
 	else
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoPawns, NULL);
 }
 
-void RootWindow::ModeDynamicsCOMCB(fltk::Widget* w, void* data)
+void BaseWindow::ModeDynamicsCOMCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (rootWindow->fltkViewer->getData()->dynamicsMode != FltkViewer::ModeShowCOM)
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowCOM, NULL);
 }
 
-void RootWindow::ModeDynamicsSupportPolygonCB(fltk::Widget* w, void* data)
+void BaseWindow::ModeDynamicsSupportPolygonCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (rootWindow->fltkViewer->getData()->dynamicsMode != FltkViewer::ModeShowCOMSupportPolygon)
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowCOMSupportPolygon, NULL);
 }
 
-void RootWindow::ModeDynamicsMassesCB(fltk::Widget* w, void* data)
+void BaseWindow::ModeDynamicsMassesCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (rootWindow->fltkViewer->getData()->dynamicsMode != FltkViewer::ModeShowMasses)
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowMasses, NULL);
 }
 
 
-void RootWindow::SettingsSofteyesToggleCB(fltk::Widget* w, void* data)
+void BaseWindow::SettingsSofteyesToggleCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	bool currentSetting = true;
@@ -709,9 +748,9 @@ void RootWindow::SettingsSofteyesToggleCB(fltk::Widget* w, void* data)
 	}
 }
 
-void RootWindow::AudioCB(fltk::Widget* w, void* data)
+void BaseWindow::AudioCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	if (mcu.play_internal_audio)
@@ -726,9 +765,9 @@ void RootWindow::AudioCB(fltk::Widget* w, void* data)
 	}
 }
 
-void RootWindow::CreateCharacterCB(fltk::Widget* w, void* data)
+void BaseWindow::CreateCharacterCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	// get a list of existing skeletons
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::vector<std::string> skeletons;
@@ -740,23 +779,23 @@ void RootWindow::CreateCharacterCB(fltk::Widget* w, void* data)
 	}
 
 	if (!rootWindow->characterCreator)
-		rootWindow->characterCreator = new CharacterCreatorWindow(rootWindow->x() + 20, rootWindow->y() + 20, 400, 450, "Create a Character");
+		rootWindow->characterCreator = new CharacterCreatorWindow(rootWindow->x() + 20, rootWindow->y() + 20, 480, 150, strdup("Create a Character"));
 
 	rootWindow->characterCreator->setSkeletons(skeletons);
 
 	rootWindow->characterCreator->show();
 }
 
-void RootWindow::CreatePawnCB(fltk::Widget* w, void* data)
+void BaseWindow::CreatePawnCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	rootWindow->fltkViewer->create_pawn();
 }
 
-void RootWindow::CreateTerrainCB(fltk::Widget* w, void* data)
+void BaseWindow::CreateTerrainCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
-	const char* terrainFile = fltk::file_chooser("Load terrain:", "*.ppm", NULL);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	const char* terrainFile = fl_file_chooser("Load terrain:", "*.ppm", NULL);
 	if (terrainFile)
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -771,15 +810,15 @@ void RootWindow::CreateTerrainCB(fltk::Widget* w, void* data)
 	}
 }
 
-void RootWindow::TrackCharacterCB(fltk::Widget* w, void* data)
+void BaseWindow::TrackCharacterCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	if (mcu.cameraTracking.size() > 0)
 	{
 		// if any tracks are active, remove them
-		mcu.execute("camera track");
+		mcu.execute((char*)"camera track");
 		return;
 	}
 
@@ -800,103 +839,60 @@ void RootWindow::TrackCharacterCB(fltk::Widget* w, void* data)
 	mcu.execute((char*)trackCommand.c_str());
 }
 
-void RootWindow::KinematicFootstepsCB(fltk::Widget* w, void* data)
+void BaseWindow::KinematicFootstepsCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowKinematicFootprints, NULL);
 }
 
-void RootWindow::TrajectoryCB(fltk::Widget* w, void* data)
+void BaseWindow::TrajectoryCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowTrajectory, NULL);	
 }
 
-void RootWindow::SteeringCharactersCB(fltk::Widget* w, void* data)
+void BaseWindow::SteeringCharactersCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdSteerCharactersGoalsOnly, NULL);	
 }
 
-void RootWindow::SteeringAllCB(fltk::Widget* w, void* data)
+void BaseWindow::SteeringAllCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdSteerAll, NULL);	
 }
 
-void RootWindow::SteeringNoneCB(fltk::Widget* w, void* data)
+void BaseWindow::SteeringNoneCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoSteer, NULL);	
 }
 
-void RootWindow::LocomotionFootstepsCB(fltk::Widget* w, void* data)
+void BaseWindow::LocomotionFootstepsCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowLocomotionFootprints, NULL);
 }
 
-void RootWindow::VelocityCB(fltk::Widget* w, void* data)
+void BaseWindow::VelocityCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowVelocity, NULL);
 }
 
-void RootWindow::GridCB(fltk::Widget* w, void* data)
+void BaseWindow::GridCB(Fl_Widget* w, void* data)
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (rootWindow->fltkViewer->getData()->gridMode != FltkViewer::ModeShowGrid)
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdGrid, NULL);
 	else
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoGrid, NULL);
 }
 
-void RootWindow::GridSizeCB(fltk::Widget* w, void* data)
+void BaseWindow::ShowPoseExamples( Fl_Widget* w, void* data )
 {
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
-
-	std::stringstream strstr;
-	strstr << rootWindow->fltkViewer->gridSize;
-	const char* gridSizeStr = fltk::input("Grid Size", strstr.str().c_str());
-	float gsize = (float) atof(gridSizeStr);
-	rootWindow->fltkViewer->gridSize = gsize;
-	glDeleteLists(rootWindow->fltkViewer->gridList, 1);
-	rootWindow->fltkViewer->gridList = -1;
-	rootWindow->fltkViewer->redraw();
-}
-
-void RootWindow::GridStepCB(fltk::Widget* w, void* data)
-{
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
-
-	std::stringstream strstr;
-	strstr << rootWindow->fltkViewer->gridStep;
-	const char* gridStepStr = fltk::input("Grid Step", strstr.str().c_str());
-	float gstep = (float) atoi(gridStepStr);
-	rootWindow->fltkViewer->gridStep = gstep;
-	glDeleteLists(rootWindow->fltkViewer->gridList, 1);
-	rootWindow->fltkViewer->gridList = -1;
-	rootWindow->fltkViewer->redraw();
-}
-
-void RootWindow::GridHeightCB(fltk::Widget* w, void* data)
-{
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
-
-	std::stringstream strstr;
-	strstr << rootWindow->fltkViewer->gridHeight;
-	const char* gridHeightStr = fltk::input("Grid Height", strstr.str().c_str());
-	float gheight = (float) atoi(gridHeightStr);
-	rootWindow->fltkViewer->gridHeight = gheight;
-	glDeleteLists(rootWindow->fltkViewer->gridList, 1);
-	rootWindow->fltkViewer->gridList = -1;
-	rootWindow->fltkViewer->redraw();
-}
-
-
-void RootWindow::ShowPoseExamples( fltk::Widget* w, void* data )
-{
-	RootWindow* rootWindow = static_cast<RootWindow*>(data);
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (rootWindow->fltkViewer->getData()->reachRenderMode != FltkViewer::ModeShowExamples)
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdReachShowExamples, NULL);
 	else
@@ -913,7 +909,7 @@ FltkViewerFactory::FltkViewerFactory()
 SrViewer* FltkViewerFactory::create(int x, int y, int w, int h)
 {
 	if (!s_viewer)
-		s_viewer = new RootWindow(x, y, w, h, "SmartBody");
+		s_viewer = new BaseWindow(x, y, w, h, "SmartBody");
 	return s_viewer;
 }
 

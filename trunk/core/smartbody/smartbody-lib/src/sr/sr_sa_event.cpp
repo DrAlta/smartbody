@@ -21,11 +21,11 @@
 
 //# include <stdlib.h>
 
-# include <SR/sr_sn_editor.h>
-# include <SR/sr_sa_event.h>
+# include <sr/sr_sn_editor.h>
+# include <sr/sr_sa_event.h>
 
 //# define SR_USE_TRACE1 // constructor / destructor
-//# include <SR/sr_trace.h>
+//# include <sr/sr_trace.h>
 
 //================================== SrSaEvent ====================================
 

@@ -26,11 +26,12 @@
 #include <sr/sr_euler.h>
 
 const double timeThreshold = 0.05;
+
 PATimeManager::PATimeManager()
 {
 }
 
-PATimeManager::PATimeManager(std::vector<SkMotion*> m, std::vector<std::vector<double>> k, std::vector<double> w)
+PATimeManager::PATimeManager(std::vector<SkMotion*> m, std::vector<std::vector<double> > k, std::vector<double> w)
 {
 	motions = m;
 	keys = k;
@@ -356,7 +357,7 @@ void PAInterpolator::blending(std::vector<double> times, SrBuffer<float>& buff)
 		int numMotions = indices.size();
 		if (numMotions == 0)
 			return;
-		std::vector<SrBuffer<float>> buffers;
+		std::vector<SrBuffer<float> > buffers;
 		for (int i = 0; i < numMotions; i++)
 		{
 			SrBuffer<float> buffer;
@@ -895,7 +896,7 @@ void PATransitionManager::bufferBlending(SrBuffer<float>& buffer, SrBuffer<float
 }
 
 
-double PATransitionManager::getTime(double time, std::vector<double> key, std::vector<std::vector<double>> keys, std::vector<double> w)
+double PATransitionManager::getTime(double time, std::vector<double> key, std::vector<std::vector<double> > keys, std::vector<double> w)
 {
 	double ret = 0.0;
 	int section = -1;

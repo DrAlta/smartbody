@@ -26,8 +26,8 @@
  * propagates events
  */
 
-# include <SR/sr_sa.h>
-# include <SR/sr_event.h>
+# include <sr/sr_sa.h>
+# include <sr/sr_event.h>
 
 /*! \class SrSaEvent sr_sa_event.h
     \brief propagates events in a scene

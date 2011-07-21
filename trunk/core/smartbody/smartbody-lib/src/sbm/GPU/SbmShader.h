@@ -35,11 +35,12 @@ protected:
 class SbmShaderManager
 {
 public:
-		
+	enum { SUPPORT_OPENGL_3_0, SUPPORT_OPENGL_2_0, NO_GPU_SUPPORT };
 protected:
 	std::map<std::string,SbmShaderProgram*> shaderMap;
 	SrViewer* viewer;
-	bool shaderInit;		
+	bool shaderInit;	
+	static int shaderSupport;
 private:
 	// for singleton
 	static SbmShaderManager* _singleton;
@@ -64,4 +65,5 @@ public:
 	void addShader(const char* entryName,const char* vsName, const char* fsName, bool shaderFile = true);
 	SbmShaderProgram* getShader(const char* entryName);
 	void buildShaders();
+	static int getShaderSupport() { return shaderSupport; }
 };

@@ -19,6 +19,7 @@ ResourceManager::~ResourceManager()
 	{
 		delete (*iter);
 	}
+        resources.clear();
 
 	for (std::list<CmdResource*>::iterator iter = commandResources.begin();
 		iter != commandResources.end();
@@ -26,6 +27,7 @@ ResourceManager::~ResourceManager()
 	{
 		delete (*iter);
 	}
+        commandResources.clear();
 
 	for (std::list<ControllerResource*>::iterator iter = controllerResources.begin();
 		iter != controllerResources.end();
@@ -33,6 +35,7 @@ ResourceManager::~ResourceManager()
 	{
 		delete (*iter);
 	}
+        controllerResources.clear();
 
 	while (!cur_cmd_parent.empty())
 	{
@@ -44,7 +47,7 @@ ResourceManager::~ResourceManager()
 
 void ResourceManager::addResource(Resource* r)
 {
-		CmdResource* cmd = dynamic_cast<CmdResource*>(r);
+	CmdResource* cmd = dynamic_cast<CmdResource*>(r);
 	if (cmd)
 	{
 		addCommandResource(cmd);
@@ -221,7 +224,11 @@ void ResourceManager::setLimit(unsigned int l)
 {
 	resource_limit = l;
 	while(l < resources.size())
+	{
+		Resource* last = resources.front();
 		resources.pop_front();
+		delete last;
+	}
 }
 
 int ResourceManager::getLimit()

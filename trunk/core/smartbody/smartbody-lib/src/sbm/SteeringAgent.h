@@ -38,6 +38,7 @@ class SteeringAgent
 		SteerLib::AgentInterface* getAgent();
 		void setTargetAgent(SbmCharacter* tChar);
 		SbmCharacter* getTargetAgent();
+		void startParameterTesting();
 
 	private:
 		void normalizeAngle(float& angle);
@@ -51,6 +52,9 @@ class SteeringAgent
 		float evaluateExampleLoco(float x, float y, float z, float yaw);
 
 		float evaluateSteppingLoco(float x, float y, float z, float yaw);
+
+		// param testing
+		void parameterTesting();
 
 	private:
 		SteerLib::AgentInterface* agent;
@@ -81,6 +85,7 @@ class SteeringAgent
 		SrVec targetLoc;
 		bool stepAdjust;
 
+		float newSpeed;
 		//----------------------------
 		// WJ added start
 		// basic param
@@ -96,7 +101,15 @@ class SteeringAgent
 		float stepTargetZ;
 		bool steppingMode;
 
-		float newSpeed;
+		// parameter testing
+		float paramTestDur;
+		float paramTestStartTime;
+		bool paramTestFlag;
+		float paramTestAngle;
+		float paramTestDistance;
+		float prevX;
+		float prevZ;
+		float prevYaw;
 };
 
 #endif

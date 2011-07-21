@@ -22,11 +22,10 @@
  *      Ed Fast, USC
  */
  
-# include <SK/sk_skeleton.h>
-# include <SK/sk_posture.h>
+# include <sk/sk_skeleton.h>
+# include <sk/sk_posture.h>
+# include <sr/sr_vec.h>
 
-//# define SR_USE_TRACE1  // trace
-//# include <SR/sr_trace.h>
 
 //=========================== SkPostureDfJoints ===============================
 
@@ -255,8 +254,16 @@ float dist ( SkPosture& p1, SkPosture& p2 )
    // Max norm :
    float dist2, d=0;
    for ( i=0; i<size; i++ )
-    { dist2 = ::dist2 ( p1.points[i], p2.points[i] );
-      if ( dist2>d ) d=dist2;
+    { 
+#if 0
+		dist2 = ::dist2 ( p1.points[i], p2.points[i] );
+#else
+		float dx = p1.points[i].x - p2.points[i].x;
+		float dy = p1.points[i].y - p2.points[i].y;
+		float dz = p1.points[i].z - p2.points[i].z;
+		dist2 = dx*dx + dy*dy + dz*dz;
+#endif
+		if ( dist2>d ) d=dist2;
     }
    return sqrtf(d);
    

@@ -25,27 +25,28 @@
 
 #define transitionTrace 0
 
-PAScriptEditor::PAScriptEditor(int x, int y, int w, int h, PanimationWindow* window) : fltk::Group(x, y, w, h), paWindow(window)
+PAScriptEditor::PAScriptEditor(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h), paWindow(window)
 {
 	this->label("Script Editor");
 	this->begin();
-		availableStateList = new Browser(2 * xDis, 3 * yDis, w / 2 - 6 * xDis, 2 * h / 3 - 5 * yDis, "Available States"); 
-		currentStateList = new Browser(w / 2 + 4 * xDis, 3 * yDis, w / 2 - 6 * xDis, 2 * h / 3 - 5 * yDis, "Scheduled States");
-		currentStateList->when(fltk::WHEN_ENTER_KEY_ALWAYS);
+		availableStateList = new Fl_Hold_Browser(2 * xDis + x, 3 * yDis + y, w / 2 - 6 * xDis, 2 * h / 3 - 5 * yDis, "Available States"); 
+		currentStateList = new Fl_Hold_Browser(w / 2 + 4 * xDis + x, 3 * yDis + y, w / 2 - 6 * xDis, 2 * h / 3 - 5 * yDis, "Scheduled States");
+		currentStateList->when(FL_WHEN_ENTER_KEY_ALWAYS);
 		currentStateList->callback(updateStateInfo, this);
-		addStateButton = new Button(w / 2 - 3 * xDis, h / 2, 6 * xDis, 2 * yDis, ">>>");
+		addStateButton = new Fl_Button(w / 2 - 3 * xDis+ x, h / 2+ y, 6 * xDis, 2 * yDis, ">>>");
 		addStateButton->callback(addState, this);
-		removeStateButton = new Button(w / 2 - 3 * xDis, h / 2 + 3 * yDis, 6 * xDis, 2 * yDis, "<<<");
+		removeStateButton = new Fl_Button(w / 2 - 3 * xDis+ x, h / 2 + 3 * yDis+ y, 6 * xDis, 2 * yDis, "<<<");
 		removeStateButton->callback(removeState, this);
-		runStateList = new Button(2 * xDis, 2 * h / 3, 100, 20, "Run");
+		runStateList = new Fl_Button(2 * xDis+ x, 2 * h / 3+ y, 100, 20, "Run");
 		runStateList->callback(run, this);
-		currentStatePanel = new Output(10 * xDis, h - 6 * yDis, 200, 2 * yDis, "Current State:");
-		currentStateWeight = new ValueSlider(11 * xDis + 200, h - 6 * yDis, 200, 2 * yDis, "Weight");
+		currentStatePanel = new Fl_Output(10 * xDis+ x, h - 6 * yDis+ y, 200, 2 * yDis, "Current State:");
+		currentStateWeight = new Fl_Value_Slider(11 * xDis + 200+ x, h - 6 * yDis+ y, 200, 2 * yDis, "Weight");
+		currentStateWeight->type(FL_HORIZONTAL);
 		currentStateWeight->callback(changeCurrentStateWeight, this);
 		currentStateWeight->minimum(0);
 		currentStateWeight->maximum(1);
 		currentStateWeight->deactivate();
-		nextStatePanel = new Output(10 * xDis, h - 3 * yDis, 200, 2 * yDis, "Next State:");
+		nextStatePanel = new Fl_Output(10 * xDis+ x, h - 3 * yDis+ y, 200, 2 * yDis, "Next State:");
 	this->end();
 	initialAvailableStates();
 }
@@ -54,14 +55,14 @@ PAScriptEditor::~PAScriptEditor()
 {
 }
 
-void PAScriptEditor::addState(fltk::Widget* widget, void* data)
+void PAScriptEditor::addState(Fl_Widget* widget, void* data)
 {
 	PAScriptEditor* editor = (PAScriptEditor*) data;
 	for (int i = 0; i < editor->availableStateList->size(); i++)
 	{
-		if (editor->availableStateList->goto_index(i)->selected())
+		if (editor->availableStateList->selected(i+1))
 		{
-			std::string selectedState = editor->availableStateList->goto_index(i)->label();
+			std::string selectedState = editor->availableStateList->text(i+1);
 			editor->currentStateList->add(selectedState.c_str());
 #if transitionTrace
 			editor->updateAvailableStates(selectedState);
@@ -71,9 +72,9 @@ void PAScriptEditor::addState(fltk::Widget* widget, void* data)
 				editor->stateTimeOffset.erase(iter);
 			editor->stateTimeOffset.insert(std::make_pair(selectedState, 0.1));
 		
-			int loopValue = fltk::ask("Is this loop mode");
+			int loopValue = fl_choice("Is this loop mode", "yes", "no", NULL);
 			bool loop;
-			if (loopValue == 1)	loop = true;
+			if (loopValue == 0)	loop = true;
 			else				loop = false;
 			std::map<std::string, bool>::iterator iter1 = editor->stateLoopMode.find(selectedState);
 			if (iter1 != editor->stateLoopMode.end())
@@ -83,19 +84,20 @@ void PAScriptEditor::addState(fltk::Widget* widget, void* data)
 	}
 }
 
-void PAScriptEditor::removeState(fltk::Widget* widget, void* data)
+void PAScriptEditor::removeState(Fl_Widget* widget, void* data)
 {
 	PAScriptEditor* editor = (PAScriptEditor*) data;
 	int size = editor->currentStateList->size();
 	if (size > 0)
 	{
-		std::string selectedState = editor->currentStateList->goto_index(size - 1)->label();
-		editor->currentStateList->remove(size - 1);
+		//Fl_Widget* curStateChild = editor->currentStateList->child(size);
+		std::string selectedState = editor->currentStateList->text(size);
+		editor->currentStateList->remove(size);
 
 		bool deleteMap = true;
 		for (int i = 0; i < editor->currentStateList->size(); i++)
 		{
-			if (selectedState == editor->currentStateList->goto_index(i)->label())
+			if (selectedState == editor->currentStateList->text(i+1))
 				deleteMap = false;
 		}
 		if (deleteMap)
@@ -124,25 +126,25 @@ void PAScriptEditor::removeState(fltk::Widget* widget, void* data)
 #endif
 }
 
-void PAScriptEditor::updateStateInfo(fltk::Widget* widget, void* data)
+void PAScriptEditor::updateStateInfo(Fl_Widget* widget, void* data)
 {
 	PAScriptEditor* editor = (PAScriptEditor*) data;
 	for (int i = 0; i < editor->currentStateList->size(); i++)
 	{
-		if (editor->currentStateList->goto_index(i)->selected())
+		if (editor->currentStateList->selected(i+1))
 		{
-			std::string selectedState = editor->currentStateList->goto_index(i)->label();
+			std::string selectedState = editor->currentStateList->text(i+1);
 			bool shouldAddTimeOffset;
-			if (i == 0)	shouldAddTimeOffset = false;
+			if (i == 1)	shouldAddTimeOffset = false;
 			else
 			{
-				std::string previousState = editor->currentStateList->goto_index(i - 1)->label();
+				std::string previousState = editor->currentStateList->text(i);
 				std::map<std::string, bool>::iterator iter1 = editor->stateLoopMode.find(previousState);
 				shouldAddTimeOffset = iter1->second;
 				}
 			if (shouldAddTimeOffset)
 			{
-				const char* offsetString = fltk::input("time offset from previous state", "0.0");
+				const char* offsetString = fl_input("time offset from previous state", "0.0");
 				if (offsetString != NULL)
 				{
 					double offset = atof(offsetString);
@@ -153,7 +155,7 @@ void PAScriptEditor::updateStateInfo(fltk::Widget* widget, void* data)
 			PAStateData* state = mcuCBHandle::singleton().lookUpPAState(selectedState);
 			if (state->getNumMotions() > 1)
 			{
-				const char* ws = fltk::input("weights (separate by white space)", "");
+				const char* ws = fl_input("weights (separate by white space)", "");
 				if (ws == NULL)	return;
 				std::string weights = ws;
 				std::vector<std::string> weight = editor->paWindow->tokenize(weights, " ");
@@ -165,14 +167,14 @@ void PAScriptEditor::updateStateInfo(fltk::Widget* widget, void* data)
 	}	
 }
 
-void PAScriptEditor::run(fltk::Widget* widget, void* data)
+void PAScriptEditor::run(Fl_Widget* widget, void* data)
 {
 	PAScriptEditor* editor = (PAScriptEditor*) data;
-	std::string charName = editor->paWindow->characterList->child(editor->paWindow->characterList->value())->label();
+	std::string charName = editor->paWindow->characterList->menu()[editor->paWindow->characterList->value()].label();
 	double offset = 0.0;
 	for (int i = 0; i < editor->currentStateList->size(); i++)
 	{
-		std::string stateName = editor->currentStateList->goto_index(i)->label();
+		std::string stateName = editor->currentStateList->text(i+1);
 		std::map<std::string, bool>::iterator iter = editor->stateLoopMode.find(stateName);
 		bool loop = iter->second;
 		std::string loopString;
@@ -191,11 +193,11 @@ void PAScriptEditor::run(fltk::Widget* widget, void* data)
 	}
 }
 
-void PAScriptEditor::changeCurrentStateWeight(fltk::Widget* widget, void* data)
+void PAScriptEditor::changeCurrentStateWeight(Fl_Widget* widget, void* data)
 {
 	PAScriptEditor* editor = (PAScriptEditor*) data;
 	double weight = editor->currentStateWeight->value();
-	std::string charName = editor->paWindow->characterList->child(editor->paWindow->characterList->value())->label();
+	std::string charName = editor->paWindow->characterList->menu()[editor->paWindow->characterList->value()].label();
 	std::string stateName = editor->currentStatePanel->value();
 	std::stringstream command;
 	command << "panim update char " << charName;
@@ -248,7 +250,7 @@ void PAScriptEditor::refresh()
 
 void PAScriptEditor::update()
 {
-	std::string charName = paWindow->characterList->child(paWindow->characterList->value())->label();
+	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
 	SbmCharacter* character = mcuCBHandle::singleton().character_map.lookup(charName.c_str());
 	if (!character)
 		return;

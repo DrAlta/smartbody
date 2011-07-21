@@ -97,6 +97,7 @@ public:
 	float           autoReturnTime;
 	float           characterHeight;
 	bool            startReach, endReach;
+	bool            ikReachTarget;
 	bool            useExample;	
 	bool            locomotionComplete;
 	bool            hasSteering;
@@ -138,7 +139,7 @@ protected:
 	void updateReachToTarget(ReachStateData* rd);
 	void updateMotionIK(ReachStateData* rd);
 	void updateMotionInterp(ReachStateData* rd);
-	bool ikTargetReached(ReachStateData* rd);
+	bool ikTargetReached(ReachStateData* rd, float ratio = 0.1f);
 	bool interpTargetReached(ReachStateData* rd);	
 };
 

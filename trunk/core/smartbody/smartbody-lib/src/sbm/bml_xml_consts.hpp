@@ -30,28 +30,7 @@ XERCES_CPP_NAMESPACE_USE
 
 
 namespace BML {
-	//  Common XML Identifiers
-	const XMLCh ATTR_ID[]    = L"id";
-	const XMLCh ATTR_TYPE[]  = L"type";
-	const XMLCh ATTR_NAME[]  = L"name";
-	const XMLCh ATTR_LEVEL[] = L"level";
-	const XMLCh ATTR_HANDLE[] = L"sbm:handle";
 
-	const XMLCh ATTR_START[]        = L"start";
-	const XMLCh ATTR_READY[]        = L"ready";
-	const XMLCh ATTR_STROKE_START[] = L"stroke_start";
-	const XMLCh ATTR_STROKE[]       = L"stroke";
-	const XMLCh ATTR_STROKE_END[]   = L"stroke_end";
-	const XMLCh ATTR_RELAX[]        = L"relax";
-	const XMLCh ATTR_END[]          = L"end";
-
-	const XMLCh TM_START[]        = L"start";
-	const XMLCh TM_READY[]        = L"ready";
-	const XMLCh TM_STROKE_START[] = L"stroke_start";
-	const XMLCh TM_STROKE[]       = L"stroke";
-	const XMLCh TM_STROKE_END[]   = L"stroke_end";
-	const XMLCh TM_RELAX[]        = L"relax";
-	const XMLCh TM_END[]          = L"end";
 }
 
 #endif  // BML_XML_HPP

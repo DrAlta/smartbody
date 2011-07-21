@@ -13,6 +13,7 @@
 
 #include "xercesc_utils.hpp"
 #include "text_speech.h"
+#include "BMLDefs.h"
 
 
 
@@ -86,8 +87,13 @@ RequestId text_speech::requestSpeechAudio( const char* agentName, std::string vo
 	{
 		// check for a mark
 		if (markNode->hasAttributes()) {
-			if (string(XMLString::transcode(markNode->getNodeName())).compare("mark") == 0) {
-				DOMNode* time = markNode->getAttributes()->getNamedItem(L"time");
+
+			string name = xml_utils::xml_translate_string( markNode->getNodeName() );
+			string cmp = xml_utils::xml_translate_string( BML::BMLDefs::TAG_MARK );
+			if( name.compare( cmp ) == 0 ) {
+
+//			if( string( XMLString::transcode( markNode->getNodeName() ) ).compare( BML::BMLDefs::TAG_MARK ) == 0 ) {
+				DOMNode* time = markNode->getAttributes()->getNamedItem( BML::BMLDefs::TAG_TIME );
 				istringstream iss(XMLString::transcode(time->getTextContent()), istringstream::in);
 				iss >> currentTime;
 			}
@@ -127,19 +133,21 @@ std::vector<VisemeData*>* text_speech::extractVisemes(DOMNode* node, vector<Vise
 		DOMElement *element= (DOMElement *)node; //instantiate an element using this node
 		//string tag= XMLString::transcode(element->getTagName()); //find the element tag  // Anm replaced with compareString
 		//if( tag == "VISEME" ) {
-		if( XMLString::compareString( element->getTagName(), L"viseme" )==0 ){
+
+//		if( XMLString::compareString( element->getTagName(), L"viseme" )==0 ){
+		if( XMLString::compareString( element->getTagName(), BML::BMLDefs::TAG_VISEME )==0 ){
 			
 			char* id = NULL;
 
 			DOMNamedNodeMap* attributes= element->getAttributes();
 			for(unsigned int i=0; i< (attributes->getLength()); i++){ //iterates through and includes all attributes (viseme type and start time)
 				const XMLCh* attr = attributes->item(i)->getNodeName();
-				if( XMLString::compareString( attr, L"type" )==0 ) {
+				if( XMLString::compareString( attr, BML::BMLDefs::ATTR_TYPE )==0 ) {
 					string temp= XMLString::transcode(attributes->item(i)->getNodeValue());
 					id = new char[temp.length() + 1];
 					strcpy(id, temp.c_str());
 				}
-				else if( XMLString::compareString( attr, L"start" )==0 ) {
+				else if( XMLString::compareString( attr, BML::BMLDefs::ATTR_START )==0 ) {
 					string temp=XMLString::transcode(attributes->item(i)->getNodeValue());
 					startTime = (float)atof(temp.c_str());
 				}
@@ -203,7 +211,7 @@ float text_speech::getMarkTime( RequestId requestId, const XMLCh* markId ){
 	ostringstream markStream; //creates an ostringstream object
 	markStream << requestId << flush; //outputs the number into the string stream and then flushes the buffer
 	DOMDocument* XMLDoc= uttLookUp.lookup(markStream.str().c_str())->getOwnerDocument(); //gets the dom document
-	XMLCh* markTag= L"mark"; //the tag for any mark 
+	XMLCh* markTag= BML::BMLDefs::TAG_MARK; //the tag for any mark 
 	DOMNodeList* marks= XMLDoc->getElementsByTagName(markTag); //looks through the DOMDocument and extracts every mark tag and puts it in a list
 
 		int foundFlag=0; //this will be set to 1 when a mark tag matches the markId
@@ -283,5 +291,5 @@ char* text_speech::getSpeechPlayCommand( RequestId requestId, const SbmCharacter
 }
 
 char* text_speech::getSpeechStopCommand( RequestId requestId, const SbmCharacter* character ){
-	return "";
+	return (char*)"";
 }

@@ -43,19 +43,21 @@ void ParamAnimEditorWidget::drawMark(nle::Block* block, nle::Mark* mark, int tra
 		int viewableStart = this->convertTimeToPosition(getViewableTimeStart());
 		int viewableEnd = this->convertTimeToPosition(getViewableTimeEnd());	
 		
-		int trackTop = padding + timeWindowHeight + trackNum * trackHeight;
+		int trackTop = padding + timeWindowHeight + trackNum * trackHeight;// + yOffset;
 		
 		int bounds[4];
 		mark->getBounds(bounds[0], bounds[1], bounds[2], bounds[3]);
+		//bounds[1] += yOffset;
+
 		if (viewableStart > bounds[0] + bounds[2])
 			return;
 		if (viewableEnd < bounds[0])
 			return;
 
 		if (mark->isSelected())
-			fltk::setcolor(fltk::GREEN);
+			fl_color(FL_GREEN);
 		else
-			fltk::setcolor(mark->getColor());
+			fl_color(mark->getColor());
 
 		bool drawText = true;
 		if (viewableStart > bounds[0])
@@ -65,8 +67,8 @@ void ParamAnimEditorWidget::drawMark(nle::Block* block, nle::Mark* mark, int tra
 			bounds[2] -= diff;
 			drawText = false;
 		}
-		fltk::Rectangle rec(bounds[0] - 2, bounds[1], bounds[2] + 4, bounds[3]);
-		fltk::fillrect(rec);
+		//fltk::Rectangle rec(bounds[0] - 2, bounds[1], bounds[2] + 4, bounds[3]);
+		fl_rectf(bounds[0] - 2, bounds[1], bounds[2] + 4, bounds[3]);
 
 		
 		if (mark->isShowName())
@@ -75,14 +77,14 @@ void ParamAnimEditorWidget::drawMark(nle::Block* block, nle::Mark* mark, int tra
 			{
 				int width, height;
 				std::string markName = mark->getName();
-				fltk::measure(markName.c_str(), width, height);
+				fl_measure(markName.c_str(), width, height);
 
 				int startTextX = bounds[0];
 				int startTextY = bounds[1];
 				if (startTextX + width <= viewableEnd)
 				{
-					fltk::setcolor(fltk::BLACK);
-					fltk::drawtext(markName.c_str(), float(startTextX), float(startTextY));
+					fl_color(FL_BLACK);
+					fl_draw(markName.c_str(), startTextX, startTextY);
 				}		
 			}
 		}
@@ -95,7 +97,7 @@ void ParamAnimEditorWidget::drawMark(nle::Block* block, nle::Mark* mark, int tra
 		{
 			int abounds[4];
 			attached->getBounds(abounds[0], abounds[1], abounds[2], abounds[3]);
-			fltk::drawline(bounds[0], bounds[1], abounds[0], abounds[1]);
+			fl_line(bounds[0], bounds[1], abounds[0], abounds[1]);
 		}
 		*/
 	}

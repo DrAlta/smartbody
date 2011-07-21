@@ -23,16 +23,16 @@
 # include <stdlib.h> 
 # include <stdio.h>
 
-# include <SR/sr_output.h>
-# include <SR/sr_string.h>
+# include <sr/sr_output.h>
+# include <sr/sr_string.h>
 
 //============================== Global data ====================================
 
 SrOutput sr_out;
 
-static char* DefaultIntFmt = "%d"; 
-static char* DefaultFloatFmt = "g";
-static char* DefaultDoubleFmt = "g";
+static char* DefaultIntFmt = (char*)"%d"; 
+static char* DefaultFloatFmt = (char*)"g";
+static char* DefaultDoubleFmt = (char*)"g";
 
 //=============================== SrOutput ======================================
 

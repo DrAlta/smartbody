@@ -24,7 +24,8 @@
 
 #include "GlChartViewCoordinate.hpp"
 
-#include <fltk/gl.h>
+#include <FL/gl.h>
+#include <cstring>
 
 
 GlChartViewCoordinate::GlChartViewCoordinate()
@@ -71,11 +72,13 @@ void GlChartViewCoordinate::InitFont()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glGenTextures(0, &textureName);
 
+#ifdef WIN32
 	if (!label.Create("../../../../data/fonts/font.glf", 0))
 	{
 		if(!label.Create(".font.glf", 0))
 			LOG("GlChartViewCoordinate::InitFont(): Error: Cannot load font file\n");
 	}
+#endif
 }
 
 void GlChartViewCoordinate::Update(float WindowWidth, float WindowHeight, SrCamera& camera)
@@ -145,11 +148,15 @@ void GlChartViewCoordinate::Draw()
 SrVec2 GlChartViewCoordinate::GetStringSize(char* str)
 {
 	SrVec2 size;
+#ifdef WIN32
 	size.y = (float)label.GetCharHeightGL(str[0]);
+#endif
 	int length = strlen(str);
 	for(int i = 0; i < length; ++i)
 	{
+#ifdef WIN32
 		size.x += (float)label.GetCharWidthGL(str[i]);
+#endif
 	}
 	return size;
 }
@@ -160,7 +167,9 @@ int GlChartViewCoordinate::GetStringWidth(char* str)
 	int width = 0;
 	for(int i = 0; i < length; ++i)
 	{
+#ifdef WIN32
 		width += label.GetCharWidthGL(str[i]);
+#endif
 	}
 	return width;
 }
@@ -182,20 +191,28 @@ void GlChartViewCoordinate::DrawCoordinateLabels()
 
 	glColor4f(0.4f, 0.4f, 0.4f, 0.3f);
 
+#ifdef WIN32
 	label.Begin();
+#endif
 
 	sprintf(value, "%d", 0);
 	size = GetStringSize(value);
+#ifdef WIN32
 	label.DrawString(value, 2.0f, -size.x*2.4f, 0.0f + 1.5f * size.y/2.0f);
+#endif
 	for(int i = y_label_num; i > 0; --i)
 	{
 		sprintf(value, "%.2f", y_size*i/y_label_num);
 		size = GetStringSize(value);
+#ifdef WIN32
 		label.DrawString(value, 2.0f, -size.x*2.4f, i*y_length/y_label_num + 1.5f*size.y/2.0f);
+#endif
 
 		sprintf(value, "-%.2f", y_size*i/y_label_num);
 		size = GetStringSize(value);
+#ifdef WIN32
 		label.DrawString(value, 2.0f, -size.x*2.4f, -i*y_length/y_label_num + 1.5f*size.y/2.0f);
+#endif
 	}
 
 	float x;
@@ -206,7 +223,9 @@ void GlChartViewCoordinate::DrawCoordinateLabels()
 		size = GetStringSize(value);
 		x = i*x_length/x_label_num;
 		x = x*((int)(i*x_size/x_label_num))/(i*x_size/x_label_num);
+#ifdef WIN32
 		label.DrawString(value, 2.0f, x - size.x/2.0f, -size.y);
+#endif
 	}
 
 	glDisable(GL_TEXTURE_2D);

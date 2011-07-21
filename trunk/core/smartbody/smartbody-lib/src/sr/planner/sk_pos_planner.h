@@ -2,7 +2,7 @@
 # ifndef SK_POS_PLANNER_H
 # define SK_POS_PLANNER_H
 
-# include <SR/sr_lines.h>
+# include <sr/sr_lines.h>
 # include "sr_cfg_manager.h"
 # include "sr_cfg_planner.h"
 

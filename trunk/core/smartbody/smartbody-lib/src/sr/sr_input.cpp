@@ -20,17 +20,21 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
 
+#ifndef WIN32
+#include <stdint.h>
+#endif
+
 # include <stdlib.h>
 # include <string.h>
 # include <ctype.h>
 
-# include <SR/sr_input.h>
-# include <SR/sr_string.h>
-# include <SR/sr_array.h>
+# include <sr/sr_input.h>
+# include <sr/sr_string.h>
+# include <sr/sr_array.h>
 
 //# define SR_USE_TRACE1 //Parser
 //# define SR_USE_TRACE2 //Init
-//# include <SR/sr_trace.h>
+//# include <sr/sr_trace.h>
 
 # define ISNULL      _type==(srbyte)TypeNull
 # define ISFILE      _type==(srbyte)TypeFile
@@ -305,7 +309,7 @@ void SrInput::rewind ()
 int SrInput::pos ()
  {
    if ( ISFILE ) return ((int)ftell(_cur.f)) - _ini.f;
-    else if ( ISSTRING ) return ((sruint)_cur.s) - ((sruint)_ini.s);
+    else if ( ISSTRING ) return ((uintptr_t)_cur.s) - ((uintptr_t)_ini.s);
      else return 0;
  }
 
@@ -506,11 +510,11 @@ SrInput::TokenType SrInput::get_token ()
 char* SrInput::error_desc ( SrInput::ErrorType t )
  {
    switch ( t )
-    { case UndefChar :      return "Undefined character found";
-      case UnexpectedToken: return "Parsed token is of an unexpected type";
-      case TooBig :         return "Name too big";
-      case OpenString :     return "EOF found before end of a string";
-      case InvalidPoint :   return "Misplaced decimal point";
+    { case UndefChar :      return (char*)"Undefined character found";
+      case UnexpectedToken: return (char*)"Parsed token is of an unexpected type";
+      case TooBig :         return (char*)"Name too big";
+      case OpenString :     return (char*)"EOF found before end of a string";
+      case InvalidPoint :   return (char*)"Misplaced decimal point";
       default : return 0;
     }
  }

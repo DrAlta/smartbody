@@ -21,8 +21,8 @@
  */
 
 # include <math.h>
-# include <SR/sr_vec.h>
-# include <SR/sr_vec2.h>
+# include <sr/sr_vec.h>
+# include <sr/sr_vec2.h>
 
 //===========================================================================
 

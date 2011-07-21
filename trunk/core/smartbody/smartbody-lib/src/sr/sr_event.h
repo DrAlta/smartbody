@@ -27,9 +27,9 @@
  * A user-generated window-event
  */
 
-# include <SR/sr_vec2.h>
-# include <SR/sr_line.h>
-# include <SR/sr_output.h>
+# include <sr/sr_vec2.h>
+# include <sr/sr_line.h>
+# include <sr/sr_output.h>
 
 /*! \class SrEvent sr_event.h
     \brief Keeps a window event
@@ -39,12 +39,12 @@
 class SrEvent 
  { public :
     /*! Enumerators for the type of event. */
-    enum Type { None,    //!< No event occured.
-                Push,    //!< A mouse button was pushed.
-                Drag,    //!< The mouse moved with a button down.
+    enum EventType { EventNone,    //!< No event occured.
+                EventPush,    //!< A mouse button was pushed.
+                EventDrag,    //!< The mouse moved with a button down.
 				Move,    //!< The mouse was moved without a button being pressed.
-                Release, //!< A mouse button was released.
-                Keyboard //!< A key was pressed.
+                EventRelease, //!< A mouse button was released.
+                EventKeyboard //!< A key was pressed.
               };
 
     /*! Enumerators with codes for special keys. */
@@ -55,7 +55,7 @@ class SrEvent
                     KeyEnter=65293 };
 
    public : //--- event occured :
-    Type type;    //!< The type of the occured event
+    EventType type;    //!< The type of the occured event
     char button;  //!< The button number 1, 2 or 3 if event type was Push or Release, 0 otherwise
     int  key;     //!< The ascii code / code of the key pressed (uppercase) if it was a keyboard event, 0 otherwise
     int  width;   //!< The width of the screen when the event occured
@@ -110,7 +110,7 @@ class SrEvent
     float mousedy () const { return mouse.y-lmouse.y; }
 
     /*! Returns true if the event type is push, drag, or release; and false otherwise. */
-    bool mouse_event () const { return type==Push||type==Drag||type==Release? true:false; }
+    bool mouse_event () const { return type==EventPush||type==EventDrag||type==EventRelease? true:false; }
 
     /*! Outputs data of this event for data inspection. */
     friend SrOutput& operator<< ( SrOutput& out, const SrEvent& e );

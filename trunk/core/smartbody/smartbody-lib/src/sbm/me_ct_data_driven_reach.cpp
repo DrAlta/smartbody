@@ -5,6 +5,8 @@
 #include <boost/foreach.hpp>
 #include "me_ct_data_driven_reach.hpp"
 
+
+#if 0
 using namespace boost;
 
 PoseExample& PoseExample::operator=( const PoseExample& rhs )
@@ -346,9 +348,9 @@ void MeCtDataDrivenReach::updateExamplesFromMotions(const MotionDataSet& inMotio
 		resampledPosedata.clearData();
 	}
 
-	/*
-	BOOST_FOREACH(SkMotion* motion, inMotionSet)
+	BOOST_FOREACH(TagMotion tagMotion, inMotionSet)
 	{
+		SkMotion* motion = tagMotion.second;
 		if (motionData.find(motion) != motionData.end())
 			continue; // we do not process example motions that are already used for this controller instance
 		
@@ -363,9 +365,8 @@ void MeCtDataDrivenReach::updateExamplesFromMotions(const MotionDataSet& inMotio
 			resampledPosedata.addPose(poseEx,minDist);
 		}
 		motion->disconnect();		
-		//motionData.insert(motion);
+		motionData.insert(motion);
 	}	
-	*/
 	//examplePoseData.buildKDTree();
 }
 
@@ -470,3 +471,5 @@ float MeCtDataDrivenReach::Random( float r_min, float r_max )
 	frand = r_min + frand*(r_max-r_min);
 	return frand;
 }
+
+#endif

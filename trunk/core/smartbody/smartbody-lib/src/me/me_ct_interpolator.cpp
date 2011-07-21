@@ -20,7 +20,7 @@
  *      Yuyu Xu, USC
  */
 
-#include <ME/me_ct_interpolator.h>
+#include <me/me_ct_interpolator.h>
 
 const char* MeCtInterpolator::Context::CONTEXT_TYPE = "MeCtInterpolator::Context";
 const char* MeCtInterpolator::CONTROLLER_TYPE = "MeCtInterpolator";

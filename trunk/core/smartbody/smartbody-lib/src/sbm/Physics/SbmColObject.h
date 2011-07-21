@@ -1,9 +1,12 @@
-#pragma once
-#include <SR/sr_mat.h>
-#include <SR/sr_quat.h>
-#include <SR/sr_vec.h>
-#include <SR/sr_model.h>
+#ifndef _SBMCOLOBJECT_H_
+#define _SBMCOLOBJECT_H_
+
+#include <sr/sr_mat.h>
+#include <sr/sr_quat.h>
+#include <sr/sr_vec.h>
+#include <sr/sr_model.h>
 #include <vector>
+#include <string>
 
 class SbmTransform
 {
@@ -11,14 +14,15 @@ public:
 	SrQuat rot;
 	SrVec  tran;
 public:
-	SbmTransform() {}
+	SbmTransform();
 	SbmTransform(const SrQuat& q, const SrVec& t) { rot = q; tran = t;}
 	SrVec localToGlobal(const SrVec& vLocal);
 	SrVec globalToLocal(const SrVec& vGlobal);
 	SrMat gmat();	
 	void  gmat(const SrMat& inMat);
-	void  add(const SbmTransform& delta);
+	void  add(const SbmTransform& delta);	
 	static SbmTransform diff(const SbmTransform& r1, const SbmTransform& r2);
+	static SbmTransform mult(const SbmTransform& r1, const SbmTransform& r2);  // return r1*r2
 	static SbmTransform blend(SbmTransform& r1, SbmTransform& r2, float weight );
 	static float             dist(const SbmTransform& r1, const SbmTransform& r2);
 
@@ -30,12 +34,19 @@ typedef SbmTransform SRT;
 class SbmGeomObject
 {
 public:
-	SbmTransform worldState;			
+	std::string  color;
+protected:
+	SbmTransform worldState;
+	SbmTransform localTransform;
+	SbmTransform globalTransform;
 	bool         isUpdate;
 public:
 	SbmGeomObject(void);
-	void updateTransform(const SrMat& newState);
+	void updateGlobalTransform(const SrMat& gmat);
 	virtual ~SbmGeomObject(void);
+	SbmTransform& getWorldState() { return worldState; }
+	SbmTransform& getGlobalTransform() { return globalTransform; }
+	void setWorldState(SbmTransform& rt);
 	virtual SrVec getCenter();	
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f) = 0; // check if a point is inside the object	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f) { return false; }; // check if a line segment is intersect with the object
@@ -82,10 +93,10 @@ class SbmGeomCapsule : public SbmGeomObject
 {
 public:
 	float extent, radius;	
-	SrVec endPts[2];
+	SrVec endPts[2];	
 public:
 	SbmGeomCapsule(float length, float radius);
-	SbmGeomCapsule(const SrVec& p1, const SrVec& p2, float radius);
+	SbmGeomCapsule(const SrVec& p1, const SrVec& p2, float radius);	
 	virtual ~SbmGeomCapsule();
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f);	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f);
@@ -114,4 +125,6 @@ class SbmCollisionUtil
 public:
 	static bool checkIntersection(SbmGeomObject* obj1, SbmGeomObject* obj2);
 };
+
+#endif
 

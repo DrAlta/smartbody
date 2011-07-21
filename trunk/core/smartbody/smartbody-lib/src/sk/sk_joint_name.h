@@ -24,7 +24,7 @@
 # ifndef SK_JOINT_NAME_H
 # define SK_JOINT_NAME_H
 
-# include <SR/sr_hash_table.h>
+# include <sr/sr_hash_table.h>
 
 /*! SkJointName contains only one integer id, which is the id of
     a name stored in a globally defined hash table.

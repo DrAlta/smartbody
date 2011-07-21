@@ -1,5 +1,5 @@
 
-# include <SR/sr_random.h>
+# include <sr/sr_random.h>
 
 # include "sk_pos_cfg.h"
 # include "sk_pos_cfg_manager.h"

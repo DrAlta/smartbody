@@ -27,11 +27,11 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMa
 	currentReachEngine = NULL;
 
 	_duration = -1.f;	
-	footIKFix = false;
+	footIKFix = true;
 	isMoving = false;
 	startReach = false;
 	endReach = false;
-	autoReturnDuration = -1.f;//0.01f;
+	autoReturnDuration = -1.f;
 	defaultReachType = -1;
 	//addDefaultAttributeFloat("reach.autoReturnDuration",0.01f,&autoReturnDuration);
 	//addDefaultAttributeBool("reach.footIK",true,&footIKFix);
@@ -142,8 +142,10 @@ bool MeCtExampleBodyReach::updateLocomotion()
 	SrVec curPos = SrVec(x,y,z);
 
 	SrVec targetXZ = currentReachData->reachTarget.getTargetState().tran; targetXZ.y = 0.f;
-	float dist = currentReachData->XZDistanceToTarget(SrVec(x,y,z));		
-	if (dist > character->getHeight()*0.35f && !isMoving && startReach)//currentReachData->startReach) 
+	SrVec distanceVec(x, y, z);
+	float dist = currentReachData->XZDistanceToTarget(distanceVec);	
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	if (dist > character->getHeight()*0.35f && !isMoving && startReach && mcu.steerEngine.isInitialized() )//currentReachData->startReach) 
 	{	
 		// if the target is far away, move the character first
 		//printf("idle to walk\n");
@@ -167,7 +169,7 @@ bool MeCtExampleBodyReach::updateLocomotion()
 	}
 	else if (!isMoving && startReach)//currentReachData->startReach) // the object is already close to character, no need to move
 	{		
-		//LOG("reach in place\n");
+		LOG("reach in place\n");
 		updateReachType(targetXZ);
 		//setFadeIn(0.5f);
 		return true;
@@ -285,8 +287,8 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	ConstraintMap& handConstraint = currentReachEngine->getHandConstraint();
 	ConstraintMap::iterator si;
 	for ( si  = handConstraint.begin();
-		  si != handConstraint.end();
-		  si++)
+		si != handConstraint.end();
+		si++)
 	{	
 		EffectorJointConstraint* cons = dynamic_cast<EffectorJointConstraint*>(si->second);//rotConstraint[i];
 		SrVec targetPos = currentReachEngine->getMotionParameter()->getMotionFrameJoint(outMotionFrame,cons->efffectorName.c_str())->gmat().get_translation();
@@ -315,7 +317,7 @@ void MeCtExampleBodyReach::init(SbmPawn* pawn)
 	}		
 	blendWeight = currentReachEngine->fadingWeight;
 	//LOG("init blend weight = %f\n",blendWeight);	
-	MeController::init();	
+	MeController::init(pawn);	
 }
 
 void MeCtExampleBodyReach::updateChannelBuffer( MeFrameData& frame, BodyMotionFrame& motionFrame, bool bRead /*= false*/ )

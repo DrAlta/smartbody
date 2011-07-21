@@ -20,10 +20,10 @@
  *      Marcelo Kallmann, USC (currently at UC Merced)
  */
 
-# include <SR/sr.h>
+# include <sr/sr.h>
 
-# include <SK/sk_joint.h>
-# include <SK/sk_joint_pos.h>
+# include <sk/sk_joint.h>
+# include <sk/sk_joint_pos.h>
 
 //============================= SkJointPos ============================
 

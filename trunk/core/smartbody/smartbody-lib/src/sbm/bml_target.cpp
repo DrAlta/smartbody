@@ -27,6 +27,7 @@
 #include <string>
 
 #include "bml_target.hpp"
+#include "BMLDefs.h"
 
 
 #define DEBUG_BML_TARGET				(0)
@@ -36,13 +37,17 @@ using namespace std;
 //using namespace BML;
 using namespace xml_utils;
 
-
-
 /**
  *  Parse joint attribute string into a valid SkJoint*.
  *
  *  Eventually this parsing system will need to support events for lookup query delays.
  */
+
+SkJoint* BML::parse_target( const XMLCh* Attr, DOMElement* Elem, mcuCBHandle *mcu ) {
+
+	return( const_cast<SkJoint*>( parse_target( Elem->getTagName(), Elem->getAttribute( Attr ), mcu ) ) );
+}
+
 const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget, mcuCBHandle *mcu ) {
 	// TODO: If the first non-whitespace character is 0..9.-+, then assume it is a coordinate
 	XMLStringTokenizer tokenizer( attrTarget );	
@@ -137,12 +142,12 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 			XMLCh* token = tokenizer.nextToken();
 
 			// TODO
-		    strstr << "WARNING: BML::parse_target(): Unimplented <"<<tagname<<" "<<ATTR_TARGET<<"=\"x, y, z\" ... />.  Behavior ignored.";
+			strstr << "WARNING: BML::parse_target(): Unimplented <"<<tagname<<" "<< BMLDefs::ATTR_TARGET<<"=\"x, y, z\" ... />.  Behavior ignored.";
 			LOG(strstr.str().c_str());
 			return NULL;
 		}
 		default: {
-		    strstr << "WARNING: BML::parse_target(): Invalid token count in <"<<tagname<<" "<<ATTR_TARGET<<"=\"x, y, z\" ... />.  Behavior ignored.";
+			strstr << "WARNING: BML::parse_target(): Invalid token count in <"<<tagname<<" "<< BMLDefs::ATTR_TARGET<<"=\"x, y, z\" ... />.  Behavior ignored.";
 			LOG(strstr.str().c_str());
 			return NULL;
 		}

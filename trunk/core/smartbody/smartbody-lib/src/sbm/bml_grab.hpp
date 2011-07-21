@@ -24,14 +24,12 @@
 #define BML_GRAB_HPP
 
 #include "bml.hpp"
-
+#include "BMLDefs.h"
 
 // Forward Declaration
 class mcuCBHandle;
 
 namespace BML {
-	const XMLCh TAG_GRAB[]      = L"sbm:grab";
-
 
 	BML::BehaviorRequestPtr parse_bml_grab( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
 };

@@ -23,7 +23,7 @@
 #ifndef ME_CT_LOCOMOTION_TIMING_SPACE_HPP
 #define ME_CT_LOCOMOTION_TIMING_SPACE_HPP
 
-#include "SR\sr_array.h"
+#include "sr/sr_array.h"
 
 #pragma once
 

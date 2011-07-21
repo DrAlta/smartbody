@@ -33,8 +33,6 @@
 class mcuCBHandle;
 
 namespace BML {
-	const XMLCh TAG_SPEECH[]     = L"speech";     // Original tag, here for backward compatibility
-	const XMLCh TAG_SBM_SPEECH[] = L"sbm:speech";
 
 	///////////////////////////////////////////////////////////////
 	// Types
@@ -165,7 +163,7 @@ namespace BML {
 		void createStandardSyncPoint( const std::wstring& attr, SyncPointPtr& sync );
 
 
-		friend BML::Processor;  //temporary
+		friend class BML::Processor;  //temporary
 	};
 
 	BML::SpeechRequestPtr parse_bml_speech( DOMElement* xml, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );

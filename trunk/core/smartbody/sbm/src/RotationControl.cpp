@@ -1,14 +1,14 @@
 #include "RotationControl.h"
 
 #include "vhcl.h"
-#include <fltk/gl.h>
+#include <FL/gl.h>
 #include <GL/glu.h>
 #include <sr/sr_plane.h>
 #include <sr/sr_sphere.h>
 #include <sr/sr_sn.h>
 #include <sr/sr_sn_group.h>
-#include <SR/sr_sa_gl_render.h>
-#include <SR/sr_gl_render_funcs.h>
+#include <sr/sr_sa_gl_render.h>
+#include <sr/sr_gl_render_funcs.h>
 
 #include "sbm/gwiz_math.h"
 
@@ -108,8 +108,10 @@ void RotationControl::draw(SrCamera& cam)
 
 	double lineWidth[5] = { 1.0, 1.0, 1.0, 1.0, 1.0} ;
 	lineWidth[opdir] = 3.0;	
+	SrVec zero(0,0,0);
 	
 	//if (active)
+		
 	{
 		SrVec center=getWorldPt();
 		SrVec dirx,diry;
@@ -136,21 +138,21 @@ void RotationControl::draw(SrCamera& cam)
 			circle_copy[i]=(radius[1]*ratio*(SrVec(0,circle[i][0],circle[i][1])))*m;
 		glColor3fv(colors[0]);	
 		glLineWidth((GLfloat)lineWidth[0]);
-		drawVisibleCircle(circle_copy,SrVec(0,0,0),nm);
+		drawVisibleCircle(circle_copy, zero,nm);
 
 		for (int i=0;i<seg;i++)
 			//		circle_copy[i]=pm->r_matrix*(radius[1]*ratio*(Vec3f(circle[i][1],0,circle[i][0])));
 			circle_copy[i]=(radius[1]*ratio*(SrVec(circle[i][1],0,circle[i][0])))*m;
 		glColor3fv(colors[1]);
 		glLineWidth((GLfloat)lineWidth[1]);
-		drawVisibleCircle(circle_copy,SrVec(0,0,0),nm);
+		drawVisibleCircle(circle_copy, zero, nm);
 
 		for (int i=0;i<seg;i++)
 			//		circle_copy[i]=pm->r_matrix*(radius[1]*ratio*(Vec3f(circle[i][0],circle[i][1],0)));
 			circle_copy[i]=(radius[1]*ratio*(SrVec(circle[i][0],circle[i][1],0)))*m;
 		glColor3fv(colors[2]);
 		glLineWidth((GLfloat)lineWidth[2]);
-		drawVisibleCircle(circle_copy,SrVec(0,0,0),nm);
+		drawVisibleCircle(circle_copy, zero, nm);
 
 		glLineWidth(1.0); // reset to default			
 		glColor3fv(colors[3]);

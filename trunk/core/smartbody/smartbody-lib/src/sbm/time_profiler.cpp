@@ -22,6 +22,7 @@
 
 #include <math.h>
 #include "sbm/time_profiler.h"
+#include "sbm/lin_win.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -942,7 +943,7 @@ double TimeIntervalProfiler::test_clock( int reps )	{
 
 		if( min > dt ) min = dt;
 		if( max < dt ) max = dt;
-		accum_dev += abs( dt - avg );
+		accum_dev += fabs( dt - avg );
 
 		if( dt > 0.0 )	{
 			

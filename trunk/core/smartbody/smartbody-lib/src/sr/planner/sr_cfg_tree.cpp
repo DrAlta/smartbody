@@ -2,7 +2,7 @@
 # include "sr_cfg_tree.h"
 
 //# define SR_USE_TRACE1    // expand node
-# include <SR/sr_trace.h>
+# include <sr/sr_trace.h>
 
 //=============================== SrCfgNode ========================================
 

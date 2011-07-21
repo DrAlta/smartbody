@@ -1,7 +1,9 @@
 #ifndef _HEIGHTFIELD_
 #define _HEIGHTFIELD_
 
+#ifdef WIN32
 #include <windows.h>
+#endif
 #include <stdio.h>
 
 #define TERRAIN_SCALE	2000.0f
@@ -28,7 +30,9 @@ class Heightfield
 		
 		unsigned char* parse_ppm( FILE *stream );
 		unsigned char* read_ppm( const char* filename );
+#ifdef WIN32
 		unsigned char *LoadBitmapFile( char *filename, BITMAPINFOHEADER* bitmapInfoHeader );
+#endif
 
 		void initializeTerrain( unsigned char* terrain );
 		void calc_normal( float *N_out, float *A, float *B, float *C, float *S );
@@ -37,7 +41,9 @@ class Heightfield
 		
 		float get_raw_elevation( int i, int j );
 
+#ifdef WIN32
 		BITMAPINFOHEADER* _header;
+#endif
 		unsigned char* _imageData;
 
 		int image_width;

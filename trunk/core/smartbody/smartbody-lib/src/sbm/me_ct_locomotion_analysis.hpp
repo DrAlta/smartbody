@@ -23,7 +23,7 @@
 #ifndef ME_CT_LOCOMOTION_ANALYSIS_HPP
 #define ME_CT_LOCOMOTION_ANALYSIS_HPP
 
-#include <ME/me_controller.h>
+#include <me/me_controller.h>
 #include "me_ct_locomotion_pawn.hpp"
 #include "me_ct_IK.hpp"
 //#include "sbm_character.hpp"

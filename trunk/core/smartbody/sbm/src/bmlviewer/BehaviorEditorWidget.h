@@ -18,7 +18,7 @@ class BehaviorEditorWidget : public nle::EditorWidget
 
 protected:
 		virtual void drawBlock(nle::Block* block, int trackNum, int blockNum);
-		virtual void BehaviorEditorWidget::drawMark(nle::Block* block, nle::Mark* mark, int trackNum, int blockNum, int markNum);
+		virtual void drawMark(nle::Block* block, nle::Mark* mark, int trackNum, int blockNum, int markNum);
 
 		bool blockSelectionChanged;
 		bool trackSelectionChanged;

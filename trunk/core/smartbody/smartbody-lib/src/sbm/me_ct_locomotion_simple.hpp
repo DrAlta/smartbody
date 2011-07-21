@@ -23,7 +23,7 @@
 #ifndef ME_CT_LOCOMOTION_SIMPLE_HPP
 #define ME_CT_LOCOMOTION_SIMPLE_HPP
 
-#include <ME/me_controller.h>
+#include <me/me_controller.h>
 
 /**
  *  Calculate new world_offset each frame, given the

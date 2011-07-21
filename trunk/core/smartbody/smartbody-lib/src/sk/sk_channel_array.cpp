@@ -22,8 +22,8 @@
  *      Marcus Thiebaux, USC
  */
 
-# include <SK/sk_channel_array.h>
-# include <SK/sk_skeleton.h>
+# include <sk/sk_channel_array.h>
+# include <sk/sk_skeleton.h>
 
 //========================= SkChannelArray::HashTable ============================
 

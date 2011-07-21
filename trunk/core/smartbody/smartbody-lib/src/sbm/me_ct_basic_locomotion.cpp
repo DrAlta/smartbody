@@ -39,10 +39,10 @@ MeCtBasicLocomotion::~MeCtBasicLocomotion()
 {
 }
 
-void MeCtBasicLocomotion::init()
+void MeCtBasicLocomotion::init(SbmPawn* pawn)
 {
 	_lastTime = -1.0;
-	MeController::init();
+	MeController::init(pawn);
 }
 
 bool MeCtBasicLocomotion::controller_evaluate(double t, MeFrameData& frame)

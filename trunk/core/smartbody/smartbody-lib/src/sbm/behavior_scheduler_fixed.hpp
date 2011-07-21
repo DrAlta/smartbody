@@ -24,7 +24,7 @@
 #define BEHAVIOR_SCHEDULER_FIXED_HPP
 
 #include "behavior_scheduler.hpp"
-#include "ME/me_controller.h"
+#include "me/me_controller.h"
 
 
 
@@ -37,7 +37,7 @@ namespace BML {
 	 */
 	class BehaviorSchedulerFixed : public BehaviorScheduler {
 		public: 
-			typedef std::vector<std::pair<std::wstring,BML::time_sec>> VecSyncPairs;
+			typedef std::vector<std::pair<std::wstring,BML::time_sec> > VecSyncPairs;
 			typedef std::map<std::wstring,size_t> MapNameIndex;
 
 		private:

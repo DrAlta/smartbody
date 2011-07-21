@@ -26,7 +26,7 @@
 
 #include "vhcl.h"
 # include <stdlib.h>
-# include <SK/sk_motion.h>
+# include <sk/sk_motion.h>
 #include <iostream>
 #include <sstream>
 

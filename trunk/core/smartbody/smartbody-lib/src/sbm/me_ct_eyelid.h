@@ -23,8 +23,8 @@
 #ifndef ME_CT_EYELID_H
 #define ME_CT_EYELID_H
 
-#include <SK/sk_skeleton.h>
-#include <ME/me_controller.h>
+#include <sk/sk_skeleton.h>
+#include <me/me_controller.h>
 #include "sr_linear_curve.h"
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -93,7 +93,7 @@ class MeCtEyeLidRegulator : public MeController	{
 		MeCtEyeLidRegulator( void );
 		~MeCtEyeLidRegulator( void );
 		
-		void init( bool tracking_pitch = false );
+		void init(SbmPawn* pawn,  bool tracking_pitch = false);
 
 		void print( void );
 
@@ -111,15 +111,15 @@ class MeCtEyeLidRegulator : public MeController	{
 		}
 
 		void set_upper_range( float fr, float to )	{
-			float mn = min( fr, to );
-			float mx = max( fr, to );
+			float mn = minval( fr, to );
+			float mx = maxval( fr, to );
 			UL_set.set_range( mn, mx );
 			UR_set.set_range( mn, mx );
 		}
 		
 		void set_lower_range( float fr, float to )	{
-			float mn = min( fr, to );
-			float mx = max( fr, to );
+			float mn = minval( fr, to );
+			float mx = maxval( fr, to );
 			LL_set.set_range( mx, mn );
 			LR_set.set_range( mx, mn );
 		}
@@ -174,12 +174,14 @@ class MeCtEyeLidRegulator : public MeController	{
 		void set_use_blink_viseme(bool val);
 		bool get_use_blink_viseme();
 
+		void notify(DSubject* subject);
+
 	private:
-		float min( float a, float b )	{
+		float minval( float a, float b )	{
 			if( a < b ) return( a );
 			return( b );
 		}
-		float max( float a, float b )	{
+		float maxval( float a, float b )	{
 			if( a > b ) return( a );
 			return( b );
 		}
@@ -262,11 +264,11 @@ class MeCtEyeLid : public MeController	{
 		float	lower_lid_range[ 2 ];
 		float	eye_pitch_range[ 2 ];
 	
-		float min( float a, float b )	{
+		float minval( float a, float b )	{
 			if( a < b ) return( a );
 			return( b );
 		}
-		float max( float a, float b )	{
+		float maxval( float a, float b )	{
 			if( a > b ) return( a );
 			return( b );
 		}
@@ -279,7 +281,7 @@ class MeCtEyeLid : public MeController	{
 
 		/*! Destructor is public but pay attention to the use of ref()/unref() */
 		virtual ~MeCtEyeLid( void );
-		void init( void );
+		void init( SbmPawn* pawn );
 		
 		void set_weight( float lo, float up )	{
 			lid_weight[ 0 ] = lo;
@@ -291,8 +293,8 @@ class MeCtEyeLid : public MeController	{
 		}
 		
 		void set_lower_lid_range( float a, float b ) {
-			lower_lid_range[ 0 ] = min( a, b );
-			lower_lid_range[ 1 ] = max( a, b );
+			lower_lid_range[ 0 ] = minval( a, b );
+			lower_lid_range[ 1 ] = maxval( a, b );
 		}
 		void get_lower_lid_range( float &lo, float &up ) {
 			lo = lower_lid_range[ 0 ];
@@ -300,8 +302,8 @@ class MeCtEyeLid : public MeController	{
 		}
 		
 		void set_upper_lid_range( float a, float b ) {
-			upper_lid_range[ 0 ] = min( a, b );
-			upper_lid_range[ 1 ] = max( a, b );
+			upper_lid_range[ 0 ] = minval( a, b );
+			upper_lid_range[ 1 ] = maxval( a, b );
 		}
 		void get_upper_lid_range( float &lo, float &up ) {
 			lo = upper_lid_range[ 0 ];
@@ -309,8 +311,8 @@ class MeCtEyeLid : public MeController	{
 		}
 		
 		void set_eye_pitch_range( float a, float b )	{
-			eye_pitch_range[ 0 ] = max( a, b ); // down is positive...
-			eye_pitch_range[ 1 ] = min( a, b );
+			eye_pitch_range[ 0 ] = maxval( a, b ); // down is positive...
+			eye_pitch_range[ 1 ] = minval( a, b );
 		}
 		void get_eye_pitch_range( float &lo, float &up )	{
 			lo = eye_pitch_range[ 0 ];

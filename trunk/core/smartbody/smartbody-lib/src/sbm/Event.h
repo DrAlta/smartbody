@@ -2,6 +2,7 @@
 #define _SBMEVENT_H
 
 #include <map>
+#include <string>
 
 class Event
 {
@@ -34,6 +35,8 @@ class EventHandler
 		std::string m_action;
 };
 
+typedef std::map<std::string, EventHandler*> EventHandlerMap;
+
 class EventManager
 {
 	public:
@@ -44,10 +47,11 @@ class EventManager
 		void addHandler(EventHandler* handle);
 		void removeHandler(std::string type);
 		static EventManager* getEventManager();
+		EventHandlerMap& getEventHandlers() { return eventHandlers; }
 
 	private:
 		static EventManager* _eventManager;
-		std::map<std::string, EventHandler*> eventHandlers;
+		EventHandlerMap eventHandlers;
 };
 
 class MotionEvent : public Event

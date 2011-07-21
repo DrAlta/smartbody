@@ -26,11 +26,14 @@
  *      Thomas Amundsen, USC
  */
 
+#define ENABLE_CMDL_TEST		0
+#define ENABLE_808_TEST			0
 
 #define SBM_REPORT_MEMORY_LEAKS  0
 #define SBM_EMAIL_CRASH_REPORTS  1
 
 #include "vhcl.h"
+#include "external/glew/glew.h"
 
 #include <signal.h>
 #include <iostream>
@@ -44,7 +47,12 @@
 #include <bmlviewer/BehaviorWindow.h>
 #include <panimationviewer/PanimationWindow.h>
 #include <channelbufferviewer/channelbufferWindow.hpp>
+#include <resourceViewer/ResourceWindow.h>
+#include <faceviewer/FaceViewer.h>
+
+#if USE_WSP
 #include "wsp.h"
+#endif
 
 #include <sbm/sbm_constants.h>
 #include <sbm/xercesc_utils.hpp>
@@ -69,6 +77,7 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <sbm/sr_cmd_line.h>
+#include <sbm/gwiz_cmdl.h>
 
 #ifdef WIN32
 #ifndef NOMINMAX
@@ -86,8 +95,8 @@
 #include <vhcl_crash.h>
 #endif
 
-#include <fltk/glut.h>
 #include "pic.h"
+//#include <FL/Fl_glut.h>
 #include "sr/sr_model.h"
 
 #define ENABLE_DEFAULT_BOOTSTRAP	(1)
@@ -164,12 +173,13 @@ int mcu_snapshot_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
 	if( mcu_p )
 	{
-		RootWindow* rootWindow = dynamic_cast<RootWindow*> (mcu_p->viewer_p);
+		BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(mcu_p->viewer_p);
 		if (!rootWindow)
 		{
-			LOG("Viewer doesn't exist!");
+			LOG("Viewer doesn't exist. Cannot take snapshot.");
 			return CMD_FAILURE;
 		}
+
 		int windowHeight = args.read_int();
 		int windowWidth = args.read_int();
 		int offsetHeight = args.read_int();
@@ -177,7 +187,7 @@ int mcu_snapshot_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 		string output_file = args.read_token();
 
-		if( windowHeight == 0 )		windowHeight = rootWindow->fltkViewer->h();							// default window size
+		if( windowHeight == 0 )		windowHeight = rootWindow->fltkViewer->h();;							// default window size
 		if( windowWidth == 0 )		windowWidth = rootWindow->fltkViewer->w();
 		if( output_file == "" )		
 		{
@@ -232,6 +242,17 @@ int mcu_quit_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 
 	mcu_p->loop = false;
 
+	if (mcu_p->steerEngine.isInitialized())
+	{
+		mcu_p->steerEngine.stopSimulation();
+		mcu_p->steerEngine.unloadSimulation();
+		mcu_p->steerEngine.finish();
+	
+		mcu_p->character_map.reset();
+		SbmCharacter* character = NULL;
+		while( character = mcu_p->character_map.next() )
+			character->steeringAgent->setAgent(NULL);
+	}
 	return( CMD_SUCCESS );
 }
 
@@ -292,6 +313,8 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "panimviewer",  mcu_panimationviewer_func);
 	mcu.insert( "cbufviewer",	mcu_channelbufferviewer_func); // deprecated
 	mcu.insert( "dataviewer",	mcu_channelbufferviewer_func);
+	mcu.insert( "resourceviewer",	mcu_resourceViewer_func);
+	mcu.insert( "faceviewer",	mcu_faceViewer_func);
 
 	mcu.insert( "camera",		mcu_camera_func );
 	mcu.insert( "terrain",		mcu_terrain_func );
@@ -299,8 +322,8 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "tip",			mcu_time_ival_prof_func );
 
 	mcu.insert( "panim",		mcu_panim_cmd_func );	
-	mcu.insert( "mirror",       mcu_motion_mirror_cmd_func);
 	mcu.insert( "physics",		mcu_physics_cmd_func );	
+	mcu.insert( "mirror",       mcu_motion_mirror_cmd_func);
 	mcu.insert( "motionplayer", mcu_motion_player_func);
 
 	mcu.insert( "load",			mcu_load_func );
@@ -312,8 +335,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "motion",		mcu_motion_controller_func );
 	mcu.insert( "stepturn",		mcu_stepturn_controller_func );
 	mcu.insert( "quickdraw",	mcu_quickdraw_controller_func );
-	mcu.insert( "gaze",			mcu_gaze_controller_func );
-	mcu.insert( "reach",		mcu_reach_controller_func );	
+	mcu.insert( "gaze",			mcu_gaze_controller_func );	
 	mcu.insert( "gazelimit",	mcu_gaze_limit_func );
 	mcu.insert( "snod",			mcu_snod_controller_func );
 	mcu.insert( "lilt",			mcu_lilt_controller_func );
@@ -345,7 +367,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "enableevents",	       enableevents_func );
 	mcu.insert( "disableevents",	   disableevents_func );
 	mcu.insert( "registerevent",       registerevent_func );
-	mcu.insert( "unregisterevent",     registerevent_func );
+	mcu.insert( "unregisterevent",     unregisterevent_func );
 	mcu.insert( "setmap",			   setmap_func );
 	mcu.insert( "motionmap",		   motionmap_func );
 	mcu.insert( "skeletonmap",		   skeletonmap_func );
@@ -354,8 +376,10 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "pawns",			   showpawns_func );
 	mcu.insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands
 	mcu.insert( "syncpoint",		   syncpoint_func);
-	mcu.insert( "pawnbonebus",		   pawnbonebus_func);
-
+#ifdef USE_GOOGLE_PROFILER
+	mcu.insert( "startprofile",			   startprofile_func );
+	mcu.insert( "stopprofile",			   stopprofile_func );
+#endif
 	mcu.insert_set_cmd( "bp",             BML_PROCESSOR::set_func );
 	mcu.insert_set_cmd( "pawn",           SbmPawn::set_cmd_func );
 	mcu.insert_set_cmd( "character",      SbmCharacter::set_cmd_func );
@@ -506,9 +530,55 @@ class SBMCrashCallback : public vhcl::Crash::CrashCallback
 
 
 ///////////////////////////////////////////////////////////////////////////////////
+std::string test_cmdl_tab_callback( std::string io_str )	{
+	std::string prompt( "X> " );
 
+	gwiz::cmdl commandline;
+	commandline.set_callback( gwiz::cmdl::editor_callback );
+	commandline.render_prompt( prompt );
+	commandline.write( io_str );
+
+	bool quit = false;
+	while( !quit ) {
+		if( commandline.pending( prompt ) )	{
+
+			std::string new_str = commandline.read();
+			if( new_str == "t" )	{
+				commandline.write( std::string( "test" ) );
+			}
+			else
+			if( new_str == "q" )	{
+				quit = true;
+				io_str = "done";
+			}
+		}
+	}
+	fprintf( stdout, "<exit>" ); 
+	fprintf( stdout, "\n" ); 
+	return( io_str );
+}
+
+///////////////////////////////////////////////////////////////////////////////////
 
 int main( int argc, char **argv )	{
+
+#if ENABLE_CMDL_TEST
+#define EARLY_EXIT 1
+
+#if 0
+gwiz::cmdl test_cmd;
+test_cmd.test_editor();
+#else
+std::string str = test_cmdl_tab_callback( std::string( "demo" ) );
+fprintf( stdout, "output:'%s'\n", str.c_str() );
+#endif
+
+#else
+#define EARLY_EXIT 0
+#endif
+
+ // 808: undefined reference to `bonebus::BoneBusCharacter::StartSendBoneRotations()'
+//	return( 0 );
 
 #if SBM_REPORT_MEMORY_LEAKS
 	// CRT Debugging flags - Search help:
@@ -561,6 +631,8 @@ int main( int argc, char **argv )	{
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
+	// change the default font size
+	FL_NORMAL_SIZE = 12;
 	FltkViewerFactory* viewerFactory = new FltkViewerFactory();
 	//viewerFactory->setFltkViewer(sbmWindow->getFltkViewer());
 	//viewerFactory->setFltkViewer(viewer);
@@ -568,6 +640,8 @@ int main( int argc, char **argv )	{
 	mcu.register_bmlviewer_factory(new BehaviorViewerFactory());
 	mcu.register_panimationviewer_factory(new PanimationViewerFactory());
 	mcu.register_channelbufferviewer_factory(new ChannelBufferViewerFactory());
+	mcu.register_ResourceViewer_factory(new ResourceViewerFactory());
+	mcu.register_FaceViewer_factory(new FaceViewerFactory());
 
 	// Build the floor for the viewer
 	//mcu.add_scene( build_checkerboard_floor( 200.0 ) );
@@ -620,7 +694,7 @@ int main( int argc, char **argv )	{
 		else if( s == "-audiopath" )  // -audiopath <dirpath> to specify where audio files (.wav and .bml) should be loaded from
 		{
 			if( ++i < argc ) {
-				LOG( "    Adding audio path '%s'\n", argv[i] );
+				LOG( "    Addcore/smartbody/sbm/src/sbm_main.cpping audio path '%s'\n", argv[i] );
 
 				audio_paths.push_back( argv[i] );
 			} else {
@@ -681,7 +755,7 @@ int main( int argc, char **argv )	{
 		}
 		else if ( s.search( "-mediapath=" ) == 0 )
 		{
-			std::string mediaPath = s;
+			std::string mediaPath = (const char*) s;
 			mediaPath = mediaPath.substr(11);
 			mcu.setMediaPath(mediaPath);
 		}
@@ -766,9 +840,9 @@ int main( int argc, char **argv )	{
 #endif
 //	atexit( exit_callback );
 
-	srCmdLine cmdl;
-	printf("> " );
-	
+	gwiz::cmdl commandline;
+	commandline.set_callback( mcuCBHandle::cmdl_tab_callback );
+
 #if ENABLE_DEFAULT_BOOTSTRAP
 	vector<string>::iterator it;
 
@@ -823,21 +897,28 @@ int main( int argc, char **argv )	{
 	mcu_vrAllCall_func( argBuff, &mcu );
 
 	timer.start();
+
+#if ENABLE_808_TEST
+	return( 0 );
+#endif
+
+#if EARLY_EXIT
+	mcu.loop = 0;
+#endif
+//	commandline.render_prompt( "> " );
+
 	while( mcu.loop )	{
-		
+
 		mcu.update_profiler();
 //		mcu.update_profiler( SBM_get_real_time() );
 		bool update_sim = mcu.update_timer();
 //		bool update_sim = mcu.update_timer( SBM_get_real_time() );
 
-
-mcu.mark( "main", 0, "fltk-check" );
-
-		fltk::check();
-
-mcu.mark( "main", 0, "ttu_poll" );
+		mcu.mark( "main", 0, "fltk-check" );
+		Fl::check();
 
 #if LINK_VHMSG_CLIENT
+		mcu.mark( "main", 0, "ttu_poll" );
 		if( mcu.vhmsg_enabled )	{
 			err = vhmsg::ttu_poll();
 			if( err == vhmsg::TTU_ERROR )	{
@@ -846,61 +927,72 @@ mcu.mark( "main", 0, "ttu_poll" );
 		}
 #endif
 
-mcu.mark( "main", 0, "bonebus" );
-
-		// [BMLR] Added to support receiving commands from renderer
+		mcu.mark( "main", 0, "bonebus" );
 		vector<string> commands = mcu.bonebus.GetCommand();
 		for ( size_t i = 0; i < commands.size(); i++ ) {
 			mcu.execute( (char *)commands[i].c_str() );
 		}
 
-mcu.mark( "main", 0, "pending_cmd" );
-                if( mcu.getInteractive() && cmdl.pending_cmd() )	{
-			char *cmd = cmdl.read_cmd();
-			if( strlen( cmd ) )	{
-				switch( int ret = mcu.execute( cmd ) ) {
-					case CMD_NOT_FOUND:
-						printf("SBM ERR: command NOT FOUND: '%s'\n> ", cmd );
-						break;
-					case CMD_FAILURE:
-						printf("SBM ERR: command FAILED: '%s'\n> ", cmd );
-						break;
-					case CMD_SUCCESS:
-						printf("> " );  // new prompt
-						break;
-					default:
-						printf("SBM ERR: return value %d ERROR: '%s'\n> ", ret, cmd );
-						break;
+		mcu.mark( "main", 0, "pending_cmd" );
+		if (mcu.getInteractive())
+		{
+			if( commandline.pending( "> " ) )	{
+				std::string cmd_str = commandline.read();
+				char *cmd = (char*)cmd_str.c_str();
+
+				if( strlen( cmd ) )	{
+					switch( int ret = mcu.execute( cmd ) ) {
+						case CMD_NOT_FOUND:
+							printf("SBM ERR: command NOT FOUND: '%s'\n", cmd );
+							fprintf( stdout, "> " ); fflush( stdout );
+							break;
+						case CMD_FAILURE:
+							printf("SBM ERR: command FAILED: '%s'\n", cmd );
+							fprintf( stdout, "> " ); fflush( stdout );
+							break;
+						case CMD_SUCCESS:						
+							break;
+						default:
+							printf("SBM ERR: return value %d ERROR: '%s'\n", ret, cmd );
+							fprintf( stdout, "> " ); fflush( stdout );
+							break;
+					}
 				}
 			}
-			else	{
-				printf("> " );
-			}
-			fflush( stdout );
 		}
 
-mcu.mark( "main", 0, "broadcast_update" );
+#if USE_WSP
+		mcu.mark( "main", 0, "broadcast_update" );
 		mcu.theWSP->broadcast_update();
+#endif
 
-mcu.mark( "main", 0, "update_sim" );
+		mcu.mark( "main", 0, "update_sim" );
 		if( update_sim )	{
 			mcu.update();
 		}
 
-mcu.mark( "main", 0, "update_channel_buffer_viewer");
+		mcu.mark( "main", 0, "update_channel_buffer_viewer");
 		if((ChannelBufferWindow*)mcu.channelbufferviewer_p != NULL)
 		{
 			((ChannelBufferWindow*)mcu.channelbufferviewer_p)->update();
 		}
 
-mcu.mark( "main", 0, "render" );
+		mcu.mark( "main", 0, "update_resource_viewer");
+		if((ResourceWindow*)mcu.resourceViewer_p != NULL)
+		{
+			((ResourceWindow*)mcu.resourceViewer_p)->update();
+		}
+
+		mcu.mark( "main", 0, "render" );
 		mcu.render();
 	
-mcu.mark( "main" );
+		mcu.mark( "main" );
 	}	
 	cleanup();
 	//vhcl::Log::g_log.RemoveAllListeners();
 	//delete listener;
 //	delete sbmWindow;
+
+//	return( 0 ); // NOT NEEDED ??
 }
 

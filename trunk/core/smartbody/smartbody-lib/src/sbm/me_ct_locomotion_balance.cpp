@@ -21,6 +21,7 @@
  */
 
 #include "me_ct_locomotion_balance.hpp"
+#include <cstdlib>
 
 MeCtLocomotionBalance::MeCtLocomotionBalance()
 {

@@ -26,7 +26,7 @@
 
 #include <sstream>
 
-#include <ME/me_evaluation_logger.hpp>
+#include <me/me_evaluation_logger.hpp>
 
 // Predeclare class and namespace because of circular reference:
 namespace joint_logger {

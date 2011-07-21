@@ -60,13 +60,13 @@ MeCtStepTurn::~MeCtStepTurn( void )	{
 	}
 }
 
-void MeCtStepTurn::init( SkMotion* mot_p ) {
+void MeCtStepTurn::init( SbmPawn* pawn, SkMotion* mot_p ) {
 
 	if( _motion ) {
 		if( mot_p == _motion ) {
 			// Minimal init()
 			_last_apply_frame = 0;
-			MeController::init ();
+			MeController::init (pawn);
 			return;
 		}
 		// else new motion
@@ -76,7 +76,7 @@ void MeCtStepTurn::init( SkMotion* mot_p ) {
 	_last_apply_frame = 0;
 	
 	raw_time = mot_p->duration();
-	raw_angle = calc_raw_turn_angle( mot_p, "base" );
+	raw_angle = calc_raw_turn_angle( mot_p, (char*)"base" );
 
 	SkMotion* mirr_p = build_mirror_motion( mot_p );
 	if( raw_angle > 0.0 )	{
@@ -126,7 +126,7 @@ void MeCtStepTurn::init( SkMotion* mot_p ) {
 	_channels.add( SkJointName( "world_offset" ), SkChannel::Quat );
 #endif
 	
-	MeController::init();
+	MeController::init(pawn);
 
 	if( _context ) {
 		// Notify _context of channel change.

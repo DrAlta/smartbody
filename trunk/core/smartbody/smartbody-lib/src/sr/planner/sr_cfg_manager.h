@@ -2,9 +2,9 @@
 # ifndef SR_CFG_MANAGER_H
 # define SR_CFG_MANAGER_H
 
-# include <SR/sr_input.h>
-# include <SR/sr_output.h>
-# include <SR/sr_class_manager.h>
+# include <sr/sr_input.h>
+# include <sr/sr_output.h>
+# include <sr/sr_class_manager.h>
 
 typedef void srcfg;
 

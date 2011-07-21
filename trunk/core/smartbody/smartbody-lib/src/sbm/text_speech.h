@@ -39,7 +39,7 @@ class text_speech: public SmartBody::SpeechInterface {
 		std::string forPlaysound;
 		srHashMap<DOMNode>     uttLookUp;
 		srHashMap<srCmdSeq>    scheduleLookUp;
-		srHashMap<std::string> text_speech::charLookUp;
+		srHashMap<std::string> charLookUp;
 		unsigned int           msgNumber;
 };
 

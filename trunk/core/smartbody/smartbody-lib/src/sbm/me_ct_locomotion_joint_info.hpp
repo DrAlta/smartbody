@@ -23,7 +23,8 @@
 #ifndef ME_CT_LOCOMOTION_JOINT_INFO_HPP
 #define ME_CT_LOCOMOTION_JOINT_INFO_HPP
 
-#include <ME/me_controller.h>
+#include "lin_win.h"
+#include <me/me_controller.h>
 
 //#include "me_ct_locomotion_limb.hpp"
 

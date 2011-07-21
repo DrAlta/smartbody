@@ -35,7 +35,7 @@ MeCtLocomotionIK::~MeCtLocomotionIK()
 
 
 //overwrites function calc_target of MeCtIK
-__forceinline void MeCtLocomotionIK::calc_target(SrVec& orientation, SrVec& offset)
+inline void MeCtLocomotionIK::calc_target(SrVec& orientation, SrVec& offset)
 {
 	orientation.normalize();
 	SrVec pos = scenario->joint_pos_list.get(manipulated_joint_index);

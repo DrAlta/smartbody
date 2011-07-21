@@ -22,8 +22,8 @@
 
 # include <math.h>
 
-# include <SK/sk_joint_quat.h>
-# include <SK/sk_joint.h>
+# include <sk/sk_joint_quat.h>
+# include <sk/sk_joint.h>
 
 //============================= SrSkQuat ============================
 

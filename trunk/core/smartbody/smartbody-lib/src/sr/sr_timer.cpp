@@ -21,7 +21,7 @@
  */
 
 # include <stdio.h>
-# include <SR/sr_timer.h>
+# include <sr/sr_timer.h>
 #include <vhcl_log.h>
 
 # ifdef SR_TARGET_WINDOWS // defined in sr.h

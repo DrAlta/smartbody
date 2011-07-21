@@ -40,22 +40,13 @@
 #include "bml_target.hpp"
 #include "bml_xml_consts.hpp"
 #include "xercesc_utils.hpp"
-
+#include "BMLDefs.h"
 
 #define TEST_GAZE_LOCOMOTION 0 // set to 1 if want to test gaze+locomotion control when reaching
 
-////// XML Tags
-const XMLCh TAG_DESCRIPTION[] = L"description";
 
-////// BML Description Type
-const XMLCh DTYPE_SBM[]  = L"ICT.SBM";
 
-////// XML ATTRIBUTES
-const XMLCh ATTR_REACH_ARM[] = L"reach-arm";
-const XMLCh ATTR_USE_EXAMPLE[] = L"use-example";
-const XMLCh ATTR_BUILD_EXAMPLE[] = L"build-example";
-const XMLCh ATTR_EXAMPLE_DIST[] = L"example-dist"; // minimal distances between pose examples
-const XMLCh ATTR_RESAMPLE_SIZE[] = L"resample-size"; // minimal distances between pose examples
+#if 0
 
 using namespace std;
 using namespace BML;
@@ -78,13 +69,13 @@ static void buildReachCtExamples(mcuCBHandle* mcu_p, MeCtDataDrivenReach* reachC
 		}
 		else
 		{
-			//motionData.insert(motion);
+			motionData.insert(motion);
 			//reachCt->addMotion(motion);
 		}		
 	}
 	// build example database
-	//reachCt->updateExamplesFromMotions(motionData,true,5.f);
-	//reachCt->buildResamplePoseData(1500,5.f);
+	reachCt->updateExamplesFromMotions(motionData,true,5.f);
+	reachCt->buildResamplePoseData(1500,5.f);
 	
 	//reachCt->buildPoseExamplesFromMotions();	
 	//reachCt->buildResamplePoseData(5.0f);
@@ -104,7 +95,7 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 	MeCtReach* reachCt = NULL; //new MeCtReach(request->actor->skeleton_p);
 #endif
 
-	const XMLCh* attrHandle = elem->getAttribute( ATTR_HANDLE );
+	const XMLCh* attrHandle = elem->getAttribute( BMLDefs::ATTR_HANDLE );
 	std::string handle = "";
 	if( attrHandle && XMLString::stringLen( attrHandle ) ) {
 		handle = asciiString(attrHandle);
@@ -131,25 +122,25 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 	}
 	
 
-	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
+	const XMLCh* attrTarget = elem->getAttribute( BMLDefs::ATTR_TARGET );
 	if( !reachCt && (!attrTarget || !XMLString::stringLen( attrTarget ) ) ) {		
-        wstrstr << "WARNING: BML::parse_bml_reach(): <"<<tag<<"> BML tag missing "<<ATTR_TARGET<<"= attribute.";
+        wstrstr << "WARNING: BML::parse_bml_reach(): <"<<tag<<"> BML tag missing "<<BMLDefs::ATTR_TARGET<<"= attribute.";
 		std::string str = convertWStringToString(wstrstr.str());
 		LOG(str.c_str());
 		return BehaviorRequestPtr();  // a.k.a., NULL
     }
 
 	const XMLCh* attrReachArm = NULL;
-	attrReachArm = elem->getAttribute( ATTR_REACH_ARM );
+	attrReachArm = elem->getAttribute( BMLDefs::ATTR_REACH_ARM );
 	MeCtReach::ReachArm reachArm = MeCtReach::REACH_RIGHT_ARM;
 	if( !reachCt && attrReachArm && *attrReachArm != 0 ) 
 	{
-		if( XMLString::compareIString( attrReachArm, L"left" )==0 ) 
+		if( XMLString::compareIString( attrReachArm, BMLDefs::ATTR_ARMLEFT )==0 ) 
 		{
 			//reachCt->setReachArm(MeCtReach::REACH_LEFT_ARM);
 			reachArm = MeCtReach::REACH_LEFT_ARM;
 		}
-		else if( XMLString::compareIString( attrReachArm, L"right" )==0 )
+		else if( XMLString::compareIString( attrReachArm, BMLDefs::ATTR_ARMRIGHT )==0 )
 		{
 			//reachCt->setReachArm(MeCtReach::REACH_RIGHT_ARM);
 			reachArm = MeCtReach::REACH_RIGHT_ARM;
@@ -166,7 +157,7 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 
-	const XMLCh* id = elem->getAttribute(ATTR_ID);
+	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
 	if (id)
 		localId = XMLString::transcode(id);
@@ -181,7 +172,7 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 #endif
 		reachCt->setReachArm(reachArm);
 		reachCt->handle(handle);
-		reachCt->init();
+		reachCt->init(const_cast<SbmCharacter*>(request->actor));
 		bCreateNewController = true;
 
 // #if DATA_DRIVEN_REACH
@@ -345,3 +336,4 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 #endif
 	return ct_request;
 }
+#endif

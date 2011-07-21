@@ -1,11 +1,11 @@
 #ifndef _BEHAVIORWINDOW_
 #define _BEHAVIORWINDOW_
 
-#include <fltk/Window.h>
-#include <fltk/FloatInput.h>
-#include <fltk/TextDisplay.h>
-#include <fltk/Choice.h>
-#include <fltk/LightButton.h>
+#include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Float_Input.H>
+#include <FL/Fl_Text_Editor.H>
+#include <FL/Fl_Choice.H>
+#include <FL/Fl_Light_Button.H>
 #include "nle/NonLinearEditor.h"
 #include "nle/NonLinearEditorWidget.h"
 #include "BehaviorEditorWidget.h"
@@ -14,7 +14,7 @@
 #include <sbm/bml_event.hpp>
 #include <sbm/GenericViewer.h>
 
-class BehaviorWindow : public fltk::Window, public GenericViewer
+class BehaviorWindow : public Fl_Double_Window, public GenericViewer
 {
 	public:
 		BehaviorWindow(int x, int y, int w, int h, char* name);
@@ -29,6 +29,7 @@ class BehaviorWindow : public fltk::Window, public GenericViewer
 		int handle(int event);
         void show();      
         void draw();
+		void resize(int x, int y, int w, int h);
         
 		void updateGUI();
         
@@ -55,18 +56,18 @@ class BehaviorWindow : public fltk::Window, public GenericViewer
 	
 		void adjustSyncPoints(BML::BehaviorRequest* behavior, nle::Block* block, std::map<std::string, double>& syncMap);
 		
-		static void ContextCB(fltk::Widget* widget, void* data);
-		static void ClearCB(fltk::Widget* widget, void* data);
-		static void ReplayCB(fltk::Widget* widget, void* data);
+		static void ContextCB(Fl_Widget* widget, void* data);
+		static void ClearCB(Fl_Widget* widget, void* data);
+		static void ReplayCB(Fl_Widget* widget, void* data);
 
 		BehaviorEditorWidget* nleWidget;
 
 
-		fltk::Choice* choiceContexts;
-		fltk::Button* buttonClear;
-		fltk::Button* buttonReplay;
-		fltk::TextDisplay* textXML;
-		fltk::TextBuffer* bufferXML;
+		Fl_Choice* choiceContexts;
+		Fl_Button* buttonClear;
+		Fl_Button* buttonReplay;
+		Fl_Text_Editor* textXML;
+		Fl_Text_Buffer* bufferXML;
 
 		int contextCounter;
 		std::string selectedContext;

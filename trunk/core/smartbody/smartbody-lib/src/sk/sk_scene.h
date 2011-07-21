@@ -25,9 +25,9 @@
 
 //================================ SkScene =================================================
 
-# include <SR/sr_array.h>
-# include <SR/sr_sn_group.h>
-# include <SR/sr_sn_shape.h>
+# include <sr/sr_array.h>
+# include <sr/sr_sn_group.h>
+# include <sr/sr_sn_shape.h>
 
 class SrModel;
 class SkJoint;

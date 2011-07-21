@@ -1,19 +1,21 @@
 #include "NonLinearEditorWidget.h"
 #include <iostream>
-#include <fltk/Cursor.h>
+#include <FL/Enumerations.H>
+#include <FL/Fl.H>
 
 namespace nle
 {
 
 EditorWidget::EditorWidget(int x, int y, int w, int h, char* name) :
-									fltk::Group(x, y, w, h, name)
+									Fl_Group(x, y, w, h, name)
 {
 	model = NULL;
+	//xOffset = x;
+	//yOffset = y;
 	setup();
 	setViewableTimeStart(0);
 	setViewableTimeEnd(3);
 	setTimeWindowSelected(false);
-
 	selectState = STATE_NORMAL;
 	cameraState = CAMERASTATE_NORMAL;
 	setBlockCandidate(NULL, true);
@@ -26,14 +28,14 @@ EditorWidget::~EditorWidget()
 
 void EditorWidget::setup()
 {
-	padding = 10;
+	padding = 20;
 	trackHeight = 30;
     activationSize = 8;
-	left = padding;
-	right = w() - padding;
+	left = padding + x();
+	right = w() - padding + x();
 	width = right - left;
-	top = padding;
-	bottom = h() - 10;
+	top = padding + y();
+	bottom = h() - padding + y();
 	height = bottom - top;
 	labelWidth = 100;
 	trackStart = left + labelWidth;
@@ -48,7 +50,7 @@ void EditorWidget::setup()
 		model->update();
 	}
 
-	int currentTrackLocation = padding + timeWindowHeight;
+	int currentTrackLocation = top + timeWindowHeight + 10;
 	for (int t = 0; t < model->getNumTracks(); t++)
 	{
 		nle::Track* track = model->getTrack(t);
@@ -165,6 +167,7 @@ void EditorWidget::setup()
 		track->setBounds(trackStart, trackTop, trackWidth, currentTrackLocation - trackTop);
 	}
 
+	trackBottom = currentTrackLocation + trackHeight;
 	// make sure that the widget can accomodate all the tracks
 	this->h(currentTrackLocation + trackHeight);
 
@@ -190,8 +193,8 @@ void EditorWidget::setup()
 	int timeWindowWidth = timeWindowRight - timeWindowLeft;
 
 	// draw the time bar
-	fltk::Rectangle timerec(timeWindowLocationStart, timeWindowTop, 
-		                    timeWindowSize, timeWindowBottom - timeWindowTop);
+	//fltk::Rectangle timerec(timeWindowLocationStart, timeWindowTop, 
+	//	                    timeWindowSize, timeWindowBottom - timeWindowTop);
 
 
 	// set the time window bounds
@@ -215,8 +218,12 @@ void EditorWidget::setup()
 }
 
 void EditorWidget::resize(int x, int y, int w, int h)
-{
-	fltk::Group::resize(x, y, w, h);
+{	
+	Fl_Group::resize(x, y, w, h);
+	//printf("w = %d, h = %d\n",w,h);
+	//printf("w() = %d, h() = %d\n",this->w(),this->h());
+// 	xOffset = x;
+// 	yOffset = y;
 	setup();
 }
 
@@ -269,7 +276,7 @@ void EditorWidget::draw()
 {
 	setup();
 
-	fltk::Group::draw();
+	Fl_Group::draw();
 	if (!model)
 		return;
 	
@@ -277,7 +284,7 @@ void EditorWidget::draw()
 	drawBackground();
 
 	// draw the window sliders
-	drawTimeWindow();
+//	drawTimeWindow();
 
 	// draw the grid ticks
 	drawTicks();
@@ -311,12 +318,11 @@ void EditorWidget::draw()
 	// show the mouse hit targets
 	if (false)
 	{
-		fltk::setcolor(fltk::GREEN);
+		fl_color(FL_GREEN);
 
 		int loc[4];
 		this->getTimeWindowBounds(loc[0], loc[1], loc[2], loc[3]);
-		fltk::Rectangle r(loc[0], loc[1], loc[2], loc[3]);
-		fltk::fillrect(r);
+		fl_rectf(loc[0], loc[1], loc[2], loc[3]);
 
 		for (int t = 0; t < numTracks; t++)
 		{
@@ -326,16 +332,15 @@ void EditorWidget::draw()
 			{
 				nle::Block* block = track->getBlock(b);
 				block->getBounds(loc[0], loc[1], loc[2], loc[3]);
-				fltk::Rectangle r(loc[0], loc[1], loc[2], loc[3]);
-				fltk::fillrect(r);
+				fl_rectf(loc[0], loc[1], loc[2], loc[3]);
 			}
 		}
 	}
 
 	// draw the current time
 	int timePos = this->convertTimeToPosition(this->getModel()->getTime());
-	fltk::color(fltk::RED);
-	fltk::drawline(timePos, top, timePos, bottom);
+	fl_color(FL_RED);
+	fl_line(timePos, top, timePos, trackBottom);
 
 	// draw the time if dragging
 	bool leftOrRight;
@@ -349,20 +354,21 @@ void EditorWidget::draw()
 			t = blockBeingDragged->getEndTime();
 		char buff[256];
 		sprintf(buff, "%8.4f", t);
-		fltk::color(fltk::BLACK);
+		fl_color(FL_BLACK);
 		int bounds[4];
 		blockBeingDragged->getTrack()->getBounds(bounds[0], bounds[1], bounds[2], bounds[3]);
-		fltk::drawtext(buff, float(this->convertTimeToPosition(t)), float(bounds[1]) +  5.0f * float(bounds[3]) / 6.0f);
+		//bounds[0] += xOffset;
+		//bounds[1] += yOffset;
+		fl_draw(buff, this->convertTimeToPosition(t), bounds[1] +  5 * bounds[3] / 6);
 		
 	}
 }
 
 void EditorWidget::drawBackground()
 {
-	fltk::setcolor(fltk::GRAY25);
+	fl_color(FL_DARK3);
 
-	fltk::Rectangle back(left, top, width, height);
-	fltk::fillrect(back);
+	fl_rectf(left, top, width, trackBottom - top);
 }
 
 void EditorWidget::drawTicks()
@@ -370,7 +376,7 @@ void EditorWidget::drawTicks()
 	if (!this->getModel())
 		return;
 
-	fltk::setcolor(fltk::GRAY25);
+	fl_color(FL_DARK3);
 
 	// draw the timing every second
 	char buff[128];
@@ -393,13 +399,14 @@ void EditorWidget::drawTicks()
 	while (cur <= this->getViewableTimeEnd())
 	{
 		int timePos = convertTimeToViewablePosition(cur);
-		fltk::drawline(timePos, top, timePos, bottom);
+		fl_line(timePos, top, timePos, trackBottom);
 		if (counter % 4 == 0)
 		{
 			sprintf(buff, "%6.2f", cur);
 			int textW, textH;
-			fltk::measure(buff, textW, textH);
-			fltk::drawtext(buff, float(timePos) - float(textW) / 2.0f, float(top) + float(this->h()) - float(textH));
+			fl_measure(buff, textW, textH);
+			fl_draw(buff, timePos - textW / 2, trackBottom + trackHeight);
+			//fl_draw(buff, timePos - textW / 2, top + this->height - textH);
 		}
 		counter++;
 		cur += tickAmount;	
@@ -411,34 +418,32 @@ void EditorWidget::drawTimeWindow()
 	int bounds[4];
 
 	this->getTimeSliderBounds(bounds[0], bounds[1], bounds[2], bounds[3]);
-	//TEMP PLEASE FIX
 		if (bounds[0] > 10000 || 
 		bounds[1] > 10000 ||
 		bounds[2] > 10000 ||
 		bounds[3] > 10000)
 		return;
 
-	fltk::Rectangle timerec(bounds[0], bounds[1], bounds[2], bounds[3]);
-	fltk::fillrect(timerec);
-	fltk::setcolor(fltk::BLACK);
-	fltk::strokerect(timerec);
+	fl_rectf(bounds[0], bounds[1], bounds[2], bounds[3]);
+	fl_color(FL_BLACK);
+	fl_rect(bounds[0], bounds[1], bounds[2], bounds[3]);
 
 	// draw the time box
 	if (isTimeWindowSelected())
-		fltk::setcolor(fltk::GRAY10);
+		fl_color(FL_GRAY0);
 	else
-		fltk::setcolor(fltk::WHITE);
+		fl_color(FL_WHITE);
 
-	fltk::fillrect(timerec);
-	fltk::setcolor(fltk::BLACK);
-	fltk::strokerect(timerec);
+	fl_rectf(bounds[0], bounds[1], bounds[2], bounds[3]);
+	fl_color(FL_BLACK);
+	fl_rect(bounds[0], bounds[1], bounds[2], bounds[3]);
 
 	// draw the time label
 /*	char buff[128];
 	sprintf(buff, "%6.2f", this->getViewableTimeStart());
-	fltk::drawtext(buff, float(bounds[0]), float((bounds[1] + (bounds[1] + bounds[3])) / 2 + 5) - 10);
+	fl_draw(buff, float(bounds[0]), float((bounds[1] + (bounds[1] + bounds[3])) / 2 + 5) - 10);
 	sprintf(buff, "%6.2f", this->getViewableTimeEnd());
-	fltk::drawtext(buff, float(bounds[0] + bounds[2]), float((bounds[1] + (bounds[1] + bounds[3])) / 2 + 5) - 10);
+	fl_draw(buff, float(bounds[0] + bounds[2]), float((bounds[1] + (bounds[1] + bounds[3])) / 2 + 5) - 10);
 	*/
 }
 
@@ -449,42 +454,33 @@ void EditorWidget::drawTrack(nle::Track* track, int trackNum)
 
 	int bounds[4];
 	track->getBounds(bounds[0], bounds[1], bounds[2], bounds[3]);
+// 	bounds[0] += xOffset;
+// 	bounds[1] += yOffset;
  
     // show the active/inactive box
     if (track->isActive())
     {
-        fltk::setcolor(fltk::BLACK);
-#ifdef WIN32
-		Rectangle rect(left, bounds[1] + bounds[3] / 2 - activationSize, activationSize, activationSize);
-        fltk::fillrect(rect);
-#else
-        fltk::fillrect(left, bounds[1] + bounds[3] / 2 - activationSize, activationSize, activationSize);
-#endif
+        fl_color(FL_BLACK);
+        fl_rectf(left, bounds[1] + bounds[3] / 2 - activationSize, activationSize, activationSize);
     }
     else
     {
-        fltk::setcolor(fltk::BLACK);
-#ifdef WIN32
-		Rectangle rect(left, bounds[1] + bounds[3] / 2 - activationSize, activationSize, activationSize);
-        fltk::strokerect(rect);
-#else
-        fltk::strokerect(left, bounds[1] + bounds[3] / 2 - activationSize, activationSize, activationSize);
-#endif
+        fl_color(FL_BLACK);
+        fl_rect(left, bounds[1] + bounds[3] / 2 - activationSize, activationSize, activationSize);
     }
 
 	// write the track names
-	fltk::setcolor(fltk::BLACK);
-	fltk::drawtext(track->getName().c_str(), float(left + 15), float((bounds[1] + (bounds[1] + bounds[3])) / 2));
+	fl_color(FL_BLACK);
+	fl_draw(track->getName().c_str(), left + 15, (bounds[1] + (bounds[1] + bounds[3])) / 2);
 
 	if (track->isSelected())
-		fltk::setcolor(fltk::GRAY50);
+		fl_color(FL_DARK2);
 	else
-		fltk::setcolor(fltk::GRAY75);
-	fltk::Rectangle trackrec(bounds[0], bounds[1], bounds[2], bounds[3]);
-	fltk::fillrect(trackrec);
+		fl_color(FL_LIGHT1);
+	fl_rectf(bounds[0], bounds[1], bounds[2], bounds[3]);
 
-	fltk::setcolor(fltk::GRAY25);
-	fltk::strokerect(trackrec);
+	fl_color(FL_DARK3);
+	fl_rect(bounds[0], bounds[1], bounds[2], bounds[3]);
 }
 
 void EditorWidget::drawBlock(nle::Block* block, int trackNum, int blockNum)
@@ -506,9 +502,9 @@ void EditorWidget::drawBlock(nle::Block* block, int trackNum, int blockNum)
 
 
 	if (block->isSelected())
-		fltk::setcolor(fltk::YELLOW);
+		fl_color(FL_YELLOW);
 	else
-		fltk::setcolor(block->getColor());
+		fl_color(block->getColor());
 
 	bool drawText = true;
 	if (viewableStart > bounds[0])
@@ -518,12 +514,13 @@ void EditorWidget::drawBlock(nle::Block* block, int trackNum, int blockNum)
 		bounds[2] -= diff;
 		drawText = false;
 	}
-	fltk::Rectangle rec(bounds[0], bounds[1], bounds[2], bounds[3]);
-	fltk::fillrect(rec);
+// 	bounds[0] += xOffset;
+// 	bounds[1] += yOffset;
+	fl_rectf(bounds[0], bounds[1], bounds[2], bounds[3]);
 
 	// draw an outline around the block
-	fltk::setcolor(fltk::BLACK);
-	fltk::strokerect(rec);
+	fl_color(FL_BLACK);
+	fl_rect(bounds[0], bounds[1], bounds[2], bounds[3]);
 
 	
 	if (block->isShowName())
@@ -533,7 +530,7 @@ void EditorWidget::drawBlock(nle::Block* block, int trackNum, int blockNum)
 			// draw the name
 			int width, height;
 			std::string blockName = block->getName();
-			fltk::measure(blockName.c_str(), width, height);
+			fl_measure(blockName.c_str(), width, height);
 			// make sure that the width of the block will fit in the block area
 			if (width > bounds[2])
 			{
@@ -543,15 +540,15 @@ void EditorWidget::drawBlock(nle::Block* block, int trackNum, int blockNum)
 					blockName = blockName.substr(0, 2);
 					blockName.append("..");
 				}
-				fltk::measure(blockName.c_str(), width, height);
+				fl_measure(blockName.c_str(), width, height);
 				if (width > bounds[2])
 					width = bounds[2];
 			}
 
-			int startTextX = (bounds[0] + (bounds[0] + bounds[2])) / 2 - width / 2;
-			int startTextY = trackTop + int(3.0 * double(trackHeight) / 4.0);
+			int startTextX = (bounds[0] + (bounds[0] + bounds[2])) / 2 - width / 2 ;//+ xOffset;
+			int startTextY = trackTop + int(3.0 * double(trackHeight) / 4.0);// + yOffset;
 			if (startTextX + width <= viewableEnd)
-				fltk::drawtext(blockName.c_str(), float(startTextX), float(startTextY));
+				fl_draw(blockName.c_str(), startTextX, startTextY);
 		}
 	}		
 }
@@ -565,15 +562,18 @@ void EditorWidget::drawMark(nle::Block* block, nle::Mark* mark, int trackNum, in
 	
 	int bounds[4];
 	mark->getBounds(bounds[0], bounds[1], bounds[2], bounds[3]);
+// 	bounds[0] += xOffset;
+// 	bounds[1] += yOffset;
+
 	if (viewableStart > bounds[0] + bounds[2])
 		return;
 	if (viewableEnd < bounds[0])
 		return;
 
 	if (mark->isSelected())
-		fltk::setcolor(fltk::GREEN);
+		fl_color(FL_GREEN);
 	else
-		fltk::setcolor(mark->getColor());
+		fl_color(mark->getColor());
 
 	bool drawText = true;
 	if (viewableStart > bounds[0])
@@ -583,8 +583,7 @@ void EditorWidget::drawMark(nle::Block* block, nle::Mark* mark, int trackNum, in
 		bounds[2] -= diff;
 		drawText = false;
 	}
-	fltk::Rectangle rec(bounds[0], bounds[1], bounds[2], bounds[3]);
-	fltk::strokerect(rec);
+	fl_rect(bounds[0], bounds[1], bounds[2], bounds[3]);
 
 	
 	if (mark->isShowName())
@@ -593,14 +592,14 @@ void EditorWidget::drawMark(nle::Block* block, nle::Mark* mark, int trackNum, in
 		{
 			int width, height;
 			std::string markName = mark->getName();
-			fltk::measure(markName.c_str(), width, height);
+			fl_measure(markName.c_str(), width, height);
 
 			int startTextX = bounds[0];
 			int startTextY = bounds[1];
 			if (startTextX + width <= viewableEnd)
 			{
-				fltk::setcolor(fltk::BLACK);
-				fltk::drawtext(markName.c_str(), float(startTextX), float(startTextY));
+				fl_color(FL_BLACK);
+				fl_draw(markName.c_str(), startTextX, startTextY);
 			}		
 		}
 	}
@@ -612,11 +611,11 @@ int EditorWidget::handle(int event)
 
 	if (!model)
 	{
-		return fltk::Group::handle(event);
+		return Fl_Group::handle(event);
 	}
 
-	int mousex = fltk::event_x();
-	int mousey = fltk::event_y();
+	int mousex = Fl::event_x();
+	int mousey = Fl::event_y();
 
 	bool mouseHit = false;
 	bool found = false;
@@ -628,10 +627,10 @@ int EditorWidget::handle(int event)
 
 	switch (event)
 	{
-		case fltk::SHORTCUT:
-		case fltk::KEY:
+		case FL_SHORTCUT:
+		case FL_KEYBOARD:
 			{
-				switch(fltk::event_key())
+				switch(Fl::event_key())
 				{
 					case 'f': 
 						// bring any selected objects in focus
@@ -689,9 +688,9 @@ int EditorWidget::handle(int event)
 				}
 			}
 			break;
-		case fltk::DRAG:
+		case FL_DRAG:
 			{
-				bool altKeyPressed = (fltk::get_key_state(fltk::LeftAltKey) || fltk::get_key_state(fltk::RightAltKey));
+				bool altKeyPressed = (Fl::event_key(FL_Left) || Fl::event_key(FL_Right));
 				if (altKeyPressed)
 				{
 					if (cameraState == CAMERASTATE_ZOOM)
@@ -748,7 +747,7 @@ int EditorWidget::handle(int event)
 			candidateBlock = this->getBlockCandidate(leftOrRight);
 			if (candidateBlock && !blockOpLocked)
 			{
-                bool shiftKeyPressed = (fltk::get_key_state(fltk::LeftShiftKey) || fltk::get_key_state(fltk::RightShiftKey));
+                bool shiftKeyPressed = (Fl::event_key(FL_Shift_L) || Fl::event_key(FL_Shift_R));
 
 				double time = this->convertViewablePositionToTime(mousex);
 				if (leftOrRight)
@@ -996,7 +995,7 @@ int EditorWidget::handle(int event)
             }
 			break;
 
-		case fltk::PUSH:		
+		case FL_PUSH:		
             
             // remember this mouse position
             clickPositionX = mousex;
@@ -1004,10 +1003,10 @@ int EditorWidget::handle(int event)
 
 			{
 				// if the alt key is pressed, then zoom then enter zoom mode
-				bool alt = (fltk::get_key_state(fltk::LeftAltKey) || fltk::get_key_state(fltk::RightAltKey));
+				bool alt = (Fl::event_key(FL_Alt_L) || Fl::event_key(FL_Alt_R));
 				if (alt)
 				{
-					int button =  fltk::event_button();
+					int button =  Fl::event_button();
 					// right mouse is zoom
 					if (button == 3)
 					{
@@ -1310,14 +1309,14 @@ int EditorWidget::handle(int event)
 
 	
 
-		case fltk::RELEASE:
+		case FL_RELEASE:
 			selectState = STATE_NORMAL;
 			cameraState = CAMERASTATE_NORMAL;
 			this->setTimeWindowSelected(false);
 			redraw();
 			break;
 
-		case fltk::MOVE:
+		case FL_MOVE:
 			// if the cursor is above a block border, 
 			// then change the cursor type
 			if (!blockOpLocked)
@@ -1345,14 +1344,14 @@ int EditorWidget::handle(int event)
 							(mousey >= leftMinY && mousey <= leftMaxY))
 						{	
 							this->setBlockCandidate(block, true);
-							this->cursor(CURSOR_CROSS);
+							fl_cursor(FL_CURSOR_CROSS);
 							foundBorder = true;
 						}
 						else if ((mousex >= rightMinX && mousex <= rightMaxX) &&
 								 (mousey >= rightMinY && mousey <= rightMaxY))
 						{	
 							this->setBlockCandidate(block, false);
-							this->cursor(CURSOR_CROSS);
+							fl_cursor(FL_CURSOR_CROSS);
 							foundBorder = true;
 						}
 					}
@@ -1365,16 +1364,16 @@ int EditorWidget::handle(int event)
 	}
 	if (foundBorder)
 	{
-		this->cursor(CURSOR_CROSS);
+		fl_cursor(FL_CURSOR_CROSS);
 	}
 	else
 	{
-		this->cursor(CURSOR_DEFAULT);
+		fl_cursor(FL_CURSOR_DEFAULT);
 		this->setBlockCandidate(NULL, true);
 	}
 
 
-	return fltk::Group::handle(event);
+	return Fl_Group::handle(event);
 }
 
 int EditorWidget::convertTimeToPosition(double time)

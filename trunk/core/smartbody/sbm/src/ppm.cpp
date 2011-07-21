@@ -2,6 +2,8 @@
 #include <sys/types.h>
 #include <ctype.h>
 #include <string>
+#include <cstring>
+#include <cstdlib>
 #include <vhcl_log.h>
 #include "pic.h"
 

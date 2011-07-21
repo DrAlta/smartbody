@@ -1,24 +1,24 @@
 #ifndef _NONLINEAREDITORWIDGET_
 #define _NONLINEAREDITORWIDGET_
 
-#include <fltk/events.h>
-#include <fltk/Window.h>
-#include <fltk/Group.h>
-#include <fltk/run.h>
-#include <fltk/Color.h>
+#include <FL/Fl.H>
+#include <FL/Fl_Window.H>
+#include <FL/Fl_Group.H>
+#include <FL/Fl.H>
+#include <FL/Fl.H>
 #include <string>
 #include <vector>
 #include <cmath>
-#include <fltk/draw.h>
+#include <FL/fl_draw.H>
 
 #include "NonLinearEditor.h"
 
-using namespace fltk;
+
 
 namespace nle
 {
 
-class EditorWidget : public fltk::Group
+class EditorWidget : public Fl_Group
 {
 	public:
 		EditorWidget(int x, int y, int w, int h, char* name);
@@ -79,6 +79,7 @@ protected:
 		int padding;
 		int trackHeight;
         int activationSize;
+		//int xOffset, yOffset;
 		int left;
 		int right;
 		int top;
@@ -90,6 +91,7 @@ protected:
 		int timeWindowHeight;
 		int timeWindowBounds[4];
 		int timeSliderBounds[4];
+		int trackBottom;
 		bool timeWindowSelected;
 
 		int selectState;

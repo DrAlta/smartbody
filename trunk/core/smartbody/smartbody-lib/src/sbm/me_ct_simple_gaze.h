@@ -23,8 +23,8 @@
 #ifndef ME_CT_SIMPLE_GAZE_H
 #define ME_CT_SIMPLE_GAZE_H
 
-#include <SK/sk_skeleton.h>
-#include <ME/me_controller.h>
+#include <sk/sk_skeleton.h>
+#include <me/me_controller.h>
 
 #include "gwiz_math.h"
 
@@ -94,7 +94,7 @@ class MeCtSimpleGaze : public MeController	{
 		MeCtSimpleGaze();
 		virtual ~MeCtSimpleGaze();
 		
-		void init( void );
+		void init( SbmPawn* pawn );
 
 		void set_target_joint( float x, float y, float z, SkJoint* ref_joint_p = NULL );
 		void set_target( float x, float y, float z, char *ref_joint_name = NULL ); // world-coord if NULL

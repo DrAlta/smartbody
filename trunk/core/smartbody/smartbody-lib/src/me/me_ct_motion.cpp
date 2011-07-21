@@ -23,7 +23,7 @@
 
 #include "vhcl_log.h"
 
-#include <ME/me_ct_motion.h>
+#include <me/me_ct_motion.h>
 #include <sbm/Event.h>
 
 //=================================== MeCtMotion =====================================
@@ -46,13 +46,13 @@ MeCtMotion::~MeCtMotion ()
    if ( _motion ) _motion->unref ();
  }
 
-void MeCtMotion::init( SkMotion* m_p, double time_offset, double time_scale )	{
+void MeCtMotion::init(SbmPawn* pawn, SkMotion* m_p, double time_offset, double time_scale)	{
 
 	if ( _motion ) {
 		if( m_p == _motion ) {
 			// Minimal init()
 			_last_apply_frame = 0;
-			MeController::init ();
+			MeController::init (pawn);
 			return;
 		}
 		// else new motion
@@ -66,7 +66,7 @@ void MeCtMotion::init( SkMotion* m_p, double time_offset, double time_scale )	{
 	_motion->move_keytimes ( 0 ); // make sure motion starts at 0
 //	_duration = _motion->duration() / _twarp;
 
-	MeController::init ();
+	MeController::init (pawn);
 
 	if( _context ) {
 		// Notify _context of channel change.
@@ -90,8 +90,8 @@ void MeCtMotion::init( SkMotion* m_p, double time_offset, double time_scale )	{
 	loadMotionEvents();
 }
 
-void MeCtMotion::init ( SkMotion* m_p ) {
-	init( m_p, 0.0, 1.0 );
+void MeCtMotion::init (SbmPawn* pawn, SkMotion* m_p ) {
+	init(pawn, m_p, 0.0, 1.0 );
 }
 
 #if 0
@@ -233,7 +233,7 @@ bool MeCtMotion::input ( SrInput& inp, const SrHashTable<SkMotion*>& motions ) {
    
 	SkMotion* m = motions.lookup ( mname );
 	if ( m ) {
-		init ( m );
+		init ( NULL, m );
 		return true;
 	} else {
 		return false;

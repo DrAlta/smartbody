@@ -110,7 +110,7 @@ void MeCtReach::set_target_joint(SkJoint* target_joint)
 	}
 }
 
-void MeCtReach::init()
+void MeCtReach::init(SbmPawn* pawn)
 {
 	assert(_skeleton);
 	joint_name.size(NUM_LIMBS);	
@@ -139,7 +139,7 @@ void MeCtReach::init()
 	limb.buildJointChain(joint_name,joint_limit);
 	limb_length = limb.computeLimbLength();
 	root_joint_ref = limb.joint_chain[0];
-	MeController::init();
+	MeController::init(pawn);
 }
 
 void MeCtReach::controller_map_updated() 

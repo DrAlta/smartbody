@@ -67,10 +67,10 @@ RequestId SpeechImplementation::requestSpeechAudio( const char* agentName, const
  *  VisemeData instances of when to cancel previous visemes (change
  *  of viseme, and end of words).
  */
-const std::vector<VisemeData *>* SpeechImplementation::getVisemes( RequestId requestId ) {
-	// TODO
-	return NULL;
-}
+//const std::vector<VisemeData *>* SpeechImplementation::getVisemes( RequestId requestId ) {
+//	// TODO
+//	return NULL;
+//}
 
 /**
  *  Returns the sbm command used to play the speech audio.

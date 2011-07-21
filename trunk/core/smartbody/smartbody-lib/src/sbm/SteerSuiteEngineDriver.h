@@ -4,10 +4,12 @@
 /// @file SteerSuiteEngineDriver.h
 /// @brief Declares the SteerSuiteEngineDriver class
 
+#include <vhcl.h>
 #include <SteerLib.h>
 #include <PPRAgent.h>
+#include <sbm/DObject.h>
 
-class SteerSuiteEngineDriver : public SteerLib::EngineControllerInterface
+class SteerSuiteEngineDriver : public SteerLib::EngineControllerInterface, public DObject
 {
 public:
 	SteerSuiteEngineDriver();
@@ -16,11 +18,11 @@ public:
 	void finish();
 	void run();
 
+	bool isInitialized();
 	bool isDone();
 	void setDone(bool val);
 	void setStartTime(float time);
 	float getStartTime();
-	bool isInitialized();
 
 	/// @name The EngineControllerInterface
 	/// @brief The CommandLineEngineDriver does not support any of the engine controls.

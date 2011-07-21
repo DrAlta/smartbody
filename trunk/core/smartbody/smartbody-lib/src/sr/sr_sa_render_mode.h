@@ -26,8 +26,8 @@
  * changes the render mode
  */
 
-# include <SR/sr_sa.h>
-# include <SR/sr_sn_shape.h>
+# include <sr/sr_sa.h>
+# include <sr/sr_sn_shape.h>
 
 /*! \class SrSaRenderMode sr_sa_render_mode.h
     \brief changes the render mode

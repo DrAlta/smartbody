@@ -20,12 +20,12 @@
  */
  
 # include <math.h>
-# include <SR/sr_box.h>
-# include <SR/sr_geo2.h>
-# include <SR/sr_polygon.h>
+# include <sr/sr_box.h>
+# include <sr/sr_geo2.h>
+# include <sr/sr_polygon.h>
 
 //# define SR_USE_TRACE1 
-//# include <SR/sr_trace.h>
+//# include <sr/sr_trace.h>
  
 //=================================== SrPolygon =================================================
 

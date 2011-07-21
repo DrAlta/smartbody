@@ -2,15 +2,19 @@
 #include "PositionControl.h"
 #include "RotationControl.h"
 #include <sbm/sbm_pawn.hpp>
+#ifdef WIN32
 #include "glfont2.h"
 
 using namespace glfont;
+#endif
 
 class PawnControl
 {
 protected:
 	SbmPawn* pawn;
+#ifdef WIN32
 	GLFont   label;
+#endif
 
 public:	
 	void attach_pawn(SbmPawn* ap);

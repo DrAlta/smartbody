@@ -23,10 +23,14 @@
 #ifndef _PARAM_ANIM_STATE_EDITOR_H_
 #define _PARAM_ANIM_STATE_EDITOR_H_
 
+#include <FL/Fl_Slider.H>
+#include <FL/Fl_Scroll.H>
+#include <vhcl.h>
+#include <FL/Fl_Multi_Browser.H>
 #include "PanimationWindow.h"
 
 class PanimationWindow;
-class PAStateEditor : public fltk::Group
+class PAStateEditor : public Fl_Group
 {
 	public:
 		PAStateEditor(int x, int y, int w, int h, PanimationWindow* window);
@@ -34,33 +38,33 @@ class PAStateEditor : public fltk::Group
 
 		void loadMotions();
 		void loadStates();
-		static void changeStateEditorMode(fltk::Widget* widget, void* data);
-		static void updateStateTimeMarkEditor(fltk::Widget* widget, void* data, bool toAdd);
-		static void createNewState(fltk::Widget* widget, void* data);
-		static void addMotion(fltk::Widget* widget, void* data);
-		static void removeMotion(fltk::Widget* widget, void* data);
-		static void changeStateList(fltk::Widget* widget, void* data);
-		static void addStateTimeMark(fltk::Widget* widget, void* data);
-		static void removeStateTimeMark(fltk::Widget* widget, void* data);
-		static void updateStateTimeMark(fltk::Widget* widget, void* data);
+		static void changeStateEditorMode(Fl_Widget* widget, void* data);
+		static void updateStateTimeMarkEditor(Fl_Widget* widget, void* data, bool toAdd);
+		static void createNewState(Fl_Widget* widget, void* data);
+		static void addMotion(Fl_Widget* widget, void* data);
+		static void removeMotion(Fl_Widget* widget, void* data);
+		static void changeStateList(Fl_Widget* widget, void* data);
+		static void addStateTimeMark(Fl_Widget* widget, void* data);
+		static void removeStateTimeMark(Fl_Widget* widget, void* data);
+		static void updateStateTimeMark(Fl_Widget* widget, void* data);
 		void updateCorrespondenceMarks(PAStateData* state);
 		void refresh();
 
 	public:
 		PanimationWindow* paWindow;
-		fltk::CheckButton*	stateEditorMode;
-		fltk::Group*		createStateGroup;
-		fltk::Button*		createStateButton;
-		fltk::Input*		newStateName;
-		fltk::Browser*		animationList;
-		fltk::Browser*		stateAnimationList;
-		fltk::Button*		animationAdd;
-		fltk::Button*		animationRemove;
-		fltk::Group*		editStateTimeMarkGroup;
-		fltk::Choice*		stateList;
-		fltk::Button*		addMark;
-		fltk::Button*		removeMark;
-		fltk::Button*		updateMark;
+		Fl_Check_Button*	stateEditorMode;
+		Fl_Group*		createStateGroup;
+		Fl_Button*		createStateButton;
+		Fl_Input*		newStateName;
+		Fl_Multi_Browser*		animationList;
+		Fl_Multi_Browser*		stateAnimationList;
+		Fl_Button*		animationAdd;
+		Fl_Button*		animationRemove;
+		Fl_Scroll*		editStateTimeMarkGroup;
+		Fl_Choice*		stateList;
+		Fl_Button*		addMark;
+		Fl_Button*		removeMark;
+		Fl_Button*		updateMark;
 		ParamAnimEditorWidget* stateTimeMarkWidget;
 		nle::NonLinearEditorModel* stateEditorNleModel;
 };

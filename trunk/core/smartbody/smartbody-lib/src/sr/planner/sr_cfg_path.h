@@ -2,8 +2,8 @@
 # ifndef SR_CFG_PATH_H
 # define SR_CFG_PATH_H
 
-# include <SR/sr_output.h>
-# include <SR/sr_array.h>
+# include <sr/sr_output.h>
+# include <sr/sr_array.h>
 //# include <SR/sr_cfg_manager.h>
 # include "sr_cfg_manager.h"
 

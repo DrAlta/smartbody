@@ -26,7 +26,7 @@
 /** \file sr_timer.h 
  * Measure time and execution per second rates.*/
 
-# include <SR/sr.h>
+# include <sr/sr.h>
 
 /*! \class SrUtcTimer sr_timer.h
     \brief Get UTC time in seconds  */

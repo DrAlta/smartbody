@@ -27,11 +27,11 @@
  * manages a set of lines
  */
 
-# include <SR/sr_vec.h>
-# include <SR/sr_box.h>
-# include <SR/sr_color.h>
-# include <SR/sr_array.h>
-# include <SR/sr_polygon.h>
+# include <sr/sr_vec.h>
+# include <sr/sr_box.h>
+# include <sr/sr_color.h>
+# include <sr/sr_array.h>
+# include <sr/sr_polygon.h>
 
 /*! \class SrLines sr_lines.h
     \brief a set of lines

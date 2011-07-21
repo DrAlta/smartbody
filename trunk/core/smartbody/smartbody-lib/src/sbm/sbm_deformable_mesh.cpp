@@ -5,6 +5,21 @@
 #include "mcontrol_util.h"
 
 
+SkinWeight::SkinWeight()
+{
+}
+
+SkinWeight::~SkinWeight()
+{
+	for (unsigned int i = 0; i < infJoint.size(); i++)
+	{
+		SkJoint* j = infJoint[i];
+		if (j)
+			j = NULL;
+	}
+	infJoint.clear();
+}
+
 DeformableMesh::DeformableMesh() 
 {
 	binding = false;
@@ -15,8 +30,32 @@ DeformableMesh::DeformableMesh()
 DeformableMesh::~DeformableMesh() 
 {
 	skeleton->unref();
+	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
+		dMeshDynamic_p[i]->unref();
+	dMeshDynamic_p.clear();
+	for (unsigned int i = 0; i < dMeshStatic_p.size(); i++)
+		dMeshStatic_p[i]->unref();
+	dMeshStatic_p.clear();
+	for (unsigned int i = 0; i < skinWeights.size(); i++)
+	{
+		SkinWeight* sw = skinWeights[i];
+		if (sw)
+		{
+			delete sw;
+			sw = NULL;
+		}
+	}
+	skinWeights.clear();
 }
 
+
+void DeformableMesh::setSkeleton(SkSkeleton* skel)
+{
+	if (skeleton)
+		skeleton->unref();
+	skeleton = skel;
+	skel->ref();
+}
 
 void DeformableMesh::update()
 {
@@ -26,7 +65,7 @@ void DeformableMesh::update()
 	for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
 	{
 		SkinWeight* skinWeight = skinWeights[skinCounter];
-		std::map<std::string, std::vector<std::string>>::iterator iter = this->morphTargets.find(skinWeight->sourceMesh);
+		std::map<std::string, std::vector<std::string> >::iterator iter = this->morphTargets.find(skinWeight->sourceMesh);
 		size_t morphSize = 1;
 		if (iter != this->morphTargets.end())	morphSize = iter->second.size();	
 		for (size_t morphCounter = 0; morphCounter < morphSize; morphCounter++)

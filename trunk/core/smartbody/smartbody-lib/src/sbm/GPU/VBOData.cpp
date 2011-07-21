@@ -155,7 +155,7 @@ VBOData::VBOData( char* name, int type, ublas::vector<Vec4f>& Data )
 
 void VBOData::EnableClient( int ArrayType )
 {
-	if (ArrayType <= 3)
+	if (ArrayType <= 5)
 	{
 		//printf("Enable Vertex Attributes %d\n",ArrayType);
 		glEnableVertexAttribArray(ArrayType);
@@ -166,7 +166,7 @@ void VBOData::EnableClient( int ArrayType )
 
 void VBOData::DisableClient( int ArrayType )
 {
-	if (ArrayType <= 3)
+	if (ArrayType <= 5)
 	{
 		glDisableVertexAttribArray(ArrayType);
 	}

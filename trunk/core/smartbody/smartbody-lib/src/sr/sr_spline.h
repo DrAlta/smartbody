@@ -27,7 +27,7 @@
 # define SR_SPLINE_H
 
 # include <math.h>
-# include <SR/sr_array.h> 
+# include <sr/sr_array.h> 
 
 /*! \class SrSpline sr_spline.h
     \brief A N-dimensional piecewise cubic spline 

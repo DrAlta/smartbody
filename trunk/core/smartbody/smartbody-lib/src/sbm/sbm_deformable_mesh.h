@@ -4,9 +4,9 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <SR/sr_sn_shape.h>
-#include <SK/sk_skeleton.h>
-#include <SR/sr_model.h>
+#include <sr/sr_sn_shape.h>
+#include <sk/sk_skeleton.h>
+#include <sr/sr_model.h>
 
 class SkinWeight
 {
@@ -22,8 +22,8 @@ public:
 	std::vector<unsigned int>	jointNameIndex;	// looking up the joint name according to this index
 
 public:
-	SkinWeight() {};
-	~SkinWeight() {};
+	SkinWeight();
+	~SkinWeight();
 };
 
 /* This class is used to simulate and represent deformed mesh
@@ -35,13 +35,14 @@ public:
 	std::vector<SrSnModel*>		dMeshDynamic_p;
 	std::vector<SrSnModel*>		dMeshStatic_p;
 	std::vector<SkinWeight*>	skinWeights;
-	std::map<std::string, std::vector<std::string>> morphTargets;
+	std::map<std::string, std::vector<std::string> > morphTargets;
 	SkSkeleton*					skeleton;			// pointer to current skeleton
 	bool						binding;			// whether in deformable mesh mode
 
 public:
 	DeformableMesh();
 	~DeformableMesh();
+	void setSkeleton(SkSkeleton* skel);
 	virtual void update();
 	SkinWeight* getSkinWeight(std::string skinSourceName);
 	int	getMesh(std::string meshName);				// get the postion given the mesh name

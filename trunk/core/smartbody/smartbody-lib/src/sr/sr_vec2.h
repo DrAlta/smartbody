@@ -26,8 +26,9 @@
 # ifndef SR_VEC2_H
 # define SR_VEC2_H
 
-# include <SR/sr_input.h> 
-# include <SR/sr_output.h> 
+# include <sr/sr_input.h> 
+# include <sr/sr_output.h> 
+
 
 class SrVec2;
 
@@ -35,6 +36,9 @@ class SrVec2;
     making possible to distiguish points from vectors parameters when
     interpreting the meaning of parameters. */
 typedef SrVec2 SrPnt2;
+
+float ccw ( const SrVec2& p1, const SrVec2& p2, const SrVec2& p3 );
+float dist ( const SrPnt2& p1, const SrPnt2& p2 );
 
 /*! \class SrVec2 sr_vec2.h
     \brief Two dimensional vector. 

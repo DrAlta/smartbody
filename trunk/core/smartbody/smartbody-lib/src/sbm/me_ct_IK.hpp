@@ -24,7 +24,7 @@
 #define ME_CT_IK_HPP
 
 
-#include <ME/me_controller.h>
+#include <me/me_controller.h>
 #include "me_ct_IK_scenario.hpp"
 
 #pragma once

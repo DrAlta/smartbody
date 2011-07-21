@@ -47,7 +47,7 @@ MeCtHeadOrient::MeCtHeadOrient( void )	{
 
 MeCtHeadOrient::~MeCtHeadOrient( void )	{}
 
-void MeCtHeadOrient::init( void )	{
+void MeCtHeadOrient::init( SbmPawn* pawn )	{
 	char joint_labels[ 3 ][ MAX_JOINT_LABEL_LEN ] = {
 		"spine4",
 		"spine5",
@@ -59,7 +59,7 @@ void MeCtHeadOrient::init( void )	{
 		_channels.add( SkJointName( joint_labels[ i ] ), SkChannel::Quat );
 	}
 
-	MeController::init();
+	MeController::init(pawn);
 }
 
 void MeCtHeadOrient::set_orient( float dur, float p, float h, float r )	{
@@ -155,7 +155,7 @@ MeCtSimpleTilt::MeCtSimpleTilt( void )	{
 
 MeCtSimpleTilt::~MeCtSimpleTilt( void )	{}
 
-void MeCtSimpleTilt::init( void )	{
+void MeCtSimpleTilt::init( SbmPawn* pawn )	{
 	char joint_labels[ 3 ][ MAX_JOINT_LABEL_LEN ] = {
 		"spine4",
 		"spine5",
@@ -167,7 +167,7 @@ void MeCtSimpleTilt::init( void )	{
 		_channels.add( SkJointName( joint_labels[ i ] ), SkChannel::Quat );
 	}
 
-	MeController::init();
+	MeController::init(pawn);
 }
 
 void MeCtSimpleTilt::set_tilt( float dur, float angle_deg )	{
@@ -260,7 +260,7 @@ MeCtSimpleNod::MeCtSimpleNod( void )	{
 
 MeCtSimpleNod::~MeCtSimpleNod( void )	{}
 
-void MeCtSimpleNod::init( void )	{
+void MeCtSimpleNod::init( SbmPawn* pawn )	{
 	char joint_labels[ 3 ][ MAX_JOINT_LABEL_LEN ] = {
 		"spine4",
 		"spine5",
@@ -274,11 +274,12 @@ void MeCtSimpleNod::init( void )	{
 
 	_first_eval = true;
 
-	MeController::init();
+	MeController::init(pawn);
 }
 
 void MeCtSimpleNod::set_nod( float dur, float mag, float rep, int aff, float smooth )	{
 	
+	_mode = NOD_SIMPLE;
 	_duration = dur;
 	_magnitude = mag;
 	_repetitions = rep;
@@ -288,11 +289,36 @@ void MeCtSimpleNod::set_nod( float dur, float mag, float rep, int aff, float smo
 
 void MeCtSimpleNod::controller_start()	{}
 
+float MeCtSimpleNod::calc_wiggle_curve( float t, float warp, float accel_pow )	{
+
+	double a = warp * pow( (double)t, (double)accel_pow );	// sine acceleration curve
+	double p = pow( (double)t, 2.0 * (double)accel_pow );	// decay power function
+	if( p < 0.000000001 ) p = 0.000000001;
+
+	double d = t / ( p * warp );			// decay envelope
+	double v = ( ( 1.0 + cos( M_PI + a * M_PI ) ) * 0.5 ) * d;
+	
+	return( (float)v );
+}
+
+float MeCtSimpleNod::calc_waggle_curve( float t, float length, float pitch, float warp, float accel_pow, float decay_pow )	{
+
+	double u = t / length;					// normalized traversal
+	double a = warp * pow( (double)t, (double)accel_pow );	// sine acceleration curve
+
+	double A = pow( u, (double)decay_pow ); 		// decay acceleration
+	double d = sin( A * M_PI ) * 0.5;		// decay envelope
+	
+	double p = -M_PI * 0.5 * pitch; 		// pitch adjustment
+	double v = ( sin( p + a * M_PI ) - sin( p ) ) * d;
+	return( (float)v );
+}
+
 bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 	
 	if( _duration > 0.0 )	{
 		if( t > (double)_duration * 2.0) {
-			return( FALSE );
+			return( false );
 		}
 	}
 
@@ -302,15 +328,34 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 		dt = 0.001f;
 	}
 	else	{
-		dt = (float)(t - _prev_time);
+		dt = (float)( t - _prev_time );
 	}
 	_prev_time = t;
 
 	float angle_deg = 0;
 	if (t <= (double) _duration)
 	{
-		float x = (float)( t / (double)_duration );
-		angle_deg = (float)( -_magnitude * sin( x * 2.0 * M_PI * _repetitions ) );
+		if( _mode == NOD_SIMPLE )	{
+			float x = (float)( t / (double)_duration );
+			angle_deg = (float)( -_magnitude * sin( x * 2.0 * M_PI * _repetitions ) );
+		}
+		else
+		if( _mode == NOD_WIGGLE )	{
+			
+			float scale_time = (float)t / _period;
+			angle_deg = -_magnitude * calc_wiggle_curve( scale_time, _warp, _accel_pow );
+		}
+		else
+		if( _mode == NOD_WAGGLE )	{
+
+			float scale_time = (float)t / _period;
+			float scale_dur = _duration / _period;
+			angle_deg =  -_magnitude * calc_waggle_curve( scale_time, scale_dur, _pitch, _warp, _accel_pow, _decay_pow );
+		}
+		else	{
+			LOG( "MeCtSimpleNod::controller_evaluate ERR: mode %d not recognized" );
+			return( false );
+		}
 	}
 	
 	SrBuffer<float>& buff = frame.buffer();

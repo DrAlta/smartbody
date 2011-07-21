@@ -1,15 +1,16 @@
 #include "CharacterCreatorWindow.h"
 #include <sbm/mcontrol_util.h>
 #include <sstream>
-#include <fltk/ask.h>
+#include <FL/fl_ask.H>
 
-CharacterCreatorWindow::CharacterCreatorWindow(int x, int y, int w, int h, char* name) : Window(x, y, w, h, name)
+CharacterCreatorWindow::CharacterCreatorWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(x, y, w, h, name)
 {
 	begin();
-	browserSkeletons = new fltk::Browser(10, 30, 300, 300, "Skeletons");
-	inputName = new fltk::Input(100, 360, 100, 25, "Name");
-	buttonCreate = new fltk::Button(10, 390, 60, 25, "Create");
-	buttonCreate->callback(CreateCB, this);
+		choiceSkeletons = new Fl_Choice(100, 30, 300, 25, "Skeleton");
+		choiceSkeletons->when(FL_WHEN_CHANGED);
+		inputName = new Fl_Input(100, 70, 100, 25, "Name");
+		buttonCreate = new Fl_Button(100, 95, 60, 25, "Create");
+		buttonCreate->callback(CreateCB, this);
 	end();
 }
 
@@ -19,33 +20,33 @@ CharacterCreatorWindow::~CharacterCreatorWindow()
 
 void CharacterCreatorWindow::setSkeletons(std::vector<std::string>& skeletonNames)
 {
-	browserSkeletons->clear();
+	choiceSkeletons->clear();
 
 	for (size_t x = 0; x < skeletonNames.size(); x++)
 	{
-		browserSkeletons->add(skeletonNames[x].c_str());
+		choiceSkeletons->add(skeletonNames[x].c_str());
 	}
 }
 
-void CharacterCreatorWindow::CreateCB(fltk::Widget* w, void* data)
+void CharacterCreatorWindow::CreateCB(Fl_Widget* w, void* data)
 {
 	CharacterCreatorWindow* creator = (CharacterCreatorWindow*) (data);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	if (creator->inputName->size() == 0)
 	{
-		fltk::alert("Please enter a character name.");
+		fl_alert("Please enter a character name.");
 		return;
 	}
 
 	SbmCharacter* character = mcu.character_map.lookup(creator->inputName->value());
 	if (character)
 	{
-		fltk::alert("Character name already exists.");
+		fl_alert("Character name already exists.");
 		return;
 	}
 
-	std::string skel = creator->browserSkeletons->child(creator->browserSkeletons->value())->label();
+	std::string skel = creator->choiceSkeletons->menu()[creator->choiceSkeletons->value()].label();
 	
 
 	std::stringstream strstr;

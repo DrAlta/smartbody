@@ -26,7 +26,7 @@
  * groups scene nodes
  */
 
-# include <SR/sr_sn.h>
+# include <sr/sr_sn.h>
 
 //======================================= SrSnGroup ====================================
 

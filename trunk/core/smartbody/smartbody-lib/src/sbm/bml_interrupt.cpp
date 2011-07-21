@@ -31,11 +31,7 @@
 #include "bml_interrupt.hpp"
 #include "xercesc_utils.hpp"
 #include "bml_xml_consts.hpp"
-
-
-////// XML ATTRIBUTES
-const XMLCh ATTR_ACT[] = L"act";
-
+#include "BMLDefs.h"
 
 
 using namespace std;
@@ -73,12 +69,14 @@ namespace BML {
 
 			ostringstream out;
 			out << "bp interrupt " << request->actorId << ' ' << performance_id << ' ' << duration;
-			commands.push_back( new SbmCommand( out.str(), (float)strokeAt ) );
+			string out_str = out.str();
+			commands.push_back( new SbmCommand( out_str, (float)strokeAt ) );
 
 			if( ECHO_BP_INTERRUPT_COMMAND ) {
 				ostringstream out2;
 				out2 << "echo " << out.str();
-				commands.push_back( new SbmCommand( out2.str(), (float)strokeAt ) );
+				string out2_str = out2.str();
+				commands.push_back( new SbmCommand( out2_str, (float)strokeAt ) );
 			}
 
 			realize_sequence( commands, mcu );
@@ -88,14 +86,30 @@ namespace BML {
 
 
 BehaviorRequestPtr BML::parse_bml_interrupt( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
-    const XMLCh* tag      = elem->getTagName();
 
-	const XMLCh* id = elem->getAttribute(ATTR_ID);
+	std::string local_id = xml_parse_string( BMLDefs::ATTR_ID, elem );
+	std::string perf_id = xml_parse_string( BMLDefs::TAG_ACT, elem );
+	if( !perf_id.empty() )	{
+		BehaviorRequestPtr interrupt( new InterruptBehavior( unique_id, local_id, perf_id, behav_syncs ) );
+		return( interrupt );
+	}
+
+	std::string tag = xml_translate_string( elem->getTagName() );
+	std::string act = xml_translate_string( BMLDefs::TAG_ACT );
+	std::stringstream strm;
+    strm << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag missing "<<act<<"= attribute." << endl;
+	LOG( strm.str().c_str() );
+	return BehaviorRequestPtr();  // a.k.a., NULL
+
+#if 0
+	const XMLCh* tag      = elem->getTagName();
+
+	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
 	if (id)
 		localId = XMLString::transcode(id);
 
-	const XMLCh* performanceId = elem->getAttribute( ATTR_ACT );
+	const XMLCh* performanceId = elem->getAttribute( BMLDefs::TAG_ACT );
 	if( performanceId && *performanceId != 0 ) {
 		// performanceId is ASCII, not Unicode
 		char* temp_ascii_id = XMLString::transcode( performanceId );
@@ -105,8 +119,9 @@ BehaviorRequestPtr BML::parse_bml_interrupt( DOMElement* elem, const std::string
 		return interrupt;
     } else {
 		std::wstringstream wstrstr;
-        wstrstr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag missing "<<ATTR_ACT<<"= attribute." << endl;
+        wstrstr << "WARNING: BodyPlannerImpl::parseBML(): <"<<tag<<"> BML tag missing "<<BMLDefs::TAG_ACT<<"= attribute." << endl;
 		LOG(convertWStringToString(wstrstr.str()).c_str());
 		return BehaviorRequestPtr();  // a.k.a., NULL
     }
+#endif
 }

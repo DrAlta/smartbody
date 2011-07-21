@@ -37,6 +37,7 @@
 #include "time.h"
 
 #include "xercesc_utils.hpp"
+#include "BMLDefs.h"
 
 
 using namespace std;
@@ -48,10 +49,6 @@ using namespace SmartBody;
 #define LOG_RHETORIC_SPEECH (0)
 
 
-const XMLCh* TAG_VISEME = L"viseme";
-const XMLCh* ATTR_TYPE  = L"type";
-const XMLCh* ATTR_START = L"start";
-const XMLCh* TAG_SOUND = L"soundFile"; //this tag is used to rename the soundFile by Remote speech process
 
 #define USE_CURVES_FOR_VISEMES 0
 
@@ -120,12 +117,20 @@ RequestId remote_speech::requestSpeechAudio( const char* agentName, std::string 
 	char timebuf[128];
 	char datebuf[128];  //time and date are needed to name the sound correctly
 	char tmpdatebuf[128];
+#ifdef WIN32
 	_tzset();
 	_strtime(timebuf);
 	_strdate(datebuf);
 	//following puts the date and time in the correct format (yyymmdd_hhmmss)
 	timebuf[2]=timebuf[3]; timebuf[3]=timebuf[4]; timebuf[4]=timebuf[6];timebuf[5]=timebuf[7]; timebuf[6]=NULL; timebuf[7]=NULL; //gets rid of colon in between time
 	tmpdatebuf[0]= '2';tmpdatebuf[1]='0';tmpdatebuf[2]=datebuf[6];tmpdatebuf[3]=datebuf[7];tmpdatebuf[4]=datebuf[0];tmpdatebuf[5]=datebuf[1];tmpdatebuf[6]=datebuf[3];tmpdatebuf[7]=datebuf[4]; tmpdatebuf[8]=NULL;
+#else
+	tzset();
+	time_t t;
+	struct tm* tmTime = localtime(&t);
+	strftime(timebuf, 128, "%H%M%S", tmTime); 
+	strftime(tmpdatebuf, 128, "%Y%m%d", tmTime);
+#endif
 	string date= tmpdatebuf;
 	string time= timebuf;
 	if( LOG_RHETORIC_SPEECH ) LOG(tmpdatebuf, "\n");
@@ -179,7 +184,8 @@ The timestamp is 20051121_150427 (that is, YYYYMMDD_HHMMSS ), so we can check ol
 	rVoiceTimeout->insert( (float)(timeOut), argumentString.c_str() );
 	
 	char* seqName = new char[ 18+myStream.str().length()+1 ];  // 18 for RemoteSpeechTimeOut, 1 for \0
-	sprintf( seqName, "RemoteSpeechTimeOut", myStream.str() );  // Anm - huh?? No % in format arg.
+//	sprintf( seqName, "RemoteSpeechTimeOut", myStream.str() );  // Anm - huh?? No % in format arg.
+	sprintf( seqName, "RemoteSpeechTimeOut" );  // Anm - huh?? No % in format arg.
 	mcu.active_seq_map.remove( seqName );  // remove old sequence by this name
 	if( mcu.active_seq_map.insert( seqName, rVoiceTimeout ) != CMD_SUCCESS ) {
 		LOG( "remote_speech::rVoiceTimeOut ERR:insert Rvoice timeoutCheck into active_seq_map FAILED, msgId=%s\n", seqName ); 
@@ -200,7 +206,7 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 		DOMElement *element= (DOMElement *)node; //instantiate an element using this node
 		//string tag= XMLString::transcode(element->getTagName()); //find the element tag  // Anm replaced with compareString
 		//if( tag == "VISEME" ) {
-		if( XMLString::compareString( element->getTagName(), TAG_VISEME )==0 ){
+		if( XMLString::compareString( element->getTagName(), BML::BMLDefs::TAG_VISEME )==0 ){
 			
 			char* id = NULL;
 
@@ -209,13 +215,13 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 				//string type= XMLString::transcode(attributes->item(i)->getNodeName());
 				const XMLCh* attr = attributes->item(i)->getNodeName();
 				//if(type=="TYPE"){
-				if( XMLString::compareString( attr, ATTR_TYPE )==0 ) {
+				if( XMLString::compareString( attr, BML::BMLDefs::ATTR_TYPE )==0 ) {
 					string temp= XMLString::transcode(attributes->item(i)->getNodeValue());
 					id = new char[temp.length() + 1];
 					strcpy(id, temp.c_str());
 				}
 				//if(type=="SRT_START"){
-				else if( XMLString::compareString( attr, ATTR_START )==0 ) {
+				else if( XMLString::compareString( attr, BML::BMLDefs::ATTR_START )==0 ) {
 					string temp=XMLString::transcode(attributes->item(i)->getNodeValue());
 					//FLOAT_EQ(startTime,atof(temp.c_str()));  // Huh???
 					startTime = (float)atof(temp.c_str());
@@ -426,9 +432,12 @@ float remote_speech::getMarkTime( RequestId requestId, const XMLCh* markId ){
 		return -1;
 	}
 	DOMDocument* XMLDoc= node->getOwnerDocument(); //gets the dom document
-	XMLCh* markTag= L"mark"; //the tag for any mark 
-	DOMNodeList* marks= XMLDoc->getElementsByTagName(markTag); //looks through the DOMDocument and extracts every mark tag and puts it in a list
 
+//	XMLCh* markTag= L"mark"; //the tag for any mark 
+	XMLCh* markTag = xml_utils::xmlch_translate( "mark" ); //the tag for any mark 
+	DOMNodeList* marks= XMLDoc->getElementsByTagName(markTag); //looks through the DOMDocument and extracts every mark tag and puts it in a list
+//	xml_utils::xmlch_release( &markTag );
+	
 		int foundFlag=0; //this will be set to 1 when a mark tag matches the markId
 
 		for(XMLSize_t w=0; w<marks->getLength(); w++){ //goes through every element in the DOMNodeList
@@ -444,11 +453,13 @@ float remote_speech::getMarkTime( RequestId requestId, const XMLCh* markId ){
 			}
 			if(foundFlag==1 && type=="time"){ //if foundFlag==1 then find the time attribute and return it's value 
 				string temp=XMLString::transcode(attributes->item(r)->getNodeValue());
+	xml_utils::xmlch_release( &markTag );
 				return( float(atof(temp.c_str())));
 			}
 		}
 		}
 //	wstrstr << "ERROR: remote_speech::getMarkTime("<<requestId<<",\""<<markId<<"\"): Mark Id Not Found" << endl; //if nothing is found print error message and return -1
+	xml_utils::xmlch_release( &markTag );
 	return -1;
 }
 
@@ -534,7 +545,7 @@ int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgI
 				
 			/*this section of code changes the sound file name if Remote speech process sends a new sound file name; by default it will send the global path of the initial file name sent
 			this only occurs if the soundFile tag is found in the RemoteSpeechReply xml message*/
-			DOMNodeList* findSpeechFile= replyDoc->getElementsByTagName(TAG_SOUND); 
+					DOMNodeList* findSpeechFile= replyDoc->getElementsByTagName(BML::BMLDefs::TAG_SOUND); 
 			if (findSpeechFile->item(0))
 			{
 				if(remote_speech::soundLookUp.lookup(msgID)){
@@ -650,7 +661,8 @@ int remoteSpeechReady_func(srArgBuffer& args, mcuCBHandle* mcu_p){
 			LOG(where);
 
 			//Delete This- THis is just to test the get mark time fcn!!
-			cout<<endl<<"Mark Time: "<<x.getMarkTime(reqId, L"mark")<<endl;
+//			cout<<endl<<"Mark Time: "<<x.getMarkTime(reqId, L"mark")<<endl;
+
 		}
 	} else {
 		// Speech failed
@@ -664,15 +676,17 @@ int remoteSpeechReady_func(srArgBuffer& args, mcuCBHandle* mcu_p){
 int remote_speech_test( srArgBuffer& args, mcuCBHandle* mcu_p ) { //Tester function for remote Speech 
 	try{
 		if( LOG_RHETORIC_SPEECH ) LOG("\n \n *************In remote_speech_test***************** \n \n");
-		char* x= "<?xml version=\"1.0\" encoding=\"UTF-8\"?><speak> Something <mark name=\"hello\"/> to <mark name=\"mark\"/> say <mark name= \"wtf\"/>  </speak>";
+//		char* x= "<?xml version=\"1.0\" encoding=\"UTF-8\"?><speak> Something <mark name=\"hello\"/> to <mark name=\"mark\"/> say <mark name= \"wtf\"/>  </speak>";
+		char *x = (char*)"WTF?";
+		
 		XercesDOMParser *xmlParser;
 		xmlParser = new XercesDOMParser();
 		xmlParser->setErrorHandler( new HandlerBase() );
 		DOMDocument *xmlDoc = xml_utils::parseMessageXml( xmlParser, x);
 		DOMNode *funNode= xmlDoc->getDocumentElement();
 		remote_speech anchor;
-		char *tre= "doctor";
-		char *command= "RemoteSpeechReplyRecieved";
+		char *tre= (char*)"doctor";
+		char *command= (char*)"RemoteSpeechReplyRecieved";
 		anchor.requestSpeechAudio(tre, "test", funNode, command);
 	
 		return(CMD_SUCCESS);

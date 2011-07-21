@@ -29,15 +29,17 @@
 class SrCylinder;
 class SrSphere;
 
-# include <SR/sr_box.h>
-# include <SR/sr_vec.h>
-# include <SR/sr_mat.h>
-# include <SR/sr_vec2.h>
-# include <SR/sr_line.h>
-# include <SR/sr_string.h>
-# include <SR/sr_material.h>
-# include <SR/sr_string_array.h>
-# include <SR/sr_shared_class.h>
+# include <sr/sr_box.h>
+# include <sr/sr_vec.h>
+# include <sr/sr_mat.h>
+# include <sr/sr_vec2.h>
+# include <sr/sr_line.h>
+# include <sr/sr_string.h>
+# include <sr/sr_material.h>
+# include <sr/sr_string_array.h>
+# include <sr/sr_shared_class.h>
+#include <map>
+#include <string>
 
 /*! \class SrModel sr_model.h
     \brief a model composed of triangular faces
@@ -64,13 +66,17 @@ class SrModel : public SrSharedClass
      };
 
     SrArray<SrMaterial> M;  //!< Used materials
-    SrArray<SrPnt>      V;  //!< Vertices coordinates
-    SrArray<SrVec>      N;  //!< Normals table
+    SrArray<SrPnt>      V;  //!< Vertices coordinates		
+    SrArray<SrVec>      N;  //!< Normals table		
+	SrArray<SrVec>      Tangent, BiNormal; // tangent and binormal vectors
     SrArray<SrPnt2>     T;  //!< Texture coordinates
     SrArray<Face>       F;  //!< Triangular faces indices to V
     SrArray<int>       Fm;  //!< Indices to the materials in M (size can be<F.size())
     SrArray<Face>      Fn;  //!< Indices to the normals in N (size can be<F.size())
     SrArray<Face>      Ft;  //!< Indices to the texture coordinates in T
+
+	std::map<std::string,std::string> mtlTextureNameMap; // map from material name to texture name
+	std::map<std::string,std::string> mtlNormalTexNameMap;
 
     /*! Will be set to true (the default) if back face culling
         should be applied, and false othrwise */
@@ -88,6 +94,8 @@ class SrModel : public SrSharedClass
 
     /*! Virtual Destructor */
     virtual ~SrModel ();
+
+	void computeTangentBiNormal(); // build the tangent and binormal vectors for each vertex. Used for tangent space normal mapping
 
     /*! Returns true if the model has no faces, and false otherwise */
     bool empty () { return F.empty(); }

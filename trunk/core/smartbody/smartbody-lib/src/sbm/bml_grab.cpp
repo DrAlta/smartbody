@@ -38,26 +38,10 @@
 #include "bml_target.hpp"
 #include "bml_xml_consts.hpp"
 #include "xercesc_utils.hpp"
+#include "BMLDefs.h"
 
 
 #define TEST_GAZE_LOCOMOTION 0 // set to 1 if want to test gaze+locomotion control when reaching
-
-////// XML Tags
-const XMLCh TAG_DESCRIPTION[] = L"description";
-
-////// BML Description Type
-const XMLCh DTYPE_SBM[]  = L"ICT.SBM";
-
-////// XML ATTRIBUTES
-const XMLCh ATTR_WRIST[] = L"sbm:wrist";
-const XMLCh ATTR_SOURCE_JOINT[] = L"sbm:source-joint";
-const XMLCh ATTR_ATTACH_PAWN[] = L"sbm:attach-pawn";
-const XMLCh ATTR_RELEASE_PAWN[] = L"sbm:release-pawn";
-const XMLCh ATTR_GRAB_VELOCITY[] = L"sbm:grab-velocity";
-const XMLCh ATTR_GRAB_STATE[] = L"sbm:grab-state";
-const XMLCh ATTR_GRAB_TYPE[] = L"sbm:grab-type";
-const XMLCh ATTR_FADE_OUT[]		= L"sbm:fade-out";
-const XMLCh ATTR_FADE_IN[]		= L"sbm:fade-in";
 
 using namespace std;
 using namespace BML;
@@ -69,7 +53,7 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 	const XMLCh* tag      = elem->getTagName();
 	std::wstringstream wstrstr;	
 	MeCtHand* handCt = NULL; 
-	const XMLCh* attrHandle = elem->getAttribute( ATTR_HANDLE );
+	const XMLCh* attrHandle = elem->getAttribute( BMLDefs::ATTR_HANDLE );
 	std::string handle = "";
 	if( attrHandle && XMLString::stringLen( attrHandle ) ) {
 		handle = asciiString(attrHandle);
@@ -90,7 +74,7 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 		}
 	}
 
-	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
+	const XMLCh* attrTarget = elem->getAttribute( BMLDefs::ATTR_TARGET );
 	const SbmPawn* target_pawn = NULL;
 	if (attrTarget && XMLString::stringLen( attrTarget ))
 	{
@@ -99,7 +83,7 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 
 	const XMLCh* attrWrist = NULL;
 	const char* wristName = NULL;
-	attrWrist = elem->getAttribute(ATTR_WRIST);	
+	attrWrist = elem->getAttribute(BMLDefs::ATTR_WRIST);	
 	SkJoint* wristJoint = NULL;
 	if( attrWrist && XMLString::stringLen( attrWrist ) ) 
 	{
@@ -108,67 +92,37 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 	}
 
 	const XMLCh* attrSourceJoint = NULL;
-	const char* sourceJointName = NULL;
-	attrSourceJoint = elem->getAttribute(ATTR_SOURCE_JOINT);		
-	if( attrSourceJoint && XMLString::stringLen( attrSourceJoint ) ) 
-	{
-		sourceJointName = asciiString(attrSourceJoint);						
-	}
-
-	const XMLCh* attrAttachPawn = elem->getAttribute( ATTR_ATTACH_PAWN );
+	std::string sourceJointName = xml_parse_string(BMLDefs::ATTR_SOURCE_JOINT,elem,"",false);
+	
+	const XMLCh* attrAttachPawn = elem->getAttribute( BMLDefs::ATTR_ATTACH_PAWN );
 	const SbmPawn* attachPawn = NULL;
 	if (attrAttachPawn && XMLString::stringLen( attrAttachPawn ))
 	{
 		attachPawn = parse_target_pawn( tag, attrAttachPawn, mcu );		
 	}
 
+	std::string grabType = xml_parse_string(BMLDefs::ATTR_GRAB_TYPE,elem,"right",false);
+
+
 	if (wristJoint == NULL && !handCt) {  // Invalid target.  Assume parse_target(..) printed error.
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 
-	const XMLCh* attrGrabVelocity = elem->getAttribute( ATTR_GRAB_VELOCITY );
-	float grabVelocity = -1.f;
-	if(attrGrabVelocity != NULL && attrGrabVelocity[0] != '\0') 
-	{
-		if( !( wistringstream( attrGrabVelocity ) >> grabVelocity) )
-		{
-			std::stringstream strstr;
-			strstr << "WARNING: Failed to parse grab-velocity interval attribute \""<< XMLString::transcode(attrGrabVelocity) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
-			LOG(strstr.str().c_str());
-		}
-	}
+	float grabVelocity = xml_parse_float(BMLDefs::ATTR_GRAB_VELOCITY,elem,-1.f,false);
+	
+	float fadeOutTime = xml_parse_float(BMLDefs::ATTR_FADE_OUT,elem,-1.f,false);
+	float fadeInTime = xml_parse_float(BMLDefs::ATTR_FADE_IN,elem,-1.f,false);
 
-	float fadeOutTime = -1.0;
-	float fadeInTime = -1.0;
-	const XMLCh* attrFadeOut = elem->getAttribute( ATTR_FADE_OUT );
-	if(attrFadeOut != NULL && attrFadeOut[0] != '\0') 
-	{
-		if( !( wistringstream( attrFadeOut ) >> fadeOutTime ) )
-		{
-			std::stringstream strstr;
-			strstr << "WARNING: Failed to parse fade-out interval attribute \""<< XMLString::transcode(attrFadeOut) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
-			LOG(strstr.str().c_str());
-		}
-	}
 
-	const XMLCh* attrFadeIn = elem->getAttribute( ATTR_FADE_IN );
-	if(attrFadeIn != NULL && attrFadeIn[0] != '\0') 
-	{
-		if( !( wistringstream( attrFadeIn ) >> fadeInTime ) )
-		{
-			std::stringstream strstr;
-			strstr << "WARNING: Failed to parse fade-in interval attribute \""<< XMLString::transcode(attrFadeIn) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
-			LOG(strstr.str().c_str());
-		}
-	}
 
-	std::string grabType = xml_parse_string(ATTR_GRAB_TYPE,elem,"right",false);
 
-	const XMLCh* id = elem->getAttribute(ATTR_ID);
-	std::string localId;
-	if (id)
-		localId = XMLString::transcode(id);
+	const char* attrFadeOut = xml_utils::asciiString(elem->getAttribute( BMLDefs::ATTR_FADE_OUT ));
+	const char* attrFadeIn = xml_utils::asciiString(elem->getAttribute( BMLDefs::ATTR_FADE_IN ));
+	
 
+	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
+	std::string localId = xml_parse_string(BMLDefs::ATTR_ID,elem,"",false);
+	
 	bool bCreateNewController = false;
 	
 	if (!handCt)
@@ -183,37 +137,32 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 		bCreateNewController = true;
 	}
 
-	const XMLCh* attrGrabState = NULL;
-	attrGrabState = elem->getAttribute(ATTR_GRAB_STATE);
-	if( attrGrabState && XMLString::stringLen( attrGrabState ) ) 
-	{
-		if( XMLString::compareIString( attrGrabState, L"start" )==0 ) 
-		{			
-			handCt->setGrabState(MeCtHand::GRAB_START);
-		}
-		else if( XMLString::compareIString( attrGrabState, L"reach" )==0 )
-		{			
-			handCt->setGrabState(MeCtHand::GRAB_REACH);
-		}
-		else if( XMLString::compareIString( attrGrabState, L"finish" )==0 )
-		{			
-			handCt->setGrabState(MeCtHand::GRAB_FINISH);
-		}
-		else if( XMLString::compareIString( attrGrabState, L"return" )==0 )
-		{			
-			handCt->setGrabState(MeCtHand::GRAB_RETURN);
-		}
-	}	
-
-	const XMLCh* attrReleasePawn = NULL;
-	attrReleasePawn = elem->getAttribute(ATTR_RELEASE_PAWN);
-	if( attrReleasePawn && XMLString::stringLen( attrReleasePawn ) ) 
-	{
-		if( XMLString::compareIString( attrReleasePawn, L"true" )==0 ) 
-		{			
-			handCt->releasePawn();
-		}
+	std::string attrGrabState = xml_parse_string(BMLDefs::ATTR_GRAB_STATE,elem,"",false);
+	if( stringICompare(attrGrabState,"start") ) 
+	{			
+		handCt->setGrabState(MeCtHand::GRAB_START);
 	}
+	else if( stringICompare(attrGrabState,"reach") )
+	{			
+		handCt->setGrabState(MeCtHand::GRAB_REACH);
+	}
+	else if( stringICompare(attrGrabState,"finish") )
+	{			
+		handCt->setGrabState(MeCtHand::GRAB_FINISH);
+	}
+	else if( stringICompare(attrGrabState,"return") )
+	{			
+		handCt->setGrabState(MeCtHand::GRAB_RETURN);
+	}
+		
+
+	std::string attrReleasePawn = xml_parse_string(BMLDefs::ATTR_RELEASE_PAWN,elem,"",false);
+	attrReleasePawn = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_RELEASE_PAWN));
+	if( stringICompare(attrReleasePawn,"true") ) 
+	{			
+		handCt->releasePawn();
+	}
+	
 
 	if (grabVelocity > 0)
 		handCt->grabVelocity = grabVelocity;
@@ -222,7 +171,7 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 		handCt->setGrabTargetObject(target_pawn->colObj_p);		
 	}
 
-	if (attachPawn && sourceJointName)
+	if (attachPawn && !sourceJointName.empty())
 	{
 		std::string jointName = sourceJointName;
 		SbmPawn* pawn = const_cast<SbmPawn*>(attachPawn);

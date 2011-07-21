@@ -23,12 +23,12 @@
 #ifndef ME_CT_LOCOMOTION_NAVIGATOR_HPP
 #define ME_CT_LOCOMOTION_NAVIGATOR_HPP
 
-//#include <ME/me_controller.h>
+//#include <me/me_controller.h>
 #include "me_ct_locomotion_limb.hpp"
 #include "me_ct_locomotion_routine.hpp"
 #include "me_ct_locomotion_speed_accelerator.hpp"
 #include "me_ct_locomotion_limb_direction_planner.hpp"
-#include "ME/me_ct_channel_writer.hpp"
+#include "me/me_ct_channel_writer.hpp"
 
 #pragma once
 

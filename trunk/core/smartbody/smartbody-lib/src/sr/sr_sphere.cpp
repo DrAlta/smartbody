@@ -20,8 +20,8 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
 
-# include <SR/sr_sphere.h>
-# include <SR/sr_box.h>
+# include <sr/sr_sphere.h>
+# include <sr/sr_box.h>
 
 //================================== SrSphere ====================================
 
