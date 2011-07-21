@@ -142,20 +142,8 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 
 
 	std::string locotype = xml_parse_string(BMLDefs::ATTR_TYPE, elem);
-	if (locotype == "procedural")
-	{
-		mcu->locomotion_type = mcu->Procedural;
-		c->steeringAgent->desiredSpeed = 1.6f;
-	}
-	else if (locotype == "example")
-	{
-		if (mcu->checkExamples())
-			mcu->locomotion_type = mcu->Example;
-		else
-			mcu->locomotion_type = mcu->Basic;
-	}
-	else if (locotype == "basic")
-		mcu->locomotion_type = mcu->Basic;
+	std::string steerTypeCommand = "steer type " + locotype;
+	mcu->execute((char*) steerTypeCommand.c_str());
 	float proximity = xml_parse_float(BMLDefs::ATTR_PROXIMITY, elem, c->steeringAgent->distThreshold / 100.0f);
 	c->steeringAgent->distThreshold = proximity * 100.0f;
 	c->steeringAgent->acceleration = xml_parse_float(BMLDefs::ATTR_STEERACCEL, elem, c->steeringAgent->acceleration);

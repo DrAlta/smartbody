@@ -84,7 +84,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="if not exist lib mkdir lib&#x0D;&#x0A;copy /Y &quot;$(TargetPath)&quot; ..\..\..\..\..\core\smartbody\sbm\bin"
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -157,7 +157,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="if not exist lib mkdir lib&#x0D;&#x0A;copy /Y &quot;$(TargetPath)&quot; ..\..\..\..\..\core\smartbody\sbm\bin&#x0D;&#x0A;"
+				CommandLine=""
 			/>
 		</Configuration>
 	</Configurations>
