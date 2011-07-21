@@ -776,7 +776,7 @@ void mcuCBHandle::update( void )	{
 		}
 	}
 
-	if (physicsEngine)// && physicsEngine->getBoolAttribute("enable"))
+	if (physicsEngine && physicsEngine->getBoolAttribute("enable"))
 	{		
 		static float dt = 0.005f;//timeStep*0.03f;
 		//elapseTime += time_dt;

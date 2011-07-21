@@ -522,7 +522,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( name, classType, mcuCBHandle::singleton().net_face_bones );
 
 	if ( mcuCBHandle::singleton().sbm_character_listener )
-	{
+	{		
 		mcuCBHandle::singleton().sbm_character_listener->OnCharacterCreate( name, classType );
 	}
 
@@ -843,6 +843,13 @@ int SbmCharacter::init_skeleton() {
 
 	// Rebuild the active channels to include new joints
 	skeleton_p->make_active_channels();
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	if (mcu.sbm_character_listener)
+	{
+		mcu.sbm_character_listener->OnCharacterChanged(name);
+	}
+
 
 	// keep record of viseme channel start index
 	if (viseme_start_name != "")
@@ -2996,4 +3003,9 @@ SrVec SbmCharacter::getFacingDirection()
 	charDir = charDir*mat;
 	charDir.normalize();
 	return charDir;
+}
+
+void SbmCharacter::setJointCollider( std::string jointName, float size )
+{
+		
 }

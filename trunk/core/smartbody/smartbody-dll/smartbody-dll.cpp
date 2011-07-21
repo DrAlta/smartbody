@@ -52,9 +52,10 @@ class Smartbody_dll_SBMCharacterListener_Internal : public SBMCharacterListener
 
       virtual void OnCharacterCreate( const string & name, const string & objectClass )
       {
+		  
          if ( m_dll->m_listener )
          {
-            m_dll->m_listener->OnCharacterCreate( name, objectClass );
+			 m_dll->m_listener->OnCharacterCreate( name, objectClass );
          }
       }
 
@@ -62,6 +63,14 @@ class Smartbody_dll_SBMCharacterListener_Internal : public SBMCharacterListener
       {
          if ( m_dll->m_listener )
          {
+			 std::map<std::string,SmartbodyCharacter*>::iterator mi = m_dll->m_characters.find(name);
+			 SmartbodyCharacter* pc = NULL;
+			 if (mi != m_dll->m_characters.end())
+			 {
+				 pc = mi->second;				  
+				 delete pc;
+				 m_dll->m_characters.erase(mi);				  
+			 }		
             m_dll->m_listener->OnCharacterDelete( name );
          }
       }
@@ -73,6 +82,22 @@ class Smartbody_dll_SBMCharacterListener_Internal : public SBMCharacterListener
             m_dll->m_listener->OnViseme( name, visemeName, weight, blendTime );
          }
       }
+
+	  virtual void OnCharacterChanged( const std::string& name ) 
+	  {
+		  if ( m_dll->m_listener )
+		  {
+			  std::map<std::string,SmartbodyCharacter*>::iterator mi = m_dll->m_characters.find(name);
+			  SmartbodyCharacter* pc = NULL;
+			  if (mi != m_dll->m_characters.end())
+			  {
+				  pc = mi->second;				  
+				  delete pc;
+				  m_dll->m_characters.erase(mi);				  
+			  }			  
+			  m_dll->m_listener->OnCharacterChanged(name);
+		  }
+	  }
 };
 
 
@@ -214,6 +239,16 @@ SMARTBODY_DLL_API bool Smartbody_dll::Shutdown()
 
    XMLPlatformUtils::Terminate();
 
+   std::map<std::string,SmartbodyCharacter*>::iterator mi; // m_dll->m_characters.find(name);
+   for (mi  = m_characters.begin();
+	    mi != m_characters.end();
+		mi++)
+   {
+	   SmartbodyCharacter* pc = mi->second;				  
+	   delete pc;	  
+   }
+   m_characters.clear();
+
    delete m_internalListener;
    m_internalListener = NULL;
 
@@ -255,15 +290,30 @@ SMARTBODY_DLL_API int Smartbody_dll::GetNumberOfCharacters()
 }
 
 
-SMARTBODY_DLL_API SmartbodyCharacter Smartbody_dll::GetCharacter( const string & name )
+SMARTBODY_DLL_API SmartbodyCharacter& Smartbody_dll::GetCharacter( const string & name )
 {
    mcuCBHandle & mcu = mcuCBHandle::singleton();
 
-   SmartbodyCharacter c;
-
    const SbmCharacter * char_p = mcu.character_map.lookup( name );
+   bool hasChar = false;
    if ( char_p )
    {
+	   std::map<std::string,SmartbodyCharacter*>::iterator mi = m_characters.find(name);
+	   SmartbodyCharacter* pc = NULL;
+	   if (mi != m_characters.end())
+	   {
+		   pc = mi->second;
+		   hasChar = true;
+	   }
+	   else
+	   {
+		   pc = new SmartbodyCharacter();
+		   hasChar = false;
+		   m_characters[name] = pc;
+	   }
+
+	   SmartbodyCharacter& c = *pc;
+
       const SkJoint * joint = char_p->get_world_offset_joint();
 
       const SkJointPos * pos = joint->const_pos();
@@ -311,22 +361,38 @@ SMARTBODY_DLL_API SmartbodyCharacter Smartbody_dll::GetCharacter( const string &
             posz += j->offset().z;
          }
 
-
-         SmartbodyJoint joint;
-         joint.m_name = j->name();
-         joint.x = posx;
-         joint.y = posy;
-         joint.z = posz;
-         joint.rw = q.w;
-         joint.rx = q.x;
-         joint.ry = q.y;
-         joint.rz = q.z;
-
-         c.m_joints.push_back( joint );
-      }
+		 if (hasChar)
+		 {
+			 SmartbodyJoint& joint = c.m_joints[i];         
+			 joint.m_name = j->name();
+			 joint.x = posx;
+			 joint.y = posy;
+			 joint.z = posz;
+			 joint.rw = q.w;
+			 joint.rx = q.x;
+			 joint.ry = q.y;
+			 joint.rz = q.z;
+		 }
+		 else
+		 {
+			 SmartbodyJoint joint;
+			 joint.m_name = j->name();
+			 joint.x = posx;
+			 joint.y = posy;
+			 joint.z = posz;
+			 joint.rw = q.w;
+			 joint.rx = q.x;
+			 joint.ry = q.y;
+			 joint.rz = q.z;
+			 c.m_joints.push_back( joint );
+		 }         
+      }	  
+	  return c;  
    }
-
-   return c;
+   else
+   {
+	   return m_emptyCharacter;	   
+   }    
 }
 
 

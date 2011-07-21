@@ -341,6 +341,7 @@ public:
 	const MotionDataSet& getReleaseHandData() const { return releaseHandData;}
 	std::map<int,MeCtReachEngine*>& getReachEngineMap() { return reachEngineMap; }
 	void buildJointPhyObjs();
+	void setJointCollider(std::string jointName, float size);
 	void updateJointPhyObjs();
 	void setJointPhyCollision(bool useCollision);
 		

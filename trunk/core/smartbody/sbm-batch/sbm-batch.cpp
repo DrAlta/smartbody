@@ -50,11 +50,18 @@ class SBMListener : public SmartbodyListener
 {
    public:
       virtual void OnCharacterCreate( const string & name )
-      {
+      {	     
          printf( "Character Create!\n" );
 
          characters.push_back( name );
       }
+
+	  virtual void OnCharacterCreate( const string & name, const string & objectClass )
+	  {	     
+		  printf( "Character Create!\n" );
+
+		  characters.push_back( name );
+	  }
 
       virtual void OnCharacterDelete( const string & name )
       {
@@ -139,7 +146,6 @@ int main( int argc, char ** argv )
    bool loop = true;
    while ( loop )
    {
-
 	   static bool once = false;
 	   if (!once)
 	   {
@@ -154,11 +160,12 @@ int main( int argc, char ** argv )
       vhmsg::ttu_poll();
 
 
+	  //LOG("character size = %d\n",characters.size());
       for ( uint32_t i = 0; i < characters.size(); i++ )
       {
-         SmartbodyCharacter c = sbm->GetCharacter( characters[ i ] );
+          SmartbodyCharacter& c = sbm->GetCharacter( characters[ i ] );
 
-         printf( "Character %s: %5.2f %5.2f %5.2f\n", c.m_name.c_str(), c.x, c.y, c.z );
+         //printf( "Character %s: %5.2f %5.2f %5.2f\n", c.m_name.c_str(), c.x, c.y, c.z );
       }
 
 ////////////////////////////////////////////////////  00985ttq08ergijefvonad;kfjbv;sdfjv;owourehcv[ vqiiw[fo jws
