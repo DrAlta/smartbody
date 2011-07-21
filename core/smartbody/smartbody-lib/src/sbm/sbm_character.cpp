@@ -386,11 +386,13 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		this->param_animation_ct = new MeCtParamAnimation(this, world_offset_writer_p);
 		std::string paramAnimationName = std::string(name)+ "'s param animation controller";
 		this->param_animation_ct->name(paramAnimationName.c_str());
+		this->param_animation_ct->set_pass_through(true);
 	}
 
 	this->basic_locomotion_ct = new MeCtBasicLocomotion(this);
 	std::string bLocoName = std::string(name)+ "'s basic locomotion controller";
 	this->basic_locomotion_ct->name(bLocoName.c_str());
+	this->basic_locomotion_ct->set_pass_through(false);
 
 	// init reach engine
 	{
@@ -416,6 +418,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		std::string locomotionname = std::string(name)+ "'s locomotion controller";
 		this->locomotion_ct->name( locomotionname.c_str() );
 		locomotion_ct->get_navigator()->setWordOffsetController(world_offset_writer_p);
+		locomotion_ct->set_pass_through(true);
 	}
 	
 	{

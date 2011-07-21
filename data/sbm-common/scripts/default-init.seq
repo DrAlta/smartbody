@@ -50,15 +50,19 @@
 #1	test loco char doctor enable
 #1	test loco char elder enable
 
-1	seq default-dynamics
+#1	seq default-dynamics
 1	seq init-param-animation
-#2	seq init-example-reach
+1.1 echo hello
+1.2 echo goodbye
+2	seq init-example-reach
+2.1 echo hello2
+2.2 echo goodbye2
 
 2 char doctor mesh doctor
 2 char elder mesh elder
 
-1	char brad init test_utah.sk Brad
-1	set character brad world_offset x 135 y 0 h -17
+1	char brad init common.sk Brad
+1	set character brad world_offset x 135 y 100 h -17
 1	set character brad voice remote brad
 #1	test loco char brad anim standing HandsAtSide_Motex
 #1	test loco char brad anim walking Walk 17 28 4 37 9 23
@@ -66,10 +70,24 @@
 2	bml char brad <body posture="HandsAtSide_Motex"/>
 #2	test loco char brad enable
 
-2 char brad mesh utah
+2 char brad mesh brad
 
+1	char utah init test_utah.sk Brad
+1	set character utah world_offset x -135 y 0 h -17
+1	set character utah voice remote brad
+#1	test loco char utah anim standing HandsAtSide_Motex
+#1	test loco char utah anim walking Walk 17 28 4 37 9 23
+#1	test loco char utah anim walking Strafe 25 39 1 52 25 27
+2	bml char utah <body posture="HandsAtSide_Motex"/>
+#2	test loco char utah enable
+
+2 char utah mesh utah
 
 2 bml char doctor <saccade mode="listen"/>
 2 bml char elder <saccade mode="listen"/>
 2 bml char brad <saccade mode="listen"/>
+2 bml char utah <saccade mode="listen"/>
+
+6 steer type example
+
 

@@ -3522,7 +3522,8 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 					if (checkStatus)
 					{
 						std::string passThroughStr = (controllerTree->controller(c)->is_pass_through())? " true " : " false";							
-						LOG("[%s]=%s", character->name, controllerTree->controller(c)->name(), passThroughStr.c_str());
+						LOG("[%s] %s = %s", character->name, controllerTree->controller(c)->name(), passThroughStr.c_str());
+						numControllersAffected = numControllers;	// just so it won't generate error
 					}
 					else if (allControllers)
 					{
@@ -5705,6 +5706,18 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					mcu_p->locomotion_type = mcu_p->Example;
 				else
 					mcu_p->locomotion_type = mcu_p->Basic;
+				mcu_p->character_map.reset();
+				SbmCharacter* character = mcu_p->character_map.next();
+				while (character)
+				{
+					if (character->param_animation_ct)
+						character->param_animation_ct->set_pass_through(false);
+					if (character->locomotion_ct)
+						character->locomotion_ct->set_pass_through(true);
+					if (character->basic_locomotion_ct)
+						character->basic_locomotion_ct->set_pass_through(true);
+					character = mcu_p->character_map.next();
+				}
 				return CMD_SUCCESS;
 			}
 			if (type == "procedural")
@@ -5715,11 +5728,37 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					return CMD_FAILURE;
 				}
 				mcu_p->locomotion_type = mcu_p->Procedural;
+				mcu_p->character_map.reset();
+				SbmCharacter* character = mcu_p->character_map.next();
+				while (character)
+				{
+					if (character->steeringAgent)
+						character->steeringAgent->desiredSpeed = 1.6f;
+					if (character->param_animation_ct)
+						character->param_animation_ct->set_pass_through(true);
+					if (character->locomotion_ct)
+						character->locomotion_ct->set_pass_through(false);
+					if (character->basic_locomotion_ct)
+						character->basic_locomotion_ct->set_pass_through(true);
+					character = mcu_p->character_map.next();
+				}
 				return CMD_SUCCESS;
 			}
 			if (type == "basic")
 			{
 				mcu_p->locomotion_type = mcu_p->Basic;
+				mcu_p->character_map.reset();
+				SbmCharacter* character = mcu_p->character_map.next();
+				while (character)
+				{
+					if (character->param_animation_ct)
+						character->param_animation_ct->set_pass_through(true);
+					if (character->locomotion_ct)
+						character->locomotion_ct->set_pass_through(true);
+					if (character->basic_locomotion_ct)
+						character->basic_locomotion_ct->set_pass_through(false);
+					character = mcu_p->character_map.next();
+				}
 				return CMD_SUCCESS;
 			}
 		}
