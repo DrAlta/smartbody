@@ -79,7 +79,7 @@ public:
 	 *  right.
 	 */
 	class Knot {
-		friend MeSpline1D;
+		friend class MeSpline1D;
 
 		///////////////////////////////////////////////////////////////
 		//  Private Data

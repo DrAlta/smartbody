@@ -1,14 +1,14 @@
 #include "PositionControl.h"
 
 #include "vhcl.h"
-#include <fltk/gl.h>
+#include <FL/gl.h>
 #include <GL/glu.h>
 #include <sr/sr_plane.h>
 #include <sr/sr_sphere.h>
 #include <sr/sr_sn.h>
 #include <sr/sr_sn_group.h>
-# include <SR/sr_sa_gl_render.h>
-# include <SR/sr_gl_render_funcs.h>
+# include <sr/sr_sa_gl_render.h>
+# include <sr/sr_gl_render_funcs.h>
 
 
 ObjectControl::ObjectControl()
@@ -164,7 +164,7 @@ PositionControl::~PositionControl(void)
 {
 }
 
-void PositionControl::drawSphere(SrVec& pos, float fRadius, SrVec& color)
+void PositionControl::drawSphere(SrVec& pos, float fRadius, SrVec color)
 {
 	//glColor3f(1.0, 0.0, 0.0);
 	glEnable(GL_LIGHTING);

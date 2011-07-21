@@ -31,11 +31,10 @@
 #include "bml_general_param.hpp"
 #include "sbm/general_param_setting.h"
 #include "bml_xml_consts.hpp"
+#include "BMLDefs.h"
 
 
-////// XML ATTRIBUTES
-const XMLCh ATTR_NAME[]   = L"name";
-const XMLCh ATTR_VALUE[]  = L"value";
+
 
 using namespace std;
 using namespace BML;
@@ -45,10 +44,10 @@ SrBuffer<float> Data_Array;
 
 BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag		= elem->getTagName();
-	const XMLCh* param_name	= elem->getAttribute( ATTR_NAME );
-	const XMLCh* value		= elem->getAttribute( ATTR_VALUE );
+	const XMLCh* param_name	= elem->getAttribute( BMLDefs::ATTR_NAME );
+	const XMLCh* value		= elem->getAttribute( BMLDefs::ATTR_VALUE );
 
-	const XMLCh* id = elem->getAttribute(ATTR_ID);
+	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
 	if (id)
 	{
@@ -125,7 +124,7 @@ BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& un
 		return BehaviorRequestPtr();
 	}
 
-	channelWriter->init(Param_Channel,true);
+	channelWriter->init(const_cast<SbmCharacter*>(request->actor),Param_Channel,true);
 	channelWriter->set_data(Data_Array);
 	// assign some (arbitrary) transition duration
 	channelWriter->inoutdt(0.5,0.5);

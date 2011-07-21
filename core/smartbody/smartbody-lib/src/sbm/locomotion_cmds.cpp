@@ -546,7 +546,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 				arg = args.read_token();
 			} 
 			else {
-				LOG("ERROR: Unexpected token \"%s\"", arg);
+				LOG("ERROR: Unexpected token \"%s\"", arg.c_str() );
 				return CMD_FAILURE;
 			}
 			

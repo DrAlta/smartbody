@@ -22,7 +22,7 @@
  */
 
 #include "vhcl.h"
-#include <ME/me_ct_blend.hpp>
+#include <me/me_ct_blend.hpp>
 
 
 #include <iostream>
@@ -31,7 +31,7 @@
 #include <vector>
 #include <set>
 
-#include <ME/me_controller_context_proxy.hpp>
+#include <me/me_controller_context_proxy.hpp>
 
 
 using namespace std;
@@ -269,7 +269,7 @@ MeCtBlend::~MeCtBlend() {
 	_sub_blend_context->unref();
 }
 
-void MeCtBlend::init( MeController* new_child ) {
+void MeCtBlend::init( MeController* new_child, SbmPawn* pawn ) {
 	MeController* old_child = child();
 	if( new_child!=old_child ) {
 		if( old_child )
@@ -278,7 +278,7 @@ void MeCtBlend::init( MeController* new_child ) {
 		if( new_child )
 			_sub_blend_context->add_controller( new_child );
 
-		MeController::init();
+		MeController::init(pawn);
 	}
 }
 

@@ -30,7 +30,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <algorithm>
-
+#include <boost/algorithm/string/predicate.hpp>
 #include "mcontrol_util.h"
 
 #include "bml_exception.hpp"
@@ -38,12 +38,15 @@
 #include "bml_speech.hpp"
 #include "bml_xml_consts.hpp"
 
-#include "ME/me_ct_blend.hpp"
+#include "me/me_ct_blend.hpp"
+#include "me/me_ct_blend.hpp"
+#include "BMLDefs.h"
 
 
 using namespace std;
 using namespace BML;
 using namespace SmartBody;
+using namespace xml_utils;
 
 
 const bool USE_CUSTOM_PRUNE_POLICY          = false; // Future feature
@@ -101,17 +104,41 @@ bool BML::isValidTmId( const std::wstring& id ) {
 	if( !isValidBmlId( id ) )
 		return false;
 
+	string id_str = xml_w2s( id );
+	if( id_str == xml_translate_string( BMLDefs::TM_START ) ) return( false );
+	if( id_str == xml_translate_string( BMLDefs::TM_READY ) ) return( false );
+	if( id_str == xml_translate_string( BMLDefs::TM_STROKE_START ) ) return( false );
+	if( id_str == xml_translate_string( BMLDefs::TM_STROKE ) ) return( false );
+	if( id_str == xml_translate_string( BMLDefs::TM_STROKE_END ) ) return( false );
+	if( id_str == xml_translate_string( BMLDefs::TM_RELAX ) ) return( false );
+	if( id_str == xml_translate_string( BMLDefs::TM_END ) ) return( false );
+	
+	return( true );
+	
+#if 0
 	//  TODO: effiency?
-	return( id!=TM_START &&
-		    id!=TM_READY &&
-		    id!=TM_STROKE_START &&
-		    id!=TM_STROKE &&
-		    id!=TM_STROKE_END &&
-		    id!=TM_RELAX &&
-		    id!=TM_END );
+
+return true;
+
+return( id!=BMLDefs::TM_START &&
+		    id!=BMLDefs::TM_READY &&
+		    id!=BMLDefs::TM_STROKE_START &&
+		    id!=BMLDefs::TM_STROKE &&
+		    id!=BMLDefs::TM_STROKE_END &&
+		    id!=BMLDefs::TM_RELAX &&
+		    id!=BMLDefs::TM_END );
+#endif
 }
 
+bool BML::stringICompare( const std::string& s1, const std::string& s2 )
+{
+	return boost::iequals(s1,s2);
+}
 
+bool BML::stringCompare( const std::string& s1, const std::string& s2 )
+{
+	return (s1 == s2);
+}
 ///////////////////////////////////////////////////////////////////////////////
 //  BML Processor Controller Prune Policy
 
@@ -149,13 +176,12 @@ void BmlRequest::init( BmlRequestPtr self ) {
 	// TODO: Assert self.get() == this
 	weak_ptr = self;
 
-	const XMLCh* start_id = L"bml:start";
-	const XMLCh* end_id   = L"bml:end";
 
-	start_trigger = createTrigger( start_id );
+	start_trigger = createTrigger( xml_translate_wide( BMLDefs::start_id ) );
 	bml_start = start_trigger->addSyncPoint();
 
-	idToSync.insert( make_pair( start_id, bml_start ) );
+//	wstring start_str = xml_translate_wide( BMLDefs::start_id );
+	idToSync.insert( make_pair( xml_translate_wide( BMLDefs::start_id ), bml_start ) );
 
 	//// bml:end SyncPoint removed until it can be better evaluated
 	//bml_end.reset( start_trigger->addSyncPoint( end_id ) );
@@ -259,7 +285,7 @@ void BmlRequest::importNamedSyncPoints( BehaviorSyncPoints& behav_syncs, const s
 	SetOfWstring::iterator it  = names.begin();
 	SetOfWstring::iterator end = names.end();
 	for( ; it!=end ; ++it ) {
-		wstring& name = *it;
+		wstring name = *it;
 		SyncPointPtr sync( behav_syncs.find( name )->sync() );
 
 		wstring sync_id = buildBmlId( id, name );
@@ -278,14 +304,16 @@ void BmlRequest::importNamedSyncPoints( BehaviorSyncPoints& behav_syncs, const s
 BehaviorSpan BmlRequest::getBehaviorSpan() {
 	if( ! span.isSet() ) {
 		if( speech_request ) {
-			span.unionWith( speech_request->getBehaviorSpan() );
+			BehaviorSpan span = speech_request->getBehaviorSpan();
+			span.unionWith( span );
 		}
 
 		VecOfBehaviorRequest::iterator behav_it = behaviors.begin();
 		VecOfBehaviorRequest::iterator behav_end = behaviors.end();
 		for( ; behav_it != behav_end; ++behav_it ) {
 			BehaviorRequestPtr behav = *behav_it;
-			span.unionWith( behav->getBehaviorSpan() );
+			BehaviorSpan span2 = behav->getBehaviorSpan();
+			span.unionWith( span2 );
 		}
 	}
 
@@ -380,20 +408,6 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 	// (Separate sequence to ensure it occurs before all behavior sequence events)
 	srCmdSeq *start_seq = new srCmdSeq(); //sequence that holds the startup feedback
 	{
-		if (bp->get_bml_feedback())
-		{
-			// send the feedback message for the start of the bml
-			std::stringstream strstr;
-			strstr << "sbm triggerevent bmlstatus \"" << request->msgId << " bml:start " << now << "\"";
-			if (start_seq->insert( (float) now, strstr.str().c_str()) != CMD_SUCCESS)
-			{
-				std::stringstream strstr;
-					strstr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
-							  "Failed to insert feedback \"" << strstr.str() <<"\" command.";
-					LOG(strstr.str().c_str());
-			}
-		}
-
 
 	    ostringstream start_command;
 #if USE_RECIPIENT
@@ -481,7 +495,6 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 		}
 	}
 
-
 #if 0	// TODO: Reimplement logging.  (Removed name from SyncPoint)
 	//  Add Logging / Debugging commands to sequence
 	if( log_syncpoints ) {
@@ -518,7 +531,7 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 	if( bp->get_auto_print_controllers() ) {
 		ostringstream oss;
 		oss << "print character "<< actorId << " schedule";
-		string& cmd = oss.str();
+		string cmd = oss.str();
 		if( cleanup_seq->insert( 0, (char*)(cmd.c_str()) )!=CMD_SUCCESS ) {
 			std::stringstream strstr;
 			strstr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
@@ -552,7 +565,7 @@ void BmlRequest::unschedule( Processor* bp, mcuCBHandle* mcu, time_sec duration 
 {
 	BmlRequestPtr request = weak_ptr.lock(); // Ref to this
 	if( bp->get_auto_print_controllers() || bp->get_auto_print_sequence() )
-		LOG("BmlRequest::unschedule(..) %s %s", request->actorId.c_str(), request->requestId);
+		LOG("BmlRequest::unschedule(..) %s %s", request->actorId.c_str(), request->requestId.c_str() );
 
 	if( speech_request ) {
 		speech_request->unschedule( mcu, request, duration );
@@ -581,7 +594,7 @@ void BmlRequest::unschedule( Processor* bp, mcuCBHandle* mcu, time_sec duration 
 	if( bp->get_auto_print_controllers() ) {
 		ostringstream oss;
 		oss << "print character "<< actorId << " schedule";
-		string& cmd = oss.str();
+		string cmd = oss.str();
 		if( mcu->execute( (char*)(cmd.c_str() ) ) != CMD_SUCCESS ) {
 			std::stringstream strstr;
 			strstr << "WARNING: BML::BmlRequest::unschedule(..): msgId=\""<<msgId<<"\": "<<
@@ -612,7 +625,7 @@ void BmlRequest::cleanup( Processor* bp, mcuCBHandle* mcu )
 {
 	BmlRequestPtr request = weak_ptr.lock(); // Ref to this
 	if( bp->get_auto_print_controllers() || bp->get_auto_print_sequence() )
-		LOG("BmlRequest::cleanup(..) %s %s", request->actorId, request->requestId);
+		LOG("BmlRequest::cleanup(..) %s %s", request->actorId.c_str() , request->requestId.c_str() );
 
 	if( speech_request ) {
 		speech_request->cleanup( mcu, request );
@@ -649,7 +662,7 @@ void BmlRequest::cleanup( Processor* bp, mcuCBHandle* mcu )
 	if( bp->get_auto_print_controllers() ) {
 		ostringstream oss;
 		oss << "print character "<< actorId << " schedule";
-		string& cmd = oss.str();
+		string cmd = oss.str();
 		if( mcu->execute( (char*)(cmd.c_str() ) ) != CMD_SUCCESS ) {
 			std::stringstream strstr;
 			strstr << "WARNING: BML::BmlRequest::cleanup(..): msgId=\""<<msgId<<"\": "<<
@@ -1169,7 +1182,7 @@ ParameterizedMotionRequest::ParameterizedMotionRequest( const std::string& uniqu
 NodRequest::NodRequest( const std::string& unique_id, const std::string& local, NodType type, float repeats, float frequency, float extent, float smooth, const SbmCharacter* actor,
 			            const BehaviorSyncPoints& syncs_in )
 :	MeControllerRequest( unique_id, local, new MeCtSimpleNod(), actor->head_sched_p, syncs_in, MeControllerRequest::MANUAL ),
-    type(type), repeats(repeats), frequency(frequency), extent(extent), smooth(smooth)
+    type(type), repeats(repeats), frequency(frequency), extent(extent), smooth(smooth), axis(-1), warp(-1), period(-1), accel(-1), pitch(-1), decay(-1)
 {
     MeCtSimpleNod* nod = (MeCtSimpleNod*)anim_ct;
 	BehaviorSchedulerConstantSpeedPtr scheduler = buildSchedulerForController( nod );
@@ -1207,8 +1220,9 @@ NodRequest::NodRequest( const std::string& unique_id, const std::string& local, 
 
 #define DFL_NOD_REF_DEG		30.0f
 #define DFL_SHAKE_REF_DEG	45.0f
+	
 
-    nod->init();
+    nod->init(NULL);
     //  TODO: Set a controller name
     switch( type ) {
         case VERTICAL:
@@ -1220,6 +1234,82 @@ NodRequest::NodRequest( const std::string& unique_id, const std::string& local, 
         default:
             clog << "WARNING: NodRequest::NodRequest(..): Unknown nod type=" << type << endl;
     }
+}
+
+#define DFL_NOD_BOBBLE_DFL_DUR		2.0f
+#define DFL_NOD_BOBBLE_REF_DEG		15.0f
+
+NodRequest::NodRequest( const std::string& unique_id, const std::string& local, NodType type, int axis, float period, float extent, float smooth, float warp, float accel, const SbmCharacter* actor,
+					   const BehaviorSyncPoints& syncs_in )
+: MeControllerRequest( unique_id, local, new MeCtSimpleNod(), actor->head_sched_p, syncs_in, MeControllerRequest::MANUAL ),
+    type(type), repeats(repeats), frequency(frequency), extent(extent), smooth(smooth), axis(axis), period(period), warp(warp), accel(accel), pitch(-1), decay(-1)
+{
+	MeCtSimpleNod* nod = (MeCtSimpleNod*)anim_ct;
+	BehaviorSchedulerConstantSpeedPtr scheduler = buildSchedulerForController( nod );
+	set_scheduler( scheduler );
+
+	// Convenience References
+	time_sec& readyTime  = scheduler->readyTime;
+	time_sec& strokeTime = scheduler->strokeTime;
+	time_sec& relaxTime  = scheduler->relaxTime;
+	time_sec& endTime    = scheduler->endTime;
+
+	readyTime = period * 0.5;
+	strokeTime = period;
+	if (endTime < BehaviorRequest::TEN_MILLION)
+	{
+		relaxTime = endTime - period * 0.5;
+	}
+	else
+	{
+		endTime = DFL_NOD_BOBBLE_DFL_DUR;
+		relaxTime = endTime - period * 0.5;
+	}
+
+    if( extent > 1 )
+        extent = 1;
+    else if( extent < -1 )
+        extent = -1;
+
+    nod->init(NULL);
+	nod->set_wiggle(axis, (float)endTime, extent*DFL_NOD_BOBBLE_REF_DEG, period, warp, accel, smooth);
+
+}
+
+NodRequest::NodRequest( const std::string& unique_id, const std::string& local, NodType type, int axis, float period, float extent, float smooth, float warp, float accel, float pitch, float decay, const SbmCharacter* actor,
+					   const BehaviorSyncPoints& syncs_in )
+: MeControllerRequest( unique_id, local, new MeCtSimpleNod(), actor->head_sched_p, syncs_in, MeControllerRequest::MANUAL ),
+    type(type), repeats(repeats), frequency(frequency), extent(extent), smooth(smooth), axis(axis), period(period), warp(warp), accel(accel), pitch(pitch), decay(decay)
+{
+	MeCtSimpleNod* nod = (MeCtSimpleNod*)anim_ct;
+	BehaviorSchedulerConstantSpeedPtr scheduler = buildSchedulerForController( nod );
+	set_scheduler( scheduler );
+
+	// Convenience References
+	time_sec& readyTime  = scheduler->readyTime;
+	time_sec& strokeTime = scheduler->strokeTime;
+	time_sec& relaxTime  = scheduler->relaxTime;
+	time_sec& endTime    = scheduler->endTime;
+
+	readyTime = period * 0.5;
+	strokeTime = period;
+	if (endTime < BehaviorRequest::TEN_MILLION)
+	{
+		relaxTime = endTime - period * 0.5;
+	}
+	else
+	{
+		endTime = DFL_NOD_BOBBLE_DFL_DUR;
+		relaxTime = endTime - period * 0.5;
+	}
+
+    if( extent > 1 )
+        extent = 1;
+    else if( extent < -1 )
+        extent = -1;
+
+    nod->init(NULL);
+	nod->set_waggle(axis, (float)endTime, extent*DFL_NOD_BOBBLE_REF_DEG, period, pitch, warp, accel, decay, smooth);
 }
 
 //  TiltRequest
@@ -1363,15 +1453,6 @@ VisemeRequest::VisemeRequest( const std::string& unique_id, const std::string& l
     viseme(viseme), weight(weight), duration(duration), rampup(rampup), rampdown(rampdown)
 {}
 
-
-void VisemeRequest::setVisemeName( const char* viseme ) {
-    this->viseme = viseme;
-}
-
-const char* VisemeRequest::getVisemeName() {
-    return this->viseme;
-}
-
 float VisemeRequest::getWeight()
 {
 	return weight;
@@ -1451,7 +1532,7 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	const SbmCharacter* actor    = request->actor;
 	SbmCharacter* character = mcu->character_map.lookup(actor->name);
 	if (character)
-		character->schedule_viseme_trapezoid( viseme, float(startAt), weight, float(endAt - startAt), float(readyAt - startAt), float(endAt - relaxAt));
+		character->schedule_viseme_trapezoid( viseme.c_str(), float(startAt), weight, float(endAt - startAt), float(readyAt - startAt), float(endAt - relaxAt));
 	
 	ostringstream start_cmd;
 	start_cmd << "char " << actor_id << " viseme " << viseme << " trap " 
@@ -1476,7 +1557,8 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	}
 */
 	VecOfSbmCommand commands;
-   	commands.push_back( new SbmCommand( start_cmd.str(), (float)startAt ) );
+	string start_string = start_cmd.str();
+   	commands.push_back( new SbmCommand( start_string, (float)startAt ) );
   // 	commands.push_back( new SbmCommand( stop_cmd.str(), (float)relaxAt ) );
 
 	realize_sequence( commands, mcu );

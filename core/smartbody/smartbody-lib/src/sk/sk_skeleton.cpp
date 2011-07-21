@@ -22,10 +22,10 @@
  *      Marcus Thiebaux, USC
  */
 
-# include <SR/sr_model.h>
+# include <sr/sr_model.h>
 
-# include <SK/sk_skeleton.h>
-# include <SK/sk_posture.h>
+# include <sk/sk_skeleton.h>
+# include <sk/sk_posture.h>
 
 //============================ SkSkeleton ============================
 
@@ -69,6 +69,7 @@ SkSkeleton::SkSkeleton (SkSkeleton* origSkel)
 	_com = origSkel->com();
 
 	compress ();
+	make_active_channels();
 }
 
 SkSkeleton::~SkSkeleton ()
@@ -151,7 +152,7 @@ SkJoint* SkSkeleton::linear_search_joint ( const char* n ) const
  
 SkJoint* SkSkeleton::search_joint ( const char* n )
  {
-   if ( !SkJointName::exist(n) ) return 0;
+   //if ( !SkJointName::exist(n) ) return 0;
 
    // Build the table in case it was not already built: 
    if ( _jhash.elements()==0 )
@@ -249,17 +250,26 @@ void SkSkeleton::copy_joint(SkJoint* dest, SkJoint* src)
 
 	SkJointPos* srcPos = src->pos();
 	SkJointPos* destPos = dest->pos();
-	destPos->limits(SkVecLimits::X, srcPos->limits(SkVecLimits::X));
-	destPos->limits(SkVecLimits::Y, srcPos->limits(SkVecLimits::Y));
-	destPos->limits(SkVecLimits::Z, srcPos->limits(SkVecLimits::Z));
+	if (!srcPos->frozen(SkVecLimits::X))
+	{
+		destPos->limits(SkVecLimits::X, srcPos->limits(SkVecLimits::X));
+		destPos->lower_limit(SkVecLimits::X, srcPos->lower_limit(SkVecLimits::X));
+		destPos->upper_limit(SkVecLimits::X, srcPos->upper_limit(SkVecLimits::X));
+	}
+	if (!srcPos->frozen(SkVecLimits::Y))
+	{
+		destPos->limits(SkVecLimits::Y, srcPos->limits(SkVecLimits::Y));
+		destPos->lower_limit(SkVecLimits::Y, srcPos->lower_limit(SkVecLimits::Y));
+		destPos->upper_limit(SkVecLimits::Y, srcPos->upper_limit(SkVecLimits::Y));
+	}
+	if (!srcPos->frozen(SkVecLimits::Z))
+	{
+		destPos->limits(SkVecLimits::Z, srcPos->limits(SkVecLimits::Z));
+		destPos->lower_limit(SkVecLimits::Z, srcPos->lower_limit(SkVecLimits::Z));
+		destPos->upper_limit(SkVecLimits::Z, srcPos->upper_limit(SkVecLimits::Z));
+	}
 
-	destPos->lower_limit(SkVecLimits::X, srcPos->lower_limit(SkVecLimits::X));
-	destPos->lower_limit(SkVecLimits::Y, srcPos->lower_limit(SkVecLimits::Y));
-	destPos->lower_limit(SkVecLimits::Z, srcPos->lower_limit(SkVecLimits::Z));
 
-	destPos->upper_limit(SkVecLimits::X, srcPos->upper_limit(SkVecLimits::X));
-	destPos->upper_limit(SkVecLimits::Y, srcPos->upper_limit(SkVecLimits::Y));
-	destPos->upper_limit(SkVecLimits::Z, srcPos->upper_limit(SkVecLimits::Z));
 
 	if (src->quat()->active())
 		dest->quat()->activate();
@@ -279,7 +289,7 @@ void SkSkeleton::create_joints(SkJoint* origParent, SkJoint* parent)
 {
 	for (int i = 0; i < origParent->num_children(); i++)
 	{
-		SkJoint* newJoint = new SkJoint(this, parent, origParent->child(i)->rot_type(), origParent->child(i)->index());
+		SkJoint* newJoint = new SkJoint(this, parent, origParent->child(i)->rot_type(), _joints.size());
 		_joints.push() = newJoint;
 
 		copy_joint(newJoint, origParent->child(i));

@@ -24,7 +24,7 @@
 #define BEHAVIOR_SCHEDULER_CONSTANT_SPEED_HPP
 
 #include "behavior_scheduler.hpp"
-#include "ME/me_controller.h"
+#include "me/me_controller.h"
 
 
 /**

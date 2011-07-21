@@ -35,6 +35,7 @@ class mcuCBHandle;
 #include <map>
 
 #define LINK_VHMSG_CLIENT		(1)
+#define USE_WSP 1
 
 
 #if LINK_VHMSG_CLIENT
@@ -44,11 +45,11 @@ class mcuCBHandle;
 #include "bonebus.h"
 
 #include <sbm/GenericViewer.h>
-#include <SR/sr_viewer.h>
-#include <SR/sr_camera.h>
-#include <ME/me_ct_pose.h>
-#include <ME/me_ct_motion.h>
-#include <ME/me_ct_lifecycle_test.hpp>
+#include <sr/sr_viewer.h>
+#include <sr/sr_camera.h>
+#include <me/me_ct_pose.h>
+#include <me/me_ct_motion.h>
+#include <me/me_ct_lifecycle_test.hpp>
 #include "me_ct_step_turn.h"
 #include "me_ct_quick_draw.h"
 #include "me_ct_gaze.h"
@@ -58,7 +59,7 @@ class mcuCBHandle;
 
 #include "sbm_constants.h"
 
-#include <ME/me_ct_scheduler2.h>
+#include <me/me_ct_scheduler2.h>
 #include <sbm/me_ct_motion_player.h>
 
 #include "sr_hash_map.h"
@@ -82,6 +83,7 @@ class mcuCBHandle;
 #include <sbm/action_unit.hpp>
 #include <sbm/viseme_map.hpp>
 #include <sbm/general_param_setting.h>
+#include <sbm/SBScene.h>
 #include "sbm/BoneMap.h"
 
 #include <me/me_ct_interpolator.h>
@@ -94,13 +96,15 @@ class mcuCBHandle;
 #include BML_PROCESSOR_INCLUDE
 
 
+#if USE_WSP
 namespace WSP
 {
     class Manager;
 };
+#endif
+
 
 //////////////////////////////////////////////////////////////////
-
 
 // This class is meant for listening to specific events that could be handled externally from smartbody
 // Currently being used by smartbody-dll
@@ -133,8 +137,14 @@ class FaceMotion
 		FaceMotion() { face_neutral_p = NULL; }
 };
 
+typedef std::map<std::string, FaceMotion*> FaceMotionMap;
+typedef std::map<std::string, SkPosture*> SkPostureMap;
+typedef std::map<std::string, SkMotion*> SkMotionMap;
+typedef std::map<std::string, SkSkeleton*> SkSkeletonMap;
+
+
 // Motion Controller Utility Callback Handle (Yes, seriously.)
-class mcuCBHandle	{
+class mcuCBHandle {
 	protected:
 		// Data
 		remote_speech				_speech_rvoice;
@@ -153,13 +163,16 @@ class mcuCBHandle	{
 		bool		use_locomotion;
 		bool		use_param_animation;
 		bool        updatePhysics;
-		bool		sendPawnUpdates; // if true, sends the pawn information over bonebus in the same wasy as the characters
+		bool        resourceDataChanged;
 		const char* net_host;
 		bonebus::BoneBusClient bonebus;
 		SBMCharacterListener * sbm_character_listener;   // only one listener possible, must be set manually
 		std::string speech_audiofile_base_path;
 		std::string process_id;
-		bool		play_internal_audio;		
+		bool		play_internal_audio;	
+		SBScene     scene;
+
+		
 		
 		// scale factor (used for SmartBody to handle unit convert, both sk and skm)
 		double		skScale;
@@ -188,10 +201,16 @@ class mcuCBHandle	{
 		GenericViewer	*bmlviewer_p;
 		GenericViewer	*panimationviewer_p;
 		GenericViewer	*channelbufferviewer_p;
+		GenericViewer   *resourceViewer_p;
+		GenericViewer   *faceViewer_p;
+
 		GenericViewerFactory *bmlviewer_factory;
 		GenericViewerFactory *panimationviewer_factory;
 		GenericViewerFactory *channelbufferviewer_factory;
 		GenericViewerFactory *commandviewer_factory;
+		GenericViewerFactory *resourceViewerFactory;
+		GenericViewerFactory *faceViewerFactory;
+		
 		SrCamera	*camera_p;
 		SrSnGroup	*root_group_p;
 		
@@ -200,6 +219,7 @@ class mcuCBHandle	{
 		srPathList	seq_paths;
 		srPathList	me_paths;
 		srPathList	audio_paths;
+		srPathList	mesh_paths;
 
 		std::string media_path;
 
@@ -239,20 +259,24 @@ class mcuCBHandle	{
 		srHashMap <SbmCharacter>	character_map;		
 
 		BML_PROCESSOR				bml_processor;
+
+#if USE_WSP
 		WSP::Manager*				theWSP;
+#endif
 
 		joint_logger::EvaluationLogger* logger_p;
 		ResourceManager*			resource_manager;
 		std::vector<CameraTrack*>	cameraTracking;
 
-		SteerSuiteEngineDriver*		steerEngine;
+		SteerSuiteEngineDriver		steerEngine;
 		SbmPhysicsSim*              physicsEngine;
 
 	private:
 		// Constant
 		static mcuCBHandle* _singleton;
 
-                bool _interactive;
+        bool _interactive;
+		std::vector<MeController*> _defaultControllers;
 
 		//  Constructor
 		mcuCBHandle( void );
@@ -320,6 +344,8 @@ class mcuCBHandle	{
 			return( true );
 		}
 
+		static std::string cmdl_tab_callback( std::string str );
+
 		int open_viewer( int width, int height, int px, int py );
 		void close_viewer( void );
 		int open_bml_viewer( int width, int height, int px, int py );
@@ -328,6 +354,12 @@ class mcuCBHandle	{
 		void close_panimation_viewer( void );
 		int open_channelbuffer_viewer( int width, int height, int px, int py );
 		void close_channelbuffer_viewer( void );
+		int openResourceViewer( int width, int height, int px, int py );
+		void closeResourceViewer( void );
+		int openFaceViewer( int width, int height, int px, int py );
+		void closeFaceViewer( void );
+
+
 		int add_scene( SrSnGroup *scene_p );
 		int remove_scene( SrSnGroup *scene_p );
 		void render()	{ if( viewer_p ) { viewer_p->render(); } }
@@ -350,19 +382,19 @@ class mcuCBHandle	{
 		}
 		
 		void update( void );
-		int insert( char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp, char* description = NULL )	{
+		int insert( const char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp, char* description = NULL )	{
 			return( cmd_map.insert( key, fp ) );
 		}
 
-		int insert_set_cmd( char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp )	{
+		int insert_set_cmd( const char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp )	{
 			return( set_cmd_map.insert( key, fp ) );
 		}
 
-		int insert_print_cmd( char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp )	{
+		int insert_print_cmd( const char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp )	{
 			return( print_cmd_map.insert( key, fp ) );
 		}
 
-		int insert_test_cmd( char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp )	{
+		int insert_test_cmd( const char *key, srCmdMap<mcuCBHandle>::sr_cmd_callback_fp fp )	{
 			return( test_cmd_map.insert( key, fp ) );
 		}
 
@@ -384,7 +416,11 @@ class mcuCBHandle	{
 
 		SkMotion* lookUpMotion(const char* motionName);
 
+		SbmCharacter* lookUpCharacter(const char* charName);
+
 		PAStateData* lookUpPAState(std::string stateName);
+
+		SkMotion* addMirrorMotion(SkMotion* motion);
 		void addPAState(PAStateData* state);
 		PATransitionData* lookUpPATransition(std::string fromStateName, std::string toStateName);
 		void addPATransition(PATransitionData* transition);
@@ -400,11 +436,15 @@ class mcuCBHandle	{
 			resource->setCommand(strstr.str());
 			resource->setTime(time);
 			resource_manager->addCommandResource(resource);
-			
-			return( cmd_map.execute( key, args, this ) ); 
+
+			int ret = ( cmd_map.execute( key, args, this ) );
+			if (ret == CMD_SUCCESS)
+				resourceDataChanged = true;
+
+			return ret; 
 		}
 
-		int execute( const char *key, char* strArgs ) { 
+		int execute( const char *key, char* strArgs ) {
 			std::stringstream strstr;
 			strstr << key << " " << strArgs;
 			CmdResource* resource = new CmdResource();
@@ -414,12 +454,17 @@ class mcuCBHandle	{
 			resource_manager->addCommandResource(resource);
 
             srArgBuffer args( strArgs );
-			return( cmd_map.execute( key, args, this ) ); 
+			
+			int ret = ( cmd_map.execute( key, args, this ) );
+			if (ret == CMD_SUCCESS)
+				resourceDataChanged = true;
+
+			return ret; 
 		}
 
 		int execute( char *cmd ) { 
 			CmdResource* resource = new CmdResource();
-			resource->setChildrenLimit(resource_manager->getLimit());	// assuming the limit of total resources( path, motion, file, command) is the same with the limit of children ( command resource only) number
+			resource->setChildrenLimit(resource_manager->getLimit());	// assuming the limit of total resources( path, motion, file, command) is the same with the limit of children ( command resource only) number						
 			resource->setCommand(cmd);
 			resource->setTime(time);
 			resource_manager->addCommandResource(resource);
@@ -442,7 +487,11 @@ class mcuCBHandle	{
 				resource->setId(remainderCmd);
 			}
 
-			return( cmd_map.execute( cmd, this ) ); 
+			int ret = ( cmd_map.execute( cmd, this ) ); 
+			if (ret == CMD_SUCCESS)
+				resourceDataChanged = true;
+
+			return ret;
 		}
 
 		int execute_seq( srCmdSeq *seq );
@@ -487,7 +536,16 @@ class mcuCBHandle	{
 				if (commandviewer_factory != NULL) delete commandviewer_factory;
 				commandviewer_factory = factory;
 		}
-		
+
+		void register_ResourceViewer_factory(GenericViewerFactory* factory) { 
+			if (resourceViewerFactory != NULL) delete resourceViewerFactory;
+			resourceViewerFactory = factory;
+		}
+
+		void register_FaceViewer_factory(GenericViewerFactory* factory) { 
+			if (faceViewerFactory != NULL) delete faceViewerFactory;
+			faceViewerFactory = factory;
+		}		
 
 		void setMediaPath(std::string path);
 		std::string getMediaPath();
@@ -495,8 +553,12 @@ class mcuCBHandle	{
                 void setInteractive(bool val);
                 bool getInteractive();
 
-	protected:
-		FILE* open_sequence_file( const char *seq_name );
+
+		void createDefaultControllers();
+		std::vector<MeController*>& getDefaultControllers();
+
+	public:
+		FILE* open_sequence_file( const char *seq_name, std::string& fullPath );
 };
 
 //////////////////////////////////////////////////////////////////

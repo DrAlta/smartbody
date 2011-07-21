@@ -69,6 +69,19 @@ PAStateData::PAStateData(std::string name)
 
 PAStateData::~PAStateData()
 {
+	for (unsigned int i = 0; i < motions.size(); i++)
+	{
+		motions[i]->unref();
+		motions[i] = NULL;
+	}
+	motions.clear();
+	for (unsigned int i = 0; i < toStates.size(); i++)
+		toStates[i] = NULL;
+	toStates.clear();
+	for (unsigned int i = 0; i < fromStates.size(); i++)
+		fromStates[i] = NULL;
+	fromStates.clear();
+
 	delete paramManager;
 }
 
@@ -185,7 +198,8 @@ bool ParameterManager::setWeight(double x)
 	{
 		int id = state->getMotionId(leftMotion);
 		state->weights[id] = 1.0;
-		setPrevVec(SrVec((float)x, 0.0f, 0.0f));
+		SrVec tmp_vec((float)x, 0.0f, 0.0f);
+		setPrevVec( tmp_vec );
 	}
 	else
 	{
@@ -196,17 +210,20 @@ bool ParameterManager::setWeight(double x)
 		{
 			state->weights[leftId] = 1 - weight;
 			state->weights[rightId] = weight;
-			setPrevVec(SrVec((float)x, 0.0, 0.0));
+			SrVec tmp_vec((float)x, 0.0, 0.0);
+			setPrevVec( tmp_vec );
 		}
 		if (leftId >=0 && rightId < 0)
 		{
 			state->weights[leftId] = 1.0;
-			setPrevVec(SrVec((float)left, 0.0, 0.0));
+			SrVec tmp_vec((float)left, 0.0, 0.0);
+			setPrevVec( tmp_vec );
 		}
 		if (rightId >=0 && leftId < 0)
 		{
 			state->weights[rightId] = 1.0;
-			setPrevVec(SrVec((float)right, 0.0, 0.0));
+			SrVec tmp_vec((float)right, 0.0, 0.0);
+			setPrevVec( tmp_vec );
 		}
 	}
 	return true;
@@ -603,7 +620,7 @@ void ParameterManager::buildTetrahedron()
 		ptIn.pointlist[i*3+1] = parameters[i].y;
 		ptIn.pointlist[i*3+2] = parameters[i].z;		
 	}
-	tetrahedralize("V",&ptIn,&tetOut);
+	tetrahedralize((char*)"V",&ptIn,&tetOut);
 //	std::cout << "Built Tetrahedron:" << std::endl;
 	for (int i = 0; i < tetOut.numberoftetrahedra; i++)
 	{
@@ -901,6 +918,7 @@ int ParameterManager::PointOutsideOfPlane(SrVec p, SrVec a, SrVec b, SrVec c)
 MotionParameters::MotionParameters(SkMotion* m, SkSkeleton* skel, std::string j)
 {
 	motion = m;
+	motion->ref();
 	skeleton = new SkSkeleton(skel);
 	skeleton->ref();
 	motion->connect(skeleton);
@@ -918,6 +936,8 @@ MotionParameters::MotionParameters(SkMotion* m, SkSkeleton* skel, std::string j)
 MotionParameters::~MotionParameters()
 {
 	motion->disconnect();
+	if (motion)
+		motion->unref();
 	if (skeleton)
 		skeleton->unref();
 }

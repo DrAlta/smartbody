@@ -23,20 +23,23 @@
 #ifndef _GL_CHART_COORDINATE_H_
 #define _GL_CHART_COORDINATE_H_
 
-#include <SR/sr_vec.h>
-#include <SR/sr_vec2.h>
-#include <SR/sr_quat.h>
-#include <SR/sr_mat.h>
-#include <SR/sr_array.h>
-#include <SR/sr_camera.h>
-#include <SR/sr_buffer.h>
-#include <SR/sr_string.h>
+#include <sr/sr_vec.h>
+#include <sr/sr_vec2.h>
+#include <sr/sr_quat.h>
+#include <sr/sr_mat.h>
+#include <sr/sr_array.h>
+#include <sr/sr_camera.h>
+#include <sr/sr_buffer.h>
+#include <sr/sr_string.h>
 #include <string>
 #include <utility>
 #include "math.h"
+#ifdef WIN32
 #include "glfont2.h"
 
+
 using namespace glfont;
+#endif
 
 class GlChartViewCoordinate
 {
@@ -52,7 +55,9 @@ public:
 	float x_margin_ratio;
 	float y_margin_ratio;
 
+#ifdef WIN32
 	GLFont label;
+#endif
 	bool font_initialized;
 
 protected:

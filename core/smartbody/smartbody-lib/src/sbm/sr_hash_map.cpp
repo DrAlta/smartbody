@@ -65,7 +65,7 @@ srHashMapBase::sr_map_entry_t *srHashMapBase::new_table_entry( const char *key, 
 
 		entry_p = new sr_map_entry_t;
 		entry_p->key = new char[ strlen( key ) + 1 ];
-		sprintf( entry_p->key, key );
+		sprintf( entry_p->key, "%s", key );
 		entry_p->data = data;
 		entry_p->claim_data = claim;
 		entry_p->prev = NULL;

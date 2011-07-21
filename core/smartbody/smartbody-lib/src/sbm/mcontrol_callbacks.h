@@ -51,6 +51,8 @@ int mcu_viewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_bmlviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_panimationviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_channelbufferviewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_resourceViewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_faceViewer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_terrain_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_time_func( srArgBuffer& args, mcuCBHandle *mcu_p );
@@ -96,7 +98,6 @@ int mcu_gaze_limit_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_snod_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_lilt_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_reach_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_load_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 int mcu_net_func( srArgBuffer& args, mcuCBHandle *mcu_p );
@@ -138,6 +139,9 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int showcharacters_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int showpawns_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int syncpoint_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int pawnbonebus_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+#ifdef USE_GOOGLE_PROFILER
+int startprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int stopprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+#endif
 //////////////////////////////////////////////////////////////////
 #endif

@@ -12,7 +12,7 @@
 #include <string>
 #include <fstream>
 #include <stdexcept>
-#include <io.h>
+//#include <io.h>
 
 namespace rapidxml
 {

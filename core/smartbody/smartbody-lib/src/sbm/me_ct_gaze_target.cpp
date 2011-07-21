@@ -22,6 +22,7 @@
  */
 
 #include "me_ct_gaze.h"
+#include "lin_win.h"
 using namespace gwiz;
 
 #if 0
@@ -228,8 +229,11 @@ void MeCtGaze::set_target( float x, float y, float z, char *ref_joint_name )	{
 	if( ref_joint_str ) {
 		free( ref_joint_str );
 	}
-	ref_joint_str = _strdup( ref_joint_name );
-	ref_joint_p = NULL;
+	if (ref_joint_name)
+	{
+		ref_joint_str = _strdup( ref_joint_name );
+		ref_joint_p = NULL;
+	}
 }
 
 void MeCtGaze::set_orient_joint( float p, float h, float r, SkJoint* joint_p )	{

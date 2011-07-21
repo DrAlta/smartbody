@@ -23,10 +23,11 @@
 #ifndef _PARAM_ANIM_TRANSITION_EDITOR_H_
 #define _PARAM_ANIM_TRANSITION_EDITOR_H_
 
+#include <FL/Fl_Slider.H>
 #include "PanimationWindow.h"
 
 class PanimationWindow;
-class PATransitionEditor : public fltk::Group
+class PATransitionEditor : public Fl_Group
 {
 	public:
 		PATransitionEditor(int x, int y, int w, int h, PanimationWindow* window);
@@ -34,30 +35,30 @@ class PATransitionEditor : public fltk::Group
 
 		void loadStates();
 		void loadTransitions();
-		static void changeTransitionEditorMode(fltk::Widget* widget, void* data);
-		static void changeStateList1(fltk::Widget* widget, void* data);
-		static void changeStateList2(fltk::Widget* widget, void* data);
-		static void changeAnimForTransition(fltk::Widget* widget, void* data);
-		static void addTransitionTimeMark(fltk::Widget* widget, void* data);
-		static void removeTransitionTimeMark(fltk::Widget* widget, void* data);
-		static void updateTransitionTimeMark(fltk::Widget* widget, void* data);
-		static void createNewTransition(fltk::Widget* widget, void* data);
-		static void changeTransitionList(fltk::Widget* widget, void* data);
+		static void changeTransitionEditorMode(Fl_Widget* widget, void* data);
+		static void changeStateList1(Fl_Widget* widget, void* data);
+		static void changeStateList2(Fl_Widget* widget, void* data);
+		static void changeAnimForTransition(Fl_Widget* widget, void* data);
+		static void addTransitionTimeMark(Fl_Widget* widget, void* data);
+		static void removeTransitionTimeMark(Fl_Widget* widget, void* data);
+		static void updateTransitionTimeMark(Fl_Widget* widget, void* data);
+		static void createNewTransition(Fl_Widget* widget, void* data);
+		static void changeTransitionList(Fl_Widget* widget, void* data);
 
 	public:
 		PanimationWindow* paWindow;
-		fltk::CheckButton*	transitionEditorMode;
-		fltk::Group*		createTransitionGroup;
-		fltk::Button*		createTransitionButton;
-		fltk::Choice*		stateList1;
-		fltk::Choice*		stateList2;
-		fltk::Browser*		animForTransition1;
-		fltk::Browser*		animForTransition2;
-		fltk::Group*		editTransitionTimeMarkGroup;
-		fltk::Choice*		transitionList;
-		fltk::Button*		addMark1;
-		fltk::Button*		removeMark1;
-		fltk::Button*		updateMark1;
+		Fl_Check_Button*	transitionEditorMode;
+		Fl_Group*		createTransitionGroup;
+		Fl_Button*		createTransitionButton;
+		Fl_Choice*		stateList1;
+		Fl_Choice*		stateList2;
+		Fl_Browser*		animForTransition1;
+		Fl_Browser*		animForTransition2;
+		Fl_Group*		editTransitionTimeMarkGroup;
+		Fl_Choice*		transitionList;
+		Fl_Button*		addMark1;
+		Fl_Button*		removeMark1;
+		Fl_Button*		updateMark1;
 		ParamAnimEditorWidget* transitionTimeMarkWidget;
 		nle::NonLinearEditorModel* transitionEditorNleModel;
 };

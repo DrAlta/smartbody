@@ -14,8 +14,8 @@ public:
 	std::string      nodeName;
 	MeCtIKTreeNode   *parent, *child, *brother;
 
-	bool             active;
 	bool             lock;
+	bool             active;
 	SrVec            targetPos; // target pos is a global position constraint for this end effector joint
 	SrQuat           targetDir; // target dir is a global rotation constraint ( parameterized as quaternion )
 	SkJoint          *joint;	

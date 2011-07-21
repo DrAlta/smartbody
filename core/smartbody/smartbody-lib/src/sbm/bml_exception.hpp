@@ -32,19 +32,33 @@ namespace BML {
 	// Class Definitions
 	/** Base class for all BML exceptions. */
 	class BmlException : public std::exception {
-	public:
-		BmlException( const char *const& what_string )
-		:	std::exception( what_string )
-		{}
 
-		virtual const char* type()
+public:
+		BmlException(std::string str)
+		:	std::exception()
+		{
+			_problem = str;
+		}
+
+		~BmlException() throw()
+		{
+		}
+
+		virtual const char* what() const throw()
+		{
+			return _problem.c_str();
+		}
+
+		std::string _problem;
+
+			virtual const char* type()
 		{	return "BML::BmlException"; }
 	};
 
 	/** Exception of errors that occur during parsing. */
 	class ParsingException : public BmlException {
 	public:
-		ParsingException( const char *const& what_string )
+		ParsingException(std::string what_string )
 		:	BmlException( what_string )
 		{}
 
@@ -54,7 +68,7 @@ namespace BML {
 	/** Exception of errors that occur during scheduling. */
 	class SchedulingException : public BmlException {
 	public:
-		SchedulingException( const char *const& what_string )
+		SchedulingException(std::string what_string )
 		:	BmlException( what_string )
 		{}
 
@@ -64,7 +78,7 @@ namespace BML {
 	/** Exception of errors that occur during realizing. */
 	class RealizingException : public BmlException {
 	public:
-		RealizingException( const char *const& what_string )
+		RealizingException(std::string what_string )
 		:	BmlException( what_string )
 		{}
 

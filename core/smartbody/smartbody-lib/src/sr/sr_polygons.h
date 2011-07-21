@@ -26,9 +26,9 @@
  * maintains an array of polygons
  */
 
-# include <SR/sr_array.h>
-# include <SR/sr_polygon.h>
-# include <SR/sr_shared_class.h>
+# include <sr/sr_array.h>
+# include <sr/sr_polygon.h>
+# include <sr/sr_shared_class.h>
 
 /*! \class SrPolygons sr_polygons.h
     \brief maintains an array of polygons

@@ -20,50 +20,50 @@
  *      Marcelo Kallmann, USC (currently at UC Merced)
  */
 
+#include "FL/Fl_Slider.H"  // before vhcl.h because of LOG enum which conflicts with vhcl::Log
 #include "vhcl.h"
+//#include <FL/enumerations.H>
 # include "fltk_viewer.h"
-# include <fltk/events.h>
-# include <fltk/gl.h>
+# include <FL/Fl.H>
+# include <GL/gl.h>
 # include <GL/glu.h>
-# include <fltk/run.h>
-# include <fltk/visual.h>
+//# include <fltk/visual.h>
 //# include <fltk/compat/FL/Fl_Menu_Item.H>
-# include <fltk/draw.h>
-# include <fltk/ColorChooser.H>
-# include <fltk/FileChooser.H>
-# include <fltk/Browser.H>
-# include <fltk/ToggleItem.H>
-# include <SR/sr_box.h>
-# include <SR/sr_sphere.h>
-# include <SR/sr_cylinder.h>
-# include <SR/sr_quat.h>
-# include <SR/sr_line.h>
-# include <SR/sr_plane.h>
-# include <SR/sr_event.h>
-# include <SR/sr_string.h>
+# include <FL/fl_draw.H>
+# include <FL/Fl_Color_Chooser.H>
+# include <FL/Fl_File_Chooser.H>
+# include <FL/Fl_Browser.H>
+//# include <fltk/ToggleItem.h>
+# include <sr/sr_box.h>
+# include <sr/sr_sphere.h>
+# include <sr/sr_cylinder.h>
+# include <sr/sr_quat.h>
+# include <sr/sr_line.h>
+# include <sr/sr_plane.h>
+# include <sr/sr_event.h>
+# include <sr/sr_string.h>
 
-# include <SR/sr_gl.h>
-# include <SR/sr_camera.h>
-# include <SR/sr_trackball.h>
-# include <SR/sr_lines.h>
-# include <SR/sr_color.h>
-# include <SR/sr_points.h>
+# include <sr/sr_gl.h>
+# include <sr/sr_camera.h>
+# include <sr/sr_trackball.h>
+# include <sr/sr_lines.h>
+# include <sr/sr_color.h>
+# include <sr/sr_points.h>
 
-# include <SR/sr_sn.h>
-# include <SR/sr_sn_group.h>
+# include <sr/sr_sn.h>
+# include <sr/sr_sn_group.h>
 
-# include <SR/sr_sa.h>
-# include <SR/sr_sa_event.h>
-# include <SR/sr_gl_render_funcs.h>
-# include <SBM/me_ct_eyelid.h>
-# include <SBM/me_ct_data_driven_reach.hpp>
-# include <SBM/MeCtBodyReachState.h>
-# include <SBM/me_ct_example_body_reach.hpp>
-# include <SBM/me_ct_constraint.hpp>
-# include <SBM/Physics/SbmColObject.h>
-# include <SBM/me_ct_param_animation_data.h>
-# include <SBM/GPU/SbmDeformableMeshGPU.h>
-
+# include <sr/sr_sa.h>
+# include <sr/sr_sa_event.h>
+# include <sr/sr_gl_render_funcs.h>
+# include <sbm/me_ct_eyelid.h>
+# include <sbm/me_ct_data_driven_reach.hpp>
+# include <sbm/MeCtBodyReachState.h>
+# include <sbm/me_ct_example_body_reach.hpp>
+# include <sbm/me_ct_constraint.hpp>
+# include <sbm/Physics/SbmColObject.h>
+# include <sbm/me_ct_param_animation_data.h>
+# include <sbm/GPU/SbmDeformableMeshGPU.h>
 
 #include <sbm/mcontrol_util.h>
 //#include <sbm/SbmShader.h>
@@ -75,7 +75,7 @@
 ////# define SR_USE_TRACE3  // sr translated events
 ////# define SR_USE_TRACE4  // view_all
 ////# define SR_USE_TRACE5  // timeout
-//# include <SR/sr_trace.h>
+//# include <sr/sr_trace.h>
 
 //=============================== srSaSetShapesChanged ===========================================
 
@@ -88,9 +88,9 @@ class srSaSetShapesChanged : public SrSa
 
 
 
-fltk::Browser* make_help_browser ()
+Fl_Browser* make_help_browser ()
  {
-  fltk::Browser* b = new fltk::Browser ( 5, 5, 290, 190 );
+  Fl_Browser* b = new Fl_Browser ( 5, 5, 290, 190 );
 
    b->add ( "Left Click: Select\n" );
    b->add ( "Left Click + ALT: Rotate\n" );
@@ -108,21 +108,21 @@ fltk::Browser* make_help_browser ()
    return b;
  }
 
-fltk::Window* make_help_window ()
+Fl_Window* make_help_window ()
  {
-   fltk::Window* win = new fltk::Window ( 300, 200, "FltkViewer Help" );
+   Fl_Window* win = new Fl_Double_Window ( 300, 200, "FltkViewer Help" );
    win->set_non_modal();
 
-   fltk::Browser* browser = make_help_browser();
+   Fl_Browser* browser = make_help_browser();
    win->add(browser);
    return win;
  }
 
 //================================= popup menu ===================================================
 
-static void menucb ( fltk::Widget* o, void* v ) 
+static void menucb ( Fl_Widget* o, void* v ) 
  {
-	 fltk::Widget* widget = o->parent();
+	 Fl_Widget* widget = o->parent();
 	 
 	 FltkViewer* viewer = NULL;
 	 while (!viewer && widget && widget->parent() != NULL)
@@ -131,10 +131,10 @@ static void menucb ( fltk::Widget* o, void* v )
 		viewer = dynamic_cast<FltkViewer*>(widget);
 	 }
 	 if (viewer)
-		 viewer->menu_cmd((FltkViewer::MenuCmd)(int)v,o->label());
+		 viewer->menu_cmd((FltkViewer::MenuCmd)(uintptr_t)v,o->label());
  }
 
-# define MCB     ((fltk::Callback*)menucb)
+# define MCB     ((Fl_Callback*)menucb)
 # define CMD(c)  ((void*)FltkViewer::c)
 const int NUM_GAZE_TYPES = 4;
 const int NUM_REACH_TYPES = 2;
@@ -165,7 +165,7 @@ Fl_Menu_Item MenuTable[] =
  { 
    { "&help",       0, MCB, CMD(CmdHelp) },
    { "&view all",   0, MCB, CMD(CmdViewAll) },
-   { "&background", 0, MCB, CMD(CmdBackground) }, // FL_MENU_DIVIDER
+   { "&background", 0, MCB, CMD(CmdBackground) }, // FL_FL_MENU_DIVIDER
 
    { "&draw style", 0, 0, 0, FL_SUBMENU },
          { "&as is",   0, MCB, CMD(CmdAsIs),    FL_MENU_RADIO },
@@ -187,6 +187,11 @@ Fl_Menu_Item MenuTable[] =
          { "&bones",   0, MCB, CMD(CmdCharacterShowBones),   FL_MENU_RADIO },
          { "&axis",   0, MCB, CMD(CmdCharacterShowAxis),   FL_MENU_RADIO },
          { 0 },
+    { "p&references", 0, 0, 0, FL_SUBMENU },
+		 { "&axis",         0, MCB, CMD(CmdAxis),        FL_MENU_TOGGLE },
+		 { "b&ounding box", 0, MCB, CMD(CmdBoundingBox), FL_MENU_TOGGLE },
+		 { "&statistics",   0, MCB, CMD(CmdStatistics),  FL_MENU_TOGGLE },
+		 { 0 },
 	{ "&pawns", 0, 0, 0, FL_SUBMENU },
 		 { "&create pawn", 0, MCB, CMD(CmdCreatePawn), FL_MENU_DIVIDER},		 
          { "&no pawns shown", 0, MCB, CMD(CmdNoPawns), FL_MENU_RADIO },
@@ -198,12 +203,7 @@ Fl_Menu_Item MenuTable[] =
 		 { "&use reference joints", 0, MCB, CMD(CmdConstraintToggleReferencePose), FL_MENU_TOGGLE },		     
 		 { 0 },    
     { gaze_on_target_menu_name, 0, 0, GazeMenuTable, FL_SUBMENU_POINTER }, 	
-	{ body_reach_menu_name, 0, 0, BodyReachMenuTable, FL_SUBMENU_POINTER },     
-    { "p&references", 0, 0, 0, FL_SUBMENU },
-         { "&axis",         0, MCB, CMD(CmdAxis),        FL_MENU_TOGGLE },
-         { "b&ounding box", 0, MCB, CMD(CmdBoundingBox), FL_MENU_TOGGLE },
-         { "&statistics",   0, MCB, CMD(CmdStatistics),  FL_MENU_TOGGLE },
-         { 0 },
+	{ body_reach_menu_name, 0, 0, BodyReachMenuTable, FL_SUBMENU_POINTER },        
     { "&terrain", 0, 0, 0, FL_SUBMENU },
          { "&no terrain",   0, MCB, CMD(CmdNoTerrain),    FL_MENU_RADIO },
          { "&terrain wireframe",  0, MCB, CMD(CmdTerrainWireframe),  FL_MENU_RADIO },
@@ -281,12 +281,16 @@ static void set_menu_data ( FltkViewer::RenderMode r, FltkViewer::CharacterMode 
                             bool axis, bool bbox, bool stat)
  {
    # define SET(i,b)  if(b) MenuTable[i].set(); else MenuTable[i].clear();
+#ifdef WIN32
    # define SETO(i)   MenuTable[i].setonly();
-   # define CMD(i)    ((int)(MenuTable[i].user_data_))
+#else
+   # define SETO(i)   
+#endif
+   # define CMD(i)    ((uintptr_t)(MenuTable[i].user_data_))
 
-   int i=0;
-   while ( CMD(i)!=FltkViewer::CmdAsIs ) i++;          SETO (  i+(int)r );
-   while ( CMD(i)!=FltkViewer::CmdCharacterShowGeometry ) i++; SETO (  i+(int)c );
+   uintptr_t i=0;
+   while ( CMD(i)!=FltkViewer::CmdAsIs ) i++;          SETO (  i+(uintptr_t)r );      
+   while ( CMD(i)!=FltkViewer::CmdCharacterShowGeometry ) i++; SETO (  i+(uintptr_t)c );
    while ( CMD(i)!=FltkViewer::CmdAxis ) i++;          SET  ( i, axis );
    while ( CMD(i)!=FltkViewer::CmdBoundingBox ) i++;   SET  ( i, bbox );
    while ( CMD(i)!=FltkViewer::CmdStatistics ) i++;    SET  ( i, stat );
@@ -303,7 +307,7 @@ static void set_menu_data ( FltkViewer::RenderMode r, FltkViewer::CharacterMode 
 //===================================== FltkViewer =================================
 
 // Called when the small "cross" button to close the window is pressed
-static void _callback_func ( fltk::Widget* win, void* pt )
+static void _callback_func ( Fl_Widget* win, void* pt )
  {
    //LOG("DBG callback_func!\n");
    FltkViewer* v = (FltkViewer*)pt;
@@ -311,9 +315,9 @@ static void _callback_func ( fltk::Widget* win, void* pt )
  }
 
 FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
-         : SrViewer(x, y, w, h) , fltk::GlWindow ( x, y, w, h, label )
+         : SrViewer(x, y, w, h) , Fl_Gl_Window ( x, y, w, h, label )
  {
-   fltk::glVisual( fltk::RGB | fltk::DOUBLE_BUFFER | fltk::DEPTH_BUFFER );//| FL_ALPHA );
+	 Fl::gl_visual( FL_RGB | FL_DOUBLE | FL_DEPTH );//| FL_ALPHA );
 
    callback ( _callback_func, this );
 
@@ -325,7 +329,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 
    _data->root = new SrSnGroup; // we maintain root pointer always valid
    _data->rendermode = ModeAsIs;
-   _data->charactermode = ModeShowBones;
+   _data->charactermode = ModeShowGeometry;
    _data->pawnmode = ModePawnShowAsSpheres;
    _data->shadowmode = ModeNoShadows;
    _data->terrainMode = ModeTerrain;
@@ -376,7 +380,8 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    gridHighlightColor[2] = .0;
    gridSize = 200.0;
    gridStep = 20.0;
-   gridHeight = 0.0;
+//   gridSize = 400.0;
+//   gridStep = 50.0;
    gridList = -1;
    _arrowTime = 0.0f;
 
@@ -387,10 +392,10 @@ void FltkViewer::create_popup_menus()
 {
 	update_submenus();   
 	begin();
-    _data->menubut = new fltk::PopupMenu(0,0,50,50);
-    _data->menubut->type(fltk::PopupMenu::POPUP23);
+    _data->menubut = new Fl_Menu_Button(0,0,50,50);
+	_data->menubut->type(Fl_Menu_Button::POPUP23);
     _data->menubut->menu(MenuTable);   
-    _data->menubut->textsize(12);
+    _data->menubut->textsize(12);	
     _data->helpwin = make_help_window ();
     end();
 }
@@ -429,13 +434,20 @@ void FltkViewer::show_menu ()
 	create_popup_menus();
 	set_menu_data (_data->rendermode, _data->charactermode, _data->displayaxis,
                    _data->boundingbox, _data->statistics);
-   _data->menubut->popup();
+	const Fl_Menu_Item *m = _data->menubut->popup();	
+	
+	if ( m ) 
+	{		
+		//m->do_callback(_data->menubut,m->user_data());     
+		// instead of doing the callback function, call the menu command directly.
+		menu_cmd((FltkViewer::MenuCmd)(uintptr_t)m->user_data(),m->label());
+	}
+	//MenuTable->popup();	
  }
 
 void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
  {
-	 bool applyToCharacter = false; 
-	 MeCtDataDrivenReach* reachCt = getCurrentCharacterReachController();
+	 bool applyToCharacter = false; 	 
 	 MeCtExampleBodyReach* bodyReachCt = getCurrentCharacterBodyReachController();
 	 MeCtConstraint* constraintCt = getCurrentCharacterConstraintController();
 
@@ -541,55 +553,61 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 
       case CmdStatistics : SR_SWAPB(_data->statistics); break;
 	  case CmdCharacterShowGeometry:
-						_data->showgeometry = true;
-						_data->showcollisiongeometry = false;
-						_data->showdeformablegeometry = false;
-						_data->showbones = false;
-						_data->showaxis = false;
-						applyToCharacter = true;
-						break;
+		  _data->charactermode = ModeShowGeometry;		  
+		  _data->showgeometry = true;
+		  _data->showcollisiongeometry = false;
+		  _data->showdeformablegeometry = false;
+		  _data->showbones = false;
+		  _data->showaxis = false;
+		  applyToCharacter = true;
+		  break;
 	  case CmdCharacterShowCollisionGeometry: 
-						_data->showgeometry = false;
-						_data->showcollisiongeometry = true;
-						_data->showdeformablegeometry = false;
-						_data->showbones = false;
-						_data->showaxis = false;
-						applyToCharacter = true;
-						break;
+		  _data->charactermode = ModeShowCollisionGeometry;		
+		  _data->showgeometry = false;
+		  _data->showcollisiongeometry = true;
+		  _data->showdeformablegeometry = false;
+		  _data->showbones = false;
+		  _data->showaxis = false;
+		  applyToCharacter = true;
+		  break;
 	  case CmdCharacterShowDeformableGeometry: 
-		                 SbmDeformableMeshGPU::useGPUDeformableMesh = false;
-						_data->showgeometry = false;
-						_data->showcollisiongeometry = false;
-						_data->showdeformablegeometry = true;
-						_data->showbones = false;
-						_data->showaxis = false;
-						applyToCharacter = true;
-						break;
+		  _data->charactermode = ModeShowDeformableGeometry;		
+		  SbmDeformableMeshGPU::useGPUDeformableMesh = false;
+		  _data->showgeometry = false;
+		  _data->showcollisiongeometry = false;
+		  _data->showdeformablegeometry = true;
+		  _data->showbones = false;
+		  _data->showaxis = false;
+		  applyToCharacter = true;
+		  break;
 	  case CmdCharacterShowDeformableGeometryGPU: 
-						SbmDeformableMeshGPU::useGPUDeformableMesh = true;
-						_data->showgeometry = false;
-						_data->showcollisiongeometry = false;
-						_data->showdeformablegeometry = true;
-						_data->showbones = false;
-						_data->showaxis = false;
-						applyToCharacter = true;
-						break;
+		  _data->charactermode = ModeShowDeformableGeometryGPU;		
+		  SbmDeformableMeshGPU::useGPUDeformableMesh = true;
+		  _data->showgeometry = false;
+		  _data->showcollisiongeometry = false;
+		  _data->showdeformablegeometry = true;
+		  _data->showbones = false;
+		  _data->showaxis = false;
+		  applyToCharacter = true;
+		  break;
 	  case CmdCharacterShowBones: 
-						_data->showgeometry = false;
-						_data->showcollisiongeometry = false;
-						_data->showdeformablegeometry = false;
-						_data->showbones = true;
-						_data->showaxis = false;
-						applyToCharacter = true;
-						break;
+		  _data->charactermode = ModeShowBones;		
+		  _data->showgeometry = false;
+		  _data->showcollisiongeometry = false;
+		  _data->showdeformablegeometry = false;
+		  _data->showbones = true;
+		  _data->showaxis = false;
+		  applyToCharacter = true;
+		  break;
 	  case CmdCharacterShowAxis: 
-						_data->showgeometry = false;
-						_data->showcollisiongeometry = false;
-						_data->showdeformablegeometry = false;
-						_data->showbones = false;
-						_data->showaxis = true;
-						applyToCharacter = true;
-						break;
+		  _data->charactermode = ModeShowAxis;		
+		  _data->showgeometry = false;
+		  _data->showcollisiongeometry = false;
+		  _data->showdeformablegeometry = false;
+		  _data->showbones = false;
+		  _data->showaxis = true;
+		  applyToCharacter = true;
+		  break;
 	  case CmdCreatePawn : 
 						create_pawn();						
 						break;
@@ -812,8 +830,8 @@ static void gl_draw_string ( const char* s, float x, float y )
    glLoadIdentity ();
    glDisable ( GL_LIGHTING );
    glColor ( SrColor::red );
-   fltk::setfont(fltk::TIMES, 12 ); // from fltk
-   fltk::drawtext(s, x, y );      // from fltk
+   Fl::set_font(FL_TIMES, 12 ); // from fltk
+   fl_draw(s, (int) x, (int) y );      // from fltk
  }
 
 //-- Render  ------------------------------------------------------------------
@@ -849,7 +867,7 @@ void FltkViewer::close_requested ()
    exit ( 0 );
  }
 
-//# include <SR/sr_sphere.h>
+//# include <sr/sr_sphere.h>
 //static SrSnSphere* SPH=0;
 //   if ( !SPH ) SPH = new SrSnSphere;
 //   SPH->shape().center = light.position;
@@ -916,6 +934,8 @@ void FltkViewer::draw()
 {
    //static bool hasShaderSupport = false;
  
+    //static bool hasShaderSupport = false;
+   
    if ( !visible() ) return;
    if ( !valid() ) 
    {
@@ -1096,7 +1116,11 @@ void FltkViewer::draw()
 		}
 	}
 
-	drawGrid();
+   // draw the grid
+	//   if (gridList == -1)
+	//	   initGridList();
+	   drawGrid();
+
 	drawEyeBeams();
 	drawEyeLids();
 	drawDynamics();
@@ -1129,50 +1153,50 @@ void FltkViewer::draw()
    //----- Fltk will then flush and swap buffers -----------------------------
  }
 
-// fltk::event_x/y() variates from (0,0) to (w(),h())
+// Fl::event_x/y() variates from (0,0) to (w(),h())
 // transformed coords in SrEvent are in "normalized device coordinates" [-1,-1]x[1,1]
-static void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h, FltkViewer* viewer )
+static void translate_event ( SrEvent& e, SrEvent::EventType t, int w, int h, FltkViewer* viewer )
  {
    e.init_lmouse ();
 
    e.type = t;
 
    // put coordinates inside [-1,1] with (0,0) in the middle :
-   e.mouse.x  = ((float)fltk::event_x())*2.0f / ((float)w) - 1.0f;
-   e.mouse.y  = ((float)fltk::event_y())*2.0f / ((float)h) - 1.0f;
+   e.mouse.x  = ((float)Fl::event_x())*2.0f / ((float)w) - 1.0f;
+   e.mouse.y  = ((float)Fl::event_y())*2.0f / ((float)h) - 1.0f;
    e.mouse.y *= -1.0f;
    e.width = w;
    e.height = h;
-   e.mouseCoord.x = (float)fltk::event_x();
-   e.mouseCoord.y = (float)fltk::event_y();
+   e.mouseCoord.x = (float)Fl::event_x();
+   e.mouseCoord.y = (float)Fl::event_y();
 
-   if ( t==SrEvent::Push)
+   if ( t==SrEvent::EventPush)
    {
-	   e.button = fltk::event_button();
+	   e.button = Fl::event_button();
 	   e.origUp = viewer->getData()->camera.up;
 	   e.origEye = viewer->getData()->camera.eye;
 	   e.origCenter = viewer->getData()->camera.center;
 	   e.origMouse.x = e.mouseCoord.x;
 	   e.origMouse.y = e.mouseCoord.y;
    }
-   else if (t==SrEvent::Release )
+   else if (t==SrEvent::EventRelease )
    {
-	   e.button = fltk::event_button();
+	   e.button = Fl::event_button();
 	   e.origMouse.x = -1;
 	   e.origMouse.y = -1;
    }
 
 
-   if ( fltk::event_state(fltk::BUTTON1) ) e.button1 = 1;
-   if ( fltk::event_state(fltk::BUTTON2) ) e.button2 = 1;
-   if ( fltk::event_state(fltk::BUTTON3) ) e.button3 = 1;
+   if ( Fl::event_state(FL_BUTTON1) ) e.button1 = 1;
+   if ( Fl::event_state(FL_BUTTON2) ) e.button2 = 1;
+   if ( Fl::event_state(FL_BUTTON3) ) e.button3 = 1;
 
-   if ( fltk::event_state(fltk::ALT)   ) e.alt = 1;
-   if ( fltk::event_state(fltk::CTRL)  ) e.ctrl = 1;
+   if ( Fl::event_state(FL_ALT)   ) e.alt = 1;
+   if ( Fl::event_state(FL_CTRL)  ) e.ctrl = 1;
 
-   if ( fltk::event_state(fltk::SHIFT) ) e.shift = 1;
+   if ( Fl::event_state(FL_SHIFT) ) e.shift = 1;
    
-   e.key = fltk::event_key();
+   e.key = Fl::event_key();
 
  }
 
@@ -1180,10 +1204,14 @@ static void translate_event ( SrEvent& e, SrEvent::Type t, int w, int h, FltkVie
 
 void FltkViewer::translate_keyboard_state()
 {
+	_paLocoData->prevJumping = _paLocoData->jumping;
+	_paLocoData->prevStarting = _paLocoData->starting;
+	_paLocoData->prevStopping = _paLocoData->stopping;
 	bool locomotion_cmd = false;
 	bool paLocomotionCmd = false;
 	float prevV = _paLocoData->v;
 	float prevW = _paLocoData->w;
+	float scoot = 0.0f;
 	char cmd[300];
 	cmd[0] = '\0';
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -1199,6 +1227,7 @@ void FltkViewer::translate_keyboard_state()
 
 	SbmCharacter* actor = NULL;
 	mcu.character_map.reset();
+	if (mcu.character_map.next() == NULL) return;
 	for(int i = 0; i <= _locoData->char_index; ++i)
 	{
 		actor = mcu.character_map.next();
@@ -1210,14 +1239,15 @@ void FltkViewer::translate_keyboard_state()
 	strcat(cmd, _locoData->character);
 
 
-	if(fltk::get_key_state('r'))
+	if(Fl::event_key('r'))
 	{
 		_locoData->height_disp += _locoData->height_disp_delta;
 		//if(height_disp > 0.0f) height_disp = 0.0f;
-		actor->get_locomotion_ct()->set_target_height_displacement(_locoData->height_disp);
+		if (actor->get_locomotion_ct())
+			actor->get_locomotion_ct()->set_target_height_displacement(_locoData->height_disp);
 	}
 
-// 	if (fltk::get_key_state('c'))
+// 	if (Fl::event_key('c'))
 // 	{
 // 		LOG("push c");
 //  		MeCtExampleBodyReach* bodyReachCt = getCurrentCharacterBodyReachController();
@@ -1227,21 +1257,22 @@ void FltkViewer::translate_keyboard_state()
 // 		}
 // 	}
 
-	if(fltk::get_key_state('f'))
+	if(Fl::event_key('f'))
 	{
 		_locoData->height_disp -= _locoData->height_disp_delta;
 		//if(height_disp < -50.0f) height_disp = -50.0f;
-		actor->get_locomotion_ct()->set_target_height_displacement(_locoData->height_disp);
+		if (actor && actor->get_locomotion_ct())
+			actor->get_locomotion_ct()->set_target_height_displacement(_locoData->height_disp);
 	}
-	if(fltk::get_key_state('k'))
+	if(Fl::event_key('k'))
 	{
 		++_locoData->off_height_comp;
 	}
-	if(fltk::get_key_state('m'))
+	if(Fl::event_key('m'))
 	{
 		--_locoData->off_height_comp;
 	}
-	if(fltk::get_key_state('x'))
+	if(Fl::event_key('x'))
 	{
 		SbmCharacter* actor = NULL;		
 		//for(int i = 0; i < mcu.character_map.get_num_entries(); ++i)
@@ -1308,12 +1339,12 @@ void FltkViewer::translate_keyboard_state()
 
 	}
 
-	if(fltk::get_key_state('w'))
+	if(Fl::event_key('w'))
 	{
 		if(_locoData->z_flag != 0) _locoData->z_spd += 10;
 		else if(_locoData->x_flag != 0) _locoData->x_spd += 1;
 	}
-	if(fltk::get_key_state('s'))
+	if(Fl::event_key('s'))
 	{
 		if(_locoData->z_flag != 0) _locoData->z_spd -= 10;
 		else if(_locoData->x_flag != 0) _locoData->x_spd -= 1;
@@ -1321,7 +1352,7 @@ void FltkViewer::translate_keyboard_state()
 		if(_locoData->x_spd < 0) _locoData->x_spd = 0;
 	}
 
-	if(fltk::get_key_state('l'))
+	if(Fl::event_key('l'))
 	{
 		if(actor->get_locomotion_ct()->is_freezed())
 			strcat(cmd, "unfreeze");
@@ -1330,7 +1361,7 @@ void FltkViewer::translate_keyboard_state()
 		return;
 	}
 
-	if(fltk::get_key_state('p'))
+	if(Fl::event_key('p'))
 	{
 		if(actor->get_locomotion_ct()->is_freezed())
 		{
@@ -1342,10 +1373,10 @@ void FltkViewer::translate_keyboard_state()
 
 	//direction control
 	PAStateData* state = NULL;
-	if (_paLocoData->character)
+	if (_paLocoData->character && _paLocoData->character->param_animation_ct)
 		if (_paLocoData->character->param_animation_ct)
 			state = _paLocoData->character->param_animation_ct->getCurrentPAStateData();
-	if(fltk::get_key_state(fltk::UpKey))
+	if(Fl::event_key(FL_Up))
 	{
 		if(!_locoData->upkey)
 		{
@@ -1359,17 +1390,11 @@ void FltkViewer::translate_keyboard_state()
 		}
 		if (mcu.use_param_animation)
 		{
-			if (fltk::event_state(fltk::ALT))
-			{
+			if (Fl::event_state(FL_ALT))
 				_paLocoData->starting = true;
-				_paLocoData->stopping = false;
-				_paLocoData->jumping = false;
-			}
-			else
-				_paLocoData->starting = false;
 			if (!_paLocoData->starting)
 				if (_paLocoData->v < -9990 && state)
-					state->paramManager->getParameter(_paLocoData->v, _paLocoData->w);
+					state->paramManager->getParameter(_paLocoData->v, _paLocoData->w, scoot);
 				else
 					_paLocoData->v += _paLocoData->linearVelocityIncrement;
 			paLocomotionCmd = true;
@@ -1379,7 +1404,7 @@ void FltkViewer::translate_keyboard_state()
 	{
 		_locoData->upkey = false;
 	}
-	if(fltk::get_key_state(fltk::DownKey))
+	if(Fl::event_key(FL_Down))
 	{
 		if(!_locoData->downkey)
 		{
@@ -1393,17 +1418,11 @@ void FltkViewer::translate_keyboard_state()
 		}
 		if (mcu.use_param_animation)
 		{
-			if (fltk::event_state(fltk::ALT))
-			{
+			if (Fl::event_state(FL_ALT))
 				_paLocoData->stopping = true;
-				_paLocoData->jumping = false;
-				_paLocoData->starting = false;
-			}
-			else
-				_paLocoData->stopping = false;
 			if (!_paLocoData->stopping)
 				if (_paLocoData->v < -9990 && state)
-					state->paramManager->getParameter(_paLocoData->v, _paLocoData->w);
+					state->paramManager->getParameter(_paLocoData->v, _paLocoData->w, scoot);
 				else
 					_paLocoData->v -= _paLocoData->linearVelocityIncrement;
 			paLocomotionCmd = true;
@@ -1413,7 +1432,7 @@ void FltkViewer::translate_keyboard_state()
 	{
 		_locoData->downkey = false;
 	}
-	if(fltk::get_key_state(fltk::LeftKey))
+	if(Fl::event_key(FL_Left))
 	{
 		if(!_locoData->leftkey)
 		{
@@ -1422,12 +1441,8 @@ void FltkViewer::translate_keyboard_state()
 		}
 		if (mcu.use_param_animation)
 		{
-			if (_paLocoData->stopping)
-				_paLocoData->stopping = false;
-			if (_paLocoData->starting)
-				_paLocoData->starting = false;
 			if (_paLocoData->w < -9990 && state)
-				state->paramManager->getParameter(_paLocoData->v, _paLocoData->w);
+				state->paramManager->getParameter(_paLocoData->v, _paLocoData->w, scoot);
 			else
 				_paLocoData->w += _paLocoData->angularVelocityIncrement;
 			paLocomotionCmd = true;
@@ -1437,7 +1452,7 @@ void FltkViewer::translate_keyboard_state()
 	{
 		_locoData->leftkey = false;
 	}
-	if(fltk::get_key_state(fltk::RightKey))
+	if(Fl::event_key(FL_Right))
 	{
 		if(!_locoData->rightkey)
 		{
@@ -1446,12 +1461,8 @@ void FltkViewer::translate_keyboard_state()
 		}
 		if (mcu.use_param_animation)
 		{
-			if (_paLocoData->stopping)
-				_paLocoData->stopping = false;
-			if (_paLocoData->starting)
-				_paLocoData->starting = false;
 			if (_paLocoData->w < -9990 && state)
-				state->paramManager->getParameter(_paLocoData->v, _paLocoData->w);
+				state->paramManager->getParameter(_paLocoData->v, _paLocoData->w, scoot);
 			else
 				_paLocoData->w -= _paLocoData->angularVelocityIncrement;
 			paLocomotionCmd = true;
@@ -1461,7 +1472,7 @@ void FltkViewer::translate_keyboard_state()
 	{
 		_locoData->rightkey = false;
 	}
-	if (fltk::get_key_state(fltk::SpaceKey))
+	if (Fl::event_key(' '))
 	{
 		_paLocoData->jumping = true;
 		_paLocoData->starting = false;
@@ -1469,7 +1480,7 @@ void FltkViewer::translate_keyboard_state()
 		paLocomotionCmd = true;
 	}
 
-	if(fltk::get_key_state('a'))//speed control
+	if(Fl::event_key('a'))//speed control
 	{
 		if(!_locoData->a_key)
 		{
@@ -1486,7 +1497,7 @@ void FltkViewer::translate_keyboard_state()
 		_locoData->a_key = false;
 	}
 
-	if(fltk::get_key_state('d'))//speed control
+	if(Fl::event_key('d'))//speed control
 	{
 		if(!_locoData->d_key)
 		{
@@ -1536,7 +1547,8 @@ void FltkViewer::translate_keyboard_state()
 	}
 	if (paLocomotionCmd)
 	{
-		if (_paLocoData->starting && state && state->stateName == PseudoIdleState)
+		// p.s. quite confused about the logic here: _paLocoData->starting && _paLocoData->prevStarting? why this works?
+		if (_paLocoData->starting && _paLocoData->prevStarting && state && state->stateName == PseudoIdleState)
 		{
 			std::stringstream command1;
 			command1 << "panim schedule char " << _paLocoData->character->name << " state UtahStopToWalk loop false playnow false";
@@ -1544,14 +1556,16 @@ void FltkViewer::translate_keyboard_state()
 			command2 << "panim schedule char " << _paLocoData->character->name << " state UtahLocomotion loop true playnow false";
 			mcu.execute((char*)command1.str().c_str());
 			mcu.execute((char*)command2.str().c_str());
+			_paLocoData->starting = false;
 		}
-		else if (_paLocoData->stopping && state && state->stateName == "UtahLocomotion")
+		else if (_paLocoData->stopping && _paLocoData->prevStopping && state && state->stateName == "UtahLocomotion")
 		{
 			std::stringstream command;
 			command << "panim schedule char " << _paLocoData->character->name << " state UtahWalkToStop loop false playnow false";
 			mcu.execute((char*)command.str().c_str());
+			_paLocoData->stopping = false;
 		}
-		else if (_paLocoData->jumping && state && state->stateName == "UtahLocomotion")
+		else if (_paLocoData->jumping && _paLocoData->prevJumping && state && state->stateName == "UtahLocomotion")
 		{
 			std::stringstream command1;
 			command1 << "panim schedule char " << _paLocoData->character->name << " state UtahJump loop false playnow false";
@@ -1567,18 +1581,19 @@ void FltkViewer::translate_keyboard_state()
 		{
 			if (state)
 			{
-				bool success = state->paramManager->setWeight(_paLocoData->v, _paLocoData->w);
-				if (!success)
+				bool success = state->paramManager->setWeight(_paLocoData->v, _paLocoData->w, scoot);
+
+				// in case scoot value comes as non-zero
+				float x = 0.0f, y = 0.0f, z = 0.0f;
+				state->paramManager->getParameter(x, y, z);
+
+				if (!success || z != 0.0f)
 				{
 					_paLocoData->v = prevV;
 					_paLocoData->w = prevW;
+					state->paramManager->setWeight(_paLocoData->v, _paLocoData->w, scoot);
 				}
-				std::stringstream command2;
-				command2 << "panim update char " << _paLocoData->character->name << " ";
-				for (int i = 0; i < state->getNumMotions(); i++)
-					command2 << state->weights[i] << " ";
-				mcu.execute((char*)command2.str().c_str());
-//				LOG("PALocomotion Parameters-> velocity: %f, angular velocity: %f", _paLocoData->v, _paLocoData->w);
+				_paLocoData->character->param_animation_ct->updateWeights();
 			}
 		}
 	}
@@ -1590,7 +1605,7 @@ static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h
 {
 	e.type = t;
 	bool not_locomotion = false;
-	e.key = fltk::event_key();
+	e.key = Fl::event_key();
 	char cmd[300];
 	cmd[0] = '\0';
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -1617,7 +1632,7 @@ static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h
 	// locomotion control
 	switch (e.key)
 	{
-	case fltk::UpKey: //move forward
+	case FL_UP: //move forward
 		_locoData->rps_flag = 0;
 		_locoData->z_flag = 1;
 		_locoData->x_flag = 0;
@@ -1625,7 +1640,7 @@ static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h
 		sprintf(_locoData->t_direction, "forward ");
 		break;
 
-    case fltk::DownKey://move back
+    case FL_DOWN://move back
 		_locoData->z_flag = -1;
 		_locoData->x_flag = 0;
 		_locoData->rps_flag = 0;
@@ -1633,7 +1648,7 @@ static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h
 		sprintf(_locoData->t_direction, "backward ");
 		break;
 
-	case fltk::LeftKey://turn left
+	case FL_Left://turn left
 		_locoData->rps_flag = -1;
 		break;
 
@@ -1646,7 +1661,7 @@ static void translate_keyboard_event ( SrEvent& e, SrEvent::Type t, int w, int h
 		not_locomotion = true;
 		break;
 
-	case fltk::RightKey://turn right
+	case FL_Right://turn right
 		rps_flag = 1;
 		break;
 
@@ -1709,22 +1724,22 @@ int FltkViewer::handle ( int event )
    # define POPUP_MENU(e) e.ctrl && e.button3
 
    SrEvent &e = _data->event;
-   e.type = SrEvent::None;
+   e.type = SrEvent::EventNone;
 
    translate_keyboard_state();   
   
    switch ( event )
-   { case fltk::PUSH:
-       { //SR_TRACE1 ( "Mouse Push : but="<<fltk::event_button()<<" ("<<fltk::event_x()<<", "<<fltk::event_y()<<")" <<" Ctrl:"<<fltk::event_state(FL_CTRL) );
-         translate_event ( e, SrEvent::Push, w(), h(), this );
-         if ( POPUP_MENU(e) ) { show_menu(); e.type=SrEvent::None; }
+   { case FL_PUSH:
+       { //SR_TRACE1 ( "Mouse Push : but="<<Fl::event_button()<<" ("<<Fl::event_x()<<", "<<Fl::event_y()<<")" <<" Ctrl:"<<Fl::event_state(FL_CTRL) );
+         translate_event ( e, SrEvent::EventPush, w(), h(), this );
+         if ( POPUP_MENU(e) ) { show_menu(); e.type=SrEvent::EventNone; }
 		 // process picking
 		 //printf("Mouse Push\n");
 
 		 char exe_cmd[256];
 		 if (e.button1)
 		 {
-			 if (fltk::event_clicks())
+			 if (Fl::event_clicks())
 			 {
 				 // pick-up object
 				 makeGLContext();
@@ -1735,13 +1750,12 @@ int FltkViewer::handle ( int event )
 				 {
 					 //std::string cmd;
 					 //cmd = "bml char " + curChar->name + " <sbm:reach sbm:handle=\"r" + curChar->name + "\" action=\"pick-up\" target=\""+ selectedPawn->name + "\" />";
-//					 sprintf(exe_cmd,"bml char %s <sbm:reach sbm:handle=\"r%s\" sbm:reach-duration=\"0.5\" sbm:action=\"pick-up\" target=\"%s\"/>",curChar->name,curChar->name,selectedPawn->name);
 					 sprintf(exe_cmd,"bml char %s <sbm:reach sbm:handle=\"r%s\" sbm:reach-duration=\"0.01\" sbm:action=\"pick-up\" target=\"%s\"/>",curChar->name,curChar->name,selectedPawn->name);
 					 mcuCBHandle& mcu = mcuCBHandle::singleton();
 					 mcu.execute(exe_cmd);
 				 }
 			 }
-			 else 
+			 else
 			 {				 			 
 				 makeGLContext();
 				 _objManipulator.picking(e.mouse.x, e.mouse.y, _data->camera);
@@ -1755,7 +1769,7 @@ int FltkViewer::handle ( int event )
 			 }			 
 		 }
 
-		 if (e.button3 && fltk::event_clicks())
+		 if (e.button3 && Fl::event_clicks() && e.alt)
 		 {
 			 // put-down object
 			 SbmCharacter* curChar = getCurrentCharacter();			 
@@ -1768,7 +1782,6 @@ int FltkViewer::handle ( int event )
 				 SrPlane ground(SrVec(0,curChar->getHeight()*0.0f,0), SrVec(0, 1, 0));
 				 SrVec dest = ground.intersect(p1, p2);
 				 dest.y = curChar->getHeight()*0.6f;
-				 //sprintf(exe_cmd,"bml char %s <sbm:reach sbm:handle=\"r%s\" sbm:action=\"put-down\" sbm:target-pos=\"%f %f %f\"/>",curChar->name,curChar->name,dest.x,dest.y,dest.z);
 				 sprintf(exe_cmd,"bml char %s <sbm:reach sbm:handle=\"r%s\" sbm:action=\"put-down\" sbm:target-pos=\"%f %f %f\"/>",curChar->name,curChar->name,dest.x,dest.y,dest.z);
 				 mcuCBHandle& mcu = mcuCBHandle::singleton();
 				 mcu.execute(exe_cmd);	 
@@ -1776,7 +1789,7 @@ int FltkViewer::handle ( int event )
 
 			
 		 }
-		 else if (mcuCBHandle::singleton().steerEngine && e.button3 && !e.alt)
+		 else if (mcuCBHandle::singleton().steerEngine.isInitialized() && e.button3 && !e.alt)
 		 {
 			_paLocoData->character->steeringAgent->setTargetAgent(NULL);
 			SrVec p1;
@@ -1791,10 +1804,10 @@ int FltkViewer::handle ( int event )
 		 }
        } break;
 
-      case fltk::RELEASE:
-        //SR_TRACE1 ( "Mouse Release : ("<<fltk::event_x()<<", "<<fltk::event_y()<<") buts: "
-         //            <<(fltk::event_state(fltk::BUTTON1)?1:0)<<" "<<(fltk::event_state(fltk::BUTTON2)?1:0) );
-        translate_event ( e, SrEvent::Release, w(), h(), this);
+      case FL_RELEASE:
+        //SR_TRACE1 ( "Mouse Release : ("<<Fl::event_x()<<", "<<Fl::event_y()<<") buts: "
+         //            <<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
+        translate_event ( e, SrEvent::EventRelease, w(), h(), this);
 		// process picking
 		//if (!e.button1)	
 		//printf("Mouse Release\n");
@@ -1802,35 +1815,35 @@ int FltkViewer::handle ( int event )
 		
         break;
 
-      case fltk::MOVE:
-        //SR_TRACE2 ( "Move buts: "<<(fltk::event_state(FL_BUTTON1)?1:0)<<" "<<(fltk::event_state(FL_BUTTON2)?1:0) );
-        if ( !fltk::event_state(fltk::BUTTON1) && !fltk::event_state(fltk::BUTTON2) ) break;
+      case FL_MOVE:
+        //SR_TRACE2 ( "Move buts: "<<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
+        if ( !Fl::event_state(FL_BUTTON1) && !Fl::event_state(FL_BUTTON2) ) break;
         // otherwise, this is a drag: enter in the drag case.
         // not sure if this is a hack or a feature.
-      case fltk::DRAG:
-        //SR_TRACE2 ( "Mouse Drag : ("<<fltk::event_x()<<", "<<fltk::event_y()<<") buts: "
-        //             <<(fltk::event_state(FL_BUTTON1)?1:0)<<" "<<(fltk::event_state(FL_BUTTON2)?1:0) );
-        translate_event ( e, SrEvent::Drag, w(), h(), this );
+      case FL_DRAG:
+        //SR_TRACE2 ( "Mouse Drag : ("<<Fl::event_x()<<", "<<Fl::event_y()<<") buts: "
+        //             <<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
+        translate_event ( e, SrEvent::EventDrag, w(), h(), this );
 		
 		
         break;
 
-      case fltk::SHORTCUT: // not sure the relationship between a shortcut and keyboard event...
-        //SR_TRACE1 ( "Shortcut : "<< fltk::event_key() <<" "<<fltk::event_text() );
+      case FL_SHORTCUT: // not sure the relationship between a shortcut and keyboard event...
+        //SR_TRACE1 ( "Shortcut : "<< Fl::event_key() <<" "<<fltk::event_text() );
         //translate_event ( e, SrEvent::Keyboard, w(), h() );
         //break;
 
-	  case fltk::KEY:
-        //SR_TRACE1 ( "Key Pressed : "<< fltk::event_key() <<" "<<fltk::event_text() );
+	  case FL_KEYBOARD:
+        //SR_TRACE1 ( "Key Pressed : "<< Fl::event_key() <<" "<<fltk::event_text() );
         //translate_keyboard_event ( e, SrEvent::Keyboard, w(), h());
         break;
 
-//      case fltk::KEYBOARD:
-        //SR_TRACE1 ( "Key Pressed : "<< fltk::event_key() <<" "<<fltk::event_text() );
+//      case FL_KEYBOARDBOARD:
+        //SR_TRACE1 ( "Key Pressed : "<< Fl::event_key() <<" "<<fltk::event_text() );
 //        translate_event ( e, SrEvent::Keyboard, w(), h() );
      //   break;
 
-      case fltk::HIDE: // Called when the window is iconized
+      case FL_HIDE: // Called when the window is iconized
         { //SR_TRACE1 ( "Hide" );
           _data->iconized = true;
           // the opengl lists need to be re-created when the window appears again, so
@@ -1841,35 +1854,35 @@ int FltkViewer::handle ( int event )
           sa.apply ( _data->root );
         } break;
 
-      case fltk::SHOW: // Called when the window is de-iconized or when show() is called
+      case FL_SHOW: // Called when the window is de-iconized or when show() is called
         //SR_TRACE1 ( "Show" );
         _data->iconized = false;
         show ();
         break;
 
       // Other events :
-      case fltk::ENTER:          
+      case FL_ENTER:          
 		  //SR_TRACE2 ( "Enter" );         
 		  break;
-      case fltk::LEAVE:          
+      case FL_LEAVE:          
 		  //SR_TRACE2 ( "Leave" );         
 		  break;
-      case fltk::FOCUS:          
+      case FL_FOCUS:          
 		  //SR_TRACE2 ( "Focus" );         
 		  break;
-      case fltk::UNFOCUS:        
+      case FL_UNFOCUS:        
 		  //SR_TRACE2 ( "Unfocus" );       
 		  break;
      // case FL_CLOSE:          
 		  //SR_TRACE2 ( "Close");          
 	//	  break;
-      case fltk::ACTIVATE:       
+      case FL_ACTIVATE:       
 		  //SR_TRACE2 ( "Activate");       
 		  break;
-      case fltk::DEACTIVATE:     
+      case FL_DEACTIVATE:     
 		  //SR_TRACE2 ( "Deactivate");     
 		  break;
-      case fltk::PASTE:          
+	  case FL_PASTE:          
 		  //SR_TRACE2 ( "Paste");          
 		  break;
  //     case FL_SELECTIONCLEAR: 
@@ -1879,18 +1892,18 @@ int FltkViewer::handle ( int event )
 
    //SR_TRACE3 ( e );
 
-   if ( e.type == SrEvent::None ) return 0; // not an interesting event
+   if ( e.type == SrEvent::EventNone ) return 0; // not an interesting event
 
-   if ( event==fltk::PUSH || event==fltk::DRAG )
+   if ( event==FL_PUSH || event==FL_DRAG )
     { SrPlane plane ( _data->camera.center, SrVec::k );
       _data->camera.get_ray ( e.mouse.x, e.mouse.y, e.ray.p1, e.ray.p2 );
       _data->camera.get_ray ( e.lmouse.x, e.lmouse.y, e.lray.p1, e.lray.p2 );
       e.mousep = plane.intersect ( e.ray.p1, e.ray.p2 );
       e.lmousep = plane.intersect ( e.lray.p1, e.lray.p2 );
-	  if ( event==fltk::PUSH  ) // update picking precision
+	  if ( event==FL_PUSH  ) // update picking precision
        { // define a and b with 1 pixel difference:
-         SrPnt2 a ( ((float)w())/2.0f, ((float)h())/2.0f ); // ( float(fltk::event_x()), float(fltk::event_y()) );
-         SrPnt2 b (a+SrVec2::one);// ( float(fltk::event_x()+1), float(fltk::event_y()+1) );
+         SrPnt2 a ( ((float)w())/2.0f, ((float)h())/2.0f ); // ( float(Fl::event_x()), float(Fl::event_y()) );
+         SrPnt2 b (a+SrVec2::one);// ( float(Fl::event_x()+1), float(Fl::event_y()+1) );
          // put coordinates inside [-1,1] with (0,0) in the middle :
          a.x  = a.x*2.0f / float(w()) - 1.0f;
          a.y  = a.y*2.0f / float(h()) - 1.0f; a.y *= -1.0f;
@@ -1939,7 +1952,7 @@ int FltkViewer::handle_event ( const SrEvent &e )
 
    if ( e.mouse_event() ) return handle_scene_event ( e );
 
-   if ( e.type == SrEvent::Keyboard )
+   if ( e.type == SrEvent::EventKeyboard )
     { if ( handle_keyboard(e)==0 ) res = handle_scene_event ( e );
       if ( res==0 && e.key==SrEvent::KeyEsc ) res=1; // to avoid exiting with ESC
     }
@@ -1951,13 +1964,14 @@ int FltkViewer::handle_event ( const SrEvent &e )
 
 int FltkViewer::handle_object_manipulation( const SrEvent& e)
 {
-	if (e.type==SrEvent::Push)
+	if (e.type==SrEvent::EventPush)
 	 {
 		 if (e.button1)
 		 {
 			 //_objManipulator.picking(e.mouse.x,e.mouse.y, _data->camera);
 			 //_objManipulator.hasPicking(true);
-			 _objManipulator.setPicking(SrVec2(e.mouse.x, e.mouse.y));
+			SrVec2 mouseVec(e.mouse.x, e.mouse.y);
+			 _objManipulator.setPicking(mouseVec);
 			 if (e.ctrl)
 				 _objManipulator.setPickingType(ObjectManipulationHandle::CONTROL_POS);
 			 else if (e.shift)
@@ -1985,7 +1999,8 @@ int FltkViewer::handle_object_manipulation( const SrEvent& e)
 		 }
 		 if (e.button3 && e.shift)
 		 {
-			_objManipulator.setPicking(SrVec2(e.mouse.x, e.mouse.y));
+			SrVec2 pickVec(e.mouse.x, e.mouse.y);
+			_objManipulator.setPicking(pickVec);
 			_objManipulator.picking(e.mouse.x, e.mouse.y, _data->camera);
 			SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
 			if (selectedPawn)
@@ -1998,14 +2013,14 @@ int FltkViewer::handle_object_manipulation( const SrEvent& e)
 		 }
 		return 1;
 	 }
-	else if (e.type==SrEvent::Drag)
+	else if (e.type==SrEvent::EventDrag)
 	{
 		if (e.button1)// && _posControl.dragging)
 		{			
 			_objManipulator.drag(_data->camera,e.lmouse.x,e.lmouse.y,e.mouse.x,e.mouse.y);			
 		}
 	}
-	else if (e.type==SrEvent::Release)
+	else if (e.type==SrEvent::EventRelease)
 	{
 		if (e.button == 1)
 		{			
@@ -2019,7 +2034,7 @@ int FltkViewer::handle_object_manipulation( const SrEvent& e)
 
 void FltkViewer::create_pawn()
 {
-	const char* pawn_name = fltk::input("Input Pawn Name","foo");
+	const char* pawn_name = fl_input("Input Pawn Name","foo");
 	if (!pawn_name) // no name is input
 		return;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -2148,7 +2163,7 @@ SrVec rotatePoint(SrVec point, SrVec origin, SrVec direction, float angle)
 
 int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
  {
-   if ( e.type==SrEvent::Drag )
+   if ( e.type==SrEvent::EventDrag )
     { 
       float dx = e.mousedx() * _data->camera.aspect;
       float dy = e.mousedy() / _data->camera.aspect;
@@ -2210,7 +2225,7 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
 		redraw();
 	  }
     }
-   else if ( e.type==SrEvent::Release )
+   else if ( e.type==SrEvent::EventRelease )
     { 
     }
    return 1;
@@ -2272,8 +2287,13 @@ void FltkViewer::drawGrid()
 {
 	if (_data->gridMode == ModeNoGrid)
 		return;
+//	if( gridList != -1 )	{
+//		glCallList( gridList );
+//		return;
+//	}
 
-	
+	GLfloat floor_height = 0.0f;
+
 	glPushAttrib(GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT);
 	bool colorChanged = false;
 	glDisable(GL_LIGHTING);
@@ -2286,65 +2306,42 @@ void FltkViewer::drawGrid()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
 	glLineWidth(1);
-
-	if ( gridList != -1 )	{
-		glCallList( gridList );
-	} 
-	else
+//	glLineStipple(1, 0xAAAA);
+	glBegin(GL_LINES);
+	for (float x = -gridSize; x <= gridSize; x += gridStep)
 	{
-		glDeleteLists(gridList, 1);
-		gridList = glGenLists(1);
-		if ( gridList == GL_INVALID_VALUE || gridList == GL_INVALID_OPERATION)
-			return;
-		glNewList(gridList, GL_COMPILE);
-			
-
-		//	glLineStipple(1, 0xAAAA);
-		glBegin(GL_LINES);
-		for (float x = -gridSize; x <= gridSize; x += gridStep)
-		{
-			if (x == 0.0) {
-				colorChanged = true;
-				glColor4f(gridHighlightColor[0], gridHighlightColor[1], gridHighlightColor[2], 1.0f);
-			}
-			glVertex3f(x, gridHeight, -gridSize);
-			glVertex3f(x, gridHeight, gridSize);
-			
-			if (colorChanged) {
-				colorChanged = false;
-				glColor4f(gridColor[0], gridColor[1], gridColor[2], gridColor[3]);
-			}
-
+		if (x == 0.0) {
+			colorChanged = true;
+			glColor4f(gridHighlightColor[0], gridHighlightColor[1], gridHighlightColor[2], 1.0f);
 		}
-		for (float x = -gridSize; x <= gridSize; x += gridStep)
-		{
-			if (x == 0) {
-				colorChanged = true;
-				glColor4f(gridHighlightColor[0], gridHighlightColor[1], gridHighlightColor[2], 1.0f );
-			}
-			glVertex3f(-gridSize, gridHeight, x);
-			glVertex3f(gridSize, gridHeight, x);
-			if (colorChanged) {
-				colorChanged = false;
-				glColor4f(gridColor[0], gridColor[1], gridColor[2], gridColor[3]);
-			}
+		glVertex3f(x, floor_height, -gridSize);
+		glVertex3f(x, floor_height, gridSize);
+		
+		if (colorChanged) {
+			colorChanged = false;
+			glColor4f(gridColor[0], gridColor[1], gridColor[2], gridColor[3]);
 		}
-
-		glEndList();
 
 	}
+	for (float x = -gridSize; x <= gridSize; x += gridStep)
+	{
+		if (x == 0) {
+			colorChanged = true;
+			glColor4f(gridHighlightColor[0], gridHighlightColor[1], gridHighlightColor[2], 1.0f );
+		}
+		glVertex3f(-gridSize, floor_height, x);
+		glVertex3f(gridSize, floor_height, x);
+		if (colorChanged) {
+			colorChanged = false;
+			glColor4f(gridColor[0], gridColor[1], gridColor[2], gridColor[3]);
+		}
+	}
 
+	glEnd();
 	glDisable(GL_BLEND);
 //	glDisable(GL_LINE_STIPPLE);
 
 	glPopAttrib();
-
-
-	
-
-
-	glEnd();
-
 }
 
 void FltkViewer::drawEyeBeams()
@@ -2581,7 +2578,7 @@ void FltkViewer::drawPawns()
 	mcu.character_map.reset();
 	while (SbmCharacter* character = mcu.character_map.next())
 	{
-		pawnSize = character->getHeight()/ 30.0f;
+		pawnSize = 5.f;//character->getHeight()/ 30.0f;
 		break;
 	}
 
@@ -2590,7 +2587,7 @@ void FltkViewer::drawPawns()
 	
 	while ( SbmPawn* pawn = pawn_map.next() )
 	{
-		if (!pawn->skeleton_p) 
+		if (!pawn->skeleton_p) // wouldn't this will go into inf loop ?
 			continue;
 		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
 		if (character)
@@ -2690,7 +2687,6 @@ void FltkViewer::drawCircle(float cx, float cy, float cz, float r, int num_segme
 	glDisable(GL_BLEND); 
 }
 static float spin_angle = 0.0f;
-
 void FltkViewer::drawActiveArrow(SrVec& from, SrVec& to, int num, float width, SrVec& color, bool spin)
 {
 	spin_angle += 0.02f;
@@ -2888,7 +2884,7 @@ static float footprintscacle = 1.0f;
 static SrVec footprintoffset;
 
 
-void FltkViewer::ChangeOffGroundHeight(fltk::Widget* widget, void* data)
+void FltkViewer::ChangeOffGroundHeight(Fl_Widget* widget, void* data)
 {
 	FltkViewer* window = (FltkViewer*) data;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -3170,8 +3166,9 @@ void FltkViewer::drawLocomotion()
 				velocity *= character->get_locomotion_ct()->get_current_speed()/2.0f;
 				float default_speed = character->get_locomotion_ct()->get_limb_list()->get(character->get_locomotion_ct()->get_dominant_limb_index())->blended_anim.global_info->speed/2.0f;
 				arrow_end = arrow_start + velocity;
-				drawArrow(arrow_start, arrow_end, 15, SrVec(0.1f, 0.3f, 1.0f));
-				drawCircle(arrow_start.x, arrow_start.y, arrow_start.z, default_speed, 72, SrVec(0.1f, 0.3f, 1.0f));
+				SrVec color(0.1f, 0.3f, 1.0f);
+				drawArrow(arrow_start, arrow_end, 15, color);
+				drawCircle(arrow_start.x, arrow_start.y, arrow_start.z, default_speed, 72, color);
 			}
 		}
 		if(_data->showselection)
@@ -3223,7 +3220,8 @@ void FltkViewer::drawLocomotion()
 						if(off_height > 0.0f) continue;
 						SrVec pos = character->get_locomotion_ct()->get_supporting_joint_pos(j, k, &orientation, &normal);
 						pos.y += 0.1f;
-						newPrints(newprint, j, pos, orientation, normal, SrVec(0.2f, (float)k, (float)(1-k)), k, 0);
+						SrVec color(.2f, (float) k, (float) 1-k);
+						newPrints(newprint, j, pos, orientation, normal, color, k, 0);
 						newprint = false;
 					}
 					//pre_dominant = k;
@@ -3254,7 +3252,8 @@ void FltkViewer::drawLocomotion()
 						//if(off_height > 0.0f) continue;
 						SrVec pos = character->get_locomotion_ct()->get_supporting_joint_pos(j, cur_dominant, &orientation, &normal);
 						pos.y += 0.1f;
-						newPrints(newprint, j, pos, orientation, normal, SrVec(0.0f, (float)cur_dominant*0.3f, (float)(1-cur_dominant)*0.3f), cur_dominant, 1);
+						SrVec color(0.0f, (float) cur_dominant*0.3f, (float)(1-cur_dominant)*0.3f);
+						newPrints(newprint, j, pos, orientation, normal, color,  cur_dominant, 1);
 						newprint = false;
 					}
 					pre_dominant = cur_dominant;
@@ -3498,28 +3497,6 @@ MeCtExampleBodyReach* FltkViewer::getCurrentCharacterBodyReachController()
 }
 
 
-MeCtDataDrivenReach* FltkViewer::getCurrentCharacterReachController()
-{
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmCharacter* character = getCurrentCharacter();
-
-	MeCtDataDrivenReach* reachCt = NULL;
-	if ( character )
-	{
-		MeCtSchedulerClass* reachSched = character->reach_sched_p;
-		MeCtSchedulerClass::VecOfTrack reach_tracks = reachSched->tracks();		
-		MeCtReach* tempCt = NULL;
-		for (unsigned int c = 0; c < reach_tracks.size(); c++)
-		{
-			MeController* controller = reach_tracks[c]->animation_ct();		
-			reachCt = dynamic_cast<MeCtDataDrivenReach*>(controller);
-			//tempCt  = dynamic_cast<MeCtReach*>(controller);
-			if (reachCt)
-				break;
-		}		
-	}
-	return reachCt;
-}
 
 MeCtConstraint* FltkViewer::getCurrentCharacterConstraintController()
 {
@@ -3570,23 +3547,24 @@ void FltkViewer::drawReach()
 		character->skeleton_p->update_global_matrices();		
 		//SkJoint* root = reachCt->getRootJoint();		
 		*/
+		
+
 		MeCtReachEngine* re = reachCt->getReachEngine();
-		ReachStateData* rd = re->getReachData();
 		if (!re)
 			return;
 
+		ReachStateData* rd = re->getReachData();
 		if (!rd)
 			return;
 		
 		SkJoint* root = character->skeleton_p->root();
-		SrMat rootMat = root->gmat();
+		SrMat rootMat = rd->gmat;//root->gmat();
 		//rootMat.translation(root->gmat().get(12),root->gmat().get(13),root->gmat().get(14));
 		const std::vector<SrVec>& exampleData = re->examplePts;
-		const std::vector<SrVec>& resampleData = re->resamplePts;
-		//OG("Root Mat = ")			
+		const std::vector<SrVec>& resampleData = re->resamplePts;		
 
-		//SrPoints srExamplePts;	
-		//srExamplePts.init_with_attributes();
+		SrPoints srExamplePts;	
+		srExamplePts.init_with_attributes();
 		for (unsigned int i=0;i<exampleData.size();i++)
 		{
 			//const PoseExample& exPose = exampleData[i];
@@ -3627,7 +3605,8 @@ void FltkViewer::drawReach()
 			SrVec lPos = resampleData[i];
 			SrVec gPos = lPos*rootMat; // transform to global coordinate
 			//drawCircle(gPos[0],gPos[1],gPos[2],1.0,5,SrVec(1.0,0.0,0.0));			
-			drawPoint(gPos[0],gPos[1],gPos[2],1.5,SrVec(0.0,1.0,0.0));
+			SrVec yaxis(0.0, 1.0, 0.0);
+			drawPoint(gPos[0],gPos[1],gPos[2],1.5, yaxis);
 			//PositionControl::drawSphere(gPos,1.0f);			
 		}	
 // 		if (reachCt->posPlanner && reachCt->posPlanner->path())
@@ -3707,6 +3686,8 @@ void FltkViewer::drawColObject( SbmGeomObject* colObj, SrMat& gmat )
 	glEnable(GL_LIGHTING);
 	glPushMatrix();
 	//SrMat gMat = colObj->worldState.gmat();
+	SrColor objColor;
+	objColor.set(colObj->color.c_str());
 	SrMat gMat = gmat;
 	glMultMatrixf((const float*) gMat);
 	if (dynamic_cast<SbmGeomSphere*>(colObj))
@@ -3715,7 +3696,7 @@ void FltkViewer::drawColObject( SbmGeomObject* colObj, SrMat& gmat )
 		SbmGeomSphere* sph = dynamic_cast<SbmGeomSphere*>(colObj);
 		SrSnSphere sphere;					
 		sphere.shape().radius = sph->radius;
-		sphere.color(SrColor(1.f,0.f,0.f));
+		sphere.color(objColor);
 		sphere.render_mode(srRenderModeSmooth);
 		SrGlRenderFuncs::render_sphere(&sphere);		
 	}
@@ -3725,10 +3706,9 @@ void FltkViewer::drawColObject( SbmGeomObject* colObj, SrMat& gmat )
 		SrSnBox sbox;					
 		sbox.shape().a = -box->extent;
 		sbox.shape().b = box->extent;
-		sbox.color(SrColor(1.f,0.f,0.f));
+		sbox.color(objColor);
 		sbox.render_mode(srRenderModeSmooth);
 		SrGlRenderFuncs::render_box(&sbox);
-
 	}
 	else if (dynamic_cast<SbmGeomCapsule*>(colObj))
 	{
@@ -3737,7 +3717,7 @@ void FltkViewer::drawColObject( SbmGeomObject* colObj, SrMat& gmat )
 		SrSnSphere sphere;				
 		sphere.shape().center = cap->endPts[0];//SrVec(0,-cap->extent,0);
 		sphere.shape().radius = cap->radius;
-		sphere.color(SrColor(1.f,0.f,0.f));
+		sphere.color(objColor);
 		sphere.render_mode(srRenderModeSmooth);
 		SrGlRenderFuncs::render_sphere(&sphere);
 
@@ -3748,7 +3728,7 @@ void FltkViewer::drawColObject( SbmGeomObject* colObj, SrMat& gmat )
 		cyc.shape().a = cap->endPts[0];//SrVec(0,-cap->extent,0);
 		cyc.shape().b = cap->endPts[1];//SrVec(0,cap->extent,0);
 		cyc.shape().radius = cap->radius;
-		cyc.color(SrColor(1.f,0.f,0.f));
+		cyc.color(objColor);
 		cyc.render_mode(srRenderModeSmooth);
 		SrGlRenderFuncs::render_cylinder(&cyc);
 	}
@@ -3759,12 +3739,12 @@ void FltkViewer::drawColObject( SbmGeomObject* colObj, SrMat& gmat )
 		{
 			SrSnModel model;
 			model.shape(*mesh->geoMesh);
-			model.color(SrColor(1.f,0.f,0.f));
+			model.color(objColor);
 			model.render_mode(srRenderModeSmooth);
 			SrGlRenderFuncs::render_model(&model);
 		}
 	}
-	glPopMatrix();
+	glPopMatrix();	
 	glDisable(GL_LIGHTING);
 }
 
@@ -3774,21 +3754,22 @@ void FltkViewer::drawSteeringInfo()
 	if (_data->steerMode == ModeNoSteer)
 		return;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if (!mcu.steerEngine || !mcu.steerEngine->_engine)
+	if (!mcu.steerEngine.isInitialized() || !mcu.steerEngine._engine)
 		return;
 
 	glPushAttrib(GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT);
 	glPushMatrix();
 	glScalef(100.0f, 100.0f, 100.0f);
 
-	const std::vector<SteerLib::AgentInterface*>& agents = mcu.steerEngine->_engine->getAgents();
+	//comment out for now, have to take a look at the steering code
+	const std::vector<SteerLib::AgentInterface*>& agents = mcu.steerEngine._engine->getAgents();
 	for (size_t x = 0; x < agents.size(); x++)
 	{
-		mcu.steerEngine->_engine->selectAgent(agents[x]);
+		mcu.steerEngine._engine->selectAgent(agents[x]);
 		agents[x]->draw();
 	}
 
-	const std::set<SteerLib::ObstacleInterface*>& obstacles = mcu.steerEngine->_engine->getObstacles();
+	const std::set<SteerLib::ObstacleInterface*>& obstacles = mcu.steerEngine._engine->getObstacles();
 	for (std::set<SteerLib::ObstacleInterface*>::const_iterator iter = obstacles.begin();
 		iter != obstacles.end();
 		iter++)
@@ -3799,7 +3780,7 @@ void FltkViewer::drawSteeringInfo()
 
 	if (_data->steerMode == ModeSteerAll)
 	{
-		mcu.steerEngine->_engine->getSpatialDatabase()->draw();
+		mcu.steerEngine._engine->getSpatialDatabase()->draw();
 	}
 
 	glPopMatrix();
@@ -3816,8 +3797,11 @@ PALocomotionData::PALocomotionData()
 	starting = false;
 	stopping = false;
 	jumping = false;
-	linearVelocityIncrement = 10.0f;
-	angularVelocityIncrement = 20.0f;
+	prevStarting = false;
+	prevStopping = false;
+	prevJumping = false;
+	linearVelocityIncrement = 5.0f;
+	angularVelocityIncrement = 10.0f;
 }
 
 PALocomotionData::~PALocomotionData()

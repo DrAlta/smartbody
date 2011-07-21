@@ -3,8 +3,10 @@
 
 #include "smartbody-dll.h"
 
+#ifdef WIN32
 #include <windows.h>
 #include <mmsystem.h>
+#endif
 #include "sbm/xercesc_utils.hpp"
 #include "sbm/mcontrol_util.h"
 #include "sbm/mcontrol_callbacks.h"
@@ -15,7 +17,7 @@
 
 using std::string;
 
-
+#ifdef WIN32
 BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 {
    switch ( fdwReason )
@@ -30,7 +32,7 @@ BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 
    return TRUE;
 }
-
+#endif
 
 
 class Smartbody_dll_SBMCharacterListener_Internal : public SBMCharacterListener
@@ -89,7 +91,8 @@ int sbm_main_func( srArgBuffer & args, mcuCBHandle * mcu_p )
    }
 
    const char * args_raw = args.read_remainder_raw();
-   int result = mcu_p->execute( token, srArgBuffer( args_raw ) );
+   srArgBuffer arg_buf( args_raw );
+   int result = mcu_p->execute( token, arg_buf );
    switch( result )
    {
       case CMD_NOT_FOUND:
@@ -190,8 +193,8 @@ SMARTBODY_DLL_API bool Smartbody_dll::Init()
    InitVHMsg();
    RegisterCallbacks();
 
-
-   mcu_vrAllCall_func( srArgBuffer(""), &mcu );
+	srArgBuffer arg_buf( "" );
+   mcu_vrAllCall_func( arg_buf, &mcu );
 
    vhcl::Log::Listener* listener = new vhcl::Log::FileListener("./smartbody.log");
    vhcl::Log::g_log.AddListener(listener);
@@ -370,7 +373,6 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert( "tip",	mcu_time_ival_prof_func );
 
    mcu.insert( "panim",		mcu_panim_cmd_func );	
-   mcu.insert( "mirror",       mcu_motion_mirror_cmd_func);
 
    mcu.insert( "load",   mcu_load_func );
    mcu.insert( "pawn",   SbmPawn::pawn_cmd_func );
@@ -381,8 +383,7 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert( "motion",    mcu_motion_controller_func );
    mcu.insert( "stepturn",  mcu_stepturn_controller_func );
    mcu.insert( "quickdraw", mcu_quickdraw_controller_func );
-   mcu.insert( "gaze",      mcu_gaze_controller_func );
-   mcu.insert( "reach",     mcu_reach_controller_func );   
+   mcu.insert( "gaze",      mcu_gaze_controller_func );  
    mcu.insert( "gazelimit", mcu_gaze_limit_func );
    mcu.insert( "snod",      mcu_snod_controller_func );
    mcu.insert( "lilt",      mcu_lilt_controller_func );
@@ -395,6 +396,7 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert( "vrSpeak",     BML_PROCESSOR::vrSpeak_func );
 
    mcu.insert( "net_reset",           mcu_net_reset );
+   mcu.insert( "net_check",           mcu_net_check );
    mcu.insert( "RemoteSpeechReply",   remoteSpeechResult_func );
    mcu.insert( "RemoteSpeechTimeOut", remoteSpeechTimeOut_func);  // internally routed message
    mcu.insert( "joint_logger",        joint_logger::start_stop_func );
@@ -413,13 +415,12 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert( "enableevents",	       enableevents_func );
    mcu.insert( "disableevents",	   disableevents_func );
    mcu.insert( "registerevent",       registerevent_func );
-   mcu.insert( "unregisterevent",       registerevent_func );
+   mcu.insert( "unregisterevent",       unregisterevent_func );
    mcu.insert( "motionmap",		   motionmap_func );
    mcu.insert( "skeletonmap",		   skeletonmap_func );
    mcu.insert( "characters",		   showcharacters_func );
    mcu.insert( "pawns",			   showpawns_func );
    mcu.insert( "syncpoint",		   syncpoint_func);
-   mcu.insert( "pawnbonebus",		   pawnbonebus_func);
    mcu.insert( "steer",			   mcu_steer_func);	
 
    mcu.insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands

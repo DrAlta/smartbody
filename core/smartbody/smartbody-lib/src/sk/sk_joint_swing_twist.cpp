@@ -23,8 +23,8 @@
 
 # include <math.h>
 
-# include <SR/sr_alg.h>
-# include <SK/sk_joint_swing_twist.h>
+# include <sr/sr_alg.h>
+# include <sk/sk_joint_swing_twist.h>
 
 //============================= SkJointSwingTwist ============================
 

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="sbm-fltk"
+	Name="sbm-fltk-1.3"
 	ProjectGUID="{2C18CD04-407B-420A-8CDC-1C6325F87072}"
-	RootNamespace="sbm-fltk"
+	RootNamespace="sbm-fltk-1.3"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -45,7 +45,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk2;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\sbm-ui\panimationviewer\src&quot;;&quot;..\..\sbm-ui\bmlviewer\src&quot;;..\..\sbm\src\channelbufferviewer;..\..\..\..\lib\ANN;&quot;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\external&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;..\..\..\..\core\smartbody\ode\include"
+				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\..\fltk-1.3.0rc6&quot;;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\sbm-ui\panimationviewer\src&quot;;&quot;..\..\sbm-ui\bmlviewer\src&quot;;..\..\sbm\src\channelbufferviewer;..\..\..\..\lib\ANN;&quot;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\external&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;..\..\..\..\core\smartbody\ode\include"
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -68,10 +68,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="Smartbodyd.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib blasd.lib libf2cd.lib lapackd.lib pthreadVSE2.lib xerces-c_3D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_44.lib boost_system-vc90-mt-gd-1_44.lib boost_regex-vc90-mt-gd-1_44.lib log4cxxd.lib OpenAL32.lib alut.lib libsndfile-1.lib fltk2_gld.lib fltk2d.lib opengl32.lib glu32.lib dbghelp.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib pprAId.lib steerlibd.lib ode_singled.lib"
+				AdditionalDependencies="Smartbodyd.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib blasd.lib libf2cd.lib lapackd.lib pthreadVSE2.lib xerces-c_3D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_44.lib boost_system-vc90-mt-gd-1_44.lib boost_regex-vc90-mt-gd-1_44.lib log4cxxd.lib OpenAL32.lib alut.lib libsndfile-1.lib fltkgld.lib fltkd.lib opengl32.lib glu32.lib dbghelp.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib pprAId.lib steerlibd.lib ode_singled.lib"
 				OutputFile="..\bin\sbm-fltkd.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;..\..\smartbody-lib\lib&quot;;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhcl\log4cxx\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk2\lib;..\..\..\..\lib\pthreads\lib;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib&quot;;..\..\..\..\lib\boost\lib;&quot;..\..\sbm-ui\panimationviewer\lib&quot;;&quot;..\..\sbm-ui\bmlviewer\lib&quot;;..\..\ode\lib;..\..\clapack\lib;&quot;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug&quot;"
+				AdditionalLibraryDirectories="&quot;..\..\smartbody-lib\lib&quot;;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhcl\log4cxx\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;&quot;..\..\fltk-1.3.0rc6\lib&quot;;..\..\..\..\lib\pthreads\lib;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib&quot;;..\..\..\..\lib\boost\lib;&quot;..\..\sbm-ui\panimationviewer\lib&quot;;&quot;..\..\sbm-ui\bmlviewer\lib&quot;;..\..\ode\lib;..\..\clapack\lib;&quot;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug&quot;"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -138,7 +138,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk2;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\sbm-ui\panimationviewer\src&quot;;&quot;..\..\sbm-ui\bmlviewer\src&quot;;&quot;..\..\sbm-ui\channelbufferviewer\src&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\external&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;..\..\..\..\core\smartbody\ode\include"
+				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\..\fltk-1.3.0rc6&quot;;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\sbm-ui\panimationviewer\src&quot;;&quot;..\..\sbm-ui\bmlviewer\src&quot;;&quot;..\..\sbm-ui\channelbufferviewer\src&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\external&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;..\..\..\..\core\smartbody\ode\include"
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -161,10 +161,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="Smartbody.lib vhcl.lib vhmsg.lib bonebus.lib wsp.lib blas.lib libf2c.lib lapack.lib fltk2.lib fltk2_gl.lib pthreadVSE2.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_44.lib boost_system-vc90-mt-1_44.lib boost_regex-vc90-mt-1_44.lib log4cxx.lib dbghelp.lib opengl32.lib glu32.lib OpenAL32.lib alut.lib libsndfile-1.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib pprAI.lib steerlib.lib ode_single.lib"
+				AdditionalDependencies="Smartbody.lib vhcl.lib vhmsg.lib bonebus.lib wsp.lib blas.lib libf2c.lib lapack.lib fltk.lib fltkgl.lib pthreadVSE2.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_44.lib boost_system-vc90-mt-1_44.lib boost_regex-vc90-mt-1_44.lib log4cxx.lib dbghelp.lib opengl32.lib glu32.lib OpenAL32.lib alut.lib libsndfile-1.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib pprAI.lib steerlib.lib ode_single.lib"
 				OutputFile="..\bin\sbm-fltk.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;..\..\smartbody-lib\lib&quot;;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhcl\log4cxx\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk2\lib;..\..\..\..\lib\pthreads\lib;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib&quot;;..\..\..\..\lib\boost\lib;&quot;..\..\sbm-ui\panimationviewer\lib&quot;;&quot;..\..\sbm-ui\bmlviewer\lib&quot;;&quot;..\..\sbm-ui\channelbufferviewer\lib&quot;;..\..\clapack\lib;..\..\ode\lib;&quot;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release&quot;"
+				AdditionalLibraryDirectories="&quot;..\..\smartbody-lib\lib&quot;;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhcl\log4cxx\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;&quot;..\..\fltk-1.3.0rc6\lib&quot;;..\..\..\..\lib\pthreads\lib;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib&quot;;..\..\..\..\lib\boost\lib;&quot;..\..\sbm-ui\panimationviewer\lib&quot;;&quot;..\..\sbm-ui\bmlviewer\lib&quot;;&quot;..\..\sbm-ui\channelbufferviewer\lib&quot;;..\..\clapack\lib;..\..\ode\lib;&quot;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release&quot;"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -251,7 +251,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk2;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\sbm-ui\panimationviewer\src&quot;;&quot;..\..\sbm-ui\bmlviewer\src&quot;;..\..\sbm\src\channelbufferviewer;..\..\..\..\lib\ANN;&quot;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\external&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;..\..\..\..\core\smartbody\ode\include"
+				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\..\fltk-1.3.0rc6&quot;;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\sbm-ui\panimationviewer\src&quot;;&quot;..\..\sbm-ui\bmlviewer\src&quot;;..\..\sbm\src\channelbufferviewer;..\..\..\..\lib\ANN;&quot;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\external&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;..\..\..\..\core\smartbody\ode\include"
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -274,10 +274,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="Smartbodyd.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib blasd.lib libf2cd.lib lapackd.lib pthreadVSE2.lib xerces-c_3D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_44.lib boost_system-vc90-mt-gd-1_44.lib boost_regex-vc90-mt-gd-1_44.lib log4cxxd.lib OpenAL32.lib alut.lib libsndfile-1.lib fltk2_gld.lib fltk2d.lib opengl32.lib glu32.lib dbghelp.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib pprAId.lib steerlibd.lib ode_singled.lib wininet.lib fbxsdk-2012.1-mdd.lib"
+				AdditionalDependencies="Smartbodyd.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib blasd.lib libf2cd.lib lapackd.lib pthreadVSE2.lib xerces-c_3D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_44.lib boost_system-vc90-mt-gd-1_44.lib boost_regex-vc90-mt-gd-1_44.lib log4cxxd.lib OpenAL32.lib alut.lib libsndfile-1.lib fltkgld.lib fltkd.lib opengl32.lib glu32.lib dbghelp.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib pprAId.lib steerlibd.lib ode_singled.lib wininet.lib fbxsdk-2012.1-mdd.lib"
 				OutputFile="..\bin\sbm-fltkd.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;..\..\smartbody-lib\lib&quot;;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhcl\log4cxx\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk2\lib;..\..\..\..\lib\pthreads\lib;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib&quot;;..\..\..\..\lib\boost\lib;&quot;..\..\sbm-ui\panimationviewer\lib&quot;;&quot;..\..\sbm-ui\bmlviewer\lib&quot;;..\..\ode\lib;..\..\clapack\lib;&quot;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug&quot;;..\..\..\..\lib\fbxsdk\lib\vs2008\x86"
+				AdditionalLibraryDirectories="&quot;..\..\smartbody-lib\lib&quot;;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhcl\log4cxx\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;&quot;..\..\fltk-1.3.0rc6\lib&quot;;..\..\..\..\lib\pthreads\lib;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib&quot;;..\..\..\..\lib\boost\lib;&quot;..\..\sbm-ui\panimationviewer\lib&quot;;&quot;..\..\sbm-ui\bmlviewer\lib&quot;;..\..\ode\lib;..\..\clapack\lib;&quot;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug&quot;;..\..\..\..\lib\fbxsdk\lib\vs2008\x86"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -344,7 +344,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk2;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\sbm-ui\panimationviewer\src&quot;;&quot;..\..\sbm-ui\bmlviewer\src&quot;;&quot;..\..\sbm-ui\channelbufferviewer\src&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\external&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;..\..\..\..\core\smartbody\ode\include"
+				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\..\fltk-1.3.0rc6&quot;;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\sbm-ui\panimationviewer\src&quot;;&quot;..\..\sbm-ui\bmlviewer\src&quot;;&quot;..\..\sbm-ui\channelbufferviewer\src&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\external&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;..\..\..\..\core\smartbody\ode\include"
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -367,10 +367,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="Smartbody.lib vhcl.lib vhmsg.lib bonebus.lib wsp.lib blas.lib libf2c.lib lapack.lib fltk2.lib fltk2_gl.lib pthreadVSE2.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_44.lib boost_system-vc90-mt-1_44.lib boost_regex-vc90-mt-1_44.lib log4cxx.lib dbghelp.lib opengl32.lib glu32.lib OpenAL32.lib alut.lib libsndfile-1.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib pprAI.lib steerlib.lib ode_single.lib wininet.lib fbxsdk-2012.1-md.lib"
+				AdditionalDependencies="Smartbody.lib vhcl.lib vhmsg.lib bonebus.lib wsp.lib blas.lib libf2c.lib lapack.lib fltk.lib fltkgl.lib pthreadVSE2.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_44.lib boost_system-vc90-mt-1_44.lib boost_regex-vc90-mt-1_44.lib log4cxx.lib dbghelp.lib opengl32.lib glu32.lib OpenAL32.lib alut.lib libsndfile-1.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib pprAI.lib steerlib.lib ode_single.lib wininet.lib fbxsdk-2012.1-md.lib"
 				OutputFile="..\bin\sbm-fltk.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;..\..\smartbody-lib\lib&quot;;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhcl\log4cxx\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk2\lib;..\..\..\..\lib\pthreads\lib;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib&quot;;..\..\..\..\lib\boost\lib;&quot;..\..\sbm-ui\panimationviewer\lib&quot;;&quot;..\..\sbm-ui\bmlviewer\lib&quot;;&quot;..\..\sbm-ui\channelbufferviewer\lib&quot;;..\..\clapack\lib;..\..\ode\lib;&quot;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release&quot;;..\..\..\..\lib\fbxsdk\lib\vs2008\x86"
+				AdditionalLibraryDirectories="&quot;..\..\smartbody-lib\lib&quot;;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhcl\log4cxx\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;&quot;..\..\fltk-1.3.0rc6\lib&quot;;..\..\..\..\lib\pthreads\lib;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib&quot;;..\..\..\..\lib\boost\lib;&quot;..\..\sbm-ui\panimationviewer\lib&quot;;&quot;..\..\sbm-ui\bmlviewer\lib&quot;;&quot;..\..\sbm-ui\channelbufferviewer\lib&quot;;..\..\clapack\lib;..\..\ode\lib;&quot;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release&quot;;..\..\..\..\lib\fbxsdk\lib\vs2008\x86"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -618,6 +618,178 @@
 			</File>
 			<File
 				RelativePath="..\src\CommandWindow.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="bmlcreator"
+			>
+			<File
+				RelativePath="..\src\bmlcreator\AttributeWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\AttributeWindow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLAnimationObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLAnimationObject.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLBodyObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLBodyObject.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLConstraintObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLConstraintObject.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLCreatorWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLCreatorWindow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLEventObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLEventObject.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLFaceObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLFaceObject.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLGazeObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLGazeObject.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLGestureObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLGestureObject.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLHeadObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLHeadObject.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLLocomotionObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLLocomotionObject.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLObject.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLReachObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLReachObject.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLSaccadeObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLSaccadeObject.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLSpeechObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLSpeechObject.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="resourceViewer"
+			>
+			<File
+				RelativePath="..\src\resourceViewer\Fl_Tree_Horizontal.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\resourceViewer\Fl_Tree_Horizontal.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\resourceViewer\ResourceWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\resourceViewer\ResourceWindow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\resourceViewer\TreeInfoObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\resourceViewer\TreeInfoObject.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\resourceViewer\TreeItemInfoWidget.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\resourceViewer\TreeItemInfoWidget.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="faceviewer"
+			>
+			<File
+				RelativePath="..\src\faceviewer\FaceViewer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\faceviewer\FaceViewer.h"
 				>
 			</File>
 		</Filter>

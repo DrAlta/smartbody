@@ -23,7 +23,7 @@
 #ifndef ME_CT_CHANNEL_WRITER_HPP
 #define ME_CT_CHANNEL_WRITER_HPP
 
-#include <ME/me_controller.h>
+#include <me/me_controller.h>
 
 
 /**
@@ -57,7 +57,7 @@ public:
 	/**
 	 *  Initializes the controller with a set of channels to write.
 	 */
-	void init( SkChannelArray& channels, bool continuous );
+	void init(SbmPawn* pawn, SkChannelArray& channels, bool continuous );
 
 	/**
 	 *  Copies data into the current data buffer.

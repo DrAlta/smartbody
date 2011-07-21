@@ -21,7 +21,7 @@
  */
 
 #include "vhcl.h"
-#include <ME/me_ct_adshr_envelope.hpp>
+#include <me/me_ct_adshr_envelope.hpp>
 
 #include <cstdlib>
 #include <sstream>
@@ -57,7 +57,7 @@ bool only_single_float_channels( SkChannelArray& channels ) {
 	return is_valid;
 }
 
-bool MeCtAdshrEnvelope::init( SkChannelArray& channels ) {
+bool MeCtAdshrEnvelope::init(SbmPawn* pawn, SkChannelArray& channels) {
 	if( !only_single_float_channels( channels ) )
 		return false;  // unsupported channel set
 	
@@ -76,7 +76,7 @@ bool MeCtAdshrEnvelope::init( SkChannelArray& channels ) {
 	}
 
 	// Initialize superclass anyway
-	MeController::init ();
+	MeController::init (pawn);
 
 	return true;
 }

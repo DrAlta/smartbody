@@ -39,27 +39,29 @@ that is distributed: */
 		Paco Abad (fjabad@dsic.upv.es)
 **********************************************************/
 
-#ifndef COMMANDWINDOW
-#define COMMANDWINDOW
+#ifndef _COMMANDWINDOW_
+#define _COMMANDWINDOW_
 
 
-#include <fltk/Window.h>
-#include <fltk/Input.h>
-#include <fltk/FloatInput.h>
-#include <fltk/MultiLineInput.h>
-#include <fltk/Output.h>
-#include <fltk/MultiLineOutput.h>
-#include <fltk/Box.h>
-#include <fltk/Button.h>
-#include <fltk/MenuBar.h>
-#include <fltk/Choice.h>
-#include <fltk/TabGroup.h>
-#include <fltk/TextBuffer.h>
-#include <fltk/TextEditor.h>
-#include <fltk/TextDisplay.h>
-#include <fltk/ValueSlider.h>
-#include <fltk/MenuBar.h>
-#include <fltk/draw.h>
+#include <FL/Fl_Slider.H>
+#include <vhcl.h>
+#include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Input.H>
+#include <FL/Fl_Float_Input.H>
+#include <FL/Fl_Multiline_Input.H>
+#include <FL/Fl_Output.H>
+#include <FL/Fl_Multiline_Output.H>
+#include <FL/Fl_Box.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Menu_Bar.H>
+#include <FL/Fl_Choice.H>
+#include <FL/Fl_Tabs.H>
+#include <FL/Fl_Text_Buffer.H>
+#include <FL/Fl_Text_Editor.H>
+#include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Value_Slider.H>
+#include <FL/Fl_Menu_Bar.H>
+#include <FL/fl_draw.H>
 #include <cstdio>
 #include <cstdlib>
 #include <string>
@@ -69,7 +71,7 @@ that is distributed: */
 #define MAXHISTORYSIZE 10
 
 
-class CommandWindow : public GenericViewer, public fltk::Window, public vhcl::Log::Listener
+class CommandWindow : public GenericViewer, public Fl_Double_Window, public vhcl::Log::Listener
 {
 public:
 	CommandWindow(int, int, int, int, const char*);
@@ -83,26 +85,26 @@ public:
 	const char* getHistoryItem(int location);
 	void clearHistory();
 
-	static CommandWindow* getCommandWindow(Widget* w);
+	static CommandWindow* getCommandWindow(Fl_Widget* w);
 
 	virtual void OnMessage( const std::string & message );
 
-	fltk::TextBuffer *textBuffer[2];
-	fltk::TextEditor *textEditor[2];
-	fltk::TextBuffer *DisplayTextBuffer;
-	fltk::TextDisplay *textDisplay;
-	fltk::MenuBar* menubar;
-	fltk::TabGroup* tabGroup;
+	Fl_Text_Buffer *textBuffer[2];
+	Fl_Text_Editor *textEditor[2];
+	Fl_Text_Buffer *DisplayTextBuffer;
+	Fl_Text_Display *textDisplay;
+	Fl_Menu_Bar* menubar;
+	Fl_Tabs* tabGroup;
 
 	static void testCB();
-	static void upcb(int key, fltk::TextEditor* te);
-	static void entercb(int key, fltk::TextEditor* te);
-	static void downcb(int key, fltk::TextEditor* te);
-	static void tabcb(int key, fltk::TextEditor* te);
-	static void ctrlUcb(int key, fltk::TextEditor* te);
+	static void upcb(int key, Fl_Text_Editor* te);
+	static void entercb(int key, Fl_Text_Editor* te);
+	static void downcb(int key, Fl_Text_Editor* te);
+	static void tabcb(int key, Fl_Text_Editor* te);
+	static void ctrlUcb(int key, Fl_Text_Editor* te);
 
-	static void clearcb(fltk::Widget* widget, void* data);
-	static void clearhistorycb(fltk::Widget* widget, void* data);
+	static void clearcb(Fl_Widget* widget, void* data);
+	static void clearhistorycb(Fl_Widget* widget, void* data);
 
 	static void FindFiles(char*, char*);
 

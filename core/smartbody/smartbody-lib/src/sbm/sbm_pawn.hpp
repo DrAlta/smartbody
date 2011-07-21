@@ -26,16 +26,19 @@
 #define SBM_PAWN_HPP
 #include "vhcl.h"
 
-#include <SK/sk_scene.h>
-#include <SK/sk_skeleton.h>
-#include <Sbm/Physics/SbmColObject.h>
+#include <sk/sk_scene.h>
+#include <sk/sk_skeleton.h>
+#include <sbm/Physics/SbmColObject.h>
 #include <sbm/SteerSuiteEngineDriver.h>
 
-#include <ME/me_controller_tree_root.hpp>
-#include <ME/me_ct_channel_writer.hpp>
-#include <ME/me_ct_curve_writer.hpp>
+#include <me/me_controller_tree_root.hpp>
+#include <me/me_ct_channel_writer.hpp>
+#include <me/me_ct_curve_writer.hpp>
+#include <sbm/DObject.h>
+
+#if USE_WSP
 #include "wsp.h"
-#include "bonebus.h"
+#endif
 
 #include <map>
 
@@ -50,7 +53,7 @@ class srArgBuffer;
 #define SBM_PAWN_USE_WORLD_OFFSET_WRITER	(1)
 #define SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK	(0)
 
-class SbmPawn {
+class SbmPawn : public DObject {
 public:
 	//  Public Constants
 	static const char* WORLD_OFFSET_JOINT_NAME;
@@ -98,11 +101,10 @@ public:  // TODO - properly encapsulate / privatize the following
 	
 	//		float scale = 0.5f;
 //		SteerLib::BoxObstacle* box = new SteerLib::BoxObstacle(x / 100.0f - scale, x / 100.0f + scale, y / 100.0f - scale, y / 100.0f + scale, z / 100.0f - scale, z / 100.0f + scale);
-//		mcuCBHandle::singleton().steerEngine->_engine->addObstacle(box);
+//		mcuCBHandle::singleton().steerEngine._engine->addObstacle(box);
 
 	// Temporarily, until there is a unified multi-skeleton controller tree
 	MeControllerTreeRoot	*ct_tree_p;
-	bonebus::BoneBusCharacter * bonebusCharacter;
 
 public:
 	
@@ -116,9 +118,10 @@ public:
 	void updateToColObject();
 	void updateToSteeringSpaceObject();
 	void initSteeringSpaceObject();
+	void clearSteeringGoals();
 
 	bool is_initialized();
-	bool initGeomObj(const char* geomType, float size, const char* meshName = NULL);
+	bool initGeomObj(const char* geomType, SrVec size, const char* color, const char* meshName = NULL);
 	void initPhysicsObj();
 	void removePhysicsObj();
 	void setPhysicsSim(bool enable);
@@ -140,6 +143,8 @@ public:
 	void setWorldOffset(const SrMat& newWorld);
 	void set_world_offset( float x, float y, float z,
 		                   float yaw, float pitch, float roll );
+
+	virtual void notify(DSubject* subject);
 
 #if SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK
 	virtual void register_controller_cleanup( MeController* ct, controller_cleanup_callback_fp func );
@@ -165,6 +170,7 @@ protected:
 
 public:
 	// static command functions
+
 
 	/**
 	 *  Creates a pawn that can be updated through the WSP library
@@ -215,10 +221,12 @@ public:
 	/**
 	 *  WSP access functions.
 	 */
+#if USE_WSP
 	static WSP::WSP_ERROR wsp_world_position_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data );
 	static WSP::WSP_ERROR wsp_world_rotation_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data );
 	static WSP::WSP_ERROR wsp_position_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data );
 	static WSP::WSP_ERROR wsp_rotation_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data );
+#endif
 };
 
 #endif // SBM_PAWN_HPP

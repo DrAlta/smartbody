@@ -2,7 +2,7 @@
 #include "me_ct_reach_IK.hpp"
 #include "me_ct_locomotion_func.hpp"
 
-#include <SR/sr_alg.h>
+#include <sr/sr_alg.h>
 #include <algorithm>
 #include <boost/foreach.hpp>
 #include <sbm/gwiz_math.h>
@@ -21,7 +21,6 @@ MeCtIKTreeNode::MeCtIKTreeNode()
 	child = NULL;
 	brother = NULL;
 	active = true;
-	lock   = false;
 
 	// a temporary hack for testing
 	// To-Do : we should provide a way to let user indicate the joint limits parameters via input script or file
@@ -86,7 +85,11 @@ MeCtIKTreeScenario::MeCtIKTreeScenario()
 
 MeCtIKTreeScenario::~MeCtIKTreeScenario()
 {
-
+	for (unsigned int i=0;i<ikTreeNodes.size();i++)
+	{
+		MeCtIKTreeNode* node = ikTreeNodes[i];
+		delete node;
+	}	
 }
 
 bool MeCtIKTreeScenario::checkJointLimit( const SrQuat& q, const MeCtIKJointLimit& limit, const SrQuat& qInit, SrVec& jointOffset )
@@ -125,7 +128,8 @@ bool MeCtIKTreeScenario::checkJointLimit( const SrQuat& q, const MeCtIKJointLimi
 			modified = true;
 		}	
 
-		quat_t ql = MeCtReachIK::swingTwist2Quat(vector_t(sw_y, sw_z, tw));//quat_t( sw_x, sw_y, tw);
+		vector_t Vect(sw_y, sw_z, tw);
+		quat_t ql = MeCtReachIK::swingTwist2Quat( Vect );//quat_t( sw_x, sw_y, tw);
 		quat_t q_offset = ql*quat_init.conjugate();//ql*quat_st.conjugate();//ql*quat_init.conjugate();
 		vector_t rot = q_offset.axisangle();		
 		jointOffset = SrVec((float)rot.x(),(float)rot.y(),(float)rot.z());		
@@ -326,6 +330,9 @@ MeCtJacobianIK::~MeCtJacobianIK(void)
 void MeCtJacobianIK::update( MeCtIKTreeScenario* scenario )
 {
 	ikScenario = scenario;
+	// don't do anything if there is no end effectors
+	if (ikScenario->ikPosEffectors->size() + ikScenario->ikRotEffectors->size() == 0)
+		return;
 
 	scenario->updateNodeGlobalMat(scenario->ikTreeRoot);
 	// solve for initial jacobian	

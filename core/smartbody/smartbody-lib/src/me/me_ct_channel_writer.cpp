@@ -21,7 +21,7 @@
  */
 
 #include <vhcl.h>
-#include <ME/me_ct_channel_writer.hpp>
+#include <me/me_ct_channel_writer.hpp>
 
 #include <cstdlib>
 #include <sstream>
@@ -40,7 +40,7 @@ const char* MeCtChannelWriter::controller_type() const {
 	return MeCtChannelWriter::TYPE;
 }
 
-void MeCtChannelWriter::init( SkChannelArray& channels, bool continuous )
+void MeCtChannelWriter::init(SbmPawn* pawn, SkChannelArray& channels, bool continuous)
 {
 	_channels.init();
 	_channels.merge( channels );
@@ -61,7 +61,7 @@ void MeCtChannelWriter::init( SkChannelArray& channels, bool continuous )
 	_continuous = continuous;
 	_write_next = false;  // Don't write until the data is set
 
-	MeController::init ();
+	MeController::init (pawn);
 }
 
 bool MeCtChannelWriter::set_data( SrBuffer<float> data ) {

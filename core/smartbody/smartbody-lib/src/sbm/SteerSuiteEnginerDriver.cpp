@@ -20,13 +20,34 @@ using namespace Util;
 //
 // constructor
 //
-SteerSuiteEngineDriver::SteerSuiteEngineDriver()
+SteerSuiteEngineDriver::SteerSuiteEngineDriver() : DObject()
 {
 	_alreadyInitialized = false;
 	_engine = NULL;
 	_done = false;
 	_options = NULL;
 	_startTime = 0;
+
+#ifdef WIN32
+			createStringAttribute("aimodule", "pprAI", true, "Basic", 60, false, false, false, "Agent module library");
+#endif
+#ifdef __linux__
+			createStringAttribute("aimodule", "libpprAI", true, "Basic", 60, false, false, false, "Agent module library");
+#endif
+#ifdef __APPLE__
+			createStringAttribute("aimodule", "libpprAI", true, "Basic", 60, false, false, false, "Agent module library");
+#endif
+
+	createStringAttribute("engineOptions.testCaseSearchPath", "../../../../core/smartbody/steersuite-1.3/testcases/", true, "Basic", 60, false, false, false, "Path to find agent shared libraries");
+	createStringAttribute("engineOptions.moduleSearchPath", "../../../../core/smartbody/sbm/bin/", true, "Basic", 60, false, false, false, "Path to find test cases");
+	createDoubleAttribute("gridDatabaseOptions.gridSizeX", 100, true, "Basic", 60, false, false, false, "Size of grid in x dimension.");
+	createDoubleAttribute("gridDatabaseOptions.gridSizeZ", 100, true, "Basic", 60, false, false, false, "Size of grid in z dimension.");
+	createDoubleAttribute("initialConditions.radius", 0.4, true, "Basic", 60, false, false, false, "Initial radius of agents in meters.");
+}
+
+bool SteerSuiteEngineDriver::isInitialized()
+{
+	return _alreadyInitialized;
 }
 
 bool SteerSuiteEngineDriver::isDone()
@@ -47,10 +68,6 @@ float SteerSuiteEngineDriver::getStartTime()
 	return _startTime;
 }
 
-bool SteerSuiteEngineDriver::isInitialized()
-{
-	return _alreadyInitialized;
-}
 
 //
 // init()
@@ -110,6 +127,8 @@ void SteerSuiteEngineDriver::finish()
 {
 	_engine->finish();
 	delete _engine;
+	_engine = NULL;
+	_alreadyInitialized = false;
 }
 
 

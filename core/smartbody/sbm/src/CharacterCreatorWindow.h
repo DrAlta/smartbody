@@ -1,25 +1,25 @@
 #ifndef _CHARACTERCREATERWINDOW_H_
 #define _CHARACTERCREATERWINDOW_H_
 
-#include <fltk/Window.h>
-#include <fltk/Browser.h>
-#include <fltk/Input.h>
-#include <fltk/Button.h>
+#include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Choice.H>
+#include <FL/Fl_Input.H>
+#include <FL/Fl_Button.H>
 #include <vector>
 #include <sk/sk_skeleton.h>
 
-class CharacterCreatorWindow : public fltk::Window
+class CharacterCreatorWindow : public Fl_Double_Window
 {
 	public:
 		CharacterCreatorWindow(int x, int y, int w, int h, char* name);
 		~CharacterCreatorWindow();
 
 		void setSkeletons(std::vector<std::string>& skeletonNames);
-		static void CreateCB(fltk::Widget* w, void* data);
+		static void CreateCB(Fl_Widget* w, void* data);
 
-		fltk::Browser* browserSkeletons;
-		fltk::Input* inputName;
-		fltk::Button* buttonCreate;
+		Fl_Choice* choiceSkeletons;
+		Fl_Input* inputName;
+		Fl_Button* buttonCreate;
 };
 
 

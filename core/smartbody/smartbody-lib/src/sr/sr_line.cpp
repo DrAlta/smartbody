@@ -21,10 +21,10 @@
  */
 
 # include <math.h>
-# include <SR/sr_box.h>
-# include <SR/sr_line.h>
-# include <SR/sr_input.h>
-# include <SR/sr_output.h>
+# include <sr/sr_box.h>
+# include <sr/sr_line.h>
+# include <sr/sr_input.h>
+# include <sr/sr_output.h>
 
 //===========================================================================
 

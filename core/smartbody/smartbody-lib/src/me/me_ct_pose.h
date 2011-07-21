@@ -28,9 +28,9 @@
 
 //=================================== MeCtPose =====================================
 
-# include <ME/me_controller.h>
-# include <SK/sk_posture.h>
-# include <SK/sk_motion.h>
+# include <me/me_controller.h>
+# include <sk/sk_posture.h>
+# include <sk/sk_motion.h>
 
 /*! This controller sends always a same posture, ie, makes the associated
     channels to rest in a same pose. The rest pose can be defined in several
@@ -56,18 +56,18 @@ class MeCtPose : public MeController
 	void init_channel_map( void );
 
     /*! Defines the channels to be used and fill the rest posture with zeros */
-    void init ( const SkChannelArray& ca );
+    void init ( SbmPawn* pawn,  const SkChannelArray& ca);
 
     /*! Defines the channels and the values from the given posture p */
-    void init ( const SkPosture& p );
+    void init ( SbmPawn* pawn, const SkPosture& p );
 
     /*! Defines the channels as those declared in the given motion, and set the
         MeCtPose posture from the motion at time t. After this call, motion m
         will be disconnected to any previous connection in the motion. */
-    void init ( SkMotion* m, float t );
+    void init ( SbmPawn* pawn, SkMotion* m, float t );
 
 	/*! Initialize a controller by cloning another */
-	void init( MeCtPose* other );
+	void init( SbmPawn* pawn, MeCtPose* other);
 
     /*! Sets the name of the SkPosture used to initialize this pose controller. */
     void posture_name ( const char* posture_name ) { _posture_name = posture_name; }

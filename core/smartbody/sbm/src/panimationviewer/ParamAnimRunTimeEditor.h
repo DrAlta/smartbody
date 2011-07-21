@@ -23,17 +23,20 @@
 #ifndef _PARAM_ANIM_RUN_TIME_EDITOR_H_
 #define _PARAM_ANIM_RUN_TIME_EDITOR_H_
 
+#include <FL/Fl_Slider.H>
+#include <vhcl.h>
 #include "PanimationWindow.h"
-#include <fltk/GlWindow.h>
-#include <SR/sr_gl.h>
-#include <SR/sr_light.h>
-#include <SR/sr_camera.h>
-#include <SR/sr_event.h>
+#include <FL/Fl_Gl_Window.H>
+#include <FL/Fl_Hold_Browser.H>
+#include <sr/sr_gl.h>
+#include <sr/sr_light.h>
+#include <sr/sr_camera.h>
+#include <sr/sr_event.h>
 
 class PanimationWindow;
 class ParameterGroup;
 
-class Parameter3DVisualization : public fltk::GlWindow
+class Parameter3DVisualization : public Fl_Gl_Window
 {
 	public:
 		Parameter3DVisualization(int x, int y, int w, int h, char* name, PAStateData* s, ParameterGroup* window);
@@ -41,8 +44,9 @@ class Parameter3DVisualization : public fltk::GlWindow
 
 		virtual void draw();
 		virtual int handle(int event);
+		virtual void resize(int x, int y, int w, int h);
 		void init_opengl();
-		void translate_event(SrEvent& e, SrEvent::Type t, int w, int h, Parameter3DVisualization* viewer);
+		void translate_event(SrEvent& e, SrEvent::EventType t, int w, int h, Parameter3DVisualization* viewer);
 		void mouse_event(SrEvent& e);
 
 		// user data
@@ -62,7 +66,7 @@ class Parameter3DVisualization : public fltk::GlWindow
 		ParameterGroup* paramGroup;
 };
 
-class ParameterVisualization : public fltk::Group
+class ParameterVisualization : public Fl_Group
 {
 	public:
 		ParameterVisualization(int x, int y, int w, int h, char* name, PAStateData* s, ParameterGroup* window);
@@ -93,22 +97,24 @@ class ParameterVisualization : public fltk::Group
 		int height;
 		int paramX;
 		int paramY;
-		PAStateData* state;
+		PAStateData* state;					// !!!Careful about this state, this PAState is a pointer to mcu state pool, not the current state to specific character
 		ParameterGroup* paramGroup;
 };
 
-class ParameterGroup : public fltk::Group
+class ParameterGroup : public Fl_Group
 {
 	public:
 		ParameterGroup(int x, int y, int w, int h, char* name, PAStateData* s, PanimationWindow* window, bool ex = false);
 		~ParameterGroup();
 
 		virtual void resize(int x, int y, int w, int h);
-
-		static void updateXAxisValue(fltk::Widget* widget, void* data);
-		static void updateXYAxisValue(fltk::Widget* widget, void* data);
-		static void updateXYZAxisValue(fltk::Widget* widget, void* data);
+		
+		static void updateXAxisValue(Fl_Widget* widget, void* data);
+		static void updateXYAxisValue(Fl_Widget* widget, void* data);
+		static void updateXYZAxisValue(Fl_Widget* widget, void* data);
 		void updateWeight();
+		PAStateData* getCurrentPAStateData();
+		SbmCharacter* getCurrentCharacter();
 
 	public:
 		PanimationWindow* paWindow;
@@ -116,36 +122,36 @@ class ParameterGroup : public fltk::Group
 		ParameterVisualization* paramVisualization;
 		Parameter3DVisualization* param3DVisualization;
 		bool exec;
-		fltk::ValueSlider* xAxis;
-		fltk::ValueSlider* yAxis;
-		fltk::ValueSlider* zAxis;
+		Fl_Value_Slider* xAxis;
+		Fl_Value_Slider* yAxis;
+		Fl_Value_Slider* zAxis;
 };
 
-class PARunTimeEditor : public fltk::Group
+class PARunTimeEditor : public Fl_Group
 {
 	public:
 		PARunTimeEditor(int x, int y, int w, int h, PanimationWindow* window);
 		~PARunTimeEditor();
 
 	public:
-		PanimationWindow*	paWindow;
-		fltk::Output*		currentCycleState;
-		fltk::Browser*		nextCycleStates;
-		fltk::Browser*		availableTransitions;
-		fltk::Button*		runNextState;
-		std::string			prevCycleState;
+		PanimationWindow*		paWindow;
+		Fl_Output*				currentCycleState;
+		Fl_Hold_Browser*		nextCycleStates;
+		Fl_Hold_Browser*		availableTransitions;
+		Fl_Button*				runNextState;
+		std::string				prevCycleState;
 
-		fltk::Group*		parameterGroup;
-		ParameterGroup*		paramGroup;
+		Fl_Group*				parameterGroup;
+		ParameterGroup*			paramGroup;
 
-	public:
+	public:		
 		void update();
 		void updateRunTimeStates(std::string currentState);
-		void addItem(fltk::Browser* browser, std::string item);
+		void addItem(Fl_Browser* browser, std::string item);
 		void initializeRunTimeEditor();
-		static void updateNonCycleState(fltk::Widget* widget, void* data);
-		static void updateTransitionStates(fltk::Widget* widget, void* data);
-		static void run(fltk::Widget* widget, void* data);
+		static void updateNonCycleState(Fl_Widget* widget, void* data);
+		static void updateTransitionStates(Fl_Widget* widget, void* data);
+		static void run(Fl_Widget* widget, void* data);
 };
 
 

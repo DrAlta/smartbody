@@ -1,6 +1,8 @@
-#pragma once
+#ifndef _SBMPHYSICSSIM_H_ 
+#define _SBMPHYSICSSIM_H_ 
 #include <deque>
 #include "SbmColObject.h"
+#include <sbm/DObject.h>
 
 class SbmPhysicsObj // abstraction for objects in the physics engine
 {
@@ -26,19 +28,24 @@ public:
 };
 
 typedef std::deque<SbmPhysicsObj*> SbmPhysicsObjList;
-class SbmPhysicsSim
+class SbmPhysicsSim : public DObject
 {
 protected:
 	SbmPhysicsObjList physicsObjList;	
 public:
 	SbmPhysicsSim(void);
-	~SbmPhysicsSim(void);	
-	virtual void initSimulation() = 0;
-	virtual void setGravity(float gravity) = 0;	
+	~SbmPhysicsSim(void);		
+	void updateSimulation(float timestep);
+	void setEnable(bool enable);
+	void setGravity(float gravity);	
+
+	virtual void initSimulation() = 0;	
 	virtual void addPhysicsObj(SbmPhysicsObj* obj) = 0;
 	virtual void removePhysicsObj(SbmPhysicsObj* obj) = 0;
-	virtual void updateSimulation(float timeStep) = 0;
+	virtual void updateSimulationInternal(float timeStep) = 0;
 	virtual SbmPhysicsObj* createPhyObj() = 0;
 };
 
+
+#endif
 

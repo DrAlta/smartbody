@@ -19,7 +19,7 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
 
-# include <SR/sr_plane.h>
+# include <sr/sr_plane.h>
 
 //============================== SrPlane ======================================
 

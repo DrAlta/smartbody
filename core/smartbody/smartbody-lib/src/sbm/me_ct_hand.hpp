@@ -43,10 +43,10 @@ protected:
 	SkChannelArray	_channels;	
 	GrabState             currentGrabState;
 	BodyMotionFrame       releaseFrame, grabFrame, reachFrame, currentFrame, tempFrame;	
-
+	
 	vector<FingerChain>   fingerChains;
 	vector<SkJoint*>      affectedJoints;
-
+	
 	ConstraintMap         handPosConstraint;
 	ConstraintMap         handRotConstraint;
 
@@ -77,7 +77,7 @@ public:
 	void set_duration(float duration) { _duration = duration; }
 	virtual const char* controller_type() const		{ return( CONTROLLER_TYPE ); }
 	virtual void print_state( int tabs );
-
+	
 	void setGrabState(GrabState state);
 	void setGrabTargetObject(SbmGeomObject* targetObj);
 

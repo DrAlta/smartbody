@@ -6,8 +6,8 @@
 # include "sr_cfg_planner.h"
 # include "sk_pos_cfg.h"
 
-# include <SR/sr_box.h>
-# include <Sk/sk_joint.h>
+# include <sr/sr_box.h>
+# include <sk/sk_joint.h>
 //================================ SkPosCfgManager =====================================
 
 class SkPosPlanner;
@@ -15,8 +15,8 @@ class SkPosPlanner;
 
 class SkPosCfgManager
  { private :
-    friend SkPosCfg;
-    friend SkPosPlanner;
+    friend class SkPosCfg;
+    friend class SkPosPlanner;
 
 	SrBox  skPosBound;	
 	VecOfSbmColObj colObstacles;	

@@ -26,11 +26,11 @@
 
 //////////////////////////////////////////////////////////////////////////////////
 
-#include <SR/sr_hash_table.h>
-#include <SR/sr_buffer.h>
-#include <SK/sk_motion.h>
-#include <SK/sk_skeleton.h>
-#include <ME/me_controller.h>
+#include <sr/sr_hash_table.h>
+#include <sr/sr_buffer.h>
+#include <sk/sk_motion.h>
+#include <sk/sk_skeleton.h>
+#include <me/me_controller.h>
 
 #include "sr_hash_map.h"
 
@@ -80,7 +80,7 @@ class MeCtFace : public MeController	{
 		
 		void clear( void );
 		
-		void init( SkMotion* base_ref_p );
+		void init(SbmPawn* pawn,  SkMotion* base_ref_p );
 		void remove_joint( const char *joint_name );
 		void remove_channel( const char *joint_name, SkChannel::Type ch_type );
 		void add_key( const char *weight_key, SkMotion* key_pose_p );

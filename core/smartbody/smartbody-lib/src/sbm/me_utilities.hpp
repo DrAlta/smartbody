@@ -25,9 +25,9 @@
 #define ME_UTILITIES_HPP
 
 
-#include <SK/sk_skeleton.h>
-#include <SK/sk_motion.h>
-#include <SK/sk_posture.h>
+#include <sk/sk_skeleton.h>
+#include <sk/sk_motion.h>
+#include <sk/sk_posture.h>
 
 #include "sr_path_list.h"
 #include "sr_hash_map.h"

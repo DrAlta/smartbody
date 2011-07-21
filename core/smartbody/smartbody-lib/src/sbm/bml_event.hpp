@@ -27,8 +27,7 @@
 
 
 namespace BML {
-	const XMLCh TAG_SBM_EVENT[] = L"sbm:event";
-	const XMLCh ATTR_MESSAGE[]  = L"message";
+
 
 
 	BML::BehaviorRequestPtr parse_bml_event( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );

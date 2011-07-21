@@ -2,11 +2,15 @@
 #ifndef SMARTBODY_C_DLL_H
 #define SMARTBODY_C_DLL_H
 
-
+#if WIN32
 #ifdef SMARTBODY_C_DLL_EXPORTS
 #define SMARTBODY_C_DLL_API __declspec(dllexport)
 #else
 #define SMARTBODY_C_DLL_API __declspec(dllimport)
+#endif
+#else
+#define SMARTBODY_C_DLL_API 
+#define __stdcall
 #endif
 
 

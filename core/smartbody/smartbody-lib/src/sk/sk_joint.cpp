@@ -23,10 +23,10 @@
 
 # include <math.h>
 
-# include <SR/sr_model.h>
+# include <sr/sr_model.h>
 
-# include <SK/sk_joint.h>
-# include <SK/sk_skeleton.h>
+# include <sk/sk_joint.h>
+# include <sk/sk_skeleton.h>
 
 //============================= SkJoint ============================
 

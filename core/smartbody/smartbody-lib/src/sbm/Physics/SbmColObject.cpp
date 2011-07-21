@@ -34,6 +34,16 @@ SbmTransform SbmTransform::diff( const SbmTransform& r1, const SbmTransform& r2 
 	return rout;
 }
 
+SbmTransform SbmTransform::mult( const SbmTransform& r1, const SbmTransform& r2 )
+{
+	SbmTransform rout;
+	rout.tran = r1.tran*r2.rot + r2.tran;
+	rout.rot  = r1.rot*r2.rot;
+	rout.rot.normalize();
+	return rout;
+}
+
+
 SbmTransform SbmTransform::blend( SbmTransform& r1, SbmTransform& r2, float weight )
 {
 	SbmTransform rout;
@@ -63,9 +73,16 @@ void SbmTransform::add( const SbmTransform& delta )
 	rot.normalize();
 }
 
+SbmTransform::SbmTransform()
+{
+	rot = SrQuat();
+	tran = SrVec(0,0,0);
+}
+
 SbmGeomObject::SbmGeomObject(void)
 {
 	isUpdate = false;	
+	
 }
 
 SbmGeomObject::~SbmGeomObject(void)
@@ -78,16 +95,23 @@ SrVec SbmGeomObject::getCenter()
 	return worldState.tran;
 }
 
-void SbmGeomObject::updateTransform( const SrMat& newState )
+void SbmGeomObject::updateGlobalTransform( const SrMat& newState )
 {
 	SrQuat newQuat = SrQuat(newState);
 	SrVec newPos = newState.get_translation();
-	if (newQuat != worldState.rot || newPos != worldState.tran)
+	if (newQuat != globalTransform.rot || newPos != globalTransform.tran)
 	{
-		worldState.rot  = newQuat;
-		worldState.tran = newPos;
+		globalTransform.rot  = newQuat;
+		globalTransform.tran = newPos;
+		worldState = SbmTransform::mult(localTransform,globalTransform);
 		isUpdate = true;
 	}	
+}
+
+void SbmGeomObject::setWorldState( SbmTransform& rt )
+{
+	worldState = rt;
+	globalTransform.gmat(localTransform.gmat().inverse()*rt.gmat());
 }
 
 bool SbmGeomNullObject::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot )
@@ -315,12 +339,13 @@ SbmGeomCapsule::SbmGeomCapsule( const SrVec& p1, const SrVec& p2, float r )
 	SrVec pos = (p2+p1)*0.5f;
 	SrQuat rot = SrQuat(zAxis,capAxis);
 
-	worldState.rot = rot;
-	worldState.tran = pos;
+	localTransform.rot = rot;
+	localTransform.tran = pos;
 
 	endPts[0] = SrVec(0,0,-extent);
 	endPts[1] = SrVec(0,0,extent);
-	radius = r;
+	radius = r;		
+	//updateGlobalTransform(SrMat::id);
 }
 
 SbmGeomCapsule::~SbmGeomCapsule()
@@ -377,19 +402,20 @@ bool SbmGeomCapsule::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHa
 	return true;
 }
 
+
 bool SbmCollisionUtil::checkIntersection( SbmGeomObject* obj1, SbmGeomObject* obj2 )
 {
 	if (dynamic_cast<SbmGeomSphere*>(obj1))
 	{
 		SbmGeomSphere* sph = dynamic_cast<SbmGeomSphere*>(obj1);
-		return obj2->isInside(obj1->worldState.tran,sph->radius);
+		return obj2->isInside(obj1->getWorldState().tran,sph->radius);
 	}
 	else if (dynamic_cast<SbmGeomCapsule*>(obj1))
 	{
 		SbmGeomCapsule* cap = dynamic_cast<SbmGeomCapsule*>(obj1);
 		SrVec g1,g2;
-		g1 = cap->endPts[0]*cap->worldState.gmat();
-		g2 = cap->endPts[1]*cap->worldState.gmat();
+		g1 = cap->endPts[0]*cap->getWorldState().gmat();
+		g2 = cap->endPts[1]*cap->getWorldState().gmat();
 		return obj2->isIntersect(g1,g2,cap->radius);		
 	}
 	else if (dynamic_cast<SbmGeomBox*>(obj1))

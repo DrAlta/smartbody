@@ -20,29 +20,29 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
 
-# include <SR/sr_vec.h>
-# include <SR/sr_mat.h>
-# include <SR/sr_model.h>
-# include <SR/sr_lines.h>
-# include <SR/sr_points.h>
-# include <SR/sr_box.h>
-# include <SR/sr_sphere.h>
-# include <SR/sr_cylinder.h>
-# include <SR/sr_polygons.h>
+# include <sr/sr_vec.h>
+# include <sr/sr_mat.h>
+# include <sr/sr_model.h>
+# include <sr/sr_lines.h>
+# include <sr/sr_points.h>
+# include <sr/sr_box.h>
+# include <sr/sr_sphere.h>
+# include <sr/sr_cylinder.h>
+# include <sr/sr_polygons.h>
 
-# include <SR/sr_sn.h>
-# include <SR/sr_sn_shape.h>
-# include <SR/sr_gl_render_funcs.h>
+# include <sr/sr_sn.h>
+# include <sr/sr_sn_shape.h>
+# include <sr/sr_gl_render_funcs.h>
 
-# include <SR/sr_gl.h>
+# include <sr/sr_gl.h>
 
 //# define SR_USE_TRACE1 // render
-//# include <SR/sr_trace.h>
+//# include <sr/sr_trace.h>
 
 //=============================== render_model ====================================
 
 void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
- {
+ {	
    SrModel& model = ((SrSnModel*)shape)->shape();
 
    //SR_TRACE1 ( "Render Model faces="<<model.F.size() );

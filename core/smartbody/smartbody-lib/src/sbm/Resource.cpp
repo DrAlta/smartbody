@@ -17,7 +17,8 @@ Resource::~Resource()
 		 iter++)
 	{
 		delete (*iter);
-	}
+        }
+        children.clear();
 }
 
 
@@ -25,13 +26,21 @@ void Resource::setChildrenLimit(int l)
 {
 	children_limit = l;
 	while(l < (int)children.size())
+	{
+		Resource* last = children.front();
 		children.pop_front();
+		delete last;
+	}
 }
 
 void Resource::addChild(Resource* resource)
 {
 	while((int)children.size() >= children_limit)
+	{
+		Resource* last = children.front();
 		children.pop_front();
+		delete last;
+	}
 	children.push_back(resource);
 	resource->setParent(this);
 }
@@ -206,7 +215,7 @@ std::string CmdResource::getId()
 
 void CmdResource::setCommand(std::string c)
 {
-	command = c;
+        command = c;
 }
 
 std::string CmdResource::getCommand()

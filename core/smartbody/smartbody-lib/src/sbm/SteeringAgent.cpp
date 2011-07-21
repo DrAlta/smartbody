@@ -44,12 +44,12 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 
 	scootThreshold = 0.02f;	
 	distThreshold = 150.0f;			// exposed, unit: centimeter
-	distDownThreshold = 30.0f;
+	distDownThreshold = 30.f;
 
 	desiredSpeed = 1.0f;			// exposed, unit: meter/sec
 	facingAngle = -200.0f;			// exposed, unit: deg
 	facingAngleThreshold = 10;
-	acceleration = 2.0f;			// exposed, unit: meter/s^2
+	acceleration = 1.0f;			// exposed, unit: meter/s^2
 	scootAcceleration = 200.0f;		// exposed, unit: unknown
 	angleAcceleration = 450.0f;		// exposed, unit: unknown
 	stepAdjust = false;
@@ -62,6 +62,15 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	stepTargetX = 0.0f;
 	stepTargetZ = 0.0f;
 	steppingMode = false;
+	
+	paramTestDur = 2.0f;
+	paramTestStartTime = 0.0f;
+	paramTestFlag = false;
+	paramTestAngle = 0.0f;
+	paramTestDistance = 0.0f;
+	prevX = 0.0f;
+	prevZ = 0.0f;
+	prevYaw = 0.0f;
 }
 
 SteeringAgent::~SteeringAgent()
@@ -75,6 +84,10 @@ void SteeringAgent::evaluate()
 	float x, y, z;
 	float yaw, pitch, roll;
 	character->get_world_offset(x, y, z, yaw, pitch, roll);
+
+	// parameter testing
+	if (paramTestFlag)
+		parameterTesting();
 
 	// TODO: better place for below code (step approach the target)
 	if (steppingMode)
@@ -147,9 +160,9 @@ void SteeringAgent::evaluate()
 		newSpeed = evaluateExampleLoco(x, y, z, yaw);
 	}
 
-	// Event Handler
+	// Event Handler	
 	if (!character->_lastReachStatus && character->_reachTarget)
-	{
+	{		
 		std::string eventType = "locomotion";		
 		MotionEvent motionEvent;
 		motionEvent.setType(eventType);			
@@ -564,7 +577,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 		if (!character->param_animation_ct->hasPAState("UtahStep"))
 		{
 			agentToTargetDist = sqrt((x - targetLoc.x) * (x - targetLoc.x) + 
-				  					 (y - targetLoc.y) * (y - targetLoc.y) + 
+				  					 //(y - targetLoc.y) * (y - targetLoc.y) + 
 									 (z - targetLoc.z) * (z - targetLoc.z));
 			agentToTargetVec.x = targetLoc.x - x;
 			agentToTargetVec.y = targetLoc.y - y;
@@ -815,6 +828,15 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			normalizeAngle(yaw);
 			float angleDiff = angleGlobal - yaw;
 			normalizeAngle(angleDiff);
+
+			// address the problem of obstacle avoiding failure during high speed movement
+			if (curSpeed > 200.0f)				
+				paLocoAngleGain = 4.0f;
+			else if (curSpeed > 300.0f)			
+				paLocoAngleGain = 7.0f;
+			else
+				paLocoAngleGain = 2.5f;
+
 			float addOnTurning = angleDiff * paLocoAngleGain;
 			if (curTurningAngle < addOnTurning)
 				curTurningAngle += angleAcceleration * dt;
@@ -862,4 +884,48 @@ float SteeringAgent::evaluateSteppingLoco(float x, float y, float z, float yaw)
 		steppingMode = false;
 
 	return 0.0f;
+}
+
+void SteeringAgent::startParameterTesting()
+{
+	LOG("Parameter Testing Start...");
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	paramTestStartTime = (float)mcu.time;
+	paramTestFlag = true;
+	paramTestAngle = 0.0f;
+	paramTestDistance = 0.0f;
+	float y, pitch, roll;
+	character->get_world_offset(prevX, y, prevZ, prevYaw, pitch, roll);
+	normalizeAngle(prevYaw);
+}
+
+void SteeringAgent::parameterTesting()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	if ((mcu.time - paramTestStartTime) > paramTestDur)
+	{
+		paramTestFlag = false;
+		paramTestAngle *= (float(M_PI) / 1.8f);
+		float paramTestVelocity = paramTestDistance / paramTestDur;
+		float paramTestAngleVelocity = paramTestAngle / paramTestDur;
+		LOG("Parameter Testing Result");
+		LOG("Duration: %f", paramTestDur);
+		LOG("Velocity: %f", paramTestVelocity);
+		LOG("Angle Velocity: %f", paramTestAngleVelocity);
+		return;
+	}
+	// current location
+	float x, y, z;
+	float yaw, pitch, roll;
+	character->get_world_offset(x, y, z, yaw, pitch, roll);
+	normalizeAngle(yaw);
+
+	paramTestDistance += sqrt((x - prevX) * (x - prevX) + (z - prevZ) * (z - prevZ));
+	if (fabs(yaw - prevYaw) < 300) 
+		paramTestAngle += (yaw - prevYaw);
+
+	prevX = x;
+	prevZ = z;
+	prevYaw = yaw;
+	normalizeAngle(prevYaw);
 }

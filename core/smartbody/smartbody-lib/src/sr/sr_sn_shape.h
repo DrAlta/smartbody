@@ -27,7 +27,7 @@
  * shape base and template class
  */
 
-# include <SR/sr_sn.h>
+# include <sr/sr_sn.h>
 
 //================================ SrSnShapeBase ====================================
 
@@ -143,7 +143,7 @@ class SrSnShapeBase : public SrSn
     node types by means of typedefs. For example, SrSnModel is
     a typedef of SrSnShape<SrModel> (note that, in the example,
     sr_model.h must be included before instantiating SrSnModel) */
-template <class X>
+template <typename X>
 class SrSnShape : public SrSnShapeBase
  { protected :
     X* _data;
@@ -185,25 +185,25 @@ class SrSnShape : public SrSnShapeBase
     SrSnSharedShape is used only for shapes deriving SrSharedClass,
     so that a pointer to the shape and ref()/unref() methods are used.
     Typedefs are used similarly to SrSnShape */
-template <class X>
+template <typename X>
 class SrSnSharedShape : public SrSnShape<X>
  { public :
     /*! Constructor receives a pointer to a shape. If the pointer is null,
         a new shape will be allocated and used. */
-    SrSnSharedShape ( X* pt=0 ) : SrSnShape<X> (pt) { _data->ref(); }
+    SrSnSharedShape ( X* pt=0 ) : SrSnShape<X> (pt) { SrSnShape<X>::_data->ref(); }
 
     /* Virtual Destructor .*/
     virtual ~SrSnSharedShape ()
-      { _data->unref();
-        _data=0; // to cope with base class destructor
+      { SrSnShape<X>::_data->unref();
+        SrSnShape<X>::_data=0; // to cope with base class destructor
       }
 
     /*! Reference a new shape, and unreference the old one. */
-    void shape ( X* pt ) { changed(true); _data->unref(); _data=pt; _data->ref(); }
+    void shape ( X* pt ) { SrSnShapeBase::changed(true); SrSnShape<X>::_data->unref(); SrSnShape<X>::_data=pt; SrSnShape<X>::_data->ref(); }
 
     /*! Get a reference to the shape data, and sets the state of the node
         as changed, implying that display lists should be regenerated. */
-    X& shape () { changed(true); return *_data; }
+    X& shape () { SrSnShapeBase::changed(true); return *SrSnShape<X>::_data; }
  };
 
 class SrModel;

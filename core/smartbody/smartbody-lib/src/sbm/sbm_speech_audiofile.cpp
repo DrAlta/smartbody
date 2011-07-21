@@ -23,16 +23,23 @@
 
 #include "vhcl.h"
 #include "sbm_speech_audiofile.hpp"
+#include "BMLDefs.h"
 #include "mcontrol_util.h"
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 #include <fstream>
 
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
+
 using std::string;
 using std::vector;
-using stdext::hash_map;
+using std::map;
 using namespace SmartBody;
 
+#ifndef _MAX_PATH
+#define _MAX_PATH 1024
+#endif
 
 AudioFileSpeech::AudioFileSpeech()
 {
@@ -98,7 +105,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 
 		m_speechRequestInfo[ m_requestIdCounter ].id = speechId;
 	} catch (...) {
-		LOG("Problem parsing XML speech request.");
+		LOG("Problem parsing XML speech request.");fullpath
 		return 0;
 	}
 
@@ -324,7 +331,11 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 
    // TODO: make sure it's "speech"
 
+	string ref = xml_utils::xml_parse_string( BML::BMLDefs::TAG_REF, speech );
+	string speechId = xml_utils::xml_parse_string( BML::BMLDefs::ATTR_ID, speech );
+	
 
+/*
    char * xmlRef = XMLString::transcode( speech->getAttribute( L"ref" ) );
    string ref = xmlRef;
    XMLString::release( &xmlRef );
@@ -332,7 +343,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    char * xmlSpeechId = XMLString::transcode( speech->getAttribute( L"id" ) );
    string speechId = xmlSpeechId;
    XMLString::release( &xmlSpeechId );
-
+*/
 
    m_speechRequestInfo[ m_requestIdCounter ].id = speechId;
 
@@ -370,18 +381,33 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 	   relativeAudioPath = relativeAudioPath + "/" + voiceCode;
    }
 
+	boost::filesystem::path p( relativeAudioPath );
+	boost::filesystem::path abs_p = boost::filesystem::complete( p );	
+
+#if 1
+	if( boost::filesystem2::exists( abs_p ) == false )	{
+      LOG( "AudioFileSpeech::requestSpeechAudio ERR: boost::filesystem2::exists() returned NULL\n" );
+	  mcu.mark("requestSpeechAudio");
+      return 0;
+	}
+#endif
+
+#if _WIN32_
    if ( _fullpath( fullAudioPath, relativeAudioPath.c_str(), _MAX_PATH ) == NULL )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: _fullpath() returned NULL\n" );
 	  mcu.mark("requestSpeechAudio");
       return 0;
    }
+#else
+	strcpy(fullAudioPath, abs_p.native_directory_string().c_str());
+#endif
 
    m_speechRequestInfo[ m_requestIdCounter ].audioFilename = (string)fullAudioPath + "\\" + ref + ".wav";
 
 
    // TODO: Should we fail if the .bml file isn't present?
-   string bmlFilename = std::string(fullAudioPath) + "/" + ref + ".bml";
+   string bmlFilename = std::string(fullAudioPath) + "\\" + ref + ".bml";
 
     mcu.mark("requestSpeechAudio", 4, "lips");
    ReadVisemeDataBML( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent );
@@ -413,7 +439,7 @@ vector<VisemeData *> * AudioFileSpeech::getVisemes( RequestId requestId, const S
    //return m_speechRequestInfo[ requestId ].visemeData
 
 
-   hash_map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
+   std::map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
    if ( it != m_speechRequestInfo.end() )
    {
 	      vector< VisemeData * > * visemeCopy = new vector< VisemeData * >;
@@ -445,7 +471,7 @@ char * AudioFileSpeech::getSpeechPlayCommand( RequestId requestId, const SbmChar
 
    // TODO: fix return type
 
-   hash_map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
+   std::map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
    if ( it != m_speechRequestInfo.end() )
    {
       it->second.playCommand = vhcl::Format( "send PlaySound \"%s\" %s", it->second.audioFilename.c_str(), character->name );
@@ -464,7 +490,7 @@ char * AudioFileSpeech::getSpeechStopCommand( RequestId requestId, const SbmChar
 
    // TODO: fix return type
 
-   hash_map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
+   std::map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
    if ( it != m_speechRequestInfo.end() )
    {
       string characterName;
@@ -485,7 +511,7 @@ char * AudioFileSpeech::getSpeechAudioFilename( RequestId requestId )
 {
    // TODO: fix return type
 
-   hash_map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
+   std::map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
    if ( it != m_speechRequestInfo.end() )
    {
       return (char *)it->second.audioFilename.c_str();
@@ -497,14 +523,14 @@ char * AudioFileSpeech::getSpeechAudioFilename( RequestId requestId )
 
 float AudioFileSpeech::getMarkTime( RequestId requestId, const XMLCh * markId )
 {
-   hash_map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
+   std::map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
    if ( it != m_speechRequestInfo.end() )
    {
       char * xmlMarkId = XMLString::transcode( markId );
       string strMarkId = xmlMarkId;
       XMLString::release( &xmlMarkId );
 
-      hash_map< string, float >::iterator markIt = it->second.timeMarkers.find( strMarkId );
+      std::map< string, float >::iterator markIt = it->second.timeMarkers.find( strMarkId );
       if ( markIt != it->second.timeMarkers.end() )
       {
          return markIt->second;
@@ -663,16 +689,16 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
    bool useVisemeCurveMode = visemeCurveMode;
    if (useVisemeCurveMode)
    {
-	   DOMNodeList* syncCurveList = bml->getElementsByTagName(L"curve");
+	   DOMNodeList* syncCurveList = bml->getElementsByTagName( BML::BMLDefs::TAG_CURVE );
 	   for (XMLSize_t i = 0; i < syncCurveList->getLength(); i++)
 	   {
 		   DOMElement* e = (DOMElement*)syncCurveList->item(i);
 
-		   char* xmlVisemeName = XMLString::transcode(e->getAttribute(L"name"));
+		   char* xmlVisemeName = XMLString::transcode(e->getAttribute( BML::BMLDefs::ATTR_NAME ));
 		   string visemeName = xmlVisemeName;
 		   XMLString::release(&xmlVisemeName);
 
-		   char* xmlNumKeys = XMLString::transcode(e->getAttribute(L"num_keys"));
+		   char* xmlNumKeys = XMLString::transcode(e->getAttribute( BML::BMLDefs::TAG_NUM_KEYS ));
 		   string numKeys = xmlNumKeys;
 		   XMLString::release(&xmlNumKeys);
 
@@ -689,32 +715,32 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
    
    if (!useVisemeCurveMode)
    {
-	   DOMNodeList * syncList = bml->getElementsByTagName( L"lips" );
+	   DOMNodeList * syncList = bml->getElementsByTagName( BML::BMLDefs::TAG_LIPS );
 	   for ( XMLSize_t i = 0; i < syncList->getLength(); i++ )
 	   {
 		  DOMElement * e = (DOMElement *)syncList->item( i );
 
-		  char * xmlViseme = XMLString::transcode( e->getAttribute( L"viseme" ) );
+		  char * xmlViseme = XMLString::transcode( e->getAttribute( BML::BMLDefs::TAG_VISEME ) );
 		  string viseme = xmlViseme;
 		  XMLString::release( &xmlViseme );
 
-		  char * xmlArticulation = XMLString::transcode( e->getAttribute( L"articulation" ) );
+		  char * xmlArticulation = XMLString::transcode( e->getAttribute( BML::BMLDefs::TAG_ARTICULATION ) );
 		  string articulation = xmlArticulation;
 		  XMLString::release( &xmlArticulation );
 
-		  char * xmlStart = XMLString::transcode( e->getAttribute( L"start" ) );
+		  char * xmlStart = XMLString::transcode( e->getAttribute( BML::BMLDefs::ATTR_START ) );
 		  string start = xmlStart;
 		  XMLString::release( &xmlStart );
 
-		  char * xmlReady = XMLString::transcode( e->getAttribute( L"ready" ) );
+		  char * xmlReady = XMLString::transcode( e->getAttribute( BML::BMLDefs::ATTR_READY ) );
 		  string ready = xmlReady;
 		  XMLString::release( &xmlReady );
 
-		  char * xmlRelax = XMLString::transcode( e->getAttribute( L"relax" ) );
+		  char * xmlRelax = XMLString::transcode( e->getAttribute( BML::BMLDefs::ATTR_RELAX ) );
 		  string relax = xmlRelax;
 		  XMLString::release( &xmlRelax );
 
-		  char * xmlEnd = XMLString::transcode( e->getAttribute( L"end" ) );
+		  char * xmlEnd = XMLString::transcode( e->getAttribute( BML::BMLDefs::ATTR_END ) );
 		  string end = xmlEnd;
 		  XMLString::release( &xmlEnd );
 		
@@ -802,7 +828,7 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
 }
 
 
-void AudioFileSpeech::ReadSpeechTiming( const char * filename, stdext::hash_map< std::string, float > & timeMarkers )
+void AudioFileSpeech::ReadSpeechTiming( const char * filename, std::map< std::string, float > & timeMarkers )
 {
    timeMarkers.clear();
 
@@ -820,16 +846,16 @@ void AudioFileSpeech::ReadSpeechTiming( const char * filename, stdext::hash_map<
    // <sync id="T0" time="0.17" />If
    // <sync id="T1" time="0.36" />
 
-   DOMNodeList * syncList = bml->getElementsByTagName( L"sync" );
+   DOMNodeList * syncList = bml->getElementsByTagName( BML::BMLDefs::TAG_SYNC );
    for ( XMLSize_t i = 0; i < syncList->getLength(); i++ )
    {
       DOMElement * e = (DOMElement *)syncList->item( i );
 
-      char * xmlId = XMLString::transcode( e->getAttribute( L"id" ) );
+      char * xmlId = XMLString::transcode( e->getAttribute( BML::BMLDefs::ATTR_ID ) );
       string id = xmlId;
       XMLString::release( &xmlId );
 
-      char * xmlTime = XMLString::transcode( e->getAttribute( L"time" ) );
+      char * xmlTime = XMLString::transcode( e->getAttribute( BML::BMLDefs::TAG_TIME ) );
       string time = xmlTime;
       XMLString::release( &xmlTime );
 
@@ -837,7 +863,7 @@ void AudioFileSpeech::ReadSpeechTiming( const char * filename, stdext::hash_map<
    }
 }
 
-stdext::hash_map< RequestId, AudioFileSpeech::SpeechRequestInfo >& AudioFileSpeech::getSpeechRequestInfo()
+std::map< RequestId, AudioFileSpeech::SpeechRequestInfo >& AudioFileSpeech::getSpeechRequestInfo()
 {
 	return m_speechRequestInfo;
 }

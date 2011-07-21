@@ -21,15 +21,15 @@
 
 # include <stdlib.h>
 
-# include <SR/sr_model.h>
-# include <SR/sr_tree.h>
-# include <SR/sr_sphere.h>
-# include <SR/sr_cylinder.h>
-# include <SR/sr_string_array.h>
+# include <sr/sr_model.h>
+# include <sr/sr_tree.h>
+# include <sr/sr_sphere.h>
+# include <sr/sr_cylinder.h>
+# include <sr/sr_string_array.h>
 
 //# define SR_USE_TRACE1 // IO
 //# define SR_USE_TRACE2 // Validation of normals materials, etc
-//# include <SR/sr_trace.h>
+//# include <sr/sr_trace.h>
  
 //=================================== SrModel =================================================
 
@@ -130,7 +130,7 @@ void SrModel::remove_redundant_materials ()
       int msize = M.size();
       for ( i=0; i<msize; i++ ) 
        { for ( j=i+1; j<msize; j++ ) 
-          { if ( M[i]==M[j] )
+          { if ( M[i]==M[j] && mtlnames[i] == mtlnames[j])
              { //SR_TRACE2 ( "Detected material "<<i<<" equal to "<<j );
                for ( k=0; k<fsize; k++ ) // replace references to j by i
                  if ( Fm[k]==j ) Fm[k]=i;
@@ -393,6 +393,53 @@ bool SrModel::load ( SrInput &in )
    //SR_TRACE1 ( "OK.\n" );
 
    return true;
+ }
+
+ void SrModel::computeTangentBiNormal()
+ {	 
+	 int nVtx = V.size();
+	 Tangent.size(nVtx); Tangent.setall(SrVec(0,0,0));
+	 BiNormal.size(nVtx); BiNormal.setall(SrVec(0,0,0));
+	 //N.setall(SrVec(0,0,0));
+
+	 if (Ft.size() != F.size())
+		 return;
+	 for (int i=0;i<F.size();i++)
+	 {
+		 int idx[3]; idx[0] = F[i].a; idx[1] = F[i].b; idx[2] = F[i].c;
+		 int tidx[3]; tidx[0] = Ft[i].a; tidx[1] = Ft[i].b; tidx[2] = Ft[i].c;
+		 SrVec sv[2];
+		 SrPnt2 st[2];		
+		 for (int k=0;k<2;k++)
+		 {
+			 sv[k] = V[idx[k+1]] - V[idx[0]];
+			 st[k] = T[tidx[k+1]] - T[tidx[0]];
+		 }	
+		 float cp = st[0].y * st[1].x - st[0].x * st[1].y;
+		 SrVec nvec = cross(sv[0],sv[1]); nvec.normalize(); 
+		 SrVec tvec = (sv[0]*st[1].y - sv[1]*st[0].y)/cp; tvec.normalize();
+		 SrVec bvec = (sv[0]*st[1].x - sv[1]*st[0].x)/(-cp); bvec.normalize();		
+
+		 if (dot(cross(tvec,bvec),nvec) < -0.1f)
+		 {
+			 //printf("mirror texture coord...\n");
+			 bvec = -bvec;
+		 }
+		 
+		 for (int k=0;k<3;k++)
+		 {
+			 Tangent[idx[k]] += tvec;
+			 BiNormal[idx[k]] += bvec;
+			 //N[idx[k]] += nvec;
+		 }
+	 }
+
+	 for (int i=0;i<nVtx;i++)
+	 {		
+		 Tangent[i].normalize();
+		 BiNormal[i].normalize();	
+		 //N[i].normalize();
+	 }
  }
 
 bool SrModel::save ( SrOutput &o ) const
@@ -908,6 +955,9 @@ void SrModel::operator = ( const SrModel& m )
    culling = m.culling;
 
    mtlnames = m.mtlnames;
+
+   mtlTextureNameMap = m.mtlTextureNameMap;
+   mtlNormalTexNameMap = m.mtlNormalTexNameMap;
     
    name = m.name;
  }

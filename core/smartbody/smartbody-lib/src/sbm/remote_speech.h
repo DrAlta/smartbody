@@ -74,7 +74,8 @@ class remote_speech: public SmartBody::SpeechInterface {
 		srHashMap<DOMNode>     uttLookUp; 
 		srHashMap<std::string> soundLookUp;
 		srHashMap<const char>  commandLookUp;
-		srHashMap<std::string> remote_speech::charLookUp;
+//		srHashMap<std::string> remote_speech::charLookUp;
+		srHashMap<std::string> charLookUp;
 		unsigned int           msgNumber;
 		float                  timeOut; //seconds for timeout between sbm's RvoiceRequest and Remote speech process's RmoteSpeechReply
 };

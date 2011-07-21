@@ -21,12 +21,12 @@
  */
  
 # include <math.h>
-# include <SR/sr_box.h>
-# include <SR/sr_plane.h>
-# include <SR/sr_camera.h>
+# include <sr/sr_box.h>
+# include <sr/sr_plane.h>
+# include <sr/sr_camera.h>
 
 //# define SR_USE_TRACE1  // ray
-//# include <SR/sr_trace.h>
+//# include <sr/sr_trace.h>
 
 //=================================== SrCamera ===================================
 

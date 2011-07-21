@@ -45,7 +45,7 @@ MeCtMotionPlayer::~MeCtMotionPlayer()
 	controller = NULL;
 }
 
-void MeCtMotionPlayer::init(std::string name, int n)
+void MeCtMotionPlayer::init(SbmPawn* pawn, std::string name, int n)
 {
 	if (motionName == name)
 	{
@@ -68,7 +68,7 @@ void MeCtMotionPlayer::init(std::string name, int n)
 	motion->connect(character->skeleton_p);
 	controller = new MeCtMotion();
 	MeCtMotion* mController = dynamic_cast<MeCtMotion*> (controller);
-	mController->init(motion);
+	mController->init(pawn,motion);
 	std::string controllerName;
 	controllerName = "motion player for " + motionName;
 	controller->name(controllerName.c_str());

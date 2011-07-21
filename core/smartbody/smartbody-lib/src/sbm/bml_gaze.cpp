@@ -36,6 +36,7 @@
 #include "bml_target.hpp"
 #include "bml_xml_consts.hpp"
 #include "xercesc_utils.hpp"
+#include "BMLDefs.h"
 
 
 #define LOG_GAZE_PARAMS				(0)
@@ -45,46 +46,6 @@
 #define DEBUG_DESCRIPTION_LEVELS	(0)
 
 
-////// XML Tags
-const XMLCh TAG_DESCRIPTION[] = L"description";
-
-
-////// BML Description Type
-const XMLCh DTYPE_SBM[]  = L"ISI.SBM";
-
-
-////// XML ATTRIBUTES
-const XMLCh ATTR_ANGLE[]        = L"angle";
-const XMLCh ATTR_DIRECTION[]    = L"direction";
-const XMLCh ATTR_SBM_ROLL[]     = L"sbm:roll";
-const XMLCh ATTR_JOINT_RANGE[]  = L"sbm:joint-range";
-const XMLCh ATTR_JOINT_SPEED[]  = L"sbm:joint-speed";
-const XMLCh ATTR_TIME_HINT[]	= L"sbm:time-hint";
-const XMLCh ATTR_JOINT_SMOOTH[] = L"sbm:speed-smoothing";
-const XMLCh ATTR_PITCH[]        = L"pitch";
-const XMLCh ATTR_HEADING[]      = L"heading";
-const XMLCh ATTR_ROLL[]         = L"roll";
-const XMLCh ATTR_BLEND[]        = L"blend";
-const XMLCh ATTR_INTERPOLATE_BIAS[] = L"interpolate-bias";
-
-const XMLCh ATTR_PRIORITY_JOINT[] = L"sbm:priority-joint";
-const XMLCh ATTR_PITCH_MIN[]	= L"pitch-min";
-const XMLCh ATTR_PITCH_MAX[]	= L"pitch-max";
-const XMLCh ATTR_FADE_OUT[]		= L"sbm:fade-out";
-const XMLCh ATTR_FADE_IN[]		= L"sbm:fade-in";
-
-////// XML Direction constants
-// Angular (gaze) and orienting (head)
-const XMLCh DIR_RIGHT[]        = L"RIGHT";
-const XMLCh DIR_LEFT[]         = L"LEFT";
-const XMLCh DIR_UP[]           = L"UP";
-const XMLCh DIR_DOWN[]         = L"DOWN";
-// Angular only
-const XMLCh DIR_UPRIGHT[]      = L"UPRIGHT";
-const XMLCh DIR_UPLEFT[]       = L"UPLEFT";
-const XMLCh DIR_DOWNRIGHT[]    = L"DOWNRIGHT";
-const XMLCh DIR_DOWNLEFT[]     = L"DOWNLEFT";
-const XMLCh DIR_POLAR[]        = L"POLAR";
 
 namespace BML {
 	namespace Gaze {
@@ -211,74 +172,19 @@ void BML::Gaze::print_gaze_smoothing() {
 }
 
 void BML::Gaze::parse_gaze_key_element( DOMElement* elem, Gaze::KeyData* key_data ) {
-	const XMLCh* value = elem->getAttribute( ATTR_PITCH );
-	if( value!=NULL && value[0]!='\0' ) {
-		if( !( wistringstream( value ) >> key_data->bias_pitch ) ) {
-			std::stringstream strstr;
-			strstr << "WARNING: Failed to parse pitch attribute \""<<XMLString::transcode(value)<<"\" of <"<<XMLString::transcode( elem->getTagName() )<<" .../> element.";
-			LOG(strstr.str().c_str());
-		}
-	}
 
-	value = elem->getAttribute( ATTR_HEADING );
-	if( value!=NULL && value[0]!='\0' ) {
-		if( !( wistringstream( value ) >> key_data->bias_heading ) ) {
-			std::stringstream strstr;
-			strstr << "WARNING: Failed to parse heading attribute \""<<XMLString::transcode(value)<<"\" of <"<<XMLString::transcode( elem->getTagName() )<<" .../> element." << endl;
-			LOG(strstr.str().c_str());
-		}
-	}
+	xml_parse_float( &( key_data->bias_pitch ), 	BMLDefs::ATTR_PITCH, elem );
+	xml_parse_float( &( key_data->bias_heading ),	BMLDefs::ATTR_HEADING, elem );
+	xml_parse_float( &( key_data->bias_roll ),		BMLDefs::ATTR_ROLL, elem );
+	xml_parse_float( &( key_data->blend_weight ), 	BMLDefs::ATTR_BLEND, elem );
+	xml_parse_float( &( key_data->pitch_min ),  	BMLDefs::ATTR_PITCH_MIN, elem );
+	xml_parse_float( &( key_data->pitch_max ),  	BMLDefs::ATTR_PITCH_MAX, elem );
+	
+	string s = xml_parse_string( BMLDefs::ATTR_INTERPOLATE_BIAS, elem );
 
-	value = elem->getAttribute( ATTR_ROLL );
-	if( value!=NULL && value[0]!='\0' ) {
-		if( !( wistringstream( value ) >> key_data->bias_roll ) ) {
-			std::stringstream strstr;
-			strstr << "WARNING: Failed to parse roll attribute \""<<XMLString::transcode(value)<<"\" of <"<<XMLString::transcode( elem->getTagName() )<<" .../> element." << endl;
-			LOG(strstr.str().c_str());
-		}
-	}
-
-	value = elem->getAttribute( ATTR_BLEND );
-	if( value!=NULL && value[0]!='\0' ) {
-		if( !( wistringstream( value ) >> key_data->blend_weight ) ) {
-			std::stringstream strstr;
-			strstr << "WARNING: Failed to parse blend attribute \""<<XMLString::transcode(value)<<"\" of <"<<XMLString::transcode( elem->getTagName() )<<" .../> element." << endl;
-			LOG(strstr.str().c_str());
-		}
-	}
-
-	value = elem->getAttribute( ATTR_PITCH_MIN );
-	if(value != NULL && value[0] != '\0') 
-	{
-		if( !( wistringstream( value ) >> key_data->pitch_min ) )
-		{
-			std::stringstream strstr;
-			strstr << "WARNING: Failed to parse minimum pitch attribute \""<< XMLString::transcode(value) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
-			LOG(strstr.str().c_str());
-		}
-	}
-
-	value = elem->getAttribute( ATTR_PITCH_MAX );
-	if(value != NULL && value[0] != '\0') 
-	{
-		if( !( wistringstream( value ) >> key_data->pitch_max ) )
-		{
-			std::stringstream strstr;
-			strstr << "WARNING: Failed to parse maximum pitch attribute \""<< XMLString::transcode(value) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
-			LOG(strstr.str().c_str());
-		}
-	}
-
-	value = elem->getAttribute( ATTR_INTERPOLATE_BIAS );
-	if( value!=NULL && value[0]!='\0' ) {
-		string s( XMLString::transcode( value ) );
-		if( DEBUG_GAZE_KEYS ) cout << "interpolate-bias=\"" << s << "\"" << endl;
-		for( string::size_type i=0; i<s.length(); ++i ) {  // Isn't there an easier way in std:: to convert strings to uppercase?
-			s[i] = toupper( s[i] );
-		}
-		if( DEBUG_GAZE_KEYS ) cout << "interpolate-bias (uppercase) =\"" << s << "\"" << endl;
-		key_data->interpolate_bias = ( s.find( "TRUE" ) != string::npos );
-		if( DEBUG_GAZE_KEYS ) cout << "key_data->interpolate_bias=" << (key_data->interpolate_bias? "true": "false") << endl;
+	key_data->interpolate_bias = false;
+	if( ( s[0] == 't' )||( s[0] == 'T' ) )	{
+		key_data->interpolate_bias = true;
 	}
 }
 
@@ -289,39 +195,24 @@ bool BML::Gaze::parse_children( DOMElement* elem, Gaze::KeyData* key_data[] ) {
 	DOMElement* description = NULL;
 	int description_level = -1;
 	DOMElement* child = getFirstChildElement( elem );
-	if( DEBUG_DESCRIPTION_LEVELS && child!=NULL ) cout << "BML::Gaze::parse_children(..): <gaze ../> has child elements." << endl;
+
 	while( child != NULL ) {  // TODO: Need BML function to order all description levels of a behavior tag.
-		std::wstring child_tag = child->getTagName();
-		if( DEBUG_DESCRIPTION_LEVELS )
-		{
-			std::wstringstream wstrstr;
-			wstrstr << "\tchild_tag = \""<< child_tag << "\"";
-			std::string str = convertWStringToString(wstrstr.str());
-			LOG(str.c_str());
-		}
-		if( child_tag == TAG_DESCRIPTION ) {
-			wstring description_type = child->getAttribute( ATTR_TYPE );
-			if( DEBUG_DESCRIPTION_LEVELS ) wcout << "\tdescription_type = \""<< description_type << "\"" << endl;
-			if( description_type == DTYPE_SBM ) {
-				string level_str = XMLString::transcode( child->getAttribute( ATTR_LEVEL ) );
+		std::string child_tag = xml_translate_string( child->getTagName() );
+
+		if( child_tag == xml_translate_string( BMLDefs::TAG_DESCRIPTION ) ) {
+//			string description_type = xml_translate_string( child->getAttribute( BMLDefs::ATTR_TYPE ) );
+			string description_type = xml_parse_string( BMLDefs::ATTR_TYPE, child );
+
+			if( stringICompare(description_type, xml_translate_string( BMLDefs::DTYPE_SBM )) ) {
+//				string level_str = xml_translate_string( child->getAttribute( BMLDefs::ATTR_LEVEL ) );
+				string level_str = xml_parse_string( BMLDefs::ATTR_LEVEL, child );
 				int child_level = 0;
 				if( level_str.length() > 0 ) {
-					if( DEBUG_DESCRIPTION_LEVELS )
-					{
-						std::stringstream strstr;
-						strstr << "\tlevel_str = \""<< level_str << "\"";
-						LOG(strstr.str().c_str());
-					}
+
 					istringstream iss;
 					iss.str( level_str );
 					if( iss >> child_level ) {  // if level_str is a valid integer
 						if( child_level > description_level ) {
-							if( DEBUG_DESCRIPTION_LEVELS )
-							{
-								std::stringstream strstr;
-								strstr << "\tFound higher-leveled description." << endl;
-								LOG(strstr.str().c_str());
-							}
 
 							description = child;
 							description_level = child_level;
@@ -331,71 +222,62 @@ bool BML::Gaze::parse_children( DOMElement* elem, Gaze::KeyData* key_data[] ) {
 						strstr << "WARNING: Invalid level number \""<<level_str<<"\" in gaze description.";
 						LOG(strstr.str().c_str());
 					}
-				} else {
-					if( DEBUG_DESCRIPTION_LEVELS ) wcout << "\tMissing level attribute." << endl;
 				}
 			} // end type == DTYPE_SBM
-		} else if( child_tag.find( L"sbm:" ) == 0 ) {
+		} else if( child_tag.find( "sbm:" ) == 0 ) {
 			// Begins with SBM:: namespace prefix
-			const char* gaze_key_name = XMLString::transcode( child_tag.substr( 4 ).c_str() );  // transcode element's local name
-			int key = MeCtGaze::key_index( gaze_key_name );
+			std::string gazeKeyName = child_tag.substr( 4 );
+			int key = MeCtGaze::key_index( gazeKeyName.c_str() );
 
 			if( key != -1 ) {
 				has_data = true;
 				if( key_data[key] == NULL ) {
 					key_data[key] = new Gaze::KeyData();
 				} else {
-					std::wstringstream wstrstr;
-					wstrstr << "WARNING: BML::Gaze::parse_children(..): Gaze joint element \""<<child_tag<<"\" overwriting existing KeyData.";
-					std::string str = convertWStringToString(wstrstr.str());
-					LOG(str.c_str());
+					std::stringstream strstr;
+					strstr << "WARNING: BML::Gaze::parse_children(..): Gaze joint element \""<<child_tag<<"\" overwriting existing KeyData.";
+					LOG(strstr.str().c_str());
 				}
 
 				parse_gaze_key_element( child, key_data[key] );
 			} else {
-				std::wstringstream wstrstr;
-				wstrstr << "WARNING: Unrecognized <"<<child_tag<<" ../> element inside gaze behavior.  Ignoring element.";
-				std::string str = convertWStringToString(wstrstr.str());
-				LOG(str.c_str());
+				std::stringstream strstr;
+				strstr << "WARNING: Unrecognized <"<<child_tag<<" ../> element inside gaze behavior.  Ignoring element.";
+				LOG(strstr.str().c_str());
 			}
 		} else {
-			std::wstringstream wstrstr;
-			wstrstr << "WARNING: Unrecognized <"<<child_tag<<" ../> inside element gaze behavior.  Ignoring element." << endl;
-			std::string str = convertWStringToString(wstrstr.str());
-			LOG(str.c_str());
+			std::stringstream strstr;
+			strstr << "WARNING: Unrecognized <"<<child_tag<<" ../> inside element gaze behavior.  Ignoring element." << endl;
+			LOG(strstr.str().c_str());
 		}
 		
 		child = getNextElement( child );
 	}
 
 	if( description != NULL ) {
-		if( DEBUG_DESCRIPTION_LEVELS ) cout << "\tFound description";
 		
 		child = getFirstChildElement( description );
 		while( child != NULL ) {
 			// Lazily parse this by directly treating the tag name as the gaze key,
 			// regardless of capitalization, etc.
-			std::wstring child_tag = child->getTagName();
-			const char* gaze_key_name = XMLString::transcode( child_tag.c_str() );  // transcode tag name
-			int key = MeCtGaze::key_index( gaze_key_name );
+			std::string child_tag = xml_utils::xml_translate_string( child->getTagName() );
+			int key = MeCtGaze::key_index( child_tag.c_str() );
 
 			if( key != -1 ) {
 				has_data = true;
 				if( key_data[key] == NULL ) {
 					key_data[key] = new Gaze::KeyData();
 				} else {
-					std::wstringstream wstrstr;
-					wstrstr << "WARNING: BML::Gaze::parse_children(..): Gaze description \""<<child_tag<<"\" overwriting existing KeyData.";
-					std::string str = convertWStringToString(wstrstr.str());
-					LOG(str.c_str());
+					std::stringstream strm;
+					strm << "WARNING: BML::Gaze::parse_children(..): Gaze description \""<<child_tag<<"\" overwriting existing KeyData.";
+					LOG(strm.str().c_str());
 				}
 
 				parse_gaze_key_element( child, key_data[key] );
 			} else {
-				std::wstringstream wstrstr;
-				wstrstr << "WARNING: Unrecognized <" << child_tag << " ../> element inside \"isi:sbm\" typed gaze description level.  Ignoring element.";
-				std::string str = convertWStringToString(wstrstr.str());
-				LOG(str.c_str());
+				std::stringstream strm;
+				strm << "WARNING: Unrecognized <" << child_tag << " ../> element inside \"isi:sbm\" typed gaze description level.  Ignoring element.";
+				LOG(strm.str().c_str());
 			}
 
 
@@ -419,7 +301,18 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 
 
 	MeCtGaze* gaze_ct = NULL;
-	const XMLCh* attrHandle = elem->getAttribute( ATTR_HANDLE );
+
+	std::string handle = xml_parse_string( BMLDefs::ATTR_HANDLE, elem );
+	if( !handle.empty() )	{
+		const SbmCharacter* character = request->actor;
+		if (character)	{
+			MeControllerTreeRoot* controllerTree = character->ct_tree_p;
+			MeController* controller = controllerTree->findControllerByHandle( handle );
+			gaze_ct = dynamic_cast<MeCtGaze*>( controller );
+		}
+	}
+#if 0
+	const XMLCh* attrHandle = elem->getAttribute( BMLDefs::ATTR_HANDLE );
 	std::string handle = "";
 	if( attrHandle && XMLString::stringLen( attrHandle ) ) {
 		handle = asciiString(attrHandle);
@@ -433,24 +326,30 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 			gaze_ct = dynamic_cast<MeCtGaze*>(controller);
 		}
 	}
+#endif
 	// Note that if a BML gaze request uses a handle and the controller exists, then we don't
 	// need the target and some other options
 
-	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
+	const XMLCh* attrTarget = elem->getAttribute( BMLDefs::ATTR_TARGET );
 	if( !gaze_ct && (!attrTarget || !XMLString::stringLen( attrTarget ) ) ) {
 		std::wstringstream wstrstr;
-        wstrstr << "WARNING: BML::parse_bml_gaze(): <"<<tag<<"> BML tag missing "<<ATTR_TARGET<<"= attribute.";
+        wstrstr << "WARNING: BML::parse_bml_gaze(): <"<<tag<<"> BML tag missing "<< BMLDefs::ATTR_TARGET <<"= attribute.";
 		std::string str = convertWStringToString(wstrstr.str());
 		LOG(str.c_str());
-		return BehaviorRequestPtr();  // a.k.a., NULL
+		//return BehaviorRequestPtr();  // a.k.a., NULL
     }
+
+	const XMLCh* attrTargetPos = elem->getAttribute( BMLDefs::ATTR_TARGET_POS );
+	SrVec targetPos = SrVec();
+	xml_parse_float((float*)&targetPos,3,BMLDefs::ATTR_TARGET_POS,elem,false);
+	bool validTargetPos = (attrTargetPos && XMLString::stringLen( attrTargetPos ));
 
 	const SkJoint* target_joint = NULL;
 	if (attrTarget && XMLString::stringLen( attrTarget ))
 	{
 		target_joint = parse_target( tag, attrTarget, mcu );
 	}
-	if (target_joint == NULL && !gaze_ct) {  // Invalid target.  Assume parse_target(..) printed error.
+	if (target_joint == NULL && !gaze_ct && !validTargetPos) {  // Invalid target.  Assume parse_target(..) printed error.
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 
@@ -476,23 +375,24 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	int low_key_index  = MeCtGaze::GAZE_KEY_LUMBAR;
 	int high_key_index = MeCtGaze::GAZE_KEY_EYES;
 
-	const XMLCh* attrJointRange = elem->getAttribute( ATTR_JOINT_RANGE );
+	const XMLCh* attrJointRange = elem->getAttribute( BMLDefs::ATTR_JOINT_RANGE );
 	if( attrJointRange && XMLString::stringLen( attrJointRange ) )
 	{
 		if (gaze_ct)
 		{
-			std::wstringstream wstrstr;
-			wstrstr << "WARNING: BML::parse_bml_gaze(..): Gaze joints cannot be reassigned." << endl;
-			std::string str = convertWStringToString(wstrstr.str());
-			LOG(str.c_str());
+			LOG("WARNING: BML::parse_bml_gaze(..): Gaze joints cannot be reassigned.");
 		}
 		else
 		{
 			//  Parse sbm:joint-range
-			XMLStringTokenizer tokenizer( attrJointRange, L" \r\n\t\f" );  // include the dash to delimit ranges
+			XMLCh *delim = XMLString::transcode( " \r\n\t\f" );
+			XMLStringTokenizer tokenizer( attrJointRange, delim );
+			XMLString::release( &delim );
+//			XMLStringTokenizer tokenizer( attrJointRange, " \r\n\t\f" );  // include the dash to delimit ranges
+//			XMLStringTokenizer tokenizer( attrJointRange, L" \r\n\t\f" );  // include the dash to delimit ranges
 			if( tokenizer.countTokens()==0 ) {
 				std::wstringstream wstrstr;
-				wstrstr << "ERROR: No valid tokens in <gaze ../> behavior attribute "<<ATTR_JOINT_RANGE;
+				wstrstr << "ERROR: No valid tokens in <gaze ../> behavior attribute "<<BMLDefs::ATTR_JOINT_RANGE;
 				std::string str = convertWStringToString(wstrstr.str());
 				LOG(str.c_str());
 			} else {
@@ -551,7 +451,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	//  Parse sbm:priority-joint attribute
 	int priority_key_index = high_key_index;
 
-	const XMLCh* attrPriority = elem->getAttribute( ATTR_PRIORITY_JOINT );
+	const XMLCh* attrPriority = elem->getAttribute( BMLDefs::ATTR_PRIORITY_JOINT );
 	if( attrPriority && XMLString::stringLen(attrPriority) > 0 ) 
 	{
 		if (gaze_ct)
@@ -595,184 +495,84 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	float gaze_smooth_lumbar   = BML::Gaze::smooth_lumbar;
 	float gaze_smooth_cervical = BML::Gaze::smooth_cervical;
 	float gaze_smooth_eyeball  = BML::Gaze::smooth_eyeball;
-	float gaze_fade_out_ival   = BML::Gaze::fade_out_ival;
-	float gaze_fade_in_ival    = BML::Gaze::fade_in_ival;
-	float gaze_time_hint = -1.0;
+//	float gaze_fade_out_ival   = BML::Gaze::fade_out_ival;
+//	float gaze_fade_in_ival    = BML::Gaze::fade_in_ival;
+//	float gaze_time_hint = -1.0;
 	
-	std::wstringstream wstrstr;
+//	std::wstringstream wstrstr;
 
 	// parse sbm:time-hint
-	const XMLCh* attrTimeHint = elem->getAttribute( ATTR_TIME_HINT );
-	if( attrTimeHint && XMLString::stringLen( attrTimeHint ) ) {
-		if( !( wistringstream( attrTimeHint ) >> gaze_time_hint ) )
-		{
-			std::stringstream strstr;
-			strstr << "WARNING: Failed to parse time-hint interval attribute \""<< XMLString::transcode(attrTimeHint) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
-			LOG(strstr.str().c_str());
-		}
-	}
+	float gaze_time_hint = xml_utils::xml_parse_float( BMLDefs::ATTR_TIME_HINT, elem, -1.0f );
 
 	// parse sbm:joint-speed
-	const XMLCh* attrSpeed = elem->getAttribute( ATTR_JOINT_SPEED );
-	if( attrSpeed && XMLString::stringLen( attrSpeed ) ) {
-		if( attrTimeHint &&  XMLString::stringLen( attrTimeHint ))	{
-			std::stringstream strstr;
-			strstr << "WARNING: speed notsupported with time-hint attribute set\""<< XMLString::transcode(attrSpeed) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
-			LOG(strstr.str().c_str());
-		}
-		else {
-			// Ugly mix of XMLStringTokenizer and streams to get a token count before parsing
-			XMLStringTokenizer tokenizer( attrSpeed );
-	//		std::wstringstream wstrstr;
-			switch( tokenizer.countTokens() ) {
-				case 3: {
-					float values[3];
-					wistringstream in;
-					bool  valid = !in.fail();
-					int i=0;
-					XMLCh* token;
-					// Takes in up three values for backward compatibility
-					//   but first two values are summed to get total head speed
-					for( ; valid && i<3; ++i ) {
-						token = tokenizer.nextToken();
-						in.clear();
-						in.str( token );
-						in.seekg(0);
-						valid = !( in >> values[i] ).fail();
-					}
-					if( valid ) {
-						if( check_gaze_speed( values[0]+values[1], values[2] ) ) {
-							gaze_speed_head    = values[0] + values[1];
-							gaze_speed_eyeball = values[2];
-						}
-					} else {
-						wstrstr << "WARNING: Expected three numerical tokens in gaze behavior attribute " << ATTR_JOINT_SPEED << "=\"" << attrSpeed << "\"."
-							<< "  Unable to parse token "<<i<<" \""<<token<<"\" ("<<in.rdstate()<<": "<<(in.bad()?"BAD ":"")<<(in.fail()?"FAIL ":"")<<(in.eof()?"EOF":"")<<").  Ignoring attribute.";
-						std::string str = convertWStringToString(wstrstr.str());
-						LOG(str.c_str());
-					}
-					break;
+	// NOTE: getAttribute() returns an empty, non-NULL string
+	{
+		XMLStringTokenizer tokenizer( elem->getAttribute( BMLDefs::ATTR_JOINT_SPEED ) );
+		int num_toks = tokenizer.countTokens();
+		if( num_toks )	{
+			if( gaze_time_hint > 0.0f )	{
+				xml_utils::xml_parse_error( BMLDefs::ATTR_JOINT_SPEED, elem );
+				LOG( "WARNING: speed not supported with time-hint attribute set" );
+			}
+			switch( num_toks )	{
+				case 1: {
+					gaze_speed_head = xml_utils::xml_parse_float( BMLDefs::ATTR_JOINT_SPEED, elem );
 				}
 				case 2: {
-					float values[2];
-					wistringstream in;
-					bool  valid = !in.fail();
-					int i=0;
-					XMLCh* token;
-					for( ; valid && i<2; ++i ) {
-						token = tokenizer.nextToken();
-						in.clear();
-						in.str( token );
-						in.seekg(0);
-						valid = !( in >> values[i] ).fail();
-					}
-					if( valid ) {
-						if( check_gaze_speed( values[0], values[1] ) ) {
-							gaze_speed_head    = values[0];
-							gaze_speed_eyeball = values[1];
-						}
-					} else {
-						wstrstr << "WARNING: Expected 2 numerical tokens in gaze behavior attribute " << ATTR_JOINT_SPEED << "=\"" << attrSpeed << "\"."
-							<< "  Unable to parse token "<<i<<" \""<<token<<"\" ("<<in.rdstate()<<": "<<(in.bad()?"BAD ":"")<<(in.fail()?"FAIL ":"")<<(in.eof()?"EOF":"")<<").  Ignoring attribute.";
-						std::string str = convertWStringToString(wstrstr.str());
-						LOG(str.c_str());
-					}
-					break;
+					XMLCh *token = tokenizer.nextToken();
+					gaze_speed_head = xml_utils::xml_translate_float( token );
+					token = tokenizer.nextToken();
+					gaze_speed_eyeball = xml_utils::xml_translate_float( token );
 				}
-				case 1: {
-					float value;
-					wistringstream in;
-					bool  valid = !in.fail();
-					int i=0;
-					XMLCh* token = tokenizer.nextToken();
-					in.clear();
-					in.str( token );
-					in.seekg(0);
-					valid = !( in >> value ).fail();
-					if( valid ) {
-						if( value > 0.0 ) {
-							gaze_speed_head = value;
-						}
-					} else {
-						wstrstr << "WARNING: Expected 1 numerical token in gaze behavior attribute " << ATTR_JOINT_SPEED << "=\"" << attrSpeed << "\"."
-							<< "  Unable to parse token "<<i<<" \""<<token<<"\" ("<<in.rdstate()<<": "<<(in.bad()?"BAD ":"")<<(in.fail()?"FAIL ":"")<<(in.eof()?"EOF":"")<<").  Ignoring attribute.";
-						std::string str = convertWStringToString(wstrstr.str());
-						LOG(str.c_str());
+				default:	{ // num_toks > 2 DEPRECATED!
+
+					float gaze_speed_back = xml_utils::xml_translate_float( tokenizer.nextToken() );
+					gaze_speed_head = xml_utils::xml_translate_float( tokenizer.nextToken() ) + gaze_speed_back;
+					gaze_speed_eyeball = xml_utils::xml_translate_float( tokenizer.nextToken() );
+
+					if( num_toks > 3 )	{
+						xml_utils::xml_parse_error( BMLDefs::ATTR_JOINT_SPEED, elem );
+						LOG( "WARNING: expecting 1, 2, or 3 values" );
 					}
-					break;
 				}
-				default:
-					wstrstr << "WARNING: Expected up to three numerical tokens in gaze behavior attribute " << ATTR_JOINT_SPEED << "=\"" << attrSpeed << "\".  Found " << tokenizer.countTokens() << ".  Ignoring attribute." << endl;
-					std::string str = convertWStringToString(wstrstr.str());
-					LOG(str.c_str());
-					break;						
 			}
 		}
 	}
 
 	// parse sbm:speed-smoothing
-	const XMLCh* attrSmooth = elem->getAttribute( ATTR_JOINT_SMOOTH );
-	if( attrSmooth && XMLString::stringLen( attrSmooth ) ) {
-		// Ugly mix of XMLStringTokenizer and streams to get a token count before parsing
-		XMLStringTokenizer tokenizer( attrSmooth );
-		switch( tokenizer.countTokens() ) {
-			case 3: {
-				float values[3];
-				wistringstream in;
-
-				bool valid = !in.fail();
-				XMLCh* token = NULL;
-				int i=0;
-				for( ; valid && i<3; ++i ) {
-					token = tokenizer.nextToken();
-					in.clear();
-					in.str( token );
-					in.seekg(0);
-					valid = !( in >> values[i] ).fail();
-				}
-				if( valid ) {
-					if( check_gaze_smoothing( values[0], values[1], values[2] ) ) {
-						gaze_smooth_lumbar   = values[0];
-						gaze_smooth_cervical = values[1];
-						gaze_smooth_eyeball  = values[2];
-					}
-				} else {
-					wstrstr << "WARNING: Expected three numerical tokens in gaze behavior attribute " << ATTR_JOINT_SPEED << "=\"" << attrSpeed << "\"."
-						<< "  Unable to parse token "<<i<<" \""<<token<<"\" ("<<in.rdstate()<<": "<<(in.bad()?"BAD ":"")<<(in.fail()?"FAIL ":"")<<(in.eof()?"EOF":"")<<").  Ignoring attribute.";
-					std::string str = convertWStringToString(wstrstr.str());
-					LOG(str.c_str());
-				}
-
-				break;
+	{
+		XMLStringTokenizer tokenizer( elem->getAttribute( BMLDefs::ATTR_JOINT_SMOOTH ) );
+		int num_toks = tokenizer.countTokens();
+		if( num_toks )	{
+			if( num_toks == 3 )	{
+			
+				gaze_smooth_lumbar = xml_utils::xml_translate_float( tokenizer.nextToken() );
+				gaze_smooth_cervical = xml_utils::xml_translate_float( tokenizer.nextToken() );
+				gaze_smooth_eyeball = xml_utils::xml_translate_float( tokenizer.nextToken() );
 			}
-			default:
-				wstrstr << "WARNING: Expected three numerical tokens in gaze behavior attribute " << ATTR_JOINT_SMOOTH << "=\"" << attrSpeed << "\".  Found " << tokenizer.countTokens() << ".  Ignoring attribute.";
-				std::string str = convertWStringToString(wstrstr.str());
-				LOG(str.c_str());
-				break;						
+			else	{
+			
+				xml_utils::xml_parse_error( BMLDefs::ATTR_JOINT_SMOOTH, elem );
+				LOG( "WARNING: expecting 3 smooth values" );
+			}
 		}
 	}
 
-	const XMLCh* attrFadeOut = elem->getAttribute( ATTR_FADE_OUT );
-	if(attrFadeOut != NULL && attrFadeOut[0] != '\0') 
-	{
-		if( !( wistringstream( attrFadeOut ) >> gaze_fade_out_ival ) )
-		{
-			std::stringstream strstr;
-			strstr << "WARNING: Failed to parse fade-out interval attribute \""<< XMLString::transcode(attrFadeOut) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
-			LOG(strstr.str().c_str());
-		}
+	float gaze_fade_out_ival = xml_utils::xml_parse_float( BMLDefs::ATTR_FADE_OUT, elem, BML::Gaze::fade_out_ival );
+	float gaze_fade_in_ival = xml_utils::xml_parse_float( BMLDefs::ATTR_FADE_IN, elem, BML::Gaze::fade_in_ival );
+
+	if( gaze_fade_out_ival >= 0.0f )	{
+		// assuming we are freeing this little angel...
+		// gaze_ct->recurrent = false...
+		if (gaze_ct)
+			gaze_ct->set_fade_out( gaze_fade_out_ival );
 	}
 
-	const XMLCh* attrFadeIn = elem->getAttribute( ATTR_FADE_IN );
-	if(attrFadeIn != NULL && attrFadeIn[0] != '\0') 
-	{
-		if( !( wistringstream( attrFadeIn ) >> gaze_fade_in_ival ) )
-		{
-			std::stringstream strstr;
-			strstr << "WARNING: Failed to parse fade-in interval attribute \""<< XMLString::transcode(attrFadeIn) <<"\" of <"<< XMLString::transcode(elem->getTagName()) << " .../> element." << endl;
-			LOG(strstr.str().c_str());
-		}
+	if( gaze_fade_in_ival >= 0.0f )	{
+		// assuming we are freeing this little angel...
+		// gaze_ct->recurrent = false...
+		if (gaze_ct)
+			gaze_ct->set_fade_in( gaze_fade_in_ival );
 	}
 
 	if( LOG_GAZE_PARAMS ) {
@@ -790,12 +590,17 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	if (!gaze_ct) {
 		gaze_ct = new MeCtGaze();
 		gaze_ct->handle(handle);
-		gaze_ct->init( low_key_index, high_key_index );
+		gaze_ct->init(const_cast<SbmCharacter*>(request->actor), low_key_index, high_key_index );
 		gaze_ct->set_task_priority( priority_key_index );
 	}
 	if( target_joint )	{
 		gaze_ct->set_target_joint( 0, 0, 0, const_cast<SkJoint*>( target_joint ) );
 	}
+	else if (validTargetPos)
+	{
+		gaze_ct->set_target(targetPos.x,targetPos.y,targetPos.z);
+	}
+
 	if( gaze_time_hint > 0.0 )	{
 		gaze_ct->set_time_hint( gaze_time_hint );
 	}
@@ -888,84 +693,48 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		}
 	}
 
-	float roll = 0;
-	const XMLCh* attrRoll = elem->getAttribute( ATTR_SBM_ROLL );
-	if( attrRoll && XMLString::stringLen(attrRoll)>0 ) {
-		if( !( wistringstream( attrRoll ) >> roll ) ) {
-			wstrstr << "WARNING: BML::parse_bml_gaze(): Expected float for "<<ATTR_SBM_ROLL<<" attribute \"" << attrRoll << "\"." << endl;
+	float roll = xml_utils::xml_parse_float( BMLDefs::ATTR_SBM_ROLL, elem, 0.0f );
+
+	{
+		XMLStringTokenizer tokenizer( elem->getAttribute( BMLDefs::ATTR_DIRECTION ) );
+		int num_toks = tokenizer.countTokens();
+		if( num_toks )	{
+
+			float dir_angle = 0.0f;
+			std::string tok = xml_utils::xml_translate_string( tokenizer.nextToken() );
+			if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_POLAR ) ) {
+
+				dir_angle = xml_utils::xml_translate_float( tokenizer.nextToken(), dir_angle );
+
+			} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_UP ) )	{
+				dir_angle = 0.0f;
+			} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_UPRIGHT ) )	{
+				dir_angle = 45.0f;
+			} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_RIGHT ) )	{
+				dir_angle = 90.0f;
+			} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_DOWNRIGHT ) )	{
+				dir_angle = 135.0f;
+			} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_DOWN ) )	{
+				dir_angle = 180.0f;
+			} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_DOWNLEFT ) )	{
+				dir_angle = 225.0f;
+			} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_LEFT ) )	{
+				dir_angle = 270.0f;
+			} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_UPLEFT ) )	{
+				dir_angle = 315.0f;
+			} else	{
+				LOG( "WARNING: direction '%s' not recognized", tok.c_str() );
+			}
+			// sweep_angle = 30.0f; reasonable default, of not further specified.
+			float sweep_angle = xml_utils::xml_parse_float( BMLDefs::ATTR_ANGLE, elem, 30.0f );
+
+			gaze_ct->set_offset_polar( dir_angle, sweep_angle, roll );
 		}
 	}
 
-	// New code: uses set_offset_polar
-	const XMLCh* attrDirection = elem->getAttribute( ATTR_DIRECTION );
-	if( attrDirection && XMLString::stringLen(attrDirection)>0 ) {
-		wistringstream dir_in( attrDirection );
-		wstring token;
-		if( dir_in >> token ) {
-			float angle = 45;  // Over-exagerated default until further analysis
-
-			const XMLCh* attrAngle = elem->getAttribute( ATTR_ANGLE );
-			if( attrAngle && XMLString::stringLen(attrAngle)>0 ) {
-				if( !( wistringstream( attrAngle ) >> angle ) ) {
-					wstrstr << "WARNING: BML::parse_bml_gaze(): Expected float for angle attribute \"" << attrAngle << "\"." << endl;
-				}
-			} else {
-				wstrstr << "WARNING: BML::parse_bml_gaze(): Found direction attribute, but no angle attribute.  Assuming angle " << angle << "\"." << endl;
-			}
-
-			float dir_angle;
-			bool parse_gaze_direction = true;  // future function name and success value
-			if( token.compare( 0, XMLString::stringLen(DIR_POLAR), DIR_POLAR )==0 ) {
-				if( !( dir_in >> dir_angle ) ) {
-					wstrstr << "WARNING: BML::parse_bml_gaze(): Expected float for \"POLAR direction attribute \"" << attrAngle << "\"." << endl;
-				}
-			} else if( token==DIR_UP ) {
-				dir_angle = 0;
-			} else if( token==DIR_UPRIGHT ) {
-				dir_angle = 45;
-			} else if( token==DIR_RIGHT ) {
-				dir_angle = 90;
-			} else if( token==DIR_DOWNRIGHT ) {
-				dir_angle = 135;
-			} else if( token==DIR_DOWN ) {
-				dir_angle = 180;
-			} else if( token==DIR_DOWNLEFT ) {
-				dir_angle = 225;
-			} else if( token==DIR_LEFT ) {
-				dir_angle = 270;
-			} else if( token==DIR_UPLEFT ) {
-				dir_angle = 315;
-			} else {
-				wstrstr << "WARNING: BML::parse_bml_gaze(): Unrecognized gaze direction \""<<attrDirection<<"\".  Direction ignored."<< endl;
-				parse_gaze_direction = false;
-			}
-
-			if( parse_gaze_direction ) {  // parsed successfully?
-				gaze_ct->set_offset_polar( dir_angle, angle, roll );
-			}
-		} else {
-			wstrstr << "WARNING: BML::parse_bml_gaze(): Failed to parse direction attribute " << attrDirection << "\"." << endl;
-		}
-	} else if( roll != 0 ) {
-		gaze_ct->set_offset_polar( 0, 0, roll );
-	}
-	
-	if( gaze_fade_out_ival >= 0.0f )	{
-		// assuming we are freeing this little angel...
-		// gaze_ct->recurrent = false...
-		gaze_ct->set_fade_out( gaze_fade_out_ival );
-	}
-
-	if( gaze_fade_in_ival >= 0.0f )	{
-		// assuming we are freeing this little angel...
-		// gaze_ct->recurrent = false...
-		gaze_ct->set_fade_in( gaze_fade_in_ival );
-	}
-
-	const XMLCh* id = elem->getAttribute(ATTR_ID);
-	std::string localId;
-	if (id)
-		localId = XMLString::transcode(id);
+	std::string localId = xml_parse_string( BMLDefs::ATTR_ID, elem );
+//	if (id)
+//		localId = XMLString::transcode(id);
 	
 	boost::shared_ptr<MeControllerRequest> ct_request( new MeControllerRequest( unique_id, localId, gaze_ct, request->actor->gaze_sched_p, behav_syncs ) );
 	ct_request->set_persistent( true );

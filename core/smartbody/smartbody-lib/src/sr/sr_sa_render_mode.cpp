@@ -21,12 +21,12 @@
 
 //# include <stdlib.h>
 
-# include <SR/sr_sa_render_mode.h>
+# include <sr/sr_sa_render_mode.h>
 
-# include <SR/sr_sn_shape.h>
+# include <sr/sr_sn_shape.h>
 
 //# define SR_USE_TRACE1 // constructor / destructor
-//# include <SR/sr_trace.h>
+//# include <sr/sr_trace.h>
 
 //=============================== SrSaRenderMode ====================================
 

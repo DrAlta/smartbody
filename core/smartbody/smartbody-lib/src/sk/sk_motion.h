@@ -26,9 +26,9 @@
 # ifndef SK_MOTION_H
 # define SK_MOTION_H
 
-# include <SR/sr_input.h>
-# include <SR/sr_shared_class.h>
-# include <SK/sk_channel_array.h>
+# include <sr/sr_input.h>
+# include <sr/sr_shared_class.h>
+# include <sk/sk_channel_array.h>
 # include <sbm/sr_synch_points.h>
 
 class SkPosture;

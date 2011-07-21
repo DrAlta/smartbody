@@ -24,6 +24,7 @@
 #define _PARSER_OPENCOLLADA_H_
 
 #include <fstream>
+#include "xercesc_utils.hpp"
 #include "sk/sk_skeleton.h"
 #include "sk/sk_motion.h"
 #include "mcontrol_util.h"
@@ -32,15 +33,15 @@
 class ParserOpenCOLLADA
 {
 	public:
-		static xercesc_3_0::DOMNode* getNode(std::string nodeName, xercesc_3_0::DOMNode* node);
-		static xercesc_3_0::DOMNode* getNode(std::string nodeName, std::string fileName);
+		static DOMNode* getNode(std::string nodeName, DOMNode* node);
+		static DOMNode* getNode(std::string nodeName, std::string fileName);
 		static bool parse(SkSkeleton& skeleton, SkMotion& motion, std::string fileName, float scale);
-		static void parseLibraryVisualScenes(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order);
-		static void parseJoints(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, SkJoint* parent = NULL);
-		static void parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order);
+		static void parseLibraryVisualScenes(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order);
+		static void parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, SkJoint* parent = NULL);
+		static void parseLibraryAnimations(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order);
 		static void animationPostProcess(SkSkeleton& skeleton, SkMotion& motion);
 		static void animationPostProcessByChannels(SkSkeleton& skeleton, SkMotion& motion, SkChannelArray& channels);
-		static void parseLibraryGeometries(xercesc_3_0::DOMNode* node, std::vector<SrModel*>& meshModelVec, float scale);
+		static void parseLibraryGeometries(DOMNode* node, std::vector<SrModel*>& meshModelVec, float scale);
 
 	private:
 		static int getMotionChannelId(SkChannelArray& channels, std::string sourceName);

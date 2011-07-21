@@ -21,8 +21,8 @@
 
 # include <math.h>
 
-# include <SR/sr_mat.h>
-//# include <SR/sr_utils.h>
+# include <sr/sr_mat.h>
+//# include <sr/sr_utils.h>
 
 //================================== Static Data ===================================
 

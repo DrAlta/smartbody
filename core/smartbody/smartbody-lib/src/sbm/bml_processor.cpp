@@ -61,6 +61,7 @@
 
 #include "me_ct_examples.h"
 #include "me_ct_gaze.h"
+#include "BMLDefs.h"
 
 using namespace std;
 using namespace BML;
@@ -71,69 +72,6 @@ const bool LOG_METHODS				= false;
 const bool BML_LOG_INTERRUPT        = false;
 
 const double SQROOT_2 = 1.4142135623730950488016887242097;
-
-
-///////////////////////////////////////////////////////////////////////////////
-//  Implementation
-
-// XMLStrings (utf-16 character arrays) for parsing vrSpeak's XML
-const XMLCh TAG_ACT[]		= L"act";
-const XMLCh TAG_BML[]       = L"bml";
-const XMLCh TAG_BODY[]      = L"body";
-const XMLCh TAG_TORSO[]      = L"torso";
-const XMLCh TAG_REQUIRED[]  = L"required";
-#ifdef BMLR_BML2ANIM
-const XMLCh TAG_POSTURE[]   = L"posture"; // [BMLR] For bml2anim postures
-#endif
-const XMLCh TAG_HEAD[]      = L"head";
-const XMLCh TAG_TM[]        = L"tm";
-const XMLCh TAG_MARK[]      = L"mark";
-
-
-const XMLCh TAG_SBM_COMMAND[] = L"sbm:command";
-
-// Deprecated behavior tags
-const XMLCh TAG_ANIMATION[] = L"animation";
-const XMLCh TAG_EVENT[]     = L"event";
-
-const XMLCh TAG_PANIMATION[] = L"panimation";
-const XMLCh TAG_REACH[] = L"sbm:reach";
-
-// XMLStrings (utf-16 character arrays) for parsing vrSpeak's XML
-const XMLCh ATTR_SPEAKER[]      = L"speaker";
-const XMLCh ATTR_ADDRESSEE[]    = L"addressee";
-const XMLCh ATTR_CONTENTTYPE[]  = L"contenttype";
-const XMLCh ATTR_LANG[]         = L"lang";
-const XMLCh ATTR_TID[]          = L"tid";
-const XMLCh ATTR_POSTURE[]      = L"posture";
-const XMLCh ATTR_REPEATS[]      = L"repeats";
-const XMLCh ATTR_AMOUNT[]       = L"amount";
-const XMLCh ATTR_VELOCITY[]     = L"velocity";
-const XMLCh ATTR_TARGET[]       = L"target";
-const XMLCh ATTR_ANGLE[]        = L"angle";
-const XMLCh ATTR_DIRECTION[]    = L"direction";
-const XMLCh ATTR_ROLL[]         = L"sbm:roll";
-const XMLCh ATTR_SMOOTH[]       = L"sbm:smooth";
-
-////// XML Direction constants
-// Angular (gaze) and orienting (head)
-const XMLCh DIR_RIGHT[]        = L"RIGHT";
-const XMLCh DIR_LEFT[]         = L"LEFT";
-const XMLCh DIR_UP[]           = L"UP";
-const XMLCh DIR_DOWN[]         = L"DOWN";
-// Angular only
-const XMLCh DIR_UPRIGHT[]      = L"UPRIGHT";
-const XMLCh DIR_UPLEFT[]       = L"UPLEFT";
-const XMLCh DIR_DOWNRIGHT[]    = L"DOWNRIGHT";
-const XMLCh DIR_DOWNLEFT[]     = L"DOWNLEFT";
-const XMLCh DIR_POLAR[]        = L"POLAR";
-// Orienting only
-const XMLCh DIR_ROLLRIGHT[]    = L"ROLLRIGHT";
-const XMLCh DIR_ROLLLEFT[]     = L"ROLLLEFT";
-
-
-
-
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -241,6 +179,7 @@ BML::Processor::Processor()
 	ct_speed_max( CONTROLLER_SPEED_MAX_DEFAULT ),
 	requestcb(NULL)
 {
+	BMLDefs* bmlDefs = new BMLDefs();
 	try {
 		xmlParser = boost::shared_ptr<XercesDOMParser>( new XercesDOMParser() );
 
@@ -317,7 +256,7 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
 
    const DOMDocument* xml = bpMsg.xml;
 	DOMElement* root = xml->getDocumentElement();  
-	if( XMLString::compareString( root->getTagName(), TAG_ACT )!=0 )
+	if( XMLString::compareString( root->getTagName(), BMLDefs::TAG_ACT )!=0 )
 		LOG("WARNING: BodyPlanner: Expected <act> tag as XML root.");
 
 
@@ -325,7 +264,7 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, mcuCBHandle *mcu ) {
 	DOMElement* bmlElem = NULL;
 	while( child!=NULL ) {
 		const XMLCh *tag = child->getTagName();
-		if( XMLString::compareString( tag, TAG_BML )==0 ) {
+		if( XMLString::compareString( tag, BMLDefs::TAG_BML )==0 ) {
 			bmlElem = child;
 			break;
 		} // else ingore other tags for now
@@ -374,17 +313,17 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 	DOMElement*  child = xml_utils::getFirstChildElement( group );
 	while( child!=NULL ) {
 		const XMLCh *tag = child->getTagName();  // Grand Child (behavior) Tag
-		if( XMLString::compareString( tag, TAG_REQUIRED )==0 ) {
+		if( XMLString::compareString( tag, BMLDefs::TAG_REQUIRED )==0 ) {
 			parseBehaviorGroup( child, request, mcu, behavior_ordinal, true );
 		} else {
-			const XMLCh* id  = child->getAttribute( ATTR_ID );
+			const XMLCh* id  = child->getAttribute( BMLDefs::ATTR_ID );
 			if (bml_feedback)
 			{
 				if (XMLString::compareString( id, XMLString::transcode("") )==0)
 				{
 					std::stringstream newIdStr;
 					newIdStr << "default" << idCounter;
-					child->setAttribute(ATTR_ID, XMLString::transcode(newIdStr.str().c_str()));
+					child->setAttribute(BMLDefs::ATTR_ID, XMLString::transcode(newIdStr.str().c_str()));
 					id = XMLString::transcode(newIdStr.str().c_str());
 					idCounter++;
 				}
@@ -399,7 +338,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 
 			// Parse behavior specifics
 			//// TODO: tag name -> behavior factory map
-			if( XMLString::compareString( tag, TAG_SBM_SPEECH )==0 || XMLString::compareString( tag, TAG_SPEECH )==0 ) {
+			if( XMLString::compareString( tag, BMLDefs::TAG_SBM_SPEECH )==0 || XMLString::compareString( tag, BMLDefs::TAG_SPEECH )==0 ) {
 				// TEMPORARY: <speech> can only be the first behavior
 				if( behavior_ordinal == 1 ) {
 					// This speech is the first
@@ -433,49 +372,47 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 					LOG("\t(unique_id \"%s\".", unique_id.c_str()); // unique id is not multibyte, and I'm lazily refusing to convert just to put it on the same line).
 					
 				}
-			} else if( XMLString::compareString( tag, TAG_ANIMATION )==0 ) {
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_ANIMATION )==0 ) {
 				// DEPRECATED FORM
 				behavior = parse_bml_animation( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, TAG_SBM_ANIMATION )==0 ) {
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_SBM_ANIMATION )==0 ) {
 				behavior = parse_bml_animation( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, TAG_SBM_PANIMATION )==0 ) {
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_SBM_PANIMATION )==0 ) {
 				behavior = parse_bml_panimation( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, TAG_BODY )==0 ) {
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_BODY )==0 ) {
 				behavior = parse_bml_body( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, TAG_TORSO )==0 ) {
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_TORSO )==0 ) {
 				behavior = parse_bml_body( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, TAG_HEAD )==0 ) {
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_HEAD )==0 ) {
 				behavior = parse_bml_head( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, TAG_FACE )==0 ) {
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_FACE )==0 ) {
 				behavior = parse_bml_face( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, TAG_GAZE )==0 ) {
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_GAZE )==0 ) {
 				behavior = /*BML::*/parse_bml_gaze( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, TAG_SACCADE )==0 ) {
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_SACCADE )==0 ) {
 				behavior = /*BML::*/parse_bml_saccade( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, TAG_REACH )==0 ) {
-				behavior = /*BML::*/parse_bml_reach( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, TAG_CONSTRAINT )==0 ) {
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_CONSTRAINT )==0 ) {
 				behavior = /*BML::*/parse_bml_constraint( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, TAG_BODYREACH )==0 ) {
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_BODYREACH )==0 ) {
 				behavior = /*BML::*/parse_bml_bodyreach( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, TAG_GRAB )==0 ) {
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_GRAB )==0 ) {
 				behavior = /*BML::*/parse_bml_grab( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, TAG_EVENT )==0 ) {
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_EVENT )==0 ) {
 				// DEPRECATED FORM
 				behavior = parse_bml_event( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, TAG_PARAM )==0 ) {
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_PARAM )==0 ) {
 				behavior = parse_bml_param( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, TAG_SBM_EVENT )==0 ) {
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_SBM_EVENT )==0 ) {
 				behavior = parse_bml_event( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, TAG_QUICKDRAW )==0 ) {
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_QUICKDRAW )==0 ) {
 				behavior = parse_bml_quickdraw( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, TAG_SPEECH )==0 ) {
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_SPEECH )==0 ) {
 				LOG("ERROR: BML::Processor::parseBML(): <speech> BML tag must be first behavior (TEMPORARY HACK).");
-			} else if( XMLString::compareString( tag, TAG_LOCOTMOTION )==0 ) {
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_LOCOTMOTION )==0 ) {
 				behavior = parse_bml_locomotion( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, TAG_EXAMPLE_LOCOMOTION )==0 ) {
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_EXAMPLE_LOCOMOTION )==0 ) {
 				behavior = parse_bml_example_locomotion( child, unique_id, behav_syncs, required, request, mcu );
-			} else if( XMLString::compareString( tag, TAG_INTERRUPT )==0 ) {
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_INTERRUPT )==0 ) {
 				behavior = parse_bml_interrupt( child, unique_id, behav_syncs, required, request, mcu );
 #ifdef BMLR_BML2ANIM
 			// [BMLR]  Note that this brace closes out the if statement above
@@ -485,8 +422,9 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 			if (behavior == NULL) {
 				// [BMLR] support for bml to animations
 				behavior = parse_bml_to_anim(child, unique_id, behav_syncs, required, request, mcu);
-				if( behavior != NULL )
-					request->registerBehavior( id, behavior );
+				if( behavior != NULL )	{
+					request->registerBehavior( xml_utils::xml_translate_wide( id ), behavior );
+				}
 				else
 					wcerr<<"WARNING: BodyPlannerImpl: <"<<tag<<"> BML tag unrecognized or unsupported."<<endl;
 			}
@@ -501,7 +439,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 
 			if( behavior != NULL ) {
 				behavior->required = required;
-				request->registerBehavior( id, behavior );
+				request->registerBehavior( xml_utils::xml_translate_wide( id ), behavior );
 				if (bml_feedback)
 				{
 					for (int i = 0; i < 7; i++)
@@ -555,90 +493,22 @@ void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, mcuCB
 	parseBehaviorGroup( bmlElem, request, mcu, behavior_ordinal, false );
 
 	if( behavior_ordinal==0 ) { // No change
-		// uncomment the following to see any bml being processed that does not contain any behaviors
-		/*
-		LOG("WARNING: BML \"%s\" does not contain any behaviors!", request->msgId.c_str());
-		// dump the xml
-		XMLCh tempStr[100];
-		XMLString::transcode("LS", tempStr, 99);
-		DOMImplementation *impl = DOMImplementationRegistry::getDOMImplementation(tempStr);
-		DOMLSSerializer* theSerializer = ((DOMImplementationLS*)impl)->createLSSerializer();
-		XMLCh* xmlOutput = theSerializer->writeToString(request->doc);
-		theSerializer->release();
-		std::wstring xmlStrWide = xmlOutput;
-		std::string xmlStr(xmlStrWide.begin(), xmlStrWide.end());
-		
-		LOG("%s", xmlStr.c_str());
-		*/
 		return;
 	}
 
-//	// TEMPORARY: <speech> can only be the first behavior
-//	if( XMLString::compareString( tag, TAG_SBM_SPEECH )==0 || XMLString::compareString( tag, TAG_SPEECH )==0 ) {
-////// Old code
-////		const XMLCh*     speechId;
-////		speechId = child->getAttribute( ATTR_ID );
-////
-////		string unique_id = request->buildUniqueBehaviorId( tag, id, ++behavior_ordinal );
-////		SpeechRequestPtr speech( new SpeechRequest( unique_id, child, speechId, request ) );
-////		request->registerBehavior( speechId, speech );
-////
-////		child = xml_utils::getNextElement( child );
-//
-//		string unique_id = request->buildUniqueBehaviorId( tag, id, ++behavior_ordinal );
-//
-//		BehaviorSyncPoints behav_syncs;
-//		behav_syncs.parseStandardSyncPoints( child, request, unique_id );
-//
-//		SpeechRequestPtr speech_request( parse_bml_speech( child, unique_id, behav_syncs, request, mcu ) );
-//		if( speech_request ) {
-//			request->registerBehavior( id, speech_request );
-//
-//			// Store reference to the speech behavior in the speeches map for later processing
-//			// TODO: generalize this to TriggerEvent handling
-//			string speechKey = buildSpeechKey( request->actor, speech_request->speech_request_id );
-//			bool insert_success = speeches.insert( make_pair( speechKey, speech_request ) ).second;  // store for later reply
-//			if( !insert_success ) {
-//				strstr << "ERROR: BML::Processor.vrSpeak(..): BmlProcessor::speehces already contains an entry for speechKey \"" << speechKey << "\".  Cannot process speech behavior.  Failing BML request.  (This error should not occur. Let Andrew know immeidately.)"  << endl;
-//				// TODO: Send vrSpeakFailed
-//			}
-//
-//			request->speech_request = speech_request;
-//		} else {
-//			//  Speech is always treated as required
-//			wcerr<<"ERROR: BML::Processor::parseBML(): Failed to parse <"<<tag<<"> tag."<<endl;
-//		}
-//
-//		child = xml_utils::getNextElement( child );
-//	}
-
 	if( LOG_SYNC_POINTS ) {
 		cout << "WARNING: LOG_SYNC_POINTS is broken.  Please fix!!" << endl;
-		//cout << "TIDs:";
-		//SyncPoint* sp = trigger->start;
-		//while( sp != NULL ) {
-		//	const XMLCh *name = sp->name;
-		//	if( name )
-		//		wcout << " " << name;
-		//	sp = sp->next;
-		//}
-		//cout<<endl;
-
-		//cout << "Behaviors:";
-		//int numGestures = request->behaviors.size();
-		//for( int i=0; i<numGestures; ++i )
-		//	wcout << "  " << request->behaviors[i]->toString() << endl;
 	}
 }
 
 BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
 	
-	const XMLCh* id = elem->getAttribute(ATTR_ID);
+	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
 	if (id)
 		localId = XMLString::transcode(id);
 
-	const XMLCh* postureName = elem->getAttribute( ATTR_POSTURE );
+	const XMLCh* postureName = elem->getAttribute( BMLDefs::ATTR_POSTURE );
 	if( postureName && *postureName != 0 ) {
 		// Look up pose
 		const char* ascii_pose_id = xml_utils::asciiString(postureName);
@@ -646,10 +516,11 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 		delete [] ascii_pose_id;
 		std::map<std::string, SkPosture*>::iterator postureIter =  mcu->pose_map.find(pose_id);
 		if( postureIter !=  mcu->pose_map.end()) {
+		
 			SkPosture* posture = (*postureIter).second;
 			MeCtPose* poseCt = new MeCtPose();
 			poseCt->name( posture->name() );  // TODO: include BML act and behavior ids
-			poseCt->init( *posture );
+			poseCt->init(const_cast<SbmCharacter*>(request->actor), *posture );
 
 			return BehaviorRequestPtr( new PostureRequest( unique_id, localId, poseCt, 1, request->actor, behav_syncs ) );
 		} else {
@@ -660,7 +531,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 				SkMotion* motion = (*motionIter).second;
 				MeCtMotion* motionCt = new MeCtMotion();
 				motionCt->name( motion->name() );  // TODO: include BML act and behavior ids
-				motionCt->init( motion );
+				motionCt->init(const_cast<SbmCharacter*>(request->actor), motion );
 				motionCt->loop( true );
 
 				PostureRequest * posture_new = new PostureRequest( unique_id, localId, motionCt, 1, request->actor, behav_syncs );
@@ -668,9 +539,11 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 
 				return BehaviorRequestPtr( posture_new );
 			} else {
-				std::wstringstream wstrstr;
-				wstrstr<<"WARNING: BML::Processor::parse_bml_body(): <body>: posture=\""<<postureName<<"\" not loaded; ignoring <body>.";
-				LOG(convertWStringToString(wstrstr.str()).c_str());
+				string s = xml_utils::xml_translate_string( postureName );
+				LOG( "WARNING: BML::Processor::parse_bml_body(): <body>: posture=\"%s\" not loaded; ignoring <body>.", s.c_str() );
+//				std::wstringstream wstrstr;
+//				wstrstr<<"WARNING: BML::Processor::parse_bml_body(): <body>: posture=\""<<postureName<<"\" not loaded; ignoring <body>.";
+//				LOG(convertWStringToString(wstrstr.str()).c_str());
 				return BehaviorRequestPtr();  // a.k.a., NULL
 			}
 		}
@@ -682,127 +555,153 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 
 BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
 	
-	const XMLCh* id = elem->getAttribute(ATTR_ID);
+	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
 	if (id)
 		localId = XMLString::transcode(id);
 	
 	const XMLCh* tag      = elem->getTagName();
-	const XMLCh* attrType = elem->getAttribute( ATTR_TYPE );
+	const XMLCh* attrType = elem->getAttribute( BMLDefs::ATTR_TYPE );
 	if( attrType && *attrType != 0 ) {
         int type = -1;
 
-        if( XMLString::compareIString( attrType, L"nod" )==0 ) {
+		if( XMLString::compareIString( attrType, BMLDefs::ATTR_NOD )==0 ) {
 			type = BML::HEAD_NOD;
-        } else if( XMLString::compareIString( attrType, L"shake" )==0 ) {
+		} else if( XMLString::compareIString( attrType, BMLDefs::ATTR_SHAKE)==0 ) {
             type = BML::HEAD_SHAKE;
-        } else if( XMLString::compareIString( attrType, L"toss" )==0 ) {
+		} else if( XMLString::compareIString( attrType, BMLDefs::ATTR_TOSS )==0 ) {
             type = BML::HEAD_TOSS;
-        } else if( XMLString::compareIString( attrType, L"orient" )==0 ) {
+		} else if( XMLString::compareIString( attrType, BMLDefs::ATTR_ORIENT )==0 ) {
             type = BML::HEAD_ORIENT;
+        } else if( XMLString::compareIString( attrType, BMLDefs::ATTR_WIGGLE )==0 ) {
+            type = BML::HEAD_WIGGLE;
+        } else if( XMLString::compareIString( attrType, BMLDefs::ATTR_WAGGLE )==0 ) {
+            type = BML::HEAD_WAGGLE;
         }
 
-#define DFL_NOD_REPS		1
+#define DFL_NOD_REPS		1.0f
+
 #define DFL_NOD_AMOUNT		0.5f
 #define DFL_NOD_VELOCITY	1.0f
 #define DFL_NOD_SMOOTH		0.5f
 
+#define DFL_NOD_PERIOD		0.5f
+#define DFL_NOD_WARP		1.0f
+#define DFL_NOD_ACCEL		1.5f
+
+#define DFL_NOD_PITCH		1.0f
+#define DFL_NOD_WARP2		0.5f
+#define DFL_NOD_ACCEL2		1.5f
+#define DFL_NOD_DECAY		0.5f
+
+#if 0
+		void set_nod( float dur, float mag, float rep, int aff, float smooth = 0.5 )
+		void set_wiggle( 
+			int axis, 
+			float dur, // not used!
+			float mag, 
+			float period, 
+			float warp, 
+			float accel_pow, 
+			float smooth = 0.5
+		)
+		void set_waggle(
+			int axis,
+			float dur,
+			float mag,
+			float period,
+			float pitch,
+			float warp,
+			float accel_pow,
+			float decay_pow,
+			float smooth = 0.5
+		)
+#endif
+
 		switch( type ) {
             case BML::HEAD_NOD:
             case BML::HEAD_SHAKE: {
-                const XMLCh* attrRepeats = elem->getAttribute( ATTR_REPEATS );
-                float repeats = DFL_NOD_REPS;  // default to one complete cycle
-                if( attrRepeats && *attrRepeats != 0 )
-                    repeats = xml_utils::xcstof( attrRepeats );
+				
+				float repeats = xml_utils::xml_parse_float( BMLDefs::ATTR_REPEATS, elem, DFL_NOD_REPS );
+				float amount = xml_utils::xml_parse_float( BMLDefs::ATTR_AMOUNT, elem, DFL_NOD_AMOUNT );
+				float velocity = xml_utils::xml_parse_float( BMLDefs::ATTR_VELOCITY, elem, DFL_NOD_VELOCITY );
+				float smooth = xml_utils::xml_parse_float( BMLDefs::ATTR_SMOOTH, elem, DFL_NOD_SMOOTH );
 
-                const XMLCh* attrAmount = elem->getAttribute( ATTR_AMOUNT );
-                float amount = DFL_NOD_AMOUNT;  // default to a moderate amount.  Range 0.0 to 1.0
-                if( attrAmount && *attrAmount != 0 )
-                    amount = xml_utils::xcstof( attrAmount );
-
-                const XMLCh* attrVelocity = elem->getAttribute( ATTR_VELOCITY );
-                float velocity = DFL_NOD_VELOCITY;  // default to one cycle per second
-                if( attrVelocity && *attrVelocity != 0 )
-                    velocity = xml_utils::xcstof( attrVelocity );
-
-				const XMLCh* attrSmooth = elem->getAttribute( ATTR_SMOOTH );
-                float smooth = DFL_NOD_SMOOTH;  
-                if( attrSmooth && *attrSmooth != 0 )
-                    smooth = xml_utils::xcstof( attrSmooth );
-
-                float duration = velocity * repeats;
-
-                return BehaviorRequestPtr( new NodRequest( unique_id,
-														   localId,
-				                                           (NodRequest::NodType) type,
-												           repeats, velocity, amount, smooth,
-                                                           request->actor,
-                                                           behav_syncs ) );
+                return BehaviorRequestPtr( 
+					new NodRequest( 
+						unique_id,
+						localId,
+						(NodRequest::NodType) type,
+						repeats, velocity, amount, smooth,
+						request->actor,
+						behav_syncs 
+					) 
+				);
             }
 
 			case BML::HEAD_ORIENT: {
-				const XMLCh* direction = elem->getAttribute( ATTR_DIRECTION );
-				const XMLCh* target    = elem->getAttribute( ATTR_TARGET );
-				const XMLCh* angle     = elem->getAttribute( ATTR_ANGLE );
+				const XMLCh* direction = elem->getAttribute( BMLDefs::ATTR_DIRECTION );
+				const XMLCh* target    = elem->getAttribute( BMLDefs::ATTR_TARGET );
+				const XMLCh* angle     = elem->getAttribute( BMLDefs::ATTR_ANGLE );
 
 				if( target && *target != 0 ) {
 					// TODO
 					std::wstringstream wstrstr;
-					wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a target.  Ignoring behavior.";
+					wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> using a target.  Ignoring behavior.";
 					LOG(convertWStringToString(wstrstr.str()).c_str());
 					return BehaviorRequestPtr();  // a.k.a., NULL
 				} else if( direction && *direction != 0 ) {
-					if( XMLString::compareIString( direction, DIR_RIGHT )==0 ) {
+					if( XMLString::compareIString( direction, BMLDefs::DIR_RIGHT )==0 ) {
 						// TODO
 						std::wstringstream wstrstr;
-						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<<DIR_RIGHT<<"\".  Ignoring behavior.";
+						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<< BMLDefs::DIR_RIGHT<<"\".  Ignoring behavior.";
 						LOG(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
-					} else if( XMLString::compareIString( direction, DIR_LEFT )==0 ) {
+					} else if( XMLString::compareIString( direction, BMLDefs::DIR_LEFT )==0 ) {
 						// TODO
 						std::wstringstream wstrstr;
-						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<<DIR_LEFT<<"\".  Ignoring behavior.";
+						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<< BMLDefs::DIR_LEFT<<"\".  Ignoring behavior.";
 						LOG(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
-					} else if( XMLString::compareIString( direction, DIR_UP )==0 ) {
+					} else if( XMLString::compareIString( direction, BMLDefs::DIR_UP )==0 ) {
 						// TODO
 						std::wstringstream wstrstr;
-						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<<DIR_UP<<"\".  Ignoring behavior.";
+						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<< BMLDefs::DIR_UP<<"\".  Ignoring behavior.";
 						LOG(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
-					} else if( XMLString::compareIString( direction, DIR_DOWN )==0 ) {
+					} else if( XMLString::compareIString( direction, BMLDefs::DIR_DOWN )==0 ) {
 						// TODO
 						std::wstringstream wstrstr;
-						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<<DIR_DOWN<<"\".  Ignoring behavior.";
+						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<< BMLDefs::DIR_DOWN<<"\".  Ignoring behavior.";
 						LOG(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
-					} else if( XMLString::compareIString( direction, DIR_ROLLRIGHT )==0 ) {
+					} else if( XMLString::compareIString( direction, BMLDefs::DIR_ROLLRIGHT )==0 ) {
 						// TODO
 						std::wstringstream wstrstr;
-						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<<DIR_ROLLRIGHT<<"\".  Ignoring behavior.";
+						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<< BMLDefs::DIR_ROLLRIGHT<<"\".  Ignoring behavior.";
 						LOG(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
-					} else if( XMLString::compareIString( direction, DIR_ROLLRIGHT )==0 ) {
+					} else if( XMLString::compareIString( direction, BMLDefs::DIR_ROLLRIGHT )==0 ) {
 						// TODO
 						std::wstringstream wstrstr;
-						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<<DIR_ROLLRIGHT<<"\".  Ignoring behavior.";
+						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction=\""<< BMLDefs::DIR_ROLLRIGHT<<"\".  Ignoring behavior.";
 						LOG(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
 					} else {
 						std::wstringstream wstrstr;
-						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unrecognized direction \""<<direction<<"\" in <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">.  Ignoring behavior.";
+						wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unrecognized direction \""<<direction<<"\" in <"<<tag<<" "<< BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\">.  Ignoring behavior.";
 						LOG(convertWStringToString(wstrstr.str()).c_str());
 						return BehaviorRequestPtr();  // a.k.a., NULL
 					}
 
 					// TODO
 					std::wstringstream wstrstr;
-					wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction.  Ignoring behavior.";
+					wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<< BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> using a direction.  Ignoring behavior.";
 					LOG(convertWStringToString(wstrstr.str()).c_str());
 					return BehaviorRequestPtr();  // a.k.a., NULL
 				} else {
 					std::wstringstream wstrstr;
-					wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\"> requires a target or a direction attribute.  Ignoring behavior.";
+					wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<< BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\"> requires a target or a direction attribute.  Ignoring behavior.";
 					LOG(convertWStringToString(wstrstr.str()).c_str());
 					return BehaviorRequestPtr();  // a.k.a., NULL
 				}
@@ -811,22 +710,66 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 			case BML::HEAD_TOSS:
 				{
 				std::wstringstream wstrstr;
-				wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">.  Ignoring behavior.";
+				wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<< BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\">.  Ignoring behavior.";
 				LOG(convertWStringToString(wstrstr.str()).c_str());
 				return BehaviorRequestPtr();  // a.k.a., NULL
+				}
+			case BML::HEAD_WIGGLE:
+				{
+					int axis = MeCtSimpleNod::NOD_PITCH;
+					//int axis = xml_utils::xml_parse_int( BMLDefs::ATTR_NODAXIS, elem, MeCtSimpleNod::NOD_PITCH );
+					float amount = xml_utils::xml_parse_float( BMLDefs::ATTR_AMOUNT, elem, DFL_NOD_AMOUNT );
+					float smooth = xml_utils::xml_parse_float( BMLDefs::ATTR_SMOOTH, elem, DFL_NOD_SMOOTH );
+					float period = xml_utils::xml_parse_float( BMLDefs::ATTR_NODPERIOD, elem, DFL_NOD_PERIOD );
+					float warp = xml_utils::xml_parse_float( BMLDefs::ATTR_NODWARP, elem, DFL_NOD_WARP );
+					float accel = xml_utils::xml_parse_float( BMLDefs::ATTR_NODACCEL, elem, DFL_NOD_ACCEL );
+
+					return BehaviorRequestPtr(
+						new NodRequest( 
+							unique_id,
+							localId,
+							(NodRequest::NodType) type,
+							axis, period, amount, smooth, warp, accel,
+							request->actor,
+							behav_syncs 
+						) 
+					);
+				}
+			case BML::HEAD_WAGGLE:
+				{
+					int axis = MeCtSimpleNod::NOD_PITCH;
+					//int axis = xml_utils::xml_parse_int( BMLDefs::ATTR_NODAXIS, elem, MeCtSimpleNod::NOD_PITCH );
+					float amount = xml_utils::xml_parse_float( BMLDefs::ATTR_AMOUNT, elem, DFL_NOD_AMOUNT );
+					float smooth = xml_utils::xml_parse_float( BMLDefs::ATTR_SMOOTH, elem, DFL_NOD_SMOOTH );
+					float period = xml_utils::xml_parse_float( BMLDefs::ATTR_NODPERIOD, elem, DFL_NOD_PERIOD );
+					float pitch = xml_utils::xml_parse_float( BMLDefs::ATTR_NODPITCH, elem, DFL_NOD_PITCH );
+					float warp = xml_utils::xml_parse_float( BMLDefs::ATTR_NODWARP, elem, DFL_NOD_WARP2 );
+					float accel = xml_utils::xml_parse_float( BMLDefs::ATTR_NODACCEL, elem, DFL_NOD_ACCEL2 );
+					float decay = xml_utils::xml_parse_float( BMLDefs::ATTR_NODDECAY, elem, DFL_NOD_DECAY );
+
+					return BehaviorRequestPtr(
+						new NodRequest( 
+							unique_id,
+							localId,
+							(NodRequest::NodType) type,
+							axis, period, amount, smooth, warp, accel, pitch, decay, 
+							request->actor,
+							behav_syncs 
+						) 
+					);
 				}
 
 			default:
 				{
 				std::wstringstream wstrstr;
-                wstrstr << "WARNING: BML::Processor::parse_bml_head(): <"<<tag<<" "<<ATTR_TYPE<<"=\""<<attrType<<"\">: Unknown type value, ignore command";
+                wstrstr << "WARNING: BML::Processor::parse_bml_head(): <"<<tag<<" "<< BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\">: Unknown type value, ignore command";
 				LOG(convertWStringToString(wstrstr.str()).c_str());
 				return BehaviorRequestPtr();  // a.k.a., NULL
 				}
         }
     } else {
 		std::wstringstream wstrstr;
-        wstrstr << "WARNING: BML::Processor::parse_bml_head(): <"<<tag<<"> BML tag missing "<<ATTR_TYPE<<"= attribute.";
+        wstrstr << "WARNING: BML::Processor::parse_bml_head(): <"<<tag<<"> BML tag missing "<< BMLDefs::ATTR_TYPE<<"= attribute.";
 		LOG(convertWStringToString(wstrstr.str()).c_str());
 		return BehaviorRequestPtr();  // a.k.a., NULL
     }
@@ -909,8 +852,8 @@ BML::BehaviorRequestPtr BML::Processor::parse_bml_to_anim( DOMElement* elem, std
 					}
 
 					configValue = string(XMLString::transcode(attr->getValue()));
-					std::transform(userValue.begin(), userValue.end(), userValue.begin(), tolower);
-					std::transform(configValue.begin(), configValue.end(), configValue.begin(), tolower);
+					std::transform(userValue.begin(), userValue.end(), userValue.begin(), ::tolower);
+					std::transform(configValue.begin(), configValue.end(), configValue.begin(), ::tolower);
 
 					if (strcmp(userValue.c_str(), configValue.c_str()) != 0)
 						sameAttrs = false;
@@ -918,7 +861,7 @@ BML::BehaviorRequestPtr BML::Processor::parse_bml_to_anim( DOMElement* elem, std
 				}
 				if (sameAttrs)
 				{			
-					if( XMLString::compareString( elem->getTagName(), TAG_POSTURE )==0 || XMLString::compareString( elem->getTagName(), TAG_BODY)==0 ) {
+					if( XMLString::compareString( elem->getTagName(), BMLDefs::TAG_POSTURE )==0 || XMLString::compareString( elem->getTagName(), BMLDefs::TAG_BODY)==0 ) {
 						string posture = "<body posture=\"" + string(XMLString::transcode(animNode->getTextContent())) + "\" />";
 						DOMElement* e = xml_utils::parseMessageXml(Prser, (char*)posture.c_str())->getDocumentElement();
 						return parse_bml_body(e, unique_id, behav_syncs, required, request, mcu);
@@ -1169,7 +1112,8 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 #if USE_RECIPIENT
 			return bp.bml_end( BMLProcessorMsg( character_id, recipient_id, message_id, character, NULL, args ), mcu );
 #else
-			return bp.bml_end( BMLProcessorMsg( character_id, message_id, character, NULL, args ), mcu );
+			BMLProcessorMsg msg( character_id, message_id, character, NULL, args );
+			return bp.bml_end( msg, mcu );
 #endif
 		} catch( BmlException& e ) {
 			std::stringstream strstr;

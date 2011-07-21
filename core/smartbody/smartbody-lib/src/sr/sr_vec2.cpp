@@ -21,8 +21,8 @@
  */
 
 # include <math.h>
-# include <SR/sr_vec2.h>
-# include <SR/sr_geo2.h>
+# include <sr/sr_vec2.h>
+# include <sr/sr_geo2.h>
 
 //============================= static data ================================
 

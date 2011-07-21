@@ -43,9 +43,9 @@
 #include "xercesc_utils.hpp"
 
 // Motion Engine & Controllers...
-#include <ME/me_ct_motion.h>
+#include <me/me_ct_motion.h>
 #include "me_ct_examples.h"
-#include <ME/me_prune_policy.hpp>
+#include <me/me_prune_policy.hpp>
 
 #include "bml_sync_point.hpp"
 
@@ -60,9 +60,12 @@ namespace BML {
 	bool isValidBmlId( const std::wstring& id );
 	bool isValidTmId( const std::wstring& id );
 
+	bool stringICompare(const std::string& s1, const std::string& s2);
+	bool stringCompare(const std::string& s1, const std::string& s2);
+
 
 	// Enumerations
-	enum HeadBehaviorType { HEAD_NOD, HEAD_SHAKE, HEAD_TOSS, HEAD_ORIENT };
+	enum HeadBehaviorType { HEAD_NOD, HEAD_SHAKE, HEAD_TOSS, HEAD_ORIENT, HEAD_WIGGLE, HEAD_WAGGLE };
 
 
 
@@ -348,11 +351,22 @@ namespace BML {
         const float repeats;
         const float frequency;
         const float extent;
-		const float smooth;   
+		const float smooth;  
+		const int axis;
+		const float warp;
+		const float period;
+		const float accel;
+		const float pitch;
+		const float decay;
+
 
 	public: ///// Methods
 		NodRequest( const std::string& unique_id, const std::string& localId, NodType type, float repeats, float frequency, float extent, float smooth, const SbmCharacter* actor,
 			        const BehaviorSyncPoints& behav_syncs );
+		NodRequest( const std::string& unique_id, const std::string& localId, NodType type, int axis, float period, float amount, float smooth, float warp, float accel, const SbmCharacter* actor,
+					const BehaviorSyncPoints& behav_syncs );
+		NodRequest( const std::string& unique_id, const std::string& localId, NodType type, int axis, float period, float amount, float smooth, float warp, float accel, float pitch, float decay, const SbmCharacter* actor,
+					const BehaviorSyncPoints& behav_syncs );
 	};
 
 	class TiltRequest : public MeControllerRequest {
@@ -409,7 +423,8 @@ namespace BML {
 
 	class VisemeRequest : public SequenceRequest {
 	protected:
-        const char* viseme;
+//        const char* viseme; // CONVERT TO std::string
+		std::string viseme;
         float       weight;
 		time_sec    duration;
 		float		rampup;
@@ -422,8 +437,14 @@ namespace BML {
 		VisemeRequest( const std::string& unique_id, const std::string& localId, const char *viseme, float weight, time_sec duration,
 			           const BehaviorSyncPoints& behav_syncs, float rampup, float rampdown);
 
-        void setVisemeName( const char* viseme );
-		const char* getVisemeName();
+// NOTE: without a destructor, the char* viseme will leak: use std::string
+//        void setVisemeName( const char* viseme );
+		void setVisemeName( std::string& v )	{
+			this->viseme = v;
+		}
+		const char* getVisemeName()	{
+			return this->viseme.c_str();
+		}
 
 		float getWeight();
 		time_sec getDuration();

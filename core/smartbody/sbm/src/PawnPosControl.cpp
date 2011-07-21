@@ -1,16 +1,16 @@
 #include "PawnPosControl.h"
+#include <sbm/mcontrol_util.h>
 
 #include "vhcl.h"
-#include <fltk/gl.h>
+#include <FL/gl.h>
 #include <GL/glu.h>
 #include <sr/sr_euler.h>
 #include <sr/sr_plane.h>
 #include <sr/sr_sphere.h>
 #include <sr/sr_sn.h>
 #include <sr/sr_sn_group.h>
-#include <SR/sr_sa_gl_render.h>
-#include <SR/sr_gl_render_funcs.h>
-#include "glfont2.h"
+#include <sr/sr_sa_gl_render.h>
+#include <sr/sr_gl_render_funcs.h>
 
 
 void PawnControl::init_font()
@@ -20,11 +20,13 @@ void PawnControl::init_font()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glGenTextures(0, &textureName);
+#ifdef WIN32
 	if (!label.Create("../../../../data/fonts/font.glf", 0))
 	{
 		if(!label.Create(".font.glf", 0))
 			LOG("PawnPosControl::InitFont(): Error: Cannot load font file\n");
 	}	
+#endif
 }
 
 void PawnControl::attach_pawn(SbmPawn* ap)
@@ -54,8 +56,11 @@ void PawnControl::set_pawn_pos(SbmPawn* pawn, SrVec& pos)
 	float x,y,z,h,p,r;
 	pawn->get_world_offset(x,y,z,h,p,r);
 	//printf("h = %f, p = %f, r = %f\n",h,p,r);
+	
 	pawn->set_world_offset(pos.x,pos.y,pos.z,h,p,r);
 	pawn->updateToColObject();
+	mcuCBHandle& mcu = mcuCBHandle::singleton();	
+	mcu.resourceDataChanged = true;
 }
 
 SrQuat PawnControl::get_pawn_rot( SbmPawn* pawn )
@@ -79,6 +84,8 @@ void PawnControl::set_pawn_rot( SbmPawn* pawn, SrQuat& quat )
 	gwiz::euler_t e = gwiz::euler_t(q);
 	pawn->set_world_offset(x,y,z,(float)e.h(),(float)e.p(),(float)e.r());	
 	pawn->updateToColObject();
+	mcuCBHandle& mcu = mcuCBHandle::singleton();	
+	mcu.resourceDataChanged = true;
 }
 /************************************************************************/
 /* Pawn Pos Control                                                     */
@@ -129,8 +136,10 @@ void PawnPosControl::renderControl(SrCamera& cam)
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+#ifdef WIN32
 	label.Begin();
 	label.DrawString("pawn", 0.003f,0.0,0.0);		
+#endif
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();

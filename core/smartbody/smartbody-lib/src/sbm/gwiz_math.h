@@ -409,8 +409,10 @@ class quat_t {
 	// CONSTRUCT
         inline quat_t( void )
             { W = 1.0; X = 0.0; Y = 0.0; Z = 0.0; }
-        inline quat_t( float_t w_in, float_t x_in, float_t y_in, float_t z_in )
+        inline quat_t( float w_in, float x_in, float y_in, float z_in )
             { set( w_in, x_in, y_in, z_in ); }
+        inline quat_t( float_t w_in, float_t x_in, float_t y_in, float_t z_in )
+            { set( (float_t)w_in, (float_t)x_in, (float_t)y_in, (float_t)z_in ); }
 		quat_t( const vector_t& axis_angle );
 		
 		quat_t( float_t angle, const vector_t& v, int use_radians = 0 );
@@ -423,17 +425,19 @@ class quat_t {
 	// WRITE
 		inline void set( float_t w_in, float_t x_in, float_t y_in, float_t z_in ) 
 			{ W = w_in; X = x_in; Y = y_in; Z = z_in; normalize(); }
+		inline void set( float w_in, float x_in, float y_in, float z_in ) 
+			{ set( (float_t)w_in, (float_t)x_in, (float_t)y_in, (float_t)z_in ); }
 
 	// READ
         inline float_t w( void ) const { return( W ); }
         inline float_t x( void ) const { return( X ); }
         inline float_t y( void ) const { return( Y ); }
         inline float_t z( void ) const { return( Z ); }
+        inline float wf( void ) const { return( (float)W ); }
+        inline float xf( void ) const { return( (float)X ); }
+        inline float yf( void ) const { return( (float)Y ); }
+        inline float zf( void ) const { return( (float)Z ); }
 
-#if 0
-		inline bool non_identity( void ) const 
-			{ return( W < 0.999999999 ); }
-#endif
 		inline vector_t axisangle( void ) const // Axis-Angle: Same as Exponential Map
 			{ return( axis() * radians() ); }
 		inline float_t radians( void ) const

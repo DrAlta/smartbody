@@ -23,8 +23,8 @@
 #ifndef _ME_CT_SACCADE_H_
 #define _ME_CT_SACCADE_H_
 
-#include <ME/me_controller.h>
-#include <SK/sk_skeleton.h>
+#include <me/me_controller.h>
+#include <sk/sk_skeleton.h>
 #include "gwiz_math.h"
 #include "sr_linear_curve.h"
 
@@ -132,7 +132,7 @@ class MeCtSaccade : public MeController
 		float intervalRandom();				// unit: sec
 		float duration(float amplitude);	// unit: sec
 
-		void init(MeFrameData& frame);
+		void initSaccade(MeFrameData& frame);
 		virtual bool controller_evaluate(double t, MeFrameData& frame);
 		virtual SkChannelArray& controller_channels()	{ return(_channels); }
 		virtual double controller_duration()			{ return((double)_duration); }

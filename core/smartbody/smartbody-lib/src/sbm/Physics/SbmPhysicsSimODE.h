@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _SBMPHYSICSSIMODE_H_
+#define _SBMPHYSICSSIMODE_H_
+
 #include <ode/ode.h>
 #include <ode/common.h>
 #include "SbmPhysicsSim.h"
@@ -42,14 +44,15 @@ public:
 	dJointGroupID getContactGroupID() { return contactGroupID; }
 	bool   systemIsInit() { return hasInit; }
 public:	
-	virtual void initSimulation();
-	virtual void setGravity(float gravity);
+	virtual void initSimulation();	
 	virtual void addPhysicsObj(SbmPhysicsObj* obj);
 	virtual void removePhysicsObj(SbmPhysicsObj* obj);
-	virtual void updateSimulation(float timeStep);	
+	virtual void updateSimulationInternal(float timeStep);	
 	virtual SbmPhysicsObj* createPhyObj() { return new SbmPhysicsObjODE(); }
 public:
 	static SbmPhysicsSimODE* getODESim();
 protected:
 	static void nearCallBack(void *data, dGeomID o1, dGeomID o2);
 };
+#endif
+

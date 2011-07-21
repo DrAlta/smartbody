@@ -30,10 +30,7 @@
 class mcuCBHandle;
 
 namespace BML {
-	const XMLCh TAG_REACH[]      = L"sbm:reach_old";
-
-
-	BML::BehaviorRequestPtr parse_bml_reach( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
+	//BML::BehaviorRequestPtr parse_bml_reach( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
 };
 
 

@@ -49,7 +49,7 @@ void SbmPhysicsObjODE::updateColObj()
 	if (!colObj || !hasPhysicsSim())
 		return;
 	// write the current simulation result into object world state
-	SbmTransform& curT = colObj->worldState;
+	SbmTransform curT;// = colObj->getGlobalTransform();
 	const dReal* quat = dBodyGetQuaternion(bodyID);
 	curT.rot.w = quat[0];
 	curT.rot.x = quat[1];
@@ -60,6 +60,7 @@ void SbmPhysicsObjODE::updateColObj()
 	curT.tran[0] = pos[0];
 	curT.tran[1] = pos[1];
 	curT.tran[2] = pos[2];
+	colObj->setWorldState(curT);
 	//sr_out << "new pos = " << curT.tran << srnl;
 }
 
@@ -68,7 +69,7 @@ void SbmPhysicsObjODE::updateSimObj()
 	if (!colObj)
 		return;
 
-	SbmTransform& curT = colObj->worldState;
+	SbmTransform& curT = colObj->getWorldState();
 	dQuaternion quat;
 	quat[0] = (dReal)curT.rot.w;	
 	quat[1] = (dReal)curT.rot.x;
@@ -87,7 +88,7 @@ void SbmPhysicsObjODE::initGeometry( SbmGeomObject* obj, float mass )
 	bodyID = dBodyCreate(odeSim->getWorldID());
 	if (obj)
 	{
-		SbmTransform& curT = obj->worldState;
+		SbmTransform& curT = obj->getWorldState();
 		dQuaternion quat;
 		quat[0] = (dReal)curT.rot.w;	
 		quat[1] = (dReal)curT.rot.x;
@@ -189,8 +190,8 @@ void SbmPhysicsSimODE::nearCallBack(void *data, dGeomID o1, dGeomID o2)
 	int n =  dCollide(o1,o2,N,&contact[0].geom,sizeof(dContact));
 	for (int i = 0; i < n; i++) {
 		contact[i].surface.mode = dContactBounce | dContactApprox1;		
-		contact[i].surface.bounce     = 0.1f; // (0.0~1.0) restitution parameter
-		contact[i].surface.mu = 500.f;//1000.f;
+		contact[i].surface.bounce     = 0.00f; // (0.0~1.0) restitution parameter
+		contact[i].surface.mu = 5000.f;//1000.f;
 		//contact[i].surface.mu2 = 3000.f;
 		//contact[i].surface.soft_cfm = 0.01f;
 		//contact[i].surface.soft_erp = 0.0001f;
@@ -206,22 +207,25 @@ void SbmPhysicsSimODE::initSimulation()
 
 	worldID = dWorldCreate();
 	//dWorldSetAutoDisableFlag(worldID,1);
-	dWorldSetGravity(worldID,0.f,-980.f,0.f);
+	dWorldSetGravity(worldID,0.f,-9.8f,0.f);
 	dWorldSetLinearDamping(worldID,0.01f);
 	dWorldSetAngularDamping(worldID,0.01f);
 
 	//spaceID = dHashSpaceCreate(0);
 	spaceID = dSimpleSpaceCreate(0);
 
-	groundID = dCreatePlane(spaceID,0,1,0,0.0f); // create a plane at y = 0
+	groundID = dCreatePlane(spaceID,0,1,0,1.0f); // create a plane at y = 0
 
 	contactGroupID = dJointGroupCreate(0);
 
 	hasInit = true;
 }
 
-void SbmPhysicsSimODE::updateSimulation( float timeStep )
+void SbmPhysicsSimODE::updateSimulationInternal( float timeStep )
 {	
+	float gravity = (float)DObject::getDoubleAttribute("gravity");
+	dWorldSetGravity(worldID,0.f,-fabs(gravity),0.f);	
+
 	dSpaceCollide(spaceID,this,SbmPhysicsSimODE::nearCallBack);		
 	//dWorldStep(worldID,timeStep);
 	//dWorldStepFast1(worldID,timeStep,10);
@@ -248,9 +252,4 @@ void SbmPhysicsSimODE::removePhysicsObj( SbmPhysicsObj* obj )
 	if (li != physicsObjList.end())
 		physicsObjList.erase(li);
 
-}
-
-void SbmPhysicsSimODE::setGravity( float gravity )
-{
-	dWorldSetGravity(worldID,0.f,-fabs(gravity),0.f);	
 }

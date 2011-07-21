@@ -24,8 +24,8 @@
 #ifndef ME_CT_TETHER_H
 #define ME_CT_TETHER_H
 
-#include <SK/sk_skeleton.h>
-#include <ME/me_controller.h>
+#include <sk/sk_skeleton.h>
+#include <me/me_controller.h>
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -57,7 +57,7 @@ class MeCtTether : public MeController	{
 		
 		void clear( void );
 
-		void init( char *channel_name );
+		void init(SbmPawn* pawn,  char *channel_name );
 		
 		// will work with or without a source joint (otherwise world coord offset)
 		void set_source_joint( char *joint_name );

@@ -188,7 +188,11 @@ void GlChartViewSeries::SetBufferIndex(int index)
 	buffer_index = index;
 }
 
+#ifdef WIN32
 __forceinline int GlChartViewSeries::CheckIndex(int index)
+#else
+int GlChartViewSeries::CheckIndex(int index)
+#endif
 {
 	if(max_size > 0) 
 	{

@@ -27,7 +27,8 @@ const char* MeCtCurveWriter::TYPE = "MeCtCurveWriter";
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void MeCtCurveWriter::init( 
+void MeCtCurveWriter::init(						   
+	SbmPawn* pawn,
 	SkChannelArray& channels,
 	int left_bound , 
 	int right_bound, 
@@ -56,12 +57,12 @@ void MeCtCurveWriter::init(
 		_local_ch_to_buffer[i] = index;
 		int chan_size = SkChannel::size( _channels.type( i ) );
 		if( chan_size > 1 ) {
-			LOG( "MeCtCurveWriter::init ERR: channel '%s' not a scalar", _channels.name( i ) );
+			LOG( "MeCtCurveWriter::init ERR: channel '%s' not a scalar", _channels.name( i ).get_string() );
 		}
 		index += chan_size;
 	}
 
-	MeController::init ();
+	MeController::init (pawn);
 }
 
 bool MeCtCurveWriter::controller_evaluate( double time, MeFrameData& frame )	{

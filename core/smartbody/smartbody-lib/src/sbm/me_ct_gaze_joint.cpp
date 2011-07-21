@@ -25,7 +25,7 @@
 using namespace gwiz;
 #include <vhcl_log.h>
 
-#include <SR/sr_alg.h>
+#include <sr/sr_alg.h>
 
 #define ENABLE_FORWARD_RAY  		1
 

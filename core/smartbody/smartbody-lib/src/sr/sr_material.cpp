@@ -19,15 +19,16 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
 
-# include <SR/sr_material.h>
+# include <sr/sr_material.h>
+#include <string>
 
 SrMaterial::SrMaterial () :
             ambient  (  51,  51,  51, 255 ),
             diffuse  ( 204, 204, 204, 255 ),
             specular (   0,   0,   0, 255 ),
-            emission (   0,   0,   0, 255 )
+            emission (   0,   0,   0, 255 )			
  {
-   shininess = 0;
+   shininess = 0;         
  }
 
 void SrMaterial::init () 
@@ -36,7 +37,7 @@ void SrMaterial::init ()
    diffuse.set  ( 204, 204, 204, 255 );
    specular.set (   0,   0,   0, 255 );
    emission.set (   0,   0,   0, 255 );
-   shininess = 0;
+   shininess = 0;       
  }
 
 bool operator == ( const SrMaterial& m1, const SrMaterial& m2 )
@@ -45,7 +46,7 @@ bool operator == ( const SrMaterial& m1, const SrMaterial& m2 )
             m1.diffuse==m2.diffuse &&
             m1.specular==m2.specular &&
             m1.emission==m2.emission &&
-            m1.shininess==m2.shininess )? true:false;
+            m1.shininess==m2.shininess)? true:false;
  }
 
 bool operator != ( const SrMaterial& m1, const SrMaterial& m2 )
@@ -54,7 +55,7 @@ bool operator != ( const SrMaterial& m1, const SrMaterial& m2 )
             m1.diffuse==m2.diffuse &&
             m1.specular==m2.specular &&
             m1.emission==m2.emission &&
-            m1.shininess==m2.shininess )? false:true;
+            m1.shininess==m2.shininess)? false:true;
  }
 
 SrOutput& operator<< ( SrOutput& o, const SrMaterial& m )
@@ -63,7 +64,7 @@ SrOutput& operator<< ( SrOutput& o, const SrMaterial& m )
                m.diffuse  <<' '<< 
                m.specular <<' '<< 
                m.emission <<' '<< 
-               m.shininess;
+               m.shininess ;
  }
 
 SrInput& operator>> ( SrInput& in, SrMaterial& m )
@@ -72,7 +73,7 @@ SrInput& operator>> ( SrInput& in, SrMaterial& m )
                 m.diffuse  >>
                 m.specular >>
                 m.emission >>
-                m.shininess;
+                m.shininess ;
  }
 
 //================================ End of File =================================================

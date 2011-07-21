@@ -5,12 +5,13 @@
 # include "sr_cfg_manager.h"
 # include "sr_cfg_planner.h"
 # include "sk_blend_cfg.h"
+# include "sk_pos_cfg.h"
 
-#include <SBM/me_ct_motion_parameter.h>
-#include <SBM/me_ct_motion_example.hpp>
+#include <sbm/me_ct_motion_parameter.h>
+#include <sbm/me_ct_motion_example.hpp>
 
-# include <SR/sr_box.h>
-# include <Sk/sk_joint.h>
+# include <sr/sr_box.h>
+# include <sk/sk_joint.h>
 //================================ SkPosCfgManager =====================================
 
 class SkBlendPlanner;
@@ -24,8 +25,8 @@ public:
 
 class SkBlendCfgManager
  { private :
-    friend SkBlendCfg;
-    friend SkBlendPlanner;
+    friend class SkBlendCfg;
+    friend class SkBlendPlanner;
 	
  public:
 	VecOfSbmColObj colObstacles;	

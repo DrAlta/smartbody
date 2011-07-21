@@ -1,6 +1,5 @@
-
-# include <SR/sr_random.h>
-# include <SBM/me_ct_data_interpolation.h>
+# include <sr/sr_random.h>
+# include <sbm/me_ct_data_interpolation.h>
 # include "sk_blend_cfg.h"
 # include "sk_blend_cfg_manager.h"
 
@@ -61,7 +60,7 @@ bool SkBlendCfg::valid ()
 	{
 		CollisionJoint& colJ = _cman->colJoints[i];
 		SkJoint* moJoint = _cman->motionParameter->getMotionFrameJoint(blendPose,colJ.joint->name().get_string());
-		colJ.colGeo->updateTransform(moJoint->gmat());
+		colJ.colGeo->updateGlobalTransform(moJoint->gmat());
 		for (unsigned int j=0;j<_cman->colObstacles.size();j++)
 		{
 			SbmGeomObject* obs = _cman->colObstacles[j];

@@ -20,14 +20,14 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
 
-# include <SR/sr_mat.h>
-# include <SR/sr_vec.h>
-# include <SR/sr_color.h>
-# include <SR/sr_quat.h>
-# include <SR/sr_output.h>
-# include <SR/sr_material.h>
-# include <SR/sr_light.h>
-# include <SR/sr_gl.h>
+# include <sr/sr_mat.h>
+# include <sr/sr_vec.h>
+# include <sr/sr_color.h>
+# include <sr/sr_quat.h>
+# include <sr/sr_output.h>
+# include <sr/sr_material.h>
+# include <sr/sr_light.h>
+# include <sr/sr_gl.h>
 
 # include <math.h>
 

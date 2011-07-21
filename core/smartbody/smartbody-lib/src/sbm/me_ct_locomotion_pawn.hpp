@@ -23,7 +23,7 @@
 #ifndef ME_CT_LOCOMOTION_PAWN_HPP
 #define ME_CT_LOCOMOTION_PAWN_HPP
 
-#include <ME/me_controller.h>
+#include <me/me_controller.h>
 
 #include "me_ct_locomotion_limb.hpp"
 #include "me_ct_locomotion_speed_accelerator.hpp"

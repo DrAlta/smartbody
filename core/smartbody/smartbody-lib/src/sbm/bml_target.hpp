@@ -32,8 +32,7 @@
 class mcuCBHandle;
 
 namespace BML {
-	const XMLCh ATTR_TARGET[] = L"target";
-
+	SkJoint* parse_target( const XMLCh* Attr, DOMElement* Elem, mcuCBHandle *mcu );	
 	const SkJoint* parse_target( const XMLCh* tagname, const XMLCh* attrTarget, mcuCBHandle *mcu );	
 	const SbmPawn* parse_target_pawn( const XMLCh* tagname, const XMLCh* attrTarget, mcuCBHandle *mcu );
 };

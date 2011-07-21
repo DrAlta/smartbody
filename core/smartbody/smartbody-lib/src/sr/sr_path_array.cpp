@@ -19,10 +19,10 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
 
-# include <SR/sr_path_array.h>
+# include <sr/sr_path_array.h>
 
 //# define SR_USE_TRACE1
-//# include <SR/sr_trace.h>
+//# include <sr/sr_trace.h>
 
 //====================== SrPathArray ==========================
 

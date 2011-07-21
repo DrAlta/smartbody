@@ -6,6 +6,7 @@
 #include <map>
 #include <fstream>
 #include <ios>
+#include <string.h>
 
 #include "smartbody-dll.h"
 

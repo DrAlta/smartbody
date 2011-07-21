@@ -34,7 +34,7 @@
 #include <boost/shared_ptr.hpp>
 #include "xercesc_utils.hpp"
 
-#include <BML/parser.hpp>
+#include <bml/parser.hpp>
 
 #include "sbm_constants.h"
 #include "sr_arg_buff.h"

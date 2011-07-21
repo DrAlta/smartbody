@@ -21,8 +21,8 @@
 */
 
 #pragma once
-#include <SK/sk_skeleton.h>
-#include <ME/me_controller.h>
+#include <sk/sk_skeleton.h>
+#include <me/me_controller.h>
 #include "me_ct_limb.hpp"
 #include "me_ct_reach_IK.hpp"
 #include "gwiz_math.h"
@@ -64,7 +64,7 @@ public:
 	void set_target_pos(SrVec& target_pos);
 	void set_target_joint(SkJoint* target_joint);	
 
-	void init ();
+	void init (SbmPawn* pawn);
 	virtual void controller_map_updated();
 	virtual void controller_start();	
 	virtual bool controller_evaluate( double t, MeFrameData& frame );

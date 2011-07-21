@@ -2,9 +2,9 @@
 # ifndef SR_CFG_PLANNER_H
 # define SR_CFG_PLANNER_H
 
-//# include <SR/sr_cfg_path.h>
-//# include <SR/sr_cfg_tree.h>
-# include <SR/sr_heap.h>
+//# include <sr/sr_cfg_path.h>
+//# include <sr/sr_cfg_tree.h>
+# include <sr/sr_heap.h>
 # include "sr_cfg_path.h"
 # include "sr_cfg_tree.h"
 

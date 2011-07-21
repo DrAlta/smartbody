@@ -31,8 +31,7 @@
 #include "bml.hpp"
 #include "bml_exception.hpp"
 #include "bml_xml_consts.hpp"
-
-
+#include "BMLDefs.h"
 
 using namespace std;
 using namespace BML;
@@ -41,11 +40,7 @@ using namespace SmartBody;
 
 
 // XML Constants
-const XMLCh TAG_TM[]        = L"tm";
-const XMLCh TAG_MARK[]      = L"mark";
 
-const XMLCh VALUE_TEXT_PLAIN[] = L"text/plain";
-const XMLCh VALUE_SSML[]       = L"application/ssml+xml";
 
 const char* VISEME_NEUTRAL = "_";
 
@@ -73,7 +68,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	BML::BmlRequestPtr request,
 	mcuCBHandle *mcu )
 {
-	const XMLCh* id = xml->getAttribute(ATTR_ID);
+	const XMLCh* id = xml->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
 	if (id)
 		localId = XMLString::transcode(id);
@@ -81,7 +76,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	vector<SpeechMark> marks;  // Ordered list of named bookmarks
 
 	// Parse <speech> for sync points
-	const XMLCh* type = xml->getAttribute( ATTR_TYPE );
+	const XMLCh* type = xml->getAttribute( BMLDefs::ATTR_TYPE );
 	if( type ) {
 #if ENABLE_BMLR_SPEECH_REQUEST_CODE
 		// [BMLR] text/plain as default type
@@ -90,8 +85,8 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 		}
 #endif
 
-		if( XMLString::compareString( type, VALUE_TEXT_PLAIN )==0 ) {
-			if(LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): <speech type=\"" << VALUE_TEXT_PLAIN << "\">" << endl;
+		if( XMLString::compareString( type, BML::BMLDefs::VALUE_TEXT_PLAIN )==0 ) {
+			if(LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): <speech type=\"" << BML::BMLDefs::VALUE_TEXT_PLAIN << "\">" << endl;
 			// Search for <tm> sync_points
 			DOMElement* child = xml_utils::getFirstChildElement( xml );
 			while( child!=NULL ) {
@@ -101,14 +96,15 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 				if( XMLString::compareString( tag, TAG_MARK )==0 ) {
 					if(LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): Found <mark>" << endl;
 #else
-				if( XMLString::compareString( tag, TAG_TM )==0 ) {
+				if( XMLString::compareString( tag, BMLDefs::TAG_TM )==0 ) {
 					if(LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): Found <tm>" << endl;
 #endif
 
 #if ENABLE_BMLR_SPEECH_REQUEST_CODE
 					wstring tmId( child->getAttribute( ATTR_NAME ) );
 #else
-					wstring tmId( child->getAttribute( ATTR_ID ) );
+//					wstring tmId( child->getAttribute( BMLDefs::ATTR_ID ) );
+					wstring tmId( xml_utils::xml_translate_wide( BMLDefs::ATTR_ID ) );
 #endif
 					// test validity?
 					if( !tmId.empty() ) {
@@ -128,16 +124,17 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 				}
 				child = xml_utils::getNextElement( child );
 			}
-		} else if( XMLString::compareString( type, VALUE_SSML )==0 ) {
-			if(LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): <speech type=\"" << VALUE_SSML << "\">" << endl;
+		} else if( XMLString::compareString( type, BMLDefs::VALUE_SSML )==0 ) {
+			if(LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): <speech type=\"" <<  BMLDefs::VALUE_SSML << "\">" << endl;
 			// Search for <mark> sync_points
 			DOMElement* child = xml_utils::getFirstChildElement( xml );
 			while( child!=NULL ) {
 				const XMLCh* tag = child->getTagName();
-				if( tag && XMLString::compareString( tag, TAG_MARK )==0 ) {
+				if( tag && XMLString::compareString( tag, BMLDefs::TAG_MARK )==0 ) {
 					if(LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): Found <mark>" << endl;
 
-					wstring tmId = child->getAttribute( ATTR_NAME );
+					const XMLCh* tdIdXml = child->getAttribute(BMLDefs::ATTR_NAME);
+					wstring tmId = xml_utils::xml_translate_wide(tdIdXml);
 					// test validity?
 					if( !tmId.empty() ) {
 						if( isValidTmId( tmId ) ) {
@@ -523,7 +520,12 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 				LOG(convertWStringToString(wstrstr.str()).c_str());
 			}
 
-			float audioTime = speech_impl->getMarkTime( speech_request_id, wb_id.c_str() );
+//			float audioTime = speech_impl->getMarkTime( speech_request_id, wb_id.c_str() );
+
+			XMLCh *xml_ch_p = xml_utils::xmlch_translate( xml_utils::xml_w2s( wb_id ) );
+			float audioTime = speech_impl->getMarkTime( speech_request_id, xml_ch_p );
+			xml_utils::xmlch_release( &xml_ch_p );
+			
 			if (audioTime < 0)
 			{
 				std::string wordBreakId(wb_id.begin(), wb_id.end());
@@ -612,7 +614,9 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 				{
 					command << data[x * floatsPerKey] << " " << data[x * floatsPerKey + 1] << " "; 
 				}
-				sbm_commands.push_back( new SbmCommand( command.str(), time ) );
+				string cmd_str = command.str();
+				SbmCommand *cmd = new SbmCommand( cmd_str, mcu->time );
+				sbm_commands.push_back( cmd );
 			}
 			else if (!v->isCurveMode())
 			{
@@ -643,7 +647,10 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 						<< v->rampin() << " "
 						<< v->rampout() << " ";
 				
-				sbm_commands.push_back( new SbmCommand( command.str(), time ) );
+				string cmd_str = command.str();
+				SbmCommand *cmd = new SbmCommand( cmd_str, time );
+				sbm_commands.push_back( cmd );
+//				sbm_commands.push_back( new SbmCommand( command.str(), time ) );
 #endif
 				if( LOG_BML_VISEMES ) cout << "command (complete): " << command.str() << endl;
 			}
@@ -665,7 +672,10 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 #else
 				command.str( "" );
 				command << "char " << actor_id << " viseme " << v->id() << " curve " << v->getNumKeys() << ' ' << v->getCurveInfo();
-				sbm_commands.push_back( new SbmCommand( command.str(), time ) );
+				string cmd_str = command.str();
+				SbmCommand *cmd = new SbmCommand( cmd_str, time );
+				sbm_commands.push_back( cmd );
+//				sbm_commands.push_back( new SbmCommand( command.str(), time ) );
 #endif
 				if( LOG_BML_VISEMES ) cout << "command (complete): " << command.str() << endl;
 			}
@@ -678,7 +688,10 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 			if( LOG_BML_VISEMES ) {
 				ostringstream echo;
 				echo << "echo LOG_BML_VISEMES:\t" << time << ":\t" << command.str();
-				sbm_commands.push_back( new SbmCommand( echo.str(), time ) );
+				string cmd_str = echo.str();
+				SbmCommand *cmd = new SbmCommand( cmd_str, time );
+				sbm_commands.push_back( cmd );
+//				sbm_commands.push_back( new SbmCommand( echo.str(), time ) );
 			}
 		}
 	} else {

@@ -21,7 +21,7 @@
  */
 
 //# include <math.h>
-# include <SR/sr_spline.h> 
+# include <sr/sr_spline.h> 
 
 //============================== SrSpline ===============================
 

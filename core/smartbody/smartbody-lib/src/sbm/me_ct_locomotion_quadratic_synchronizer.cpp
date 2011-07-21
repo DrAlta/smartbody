@@ -21,7 +21,7 @@
  */
 
 #include "me_ct_locomotion_quadratic_synchronizer.hpp"
-
+#include <stdio.h>
 
 MeCtLocomotionQuadraticSynchronizer::MeCtLocomotionQuadraticSynchronizer()
 {

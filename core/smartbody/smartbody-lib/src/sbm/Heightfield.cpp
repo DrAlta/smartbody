@@ -1,12 +1,13 @@
 #include "Heightfield.h"
 
-#include <windows.h> // standard Windows app include
-#include <gl/gl.h> // standard OpenGL include
-#include <gl/glu.h> // OpenGL utilties
+//#include <windows.h> // standard Windows app include
+#include <GL/gl.h> // standard OpenGL include
+#include <GL/glu.h> // OpenGL utilties
 //#include <gl/glaux.h> // OpenGL auxiliary functions
 #include <cstdio>
 #include <cstdlib>
 #include <math.h>
+#include "lin_win.h"
 
 #define BITMAP_ID 0x4D42
 
@@ -20,7 +21,9 @@ Heightfield::~Heightfield() {
 
 void Heightfield::defaults( void ) {
 
+#ifdef WIN32
 	_header = NULL;
+#endif
 	_imageData = NULL;
 	
 	image_width = 0;
@@ -46,9 +49,11 @@ void Heightfield::defaults( void ) {
 
 void Heightfield::clear( void ) {
 
+#ifdef WIN32
 	if (_header)	{
 		delete _header;
 	}
+#endif
 	if (_imageData) {
 		delete [] _imageData;
 	}
@@ -452,7 +457,7 @@ unsigned char* Heightfield::parse_ppm( FILE *stream )	{
 
 	unsigned char* buff = new unsigned char [ image_bytes ];
 	if( buff == NULL )	{
-		printf( "Heightfield::Heightfield ERR: new [%d] bytes FAILED\n", image_bytes );
+		printf( "Heightfield::Heightfield ERR: new [%d] bytes FAILED\n", (int)image_bytes );
 		return( NULL );
 	}
 
@@ -497,7 +502,7 @@ unsigned char* Heightfield::parse_ppm( FILE *stream )	{
 		}
 	}
 	if( n != image_bytes )	{
-		printf( "Heightfield::parse_ppm ERR: read %d of %d components\n", n, image_bytes );
+		printf( "Heightfield::parse_ppm ERR: read %d of %d components\n", (int)n, (int)image_bytes );
 		delete [] buff;
 		return( NULL );
 	}
@@ -516,6 +521,7 @@ unsigned char* Heightfield::read_ppm( const char* filename )	{
 	return( buff );
 }
 
+#ifdef WIN32
 unsigned char* Heightfield::LoadBitmapFile(char *filename, BITMAPINFOHEADER * bitmapInfoHeader)
 {
 	FILE *filePtr; //the file pointer
@@ -656,6 +662,7 @@ unsigned char* Heightfield::LoadBitmapFile(char *filename, BITMAPINFOHEADER * bi
 
 	return bitmapImage;
 }
+#endif
 
 float Heightfield::get_raw_elevation( int i, int j )	{
 

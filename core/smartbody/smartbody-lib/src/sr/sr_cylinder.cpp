@@ -20,8 +20,8 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
 
-# include <SR/sr_cylinder.h>
-# include <SR/sr_box.h>
+# include <sr/sr_cylinder.h>
+# include <sr/sr_box.h>
 
 //================================== SrCylinder ====================================
 

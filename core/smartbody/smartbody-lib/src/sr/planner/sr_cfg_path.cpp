@@ -1,9 +1,9 @@
 
 # include "sr_cfg_path.h"
-# include <SR/sr_random.h>
+# include <sr/sr_random.h>
 
 //# define SR_USE_TRACE1    // 
-# include <SR/sr_trace.h>
+# include <sr/sr_trace.h>
 
 //================================ SrCfgPathBase ========================================
 

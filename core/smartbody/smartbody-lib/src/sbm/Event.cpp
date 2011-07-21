@@ -62,6 +62,5 @@ void EventManager::removeHandler(std::string type)
 		EventHandler* oldHandler = (*iter).second;
 		eventHandlers.erase(iter);
 		delete oldHandler;
-
 	}
 }

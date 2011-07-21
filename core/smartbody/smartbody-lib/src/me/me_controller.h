@@ -29,20 +29,24 @@
 #include <list>
 #include <vector>
 
-#include <SR/sr_hash_table.h>
-#include <SR/sr_buffer.h>
-#include <SR/sr_shared_class.h>
-#include <SK/sk_channel_array.h>
-#include <SK/sk_motion.h>
-#include <SK/sk_posture.h>
-#include <SK/sk_skeleton.h>
+#include <sr/sr_hash_table.h>
+#include <sr/sr_buffer.h>
+#include <sr/sr_shared_class.h>
+#include <sk/sk_channel_array.h>
+#include <sk/sk_motion.h>
+#include <sk/sk_posture.h>
+#include <sk/sk_skeleton.h>
+#include <sbm/DObject.h>
+#include <sbm/DAttribute.h>
+#include <sbm/DefaultAttributeTable.h>
 
 
 // Predeclare class because of circular reference:
 class MeController;
+class SbmPawn;
 
-#include <ME/me_controller_context.hpp>
-#include <ME/me_default_prune_policy.hpp>
+#include <me/me_controller_context.hpp>
+#include <me/me_default_prune_policy.hpp>
 
 #define ME_CONTROLLER_ENABLE_XMLIFY (0)
 #if ME_CONTROLLER_ENABLE_XMLIFY
@@ -65,7 +69,7 @@ class MeController;
     last call to evaluate() and as well an integer buffer to be used as
     a mapping of indices to another buffer of float values */
 class MeController
-    : public SrSharedClass
+    : public SrSharedClass, public DObject, public DefaultAttributeTable
 {
 #if VALIDATE_BLEND_CHANNEL_REMAP
 	friend MeCtBlend;   // Temporary hack
@@ -88,12 +92,13 @@ private :
     float _outdt;             // final period for blending, eg static or retract phase
     float _emphasist;         // time point of "main importance" in the controller
 		
+	bool _initialized;
 	bool _active;             // if the controller is still active
     double _lastEval;         // time at which the controller was evaluated last
 	double _startTime;		  // time when the controller was started
 	double _stopTime;         // time when the controller was stopped
 
-	std::string _handle;	  // handle of the controller - used to match requests to changes in the controller parameters
+	//std::string _handle;	  // handle of the controller - used to match requests to changes in the controller parameters
 	MePrunePolicy* _prune_policy;  // controller tree pruning policy for this controller
 
 protected :
@@ -137,7 +142,7 @@ protected :
 	std::vector<float>	_bufferRecord;              // data containing the changes made each time inside the controller evaluation
 	bool		_buffer_changes_toggle_reset;	// flag to initialize the buffer_changes
 
-	bool		_pass_through;						// determines if this controller does not get evaluated. 
+	//bool		_pass_through;						// determines if this controller does not get evaluated. 	
 protected :
     /*! Constructor */
     MeController ();
@@ -169,8 +174,8 @@ public :
     const char* name () const { return _name? _name:""; }
     void name ( const char* n ) { sr_string_set ( _name, n ); }
 
-	std::string handle() const { return _handle; }
-    void handle ( std::string handle ) { _handle = handle; }
+	std::string handle() const;// { return _handle; }
+	void handle ( std::string handle );// { _handle = handle; }
 
 	///////////////////////////////////////////////////////////////////////
     // Controller tree traversal methods
@@ -249,7 +254,7 @@ public :
         Both controller_init() and controller_channels() are called here.
         The convention is that, if there is another init method in the derived
         class, the derived class will be responsible for calling MeController::init() */
-    void init ();
+    void init (SbmPawn* pawn);
 
 	/*! Returns the controller's prune policy, if set.  Otherwise, NULL. */
 	MePrunePolicy* prune_policy();
@@ -301,18 +306,19 @@ public :
 	std::vector<float>& get_buffer_changes();
 	bool is_record_buffer_changes() { return _buffer_changes_toggle; }
 
-	bool is_pass_through() const { return _pass_through; }
-	void set_pass_through(bool val) { _pass_through = val; }
+	bool is_pass_through() const;// { return _pass_through; }
+	void set_pass_through(bool val);// { _pass_through = val; }
 
 #if ME_CONTROLLER_ENABLE_XMLIFY
 	/*! Serialize state (or most of it) to a single XML element for later analysis. */
 	DOMElement* xmlify( DOMDocument* doc ) const;
 #endif // ME_CONTROLLER_ENABLE_XMLIFY
 
-	void dumpChannelMap();
+	void dumpChannelMap();	
 
    protected :
 
+	void updateDefaultVariables(SbmPawn* pawn);
 	void print_tabs( int depth );
 	bool print_bvh_hierarchy( SkJoint* joint_p, int depth );
 	// NOTE: depth only used to hack STUPID-POLYTRANS ROOT bug
@@ -404,7 +410,7 @@ public :
 	    print_state (that is, before it is increment for the child's print_state).  */
 	virtual void print_children( int tab_count );
 
-	friend MeControllerContext;
+	friend class MeControllerContext;
 };
 
 //======================================= EOF =====================================

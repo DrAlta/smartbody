@@ -59,10 +59,10 @@ SrVec EffectorJointConstraint::getPosConstraint()
 
 FadingControl::FadingControl()
 {
+	fadeMode = FADING_MODE_OFF;
 	blendWeight = 0.0;
 	prev_time = -1.0;
 	restart = false;
-	fadeMode = FADING_MODE_OFF;
 }
 
 bool FadingControl::updateFading( float dt )
@@ -191,7 +191,7 @@ void MeCtConstraint::updateChannelBuffer(MeFrameData& frame, std::vector<SrQuat>
 }
 
 
-void MeCtConstraint::init(const char* rootJointName)
+void MeCtConstraint::init(SbmPawn* pawn, const char* rootJointName)
 {
 	assert(_skeleton);	
 	// root is "world_offset", so we use root->child to get the base joint.
@@ -215,7 +215,7 @@ void MeCtConstraint::init(const char* rootJointName)
 
 	double ikReachRegion = characterHeight*0.02f;		
 	ikDamp        = ikReachRegion*ikReachRegion*14.0;
-	MeController::init();
+	MeController::init(pawn);
 }
 
 void MeCtConstraint::controller_map_updated() 
@@ -236,6 +236,7 @@ bool MeCtConstraint::controller_evaluate( double t, MeFrameData& frame )
 		updateChannelBuffer(frame,tempQuatList,true);			
 		ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_INIT);
 		ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_PREVREF);
+		ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_CUR);
 	}
 	updateDt((float)t);
 // 	else
@@ -334,8 +335,15 @@ void MeCtConstraint::print_state(int tabs)
 bool MeCtConstraint::addEffectorJointPair( SkJoint* targetJoint, const char* effectorName, const char* effectorRootName, const SrVec& posOffset, const SrQuat& rotOffset, ConstraintType cType )
 {
 	MeCtIKTreeNode* node = ik_scenario.findIKTreeNode(effectorName);
+	MeCtIKTreeNode* rootNode = ik_scenario.findIKTreeNode(effectorRootName);	
+
 	if (!node)
 		return false;
+
+	std::string rootName = effectorRootName;
+
+	if (!rootNode)
+		rootName = ik_scenario.ikTreeRoot->nodeName;
 
 	// separate position & rotation constraint
 	//ConstraintList& jEffectorList = (cType == CONSTRAINT_ROT) ? rotConstraint : posConstraint;
@@ -355,7 +363,7 @@ bool MeCtConstraint::addEffectorJointPair( SkJoint* targetJoint, const char* eff
 		//EffectorJointConstraint& cons = jEffectorList[idx];
 		EffectorJointConstraint* cons = dynamic_cast<EffectorJointConstraint*>((*ci).second);
 		cons->targetJoint = targetJoint;
-		cons->rootName = effectorRootName;
+		cons->rootName = rootName;//effectorRootName;
 		cons->posOffset = posOffset;
 		cons->rotOffset = rotOffset;
 		
@@ -367,7 +375,7 @@ bool MeCtConstraint::addEffectorJointPair( SkJoint* targetJoint, const char* eff
 		//constraint.node = node;
 		cons->efffectorName = effectorName;
 		cons->targetJoint = targetJoint;
-		cons->rootName = effectorRootName;
+		cons->rootName = rootName;//effectorRootName;
 		cons->posOffset = posOffset;
 		cons->rotOffset = rotOffset;
 		jEffectorMap[str] = cons;

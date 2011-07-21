@@ -24,7 +24,8 @@
 #ifndef SBM_SPEECH_AUDIOFILE_HPP
 #define SBM_SPEECH_AUDIOFILE_HPP
 
-#include <hash_map>
+//#include <hash_map>
+#include <map>
 
 #include "sbm_speech.hpp"
 
@@ -38,7 +39,8 @@ class AudioFileSpeech : public SpeechInterface
       struct SpeechRequestInfo
       {
          std::vector< VisemeData > visemeData;
-         stdext::hash_map< std::string, float > timeMarkers;
+//         stdext::hash_map< std::string, float > timeMarkers;
+         std::map< std::string, float > timeMarkers;
          std::string id;
          std::string audioFilename;
          std::string playCommand;
@@ -51,7 +53,8 @@ class AudioFileSpeech : public SpeechInterface
       int m_requestIdCounter;
 	  bool visemeCurveMode;
 
-      stdext::hash_map< RequestId, SpeechRequestInfo > m_speechRequestInfo;
+//      stdext::hash_map< RequestId, SpeechRequestInfo > m_speechRequestInfo;
+      std::map< RequestId, SpeechRequestInfo > m_speechRequestInfo;
 
    public:
       AudioFileSpeech();
@@ -65,14 +68,16 @@ class AudioFileSpeech : public SpeechInterface
       virtual char * getSpeechAudioFilename( RequestId requestId );
       virtual float getMarkTime( RequestId requestId, const XMLCh * markId );
       virtual void requestComplete( RequestId requestId );
-	  stdext::hash_map< RequestId, SpeechRequestInfo >& getSpeechRequestInfo();
+//	  stdext::hash_map< RequestId, SpeechRequestInfo >& getSpeechRequestInfo();
+	  std::map< RequestId, SpeechRequestInfo >& getSpeechRequestInfo();
 
 	  void setVisemeMode(bool mode) {visemeCurveMode = mode;}
 
    protected:
       virtual void ReadVisemeDataLTF( const char * filename, std::vector< VisemeData > & visemeData );
       virtual void ReadVisemeDataBML( const char * filename, std::vector< VisemeData > & visemeData, const SbmCharacter* character );
-      virtual void ReadSpeechTiming( const char * filename, stdext::hash_map< std::string, float > & timeMarkers );
+//      virtual void ReadSpeechTiming( const char * filename, stdext::hash_map< std::string, float > & timeMarkers );
+      virtual void ReadSpeechTiming( const char * filename, std::map< std::string, float > & timeMarkers );
 };
 
 };

@@ -25,9 +25,9 @@
 # ifndef SR_QUAT_H
 # define SR_QUAT_H
 
-# include <math.h>
-# include <SR/sr_vec.h> 
-# include <SR/sr_mat.h> 
+# include <cmath>
+# include <sr/sr_vec.h> 
+# include <sr/sr_mat.h> 
 
 /*! \class SrQuat sr_quat.h
     \brief Quaternion for rotations. 

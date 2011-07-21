@@ -32,15 +32,17 @@
 #include <string>
 #include <cstring>
 
-#include <SK/sk_skeleton.h>
-#include <ME/me_ct_blend.hpp>
-#include <ME/me_ct_time_shift_warp.hpp>
+#include <sk/sk_skeleton.h>
+#include <me/me_ct_blend.hpp>
+#include <me/me_ct_time_shift_warp.hpp>
 #include "mcontrol_util.h"
 #include "mcontrol_callbacks.h"
 #include "me_utilities.hpp"
-#include <ME/me_spline_1d.hpp>
-#include <ME/me_ct_interpolator.h>
+#include <me/me_spline_1d.hpp>
+#include <me/me_ct_interpolator.h>
 #include "sr_curve_builder.h"
+#include "lin_win.h"
+#include <boost/filesystem/operations.hpp>
 
 #define USE_REACH 1
 //#define USE_REACH_TEST 0
@@ -111,8 +113,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	param_animation_ct( NULL ),
 	face_ct( NULL ),
 	eyelid_ct( new MeCtEyeLid() ),
-	motionplayer_ct( NULL ),
-	reachEngine( NULL ),
+	motionplayer_ct( NULL ),	
 	face_neutral( NULL ),
 	_soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT ),
 	_height(1.0f), 
@@ -125,10 +126,11 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	param_sched_p->ref();
 	eyelid_ct->ref();
 
+	bonebusCharacter = NULL;
 	steeringAgent = NULL;
 	_numSteeringGoal = 0;
 	_reachTarget = false;
-	_lastReachStatus = true;
+	_lastReachStatus = true;	
 	_classType = "";
 
 	use_viseme_curve = false;
@@ -140,6 +142,12 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	viseme_channel_end_pos = 0;
 	viseme_history_arr = NULL;
 	_minVisemeTime = 0.0f;
+
+	createBoolAttribute("facebone", false, true, "Basic", 200, false, false, false, "Use bones for facial animation. If false, blendshapes will be used. If true, face will be animated via face definitions.");
+	createBoolAttribute("visemecurve", false, true, "Basic", 200, false, false, false, "Use curve-based visemes instead of discrete visemes.");
+	DoubleAttribute* timeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 210, false, false, false, "Delay visemes by a fixed amount.");
+	timeDelayAttr->setMin(0.0);
+	createStringAttribute("mesh", "", true, "Basic", 220, false, false, false, "Directory that contains mesh information.");
 }
 
 //  Destructor
@@ -182,8 +190,27 @@ SbmCharacter::~SbmCharacter( void )	{
 		motionplayer_ct->unref();
 	if (saccade_ct)
 		saccade_ct->unref();
-	if (reachEngine)
-		delete reachEngine;
+	
+	std::map<int,MeCtReachEngine*>::iterator mi;
+	for ( mi  = reachEngineMap.begin();
+		  mi != reachEngineMap.end();
+		  mi++)
+	{
+		MeCtReachEngine* re = mi->second;
+		delete re;
+	}
+	reachEngineMap.clear();
+
+	if ( mcuCBHandle::singleton().sbm_character_listener )
+	{
+		mcuCBHandle::singleton().sbm_character_listener->OnCharacterDelete( name );
+	}
+
+    if ( bonebusCharacter )
+    {
+       mcuCBHandle::singleton().bonebus.DeleteCharacter( bonebusCharacter );
+       bonebusCharacter = NULL;
+    }
 	
 	if( viseme_history_arr )	{
 		delete [] viseme_history_arr;
@@ -257,7 +284,7 @@ void SbmCharacter::updateJointPhyObjs()
 		if (jointPhyObjMap.find(jointName) != jointPhyObjMap.end())
 		{
 			SbmPhysicsObj* phyObj = jointPhyObjMap[jointName];
-			phyObj->getColObj()->updateTransform(curJoint->gmat());
+			phyObj->getColObj()->updateGlobalTransform(curJoint->gmat());
 			phyObj->updateSimObj();
 		}
 	}	
@@ -305,6 +332,7 @@ void SbmCharacter::buildJointPhyObjs()
 		else // use procedural capsule geometry
 		{
 
+
 		}
 	}
 }
@@ -318,6 +346,9 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 						bool use_locomotion,
 						bool use_param_animation)
 {
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
 	// Store pointers for access via init_skeleton()
 	if( face_neutral ) {
 		this->face_neutral      = face_neutral;
@@ -342,7 +373,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		if (!face_neutral)
 			eyelid_reg_ct_p->set_use_blink_viseme( true );
 
-		eyelid_reg_ct_p->init(true);
+		eyelid_reg_ct_p->init(this,true);
 		eyelid_reg_ct_p->set_upper_range( -30.0, 30.0 );
 		eyelid_reg_ct_p->set_close_angle( 30.0 );
 		ostringstream ct_name;
@@ -362,7 +393,6 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	this->basic_locomotion_ct->name(bLocoName.c_str());
 
 	// init reach engine
-	// init reach engine
 	{
 		SkJoint* effector = this->skeleton_p->search_joint("r_middle1");
 		if (effector)
@@ -380,19 +410,6 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 			this->reachEngineMap[MeCtReachEngine::LEFT_ARM] = rengine;		
 		}	
 	}
-// 	{
-// 		SkJoint* effector = this->skeleton_p->search_joint("r_middle1");
-// 		if (effector)
-// 		{
-// 			this->reachEngine = new MeCtReachEngine(this,this->skeleton_p,effector);
-// 			reachEngine->init();
-// 		}
-// 		else
-// 		{
-// 			reachEngine = NULL;
-// 		}
-// 		
-// 	}
 	//if (use_locomotion) 
 	{
 		this->locomotion_ct =  new MeCtLocomotionClass();
@@ -403,6 +420,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	
 	{
 		this->saccade_ct = new MeCtSaccade(this->skeleton_p);
+		this->saccade_ct->init(this);
 		std::string saccadeCtName = std::string(name)+ "'s eye saccade controller";
 		this->saccade_ct->name(saccadeCtName.c_str());
 
@@ -416,23 +434,23 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		this->face_neutral = NULL; // MLT: What is the purpose of this?
 	}
 
-	posture_sched_p->init();
-	motion_sched_p->init();
+	posture_sched_p->init(this);
+	motion_sched_p->init(this);
 	if( locomotion_ct != NULL )
-		locomotion_ct->init();
-	gaze_sched_p->init();
+		locomotion_ct->init(this);
+	gaze_sched_p->init(this);
 
 #ifdef USE_REACH
-	reach_sched_p->init();
-	grab_sched_p->init();
-	constraint_sched_p->init();
+	reach_sched_p->init(this);
+	grab_sched_p->init(this);
+	constraint_sched_p->init(this);
 #endif
 
 
 	// Blink controller before head group (where visemes are controlled)
-	head_sched_p->init();
+	head_sched_p->init(this);
 
-	param_sched_p->init();
+	param_sched_p->init(this);
 
 	ct_tree_p->name( std::string(name)+"'s ct_tree" );
 
@@ -449,8 +467,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	ct_tree_p->add_controller(basic_locomotion_ct);
 
 	ct_tree_p->add_controller( reach_sched_p );	
-	ct_tree_p->add_controller( grab_sched_p );
-	
+	ct_tree_p->add_controller( grab_sched_p );	
 	ct_tree_p->add_controller( gaze_sched_p );	
 	ct_tree_p->add_controller( saccade_ct );
 	ct_tree_p->add_controller( constraint_sched_p );	
@@ -483,7 +500,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 			eyelid_ct->get_lower_lid_range( lo, up );
 			eyelid_ct->set_lower_lid_range( lo * rel_scale, up * rel_scale );
 			
-			eyelid_ct->init();
+			eyelid_ct->init(this);
 			ct_tree_p->add_controller( eyelid_ct );
 		}
 	}
@@ -603,6 +620,22 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 	//buildJointPhyObjs();
 	
+
+	// get the default attributes from the default controllers
+	std::vector<MeController*>& defaultControllers = mcu.getDefaultControllers();
+	for (size_t x = 0; x < defaultControllers.size(); x++)
+	{
+		MeController* controller = defaultControllers[x];
+		const std::vector<AttributeVarPair>& defaultAttributes = controller->getDefaultAttributes();
+		std::string groupName = controller->name();		
+		for (size_t a = 0; a < defaultAttributes.size(); a++)
+		{
+			DAttribute* attribute = defaultAttributes[a].first;
+			DAttribute* attributeCopy = attribute->copy();
+			this->addAttribute(attributeCopy);
+		}
+	}
+
 	return( CMD_SUCCESS ); 
 }
 
@@ -694,7 +727,7 @@ int SbmCharacter::init_skeleton() {
 		face_ct_name += "'s face_ct";
 		face_ct->name( face_ct_name.c_str() );
 
-		face_ct->init( face_neutral );
+		face_ct->init(this, face_neutral );
 	}
 
 	std::string viseme_start_name;
@@ -1391,7 +1424,7 @@ void SbmCharacter::schedule_viseme_curve(
 ) {
 
 	std::vector<std::string> visemeNames;
-	std::map<std::string, std::vector<std::string>>::iterator iter;
+	std::map<std::string, std::vector<std::string> >::iterator iter;
 	
 	iter = viseme_name_patch.find(viseme);
 	if (iter != viseme_name_patch.end())
@@ -1416,7 +1449,7 @@ void SbmCharacter::schedule_viseme_curve(
 
 			MeCtCurveWriter* ct_p = new MeCtCurveWriter();
 			ct_p->name( ct_name.str().c_str() );
-			ct_p->init( channels ); // CROP, CROP, true
+			ct_p->init(this, channels ); // CROP, CROP, true
 
 			if (num_keys <= 2)
 			{
@@ -1502,7 +1535,7 @@ void SbmCharacter::schedule_viseme_blend_curve(
 ) {
 
 	std::vector<std::string> visemeNames;
-	std::map<std::string, std::vector<std::string>>::iterator iter;
+	std::map<std::string, std::vector<std::string> >::iterator iter;
 	
 	iter = viseme_name_patch.find(viseme);
 	if (iter != viseme_name_patch.end())
@@ -1527,7 +1560,7 @@ void SbmCharacter::schedule_viseme_blend_curve(
 
 			MeCtChannelWriter* ct_p = new MeCtChannelWriter();
 			ct_p->name( ct_name.str().c_str() );
-			ct_p->init( channels, true );
+			ct_p->init(this, channels, true );
 			SrBuffer<float> value;
 			value.size( 1 );
 			value[ 0 ] = weight;
@@ -1771,7 +1804,90 @@ int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 
 int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, mcuCBHandle *mcu_p, bool all_characters ) {
 
-	if( cmd == "smoothbindmesh" ) {
+	if (cmd == "mesh")
+	{
+		char* meshdir = args.read_token();
+		if (!meshdir)
+		{
+			LOG("Usage: mesh <meshdirectory> |-prefix|");
+			return CMD_FAILURE;
+		}
+
+		std::string prefix = "";
+		int numRemaining  = args.calc_num_tokens();
+		if (numRemaining > 0)
+		{
+			std::string prefixCommand = args.read_token();
+			if (prefixCommand == "-prefix")
+			{
+				prefix = args.read_token();
+			}
+		}
+		// remove any existing mesh for this character
+		// how do we do this???
+		// ...
+		// ... FIXME!
+		// ...
+		mcu_p->mesh_paths.reset();
+		std::string path = "";
+		while ((path = mcu_p->mesh_paths.next_path()) != "")
+		{
+			boost::filesystem2::path curpath( path );
+			if (!boost::filesystem2::is_directory(curpath))
+				continue;
+			curpath /= std::string(meshdir);
+			bool isDir = boost::filesystem2::is_directory(curpath);  
+			if (!isDir)
+			{
+				LOG("%s is not a directory.", curpath.directory_string().c_str());
+				return CMD_FAILURE;
+			}
+			else
+			{
+				// set the mesh directory
+				std::string meshFullDir = curpath.string();
+				this->setStringAttribute("mesh",meshFullDir);
+			}
+			boost::filesystem2::directory_iterator end;
+			for (boost::filesystem2::directory_iterator iter(curpath); iter != end; iter++)
+			{
+				if (boost::filesystem2::is_regular(*iter))
+				{
+					std::string fileName = (*iter).string();
+					if (fileName.size() < 4)
+						continue;
+					std::string ext = fileName.substr(fileName.size() - 4);
+					if (ext == ".xml" || ext == ".XML" ||
+						ext == ".dae" || ext == ".DAE")
+					{
+						std::stringstream strstr;
+						strstr << "char " << name << " smoothbindweight " << fileName;
+						if (prefix != "")
+							strstr << " -prefix " << prefix;
+						int success = mcu_p->execute((char*) strstr.str().c_str());
+						if (success != CMD_SUCCESS)
+						{
+							LOG("Problem running: %s", strstr.str().c_str());
+						}
+					}
+					else if (ext == ".obj" || ext == ".OBJ")
+					{
+						std::stringstream strstr;
+						strstr << "char " << name << " smoothbindmesh " << fileName;
+						int success = mcu_p->execute((char*) strstr.str().c_str());
+						if (success != CMD_SUCCESS)
+						{
+							LOG("Problem running: %s", strstr.str().c_str());
+						}
+					}
+				}
+			}
+		}
+		return CMD_SUCCESS;
+
+	}
+	else if( cmd == "smoothbindmesh" )
+	{
 		char* obj_file = args.read_token();
 		char* option = args.read_token();
 		return mcu_character_load_mesh( name, obj_file, mcu_p, option );
@@ -1792,6 +1908,10 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			else if (strcmp(option,"-m") == 0)
 			{
 				scaleFactor = 0.01f;
+			}
+			else if (strcmp(option,"-scale") == 0)
+			{
+				scaleFactor =  args.read_float();
 			}
 			option = args.read_token();
 		}
@@ -1950,49 +2070,49 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 //		int numKeys = 0;
 //		int numKeyParams = 0;
 
-		if( _strcmpi( viseme, "curveon" ) == 0 )
+		if( _stricmp( viseme, "curveon" ) == 0 )
 		{
 			set_viseme_curve_mode(true);
 			return CMD_SUCCESS;
 		}
 		else 
-		if( _strcmpi( viseme, "curveoff" ) == 0 )
+		if( _stricmp( viseme, "curveoff" ) == 0 )
 		{
 			set_viseme_curve_mode(false);
 			return CMD_SUCCESS;
 		}
 		else
-		if( _strcmpi( viseme, "timedelay" ) == 0 )
+		if( _stricmp( viseme, "timedelay" ) == 0 )
 		{
 			float timeDelay = (float)atof( next );
 			set_viseme_time_delay( timeDelay );
 			return CMD_SUCCESS;
 		}
-		if( _strcmpi( viseme, "sounddelay" ) == 0 )
+		if( _stricmp( viseme, "sounddelay" ) == 0 )
 		{
 			float soundDelay = (float)atof( next );
 			set_viseme_sound_delay( soundDelay );
 			return CMD_SUCCESS;
 		}
-		if( _strcmpi( viseme, "magnitude" ) == 0 )
+		if( _stricmp( viseme, "magnitude" ) == 0 )
 		{
 			float magnitude = (float)atof( next );
 			set_viseme_magnitude( magnitude );
 			return CMD_SUCCESS;
 		}
-		if( _strcmpi( viseme, "plateau" ) == 0 )
+		if( _stricmp( viseme, "plateau" ) == 0 )
 		{
 			if (!next)
 			{
 				LOG("Character %s viseme plateau setting is %s", this->name, this->isVisemePlateau()? "on" : "off");
 				return CMD_SUCCESS;
 			}
-			if (_strcmpi(next, "on") == 0)
+			if (_stricmp(next, "on") == 0)
 			{
 				this->setVisemePlateau(true);
 				LOG("Character %s viseme plateau setting is now on.", this->name);
 			}
-			else if (_strcmpi(next, "off") == 0)
+			else if (_stricmp(next, "off") == 0)
 			{
 				this->setVisemePlateau(false);
 				LOG("Character %s viseme plateau setting is now off.", this->name);
@@ -2004,7 +2124,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			return CMD_SUCCESS;
 		}
 
-		if( _strcmpi( viseme, "minvisemetime" ) == 0 )
+		if( strcmp( viseme, "minvisemetime" ) == 0 )
 		{
 			if (!next)
 			{
@@ -2017,7 +2137,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		}
 
 		// keyword next to viseme
-		if( _strcmpi( viseme, "clear" ) == 0 ) // removes all head controllers
+		if( strcmp( viseme, "clear" ) == 0 ) // removes all head controllers
 		{
 			if (head_sched_p)
 			{
@@ -2026,7 +2146,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			}
 		}
 		else
-		if( _strcmpi( next, "curve" ) == 0 )
+		if( strcmp( next, "curve" ) == 0 )
 		{
 			int numKeys = args.read_int();
 			if( numKeys <= 0 )	
@@ -2048,7 +2168,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			delete [] curveInfo;
 		}
 		else
-		if( _strcmpi( next, "trap" ) == 0 )
+		if( _stricmp( next, "trap" ) == 0 )
 		{
 			// trap <weight> <dur> [<ramp-in> <ramp-out>]
 			float weight = args.read_float();
@@ -2434,12 +2554,12 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			if (reachEngineMap.size() == 0)
 			{
 				LOG("character %s, reach engine is not initialized.", this->name);
-				return CMD_FAILURE;
+			    return CMD_FAILURE;
 			}				
 			ReachEngineMap::iterator mi;
 			for ( mi  = reachEngineMap.begin();
-				mi != reachEngineMap.end();
-				mi++)
+				  mi != reachEngineMap.end();
+				  mi++)
 			{
 				MeCtReachEngine* re = mi->second;
 				if (re)
@@ -2457,7 +2577,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			{
 				//motion->name()
 				char cmd[256];
-				sprintf_s(cmd,"bml char %s <body posture=\"%s\"/>",name,motion->name());
+				sprintf(cmd,"bml char %s <body posture=\"%s\"/>",name,motion->name());
 				mcuCBHandle::singleton().execute(cmd);
 			}			
 			return CMD_SUCCESS;
@@ -2475,6 +2595,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		LOG( "  init" );
 		LOG( "  smoothbindmesh" );
 		LOG( "  smoothbindweight" );
+		LOG( "  mesh");
 		LOG( "  ctrl" );
 		LOG( "  inspect" );
 		LOG( "  channels" );
@@ -2650,19 +2771,21 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle 
 
 	if( strlen( impl_id )==0 ) {
 		character->set_speech_impl( NULL );
-		character->set_voice_code( string("") );
+		string s( "" );
+		character->set_voice_code( s );
 		
 		// Give feedback if unsetting
 		LOG("Unset %s's voice.", character->name);
-	} else if( _strcmpi( impl_id, "remote" )==0 ) {
+	} else if( _stricmp( impl_id, "remote" )==0 ) {
 		const char* voice_id = args.read_token();
 		if( strlen( voice_id )==0 ) {
 			LOG("ERROR: Expected remote voice id.");
 			return CMD_FAILURE;
 		}
 		character->set_speech_impl( mcu_p->speech_rvoice() );
-		character->set_voice_code( string( voice_id ) );
-	} else if( _strcmpi( impl_id, "audiofile" )==0 ) {
+		string s( voice_id );
+		character->set_voice_code( s );
+	} else if( _stricmp( impl_id, "audiofile" )==0 ) {
 		const char* voice_path = args.read_token();
 		if( strlen( voice_path )==0 ) {
 			LOG("ERROR: Expected audiofile voice path.");
@@ -2672,7 +2795,7 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle 
 		string voice_path_str= "";
 		voice_path_str+=voice_path;
 		character->set_voice_code( voice_path_str );
-	} else if( _strcmpi( impl_id, "text" )==0 ) {
+	} else if( _stricmp( impl_id, "text" )==0 ) {
 		const char* voice_path = args.read_token();
 		if( strlen( voice_path )==0 ) {
 			LOG("ERROR: Expected id.");
@@ -2697,19 +2820,21 @@ int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBH
 
 	if( strlen( impl_id )==0 ) {
 		character->set_speech_impl_backup( NULL );
-		character->set_voice_code_backup( string("") );
+		string s("");
+		character->set_voice_code_backup( s );
 		
 		// Give feedback if unsetting
 		LOG("Unset %s's voice.", character->name);
-	} else if( _strcmpi( impl_id, "remote" )==0 ) {
+	} else if( _stricmp( impl_id, "remote" )==0 ) {
 		const char* voice_id = args.read_token();
 		if( strlen( voice_id )==0 ) {
 			LOG("ERROR: Expected remote voice id.");
 			return CMD_FAILURE;
 		}
 		character->set_speech_impl_backup( mcu_p->speech_rvoice() );
-		character->set_voice_code_backup( string( voice_id ) );
-	} else if( _strcmpi( impl_id, "audiofile" )==0 ) {
+		string s( voice_id );
+		character->set_voice_code_backup( s );
+	} else if( _stricmp( impl_id, "audiofile" )==0 ) {
 		const char* voice_path = args.read_token();
 		if( strlen( voice_path )==0 ) {
 			LOG("ERROR: Expected audiofile voice path.");
@@ -2719,7 +2844,7 @@ int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBH
 		string voice_path_str= "";
 		voice_path_str+=voice_path;
 		character->set_voice_code_backup( voice_path_str );
-	} else if( _strcmpi( impl_id, "text" )==0 ) {
+	} else if( _stricmp( impl_id, "text" )==0 ) {
 		const char* voice_path = args.read_token();
 		if( strlen( voice_path )==0 ) {
 			LOG("ERROR: Expected id.");
@@ -2816,6 +2941,47 @@ void SbmCharacter::setClassType(std::string classType)
 	_classType = classType;
 }
 
+
+void SbmCharacter::notify(DSubject* subject)
+{
+	SbmPawn::notify(subject);
+
+	DObject* object = dynamic_cast<DObject*>(subject);
+	if (object)
+	{
+		DAttribute* attribute = dynamic_cast<DAttribute*>(object);
+		if (attribute)
+		{
+			if (attribute->getName() == "visemecurve")
+			{
+				BoolAttribute* curveAttribute = dynamic_cast<BoolAttribute*>(attribute);
+				set_viseme_curve_mode(curveAttribute->getValue());
+			}
+			else if (attribute->getName() == "visemetimedelay")
+			{
+				DoubleAttribute* timeDelayAttribute = dynamic_cast<DoubleAttribute*>(attribute);
+				set_viseme_time_delay((float) timeDelayAttribute->getValue());
+			}
+			else if (attribute->getName() == "mesh")
+			{
+				StringAttribute* meshAttribute = dynamic_cast<StringAttribute*>(attribute);
+				std::stringstream strstr;
+				strstr << "char " << name << " mesh " << meshAttribute->getValue();
+				mcuCBHandle& mcu = mcuCBHandle::singleton();
+				int success = mcu.execute((char*) strstr.str().c_str());
+				if (success != CMD_SUCCESS)
+				{
+					LOG("Problem setting attribute 'mesh' on character %s", name);
+				}
+			}
+			if (attribute->getName() == "facebone")
+			{
+				BoolAttribute* faceBoneAttribute = dynamic_cast<BoolAttribute*>(attribute);
+				// ...
+			}
+		}
+	}
+}
 
 SrVec SbmCharacter::getFacingDirection()
 {

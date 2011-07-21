@@ -35,6 +35,8 @@
 #include "bml_xml_consts.hpp"
 #include "bml_event.hpp"
 #include "xercesc_utils.hpp"
+#include "BMLDefs.h"
+
 using namespace std;
 using namespace BML;
 using namespace xml_utils;
@@ -43,7 +45,7 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 	MeCtSaccade* saccade_ct = request->actor->saccade_ct;
 	saccade_ct->setValid(true);
 	saccade_ct->setUseModel(true);	
-	const XMLCh* id = elem->getAttribute(ATTR_ID);
+	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
 	if (id)
 		localId = XMLString::transcode(id);
@@ -51,23 +53,23 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 	float duration = 0.03f;
 	float magnitude = 3.0f;
 	float direction = 45.0f;
-	const XMLCh* dur = elem->getAttribute(L"duration");
-	if (XMLString::compareIString(dur, L"") != 0)
+	const char* dur = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_DURATION));
+	if (strcmp(dur, "") != 0)
 	{
 		saccade_ct->setUseModel(false);
-		duration = (float)atof(XMLString::transcode(dur));
+		duration = (float)atof(dur);
 	}
-	const XMLCh* mag = elem->getAttribute(L"magnitude");
-	if (XMLString::compareIString(mag, L"") != 0)
+	const char* mag = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_MAGNITUDE));
+	if (strcmp(mag, "") != 0)
 	{
 		saccade_ct->setUseModel(false);
-		magnitude = (float)atof(XMLString::transcode(mag));
+		magnitude = (float)atof(mag);
 	}
-	const XMLCh* dir = elem->getAttribute(L"direction");
-	if (XMLString::compareIString(dir, L"") != 0)
+	const char* dir = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_DIRECTION));
+	if (strcmp(dir, "") != 0)
 	{
 		saccade_ct->setUseModel(false);
-		direction = (float)atof(XMLString::transcode(dir));
+		direction = (float)atof(dir);
 	}
 	if (!saccade_ct->getUseModel())
 	{
@@ -76,10 +78,10 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 	}
 
 	//-----
-	const XMLCh* bMode = elem->getAttribute(L"mode");
-	if (XMLString::compareIString(bMode, L"") != 0)
+	const char* bMode = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_MODE));
+	if (strcmp(bMode, "") != 0)
 	{
-		std::string bModeString = XMLString::transcode(bMode);
+		std::string bModeString = bMode;
 		if (bModeString == "talk")
 			saccade_ct->setBehaviorMode(MeCtSaccade::Talking);
 		else if (bModeString == "listen")
@@ -93,10 +95,10 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 		}
 	}
 
-	const XMLCh* limitAngle = elem->getAttribute(L"angle-limit");
-	if (XMLString::compareIString(limitAngle, L"") != 0)
+	const char* limitAngle = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_ANGLELIMIT));
+	if (strcmp(limitAngle, "") != 0)
 	{
-		float angle = (float)atof(XMLString::transcode(limitAngle));
+		float angle = (float)atof(limitAngle);
 		MeCtSaccade::BehaviorMode mode = saccade_ct->getBehaviorMode();
 		if (mode == MeCtSaccade::Talking)
 			saccade_ct->setTalkingAngleLimit(angle);
@@ -106,10 +108,10 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 			saccade_ct->setThinkingAngleLimit(angle);
 	}
 
-	const XMLCh* finishFlag = elem->getAttribute(L"finish");
-	if (XMLString::compareIString(finishFlag, L"") != 0)
+	const char* finishFlag = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_FINISH));
+	if (strcmp(finishFlag, "") != 0)
 	{
-		std::string finish = XMLString::transcode(finishFlag);
+		std::string finish = finishFlag;
 		if (finish == "true")
 			saccade_ct->setValid(false);
 		else

@@ -380,6 +380,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\gwiz_cmdl.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\gwiz_cmdl.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\gwiz_math.cpp"
 				>
 			</File>
@@ -440,19 +448,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\ParserASFAMC.cxx"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\ParserASFAMC.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\ParserBVH.cxx"
 				>
 			</File>
 			<File
 				RelativePath="..\src\sbm\ParserBVH.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\ParserFBX.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\ParserFBX.h"
 				>
 			</File>
 			<File
@@ -556,6 +564,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\SBScene.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\SBScene.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\sr_arg_buff.cpp"
 				>
 			</File>
@@ -624,22 +640,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\SteeringAgent.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\SteeringAgent.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\SteerSuiteEngineDriver.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\SteerSuiteEnginerDriver.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\sbm\text_speech.cpp"
 				>
 			</File>
@@ -692,6 +692,14 @@
 				</File>
 				<File
 					RelativePath="..\src\sbm\GPU\SbmShader.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\GPU\SbmTexture.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\GPU\SbmTexture.h"
 					>
 				</File>
 				<File
@@ -776,6 +784,78 @@
 				</File>
 				<File
 					RelativePath="..\src\sbm\Physics\SbmPhysicsSimODE.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="attributes"
+				>
+				<File
+					RelativePath="..\src\sbm\DAttribute.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\DAttribute.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\DAttributeManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\DAttributeManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\DefaultAttributeTable.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\DefaultAttributeTable.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\DObject.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\DObject.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\DObserver.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\DObserver.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\DSubject.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\DSubject.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="steering"
+				>
+				<File
+					RelativePath="..\src\sbm\SteeringAgent.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\SteeringAgent.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\SteerSuiteEngineDriver.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\SteerSuiteEnginerDriver.cpp"
 					>
 				</File>
 			</Filter>
@@ -1478,6 +1558,14 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\sbm\me_ct_inverse_interpolation.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_inverse_interpolation.h"
+						>
+					</File>
+					<File
 						RelativePath="..\src\sbm\me_ct_motion_example.cpp"
 						>
 					</File>
@@ -1757,6 +1845,14 @@
 			</File>
 			<File
 				RelativePath="..\src\sbm\bml_xml_consts.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\BMLDefs.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\BMLDefs.h"
 				>
 			</File>
 		</Filter>
@@ -2536,6 +2632,50 @@
 				</File>
 				<File
 					RelativePath="..\src\external\glew\wglew.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="SOIL"
+				>
+				<File
+					RelativePath="..\src\external\SOIL\image_DXT.c"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\SOIL\image_DXT.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\SOIL\image_helper.c"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\SOIL\image_helper.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\SOIL\SOIL.c"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\SOIL\SOIL.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\SOIL\stb_image_aug.c"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\SOIL\stb_image_aug.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\SOIL\stbi_DDS_aug.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\external\SOIL\stbi_DDS_aug_c.h"
 					>
 				</File>
 			</Filter>

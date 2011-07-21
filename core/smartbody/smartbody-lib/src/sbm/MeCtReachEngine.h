@@ -82,6 +82,7 @@ public:
 public:
 	MeCtReachEngine(SbmCharacter* sbmChar, SkSkeleton* sk);
 	virtual ~MeCtReachEngine(void);
+	bool isValid() { return valid; }
 	std::string     getReachTypeTag();
 	ReachStateInterface* getCurrentState() { return curReachState; }
 	SbmCharacter*   getCharacter() { return character; }
@@ -92,7 +93,6 @@ public:
 	ConstraintMap&  getHandConstraint() { return handConstraint; }
 
 
-	bool isValid() { return valid; }
 	bool addHandConstraint(SkJoint* targetJoint, const char* effectorName);
 	void updateReach(float t, float dt, BodyMotionFrame& inputFrame);
 	void init(int rtype, SkJoint* effectorJoint);

@@ -15,7 +15,7 @@ MeCtCCDIK::~MeCtCCDIK( void )
 typedef std::pair<std::string,int> StrIntPair;
 typedef std::vector<StrIntPair> StrIntList;
 
-static bool strIntComp(StrIntPair& p1, StrIntPair& p2)
+static bool strIntComp(const StrIntPair& p1, const StrIntPair& p2)
 {
 	return (p1.second < p2.second);
 }

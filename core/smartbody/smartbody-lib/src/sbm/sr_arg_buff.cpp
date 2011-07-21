@@ -96,7 +96,7 @@ char* srArgBuffer::read_token( void )	{
     	token = strtok( peek_buff, WHITE_SPACE );
     }
 	if( token == NULL )	{
-		token = EMPTY_STRING;
+		token = (char*)EMPTY_STRING;
 	}
 	return( token );
 }
@@ -115,5 +115,5 @@ char* srArgBuffer::peek_string( void )	{
 	if( ( tok_len > 0 ) && ( arg_len > ( ( token - tok_buff ) + tok_len ) ) )	{
 		return( token + tok_len + 1 );
 	}
-	return( EMPTY_STRING );
+	return( (char*)EMPTY_STRING );
 }

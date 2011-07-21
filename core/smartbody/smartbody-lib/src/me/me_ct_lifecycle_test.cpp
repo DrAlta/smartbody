@@ -20,7 +20,7 @@
  *      Andrew n marshall, USC
  */
 
-#include "ME/me_ct_lifecycle_test.hpp"
+#include "me/me_ct_lifecycle_test.hpp"
 
 
 #include <iostream>

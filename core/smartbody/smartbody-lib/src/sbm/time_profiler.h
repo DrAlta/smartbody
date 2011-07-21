@@ -23,6 +23,7 @@
 #ifndef TIME_INTERVAL_PROFILER_H
 #define TIME_INTERVAL_PROFILER_H
 
+#include <stdio.h>
 #include <iostream>
 #include "sbm/sr_hash_map.h"
 #include "sbm/time_regulator.h"

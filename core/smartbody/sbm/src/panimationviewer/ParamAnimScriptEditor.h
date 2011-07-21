@@ -23,20 +23,22 @@
 #ifndef _PARAM_ANIM_SCRIPT_EDITOR_H_
 #define _PARAM_ANIM_SCRIPT_EDITOR_H_
 
+#include <FL/Fl_Slider.H>
+#include <vhcl.h>
 #include "PanimationWindow.h"
 
 class PanimationWindow;
-class PAScriptEditor : public fltk::Group
+class PAScriptEditor : public Fl_Group
 {
 	public:
 		PAScriptEditor(int x, int y, int w, int h, PanimationWindow* window);
 		~PAScriptEditor();
 		
-		static void addState(fltk::Widget* widget, void* data);
-		static void removeState(fltk::Widget* widget, void* data);
-		static void updateStateInfo(fltk::Widget* widget, void* data);
-		static void run(fltk::Widget* widget, void* data);
-		static void changeCurrentStateWeight(fltk::Widget* widget, void* data);
+		static void addState(Fl_Widget* widget, void* data);
+		static void removeState(Fl_Widget* widget, void* data);
+		static void updateStateInfo(Fl_Widget* widget, void* data);
+		static void run(Fl_Widget* widget, void* data);
+		static void changeCurrentStateWeight(Fl_Widget* widget, void* data);
 		void initialAvailableStates();
 		void updateAvailableStates(std::string currentState);
 		void refresh();
@@ -44,14 +46,14 @@ class PAScriptEditor : public fltk::Group
 
 	public:
 		PanimationWindow*	paWindow;
-		fltk::Browser*		availableStateList;
-		fltk::Browser*		currentStateList;
-		fltk::Button*		addStateButton;
-		fltk::Button*		removeStateButton;
-		fltk::Button*		runStateList;
-		fltk::Output*		currentStatePanel;
-		fltk::Output*		nextStatePanel;
-		fltk::ValueSlider*	currentStateWeight;
+		Fl_Browser*		availableStateList;
+		Fl_Browser*		currentStateList;
+		Fl_Button*		addStateButton;
+		Fl_Button*		removeStateButton;
+		Fl_Button*		runStateList;
+		Fl_Output*		currentStatePanel;
+		Fl_Output*		nextStatePanel;
+		Fl_Value_Slider*	currentStateWeight;
 
 		std::map<std::string, double>	stateTimeOffset;
 		std::map<std::string, bool>		stateLoopMode;

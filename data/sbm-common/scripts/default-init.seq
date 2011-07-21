@@ -7,11 +7,12 @@
 ### Assumes current directory is: core/smartbody/sbm/bin
 0	path seq ../../../../data/sbm-common/scripts
 0	path seq ../../../../data/sbm-test/scripts
+0   path mesh ../../../../data/mesh
 
 0	seq common-init inline 
-0	test locomotion initialize
+#0	test locomotion initialize
 0	seq init-general-parameters
-0   seq init-common-face
+0	seq init-common-face
 0	panim enable
 
 ###  Common-sk assets are centered on the pelvis,
@@ -20,17 +21,18 @@
 ###  Using remote rVoice speech synthesis
 ###  NOTE: increment time to insure common-init is processed in order.
 1	char doctor init common.sk SasoBase.SasoDoctorPerez
-1	test loco char doctor anim standing HandsAtSide_Motex
-1	test loco char doctor anim walking Walk 17 28 4 37 9 23
-1	test loco char doctor anim walking Strafe 25 39 1 52 25 27
+#1	test loco char doctor anim standing HandsAtSide_Motex
+#1	test loco char doctor anim walking Walk 17 28 4 37 9 23
+#1	test loco char doctor anim walking Strafe 25 39 1 52 25 27
 1	set character doctor world_offset x 35 y 102 h -17
 1	set character doctor voice remote M021
 
-#1	char elder init common.sk SasoBase.Mayor
-1	char elder init common.sk SasoBase.SasoDoctorPerez
-1	test loco char elder anim standing HandsAtSide_Motex
-1	test loco char elder anim walking Walk 17 28 4 37 9 23
-1	test loco char elder anim walking Strafe 25 39 1 52 25 27
+1	char elder init common.sk SasoBase.Mayor
+#1	char elder init common.sk SasoBase.SasoDoctorPerez
+#1   char elder init test_utah.sk SasoBase.SasoDoctorPerez
+#1	test loco char elder anim standing HandsAtSide_Motex
+#1	test loco char elder anim walking Walk 17 28 4 37 9 23
+#1	test loco char elder anim walking Strafe 25 39 1 52 25 27
 1	set character elder world_offset x -35 y 102 h -17
 1	set character elder voice remote M009
 
@@ -45,48 +47,29 @@
 1	set test character doctor
 1	set test recipient elder
 
-1	test loco char doctor enable
-1	test loco char elder enable
+#1	test loco char doctor enable
+#1	test loco char elder enable
 
 1	seq default-dynamics
 1	seq init-param-animation
-2	seq init-example-reach
+#2	seq init-example-reach
 
-2 char doctor smoothbindweight ../../../../data/mesh/doctor/Doctor.xml
-2 char doctor smoothbindmesh ../../../../data/mesh/doctor/faceShape.obj
-2 char doctor smoothbindmesh ../../../../data/mesh/doctor/left_handShape.obj
-2 char doctor smoothbindmesh ../../../../data/mesh/doctor/pantsShape.obj
-2 char doctor smoothbindmesh ../../../../data/mesh/doctor/polySurfaceShape10.obj
-2 char doctor smoothbindmesh ../../../../data/mesh/doctor/right_handShape.obj
-2 char doctor smoothbindmesh ../../../../data/mesh/doctor/shirtShape.obj
+2 char doctor mesh doctor
+2 char elder mesh elder
 
-2 char elder smoothbindweight ../../../../data/mesh/elder/Elder.xml
-2 char elder smoothbindmesh ../../../../data/mesh/elder/Mayor2Shape.obj
-
-1	char brad init common.sk Brad
-1	set character brad world_offset x 135 y 102 h -17
+1	char brad init test_utah.sk Brad
+1	set character brad world_offset x 135 y 0 h -17
 1	set character brad voice remote brad
-1	test loco char brad anim standing HandsAtSide_Motex
-1	test loco char brad anim walking Walk 17 28 4 37 9 23
-1	test loco char brad anim walking Strafe 25 39 1 52 25 27
+#1	test loco char brad anim standing HandsAtSide_Motex
+#1	test loco char brad anim walking Walk 17 28 4 37 9 23
+#1	test loco char brad anim walking Strafe 25 39 1 52 25 27
 2	bml char brad <body posture="HandsAtSide_Motex"/>
-2	test loco char brad enable
+#2	test loco char brad enable
 
-2 char brad smoothbindweight ../../../../data/mesh/Brad/Brad.xml
-2 char brad smoothbindmesh ../../../../data/mesh/Brad/Face1Shape.obj
-2 char brad smoothbindmesh ../../../../data/mesh/Brad/BeltShape.obj
-2 char brad smoothbindmesh ../../../../data/mesh/Brad/EyesShape.obj
-2 char brad smoothbindmesh ../../../../data/mesh/Brad/HandsShape.obj
-2 char brad smoothbindmesh ../../../../data/mesh/Brad/InnerMouthShape.obj
-2 char brad smoothbindmesh ../../../../data/mesh/Brad/PantsShape.obj
-2 char brad smoothbindmesh ../../../../data/mesh/Brad/ShirtShape.obj
-2 char brad smoothbindmesh ../../../../data/mesh/Brad/ShoesShape.obj
-2 char brad smoothbindmesh ../../../../data/mesh/Brad/UpperTeethShape.obj
+2 char brad mesh utah
+
 
 2 bml char doctor <saccade mode="listen"/>
 2 bml char elder <saccade mode="listen"/>
 2 bml char brad <saccade mode="listen"/>
-
-
-
 

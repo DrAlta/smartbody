@@ -24,8 +24,8 @@
 
 # include <math.h>
 
-# include <SR/sr.h>
-# include <SK/sk_joint_euler.h>
+# include <sr/sr.h>
+# include <sk/sk_joint_euler.h>
 
 //============================= SkJointEuler ============================
 

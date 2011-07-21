@@ -19,16 +19,16 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
 
-# include <SR/sr_gl.h>
-# include <SR/sr_sn.h>
-# include <SR/sr_gl_render_funcs.h>
-# include <SR/sr_sa_render_mode.h>
-# include <SR/sr_sa_gl_render.h>
+# include <sr/sr_gl.h>
+# include <sr/sr_sn.h>
+# include <sr/sr_gl_render_funcs.h>
+# include <sr/sr_sa_render_mode.h>
+# include <sr/sr_sa_gl_render.h>
 
 //# define SR_USE_TRACE1 // constructor / destructor
 //# define SR_USE_TRACE2 // render
 //# define SR_USE_TRACE3 // matrix
-//# include <SR/sr_trace.h>
+//# include <sr/sr_trace.h>
 
 //=============================== SrOGLData ====================================
 
@@ -66,6 +66,20 @@ SrOGLData::SrOGLData ( SrSnShapeBase* s )
 
 SrArray<SrSaGlRender::RegData> SrSaGlRender::_rfuncs;
 
+void register_render_function ( const char* class_name, SrSaGlRender::render_function rfunc ) // friend
+ {
+   SrArray<SrSaGlRender::RegData> &rf = SrSaGlRender::_rfuncs;
+
+   int i;
+   for ( i=0; i<rf.size(); i++ ) 
+    { if ( sr_compare(rf[i].class_name,class_name)==0 ) break;
+    }
+   if ( i==rf.size() ) rf.push(); // if not found, push a new position
+
+   rf[i].class_name = class_name;
+   rf[i].rfunc = rfunc;
+ }
+
 SrSaGlRender::SrSaGlRender () 
  { 
    //SR_TRACE1 ( "Constructor" );
@@ -84,20 +98,6 @@ SrSaGlRender::SrSaGlRender ()
 SrSaGlRender::~SrSaGlRender ()
  {
    //SR_TRACE1 ( "Destructor" );
- }
-
-void register_render_function ( const char* class_name, SrSaGlRender::render_function rfunc ) // friend
- {
-   SrArray<SrSaGlRender::RegData> &rf = SrSaGlRender::_rfuncs;
-
-   int i;
-   for ( i=0; i<rf.size(); i++ ) 
-    { if ( sr_compare(rf[i].class_name,class_name)==0 ) break;
-    }
-   if ( i==rf.size() ) rf.push(); // if not found, push a new position
-
-   rf[i].class_name = class_name;
-   rf[i].rfunc = rfunc;
  }
 
 void SrSaGlRender::restore_render_mode ( SrSn* n )

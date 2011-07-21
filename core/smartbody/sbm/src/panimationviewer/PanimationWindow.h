@@ -23,19 +23,21 @@
 #ifndef _PANIMATION_WINDOW_H_
 #define _PANIMATION_WINDOW_H_
 
-#include <fltk/Window.h>
-#include <fltk/Choice.h>
-#include <fltk/Button.h>
-#include <fltk/CheckButton.h>
-#include <fltk/TabGroup.h>
-#include <fltk/Group.h>
-#include <fltk/Browser.h>
-#include <fltk/Input.h>
-#include <fltk/ValueSlider.h>
-#include <fltk/TextDisplay.h>
-#include <fltk/MultiLineOutput.h>
-#include <fltk/MenuBar.h>
-#include <fltk/ask.h>
+#include <FL/Fl_Slider.H>
+#include "vhcl.h"
+#include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Choice.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Check_Button.H>
+#include <FL/Fl_Tabs.H>
+#include <FL/Fl_Group.H>
+#include <FL/Fl_Browser.H>
+#include <FL/Fl_Input.H>
+#include <FL/Fl_Value_Slider.H>
+#include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Multiline_Output.H>
+#include <FL/Fl_Menu_Bar.H>
+#include <FL/fl_ask.H>
 #include <sbm/GenericViewer.h>
 #include <sbm/me_ct_param_animation_utilities.h>
 #include <sbm/me_ct_param_animation_data.h>
@@ -53,7 +55,7 @@ class PAStateEditor;
 class PATransitionEditor;
 class PAScriptEditor;
 class PARunTimeEditor;
-class PanimationWindow : public fltk::Window, public GenericViewer
+class PanimationWindow : public Fl_Double_Window, public GenericViewer
 {
 	public:
 		PanimationWindow(int x, int y, int w, int h, char* name);
@@ -73,42 +75,43 @@ class PanimationWindow : public fltk::Window, public GenericViewer
 		void removeTimeMark(nle::NonLinearEditorModel* model); 
 		void addTimeMarkToBlock(nle::Block* block, double t);
 
-		static void loadCharacters(fltk::Choice* characterList);
-		static void refreshUI(fltk::Widget* widget, void* data);
-		static void clearTextDisplay(fltk::Widget* widget, void* data);
-		static void changeMotionPlayerMode(fltk::Widget* widget, void* data);
+		static void loadCharacters(Fl_Choice* characterList);
+		static void refreshUI(Fl_Widget* widget, void* data);
+		static void clearTextDisplay(Fl_Widget* widget, void* data);
+		static void changeMotionPlayerMode(Fl_Widget* widget, void* data);
 		void motionPlayerUpdate();
 		void getSelectedMarkInfo(nle::NonLinearEditorModel* model, std::string& blockName, double& time);
-		static void reset(fltk::Widget* widget, void* data);
+		static void reset(Fl_Widget* widget, void* data);
+		static PanimationWindow* getPAnimationWindow(Fl_Widget* w);
 
 		// transition editor functions
-		static void changeTransitionEditorMode(fltk::Widget* widget, void* data);
-		static void changeStateList1(fltk::Widget* widget, void* data);
-		static void changeStateList2(fltk::Widget* widget, void* data);
-		static void changeAnimForTransition(fltk::Widget* widget, void* data);
-		static void addTransitionTimeMark(fltk::Widget* widget, void* data);
-		static void removeTransitionTimeMark(fltk::Widget* widget, void* data);
-		static void updateTransitionTimeMark(fltk::Widget* widget, void* data);
-		static void loadTransitions(fltk::Choice* transitionList);
-		static void createNewTransition(fltk::Widget* widget, void* data);
-		static void changeTransitionList(fltk::Widget* widget, void* data);
+		static void changeTransitionEditorMode(Fl_Widget* widget, void* data);
+		static void changeStateList1(Fl_Widget* widget, void* data);
+		static void changeStateList2(Fl_Widget* widget, void* data);
+		static void changeAnimForTransition(Fl_Widget* widget, void* data);
+		static void addTransitionTimeMark(Fl_Widget* widget, void* data);
+		static void removeTransitionTimeMark(Fl_Widget* widget, void* data);
+		static void updateTransitionTimeMark(Fl_Widget* widget, void* data);
+		static void loadTransitions(Fl_Choice* transitionList);
+		static void createNewTransition(Fl_Widget* widget, void* data);
+		static void changeTransitionList(Fl_Widget* widget, void* data);
 
 	public:
 		std::string lastCommand;
 	
-		fltk::TabGroup*		tabGroup;
+		Fl_Tabs*		tabGroup;
 		PATransitionEditor* transitionEditor;
 		PAStateEditor*		stateEditor;
 		PAScriptEditor*		scriptEditor;
 		PARunTimeEditor*	runTimeEditor;
 
-		fltk::CheckButton*	motionPlayerMode;
-		fltk::Choice*		characterList;
-		fltk::Button*		refresh;
-		fltk::Button*		resetCharacter;
-		fltk::TextDisplay*	textDisplay;
-		fltk::TextBuffer*	textBuffer;
-		fltk::Button*		clearHistoryButton;
+		Fl_Check_Button*	motionPlayerMode;
+		Fl_Choice*		characterList;
+		Fl_Button*		refresh;
+		Fl_Button*		resetCharacter;
+		Fl_Text_Display*	textDisplay;
+		Fl_Text_Buffer*	textBuffer;
+		Fl_Button*		clearHistoryButton;
 };
 
  class PanimationViewerFactory : public GenericViewerFactory

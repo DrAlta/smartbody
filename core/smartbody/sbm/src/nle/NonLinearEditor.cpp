@@ -14,7 +14,7 @@ Mark::Mark()
 	for (int i = 0; i < 4; i++)
 		bounds[i] = 0;
 
-	setColor(fltk::BLACK);
+	setColor(FL_BLACK);
 	
 	showName = true;
 	info = "";
@@ -100,12 +100,12 @@ double Mark::getEndTime()
 	return endTime;
 }
 
-void Mark::setColor(fltk::Color c)
+void Mark::setColor(Fl_Color c)
 {
 	color = c;
 }
 
-fltk::Color Mark::getColor()
+Fl_Color Mark::getColor()
 {
 	return color;
 }
@@ -130,7 +130,7 @@ Block::Block()
 	for (int i = 0; i < 4; i++)
 		bounds[i] = 0;
 
-	setColor(fltk::WHITE);
+	setColor(FL_WHITE);
 	info = "";
 	showName = true;
 }
@@ -339,7 +339,7 @@ void Block::addMark(Mark* mark)
 	mark->setBlock(this);
 }
 
-void Block::setColor(fltk::Color c)
+void Block::setColor(Fl_Color c)
 {
 	color = c;
 }
@@ -354,7 +354,7 @@ std::string Block::getInfo()
 	return info;
 }
 
-fltk::Color Block::getColor()
+Fl_Color Block::getColor()
 {
 	return color;
 }

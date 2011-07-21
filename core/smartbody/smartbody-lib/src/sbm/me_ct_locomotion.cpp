@@ -336,8 +336,16 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame )
 		for(int i = 0; i < limb_list.size(); ++i)
 		{
 			limb = limb_list.get(i);
-			if(navigator.has_destination) limb->direction_planner.set_target_direction(&navigator.get_dis_to_dest_local());
-			else limb->direction_planner.set_target_direction(&navigator.get_target_local_velocity());
+			if(navigator.has_destination) 
+			{
+				SrVec v = navigator.get_dis_to_dest_local();
+				limb->direction_planner.set_target_direction( &v );
+			}
+			else 
+			{
+				SrVec v = navigator.get_target_local_velocity();
+				limb->direction_planner.set_target_direction( &v );
+			}
 		}
 	}
 	speed_accelerator.set_target_speed(navigator.get_target_local_velocity().len());
@@ -346,7 +354,8 @@ bool MeCtLocomotion::controller_evaluate( double time, MeFrameData& frame )
 	if(ik_enabled) apply_IK(); 
 
 	//balance control
-	balance.update(limb_list, SrVec(0.0f,1.0f,0.0f), &nonlimb_joint_info, navigator.get_orientation_angle(), translation_joint_index, (float)delta_time);
+	SrVec sr_tmp_vec(0.0f,1.0f,0.0f);
+	balance.update(limb_list, sr_tmp_vec, &nonlimb_joint_info, navigator.get_orientation_angle(), translation_joint_index, (float)delta_time);
 
 	navigator.post_controller_evaluate(frame, limb_list.get(dominant_limb), reset);
 
@@ -647,7 +656,8 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 	speed_accelerator.update_speed(delta_time);
 
 	// get current acceleration
-	float acc = speed_accelerator.update(&(limb_list.get(dominant_limb)->direction_planner.get_curr_direction()), limb_list.get(dominant_limb));
+	SrVec v = limb_list.get(dominant_limb)->direction_planner.get_curr_direction();
+	float acc = speed_accelerator.update(&v, limb_list.get(dominant_limb));
 
 	navigator.update_framerate_accelerator(acc, &limb_list);
 

@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 #include <stdio.h>
-//#include <fltk/glut.h>
+//#include <FL/Fl_glut.h>
 
 #ifndef ALLOC
 #define ALLOC(ptr, type, n) { \

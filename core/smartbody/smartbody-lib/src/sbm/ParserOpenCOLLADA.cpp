@@ -56,15 +56,15 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 		motion.name(filebasename.c_str());
 		skeleton.name(filebasename.c_str());
 		parser->parse(pathName.c_str());
-		xercesc_3_0::DOMDocument* doc = parser->getDocument();
-		xercesc_3_0::DOMNode* skNode = getNode("library_visual_scenes", doc);
+		DOMDocument* doc = parser->getDocument();
+		DOMNode* skNode = getNode("library_visual_scenes", doc);
 		if (!skNode)
 		{
 			LOG("ParserOpenCOLLADA::parse ERR: no skeleton info contained in this file");
 			return false;
 		}
 		parseLibraryVisualScenes(skNode, skeleton, motion, scale, order);
-		xercesc_3_0::DOMNode* skmNode = getNode("library_animations", doc);
+		DOMNode* skmNode = getNode("library_animations", doc);
 		if (!skmNode)
 		{
 		//	LOG("ParserOpenCOLLADA::parse WARNING: no motion info contained in this file");
@@ -96,17 +96,16 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 	return true;
 }
 
-xercesc_3_0::DOMNode* ParserOpenCOLLADA::getNode(std::string nodeName, xercesc_3_0::DOMNode* node)
+DOMNode* ParserOpenCOLLADA::getNode(std::string nodeName, DOMNode* node)
 {
 	int type = node->getNodeType();
 	std::string name = getString(node->getNodeName());
 	std::string value = getString(node->getNodeValue());
-	if (name == nodeName && node->getNodeType() ==  xercesc_3_0::DOMNode::ELEMENT_NODE)
+	if (name == nodeName && node->getNodeType() ==  DOMNode::ELEMENT_NODE)
 		return node;
 
-
-	xercesc_3_0::DOMNode* child = NULL;
-	const xercesc_3_0::DOMNodeList* list = node->getChildNodes();
+	DOMNode* child = NULL;
+	const DOMNodeList* list = node->getChildNodes();
 	for (unsigned int c = 0; c < list->getLength(); c++)
 	{
 		child = getNode(nodeName, list->item(c));
@@ -116,7 +115,7 @@ xercesc_3_0::DOMNode* ParserOpenCOLLADA::getNode(std::string nodeName, xercesc_3
 	return child;
 }
 
-xercesc_3_0::DOMNode* ParserOpenCOLLADA::getNode(std::string nodeName, std::string fileName)
+DOMNode* ParserOpenCOLLADA::getNode(std::string nodeName, std::string fileName)
 {
 	try 
 	{
@@ -141,7 +140,7 @@ xercesc_3_0::DOMNode* ParserOpenCOLLADA::getNode(std::string nodeName, std::stri
 	{
 		std::string filebasename = boost::filesystem::basename(fileName);
 		parser->parse(fileName.c_str());
-		xercesc_3_0::DOMDocument* doc = parser->getDocument();
+		DOMDocument* doc = parser->getDocument();
 		return getNode(nodeName, doc);
 	}
 	catch (const XMLException& toCatch) 
@@ -167,33 +166,33 @@ xercesc_3_0::DOMNode* ParserOpenCOLLADA::getNode(std::string nodeName, std::stri
 	return NULL;
 }
 
-void ParserOpenCOLLADA::parseLibraryVisualScenes(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order)
+void ParserOpenCOLLADA::parseLibraryVisualScenes(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order)
 {
-	const xercesc_3_0::DOMNodeList* list1 = node->getChildNodes();
+	const DOMNodeList* list1 = node->getChildNodes();
 	for (unsigned int c = 0; c < list1->getLength(); c++)
 	{
-		xercesc_3_0::DOMNode* node1 = list1->item(c);
+		DOMNode* node1 = list1->item(c);
 		std::string nodeName = getString(node1->getNodeName());
 		if (nodeName == "visual_scene")
 			parseJoints(node1, skeleton, motion, scale, order, NULL);
 	}
 }
 
-void ParserOpenCOLLADA::parseJoints(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, SkJoint* parent)
+void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, SkJoint* parent)
 {
-	const xercesc_3_0::DOMNodeList* list = node->getChildNodes();
+	const DOMNodeList* list = node->getChildNodes();
 	for (unsigned int i = 0; i < list->getLength(); i++)
 	{
-		xercesc_3_0::DOMNode* childNode = list->item(i);
+		DOMNode* childNode = list->item(i);
 		std::string nodeName = getString(childNode->getNodeName());
 		if (nodeName == "node")
 		{
-			xercesc_3_0::DOMNamedNodeMap* childAttr = childNode->getAttributes();
-			xercesc_3_0::DOMNode* nameNode = childAttr->getNamedItem(XMLString::transcode("name"));
+			DOMNamedNodeMap* childAttr = childNode->getAttributes();
+			DOMNode* nameNode = childAttr->getNamedItem(XMLString::transcode("name"));
 			std::string nameAttr = "";
 			if (nameNode)
 				nameAttr = getString(nameNode->getNodeValue());
-			xercesc_3_0::DOMNode* typeNode = childAttr->getNamedItem(XMLString::transcode("type"));
+			DOMNode* typeNode = childAttr->getNamedItem(XMLString::transcode("type"));
 			std::string typeAttr = "";
 			if (typeNode)
 				typeAttr = getString(typeNode->getNodeValue());
@@ -227,10 +226,10 @@ void ParserOpenCOLLADA::parseJoints(xercesc_3_0::DOMNode* node, SkSkeleton& skel
 				if (parent == NULL)
 					skeleton.root(joint);
 
-				const xercesc_3_0::DOMNodeList* infoList = childNode->getChildNodes();
+				const DOMNodeList* infoList = childNode->getChildNodes();
 				for (unsigned int j = 0; j < infoList->getLength(); j++)
 				{
-					xercesc_3_0::DOMNode* infoNode = infoList->item(j);
+					DOMNode* infoNode = infoList->item(j);
 					std::string infoNodeName = getString(infoNode->getNodeName());
 					if (infoNodeName == "translate")
 					{
@@ -241,8 +240,8 @@ void ParserOpenCOLLADA::parseJoints(xercesc_3_0::DOMNode* node, SkSkeleton& skel
 					}
 					if (infoNodeName == "rotate")
 					{
-						xercesc_3_0::DOMNamedNodeMap* rotateAttr = infoNode->getAttributes();
-						xercesc_3_0::DOMNode* sidNode = rotateAttr->getNamedItem(XMLString::transcode("sid"));
+						DOMNamedNodeMap* rotateAttr = infoNode->getAttributes();
+						DOMNode* sidNode = rotateAttr->getNamedItem(XMLString::transcode("sid"));
 						std::string sidAttr = getString(sidNode->getNodeValue());
 
 						if (sidAttr.substr(0, 11) == "jointOrient")
@@ -300,22 +299,22 @@ void ParserOpenCOLLADA::parseJoints(xercesc_3_0::DOMNode* node, SkSkeleton& skel
 	}
 }
 
-void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order)
+void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order)
 {
 	SkChannelArray& skChannels = skeleton.channels();
 	motion.init(skChannels);
 	SkChannelArray& motionChannels = motion.channels();
 	SkChannelArray channelsForAdjusting;
 
-	const xercesc_3_0::DOMNodeList* list = node->getChildNodes();
+	const DOMNodeList* list = node->getChildNodes();
 	for (unsigned int i = 0; i < list->getLength(); i++)
 	{
-		xercesc_3_0::DOMNode* node1 = list->item(i);
+		DOMNode* node1 = list->item(i);
 		std::string node1Name = getString(node1->getNodeName());
 		if (node1Name == "animation")
 		{
-			xercesc_3_0::DOMNamedNodeMap* animationAttr = node1->getAttributes();
-			xercesc_3_0::DOMNode* idNode = animationAttr->getNamedItem(XMLString::transcode("id"));
+			DOMNamedNodeMap* animationAttr = node1->getAttributes();
+			DOMNode* idNode = animationAttr->getNamedItem(XMLString::transcode("id"));
 			std::string idAttr = getString(idNode->getNodeValue()); // these three variables have no use
 			std::string jointName = tokenize(idAttr, ".-");	
 			std::string channelType = tokenize(idAttr, "_");
@@ -338,27 +337,27 @@ void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSke
 			if (channelType == "translateZ")
 				channelsForAdjusting.add(SkJointName(jointName.c_str()), SkChannel::ZPos);
 			
-			const xercesc_3_0::DOMNodeList* list1 = node1->getChildNodes();
+			const DOMNodeList* list1 = node1->getChildNodes();
 			for (unsigned int j = 0; j < list1->getLength(); j++)
 			{
-				xercesc_3_0::DOMNode* node2 = list1->item(j);
+				DOMNode* node2 = list1->item(j);
 				std::string node2Name = getString(node2->getNodeName());
 				if (node2Name == "source")
 				{
-					xercesc_3_0::DOMNamedNodeMap* sourceAttr = node2->getAttributes();
-					xercesc_3_0::DOMNode* sourceIdNode = sourceAttr->getNamedItem(XMLString::transcode("id"));
+					DOMNamedNodeMap* sourceAttr = node2->getAttributes();
+					DOMNode* sourceIdNode = sourceAttr->getNamedItem(XMLString::transcode("id"));
 					std::string sourceIdAttr = getString(sourceIdNode->getNodeValue());
 					size_t pos = sourceIdAttr.find_last_of("-");
 					std::string op = sourceIdAttr.substr(pos + 1);
-					const xercesc_3_0::DOMNodeList* list2 = node2->getChildNodes();
+					const DOMNodeList* list2 = node2->getChildNodes();
 					for (unsigned int k = 0; k < list2->getLength(); k++)
 					{
-						xercesc_3_0::DOMNode* node3 = list2->item(k);
+						DOMNode* node3 = list2->item(k);
 						std::string node3Name = getString(node3->getNodeName());
 						if (node3Name == "float_array")
 						{
-							xercesc_3_0::DOMNamedNodeMap* arrayAttr = node3->getAttributes();
-							xercesc_3_0::DOMNode* arrayCountNode = arrayAttr->getNamedItem(XMLString::transcode("count"));
+							DOMNamedNodeMap* arrayAttr = node3->getAttributes();
+							DOMNode* arrayCountNode = arrayAttr->getNamedItem(XMLString::transcode("count"));
 							int counter = atoi(getString(arrayCountNode->getNodeValue()).c_str());
 							std::string arrayString = getString(node3->getTextContent());
 						
@@ -412,6 +411,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations(xercesc_3_0::DOMNode* node, SkSke
 			}
 		}
 	}
+
 	// now transfer the motion euler data to quaternion data
 	std::vector<int> quatIndices;
 	for (int i = 0; i < motionChannels.size(); i++)
@@ -462,7 +462,7 @@ void ParserOpenCOLLADA::animationPostProcessByChannels(SkSkeleton& skeleton, SkM
 		for (int j = 0; j < numChannel; j++)
 		{
 			SkChannel& chan = motionChannels[j];
-			std::string chanName = motionChannels.name(j);
+			std::string chanName = (const char*) motionChannels.name(j);
 			SkChannel::Type chanType = chan.type;
 			SkJoint* joint = skeleton.search_joint(chanName.c_str());
 			if (!joint)
@@ -607,7 +607,7 @@ int ParserOpenCOLLADA::getRotationOrder(std::vector<std::string> orderVec)
 			return 123;
 	}
 	return -1;
-} 
+}
 
 std::string ParserOpenCOLLADA::getGeometryType(std::string idString)
 {
@@ -628,42 +628,41 @@ std::string ParserOpenCOLLADA::getGeometryType(std::string idString)
 	return "";
 }
 
-void ParserOpenCOLLADA::parseLibraryGeometries(xercesc_3_0::DOMNode* node, std::vector<SrModel*>& meshModelVec, float scale)
+void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, std::vector<SrModel*>& meshModelVec, float scale)
 {
-	const xercesc_3_0::DOMNodeList* list = node->getChildNodes();
+	const DOMNodeList* list = node->getChildNodes();
 	for (unsigned int c = 0; c < list->getLength(); c++)
 	{
-		xercesc_3_0::DOMNode* node = list->item(c);
+		DOMNode* node = list->item(c);
 		std::string nodeName = getString(node->getNodeName());
 		if (nodeName == "geometry")
 		{
 			SrModel* newModel = new SrModel();
-			xercesc_3_0::DOMNamedNodeMap* nodeAttr = node->getAttributes();
-			xercesc_3_0::DOMNode* nameNode = nodeAttr->getNamedItem(XMLString::transcode("name"));
+			DOMNamedNodeMap* nodeAttr = node->getAttributes();
+			DOMNode* nameNode = nodeAttr->getNamedItem(XMLString::transcode("name"));
 			std::string nameAttr = "";
 			if (nameNode)
 				nameAttr = getString(nameNode->getNodeValue());
 			newModel->name = SrString(nameAttr.c_str());
-			xercesc_3_0::DOMNode* meshNode = ParserOpenCOLLADA::getNode("mesh", node);
+			DOMNode* meshNode = ParserOpenCOLLADA::getNode("mesh", node);
 			if (!meshNode)	continue;
 			for (unsigned int c1 = 0; c1 < meshNode->getChildNodes()->getLength(); c1++)
 			{
-				xercesc_3_0::DOMNode* node1 = meshNode->getChildNodes()->item(c1);
+				DOMNode* node1 = meshNode->getChildNodes()->item(c1);
 				std::string nodeName1 = getString(node1->getNodeName());
 				if (nodeName1 == "source")
 				{
-					xercesc_3_0::DOMNamedNodeMap* sourceAttr = node1->getAttributes();
-					xercesc_3_0::DOMNode* idNode = sourceAttr->getNamedItem(XMLString::transcode("id"));
+					DOMNamedNodeMap* sourceAttr = node1->getAttributes();
+					DOMNode* idNode = sourceAttr->getNamedItem(XMLString::transcode("id"));
 					std::string idString = getString(idNode->getNodeValue());
 					size_t pos = idString.find_last_of("-");
 					std::string tempString = idString.substr(pos + 1);
 					idString = tempString;
-					std::transform(idString.begin(), idString.end(), idString.begin(), tolower);
+					std::transform(idString.begin(), idString.end(), idString.begin(), ::tolower);
 					std::string idType = getGeometryType(idString);
 					// below is a faster way to parse all the data, have potential bug
-					xercesc_3_0::DOMNode* floatNode = ParserOpenCOLLADA::getNode("float_array", node1);
-					xercesc_3_0::DOMNamedNodeMap* floatNodeAttr = floatNode->getAttributes();
-					xercesc_3_0::DOMNode* countNode = floatNodeAttr->getNamedItem(XMLString::transcode("count"));
+					DOMNode* floatNode = ParserOpenCOLLADA::getNode("float_array", node1);
+					DOMNode* countNode = floatNode->getAttributes()->getNamedItem(XMLString::transcode("count"));
 					int count = atoi(getString(countNode->getNodeValue()).c_str());
 					if (idType == "positions")
 						count /= 3;
@@ -698,23 +697,23 @@ void ParserOpenCOLLADA::parseLibraryGeometries(xercesc_3_0::DOMNode* node, std::
 				}
 				if (nodeName1 == "triangles" || nodeName1 == "polylist")
 				{
-					xercesc_3_0::DOMNamedNodeMap* nodeAttr1 = node1->getAttributes();
-					xercesc_3_0::DOMNode* countNode = nodeAttr1->getNamedItem(XMLString::transcode("count"));
+					DOMNamedNodeMap* nodeAttr1 = node1->getAttributes();
+					DOMNode* countNode = nodeAttr1->getNamedItem(XMLString::transcode("count"));
 					int count = atoi(getString(countNode->getNodeValue()).c_str());
 					std::vector<std::string> inputs;
 					int numInput = 0;
 					std::vector<int> vcountList;
 					for (unsigned int c2 = 0; c2 < node1->getChildNodes()->getLength(); c2++)
 					{
-						xercesc_3_0::DOMNode* inputNode = node1->getChildNodes()->item(c2);
-						if (XMLString::compareString(inputNode->getNodeName(), L"input") == 0)
+						DOMNode* inputNode = node1->getChildNodes()->item(c2);
+						if (XMLString::compareString(inputNode->getNodeName(), XMLString::transcode("input")) == 0)
 						{
-							xercesc_3_0::DOMNamedNodeMap* inputNodeAttr = inputNode->getAttributes();
-							xercesc_3_0::DOMNode* semanticNode = inputNodeAttr->getNamedItem(XMLString::transcode("semantic"));
+							DOMNamedNodeMap* inputNodeAttr = inputNode->getAttributes();
+							DOMNode* semanticNode = inputNodeAttr->getNamedItem(XMLString::transcode("semantic"));
 							inputs.push_back(getString(semanticNode->getNodeValue()));
 							numInput++;
 						}
-						if (XMLString::compareString(inputNode->getNodeName(), L"vcount") == 0)
+						if (XMLString::compareString(inputNode->getNodeName(), XMLString::transcode("vcount")) == 0)
 						{
 							std::string vcountString = getString(inputNode->getTextContent());
 							for (int i = 0; i < count; i++)
@@ -726,7 +725,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries(xercesc_3_0::DOMNode* node, std::
 						for (int i = 0; i < count; i++)
 							vcountList.push_back(3);
 					}
-					xercesc_3_0::DOMNode* pNode = ParserOpenCOLLADA::getNode("p", node1);
+					DOMNode* pNode = ParserOpenCOLLADA::getNode("p", node1);
 					std::string pString = getString(pNode->getTextContent());
 					// below code has potential bug because input order maybe different
 					for (int i = 0; i < count; i++)

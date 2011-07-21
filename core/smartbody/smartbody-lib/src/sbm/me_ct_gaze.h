@@ -25,8 +25,8 @@
 #ifndef ME_CT_GAZE_H
 #define ME_CT_GAZE_H
 
-#include <SK/sk_skeleton.h>
-#include <ME/me_controller.h>
+#include <sk/sk_skeleton.h>
+#include <me/me_controller.h>
 
 #include "gwiz_math.h"
 #include "me_ct_gaze_joint.h"
@@ -175,8 +175,8 @@ class MeCtGaze : public MeController	{
 		MeCtGaze();
 		virtual ~MeCtGaze();
 		
-		void init( void )	{ init( GAZE_KEY_EYES, GAZE_KEY_LUMBAR ); }
-		void init( int key_fr, int key_to );
+		void init( SbmPawn* pawn )	{ init( pawn, GAZE_KEY_EYES, GAZE_KEY_LUMBAR ); }
+		void init( SbmPawn* pawn, int key_fr, int key_to );
 //		void init( int key_fr, int key_to, int priority_key = GAZE_JOINT_EYE_L );
 		void set_task_priority( int key ); // which joint to attempt to satisfy target task
 

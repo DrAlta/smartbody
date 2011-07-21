@@ -30,8 +30,6 @@
 class mcuCBHandle;
 
 namespace BML {
-	const XMLCh TAG_PARAM[]      = L"param";
-
 	BML::BehaviorRequestPtr parse_bml_param( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
 };
 

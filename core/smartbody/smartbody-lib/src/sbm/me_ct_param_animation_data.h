@@ -38,7 +38,7 @@ class PAStateData
 	public:
 		std::string stateName;
 		std::vector<SkMotion*> motions;
-		std::vector<std::vector<double>> keys;
+		std::vector<std::vector<double> > keys;
 		std::vector<double> weights;
 		std::vector<PAStateData*> toStates;				
 		std::vector<PAStateData*> fromStates;

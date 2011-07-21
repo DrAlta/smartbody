@@ -27,8 +27,8 @@
  * trackball manipulation
  */
 
-# include <SR/sr_vec.h>
-# include <SR/sr_quat.h>
+# include <sr/sr_vec.h>
+# include <sr/sr_quat.h>
 
 class SrMat;
 

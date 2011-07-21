@@ -19,10 +19,10 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
 
-# include <SR/sr_sn_group.h>
+# include <sr/sr_sn_group.h>
 
 //# define SR_USE_TRACE1  // Const/Dest
-//# include <SR/sr_trace.h>
+//# include <sr/sr_trace.h>
 
 //======================================= SrSnGroup ====================================
 

@@ -31,7 +31,7 @@ class MeCtBasicLocomotion : public MeController
 	public:
 		MeCtBasicLocomotion(SbmCharacter* c);
 		~MeCtBasicLocomotion();
-		void init();
+		void init(SbmPawn* pawn);
 		
 		virtual bool controller_evaluate(double t, MeFrameData& frame);		
 		virtual SkChannelArray& controller_channels()	{return(_channels);}

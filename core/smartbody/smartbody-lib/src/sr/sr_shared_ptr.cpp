@@ -26,7 +26,7 @@
 //  (which acts like a shared_ptr)
 
 
-#include <SR/sr_shared_ptr.hpp>
+#include <sr/sr_shared_ptr.hpp>
 
 
 #if !defined(BOOST_NO_MEMBER_TEMPLATES) || defined(BOOST_MSVC6_MEMBER_TEMPLATES)

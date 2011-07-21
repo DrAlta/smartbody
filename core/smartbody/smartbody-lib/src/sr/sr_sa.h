@@ -26,7 +26,7 @@
  * scene action base class
  */
 
-# include <SR/sr_sn.h>
+# include <sr/sr_sn.h>
 
 class SrSnGroup;
 class SrSnEditor;

@@ -21,6 +21,7 @@
  *      Andrew n marshall, USC
  */
 
+#include "lin_win.h"
 #include "gwiz_math.h"
 using namespace gwiz;
 
@@ -53,7 +54,7 @@ void MeCtTether::clear( void )	{
 	}
 }
 
-void MeCtTether::init( char *channel_name ) {
+void MeCtTether::init(SbmPawn* pawn,  char *channel_name) {
 	
 	clear();
 
@@ -62,7 +63,7 @@ void MeCtTether::init( char *channel_name ) {
 	_channels.add( channel_name, SkChannel::ZPos );
 	_channels.add( channel_name, SkChannel::Quat );
 	
-	MeController::init();
+	MeController::init(pawn);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////

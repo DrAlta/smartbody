@@ -24,7 +24,7 @@
 #define ME_CT_IK_SCENARIO_HPP
 
 
-#include <ME/me_controller.h>
+#include <me/me_controller.h>
 #include "me_ct_locomotion_func.hpp"
 
 #include <sr/sr_vec2.h>

@@ -27,11 +27,11 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
-#include <Me/me_ct_container.hpp>
-#include <ME/me_ct_motion.h>
+#include <me/me_ct_container.hpp>
+#include <me/me_ct_motion.h>
 #include <map>
 #include <string>
-#include <ME/me_spline_1d.hpp>
+#include <me/me_spline_1d.hpp>
 #include <sbm/sbm_character.hpp>
 #include <sbm/mcontrol_util.h>
 

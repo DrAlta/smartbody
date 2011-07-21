@@ -23,7 +23,7 @@
 # ifndef SK_JOINT_POS_H
 # define SK_JOINT_POS_H
 
-# include <SK/sk_vec_limits.h>
+# include <sk/sk_vec_limits.h>
 
 class SkJoint;
 

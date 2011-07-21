@@ -24,11 +24,11 @@
 # ifndef SK_CHANNEL_ARRAY_H
 # define SK_CHANNEL_ARRAY_H
 
-# include <SR/sr_buffer.h>
-# include <SR/sr_shared_class.h>
+# include <sr/sr_buffer.h>
+# include <sr/sr_shared_class.h>
 
-# include <SK/sk_channel.h>
-# include <SK/sk_joint_name.h>
+# include <sk/sk_channel.h>
+# include <sk/sk_joint_name.h>
 #include <string>
 
 class SkPosture;

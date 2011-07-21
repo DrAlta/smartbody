@@ -23,15 +23,12 @@
  *		Jingqiao Fu, USC
  */
 
-# include <SR/sr_model.h>
-# include <SR/sr_path_array.h>
+# include <sr/sr_model.h>
+# include <sr/sr_path_array.h>
 
-////# define SR_USE_TRACE1 // keyword tracking
-////# define SR_USE_TRACE2 // geometry loading
-//# include <SR/SR_TRACE.h>
 
-# include <SK/sk_skeleton.h>
-# include <SK/sk_posture.h>
+# include <sk/sk_skeleton.h>
+# include <sk/sk_posture.h>
 
 //============================ load_skeleton ============================
 

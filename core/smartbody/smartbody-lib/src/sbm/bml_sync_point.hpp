@@ -115,7 +115,7 @@ namespace BML {
 		{	return _sync->time; }
 
 	protected:
-		friend BML::BehaviorSyncPoints;
+		friend class BML::BehaviorSyncPoints;
 		void set_sync( SyncPointPtr new_sync ) { _sync = new_sync; }
 	};
 
@@ -226,7 +226,7 @@ namespace BML {
 
 		/** For each SyncPoint, if parent is set, applies the parent time and offset. */
 		// Called by BehaviorRequest::schedule, not BehaviorScheduler
-		void applyParentTimes( std::string& warning_context = std::string() );
+		void applyParentTimes( std::string& warning_context );
 
 		/** Prints SyncPoint ids in order, separated by commas. */
 		void printSyncIds();

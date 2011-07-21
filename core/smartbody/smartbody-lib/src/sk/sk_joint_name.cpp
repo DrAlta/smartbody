@@ -20,7 +20,7 @@
  *      Marcelo Kallmann, USC (currently at UC Merced)
  */
 
-# include <SK/sk_joint_name.h>
+# include <sk/sk_joint_name.h>
 
 //============================= SkJointName ============================
 

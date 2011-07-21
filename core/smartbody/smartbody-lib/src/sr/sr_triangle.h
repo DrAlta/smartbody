@@ -26,7 +26,7 @@
 # ifndef SR_TRIANGLE_H
 # define SR_TRIANGLE_H
 
-# include <SR/sr_vec.h> 
+# include <sr/sr_vec.h> 
 
 /*! \class SrTriangle sr_triangle.h
     \brief A triangle in 3d space. 

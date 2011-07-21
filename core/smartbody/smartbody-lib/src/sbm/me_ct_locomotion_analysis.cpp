@@ -106,11 +106,11 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 	MeCtLocomotionLimb* limb = new MeCtLocomotionLimb();
 	limb->init_skeleton(standing_skeleton, walking_skeleton);
 	get_ct_pawn()->get_limb_list()->push() = limb;
-	limb->set_skeleton_name("common.sk");
-	result += limb->set_limb_base("l_hip");
-	result += limb->add_support_joint("l_ankle");
-	result += limb->add_support_joint("l_forefoot");
-	result += limb->add_support_joint("l_toe");
+	limb->set_skeleton_name( (char*)"common.sk");
+	result += limb->set_limb_base((char*)"l_hip");
+	result += limb->add_support_joint((char*)"l_ankle");
+	result += limb->add_support_joint((char*)"l_forefoot");
+	result += limb->add_support_joint((char*)"l_toe");
 	
 	if(result != 0)
 	{
@@ -127,11 +127,11 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 	limb = new MeCtLocomotionLimb();
 	limb->init_skeleton(standing_skeleton, walking_skeleton);
 	get_ct_pawn()->get_limb_list()->push() = limb;
-	limb->set_skeleton_name("common.sk");
-	result += limb->set_limb_base("r_hip");
-	result += limb->add_support_joint("r_ankle");
-	result += limb->add_support_joint("r_forefoot");
-	result += limb->add_support_joint("r_toe");
+	limb->set_skeleton_name((char*)"common.sk");
+	result += limb->set_limb_base((char*)"r_hip");
+	result += limb->add_support_joint((char*)"r_ankle");
+	result += limb->add_support_joint((char*)"r_forefoot");
+	result += limb->add_support_joint((char*)"r_toe");
 	
 
 	if(result != 0)
@@ -252,9 +252,9 @@ void MeCtLocomotionAnalysis::analyze_standing(MeCtLocomotionLimb* limb, SkMotion
 	limb->walking_list.push() = anim;
 	anim->set_anim(standing);
 	anim->init_skeleton(standing_skeleton, walking_skeleton);
-	anim->get_timing_space()->add_ref_time_name("stance_time");
-	anim->get_timing_space()->add_ref_time_name("lift_time");
-	anim->get_timing_space()->add_ref_time_name("land_time");
+	anim->get_timing_space()->add_ref_time_name((char*)"stance_time");
+	anim->get_timing_space()->add_ref_time_name((char*)"lift_time");
+	anim->get_timing_space()->add_ref_time_name((char*)"land_time");
 	limb->joint_num = get_descendant_num(limb->limb_base_name)+1;
 	limb->pos_buffer.capacity(limb->joint_num);
 	limb->pos_buffer.size(limb->joint_num);
@@ -450,13 +450,13 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 	stance_frame.push() = (int)stance_time;
 	//calc_stance_time(anim, limb_base);
 
-	anim->get_timing_space()->add_ref_time_name("stance_time");
+	anim->get_timing_space()->add_ref_time_name((char*)"stance_time");
 	anim->get_timing_space()->set_ref_time(0, (float)stance_time);
 
-	anim->get_timing_space()->add_ref_time_name("lift_time");
+	anim->get_timing_space()->add_ref_time_name((char*)"lift_time");
 	anim->get_timing_space()->set_ref_time(1, (float)lift_time);
 
-	anim->get_timing_space()->add_ref_time_name("land_time");
+	anim->get_timing_space()->add_ref_time_name((char*)"land_time");
 	anim->get_timing_space()->set_ref_time(2, (float)land_time);
 
 	anim->get_timing_space()->set_frame_num((float)motion_locomotion->frames());
@@ -756,7 +756,7 @@ float MeCtLocomotionAnalysis::iterate_sub_joints(SkJoint* walking_joint, SkJoint
 void MeCtLocomotionAnalysis::add_ref_times(MeCtLocomotionLimbAnim* anim, int* count)
 {
 	int counter = 0;
-	anim->get_timing_space()->add_ref_time_name("stance_time");
+	anim->get_timing_space()->add_ref_time_name((char*)"stance_time");
 	anim->get_timing_space()->set_ref_time(counter++, (float)stance_frame.get(0));
 
 	float val = 0.0f;
@@ -780,7 +780,7 @@ void MeCtLocomotionAnalysis::add_ref_times(MeCtLocomotionLimbAnim* anim, int* co
 			break;
 		}
 	}
-	anim->get_timing_space()->add_ref_time_name("lift_time");
+	anim->get_timing_space()->add_ref_time_name((char*)"lift_time");
 	anim->get_timing_space()->set_ref_time(counter++, (float)end);
 	while(j!=i)
 	{
@@ -788,7 +788,7 @@ void MeCtLocomotionAnalysis::add_ref_times(MeCtLocomotionLimbAnim* anim, int* co
 		if(count[j] <= 0) break;
 		start = j;
 	}
-	anim->get_timing_space()->add_ref_time_name("land_time");
+	anim->get_timing_space()->add_ref_time_name((char*)"land_time");
 	anim->get_timing_space()->set_ref_time(counter++, (float)start);
 
 	anim->get_timing_space()->set_frame_num((float)motion_locomotion->frames());

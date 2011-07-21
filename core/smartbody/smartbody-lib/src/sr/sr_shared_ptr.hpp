@@ -19,7 +19,6 @@
  *      Andrew n marshall, USC
  */
 
-//  SR/sr_shared_ptr.hpp
 //
 //  Implements the hook functions needed to use 
 //  SrSharedClass from boost::intrusive_ptr
@@ -27,7 +26,7 @@
 #ifndef SR_SHARED_PTR_HPP
 #define SR_SHARED_PTR_HPP
 
-#include "SR/sr_shared_class.h"
+#include "sr/sr_shared_class.h"
 #include <boost/intrusive_ptr.hpp>
 
 

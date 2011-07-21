@@ -38,9 +38,6 @@ class mcuCBHandle;
 
 namespace BML 
 {
-	const XMLCh TAG_LOCOTMOTION[] = L"locomotion";
-	const XMLCh TAG_EXAMPLE_LOCOMOTION[] = L"sbm:loco";
-
 	namespace Locomotion
 	{
 		void parse_routine(DOMElement* elem, BmlRequestPtr request, int type, int id);

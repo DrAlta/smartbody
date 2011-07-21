@@ -35,13 +35,13 @@
 
 #include "bonebus.h"
 
-#include <SK/sk_motion.h>
+#include <sk/sk_motion.h>
 
 #include "sbm_constants.h"
 #include "sbm_speech.hpp"
 #include <sbm/sr_linear_curve.h>
 
-#include <ME/me_ct_scheduler2.h>
+#include <me/me_ct_scheduler2.h>
 #include <sbm/me_ct_face.h>
 #include <sbm/me_ct_eyelid.h>
 #include <sbm/me_ct_gaze.h>
@@ -126,9 +126,7 @@ protected:
 	MeCtEyeLid*				eyelid_ct;
 
 
-	// Face data temporary storage to pass reference into init_skeleton()
-	AUMotionMap*			au_motion_map;
-	VisemeMotionMap*		viseme_motion_map;
+	
 
 	// The term "viseme" in the following variables is a misnomer,
 	// and may also refer to an action unit or other face shape.
@@ -139,12 +137,13 @@ protected:
 	// e.g. Oh <-> oh, OW <-> oh
 	// also doing this for bilateral au, e.g. mapping au_1 to au_1_left and au_1_right
 	// in this way, au_1 can control both au_1_left and au_1_right
-	std::map<std::string, std::vector<std::string>> viseme_name_patch;
+	std::map<std::string, std::vector<std::string> > viseme_name_patch;
 
 	// associate each joint with a physics object
 	// currently, we assume the vis-geo as the geometry ( or an capsule to the child if vis-geo is not available )
 	std::map<std::string, SbmPhysicsObj*> jointPhyObjMap; 	
 
+	// reach engine map
 	ReachEngineMap reachEngineMap;
 
 	// Viseme Curve Info
@@ -153,9 +152,11 @@ protected:
 	float	viseme_sound_offset;
 	float	viseme_magnitude;
 	int 	viseme_channel_count;
-	int 	viseme_channel_start_pos;
-	int 	viseme_channel_end_pos;
+
 	float	*viseme_history_arr;
+
+		AUMotionMap*			au_motion_map;
+	VisemeMotionMap*		viseme_motion_map;
 
 	std::string _classType;
 
@@ -221,7 +222,7 @@ public:
 	const std::string& get_voice_code_backup() const; //returns voice if exists or NULL if not
 
 
-	
+	bonebus::BoneBusCharacter * bonebusCharacter;
 
 	// Prioritized Schedules for behaviors (known as "blocking" in manual animation)
 	// TODO: Rename by body part, rather than controller type
@@ -238,8 +239,11 @@ public:
 	MeCtParamAnimation* param_animation_ct;
 	MeCtMotionPlayer*	motionplayer_ct;
 	MeCtSaccade*		saccade_ct;
-	MeCtReachEngine*	reachEngine;
+	//MeCtReachEngine*	reachEngine[2];	
 	MeCtBasicLocomotion*	basic_locomotion_ct;
+
+	int 	viseme_channel_start_pos;
+	int 	viseme_channel_end_pos;
 
 	void schedule_viseme_curve( 
 		const char* viseme, 
@@ -366,6 +370,7 @@ public:
 
 	void setMinVisemeTime(float minTime);
 	float getMinVisemeTime() const;
+	void notify(DSubject* subject);
 
 	std::string getClassType();
 	void setClassType(std::string classType);

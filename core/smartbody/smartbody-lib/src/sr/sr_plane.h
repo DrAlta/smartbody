@@ -22,7 +22,7 @@
 # ifndef SR_PLANE_H
 # define SR_PLANE_H
 
-# include <SR/sr_vec.h>
+# include <sr/sr_vec.h>
 
 class SrPlane
  { public :

@@ -25,53 +25,52 @@
 #include "ParamAnimBlock.h"
 
 
-PATransitionEditor::PATransitionEditor(int x, int y, int w, int h, PanimationWindow* window) : fltk::Group(x, y, w, h), paWindow(window)
+PATransitionEditor::PATransitionEditor(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h), paWindow(window)
 {
 	this->label("Transition Editor");
 	this->begin();
-		transitionEditorMode = new CheckButton(xDis, yDis, 200, 2 * yDis, "Create Transition Mode");
+		transitionEditorMode = new Fl_Check_Button(xDis, yDis, 200, 2 * yDis, "Create Transition Mode");
 		transitionEditorMode->callback(changeTransitionEditorMode, this);
 		
-		createTransitionGroup = new Group(xDis, 4 * yDis, w - 2 * xDis, h /2 - 4 * yDis, "new transition");
+		int tgx = xDis + x;
+		int tgy = 4*yDis + y;
+		createTransitionGroup = new Fl_Group(tgx, tgy, w - 2 * xDis, h /2 - 4 * yDis, "new transition");
 		int createTransitionGroupW = w - 2 * xDis;
-		int createTransitionGroupH = h /2 - 4 * yDis;
+		int createTransitionGroupH = h /2 - 4 * yDis;		
 		createTransitionGroup->begin();
-			createTransitionButton = new Button(xDis, yDis, 10 * xDis, 2 * yDis, "Create Transition");
+			createTransitionButton = new Fl_Button(xDis + tgx, yDis +tgy, 10 * xDis, 2 * yDis, "Create Transition");
 			createTransitionButton->callback(createNewTransition, this);
-			stateList1 = new Choice(xDis + 100, 5 * yDis, 100, 2 * yDis, "State1");
+			stateList1 = new Fl_Choice(xDis + 100 + tgx, 5 * yDis + tgy, 100, 2 * yDis, "State1");			
 			stateList1->callback(changeStateList1, this);
-			stateList1->when(fltk::WHEN_CHANGED);
-			animForTransition1 = new Browser(xDis, 8 * yDis, createTransitionGroupW / 2 - 5 * xDis, createTransitionGroupH - 9 * yDis);
+			stateList1->when(FL_WHEN_CHANGED);
+			animForTransition1 = new Fl_Hold_Browser(xDis + tgx, 8 * yDis + tgy, createTransitionGroupW / 2 - 5 * xDis, createTransitionGroupH - 9 * yDis);
 			animForTransition1->callback(changeAnimForTransition, this);
-			stateList2 = new Choice(createTransitionGroupW / 2 + 4 * xDis + 100, 5 * yDis, 100, 2 * yDis, "State2");
+			stateList2 = new Fl_Choice(createTransitionGroupW / 2 + 4 * xDis + 100 + tgx, 5 * yDis + tgy, 100, 2 * yDis, "State2");
 			stateList2->callback(changeStateList2, this);
-			stateList2->when(fltk::WHEN_CHANGED);
-			animForTransition2 = new Browser(createTransitionGroupW / 2 + 4 * xDis, 8 * yDis, createTransitionGroupW / 2 - 5 * xDis, createTransitionGroupH - 9 * yDis);
+			stateList2->when(FL_WHEN_CHANGED);
+			animForTransition2 = new Fl_Hold_Browser(createTransitionGroupW / 2 + 4 * xDis + tgx, 8 * yDis + tgy, createTransitionGroupW / 2 - 5 * xDis, createTransitionGroupH - 9 * yDis);
 			animForTransition2->callback(changeAnimForTransition, this);
 		createTransitionGroup->end();
-		createTransitionGroup->box(fltk::BORDER_BOX);
-		this->add(createTransitionGroup);
+		createTransitionGroup->box(FL_BORDER_BOX);
 		this->resizable(createTransitionGroup);
 
-		editTransitionTimeMarkGroup = new Group(xDis, h / 2 + yDis, w - 2 * xDis, h / 2 - 2 * yDis, "time mark editor");
+		int etx = xDis + x;
+		int ety = h / 2 + yDis + y;
+		editTransitionTimeMarkGroup = new Fl_Group(etx, ety, w - 2 * xDis, h / 2 - 2 * yDis);
 		editTransitionTimeMarkGroup->begin();
-			transitionList = new Choice(10 * xDis, yDis, 100, 2 * yDis, "Transition List");
+			transitionList = new Fl_Choice(10 * xDis + etx, yDis + ety, 100, 2 * yDis, "Transition List");
 			transitionList->callback(changeTransitionList, this);
-			transitionList->when(fltk::WHEN_CHANGED);
-			addMark1 = new Button(12 * xDis + 100, yDis, 100, 2 * yDis, "Add Mark");
+			transitionList->when(FL_WHEN_CHANGED);
+			addMark1 = new Fl_Button(12 * xDis + 100 + etx, yDis + ety, 100 , 2 * yDis, "Add Mark");
 			addMark1->callback(addTransitionTimeMark, this);
-			removeMark1 = new Button(13 * xDis + 200, yDis, 100, 2 * yDis, "Delete Mark");
+			removeMark1 = new Fl_Button(13 * xDis + 200 + etx, yDis + ety, 100 , 2 * yDis, "Delete Mark");
 			removeMark1->callback(removeTransitionTimeMark, this);
-			updateMark1 = new Button(14 * xDis + 300, yDis, 100, 2 * yDis, "Update Mark");
+			updateMark1 = new Fl_Button(14 * xDis + 300 + etx, yDis + ety, 100 , 2 * yDis, "Update Mark");
 			updateMark1->callback(updateTransitionTimeMark, this);
-			transitionTimeMarkWidget = new ParamAnimEditorWidget(2 * xDis, 5 * yDis, w - 5 * xDis, h / 2 - 6 * yDis, "Transition Time Mark Editor");
+			transitionTimeMarkWidget = new ParamAnimEditorWidget(2 * xDis+ etx, 5 * yDis + ety, w - 5 * xDis, h / 2 - 6 * yDis, (char*) "");
+			transitionTimeMarkWidget->begin();
+			transitionTimeMarkWidget->end();
 		editTransitionTimeMarkGroup->end();
-		editTransitionTimeMarkGroup->resizable(transitionTimeMarkWidget);
-		editTransitionTimeMarkGroup->box(fltk::BORDER_BOX);
-		this->add(editTransitionTimeMarkGroup);
-		this->resizable(editTransitionTimeMarkGroup);
-	this->end();
-
 	transitionEditorNleModel = new nle::NonLinearEditorModel();
 	transitionTimeMarkWidget->setModel(transitionEditorNleModel);
 
@@ -86,9 +85,9 @@ PATransitionEditor::PATransitionEditor(int x, int y, int w, int h, PanimationWin
 	ParamAnimBlock* block2 = new ParamAnimBlock();
 	track2->addBlock(block2);
 	transitionEditorNleModel->addTrack(track2);
-	transitionTimeMarkWidget->setup();
+//	transitionTimeMarkWidget->setup();
 
-	transitionEditorMode->state(true);
+	transitionEditorMode->value(true);
 	createTransitionGroup->activate();
 	transitionList->deactivate();
 
@@ -103,8 +102,8 @@ PATransitionEditor::~PATransitionEditor()
 void PATransitionEditor::loadStates()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	stateList1->remove_all();
-	stateList2->remove_all();
+	stateList1->clear();
+	stateList2->clear();
 	stateList1->add("---");
 	stateList2->add("---");
 	for (size_t i = 0; i < mcu.param_anim_states.size(); i++)
@@ -112,11 +111,13 @@ void PATransitionEditor::loadStates()
 		stateList1->add(mcu.param_anim_states[i]->stateName.c_str());
 		stateList2->add(mcu.param_anim_states[i]->stateName.c_str());
 	}
+	stateList1->value(0);
+	stateList2->value(0);
 }
 
 void PATransitionEditor::loadTransitions()
 {
-	transitionList->remove_all();
+	transitionList->clear();
 	transitionList->add("---");
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	for (size_t i = 0; i < mcu.param_anim_transitions.size(); i++)
@@ -124,12 +125,13 @@ void PATransitionEditor::loadTransitions()
 		std::string transitionName = mcu.param_anim_transitions[i]->fromState->stateName + std::string(" | ") + mcu.param_anim_transitions[i]->toState->stateName;
 		transitionList->add(transitionName.c_str());
 	}
+	transitionList->value(0);
 }
 
-void PATransitionEditor::changeTransitionEditorMode(fltk::Widget* widget, void* data)
+void PATransitionEditor::changeTransitionEditorMode(Fl_Widget* widget, void* data)
 {
 	PATransitionEditor* editor = (PATransitionEditor*) data;
-	if (editor->transitionEditorMode->state())		// create mode
+	if (editor->transitionEditorMode->value())		// create mode
 	{
 		editor->createTransitionGroup->activate();
 		editor->transitionList->deactivate();
@@ -141,11 +143,15 @@ void PATransitionEditor::changeTransitionEditorMode(fltk::Widget* widget, void* 
 	}	
 }
 
-void PATransitionEditor::changeStateList1(fltk::Widget* widget, void* data)
+void PATransitionEditor::changeStateList1(Fl_Widget* widget, void* data)
 {
 	PATransitionEditor* editor = (PATransitionEditor*) data;
-	editor->loadStates();
-	PAStateData* state1 = mcuCBHandle::singleton().lookUpPAState(editor->stateList1->child(editor->stateList1->value())->label());
+	int stateValue = editor->stateList1->value();
+	int stateValueP = editor->stateList2->value();
+	editor->loadStates();	
+	editor->stateList1->value(stateValue);
+	editor->stateList2->value(stateValueP);
+	PAStateData* state1 = mcuCBHandle::singleton().lookUpPAState(editor->stateList1->text(stateValue));
 	editor->animForTransition1->clear();
 	if (state1)
 	{
@@ -156,11 +162,15 @@ void PATransitionEditor::changeStateList1(fltk::Widget* widget, void* data)
 		editor->animForTransition1->select(i, false);
 }
 
-void PATransitionEditor::changeStateList2(fltk::Widget* widget, void* data)
+void PATransitionEditor::changeStateList2(Fl_Widget* widget, void* data)
 {
 	PATransitionEditor* editor = (PATransitionEditor*) data;
+	int stateValue = editor->stateList2->value();
+	int stateValueP = editor->stateList1->value();
 	editor->loadStates();
-	PAStateData* state2 = mcuCBHandle::singleton().lookUpPAState(editor->stateList2->child(editor->stateList2->value())->label());
+	PAStateData* state2 = mcuCBHandle::singleton().lookUpPAState(editor->stateList2->menu()[stateValue].label());
+	editor->stateList2->value(stateValue);
+	editor->stateList1->value(stateValueP);
 	editor->animForTransition2->clear();
 	if (state2)
 	{
@@ -172,25 +182,25 @@ void PATransitionEditor::changeStateList2(fltk::Widget* widget, void* data)
 }
 
 const double precisionCompensate = 0.0001;
-void PATransitionEditor::changeAnimForTransition(fltk::Widget* widget, void* data)
+void PATransitionEditor::changeAnimForTransition(Fl_Widget* widget, void* data)
 {
 	PATransitionEditor* editor = (PATransitionEditor*) data;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::string motionName1 = "";
 	for (int i = 0; i < editor->animForTransition1->size(); i++)
 	{
-		if (editor->animForTransition1->selected(i))
+		if (editor->animForTransition1->selected(i+1))
 		{
-			motionName1 = editor->animForTransition1->goto_index(i)->label();
+			motionName1 = editor->animForTransition1->text(i+1);
 			break;
 		}
 	}
 	std::string motionName2 = "";
 	for (int i = 0; i < editor->animForTransition2->size(); i++)
 	{
-		if (editor->animForTransition2->selected(i))
+		if (editor->animForTransition2->selected(i+1))
 		{
-			motionName2 = editor->animForTransition2->goto_index(i)->label();
+			motionName2 = editor->animForTransition2->text(i+1);
 			break;
 		}
 	}
@@ -217,8 +227,8 @@ void PATransitionEditor::changeAnimForTransition(fltk::Widget* widget, void* dat
 	{
 		nle::Block* block1 = editor->transitionEditorNleModel->getTrack(0)->getBlock(0);
 		nle::Block* block2 = editor->transitionEditorNleModel->getTrack(1)->getBlock(0);
-		std::string stateName1 = editor->stateList1->child(editor->stateList1->value())->label();
-		std::string stateName2 = editor->stateList2->child(editor->stateList2->value())->label();
+		std::string stateName1 = editor->stateList1->menu()[editor->stateList1->value()].label();
+		std::string stateName2 = editor->stateList2->menu()[editor->stateList2->value()].label();
 		PAStateData* fromState = mcu.lookUpPAState(stateName1);
 		PAStateData* toState = mcu.lookUpPAState(stateName2);
 		for (int i = 0; i < fromState->getNumMotions(); i++)
@@ -240,27 +250,27 @@ void PATransitionEditor::changeAnimForTransition(fltk::Widget* widget, void* dat
 			}
 		}
 	}
-	editor->transitionTimeMarkWidget->setup();
+//	editor->transitionTimeMarkWidget->setup();
 	editor->paWindow->redraw();
 }
 
-void PATransitionEditor::addTransitionTimeMark(fltk::Widget* widget, void* data)
+void PATransitionEditor::addTransitionTimeMark(Fl_Widget* widget, void* data)
 {
 	PATransitionEditor* editor = (PATransitionEditor*) data;
 	editor->paWindow->addTimeMark(editor->transitionEditorNleModel, true);
-	editor->transitionTimeMarkWidget->setup();
+//	editor->transitionTimeMarkWidget->setup();
 	editor->paWindow->redraw();
 }
 
-void PATransitionEditor::removeTransitionTimeMark(fltk::Widget* widget, void* data)
+void PATransitionEditor::removeTransitionTimeMark(Fl_Widget* widget, void* data)
 {
 	PATransitionEditor* editor = (PATransitionEditor*) data;
 	editor->paWindow->removeTimeMark(editor->transitionEditorNleModel);
-	editor->transitionTimeMarkWidget->setup();
+//	editor->transitionTimeMarkWidget->setup();
 	editor->paWindow->redraw();
 }
 
-void PATransitionEditor::updateTransitionTimeMark(fltk::Widget* widget, void* data)
+void PATransitionEditor::updateTransitionTimeMark(Fl_Widget* widget, void* data)
 {
 	PATransitionEditor* editor = (PATransitionEditor*) data;
 	PATransitionData* transition = NULL;
@@ -268,13 +278,13 @@ void PATransitionEditor::updateTransitionTimeMark(fltk::Widget* widget, void* da
 	std::string toStateName = "";
 	if (!editor->transitionList->active())
 	{
-		fromStateName = editor->stateList1->child(editor->stateList1->value())->label();
-		toStateName = editor->stateList2->child(editor->stateList2->value())->label();
+		fromStateName = editor->stateList1->menu()[editor->stateList1->value()].label();
+		toStateName = editor->stateList2->menu()[editor->stateList2->value()].label();
 		transition = mcuCBHandle::singleton().lookUpPATransition(fromStateName, toStateName);
 	}
 	else
 	{
-		std::string fullName = editor->transitionList->child(editor->transitionList->value())->label();
+		std::string fullName = editor->transitionList->menu()[editor->transitionList->value()].label();
 		if (fullName == "---")
 		{
 			editor->transitionEditorNleModel->getTrack(0)->getBlock(0)->setName("");
@@ -330,12 +340,12 @@ void PATransitionEditor::updateTransitionTimeMark(fltk::Widget* widget, void* da
 }
 
 
-void PATransitionEditor::createNewTransition(fltk::Widget* widget, void* data)
+void PATransitionEditor::createNewTransition(Fl_Widget* widget, void* data)
 {
 	PATransitionEditor* editor = (PATransitionEditor*) data;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	std::string fromStateName = editor->stateList1->child(editor->stateList1->value())->label();
-	std::string toStateName = editor->stateList2->child(editor->stateList2->value())->label();
+	std::string fromStateName = editor->stateList1->menu()[editor->stateList1->value()].label();
+	std::string toStateName = editor->stateList2->menu()[editor->stateList2->value()].label();
 
 	PATransitionData* transition = mcu.lookUpPATransition(fromStateName, toStateName);
 	if (transition != NULL)
@@ -359,28 +369,28 @@ void PATransitionEditor::createNewTransition(fltk::Widget* widget, void* data)
 		std::stringstream createTransitionCommand;
 		createTransitionCommand << "panim transition fromstate " << transition->fromState->stateName << " tostate " << transition->toState->stateName << " ";
 		for (int i = 0; i < editor->animForTransition1->size(); i++)
-			if (editor->animForTransition1->selected(i))
-				createTransitionCommand << editor->animForTransition1->goto_index(i)->label() << " ";
+			if (editor->animForTransition1->selected(i+1))
+				createTransitionCommand << editor->animForTransition1->text(i+1) << " ";
 		createTransitionCommand << transition->getNumEaseOut() << " ";
 		for (int i = 0; i < transition->getNumEaseOut(); i++)
 			createTransitionCommand << transition->easeOutStart[i] << " " << transition->easeOutEnd[i] << " ";
 		
 		for (int i = 0; i < editor->animForTransition2->size(); i++)
-			if (editor->animForTransition2->selected(i))
-				createTransitionCommand << editor->animForTransition2->goto_index(i)->label() << " ";
+			if (editor->animForTransition2->selected(i+1))
+				createTransitionCommand << editor->animForTransition2->text(i+1) << " ";
 		createTransitionCommand << transition->easeInStart << " " << transition->easeInEnd << " ";
 
 		editor->paWindow->textDisplay->buffer()->append(createTransitionCommand.str().c_str());	
 		editor->paWindow->textDisplay->buffer()->append("\n");
-		editor->paWindow->textDisplay->relayout();
 		editor->paWindow->textDisplay->redraw();
 	}
 }
 
-void PATransitionEditor::changeTransitionList(fltk::Widget* widget, void* data)
+void PATransitionEditor::changeTransitionList(Fl_Widget* widget, void* data)
 {
 	PATransitionEditor* editor = (PATransitionEditor*) data;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	int stateValue = editor->transitionList->value();
 	editor->loadTransitions();
 
 	nle::Block* block1 = editor->transitionEditorNleModel->getTrack(0)->getBlock(0);
@@ -388,7 +398,7 @@ void PATransitionEditor::changeTransitionList(fltk::Widget* widget, void* data)
 	nle::Block* block2 = editor->transitionEditorNleModel->getTrack(1)->getBlock(0);		
 	block2->removeAllMarks();
 
-	std::string fullName = editor->transitionList->child(editor->transitionList->value())->label();
+	std::string fullName = editor->transitionList->menu()[stateValue].label();
 	if (fullName == "---")
 	{
 		editor->paWindow->redraw();

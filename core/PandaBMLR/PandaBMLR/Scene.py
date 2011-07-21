@@ -163,6 +163,22 @@ class Scene:
 				
 				if (not found):
 					CharacterPawn(self.__BMLR, charName, charClass, charID, registered = True)
+		if (command == "UpdateActor"):
+			if (len(arguments) > 3):
+				charID      = int(arguments[0])
+				charClass   = strip(arguments[1])
+				charName    = strip(arguments[2])
+				skelType    = arguments[3] # Not used
+				
+				found = False
+				for char in self.Pawns.values():
+					if (char.GetName() == charName):
+						char.SetID(charID)
+						found = True
+						break				
+				
+				if (not found):
+					CharacterPawn(self.__BMLR, charName, charClass, charID, registered = True)
 				
 		elif (command == "DeleteActor"):
 			if (len(arguments) > 0):

@@ -30,8 +30,8 @@
 #include <vector>
 
 
-#include <ME/me_ct_container.hpp>
-#include <ME/me_ct_unary.hpp>
+#include <me/me_ct_container.hpp>
+#include <me/me_ct_unary.hpp>
 
 // Use Boost Smart Point Impl until TR1 is finalized
 #include <boost/shared_ptr.hpp>
@@ -68,7 +68,7 @@ protected:
 	*  MeControllerContext implementation for child controller.
 	*/
 	class Context : public MeCtContainer::Context {
-		friend MeCtScheduler2;
+		friend class MeCtScheduler2;
 	public:
 		///////////////////////////////////////////////////////////////
 		//  Public Constants
@@ -100,8 +100,8 @@ public:
 	///////////////////////////////////////////////////////////////////////
 	//  Public Inner Classes
 	class Track {
-		friend MeCtScheduler2;
-		friend MeCtScheduler2::Context;
+		friend class MeCtScheduler2;
+		friend class MeCtScheduler2::Context;
 
 	///////////////////////////////////////////////////////////////
 	//  Private Data
@@ -259,7 +259,7 @@ public:
 	 *
      *  Returns NULL for invalid n.
      */
-	MeController* child( size_t n );
+	MeController* child( unsigned int n );
 
 ////  Bad design to share iterators to an encapsulated collection
 //	/** Iterator for the first Track, or end() if there are no tracks. */

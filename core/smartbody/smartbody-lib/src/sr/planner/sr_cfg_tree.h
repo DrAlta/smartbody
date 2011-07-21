@@ -2,8 +2,8 @@
 # ifndef SR_CFG_TREE_H
 # define SR_CFG_TREE_H
 
-# include <SR/sr_set.h>
-//# include <SR/sr_cfg_manager.h>
+# include <sr/sr_set.h>
+//# include <sr/sr_cfg_manager.h>
 # include "sr_cfg_manager.h"
 # include "sr_cfg_path.h"
 
@@ -27,7 +27,7 @@ class SrCfgNode
     int _parentlink;
     struct Link { SrCfgNode* node; float dist; int level; };
     SrArray<Link> _children;
-    friend SrCfgTreeBase;
+    friend class SrCfgTreeBase;
    public :
     SrCfgNode* parent () const { return _parent; }
     int parentlink () const { return _parentlink; } // -1 if root node

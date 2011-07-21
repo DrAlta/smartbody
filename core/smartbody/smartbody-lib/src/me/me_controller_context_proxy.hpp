@@ -20,12 +20,11 @@
  *      Andrew n marshall, USC
  */
 
-//  ME/me_controller_context_proxy.hpp
 #ifndef ME_CONTROLLER_CONTEXT_PROXY_HPP
 #define ME_CONTROLLER_CONTEXT_PROXY_HPP
 
 
-#include "ME/me_controller_context.hpp"
+#include "me/me_controller_context.hpp"
 
 
 /**

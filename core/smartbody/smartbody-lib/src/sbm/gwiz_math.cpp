@@ -21,6 +21,7 @@
  */
 
 #include "gwiz_math.h"
+#include "lin_win.h"
 
 //int gwiz::temp_read2( void ) { return( temp_test ); }
 
@@ -28,12 +29,6 @@ using namespace gwiz;
 #define gw_float	gwiz::float_t // Ubuntu: float_t defined in mathdef.h
 
 //int temp_read2( void ) { return( temp_test ); }
-
-////////////////////////////////
-
-#ifndef abs
-#define abs fabs
-#endif
 
 ////////////////////////////////
 // SAFE TRIGONOMETRY:
@@ -440,7 +435,7 @@ inline matrix_t matrixFromZY( const vector_t& z_axis, const vector_t& y_axis_app
 
 	vector_t z_axis_n = z_axis.normal();
 	vector_t y_axis_approx_n = y_axis_approx.normal();
-	if( abs( z_axis_n.dot( y_axis_approx_n ) ) > 0.999 ) { // degenerate
+	if( fabs( z_axis_n.dot( y_axis_approx_n ) ) > 0.999 ) { // degenerate
 		return( euler_t( z_axis_n, 0.0 ) );
 	}
 	vector_t x_axis_n = y_axis_approx_n.cross( z_axis_n );

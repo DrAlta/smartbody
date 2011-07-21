@@ -26,8 +26,8 @@
  * A polygon described by an array of 2d points
  */
 
-# include <SR/sr_vec2.h>
-# include <SR/sr_array.h>
+# include <sr/sr_vec2.h>
+# include <sr/sr_array.h>
 
 class SrBox;
 

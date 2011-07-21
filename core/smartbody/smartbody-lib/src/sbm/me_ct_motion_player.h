@@ -23,8 +23,8 @@
 #ifndef _ME_CT_MOTION_PLAYER_H
 #define _ME_CT_MOTION_PLAYER_H
 
-#include <ME/me_ct_container.hpp>
-#include <ME/me_ct_motion.h>
+#include <me/me_ct_container.hpp>
+#include <me/me_ct_motion.h>
 #include <sbm/sbm_character.hpp>
 #include <sbm/mcontrol_util.h>
 #include <string>
@@ -51,7 +51,7 @@ public:
 	MeCtMotionPlayer(SbmCharacter* c);
 	~MeCtMotionPlayer();
 
-	void init(std::string motionName, int n);
+	void init(SbmPawn* pawn, std::string motionName, int n);
 
 	void setFrameNum(int n);
 	int getFrameNum();

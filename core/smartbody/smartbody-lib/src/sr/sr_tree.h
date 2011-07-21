@@ -27,8 +27,8 @@
 # ifndef SR_TREE_H
 # define SR_TREE_H
 
-# include <SR/sr_class_manager.h>
-# include <SR/sr_output.h>
+# include <sr/sr_class_manager.h>
+# include <sr/sr_output.h>
 
 /*! \class SrTreeNode sr_tree_node.h
     \brief A red-black node for SrTree

@@ -1,0 +1,407 @@
+#include "DObject.h"
+#include <sr/sr_vec.h>
+
+DObject::DObject()
+{
+	m_attributeManager = new DAttributeManager();
+}
+
+DObject::~DObject()
+{
+	delete m_attributeManager;
+}
+
+void DObject::setName(std::string name)
+{
+	m_name = name;
+}
+
+
+std::string& DObject::getName()
+{
+	return m_name;
+}
+
+
+void DObject::addAttribute(DAttribute* attr)
+{
+	 // check for the existence of the attribute
+	std::map<std::string, DAttribute*>::iterator iter = m_attributeList.find(attr->getName());
+	if (iter != m_attributeList.end()) // attribute exists, remove the old attribute 
+	{
+		DAttribute* attr = iter->second;
+
+		// notify the attribute manager of the change
+		this->getAttributeManager()->notifyRemoveAttribute(attr);
+
+		m_attributeList.erase(iter);
+		delete attr;
+	}
+
+	m_attributeList[attr->getName()] = attr;
+	attr->setObject(this);
+	// notify the attribute manager of the change
+	this->getAttributeManager()->notifyCreateAttribute(attr);
+}
+
+void DObject::addAttribute( DAttribute* attr, std::string groupName )
+{
+	// check for the existence of the attribute
+	std::map<std::string, DAttribute*>::iterator iter = m_attributeList.find(attr->getName());
+	if (iter != m_attributeList.end()) // attribute exists, remove the old attribute 
+	{
+		DAttribute* attr = iter->second;
+
+		// notify the attribute manager of the change
+		this->getAttributeManager()->notifyRemoveAttribute(attr);
+
+		m_attributeList.erase(iter);
+		delete attr;
+	}
+
+	m_attributeList[attr->getName()] = attr;
+	DAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
+	attr->getAttributeInfo()->setGroup(group);
+	attr->setObject(this);
+	// notify the attribute manager of the change
+	this->getAttributeManager()->notifyCreateAttribute(attr);
+}
+
+
+ DAttribute* DObject::getAttribute(std::string name)
+ {
+	std::map<std::string, DAttribute*>::iterator iter = m_attributeList.find(name);
+	if (iter != m_attributeList.end()) // attribute exists, remove the old attribute 
+	{
+		return iter->second;
+	}
+	else
+	{
+		return NULL;
+	}
+ }
+
+ void DObject::clearAttributes()
+ {
+	 std::map<std::string, DAttribute*>::iterator iter = m_attributeList.begin();
+	 std::vector<std::string> attrNameList;
+	 for ( iter  = m_attributeList.begin();
+		   iter != m_attributeList.end();
+		   iter++)
+	 {
+		 attrNameList.push_back(iter->first);
+	 }		 
+	 for (unsigned int i=0;i<attrNameList.size();i++)
+		 removeAttribute(attrNameList[i]);
+ }
+ 
+ bool DObject::removeAttribute(std::string name)
+ {
+	// check for the existence of the attribute
+	std::map<std::string, DAttribute*>::iterator iter = m_attributeList.find(name);
+	if (iter != m_attributeList.end()) // attribute exists, remove the old attribute 
+	{
+
+		DAttribute* attr = iter->second;
+	
+		// notify the attribute manager of the change
+		this->getAttributeManager()->notifyRemoveAttribute(attr);
+		
+		m_attributeList.erase(iter);
+		delete attr;
+		
+		return true;
+	}
+
+	return false;
+ }
+
+  BoolAttribute* DObject::createBoolAttribute(std::string name, bool value, bool notifySelf, std::string groupName, int priority, 
+											  bool isReadOnly, bool isLocked, bool isHidden, std::string description)
+ {
+	 BoolAttribute* boolAttr = new BoolAttribute();
+	 boolAttr->setName(name);
+	 boolAttr->setValue(value);
+	 boolAttr->setDefaultValue(value);
+	 boolAttr->getAttributeInfo()->setPriority(priority);
+	 boolAttr->getAttributeInfo()->setReadOnly(isReadOnly);
+	 boolAttr->getAttributeInfo()->setLocked(isLocked);
+	 boolAttr->getAttributeInfo()->setHidden(isHidden);
+	 boolAttr->getAttributeInfo()->setDescription(description);
+
+	 this->addAttribute(boolAttr);
+
+	 DAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
+	 boolAttr->getAttributeInfo()->setGroup(group);
+
+	 if (notifySelf)
+		boolAttr->registerObserver(this);
+
+	 return boolAttr;
+}
+
+IntAttribute* DObject::createIntAttribute(std::string name, int value, bool notifySelf, std::string groupName, int priority, 
+												  bool isReadOnly, bool isLocked, bool isHidden, std::string description)
+ {
+	 IntAttribute* intAttr = new IntAttribute();
+	 intAttr->setName(name);
+	 intAttr->setValue(value);
+	 intAttr->setDefaultValue(value);
+	 intAttr->getAttributeInfo()->setPriority(priority);
+	 intAttr->getAttributeInfo()->setReadOnly(isReadOnly);
+	 intAttr->getAttributeInfo()->setLocked(isLocked);
+	 intAttr->getAttributeInfo()->setHidden(isHidden);
+	 intAttr->getAttributeInfo()->setDescription(description);
+
+	 this->addAttribute(intAttr);
+
+	 DAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
+	 intAttr->getAttributeInfo()->setGroup(group);
+
+	 if (notifySelf)
+		intAttr->registerObserver(this);
+
+	  return intAttr;
+}
+
+ DoubleAttribute* DObject::createDoubleAttribute(std::string name, double value, bool notifySelf, std::string groupName, int priority, 
+												  bool isReadOnly, bool isLocked, bool isHidden, std::string description)
+ {
+	 DoubleAttribute* doubleAttr = new DoubleAttribute();
+	 doubleAttr->setName(name);
+	 doubleAttr->setValue(value);
+	 doubleAttr->setDefaultValue(value);
+	 doubleAttr->getAttributeInfo()->setPriority(priority);
+	 doubleAttr->getAttributeInfo()->setReadOnly(isReadOnly);
+	 doubleAttr->getAttributeInfo()->setLocked(isLocked);
+	 doubleAttr->getAttributeInfo()->setHidden(isHidden);
+	 doubleAttr->getAttributeInfo()->setDescription(description);
+
+	 this->addAttribute(doubleAttr);
+
+	 DAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
+	 doubleAttr->getAttributeInfo()->setGroup(group);
+
+	 if (notifySelf)
+		doubleAttr->registerObserver(this);
+
+	  return doubleAttr;
+}
+
+ Vec3Attribute* DObject::createVec3Attribute(std::string name, float val1, float val2, float val3, bool notifySelf, std::string groupName, int priority, 
+												  bool isReadOnly, bool isLocked, bool isHidden, std::string description)
+ {
+	 Vec3Attribute* vec3Attr = new Vec3Attribute();
+	 vec3Attr->setName(name);
+	 SrVec vec(val1, val2, val3);
+	 vec3Attr->setValue(vec);
+	 vec3Attr->setDefaultValue(vec);
+	 vec3Attr->getAttributeInfo()->setPriority(priority);
+	 vec3Attr->getAttributeInfo()->setReadOnly(isReadOnly);
+	 vec3Attr->getAttributeInfo()->setLocked(isLocked);
+	 vec3Attr->getAttributeInfo()->setHidden(isHidden);
+	 vec3Attr->getAttributeInfo()->setDescription(description);
+
+	 this->addAttribute(vec3Attr);
+
+	 DAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
+	 vec3Attr->getAttributeInfo()->setGroup(group);
+
+	 if (notifySelf)
+		vec3Attr->registerObserver(this);
+
+	  return vec3Attr;
+}
+
+
+ StringAttribute* DObject::createStringAttribute(std::string name, std::string value, bool notifySelf, std::string groupName, int priority, 
+												  bool isReadOnly, bool isLocked, bool isHidden, std::string description)
+ {
+	 StringAttribute* strAttr = new StringAttribute();
+	 strAttr->setName(name);
+	 strAttr->setValue(value);
+	 strAttr->setDefaultValue(value);
+	 strAttr->getAttributeInfo()->setPriority(priority);
+	 strAttr->getAttributeInfo()->setReadOnly(isReadOnly);
+	 strAttr->getAttributeInfo()->setLocked(isLocked);
+	 strAttr->getAttributeInfo()->setHidden(isHidden);
+	 strAttr->getAttributeInfo()->setDescription(description);
+
+	 this->addAttribute(strAttr);
+
+	 DAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
+	 strAttr->getAttributeInfo()->setGroup(group);
+	
+	 if (notifySelf)
+		strAttr->registerObserver(this);
+
+	 return strAttr;
+}
+
+ MatrixAttribute* DObject::createMatrixAttribute(std::string name, SrMat& value, bool notifySelf, std::string groupName, int priority, 
+												  bool isReadOnly, bool isLocked, bool isHidden, std::string description)
+ {
+	 MatrixAttribute* matrixAttr = new MatrixAttribute();
+	 matrixAttr->setName(name);
+	 matrixAttr->setValue(value);
+	 matrixAttr->setDefaultValue(value);
+	 matrixAttr->getAttributeInfo()->setPriority(priority);
+	 matrixAttr->getAttributeInfo()->setReadOnly(isReadOnly);
+	 matrixAttr->getAttributeInfo()->setLocked(isLocked);
+	 matrixAttr->getAttributeInfo()->setHidden(isHidden);
+	 matrixAttr->getAttributeInfo()->setDescription(description);
+
+	 this->addAttribute(matrixAttr);
+
+	 DAttributeGroup* group = this->getAttributeManager()->getGroup(groupName, true);
+	 matrixAttr->getAttributeInfo()->setGroup(group);
+
+	 if (notifySelf)
+		matrixAttr->registerObserver(this);
+
+	  return matrixAttr;
+}
+
+  std::map<std::string, DAttribute*>& DObject::getAttributeList()
+ {
+	return m_attributeList;
+ }
+
+
+  DAttributeManager* DObject::getAttributeManager()
+{
+	return m_attributeManager;
+}
+
+  void DObject::notify(DSubject* subject)
+{
+	
+  }
+
+  void DObject::setBoolAttribute( std::string name, bool value )
+  {
+	  DAttribute* attr = getAttribute(name);
+	  BoolAttribute* battr = dynamic_cast<BoolAttribute*>(attr);
+	  if (battr)
+	  {
+		  battr->setValue(value);
+	  }
+  }
+
+  void DObject::setIntAttribute( std::string name, int value )
+  {
+	  DAttribute* attr = getAttribute(name);
+	  IntAttribute* iattr = dynamic_cast<IntAttribute*>(attr);
+	  if (iattr)
+	  {
+		  iattr->setValue(value);
+	  }
+  }
+
+  void DObject::setDoubleAttribute( std::string name, double value )
+  {
+	  DAttribute* attr = getAttribute(name);
+	  DoubleAttribute* dattr = dynamic_cast<DoubleAttribute*>(attr);
+	  if (dattr)
+	  {
+		  dattr->setValue(value);
+	  }
+  }
+
+  void DObject::setVec3Attribute( std::string name, float val1, float val2, float val3 )
+  {
+	  DAttribute* attr = getAttribute(name);
+	  Vec3Attribute* vattr = dynamic_cast<Vec3Attribute*>(attr);
+	  if (vattr)
+	  {
+		  vattr->setValue(SrVec(val1,val2,val3));
+	  }
+  }
+
+  void DObject::setStringAttribute( std::string name, std::string value )
+  {
+	  DAttribute* attr = getAttribute(name);
+	  StringAttribute* sattr = dynamic_cast<StringAttribute*>(attr);
+	  if (sattr)
+	  {
+		  sattr->setValue(value);
+	  }
+  }
+
+  void DObject::setMatrixAttribute( std::string name, SrMat& value )
+  {
+	  DAttribute* attr = getAttribute(name);
+	  MatrixAttribute* mattr = dynamic_cast<MatrixAttribute*>(attr);
+	  if (mattr)
+	  {
+		  mattr->setValue(value);
+	  }
+  }
+
+  bool DObject::getBoolAttribute( std::string name )
+  {
+	  DAttribute* attr = getAttribute(name);
+	  BoolAttribute* battr = dynamic_cast<BoolAttribute*>(attr);
+	  if (battr)
+	  {
+		  return battr->getValue();
+	  }	  
+	  return false;
+  }
+
+  int DObject::getIntAttribute( std::string name )
+  {
+	  DAttribute* attr = getAttribute(name);
+	  IntAttribute* iattr = dynamic_cast<IntAttribute*>(attr);
+	  if (iattr)
+	  {
+		  return iattr->getValue();
+	  }
+	  return 0;
+  }
+
+  double DObject::getDoubleAttribute( std::string name )
+  {
+	  DAttribute* attr = getAttribute(name);
+	  DoubleAttribute* dattr = dynamic_cast<DoubleAttribute*>(attr);
+	  if (dattr)
+	  {
+		 return dattr->getValue();
+	  }
+	  return 0.0;
+  }
+
+  SrVec DObject::getVec3Attribute( std::string name )
+  {
+	  DAttribute* attr = getAttribute(name);
+	  Vec3Attribute* vattr = dynamic_cast<Vec3Attribute*>(attr);
+	  if (vattr)
+	  {
+		  return vattr->getValue();
+	  }
+	  return SrVec();
+  }
+
+  std::string DObject::getStringAttribute( std::string name )
+  {
+	  DAttribute* attr = getAttribute(name);
+	  StringAttribute* sattr = dynamic_cast<StringAttribute*>(attr);
+	  if (sattr)
+	  {
+		  return sattr->getValue();
+	  }
+	  return "";
+  }
+
+  SrMat DObject::getMatrixAttribute( std::string name )
+  {
+	  DAttribute* attr = getAttribute(name);
+	  MatrixAttribute* mattr = dynamic_cast<MatrixAttribute*>(attr);
+	  if (mattr)
+	  {
+		  return mattr->getValue();
+	  }
+	  return SrMat();
+  }
+
+  

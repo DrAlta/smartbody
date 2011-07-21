@@ -63,7 +63,7 @@ void MeCtFace::clear( void )	{
 	_baseChannelToBufferIndex.clear();
 }
 
-void MeCtFace::init( SkMotion* base_ref_p ) {
+void MeCtFace::init(SbmPawn* pawn,  SkMotion* base_ref_p) {
 	
 	clear();
 	
@@ -79,7 +79,7 @@ void MeCtFace::init( SkMotion* base_ref_p ) {
 			_include_chan_flag[ i ] = 1;
 			_channels.add( mchan_arr.name( i ), mchan_arr.type( i ) );
 		}
-		MeController::init();
+		MeController::init(pawn);
 
 #define DEFAULT_REMOVE_EYEBALLS 1
 #if DEFAULT_REMOVE_EYEBALLS
@@ -187,7 +187,7 @@ void MeCtFace::finish_adding( void )	{
 		for (int c = 0; c < size; c++)
 		{
 			SkChannel& channel = nextKey->channels()[c];
-			SkJointName& jointName = nextKey->channels().name(c);
+			SkJointName jointName = nextKey->channels().name(c);
 			int baseChannelIndex = _base_pose_p->channels().search(jointName, channel.type);
 			if (baseChannelIndex >= 0)
 			{

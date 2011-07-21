@@ -1,7 +1,7 @@
 #include "ObjectManipulationHandle.h"
 #include "fltk_viewer.h"
 #include "vhcl.h"
-#include <fltk/gl.h>
+#include <FL/gl.h>
 #include <GL/glu.h>
 #include <sbm/mcontrol_util.h>
 
@@ -111,7 +111,8 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera& c
 		}
 		else if (pawn->colObj_p)
 		{
-			FltkViewer::drawColObject(pawn->colObj_p,pawn->colObj_p->worldState.gmat());
+			SrMat gmat = pawn->colObj_p->getWorldState().gmat();
+			FltkViewer::drawColObject(pawn->colObj_p, gmat);
 		}
 		else
 		{

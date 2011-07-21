@@ -27,7 +27,7 @@
  * matrix transformation
  */
 
-# include <SR/sr_sn.h>
+# include <sr/sr_sn.h>
 
 //======================================= SrSnMatrix ====================================
 

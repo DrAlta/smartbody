@@ -17,63 +17,198 @@
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
  *
  *  CONTRIBUTORS:
- *      Andrew n marshall, USC
+ *      Marcus Thiebaux, USC
  */
 
 #include "vhcl.h"
-#include <iostream>
-#include <sstream>
 #include <string>
-
-#include <xercesc/util/XMLStringTokenizer.hpp>
 
 #include "mcontrol_util.h"
 #include "bml_quickdraw.hpp"
 #include "me_ct_quick_draw.h"
 #include "bml_target.hpp"
 #include "xercesc_utils.hpp"
-#include <sbm/bml_xml_consts.hpp>
+#include "BMLDefs.h"
 
-
-#define DEBUG_DESCRIPTION_LEVELS	(0)
-
-
-////// XML ATTRIBUTES
-const XMLCh ATTR_ANIM[]         = L"anim";
-const XMLCh ATTR_SMOOTH[]       = L"smooth";
-const XMLCh ATTR_TRACK_DUR[]    = L"track-duration";
-const XMLCh ATTR_GUNDRAW_DUR[]   = L"gundraw-duration";
-const XMLCh ATTR_HOLSTER_DUR[]   = L"holster-duration";
-const XMLCh ATTR_AIM_OFFSET[]    = L"aim-offset";
-
-
-
-char* DEFAULT_QUICKDRAW_ANIM	= "AdultM_FastDraw001";
-
+char* DEFAULT_QUICKDRAW_ANIM	= (char*)"AdultM_FastDraw001";
 
 using namespace std;
 using namespace BML;
 using namespace xml_utils;
 
+#define REQUIRED_ATTR	(true)
 
-BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
-											 std::string& unique_id,
-											 BehaviorSyncPoints& behav_syncs,
-											 bool required,
-											 BmlRequestPtr request,
-											 mcuCBHandle *mcu )
-{
+BehaviorRequestPtr BML::parse_bml_quickdraw( 
+	DOMElement* elem,
+	string& unique_id,
+	BehaviorSyncPoints& behav_syncs,
+	bool required,
+	BmlRequestPtr request,
+	mcuCBHandle *mcu
+)	{
+
+	string localId = xml_parse_string( BMLDefs::ATTR_ID, elem, "", REQUIRED_ATTR );
+
+	string target = xml_parse_string( BMLDefs::ATTR_TARGET, elem, "", REQUIRED_ATTR );
+	if( target.empty() )	{
+		return BehaviorRequestPtr();  // NULL
+	}
+
+	SkJoint* joint = parse_target( BMLDefs::ATTR_TARGET, elem, mcu );
+	if( joint == NULL ) {  // invalid target (parse_target should have printed something)
+		return BehaviorRequestPtr();  // NULL
+	}
+
+	string anim_name = xml_parse_string( BMLDefs::ATTR_ANIM, elem, DEFAULT_QUICKDRAW_ANIM );
+	map< string, SkMotion* >::iterator motionIter = mcu->motion_map.find( anim_name );
+	if( motionIter ==  mcu->motion_map.end() ){
+		LOG( "BML::parse_bml_quickdraw ERR: unknown motion: \"%s\"", anim_name.c_str() );
+		return BehaviorRequestPtr();  // NULL
+	}
+	SkMotion* anim = (*motionIter).second;
+
+	float track_duration = xml_parse_float( BMLDefs::ATTR_TRACK_DUR, elem, -1.0 );
+
+	bool set_gundraw_dur_param = false;
+	float gundraw_dur = xml_parse_float( BMLDefs::ATTR_GUNDRAW_DUR, elem );
+	if( gundraw_dur > 0.0 ) set_gundraw_dur_param = true;
+
+	bool set_holster_dur_param = false;
+	float holster_dur = xml_parse_float( BMLDefs::ATTR_HOLSTER_DUR, elem );
+	if( holster_dur > 0.0 ) set_holster_dur_param = true;
+
+	bool set_aim_offset_param = false;
+	float aim_phr_arr[ 3 ] = { 0.0, 0.0, 0.0 };
+	int count = xml_parse_float( aim_phr_arr, 3, BMLDefs::ATTR_AIM_OFFSET, elem );
+	if( count > 0 )	{
+		if( count < 3 )	{
+			xml_parse_error( BMLDefs::ATTR_AIM_OFFSET, elem );
+		}
+		else	{
+			set_aim_offset_param = true;
+		}
+	}
+
+	bool set_smooth_param = false;
+	float smooth_factor = xml_parse_float( BMLDefs::ATTR_SMOOTH, elem, -1.0 );
+	if( smooth_factor >= 0.0 ) set_smooth_param = true;
+
+	MeCtQuickDraw* qdraw_ct = new MeCtQuickDraw();
+
+	qdraw_ct->init( const_cast<SbmCharacter*>(request->actor), anim );
+	qdraw_ct->set_target_joint( 0, 0, 0, joint );
+	qdraw_ct->set_track_duration( track_duration );
+	if( set_gundraw_dur_param ) qdraw_ct->set_gundraw_duration( gundraw_dur );
+	if( set_holster_dur_param ) qdraw_ct->set_holster_duration( holster_dur );
+	if( set_aim_offset_param ) qdraw_ct->set_aim_offset( aim_phr_arr[ 0 ], aim_phr_arr[ 1 ], aim_phr_arr[ 2 ] );
+	if( set_smooth_param ) qdraw_ct->set_smooth( smooth_factor );
+
+	return BehaviorRequestPtr( 
+		new MeControllerRequest( 
+			unique_id, 
+			localId, 
+			qdraw_ct, 
+			request->actor->motion_sched_p, 
+			behav_syncs 
+		) 
+	);
+}
+
+/*
+// CONVERSION TO THE ABOVE COMPRESSED BML PARSING...
+BehaviorRequestPtr BML::parse_bml_quickdraw( 
+	DOMElement* elem,
+	std::string& unique_id,
+	BehaviorSyncPoints& behav_syncs,
+	bool required,
+	BmlRequestPtr request,
+	mcuCBHandle *mcu
+)	{
+
     const XMLCh* tag      = elem->getTagName();
 
-	const XMLCh* id = elem->getAttribute(ATTR_ID);
+	std::string localId = xml_parse_string( BMLDefs::ATTR_ID, elem, "", REQUIRED_ATTR );
+	std::string target = xml_parse_string( BMLDefs::ATTR_TARGET, elem, "", REQUIRED_ATTR );
+	
+	if( target.empty() )	{
+		return BehaviorRequestPtr();  // NULL
+	}
+
+//	SkJoint* joint = const_cast<SkJoint*>( parse_target( tag, elem->getAttribute( BMLDefs::ATTR_TARGET ), mcu ) );
+	SkJoint* joint = parse_target( BMLDefs::ATTR_TARGET, elem, mcu );
+	if( joint == NULL ) {  // invalid target (parse_target should have printed something)
+		return BehaviorRequestPtr();  // NULL
+	}
+
+	string anim_name = xml_parse_string( BMLDefs::ATTR_ANIM, elem, DEFAULT_QUICKDRAW_ANIM );
+	std::map< std::string, SkMotion* >::iterator motionIter = mcu->motion_map.find( anim_name );
+	if( motionIter ==  mcu->motion_map.end() ){
+		LOG( "BML::parse_bml_quickdraw ERR: unknown motion: \"%s\"", anim_name.c_str() );
+		return BehaviorRequestPtr();  // NULL
+	}
+	SkMotion* anim = (*motionIter).second;
+
+	float track_duration = xml_parse_float( BMLDefs::ATTR_TRACK_DUR, elem, -1.0 );
+
+	bool set_gundraw_dur_param = false;
+	float gundraw_dur = xml_parse_float( BMLDefs::ATTR_GUNDRAW_DUR, elem );
+	if( gundraw_dur > 0.0 ) set_gundraw_dur_param = true;
+
+	bool set_holster_dur_param = false;
+	float holster_dur = xml_parse_float( BMLDefs::ATTR_HOLSTER_DUR, elem );
+	if( holster_dur > 0.0 ) set_holster_dur_param = true;
+
+	bool set_aim_offset_param = false;
+	float aim_phr_arr[ 3 ] = { 0.0, 0.0, 0.0 };
+	int count = xml_parse_float( aim_phr_arr, 3, BMLDefs::ATTR_AIM_OFFSET, elem );
+	if( count > 0 )	{
+		if( count < 3 )	{
+			xml_parse_error( BMLDefs::ATTR_AIM_OFFSET, elem );
+		}
+		else	{
+			set_aim_offset_param = true;
+		}
+	}
+
+#if 0
+	float aim_offset_p = 0.0;
+	float aim_offset_h = 0.0;
+	float aim_offset_r = 0.0;
+	const XMLCh* attrAimOffset = elem->getAttribute( BMLDefs::ATTR_AIM_OFFSET );
+	if( attrAimOffset && *attrAimOffset != 0 ) {
+		char* temp_ascii = XMLString::transcode( attrAimOffset );
+		string parse_buffer( temp_ascii );
+		istringstream parser( parse_buffer );
+		if( !( parser >> aim_offset_p >> aim_offset_h >> aim_offset_r ) ) {
+			std::wstringstream wstrstr;
+			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<< BMLDefs::ATTR_AIM_OFFSET<<"=\""<<attrAimOffset<<"\" is not valid.";
+			std::string str = convertWStringToString(wstrstr.str());
+			LOG(str.c_str());
+		}
+		else	{
+			set_aim_offset_param = true;
+		}
+		XMLString::release( &temp_ascii );
+	}
+#endif
+
+	bool set_smooth_param = false;
+	float smooth_factor = xml_parse_float( BMLDefs::ATTR_SMOOTH, elem, -1.0 );
+	if( smooth_factor >= 0.0 ) set_smooth_param = true;
+
+#if 0
+
+	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
 	if (id)
 		localId = XMLString::transcode(id);
 
-	const XMLCh* attrTarget = elem->getAttribute( ATTR_TARGET );
+	const XMLCh* attrTarget = elem->getAttribute( BMLDefs::ATTR_TARGET );
 	if( !attrTarget || *attrTarget == 0 ) {
-		std::wostringstream wstrstr;
-        wstrstr << "WARNING: BML::parse_bml_quickdraw(): <"<<tag<<"> BML tag missing "<<ATTR_TARGET<<"= attribute." << endl;
+		std::stringstream strm;
+		std:string tag_str = xml_translate_string( elem->getTagName() );
+		std:string attr_str = xml_translate_string( BMLDefs::ATTR_TARGET );
+        strm << "WARNING: BML::parse_bml_quickdraw(): <"<< tag_str <<"> BML tag missing "<< attr_str <<"= attribute." << endl;
 		return BehaviorRequestPtr();  // a.k.a., NULL
     }
 
@@ -83,7 +218,7 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 	}
 
 	string anim_name( DEFAULT_QUICKDRAW_ANIM );
-	const XMLCh* attrAnim = elem->getAttribute( ATTR_ANIM );
+	const XMLCh* attrAnim = elem->getAttribute( BMLDefs::ATTR_ANIM );
 	if( attrTarget && *attrAnim != 0 ) {
 		char* temp_ascii = XMLString::transcode( attrAnim );
 		anim_name = temp_ascii;
@@ -101,14 +236,14 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 	SkMotion* anim = (*motionIter).second;
 
 	float track_duration = -1;  // indefinite tracking by default
-	const XMLCh* attrTrackDur = elem->getAttribute( ATTR_TRACK_DUR );
+	const XMLCh* attrTrackDur = elem->getAttribute( BMLDefs::ATTR_TRACK_DUR );
 	if( attrTrackDur && *attrTrackDur != 0 ) {
 		char* temp_ascii = XMLString::transcode( attrTrackDur );
 		string parse_buffer( temp_ascii );
 		istringstream parser( parse_buffer );
 		if( !( parser >> track_duration ) ) {
 			std::wstringstream wstrstr;
-			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<<ATTR_TRACK_DUR<<"=\""<<attrTrackDur<<"\" is not a valid number.";
+			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<< BMLDefs::ATTR_TRACK_DUR<<"=\""<<attrTrackDur<<"\" is not a valid number.";
 			std::string str = convertWStringToString(wstrstr.str());
 			LOG(str.c_str());
 
@@ -118,14 +253,14 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 
 	bool set_gundraw_dur_param = false;
 	float gundraw_dur = 0.0;
-	const XMLCh* attrGundrawDur = elem->getAttribute( ATTR_GUNDRAW_DUR );
+	const XMLCh* attrGundrawDur = elem->getAttribute( BMLDefs::ATTR_GUNDRAW_DUR );
 	if( attrGundrawDur && *attrGundrawDur != 0 ) {
 		char* temp_ascii = XMLString::transcode( attrGundrawDur );
 		string parse_buffer( temp_ascii );
 		istringstream parser( parse_buffer );
 		if( !( parser >> gundraw_dur ) ) {
 			std::wstringstream wstrstr;
-			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<<ATTR_GUNDRAW_DUR<<"=\""<<attrGundrawDur<<"\" is not a valid number.";
+			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<< BMLDefs::ATTR_GUNDRAW_DUR<<"=\""<<attrGundrawDur<<"\" is not a valid number.";
 			std::string str = convertWStringToString(wstrstr.str());
 			LOG(str.c_str());
 		}
@@ -137,14 +272,14 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 
 	bool set_holster_dur_param = false;
 	float holster_dur = 0.0;
-	const XMLCh* attrHolsterDur = elem->getAttribute( ATTR_HOLSTER_DUR );
+	const XMLCh* attrHolsterDur = elem->getAttribute( BMLDefs::ATTR_HOLSTER_DUR );
 	if( attrHolsterDur && *attrHolsterDur != 0 ) {
 		char* temp_ascii = XMLString::transcode( attrHolsterDur );
 		string parse_buffer( temp_ascii );
 		istringstream parser( parse_buffer );
 		if( !( parser >> gundraw_dur ) ) {
 			std::wstringstream wstrstr;
-			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<<ATTR_HOLSTER_DUR<<"=\""<<attrHolsterDur<<"\" is not a valid number.";
+			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<< BMLDefs::ATTR_HOLSTER_DUR<<"=\""<<attrHolsterDur<<"\" is not a valid number.";
 			std::string str = convertWStringToString(wstrstr.str());
 			LOG(str.c_str());
 		}
@@ -158,14 +293,14 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 	float aim_offset_p = 0.0;
 	float aim_offset_h = 0.0;
 	float aim_offset_r = 0.0;
-	const XMLCh* attrAimOffset = elem->getAttribute( ATTR_AIM_OFFSET );
+	const XMLCh* attrAimOffset = elem->getAttribute( BMLDefs::ATTR_AIM_OFFSET );
 	if( attrAimOffset && *attrAimOffset != 0 ) {
 		char* temp_ascii = XMLString::transcode( attrAimOffset );
 		string parse_buffer( temp_ascii );
 		istringstream parser( parse_buffer );
 		if( !( parser >> aim_offset_p >> aim_offset_h >> aim_offset_r ) ) {
 			std::wstringstream wstrstr;
-			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<<ATTR_AIM_OFFSET<<"=\""<<attrAimOffset<<"\" is not valid.";
+			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<< BMLDefs::ATTR_AIM_OFFSET<<"=\""<<attrAimOffset<<"\" is not valid.";
 			std::string str = convertWStringToString(wstrstr.str());
 			LOG(str.c_str());
 		}
@@ -177,14 +312,14 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 
 	bool set_smooth_param = false;
 	float smooth_factor = 0.0;
-	const XMLCh* attrSmooth = elem->getAttribute( ATTR_SMOOTH );
+	const XMLCh* attrSmooth = elem->getAttribute( BMLDefs::ATTR_SMOOTH );
 	if( attrSmooth && *attrSmooth != 0 ) {
 		char* temp_ascii = XMLString::transcode( attrSmooth );
 		string parse_buffer( temp_ascii );
 		istringstream parser( parse_buffer );
 		if( !( parser >> smooth_factor ) ) {
 			std::wstringstream wstrstr;
-			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<<ATTR_SMOOTH<<"=\""<<attrSmooth<<"\" is not a valid number.";
+			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<< BMLDefs::ATTR_SMOOTH<<"=\""<<attrSmooth<<"\" is not a valid number.";
 			std::string str = convertWStringToString(wstrstr.str());
 			LOG(str.c_str());
 		}
@@ -193,15 +328,18 @@ BehaviorRequestPtr BML::parse_bml_quickdraw( DOMElement* elem,
 		}
 		XMLString::release( &temp_ascii );
 	}
+#endif
 
 	MeCtQuickDraw* qdraw_ct = new MeCtQuickDraw();
 	qdraw_ct->init( anim );
-	qdraw_ct->set_target_joint( 0, 0, 0, const_cast<SkJoint*>(joint) );
+	qdraw_ct->set_target_joint( 0, 0, 0, joint );
 	qdraw_ct->set_track_duration( track_duration );
 	if( set_gundraw_dur_param ) qdraw_ct->set_gundraw_duration( gundraw_dur );
 	if( set_holster_dur_param ) qdraw_ct->set_holster_duration( holster_dur );
-	if( set_aim_offset_param ) qdraw_ct->set_aim_offset( aim_offset_p, aim_offset_h, aim_offset_r );
+	if( set_aim_offset_param ) qdraw_ct->set_aim_offset( aim_phr_arr[ 0 ], aim_phr_arr[ 1 ], aim_phr_arr[ 2 ] );
+//	if( set_aim_offset_param ) qdraw_ct->set_aim_offset( aim_offset_p, aim_offset_h, aim_offset_r );
 	if( set_smooth_param ) qdraw_ct->set_smooth( smooth_factor );
 
 	return BehaviorRequestPtr( new MeControllerRequest( unique_id, localId, qdraw_ct, request->actor->motion_sched_p, behav_syncs ) );
 }
+*/

@@ -22,13 +22,11 @@
 
 #pragma once
 #include <map>
-#include <SK/sk_skeleton.h>
-#include <ME/me_controller.h>
+#include <sk/sk_skeleton.h>
+#include <me/me_controller.h>
 #include "me_ct_limb.hpp"
 #include "me_ct_jacobian_IK.hpp"
 #include "gwiz_math.h"
-
-//typedef std::set<SkMotion*> MotionDataSet;
 
 class EffectorJointConstraint : public EffectorConstraint
 {
@@ -73,6 +71,7 @@ public:
 	void updateDt(float curTime);
 };
 
+
 class MeCtConstraint : public MeController, public FadingControl
 {
 private:
@@ -110,7 +109,7 @@ public:
 	float           characterHeight;
 	double          ikDamp;
 public:			
-	void init (const char* rootName);
+	void init (SbmPawn* pawn, const char* rootName);
 	bool addEffectorJointPair(SkJoint* targetJoint, const char* effectorName, const char* effectorRootName, const SrVec& posOffset , const SrQuat& rotOffset , ConstraintType cType = CONSTRAINT_POS);
 	virtual void controller_map_updated();
 	virtual void controller_start();	

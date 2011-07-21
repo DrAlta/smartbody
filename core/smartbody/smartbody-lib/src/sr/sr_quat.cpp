@@ -19,7 +19,7 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
 
-# include <SR/sr_quat.h>
+# include <sr/sr_quat.h>
 
 //============================== Static Data ====================================
 

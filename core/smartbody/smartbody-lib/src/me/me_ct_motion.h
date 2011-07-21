@@ -27,12 +27,12 @@
 
 //=================================== MeCtMotion =====================================
 
-# include <SR/sr_hash_table.h>
-# include <SR/sr_buffer.h>
+# include <sr/sr_hash_table.h>
+# include <sr/sr_buffer.h>
 
-# include <SK/sk_motion.h>
+# include <sk/sk_motion.h>
 
-# include <ME/me_controller.h>
+# include <me/me_controller.h>
 #include <queue>
 
 /*! This motion controller provides a controller interface to play
@@ -70,8 +70,8 @@ class MeCtMotion : public MeController
         (SkMotion derives SrSharedClass and has ref/unref methods)
         The keytimes of m are translated to ensure start from zero. 
         MeController::init() is automatically called. */
-    void init ( SkMotion* m_p );
-    void init ( SkMotion* m_p, double time_offset, double time_scale );
+    void init (SbmPawn* pawn, SkMotion* m_p );
+    void init (SbmPawn* pawn, SkMotion* m_p, double time_offset, double time_scale );
 
 	/*! Initialize a controller by cloning another */
 //	void init ( MeCtMotion* other );

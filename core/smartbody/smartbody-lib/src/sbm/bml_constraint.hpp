@@ -30,9 +30,6 @@
 class mcuCBHandle;
 
 namespace BML {
-	const XMLCh TAG_CONSTRAINT[]      = L"sbm:constraint";
-
-
 	BML::BehaviorRequestPtr parse_bml_constraint( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
 };
 

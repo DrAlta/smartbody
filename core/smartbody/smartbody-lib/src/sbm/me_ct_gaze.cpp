@@ -23,6 +23,7 @@
  */
 
 #include "me_ct_gaze.h"
+#include "lin_win.h"
 using namespace gwiz;
 #include <vhcl_log.h>
 
@@ -131,16 +132,16 @@ int MeCtGaze::joint_index( const char *label )	{
 
 char * MeCtGaze::joint_label( const int index ) {
 	switch( index )	{
-		case GAZE_JOINT_SPINE1: return( "spine1" );
-		case GAZE_JOINT_SPINE2: return( "spine2" );
-		case GAZE_JOINT_SPINE3: return( "spine3" );
-		case GAZE_JOINT_SPINE4: return( "spine4" );
-		case GAZE_JOINT_SPINE5: return( "spine5" );
-		case GAZE_JOINT_SKULL:  return( "skullbase" );
-		case GAZE_JOINT_EYE_L:  return( "eyeball_left" );
-		case GAZE_JOINT_EYE_R:  return( "eyeball_right" );
+		case GAZE_JOINT_SPINE1: return( (char*)"spine1" );
+		case GAZE_JOINT_SPINE2: return( (char*)"spine2" );
+		case GAZE_JOINT_SPINE3: return( (char*)"spine3" );
+		case GAZE_JOINT_SPINE4: return( (char*)"spine4" );
+		case GAZE_JOINT_SPINE5: return( (char*)"spine5" );
+		case GAZE_JOINT_SKULL:  return( (char*)"skullbase" );
+		case GAZE_JOINT_EYE_L:  return( (char*)"eyeball_left" );
+		case GAZE_JOINT_EYE_R:  return( (char*)"eyeball_right" );
 	}
-	return( "UNKNOWN" ); // default err
+	return( (char*)"UNKNOWN" ); // default err
 }
 
 int MeCtGaze::key_index( const char *label )	{
@@ -161,16 +162,16 @@ int MeCtGaze::key_index( const char *label )	{
 
 char * MeCtGaze::key_label( const int key )	{
 	switch( key )	{
-		case GAZE_KEY_BACK: 	return( "BACK" );
-		case GAZE_KEY_CHEST:	return( "CHEST" );
-		case GAZE_KEY_NECK: 	return( "NECK" );
+		case GAZE_KEY_BACK: 	return( (char*)"BACK" );
+		case GAZE_KEY_CHEST:	return( (char*)"CHEST" );
+		case GAZE_KEY_NECK: 	return( (char*)"NECK" );
 #if GAZE_KEY_COMBINE_HEAD_AND_NECK
 #else
-		case GAZE_KEY_HEAD:		return( "HEAD" );
+		case GAZE_KEY_HEAD:		return((char*) "HEAD" );
 #endif
-		case GAZE_KEY_EYES: 	return( "EYES" );
+		case GAZE_KEY_EYES: 	return( (char*)"EYES" );
 	}
-	return( "UNKNOWN" ); // default err
+	return( (char*)"UNKNOWN" ); // default err
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -252,7 +253,7 @@ MeCtGaze::~MeCtGaze( void )	{
 	}
 }
 
-void MeCtGaze::init( int key_fr, int key_to )	{
+void MeCtGaze::init( SbmPawn* pawn, int key_fr, int key_to )	{
 	int i;
 	
 	joint_key_count = NUM_GAZE_KEYS;
@@ -368,7 +369,7 @@ void MeCtGaze::init( int key_fr, int key_to )	{
 		set_blend( i, 1.0f );
 	}
 
-	MeController::init();
+	MeController::init(pawn);
 
 #if TEST_SENSOR
 	sensor_p = new MeCtGazeSensor;
@@ -728,11 +729,11 @@ printf( "s2: %f\n", joint_arr[ GAZE_JOINT_SPINE2 ].local_pos.y() );
 printf( "s1: %f\n", joint_arr[ GAZE_JOINT_SPINE1 ].local_pos.y() );
 #endif
 
-	float_t interocular = 
+	gwiz::float_t interocular = 
 		joint_arr[ GAZE_JOINT_EYE_L ].local_pos.x() - 
 		joint_arr[ GAZE_JOINT_EYE_R ].local_pos.x();
 		
-	float_t height;
+	gwiz::float_t height;
 	
 	height = 
 		joint_arr[ GAZE_JOINT_EYE_L ].local_pos.y() +
@@ -959,7 +960,7 @@ void MeCtGaze::controller_start_evaluate( void )	{
 			joint_arr[ GAZE_JOINT_SKULL ].forward_rot;
 		
 		quat_t head_task_rot = ( -body_head_rot ).product( body_task_rot );
-		float_t head_task_deg = head_task_rot.degrees();
+		gwiz::float_t head_task_deg = head_task_rot.degrees();
 		head_speed = (float)( head_task_deg / head_time );
 //LOG( "MeCtGaze::controller_start TASK: %f deg  %f dps\n", head_task_deg, head_speed );
 	}

@@ -1,5 +1,5 @@
 #include "me_ct_reach_IK.hpp"
-#include <SR/sr_alg.h>
+#include <sr/sr_alg.h>
 
 
 MeCtReachIK::MeCtReachIK(void)
@@ -85,7 +85,8 @@ int MeCtReachIK::check_joint_limit( SrQuat* quat, int index )
  		if( tw > limit.twist_limit[0] ) tw = limit.twist_limit[0];
  		if( tw < limit.twist_limit[1] ) tw = limit.twist_limit[1];
 		
-		gwiz::quat_t ql = swingTwist2Quat(gwiz::vector_t(sw_y, sw_z, tw));//quat_t( sw_x, sw_y, tw);
+		gwiz::vector_t sr_tmp(sw_y, sw_z, tw);
+		gwiz::quat_t ql = swingTwist2Quat( sr_tmp );//quat_t( sw_x, sw_y, tw);
 		quat->set((float)ql.w(),(float)ql.x(),(float)ql.y(),(float)ql.z());
 	}	
 	return modified;

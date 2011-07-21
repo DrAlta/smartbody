@@ -32,100 +32,106 @@
 #include <sbm/bml.hpp>
 
 
-ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name) : Window(w, h, name), GenericViewer(x, y, w, h)
+ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(w, h, name), GenericViewer(x, y, w, h)
 {
 	set_default_values();
 	char value[10];
 	this->begin();
 
-	Group* firstGroup = new fltk::Group(10, 20, w - 20, h/4 - 20, "");
+	int yOffset = 20;
+	int xOffset = 10;
+	Fl_Group* firstGroup = new Fl_Group(xOffset, yOffset, w - 20, h/4 - 20, "");
 	firstGroup->begin();
-		character = new fltk::Choice(60, 20, w/8, 20, "Character");
+		character = new Fl_Choice(60 + xOffset, 20 + yOffset, w/8, 20, "Character");
 		loadCharacters(character);
 		character->callback(refreshChannels, this);
 
-		refresh = new fltk::Button(60+w/8+5, 20, w/16, 20, "Refresh");
+		refresh = new Fl_Button(60+w/8+5 + xOffset, 20 + yOffset, w/16, 20, "Refresh");
 		refresh->callback(refreshCharacters, this);
 
-		controller = new fltk::Choice(60, 50, w/4, 20, "Controller");
+		controller = new Fl_Choice(60 + xOffset, 50 + yOffset, w/4, 20, "Controller");
 		loadControllers(controller, character);
 		controller->callback(refreshControllerChannels, this);
 
-		check_hide_other_channels = new fltk::CheckButton(60, 70, 18, 18, "Hide other channels");
+		check_hide_other_channels = new Fl_Check_Button(60 + xOffset, 70 + yOffset, 18, 18, "Hide other channels");
 		check_hide_other_channels->callback(refreshHideOtherChannels, this);
-		check_hide_other_channels->state(true);
 		check_hide_other_channels->deactivate();
 
-		motion = new fltk::Choice(60, 100, w/4, 20, "Motion");
+		motion = new Fl_Choice(60 + xOffset, 100 + yOffset, w/4, 20, "Motion");
 		loadMotions(this);
 		motion->callback(refreshMotionChannels, this);
 
-		channel_filter = new fltk::Input(50+w/4+w/16+50, 0, w/4-50, 18, "Channels:");
-		channel_filter->when(fltk::WHEN_CHANGED);
+		channel_filter = new Fl_Input(50+w/4+w/16+50 + xOffset, 0 + yOffset, w/4-50, 18, "Channels:");
+		channel_filter->when(FL_WHEN_CHANGED);
 		channel_filter->callback(FilterChannelItem, this);
 
-		channel_list = new fltk::Browser(50+w/4+w/16, 20, w/4, 120, "");
-		channel_list->type(fltk::Browser::MULTI);
+		channel_list = new Fl_Multi_Browser(50+w/4+w/16 + xOffset, 20 + yOffset, w/4, 120, "");
 		loadChannels(this);
 		refreshChannelsWidget(this);
 		
-		channel_monitored_filter = new fltk::Input(50+w/2+w/8+20+50, 0, w/4-50, 18, "Monitored:");
-		channel_monitored_filter->when(fltk::WHEN_CHANGED);
+		channel_monitored_filter = new Fl_Input(50+w/2+w/8+20+50 + xOffset, 0 + yOffset, w/4-50, 18, "Monitored:");
+		channel_monitored_filter->when(FL_WHEN_CHANGED);
 		channel_monitored_filter->callback(FilterMonitoredChannelItem, this);
 
-		channel_monitor = new fltk::Browser(50+w/2+w/8+20, 20, w/4, 120, "");
-		channel_monitor->type(fltk::Browser::MULTI);
-		channel_monitor->when(fltk::WHEN_CHANGED);
+		channel_monitor = new Fl_Multi_Browser(50+w/2+w/8+20 + xOffset, 20 + yOffset, w/4, 120, "");
+		channel_monitor->when(FL_WHEN_CHANGED);
 		channel_monitor->callback(refreshBold, this);
 		refreshMonitoredChannelsWidget(this);
 
-		channel_add = new fltk::Button(50+w/2+w/16+10, 20, w/16, 20, ">>>");
+		channel_add = new Fl_Button(50+w/2+w/16+10 + xOffset, 20 + yOffset, w/16, 20, ">>>");
 		channel_add->callback(addMonitoredChannel, this);
 
-		channel_remove = new fltk::Button(50+w/2+w/16+10, 50, w/16, 20, "<<<");
+		channel_remove = new Fl_Button(50+w/2+w/16+10 + xOffset, 50 + yOffset, w/16, 20, "<<<");
 		channel_remove->callback(removeMonitoredChannel, this);
 
 	firstGroup->end();
 	this->resizable(firstGroup);
 
 
-	Group* secondGroup = new fltk::Group(10, h/4+30, w - 20, h/2 - 40, "");
+	yOffset =  h/4+30; 
+	
+	Fl_Group* secondGroup = new Fl_Group(xOffset, yOffset, w - 20, h/2 - 40, "");
 	secondGroup->begin();
-		frame_num = new fltk::Input(120, 0, 40, 18, "No. of frames shown:");
+		frame_num = new Fl_Input(120 + xOffset, 0 + yOffset, 40, 18, "No. of frames shown:");
 		sprintf(value, "%d", num_of_frames);
-		frame_num->when(fltk::WHEN_ENTER_KEY);
+		frame_num->when(FL_WHEN_ENTER_KEY);
 		frame_num->callback(refreshMaxSize, this);
 		frame_num->value(value);
 
-		quat = new fltk::Choice(300, 0, (int)(1.5f*w/8), 18, "Rotation shown as:");
+		quat = new Fl_Choice(300 + xOffset, 0 + yOffset, (int)(1.5f*w/8), 18, "Rotation shown as:");
 		quat->callback(refreshQuat, this);
 
-		show_x = new fltk::CheckButton(300+(int)(1.5f*w/8), 0, 18, 18, "X");
+		show_x = new Fl_Check_Button(300+(int)(1.5f*w/8) + xOffset, 0 + yOffset, 18, 18, "X");
 		show_x->callback(refreshShowX, this);
-		show_x->state(true);
-		show_y = new fltk::CheckButton(300+(int)(1.5f*w/8)+30, 0, 18, 18, "Y");
+		show_x->value(1);
+		show_x->activate();
+		show_y = new Fl_Check_Button(300+(int)(1.5f*w/8)+30 + xOffset, 0 + yOffset, 18, 18, "Y");
 		show_y->callback(refreshShowY, this);
-		show_y->state(true);
-		show_z = new fltk::CheckButton(300+(int)(1.5f*w/8)+60, 0, 18, 18, "Z");
+		show_y->value(1);
+		show_y->activate();
+		show_z = new Fl_Check_Button(300+(int)(1.5f*w/8)+60 + xOffset, 0 + yOffset, 18, 18, "Z");
 		show_z->callback(refreshShowZ, this);
-		show_z->state(true);
-		show_w = new fltk::CheckButton(300+(int)(1.5f*w/8)+90, 0, 18, 18, "W");
+		show_z->value(1);
+		show_z->activate();
+		show_w = new Fl_Check_Button(300+(int)(1.5f*w/8)+90 + xOffset, 0 + yOffset, 18, 18, "W");
 		show_w->callback(refreshShowW, this);
-		show_w->state(true);
+		show_w->value(1);
+		show_w->activate();
 
 		initQuat();
 
-		freeze = new fltk::Button(w-200, 0, 80, 18, "Freeze");
+		freeze = new Fl_Button(w-200 + xOffset, 0 + yOffset, 80, 18, "Freeze");
 		freeze->callback(freezeView, this);
 		is_freezed = false;
 
-		reset_camera = new fltk::Button(w-100, 0, 80, 18, "Reset Camera");
+		reset_camera = new Fl_Button(w-100 + xOffset, 0 + yOffset, 80, 18, "Reset Camera");
 		reset_camera->callback(resetCamera, this);
 
-		chartview = new GlChartView(0, 20, w-20, 3*h/4-60, "");
+		chartview = new GlChartView(0 + xOffset, 20 + yOffset, w-20, 3*h/4-60, (char*)"");
 	secondGroup->end();
 	secondGroup->resizable(chartview);
 	this->resizable(secondGroup);
+	this->size_range(800, 480);
 }
 
 ChannelBufferWindow::~ChannelBufferWindow()
@@ -153,7 +159,7 @@ void ChannelBufferWindow::initChannelItem(ChannelBufferWindow* window, int num)
 	}
 }
 
-void ChannelBufferWindow::refreshBold(fltk::Widget* widget, void* data)
+void ChannelBufferWindow::refreshBold(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	for(int i = 0; i < window->chartview->get_archive()->GetSeriesCount(); ++i)
@@ -162,9 +168,9 @@ void ChannelBufferWindow::refreshBold(fltk::Widget* widget, void* data)
 	}
 	for(int j = 0; j < window->channel_monitor->size(); ++j)
 	{
-		if(window->channel_monitor->selected(j))
+		if(window->channel_monitor->selected(j+1))
 		{
-			const char* label = window->channel_monitor->goto_index(j)->label();
+			const char* label = window->channel_monitor->text(j+1);//child(j)->label();
 			for(int i = 0; i < window->Channel_item_list.size(); ++i)
 			{
 				ChannelItem& item = window->Channel_item_list.get(i);
@@ -187,21 +193,21 @@ void ChannelBufferWindow::refreshBold(fltk::Widget* widget, void* data)
 	}
 }
 
-void ChannelBufferWindow::FilterChannelItem(fltk::Widget* widget, void* data)
+void ChannelBufferWindow::FilterChannelItem(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	FilterItem(window, window->channel_list, window->channel_filter, false);
 	refreshChannelsWidget(window);
 }
 
-void ChannelBufferWindow::FilterMonitoredChannelItem(fltk::Widget* widget, void* data)
+void ChannelBufferWindow::FilterMonitoredChannelItem(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	FilterItem(window, window->channel_monitor, window->channel_monitored_filter, true);
 	refreshMonitoredChannelsWidget(window);
 }
 
-void ChannelBufferWindow::FilterItem(ChannelBufferWindow* window, fltk::Browser* list, fltk::Input* filter, bool monitored)
+void ChannelBufferWindow::FilterItem(ChannelBufferWindow* window, Fl_Browser* list, Fl_Input* filter, bool monitored)
 {
 	const char* keyword = filter->value();
 	if(keyword[0] == '\0')
@@ -230,18 +236,18 @@ void ChannelBufferWindow::FilterItem(ChannelBufferWindow* window, fltk::Browser*
 	}
 }
 
-void ChannelBufferWindow::resetCamera(fltk::Widget* widget, void* data)
+void ChannelBufferWindow::resetCamera(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	int i = -1;
-	if(strcmp(window->quat->get_item()->label(), "Quaternion") == 0) i = 0;
-	else if(strcmp(window->quat->get_item()->label(), "Euler angle") == 0) i = 1;
-	else if (strcmp(window->quat->get_item()->label(), "Swing twist") == 0) i = 3;
+	if(strcmp(window->quat->mvalue()->label(), "Quaternion") == 0) i = 0;
+	else if(strcmp(window->quat->mvalue()->label(), "Euler angle") == 0) i = 1;
+	else if (strcmp(window->quat->mvalue()->label(), "Swing twist") == 0) i = 3;
 	window->chartview->init_camera(i);
 	window->chartview->update_coordinate = true;
 }
 
-void ChannelBufferWindow::freezeView(fltk::Widget* widget, void* data)
+void ChannelBufferWindow::freezeView(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	window->is_freezed = !window->is_freezed;
@@ -250,38 +256,38 @@ void ChannelBufferWindow::freezeView(fltk::Widget* widget, void* data)
 
 }
 
-void ChannelBufferWindow::refreshShowX(fltk::Widget* widget, void* data)
+void ChannelBufferWindow::refreshShowX(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	window->chartview->show_x = !window->chartview->show_x;
 }
 
-void ChannelBufferWindow::refreshShowY(fltk::Widget* widget, void* data)
+void ChannelBufferWindow::refreshShowY(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	window->chartview->show_y = !window->chartview->show_y;
 }
 
-void ChannelBufferWindow::refreshShowZ(fltk::Widget* widget, void* data)
+void ChannelBufferWindow::refreshShowZ(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	window->chartview->show_z = !window->chartview->show_z;
 }
 
-void ChannelBufferWindow::refreshShowW(fltk::Widget* widget, void* data)
+void ChannelBufferWindow::refreshShowW(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	window->chartview->show_w = !window->chartview->show_w;
 }
 
-void ChannelBufferWindow::refreshQuat(fltk::Widget* widget, void* data)
+void ChannelBufferWindow::refreshQuat(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	int i = 0;
 
-	if(strcmp(window->quat->get_item()->label(), "Quaternion") == 0) i = 0;
-	else if(strcmp(window->quat->get_item()->label(), "Euler angle") == 0) i = 1;
-	else if (strcmp(window->quat->get_item()->label(), "Swing twist") == 0) i = 3;
+	if(strcmp(window->quat->mvalue()->label(), "Quaternion") == 0) i = 0;
+	else if(strcmp(window->quat->mvalue()->label(), "Euler angle") == 0) i = 1;
+	else if (strcmp(window->quat->mvalue()->label(), "Swing twist") == 0) i = 3;
 	
 	window->chartview->set_quat_show_type(i);
 	setXYZVisibility(window);
@@ -291,46 +297,50 @@ void ChannelBufferWindow::initQuat()
 {
 	quat->add("Quaternion");
 	quat->add("Euler angle");
-	quat->add("Swing twist");
+	quat->add("Swing twist");	
+	quat->value(0);
 	setXYZVisibility(this);
 }
 
 void ChannelBufferWindow::setXYZVisibility(ChannelBufferWindow* window)
 {
-	fltk::Color color;
-	if(strcmp(window->quat->get_item()->label(), "Quaternion") == 0)
+	Fl_Color color;
+	const Fl_Menu_Item* menuValue = window->quat->mvalue();
+	if (!menuValue)
+		return;
+	if(strcmp(menuValue->label(), "Quaternion") == 0)
 	{
 		color = 0x38;
 		window->show_x->activate();
 		window->show_y->activate();
 		window->show_z->activate();
 		window->show_w->activate();
-		window->show_x->textcolor(color);
-		window->show_y->textcolor(color);
-		window->show_z->textcolor(color);
-		window->show_w->textcolor(color);
+		window->show_x->labelcolor(color);
+		window->show_y->labelcolor(color);
+		window->show_z->labelcolor(color);
+		window->show_w->labelcolor(color);
 	}
-	else if(strcmp(window->quat->get_item()->label(), "Euler angle") == 0)
+	else if(strcmp(menuValue->label(), "Euler angle") == 0)
 	{
 		color = 47;
 		window->show_x->activate();
 		window->show_y->activate();
 		window->show_z->activate();
 		window->show_w->deactivate();
-		window->show_w->textcolor(color);
+		window->show_w->labelcolor(color);
 	}
-	else if(strcmp(window->quat->get_item()->label(), "Swing twist") == 0)
+	else if(strcmp(menuValue->label(), "Swing twist") == 0)
 	{
 		color = 47;
 		window->show_x->activate();
 		window->show_y->activate();
 		window->show_z->activate();
 		window->show_w->deactivate();
-		window->show_w->textcolor(color);		
+		window->show_w->labelcolor(color);		
 	}
 }
 
-void ChannelBufferWindow::refreshMaxSize(fltk::Widget* widget, void* data)
+void ChannelBufferWindow::refreshMaxSize(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	if(window->mode == 2) 
@@ -369,9 +379,10 @@ void ChannelBufferWindow::loadMotions(ChannelBufferWindow* window)
 	{
 		window->motion->add((*it).first.c_str());
 	}
+	window->motion->value(0);
 }
 
-void ChannelBufferWindow::loadCharacters(fltk::Choice* character)
+void ChannelBufferWindow::loadCharacters(Fl_Choice* character)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	character->clear();
@@ -383,18 +394,18 @@ void ChannelBufferWindow::loadCharacters(fltk::Choice* character)
 		character->add(actor->name);
 	}
 	int ind = 0;
-	character->set_item(&ind, 0);
+	character->value(0);
 }
 
-void ChannelBufferWindow::loadControllers(fltk::Choice* controller, fltk::Choice* character)
+void ChannelBufferWindow::loadControllers(Fl_Choice* controller, Fl_Choice* character)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	controller->clear();
 
-	if(character->get_item()== NULL) return;
+	if(character->mvalue()== NULL) return;
 
-	SbmCharacter* actor = mcu.character_map.lookup(character->get_item()->label());
+	SbmCharacter* actor = mcu.character_map.lookup(character->mvalue()->label());
 
 	controller->add("All controllers");
 
@@ -404,13 +415,15 @@ void ChannelBufferWindow::loadControllers(fltk::Choice* controller, fltk::Choice
 		controller->add(actor->ct_tree_p->controller(i)->name());
 		actor->ct_tree_p->controller(i)->record_buffer_changes(true);
 	}
+	if (controller->mvalue() == NULL)
+		controller->value(0);
 }
 
 void ChannelBufferWindow::refreshChannelsWidget(ChannelBufferWindow* window)
 {
 	window->channel_list->clear();
 	int num = window->Channel_item_list.size();
-	fltk::Color color;
+	Fl_Color color;
 	color = 45;
 	for(int i = 0; i < num; ++i)
 	{
@@ -430,7 +443,7 @@ void ChannelBufferWindow::refreshChannelsWidget(ChannelBufferWindow* window)
 				else if(!window->hide_other_channels)
 				{
 					window->channel_list->add(&(item.label->get(0)));
-					window->channel_list->goto_index(window->channel_list->size()-1)->textcolor(color);
+					window->channel_list->child(window->channel_list->size()-1)->labelcolor(color);
 				}
 			}
 		}
@@ -439,7 +452,7 @@ void ChannelBufferWindow::refreshChannelsWidget(ChannelBufferWindow* window)
 
 void ChannelBufferWindow::refreshMonitoredChannelsWidget(ChannelBufferWindow* window)
 {
-	fltk::Color color;
+	Fl_Color color;
 	color = 47;
 	window->channel_monitor->clear();
 	int num = window->Channel_item_list.size();
@@ -449,17 +462,17 @@ void ChannelBufferWindow::refreshMonitoredChannelsWidget(ChannelBufferWindow* wi
 		if(item.monitored && !item.not_in_search)
 		{
 			window->channel_monitor->add(&(item.label->get(0)));
-			if(item.motion_filtered) window->channel_monitor->goto_index(window->channel_monitor->size()-1)->textcolor(color);
+			if(item.motion_filtered) window->channel_monitor->child(window->channel_monitor->size()-1)->labelcolor(color);
 		}
 	}
 }
 
 void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 {
-	fltk::Choice* character = window->character;
+	Fl_Choice* character = window->character;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	if(character->get_item()== NULL) return;
-	SbmCharacter* actor = mcu.character_map.lookup(character->get_item()->label());
+	if(character->mvalue()== NULL) return;
+	SbmCharacter* actor = mcu.character_map.lookup(character->mvalue()->label());
 	SkSkeleton* skeleton = actor->skeleton_p;
 
 	SkChannelArray& channels = skeleton->channels();
@@ -504,12 +517,12 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 
 const char* ChannelBufferWindow::getSelectedCharacterName()
 {
-	fltk::Widget* item = character->get_item();
+	const Fl_Menu_Item* item = character->mvalue();
 	if(item == NULL) return NULL;
-	return character->get_item()->label();
+	return character->mvalue()->label();
 }
 
-void ChannelBufferWindow::refreshCharacters(fltk::Widget* widget, void* data)
+void ChannelBufferWindow::refreshCharacters(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	loadCharacters(window->character);
@@ -517,13 +530,13 @@ void ChannelBufferWindow::refreshCharacters(fltk::Widget* widget, void* data)
 	loadMotions(window);
 }
 
-void ChannelBufferWindow::refreshControllers(fltk::Widget* widget, void* data)
+void ChannelBufferWindow::refreshControllers(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	loadControllers(window->controller, window->character);
 }
 
-void ChannelBufferWindow::refreshChannels(fltk::Widget* widget, void* data)
+void ChannelBufferWindow::refreshChannels(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	loadChannels(window);
@@ -532,14 +545,14 @@ void ChannelBufferWindow::refreshChannels(fltk::Widget* widget, void* data)
 	refreshMonitoredChannelsWidget(window);
 }
 
-void ChannelBufferWindow::refreshMotionChannels(fltk::Widget* widget, void* data)
+void ChannelBufferWindow::refreshMotionChannels(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	int j = 0;
 	refreshControllerVisibilities(window);
 	
-	if(strcmp(window->motion->get_item()->label(), &(window->no_motion.get(0))) == 0)
+	if(strcmp(window->motion->mvalue()->label(), &(window->no_motion.get(0))) == 0)
 	{
 		for(j = 0; j < window->Channel_item_list.size(); ++j)
 		{
@@ -556,8 +569,8 @@ void ChannelBufferWindow::refreshMotionChannels(fltk::Widget* widget, void* data
 		return;
 	}
 	window->mode = 2;
-	SbmCharacter* actor = mcu.character_map.lookup(window->character->get_item()->label());
-	std::map<std::string, SkMotion*>::iterator motionIter = mcu.motion_map.find(window->motion->get_item()->label());
+	SbmCharacter* actor = mcu.character_map.lookup(window->character->mvalue()->label());
+	std::map<std::string, SkMotion*>::iterator motionIter = mcu.motion_map.find(window->motion->mvalue()->label());
 	if (motionIter != mcu.motion_map.end())
 	{
 		SkMotion* motion = (*motionIter).second;
@@ -589,7 +602,7 @@ void ChannelBufferWindow::refreshMotionChannels(fltk::Widget* widget, void* data
 	refreshChannelsWidget(window);
 }
 
-void ChannelBufferWindow::refreshHideOtherChannels(fltk::Widget* widget, void* data)
+void ChannelBufferWindow::refreshHideOtherChannels(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	window->hide_other_channels = !window->hide_other_channels;
@@ -598,7 +611,7 @@ void ChannelBufferWindow::refreshHideOtherChannels(fltk::Widget* widget, void* d
 
 void ChannelBufferWindow::refreshControllerVisibilities(ChannelBufferWindow* window)
 {
-	if(strcmp(window->motion->get_item()->label(), &(window->no_motion.get(0))) == 0)
+	if(strcmp(window->motion->mvalue()->label(), &(window->no_motion.get(0))) == 0)
 	{
 		window->controller->activate();
 	}
@@ -608,21 +621,21 @@ void ChannelBufferWindow::refreshControllerVisibilities(ChannelBufferWindow* win
 		window->check_hide_other_channels->deactivate();
 		return;
 	}
-	if(strcmp(window->controller->get_item()->label(), "All controllers") == 0)
+	if(strcmp(window->controller->mvalue()->label(), "All controllers") == 0)
 	{
 		window->check_hide_other_channels->deactivate();
 	}
 	else window->check_hide_other_channels->activate();
 }
 
-void ChannelBufferWindow::refreshControllerChannels(fltk::Widget* widget, void* data)
+void ChannelBufferWindow::refreshControllerChannels(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
-	if(window->character->get_item() == NULL) return;
-	fltk::Browser* channels = window->channel_list;
+	if(window->character->mvalue() == NULL) return;
+	Fl_Browser* channels = window->channel_list;
 
 	refreshControllerVisibilities(window);
-	if(strcmp(window->controller->get_item()->label(), "All controllers") == 0)
+	if(strcmp(window->controller->mvalue()->label(), "All controllers") == 0)
 	{
 		for(int i = 0; i < window->Channel_item_list.size(); ++i)
 		{
@@ -632,7 +645,7 @@ void ChannelBufferWindow::refreshControllerChannels(fltk::Widget* widget, void* 
 		return;
 	}
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmCharacter* actor = mcu.character_map.lookup(window->character->get_item()->label());
+	SbmCharacter* actor = mcu.character_map.lookup(window->character->mvalue()->label());
 	
 	for(int i = 0; i < window->Channel_item_list.size(); ++i)
 	{
@@ -642,7 +655,7 @@ void ChannelBufferWindow::refreshControllerChannels(fltk::Widget* widget, void* 
 	int ct_num = actor->ct_tree_p->count_controllers();
 	for(int i = 0; i < ct_num; ++i)
 	{
-		if(strcmp(actor->ct_tree_p->controller(i)->name(), window->controller->get_item()->label())== 0)
+		if(strcmp(actor->ct_tree_p->controller(i)->name(), window->controller->mvalue()->label())== 0)
 		{
 			std::vector<float> buff = actor->ct_tree_p->controller(i)->get_buffer_changes();
 			SkChannelArray& channelsInUse = actor->ct_tree_p->controller(i)->controller_channels();
@@ -656,7 +669,7 @@ void ChannelBufferWindow::refreshControllerChannels(fltk::Widget* widget, void* 
 	refreshChannelsWidget(window);
 }
 
-void ChannelBufferWindow::addMonitoredChannel(fltk::Widget* widget, void* data)
+void ChannelBufferWindow::addMonitoredChannel(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	GlChartViewSeries* series = NULL;
@@ -665,8 +678,8 @@ void ChannelBufferWindow::addMonitoredChannel(fltk::Widget* widget, void* data)
 	SkMotion* motion = NULL;
 	if(window->mode == 2)
 	{
-		SbmCharacter* actor = mcu.character_map.lookup(window->character->get_item()->label());
-		motionIter = mcu.motion_map.find(window->motion->get_item()->label());
+		SbmCharacter* actor = mcu.character_map.lookup(window->character->mvalue()->label());
+		motionIter = mcu.motion_map.find(window->motion->mvalue()->label());
 		if (motionIter != mcu.motion_map.end())
 		{
 			motion = (*motionIter).second;
@@ -676,11 +689,11 @@ void ChannelBufferWindow::addMonitoredChannel(fltk::Widget* widget, void* data)
 
 	for(int i = 0; i < window->channel_list->size(); ++i)
 	{
-		if(window->channel_list->selected(i))
+		if(window->channel_list->selected(i+1))
 		{
 			for(int j = 0; j < window->Channel_item_list.size(); ++j)
 			{
-				if(strcmp(&(window->Channel_item_list.get(j).label->get(0)), window->channel_list->goto_index(i)->label()) == 0)
+				if(strcmp(&(window->Channel_item_list.get(j).label->get(0)), window->channel_list->text(i+1)) == 0)
 				{
 					ChannelItem& item = window->Channel_item_list.get(j);
 					item.monitored = true;
@@ -745,16 +758,16 @@ void ChannelBufferWindow::fillSeriesWithMotionData(ChannelBufferWindow* window, 
 	}
 }
 
-void ChannelBufferWindow::removeMonitoredChannel(fltk::Widget* widget, void* data)
+void ChannelBufferWindow::removeMonitoredChannel(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	for(int i = 0; i < window->channel_monitor->size(); ++i)
 	{
-		if(window->channel_monitor->selected(i))
+		if(window->channel_monitor->selected(i+1))
 		{
 			for(int j = 0; j < window->Channel_item_list.size(); ++j)
 			{
-				if(strcmp(&(window->Channel_item_list.get(j).label->get(0)), window->channel_monitor->goto_index(i)->label()) == 0)
+				if(strcmp(&(window->Channel_item_list.get(j).label->get(0)), window->channel_monitor->text(i+1)) == 0)
 				{
 					ChannelItem& item = window->Channel_item_list.get(j);
 					const char* label = &(item.label->get(0));
@@ -787,7 +800,7 @@ int ChannelBufferWindow::get_size(const char* title)
 
 void ChannelBufferWindow::draw()
 {
-	Window::draw();
+	Fl_Double_Window::draw();
 	chartview->render();
 }
 
@@ -820,7 +833,7 @@ void ChannelBufferWindow::update_viewer()
 
 void ChannelBufferWindow::show()
 {    
-	Window::show();   
+	Fl_Window::show();   
 }
 
 void ChannelBufferWindow::update()
@@ -829,7 +842,7 @@ void ChannelBufferWindow::update()
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		SbmPawn* pawn_p = NULL;
-		SbmCharacter* actor = mcu.character_map.lookup(character->get_item()->label());
+		SbmCharacter* actor = mcu.character_map.lookup(character->mvalue()->label());
 		mcu.pawn_map.reset();
 		while(pawn_p = mcu.pawn_map.next())
 		{
@@ -849,7 +862,7 @@ void ChannelBufferWindow::update()
 				int ct_num = actor->ct_tree_p->count_controllers();
 				for(int i = 0; i < ct_num; ++i)
 				{
-					if(strcmp(actor->ct_tree_p->controller(i)->name(), controller->get_item()->label())== 0)
+					if(strcmp(actor->ct_tree_p->controller(i)->name(), controller->mvalue()->label())== 0)
 					{
 						std::vector<float> buff = actor->ct_tree_p->controller(i)->get_buffer_changes();
 						SkChannelArray& channelsInUse = actor->ct_tree_p->controller(i)->controller_channels();
@@ -896,7 +909,7 @@ ChannelBufferViewerFactory::ChannelBufferViewerFactory()
 
 GenericViewer* ChannelBufferViewerFactory::create(int x, int y, int w, int h)
 {
-	ChannelBufferWindow* channelbufferWindow = new ChannelBufferWindow(x, y, w, h, "Channel Buffer");
+	ChannelBufferWindow* channelbufferWindow = new ChannelBufferWindow(x, y, w, h, (char*)"Channel Buffer");
 	return channelbufferWindow;
 }
 

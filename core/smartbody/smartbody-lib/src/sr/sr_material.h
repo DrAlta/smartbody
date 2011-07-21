@@ -26,10 +26,9 @@
 # ifndef SR_MATERIAL_H
 # define SR_MATERIAL_H
 
-# include <SR/sr_input.h> 
-# include <SR/sr_output.h> 
-
-# include <SR/sr_color.h>
+# include <sr/sr_input.h> 
+# include <sr/sr_output.h> 
+# include <sr/sr_color.h>
 
 /*! \class SrMaterial sr_material.h
     \brief specifies a material
@@ -41,7 +40,7 @@ class SrMaterial
     SrColor diffuse;   //!< default in float coords: 0.8, 0.8, 0.8, 1.0
     SrColor specular;  //!< default in float coords: 0.0, 0.0, 0.0, 1.0
     SrColor emission;  //!< default in float coords: 0.0, 0.0, 0.0, 1.0
-    srbyte  shininess; //!< default: 0, can be in : [0,128]
+    srbyte  shininess; //!< default: 0, can be in : [0,128]	
    public :
     
     /*! Initializes with the default values. */

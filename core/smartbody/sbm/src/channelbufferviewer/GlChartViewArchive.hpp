@@ -23,14 +23,14 @@
 #ifndef _GL_CHART_VIEW_ARCHIVE_H_
 #define _GL_CHART_VIEW_ARCHIVE_H_
 
-#include <SR/sr_vec.h>
-#include <SR/sr_vec2.h>
-#include <SR/sr_quat.h>
-#include <SR/sr_mat.h>
-#include <SR/sr_array.h>
-//#include <SR/sr_channel_array.h>
-#include <SR/sr_buffer.h>
-#include <SR/sr_string.h>
+#include <sr/sr_vec.h>
+#include <sr/sr_vec2.h>
+#include <sr/sr_quat.h>
+#include <sr/sr_mat.h>
+#include <sr/sr_array.h>
+//#include <sr/sr_channel_array.h>
+#include <sr/sr_buffer.h>
+#include <sr/sr_string.h>
 #include "string.h"
 #include "math.h"
 #include "stdlib.h"
@@ -103,8 +103,8 @@ public:
 	void SetColor(int index, SrVec& color);
 	SrVec GetColor(int index);
 
-	SrVec GetEulerFromQuaternion(SrQuat& quat);
-	SrVec GetSwingTwistFromQuaternion(SrQuat& quat);
+	static SrVec GetEulerFromQuaternion(SrQuat& quat);
+	static SrVec GetSwingTwistFromQuaternion(SrQuat& quat);
 
 protected:
 	int CheckIndex(int index);

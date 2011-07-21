@@ -21,7 +21,7 @@
  *      Ed Fast, USC
  */
 
-#include <ME/me_ct_unary.hpp>
+#include <me/me_ct_unary.hpp>
 
 
 #include <iostream>

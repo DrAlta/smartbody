@@ -5,11 +5,15 @@
 #include <external/ANN/ANN.h>
 
 
+
 class PoseExample;
 typedef std::vector<PoseExample> VecOfPoseExample;
 typedef std::vector<SrQuat> VecOfSrQuat;
 typedef std::vector<double> VecOfDouble;
 typedef std::vector<int>    VecOfInt;
+
+
+#if 0 
 
 using namespace std;
 
@@ -82,6 +86,8 @@ private:
 	static SrVec getWorldPos(SkJoint* joint);
 };
 
+#endif
+
 template <class T> void Plus(const vector<T>& A, const vector<T>& B, vector<T>& Out, double ratio)
 {
 	assert(A.size() == B.size());
@@ -92,7 +98,7 @@ template <class T> void Plus(const vector<T>& A, const vector<T>& B, vector<T>& 
 	}
 }
 
-template <class T, class S> void pairToVec(const vector<pair<T,S>>& A, vector<T>& outT, vector<S>& outS)
+template <class T, class S> void pairToVec(const vector<pair<T,S> >& A, vector<T>& outT, vector<S>& outS)
 {
 	outT.resize(A.size());
 	outS.resize(A.size());
@@ -102,7 +108,7 @@ template <class T, class S> void pairToVec(const vector<pair<T,S>>& A, vector<T>
 		outS[i] = A[i].second;
 	}
 }
-template <class T, class S> void vecToPair(vector<T>& vecT, vector<S>& vecS, vector<pair<T,S>>& outVec)
+template <class T, class S> void vecToPair(vector<T>& vecT, vector<S>& vecS, vector<pair<T,S> >& outVec)
 {
 	int numElem = vecT.size() < vecS.size() ? vecT.size() : vecS.size();
 	outVec.resize(numElem);

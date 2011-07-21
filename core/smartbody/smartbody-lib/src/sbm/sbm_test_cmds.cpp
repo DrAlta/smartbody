@@ -73,10 +73,10 @@ int sbm_set_test_func( srArgBuffer& args, mcuCBHandle *mcu  ) {
 int sbm_print_test_func( srArgBuffer& args, mcuCBHandle *mcu_p  ) {
 	string arg = args.read_token();
 	if( arg=="char" || arg=="character" ) {
-		LOG("Default test character: \"%s\"", mcu_p->test_character_default);
+		LOG("Default test character: \"%s\"", mcu_p->test_character_default.c_str() );
 		return CMD_SUCCESS;
 	} else {
-		LOG("ERROR: Unrecogized test variable \"%s\"", arg);
+		LOG("ERROR: Unrecogized test variable \"%s\"", arg.c_str() );
 		return CMD_NOT_FOUND;
 	}
 }
@@ -809,7 +809,7 @@ int test_bone_pos_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
 
 	
 	MeCtChannelWriter* boneWriter= new MeCtChannelWriter();
-	boneWriter->init(_channels, true);
+	boneWriter->init(character, _channels, true);
 	//quat_t q = euler_t(50,50,50);
 	float data[3] = { (float)args.read_double(), (float)args.read_double(), (float)args.read_double() };
 	//cout<<endl<<"here's the data "<<endl<<data[0]<<" "<<data[1]<<" "<<data[2]<<endl;

@@ -24,17 +24,13 @@
 #define BML_ANIMATION_HPP
 
 #include "bml.hpp"
-
+#include "BMLDefs.h"
 
 // Forward Declaration
 class mcuCBHandle;
 
-namespace BML {
-	const XMLCh TAG_SBM_ANIMATION[] = L"sbm:animation";
-	const XMLCh TAG_SBM_PANIMATION[] = L"sbm:panimation";
-	const XMLCh ATTR_SPEED[]        = L"ME:twarp";  // MotionEngine:time warp
-	const XMLCh ATTR_PVALUE[]        = L"sbm:value";
-
+namespace BML
+{
 	BML::BehaviorRequestPtr parse_bml_animation( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
 	BML::BehaviorRequestPtr parse_bml_panimation( DOMElement* elem, const std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, mcuCBHandle *mcu );
 };

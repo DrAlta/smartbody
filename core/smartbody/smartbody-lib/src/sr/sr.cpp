@@ -23,7 +23,7 @@
 # include <stdio.h>
 # include <string.h>
 
-# include <SR/sr.h>
+# include <sr/sr.h>
 
 //================================ sr.cpp ============================================
 

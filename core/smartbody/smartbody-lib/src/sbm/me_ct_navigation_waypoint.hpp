@@ -23,7 +23,7 @@
 #ifndef ME_CT_NAVIGATION_WAYPOINT_HPP
 #define ME_CT_NAVIGATION_WAYPOINT_HPP
 
-#include <ME/me_controller.h>
+#include <me/me_controller.h>
 
 
 /**

@@ -154,14 +154,14 @@ void ReachHandAction::reachPreCompleteAction( ReachStateData* rd )
 	std::string cmd;
 	std::string charName = rd->charName;
 	std::string targetName = targetPawn->name;	
-	// 	std::string wristName = "r_wrist";
-	// 	std::string reachType = "right";
-	// 	if (rd->reachType == MeCtReach::REACH_LEFT_ARM)
-	// 	{
-	// 		wristName = "l_wrist";
-	// 		reachType = "left";
-	// 	}	
-	// 	cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + reachType + "_gc\" sbm:wrist=\"" + wristName + "\"sbm:grab-type=\"" + reachType + "\" sbm:grab-state=\"start\" target=\"" + targetName  + "\"/>";
+// 	std::string wristName = "r_wrist";
+// 	std::string reachType = "right";
+// 	if (rd->reachType == MeCtReach::REACH_LEFT_ARM)
+// 	{
+// 		wristName = "l_wrist";
+// 		reachType = "left";
+// 	}	
+// 	cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + reachType + "_gc\" sbm:wrist=\"" + wristName + "\"sbm:grab-type=\"" + reachType + "\" sbm:grab-state=\"start\" target=\"" + targetName  + "\"/>";
 
 	cmd = generateGrabCmd(charName,targetName,"start",rd->reachType);
 	sendReachEvent(cmd);
@@ -178,13 +178,13 @@ void ReachHandAction::reachCompleteAction( ReachStateData* rd )
 	std::string cmd;
 	std::string charName = rd->charName;
 	std::string targetName = targetPawn->name;
-	// 	std::string wristName = "r_wrist";
-	// 	std::string reachType = "right";
-	// 	if (rd->reachType == MeCtReach::REACH_LEFT_ARM)
-	// 	{
-	// 		wristName = "l_wrist";
-	// 		reachType = "left";
-	// 	}	
+// 	std::string wristName = "r_wrist";
+// 	std::string reachType = "right";
+// 	if (rd->reachType == MeCtReach::REACH_LEFT_ARM)
+// 	{
+// 		wristName = "l_wrist";
+// 		reachType = "left";
+// 	}	
 	cmd = generateGrabCmd(charName,targetName,"reach",rd->reachType);
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:wrist=\"r_wrist\" sbm:grab-state=\"reach\" target=\"" + targetName  + "\"/>";
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + reachType + "_gc\" sbm:wrist=\"" + wristName + "\"sbm:grab-type=\"" + reachType + "\" sbm:grab-state=\"reach\" target=\"" + targetName  + "\"/>";
@@ -212,7 +212,7 @@ void ReachHandAction::reachReturnAction( ReachStateData* rd )
 	cmd = generateGrabCmd(charName,"","return",rd->reachType);
 	sendReachEvent(cmd);	
 	cmd = "char " + charName + " gazefade out 0.5";
-	sendReachEvent(cmd);
+	//sendReachEvent(cmd);
 	rd->effectorState.removeAttachedPawn(rd);
 }
 
@@ -313,6 +313,11 @@ std::string ReachHandAction::generateAttachCmd( std::string charName, std::strin
 /************************************************************************/
 void ReachHandPickUpAction::reachCompleteAction( ReachStateData* rd )
 {
+	if (!rd->ikReachTarget)
+	{
+		ReachHandAction::reachPreReturnAction(rd);
+		return;
+	}
 	ReachHandAction::reachCompleteAction(rd);
 	rd->effectorState.setAttachedPawn(rd);
 	pickUpAttachedPawn(rd);
@@ -329,7 +334,7 @@ void ReachHandPickUpAction::reachReturnAction( ReachStateData* rd )
 	std::string cmd;
 	std::string charName = rd->charName;	
 	cmd = "char " + charName + " gazefade out 0.5";
-	sendReachEvent(cmd);
+	//sendReachEvent(cmd);
 }
 /************************************************************************/
 /* Reach Hand Put-Down Action                                           */
@@ -349,7 +354,7 @@ void ReachHandPutDownAction::reachReturnAction( ReachStateData* rd )
 	sendReachEvent(cmd);	
 
 	cmd = "char " + charName + " gazefade out 0.5";
-	sendReachEvent(cmd);
+	//sendReachEvent(cmd);
 }
 
 SRT ReachHandPutDownAction::getHandTargetStateOffset( ReachStateData* rd, SRT& naturalState )
@@ -367,7 +372,7 @@ ReachStateData::ReachStateData()
 	stateTime = 0.f;
 	blendWeight = 0.f;
 	dt = du = 0.f;
-	startReach = endReach = useExample = locomotionComplete = newTarget = hasSteering = false;
+	startReach = endReach = useExample = locomotionComplete = newTarget = hasSteering = ikReachTarget = false;
 	autoReturnTime = -1.f;
 	reachType = MeCtReach::REACH_RIGHT_ARM;
 
@@ -389,7 +394,7 @@ void ReachStateData::updateReachState(const SrMat& worldOffset, BodyMotionFrame&
 
 void ReachStateData::updateBlendWeight( SrVec paraPos )
 {
-	SrVec localTarget = paraPos*gmat.inverse();
+	SrVec localTarget = paraPos*gmat.inverse();	
 	dVector para; para.resize(3);
 	for (int i=0;i<3;i++)
 		para[i] = localTarget[i];
@@ -527,11 +532,11 @@ void ReachStateInterface::updateMotionInterp( ReachStateData* rd )
 	rd->curRefTime += rd->du;
 }
 
-bool ReachStateInterface::ikTargetReached( ReachStateData* rd )
+bool ReachStateInterface::ikTargetReached( ReachStateData* rd, float ratio )
 {
 	EffectorState& estate = rd->effectorState;
 	float dist = SRT::dist(estate.curState,estate.targetState);
-	return (dist < rd->reachRegion*0.1f);
+	return (dist < rd->reachRegion*ratio);
 }
 
 bool ReachStateInterface::interpTargetReached( ReachStateData* rd )
@@ -561,6 +566,7 @@ std::string ReachStateIdle::nextState( ReachStateData* rd )
 	if (rd->startReach)
 	{		
 		rd->curRefTime = 0.f;
+		rd->ikReachTarget = false;
 		// test the distance to the target	
 		{
 			//printf("idle to start\n");
@@ -605,12 +611,14 @@ std::string ReachStateStart::nextState( ReachStateData* rd )
 	std::string nextStateName = "Start";
 	if (interpTargetReached(rd))
 	{
-		//if (ikTargetReached(rd))
+		//if (ikTargetReached(rd,10.f))
+		rd->ikReachTarget = ikTargetReached(rd,2.f);
 		{
 			rd->curHandAction->reachCompleteAction(rd);
-			//rd->startReach = false;
 			nextStateName = "Complete";
+			//rd->startReach = false;		
 		}
+		
 		// 		else
 		// 		{
 		// 			rd->startReach = false;

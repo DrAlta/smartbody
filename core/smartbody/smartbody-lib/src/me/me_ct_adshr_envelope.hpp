@@ -23,7 +23,7 @@
 #ifndef ME_CT_ADSHR_ENVELOPE_HPP
 #define ME_CT_ADSHR_ENVELOPE_HPP
 
-#include <ME/me_controller.h>
+#include <me/me_controller.h>
 
 
 /**
@@ -61,7 +61,7 @@ public:
 	/**
 	 *  Initializes the controller with a set of channels to write to.
 	 */
-	bool init( SkChannelArray& channels );
+	bool init(SbmPawn* pawn, SkChannelArray& channels );
 
 	float base_level() const { return _base_level; }
 	float amplitude() const  { return _amplitude; }

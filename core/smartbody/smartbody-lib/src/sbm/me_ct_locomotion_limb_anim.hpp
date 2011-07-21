@@ -26,7 +26,7 @@
 #include "me_ct_locomotion_timing_space.hpp"
 #include "me_ct_locomotion_anim_global_info.hpp"
 #include "me_ct_locomotion_func.hpp"
-#include <SK/sk_motion.h>
+#include <sk/sk_motion.h>
 
 #pragma once
 

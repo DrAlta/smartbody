@@ -23,7 +23,7 @@
 #ifndef ME_LOCOMOTION_ANIM_GLOBAL_INFO_HPP
 #define ME_LOCOMOTION_ANIM_GLOBAL_INFO_HPP
 
-#include <SK/sk_motion.h>
+#include <sk/sk_motion.h>
 
 #pragma once
 

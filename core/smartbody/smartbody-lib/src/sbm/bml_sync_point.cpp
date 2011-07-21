@@ -30,6 +30,7 @@
 #include "bml.hpp"
 #include "bml_exception.hpp"
 #include "bml_xml_consts.hpp"
+#include "BMLDefs.h"
 
 
 using namespace std;
@@ -114,13 +115,13 @@ NamedSyncPointPtr::NamedSyncPointPtr( const NamedSyncPointPtr& other )
 // default constructor
 BehaviorSyncPoints::BehaviorSyncPoints()
 {
-	start_it = insert( ATTR_START, SyncPointPtr(), end() );
-	ready_it = insert( ATTR_READY, SyncPointPtr(), end() );
-	stroke_start_it = insert( ATTR_STROKE_START, SyncPointPtr(), end() );
-	stroke_it = insert( ATTR_STROKE, SyncPointPtr(), end() );
-	stroke_end_it = insert( ATTR_STROKE_END, SyncPointPtr(), end() );
-	relax_it = insert( ATTR_RELAX, SyncPointPtr(), end() );
-	end_it = insert( ATTR_END, SyncPointPtr(), end() );
+	start_it = insert( xml_utils::xml_translate_wide( BMLDefs::ATTR_START ), SyncPointPtr(), end() );
+	ready_it = insert( xml_utils::xml_translate_wide( BMLDefs::ATTR_READY ), SyncPointPtr(), end() );
+	stroke_start_it = insert( xml_utils::xml_translate_wide( BMLDefs::ATTR_STROKE_START ), SyncPointPtr(), end() );
+	stroke_it = insert( xml_utils::xml_translate_wide( BMLDefs::ATTR_STROKE ), SyncPointPtr(), end() );
+	stroke_end_it = insert( xml_utils::xml_translate_wide( BMLDefs::ATTR_STROKE_END ), SyncPointPtr(), end() );
+	relax_it = insert( xml_utils::xml_translate_wide( BMLDefs::ATTR_RELAX ), SyncPointPtr(), end() );
+	end_it = insert( xml_utils::xml_translate_wide( BMLDefs::ATTR_END ), SyncPointPtr(), end() );
 }
 
 BehaviorSyncPoints::BehaviorSyncPoints( const BehaviorSyncPoints& other )
@@ -135,13 +136,13 @@ BehaviorSyncPoints::BehaviorSyncPoints( const BehaviorSyncPoints& other )
 	}
 
 	// Rebuild Convience references
-	start_it = find( ATTR_START );
-	ready_it = find( ATTR_READY );
-	stroke_start_it = find( ATTR_STROKE_START );
-	stroke_it = find( ATTR_STROKE );
-	stroke_end_it = find( ATTR_STROKE_END );
-	relax_it = find( ATTR_RELAX );
-	end_it = find( ATTR_END );
+	start_it = find( xml_utils::xml_translate_wide( BMLDefs::ATTR_START ) );
+	ready_it = find( xml_utils::xml_translate_wide( BMLDefs::ATTR_READY ) );
+	stroke_start_it = find( xml_utils::xml_translate_wide( BMLDefs::ATTR_STROKE_START ) );
+	stroke_it = find( xml_utils::xml_translate_wide( BMLDefs::ATTR_STROKE ) );
+	stroke_end_it = find( xml_utils::xml_translate_wide( BMLDefs::ATTR_STROKE_END ) );
+	relax_it = find( xml_utils::xml_translate_wide( BMLDefs::ATTR_RELAX ) );
+	end_it = find( xml_utils::xml_translate_wide( BMLDefs::ATTR_END ) );
 
 	
 	const std::map<std::wstring, std::wstring>& nameMap = other.getBehaviorToSyncNames();
@@ -252,8 +253,8 @@ void BehaviorSyncPoints::parseStandardSyncPoints( DOMElement* elem, BmlRequestPt
 	
 
 	// DOM functions never return NULL
-	const wstring tag = elem->getTagName();
-	const wstring id  = elem->getAttribute( ATTR_ID );
+//	const wstring tag = elem->getTagName();
+	const wstring id  = xml_utils::xml_translate_wide( BMLDefs::ATTR_ID );
 
 	/////////////////////// Create fake ID value?
 	//if( !id ) {
@@ -278,61 +279,61 @@ void BehaviorSyncPoints::parseStandardSyncPoints( DOMElement* elem, BmlRequestPt
 	//}
 
 	// Load SyncPoint references
-	start_it        = parseSyncPointAttr( elem, id, ATTR_START,        request, behavior_id );
-	ready_it        = parseSyncPointAttr( elem, id, ATTR_READY,        request, behavior_id );
-	stroke_start_it = parseSyncPointAttr( elem, id, ATTR_STROKE_START, request, behavior_id );
-	stroke_it       = parseSyncPointAttr( elem, id, ATTR_STROKE,       request, behavior_id );
-	stroke_end_it   = parseSyncPointAttr( elem, id, ATTR_STROKE_END,   request, behavior_id );
-	relax_it        = parseSyncPointAttr( elem, id, ATTR_RELAX,        request, behavior_id );
-	end_it          = parseSyncPointAttr( elem, id, ATTR_END,          request, behavior_id );
+	start_it        = parseSyncPointAttr( elem, id, xml_utils::xml_translate_wide( BMLDefs::ATTR_START ),        request, behavior_id );
+	ready_it        = parseSyncPointAttr( elem, id, xml_utils::xml_translate_wide( BMLDefs::ATTR_READY ),        request, behavior_id );
+	stroke_start_it = parseSyncPointAttr( elem, id, xml_utils::xml_translate_wide( BMLDefs::ATTR_STROKE_START ), request, behavior_id );
+	stroke_it       = parseSyncPointAttr( elem, id, xml_utils::xml_translate_wide( BMLDefs::ATTR_STROKE ),       request, behavior_id );
+	stroke_end_it   = parseSyncPointAttr( elem, id, xml_utils::xml_translate_wide( BMLDefs::ATTR_STROKE_END ),   request, behavior_id );
+	relax_it        = parseSyncPointAttr( elem, id, xml_utils::xml_translate_wide( BMLDefs::ATTR_RELAX ),        request, behavior_id );
+	end_it          = parseSyncPointAttr( elem, id, xml_utils::xml_translate_wide( BMLDefs::ATTR_END ),          request, behavior_id );
 }
 
 
 BehaviorSyncPoints::iterator BehaviorSyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const string& behavior_id ) {
 	
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	//  Get behavior id as wstring
-	wstring behavior_wid;
-	{
-		XMLCh* temp = XMLString::transcode( behavior_id.c_str() );
-		behavior_wid = temp;
-		XMLString::release( &temp );
-	}
 
 	// Does the sync point already exist?
 	MapNameToPos::iterator map_it = name_to_pos.find( sync_attr );
 	if( map_it != name_to_pos.end() && map_it->second->sync() ) {
 		// SyncPoint of this name already exists
 
+		std::string e = xml_utils::xml_w2s( elem_id );
+		std::string a = xml_utils::xml_w2s( sync_attr );
+		LOG( "BehaviorSyncPoints::parseSyncPointAttr ERR: >>SyncPoint of this name already exists<< %s %s", e.c_str(), a.c_str() );
+#if 0
 		// TODO: Throw BML ParsingException
-		std::wstringstream wstrstr;
-		wstrstr << "ERROR: Behavior \""<<behavior_wid<<"\": BehaviorSyncPoints contains SyncPoint with id \"" << sync_attr << "\".  Ignoring attribute in <"<<elem->getTagName();
+		std::stringstream strm;
+		strm << "ERROR: Behavior \""<<behavior_id<<"\": BehaviorSyncPoints contains SyncPoint with id \"" << sync_attr << "\".  Ignoring attribute in <"<<elem->getTagName();
 		if( !elem_id.empty() )
-			wstrstr<<"> id=\""<<elem_id<<"\"";
+			strm<<"> id=\""<<elem_id<<"\"";
 		else
-			wstrstr<<">";
-		wstrstr << " and returning existing SyncPoint.";
-		std::string str = convertWStringToString(wstrstr.str());
-		LOG(str.c_str());
+			strm<<">";
+		strm << " and returning existing SyncPoint.";
+		LOG(strm.str().c_str());
+#endif
 		return map_it->second;
 	}
 
 	// Get the sync refernce string
-	const XMLCh* sync_ref = elem->getAttribute( sync_attr.c_str() );
-	bool has_sync_ref = sync_ref!=NULL && sync_ref[0]!=0;
+
+	XMLCh* xml_ch_p = xml_utils::xmlch_translate( xml_utils::xml_w2s( sync_attr ) );
+	const XMLCh* sync_ref = elem->getAttribute( xml_ch_p );
+	xml_utils::xmlch_release( & xml_ch_p );
 
 	SyncPointPtr sync;  // unset by default
 	if( sync_ref!=NULL && sync_ref[0]!=0 ) {
 		// Has sync reference.
-		sync = request->getSyncByReference( sync_ref );  // Parses the sync reference notation
+		sync = request->getSyncByReference( xml_utils::xml_translate_wide( sync_ref ) );  // Parses the sync reference notation
 
 		// add to the map of beahvior -> sync point names (ashapiro 5/24/10)
-		behaviorToSyncName.insert(std::pair<std::wstring, std::wstring>(sync_attr, sync_ref));
+		
+		behaviorToSyncName.insert(std::pair<std::wstring, std::wstring>(sync_attr, xml_utils::xml_translate_wide(sync_ref)));
 
 		if( !sync ) {
 			// 8-bit C-string references
-			char* temp_sync_att = XMLString::transcode( sync_attr.c_str() );
-			char* temp_sync_ref = XMLString::transcode( sync_ref );
+			string temp_sync_att = xml_utils::xml_w2s( sync_attr );
+			string temp_sync_ref = xml_utils::xml_translate_string( sync_ref );
 
 			std::stringstream strstr;
 			strstr << "BehaviorSyncPoint:parseSyncPointAttr(..): Invalid SyncPoint reference \"" << temp_sync_ref << "\" in behavior \"" << behavior_id << "\" " << temp_sync_att << "; generated unconstrained sync point.";		
@@ -344,11 +345,6 @@ BehaviorSyncPoints::iterator BehaviorSyncPoints::parseSyncPointAttr( DOMElement*
 #else
 			throw BML::ParsingException( oss.str().c_str() );
 #endif
-
-			XMLString::release( &temp_sync_att );
-			XMLString::release( &temp_sync_ref );
-
-			
 		}
 	} else {
 		sync = request->start_trigger->addSyncPoint();
@@ -379,9 +375,9 @@ string BehaviorSyncPoints::debug_label( SyncPointPtr& sync ) {
 		out << "SyncPoint #" << count;
 	}
 	if( !id.empty() ) {
-		const char* ascii = xml_utils::asciiString( id.c_str() );
-		out << " \"" << ascii << "\"";
-		delete[] ascii;
+
+		string id_str = xml_utils::xml_w2s( id );
+		out << " \"" << id_str << "\"";
 	}
 
 	return out.str();
@@ -466,7 +462,7 @@ void BehaviorSyncPoints::applyParentTimes( std::string& warning_context ) {
 			if( parent ) {
 				if( parent->is_set() ) {
 					if( sync->is_set() ) {
-						char* ascii_sync_id = XMLString::transcode( it->name().c_str() );
+						string ascii_sync_id = xml_utils::xml_w2s( it->name() );
 
 						std::stringstream strstr;
 						strstr << "WARNING: ";
@@ -474,12 +470,10 @@ void BehaviorSyncPoints::applyParentTimes( std::string& warning_context ) {
 							strstr << warning_context << ": ";
 						strstr << "SyncPoint \""<<ascii_sync_id<<"\" time set before applyParentTimes().";
 						LOG(strstr.str().c_str());
-
-						delete [] ascii_sync_id;
 					}
 					sync->time = parent->time + sync->offset;
 				} else {
-					char* ascii_sync_id = XMLString::transcode( it->name().c_str() );
+					string ascii_sync_id = xml_utils::xml_w2s( it->name() );
 
 					// Parent not set!!
 					std::stringstream strstr;
@@ -488,8 +482,6 @@ void BehaviorSyncPoints::applyParentTimes( std::string& warning_context ) {
 						strstr << warning_context << ": ";
 					strstr << "SyncPoint \""<<ascii_sync_id<<"\" parent unset.";
 					LOG(strstr.str().c_str());
-
-					delete [] ascii_sync_id;
 				}
 			}
 		}
@@ -535,3 +527,4 @@ const std::map<std::wstring, std::wstring>& BehaviorSyncPoints::getBehaviorToSyn
 {
 	return behaviorToSyncName;
 }
+

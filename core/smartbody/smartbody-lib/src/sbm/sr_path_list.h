@@ -99,7 +99,7 @@ class srPathList	{
 
 					SrString candidatePath;
 					candidatePath.make_valid_path(strstr.str().c_str());
-					std::string finalPath = candidatePath;
+					std::string finalPath = (const char*)candidatePath;
 					// remove the final '/'
 					finalPath = finalPath.substr(0, finalPath.size() - 1);
 					

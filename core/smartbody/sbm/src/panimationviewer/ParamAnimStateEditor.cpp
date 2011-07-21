@@ -24,49 +24,55 @@
 #include <sbm/mcontrol_util.h>
 #include "ParamAnimBlock.h"
 
-PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* window) : fltk::Group(x, y, w, h), paWindow(window)
+PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h), paWindow(window)
 {
 	this->label("State Editor");
 	this->begin();
-		stateEditorMode = new CheckButton(xDis, yDis, 200, 2 * yDis, "Create State Mode");
+		stateEditorMode = new Fl_Check_Button(xDis + x, yDis + y, 200, 2 * yDis, "Create State Mode");
 		stateEditorMode->callback(changeStateEditorMode, this);
 
-		createStateGroup = new Group(xDis, 4 * yDis, w - 2 * xDis, h /2 - 4 * yDis, "new state");
+		int csx = xDis + x;
+		int csy = 4 * yDis + y;
+		createStateGroup = new Fl_Group(csx, csy, w - 2 * xDis, h /2 - 4 * yDis, "new state");
 		int createStateGroupW = w - 2 * xDis;
 		int createStateGroupH = h /2 - 4 * yDis;
 		createStateGroup->begin();
-			createStateButton = new Button(xDis, yDis, 10 * xDis, 2 * yDis, "Create State");
+			createStateButton = new Fl_Button(xDis + csx, yDis + csy, 10 * xDis, 2 * yDis, "Create State");
 			createStateButton->callback(createNewState, this);
-			newStateName = new Input(createStateGroupW -  11 * xDis, yDis, 10 * xDis, 2 * yDis, "New State Name:");
-			animationList = new Browser(xDis, 4 * yDis, createStateGroupW / 2 - 5 * xDis, createStateGroupH - 5 * yDis);
-			animationList->type(Browser::MULTI);
-			stateAnimationList = new Browser(createStateGroupW / 2 + 4 * xDis, 4 * yDis, createStateGroupW / 2 - 5 * xDis, createStateGroupH - 5 * yDis);
-			stateAnimationList->type(Browser::MULTI);
-			animationAdd = new Button(createStateGroupW / 2 - 3 * xDis, createStateGroupH / 2, 6 * xDis, 2 * yDis, ">>>");
+			newStateName = new Fl_Input(createStateGroupW -  11 * xDis + csx, yDis + csy, 10 * xDis, 2 * yDis, "New State Name:");
+			animationList = new Fl_Multi_Browser(xDis + csx, 4 * yDis + csy, createStateGroupW / 2 - 5 * xDis, createStateGroupH - 5 * yDis);
+			stateAnimationList = new Fl_Multi_Browser(createStateGroupW / 2 + 4 * xDis + csx, 4 * yDis + csy, createStateGroupW / 2 - 5 * xDis, createStateGroupH - 5 * yDis);
+			animationAdd = new Fl_Button(createStateGroupW / 2 - 3 * xDis + csx, createStateGroupH / 2 + csy, 6 * xDis, 2 * yDis, ">>>");
 			animationAdd->callback(addMotion, this);
-			animationRemove = new Button(createStateGroupW / 2 - 3 * xDis, createStateGroupH / 2 + 5 * yDis, 6 * xDis, 2 * yDis, "<<<");
+			animationRemove = new Fl_Button(createStateGroupW / 2 - 3 * xDis + csx, createStateGroupH / 2 + 5 * yDis + csy, 6 * xDis, 2 * yDis, "<<<");
 			animationRemove->callback(removeMotion, this);
 		createStateGroup->end();
-		createStateGroup->box(fltk::BORDER_BOX);
-		this->add(createStateGroup);
-		this->resizable(createStateGroup);
+		createStateGroup->box(FL_BORDER_BOX);
 
-		editStateTimeMarkGroup = new Group(xDis, h / 2 + yDis, w - 2 * xDis, h / 2 - 2 * yDis, "time mark editor");
-		editStateTimeMarkGroup->begin();
-			stateList = new Choice(10 * xDis, yDis, 100, 2 * yDis, "State List");
-			stateList->when(fltk::WHEN_ENTER_KEY);
+		int esx = xDis + x;
+		int esy = h / 2 + yDis + y;
+		Fl_Group* buttonGroup = new Fl_Group(esx, esy, w - 2 * xDis, 3 * yDis);
+		buttonGroup->begin();
+			stateList = new Fl_Choice(10 * xDis + esx, yDis + esy, 100, 2 * yDis, "State List");
+			stateList->when(FL_WHEN_ENTER_KEY);
 			stateList->callback(changeStateList, this);
-			addMark = new Button(12 * xDis + 100, yDis, 100, 2 * yDis, "Add Mark");
+			addMark = new Fl_Button(12 * xDis + 100 + esx, yDis + esy, 100, 2 * yDis, "Add Mark");
 			addMark->callback(addStateTimeMark, this);
-			removeMark = new Button(13 * xDis + 200, yDis, 100, 2 * yDis, "Delete Mark");
+			removeMark = new Fl_Button(13 * xDis + 200+ esx, yDis + esy, 100, 2 * yDis, "Delete Mark");
 			removeMark->callback(removeStateTimeMark, this);
-			updateMark = new Button(14 * xDis + 300, yDis, 100, 2 * yDis, "Update Mark");
+			updateMark = new Fl_Button(14 * xDis + 300+ esx, yDis + esy, 100, 2 * yDis, "Update Mark");
 			updateMark->callback(updateStateTimeMark, this);
-			stateTimeMarkWidget = new ParamAnimEditorWidget(2 * xDis, 5 * yDis, w - 5 * xDis, h / 2 - 6 * yDis, "State Time Mark Editor");
+		buttonGroup->end();
+
+		editStateTimeMarkGroup = new Fl_Scroll(esx, esy + 3 * yDis + 10, w - 2 * xDis, h / 2 - 5 * yDis - 10);
+		editStateTimeMarkGroup->type(Fl_Scroll::VERTICAL_ALWAYS);
+		editStateTimeMarkGroup->begin();
+			stateTimeMarkWidget = new ParamAnimEditorWidget(2 * xDis + esx, 5 * yDis + esy, w - 5 * xDis, h / 2 - 6 * yDis, (char*) "");
+			stateTimeMarkWidget->begin();
+			stateTimeMarkWidget->end();
 		editStateTimeMarkGroup->end();
 		editStateTimeMarkGroup->resizable(stateTimeMarkWidget);
-		editStateTimeMarkGroup->box(fltk::BORDER_BOX);
-		this->add(editStateTimeMarkGroup);
+		editStateTimeMarkGroup->box(FL_BORDER_BOX);
 		this->resizable(editStateTimeMarkGroup);
 	this->end();
 
@@ -74,7 +80,7 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 	stateTimeMarkWidget->setModel(stateEditorNleModel);
 	stateTimeMarkWidget->setup();
 
-	stateEditorMode->state(true);
+	stateEditorMode->value(true);
 	createStateGroup->activate();
 	stateList->deactivate();
 	loadMotions();
@@ -96,17 +102,17 @@ void PAStateEditor::loadMotions()
 void PAStateEditor::loadStates()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	stateList->remove_all();
+	stateList->clear();
 	stateList->add("---");
 	for (size_t i = 0; i < mcu.param_anim_states.size(); i++)
 		stateList->add(mcu.param_anim_states[i]->stateName.c_str());
 }
 
-void PAStateEditor::changeStateEditorMode(fltk::Widget* widget, void* data)
+void PAStateEditor::changeStateEditorMode(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
 	editor->refresh();
-	if (editor->stateEditorMode->state())		// create mode
+	if (editor->stateEditorMode->value())		// create mode
 	{
 		editor->createStateGroup->activate();
 		editor->stateList->deactivate();
@@ -118,7 +124,7 @@ void PAStateEditor::changeStateEditorMode(fltk::Widget* widget, void* data)
 	}
 }
 
-void PAStateEditor::updateStateTimeMarkEditor(fltk::Widget* widget, void* data, bool toAdd)
+void PAStateEditor::updateStateTimeMarkEditor(Fl_Widget* widget, void* data, bool toAdd)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -130,7 +136,7 @@ void PAStateEditor::updateStateTimeMarkEditor(fltk::Widget* widget, void* data, 
 	{
 		for (int i = 0; i < editor->stateAnimationList->size(); i++)
 		{
-			std::string motionName = editor->stateAnimationList->goto_index(i)->label();
+			std::string motionName = editor->stateAnimationList->text(i+1);//text(i+1);
 			nle::Track* track = editor->stateEditorNleModel->getTrack(motionName);
 			if (!track && toAdd)
 			{
@@ -143,6 +149,8 @@ void PAStateEditor::updateStateTimeMarkEditor(fltk::Widget* widget, void* data, 
 				block->setEndTime(iter->second->duration());
 				editor->stateEditorNleModel->addTrack(newTrack);
 				newTrack->addBlock(block);		
+				editor->stateEditorNleModel->update();
+				editor->stateTimeMarkWidget->setViewableTimeEnd(editor->stateEditorNleModel->getEndTime());
 			}
 		}
 	}
@@ -154,7 +162,7 @@ void PAStateEditor::updateStateTimeMarkEditor(fltk::Widget* widget, void* data, 
 			bool del = true;
 			for (int j = 0; j < editor->stateAnimationList->size(); j++)
 			{
-				motionName = editor->stateAnimationList->goto_index(j)->label();
+				std::string motionName = editor->stateAnimationList->text(j + 1);
 				if (editor->stateEditorNleModel->getTrack(i)->getName() == motionName)
 				{
 					del = false;
@@ -165,18 +173,17 @@ void PAStateEditor::updateStateTimeMarkEditor(fltk::Widget* widget, void* data, 
 				editor->stateEditorNleModel->removeTrack(editor->stateEditorNleModel->getTrack(i)->getName());
 		}
 	}
-	editor->stateTimeMarkWidget->setup();
 	editor->paWindow->redraw();
 }
 
-void PAStateEditor::createNewState(fltk::Widget* widget, void* data)
+void PAStateEditor::createNewState(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::string stateName = editor->newStateName->value();
 	if (stateName == "")
 	{
-		fltk::message("Please input new state name");
+		fl_message("Please input new state name");
 		return;
 	}
 	if (mcu.lookUpPAState(stateName))
@@ -186,7 +193,7 @@ void PAStateEditor::createNewState(fltk::Widget* widget, void* data)
 	}
 	std::stringstream createStateCommand;
 	int numMotion = editor->stateEditorNleModel->getNumTracks();
-	int cycleWindow = fltk::ask("This is a Cycle State?");
+	int cycleWindow = fl_choice((char*) "This is a Cycle State?", "yes", "no", NULL);
 	std::string cycle = "true";
 	if (cycleWindow == 1) cycle = "false";
 	createStateCommand << "panim state " << stateName << " cycle " << cycle << " " << numMotion << " ";
@@ -207,30 +214,30 @@ void PAStateEditor::createNewState(fltk::Widget* widget, void* data)
 	editor->paWindow->redraw();
 }
 
-void PAStateEditor::addMotion(fltk::Widget* widget, void* data)
+void PAStateEditor::addMotion(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
 	for (int i = 0; i < editor->animationList->size(); i++)
 	{
-		if (editor->animationList->selected(i))
+		if (editor->animationList->selected(i+1))
 		{
 			bool shouldAdd = true;
 			for (int j = 0; j < editor->stateAnimationList->size(); j++)
 			{
-				if (strcmp(editor->stateAnimationList->goto_index(j)->label(), editor->animationList->goto_index(i)->label()) == 0)
+				if (strcmp(editor->stateAnimationList->text(j+1), editor->animationList->text(i+1)) == 0)
 				{
 					shouldAdd = false;
 					break;
 				}
 			}
 			if (shouldAdd)
-				editor->stateAnimationList->add(editor->animationList->goto_index(i)->label());
+				editor->stateAnimationList->add(editor->animationList->text(i+1));
 		}
 	}
 	updateStateTimeMarkEditor(widget, data, true);
 }
 
-void PAStateEditor::removeMotion(fltk::Widget* widget, void* data)
+void PAStateEditor::removeMotion(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
 	bool cycle = true;
@@ -239,9 +246,9 @@ void PAStateEditor::removeMotion(fltk::Widget* widget, void* data)
 		cycle = false;
 		for (int i = 0; i < editor->stateAnimationList->size(); i++)
 		{
-			if (editor->stateAnimationList->selected(i))
+			if (editor->stateAnimationList->selected(i+1))
 			{
-				editor->stateAnimationList->remove(editor->stateAnimationList->goto_index(i));
+				editor->stateAnimationList->remove(i+1);
 				cycle = true;
 				break;
 			}
@@ -250,13 +257,13 @@ void PAStateEditor::removeMotion(fltk::Widget* widget, void* data)
 	updateStateTimeMarkEditor(widget, data, false);
 }
 
-void PAStateEditor::changeStateList(fltk::Widget* widget, void* data)
+void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	editor->loadStates();
 	editor->stateEditorNleModel->removeAllTracks();
-	std::string currentStateName = editor->stateList->child(editor->stateList->value())->label();
+	std::string currentStateName = editor->stateList->menu()[editor->stateList->value()].label();
 	PAStateData* currentState = mcu.lookUpPAState(currentStateName);
 	if (currentState)
 	{
@@ -276,27 +283,27 @@ void PAStateEditor::changeStateList(fltk::Widget* widget, void* data)
 		}
 		editor->updateCorrespondenceMarks(currentState);
 	}
-	editor->stateTimeMarkWidget->setup();
+//	editor->stateTimeMarkWidget->setup();
 	editor->paWindow->redraw();
 }
 
-void PAStateEditor::addStateTimeMark(fltk::Widget* widget, void* data)
+void PAStateEditor::addStateTimeMark(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
 	editor->paWindow->addTimeMark(editor->stateEditorNleModel);
-	editor->stateTimeMarkWidget->setup();
+//	editor->stateTimeMarkWidget->setup();
 	editor->paWindow->redraw();
 }
 
-void PAStateEditor::removeStateTimeMark(fltk::Widget* widget, void* data)
+void PAStateEditor::removeStateTimeMark(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
 	editor->paWindow->removeTimeMark(editor->stateEditorNleModel);
-	editor->stateTimeMarkWidget->setup();
+//	editor->stateTimeMarkWidget->setup();
 	editor->paWindow->redraw();
 }
 
-void PAStateEditor::updateStateTimeMark(fltk::Widget* widget, void* data)
+void PAStateEditor::updateStateTimeMark(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
 	
@@ -316,7 +323,16 @@ void PAStateEditor::updateStateTimeMark(fltk::Widget* widget, void* data)
 		}
 	}
 
-	std::string currentStateName = editor->stateList->child(editor->stateList->value())->label();
+	int stateIdx = editor->stateList->value();
+
+	if (stateIdx < 0)
+	{
+		LOG("PanimationWindow::updateStateTimeMark WARNING: no state selected.");
+		return;
+	}
+
+	const char* stateText = editor->stateList->text();
+	std::string currentStateName = editor->stateList->text(stateIdx);
 	PAStateData* currentState = NULL;
 	if (editor->stateList->active())
 		currentState = mcuCBHandle::singleton().lookUpPAState(currentStateName);
@@ -358,7 +374,7 @@ void PAStateEditor::updateCorrespondenceMarks(PAStateData* state)
 			CorrespondenceMark* mark = new CorrespondenceMark();
 			mark->setStartTime(state->keys[i][j]);
 			mark->setEndTime(mark->getStartTime());
-			mark->setColor(fltk::RED);
+			mark->setColor(FL_RED);
 			char buff[256];
 			sprintf(buff, "%6.2f", mark->getStartTime());
 			mark->setName(buff);
@@ -387,7 +403,7 @@ void PAStateEditor::updateCorrespondenceMarks(PAStateData* state)
 void PAStateEditor::refresh()
 {
 	stateEditorNleModel->removeAllTracks();
-	stateTimeMarkWidget->setup();
+//	stateTimeMarkWidget->setup();
 	stateAnimationList->clear();
 	animationList->clear();
 	loadMotions();

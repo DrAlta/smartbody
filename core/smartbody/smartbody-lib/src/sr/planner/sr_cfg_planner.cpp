@@ -4,7 +4,7 @@
 //# define SR_USE_TRACE1    // start
 //# define SR_USE_TRACE2    // update
 //# define SR_USE_TRACE3    // bridge
-# include <SR/sr_trace.h>
+# include <sr/sr_trace.h>
 
 //============================= SrCfgPlannerBase ========================================
 

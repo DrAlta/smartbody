@@ -22,11 +22,11 @@
 
 # include <math.h>
  
-# include <SR/sr_trackball.h>
-# include <SR/sr_mat.h>
+# include <sr/sr_trackball.h>
+# include <sr/sr_mat.h>
 
 //# define SR_USE_TRACE1  
-//# include <SR/sr_trace.h>
+//# include <sr/sr_trace.h>
 
 //=================================== SrTrackball ===================================
 

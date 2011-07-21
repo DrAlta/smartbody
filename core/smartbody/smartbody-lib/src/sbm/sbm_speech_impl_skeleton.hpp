@@ -27,21 +27,21 @@
 
 
 // TODO - replace SpeechImplementation with actual class name
-class SpeechImplementation : public SpeechInterface {
+class SpeechImplementation : public SmartBody::SpeechInterface {
 public:
 	// Constructor / Destructor
 	SpeechImplementation();
 	virtual ~SpeechImplementation();
 
 	//  Override SpeechInterface methods (see sbm_speech.hpp)
-    virtual RequestId requestSpeechAudio( const char* agentName, const DOMNode* node, const char* callbackCmd );
-    virtual RequestId requestSpeechAudio( const char* agentName, const char* text, const char* callbackCmd );
-    virtual const std::vector<VisemeData *>* getVisemes( RequestId requestId );
-    virtual char* getSpeechPlayCommand( RequestId requestId );
-    virtual char* getSpeechStopCommand( RequestId requestId );
-    virtual char* getSpeechAudioFilename( RequestId requestId );
-    virtual float getMarkTime( RequestId requestId, const XMLCh* markId );
-    virtual void requestComplete( RequestId requestId );
+    virtual SmartBody::RequestId requestSpeechAudio( const char* agentName, const DOMNode* node, const char* callbackCmd );
+    virtual SmartBody::RequestId requestSpeechAudio( const char* agentName, const char* text, const char* callbackCmd );
+//    virtual const std::vector<SmartBody::VisemeData *>* getVisemes( RequestId requestId );
+    virtual char* getSpeechPlayCommand( SmartBody::RequestId requestId );
+    virtual char* getSpeechStopCommand( SmartBody::RequestId requestId );
+    virtual char* getSpeechAudioFilename( SmartBody::RequestId requestId );
+    virtual float getMarkTime( SmartBody::RequestId requestId, const XMLCh* markId );
+    virtual void requestComplete( SmartBody::RequestId requestId );
 };
 
 

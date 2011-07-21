@@ -52,7 +52,8 @@ template <class X> class srCmdMap	{
 		int execute( const char *key, srArgBuffer& argb, X *x_p = NULL )	{
 			if( key )	{
 				if( strlen( key ) > 0 )	{
-					sr_cmd_callback_fp fp = static_cast<sr_cmd_callback_fp>( cmdToCallback.lookup( key ) );
+//					sr_cmd_callback_fp fp = static_cast<sr_cmd_callback_fp>( cmdToCallback.lookup( key ) );
+					sr_cmd_callback_fp fp = (sr_cmd_callback_fp)( cmdToCallback.lookup( key ) );
 					if( fp )	{
 						return( fp( argb, x_p ) );
 					}
@@ -73,7 +74,8 @@ template <class X> class srCmdMap	{
 		}
 
 		int is_command( const char* cmd_key ) {
-			sr_cmd_callback_fp fp = static_cast<sr_cmd_callback_fp>( cmdToCallback.lookup( cmd_key ) );
+//			sr_cmd_callback_fp fp = static_cast<sr_cmd_callback_fp>( cmdToCallback.lookup( cmd_key ) );
+			sr_cmd_callback_fp fp = (sr_cmd_callback_fp)( cmdToCallback.lookup( cmd_key ) );
 
 			return( fp != NULL );
 		}

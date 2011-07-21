@@ -39,58 +39,54 @@ that is distributed: */
 		Paco Abad (fjabad@dsic.upv.es)
 **********************************************************/
 
-#include "vhcl.h"
-
 #include "CommandWindow.h"
 #include <vector>
 
 #include <sys/stat.h> 
 #include <sys/types.h>
 #include <iostream>
-#include <cstdlib>
-#include <cstdio>
-#include <string>
-#include <fltk/events.h>
 #include <sbm/mcontrol_util.h>
 #include <boost/algorithm/string/replace.hpp>
+#include <FL/Fl.H>
 
-using namespace fltk;
+
 using namespace std;
 
 void updateDisplay(int pos, int nInserted, int nDeleted,int b, const char* d, void* v);
 
 //creating FLTK multiline editor to connect to the interpreter
-CommandWindow::CommandWindow(int x,int y,int w,int h, const char* s) : GenericViewer(x, y, w, h), Window(x, y, w, h, s)
+CommandWindow::CommandWindow(int x,int y,int w,int h, const char* s) : GenericViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, s)
 {
        curDir[0] = '\0';
 
 	this->begin();
 
-	menubar = new MenuBar(0, 0, w, 25); 
-	menubar->add("&Edit/&Clear",NULL, clearcb, 0);
-	menubar->add("&Edit/C&lear History",NULL, clearhistorycb, 0);
+	menubar = new Fl_Menu_Bar(0, 0, w, 25); 
+	menubar->add("&Edit/&Clear", (const char*) NULL, clearcb, 0);
+	menubar->add("&Edit/C&lear History", (const char*) NULL, clearhistorycb, 0);
 
 	historyCounter = 0;
 	historyLocation = 0;
-	this->color(fltk::GRAY75);
+	this->color(FL_LIGHT1);
 	strcpy(printout,"");
 
 	int yDis = 25;
 	
 	// output
-	textDisplay = new TextDisplay(10, yDis, w - 20, 250, ""); yDis += 250;
-	textDisplay->box(fltk::UP_BOX);
-	textDisplay->textfont(COURIER);
+	textDisplay = new Fl_Text_Display(10, yDis, w - 20, 250, "");
+	yDis += 250;
+	textDisplay->box(FL_UP_BOX);
+	textDisplay->textfont(FL_COURIER);
 #ifdef _MACOSX_
 	textDisplay->textsize(10);
 #else
 	textDisplay->textsize(11);
 #endif
-	textDisplay->color(fltk::GRAY75);
-	textDisplay->textcolor(BLACK);
+	textDisplay->color(FL_LIGHT1);
+	textDisplay->textcolor(FL_BLACK);
 	textDisplay->redraw() ;
 
-	DisplayTextBuffer = new TextBuffer();
+	DisplayTextBuffer = new Fl_Text_Buffer();
 	DisplayTextBuffer->add_modify_callback(updateDisplay, this);
 	textDisplay->buffer(DisplayTextBuffer);
 
@@ -98,40 +94,44 @@ CommandWindow::CommandWindow(int x,int y,int w,int h, const char* s) : GenericVi
 	yDis += 25;
 
 	// command input
-	tabGroup = new TabGroup(10, yDis, w - 10, h - yDis);
+	tabGroup = new Fl_Tabs(10, yDis, w - 10, h - yDis);	
+	tabGroup->color(FL_WHITE,FL_GRAY);
 	tabGroup->begin();
-	for (int i = 0; i < 2; i++)
+	yDis += 30;
+	for (int i = 0; i < 1; i++)
 	{
-		textEditor[i] = new TextEditor(0, 0, w - 20, h - yDis - 30);  
-		textEditor[i]->textfont(COURIER);
+		textEditor[i] = new Fl_Text_Editor(15, yDis, w - 20, h - yDis - 10);		
+		textEditor[i]->selection_color(FL_DARK1);
+		textEditor[i]->textfont(FL_COURIER);
 	#ifdef _MACOSX_
-		textEditor[i]->textsize(10);
+		Fl_Text_Editor[i]->textsize(10);
 	#else
 		textEditor[i]->textsize(13);
 	#endif
-		textEditor[i]->box(fltk::UP_BOX);
-		textEditor[i]->textcolor(fltk::BLACK);
-		textBuffer[i] = new TextBuffer();
+		textEditor[i]->box(FL_UP_BOX);
+		textEditor[i]->textcolor(FL_BLACK);
+		textBuffer[i] = new Fl_Text_Buffer();
 		textEditor[i]->buffer(textBuffer[i]); 
-		textEditor[i]->add_key_binding(fltk::UpKey, TEXT_EDITOR_ANY_STATE, (TextEditor::Key_Func) upcb);
-		textEditor[i]->add_key_binding(fltk::DownKey, TEXT_EDITOR_ANY_STATE, (TextEditor::Key_Func) downcb);
+		textEditor[i]->add_key_binding(FL_Up, FL_TEXT_EDITOR_ANY_STATE, (Fl_Text_Editor::Key_Func) upcb);
+		textEditor[i]->add_key_binding(FL_Down, FL_TEXT_EDITOR_ANY_STATE, (Fl_Text_Editor::Key_Func) downcb);
 
-		textEditor[i]->add_key_binding(fltk::TabKey, TEXT_EDITOR_ANY_STATE, (TextEditor::Key_Func) tabcb);
-		textEditor[i]->add_key_binding(fltk::ReturnKey, TEXT_EDITOR_ANY_STATE, (TextEditor::Key_Func) entercb);
-		textEditor[i]->add_key_binding('u', CTRL | SHIFT, (TextEditor::Key_Func) ctrlUcb);
-		textEditor[i]->add_key_binding('u', CTRL, (TextEditor::Key_Func) ctrlUcb);
+		textEditor[i]->add_key_binding(FL_Tab, FL_TEXT_EDITOR_ANY_STATE, (Fl_Text_Editor::Key_Func) tabcb);
+		textEditor[i]->add_key_binding(FL_Enter, FL_TEXT_EDITOR_ANY_STATE, (Fl_Text_Editor::Key_Func) entercb);
+		textEditor[i]->add_key_binding('u', FL_CTRL | FL_SHIFT, (Fl_Text_Editor::Key_Func) ctrlUcb);
+		textEditor[i]->add_key_binding('u', FL_CTRL, (Fl_Text_Editor::Key_Func) ctrlUcb);
 	}
 
 	textEditor[0]->label("Sbm");
-	textEditor[1]->label("Python");
+//	textEditor[1]->label("Python");
 
 	tabGroup->end();
 	//tabGroup->selected_child(textEditor[1]); // Python command interface by default
-	tabGroup->selected_child(textEditor[0]);   // Sbm command interface by default
+	tabGroup->value(textEditor[0]);   // Sbm command interface by default
 
 	this->end();
 
 	this->resizable(tabGroup);
+	this->size_range(640, 480);
 }
 
 void CommandWindow::OnMessage( const std::string & message )
@@ -145,14 +145,14 @@ CommandWindow::~CommandWindow()
 	//delete EditorTextBuffer;
 	delete textEditor[0];
 	delete textEditor[1];
-	/*fltk::TextBuffer *DisplayTextBuffer;
-	fltk::TextDisplay *textDisplay;*/
+	/*Fl_Text_Buffer *DisplayTextBuffer;
+	Fl_Text_Display *textDisplay;*/
 }
 
-CommandWindow* CommandWindow::getCommandWindow(Widget* w)
+CommandWindow* CommandWindow::getCommandWindow(Fl_Widget* w)
 {
 	CommandWindow* commandWindow = NULL;
-	Widget* widget = w;
+	Fl_Widget* widget = w;
 	while (widget)
 	{
 		commandWindow = dynamic_cast<CommandWindow*>(widget);
@@ -165,11 +165,11 @@ CommandWindow* CommandWindow::getCommandWindow(Widget* w)
 	return commandWindow;
 }
 
-void CommandWindow::entercb(int key, fltk::TextEditor* editor) 
+void CommandWindow::entercb(int key, Fl_Text_Editor* editor) 
 {
 	CommandWindow* commandWindow =  CommandWindow::getCommandWindow(editor);
 
-	TextBuffer* tempBuffer = editor->buffer();
+	Fl_Text_Buffer* tempBuffer = editor->buffer();
 	char* c = (char*) tempBuffer->text();
 	int len = (int) strlen(c);
 
@@ -196,7 +196,7 @@ void CommandWindow::entercb(int key, fltk::TextEditor* editor)
 	tempBuffer->remove(0,len + 1);
 }
 
-void CommandWindow::upcb(int key, fltk::TextEditor* editor) 
+void CommandWindow::upcb(int key, Fl_Text_Editor* editor) 
 {
 	CommandWindow* commandWindow = CommandWindow::getCommandWindow(editor);
 	commandWindow->historyLocation--;
@@ -207,7 +207,7 @@ void CommandWindow::upcb(int key, fltk::TextEditor* editor)
 	editor->buffer()->insert(editor->buffer()->length(), command);
 }
 
-void CommandWindow::downcb(int key, fltk::TextEditor* editor)
+void CommandWindow::downcb(int key, Fl_Text_Editor* editor)
 {
 	CommandWindow* commandWindow = CommandWindow::getCommandWindow(editor);
 
@@ -220,29 +220,29 @@ void CommandWindow::downcb(int key, fltk::TextEditor* editor)
 	editor->buffer()->insert(editor->buffer()->length(), command);
 }
 
-void CommandWindow::clearcb(fltk::Widget* w, void* data)
+void CommandWindow::clearcb(Fl_Widget* w, void* data)
 {
 	CommandWindow* commandWindow = CommandWindow::getCommandWindow(w);
 
 	if (!commandWindow)
 		return;
-	TextDisplay* display = commandWindow->textDisplay;
+	Fl_Text_Display* display = commandWindow->textDisplay;
 	display->buffer()->remove(0, display->buffer()->length());
 }
 
-void CommandWindow::clearhistorycb(fltk::Widget* w, void* data)
+void CommandWindow::clearhistorycb(Fl_Widget* w, void* data)
 {
 	CommandWindow* commandWindow = CommandWindow::getCommandWindow(w);
 	commandWindow->clearHistory();
 }
 
-void CommandWindow::tabcb(int key, fltk::TextEditor* editor)
+void CommandWindow::tabcb(int key, Fl_Text_Editor* editor)
 {
 	editor->insert("\t");
 
 	if (true) return;
 
-	TextBuffer* tempBuffer = editor->buffer();
+	Fl_Text_Buffer* tempBuffer = editor->buffer();
 	const char* c = tempBuffer->text();
 
 	//get the last word
@@ -302,9 +302,9 @@ void CommandWindow::tabcb(int key, fltk::TextEditor* editor)
 	lastword[j] = '\0';
 }
 
-void CommandWindow::ctrlUcb(int key, fltk::TextEditor* editor)
+void CommandWindow::ctrlUcb(int key, Fl_Text_Editor* editor)
 {
-	TextBuffer* tempBuffer = editor->buffer();
+	Fl_Text_Buffer* tempBuffer = editor->buffer();
 
 	tempBuffer->remove(0, editor->insert_position());
 }

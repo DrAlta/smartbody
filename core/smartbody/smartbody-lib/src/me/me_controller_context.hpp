@@ -29,17 +29,17 @@
 #include <set>
 
 
-#include <SR/sr_shared_class.h>
-#include <SR/sr_buffer.h>
-#include <SK/sk_channel_array.h>
+#include <sr/sr_shared_class.h>
+#include <sr/sr_buffer.h>
+#include <sk/sk_channel_array.h>
 
 
 // Predeclare class because of circular reference:
 class MeControllerContext;
 class MeFrameData;
 
-#include <ME/me_controller.h>
-#include <ME/me_evaluation_logger.hpp>
+#include <me/me_controller.h>
+#include <me/me_evaluation_logger.hpp>
 
 
 

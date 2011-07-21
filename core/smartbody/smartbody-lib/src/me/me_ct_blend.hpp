@@ -26,8 +26,8 @@
 
 #include <vector>
 
-#include <ME/me_ct_unary.hpp>
-#include <ME/me_controller_context_proxy.hpp>
+#include <me/me_ct_unary.hpp>
+#include <me/me_controller_context_proxy.hpp>
 
 #include <sbm/sr_linear_curve.h>
 
@@ -46,8 +46,8 @@ public:
 	 *  FrameData for child evaluation (before interpolation).
 	 */
 	class FrameData : public MeFrameDataProxy {
-		friend MeCtBlend;
-		friend MeCtBlend::Context;
+		friend class MeCtBlend;
+		friend class MeCtBlend::Context;
 
 		///////////////////////////////////////////////////////////////
 		//  Private Data
@@ -74,7 +74,7 @@ public:
 
 		bool isChannelUpdated( unsigned int n ) const;
 	};
-	friend MeCtBlend::FrameData;
+	friend class MeCtBlend::FrameData;
 
 	/**
 	 *  MeControllerContext implementation for child controller.
@@ -83,8 +83,8 @@ public:
 	 *  evaluation of the child and interpolation into the parent context.
 	 */
 	class Context : public MeCtUnary::Context {
-		friend MeCtBlend;
-		friend MeCtBlend::FrameData;
+		friend class MeCtBlend;
+		friend class MeCtBlend::FrameData;
 	public:
 		///////////////////////////////////////////////////////////////
 		//  Public Constants
@@ -129,7 +129,7 @@ public:
 
 		const std::set<int>& get_logged_channel_indices() const;
 	};
-	friend MeCtBlend::Context;
+	friend class MeCtBlend::Context;
 
 protected:
 	//////////////////////////////////////////////////////////////////////////
@@ -151,7 +151,7 @@ public:
 	virtual ~MeCtBlend();
 
 	/** Initialize the Blend controller with the given child controller.  */
-	void init( MeController* child );
+	void init( MeController* child, SbmPawn* pawn );
 
 	//virtual void set_child( MeController* child );  // Use init( child )
 
