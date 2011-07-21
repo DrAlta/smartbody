@@ -5710,12 +5710,14 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				SbmCharacter* character = mcu_p->character_map.next();
 				while (character)
 				{
+					/*
 					if (character->param_animation_ct)
 						character->param_animation_ct->set_pass_through(false);
 					if (character->locomotion_ct)
 						character->locomotion_ct->set_pass_through(true);
 					if (character->basic_locomotion_ct)
 						character->basic_locomotion_ct->set_pass_through(true);
+					*/
 					character = mcu_p->character_map.next();
 				}
 				return CMD_SUCCESS;
@@ -5734,12 +5736,14 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				{
 					if (character->steeringAgent)
 						character->steeringAgent->desiredSpeed = 1.6f;
+					/*
 					if (character->param_animation_ct)
 						character->param_animation_ct->set_pass_through(true);
 					if (character->locomotion_ct)
 						character->locomotion_ct->set_pass_through(false);
 					if (character->basic_locomotion_ct)
 						character->basic_locomotion_ct->set_pass_through(true);
+					*/
 					character = mcu_p->character_map.next();
 				}
 				return CMD_SUCCESS;
@@ -5751,12 +5755,14 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				SbmCharacter* character = mcu_p->character_map.next();
 				while (character)
 				{
+					/*
 					if (character->param_animation_ct)
 						character->param_animation_ct->set_pass_through(true);
 					if (character->locomotion_ct)
 						character->locomotion_ct->set_pass_through(true);
 					if (character->basic_locomotion_ct)
 						character->basic_locomotion_ct->set_pass_through(false);
+					*/
 					character = mcu_p->character_map.next();
 				}
 				return CMD_SUCCESS;
