@@ -25,7 +25,7 @@
 #include <sbm/mcontrol_util.h>
 #include <sbm/me_ct_param_animation_data.h>
 #define DebugInfo 0
-#define FastStart 1
+#define FastStart 0
 
 SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 {
