@@ -277,6 +277,7 @@ void SbmCharacter::locomotion_set_turning_mode(int mode)
 void SbmCharacter::updateJointPhyObjs()
 {
 	const SrArray<SkJoint*>& joints = skeleton_p->joints();	
+	skeleton_p->update_global_matrices();
 	for (int i=0;i<joints.size();i++)
 	{
 		SkJoint* curJoint = joints[i];
@@ -284,18 +285,15 @@ void SbmCharacter::updateJointPhyObjs()
 		if (jointPhyObjMap.find(jointName) != jointPhyObjMap.end())
 		{
 			SbmPhysicsObj* phyObj = jointPhyObjMap[jointName];
-			phyObj->getColObj()->updateGlobalTransform(curJoint->gmat());
+			const SrMat& gmat = curJoint->gmat();
+			phyObj->getColObj()->updateGlobalTransform(gmat);
 			phyObj->updateSimObj();
 		}
 	}	
 }
 
 void SbmCharacter::setJointPhyCollision( bool useCollision )
-{
-	if (jointPhyObjMap.size() == 0)
-	{
-		buildJointPhyObjs();
-	}
+{	
 	const SrArray<SkJoint*>& joints = skeleton_p->joints();		
 	for (int i=0;i<joints.size();i++)
 	{
@@ -320,21 +318,60 @@ void SbmCharacter::buildJointPhyObjs()
 	{
 		SkJoint* curJoint = joints[i];
 		std::string jointName = curJoint->name().get_string();
-		if (curJoint->visgeo())
+// 		if (curJoint->visgeo())
+// 		{
+// 			SbmGeomObject* jointGeom = new SbmGeomTriMesh(curJoint->visgeo());			
+// 			SbmPhysicsObj* jointPhy = phySim->createPhyObj();
+// 			jointPhy->initGeometry(jointGeom,1.f);	
+// 			jointPhy->setPhysicsSim(false);
+// 			phySim->addPhysicsObj(jointPhy);
+// 			jointPhyObjMap[jointName] = jointPhy;
+// 		}
+// 		else // use procedural capsule geometry
 		{
-			SbmGeomObject* jointGeom = new SbmGeomTriMesh(curJoint->visgeo());			
-			SbmPhysicsObj* jointPhy = phySim->createPhyObj();
-			jointPhy->initGeometry(jointGeom,1.f);	
-			jointPhy->setPhysicsSim(false);
-			phySim->addPhysicsObj(jointPhy);
-			jointPhyObjMap[jointName] = jointPhy;
-		}
-		else // use procedural capsule geometry
-		{
-
+			setJointCollider(jointName,-1.f, -1.f);
 
 		}
 	}
+}
+
+void SbmCharacter::setJointCollider( std::string jointName, float len, float radius )
+{
+	SkJoint* joint = skeleton_p->search_joint(jointName.c_str());
+	if (!joint || joint->num_children() == 0)
+		return;
+	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
+	if (!phySim)
+		return;
+
+	std::map<std::string, SbmPhysicsObj*>::iterator mi = jointPhyObjMap.find(jointName);
+	// clean up first
+	if (mi != jointPhyObjMap.end())
+	{
+		SbmPhysicsObj* phyObj = mi->second;		
+		SbmGeomObject* geomObj = phyObj->getColObj();		
+		phySim->removePhysicsObj(phyObj);
+		delete geomObj;
+		delete phyObj;
+	}
+	
+	SkJoint* child = joint->child(0);
+	SrVec offset = child->offset(); 
+	SrVec center = offset*0.5f;
+	SrVec dir = offset; dir.normalize();
+	float boneLen = offset.len();	
+	if (len <= 0.f)
+		len = boneLen+0.001f;
+	if (radius <= 0.f)
+		radius = len*0.2f;	
+	
+	// generate new geometry
+	SbmGeomObject* newGeomObj = new SbmGeomCapsule(center-dir*len*0.5f, center+dir*len*0.5f,radius);
+	SbmPhysicsObj* jointPhy = phySim->createPhyObj();
+	jointPhy->initGeometry(newGeomObj,10.f);	
+	jointPhy->setPhysicsSim(false);
+	phySim->addPhysicsObj(jointPhy);
+	jointPhyObjMap[jointName] = jointPhy;
 }
 
 int SbmCharacter::init( SkSkeleton* new_skeleton_p,
@@ -2491,6 +2528,32 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			LOG( "SbmCharacter::parse_character_command ERR: incorrect parameter for collision = %s",phyCmd.c_str());
 			return CMD_FAILURE;
 		}
+	}
+	else if ( cmd == "collider" )
+	{
+		string colCmd = args.read_token();
+		if (colCmd == "build") // build all joint colliders automatically
+		{
+			this->buildJointPhyObjs();
+			return CMD_SUCCESS;
+		}
+		else if (colCmd == "joint") // build 
+		{
+			string jointName = args.read_token();
+			float length = -1.f, width = -1.f;			
+			string nextCmd = args.read_token();
+			while (nextCmd != "")
+			{
+				float nextFloat = args.read_float();
+				if (nextCmd == "length")
+					length = nextFloat;
+				else if (nextCmd == "width")
+					width = nextFloat;
+				nextCmd = args.read_token();
+			}
+			this->setJointCollider(jointName,length,width);
+			return CMD_SUCCESS;
+		}		
 	}
 	else if ( cmd == "handmotion")
 	{

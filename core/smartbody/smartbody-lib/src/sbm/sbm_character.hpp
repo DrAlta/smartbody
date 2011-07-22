@@ -340,10 +340,13 @@ public:
 	const MotionDataSet& getReachHandData() const { return reachHandData;}
 	const MotionDataSet& getReleaseHandData() const { return releaseHandData;}
 	std::map<int,MeCtReachEngine*>& getReachEngineMap() { return reachEngineMap; }
+
+	std::map<std::string,SbmPhysicsObj*>& getJointPhyObjs() { return jointPhyObjMap; }
 	void buildJointPhyObjs();
 	void setJointCollider(std::string jointName, float size);
 	void updateJointPhyObjs();
 	void setJointPhyCollision(bool useCollision);
+	void setJointCollider(std::string jointName, float len, float radius);
 		
 	// viseme curve related functions
 	void set_viseme_curve_mode( bool mode )		{ use_viseme_curve = mode; }

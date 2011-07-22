@@ -328,6 +328,7 @@ class FltkViewer : public SrViewer, public Fl_Gl_Window
 	void drawReach();
 	void drawInteractiveLocomotion();
 	void drawPawns();
+	void drawColliders();
 	void drawSteeringInfo();
 	static void drawColObject(SbmGeomObject* colObj, SrMat& gmat);
 	void drawTetra(SrVec vtxPos[4], SrVec& color);
