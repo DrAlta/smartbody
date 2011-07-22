@@ -369,7 +369,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 					_stricmp( ext.c_str(), ".dae" ) == 0 ||
 					_stricmp( ext.c_str(), ".DAE" ) == 0 ||
 					_stricmp( ext.c_str(), ".asf" ) == 0 ||
-					_stricmp( ext.c_str(), ".ASF" ) == 0)
+					_stricmp( ext.c_str(), ".ASF" ) == 0 ||
 					_stricmp( ext.c_str(), ".fbx" ) == 0 ||
 					_stricmp( ext.c_str(), ".FBX" ) == 0)
 #else
