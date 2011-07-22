@@ -28,6 +28,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&File/Run Script...", 0, NULL, 0, NULL);
 	menubar->add("&View/Character/Bones", 0, ModeBonesCB, this, NULL);
 	menubar->add("&View/Character/Geometry", 0, ModeGeometryCB, this, NULL);
+	menubar->add("&View/Character/Collision Geometry", 0, ModeCollisionGeometryCB, this, NULL);
 	menubar->add("&View/Character/Deformable Geometry", 0, ModeDeformableGeometryCB, this, NULL);
 	menubar->add("&View/Character/GPU Deformable Geometry", 0, ModeGPUDeformableGeometryCB, this, NULL);
 	menubar->add("&View/Character/Axis", 0, ModeAxisCB, this, NULL);
@@ -629,6 +630,12 @@ void BaseWindow::ModeGeometryCB(Fl_Widget* w, void* data)
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdCharacterShowGeometry, NULL);
+}
+
+void BaseWindow::ModeCollisionGeometryCB( Fl_Widget* w, void* data )
+{
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdCharacterShowCollisionGeometry, NULL);	
 }
 
 void BaseWindow::ModeDeformableGeometryCB(Fl_Widget* w, void* data)

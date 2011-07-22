@@ -667,7 +667,10 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 		while ( character )
 		{	
 			// set the visibility parameters of the scene
-			character->scene_p->set_visibility(_data->showbones,_data->showgeometry, _data->showcollisiongeometry, _data->showaxis);
+			//character->scene_p->set_visibility(_data->showbones,_data->showgeometry, _data->showcollisiongeometry, _data->showaxis);
+
+			// feng : never show the collision mesh, instead we will show the bounding volumes as capsules
+			character->scene_p->set_visibility(_data->showbones,_data->showgeometry, false, _data->showaxis);
 			character->dMesh_p->set_visibility(_data->showdeformablegeometry);
 			character = character_map.next();
 		}
@@ -1126,6 +1129,9 @@ void FltkViewer::draw()
 	drawDynamics();
 	drawLocomotion();
 	drawPawns();
+
+	if (_data->showcollisiongeometry)
+		drawColliders();
 	drawInteractiveLocomotion();
 
 	//_posControl.Draw();
@@ -2564,6 +2570,25 @@ void FltkViewer::drawEyeLids()
 
 	glPopAttrib();
 
+}
+
+void FltkViewer::drawColliders()
+{
+	float pawnSize = 1.0;
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.character_map.reset();
+	while (SbmCharacter* character = mcu.character_map.next())
+	{
+		std::map<std::string,SbmPhysicsObj*>& jointPhyObjs = character->getJointPhyObjs();
+		std::map<std::string,SbmPhysicsObj*>::iterator mi;
+		for ( mi  = jointPhyObjs.begin();
+			  mi != jointPhyObjs.end();
+			  mi++)
+		{
+			SbmPhysicsObj* obj = mi->second;
+			this->drawColObject(obj->getColObj(),obj->getColObj()->getWorldState().gmat());
+		}		
+	}
 }
 
 void FltkViewer::drawPawns()

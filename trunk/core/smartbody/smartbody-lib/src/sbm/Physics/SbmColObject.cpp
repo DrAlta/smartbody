@@ -11,7 +11,7 @@ SrVec SbmTransform::globalToLocal( const SrVec& vGlobal )
 	return (vGlobal-tran)*rot.inverse();
 }
 
-SrMat SbmTransform::gmat()
+SrMat SbmTransform::gmat() const
 {
 	SrMat mat;
 	mat = rot.get_mat(mat);
@@ -37,9 +37,12 @@ SbmTransform SbmTransform::diff( const SbmTransform& r1, const SbmTransform& r2 
 SbmTransform SbmTransform::mult( const SbmTransform& r1, const SbmTransform& r2 )
 {
 	SbmTransform rout;
-	rout.tran = r1.tran*r2.rot + r2.tran;
-	rout.rot  = r1.rot*r2.rot;
-	rout.rot.normalize();
+	SrMat g1 = r1.gmat();
+	SrMat g2 = r2.gmat();
+	rout.gmat(g1*g2);
+	//rout.tran = r1.tran*r2.rot + r2.tran;
+	//rout.rot  = r1.rot*r2.rot;
+	//rout.rot.normalize();
 	return rout;
 }
 
@@ -97,7 +100,7 @@ SrVec SbmGeomObject::getCenter()
 
 void SbmGeomObject::updateGlobalTransform( const SrMat& newState )
 {
-	SrQuat newQuat = SrQuat(newState);
+	SrQuat newQuat = SrQuat(newState);	newQuat.normalize();
 	SrVec newPos = newState.get_translation();
 	if (newQuat != globalTransform.rot || newPos != globalTransform.tran)
 	{
@@ -336,9 +339,12 @@ SbmGeomCapsule::SbmGeomCapsule( const SrVec& p1, const SrVec& p2, float r )
 	extent = (p2-p1).norm()*0.5f;
 	SrVec zAxis = SrVec(0,0,1);
 	SrVec capAxis = (p2-p1); capAxis.normalize();
+	if (capAxis.len() < gwiz::epsilon10())
+		capAxis = SrVec(0,0,1);
 	SrVec pos = (p2+p1)*0.5f;
 	SrQuat rot = SrQuat(zAxis,capAxis);
 
+	rot.normalize();
 	localTransform.rot = rot;
 	localTransform.tran = pos;
 

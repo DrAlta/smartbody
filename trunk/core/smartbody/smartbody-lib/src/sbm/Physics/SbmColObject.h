@@ -18,7 +18,7 @@ public:
 	SbmTransform(const SrQuat& q, const SrVec& t) { rot = q; tran = t;}
 	SrVec localToGlobal(const SrVec& vLocal);
 	SrVec globalToLocal(const SrVec& vGlobal);
-	SrMat gmat();	
+	SrMat gmat() const;	
 	void  gmat(const SrMat& inMat);
 	void  add(const SbmTransform& delta);	
 	static SbmTransform diff(const SbmTransform& r1, const SbmTransform& r2);
