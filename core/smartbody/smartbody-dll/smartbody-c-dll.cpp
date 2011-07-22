@@ -68,14 +68,16 @@ private:
    SBMHANDLE m_sbmHandle;
    SBM_OnCreateCharacterCallback m_createCharacterCallback;
    SBM_OnCharacterDeleteCallback m_deleteCharacterCallback;
+   SBM_OnCharacterChangeCallback m_changeCharacterCallback;
    SBM_OnVisemeCallback m_viseme;
 
 public:
-   SBM_SmartbodyListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCharCallback, SBM_OnCharacterDeleteCallback deleteCharCallback, SBM_OnVisemeCallback visemeCallback )
+   SBM_SmartbodyListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCharCallback, SBM_OnCharacterDeleteCallback deleteCharCallback, SBM_OnCharacterChangeCallback changeCharCallback, SBM_OnVisemeCallback visemeCallback )
    {
       m_sbmHandle = sbmHandle;
       m_createCharacterCallback = createCharCallback;
       m_deleteCharacterCallback = deleteCharCallback;
+	  m_changeCharacterCallback = changeCharCallback;
       m_viseme = visemeCallback;
    }
 
@@ -127,6 +129,11 @@ public:
       myfile.close();
 #endif
    }
+
+    virtual void OnCharacterChange( const std::string & name )
+    {
+         m_changeCharacterCallback( m_sbmHandle, name.c_str() );
+	}
 
    virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime )
    {
@@ -258,14 +265,14 @@ SMARTBODY_C_DLL_API bool SBM_Shutdown( SBMHANDLE sbmHandle )
 }
 
 
-SMARTBODY_C_DLL_API bool SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB, SBM_OnCharacterDeleteCallback deleteCB, SBM_OnVisemeCallback visemeCB )
+SMARTBODY_C_DLL_API bool SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB, SBM_OnCharacterDeleteCallback deleteCB, SBM_OnCharacterChangeCallback changedCB, SBM_OnVisemeCallback visemeCB )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
       return false;
    }
 
-   SBM_SmartbodyListener * listener = new SBM_SmartbodyListener( sbmHandle, createCB, deleteCB, visemeCB );
+   SBM_SmartbodyListener * listener = new SBM_SmartbodyListener( sbmHandle, createCB, deleteCB, changedCB, visemeCB );
    g_smartbodyInstances[ sbmHandle ]->SetListener( listener );
    return true;
 }
@@ -362,18 +369,22 @@ void SBM_CharToCSbmChar( const ::SmartbodyCharacter * sbmChar, SBM_SmartbodyChar
    sbmCChar->ry = sbmChar->ry;
    sbmCChar->rz = sbmChar->rz;
 
+  
    // copy name
-   sbmCChar->m_name = new char[ sbmChar->m_name.length() + 1 ];
-   strcpy( sbmCChar->m_name, sbmChar->m_name.c_str() );
+   // NOTE: name should be copied during callback and character creation
+   //sbmCChar->m_name = new char[ sbmChar->m_name.length() + 1 ];
+   //strcpy( sbmCChar->m_name, sbmChar->m_name.c_str() );
 
-   // copy joint data
-   sbmCChar->m_numJoints = 0;
-   sbmCChar->m_joints = NULL;
 
    if ( sbmChar->m_joints.size() > 0 )
    {
-      sbmCChar->m_numJoints = sbmChar->m_joints.size();
-      sbmCChar->m_joints = new SBM_SmartbodyJoint[ sbmCChar->m_numJoints ];
+	  bool initJoints = false;
+	  if (sbmCChar->m_numJoints == 0)
+	  {
+		sbmCChar->m_numJoints = sbmChar->m_joints.size();
+		sbmCChar->m_joints = new SBM_SmartbodyJoint[ sbmCChar->m_numJoints ];
+		initJoints = true;
+	  }
 
       for ( size_t i = 0; i < sbmCChar->m_numJoints; i++ )
       {
@@ -387,8 +398,11 @@ void SBM_CharToCSbmChar( const ::SmartbodyCharacter * sbmChar, SBM_SmartbodyChar
          sbmCChar->m_joints[ i ].rz = sbmChar->m_joints[ i ].rz;
 
          // copy name
-         sbmCChar->m_joints[ i ].m_name = new char[ sbmChar->m_joints[ i ].m_name.length() + 1 ];
-         strcpy( sbmCChar->m_joints[ i ].m_name, sbmChar->m_joints[ i ].m_name.c_str() );
+		 if (initJoints) 
+		 { // only initialize joints if this is the first time
+			sbmCChar->m_joints[ i ].m_name = new char[ sbmChar->m_joints[ i ].m_name.length() + 1 ];
+			strcpy( sbmCChar->m_joints[ i ].m_name, sbmChar->m_joints[ i ].m_name.c_str() );
+		 }
       }
    }
 }
