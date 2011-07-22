@@ -340,15 +340,26 @@ SMARTBODY_C_DLL_API bool SBM_ReleaseCharacter( SBM_SmartbodyCharacter * characte
       return false;
    }
 
+   SBM_ReleaseCharacterJoints(character);
+   
+   delete [] character->m_name;
+
+   return true;
+}
+
+SMARTBODY_C_DLL_API bool SBM_ReleaseCharacterJoints( SBM_SmartbodyCharacter * character )
+{
+   if ( !character )
+   {
+      return false;
+   }
+
    for ( size_t i = 0; i < character->m_numJoints; i++ )
    {
       delete [] character->m_joints[ i ].m_name;
    }
 
    delete [] character->m_joints;
-   delete [] character->m_name;
-
-   return true;
 }
 
 
@@ -381,6 +392,7 @@ void SBM_CharToCSbmChar( const ::SmartbodyCharacter * sbmChar, SBM_SmartbodyChar
 	  bool initJoints = false;
 	  if (sbmCChar->m_numJoints == 0)
 	  {
+        SBM_LogMessage("CREATING JOINTS!", 2);
 		sbmCChar->m_numJoints = sbmChar->m_joints.size();
 		sbmCChar->m_joints = new SBM_SmartbodyJoint[ sbmCChar->m_numJoints ];
 		initJoints = true;

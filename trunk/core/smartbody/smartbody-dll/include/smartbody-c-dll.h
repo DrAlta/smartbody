@@ -83,6 +83,7 @@ SMARTBODY_C_DLL_API bool SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op
 SMARTBODY_C_DLL_API int  SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle );
 SMARTBODY_C_DLL_API bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character );
 SMARTBODY_C_DLL_API bool SBM_ReleaseCharacter( SBM_SmartbodyCharacter * character );
+SMARTBODY_C_DLL_API bool SBM_ReleaseCharacterJoints( SBM_SmartbodyCharacter * character );
 SMARTBODY_C_DLL_API bool SBM_SetLogMessageCallback(LogMessageCallback cb);
 SMARTBODY_C_DLL_API void SBM_LogMessage(const char* message, int messageType);
 #ifdef __cplusplus
