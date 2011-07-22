@@ -46,7 +46,7 @@ using namespace bonebus;
 Entity * ent;
 SceneNode * mSceneNode;
 
-std::string skeleton[ 115 ];
+std::string skeleton[ 116 ];
 
 // Event handler to animate
 class SkeletalAnimationFrameListener : public ExampleFrameListener
@@ -688,10 +688,10 @@ class OgreViewerApplication : public ExampleApplication
 			}
 
 			std::vector<int>* lastPosTimes = new std::vector<int>();
-			lastPosTimes->resize(115);
+			lastPosTimes->resize(116);
 			std::vector<int>* lastRotTimes = new std::vector<int>();
-			lastRotTimes->resize(115);
-			for (int x = 0; x < 115; x++)
+			lastRotTimes->resize(116);
+			for (int x = 0; x < 116; x++)
 			{
 				(*lastPosTimes)[x] = -1;
 				(*lastRotTimes)[x] = -1;
@@ -725,6 +725,7 @@ class OgreViewerApplication : public ExampleApplication
 			// Add entity to the scene node
 			SceneNode * mSceneNode = app->mSceneMgr->getRootSceneNode()->createChildSceneNode( charIdStr );
 			mSceneNode->attachObject( ent );
+
 		}
 
 
@@ -776,8 +777,17 @@ class OgreViewerApplication : public ExampleApplication
 				char charIdStr[ 16 ];
 				_itoa( characterID, charIdStr, 10 );
 				
-				Node * node = app->mSceneMgr->getRootSceneNode()->getChild( charIdStr );
-				node->setPosition( x, y, z );
+
+				if (!app->mSceneMgr->hasEntity(charIdStr))
+					return;
+				
+				SceneNode* sceneNode = app->mSceneMgr->getRootSceneNode();
+				if (sceneNode)
+				{
+					Node * node = sceneNode->getChild( charIdStr );
+					if (node)
+						node->setPosition( x, y, z );
+				}
 			}
 		}
 
@@ -798,14 +808,23 @@ class OgreViewerApplication : public ExampleApplication
 				char charIdStr[ 16 ];
 				_itoa( characterID, charIdStr, 10 );
 
-				Node * node = app->mSceneMgr->getRootSceneNode()->getChild( charIdStr );
-				node->setOrientation( Quaternion( w, x, y, z ) );
+				if (!app->mSceneMgr->hasEntity(charIdStr))
+					return;
+
+				SceneNode* sceneNode = app->mSceneMgr->getRootSceneNode();
+				if (sceneNode)
+				{
+					Node * node = sceneNode->getChild( charIdStr );
+					if (node)
+						node->setOrientation( Quaternion( w, x, y, z ) );
+				}
 			}
 		}
 
 
 		static void OnBoneRotations( const BulkBoneRotations * bulkBoneRotations, void * userData )
 		{
+						
 			//printf( "Set Bone Rotations! - %d %d %d\n", bulkBoneRotations->packetId, bulkBoneRotations->charId, bulkBoneRotations->numBoneRotations );
 
 
