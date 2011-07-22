@@ -219,7 +219,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 				if( _stricmp( ext.c_str(), MOTION_EXT ) == 0 || 
 					_stricmp( ext.c_str(), ".bvh" ) == 0 ||
 					_stricmp( ext.c_str(), ".dae" ) == 0 ||
-					_stricmp( ext.c_str(), ".amc" ) == 0)
+					_stricmp( ext.c_str(), ".amc" ) == 0 ||
 					_stricmp( ext.c_str(), ".fbx" ) == 0)
 #else
 				if( _stricmp( ext.c_str(), MOTION_EXT ) == 0 || 
