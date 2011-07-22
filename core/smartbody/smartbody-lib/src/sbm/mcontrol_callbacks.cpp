@@ -5547,14 +5547,16 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			steerOptions->engineOptions.testCaseSearchPath = testCases;
 			std::string moduleSearchPath = dynamic_cast<StringAttribute*>( mcu_p->steerEngine.getAttribute("engineOptions.moduleSearchPath") )->getValue();
 			steerOptions->engineOptions.moduleSearchPath = moduleSearchPath;
-			//double gridSizeX = dynamic_cast<DoubleAttribute*>( mcu_p->steerEngine.getAttribute("gridDatabaseOptions.gridSizeX") )->getValue();
-			//double gridSizeZ = dynamic_cast<DoubleAttribute*>( mcu_p->steerEngine.getAttribute("gridDatabaseOptions.gridSizeZ") )->getValue();
-			//steerOptions->gridDatabaseOptions.gridSizeX = float(gridSizeX);
-            //steerOptions->gridDatabaseOptions.gridSizeZ = float(gridSizeZ);
-			steerOptions->gridDatabaseOptions.gridSizeX = 35;
-			steerOptions->gridDatabaseOptions.gridSizeZ = 35;
-			steerOptions->gridDatabaseOptions.numGridCellsX = 70;
-			steerOptions->gridDatabaseOptions.numGridCellsZ = 70;
+			double gridSizeX = dynamic_cast<DoubleAttribute*>( mcu_p->steerEngine.getAttribute("gridDatabaseOptions.gridSizeX") )->getValue();
+			double gridSizeZ = dynamic_cast<DoubleAttribute*>( mcu_p->steerEngine.getAttribute("gridDatabaseOptions.gridSizeZ") )->getValue();
+			steerOptions->gridDatabaseOptions.gridSizeX = float(gridSizeX);
+            steerOptions->gridDatabaseOptions.gridSizeZ = float(gridSizeZ);
+			int numGridCellsX = dynamic_cast<IntAttribute*> (mcu_p->steerEngine.getAttribute("gridDatabaseOptions.numGridCellsX"))->getValue();
+			int numGridCellsZ = dynamic_cast<IntAttribute*> (mcu_p->steerEngine.getAttribute("gridDatabaseOptions.numGridCellsZ"))->getValue();
+			int maxItemsPerGridCell = dynamic_cast<IntAttribute*> (mcu_p->steerEngine.getAttribute("gridDatabaseOptions.maxItemsPerGridCell"))->getValue();
+			steerOptions->gridDatabaseOptions.numGridCellsX = numGridCellsX;
+			steerOptions->gridDatabaseOptions.numGridCellsZ = numGridCellsZ;
+			steerOptions->gridDatabaseOptions.maxItemsPerGridCell = maxItemsPerGridCell;
 
 			LOG("INIT STEERSIM");
 			try {
