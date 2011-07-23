@@ -126,7 +126,6 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	param_sched_p->ref();
 	eyelid_ct->ref();
 
-	bonebusCharacter = NULL;
 	steeringAgent = NULL;
 	_numSteeringGoal = 0;
 	_reachTarget = false;

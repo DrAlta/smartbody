@@ -153,7 +153,8 @@ mcuCBHandle::mcuCBHandle()
 	snapshot_counter( 1 ),
 	delay_behaviors(true),
 	media_path("."),
-	_interactive(true)
+	_interactive(true),
+	sendPawnUpdates(false)
 	//physicsEngine(NULL)
 {
 
@@ -871,6 +872,31 @@ void mcuCBHandle::update( void )	{
 		}
 
 		char_p = character_map.lookup( pawn_p->name );
+		if (!char_p)
+		{
+			if (net_bone_updates)
+			{
+				if (!isClosingBoneBus && !pawn_p->bonebusCharacter && bonebus.IsOpen())
+				{
+					// bonebus was connected after character creation, create it now
+					pawn_p->bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( pawn_p->name, "pawn" , false );
+				}
+				if (sendPawnUpdates)
+					NetworkSendSkeleton( pawn_p->bonebusCharacter, pawn_p->skeleton_p, &param_map );
+				if (pawn_p->bonebusCharacter && pawn_p->bonebusCharacter->GetNumErrors() > 3)
+				{
+					// connection is bad, remove the bonebus character 
+					LOG("BoneBus cannot connect to server. Removing pawn %s", pawn_p->name);
+					bool success = bonebus.DeleteCharacter(pawn_p->bonebusCharacter);
+					char_p->bonebusCharacter = NULL;
+					isClosingBoneBus = true;
+					if (bonebus.GetNumCharacters() == 0)
+					{
+						bonebus.CloseConnection();
+					}
+				}
+			}
+		}
 		if( char_p ) {
 
 			char_p->forward_visemes( time );	
@@ -901,7 +927,7 @@ void mcuCBHandle::update( void )	{
 					char_p->bonebusCharacter->SetPosition( x, y, z, time );
 					char_p->bonebusCharacter->SetRotation( (float)q.w, (float)q.x, (float)q.y, (float)q.z, time );
 
-					if (char_p->bonebusCharacter->GetNumErrors() > 5)
+					if (char_p->bonebusCharacter->GetNumErrors() > 3)
 					{
 						// connection is bad, remove the bonebus character 
 						LOG("BoneBus cannot connect to server. Removing character %s", char_p->name);

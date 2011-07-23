@@ -36,6 +36,8 @@
 #include <me/me_ct_curve_writer.hpp>
 #include <sbm/DObject.h>
 
+#include "bonebus.h"
+
 #if USE_WSP
 #include "wsp.h"
 #endif
@@ -105,6 +107,7 @@ public:  // TODO - properly encapsulate / privatize the following
 
 	// Temporarily, until there is a unified multi-skeleton controller tree
 	MeControllerTreeRoot	*ct_tree_p;
+	bonebus::BoneBusCharacter * bonebusCharacter;
 
 public:
 	

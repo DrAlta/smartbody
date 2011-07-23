@@ -376,6 +376,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "pawns",			   showpawns_func );
 	mcu.insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands
 	mcu.insert( "syncpoint",		   syncpoint_func);
+	mcu.insert( "pawnbonebus",		   pawnbonebus_func);
 #ifdef USE_GOOGLE_PROFILER
 	mcu.insert( "startprofile",			   startprofile_func );
 	mcu.insert( "stopprofile",			   stopprofile_func );

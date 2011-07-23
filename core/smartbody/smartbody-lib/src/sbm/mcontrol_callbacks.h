@@ -139,6 +139,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int showcharacters_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int showpawns_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int syncpoint_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int pawnbonebus_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 #ifdef USE_GOOGLE_PROFILER
 int startprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int stopprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p );
