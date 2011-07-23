@@ -35,6 +35,7 @@
 #include <iostream>
 
 #include "smartbody-dll.h"
+#include "smartbody-c-dll.h"
 #include "vhmsg-tt.h"
 
 
@@ -44,6 +45,7 @@ using std::vector;
 
 Smartbody_dll * sbm = NULL;
 vector< string > characters;
+vector<SBM_SmartbodyCharacter*> instances;
 
 
 class SBMListener : public SmartbodyListener
@@ -54,6 +56,7 @@ class SBMListener : public SmartbodyListener
          printf( "Character Create!\n" );
 
          characters.push_back( name );
+		 
       }
 
 	  virtual void OnCharacterCreate( const string & name, const string & objectClass )
@@ -76,10 +79,77 @@ class SBMListener : public SmartbodyListener
             }
          }
       }
+
+	  virtual void OnCharacterChange( const string & name )
+      {
+         printf( "Character Changed!\n" );
+
+         for ( uint32_t i = 0; i < characters.size(); i++ )
+         {
+            if ( characters[ i ].compare( name ) == 0 )
+            {
+               characters.erase( characters.begin() + i );
+               break;
+            }
+         }
+      }
 };
 
 
-void tt_client_callback( const char * op, const char * args, void * user_data )
+ int _stdcall OnCreateCharacterCallback( SBMHANDLE sbmHandle, const char * name, const char * objectClass )
+{
+	 characters.push_back( name );
+	 SBM_SmartbodyCharacter* character = new SBM_SmartbodyCharacter();
+	  // copy name
+	   character->m_name = new char[ strlen(name) + 1 ];
+	   strcpy( character->m_name, name  );
+	 instances.push_back(character);
+	 return 0;
+}
+
+ int _stdcall OnCharacterDeleteCallback( SBMHANDLE sbmHandle, const char * name )
+{
+	 printf( "Character Delete!\n" );
+
+     for (uint32_t i = 0; i < characters.size(); i++ )
+     {
+        if ( characters[ i ].compare( name ) == 0 )
+        {
+           characters.erase( characters.begin() + i );
+		   SBM_SmartbodyCharacter* c = instances[i];
+		   delete c;
+		   instances.erase(instances.begin() + i);
+           break;
+        }
+     }
+
+	 return 0;
+}
+ int _stdcall OnCharacterChangeCallback( SBMHANDLE sbmHandle, const char * name )
+{
+	 printf( "Character Delete!\n" );
+
+     for (uint32_t i = 0; i < characters.size(); i++ )
+     {
+        if ( characters[ i ].compare( name ) == 0 )
+        {
+			SBM_SmartbodyCharacter* c = instances[i];
+			c->m_numJoints = 0;
+			delete [] c->m_joints;
+           break;
+        }
+     }
+
+	 return 0;
+}
+
+ int _stdcall OnVisemeCallback( SBMHANDLE sbmHandle, const char * name, const char * visemeName, float weight, float blendTime )
+{
+	return 0;
+}
+
+
+static void tt_client_callback( const char * op, const char * args, void * user_data )
 {
    printf( "received - '%s %s'\n", op, args );
 
@@ -131,11 +201,17 @@ int main( int argc, char ** argv )
 	vhcl::Log::g_log.AddListener(logListener);
 
    SBMListener listener;
-   sbm = new Smartbody_dll;
-
-   sbm->Init();
-   sbm->SetListener( &listener );
-
+   //sbm = new Smartbody_dll;
+   //sbm->Init();
+   //sbm->SetListener( &listener );
+   
+   SBMHANDLE sbmHandle = SBM_CreateSBM();
+   SBM_Init(sbmHandle);
+   SBM_SetListener(sbmHandle, 
+	   (SBM_OnCreateCharacterCallback) OnCreateCharacterCallback, 
+	   (SBM_OnCharacterDeleteCallback) OnCharacterDeleteCallback, 
+	   (SBM_OnCharacterChangeCallback) OnCharacterChangeCallback, 
+	   (SBM_OnVisemeCallback) OnVisemeCallback);
 
    printf( "Starting main loop...\n");
 #if WIN32
@@ -151,20 +227,23 @@ int main( int argc, char ** argv )
 	   {
 		   for (int i = 1; i < argc; i++)
 		   {
-			   sbm->ProcessVHMsgs("sbm", argv[i]);
+			   //sbm->ProcessVHMsgs("sbm", argv[i]);
+			    SBM_ProcessVHMsgs(sbmHandle, "sbm", argv[i]);
 		   }
 		   once = true;
 	   }  
 
-      sbm->Update( get_time() );
-      vhmsg::ttu_poll();
+      //sbm->Update( get_time() );
+		SBM_Update( sbmHandle, get_time());
+		vhmsg::ttu_poll();
 
 
 	  //LOG("character size = %d\n",characters.size());
       for ( uint32_t i = 0; i < characters.size(); i++ )
       {
-          SmartbodyCharacter& c = sbm->GetCharacter( characters[ i ] );
-
+          //SmartbodyCharacter& c = sbm->GetCharacter( characters[ i ] );
+		  SBM_GetCharacter(sbmHandle, characters[ i ].c_str(), instances[i] );
+		  
          //printf( "Character %s: %5.2f %5.2f %5.2f\n", c.m_name.c_str(), c.x, c.y, c.z );
       }
 
