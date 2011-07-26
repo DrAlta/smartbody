@@ -74,6 +74,7 @@
 #include <sbm/me_ct_basic_locomotion.h>
 #include "SteeringAgent.h"
 
+#include <sbm/me_ct_data_receiver.h>
 //#include <me/me_spline_1d.hpp>
 class MeCtMotionPlayer;
 class MeCtPAnimation;
@@ -81,6 +82,7 @@ class MeCtParamAnimation;
 class MeCtSaccade;
 class SteeringAgent;
 class MeCtBasicLocomotion;
+class MeCtDataReceiver;
 
 class SbmCharacter : public SbmPawn	{
 
@@ -171,7 +173,8 @@ public:
 			  GeneralParamMap* param_map,
 			  const char* classType,
 			  bool use_locomotion,
-			  bool use_param_animation);
+			  bool use_param_animation,
+			  bool use_data_receiver);
 
 	//* Overrides SbmPawn::prune_controller_tree()
 	virtual int prune_controller_tree( mcuCBHandle *mcu_p );
@@ -233,6 +236,7 @@ public:
 	MeCtSchedulerClass*	head_sched_p; // neck / head orientation
 	MeCtSchedulerClass*	param_sched_p; // general parameters
 
+	MeCtDataReceiver*	datareceiver_ct;
 	MeCtParamAnimation* param_animation_ct;
 	MeCtMotionPlayer*	motionplayer_ct;
 	MeCtSaccade*		saccade_ct;

@@ -2205,7 +2205,7 @@ int mcu_character_init(
 		}
 	}
 
-	err = char_p->init( skeleton_p, face_neutral_p, auMotionMap, visemeMotionMap, &mcu_p->param_map, unreal_class, mcu_p->use_locomotion, mcu_p->use_param_animation );
+	err = char_p->init( skeleton_p, face_neutral_p, auMotionMap, visemeMotionMap, &mcu_p->param_map, unreal_class, mcu_p->use_locomotion, mcu_p->use_param_animation, mcu_p->use_data_receiver );
 	if( err == CMD_SUCCESS ) {
 
 		if (mcu_p->use_locomotion) 
@@ -5914,4 +5914,95 @@ int stopprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 }
 #endif
 
+// Usage:
+// receiver echo <content>
+// receiver enable
+// receiver skeleton <skeletonName> <emitterType> position <joint-index/joint-name> <x> <y> <z>	
+// receiver skeleton <skeletonName> <emitterType> positions <x1> <y1> <z1> <x2> <y2> <z2> ...							20 Joints in total if emitterType == "kinect"
+// receiver skeleton <skeletonName> <emitterType> rotation <joint-index/joint-name> <q.w> <q.x> <q.y> <q.z>
+// receiver skeleton <skeletonName> <emitterType> rotations <q1.w> <q1.x> <q1.y> <q1.z> <q2.w> <q2.x> <q2.y> <q2.z>...	20 Joints in total if emitterType == "kinect"
+// 
+// p.s. 
+// currently position is for global and rotation is for local
+int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
+{
+	std::string operation = args.read_token();
+	if (operation == "echo")
+		LOG("%s", args.read_remainder_raw());
+	if (operation == "enable")
+		mcu->use_data_receiver = true;
+	if (operation == "skeleton")
+	{
+		std::string skelName = args.read_token();
+		std::string emitterName = args.read_token();
+		float scale = 1.0f;
+		if (emitterName == "kinect")
+			scale = 0.1f;
 
+		std::string skeletonType = args.read_token();
+		if (skeletonType == "position")
+		{
+			std::string jName;
+			if (emitterName == "kinect")
+				jName = mcu->kinectProcessor->getSBJointName(args.read_int());
+			else
+				jName = args.read_token();
+			float x = args.read_float() * scale;
+			float y = args.read_float() * scale;
+			float z = args.read_float() * scale;
+			SbmCharacter* character = mcu->character_map.lookup(skelName.c_str());	
+			character->datareceiver_ct->setGlobalPosition(jName, SrVec(x, y, z));
+		}
+		if (skeletonType == "positions")
+		{
+			;	// TODO: add support to joint global positions
+		}
+		if (skeletonType == "rotation")
+		{
+			std::string jName;
+			if (emitterName == "kinect")
+				jName = mcu->kinectProcessor->getSBJointName(args.read_int());
+			else
+				jName = args.read_token();
+
+			SrQuat quat;
+			quat.w = args.read_float();
+			quat.x = args.read_float();
+			quat.y = args.read_float();
+			quat.z = args.read_float();
+			SbmCharacter* character = mcu->character_map.lookup(skelName.c_str());	
+			character->datareceiver_ct->setLocalRotation(jName, quat);
+		}
+		if (skeletonType == "rotations")
+		{
+			if (emitterName == "kinect")
+			{
+				int numRemainTokens = args.calc_num_tokens();
+				if (numRemainTokens < 80)
+				{
+					LOG("Kinect skeleton %s rotation data is not valid.", skelName.c_str());
+					return CMD_FAILURE;
+				}
+				std::vector<SrQuat> quats;
+				for (int i = 0; i < 20; i++)
+				{
+					SrQuat quat;
+					quat.w = args.read_float();
+					quat.x = args.read_float();
+					quat.y = args.read_float();
+					quat.z = args.read_float();
+					quats.push_back(quat);
+				}
+				KinectProcessor::processGlobalRotation(quats);
+	//			mcu->kinectProcessor->filterRotation(quats);
+				SbmCharacter* character = mcu->character_map.lookup(skelName.c_str());	
+				for (int i = 0; i < 20; i++)
+				{
+					if (quats[i].w != 0)
+						character->datareceiver_ct->setLocalRotation(mcu->kinectProcessor->getSBJointName(i), quats[i]);
+				}
+			}
+		}
+	}
+	return CMD_SUCCESS;
+}
