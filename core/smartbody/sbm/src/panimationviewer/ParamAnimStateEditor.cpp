@@ -54,7 +54,7 @@ PAStateEditor::PAStateEditor(int x, int y, int w, int h, PanimationWindow* windo
 		Fl_Group* buttonGroup = new Fl_Group(esx, esy, w - 2 * xDis, 3 * yDis);
 		buttonGroup->begin();
 			stateList = new Fl_Choice(10 * xDis + esx, yDis + esy, 100, 2 * yDis, "State List");
-			stateList->when(FL_WHEN_ENTER_KEY);
+//			stateList->when(FL_WHEN_ENTER_KEY);
 			stateList->callback(changeStateList, this);
 			addMark = new Fl_Button(12 * xDis + 100 + esx, yDis + esy, 100, 2 * yDis, "Add Mark");
 			addMark->callback(addStateTimeMark, this);
@@ -106,6 +106,7 @@ void PAStateEditor::loadStates()
 	stateList->add("---");
 	for (size_t i = 0; i < mcu.param_anim_states.size(); i++)
 		stateList->add(mcu.param_anim_states[i]->stateName.c_str());
+	stateList->value(0);
 }
 
 void PAStateEditor::changeStateEditorMode(Fl_Widget* widget, void* data)
@@ -261,7 +262,9 @@ void PAStateEditor::changeStateList(Fl_Widget* widget, void* data)
 {
 	PAStateEditor* editor = (PAStateEditor*) data;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	int curValue = editor->stateList->value();
 	editor->loadStates();
+	editor->stateList->value(curValue);
 	editor->stateEditorNleModel->removeAllTracks();
 	std::string currentStateName = editor->stateList->menu()[editor->stateList->value()].label();
 	PAStateData* currentState = mcu.lookUpPAState(currentStateName);

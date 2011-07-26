@@ -29,7 +29,7 @@ PATransitionEditor::PATransitionEditor(int x, int y, int w, int h, PanimationWin
 {
 	this->label("Transition Editor");
 	this->begin();
-		transitionEditorMode = new Fl_Check_Button(xDis, yDis, 200, 2 * yDis, "Create Transition Mode");
+		transitionEditorMode = new Fl_Check_Button(xDis + x, yDis + y, 200, 2 * yDis, "Create Transition Mode");
 		transitionEditorMode->callback(changeTransitionEditorMode, this);
 		
 		int tgx = xDis + x;
@@ -122,7 +122,7 @@ void PATransitionEditor::loadTransitions()
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	for (size_t i = 0; i < mcu.param_anim_transitions.size(); i++)
 	{
-		std::string transitionName = mcu.param_anim_transitions[i]->fromState->stateName + std::string(" | ") + mcu.param_anim_transitions[i]->toState->stateName;
+		std::string transitionName = mcu.param_anim_transitions[i]->fromState->stateName + std::string(" + ") + mcu.param_anim_transitions[i]->toState->stateName;
 		transitionList->add(transitionName.c_str());
 	}
 	transitionList->value(0);
@@ -291,7 +291,7 @@ void PATransitionEditor::updateTransitionTimeMark(Fl_Widget* widget, void* data)
 			editor->transitionEditorNleModel->getTrack(1)->getBlock(0)->setName("");
 			return;
 		}
-		size_t seperateMarkPos = fullName.find("|");
+		size_t seperateMarkPos = fullName.find("+");
 		fromStateName = fullName.substr(0, seperateMarkPos);
 		toStateName = fullName.substr(seperateMarkPos + 1, fullName.size() - 1);
 		transition = mcuCBHandle::singleton().lookUpPATransition(fromStateName, toStateName);
@@ -392,6 +392,7 @@ void PATransitionEditor::changeTransitionList(Fl_Widget* widget, void* data)
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	int stateValue = editor->transitionList->value();
 	editor->loadTransitions();
+	editor->transitionList->value(stateValue);
 
 	nle::Block* block1 = editor->transitionEditorNleModel->getTrack(0)->getBlock(0);
 	block1->removeAllMarks();
@@ -405,7 +406,9 @@ void PATransitionEditor::changeTransitionList(Fl_Widget* widget, void* data)
 		return;
 	}
 
-	size_t seperateMarkPos = fullName.find("|");
+	size_t seperateMarkPos = fullName.find("+");
+	if (seperateMarkPos == std::string::npos)
+		return;
 	std::string fromStateName = fullName.substr(0, seperateMarkPos - 1);
 	std::string toStateName = fullName.substr(seperateMarkPos + 2, fullName.size() - 1);
 	PATransitionData* transition = mcu.lookUpPATransition(fromStateName, toStateName);
