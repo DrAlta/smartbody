@@ -876,7 +876,7 @@ void mcuCBHandle::update( void )	{
 		{
 			if (net_bone_updates)
 			{
-				if (!isClosingBoneBus && !pawn_p->bonebusCharacter && bonebus.IsOpen())
+				if (!isClosingBoneBus && !pawn_p->bonebusCharacter && bonebus.IsOpen() && sendPawnUpdates)
 				{
 					// bonebus was connected after character creation, create it now
 					pawn_p->bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( pawn_p->name, "pawn" , false );
