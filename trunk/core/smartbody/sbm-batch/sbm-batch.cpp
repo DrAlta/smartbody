@@ -29,10 +29,13 @@
 #include <conio.h>
 #include <windows.h>
 #include <mmsystem.h>
+#else
+#define _stdcall 
 #endif
 
 #include <set>
 #include <iostream>
+#include <cstring>
 
 #include "smartbody-dll.h"
 #include "smartbody-c-dll.h"
