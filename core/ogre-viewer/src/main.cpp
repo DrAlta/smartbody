@@ -25,8 +25,8 @@
 */
 
 #include "vhcl.h"
-#include <windows.h>
 #include "bonebus.h"
+#include "smartbody-dll.h"
 #include "vhmsg-tt.h"
 
 #include <Ogre.h>
@@ -35,25 +35,55 @@
 
 #include <map>
 #include <string>
+#include <set>
+
+#ifdef WIN32
+#include <conio.h>
+#include <windows.h>
+#include <mmsystem.h>
+#endif
 
 using std::string;
 using std::vector;
+using std::stringstream;
 using namespace bonebus;
 
 
-#define FPS_LIMIT 31
+#define FPS_LIMIT 60
 
 Entity * ent;
 SceneNode * mSceneNode;
 
 std::string skeleton[ 116 ];
+std::set<std::string> validJointNames;
+bool isBonebus;
+
+DWORD startTime;
+
+double get_time()
+{
+#if WIN32
+	DWORD ticks = GetTickCount();
+	ticks -= startTime;
+   return (ticks / 1000.0 );
+#else
+	struct timeval tv;
+	gettimeofday( &tv, NULL );
+	return( tv.tv_sec + ( tv.tv_usec / 1000000.0 ) );
+#endif
+}
 
 // Event handler to animate
 class SkeletalAnimationFrameListener : public ExampleFrameListener
 {
+public:
+	std::vector<std::string>	m_characterList;
+	std::map<std::string, std::map<std::string, Ogre::Vector3>>	m_initialBonePositions;
+
 private:
 	SceneManager * mSceneMgr;
 	BoneBusServer * m_bonebus;
+	Smartbody_dll* m_sbm;
 
 	bool m_ogreMouseEnabled;
 	
@@ -61,11 +91,12 @@ protected:
 	bool mQuit;
 
 public:
-	SkeletalAnimationFrameListener(RenderWindow * win, Camera * cam, const std::string & debugText, SceneManager * mgr, BoneBusServer * bonebus) : ExampleFrameListener( win, cam )
+	SkeletalAnimationFrameListener(RenderWindow * win, Camera * cam, const std::string & debugText, SceneManager * mgr, BoneBusServer * bonebus, Smartbody_dll* sbmdll) : ExampleFrameListener( win, cam )
 	{
 		mDebugText = debugText;
 		mSceneMgr = mgr;
 		m_bonebus = bonebus;
+		m_sbm = sbmdll;
 		mQuit = false;
 		m_ogreMouseEnabled = true;
 
@@ -246,12 +277,83 @@ public:
 
 
 		vhmsg::ttu_poll();
-
-		m_bonebus->Update();
-
 		
+		if (isBonebus)
+		{
+			m_bonebus->Update();
+		}
+		else
+		{
+			m_sbm->Update(get_time());
+
+			SceneNode* sceneNode = mSceneMgr->getRootSceneNode();
+			if (!sceneNode)
+				return false;
+			
+			// set character position and rotation
+			for ( size_t i = 0; i < m_characterList.size(); i++ )
+			{
+				std::string& name = m_characterList[i];
+				SmartbodyCharacter& c = m_sbm->GetCharacter(name);
+				if (!mSceneMgr->hasEntity(name))
+					continue;
+
+				Node* node = sceneNode->getChild(name);
+
+				if (!node)
+					continue;
+				// set character positions& rotations
+				node->setPosition(c.x, c.y, c.z);
+				node->setOrientation(Quaternion(c.rw, c.rx, c.ry, c.rz));
+				
+				// set bone positions& rotations				
+				SceneNode* n = (SceneNode*) sceneNode->getChild(name);
+				Entity * ent = (Entity*)n->getAttachedObject(name);
+				if ( ent == NULL )
+					continue;
+				std::map<std::string, Ogre::Vector3>& intialBonePositionMap = m_initialBonePositions[name];
+				Ogre::Skeleton* skel = ent->getSkeleton();
+				for (size_t jId = 0; jId < c.m_joints.size(); jId++)
+				{
+					SmartbodyJoint& joint = c.m_joints[jId];
+					std::string& jointName = joint.m_name;
+					if (jointName == "")
+						continue;
+
+					std::set<std::string>::iterator iter = validJointNames.find(jointName);
+					if (iter == validJointNames.end())
+					{
+						continue;
+					}
+
+					try
+					{
+						Ogre::Bone* bone = skel->getBone(jointName);
+						if (bone)
+						{
+							bone->setManuallyControlled(true);
+						 	
+							Ogre::Vector3& vec = intialBonePositionMap[jointName];
+							float x = joint.x + vec.x;
+							float y = joint.y + vec.y;
+							float z = joint.z + vec.z;
+							bone->setPosition(x, y, z);
+
+							bone->setOrientation(Quaternion(joint.rw, joint.rx, joint.ry, joint.rz));
+						}
+					}
+					catch (ItemIdentityException&)
+					{
+						//printf("Could not find bone name %s", jointName.c_str());
+					}
+				}
+				
+			}
+		}
+
+
 		//Limiting the frames per second as otherwise it takes up entire CPU
-		// Setting it to 30, but in effect it comes up to 60 due to granularity issues
+		// Setting it to 60, but in effect it comes up to 90 due to granularity issues
 		Ogre::Root::getSingleton().setFrameSmoothingPeriod(0);
 		Ogre::Real ttW;
 		ttW = 1000.0f / FPS_LIMIT - 1000.0f * evt.timeSinceLastFrame;
@@ -339,7 +441,7 @@ public:
 };
 
 
-class OgreViewerApplication : public ExampleApplication
+class OgreViewerApplication : public ExampleApplication, public SmartbodyListener
 {
 	private:
 		Ogre::SceneNode * sceneNode;
@@ -351,7 +453,9 @@ class OgreViewerApplication : public ExampleApplication
 
 		std::map<std::string, std::vector<int>*> m_lastPosTimes;
 		std::map<std::string, std::vector<int>*> m_lastRotTimes;
-		
+	public:
+		std::vector<std::string>	commandLineArgs;
+
 	public:
 		OgreViewerApplication()
 		{
@@ -613,29 +717,157 @@ class OgreViewerApplication : public ExampleApplication
 			skeleton[ 111 ] = "r_thumb2";
 			skeleton[ 112 ] = "r_thumb3";
 			skeleton[ 113 ] = "r_thumb4";
-			
-			m_bonebus.SetOnClientConnectCallback( OnClientConnect, this );
-			m_bonebus.SetOnCreateCharacterFunc( OnCreateCharacter, this );
-			m_bonebus.SetOnDeleteCharacterFunc( OnDeleteCharacter, this );
-			m_bonebus.SetOnUpdateCharacterFunc( OnUpdateCharacter, this );
-			m_bonebus.SetOnSetCharacterPositionFunc( OnSetCharacterPosition, this );
-			m_bonebus.SetOnSetCharacterRotationFunc( OnSetCharacterRotation, this );
-			m_bonebus.SetOnBoneRotationsFunc( OnBoneRotations, this );
-			m_bonebus.SetOnBonePositionsFunc( OnBonePositions, this );
-			m_bonebus.OpenConnection();
+
+			for (int x = 0; x < 114; x++)
+				validJointNames.insert(skeleton[x]);
 
 			// ask SmartBody to connect to this server if it hasn't already done so
 			vhmsg::ttu_notify2("sbm", "net_check");
+		    vhmsg::ttu_notify2( "vrComponent", "renderer all" );
+
+			// sbm related vhmsgs
+		    vhmsg::ttu_register( "vrAllCall" );
+		    vhmsg::ttu_register( "vrKillComponent" );
+		    vhmsg::ttu_register( "sbm" );
+		    vhmsg::ttu_register( "vrAgentBML" );
+		    vhmsg::ttu_register( "vrSpeak" );
+		    vhmsg::ttu_register( "vrExpress" );
+		    vhmsg::ttu_register( "vrSpoke" );
+		    vhmsg::ttu_register( "RemoteSpeechReply" );
+		    vhmsg::ttu_register( "PlaySound" );
+		    vhmsg::ttu_register( "StopSound" );
+		    vhmsg::ttu_register( "CommAPI" );
+		    vhmsg::ttu_register( "object-data" );
+		    vhmsg::ttu_register( "wsp" );
+
+			if (isBonebus)
+			{
+				m_bonebus.SetOnClientConnectCallback( OnClientConnect, this );
+				m_bonebus.SetOnCreateCharacterFunc( OnCreateCharacter, this );
+				m_bonebus.SetOnDeleteCharacterFunc( OnDeleteCharacter, this );
+				m_bonebus.SetOnUpdateCharacterFunc( OnUpdateCharacter, this );
+				m_bonebus.SetOnSetCharacterPositionFunc( OnSetCharacterPosition, this );
+				m_bonebus.SetOnSetCharacterRotationFunc( OnSetCharacterRotation, this );
+				m_bonebus.SetOnBoneRotationsFunc( OnBoneRotations, this );
+				m_bonebus.SetOnBonePositionsFunc( OnBonePositions, this );
+				m_bonebus.OpenConnection();
+			}
+			else
+			{
+				sbm = new Smartbody_dll;
+				sbm->Init();
+				startTime = GetTickCount();
+				sbm->SetListener(this);
+				for (size_t i = 0; i < commandLineArgs.size(); i++)
+				   vhmsg::ttu_notify2("sbm", commandLineArgs[i].c_str());
+			}
 		}
 
 
 		// Create new frame listener
 		void createFrameListener()
 		{
-			mFrameListener = new SkeletalAnimationFrameListener( mWindow, mCamera, mDebugText, mSceneMgr, &m_bonebus );
+			mFrameListener = new SkeletalAnimationFrameListener( mWindow, mCamera, mDebugText, mSceneMgr, &m_bonebus, sbm );
 			mRoot->addFrameListener( mFrameListener );
 		}
 
+	public:
+		virtual void OnCharacterCreate( const string & name )
+		{	     
+			printf( "Character Create!\n" );
+		}
+
+		virtual void OnCharacterCreate( const string & name, const string & objectClass )
+		{	
+			std::string logMsg = "Character " + name + " Created. Type is " + objectClass;
+			LogManager::getSingleton().logMessage(logMsg.c_str());
+			if (objectClass == "pawn")
+				return;
+
+			Entity * ent;
+			if (mSceneMgr->hasEntity(name))
+				return;
+
+			try
+			{
+				//Create character from characterType
+				ent = mSceneMgr->createEntity(name, name + ".mesh" );
+			}
+			catch( Ogre::ItemIdentityException& )
+			{
+				;
+			}
+			catch( Ogre::Exception& e )
+			{
+				if( e.getNumber() == Ogre::Exception::ERR_FILE_NOT_FOUND ) 
+				{
+					//Default to existing Brad character
+					ent = mSceneMgr->createEntity(name, "Brad.mesh" );
+				}
+			}
+
+			if (ent == NULL)
+			{
+				return;
+			}
+
+			// Add entity to the scene node
+			SceneNode * mSceneNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(name);
+			mSceneNode->attachObject(ent);
+			Ogre::Skeleton* skel = ent->getSkeleton();
+
+			SkeletalAnimationFrameListener* frameListener = dynamic_cast<SkeletalAnimationFrameListener*> (mFrameListener);
+			if (frameListener)
+			{
+				// insert into character list
+				frameListener->m_characterList.push_back(name);
+				
+				// get intial bone position for every character
+				std::map<std::string, Ogre::Vector3> intialBonePositions;
+
+				for (int i = 0; i < skel->getNumBones(); i++)
+				{
+					Bone* bone = skel->getBone(i);
+					intialBonePositions.insert(std::make_pair(bone->getName(), bone->getPosition()));
+				}
+				frameListener->m_initialBonePositions.insert(std::make_pair(name, intialBonePositions));
+			}
+		}
+
+		virtual void OnCharacterDelete( const string & name )
+		{
+			SceneNode * node = (SceneNode *)mSceneMgr->getRootSceneNode()->getChild(name);
+			node->detachAllObjects();
+			mSceneMgr->destroyEntity(name);
+			mSceneMgr->getRootSceneNode()->removeAndDestroyChild(name);
+
+			SkeletalAnimationFrameListener* frameListener = dynamic_cast<SkeletalAnimationFrameListener*> (mFrameListener);
+			if (frameListener)
+			{
+				// delete from character list
+				int eraseId = -1;
+				for (unsigned int i = 0; i < frameListener->m_characterList.size(); i++)
+				{
+					if (frameListener->m_characterList[i] == name)
+					{
+						eraseId = i;
+						break;
+					}
+				}
+				if (eraseId >= 0)
+					frameListener->m_characterList.erase(frameListener->m_characterList.begin() + eraseId);
+
+				// delete from initial bone position map
+				std::map<std::string, std::map<std::string, Ogre::Vector3>>::iterator iter = frameListener->m_initialBonePositions.find(name);
+				if (iter != frameListener->m_initialBonePositions.end())
+					frameListener->m_initialBonePositions.erase(iter);
+			}
+		}
+
+		virtual void OnCharacterChange( const string & name )
+		{
+			printf( "Character Changed!\n" );
+		}
 
 	protected:
 		static void OnClientConnect( const string & clientName, void * userData )
@@ -647,6 +879,8 @@ class OgreViewerApplication : public ExampleApplication
 		static void OnCreateCharacter( const int characterID, const std::string & characterType, const std::string & characterName, const int skeletonType, void * userData )
 		{
 			//printf( "Character Create! - %d, %s, %s, %d\n", characterID, characterType.c_str(), characterName.c_str(), skeletonType );
+			if (characterType == "pawn")
+				return;
 
 			OgreViewerApplication * app = (OgreViewerApplication *)userData;
 
@@ -987,7 +1221,6 @@ class OgreViewerApplication : public ExampleApplication
 			}
 		}
 
-
 		static void tt_client_callback( const char * op, const char * args, void * user_data )
 		{
 		   OgreViewerApplication * app = (OgreViewerApplication *)user_data;
@@ -1014,25 +1247,58 @@ class OgreViewerApplication : public ExampleApplication
 				 }
 			  }
 		   }
+		   if (!isBonebus)
+		     app->sbm->ProcessVHMsgs(op, args);
 		}
 
 	protected:
 		std::string mDebugText;
 
 		BoneBusServer  m_bonebus;
+		Smartbody_dll* sbm;
 };
-
-
-
-
-
-
-
 
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
 	// Create application object
 	OgreViewerApplication app;
+
+	isBonebus = true;
+
+	// Processing command line arguments, if there are, then use dll mode
+	std::string commandLine = lpCmdLine;
+	std::stringstream strstr(commandLine);
+	std::istream_iterator<std::string> it(strstr);
+	std::istream_iterator<std::string> end;
+	std::vector<std::string> tokenzied(it, end);
+	int numTokens = tokenzied.size();
+	int tokenCounter = 0;
+	while (tokenCounter < numTokens)
+	{
+		std::string op = tokenzied[tokenCounter];
+		if (op == "-seqpath")
+		{
+			tokenCounter++;
+			if (tokenCounter < numTokens)
+			{
+				std::string command = "path seq " + tokenzied[tokenCounter];
+				app.commandLineArgs.push_back(command);
+			}
+		}
+		if (op == "-seq")
+		{
+			tokenCounter++;
+			if (tokenCounter < numTokens)
+			{
+				std::string command = "seq " + tokenzied[tokenCounter];
+				app.commandLineArgs.push_back(command);
+			}
+		}
+		tokenCounter++;
+	}
+
+	if (app.commandLineArgs.size() > 0)
+		isBonebus = false;
 
 	try
 	{
