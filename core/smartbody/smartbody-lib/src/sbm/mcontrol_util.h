@@ -92,6 +92,7 @@ class mcuCBHandle;
 
 #include <sbm/SteerSuiteEngineDriver.h>
 #include <sbm/Physics/SbmPhysicsSim.h>
+#include <sbm/KinectProcessor.h>
 
 #include BML_PROCESSOR_INCLUDE
 
@@ -163,6 +164,7 @@ class mcuCBHandle {
 		bool		net_face_bones;
 		bool		use_locomotion;
 		bool		use_param_animation;
+		bool		use_data_receiver;
 		bool        updatePhysics;
 		bool		sendPawnUpdates; // if true, sends the pawn information over bonebus in the same wasy as the characters
 		bool        resourceDataChanged;
@@ -180,6 +182,8 @@ class mcuCBHandle {
 		double		skScale;
 		double		skmScale;
 		double      physicsTime;
+
+		KinectProcessor*							kinectProcessor;
 
 		std::vector<PAStateData*>					param_anim_states;
 		std::vector<PATransitionData*>				param_anim_transitions;

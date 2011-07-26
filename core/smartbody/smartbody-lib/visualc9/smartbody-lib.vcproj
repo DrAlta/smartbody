@@ -416,6 +416,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\KinectProcessor.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\KinectProcessor.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\lin_win.cpp"
 				>
 			</File>
@@ -1652,6 +1660,18 @@
 				</File>
 				<File
 					RelativePath="..\src\sbm\me_ct_basic_locomotion.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="datareceiver"
+				>
+				<File
+					RelativePath="..\src\sbm\me_ct_data_receiver.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\sbm\me_ct_data_receiver.h"
 					>
 				</File>
 			</Filter>

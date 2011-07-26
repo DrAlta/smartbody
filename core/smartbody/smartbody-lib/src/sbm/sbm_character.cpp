@@ -380,7 +380,8 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 						GeneralParamMap* param_map,
                         const char* classType,
 						bool use_locomotion,
-						bool use_param_animation)
+						bool use_param_animation,
+						bool use_data_receiver)
 {
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
@@ -462,7 +463,12 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 		this->saccade_ct->init(this);
 		std::string saccadeCtName = std::string(name)+ "'s eye saccade controller";
 		this->saccade_ct->name(saccadeCtName.c_str());
+	}
 
+	{
+		this->datareceiver_ct = new MeCtDataReceiver(this->skeleton_p);
+		std::string datareceiverCtName = std::string(name) + "'s data receiver controller";
+		this->datareceiver_ct->name(datareceiverCtName.c_str());
 	}
 
 	// Clear pointer data no longer used after this point in initialization.
@@ -543,6 +549,10 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 			ct_tree_p->add_controller( eyelid_ct );
 		}
 	}
+
+	// data receiver player
+	if (use_data_receiver)
+		ct_tree_p->add_controller(datareceiver_ct);
 
 	// motion player
 	motionplayer_ct = new MeCtMotionPlayer(this);

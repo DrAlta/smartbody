@@ -140,6 +140,7 @@ mcuCBHandle::mcuCBHandle()
 	queued_cmds( 0 ),
 	use_locomotion( false ),
 	use_param_animation( false ),
+	use_data_receiver( false ),
 	updatePhysics( false ),
 	locomotion_type( Basic ),
 	viewer_factory ( new SrViewerFactory() ),
@@ -157,7 +158,7 @@ mcuCBHandle::mcuCBHandle()
 	sendPawnUpdates(false)
 	//physicsEngine(NULL)
 {
-
+	kinectProcessor = new KinectProcessor();
 	
 	root_group_p->ref();
 	logger_p->ref();
@@ -192,6 +193,7 @@ void mcuCBHandle::reset( void )	{
 	time = 0.0;
 	net_bone_updates = true;
 	use_locomotion = false;
+	use_data_receiver = false;
 	root_group_p = new SrSnGroup();
 	root_group_p->ref();
 	logger_p = new joint_logger::EvaluationLogger();
@@ -474,7 +476,9 @@ void mcuCBHandle::clear( void )	{
 #if USE_WSP
 	theWSP->shutdown();
 #endif
-
+	if (kinectProcessor)
+		delete kinectProcessor;
+	kinectProcessor = NULL;
 }
 
 /////////////////////////////////////////////////////////////
