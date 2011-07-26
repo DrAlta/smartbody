@@ -2586,7 +2586,8 @@ void FltkViewer::drawColliders()
 			  mi++)
 		{
 			SbmPhysicsObj* obj = mi->second;
-			this->drawColObject(obj->getColObj(),obj->getColObj()->getWorldState().gmat());
+			SrMat gmat = obj->getColObj()->getWorldState().gmat();
+			this->drawColObject(obj->getColObj(), gmat);
 		}		
 	}
 }
