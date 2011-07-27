@@ -400,7 +400,7 @@ protected:
 	 */
 
 	// NOTE: called for shader params, bound ( 0, 2 )
-	void add_bounded_float_channel( const std::string & name, float lower, float upper, const int wo_index );
+	SkJoint* add_bounded_float_channel( const std::string & name, float lower, float upper, const int wo_index );
 
 
 	/*!
@@ -410,6 +410,11 @@ protected:
 
 	// NOTE: called for A-units and visemes; bound ( 0, 1 )
 	void add_face_channel( const std::string& name, const int wo_index );
+
+	
+	int writeSkeletonHierarchy(std::string file, double scale);
+	void writeSkeletonHierarchyRecurse(SkJoint* joint, std::ofstream& ostream, double scale, int indentLevel);
+	void indent(int num, std::ofstream& ostream);
 };
 
 /////////////////////////////////////////////////////////////

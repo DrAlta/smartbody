@@ -53,6 +53,11 @@ class SkJoint
                    TypeEuler       // Euler angles with min/max limits per dof
                  };
 
+	enum JointType { TypeJoint,
+					 TypeViseme,
+					 TypeOther
+				   };
+
    private :
     SrModel* _visgeo; // the attached geometry to visualize this joint
     SrModel* _colgeo; // the attached geometry used for collision detection
@@ -71,6 +76,7 @@ class SkJoint
     SkJointQuat* _quat;    // generic access to the quaternion of any parameterization
     SkJointPos _pos;       // controls the translation parameterization
 	float _mass;		   // mass of the bone associated with the joint
+	int _jointType;
 
     friend class SkSkeleton;
     friend class SkColdet;
@@ -227,6 +233,9 @@ class SkJoint
 
 	/*! Gets the mass of the bone. */
 	float mass () const { return _mass; };
+
+	int getJointType() { return _jointType; };
+	void setJointType(int jtype) {  _jointType = jtype; };
  };
 
 //==================================== End of File ===========================================

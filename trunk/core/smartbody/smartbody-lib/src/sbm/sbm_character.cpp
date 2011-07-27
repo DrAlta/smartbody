@@ -690,16 +690,18 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 
 void SbmCharacter::add_face_channel( const string& name, const int wo_index ) {
-	add_bounded_float_channel( name, 0, 2, wo_index );
+	SkJoint* joint = add_bounded_float_channel( name, 0, 2, wo_index );
+	joint->setJointType(SkJoint::TypeViseme);
 }
 
 
-void SbmCharacter::add_bounded_float_channel( const string& name, float lower, float upper, const int wo_index ) {
+SkJoint*  SbmCharacter::add_bounded_float_channel( const string& name, float lower, float upper, const int wo_index ) {
 
 	SkJoint* joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
 	joint_p->name( SkJointName( name.c_str() ) );
 	// Activate channel with lower limit != upper.
 	joint_p->pos()->limits( SkJointPos::X, lower, upper );  // Setting upper bound to 2 allows some exageration
+	return joint_p;
 }
 
 int SbmCharacter::init_skeleton() {
@@ -881,7 +883,8 @@ int SbmCharacter::init_skeleton() {
 				{
 					std::stringstream joint_name;
 					joint_name << this->name << "_" << Index << "_" << ( i + 1 );
-					add_bounded_float_channel( joint_name.str(), 0 , 1, wo_index );
+					SkJoint* joint = add_bounded_float_channel( joint_name.str(), 0 , 1, wo_index );
+					joint->setJointType(SkJoint::TypeOther);
 				}
 			}
 		}
@@ -1664,7 +1667,7 @@ void SbmCharacter::forward_visemes( double curTime )
 				
 					if( bonebusCharacter )
 					{
-						bonebusCharacter->SetViseme( channels.name(c).get_string(), value, 0 );
+						//bonebusCharacter->SetViseme( channels.name(c).get_string(), value, 0 );
 					}
 					if( listener_p )
 					{
@@ -2519,6 +2522,13 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		}
 		return CMD_SUCCESS;
 	}
+	else if (cmd == "sk")
+	{
+		string file = args.read_token();
+		string scaleStr = args.read_token();
+		double scale = atof(scaleStr.c_str());
+		return writeSkeletonHierarchy(file, scale);		
+	}
 	else if ( cmd == "collision")
 	{
 		string phyCmd = args.read_token();
@@ -2706,6 +2716,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		LOG( "  eyelid close <closed-angle>" );
 		LOG( "  eyelid tight <upper-norm> [<lower-norm>]" );
 		LOG( "  softeyes" );
+		LOG( "  sk <file> <scale>");
 		return( CMD_SUCCESS );
 	}
 
@@ -3081,3 +3092,88 @@ void SbmCharacter::setJointCollider( std::string jointName, float size )
 {
 		
 }
+
+int SbmCharacter::writeSkeletonHierarchy(std::string file, double scale)
+{
+	std::ofstream ostream(file.c_str());
+	if (!ostream.good())
+	{
+		LOG("Cannot open file '%s' for writing .sk file.", file.c_str());
+		return CMD_FAILURE;
+	}
+
+	SkJoint* root = skeleton_p->root();
+	if (!root)
+		return CMD_SUCCESS;
+
+	ostream << "set_name " << this->name << "\n";
+	ostream << "\n";
+	ostream << "skeleton\n";
+	ostream << "root " << root->name().get_string() << "\n";
+	writeSkeletonHierarchyRecurse(root, ostream, scale, 0);
+	ostream << "\n";
+	ostream << "end\n";
+
+	LOG("Wrote file '%s'.", file.c_str());
+
+	return CMD_SUCCESS;
+
+}
+
+void SbmCharacter::indent(int num, std::ofstream& ostream)
+{
+	for (int x = 0; x < num; x++)
+	{
+		ostream << "\t";
+	}
+}
+
+void SbmCharacter::writeSkeletonHierarchyRecurse(SkJoint* joint, std::ofstream& ostream, double scale, int indentLevel)
+{
+	SrVec offset = joint->offset();
+	indent(indentLevel, ostream);
+	ostream << "{\n";
+	indentLevel++;
+	indent(indentLevel, ostream);
+	ostream << "offset " << offset[0] * scale << " " << offset[1] * scale << " " << offset[2] * scale << "\n";
+	SkJointPos* pos = joint->pos();
+	if (pos)
+	{
+		if (!pos->frozen(0))
+		{
+			indent(indentLevel, ostream);
+			ostream << "channel XPos 0 free\n";
+		}
+		if (!pos->frozen(1))
+		{
+			indent(indentLevel, ostream);
+			ostream << "channel YPos 0 free\n";
+		}
+		if (!pos->frozen(2))
+		{
+			indent(indentLevel, ostream);
+			ostream << "channel ZPos 0 free\n";
+		}
+	}
+	SkJointQuat* quat = joint->quat();
+	if (quat)
+	{
+		indent(indentLevel, ostream);
+		ostream << "channel Quat\n";
+	}
+	ostream << "\n";
+
+	for (int n = 0; n < joint->num_children(); n++)
+	{
+		SkJoint* child = joint->child(n);
+		// make sure that 
+		indent(indentLevel, ostream);
+		ostream << "joint " << child->name() << "\n";
+		writeSkeletonHierarchyRecurse(child, ostream, scale, indentLevel);	
+	}
+
+	indentLevel--;
+	indent(indentLevel, ostream);
+	ostream << "}\n";
+}
+

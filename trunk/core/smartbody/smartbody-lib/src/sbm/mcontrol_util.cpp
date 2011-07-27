@@ -768,6 +768,7 @@ void mcuCBHandle::update( void )	{
 		if (!this->steerEngine.isDone())
 		{
 			if (this->steerEngine.getStartTime() == 0.0f)
+
 				this->steerEngine.setStartTime(float(this->time));
 	
 			SbmCharacter* character;
@@ -934,14 +935,8 @@ void mcuCBHandle::update( void )	{
 					if (char_p->bonebusCharacter->GetNumErrors() > 3)
 					{
 						// connection is bad, remove the bonebus character 
-						LOG("BoneBus cannot connect to server. Removing character %s", char_p->name);
-						bool success = bonebus.DeleteCharacter(char_p->bonebusCharacter);
-						char_p->bonebusCharacter = NULL;
 						isClosingBoneBus = true;
-						if (bonebus.GetNumCharacters() == 0)
-						{
-							bonebus.CloseConnection();
-						}
+						LOG("BoneBus cannot connect to server. Removing all characters");
 					}
 				}
 			}
@@ -952,6 +947,23 @@ void mcuCBHandle::update( void )	{
 			}
 		}  // end of char_p processing
 	} // end of loop
+
+	if (isClosingBoneBus)
+	{
+		pawn_map.reset();
+	
+		while( pawn_p = pawn_map.next() )
+		{
+			if (pawn_p->bonebusCharacter)
+			{
+				bool success = bonebus.DeleteCharacter(pawn_p->bonebusCharacter);
+				pawn_p->bonebusCharacter = NULL;
+			}
+		}
+
+		bonebus.CloseConnection();
+	}
+
 
 	if (panimationviewer_p)
 		panimationviewer_p->update_viewer();
@@ -1337,8 +1349,10 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 	for ( int i = 0; i < joints.size(); i++ )
 	{
 		SkJoint * j = joints[ i ];
+		if (j->getJointType() != SkJoint::TypeJoint)
+			continue;
 
-		SrQuat q = j->quat()->value();
+		const SrQuat& q = j->quat()->value();
 
 		character->AddBoneRotation( j->name(), q.w, q.x, q.y, q.z, time );
 
@@ -1353,6 +1367,8 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 	for ( int i = 0; i < joints.size(); i++ )
 	{
 		SkJoint * j = joints[ i ];
+		if (j->getJointType() != SkJoint::TypeJoint)
+			continue;
 
 		float posx = j->pos()->value( 0 );
 		float posy = j->pos()->value( 1 );
@@ -1372,11 +1388,16 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 
 	character->EndSendBonePositions();
 
+/*
 	// Passing General Parameters
 	character->StartSendGeneralParameters();
+	int numFound = 0;
 	for (int i = 0; i < joints.size(); i++)
 	{
 		SkJoint* j = joints[ i ];
+		if (j->getJointType() != SkJoint::TypeOther)
+			continue;
+
 		// judge whether it is joint for general parameters, usually should have a prefix as "param"
 		string j_name = j->name().get_string();
 		int name_end_pos = j_name.find_first_of("_");
@@ -1406,6 +1427,8 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 		}
 	}
 	character->EndSendGeneralParameters();
+*/
+	
 }
 
 void mcuCBHandle::setMediaPath(std::string path)
