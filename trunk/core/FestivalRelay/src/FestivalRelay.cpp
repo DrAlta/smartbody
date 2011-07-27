@@ -447,6 +447,8 @@ std::string generateReply(const char * utterance,const char * soundFileName)
 
 	removeTabsFromString(spoken_text);
 
+	printf( "generateReply() - \nbefore: '%s'\nafter: '%s'\n'%s'\n", utterance, spoken_text.c_str(), soundFileName );
+
 	//festival_say_text(spoken_text.c_str());
 	festival_text_to_wave(spoken_text.c_str(),wave);
     wave.save(soundFileName,"riff");
