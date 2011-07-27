@@ -6,7 +6,7 @@
 *  modify it under the terms of the Lesser GNU General Public License
 *  as published by the Free Software Foundation, version 3 of the
 *  license.
-*s
+*
 *  SmartBody is distributed in the hope that it will be useful,
 *  but WITHOUT ANY WARRANTY; without even the implied warranty of
 *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -54,36 +54,24 @@ using namespace bonebus;
 Entity * ent;
 SceneNode * mSceneNode;
 
-std::string skeleton[ 116 ];
 std::set<std::string> validJointNames;
 bool isBonebus;
 
 DWORD startTime;
 
-double get_time()
-{
-#if WIN32
-	DWORD ticks = GetTickCount();
-	ticks -= startTime;
-   return (ticks / 1000.0 );
-#else
-	struct timeval tv;
-	gettimeofday( &tv, NULL );
-	return( tv.tv_sec + ( tv.tv_usec / 1000000.0 ) );
-#endif
-}
 
 // Event handler to animate
 class SkeletalAnimationFrameListener : public ExampleFrameListener
 {
 public:
 	std::vector<std::string>	m_characterList;
-	std::map<std::string, std::map<std::string, Ogre::Vector3>>	m_initialBonePositions;
+	std::map<std::string, std::map<std::string, Ogre::Vector3> > m_initialBonePositions;
 
 private:
 	SceneManager * mSceneMgr;
 	BoneBusServer * m_bonebus;
-	Smartbody_dll* m_sbm;
+	Smartbody_dll* m_sbmDLL;
+	vhcl::Timer* m_timer;
 
 	bool m_ogreMouseEnabled;
 	
@@ -96,7 +84,8 @@ public:
 		mDebugText = debugText;
 		mSceneMgr = mgr;
 		m_bonebus = bonebus;
-		m_sbm = sbmdll;
+		m_sbmDLL = sbmdll;
+		m_timer = NULL;
 		mQuit = false;
 		m_ogreMouseEnabled = true;
 
@@ -284,7 +273,9 @@ public:
 		}
 		else
 		{
-			m_sbm->Update(get_time());
+			if (!m_timer)
+				m_timer = new vhcl::Timer();
+			m_sbmDLL->Update(m_timer->GetTime());
 
 			SceneNode* sceneNode = mSceneMgr->getRootSceneNode();
 			if (!sceneNode)
@@ -294,7 +285,7 @@ public:
 			for ( size_t i = 0; i < m_characterList.size(); i++ )
 			{
 				std::string& name = m_characterList[i];
-				SmartbodyCharacter& c = m_sbm->GetCharacter(name);
+				SmartbodyCharacter& c = m_sbmDLL->GetCharacter(name);
 				if (!mSceneMgr->hasEntity(name))
 					continue;
 
@@ -351,7 +342,7 @@ public:
 			}
 		}
 
-
+		/*
 		//Limiting the frames per second as otherwise it takes up entire CPU
 		// Setting it to 60, but in effect it comes up to 90 due to granularity issues
 		Ogre::Root::getSingleton().setFrameSmoothingPeriod(0);
@@ -359,6 +350,7 @@ public:
 		ttW = 1000.0f / FPS_LIMIT - 1000.0f * evt.timeSinceLastFrame;
 		if (ttW > 0)
 			Sleep(ttW);
+		*/
 
 		return true;
 	}
@@ -453,6 +445,9 @@ class OgreViewerApplication : public ExampleApplication, public SmartbodyListene
 
 		std::map<std::string, std::vector<int>*> m_lastPosTimes;
 		std::map<std::string, std::vector<int>*> m_lastRotTimes;
+		std::map<std::string, std::vector<std::string> > m_skeletonMap;
+		std::map<std::string, std::vector<std::string> > m_visemeMap;
+
 	public:
 		std::vector<std::string>	commandLineArgs;
 
@@ -602,124 +597,10 @@ class OgreViewerApplication : public ExampleApplication, public SmartbodyListene
 		{
 
 			createDefaultScene();
-
-			skeleton[ 0 ] = ""; // unused
-			skeleton[ 1 ] = ""; //"skeleton";
-			skeleton[ 2 ] = "base";
-			skeleton[ 3 ] = "l_hip";
-			skeleton[ 4 ] = "l_knee";
-			skeleton[ 5 ] = "l_ankle";
-			skeleton[ 6 ] = "l_forefoot";
-			skeleton[ 7 ] = "l_toe";
-			skeleton[ 8 ] = "r_hip";
-			skeleton[ 9 ] = "r_knee";
-			skeleton[ 10 ] = "r_ankle";
-			skeleton[ 11 ] = "r_forefoot";
-			skeleton[ 12 ] = "r_toe";
-			skeleton[ 13 ] = "spine1";
-			skeleton[ 14 ] = "spine2";
-			skeleton[ 15 ] = "spine3";
-			skeleton[ 16 ] = "spine4";
-			skeleton[ 17 ] = "spine5";
-			skeleton[ 18 ] = "skullbase";
-			skeleton[ 19 ] = "face_top_parent";
-			skeleton[ 20 ] = "brow_parent_left";
-			skeleton[ 21 ] = "brow01_left";
-			skeleton[ 22 ] = "brow02_left";
-			skeleton[ 23 ] = "brow03_left";
-			skeleton[ 24 ] = "brow04_left";
-			skeleton[ 25 ] = "brow_parent_right";
-			skeleton[ 26 ] = "brow01_right";
-			skeleton[ 27 ] = "brow02_right";
-			skeleton[ 28 ] = "brow03_right";
-			skeleton[ 29 ] = "brow05_right";
-			skeleton[ 30 ] = "ear_left";
-			skeleton[ 31 ] = "eyeball_left";
-			skeleton[ 32 ] = "upper_nose_left";
-			skeleton[ 33 ] = "lower_nose_left";
-			skeleton[ 34 ] = "upper_nose_right";
-			skeleton[ 35 ] = "lower_nose_right";
-			skeleton[ 36 ] = "lower_eyelid_right";
-			skeleton[ 37 ] = "upper_eyelid_right";
-			skeleton[ 38 ] = "eyeball_right";
-			skeleton[ 39 ] = "ear_right";
-			skeleton[ 40 ] = "lower_eyelid_left";
-			skeleton[ 41 ] = "upper_eyelid_left";
-			skeleton[ 42 ] = "joint18";
-			skeleton[ 43 ] = "face_bottom_parent";
-			skeleton[ 44 ] = "Jaw";
-			skeleton[ 45 ] = "Jaw_back";
-			skeleton[ 46 ] = "Jaw_front";
-			skeleton[ 47 ] = "Lip_bttm_mid";
-			skeleton[ 48 ] = "Lip_bttm_right";
-			skeleton[ 49 ] = "Lip_bttm_left";
-			skeleton[ 50 ] = "Tongue_back";
-			skeleton[ 51 ] = "Tongue_mid";
-			skeleton[ 52 ] = "Tongue_front";
-			skeleton[ 53 ] = "Lip_top_left";
-			skeleton[ 54 ] = "Lip_top_right";
-			skeleton[ 55 ] = "Cheek_low_right";
-			skeleton[ 56 ] = "Cheek_up_right";
-			skeleton[ 57 ] = "cheek_low_left";
-			skeleton[ 58 ] = "Cheek_up_left";
-			skeleton[ 59 ] = "Lip_out_left";
-			skeleton[ 60 ] = "Lip_out_right";
-			skeleton[ 61 ] = "Lip_top_mid";
-			skeleton[ 62 ] = "l_sternoclavicular";
-			skeleton[ 63 ] = "l_acromioclavicular";
-			skeleton[ 64 ] = "l_shoulder";
-			skeleton[ 65 ] = "l_elbow";
-			skeleton[ 66 ] = "l_forearm";
-			skeleton[ 67 ] = "l_wrist";
-			skeleton[ 68 ] = "l_pinky1";
-			skeleton[ 69 ] = "l_pinky2";
-			skeleton[ 70 ] = "l_pinky3";
-			skeleton[ 71 ] = "l_pinky4";
-			skeleton[ 72 ] = "l_ring1";
-			skeleton[ 73 ] = "l_ring2";
-			skeleton[ 74 ] = "l_ring3";
-			skeleton[ 75 ] = "l_ring4";
-			skeleton[ 76 ] = "l_middle1";
-			skeleton[ 77 ] = "l_middle2";
-			skeleton[ 78 ] = "l_middle3";
-			skeleton[ 79 ] = "l_middle4";
-			skeleton[ 80 ] = "l_index1";
-			skeleton[ 81 ] = "l_index2";
-			skeleton[ 82 ] = "l_index3";
-			skeleton[ 83 ] = "l_index4";
-			skeleton[ 84 ] = "l_thumb1";
-			skeleton[ 85 ] = "l_thumb2";
-			skeleton[ 86 ] = "l_thumb3";
-			skeleton[ 87 ] = "l_thumb4";
-			skeleton[ 88 ] = "r_sternoclavicular";
-			skeleton[ 89 ] = "r_acromioclavicular";
-			skeleton[ 90 ] = "r_shoulder";
-			skeleton[ 91 ] = "r_elbow";
-			skeleton[ 92 ] = "r_forearm";
-			skeleton[ 93 ] = "r_wrist";
-			skeleton[ 94 ] = "r_pinky1";
-			skeleton[ 95 ] = "r_pinky2";
-			skeleton[ 96 ] = "r_pinky3";
-			skeleton[ 97 ] = "r_pinky4";
-			skeleton[ 98 ] = "r_ring1";
-			skeleton[ 99 ] = "r_ring2";
-			skeleton[ 100 ] = "r_ring3";
-			skeleton[ 101 ] = "r_ring4";
-			skeleton[ 102 ] = "r_middle1";
-			skeleton[ 103 ] = "r_middle2";
-			skeleton[ 104 ] = "r_middle3";
-			skeleton[ 105 ] = "r_middle4";
-			skeleton[ 106 ] = "r_index1";
-			skeleton[ 107 ] = "r_index2";
-			skeleton[ 108 ] = "r_index3";
-			skeleton[ 109 ] = "r_index4";
-			skeleton[ 110 ] = "r_thumb1";
-			skeleton[ 111 ] = "r_thumb2";
-			skeleton[ 112 ] = "r_thumb3";
-			skeleton[ 113 ] = "r_thumb4";
-
-			for (int x = 0; x < 114; x++)
-				validJointNames.insert(skeleton[x]);
+		
+			
+			if (isBonebus)
+				m_bonebus.OpenConnection();
 
 			// ask SmartBody to connect to this server if it hasn't already done so
 			vhmsg::ttu_notify2("sbm", "net_check");
@@ -750,6 +631,8 @@ class OgreViewerApplication : public ExampleApplication, public SmartbodyListene
 				m_bonebus.SetOnSetCharacterRotationFunc( OnSetCharacterRotation, this );
 				m_bonebus.SetOnBoneRotationsFunc( OnBoneRotations, this );
 				m_bonebus.SetOnBonePositionsFunc( OnBonePositions, this );
+				m_bonebus.SetOnBoneIdFunc( OnBoneId, this );
+				m_bonebus.SetOnVisemeIdFunc( OnVisemeId, this );
 				m_bonebus.OpenConnection();
 			}
 			else
@@ -829,6 +712,8 @@ class OgreViewerApplication : public ExampleApplication, public SmartbodyListene
 				{
 					Bone* bone = skel->getBone(i);
 					intialBonePositions.insert(std::make_pair(bone->getName(), bone->getPosition()));
+					validJointNames.insert(bone->getName());
+
 				}
 				frameListener->m_initialBonePositions.insert(std::make_pair(name, intialBonePositions));
 			}
@@ -922,10 +807,10 @@ class OgreViewerApplication : public ExampleApplication, public SmartbodyListene
 			}
 
 			std::vector<int>* lastPosTimes = new std::vector<int>();
-			lastPosTimes->resize(116);
+			lastPosTimes->resize(1000);
 			std::vector<int>* lastRotTimes = new std::vector<int>();
-			lastRotTimes->resize(116);
-			for (int x = 0; x < 116; x++)
+			lastRotTimes->resize(1000);
+			for (int x = 0; x < 1000; x++)
 			{
 				(*lastPosTimes)[x] = -1;
 				(*lastRotTimes)[x] = -1;
@@ -936,6 +821,11 @@ class OgreViewerApplication : public ExampleApplication, public SmartbodyListene
 			Ogre::Skeleton* skel = NULL;
 
 			skel = ent->getSkeleton();
+
+			if (!skel)
+			{
+				return;
+			}
 		
 			//Number of the skeleton's bones 
 			int count = skel->getNumBones(); 
@@ -1099,6 +989,10 @@ class OgreViewerApplication : public ExampleApplication, public SmartbodyListene
 				return;
 			std::vector<int>* lastTimes = (*iter).second;
 
+			std::map<std::string, std::vector<std::string> >::iterator iter2 = app->m_skeletonMap.find(charIdStr);
+			if (iter2 == app->m_skeletonMap.end())
+				return;
+			std::vector<std::string>& skeletonMap = (*iter2).second;
 
 			int i;
 			for ( i = 0; i < bulkBoneRotations->numBoneRotations; i++ )
@@ -1110,7 +1004,9 @@ class OgreViewerApplication : public ExampleApplication, public SmartbodyListene
 				}
 				(*lastTimes)[i] = bulkBoneRotations->time;
 
-				std::string & boneName = skeleton[ id ];
+				if (id >= skeletonMap.size())
+					continue;
+				std::string & boneName = skeletonMap[ id ];
 
 				if ( boneName == "" )
 					continue;
@@ -1130,12 +1026,12 @@ class OgreViewerApplication : public ExampleApplication, public SmartbodyListene
 						q.z = bulkBoneRotations->bones[ i ].rot_z;
 
 						bone->setOrientation( q );
-
+						
 						//Vector3 v;
 						//v.x = bulkBoneData->bones[ i ].
 					}
 				} catch (ItemIdentityException&) {
-					printf("Could not find bone name %s", boneName.c_str());
+					
 				}
 			}
 		}
@@ -1176,6 +1072,11 @@ class OgreViewerApplication : public ExampleApplication, public SmartbodyListene
 				return;
 			std::vector<int>* lastTimes = (*iter).second;
 
+			std::map<std::string, std::vector<std::string> >::iterator iter2 = app->m_skeletonMap.find(charIdStr);
+			if (iter2 == app->m_skeletonMap.end())
+				return;
+			std::vector<std::string>& skeletonMap = (*iter2).second;
+
 			//Get map of initial bone positions for the character
 			std::map<string,Ogre::Vector3> cachedInitialBonePositions =
 				app->characterInitBonePosMap[bulkBonePositions->charId];
@@ -1190,7 +1091,9 @@ class OgreViewerApplication : public ExampleApplication, public SmartbodyListene
 				}
 				(*lastTimes)[i] = bulkBonePositions->time;
 
-				std::string & boneName = skeleton[ id ];
+				if (id >= skeletonMap.size())
+					continue;
+				std::string & boneName = skeletonMap[ id ];
 
 				if ( boneName == "" )
 					continue;
@@ -1216,10 +1119,57 @@ class OgreViewerApplication : public ExampleApplication, public SmartbodyListene
 						bone->setPosition( v );
 					}
 				} catch (ItemIdentityException&) {
-					printf("Could not find bone name %s", boneName.c_str());
+					
 				}
 			}
 		}
+                              
+		static void OnBoneId( const int characterID, const std::string boneName, const int boneId, void * user_data )
+		{
+			OgreViewerApplication * app = (OgreViewerApplication *)user_data;
+
+			char charIdStrBuff[ 36 ];
+			string charIdStr = string( _itoa( characterID, charIdStrBuff, 10 ) );
+
+			std::map<std::string, std::vector<std::string> >::iterator iter = app->m_skeletonMap.find(charIdStr);
+			if (iter == app->m_skeletonMap.end())
+			{
+				app->m_skeletonMap[charIdStr] = std::vector<std::string>();
+				iter = app->m_skeletonMap.find(charIdStr);
+				(*iter).second.resize(1000);
+			}
+			std::vector<std::string>& localSkeletonMap = (*iter).second;
+			if (localSkeletonMap.size() <= boneId)
+			{
+				// boneId is out of range, ignore...
+				return;
+			}
+			localSkeletonMap[boneId] = boneName;
+		}
+
+		static void OnVisemeId( const int characterID, const std::string visemeName, const int visemeId, void * user_data )
+		{
+			OgreViewerApplication * app = (OgreViewerApplication *)user_data;
+
+			char charIdStrBuff[ 36 ];
+			string charIdStr = string( _itoa( characterID, charIdStrBuff, 10 ) );
+
+			std::map<std::string, std::vector<std::string> >::iterator iter = app->m_visemeMap.find(charIdStr);
+			if (iter == app->m_visemeMap.end())
+			{
+				app->m_visemeMap[charIdStr] = std::vector<std::string>();
+				iter = app->m_visemeMap.find(charIdStr);
+				(*iter).second.resize(1000);
+			}
+			std::vector<std::string>& localVisemeMap = (*iter).second;
+			if (localVisemeMap.size() <= visemeId)
+			{
+				// viseme id is out of range, ignore...
+				return;
+			}
+			localVisemeMap[visemeId] = visemeName;
+		}
+
 
 		static void tt_client_callback( const char * op, const char * args, void * user_data )
 		{
