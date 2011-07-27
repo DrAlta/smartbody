@@ -928,14 +928,11 @@ void PARunTimeEditor::updateRunTimeStates(std::string currentState)
 	}
 	else
 	{
+		if (stateData->toStates.size() == 0)
+			addItem(nextCycleStates, PseudoIdleState);
 		for (size_t i = 0; i < stateData->toStates.size(); i++)
-		{
-			if (stateData->toStates[i]->toStates.size() == 0)
-				addItem(nextCycleStates, PseudoIdleState);
-			else
-				for (size_t j = 0; j < stateData->toStates[i]->toStates.size(); j++)
-					addItem(nextCycleStates, stateData->toStates[i]->toStates[j]->stateName.c_str());
-		}
+			for (size_t j = 0; j < stateData->toStates[i]->toStates.size(); j++)
+				addItem(nextCycleStates, stateData->toStates[i]->toStates[j]->stateName.c_str());
 	}
 	for (int i = 0; i < nextCycleStates->size(); i++)
 		nextCycleStates->select(i+1, false);
@@ -1113,5 +1110,11 @@ void PARunTimeEditor::run(Fl_Widget* widget, void* data)
 		editor->paWindow->execCmd(editor->paWindow, command2.str(), timeoffset);
 	}
 	
-	if (nextCycleState == PseudoIdleState || nextCycleState == "") return;
+	if (nextCycleState == "") return;
+	if (nextCycleState == PseudoIdleState)
+	{
+		std::stringstream command3;
+		command3 << "panim schedule char " << charName << " state " << "PseudoIdle" << " loop true playnow true";
+		editor->paWindow->execCmd(editor->paWindow, command3.str(), timeoffset);
+	}
 }
