@@ -3,6 +3,8 @@
 0 mirror ChrUtah_Idle01_ToWalk01_Turn180Lf01 ChrUtah_Idle01_ToWalk01_Turn180Rt01
 0 mirror ChrUtah_StopToWalkRt01 ChrUtah_StopToWalkLf01	
 0 mirror ChrUtah_Relax001_CrouchProtectHead_right ChrUtah_Relax001_CrouchProtectHead_left
+0 mirror ChrUtah_Relax001_CrouchBlock02Low ChrUtah_Relax001_CrouchBlock02Low_Right
+0 mirror ChrUtah_Relax001_CrouchBlock02High ChrUtah_Relax001_CrouchBlock02High_Right
 
 #### Crouching State
 0 panim state UtahCrouchProtectHead cycle true 3 ChrUtah_Relax001_CrouchProtectHead_center ChrUtah_Relax001_CrouchProtectHead_left ChrUtah_Relax001_CrouchProtectHead_right 3 0 1.0331 2.46667 0 1.33724 2.8 0 1.3131 2.79517 
@@ -10,6 +12,9 @@
 0 panim state UtahCrouchSwayBlock cycle true 4 ChrUtah_CrouchBlock02High_swayLf ChrUtah_CrouchBlock02High_swayRt ChrUtah_CrouchBlock02Low_swayLf ChrUtah_CrouchBlock02Low_swayRt 3 0 0.671264 1.3 0 0.528736 1.26667 0 0.590805 1.3 0 0.68046 1.33333 
 0 panim state UtahCrouchSwayBlock parameter 2D 4 ChrUtah_CrouchBlock02High_swayLf -40 common.sk|avgrooty ChrUtah_CrouchBlock02High_swayRt 40 common.sk|avgrooty ChrUtah_CrouchBlock02Low_swayLf -40 common.sk|avgrooty ChrUtah_CrouchBlock02Low_swayRt 40 common.sk|avgrooty
 0 panim state UtahCrouchSwayBlock triangle 2 ChrUtah_CrouchBlock02High_swayLf ChrUtah_CrouchBlock02High_swayRt ChrUtah_CrouchBlock02Low_swayLf ChrUtah_CrouchBlock02High_swayRt ChrUtah_CrouchBlock02Low_swayLf ChrUtah_CrouchBlock02Low_swayRt
+0 panim state UtahCrouchBlock cycle true 4 ChrUtah_Relax001_CrouchBlock02High ChrUtah_Relax001_CrouchBlock02Low ChrUtah_Relax001_CrouchBlock02High_Right ChrUtah_Relax001_CrouchBlock02Low_Right 3 0 1.0842 1.63052 0 1.08138 1.63333 0 1.0842 1.63052 0 1.08138 1.63333 
+0 panim state UtahCrouchBlock parameter 2D 4 ChrUtah_Relax001_CrouchBlock02High -30 100 ChrUtah_Relax001_CrouchBlock02Low -30 80 ChrUtah_Relax001_CrouchBlock02High_Right 30 100 ChrUtah_Relax001_CrouchBlock02Low_Right 30 80
+0 panim state UtahCrouchBlock triangle 2 ChrUtah_Relax001_CrouchBlock02High ChrUtah_Relax001_CrouchBlock02Low ChrUtah_Relax001_CrouchBlock02High_Right ChrUtah_Relax001_CrouchBlock02Low ChrUtah_Relax001_CrouchBlock02High_Right ChrUtah_Relax001_CrouchBlock02Low_Right
 
 
 # Character Utah (Old animation set)
