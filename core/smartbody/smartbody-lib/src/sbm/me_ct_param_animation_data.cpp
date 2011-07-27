@@ -971,6 +971,10 @@ double MotionParameters::getParameter(int type)
 		return getTransitionX();
 	if (type == 5)
 		return getTransitionY();
+	if (type == 6)
+		return getTransitionZ();
+	if (type == 7)
+		return getAvgRootJointY();
 	return -1.0;
 }
 
@@ -1086,5 +1090,34 @@ double MotionParameters::getTransitionY()
 	SrVec transitionVec = destPnt - srcPnt;
 	SrVec heading = SrVec(sin(ry), 0, cos(ry));
 	double y = dot(transitionVec, heading);
+	return y;
+}
+
+double MotionParameters::getTransitionZ()
+{
+	motion->apply_frame(minFrameId);
+	skeleton->update_global_matrices();
+	const SrMat& srcMat = joint->gmat();
+	motion->apply_frame(maxFrameId);
+	skeleton->update_global_matrices();
+	const SrMat& destMat = joint->gmat();
+	double z = destMat.get(14) - srcMat.get(14);
+	return z;
+}
+
+double MotionParameters::getAvgRootJointY()
+{
+	int numFrames = maxFrameId - minFrameId;
+	if (numFrames == 0)
+		return 0;
+	double y = 0.0;
+	for (int i = 0; i < numFrames; i++)
+	{
+		motion->apply_frame(minFrameId + i);
+		skeleton->update_global_matrices();
+		const SrMat& mat = joint->gmat();
+		y += mat.get(13);
+	}
+	y = y / (double)numFrames;
 	return y;
 }

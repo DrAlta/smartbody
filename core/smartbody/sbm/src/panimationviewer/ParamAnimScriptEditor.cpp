@@ -138,7 +138,7 @@ void PAScriptEditor::updateStateInfo(Fl_Widget* widget, void* data)
 			if (i == 1)	shouldAddTimeOffset = false;
 			else
 			{
-				std::string previousState = editor->currentStateList->text(i);
+				std::string previousState = editor->currentStateList->text(i + 1);
 				std::map<std::string, bool>::iterator iter1 = editor->stateLoopMode.find(previousState);
 				shouldAddTimeOffset = iter1->second;
 				}
