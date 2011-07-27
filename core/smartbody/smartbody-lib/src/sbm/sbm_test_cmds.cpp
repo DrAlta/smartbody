@@ -41,9 +41,8 @@ int sbm_set_test_func( srArgBuffer& args, mcuCBHandle *mcu  ) {
 		mcu->test_character_default = args.read_token();
 
 		if( mcu->test_character_default.length() > 0 ) {
-			mcu->character_map.reset();
-			SbmCharacter* character = mcu->character_map.next();
-			if( character==NULL ) {
+			if (mcu->getNumCharacters() > 0)
+			{
 				LOG("WARNING: Unknown default test character: \"%s\"", mcu->test_character_default.c_str());
 			} else {
 				LOG("Default test character: \"%s\"", mcu->test_character_default.c_str());
@@ -54,9 +53,8 @@ int sbm_set_test_func( srArgBuffer& args, mcuCBHandle *mcu  ) {
 		mcu->test_recipient_default = args.read_token();
 
 		if( mcu->test_recipient_default.length() > 0 ) {
-			mcu->character_map.reset();
-			SbmCharacter* character = mcu->character_map.next();
-			if( character==NULL ) {
+			if (mcu->getNumCharacters() > 0)
+			{
 				LOG("WARNING: Unknown default test recipient: \"%s\"", mcu->test_recipient_default.c_str());
 			} else {
 				LOG("Default test recipient: \"%s\"", mcu->test_recipient_default.c_str());
@@ -136,7 +134,7 @@ bool normalize_character_id( const string& module, const string& role, const str
 	} else {
 		// Lookup character
 		if( char_id!="*" ) {
-			SbmCharacter* character = mcu.character_map.lookup( char_id.c_str() );
+			SbmCharacter* character = mcu.getCharacter( char_id );
 			if( character == NULL ) {
 				std::stringstream strstr;
 				strstr << "WARNING: "<<module<<": Unknown "<<role<<" id \""<<char_id<<"\".";
@@ -236,11 +234,11 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 		if( send ) {
 			// execute directly
 			if( all_characters ) {
-				srHashMap<SbmCharacter>& map = mcu.character_map;
-				map.reset();
-				SbmCharacter* character;
-				while( character = map.next() ) {
-					build_vrX( msg, cmd, character->name, recip_id, bml, false );
+				for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+					iter != mcu.getCharacterMap().end();
+					iter++)
+				{
+					build_vrX( msg, cmd, (*iter).second->name, recip_id, bml, false );
 					mcu.vhmsg_send( cmd, msg.str().c_str() );
 				}
 			} else {
@@ -270,11 +268,11 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 		}
 
 		if( all_characters ) {
-			srHashMap<SbmCharacter>& map = mcu.character_map;
-			map.reset();
-			SbmCharacter* character;
-			while( character = map.next() ) {
-				build_vrX( msg, cmd, character->name, recip_id, bml, true );
+			for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+				iter != mcu.getCharacterMap().end();
+				iter++)
+			{
+				build_vrX( msg, cmd, (*iter).second->name, recip_id, bml, true );
 
 				//echo.str("");
 				//echo << "echo " << msg.str();
@@ -371,7 +369,7 @@ int test_bml_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 	
 	if (char_id != "*" )
 	{
-		SbmCharacter* character = mcu->character_map.lookup(char_id.c_str());
+		SbmCharacter* character = mcu->getCharacter(char_id);
 		if (!character)
 		{
 			LOG("No character named '%s'.", char_id.c_str());
@@ -792,7 +790,7 @@ int test_bone_pos_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
 		return CMD_FAILURE;
 	}
 
-	SbmCharacter* character = mcu_p->character_map.lookup( character_id.c_str() );
+	SbmCharacter* character = mcu_p->getCharacter( character_id );
 	if( character == NULL ) {
 		LOG("ERROR: Unknown test character \"%s\"", character_id.c_str());
 		return CMD_FAILURE;

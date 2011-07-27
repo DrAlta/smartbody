@@ -174,7 +174,7 @@ void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const 
 			// add constraint
 			EffectorConstantConstraint* cons = new EffectorConstantConstraint();
 			cons->efffectorName = node->nodeName;
-			cons->rootName = wristJoint->name().get_string();//"r_shoulder";//rootJoint->name().get_string();		
+			cons->rootName = wristJoint->name();//"r_shoulder";//rootJoint->name().get_string();		
 			handPosConstraint[cons->efffectorName] = cons;
 		}
 	}
@@ -192,7 +192,7 @@ void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const 
 		SkJoint* joint = skeletonCopy->linear_search_joint(node->nodeName.c_str());
 		SkJointQuat* skQuat = joint->quat();		
 		affectedJoints.push_back(joint);	
-		_channels.add(joint->name().get_string(), SkChannel::Quat);		
+		_channels.add(joint->name(), SkChannel::Quat);		
 	}	
 	SkMotion *releaseHand, *grabHand, *reachHand;
 	releaseHand = findTagSkMotion(type,releasePose);
@@ -299,7 +299,7 @@ bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 	skeletonRef->invalidate_global_matrices();
 	skeletonRef->update_global_matrices();
 	updateAttachedPawn();	
-	const char* rootName = ikScenario.ikTreeRoot->joint->parent()->name().get_string();
+	const char* rootName = ikScenario.ikTreeRoot->joint->parent()->name().c_str();
 	ikScenario.ikGlobalMat = skeletonRef->search_joint(rootName)->gmat();
 	ikScenario.updateNodeGlobalMat(ikScenario.ikTreeRoot,QUAT_CUR);
 

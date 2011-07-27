@@ -52,14 +52,14 @@ const char* MeCtLocomotionSimple::controller_type() {
 SkChannelArray& MeCtLocomotionSimple::controller_channels() {
 	if( request_channels.size() == 0 ) {
 		// Initialize Requested Channels                                                           // Indices
-		request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::XPos );  // #0
-		request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::YPos );  //  1
-		request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::ZPos );  //  2
-		request_channels.add( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::Quat );  //  3
+		request_channels.add(  SbmPawn::WORLD_OFFSET_JOINT_NAME, SkChannel::XPos );  // #0
+		request_channels.add(  SbmPawn::WORLD_OFFSET_JOINT_NAME , SkChannel::YPos );  //  1
+		request_channels.add( SbmPawn::WORLD_OFFSET_JOINT_NAME , SkChannel::ZPos );  //  2
+		request_channels.add(  SbmPawn::WORLD_OFFSET_JOINT_NAME , SkChannel::Quat );  //  3
 
-		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_VELOCITY ), SkChannel::XPos ); //  4
-		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_VELOCITY ), SkChannel::YPos ); //  5
-		request_channels.add( SkJointName( MeCtLocomotionPawn::LOCOMOTION_VELOCITY ), SkChannel::ZPos ); //  6
+		request_channels.add( MeCtLocomotionPawn::LOCOMOTION_VELOCITY, SkChannel::XPos ); //  4
+		request_channels.add( MeCtLocomotionPawn::LOCOMOTION_VELOCITY, SkChannel::YPos ); //  5
+		request_channels.add(  MeCtLocomotionPawn::LOCOMOTION_VELOCITY , SkChannel::ZPos ); //  6
 
 	}
 

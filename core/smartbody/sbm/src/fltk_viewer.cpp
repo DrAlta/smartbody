@@ -661,18 +661,17 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 	if (applyToCharacter)
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		srHashMap<SbmCharacter>& character_map = mcu.character_map;
-		character_map.reset();
-		SbmCharacter* character = character_map.next();
-		while ( character )
-		{	
+		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+			iter != mcu.getCharacterMap().end();
+			iter++)
+		{
+			SbmCharacter* character = (*iter).second;
 			// set the visibility parameters of the scene
 			//character->scene_p->set_visibility(_data->showbones,_data->showgeometry, _data->showcollisiongeometry, _data->showaxis);
 
 			// feng : never show the collision mesh, instead we will show the bounding volumes as capsules
 			character->scene_p->set_visibility(_data->showbones,_data->showgeometry, false, _data->showaxis);
 			character->dMesh_p->set_visibility(_data->showdeformablegeometry);
-			character = character_map.next();
 		}
 						
 	}
@@ -1023,23 +1022,23 @@ void FltkViewer::draw()
 
 	// update deformable mesh
 	bool updateSim = mcu.update_timer();
-	mcu.pawn_map.reset();
-	//if (updateSim)
+	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
+		iter != mcu.getPawnMap().end();
+		iter++)
 	{
-		SbmPawn* pawn_p = NULL;
-		while( pawn_p = mcu.pawn_map.next() )	{
+		SbmPawn* pawn = (*iter).second;
 
-			//pawn_p->reset_all_channels();
-			//pawn_p->ct_tree_p->evaluate( time );
-			//pawn_p->ct_tree_p->applyBufferToAllSkeletons();
+		//pawn_p->reset_all_channels();
+		//pawn_p->ct_tree_p->evaluate( time );
+		//pawn_p->ct_tree_p->applyBufferToAllSkeletons();
 
-			SbmCharacter* char_p = mcu.character_map.lookup( pawn_p->name );
-			if( char_p ) {
+		SbmCharacter* char_p = mcu.getCharacter(pawn->name );
+		if( char_p )
+		{
 
-				//char_p->forward_visemes( time );	
-				//char_p->scene_p->update();	
-				char_p->dMesh_p->update();
-			}
+			//char_p->forward_visemes( time );	
+			//char_p->scene_p->update();	
+			char_p->dMesh_p->update();
 		}
 	}
 	
@@ -1231,15 +1230,22 @@ void FltkViewer::translate_keyboard_state()
 		sprintf(_locoData->t_direction, "forward ");
 	}
 
-	SbmCharacter* actor = NULL;
-	mcu.character_map.reset();
-	if (mcu.character_map.next() == NULL) return;
-	for(int i = 0; i <= _locoData->char_index; ++i)
+	int counter = 0;
+	SbmCharacter* character = NULL;
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
 	{
-		actor = mcu.character_map.next();
-		if (actor)
-			sprintf(_locoData->character, "char %s ", actor->name);
+		if (counter == _locoData->char_index)
+		{
+			character = (*iter).second;
+			sprintf(_locoData->character, "char %s ", character->name);
+		}
+		counter++;
 	}
+	if (!character)
+		return;
+
 
 	sprintf(cmd, "test loco ");
 	strcat(cmd, _locoData->character);
@@ -1249,8 +1255,8 @@ void FltkViewer::translate_keyboard_state()
 	{
 		_locoData->height_disp += _locoData->height_disp_delta;
 		//if(height_disp > 0.0f) height_disp = 0.0f;
-		if (actor->get_locomotion_ct())
-			actor->get_locomotion_ct()->set_target_height_displacement(_locoData->height_disp);
+		if (character->get_locomotion_ct())
+			character->get_locomotion_ct()->set_target_height_displacement(_locoData->height_disp);
 	}
 
 // 	if (Fl::event_key('c'))
@@ -1267,8 +1273,8 @@ void FltkViewer::translate_keyboard_state()
 	{
 		_locoData->height_disp -= _locoData->height_disp_delta;
 		//if(height_disp < -50.0f) height_disp = -50.0f;
-		if (actor && actor->get_locomotion_ct())
-			actor->get_locomotion_ct()->set_target_height_displacement(_locoData->height_disp);
+		if (character && character->get_locomotion_ct())
+			character->get_locomotion_ct()->set_target_height_displacement(_locoData->height_disp);
 	}
 	if(Fl::event_key('k'))
 	{
@@ -1284,23 +1290,24 @@ void FltkViewer::translate_keyboard_state()
 		//for(int i = 0; i < mcu.character_map.get_num_entries(); ++i)
 		{
 			++_locoData->char_index;
-			if(_locoData->char_index >= mcu.character_map.get_num_entries())
+			if(_locoData->char_index >= mcu.getNumCharacters())
 			{
 				_locoData->char_index = 0;
 			}
-			mcu.character_map.reset();
-			for(int i = 0; i <= _locoData->char_index; ++i)
+			int counter = 0;
+			for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+				iter != mcu.getCharacterMap().end();
+				iter++)
 			{
-				actor = mcu.character_map.next();
+				if (counter != _locoData->char_index)
+				{
+					counter++;
+					continue;
+				}
 				_paLocoData->character = actor;
+				break;
 			}
 
-			/*mcu.character_map.reset();
-			for(int j = 0; j <= char_index; ++j)
-			{
-				actor = mcu.character_map.next();
-			}
-			if(actor->get_locomotion_ct()->is_valid()) break;*/
 		}
 
 		//_data->showselection = !_data->showselection;
@@ -1360,7 +1367,7 @@ void FltkViewer::translate_keyboard_state()
 
 	if(Fl::event_key('l'))
 	{
-		if(actor->get_locomotion_ct()->is_freezed())
+		if(character->get_locomotion_ct()->is_freezed())
 			strcat(cmd, "unfreeze");
 		else strcat(cmd, "freeze");
 		mcu.execute(cmd);
@@ -1369,7 +1376,7 @@ void FltkViewer::translate_keyboard_state()
 
 	if(Fl::event_key('p'))
 	{
-		if(actor->get_locomotion_ct()->is_freezed())
+		if(character->get_locomotion_ct()->is_freezed())
 		{
 			strcat(cmd, "nextframe");
 			mcu.execute(cmd);
@@ -2055,10 +2062,17 @@ void FltkViewer::set_reach_target( int itype, const char* targetname )
 	char exe_cmd[256];
 	SbmCharacter* actor = NULL;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.character_map.reset();
-	for(int i = 0; i <= _locoData->char_index; ++i)
+	int counter = 0;
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
 	{
-		actor = mcu.character_map.next();		
+		if (counter == _locoData->char_index)
+		{
+			actor = (*iter).second;
+			break;
+		}
+		counter++;
 	}	
 
 	SbmPawn* pawn = _objManipulator.get_selected_pawn();
@@ -2088,12 +2102,17 @@ void FltkViewer::set_gaze_target(int itype, const char* label)
 	char exe_cmd[256];
 	SbmCharacter* actor = NULL;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.character_map.reset();
-	for(int i = 0; i <= _locoData->char_index; ++i)
+	int counter = 0;
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
 	{
-		actor = mcu.character_map.next();
-		//if (actor)
-		//	sprintf(character, "char %s ", actor->name);
+		if (counter == _locoData->char_index)
+		{
+			 actor = (*iter).second;
+			 break;
+		}
+		counter++;
 	}	
 
 	if (actor && itype == -1)
@@ -2356,12 +2375,11 @@ void FltkViewer::drawEyeBeams()
 		return;
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	srHashMap<SbmCharacter>& character_map = mcu.character_map;
-	character_map.reset();
-	SbmCharacter* character = character_map.next();
-
-	while ( character )
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
 	{
+		SbmCharacter* character = (*iter).second;
 		character->skeleton_p->invalidate_global_matrices();
 		character->skeleton_p->update_global_matrices();
 		SkJoint* eyeRight = character->skeleton_p->search_joint("eyeball_right");
@@ -2391,7 +2409,6 @@ void FltkViewer::drawEyeBeams()
 			glEnd();
 			glPopMatrix();
 		}
-		character = character_map.next();
 	}
 
 }
@@ -2404,12 +2421,11 @@ void FltkViewer::drawEyeLids()
 	glPushAttrib(GL_LIGHTING_BIT | GL_POINT_BIT);
 	glDisable(GL_LIGHTING);
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	srHashMap<SbmCharacter>& character_map = mcu.character_map;
-	character_map.reset();
-	SbmCharacter* character = character_map.next();
-
-	while ( character )
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
 	{
+		SbmCharacter* character = (*iter).second;
 		MeControllerTreeRoot* controllerTree = character->ct_tree_p;
 		int numControllers = controllerTree->count_controllers();
 	
@@ -2423,7 +2439,6 @@ void FltkViewer::drawEyeLids()
 		}
 		if (!eyelidCt)
 		{
-			character = character_map.next();
 			continue;
 		}
 
@@ -2564,8 +2579,6 @@ void FltkViewer::drawEyeLids()
 				glPopMatrix();
 			}
 		}
-
-		character = character_map.next();
 	}
 
 	glPopAttrib();
@@ -2576,9 +2589,11 @@ void FltkViewer::drawColliders()
 {
 	float pawnSize = 1.0;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.character_map.reset();
-	while (SbmCharacter* character = mcu.character_map.next())
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
 	{
+		SbmCharacter* character = (*iter).second;
 		std::map<std::string,SbmPhysicsObj*>& jointPhyObjs = character->getJointPhyObjs();
 		std::map<std::string,SbmPhysicsObj*>::iterator mi;
 		for ( mi  = jointPhyObjs.begin();
@@ -2601,25 +2616,27 @@ void FltkViewer::drawPawns()
 
 	// determine the size of the pawns relative to the size of the characters
 	float pawnSize = 1.0;
-	mcu.character_map.reset();
-	while (SbmCharacter* character = mcu.character_map.next())
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
 	{
+		SbmCharacter* character = (*iter).second;
 		pawnSize = 5.f;//character->getHeight()/ 30.0f;
 		break;
 	}
 
-	srHashMap<SbmPawn>& pawn_map = mcu.pawn_map;
-	pawn_map.reset();
-	
-	while ( SbmPawn* pawn = pawn_map.next() )
+	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
+		iter != mcu.getPawnMap().end();
+		iter++)
 	{
+		SbmPawn* pawn = (*iter).second;
 		if (!pawn->skeleton_p) // wouldn't this will go into inf loop ?
 			continue;
 		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
 		if (character)
 			continue;
 		pawn->skeleton_p->update_global_matrices();
-		SrArray<SkJoint*>& joints = pawn->skeleton_p->get_joint_array();		
+		std::vector<SkJoint*>& joints = pawn->skeleton_p->get_joint_array();		
 		//glColor3f(1.0f, 1.0f, 0.0f);
 		SrMat gmat = joints[0]->gmat();
 		
@@ -3173,11 +3190,12 @@ void FltkViewer::drawLocomotion()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	SbmCharacter* character = NULL;
-	mcu.character_map.reset();
-	for(int i = 0; i < mcu.character_map.get_num_entries(); ++i)
+	int counter = 0;
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
 	{
-		character = mcu.character_map.next();
+		SbmCharacter* character = (*iter).second;
 		//if(!character->get_locomotion_ct()->is_valid()) continue;
 		float x, y, z, yaw, pitch, roll;
 		character->get_world_offset(x, y, z, yaw, pitch, roll);
@@ -3199,7 +3217,7 @@ void FltkViewer::drawLocomotion()
 		}
 		if(_data->showselection)
 		{
-			if(i == _locoData->char_index)
+			if(counter == _locoData->char_index)
 			{
 				float height = character->getHeight();
 				SrVec color;
@@ -3224,7 +3242,7 @@ void FltkViewer::drawLocomotion()
 		{
 			//int cur_dominant = character->get_locomotion_ct()->get_dominant_limb_index();
 			//if(i == char_index && character->get_locomotion_ct()->limb_list.size()>cur_dominant)
-			if(i == _locoData->char_index)
+			if(counter == _locoData->char_index)
 			{
 				//if(cur_dominant != pre_dominant && character->get_locomotion_ct()->limb_list.get(cur_dominant)->space_time >= 0.0f
 				//	&& character->get_locomotion_ct()->limb_list.get(cur_dominant)->space_time < 1.0f)
@@ -3258,7 +3276,7 @@ void FltkViewer::drawLocomotion()
 		if(_data->showlocofootprints)
 		{
 			int cur_dominant = character->get_locomotion_ct()->get_dominant_limb_index();
-			if(i == _locoData->char_index && character->get_locomotion_ct()->limb_list.size()>cur_dominant)
+			if (counter == _locoData->char_index && character->get_locomotion_ct()->limb_list.size()>cur_dominant)
 			{
 				if(cur_dominant != pre_dominant && character->get_locomotion_ct()->limb_list.get(cur_dominant)->get_space_time() >= 0.0f
 					&& character->get_locomotion_ct()->limb_list.get(cur_dominant)->get_space_time() < 1.0f)
@@ -3323,11 +3341,13 @@ void FltkViewer::drawInteractiveLocomotion()
 	if (!_data->interactiveLocomotion)
 		return;
 
-	float pawnSize = 1.0;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.character_map.reset();
-	while (SbmCharacter* character = mcu.character_map.next())
+	float pawnSize = 1.0;
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
 	{
+		SbmCharacter* character = (*iter).second;
 		pawnSize = character->getHeight() / 8.0f;
 		break;
 	}
@@ -3346,22 +3366,21 @@ void FltkViewer::drawDynamics()
 {
 	if (_data->dynamicsMode == ModeNoDynamics && !_data->showmasses)
 		return;
-
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	srHashMap<SbmCharacter>& character_map = mcu.character_map;
-	character_map.reset();
-	SbmCharacter* character = character_map.next();
 
-	while ( character )
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+			iter != mcu.getCharacterMap().end();
+			iter++)
 	{
+		SbmCharacter* character = (*iter).second;
 		character->skeleton_p->update_global_matrices();
 
-		const SrArray<SkJoint*>& joints = character->skeleton_p->joints();
+		const std::vector<SkJoint*>& joints = character->skeleton_p->joints();
 		
 		int numJoints = 0;
 		float totalMass = 0;
 		SrVec com(0, 0, 0);
-		for (int j = 0; j < joints.size(); j++)
+		for (size_t j = 0; j < joints.size(); j++)
 		{
 			float mass = joints[j]->mass();
 			if (mass > 0)
@@ -3458,7 +3477,7 @@ void FltkViewer::drawDynamics()
 			glColor3f(1.0f, 1.0f, 0.0f);
 			SrSnSphere sphere;
 			float height = 200.0;
-			for (int j = 0; j < joints.size(); j++)
+			for (size_t j = 0; j < joints.size(); j++)
 			{
 				float mass = joints[j]->mass();
 				if (mass > 0)
@@ -3479,7 +3498,6 @@ void FltkViewer::drawDynamics()
 		
 		glPopAttrib();
 		glPopMatrix();
-		character = character_map.next();
 	}
 }
 
@@ -3489,12 +3507,16 @@ SbmCharacter* FltkViewer::getCurrentCharacter()
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	SbmCharacter* character = NULL;	
 	// get current character
-	mcu.character_map.reset();
-	for(int i = 0; i <= _locoData->char_index; ++i)
+	int counter = 0;
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
 	{
-		character = mcu.character_map.next();		
+		if (counter == _locoData->char_index)
+			return (*iter).second;
+		counter++;
 	}
-	return character;
+	return NULL;
 }
 
 
@@ -3818,8 +3840,16 @@ PALocomotionData::PALocomotionData()
 {
 	w = -9999;
 	v = -9999;
-	mcuCBHandle::singleton().character_map.reset();
-	character = mcuCBHandle::singleton().character_map.next();
+	character = NULL;
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
+	{
+		character = (*iter).second;
+		break;
+	}
+	
 	starting = false;
 	stopping = false;
 	jumping = false;

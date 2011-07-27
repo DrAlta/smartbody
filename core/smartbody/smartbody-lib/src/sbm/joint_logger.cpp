@@ -72,13 +72,11 @@ int joint_logger::set_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			}
 		}
 
-		// Update all MeControllerTreeRoots
-		srHashMap<SbmCharacter>& characters = mcu_p->character_map;
-		characters.reset(); // resets the internal iterator
-		SbmCharacter* character = characters.next();
-		while( character ) {
-			character->ct_tree_p->set_logged_joints( joints_to_log );
-			character = characters.next();
+		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
+			iter != mcu_p->getCharacterMap().end();
+			iter++)
+		{
+			(*iter).second->ct_tree_p->set_logged_joints( joints_to_log );
 		}
 
 		return CMD_SUCCESS;

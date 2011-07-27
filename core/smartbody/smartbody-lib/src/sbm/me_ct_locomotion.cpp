@@ -53,7 +53,7 @@ MeCtLocomotion::MeCtLocomotion() {
 	enabled = false;
 	nonlimb_joints_indexed = false;
 	motions_loaded = true;
-	base_name = NULL;
+	base_name = "";
 	locomotion_anims.capacity(0);
 	pre_blended_base_height = 0.0f;
 	r_blended_base_height = 0.0f;
@@ -100,7 +100,7 @@ SkChannelArray& MeCtLocomotion::controller_channels() {
 		for(int i = 0; i < limb_list.size(); ++i)
 		{
 			MeCtLocomotionLimb* limb = limb_list.get(i);
-			SkJoint* base = standing_skeleton->search_joint(limb->get_limb_base_name());
+			SkJoint* base = standing_skeleton->search_joint(limb->get_limb_base_name().c_str());
 			//limb_joint_num += iterate_limb_joints(base, 0); // starting from joint_channel_start_ind
 			iterate_joints(&(limb->limb_joint_info));
 			limb_joint_num += limb->limb_joint_info.joint_num;
@@ -122,9 +122,9 @@ SkChannelArray& MeCtLocomotion::controller_channels() {
 
 void MeCtLocomotion::get_translation_base_joint_index()
 {
-	for(int i = 0 ; i < nonlimb_joint_info.joint_name.size(); ++i)
+	for(size_t i = 0 ; i < nonlimb_joint_info.joint_name.size(); ++i)
 	{
-		if(nonlimb_joint_info.joint_name.get(i) == translation_joint_name)
+		if(nonlimb_joint_info.joint_name[i] == translation_joint_name)
 		{
 			translation_joint_index = i;
 			return;
@@ -138,10 +138,10 @@ void MeCtLocomotion::iterate_joints(MeCtLocomotionJointInfo* joint_info)
 	SrQuat quat;
 	for(int i = 0; i < joint_info->joint_num; ++i)
 	{
-		const char* name = joint_info->joint_name.get(i);
+		std::string name = joint_info->joint_name[i];
 		if(joint_info->quat_valid.get(i) == 1)
 		{
-			request_channels.add( SkJointName(name), SkChannel::Quat );
+			request_channels.add( name, SkChannel::Quat );
 		}
 		else joint_info->quat.set(i, quat);
 	}
@@ -431,7 +431,7 @@ void MeCtLocomotion::set_balance_factor(float factor)
 SrVec MeCtLocomotion::calc_rotational_displacement()
 {
 	SrVec v;
-	SkJoint* tjoint = walking_skeleton->search_joint(nonlimb_joint_info.joint_name.get(0));
+	SkJoint* tjoint = walking_skeleton->search_joint(nonlimb_joint_info.joint_name[0].c_str());
 	SrMat pmat;
 
 	v = -get_offset(walking_skeleton->root(), translation_joint_index+1, nonlimb_joint_info.quat);
@@ -472,7 +472,7 @@ const char* MeCtLocomotion::controller_type( void )	const {
 	return TYPE;
 }
 
-SrString& MeCtLocomotion::get_translation_joint_name()
+std::string& MeCtLocomotion::get_translation_joint_name()
 {
 	return translation_joint_name;
 }
@@ -526,7 +526,7 @@ void MeCtLocomotion::blend_base_joint(MeFrameData& frame, float space_time, int 
 	SrQuat rot1, rot2, rot3, rot4;
 	float ratio = 0.0f;
 	float pheight = 0.0f;
-	char* translate_base;
+	std::string translate_base;
 	SkJoint* base;
 
 	MeCtLocomotionLimbAnim* anim1 = limb_list.get(0)->walking_list.get(anim_index1);
@@ -537,8 +537,8 @@ void MeCtLocomotion::blend_base_joint(MeFrameData& frame, float space_time, int 
 	int t_frame1;
 	int t_frame2;
 
-	translate_base = (char*)nonlimb_joint_info.joint_name.get(translation_joint_index);
-	base = walking_skeleton->search_joint(translate_base);
+	translate_base = nonlimb_joint_info.joint_name[translation_joint_index];
+	base = walking_skeleton->search_joint(translate_base.c_str());
 
 	t_frame1 = (int)frame1;
 	t_frame2 = (int)frame1+1;
@@ -727,8 +727,8 @@ void MeCtLocomotion::update(float inc_frame, MeFrameData& frame)
 	for(int i = 0; i < limb_list.size(); ++i)
 	{
 		if(limb_list.get(i)->curr_rotation == 0.0f) continue;
-		SkJoint* tjoint = walking_skeleton->search_joint(limb_list.get(i)->get_limb_base_name());
-		int parent_ind = nonlimb_joint_info.get_index_by_name(tjoint->parent()->name().get_string());
+		SkJoint* tjoint = walking_skeleton->search_joint(limb_list.get(i)->get_limb_base_name().c_str());
+		int parent_ind = nonlimb_joint_info.get_index_by_name(tjoint->parent()->name().c_str());
 		SrMat mat = nonlimb_joint_info.mat.get(parent_ind);
 		limb_list.get(i)->manipulate_turning(mat);
 	}
@@ -780,7 +780,7 @@ float MeCtLocomotion::get_current_speed()
 void MeCtLocomotion::update_nonlimb_mat_with_global_info()
 {
 	SrMat mat = navigator.get_world_mat();
-	for(int i = 0; i < nonlimb_joint_info.joint_name.size(); ++i)
+	for(size_t i = 0; i < nonlimb_joint_info.joint_name.size(); ++i)
 	{
 		nonlimb_joint_info.mat.set(i, nonlimb_joint_info.mat.get(i)*mat);
 	}
@@ -797,7 +797,7 @@ void MeCtLocomotion::update_limb_mat_with_global_info()
 	for(int j = 0; j < limb_list.size(); ++j)
 	{
 		MeCtLocomotionLimb* limb = limb_list.get(j);
-		for(int i = 0; i < nonlimb_joint_info.joint_name.size(); ++i)
+		for(size_t i = 0; i < nonlimb_joint_info.joint_name.size(); ++i)
 		{
 			limb->limb_joint_info.mat.set(i, limb->limb_joint_info.mat.get(i)*mat);
 		}
@@ -859,13 +859,13 @@ void MeCtLocomotion::update_nonlimb_mat(SkJoint* joint, SrMat* mat, int depth)
 
 	for(int j = 0; j < limb_list.size(); ++j)
 	{
-		if(strcmp(joint->name().get_string(), limb_list.get(j)->limb_base_name) == 0) 
+		if(joint->name() == limb_list.get(j)->limb_base_name) 
 		{
 			return;
 		}
 	}
 
-	index = nonlimb_joint_info.get_index_by_name(joint->name().get_string());
+	index = nonlimb_joint_info.get_index_by_name(joint->name().c_str());
 	if(nonlimb_joint_info.mat_valid.get(index) != 1) return;
 	if(nonlimb_joint_info.quat_valid.get(index) == 1) quat = nonlimb_joint_info.quat.get(index);
 	lmat = get_lmat(joint, &quat);
@@ -944,8 +944,8 @@ void MeCtLocomotion::apply_IK()
 		//ik_scenario->joint_info_list.get(2).constraint.ball.max = 3.14159265f/4.0f;
 		//temp...............
 
-		SkJoint* tjoint = walking_skeleton->search_joint(limb_list.get(i)->get_limb_base_name());
-		int parent_ind = nonlimb_joint_info.get_index_by_name(tjoint->parent()->name().get_string());
+		SkJoint* tjoint = walking_skeleton->search_joint(limb_list.get(i)->get_limb_base_name().c_str());
+		int parent_ind = nonlimb_joint_info.get_index_by_name(tjoint->parent()->name().c_str());
 		ik_scenario->gmat = nonlimb_joint_info.mat.get(parent_ind);
 		ik_scenario->gmat.set(12, ik_scenario->gmat.get(12) - world_offset_to_base.x);
 		ik_scenario->gmat.set(13, ik_scenario->gmat.get(13) - world_offset_to_base.y);
@@ -1084,9 +1084,9 @@ SrVec MeCtLocomotion::get_limb_pos(MeCtLocomotionLimb* limb)
 	//float* ppos;
 	SkSkeleton* skeleton = limb->walking_skeleton;
 
-	tjoint = skeleton->search_joint(limb->get_limb_base_name());
-	tjoint_base = skeleton->search_joint(tjoint->parent()->name().get_string());
-	int parent_ind = nonlimb_joint_info.get_index_by_name(tjoint->parent()->name().get_string());
+	tjoint = skeleton->search_joint(limb->get_limb_base_name().c_str());
+	tjoint_base = skeleton->search_joint(tjoint->parent()->name().c_str());
+	int parent_ind = nonlimb_joint_info.get_index_by_name(tjoint->parent()->name().c_str());
 	gmat = nonlimb_joint_info.mat.get(parent_ind);
 
 	for(int j  = 0; j <= limb->limb_joint_info.quat.size()-1; ++j)

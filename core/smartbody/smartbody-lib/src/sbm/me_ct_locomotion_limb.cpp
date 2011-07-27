@@ -37,7 +37,7 @@ MeCtLocomotionLimb::MeCtLocomotionLimb() {
 	height_bound = 0.0f;
 	is_valid = false;
 	ground_height = 0.0f;
-	limb_base_name = NULL;
+	limb_base_name = "";
 	skeleton_name = NULL;
 	space_time = 0.0f;
 	limb_joint_info.quat.capacity(0);
@@ -62,8 +62,6 @@ MeCtLocomotionLimb::MeCtLocomotionLimb(char* name)
 /** Destructor */
 MeCtLocomotionLimb::~MeCtLocomotionLimb() 
 {
-	limb_base_name = NULL;
-
 	int count = walking_list.size();
 	for (int x = 0; x < count; ++x)
 	{
@@ -78,8 +76,6 @@ MeCtLocomotionLimb::~MeCtLocomotionLimb()
 	}
 	//support_joint_list.capacity(0);
 
-	if (limb_base_name)
-		free(limb_base_name);
 	delete blended_anim.global_info;
 	/*if (walking_skeleton)
 		this->walking_skeleton->unref();
@@ -105,7 +101,7 @@ void MeCtLocomotionLimb::set_space_time(float space_time)
 		//add the sound play message here // jingqiao 2/1/2011
 
 		std::string eventType = "";
-		if (limb_base_name && limb_base_name[0] == 'l')
+		if (limb_base_name != "" && limb_base_name[0] == 'l')
 			eventType = "footstep_left";
 		else
 			eventType = "footstep_right";
@@ -133,7 +129,7 @@ int MeCtLocomotionLimb::get_support_joint_num()
 	return support_joint_list.size();
 }
 
-char* MeCtLocomotionLimb::get_limb_base_name()
+std::string MeCtLocomotionLimb::get_limb_base_name()
 {
 	return limb_base_name;
 }
@@ -147,17 +143,16 @@ SrVec MeCtLocomotionLimb::get_orientation()
 	return v;
 }
 
-int MeCtLocomotionLimb::set_limb_base(char* name)
+int MeCtLocomotionLimb::set_limb_base(std::string name)
 {
-	SkJoint* joint = standing_skeleton->search_joint(name);
+	SkJoint* joint = standing_skeleton->search_joint(name.c_str());
 	if(joint == NULL) 
 	{
-		printf("\nMeCtLocomotionLimb::set_limb_base(): Joint:%s does not exist", name);
+		LOG("MeCtLocomotionLimb::set_limb_base(): Joint:%s does not exist", name.c_str());
 		return -1;
 	}
 
-	limb_base_name = (char*)malloc(sizeof(char)*(strlen(name)+1));
-	strcpy(limb_base_name, name);
+	limb_base_name = name;
 	int num = get_descendant_num(joint)+1;
 	ik.joint_info_list.capacity(num);
 	ik.joint_info_list.size(num);

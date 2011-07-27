@@ -64,8 +64,7 @@ SkMotion::~SkMotion()
    delete[] _name;
    delete[] _filename;
 
-   int f;
-   for ( f = 0; f < _frames.size(); f++ )
+   for (size_t f = 0; f < _frames.size(); f++ )
    {
       free( _frames[f].posture );
       _frames[f].posture = NULL;
@@ -81,8 +80,11 @@ void SkMotion::init()
    _floatbuffer = 0;
    _postsize = 0;
 
-   while ( _frames.size()>0 )
-    free ( _frames.pop().posture );
+   for (size_t x = 0; x < _frames.size(); x++)
+   {
+	   free ( _frames[x].posture );
+   }
+	_frames.clear();
 
    _channels.init();
 
@@ -98,26 +100,25 @@ void SkMotion::init ( const SkChannelArray& ca )
  
 void SkMotion::compress()
  {
-   _frames.compress ();
-   _channels.compress ();
+ //  _frames.compress ();
+  // _channels.compress ();
  }
 
-bool SkMotion::create_from_postures ( const SrArray<SkPosture*>& keypost, 
-                                      const SrArray<float>& keytime )
+bool SkMotion::create_from_postures ( const std::vector<SkPosture*>& keypost, 
+									 const std::vector<float>& keytime )
  {
    if ( keypost.size()<1 || keypost.size()!=keytime.size() ) return false;
 
-   SrArray<int> index;
+    std::vector<int> index;
    if ( !_channels.get_used_channels(keypost,&index) ) return false;
 
    // create the frames:
-   int i, j;
    _postsize = _channels.floats();
-   _frames.size ( keypost.size() );
-   _frames.size ( 0 );
-   for ( i=0; i<keypost.size(); i++ )
+   _frames.resize ( keypost.size() );
+   _frames.clear();
+   for (size_t  i=0; i<keypost.size(); i++ )
     { insert_frame ( i, keytime[i] );
-      for ( j=0; j<index.size(); j++ )
+      for (size_t j=0; j<index.size(); j++ )
        { if ( index[j]<0 ) continue;
          _frames[i].posture[index[j]] = keypost[i]->values[j];
        }
@@ -127,16 +128,16 @@ bool SkMotion::create_from_postures ( const SrArray<SkPosture*>& keypost,
 
 bool SkMotion::insert_channel ( int pos, const char* name, SkChannel::Type type, float* values )
  {
-   if ( !_channels.insert(pos,name,type) ) return false;
+    if ( !_channels.insert(pos,name,type) ) return false;
    
    // add position in all frames:
    int ins = SkChannel::size(type);
-   int f, i, size;
-   for ( f=0; f<_frames.size(); f++ )
+   int size;
+   for (size_t f=0; f<_frames.size(); f++ )
     { size = _postsize; // we need to save size here as buffer_insert will update it
       _frames[f].posture =
        (float*) sr_buffer_insert ( _frames[f].posture, sizeof(float), size, pos, ins );
-      for ( i=0; i<ins; i++ )
+      for (int i=0; i<ins; i++ )
        _frames[f].posture[pos+i] = values[i];
     }
 
@@ -147,8 +148,26 @@ bool SkMotion::insert_channel ( int pos, const char* name, SkChannel::Type type,
 
 bool SkMotion::insert_frame ( int pos, float kt )
  {
-   if ( pos<0 || pos>_frames.size() ) return false;
-   _frames.insert ( pos );
+   if ( pos<0 || size_t(pos)>_frames.size() ) return false;
+   int index = 0;
+   if (pos == _frames.size())
+   {
+	   _frames.push_back(Frame());
+   }
+   else
+   {
+	   for (std::vector<Frame>::iterator iter = _frames.begin();
+		   iter != _frames.end();
+		   iter++)
+	   {
+		   if (pos == index)
+		   {
+			   _frames.insert(iter, Frame());
+			   break;
+		   }
+	   }
+   }
+  
    _frames[pos].keytime = kt;
    _frames[pos].posture = (float*) malloc ( sizeof(float)*_postsize );
    return true;
@@ -251,7 +270,7 @@ void SkMotion::apply ( float t,
 	}
 
 	if ( itype==CubicSpline )
-		t = _cubic ( t, _frames[0].keytime, _frames.top().keytime );
+		t = _cubic ( t, _frames[0].keytime, _frames[_frames.size() - 1].keytime );
 
 #if DEBUG_T
 	if ( t<_frames[0].keytime )	{
@@ -376,8 +395,8 @@ void SkMotion::operator = ( const SkMotion& m )
    _channels = m._channels;
 
    int fsize = m._frames.size();
-   _frames.size ( fsize );
-   _frames.size ( 0 );
+   _frames.resize( fsize );
+   _frames.clear();
    for ( i=0; i<fsize; i++ )
     { insert_frame ( i, m._frames[i].keytime );
       sr_buffer_copy ( _frames[i].posture, sizeof(float), _postsize, m._frames[i].posture, _postsize );
@@ -386,13 +405,12 @@ void SkMotion::operator = ( const SkMotion& m )
 
 void SkMotion::move_keytimes ( float startkt )
  {
-   if ( _frames.size()==0 ) return;
+    if ( _frames.size()==0 ) return;
    
    float diff = _frames[0].keytime-startkt;
    if ( diff==0 ) return;
 
-   int i;
-   for ( i=0; i<_frames.size(); i++ )
+   for (size_t i=0; i<_frames.size(); i++ )
     { _frames[i].keytime -= diff;
     }
  }
@@ -454,7 +472,7 @@ void SkMotion::registerAnimation()
 	if (_frames.size() == 0)
 		return;
 
-	SkJointName jname("base");
+	std::string jname("base");
 	// get the offset from the first frame
 	SkChannelArray& channels = this->channels();
 	int xIndex = channels.search(jname, SkChannel::XPos);
@@ -464,7 +482,7 @@ void SkMotion::registerAnimation()
 		return;
 
 	// subtract that offset from all the other animation clips
-	for (int f = 0; f < _frames.size(); f++)
+	for (size_t f = 0; f < _frames.size(); f++)
 	{	
 		if (f == 0)
 		{
@@ -589,7 +607,7 @@ SkMotion* SkMotion::buildMirrorMotion()
 		for (int k=0;k<mchan_arr.size();k++)
 		{
 			SkChannel& chan = mchan_arr[k];
-			std::string jointName = mchan_arr.name(k).get_string();
+			std::string jointName = mchan_arr.name(k);
 			int index = mchan_arr.float_position(k);
 			if (chan.type == SkChannel::XPos)
 			{
@@ -614,13 +632,13 @@ SkMotion* SkMotion::buildMirrorMotion()
 		for (int k=0;k<mchan_arr.size();k++)
 		{
 			SkChannel& chan = mchan_arr[k];
-			std::string jointName = mchan_arr.name(k).get_string();
+			std::string jointName = mchan_arr.name(k);
 			int index = mchan_arr.float_position(k);
 			if (boost::algorithm::starts_with(jointName,"l_"))
 			{
 				std::string jointNameRight = jointName;
 				jointNameRight[0] = 'r';  // get the mirror joint name
-				int rjointIndex = mchan_arr.search( SkJointName( jointNameRight.c_str() ), chan.type );
+				int rjointIndex = mchan_arr.search( jointNameRight.c_str(), chan.type );
 				if (rjointIndex < 0)
 					continue;
 				int rindex = mchan_arr.float_position(rjointIndex);				

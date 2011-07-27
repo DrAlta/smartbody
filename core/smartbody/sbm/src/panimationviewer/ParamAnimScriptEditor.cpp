@@ -251,7 +251,7 @@ void PAScriptEditor::refresh()
 void PAScriptEditor::update()
 {
 	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
-	SbmCharacter* character = mcuCBHandle::singleton().character_map.lookup(charName.c_str());
+	SbmCharacter* character = mcuCBHandle::singleton().getCharacter(charName);
 	if (!character)
 		return;
 	if (!character->param_animation_ct)

@@ -50,7 +50,7 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 	int curY = faceViewer->bottomGroup->y() + 25;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	const Fl_Menu_Item* menu = faceViewer->choiceCharacters->menu();
-	SbmCharacter* character = mcu.character_map.lookup(menu[faceViewer->choiceCharacters->value()].label());
+	SbmCharacter* character = mcu.getCharacter(menu[faceViewer->choiceCharacters->value()].label());
 	if (character)
 	{	
 		int startIndex = character->viseme_channel_start_pos;
@@ -62,7 +62,7 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 			std::stringstream strstr;
 
 			SkChannel& channel = channels[c];
-			const char* jointName = channels.name(c).get_string();
+			const char* jointName = channels.name(c).c_str();
 
 			strstr << jointName;
 
@@ -87,10 +87,11 @@ void FaceViewer::RefreshCB(Fl_Widget* widget, void* data)
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	mcu.character_map.reset();
-	SbmCharacter* character = NULL;
-	while (character = mcu.character_map.next())
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
 	{
+		SbmCharacter* character = (*iter).second;
 		faceViewer->choiceCharacters->add(character->name);
 	}
 }
@@ -101,7 +102,7 @@ void FaceViewer::ResetCB(Fl_Widget* widget, void* data)
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	const Fl_Menu_Item* menu = faceViewer->choiceCharacters->menu();
-	SbmCharacter* character = mcu.character_map.lookup(menu[faceViewer->choiceCharacters->value()].label());
+	SbmCharacter* character = mcu.getCharacter(menu[faceViewer->choiceCharacters->value()].label());
 	if (character)
 	{
 		int numSliders = faceViewer->bottomGroup->children();

@@ -157,7 +157,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 				{
 					cur = skeleton.add_joint(SkJoint::TypeQuat);
 					skeleton.root(cur);
-					cur->name(SkJointName("root"));
+					cur->name("root");
 					cur->quat()->activate();
 					JointInfo* newJointInfo = new JointInfo();
 					curJointInfo = newJointInfo;
@@ -479,7 +479,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 							return false;
 						}
 						SkJoint* child = skeleton.add_joint(SkJoint::TypeQuat, parentId);
-						child->name(SkJointName(childInfo->name.c_str()));
+						child->name(childInfo->name);
 						child->quat()->activate();
 						child->pos()->limits(SkVecLimits::X, false);
 						child->pos()->limits(SkVecLimits::Y, false);
@@ -683,7 +683,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 			sr_euler_mat(order, M, rotx, roty, rotz);
 
 			// Matrix C
-			std::string jName = motion.channels().name(quatIndices[i]).get_string();
+			std::string jName = motion.channels().name(quatIndices[i]);
 			JointInfo* jointInfo = NULL;
 			for (unsigned int cnum = 0; cnum < jointInfoList.size(); cnum++)
 			{
@@ -719,37 +719,37 @@ int ParserASFAMC::getMotionChannelId(SkChannelArray& mChannels, std::string sour
 	if (strcasecmp(sourceName.c_str(), "tx") == 0)
 	{
 		chanType = SkChannel::XPos;
-		id = mChannels.search(SkJointName(jName.c_str()), chanType);
+		id = mChannels.search(jName.c_str(), chanType);
 		dataId = mChannels.float_position(id);
 	}
 	else if (strcasecmp(sourceName.c_str(), "ty") == 0)
 	{
 		chanType = SkChannel::YPos;
-		id = mChannels.search(SkJointName(jName.c_str()), chanType);
+		id = mChannels.search(jName.c_str(), chanType);
 		dataId = mChannels.float_position(id);
 	}
 	else if (strcasecmp(sourceName.c_str(), "tz") == 0)
 	{
 		chanType = SkChannel::ZPos;
-		id = mChannels.search(SkJointName(jName.c_str()), chanType);
+		id = mChannels.search(jName.c_str(), chanType);
 		dataId = mChannels.float_position(id);
 	}
 	else if (strcasecmp(sourceName.c_str(), "rx") == 0)
 	{
 		chanType = SkChannel::Quat;
-		id = mChannels.search(SkJointName(jName.c_str()), chanType);
+		id = mChannels.search(jName.c_str(), chanType);
 		dataId = mChannels.float_position(id) + 0;
 	}
 	else if (strcasecmp(sourceName.c_str(), "ry") == 0)
 	{
 		chanType = SkChannel::Quat;
-		id = mChannels.search(SkJointName(jName.c_str()), chanType);
+		id = mChannels.search(jName.c_str(), chanType);
 		dataId = mChannels.float_position(id) + 1;
 	}
 	else if (strcasecmp(sourceName.c_str(), "rz") == 0)
 	{
 		chanType = SkChannel::Quat;
-		id = mChannels.search(SkJointName(jName.c_str()), chanType);
+		id = mChannels.search(jName.c_str(), chanType);
 		dataId = mChannels.float_position(id) + 2;
 	}
 	return dataId;

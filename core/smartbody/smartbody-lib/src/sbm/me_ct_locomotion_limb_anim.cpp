@@ -110,9 +110,9 @@ void MeCtLocomotionLimbAnim::apply_frame(int frame)
 	{
 		SkJoint* joint = NULL;
 		float val = 0.0f;
-		for(int i = 0; i < walking_skeleton->joints().size(); ++i)
+		for(size_t i = 0; i < walking_skeleton->joints().size(); ++i)
 		{
-			joint = walking_skeleton->joints().get(i);
+			joint = walking_skeleton->joints()[i];
 			for(int j = 0; j < 3; ++j)
 			{
 				val = joint->pos()->value(j);
@@ -161,7 +161,7 @@ void MeCtLocomotionLimbAnim::init_quat_buffers(int num)
 }
 
 // pass a float index in 
-void MeCtLocomotionLimbAnim::get_frame(float frame, char* limb_base, SrArray<int>* index_buff)
+void MeCtLocomotionLimbAnim::get_frame(float frame, std::string limb_base, SrArray<int>* index_buff)
 {
 	//temp int, must be changed
 	//printf("\nframe: %f", frame);
@@ -173,7 +173,7 @@ void MeCtLocomotionLimbAnim::get_frame(float frame, char* limb_base, SrArray<int
 	float ratio = frame - frame1;
 	walking->connect(walking_skeleton);
 
-	SkJoint* base = walking_skeleton->search_joint(limb_base);
+	SkJoint* base = walking_skeleton->search_joint(limb_base.c_str());
 
 	walking->apply_frame(frame1);
 	iterate_set(base, 0, 0, &quat_buffer_key_frame1, index_buff);

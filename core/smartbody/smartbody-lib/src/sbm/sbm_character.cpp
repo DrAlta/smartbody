@@ -275,12 +275,12 @@ void SbmCharacter::locomotion_set_turning_mode(int mode)
 
 void SbmCharacter::updateJointPhyObjs()
 {
-	const SrArray<SkJoint*>& joints = skeleton_p->joints();	
+	const std::vector<SkJoint*>& joints = skeleton_p->joints();	
 	skeleton_p->update_global_matrices();
-	for (int i=0;i<joints.size();i++)
+	for (size_t i=0;i<joints.size();i++)
 	{
 		SkJoint* curJoint = joints[i];
-		std::string jointName = curJoint->name().get_string();
+		std::string jointName = curJoint->name();
 		if (jointPhyObjMap.find(jointName) != jointPhyObjMap.end())
 		{
 			SbmPhysicsObj* phyObj = jointPhyObjMap[jointName];
@@ -293,11 +293,11 @@ void SbmCharacter::updateJointPhyObjs()
 
 void SbmCharacter::setJointPhyCollision( bool useCollision )
 {	
-	const SrArray<SkJoint*>& joints = skeleton_p->joints();		
-	for (int i=0;i<joints.size();i++)
+	const std::vector<SkJoint*>& joints = skeleton_p->joints();		
+	for (size_t i=0;i<joints.size();i++)
 	{
 		SkJoint* curJoint = joints[i];
-		std::string jointName = curJoint->name().get_string();
+		std::string jointName = curJoint->name();
 		if (jointPhyObjMap.find(jointName) != jointPhyObjMap.end())
 		{
 			SbmPhysicsObj* phyObj = jointPhyObjMap[jointName];
@@ -308,15 +308,15 @@ void SbmCharacter::setJointPhyCollision( bool useCollision )
 
 void SbmCharacter::buildJointPhyObjs()
 {
-	const SrArray<SkJoint*>& joints = skeleton_p->joints();
+	const std::vector<SkJoint*>& joints = skeleton_p->joints();
 	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
 	if (!phySim)
 		return;
 	//printf("init physics obj\n");	
-	for (int i=0;i<joints.size();i++)
+	for (size_t i=0;i<joints.size();i++)
 	{
 		SkJoint* curJoint = joints[i];
-		std::string jointName = curJoint->name().get_string();
+		std::string jointName = curJoint->name();
 // 		if (curJoint->visgeo())
 // 		{
 // 			SbmGeomObject* jointGeom = new SbmGeomTriMesh(curJoint->visgeo());			
@@ -698,7 +698,7 @@ void SbmCharacter::add_face_channel( const string& name, const int wo_index ) {
 SkJoint*  SbmCharacter::add_bounded_float_channel( const string& name, float lower, float upper, const int wo_index ) {
 
 	SkJoint* joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
-	joint_p->name( SkJointName( name.c_str() ) );
+	joint_p->name( name );
 	// Activate channel with lower limit != upper.
 	joint_p->pos()->limits( SkJointPos::X, lower, upper );  // Setting upper bound to 2 allows some exageration
 	return joint_p;
@@ -729,7 +729,7 @@ int SbmCharacter::init_skeleton() {
 
 		// 3D vector for current speed and trajectory of the body
 		SkJoint* loc_vector_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
-		loc_vector_joint_p->name( SkJointName( MeCtLocomotionPawn::LOCOMOTION_VELOCITY ) );
+		loc_vector_joint_p->name( MeCtLocomotionPawn::LOCOMOTION_VELOCITY );
 		// Activate positional channels
 		loc_vector_joint_p->pos()->limits( 0, -max_speed, max_speed );
 		loc_vector_joint_p->pos()->limits( 1, -max_speed, max_speed );
@@ -747,11 +747,11 @@ int SbmCharacter::init_skeleton() {
 		SkJoint* l_angular_angle_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
 		SkJoint* time_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
 		SkJoint* id_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
-		g_angular_velocity_joint_p->name( SkJointName( MeCtLocomotionPawn::LOCOMOTION_GLOBAL_ROTATION ) );
-		l_angular_velocity_joint_p->name( SkJointName( MeCtLocomotionPawn::LOCOMOTION_LOCAL_ROTATION ) );
-		l_angular_angle_joint_p->name( SkJointName( MeCtLocomotionPawn::LOCOMOTION_LOCAL_ROTATION_ANGLE ) );
-		time_joint_p->name( SkJointName( MeCtLocomotionPawn::LOCOMOTION_TIME ) );
-		id_joint_p->name( SkJointName( MeCtLocomotionPawn::LOCOMOTION_ID ) );
+		g_angular_velocity_joint_p->name( MeCtLocomotionPawn::LOCOMOTION_GLOBAL_ROTATION  );
+		l_angular_velocity_joint_p->name( MeCtLocomotionPawn::LOCOMOTION_LOCAL_ROTATION  );
+		l_angular_angle_joint_p->name( MeCtLocomotionPawn::LOCOMOTION_LOCAL_ROTATION_ANGLE  );
+		time_joint_p->name(  MeCtLocomotionPawn::LOCOMOTION_TIME  );
+		id_joint_p->name( MeCtLocomotionPawn::LOCOMOTION_ID  );
 
 		// Activate positional channels, unlimited
 		g_angular_velocity_joint_p->pos()->limits( 1, false ); // Unlimit YPos
@@ -903,7 +903,7 @@ int SbmCharacter::init_skeleton() {
 	// keep record of viseme channel start index
 	if (viseme_start_name != "")
 	{
-		viseme_channel_start_pos = skeleton_p->channels().search(SkJointName(viseme_start_name.c_str()), SkChannel::XPos);
+		viseme_channel_start_pos = skeleton_p->channels().search(viseme_start_name.c_str(), SkChannel::XPos);
 		viseme_channel_end_pos = viseme_channel_start_pos + viseme_channel_count;
 		viseme_history_arr = new float[ viseme_channel_count ];
 	}
@@ -1418,7 +1418,7 @@ void SbmCharacter::remove_from_scene() {
 	vrProcEnd_msg += name;
 	mcu.vhmsg_send( vrProcEnd_msg.c_str() );
 
-	mcu.character_map.remove( name );
+	mcu.removeCharacter(name);
 
 	SbmPawn::remove_from_scene();
 }
@@ -1504,7 +1504,7 @@ void SbmCharacter::schedule_viseme_curve(
 			ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
 
 			SkChannelArray channels;
-			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
+			channels.add( visemeNames[nCount], SkChannel::XPos );
 
 			MeCtCurveWriter* ct_p = new MeCtCurveWriter();
 			ct_p->name( ct_name.str().c_str() );
@@ -1615,7 +1615,7 @@ void SbmCharacter::schedule_viseme_blend_curve(
 			ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
 
 			SkChannelArray channels;
-			channels.add( SkJointName(visemeNames[nCount].c_str()), SkChannel::XPos );
+			channels.add( visemeNames[nCount], SkChannel::XPos );
 
 			MeCtChannelWriter* ct_p = new MeCtChannelWriter();
 			ct_p->name( ct_name.str().c_str() );
@@ -1667,11 +1667,11 @@ void SbmCharacter::forward_visemes( double curTime )
 				
 					if( bonebusCharacter )
 					{
-						//bonebusCharacter->SetViseme( channels.name(c).get_string(), value, 0 );
+						bonebusCharacter->SetViseme( channels.name(c).c_str(), value, 0 );
 					}
 					if( listener_p )
 					{
-						listener_p->OnViseme( name, channels.name(c).get_string(), value, 0 );
+						listener_p->OnViseme( name, channels.name(c), value, 0 );
 					}
 					viseme_history_arr[ i ] = value;
 				}
@@ -1686,7 +1686,7 @@ void SbmCharacter::inspect_skeleton( SkJoint* joint_p, int depth )	{
 	int i, j, n;
 	
 	if( joint_p )	{
-		const char *name = joint_p->name();
+		const char *name = joint_p->name().c_str();
 		for( j=0; j<depth; j++ ) { LOG( " " ); }
 		LOG( "%s\n", name );
 		n = joint_p->num_children();
@@ -1699,7 +1699,7 @@ void SbmCharacter::inspect_skeleton( SkJoint* joint_p, int depth )	{
 void SbmCharacter::inspect_skeleton_local_transform( SkJoint* joint_p, int depth )	{
 	
 	if( joint_p )	{
-		const char *name = joint_p->name();
+		const char *name = joint_p->name().c_str();
 		gwiz::matrix_t M;
 		int i, j;
 
@@ -1729,7 +1729,7 @@ void SbmCharacter::inspect_skeleton_local_transform( SkJoint* joint_p, int depth
 void SbmCharacter::inspect_skeleton_world_transform( SkJoint* joint_p, int depth )	{
 	
 	if( joint_p )	{
-		const char *name = joint_p->name();
+		const char *name = joint_p->name().c_str();
 		gwiz::matrix_t M;
 		int i, j;
 
@@ -1978,10 +1978,10 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		//printf("prefix name = %s\n",prefixName);
 		return mcu_character_load_skinweights( name, skin_file, mcu_p, scaleFactor,prefixName);
 	} 
-	else 
-	if( cmd == "ctrl" ) {
-		return mcu_character_ctrl_cmd( name, args, mcu_p );
-	} 
+//	else 
+//	if( cmd == "ctrl" ) {
+//		return mcu_character_ctrl_cmd( name, args, mcu_p );
+//	} 
 	else 
 	if( cmd == "bone" ) {
 		return mcu_character_bone_cmd( name, args, mcu_p );
@@ -2023,7 +2023,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 					SkJoint* joint = channels.joint(c);
 					if (joint)
 					{
-						strstr << joint->name().get_string() << " ";
+						strstr << joint->name() << " ";
 					}
 					SkChannel& channel = channels[c];
 					int channelSize = channel.size();
@@ -2731,11 +2731,12 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	if( char_name == "*" ) {
 
 		all_characters = true;
-		mcu_p->character_map.reset();
-		while( character = mcu_p->character_map.next() ) {
-			
+		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
+			iter != mcu_p->getCharacterMap().end();
+			iter++)
+		{
 			srArgBuffer copy_args( args.peek_string() );
-			int err = character->parse_character_command( char_cmd, copy_args, mcu_p, true );
+			int err = (*iter).second->parse_character_command( char_cmd, copy_args, mcu_p, true );
 			if( err != CMD_SUCCESS )	{
 				return( err );
 			}
@@ -2743,7 +2744,7 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return( CMD_SUCCESS );
 	} 
 
-	character = mcu_p->character_map.lookup( char_name.c_str() );
+	character = mcu_p->getCharacter( char_name );
 	if( character ) {
 	
 		int err = character->parse_character_command( char_cmd, args, mcu_p, false );
@@ -2805,15 +2806,17 @@ int SbmCharacter::remove_from_scene( const char* char_name ) {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	if( strcmp( char_name, "*" )==0 ) {
-		SbmCharacter * char_p;
-		mcu.character_map.reset();
-		while( char_p = mcu.character_map.pull() ) {
-			char_p->remove_from_scene();
-			delete char_p;
+		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+			iter != mcu.getCharacterMap().end();
+			iter++)
+		{
+			SbmCharacter* character = (*iter).second;
+			character->remove_from_scene();
+			delete character;
 		}
 		return CMD_SUCCESS;
 	} else {
-		SbmCharacter* char_p = mcu.character_map.lookup( char_name );
+		SbmCharacter* char_p = mcu.getCharacter( char_name );
 
 		if ( char_p ) {
 			char_p->remove_from_scene();
@@ -2834,7 +2837,7 @@ int SbmCharacter::set_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return CMD_FAILURE;
 	}
 
-	SbmCharacter* character = mcu_p->character_map.lookup( character_id.c_str() );
+	SbmCharacter* character = mcu_p->getCharacter( character_id );
 	if( character==NULL ) {
 		LOG("ERROR: SbmCharacter::set_cmd_func(..): Unknown character \"%s\" to set.", character_id.c_str());
 		return CMD_FAILURE;
@@ -2961,7 +2964,7 @@ int SbmCharacter::print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return CMD_FAILURE;
 	}
 
-	SbmCharacter* character = mcu_p->character_map.lookup( character_id.c_str() );
+	SbmCharacter* character = mcu_p->getCharacter( character_id );
 	if( character==NULL ) {
 		LOG("ERROR: SbmCharacter::print_cmd_func(..): Unknown character \"%s\".", character_id.c_str());
 		return CMD_FAILURE;
@@ -3109,7 +3112,7 @@ int SbmCharacter::writeSkeletonHierarchy(std::string file, double scale)
 	ostream << "set_name " << this->name << "\n";
 	ostream << "\n";
 	ostream << "skeleton\n";
-	ostream << "root " << root->name().get_string() << "\n";
+	ostream << "root " << root->name() << "\n";
 	writeSkeletonHierarchyRecurse(root, ostream, scale, 0);
 	ostream << "\n";
 	ostream << "end\n";

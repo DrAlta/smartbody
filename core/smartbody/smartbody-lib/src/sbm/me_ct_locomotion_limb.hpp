@@ -75,7 +75,7 @@ public:
 	MeCtLocomotionLimbDirectionPlanner direction_planner; 
 	
 	SrVec							pos;
-	char*							limb_base_name;
+	std::string						limb_base_name;
 	float							rotation_record;
 	float							curr_rotation;
 	float							pre_rotation;
@@ -111,14 +111,14 @@ public:
 	void	init_skeleton(SkSkeleton* standing_skeleton, SkSkeleton* walking_skeleton);
 
 	int		add_support_joint(char* joint_name);
-	int		set_limb_base(char* name);
+	int		set_limb_base(std::string name);
 
 	int		get_descendant_num(SkJoint* joint);
 	int		get_support_joint_num();
 
 	void	set_skeleton_name(char* name);
 
-	char*	get_limb_base_name();
+	std::string	get_limb_base_name();
 
 	void	calc_blended_anim_speed(MeCtLocomotionLimbAnim* anim1, MeCtLocomotionLimbAnim* anim2, float weight);
 

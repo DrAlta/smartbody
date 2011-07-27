@@ -62,7 +62,7 @@ bool MeCtDataReceiver::controller_evaluate(double t, MeFrameData& frame)
 			std::string jName = iter->first;
 			SkJoint* joint = _skeleton->search_joint(jName.c_str());
 			if (!joint)	continue;
-			int channelId = _context->channels().search(SkJointName(jName.c_str()), SkChannel::Quat);
+			int channelId = _context->channels().search(jName, SkChannel::Quat);
 			if (channelId < 0)	continue;
 			int bufferId = frame.toBufferIndex(channelId);
 			if (bufferId < 0)	continue;
@@ -80,7 +80,7 @@ bool MeCtDataReceiver::controller_evaluate(double t, MeFrameData& frame)
 			std::string jName = iter1->first;
 			SkJoint* joint = _skeleton->search_joint(jName.c_str());
 			if (!joint)	continue;
-			int channelId = _context->channels().search(SkJointName(jName.c_str()), SkChannel::XPos);
+			int channelId = _context->channels().search(jName, SkChannel::XPos);
 			if (channelId < 0)	continue;
 			int bufferId = frame.toBufferIndex(channelId);
 			if (bufferId < 0)	continue;

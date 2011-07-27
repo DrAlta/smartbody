@@ -286,7 +286,7 @@ SMARTBODY_DLL_API int Smartbody_dll::GetNumberOfCharacters()
 {
    mcuCBHandle & mcu = mcuCBHandle::singleton();
 
-   return mcu.character_map.get_num_entries();
+   return mcu.getNumCharacters();
 }
 
 
@@ -294,7 +294,7 @@ SMARTBODY_DLL_API SmartbodyCharacter& Smartbody_dll::GetCharacter( const string 
 {
    mcuCBHandle & mcu = mcuCBHandle::singleton();
 
-   const SbmCharacter * char_p = mcu.character_map.lookup( name );
+   const SbmCharacter * char_p = mcu.getCharacter(name );
    bool hasChar = false;
    if ( char_p )
    {
@@ -340,12 +340,12 @@ SMARTBODY_DLL_API SmartbodyCharacter& Smartbody_dll::GetCharacter( const string 
       c.rz = q.z;
 
 
-      const SrArray<SkJoint *> & joints  = char_p->skeleton_p->joints();
+	  const std::vector<SkJoint *> & joints  = char_p->skeleton_p->joints();
 
-      for ( int i = 0; i < joints.size(); i++ )
+      for ( size_t i = 0; i < joints.size(); i++ )
       {
          // const_cast because the SrQuat does validation (no const version of value())
-         SkJoint * j = (SkJoint *)joints.const_get( i );
+         SkJoint * j = joints[i];
 
          SrQuat q = j->quat()->value();
 
@@ -445,15 +445,15 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert( "char",   SbmCharacter::character_cmd_func );
 
    mcu.insert( "ctrl",      mcu_controller_func );
-   mcu.insert( "sched",     mcu_sched_controller_func );
-   mcu.insert( "motion",    mcu_motion_controller_func );
-   mcu.insert( "stepturn",  mcu_stepturn_controller_func );
-   mcu.insert( "quickdraw", mcu_quickdraw_controller_func );
-   mcu.insert( "gaze",      mcu_gaze_controller_func );  
+//   mcu.insert( "sched",     mcu_sched_controller_func );
+  // mcu.insert( "motion",    mcu_motion_controller_func );
+  // mcu.insert( "stepturn",  mcu_stepturn_controller_func );
+   //mcu.insert( "quickdraw", mcu_quickdraw_controller_func );
+   //mcu.insert( "gaze",      mcu_gaze_controller_func );  
    mcu.insert( "gazelimit", mcu_gaze_limit_func );
-   mcu.insert( "snod",      mcu_snod_controller_func );
-   mcu.insert( "lilt",      mcu_lilt_controller_func );
-   mcu.insert( "divulge",   mcu_divulge_content_func );
+   //mcu.insert( "snod",      mcu_snod_controller_func );
+   //mcu.insert( "lilt",      mcu_lilt_controller_func );
+   //mcu.insert( "divulge",   mcu_divulge_content_func );
    mcu.insert( "wsp",       mcu_wsp_cmd_func );
    mcu.insert( "create_remote_pawn",	SbmPawn::create_remote_pawn_func );
 
@@ -508,7 +508,7 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert_print_cmd( "face",         mcu_print_face_func );
    mcu.insert_print_cmd( "joint_logger", joint_logger::print_func );
    mcu.insert_print_cmd( "J_L",          joint_logger::print_func );  // shorthand
-   mcu.insert_print_cmd( "mcu",          mcu_divulge_content_func );
+   //mcu.insert_print_cmd( "mcu",          mcu_divulge_content_func );
    mcu.insert_print_cmd( "test",         sbm_print_test_func );
 
    mcu.insert_test_cmd( "args", test_args_func );

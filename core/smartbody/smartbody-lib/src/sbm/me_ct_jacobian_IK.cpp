@@ -157,7 +157,7 @@ void MeCtIKTreeScenario::buildIKTreeFromJointRoot( SkJoint* root )
 	ikTreeRoot->joint = root;
 	ikTreeRoot->nodeIdx = ikTreeNodes.size();
 	ikTreeRoot->nodeLevel = 0;
-	ikTreeRoot->nodeName = root->name().get_string();
+	ikTreeRoot->nodeName = root->name();
 	ikTreeNodes.push_back(ikTreeRoot);
 	traverseJoint(root,ikTreeRoot,ikTreeNodes);
 	
@@ -176,7 +176,7 @@ int MeCtIKTreeScenario::traverseJoint(SkJoint* joint, MeCtIKTreeNode* jointNode,
 		MeCtIKTreeNode* childNode = new MeCtIKTreeNode();
 		childNode->nodeLevel = jointNode->nodeLevel + 1;
 		childNode->joint = child;
-		childNode->nodeName = child->name().get_string();
+		childNode->nodeName = child->name();
 		childNode->nodeIdx = nodeList.size();
 		childNode->parent = jointNode;
 		nodeList.push_back(childNode);
@@ -186,7 +186,7 @@ int MeCtIKTreeScenario::traverseJoint(SkJoint* joint, MeCtIKTreeNode* jointNode,
 		if (prevNode)
 			prevNode->brother = childNode;
 
-		if ( strcmp(child->name().get_string(),"spine4")==0)// || 
+		if ( strcmp(child->name().c_str(),"spine4")==0)// || 
 // 			strcmp(child->name().get_string(),"l_wrist")==0 ||
 // 			strcmp(child->name().get_string(),"r_wrist")==0 )
 		{
@@ -257,7 +257,7 @@ int MeCtIKTreeScenario::findIKTreeNodeInList( const char* jointName, IKTreeNodeL
 	int iCount = 0;
 	BOOST_FOREACH(MeCtIKTreeNode* node, nodeList)
 	{
-		if (strcmp(node->joint->name().get_string(),jointName) == 0)
+		if (strcmp(node->joint->name().c_str(),jointName) == 0)
 			return iCount;		
 		iCount++;
 	}

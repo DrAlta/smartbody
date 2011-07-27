@@ -354,8 +354,8 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 	int n_chan = _channels.size();
 
 	if( pitch_tracking ) {
-		int L_eye_quat_idx = _context->channels().search( SkJointName( "eyeball_left" ), SkChannel::Quat );
-		int R_eye_quat_idx =  _context->channels().search( SkJointName( "eyeball_right" ), SkChannel::Quat );
+		int L_eye_quat_idx = _context->channels().search( "eyeball_left", SkChannel::Quat );
+		int R_eye_quat_idx =  _context->channels().search( "eyeball_right", SkChannel::Quat );
 
 		int buff_idx = _context->toBufferIndex( L_eye_quat_idx );
 		euler_t L_eye_e = quat_t(
@@ -419,7 +419,7 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 	bool applied = false;
 
 	if (get_use_blink_viseme()) {
-		int U_au_blink_idx = _context->channels().search( SkJointName( "blink" ), SkChannel::XPos );
+		int U_au_blink_idx = _context->channels().search("blink", SkChannel::XPos );
 		int U_au_blink_buff_idx = _context->toBufferIndex( U_au_blink_idx );
 		if( U_au_blink_idx >= 0 )	{
 			fbuffer[ U_au_blink_buff_idx ] = UL_value;
@@ -441,14 +441,14 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 
 	if( applied == false ) {
 		if( UL_value != 0.0f ) {
-			int UL_au_blink_idx =  _context->channels().search( SkJointName( "au_45_left" ), SkChannel::XPos );
+			int UL_au_blink_idx =  _context->channels().search("au_45_left", SkChannel::XPos );
 			int UL_au_blink_buff_idx = _context->toBufferIndex( UL_au_blink_idx );
 			if( UL_au_blink_buff_idx >= 0 ) {
 				fbuffer[ UL_au_blink_buff_idx ] = UL_value;
 			}
 		}
 		if( UR_value != 0.0f ) {
-			int UR_au_blink_idx =  _context->channels().search( SkJointName( "au_45_right" ), SkChannel::XPos );
+			int UR_au_blink_idx =  _context->channels().search( "au_45_right", SkChannel::XPos );
 			int UR_au_blink_buff_idx = _context->toBufferIndex( UR_au_blink_idx );
 			if( UR_au_blink_buff_idx >= 0 ) {
 				fbuffer[ UR_au_blink_buff_idx ] = UR_value;
@@ -735,14 +735,14 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 	float *fbuffer = &( frame.buffer()[0] );
 	int n_chan = _channels.size();
 
-	int L_eye_quat_chan_index = _context->channels().search( SkJointName( "eyeball_left" ), SkChannel::Quat );
+	int L_eye_quat_chan_index = _context->channels().search( "eyeball_left", SkChannel::Quat );
 //	int R_eye_quat_chan_index =  _context->channels().search( SkJointName( "eyeball_right" ), SkChannel::Quat );
 
-	int UL_lid_posy_chan_index =  _context->channels().search( SkJointName( "upper_eyelid_left" ), SkChannel::YPos );
-	int UR_lid_posy_chan_index =  _context->channels().search( SkJointName( "upper_eyelid_right" ), SkChannel::YPos );
+	int UL_lid_posy_chan_index =  _context->channels().search("upper_eyelid_left", SkChannel::YPos );
+	int UR_lid_posy_chan_index =  _context->channels().search("upper_eyelid_right", SkChannel::YPos );
 
-	int LL_lid_posy_chan_index =  _context->channels().search( SkJointName( "lower_eyelid_left" ), SkChannel::YPos );
-	int LR_lid_posy_chan_index =  _context->channels().search( SkJointName( "lower_eyelid_right" ), SkChannel::YPos );
+	int LL_lid_posy_chan_index =  _context->channels().search( "lower_eyelid_left", SkChannel::YPos );
+	int LR_lid_posy_chan_index =  _context->channels().search( "lower_eyelid_right" , SkChannel::YPos );
 
 	int i_map;
 	

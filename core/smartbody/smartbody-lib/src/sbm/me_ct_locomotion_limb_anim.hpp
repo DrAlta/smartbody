@@ -95,7 +95,7 @@ public:
 
 	void					apply_frame(int frame);
 
-	void					get_frame(float frame, char* limb_base, SrArray<int>* index_buff);
+	void					get_frame(float frame, std::string limb_base, SrArray<int>* index_buff);
 
 	SrArray<SrQuat>*		get_buffer();
 

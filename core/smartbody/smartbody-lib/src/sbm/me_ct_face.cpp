@@ -187,8 +187,8 @@ void MeCtFace::finish_adding( void )	{
 		for (int c = 0; c < size; c++)
 		{
 			SkChannel& channel = nextKey->channels()[c];
-			SkJointName jointName = nextKey->channels().name(c);
-			int baseChannelIndex = _base_pose_p->channels().search(jointName, channel.type);
+			std::string jointName = nextKey->channels().name(c);
+			int baseChannelIndex = _base_pose_p->channels().search(jointName.c_str(), channel.type);
 			if (baseChannelIndex >= 0)
 			{
 				keyIndices.push_back(baseChannelIndex); // mapping from the key pose channel index to the base pose channel index

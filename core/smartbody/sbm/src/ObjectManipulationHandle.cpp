@@ -19,14 +19,12 @@ ObjectManipulationHandle::~ObjectManipulationHandle(void)
 void ObjectManipulationHandle::get_pawn_list(SrArray<SbmPawn*>& pawn_list)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	srHashMap<SbmPawn>& pawn_map = mcu.pawn_map;
-	pawn_map.reset();
-	SbmPawn* pawn = pawn_map.next();
-	
-	while ( pawn )
+	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
+		iter != mcu.getPawnMap().end();
+		iter++)
 	{
-		pawn_list.push(pawn);							
-		pawn = pawn_map.next();
+		SbmPawn* pawn = (*iter).second;
+		pawn_list.push(pawn);
 	}
 }
 
@@ -90,9 +88,11 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera& c
 	// determine the size of the pawns relative to the size of the characters
 	float pawnSize = 1.0;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.character_map.reset();
-	while (SbmCharacter* character = mcu.character_map.next())
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
 	{
+		SbmCharacter* character = (*iter).second;
 		pawnSize = character->getHeight() / 30.0f;
 		break;
 	}

@@ -37,7 +37,7 @@ void MeCtCurveWriter::init(
 	
 	_channels.init();
 	_channels.merge( channels );
-	_channels.compress();
+//	_channels.compress();
 	_channels.rebuild_hash_table();
 	
 	num_curves = _channels.floats();
@@ -57,7 +57,7 @@ void MeCtCurveWriter::init(
 		_local_ch_to_buffer[i] = index;
 		int chan_size = SkChannel::size( _channels.type( i ) );
 		if( chan_size > 1 ) {
-			LOG( "MeCtCurveWriter::init ERR: channel '%s' not a scalar", _channels.name( i ).get_string() );
+			LOG( "MeCtCurveWriter::init ERR: channel '%s' not a scalar", _channels.name( i ).c_str() );
 		}
 		index += chan_size;
 	}

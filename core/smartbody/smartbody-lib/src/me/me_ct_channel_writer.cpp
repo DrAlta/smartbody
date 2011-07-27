@@ -44,7 +44,7 @@ void MeCtChannelWriter::init(SbmPawn* pawn, SkChannelArray& channels, bool conti
 {
 	_channels.init();
 	_channels.merge( channels );
-	_channels.compress();  // save memory
+//	_channels.compress();  // save memory
 	_channels.rebuild_hash_table();
 
 	_data.size( _channels.floats() );

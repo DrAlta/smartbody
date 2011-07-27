@@ -60,7 +60,7 @@ WSP::WSP_ERROR remote_pawn_position_update( std::string id, std::string attribut
 {
 	mcuCBHandle * mcu_p = static_cast< mcuCBHandle * >( data );
 
-	SbmPawn * pawn_p = mcu_p->pawn_map.lookup( id );
+	SbmPawn * pawn_p = mcu_p->getPawn( id );
 	if ( pawn_p != NULL )
 	{
 		float x, y, z, h, p, r;
@@ -83,7 +83,7 @@ WSP::WSP_ERROR remote_pawn_rotation_update( std::string id, std::string attribut
 {
 	mcuCBHandle * mcu_p = static_cast< mcuCBHandle * >( data );
 
-	SbmPawn * pawn_p = mcu_p->pawn_map.lookup( id );
+	SbmPawn * pawn_p = mcu_p->getPawn( id );
 
 	if ( pawn_p != NULL )
 	{
@@ -197,7 +197,7 @@ int SbmPawn::init_skeleton() {
 	}
 
 	SkJoint* world_offset_joint = skeleton_p->insert_new_root_joint( SkJoint::TypeQuat );
-	world_offset_joint->name( SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ) );
+	world_offset_joint->name( SbmPawn::WORLD_OFFSET_JOINT_NAME );
 	// Make sure the world_offset accepts new pos and quat values
 	SkJointPos* world_offset_pos = world_offset_joint->pos();
 	world_offset_pos->limits( SkVecLimits::X, false );
@@ -249,7 +249,7 @@ void SbmPawn::reset_all_channels()
 
 void SbmPawn::init_world_offset_channels() {
 	if( WORLD_OFFSET_CHANNELS_P.size()==0 ) {
-		SkJointName world_offset_joint_name( WORLD_OFFSET_JOINT_NAME );
+		std::string world_offset_joint_name = WORLD_OFFSET_JOINT_NAME;
 		WORLD_OFFSET_CHANNELS_P.add( world_offset_joint_name, SkChannel::XPos );
 		WORLD_OFFSET_CHANNELS_P.add( world_offset_joint_name, SkChannel::YPos );
 		WORLD_OFFSET_CHANNELS_P.add( world_offset_joint_name, SkChannel::ZPos );
@@ -273,7 +273,7 @@ void SbmPawn::remove_from_scene() {
 	
 	if( scene_p != NULL )
 		mcu.remove_scene( scene_p );
-	mcu.pawn_map.remove( name );
+	mcu.removePawn( name );
 	// remove the connected steering object for steering space
 	if (steeringSpaceObj_p)
 	{
@@ -498,7 +498,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	if( pawn_name=="*" ) {
 		all_pawns = true;
 	} else {
-		pawn_p = mcu_p->pawn_map.lookup( pawn_name.c_str() );
+		pawn_p = mcu_p->getPawn( pawn_name.c_str() );
 	}
 
 	if( pawn_cmd=="init" ) {
@@ -611,8 +611,8 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		// 			pawn_p->colObj_p = colObj;
 		// 		}
 		
-		err = mcu_p->pawn_map.insert( pawn_name.c_str(), pawn_p );
-		if( err != CMD_SUCCESS )	{
+		bool ok = mcu_p->addPawn( pawn_p );
+		if( !ok )	{
 			std::stringstream strstr;
 			strstr << "ERROR: SbmPawn pawn_map.insert(..) \"" << pawn_name << "\" FAILED";
 			LOG(strstr.str().c_str());
@@ -657,9 +657,11 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		int result = CMD_SUCCESS;
 		if( all_pawns ) {
 			// Prune all pawns
-			mcu_p->pawn_map.reset();
-			while( pawn_p = mcu_p->pawn_map.next() ) {
-				if( pawn_p->prune_controller_tree() != CMD_SUCCESS ) {
+			for (std::map<std::string, SbmPawn*>::iterator iter = mcu_p->getPawnMap().begin();
+				iter != mcu_p->getPawnMap().end();
+				iter++)
+			{
+				if( (*iter).second->prune_controller_tree() != CMD_SUCCESS ) {
 					std::stringstream strstr;
 					strstr << "ERROR: Failed to prune pawn \""<<pawn_name<<"\".";
 					LOG(strstr.str().c_str());
@@ -795,15 +797,17 @@ int SbmPawn::remove_from_scene( const char* pawn_name ) {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	if( strcmp( pawn_name, "*" )==0 ) {
-		SbmPawn * pawn_p;
-		mcu.character_map.reset();
-		while( pawn_p = mcu.character_map.pull() ) {
-			pawn_p->remove_from_scene();
-			delete pawn_p;
+		for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
+				iter != mcu.getPawnMap().end();
+				iter++)
+		{
+			SbmPawn* pawn = (*iter).second;
+			pawn->remove_from_scene();
+			delete pawn;
 		}
 		return CMD_SUCCESS;
 	} else {
-		SbmPawn* pawn_p = mcu.character_map.lookup( pawn_name );
+		SbmPawn* pawn_p = mcu.getPawn( pawn_name );
 
 		if ( pawn_p ) {
 			pawn_p->remove_from_scene();
@@ -824,7 +828,7 @@ int SbmPawn::set_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return CMD_FAILURE;
 	}
 
-	SbmPawn* pawn = mcu_p->pawn_map.lookup( pawn_id.c_str() );
+	SbmPawn* pawn = mcu_p->getPawn( pawn_id );
 	if( pawn==NULL ) {
 		LOG("ERROR: SbmPawn::set_cmd_func(..): Unknown pawn id \"%s\".", pawn_id.c_str());
 		return CMD_FAILURE;
@@ -850,10 +854,10 @@ int SbmPawn::set_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& args,
 		if (args.calc_num_tokens() == 0)
 		{
 			SkSkeleton* skeleton = pawn->skeleton_p;
-			SrArray<SkJoint*>& joints = skeleton->get_joint_array();
-			for (int j = 0; j < joints.size(); j++)
+			std::vector<SkJoint*>& joints = skeleton->get_joint_array();
+			for (size_t j = 0; j < joints.size(); j++)
 			{
-				LOG("%s : %f", joints[j]->name().get_string(), joints[j]->mass());
+				LOG("%s : %f", joints[j]->name().c_str(), joints[j]->mass());
 				
 			}
 			return CMD_SUCCESS;
@@ -947,7 +951,7 @@ int SbmPawn::print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return CMD_FAILURE;
 	}
 
-	SbmPawn* pawn = mcu_p->pawn_map.lookup( pawn_id.c_str() );
+	SbmPawn* pawn = mcu_p->getPawn( pawn_id );
 	if( pawn==NULL ) {
 		LOG("ERROR: SbmPawn::print_cmd_func(..): Unknown pawn \"%s\".", pawn_id.c_str());
 		return CMD_FAILURE;
@@ -1014,7 +1018,7 @@ int SbmPawn::create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 	SbmPawn* pawn_p = NULL;
 
-	pawn_p = mcu_p->pawn_map.lookup( pawn_and_attribute.c_str() );
+	pawn_p = mcu_p->getPawn( pawn_and_attribute );
 
 	if( pawn_p != NULL ) {
 		LOG("ERROR: Pawn \"%s\" already exists.", pawn_and_attribute.c_str() );
@@ -1044,7 +1048,7 @@ int SbmPawn::create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return err;
 	}
 
-	err = mcu_p->pawn_map.insert( pawn_and_attribute.c_str(), pawn_p );
+	err = mcu_p->addPawn( pawn_p );
 
 	if( err != CMD_SUCCESS )	{
 		LOG("ERROR: SbmPawn pawn_map.insert(..) \"%s\" FAILED", pawn_and_attribute.c_str() );
@@ -1083,7 +1087,7 @@ int SbmPawn::remove_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 	SbmPawn* pawn_p = NULL;
 
-	pawn_p = mcu_p->pawn_map.lookup( pawn_name.c_str() );
+	pawn_p = mcu_p->getPawn( pawn_name );
 
 	if( pawn_p != NULL ) {
 

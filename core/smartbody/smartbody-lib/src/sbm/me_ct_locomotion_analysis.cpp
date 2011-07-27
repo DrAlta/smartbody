@@ -91,9 +91,9 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 	//if (this->motion_standing)
 	//	this->motion_standing->unref();
 	this->motion_standing = standing;
-	const char* base_name = standing_skeleton->root()->name().get_string();
+	std::string baseNameStr = standing_skeleton->root()->name();
 
-	get_ct_pawn()->set_base_name(base_name);
+	get_ct_pawn()->set_base_name(baseNameStr.c_str());
 	int count = get_ct_pawn()->get_limb_list()->size();
 	for(int i = 0; i < count; ++i)
 	{
@@ -175,7 +175,7 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 	for(int i = 0; i < get_ct_pawn()->get_limb_list()->size(); ++i)
 	{
 		limb = get_ct_pawn()->get_limb_list()->get(i);
-		joint = standing_skeleton->search_joint(limb->limb_base_name);
+		joint = standing_skeleton->search_joint(limb->limb_base_name.c_str());
 		for(int j = 0; j < limb->joint_num; ++j)
 		{
 			limb->ik.joint_info_list.get(j).is_support_joint = 0;
@@ -203,10 +203,10 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 	standing_initialized = true;
 }
 
-int MeCtLocomotionAnalysis::get_descendant_num(char* base_name)
+int MeCtLocomotionAnalysis::get_descendant_num(std::string base_name)
 {
 	//motion_locomotion->connect(walking_skeleton);
-	SkJoint* base = walking_skeleton->search_joint(base_name);
+	SkJoint* base = walking_skeleton->search_joint(base_name.c_str());
 	return get_descendant_num(base);
 }
 
@@ -276,7 +276,7 @@ int MeCtLocomotionAnalysis::get_translation_base_joint_name(SkSkeleton* skeleton
 	{
 		if(!joint->pos()->frozen(1))
 		{
-			get_ct_pawn()->set_translation_joint_name(joint->name().get_string());
+			get_ct_pawn()->set_translation_joint_name(joint->name().c_str());
 			return i;
 		}
 		joint = joint->child(0);
@@ -323,7 +323,7 @@ void MeCtLocomotionAnalysis::analyze_standing_core(MeCtLocomotionLimb* limb, SkS
 
 	int translation_base_joint_index = get_translation_base_joint_name(skeleton);
 
-	joint = skeleton->search_joint(get_ct_pawn()->translation_joint_name);
+	joint = skeleton->search_joint(get_ct_pawn()->translation_joint_name.c_str());
 
 	mat = joint->gmat();
 	get_ct_pawn()->translation_joint_height = mat.get(13)-ground_height;
@@ -331,7 +331,7 @@ void MeCtLocomotionAnalysis::analyze_standing_core(MeCtLocomotionLimb* limb, SkS
 
 }
 
-void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkMotion* walking, SkMotion* standing, char* limb_base, float land_time, float stance_time, float lift_time)
+void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkMotion* walking, SkMotion* standing, std::string limb_base, float land_time, float stance_time, float lift_time)
 {
 	//printf("\nstart analysis......");
 	anim->set_anim(walking);
@@ -466,7 +466,7 @@ void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkM
 	//printf("\nend analysis......");
 }
 
-void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkMotion* walking, SkMotion* standing, char* limb_base, SrArray<float>* support_height, float ground_height, float height_bound, float base_height_offset = 0.0f)
+void MeCtLocomotionAnalysis::analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkMotion* walking, SkMotion* standing, std::string limb_base, SrArray<float>* support_height, float ground_height, float height_bound, float base_height_offset = 0.0f)
 {
 
 	//printf("\nstart analysis......");
@@ -707,7 +707,7 @@ void MeCtLocomotionAnalysis::filter_displacement(MeCtLocomotionLimbAnim* anim, i
 	}
 }
 
-void MeCtLocomotionAnalysis::calc_stance_time(MeCtLocomotionLimbAnim* anim, char* limb_base)
+void MeCtLocomotionAnalysis::calc_stance_time(MeCtLocomotionLimbAnim* anim, std::string limb_base)
 {
 	stance_frame.capacity(0);
 	motion_locomotion->connect(walking_skeleton);
@@ -719,8 +719,8 @@ void MeCtLocomotionAnalysis::calc_stance_time(MeCtLocomotionLimbAnim* anim, char
 	float dis = -1.0f;
 	int stance = -1;
 
-	SkJoint* walking_base = walking_skeleton->search_joint(limb_base);
-	SkJoint* standing_base = standing_skeleton->search_joint(limb_base);
+	SkJoint* walking_base = walking_skeleton->search_joint(limb_base.c_str());
+	SkJoint* standing_base = standing_skeleton->search_joint(limb_base.c_str());
 
 	for(int i = 0; i < motion_locomotion->frames(); ++i)
 	{

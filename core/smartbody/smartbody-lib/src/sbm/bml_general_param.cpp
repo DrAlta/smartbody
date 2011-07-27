@@ -112,7 +112,7 @@ BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& un
 		pch =(strtok(NULL," "));
 		std::stringstream joint_name;
 		joint_name << char_name << "_" << Index << "_" << ( i + 1 );
-		SkJointName channel_name(joint_name.str().c_str());
+		std::string channel_name = joint_name.str();
 		Param_Channel.add(channel_name,SkChannel::XPos);
 	}
 	

@@ -49,7 +49,7 @@ public:
 	bool has_destination;
 	bool reached_destination;
 
-	SrString translation_joint_name;
+	std::string translation_joint_name;
 
 	float target_height_adjustment;
 	float curr_height_adjustment;
@@ -125,7 +125,7 @@ public: // channels and routine funcs
 	bool controller_evaluate(double delta_time, MeFrameData& frame);
 	void post_controller_evaluate(MeFrameData& frame, MeCtLocomotionLimb* limb, bool reset);
 	int controller_channels(SkChannelArray* request_channels);
-	void AddChannel(SkChannelArray* request_channels, const char* name, SkChannel::Type type, int* index);
+	void AddChannel(SkChannelArray* request_channels, std::string name, SkChannel::Type type, int* index);
 
 public:
 	float get_turning_angle();
@@ -162,7 +162,7 @@ public:
 
 	void set_world_mat(SrMat& mat);
 
-	void set_translation_joint_name(SrString& name);
+	void set_translation_joint_name(std::string name);
 
 
 	bool check_stopped(SrArray<MeCtLocomotionLimb*>* limb_list);

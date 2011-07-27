@@ -39,7 +39,7 @@ void CharacterCreatorWindow::CreateCB(Fl_Widget* w, void* data)
 		return;
 	}
 
-	SbmCharacter* character = mcu.character_map.lookup(creator->inputName->value());
+	SbmCharacter* character = mcu.getCharacter(creator->inputName->value());
 	if (character)
 	{
 		fl_alert("Character name already exists.");

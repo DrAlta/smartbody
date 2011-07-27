@@ -203,7 +203,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 					index = parent->index();
 				SkJoint* joint = skeleton.add_joint(SkJoint::TypeQuat, index);
 				joint->quat()->activate();
-				joint->name(SkJointName(nameAttr.c_str()));
+				joint->name(nameAttr);
 
 				skeleton.channels().add(joint->name(), SkChannel::XPos);
 				skeleton.channels().add(joint->name(), SkChannel::YPos);
@@ -321,21 +321,21 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 			int numTimeInput = -1;
 			if (channelType == "rotateX" || channelType == "rotateY" || channelType == "rotateZ")
 			{
-				if (channelsForAdjusting.search(SkJointName(jointName.c_str()), SkChannel::Quat) < 0)
-					channelsForAdjusting.add(SkJointName(jointName.c_str()), SkChannel::Quat);
+				if (channelsForAdjusting.search(jointName.c_str(), SkChannel::Quat) < 0)
+					channelsForAdjusting.add(jointName.c_str(), SkChannel::Quat);
 			}
 			if (channelType == "translate")
 			{
-				channelsForAdjusting.add(SkJointName(jointName.c_str()), SkChannel::XPos);
-				channelsForAdjusting.add(SkJointName(jointName.c_str()), SkChannel::YPos);
-				channelsForAdjusting.add(SkJointName(jointName.c_str()), SkChannel::ZPos);
+				channelsForAdjusting.add(jointName.c_str(), SkChannel::XPos);
+				channelsForAdjusting.add(jointName.c_str(), SkChannel::YPos);
+				channelsForAdjusting.add(jointName.c_str(), SkChannel::ZPos);
 			}
 			if (channelType == "translateX")
-				channelsForAdjusting.add(SkJointName(jointName.c_str()), SkChannel::XPos);
+				channelsForAdjusting.add(jointName.c_str(), SkChannel::XPos);
 			if (channelType == "translateY")
-				channelsForAdjusting.add(SkJointName(jointName.c_str()), SkChannel::YPos);
+				channelsForAdjusting.add(jointName.c_str(), SkChannel::YPos);
 			if (channelType == "translateZ")
-				channelsForAdjusting.add(SkJointName(jointName.c_str()), SkChannel::ZPos);
+				channelsForAdjusting.add(jointName.c_str(), SkChannel::ZPos);
 			
 			const DOMNodeList* list1 = node1->getChildNodes();
 			for (unsigned int j = 0; j < list1->getLength(); j++)
@@ -462,13 +462,13 @@ void ParserOpenCOLLADA::animationPostProcessByChannels(SkSkeleton& skeleton, SkM
 		for (int j = 0; j < numChannel; j++)
 		{
 			SkChannel& chan = motionChannels[j];
-			std::string chanName = (const char*) motionChannels.name(j);
+			std::string chanName = motionChannels.name(j);
 			SkChannel::Type chanType = chan.type;
 			SkJoint* joint = skeleton.search_joint(chanName.c_str());
 			if (!joint)
 				continue;
 
-			int id = motion.channels().search(SkJointName(chanName.c_str()), chanType);
+			int id = motion.channels().search(chanName.c_str(), chanType);
 			int dataId = motion.channels().float_position(id);
 			if (dataId < 0)
 				continue;
@@ -507,7 +507,7 @@ int ParserOpenCOLLADA::getMotionChannelId(SkChannelArray& mChannels, std::string
 {
 	int id = -1;
 	int dataId = -1;
-	SkJointName jName = SkJointName(tokenize(sourceName, ".-").c_str());
+	std::string jName = tokenize(sourceName, ".-");
 	SkChannel::Type chanType;
 	
 	if (sourceName.find("translate") != std::string::npos)

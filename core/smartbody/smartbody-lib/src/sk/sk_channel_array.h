@@ -28,8 +28,9 @@
 # include <sr/sr_shared_class.h>
 
 # include <sk/sk_channel.h>
-# include <sk/sk_joint_name.h>
 #include <string>
+#include <vector>
+#include <map>
 
 class SkPosture;
 
@@ -50,12 +51,32 @@ private :
 	static SkChannelArray EMPTY_CHANNELS;
 
 	//////////////////////////////////////////////////////////////////////////
-	//  Private Data
-	class HashTable;
-	struct Channel : public SkChannel { SkJointName name; int fmap; };
-	SrArray<Channel> _channels;
-	HashTable* _htable;
+
+	class Channel : public SkChannel
+	{ 
+		public:
+			Channel()
+			{
+				name = "";
+				fmap = 0;
+			}
+			void operator=(const Channel& c)
+			{
+				name = c.name;
+				fmap = c.fmap;
+				SkChannel::operator=(c);
+			}
+
+		std::string name; 
+		int fmap;
+	};
+	//SrArray<Channel> _channels;
+	//HashTable* _htable;
 	int _floats;
+	bool _dirty;
+
+	std::map<std::string, std::map<SkChannel::Type, int> > _channelMap;
+	std::vector<Channel> _channelList;
 
 public :
 	//////////////////////////////////////////////////////////////////////////
@@ -71,51 +92,53 @@ public :
 	void init ();
 
 	/*! Compress internal tables */
-	void compress () { _channels.compress(); }
+//	void compress () { _channels.compress(); }
 
 	/*! Returns the number of channels in the array */
-	int size () const { return _channels.size(); }
+	int size () const { return _channelList.size(); }
+
+	bool doesChannelExist(std::string name, SkChannel::Type t);
 
 	/*! Add in the end of the array a new channel, by giving
 		only its name and type; the joint is set to null (disconnected) */
-	void add ( SkJointName name, SkChannel::Type t ) { _add(0,name,t,false); }
+	void add ( std::string name, SkChannel::Type t ) { _add(0,name,t,false); }
 
 	/*! Add in the end of the array a new channel */
 	void add ( SkJoint* j, SkChannel::Type t, bool connect=false )
-		{ _add(j,SkJointName(),t,connect); }
+		{ _add(j, "" ,t,connect); }
 
 	/*! Same as add(ch.joint,ch.type) */
-	void add ( SkChannel ch ) { _add(ch.joint,SkJointName(),ch.type,false); }
+	void add ( SkChannel ch ) { _add(ch.joint, "",ch.type,false); }
 
 	void changeChannelName(std::string oldName, std::string newName);
 
 	/*! Inserts a channel in the array at given position. The joint is
 		set as null and can be 'connected' later */
-	bool insert ( int pos, SkJointName name, SkChannel::Type type );
+	bool insert ( int pos, std::string name, SkChannel::Type type );
 
 	/*! Access operator */
-	SkChannel& operator[] ( int i ) { return _channels[i]; }
-	SkChannel& get ( int i ) { return _channels[i]; }
-	const SkChannel& const_get ( int i ) const { return _channels[i]; }
+	SkChannel& operator[] ( int i ) { return _channelList[i]; }
+	SkChannel& get ( int i ) { return _channelList[i]; }
+	const SkChannel& const_get ( int i ) const { return _channelList[i]; }
 
 	/*! Returns the last channel added */
-	SkChannel& top () { return _channels.top(); }
+	SkChannel& top () { return _channelList[_channelList.size() -1]; }
 
 	/*! Returns the declared joint name for the channel. It is the
 		user responsibility to ensure that 0<=i and i<size() */
-	SkJointName name ( int i ) const { 
-		const Channel& ch = _channels[i];
+	std::string name ( int i ) const { 
+		const Channel& ch = _channelList[i];
 		return ch.name;
 	}
 
 	/*! Returns the joint of channel i. The joint pointer will only be valid (i.e.!=0)
 		if the channel was succesfully connected to a skeleton joint.
 		It is the user responsibility to ensure that 0<=i and i<size() */
-	SkJoint* joint ( int i ) const { return _channels[i].joint; }
+	SkJoint* joint ( int i ) const { return _channelList[i].joint; }
 
 	/*! Returns the type of channel i. It is the user
 		responsibility to ensure that i<=0 and i<size() */
-	SkChannel::Type type ( int i ) const { return _channels[i].type; }
+	SkChannel::Type type ( int i ) const { return _channelList[i].type; }
 
 	/*! Returns the skeleton associated with the first channel joint or null if empty.
 		Note that the skeleton is expected to be the same for all channels */
@@ -152,18 +175,18 @@ public :
 		Array pointer indices, if not null, will translate the indices of the old
 		and new values, eg, newval[index[i]] will reference oldval[i], if index[i]>=0.
 		True is returned if parameters were correct, false otherwise. */
-	bool get_used_channels ( const SrArray<SkPosture*>& postures, SrArray<int>* indices=0 );
+	bool get_used_channels ( const std::vector<SkPosture*>& postures, std::vector<int>* indices=0 );
 
 	/*! Returns the channel position of given channel type and joint name, or -1 if not found.
 		This method uses a linear search, not relying in the internal hash table option. */
-	int linear_search ( SkJointName name, SkChannel::Type type ) const;
+	int linear_search ( std::string name, SkChannel::Type type ) const;
 
 	/*! Returns the channel position of given channel type and joint name, or -1 if not found.
 		This method uses an internal hash table to speed up the search; however the hash
 		table must be up to date. If the hash table is not built, it will automatically be
 		built, but if the channel array is changed after that, it is the user responsibility
 		to manually call method rebuild_hash_table(). */
-	int search ( SkJointName name, SkChannel::Type type );
+	int search ( std::string name, SkChannel::Type type );
 
 	/*! An internal hash table is used to optimize search in two methods: search() and map().
 		Whenever the channel array is edited, the user must call this method to ensure the
@@ -189,7 +212,7 @@ public :
 		but if the channel array is changed after that, method 
 		rebuild_hash_table() must be called before calling map().
 		('ca' can be considered const, only its hash table may be changed)*/
-	void map ( /*const*/ SkChannelArray& ca, SrBuffer<int>& m );
+//	void map ( /*const*/ SkChannelArray& ca, SrBuffer<int>& m );
 
 	/*! Adds to the channel array all channels that are in ca,
 		but are not in the channel array. The "floats counter" is updated. */
@@ -216,7 +239,7 @@ public :
 	}
 
 private:
-    void _add ( SkJoint* j, SkJointName name, SkChannel::Type t, bool connect );
+	void _add ( SkJoint* j, std::string name, SkChannel::Type t, bool connect );
 };
 
 //==================================== End of File ===========================================

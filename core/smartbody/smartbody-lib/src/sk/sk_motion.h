@@ -51,7 +51,7 @@ public:
 	float* _floatbuffer;      // or the connected buffer
 	char* _name;              // motion name
 	char* _filename;          // file name (optional)
-	SrArray<Frame> _frames;   // frame data
+	std::vector<Frame> _frames;   // frame data
 	SkChannelArray _channels; // channels
 	int _last_apply_frame;    // used to speed up playing with monotone time
 
@@ -114,8 +114,8 @@ public :
 	in relation to the first keyposture, are stored in the motion.
 	Arrays keypostures and keytimes must have the same size.
 	True is returned if the motion could be created, false otherwise. */
-	bool create_from_postures ( const SrArray<SkPosture*>& keypostures, const SrArray<float>& keytimes );
-
+	bool SkMotion::create_from_postures ( const std::vector<SkPosture*>& keypost, 
+									 const std::vector<float>& keytime );
 	/*! Inserts one channel at position i, with the given name, type and value.
 	This implies inserting new position(s) in all frames. Returns true if
 	all parameters are ok. Note that the channel will only take effect when
@@ -148,7 +148,7 @@ public :
 
 	/*! Returns the final keytime of the motion minus the first one.
 	This method requires the motion to not be empty. */
-	float duration () { if (_frames.size() == 0) return 0; return _frames.top().keytime-_frames[0].keytime; }
+	float duration () {  if (_frames.size() == 0) return 0; return _frames[_frames.size() - 1].keytime-_frames[0].keytime; }
 
 	/*! Matches the joint names defined in SkMotion and in SkSkeleton,
 	stablishing a direct link between each channel in the motion

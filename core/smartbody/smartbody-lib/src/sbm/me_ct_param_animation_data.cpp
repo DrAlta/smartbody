@@ -924,8 +924,7 @@ MotionParameters::MotionParameters(SkMotion* m, SkSkeleton* skel, std::string j)
 	motion->connect(skeleton);
 	if (j == "")
 	{
-		joint = skeleton->search_joint(motion->channels().name(0).get_string());
-		std::string jName = joint->name().get_string();
+		joint = skeleton->search_joint(motion->channels().name(0).c_str());
 	}
 	else
 		joint = skeleton->search_joint(j.c_str());

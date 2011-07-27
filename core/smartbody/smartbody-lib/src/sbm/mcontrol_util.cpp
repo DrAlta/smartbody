@@ -341,17 +341,12 @@ void mcuCBHandle::clear( void )	{
 		delete seq_p;
 	}
 
-	SbmPawn* pawn_p;
-	character_map.reset();
-	while( pawn_p = character_map.pull() )	{ 
-		// characters are referenced by both maps
-		character_map.remove( pawn_p->name );
-		pawn_map.remove( pawn_p->name );
-		delete pawn_p;
-	}
-	pawn_map.reset();
-	while( pawn_p = pawn_map.pull() ) {
-		delete pawn_p;
+	for (std::map<std::string, SbmPawn*>::iterator iter = getPawnMap().begin();
+			iter != getPawnMap().end();
+			iter++)
+	{
+		SbmPawn* pawn = (*iter).second;
+		delete pawn;
 	}
 	
 	for (std::map<std::string, SkPosture*>::iterator postureIter = pose_map.begin();
@@ -398,6 +393,7 @@ void mcuCBHandle::clear( void )	{
 	}
 	param_anim_transitions.clear();
 	
+	/*
 	MeCtPose* pose_ctrl_p;
 	pose_ctrl_map.reset();
 	while( pose_ctrl_p = pose_ctrl_map.pull() )	{
@@ -457,6 +453,7 @@ void mcuCBHandle::clear( void )	{
 	while( ctrl_p = controller_map.pull() )	{
 		ctrl_p->unref();
 	}
+	*/
 	
 	if( root_group_p )	{
 		root_group_p->unref();
@@ -771,10 +768,13 @@ void mcuCBHandle::update( void )	{
 
 				this->steerEngine.setStartTime(float(this->time));
 	
-			SbmCharacter* character;
-			character_map.reset();
-			while (character = character_map.next())
+			for (std::map<std::string, SbmCharacter*>::iterator iter = getCharacterMap().begin();
+				iter != getCharacterMap().end();
+				iter++)
+			{
+				SbmCharacter* character = (*iter).second;
 				character->steeringAgent->evaluate();
+			}
 
 			bool running = this->steerEngine._engine->update(false, true, float(this->time) - this->steerEngine.getStartTime());
 			if (!running)
@@ -852,47 +852,45 @@ void mcuCBHandle::update( void )	{
 	{
 		ssm.buildShaders();
 		texm.updateTexture();
-	}
-	
-
-	SbmPawn* pawn_p;
-	SbmCharacter* char_p;
-	pawn_map.reset();
+	}	
 	
 	bool isClosingBoneBus = false;
-	while( pawn_p = pawn_map.next() )	{
+	for (std::map<std::string, SbmPawn*>::iterator iter = getPawnMap().begin();
+		iter != getPawnMap().end();
+		iter++)
+	{
+		SbmPawn* pawn = (*iter).second;
+		pawn->reset_all_channels();
+		pawn->ct_tree_p->evaluate( time );
+		pawn->ct_tree_p->applyBufferToAllSkeletons();
 
-		pawn_p->reset_all_channels();
-		pawn_p->ct_tree_p->evaluate( time );
-		pawn_p->ct_tree_p->applyBufferToAllSkeletons();
-
-		if (pawn_p->hasPhysicsSim() && physicsEngine->getBoolAttribute("enable"))
+		if (pawn->hasPhysicsSim() && physicsEngine->getBoolAttribute("enable"))
 		{
-			pawn_p->updateFromColObject();
+			pawn->updateFromColObject();
 		}
 		else
 		{			
-			pawn_p->updateToColObject();
-			pawn_p->updateToSteeringSpaceObject();
+			pawn->updateToColObject();
+			pawn->updateToSteeringSpaceObject();
 		}
 
-		char_p = character_map.lookup( pawn_p->name );
+		SbmCharacter* char_p = getCharacter(pawn->name );
 		if (!char_p)
 		{
 			if (net_bone_updates)
 			{
-				if (!isClosingBoneBus && !pawn_p->bonebusCharacter && bonebus.IsOpen() && sendPawnUpdates)
+				if (!isClosingBoneBus && !pawn->bonebusCharacter && bonebus.IsOpen() && sendPawnUpdates)
 				{
 					// bonebus was connected after character creation, create it now
-					pawn_p->bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( pawn_p->name, "pawn" , false );
+					pawn->bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( pawn->name, "pawn" , false );
 				}
 				if (sendPawnUpdates)
-					NetworkSendSkeleton( pawn_p->bonebusCharacter, pawn_p->skeleton_p, &param_map );
-				if (pawn_p->bonebusCharacter && pawn_p->bonebusCharacter->GetNumErrors() > 3)
+					NetworkSendSkeleton( pawn->bonebusCharacter, pawn->skeleton_p, &param_map );
+				if (pawn->bonebusCharacter && pawn->bonebusCharacter->GetNumErrors() > 3)
 				{
 					// connection is bad, remove the bonebus character 
-					LOG("BoneBus cannot connect to server. Removing pawn %s", pawn_p->name);
-					bool success = bonebus.DeleteCharacter(pawn_p->bonebusCharacter);
+					LOG("BoneBus cannot connect to server. Removing pawn %s", pawn->name);
+					bool success = bonebus.DeleteCharacter(pawn->bonebusCharacter);
 					char_p->bonebusCharacter = NULL;
 					isClosingBoneBus = true;
 					if (bonebus.GetNumCharacters() == 0)
@@ -950,14 +948,15 @@ void mcuCBHandle::update( void )	{
 
 	if (isClosingBoneBus)
 	{
-		pawn_map.reset();
-	
-		while( pawn_p = pawn_map.next() )
+		for (std::map<std::string, SbmPawn*>::iterator iter = getPawnMap().begin();
+			iter != getPawnMap().end();
+			iter++)
 		{
-			if (pawn_p->bonebusCharacter)
+			SbmPawn* pawn = (*iter).second;
+			if (pawn->bonebusCharacter)
 			{
-				bool success = bonebus.DeleteCharacter(pawn_p->bonebusCharacter);
-				pawn_p->bonebusCharacter = NULL;
+				bool success = bonebus.DeleteCharacter(pawn->bonebusCharacter);
+				pawn->bonebusCharacter = NULL;
 			}
 		}
 
@@ -1283,7 +1282,7 @@ MeController* mcuCBHandle::lookup_ctrl( const string& ctrl_name, const char* pri
 			return NULL;
 		}
 
-		SbmCharacter* char_p = character_map.lookup( char_name.c_str() );
+		SbmCharacter* char_p = getCharacter(char_name);
 		if( char_p == NULL ) {
 			if( print_error_prefix )
 				LOG("%s Unknown character \"%s\" in controller reference \"%s\"", print_error_prefix, char_name.c_str(), ctrl_name.c_str());
@@ -1341,12 +1340,12 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 
 
 	// Send the bone rotation for each joint in the skeleton
-	const SrArray<SkJoint *> & joints  = skeleton->joints();
+	const std::vector<SkJoint *> & joints  = skeleton->joints();
 
 	character->IncrementTime();
 	character->StartSendBoneRotations();
 
-	for ( int i = 0; i < joints.size(); i++ )
+	for ( size_t i = 0; i < joints.size(); i++ )
 	{
 		SkJoint * j = joints[ i ];
 		if (j->getJointType() != SkJoint::TypeJoint)
@@ -1354,7 +1353,7 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 
 		const SrQuat& q = j->quat()->value();
 
-		character->AddBoneRotation( j->name(), q.w, q.x, q.y, q.z, time );
+		character->AddBoneRotation( j->name().c_str(), q.w, q.x, q.y, q.z, time );
 
 		//printf( "%s %f %f %f %f\n", (const char *)j->name(), q.w, q.x, q.y, q.z );
 	}
@@ -1364,7 +1363,7 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 
 	character->StartSendBonePositions();
 
-	for ( int i = 0; i < joints.size(); i++ )
+	for ( size_t i = 0; i < joints.size(); i++ )
 	{
 		SkJoint * j = joints[ i ];
 		if (j->getJointType() != SkJoint::TypeJoint)
@@ -1383,7 +1382,7 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 		//these coordinates are meant to mimic the setpositionbyname coordinates you give to move the character
 		//so if you wanted to move a joint on the face in the x direction you'd do whatever you did to move the actor
 		//itself further in the x position.
-		character->AddBonePosition( j->name(), posx, posy, posz, time );
+		character->AddBonePosition( j->name().c_str(), posx, posy, posz, time );
 	}
 
 	character->EndSendBonePositions();
@@ -1391,15 +1390,19 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 /*
 	// Passing General Parameters
 	character->StartSendGeneralParameters();
+<<<<<<< .mine
+	for (size_t i = 0; i < joints.size(); i++)
+=======
 	int numFound = 0;
 	for (int i = 0; i < joints.size(); i++)
+>>>>>>> .r2317
 	{
 		SkJoint* j = joints[ i ];
 		if (j->getJointType() != SkJoint::TypeOther)
 			continue;
 
 		// judge whether it is joint for general parameters, usually should have a prefix as "param"
-		string j_name = j->name().get_string();
+		string j_name = j->name();
 		int name_end_pos = j_name.find_first_of("_");
 		string test_prefix = j_name.substr( 0, name_end_pos );
 		if( test_prefix == character->m_name )	
@@ -1418,7 +1421,7 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 						{
 							std::stringstream joint_name;
 							joint_name << character->m_name << "_" << index << "_" << ( m + 1 );
-							if(_stricmp( j->name(), joint_name.str().c_str()) == 0)
+							if(_stricmp( j->name().c_str(), joint_name.str().c_str()) == 0)
 								character->AddGeneralParameters(index, pos->second->size, j->pos()->value(0), m, time);
 						}
 					}
@@ -1454,14 +1457,6 @@ SkMotion* mcuCBHandle::lookUpMotion( const char* motionName )
 		anim_p = (*animIter).second;
 	return anim_p;
 }
-
-SbmCharacter* mcuCBHandle::lookUpCharacter( const char* charName )
-{
-	character_map.reset();
-	SbmCharacter* curChar = character_map.lookup(charName);
-	return curChar;
-}
-
 
 PAStateData* mcuCBHandle::lookUpPAState(std::string stateName)
 {
@@ -1546,5 +1541,91 @@ std::vector<MeController*>& mcuCBHandle::getDefaultControllers()
 {
 	return _defaultControllers;
 }
+
+std::map<std::string, SbmPawn*>& mcuCBHandle::getPawnMap()
+{
+	return pawn_map;
+}
+
+bool mcuCBHandle::addPawn(SbmPawn* pawn)
+{
+	SbmPawn* p = getPawn(pawn->name);
+	if (!p)
+	{
+		pawn_map[pawn->name] = pawn;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+
+}
+
+void mcuCBHandle::removePawn(std::string name)
+{
+	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(name);
+	if (iter == pawn_map.end())
+	{
+		pawn_map.erase(iter);
+	}
+}
+
+SbmPawn* mcuCBHandle::getPawn(std::string name)
+{
+	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(name);
+	if (iter == pawn_map.end())
+		return NULL;
+	else
+		return (*iter).second;
+}
+
+int mcuCBHandle::getNumPawns()
+{
+	return pawn_map.size();
+}
+
+std::map<std::string, SbmCharacter*>& mcuCBHandle::getCharacterMap()
+{
+	return character_map;
+}
+
+bool mcuCBHandle::addCharacter(SbmCharacter* character)
+{
+	SbmCharacter* c = getCharacter(character->name);
+	if (!c)
+	{
+		character_map[character->name] = character;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void mcuCBHandle::removeCharacter(std::string name)
+{
+	std::map<std::string, SbmCharacter*>::iterator iter = character_map.find(name);
+	if (iter == character_map.end())
+	{
+		character_map.erase(iter);
+	}
+}
+
+SbmCharacter* mcuCBHandle::getCharacter(std::string name)
+{
+	std::map<std::string, SbmCharacter*>::iterator iter = character_map.find(name);
+	if (iter == character_map.end())
+		return NULL;
+	else
+		return (*iter).second;
+}
+
+int mcuCBHandle::getNumCharacters()
+{
+	return character_map.size();
+}
+
 
 /////////////////////////////////////////////////////////////

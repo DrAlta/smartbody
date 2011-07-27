@@ -62,7 +62,7 @@ bool SkMotion::_load_bvh ( SrInput& in ) {
             if ( in.last_error()!=SrInput::NoError ) return false;
             while ( n-- )
              { in.get_token();
-               _channels.add ( SkJointName(name), SkChannel::get_type(in.last_token()) );
+               _channels.add ( (const char*) name, SkChannel::get_type(in.last_token()) );
              }
           }
          else if ( s=="MOTION" ) break;
@@ -88,23 +88,25 @@ bool SkMotion::_load_bvh ( SrInput& in ) {
    if ( _channels.size()==0 ) return false;
 
    _postsize = _channels.size();
-   _frames.capacity ( frames );
-   _frames.size ( 0 );
+   _frames.resize( frames );
+   _frames.clear ();
 
    // 3. Read the motion data, note that Quaternions are not used in bvh format
    int f, i;
    float val, kt = 0;
    for ( f=0; f<frames; f++ )
-    { _frames.push();
-      _frames.top().keytime = kt;
-      _frames.top().posture = (float*) malloc ( sizeof(float)*_postsize );
+    {
+		_frames.push_back(Frame());
+		int topFrame = _frames.size() - 1;
+      _frames[topFrame].keytime = kt;
+      _frames[topFrame].posture = (float*) malloc ( sizeof(float)*_postsize );
       kt += freq;
       for ( i=0; i<_postsize; i++ )
        { in.getn();
          if ( in.last_error()==SrInput::UnexpectedToken ) return false; // eof or other
          val = in.last_token().atof();
          if ( _channels[i].type>=SkChannel::XRot ) val = SR_TORAD(val);
-         _frames.top().posture[i] = val;
+         _frames[topFrame].posture[i] = val;
        }
     }
 
@@ -197,8 +199,8 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 	if ( in.last_token()=="frames" ) {
 		in.get_token(); 
 		num_frames = in.last_token().atoi();
-		_frames.size ( num_frames );
-		_frames.size ( 0 );
+		_frames.resize ( num_frames );
+		_frames.clear ();
 	}
 	else
 		in.unget_token();
@@ -420,8 +422,6 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 
 bool SkMotion::save ( SrOutput& out )
  {
-   int i, j;
-
    out << "SkMotion\n\n";
 
    if ( _name )
@@ -437,10 +437,10 @@ bool SkMotion::save ( SrOutput& out )
    float *pt;
    int chsize = _channels.size();
    
-   for ( i=0; i<_frames.size(); i++ )
+   for (size_t i=0; i<_frames.size(); i++ )
     { out << "kt " << _frames[i].keytime << " fr ";
       pt = _frames[i].posture;
-      for ( j=0; j<chsize; j++ )
+      for (int j=0; j<chsize; j++ )
        { pt += _channels[j].save ( out, pt );
          if ( j+1<chsize ) out<<srspc;
        }

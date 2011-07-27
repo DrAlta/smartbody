@@ -46,12 +46,12 @@ class SkSkeleton : public SrSharedClass
     SrString _name;
 	SrString _skfilename;
     SkJoint* _root;
-    SrArray<SkJoint*> _joints;
-    SrHashTableBase _jhash;
+    std::vector<SkJoint*> _joints;
+    std::map<std::string, SkJoint*> _jointMap;
     bool _gmat_uptodate;
 
     // collision detection:
-    SrArray<SkJoint*> _coldet_free_pairs;
+    std::vector<SkJoint*> _coldet_free_pairs;
     int _coldetid;
     friend class SkColdet;
 
@@ -86,8 +86,7 @@ class SkSkeleton : public SrSharedClass
     /*! Deletes all data and set the skeleton to be an empty hierarchy */
     void init ();
 	
-	/* thiebaux 6/19/2006 */
-	SrArray<SkJoint*>& get_joint_array( void ) { return( _joints ); }
+	std::vector<SkJoint*>& get_joint_array( void ) { return( _joints ); }
 
     /*! Adds a joint to the hierarchy. If parentid<0 (the default) the last
         joint in the joint list is used as parent (the joint becomes root
@@ -102,12 +101,12 @@ class SkSkeleton : public SrSharedClass
 
     /*! Returns a flat list with all joints. Note that method
         SkJoint::index() returns the index of the joint in this list */
-    const SrArray<SkJoint*>& joints () const { return _joints; }
+    const std::vector<SkJoint*>& joints () const { return _joints; }
 
     /*! Array with the pairs that should be deactivated for collision
         detection at connection time with SrColdet. The pairs can be
         declared in the skeleton .sk file */
-    SrArray<SkJoint*>& coldet_free_pairs () { return _coldet_free_pairs; }
+    std::vector<SkJoint*>& coldet_free_pairs () { return _coldet_free_pairs; }
 
     /*! Returns the channel array of all the active channels */
     SkChannelArray& channels () { return *_channels; }

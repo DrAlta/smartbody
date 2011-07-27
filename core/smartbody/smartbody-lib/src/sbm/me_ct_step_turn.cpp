@@ -120,10 +120,10 @@ void MeCtStepTurn::init( SbmPawn* pawn, SkMotion* mot_p ) {
 
 #if 1
 // NOTE: creates correct playback:
-	_channels.add( SkJointName( "world_offset" ), SkChannel::XPos );
-	_channels.add( SkJointName( "world_offset" ), SkChannel::YPos );
-	_channels.add( SkJointName( "world_offset" ), SkChannel::ZPos );
-	_channels.add( SkJointName( "world_offset" ), SkChannel::Quat );
+	_channels.add( "world_offset" , SkChannel::XPos );
+	_channels.add( "world_offset" , SkChannel::YPos );
+	_channels.add( "world_offset" , SkChannel::ZPos );
+	_channels.add( "world_offset" , SkChannel::Quat );
 #endif
 	
 	MeController::init(pawn);
@@ -170,16 +170,16 @@ SkMotion* MeCtStepTurn::build_mirror_motion( SkMotion* ref_motion_p )	{
 		float *new_p = mirror_p->posture( i );
 		int ref_i, new_i;
 
-		ref_i = mchan_arr.float_position( mchan_arr.search( SkJointName( "base" ), SkChannel::XPos ) );
+		ref_i = mchan_arr.float_position( mchan_arr.search("base" , SkChannel::XPos ) );
 		new_p[ ref_i ] = -ref_p[ ref_i ];
-		ref_i = mchan_arr.float_position( mchan_arr.search( SkJointName( "base" ), SkChannel::YPos ) );
+		ref_i = mchan_arr.float_position( mchan_arr.search("base" , SkChannel::YPos ) );
 		new_p[ ref_i ] = ref_p[ ref_i ];
-		ref_i = mchan_arr.float_position( mchan_arr.search( SkJointName( "base" ), SkChannel::ZPos ) );
+		ref_i = mchan_arr.float_position( mchan_arr.search("base" , SkChannel::ZPos ) );
 		new_p[ ref_i ] = ref_p[ ref_i ];
 
 		for( j=0; j<NUM_STEPTURN_JOINTS; j++ )	{
-			ref_i = mchan_arr.float_position( mchan_arr.search( SkJointName( ref_labels[ j ] ), SkChannel::Quat ) );
-			new_i = mchan_arr.float_position( mchan_arr.search( SkJointName( new_labels[ j ] ), SkChannel::Quat ) );
+			ref_i = mchan_arr.float_position( mchan_arr.search( ref_labels[ j ] , SkChannel::Quat ) );
+			new_i = mchan_arr.float_position( mchan_arr.search( new_labels[ j ] , SkChannel::Quat ) );
 			euler_t ref_e = quat_t( ref_p[ ref_i ], ref_p[ ref_i + 1 ], ref_p[ ref_i + 2 ], ref_p[ ref_i + 3 ] );
 			quat_t new_q = euler_t( ref_e.x(), -ref_e.y(), -ref_e.z() );
 			new_p[ new_i + 0 ] = (float)new_q.w();
@@ -200,7 +200,7 @@ float MeCtStepTurn::calc_raw_turn_angle( SkMotion* mot_p, char *joint_name )	{
 		float * final_p = mot_p->posture( mot_p->frames() - 1 );
 
 		SkChannelArray& mchan_arr = mot_p->channels();
-		int i = mchan_arr.float_position( mchan_arr.search( SkJointName( joint_name ), SkChannel::Quat ) );
+		int i = mchan_arr.float_position( mchan_arr.search( joint_name, SkChannel::Quat ) );
 
 		quat_t first_q( first_p[ i ], first_p[ i + 1 ], first_p[ i + 2 ], first_p[ i + 3 ] );
 		quat_t final_q( final_p[ i ], final_p[ i + 1 ], final_p[ i + 2 ], final_p[ i + 3 ] );
@@ -349,20 +349,20 @@ void MeCtStepTurn::controller_map_updated( void ) {
 			_mChan_to_buff[ i ] = _context->toBufferIndex( chanIndex );
 		}
 
-		world_offset_chan.x = cChannels.search( SkJointName( "world_offset" ), SkChannel::XPos );
-		world_offset_chan.y = cChannels.search( SkJointName( "world_offset" ), SkChannel::YPos );
-		world_offset_chan.z = cChannels.search( SkJointName( "world_offset" ), SkChannel::ZPos );
-		world_offset_chan.q = cChannels.search( SkJointName( "world_offset" ), SkChannel::Quat );
+		world_offset_chan.x = cChannels.search( "world_offset" , SkChannel::XPos );
+		world_offset_chan.y = cChannels.search( "world_offset" , SkChannel::YPos );
+		world_offset_chan.z = cChannels.search( "world_offset" , SkChannel::ZPos );
+		world_offset_chan.q = cChannels.search( "world_offset" , SkChannel::Quat );
 
 		world_offset_idx.x = _context->toBufferIndex( world_offset_chan.x );
 		world_offset_idx.y = _context->toBufferIndex( world_offset_chan.y );
 		world_offset_idx.z = _context->toBufferIndex( world_offset_chan.z );
 		world_offset_idx.q = _context->toBufferIndex( world_offset_chan.q );
 
-		base_joint_chan.x = cChannels.search( SkJointName( "base" ), SkChannel::XPos );
-		base_joint_chan.y = cChannels.search( SkJointName( "base" ), SkChannel::YPos );
-		base_joint_chan.z = cChannels.search( SkJointName( "base" ), SkChannel::ZPos );
-		base_joint_chan.q = cChannels.search( SkJointName( "base" ), SkChannel::Quat );
+		base_joint_chan.x = cChannels.search( "base" , SkChannel::XPos );
+		base_joint_chan.y = cChannels.search( "base" , SkChannel::YPos );
+		base_joint_chan.z = cChannels.search( "base" , SkChannel::ZPos );
+		base_joint_chan.q = cChannels.search( "base" , SkChannel::Quat );
 
 		base_joint_idx.x = _context->toBufferIndex( base_joint_chan.x );
 		base_joint_idx.y = _context->toBufferIndex( base_joint_chan.y );

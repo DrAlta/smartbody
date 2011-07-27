@@ -991,7 +991,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			std::string charString = args.read_token();
 			if (charString != "char")
 				return CMD_FAILURE;
-			SbmCharacter* character = mcu_p->character_map.lookup(args.read_token());
+			SbmCharacter* character = mcu_p->getCharacter(args.read_token());
 			if (!character)
 				return CMD_FAILURE;
 			if (!character->param_animation_ct)
@@ -1108,7 +1108,7 @@ int mcu_motion_player_func(srArgBuffer& args, mcuCBHandle *mcu_p )
 	if (mcu_p)
 	{
 		std::string charName = args.read_token();
-		SbmCharacter* character = mcu_p->character_map.lookup(charName.c_str());
+		SbmCharacter* character = mcu_p->getCharacter(charName);
 		if (character)
 		{
 			std::string next = args.read_token();
@@ -1187,10 +1187,10 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 					LOG("Need to specify an object and a joint to track.");
 					return( CMD_FAILURE );
 				}
-				SbmPawn* pawn = mcu_p->pawn_map.lookup(name);
+				SbmPawn* pawn = mcu_p->getPawn(name);
 				if (!pawn)
 				{
-					pawn = mcu_p->character_map.lookup(name);
+					pawn = mcu_p->getCharacter(name);
 					if (!pawn)
 					{
 						LOG("Object %s was not found, cannot track.", name);
@@ -1257,10 +1257,11 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			else if (strcmp( cam_cmd, "frame" ) == 0 ) {
 				SrBox sceneBox;
 				SrCamera* camera = mcu_p->viewer_p->get_camera();
-				mcu_p->pawn_map.reset();
-				while (SbmPawn* pawn = mcu_p->pawn_map.next())
+				for (std::map<std::string, SbmPawn*>::iterator iter = mcu_p->getPawnMap().begin();
+					iter != mcu_p->getPawnMap().end();
+					iter++)
 				{
-					SrBox box = pawn->skeleton_p->getBoundingBox();
+					SrBox box = (*iter).second->skeleton_p->getBoundingBox();
 					sceneBox.extend(box);
 				}
 
@@ -1742,7 +1743,7 @@ int mcu_time_ival_prof_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHandle *mcu_p, const char* option)
 {
-	SbmCharacter* char_p = mcu_p->character_map.lookup( char_name );
+	SbmCharacter* char_p = mcu_p->getCharacter( char_name );
 	if( !char_p )	
 	{
 		LOG( "mcu_character_load_mesh ERR: SbmCharacter '%s' NOT FOUND\n", char_name ); 
@@ -1845,7 +1846,7 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 {
 	boost::char_separator<char> sep(" ");
 
-	SbmCharacter* char_p = mcu_p->character_map.lookup( char_name );
+	SbmCharacter* char_p = mcu_p->getCharacter( char_name );
 	const DOMNodeList* list = node->getChildNodes();
 	for (unsigned int c = 0; c < list->getLength(); c++)
 	{
@@ -2154,7 +2155,7 @@ int mcu_character_init(
 		LOG( "init_character ERR: Invalid SbmCharacter name '%s'\n", char_name ); 
 		return( CMD_FAILURE );
 	}
-	if( mcu_p->character_map.lookup( char_name ) )	{
+	if( mcu_p->getCharacter( char_name ) )	{
 		LOG( "init_character ERR: SbmCharacter '%s' EXISTS\n", char_name ); 
 		return( CMD_FAILURE );
 	}
@@ -2223,17 +2224,17 @@ int mcu_character_init(
 
 		char_p->ct_tree_p->set_evaluation_logger( mcu_p->logger_p );
 
-		err = mcu_p->pawn_map.insert( char_name, char_p );
-		if( err != CMD_SUCCESS )	{
+		bool ok = mcu_p->addPawn( char_p );
+		if( !ok )	{
 			LOG( "init_character ERR: SbmCharacter pawn_map.insert(..) '%s' FAILED\n", char_name ); 
 			delete char_p;
 			return( err );
 		}
 
-		err = mcu_p->character_map.insert( char_name, char_p );
-		if( err != CMD_SUCCESS )	{
+		ok = mcu_p->addCharacter( char_p );
+		if( !ok )	{
 			LOG( "init_character ERR: SbmCharacter character_map.insert(..) '%s' FAILED\n", char_name ); 
-			mcu_p->pawn_map.remove( char_name );
+			mcu_p->removePawn( char_name );
 			delete char_p;
 			return( err );
 		}
@@ -2263,16 +2264,15 @@ int mcu_character_init(
 
 
 		// now register all joints.  wsp data isn't sent out until a request for it is received
-		const SrArray<SkJoint *> & joints  = char_p->skeleton_p->joints();
+		const std::vector<SkJoint *> & joints  = char_p->skeleton_p->joints();
 
-		int i;
-		for ( i = 0; i < joints.size(); i++ )
+		for (size_t i = 0; i < joints.size(); i++ )
 		{
 			SkJoint * j = joints[ i ];
 
 
 #if USE_WSP
-			string wsp_joint_name = vhcl::Format( "%s:%s", char_name, (const char *)j->name() );
+			string wsp_joint_name = vhcl::Format( "%s:%s", char_name, j->name().c_str() );
 
 			err = mcu_p->theWSP->register_vector_3d_source( wsp_joint_name, "position", SbmPawn::wsp_position_accessor, char_p );
 			if ( err != CMD_SUCCESS )
@@ -2293,13 +2293,14 @@ int mcu_character_init(
 	return( err );
 }
 
+/*
 int begin_controller( 
 	const char *char_name, 
 	const char *ctrl_name, 
 	mcuCBHandle *mcu_p
 )	{
 	
-	SbmCharacter *char_p = mcu_p->character_map.lookup( char_name );
+	SbmCharacter *char_p = mcu_p->getCharacter(char_name );
 	if( char_p )	{
 		MeController *ctrl_p = mcu_p->controller_map.lookup( ctrl_name );
 		if( ctrl_p )	{
@@ -2334,7 +2335,7 @@ int begin_controller(
 	mcuCBHandle *mcu_p
 )	{
 	
-	SbmCharacter *char_p = mcu_p->character_map.lookup( char_name );
+	SbmCharacter *char_p = mcu_p->getCharacter(char_name );
 	if( char_p )	{
 		MeController *ctrl_p = mcu_p->controller_map.lookup( ctrl_name );
 		if( ctrl_p )	{
@@ -2354,6 +2355,7 @@ int begin_controller(
 	LOG( "begin_controller ERR: char '%s' NOT FOUND\n", char_name );
 	return( CMD_FAILURE );
 }
+*/
 
 #if 0  // Version replaced by SbmCharacter::character_cmd_func // WHY ???
 /*
@@ -2388,7 +2390,7 @@ int mcu_character_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			float  weight = args.read_float();
 			float  duration = args.read_float();	// added for ramps but not used yet!
 		 
-			SbmCharacter * actor = mcu_p->character_map.lookup( char_name );
+			SbmCharacter * actor = mcu_p->getCharacter(char_name );
 			if ( !actor ) {
 				LOG( "ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"%s\".\n", char_name );
 				return CMD_FAILURE;  // this should really be an ignore/out-of-domain result
@@ -2416,6 +2418,7 @@ int mcu_character_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 /////////////////////////////////////////////////////////////
 
+/*
 int mcu_character_ctrl_cmd(
 	const char* char_name,
 	srArgBuffer& args,
@@ -2459,6 +2462,7 @@ int mcu_character_ctrl_cmd(
 	else
 		return( CMD_FAILURE );
 }
+*/
 
 /////////////////////////////////////////////////////////////
 
@@ -2477,7 +2481,7 @@ int mcu_character_bone_cmd(
 	float  y    = args.read_float();
 	float  z    = args.read_float();
 
-	SbmCharacter * actor = mcu_p->character_map.lookup( char_name );
+	SbmCharacter * actor = mcu_p->getCharacter( char_name );
 	if ( !actor || !actor->skeleton_p )
 	{
 		return CMD_FAILURE;  // this should really be an ignore/out-of-domain result
@@ -2486,13 +2490,13 @@ int mcu_character_bone_cmd(
 	{
 		actor->bonebusCharacter->StartSendBoneRotations();
 
-		for ( int i = 0; i < actor->skeleton_p->joints().size(); i++ )
+		for ( size_t i = 0; i < actor->skeleton_p->joints().size(); i++ )
 		{
 			SkJoint * j = actor->skeleton_p->joints()[ i ];
 
-			if ( _stricmp( j->name(), bone ) == 0 )
+			if ( _stricmp( j->name().c_str(), bone ) == 0 )
 			{
-				actor->bonebusCharacter->AddBoneRotation( j->name(), w, x, y, z, mcu_p->time );
+				actor->bonebusCharacter->AddBoneRotation( j->name().c_str(), w, x, y, z, mcu_p->time );
 
 				//LOG( "%s %f %f %f %f\n", (const char *)j->name(), w, x, y, z );
 			}
@@ -2503,17 +2507,17 @@ int mcu_character_bone_cmd(
 
 		actor->bonebusCharacter->StartSendBonePositions();
 
-		for ( int i = 0; i < actor->skeleton_p->joints().size(); i++ )
+		for ( size_t i = 0; i < actor->skeleton_p->joints().size(); i++ )
 		{
 			SkJoint * j = actor->skeleton_p->joints()[ i ];
 
-			if ( _stricmp( j->name(), bone ) == 0 )
+			if ( _stricmp( j->name().c_str(), bone ) == 0 )
 			{
 				float posx = j->pos()->value( 0 );
 				float posy = j->pos()->value( 1 );
 				float posz = j->pos()->value( 2 );
 
-				actor->bonebusCharacter->AddBonePosition( j->name(), posx, posy, posz, mcu_p->time );
+				actor->bonebusCharacter->AddBonePosition( j->name().c_str(), posx, posy, posz, mcu_p->time );
 			}
 		}
 
@@ -2533,9 +2537,8 @@ int mcu_character_bone_position_cmd(
    float  x    = args.read_float();
    float  y    = args.read_float();
    float  z    = args.read_float();
-   int i;
 
-   SbmCharacter * actor = mcu_p->character_map.lookup( char_name );
+   SbmCharacter * actor = mcu_p->getCharacter( char_name );
    if ( !actor || !actor->skeleton_p )
    {
       return CMD_FAILURE;  // this should really be an ignore/out-of-domain result
@@ -2544,11 +2547,11 @@ int mcu_character_bone_position_cmd(
    {
       actor->bonebusCharacter->StartSendBonePositions();
 
-      for ( i = 0; i < actor->skeleton_p->joints().size(); i++ )
+      for (size_t i = 0; i < actor->skeleton_p->joints().size(); i++ )
       {
          SkJoint * j	= actor->skeleton_p->joints()[ i ];
 
-         if ( _stricmp( j->name(), bone ) == 0 )
+		 if ( _stricmp( j->name().c_str(), bone ) == 0 )
          {
             float posx, posy, posz;
 
@@ -2573,7 +2576,7 @@ int mcu_character_bone_position_cmd(
             posy = y;
             posz = z;
 
-            actor->bonebusCharacter->AddBonePosition( j->name(), posx, posy, posz, mcu_p->time );
+			actor->bonebusCharacter->AddBonePosition( j->name().c_str(), posx, posy, posz, mcu_p->time );
          }
       }
 
@@ -3070,7 +3073,7 @@ int mcu_print_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p,std::strin
 }
 
 /////////////////////////////////////////////////////////////
-
+/*
 int init_pose_controller( 
 	char *ctrl_name, 
 	char *pose_name, 
@@ -3298,7 +3301,7 @@ int init_lilt_controller(
 )	{
 	int err = CMD_SUCCESS;
 	
-	SbmCharacter *char_p= mcu_p->character_map.lookup( char_name );
+	SbmCharacter *char_p= mcu_p->getCharacter(char_name );
 	if ( !char_p ) {
 		LOG( "init_lilt_controller ERR: SbmCharacter '%s' NOT FOUND\n", char_name );
 		return( CMD_FAILURE );
@@ -3379,7 +3382,7 @@ int init_scheduler_controller(
 )	{
 	int err = CMD_SUCCESS;
 	
-	SbmCharacter *char_p = mcu_p->character_map.lookup( char_name );
+	SbmCharacter *char_p = mcu_p->getCharacter(char_name );
 	if( char_p )	{
 		MeCtScheduler2* sched_p = new MeCtScheduler2;
 		err = mcu_p->sched_ctrl_map.insert( ctrl_name, sched_p );
@@ -3405,6 +3408,7 @@ int init_scheduler_controller(
 	LOG( "init_scheduler_controller ERR: SbmCharacter '%s' NOT FOUND\n", char_name ); 
 	return( CMD_FAILURE );
 }
+*/
 
 int set_controller_timing(
 	MeController* ctrl_p, 
@@ -3513,12 +3517,12 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			}
 
 		
-			srHashMap<SbmCharacter>& character_map = mcu_p->character_map;
-			character_map.reset(); 
-			SbmCharacter* character = character_map.next();
 			int numControllersAffected = 0;
-			while (character)
+			for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
+				iter != mcu_p->getCharacterMap().end();
+				iter++)
 			{
+				SbmCharacter* character = (*iter).second;
 				MeControllerTreeRoot* controllerTree = character->ct_tree_p;
 				int numControllers = controllerTree->count_controllers();
 			
@@ -3547,7 +3551,6 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 						numControllersAffected++;
 					}
 				}
-				character = character_map.next();
 			}
 			if (numControllersAffected > 0)
 				return CMD_SUCCESS;
@@ -3555,6 +3558,7 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				return CMD_FAILURE;
 		}
 
+		/*
 		if( strcmp( ctrl_cmd, "pose" ) == 0 )	{
 			char *pose_name = args.read_token();
 			return(
@@ -3629,6 +3633,7 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				init_scheduler_controller( ctrl_name, char_name, mcu_p )
 			);
 		}
+		*/
 		else
 		{
 			// Non-initializing controllers need an actual instance
@@ -3770,7 +3775,7 @@ int mcu_motion_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 /*
 	stepturn <> dur|time|speed <sec|dps> local|world <heading-deg>
 */
-
+/*
 int mcu_stepturn_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 	if( mcu_p ) {
@@ -3801,6 +3806,7 @@ int mcu_stepturn_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	}
 	return( CMD_FAILURE );
 }
+*/
 
 /*
 X	quickdraw <> <dur-sec> point <x y z>
@@ -3814,7 +3820,7 @@ X	quickdraw <> <dur-sec> point <x y z> [<joint>]
 	quickdraw <> track <tracking-dur>
 	quickdraw <> persist | reholster
 */
-
+/*
 int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 	if( mcu_p ) {
@@ -3898,7 +3904,7 @@ int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	}
 	return( CMD_FAILURE );
 }
-
+*/
 int mcu_gaze_limit_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
 	if( mcu_p )
@@ -3963,7 +3969,7 @@ int mcu_gaze_limit_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	gaze <> priority <key>
 	gaze <> fadein|fadeout [<interval>]
 */
-
+/*
 int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 	if( mcu_p ) {
@@ -4088,11 +4094,12 @@ int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	}
 	return( CMD_FAILURE );
 }
+*/
 
 /*
 	snod <> <dur-sec> <mag-deg> [<reps=1.0> [<affirm=1>]]
 */
-
+/*
 int mcu_snod_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 	if( mcu_p )	{
@@ -4116,7 +4123,8 @@ int mcu_snod_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	}
 	return( CMD_FAILURE );
 }
-
+*/
+/*
 int mcu_lilt_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p) {
 
 	if( mcu_p ) {
@@ -4132,9 +4140,9 @@ int mcu_lilt_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p) {
 	}
 	return( CMD_FAILURE );
 }
-
+*/
 /////////////////////////////////////////////////////////////
-
+/*
 int add_controller_to_scheduler( 
 	char *sched_ctrl_name, 
 	char *add_ctrl_name, 
@@ -4186,13 +4194,14 @@ int add_controller_to_scheduler(
 
 	return( CMD_FAILURE );
 }
-
+*/
 /*
 
 	sched <> add <ctrl-name> <at> [<ease-in> [<ease-out>]] 
 
 */
 
+/*
 int mcu_sched_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 	if( mcu_p )	{
@@ -4232,6 +4241,7 @@ int mcu_sched_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	}
 	return( CMD_FAILURE );
 }
+*/
 
 /////////////////////////////////////////////////////////////
 
@@ -4713,12 +4723,12 @@ int mcu_vrAllCall_func( srArgBuffer& args, mcuCBHandle *mcu_p )
  
         // EDF - For our reply, we're going to send one vrComponent 
         //       message for each agent loaded
-        SbmCharacter * char_p;
-        mcu_p->character_map.reset();
-        while ( char_p = mcu_p->character_map.next() )
-        {
+        for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
+			iter != mcu_p->getCharacterMap().end();
+			iter++)
+		{
             string message = "sbm ";
-            message += char_p->name;
+			message += (*iter).second->name;
             mcu_p->vhmsg_send( "vrComponent", message.c_str() );
         }
     }
@@ -4739,7 +4749,7 @@ int mcu_vrAllCall_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		srHashMap <MeCtScheduler2>	sched_ctrl_map;
 		srHashMap <MeController>	controller_map; 
 */
-
+/*
 int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
 
 	LOG( "POSES:\n" );
@@ -4803,7 +4813,7 @@ int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
 	
 	return (CMD_SUCCESS);
 }
-
+*/
 /////////////////////////////////////////////////////////////
 
 int mcu_wsp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
@@ -4885,7 +4895,7 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			return CMD_FAILURE;
 		}
 
-		SbmCharacter* character = mcu_p->character_map.lookup(charName);
+		SbmCharacter* character = mcu_p->getCharacter(charName);
 		SkMotion* motion;
 		std::map<std::string, SkMotion*>::iterator motionIter = mcu_p->motion_map.find(motionName);
 		if (motionIter != mcu_p->motion_map.end())
@@ -4922,12 +4932,12 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				if (mode == 1)
 				{
 					chan = mChanArray[i];
-					channelName = mChanArray.name(i).get_string();
+					channelName = mChanArray.name(i);
 				}
 				if (mode == 2)
 				{
 					chan = skelChanArray[i];
-					channelName = skelChanArray.name(i).get_string();
+					channelName = skelChanArray.name(i);
 				}
 
 				if (!chan.joint)
@@ -4936,7 +4946,7 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					continue;
 				}
 
-				std::string jointName = chan.joint->name().get_string();
+				std::string jointName = chan.joint->name();
 				int	chanType = chan.type;
 				std::string chanTypeString;
 				switch (chanType)
@@ -4984,7 +4994,7 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				{
 					int curIndex = channelCounter;
 					SkChannel& channel = mChanArray.get(c);
-					SkJointName jointName = mChanArray.name(c);
+					std::string jointName = mChanArray.name(c);
 					int chanSize = channel.size();
 					int numZeroFrames = 0;
 					int	chanType = channel.type;
@@ -5019,11 +5029,11 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 						if (chanType == SkChannel::XPos || chanType == SkChannel::YPos || chanType == SkChannel::ZPos ||
 							chanType == SkChannel::XRot || chanType == SkChannel::YRot || chanType == SkChannel::ZRot || 
 							chanType == SkChannel::Twist)
-							LOG("Channel %s/%s has non-zero value: %f.", jointName.get_string(), channel.type_name(), frameData[curIndex]);
+							LOG("Channel %s/%s has non-zero value: %f.", jointName.c_str(), channel.type_name(), frameData[curIndex]);
 						else if (chanType == SkChannel::Swing)
-							LOG("Channel %s/%s has non-zero value: %f %f.", jointName.get_string(), channel.type_name(), frameData[curIndex], frameData[curIndex + 1]);
+							LOG("Channel %s/%s has non-zero value: %f %f.", jointName.c_str(), channel.type_name(), frameData[curIndex], frameData[curIndex + 1]);
 						else if (chanType == SkChannel::Quat)
-							LOG("Channel %s/%s has non-zero value: %f %f %f %f.", jointName.get_string(), channel.type_name(), frameData[curIndex], frameData[curIndex+ 1], frameData[curIndex + 2], frameData[curIndex + 3]);
+							LOG("Channel %s/%s has non-zero value: %f %f %f %f.", jointName.c_str(), channel.type_name(), frameData[curIndex], frameData[curIndex+ 1], frameData[curIndex + 2], frameData[curIndex + 3]);
 					}
 				}
 				motion->disconnect();
@@ -5062,7 +5072,7 @@ int mcu_adjust_motion_function( srArgBuffer& args, mcuCBHandle *mcu_p )
 			LOG("mcu_adjust_motion_function ERR: motion %s not found!", motionName.c_str());
 			return CMD_FAILURE;
 		}
-		SbmCharacter* character = mcu_p->character_map.lookup(charName.c_str());
+		SbmCharacter* character = mcu_p->getCharacter(charName);
 		if (!character)
 		{
 			LOG("mcu_adjust_motion_function ERR: character %s not found!", charName.c_str());
@@ -5582,10 +5592,11 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 			// create an agent based on the current characters and positions
 			SteerLib::ModuleInterface* pprAIModule = mcu_p->steerEngine._engine->getModule(ai);
-			mcu_p->character_map.reset();
-			SbmCharacter* character = NULL;
-			while( character = mcu_p->character_map.next() )
+			for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
+				iter != mcu_p->getCharacterMap().end();
+				iter++)
 			{
+				SbmCharacter* character = (*iter).second;
 				float x, y, z;
 				float yaw, pitch, roll;
 				character->get_world_offset(x, y, z, yaw, pitch, roll);
@@ -5604,12 +5615,12 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				agent->reset(initialConditions, dynamic_cast<SteerLib::EngineInterface*>(pprAIModule));
 			}
 			// adding obstacles to the steering space
-			mcu_p->pawn_map.reset();
-			SbmPawn* pawn = NULL;
-			while (pawn = mcu_p->pawn_map.next())
+			for (std::map<std::string, SbmPawn*>::iterator iter = mcu_p->getPawnMap().begin();
+				iter != mcu_p->getPawnMap().end();
+				iter++)
 			{
-				if (pawn->colObj_p)
-					pawn->initSteeringSpaceObject();
+				if ((*iter).second->colObj_p)
+					(*iter).second->initSteeringSpaceObject();
 			}
 
 			LOG("STARTING STEERSIM");
@@ -5625,19 +5636,21 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				mcu_p->steerEngine.unloadSimulation();
 				mcu_p->steerEngine.finish();
 
-				mcu_p->character_map.reset();
-				SbmCharacter* character = NULL;
-				while( character = mcu_p->character_map.next() )
-					character->steeringAgent->setAgent(NULL);
-
-				mcu_p->pawn_map.reset();
-				SbmPawn* pawn = NULL;
-				while (pawn = mcu_p->pawn_map.next())
+				for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
+					iter != mcu_p->getCharacterMap().end();
+					iter++)
 				{
-					if (pawn->steeringSpaceObj_p)
+					(*iter).second->steeringAgent->setAgent(NULL);
+				}
+
+				for (std::map<std::string, SbmPawn*>::iterator iter = mcu_p->getPawnMap().begin();
+					iter != mcu_p->getPawnMap().end();
+					iter++)
+				{
+					if ((*iter).second->steeringSpaceObj_p)
 					{
-						delete pawn->steeringSpaceObj_p;
-						pawn->steeringSpaceObj_p = NULL;
+						delete (*iter).second->steeringSpaceObj_p;
+						(*iter).second->steeringSpaceObj_p = NULL;
 					}
 				}
 			}
@@ -5654,7 +5667,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			if (mcu_p->steerEngine.isInitialized())
 			{
 				std::string characterName = args.read_token();
-				SbmCharacter* character = mcu_p->character_map.lookup(characterName.c_str());
+				SbmCharacter* character = mcu_p->getCharacter(characterName);
 				if (character)
 				{
 					float x, y, z;
@@ -5679,7 +5692,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		else if (command == "proximity")
 		{
 			std::string characterName = args.read_token();
-			SbmCharacter* character = mcu_p->character_map.lookup(characterName.c_str());
+			SbmCharacter* character = mcu_p->getCharacter(characterName);
 			if (character)
 			{
 				character->steeringAgent->distThreshold = (float)args.read_double() * 100.0f;
@@ -5689,7 +5702,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		else if (command == "speed")
 		{
 			std::string characterName = args.read_token();
-			SbmCharacter* character = mcu_p->character_map.lookup(characterName.c_str());
+			SbmCharacter* character = mcu_p->getCharacter(characterName);
 			if (character)
 			{
 				if (mcu_p->locomotion_type != mcu_p->Procedural)
@@ -5713,10 +5726,12 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					mcu_p->locomotion_type = mcu_p->Example;
 				else
 					mcu_p->locomotion_type = mcu_p->Basic;
-				mcu_p->character_map.reset();
-				SbmCharacter* character = mcu_p->character_map.next();
-				while (character)
+				
+				for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
+					iter != mcu_p->getCharacterMap().end();
+					iter++)
 				{
+					SbmCharacter* character = (*iter).second;
 					/*
 					if (character->param_animation_ct)
 						character->param_animation_ct->set_pass_through(false);
@@ -5725,7 +5740,6 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					if (character->basic_locomotion_ct)
 						character->basic_locomotion_ct->set_pass_through(true);
 					*/
-					character = mcu_p->character_map.next();
 				}
 				return CMD_SUCCESS;
 			}
@@ -5737,10 +5751,11 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					return CMD_FAILURE;
 				}
 				mcu_p->locomotion_type = mcu_p->Procedural;
-				mcu_p->character_map.reset();
-				SbmCharacter* character = mcu_p->character_map.next();
-				while (character)
+				for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
+					iter != mcu_p->getCharacterMap().end();
+					iter++)
 				{
+					SbmCharacter* character = (*iter).second;
 					if (character->steeringAgent)
 						character->steeringAgent->desiredSpeed = 1.6f;
 					/*
@@ -5751,17 +5766,17 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					if (character->basic_locomotion_ct)
 						character->basic_locomotion_ct->set_pass_through(true);
 					*/
-					character = mcu_p->character_map.next();
 				}
 				return CMD_SUCCESS;
 			}
 			if (type == "basic")
 			{
 				mcu_p->locomotion_type = mcu_p->Basic;
-				mcu_p->character_map.reset();
-				SbmCharacter* character = mcu_p->character_map.next();
-				while (character)
+				for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
+					iter != mcu_p->getCharacterMap().end();
+					iter++)
 				{
+					SbmCharacter* character = (*iter).second;
 					/*
 					if (character->param_animation_ct)
 						character->param_animation_ct->set_pass_through(true);
@@ -5770,7 +5785,6 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					if (character->basic_locomotion_ct)
 						character->basic_locomotion_ct->set_pass_through(false);
 					*/
-					character = mcu_p->character_map.next();
 				}
 				return CMD_SUCCESS;
 			}
@@ -5778,7 +5792,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		else if (command == "facing")
 		{
 			std::string characterName = args.read_token();
-			SbmCharacter* character = mcu_p->character_map.lookup(characterName.c_str());
+			SbmCharacter* character = mcu_p->getCharacter(characterName);
 			if (character)
 			{
 				character->steeringAgent->facingAngle = (float)args.read_double();
@@ -5788,7 +5802,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		else if (command == "test")
 		{
 			std::string characterName = args.read_token();
-			SbmCharacter* character = mcu_p->character_map.lookup(characterName.c_str());
+			SbmCharacter* character = mcu_p->getCharacter(characterName);
 			if (character)
 			{
 				character->steeringAgent->startParameterTesting();
@@ -5802,11 +5816,11 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 int showcharacters_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
-	SbmCharacter* character = NULL;
-	mcu_p->character_map.reset();
-	while ((character = mcu_p->character_map.next()) != NULL)
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
+		iter != mcu_p->getCharacterMap().end();
+		iter++)
 	{
-		LOG("%s", character->name);
+		LOG("%s", (*iter).second->name);
 	}
 	return CMD_SUCCESS;
 }
@@ -5814,13 +5828,13 @@ int showcharacters_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 
 int showpawns_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
-	SbmPawn* pawn = NULL;
-	mcu_p->pawn_map.reset();
-	while ((pawn = mcu_p->pawn_map.next()) != NULL)
+	for (std::map<std::string, SbmPawn*>::iterator iter = mcu_p->getPawnMap().begin();
+		iter != mcu_p->getPawnMap().end();
+		iter++)
 	{
-		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
+		SbmCharacter* character = dynamic_cast<SbmCharacter*>((*iter).second);
 		if (!character)
-			LOG("%s", pawn->name);
+			LOG("%s", (*iter).second->name);
 	}
 
 	return CMD_SUCCESS;
@@ -5955,7 +5969,7 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 			float x = args.read_float() * scale;
 			float y = args.read_float() * scale;
 			float z = args.read_float() * scale;
-			SbmCharacter* character = mcu->character_map.lookup(skelName.c_str());	
+			SbmCharacter* character = mcu->getCharacter(skelName);	
 			character->datareceiver_ct->setGlobalPosition(jName, SrVec(x, y, z));
 		}
 		if (skeletonType == "positions")
@@ -5975,7 +5989,7 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 			quat.x = args.read_float();
 			quat.y = args.read_float();
 			quat.z = args.read_float();
-			SbmCharacter* character = mcu->character_map.lookup(skelName.c_str());	
+			SbmCharacter* character = mcu->getCharacter(skelName);	
 			character->datareceiver_ct->setLocalRotation(jName, quat);
 		}
 		if (skeletonType == "rotations")
@@ -6000,7 +6014,7 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 				}
 				KinectProcessor::processGlobalRotation(quats);
 	//			mcu->kinectProcessor->filterRotation(quats);
-				SbmCharacter* character = mcu->character_map.lookup(skelName.c_str());	
+				SbmCharacter* character = mcu->getCharacter(skelName);	
 				for (int i = 0; i < 20; i++)
 				{
 					if (quats[i].w != 0)

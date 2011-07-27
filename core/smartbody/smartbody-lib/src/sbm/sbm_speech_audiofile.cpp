@@ -109,7 +109,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 		return 0;
 	}
 
-   SbmCharacter * agent = mcu.character_map.lookup( agentName );
+   SbmCharacter * agent = mcu.getCharacter(agentName );
    if ( agent == NULL )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: insert AudioFile voice code lookup FAILED, msgId=%s\n", agentName ); 
@@ -350,7 +350,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 
    
 
-   SbmCharacter * agent = mcu.character_map.lookup( agentName );
+   SbmCharacter * agent = mcu.getCharacter( agentName );
    if ( agent == NULL )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: insert AudioFile voice code lookup FAILED, msgId=%s\n", agentName ); 

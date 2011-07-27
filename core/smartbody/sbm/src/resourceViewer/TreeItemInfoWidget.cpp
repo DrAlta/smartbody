@@ -106,7 +106,7 @@ void SkeletonItemInfoWidget::updateJointAttributes(std::string jointName)
 void SkeletonItemInfoWidget::updateSkeletonTree( Fl_Tree_Item* root, SkSkeleton* skel )
 {
 	SkJoint* skelRoot = skel->root();	
-	root->label(skelRoot->name().get_string());	
+	root->label(skelRoot->name().c_str());	
 	for (int i=0;i<skelRoot->num_children();i++)
 	{
 		updateJointTree(root,skelRoot->child(i));
@@ -117,7 +117,7 @@ void SkeletonItemInfoWidget::updateJointTree( Fl_Tree_Item* root, SkJoint* node 
 {	
 	//skeletonTree->sortorder(FL_TREE_SORT_ASCENDING);	
 
-	Fl_Tree_Item* treeItem = skeletonTree->add(root,node->name().get_string());
+	Fl_Tree_Item* treeItem = skeletonTree->add(root,node->name().c_str());
 
 	std::string posName[3] = { "pos X", "pos Y", "pos Z" };
 	skeletonTree->sortorder(FL_TREE_SORT_NONE);
@@ -187,7 +187,7 @@ void MotionItemInfoWidget::updateWidget()
 	SkChannelArray& channels = motion->channels();
 	for (int i = 0; i < channels.size(); i++)
 	{
-		std::string chanName = channels.name(i).get_string();
+		std::string chanName = channels.name(i).c_str();
 		std::string typeName = channels[i].type_name();
 		channelBrowser->add((chanName+"."+typeName).c_str());
 	}
@@ -228,7 +228,7 @@ void MotionItemInfoWidget::updateChannelAttributes()
 	channelInfoObject->clearAttributes();	
 	attrWindow->cleanUpWidgets();
 	SkChannel& chan = channels[channelIndex];
-	std::string chanName = channels.name(channelIndex).get_string();
+	std::string chanName = channels.name(channelIndex);
 	std::string typeName = channels[channelIndex].type_name();	
 	int floatIdx = channels.float_position(channelIndex);
 	float* buffer = motion->posture(motionFrame);
@@ -530,7 +530,7 @@ PawnItemInfoWidget::PawnItemInfoWidget( int x, int y, int w, int h, const char* 
 void PawnItemInfoWidget::updateWidget()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPawn* pawn = mcu.pawn_map.lookup(pawnName);
+	SbmPawn* pawn = mcu.getPawn(pawnName);
 	if (!pawn) return;
 	float x, y, z, h, p, r;
 	pawn->get_world_offset(x,y,z,h,p,r);
@@ -548,7 +548,7 @@ void PawnItemInfoWidget::updateWidget()
 void PawnItemInfoWidget::notify( DSubject* subject )
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPawn* pawn = mcu.pawn_map.lookup(pawnName);
+	SbmPawn* pawn = mcu.getPawn(pawnName);
 	if (!pawn) return;
 
 	TreeInfoObject* infoObject = dynamic_cast<TreeInfoObject*>(subject);

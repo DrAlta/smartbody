@@ -46,7 +46,7 @@ SkSkeleton::SkSkeleton (SkSkeleton* origSkel)
 	_skfilename = origSkel->skfilename();
 	_root = new SkJoint(this, 0, origSkel->root()->rot_type(), origSkel->root()->index());
 	copy_joint(_root, origSkel->root());
-	_joints.push() = _root;
+	_joints.push_back(_root);
 	SkJoint* origParent = origSkel->root();
 	SkJoint* thisParent = _root;
 	create_joints(origParent, thisParent);
@@ -61,7 +61,7 @@ SkSkeleton::SkSkeleton (SkSkeleton* origSkel)
 		SkJoint* origJoint = origChannels.joint(c);
 		if (origJoint)
 		{
-			SkJoint* joint = this->search_joint(origJoint->name().get_string());
+			SkJoint* joint = this->search_joint(origJoint->name().c_str());
 			_channels->add(joint, origChannel.type, true);
 		}
 	}
@@ -80,7 +80,7 @@ SkSkeleton::~SkSkeleton ()
 
 void SkSkeleton::init ()
  {
-   _coldet_free_pairs.size(0);
+    _coldet_free_pairs.clear();
    _channels->init();
    while ( _postures.size()>0 ) 
    {
@@ -89,30 +89,31 @@ void SkSkeleton::init ()
    }
    while ( _joints.size()>0 ) 
    {
-	   SkJoint* joint = _joints.pop();
+	   SkJoint* joint = _joints[_joints.size() - 1];
 	   delete joint;
+	   _joints.pop_back();
    }
-   _jhash.init(0);
+    _jointMap.clear();
    _root = 0;
    _gmat_uptodate = false;
  }
 
 SkJoint* SkSkeleton::add_joint ( SkJoint::RotType rtype, int parentid )
 {
-    _jhash.init(0);
+    _jointMap.clear();
 
     SkJoint* parent=0;
 	if ( parentid<0 ) {
 		if( _joints.size()>0 )
-			parent=_joints.top();
+			parent =_joints[_joints.size() - 1];
 		else
 			parent=NULL;
 	} else {
-		parent = _joints.get( parentid );
+		parent = _joints[parentid];
 	}
-   
+
     SkJoint* j = new SkJoint ( this, parent, rtype, _joints.size() );
-    _joints.push() = j;
+      _joints.push_back(j);
    
     if ( parent==NULL )
 		_root=j;
@@ -122,17 +123,17 @@ SkJoint* SkSkeleton::add_joint ( SkJoint::RotType rtype, int parentid )
 
 SkJoint* SkSkeleton::insert_new_root_joint ( SkJoint::RotType rtype )
 {
-    _jhash.init(0);
+    _jointMap.clear();
 	SkJoint* old_root = _root;
 
     _root = new SkJoint ( this, 0, rtype, _joints.size() );
-    _joints.push() = _root;
+    _joints.push_back(_root);
 
 	if( old_root ) {
 		old_root->_parent = _root;
 
 		/* thiebaux 6/19/2006 */
-		_root->_children.push( old_root );
+		_root->_children.push_back( old_root );
 	}
 
     return _root;
@@ -140,34 +141,36 @@ SkJoint* SkSkeleton::insert_new_root_joint ( SkJoint::RotType rtype )
 
 SkJoint* SkSkeleton::linear_search_joint ( const char* n ) const
  {
-   if ( !SkJointName::exist(n) ) return 0;
-   
-   int i;
-   SkJointName name(n);
-   for ( i=0; i<_joints.size(); i++ )
-    { if ( _joints[i]->name()==name ) return _joints[i];
-    }
+  std::string name(n);
+   for (size_t i=0; i<_joints.size(); i++ )
+   { 
+		if (_joints[i]->name() == name )
+			return _joints[i];
+   }
    return 0;
  }
  
 SkJoint* SkSkeleton::search_joint ( const char* n )
  {
-   //if ( !SkJointName::exist(n) ) return 0;
+  if (_jointMap.size() == 0 &&
+		_joints.size() > 0)
+	{
+		int jointSize = _joints.size();
+		for (int i = 0; i < jointSize; i++)
+		{
+			_jointMap.insert(std::pair<std::string, SkJoint*>(_joints[i]->name(), _joints[i]));
+		}
+	}
 
-   // Build the table in case it was not already built: 
-   if ( _jhash.elements()==0 )
-    { int i, jsize = _joints.size();
-      _jhash.init ( jsize*2 );
-      for ( i=0; i<jsize; i++ )
-       { _jhash.insertstat ( _joints[i]->name(), _joints[i] );
-         // only the first entry of duplicated names is inserted
-       }
-      //sr_out<<"Skeleton Hash Table Longest Entry: "<<_jhash.longest_entry()<<srnl;
-      //sr_out<<"Skeleton Hash Table Size: "<<_jhash.size()<<srnl;
-    }
-    
-   // ok, now search the name:
-   return (SkJoint*) _jhash.lookup(n);
+	std::map<std::string, SkJoint*>::iterator iter = _jointMap.find(n);
+	if (iter != _jointMap.end())
+	{
+		return (*iter).second;
+	}
+	else
+	{
+		return NULL;
+	}
  }
 
 void SkSkeleton::update_global_matrices ()
@@ -179,6 +182,7 @@ void SkSkeleton::update_global_matrices ()
 
 void SkSkeleton::compress ()
  {
+	 /*
    _coldet_free_pairs.compress();
    _channels->compress();
    _postures.compress();
@@ -187,24 +191,25 @@ void SkSkeleton::compress ()
    int i;
    for ( i=0; i<_joints.size(); i++ )
      _joints[i]->_children.compress();
+	 */
  }
 
 void SkSkeleton::set_geo_local ()
  {
-   int i;
    SkJoint* j;
    
-   for ( i=0; i<_joints.size(); i++ ) _joints[i]->init_values();
+  for (size_t i=0; i<_joints.size(); i++ ) _joints[i]->init_values();
    update_global_matrices ();
 
    SrMat mat;
-   for ( i=0; i<_joints.size(); i++ )
+    for (size_t i=0; i<_joints.size(); i++ )
     { j = _joints[i];
       mat = j->gmat();
       mat.invert();
       if ( j->_visgeo ) j->_visgeo->apply_transformation(mat);
       if ( j->_colgeo ) j->_colgeo->apply_transformation(mat);
     }
+
 
    update_global_matrices ();
 }
@@ -213,8 +218,8 @@ float SkSkeleton::getCurrentHeight()
 {
 	SrBox initialBoundingBox;
 	update_global_matrices();
-	SrArray<SkJoint*>& joints = get_joint_array();
-	for (int j = 0; j < joints.size(); j++)
+	std::vector<SkJoint*>& joints = get_joint_array();
+	for (size_t j = 0; j < joints.size(); j++)
 	{
 		joints[j]->update_gmat();
 		const SrMat& gmat = joints[j]->gmat();
@@ -229,8 +234,8 @@ SrBox SkSkeleton::getBoundingBox()
 {
 	SrBox initialBoundingBox;
 	update_global_matrices();
-	SrArray<SkJoint*>& joints = get_joint_array();
-	for (int j = 0; j < joints.size(); j++)
+	std::vector<SkJoint*>& joints = get_joint_array();
+	for (size_t j = 0; j < joints.size(); j++)
 	{
 		joints[j]->update_gmat();
 		const SrMat& gmat = joints[j]->gmat();
@@ -287,10 +292,10 @@ void SkSkeleton::copy_joint(SkJoint* dest, SkJoint* src)
 
 void SkSkeleton::create_joints(SkJoint* origParent, SkJoint* parent)
 {
-	for (int i = 0; i < origParent->num_children(); i++)
+		for (int i = 0; i < origParent->num_children(); i++)
 	{
-		SkJoint* newJoint = new SkJoint(this, parent, origParent->child(i)->rot_type(), _joints.size());
-		_joints.push() = newJoint;
+		SkJoint* newJoint = new SkJoint(this, parent, origParent->child(i)->rot_type(), origParent->child(i)->index());
+		_joints.push_back(newJoint);
 
 		copy_joint(newJoint, origParent->child(i));
 		create_joints(origParent->child(i), newJoint);

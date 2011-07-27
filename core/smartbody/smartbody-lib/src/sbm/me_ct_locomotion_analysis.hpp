@@ -86,9 +86,9 @@ public:
 
 	//void analyze_locomotion(MeCtLocomotion* locomotion, SbmCharacter* character, SkMotion* motion, mcuCBHandle *mcu_p );
 
-	void analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkMotion* walking, SkMotion* standing, char* limb_base, SrArray<float>* support_height, float ground_height, float height_bound, float base_height_offset);
+	void analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkMotion* walking, SkMotion* standing, std::string limb_base, SrArray<float>* support_height, float ground_height, float height_bound, float base_height_offset);
 
-	void analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkMotion* walking, SkMotion* standing, char* limb_base, float land_time, float stance_time, float lift_time);
+	void analyze_limb_anim(MeCtLocomotionLimbAnim* anim, SkMotion* walking, SkMotion* standing, std::string limb_base, float land_time, float stance_time, float lift_time);
 
 	void analyze_walking_limb(MeCtLocomotionLimb* limb, SkMotion* walking, SkMotion* standing, int walking_style, float translation_scale, float base_height_offset);
 	void analyze_walking_limb(MeCtLocomotionLimb* limb, SkMotion* walking, SkMotion* standing, float land_time, float stance_time, float lift_time, int walking_style, float translation_scale);
@@ -97,11 +97,11 @@ public:
 
 	void analyze_standing_core(MeCtLocomotionLimb* limb, SkSkeleton* skeleton);
 
-	void calc_stance_time(MeCtLocomotionLimbAnim* anim, char* limb_base);
+	void calc_stance_time(MeCtLocomotionLimbAnim* anim, std::string limb_base);
 
 	float iterate_sub_joints(SkJoint* walking_joint, SkJoint* standing_joint);
 
-	int get_descendant_num(char* base_name);
+	int get_descendant_num(std::string base_name);
 
 	int get_descendant_num(SkJoint* base);
 

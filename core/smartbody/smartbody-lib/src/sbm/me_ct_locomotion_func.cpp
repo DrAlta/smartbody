@@ -149,14 +149,14 @@ int iterate_set(SkJoint* base, int index, int depth, SrArray<SrQuat>* buff, SrAr
 	return index;
 }
 
-void get_frame(SkMotion* walking, SkSkeleton* walking_skeleton, float frame, char* limb_base, MeCtLocomotionJointInfo* joint_info)
+void get_frame(SkMotion* walking, SkSkeleton* walking_skeleton, float frame, std::string limb_base, MeCtLocomotionJointInfo* joint_info)
 {
 	get_frame(walking, walking_skeleton, frame, limb_base, &(joint_info->quat), &(joint_info->quat_key_frame1), &(joint_info->quat_key_frame2), &(joint_info->joint_index));
 }
 
-void get_frame(SkMotion* walking, SkSkeleton* walking_skeleton, float frame, char* limb_base, SrArray<SrQuat>* quat_buffer, SrArray<SrQuat>* quat_buffer1, SrArray<SrQuat>* quat_buffer2, SrArray<int>* index_buff)
+void get_frame(SkMotion* walking, SkSkeleton* walking_skeleton, float frame, std::string limb_base, SrArray<SrQuat>* quat_buffer, SrArray<SrQuat>* quat_buffer1, SrArray<SrQuat>* quat_buffer2, SrArray<int>* index_buff)
 {
-	SkJoint* base = walking_skeleton->search_joint(limb_base);
+	SkJoint* base = walking_skeleton->search_joint(limb_base.c_str());
 
 	int frame1 = (int)frame;
 	int frame2 = ((int)frame+1);

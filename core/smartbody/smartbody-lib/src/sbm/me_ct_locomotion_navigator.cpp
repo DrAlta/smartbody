@@ -376,7 +376,7 @@ void MeCtLocomotionNavigator::set_world_mat(SrMat& mat)
 	world_mat = mat;
 }
 
-void MeCtLocomotionNavigator::set_translation_joint_name(SrString& name)
+void MeCtLocomotionNavigator::set_translation_joint_name(std::string name)
 {
 	translation_joint_name = name;
 }
@@ -541,14 +541,14 @@ int MeCtLocomotionNavigator::controller_channels(SkChannelArray* request_channel
 
 	// Initialize Requested Channels                                                           // Indices
 
-	AddChannel(request_channels, SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::XPos, &bi_world_x);
-	AddChannel(request_channels, SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::YPos, &bi_world_y);
-	AddChannel(request_channels, SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::ZPos, &bi_world_z);
-	AddChannel(request_channels, SkJointName( SbmPawn::WORLD_OFFSET_JOINT_NAME ), SkChannel::Quat, &bi_world_rot);
+	AddChannel(request_channels, SbmPawn::WORLD_OFFSET_JOINT_NAME , SkChannel::XPos, &bi_world_x);
+	AddChannel(request_channels, SbmPawn::WORLD_OFFSET_JOINT_NAME , SkChannel::YPos, &bi_world_y);
+	AddChannel(request_channels, SbmPawn::WORLD_OFFSET_JOINT_NAME , SkChannel::ZPos, &bi_world_z);
+	AddChannel(request_channels, SbmPawn::WORLD_OFFSET_JOINT_NAME , SkChannel::Quat, &bi_world_rot);
 
-	AddChannel(request_channels, SkJointName( &(translation_joint_name.get(0)) ), SkChannel::XPos, &bi_base_x);
-	AddChannel(request_channels, SkJointName( &(translation_joint_name.get(0)) ), SkChannel::YPos, &bi_base_y);
-	AddChannel(request_channels, SkJointName( &(translation_joint_name.get(0)) ), SkChannel::ZPos, &bi_base_z);
+	AddChannel(request_channels, translation_joint_name , SkChannel::XPos, &bi_base_x);
+	AddChannel(request_channels, translation_joint_name, SkChannel::YPos, &bi_base_y);
+	AddChannel(request_channels, translation_joint_name, SkChannel::ZPos, &bi_base_z);
 
 	AddChannel(request_channels, MeCtLocomotionPawn::LOCOMOTION_VELOCITY, SkChannel::XPos, &bi_loco_vel_x); 
 	AddChannel(request_channels, MeCtLocomotionPawn::LOCOMOTION_VELOCITY, SkChannel::YPos, &bi_loco_vel_y);
@@ -573,9 +573,9 @@ SrVec MeCtLocomotionNavigator::get_base_pos()
 	return base_pos;
 }
 
-void MeCtLocomotionNavigator::AddChannel(SkChannelArray* request_channels, const char* name, SkChannel::Type type, int* index)
+void MeCtLocomotionNavigator::AddChannel(SkChannelArray* request_channels, std::string name, SkChannel::Type type, int* index)
 {
-	request_channels->add( SkJointName(name), type);
+	request_channels->add( name, type);
 	*index = routine_channel_num;
 	++routine_channel_num;
 }
@@ -743,7 +743,7 @@ void MeCtLocomotionNavigator::print_foot_pos(MeFrameData& frame, MeCtLocomotionL
 	SrQuat rotation;
 	SrVec pos;
 	SkSkeleton* skeleton = limb->walking_skeleton;
-	SkJoint* tjoint = skeleton->search_joint(limb->get_limb_base_name());
+	SkJoint* tjoint = skeleton->search_joint(limb->get_limb_base_name().c_str());
 	gmat = tjoint->parent()->gmat();
 	for(int j  = 0;j < limb->limb_joint_info.quat.size()-1;++j)
 	{
