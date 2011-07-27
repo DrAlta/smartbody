@@ -785,8 +785,12 @@ double parseMotionParameters(std::string m, std::string parameter, double min, d
 		type = 4;
 	if (parameter == "transitiony")
 		type = 5;
+	if (parameter == "transitionz")
+		type = 6;
+	if (parameter == "avgrooty")
+		type = 7;
 	if (!sk) return -9999;
-	MotionParameters mParam(mcuCBHandle::singleton().lookUpMotion(m.c_str()), sk);
+	MotionParameters mParam(mcuCBHandle::singleton().lookUpMotion(m.c_str()), sk, "base");
 	mParam.setFrameId(min, max);
 	return mParam.getParameter(type);
 }
@@ -806,6 +810,7 @@ int mcu_motion_mirror_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p )
 				mirrorMotionName = refMotionName + "_mirror";
 			mirrorMotion->name(mirrorMotionName.c_str());
 			map.insert(std::pair<std::string, SkMotion*>(mirrorMotionName, mirrorMotion));
+			mirrorMotion->ref();
 			return CMD_SUCCESS;
 		}		
 	}
