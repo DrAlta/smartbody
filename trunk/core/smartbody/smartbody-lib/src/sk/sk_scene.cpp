@@ -58,7 +58,6 @@ static SrSnGroup* make_joint_group ( const SkJoint* j, SkSkeleton* s, SrArray<Sr
    int i;
    SrSnGroup* g = new SrSnGroup;
    g->separator ( true );
-   const char* name = j->name().get_string();  // expose for debugger
    _jgroup [ j->index() ] = g;
 
    // insert children recursivelly
@@ -87,7 +86,7 @@ void SkScene::init ( SkSkeleton* s )
    SrSnSphere* sphere;
    SrSnSharedModel* smodel;
 
-   const SrArray<SkJoint*>& joints = s->joints ();
+   const std::vector<SkJoint*>& joints = s->joints ();
    _jgroup.size ( joints.size() );
 
    SkJoint* root = s->root();
@@ -111,12 +110,9 @@ void SkScene::init ( SkSkeleton* s )
 
    add ( g );
 
-   int i, j;
-   for ( i=0; i<joints.size(); i++ )
+   for (size_t i=0; i<joints.size(); i++ )
     { 
       SkJoint* joint_p = joints[i];
-	  const char* joint_name = joint_p->name().get_string(); // expose to debugger
-
       // axis shows the frame after correction, but before the joint local rotation:
       gaxis = new SrSnGroup;
       gaxis->separator ( true );
@@ -143,7 +139,7 @@ void SkScene::init ( SkSkeleton* s )
       smodel->visible ( false );
       g->add ( smodel ); // at ColgeoPos
     
-      for ( j=0; j<joints[i]->num_children(); j++ )
+      for (size_t j=0; j < (size_t) joints[i]->num_children(); j++ )
        { SrSnCylinder* c = new SrSnCylinder;
 		 c->color(SrColor::white);
          c->shape().a = SrPnt::null;
@@ -172,9 +168,8 @@ void SkScene::init ( SkSkeleton* s )
 void SkScene::update ()
  {
    if ( !_skeleton ) return;
-   const SrArray<SkJoint*>& joints = _skeleton->joints ();
-   int i;
-   for ( i=0; i<joints.size(); i++ ) update ( i );
+   const std::vector<SkJoint*>& joints = _skeleton->joints ();
+   for (size_t i=0; i<joints.size(); i++ ) update ( i );
  }
 
 void SkScene::update ( int j )
@@ -188,9 +183,8 @@ void SkScene::update ( int j )
 void SkScene::rebuild ()
  {
    if ( !_skeleton ) return;
-   const SrArray<SkJoint*>& joints = _skeleton->joints ();
-   int i;
-   for ( i=0; i<joints.size(); i++ ) rebuild ( i );
+   const std::vector<SkJoint*>& joints = _skeleton->joints();
+   for (size_t i=0; i<joints.size(); i++ ) rebuild ( i );
  }
 
 void SkScene::rebuild ( int j )
@@ -225,9 +219,8 @@ void SkScene::rebuild ( int j )
 
 void SkScene::set_visibility ( int skel, int visgeo, int colgeo, int vaxis )
  {
-   int i;
-   const SrArray<SkJoint*>& joints = _skeleton->joints();
-   for ( i=0; i<joints.size(); i++ )
+   const std::vector<SkJoint*>& joints = _skeleton->joints();
+   for (size_t i=0; i<joints.size(); i++ )
     { 
       set_visibility ( joints[i], skel, visgeo, colgeo, vaxis );
     }
@@ -310,7 +303,7 @@ void SkScene::set_axis_length ( float l )
    if ( _axislen==l || _skeleton==0 ) return;
    _axislen = l;
 
-   const SrArray<SkJoint*>& joints = _skeleton->joints ();
+    const std::vector<SkJoint*>& joints = _skeleton->joints();
    
    int i;
    for ( i=0; i<_jgroup.size(); i++ )

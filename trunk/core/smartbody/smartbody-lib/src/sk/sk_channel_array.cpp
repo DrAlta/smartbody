@@ -25,174 +25,226 @@
 # include <sk/sk_channel_array.h>
 # include <sk/sk_skeleton.h>
 
-//========================= SkChannelArray::HashTable ============================
-
-/* We use an internal specific implementation of a hash table for fast channel search.
-   The hash table is created and used whenever methods SkChannelArray::search() and 
-   SkChannelArray::map() are called (methods implementation in the end of this file)*/
-class SkChannelArray::HashTable
- { public:
-    struct Entry
-     { int    jname_key;   // SkJointName::id()
-       char   ctype_key;   // the SkChannel::Type enumerator [-127,128] (see sr.h)
-       srword pos_data;    // the position of the key in the channel array max is 65,535
-       srsint next;        // the index of the next colliding item in [-32768,32767]
-       void set ( int jk, char ck, srword pos, srsint n )
-        { jname_key=jk; ctype_key=ck; pos_data=pos; next=n; }
-     };
-    SrArray<Entry> table;
-    int hash_size;
-   public:
-    HashTable () { hash_size=0; }
-    void init ( int hsize );
-    int collisions () const { return table.size()-hash_size; }
-    int longest_entry () const;                       // for inspection purposes only
-    int lookup ( int jname, char ctype ) const;       // returns position or -1 if not there
-    int insert ( int jname, char ctype, srword pos ); // return -1 if already inserted
- };
-
 //============================= SkChannelArray ============================
-
-
 //  A persistent empty SkChannelArray returned by empty_channel_array().
 SkChannelArray SkChannelArray::EMPTY_CHANNELS = SkChannelArray();
 
 
-SkChannelArray::SkChannelArray () {
-    _floats=0;
-    _htable=0;
-}
-
-SkChannelArray::~SkChannelArray () {
-    if ( _htable ) { delete _htable; }
-}
-
-void SkChannelArray::init() {
-	_channels.size ( 0 );
+SkChannelArray::SkChannelArray ()
+{
 	_floats = 0;
-	if ( _htable ) {
-		delete _htable; _htable=0;
+
+}
+
+SkChannelArray::~SkChannelArray ()
+{
+}
+
+void SkChannelArray::init()
+{
+	_floats = 0;
+	_channelMap.clear();
+	_channelList.clear();
+}
+
+bool SkChannelArray::doesChannelExist(std::string name, SkChannel::Type t)
+{
+	std::map<std::string, std::map<SkChannel::Type, int> >::iterator iter = _channelMap.find(name);
+	if (iter != _channelMap.end())
+	{
+		std::map<SkChannel::Type, int>& typeMap = (*iter).second;
+		std::map<SkChannel::Type, int>::iterator typeIter = typeMap.find(t);
+		if (typeIter != typeMap.end())
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void SkChannelArray::_add ( SkJoint* j, std::string name, SkChannel::Type t, bool connect ) {
+	if ( name == "" && j )
+		name = j->name();
+
+	// does this channel name and type already exist
+	Channel channel;
+	channel.set(j, t);
+	channel.name = name;
+
+	bool exist = doesChannelExist(name, t);
+	if (exist)
+		return;
+
+	std::map<std::string, std::map<SkChannel::Type, int> >::iterator iter = _channelMap.find(name);
+	if (iter != _channelMap.end())
+	{
+		std::map<SkChannel::Type, int>& typeMap = (*iter).second;
+		std::map<SkChannel::Type, int>::iterator typeIter = typeMap.find(t);
+		
+		_channelList.push_back(channel);
+		typeMap.insert(std::pair<SkChannel::Type, int>(t, _channelList.size() - 1));
+		_floats += SkChannel::size(t);
+	}
+	else
+	{
+		_channelList.push_back(channel);
+		std::map<SkChannel::Type, int> typeMap;
+		typeMap.insert(std::pair<SkChannel::Type, int>(t, _channelList.size() - 1));
+		_channelMap.insert(std::pair<std::string, std::map<SkChannel::Type, int> >(name, typeMap));
+		_floats += SkChannel::size(t);
 	}
 }
 
-void SkChannelArray::_add ( SkJoint* j, SkJointName name, SkChannel::Type t, bool connect ) {
-	if ( name.undefined() && j )
-		name=j->name();
+bool SkChannelArray::insert ( int pos, std::string name, SkChannel::Type t )
+{
+	if (pos < 0 || size_t(pos) > _channelList.size())
+		return false;
 
-	_channels.push().set ( j, t );
-	_channels.top().name = name;
-	_channels.top().fmap = 0;     // fmap is the "float map" only used in method map()
-	_floats += SkChannel::size(t);
-	if ( _htable ) {
-		delete _htable;
-		_htable=0;
+	bool exist = doesChannelExist(name, t);
+	if (exist)
+		return false;
+
+	Channel channel;
+	channel.set(NULL, t);
+	channel.name = name;
+	int counter = 0;
+	for (std::vector<Channel>::iterator iter = _channelList.begin();
+		iter != _channelList.end();
+		iter++)
+	{
+		if (counter == pos)
+		{
+			_channelList.insert(iter, channel);
+			_floats += SkChannel::size(t);
+			break;
+		}
+		counter++;
 	}
+
+	std::map<std::string, std::map<SkChannel::Type, int> >::iterator iter = _channelMap.find(name);
+	if (iter != _channelMap.end())
+	{
+		std::map<SkChannel::Type, int>& typeMap = (*iter).second;
+		std::map<SkChannel::Type, int>::iterator typeIter = typeMap.find(t);
+		
+		typeMap.insert(std::pair<SkChannel::Type, int>(t, counter));
+	}
+	else
+	{
+		std::map<SkChannel::Type, int> typeMap;
+		typeMap.insert(std::pair<SkChannel::Type, int>(t, counter));
+		_channelMap.insert(std::pair<std::string, std::map<SkChannel::Type, int> >(name, typeMap));
+	}
+
+	return true;
 }
-
-bool SkChannelArray::insert ( int pos, SkJointName name, SkChannel::Type type )
- {
-   if ( pos<0 || pos>_channels.size() ) return false;
-
-   // add channel:
-   _channels.insert ( pos );
-   _channels[pos].set ( 0, type );
-   _channels[pos].name = name;
-   _channels[pos].fmap = 0;
-   _floats += SkChannel::size ( type );
-   if ( _htable ) { delete _htable; _htable=0; }
-
-   return true;
- }
 
 SkSkeleton* SkChannelArray::skeleton () const
- {
-   if ( _channels.size()==0 ) return 0;
-   return _channels[0].joint->skeleton();
- }
+{
+	if (_channelList.size() == 0)
+	{
+		return NULL;
+	}
+	else
+	{
+		if (!_channelList[0].joint)
+			return NULL;
+		else
+			return _channelList[0].joint->skeleton();
+	}
+}
 
-void SkChannelArray::get_active_channels ( SkSkeleton* sk, bool connect ) {
+void SkChannelArray::get_active_channels ( SkSkeleton* sk, bool connect )
+{
 	init();
 	add_active_channels( sk, connect );
 }
 
-void SkChannelArray::add_active_channels ( SkSkeleton* sk, bool connect ) {
+void SkChannelArray::add_active_channels ( SkSkeleton* sk, bool connect )
+{
 	int i;
 	int jsize = sk->joints().size();
 	SkJoint* joint;
 
-	for ( i=0; i<jsize; i++ ) {
+	for (i = 0; i < jsize; i++)
+	{
 		joint = sk->joints()[i];
 
-
 		// position channels:
-		if ( !joint->pos()->frozen(0) )
-			add(joint,SkChannel::XPos,connect);
-		if ( !joint->pos()->frozen(1) )
-			add(joint,SkChannel::YPos,connect);
-		if ( !joint->pos()->frozen(2) )
-			add(joint,SkChannel::ZPos,connect);
+		if (!joint->pos()->frozen(0))
+			add(joint, SkChannel::XPos, connect);
+		if (!joint->pos()->frozen(1))
+			add(joint, SkChannel::YPos, connect);
+		if (!joint->pos()->frozen(2))
+			add(joint, SkChannel::ZPos, connect);
 
 		// rotation channels:
-		if ( !joint->quat()->active() ) 
+		if (!joint->quat()->active()) 
 			continue;
-		switch ( joint->rot_type() ) {
+		switch (joint->rot_type())
+		{
 			case SkJoint::TypeQuat:
-				add(joint,SkChannel::Quat,connect);
+				add(joint, SkChannel::Quat, connect);
 				break;
 			case SkJoint::TypeSwingTwist:
-				add(joint,SkChannel::Swing);
-				if ( !joint->st()->twist_frozen() )
-					add(joint,SkChannel::Twist,connect);
+				add(joint, SkChannel::Swing);
+				if (!joint->st()->twist_frozen())
+					add(joint, SkChannel::Twist, connect);
 				break;
 			case SkJoint::TypeEuler:
-				if ( !joint->euler()->frozen(0) )
-					add(joint,SkChannel::XRot,connect);
-				if ( !joint->euler()->frozen(1) )
-					add(joint,SkChannel::YRot,connect);
-				if ( !joint->euler()->frozen(2) )
-					add(joint,SkChannel::ZRot,connect);
+				if (!joint->euler()->frozen(0))
+					add(joint, SkChannel::XRot, connect);
+				if (!joint->euler()->frozen(1))
+					add(joint, SkChannel::YRot, connect);
+				if (!joint->euler()->frozen(2))
+					add(joint, SkChannel::ZRot, connect);
 				break;
 		}
 	}
-
-	compress ();
+	count_floats();
 }
 
 int SkChannelArray::count_floats ()
- {
-   int i, csize = _channels.size();
-   _floats = 0;
-   for ( i=0; i<csize; i++ )
-    { _floats += _channels[i].size();
-    }
-   return _floats;
- }
+{
+	int csize = _channelList.size();
+	_floats = 0;
+	for (int i = 0; i < csize; i++)
+	{ 
+		_floats += _channelList[i].size();
+	}
+	return _floats;
+}
 
 int SkChannelArray::float_position ( int c ) const
- {
-   if ( c>=_channels.size() ) c=_channels.size()-1;
-   int i, floats=0;
-   for ( i=0; i<c; i++ )
-    { floats += _channels[i].size();
-    }
-   return floats;
- }
+{
+	if (size_t(c) >= _channelList.size()) 
+		c = _channelList.size() - 1;
+	int pos = 0;
+	for (int i = 0; i < c; i++)
+	{ 
+		pos += _channelList[i].size();
+	}
+	return pos;	
+}
 
 void SkChannelArray::get_values ( float* fp )
- {
-   int i, csize = _channels.size();
-   for ( i=0; i<csize; i++ )
-    { fp += _channels[i].get ( fp );
-    }
- }
+{
+	int csize = _channelList.size();
+	for (int i = 0; i < csize; i++)
+	{ 
+		fp += _channelList[i].get(fp);
+	}
+}
  
 void SkChannelArray::set_values ( const float* fp )
- {
-   int i, csize = _channels.size();
-   for ( i=0; i<csize; i++ )
-    { fp += _channels[i].set ( fp );
-    }
- }
+{
+	int csize = _channelList.size();
+	for (int i = 0; i < csize; i++)
+	{ 
+		fp += _channelList[i].set(fp);
+	}
+}
 
 //void SkChannelArray::get_random_values ( float* fp ) const
 // {
@@ -202,29 +254,31 @@ void SkChannelArray::set_values ( const float* fp )
 //    }
 // }
 
-bool SkChannelArray::get_used_channels ( const SrArray<SkPosture*>& postures, SrArray<int>* indices )
+bool SkChannelArray::get_used_channels ( const std::vector<SkPosture*>& postures, std::vector<int>* indices )
  {
    init ();
    if ( postures.size()<1 ) return 0;
 
    // check the actual channels being used:
-   int i, j;
    SrBuffer<float>& firstpost = postures[0]->values;
    int firstpostsize = firstpost.size();
-   SrArray<int> locindices;
-   SrArray<int>& index = (indices? *indices:locindices);
+   std::vector<int> locindices;
+   std::vector<int>& index = (indices? *indices:locindices);
 
    // init as -1 meaning indices not used (or 1 if one channel):
-   index.size ( firstpost.size() ); // index has size==floats, not channels
+   index.resize ( firstpost.size() ); // index has size==floats, not channels
    if ( firstpost.size()==1 )
     index[0] = 1;
    else
-    index.setall ( -1 );
+   {
+	   for (size_t i = 0; i < index.size(); i++)
+		   index[i] = -1;
+   }
 
    // mark with 1 the indices of active channels, ie, those with changing values:
-   for ( i=1; i<postures.size(); i++ )
+   for (size_t i=1; i<postures.size(); i++ )
     { if ( postures[i]->values.size()!=firstpost.size() ) return false;
-      for ( j=0; j<firstpostsize; j++ )
+      for (int j=0; j<firstpostsize; j++ )
        { if ( postures[i]->values[j]!=firstpost[j] ) index[j]=1;
        }
     }
@@ -233,8 +287,8 @@ bool SkChannelArray::get_used_channels ( const SrArray<SkPosture*>& postures, Sr
    SkChannelArray& ch = *postures[0]->channels();
    int csize;
    int postsize=0;
-   i=0; j=0;
-   for ( i=0; i<ch.size(); i++ )
+   int j = 0;
+   for (int i=0; i<ch.size(); i++ )
     { csize = ch[i].size();//ch[i].size(ch[i].type);
 
       if ( index[j]<0 ) // not used: advance j to next value and continue
@@ -249,78 +303,115 @@ bool SkChannelArray::get_used_channels ( const SrArray<SkPosture*>& postures, Sr
    return true;
  }
 
-int SkChannelArray::linear_search ( SkJointName name, SkChannel::Type type ) const
- {
-   int i;
-   int chs = _channels.size();
+int SkChannelArray::linear_search (std::string name, SkChannel::Type type) const
+{
+	int chs = _channelList.size();
 
-   for ( i=0; i<chs; i++ )
-    { if ( _channels[i].type==type && SkChannelArray::name(i)==name )
-       { return i;
-       }
-    }
-
-   return -1;
- }
-
-int SkChannelArray::search ( SkJointName name, SkChannel::Type type ) {
-	if( _channels.size()==0 ) {  // rebuild_hash_table() will fail (attempt a modulo 0 operation) in this case
-		return -1;               // Besides, there is no possible match
+	for (int i = 0; i < chs; i++)
+	{ 
+	   if ( _channelList[i].type == type && 
+		    _channelList[i].name == name)
+	   { 
+		   return i;
+	   }
 	}
-	if ( !_htable ) {
-		rebuild_hash_table();
-	}
-    return _htable->lookup ( name.id(), (char)type );
+
+	return -1;
 }
 
-void SkChannelArray::rebuild_hash_table ()
- {
-   if ( !_htable ) _htable = new HashTable;
+int SkChannelArray::search ( std::string name, SkChannel::Type type )
+{
+	if( _channelList.size()==0 )
+		return -1;                  
 
-   // first rebuild the "float mapping":
-   int i, _floats=0;
-   for ( i=0; i<_channels.size(); i++ )
-    { _channels[i].fmap = _floats;
-      _floats += _channels[i].size();
-    }
+	if (_dirty)
+	{
+		rebuild_hash_table();
+		_dirty = false;
+	}
 
-   // now build the hash table:
-   _htable->init ( _channels.size()*2 );
-   for ( i=0; i<_channels.size(); i++ )
-    { _htable->insert ( _channels[i].name.id(), (char)_channels[i].type, (srword)i );
-      // duplicated entries will not be inserted, but they should not exist.
-    }
-    
-   //sr_out<<"Channel Array size:"<<size();
-   //sr_out<<" htable size:"<<_htable->table.size()<<" longest:"<<_htable->longest_entry()<<srnl;
+	std::map<std::string, std::map<SkChannel::Type, int> >::iterator iter = _channelMap.find(name);
+	if (iter != _channelMap.end())
+	{
+		std::map<SkChannel::Type, int>& typeMap = (*iter).second;
+		std::map<SkChannel::Type, int>::iterator typeIter = typeMap.find(type);
+		if (typeIter == typeMap.end())
+		{
+			return -1;
+		}
+		else
+		{
+			return (*typeIter).second;
+		}
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+void SkChannelArray::rebuild_hash_table()
+{
+	_channelMap.clear();
+	_floats = 0;
+
+	int index = 0;
+	for (std::vector<Channel>::iterator iter = _channelList.begin();
+		 iter != _channelList.end();
+		 iter++)
+	{
+		Channel& channel = (*iter);
+
+		std::map<std::string, std::map<SkChannel::Type, int> >::iterator mapIter = _channelMap.find(channel.name);
+		if (mapIter != _channelMap.end())
+		{
+			std::map<SkChannel::Type, int>& typeMap = (*mapIter).second;
+			std::map<SkChannel::Type, int>::iterator typeIter = typeMap.find(channel.type);
+			
+			typeMap.insert(std::pair<SkChannel::Type, int>(channel.type, index));
+		}
+		else
+		{
+			std::map<SkChannel::Type, int> typeMap;
+			typeMap.insert(std::pair<SkChannel::Type, int>(channel.type, index));
+			_channelMap.insert(std::pair<std::string, std::map<SkChannel::Type, int> >(channel.name, typeMap));
+		}
+
+		_floats +=  channel.size();
+		index++;
+	}
  }
 
-int SkChannelArray::connect ( SkSkeleton* s )
- {
-   int i;
-   int count = 0;
-   int chsize = _channels.size();
-   SkJoint* joint=0;
+int SkChannelArray::connect(SkSkeleton* s)
+{
+	int count = 0;
+	int chsize = _channelList.size();
+	SkJoint* joint = NULL;
 
-   if ( !s )
-    { for ( i=0; i<chsize; i++ ) _channels[i].joint = 0;
-      return 0;
-    }
+	if (!s)
+	{ 
+		for (int i=0; i < chsize; i++ ) 
+			_channelList[i].joint = NULL;
+		return 0;
+	}
 
-   for ( i=0; i<chsize; i++ )
-    { joint = s->search_joint(_channels[i].name);
-      _channels[i].joint = 0;
-      if ( joint )
-       { if ( SkChannel::valid(type(i),joint->rot_type()) )
-          { _channels[i].joint = joint;
-            count++;
-          }
-       }
-    }
+	for (int i = 0; i < chsize; i++ )
+	{ 
+		joint = s->search_joint(_channelList[i].name.c_str());
+		_channelList[i].joint = 0;
+		if (joint)
+		{ 
+			if (SkChannel::valid(type(i), joint->rot_type()) )
+			{ 
+				_channelList[i].joint = joint;
+				count++;
+			}
+		}
+	}
 
-   return count;
- }
-
+	return count;
+}
+/*
 // Without using the hash table, with 53 channels, a test performed 1431 comparisons
 // to accomplish the mapping.
 // With a hash size of 53*2=106, the hash table had longest entry==2, and 111 elements,
@@ -347,6 +438,7 @@ void SkChannelArray::map ( SkChannelArray& ca, SrBuffer<int>& m )
         m[i++] = cmap<0? cmap:cmap+v;
     }
  }
+ */
 
 /* Old O(n^2) implementation:
 void SkChannelArray::map ( const SkChannelArray& ca, SrBuffer<int>& m )
@@ -374,40 +466,53 @@ void SkChannelArray::map ( const SkChannelArray& ca, SrBuffer<int>& m )
 
 void SkChannelArray::merge ( SkChannelArray& ca )
  {
-   int c, id;
-   for ( c=0; c<ca.size(); c++ ) // for each channel c in ca
-    { id = search ( ca.name(c), ca.type(c) );
-      if ( id<0 ) // missing channel found
-       { add ( ca.name(c), ca.type(c) ); // add it
-       }
+	for (int c=0; c<ca.size(); c++ ) // for each channel c in ca
+	{ 
+		int pos = search(ca.name(c), ca.type(c));
+		if (pos < 0) // missing channel found
+		{ 
+			add(ca.name(c), ca.type(c)); // add it
+		}
     }
  }
 
 void SkChannelArray::operator = ( const SkChannelArray& a )
- {
-   _channels = a._channels;
+{
+	if (this == &a)
+	{
+		return;
+	}
+
+	_channelList.clear();
+	for (size_t x = 0; x < a._channelList.size(); x++)
+	{
+		_channelList.push_back(a._channelList[x]);
+	}
    _floats = a._floats;
-   if ( _htable ) { delete _htable; _htable=0; }
- }
+   _dirty = true;
+}
 
 bool SkChannelArray::operator == ( const SkChannelArray& a )
- {
-   if ( size()!=a.size() ) return false;
+{
+   if (size() != a.size())
+	   return false;
    
-   int i;
-   for ( i=0; i<size(); i++ )
-    { if ( _channels[i].type!=a._channels[i].type ||
-           _channels[i].name!=a._channels[i].name ) return false;
+   for (int i=0; i<size(); i++ )
+    { 
+		if (_channelList[i].type != a._channelList[i].type ||
+            _channelList[i].name != a._channelList[i].name ) 
+		   return false;
     }
    return true;
- }
+}
 
 SrOutput& operator<< ( SrOutput& o, const SkChannelArray& ca )
  {
    int i;
    o << "channels " << ca.size() << srnl;
    for ( i=0; i<ca.size(); i++ )
-    { o << (const char*)ca.name(i) << srspc
+    { 
+		o << ca.name(i).c_str() << srspc
         << ca.const_get(i).type_name() << srnl;
     }
    return o;
@@ -421,114 +526,35 @@ SrInput& operator>> ( SrInput& in, SkChannelArray& ca )
    if ( in.last_error()==SrInput::UnexpectedToken ) return in;
 
    ca.init ();
-   ca._channels.capacity(256); // reserve 256 entries
+   ca._channelList.reserve(256); // reserve 256 entries
 
    SrString name;
    while ( (n--) > 0 )
     { in.get_token ( name );
       in.get_token ();
-      ca.add ( SkJointName(name), SkChannel::get_type(in.last_token()) );
+	  ca.add ( std::string(name), SkChannel::get_type(in.last_token()) );
     }         
 
-   ca.compress();
+//   ca.compress();
 
    return in;
  }
 
-//========================= SkChannelArray::HashTable ============================
-
-static int hash ( int jname, char ctype, int size )
- {
-   int h = jname + (int)ctype;
-   h = SR_ABS(h);
-   h = h%size;
-   return h;
- }
-
-void SkChannelArray::HashTable::init ( int hsize )
- {
-   hash_size = hsize;
-   table.capacity ( hsize );
-   table.size ( hsize );
-   int i;
-   for ( i=0; i<hsize; i++ )
-    table[i].set ( -1/*joint*/, -1/*channel*/, 0/*pos*/, -1/*next*/ );
- }
-
-int SkChannelArray::HashTable::longest_entry () const
- {
-   int i, j, len, longest=0;
-   for ( i=0; i<hash_size; i++ )
-    { if ( table[i].jname_key<0 ) continue; // empty
-      len = 1;
-      j = table[i].next;
-      while ( j>=0 ) { len++; j=table[j].next; }
-      if ( len>longest ) longest=len;
-    }
-   return longest;
- }
-
-int SkChannelArray::HashTable::lookup ( int jname, char ctype ) const
- {
-   int id = ::hash ( jname, ctype, hash_size );
-
-   if ( table[id].jname_key<0 ) return -1; // empty entry, not found
-   while ( true )
-    { if ( table[id].jname_key==jname && table[id].ctype_key==ctype ) // found
-       return (int)table[id].pos_data;
-      // else check next colliding entry:
-      if ( table[id].next<0 ) return -1; // no more entries, not found
-      id = table[id].next;
-    }
- }
-
-int SkChannelArray::HashTable::insert ( int jname, char ctype, srword pos )
- {
-   int id = ::hash ( jname, ctype, hash_size );
-
-   if ( table[id].jname_key<0 ) // empty entry, just take it
-    { table[id].set ( jname, ctype, pos, -1/*next*/ );
-      return id;
-    }
-
-   while ( true )
-    { if ( table[id].jname_key==jname && table[id].ctype_key==ctype ) return -1; // already there
-
-      // else check next colliding entry:
-      if ( table[id].next<0 ) // no more entries, add one:
-       { table[id].next = table.size();
-         table.push().set ( jname, ctype, pos, -1/*next*/ );
-         return table.size()-1;
-       }
-      
-      id = table[id].next;
-    }
- }
 
 void SkChannelArray::changeChannelName(std::string oldName, std::string newName)
 {
 	bool channelFound = false;
-	for (int c = 0; c < _channels.size(); c++)
+	for (size_t c = 0; c < _channelList.size(); c++)
 	{
-		if (oldName == _channels[c].name.get_string())
+		if (oldName == _channelList[c].name)
 		{
-			_channels[c].name = SkJointName(newName.c_str());
+			_channelList[c].name = newName;
 			channelFound = true;
 		}
 	}
 
-	if (channelFound)
-	{
-		if ( _htable )
-		{
-			delete _htable;
-			_htable=0;
-		}
-	}
-
-	rebuild_hash_table();
+	_dirty = true;
 }
-
 
 
 //============================ End of File ============================

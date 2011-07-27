@@ -313,7 +313,7 @@ void MeCtExampleBodyReach::init(SbmPawn* pawn)
 		SkJoint* joint = node->joint;
 		SkJointQuat* skQuat = joint->quat();				
 		affectedJoints.push_back(joint);
-		_channels.add(joint->name().get_string(), SkChannel::Quat);		
+		_channels.add(joint->name(), SkChannel::Quat);		
 	}		
 	blendWeight = currentReachEngine->fadingWeight;
 	//LOG("init blend weight = %f\n",blendWeight);	

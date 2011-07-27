@@ -359,7 +359,7 @@ void MeCtSimpleGazeJoint::capture_joint_state( void ) {
 			parent_rot = M.quat( gwiz::COMP_M_TR );
 		}
 		else	{
-			const char *name = joint_p->name();
+			const char *name = joint_p->name().c_str();
 			LOG( "MeCtSimpleGazeJoint::capture_joint_state ERR: parent of joint '%s' not found\n", name );
 		}
 	}
@@ -621,7 +621,7 @@ void MeCtSimpleGaze::init( SbmPawn* pawn )	{
 	joint_arr = new MeCtSimpleGazeJoint[ joint_count ];
 
 	for( i = 0; i < joint_count; i++ )	{
-		_channels.add( SkJointName( joint_labels[ i ] ), SkChannel::Quat );
+		_channels.add( joint_labels[ i ] , SkChannel::Quat );
 	}
 
 	MeController::init(pawn);
@@ -723,7 +723,7 @@ void MeCtSimpleGaze::inspect_skeleton( SkJoint* joint_p, int depth )	{
 	int i, j, n;
 	
 	if( joint_p )	{
-		const char *name = joint_p->name();
+		const char *name = joint_p->name().c_str();
 		for( j=0; j<depth; j++ ) { LOG( " " ); }
 		LOG( "%s\n", name );
 		n = joint_p->num_children();
@@ -736,7 +736,7 @@ void MeCtSimpleGaze::inspect_skeleton( SkJoint* joint_p, int depth )	{
 void MeCtSimpleGaze::inspect_skeleton_local_transform( SkJoint* joint_p, int depth )	{
 	
 	if( joint_p )	{
-		const char *name = joint_p->name();
+		const char *name = joint_p->name().c_str();
 		gwiz::matrix_t M;
 		int i, j;
 
@@ -766,7 +766,7 @@ void MeCtSimpleGaze::inspect_skeleton_local_transform( SkJoint* joint_p, int dep
 void MeCtSimpleGaze::inspect_skeleton_world_transform( SkJoint* joint_p, int depth )	{
 	
 	if( joint_p )	{
-		const char *name = joint_p->name();
+		const char *name = joint_p->name().c_str();
 		gwiz::matrix_t M;
 		int i, j;
 

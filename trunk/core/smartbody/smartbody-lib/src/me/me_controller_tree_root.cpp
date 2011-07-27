@@ -475,7 +475,6 @@ public:
 			for( int i=BEGIN; i<END; ++i ) {
 				SkChannel& channel = channels[i];
 				if( channel.joint ) {
-					const char* chName = (const char*)(channel.joint->name());  // View in debugger
 					if( channel.joint->skeleton() == _skeleton ) {
 						// Line by line temp variables for the debugger
 						int buffer_index = _frame_data.toBufferIndex( i );
@@ -519,7 +518,7 @@ public:
 			// MeControllerTreeRoot only takes skeletons,
 			// so all channels should be connected.
 			// Avoiding the check.
-			string name( channels.name(i).get_string() );
+			string name( channels.name(i) );
 			if( _logged_joints.find(name)!=set_end )
 				_logged_channel_indices.insert(i);
 		}

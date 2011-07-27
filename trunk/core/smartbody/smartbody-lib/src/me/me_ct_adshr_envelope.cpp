@@ -64,7 +64,7 @@ bool MeCtAdshrEnvelope::init(SbmPawn* pawn, SkChannelArray& channels) {
 	// Copied from MeCtRawWrite
 	_channels.init();
 	_channels.merge( channels );
-	_channels.compress();  // save memory
+//	_channels.compress();  // save memory
 	_channels.rebuild_hash_table();
 
 	const int size = _channels.size();

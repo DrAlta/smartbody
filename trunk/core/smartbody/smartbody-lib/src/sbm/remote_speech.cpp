@@ -152,7 +152,7 @@ The timestamp is 20051121_150427 (that is, YYYYMMDD_HHMMSS ), so we can check ol
 	string soundFile= "../../data/cache/audio/utt_" +date+ "_"+ time+ "_"+ string(agentName)+"_"+ myStream.str()+".aiff"; //gives sound file correct name to Remote speech process (and thus relative to Remote speech process)
 	string* soundFilePtr= new string(soundFile);
 	//mcu.character_map.lookup(agentName)->getVoice()-- gets the voice name from the character in meCharacter (it's a string pointer so the * dereferences it)
-	SbmCharacter* agent = mcuCBHandle::singleton().character_map.lookup(agentName);
+	SbmCharacter* agent = mcuCBHandle::singleton().getCharacter(agentName);
 	if( agent == NULL ) {
 		// TODO: Log: Unknown Agent
 		return -1;  // TODO: Define error return value as a constant somewhere (or new exception type).
@@ -491,7 +491,7 @@ int remoteSpeechResult_func( srArgBuffer& args, mcuCBHandle* mcu_p ) { //this fu
 	if( LOG_RHETORIC_SPEECH ) LOG("\n \n *************in recieving_func***************** \n \n" );
 
 	char* character_name = args.read_token(); //character speaking
-	SbmCharacter* character = mcu_p->character_map.lookup( character_name );
+	SbmCharacter* character = mcu_p->getCharacter( character_name );
 	if( character==NULL )
 		return( CMD_SUCCESS );  // Ignore messages for characters who are not present in this SBM process
 
@@ -699,12 +699,12 @@ int remote_speech_test( srArgBuffer& args, mcuCBHandle* mcu_p ) { //Tester funct
 
 int set_char_voice(char* char_name, char* voiceCode, mcuCBHandle* mcu_p) //handles the voice command
 {	
-	if( mcu_p->character_map.lookup( char_name ) )	{ 
+	if( mcu_p->getCharacter( char_name ) )	{ 
 		string voiceCodeStr= "";
 		voiceCodeStr= voiceCodeStr+voiceCode;
 		//char* voiceCodeCharArray= new char[voiceCodeStr.length()]; 
 		//strcpy(voiceCodeCharArray,voiceCodeStr.c_str()); //Allocates memory andcopies the string to a char*
-		mcu_p->character_map.lookup( char_name)->set_voice_code(voiceCodeStr);
+		mcu_p->getCharacter( char_name )->set_voice_code(voiceCodeStr);
 		return (CMD_SUCCESS);
 	}
 	else{

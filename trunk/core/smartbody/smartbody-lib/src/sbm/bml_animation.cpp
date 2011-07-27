@@ -107,7 +107,7 @@ BML::BehaviorRequestPtr BML::parse_bml_panimation( DOMElement* elem, const std::
 	int nameStartPos = unique_id.find_first_of("_");
 	int nameEndPos = unique_id.find_first_of("_", nameStartPos + 1);
 	charName = unique_id.substr(nameStartPos+1, nameEndPos-nameStartPos-1);
-	SbmCharacter* character = mcu->character_map.lookup(charName);
+	SbmCharacter* character = mcu->getCharacter(charName);
 
 	if( animName1 != 0 && *animName1 != 0 && animName2 != 0 && *animName2 != 0 )	
 	{

@@ -71,7 +71,7 @@ int mcu_motion_mirror_cmd_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 //int mcu_character_func( srArgBuffer& args, mcuCBHandle *mcu_p );  // Old version... See SbmCharacter::character_cmd_func
 
 int mcu_character_init( const char* char_name, const char *skel_file, const char *unreal_class, mcuCBHandle *mcu_p );
-int mcu_character_ctrl_cmd( const char* char_name, srArgBuffer& args, mcuCBHandle *mcu_p );
+//int mcu_character_ctrl_cmd( const char* char_name, srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_character_bone_cmd( const char* char_name, srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_character_bone_position_cmd( const char* char_name, srArgBuffer& args, mcuCBHandle *mcu_p );
 
@@ -90,14 +90,14 @@ int mcu_set_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string
 int mcu_print_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string name  );
 
 int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_sched_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+//int mcu_sched_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_motion_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_stepturn_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+//int mcu_stepturn_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+//int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_gaze_limit_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_snod_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
-int mcu_lilt_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+//int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+//int mcu_snod_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+//int mcu_lilt_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_load_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 int mcu_net_func( srArgBuffer& args, mcuCBHandle *mcu_p );
@@ -115,7 +115,7 @@ int mcu_vrKillComponent_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_vrAllCall_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_vrQuery_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 
-int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p );
+//int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 int mcu_wsp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_syncpolicy_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 

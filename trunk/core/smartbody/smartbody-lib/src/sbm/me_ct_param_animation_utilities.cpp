@@ -214,10 +214,10 @@ void PAMotions::initChanId(MeControllerContext* context, std::string baseJointNa
 	SkChannelArray& cChannels = context->channels();
 
 	// base joint
-	baseChanId.x = cChannels.search(SkJointName(baseJointName.c_str()), SkChannel::XPos);
-	baseChanId.y = cChannels.search(SkJointName(baseJointName.c_str()), SkChannel::YPos);
-	baseChanId.z = cChannels.search(SkJointName(baseJointName.c_str()), SkChannel::ZPos);
-	baseChanId.q = cChannels.search(SkJointName(baseJointName.c_str()), SkChannel::Quat);
+	baseChanId.x = cChannels.search(baseJointName.c_str(), SkChannel::XPos);
+	baseChanId.y = cChannels.search(baseJointName.c_str(), SkChannel::YPos);
+	baseChanId.z = cChannels.search(baseJointName.c_str(), SkChannel::ZPos);
+	baseChanId.q = cChannels.search(baseJointName.c_str(), SkChannel::Quat);
 	baseBuffId.x = context->toBufferIndex(baseChanId.x);
 	baseBuffId.y = context->toBufferIndex(baseChanId.y);
 	baseBuffId.z = context->toBufferIndex(baseChanId.z);
@@ -374,10 +374,10 @@ void PAInterpolator::blending(std::vector<double> times, SrBuffer<float>& buff)
 		int chanSize = motionChan.size();
 		for (int i = 0; i < chanSize; i++)
 		{
-			SkJointName chanName = motionChan.name(i);
+			std::string chanName = motionChan.name(i);
 			for (int j = 1; j < numMotions; j++)
 			{
-				int id = motions[indices[j]]->channels().search(chanName, motionChan[i].type);
+				int id = motions[indices[j]]->channels().search(chanName.c_str(), motionChan[i].type);
 				if (id < 0)
 					continue;
 				int buffId = motionContextMaps[indices[0]].get(i);
@@ -866,7 +866,7 @@ void PATransitionManager::bufferBlending(SrBuffer<float>& buffer, SrBuffer<float
 	SkChannelArray& channels = _context->channels();
 	for (int i = 0; i < channels.size(); i++)
 	{
-		std::string chanName = channels.name(i).get_string();
+		std::string chanName = channels.name(i);
 		if (chanName == SbmPawn::WORLD_OFFSET_JOINT_NAME)
 			continue;
 

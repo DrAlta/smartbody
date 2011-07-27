@@ -815,7 +815,7 @@ void ParameterGroup::updateWeight()
 PAStateData* ParameterGroup::getCurrentPAStateData()
 {
 	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
-	SbmCharacter* character = mcuCBHandle::singleton().character_map.lookup(charName.c_str());
+	SbmCharacter* character = mcuCBHandle::singleton().getCharacter(charName);
 	if (!character)
 		return NULL;
 	if (!character->param_animation_ct)
@@ -826,7 +826,7 @@ PAStateData* ParameterGroup::getCurrentPAStateData()
 SbmCharacter* ParameterGroup::getCurrentCharacter()
 {
 	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
-	return mcuCBHandle::singleton().character_map.lookup(charName.c_str());	
+	return mcuCBHandle::singleton().getCharacter(charName);	
 }
 
 PARunTimeEditor::PARunTimeEditor(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h), paWindow(window)
@@ -858,7 +858,7 @@ PARunTimeEditor::~PARunTimeEditor()
 void PARunTimeEditor::update()
 {
 	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
-	SbmCharacter* character = mcuCBHandle::singleton().character_map.lookup(charName.c_str());
+	SbmCharacter* character = mcuCBHandle::singleton().getCharacter(charName);
 	if (!character)
 		return;
 	if (!character->param_animation_ct)
@@ -970,7 +970,7 @@ void PARunTimeEditor::addItem(Fl_Browser* browser, std::string item)
 void PARunTimeEditor::initializeRunTimeEditor()
 {
 	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
-	SbmCharacter* character = mcuCBHandle::singleton().character_map.lookup(charName.c_str());
+	SbmCharacter* character = mcuCBHandle::singleton().getCharacter(charName);
 	if (character)
 	{
 		if (character->param_animation_ct == NULL)

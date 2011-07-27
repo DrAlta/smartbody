@@ -382,19 +382,19 @@ void ChannelBufferWindow::loadMotions(ChannelBufferWindow* window)
 	window->motion->value(0);
 }
 
-void ChannelBufferWindow::loadCharacters(Fl_Choice* character)
+void ChannelBufferWindow::loadCharacters(Fl_Choice* characterChoice)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	character->clear();
-	SbmCharacter* actor = NULL;
-	mcu.character_map.reset();
-	for(int i = 0; i < mcu.character_map.get_num_entries(); ++i)
+	characterChoice->clear();
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
 	{
-		actor = mcu.character_map.next();
-		character->add(actor->name);
+		SbmCharacter* character = (*iter).second;
+		characterChoice->add(character->name);
 	}
 	int ind = 0;
-	character->value(0);
+	characterChoice->value(0);
 }
 
 void ChannelBufferWindow::loadControllers(Fl_Choice* controller, Fl_Choice* character)
@@ -405,7 +405,7 @@ void ChannelBufferWindow::loadControllers(Fl_Choice* controller, Fl_Choice* char
 
 	if(character->mvalue()== NULL) return;
 
-	SbmCharacter* actor = mcu.character_map.lookup(character->mvalue()->label());
+	SbmCharacter* actor = mcu.getCharacter(character->mvalue()->label());
 
 	controller->add("All controllers");
 
@@ -472,7 +472,7 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 	Fl_Choice* character = window->character;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if(character->mvalue()== NULL) return;
-	SbmCharacter* actor = mcu.character_map.lookup(character->mvalue()->label());
+	SbmCharacter* actor = mcu.getCharacter(character->mvalue()->label());
 	SkSkeleton* skeleton = actor->skeleton_p;
 
 	SkChannelArray& channels = skeleton->channels();
@@ -498,7 +498,7 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 		else if(channel.type == SkChannel::ZPos) sprintf(ext, "_z");
 		else ext[0] = '\0';
 
-		sprintf(str, "%s%s (%d)", joint->name().get_string(), ext, channelSize);
+		sprintf(str, "%s%s (%d)", joint->name().c_str(), ext, channelSize);
 		ChannelItem& item = window->Channel_item_list.get(i);
 		item.channel_filtered = false;
 		item.motion_filtered = false;
@@ -506,7 +506,7 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 		item.not_in_search = false;
 		item.index = channel_index;
 		item.label->set(str);
-		item.name->set(joint->name().get_string());
+		item.name->set(joint->name().c_str());
 		item.type = channel.type;
 		channel_index += channelSize;
 	}
@@ -569,7 +569,7 @@ void ChannelBufferWindow::refreshMotionChannels(Fl_Widget* widget, void* data)
 		return;
 	}
 	window->mode = 2;
-	SbmCharacter* actor = mcu.character_map.lookup(window->character->mvalue()->label());
+	SbmCharacter* actor = mcu.getCharacter(window->character->mvalue()->label());
 	std::map<std::string, SkMotion*>::iterator motionIter = mcu.motion_map.find(window->motion->mvalue()->label());
 	if (motionIter != mcu.motion_map.end())
 	{
@@ -584,7 +584,7 @@ void ChannelBufferWindow::refreshMotionChannels(Fl_Widget* widget, void* data)
 		for(int i = 0; i < channels.size(); ++i)
 		{
 			if(channels.joint(i) == NULL) continue;
-			const char* name = channels.joint(i)->name().get_string();
+			const char* name = channels.joint(i)->name().c_str();
 			SkChannel::Type type = channels.get(i).type;
 			for(j = 0; j < window->Channel_item_list.size(); ++j)
 			{
@@ -645,7 +645,7 @@ void ChannelBufferWindow::refreshControllerChannels(Fl_Widget* widget, void* dat
 		return;
 	}
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmCharacter* actor = mcu.character_map.lookup(window->character->mvalue()->label());
+	SbmCharacter* actor = mcu.getCharacter(window->character->mvalue()->label());
 	
 	for(int i = 0; i < window->Channel_item_list.size(); ++i)
 	{
@@ -678,7 +678,7 @@ void ChannelBufferWindow::addMonitoredChannel(Fl_Widget* widget, void* data)
 	SkMotion* motion = NULL;
 	if(window->mode == 2)
 	{
-		SbmCharacter* actor = mcu.character_map.lookup(window->character->mvalue()->label());
+		SbmCharacter* actor = mcu.getCharacter(window->character->mvalue()->label());
 		motionIter = mcu.motion_map.find(window->motion->mvalue()->label());
 		if (motionIter != mcu.motion_map.end())
 		{
@@ -727,7 +727,7 @@ void ChannelBufferWindow::fillSeriesWithMotionData(ChannelBufferWindow* window, 
 	for(index = 0; index < channels.size(); ++index)
 	{
 		if(channels[index].joint == NULL) continue;
-		const char* name = channels[index].joint->name().get_string();
+		const char* name = channels[index].joint->name().c_str();
 		if(strcmp(name, &(item.name->get(0))) == 0 && item.type == channels[index].type)
 		{
 			break;
@@ -842,12 +842,15 @@ void ChannelBufferWindow::update()
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		SbmPawn* pawn_p = NULL;
-		SbmCharacter* actor = mcu.character_map.lookup(character->mvalue()->label());
-		mcu.pawn_map.reset();
-		while(pawn_p = mcu.pawn_map.next())
+		SbmCharacter* actor = mcu.getCharacter(character->mvalue()->label());
+		for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
+			iter != mcu.getPawnMap().end();
+			iter++)
 		{
+			SbmPawn* pawn = (*iter).second;
 			const char* name = getSelectedCharacterName();
-			if( name != NULL && strcmp(pawn_p->name, name) == 0) break;
+			if( name && strcmp(pawn->name, name) == 0)
+				break;
 		}
 		if(pawn_p != NULL)
 		{

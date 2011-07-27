@@ -44,8 +44,8 @@ SrArray<SrQuat>* get_blended_quat_buffer(SrArray<SrQuat>* dest, SrArray<SrQuat>*
 
 int iterate_set(SkJoint* base, int index, int depth, SrArray<SrQuat>* buff, SrArray<int>* index_buff);
 
-void get_frame(SkMotion* walking, SkSkeleton* walking_skeleton, float frame, char* limb_base, MeCtLocomotionJointInfo* joint_info);
-void get_frame(SkMotion* walking, SkSkeleton* walking_skeleton, float frame, char* limb_base, SrArray<SrQuat>* quat_buffer, SrArray<SrQuat>* quat_buffer1, SrArray<SrQuat>* quat_buffer2, SrArray<int>* index_buff);
+void get_frame(SkMotion* walking, SkSkeleton* walking_skeleton, float frame, std::string limb_base, MeCtLocomotionJointInfo* joint_info);
+void get_frame(SkMotion* walking, SkSkeleton* walking_skeleton, float frame, std::string limb_base, SrArray<SrQuat>* quat_buffer, SrArray<SrQuat>* quat_buffer1, SrArray<SrQuat>* quat_buffer2, SrArray<int>* index_buff);
 
 
 #endif // ME_CT_LOCOMOTION_FUNC_HPP

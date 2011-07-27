@@ -35,6 +35,9 @@
 # include <sk/sk_joint_euler.h>
 # include <sk/sk_joint_swing_twist.h>
 
+#include <string>
+#include <vector>
+
 class SrModel;
 class SkSkeleton;
 
@@ -62,11 +65,11 @@ class SkJoint
     SrModel* _visgeo; // the attached geometry to visualize this joint
     SrModel* _colgeo; // the attached geometry used for collision detection
     SkJoint* _parent;
-    SrArray<SkJoint*> _children;
+	std::vector<SkJoint*> _children;
     SrMat _gmat;           // global matrix: from the root to the children of this joint
     SrMat _lmat;           // local matrix: from this joint to its children
     char  _lmat_uptodate;  // true if lmat is up to date
-    SkJointName _name;     // the given name
+	std::string _name;     // the given name
     int   _index;          // its index in SkSkeleton::_joint_table
     int   _coldetid;       // index used in collision detection
     SkSkeleton* _skeleton; // pointer to the associated skeleton
@@ -119,8 +122,8 @@ class SkJoint
     int num_children () const { return _children.size(); }
 
     /*! Set the name of this joint */
-    void name ( SkJointName jn ) { _name=jn; }
-    SkJointName name () const { return _name; }
+	void name ( std::string jn ) { _name=jn; }
+	std::string name () const { return _name; }
 
     /*! Returns the index of this joint in the SkSkeleton list
         of joints */
@@ -194,7 +197,7 @@ class SkJoint
 
     /*! Same as update_gmat(), but it stops the recursive update
         of chidren when joint in the last_joints arrays are reached */
-    void update_gmat ( SrArray<SkJoint*>& end_joints );
+	void update_gmat ( std::vector<SkJoint*>& end_joints );
 
     /*! Updates the local matrix and set the global matrix of this joint
         to be the local matrix multiplied by the parent global matrix */

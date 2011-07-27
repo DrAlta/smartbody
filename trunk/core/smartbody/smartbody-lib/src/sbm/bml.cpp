@@ -1530,7 +1530,7 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 #else
 
 	const SbmCharacter* actor    = request->actor;
-	SbmCharacter* character = mcu->character_map.lookup(actor->name);
+	SbmCharacter* character = mcu->getCharacter(actor->name);
 	if (character)
 		character->schedule_viseme_trapezoid( viseme.c_str(), float(startAt), weight, float(endAt - startAt), float(readyAt - startAt), float(endAt - relaxAt));
 	

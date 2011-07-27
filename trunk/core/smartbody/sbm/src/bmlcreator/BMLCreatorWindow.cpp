@@ -152,9 +152,11 @@ void BMLCreatorWindow::RefreshCharactersCB(Fl_Widget* w, void *data)
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	
-	mcu.character_map.reset();
-	while (SbmCharacter* character = mcu.character_map.next())
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
 	{
+		SbmCharacter* character = (*iter).second;
 		window->_choiceCharacters->add(character->name);
 	}
 }
@@ -209,9 +211,11 @@ void BMLCreatorWindow::ResetBMLCB(Fl_Widget* w, void *data)
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	
-	mcu.character_map.reset();
-	while (SbmCharacter* character = mcu.character_map.next())
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
 	{
+		SbmCharacter* character = (*iter).second;
 		window->_choiceCharacters->add(character->name);
 	}
 }

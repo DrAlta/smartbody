@@ -67,7 +67,7 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 			string::size_type colon_index = object_id.find( ':' );
 			if( colon_index == string::npos ) {
 				// Missing ':' object/bone delimiter, so guess...
-				target = mcu->character_map.lookup( object_id.c_str() );
+				target = mcu->getCharacter( object_id );
 				if( target ) {
 					// Target is a character, look at eyeball
 					bone_id = "eyeball_left";
@@ -79,7 +79,7 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 					}
 				} else {
 					// Target is a pawn, look at world offset
-					target = mcu->pawn_map.lookup( object_id.c_str() );
+					target = mcu->getPawn( object_id );
 					if( target ) {
 						bone_id = SbmPawn::WORLD_OFFSET_JOINT_NAME;
 						if( DEBUG_BML_TARGET )
@@ -102,11 +102,11 @@ const SkJoint* BML::parse_target( const XMLCh* tagname, const XMLCh* attrTarget,
 				object_id.erase( colon_index );
 				if( DEBUG_BML_TARGET )
 					cout << "DEBUG: BML::parse_target(): Gaze:\tobject_id \""<<object_id<<"\",\tbone_id \""<<bone_id<<"\"." <<endl;
-				target = mcu->pawn_map.lookup( object_id.c_str() );
+				target = mcu->getPawn( object_id );
 				if( target==NULL ) {
 
 					// we've failed to find object:bone locally, now query wsp
-					target = mcu->pawn_map.lookup( object_id + ":" + bone_id );
+					target = mcu->getPawn( object_id + ":" + bone_id );
 					if( target )
 					{
 						bone_id = SbmPawn::WORLD_OFFSET_JOINT_NAME;
@@ -169,7 +169,7 @@ const SbmPawn* BML::parse_target_pawn( const XMLCh* tagname, const XMLCh* attrTa
 	// TODO: Revisit the target syntax.
 	// Currently, we use "object_id:bone_id", but this is probably not sufficient
 	// Target is a pawn, look at world offset
-	target = mcu->pawn_map.lookup( object_id.c_str() );
+	target = mcu->getPawn( object_id );
 	if( target ) 
 	{
 		return target;	   

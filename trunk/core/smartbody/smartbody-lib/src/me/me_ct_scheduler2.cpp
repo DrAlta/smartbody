@@ -819,9 +819,9 @@ void MeCtScheduler2::controller_map_updated() {
 			set<int>::const_iterator i = context_logged_channels.begin();
 			for(; i!=context_logged_channels_end; ++i ) {
 				int index = *i;
-				SkJointName name = _context->channels().name(index);
+				std::string name = _context->channels().name(index);
 				SkChannel::Type type = _context->channels().type(index);
-				oss <<'['<<index<<']'<<name.get_string()
+				oss <<'['<<index<<']'<<name.c_str()
 					<<'('<<SkChannel::type_name(type)<<"), ";
 			}
 

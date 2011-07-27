@@ -250,6 +250,7 @@ class mcuCBHandle {
 
 		GeneralParamMap				param_map;			// map that contains the information of shader parameters
 
+		/*
 		srHashMap <MeCtPose>		pose_ctrl_map;
 		srHashMap <MeCtMotion>		motion_ctrl_map;
 		srHashMap <MeCtStepTurn>	stepturn_ctrl_map;
@@ -259,10 +260,27 @@ class mcuCBHandle {
 		srHashMap <MeCtAnkleLilt>	lilt_ctrl_map;
 		srHashMap <MeCtEyeLid>		eyelid_ctrl_map;
 		srHashMap <MeCtScheduler2>	sched_ctrl_map;
+		*/
 		srHashMap <MeController>	controller_map;
 
-		srHashMap <SbmPawn>			pawn_map;
-		srHashMap <SbmCharacter>	character_map;		
+
+
+		std::map<std::string, SbmPawn*>& getPawnMap();
+		bool addPawn(SbmPawn* pawn);
+		void removePawn(std::string name);
+		SbmPawn* getPawn(std::string name);
+		int getNumPawns();
+
+		std::map<std::string, SbmCharacter*>& getCharacterMap();
+		bool addCharacter(SbmCharacter* character);
+		void removeCharacter(std::string name);
+		SbmCharacter* getCharacter(std::string name);
+		int getNumCharacters();
+
+protected:
+		std::map<std::string, SbmPawn*>	pawn_map;
+		std::map<std::string, SbmCharacter*> character_map;
+public:
 
 		BML_PROCESSOR				bml_processor;
 
@@ -421,8 +439,6 @@ class mcuCBHandle {
 		srCmdSeq* lookup_seq( const char* );
 
 		SkMotion* lookUpMotion(const char* motionName);
-
-		SbmCharacter* lookUpCharacter(const char* charName);
 
 		PAStateData* lookUpPAState(std::string stateName);
 

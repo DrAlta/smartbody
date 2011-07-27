@@ -357,9 +357,9 @@ void MeCtSaccade::initSaccade(MeFrameData& frame)
 
 	if (!_initialized)
 	{
-		int idL = _context->channels().search(SkJointName(eyeballL), SkChannel::Quat);
+		int idL = _context->channels().search(eyeballL, SkChannel::Quat);
 		_idL = frame.toBufferIndex(idL);
-		int idR = _context->channels().search(SkJointName(eyeballR), SkChannel::Quat);
+		int idR = _context->channels().search(eyeballR, SkChannel::Quat);
 		_idR = frame.toBufferIndex(idR);
 		if (_idL < 0 || _idR < 0)
 			LOG("MeCtSaccade::initBufferIndex ERR: channel id not correct!");

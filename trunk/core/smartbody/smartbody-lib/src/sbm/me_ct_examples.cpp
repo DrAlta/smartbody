@@ -56,7 +56,7 @@ void MeCtHeadOrient::init( SbmPawn* pawn )	{
 	int i;
 	
 	for( i = 0; i < 3; i++ )	{
-		_channels.add( SkJointName( joint_labels[ i ] ), SkChannel::Quat );
+		_channels.add( joint_labels[ i ], SkChannel::Quat );
 	}
 
 	MeController::init(pawn);
@@ -164,7 +164,7 @@ void MeCtSimpleTilt::init( SbmPawn* pawn )	{
 	int i;
 
 	for( i = 0; i < 3; i++ )	{
-		_channels.add( SkJointName( joint_labels[ i ] ), SkChannel::Quat );
+		_channels.add( joint_labels[ i ], SkChannel::Quat );
 	}
 
 	MeController::init(pawn);
@@ -269,7 +269,7 @@ void MeCtSimpleNod::init( SbmPawn* pawn )	{
 	int i;
 	
 	for( i = 0; i < 3; i++ )	{
-		_channels.add( SkJointName( joint_labels[ i ] ), SkChannel::Quat );
+		_channels.add( joint_labels[ i ], SkChannel::Quat );
 	}
 
 	_first_eval = true;

@@ -229,9 +229,9 @@ void MeController::remap() {
 	SkChannelArray& contextChnls = _context->channels();
 
 	for( int i=0; i<size; ++i ) {
-		SkJointName name = localChnls.name( i );
+		std::string name = localChnls.name( i );
 		SkChannel::Type type = localChnls.type( i );
-		_toContextCh[i] = contextChnls.search( name, type );
+		_toContextCh[i] = contextChnls.search( name.c_str(), type );
 
 		int parent_index = _toContextCh[i];
 		if( parent_index >= 0 ) {
@@ -239,7 +239,7 @@ void MeController::remap() {
 			// WARN for invalid parent context buffer indices
 			if( _context->toBufferIndex( parent_index ) < 0 ) {
 				const char* parent_ch_type = SkChannel::type_name( _context->channels().type( parent_index ) );
-				const char* parent_ch_name = (const char*)(_context->channels().name( parent_index ));
+				const char* parent_ch_name = _context->channels().name( parent_index ).c_str();
 				std::stringstream strstr;
 				strstr << "WARNING: MeController::remap(): "<<controller_type()<<" \""<<this->name()<<"\": "
 					<<_context->context_type()<<" channel "<<parent_index<<", \""<<parent_ch_name<<"\" ("<<parent_ch_type<<") lacks valid buffer index!!";
@@ -288,7 +288,7 @@ void MeController::dumpChannelMap()
 
 	SkChannelArray& contextChnls = _context->channels();
 	for( int i=0; i<size; ++i ) {
-		SkJointName name = localChnls.name( i );
+		std::string name = localChnls.name( i );
 		SkChannel::Type type = localChnls.type( i );
 		//_toContextCh[i] = contextChnls.search( name, type );
 
@@ -298,7 +298,7 @@ void MeController::dumpChannelMap()
 			// WARN for invalid parent context buffer indices
 			if( _context->toBufferIndex( parent_index ) < 0 ) {
 				const char* parent_ch_type = SkChannel::type_name( _context->channels().type( parent_index ) );
-				const char* parent_ch_name = (const char*)(_context->channels().name( parent_index ));
+				const char* parent_ch_name = _context->channels().name( parent_index ).c_str();
 				std::stringstream strstr;
 				strstr << "WARNING: MeController::remap(): "<<controller_type()<<" \""<<this->name()<<"\": "
 					<<_context->context_type()<<" channel "<<parent_index<<", \""<<parent_ch_name<<"\" ("<<parent_ch_type<<") lacks valid buffer index!!";
@@ -307,9 +307,9 @@ void MeController::dumpChannelMap()
 #endif
 
 			// Get a reference to the channel to inspect via debugger
-			const char*     local_ch_name = name.get_string();
+			const char*     local_ch_name = name.c_str();
 			SkChannel::Type parent_ch_type = _context->channels().type( parent_index );
-			const char*     parent_ch_name = (const char*)(_context->channels().name( parent_index ));
+			const char*     parent_ch_name = _context->channels().name( parent_index ).c_str();
 
 			// Print it out...
 			LOG("L# %d \t-> P#%d\t\t%s (%s)", i, parent_index, local_ch_name, SkChannel::type_name(type));
@@ -443,10 +443,10 @@ bool MeController::print_bvh_hierarchy( SkJoint* joint_p, int depth )	{
 	
 	print_tabs( depth );
 	if( depth == 0 )	{
-		*_record_output << "ROOT " << joint_p->name() << "\n";
+		*_record_output << "ROOT " << joint_p->name().c_str() << "\n";
 	}
 	else	{
-		*_record_output << "JOINT " << joint_p->name() << "\n";
+		*_record_output << "JOINT " << joint_p->name().c_str() << "\n";
 	}
 
 	print_tabs( depth );

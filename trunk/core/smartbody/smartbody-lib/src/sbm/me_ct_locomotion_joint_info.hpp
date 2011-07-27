@@ -36,7 +36,7 @@ struct MeCtLocomotionJointInfo
 {
 	int joint_num;
 	bool joints_indexed;
-	SrArray<const char*> joint_name;
+	std::vector<std::string> joint_name;
 	SrArray<int> buff_index;
 	SrArray<int> joint_index;
 	SrArray<int> quat_valid;
@@ -54,15 +54,16 @@ struct MeCtLocomotionJointInfo
 		joints_indexed = false;
 	}
 
-	int iterate(SkJoint* joint, SrArray<char*>* limb_joint_name)
+	int iterate(SkJoint* joint, std::vector<std::string>* limb_joint_name)
 	{
 		int sum = 0;
-		const char* name = joint->name().get_string();
+		std::string name = joint->name();
 		if(limb_joint_name != NULL)
 		{
-			for(int i = 0; i < limb_joint_name->size(); ++i)
+			for(size_t i = 0; i < limb_joint_name->size(); ++i)
 			{
-				if(strcmp(limb_joint_name->get(i), name) == 0) return 0;
+				if ((*limb_joint_name)[i] == name)
+					return 0;
 			}
 		}
 		if(joint->quat()->active() == true)
@@ -74,7 +75,7 @@ struct MeCtLocomotionJointInfo
 			quat_valid.push() = 0;
 		}
 
-		joint_name.push() = name;
+		joint_name.push_back(name);
 		joint_index.push() = joint->index();
 		sum = 1;
 
@@ -86,11 +87,11 @@ struct MeCtLocomotionJointInfo
 		return sum;
 	}
 
-	void Init(SkSkeleton* skeleton, const char* base_name, SrArray<char*>* limb_joint_name)
+	void Init(SkSkeleton* skeleton, std::string base_name, std::vector<std::string>* limb_joint_name)
 	{
-		joint_name.capacity(0);
+		joint_name.resize(0);
 		joint_index.capacity(0);
-		SkJoint* tjoint = skeleton->search_joint(base_name);
+		SkJoint* tjoint = skeleton->search_joint(base_name.c_str());
 		joint_num = iterate(tjoint, limb_joint_name);
 		quat.capacity(joint_num);
 		quat.size(joint_num);
@@ -107,13 +108,14 @@ struct MeCtLocomotionJointInfo
 		joints_indexed = false;
 	}
 
-	int get_index_by_name(const char* name)
+	int get_index_by_name(std::string name)
 	{
-		for(int i = 0; i < joint_name.size(); ++i)
+		for(size_t i = 0; i < joint_name.size(); ++i)
 		{
-			if(strcmp(joint_name.get(i), name) == 0) return i;
+			if (joint_name[i] == name)
+				 return i;
 		}
-		printf("Error: joint: '%s' not found.", name);
+		LOG("Error: joint: '%s' not found.", name);
 		return -1;
 	}
 };

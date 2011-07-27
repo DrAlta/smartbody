@@ -146,7 +146,7 @@ void MeCtGazeJoint::capture_joint_state( void ) {
 			parent_rot = M.quat( gwiz::COMP_M_TR );
 		}
 		else	{
-			const char *name = joint_p->name();
+			const char *name = joint_p->name().c_str();
 			LOG( "MeCtGazeJoint::capture_joint_state ERR: parent of joint '%s' not found\n", name );
 		}
 	}

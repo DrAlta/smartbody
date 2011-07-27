@@ -41,7 +41,7 @@ SkJoint::SkJoint ( SkSkeleton* sk, SkJoint* parent, RotType rtype, int i )
    _parent = parent;
 
    _lmat_uptodate = 0;
-   _name = 0;
+   _name = "";
    _index = i;
    _skeleton = sk;
 
@@ -55,7 +55,7 @@ SkJoint::SkJoint ( SkSkeleton* sk, SkJoint* parent, RotType rtype, int i )
 
    // TODO: verify we are a parent/ancestor of the parent
    if( parent )
-	   parent->_children.push() = this;
+	   parent->_children.push_back(this);
  }
 
 SkJoint::~SkJoint()
@@ -175,13 +175,12 @@ void SkJoint::update_gmat ()
 
    _gmat.mult ( _lmat, pmat );
 
-   int i;
-   for ( i=0; i<_children.size(); i++ )
+   for (size_t i=0; i<_children.size(); i++ )
     { _children[i]->update_gmat();
     }
  }
 
-void SkJoint::update_gmat ( SrArray<SkJoint*>& end_joints )
+void SkJoint::update_gmat ( std::vector<SkJoint*>& end_joints )
  {
    const SrMat& pmat = _parent? _parent->_gmat : SrMat::id;
 
@@ -189,12 +188,10 @@ void SkJoint::update_gmat ( SrArray<SkJoint*>& end_joints )
 
    _gmat.mult ( _lmat, pmat );
 
-   int i;
-
-   for ( i=0; i<end_joints.size(); i++ )
+   for (size_t i=0; i<end_joints.size(); i++ )
     if ( this==end_joints[i] ) return;
 
-   for ( i=0; i<_children.size(); i++ )
+   for (size_t i=0; i<_children.size(); i++ )
     { _children[i]->update_gmat(end_joints);
     }
  }

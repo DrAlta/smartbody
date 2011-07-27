@@ -250,18 +250,22 @@ void ResourceWindow::updateGUI()
 
 	// update pawn objects
 	SbmPawn* pawn_p = NULL;
-	mcu.pawn_map.reset();
 	resourceTree->clear_children(treeItemList[ITEM_PAWN]);
-	while( pawn_p = mcu.pawn_map.next() )	{
-		updatePawn(treeItemList[ITEM_PAWN],pawn_p);
+	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
+		iter != mcu.getPawnMap().end();
+		iter++)
+	{
+		SbmPawn* pawn = (*iter).second;
+		updatePawn(treeItemList[ITEM_PAWN], pawn);
 	}
 
 	// update characters
-	SbmCharacter* character = NULL;
-	mcu.character_map.reset();	
 	resourceTree->clear_children(treeItemList[ITEM_CHARACTER]);
-	while( character = mcu.character_map.next() )
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
 	{
+		SbmCharacter* character = (*iter).second;
 		resourceTree->sortorder(FL_TREE_SORT_ASCENDING);	
 		updateCharacter(treeItemList[ITEM_CHARACTER],character);
 	}			
@@ -537,7 +541,7 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 	}
 	else if (itemType == ITEM_CHARACTER)
 	{
-		SbmCharacter* curChar = mcuCBHandle::singleton().lookUpCharacter(treeItem->label());
+		SbmCharacter* curChar = mcuCBHandle::singleton().getCharacter(treeItem->label());
 		if (curChar)
 			widget = new AttributeItemWidget(curChar,x,y,w,h,name,treeItem,itemType,this);
 		else
@@ -561,7 +565,7 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 	}
 	else if (itemType == ITEM_CONTROLLER)
 	{
-		SbmCharacter* curChar = mcuCBHandle::singleton().lookUpCharacter(treeItem->parent()->label()); // a controller's parent is its character name
+		SbmCharacter* curChar = mcuCBHandle::singleton().getCharacter(treeItem->parent()->label()); // a controller's parent is its character name
 		MeController* ctrl = NULL;
 		if (curChar)
 		{			

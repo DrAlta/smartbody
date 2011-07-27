@@ -1031,7 +1031,7 @@ int BML::Processor::vrAgentBML_cmd_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 	Processor& bp = mcu->bml_processor;
 
 	const char   *character_id     = args.read_token();
-	SbmCharacter *character        = mcu->character_map.lookup( character_id );
+	SbmCharacter *character        = mcu->getCharacter( character_id );
 	if( character == NULL ) {
 		//  Character is not managed by this SBM process
 		if( bp.warn_unknown_agents )
@@ -1181,7 +1181,7 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 			}
 		}
 
-		SbmCharacter *agent = mcu->character_map.lookup( agent_id );
+		SbmCharacter *agent = mcu->getCharacter( agent_id );
 		if( agent==NULL ) {
 			//  Agent is not managed by this SBM process
 			if( bp.warn_unknown_agents )
@@ -1246,7 +1246,7 @@ int BML::Processor::vrSpoke_func( srArgBuffer& args, mcuCBHandle *mcu )	{
 	try {
 		//cout << "DEBUG: vrSpoke " << agent_id << " " << recipientId << " " << message_id << endl;
 
-		SbmCharacter *agent = mcu->character_map.lookup( agent_id );
+		SbmCharacter *agent = mcu->getCharacter( agent_id );
 		if( agent==NULL ) {
 			// Ignore unknown agent.  Probably managed by other SBM process.
 			return CMD_SUCCESS;
@@ -1285,7 +1285,7 @@ int BML::Processor::bp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 	} else if( command == "speech_ready" ) {
 		// bp speech_ready <CharacterId> <RequestId> SUCCESS/ERROR reason
 		char* actorId = args.read_token();
-		SbmCharacter* actor = mcu->character_map.lookup( actorId );
+		SbmCharacter* actor = mcu->getCharacter( actorId );
 		if( actor==NULL ) {
 			std::stringstream strstr;
 			strstr << "WARNING: BML::Processor::bp_cmd_func(): Unknown actor \"" << actorId << "\".  This is probably an error since the command \"bp speech_reply\" is not supposed to be sent over the network, thus it should not be coming from another SBM process." << endl;
@@ -1306,7 +1306,7 @@ int BML::Processor::bp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu ) {
 			return CMD_FAILURE;
 		}
 
-		SbmCharacter* actor = mcu->character_map.lookup( actor_id.c_str() );
+		SbmCharacter* actor = mcu->getCharacter( actor_id );
 		if( actor==NULL ) {
 			// Unknown actor.  ignore and 
 			cout << "WARNING: bp interrupt: Unknown actor \""<<actor_id<<"\"." << endl;

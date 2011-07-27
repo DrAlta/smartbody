@@ -24,6 +24,7 @@
 # ifndef SK_JOINT_NAME_H
 # define SK_JOINT_NAME_H
 
+#if 0
 # include <sr/sr_hash_table.h>
 
 /*! SkJointName contains only one integer id, which is the id of
@@ -85,4 +86,5 @@ class SkJointName
 
 //==================================== End of File ===========================================
 
+#endif
 # endif  // SK_JOINT_NAME_H

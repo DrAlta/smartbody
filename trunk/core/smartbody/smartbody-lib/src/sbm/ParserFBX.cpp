@@ -87,7 +87,7 @@ bool ParserFBX::parseSkin(const std::string& fileName, const char* char_name, fl
    KFbxNode* pRootNode = pScene->GetRootNode();
    if(pRootNode) 
    {
-       SbmCharacter* char_p = mcu_p->character_map.lookup( char_name );
+       SbmCharacter* char_p = mcu_p->getCharacter(char_name );
        std::vector<SrModel*> meshModelVec;
        for (int i = 0; i < pRootNode->GetChildCount(); i++)
        {

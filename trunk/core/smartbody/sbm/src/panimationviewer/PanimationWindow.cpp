@@ -130,7 +130,7 @@ void PanimationWindow::update_viewer()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::string charName = characterList->menu()[characterList->value()].label();
-	SbmCharacter* character = mcu.character_map.lookup(charName.c_str());
+	SbmCharacter* character = mcu.getCharacter(charName);
 	if (!character)
 		return;
 
@@ -347,10 +347,13 @@ void PanimationWindow::changeMotionPlayerMode(Fl_Widget* widget, void* data)
 void PanimationWindow::loadCharacters(Fl_Choice* characterList)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmCharacter* char_p;
-	mcu.character_map.reset();
-	while(char_p = mcu.character_map.next())
-		characterList->add(char_p->name);
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
+	{
+		SbmCharacter* character = (*iter).second;
+		characterList->add(character->name);
+	}
 	characterList->value(0);
 }
 

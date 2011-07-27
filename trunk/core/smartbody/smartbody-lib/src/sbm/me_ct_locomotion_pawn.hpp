@@ -62,7 +62,7 @@ public: // constants
 
 public:
 
-	SrString translation_joint_name;
+	std::string translation_joint_name;
 	float translation_joint_height;
 	SrArray<MeCtLocomotionAnimGlobalInfo*> anim_global_info;
 
@@ -83,7 +83,7 @@ protected:
 
 	MeCtLocomotionJointInfo nonlimb_joint_info;
 
-	char* base_name;
+	std::string base_name;
 
 	//temp, to be deleted=================
 public:
@@ -109,9 +109,9 @@ public:
 
 	SrArray<MeCtLocomotionLimb*>* get_limb_list();
 
-	void set_translation_joint_name(const char* name);
+	void set_translation_joint_name(std::string name);
 
-	void set_base_name(const char* name);
+	void set_base_name(std::string name);
 
 	MeCtLocomotionSpeedAccelerator* get_speed_accelerator();
 

@@ -59,7 +59,7 @@ bool SkBlendCfg::valid ()
 	for (unsigned int i=0;i<_cman->colJoints.size();i++)
 	{
 		CollisionJoint& colJ = _cman->colJoints[i];
-		SkJoint* moJoint = _cman->motionParameter->getMotionFrameJoint(blendPose,colJ.joint->name().get_string());
+		SkJoint* moJoint = _cman->motionParameter->getMotionFrameJoint(blendPose,colJ.joint->name().c_str());
 		colJ.colGeo->updateGlobalTransform(moJoint->gmat());
 		for (unsigned int j=0;j<_cman->colObstacles.size();j++)
 		{

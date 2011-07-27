@@ -86,25 +86,24 @@ SrArray<MeCtLocomotionAnimGlobalInfo*>* MeCtLocomotionPawn::get_anim_global_info
 
 void MeCtLocomotionPawn::init_nonlimb_joint_info()
 {
-	SrArray<char*> limb_base_name;
-	limb_base_name.capacity(limb_list.size());
-	limb_base_name.size(limb_list.size());
+	std::vector<std::string> limb_base_name;
+	limb_base_name.resize(limb_list.size());
 	for(int i = 0; i < limb_list.size(); ++i)
 	{
-		limb_base_name.set(i, limb_list.get(i)->get_limb_base_name());
+		limb_base_name[i] = limb_list.get(i)->get_limb_base_name();
 	}
-	const char* base_name = walking_skeleton->root()->name().get_string();
-	nonlimb_joint_info.Init(walking_skeleton, base_name, &limb_base_name);
+	std::string base_name = walking_skeleton->root()->name();
+	nonlimb_joint_info.Init(walking_skeleton, base_name.c_str(), &limb_base_name);
 	SkJoint* joint = NULL;
 	int index = -1;
 	for(int i = 0; i < limb_list.size(); ++i)
 	{
-		joint = walking_skeleton->search_joint(limb_list.get(i)->get_limb_base_name());
+		joint = walking_skeleton->search_joint(limb_list.get(i)->get_limb_base_name().c_str());
 		while(true)
 		{
 			joint = joint->parent();
 			if(joint == NULL) break;
-			index = nonlimb_joint_info.get_index_by_name(joint->name().get_string());
+			index = nonlimb_joint_info.get_index_by_name(joint->name().c_str());
 			nonlimb_joint_info.mat_valid.set(index, 1);
 		}
 	}
@@ -115,17 +114,15 @@ SrArray<MeCtLocomotionLimb*>* MeCtLocomotionPawn::get_limb_list()
 	return &limb_list;
 }
 
-void MeCtLocomotionPawn::set_translation_joint_name(const char* name)
+void MeCtLocomotionPawn::set_translation_joint_name(std::string name)
 {
-	translation_joint_name.set(name);
+	translation_joint_name = name;
 	navigator.set_translation_joint_name(translation_joint_name);
 }
 
-void MeCtLocomotionPawn::set_base_name(const char* name)
+void MeCtLocomotionPawn::set_base_name(std::string name)
 {
-	if(base_name != NULL) free(base_name);
-	base_name = (char*)malloc(sizeof(char)*(strlen(name)+1));
-	strcpy(base_name, name);
+	base_name = name;
 }
 
 MeCtLocomotionSpeedAccelerator* MeCtLocomotionPawn::get_speed_accelerator()

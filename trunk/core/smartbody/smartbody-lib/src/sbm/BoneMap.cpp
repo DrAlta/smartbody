@@ -31,8 +31,8 @@ void BoneMap::apply(SkSkeleton* skeleton)
 	if (!skeleton)
 		return;
 	
-	SrArray<SkJoint*> joints = skeleton->joints();
-	for (int j = 0; j < joints.size(); j++)
+	std::vector<SkJoint*> joints = skeleton->joints();
+	for (size_t j = 0; j < joints.size(); j++)
 	{
 		for (std::vector<std::pair<std::string, std::string> >::iterator iter = map.begin();
 			 iter != map.end();
@@ -42,7 +42,7 @@ void BoneMap::apply(SkSkeleton* skeleton)
 			std::string to = (*iter).second;
 			if (joints[j]->name() == from.c_str())
 			{
-				joints[j]->name(SkJointName(to.c_str()));
+				joints[j]->name(to);
 			}
 		}
 	}

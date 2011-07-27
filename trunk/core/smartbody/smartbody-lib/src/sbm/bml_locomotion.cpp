@@ -131,7 +131,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));
 	}
 	std::stringstream command;
-	SbmCharacter* c = mcu->character_map.lookup(request->actor->name);
+	SbmCharacter* c = mcu->getCharacter(request->actor->name);
 
 	c->steeringAgent->steppingMode = false;
 	bool stepMode = false;
@@ -192,7 +192,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		mcu->execute_seq(seq);
 	}
 	std::string following = xml_parse_string(BMLDefs::ATTR_FOLLOW, elem);
-	SbmCharacter* followingC = mcu->character_map.lookup(following.c_str());
+	SbmCharacter* followingC = mcu->getCharacter(following);
 	c->steeringAgent->setTargetAgent(followingC);
 	float* targetFloat = new float[2];
 	int targetParsing = xml_parse_float(targetFloat, 2, BMLDefs::ATTR_TARGET, elem);
@@ -220,7 +220,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		}
 		else
 		{
-			SbmPawn* pawn = mcu->pawn_map.lookup(targetString.c_str());
+			SbmPawn* pawn = mcu->getPawn(targetString);
 			if (pawn)
 			{
 				// get the world offset x & z
@@ -394,7 +394,7 @@ BehaviorRequestPtr BML::parse_bml_example_locomotion( DOMElement* elem, const st
 	std::string localId;
 	if (id)
 		localId = XMLString::transcode(id);
-	SbmCharacter* c = mcu->character_map.lookup(request->actor->name);
+	SbmCharacter* c = mcu->getCharacter(request->actor->name);
 	if (!c->param_animation_ct)
 	{
 		LOG("Parameterized Animation not enabled!");

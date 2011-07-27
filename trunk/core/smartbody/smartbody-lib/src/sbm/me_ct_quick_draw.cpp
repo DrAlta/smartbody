@@ -160,7 +160,7 @@ void MeCtQuickDraw::init( SbmPawn* pawn, SkMotion* mot_p, SkMotion* mot2_p ) {
 
 		// ASSUME right handed draw
 		_arm_chan_indices[ i ] = 
-			_gundraw_motion->channels().search( SkJointName( r_arm_labels[ i ] ), SkChannel::Quat );
+			_gundraw_motion->channels().search( r_arm_labels[ i ] , SkChannel::Quat );
 		
 		quat_t joint_rot = get_final_joint_rot( _gundraw_motion, r_arm_labels[ i ] );
 		l_final_hand_in_body_rot = l_final_hand_in_body_rot * joint_rot;
@@ -278,7 +278,7 @@ quat_t MeCtQuickDraw::get_final_joint_rot( SkMotion* mot_p, char *joint_name )	{
 		float * final_p = mot_p->posture( mot_p->frames() - 1 );
 		SkChannelArray& mchan_arr = mot_p->channels();
 
-		int i = mchan_arr.float_position( mchan_arr.search( SkJointName( joint_name ), SkChannel::Quat ) );
+		int i = mchan_arr.float_position( mchan_arr.search(joint_name, SkChannel::Quat ) );
 		q = quat_t( final_p[ i ], final_p[ i + 1 ], final_p[ i + 2 ], final_p[ i + 3 ] );
 	}
 	return( q );
@@ -323,7 +323,7 @@ MeCtQuickDraw::joint_state_t MeCtQuickDraw::capture_joint_state( SkJoint *joint_
 			state.parent_rot = M.quat( COMP_M_TR );
 		}
 		else	{
-			const char *name = joint_p->name();
+			const char *name = joint_p->name().c_str();
 			LOG( "MeCtQuickDraw::capture_joint_state ERR: parent of joint '%s' not found\n", name );
 		}
 	}

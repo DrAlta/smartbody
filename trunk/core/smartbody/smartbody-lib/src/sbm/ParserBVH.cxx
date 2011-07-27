@@ -121,7 +121,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 						SkJoint* root = skeleton.add_joint(SkJoint::TypeQuat);
 						root->quat()->activate();
 						jointCounter++;
-						root->name(SkJointName(strstr.str().c_str()));
+						root->name(strstr.str());
 						//skeleton.make_active_channels();
 						cur = root;
 						state = 2;
@@ -298,7 +298,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 						SkJoint* joint = skeleton.add_joint(SkJoint::TypeQuat, parent->index());
 						joint->quat()->activate();
 						jointCounter++;
-						joint->name(SkJointName(trimmedname.c_str()));
+						joint->name(trimmedname);
 						skeleton.make_active_channels();
 						cur = joint;
 						//cout << "Found joint " << str << endl;
@@ -429,8 +429,8 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					state = 11;
 
 					// set up the bvhIndex map
-					const SrArray<SkJoint*>& allJoints = skeleton.joints();
-					for (int j = 0; j < allJoints.size(); j++)
+					const std::vector<SkJoint*>& allJoints = skeleton.joints();
+					for (size_t j = 0; j < allJoints.size(); j++)
 					{
 						ChannelInfo* channelInfo = channelInfoMap[j];
 						for (int n = 0; n < channelInfo->numBVHChannels; n++)
@@ -440,20 +440,23 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					//skChannels.compress();
 					postureSize = skChannels.floats();
 
+					/*
 					for (int m = 0; m < motionChannels.size(); m++)
 					{
-						SkJointName name = motionChannels.name(m);
-						std::string n = name.get_string();
+						std::string name = motionChannels.name(m);
+						std::string n = name;
 						int y = 0;
 					}
+					*/
 					motion.init(motionChannels);
 
-					for (int m = 0; m < motion.channels().size(); m++)
+					/*for (int m = 0; m < motion.channels().size(); m++)
 					{
-						SkJointName name = motion.channels().name(m);
-						std::string n = name.get_string();
+						std::string name = motion.channels().name(m);
+						std::string n = name;
 						int y = 0;
 					}
+					*/
 				}
 				else
 				{

@@ -24,7 +24,7 @@ SkJoint* MotionParameter::getMotionFrameJoint( const BodyMotionFrame& frame, con
 		SkJoint* joint = affectedJoints[i];				
 		joint->quat()->value(frame.jointQuat[i]);
 		joint->update_lmat();
-		if (strcmp(joint->name().get_string(),jointName) == 0)
+		if (strcmp(joint->name().c_str(),jointName) == 0)
 			outJoint = joint;
 	}			
 	skeletonRef->invalidate_global_matrices();
@@ -46,12 +46,12 @@ ReachMotionParameter::~ReachMotionParameter()
 void ReachMotionParameter::getPoseParameter( const BodyMotionFrame& frame, dVector& outPara )
 {
 	// set root 		
-	SkJoint* rJoint = getMotionFrameJoint(frame,reachJoint->name().get_string());	
+	SkJoint* rJoint = getMotionFrameJoint(frame,reachJoint->name().c_str());	
 	rJoint->update_lmat();
 	rJoint->update_gmat_up();
 	skeletonRef->update_global_matrices();
 	//printf("reach joint name = %s\n",reachJoint->name().get_string());
-	SrMat ginv = skeletonRef->search_joint(rootJoint->name())->gmat().inverse();
+	SrMat ginv = skeletonRef->search_joint(rootJoint->name().c_str())->gmat().inverse();
 	SrVec endPos = rJoint->gmat().get_translation()*ginv;
 	outPara.resize(3);
 	for (int i=0;i<3;i++)

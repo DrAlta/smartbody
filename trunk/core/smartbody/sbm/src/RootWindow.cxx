@@ -142,14 +142,16 @@ BaseWindow::~BaseWindow() {
 
 SbmCharacter* BaseWindow::getSelectedCharacter()
 {
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	LocomotionData* locoData = fltkViewer->getLocomotionData();
 	int charIndex = locoData->char_index;
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.character_map.reset();
 	int index = 0;
-	while (SbmCharacter* character = mcu.character_map.next())
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
 	{
+		SbmCharacter* character = (*iter).second;
 		if (index == charIndex)
 			return character;
 		index++;
@@ -356,7 +358,6 @@ void BaseWindow::FaceCameraCB(Fl_Widget* widget, void* data)
 	// position the camera such that the character's face appears in the frame
 	SrBox faceBox;
 	SrCamera* camera = mcu.viewer_p->get_camera();
-	mcu.pawn_map.reset();
 
 	SkSkeleton* skeleton = character->skeleton_p;
 	float height = skeleton->getCurrentHeight();
@@ -748,9 +749,11 @@ void BaseWindow::SettingsSofteyesToggleCB(Fl_Widget* w, void* data)
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	bool currentSetting = true;
-	mcu.character_map.reset();
-	while (SbmCharacter* character = mcu.character_map.next())
+	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+		iter != mcu.getCharacterMap().end();
+		iter++)
 	{
+		SbmCharacter* character = (*iter).second;
 		currentSetting = character->isSoftEyes();
 	}
 }

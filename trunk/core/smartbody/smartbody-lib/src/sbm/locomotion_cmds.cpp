@@ -102,18 +102,18 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 	SbmCharacter* actor = NULL;
 	if(arg == "status")
 	{
-		mcu_p->character_map.reset();
-		for(int i = 0; i < mcu_p->character_map.get_num_entries(); ++i)
+		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
+			iter != mcu_p->getCharacterMap().end();
+			iter++)
 		{
-			actor = mcu_p->character_map.next();
-			actor->get_locomotion_ct()->print_info(actor->name);
+			(*iter).second->get_locomotion_ct()->print_info(actor->name);
 		}
 		return CMD_SUCCESS;
 	}
 	
 	if( arg=="character" || arg=="char" ) {
 		string name = args.read_token();
-		actor = mcu_p->character_map.lookup( name );
+		actor = mcu_p->getCharacter( name );
 		if( actor == NULL ) {
 			LOG("ERROR: Could not find character \"%s\".", name.c_str());
 			return CMD_FAILURE;
@@ -125,7 +125,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			LOG("ERROR: No character specified, and no default set.");
 			return CMD_FAILURE;
 		}
-		actor = mcu_p->character_map.lookup( mcu_p->test_character_default );
+		actor = mcu_p->getCharacter( mcu_p->test_character_default );
 		if( actor == NULL ) {
 			LOG("ERROR: Could not find default character \"%s\".", mcu_p->test_character_default.c_str());
 			return CMD_FAILURE;

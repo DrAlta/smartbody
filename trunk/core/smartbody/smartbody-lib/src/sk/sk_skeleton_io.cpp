@@ -401,9 +401,9 @@ SkJoint* SkSkeleton::_loadj ( SrInput& in, SkJoint* p, SrStringArray& paths, boo
     }
     
    j = new SkJoint ( this, p, SkJoint::TypeQuat, _joints.size() );
-   _joints.push() = j;
+   _joints.push_back(j);
 
-   j->name ( SkJointName(name) );
+   j->name ( (const char*) name );
 
    int kw=0;
    while ( kw>=0 )
@@ -429,9 +429,9 @@ bool SkSkeleton::load ( SrInput& in, double skScale, const char* basedir )
  {
    SrString path;
    SrPathArray paths;
-   SrStringArray coldet_pairs;
+   std::vector<std::string> coldet_pairs;
    SrStringArray distrib_joints;
-   SrArray<SrArray<float>*> distrib;
+   std::vector<SrArray<float>*> distrib;
    SrInput::TokenType type;
    float scale=1.0f;
    bool scale_offsets=false;
@@ -486,7 +486,7 @@ bool SkSkeleton::load ( SrInput& in, double skScale, const char* basedir )
        }
       else if ( s=="set_collision_free_pairs" )
        { while ( in.get_token()==SrInput::Name )
-          coldet_pairs.push ( in.last_token() );
+          coldet_pairs.push_back( (const char*) in.last_token() );
        }
       else if ( s=="add_posture" )
        { if ( _channels->size()==0 ) make_active_channels ();
@@ -514,7 +514,7 @@ bool SkSkeleton::load ( SrInput& in, double skScale, const char* basedir )
        }
     }
 
-   int i, d;
+   int d;
    float val;
    SkJoint* j;
    SkJoint* j1;
@@ -522,11 +522,11 @@ bool SkSkeleton::load ( SrInput& in, double skScale, const char* basedir )
 
    // check scalings
 //   if ( scale_offsets )
-    for ( i=0; i<_joints.size(); i++ )
+   for (size_t i=0; i<_joints.size(); i++ )
      _joints[i]->_offset *= scale;
 
    if ( scale_limits )
-    { for ( i=0; i<_joints.size(); i++ )
+    { for (size_t i=0; i<_joints.size(); i++ )
        { j = _joints[i];
          for ( d=0; d<3; d++ )
           { if ( j->pos()->frozen(d) ) continue;
@@ -553,12 +553,12 @@ bool SkSkeleton::load ( SrInput& in, double skScale, const char* basedir )
     }*/
 
    // transform coldet pair names to joint pointers
-   for ( i=0; i<coldet_pairs.size(); i+=2 )
-    { j1 = search_joint ( coldet_pairs[i] );
-      j2 = search_joint ( coldet_pairs[i+1] );
+    for (size_t i=0; i<coldet_pairs.size(); i+=2 )
+    { j1 = search_joint ( coldet_pairs[i].c_str() );
+      j2 = search_joint ( coldet_pairs[i+1].c_str() );
       if ( j1 && j2 )
-       { _coldet_free_pairs.push() = j1;
-         _coldet_free_pairs.push() = j2;
+       { _coldet_free_pairs.push_back(j1);
+         _coldet_free_pairs.push_back(j2);
        }
     }
 
@@ -574,7 +574,7 @@ bool SkSkeleton::load ( SrInput& in, double skScale, const char* basedir )
 
 SkJoint* SkSkeleton::_loadjlist ( SrInput& in, float scale, SrStringArray& paths )
  {
-   int i, k, kw;
+   int kw;
    SkJoint* j;
    SrString name;
    SrStringArray pnames;
@@ -587,9 +587,9 @@ SkJoint* SkSkeleton::_loadjlist ( SrInput& in, float scale, SrStringArray& paths
       if ( in.last_token_type()!=SrInput::Name && in.last_token_type()!=SrInput::String ) break;
       
       j = new SkJoint ( this, 0/*parent*/, SkJoint::TypeQuat, _joints.size() );
-      _joints.push() = j;
+       _joints.push_back(j);
 
-      j->name ( SkJointName(in.last_token()) );
+      j->name ( (const char*) in.last_token() );
 
       in.get_token(); 
       if ( in.last_token()[0]==':' )
@@ -613,15 +613,18 @@ SkJoint* SkSkeleton::_loadjlist ( SrInput& in, float scale, SrStringArray& paths
    _root = _joints[0];
    _root->_offset = offsets[0]*scale;
 
-   for ( i=1; i<_joints.size(); i++ )
+   size_t k;
+   for (size_t i=1; i<_joints.size(); i++ )
     { // find the parent joint of joint i:
       for ( k=0; k<_joints.size(); k++ )
-       { if ( sr_compare(pnames[i],_joints[k]->name())==0 ) break;
-       }
+	  { 
+		  if ( sr_compare(pnames[i],_joints[k]->name().c_str())==0 )
+			  break;
+      }
       // joint k is the parent of joint i:
-      if ( k<_joints.size() )
+      if (k<_joints.size() )
        { _joints[i]->_parent = _joints[k];
-         _joints[k]->_children.push() = _joints[i];
+         _joints[k]->_children.push_back(_joints[i]);
          _joints[i]->_offset = offsets[i]-offsets[k];
          _joints[i]->_offset *= scale;
        }
@@ -635,10 +638,10 @@ SkJoint* SkSkeleton::_loadjlist ( SrInput& in, float scale, SrStringArray& paths
    post->init ( this ); // save current posture
    post->get();
 
-   for ( i=0; i<_joints.size(); i++ ) _joints[i]->init_values();
+   for (size_t i=0; i<_joints.size(); i++ ) _joints[i]->init_values();
    _root->update_gmat();
    SrMat mat;
-   for ( i=0; i<_joints.size(); i++ )
+   for (size_t i=0; i<_joints.size(); i++ )
     { j = _joints[i];
       mat = j->gmat();
       mat.invert();
@@ -661,7 +664,7 @@ static void outgeo ( SrOutput& out, const char* s, SkJoint* j, const char* geopa
  {
    SrString name;
    name << j->skeleton()->name() << '_'
-        << j->name() << '_'
+	   << j->name().c_str() << '_'
         << (const char*)(s[0]=='v'? "vis":"col" ) << ".srm";
    name.lower ();        
            
@@ -751,7 +754,7 @@ static void write_joint ( SrOutput& out, SkJoint* j, int marg, const char* geopa
 
    out.outm();
    if ( j->parent() ) out << "joint "; else out << "root ";
-   out << j->name() << srnl;
+   out << j->name().c_str() << srnl;
 
    // write offset :
    out.outm();
@@ -852,10 +855,10 @@ bool SkSkeleton::save ( SrOutput& out, const char* geopath )
     }
 
    // write collision-free pairs list:
-   if ( _coldet_free_pairs.size()>0 )
+  if ( _coldet_free_pairs.size()>0 )
     { out << "set_collision_free_pairs\n";
-      for ( i=0; i<_coldet_free_pairs.size(); i++ )
-       { s.make_valid_string(_coldet_free_pairs[i]->name());
+      for (size_t i=0; i<_coldet_free_pairs.size(); i++ )
+       { s.make_valid_string(_coldet_free_pairs[i]->name().c_str());
          out << s;
          if ( i%2==0 ) out<<srspc;
           else if ( i+1==_coldet_free_pairs.size() ) out<<";\n\n";
@@ -876,7 +879,6 @@ bool SkSkeleton::save ( SrOutput& out, const char* geopath )
 // and adapt load to do also a merge
 bool SkSkeleton::export_joints ( SrOutput& out )
  {
-   int i;
    SrString s;
 
    SrString fmt ( out.fmt_float() );
@@ -888,7 +890,7 @@ bool SkSkeleton::export_joints ( SrOutput& out )
    out << "joint_data\n";
 
    if ( _root ) // write joints:
-    { for ( i=0; i<_joints.size(); i++ )
+    { for (size_t i=0; i<_joints.size(); i++ )
        write_joint ( out, _joints[i], 0, "", false );
     }
 
