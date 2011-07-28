@@ -18,7 +18,7 @@ class KinectProcessor
 	
 	private:
 		std::vector<std::string>			boneMapping;
-		std::vector<std::list<SrQuat>>		rotationBuffer;
+		std::vector<std::list<SrQuat> >		rotationBuffer;
 		int									filterSize;
 };
 #endif

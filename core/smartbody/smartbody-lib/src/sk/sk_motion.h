@@ -114,7 +114,7 @@ public :
 	in relation to the first keyposture, are stored in the motion.
 	Arrays keypostures and keytimes must have the same size.
 	True is returned if the motion could be created, false otherwise. */
-	bool SkMotion::create_from_postures ( const std::vector<SkPosture*>& keypost, 
+	bool create_from_postures ( const std::vector<SkPosture*>& keypost, 
 									 const std::vector<float>& keytime );
 	/*! Inserts one channel at position i, with the given name, type and value.
 	This implies inserting new position(s) in all frames. Returns true if

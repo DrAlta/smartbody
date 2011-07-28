@@ -49,6 +49,7 @@ set( SBM_FLTK_SRC
 	src/bmlcreator/BMLReachObject.cpp
 	src/bmlcreator/BMLSpeechObject.cpp
 	src/bmlcreator/BMLSaccadeObject.cpp
+	src/bmlcreator/BMLStateObject.cpp
 
 	src/resourceViewer/Fl_Tree_Horizontal.cpp
 	src/resourceViewer/TreeItemInfoWidget.cpp

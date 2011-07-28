@@ -115,7 +115,7 @@ struct MeCtLocomotionJointInfo
 			if (joint_name[i] == name)
 				 return i;
 		}
-		LOG("Error: joint: '%s' not found.", name);
+		LOG("Error: joint: '%s' not found.", name.c_str());
 		return -1;
 	}
 };
