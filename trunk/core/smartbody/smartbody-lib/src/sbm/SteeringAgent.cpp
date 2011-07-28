@@ -131,7 +131,6 @@ void SteeringAgent::evaluate()
 	}
 	character->_lastReachStatus = character->_reachTarget;
 	character->_reachTarget = false;
-	character->_numSteeringGoal = goalQueue.size();
 
 	// Evaluate
 	//float newSpeed = desiredSpeed;
@@ -171,6 +170,7 @@ void SteeringAgent::evaluate()
 		EventManager* manager = EventManager::getEventManager();		
 		manager->handleEvent(&motionEvent, mcu.time);
 	}
+	character->_numSteeringGoal = goalQueue.size();
 }
 
 void SteeringAgent::setAgent(SteerLib::AgentInterface* a)
@@ -697,7 +697,8 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 	//---start locomotion
 #if !FastStart	// starting with angle transition
 	if (curState)
-		if (curState->stateName == PseudoIdleState && numGoals != 0 && nextStateName == "")
+//		if (curState->stateName == PseudoIdleState && numGoals != 0 && nextStateName == "")
+		if (character->_numSteeringGoal == 0 && numGoals != 0)
 		{
 			float targetAngle = radToDeg(atan2(mToCm(goalQueue.front().targetLocation.x) - x, mToCm(goalQueue.front().targetLocation.z) - z));
 			normalizeAngle(targetAngle);

@@ -744,6 +744,14 @@
 				RelativePath="..\src\bmlcreator\BMLSpeechObject.h"
 				>
 			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLStateObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLStateObject.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="resourceViewer"

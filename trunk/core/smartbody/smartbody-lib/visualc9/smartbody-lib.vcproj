@@ -1852,6 +1852,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sbm\bml_states.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\bml_states.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\bml_sync_point.cpp"
 				>
 			</File>

@@ -1046,6 +1046,8 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 						w.push_back(args.read_double());
 					character->param_animation_ct->updateWeights(w);
 				}
+				else
+					LOG("Panim State Update ERR: state updated is not corrent.");
 			}
 
 			if (operation == "basename")

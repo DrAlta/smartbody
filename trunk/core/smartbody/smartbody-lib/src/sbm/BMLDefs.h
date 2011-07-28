@@ -270,6 +270,9 @@ class BMLDefs
 		static XMLCh* ATTR_WIGGLE;
 		static XMLCh* ATTR_WAGGLE;
 
+		static XMLCh* TAG_STATES;
+		static XMLCh* ATTR_STARTINGNOW;
+
 };
 
 

@@ -273,6 +273,9 @@ XMLCh* BMLDefs::ATTR_NODDECAY = NULL;
 XMLCh* BMLDefs::ATTR_WIGGLE = NULL;
 XMLCh* BMLDefs::ATTR_WAGGLE = NULL;
 
+XMLCh* BMLDefs::TAG_STATES = NULL;
+XMLCh* BMLDefs::ATTR_STARTINGNOW = NULL;
+
 BMLDefs::BMLDefs()
 {
 	ATTR_ID = XMLString::transcode("id");
@@ -559,6 +562,9 @@ BMLDefs::BMLDefs()
 	ATTR_NODWARP = XMLString::transcode("sbm:warp");
 	ATTR_NODPITCH = XMLString::transcode("sbm:pitch");
 	ATTR_NODDECAY = XMLString::transcode("sbm:decay");
+
+	TAG_STATES = XMLString::transcode("sbm:states");
+	ATTR_STARTINGNOW = XMLString::transcode("sbm:startnow");
 
 }
 
