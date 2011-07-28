@@ -112,7 +112,7 @@ void GlChartViewCoordinate::Draw()
 {
 	float y_length = GetYScale()*y_size;
 	float x_length = GetXScale();
-	glColor4f(0.1f, 0.1f, 0.1f, 0.3f);
+	glColor4f(0.1f, 0.1f, 0.1f, 1.f);	
 	float x;
 	glBegin(GL_LINES);
 		for(int i = y_label_num; i > 0; --i)

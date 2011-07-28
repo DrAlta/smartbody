@@ -316,7 +316,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "panimviewer",  mcu_panimationviewer_func);
 	mcu.insert( "cbufviewer",	mcu_channelbufferviewer_func); // deprecated
 	mcu.insert( "dataviewer",	mcu_channelbufferviewer_func);
-	mcu.insert( "resourceviewer",	mcu_resourceViewer_func);
+	mcu.insert( "resourceviewer",	mcu_resourceViewer_func);	
 	mcu.insert( "faceviewer",	mcu_faceViewer_func);
 
 	mcu.insert( "camera",		mcu_camera_func );
@@ -645,7 +645,7 @@ fprintf( stdout, "output:'%s'\n", str.c_str() );
 	mcu.register_viewer_factory(viewerFactory);
 	mcu.register_bmlviewer_factory(new BehaviorViewerFactory());
 	mcu.register_panimationviewer_factory(new PanimationViewerFactory());
-	mcu.register_channelbufferviewer_factory(new ChannelBufferViewerFactory());
+	mcu.register_channelbufferviewer_factory(new ChannelBufferViewerFactory());	
 	mcu.register_ResourceViewer_factory(new ResourceViewerFactory());
 	mcu.register_FaceViewer_factory(new FaceViewerFactory());
 

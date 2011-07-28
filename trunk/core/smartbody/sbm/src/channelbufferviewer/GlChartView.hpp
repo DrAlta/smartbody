@@ -94,9 +94,13 @@ protected:
 	void draw_series_vec2(GlChartViewSeries* series);
 	void draw_series_vec3(GlChartViewSeries* series);
 	void draw_series_euler(GlChartViewSeries* series);
+	void draw_series_axisangle(GlChartViewSeries* series);
 	void draw_series_swingtwist(GlChartViewSeries* series);
 	void draw_series_3D_euler(GlChartViewSeries* series);
 	void draw_series_quat(GlChartViewSeries* series);
+	void draw_series_quaternion_velocity(GlChartViewSeries* series);
+	void draw_series_euler_velocity(GlChartViewSeries* series);
+	void draw_series_axisangle_velocity(GlChartViewSeries* series);
 
 };
 

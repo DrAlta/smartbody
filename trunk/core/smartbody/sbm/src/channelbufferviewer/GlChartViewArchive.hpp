@@ -51,6 +51,7 @@ public:
 	int current_ind;
 	int size;
 	bool bold;
+	float dt;
 
 	SrArray<float> x;
 	SrArray<float> y;

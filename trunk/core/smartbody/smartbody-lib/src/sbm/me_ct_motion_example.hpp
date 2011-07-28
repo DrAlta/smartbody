@@ -9,6 +9,7 @@ class InterpolationExample;
 class BodyMotionInterface;
 class MotionExample;
 class MotionParameter;
+class MotionProfile;
 typedef std::vector<InterpolationExample*> VecOfInterpExample;
 typedef std::vector<BodyMotionInterface*> VecOfBodyMotionPtr;
 typedef std::vector<MotionExample*> VecOfMotionExamplePtr;
@@ -36,9 +37,10 @@ class BodyMotionInterface
 public:
 	enum DurationType { DURATION_ACTUAL = 0, DURATION_REF };
 	MotionParameter* motionParameterFunc;
+	MotionProfile*   motionProfile;
 public:
 	virtual ~BodyMotionInterface() {}
-public:
+public:	
 	virtual void getMotionParameter(dVector& outPara);	
 	virtual double getMotionFrame(float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame) = 0;
 
@@ -113,6 +115,7 @@ public:
 	virtual void getExampleParameter(dVector& outPara);
 	virtual double motionPercent(float time);
 	virtual double getRefDeltaTime(float u, float dt);
+	MotionProfile* getValidMotionProfile();
 };
 
 class MotionExample : public InterpolationExample, public BodyMotion
@@ -170,6 +173,7 @@ public:
 		                        const VecOfInterpWeight& blendWeight, BodyMotionFrame& outMotionFrame);
 	// blend start frame to end frame based on blend weight
 	static void   blendMotionFrame( BodyMotionFrame& startFrame,  BodyMotionFrame& endFrame, float weight, BodyMotionFrame& outFrame);	
+	static void   blendMotionFrameProfile( ResampleMotion* motion, BodyMotionFrame& startFrame,  BodyMotionFrame& endFrame, float weight, BodyMotionFrame& outFrame);
 };
 
 

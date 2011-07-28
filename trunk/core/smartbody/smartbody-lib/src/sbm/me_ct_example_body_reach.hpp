@@ -37,11 +37,13 @@ protected:
 	ReachEngineMap        reachEngineMap;
 	MeCtReachEngine*      currentReachEngine;
 	std::string           characterName;		
-	bool                  footIKFix;	
+	bool                  footIKFix;
+	bool                  useProfileInterpolation;
 	bool                  isMoving;
 	bool                  startReach;
 	bool                  endReach;
 	float                 autoReturnDuration;
+	float                 reachVelocityScale;
 	vector<SkJoint*>      affectedJoints;		
 	BodyMotionFrame       inputMotionFrame;		
 	float 			      _duration;

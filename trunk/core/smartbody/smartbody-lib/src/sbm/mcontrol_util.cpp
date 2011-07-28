@@ -130,6 +130,7 @@ mcuCBHandle::mcuCBHandle()
 	panimationviewer_p( NULL ),
 	channelbufferviewer_p( NULL ),
 	resourceViewer_p( NULL ),
+	velocityViewer_p( NULL ),
 	faceViewer_p( NULL ),
 	camera_p( NULL ),
 	root_group_p( new SrSnGroup() ),
@@ -149,6 +150,7 @@ mcuCBHandle::mcuCBHandle()
 	channelbufferviewer_factory ( new GenericViewerFactory() ),
 	commandviewer_factory ( new GenericViewerFactory() ),
 	resourceViewerFactory ( new GenericViewerFactory() ),
+	velocityViewerFactory ( new GenericViewerFactory() ),
 	faceViewerFactory ( new GenericViewerFactory() ),
 	resource_manager(ResourceManager::getResourceManager()),
 	snapshot_counter( 1 ),
@@ -701,6 +703,26 @@ void mcuCBHandle::closeResourceViewer( void )
 	if( resourceViewer_p )	{
 		resourceViewerFactory->destroy(resourceViewer_p);
 		resourceViewer_p = NULL;
+	}
+}
+
+int mcuCBHandle::openVelocityViewer( int width, int height, int px, int py )
+{
+	if( velocityViewer_p == NULL )	{
+		velocityViewer_p = velocityViewerFactory->create( px, py, width, height );
+		velocityViewer_p->label_viewer( "Velocity Viewer" );
+		velocityViewer_p->show_viewer();
+
+		return( CMD_SUCCESS );
+	}
+	return( CMD_FAILURE );
+}
+
+void mcuCBHandle::closeVelocityViewer( void )
+{
+	if( velocityViewer_p )	{
+		velocityViewerFactory->destroy(velocityViewer_p);
+		velocityViewer_p = NULL;
 	}
 }
 
@@ -1626,6 +1648,7 @@ int mcuCBHandle::getNumCharacters()
 {
 	return character_map.size();
 }
+
 
 
 /////////////////////////////////////////////////////////////

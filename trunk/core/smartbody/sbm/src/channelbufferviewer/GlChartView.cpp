@@ -228,8 +228,13 @@ void GlChartView::draw_series()
 		{
 			if(quat_shown_type == 0) draw_series_quat(series);
 			else if(quat_shown_type == 1) draw_series_euler(series);
-			//else if(quat_shown_type == 2) draw_series_3D_euler(series);
-			else if (quat_shown_type == 3) draw_series_swingtwist(series);
+			//else if(quat_shown_type == 2) draw_series_3D_euler(series);			
+			//else if (quat_shown_type == 3) draw_series_swingtwist(series);	
+			else if (quat_shown_type == 3) draw_series_axisangle(series);
+			else if (quat_shown_type == 4) draw_series_quaternion_velocity(series);
+			else if (quat_shown_type == 5) draw_series_euler_velocity(series);
+			else if (quat_shown_type == 6) draw_series_axisangle_velocity(series);
+			
 		}
 	}
 }
@@ -248,6 +253,16 @@ void GlChartView::set_quat_show_type(int type)
 		coordinate.y_scale_zoom = 1.0f/180.0f;
 	}
 	else if (type == 3 && coordinate.GetYSize() == 1.0f)
+	{
+		coordinate.SetYSize(180.0f);
+		coordinate.y_scale_zoom = 1.0f/180.0f;
+	}
+	else if (type == 4 && coordinate.GetYSize() == 1.0f)
+	{
+		coordinate.SetYSize(180.0f);
+		coordinate.y_scale_zoom = 1.0f/180.0f;
+	}
+	else if (type == 5 && coordinate.GetYSize() == 1.0f)
 	{
 		coordinate.SetYSize(180.0f);
 		coordinate.y_scale_zoom = 1.0f/180.0f;
@@ -425,6 +440,83 @@ void GlChartView::draw_series_swingtwist( GlChartViewSeries* series )
 	glLineWidth(1.0f);
 }
 
+
+void GlChartView::draw_series_axisangle( GlChartViewSeries* series )
+{
+	SrVec axisAngle;
+	SrVec prevAxisAngle;
+	SrVec color;
+	char t_label[50];
+	float step = coordinate.GetXScale()/(series->max_size-1);
+	float y_scale = coordinate.GetYScale();
+
+	float dt = series->dt;
+
+	if(series->bold)
+	{
+		glLineWidth(3.0f);
+	}
+#ifdef WIN32
+	label.Begin();
+#endif
+	if(show_x)
+	{
+		color = series->GetColor(1);
+		glColor4f(color.x, color.y, color.z, 0.5f);
+		glBegin(GL_LINE_STRIP);
+		for(int i = 1; i < series->size; ++i)
+		{
+			axisAngle = series->GetQuat(i).axisAngle()*180.f/(float)M_PI;			
+			glVertex3f(i*step, axisAngle.x*y_scale, 0.0f);
+		}
+		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		get_label(t_label, series->title, 0);
+#ifdef WIN32
+		label.DrawString(t_label, 2.0f, (series->size-1)*step, axisAngle.x*y_scale);
+#endif
+		glDisable(GL_TEXTURE_2D);
+	}
+	if(show_y)
+	{
+		color = series->GetColor(2);
+		glColor4f(color.x, color.y, color.z, 0.5f);
+		glBegin(GL_LINE_STRIP);
+		for(int i = 1; i < series->size; ++i)
+		{
+			axisAngle = series->GetQuat(i).axisAngle()*180.f/(float)M_PI;				
+			glVertex3f(i*step, axisAngle.y*y_scale, 0.0f);
+		}
+		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		get_label(t_label, series->title, 1);
+#ifdef WIN32
+		label.DrawString(t_label, 2.0f, (series->size-1)*step, axisAngle.y*y_scale);
+#endif
+		glDisable(GL_TEXTURE_2D);
+	}
+	if(show_z)
+	{
+		color = series->GetColor(3);
+		glColor4f(color.x, color.y, color.z, 0.5f);
+		glBegin(GL_LINE_STRIP);
+		for(int i = 1; i < series->size; ++i)
+		{
+			axisAngle = series->GetQuat(i).axisAngle()*180.f/(float)M_PI;	
+			prevAxisAngle = series->GetQuat(i-1).axisAngle()*180.f/(float)M_PI;
+			glVertex3f(i*step, axisAngle.z*y_scale, 0.0f);
+		}
+		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		get_label(t_label, series->title, 2);
+#ifdef WIN32
+		label.DrawString(t_label, 2.0f, (series->size-1)*step, axisAngle.z*y_scale);
+#endif
+		glDisable(GL_TEXTURE_2D);
+	}
+	glLineWidth(1.0f);
+}
+
 void GlChartView::draw_series_euler(GlChartViewSeries* series)
 {
 	SrVec euler;
@@ -497,6 +589,219 @@ void GlChartView::draw_series_euler(GlChartViewSeries* series)
 	glLineWidth(1.0f);
 }
 
+
+void GlChartView::draw_series_axisangle_velocity( GlChartViewSeries* series )
+{
+	SrVec axisAngle;
+	SrVec prevAxisAngle;
+	SrVec color;
+	char t_label[50];
+	float step = coordinate.GetXScale()/(series->max_size-1);
+	float y_scale = coordinate.GetYScale();
+
+	float dt = series->dt;
+
+	if(series->bold)
+	{
+		glLineWidth(3.0f);
+	}
+#ifdef WIN32
+	label.Begin();
+#endif
+	if(show_x)
+	{
+		color = series->GetColor(1);
+		glColor4f(color.x, color.y, color.z, 0.5f);
+		glBegin(GL_LINE_STRIP);
+		for(int i = 1; i < series->size; ++i)
+		{
+			axisAngle = series->GetQuat(i).axisAngle()*180.f/(float)M_PI;	
+			prevAxisAngle = series->GetQuat(i-1).axisAngle()*180.f/(float)M_PI;
+			glVertex3f(i*step, (axisAngle.x-prevAxisAngle.x)/dt*y_scale, 0.0f);
+		}
+		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		get_label(t_label, series->title, 0);
+#ifdef WIN32
+		label.DrawString(t_label, 2.0f, (series->size-1)*step, axisAngle.x*y_scale);
+#endif
+		glDisable(GL_TEXTURE_2D);
+	}
+	if(show_y)
+	{
+		color = series->GetColor(2);
+		glColor4f(color.x, color.y, color.z, 0.5f);
+		glBegin(GL_LINE_STRIP);
+		for(int i = 1; i < series->size; ++i)
+		{
+			axisAngle = series->GetQuat(i).axisAngle()*180.f/(float)M_PI;	
+			prevAxisAngle = series->GetQuat(i-1).axisAngle()*180.f/(float)M_PI;
+			glVertex3f(i*step, (axisAngle.y-prevAxisAngle.y)/dt*y_scale, 0.0f);
+		}
+		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		get_label(t_label, series->title, 1);
+#ifdef WIN32
+		label.DrawString(t_label, 2.0f, (series->size-1)*step, axisAngle.y*y_scale);
+#endif
+		glDisable(GL_TEXTURE_2D);
+	}
+	if(show_z)
+	{
+		color = series->GetColor(3);
+		glColor4f(color.x, color.y, color.z, 0.5f);
+		glBegin(GL_LINE_STRIP);
+		for(int i = 1; i < series->size; ++i)
+		{
+			axisAngle = series->GetQuat(i).axisAngle()*180.f/(float)M_PI;	
+			prevAxisAngle = series->GetQuat(i-1).axisAngle()*180.f/(float)M_PI;
+			glVertex3f(i*step, (axisAngle.z-prevAxisAngle.z)/dt*y_scale, 0.0f);
+		}
+		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		get_label(t_label, series->title, 2);
+#ifdef WIN32
+		label.DrawString(t_label, 2.0f, (series->size-1)*step, axisAngle.z*y_scale);
+#endif
+		glDisable(GL_TEXTURE_2D);
+	}
+	glLineWidth(1.0f);
+
+}
+
+
+void GlChartView::draw_series_euler_velocity( GlChartViewSeries* series )
+{
+	SrVec euler;
+	SrVec prevEuler;
+	SrVec color;
+	char t_label[50];
+	float step = coordinate.GetXScale()/(series->max_size-1);
+	float y_scale = coordinate.GetYScale();
+
+	float dt = series->dt;
+
+	if(series->bold)
+	{
+		glLineWidth(3.0f);
+	}
+#ifdef WIN32
+	label.Begin();
+#endif
+	if(show_x)
+	{
+		color = series->GetColor(1);
+		glColor4f(color.x, color.y, color.z, 0.5f);
+		glBegin(GL_LINE_STRIP);
+		for(int i = 1; i < series->size; ++i)
+		{
+			euler = series->GetEuler(i);	
+			prevEuler = series->GetEuler(i-1);
+			glVertex3f(i*step, (euler.x-prevEuler.x)/dt*y_scale, 0.0f);
+		}
+		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		get_label(t_label, series->title, 0);
+#ifdef WIN32
+		label.DrawString(t_label, 2.0f, (series->size-1)*step, euler.x*y_scale);
+#endif
+		glDisable(GL_TEXTURE_2D);
+	}
+	if(show_y)
+	{
+		color = series->GetColor(2);
+		glColor4f(color.x, color.y, color.z, 0.5f);
+		glBegin(GL_LINE_STRIP);
+		for(int i = 1; i < series->size; ++i)
+		{
+			euler = series->GetEuler(i);
+			prevEuler = series->GetEuler(i-1);
+			glVertex3f(i*step, (euler.y-prevEuler.y)/dt*y_scale, 0.0f);
+		}
+		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		get_label(t_label, series->title, 1);
+#ifdef WIN32
+		label.DrawString(t_label, 2.0f, (series->size-1)*step, euler.y*y_scale);
+#endif
+		glDisable(GL_TEXTURE_2D);
+	}
+	if(show_z)
+	{
+		color = series->GetColor(3);
+		glColor4f(color.x, color.y, color.z, 0.5f);
+		glBegin(GL_LINE_STRIP);
+		for(int i = 1; i < series->size; ++i)
+		{
+			euler = series->GetEuler(i);
+			prevEuler = series->GetEuler(i-1);
+			glVertex3f(i*step, (euler.z-prevEuler.z)/dt*y_scale, 0.0f);
+		}
+		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		get_label(t_label, series->title, 2);
+#ifdef WIN32
+		label.DrawString(t_label, 2.0f, (series->size-1)*step, euler.z*y_scale);
+#endif
+		glDisable(GL_TEXTURE_2D);
+	}
+	glLineWidth(1.0f);
+}
+
+void GlChartView::draw_series_quaternion_velocity( GlChartViewSeries* series )
+{
+	SrQuat quat;
+	SrVec color;
+	char t_label[50];
+
+	float step = coordinate.GetXScale()/(series->max_size-1);
+	float y_scale = coordinate.GetYScale();
+	if(series->bold)
+	{
+		glLineWidth(3.0f);
+	}
+
+#ifdef WIN32
+	label.Begin();
+#endif
+
+	float dt = series->dt;
+	SrQuat q1 = series->GetQuat(0);
+	SrQuat q2 = series->GetQuat(series->size/2-1);
+	
+	SrQuat diff = q2*q1.inverse();
+	SrVec mainAxis = diff.axis();
+
+	if(show_x)
+	{
+		color = series->GetColor(1);
+		glColor4f(color.x, color.y, color.z, 0.5f);
+		glBegin(GL_LINE_STRIP);
+		for(int i = 1; i < series->size; ++i)
+		{
+			quat = series->GetQuat(i);
+			SrQuat prevQ = series->GetQuat(i-1);
+			SrQuat diff = quat*prevQ.inverse();
+			diff.normalize();
+			float angle = quat.angle()*180.f/(float)M_PI;
+			float prevAngle = prevQ.angle()*180.f/(float)M_PI;
+			float diffAngle = diff.angle()*180.f/(float)M_PI;
+			//if (dot(diff.axis(),mainAxis)<0.f)
+			//	diffAngle = -diffAngle;
+			//glVertex3f(i*step, angle*y_scale, 0.0f);
+			glVertex3f(i*step, (diffAngle)/dt*y_scale, 0.0f);
+			//glVertex3f(i*step, (angle-prevAngle)/dt*y_scale, 0.0f);
+		}
+		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		get_label(t_label, series->title, 0);
+#ifdef WIN32
+		label.DrawString(t_label, 2.0f, (series->size-1)*step, quat.x*y_scale);
+#endif
+		glDisable(GL_TEXTURE_2D);
+	}
+}
+
 void GlChartView::draw_series_quat(GlChartViewSeries* series)
 {
 	SrQuat quat;
@@ -522,6 +827,8 @@ void GlChartView::draw_series_quat(GlChartViewSeries* series)
 			for(int i = 0; i < series->size; ++i)
 			{
 				quat = series->GetQuat(i);
+				//float angle = quat.angle();
+				//glVertex3f(i*step, angle*y_scale, 0.0f);
 				glVertex3f(i*step, quat.x*y_scale, 0.0f);
 			}
 		glEnd();

@@ -26,7 +26,8 @@ class EffectorState
 {
 public:
 	std::string  effectorName;
-	SRT curTargetState, targetState;
+	SRT startTargetState, curBlendState; 
+	SRT curIKTargetState, ikTargetState;
 	SRT curState; 
 	SRT grabStateError;
 	SrVec paraTarget;
@@ -89,7 +90,7 @@ public:
 	float           blendWeight;
 	SrMat           gmat;
 	// reference motion frames ( as motion interpolation output, or IK reference pose )
-	BodyMotionFrame idleRefFrame, targetRefFrame, currentRefFrame;		
+	BodyMotionFrame idleRefFrame, startRefFrame, targetRefFrame, currentRefFrame;		
 	BodyMotionFrame curMotionFrame; 
 	EffectorState   effectorState;
 	ReachTarget     reachTarget;	
@@ -101,6 +102,7 @@ public:
 	bool            useExample;	
 	bool            locomotionComplete;
 	bool            hasSteering;
+	bool            useProfileInterpolation;
 	bool            newTarget;
 
 	// for pick-up/put-down action
@@ -138,8 +140,10 @@ protected:
 	void updateReturnToIdle(ReachStateData* rd);
 	void updateReachToTarget(ReachStateData* rd);
 	void updateMotionIK(ReachStateData* rd);
+	void updateMotionPoseInterpolation(ReachStateData* rd);
 	void updateMotionInterp(ReachStateData* rd);
 	bool ikTargetReached(ReachStateData* rd, float ratio = 0.1f);
+	bool poseTargetReached(ReachStateData* rd, float ratio = 0.1f);
 	bool interpTargetReached(ReachStateData* rd);	
 };
 

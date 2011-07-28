@@ -134,7 +134,7 @@ void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
 	reachData->characterHeight = characterHeight;		
 	reachData->charName = character->name;
 	reachData->reachRegion = ikReachRegion;	
-	reachData->linearVel = ikDefaultVelocity*0.5f;
+	reachData->linearVel = ikDefaultVelocity;
 	reachData->curRefTime = 0.f;
 	reachData->motionParameter = motionParameter;
 	reachData->idleRefFrame = reachData->currentRefFrame = reachData->targetRefFrame = idleMotionFrame;	
@@ -142,7 +142,7 @@ void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
 
 	EffectorState& estate = reachData->effectorState;
 	estate.effectorName = reachEndEffector->name().c_str();
-	estate.curTargetState = reachData->getPoseState(idleMotionFrame);
+	estate.curIKTargetState = reachData->getPoseState(idleMotionFrame);
 
 
 	stateTable["Idle"] = new ReachStateIdle();
@@ -166,8 +166,8 @@ void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet )
 		return;
 
 	// set world offset to zero	
-	const char* rootName = ikScenario.ikTreeRoot->joint->parent()->name().c_str();
-	SkJoint* root = skeletonRef->search_joint(rootName);
+	std::string rootName = ikScenario.ikTreeRoot->joint->parent()->name().c_str();
+	SkJoint* root = skeletonRef->search_joint(rootName.c_str());
 	if (root)
 	{
 		root->quat()->value(SrQuat());
@@ -195,6 +195,10 @@ void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet )
 		ex->motion = motion;
 		ex->timeWarp = new SimpleTimeWarp(refMotion->duration(),motion->duration());
 		ex->motionParameterFunc = motionParameter;
+		ex->motionProfile = new MotionProfile(motion);
+		ex->motionProfile->buildVelocityProfile(0.f,motion->duration()*0.999f,0.05f);
+		ex->motionProfile->buildInterpolationProfile(0.f,(float)motion->time_stroke_emphasis(),0.005f);
+
 		ex->getMotionParameter(ex->parameter);		
 		// set initial index & weight for the motion example
 		// by default, the index should be this motion & weight should be 1
@@ -276,7 +280,7 @@ void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
 	EffectorState& estate = rd->effectorState;
 
 	EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>(reachPosConstraint[reachEndEffector->name().c_str()]);
-	cons->targetPos = estate.curTargetState.tran;	
+	cons->targetPos = estate.curIKTargetState.tran;	
 
 	ikScenario.ikGlobalMat = rd->gmat;//skeletonRef->search_joint(rootName)->gmat();//ikScenario.ikTreeRoot->joint->parent()->gmat();	
 	ikScenario.ikTreeRootPos = refFrame.rootPos;
@@ -285,7 +289,7 @@ void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
 
 	{
 		EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>(reachRotConstraint[reachEndEffector->name().c_str()]);		
-		cons->targetRot = estate.curTargetState.rot;//ikRotTrajectory;//ikRotTarget;//motionParameter->getMotionFrameJoint(interpMotionFrame,reachEndEffector->name().get_string())->gmat();//ikRotTarget;	
+		cons->targetRot = estate.curIKTargetState.rot;//ikRotTrajectory;//ikRotTarget;//motionParameter->getMotionFrameJoint(interpMotionFrame,reachEndEffector->name().get_string())->gmat();//ikRotTarget;	
 		cons->constraintWeight = 0.f;//1.f - rd->blendWeight;
 
 		//if (rd->curHandAction == handActionTable[PICK_UP_OBJECT] || rd->curHandAction == handActionTable[PUT_DOWN_OBJECT])
@@ -382,6 +386,7 @@ ResampleMotion* MeCtReachEngine::createInterpMotion()
 {
 	ResampleMotion* ex = new ResampleMotion(motionExamples.getMotionData());
 	ex->motionParameterFunc = motionParameter;
+	ex->motionProfile = NULL;
 	return ex;
 }
 
@@ -403,12 +408,12 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 	skeletonRef->update_global_matrices();	
 	updateSkeletonCopy();	
 	// update reach data
-	const char* rootName = ikScenario.ikTreeRoot->joint->parent()->name().c_str();
+	std::string rootName = ikScenario.ikTreeRoot->joint->parent()->name().c_str();
 	reachData->curTime = (float)t;
 	reachData->dt = dt;	
 	reachData->stateTime += dt;
 	reachData->curHandAction = handActionTable[curHandActionState];	
-	reachData->updateReachState(skeletonRef->search_joint(rootName)->gmat(),ikMotionFrame);
+	reachData->updateReachState(skeletonRef->search_joint(rootName.c_str())->gmat(),ikMotionFrame);
 	if (curCharacter)
 	{		
 		reachData->locomotionComplete = (curCharacter->_reachTarget && !curCharacter->_lastReachStatus);		
@@ -426,12 +431,15 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 	{
 		//printf("engine type = %s,  cur State = %s\n",this->getReachTypeTag().c_str(), nextState->curStateName().c_str());
 		reachData->stateTime = 0.f;
+		reachData->effectorState.startTargetState = reachData->effectorState.curIKTargetState;
+		reachData->effectorState.curBlendState = reachData->effectorState.startTargetState;
+		reachData->startRefFrame = reachData->currentRefFrame;
 		curReachState = nextState;
 	}
 
 	ikMaxOffset = ikDefaultVelocity*3.f*dt;
-	solveIK(reachData,ikMotionFrame);	
-	//ikMotionFrame = reachData->currentRefFrame;
+	//solveIK(reachData,ikMotionFrame);	
+	ikMotionFrame = reachData->currentRefFrame;
 }
 
 bool MeCtReachEngine::addHandConstraint( SkJoint* targetJoint, const char* effectorName )

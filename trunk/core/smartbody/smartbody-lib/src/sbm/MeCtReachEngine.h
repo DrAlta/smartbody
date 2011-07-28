@@ -2,6 +2,7 @@
 #include "me_ct_data_interpolation.h"
 #include "me_ct_barycentric_interpolation.h"
 #include "me_ct_motion_parameter.h"
+#include "me_ct_motion_profile.h"
 #include "me_ct_jacobian_IK.hpp"
 #include "me_ct_ccd_IK.hpp"
 #include "me_ct_constraint.hpp"
@@ -66,7 +67,7 @@ protected:
 
 	bool                  initStart;
 	double                ikDamp;
-	float                 ikReachRegion, ikMaxOffset, ikDefaultVelocity;	
+	float                 ikReachRegion, ikMaxOffset;	
 
 	MeCtJacobianIK        ik;
 	MeCtCCDIK             ikCCD;
@@ -75,7 +76,7 @@ protected:
 public:
 	vector<SrVec>         examplePts,resamplePts;
 	HandActionState       curHandActionState;
-	float                 fadingWeight;
+	float                 fadingWeight, ikDefaultVelocity;
 	float                 reachCompleteDuration;
 	bool                  footIKFix;
 
