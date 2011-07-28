@@ -17,6 +17,7 @@
 #include "BMLSpeechObject.h"
 #include "BMLEventObject.h"
 #include "BMLSaccadeObject.h"
+#include "BMLStateObject.h"
 #include "sbm/mcontrol_util.h"
 
 BMLCreatorWindow::BMLCreatorWindow(int x,int y,int w,int h, const char* s) : Fl_Double_Window(x, y, w, h, s)
@@ -46,6 +47,8 @@ BMLCreatorWindow::BMLCreatorWindow(int x,int y,int w,int h, const char* s) : Fl_
 	saccade->setName("saccade");
 	BMLObject* event = new BMLEventObject();
 	event->setName("event");
+	BMLObject* state = new BMLStateObject();
+	state->setName("sbm:states");
 
 	_bmlObjects.push_back(body);
 	_bmlObjects.push_back(locomotion);
@@ -59,6 +62,7 @@ BMLCreatorWindow::BMLCreatorWindow(int x,int y,int w,int h, const char* s) : Fl_
 	_bmlObjects.push_back(speech);
 	_bmlObjects.push_back(saccade);
 	_bmlObjects.push_back(event);
+	_bmlObjects.push_back(state);
 
 	for (size_t i = 0; i < _bmlObjects.size(); i++)
 	{

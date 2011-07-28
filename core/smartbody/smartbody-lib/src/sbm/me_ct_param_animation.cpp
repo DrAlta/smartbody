@@ -341,7 +341,10 @@ PAStateModule* MeCtParamAnimation::createStateModule(PAStateData* stateData, boo
 	if (stateData)
 		module = new PAStateModule(stateData, l, pn);
 	else
+	{
 		module = new PseudoPAStateModule();
+		module->playNow = pn;
+	}
 	if (_context)
 	{
 		module->interpolator->setMotionContextMaps(_context);

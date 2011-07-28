@@ -58,6 +58,7 @@
 #include "bml_locomotion.hpp"
 #include "bml_quickdraw.hpp"
 #include "bml_general_param.hpp"
+#include "bml_states.hpp"
 
 #include "me_ct_examples.h"
 #include "me_ct_gaze.h"
@@ -410,6 +411,8 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				LOG("ERROR: BML::Processor::parseBML(): <speech> BML tag must be first behavior (TEMPORARY HACK).");
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_LOCOTMOTION )==0 ) {
 				behavior = parse_bml_locomotion( child, unique_id, behav_syncs, required, request, mcu );
+			} else if( XMLString::compareString( tag, BMLDefs::TAG_STATES )==0 ) {
+				behavior = parse_bml_states( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_EXAMPLE_LOCOMOTION )==0 ) {
 				behavior = parse_bml_example_locomotion( child, unique_id, behav_syncs, required, request, mcu );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_INTERRUPT )==0 ) {
