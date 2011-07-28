@@ -150,6 +150,7 @@ namespace SteerLib {
 		void getItemsInRange(std::set<SpatialDatabaseItemPtr> & neighborList, unsigned int xMinIndex, unsigned int xMaxIndex, unsigned int zMinIndex, unsigned int zMaxIndex, SpatialDatabaseItemPtr exclude);
 		/// Returns an STL set of objects in the specified range, culling agent objects to a hemisphere centered around the facingDirection.
 		void getItemsInVisualField(std::set<SpatialDatabaseItemPtr> & neighborList, float xmin, float xmax, float zmin, float zmax, SpatialDatabaseItemPtr exclude, const Util::Point & position, const Util::Vector & facingDirection, float radiusSquared);
+		void getAllItems(std::set<SpatialDatabaseItemPtr> &neighborList, SpatialDatabaseItemPtr exclude);
 		//@}
 
 		/// @name Ray tracing queries
@@ -176,6 +177,8 @@ namespace SteerLib {
 		Util::Point randomPositionInRegionWithoutCollisions(const Util::AxisAlignedBox & region, float radius, bool excludeAgents);
 		/// Finds a random 2D point, within the specified region, that has no other objects within the requested radius, using an exising (already seeded) Mersenne Twister random number generator.
 		Util::Point randomPositionInRegionWithoutCollisions(const Util::AxisAlignedBox & region, float radius, bool excludeAgents, MTRand & randomNumberGenerator);
+		// check if the radom position can be found or not
+		Util::Point randomPositionInRegionWithoutCollisions(const Util::AxisAlignedBox & region, float radius, bool excludeAgents, bool &succeed);		
 		/// Uses openGL and DrawLib to visualize the grid.
 		void draw();
 		//@}
