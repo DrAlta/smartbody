@@ -299,8 +299,8 @@ bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 	skeletonRef->invalidate_global_matrices();
 	skeletonRef->update_global_matrices();
 	updateAttachedPawn();	
-	const char* rootName = ikScenario.ikTreeRoot->joint->parent()->name().c_str();
-	ikScenario.ikGlobalMat = skeletonRef->search_joint(rootName)->gmat();
+	std::string rootName = ikScenario.ikTreeRoot->joint->parent()->name();
+	ikScenario.ikGlobalMat = skeletonRef->search_joint(rootName.c_str())->gmat();
 	ikScenario.updateNodeGlobalMat(ikScenario.ikTreeRoot,QUAT_CUR);
 
 	for (int i=0;i<MeCtHand::F_NUM_FINGERS;i++)

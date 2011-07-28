@@ -10,36 +10,21 @@
 0   path mesh ../../../../data/mesh
 
 0	seq common-init inline 
-0	test locomotion initialize
 0	seq init-general-parameters
 0	seq init-common-face
 0	panim enable
 
 ###  Common-sk assets are centered on the pelvis,
 ###  placed 102 units above the ground plane.
-###  Using Unia (Unreal-based) class names for renderer assets
-###  Using remote rVoice speech synthesis
-###  NOTE: increment time to insure common-init is processed in order.
 1	char doctor init common.sk SasoBase.SasoDoctorPerez
-1	test loco char doctor anim standing HandsAtSide_Motex
-1	test loco char doctor anim walking Walk 17 28 4 37 9 23
-1	test loco char doctor anim walking Strafe 25 39 1 52 25 27
 1	set character doctor world_offset x 35 y 102 h -17
 1	set character doctor voice remote M021
 
 1	char elder init common.sk SasoBase.Mayor
-#1	char elder init common.sk SasoBase.SasoDoctorPerez
-#1   char elder init test_utah.sk SasoBase.SasoDoctorPerez
-1	test loco char elder anim standing HandsAtSide_Motex
-1	test loco char elder anim walking Walk 17 28 4 37 9 23
-1	test loco char elder anim walking Strafe 25 39 1 52 25 27
 1	set character elder world_offset x -35 y 102 h -17
 1	set character elder voice remote M009
 
-###  Using "test bml" command to avoid hard-coding
-###  message id into sequence file.
 1	test bml character doctor noecho posture LHandOnHip_Motex
-#1	test bml character elder  noecho posture HandsAtSide_Motex
 1	test bml character elder noecho posture LHandOnHip_Motex
 
 1	seq default-viewer
@@ -47,12 +32,9 @@
 1	set test character doctor
 1	set test recipient elder
 
-1	test loco char doctor enable
-1	test loco char elder enable
-
 #1	seq default-dynamics
-1	seq init-param-animation
-#2	seq init-example-reach
+1	seq init-param-animation inline
+2	seq init-example-reach inline
 
 2 char doctor mesh doctor
 2 char elder mesh elder
@@ -60,22 +42,14 @@
 1	char brad init common.sk Brad
 1	set character brad world_offset x 135 y 100 h -17
 1	set character brad voice remote brad
-1	test loco char brad anim standing HandsAtSide_Motex
-1	test loco char brad anim walking Walk 17 28 4 37 9 23
-1	test loco char brad anim walking Strafe 25 39 1 52 25 27
 2	bml char brad <body posture="HandsAtSide_Motex"/>
-2	test loco char brad enable
 
 2 char brad mesh brad
 
-1	char utah init test_utah.sk Brad
+1	char utah init test_utah.sk utah
 1	set character utah world_offset x -135 y 0 h -17
-1	set character utah voice remote brad
-1	test loco char utah anim standing HandsAtSide_Motex
-1	test loco char utah anim walking Walk 17 28 4 37 9 23
-1	test loco char utah anim walking Strafe 25 39 1 52 25 27
+1	set character utah voice remote utah
 2	bml char utah <body posture="HandsAtSide_Motex"/>
-2	test loco char utah enable
 
 2 char utah mesh utah
 
@@ -85,3 +59,5 @@
 2 bml char utah <saccade mode="listen"/>
 
 
+4 steer start
+5 steer type example
