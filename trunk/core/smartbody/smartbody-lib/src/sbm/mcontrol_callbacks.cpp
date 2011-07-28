@@ -5979,7 +5979,8 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 			float y = args.read_float() * scale;
 			float z = args.read_float() * scale;
 			SbmCharacter* character = mcu->getCharacter(skelName);	
-			character->datareceiver_ct->setGlobalPosition(jName, SrVec(x, y, z));
+			SrVec vec(x, y, z);
+			character->datareceiver_ct->setGlobalPosition(jName, vec);
 		}
 		if (skeletonType == "positions")
 		{

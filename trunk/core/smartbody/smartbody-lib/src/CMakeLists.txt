@@ -165,6 +165,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/bml_sync_point.cpp
 	sbm/bml_target.cpp
 	sbm/bml_saccade.cpp
+	sbm/bml_states.cpp
 	sbm/BoneMap.cpp
 	sbm/Event.cpp
 	sbm/GenericViewer.cpp
@@ -228,6 +229,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/me_ct_quick_draw.cpp
 	sbm/me_ct_reach.cpp
 	sbm/me_ct_hand.cpp
+	sbm/me_ct_motion_profile.cpp
 	sbm/me_ct_barycentric_interpolation.cpp
 	sbm/me_ct_inverse_interpolation.cpp
 	sbm/me_ct_reach_IK.cpp
@@ -291,6 +293,8 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/DefaultAttributeTable.cpp
 
 	sbm/SBScene.cpp
+	sbm/KinectProcessor.cpp
+	sbm/me_ct_data_receiver.cpp
 
 )
 
