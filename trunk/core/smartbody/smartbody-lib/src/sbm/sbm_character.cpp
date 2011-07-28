@@ -904,7 +904,7 @@ int SbmCharacter::init_skeleton() {
 	if (viseme_start_name != "")
 	{
 		viseme_channel_start_pos = skeleton_p->channels().search(viseme_start_name.c_str(), SkChannel::XPos);
-		viseme_channel_end_pos = viseme_channel_start_pos + viseme_channel_count;
+		viseme_channel_end_pos = viseme_channel_start_pos + viseme_channel_count - 1;
 		viseme_history_arr = new float[ viseme_channel_count ];
 	}
 	else	// no map exist
