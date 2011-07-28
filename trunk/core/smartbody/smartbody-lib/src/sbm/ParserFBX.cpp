@@ -417,7 +417,7 @@ SkJoint* ParserFBX::createJoint(KFbxNode* pNode, SkSkeleton& skeleton, SkMotion&
    std::string nameAttr = pNode->GetName();
    SkJoint* joint = skeleton.add_joint(SkJoint::TypeQuat, index);
    joint->quat()->activate();
-   joint->name(SkJointName(nameAttr.c_str()));
+   joint->name(nameAttr);
 
    // setup skeleton channels	
    bool bHasChannelProperty = false;
@@ -749,7 +749,7 @@ void ParserFBX::ConvertfbxAnimToSBM(const std::vector<FBXAnimData*>& fbxAnimData
          std::string jointName = fbxAnimData[j]->channelName;
 
          // find the skeleton's joint index based off the name of the joint and its channel type
-         int jointIndex = motion.channels().search(SkJointName(fbxAnimData[j]->channelName.c_str()),
+         int jointIndex = motion.channels().search(fbxAnimData[j]->channelName,
             fbxAnimData[j]->channelType == SkChannel::XRot ? SkChannel::Quat : fbxAnimData[j]->channelType);
          int floatIndex = -1;
          if (jointIndex >= 0)
