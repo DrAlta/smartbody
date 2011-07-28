@@ -736,7 +736,7 @@ void PATransitionManager::align(PAStateModule* current, PAStateModule* next)
 {
 
 	// possible bug spot, although for now, the result seems better
-#if 1
+#if 0
 	int numEaseOut = getNumEaseOut();
 	for (int i = 0; i < numEaseOut; i++)
 	{
@@ -774,6 +774,8 @@ void PATransitionManager::align(PAStateModule* current, PAStateModule* next)
 	{
 		next->active = true;
 		blendingMode = true;
+		// Important: adjust for the duration (is this enough?)
+		duration += (current->timeManager->prevLocalTime - current->timeManager->localTime);
 		curve->insert(0.0, 1.0);
 		curve->insert(duration, 0.0);
 #if PrintPADebugInfo

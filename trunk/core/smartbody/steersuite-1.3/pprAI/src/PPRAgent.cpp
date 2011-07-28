@@ -194,7 +194,7 @@ void PPRAgent::addGoal(const SteerLib::AgentGoalInfo & newGoal) {
 		allObjects.clear();
 		gSpatialDatabase->getAllItems(allObjects, dynamic_cast<SpatialDatabaseItemPtr>(this));
 		
-		while (!succeed && regionRadius < 2.3f) {
+		while (!succeed && regionRadius < 100.0f) {
 			// define the searching region
 			Util::AxisAlignedBox aab = Util::AxisAlignedBox(_currentGoal.targetLocation.x - regionRadius, _currentGoal.targetLocation.x + regionRadius, 
 				0.0f, 0.0f, _currentGoal.targetLocation.z - regionRadius, _currentGoal.targetLocation.z + regionRadius);
