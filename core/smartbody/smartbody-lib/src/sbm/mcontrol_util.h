@@ -208,6 +208,7 @@ class mcuCBHandle {
 		GenericViewer	*panimationviewer_p;
 		GenericViewer	*channelbufferviewer_p;
 		GenericViewer   *resourceViewer_p;
+		GenericViewer   *velocityViewer_p;
 		GenericViewer   *faceViewer_p;
 
 		GenericViewerFactory *bmlviewer_factory;
@@ -215,6 +216,7 @@ class mcuCBHandle {
 		GenericViewerFactory *channelbufferviewer_factory;
 		GenericViewerFactory *commandviewer_factory;
 		GenericViewerFactory *resourceViewerFactory;
+		GenericViewerFactory *velocityViewerFactory;
 		GenericViewerFactory *faceViewerFactory;
 		
 		SrCamera	*camera_p;
@@ -380,6 +382,8 @@ public:
 		void close_channelbuffer_viewer( void );
 		int openResourceViewer( int width, int height, int px, int py );
 		void closeResourceViewer( void );
+		int openVelocityViewer( int width, int height, int px, int py );
+		void closeVelocityViewer( void );
 		int openFaceViewer( int width, int height, int px, int py );
 		void closeFaceViewer( void );
 
@@ -562,6 +566,11 @@ public:
 		void register_ResourceViewer_factory(GenericViewerFactory* factory) { 
 			if (resourceViewerFactory != NULL) delete resourceViewerFactory;
 			resourceViewerFactory = factory;
+		}
+
+		void register_VelocityViewer_factory(GenericViewerFactory* factory) { 
+			if (velocityViewerFactory != NULL) delete velocityViewerFactory;
+			velocityViewerFactory = factory;
 		}
 
 		void register_FaceViewer_factory(GenericViewerFactory* factory) { 

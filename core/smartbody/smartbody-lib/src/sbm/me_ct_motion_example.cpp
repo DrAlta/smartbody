@@ -6,6 +6,7 @@
 #include <sr/sr_euler.h>
 #include "me_ct_motion_example.hpp"
 #include "me_ct_motion_parameter.h"
+#include "me_ct_motion_profile.h"
 #include "me_ct_ublas.hpp"
 
 #ifdef _DEBUG
@@ -237,6 +238,24 @@ double ResampleMotion::getRefDeltaTime( float u, float dt )
 	
 }
 
+MotionProfile* ResampleMotion::getValidMotionProfile()
+{
+	float maxWeight = -1.f;
+	MotionProfile* validProfile = NULL;
+	for (unsigned int i=0;i<weight.size();i++)
+	{		
+		int idx = weight[i].first;
+		float w = weight[i].second;	
+		BodyMotionInterface* motion = (*motionDataRef)[idx];
+		if (motion->motionProfile && w > maxWeight)
+		{
+			validProfile = motion->motionProfile;
+			maxWeight = w;
+		}
+	}
+	return validProfile;
+}
+
 /************************************************************************/
 /* Grid Box                                                             */
 /************************************************************************/
@@ -392,6 +411,7 @@ InterpolationExample* MotionExampleSet::createPseudoExample()
 {
 	ResampleMotion* ex = new ResampleMotion(&motionData);
 	ex->motionParameterFunc = motionParameterFunc;
+	ex->motionProfile = NULL;
 	return ex;
 }
 
@@ -449,4 +469,45 @@ void MotionExampleSet::blendMotionFrame( BodyMotionFrame& startFrame, BodyMotion
 		tempFrame.jointQuat[i].normalize();
 	}
 	outFrame = tempFrame;	
+}
+
+void MotionExampleSet::blendMotionFrameProfile( ResampleMotion* motion, BodyMotionFrame& startFrame, BodyMotionFrame& endFrame, float weight, BodyMotionFrame& outFrame )
+{
+	std::vector<SkJoint*>& affectedJoints = motion->motionParameterFunc->affectedJoints;
+	MotionProfile* profile = motion->getValidMotionProfile();
+	if (!profile)
+	{
+		// no existing profile, just use the basic linear blend between motion frames
+		MotionExampleSet::blendMotionFrame(startFrame,endFrame,weight,outFrame);
+		return;
+	}
+
+	BodyMotionFrame tempFrame;
+	float oneMinusWeight = 1.f - weight;
+	tempFrame = startFrame;
+	tempFrame.rootPos = startFrame.rootPos*oneMinusWeight + endFrame.rootPos*weight; // interpolate the position using linear blend
+
+	ProfileCurveMap& interpProfileMap = profile->interpolationProfile;
+	//LOG("profile curve map size = %d\n",interpProfileMap.size());
+	//LOG("num affected joints = %d\n",affectedJoints.size());
+	for (unsigned int i=0;i<affectedJoints.size();i++)
+	{
+		SkJoint* joint = affectedJoints[i];
+ 		std::string chanName = joint->name();
+ 		float interpW = weight;
+		if (interpProfileMap.find(chanName) != interpProfileMap.end())
+		{
+			ProfileCurve* curve = interpProfileMap[chanName];
+			interpW = curve->evaluate(weight);
+			//LOG("interp W = %f\n",interpW);
+		}
+		if (interpW < 0)
+			interpW = 0;
+		if (interpW > 1.f)
+			interpW = 1.f;
+		
+		tempFrame.jointQuat[i] = slerp(startFrame.jointQuat[i],endFrame.jointQuat[i],interpW);
+		tempFrame.jointQuat[i].normalize();		
+	}	
+	outFrame = tempFrame;
 }

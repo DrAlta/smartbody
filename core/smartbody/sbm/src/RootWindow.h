@@ -56,7 +56,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void LaunchParamAnimViewerCB(Fl_Widget* widget, void* data);
 		static void LaunchConsoleCB(Fl_Widget* widget, void* data);
 		static void LaunchBMLCreatorCB(Fl_Widget* widget, void* data);
-		static void LaunchResourceViewerCB(Fl_Widget* widget, void* data);
+		static void LaunchResourceViewerCB(Fl_Widget* widget, void* data);		
 		static void LaunchFaceViewerCB(Fl_Widget* widget, void* data);
 		static void StartCB(Fl_Widget* widget, void* data);
 		static void StopCB(Fl_Widget* widget, void* data);

@@ -373,6 +373,7 @@ ReachStateData::ReachStateData()
 	blendWeight = 0.f;
 	dt = du = 0.f;
 	startReach = endReach = useExample = locomotionComplete = newTarget = hasSteering = ikReachTarget = false;
+	useProfileInterpolation = false;
 	autoReturnTime = -1.f;
 	reachType = MeCtReach::REACH_RIGHT_ARM;
 
@@ -451,7 +452,7 @@ void ReachStateInterface::updateReturnToIdle( ReachStateData* rd )
 		//rd->getInterpFrame(rtime,rd->targetRefFrame);		
 		rd->targetRefFrame = rd->idleRefFrame;		
 	}	
-	estate.targetState = rd->getPoseState(rd->idleRefFrame);
+	estate.ikTargetState = rd->getPoseState(rd->idleRefFrame);
 }
 
 void ReachStateInterface::updateReachToTarget( ReachStateData* rd )
@@ -473,8 +474,53 @@ void ReachStateInterface::updateReachToTarget( ReachStateData* rd )
 	SRT offset = rd->curHandAction->getHandTargetStateOffset(rd,tsBlend);
 	tsBlend.add(offset);		
 	//LOG("reach target after offset = %f %f %f\n",tsBlend.tran[0],tsBlend.tran[1],tsBlend.tran[2]);
-	estate.targetState = tsBlend;
+	estate.ikTargetState = tsBlend;
 	estate.grabStateError = offset;
+}
+
+
+void ReachStateInterface::updateMotionPoseInterpolation( ReachStateData* rd )
+{
+	EffectorState& estate = rd->effectorState;
+	float reachStep = rd->linearVel*rd->dt;
+
+	SRT diff = SRT::diff(estate.curBlendState,estate.ikTargetState);	
+	float difflenght = diff.tran.norm();
+	SrVec stepVec = diff.tran;		
+	if (stepVec.norm() > reachStep)
+	{
+		stepVec.normalize();
+		stepVec = stepVec*reachStep;
+	}
+
+	BodyMotionFrame interpFrame;	
+	SRT stateOffset = SRT::diff(rd->getPoseState(rd->currentRefFrame),estate.curIKTargetState);	
+	
+	SrVec newCurTarget = estate.curBlendState.tran + stepVec;
+	
+	float startLength = (newCurTarget - estate.startTargetState.tran).norm();
+	float endLength   = (estate.ikTargetState.tran - newCurTarget).norm();
+
+	float morphWeight = endLength > 0.f ? (startLength+reachStep)/(endLength+startLength+reachStep) : 1.f;
+	BodyMotionFrame morphFrame;				
+
+	//				
+	if (rd->useProfileInterpolation)
+		MotionExampleSet::blendMotionFrameProfile(rd->interpMotion,rd->startRefFrame,rd->targetRefFrame,morphWeight,morphFrame);
+	else
+		MotionExampleSet::blendMotionFrame(rd->startRefFrame,rd->targetRefFrame,morphWeight,morphFrame);	
+
+	SRT interpState = rd->getPoseState(morphFrame);	
+	SRT stateError = SRT::diff(rd->getPoseState(rd->targetRefFrame),estate.ikTargetState);	
+
+	float weight = 1.f;
+	if (reachStep < endLength && endLength != 0.f)
+		weight = reachStep /endLength;
+	SRT delta = SRT::blend(stateOffset,stateError,weight);
+	interpState.add(delta);
+	estate.curBlendState = SRT::blend(estate.startTargetState,estate.ikTargetState,morphWeight);
+	estate.curIKTargetState = interpState;	
+	rd->currentRefFrame = morphFrame;	
 }
 
 void ReachStateInterface::updateMotionIK( ReachStateData* rd )
@@ -482,7 +528,7 @@ void ReachStateInterface::updateMotionIK( ReachStateData* rd )
 	EffectorState& estate = rd->effectorState;
 	float reachStep = rd->linearVel*rd->dt;
 
-	SRT diff = SRT::diff(estate.curTargetState,estate.targetState);
+	SRT diff = SRT::diff(estate.curIKTargetState,estate.ikTargetState);
 	SrVec offset = diff.tran;
 
 	float offsetLength = offset.norm();								
@@ -495,7 +541,7 @@ void ReachStateInterface::updateMotionIK( ReachStateData* rd )
 
 	BodyMotionFrame morphFrame;				
 	MotionExampleSet::blendMotionFrame(rd->currentRefFrame,rd->targetRefFrame,morphWeight,morphFrame);						
-	estate.curTargetState = SRT::blend(estate.curTargetState,estate.targetState,morphWeight);
+	estate.curIKTargetState = SRT::blend(estate.curIKTargetState,estate.ikTargetState,morphWeight);
 	rd->currentRefFrame = morphFrame;	
 }
 
@@ -509,12 +555,12 @@ void ReachStateInterface::updateMotionInterp( ReachStateData* rd )
 		return;
 	}
 	EffectorState& estate = rd->effectorState;
-	SRT stateOffset = SRT::diff(rd->getPoseState(rd->currentRefFrame),estate.curTargetState);
+	SRT stateOffset = SRT::diff(rd->getPoseState(rd->currentRefFrame),estate.curIKTargetState);
 	BodyMotionFrame outFrame,interpFrame;
 	rd->getInterpFrame(rd->curRefTime,interpFrame);
 	MotionExampleSet::blendMotionFrame(interpFrame,rd->idleRefFrame,rd->blendWeight,outFrame);
 	SRT interpState = rd->getPoseState(outFrame);	
-	SRT stateError = SRT::diff(rd->getPoseState(rd->targetRefFrame),estate.targetState);	
+	SRT stateError = SRT::diff(rd->getPoseState(rd->targetRefFrame),estate.ikTargetState);	
 
 	float percentTime = curStatePercentTime(rd,rd->curRefTime);		
 	float deltaPercent = percentTime - curStatePercentTime(rd,rd->curRefTime-rd->du);
@@ -525,7 +571,7 @@ void ReachStateInterface::updateMotionInterp( ReachStateData* rd )
 
 	SRT delta = SRT::blend(stateOffset,stateError,weight);
 	interpState.add(delta);
-	estate.curTargetState = interpState;
+	estate.curIKTargetState = interpState;
 	rd->currentRefFrame = outFrame;	
 
 	rd->du = (float)interpMotion->getRefDeltaTime(rd->curRefTime,rd->dt);
@@ -535,7 +581,7 @@ void ReachStateInterface::updateMotionInterp( ReachStateData* rd )
 bool ReachStateInterface::ikTargetReached( ReachStateData* rd, float ratio )
 {
 	EffectorState& estate = rd->effectorState;
-	float dist = SRT::dist(estate.curState,estate.targetState);
+	float dist = SRT::dist(estate.curState,estate.ikTargetState);
 	return (dist < rd->reachRegion*ratio);
 }
 
@@ -546,13 +592,20 @@ bool ReachStateInterface::interpTargetReached( ReachStateData* rd )
 	else
 		return ikTargetReached(rd);
 }
+
+bool ReachStateInterface::poseTargetReached( ReachStateData* rd, float ratio /*= 0.1f*/ )
+{
+	EffectorState& estate = rd->effectorState;
+	float dist = SRT::dist(estate.curIKTargetState,estate.ikTargetState);
+	return (dist < rd->reachRegion*ratio);
+}
 /************************************************************************/
 /* Reach State Idle                                                       */
 /************************************************************************/
 void ReachStateIdle::updateEffectorTargetState( ReachStateData* rd )
 {
 	ReachStateInterface::updateReturnToIdle(rd);	
-	rd->effectorState.curTargetState = rd->effectorState.targetState;
+	rd->effectorState.curIKTargetState = rd->effectorState.ikTargetState;
 }
 
 void ReachStateIdle::update( ReachStateData* rd )
@@ -663,7 +716,7 @@ std::string ReachStateComplete::nextState( ReachStateData* rd )
 	else if (rd->curHandAction->isPickingUpNewPawn(rd))
 	{
 		rd->curHandAction->reachNewTargetAction(rd);
-		rd->newTarget = true;
+		rd->newTarget = true;		
 		//completeTime = 0.f;		
 		nextStateName = "PreReturn";//"NewTarget";
 	}
@@ -681,12 +734,14 @@ void ReachStateNewTarget::updateEffectorTargetState( ReachStateData* rd )
 
 void ReachStateNewTarget::update( ReachStateData* rd )
 {
-	ReachStateInterface::updateMotionIK(rd);	
+	//ReachStateInterface::updateMotionIK(rd);	
+	ReachStateInterface::updateMotionPoseInterpolation(rd);
 }
 std::string ReachStateNewTarget::nextState( ReachStateData* rd )
 {
 	std::string nextStateName = "NewTarget";
-	if (ikTargetReached(rd))
+	//if (ikTargetReached(rd))
+	if (poseTargetReached(rd))
 	{
 		rd->curHandAction->reachCompleteAction(rd);
 		rd->startReach = false;
@@ -697,7 +752,6 @@ std::string ReachStateNewTarget::nextState( ReachStateData* rd )
 		rd->startReach = false;
 		nextStateName = "PreReturn";
 	}
-
 	return nextStateName;
 }
 

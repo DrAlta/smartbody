@@ -287,7 +287,10 @@ void ChannelBufferWindow::refreshQuat(Fl_Widget* widget, void* data)
 
 	if(strcmp(window->quat->mvalue()->label(), "Quaternion") == 0) i = 0;
 	else if(strcmp(window->quat->mvalue()->label(), "Euler angle") == 0) i = 1;
-	else if (strcmp(window->quat->mvalue()->label(), "Swing twist") == 0) i = 3;
+	else if (strcmp(window->quat->mvalue()->label(), "Axis-Angle") == 0) i = 3;
+	else if (strcmp(window->quat->mvalue()->label(), "Quat Velocity") == 0) i = 4;
+	else if (strcmp(window->quat->mvalue()->label(), "Euler Velocity") == 0) i = 5;
+	else if (strcmp(window->quat->mvalue()->label(), "Axis-Angle Velocity") == 0) i = 6;
 	
 	window->chartview->set_quat_show_type(i);
 	setXYZVisibility(window);
@@ -297,7 +300,10 @@ void ChannelBufferWindow::initQuat()
 {
 	quat->add("Quaternion");
 	quat->add("Euler angle");
-	quat->add("Swing twist");	
+	quat->add("Axis-Angle");	
+	quat->add("Quat Velocity");
+	quat->add("Euler Velocity");
+	quat->add("Axis-Angle Velocity");
 	quat->value(0);
 	setXYZVisibility(this);
 }
@@ -329,7 +335,7 @@ void ChannelBufferWindow::setXYZVisibility(ChannelBufferWindow* window)
 		window->show_w->deactivate();
 		window->show_w->labelcolor(color);
 	}
-	else if(strcmp(menuValue->label(), "Swing twist") == 0)
+	else if(strcmp(menuValue->label(), "Axis-Angle") == 0)
 	{
 		color = 47;
 		window->show_x->activate();
@@ -727,8 +733,8 @@ void ChannelBufferWindow::fillSeriesWithMotionData(ChannelBufferWindow* window, 
 	for(index = 0; index < channels.size(); ++index)
 	{
 		if(channels[index].joint == NULL) continue;
-		const char* name = channels[index].joint->name().c_str();
-		if(strcmp(name, &(item.name->get(0))) == 0 && item.type == channels[index].type)
+		std::string name = channels[index].joint->name().c_str();
+		if(strcmp(name.c_str(), &(item.name->get(0))) == 0 && item.type == channels[index].type)
 		{
 			break;
 		}
@@ -738,6 +744,8 @@ void ChannelBufferWindow::fillSeriesWithMotionData(ChannelBufferWindow* window, 
 		series->Clear();
 		return;
 	}
+	float motionDt = motion->duration()/(float)motion->frames();
+	series->dt = motionDt;
 	for(int k = 0; k < window->num_of_frames; ++k)
 	{
 		motion->apply_frame(k);
@@ -850,10 +858,13 @@ void ChannelBufferWindow::update()
 			SbmPawn* pawn = (*iter).second;
 			const char* name = getSelectedCharacterName();
 			if( name && strcmp(pawn->name, name) == 0)
+			{
+				pawn_p = pawn;
 				break;
+			}
 		}
 		if(pawn_p != NULL)
-		{
+		{			
 			if(mode != 2)
 			{
 				SrBuffer<float>& buffer = pawn_p->ct_tree_p->getLastFrame().buffer();

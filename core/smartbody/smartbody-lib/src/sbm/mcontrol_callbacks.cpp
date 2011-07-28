@@ -685,6 +685,7 @@ int mcu_resourceViewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return( CMD_FAILURE );
 }
 
+
 int mcu_faceViewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
 	if( mcu_p )	{

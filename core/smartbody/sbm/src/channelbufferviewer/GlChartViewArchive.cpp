@@ -30,6 +30,7 @@ GlChartViewSeries::GlChartViewSeries()
 	current_ind = -1;
 	size = 0;
 	bold = false;
+	dt = 0.01f;
 };
 
 GlChartViewSeries::~GlChartViewSeries()

@@ -1598,6 +1598,14 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\sbm\me_ct_motion_profile.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\sbm\me_ct_motion_profile.h"
+						>
+					</File>
+					<File
 						RelativePath="..\src\sbm\me_ct_motion_timewarp.cpp"
 						>
 					</File>

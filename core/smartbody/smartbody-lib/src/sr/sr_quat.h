@@ -118,6 +118,8 @@ class SrQuat
     /*! Returns the angle in radians. */
     float angle () const;
 
+	SrVec axisAngle() const;
+
     /*! Normalizes the quaternion and ensures w>=0 */
     void normalize ();
 

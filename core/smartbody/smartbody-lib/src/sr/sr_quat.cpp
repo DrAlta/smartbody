@@ -220,6 +220,10 @@ SrMat& SrQuat::get_mat ( SrMat& m ) const
    return m;
  }
 
+SrVec SrQuat::axisAngle() const
+{
+	return axis()*angle();
+}
 //=================================== Friend Functions ===================================
 
 SrVec operator * ( const SrVec &v, const SrQuat &q )

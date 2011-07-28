@@ -1763,7 +1763,9 @@ int FltkViewer::handle ( int event )
 				 {
 					 //std::string cmd;
 					 //cmd = "bml char " + curChar->name + " <sbm:reach sbm:handle=\"r" + curChar->name + "\" action=\"pick-up\" target=\""+ selectedPawn->name + "\" />";
-					 sprintf(exe_cmd,"bml char %s <sbm:reach sbm:handle=\"r%s\" sbm:reach-duration=\"0.01\" sbm:action=\"pick-up\" target=\"%s\"/>",curChar->name,curChar->name,selectedPawn->name);
+					 //sprintf(exe_cmd,"bml char %s <sbm:reach sbm:handle=\"r%s\" sbm:reach-duration=\"0.01\" sbm:action=\"pick-up\" target=\"%s\"/>",curChar->name,curChar->name,selectedPawn->name);
+					 sprintf(exe_cmd,"bml char %s <sbm:reach sbm:reach-duration=\"-1.0\" sbm:action=\"touch\" target=\"%s\"/>",curChar->name,selectedPawn->name);
+
 					 mcuCBHandle& mcu = mcuCBHandle::singleton();
 					 mcu.execute(exe_cmd);
 				 }
@@ -3707,9 +3709,9 @@ void FltkViewer::drawReach()
 		EffectorState& es = rd->effectorState;
 // 		SrVec reachTraj = es.curState.tran;
 // 		PositionControl::drawSphere(reachTraj,sphereSize,SrVec(0,1,1));
-		SrVec ikTraj = es.curTargetState.tran;		
+		SrVec ikTraj = es.curIKTargetState.tran;		
 		PositionControl::drawSphere(ikTraj,sphereSize,SrVec(1,0,1));
-		SrVec ikTarget = es.targetState.tran;
+		SrVec ikTarget = es.ikTargetState.tran;
 		
 
 // 		glColor3f(1.0, 0.0, 0.0);
