@@ -50,8 +50,8 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	facingAngle = -200.0f;			// exposed, unit: deg
 	facingAngleThreshold = 10;
 	acceleration = 1.0f;			// exposed, unit: meter/s^2
-	scootAcceleration = 200.0f;		// exposed, unit: unknown
-	angleAcceleration = 450.0f;		// exposed, unit: unknown
+	scootAcceleration = 300.0f; //200.0f;		// exposed, unit: unknown
+	angleAcceleration = 600.0f; //450.0f;		// exposed, unit: unknown
 	stepAdjust = false;
 
 	forward = Util::Vector(-1.0f, 0.0f, 0.0f);
@@ -562,7 +562,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 		targetLoc.y = mToCm(goalQueue.front().targetLocation.y);
 		targetLoc.z = mToCm(goalQueue.front().targetLocation.z);
 		float dist = sqrt((x - mToCm(goalQueue.front().targetLocation.x)) * (x - mToCm(goalQueue.front().targetLocation.x)) + 
-					  	  (y - mToCm(goalQueue.front().targetLocation.y)) * (y - mToCm(goalQueue.front().targetLocation.y)) + 
+					  	//  (y - mToCm(goalQueue.front().targetLocation.y)) * (y - mToCm(goalQueue.front().targetLocation.y)) + 
 						  (z - mToCm(goalQueue.front().targetLocation.z)) * (z - mToCm(goalQueue.front().targetLocation.z)));
 		if (dist < distThreshold)
 			character->steeringAgent->getAgent()->clearGoals();
@@ -700,7 +700,8 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 //		if (curState->stateName == PseudoIdleState && numGoals != 0 && nextStateName == "")
 		if (character->_numSteeringGoal == 0 && numGoals != 0)
 		{
-			float targetAngle = radToDeg(atan2(mToCm(goalQueue.front().targetLocation.x) - x, mToCm(goalQueue.front().targetLocation.z) - z));
+			//float targetAngle = radToDeg(atan2(mToCm(goalQueue.front().targetLocation.x) - x, mToCm(goalQueue.front().targetLocation.z) - z));
+			float targetAngle = radToDeg(atan2(mToCm(pprAgent->getStartTargetPosition().x) - x, mToCm(pprAgent->getStartTargetPosition().z) - z));
 			normalizeAngle(targetAngle);
 			float diff = targetAngle - yaw;
 			normalizeAngle(diff);

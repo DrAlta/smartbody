@@ -248,6 +248,20 @@ void GridDatabase2D::getItemsInRange(set<SpatialDatabaseItemPtr> & neighborList,
 	}
 }
 
+void GridDatabase2D::getAllItems(std::set<SpatialDatabaseItemPtr> &neighborList, SpatialDatabaseItemPtr exclude) {
+	int cellIndex;
+
+	for (unsigned int i = 0; i < _xNumCells; i++) {
+		for (unsigned int j = 0; j < _zNumCells; j++) {
+			cellIndex = i * _zNumCells + j;
+			for (unsigned int k = 0; k < _maxItemsPerCell; k++) {
+				if ((_cells[cellIndex]._items[k] != NULL) && (_cells[cellIndex]._items[k] != exclude)) {
+					neighborList.insert(_cells[cellIndex]._items[k]);
+				}
+			}
+		}
+	}
+}
 
 //
 // getItemsInRange() - simply converts the spatial bounds into index range, and then calls the private getItemsInRange().
@@ -636,6 +650,54 @@ Point GridDatabase2D::randomPositionInRegionWithoutCollisions(const AxisAlignedB
 {
 	static MTRand _randomNumberGenerator(2);
 	return randomPositionInRegionWithoutCollisions(region, radius, excludeAgents, _randomNumberGenerator);
+}
+
+Point GridDatabase2D::randomPositionInRegionWithoutCollisions(const Util::AxisAlignedBox & region, float radius, bool excludeAgents, bool &succeed)
+{
+	static MTRand _randomNumberGenerator(2);
+	Point ret(0.0f, 0.0f, 0.0f);
+	bool notFoundYet;
+	unsigned int numTries = 0;
+	float xspan = region.xmax - region.xmin - 2*radius;
+	float zspan = region.zmax - region.zmin - 2*radius;
+	succeed = false;
+
+	do {
+
+		ret.x = region.xmin + radius + ((float)_randomNumberGenerator.rand(xspan));
+		ret.y = 0.0f;
+		ret.z = region.zmin + radius + ((float)_randomNumberGenerator.rand(zspan));
+
+		// assume this new point has no collisions, until we find out below
+		notFoundYet = false;
+
+		// check if ret collides with anything
+		set<SpatialDatabaseItemPtr> neighbors;
+		neighbors.clear();
+		getItemsInRange(neighbors, ret.x - radius, ret.x + radius, ret.z - radius, ret.z + radius, NULL);
+
+		set<SpatialDatabaseItemPtr>::iterator neighbor;
+		for (neighbor = neighbors.begin(); neighbor != neighbors.end(); ++neighbor) {
+			if ((excludeAgents) && ((*neighbor)->isAgent())) {
+				continue;
+			}
+			notFoundYet = (*neighbor)->overlaps(ret, radius);
+			if (notFoundYet) {
+				break;
+			}
+		}
+
+		numTries++;
+		if (numTries > 1) {
+			if (notFoundYet)
+				succeed = false;
+			else
+				succeed = true;
+			return ret;
+		}
+	} while (notFoundYet);
+	succeed = true;
+	return ret;
 }
 
 Point GridDatabase2D::randomPositionInRegionWithoutCollisions(const AxisAlignedBox & region, float radius, bool excludeAgents,  MTRand & randomNumberGenerator)

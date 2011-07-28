@@ -60,6 +60,8 @@ void PPRAgent::reset(const SteerLib::AgentInitialConditions & initialConditions,
 
 	_desiredForward = _forward;
 	_magnifiedDesiredForward = _desiredForward;
+	_isNewGoal = false;
+	_startTargetPosition = _position;
 
 	if (!_enabled) {
 		gSpatialDatabase->addObject( dynamic_cast<SpatialDatabaseItemPtr>(this), newBounds);
@@ -180,13 +182,52 @@ void PPRAgent::addGoal(const SteerLib::AgentGoalInfo & newGoal) {
 	if (newGoal.goalType != SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET) {
 		throw Util::GenericException("Currently the PPR agent does not support goal types other than GOAL_TYPE_SEEK_STATIC_TARGET.");
 	}
+
 	_landmarkQueue.push(newGoal); 
 	if (_landmarkQueue.size()==1) {
 		_currentGoal = newGoal;
-		if (_currentGoal.targetIsRandom) {
+		_isNewGoal = true;
 
-			Util::AxisAlignedBox aab = Util::AxisAlignedBox(-100.0f, 100.0f, 0.0f, 0.0f, -100.0f, 100.0f);
-			_currentGoal.targetLocation = gSpatialDatabase->randomPositionInRegionWithoutCollisions(aab, 1.0f, true);
+		float regionRadius = 0.6f;
+		bool succeed = false;
+		std::set<SpatialDatabaseItemPtr> allObjects;
+		allObjects.clear();
+		gSpatialDatabase->getAllItems(allObjects, dynamic_cast<SpatialDatabaseItemPtr>(this));
+		
+		while (!succeed && regionRadius < 2.3f) {
+			// define the searching region
+			Util::AxisAlignedBox aab = Util::AxisAlignedBox(_currentGoal.targetLocation.x - regionRadius, _currentGoal.targetLocation.x + regionRadius, 
+				0.0f, 0.0f, _currentGoal.targetLocation.z - regionRadius, _currentGoal.targetLocation.z + regionRadius);
+
+			unsigned int numTries = 0;
+			while (!succeed) {
+				// find a postion that is free of static obstacles and agents
+				Util::Point pos = gSpatialDatabase->randomPositionInRegionWithoutCollisions(aab, 0.3f, false, succeed);
+				// check if this is also other agents' goal
+				if (succeed) {
+					for (std::set<SpatialDatabaseItemPtr>::iterator object = allObjects.begin(); object != allObjects.end(); ++object) {
+						if ((*object)->isAgent()) {
+							PPRAgent* agent = dynamic_cast<PPRAgent*> (*object);
+							if((agent->currentGoal().targetLocation - pos).length() < 0.5f) {
+								succeed = false;
+								break;
+							}
+						}
+					}
+				}
+
+				if(succeed) {
+					_currentGoal.targetLocation = pos;
+					_landmarkQueue.front().targetLocation = pos;
+					break;
+				}
+				if (numTries > 1000) {
+					break;
+				}
+				numTries++;
+			}
+
+			regionRadius += 0.3f;
 		}
 	}
 }
@@ -301,6 +342,7 @@ void PPRAgent::runCognitivePhase()
 	}
 	else {
 		_currentGoal = _landmarkQueue.front();
+		_isNewGoal = true;
 	}
 
 	// if the goal is something other than "seek static target", PPR does not support it at the moment.
@@ -951,7 +993,10 @@ void PPRAgent::runReactivePhase()
 	//_finalSteeringCommand.dynamicsSteeringForce
 	//_finalSteeringCommand.steeringMode
 
-
+	if(_isNewGoal) {
+		_startTargetPosition = _localTargetLocation;
+		_isNewGoal = false;
+	}
 
 	//
 	// apply scooting.
@@ -2090,6 +2135,7 @@ void PPRAgent::draw()
 		DrawLib::drawFlag(_currentGoal.targetLocation);
 	}
 
+	DrawLib::drawStar(_startTargetPosition, Vector(1.0f, 0.0f, 0.0f), 0.20f, gYellow);
 
 	Vector verticalOffset = Vector(0.0f, 0.03f, 0.0f);
 
@@ -2114,8 +2160,8 @@ void PPRAgent::draw()
 	//DrawLib::drawLine(_position, _position+(__plannedSteeringForce), gGreen);
 	DrawLib::glColor(gGreen);
 	DrawLib::drawLine(_position, _position + _desiredForward * 3.0f);
-	DrawLib::glColor(gYellow);
-	DrawLib::drawLine(_position, _position + _magnifiedDesiredForward * 3.0f);
+	//DrawLib::glColor(gYellow);
+	//DrawLib::drawLine(_position, _position + _magnifiedDesiredForward * 3.0f);
 
 
 	if (__hitSomething) {

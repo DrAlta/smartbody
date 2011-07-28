@@ -107,7 +107,6 @@ public:
 		_nextFrameToRunReactivePhase = 0;
 	}
 
-
 	bool intersects(const Util::Ray &r, float &t) { return Util::rayIntersectsCircle2D(_position, _radius, r, t); }
 	bool overlaps(const Util::Point & p, float radius) { return Util::circleOverlapsCircle2D( _position, _radius, p, radius); }
 	float computePenetration(const Util::Point & p, float radius) { return Util::computeCircleCirclePenetration2D( _position, _radius, p, radius); }
@@ -138,6 +137,7 @@ public:
 	void updateAgentState(const Util::Point & newPosition,  const Util::Vector & newOrientation, float newSpeed);
 	void updateDesiredForward(const Util::Vector & desiredForward) {_desiredForward = desiredForward;};
 	void updateMagnifiedDesiredForward(const Util::Vector & magnifiedDesiredForward) {_magnifiedDesiredForward = magnifiedDesiredForward;}
+	Util::Point& getStartTargetPosition() {return _startTargetPosition;}
 
 protected:
 	//========================
@@ -258,6 +258,8 @@ protected:
 	SteerLib::AgentGoalInfo _currentGoal;
 	std::queue<SteerLib::AgentGoalInfo> _landmarkQueue;
 
+	bool _isNewGoal;
+	Util::Point _startTargetPosition;
 
 	//
 	// NOTE CAREFULLY these annotation varibales have TWO UNDERSCORES prefix.
