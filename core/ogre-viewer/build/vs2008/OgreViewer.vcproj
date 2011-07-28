@@ -183,7 +183,39 @@
 	</References>
 	<Files>
 		<File
+			RelativePath="..\..\src\BoneBusHandler.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\BoneBusHandler.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\src\main.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\OgreFrameListener.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\OgreFrameListener.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\OgreRenderer.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\OgreRenderer.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\SBListener.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\SBListener.h"
 			>
 		</File>
 	</Files>
