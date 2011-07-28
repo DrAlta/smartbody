@@ -336,4 +336,6 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 #endif
 	return ct_request;
 }
+#else
+int g_bml_reach_unused_xxxxxxx = 0;  // fix LNK4221: no public symbols found; archive member will be inaccessible
 #endif

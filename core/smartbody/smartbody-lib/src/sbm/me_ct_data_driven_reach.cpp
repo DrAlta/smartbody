@@ -472,4 +472,6 @@ float MeCtDataDrivenReach::Random( float r_min, float r_max )
 	return frand;
 }
 
+#else
+int g_me_ct_data_driven_reach_unused_xxxxxxx = 0;  // fix LNK4221: no public symbols found; archive member will be inaccessible
 #endif
