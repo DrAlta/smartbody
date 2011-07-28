@@ -5576,6 +5576,12 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			steerOptions->gridDatabaseOptions.numGridCellsZ = numGridCellsZ;
 			steerOptions->gridDatabaseOptions.maxItemsPerGridCell = maxItemsPerGridCell;
 
+
+			// specify maxItemsPerGridCell from command line
+			if (args.calc_num_tokens() > 0)
+				steerOptions->gridDatabaseOptions.maxItemsPerGridCell = args.read_int();
+
+
 			LOG("INIT STEERSIM");
 			try {
 				mcu_p->steerEngine.init(steerOptions);
