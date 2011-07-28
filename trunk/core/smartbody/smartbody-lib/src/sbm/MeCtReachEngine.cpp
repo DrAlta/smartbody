@@ -166,8 +166,9 @@ void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet )
 		return;
 
 	// set world offset to zero	
-	std::string rootName = ikScenario.ikTreeRoot->joint->parent()->name().c_str();
+	std::string rootName = ikScenario.ikTreeRoot->joint->parent()->name();
 	SkJoint* root = skeletonRef->search_joint(rootName.c_str());
+
 	if (root)
 	{
 		root->quat()->value(SrQuat());
@@ -408,7 +409,7 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 	skeletonRef->update_global_matrices();	
 	updateSkeletonCopy();	
 	// update reach data
-	std::string rootName = ikScenario.ikTreeRoot->joint->parent()->name().c_str();
+	std::string rootName = ikScenario.ikTreeRoot->joint->parent()->name();
 	reachData->curTime = (float)t;
 	reachData->dt = dt;	
 	reachData->stateTime += dt;
