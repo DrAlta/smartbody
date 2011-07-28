@@ -62,7 +62,7 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 			std::stringstream strstr;
 
 			SkChannel& channel = channels[c];
-			const char* jointName = channels.name(c).c_str();
+			std::string jointName = channels.name(c).c_str();
 
 			strstr << jointName;
 
