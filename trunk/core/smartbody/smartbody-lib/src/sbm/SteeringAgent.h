@@ -53,8 +53,9 @@ class SteeringAgent
 
 		float evaluateSteppingLoco(float x, float y, float z, float yaw);
 
-		// param testing
 		void parameterTesting();
+		void cacheParameter(std::list<float>& sampleData, float data, int size);
+		float getFilteredParameter(std::list<float>& sampleData);
 
 	private:
 		SteerLib::AgentInterface* agent;
@@ -74,6 +75,8 @@ class SteeringAgent
 		float paLocoScootGain;
 		// global param
 		float scootThreshold;
+		float speedThreshold;
+		float angleSpeedThreshold;
 		float distThreshold;	
 		float distDownThreshold;
 		float desiredSpeed;
@@ -110,6 +113,14 @@ class SteeringAgent
 		float prevX;
 		float prevZ;
 		float prevYaw;
+
+		// low pass filter
+		int speedWindowSize;
+		int angleWindowSize;
+		int scootWindowSize;
+		std::list<float> speedCache;
+		std::list<float> angleCache;
+		std::list<float> scootCache;
 };
 
 #endif
