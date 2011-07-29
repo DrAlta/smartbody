@@ -40,10 +40,10 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;&quot;..\..\..\..\core\smartbody\smartbody-dll\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\OgreSDK\include;..\..\..\..\lib\OgreSDK\samples\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
-				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
@@ -121,6 +121,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
 				Optimization="3"
 				InlineFunctionExpansion="2"
 				AdditionalIncludeDirectories="..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;&quot;..\..\..\..\core\smartbody\smartbody-dll\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\OgreSDK\include;..\..\..\..\lib\OgreSDK\samples\include"
