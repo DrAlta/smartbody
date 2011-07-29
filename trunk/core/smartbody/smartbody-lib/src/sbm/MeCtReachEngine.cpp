@@ -199,6 +199,7 @@ void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet )
 		ex->motionProfile = new MotionProfile(motion);
 		ex->motionProfile->buildVelocityProfile(0.f,motion->duration()*0.999f,0.05f);
 		ex->motionProfile->buildInterpolationProfile(0.f,(float)motion->time_stroke_emphasis(),0.005f);
+		ex->motionProfile->buildEulerCurveProfile(0.f,(float)motion->time_stroke_emphasis(),0.005f);
 
 		ex->getMotionParameter(ex->parameter);		
 		// set initial index & weight for the motion example
@@ -439,8 +440,8 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 	}
 
 	ikMaxOffset = ikDefaultVelocity*3.f*dt;
-	//solveIK(reachData,ikMotionFrame);	
-	ikMotionFrame = reachData->currentRefFrame;
+	solveIK(reachData,ikMotionFrame);	
+	//ikMotionFrame = reachData->currentRefFrame;
 }
 
 bool MeCtReachEngine::addHandConstraint( SkJoint* targetJoint, const char* effectorName )

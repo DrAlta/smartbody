@@ -18,6 +18,15 @@ float LinearProfileCurve::evaluate( float t )
 	return (float)curve.evaluate(t);
 }
 
+float LinearProfileCurve::start()
+{
+	return (float)curve.get_head_value();
+}
+
+float LinearProfileCurve::end()
+{
+	return (float)curve.get_tail_value();
+}
 /************************************************************************/
 /* Motion Profile                                                       */
 /************************************************************************/
@@ -47,6 +56,31 @@ void MotionProfile::buildInterpolationProfile( float startTime, float endTime, f
 	}
 }
 
+void MotionProfile::buildEulerCurveProfile( float startTime, float endTime, float timeStep )
+{
+	float motionLength = motion->duration();
+	std::vector<float> motionBuffer[2];
+	for (int k=0;k<2;k++)
+		motionBuffer[k].resize(motion->channels().count_floats()); 
+	
+	for (int i=0;i<3;i++)
+		cleanUpProfileMap(eulerProfile[i]);
+	float prevTime = startTime - timeStep;
+	if (prevTime < 0.f) prevTime = 0.f;
+	motion->apply(prevTime,&motionBuffer[0][0],NULL);
+	int curBufferIdx = 1;
+	int prevBufferIdx = 0;
+	for (float t = startTime; t <= endTime; t+= timeStep)
+	{
+		// get current motion frame
+		motion->apply(t,&motionBuffer[1][0],NULL);
+		float normT = (t-startTime)/(endTime-startTime);
+		float normTimeStep = timeStep/(endTime-startTime);
+		computeEulerVelocity(motion,normT,normTimeStep,motionBuffer[0],motionBuffer[1],eulerProfile);		
+	}
+}
+
+
 void MotionProfile::buildVelocityProfile( float startTime, float endTime, float timeStep )
 {
 	float motionLength = motion->duration();
@@ -56,6 +90,8 @@ void MotionProfile::buildVelocityProfile( float startTime, float endTime, float 
 
 	// clean up profile curves
 	cleanUpProfileMap(velocityProfile);
+	for (int i=0;i<3;i++)
+		cleanUpProfileMap(eulerProfile[i]);
 
 	float prevTime = startTime - timeStep;
 	if (prevTime < 0.f) prevTime = 0.f;
@@ -66,7 +102,8 @@ void MotionProfile::buildVelocityProfile( float startTime, float endTime, float 
 	{
 		// get current motion frame
 		motion->apply(t,&motionBuffer[curBufferIdx][0],NULL);		
-		computeVelocity(motion,t,motionBuffer[prevBufferIdx],motionBuffer[curBufferIdx],velocityProfile);
+		computeVelocity(motion,t,timeStep,motionBuffer[prevBufferIdx],motionBuffer[curBufferIdx],velocityProfile);
+		//computeEulerVelocity(motion,t,timeStep,motionBuffer[prevBufferIdx],motionBuffer[curBufferIdx],eulerProfile);
 		curBufferIdx = 1 - curBufferIdx;
 		prevBufferIdx = 1 - prevBufferIdx;
 	}
@@ -103,7 +140,7 @@ void MotionProfile::createNormalizeInterpolationCurve( float startTime, float en
 	}
 }
 
-void MotionProfile::computeVelocity( SkMotion* m, float t, std::vector<float>& prevFrame, std::vector<float>& curFrame, ProfileCurveMap& outProfile )
+void MotionProfile::computeVelocity( SkMotion* m, float t, float dt, std::vector<float>& prevFrame, std::vector<float>& curFrame, ProfileCurveMap& outProfile )
 {
 	SkChannelArray& channels = m->channels();
 	for (int i=0;i<channels.size();i++)
@@ -127,6 +164,36 @@ void MotionProfile::computeVelocity( SkMotion* m, float t, std::vector<float>& p
 		ProfileCurve* curve = outProfile[chanName];
 		float velAngle = diff.angle();	
 		curve->addPt(t,diff.angle());
+	}
+}
+
+
+
+void MotionProfile::computeEulerVelocity( SkMotion* m, float t, float dt, std::vector<float>& prevFrame, std::vector<float>& curFrame, ProfileCurveMap outProfile[3] )
+{
+	SkChannelArray& channels = m->channels();
+	for (int i=0;i<channels.size();i++)
+	{
+		std::string chanName = channels.name(i);
+		int chanType = channels.type(i);
+		if (chanType != SkChannel::Quat)
+			continue;
+
+		int floatIdx = channels.float_position(i);
+		SrVec pe = SrQuat(&prevFrame[floatIdx]).getEuler();
+		SrVec ce = SrQuat(&curFrame[floatIdx]).getEuler();
+
+		for (int k=0;k<3;k++)
+		{
+			ProfileCurveMap::iterator mi = outProfile[k].find(chanName);
+			if (mi == outProfile[k].end())
+				outProfile[k][chanName] = createProfileCurve();
+
+			ProfileCurve* curve = outProfile[k][chanName];
+			float eulerVel = (ce[k] - pe[k]);	
+			curve->addPt(t,eulerVel);
+		}			
+		//ProfileCurveMap::iterator mi = outProfile.find(chanName);	
 	}
 }
 

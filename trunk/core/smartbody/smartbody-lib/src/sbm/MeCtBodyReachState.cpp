@@ -501,12 +501,17 @@ void ReachStateInterface::updateMotionPoseInterpolation( ReachStateData* rd )
 	float startLength = (newCurTarget - estate.startTargetState.tran).norm();
 	float endLength   = (estate.ikTargetState.tran - newCurTarget).norm();
 
+	float scaleFactor = (startLength+endLength)*3.f/rd->characterHeight;///rd->linearVel;
+
 	float morphWeight = endLength > 0.f ? (startLength+reachStep)/(endLength+startLength+reachStep) : 1.f;
 	BodyMotionFrame morphFrame;				
 
 	//				
 	if (rd->useProfileInterpolation)
-		MotionExampleSet::blendMotionFrameProfile(rd->interpMotion,rd->startRefFrame,rd->targetRefFrame,morphWeight,morphFrame);
+	{
+		//MotionExampleSet::blendMotionFrameProfile(rd->interpMotion,rd->startRefFrame,rd->targetRefFrame,morphWeight,morphFrame);
+		MotionExampleSet::blendMotionFrameEulerProfile(rd->interpMotion,rd->startRefFrame,rd->targetRefFrame,scaleFactor,morphWeight,morphFrame);
+	}
 	else
 		MotionExampleSet::blendMotionFrame(rd->startRefFrame,rd->targetRefFrame,morphWeight,morphFrame);	
 
