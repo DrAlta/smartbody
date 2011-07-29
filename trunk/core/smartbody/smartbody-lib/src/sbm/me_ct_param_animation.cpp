@@ -81,9 +81,34 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 	{
 		if (curStateModule == NULL || nextStateModule == NULL)
 		{
-			LOG("MeCtParamAnimation::controller_evaluate ERR!");
-			reset();
-			return false;
+			std::string errorInfo;
+			errorInfo = character->getName() + "'s animation state transition warning. ";
+			if (curStateModule)
+				errorInfo += "current state: " + curStateModule->data->stateName;
+			else
+				errorInfo += "current state: null ";
+			if (nextStateModule)
+				errorInfo += "next state: " + nextStateModule->data->stateName;
+			else 
+				errorInfo += "next state: null ";
+			LOG("%s", errorInfo.c_str());
+			if (curStateModule == NULL && nextStateModule != NULL)
+			{
+				LOG("would start state %s now", nextStateModule->data->stateName.c_str());
+				// should not delete, just swap the pointers
+				curStateModule = nextStateModule;
+				nextStateModule = NULL;
+				nextStateModule->active = true;
+				delete transitionManager;
+				transitionManager = NULL;
+				return true;
+			}
+			if (curStateModule != NULL && nextStateModule == NULL)
+			{
+				LOG("scheduling problem, please check the corresponding time marks for two states.");
+				reset();
+				return false;
+			}
 		}
 
 		if (!transitionManager->blendingMode)
