@@ -42,7 +42,9 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	paLocoAngleGain = 2.0f;
 	paLocoScootGain = 9.0f;
 
-	scootThreshold = 0.02f;	
+	scootThreshold = 0.1f;	
+	speedThreshold = 0.1f;
+	angleSpeedThreshold = 10.0f;
 	distThreshold = 150.0f;			// exposed, unit: centimeter
 	distDownThreshold = 30.f;
 
@@ -50,8 +52,8 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	facingAngle = -200.0f;			// exposed, unit: deg
 	facingAngleThreshold = 10;
 	acceleration = 1.0f;			// exposed, unit: meter/s^2
-	scootAcceleration = 300.0f; //200.0f;		// exposed, unit: unknown
-	angleAcceleration = 600.0f; //450.0f;		// exposed, unit: unknown
+	scootAcceleration = 300.0f;		// exposed, unit: unknown
+	angleAcceleration = 350.0f;		// exposed, unit: unknown
 	stepAdjust = false;
 
 	forward = Util::Vector(-1.0f, 0.0f, 0.0f);
@@ -71,6 +73,10 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	prevX = 0.0f;
 	prevZ = 0.0f;
 	prevYaw = 0.0f;
+
+	speedWindowSize = 10;
+	angleWindowSize = 3;
+	scootWindowSize = 3;
 }
 
 SteeringAgent::~SteeringAgent()
@@ -689,7 +695,12 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 		}
 	}
 	else if (character->param_animation_ct->isIdle())
+	{
 		character->_reachTarget = true;
+		speedCache.clear();
+		angleCache.clear();
+		scootCache.clear();
+	}
 
 	if (character->param_animation_ct->isIdle() && (agentToTargetDist < distDownThreshold))
 		stepAdjust = false;
@@ -697,8 +708,8 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 	//---start locomotion
 #if !FastStart	// starting with angle transition
 	if (curState)
-//		if (curState->stateName == PseudoIdleState && numGoals != 0 && nextStateName == "")
-		if (character->_numSteeringGoal == 0 && numGoals != 0)
+		if (curState->stateName == PseudoIdleState && numGoals != 0 && nextStateName == "")
+//		if (character->_numSteeringGoal == 0 && numGoals != 0)
 		{
 			//float targetAngle = radToDeg(atan2(mToCm(goalQueue.front().targetLocation.x) - x, mToCm(goalQueue.front().targetLocation.z) - z));
 			float targetAngle = radToDeg(atan2(mToCm(pprAgent->getStartTargetPosition().x) - x, mToCm(pprAgent->getStartTargetPosition().z) - z));
@@ -809,17 +820,20 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			curSpeed = cmToM(curSpeed);
 			if (steeringCommand.aimForTargetSpeed)
 			{
-				if (curSpeed < steeringCommand.targetSpeed)
+//				if (fabs(curSpeed - steeringCommand.targetSpeed) > speedThreshold)
 				{
-					curSpeed += acceleration * dt;
-					if (curSpeed > steeringCommand.targetSpeed)
-						curSpeed = steeringCommand.targetSpeed;
-				}
-				else
-				{
-					curSpeed -= acceleration * dt;
 					if (curSpeed < steeringCommand.targetSpeed)
-						curSpeed = steeringCommand.targetSpeed;
+					{
+						curSpeed += acceleration * dt;
+						if (curSpeed > steeringCommand.targetSpeed)
+							curSpeed = steeringCommand.targetSpeed;
+					}
+					else
+					{
+						curSpeed -= acceleration * dt;
+						if (curSpeed < steeringCommand.targetSpeed)
+							curSpeed = steeringCommand.targetSpeed;
+					}
 				}
 			}
 			else
@@ -840,14 +854,25 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 				paLocoAngleGain = 2.5f;
 
 			float addOnTurning = angleDiff * paLocoAngleGain;
-			if (curTurningAngle < addOnTurning)
-				curTurningAngle += angleAcceleration * dt;
-			else if (curTurningAngle > addOnTurning)
-				curTurningAngle -= angleAcceleration * dt;
+//			if (fabs(curTurningAngle - addOnTurning) > angleSpeedThreshold)
+			{
+				if (curTurningAngle < addOnTurning)
+					curTurningAngle += angleAcceleration * dt;
+				else if (curTurningAngle > addOnTurning)
+					curTurningAngle -= angleAcceleration * dt;
+			}
 
 			// update locomotion state
 			newSpeed = curSpeed;
 			curSpeed = mToCm(curSpeed);
+
+			cacheParameter(speedCache, curSpeed, speedWindowSize);
+			curSpeed = getFilteredParameter(speedCache);
+			cacheParameter(angleCache, curTurningAngle, angleWindowSize);
+			curTurningAngle = getFilteredParameter(angleCache);
+			cacheParameter(scootCache, curScoot, scootWindowSize);
+			curScoot = getFilteredParameter(scootCache);
+
 			curState->paramManager->setWeight(curSpeed, curTurningAngle, curScoot);
 			character->param_animation_ct->updateWeights();
 		}
@@ -930,4 +955,21 @@ void SteeringAgent::parameterTesting()
 	prevZ = z;
 	prevYaw = yaw;
 	normalizeAngle(prevYaw);
+}
+
+void SteeringAgent::cacheParameter(std::list<float>& sampleData, float data, int size)
+{
+	sampleData.push_back(data);
+	while (sampleData.size() > (size_t)size)
+		sampleData.pop_front();
+}
+
+float SteeringAgent::getFilteredParameter(std::list<float>& sampleData)
+{
+	float ret = 0.0f;
+	std::list<float>::iterator iter = sampleData.begin();
+	for (; iter != sampleData.end(); iter++)
+		ret += *iter;
+	ret /= float(sampleData.size());
+	return ret;
 }
