@@ -799,8 +799,8 @@ void ParameterGroup::updateXYZAxisValue(Fl_Widget* widget, void* data)
 
 void ParameterGroup::updateWeight()
 {
-	if (!state->cycle)
-		return;
+//	if (!state->cycle)
+//		return;
 	std::string charName = paWindow->characterList->menu()[paWindow->characterList->value()].label();
 	std::stringstream command;
 	command << "panim update char " << charName;
@@ -879,7 +879,7 @@ void PARunTimeEditor::update()
 			return;
 		if (curState)
 		{
-			if (curState->cycle)
+	//		if (curState->cycle)
 			{
 				if (paramGroup->paramVisualization)
 				{
@@ -911,9 +911,9 @@ void PARunTimeEditor::updateRunTimeStates(std::string currentState)
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	PAStateData* stateData = mcu.lookUpPAState(currentState);
 
-	if (stateData)
-		if (!stateData->cycle)
-			return;
+//	if (stateData)
+//		if (!stateData->cycle)
+//			return;
 
 	if (currentState == "")
 		return;
@@ -922,13 +922,13 @@ void PARunTimeEditor::updateRunTimeStates(std::string currentState)
 	{
 		for (size_t i = 0; i < mcu.param_anim_states.size(); i++)
 		{
-			if (mcu.param_anim_states[i]->cycle)
+//			if (mcu.param_anim_states[i]->cycle)
 				addItem(nextCycleStates, mcu.param_anim_states[i]->stateName);
 		}
 	}
 	else
 	{
-		if (stateData->toStates.size() == 0)
+//		if (stateData->toStates.size() == 0)
 			addItem(nextCycleStates, PseudoIdleState);
 		for (size_t i = 0; i < stateData->toStates.size(); i++)
 			for (size_t j = 0; j < stateData->toStates[i]->toStates.size(); j++)
