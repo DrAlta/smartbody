@@ -43,7 +43,6 @@
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\include;..\..\..\steerlib\include;..\..\..\external"
 				PreprocessorDefinitions="ENABLE_GUI;$(GUI_DEFINE)"
-				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				WarningLevel="3"
