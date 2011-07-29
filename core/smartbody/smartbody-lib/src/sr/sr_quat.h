@@ -109,6 +109,8 @@ class SrQuat
     /*! Defines SrQuat by extracting the rotation from the given rotation matrix. */
     void set ( const SrMat& m );
 
+	void set ( float ex, float ey, float ez);
+
     /*! Gets the current axis and angle of rotation (in radians) that SrQuat defines. */
     void get ( SrVec& axis, float& radians ) const;
 
@@ -119,6 +121,8 @@ class SrQuat
     float angle () const;
 
 	SrVec axisAngle() const;
+
+	SrVec getEuler() const;
 
     /*! Normalizes the quaternion and ensures w>=0 */
     void normalize ();

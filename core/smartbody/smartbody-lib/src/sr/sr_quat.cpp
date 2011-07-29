@@ -20,6 +20,7 @@
  */
 
 # include <sr/sr_quat.h>
+#include <sbm/gwiz_math.h>
 
 //============================== Static Data ====================================
 
@@ -124,6 +125,39 @@ void SrQuat::set ( const SrMat& m )
    # undef Q
  }
 
+void SrQuat::set( float ex, float ey, float ez )
+{
+ 	set(SrVec(ex,ey,ez));
+ 	return;
+// 	float cx, cy, cz, sx, sy, sz;
+// 
+// 	cx = sx = ex/2;
+// 	cy = sy = ey/2;
+// 	cz = sz = ez/2;
+// 
+// 	cx = cosf ( cx );
+// 	cy = cosf ( cy );
+// 	cz = cosf ( cz );
+// 	sx = sinf ( sx );
+// 	sy = sinf ( sy );
+// 	sz = sinf ( sz );
+// 
+// 	float w0 = cx*cy;
+// 	float x0 = sx*cy;
+// 	float y0 = sy*cx;
+// 	float z0 = sx*sy;
+// 
+// 	w = cz*w0 - sz*z0;
+// 	x = x0*cz - sz*y0;
+// 	y = sz*x0 + y0*cz;
+// 	z = sz*w0 + cz*z0;
+	gwiz::quat_t euQ = gwiz::quat_t(gwiz::euler_t(ex,ey,ez));
+	x = (float)euQ.x();
+	y = (float)euQ.y();
+	z = (float)euQ.z();
+	w = (float)euQ.w();
+}
+
 void SrQuat::get ( SrVec& axis, float& radians ) const
  {
    // if SrQuat==(1,0,0,0), the axis will be null, so we
@@ -223,6 +257,20 @@ SrMat& SrQuat::get_mat ( SrMat& m ) const
 SrVec SrQuat::axisAngle() const
 {
 	return axis()*angle();
+}
+
+SrVec SrQuat::getEuler() const
+{
+	return axisAngle();
+
+	// Y, X, Z order
+	SrVec euler;
+	gwiz::euler_t eu = gwiz::euler_t(gwiz::quat_t(w,x,y,z));
+	//euler.x = atan2(2.0f*(w*x+y*z), 1.0f-2.0f*(x*x+y*y));
+	//euler.y = asin(2.0f*(w*y - z*x));
+	//euler.z = atan2(2.0f*(w*z + x*y), 1.0f-2.0f*(y*y+z*z));
+	euler = SrVec(((float)eu.x()),((float)eu.y()),((float)eu.z()));
+	return euler;
 }
 //=================================== Friend Functions ===================================
 

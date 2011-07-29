@@ -511,3 +511,64 @@ void MotionExampleSet::blendMotionFrameProfile( ResampleMotion* motion, BodyMoti
 	}	
 	outFrame = tempFrame;
 }
+
+void MotionExampleSet::blendMotionFrameEulerProfile( ResampleMotion* motion, BodyMotionFrame& startFrame, BodyMotionFrame& endFrame, float scaleFactor, float weight, BodyMotionFrame& outFrame )
+{
+	std::vector<SkJoint*>& affectedJoints = motion->motionParameterFunc->affectedJoints;
+	MotionProfile* profile = motion->getValidMotionProfile();
+	if (!profile)
+	{
+		// no existing profile, just use the basic linear blend between motion frames
+		MotionExampleSet::blendMotionFrame(startFrame,endFrame,weight,outFrame);
+		return;
+	}
+
+	float scale = scaleFactor;///motion->motionDuration(MotionExample::DURATION_ACTUAL);
+
+	BodyMotionFrame tempFrame;
+	float oneMinusWeight = 1.f - weight;
+	tempFrame = startFrame;
+	tempFrame.rootPos = startFrame.rootPos*oneMinusWeight + endFrame.rootPos*weight; // interpolate the position using linear blend
+
+	ProfileCurveMap& eulerProfileMap = profile->eulerProfile[0];
+	//LOG("profile curve map size = %d\n",interpProfileMap.size());
+	//LOG("num affected joints = %d\n",affectedJoints.size());
+	for (unsigned int i=0;i<affectedJoints.size();i++)
+	{
+		SkJoint* joint = affectedJoints[i];
+		std::string chanName = joint->name();
+		float interpW = weight;
+		SrVec startEuler = startFrame.jointQuat[i].getEuler();
+		SrVec endEuler = endFrame.jointQuat[i].getEuler();
+		
+		if (eulerProfileMap.find(chanName) != eulerProfileMap.end())
+		{
+			SrVec outEuler;
+			for (int k=0;k<3;k++)
+			{	
+				ProfileCurveMap& profileMap = profile->eulerProfile[k];
+				ProfileCurve* curve = profileMap[chanName];		
+				float curveDiff = (curve->end() - curve->start());
+				float interpDiff = endEuler[k] - startEuler[k];
+				float modulateWeight = 1.f;
+// 				if (curveDiff*interpDiff < 0.f)
+// 				{
+// 					modulateWeight = -1.f;																						
+// 				}
+				float modulateDiff = interpDiff - curveDiff*modulateWeight;	
+				float linearEstimate = curveDiff*weight;
+				float curveLinearDiff = curve->evaluate(weight) - linearEstimate;
+				outEuler[k] = startEuler[k] + linearEstimate + curveLinearDiff*modulateWeight*scale + modulateDiff*weight;				
+			}
+			//tempFrame.jointQuat[i].set(outEuler[0],outEuler[1],outEuler[2]);
+			tempFrame.jointQuat[i].set(outEuler);
+		}
+		else
+		{
+			tempFrame.jointQuat[i] = slerp(startFrame.jointQuat[i],endFrame.jointQuat[i],interpW);
+		}
+		tempFrame.jointQuat[i].normalize();				
+	}	
+	outFrame = tempFrame;
+
+}

@@ -174,6 +174,7 @@ public:
 	// blend start frame to end frame based on blend weight
 	static void   blendMotionFrame( BodyMotionFrame& startFrame,  BodyMotionFrame& endFrame, float weight, BodyMotionFrame& outFrame);	
 	static void   blendMotionFrameProfile( ResampleMotion* motion, BodyMotionFrame& startFrame,  BodyMotionFrame& endFrame, float weight, BodyMotionFrame& outFrame);
+	static void   blendMotionFrameEulerProfile( ResampleMotion* motion, BodyMotionFrame& startFrame,  BodyMotionFrame& endFrame, float scaleFactor, float weight, BodyMotionFrame& outFrame);
 };
 
 
