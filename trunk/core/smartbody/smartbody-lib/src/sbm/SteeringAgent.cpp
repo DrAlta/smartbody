@@ -52,7 +52,7 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	facingAngle = -200.0f;			// exposed, unit: deg
 	facingAngleThreshold = 10;
 	acceleration = 1.0f;			// exposed, unit: meter/s^2
-	scootAcceleration = 300.0f;		// exposed, unit: unknown
+	scootAcceleration = 200.0f;		// exposed, unit: unknown
 	angleAcceleration = 350.0f;		// exposed, unit: unknown
 	stepAdjust = false;
 
@@ -846,13 +846,14 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			normalizeAngle(angleDiff);
 
 			// address the problem of obstacle avoiding failure during high speed movement
-			if (curSpeed > 200.0f)				
-				paLocoAngleGain = 4.0f;
-			else if (curSpeed > 300.0f)			
-				paLocoAngleGain = 7.0f;
-			else
-				paLocoAngleGain = 2.5f;
+			//if (curSpeed > 200.0f)				
+			//	paLocoAngleGain = 4.0f;
+			//else if (curSpeed > 300.0f)			
+			//	paLocoAngleGain = 7.0f;
+			//else
+			//	paLocoAngleGain = 2.5f;
 
+			paLocoAngleGain = 2.0f;
 			float addOnTurning = angleDiff * paLocoAngleGain;
 //			if (fabs(curTurningAngle - addOnTurning) > angleSpeedThreshold)
 			{
@@ -866,12 +867,14 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			newSpeed = curSpeed;
 			curSpeed = mToCm(curSpeed);
 
-			cacheParameter(speedCache, curSpeed, speedWindowSize);
-			curSpeed = getFilteredParameter(speedCache);
-			cacheParameter(angleCache, curTurningAngle, angleWindowSize);
-			curTurningAngle = getFilteredParameter(angleCache);
-			cacheParameter(scootCache, curScoot, scootWindowSize);
-			curScoot = getFilteredParameter(scootCache);
+			//std::cout << curSpeed << " " << curTurningAngle << " " << curScoot << "   ";
+			//cacheParameter(speedCache, curSpeed, speedWindowSize);
+			//curSpeed = getFilteredParameter(speedCache);
+			//cacheParameter(angleCache, curTurningAngle, angleWindowSize);
+			//curTurningAngle = getFilteredParameter(angleCache);
+			//cacheParameter(scootCache, curScoot, scootWindowSize);
+			//curScoot = getFilteredParameter(scootCache);
+			//std::cout << curSpeed << " " << curTurningAngle << " " << curScoot << std::endl;
 
 			curState->paramManager->setWeight(curSpeed, curTurningAngle, curScoot);
 			character->param_animation_ct->updateWeights();
