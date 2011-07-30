@@ -84,17 +84,20 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 			std::string errorInfo;
 			errorInfo = character->getName() + "'s animation state transition warning. ";
 			if (curStateModule)
-				errorInfo += "current state: " + curStateModule->data->stateName;
+				if (curStateModule->data)
+					errorInfo += "current state: " + curStateModule->data->stateName;
 			else
 				errorInfo += "current state: null ";
 			if (nextStateModule)
-				errorInfo += "next state: " + nextStateModule->data->stateName;
+				if (nextStateModule->data)
+					errorInfo += "next state: " + nextStateModule->data->stateName;
 			else 
 				errorInfo += "next state: null ";
 			LOG("%s", errorInfo.c_str());
 			if (curStateModule == NULL && nextStateModule != NULL)
 			{
-				LOG("would start state %s now", nextStateModule->data->stateName.c_str());
+				if (nextStateModule->data)
+					LOG("would start state %s now", nextStateModule->data->stateName.c_str());
 				// should not delete, just swap the pointers
 				curStateModule = nextStateModule;
 				nextStateModule = NULL;
