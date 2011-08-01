@@ -197,7 +197,7 @@ void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet )
 		ex->timeWarp = new SimpleTimeWarp(refMotion->duration(),motion->duration());
 		ex->motionParameterFunc = motionParameter;
 		ex->motionProfile = new MotionProfile(motion);
-		ex->motionProfile->buildVelocityProfile(0.f,motion->duration()*0.999f,0.05f);
+		ex->motionProfile->buildVelocityProfile(0.f,motion->duration()*0.999f,0.005f);
 		ex->motionProfile->buildInterpolationProfile(0.f,(float)motion->time_stroke_emphasis(),0.005f);
 		ex->motionProfile->buildEulerCurveProfile(0.f,(float)motion->time_stroke_emphasis(),0.005f);
 

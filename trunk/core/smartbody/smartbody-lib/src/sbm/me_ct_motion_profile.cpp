@@ -98,15 +98,32 @@ void MotionProfile::buildVelocityProfile( float startTime, float endTime, float 
 	motion->apply(prevTime,&motionBuffer[0][0],NULL);
 	int curBufferIdx = 1;
 	int prevBufferIdx = 0;
+	float maxAvgVel = 0.f;
+	float minAvgVel = 100000.f;
+	std::string velAvgName = "Average";
 	for (float t = startTime; t <= endTime; t+= timeStep)
 	{
 		// get current motion frame
 		motion->apply(t,&motionBuffer[curBufferIdx][0],NULL);		
 		computeVelocity(motion,t,timeStep,motionBuffer[prevBufferIdx],motionBuffer[curBufferIdx],velocityProfile);
+		ProfileCurve* curve = velocityProfile[velAvgName];
+		float avgVel = curve->evaluate(t);
+		if (avgVel > maxAvgVel)
+			maxAvgVel = avgVel;
+		if (avgVel < minAvgVel)
+			minAvgVel = avgVel;
 		//computeEulerVelocity(motion,t,timeStep,motionBuffer[prevBufferIdx],motionBuffer[curBufferIdx],eulerProfile);
 		curBufferIdx = 1 - curBufferIdx;
 		prevBufferIdx = 1 - prevBufferIdx;
 	}
+	ProfileCurve* curve = velocityProfile[velAvgName];
+	avgVelProfile = createProfileCurve();
+	float avgDiv = 1.f/(maxAvgVel-minAvgVel);
+	for (float t = startTime; t <= endTime; t+= timeStep)
+	{
+		float normT = (t-startTime)/(endTime-startTime);
+		avgVelProfile->addPt(normT,(curve->evaluate(t)-minAvgVel)*avgDiv);
+	}	
 }
 
 void MotionProfile::createNormalizeInterpolationCurve( float startTime, float endTime, float timeStep, ProfileCurve* velCurve, ProfileCurve* interpCurve )
@@ -143,6 +160,7 @@ void MotionProfile::createNormalizeInterpolationCurve( float startTime, float en
 void MotionProfile::computeVelocity( SkMotion* m, float t, float dt, std::vector<float>& prevFrame, std::vector<float>& curFrame, ProfileCurveMap& outProfile )
 {
 	SkChannelArray& channels = m->channels();
+	float aveargeVelocity = 0.f;
 	for (int i=0;i<channels.size();i++)
 	{
 		std::string chanName = channels.name(i);
@@ -163,8 +181,16 @@ void MotionProfile::computeVelocity( SkMotion* m, float t, float dt, std::vector
 
 		ProfileCurve* curve = outProfile[chanName];
 		float velAngle = diff.angle();	
+		aveargeVelocity += velAngle;
 		curve->addPt(t,diff.angle());
-	}
+	}	
+	std::string velAvgChanName = "Average";
+	ProfileCurveMap::iterator mi = outProfile.find(velAvgChanName);
+	if (mi == outProfile.end())
+		outProfile[velAvgChanName]  = createProfileCurve();
+
+	ProfileCurve* curve = outProfile[velAvgChanName];
+	curve->addPt(t,aveargeVelocity);
 }
 
 

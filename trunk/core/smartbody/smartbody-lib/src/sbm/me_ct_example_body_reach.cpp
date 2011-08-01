@@ -28,7 +28,8 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMa
 
 	_duration = -1.f;	
 	footIKFix = true;
-	useProfileInterpolation;
+	useProfileInterpolation = false;
+	useRetiming = false;
 	isMoving = false;
 	startReach = false;
 	endReach = false;
@@ -39,6 +40,7 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMa
 	addDefaultAttributeFloat("reach.velocityScale",1.f,&reachVelocityScale);
 	addDefaultAttributeBool("reach.footIK",true,&footIKFix);
 	addDefaultAttributeBool("reach.useProfileInterpolation",false,&useProfileInterpolation);
+	addDefaultAttributeBool("reach.useRetiming",false,&useRetiming);
 
 	reachEngineMap = reMap;
 	ReachEngineMap::iterator mi;
@@ -267,6 +269,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	currentReachEngine->fadingWeight = blendWeight;
 	currentReachData->autoReturnTime = autoReturnDuration;	
 	currentReachData->useProfileInterpolation = useProfileInterpolation;
+	currentReachData->useRetiming = useRetiming;
 	currentReachData->linearVel = currentReachEngine->ikDefaultVelocity*reachVelocityScale;
 	currentReachEngine->footIKFix    = footIKFix;
 	//if (canReach)

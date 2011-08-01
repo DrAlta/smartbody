@@ -39,6 +39,7 @@ protected:
 	std::string           characterName;		
 	bool                  footIKFix;
 	bool                  useProfileInterpolation;
+	bool                  useRetiming;
 	bool                  isMoving;
 	bool                  startReach;
 	bool                  endReach;
