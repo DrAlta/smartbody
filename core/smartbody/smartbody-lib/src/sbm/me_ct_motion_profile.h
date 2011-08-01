@@ -43,6 +43,7 @@ public:
 	ProfileCurveMap eulerProfile[3]; // euler angles X,Y,Z
 	ProfileCurveMap velocityProfile; 
 	ProfileCurveMap interpolationProfile;	
+	ProfileCurve*   avgVelProfile;
 public:
 	MotionProfile(SkMotion* m);
 	virtual ~MotionProfile(void);	

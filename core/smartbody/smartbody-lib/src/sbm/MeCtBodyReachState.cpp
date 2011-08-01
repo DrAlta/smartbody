@@ -371,9 +371,11 @@ ReachStateData::ReachStateData()
 	curRefTime = 0.f;
 	stateTime = 0.f;
 	blendWeight = 0.f;
+	retimingFactor = 1.f;
 	dt = du = 0.f;
 	startReach = endReach = useExample = locomotionComplete = newTarget = hasSteering = ikReachTarget = false;
 	useProfileInterpolation = false;
+	useRetiming = false;
 	autoReturnTime = -1.f;
 	reachType = MeCtReach::REACH_RIGHT_ARM;
 
@@ -482,8 +484,12 @@ void ReachStateInterface::updateReachToTarget( ReachStateData* rd )
 void ReachStateInterface::updateMotionPoseInterpolation( ReachStateData* rd )
 {
 	EffectorState& estate = rd->effectorState;
-	float reachStep = rd->linearVel*rd->dt;
 
+	// scale factor depends only on traveling distance
+	float reachDistance = (estate.startTargetState.tran - estate.ikTargetState.tran).norm();
+	float scaleFactor = (reachDistance)*3.f/rd->characterHeight;
+	float timeScale = (rd->useRetiming && rd->useProfileInterpolation) ? (scaleFactor*(1.f - rd->retimingFactor) + rd->retimingFactor) : 1.f;//(pow(scaleFactor,rd->retimingFactor)) : 1.f;	
+	float reachStep = rd->linearVel*rd->dt*timeScale;
 	SRT diff = SRT::diff(estate.curBlendState,estate.ikTargetState);	
 	float difflenght = diff.tran.norm();
 	SrVec stepVec = diff.tran;		
@@ -500,20 +506,22 @@ void ReachStateInterface::updateMotionPoseInterpolation( ReachStateData* rd )
 	
 	float startLength = (newCurTarget - estate.startTargetState.tran).norm();
 	float endLength   = (estate.ikTargetState.tran - newCurTarget).norm();
-
-	float scaleFactor = (startLength+endLength)*3.f/rd->characterHeight;///rd->linearVel;
-
 	float morphWeight = endLength > 0.f ? (startLength+reachStep)/(endLength+startLength+reachStep) : 1.f;
-	BodyMotionFrame morphFrame;				
+	BodyMotionFrame morphFrame;			
 
-	//				
+	if (scaleFactor > 1.f) scaleFactor = 1.f;
 	if (rd->useProfileInterpolation)
 	{
-		//MotionExampleSet::blendMotionFrameProfile(rd->interpMotion,rd->startRefFrame,rd->targetRefFrame,morphWeight,morphFrame);
-		MotionExampleSet::blendMotionFrameEulerProfile(rd->interpMotion,rd->startRefFrame,rd->targetRefFrame,scaleFactor,morphWeight,morphFrame);
+		//MotionExampleSet::blendMotionFrameProfile(rd->interpMotion,rd->startRefFrame,rd->targetRefFrame,morphWeight,morphFrame);		
+		float timeFactor = MotionExampleSet::blendMotionFrameEulerProfile(rd->interpMotion,rd->startRefFrame,rd->targetRefFrame,scaleFactor,morphWeight,morphFrame);
+		rd->retimingFactor = pow(timeFactor,2.f);//timeFactor*timeFactor;	
+		//LOG("retiming factor = %f\n",rd->retimingFactor);
 	}
 	else
+	{
 		MotionExampleSet::blendMotionFrame(rd->startRefFrame,rd->targetRefFrame,morphWeight,morphFrame);	
+		rd->retimingFactor = 0.f;
+	}
 
 	SRT interpState = rd->getPoseState(morphFrame);	
 	SRT stateError = SRT::diff(rd->getPoseState(rd->targetRefFrame),estate.ikTargetState);	
@@ -721,7 +729,8 @@ std::string ReachStateComplete::nextState( ReachStateData* rd )
 	else if (rd->curHandAction->isPickingUpNewPawn(rd))
 	{
 		rd->curHandAction->reachNewTargetAction(rd);
-		rd->newTarget = true;		
+		rd->newTarget = true;	
+		rd->retimingFactor = 0.f;
 		//completeTime = 0.f;		
 		nextStateName = "PreReturn";//"NewTarget";
 	}

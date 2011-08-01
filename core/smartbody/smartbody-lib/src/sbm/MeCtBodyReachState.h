@@ -88,6 +88,7 @@ public:
 	float           stateTime; // how much time has been in a state 
 	float           curRefTime, du;	
 	float           blendWeight;
+	float           retimingFactor;
 	SrMat           gmat;
 	// reference motion frames ( as motion interpolation output, or IK reference pose )
 	BodyMotionFrame idleRefFrame, startRefFrame, targetRefFrame, currentRefFrame;		
@@ -103,6 +104,7 @@ public:
 	bool            locomotionComplete;
 	bool            hasSteering;
 	bool            useProfileInterpolation;
+	bool            useRetiming;
 	bool            newTarget;
 
 	// for pick-up/put-down action

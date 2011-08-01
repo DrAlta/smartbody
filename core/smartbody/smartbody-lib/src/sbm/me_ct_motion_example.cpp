@@ -512,15 +512,16 @@ void MotionExampleSet::blendMotionFrameProfile( ResampleMotion* motion, BodyMoti
 	outFrame = tempFrame;
 }
 
-void MotionExampleSet::blendMotionFrameEulerProfile( ResampleMotion* motion, BodyMotionFrame& startFrame, BodyMotionFrame& endFrame, float scaleFactor, float weight, BodyMotionFrame& outFrame )
+float MotionExampleSet::blendMotionFrameEulerProfile( ResampleMotion* motion, BodyMotionFrame& startFrame, BodyMotionFrame& endFrame, float scaleFactor, float weight, BodyMotionFrame& outFrame )
 {
+	float retimingScale = 0.f;
 	std::vector<SkJoint*>& affectedJoints = motion->motionParameterFunc->affectedJoints;
 	MotionProfile* profile = motion->getValidMotionProfile();
 	if (!profile)
 	{
 		// no existing profile, just use the basic linear blend between motion frames
 		MotionExampleSet::blendMotionFrame(startFrame,endFrame,weight,outFrame);
-		return;
+		return retimingScale;
 	}
 
 	float scale = scaleFactor;///motion->motionDuration(MotionExample::DURATION_ACTUAL);
@@ -571,4 +572,11 @@ void MotionExampleSet::blendMotionFrameEulerProfile( ResampleMotion* motion, Bod
 	}	
 	outFrame = tempFrame;
 
+	
+	if (profile->avgVelProfile)
+	{
+		retimingScale = profile->avgVelProfile->evaluate(weight);		
+	}
+
+	return retimingScale;
 }
