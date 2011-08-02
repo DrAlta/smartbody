@@ -820,7 +820,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			curSpeed = cmToM(curSpeed);
 			if (steeringCommand.aimForTargetSpeed)
 			{
-//				if (fabs(curSpeed - steeringCommand.targetSpeed) > speedThreshold)
+				if (fabs(curSpeed - steeringCommand.targetSpeed) > speedThreshold)
 				{
 					if (curSpeed < steeringCommand.targetSpeed)
 					{
@@ -855,14 +855,13 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 
 			paLocoAngleGain = 2.0f;
 			float addOnTurning = angleDiff * paLocoAngleGain;
-//			if (fabs(curTurningAngle - addOnTurning) > angleSpeedThreshold)
+			if (fabs(curTurningAngle - addOnTurning) > angleSpeedThreshold)
 			{
 				if (curTurningAngle < addOnTurning)
 					curTurningAngle += angleAcceleration * dt;
 				else if (curTurningAngle > addOnTurning)
 					curTurningAngle -= angleAcceleration * dt;
 			}
-
 			// update locomotion state
 			newSpeed = curSpeed;
 			curSpeed = mToCm(curSpeed);
