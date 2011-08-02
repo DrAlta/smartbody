@@ -852,7 +852,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		if (operation == "enable")
 		{
 			mcu_p->use_param_animation = true;
-			LOG("Parameterized Animation Enabled!");
+			//LOG("Parameterized Animation Enabled!");
 			return CMD_SUCCESS;
 		}
 		if (operation == "state")
