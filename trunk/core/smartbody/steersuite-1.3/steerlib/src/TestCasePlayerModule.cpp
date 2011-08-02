@@ -71,6 +71,7 @@ void TestCasePlayerModule::initializeSimulation() {
 
 	//SteerLib::TestCaseReader * testCaseReader;
 
+	/*
 	std::string testCasePath;
 
 	// try to find the test case in several ways:
@@ -90,7 +91,6 @@ void TestCasePlayerModule::initializeSimulation() {
 		throw Util::GenericException("Could not find test case " + _testCaseFilename + ".");
 	}
 
-	/*
 	// open the test case
 	testCaseReader = new SteerLib::TestCaseReader();
 	testCaseReader->readTestCaseFromFile(testCasePath);
