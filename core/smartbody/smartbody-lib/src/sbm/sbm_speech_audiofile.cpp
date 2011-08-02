@@ -386,7 +386,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 
 #if 1
 	if( boost::filesystem2::exists( abs_p ) == false )	{
-      LOG( "AudioFileSpeech::requestSpeechAudio ERR: boost::filesystem2::exists() returned NULL\n" );
+      LOG( "AudioFileSpeech::requestSpeechAudio ERR: boost::filesystem2::exists() returned NULL - '%s' - '%s'\n", relativeAudioPath.c_str(), abs_p.string().c_str() );
 	  mcu.mark("requestSpeechAudio");
       return 0;
 	}
