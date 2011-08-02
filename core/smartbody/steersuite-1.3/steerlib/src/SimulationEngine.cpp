@@ -664,6 +664,11 @@ SteerLib::ModuleMetaInformation * SimulationEngine::_loadModule(const std::strin
 #else
 		std::string moduleFileName = searchPath + moduleName + extension;
 #endif
+
+		// EDF - 8/1/11 - Ignore this block under WIN32.  Under Win32, this code calls LoadLibrary() that follows Win32 dll loading rules 
+		// (Dynamic-Link Library Search Order http://msdn.microsoft.com/en-us/library/ms682586(v=vs.85).aspx )
+		// This block below doesn't match those rules.  So this block may throw an exception, but the code could find the dll just fine.
+#ifndef _WIN32
 		if (!fileExists(moduleFileName)) {
 #ifdef _DEBUG
 			moduleFileName = _options->engineOptions.moduleSearchPath + moduleName + "d" + extension;  // if module wasn't found in the searchPath directory, try with the default search path.
@@ -681,6 +686,7 @@ SteerLib::ModuleMetaInformation * SimulationEngine::_loadModule(const std::strin
 				}
 			}
 		}
+#endif
 
 
 		// load the dynamic library
