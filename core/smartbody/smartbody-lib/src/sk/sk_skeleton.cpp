@@ -294,7 +294,7 @@ void SkSkeleton::create_joints(SkJoint* origParent, SkJoint* parent)
 {
 		for (int i = 0; i < origParent->num_children(); i++)
 	{
-		SkJoint* newJoint = new SkJoint(this, parent, origParent->child(i)->rot_type(), origParent->child(i)->index());
+		SkJoint* newJoint = new SkJoint(this, parent, origParent->child(i)->rot_type(), _joints.size());
 		_joints.push_back(newJoint);
 
 		copy_joint(newJoint, origParent->child(i));
