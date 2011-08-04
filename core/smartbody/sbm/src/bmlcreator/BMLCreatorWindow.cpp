@@ -161,7 +161,7 @@ void BMLCreatorWindow::RefreshCharactersCB(Fl_Widget* w, void *data)
 		iter++)
 	{
 		SbmCharacter* character = (*iter).second;
-		window->_choiceCharacters->add(character->name);
+		window->_choiceCharacters->add(character->getName().c_str());
 	}
 }
 
@@ -220,7 +220,7 @@ void BMLCreatorWindow::ResetBMLCB(Fl_Widget* w, void *data)
 		iter++)
 	{
 		SbmCharacter* character = (*iter).second;
-		window->_choiceCharacters->add(character->name);
+		window->_choiceCharacters->add(character->getName().c_str());
 	}
 }
 

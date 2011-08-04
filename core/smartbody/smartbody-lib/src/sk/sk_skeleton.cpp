@@ -26,6 +26,8 @@
 
 # include <sk/sk_skeleton.h>
 # include <sk/sk_posture.h>
+#include <queue>
+#include <sbm/SBJoint.h>
 
 //============================ SkSkeleton ============================
 
@@ -44,7 +46,7 @@ SkSkeleton::SkSkeleton (SkSkeleton* origSkel)
 {
 	_name = origSkel->name();
 	_skfilename = origSkel->skfilename();
-	_root = new SkJoint(this, 0, origSkel->root()->rot_type(), origSkel->root()->index());
+	_root = new SmartBody::SBJoint(this, 0, origSkel->root()->rot_type(), origSkel->root()->index());
 	copy_joint(_root, origSkel->root());
 	_joints.push_back(_root);
 	SkJoint* origParent = origSkel->root();
@@ -78,6 +80,35 @@ SkSkeleton::~SkSkeleton ()
    _channels->unref();
  }
 
+void SkSkeleton::copy(SkSkeleton* origSkel)
+{
+	_name = origSkel->name();
+	_skfilename = origSkel->skfilename();
+//	_root = new SkJoint(this, 0, origSkel->root()->rot_type(), origSkel->root()->index());
+	_root = new SmartBody::SBJoint(this, 0, origSkel->root()->rot_type(), origSkel->root()->index());
+	copy_joint(_root, origSkel->root());
+	_joints.push_back(_root);
+	SkJoint* origParent = origSkel->root();
+	SkJoint* thisParent = _root;
+	create_joints(origParent, thisParent);
+
+	_gmat_uptodate = origSkel->global_matrices_uptodate();
+	_channels = new SkChannelArray;
+	_channels->ref();
+	SkChannelArray& origChannels = origSkel->channels();
+	for (int c = 0; c < origChannels.size(); c++)
+	{
+		SkChannel& origChannel = origChannels.get(c);
+		SkJoint* origJoint = origChannels.joint(c);
+		SkJoint* joint = this->search_joint(origJoint->name().c_str());
+		_channels->add(joint, origChannel.type, true);
+	}
+	_channels->count_floats();
+	_com = origSkel->com();
+
+	compress ();
+}
+
 void SkSkeleton::init ()
  {
     _coldet_free_pairs.clear();
@@ -98,6 +129,30 @@ void SkSkeleton::init ()
    _gmat_uptodate = false;
  }
 
+void SkSkeleton::refresh_joints()
+{
+	_joints.clear();
+
+	SkJoint* j = _root;
+	std::queue<SkJoint*> queue;
+	if (_root)
+		queue.push(j);
+
+	int curIndex = 0;
+
+	while (!queue.empty())
+	{
+		SkJoint* joint = queue.front();
+		joint->set_index(curIndex);
+		curIndex++;
+		_joints.push_back(joint);
+		for (int c = 0; c < joint->num_children(); c++)
+			queue.push(joint->child(c));
+		queue.pop();
+	}
+}
+
+
 SkJoint* SkSkeleton::add_joint ( SkJoint::RotType rtype, int parentid )
 {
     _jointMap.clear();
@@ -112,7 +167,7 @@ SkJoint* SkSkeleton::add_joint ( SkJoint::RotType rtype, int parentid )
 		parent = _joints[parentid];
 	}
 
-    SkJoint* j = new SkJoint ( this, parent, rtype, _joints.size() );
+    SkJoint* j = new SmartBody::SBJoint ( this, parent, rtype, _joints.size() );
       _joints.push_back(j);
    
     if ( parent==NULL )
@@ -126,7 +181,7 @@ SkJoint* SkSkeleton::insert_new_root_joint ( SkJoint::RotType rtype )
     _jointMap.clear();
 	SkJoint* old_root = _root;
 
-    _root = new SkJoint ( this, 0, rtype, _joints.size() );
+    _root = new SmartBody::SBJoint ( this, 0, rtype, _joints.size() );
     _joints.push_back(_root);
 
 	if( old_root ) {
@@ -294,7 +349,8 @@ void SkSkeleton::create_joints(SkJoint* origParent, SkJoint* parent)
 {
 		for (int i = 0; i < origParent->num_children(); i++)
 	{
-		SkJoint* newJoint = new SkJoint(this, parent, origParent->child(i)->rot_type(), _joints.size());
+		SkJoint* newJoint = new SmartBody::SBJoint(this, parent, origParent->child(i)->rot_type(), origParent->child(i)->index());
+		// ??? SkJoint* newJoint = new SkJoint(this, parent, origParent->child(i)->rot_type(), _joints.size());
 		_joints.push_back(newJoint);
 
 		copy_joint(newJoint, origParent->child(i));

@@ -121,7 +121,7 @@ BML::BehaviorRequestPtr BML::parse_bml_panimation( DOMElement* elem, const std::
 		if (motion1Iter != mcu->motion_map.end())
 		{
 			SkMotion* motion1 = (*motion1Iter).second;
-			motion1->connect(character->skeleton_p);
+			motion1->connect(character->getSkeleton());
 			motion1Ct = new MeCtMotion();
 			motion1Ct->init( const_cast<SbmCharacter*>(request->actor), motion1 );
 			// Name controller with behavior unique_id
@@ -138,7 +138,7 @@ BML::BehaviorRequestPtr BML::parse_bml_panimation( DOMElement* elem, const std::
 		if (motion2Iter != mcu->motion_map.end())
 		{
 			SkMotion* motion2 = (*motion2Iter).second;
-			motion2->connect(character->skeleton_p);
+			motion2->connect(character->getSkeleton());
 			motion2Ct = new MeCtMotion();
 			motion2Ct->init( const_cast<SbmCharacter*>(request->actor), motion2 );
 			// Name controller with behavior unique_id

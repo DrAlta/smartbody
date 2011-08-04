@@ -23,14 +23,14 @@
 #ifndef ME_CT_NAVIGATION_CIRCLE_HPP
 #define ME_CT_NAVIGATION_CIRCLE_HPP
 
-#include <me/me_controller.h>
+#include <sbm/SBController.h>
 
 
 
 /**
  *  Controls the locomotions inputs to drive a character in a circle
  */
-class MeCtNavigationCircle : public MeController {
+class MeCtNavigationCircle : public SmartBody::SBController {
 public:
 	// Public Constants
 	static const char* TYPE;

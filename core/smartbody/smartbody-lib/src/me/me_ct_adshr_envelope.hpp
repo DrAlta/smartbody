@@ -23,7 +23,7 @@
 #ifndef ME_CT_ADSHR_ENVELOPE_HPP
 #define ME_CT_ADSHR_ENVELOPE_HPP
 
-#include <me/me_controller.h>
+#include <sbm/SBController.h>
 
 
 /**
@@ -33,7 +33,7 @@
  *  Only supports single float channel types (positions and euler rotations).
  *  Assumes amplitude and sustain are relative to zero.
  */
-class MeCtAdshrEnvelope : public MeController {
+class MeCtAdshrEnvelope : public SmartBody::SBController {
 public:
 	// Public Constants
 	static const char* CONTROLLER_TYPE;

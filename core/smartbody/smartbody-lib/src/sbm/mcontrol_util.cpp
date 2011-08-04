@@ -52,6 +52,8 @@
 #include "wsp.h"
 #endif
 
+#include <boost/python.hpp> // boost python support
+#include <sbm/SbmPython.h>
 #include "sr/sr_model.h"
 #include "sbm/GPU/SbmShader.h"
 #include "sbm/GPU/SbmTexture.h"
@@ -154,6 +156,7 @@ mcuCBHandle::mcuCBHandle()
 	faceViewerFactory ( new GenericViewerFactory() ),
 	resource_manager(ResourceManager::getResourceManager()),
 	snapshot_counter( 1 ),
+	use_python( false ),
 	delay_behaviors(true),
 	media_path("."),
 	_interactive(true),
@@ -176,7 +179,9 @@ mcuCBHandle::mcuCBHandle()
 	createDefaultControllers();
 
 	// initialize the default face motion mappings
-	face_map["_default_"] = new FaceMotion();	
+	FaceDefinition* faceDefinition = new FaceDefinition();
+	faceDefinition->setName("_default_");
+	face_map["_default_"] = faceDefinition;
 	physicsEngine = new SbmPhysicsSimODE();
 	physicsEngine->initSimulation();
 }
@@ -185,6 +190,9 @@ mcuCBHandle::mcuCBHandle()
 
 mcuCBHandle::~mcuCBHandle() {
 	clear();
+
+	// clean up python
+	Py_Finalize();
 }
 
 void mcuCBHandle::reset( void )	{
@@ -291,26 +299,12 @@ void mcuCBHandle::reset( void )	{
  */
 void mcuCBHandle::clear( void )	{
 
-	for (std::map<std::string, FaceMotion*>::iterator iter = this->face_map.begin();
+	for (std::map<std::string, FaceDefinition*>::iterator iter = this->face_map.begin();
 		iter != face_map.end();
 		iter++)
 	{
-		FaceMotion* face = (*iter).second;
-		VisemeMotionMap::iterator vis_it = face->viseme_map.begin();
-		VisemeMotionMap::iterator vis_end = face->viseme_map.end();
-		for( ; vis_it != vis_end; ++vis_it ) {
-			if (vis_it->second)
-				vis_it->second->unref();  // unref SkMotion
-		}
-		face->viseme_map.clear();
-		face->au_motion_map.clear();
-
-		
-		if (face->face_neutral_p)
-		{
-			face->face_neutral_p->unref();
-			face->face_neutral_p = NULL;
-		}
+		FaceDefinition* face = (*iter).second;
+		delete face;
 	}
 
 	for (size_t x = 0; x < this->cameraTracking.size(); x++)
@@ -343,14 +337,10 @@ void mcuCBHandle::clear( void )	{
 		delete seq_p;
 	}
 
-	for (std::map<std::string, SbmPawn*>::iterator iter = getPawnMap().begin();
-			iter != getPawnMap().end();
-			iter++)
-	{
-		SbmPawn* pawn = (*iter).second;
-		delete pawn;
-	}
-	
+	getCharacterMap().clear();
+	getPawnMap().clear();
+
+
 	for (std::map<std::string, SkPosture*>::iterator postureIter = pose_map.begin();
 		postureIter != pose_map.end();
 		postureIter++)
@@ -896,7 +886,7 @@ void mcuCBHandle::update( void )	{
 			pawn->updateToSteeringSpaceObject();
 		}
 
-		SbmCharacter* char_p = getCharacter(pawn->name );
+		SbmCharacter* char_p = getCharacter(pawn->getName().c_str() );
 		if (!char_p)
 		{
 			if (net_bone_updates)
@@ -904,14 +894,14 @@ void mcuCBHandle::update( void )	{
 				if (!isClosingBoneBus && !pawn->bonebusCharacter && bonebus.IsOpen() && sendPawnUpdates)
 				{
 					// bonebus was connected after character creation, create it now
-					pawn->bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( pawn->name, "pawn" , false );
+					pawn->bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( pawn->getName().c_str(), "pawn" , false );
 				}
 				if (sendPawnUpdates)
-					NetworkSendSkeleton( pawn->bonebusCharacter, pawn->skeleton_p, &param_map );
+					NetworkSendSkeleton( pawn->bonebusCharacter, pawn->getSkeleton(), &param_map );
 				if (pawn->bonebusCharacter && pawn->bonebusCharacter->GetNumErrors() > 3)
 				{
 					// connection is bad, remove the bonebus character 
-					LOG("BoneBus cannot connect to server. Removing pawn %s", pawn->name);
+					LOG("BoneBus cannot connect to server. Removing pawn %s", pawn->getName().c_str());
 					bool success = bonebus.DeleteCharacter(pawn->bonebusCharacter);
 					char_p->bonebusCharacter = NULL;
 					isClosingBoneBus = true;
@@ -929,8 +919,8 @@ void mcuCBHandle::update( void )	{
 			char_p->updateJointPhyObjs();
 			//char_p->dMesh_p->update();
 
-			if ( net_bone_updates && char_p->skeleton_p && char_p->bonebusCharacter ) {
-				NetworkSendSkeleton( char_p->bonebusCharacter, char_p->skeleton_p, &param_map );
+			if ( net_bone_updates && char_p->getSkeleton() && char_p->bonebusCharacter ) {
+				NetworkSendSkeleton( char_p->bonebusCharacter, char_p->getSkeleton(), &param_map );
 
 				if ( net_world_offset_updates ) {
 
@@ -963,7 +953,7 @@ void mcuCBHandle::update( void )	{
 			else if (!isClosingBoneBus && !char_p->bonebusCharacter && bonebus.IsOpen())
 			{
 				// bonebus was connected after character creation, create it now
-				char_p->bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( char_p->name, char_p->getClassType().c_str(), this->net_face_bones );
+				char_p->bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( char_p->getName().c_str(), char_p->getClassType().c_str(), this->net_face_bones );
 			}
 		}  // end of char_p processing
 	} // end of loop
@@ -1456,6 +1446,50 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 	
 }
 
+int mcuCBHandle::executePythonFile(const char* filename)
+{
+	try {
+		FILE* file = fopen(filename, "r");
+		if (file)
+		{
+			PyRun_SimpleFile(file, filename);
+			PyErr_Print();
+			PyErr_Clear();
+			fclose(file);
+			return CMD_SUCCESS;
+		}
+		else
+		{
+			if (file)
+				fclose(file);
+			return CMD_FAILURE;
+		}
+	} catch (...) {
+		PyErr_Print();
+	}
+
+	return CMD_FAILURE;
+}
+
+int mcuCBHandle::executePython(const char* command)
+{
+	try {
+		CmdResource* resource = new CmdResource();
+		resource->setChildrenLimit(resource_manager->getLimit());	// assuming the limit of total resources( path, motion, file, command) is the same with the limit of children ( command resource only) number
+		resource->setCommand(command);
+		resource_manager->addResource(resource);
+
+		PyRun_SimpleString(command);
+
+		return CMD_SUCCESS;
+	} catch (...) {
+		PyErr_Print();
+	}
+
+	return CMD_FAILURE;
+}
+
+
 void mcuCBHandle::setMediaPath(std::string path)
 {
 	media_path = path;
@@ -1514,21 +1548,31 @@ void mcuCBHandle::addPATransition(PATransitionData* transition)
 
 bool mcuCBHandle::checkExamples()
 {
-	PAStateData* locomotion = lookUpPAState("UtahLocomotion");
-	PAStateData* staringLeft = lookUpPAState("UtahStartingLeft");
-	PAStateData* staringRight = lookUpPAState("UtahStartingRight");
-	PAStateData* starting = lookUpPAState("UtahStopToWalk");
-	PAStateData* stopping = lookUpPAState("UtahWalkToStop");
-	PAStateData* idleLeft = lookUpPAState("UtahIdleTurnLeft");
-	PAStateData* idleRight = lookUpPAState("UtahIdleTurnRight");
-	PAStateData* step = lookUpPAState("UtahStep");
+	std::vector<std::string> requiredStates;
+	requiredStates.push_back("UtahLocomotion");
+	requiredStates.push_back("UtahStartingLeft");
+	requiredStates.push_back("UtahStartingRight");
+	requiredStates.push_back("UtahStopToWalk");
+	requiredStates.push_back("UtahWalkToStop");
+	requiredStates.push_back("UtahIdleTurnLeft");
+	requiredStates.push_back("UtahIdleTurnRight");
+	requiredStates.push_back("UtahStep");
 
-	if (!locomotion || !staringLeft || !staringRight || !starting || !stopping || !idleLeft || !idleRight || !step)
+	int numMissing = 0;
+	for (size_t x = 0; x < requiredStates.size(); x++)
 	{
-		LOG("SteeringAgent::checkExamples() Failure: Missing animation states needed for steerting with example based locomotion!");
-		return false;
+		PAStateData* state = lookUpPAState(requiredStates[x]);
+		if (!state)
+		{
+			numMissing++;
+			LOG("SteeringAgent::checkExamples() Failure: Could not find state '%s' needed for example-based locomotion.", requiredStates[x].c_str());
+		}
 	}
-	return true;
+
+	if (numMissing > 0)
+		return false;
+	else
+		return true;
 }
 
 void mcuCBHandle::setInteractive(bool val)
@@ -1571,10 +1615,10 @@ std::map<std::string, SbmPawn*>& mcuCBHandle::getPawnMap()
 
 bool mcuCBHandle::addPawn(SbmPawn* pawn)
 {
-	SbmPawn* p = getPawn(pawn->name);
+	SbmPawn* p = getPawn(pawn->getName());
 	if (!p)
 	{
-		pawn_map[pawn->name] = pawn;
+		pawn_map[pawn->getName()] = pawn;
 		return true;
 	}
 	else
@@ -1614,10 +1658,10 @@ std::map<std::string, SbmCharacter*>& mcuCBHandle::getCharacterMap()
 
 bool mcuCBHandle::addCharacter(SbmCharacter* character)
 {
-	SbmCharacter* c = getCharacter(character->name);
+	SbmCharacter* c = getCharacter(character->getName());
 	if (!c)
 	{
-		character_map[character->name] = character;
+		character_map[character->getName()] = character;
 		return true;
 	}
 	else
@@ -1649,6 +1693,85 @@ int mcuCBHandle::getNumCharacters()
 	return character_map.size();
 }
 
+SkMotion* mcuCBHandle::getMotion(std::string motionName)
+{
+	std::map<std::string, SkMotion*>::iterator iter = this->motion_map.find(motionName);
+	if (iter == this->motion_map.end())
+		return NULL;
+	else
+		return (*iter).second;
+}
+
+std::string mcuCBHandle::getValidName(std::string name)
+{
+	bool nameFound = true;
+	int nameCounter = 0;
+	std::string currentName = name;
+	while (nameFound)
+	{
+		std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(currentName);
+		if (iter == pawn_map.end())
+		{
+			nameFound = false;
+		}
+		else
+		{
+			std::stringstream strstr;
+			strstr << name << nameCounter;
+			nameCounter++;
+			currentName = strstr.str();
+		}
+	}
+	return currentName;
+}
+
+int mcuCBHandle::registerCharacter(SbmCharacter* character)
+{
+	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(character->getName());
+	if (iter != pawn_map.end())
+	{
+		LOG( "Register character: pawn_map.insert(..) '%s' FAILED\n", character->getName().c_str() ); 
+		return( CMD_FAILURE );
+	}
+
+	pawn_map.insert(std::pair<std::string, SbmPawn*>(character->getName(), character));
+	
+
+	std::map<std::string, SbmCharacter*>::iterator citer = character_map.find(character->getName());
+	if (citer != character_map.end())
+	{
+		LOG( "Register character: character_map.insert(..) '%s' FAILED\n", character->getName().c_str() );
+		pawn_map.erase(iter);
+		return( CMD_FAILURE );
+	}
+	character_map.insert(std::pair<std::string, SbmCharacter*>(character->getName(), character));
+
+	if (net_bone_updates)
+		mcuCBHandle::singleton().bonebus.CreateCharacter( character->getName().c_str(), character->getClassType().c_str(), mcuCBHandle::singleton().net_face_bones );
+	if ( mcuCBHandle::singleton().sbm_character_listener )
+		mcuCBHandle::singleton().sbm_character_listener->OnCharacterCreate( character->getName().c_str(), character->getClassType() );
+
+	return 1;
+}
+
+int mcuCBHandle::unregisterCharacter(SbmCharacter* character)
+{
+	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(character->getName());
+	if (iter != pawn_map.end())
+	{
+		pawn_map.erase(iter);
+	}
+
+	std::map<std::string, SbmCharacter*>::iterator citer = character_map.find(character->getName());
+	if (citer != character_map.end())
+	{
+		character_map.erase(citer);
+	}
+
+	//root_group_p->remove(character->scene_p); 
+
+	return 1;
+}
 
 
 /////////////////////////////////////////////////////////////

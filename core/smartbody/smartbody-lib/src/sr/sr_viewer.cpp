@@ -22,6 +22,11 @@
 
 #include "sr_viewer.h"
 
+SrViewer::SrViewer()
+{
+}
+
+
 SrViewer::SrViewer( int x, int y, int w, int h, const char *label )
 {
 }

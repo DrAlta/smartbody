@@ -31,7 +31,7 @@ const char* MeCtSaccade::CONTROLLER_TYPE = "Saccade";
 const char* eyeballL = "eyeball_left";
 const char* eyeballR = "eyeball_right";
 
-MeCtSaccade::MeCtSaccade(SkSkeleton* skel) : MeController()
+MeCtSaccade::MeCtSaccade(SkSkeleton* skel) : SmartBody::SBController()
 {
 	_skeleton = skel;
 	if (skel)

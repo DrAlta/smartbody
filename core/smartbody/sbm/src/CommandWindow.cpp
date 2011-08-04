@@ -98,7 +98,7 @@ CommandWindow::CommandWindow(int x,int y,int w,int h, const char* s) : GenericVi
 	tabGroup->color(FL_WHITE,FL_GRAY);
 	tabGroup->begin();
 	yDis += 30;
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		textEditor[i] = new Fl_Text_Editor(15, yDis, w - 20, h - yDis - 10);		
 		textEditor[i]->selection_color(FL_DARK1);
@@ -110,6 +110,9 @@ CommandWindow::CommandWindow(int x,int y,int w,int h, const char* s) : GenericVi
 	#endif
 		textEditor[i]->box(FL_UP_BOX);
 		textEditor[i]->textcolor(FL_BLACK);
+		if (i == 1)
+			textEditor[i]->color(FL_LIGHT2);
+
 		textBuffer[i] = new Fl_Text_Buffer();
 		textEditor[i]->buffer(textBuffer[i]); 
 		textEditor[i]->add_key_binding(FL_Up, FL_TEXT_EDITOR_ANY_STATE, (Fl_Text_Editor::Key_Func) upcb);
@@ -122,11 +125,11 @@ CommandWindow::CommandWindow(int x,int y,int w,int h, const char* s) : GenericVi
 	}
 
 	textEditor[0]->label("Sbm");
-//	textEditor[1]->label("Python");
+	textEditor[1]->label("Python");
 
 	tabGroup->end();
-	//tabGroup->selected_child(textEditor[1]); // Python command interface by default
-	tabGroup->value(textEditor[0]);   // Sbm command interface by default
+	tabGroup->value(textEditor[1]); // Python command interface by default
+	//tabGroup->value(textEditor[0]);   // Sbm command interface by default
 
 	this->end();
 
@@ -185,7 +188,7 @@ void CommandWindow::entercb(int key, Fl_Text_Editor* editor)
 
 	if (editor == commandWindow->textEditor[1])
 	{
-		//mcuCBHandle::singleton().executePython(c);
+		mcuCBHandle::singleton().executePython(c);
 	}
 	else
 	{

@@ -171,7 +171,7 @@ void SteeringAgent::evaluate()
 		std::string eventType = "locomotion";		
 		MotionEvent motionEvent;
 		motionEvent.setType(eventType);			
-		std::string param = std::string(character->name) + " success";
+		std::string param = std::string(character->getName()) + " success";
 		motionEvent.setParameters(param);
 		EventManager* manager = EventManager::getEventManager();		
 		manager->handleEvent(&motionEvent, mcu.time);
@@ -424,7 +424,7 @@ float SteeringAgent::evaluateProceduralLoco(float x, float y, float z, float yaw
 	{				
 		std::stringstream strstr;
 		strstr << "test loco char ";
-		strstr << character->name;
+		strstr << character->getName();
 		strstr << " stop";
 		mcu.execute((char*)strstr.str().c_str());
 		MeCtLocomotionNavigator* nav = character->locomotion_ct->get_navigator();
@@ -439,7 +439,7 @@ float SteeringAgent::evaluateProceduralLoco(float x, float y, float z, float yaw
 					turn *= -1.0f;
 				std::stringstream strstr;
 				strstr << "test loco char ";
-				strstr << character->name;
+				strstr << character->getName();
 				strstr << " leftward spd 0.0 rps " << turn;
 				mcu.execute((char*)strstr.str().c_str());	
 			}
@@ -458,7 +458,7 @@ float SteeringAgent::evaluateProceduralLoco(float x, float y, float z, float yaw
 				turn *= -1.0f;
 			std::stringstream strstr;
 			strstr << "test loco char ";
-			strstr << character->name;
+			strstr << character->getName();
 			strstr << " forward spd 0.0 rps " << turn;
 			mcu.execute((char*)strstr.str().c_str());			
 		}
@@ -469,7 +469,7 @@ float SteeringAgent::evaluateProceduralLoco(float x, float y, float z, float yaw
 				float spd = 1.0f;
 				std::stringstream strstr;
 				strstr << "test loco char ";
-				strstr << character->name;
+				strstr << character->getName();
 				strstr << " forward spd " << speed << " rps ";
 				if (angleDiff < 0)
 				 strstr << spd << " ";
@@ -482,7 +482,7 @@ float SteeringAgent::evaluateProceduralLoco(float x, float y, float z, float yaw
 			{
 				std::stringstream strstr;
 				strstr << "test loco char ";
-				strstr << character->name;
+				strstr << character->getName();
 				strstr << " forward spd " << speed;
 				mcu.execute((char*)strstr.str().c_str());
 			}
@@ -607,7 +607,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			}
 			if (nextStateName == "" && (curStateName == "UtahStopToWalk" || curStateName == "UtahStartingLeft" || curStateName == "UtahStartingRight"))
 			{
-				std::cout << character->name << " schedule stop" << std::endl;
+				std::cout << character->getName() << " schedule stop" << std::endl;
 				PAStateData* state = mcu.lookUpPAState("UtahLocomotion");
 				character->param_animation_ct->schedule(state, true);
 				state = mcu.lookUpPAState("UtahWalkToStop");
@@ -639,7 +639,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			PAStateData* stepState = mcu.lookUpPAState("UtahStep");
 			stepState->paramManager->setWeight(x, y);
 			std::stringstream command;
-			command << "panim schedule char " << character->name;			
+			command << "panim schedule char " << character->getName();			
 			command << " state UtahStep loop false playnow false ";
 			for (int i = 0; i < stepState->getNumMotions(); i++)
 				command << stepState->weights[i] << " ";
@@ -659,7 +659,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			{
 				w = (diff + 180) / 180;
 				std::stringstream command1;
-				command1 << "panim schedule char " << character->name;
+				command1 << "panim schedule char " << character->getName();
 				command1 << " state UtahIdleTurnRight loop false playnow " << playNow << " 0 " << w << " " << 1 - w;
 				mcu.execute((char*) command1.str().c_str());						
 			}
@@ -667,7 +667,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			{
 				w = (diff - 90) / 90;
 				std::stringstream command1;
-				command1 << "panim schedule char " << character->name;
+				command1 << "panim schedule char " << character->getName();
 				command1 << " state UtahIdleTurnLeft loop false playnow " << playNow << " 0 " << 1 - w << " " << w;
 				mcu.execute((char*) command1.str().c_str());												
 			}
@@ -675,7 +675,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			{
 				w = fabs(diff / 90);
 				std::stringstream command1;
-				command1 << "panim schedule char " << character->name;
+				command1 << "panim schedule char " << character->getName();
 				command1 << " state UtahIdleTurnRight loop false playnow " << playNow << " " << 1 - w << " " << w << " 0 ";
 				mcu.execute((char*) command1.str().c_str());
 			}
@@ -683,7 +683,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			{
 				w = diff / 90;
 				std::stringstream command1;
-				command1 << "panim schedule char " << character->name;
+				command1 << "panim schedule char " << character->getName();
 				command1 << " state UtahIdleTurnLeft loop false playnow " << playNow << " " << 1 - w << " " << w << " 0 ";
 				mcu.execute((char*) command1.str().c_str());	
 			}
@@ -723,7 +723,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 				{
 					w = (diff - 90) / 90;
 					std::stringstream command;
-					command << "panim schedule char " << character->name;			
+					command << "panim schedule char " << character->getName();			
 					command << " state UtahStartingLeft loop false playnow false " << " 0 " << 1 - w << " " << w;
 					mcu.execute((char*) command.str().c_str());
 				}
@@ -731,7 +731,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 				{
 					w = diff / 90;
 					std::stringstream command;
-					command << "panim schedule char " << character->name;					
+					command << "panim schedule char " << character->getName();					
 					command << " state UtahStartingLeft loop false playnow false " << 1 - w << " " << w << " " << " 0 ";
 					mcu.execute((char*) command.str().c_str());
 				}
@@ -742,7 +742,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 				{
 					w = (diff + 180) / 90;
 					std::stringstream command;
-					command << "panim schedule char " << character->name;
+					command << "panim schedule char " << character->getName();
 					command << " state UtahStartingRight loop false playnow false " << " 0 " << w << " " << 1 - w;
 					mcu.execute((char*) command.str().c_str());
 				}
@@ -750,7 +750,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 				{
 					w = -diff / 90;
 					std::stringstream command;
-					command << "panim schedule char " << character->name;
+					command << "panim schedule char " << character->getName();
 					command << " state UtahStartingRight loop false playnow true " << 1 - w << " " << w << " 0 ";
 					mcu.execute((char*) command.str().c_str());
 				}				
@@ -765,7 +765,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 					locoState->weights[i] = 0.0;
 			}
 			std::stringstream command1;
-			command1 << "panim schedule char " << character->name;
+			command1 << "panim schedule char " << character->getName();
 			command1 << " state UtahLocomotion loop true playnow false";
 			mcu.execute((char*) command1.str().c_str());
 		}	
@@ -902,7 +902,7 @@ float SteeringAgent::evaluateSteppingLoco(float x, float y, float z, float yaw)
 			PAStateData* stepState = mcu.lookUpPAState("UtahStep");
 			stepState->paramManager->setWeight(offsetx, offsety);
 			std::stringstream command;
-			command << "panim schedule char " << character->name;			
+			command << "panim schedule char " << character->getName();			
 			command << " state UtahStep loop false playnow false ";
 			for (int i = 0; i < stepState->getNumMotions(); i++)
 				command << stepState->weights[i] << " ";

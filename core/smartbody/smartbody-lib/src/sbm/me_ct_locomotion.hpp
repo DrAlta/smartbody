@@ -23,7 +23,7 @@
 #ifndef ME_CT_LOCOMOTION_HPP
 #define ME_CT_LOCOMOTION_HPP
 
-#include <me/me_controller.h>
+#include <sbm/SBController.h>
 #include "me_ct_locomotion_pawn.hpp"
 #include "me_ct_locomotion_analysis.hpp"
 #include "me_ct_locomotion_limb.hpp"
@@ -41,7 +41,7 @@ class MeCtLocomotionLimb;
 #pragma once
 
 
-class MeCtLocomotion : public MeController, public MeCtLocomotionPawn {
+class MeCtLocomotion : public SmartBody::SBController, public MeCtLocomotionPawn {
 public:
 	// Public Constants
 	static const char* TYPE;
@@ -211,7 +211,7 @@ public:
 
 	void set_enabled(bool enable){enabled = enable;}
 
-	void print_info(char* name);
+	void print_info(std::string name);
 
 	void set_balance_factor(float factor);
 

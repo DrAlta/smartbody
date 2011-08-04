@@ -93,6 +93,9 @@ class TimeRegulator	{
 		TimeRegulator( void ) { defaults(); }
 		~TimeRegulator( void ) {}
 
+		bool isStarted() { return started; }
+		bool isRunning() { return !paused; }
+
 		void set_verbose( bool v = true ) { verbose = v; }
 		void set_perf( double interval )	{
 			perf_interval = interval;

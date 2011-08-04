@@ -256,6 +256,7 @@ public :
         class, the derived class will be responsible for calling MeController::init() */
     void init (SbmPawn* pawn);
 
+
 	/*! Returns the controller's prune policy, if set.  Otherwise, NULL. */
 	MePrunePolicy* prune_policy();
 

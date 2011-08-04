@@ -4,7 +4,7 @@
 
 const char* MeCtDataReceiver::CONTROLLER_TYPE = "DataReceiver";
 
-MeCtDataReceiver::MeCtDataReceiver(SkSkeleton* skel) : MeController()
+MeCtDataReceiver::MeCtDataReceiver(SkSkeleton* skel) : SmartBody::SBController()
 {
 	_skeleton = skel;
 	skel->ref();

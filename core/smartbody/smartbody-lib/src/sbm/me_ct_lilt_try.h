@@ -25,7 +25,7 @@
 #define ME_CT_LILT_TRY_H
 
 #include <sk/sk_skeleton.h>
-#include <me/me_controller.h>
+#include <sbm/SBController.h>
 
 #include "gwiz_math.h"
 
@@ -60,7 +60,7 @@ EXAMPLE: for example if I wanted the doctor's ankles to go to a 50 degree angle 
 	
 	*/ 
 
-class MeCtAnkleLilt : public MeController	{
+class MeCtAnkleLilt : public SmartBody::SBController	{
 	
 	public:
 		static const char* type_name;

@@ -26,13 +26,15 @@
 
 //////////////////////////////////////////////////////////////////////////////////
 
-#include <sr/sr_hash_table.h>
-#include <sr/sr_buffer.h>
-#include <sk/sk_motion.h>
-#include <sk/sk_skeleton.h>
-#include <me/me_controller.h>
-
+#include <SR/sr_hash_table.h>
+#include <SR/sr_buffer.h>
+#include <SK/sk_motion.h>
+#include <SK/sk_skeleton.h>
+#include <ME/me_controller.h>
+#include <sbm/VisemeMap.hpp>
 #include "sr_hash_map.h"
+#include "sbm/SBController.h"
+#include <vector>
 
 /*
 	First Pass: 09/05/07
@@ -50,13 +52,13 @@
 		- once keys have been added, followed by finish_adding(), no more keys are added.
 */
 
-class MeCtFace : public MeController	{ 
+class MeCtFace : public SmartBody::SBController	{ 
 
 	private:
 
 		double              _duration;  // the time-warped duration
-		SrBuffer<int>       _bChan_to_buff; // base-motion's channels to context's buffer index
-		SrBuffer<int>       _kChan_to_buff; // weight key's channels to context's buffer index
+		std::vector<int>       _bChan_to_buff; // base-motion's channels to context's buffer index
+		std::vector<int>       _kChan_to_buff; // weight key's channels to context's buffer index
 		SkChannelArray		_channels; // override motion channels, to include world_offset
 		
 		SkMotion*				_base_pose_p;
@@ -80,7 +82,7 @@ class MeCtFace : public MeController	{
 		
 		void clear( void );
 		
-		void init(SbmPawn* pawn,  SkMotion* base_ref_p );
+		void init( FaceDefinition* faceDefinition);
 		void remove_joint( const char *joint_name );
 		void remove_channel( const char *joint_name, SkChannel::Type ch_type );
 		void add_key( const char *weight_key, SkMotion* key_pose_p );

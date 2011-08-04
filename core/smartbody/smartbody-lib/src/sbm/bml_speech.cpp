@@ -368,7 +368,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 		offset = sp_start->time - now;
 
 	BmlRequestPtr       request  = trigger->request.lock();
-	const SbmCharacter* actor    = request->actor;
+	SbmCharacter* actor    = request->actor;
 	string              actor_id = request->actorId;
 
 	// Found speech implementation.  Making request.
@@ -575,7 +575,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 #if ENABLE_DIRECT_VISEME_SCHEDULE
 	SbmCharacter *actor_p = (SbmCharacter*)( request->actor );
 #endif
-	const string& actor_id = request->actor->name;
+	const string& actor_id = request->actor->getName();
 
 //// SyncPoints should already be set from viseme processing
 //	{	// Offset prior syncpoint times by startAt
@@ -723,7 +723,7 @@ void BML::SpeechRequest::unschedule( mcuCBHandle* mcu,
 
 	// Clear visemes
 	ostringstream cmd;
-	cmd << "char " << request->actor->name << " viseme ALL 0 " << duration;
+	cmd << "char " << request->actor->getName() << " viseme ALL 0 " << duration;
 	mcu->execute_later( cmd.str().c_str(), 0 );
 
 	if( !audioStop.empty() )

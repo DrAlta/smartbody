@@ -45,7 +45,7 @@ MeCtMotionPlayer::~MeCtMotionPlayer()
 	controller = NULL;
 }
 
-void MeCtMotionPlayer::init(SbmPawn* pawn, std::string name, int n)
+void MeCtMotionPlayer::init(SbmPawn* pawn, std::string name, double n)
 {
 	if (motionName == name)
 	{
@@ -65,7 +65,7 @@ void MeCtMotionPlayer::init(SbmPawn* pawn, std::string name, int n)
 
 	motionName = name;
 	SkMotion* motion = (*iter).second;
-	motion->connect(character->skeleton_p);
+	motion->connect(character->getSkeleton());
 	controller = new MeCtMotion();
 	MeCtMotion* mController = dynamic_cast<MeCtMotion*> (controller);
 	mController->init(pawn,motion);
@@ -81,12 +81,12 @@ void MeCtMotionPlayer::init(SbmPawn* pawn, std::string name, int n)
 	frameNum = n;
 }
 
-void MeCtMotionPlayer::setFrameNum(int n)
+void MeCtMotionPlayer::setFrameNum(double n)
 {
 	frameNum = n;
 }
 
-int MeCtMotionPlayer::getFrameNum()
+double MeCtMotionPlayer::getFrameNum()
 {
 	return frameNum;
 }
@@ -143,6 +143,7 @@ bool MeCtMotionPlayer::controller_evaluate(double t, MeFrameData& frame)
 
 	double deltaT = motion->duration() / double(motion->frames() - 1);
 	double time = deltaT * frameNum;
-	motion->apply((float)time, &frame.buffer()[0], &mController->get_context_map(), SkMotion::Linear, &frameNum);
+	int lastFrame = int(frameNum);
+	motion->apply((float)time, &frame.buffer()[0], &mController->get_context_map(), SkMotion::Linear, &lastFrame);
 	return true;
 }

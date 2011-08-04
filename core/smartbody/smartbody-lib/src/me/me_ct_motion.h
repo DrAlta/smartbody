@@ -32,14 +32,14 @@
 
 # include <sk/sk_motion.h>
 
-# include <me/me_controller.h>
+# include <sbm/SBController.h>
 #include <queue>
 
 /*! This motion controller provides a controller interface to play
     an attached SkMotion. Besides few extra functionality such as
     time warping, loop, etc; it also efficiently supports the
     creation of several MeCtMotions sharing a same SkMotion. */
-class MeCtMotion : public MeController
+class MeCtMotion : public SmartBody::SBController
  { private :
     SkMotion*            _motion;    // the motion,
     SkMotion::InterpType _play_mode; // its play mode

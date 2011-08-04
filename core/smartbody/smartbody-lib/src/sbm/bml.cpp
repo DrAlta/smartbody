@@ -163,7 +163,7 @@ BmlRequest::BmlRequest( const SbmCharacter* actor, const string & actorId, const
 	actorId( actorId ),
 	recipientId( recipientId ),
 #else
-BmlRequest::BmlRequest( const SbmCharacter* actor, const string & actorId, const string & requestId, const string & msgId, const DOMDocument* xmlDoc )
+BmlRequest::BmlRequest( SbmCharacter* actor, const string & actorId, const string & requestId, const string & msgId, const DOMDocument* xmlDoc )
 :	actor( actor ),
 	actorId( actorId ),
 #endif
@@ -1529,8 +1529,8 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 
 #else
 
-	const SbmCharacter* actor    = request->actor;
-	SbmCharacter* character = mcu->getCharacter(actor->name);
+	SbmCharacter* actor    = request->actor;
+	SbmCharacter* character = mcu->getCharacter(actor->getName());
 	if (character)
 		character->schedule_viseme_trapezoid( viseme.c_str(), float(startAt), weight, float(endAt - startAt), float(readyAt - startAt), float(endAt - relaxAt));
 	

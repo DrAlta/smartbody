@@ -23,7 +23,7 @@
 #ifndef ME_CT_LOCOMOTION_SIMPLE_HPP
 #define ME_CT_LOCOMOTION_SIMPLE_HPP
 
-#include <me/me_controller.h>
+#include <sbm/SBController.h>
 
 /**
  *  Calculate new world_offset each frame, given the
@@ -37,7 +37,7 @@
 // TODO: Replace too generic controllers (after MotionEngine v2's generic channel types?)
 //   Integrator controller (locomotion_vector X/Z -> world_offset X/Z )
 //   Rotational Tracking controller (given positions world_offset and orientation_target, calc new world_offset rotation)
-class MeCtLocomotionSimple : public MeController {
+class MeCtLocomotionSimple : public SmartBody::SBController {
 public:
 	// Public Constants
 	static const char* TYPE;

@@ -133,9 +133,7 @@ class FaceMotion
 {
 	public:
 		SkMotion* face_neutral_p;
-		AUMotionMap au_motion_map;
-		VisemeMotionMap viseme_map;
-
+	
 		FaceMotion() { face_neutral_p = NULL; }
 };
 
@@ -201,6 +199,7 @@ class mcuCBHandle {
 
 		bool		delay_behaviors;
 		int			snapshot_counter;
+		bool		use_python;
 
 		SrViewerFactory *viewer_factory;
 		SrViewer	*viewer_p;
@@ -244,7 +243,7 @@ class mcuCBHandle {
 		srHashMap <srCmdSeq>		pending_seq_map;
 		srHashMap <srCmdSeq>		active_seq_map;
 
-		std::map<std::string, FaceMotion*> face_map;
+		std::map<std::string, FaceDefinition*> face_map;
 		std::map<std::string, SkPosture*> pose_map;
 		std::map<std::string, SkMotion*> motion_map;
 		std::map<std::string, SkSkeleton*> skeleton_map;
@@ -252,7 +251,6 @@ class mcuCBHandle {
 
 		GeneralParamMap				param_map;			// map that contains the information of shader parameters
 
-		/*
 		srHashMap <MeCtPose>		pose_ctrl_map;
 		srHashMap <MeCtMotion>		motion_ctrl_map;
 		srHashMap <MeCtStepTurn>	stepturn_ctrl_map;
@@ -262,10 +260,13 @@ class mcuCBHandle {
 		srHashMap <MeCtAnkleLilt>	lilt_ctrl_map;
 		srHashMap <MeCtEyeLid>		eyelid_ctrl_map;
 		srHashMap <MeCtScheduler2>	sched_ctrl_map;
-		*/
+		
 		srHashMap <MeController>	controller_map;
 
 
+		std::string getValidName(std::string name);
+		int registerCharacter(SbmCharacter* character);
+		int unregisterCharacter(SbmCharacter* character);
 
 		std::map<std::string, SbmPawn*>& getPawnMap();
 		bool addPawn(SbmPawn* pawn);
@@ -278,6 +279,8 @@ class mcuCBHandle {
 		void removeCharacter(std::string name);
 		SbmCharacter* getCharacter(std::string name);
 		int getNumCharacters();
+
+		SkMotion* getMotion(std::string motionName);
 
 protected:
 		std::map<std::string, SbmPawn*>	pawn_map;
@@ -531,6 +534,10 @@ public:
 		int execute_later( const char* command ) { 
 			return( execute_later( command, 0 ) ); 
 		}
+
+		int executePython(const char* command);
+		int executePythonFile(const char* filename);
+
 
 		int abort_seq( const char* command );
 		int delete_seq( const char* command );

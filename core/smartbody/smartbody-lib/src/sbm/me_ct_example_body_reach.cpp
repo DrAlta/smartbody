@@ -156,7 +156,7 @@ bool MeCtExampleBodyReach::updateLocomotion()
 		// if the target is far away, move the character first
 		//printf("idle to walk\n");
 		std::string cmd;
-		std::string charName = character->name;		
+		std::string charName = character->getName();		
 		SrVec curXZ = curPos; curXZ.y = 0.f;
 		SrVec targetDir = targetXZ - curXZ; targetDir.normalize();					
 		SrVec steerTarget = curXZ + targetDir*(dist - character->getHeight()*0.2f);

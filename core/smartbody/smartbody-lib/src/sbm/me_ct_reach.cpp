@@ -57,6 +57,11 @@ const MeCtIKJointLimit limb_joint_limit_l[] = {
 
 #endif
 
+MeCtReach::MeCtReach( ) 
+{
+	MeCtReach(NULL);
+}
+
 MeCtReach::MeCtReach( SkSkeleton* skeleton ) 
 {
 	reach_mode = TARGET_POS;

@@ -8,6 +8,7 @@
 0	echo >>> Loading common motions and poses...
 0	load motions -R ../../../../data/sbm-common/common-sk
 0	load poses   -R ../../../../data/sbm-common/common-sk
+0   path mesh ../../../../data/mesh
 
 # ---- Using virtual timing
 0	time sleepfps 0
@@ -16,17 +17,11 @@
 
 # ---- Setting characters and default posture
 1	seq init-common-face
-3	char BillFord init test_billford.sk
-3	set character BillFord world_offset x 0 y 102 h 0
-3	char BillFord smoothbindmesh ../../../../data/mesh/BillFord/HeadShape1Deformed.obj
-3	char BillFord smoothbindmesh ../../../../data/mesh/BillFord/L_eyeballShapeDeformed.obj
-3	char BillFord smoothbindmesh ../../../../data/mesh/BillFord/R_eyeballShapeDeformed.obj
-3	char BillFord smoothbindmesh ../../../../data/mesh/BillFord/TongueShapeDeformed.obj
-3	char BillFord smoothbindmesh ../../../../data/mesh/BillFord/UpperTeethShapeDeformed.obj
-3	char BillFord smoothbindmesh ../../../../data/mesh/BillFord/LowerTeethShapeDeformed.obj
-3	char BillFord smoothbindweight ../../../../data/mesh/BillFord/BillFord.xml
-3	set test character BillFord
-3	char BillFord viewer 4
+3	char brad init common.sk
+3	set character brad world_offset x 0 y 102 h 0
+3   char brad mesh brad
+3	set test character brad
+3	char brad viewer 4
 
 
 # ---- Setting Camera Parameters
@@ -37,60 +32,60 @@
 3	pawn camera init loc 0 166 185
 3	set pawn camera world_offset x 0 y 166 z 185
 
-4	char BillFord viseme Ao 1 1
+4	char brad viseme Ao 1 1
 5	snapshot
-5	char BillFord viseme Ao 0 1
+5	char brad viseme Ao 0 1
 
-6	char BillFord viseme D 1 1
+6	char brad viseme D 1 1
 7	snapshot
-7	char BillFord viseme D 0 1
+7	char brad viseme D 0 1
 
-8	char BillFord viseme EE 1 1
+8	char brad viseme EE 1 1
 9	snapshot
-9	char BillFord viseme EE 0 1
+9	char brad viseme EE 0 1
 
-10	char BillFord viseme Er 1 1
+10	char brad viseme Er 1 1
 11	snapshot
-11	char BillFord viseme Er 0 1
+11	char brad viseme Er 0 1
 
-12	char BillFord viseme f 1 1
+12	char brad viseme f 1 1
 13	snapshot
-13	char BillFord viseme f 0 1
+13	char brad viseme f 0 1
 
-14	char BillFord viseme j 1 1
+14	char brad viseme j 1 1
 15	snapshot
-15	char BillFord viseme j 0 1
+15	char brad viseme j 0 1
 
-16	char BillFord viseme KG 1 1
+16	char brad viseme KG 1 1
 17	snapshot
-17	char BillFord viseme KG 0 1
+17	char brad viseme KG 0 1
 
-18	char BillFord viseme Ih 1 1
+18	char brad viseme Ih 1 1
 19	snapshot
-19	char BillFord viseme Ih 0 1
+19	char brad viseme Ih 0 1
 
-20	char BillFord viseme NG 1 1
+20	char brad viseme NG 1 1
 21	snapshot
-21	char BillFord viseme NG 0 1
+21	char brad viseme NG 0 1
 
-22	char BillFord viseme oh 1 1
+22	char brad viseme oh 1 1
 23	snapshot
-23	char BillFord viseme oh 0 1
+23	char brad viseme oh 0 1
 
-24	char BillFord viseme OO 1 1
+24	char brad viseme OO 1 1
 25	snapshot
-25	char BillFord viseme OO 0 1
+25	char brad viseme OO 0 1
 
-26	char BillFord viseme R 1 1
+26	char brad viseme R 1 1
 27	snapshot
-27	char BillFord viseme R 0 1
+27	char brad viseme R 0 1
 
-28	char BillFord viseme Th 1 1
+28	char brad viseme Th 1 1
 29	snapshot
-29	char BillFord viseme Th 0 1
+29	char brad viseme Th 0 1
 
-30	char BillFord viseme Z 1 1
+30	char brad viseme Z 1 1
 31	snapshot
-31	char BillFord viseme Z 0 1
+31	char brad viseme Z 0 1
 
 32	quit

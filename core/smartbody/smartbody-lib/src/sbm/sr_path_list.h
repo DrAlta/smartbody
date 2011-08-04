@@ -25,114 +25,30 @@
 #ifndef SR_PATH_LIST_H
 #define SR_PATH_LIST_H
 
-#include <stdio.h>
-#include <string.h>
-#include <sstream>
-
-#include "sbm_constants.h"
+#include <cstdio>
+#include <string>
+#include <vector>
 
 //////////////////////////////////////////////////////////////////////////////////
 
-class srPathList	{
-
-	typedef struct sr_path_link_s  {
-		
-		char			*path;
-		sr_path_link_s	*next;
-		
-	} sr_path_link_t;
-
+class srPathList
+{
 	public:
-		srPathList(void)	{
-			link_count = 0;
-			head = new sr_path_link_t;
-			head->next = NULL;
-			head->path = NULL;
-			tail = head;
-		}
-		virtual ~srPathList(void)	{
-			iterator = head;
-			while( iterator )	{
-				delete [] iterator->path;
-				sr_path_link_t * iterator_copy = iterator;
-				iterator = iterator->next;
-				delete iterator_copy;
-			}
-			//delete head;
-		}
+		srPathList();
+		virtual ~srPathList();
 
-		void setPathPrefix(std::string pre) {
-			prefix = pre;
-		}
-		
-		std::string getPathPrefix() {
-			return prefix;
-		}
-		
-		int insert( char *path )	{
-			if( path )	{
-				tail->next = new sr_path_link_t;
-				tail = tail->next;
-				tail->next = NULL;
-				tail->path = new char[ strlen( path ) + 1 ];
-				sprintf( tail->path, "%s", path );
-				return( CMD_SUCCESS );	
-			}
-			return( CMD_FAILURE );	
-		}
-		
-		void reset(void) {	
-			iterator = head; 
-		}
-		
-		std::string next_path( void )	{
-			if( iterator )	{
-				iterator = iterator->next;
-				if( iterator )	{
-					std::stringstream strstr;
-					// if the path is an absolute path, don't prepend the media path
-					SrString p = iterator->path;
-					std::string mediaPath = getPathPrefix();
-					if (mediaPath.size() > 0 && !p.has_absolute_path())
-						strstr << getPathPrefix() << "\\";
-					strstr << iterator->path;
-
-					SrString candidatePath;
-					candidatePath.make_valid_path(strstr.str().c_str());
-					std::string finalPath = (const char*)candidatePath;
-					// remove the final '/'
-					finalPath = finalPath.substr(0, finalPath.size() - 1);
-					
-					return( finalPath );
-				}
-			}
-			return( "" );
-		}
-
-		std::string next_filename( 
-			char *buffer, 
-			const char *name, 
-			char **path_pp = NULL
-		)	{
-			std::string path = next_path();
-			if( path.size() > 0 )	{
-				std::stringstream strstr;
-				strstr << path << "/" << name;
-				if( path_pp )	{
-					//*path_pp = path;
-					// what to do here?
-				}
-				return( strstr.str() );
-			}
-			return( "" );
-		}
+		void setPathPrefix(std::string pre);
+		std::string getPathPrefix();
+		bool insert(std::string path);
+		bool remove(std::string path);
+		void reset();
+		std::string next_path();
+		std::string next_filename(char *buffer, const char *name);
 
 	private:
-		int		link_count;
-		sr_path_link_t *head;
-		sr_path_link_t *tail;
-		sr_path_link_t *iterator;
-		std::string prefix;
+		std::string _prefix;
+		std::vector<std::string> _paths;
+		int _curIndex;
 };
 
 //////////////////////////////////////////////////////////////////////////////////

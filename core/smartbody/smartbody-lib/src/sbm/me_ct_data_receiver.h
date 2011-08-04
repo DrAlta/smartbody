@@ -1,11 +1,11 @@
 #ifndef _ME_CT_DATA_RECEIVER_H_
 #define _ME_CT_DATA_RECEIVER_H_
 
-#include <me/me_controller.h>
+#include <sbm/SBController.h>
 #include <sk/sk_skeleton.h>
 #include <map>
 
-class MeCtDataReceiver : public MeController
+class MeCtDataReceiver : public SmartBody::SBController
 {
 	public:
 		static const char* CONTROLLER_TYPE;

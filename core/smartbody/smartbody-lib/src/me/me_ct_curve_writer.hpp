@@ -23,11 +23,11 @@
 #ifndef ME_CT_CURVE_WRITER_HPP
 #define ME_CT_CURVE_WRITER_HPP
 
-#include <me/me_controller.h>
+#include <sbm/SBController.h>
 #include <sbm/sr_linear_curve.h>
 #include <sbm/sr_curve_builder.h>
 
-class MeCtCurveWriter : public MeController {
+class MeCtCurveWriter : public SmartBody::SBController {
 
 	public:
 

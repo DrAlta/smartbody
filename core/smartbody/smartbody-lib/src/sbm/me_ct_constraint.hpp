@@ -23,7 +23,7 @@
 #pragma once
 #include <map>
 #include <sk/sk_skeleton.h>
-#include <me/me_controller.h>
+#include <sbm/SBController.h>
 #include "me_ct_limb.hpp"
 #include "me_ct_jacobian_IK.hpp"
 #include "gwiz_math.h"
@@ -72,7 +72,7 @@ public:
 };
 
 
-class MeCtConstraint : public MeController, public FadingControl
+class MeCtConstraint : public SmartBody::SBController, public FadingControl
 {
 private:
 	static const char* CONTROLLER_TYPE;

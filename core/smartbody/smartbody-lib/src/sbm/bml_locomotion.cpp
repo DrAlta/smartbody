@@ -131,7 +131,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));
 	}
 	std::stringstream command;
-	SbmCharacter* c = mcu->getCharacter(request->actor->name);
+	SbmCharacter* c = mcu->getCharacter(request->actor->getName());
 
 	c->steeringAgent->steppingMode = false;
 	bool stepMode = false;
@@ -178,7 +178,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	if (strcmp(facingAngle, "") != 0)
 	{
 		std::stringstream command;
-		command << "steer facing " << c->name << " " << (float)atof(facingAngle);
+		command << "steer facing " << c->getName() << " " << (float)atof(facingAngle);
 		srCmdSeq *seq = new srCmdSeq();
 		seq->insert(float(mcu->time + mcu->time_dt), command.str().c_str());
 		mcu->execute_seq(seq);
@@ -186,7 +186,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	else
 	{
 		std::stringstream command;
-		command << "steer facing " << c->name << " " << "-200"; // set to fabs() > 180 to cancel old facing value
+		command << "steer facing " << c->getName() << " " << "-200"; // set to fabs() > 180 to cancel old facing value
 		srCmdSeq *seq = new srCmdSeq();
 		seq->insert(float(mcu->time + mcu->time_dt), command.str().c_str());
 		mcu->execute_seq(seq);
@@ -205,7 +205,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			stepTargetMode = true;
 		}
 		else
-			command << "sbm steer move " << c->name << " " << targetFloat[0] << " 0 " << targetFloat[1];
+			command << "sbm steer move " << c->getName() << " " << targetFloat[0] << " 0 " << targetFloat[1];
 	}
 	else
 	{
@@ -233,7 +233,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 					stepTargetZ = z;
 				}
 				else
-					command << "sbm steer move " << c->name << " " << x << " 0 " << z;
+					command << "sbm steer move " << c->getName() << " " << x << " 0 " << z;
 			}
 		}
 	}
@@ -265,7 +265,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			for (int i = 0; i < numSteps; i++)
 			{
 				std::stringstream command1;
-				command1 << "panim schedule char " << c->name;
+				command1 << "panim schedule char " << c->getName();
 				command1 << " state UtahStep loop false playnow false ";
 				if (stepDirection == "forward")
 					command1 << "0 0 1 0 0 0 0";
@@ -394,7 +394,7 @@ BehaviorRequestPtr BML::parse_bml_example_locomotion( DOMElement* elem, const st
 	std::string localId;
 	if (id)
 		localId = XMLString::transcode(id);
-	SbmCharacter* c = mcu->getCharacter(request->actor->name);
+	SbmCharacter* c = mcu->getCharacter(request->actor->getName());
 	if (!c->param_animation_ct)
 	{
 		LOG("Parameterized Animation not enabled!");
@@ -414,7 +414,7 @@ BehaviorRequestPtr BML::parse_bml_example_locomotion( DOMElement* elem, const st
 		if (c->param_animation_ct->getCurrentStateName() == "UtahLocomotion")
 		{
 			std::stringstream command;
-			command << "panim schedule char " << c->name;
+			command << "panim schedule char " << c->getName();
 			command << " state UtahWalkToStop loop false playnow false";	
 			mcu->execute((char*) command.str().c_str());
 		}
@@ -422,11 +422,11 @@ BehaviorRequestPtr BML::parse_bml_example_locomotion( DOMElement* elem, const st
 	if (c->param_animation_ct->getCurrentPAStateData() == NULL)
 	{
 		std::stringstream command;
-		command << "panim schedule char " << c->name;
+		command << "panim schedule char " << c->getName();
 		command << " state UtahStopToWalk loop false playnow false";
 		mcu->execute((char*) command.str().c_str());
 		std::stringstream command1;
-		command1 << "panim schedule char " << c->name;
+		command1 << "panim schedule char " << c->getName();
 		command1 << " state UtahLocomotion loop true playnow false";
 		mcu->execute((char*) command1.str().c_str());
 	}

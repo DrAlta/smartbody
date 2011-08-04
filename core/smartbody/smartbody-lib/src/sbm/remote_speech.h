@@ -55,9 +55,9 @@ class remote_speech: public SmartBody::SpeechInterface {
 		// Methods
 		SmartBody::RequestId requestSpeechAudio( const char* agentName, const std::string voiceCode, const DOMNode* node, const char* callbackCmd ); //accepts dom document of which sound will be created from, returns Request ID
 		SmartBody::RequestId requestSpeechAudio( const char* agentName, const std::string voiceCode, std::string text, const char* callbackCmd ); //accepts char* of above and returns request ID
-		std::vector<SmartBody::VisemeData *>* getVisemes( SmartBody::RequestId requestId,  const SbmCharacter* character ); //returns visemes  for given request
-		char* getSpeechPlayCommand( SmartBody::RequestId requestId, const SbmCharacter* character = NULL ); //returns the command to play speech
-		char* getSpeechStopCommand( SmartBody::RequestId requestId, const SbmCharacter* character = NULL ); //''                     stop
+		std::vector<SmartBody::VisemeData *>* getVisemes( SmartBody::RequestId requestId,  SbmCharacter* character ); //returns visemes  for given request
+		char* getSpeechPlayCommand( SmartBody::RequestId requestId, SbmCharacter* character = NULL ); //returns the command to play speech
+		char* getSpeechStopCommand( SmartBody::RequestId requestId, SbmCharacter* character = NULL ); //''                     stop
 		char* getSpeechAudioFilename( SmartBody::RequestId requestId ); // gets the fileName of speech
 		float getMarkTime( SmartBody::RequestId requestId, const XMLCh* markId ); //gets time value for a given marker
 		
@@ -69,7 +69,7 @@ class remote_speech: public SmartBody::SpeechInterface {
 		int testRemoteSpeechTimeOut( const char* request_id_str, mcuCBHandle* mcu_p );
 		
 	private:
-		std::vector<SmartBody::VisemeData *>* extractVisemes(DOMNode* node, std::vector<SmartBody::VisemeData*>* visemes, const SbmCharacter* character);
+		std::vector<SmartBody::VisemeData *>* extractVisemes(DOMNode* node, std::vector<SmartBody::VisemeData*>* visemes, SbmCharacter* character);
 		std::string forPlaysound;
 		srHashMap<DOMNode>     uttLookUp; 
 		srHashMap<std::string> soundLookUp;

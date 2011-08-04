@@ -397,7 +397,7 @@ void ChannelBufferWindow::loadCharacters(Fl_Choice* characterChoice)
 		iter++)
 	{
 		SbmCharacter* character = (*iter).second;
-		characterChoice->add(character->name);
+		characterChoice->add(character->getName().c_str());
 	}
 	int ind = 0;
 	characterChoice->value(0);
@@ -479,7 +479,7 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if(character->mvalue()== NULL) return;
 	SbmCharacter* actor = mcu.getCharacter(character->mvalue()->label());
-	SkSkeleton* skeleton = actor->skeleton_p;
+	SkSkeleton* skeleton = actor->getSkeleton();
 
 	SkChannelArray& channels = skeleton->channels();
 	int numChannels = channels.size();
@@ -580,7 +580,7 @@ void ChannelBufferWindow::refreshMotionChannels(Fl_Widget* widget, void* data)
 	if (motionIter != mcu.motion_map.end())
 	{
 		SkMotion* motion = (*motionIter).second;
-		motion->connect(actor->skeleton_p);
+		motion->connect(actor->getSkeleton());
 		refreshMaxSize(window, motion->frames());
 		SkChannelArray& channels = motion->channels();
 		for(int i = 0; i < window->Channel_item_list.size(); ++i)
@@ -689,7 +689,7 @@ void ChannelBufferWindow::addMonitoredChannel(Fl_Widget* widget, void* data)
 		if (motionIter != mcu.motion_map.end())
 		{
 			motion = (*motionIter).second;
-			motion->connect(actor->skeleton_p);
+			motion->connect(actor->getSkeleton());
 		}
 	}
 
@@ -857,7 +857,7 @@ void ChannelBufferWindow::update()
 		{
 			SbmPawn* pawn = (*iter).second;
 			const char* name = getSelectedCharacterName();
-			if( name && strcmp(pawn->name, name) == 0)
+			if( name && strcmp(pawn->getName().c_str(), name) == 0)
 			{
 				pawn_p = pawn;
 				break;

@@ -29,7 +29,7 @@
 #include <sr/sr_buffer.h>
 #include <sk/sk_motion.h>
 #include <sk/sk_skeleton.h>
-#include <me/me_controller.h>
+#include <sbm/SBController.h>
 
 #include "gwiz_math.h"
 
@@ -70,7 +70,7 @@ Testing sequence:
  * This runs the doctor through a few hoops.
 */
 
-class MeCtStepTurn : public MeController	{ 
+class MeCtStepTurn : public SmartBody::SBController	{ 
 
 	private:
 		enum timing_mode_enum_set	{

@@ -26,7 +26,7 @@
 #include <me/me_controller.h>
 #include <sbm/sbm_character.hpp>
 
-class MeCtBasicLocomotion : public MeController
+class MeCtBasicLocomotion : public SmartBody::SBController
 {
 	public:
 		MeCtBasicLocomotion(SbmCharacter* c);

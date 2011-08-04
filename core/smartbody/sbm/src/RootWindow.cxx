@@ -359,7 +359,7 @@ void BaseWindow::FaceCameraCB(Fl_Widget* widget, void* data)
 	SrBox faceBox;
 	SrCamera* camera = mcu.viewer_p->get_camera();
 
-	SkSkeleton* skeleton = character->skeleton_p;
+	SkSkeleton* skeleton = character->getSkeleton();
 	float height = skeleton->getCurrentHeight();
 	SkJoint* joint = skeleton->linear_search_joint("skullbase");
 	SkJoint* joint2 = skeleton->linear_search_joint("face_top_parent");
@@ -461,12 +461,12 @@ void BaseWindow::runScript(std::string filename)
 	SbmCharacter* character = getSelectedCharacter();
 	std::string selectedCharacterName = "";
 	if (character)
-		selectedCharacterName = character->name;
+		selectedCharacterName = character->getName();
 
 	SbmPawn* pawn = fltkViewer->getObjectManipulationHandle().get_selected_pawn();
 	std::string selectedTargetName = "";
 	if (pawn)
-		selectedTargetName = pawn->name;
+		selectedTargetName = pawn->getName();
 
 	char line[8192];
 	while(!file.eof() && file.good())
@@ -837,12 +837,12 @@ void BaseWindow::TrackCharacterCB(Fl_Widget* w, void* data)
 	if (!character)
 		return;
 
-	if (!character->skeleton_p)
+	if (!character->getSkeleton())
 		return;
 
-	SkJoint* joint = character->skeleton_p->joints()[0];
+	SkJoint* joint = character->getSkeleton()->joints()[0];
 	std::string trackCommand = "camera track ";
-	trackCommand.append(character->name);
+	trackCommand.append(character->getName());
 	trackCommand.append(" ");
 	trackCommand.append(joint->name());
 

@@ -17,7 +17,7 @@ void DObject::setName(std::string name)
 }
 
 
-std::string& DObject::getName()
+const std::string& DObject::getName()
 {
 	return m_name;
 }

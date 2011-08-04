@@ -167,6 +167,10 @@ class SrQuat
 
     /*! Input data from "axis x y z ang a" format. */
     friend SrInput& operator>> ( SrInput& in, SrQuat& q );
+
+	void setData(int i, float val) { if (i == 0) w = val; else if (i == 1) x = val; else if (i == 2) y = val; else if (i == 3) z = val; }
+
+	float getData(int i) { if (i == 0) return w; else if (i == 1) return x; else if (i == 2) return y; else if (i == 3) return z; else return 0;}
  };
 
 //============================== end of file ===============================

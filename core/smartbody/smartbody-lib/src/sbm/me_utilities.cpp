@@ -50,6 +50,7 @@
 #include "ParserOpenCOLLADA.h"
 #include "ParserASFAMC.h"
 #include "ParserFBX.h"
+#include <sbm/SBSkeleton.h>
 
 using namespace std;
 using namespace boost::filesystem;
@@ -64,6 +65,18 @@ const char* POSTURE_EXT = ".skp";
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, ResourceManager* manager, double scale ) {
+	
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	std::map<std::string, SkSkeleton*>::iterator iter = mcu.skeleton_map.find(std::string(skel_file));
+	if (iter != mcu.skeleton_map.end())
+	{
+		//SkSkeleton* ret = new SkSkeleton(iter->second);
+		SkSkeleton* existingSkel = iter->second;
+		SmartBody::SBSkeleton* existingSBSkel = dynamic_cast<SmartBody::SBSkeleton*>(existingSkel);
+		SkSkeleton* ret = new SmartBody::SBSkeleton(existingSBSkel);
+		return ret;
+	}
+	
 	FILE *fp = NULL;
 	char buffer[ MAX_FILENAME_LEN ];
 	std::string filename;
@@ -92,7 +105,7 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, Resourc
 		return NULL;
 	}
 
-	SkSkeleton* skeleton_p = new SkSkeleton();
+	SkSkeleton* skeleton_p = new SmartBody::SBSkeleton();
 #if 0
 	if( !skeleton_p->load( input, path ) )	{ 
 #else
@@ -397,7 +410,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 		SkSkeleton* skeleton = NULL;
 		if (ext == ".sk")
 		{			
-			skeleton = new SkSkeleton();
+			skeleton = new SmartBody::SBSkeleton();
 			
 			FILE* fp = fopen( pathname.string().c_str(), "rt" );
 			if (fp)
@@ -420,7 +433,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 		else if (ext == ".bvh" || ext == ".BVH")
 		{		
 			std::ifstream filestream(pathname.string().c_str());
-			skeleton = new SkSkeleton();
+			skeleton = new SmartBody::SBSkeleton();
 			skeleton->skfilename(filebase.c_str());
 			SkMotion motion;
 			bool ok = ParserBVH::parse(*skeleton, motion, filebase, filestream, float(scale));

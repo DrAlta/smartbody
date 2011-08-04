@@ -433,7 +433,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    return m_requestIdCounter++;
 }
 
-vector<VisemeData *> * AudioFileSpeech::getVisemes( RequestId requestId, const SbmCharacter* character )
+vector<VisemeData *> * AudioFileSpeech::getVisemes( RequestId requestId, SbmCharacter* character )
 {
    // TODO: Change the return type data structure, so that I can simply do this:
    //return m_speechRequestInfo[ requestId ].visemeData
@@ -461,7 +461,7 @@ vector<VisemeData *> * AudioFileSpeech::getVisemes( RequestId requestId, const S
 }
 
 
-char * AudioFileSpeech::getSpeechPlayCommand( RequestId requestId, const SbmCharacter * character )
+char * AudioFileSpeech::getSpeechPlayCommand( RequestId requestId, SbmCharacter * character )
 {
 	if (!character)
 		return NULL;
@@ -474,7 +474,7 @@ char * AudioFileSpeech::getSpeechPlayCommand( RequestId requestId, const SbmChar
    std::map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
    if ( it != m_speechRequestInfo.end() )
    {
-      it->second.playCommand = vhcl::Format( "send PlaySound \"%s\" %s", it->second.audioFilename.c_str(), character->name );
+      it->second.playCommand = vhcl::Format( "send PlaySound \"%s\" %s", it->second.audioFilename.c_str(), character->getName().c_str() );
       return (char *)it->second.playCommand.c_str();
    }
 
@@ -482,7 +482,7 @@ char * AudioFileSpeech::getSpeechPlayCommand( RequestId requestId, const SbmChar
 }
 
 
-char * AudioFileSpeech::getSpeechStopCommand( RequestId requestId, const SbmCharacter * character )
+char * AudioFileSpeech::getSpeechStopCommand( RequestId requestId, SbmCharacter * character )
 {
    // TODO: Wrap up this SASO/PlaySound specific audio command string generation
    // into a class that can abstracted and shared between speech implementations.

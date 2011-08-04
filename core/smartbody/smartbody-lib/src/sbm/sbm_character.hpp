@@ -49,6 +49,7 @@
 #include <sbm/me_ct_example_body_reach.hpp>
 #include <sbm/me_ct_hand.hpp>
 #include <sbm/MeCtReachEngine.h>
+#include <sbm/VisemeMap.hpp>
 #define MeCtSchedulerClass MeCtScheduler2
 
 #if(1) // Use primary locomotion controller
@@ -126,9 +127,6 @@ protected:
 	MeCtFace*				face_ct;
 	MeCtEyeLid*				eyelid_ct;
 
-
-	
-
 	// The term "viseme" in the following variables is a misnomer,
 	// and may also refer to an action unit or other face shape.
 	// They are all controlled by the "character .. viseme .." command.
@@ -156,25 +154,30 @@ protected:
 
 	float	*viseme_history_arr;
 
-		AUMotionMap*			au_motion_map;
-	VisemeMotionMap*		viseme_motion_map;
+	FaceDefinition* _faceDefinition;
 
 	std::string _classType;
 
+	bool _isControllerPruning;
+
 public:
 	//  Methods
+	SbmCharacter();
 	SbmCharacter( const char * char_name );
+	SbmCharacter::SbmCharacter( const char* character_name, std::string type);
 	virtual ~SbmCharacter();
 	
 	int init( SkSkeleton* skeleton_p,
-	          SkMotion* face_neutral,
-	          AUMotionMap* fac_map,
-			  VisemeMotionMap* viseme_map,
+				FaceDefinition* faceDefinition,
 			  GeneralParamMap* param_map,
 			  const char* classType,
 			  bool use_locomotion,
 			  bool use_param_animation,
 			  bool use_data_receiver);
+
+	virtual int setup();
+
+	virtual void createStandardControllers();
 
 	//* Overrides SbmPawn::prune_controller_tree()
 	virtual int prune_controller_tree( mcuCBHandle *mcu_p );
@@ -380,6 +383,11 @@ public:
 	std::string getClassType();
 	void setClassType(std::string classType);
 
+	FaceDefinition* getFaceDefinition();
+	void setFaceDefinition(FaceDefinition* face);
+	void updateFaceDefinition();
+	void removeAllFaceChannels();
+
 private:
 
 	bool	_soft_eyes_enabled;
@@ -415,6 +423,13 @@ protected:
 	int writeSkeletonHierarchy(std::string file, double scale);
 	void writeSkeletonHierarchyRecurse(SkJoint* joint, std::ofstream& ostream, double scale, int indentLevel);
 	void indent(int num, std::ofstream& ostream);
+
+	void addVisemeChannel(std::string visemeName, SkMotion* motion);
+	void addVisemeChannel(std::string visemeName, std::string motionName);
+	void addActionUnitChannel(int auNum, ActionUnit* au);
+
+	void initData();
+
 };
 
 /////////////////////////////////////////////////////////////

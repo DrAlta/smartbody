@@ -66,6 +66,7 @@ class MeCtParamAnimation : public MeCtContainer
 		};
 
 	public:
+		MeCtParamAnimation();
 		MeCtParamAnimation(SbmCharacter* c, MeCtChannelWriter* wo);
 		~MeCtParamAnimation();
 

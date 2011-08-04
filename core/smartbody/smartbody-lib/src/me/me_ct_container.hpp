@@ -23,14 +23,14 @@
 #ifndef ME_CT_CONTAINER_HPP
 #define ME_CT_CONTAINER_HPP
 
-#include <me/me_controller.h>
+#include <sbm/SBController.h>
 #include <me/me_controller_context_proxy.hpp>
 
 
 /**
  *  Base class for controllers that parent other controllers.
  */
-class MeCtContainer : public MeController {
+class MeCtContainer : public SmartBody::SBController {
 public:
 	///////////////////////////////////////////////////////////////////////
 	//  Public Inner Classes

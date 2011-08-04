@@ -58,7 +58,7 @@ namespace BML {
 			const char			*recipientId;
 #endif
 			const char			*msgId;
-			const SbmCharacter	*actor;
+			SbmCharacter	*actor;
 			const XERCES_CPP_NAMESPACE::DOMDocument	*xml;
 
 			const std::string   requestId;
@@ -73,8 +73,8 @@ namespace BML {
 			BMLProcessorMsg( const char *actorId, const char *recipientId, const char *msgId, const SbmCharacter *actor, DOMDocument *xml, const char* args );
 			BMLProcessorMsg( const char *actorId, const char *recipientId, const char *msgId, const SbmCharacter *actor, DOMDocument *xml, srArgBuffer& arg );
 #else
-			BMLProcessorMsg( const char *actorId, const char *msgId, const SbmCharacter *actor, XERCES_CPP_NAMESPACE::DOMDocument *xml, const char* args );
-			BMLProcessorMsg( const char *actorId, const char *msgId, const SbmCharacter *actor, XERCES_CPP_NAMESPACE::DOMDocument *xml, srArgBuffer& arg );
+			BMLProcessorMsg( const char *actorId, const char *msgId,  SbmCharacter *actor, XERCES_CPP_NAMESPACE::DOMDocument *xml, const char* args );
+			BMLProcessorMsg( const char *actorId, const char *msgId,  SbmCharacter *actor, XERCES_CPP_NAMESPACE::DOMDocument *xml, srArgBuffer& arg );
 #endif
 			~BMLProcessorMsg();
 		};
@@ -227,9 +227,9 @@ namespace BML {
 		//////////////////////////////////////////////////////////////////////////
 		// Protected Methods
 #if USE_RECIPIENT
-		BmlRequestPtr createBmlRequest( const SbmCharacter* agent, const std::string & actorId, const std::string & requestId, const std::string & recipientId, const std::string & msgId );
+		BmlRequestPtr createBmlRequest( SbmCharacter* agent, const std::string & actorId, const std::string & requestId, const std::string & recipientId, const std::string & msgId );
 #else
-		BmlRequestPtr createBmlRequest( const SbmCharacter* agent, const std::string & actorId, const std::string & requestId, const std::string & msgId, const  XERCES_CPP_NAMESPACE::DOMDocument* xmlDoc );
+		BmlRequestPtr createBmlRequest( SbmCharacter* agent, const std::string & actorId, const std::string & requestId, const std::string & msgId, const  XERCES_CPP_NAMESPACE::DOMDocument* xmlDoc );
 #endif
 
 		/**

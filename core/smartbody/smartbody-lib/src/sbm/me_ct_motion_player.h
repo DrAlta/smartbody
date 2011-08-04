@@ -51,10 +51,10 @@ public:
 	MeCtMotionPlayer(SbmCharacter* c);
 	~MeCtMotionPlayer();
 
-	void init(SbmPawn* pawn, std::string motionName, int n);
+	void init(SbmPawn* pawn, std::string motionName, double n);
 
-	void setFrameNum(int n);
-	int getFrameNum();
+	void setFrameNum(double n);
+	double getFrameNum();
 
 	void setMotionName(std::string name);
 	std::string getMotionName();
@@ -73,7 +73,7 @@ private:
 	MeController*					controller;		
 	SkChannelArray					channels;
 
-	int								frameNum;
+	double							frameNum;
 	std::string						motionName;
 	bool							isActive;
 };

@@ -14,7 +14,7 @@ class DObject : public DObserver
 		~DObject();
 
 		void setName(std::string name);
-		std::string& getName();
+		const std::string& getName();
 		DAttribute* getAttribute(std::string attrName);
 		std::map<std::string, DAttribute*>& getAttributeList();
 		DAttributeManager* getAttributeManager();

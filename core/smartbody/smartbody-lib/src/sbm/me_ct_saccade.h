@@ -23,12 +23,12 @@
 #ifndef _ME_CT_SACCADE_H_
 #define _ME_CT_SACCADE_H_
 
-#include <me/me_controller.h>
+#include <sbm/SBController.h>
 #include <sk/sk_skeleton.h>
 #include "gwiz_math.h"
 #include "sr_linear_curve.h"
 
-class MeCtSaccade : public MeController
+class MeCtSaccade : public SmartBody::SBController
 {
 	public:
 		static const char* CONTROLLER_TYPE;

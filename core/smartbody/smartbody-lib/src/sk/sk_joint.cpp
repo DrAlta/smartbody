@@ -30,6 +30,28 @@
 
 //============================= SkJoint ============================
 
+SkJoint::SkJoint() : _pos ( 0 )
+{
+   _visgeo = 0;
+   _colgeo = 0;
+
+   _coldetid = -1;
+
+   _parent = NULL;
+
+   _lmat_uptodate = 0;
+   _name = "";
+   _index = -1;
+   _skeleton = NULL;
+
+   _pos._joint = this; // as we initialized it with null (to avoid a warning)
+   _quat = 0;
+   _rtype =-1;
+   rot_type(TypeQuat);
+
+   _mass = 0;
+}
+
 SkJoint::SkJoint ( SkSkeleton* sk, SkJoint* parent, RotType rtype, int i )
           : _pos ( 0 )
  {
@@ -220,7 +242,8 @@ void SkJoint::update_gmat_up ( SkJoint* stop_joint )
 void SkJoint::set_lmat_changed ()
  {
    _lmat_uptodate = 0;
-   _skeleton->invalidate_global_matrices();
+   if (_skeleton)
+	_skeleton->invalidate_global_matrices();
  }
 
 static void _unite ( const SkJoint* j, SrModel& m, SrModel& tmp, bool ifvisgeo )
@@ -257,5 +280,12 @@ void SkJoint::unite_colgeo ( SrModel& m )
    SrModel tmp;
    _unite ( this, m, tmp, false );
  }
+
+void SkJoint::add_child( SkJoint* child )
+ { 
+	 _children.push_back(child); 
+	 child->set_parent(this);
+	 child->skeleton(this->skeleton());
+}
 
 //============================ End of File ============================
