@@ -762,6 +762,7 @@ void PATransitionManager::align(PAStateModule* current, PAStateModule* next)
 	int numEaseOut = getNumEaseOut();
 	for (int i = 0; i < numEaseOut; i++)
 	{
+//		std::cout << "transition align" << i << " " << current->timeManager->prevLocalTime << " " << easeOutStarts[i] << " " << current->timeManager->localTime << std::endl;
 		if (current->timeManager->prevLocalTime <= easeOutStarts[i] && current->timeManager->localTime >= easeOutStarts[i]) 
 		{
 			s1 = easeOutStarts[i];
