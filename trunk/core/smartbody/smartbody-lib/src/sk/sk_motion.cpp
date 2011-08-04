@@ -595,7 +595,8 @@ SkMotion* SkMotion::buildMirrorMotion()
 {	
 	SkChannelArray& mchan_arr = this->channels();
 	SkMotion *mirror_p = new SkMotion;
-	mirror_p->synch_points = srSynchPoints(synch_points);
+	srSynchPoints sp(synch_points);
+	mirror_p->synch_points = sp;
 	mirror_p->init( mchan_arr );
 	int num_f = this->frames();
 	for (int i = 0; i < num_f; i++)
