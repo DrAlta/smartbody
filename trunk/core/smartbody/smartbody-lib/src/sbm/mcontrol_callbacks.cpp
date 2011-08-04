@@ -2761,7 +2761,7 @@ int mcu_print_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string c
 		if( !( unit_iss >> unit )
 			|| ( unit < 1 ) )
 		{
-			LOG("ERROR: Invalid action unit number \"%s\".", unit_str);
+			LOG("ERROR: Invalid action unit number \"%s\".", unit_str.c_str());
 			return CMD_FAILURE;
 		}
 	}

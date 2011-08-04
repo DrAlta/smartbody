@@ -164,7 +164,7 @@ public:
 	//  Methods
 	SbmCharacter();
 	SbmCharacter( const char * char_name );
-	SbmCharacter::SbmCharacter( const char* character_name, std::string type);
+	SbmCharacter( const char* character_name, std::string type);
 	virtual ~SbmCharacter();
 	
 	int init( SkSkeleton* skeleton_p,

@@ -189,27 +189,27 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getDuration", &SBController::getDuration, "Gets the controller's duration.")
 		;
 
-	boost::python::class_<MeCtScheduler2, boost::python::bases<SBController>> ("SchedulerController")
+	boost::python::class_<MeCtScheduler2, boost::python::bases<SBController> > ("SchedulerController")
 		.def("getNumTracks", &MeCtScheduler2::count_children, "Returns the number of children/tracks.")
 		;
 
-	boost::python::class_<MeCtMotion, boost::python::bases<SBController>> ("MotionController")
+	boost::python::class_<MeCtMotion, boost::python::bases<SBController> > ("MotionController")
 		//	.def("getMotion", &MeCtMotion::motion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the motion associated with this motion controller.")
 		;
 
-	boost::python::class_<MeCtEyeLid, boost::python::bases<SBController>> ("EyelidController")
+	boost::python::class_<MeCtEyeLid, boost::python::bases<SBController> > ("EyelidController")
 		;
 
-	boost::python::class_<MeCtLocomotion, boost::python::bases<SBController>> ("LocomotionController")
+	boost::python::class_<MeCtLocomotion, boost::python::bases<SBController> > ("LocomotionController")
 		;
 
-	boost::python::class_<MeCtGaze, boost::python::bases<SBController>> ("GazeController")
+	boost::python::class_<MeCtGaze, boost::python::bases<SBController> > ("GazeController")
 		;
 
-	boost::python::class_<MeCtReach, boost::python::bases<SBController>> ("ReachController")
+	boost::python::class_<MeCtReach, boost::python::bases<SBController> > ("ReachController")
 		;
 
-	boost::python::class_<MeCtCurveWriter, boost::python::bases<SBController>> ("CurveWriterController")
+	boost::python::class_<MeCtCurveWriter, boost::python::bases<SBController> > ("CurveWriterController")
 		;
 
 	boost::python::class_<SBSkeleton>("SBSkeleton")
@@ -305,7 +305,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("setData", &SrQuat::setData, "sets the data in the quaterion at location indicated by the index w,x,y,z")
 		;
 
-		boost::python::class_<PythonController, boost::python::bases<SBController>>("PythonController")
+		boost::python::class_<PythonController, boost::python::bases<SBController> >("PythonController")
 			.def("start", &PythonController::start, "start.")
 			.def("stop", &PythonController::stop, "stop.")
 			.def("init", &PythonController::init, "init.")

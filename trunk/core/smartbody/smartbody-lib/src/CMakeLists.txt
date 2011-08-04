@@ -296,6 +296,16 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/KinectProcessor.cpp
 	sbm/me_ct_data_receiver.cpp
 
+	sbm/SBCharacter.cpp
+	sbm/SBJoint.cpp
+	sbm/SBSkeleton.cpp
+	sbm/SBController.cpp
+	sbm/VisemeMap.cpp
+	sbm/sr_path_list.cpp
+
+	sbm/SbmPython.cpp
+	sbm/SbmPythonClass.cpp
+
 )
 
 ####

@@ -120,7 +120,7 @@ void FaceDefinition::setAU(int auNum, std::string side, std::string motionName)
 		side != ""
 		)
 	{
-		LOG("Unrecognized side '%s'. Action Unit %d not added.", side, auNum);
+		LOG("Unrecognized side '%s'. Action Unit %d not added.", side.c_str(), auNum);
 		return;
 	}
 
