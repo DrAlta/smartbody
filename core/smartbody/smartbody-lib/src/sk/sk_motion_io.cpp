@@ -432,7 +432,7 @@ bool SkMotion::save ( SrOutput& out )
 
    out << _channels << srnl;
 
-   out << "frames " << _frames.size() << srnl;
+   out << "frames " << (int) _frames.size() << srnl;
 
    float *pt;
    int chsize = _channels.size();

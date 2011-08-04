@@ -10,28 +10,21 @@
 0   path mesh ../../../../data/mesh
 
 0	seq common-init inline 
-#0	test locomotion initialize
 0	seq init-general-parameters
 0	seq init-common-face
 0	panim enable
 
 ###  Common-sk assets are centered on the pelvis,
 ###  placed 102 units above the ground plane.
-###  Using Unia (Unreal-based) class names for renderer assets
-###  Using remote rVoice speech synthesis
-###  NOTE: increment time to insure common-init is processed in order.
-1	char doctor init common.sk brad SasoBase.SasoDoctorPerez
+1	char doctor init common.sk SasoBase.SasoDoctorPerez
 1	set character doctor world_offset x 35 y 102 h -17
 1	set character doctor voice remote M021
 
-1	char elder init common.sk brad SasoBase.Mayor
+1	char elder init common.sk SasoBase.Mayor
 1	set character elder world_offset x -35 y 102 h -17
 1	set character elder voice remote M009
 
-###  Using "test bml" command to avoid hard-coding
-###  message id into sequence file.
 1	test bml character doctor noecho posture LHandOnHip_Motex
-#1	test bml character elder  noecho posture HandsAtSide_Motex
 1	test bml character elder noecho posture LHandOnHip_Motex
 
 1	seq default-viewer
@@ -39,272 +32,32 @@
 1	set test character doctor
 1	set test recipient elder
 
-#1	test loco char doctor enable
-#1	test loco char elder enable
-
-1	seq default-dynamics
-1	seq init-param-animation
-#2	seq init-example-reach
+#1	seq default-dynamics
+1	seq init-param-animation inline
+#2	seq init-example-reach inline
 
 2 char doctor mesh doctor
 2 char elder mesh elder
 
-1	char brad init test_utah.sk Brad
-1	set character brad world_offset x 135 y 102 h -17
+1	char brad init common.sk Brad
+1	set character brad world_offset x 135 y 100 h -17
 1	set character brad voice remote brad
 2	bml char brad <body posture="HandsAtSide_Motex"/>
-#2	test loco char brad enable
 
-2 char brad mesh utah
+2 char brad mesh brad
 
-# more characters
-1	char foo1 init common.sk brad
-1	set character foo1 world_offset x 185 y 102 h -17
-2	bml char foo1 <body posture="HandsAtSide_Motex"/>
+1	char utah init test_utah.sk utah
+1	set character utah world_offset x -135 y 0 h -17
+1	set character utah voice remote utah
+2	bml char utah <body posture="HandsAtSide_Motex"/>
 
-1	char foo2 init common.sk brad
-1	set character foo2 world_offset x 235 y 102 h -17
-2	bml char foo2 <body posture="HandsAtSide_Motex"/>
+2 char utah mesh utah
 
-1	char foo3 init common.sk brad
-1	set character foo3 world_offset x 285 y 102 h -17
-2	bml char foo3 <body posture="HandsAtSide_Motex"/>
-
-1	char foo4 init common.sk brad
-1	set character foo4 world_offset x -185 y 102 h -17
-2	bml char foo4 <body posture="HandsAtSide_Motex"/>
-
-1	char foo5 init common.sk brad
-1	set character foo5 world_offset x -235 y 102 h -17
-2	bml char foo5 <body posture="HandsAtSide_Motex"/>
-
-1	char foo6 init common.sk brad
-1	set character foo6 world_offset x -285 y 102 h -17
-2	bml char foo6 <body posture="HandsAtSide_Motex"/>
-
-1	char foo7 init common.sk brad
-1	set character foo7 world_offset x -335 y 102 h -17
-2	bml char foo7 <body posture="HandsAtSide_Motex"/>
+2 bml char doctor <saccade mode="listen"/>
+2 bml char elder <saccade mode="listen"/>
+2 bml char brad <saccade mode="listen"/>
+2 bml char utah <saccade mode="listen"/>
 
 
-1	char foo10 init common.sk brad
-1	set character foo10 world_offset x 185 y 102 z 100 h -17
-2	bml char foo10 <body posture="HandsAtSide_Motex"/>
-
-1	char foo11 init common.sk brad
-1	set character foo11 world_offset x 235 y 102 z 100 h -17
-2	bml char foo11 <body posture="HandsAtSide_Motex"/>
-
-1	char foo12 init common.sk brad
-1	set character foo12 world_offset x 285 y 102 z 100 h -17
-2	bml char foo12 <body posture="HandsAtSide_Motex"/>
-
-1	char foo13 init common.sk brad
-1	set character foo13 world_offset x -185 y 102 z 100 h -17
-2	bml char foo13 <body posture="HandsAtSide_Motex"/>
-
-1	char foo14 init common.sk brad
-1	set character foo14 world_offset x -235 y 102 z 100 h -17
-2	bml char foo14 <body posture="HandsAtSide_Motex"/>
-
-1	char foo15 init common.sk brad
-1	set character foo15 world_offset x -285 y 102 z 100 h -17
-2	bml char foo15 <body posture="HandsAtSide_Motex"/>
-
-1	char foo16 init common.sk brad
-1	set character foo16 world_offset x -335 y 102 z 100 h -17
-2	bml char foo16 <body posture="HandsAtSide_Motex"/>
-
-1	char foo17 init common.sk brad
-1	set character foo17 world_offset x -135 y 102 z 100 h -17
-2	bml char foo17 <body posture="HandsAtSide_Motex"/>
-
-1	char foo18 init common.sk brad
-1	set character foo18 world_offset x 135 y 102 z 100 h -17
-2	bml char foo18 <body posture="HandsAtSide_Motex"/>
-
-1	char foo19 init common.sk brad
-1	set character foo19 world_offset x 35 y 102 z 100 h -17
-2	bml char foo19 <body posture="HandsAtSide_Motex"/>
-
-1	char foo20 init common.sk brad
-1	set character foo20 world_offset x -35 y 102 z 100 h -17
-2	bml char foo20 <body posture="HandsAtSide_Motex"/>
-
-
-
-
-1	char foo21 init common.sk brad
-1	set character foo21 world_offset x 185 y 102 z -100 h -17
-2	bml char foo21 <body posture="HandsAtSide_Motex"/>
-
-1	char foo22 init common.sk brad
-1	set character foo22 world_offset x 235 y 102 z -100 h -17
-2	bml char foo22 <body posture="HandsAtSide_Motex"/>
-
-1	char foo23 init common.sk brad
-1	set character foo23 world_offset x 285 y 102 z -100 h -17
-2	bml char foo23 <body posture="HandsAtSide_Motex"/>
-
-1	char foo24 init common.sk brad
-1	set character foo24 world_offset x -185 y 102 z -100 h -17
-2	bml char foo24 <body posture="HandsAtSide_Motex"/>
-
-1	char foo25 init common.sk brad
-1	set character foo25 world_offset x -235 y 102 z -100 h -17
-2	bml char foo25 <body posture="HandsAtSide_Motex"/>
-
-1	char foo26 init common.sk brad
-1	set character foo26 world_offset x -285 y 102 z -100 h -17
-2	bml char foo26 <body posture="HandsAtSide_Motex"/>
-
-1	char foo27 init common.sk brad
-1	set character foo27 world_offset x -335 y 102 z -100 h -17
-2	bml char foo27 <body posture="HandsAtSide_Motex"/>
-
-1	char foo28 init common.sk brad
-1	set character foo28 world_offset x -135 y 102 z -100 h -17
-2	bml char foo28 <body posture="HandsAtSide_Motex"/>
-
-1	char foo29 init common.sk brad
-1	set character foo29 world_offset x 135 y 102 z -100 h -17
-2	bml char foo29 <body posture="HandsAtSide_Motex"/>
-
-1	char foo30 init common.sk brad
-1	set character foo30 world_offset x 35 y 102 z -100 h -17
-2	bml char foo30 <body posture="HandsAtSide_Motex"/>
-
-
-
-
-1	char foo31 init common.sk brad
-1	set character foo31 world_offset x 185 y 102 z -200 h -17
-2	bml char foo31 <body posture="HandsAtSide_Motex"/>
-
-1	char foo32 init common.sk brad
-1	set character foo32 world_offset x 235 y 102 z -200 h -17
-2	bml char foo32 <body posture="HandsAtSide_Motex"/>
-
-1	char foo33 init common.sk brad
-1	set character foo33 world_offset x 285 y 102 z -200 h -17
-2	bml char foo33 <body posture="HandsAtSide_Motex"/>
-
-1	char foo34 init common.sk brad
-1	set character foo34 world_offset x -185 y 102 z -200 h -17
-2	bml char foo34 <body posture="HandsAtSide_Motex"/>
-
-1	char foo35 init common.sk brad
-1	set character foo35 world_offset x -235 y 102 z -200 h -17
-2	bml char foo35 <body posture="HandsAtSide_Motex"/>
-
-1	char foo36 init common.sk brad
-1	set character foo36 world_offset x -285 y 102 z -200 h -17
-2	bml char foo36 <body posture="HandsAtSide_Motex"/>
-
-1	char foo37 init common.sk brad
-1	set character foo37 world_offset x -335 y 102 z -200 h -17
-2	bml char foo37 <body posture="HandsAtSide_Motex"/>
-
-1	char foo38 init common.sk brad
-1	set character foo38 world_offset x -135 y 102 z -200 h -17
-2	bml char foo38 <body posture="HandsAtSide_Motex"/>
-
-1	char foo39 init common.sk brad
-1	set character foo39 world_offset x 135 y 102 z -200 h -17
-2	bml char foo39 <body posture="HandsAtSide_Motex"/>
-
-1	char foo40 init common.sk brad
-1	set character foo40 world_offset x 35 y 102 z -200 h -17
-2	bml char foo40 <body posture="HandsAtSide_Motex"/>
-
-
-
-1	char foo41 init common.sk brad
-1	set character foo41 world_offset x 185 y 102 z 200 h -17
-2	bml char foo41 <body posture="HandsAtSide_Motex"/>
-
-1	char foo42 init common.sk brad
-1	set character foo42 world_offset x 235 y 102 z 200 h -17
-2	bml char foo42 <body posture="HandsAtSide_Motex"/>
-
-1	char foo43 init common.sk brad
-1	set character foo43 world_offset x 285 y 102 z 200 h -17
-2	bml char foo43 <body posture="HandsAtSide_Motex"/>
-
-1	char foo44 init common.sk brad
-1	set character foo44 world_offset x -185 y 102 z 200 h -17
-2	bml char foo44 <body posture="HandsAtSide_Motex"/>
-
-1	char foo45 init common.sk brad
-1	set character foo45 world_offset x -235 y 102 z 200 h -17
-2	bml char foo45 <body posture="HandsAtSide_Motex"/>
-
-1	char foo46 init common.sk brad
-1	set character foo46 world_offset x -285 y 102 z 200 h -17
-2	bml char foo46 <body posture="HandsAtSide_Motex"/>
-
-1	char foo47 init common.sk brad
-1	set character foo47 world_offset x -335 y 102 z 200 h -17
-2	bml char foo47 <body posture="HandsAtSide_Motex"/>
-
-1	char foo48 init common.sk brad
-1	set character foo48 world_offset x -135 y 102 z 200 h -17
-2	bml char foo48 <body posture="HandsAtSide_Motex"/>
-
-1	char foo49 init common.sk brad
-1	set character foo49 world_offset x 135 y 102 z 200 h -17
-2	bml char foo49 <body posture="HandsAtSide_Motex"/>
-
-1	char foo50 init common.sk brad
-1	set character foo50 world_offset x 35 y 102 z 200 h -17
-2	bml char foo50 <body posture="HandsAtSide_Motex"/>
-
-10 char foo1 mesh brad
-10 char foo2 mesh brad
-10 char foo3 mesh brad
-10 char foo4 mesh brad
-10 char foo5 mesh brad
-10 char foo6 mesh brad
-10 char foo7 mesh brad
-10 char foo8 mesh brad
-10 char foo9 mesh brad
-10 char foo10 mesh brad
-10 char foo11 mesh brad
-10 char foo12 mesh brad
-10 char foo13 mesh brad
-10 char foo14 mesh brad
-10 char foo15 mesh brad
-10 char foo16 mesh brad
-10 char foo17 mesh brad
-10 char foo18 mesh brad
-10 char foo19 mesh brad
-10 char foo20 mesh brad
-10 char foo21 mesh brad
-10 char foo22 mesh brad
-10 char foo23 mesh brad
-10 char foo24 mesh brad
-10 char foo25 mesh brad
-10 char foo26 mesh brad
-10 char foo27 mesh brad
-10 char foo28 mesh brad
-10 char foo29 mesh brad
-10 char foo30 mesh brad
-10 char foo31 mesh brad
-10 char foo32 mesh brad
-10 char foo33 mesh brad
-10 char foo34 mesh brad
-10 char foo35 mesh brad
-10 char foo36 mesh brad
-10 char foo37 mesh brad
-10 char foo38 mesh brad
-10 char foo39 mesh brad
-10 char foo40 mesh brad
-10 char foo41 mesh brad
-10 char foo42 mesh brad
-10 char foo43 mesh brad
-10 char foo44 mesh brad
-10 char foo45 mesh brad
-10 char foo46 mesh brad
-10 char foo47 mesh brad
-10 char foo48 mesh brad
-10 char foo49 mesh brad
+4 steer start
+5 steer type example
