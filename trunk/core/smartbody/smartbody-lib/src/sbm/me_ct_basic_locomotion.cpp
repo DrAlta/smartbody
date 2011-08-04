@@ -25,7 +25,7 @@
 
 const char* MeCtBasicLocomotion::_type_name = "BasicLocomotion";
 
-MeCtBasicLocomotion::MeCtBasicLocomotion(SbmCharacter* c) :  MeController(), 
+MeCtBasicLocomotion::MeCtBasicLocomotion(SbmCharacter* c) :  SmartBody::SBController(), 
 															 character(c)
 {
 	scootSpd = 0.0f;	//	unit: centermeter/sec

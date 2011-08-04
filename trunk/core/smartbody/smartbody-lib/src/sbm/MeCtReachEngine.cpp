@@ -132,7 +132,7 @@ void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
 
 	reachData = new ReachStateData();
 	reachData->characterHeight = characterHeight;		
-	reachData->charName = character->name;
+	reachData->charName = character->getName();
 	reachData->reachRegion = ikReachRegion;	
 	reachData->linearVel = ikDefaultVelocity;
 	reachData->curRefTime = 0.f;

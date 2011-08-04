@@ -24,12 +24,12 @@
 #define ME_CT_EYELID_H
 
 #include <sk/sk_skeleton.h>
-#include <me/me_controller.h>
+#include <sbm/SBController.h>
 #include "sr_linear_curve.h"
 
 //////////////////////////////////////////////////////////////////////////////////
 
-class MeCtEyeLidRegulator : public MeController	{ 
+class MeCtEyeLidRegulator : public SmartBody::SBController	{ 
 
 	private:
 
@@ -252,7 +252,7 @@ class MeCtEyeLidRegulator : public MeController	{
 
 //////////////////////////////////////////////////////////////////////////////////
 
-class MeCtEyeLid : public MeController	{ 
+class MeCtEyeLid : public SmartBody::SBController	{ 
 
 	private:
 

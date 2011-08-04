@@ -43,6 +43,8 @@
 #include "sr_curve_builder.h"
 #include "lin_win.h"
 #include <boost/filesystem/operations.hpp>
+#include <sbm/SBSkeleton.h>
+#include <sbm/SBJoint.h>
 
 #define USE_REACH 1
 //#define USE_REACH_TEST 0
@@ -91,11 +93,23 @@ MeCtSchedulerClass* CreateSchedulerCt( const char* character_name, const char* s
 	return sched_p;
 }
 
+SbmCharacter::SbmCharacter() : SbmPawn()
+{
+	SbmCharacter::initData();
+	setClassType("");
+}
+
+SbmCharacter::SbmCharacter( const char* character_name, std::string type)
+:	SbmPawn( character_name )
+{
+	SbmCharacter::initData();
+	setClassType(type);
+}
+
 //  Constructor
 SbmCharacter::SbmCharacter( const char* character_name )
 :	SbmPawn( character_name ),
-	speech_impl( NULL ),
-	speech_impl_backup( NULL ),
+
 	posture_sched_p( CreateSchedulerCt( character_name, "posture" ) ),
 	motion_sched_p( CreateSchedulerCt( character_name, "motion" ) ),
 	gaze_sched_p( CreateSchedulerCt( character_name, "gaze" ) ),
@@ -115,9 +129,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	eyelid_ct( new MeCtEyeLid() ),
 	motionplayer_ct( NULL ),	
 	face_neutral( NULL ),
-	_soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT ),
-	_height(1.0f), 
-	_visemePlateau(true)
+	_soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT )
 {
 	posture_sched_p->ref();
 	motion_sched_p->ref();
@@ -125,34 +137,13 @@ SbmCharacter::SbmCharacter( const char* character_name )
 	head_sched_p->ref();
 	param_sched_p->ref();
 	eyelid_ct->ref();
-
-	steeringAgent = NULL;
-	_numSteeringGoal = 0;
-	_reachTarget = false;
-	_lastReachStatus = true;	
-	_classType = "";
-
-	use_viseme_curve = false;
-	viseme_time_offset = 0.0;
-	viseme_sound_offset = 0.0;
-	viseme_magnitude = 1.0;
-	viseme_channel_count = 0;
-	viseme_channel_start_pos = 0;
-	viseme_channel_end_pos = 0;
-	viseme_history_arr = NULL;
-	_minVisemeTime = 0.0f;
-
-	createBoolAttribute("facebone", false, true, "Basic", 200, false, false, false, "Use bones for facial animation. If false, blendshapes will be used. If true, face will be animated via face definitions.");
-	createBoolAttribute("visemecurve", false, true, "Basic", 200, false, false, false, "Use curve-based visemes instead of discrete visemes.");
-	DoubleAttribute* timeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 210, false, false, false, "Delay visemes by a fixed amount.");
-	timeDelayAttr->setMin(0.0);
-	createStringAttribute("mesh", "", true, "Basic", 220, false, false, false, "Directory that contains mesh information.");
 }
+	
 
 //  Destructor
 SbmCharacter::~SbmCharacter( void )	{
 
-	printf("delete character %s\n",this->name);
+	printf("delete character %s\n",this->getName().c_str());
 
 	if (posture_sched_p)
 		posture_sched_p->unref();
@@ -178,8 +169,10 @@ SbmCharacter::~SbmCharacter( void )	{
 		param_sched_p->unref();
 	if( face_ct )
 		face_ct->unref();
+	/*
 	if (eyelid_ct)
 		eyelid_ct->unref();
+	*/
 
 	if (locomotion_ct)
 		locomotion_ct->unref();
@@ -202,7 +195,7 @@ SbmCharacter::~SbmCharacter( void )	{
 
 	if ( mcuCBHandle::singleton().sbm_character_listener )
 	{
-		mcuCBHandle::singleton().sbm_character_listener->OnCharacterDelete( name );
+		mcuCBHandle::singleton().sbm_character_listener->OnCharacterDelete( getName() );
 	}
 
     if ( bonebusCharacter )
@@ -217,6 +210,176 @@ SbmCharacter::~SbmCharacter( void )	{
 	}
 
 	delete steeringAgent;
+}
+
+void SbmCharacter::createStandardControllers()
+{
+	posture_sched_p = CreateSchedulerCt( getName().c_str(), "posture" );
+	motion_sched_p = CreateSchedulerCt( getName().c_str(), "motion" );
+	
+	// procedural locomotion
+	this->locomotion_ct =  new MeCtLocomotionClass();
+	std::string locomotionname = getName() + "'s locomotion controller";
+	this->locomotion_ct->name( locomotionname.c_str() );
+	locomotion_ct->get_navigator()->setWordOffsetController(world_offset_writer_p);
+	locomotion_ct->ref();
+	
+	// example-based locomotion
+	this->param_animation_ct = new MeCtParamAnimation(this, world_offset_writer_p);
+	std::string paramAnimationName = getName() + "'s param animation controller";
+	this->param_animation_ct->name(paramAnimationName.c_str());
+	param_sched_p = CreateSchedulerCt( getName().c_str(), "param" );
+	
+	// basic locomotion
+	this->basic_locomotion_ct = new MeCtBasicLocomotion(this);
+	std::string bLocoName = getName() + "'s basic locomotion controller";
+	this->basic_locomotion_ct->name(bLocoName.c_str());
+	//this->basic_locomotion_ct->set_pass_through(false);
+	
+	
+	
+	SkJoint* effector = this->_skeleton->search_joint("r_middle1");
+	if (effector)
+	{
+		MeCtReachEngine* rengine = new MeCtReachEngine(this,this->_skeleton);
+		rengine->init(MeCtReachEngine::RIGHT_ARM,effector);
+		this->reachEngineMap[MeCtReachEngine::RIGHT_ARM] = rengine;		
+	}	
+
+	SkJoint* leftEffector = this->_skeleton->search_joint("l_middle1");
+	if (leftEffector)
+	{
+		MeCtReachEngine* rengine = new MeCtReachEngine(this,this->_skeleton);
+		rengine->init(MeCtReachEngine::LEFT_ARM,leftEffector);
+		this->reachEngineMap[MeCtReachEngine::LEFT_ARM] = rengine;		
+	}	
+	
+	constraint_sched_p = CreateSchedulerCt( getName().c_str(), "constraint" );
+	reach_sched_p = CreateSchedulerCt( getName().c_str(), "reach" );
+	grab_sched_p = CreateSchedulerCt( getName().c_str(), "grab" );
+	
+	gaze_sched_p = CreateSchedulerCt( getName().c_str(), "gaze" );
+
+	head_sched_p = CreateSchedulerCt( getName().c_str(), "head" );
+	face_ct = new MeCtFace();
+	string faceCtName( getName() );
+	faceCtName += "'s face_ct";
+	face_ct->setName(faceCtName);
+	
+	eyelid_reg_ct_p = new MeCtEyeLidRegulator();
+	eyelid_reg_ct_p->ref();
+	if (!_faceDefinition || !_faceDefinition->getFaceNeutral())
+		eyelid_reg_ct_p->set_use_blink_viseme( true );
+
+	eyelid_reg_ct_p->init(this, true);
+	eyelid_reg_ct_p->set_upper_range( -30.0, 30.0 );
+	eyelid_reg_ct_p->set_close_angle( 30.0 );
+	ostringstream ct_name;
+	ct_name << getName() << "'s eyelid controller";
+	eyelid_reg_ct_p->name( ct_name.str().c_str() );
+	
+	this->saccade_ct = new MeCtSaccade(this->_skeleton);
+	this->saccade_ct->init(this);
+	std::string saccadeCtName = getName() + "'s eye saccade controller";
+	this->saccade_ct->name(saccadeCtName.c_str());
+
+	// motion player
+	motionplayer_ct = new MeCtMotionPlayer(this);
+//	motionplayer_ct->ref();
+	std::string mpName = getName();
+	mpName += "'s motion player";
+	motionplayer_ct->name(mpName.c_str());
+	motionplayer_ct->setActive(false);
+	ct_tree_p->add_controller(motionplayer_ct);
+	
+	this->datareceiver_ct = new MeCtDataReceiver(this->_skeleton);
+	std::string datareceiverCtName = getName() + "'s data receiver controller";
+	this->datareceiver_ct->name(datareceiverCtName.c_str());
+
+	posture_sched_p->ref();
+	motion_sched_p->ref();
+	gaze_sched_p->ref();
+	head_sched_p->ref();
+	face_ct->ref();
+	param_sched_p->ref();
+
+	posture_sched_p->init(this);
+	motion_sched_p->init(this);
+	param_sched_p->init(this);
+	locomotion_ct->init(this);
+	gaze_sched_p->init(this);
+
+	reach_sched_p->init(this);
+	grab_sched_p->init(this);
+	constraint_sched_p->init(this);
+
+	head_sched_p->init(this);
+	face_ct->init( getFaceDefinition() );
+
+	ct_tree_p->add_controller( posture_sched_p );
+	ct_tree_p->add_controller( motion_sched_p );
+	ct_tree_p->add_controller( locomotion_ct );
+	ct_tree_p->add_controller( param_animation_ct );
+	ct_tree_p->add_controller( basic_locomotion_ct );
+	
+	ct_tree_p->add_controller( reach_sched_p );	
+	ct_tree_p->add_controller( grab_sched_p );
+	ct_tree_p->add_controller( gaze_sched_p );
+	ct_tree_p->add_controller( constraint_sched_p );	
+	ct_tree_p->add_controller( eyelid_reg_ct_p );
+	ct_tree_p->add_controller( head_sched_p );
+	ct_tree_p->add_controller( face_ct );
+	ct_tree_p->add_controller( param_sched_p );
+	ct_tree_p->add_controller( motionplayer_ct );
+	ct_tree_p->add_controller(datareceiver_ct);
+}
+void SbmCharacter::initData()
+{
+	posture_sched_p = NULL;
+	motion_sched_p = NULL;
+	gaze_sched_p = NULL;
+	reach_sched_p = NULL;
+	head_sched_p = NULL;
+	param_sched_p = NULL;
+
+	speech_impl = NULL;
+	speech_impl_backup = NULL;
+	locomotion_ct = NULL;
+	eyelid_reg_ct_p = NULL;
+	face_ct = NULL;
+	motionplayer_ct = NULL;
+	use_viseme_curve = false;
+	_soft_eyes_enabled = ENABLE_EYELID_CORRECTIVE_CT;
+	_height = 1.0f;
+	bonebusCharacter = NULL;
+
+	param_map = new GeneralParamMap;
+
+	use_viseme_curve = false;
+	viseme_time_offset = 0.0;
+	viseme_sound_offset = 0.0;
+	viseme_magnitude = 1.0;
+	viseme_channel_count = 0;
+	viseme_channel_start_pos = 0;
+	viseme_channel_end_pos = 0;
+	viseme_history_arr = NULL;
+	_minVisemeTime = 0.0f;
+	_isControllerPruning = true;
+	_classType = "";
+	_minVisemeTime = 0.0f;
+	_faceDefinition = NULL;
+	steeringAgent = NULL;
+	_numSteeringGoal = 0;
+	_reachTarget = false;
+	_lastReachStatus = true;
+	_height = 1.0f; 
+	_visemePlateau = true;
+
+	createBoolAttribute("facebone", false, true, "Basic", 200, false, false, false, "Use bones for facial animation. If false, blendshapes will be used. If true, face will be animated via face definitions.");
+	createBoolAttribute("visemecurve", false, true, "Basic", 200, false, false, false, "Use curve-based visemes instead of discrete visemes.");
+	DoubleAttribute* timeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 210, false, false, false, "Delay visemes by a fixed amount.");
+	timeDelayAttr->setMin(0.0);
+	createStringAttribute("mesh", "", true, "Basic", 220, false, false, false, "Directory that contains mesh information.");
 }
 
 int SbmCharacter::init_locomotion_skeleton(const char* skel_file, mcuCBHandle *mcu_p)
@@ -275,8 +438,8 @@ void SbmCharacter::locomotion_set_turning_mode(int mode)
 
 void SbmCharacter::updateJointPhyObjs()
 {
-	const std::vector<SkJoint*>& joints = skeleton_p->joints();	
-	skeleton_p->update_global_matrices();
+	const std::vector<SkJoint*>& joints = _skeleton->joints();	
+	_skeleton->update_global_matrices();
 	for (size_t i=0;i<joints.size();i++)
 	{
 		SkJoint* curJoint = joints[i];
@@ -293,7 +456,7 @@ void SbmCharacter::updateJointPhyObjs()
 
 void SbmCharacter::setJointPhyCollision( bool useCollision )
 {	
-	const std::vector<SkJoint*>& joints = skeleton_p->joints();		
+	const std::vector<SkJoint*>& joints = _skeleton->joints();		
 	for (size_t i=0;i<joints.size();i++)
 	{
 		SkJoint* curJoint = joints[i];
@@ -308,7 +471,7 @@ void SbmCharacter::setJointPhyCollision( bool useCollision )
 
 void SbmCharacter::buildJointPhyObjs()
 {
-	const std::vector<SkJoint*>& joints = skeleton_p->joints();
+	const std::vector<SkJoint*>& joints = _skeleton->joints();
 	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
 	if (!phySim)
 		return;
@@ -336,7 +499,7 @@ void SbmCharacter::buildJointPhyObjs()
 
 void SbmCharacter::setJointCollider( std::string jointName, float len, float radius )
 {
-	SkJoint* joint = skeleton_p->search_joint(jointName.c_str());
+	SkJoint* joint = _skeleton->search_joint(jointName.c_str());
 	if (!joint || joint->num_children() == 0)
 		return;
 	SbmPhysicsSim* phySim = mcuCBHandle::singleton().physicsEngine;
@@ -373,10 +536,11 @@ void SbmCharacter::setJointCollider( std::string jointName, float len, float rad
 	jointPhyObjMap[jointName] = jointPhy;
 }
 
+
+
+
 int SbmCharacter::init( SkSkeleton* new_skeleton_p,
-					    SkMotion* face_neutral,
-                        AUMotionMap* au_motion_map,
-                        VisemeMotionMap* viseme_motion_map,
+					    FaceDefinition* faceDefinition,
 						GeneralParamMap* param_map,
                         const char* classType,
 						bool use_locomotion,
@@ -387,13 +551,11 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	// Store pointers for access via init_skeleton()
-	if( face_neutral ) {
-		this->face_neutral      = face_neutral;
-		face_neutral->ref();
-	}
-	this->au_motion_map     = au_motion_map;
-	this->viseme_motion_map = viseme_motion_map;
+	
 	this->param_map = param_map;
+
+	scene_p = new SkScene();
+	scene_p->ref();
 
 	int init_result = SbmPawn::init( new_skeleton_p );  // Indirectly calls init_skeleton 
 	if( init_result!=CMD_SUCCESS ) {
@@ -403,7 +565,11 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	setClassType(classType);
 	float height = new_skeleton_p->getCurrentHeight();
 	setHeight(height);
+	
+	setFaceDefinition(faceDefinition);
+	createStandardControllers();
 
+	/*
 	eyelid_reg_ct_p = new MeCtEyeLidRegulator();
 	if( eyelid_reg_ct_p )	{
 		eyelid_reg_ct_p->ref();
@@ -433,18 +599,18 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 	// init reach engine
 	{
-		SkJoint* effector = this->skeleton_p->search_joint("r_middle1");
+		SkJoint* effector = this->_skeleton->search_joint("r_middle1");
 		if (effector)
 		{
-			MeCtReachEngine* rengine = new MeCtReachEngine(this,this->skeleton_p);
+			MeCtReachEngine* rengine = new MeCtReachEngine(this,this->_skeleton);
 			rengine->init(MeCtReachEngine::RIGHT_ARM,effector);
 			this->reachEngineMap[MeCtReachEngine::RIGHT_ARM] = rengine;		
 		}	
 
-		SkJoint* leftEffector = this->skeleton_p->search_joint("l_middle1");
+		SkJoint* leftEffector = this->_skeleton->search_joint("l_middle1");
 		if (leftEffector)
 		{
-			MeCtReachEngine* rengine = new MeCtReachEngine(this,this->skeleton_p);
+			MeCtReachEngine* rengine = new MeCtReachEngine(this,this->_skeleton);
 			rengine->init(MeCtReachEngine::LEFT_ARM,leftEffector);
 			this->reachEngineMap[MeCtReachEngine::LEFT_ARM] = rengine;		
 		}	
@@ -459,24 +625,16 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	}
 	
 	{
-		this->saccade_ct = new MeCtSaccade(this->skeleton_p);
+		this->saccade_ct = new MeCtSaccade(this->_skeleton);
 		this->saccade_ct->init(this);
 		std::string saccadeCtName = std::string(name)+ "'s eye saccade controller";
 		this->saccade_ct->name(saccadeCtName.c_str());
 	}
 
 	{
-		this->datareceiver_ct = new MeCtDataReceiver(this->skeleton_p);
+		this->datareceiver_ct = new MeCtDataReceiver(this->_skeleton);
 		std::string datareceiverCtName = std::string(name) + "'s data receiver controller";
 		this->datareceiver_ct->name(datareceiverCtName.c_str());
-	}
-
-	// Clear pointer data no longer used after this point in initialization.
-	this->viseme_motion_map = NULL;
-	this->au_motion_map     = NULL;
-	if( face_neutral ) {
-		face_neutral->unref();
-		this->face_neutral = NULL; // MLT: What is the purpose of this?
 	}
 
 	posture_sched_p->init(this);
@@ -554,22 +712,18 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	if (use_data_receiver)
 		ct_tree_p->add_controller(datareceiver_ct);
 
-	// motion player
-	motionplayer_ct = new MeCtMotionPlayer(this);
-//	motionplayer_ct->ref();
-	std::string mpName(name);
-	mpName += "'s motion player";
-	motionplayer_ct->name(mpName.c_str());
-	motionplayer_ct->setActive(false);
-	ct_tree_p->add_controller(motionplayer_ct);
+	*/
+
+	scene_p->init( _skeleton ); 
 
 	steeringAgent = new SteeringAgent(this);
 
-	bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( name, classType, mcuCBHandle::singleton().net_face_bones );
+	if (mcuCBHandle::singleton().net_bone_updates)
+		bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( getName().c_str(), classType, mcuCBHandle::singleton().net_face_bones );
 
 	if ( mcuCBHandle::singleton().sbm_character_listener )
 	{		
-		mcuCBHandle::singleton().sbm_character_listener->OnCharacterCreate( name, classType );
+		mcuCBHandle::singleton().sbm_character_listener->OnCharacterCreate( getName(), classType );
 	}
 
 	// This needs to be tested
@@ -697,7 +851,7 @@ void SbmCharacter::add_face_channel( const string& name, const int wo_index ) {
 
 SkJoint*  SbmCharacter::add_bounded_float_channel( const string& name, float lower, float upper, const int wo_index ) {
 
-	SkJoint* joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
+	SkJoint* joint_p = _skeleton->add_joint( SkJoint::TypeEuler, wo_index );
 	joint_p->name( name );
 	// Activate channel with lower limit != upper.
 	joint_p->pos()->limits( SkJointPos::X, lower, upper );  // Setting upper bound to 2 allows some exageration
@@ -728,7 +882,7 @@ int SbmCharacter::init_skeleton() {
 		const float max_speed = 1000000.0f;   // TODO: set max speed value to some reasonable value for the current scale
 
 		// 3D vector for current speed and trajectory of the body
-		SkJoint* loc_vector_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
+		SkJoint* loc_vector_joint_p = _skeleton->add_joint( SkJoint::TypeEuler, wo_index );
 		loc_vector_joint_p->name( MeCtLocomotionPawn::LOCOMOTION_VELOCITY );
 		// Activate positional channels
 		loc_vector_joint_p->pos()->limits( 0, -max_speed, max_speed );
@@ -742,11 +896,11 @@ int SbmCharacter::init_skeleton() {
 		//velocity_joint_p->euler()->activate();
 
 		// 3D position for angular velocity
-		SkJoint* g_angular_velocity_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
-		SkJoint* l_angular_velocity_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
-		SkJoint* l_angular_angle_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
-		SkJoint* time_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
-		SkJoint* id_joint_p = skeleton_p->add_joint( SkJoint::TypeEuler, wo_index );
+		SkJoint* g_angular_velocity_joint_p = _skeleton->add_joint( SkJoint::TypeEuler, wo_index );
+		SkJoint* l_angular_velocity_joint_p = _skeleton->add_joint( SkJoint::TypeEuler, wo_index );
+		SkJoint* l_angular_angle_joint_p = _skeleton->add_joint( SkJoint::TypeEuler, wo_index );
+		SkJoint* time_joint_p = _skeleton->add_joint( SkJoint::TypeEuler, wo_index );
+		SkJoint* id_joint_p = _skeleton->add_joint( SkJoint::TypeEuler, wo_index );
 		g_angular_velocity_joint_p->name( MeCtLocomotionPawn::LOCOMOTION_GLOBAL_ROTATION  );
 		l_angular_velocity_joint_p->name( MeCtLocomotionPawn::LOCOMOTION_LOCAL_ROTATION  );
 		l_angular_angle_joint_p->name( MeCtLocomotionPawn::LOCOMOTION_LOCAL_ROTATION_ANGLE  );
@@ -767,122 +921,19 @@ int SbmCharacter::init_skeleton() {
 		id_joint_p->euler()->activate();
 	}
 
-	if( face_neutral ) {
-		// Unlike other controllers, face_ct is constructed and initialized in
-		// init_skelton because it initialized by data in the au_motion_map
-		// and viseme_motion_map that is not available later.
-		face_ct = new MeCtFace();
-		face_ct->ref();
-
-		string face_ct_name( name );
-		face_ct_name += "'s face_ct";
-		face_ct->name( face_ct_name.c_str() );
-
-		face_ct->init(this, face_neutral );
-	}
-
-	std::string viseme_start_name;
-	viseme_channel_count = 0;
-
-	{	// Generate AU and viseme activation channels.
-		AUMotionMap::const_iterator i   = au_motion_map->begin();
-		AUMotionMap::const_iterator end = au_motion_map->end();
-		
-		for(; i != end; ++i ) {
-			//const int   id = i->first;
-			stringstream id;
-			id << i->first;
-			AUMotionPtr au( i->second );
-
-			if( au->is_left() ) {
-				string name = "au_";
-				//name += id;
-				name += id.str();
-				name += "_left";
-
-				// Create the AU control channel
-				add_face_channel( name, wo_index );
-				if (viseme_channel_count == 0)	viseme_start_name = name;
-				viseme_channel_count ++;
-
-				// TODO: Add to au_channel_map (?)
-
-				// Register control channel with face controller
-				if( face_ct )
-					face_ct->add_key( name.c_str(), au->left );
-			}
-			if( au->is_right()) {
-				string name = "au_";
-				//name += id;
-				name += id.str();
-				name += "_right";
-
-				// Create the AU control channel
-				add_face_channel( name, wo_index );
-				if (viseme_channel_count == 0)	viseme_start_name = name;
-				viseme_channel_count ++;
-
-				// Register control channel with face controller
-				if( face_ct )
-					face_ct->add_key( name.c_str(), au->right );
-			}
-			if (au->is_bilateral())
-			{
-				string name = "au_";
-					//name += id;
-					name += id.str();
-
-					// Create the AU control channel
-					add_face_channel( name, wo_index );
-					if (viseme_channel_count == 0)	viseme_start_name = name;
-					viseme_channel_count ++;
-
-					// Register control channel with face controller
-					if( face_ct )
-						face_ct->add_key( name.c_str(), au->left );
-			}
-		}
-
-		VisemeMotionMap::const_iterator vi   = viseme_motion_map->begin();
-		VisemeMotionMap::const_iterator vend = viseme_motion_map->end();
-		for(; vi != vend; ++vi ) {
-			const string&    id     = vi->first;
-			SkMotion* motion = vi->second;
-
-				/* get rid of the "viseme_" prefix */ 
-//				string name = "viseme_";
-//				name += id;
-
-				// Create the Viseme control channel
-				add_face_channel( id, wo_index );
-				if (viseme_channel_count == 0)	viseme_start_name = id;
-				viseme_channel_count ++;
-				
-				// Register control channel with face controller
-				if( face_ct )
-					if( motion ) {
-						face_ct->add_key( id.c_str(), motion );
-			}
-		}
-	}
-
-	if( face_ct ) {
-		face_ct->finish_adding();
-	}
-
 	// Adding general parameter channels using a format of <char_name>_1_1, <char_name>_2_1, <char_name>_2_2, <char_name>_2_3...(for joint name)
 	int Index = 0;
 	for( GeneralParamMap::const_iterator pos = param_map->begin(); pos != param_map->end(); pos++ )
 	{
 		for( int m = 0; m < (int)pos->second->char_names.size(); m++ )
 		{
-			if( pos->second->char_names[m] == string(this->name) )
+			if( pos->second->char_names[m] == this->getName() )
 			{
 				Index ++;
 				for(int i = 0; i< pos->second->size; i++)
 				{
 					std::stringstream joint_name;
-					joint_name << this->name << "_" << Index << "_" << ( i + 1 );
+					joint_name << this->getName() << "_" << Index << "_" << ( i + 1 );
 					SkJoint* joint = add_bounded_float_channel( joint_name.str(), 0 , 1, wo_index );
 					joint->setJointType(SkJoint::TypeOther);
 				}
@@ -891,30 +942,25 @@ int SbmCharacter::init_skeleton() {
 	}	
 
 	// Rebuild the active channels to include new joints
-	skeleton_p->make_active_channels();
+	_skeleton->make_active_channels();
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (mcu.sbm_character_listener)
 	{
-		mcu.sbm_character_listener->OnCharacterChanged(name);
-	}
-
-
-	// keep record of viseme channel start index
-	if (viseme_start_name != "")
-	{
-		viseme_channel_start_pos = skeleton_p->channels().search(viseme_start_name.c_str(), SkChannel::XPos);
-		viseme_channel_end_pos = viseme_channel_start_pos + viseme_channel_count - 1;
-		viseme_history_arr = new float[ viseme_channel_count ];
-	}
-	else	// no map exist
-	{
-		viseme_channel_start_pos = 0;
-		viseme_channel_end_pos = 0;
+		mcu.sbm_character_listener->OnCharacterChanged(getName());
 	}
 
 	for( int i=0; i<viseme_channel_count; i++ ) {
 		viseme_history_arr[ i ] = -1.0;
+	}
+
+	return CMD_SUCCESS;
+}
+
+int SbmCharacter::setup() {
+
+	if( SbmPawn::setup() != CMD_SUCCESS ) {
+		return CMD_FAILURE;
 	}
 
 	return CMD_SUCCESS;
@@ -1370,7 +1416,7 @@ int SbmCharacter::prune_controller_tree( mcuCBHandle* mcu_p ) {
 	if( LOG_PRUNE_CMD_TIME || LOG_CONTROLLER_TREE_PRUNING )
 	{
 		std::stringstream strstr;
-		strstr << "SbmCharacter \""<<name<<"\" prune_controller_tree(..) @ time "<<time<<endl;
+		strstr << "SbmCharacter \""<<getName()<<"\" prune_controller_tree(..) @ time "<<time<<endl;
 		LOG(strstr.str().c_str());
 	}
 
@@ -1415,10 +1461,10 @@ void SbmCharacter::remove_from_scene() {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	
 	string vrProcEnd_msg = "vrProcEnd sbm ";
-	vrProcEnd_msg += name;
+	vrProcEnd_msg += getName();
 	mcu.vhmsg_send( vrProcEnd_msg.c_str() );
 
-	mcu.removeCharacter(name);
+	mcu.removeCharacter(getName());
 
 	SbmPawn::remove_from_scene();
 }
@@ -1651,7 +1697,7 @@ void SbmCharacter::forward_visemes( double curTime )
 
 	if( bonebusCharacter || listener_p )
 	{
-		SkChannelArray& channels = skeleton_p->channels();
+		SkChannelArray& channels = _skeleton->channels();
 		MeFrameData& frameData = ct_tree_p->getLastFrame();
 		
 		int i = 0;
@@ -1671,7 +1717,7 @@ void SbmCharacter::forward_visemes( double curTime )
 					}
 					if( listener_p )
 					{
-						listener_p->OnViseme( name, channels.name(c), value, 0 );
+						listener_p->OnViseme( getName(), channels.name(c), value, 0 );
 					}
 					viseme_history_arr[ i ] = value;
 				}
@@ -1760,7 +1806,7 @@ void SbmCharacter::inspect_skeleton_world_transform( SkJoint* joint_p, int depth
 int SbmCharacter::print_controller_schedules() {
 		//  Command: print character <character id> schedule
 		//  Print out the current state of the character's schedule
-		LOG("Character %s's schedule:", name);
+	LOG("Character %s's schedule:", getName().c_str());
 		LOG("POSTURE Schedule:");
 		posture_sched_p->print_state( 0 );
 		LOG("MOTION Schedule");
@@ -1840,7 +1886,7 @@ int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 
 	if( !found_quickdraw ) {
 		std::stringstream strstr;
-		strstr << "WARNING: Character \""<<name<<"\" reholster(): No quickdraw controller found.";
+		strstr << "WARNING: Character \""<<getName()<<"\" reholster(): No quickdraw controller found.";
 		LOG(strstr.str().c_str());
 	}
 
@@ -1920,7 +1966,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 						ext == ".dae" || ext == ".DAE")
 					{
 						std::stringstream strstr;
-						strstr << "char " << name << " smoothbindweight " << fileName;
+						strstr << "char " << getName() << " smoothbindweight " << fileName;
 						if (prefix != "")
 							strstr << " -prefix " << prefix;
 						int success = mcu_p->execute((char*) strstr.str().c_str());
@@ -1932,7 +1978,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 					else if (ext == ".obj" || ext == ".OBJ")
 					{
 						std::stringstream strstr;
-						strstr << "char " << name << " smoothbindmesh " << fileName;
+						strstr << "char " << getName() << " smoothbindmesh " << fileName;
 						int success = mcu_p->execute((char*) strstr.str().c_str());
 						if (success != CMD_SUCCESS)
 						{
@@ -1949,7 +1995,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 	{
 		char* obj_file = args.read_token();
 		char* option = args.read_token();
-		return mcu_character_load_mesh( name, obj_file, mcu_p, option );
+		return mcu_character_load_mesh( getName().c_str(), obj_file, mcu_p, option );
 	} 
 	else 
 	if( cmd == "smoothbindweight" ) {
@@ -1976,29 +2022,29 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		}
 		
 		//printf("prefix name = %s\n",prefixName);
-		return mcu_character_load_skinweights( name, skin_file, mcu_p, scaleFactor,prefixName);
+		return mcu_character_load_skinweights( getName().c_str(), skin_file, mcu_p, scaleFactor,prefixName);
 	} 
-//	else 
-//	if( cmd == "ctrl" ) {
-//		return mcu_character_ctrl_cmd( name, args, mcu_p );
-//	} 
+	else 
+	if( cmd == "ctrl" ) {
+		return mcu_character_ctrl_cmd( getName().c_str(), args, mcu_p );
+	} 
 	else 
 	if( cmd == "bone" ) {
-		return mcu_character_bone_cmd( name, args, mcu_p );
+		return mcu_character_bone_cmd( getName().c_str(), args, mcu_p );
 	} 
 	else 
 	if( cmd == "bonep" ) {
-		return mcu_character_bone_position_cmd( name, args, mcu_p );
+		return mcu_character_bone_position_cmd( getName().c_str(), args, mcu_p );
 	} 
 	else 
 	if( cmd == "remove" ) {
-		return SbmCharacter::remove_from_scene( name );
+		return SbmCharacter::remove_from_scene( getName().c_str() );
 	} 
 	else 
 	if( cmd == "inspect" ) {
 	
-		if( skeleton_p ) {
-			SkJoint* joint_p = skeleton_p->search_joint( SbmPawn::WORLD_OFFSET_JOINT_NAME );
+		if( _skeleton ) {
+			SkJoint* joint_p = _skeleton->search_joint( SbmPawn::WORLD_OFFSET_JOINT_NAME );
 			if( joint_p )	{
 				inspect_skeleton( joint_p );
 //				inspect_skeleton_local_transform( joint_p );
@@ -2010,11 +2056,11 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 	else
 	if( cmd == "channels" ) {
 
-		if( skeleton_p )
+		if( _skeleton )
 		{
 			if( ct_tree_p ) 
 			{
-				SkChannelArray channels = skeleton_p->channels();
+				SkChannelArray channels = _skeleton->channels();
 				int numChannels = channels.size();
 				for (int c = 0; c < numChannels; c++)
 				{
@@ -2065,7 +2111,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			{			
 				// make sure the requests is for this character
 				std::string requestWithName = (*iter).second->requestId;
-				std::string charName = this->name;
+				std::string charName = this->getName();
 				charName.append("|");
 				int index = requestWithName.find(charName);
 				if (index == 0)
@@ -2099,19 +2145,19 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			{			
 				// make sure the requests is for this character
 				
-				std::string charName = this->name;
+				std::string charName = this->getName();
 				charName.append("|");
 				int index = requestWithName.find(charName);
 				if (index == 0)
 				{
 					std::string request = requestWithName.substr(charName.size());
 					std::stringstream strstr;
-					strstr << "bp interrupt " << this->name << " " << request << " .5"; 
+					strstr << "bp interrupt " << this->getName() << " " << request << " .5"; 
 					mcu_p->execute((char*) strstr.str().c_str());
 					numRequestsInterrupted++;
 				}
 			}
-			LOG("%d requests interrupted on character %s.", numRequestsInterrupted, this->name);
+			LOG("%d requests interrupted on character %s.", numRequestsInterrupted, this->getName());
 		}
 		return CMD_SUCCESS;
 	}
@@ -2163,22 +2209,22 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		{
 			if (!next)
 			{
-				LOG("Character %s viseme plateau setting is %s", this->name, this->isVisemePlateau()? "on" : "off");
+				LOG("Character %s viseme plateau setting is %s", this->getName().c_str(), this->isVisemePlateau()? "on" : "off");
 				return CMD_SUCCESS;
 			}
 			if (_stricmp(next, "on") == 0)
 			{
 				this->setVisemePlateau(true);
-				LOG("Character %s viseme plateau setting is now on.", this->name);
+				LOG("Character %s viseme plateau setting is now on.", this->getName().c_str());
 			}
 			else if (_stricmp(next, "off") == 0)
 			{
 				this->setVisemePlateau(false);
-				LOG("Character %s viseme plateau setting is now off.", this->name);
+				LOG("Character %s viseme plateau setting is now off.", this->getName().c_str());
 			}
 			else
 			{
-				LOG("use: char %s viseme plateau <on|off>", this->name);
+				LOG("use: char %s viseme plateau <on|off>", this->getName().c_str());
 			}
 			return CMD_SUCCESS;
 		}
@@ -2187,7 +2233,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		{
 			if (!next)
 			{
-				LOG("Character %s min viseme time is %f", this->name, this->getMinVisemeTime());
+				LOG("Character %s min viseme time is %f", this->getName().c_str(), this->getMinVisemeTime());
 				return CMD_SUCCESS;
 			}
 			float minTime = (float)atof( next );
@@ -2250,32 +2296,38 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 	} 
 	else 
 	if( cmd == "viewer" ) {
-		int mode = args.read_int();
-		switch (mode)
+		std::string viewType = args.read_token();
+
+		if (viewType == "0" || viewType == "bones")
 		{
-			case 0:
-				scene_p->set_visibility(1,0,0,0);
-				dMesh_p->set_visibility(0);
-				break;
-			case 1:
-				scene_p->set_visibility(0,1,0,0);
-				dMesh_p->set_visibility(0);
-				break;
-			case 2:
-				scene_p->set_visibility(0,0,1,0);
-				dMesh_p->set_visibility(0);
-				break;
-			case 3:
-				scene_p->set_visibility(0,0,0,1);
-				dMesh_p->set_visibility(0);
-				break;
-			case 4:
-				scene_p->set_visibility(0,0,0,0);
-				dMesh_p->set_visibility(1);
-				break;
-			default:	
-				break;
+			scene_p->set_visibility(1,0,0,0);
+			dMesh_p->set_visibility(0);
 		}
+		else if (viewType == "1" || viewType == "visgeo")
+		{
+			scene_p->set_visibility(0,1,0,0);
+			dMesh_p->set_visibility(0);
+		}
+		else if (viewType == "2" || viewType == "colgeo")
+		{
+			scene_p->set_visibility(0,0,1,0);
+			dMesh_p->set_visibility(0);
+		}
+		else if (viewType == "3" || viewType == "axis")
+		{
+			scene_p->set_visibility(0,0,0,1);
+			dMesh_p->set_visibility(0);
+		}
+		else if (viewType == "4" || viewType == "deformable")
+		{
+			scene_p->set_visibility(0,0,0,0);
+			dMesh_p->set_visibility(1);
+		}
+		else
+		{
+			LOG("Usage: char <name> viewer <bones|visgeo|colgeo|axis|deformable>");
+		}
+
 		return CMD_SUCCESS;
 	} 
 	else 
@@ -2300,7 +2352,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		}
 		float interval = args.read_float();
 		if( print_track )	{
-			LOG( "char '%s' gaze tracks:", name );
+			LOG( "char '%s' gaze tracks:", getName().c_str() );
 		}
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		double curTime = mcu.time;
@@ -2451,7 +2503,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 	{
 		if( eyelid_ct == NULL )
 		{
-			LOG("ERROR: SbmCharacter::parse_character_command(..): character \"%s\" has no eyelid_ct.", name );
+			LOG("ERROR: SbmCharacter::parse_character_command(..): character \"%s\" has no eyelid_ct.", getName().c_str() );
 			return CMD_FAILURE;
 		}
 		
@@ -2645,7 +2697,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		{			
 			if (reachEngineMap.size() == 0)
 			{
-				LOG("character %s, reach engine is not initialized.", this->name);
+				LOG("character %s, reach engine is not initialized.", this->getName().c_str());
 			    return CMD_FAILURE;
 			}				
 			ReachEngineMap::iterator mi;
@@ -2669,7 +2721,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			{
 				//motion->name()
 				char cmd[256];
-				sprintf(cmd,"bml char %s <body posture=\"%s\"/>",name,motion->name());
+				sprintf(cmd,"bml char %s <body posture=\"%s\"/>",getName().c_str(),motion->name());
 				mcuCBHandle::singleton().execute(cmd);
 			}			
 			return CMD_SUCCESS;
@@ -2757,9 +2809,9 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	if( char_cmd == "init" ) {
 
 		char* skel_file = args.read_token();
-		char* unreal_class = args.read_token();
+		char* type = args.read_token();
 		return(	
-			mcu_character_init( char_name.c_str(), skel_file, unreal_class, mcu_p )
+			mcu_character_init( char_name.c_str(), skel_file, type, mcu_p )
 		);
 	} 
 	else
@@ -2871,7 +2923,7 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle 
 		character->set_voice_code( s );
 		
 		// Give feedback if unsetting
-		LOG("Unset %s's voice.", character->name);
+		LOG("Unset %s's voice.", character->getName().c_str());
 	} else if( _stricmp( impl_id, "remote" )==0 ) {
 		const char* voice_id = args.read_token();
 		if( strlen( voice_id )==0 ) {
@@ -2920,7 +2972,7 @@ int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBH
 		character->set_voice_code_backup( s );
 		
 		// Give feedback if unsetting
-		LOG("Unset %s's voice.", character->name);
+		LOG("Unset %s's voice.", character->getName().c_str());
 	} else if( _stricmp( impl_id, "remote" )==0 ) {
 		const char* voice_id = args.read_token();
 		if( strlen( voice_id )==0 ) {
@@ -3062,12 +3114,12 @@ void SbmCharacter::notify(DSubject* subject)
 			{
 				StringAttribute* meshAttribute = dynamic_cast<StringAttribute*>(attribute);
 				std::stringstream strstr;
-				strstr << "char " << name << " mesh " << meshAttribute->getValue();
+				strstr << "char " << getName() << " mesh " << meshAttribute->getValue();
 				mcuCBHandle& mcu = mcuCBHandle::singleton();
 				int success = mcu.execute((char*) strstr.str().c_str());
 				if (success != CMD_SUCCESS)
 				{
-					LOG("Problem setting attribute 'mesh' on character %s", name);
+					LOG("Problem setting attribute 'mesh' on character %s", getName().c_str());
 				}
 			}
 			if (attribute->getName() == "facebone")
@@ -3105,11 +3157,11 @@ int SbmCharacter::writeSkeletonHierarchy(std::string file, double scale)
 		return CMD_FAILURE;
 	}
 
-	SkJoint* root = skeleton_p->root();
+	SkJoint* root = _skeleton->root();
 	if (!root)
 		return CMD_SUCCESS;
 
-	ostream << "set_name " << this->name << "\n";
+	ostream << "set_name " << this->getName().c_str() << "\n";
 	ostream << "\n";
 	ostream << "skeleton\n";
 	ostream << "root " << root->name() << "\n";
@@ -3180,3 +3232,262 @@ void SbmCharacter::writeSkeletonHierarchyRecurse(SkJoint* joint, std::ofstream& 
 	ostream << "}\n";
 }
 
+FaceDefinition* SbmCharacter::getFaceDefinition()
+{
+	return _faceDefinition;
+}
+
+void SbmCharacter::setFaceDefinition(FaceDefinition* faceDefinition)
+{
+	if (_faceDefinition)
+	{
+		delete _faceDefinition;
+		this->removeAllFaceChannels();
+	}
+	_faceDefinition = new FaceDefinition(faceDefinition);
+	_faceDefinition->setName(faceDefinition->getName() + "_copy");
+
+	SkSkeleton* skeleton = getSkeleton();
+	if (!skeleton)
+		return;
+
+	updateFaceDefinition();
+}
+
+void SbmCharacter::updateFaceDefinition()
+{
+	if (!_faceDefinition)
+		return;
+
+	if (!getSkeleton())
+		return;
+
+	getSkeleton()->make_active_channels();
+
+	SkSkeleton* skeleton = getSkeleton();
+	SkChannelArray& skelChannelArray = skeleton->channels();
+
+
+	// add the action units (AUs)
+	int numAUs = _faceDefinition->getNumAUs();
+	for (int a = 0; a < numAUs; a++)
+	{
+		int auNum = _faceDefinition->getAUNum(a);
+		ActionUnit* au = _faceDefinition->getAU(auNum);
+		this->addActionUnitChannel(auNum, au);
+	}
+
+	// add the visemes
+	int numVisemes = _faceDefinition->getNumVisemes();
+	for (int v = 0; v < numVisemes; v++)
+	{
+		std::string visemeName = _faceDefinition->getVisemeName(v);
+		SkMotion* motion = _faceDefinition->getVisemeMotion(visemeName);
+		this->addVisemeChannel(visemeName, motion);
+	}
+
+	// look for the start and end position of the viseme channels
+	std::vector<SkJoint*>& joints = skeleton->get_joint_array();
+	viseme_channel_start_pos = -1;
+	viseme_channel_end_pos = -1;
+
+	for (int c = 0; c < skelChannelArray.size(); c++)
+	{
+		SkChannel& channel = skelChannelArray[c];
+		SkJoint* joint = channel.joint;
+		if (joint && joint->getJointType() == SkJoint::TypeViseme)
+		{
+			if (viseme_channel_start_pos == -1)
+			{
+				viseme_channel_start_pos = c;
+				viseme_channel_end_pos = c;
+			}
+			else
+			{
+				viseme_channel_end_pos = c;
+			}
+		}
+
+	}
+
+	viseme_channel_count = numAUs + numVisemes;
+	
+	viseme_history_arr = new float[viseme_channel_count];
+	for( int i=0; i<viseme_channel_count; i++ ) {
+		viseme_history_arr[ i ] = -1.0;
+	}
+
+	// Do the sbm viseme name patch here
+	viseme_name_patch.clear();
+	std::vector<std::string> au_1_patch;
+	au_1_patch.push_back("au_1_left");
+	au_1_patch.push_back("au_1_right");
+	std::vector<std::string> au_2_patch;
+	au_2_patch.push_back("au_2_left");
+	au_2_patch.push_back("au_2_right");
+	std::vector<std::string> au_4_patch;
+	au_4_patch.push_back("au_4_left");
+	au_4_patch.push_back("au_4_right");
+	std::vector<std::string> au_45_patch;
+	au_45_patch.push_back("au_45_left");
+	au_45_patch.push_back("au_45_right");
+	viseme_name_patch.insert(make_pair("au_1", au_1_patch));
+	viseme_name_patch.insert(make_pair("au_2", au_2_patch));
+	viseme_name_patch.insert(make_pair("au_4", au_4_patch));
+	viseme_name_patch.insert(make_pair("au_45", au_45_patch));
+
+	// Do the bone bus viseme name patch here
+	// hard coded, can be removed if these are added to bone bus and rendering side
+	std::vector<std::string> closed_mouth;							// this should is an empty vector
+	viseme_name_patch.insert(make_pair("_", closed_mouth));	// when receiving this two viseme, do not send signal to bone bus
+	//viseme_name_patch.insert(make_pair("BMP", closed_mouth));
+	
+	std::vector<std::string> f_patch;								// "F" patch (match to "f")
+	f_patch.push_back("f");
+	viseme_name_patch.insert(make_pair("F",f_patch));
+	
+	std::vector<std::string> oh_patch;								// "OW" patch (match to "oh")
+	oh_patch.push_back("oh");
+	viseme_name_patch.insert(make_pair("OW",oh_patch));
+
+	std::vector<std::string> all_viseme;							// "ALL" patch (match to all the viseme)
+	all_viseme.push_back("Ao");
+	all_viseme.push_back("D");
+	all_viseme.push_back("EE");
+	all_viseme.push_back("Er");
+	all_viseme.push_back("f");
+	all_viseme.push_back("Ih");
+	all_viseme.push_back("j");
+	all_viseme.push_back("KG");
+	all_viseme.push_back("oh");
+	all_viseme.push_back("OO");
+	all_viseme.push_back("NG");
+	all_viseme.push_back("R");
+	all_viseme.push_back("Th");
+	all_viseme.push_back("Z");
+	// new added visemes: here viseme needs a better name, because following is really facial expressions
+	//all_viseme.push_back("base"); // Removed by A. Shapiro 3/8/11 - was causing a conflict with joint name 'base'
+	all_viseme.push_back("base_lower_face");
+	all_viseme.push_back("base_upper_face");
+	all_viseme.push_back("fe103_effort");
+	all_viseme.push_back("fe107_surprised");
+	all_viseme.push_back("fe112_happy");
+	all_viseme.push_back("fe113_sad");
+	all_viseme.push_back("fe119_bored");
+	all_viseme.push_back("fe124_dislike");
+	all_viseme.push_back("fe7_worried");
+	all_viseme.push_back("fe8_scared");
+	all_viseme.push_back("fe9_thinking");
+	all_viseme.push_back("fe127_yawn");
+	all_viseme.push_back("fe129_angry");
+	viseme_name_patch.insert(make_pair("ALL",all_viseme));
+
+	// make sure that the face controller has been updated
+	if (face_ct)
+	{
+		face_ct->init( _faceDefinition );
+	}
+}
+
+
+void SbmCharacter::removeAllFaceChannels()
+{
+	if (viseme_channel_start_pos == 0 && viseme_channel_end_pos == 0)
+		return;
+
+	SkSkeleton* skeleton = getSkeleton();
+	SkChannelArray& channels = skeleton->channels();
+	for (int i = viseme_channel_end_pos; i >= viseme_channel_start_pos; i++)
+	{
+		SkJoint* joint = channels.joint(i);
+		if (joint)
+		{
+			// remove the joint
+			// function does not exist - add it
+		}
+	}
+}
+
+void SbmCharacter::addVisemeChannel(std::string visemeName, SkMotion* motion)
+{
+	// add a corresponding channel for this viseme
+	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
+	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSkel->root());
+	SmartBody::SBJoint* visemeJoint = new SmartBody::SBJoint();
+	visemeJoint->setName(visemeName);
+	visemeJoint->setJointType(SkJoint::TypeViseme);
+	visemeJoint->setUsePosition(0, true);
+	visemeJoint->pos()->limits(SkJointPos::X, 0, 2);  // Setting upper bound to 2 allows some exageration
+	rootJoint->addChild(visemeJoint);
+	viseme_channel_count++;
+}
+
+void SbmCharacter::addVisemeChannel(std::string visemeName, std::string motionName)
+{
+	// find the motion
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	if (motionName != "")
+	{
+		std::map<std::string, SkMotion*>::iterator iter = mcu.motion_map.find(motionName);
+		if (iter != mcu.motion_map.end())
+		{
+			addVisemeChannel(visemeName, (*iter).second);
+		}
+		else
+		{
+			LOG("Could not find motion named '%s' - no viseme added.", motionName.c_str());
+		}
+	}
+	else
+	{
+		addVisemeChannel(visemeName, NULL);
+	}
+}
+
+void SbmCharacter::addActionUnitChannel(int auNum, ActionUnit* au)
+{
+	// add a corresponding channel for this viseme
+	std::stringstream strstr;
+	strstr << auNum;
+	std::string id = strstr.str();
+	
+	std::vector<std::string> allUnits;
+	if( au->is_left() ) {
+		std::string name = "au_";
+		name += id;
+		name += "_";
+		name += "left";
+
+		allUnits.push_back(name);
+	}
+	if( au->is_right()) {
+		std::string name = "au_";
+		name += id;
+		name += "_";
+		name += "right";
+
+		allUnits.push_back(name);
+	}
+	if (au->is_bilateral())
+	{
+		std::string name = "au_";
+		name += id;
+
+		allUnits.push_back(name);
+	}
+
+	// add a corresponding channel for this action unit
+	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
+	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSkel->root());
+	for (size_t a = 0; a < allUnits.size(); a++)
+	{
+		SmartBody::SBJoint* auJoint = new SmartBody::SBJoint();
+		auJoint->setJointType(SkJoint::TypeViseme);
+		auJoint->setName(allUnits[a]);
+		auJoint->setUsePosition(0, true);
+		auJoint->pos()->limits(SkJointPos::X, 0, 2);  // Setting upper bound to 2 allows some exageration
+		rootJoint->addChild(auJoint);
+		viseme_channel_count++;
+	}
+}

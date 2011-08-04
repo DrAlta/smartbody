@@ -29,6 +29,7 @@
 
 # include <sk/sk_skeleton.h>
 # include <sk/sk_posture.h>
+#include <sbm/SBJoint.h>
 
 //============================ load_skeleton ============================
 
@@ -400,7 +401,7 @@ SkJoint* SkSkeleton::_loadj ( SrInput& in, SkJoint* p, SrStringArray& paths, boo
       return j;
     }
     
-   j = new SkJoint ( this, p, SkJoint::TypeQuat, _joints.size() );
+   j = new SmartBody::SBJoint  ( this, p, SkJoint::TypeQuat, _joints.size() );
    _joints.push_back(j);
 
    j->name ( (const char*) name );
@@ -586,7 +587,7 @@ SkJoint* SkSkeleton::_loadjlist ( SrInput& in, float scale, SrStringArray& paths
     
       if ( in.last_token_type()!=SrInput::Name && in.last_token_type()!=SrInput::String ) break;
       
-      j = new SkJoint ( this, 0/*parent*/, SkJoint::TypeQuat, _joints.size() );
+      j = new SmartBody::SBJoint  ( this, 0/*parent*/, SkJoint::TypeQuat, _joints.size() );
        _joints.push_back(j);
 
       j->name ( (const char*) in.last_token() );
@@ -902,5 +903,6 @@ bool SkSkeleton::export_joints ( SrOutput& out )
 
    return true;
  }
+
 
 //============================ End of File ============================

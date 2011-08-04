@@ -78,15 +78,15 @@ const double SQROOT_2 = 1.4142135623730950488016887242097;
 ///////////////////////////////////////////////////////////////////////
 //  Helper Functions
 namespace BML {
-	string buildRequestId( const SbmCharacter* character, std::string messageId ) {
+	string buildRequestId( SbmCharacter* character, std::string messageId ) {
 		ostringstream out;
-		out << character->name << "|" << messageId;  // pipe is unlikely to be found in either field
+		out << character->getName() << "|" << messageId;  // pipe is unlikely to be found in either field
 		return out.str();
 	}
 
-	string buildSpeechKey( const SbmCharacter* actor, SmartBody::RequestId requestId ) {
+	string buildSpeechKey( SbmCharacter* actor, SmartBody::RequestId requestId ) {
 		ostringstream speechKey;
-		speechKey << actor->name << requestId;  // no space / single token
+		speechKey << actor->getName() << requestId;  // no space / single token
 		return speechKey.str();
 	}
 
@@ -132,7 +132,7 @@ BML::Processor::BMLProcessorMsg::BMLProcessorMsg( const char *actorId, const cha
 :	actorId(actorId),
 	recipientId(recipientId),
 #else
-BML::Processor::BMLProcessorMsg::BMLProcessorMsg( const char *actorId, const char *msgId, const SbmCharacter *actor, DOMDocument *xml, const char* args )
+BML::Processor::BMLProcessorMsg::BMLProcessorMsg( const char *actorId, const char *msgId, SbmCharacter *actor, DOMDocument *xml, const char* args )
 :	actorId(actorId),
 #endif
 	msgId(msgId),
@@ -147,7 +147,7 @@ BML::Processor::BMLProcessorMsg::BMLProcessorMsg( const char *actorId, const cha
 :	actorId(actorId),
 	recipientId(recipientId),
 #else
-BML::Processor::BMLProcessorMsg::BMLProcessorMsg( const char *actorId, const char *msgId, const SbmCharacter *actor, DOMDocument *xml, srArgBuffer& args )
+BML::Processor::BMLProcessorMsg::BMLProcessorMsg( const char *actorId, const char *msgId, SbmCharacter *actor, DOMDocument *xml, srArgBuffer& args )
 :	actorId(actorId),
 #endif
 	msgId(msgId),
@@ -220,7 +220,7 @@ void BML::Processor::reset() {
 
 
 BmlRequestPtr BML::Processor::createBmlRequest(
-	const SbmCharacter* agent,
+    SbmCharacter* agent,
 	const std::string & actorId,
 	const std::string & requestId,
 #if USE_RECIPIENT
@@ -901,7 +901,7 @@ void BML::Processor::speechReply( SbmCharacter* actor, SmartBody::RequestId requ
 #if USE_RECIPIENT
 					BMLProcessorMsg msg( request->actor->name, request->recipientId.c_str(), request->msgId.c_str(), request->actor, NULL, NULL );
 #else
-					BMLProcessorMsg msg( request->actor->name, request->msgId.c_str(), request->actor, NULL, NULL );
+					BMLProcessorMsg msg( request->actor->getName().c_str(), request->msgId.c_str(), request->actor, NULL, NULL );
 #endif
 					
 					// check for negative times and change all times if needed
@@ -923,7 +923,7 @@ void BML::Processor::speechReply( SbmCharacter* actor, SmartBody::RequestId requ
 					std::stringstream strstr;
 					strstr << "ERROR: BML::Processor::speechReply() exception:" << e.what();
 					LOG(strstr.str().c_str());
-					bml_error( actor->name, request->msgId.c_str(), e.what(), mcu );
+					bml_error( actor->getName().c_str(), request->msgId.c_str(), e.what(), mcu );
 				}
 			} else {
 				if( LOG_SPEECH )
@@ -967,7 +967,7 @@ int BML::Processor::interrupt( SbmCharacter* actor, const std::string& performan
 		bml_requests.erase( result );
 	} else {
 		// Probably already cleaned up
-		LOG("WARNING: BML::Processor::interrupt(..): No such BmlRequest for actor \"%s\" and performance_id %s.", actor->name, performance_id.c_str());
+		LOG("WARNING: BML::Processor::interrupt(..): No such BmlRequest for actor \"%s\" and performance_id %s.", actor->getName().c_str(), performance_id.c_str());
 		// ignore without error
 	}
 

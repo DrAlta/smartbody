@@ -220,7 +220,7 @@ void ResourceWindow::updateGUI()
 	}
 
 	// update face definition map
-	FaceMotionMap::iterator fi;
+	std::map<std::string, FaceDefinition*>::iterator fi;
 	resourceTree->clear_children(treeItemList[ITEM_FACE_DEFINITION]);
 	for ( fi  = mcu.face_map.begin();
 		  fi != mcu.face_map.end();
@@ -281,12 +281,12 @@ void ResourceWindow::updateGUI()
 	}
 }
 
-void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, FaceMotion* motion )
+void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, FaceDefinition* faceDefinition )
 {
 	std::string neutralMotionName = "NA";
-	if (motion->face_neutral_p)
+	if (faceDefinition->getFaceNeutral())
 	{
-		neutralMotionName = motion->face_neutral_p->name();		
+		neutralMotionName = faceDefinition->getFaceNeutral()->name();		
 	}
 	Fl_Tree_Item* neutralMotionTree = resourceTree->add(tree,"Neutral Motion");
 	neutralMotionTree->user_data((void*)ITEM_NETURAL_MOTION);
@@ -297,34 +297,32 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, FaceMotion* motion )
 	// update action unit tree
 	Fl_Tree_Item* auTree = resourceTree->add(tree,"AU Map");
 	auTree->user_data((void*)ITEM_AU_MAP);
-	AUMotionMap& auMap = motion->au_motion_map;
-	AUMotionMap::iterator ai;
-	for ( ai  = auMap.begin();
-		  ai != auMap.end();
-		  ai++)
+	int numAUs = faceDefinition->getNumAUs();
+	for (int a = 0; a < numAUs; a++)
 	{
-		std::string auName = "Au " + boost::lexical_cast<std::string>(ai->first);
-		AUMotionPtr auMotion = ai->second;
+		ActionUnit* au = faceDefinition->getAU(a);
+		std::string auName = "Au " + boost::lexical_cast<std::string>(faceDefinition->getAUNum(a));
+		
 		Fl_Tree_Item* auItem = resourceTree->add(auTree,auName.c_str());
 		auItem->user_data((void*)ITEM_AU_MAP);
 		std::string auType = "bilateral:";
-		if (auMotion->is_bilateral())
+		if (au->is_bilateral())
 		{			
-			Fl_Tree_Item* item = resourceTree->add(auItem,(auType+auMotion->left->name()).c_str());
+			Fl_Tree_Item* item = resourceTree->add(auItem,(auType+ au->left->name()).c_str());
 			item->user_data((void*)ITEM_AU_MAP);
 		}
 		else 
 		{
-			if (auMotion->is_left())
+			if (au->is_left())
 			{
 				auType = "left:";
-				Fl_Tree_Item* item = resourceTree->add(auItem,(auType+auMotion->left->name()).c_str());
+				Fl_Tree_Item* item = resourceTree->add(auItem,(auType+au->left->name()).c_str());
 				item->user_data((void*)ITEM_AU_MAP);
 			}
-			if (auMotion->is_right())
+			if (au->is_right())
 			{
 				auType = "right:";
-				Fl_Tree_Item* item = resourceTree->add(auItem,(auType+auMotion->right->name()).c_str());
+				Fl_Tree_Item* item = resourceTree->add(auItem,(auType+au->right->name()).c_str());
 				item->user_data((void*)ITEM_AU_MAP);
 			}
 		}		
@@ -333,14 +331,13 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, FaceMotion* motion )
 	// update viseme tree
 	Fl_Tree_Item* visemeTree = resourceTree->add(tree,"Viseme Map");	
 	visemeTree->user_data((void*)ITEM_VISEME_MAP);
-	VisemeMotionMap& visemeMap = motion->viseme_map;
-	VisemeMotionMap::iterator vi;
-	for ( vi  = visemeMap.begin();
-		  vi != visemeMap.end();
-		  vi++)
+	int numVisemes = faceDefinition->getNumVisemes();
+	for (int v = 0; v < numVisemes; v++)
 	{
-		std::string visemeName = vi->first;
-		std::string motionName = vi->second->name();
+		std::string visemeName = faceDefinition->getVisemeName(v);
+		std::string motionName = "";
+		if (faceDefinition->getVisemeMotion(visemeName))
+			motionName = faceDefinition->getVisemeMotion(visemeName)->name();
 		Fl_Tree_Item* item = resourceTree->add(visemeTree,(visemeName+"-->"+motionName).c_str());
 		item->user_data((void*)ITEM_VISEME_MAP);		
 	}
@@ -425,13 +422,13 @@ void ResourceWindow::updatePawn( Fl_Tree_Item* tree, SbmPawn* pawn )
 	if (dynamic_cast<SbmCharacter*>(pawn) != NULL)
 		return; // this is actually a character
 
-	Fl_Tree_Item* item = resourceTree->add(tree,pawn->name);
+	Fl_Tree_Item* item = resourceTree->add(tree,pawn->getName().c_str());
 	item->user_data((void*)ITEM_PAWN);
 }
 
 void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SbmCharacter* character )
 {
-	Fl_Tree_Item* item = resourceTree->add(tree,character->name);
+	Fl_Tree_Item* item = resourceTree->add(tree,character->getName().c_str());
 	item->user_data((void*)ITEM_CHARACTER);
 	resourceTree->sortorder(FL_TREE_SORT_NONE);	
 

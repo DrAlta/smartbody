@@ -25,11 +25,11 @@
 #define ME_CT_TETHER_H
 
 #include <sk/sk_skeleton.h>
-#include <me/me_controller.h>
+#include <sbm/SBController.h>
 
 //////////////////////////////////////////////////////////////////////////////////
 
-class MeCtTether : public MeController	{ 
+class MeCtTether : public SmartBody::SBController	{ 
 
 	private:
 

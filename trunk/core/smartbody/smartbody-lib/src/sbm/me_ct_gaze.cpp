@@ -176,7 +176,7 @@ char * MeCtGaze::key_label( const int key )	{
 
 ///////////////////////////////////////////////////////////////////////////
 
-MeCtGaze::MeCtGaze( void )	: MeController() {
+MeCtGaze::MeCtGaze( void )	: SmartBody::SBController() {
 	
 	started = 0;
 	setStart(0);

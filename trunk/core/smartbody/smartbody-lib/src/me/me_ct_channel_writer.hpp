@@ -23,7 +23,7 @@
 #ifndef ME_CT_CHANNEL_WRITER_HPP
 #define ME_CT_CHANNEL_WRITER_HPP
 
-#include <me/me_controller.h>
+#include <sbm/SBController.h>
 
 
 /**
@@ -35,7 +35,7 @@
  *
  *  This controller only works with the new controller API.
  */
-class MeCtChannelWriter : public MeController {
+class MeCtChannelWriter : public SmartBody::SBController {
 public:
 	// Public Constants
 	static const char* TYPE;

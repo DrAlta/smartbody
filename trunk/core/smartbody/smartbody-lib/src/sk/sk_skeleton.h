@@ -99,6 +99,9 @@ class SkSkeleton : public SrSharedClass
     /*! Returns the collision detection id (or -1 if no id). */
     int coldet_id () const { return _coldetid; }
 
+	/*! Refresh the joints */
+	void refresh_joints();
+
     /*! Returns a flat list with all joints. Note that method
         SkJoint::index() returns the index of the joint in this list */
     const std::vector<SkJoint*>& joints () const { return _joints; }
@@ -167,6 +170,8 @@ class SkSkeleton : public SrSharedClass
 
     /*! Save joints definitions that can be merged into a skeleton */
     bool export_joints ( SrOutput& out );
+
+	void copy(SkSkeleton* origSkel);
 
 	/*! Computes the center of mass of the skeleton */
 	void compute_com () {}; 

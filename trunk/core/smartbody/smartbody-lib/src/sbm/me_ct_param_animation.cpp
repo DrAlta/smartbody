@@ -30,6 +30,12 @@ void MeCtParamAnimation::Context::child_channels_updated( MeController* child )
 {
 }
 
+MeCtParamAnimation::MeCtParamAnimation() : MeCtContainer(new MeCtParamAnimation::Context(this))
+{
+	character = NULL;
+	woWriter = NULL;
+}
+
 MeCtParamAnimation::MeCtParamAnimation(SbmCharacter* c, MeCtChannelWriter* wo) : MeCtContainer(new MeCtParamAnimation::Context(this)), character(c), woWriter(wo)
 {
 	baseJointName = "base";

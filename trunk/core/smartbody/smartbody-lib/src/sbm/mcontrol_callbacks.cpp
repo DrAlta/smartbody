@@ -34,6 +34,7 @@
 #include <iostream>
 #include <string>
 #include <boost/tokenizer.hpp>
+#include <sbm/SBSkeleton.h>
 
 #ifdef WIN32
 #include <direct.h>
@@ -63,6 +64,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include "ParserFBX.h"
+#include "SBCharacter.h"
 
 #ifdef USE_GOOGLE_PROFILER
 #include <google/profiler.h>
@@ -1121,7 +1123,7 @@ int mcu_motion_player_func(srArgBuffer& args, mcuCBHandle *mcu_p )
 				character->motionplayer_ct->setActive(false);
 			else
 			{
-				int frameNumber = args.read_int();
+				double frameNumber = args.read_double();
 				character->motionplayer_ct->init(character,next, frameNumber);
 			}
 			return CMD_SUCCESS;
@@ -1207,9 +1209,9 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 					return( CMD_FAILURE );
 				}
 				SkSkeleton* skeleton = NULL;
-				skeleton = pawn->skeleton_p;
+				skeleton = pawn->getSkeleton();
 
-				SkJoint* joint = pawn->skeleton_p->search_joint(jointName);
+				SkJoint* joint = pawn->getSkeleton()->search_joint(jointName);
 				if (!joint)
 				{
 					LOG("Could not find joint %s on object %s.", jointName, name);
@@ -1264,7 +1266,7 @@ int mcu_camera_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 					iter != mcu_p->getPawnMap().end();
 					iter++)
 				{
-					SrBox box = (*iter).second->skeleton_p->getBoundingBox();
+					SrBox box = (*iter).second->getSkeleton()->getBoundingBox();
 					sceneBox.extend(box);
 				}
 
@@ -1782,7 +1784,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, meshModelVec, 1.0f);
 
 		// below code is to adjust the mesh if there's orientation in the joints. potential bug too because here only detect the first joint
-		SkSkeleton* skel = char_p->skeleton_p;
+		SkSkeleton* skel = char_p->getSkeleton();
 		SkJoint* firstJ = skel->root()->child(0);
 		if (firstJ)
 		{
@@ -2071,7 +2073,7 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 		for (size_t j = 0; j < skinWeight->infJointName.size(); j++)
 		{
 			std::string& jointName = skinWeight->infJointName[j];
-			SkJoint* curJoint = char_p->skeleton_p->search_joint(jointName.c_str());
+			SkJoint* curJoint = char_p->getSkeleton()->search_joint(jointName.c_str());
 			skinWeight->infJoint.push_back(curJoint); // NOTE: If joints are added/removed during runtime, this list will contain stale data
 		}
 	}
@@ -2149,21 +2151,24 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 int mcu_character_init( 
 	const char* char_name, 
 	const char* skel_file, 
-	const char* unreal_class, 
-	mcuCBHandle *mcu_p
-)	{
+	const char* className, 
+	mcuCBHandle *mcu_p)
+{
 	int err;
 	
 	if( strcmp(char_name, "*" )==0 ) {  // TODO: better character name valiadtion
 		LOG( "init_character ERR: Invalid SbmCharacter name '%s'\n", char_name ); 
 		return( CMD_FAILURE );
 	}
-	if( mcu_p->getCharacter( char_name ) )	{
+	 SbmCharacter* existingCharacter = mcu_p->getCharacter(char_name);
+	if (existingCharacter)
+	{
 		LOG( "init_character ERR: SbmCharacter '%s' EXISTS\n", char_name ); 
 		return( CMD_FAILURE );
 	}
 
-	SbmCharacter *char_p = new SbmCharacter(char_name);
+	//SbmCharacter *char_p = new SbmCharacter(char_name);
+	SmartBody::SBCharacter *char_p = new SmartBody::SBCharacter(char_name, className);
 	SkSkeleton* skeleton_p = NULL;
 	// does the skeleton already exist in the skeleton map?
 	std::map<std::string, SkSkeleton*>::iterator skelIter = mcu_p->skeleton_map.find(skel_file);
@@ -2179,22 +2184,17 @@ int mcu_character_init(
 		skelIter = mcu_p->skeleton_map.find(skel_file);
 	}
 
-	skeleton_p = new SkSkeleton((*skelIter).second);
+	//skeleton_p = new SkSkeleton((*skelIter).second);
+	SmartBody::SBSkeleton* sbSkeleton = dynamic_cast<SmartBody::SBSkeleton*>((*skelIter).second);
+	skeleton_p = new SmartBody::SBSkeleton(sbSkeleton);
 
-	// Only initialize face_neutral if -facebone is enabled
-	SkMotion* face_neutral_p = NULL;
-	AUMotionMap* auMotionMap = NULL;
-	VisemeMotionMap* visemeMotionMap = NULL;
+	FaceDefinition* faceDefinition = NULL;
 
 	// get the face motion mapping per character
-	std::map<std::string, FaceMotion*>::iterator faceIter = mcu_p->face_map.find(std::string(char_name));
+	std::map<std::string, FaceDefinition*>::iterator faceIter = mcu_p->face_map.find(std::string(char_name));
 	if (faceIter !=  mcu_p->face_map.end())
 	{
-		FaceMotion* faceMotion = (*faceIter).second;
-		if (mcu_p->net_face_bones)
-			face_neutral_p = faceMotion->face_neutral_p;
-		auMotionMap = &faceMotion->au_motion_map;
-		visemeMotionMap = &faceMotion->viseme_map;
+		faceDefinition = (*faceIter).second;
 	}
 	else
 	{
@@ -2202,11 +2202,7 @@ int mcu_character_init(
 		faceIter = mcu_p->face_map.find("_default_");
 		if (faceIter !=  mcu_p->face_map.end())
 		{
-			FaceMotion* faceMotion = (*faceIter).second;
-			if (mcu_p->net_face_bones)
-				face_neutral_p = faceMotion->face_neutral_p;
-			auMotionMap = &faceMotion->au_motion_map;
-			visemeMotionMap = &faceMotion->viseme_map;
+			faceDefinition = (*faceIter).second;
 		}
 		else
 		{
@@ -2214,7 +2210,7 @@ int mcu_character_init(
 		}
 	}
 
-	err = char_p->init( skeleton_p, face_neutral_p, auMotionMap, visemeMotionMap, &mcu_p->param_map, unreal_class, mcu_p->use_locomotion, mcu_p->use_param_animation, mcu_p->use_data_receiver );
+	err = char_p->init( skeleton_p, faceDefinition, &mcu_p->param_map, className, mcu_p->net_face_bones, mcu_p->use_locomotion, mcu_p->use_param_animation );
 	if( err == CMD_SUCCESS ) {
 
 		if (mcu_p->use_locomotion) 
@@ -2227,26 +2223,13 @@ int mcu_character_init(
 
 		char_p->ct_tree_p->set_evaluation_logger( mcu_p->logger_p );
 
-		bool ok = mcu_p->addPawn( char_p );
-		if( !ok )	{
-			LOG( "init_character ERR: SbmCharacter pawn_map.insert(..) '%s' FAILED\n", char_name ); 
-			delete char_p;
-			return( err );
-		}
-
-		ok = mcu_p->addCharacter( char_p );
-		if( !ok )	{
-			LOG( "init_character ERR: SbmCharacter character_map.insert(..) '%s' FAILED\n", char_name ); 
-			mcu_p->removePawn( char_name );
-			delete char_p;
-			return( err );
-		}
-
 		err = mcu_p->add_scene( char_p->scene_p );
-		if( err != CMD_SUCCESS )	{
-			LOG( "init_character ERR: add_scene '%s' FAILED\n", char_name ); 
-			return( err );
+		if (err != CMD_SUCCESS)
+		{
+			LOG("Could not initialize scene for character %s.", char_name);
+			return err;
 		}
+	}
 
 
 #if USE_WSP
@@ -2267,7 +2250,7 @@ int mcu_character_init(
 
 
 		// now register all joints.  wsp data isn't sent out until a request for it is received
-		const std::vector<SkJoint *> & joints  = char_p->skeleton_p->joints();
+		const std::vector<SkJoint *> & joints  = char_p->getSkeleton()->joints();
 
 		for (size_t i = 0; i < joints.size(); i++ )
 		{
@@ -2291,12 +2274,12 @@ int mcu_character_init(
 #endif
 
 		}
-	}
+	
 
 	return( err );
 }
 
-/*
+
 int begin_controller( 
 	const char *char_name, 
 	const char *ctrl_name, 
@@ -2358,70 +2341,12 @@ int begin_controller(
 	LOG( "begin_controller ERR: char '%s' NOT FOUND\n", char_name );
 	return( CMD_FAILURE );
 }
-*/
 
-#if 0  // Version replaced by SbmCharacter::character_cmd_func // WHY ???
-/*
 
-	char <> init <skel-file>
-	char <> ctrl <> begin [<ease-in> [<ease-out>]]
-	char <> viseme <viseme_name> <weight>
-	char <> bone <bone_name> <w> <x> <y> <z>
-	char <> remove
-
-*/
-
-int mcu_character_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
-	
-	if( mcu_p )	{
-		char *char_name = args.read_token();
-		char *char_cmd = args.read_token();
-	
-		if( strcmp( char_cmd, "init" ) == 0 )	{
-			char *skel_file = args.read_token();
-			char *unreal_class = args.read_token();
-			return(	
-				mcu_character_init( char_name, skel_file, unreal_class, mcu_p )
-			);
-		}
-		if( strcmp( char_cmd, "ctrl" ) == 0 )	{
-			return mcu_character_ctrl_cmd( char_name, args, mcu_p );
-		}
-		if ( strcmp( char_cmd, "viseme" ) == 0 )
-		{
-			char * viseme = args.read_token();
-			float  weight = args.read_float();
-			float  duration = args.read_float();	// added for ramps but not used yet!
-		 
-			SbmCharacter * actor = mcu_p->getCharacter(char_name );
-			if ( !actor ) {
-				LOG( "ERROR: SbmCharacter::character_cmd_func(..): Unknown character \"%s\".\n", char_name );
-				return CMD_FAILURE;  // this should really be an ignore/out-of-domain result
-			} else {
-				actor->set_viseme( viseme, weight, duration );
-				return CMD_SUCCESS;
-			}
-		}
-		if ( strcmp( char_cmd, "bone" ) == 0 )
-		{
-			mcu_character_bone_cmd( char_name, args, mcu_p );
-		}
-		if ( strcmp( char_cmd, "remove" ) == 0 )
-		{
-			mcu_character_remove( char_name, mcu_p );
-
-			return CMD_SUCCESS;
-		}
-
-		return( CMD_NOT_FOUND );
-	}
-	return( CMD_FAILURE );
-}
-#endif
 
 /////////////////////////////////////////////////////////////
 
-/*
+
 int mcu_character_ctrl_cmd(
 	const char* char_name,
 	srArgBuffer& args,
@@ -2465,7 +2390,7 @@ int mcu_character_ctrl_cmd(
 	else
 		return( CMD_FAILURE );
 }
-*/
+
 
 /////////////////////////////////////////////////////////////
 
@@ -2476,8 +2401,8 @@ int mcu_character_ctrl_cmd(
 int mcu_character_bone_cmd(
 	const char * char_name,
 	srArgBuffer & args,
-	mcuCBHandle *mcu_p 
-) {
+	mcuCBHandle *mcu_p)
+{
 	char * bone = args.read_token();
 	float  w    = args.read_float();
 	float  x    = args.read_float();
@@ -2485,7 +2410,7 @@ int mcu_character_bone_cmd(
 	float  z    = args.read_float();
 
 	SbmCharacter * actor = mcu_p->getCharacter( char_name );
-	if ( !actor || !actor->skeleton_p )
+	if ( !actor || !actor->getSkeleton() )
 	{
 		return CMD_FAILURE;  // this should really be an ignore/out-of-domain result
 	}
@@ -2493,9 +2418,9 @@ int mcu_character_bone_cmd(
 	{
 		actor->bonebusCharacter->StartSendBoneRotations();
 
-		for ( size_t i = 0; i < actor->skeleton_p->joints().size(); i++ )
+		for ( size_t i = 0; i < actor->getSkeleton()->joints().size(); i++ )
 		{
-			SkJoint * j = actor->skeleton_p->joints()[ i ];
+			SkJoint * j = actor->getSkeleton()->joints()[ i ];
 
 			if ( _stricmp( j->name().c_str(), bone ) == 0 )
 			{
@@ -2510,9 +2435,9 @@ int mcu_character_bone_cmd(
 
 		actor->bonebusCharacter->StartSendBonePositions();
 
-		for ( size_t i = 0; i < actor->skeleton_p->joints().size(); i++ )
+		for ( size_t i = 0; i < actor->getSkeleton()->joints().size(); i++ )
 		{
-			SkJoint * j = actor->skeleton_p->joints()[ i ];
+			SkJoint * j = actor->getSkeleton()->joints()[ i ];
 
 			if ( _stricmp( j->name().c_str(), bone ) == 0 )
 			{
@@ -2542,7 +2467,7 @@ int mcu_character_bone_position_cmd(
    float  z    = args.read_float();
 
    SbmCharacter * actor = mcu_p->getCharacter( char_name );
-   if ( !actor || !actor->skeleton_p )
+   if ( !actor || !actor->getSkeleton() )
    {
       return CMD_FAILURE;  // this should really be an ignore/out-of-domain result
    }
@@ -2550,9 +2475,9 @@ int mcu_character_bone_position_cmd(
    {
       actor->bonebusCharacter->StartSendBonePositions();
 
-      for (size_t i = 0; i < actor->skeleton_p->joints().size(); i++ )
+      for (size_t i = 0; i < actor->getSkeleton()->joints().size(); i++ )
       {
-         SkJoint * j	= actor->skeleton_p->joints()[ i ];
+         SkJoint * j	= actor->getSkeleton()->joints()[ i ];
 
 		 if ( _stricmp( j->name().c_str(), bone ) == 0 )
          {
@@ -2637,17 +2562,18 @@ int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	} else if( type=="neutral" ) {
 		const string motion_name = args.read_token();
 
-		FaceMotion* faceMotion = NULL;
-		std::map<std::string, FaceMotion*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
+		FaceDefinition* faceDefinition = NULL;
+		std::map<std::string, FaceDefinition*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
 		if (faceMotionIter == mcu_p->face_map.end())
 		{
 			// face motion mappings for character do not yet exist - create them
-			faceMotion = new FaceMotion();
-			mcu_p->face_map.insert(std::pair<std::string, FaceMotion*>(characterName, faceMotion));
+			faceDefinition = new FaceDefinition();
+			faceDefinition->setName(characterName);
+			mcu_p->face_map.insert(std::pair<std::string, FaceDefinition*>(characterName, faceDefinition));
 		}
 		else
 		{
-			faceMotion = (*faceMotionIter).second;
+			faceDefinition = (*faceMotionIter).second;
 		}
 
 		if (motion_name.size() > 0)
@@ -2656,7 +2582,7 @@ int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			if (motionIter != mcu_p->motion_map.end())
 			{
 				SkMotion* motion_p = (*motionIter).second;
-				faceMotion->face_neutral_p = motion_p;
+				faceDefinition->setFaceNeutral(motion_p->name());
 				return CMD_SUCCESS;
 			} else {
 				LOG("ERROR: Unknown motion \"%s\".", motion_name.c_str());
@@ -2666,7 +2592,7 @@ int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		else
 		{
 			// no motion specified, create the channel without mapping it to a motion
-			faceMotion->face_neutral_p = NULL;
+			faceDefinition->setFaceNeutral(NULL);
 			return CMD_SUCCESS;
 		}
 	} else {
@@ -2718,6 +2644,7 @@ int mcu_print_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	}
 }
 
+
 /**
  *  Command processor for "set face au ...".
  *  Syntax:
@@ -2740,127 +2667,41 @@ int mcu_set_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string cha
 		return CMD_FAILURE;
 	}
 
-	enum { UNIFIED, LEFT, RIGHT } side;
 	string token = args.read_token();
-	string face_pose_name;
-	if( token=="left" || token=="LEFT" ) {
-		side = LEFT;
-		face_pose_name = args.read_token();
-	} else if( token=="right" || token=="RIGHT" ) {
-		side = RIGHT;
-		face_pose_name = args.read_token();
-	} else {
-		side = UNIFIED;
-		face_pose_name = token;
-	}
+	std::string side = token;
 
-	FaceMotion* faceMotion = NULL;
-	std::map<std::string, FaceMotion*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
+	std::string motion = args.read_token();
+
+	if (side != "left" && 
+		side != "right" &&
+		side != "LEFT" &&
+		side != "RIGHT")
+	{
+		motion = side;
+		side = "";
+	}
+	
+	FaceDefinition* faceDefinition = NULL;
+	std::map<std::string, FaceDefinition*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
 	if (faceMotionIter == mcu_p->face_map.end())
 	{
 		// face motion mappings for character do not yet exist - create them
-		faceMotion = new FaceMotion();
-		mcu_p->face_map.insert(std::pair<std::string, FaceMotion*>(characterName, faceMotion));
+		faceDefinition = new FaceDefinition();
+		faceDefinition->setName(characterName);
+		mcu_p->face_map.insert(std::pair<std::string, FaceDefinition*>(characterName, faceDefinition));
 	}
 	else
 	{
-		faceMotion = (*faceMotionIter).second;
+		faceDefinition = (*faceMotionIter).second;
 	}
 
-	// Currently we use the first frame of SkMotion because
-	// of limitations in our exports (can't export direct to .skp).
-	// TODO: use .skp and/or convert arbitrary frame number/time to SkPosture
-	SkMotion* motion = NULL;
-	if (face_pose_name.length() > 0)
-	{
-		std::map<std::string, SkMotion*>::iterator motionIter =  mcu_p->motion_map.find(face_pose_name);
-		if (motionIter == mcu_p->motion_map.end())
-		{
-			LOG("ERROR: Unknown facial pose \"%s\".", face_pose_name.c_str());
-			return CMD_FAILURE;
-		}
-		motion =(*motionIter).second;
-	}
-
-	AUMotionPtr au;
-	AUMotionMap& au_map = faceMotion->au_motion_map;
-	AUMotionMap::iterator pos = au_map.find(unit);
-	if( pos == au_map.end() ) {
-		switch( side ) {
-			case UNIFIED:
-				au = new AUMotion( motion );
-				au->reset_type();
-				au->set_bilateral();
-				break;
-			case LEFT:
-				au = new AUMotion( motion, NULL );
-				au->reset_type();
-				au->set_left();
-				break;
-			case RIGHT:
-				au = new AUMotion( NULL, motion );
-				au->reset_type();
-				au->set_right();
-				break;
-			default:
-				// Invalid code.  Throw assert?
-				LOG("ERROR: Invalid side \"%d\".", side);
-				return CMD_FAILURE;
-		}
-		au_map.insert( make_pair( unit, au ) );
-	} else {
-		au = pos->second;  // value half of std::pair
-		switch( side ) {
-			case UNIFIED:
-				if( au->is_left() || au->is_right() )
-					LOG("WARNING: Overwritting au #%d", unit);
-				au->set( motion );
-				au->reset_type();
-				au->set_bilateral();
-				break;
-			case LEFT:
-				if( au->is_left() || au->is_bilateral())
-					LOG("WARNING: Overwritting au #%d left", unit);
-				au->set( motion, au->right );
-				if (au->is_right())
-				{
-					au->reset_type();
-					au->set_left();
-					au->set_right();
-				}
-				else if (au->is_bilateral())
-				{
-					au->reset_type();
-					au->set_left();
-				}
-				break;
-			case RIGHT:
-				if( au->is_right() )
-					LOG("WARNING: Overwritting au #%d right", unit);
-				au->set( au->left, motion );
-				if (au->is_left())
-				{
-					au->reset_type();
-					au->set_left();
-					au->set_right();
-				}
-				else if (au->is_bilateral())
-				{
-					au->reset_type();
-					au->set_right();
-				}
-				break;
-			default:
-				// Invalid code.  Throw assert?
-				LOG("ERROR: Invalid side \"%d\"", side);
-				return CMD_FAILURE;
-		}
-	}
+	faceDefinition->setAU(unit, side, motion);
 
 	return CMD_SUCCESS;
 }
 
-inline void print_au( const int unit, const AUMotionPtr au ) {
+
+inline void print_au( const int unit, const ActionUnit* au ) {
 	if( au->is_bilateral() ) {
 		std::stringstream strstr;
 		strstr << "Action Unit #" << unit << ": Left SkMotion ";
@@ -2920,13 +2761,13 @@ int mcu_print_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string c
 		if( !( unit_iss >> unit )
 			|| ( unit < 1 ) )
 		{
-			LOG("ERROR: Invalid action unit number \"%s\".", unit_str.c_str() );
+			LOG("ERROR: Invalid action unit number \"%s\".", unit_str);
 			return CMD_FAILURE;
 		}
 	}
 
-	FaceMotion* faceMotion = NULL;
-	std::map<std::string, FaceMotion*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
+	FaceDefinition* faceDefinition = NULL;
+	std::map<std::string, FaceDefinition*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
 	if (faceMotionIter == mcu_p->face_map.end())
 	{
 		// face motion mappings for character do not yet exist
@@ -2935,30 +2776,34 @@ int mcu_print_face_au_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string c
 	}
 	else
 	{
-		faceMotion = (*faceMotionIter).second;
+		faceDefinition = (*faceMotionIter).second;
 	}
 
-	AUMotionPtr au;
-	AUMotionMap& au_map = faceMotion->au_motion_map;
-	AUMotionMap::iterator pos;
-	AUMotionMap::iterator end = au_map.end();
-	if( unit == ALL_ACTION_UNITS ) {
-		for( pos = au_map.begin(); pos!=end; ++pos ) {
-			unit = pos->first;
-			au  = pos->second;
-
-			print_au( unit, au );
+	if( unit == ALL_ACTION_UNITS )
+	{
+		int numAUs = faceDefinition->getNumAUs();
+		for (int a = 0; a < numAUs; a++)
+		{
+			int unit = faceDefinition->getAUNum(a);
+			ActionUnit* au = faceDefinition->getAU(unit);
+			print_au(unit, au);
 		}
-	} else {
-		pos = au_map.find( unit );
-		if( pos == end ) {
+	} 
+	else
+	{
+		ActionUnit* au = faceDefinition->getAU(unit);
+		if (!au)
+		{
 			LOG("Action Unit #%s is not set.", unit);
-		} else {
-			print_au( unit, pos->second );
+		} 
+		else
+		{
+			print_au(unit, au);
 		}
 	}
 	return CMD_SUCCESS;
 }
+
 
 /**
  *  Implements the "set face viseme ..." command.
@@ -2974,46 +2819,24 @@ int mcu_set_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p, std::string
 		return CMD_SUCCESS;
 	}
 
-	FaceMotion* faceMotion = NULL;
-	std::map<std::string, FaceMotion*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
+	FaceDefinition* faceDefinition = NULL;
+	std::map<std::string, FaceDefinition*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
 	if (faceMotionIter == mcu_p->face_map.end())
 	{
 		// face motion mappings for character do not yet exist - create them
-		faceMotion = new FaceMotion();
-		mcu_p->face_map.insert(std::pair<std::string, FaceMotion*>(characterName, faceMotion));
+		faceDefinition = new FaceDefinition();
+		faceDefinition->setName(characterName);
+		mcu_p->face_map.insert(std::pair<std::string, FaceDefinition*>(characterName, faceDefinition));
 	}
 	else
 	{
-		faceMotion = (*faceMotionIter).second;
+		faceDefinition = (*faceMotionIter).second;
 	}
 
-	string motion_name = args.read_token();
+	std::string motionName = args.read_token();
 
-	SkMotion* motion = NULL;
-	if (motion_name.length() > 0)
-	{
-			// Currently we use the first frame of SkMotion because
-		// of limitations in our exports (can't export direct to .skp).
-		// TODO: use .skp and/or convert arbitrary frame number/time to SkPosture
-		std::map<std::string, SkMotion*>::iterator motionIter = mcu_p->motion_map.find(motion_name);
-		if (motionIter == mcu_p->motion_map.end())
-		{
-			LOG("ERROR: Unknown viseme pose \"%s\".", motion_name.c_str());
-			return CMD_FAILURE;
-		}
-		motion = (*motionIter).second;
-	}
+	faceDefinition->setViseme(viseme, motionName);
 
-
-	VisemeMotionMap& viseme_map = faceMotion->viseme_map;
-	VisemeMotionMap::iterator pos = viseme_map.find( viseme );
-	if( pos != viseme_map.end() ) {
-		LOG("WARNING: Overwriting viseme \"%s\" motion mapping.", viseme.c_str());
-	}
-	viseme_map.insert( make_pair( viseme, motion ) );
-	if (motion)
-		motion->ref();
-	
 	return CMD_SUCCESS;
 }
 
@@ -3046,37 +2869,37 @@ int mcu_print_face_viseme_func( srArgBuffer& args, mcuCBHandle *mcu_p,std::strin
 		return CMD_SUCCESS;
 	}
 
-	FaceMotion* faceMotion = NULL;
-	std::map<std::string, FaceMotion*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
+	FaceDefinition* faceDefinition = NULL;
+	std::map<std::string, FaceDefinition*>::iterator faceMotionIter = mcu_p->face_map.find(characterName);
 	if (faceMotionIter == mcu_p->face_map.end())
 	{
 		// face motion mappings for character do not yet exist
 		LOG("Character %s does not yet have any viseme mappings for the face.", characterName.c_str());
 		return CMD_FAILURE;
 	}
-	faceMotion = (*faceMotionIter).second;
+	faceDefinition = (*faceMotionIter).second;
 
-	VisemeMotionMap& viseme_map = faceMotion->viseme_map;
-	VisemeMotionMap::iterator pos;
-	VisemeMotionMap::iterator end = viseme_map.end();
-	if( viseme=="*" ) {
-		for( pos=viseme_map.begin(); pos!=end; ++pos ) {
-			print_viseme( pos->first, pos->second );
+	if (viseme == "*")
+	{
+		int numVisemes = faceDefinition->getNumVisemes();
+		for (int v = 0; v < numVisemes; v++)
+		{
+			std::string visemeName = faceDefinition->getVisemeName(v);
+			SkMotion* motion = faceDefinition->getVisemeMotion(visemeName);
+			print_viseme(visemeName, motion);
 		}
-	} else {
-		pos = viseme_map.find( viseme );
-		if( pos == end ) {
-			cout << "Viseme \""<<viseme<<"\" is unset." << endl;
-		} else {
-			print_viseme( viseme, pos->second );
-		}
+	}
+	else
+	{
+		SkMotion* motion = faceDefinition->getVisemeMotion(viseme);
+		print_viseme(viseme, motion);
 	}
 
 	return CMD_SUCCESS;
 }
 
 /////////////////////////////////////////////////////////////
-/*
+
 int init_pose_controller( 
 	char *ctrl_name, 
 	char *pose_name, 
@@ -3327,7 +3150,7 @@ int init_lilt_controller(
 	}
 	ctrl_p->ref();
 	ctrl_p->name( ctrl_name );
-	ctrl_p->init( char_p, char_p->skeleton_p );
+	ctrl_p->init( char_p, char_p->getSkeleton() );
 	return( CMD_SUCCESS );
 }
 
@@ -3411,7 +3234,7 @@ int init_scheduler_controller(
 	LOG( "init_scheduler_controller ERR: SbmCharacter '%s' NOT FOUND\n", char_name ); 
 	return( CMD_FAILURE );
 }
-*/
+
 
 int set_controller_timing(
 	MeController* ctrl_p, 
@@ -3534,7 +3357,7 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 					if (checkStatus)
 					{
 						std::string passThroughStr = (controllerTree->controller(c)->is_pass_through())? " true " : " false";							
-						LOG("[%s] %s = %s", character->name, controllerTree->controller(c)->name(), passThroughStr.c_str());
+						LOG("[%s] %s = %s", character->getName().c_str(), controllerTree->controller(c)->name(), passThroughStr.c_str());
 						numControllersAffected = numControllers;	// just so it won't generate error
 					}
 					else if (allControllers)
@@ -3561,7 +3384,6 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				return CMD_FAILURE;
 		}
 
-		/*
 		if( strcmp( ctrl_cmd, "pose" ) == 0 )	{
 			char *pose_name = args.read_token();
 			return(
@@ -3636,7 +3458,7 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 				init_scheduler_controller( ctrl_name, char_name, mcu_p )
 			);
 		}
-		*/
+		
 		else
 		{
 			// Non-initializing controllers need an actual instance
@@ -3778,7 +3600,6 @@ int mcu_motion_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 /*
 	stepturn <> dur|time|speed <sec|dps> local|world <heading-deg>
 */
-/*
 int mcu_stepturn_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 	if( mcu_p ) {
@@ -3809,7 +3630,6 @@ int mcu_stepturn_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	}
 	return( CMD_FAILURE );
 }
-*/
 
 /*
 X	quickdraw <> <dur-sec> point <x y z>
@@ -3823,7 +3643,7 @@ X	quickdraw <> <dur-sec> point <x y z> [<joint>]
 	quickdraw <> track <tracking-dur>
 	quickdraw <> persist | reholster
 */
-/*
+
 int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 	if( mcu_p ) {
@@ -3907,7 +3727,7 @@ int mcu_quickdraw_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	}
 	return( CMD_FAILURE );
 }
-*/
+
 int mcu_gaze_limit_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
 	if( mcu_p )
@@ -3972,7 +3792,7 @@ int mcu_gaze_limit_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	gaze <> priority <key>
 	gaze <> fadein|fadeout [<interval>]
 */
-/*
+
 int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 	if( mcu_p ) {
@@ -4097,12 +3917,12 @@ int mcu_gaze_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	}
 	return( CMD_FAILURE );
 }
-*/
+
 
 /*
 	snod <> <dur-sec> <mag-deg> [<reps=1.0> [<affirm=1>]]
 */
-/*
+
 int mcu_snod_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 	if( mcu_p )	{
@@ -4126,8 +3946,8 @@ int mcu_snod_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	}
 	return( CMD_FAILURE );
 }
-*/
-/*
+
+
 int mcu_lilt_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p) {
 
 	if( mcu_p ) {
@@ -4143,9 +3963,9 @@ int mcu_lilt_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p) {
 	}
 	return( CMD_FAILURE );
 }
-*/
+
 /////////////////////////////////////////////////////////////
-/*
+
 int add_controller_to_scheduler( 
 	char *sched_ctrl_name, 
 	char *add_ctrl_name, 
@@ -4197,14 +4017,14 @@ int add_controller_to_scheduler(
 
 	return( CMD_FAILURE );
 }
-*/
+
 /*
 
 	sched <> add <ctrl-name> <at> [<ease-in> [<ease-out>]] 
 
 */
 
-/*
+
 int mcu_sched_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 
 	if( mcu_p )	{
@@ -4244,7 +4064,7 @@ int mcu_sched_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 	}
 	return( CMD_FAILURE );
 }
-*/
+
 
 /////////////////////////////////////////////////////////////
 
@@ -4731,7 +4551,7 @@ int mcu_vrAllCall_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			iter++)
 		{
             string message = "sbm ";
-			message += (*iter).second->name;
+			message += (*iter).second->getName();
             mcu_p->vhmsg_send( "vrComponent", message.c_str() );
         }
     }
@@ -4752,7 +4572,7 @@ int mcu_vrAllCall_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		srHashMap <MeCtScheduler2>	sched_ctrl_map;
 		srHashMap <MeController>	controller_map; 
 */
-/*
+
 int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
 
 	LOG( "POSES:\n" );
@@ -4816,7 +4636,7 @@ int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
 	
 	return (CMD_SUCCESS);
 }
-*/
+
 /////////////////////////////////////////////////////////////
 
 int mcu_wsp_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
@@ -4910,10 +4730,10 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		}
 		if (character)
 		{
-			int numValidChannels = motion->connect(character->skeleton_p);	// connect and check for the joints
+			int numValidChannels = motion->connect(character->getSkeleton());	// connect and check for the joints
 			SkChannelArray& mChanArray = motion->channels();
 			int mChanSize = mChanArray.size();
-			SkChannelArray& skelChanArray = character->skeleton_p->channels();
+			SkChannelArray& skelChanArray = character->getSkeleton()->channels();
 			int skelChanSize = skelChanArray.size();
 			if (mode == 1)
 			{
@@ -5081,7 +4901,7 @@ int mcu_adjust_motion_function( srArgBuffer& args, mcuCBHandle *mcu_p )
 			LOG("mcu_adjust_motion_function ERR: character %s not found!", charName.c_str());
 			return CMD_FAILURE;
 		}
-		ParserOpenCOLLADA::animationPostProcess(*character->skeleton_p, *motion);
+		ParserOpenCOLLADA::animationPostProcess(*character->getSkeleton(), *motion);
 	}
 	return CMD_SUCCESS;
 }
@@ -5134,6 +4954,14 @@ int triggerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		
 	return CMD_SUCCESS;
 }
+
+int mcu_python_func( srArgBuffer& args, mcuCBHandle* mcu_p )
+{
+	mcu_p->use_python = true;
+
+	return CMD_SUCCESS;
+}
+
 
 int addevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
@@ -5618,7 +5446,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				initialConditions.radius = 0.3f;//0.2f;//0.4f;
 				initialConditions.speed = 0.0f;
 				initialConditions.goals.clear();
-				initialConditions.name = character->name;
+				initialConditions.name = character->getName();
 				SteerLib::AgentInterface* agent = mcu_p->steerEngine._engine->createAgent( initialConditions, pprAIModule );
 				character->steeringAgent->setAgent(agent);
 				agent->reset(initialConditions, dynamic_cast<SteerLib::EngineInterface*>(pprAIModule));
@@ -5829,7 +5657,7 @@ int showcharacters_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		iter != mcu_p->getCharacterMap().end();
 		iter++)
 	{
-		LOG("%s", (*iter).second->name);
+		LOG("%s", (*iter).second->getName().c_str());
 	}
 	return CMD_SUCCESS;
 }
@@ -5843,7 +5671,7 @@ int showpawns_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	{
 		SbmCharacter* character = dynamic_cast<SbmCharacter*>((*iter).second);
 		if (!character)
-			LOG("%s", (*iter).second->name);
+			LOG("%s", (*iter).second->getName().c_str());
 	}
 
 	return CMD_SUCCESS;

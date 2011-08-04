@@ -211,17 +211,17 @@ namespace SmartBody {
          *  VisemeData instances of when to cancel previous visemes (change
          *  of viseme, and end of words).
          */
-        virtual std::vector<VisemeData *>* getVisemes( RequestId requestId, const SbmCharacter* character ) = 0;
+        virtual std::vector<VisemeData *>* getVisemes( RequestId requestId, SbmCharacter* character ) = 0;
 
         /**
          *  Returns the sbm command used to play the speech audio.
          */
-        virtual char* getSpeechPlayCommand( RequestId requestId, const SbmCharacter* character = NULL ) = 0;
+        virtual char* getSpeechPlayCommand( RequestId requestId, SbmCharacter* character = NULL ) = 0;
 
         /**
          *  Returns the sbm command used to stop the speech audio.
          */
-        virtual char* getSpeechStopCommand( RequestId requestId, const SbmCharacter* character = NULL ) = 0;
+        virtual char* getSpeechStopCommand( RequestId requestId, SbmCharacter* character = NULL ) = 0;
 
         /**
          *  Returns the filename of the audio.

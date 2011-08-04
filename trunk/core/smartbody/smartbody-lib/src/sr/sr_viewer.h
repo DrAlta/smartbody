@@ -48,6 +48,8 @@ class SrViewer
  {
    public : //----> public methods 
 
+	SrViewer();
+
     /*! Constructor needs the size and location of the window. */
     SrViewer ( int x, int y, int w, int h, const char *label=0 );
 

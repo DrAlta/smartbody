@@ -20,7 +20,7 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 	if (attrID)
 		localId = XMLString::transcode(attrID);
 	std::stringstream command;	
-	std::string characterName = request->actor->name;
+	std::string characterName = request->actor->getName();
 
 	std::string stateName = xml_parse_string(BMLDefs::ATTR_NAME, elem);
 	if (stateName == "")

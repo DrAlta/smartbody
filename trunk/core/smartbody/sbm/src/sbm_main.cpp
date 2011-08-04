@@ -71,6 +71,7 @@
 //#include "SBMWindow.h"
 #include "CommandWindow.h"
 #include <boost/algorithm/string/replace.hpp>
+#include <sbm/SbmPython.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef WIN32_LEAN_AND_MEAN
@@ -99,8 +100,9 @@
 //#include <FL/Fl_glut.h>
 #include "sr/sr_model.h"
 
-#define ENABLE_DEFAULT_BOOTSTRAP	(1)
+#define ENABLE_DEFAULT_BOOTSTRAP	(1) 
 #define DEFAULT_SEQUENCE_FILE		("default.seq")
+#define DEFAULT_PY_FILE				("default.py")
 
 ///////////////////////////////////////////////////////////////////////////////////
 
@@ -226,7 +228,9 @@ int mcu_echo_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 	std::stringstream timeStr;
 	timeStr << mcu_p->time;
 	std::string echoStr = args.read_remainder_raw();
-	boost::replace_all(echoStr, "$time", timeStr.str());
+	int pos = echoStr.find("$time");
+	if (pos != std::string::npos)
+		boost::replace_all(echoStr, "$time", timeStr.str());
 	
     LOG("%s ", echoStr.c_str() );
 	return( CMD_SUCCESS );
@@ -334,15 +338,15 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "char",			SbmCharacter::character_cmd_func );
 
 	mcu.insert( "ctrl",			mcu_controller_func );
-//	mcu.insert( "sched",		mcu_sched_controller_func );
-//	mcu.insert( "motion",		mcu_motion_controller_func );
-//	mcu.insert( "stepturn",		mcu_stepturn_controller_func );
-//	mcu.insert( "quickdraw",	mcu_quickdraw_controller_func );
-//	mcu.insert( "gaze",			mcu_gaze_controller_func );	
+	mcu.insert( "sched",		mcu_sched_controller_func );
+	mcu.insert( "motion",		mcu_motion_controller_func );
+	mcu.insert( "stepturn",		mcu_stepturn_controller_func );
+	mcu.insert( "quickdraw",	mcu_quickdraw_controller_func );
+	mcu.insert( "gaze",			mcu_gaze_controller_func );	
 	mcu.insert( "gazelimit",	mcu_gaze_limit_func );
-//	mcu.insert( "snod",			mcu_snod_controller_func );
-//	mcu.insert( "lilt",			mcu_lilt_controller_func );
-//	mcu.insert( "divulge",		mcu_divulge_content_func );
+	mcu.insert( "snod",			mcu_snod_controller_func );
+	mcu.insert( "lilt",			mcu_lilt_controller_func );
+	mcu.insert( "divulge",		mcu_divulge_content_func );
 	mcu.insert( "wsp",			mcu_wsp_cmd_func );
 	mcu.insert( "create_remote_pawn", SbmPawn::create_remote_pawn_func );
 
@@ -363,6 +367,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "resource",            resource_cmd_func );
 	mcu.insert( "syncpolicy",          mcu_syncpolicy_func );
 	mcu.insert( "check",			   mcu_check_func);		// check matching between .skm and .sk
+	mcu.insert( "python",			   mcu_python_func);
 	mcu.insert( "adjustmotion",		   mcu_adjust_motion_function);
 	mcu.insert( "mediapath",		   mcu_mediapath_func);
 	mcu.insert( "bml",				   test_bml_func );
@@ -402,7 +407,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert_print_cmd( "face",         mcu_print_face_func );
 	mcu.insert_print_cmd( "joint_logger", joint_logger::print_func );
 	mcu.insert_print_cmd( "J_L",          joint_logger::print_func );  // shorthand
-//	mcu.insert_print_cmd( "mcu",          mcu_divulge_content_func );
+	mcu.insert_print_cmd( "mcu",          mcu_divulge_content_func );
 	mcu.insert_print_cmd( "test",         sbm_print_test_func );
 
 	mcu.insert_test_cmd( "args", test_args_func );
@@ -628,9 +633,11 @@ fprintf( stdout, "output:'%s'\n", str.c_str() );
 	int err;
 	SrString net_host;
 	vector<string> seq_paths;
+	vector<string> py_paths;
 	vector<string> me_paths;
 	vector<string> audio_paths;
 	vector<string> init_seqs;
+	vector<string> init_pys;
 	SrString proc_id;
 	
 	XMLPlatformUtils::Initialize();  // Initialize Xerces before creating MCU
@@ -660,6 +667,7 @@ fprintf( stdout, "output:'%s'\n", str.c_str() );
 	TimeIntervalProfiler* profiler = new TimeIntervalProfiler();
 	mcu.register_profiler(*profiler);
 
+	std::string python_lib_path = "../../../../lib/Python26/Lib";
 	// EDF - taken from tre_main.cpp, a fancier command line parser can be put here if desired.
 	//	check	command line parameters:
 	bool lock_dt_mode = false;
@@ -670,10 +678,28 @@ fprintf( stdout, "output:'%s'\n", str.c_str() );
 		LOG( "SBM ARG[%d]: '%s'", i, argv[i] );
 		s = argv[i];
 
-		if( s.search(	"-host=" ) == 0 )  // argument starts with -host=
+		if( s == "-pythonpath" )  // argument -pythonpath
+		{
+			if( ++i < argc ) {
+				LOG( "    Adding path path '%s'\n", argv[i] );
+				python_lib_path = argv[i];
+			} else {
+				LOG( "ERROR: Expected directory path to follow -pythonpath\n" );
+				// return -1
+			}
+		}
+		else if( s == "-python" )  // argument -python
+		{
+			mcu.use_python = true;
+		}
+		else if( s.search(	"-host=" ) == 0 )  // argument starts with -host=
 		{
 			net_host = s;
 			net_host.remove( 0, 6 );
+		}
+		else if( s == "-python" )  // argument -python
+		{
+			mcu.use_python = true;
 		}
 		else if( s == "-mepath" )  // -mepath <dirpath> to specify where Motion Engine files (.sk, .skm) should be loaded from
 		{
@@ -694,6 +720,17 @@ fprintf( stdout, "output:'%s'\n", str.c_str() );
 				seq_paths.push_back( argv[i] );
 			} else {
 				LOG( "ERROR: Expected directory path to follow -seqpath\n" );
+				// return -1
+			}
+		}
+		else if( s == "-pypath" )  // -mepath <dirpath> to specify where sequence files (.seq) should be loaded from
+		{
+			if( ++i < argc ) {
+				LOG( "    Adding python script path '%s'\n", argv[i] );
+
+				py_paths.push_back( argv[i] );
+			} else {
+				LOG( "ERROR: Expected directory path to follow -pypath\n" );
 				// return -1
 			}
 		}
@@ -777,6 +814,9 @@ fprintf( stdout, "output:'%s'\n", str.c_str() );
 	if( lock_dt_mode )	{ 
 		timer.set_sleep_lock();
 	}
+
+	// initialize python
+	initPython(python_lib_path);
 
 #if LINK_VHMSG_CLIENT
 	char * vhmsg_server = getenv( "VHMSG_SERVER" );
@@ -881,17 +921,49 @@ fprintf( stdout, "output:'%s'\n", str.c_str() );
 		mcu.execute( (char *)(const char *)audio_command );
 	}
 
-	if( init_seqs.empty() ) {
-		LOG( "No sequences specified. Loading sequence '%s'\n", DEFAULT_SEQUENCE_FILE );
-		init_seqs.push_back( DEFAULT_SEQUENCE_FILE );
+	if (!mcu.use_python)
+	{
+		if( init_seqs.empty() ) {
+			LOG( "No sequences specified. Loading sequence '%s'\n", DEFAULT_SEQUENCE_FILE );
+			init_seqs.push_back( DEFAULT_SEQUENCE_FILE );
+		}
+	}
+	else
+	{
+		if( py_paths.empty() ) {
+			LOG( "No python paths specified. Adding current working directory to python path\n" );
+			py_paths.push_back( "." );
+		}
 	}
 
-	for( it = init_seqs.begin();
-	     it != init_seqs.end();
-		 ++it )
+	if (!mcu.use_python)
 	{
-		SrString seq_command = SrString( "seq " ) << (it->c_str()) << " begin";
-		mcu.execute( (char *)(const char *)seq_command );
+		for( it = init_seqs.begin();
+			 it != init_seqs.end();
+			 ++it )
+		{
+			SrString seq_command = SrString( "seq " ) << (it->c_str()) << " begin";
+			mcu.execute( (char *)(const char *)seq_command );
+		}
+	}
+	else
+	{
+		if( init_pys.empty() ) {
+			LOG( "No sequences specified. Loading sequence '%s'\n", DEFAULT_PY_FILE );
+			init_pys.push_back( DEFAULT_PY_FILE );
+		}
+	}
+
+	if (mcu.use_python)
+	{
+		for( it = init_pys.begin();
+			 it != init_pys.end();
+			 ++it )
+		{
+			std::stringstream strstr;
+			strstr << "getScript(\"" << (it->c_str()) << "\").run()";
+			mcu.executePython(strstr.str().c_str());
+		}
 	}
 
 	me_paths.clear();
@@ -935,7 +1007,7 @@ fprintf( stdout, "output:'%s'\n", str.c_str() );
 #endif
 
 		mcu.mark( "main", 0, "bonebus" );
-		vector<string> commands = mcu.bonebus.GetCommand();
+		vector<string> commands;// = mcu.bonebus.GetCommand();
 		for ( size_t i = 0; i < commands.size(); i++ ) {
 			mcu.execute( (char *)commands[i].c_str() );
 		}
@@ -948,6 +1020,14 @@ fprintf( stdout, "output:'%s'\n", str.c_str() );
 				char *cmd = (char*)cmd_str.c_str();
 
 				if( strlen( cmd ) )	{
+
+					int result = CMD_FAILURE;
+					if (mcu.use_python) {
+						result = mcu.executePython(cmd);
+					} else {
+						result = mcu.execute(cmd);
+					}
+
 					switch( int ret = mcu.execute( cmd ) ) {
 						case CMD_NOT_FOUND:
 							printf("SBM ERR: command NOT FOUND: '%s'\n", cmd );

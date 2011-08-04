@@ -3,6 +3,7 @@
 
 #include "sbm_deformable_mesh.h"
 #include "mcontrol_util.h"
+#include <sbm/SBSkeleton.h>
 
 
 SkinWeight::SkinWeight()
@@ -23,7 +24,7 @@ SkinWeight::~SkinWeight()
 DeformableMesh::DeformableMesh() 
 {
 	binding = false;
-	skeleton = new SkSkeleton();
+	skeleton = new SmartBody::SBSkeleton();
 	skeleton->ref();
 }
 

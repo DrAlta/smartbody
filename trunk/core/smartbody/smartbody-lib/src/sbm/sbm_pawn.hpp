@@ -91,8 +91,7 @@ protected:
 #endif // SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK
 
 public:  // TODO - properly encapsulate / privatize the following
-    char*           name;
-	SkSkeleton*		skeleton_p;  // MAY BE NULL!!!
+	SkSkeleton*	_skeleton;;  // MAY BE NULL!!!
 	SkScene*		scene_p;	 // Skeleton Scene and Rigid Mesh		
 	DeformableMesh*	dMesh_p;	 // Deformable Mesh using smooth skinning
 	SbmGeomObject*  colObj_p;
@@ -112,8 +111,13 @@ public:  // TODO - properly encapsulate / privatize the following
 public:
 	
 	//  Public Methods
+	SbmPawn();
 	SbmPawn( const char* name );
 	virtual ~SbmPawn();
+
+	SkSkeleton* getSkeleton() const;
+	void setSkeleton(SkSkeleton* sk);
+
 
 	virtual int init( SkSkeleton* skeleton_p );
 
@@ -168,7 +172,16 @@ protected:
 	 */
 	virtual int init_skeleton();	
 
+	/*!
+	 *   Modify skeleton, if necessary.
+	 *
+	 *   SbmPawn inserts world_offset joint above the existing root.
+	 */
+	virtual int setup();
+
 	void wo_cache_update();
+
+	void initData();
 
 
 public:
@@ -220,6 +233,8 @@ public:
 	 *  Prints the given attribute of the pawn.
 	 */
 	static int print_attribute( SbmPawn* pawn, std::string& attribute, srArgBuffer& args, mcuCBHandle *mcu_p );
+
+	MeCtChannelWriter* get_world_offset_writer_p()	{return world_offset_writer_p;}
 
 	/**
 	 *  WSP access functions.

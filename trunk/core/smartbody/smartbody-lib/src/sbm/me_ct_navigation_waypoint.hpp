@@ -23,13 +23,13 @@
 #ifndef ME_CT_NAVIGATION_WAYPOINT_HPP
 #define ME_CT_NAVIGATION_WAYPOINT_HPP
 
-#include <me/me_controller.h>
+#include <sbm/SBController.h>
 
 
 /**
  *  Controls the locomotion vector to approach a single waypoint at a given speed.
  */
-class MeCtNavigationWaypoint : public MeController {
+class MeCtNavigationWaypoint : public SmartBody::SBController {
 public:
 	// Public Constants
 	static const char* TYPE;

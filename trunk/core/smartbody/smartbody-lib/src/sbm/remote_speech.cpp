@@ -196,7 +196,7 @@ The timestamp is 20051121_150427 (that is, YYYYMMDD_HHMMSS ), so we can check ol
 	return (msgNumber); //returns the unique message number
 }
 
-std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<VisemeData*>* visemes, const SbmCharacter* character) {
+std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<VisemeData*>* visemes, SbmCharacter* character) {
 	//this is used to recursively search the DOM tree and return a vector containing the visemes and the appropriate viseme resets (before a subsequent viseme is set the previous one must be reset)
 	VisemeData* curViseme = NULL;
 	float blendTime = 0.0f;
@@ -333,7 +333,7 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 }
 
 
-std::vector<VisemeData*>* remote_speech::getVisemes( RequestId requestId, const SbmCharacter* character) {
+std::vector<VisemeData*>* remote_speech::getVisemes( RequestId requestId, SbmCharacter* character) {
 
 	/**
         *  If the request has been processed, returns the time ordered vector 
@@ -362,7 +362,7 @@ std::vector<VisemeData*>* remote_speech::getVisemes( RequestId requestId, const 
 /**
  *  Returns the sbm command used to play the speech audio. The command is now of form:  send PlaySound <audio path>- this sends the sound directly to Unreal
  */
-char* remote_speech::getSpeechPlayCommand( RequestId requestId, const SbmCharacter* character ){
+char* remote_speech::getSpeechPlayCommand( RequestId requestId, SbmCharacter* character ){
 	// TODO: Wrap up this SASO/PlaySound specific audio command string generation
 	// into a class that can abstracted and shared between speech implementations.
 	// The SpeechInterface should only need to provide the audio filename.
@@ -380,7 +380,7 @@ char* remote_speech::getSpeechPlayCommand( RequestId requestId, const SbmCharact
 
 	string cmd;
 	if (character)
-		cmd = vhcl::Format( "send PlaySound \"%s\" %s", soundFile.c_str(), character->name );
+		cmd = vhcl::Format( "send PlaySound \"%s\" %s", soundFile.c_str(), character->getName().c_str() );
 	else
 		cmd = vhcl::Format( "send PlaySound \"%s\"", soundFile.c_str());
 
@@ -392,7 +392,7 @@ char* remote_speech::getSpeechPlayCommand( RequestId requestId, const SbmCharact
 /**
  *  Returns the sbm command used to stop the speech audio. The command is of form: send StopSound <audio path>
  */
-char* remote_speech::getSpeechStopCommand( RequestId requestId, const SbmCharacter* character ){
+char* remote_speech::getSpeechStopCommand( RequestId requestId, SbmCharacter* character ){
 	// TODO: Wrap up this SASO/PlaySound specific audio command string generation
 	// into a class that can abstracted and shared between speech implementations.
 	// The SpeechInterface should only need to provide the audio filename.
@@ -529,7 +529,7 @@ int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgI
 				{	
 					const char* commandChars = remote_speech::commandLookUp.lookup(msgID);
 					if( commandChars ) {
-						string command= string(commandChars)+" "+character->name+" "+string(msgID)+ "ERROR::remote_speech Remote speech process returns NULL document";
+						string command= string(commandChars)+" "+character->getName() +" "+string(msgID)+ "ERROR::remote_speech Remote speech process returns NULL document";
 						char* failCmd= new char[command.length()+1];
 						strcpy(failCmd, command.c_str());
 						LOG(failCmd);
@@ -559,7 +559,7 @@ int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgI
 
 
 
-			string callbackCmd= string(remote_speech::commandLookUp.lookup(msgID)) +" "+ character->name+" "+ string(msgID)+" SUCCESS";
+			string callbackCmd= string(remote_speech::commandLookUp.lookup(msgID)) +" "+ character->getName() +" "+ string(msgID)+" SUCCESS";
 			char* callback= new char[callbackCmd.length() + 1];
 			strcpy(callback,callbackCmd.c_str());
 			mcu_p->execute(callback);
@@ -571,7 +571,7 @@ int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgI
 			return(CMD_SUCCESS); 
 		} else {
 			//cout<<endl<<"Okay :"<<Okay<<endl;
-			string callbackCmd= string(remote_speech::commandLookUp.lookup(msgID)) +" "+ character->name+" "+ string(msgID)+" ERROR "+result;
+			string callbackCmd= string(remote_speech::commandLookUp.lookup(msgID)) +" "+ character->getName()+" "+ string(msgID)+" ERROR "+result;
 			char* callback= new char[callbackCmd.length()];
 			strcpy(callback,callbackCmd.c_str());
 			mcu_p->execute(callback);
@@ -586,7 +586,7 @@ int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgI
 	} catch( const exception& e ) {
 		LOG("vrSpeakSeq: std::exception: %s", e.what());
 
-		string callbackCmd= string(remote_speech::commandLookUp.lookup(msgID)) +" "+ character->name+" "+ string(msgID)+" ERROR XercesC error: "+e.what();
+		string callbackCmd= string(remote_speech::commandLookUp.lookup(msgID)) +" "+ character->getName()+" "+ string(msgID)+" ERROR XercesC error: "+e.what();
 		char* callback= new char[callbackCmd.length()];
 		strcpy(callback,callbackCmd.c_str());
 		mcu_p->execute(callback);

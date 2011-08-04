@@ -85,6 +85,7 @@ class SkJoint
     friend class SkColdet;
 
  public:
+	 SkJoint();
     // constructor sets all dofs to non active, and rotation type as euler
     SkJoint ( SkSkeleton* sk, SkJoint* parent, RotType rtype, int i );
     virtual ~SkJoint ();
@@ -112,6 +113,9 @@ class SkJoint
 
     /*! Get a pointer to the skeleton owner of this joint */
     SkSkeleton* skeleton () { return _skeleton; }
+
+	/*! Sets the skeleton skeleton owner of this joint */
+    void skeleton (SkSkeleton* skel) { _skeleton = skel; }
 	
 	/* thiebaux 6/19/2006 */
 	void set_parent( SkJoint* p ) { _parent = p; }
@@ -128,6 +132,8 @@ class SkJoint
     /*! Returns the index of this joint in the SkSkeleton list
         of joints */
     int index () const { return _index; }
+
+	void set_index(int id)	{_index = id;}
 
     /*! Returns the collision detection id of the colgeo attached
         to this joint (or -1 if no id). */
@@ -239,6 +245,8 @@ class SkJoint
 
 	int getJointType() { return _jointType; };
 	void setJointType(int jtype) {  _jointType = jtype; };
+
+	void add_child ( SkJoint* child );
  };
 
 //==================================== End of File ===========================================

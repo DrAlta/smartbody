@@ -52,7 +52,7 @@
 2 test bml character elder <animation name="HandsAtSide_RArm_GestureYou" priority="1" />
 3 snapshot
 3.5 snapshot
-6 test bml character doctor <animation name="Step_WalkForward" priority="1" />
+6 test bml character doctor <animation name="LHandOnHip_RArm_GestureOffer" priority="1" />
 6 test bml character elder <animation name="HandsAtSide_Arms_Sweep" priority="1" />
 6.5 snapshot
 7 snapshot

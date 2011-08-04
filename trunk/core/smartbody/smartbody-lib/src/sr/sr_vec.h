@@ -276,6 +276,13 @@ class SrVec
 
     /*! Inputs from format: "x y z". */
     friend SrInput& operator>> ( SrInput& in, SrVec& v );
+
+	/*! Set the value specified by the index */
+    void setData ( int index, float val ) { (*this)[index] = val;}
+
+	/*! Returns the value specified by the index */
+    float getData ( int index ) { return (*this)[index];}
+
  };
 
 //============================== end of file ===============================

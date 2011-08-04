@@ -28,14 +28,14 @@
 
 //=================================== MeCtPose =====================================
 
-# include <me/me_controller.h>
+# include <sbm/SBController.h>
 # include <sk/sk_posture.h>
 # include <sk/sk_motion.h>
 
 /*! This controller sends always a same posture, ie, makes the associated
     channels to rest in a same pose. The rest pose can be defined in several
     ways: through SkMotion, SkPosture, SkPose or with a channels/buffer pair. */
-class MeCtPose : public MeController
+class MeCtPose : public SmartBody::SBController
  { private :
     SkChannelArray		_channels;	// used channels
 	SrBuffer<int>		_toBuff;	// map _channels index to _buffer index

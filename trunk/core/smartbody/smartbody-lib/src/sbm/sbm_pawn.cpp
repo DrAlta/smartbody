@@ -40,8 +40,7 @@
 #include "me_utilities.hpp"
 #include "sr/sr_model.h"
 #include "sr/sr_euler.h"
-
-
+#include <sbm/SBSkeleton.h>
 
 using namespace std;
 
@@ -116,25 +115,50 @@ const char* SbmPawn::WORLD_OFFSET_JOINT_NAME = "world_offset";
 SkChannelArray SbmPawn::WORLD_OFFSET_CHANNELS_P;
 
 
+SbmPawn::SbmPawn()
+{
+	SbmPawn::initData();
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	std::string validName = mcu.getValidName("object");
+	setName(validName);	
+}
+
 // Constructor
 SbmPawn::SbmPawn( const char * name )
-:	name( new char[strlen(name)+1] ),
-
-	skeleton_p( NULL ),
-	scene_p( new SkScene() ),
+:	_skeleton( NULL ),
+	scene_p( NULL ),
 	//dMesh_p( new DeformableMesh() ),
 	dMesh_p( new SbmDeformableMeshGPU() ),
 	ct_tree_p( MeControllerTreeRoot::create() ),
 	world_offset_writer_p( new MeCtChannelWriter() ),
 	wo_cache_timestamp( -std::numeric_limits<float>::max() )
 {
-	bonebusCharacter = NULL;
-	strcpy( this->name, name );
-	//skeleton_p->ref();
-	scene_p->ref();
+	setName( name );
+	//_skeleton->ref();
 	ct_tree_p->ref();
 	ct_tree_p->setPawn(this);
 
+	SbmPawn::initData();
+
+	this->createBoolAttribute("physics", false, true, "Basic", 300, false, false, "is the pawn physics enabled");
+}
+
+void SbmPawn::initData()
+{
+	bonebusCharacter = NULL;
+	_skeleton = NULL;
+	//scene_p = new SkScene();
+	//dMesh_p = new DeformableMesh();
+	dMesh_p =  new SbmDeformableMeshGPU();
+	ct_tree_p = MeControllerTreeRoot::create();
+	world_offset_writer_p = new MeCtChannelWriter();
+	std::string controllerName = this->getName();
+	controllerName += "'s world offset writer";
+	world_offset_writer_p->name( controllerName.c_str() );
+	wo_cache_timestamp = -std::numeric_limits<float>::max(); 
+	//skeleton_p->ref();
+	ct_tree_p->ref();
 	colObj_p = NULL;
 	phyObj_p = NULL;
 	steeringSpaceObj_p = NULL;
@@ -146,25 +170,55 @@ SbmPawn::SbmPawn( const char * name )
 	world_offset_writer_p->ref();
 	ct_tree_p->add_controller( world_offset_writer_p );
 
-	this->createBoolAttribute("physics", false, true, "Basic", 300, false, false, "is the pawn physics enabled");
+}
+
+SkSkeleton* SbmPawn::getSkeleton() const
+{
+	return _skeleton;
+}
+
+void SbmPawn::setSkeleton(SkSkeleton* sk)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+
+	if (_skeleton)
+	{
+		ct_tree_p->remove_skeleton( _skeleton->name() );
+		_skeleton->unref();
+//		if( scene_p != NULL )
+//		{
+//			mcu.remove_scene( scene_p );
+//		}
+	}
+	_skeleton = sk;
+	_skeleton->ref();
+	ct_tree_p->add_skeleton( _skeleton->name(), _skeleton );
+
+	if ( mcuCBHandle::singleton().sbm_character_listener )
+	{
+		mcuCBHandle::singleton().sbm_character_listener->OnCharacterUpdate( getName(), "pawn" );
+	}
+	//scene_p->init(_skeleton);
+	//int err = mcu.add_scene(scene_p);
+	dMesh_p->skeleton = _skeleton;
 }
 
 int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
-	if( skeleton_p ) {
-		ct_tree_p->remove_skeleton( skeleton_p->name() );
-		skeleton_p->unref();
+	if( _skeleton ) {
+		ct_tree_p->remove_skeleton( _skeleton->name() );
+		_skeleton->unref();
 	}
-	skeleton_p = new_skeleton_p;
-	if( skeleton_p ) {
-		skeleton_p->ref();
+	_skeleton = new_skeleton_p;
+	if( _skeleton ) {
+		_skeleton->ref();
 		if( init_skeleton()!=CMD_SUCCESS ) {
 			return CMD_FAILURE; 
 		}
-		ct_tree_p->add_skeleton( skeleton_p->name(), skeleton_p );
+		ct_tree_p->add_skeleton( _skeleton->name(), _skeleton );
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		if (mcu.sbm_character_listener)
 		{
-			mcu.sbm_character_listener->OnCharacterChanged(name);
+			mcu.sbm_character_listener->OnCharacterChanged(getName());
 		}
 	}
 
@@ -173,30 +227,34 @@ int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 // 		initPhysicsObj();
 // 	}
 
-	scene_p->init( skeleton_p );  // if skeleton_p == NULL, the scene is cleared
+
+	if (!scene_p)
+	{
+		scene_p = new SkScene();
+		scene_p->ref();
+		scene_p->init( _skeleton );  // if skeleton_p == NULL, the scene is cleared
+	}
 //	dMesh_p->skeleton = new_skeleton_p;		
 	dMesh_p->setSkeleton(new_skeleton_p);
 
 	// Name the controllers
-	string ct_name( name );
+	string ct_name( getName() );
 	ct_name += "'s world_offset writer";
 	world_offset_writer_p->name( ct_name.c_str() );
 
 	return CMD_SUCCESS;
 }
 
-
-
-int SbmPawn::init_skeleton() {
+int SbmPawn::setup() {
 	// Verifiy the joint name is not already in use.
-	if( skeleton_p->search_joint( SbmPawn::WORLD_OFFSET_JOINT_NAME ) ) {
+	if( _skeleton->search_joint( SbmPawn::WORLD_OFFSET_JOINT_NAME ) ) {
 		std::stringstream strstr;
 		strstr << "ERROR: SbmPawn::init_skeleton_offset: Skeleton already contains joint \"" << SbmPawn::WORLD_OFFSET_JOINT_NAME << "\".";
 		LOG(strstr.str().c_str());
 		return( CMD_FAILURE ); 
 	}
 
-	SkJoint* world_offset_joint = skeleton_p->insert_new_root_joint( SkJoint::TypeQuat );
+	SkJoint* world_offset_joint = _skeleton->insert_new_root_joint( SkJoint::TypeQuat );
 	world_offset_joint->name( SbmPawn::WORLD_OFFSET_JOINT_NAME );
 	// Make sure the world_offset accepts new pos and quat values
 	SkJointPos* world_offset_pos = world_offset_joint->pos();
@@ -204,7 +262,49 @@ int SbmPawn::init_skeleton() {
 	world_offset_pos->limits( SkVecLimits::Y, false );
 	world_offset_pos->limits( SkVecLimits::Z, false );
 	world_offset_joint->quat()->activate();
-	skeleton_p->compress();
+	_skeleton->compress();
+
+	if( WORLD_OFFSET_CHANNELS_P.size()==0 ) {
+		std::string world_offset_joint_name( WORLD_OFFSET_JOINT_NAME );
+		WORLD_OFFSET_CHANNELS_P.add( world_offset_joint_name, SkChannel::XPos );
+		WORLD_OFFSET_CHANNELS_P.add( world_offset_joint_name, SkChannel::YPos );
+		WORLD_OFFSET_CHANNELS_P.add( world_offset_joint_name, SkChannel::ZPos );
+		WORLD_OFFSET_CHANNELS_P.add( world_offset_joint_name, SkChannel::Quat );
+	}
+	world_offset_writer_p->init( this, WORLD_OFFSET_CHANNELS_P, true );
+
+	wo_cache.x = 0;
+	wo_cache.y = 0;
+	wo_cache.z = 0;
+	wo_cache.h = 0;
+	wo_cache.p = 0;
+	wo_cache.r = 0;
+
+	if ( mcuCBHandle::singleton().sbm_character_listener )
+	{
+		mcuCBHandle::singleton().sbm_character_listener->OnCharacterUpdate( getName(), "pawn" );
+	}
+	return( CMD_SUCCESS ); 
+}
+
+int SbmPawn::init_skeleton() {
+	// Verifiy the joint name is not already in use.
+	if( _skeleton->search_joint( SbmPawn::WORLD_OFFSET_JOINT_NAME ) ) {
+		std::stringstream strstr;
+		strstr << "ERROR: SbmPawn::init_skeleton_offset: Skeleton already contains joint \"" << SbmPawn::WORLD_OFFSET_JOINT_NAME << "\".";
+		LOG(strstr.str().c_str());
+		return( CMD_FAILURE ); 
+	}
+
+	SkJoint* world_offset_joint = _skeleton->insert_new_root_joint( SkJoint::TypeQuat );
+	world_offset_joint->name( SbmPawn::WORLD_OFFSET_JOINT_NAME );
+	// Make sure the world_offset accepts new pos and quat values
+	SkJointPos* world_offset_pos = world_offset_joint->pos();
+	world_offset_pos->limits( SkVecLimits::X, false );
+	world_offset_pos->limits( SkVecLimits::Y, false );
+	world_offset_pos->limits( SkVecLimits::Z, false );
+	world_offset_joint->quat()->activate();
+	_skeleton->compress();
 
 	init_world_offset_channels();
 	world_offset_writer_p->init( this, WORLD_OFFSET_CHANNELS_P, true );
@@ -221,7 +321,7 @@ int SbmPawn::init_skeleton() {
 
 void SbmPawn::reset_all_channels()
 {
-	SkChannelArray& channels = skeleton_p->channels();
+	SkChannelArray& channels = _skeleton->channels();
 	MeFrameData& frameData = ct_tree_p->getLastFrame();
 	SrBuffer<float>& sr_fbuff = frameData.buffer();
 	int n = channels.size();
@@ -259,7 +359,7 @@ void SbmPawn::init_world_offset_channels() {
 
 
 bool SbmPawn::is_initialized() {
-	return skeleton_p != NULL;
+	return _skeleton != NULL;
 }
 
 int SbmPawn::prune_controller_tree() {
@@ -273,7 +373,7 @@ void SbmPawn::remove_from_scene() {
 	
 	if( scene_p != NULL )
 		mcu.remove_scene( scene_p );
-	mcu.removePawn( name );
+	mcu.removePawn( getName() );
 	// remove the connected steering object for steering space
 	if (steeringSpaceObj_p)
 	{
@@ -317,7 +417,7 @@ SbmPawn::~SbmPawn()	{
 
 	if ( mcuCBHandle::singleton().sbm_character_listener )
 	{
-		mcuCBHandle::singleton().sbm_character_listener->OnCharacterDelete( name );
+		mcuCBHandle::singleton().sbm_character_listener->OnCharacterDelete( getName() );
 	}
 
 	if ( bonebusCharacter )
@@ -334,10 +434,10 @@ SbmPawn::~SbmPawn()	{
 	ct_tree_p->clear();  // Because controllers within reference back to tree root context
 
 	scene_p->unref();
-	if( skeleton_p )
-		skeleton_p->unref();
+	if( _skeleton )
+		_skeleton->unref();
 	ct_tree_p->unref();
-    delete [] name;
+    
 	if (colObj_p)
 		delete colObj_p;
 	if (phyObj_p)
@@ -359,7 +459,7 @@ SbmPawn::~SbmPawn()	{
 
 
 const SkJoint* SbmPawn::get_joint( const char* joint_name ) const {
-	return skeleton_p->search_joint( joint_name );
+	return _skeleton->search_joint( joint_name );
 }
 
 
@@ -403,7 +503,7 @@ void SbmPawn::set_world_offset( float x, float y, float z,
 	world_offset_writer_p->set_data( data );
 	return;
 
-	SkJoint* woj = skeleton_p->search_joint( WORLD_OFFSET_JOINT_NAME );
+	SkJoint* woj = _skeleton->search_joint( WORLD_OFFSET_JOINT_NAME );
 	SkJointPos* woj_pos = woj->pos();
 	woj_pos->value( SkJointPos::X, x );
 	woj_pos->value( SkJointPos::Y, y );
@@ -442,7 +542,7 @@ void SbmPawn::wo_cache_update() {
 	if( joint==NULL )
 	{
 		std::stringstream strstr;
-		strstr << "ERROR: SbmPawn::wo_cache_update(..): \"" << name << "\" does not have a " << WORLD_OFFSET_JOINT_NAME << " joint.";
+		strstr << "ERROR: SbmPawn::wo_cache_update(..): \"" << getName() << "\" does not have a " << WORLD_OFFSET_JOINT_NAME << " joint.";
 		LOG(strstr.str().c_str());
 		return;
 	}
@@ -560,7 +660,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		}		
 
 		pawn_p = new SbmPawn( pawn_name.c_str() );
-		SkSkeleton* skeleton = new SkSkeleton();
+		SkSkeleton* skeleton = new SmartBody::SBSkeleton();
 		skeleton->ref();
 		string skel_name = pawn_name+"-skel";
 		skeleton->name( skel_name.c_str() );
@@ -853,7 +953,7 @@ int SbmPawn::set_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& args,
 	{
 		if (args.calc_num_tokens() == 0)
 		{
-			SkSkeleton* skeleton = pawn->skeleton_p;
+			SkSkeleton* skeleton = pawn->_skeleton;
 			std::vector<SkJoint*>& joints = skeleton->get_joint_array();
 			for (size_t j = 0; j < joints.size(); j++)
 			{
@@ -970,7 +1070,7 @@ int SbmPawn::print_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& arg
 	if( attribute=="world_offset" || attribute=="world-offset" ) {
 		//  Command: print pawn <character id> world_offset
 		//  Print out the current state of the world_offset joint
-		cout << "pawn " << pawn->name << " world_offset:\t";
+		cout << "pawn " << pawn->getName() << " world_offset:\t";
 		const SkJoint* joint = pawn->get_world_offset_joint();
 		if( joint==NULL ) {
 			cout << "No world_offset joint." << endl;
@@ -988,7 +1088,7 @@ int SbmPawn::print_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& arg
 		}
 
 		do {
-			cout << "pawn " << pawn->name << " joint "<<joint_name<<":\t";
+			cout << "pawn " << pawn->getName() << " joint "<<joint_name<<":\t";
 			const SkJoint* joint = pawn->get_joint( joint_name.c_str() );
 			if( joint==NULL ) {
 				LOG("No joint \"%s\".", joint_name.c_str() );
@@ -1027,7 +1127,7 @@ int SbmPawn::create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 
 	pawn_p = new SbmPawn( pawn_and_attribute.c_str() );
 
-	SkSkeleton* skeleton = new SkSkeleton();
+	SkSkeleton* skeleton = new SmartBody::SBSkeleton();
 	skeleton->ref();
 	std::string skel_name = pawn_and_attribute+"-skel";
 	skeleton->name( skel_name.c_str() );
@@ -1155,7 +1255,7 @@ WSP_ERROR SbmPawn::wsp_position_accessor( const std::string id, const std::strin
 	string & char_name = tokens[ 0 ];
 	string & joint_name = tokens[ 1 ];
 
-	SkJoint * joint = pawn_p->skeleton_p->search_joint( joint_name.c_str() );
+	SkJoint * joint = pawn_p->_skeleton->search_joint( joint_name.c_str() );
 	if ( joint != NULL )
 	{
 		joint->update_gmat();
@@ -1194,7 +1294,7 @@ WSP_ERROR SbmPawn::wsp_rotation_accessor( const std::string id, const std::strin
 	string & char_name = tokens[ 0 ];
 	string & joint_name = tokens[ 1 ];
 
-	SkJoint * joint = pawn_p->skeleton_p->search_joint( joint_name.c_str() );
+	SkJoint * joint = pawn_p->_skeleton->search_joint( joint_name.c_str() );
 	if ( joint != NULL )
 	{
 		joint->update_gmat();

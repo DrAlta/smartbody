@@ -56,7 +56,7 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 		int startIndex = character->viseme_channel_start_pos;
 		int endIndex = character->viseme_channel_end_pos;
 
-		SkChannelArray& channels = character->skeleton_p->channels();
+		SkChannelArray& channels = character->getSkeleton()->channels();
 		for (int c = startIndex; c <= endIndex; c++)
 		{
 			std::stringstream strstr;
@@ -92,7 +92,7 @@ void FaceViewer::RefreshCB(Fl_Widget* widget, void* data)
 		iter++)
 	{
 		SbmCharacter* character = (*iter).second;
-		faceViewer->choiceCharacters->add(character->name);
+		faceViewer->choiceCharacters->add(character->getName().c_str());
 	}
 }
 

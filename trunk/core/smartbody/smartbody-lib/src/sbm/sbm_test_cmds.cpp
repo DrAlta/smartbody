@@ -238,7 +238,7 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 					iter != mcu.getCharacterMap().end();
 					iter++)
 				{
-					build_vrX( msg, cmd, (*iter).second->name, recip_id, bml, false );
+					build_vrX( msg, cmd, (*iter).second->getName().c_str(), recip_id, bml, false );
 					mcu.vhmsg_send( cmd, msg.str().c_str() );
 				}
 			} else {
@@ -272,7 +272,7 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 				iter != mcu.getCharacterMap().end();
 				iter++)
 			{
-				build_vrX( msg, cmd, (*iter).second->name, recip_id, bml, true );
+				build_vrX( msg, cmd, (*iter).second->getName().c_str(), recip_id, bml, true );
 
 				//echo.str("");
 				//echo << "echo " << msg.str();

@@ -153,7 +153,7 @@ void ReachHandAction::reachPreCompleteAction( ReachStateData* rd )
 		return;
 	std::string cmd;
 	std::string charName = rd->charName;
-	std::string targetName = targetPawn->name;	
+	std::string targetName = targetPawn->getName();	
 // 	std::string wristName = "r_wrist";
 // 	std::string reachType = "right";
 // 	if (rd->reachType == MeCtReach::REACH_LEFT_ARM)
@@ -177,7 +177,7 @@ void ReachHandAction::reachCompleteAction( ReachStateData* rd )
 
 	std::string cmd;
 	std::string charName = rd->charName;
-	std::string targetName = targetPawn->name;
+	std::string targetName = targetPawn->getName();
 // 	std::string wristName = "r_wrist";
 // 	std::string reachType = "right";
 // 	if (rd->reachType == MeCtReach::REACH_LEFT_ARM)
@@ -235,7 +235,7 @@ void ReachHandAction::pickUpAttachedPawn( ReachStateData* rd )
 		return;
 
 	std::string charName = rd->charName;
-	std::string targetName = attachedPawn->name;
+	std::string targetName = attachedPawn->getName();
 	std::string cmd;
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:source-joint=\"" + "r_wrist" + "\" sbm:attach-pawn=\"" + targetName + "\"/>";
 	cmd = generateAttachCmd(charName,targetName,rd->reachType);
@@ -257,7 +257,7 @@ void ReachHandAction::putDownAttachedPawn( ReachStateData* rd )
 	rd->curHandAction->sendReachEvent(cmd);
 	std::string targetName = "";	
 	if (attachedPawn)
-		targetName = attachedPawn->name;
+		targetName = attachedPawn->getName();
 	cmd = "pawn " + targetName + " physics on";
 	rd->curHandAction->sendReachEvent(cmd);
 }

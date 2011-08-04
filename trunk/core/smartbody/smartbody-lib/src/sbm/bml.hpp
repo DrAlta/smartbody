@@ -72,7 +72,7 @@ namespace BML {
 	// Class Definitions
 	class BmlRequest {
 	public:
-		const SbmCharacter   *actor;
+		SbmCharacter   *actor;
 		const std::string    actorId;  // in case referenced via an alias
 
 		const std::string    requestId;
@@ -107,9 +107,9 @@ namespace BML {
 
 	protected:
 #if VRAGENTBML_USES_RECIPIENT
-		BmlRequest( const SbmCharacter* agent, const std::string& actorId, const std::string& requestId, const std::string& recipientId, const std::string & msgId, const XERCES_CPP_NAMESPACE::DOMDocument* doc );
+		BmlRequest( SbmCharacter* agent, const std::string& actorId, const std::string& requestId, const std::string& recipientId, const std::string & msgId, const XERCES_CPP_NAMESPACE::DOMDocument* doc );
 #else
-		BmlRequest( const SbmCharacter* agent, const std::string& actorId, const std::string& requestId, const std::string & msgId, const  XERCES_CPP_NAMESPACE::DOMDocument* doc );
+		BmlRequest( SbmCharacter* agent, const std::string& actorId, const std::string& requestId, const std::string & msgId, const  XERCES_CPP_NAMESPACE::DOMDocument* doc );
 #endif
 		void init( BmlRequestPtr self );
 

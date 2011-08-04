@@ -102,6 +102,12 @@ class SrMat
     /*! const version of operator(), implemented inline */
     float get ( int i, int j ) const { return e[i*4+j]; }
 
+	/*! returns data at ith column and jth row */
+    float getData ( int i, int j ) const { return e[i*4+j]; }
+
+    /*! sets data at ith column and jth row */
+    void setData ( int i, int j, float v ) { e[i*4+j] = v; }
+
     float& e11 () { return e[0]; } //!< Returns a reference to the element [0]
     float& e12 () { return e[1]; } //!< Returns a reference to the element [1]
     float& e13 () { return e[2]; } //!< Returns a reference to the element [2]

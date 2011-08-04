@@ -25,7 +25,7 @@
 #define ME_CT_EXAMPLES_H
 
 #include <sk/sk_skeleton.h>
-#include <me/me_controller.h>
+#include <sbm/SBController.h>
 
 #include "gwiz_math.h"
 
@@ -38,7 +38,7 @@
 
 ///////////////////////////////////////////////////////////////////////////
 
-class MeCtHeadOrient : public MeController	{
+class MeCtHeadOrient : public SmartBody::SBController	{
 	
 	public:
 		MeCtHeadOrient();
@@ -70,7 +70,7 @@ class MeCtHeadOrient : public MeController	{
 
 ///////////////////////////////////////////////////////////////////////////
 
-class MeCtSimpleTilt : public MeController	{
+class MeCtSimpleTilt : public SmartBody::SBController	{
 	
 	public:
 		MeCtSimpleTilt();
@@ -99,7 +99,7 @@ class MeCtSimpleTilt : public MeController	{
 
 ///////////////////////////////////////////////////////////////////////////
 
-class MeCtSimpleNod : public MeController	{
+class MeCtSimpleNod : public SmartBody::SBController	{
 	
 	public:
 		enum nod_axis_enum_set	{

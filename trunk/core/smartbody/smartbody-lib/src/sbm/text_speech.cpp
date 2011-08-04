@@ -181,7 +181,7 @@ std::vector<VisemeData*>* text_speech::extractVisemes(DOMNode* node, vector<Vise
 }
 
 
-std::vector<VisemeData*>* text_speech::getVisemes( RequestId requestId, const SbmCharacter* character) {
+std::vector<VisemeData*>* text_speech::getVisemes( RequestId requestId, SbmCharacter* character) {
 
 	/**
         *  If the request has been processed, returns the time ordered vector 
@@ -281,7 +281,7 @@ char* text_speech::getSpeechAudioFilename( RequestId requestId ){
 	return NULL;
 }
 
-char* text_speech::getSpeechPlayCommand( RequestId requestId, const SbmCharacter* character ){
+char* text_speech::getSpeechPlayCommand( RequestId requestId,  SbmCharacter* character ){
 	stringstream ss;
 	ss << requestId;
 	std::string play = "text_speech " + ss.str();
@@ -290,6 +290,6 @@ char* text_speech::getSpeechPlayCommand( RequestId requestId, const SbmCharacter
 	return result;
 }
 
-char* text_speech::getSpeechStopCommand( RequestId requestId, const SbmCharacter* character ){
+char* text_speech::getSpeechStopCommand( RequestId requestId, SbmCharacter* character ){
 	return (char*)"";
 }

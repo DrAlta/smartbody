@@ -352,7 +352,7 @@ void PanimationWindow::loadCharacters(Fl_Choice* characterList)
 		iter++)
 	{
 		SbmCharacter* character = (*iter).second;
-		characterList->add(character->name);
+		characterList->add(character->getName().c_str());
 	}
 	characterList->value(0);
 }

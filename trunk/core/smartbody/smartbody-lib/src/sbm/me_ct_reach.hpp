@@ -22,7 +22,7 @@
 
 #pragma once
 #include <sk/sk_skeleton.h>
-#include <me/me_controller.h>
+#include <sbm/SBController.h>
 #include "me_ct_limb.hpp"
 #include "me_ct_reach_IK.hpp"
 #include "gwiz_math.h"
@@ -30,7 +30,7 @@
 typedef std::pair<int,SkMotion*> TagMotion; // pair the motion with a tag
 typedef std::set<TagMotion> MotionDataSet;
 
-class MeCtReach : public MeController
+class MeCtReach : public SmartBody::SBController
 {
 private:
 	static const char* CONTROLLER_TYPE;
@@ -40,6 +40,7 @@ public:
 	enum ReachArm { REACH_LEFT_ARM = 1, REACH_RIGHT_ARM };
 
 public:	
+	MeCtReach();
 	MeCtReach(SkSkeleton* skeleton);
 	~MeCtReach(void);
 

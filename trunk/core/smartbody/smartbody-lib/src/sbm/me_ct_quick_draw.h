@@ -29,7 +29,7 @@
 #include <sr/sr_buffer.h>
 #include <sk/sk_motion.h>
 #include <sk/sk_skeleton.h>
-#include <me/me_controller.h>
+#include <sbm/SBController.h>
 
 #include "gwiz_math.h"
 
@@ -66,7 +66,7 @@ Testing sequence:
         seq sbm-qdraw
 */
 
-class MeCtQuickDraw : public MeController	{ 
+class MeCtQuickDraw : public SmartBody::SBController	{ 
 
 	private:
 //		enum aim_coord_enum_set	{

@@ -45,14 +45,10 @@ public:
 	SkMotion* left;
 	SkMotion* right;
 
-	ActionUnit( SkMotion* unified ) :
+	ActionUnit(SkMotion* unified ) :
 		left( unified ),
 		right( unified )
 	{
-		if (left)
-			left->ref();
-		if (right)
-			right->ref();
 		m_isLeft = false;
 		m_isRight = false;
 		m_isBilateral = true;
@@ -62,13 +58,24 @@ public:
 		left( left ),
 		right( right )
 	{
-		
+	}
+
+	ActionUnit(ActionUnit* source)
+	{
+		if (source->is_left())
+			set_left();
+		if (source->is_right())
+			set_right();
+		if (source->is_bilateral())
+			set_bilateral();
+		left = source->left;
 		if (left)
 			left->ref();
+		right = source->right;
 		if (right)
 			right->ref();
 	}
-
+	
 	~ActionUnit()
 	{
 		if (left)
@@ -111,17 +118,9 @@ public:
 		set( motion, motion );
 	}
 
-	void set( SkMotion* l, SkMotion* r ) {
-		if (left)
-			left->unref();
-		if (right)
-			right->unref();
-		left	= l;
-		if (left)
-			left->ref();
-		right	= r;
-		if (right)
-			right->ref();
+	void set( SkMotion* left, SkMotion* right ) {
+		this->left	= left;
+		this->right	= right;
 	}
 
 	protected:
@@ -129,17 +128,5 @@ public:
 		bool m_isRight;
 		bool m_isBilateral;
 };
-
-
-
-/**
- *  An action unit with SkChannel components.
- *
- *  Use in the mcuCBHandle.
- */
-typedef ActionUnit										AUMotion;
-typedef boost::intrusive_ptr< AUMotion >				AUMotionPtr;
-typedef std::map< int, AUMotionPtr >					AUMotionMap;
-
 
 #endif // SBM_ActionUnit_HPP

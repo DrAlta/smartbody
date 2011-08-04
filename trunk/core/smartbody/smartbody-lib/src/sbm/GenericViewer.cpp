@@ -1,5 +1,9 @@
 #include "GenericViewer.h"
 
+GenericViewer::GenericViewer()
+{
+}
+
 GenericViewer::GenericViewer(int x, int y, int w, int h)
 {
 }

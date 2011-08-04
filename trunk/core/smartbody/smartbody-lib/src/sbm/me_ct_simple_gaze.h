@@ -24,7 +24,7 @@
 #define ME_CT_SIMPLE_GAZE_H
 
 #include <sk/sk_skeleton.h>
-#include <me/me_controller.h>
+#include <sbm/SBController.h>
 
 #include "gwiz_math.h"
 
@@ -86,7 +86,7 @@ class MeCtSimpleGazeJoint	{
 		SkJoint* joint_p;
 };
 
-class MeCtSimpleGaze : public MeController	{
+class MeCtSimpleGaze : public SmartBody::SBController	{
 	
 	public:
 		static const char* type_name;

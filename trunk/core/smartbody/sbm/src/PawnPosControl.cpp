@@ -42,7 +42,7 @@ void PawnControl::detach_pawn()
 SrVec PawnControl::get_pawn_pos(SbmPawn* pawn)
 {
 	SrVec pos;
-	pawn->skeleton_p->update_global_matrices();	
+	pawn->getSkeleton()->update_global_matrices();	
 	float x,y,z,h,p,r;
 	pawn->get_world_offset(x,y,z,h,p,r);	
 	pos.x = x; pos.y = y; pos.z = z;
@@ -66,7 +66,7 @@ void PawnControl::set_pawn_pos(SbmPawn* pawn, SrVec& pos)
 SrQuat PawnControl::get_pawn_rot( SbmPawn* pawn )
 {
 	SrQuat rot;
-	pawn->skeleton_p->update_global_matrices();	
+	pawn->getSkeleton()->update_global_matrices();	
 	float x,y,z,h,p,r;
 	pawn->get_world_offset(x,y,z,h,p,r);	
 	gwiz::quat_t q = gwiz::euler_t(p,h,r);	
@@ -77,7 +77,7 @@ SrQuat PawnControl::get_pawn_rot( SbmPawn* pawn )
 void PawnControl::set_pawn_rot( SbmPawn* pawn, SrQuat& quat )
 {
 	SrQuat rot;
-	pawn->skeleton_p->update_global_matrices();	
+	pawn->getSkeleton()->update_global_matrices();	
 	float x,y,z,h,p,r;
 	pawn->get_world_offset(x,y,z,h,p,r);
 	gwiz::quat_t q = gwiz::quat_t(quat.w,quat.x,quat.y,quat.z);

@@ -246,7 +246,7 @@ static void get_pawn_submenus(void* user_data,SrArray<Fl_Menu_Item>& menu_list)
 	{
 		SbmPawn* pawn = pawn_list[i];
 		//printf("pawn name = %s\n",pawn->name);
-		Fl_Menu_Item temp_pawn = { pawn->name, 0, MCB, user_data } ;
+		Fl_Menu_Item temp_pawn = { pawn->getName().c_str(), 0, MCB, user_data } ;
 		menu_list.push(temp_pawn);		
 	}
 
@@ -1032,7 +1032,7 @@ void FltkViewer::draw()
 		//pawn_p->ct_tree_p->evaluate( time );
 		//pawn_p->ct_tree_p->applyBufferToAllSkeletons();
 
-		SbmCharacter* char_p = mcu.getCharacter(pawn->name );
+		SbmCharacter* char_p = mcu.getCharacter(pawn->getName() );
 		if( char_p )
 		{
 
@@ -1239,7 +1239,7 @@ void FltkViewer::translate_keyboard_state()
 		if (counter == _locoData->char_index)
 		{
 			character = (*iter).second;
-			sprintf(_locoData->character, "char %s ", character->name);
+			sprintf(_locoData->character, "char %s ", character->getName().c_str());
 		}
 		counter++;
 	}
@@ -1564,9 +1564,9 @@ void FltkViewer::translate_keyboard_state()
 		if (_paLocoData->starting && _paLocoData->prevStarting && state && state->stateName == PseudoIdleState)
 		{
 			std::stringstream command1;
-			command1 << "panim schedule char " << _paLocoData->character->name << " state UtahStopToWalk loop false playnow false";
+			command1 << "panim schedule char " << _paLocoData->character->getName() << " state UtahStopToWalk loop false playnow false";
 			std::stringstream command2;
-			command2 << "panim schedule char " << _paLocoData->character->name << " state UtahLocomotion loop true playnow false";
+			command2 << "panim schedule char " << _paLocoData->character->getName() << " state UtahLocomotion loop true playnow false";
 			mcu.execute((char*)command1.str().c_str());
 			mcu.execute((char*)command2.str().c_str());
 			_paLocoData->starting = false;
@@ -1574,17 +1574,17 @@ void FltkViewer::translate_keyboard_state()
 		else if (_paLocoData->stopping && _paLocoData->prevStopping && state && state->stateName == "UtahLocomotion")
 		{
 			std::stringstream command;
-			command << "panim schedule char " << _paLocoData->character->name << " state UtahWalkToStop loop false playnow false";
+			command << "panim schedule char " << _paLocoData->character->getName() << " state UtahWalkToStop loop false playnow false";
 			mcu.execute((char*)command.str().c_str());
 			_paLocoData->stopping = false;
 		}
 		else if (_paLocoData->jumping && _paLocoData->prevJumping && state && state->stateName == "UtahLocomotion")
 		{
 			std::stringstream command1;
-			command1 << "panim schedule char " << _paLocoData->character->name << " state UtahJump loop false playnow false";
+			command1 << "panim schedule char " << _paLocoData->character->getName() << " state UtahJump loop false playnow false";
 			mcu.execute((char*)command1.str().c_str());	
 			std::stringstream command2;
-			command2 << "panim schedule char " << _paLocoData->character->name << " state UtahLocomotion loop true playnow false ";
+			command2 << "panim schedule char " << _paLocoData->character->getName() << " state UtahLocomotion loop true playnow false ";
 			for (int i = 0; i < state->getNumMotions(); i++)
 				command2 << state->weights[i] << " ";
 			mcu.execute((char*)command2.str().c_str());
@@ -1764,7 +1764,7 @@ int FltkViewer::handle ( int event )
 					 //std::string cmd;
 					 //cmd = "bml char " + curChar->name + " <sbm:reach sbm:handle=\"r" + curChar->name + "\" action=\"pick-up\" target=\""+ selectedPawn->name + "\" />";
 					 //sprintf(exe_cmd,"bml char %s <sbm:reach sbm:handle=\"r%s\" sbm:reach-duration=\"0.01\" sbm:action=\"pick-up\" target=\"%s\"/>",curChar->name,curChar->name,selectedPawn->name);
-					 sprintf(exe_cmd,"bml char %s <sbm:reach sbm:reach-duration=\"-1.0\" sbm:action=\"touch\" target=\"%s\"/>",curChar->name,selectedPawn->name);
+					 sprintf(exe_cmd,"bml char %s <sbm:reach sbm:reach-duration=\"-1.0\" sbm:action=\"touch\" target=\"%s\"/>",curChar->getName().c_str(),selectedPawn->getName().c_str());
 
 					 mcuCBHandle& mcu = mcuCBHandle::singleton();
 					 mcu.execute(exe_cmd);
@@ -1797,7 +1797,7 @@ int FltkViewer::handle ( int event )
 				 SrPlane ground(SrVec(0,curChar->getHeight()*0.0f,0), SrVec(0, 1, 0));
 				 SrVec dest = ground.intersect(p1, p2);
 				 dest.y = curChar->getHeight()*0.6f;
-				 sprintf(exe_cmd,"bml char %s <sbm:reach sbm:handle=\"r%s\" sbm:action=\"put-down\" sbm:target-pos=\"%f %f %f\"/>",curChar->name,curChar->name,dest.x,dest.y,dest.z);
+				 sprintf(exe_cmd,"bml char %s <sbm:reach sbm:handle=\"r%s\" sbm:action=\"put-down\" sbm:target-pos=\"%f %f %f\"/>",curChar->getName().c_str(),curChar->getName().c_str(),dest.x,dest.y,dest.z);
 				 mcuCBHandle& mcu = mcuCBHandle::singleton();
 				 mcu.execute(exe_cmd);	 
 			 }
@@ -1814,7 +1814,7 @@ int FltkViewer::handle ( int event )
 			SrVec dest = ground.intersect(p1, p2);
 			dest.y = _paLocoData->character->getHeight() / 100.0f;
 			std::stringstream command;
-			command << "steer move " << _paLocoData->character->name << " " << dest.x << " " << dest.y << " " << dest.z;
+			command << "steer move " << _paLocoData->character->getName() << " " << dest.x << " " << dest.y << " " << dest.z;
 			mcuCBHandle::singleton().execute((char*)command.str().c_str());
 		 }
        } break;
@@ -2019,7 +2019,7 @@ int FltkViewer::handle_object_manipulation( const SrEvent& e)
 			_objManipulator.picking(e.mouse.x, e.mouse.y, _data->camera);
 			SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
 			if (selectedPawn)
-				if (selectedPawn->name != _paLocoData->character->name)
+				if (selectedPawn->getName() != _paLocoData->character->getName())
 				{
 					SbmCharacter* selectedCharacter = dynamic_cast<SbmCharacter*> (selectedPawn);
 					if (selectedCharacter)
@@ -2085,7 +2085,7 @@ void FltkViewer::set_reach_target( int itype, const char* targetname )
 		if (strcmp(targetname,"selected pawn")==0)
 		{
 			if (pawn)
-				strcpy(pawn_name,pawn->name);
+				strcpy(pawn_name,pawn->getName().c_str());
 			else
 			{
 				// handle user error : call set target command without selecting a pawn target.
@@ -2094,7 +2094,7 @@ void FltkViewer::set_reach_target( int itype, const char* targetname )
 		else
 			strcpy(pawn_name,targetname);
 
-		sprintf(exe_cmd,"bml char %s <sbm:reach target=\"%s\" reach-arm=\"%s\"/>",actor->name,pawn_name,reach_type[itype]);
+		sprintf(exe_cmd,"bml char %s <sbm:reach target=\"%s\" reach-arm=\"%s\"/>",actor->getName().c_str(),pawn_name,reach_type[itype]);
 		mcu.execute_later(exe_cmd,1.0); // delay execution for one second to avoid popping
 	}
 }
@@ -2119,7 +2119,7 @@ void FltkViewer::set_gaze_target(int itype, const char* label)
 
 	if (actor && itype == -1)
 	{
-		sprintf(exe_cmd,"char %s gazefade out 0",actor->name);	
+		sprintf(exe_cmd,"char %s gazefade out 0",actor->getName().c_str());	
 		mcu.execute(exe_cmd);
 		return;
 	}
@@ -2136,7 +2136,7 @@ void FltkViewer::set_gaze_target(int itype, const char* label)
 		if (strcmp(label,"selected pawn")==0)
 		{
 			if (pawn)
-				strcpy(pawn_name,pawn->name);
+				strcpy(pawn_name,pawn->getName().c_str());
 			else
 			{
 				// handle user error : call set target command without selecting a pawn target.
@@ -2145,7 +2145,7 @@ void FltkViewer::set_gaze_target(int itype, const char* label)
 		else
 			strcpy(pawn_name,label);
 
-		sprintf(exe_cmd,"bml char %s <gaze target=\"%s\" sbm:joint-range=\"%s\"/>",actor->name,pawn_name,gaze_type[itype]);
+		sprintf(exe_cmd,"bml char %s <gaze target=\"%s\" sbm:joint-range=\"%s\"/>",actor->getName().c_str(),pawn_name,gaze_type[itype]);
 		mcu.execute(exe_cmd);
 	}
 }
@@ -2382,9 +2382,9 @@ void FltkViewer::drawEyeBeams()
 		iter++)
 	{
 		SbmCharacter* character = (*iter).second;
-		character->skeleton_p->invalidate_global_matrices();
-		character->skeleton_p->update_global_matrices();
-		SkJoint* eyeRight = character->skeleton_p->search_joint("eyeball_right");
+		character->getSkeleton()->invalidate_global_matrices();
+		character->getSkeleton()->update_global_matrices();
+		SkJoint* eyeRight = character->getSkeleton()->search_joint("eyeball_right");
 		float eyebeamLength = 100 * character->getHeight() / 175.0f;
 		if (eyeRight)
 		{
@@ -2398,7 +2398,7 @@ void FltkViewer::drawEyeBeams()
 			glEnd();
 			glPopMatrix();
 		}
-		SkJoint* eyeLeft = character->skeleton_p->search_joint("eyeball_left");
+		SkJoint* eyeLeft = character->getSkeleton()->search_joint("eyeball_left");
 		if (eyeLeft)
 		{
 			SrMat gmat = eyeLeft->gmat();
@@ -2444,7 +2444,7 @@ void FltkViewer::drawEyeLids()
 			continue;
 		}
 
-		character->skeleton_p->update_global_matrices();
+		character->getSkeleton()->update_global_matrices();
 		
 		float upperHi;
 		float upperLo;
@@ -2454,10 +2454,10 @@ void FltkViewer::drawEyeLids()
 		float lowerLo;
 		eyelidCt->get_lower_lid_range(lowerLo, lowerHi);
 
-		SkJoint* eyeLidUpperRight = character->skeleton_p->search_joint("upper_eyelid_right");
-		SkJoint* eyeLidUpperLeft = character->skeleton_p->search_joint("upper_eyelid_left");
-		SkJoint* eyeLidLowerRight = character->skeleton_p->search_joint("lower_eyelid_right");
-		SkJoint* eyeLidLowerLeft = character->skeleton_p->search_joint("lower_eyelid_left");
+		SkJoint* eyeLidUpperRight = character->getSkeleton()->search_joint("upper_eyelid_right");
+		SkJoint* eyeLidUpperLeft = character->getSkeleton()->search_joint("upper_eyelid_left");
+		SkJoint* eyeLidLowerRight = character->getSkeleton()->search_joint("lower_eyelid_right");
+		SkJoint* eyeLidLowerLeft = character->getSkeleton()->search_joint("lower_eyelid_left");
 
 		glPointSize(10);
 		float range = character->getHeight() / 175.0f * 2.0f;
@@ -2632,13 +2632,13 @@ void FltkViewer::drawPawns()
 		iter++)
 	{
 		SbmPawn* pawn = (*iter).second;
-		if (!pawn->skeleton_p) // wouldn't this will go into inf loop ?
+		if (!pawn->getSkeleton()) // wouldn't this will go into inf loop ?
 			continue;
 		SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
 		if (character)
 			continue;
-		pawn->skeleton_p->update_global_matrices();
-		std::vector<SkJoint*>& joints = pawn->skeleton_p->get_joint_array();		
+		pawn->getSkeleton()->update_global_matrices();
+		std::vector<SkJoint*>& joints = pawn->getSkeleton()->get_joint_array();		
 		//glColor3f(1.0f, 1.0f, 0.0f);
 		SrMat gmat = joints[0]->gmat();
 		
@@ -3312,9 +3312,9 @@ void FltkViewer::drawLocomotion()
 			if (!character->param_animation_ct)
 				return;
 			std::string baseJointName = character->param_animation_ct->getBaseJointName();
-			SkJoint* baseJ = character->skeleton_p->search_joint(baseJointName.c_str());
+			SkJoint* baseJ = character->getSkeleton()->search_joint(baseJointName.c_str());
 			if (!baseJ) return;
-			character->skeleton_p->update_global_matrices();
+			character->getSkeleton()->update_global_matrices();
 			SrMat baseGM = baseJ->gmat();
 			SrVec baseVec = SrVec(baseGM.get(12), baseGM.get(13), baseGM.get(14));
 			if (character->trajectoryBuffer.size() >= SbmCharacter::trajectoryLength)
@@ -3375,9 +3375,9 @@ void FltkViewer::drawDynamics()
 			iter++)
 	{
 		SbmCharacter* character = (*iter).second;
-		character->skeleton_p->update_global_matrices();
+		character->getSkeleton()->update_global_matrices();
 
-		const std::vector<SkJoint*>& joints = character->skeleton_p->joints();
+		const std::vector<SkJoint*>& joints = character->getSkeleton()->joints();
 		
 		int numJoints = 0;
 		float totalMass = 0;
@@ -3423,26 +3423,26 @@ void FltkViewer::drawDynamics()
 			// get the heel/toe points for the left and right foot
 			SrVec polygon[4];
 			// left heel, toe
-			SkJoint* leftFoot = character->skeleton_p->search_joint("l_ankle");
+			SkJoint* leftFoot = character->getSkeleton()->search_joint("l_ankle");
 			if (leftFoot)
 			{
 				SrMat gmat = leftFoot->gmat();
 				polygon[0].set(*gmat.pt(12), *gmat.pt(13), *gmat.pt(14)); 
 			}
-			SkJoint* leftToe = character->skeleton_p->search_joint("l_toe");
+			SkJoint* leftToe = character->getSkeleton()->search_joint("l_toe");
 			if (leftToe)
 			{
 				SrMat gmat  = leftToe->gmat();
 				polygon[1].set(*gmat.pt(12), *gmat.pt(13), *gmat.pt(14)); 
 			}			
 			// right heel, toe
-			SkJoint* rightFoot =character->skeleton_p->search_joint("r_ankle");
+			SkJoint* rightFoot =character->getSkeleton()->search_joint("r_ankle");
 			if (rightFoot)
 			{
 				SrMat gmat = rightFoot->gmat();
 				polygon[3].set(*gmat.pt(12), *gmat.pt(13), *gmat.pt(14)); 
 			}
-			SkJoint* rightToe = character->skeleton_p->search_joint("r_toe");
+			SkJoint* rightToe = character->getSkeleton()->search_joint("r_toe");
 			if (rightToe)
 			{
 				SrMat gmat = rightToe->gmat();
@@ -3607,7 +3607,7 @@ void FltkViewer::drawReach()
 		if (!rd)
 			return;
 		
-		SkJoint* root = character->skeleton_p->root();
+		SkJoint* root = character->getSkeleton()->root();
 		SrMat rootMat = rd->gmat;//root->gmat();
 		//rootMat.translation(root->gmat().get(12),root->gmat().get(13),root->gmat().get(14));
 		const std::vector<SrVec>& exampleData = re->examplePts;

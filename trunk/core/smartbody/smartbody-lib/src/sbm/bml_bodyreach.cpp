@@ -82,7 +82,7 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	std::map<int,MeCtReachEngine*>& reMap = curCharacter->getReachEngineMap();
 	if (reMap.size() == 0)
 	{
-		LOG("Character : %s, no reach engine initialized.",request->actor->name);
+		LOG("Character : %s, no reach engine initialized.", request->actor->getName().c_str());
 		return BehaviorRequestPtr();
 	}
 

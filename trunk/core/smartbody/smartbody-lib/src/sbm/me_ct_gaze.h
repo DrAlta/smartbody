@@ -26,7 +26,7 @@
 #define ME_CT_GAZE_H
 
 #include <sk/sk_skeleton.h>
-#include <me/me_controller.h>
+#include <sbm/SBController.h>
 
 #include "gwiz_math.h"
 #include "me_ct_gaze_joint.h"
@@ -71,7 +71,7 @@ class MeCtGazeKey	{
 		float 	smooth;
 };
 
-class MeCtGaze : public MeController	{
+class MeCtGaze : public SmartBody::SBController	{
 	
 	private:
 		enum timing_mode_enum_set	{

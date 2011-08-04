@@ -106,7 +106,7 @@ int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			iter != mcu_p->getCharacterMap().end();
 			iter++)
 		{
-			(*iter).second->get_locomotion_ct()->print_info(actor->name);
+			(*iter).second->get_locomotion_ct()->print_info(actor->getName());
 		}
 		return CMD_SUCCESS;
 	}

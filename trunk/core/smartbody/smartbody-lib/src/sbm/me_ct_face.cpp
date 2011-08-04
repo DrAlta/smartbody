@@ -25,6 +25,7 @@
 #include "gwiz_math.h"
 #include "me_ct_face.h"
 #include <vhcl_log.h>
+#include <sstream>
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -63,12 +64,56 @@ void MeCtFace::clear( void )	{
 	_baseChannelToBufferIndex.clear();
 }
 
-void MeCtFace::init(SbmPawn* pawn,  SkMotion* base_ref_p) {
+void MeCtFace::init( FaceDefinition* faceDefinition) {
 	
 	clear();
+	MeController::init(NULL);
+
+	if (!faceDefinition->getFaceNeutral())
+		return;
+
+	int numAUs = faceDefinition->getNumAUs();
+	for (int a = 0; a < numAUs; a++)
+	{
+		int auNum = faceDefinition->getAUNum(a);
+		std::stringstream id;
+		id << auNum;
+		ActionUnit* au = faceDefinition->getAU(auNum);
+		if( au->is_left() )
+		{
+			std::string name = "au_";
+			name += id.str();
+			name += "_left";
+			add_key( name.c_str(), au->left);
+		}
+		if( au->is_right() )
+		{
+			std::string name = "au_";
+			name += id.str();
+			name += "_right";
+			add_key( name.c_str(), au->right);
+		}
+		if( au->is_bilateral() )
+		{
+			std::string name = "au_";
+			name += id.str();
+			add_key( name.c_str(), au->left);
+		}
+	}
+
+	// add the visemes
+	int numVisemes = faceDefinition->getNumVisemes();
+	for (int v = 0; v < numVisemes; v++)
+	{
+		std::string visemeName = faceDefinition->getVisemeName(v);
+		SkMotion* motion = faceDefinition->getVisemeMotion(visemeName);
+		if( motion )
+			add_key( visemeName.c_str(), motion );
+	}
 	
-	if( base_ref_p )	{
-		_base_pose_p = base_ref_p;
+	SkMotion* faceNeutral = faceDefinition->getFaceNeutral();
+	if ( faceNeutral )	{
+		_base_pose_p = faceNeutral;
 		_base_pose_p->ref();
 		_base_pose_p->move_keytimes( 0.0 ); // make sure motion starts at 0
 
@@ -79,7 +124,8 @@ void MeCtFace::init(SbmPawn* pawn,  SkMotion* base_ref_p) {
 			_include_chan_flag[ i ] = 1;
 			_channels.add( mchan_arr.name( i ), mchan_arr.type( i ) );
 		}
-		MeController::init(pawn);
+		
+		finish_adding();
 
 #define DEFAULT_REMOVE_EYEBALLS 1
 #if DEFAULT_REMOVE_EYEBALLS
@@ -87,9 +133,6 @@ void MeCtFace::init(SbmPawn* pawn,  SkMotion* base_ref_p) {
 		remove_joint( "eyeball_right" );
 #endif
 
-	}
-	else	{
-		LOG( "MeCtFace::init ERR: base_ref_p is NULL\n" );
 	}
 }
 
@@ -151,8 +194,11 @@ void MeCtFace::remove_channel( const char *joint_name, SkChannel::Type ch_type )
 
 void MeCtFace::add_key( const char *weight_key, SkMotion* key_pose_p ) {
 	
-	key_pose_p->ref();
-	key_pose_p->move_keytimes( 0.0 );
+	if (key_pose_p)
+	{
+		key_pose_p->ref();
+		key_pose_p->move_keytimes( 0.0 );
+	}
 	_key_pose_map.insert( weight_key, key_pose_p );
 	
 	_channels.add( weight_key, SkChannel::XPos );
@@ -165,6 +211,9 @@ void MeCtFace::finish_adding( void )	{
 
 	_visemeChannelMap.clear();
 	_key_pose_map.reset();
+
+	if (!_base_pose_p)
+		return;
 
 	// get a map from the base channel index to the base buffer index
 	SkChannelArray& baseChannelArray = _base_pose_p->channels();
@@ -188,7 +237,7 @@ void MeCtFace::finish_adding( void )	{
 		{
 			SkChannel& channel = nextKey->channels()[c];
 			std::string jointName = nextKey->channels().name(c);
-			int baseChannelIndex = _base_pose_p->channels().search(jointName.c_str(), channel.type);
+			int baseChannelIndex = _base_pose_p->channels().search(jointName, channel.type);
 			if (baseChannelIndex >= 0)
 			{
 				keyIndices.push_back(baseChannelIndex); // mapping from the key pose channel index to the base pose channel index
@@ -230,8 +279,8 @@ void MeCtFace::controller_map_updated( void ) {
 		const int num_base_chans = base_channels.size();
 		int num_key_chans = _key_pose_map.get_num_entries();
 
-		_bChan_to_buff.size( num_base_chans );
-		_kChan_to_buff.size( num_key_chans );
+		_bChan_to_buff.resize( num_base_chans );
+		_kChan_to_buff.resize( num_key_chans );
 
 		if( _context ) {
 
@@ -253,8 +302,10 @@ void MeCtFace::controller_map_updated( void ) {
 			}
 		} 
 		else {
-			_bChan_to_buff.setall( -1 );
-			_kChan_to_buff.setall( -1 );
+			for (size_t x = 0; x < _bChan_to_buff.size(); x++)
+				_bChan_to_buff[x] = -1;
+			for (size_t x = 0; x < _kChan_to_buff.size(); x++)
+				_kChan_to_buff[x] = -1;
 		}
 	}
 }
@@ -272,6 +323,11 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 
 	float *fbuffer = &( frame.buffer()[0] );
 	SkChannelArray& base_channels = _base_pose_p->channels();
+	if (_base_pose_p == NULL)
+	{
+		continuing = false;
+		return continuing;
+	}
 	int nchan = base_channels.size();
 	float * base_pose_buff_p = _base_pose_p->posture( 0 );
 
