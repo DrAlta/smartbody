@@ -26,6 +26,8 @@
 const char* MeCtParamAnimation::Context::CONTEXT_TYPE = "MeCtParamAnimation::Context";
 const char* MeCtParamAnimation::CONTROLLER_TYPE = "MeCtParamAnimation";
 
+#define debug 0
+
 void MeCtParamAnimation::Context::child_channels_updated( MeController* child )
 {
 }
@@ -68,6 +70,7 @@ double MeCtParamAnimation::controller_duration()
 
 bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 {
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	double timeStep = t - prevGlobalTime;
 	prevGlobalTime = t;
 	autoScheduling(t);
@@ -106,8 +109,8 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 					LOG("would start state %s now", nextStateModule->data->stateName.c_str());
 				// should not delete, just swap the pointers
 				curStateModule = nextStateModule;
+				curStateModule->active = true;
 				nextStateModule = NULL;
-				nextStateModule->active = true;
 				delete transitionManager;
 				transitionManager = NULL;
 				return true;
@@ -137,6 +140,59 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 				nextStateModule->evaluate(timeStep, buffer2);
 				transitionManager->blending(frame.buffer(), buffer1, buffer2, transformMat, curStateModule->woManager->getBaseTransformMat(), nextStateModule->woManager->getBaseTransformMat(), timeStep, _context);
 				updateWo(transformMat, woWriter, frame.buffer());
+
+#if debug
+				std::cout << "current state " << curStateModule->data->stateName << " " << curStateModule->timeManager->localTime << std::endl;
+				std::cout << "next state " << nextStateModule->data->stateName << " " << nextStateModule->timeManager->localTime << std::endl;
+
+				// creating two extra characters just to check out the blending
+				std::string name1 = std::string(character->getName()) + "1";
+				SbmCharacter* c1 = mcu.getCharacter(name1);
+				if (!c1)
+				{
+					std::string command = "char " + name1 + " init common.sk";
+					mcu.execute((char *)command.c_str());
+					std::string command1 = "char " + name1 + " mesh brad";
+					mcu.execute((char *)command1.c_str());
+				}
+				std::string name2 = std::string(character->getName()) + "2";
+				SbmCharacter* c2 = mcu.getCharacter(name2);
+				if (!c2)
+				{
+					std::string command = "char " + name2 + " init common.sk";
+					mcu.execute((char *)command.c_str());
+					std::string command1 = "char " + name2 + " mesh brad";
+					mcu.execute((char *)command1.c_str());
+				}
+				if (c1 && c2)
+				{
+					// world offset translation
+					int woPosChanId = _context->channels().search("world_offset", SkChannel::XPos);
+					int woPosBufferId = _context->toBufferIndex(woPosChanId);
+
+					std::stringstream command1;
+					command1 << "set character " << c1->getName() << " world_offset x " << woWriter->get_data()[0] + 100 << " y " << woWriter->get_data()[1] << " z " << woWriter->get_data()[2];
+					std::stringstream command2;
+					command2 << "set character " << c2->getName() << " world_offset x " << woWriter->get_data()[0] + 200 << " y " << woWriter->get_data()[1] << " z " << woWriter->get_data()[2];
+					mcu.execute((char *)command1.str().c_str());
+					mcu.execute((char *)command2.str().c_str());				
+
+					// other joints
+					for (int i = 0; i < (int)character->getSkeleton()->joints().size(); i++)
+					{
+						int chanId = _context->channels().search(character->getSkeleton()->joints()[i]->name(), SkChannel::Quat);
+						int bufferId = _context->toBufferIndex(chanId);
+						std::stringstream command1;
+						command1 << "receiver skeleton " << c1->getName() << " other rotation " << character->getSkeleton()->joints()[i]->name() << " " 
+								 << buffer1[bufferId + 0] << " " << buffer1[bufferId + 1] << " " << buffer1[bufferId + 2] << " " << buffer1[bufferId + 3];
+						std::stringstream command2;
+						command2 << "receiver skeleton " << c2->getName() << " other rotation " << character->getSkeleton()->joints()[i]->name() << " " 
+								 << buffer2[bufferId + 0] << " " << buffer2[bufferId + 1] << " " << buffer2[bufferId + 2] << " " << buffer2[bufferId + 3];
+						mcu.execute((char *)command1.str().c_str());
+						mcu.execute((char *)command2.str().c_str());
+					}
+				}
+#endif
 				return true;
 			}
 			else
@@ -154,6 +210,8 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 	{
 		if (curStateModule->active)
 		{
+//			if (curStateModule->data->stateName != PseudoIdleState)
+//				std::cout << "current state " << curStateModule->data->stateName << " " << curStateModule->timeManager->localTime << std::endl;
 			curStateModule->evaluate(timeStep, frame.buffer());
 			updateWo(curStateModule->woManager->getBaseTransformMat(), woWriter, frame.buffer());
 			if (controllerBlending->getKey(t) > 0.0)
