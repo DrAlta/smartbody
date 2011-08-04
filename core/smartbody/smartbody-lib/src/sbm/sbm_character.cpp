@@ -325,13 +325,14 @@ void SbmCharacter::createStandardControllers()
 	ct_tree_p->add_controller( reach_sched_p );	
 	ct_tree_p->add_controller( grab_sched_p );
 	ct_tree_p->add_controller( gaze_sched_p );
+	ct_tree_p->add_controller( saccade_ct );
 	ct_tree_p->add_controller( constraint_sched_p );	
 	ct_tree_p->add_controller( eyelid_reg_ct_p );
 	ct_tree_p->add_controller( head_sched_p );
 	ct_tree_p->add_controller( face_ct );
 	ct_tree_p->add_controller( param_sched_p );
 	ct_tree_p->add_controller( motionplayer_ct );
-	ct_tree_p->add_controller(datareceiver_ct);
+	ct_tree_p->add_controller( datareceiver_ct );
 }
 void SbmCharacter::initData()
 {
