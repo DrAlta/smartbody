@@ -23,6 +23,7 @@ target_link_libraries( smartbody-dll
 	boost_filesystem
 	boost_system
 	boost_regex
+	boost_python
 	blas
 	lapack
 	${OPENGL_LIBRARIES}
@@ -32,4 +33,5 @@ target_link_libraries( smartbody-dll
 	steerlib
 	pprAI
 	ode
+	python2.6
 )

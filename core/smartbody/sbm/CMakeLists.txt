@@ -73,10 +73,10 @@ endif()
 
 target_link_libraries( sbm-fltk
 
-#	tcmalloc
-#	profiler
-	bonebus
+	#tcmalloc
+	#profiler
 	smartbody-lib
+	bonebus
 	vhmsg
 	vhcl
 	wsp
@@ -84,6 +84,7 @@ target_link_libraries( sbm-fltk
 	boost_filesystem
 	boost_system
 	boost_regex
+	boost_python
 	blas
 	lapack
 	GLEW
@@ -97,6 +98,7 @@ target_link_libraries( sbm-fltk
 	steerlib
 	pprAI
 	ode
+	python2.6
 )
 
 set( EXEC_LIST

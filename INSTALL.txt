@@ -22,6 +22,7 @@ libblas-dev
 build-essential
 mono-devel
 mono-xbuild
+python-dev
 
 To install the Festival text-to-speech engine, you need:
 
@@ -39,8 +40,16 @@ Get boost-1.44 from:
 http://sourceforge.net/projects/boost/files/boost/1.44.0/boost_1_44_0.tar.gz/download
 Place in lib/ and unpack and build using:
 ./boostrap.sh
-./bjam
+./bjam --with-python
 ./bjam install <-- installed to /usr/local, need sudo or root access
+
+Download the boost numeric bindings from:
+http://mathema.tician.de/news.tiker.net/download/software/boost-numeric-bindings/boost-numeric-bindings-20081116.tar.gz
+Place in lib/ and unpack using:
+tar -xvzf boost-numeric-bindings-20081116.tar.gz
+cd boost-numeric-bindings
+sudo cp -R boost/numeric/bindings /usr/local/include/boost/numeric
+
 
 Get FLTK 1.3 from:
 http://ftp.easysw.com/pub/fltk/1.3.0/fltk-1.3.0-source.tar.gz
@@ -87,6 +96,14 @@ Place in lib/ and unpack and build using:
 ./boostrap.sh
 ./bjam
 ./bjam install <-- installed to /usr/local, need sudo or root access
+
+Download the boost numeric bindings from:
+http://mathema.tician.de/news.tiker.net/download/software/boost-numeric-bindings/boost-numeric-bindings-20081116.tar.gz
+Place in lib/ and unpack using:
+tar -xvzf boost-numeric-bindings-20081116.tar.gz
+cd boost-numeric-bindings
+sudo cp -R boost/numeric/bindings /usr/local/include/boost/numeric
+
 
 Get FLTK 1.3 from:
 http://ftp.easysw.com/pub/fltk/1.3.0/fltk-1.3.0-source.tar.gz

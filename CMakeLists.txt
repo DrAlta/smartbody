@@ -19,7 +19,8 @@ include_directories(
 	lib/vhmsg/vhmsg-c/include
 	lib/bonebus/include
 	lib/wsp/wsp/include
-	lib/boost
+#	lib/boost
+	/usr/local/include/boost
 
 )
 

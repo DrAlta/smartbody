@@ -4,6 +4,7 @@ include_directories(
 	steersuite-1.3/steerlib/include
 	steersuite-1.3/pprAI/include
 	steersuite-1.3/external
+	/usr/include/python2.6
 )
 
 add_subdirectory( smartbody-lib/src )

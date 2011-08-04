@@ -26,11 +26,11 @@
 
 //////////////////////////////////////////////////////////////////////////////////
 
-#include <SR/sr_hash_table.h>
-#include <SR/sr_buffer.h>
-#include <SK/sk_motion.h>
-#include <SK/sk_skeleton.h>
-#include <ME/me_controller.h>
+#include <sr/sr_hash_table.h>
+#include <sr/sr_buffer.h>
+#include <sk/sk_motion.h>
+#include <sk/sk_skeleton.h>
+#include <me/me_controller.h>
 #include <sbm/VisemeMap.hpp>
 #include "sr_hash_map.h"
 #include "sbm/SBController.h"
