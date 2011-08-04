@@ -1349,37 +1349,49 @@ void PPRAgent::runReactivePhase()
 				PPRAgent * pRight = dynamic_cast<PPRAgent*>(objRight);
 				float cosThetaLeft = dot(_forward, pLeft->forward());
 				float cosThetaRight = dot(_forward, pRight->forward());
-				if ((cosThetaLeft < PED_ONCOMING_REACTION_THRESHOLD) && (cosThetaRight < PED_ONCOMING_REACTION_THRESHOLD)) {
-					//if (isSelected()) cerr << "REACTION: two agents oncoming to me... I'll just stop...\n";
-					_finalSteeringCommand.aimForTargetDirection = true;
-					_finalSteeringCommand.turningAmount = PED_TYPICAL_AVOIDANCE_TURN_RATE;
-					_finalSteeringCommand.targetSpeed = 0.0;
-				}
-				else if ((cosThetaLeft > PED_SAME_DIRECTION_DOT_PRODUCT_THRESHOLD) && (cosThetaRight < PED_ONCOMING_REACTION_THRESHOLD)) {
-					//if (isSelected()) cerr << "REACTION: two agents - I'll follow the one on the left.\n";
+				if (pLeft->velocity().length() == 0 && pRight->velocity().length() == 0) {
 					_finalSteeringCommand.aimForTargetDirection = false;
-					_finalSteeringCommand.turningAmount = (objRight == feelers.object_front) ? -PED_TYPICAL_AVOIDANCE_TURN_RATE : -PED_ADJUSTMENT_TURN_RATE;
-					float tempVelocity = dot(forward(),pLeft->velocity());
-					_finalSteeringCommand.targetSpeed = min(_finalSteeringCommand.targetSpeed, tempVelocity);
-					if (comfortZoneViolated) _finalSteeringCommand.targetSpeed = 0.7f * _finalSteeringCommand.targetSpeed;
-					if (_finalSteeringCommand.targetSpeed < 0.0f) _finalSteeringCommand.targetSpeed = 0.0f;
-				}
-				else if ((cosThetaLeft < PED_ONCOMING_REACTION_THRESHOLD) && (cosThetaRight > PED_SAME_DIRECTION_DOT_PRODUCT_THRESHOLD)) {
-					//if (isSelected()) cerr << "REACTION: two agents - I'll follow the one on the right.\n";
-					_finalSteeringCommand.aimForTargetDirection = false;
-					_finalSteeringCommand.turningAmount = (objLeft == feelers.object_front) ? PED_TYPICAL_AVOIDANCE_TURN_RATE : PED_ADJUSTMENT_TURN_RATE;
-					float tempVelocity = dot(forward(),pRight->velocity());
-					_finalSteeringCommand.targetSpeed = min(_finalSteeringCommand.targetSpeed, tempVelocity);
-					if (comfortZoneViolated) _finalSteeringCommand.targetSpeed = 0.7f * _finalSteeringCommand.targetSpeed;
-					if (_finalSteeringCommand.targetSpeed < 0.0f) _finalSteeringCommand.targetSpeed = 0.0f;
+					if (!feelers.object_left)
+						_finalSteeringCommand.turningAmount = -PED_TYPICAL_AVOIDANCE_TURN_RATE;
+					else if (!feelers.object_front)
+						_finalSteeringCommand.turningAmount = 0.0f;
+					else
+						_finalSteeringCommand.turningAmount = PED_TYPICAL_AVOIDANCE_TURN_RATE;
+					_finalSteeringCommand.targetSpeed = (comfortZoneViolated) ? PED_SLOWER_SPEED_FACTOR * _currentGoal.desiredSpeed : PED_TYPICAL_SPEED_FACTOR * _currentGoal.desiredSpeed;
 				}
 				else {
-					//if (isSelected()) cerr << "REACTION: two agents - I'll just match the speed they are going.\n";
-					float tempVelocity = dot(forward(),pLeft->velocity());
-					tempVelocity = min(tempVelocity, dot(forward(),pRight->velocity()));
-					_finalSteeringCommand.targetSpeed = min(_finalSteeringCommand.targetSpeed, tempVelocity);
-					if (comfortZoneViolated) _finalSteeringCommand.targetSpeed = 0.7f * _finalSteeringCommand.targetSpeed;
-					if (_finalSteeringCommand.targetSpeed < 0.0f) _finalSteeringCommand.targetSpeed = 0.0f;
+					if ((cosThetaLeft < PED_ONCOMING_REACTION_THRESHOLD) && (cosThetaRight < PED_ONCOMING_REACTION_THRESHOLD)) {
+						//if (isSelected()) cerr << "REACTION: two agents oncoming to me... I'll just stop...\n";
+						_finalSteeringCommand.aimForTargetDirection = true;
+						_finalSteeringCommand.turningAmount = PED_TYPICAL_AVOIDANCE_TURN_RATE;
+						_finalSteeringCommand.targetSpeed = 0.0;
+					}
+					else if ((cosThetaLeft > PED_SAME_DIRECTION_DOT_PRODUCT_THRESHOLD) && (cosThetaRight < PED_ONCOMING_REACTION_THRESHOLD)) {
+						//if (isSelected()) cerr << "REACTION: two agents - I'll follow the one on the left.\n";
+						_finalSteeringCommand.aimForTargetDirection = false;
+						_finalSteeringCommand.turningAmount = (objRight == feelers.object_front) ? -PED_TYPICAL_AVOIDANCE_TURN_RATE : -PED_ADJUSTMENT_TURN_RATE;
+						float tempVelocity = dot(forward(),pLeft->velocity());
+						_finalSteeringCommand.targetSpeed = min(_finalSteeringCommand.targetSpeed, tempVelocity);
+						if (comfortZoneViolated) _finalSteeringCommand.targetSpeed = 0.7f * _finalSteeringCommand.targetSpeed;
+						if (_finalSteeringCommand.targetSpeed < 0.0f) _finalSteeringCommand.targetSpeed = 0.0f;
+					}
+					else if ((cosThetaLeft < PED_ONCOMING_REACTION_THRESHOLD) && (cosThetaRight > PED_SAME_DIRECTION_DOT_PRODUCT_THRESHOLD)) {
+						//if (isSelected()) cerr << "REACTION: two agents - I'll follow the one on the right.\n";
+						_finalSteeringCommand.aimForTargetDirection = false;
+						_finalSteeringCommand.turningAmount = (objLeft == feelers.object_front) ? PED_TYPICAL_AVOIDANCE_TURN_RATE : PED_ADJUSTMENT_TURN_RATE;
+						float tempVelocity = dot(forward(),pRight->velocity());
+						_finalSteeringCommand.targetSpeed = min(_finalSteeringCommand.targetSpeed, tempVelocity);
+						if (comfortZoneViolated) _finalSteeringCommand.targetSpeed = 0.7f * _finalSteeringCommand.targetSpeed;
+						if (_finalSteeringCommand.targetSpeed < 0.0f) _finalSteeringCommand.targetSpeed = 0.0f;
+					}
+					else {
+						//if (isSelected()) cerr << "REACTION: two agents - I'll just match the speed they are going.\n";
+						float tempVelocity = dot(forward(),pLeft->velocity());
+						tempVelocity = min(tempVelocity, dot(forward(),pRight->velocity()));
+						_finalSteeringCommand.targetSpeed = min(_finalSteeringCommand.targetSpeed, tempVelocity);
+						if (comfortZoneViolated) _finalSteeringCommand.targetSpeed = 0.7f * _finalSteeringCommand.targetSpeed;
+						if (_finalSteeringCommand.targetSpeed < 0.0f) _finalSteeringCommand.targetSpeed = 0.0f;
+					}
 				}
 			}
 			else if (reactiveSituation == REACTIVE_SITUATION_STATIC_OBJECTS_ZERO_AGENTS) {
@@ -1513,68 +1525,86 @@ void PPRAgent::runReactivePhase()
 			}
 			else if (reactiveSituation == REACTIVE_SITUATION_THREE_AGENTS) {
 				// unlikely case...
-				//PPRAgent * pLeft = dynamic_cast<PPRAgent*>(feelers.object_left);
-				//PPRAgent * pMiddle = dynamic_cast<PPRAgent*>(feelers.object_front);
-				//PPRAgent * pRight = dynamic_cast<PPRAgent*>(feelers.object_right);
-				//if (isSelected()) cerr << "REACTION: three agents - I'll just match their speed and hope it doesnt get clogged?\n";
-				if ((feelers.object_left)&&(feelers.object_left->isAgent())) {
-					float tempVelocity = dot(forward(),(dynamic_cast<PPRAgent*>(feelers.object_left))->velocity());
-					_finalSteeringCommand.targetSpeed = min(_finalSteeringCommand.targetSpeed,tempVelocity);
+				PPRAgent * pLeft = dynamic_cast<PPRAgent*>(feelers.object_left);
+				PPRAgent * pMiddle = dynamic_cast<PPRAgent*>(feelers.object_front);
+				PPRAgent * pRight = dynamic_cast<PPRAgent*>(feelers.object_right);
+				if (pLeft->velocity().length() == 0 && pMiddle->velocity().length() == 0 && pRight->velocity().length() == 0) {
+					_finalSteeringCommand.aimForTargetDirection = false;
+					_finalSteeringCommand.turningAmount = PED_TYPICAL_AVOIDANCE_TURN_RATE;
+					_finalSteeringCommand.targetSpeed = (comfortZoneViolated) ? PED_SLOWER_SPEED_FACTOR * _currentGoal.desiredSpeed : PED_TYPICAL_SPEED_FACTOR * _currentGoal.desiredSpeed;
 				}
-				if ((feelers.object_right)&&(feelers.object_right->isAgent())) {
-					float tempVelocity = dot(forward(),(dynamic_cast<PPRAgent*>(feelers.object_right))->velocity());
-					_finalSteeringCommand.targetSpeed = min(_finalSteeringCommand.targetSpeed,tempVelocity);
-				}
-				if ((feelers.object_front)&&(feelers.object_front->isAgent())) {
-					float tempVelocity = dot(forward(),(dynamic_cast<PPRAgent*>(feelers.object_front))->velocity());
-					_finalSteeringCommand.targetSpeed = min(_finalSteeringCommand.targetSpeed,tempVelocity);
-				}
-				if (comfortZoneViolated) {
-					_finalSteeringCommand.targetSpeed = 0.7f * _finalSteeringCommand.targetSpeed;
-				}
+				else {
+					//if (isSelected()) cerr << "REACTION: three agents - I'll just match their speed and hope it doesnt get clogged?\n";
+					if ((feelers.object_left)&&(feelers.object_left->isAgent())) {
+						float tempVelocity = dot(forward(),(dynamic_cast<PPRAgent*>(feelers.object_left))->velocity());
+						_finalSteeringCommand.targetSpeed = min(_finalSteeringCommand.targetSpeed,tempVelocity);
+					}
+					if ((feelers.object_right)&&(feelers.object_right->isAgent())) {
+						float tempVelocity = dot(forward(),(dynamic_cast<PPRAgent*>(feelers.object_right))->velocity());
+						_finalSteeringCommand.targetSpeed = min(_finalSteeringCommand.targetSpeed,tempVelocity);
+					}
+					if ((feelers.object_front)&&(feelers.object_front->isAgent())) {
+						float tempVelocity = dot(forward(),(dynamic_cast<PPRAgent*>(feelers.object_front))->velocity());
+						_finalSteeringCommand.targetSpeed = min(_finalSteeringCommand.targetSpeed,tempVelocity);
+					}
+					if (comfortZoneViolated) {
+						_finalSteeringCommand.targetSpeed = 0.7f * _finalSteeringCommand.targetSpeed;
+					}
 
-				if (_finalSteeringCommand.targetSpeed < 0.0f) _finalSteeringCommand.targetSpeed = 0.0f;
+					if (_finalSteeringCommand.targetSpeed < 0.0f) _finalSteeringCommand.targetSpeed = 0.0f;
+				}
 			}
 			else if (reactiveSituation == REACTIVE_SITUATION_STATIC_OBJECTS_TWO_AGENTS) {
 				// unlikely case...
 				//if (isSelected()) cerr << "REACTION: static obstacle and two agents...I'll just match the agent's speeds and avoid the obstacle.\n";
-
-				// choose speed
-				SpatialDatabaseItemPtr obstacle = (feelers.object_front && !feelers.object_front->isAgent()) ? feelers.object_front : (feelers.object_right && !feelers.object_right->isAgent()) ? feelers.object_right : feelers.object_left;
-
-				if ((feelers.object_left)&&(feelers.object_left->isAgent())) {
-					float tempVelocity = dot(forward(),(dynamic_cast<PPRAgent*>(feelers.object_left))->velocity());
-					_finalSteeringCommand.targetSpeed = min(_finalSteeringCommand.targetSpeed,tempVelocity);
-				}
-				if ((feelers.object_right)&&(feelers.object_right->isAgent())) {
-					float tempVelocity = dot(forward(),(dynamic_cast<PPRAgent*>(feelers.object_right))->velocity());
-					_finalSteeringCommand.targetSpeed = min(_finalSteeringCommand.targetSpeed,tempVelocity);
-				}
-				if ((feelers.object_front)&&(feelers.object_front->isAgent())) {
-					float tempVelocity = dot(forward(),(dynamic_cast<PPRAgent*>(feelers.object_front))->velocity());
-					_finalSteeringCommand.targetSpeed = min(_finalSteeringCommand.targetSpeed,tempVelocity);
-				}
-				if (comfortZoneViolated) {
-					_finalSteeringCommand.targetSpeed = 0.7f * _finalSteeringCommand.targetSpeed;
-				}
-
-				if (_finalSteeringCommand.targetSpeed < 0.0f) _finalSteeringCommand.targetSpeed = 0.0f;
-
-				// choose turning
-				if (obstacle == feelers.object_right) {
+				SpatialDatabaseItemPtr objLeft = (feelers.object_left) ? feelers.object_left : feelers.object_front;
+				SpatialDatabaseItemPtr objRight = (feelers.object_right) ? feelers.object_right : feelers.object_front;
+				assert(objLeft!=objRight);
+				PPRAgent * pLeft = dynamic_cast<PPRAgent*>(objLeft);
+				PPRAgent * pRight = dynamic_cast<PPRAgent*>(objRight);
+				if (pLeft->velocity().length() == 0 && pRight->velocity().length() == 0) {
 					_finalSteeringCommand.aimForTargetDirection = false;
-					_finalSteeringCommand.turningAmount = (comfortZoneViolated) ? -PED_FASTER_AVOIDANCE_TURN_RATE : -PED_TYPICAL_AVOIDANCE_TURN_RATE;
-				}
-				else if (obstacle == feelers.object_left) {
-					_finalSteeringCommand.aimForTargetDirection = false;
-					_finalSteeringCommand.turningAmount = (comfortZoneViolated) ? PED_FASTER_AVOIDANCE_TURN_RATE : PED_TYPICAL_AVOIDANCE_TURN_RATE;
+					_finalSteeringCommand.turningAmount = PED_TYPICAL_AVOIDANCE_TURN_RATE;
+					_finalSteeringCommand.targetSpeed = (comfortZoneViolated) ? PED_SLOWER_SPEED_FACTOR * _currentGoal.desiredSpeed : PED_TYPICAL_SPEED_FACTOR * _currentGoal.desiredSpeed;
 				}
 				else {
-					// weird, only hit the static object in the middle, its either a small obstacle, or a corner.
-					// TODO: is this the right thing to do here?
-					_finalSteeringCommand.aimForTargetDirection = true;
-					_finalSteeringCommand.turningAmount = PED_CORNERING_TURN_RATE;
-					_finalSteeringCommand.targetSpeed = 0.0f;
+					// choose speed
+					SpatialDatabaseItemPtr obstacle = (feelers.object_front && !feelers.object_front->isAgent()) ? feelers.object_front : (feelers.object_right && !feelers.object_right->isAgent()) ? feelers.object_right : feelers.object_left;
+
+					if ((feelers.object_left)&&(feelers.object_left->isAgent())) {
+						float tempVelocity = dot(forward(),(dynamic_cast<PPRAgent*>(feelers.object_left))->velocity());
+						_finalSteeringCommand.targetSpeed = min(_finalSteeringCommand.targetSpeed,tempVelocity);
+					}
+					if ((feelers.object_right)&&(feelers.object_right->isAgent())) {
+						float tempVelocity = dot(forward(),(dynamic_cast<PPRAgent*>(feelers.object_right))->velocity());
+						_finalSteeringCommand.targetSpeed = min(_finalSteeringCommand.targetSpeed,tempVelocity);
+					}
+					if ((feelers.object_front)&&(feelers.object_front->isAgent())) {
+						float tempVelocity = dot(forward(),(dynamic_cast<PPRAgent*>(feelers.object_front))->velocity());
+						_finalSteeringCommand.targetSpeed = min(_finalSteeringCommand.targetSpeed,tempVelocity);
+					}
+					if (comfortZoneViolated) {
+						_finalSteeringCommand.targetSpeed = 0.7f * _finalSteeringCommand.targetSpeed;
+					}
+
+					if (_finalSteeringCommand.targetSpeed < 0.0f) _finalSteeringCommand.targetSpeed = 0.0f;
+
+					// choose turning
+					if (obstacle == feelers.object_right) {
+						_finalSteeringCommand.aimForTargetDirection = false;
+						_finalSteeringCommand.turningAmount = (comfortZoneViolated) ? -PED_FASTER_AVOIDANCE_TURN_RATE : -PED_TYPICAL_AVOIDANCE_TURN_RATE;
+					}
+					else if (obstacle == feelers.object_left) {
+						_finalSteeringCommand.aimForTargetDirection = false;
+						_finalSteeringCommand.turningAmount = (comfortZoneViolated) ? PED_FASTER_AVOIDANCE_TURN_RATE : PED_TYPICAL_AVOIDANCE_TURN_RATE;
+					}
+					else {
+						// weird, only hit the static object in the middle, its either a small obstacle, or a corner.
+						// TODO: is this the right thing to do here?
+						_finalSteeringCommand.aimForTargetDirection = true;
+						_finalSteeringCommand.turningAmount = PED_CORNERING_TURN_RATE;
+						_finalSteeringCommand.targetSpeed = 0.0f;
+					}
 				}
 			}
 			else if (reactiveSituation == REACTIVE_SITUATION_UNKNOWN) {
