@@ -7,6 +7,30 @@
 #include "VisemeMap.hpp"
 #include "Nvbg.h"
 
+
+struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
+{
+	virtual bool execute(std::string character, std::string to, std::string messageId, std::string xml)
+	{
+		if (boost::python::override o = this->get_override("execute"))
+		{
+			try {
+				return o(character, to, messageId, xml);
+			} catch (...) {
+				LOG("Problem running Python command 'execute'.");
+			}
+		}
+
+		return Nvbg::execute(character, to, messageId, xml);
+	}
+
+	bool default_execute(std::string character, std::string to, std::string messageId, std::string xml)
+	{
+		return Nvbg::execute(character, to, messageId, xml);
+	}
+};
+
+
 namespace SmartBody 
 {
 BOOST_PYTHON_MODULE(SmartBody)
@@ -311,9 +335,10 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("setData", &SrQuat::setData, "sets the data in the quaterion at location indicated by the index w,x,y,z")
 		;
 
-	boost::python::class_<Nvbg>("Nvbg")
-		.def(boost::python::init<>())
-		.def("execute", &Nvbg::execute, "Execute the NVBG processor.");
+	
+	boost::python::class_<NvbgWrap, boost::noncopyable>("Nvbg")
+		.def("execute", &Nvbg::execute, &NvbgWrap::default_execute, "Execute the NVBG processor.")
+		;
 
 	boost::python::class_<PythonController, boost::python::bases<SBController> >("PythonController")
 		.def("start", &PythonController::start, "start.")
@@ -322,10 +347,13 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("evaluate", &PythonController::evaluate, "evaluate.")
 		;
 
+   
+
 	}
 
 
 }
+
 
 void initPython(std::string pythonLibPath)
 {	

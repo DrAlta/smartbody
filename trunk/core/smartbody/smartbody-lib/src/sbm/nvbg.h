@@ -5,11 +5,9 @@
 #include <sbm/DObject.h>
 #include <string>
 
-class Nvbg : public DObject
+struct Nvbg 
 {
-	public:
-		Nvbg();
-		~Nvbg();
+		virtual ~Nvbg();
 
 		virtual bool execute(std::string character, std::string to, std::string messageId, std::string xml);
 };
