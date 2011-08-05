@@ -65,8 +65,11 @@ CommandWindow::CommandWindow(int x,int y,int w,int h, const char* s) : GenericVi
 	menubar->add("&Edit/&Clear", (const char*) NULL, clearcb, 0);
 	menubar->add("&Edit/C&lear History", (const char*) NULL, clearhistorycb, 0);
 
-	historyCounter = 0;
-	historyLocation = 0;
+	for (int c = 0; c < 2; c++)
+	{
+		historyCounter[c] = 0;
+		historyLocation[c] = 0;
+	}
 	this->color(FL_LIGHT1);
 	strcpy(printout,"");
 
@@ -200,7 +203,9 @@ void CommandWindow::entercb(int key, Fl_Text_Editor* editor)
 	{
 		mcuCBHandle::singleton().execute(c);
 	}
-	commandWindow->addHistoryItem(c);
+
+	int index = (editor == commandWindow->textEditor[0]? 0 : 1);
+	commandWindow->addHistoryItem(c, index);
 
 	tempBuffer->remove(0,len + 1);
 }
@@ -212,10 +217,11 @@ void CommandWindow::upcb(int key, Fl_Text_Editor* editor)
 	if (editor->buffer()->length() > 0)
 		return;
 
-	commandWindow->historyLocation--;
-	if (commandWindow->historyLocation < 0)
-		commandWindow->historyLocation = 0;
-	const char* command = commandWindow->getHistoryItem(commandWindow->historyLocation);
+	int index = editor == commandWindow->textEditor[0]? 0 : 1;
+	commandWindow->historyLocation[index]--;
+	if (commandWindow->historyLocation[index] < 0)
+		commandWindow->historyLocation[index] = 0;
+	const char* command = commandWindow->getHistoryItem(commandWindow->historyLocation[index], index);
 	editor->buffer()->remove(0, editor->buffer()->length());
 	editor->buffer()->insert(editor->buffer()->length(), command);
 }
@@ -224,11 +230,12 @@ void CommandWindow::downcb(int key, Fl_Text_Editor* editor)
 {
 	CommandWindow* commandWindow = CommandWindow::getCommandWindow(editor);
 
-	commandWindow->historyLocation++;
-	if (commandWindow->historyLocation > int(commandWindow->historyItems.size()))
-		commandWindow->historyLocation = commandWindow->historyItems.size();
+	int index = editor == commandWindow->textEditor[0]? 0 : 1;
+	commandWindow->historyLocation[index]++;
+	if (commandWindow->historyLocation[index] > int(commandWindow->historyItems[index].size()))
+		commandWindow->historyLocation[index] = commandWindow->historyItems[index].size();
 
-	const char* command = commandWindow->getHistoryItem(commandWindow->historyLocation);
+	const char* command = commandWindow->getHistoryItem(commandWindow->historyLocation[index], index);
 	editor->buffer()->remove(0, editor->buffer()->length());
 	editor->buffer()->insert(editor->buffer()->length(), command);
 }
@@ -253,7 +260,8 @@ void CommandWindow::executecb(Fl_Widget* w, void* data)
 void CommandWindow::clearhistorycb(Fl_Widget* w, void* data)
 {
 	CommandWindow* commandWindow = CommandWindow::getCommandWindow(w);
-	commandWindow->clearHistory();
+	commandWindow->clearHistory(0);
+	commandWindow->clearHistory(1);
 }
 
 void CommandWindow::tabcb(int key, Fl_Text_Editor* editor)
@@ -408,32 +416,32 @@ void updateDisplay(int pos, int nInserted, int nDeleted, int b, const char* d, v
 	commandWindow->textDisplay->show_insert_position();
 }
 
-void CommandWindow::addHistoryItem(const char* item)
+void CommandWindow::addHistoryItem(const char* item, int index)
 {
-	if (this->historyItems.size() > MAXHISTORYSIZE - 1)
+	if (this->historyItems[index].size() > MAXHISTORYSIZE - 1)
 	{
-		freeHistorySpace();
+		freeHistorySpace(index);
 	}
-	this->historyItems.push_back(item);
-	this->historyLocation = this->historyItems.size();
+	this->historyItems[index].push_back(item);
+	this->historyLocation[index] = this->historyItems[index].size();
 }
 
-const char* CommandWindow::getHistoryItem(int location)
+const char* CommandWindow::getHistoryItem(int location, int index)
 {
-	if ((unsigned int) location < this->historyItems.size() && location >= 0)
-		return (char*) this->historyItems[location].c_str();
+	if ((unsigned int) location < this->historyItems[index].size() && location >= 0)
+		return (char*) this->historyItems[index][location].c_str();
 	else
 		return "";
 }
 
-void CommandWindow::clearHistory()
+void CommandWindow::clearHistory(int index)
 {
-	historyItems.clear();
-	historyCounter = 0;
-	historyLocation = 0;
+	historyItems[index].clear();
+	historyCounter[index] = 0;
+	historyLocation[index] = 0;
 }
 
-void CommandWindow::freeHistorySpace()
+void CommandWindow::freeHistorySpace(int index)
 {
 	int halfHistorySize = MAXHISTORYSIZE / 2;
 	// shift history items down
@@ -442,17 +450,17 @@ void CommandWindow::freeHistorySpace()
 	int count = 0;
 	while (count < halfHistorySize)
 	{
-		historyItems.erase(historyItems.begin());
+		historyItems[index].erase(historyItems[index].begin());
 		count++;
 	}
 
-	if (historyLocation < count)
+	if (historyLocation[index] < count)
 	{
-		historyLocation = 0;
+		historyLocation[index] = 0;
 	}
 	else
 	{
-		historyLocation -= count;
+		historyLocation[index] -= count;
 	}
 }
 

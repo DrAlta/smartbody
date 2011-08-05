@@ -81,9 +81,9 @@ public:
 	int height;
 	char printout[1024];
 	void UpdateOutput(char *text, bool origCommand = false);
-	void addHistoryItem(const char* item);
-	const char* getHistoryItem(int location);
-	void clearHistory();
+	void addHistoryItem(const char* item, int index);
+	const char* getHistoryItem(int location, int index);
+	void clearHistory(int index);
 
 	static CommandWindow* getCommandWindow(Fl_Widget* w);
 
@@ -111,11 +111,11 @@ public:
 	static void FindFiles(char*, char*);
 
 private:
-	void freeHistorySpace();
+	void freeHistorySpace(int index);
 
-	int historyCounter;	
-	int historyLocation;
-	std::vector<std::string> historyItems;
+	int historyCounter[2];	
+	int historyLocation[2];
+	std::vector<std::string> historyItems[2];
 	int when;
 	char curDir[256];
 
