@@ -394,13 +394,15 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 					int baseIndex = keyToChannelMap[i];
 //					if (i == -1) // this should only happen if there is a channel in the key pose that does not exist in the base pose
 					if (baseIndex == -1) // this should only happen if there is a channel in the key pose that does not exist in the base pose
+					{
+						pose_var_index += ch_size;
 						continue;
-
+					}
 					int baseBufferIndex = _baseChannelToBufferIndex[baseIndex];
 
 					if(_include_chan_flag[ chIndex ] )	{
 						SkChannel::Type ch_type = keyPoseChannels[ i ].type;
-
+						
 						int base_ch_index = _bChan_to_buff[ chIndex ];
 						if( base_ch_index >= 0 )	{
 							if( 
@@ -421,13 +423,13 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 									fbuffer[ base_ch_index + 2 ],
 									fbuffer[ base_ch_index + 3 ]
 								);
-								gwiz::quat_t base_q( 
+								gwiz::quat_t base_q(
 									base_pose_buff_p[ baseBufferIndex ], 
 									base_pose_buff_p[ baseBufferIndex + 1 ], 
 									base_pose_buff_p[ baseBufferIndex + 2 ], 
 									base_pose_buff_p[ baseBufferIndex + 3 ] 
 								);
-								gwiz::quat_t key_q( 
+								gwiz::quat_t key_q(
 									key_pose_buff_p[ pose_var_index ], 
 									key_pose_buff_p[ pose_var_index + 1 ], 
 									key_pose_buff_p[ pose_var_index + 2 ], 
@@ -436,7 +438,7 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 
 								gwiz::quat_t result_q = ( ( key_q * -base_q ) * adjustedWeight ) * accum_q;
 
-								fbuffer[ base_ch_index ] = (float)result_q.w();
+								fbuffer[ base_ch_index + 0 ] = (float)result_q.w();
 								fbuffer[ base_ch_index + 1 ] = (float)result_q.x();
 								fbuffer[ base_ch_index + 2 ] = (float)result_q.y();
 								fbuffer[ base_ch_index + 3 ] = (float)result_q.z();
