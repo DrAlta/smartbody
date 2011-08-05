@@ -76,6 +76,8 @@
 #include "SteeringAgent.h"
 
 #include <sbm/me_ct_data_receiver.h>
+#include <sbm/Nvbg.h>
+
 //#include <me/me_spline_1d.hpp>
 class MeCtMotionPlayer;
 class MeCtPAnimation;
@@ -160,6 +162,7 @@ protected:
 
 	bool _isControllerPruning;
 
+	Nvbg* _nvbg;
 public:
 	//  Methods
 	SbmCharacter();
@@ -387,6 +390,9 @@ public:
 	void setFaceDefinition(FaceDefinition* face);
 	void updateFaceDefinition();
 	void removeAllFaceChannels();
+
+	virtual void setNvbg(Nvbg* nvbg);
+	virtual Nvbg* getNvbg();
 
 private:
 

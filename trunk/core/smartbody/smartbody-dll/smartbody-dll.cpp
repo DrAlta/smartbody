@@ -460,6 +460,7 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert( "vrAgentBML",  BML_PROCESSOR::vrAgentBML_cmd_func );
    mcu.insert( "bp",          BML_PROCESSOR::bp_cmd_func );
    mcu.insert( "vrSpeak",     BML_PROCESSOR::vrSpeak_func );
+   mcu.insert( "vrExpress",  mcu_vrExpress_func );
 
    mcu.insert( "net_reset",           mcu_net_reset );
    mcu.insert( "net_check",           mcu_net_check );

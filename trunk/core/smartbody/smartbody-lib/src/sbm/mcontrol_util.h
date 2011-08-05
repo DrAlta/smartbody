@@ -85,6 +85,7 @@ class mcuCBHandle;
 #include <sbm/general_param_setting.h>
 #include <sbm/SBScene.h>
 #include "sbm/BoneMap.h"
+#include <sbm/Nvbg.h>
 
 #include <me/me_ct_interpolator.h>
 #include <sbm/me_ct_param_animation_utilities.h>
@@ -285,6 +286,7 @@ class mcuCBHandle {
 protected:
 		std::map<std::string, SbmPawn*>	pawn_map;
 		std::map<std::string, SbmCharacter*> character_map;
+		std::map<std::string, Nvbg*> nvbgMap;
 public:
 
 		BML_PROCESSOR				bml_processor;
@@ -594,6 +596,10 @@ public:
 
 		void createDefaultControllers();
 		std::vector<MeController*>& getDefaultControllers();
+
+		void addNvbg(std::string id, Nvbg* nvbg);
+		void removeNvbg(std::string id);
+		Nvbg* getNvbg(std::string id);
 
 	public:
 		FILE* open_sequence_file( const char *seq_name, std::string& fullPath );

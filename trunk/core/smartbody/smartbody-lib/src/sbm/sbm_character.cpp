@@ -375,6 +375,7 @@ void SbmCharacter::initData()
 	_lastReachStatus = true;
 	_height = 1.0f; 
 	_visemePlateau = true;
+	_nvbg = NULL;
 
 	createBoolAttribute("facebone", false, true, "Basic", 200, false, false, false, "Use bones for facial animation. If false, blendshapes will be used. If true, face will be animated via face definitions.");
 	createBoolAttribute("visemecurve", false, true, "Basic", 200, false, false, false, "Use curve-based visemes instead of discrete visemes.");
@@ -3491,4 +3492,14 @@ void SbmCharacter::addActionUnitChannel(int auNum, ActionUnit* au)
 		rootJoint->addChild(auJoint);
 		viseme_channel_count++;
 	}
+}
+
+void SbmCharacter::setNvbg(Nvbg* nvbg)
+{
+	_nvbg = nvbg;
+}
+
+Nvbg* SbmCharacter::getNvbg()
+{
+	return _nvbg;
 }

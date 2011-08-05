@@ -1773,5 +1773,38 @@ int mcuCBHandle::unregisterCharacter(SbmCharacter* character)
 	return 1;
 }
 
+void mcuCBHandle::addNvbg(std::string id, Nvbg* nvbg)
+{
+	std::map<std::string, Nvbg*>::iterator iter = nvbgMap.find(id);
+	if (iter != nvbgMap.end())
+	{
+		removeNvbg(id);
+	}
+	nvbgMap[id] = nvbg;
+}
+
+void mcuCBHandle::removeNvbg(std::string id)
+{
+	std::map<std::string, Nvbg*>::iterator iter = nvbgMap.find(id);
+	if (iter != nvbgMap.end())
+	{
+		delete (*iter).second;
+	}
+}
+
+Nvbg* mcuCBHandle::getNvbg(std::string id)
+{
+	std::map<std::string, Nvbg*>::iterator iter = nvbgMap.find(id);
+	if (iter != nvbgMap.end())
+	{
+		return (*iter).second;
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+
 
 /////////////////////////////////////////////////////////////

@@ -22,6 +22,7 @@ class DObject : public DObserver
 		void addAttribute(DAttribute* attr, std::string groupName);
 		bool removeAttribute(std::string name);
 		void clearAttributes();
+		int getNumAttributes();
 		BoolAttribute* createBoolAttribute(std::string name, bool value, bool notifySelf, std::string groupName, int priority, 
 													  bool isReadOnly, bool isLocked, bool isHidden, std::string description = "");
 		IntAttribute* createIntAttribute(std::string name, int value, bool notifySelf, std::string groupName, int priority, 

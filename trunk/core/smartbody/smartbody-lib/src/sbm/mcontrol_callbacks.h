@@ -147,6 +147,7 @@ int stopprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 #endif
 
 int mcu_joint_datareceiver_func(srArgBuffer& args, mcuCBHandle *mcu_p);
+int mcu_vrExpress_func(srArgBuffer& args, mcuCBHandle *mcu_p);
 
 //////////////////////////////////////////////////////////////////
 #endif

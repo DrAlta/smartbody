@@ -95,6 +95,12 @@ void DObject::addAttribute( DAttribute* attr, std::string groupName )
 		 removeAttribute(attrNameList[i]);
  }
  
+int DObject::getNumAttributes()
+{
+	return m_attributeList.size();
+}
+
+
  bool DObject::removeAttribute(std::string name)
  {
 	// check for the existence of the attribute
