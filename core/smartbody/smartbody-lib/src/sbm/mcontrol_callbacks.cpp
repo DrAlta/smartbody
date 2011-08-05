@@ -5863,3 +5863,33 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 	}
 	return CMD_SUCCESS;
 }
+
+int mcu_vrExpress_func( srArgBuffer& args, mcuCBHandle *mcu )
+{
+	if (args.calc_num_tokens() < 4)
+	{
+		return CMD_SUCCESS;
+	}
+
+	std::string actor = args.read_token();
+	std::string to = args.read_token();
+	std::string messageId = args.read_token();
+	std::string xml = args.read_token();
+
+	// get the NVBG process for the character, if available
+	SbmCharacter* character = mcu->getCharacter(actor);
+	if (!character)
+		return CMD_SUCCESS;
+
+	Nvbg* nvbg = character->getNvbg();
+	if (!nvbg)
+		return CMD_SUCCESS;
+
+	bool ok = nvbg->execute(actor, to, messageId, xml);
+
+	if (!ok)
+	{
+		LOG("NVBG for character %s to %s did not handle message %s.", actor.c_str(), to.c_str(), messageId.c_str());
+	}
+	return CMD_SUCCESS;
+}

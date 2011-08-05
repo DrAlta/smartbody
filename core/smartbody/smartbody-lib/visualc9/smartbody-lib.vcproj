@@ -2792,6 +2792,18 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="nvbg"
+			>
+			<File
+				RelativePath="..\src\sbm\nvbg.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\nvbg.h"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

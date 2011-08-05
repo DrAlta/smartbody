@@ -95,8 +95,10 @@ public:
 	Fl_Text_Display *textDisplay;
 	Fl_Menu_Bar* menubar;
 	Fl_Tabs* tabGroup;
+	Fl_Button* buttonExecute;
 
 	static void testCB();
+	static void executecb(Fl_Widget* widget, void* data);
 	static void upcb(int key, Fl_Text_Editor* te);
 	static void entercb(int key, Fl_Text_Editor* te);
 	static void downcb(int key, Fl_Text_Editor* te);

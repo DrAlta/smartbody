@@ -353,6 +353,7 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "vrAgentBML",   BML_PROCESSOR::vrAgentBML_cmd_func );
 	mcu.insert( "bp",		    BML_PROCESSOR::bp_cmd_func );
 	mcu.insert( "vrSpeak",		BML_PROCESSOR::vrSpeak_func );
+	mcu.insert( "vrExpress",  mcu_vrExpress_func );
 
 	mcu.insert( "receiver",		mcu_joint_datareceiver_func );
 
@@ -828,6 +829,7 @@ fprintf( stdout, "output:'%s'\n", str.c_str() );
 		vhmsg::ttu_set_client_callback( sbm_vhmsg_callback );
 		err = vhmsg::ttu_register( "sbm" );
 		err = vhmsg::ttu_register( "vrAgentBML" );
+		err = vhmsg::ttu_register( "vrExpress" );
 		err = vhmsg::ttu_register( "vrSpeak" );
 		err = vhmsg::ttu_register( "RemoteSpeechReply" );
 		err = vhmsg::ttu_register( "PlaySound" );

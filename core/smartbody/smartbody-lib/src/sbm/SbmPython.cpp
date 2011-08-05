@@ -5,6 +5,7 @@
 #include <boost/python/args.hpp>
 #include "me/me_ct_scheduler2.h"
 #include "VisemeMap.hpp"
+#include "Nvbg.h"
 
 namespace SmartBody 
 {
@@ -176,8 +177,11 @@ BOOST_PYTHON_MODULE(SmartBody)
 		;
 
 
+	boost::python::class_<DObject>("SBObject")
+		.def("getNumAttributes", &DObject::getNumAttributes,  "Returns the number of attributes associated with this object.")
+		;
 
-	boost::python::class_<SBController>("SBController")
+	boost::python::class_<SBController, boost::python::bases<DObject> >("SBController")
 		.def(boost::python::init<>())
 		.def("setName", &SBController::setName, "Sets the name for the controller.")
 		.def("getName", &SBController::getName, "Returns the name for this controller.")
@@ -284,6 +288,8 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("setVoiceBackupCode", &SBCharacter::setVoiceBackupCode, "Sets the voice backup code. For audiofile type, this is a path.")
 		.def("setFaceDefinition", &SBCharacter::setFaceDefinition, "Sets face definition (visemes, action units) for a character.")
 		//.def("getFaceDefinition", &SBCharacter::getFaceDefinition, "Gets face definition (visemes, action units) for a character.")
+		.def("setNvbg", &SBCharacter::setNvbg, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Sets the NVBG handler for this character.")
+		.def("getNvbg", &SBCharacter::getNvbg, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the NVBG handler for this character.")
 		;
 
 	boost::python::class_<SrVec>("SrVec")
@@ -305,14 +311,19 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("setData", &SrQuat::setData, "sets the data in the quaterion at location indicated by the index w,x,y,z")
 		;
 
-		boost::python::class_<PythonController, boost::python::bases<SBController> >("PythonController")
-			.def("start", &PythonController::start, "start.")
-			.def("stop", &PythonController::stop, "stop.")
-			.def("init", &PythonController::init, "init.")
-			.def("evaluate", &PythonController::evaluate, "evaluate.")
-			;
+	boost::python::class_<Nvbg>("Nvbg")
+		.def(boost::python::init<>())
+		.def("execute", &Nvbg::execute, "Execute the NVBG processor.");
 
-		}
+	boost::python::class_<PythonController, boost::python::bases<SBController> >("PythonController")
+		.def("start", &PythonController::start, "start.")
+		.def("stop", &PythonController::stop, "stop.")
+		.def("init", &PythonController::init, "init.")
+		.def("evaluate", &PythonController::evaluate, "evaluate.")
+		;
+
+	}
+
 
 }
 

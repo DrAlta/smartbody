@@ -93,6 +93,11 @@ CommandWindow::CommandWindow(int x,int y,int w,int h, const char* s) : GenericVi
 
 	yDis += 25;
 
+	buttonExecute = new Fl_Button(w - 100, yDis, 60, 25, "Run");
+	buttonExecute->callback(executecb, this);
+
+	yDis += 25;
+
 	// command input
 	tabGroup = new Fl_Tabs(10, yDis, w - 10, h - yDis);	
 	tabGroup->color(FL_WHITE,FL_GRAY);
@@ -115,11 +120,12 @@ CommandWindow::CommandWindow(int x,int y,int w,int h, const char* s) : GenericVi
 
 		textBuffer[i] = new Fl_Text_Buffer();
 		textEditor[i]->buffer(textBuffer[i]); 
+
 		textEditor[i]->add_key_binding(FL_Up, FL_TEXT_EDITOR_ANY_STATE, (Fl_Text_Editor::Key_Func) upcb);
 		textEditor[i]->add_key_binding(FL_Down, FL_TEXT_EDITOR_ANY_STATE, (Fl_Text_Editor::Key_Func) downcb);
 
 		textEditor[i]->add_key_binding(FL_Tab, FL_TEXT_EDITOR_ANY_STATE, (Fl_Text_Editor::Key_Func) tabcb);
-		textEditor[i]->add_key_binding(FL_Enter, FL_TEXT_EDITOR_ANY_STATE, (Fl_Text_Editor::Key_Func) entercb);
+		//textEditor[i]->add_key_binding(FL_Enter, FL_TEXT_EDITOR_ANY_STATE, (Fl_Text_Editor::Key_Func) entercb);
 		textEditor[i]->add_key_binding('u', FL_CTRL | FL_SHIFT, (Fl_Text_Editor::Key_Func) ctrlUcb);
 		textEditor[i]->add_key_binding('u', FL_CTRL, (Fl_Text_Editor::Key_Func) ctrlUcb);
 	}
@@ -202,6 +208,10 @@ void CommandWindow::entercb(int key, Fl_Text_Editor* editor)
 void CommandWindow::upcb(int key, Fl_Text_Editor* editor) 
 {
 	CommandWindow* commandWindow = CommandWindow::getCommandWindow(editor);
+	// only use up/down functionality if the cursor is at the very beginning
+	if (editor->buffer()->length() > 0)
+		return;
+
 	commandWindow->historyLocation--;
 	if (commandWindow->historyLocation < 0)
 		commandWindow->historyLocation = 0;
@@ -231,6 +241,13 @@ void CommandWindow::clearcb(Fl_Widget* w, void* data)
 		return;
 	Fl_Text_Display* display = commandWindow->textDisplay;
 	display->buffer()->remove(0, display->buffer()->length());
+}
+
+void CommandWindow::executecb(Fl_Widget* w, void* data)
+{
+	CommandWindow* commandWindow = (CommandWindow*) data;
+
+	CommandWindow::entercb(0, (Fl_Text_Editor*) commandWindow->tabGroup->value());
 }
 
 void CommandWindow::clearhistorycb(Fl_Widget* w, void* data)
