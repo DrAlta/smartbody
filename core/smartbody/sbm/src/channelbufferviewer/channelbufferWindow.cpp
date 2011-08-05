@@ -590,11 +590,11 @@ void ChannelBufferWindow::refreshMotionChannels(Fl_Widget* widget, void* data)
 		for(int i = 0; i < channels.size(); ++i)
 		{
 			if(channels.joint(i) == NULL) continue;
-			const char* name = channels.joint(i)->name().c_str();
+			std::string name = channels.joint(i)->name();
 			SkChannel::Type type = channels.get(i).type;
 			for(j = 0; j < window->Channel_item_list.size(); ++j)
 			{
-				if(strcmp(&(window->Channel_item_list.get(j).name->get(0)), name) == 0
+				if(strcmp(&(window->Channel_item_list.get(j).name->get(0)), name.c_str()) == 0
 					&& window->Channel_item_list.get(j).type == type)
 				{
 					window->Channel_item_list.get(j).motion_filtered = false;
