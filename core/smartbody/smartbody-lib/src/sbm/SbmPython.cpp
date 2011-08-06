@@ -30,6 +30,87 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 	}
 };
 
+struct PythonControllerWrap : SmartBody::PythonController, boost::python::wrapper<SmartBody::PythonController>
+{
+	virtual void start()
+	{
+		if (boost::python::override o = this->get_override("start"))
+		{
+			try {
+				o();
+			} catch (...) {
+				LOG("Problem running PythonController command 'start'.");
+			}
+		}
+
+		return PythonController::start();
+	};
+
+	void default_start()
+	{
+		SmartBody::PythonController::start();
+	}
+
+	virtual void init()
+	{
+		if (boost::python::override o = this->get_override("init"))
+		{
+			try {
+				o();
+			} catch (...) {
+				LOG("Problem running PythonController command 'init'.");
+			}
+		}
+
+		return PythonController::init();
+	};
+
+	void default_init()
+	{
+		SmartBody::PythonController::init();
+	}
+
+	virtual void evaluate()
+	{
+		if (boost::python::override o = this->get_override("evaluate"))
+		{
+			try {
+				o();
+			} catch (...) {
+				LOG("Problem running PythonController command 'evaluate'.");
+			}
+		}
+
+		return PythonController::evaluate();
+	};
+
+	void default_evaluate()
+	{
+		SmartBody::PythonController::evaluate();
+	}
+
+	virtual void stop()
+	{
+		if (boost::python::override o = this->get_override("stop"))
+		{
+			try {
+				o();
+			} catch (...) {
+				LOG("Problem running PythonController command 'stop'.");
+			}
+		}
+
+		return PythonController::stop();
+	};
+
+	void default_stop()
+	{
+		SmartBody::PythonController::stop();
+	}
+};
+
+
+
 
 namespace SmartBody 
 {
@@ -340,14 +421,12 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("execute", &Nvbg::execute, &NvbgWrap::default_execute, "Execute the NVBG processor.")
 		;
 
-	boost::python::class_<PythonController, boost::python::bases<SBController> >("PythonController")
-		.def("start", &PythonController::start, "start.")
-		.def("stop", &PythonController::stop, "stop.")
-		.def("init", &PythonController::init, "init.")
-		.def("evaluate", &PythonController::evaluate, "evaluate.")
+	boost::python::class_<PythonControllerWrap, boost::python::bases<SBController>, boost::noncopyable> ("PythonController")
+		.def("start", &PythonController::start, &PythonControllerWrap::default_start, "start.")
+		.def("stop", &PythonController::stop, &PythonControllerWrap::default_stop, "stop.")
+		.def("init", &PythonController::init, &PythonControllerWrap::default_init, "init.")
+		.def("evaluate", &PythonController::evaluate, &PythonControllerWrap::default_evaluate, "evaluate.")
 		;
-
-   
 
 	}
 
