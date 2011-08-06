@@ -85,7 +85,7 @@ class mcuCBHandle;
 #include <sbm/general_param_setting.h>
 #include <sbm/SBScene.h>
 #include "sbm/BoneMap.h"
-#include <sbm/Nvbg.h>
+#include <sbm/nvbg.h>
 
 #include <me/me_ct_interpolator.h>
 #include <sbm/me_ct_param_animation_utilities.h>

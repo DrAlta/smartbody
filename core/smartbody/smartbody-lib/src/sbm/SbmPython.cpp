@@ -5,7 +5,7 @@
 #include <boost/python/args.hpp>
 #include "me/me_ct_scheduler2.h"
 #include "VisemeMap.hpp"
-#include "Nvbg.h"
+#include "nvbg.h"
 
 
 struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>

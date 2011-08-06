@@ -76,7 +76,7 @@
 #include "SteeringAgent.h"
 
 #include <sbm/me_ct_data_receiver.h>
-#include <sbm/Nvbg.h>
+#include <sbm/nvbg.h>
 
 //#include <me/me_spline_1d.hpp>
 class MeCtMotionPlayer;
