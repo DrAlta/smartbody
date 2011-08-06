@@ -306,6 +306,8 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/SbmPython.cpp
 	sbm/SbmPythonClass.cpp
 
+	sbm/nvbg.cpp
+
 )
 
 ####
