@@ -245,11 +245,11 @@ void BoneBusHandler::OnBoneRotations( const bonebus::BulkBoneRotations * bulkBon
 	for ( i = 0; i < bulkBoneRotations->numBoneRotations; i++ )
 	{
 		int id = bulkBoneRotations->bones[ i ].boneId;
-		if ((*lastTimes)[i] >= bulkBoneRotations->time)
+		if ((*lastTimes)[id] >= bulkBoneRotations->time)
 		{
 			continue;
 		}
-		(*lastTimes)[i] = bulkBoneRotations->time;
+		(*lastTimes)[id] = bulkBoneRotations->time;
 
 		if (id >= (int) skeletonMap.size())
 			continue;
@@ -332,11 +332,11 @@ void BoneBusHandler::OnBonePositions( const bonebus::BulkBonePositions * bulkBon
 	for ( i = 0; i < bulkBonePositions->numBonePositions; i++ )
 	{
 		int id = bulkBonePositions->bones[ i ].boneId;
-		if ((*lastTimes)[i] >= bulkBonePositions->time)
+		if ((*lastTimes)[id] >= bulkBonePositions->time)
 		{
 			continue;
 		}
-		(*lastTimes)[i] = bulkBonePositions->time;
+		(*lastTimes)[id] = bulkBonePositions->time;
 
 		if (id >= (int) skeletonMap.size())
 			continue;
