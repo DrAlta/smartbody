@@ -830,6 +830,8 @@ std::string cerevoice_tts::tts( const char * text, const char * cereproc_file_na
 {
    char * result = "";
 
+   printf( "cerevoice_tts::tts() - '%s' - '%s' - '%s' - '%s'\n", text, cereproc_file_name, player_file_name, voice_id.c_str() );
+
    /*
       Create a text normalisation parser
       The parser is configured with a file defining abbreviations to be
