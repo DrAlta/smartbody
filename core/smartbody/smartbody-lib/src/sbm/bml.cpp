@@ -1488,6 +1488,11 @@ void VisemeRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu )
 	{
 		readyAt += rampup;
 		relaxAt = endAt - rampdown;
+		if (relaxAt < readyAt)
+		{
+			readyAt = (endAt + startAt) * 0.5f;
+			relaxAt = readyAt;
+		}
 	}
 
 #if ENABLE_DIRECT_VISEME_SCHEDULE
