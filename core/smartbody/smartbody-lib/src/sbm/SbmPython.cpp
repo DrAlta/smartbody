@@ -1,13 +1,12 @@
 #include "SbmPython.h"
 #include "SbmPythonClass.h"
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp> 
-#include <boost/python/return_internal_reference.hpp>
-#include <boost/python/args.hpp>
 #include "me/me_ct_scheduler2.h"
 #include "VisemeMap.hpp"
 #include "nvbg.h"
 
 
+
+#ifdef USE_PYTHON
 struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 {
 	virtual bool execute(std::string character, std::string to, std::string messageId, std::string xml)
@@ -108,12 +107,22 @@ struct PythonControllerWrap : SmartBody::PythonController, boost::python::wrappe
 		SmartBody::PythonController::stop();
 	}
 };
+#endif
 
+
+
+
+#ifdef USE_PYTHON
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp> 
+#include <boost/python/return_internal_reference.hpp>
+#include <boost/python/args.hpp>
+#endif
 
 
 
 namespace SmartBody 
 {
+#ifdef USE_PYTHON
 BOOST_PYTHON_MODULE(SmartBody)
 {
 	boost::python::numeric::array::set_module_and_type("numpy", "ndarray");
@@ -429,6 +438,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 		;
 
 	}
+#endif
 
 
 }
@@ -436,6 +446,8 @@ BOOST_PYTHON_MODULE(SmartBody)
 
 void initPython(std::string pythonLibPath)
 {	
+#ifdef USE_PYTHON
+	Py_SetProgramName("../../../../core/smarybody/Python26/");
 	Py_Initialize();
 	try {
 		boost::python::object objectMain = boost::python::import("__main__");
@@ -486,4 +498,5 @@ void initPython(std::string pythonLibPath)
 	} catch (...) {
 		PyErr_Print();
 	}
+#endif
 }

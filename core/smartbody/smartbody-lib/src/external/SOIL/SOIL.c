@@ -20,6 +20,9 @@
 	#include <windows.h>
 	#include <wingdi.h>
 	#include <GL/gl.h>
+#elif defined(BUILD_ANDROID)
+	#include <GLES2/gl2.h>
+	#include <GLES2/gl2ext.h>
 #elif defined(__APPLE__) || defined(__APPLE_CC__)
        #include <OpenGL/gl.h>
 //       #include <Carbon/Carbon.h>

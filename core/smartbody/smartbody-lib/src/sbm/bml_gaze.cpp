@@ -480,7 +480,6 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 				wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid priority key attribute\"" << priority_key_name << "\"." << endl;
 				std::string str = convertWStringToString(wstrstr.str());
 				LOG(str.c_str());
-
 			}
 		}
 	}

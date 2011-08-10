@@ -490,7 +490,6 @@ void BehaviorSyncPoints::applyParentTimes( std::string& warning_context ) {
 
 void BehaviorSyncPoints::printSyncIds() {
 	wostringstream buffer;
-
 	if( !named_syncs.empty() ) {
 		iterator it = named_syncs.begin();
 		iterator end = named_syncs.end();
@@ -503,7 +502,6 @@ void BehaviorSyncPoints::printSyncIds() {
 			buffer << ", " << it->name();
 		}
 	}
-
 	wcout << buffer.str() << endl;
 }
 

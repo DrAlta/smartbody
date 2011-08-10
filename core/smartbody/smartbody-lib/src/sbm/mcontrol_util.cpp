@@ -51,9 +51,11 @@
 #if USE_WSP
 #include "wsp.h"
 #endif
-
-#include <boost/python.hpp> // boost python support
+#include <sbm/SbmPythonClass.h>
 #include <sbm/SbmPython.h>
+#ifdef USE_PYTHON
+#include <boost/python.hpp> // boost python support
+#endif
 #include "sr/sr_model.h"
 #include "sbm/GPU/SbmShader.h"
 #include "sbm/GPU/SbmTexture.h"
@@ -192,7 +194,9 @@ mcuCBHandle::~mcuCBHandle() {
 	clear();
 
 	// clean up python
+#ifdef USE_PYTHON
 	Py_Finalize();
+#endif
 }
 
 void mcuCBHandle::reset( void )	{
@@ -1448,6 +1452,7 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 
 int mcuCBHandle::executePythonFile(const char* filename)
 {
+#ifdef USE_PYTHON
 	try {
 		FILE* file = fopen(filename, "r");
 		if (file)
@@ -1467,12 +1472,13 @@ int mcuCBHandle::executePythonFile(const char* filename)
 	} catch (...) {
 		PyErr_Print();
 	}
-
+#endif
 	return CMD_FAILURE;
 }
 
 int mcuCBHandle::executePython(const char* command)
 {
+#ifdef USE_PYTHON
 	try {
 		CmdResource* resource = new CmdResource();
 		resource->setChildrenLimit(resource_manager->getLimit());	// assuming the limit of total resources( path, motion, file, command) is the same with the limit of children ( command resource only) number
@@ -1485,7 +1491,7 @@ int mcuCBHandle::executePython(const char* command)
 	} catch (...) {
 		PyErr_Print();
 	}
-
+#endif
 	return CMD_FAILURE;
 }
 

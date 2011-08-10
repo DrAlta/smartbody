@@ -72,12 +72,7 @@ using namespace xml_utils;
 BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     const XMLCh* tag      = elem->getTagName();
 
-	std::wstringstream wstrstr;	
-
 	MeCtExampleBodyReach* bodyReachCt = NULL; 
-
-	
-
 	SbmCharacter* curCharacter = const_cast<SbmCharacter*>(request->actor);
 	std::map<int,MeCtReachEngine*>& reMap = curCharacter->getReachEngineMap();
 	if (reMap.size() == 0)

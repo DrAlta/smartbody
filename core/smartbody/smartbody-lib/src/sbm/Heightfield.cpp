@@ -1,8 +1,11 @@
 #include "Heightfield.h"
 
 //#include <windows.h> // standard Windows app include
+#ifdef __ANDROID__
+#else
 #include <GL/gl.h> // standard OpenGL include
 #include <GL/glu.h> // OpenGL utilties
+#endif
 //#include <gl/glaux.h> // OpenGL auxiliary functions
 #include <cstdio>
 #include <cstdlib>
@@ -125,7 +128,8 @@ void Heightfield::paste_img( void )	{
 #endif
 
 void Heightfield::render( int renderMode )	{
-
+#ifdef __ANDROID__
+#else
 	if( vertex_arr && color_arr )	{
 
 		if( dirty_normals )	{
@@ -247,6 +251,7 @@ void Heightfield::render( int renderMode )	{
 		glPopAttrib();
 
 	}
+#endif
 }
 
 void Heightfield::normalize_arr3( float V[ 3 ] ) {

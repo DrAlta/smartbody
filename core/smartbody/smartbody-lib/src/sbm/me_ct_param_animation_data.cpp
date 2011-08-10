@@ -23,9 +23,12 @@
 #include "me_ct_param_animation_data.h"
 #include <sr/sr_euler.h>
 #include <sbm/me_ct_ublas.hpp>
-#include <external/tetgen/tetgen.h>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
+
+#ifdef USE_TETGEN
+#include <external/tetgen/tetgen.h>
+#endif
 
 const double changeLimit = 20;
 
@@ -610,6 +613,7 @@ void ParameterManager::addTetrahedron(std::string motion1, std::string motion2, 
 
 void ParameterManager::buildTetrahedron()
 {
+#if USE_TETGEN
 	tetgenio ptIn, tetOut;
 	// initialize input points
 	ptIn.numberofpoints = parameters.size();
@@ -633,6 +637,7 @@ void ParameterManager::buildTetrahedron()
 //		std::cout << "[" << i << "]: " << motions[0] << ", " << motions[1] << ", " << motions[2] << ", " << motions[3] << std::endl; 
 		addTetrahedron(motions[0], motions[1], motions[2], motions[3]);
 	}
+#endif
 }
 
 int ParameterManager::getType()

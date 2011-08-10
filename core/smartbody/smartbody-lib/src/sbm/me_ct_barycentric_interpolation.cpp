@@ -1,9 +1,14 @@
 #include <map>
 #include <boost/foreach.hpp>
 #include "me_ct_barycentric_interpolation.h"
-#include <external/tetgen/tetgen.h>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
+
+
+//#define USE_TETGEN
+#ifdef USE_TETGEN
+#include <external/tetgen/tetgen.h>
+#endif
 
 #define FREE_DATA(data) if (data) delete data; data=NULL;
 
@@ -137,6 +142,7 @@ bool BarycentricInterpolator::pointInsideSimplex(const dVector& pt, Simplex& tet
 
 bool BarycentricInterpolator::buildInterpolator()
 {
+#ifdef USE_TETGEN
 	tetgenio ptIn, tetOut;
 	// initialize input points
 	ptIn.numberofpoints = interpExamples.size();	
@@ -162,7 +168,7 @@ bool BarycentricInterpolator::buildInterpolator()
 			tet.vertexIndices.push_back(tetOut.tetrahedronlist[i*tetOut.numberofcorners+k]);
 		simplexList.push_back(tet);
 	}
-
+#endif
 	//ptIn.deinitialize();	
 	//tetOut.deinitialize();
 	return true;	

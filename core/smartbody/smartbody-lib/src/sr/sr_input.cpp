@@ -227,7 +227,7 @@ int SrInput::getline ( SrString& buf )
    return c;
  }
 
-int SrInput::getchar ()
+int SrInput::getchar_sr ()
  {
    int c = EOF;
 
@@ -247,13 +247,13 @@ static void skip_c_comment ( SrInput *p )
  {
    int c, d;
    while ( true )
-    { c = p->getchar();
+    { c = p->getchar_sr();
       if ( c=='/' ) // for nested comments
-       { d = p->getchar();
+       { d = p->getchar_sr();
          if ( d=='*' ) skip_c_comment(p); else p->unget(d);
        }
       else if ( c=='*' )
-       { d = p->getchar();
+       { d = p->getchar_sr();
          if ( d=='/' ) return; else p->unget(d);
        }
       else if ( c<0 ) return; // EOF found in the middle of a comment will not cause an error.
@@ -262,13 +262,13 @@ static void skip_c_comment ( SrInput *p )
 
 int SrInput::get ()
  {
-   int c = getchar();
+   int c = getchar_sr();
 
    if ( _comment_style==0 )
     { return c;
     }
    else if ( _comment_style=='C' && c=='/' )
-    { int d = getchar();
+    { int d = getchar_sr();
       if ( d=='*' )
        { skip_c_comment(this);
          return get();
@@ -294,7 +294,7 @@ void SrInput::unget ( char c )
 
 void SrInput::advance ( int n )
  {
-   while ( n-->0 ) if ( getchar()<0 ) break;
+   while ( n-- > 0 ) if ( getchar_sr() < 0 ) break;
  }
 
 void SrInput::rewind ()
@@ -330,7 +330,7 @@ void SrInput::set_pos_and_update_cur_line ( int pos )
 void SrInput::skip_line ()
  {
    int c;
-   do { c = getchar();
+   do { c = getchar_sr();
       } while ( c!=EOF && c!='\n' );
  }
 
@@ -401,9 +401,9 @@ SrInput::TokenType SrInput::get_token ( SrString &buf )
     { //SR_TRACE1 ( "Quote found..." );
       i = 0;
       while ( true )
-       { c = getchar();                    // Comments inside a string are not considered
+       { c = getchar_sr();                    // Comments inside a string are not considered
          if ( !c || c=='"' ) break;
-         if ( c=='\\' ) c = get_escape_char ( getchar() );
+         if ( c=='\\' ) c = get_escape_char ( getchar_sr() );
          if ( c ) buf[i++]=c; 
          if ( i+1==size ) break;
        }
@@ -436,7 +436,7 @@ SrInput::TokenType SrInput::get_token ( SrString &buf )
           else if ( !isdigit(c) ) break;
          buf[i++]=c; 
          if ( i+1==size ) break;
-         c = getchar();
+         c = getchar_sr();
        }
       buf[i]=0;
 
@@ -474,7 +474,7 @@ SrInput::TokenType SrInput::get_token ( SrString &buf )
        { if ( !isalnum(c) && c!='_' ) break;
          buf[i++]=c; 
          if ( i+1==size ) break;
-         c = getchar();
+         c = getchar_sr();
        }
       buf[i]=0;
       if ( i+1==size ) { 
