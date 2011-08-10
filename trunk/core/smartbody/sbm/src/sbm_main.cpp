@@ -668,7 +668,7 @@ fprintf( stdout, "output:'%s'\n", str.c_str() );
 	TimeIntervalProfiler* profiler = new TimeIntervalProfiler();
 	mcu.register_profiler(*profiler);
 
-	std::string python_lib_path = "../../../../lib/Python26/Lib";
+	std::string python_lib_path = "../../../../core/smartbody/Python26/Lib";
 	// EDF - taken from tre_main.cpp, a fancier command line parser can be put here if desired.
 	//	check	command line parameters:
 	bool lock_dt_mode = false;

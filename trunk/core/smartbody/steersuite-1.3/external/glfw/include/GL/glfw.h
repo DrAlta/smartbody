@@ -158,6 +158,7 @@ extern "C" {
 #if defined(__APPLE_CC__)
  #include <OpenGL/gl.h>
  #include <OpenGL/glu.h>
+#elif defined(BUILD_ANDROID)
 #else
  #include <GL/gl.h>
  #include <GL/glu.h>

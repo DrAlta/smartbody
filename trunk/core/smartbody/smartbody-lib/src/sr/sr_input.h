@@ -204,7 +204,7 @@ class SrInput
         Will read next char from the associated string or file. If SrInput is of
         TypeNull, -1 is always returned. Comments are not considered, but unget
         chars are correctly handled. */
-    int getchar (); // comments not handled
+    int getchar_sr(); 
 
     /*! Get current byte and advance, will return 0 if finish is reached.
         This is for ascii inputs where comments are skipped according to

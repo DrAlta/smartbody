@@ -87,7 +87,6 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 		std::wstringstream wstrstr;
 		cerr<<"WARNING: BML::parse_bml_animation(): behavior \""<<unique_id<<"\": missing name= attribute; ignoring <animation>.";
 		LOG(convertWStringToString(wstrstr.str()).c_str());
-
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 }

@@ -98,6 +98,11 @@ namespace Util {
 		clock_gettime(CLOCK_HIGHRES, &timeInfo);
 		unsigned long long int nanosecs = ((unsigned long long)timeInfo.tv_sec)*1000000000  +  ((unsigned long long)timeInfo.tv_nsec);
 		return nanosecs;
+	#elif defined (BUILD_ANDROID)
+		timespec timeInfo;
+		clock_gettime(CLOCK_REALTIME, &timeInfo);
+		unsigned long long int nanosecs = ((unsigned long long)timeInfo.tv_sec)*1000000000  +  ((unsigned long long)timeInfo.tv_nsec);
+		return nanosecs;
 	#else
 		// **** NOTE CAREFULLY: ****
 		// if you change the option used here, you MUST update the frequency that is computed in getHighResCounterFrequency() as well!

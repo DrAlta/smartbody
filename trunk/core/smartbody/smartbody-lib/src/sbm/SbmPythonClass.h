@@ -1,9 +1,9 @@
 #ifndef _SBMPYTHONCLASS_
 #define _SBMPYTHONCLASS_
 
-#include "vhcl.h"
 
-#include <boost/python.hpp>
+
+#include "vhcl.h"
 #include <sbm/mcontrol_util.h>
 #include <sbm/resource_cmds.h>
 #include <sbm/sbm_character.hpp>
@@ -16,6 +16,13 @@
 #include <sbm/SBSkeleton.h>
 #include <sbm/SBCharacter.h>
 #include <sbm/SBController.h>
+
+#ifndef __ANDROID__
+#define USE_PYTHON
+#endif
+
+#ifdef USE_PYTHON
+#include <boost/python.hpp>
 
 namespace SmartBody 
 {
@@ -271,5 +278,6 @@ protected:
 
 
 }
+#endif
 
 #endif

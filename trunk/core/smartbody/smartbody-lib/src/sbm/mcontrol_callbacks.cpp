@@ -59,7 +59,12 @@
 #include "sr/sr_model.h"
 #include "sbm_pawn.hpp"
 #include "sbm/Event.h"
+
+#ifndef __ANDROID__
 #include "sbm/ParserOpenCOLLADA.h"
+#endif
+
+
 #include "SteeringAgent.h"
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -2079,8 +2084,14 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 	}
 }
 
+
 int mcu_character_load_skinweights( const char* char_name, const char* skin_file, mcuCBHandle* mcu_p, float scaleFactor, const char* prefix )
 {
+
+#ifdef __ANDROID__
+	return ( CMD_SUCCESS );	
+#endif
+
    std::string jointNamePrefix;
 	if (prefix)
 		jointNamePrefix = prefix;
@@ -2144,7 +2155,6 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 
 	delete parser;
 	delete errHandler;
-
 	return( CMD_SUCCESS );	
 }
 

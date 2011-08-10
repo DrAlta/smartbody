@@ -50,8 +50,7 @@ using namespace xml_utils;
 
 BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
     
-	const XMLCh* tag      = elem->getTagName();
-	std::wstringstream wstrstr;	
+	const XMLCh* tag      = elem->getTagName();	
 	MeCtHand* handCt = NULL; 
 	const XMLCh* attrHandle = elem->getAttribute( BMLDefs::ATTR_HANDLE );
 	std::string handle = "";

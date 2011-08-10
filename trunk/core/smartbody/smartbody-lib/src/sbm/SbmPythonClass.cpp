@@ -4,6 +4,8 @@
 namespace SmartBody 
 {
 
+#ifdef USE_PYTHON
+
 Script::Script()
 {
 }
@@ -1646,5 +1648,5 @@ SkMotion* getMotion(std::string name)
 	return motion;
 }
 
-
+#endif
 }

@@ -26,7 +26,7 @@
 
 
 // to handle user input properly with GLFW_PRESS and GLFW_RELEASE macros
-#include "glfw/include/GL/glfw.h"
+//#include "glfw/include/GL/glfw.h"
 
 using namespace std;
 using namespace SteerLib;

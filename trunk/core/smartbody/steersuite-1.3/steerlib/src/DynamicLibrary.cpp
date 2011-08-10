@@ -101,7 +101,7 @@ void* DynamicLibrary::getSymbol( const std::string & symbolName, bool throwIfNot
     // then call dlsym(), and check if dlerror() had any error message afterwards.
     dlerror();
     symbol = dlsym( _libraryHandle,  symbolName.c_str() );
-    char * errorMsg = dlerror();
+    const char * errorMsg = dlerror();
     if (errorMsg != NULL) {
 	if (throwIfNotFound) {
 	    throw GenericException( std::string(errorMsg) );

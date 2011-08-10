@@ -2660,22 +2660,6 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="TetGen"
-				>
-				<File
-					RelativePath="..\src\external\tetgen\predicates.cxx"
-					>
-				</File>
-				<File
-					RelativePath="..\src\external\tetgen\tetgen.cxx"
-					>
-				</File>
-				<File
-					RelativePath="..\src\external\tetgen\tetgen.h"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="glew"
 				>
 				<File

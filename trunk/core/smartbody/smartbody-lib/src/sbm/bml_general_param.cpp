@@ -85,9 +85,8 @@ BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& un
 	if(flag == 0)
 	{	
 		std::wstringstream wstrstr;
-		wcerr<<"WARNING: Cannot find the parameter name! Please check your initialization in Sequence File\n";
+		wstrstr<<"WARNING: Cannot find the parameter name! Please check your initialization in Sequence File\n";
 		LOG(convertWStringToString(wstrstr.str()).c_str());
-
 		return BehaviorRequestPtr();
 	}
 
