@@ -223,8 +223,8 @@
 		</Configuration>
 		<Configuration
 			Name="DebugFBX|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory=".\obj\sbm_debugfbx"
+			IntermediateDirectory=".\obj\sbm_debugfbx"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
@@ -311,8 +311,8 @@
 		</Configuration>
 		<Configuration
 			Name="ReleaseFBX|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory=".\obj\sbm_releasefbx"
+			IntermediateDirectory=".\obj\sbm_releasefbx"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
