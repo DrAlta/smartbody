@@ -115,7 +115,7 @@ const char* SbmPawn::WORLD_OFFSET_JOINT_NAME = "world_offset";
 SkChannelArray SbmPawn::WORLD_OFFSET_CHANNELS_P;
 
 
-SbmPawn::SbmPawn()
+SbmPawn::SbmPawn() : DObject()
 {
 	SbmPawn::initData();
 
@@ -125,8 +125,8 @@ SbmPawn::SbmPawn()
 }
 
 // Constructor
-SbmPawn::SbmPawn( const char * name )
-:	_skeleton( NULL ),
+SbmPawn::SbmPawn( const char * name ) : DObject(),
+	_skeleton( NULL ),
 	scene_p( NULL ),
 	//dMesh_p( new DeformableMesh() ),
 	dMesh_p( new SbmDeformableMeshGPU() ),
