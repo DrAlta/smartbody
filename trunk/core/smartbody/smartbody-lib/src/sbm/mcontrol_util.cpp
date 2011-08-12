@@ -1637,7 +1637,7 @@ bool mcuCBHandle::addPawn(SbmPawn* pawn)
 void mcuCBHandle::removePawn(std::string name)
 {
 	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(name);
-	if (iter == pawn_map.end())
+	if (iter != pawn_map.end())
 	{
 		pawn_map.erase(iter);
 	}
@@ -1679,7 +1679,7 @@ bool mcuCBHandle::addCharacter(SbmCharacter* character)
 void mcuCBHandle::removeCharacter(std::string name)
 {
 	std::map<std::string, SbmCharacter*>::iterator iter = character_map.find(name);
-	if (iter == character_map.end())
+	if (iter != character_map.end())
 	{
 		character_map.erase(iter);
 	}

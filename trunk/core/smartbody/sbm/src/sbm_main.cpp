@@ -1030,7 +1030,7 @@ fprintf( stdout, "output:'%s'\n", str.c_str() );
 						result = mcu.execute(cmd);
 					}
 
-					switch( int ret = mcu.execute( cmd ) ) {
+					switch( result ) {
 						case CMD_NOT_FOUND:
 							printf("SBM ERR: command NOT FOUND: '%s'\n", cmd );
 							fprintf( stdout, "> " ); fflush( stdout );
@@ -1042,7 +1042,7 @@ fprintf( stdout, "output:'%s'\n", str.c_str() );
 						case CMD_SUCCESS:						
 							break;
 						default:
-							printf("SBM ERR: return value %d ERROR: '%s'\n", ret, cmd );
+							printf("SBM ERR: return value %d ERROR: '%s'\n", result, cmd );
 							fprintf( stdout, "> " ); fflush( stdout );
 							break;
 					}
