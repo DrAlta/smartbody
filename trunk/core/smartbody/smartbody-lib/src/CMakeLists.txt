@@ -19,8 +19,6 @@ set( SMARTBODY_LIB_EXT_ANN_SRC
 	external/ANN/kd_util.cpp
 	external/ANN/perf.cpp
 
-	external/tetgen/tetgen.cxx
-	external/tetgen/predicates.cxx
 )
 
 set( SMARTBODY_LIB_EXT_SOIL_SRC
