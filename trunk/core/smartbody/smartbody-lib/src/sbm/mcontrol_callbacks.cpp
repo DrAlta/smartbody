@@ -978,7 +978,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				}
 			}
 			else if (nextString == "tetrahedron")
-			{
+			{ 
 				PAStateData* state = mcu_p->lookUpPAState(stateName);
 				if (!state) return CMD_FAILURE;
 				int numTetrahedrons = args.read_int();
@@ -5876,6 +5876,191 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, mcuCBHandle *mcu )
 	}
 	return CMD_SUCCESS;
 }
+
+
+int mcu_character_breathing( const char* name, srArgBuffer& args, mcuCBHandle *mcu_p) //Celso: Summer 2008
+{
+	SbmCharacter* char_p = mcu_p->getCharacter( name );
+	if( !char_p )	
+	{
+		LOG( "mcu_character_breathing ERR: Character '%s' NOT FOUND\n", name ); 
+		return( CMD_FAILURE );
+	}
+
+	MeCtBreathing* breathing_p = char_p->breathing_p;
+	if (!breathing_p)
+	{
+		LOG("Character '%s' has no breathing controller.", name);
+		return CMD_FAILURE;
+	}
+
+	char *breathing_cmd = args.read_token();
+	
+	if( strcmp( breathing_cmd, "bpm" ) == 0 )	
+	{
+		float bpm = args.read_float();
+		bool smooth = true;
+		if(args.calc_num_tokens() > 0)
+		{
+			char *smooth_str = args.read_token();
+			smooth = (strcmp(smooth_str, "true") == 0);
+		}
+		breathing_p->breaths_per_minute(bpm, smooth);
+		return( CMD_SUCCESS );
+	}
+	else if( strcmp( breathing_cmd, "min" ) == 0 )	
+	{
+		float min = args.read_float();
+		float transition = 1.0f;
+		if(args.calc_num_tokens() > 0)
+			transition = args.read_float();
+		if((strcmp(breathing_p->current_breath_layer()->cycle->type(), "LinearBreathCycle") == 0)
+			|| (strcmp(breathing_p->current_breath_layer()->cycle->type(), "SineBreathCycle") == 0))
+			((MinMaxBreathCycle*)breathing_p->current_breath_layer()->cycle)->min(min, transition);
+		return( CMD_SUCCESS );
+	}
+	else if( strcmp( breathing_cmd, "max" ) == 0 )	
+	{
+		float max = args.read_float();
+		float transition = 1.0f;
+		if(args.calc_num_tokens() > 0)
+			transition = args.read_float();
+		if((strcmp(breathing_p->current_breath_layer()->cycle->type(), "LinearBreathCycle") == 0)
+			|| (strcmp(breathing_p->current_breath_layer()->cycle->type(), "SineBreathCycle") == 0))
+			((MinMaxBreathCycle*)breathing_p->current_breath_layer()->cycle)->max(max, transition);
+		return( CMD_SUCCESS );
+	}
+	else if( strcmp( breathing_cmd, "motion" ) == 0 )	
+	{
+		char *motion = args.read_token();
+		SkMotion *mot_p = mcu_p->getMotion( motion );
+		if( mot_p == NULL ) {
+			printf( "Breathing motion '%s' NOT FOUND in motion map\n", motion ); 
+			return( CMD_FAILURE );
+		}
+		breathing_p->motion(mot_p);
+		return( CMD_SUCCESS );
+	}
+	else if( strcmp( breathing_cmd, "incremental" ) == 0 )
+	{
+		char *incremental_str = args.read_token();
+		bool incremental = (strcmp(incremental_str, "true") == 0);
+		breathing_p->incremental(incremental);
+		return( CMD_SUCCESS );
+	}
+	else if( strcmp( breathing_cmd, "push" ) == 0 )	
+	{
+		char *type = args.read_token();
+
+		if( strcmp(type, "linear") == 0)
+			breathing_p->push_breath_layer(breathing_p->default_breath_cycle());
+		else if( strcmp(type, "sine") == 0)
+			breathing_p->push_breath_layer(new SineBreathCycle(
+			breathing_p->default_breath_cycle()->min(), breathing_p->default_breath_cycle()->max()));
+		else if( strcmp(type, "keyframe") == 0)
+		{
+			int args_count = args.calc_num_tokens();
+			if((args_count % 2) != 0)
+			{
+				printf( "Number of arguments should be even. Try 'breathing <name> help'."); 
+				return( CMD_FAILURE );
+			}
+			
+			KeyframeBreathCycle* cycle = new KeyframeBreathCycle();
+			for(int i=0; i<args_count; i = i+2)
+			{
+				float time = args.read_float();
+				float value = args.read_float();
+				cycle->keyframes.push_back(new KeyframeBreathCycle::Keyframe(value, time));
+			}
+			cycle->update();
+
+			breathing_p->push_breath_layer(cycle);
+		}
+		else if( strcmp(type, "spline") == 0)
+		{
+			int args_count = args.calc_num_tokens();
+			if((args_count % 2) != 0)
+			{
+				printf( "Number of arguments should be even. Try 'breathing <name> help'."); 
+				return( CMD_FAILURE );
+			}
+
+			MeSpline1D* spline = new MeSpline1D();
+			for(int i=0; i<args_count; i = i+2)
+			{
+				float x = args.read_float();
+				float y = args.read_float();
+				spline->make_smooth(x, y, 0, 0, 0);
+			}
+			breathing_p->push_breath_layer(new SplineBreathCycle(spline));
+		}
+
+		return( CMD_SUCCESS );
+	}
+	else if( strcmp( breathing_cmd, "pop" ) == 0 )
+	{
+		breathing_p->pop_breath_layer();
+		return( CMD_SUCCESS );
+	}
+	else if( strcmp( breathing_cmd, "print" ) == 0 )
+	{
+		breathing_p->print_state(0);
+		return( CMD_SUCCESS );
+	}
+	else if( strcmp( breathing_cmd, "help" ) == 0 )
+	{
+		printf("Sintax: breathing <controller_name> <options>\n"
+			"Options:\n"
+			" help\n"
+			"\tSets the breaths-per-minute rate.\n"
+			"\tSet 'isSmooth' to 'true' or 'false' to define whether to apply a\n"
+			"\tsmooth transition. Defaults to 'true'.\n"
+
+			" min <value> [transition]\n"
+			"\tSets the minimum respiratory volume. Use with the linear and sine\n"
+			"\tbreath cycles only.\n"
+			"\tSet 'transition' to the transition duration in seconds. Default\n"
+			"\tvalue is 1.0s.\n"
+			
+			" max <value> [transition]\n"
+			"\tSets the maximum respiratory volume. Use with the linear and sine\n"
+			"\tbreath cycles only.\n"
+			"\tSet 'transition' to the transition duration in seconds. Default\n"
+			"\tvalue is 1.0s.\n"
+			
+			" motion <name> [isSmooth]\n"
+			"\tSets the breathing motion.\n"
+
+			" incremental <bool>\n"
+			"\tSets whether the breathing motion is additive.\n"
+
+			" push linear\n"
+			"\tPushes to the top of the stack the (default) linear breathing cycle.\n"
+
+			" push sine\n"
+			"\tPushes to the top of the stack a sine breathing cycle.\n"
+			
+			" push keyframe <time1> <value1> <time2> <value2> ...\n"
+			"\tPushes to the top of the stack a custom keyframe breathing cycle.\n"
+			
+			" push spline knot1_x knot1_y knot2_x knot2_y ...\n"
+			"\tPushes to the top of the stack a spline breathing cycle.\n"
+			
+			" pop\n"
+			"\tPops the breathing cycle from the top of the stack.\n"
+			
+			" print\n"
+			"\tPrints the controller's state\n"
+			);
+					
+		return( CMD_SUCCESS );
+	}
+
+
+	return( CMD_FAILURE );
+}
+
 
 int mcu_vrExpress_func( srArgBuffer& args, mcuCBHandle *mcu )
 {
