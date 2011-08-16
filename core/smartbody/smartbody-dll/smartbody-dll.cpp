@@ -3,7 +3,7 @@
 
 #include "smartbody-dll.h"
 
-#ifdef WIN32
+#ifdef WIN_BUILD
 #include <windows.h>
 #include <mmsystem.h>
 #endif
@@ -15,9 +15,11 @@
 #include "sbm/resource_cmds.h"
 #include "sbm/locomotion_cmds.hpp"
 
+
 using std::string;
 
-#ifdef WIN32
+
+#ifdef WIN_BUILD
 BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 {
    switch ( fdwReason )
@@ -52,10 +54,9 @@ class Smartbody_dll_SBMCharacterListener_Internal : public SBMCharacterListener
 
       virtual void OnCharacterCreate( const string & name, const string & objectClass )
       {
-		  
          if ( m_dll->m_listener )
          {
-			 m_dll->m_listener->OnCharacterCreate( name, objectClass );
+            m_dll->m_listener->OnCharacterCreate( name, objectClass );
          }
       }
 
@@ -63,14 +64,14 @@ class Smartbody_dll_SBMCharacterListener_Internal : public SBMCharacterListener
       {
          if ( m_dll->m_listener )
          {
-			 std::map<std::string,SmartbodyCharacter*>::iterator mi = m_dll->m_characters.find(name);
-			 SmartbodyCharacter* pc = NULL;
-			 if (mi != m_dll->m_characters.end())
-			 {
-				 pc = mi->second;				  
-				 delete pc;
-				 m_dll->m_characters.erase(mi);				  
-			 }		
+            std::map<std::string,SmartbodyCharacter*>::iterator mi = m_dll->m_characters.find(name);
+            SmartbodyCharacter* pc = NULL;
+            if (mi != m_dll->m_characters.end())
+            {
+               pc = mi->second;
+               delete pc;
+               m_dll->m_characters.erase(mi);
+            }
             m_dll->m_listener->OnCharacterDelete( name );
          }
       }
@@ -83,21 +84,21 @@ class Smartbody_dll_SBMCharacterListener_Internal : public SBMCharacterListener
          }
       }
 
-	  virtual void OnCharacterChanged( const std::string& name ) 
-	  {
-		  if ( m_dll->m_listener )
-		  {
-			  std::map<std::string,SmartbodyCharacter*>::iterator mi = m_dll->m_characters.find(name);
-			  SmartbodyCharacter* pc = NULL;
-			  if (mi != m_dll->m_characters.end())
-			  {
-				  pc = mi->second;				  
-				  delete pc;
-				  m_dll->m_characters.erase(mi);				  
-			  }			  
-			  m_dll->m_listener->OnCharacterChanged(name);
-		  }
-	  }
+      virtual void OnCharacterChanged( const std::string& name ) 
+      {
+         if ( m_dll->m_listener )
+         {
+            std::map<std::string,SmartbodyCharacter*>::iterator mi = m_dll->m_characters.find(name);
+            SmartbodyCharacter* pc = NULL;
+            if (mi != m_dll->m_characters.end())
+            {
+               pc = mi->second;
+               delete pc;
+               m_dll->m_characters.erase(mi);				  
+            }
+            m_dll->m_listener->OnCharacterChanged(name);
+         }
+      }
 };
 
 
@@ -218,7 +219,7 @@ SMARTBODY_DLL_API bool Smartbody_dll::Init()
    InitVHMsg();
    RegisterCallbacks();
 
-	srArgBuffer arg_buf( "" );
+   srArgBuffer arg_buf( "" );
    mcu_vrAllCall_func( arg_buf, &mcu );
 
    vhcl::Log::Listener* listener = new vhcl::Log::FileListener("./smartbody.log");
@@ -241,11 +242,11 @@ SMARTBODY_DLL_API bool Smartbody_dll::Shutdown()
 
    std::map<std::string,SmartbodyCharacter*>::iterator mi; // m_dll->m_characters.find(name);
    for (mi  = m_characters.begin();
-	    mi != m_characters.end();
-		mi++)
+        mi != m_characters.end();
+        mi++)
    {
-	   SmartbodyCharacter* pc = mi->second;				  
-	   delete pc;	  
+      SmartbodyCharacter* pc = mi->second;
+      delete pc;
    }
    m_characters.clear();
 
@@ -298,21 +299,21 @@ SMARTBODY_DLL_API SmartbodyCharacter& Smartbody_dll::GetCharacter( const string 
    bool hasChar = false;
    if ( char_p )
    {
-	   std::map<std::string,SmartbodyCharacter*>::iterator mi = m_characters.find(name);
-	   SmartbodyCharacter* pc = NULL;
-	   if (mi != m_characters.end())
-	   {
-		   pc = mi->second;
-		   hasChar = true;
-	   }
-	   else
-	   {
-		   pc = new SmartbodyCharacter();
-		   hasChar = false;
-		   m_characters[name] = pc;
-	   }
+      std::map<std::string,SmartbodyCharacter*>::iterator mi = m_characters.find(name);
+      SmartbodyCharacter* pc = NULL;
+      if (mi != m_characters.end())
+      {
+         pc = mi->second;
+         hasChar = true;
+      }
+      else
+      {
+         pc = new SmartbodyCharacter();
+         hasChar = false;
+         m_characters[name] = pc;
+      }
 
-	   SmartbodyCharacter& c = *pc;
+      SmartbodyCharacter& c = *pc;
 
       const SkJoint * joint = char_p->get_world_offset_joint();
 
@@ -340,7 +341,7 @@ SMARTBODY_DLL_API SmartbodyCharacter& Smartbody_dll::GetCharacter( const string 
       c.rz = q.z;
 
 
-	  const std::vector<SkJoint *> & joints  = char_p->getSkeleton()->joints();
+      const std::vector<SkJoint *> & joints  = char_p->getSkeleton()->joints();
 
       for ( size_t i = 0; i < joints.size(); i++ )
       {
@@ -361,38 +362,38 @@ SMARTBODY_DLL_API SmartbodyCharacter& Smartbody_dll::GetCharacter( const string 
             posz += j->offset().z;
          }
 
-		 if (hasChar)
-		 {
-			 SmartbodyJoint& joint = c.m_joints[i];         
-			 joint.m_name = j->name();
-			 joint.x = posx;
-			 joint.y = posy;
-			 joint.z = posz;
-			 joint.rw = q.w;
-			 joint.rx = q.x;
-			 joint.ry = q.y;
-			 joint.rz = q.z;
-		 }
-		 else
-		 {
-			 SmartbodyJoint joint;
-			 joint.m_name = j->name();
-			 joint.x = posx;
-			 joint.y = posy;
-			 joint.z = posz;
-			 joint.rw = q.w;
-			 joint.rx = q.x;
-			 joint.ry = q.y;
-			 joint.rz = q.z;
-			 c.m_joints.push_back( joint );
-		 }         
-      }	  
-	  return c;  
+         if (hasChar)
+         {
+            SmartbodyJoint& joint = c.m_joints[i];
+            joint.m_name = j->name();
+            joint.x = posx;
+            joint.y = posy;
+            joint.z = posz;
+            joint.rw = q.w;
+            joint.rx = q.x;
+            joint.ry = q.y;
+            joint.rz = q.z;
+         }
+         else
+         {
+            SmartbodyJoint joint;
+            joint.m_name = j->name();
+            joint.x = posx;
+            joint.y = posy;
+            joint.z = posz;
+            joint.rw = q.w;
+            joint.rx = q.x;
+            joint.ry = q.y;
+            joint.rz = q.z;
+            c.m_joints.push_back( joint );
+         }
+      }
+      return c;
    }
    else
    {
-	   return m_emptyCharacter;	   
-   }    
+      return m_emptyCharacter;
+   }
 }
 
 
@@ -434,12 +435,12 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert( "panimviewer",  mcu_panimationviewer_func);
    mcu.insert( "cbufviewer", mcu_channelbufferviewer_func);
    mcu.insert( "camera", mcu_camera_func );
-   mcu.insert( "terrain",	mcu_terrain_func );
+   mcu.insert( "terrain", mcu_terrain_func );
    mcu.insert( "time",   mcu_time_func );
-   mcu.insert( "tip",	mcu_time_ival_prof_func );
+   mcu.insert( "tip", mcu_time_ival_prof_func );
 
-   mcu.insert( "panim",		mcu_panim_cmd_func );	
-   mcu.insert( "mirror",       mcu_motion_mirror_cmd_func);
+   mcu.insert( "panim",  mcu_panim_cmd_func );
+   mcu.insert( "mirror", mcu_motion_mirror_cmd_func);
    mcu.insert( "load",   mcu_load_func );
    mcu.insert( "pawn",   SbmPawn::pawn_cmd_func );
    mcu.insert( "char",   SbmCharacter::character_cmd_func );
@@ -470,27 +471,27 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert( "J_L",                 joint_logger::start_stop_func );  // shorthand
    mcu.insert( "locomotion",          locomotion_cmd_func );
    mcu.insert( "loco",                locomotion_cmd_func ); // shorthand
-   mcu.insert( "resource",	resource_cmd_func );
-   mcu.insert( "syncpolicy",			mcu_syncpolicy_func );
-   mcu.insert( "check",                mcu_check_func ); // shorthand
-   mcu.insert( "python",			   mcu_python_func);
-   mcu.insert( "adjustmotion",		   mcu_adjust_motion_function );
-   mcu.insert( "mediapath",		   mcu_mediapath_func);
+   mcu.insert( "resource",            resource_cmd_func );
+   mcu.insert( "syncpolicy",          mcu_syncpolicy_func );
+   mcu.insert( "check",               mcu_check_func ); // shorthand
+   mcu.insert( "python",              mcu_python_func);
+   mcu.insert( "adjustmotion",        mcu_adjust_motion_function );
+   mcu.insert( "mediapath",           mcu_mediapath_func);
    mcu.insert( "bml",  test_bml_func );
-   mcu.insert( "addevent",			   addevent_func );
-   mcu.insert( "triggerevent",		   triggerevent_func );
-   mcu.insert( "removeevent",		   removeevent_func );
-   mcu.insert( "enableevents",	       enableevents_func );
-   mcu.insert( "disableevents",	   disableevents_func );
+   mcu.insert( "addevent",            addevent_func );
+   mcu.insert( "triggerevent",        triggerevent_func );
+   mcu.insert( "removeevent",         removeevent_func );
+   mcu.insert( "enableevents",        enableevents_func );
+   mcu.insert( "disableevents",       disableevents_func );
    mcu.insert( "registerevent",       registerevent_func );
-   mcu.insert( "unregisterevent",       unregisterevent_func );
-   mcu.insert( "motionmap",		   motionmap_func );
-   mcu.insert( "skeletonmap",		   skeletonmap_func );
-   mcu.insert( "characters",		   showcharacters_func );
-   mcu.insert( "pawns",			   showpawns_func );
-   mcu.insert( "syncpoint",		   syncpoint_func);
-   mcu.insert( "steer",			   mcu_steer_func);	
-   mcu.insert( "pawnbonebus",		   pawnbonebus_func);
+   mcu.insert( "unregisterevent",     unregisterevent_func );
+   mcu.insert( "motionmap",           motionmap_func );
+   mcu.insert( "skeletonmap",         skeletonmap_func );
+   mcu.insert( "characters",          showcharacters_func );
+   mcu.insert( "pawns",               showpawns_func );
+   mcu.insert( "syncpoint",           syncpoint_func);
+   mcu.insert( "steer",               mcu_steer_func);
+   mcu.insert( "pawnbonebus",         pawnbonebus_func);
 
    mcu.insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands
 

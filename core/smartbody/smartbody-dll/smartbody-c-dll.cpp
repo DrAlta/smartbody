@@ -13,8 +13,9 @@
 
 using std::string;
 
-// MESSAGE LOGGING ////////////////////////////////
+
 LogMessageCallback LogMessageFunc = NULL;
+
 
 class LogMessageListener : public vhcl::Log::Listener
 {
@@ -38,6 +39,7 @@ public:
 };
 LogMessageListener* g_pLogMessageListener = NULL;
 
+
 SMARTBODY_C_DLL_API bool SBM_SetLogMessageCallback(LogMessageCallback cb)
 {
    LogMessageFunc = cb;
@@ -52,6 +54,7 @@ SMARTBODY_C_DLL_API bool SBM_SetLogMessageCallback(LogMessageCallback cb)
    return false;
 }
 
+
 SMARTBODY_C_DLL_API void SBM_LogMessage(const char* message, int messageType)
 {
    // 0 = normal, 1 = error, 2 = warning
@@ -60,7 +63,7 @@ SMARTBODY_C_DLL_API void SBM_LogMessage(const char* message, int messageType)
       LogMessageFunc(message, messageType);
    }
 }
-// END MESSAGE LOGGING ////////////////////////////////
+
 
 class SBM_SmartbodyListener : public SmartbodyListener
 {
@@ -77,92 +80,31 @@ public:
       m_sbmHandle = sbmHandle;
       m_createCharacterCallback = createCharCallback;
       m_deleteCharacterCallback = deleteCharCallback;
-	  m_changeCharacterCallback = changeCharCallback;
+      m_changeCharacterCallback = changeCharCallback;
       m_viseme = visemeCallback;
    }
 
    virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass )
    {
-#if 0
-      std::ofstream myfile;
-      try
-      {
-         myfile.open( "example.txt", std::ios_base::in | std::ios_base::out | std::ios_base::app );
-         myfile << "loading character: " << name.c_str() << '\n';
-#endif
-
-         m_createCharacterCallback( m_sbmHandle, name.c_str(), objectClass.c_str() );
-
-#if 0
-         myfile << "returned: " << hr << '\n';
-         myfile << "finished loading character: " << name.c_str()  << '\n';
-      }
-      catch ( std::exception e )
-      {
-         myfile << "OnCharacterDelete Caught an error: " << e.what() << '\n';
-      }
-
-      myfile.close();
-#endif
+      m_createCharacterCallback( m_sbmHandle, name.c_str(), objectClass.c_str() );
    }
 
    virtual void OnCharacterDelete( const std::string & name )
    {
-#if 0
-      std::ofstream myfile;
-      try
-      {
-         myfile.open( "example.txt", std::ios_base::in | std::ios_base::out | std::ios_base::app );
-         myfile << "deleting character: " << name.c_str() << '\n';
-#endif
-
-         m_deleteCharacterCallback( m_sbmHandle, name.c_str() );
-
-#if 0
-         myfile << "finished deleting character: " << name.c_str()  << '\n';
-      }
-      catch ( std::exception & e )
-      {
-         myfile << "OnCharacterDelete Caught an error: " << e.what() << '\n';
-      }
-
-      myfile.close();
-#endif
+      m_deleteCharacterCallback( m_sbmHandle, name.c_str() );
    }
 
-    virtual void OnCharacterChange( const std::string & name )
-    {
-         m_changeCharacterCallback( m_sbmHandle, name.c_str() );
-	}
+   virtual void OnCharacterChange( const std::string & name )
+   {
+      m_changeCharacterCallback( m_sbmHandle, name.c_str() );
+   }
 
    virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime )
    {
-#if 0
-      std::ofstream myfile;
-      try
-      {
-         myfile.open( "example.txt", std::ios_base::in | std::ios_base::out | std::ios_base::app );
-         myfile << "OnViseme: " << name.c_str() << '\n';
-#endif
-
-         m_viseme( m_sbmHandle, name.c_str(), visemeName.c_str(), weight, blendTime );
-
-#if 0
-         myfile << "returned: " << hr << '\n';
-         myfile << "finished OnViseme: " << name.c_str()  << '\n';
-      }
-      catch ( std::exception & e )
-      {
-         myfile << "OnViseme Caught an error: " << e.what() << '\n';
-      }
-
-      myfile.close();
-#endif
+      m_viseme( m_sbmHandle, name.c_str(), visemeName.c_str(), weight, blendTime );
    }
 };
 
-
-// prototypes for local functions
 
 bool SBM_HandleExists( SBMHANDLE sbmHandle );
 void SBM_CharToCSbmChar( const SmartbodyCharacter * sbmChar, SBM_SmartbodyCharacter * sbmCChar );
@@ -296,13 +238,6 @@ SMARTBODY_C_DLL_API bool SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op
       return false;
    }
 
-#if 0
-   std::ofstream myfile;
-   myfile.open( "example.txt", std::ios_base::in | std::ios_base::out | std::ios_base::app );
-   myfile << op << " " << args << '\n';
-   myfile.close();
-#endif
-
    return g_smartbodyInstances[ sbmHandle ]->ProcessVHMsgs( op, args );
 }
 
@@ -347,6 +282,7 @@ SMARTBODY_C_DLL_API bool SBM_ReleaseCharacter( SBM_SmartbodyCharacter * characte
    return true;
 }
 
+
 SMARTBODY_C_DLL_API bool SBM_ReleaseCharacterJoints( SBM_SmartbodyCharacter * character )
 {
    if ( !character )
@@ -370,7 +306,7 @@ bool SBM_HandleExists( SBMHANDLE sbmHandle )
 }
 
 
-void SBM_CharToCSbmChar( const ::SmartbodyCharacter * sbmChar, SBM_SmartbodyCharacter * sbmCChar )
+void SBM_CharToCSbmChar( const::SmartbodyCharacter * sbmChar, SBM_SmartbodyCharacter * sbmCChar )
 {
    // copy transformation data
    sbmCChar->x = sbmChar->x;
@@ -381,7 +317,7 @@ void SBM_CharToCSbmChar( const ::SmartbodyCharacter * sbmChar, SBM_SmartbodyChar
    sbmCChar->ry = sbmChar->ry;
    sbmCChar->rz = sbmChar->rz;
 
-  
+
    // copy name
    // NOTE: name should be copied during callback and character creation
    //sbmCChar->m_name = new char[ sbmChar->m_name.length() + 1 ];
@@ -390,14 +326,14 @@ void SBM_CharToCSbmChar( const ::SmartbodyCharacter * sbmChar, SBM_SmartbodyChar
 
    if ( sbmChar->m_joints.size() > 0 )
    {
-	  bool initJoints = false;
-	  if (sbmCChar->m_numJoints == 0)
-	  {
-        //SBM_LogMessage("CREATING JOINTS!", 2);
-		sbmCChar->m_numJoints = sbmChar->m_joints.size();
-		sbmCChar->m_joints = new SBM_SmartbodyJoint[ sbmCChar->m_numJoints ];
-		initJoints = true;
-	  }
+      bool initJoints = false;
+      if (sbmCChar->m_numJoints == 0)
+      {
+         //SBM_LogMessage("CREATING JOINTS!", 2);
+         sbmCChar->m_numJoints = sbmChar->m_joints.size();
+         sbmCChar->m_joints = new SBM_SmartbodyJoint[ sbmCChar->m_numJoints ];
+         initJoints = true;
+      }
 
       for ( size_t i = 0; i < sbmCChar->m_numJoints; i++ )
       {
@@ -411,11 +347,12 @@ void SBM_CharToCSbmChar( const ::SmartbodyCharacter * sbmChar, SBM_SmartbodyChar
          sbmCChar->m_joints[ i ].rz = sbmChar->m_joints[ i ].rz;
 
          // copy name
-		 if (initJoints) 
-		 { // only initialize joints if this is the first time
-			sbmCChar->m_joints[ i ].m_name = new char[ sbmChar->m_joints[ i ].m_name.length() + 1 ];
-			strcpy( sbmCChar->m_joints[ i ].m_name, sbmChar->m_joints[ i ].m_name.c_str() );
-		 }
+         if (initJoints)
+         {
+            // only initialize joints if this is the first time
+            sbmCChar->m_joints[ i ].m_name = new char[ sbmChar->m_joints[ i ].m_name.length() + 1 ];
+            strcpy( sbmCChar->m_joints[ i ].m_name, sbmChar->m_joints[ i ].m_name.c_str() );
+         }
       }
    }
 }
