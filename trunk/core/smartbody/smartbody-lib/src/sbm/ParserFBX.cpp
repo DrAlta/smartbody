@@ -384,7 +384,8 @@ void ParserFBX::Shutdown(KFbxSdkManager* pSdkManager, KFbxImporter* pImporter)
 void ParserFBX::parseJoints(KFbxNode* pNode, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, FBxMetaData& metaData, SkJoint* parent)
 {
    SkJoint* joint = parent;
-   if (pNode->GetNodeAttribute()->GetAttributeType() == KFbxNodeAttribute::eSKELETON)
+   if (pNode->GetNodeAttribute() != NULL 
+      && pNode->GetNodeAttribute()->GetAttributeType() == KFbxNodeAttribute::eSKELETON)
    {
       // we only create joints for nodes flagged as having the eSKELETON attribute
       joint = createJoint(pNode, skeleton, motion, scale, order, parent);
@@ -686,6 +687,7 @@ void ParserFBX::ConvertfbxAnimToSBM(const std::vector<FBXAnimData*>& fbxAnimData
    int numKeys = fbxAnimData[0]->keyFrameData.size();
    std::map<kLongLong, float>::iterator it;
    int f = 0;
+
    for (it = fbxAnimData[0]->keyFrameData.begin(); it != fbxAnimData[0]->keyFrameData.end(); f++, it++)
    {
       // convert the way fbx stores the time into the way sbm does (in seconds)
@@ -697,54 +699,13 @@ void ParserFBX::ConvertfbxAnimToSBM(const std::vector<FBXAnimData*>& fbxAnimData
       }
    }
 
+   //float tempVec, keyChannelData;
    SrMat mat; SrQuat quat;
-   /*for (int i = 0; i < numKeys; i++)
-   {
-      for (unsigned int j = 0; j < fbxAnimData.size(); j+= stride)
-      {
-         std::string jointName = fbxAnimData[j]->channelName;
-
-         // find the skeleton's joint index based off the name of the joint and its channel type
-         int jointIndex = motion.channels().search(SkJointName(fbxAnimData[j]->channelName.c_str()), SkChannel::XPos);
-         int floatIndex = -1;
-         if (jointIndex >= 0)
-         {
-            floatIndex = motion.channels().float_position(jointIndex);
-         }
-            
-         if (floatIndex < 0)
-         {
-            // either the joint doesn't exist or the channel's buffer doesn't exist
-            continue;
-         }
-
-         // i need the joint so that I can subtract the starting offset from the anim data
-         SkJoint* joint = skeleton.search_joint(fbxAnimData[j]->channelName.c_str());
-
-         // set x,y,z pos channels
-         motion.posture(i)[floatIndex] = (fbxAnimData[j]->keyFrameDataFrame[i] - joint->offset().x) / scale; //x pos
-         motion.posture(i)[floatIndex+1] = (fbxAnimData[j+1]->keyFrameDataFrame[i] - joint->offset().y) / scale; //y pos
-         motion.posture(i)[floatIndex+2] = (fbxAnimData[j+2]->keyFrameDataFrame[i] - joint->offset().z) / scale; //z pos
-
-         // convert euler angles to mat
-         sr_euler_mat(order, mat, fbxAnimData[j+3]->keyFrameDataFrame[i] * DEG_TO_RAD,
-            fbxAnimData[j+4]->keyFrameDataFrame[i] * DEG_TO_RAD, fbxAnimData[j+5]->keyFrameDataFrame[i] * DEG_TO_RAD);
-         
-         // convert the mat to a quat
-         quat = SrQuat(mat);
-
-         // set the rotation
-         motion.posture(i)[floatIndex+3] = quat.w;
-         motion.posture(i)[floatIndex+4] = quat.x;
-         motion.posture(i)[floatIndex+5] = quat.y;
-         motion.posture(i)[floatIndex+6] = quat.z;
-      }
-   }*/
-
    for (int i = 0; i < numKeys; i++)
    {
       int offset = 1;
-      for (unsigned int j = 0; j < fbxAnimData.size(); j+= offset)
+      unsigned int j = 0;
+      for (j = 0; j < fbxAnimData.size(); j+= offset)
       {
          std::string jointName = fbxAnimData[j]->channelName;
 
@@ -786,7 +747,9 @@ void ParserFBX::ConvertfbxAnimToSBM(const std::vector<FBXAnimData*>& fbxAnimData
          else
          {
             // translational data, x, y, or z
-            motion.posture(i)[floatIndex] = (fbxAnimData[j]->keyFrameDataFrame[i] - joint->offset()[SkChannel::ZPos - fbxAnimData[j]->channelType]) / scale;
+            //tempVec = joint->offset()[fbxAnimData[j]->channelType - SkChannel::XPos];
+            //keyChannelData = fbxAnimData[j]->keyFrameDataFrame[i];
+            motion.posture(i)[floatIndex] = (fbxAnimData[j]->keyFrameDataFrame[i] - joint->offset()[fbxAnimData[j]->channelType - SkChannel::XPos]) / scale;
          }
 
          // rots are stored as 3 seperate entries in fbxAnimData, x, y, z euler angles.  You need all 3 of them to 
@@ -794,8 +757,10 @@ void ParserFBX::ConvertfbxAnimToSBM(const std::vector<FBXAnimData*>& fbxAnimData
          // we move by 1 channel.
          offset = fbxAnimData[j]->channelType == SkChannel::XRot ? 3 : 1; 
       }
+      //numKeys = fbxAnimData[j - 1]->keyFrameData.size();
    }
-
+   
+   
    // set the meta data
    motion.synch_points.set_time(metaData.readyTime, metaData.strokeStart,
       metaData.emphasisTime, metaData.strokeTime, metaData.relaxTime);
