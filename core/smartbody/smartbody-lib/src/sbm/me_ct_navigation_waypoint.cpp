@@ -90,3 +90,8 @@ void MeCtNavigationWaypoint::print_state( int tab_count ) {
 	// TODO
 	MeController::print_state( tab_count );
 }
+
+double MeCtNavigationWaypoint::controller_duration()
+{
+	return -1;
+}

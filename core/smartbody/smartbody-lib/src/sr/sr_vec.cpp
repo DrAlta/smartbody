@@ -220,5 +220,35 @@ SrInput& operator>> ( SrInput& in, SrVec& v )
    return in >> v.x >> v.y >> v.z;
  }
 
+#include <sr/sr_mat.h>
+
+SrVec rotatePoint(SrVec point, SrVec origin, SrVec direction, float angle)
+{
+	float originalLength = point.len();
+
+	SrVec v = direction;
+	SrVec o = origin;
+	SrVec p = point;
+	float c = cos(angle);
+	float s = sin(angle);
+	float C = 1.0f - c;
+
+	SrMat mat;
+	mat.e11() = v[0] * v[0] * C + c;
+	mat.e12() = v[0] * v[1] * C - v[2] * s;
+	mat.e13() = v[0] * v[2] * C + v[1] * s;
+	mat.e21() = v[1] * v[0] * C + v[2] * s;
+	mat.e22() = v[1] * v[1] * C + c;
+	mat.e23() = v[1] * v[2] * C - v[0] * s;
+	mat.e31() = v[2] * v[0] * C - v[1] * s;
+	mat.e32() = v[2] * v[1] * C + v[0] * s;
+	mat.e33() = v[2] * v[2] * C + c;
+
+	mat.transpose();
+
+	SrVec result = origin + mat * (point - origin);
+
+	return result;
+}
 //================================== End of File ===========================================
 

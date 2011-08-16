@@ -109,7 +109,6 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, Resourc
 #if 0
 	if( !skeleton_p->load( input, path ) )	{ 
 #else
-
 	if (filename.find(".bvh") == (filename.size() - 4) || 
 		filename.find(".BVH") == (filename.size() - 4))
 	{

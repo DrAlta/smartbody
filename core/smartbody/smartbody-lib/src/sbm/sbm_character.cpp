@@ -1234,7 +1234,9 @@ void prune_schedule( SbmCharacter*   actor,
 								in_use = true;
 						}
 					}
-				} else if (dynamic_cast<MeCtReach*>(anim_source)) {
+				} 
+#if 0
+				else if (dynamic_cast<MeCtReach*>(anim_source)) {
 					MeCtReach* ct_reach = dynamic_cast<MeCtReach*>(anim_source);
 
 					if (ct_reach->getReachArm() == MeCtReach::REACH_LEFT_ARM)
@@ -1261,6 +1263,7 @@ void prune_schedule( SbmCharacter*   actor,
 						}
 					}
 				} 
+#endif
 				else if (dynamic_cast<MeCtConstraint*>(anim_source)) {
 					MeCtConstraint* ct_constraint = dynamic_cast<MeCtConstraint*>(anim_source);
 					if (hasConstraint)
@@ -1951,7 +1954,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			boost::filesystem2::path curpath( path );
 			if (!boost::filesystem2::is_directory(curpath))
 				continue;
-			curpath /= std::string(meshdir);
+			curpath /= std::string(meshdir);			
 			bool isDir = boost::filesystem2::is_directory(curpath);  
 			if (!isDir)
 			{
@@ -2168,7 +2171,8 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 					numRequestsInterrupted++;
 				}
 			}
-			LOG("%d requests interrupted on character %s.", numRequestsInterrupted, this->getName());
+			std::string name = this->getName();
+			LOG("%d requests interrupted on character %s.", numRequestsInterrupted, name.c_str());
 		}
 		return CMD_SUCCESS;
 	}

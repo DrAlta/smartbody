@@ -253,6 +253,7 @@ SplineBreathCycle::~SplineBreathCycle()
 }
 void SplineBreathCycle::update()
 {
+#ifndef __ANDROID__
 	MeSpline1D::Knot* knot = _spline->knot_first();
 	float max = -1;
 	do
@@ -265,14 +266,22 @@ void SplineBreathCycle::update()
 		knot = knot->get_next();
 	}
 	while(knot != NULL);
+#endif
 }
 float SplineBreathCycle::duration()
 {
+#ifdef __ANDROID__
+	return 1.f;
+#else
 	return float(_spline->knot_last()->get_x()-_spline->knot_first()->get_x());
+#endif
 }
 float SplineBreathCycle::value(double realTime, double cycleTime)
 {
+#ifdef __ANDROID__
+	return 1.f;
+#else
 	_is_inspiring = cycleTime < _max_time;
-
 	return float(_spline->eval(cycleTime));
+#endif
 }

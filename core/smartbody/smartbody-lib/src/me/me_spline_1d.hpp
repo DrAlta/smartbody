@@ -277,7 +277,7 @@ protected:
 	 *  (Generic template to avoid maintaining three complex versions.)
 	 */
 	template <typename update_knot_algo>
-	Knot* make_knot( domain x, range y, update_knot_algo& update_knot );
+	Knot* make_knot( domain x, range y, update_knot_algo &update_knot );
 
 	void update_all_knots();
 
@@ -317,5 +317,7 @@ operator << ( std::basic_ostream<charT,traits>& out, const MeSpline1D::Knot& kno
 
 	return out;
 }
+
+
 
 #endif // ME_SPLINE_1D_HPP

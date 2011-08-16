@@ -21,7 +21,10 @@
 
 # include <sr/sr_string_array.h>
 # include <sr/sr_model.h>
+
+#ifndef __ANDROID__
 #include <sbm/GPU/SbmTexture.h>
+#endif
 
 //# define SR_USE_TRACE1    // keyword tracking
 //# include <sr/sr_trace.h>
@@ -63,6 +66,7 @@ static SrColor read_color ( SrInput& in )
 
 static void load_texture(int type, const char* file, const SrStringArray& paths)
 {
+#ifndef __ANDROID__	
 	SrString s;
 	SrInput in;
 	std::string imageFile = file;
@@ -75,10 +79,10 @@ static void load_texture(int type, const char* file, const SrStringArray& paths)
 		imageFile = s;
 		in.init ( fopen(s,"r") );
 	}
-	if (!in.valid()) return;	
-		
+	if (!in.valid()) return;		
 	SbmTextureManager& texManager = SbmTextureManager::singleton();
 	texManager.loadTexture(type,file,s);	
+#endif
 }
 
 static void read_materials ( SrArray<SrMaterial>& M,
@@ -288,6 +292,7 @@ bool SrModel::import_obj ( const char* file )
    compress ();
 
    // after remove all redundant materials, load the corresponding textures
+#ifndef __ANDROID__
    for (int i=0;i<M.size();i++)
    {
 	   std::string matName = mtlnames[i];
@@ -300,7 +305,7 @@ bool SrModel::import_obj ( const char* file )
 		   load_texture(SbmTextureManager::TEXTURE_NORMALMAP,mtlNormalTexNameMap[matName].c_str(),paths);	   
 	   }
    }
-
+#endif
    //SR_TRACE1("Ok!");
    return true;
  }

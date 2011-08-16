@@ -57,8 +57,12 @@
 #include <boost/python.hpp> // boost python support
 #endif
 #include "sr/sr_model.h"
+
+#ifndef __ANDROID__ // disable shader support
 #include "sbm/GPU/SbmShader.h"
 #include "sbm/GPU/SbmTexture.h"
+#endif
+
 #include "sbm_deformable_mesh.h"
 #include "sbm/Physics/SbmPhysicsSimODE.h"
 
@@ -164,12 +168,10 @@ mcuCBHandle::mcuCBHandle()
 	_interactive(true),
 	sendPawnUpdates(false)
 	//physicsEngine(NULL)
-{
-	kinectProcessor = new KinectProcessor();
-	
+{	
 	root_group_p->ref();
 	logger_p->ref();
-
+	kinectProcessor = new KinectProcessor();
 #if USE_WSP
 	theWSP = WSP::create_manager();
 
@@ -177,15 +179,14 @@ mcuCBHandle::mcuCBHandle()
 	// processes will be identified differently
 	theWSP->init( "SMARTBODY" );
 #endif
-
 	createDefaultControllers();
-
 	// initialize the default face motion mappings
 	FaceDefinition* faceDefinition = new FaceDefinition();
 	faceDefinition->setName("_default_");
 	face_map["_default_"] = faceDefinition;
 	physicsEngine = new SbmPhysicsSimODE();
 	physicsEngine->initSimulation();
+
 }
 
 /////////////////////////////////////////////////////////////
@@ -599,7 +600,9 @@ int mcuCBHandle::open_viewer( int width, int height, int px, int py )	{
 		if( root_group_p )	{
 			viewer_p->root( root_group_p );
 		}
+#ifndef __ANDROID__
 		SbmShaderManager::singleton().setViewer(viewer_p);
+#endif
 		return( CMD_SUCCESS );
 	}
 	return( CMD_FAILURE );
@@ -610,7 +613,9 @@ void mcuCBHandle::close_viewer( void )	{
 	if( viewer_p )	{
 		viewer_factory->remove(viewer_p);
 		viewer_p = NULL;
+#ifndef __ANDROID__
 		SbmShaderManager::singleton().setViewer(NULL);
+#endif
 	}
 	if( camera_p )	{
 		delete camera_p;
@@ -853,6 +858,7 @@ void mcuCBHandle::update( void )	{
 #endif
 	}
 
+#ifndef __ANDROID__
 	SbmShaderManager& ssm = SbmShaderManager::singleton();
 	SbmTextureManager& texm = SbmTextureManager::singleton();
 	bool hasOpenGL        = ssm.initOpenGL();
@@ -869,6 +875,7 @@ void mcuCBHandle::update( void )	{
 		ssm.buildShaders();
 		texm.updateTexture();
 	}	
+#endif
 	
 	bool isClosingBoneBus = false;
 	for (std::map<std::string, SbmPawn*>::iterator iter = getPawnMap().begin();
@@ -921,6 +928,7 @@ void mcuCBHandle::update( void )	{
 			char_p->forward_visemes( time );	
 			char_p->scene_p->update();	
 			char_p->updateJointPhyObjs();
+			char_p->_skeleton->update_global_matrices();
 			//char_p->dMesh_p->update();
 
 			if ( net_bone_updates && char_p->getSkeleton() && char_p->bonebusCharacter ) {
