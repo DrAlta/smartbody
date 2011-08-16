@@ -49,6 +49,8 @@
 #include <sbm/me_ct_example_body_reach.hpp>
 #include <sbm/me_ct_hand.hpp>
 #include <sbm/MeCtReachEngine.h>
+#include <sbm/me_ct_breathing_interface.h>
+#include <sbm/me_ct_breathing.h>
 #include <sbm/VisemeMap.hpp>
 #define MeCtSchedulerClass MeCtScheduler2
 
@@ -128,6 +130,7 @@ protected:
 	MeCtEyeLidRegulator*	eyelid_reg_ct_p;
 	MeCtFace*				face_ct;
 	MeCtEyeLid*				eyelid_ct;
+
 
 	// The term "viseme" in the following variables is a misnomer,
 	// and may also refer to an action unit or other face shape.
@@ -247,6 +250,7 @@ public:
 	MeCtMotionPlayer*	motionplayer_ct;
 	MeCtSaccade*		saccade_ct;
 	//MeCtReachEngine*	reachEngine[2];	
+	MeCtBreathing*			breathing_p;
 	MeCtBasicLocomotion*	basic_locomotion_ct;
 
 	int 	viseme_channel_start_pos;

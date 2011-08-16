@@ -112,6 +112,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 
 	posture_sched_p( CreateSchedulerCt( character_name, "posture" ) ),
 	motion_sched_p( CreateSchedulerCt( character_name, "motion" ) ),
+	breathing_p( ),
 	gaze_sched_p( CreateSchedulerCt( character_name, "gaze" ) ),
 	locomotion_ct( NULL ),
 	eyelid_reg_ct_p( NULL ),
@@ -133,6 +134,7 @@ SbmCharacter::SbmCharacter( const char* character_name )
 {
 	posture_sched_p->ref();
 	motion_sched_p->ref();
+	breathing_p->ref();
 	gaze_sched_p->ref();
 	head_sched_p->ref();
 	param_sched_p->ref();
@@ -149,6 +151,8 @@ SbmCharacter::~SbmCharacter( void )	{
 		posture_sched_p->unref();
 	if (motion_sched_p)
 		motion_sched_p->unref();
+	if (breathing_p)
+		breathing_p->unref();
 	if (gaze_sched_p)
 		gaze_sched_p->unref();
 	if (reach_sched_p)
@@ -258,6 +262,8 @@ void SbmCharacter::createStandardControllers()
 	reach_sched_p = CreateSchedulerCt( getName().c_str(), "reach" );
 	grab_sched_p = CreateSchedulerCt( getName().c_str(), "grab" );
 	
+	breathing_p = new MeCtBreathing();
+
 	gaze_sched_p = CreateSchedulerCt( getName().c_str(), "gaze" );
 
 	head_sched_p = CreateSchedulerCt( getName().c_str(), "head" );
@@ -307,6 +313,7 @@ void SbmCharacter::createStandardControllers()
 	motion_sched_p->init(this);
 	param_sched_p->init(this);
 	locomotion_ct->init(this);
+	breathing_p->init(this);
 	gaze_sched_p->init(this);
 
 	reach_sched_p->init(this);
@@ -324,6 +331,7 @@ void SbmCharacter::createStandardControllers()
 	
 	ct_tree_p->add_controller( reach_sched_p );	
 	ct_tree_p->add_controller( grab_sched_p );
+	ct_tree_p->add_controller( breathing_p );
 	ct_tree_p->add_controller( gaze_sched_p );
 	ct_tree_p->add_controller( saccade_ct );
 	ct_tree_p->add_controller( constraint_sched_p );	
@@ -342,6 +350,7 @@ void SbmCharacter::initData()
 	reach_sched_p = NULL;
 	head_sched_p = NULL;
 	param_sched_p = NULL;
+	breathing_p = NULL;
 
 	speech_impl = NULL;
 	speech_impl_backup = NULL;
@@ -2409,6 +2418,15 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		return( CMD_FAILURE );
 	}
 	else
+	if (cmd == "breathing")
+	{
+		if (breathing_p)
+		{
+			return mcu_character_breathing(getName().c_str(), args, mcu_p);
+		}
+		return CMD_FAILURE;
+	}
+	else
 	if( cmd == "eyelid" )
 	{
 		if( eyelid_reg_ct_p )	{
@@ -2860,13 +2878,17 @@ int SbmCharacter::remove_from_scene( const char* char_name ) {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
 	if( strcmp( char_name, "*" )==0 ) {
+		std::vector<SbmCharacter*> charsToDelete;
 		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
 			iter != mcu.getCharacterMap().end();
 			iter++)
 		{
-			SbmCharacter* character = (*iter).second;
-			character->remove_from_scene();
-			delete character;
+			charsToDelete.push_back(iter->second);
+		}
+		for (size_t c = 0; c < charsToDelete.size(); c++)
+		{
+			charsToDelete[c]->remove_from_scene();	
+			delete charsToDelete[c];
 		}
 		return CMD_SUCCESS;
 	} else {

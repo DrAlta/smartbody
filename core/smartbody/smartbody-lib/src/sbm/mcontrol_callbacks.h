@@ -77,6 +77,8 @@ int mcu_character_bone_position_cmd( const char* char_name, srArgBuffer& args, m
 
 int mcu_character_load_mesh( const char* char_name, const char* obj_file, mcuCBHandle* mcu_p, const char* option = NULL );	// support obj file for now
 int mcu_character_load_skinweights( const char* char_name, const char* skin_file, mcuCBHandle* mcu_p, float scaleFactor, const char* prefix = NULL );	// support colladda for now
+int mcu_character_breathing(const char* char_name, srArgBuffer& args, mcuCBHandle* mcu_p);
+
 
 //  The following have been replace by SbmCharacter::remove_from_scene( const char* )
 //int mcu_character_remove( const char * char_name, mcuCBHandle * mcu_p );
