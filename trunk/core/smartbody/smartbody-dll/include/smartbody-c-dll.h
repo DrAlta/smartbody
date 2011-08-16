@@ -86,6 +86,8 @@ SMARTBODY_C_DLL_API bool SBM_ReleaseCharacter( SBM_SmartbodyCharacter * characte
 SMARTBODY_C_DLL_API bool SBM_ReleaseCharacterJoints( SBM_SmartbodyCharacter * character );
 SMARTBODY_C_DLL_API bool SBM_SetLogMessageCallback(LogMessageCallback cb);
 SMARTBODY_C_DLL_API void SBM_LogMessage(const char* message, int messageType);
+
+
 #ifdef __cplusplus
 }
 #endif

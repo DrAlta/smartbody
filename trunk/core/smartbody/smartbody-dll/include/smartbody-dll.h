@@ -16,13 +16,14 @@
 #include <queue>
 #include <map>
 
+
 // Listener class that executables should derive from to get Smartbody related notifications.
 class SmartbodyListener
 {
    public:
       virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass ) {}
       virtual void OnCharacterDelete( const std::string & name ) {}
-	  virtual void OnCharacterChanged( const std::string & name ) {}
+      virtual void OnCharacterChanged( const std::string & name ) {}
       virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime ) {}
 };
 
@@ -67,7 +68,7 @@ class Smartbody_dll
       SmartbodyCharacter m_emptyCharacter;
       SmartbodyListener * m_listener;
       Smartbody_dll_SBMCharacterListener_Internal * m_internalListener;
-	  std::map<std::string, SmartbodyCharacter*> m_characters;
+      std::map<std::string, SmartbodyCharacter*> m_characters;
 
    public:
       SMARTBODY_DLL_API Smartbody_dll();
