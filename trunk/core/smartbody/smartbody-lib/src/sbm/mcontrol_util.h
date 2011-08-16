@@ -24,18 +24,21 @@
  *      Eric Forbell, USC
  *      Thomas Amundsen, USC
  */
-
 #ifndef MCONTROL_UTIL_H
 #define MCONTROL_UTIL_H
-
 //  Declare classes defined by this file
 //  (prevents include recursion)
 class mcuCBHandle;
 
 #include <map>
 
+#ifdef __ANDROID__
+#define LINK_VHMSG_CLIENT		(0)
+#define USE_WSP 1
+#else
 #define LINK_VHMSG_CLIENT		(1)
 #define USE_WSP 1
+#endif
 
 
 #if LINK_VHMSG_CLIENT
@@ -320,8 +323,12 @@ public:
 
 	public:
 		static mcuCBHandle& singleton() {
+			//LOG("Begin Singleton\n");
+			//if (!_singleton)
+			//	LOG("Singleton is NULL\n");
 			if( !_singleton )
 				_singleton = new mcuCBHandle();
+			//LOG("End Singleton\n");
 			return *_singleton;
 		}
 		static void destroy_singleton() {

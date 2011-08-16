@@ -285,6 +285,8 @@ class SrVec
 
  };
 
+ SrVec rotatePoint(SrVec point, SrVec origin, SrVec direction, float angle);
+
 //============================== end of file ===============================
 
 # endif // SR_VEC_H

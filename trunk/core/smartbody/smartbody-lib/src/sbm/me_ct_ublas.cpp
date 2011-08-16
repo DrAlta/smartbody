@@ -54,8 +54,10 @@ bool MeCtUBLAS::linearLeastSquare( const dMatrix& A, const dMatrix& B, dMatrix& 
 
 bool MeCtUBLAS::matrixSVD( const dMatrix& A, dVector& S, dMatrix& U, dMatrix& V )
 {
+#ifndef __ANDROID__
 	dMatrix M(A);
 	lapack::gesvd(M,S,U,V);
+#endif
 	
 	return true;
 }

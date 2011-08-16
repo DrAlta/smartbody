@@ -29,6 +29,12 @@
 
 const char* MeCtIK::TYPE = "MeCtIK";
 
+#ifdef __ANDROID__
+#define SBM_INLINE
+#else
+#define SBM_INLINE inline
+#endif
+
 
 /** Constructor */
 MeCtIK::MeCtIK() {
@@ -131,7 +137,7 @@ void MeCtIK::update(MeCtIKScenario* scenario)
 	
 }
 
-inline void MeCtIK::unstretch_joints()
+SBM_INLINE void MeCtIK::unstretch_joints()
 {
 	SrVec& pivot = scenario->joint_pos_list.get(0);
 	SrVec& i_target = target.get(manipulated_joint_index);
@@ -159,12 +165,12 @@ inline void MeCtIK::unstretch_joints()
 }
 
 // fast solution for 2 joints
-inline void MeCtIK::adjust_2_joints()
+SBM_INLINE void MeCtIK::adjust_2_joints()
 {
 	rotate(scenario->joint_pos_list.get(manipulated_joint_index), start_joint_index);
 }
 
-inline void MeCtIK::adjust()
+SBM_INLINE void MeCtIK::adjust()
 {
 	int reach = 0;
 	int i,j;
@@ -193,7 +199,7 @@ int MeCtIK::get_support_joint_num()
 	return num;
 }
 
-inline int MeCtIK::check_constraint(SrQuat* quat, int index)
+SBM_INLINE int MeCtIK::check_constraint(SrQuat* quat, int index)
 {
 	return 0;
 	float angle = quat->angle();
@@ -229,14 +235,14 @@ inline int MeCtIK::check_constraint(SrQuat* quat, int index)
 	return modified;
 }
 
-inline int MeCtIK::reach_destination()
+SBM_INLINE int MeCtIK::reach_destination()
 {
 	SrVec v = scenario->joint_pos_list.get(manipulated_joint_index) - target.get(manipulated_joint_index);
 	if(v.len() < threshold) return 1;
 	return 0;
 }
 
-inline float MeCtIK::distance_to_plane(SrVec& point, SrVec& plane_normal, SrVec& plane_point)
+SBM_INLINE float MeCtIK::distance_to_plane(SrVec& point, SrVec& plane_normal, SrVec& plane_point)
 {
 	SrVec v;
 	plane_normal.normalize();
@@ -245,20 +251,20 @@ inline float MeCtIK::distance_to_plane(SrVec& point, SrVec& plane_normal, SrVec&
 	return dis;
 }
 
-inline SrVec MeCtIK::cross_point_on_plane(SrVec& point, SrVec& line, SrVec& plane_normal, SrVec& plane_point)
+SBM_INLINE SrVec MeCtIK::cross_point_on_plane(SrVec& point, SrVec& line, SrVec& plane_normal, SrVec& plane_point)
 {
 	float dis = distance_to_plane(point, plane_normal, plane_point);
 	float cos = dot(line, plane_normal)/plane_normal.len();
 	return (point - line*dis/cos);
 }
 
-inline SrVec MeCtIK::upright_point_to_plane(SrVec& point, SrVec& plane_normal, SrVec& plane_point)
+SBM_INLINE SrVec MeCtIK::upright_point_to_plane(SrVec& point, SrVec& plane_normal, SrVec& plane_point)
 {
 	float dis = distance_to_plane(point, plane_normal, plane_point);
 	return (point - plane_normal*dis);
 }
 
-inline bool MeCtIK::cross_point_with_plane(SrVec* cross_point, SrVec& line_point, SrVec& direction, SrVec& plane_normal, SrVec& plane_point)
+SBM_INLINE bool MeCtIK::cross_point_with_plane(SrVec* cross_point, SrVec& line_point, SrVec& direction, SrVec& plane_normal, SrVec& plane_point)
 {
 	float angle = dot(direction, plane_normal);
 	if(angle == 0.0f) return false;
@@ -269,7 +275,7 @@ inline bool MeCtIK::cross_point_with_plane(SrVec* cross_point, SrVec& line_point
 	return true;
 }
 
-inline void MeCtIK::update_limb_section_local_pos(int start_index)
+SBM_INLINE void MeCtIK::update_limb_section_local_pos(int start_index)
 {
 	//temp solution, for efficiency, this must be replaced with optimized methods.
 	get_limb_section_local_pos(start_index, -1);
@@ -277,7 +283,7 @@ inline void MeCtIK::update_limb_section_local_pos(int start_index)
 }
 
 //The rotate function basicaly puts the joint back to its local coordinate
-inline void MeCtIK::rotate(SrVec& src, int start_index)
+SBM_INLINE void MeCtIK::rotate(SrVec& src, int start_index)
 {
 	SrVec v1, v2, v3, v4;
 	SrVec v, i_target, i_src;
@@ -409,7 +415,7 @@ inline void MeCtIK::rotate(SrVec& src, int start_index)
 	get_limb_section_local_pos(start_index, -1);
 }*/
 
-inline void MeCtIK::calc_target(SrVec& orientation, SrVec& offset)
+SBM_INLINE void MeCtIK::calc_target(SrVec& orientation, SrVec& offset)
 {	
 	orientation.normalize();
 	SrVec pos = scenario->joint_pos_list.get(manipulated_joint_index);
@@ -418,7 +424,7 @@ inline void MeCtIK::calc_target(SrVec& orientation, SrVec& offset)
 	target.set(manipulated_joint_index, -(manipulated_joint->support_joint_comp + manipulated_joint->support_joint_height)*orientation + t);
 }
 
-inline void MeCtIK::get_next_support_joint()
+SBM_INLINE void MeCtIK::get_next_support_joint()
 {
 	int i;
 	for(i = manipulated_joint_index+1; i < scenario->joint_info_list.size(); ++i)
@@ -475,17 +481,17 @@ void MeCtIK::init()
 	calc_target(scenario->ik_orientation, scenario->ik_offset);
 }
 
-inline void MeCtIK::get_init_mat_list()
+SBM_INLINE void MeCtIK::get_init_mat_list()
 {
 	joint_init_mat_list = scenario->joint_global_mat_list;
 }
 
-inline void MeCtIK::update_manipulated_joint_pos(int index)
+SBM_INLINE void MeCtIK::update_manipulated_joint_pos(int index)
 {
 	scenario->joint_pos_list.set(manipulated_joint_index, scenario->joint_global_mat_list.get(index) * scenario->joint_pos_list.get(manipulated_joint_index));
 }
 
-inline void MeCtIK::get_limb_section_local_pos(int start_index, int end_index)
+SBM_INLINE void MeCtIK::get_limb_section_local_pos(int start_index, int end_index)
 {
 	SrMat gmat;
 	SrMat pmat;

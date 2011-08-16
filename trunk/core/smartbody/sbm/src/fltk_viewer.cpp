@@ -1035,10 +1035,12 @@ void FltkViewer::draw()
 		SbmCharacter* char_p = mcu.getCharacter(pawn->getName() );
 		if( char_p )
 		{
-
+			
 			//char_p->forward_visemes( time );	
-			//char_p->scene_p->update();	
+			//char_p->scene_p->update();
+			
 			char_p->dMesh_p->update();
+			// 
 		}
 	}
 	
@@ -2158,35 +2160,6 @@ void FltkViewer::set_gaze_target(int itype, const char* label)
 # define ZOOMING(e)     (e.shift && e.ctrl && e.button3)
 # define DOLLYING(e)     (e.alt && e.button3)
 # define TRANSLATING(e) (e.alt && e.button2)
-
-SrVec rotatePoint(SrVec point, SrVec origin, SrVec direction, float angle)
-{
-	float originalLength = point.len();
-
-	SrVec v = direction;
-	SrVec o = origin;
-	SrVec p = point;
-	float c = cos(angle);
-	float s = sin(angle);
-	float C = 1.0f - c;
-
-	SrMat mat;
-	mat.e11() = v[0] * v[0] * C + c;
-	mat.e12() = v[0] * v[1] * C - v[2] * s;
-	mat.e13() = v[0] * v[2] * C + v[1] * s;
-	mat.e21() = v[1] * v[0] * C + v[2] * s;
-	mat.e22() = v[1] * v[1] * C + c;
-	mat.e23() = v[1] * v[2] * C - v[0] * s;
-	mat.e31() = v[2] * v[0] * C - v[1] * s;
-	mat.e32() = v[2] * v[1] * C + v[0] * s;
-	mat.e33() = v[2] * v[2] * C + c;
-
-	mat.transpose();
-
-	SrVec result = origin + mat * (point - origin);
-
-	return result;
-}
 
 int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
  {

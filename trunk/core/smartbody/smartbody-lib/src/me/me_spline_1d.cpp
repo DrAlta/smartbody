@@ -38,7 +38,8 @@ typedef MeSpline1D::Knot   Knot;
 /**
  *  Algorithm for configuring a smooth Knot in make_knot.
  */
-struct configure_smooth {
+class configure_smooth {
+public:
 	MeSpline1D* const spline;
 	range y, slope, l_control, r_control;
 
@@ -384,3 +385,4 @@ void MeSpline1D::erase( knots_iterator range1, knots_iterator range2 ) {
 		knots.erase( range1, ++range2 );
 	}
 }
+

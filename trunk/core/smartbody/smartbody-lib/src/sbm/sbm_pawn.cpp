@@ -25,7 +25,12 @@
 #include "vhcl.h"
 #include <sbm/mcontrol_util.h>
 #include "sbm_pawn.hpp"
+
+#ifdef __ANDROID__
+#include <sbm/sbm_deformable_mesh.h>
+#else
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
+#endif
 
 #include <string.h>
 #include <iostream>
@@ -128,8 +133,11 @@ SbmPawn::SbmPawn() : DObject()
 SbmPawn::SbmPawn( const char * name ) : DObject(),
 	_skeleton( NULL ),
 	scene_p( NULL ),
-	//dMesh_p( new DeformableMesh() ),
+#ifdef __ANDROID__ // don't use the GPU version in android
+	dMesh_p( new DeformableMesh() ),
+#else
 	dMesh_p( new SbmDeformableMeshGPU() ),
+#endif
 	ct_tree_p( MeControllerTreeRoot::create() ),
 	world_offset_writer_p( new MeCtChannelWriter() ),
 	wo_cache_timestamp( -std::numeric_limits<float>::max() )
@@ -149,8 +157,11 @@ void SbmPawn::initData()
 	bonebusCharacter = NULL;
 	_skeleton = NULL;
 	//scene_p = new SkScene();
-	//dMesh_p = new DeformableMesh();
+#ifdef __ANDROID__
+	dMesh_p = new DeformableMesh();
+#else
 	dMesh_p =  new SbmDeformableMeshGPU();
+#endif
 	ct_tree_p = MeControllerTreeRoot::create();
 	world_offset_writer_p = new MeCtChannelWriter();
 	std::string controllerName = this->getName();

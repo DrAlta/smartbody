@@ -59,11 +59,7 @@
 #include "sr/sr_model.h"
 #include "sbm_pawn.hpp"
 #include "sbm/Event.h"
-
-#ifndef __ANDROID__
 #include "sbm/ParserOpenCOLLADA.h"
-#endif
-
 
 #include "SteeringAgent.h"
 #include <boost/filesystem/operations.hpp>
@@ -5979,6 +5975,7 @@ int mcu_character_breathing( const char* name, srArgBuffer& args, mcuCBHandle *m
 		}
 		else if( strcmp(type, "spline") == 0)
 		{
+#ifndef __ANDROID__
 			int args_count = args.calc_num_tokens();
 			if((args_count % 2) != 0)
 			{
@@ -5994,8 +5991,8 @@ int mcu_character_breathing( const char* name, srArgBuffer& args, mcuCBHandle *m
 				spline->make_smooth(x, y, 0, 0, 0);
 			}
 			breathing_p->push_breath_layer(new SplineBreathCycle(spline));
+#endif
 		}
-
 		return( CMD_SUCCESS );
 	}
 	else if( strcmp( breathing_cmd, "pop" ) == 0 )
