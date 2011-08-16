@@ -1016,7 +1016,10 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				std::string stateName = args.read_token();
 				PAStateData* state = mcu_p->lookUpPAState(stateName);
 				if (!state)
+				{
 					LOG("State %s not exist, schedule Idle State.", stateName.c_str());
+					return CMD_FAILURE;
+				}
 				std::string loopString = args.read_token();
 				if (loopString != "loop")
 					return CMD_FAILURE;
