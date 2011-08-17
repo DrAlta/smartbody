@@ -50,6 +50,7 @@ set( SMARTBODY_LIB_ME_SRC
 	me/me_ct_time_shift_warp.cpp
 	me/me_ct_unary.cpp
 	me/me_default_prune_policy.cpp
+	me/me_spline_1d.cpp
 )
 
 set( SMARTBODY_LIB_SK_SRC
@@ -236,6 +237,8 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/me_ct_tether.cpp
 	sbm/me_ct_ublas.cpp
 	sbm/me_utilities.cpp
+	sbm/me_ct_breathing.cpp
+	sbm/me_ct_breathing_interface.cpp
 	sbm/ParserBVH.cxx
 	sbm/ParserASFAMC.cxx
 	sbm/ParserFBX.cpp

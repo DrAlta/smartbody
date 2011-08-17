@@ -321,3 +321,4 @@ operator << ( std::basic_ostream<charT,traits>& out, const MeSpline1D::Knot& kno
 
 
 #endif // ME_SPLINE_1D_HPP
+

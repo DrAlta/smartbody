@@ -821,6 +821,7 @@ fprintf( stdout, "output:'%s'\n", str.c_str() );
 
 #if LINK_VHMSG_CLIENT
 	char * vhmsg_server = getenv( "VHMSG_SERVER" );
+	char * vhmsg_port = getenv("VHMSG_PORT");
 	bool vhmsg_disabled = ( vhmsg_server != NULL && strcasecmp( vhmsg_server, "none" ) == 0 );  // hope there is no valid server named "none"
 
 	if( !vhmsg_disabled &&
@@ -850,7 +851,10 @@ fprintf( stdout, "output:'%s'\n", str.c_str() );
 			const char* vhmsg_server_actual = vhmsg::ttu_get_server();
 			LOG( "SBM ERR: ttu_open VHMSG_SERVER='%s' FAILED\n", vhmsg_server_actual?"NULL":vhmsg_server_actual );
 #else
+			std::string vhserver = (vhmsg_server? vhmsg_server : "localhost");
+			std::string vhport = (vhmsg_port ? vhmsg_port : "61616");
 			LOG( "SBM ERR: ttu_open FAILED\n" );
+			LOG("Could not connect to %s:%s", vhserver.c_str(), vhport.c_str());
 #endif
 		}
 		mcu.vhmsg_enabled = false;

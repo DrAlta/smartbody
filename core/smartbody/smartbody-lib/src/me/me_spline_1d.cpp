@@ -93,11 +93,33 @@ struct configure_disjoint {
 };
 
 Knot* MeSpline1D::make_smooth( domain x, range y, range slope, range l_control, range r_control )
-{	return make_knot<configure_smooth>( x, y, configure_smooth( this, y, slope, l_control, r_control ) ); }
+{
+#ifdef _WIN32_
+	return make_knot<configure_smooth>( x, y, configure_smooth( this, y, slope, l_control, r_control ) );
+#else
+	configure_smooth c = configure_smooth(this, y, slope, l_control, r_control);
+	return make_knot<configure_smooth>( x, y, c);
+#endif
+}
 Knot* MeSpline1D::make_cusp( domain x, range y, range l_slope, range l_control, range r_slope, range r_control )
-{	return make_knot<configure_cusp>( x, y, configure_cusp( this, y, l_slope, l_control, r_slope, r_control ) ); }
+{	
+#ifdef _WIN32_
+	return make_knot<configure_cusp>( x, y, configure_cusp( this, y, l_slope, l_control, r_slope, r_control ) ); 
+#else
+	configure_cusp c = configure_cusp( this, y, l_slope, l_control, r_slope, r_control ); 
+	return make_knot<configure_cusp>( x, y, c);
+#endif
+}
+
 Knot* MeSpline1D::make_disjoint( domain x, range y, range left_y, range l_slope, range l_control, range r_slope, range r_control )
-{	return make_knot<configure_disjoint>( x, y, configure_disjoint( this, y, left_y, l_slope, l_control, r_slope, r_control ) ); }
+{	
+#ifdef _WIN32_
+	return make_knot<configure_disjoint>( x, y, configure_disjoint( this, y, left_y, l_slope, l_control, r_slope, r_control ) ); 
+#else
+	configure_disjoint c = configure_disjoint( this, y, left_y, l_slope, l_control, r_slope, r_control ); 
+	return make_knot<configure_disjoint>( x, y, c);
+#endif
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
