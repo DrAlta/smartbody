@@ -111,41 +111,41 @@ void MeCtBreathing::breaths_per_minute(float bpm, bool smooth_transition)
 }
 void MeCtBreathing::print_state( int tabCount ) 
 {
-	fprintf( stdout, "MeCtBreathing" );
+	LOG( "MeCtBreathing" );
 
 	const char* str = name();
 	if( str )
-		fprintf( stdout, " \"%s\"", str );
+		LOG(" \"%s\"", str );
 
-	fprintf( stdout, ", motion" );
+	LOG( ", motion" );
 	if( _motion ) 
 	{
 		// motion name
 		str = _motion->name();
 		if( str )
-			fprintf( stdout, "=\"%s\"", str );
+			LOG("=\"%s\"", str );
 
 		// motion filename
 		str = _motion->filename();
 		if( str )
-			fprintf( stdout, " file=\"%s\"", str );
+			LOG(" file=\"%s\"", str );
 	} 
 	else
-		fprintf( stdout, "=NULL" );
+		LOG( "=NULL" );
 	// bpm
-	fprintf( stdout, ", bpm=%d", _bpm );
-	fprintf( stdout, ", topBreathCycle" );
+	LOG( ", bpm=%d", _bpm );
+	LOG( ", topBreathCycle" );
 	if( current_breath_layer() != NULL ) 
 	{
 		// top layer's breath cycle name
-		fprintf( stdout, " name=\"%s\"", current_breath_layer()->cycle->type() );
+		LOG( " name=\"%s\"", current_breath_layer()->cycle->type() );
 		// top layer's cycles remaining
-		fprintf( stdout, " cyclesRemaining=%d", current_breath_layer()->cycles_remaining );
+		LOG( " cyclesRemaining=%d", current_breath_layer()->cycles_remaining );
 	}
 	else
-		fprintf( stdout, "=NULL" );
+		LOG( "=NULL" );
 
-	fprintf( stdout, "\n" );
+	LOG( "\n" );
 }
 
 void MeCtBreathing::immediate_push_breath_layer(BreathLayer* layer)

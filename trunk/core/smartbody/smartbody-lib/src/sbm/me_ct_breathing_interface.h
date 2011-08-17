@@ -30,7 +30,7 @@
 # ifndef ME_CT_BREATHING_INTERFACE_H
 # define ME_CT_BREATHING_INTERFACE_H
 
-# include <SK/sk_motion.h>
+# include <sk/sk_motion.h>
 # include <sbm/gwiz_math.h>
 #include <me/me_spline_1d.hpp>
 
