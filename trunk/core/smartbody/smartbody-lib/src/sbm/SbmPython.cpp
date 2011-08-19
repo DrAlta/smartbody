@@ -447,7 +447,8 @@ BOOST_PYTHON_MODULE(SmartBody)
 void initPython(std::string pythonLibPath)
 {	
 #ifdef USE_PYTHON
-	Py_SetProgramName("../../../../core/smarybody/Python26/");
+	std::string ppath = "../../../../core/smartbody/Python26/"; 
+	Py_SetProgramName((char*) ppath.c_str());
 	Py_Initialize();
 	try {
 		boost::python::object objectMain = boost::python::import("__main__");

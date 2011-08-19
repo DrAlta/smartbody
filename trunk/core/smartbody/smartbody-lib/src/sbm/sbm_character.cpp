@@ -995,7 +995,7 @@ bool test_ct_for_pruning( MeCtScheduler2::TrackPtr track ) {
 			prune_ok = prune_policy->shouldPrune( ct, track->animation_parent_ct() );
 
 			if( LOG_CONTROLLER_TREE_PRUNING && !prune_ok )
-				LOG("DEBUG: %s \"%s\" withheld from pruning by MePrunePolicy.", ct->controller_type(), ct->getName().c_str());
+				LOG("DEBUG: %s \"%s\" withheld from pruning by MePrunePolicy.", ct->controller_type().c_str(), ct->getName().c_str());
 		}
 	}
 
@@ -1376,7 +1376,7 @@ void prune_schedule( SbmCharacter*   actor,
 				}
 				else {
 					//  TODO: Throttle warnings....
-					LOG("WARNING: Cannot prune unknown controller type \"%s\"", anim_source->controller_type());
+					LOG("WARNING: Cannot prune unknown controller type \"%s\"", anim_source->controller_type().c_str());
 				}
 				if( LOG_CONTROLLER_TREE_PRUNING )
 					if (in_use)
@@ -2726,7 +2726,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			//SkMotion* motion = getReachMotion(motion_num);
 			for (int c = 0; c < motion_num; c++)
 			{
-				LOG( "%s", getReachMotion(c)->name() );
+				LOG( "%s", getReachMotion(c)->name().c_str() );
 			}
 			return CMD_SUCCESS;
 		}
@@ -2758,7 +2758,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			{
 				//motion->name()
 				char cmd[256];
-				sprintf(cmd,"bml char %s <body posture=\"%s\"/>",getName().c_str(),motion->name());
+				sprintf(cmd,"bml char %s <body posture=\"%s\"/>",getName().c_str(),motion->name().c_str());
 				mcuCBHandle::singleton().execute(cmd);
 			}			
 			return CMD_SUCCESS;

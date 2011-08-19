@@ -83,8 +83,8 @@ MeCtQuickDraw::~MeCtQuickDraw( void )	{
 void print_motion( SkMotion* mot_p )	{
 
 	if( mot_p ) {
-		LOG( "motion:'%s'\n", mot_p->name() );
-		LOG( "file:'%s'\n", mot_p->filename() );
+		LOG( "motion:'%s'\n", mot_p->name().c_str() );
+		LOG( "file:'%s'\n", mot_p->filename().c_str() );
 		LOG( " ready:     %f\n", mot_p->time_ready() );
 		LOG( " str-start: %f \n", mot_p->time_stroke_start() );
 		LOG( " str-emph:  %f \n", mot_p->time_stroke_emphasis() );
@@ -137,7 +137,7 @@ void MeCtQuickDraw::init( SbmPawn* pawn, SkMotion* mot_p, SkMotion* mot2_p ) {
 			set_holster_duration( raw_holster_dur );
 		}
 		else	{
-			LOG( "MeCtQuickDraw::init ERR: unmatched channels in reholster motion '%s', IGNORED\n", mot2_p->filename() );
+			LOG( "MeCtQuickDraw::init ERR: unmatched channels in reholster motion '%s', IGNORED\n", mot2_p->filename().c_str() );
 		}
 	}
 	else	{

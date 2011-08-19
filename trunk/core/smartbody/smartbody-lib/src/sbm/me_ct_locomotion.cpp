@@ -1231,7 +1231,7 @@ void MeCtLocomotion::print_info(std::string name)
 	LOG("Animations loaded:");
 	for(int i = 0; i < locomotion_anims.size(); ++i)
 	{
-		LOG("\t[%d] %s", i, locomotion_anims.get(i)->name());
+		LOG("\t[%d] %s", i, locomotion_anims.get(i)->name().c_str());
 	}
 
 	LOG("Limbs:");

@@ -115,7 +115,7 @@ void MeCtBreathing::print_state( int tabCount )
 
 	std::string str = getName();
 	if( str != "")
-		LOG(" \"%s\"", str );
+		LOG(" \"%s\"", str.c_str() );
 
 	LOG( ", motion" );
 	if( _motion ) 
