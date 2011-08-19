@@ -72,7 +72,8 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 
    int f;
    SrVec fn(SrVec::i);
-   SrMaterial curmtl = fmsize>0? M[Fm[0]]:shape->material();
+   int fmIndex = Fm.size() > 0? Fm[0] : -1;
+   SrMaterial curmtl = fmsize>0 && fmIndex >= 0? M[Fm[0]]:shape->material();
 
    switch ( shape->render_mode() )
     { case srRenderModeDefault :

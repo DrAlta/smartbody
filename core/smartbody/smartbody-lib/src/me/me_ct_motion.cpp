@@ -336,19 +336,19 @@ void MeCtMotion::print_state( int tabCount ) {
 
 	std::string str = getName();
 	if( str != "" )
-		LOG(" \"%s\"", str );
+		LOG(" \"%s\"", str.c_str() );
 
 	LOG(", motion" );
 	if( _motion ) {
 		// motion name
 		str = _motion->name();
 		if( str != "")
-			LOG(" \"%s\"", str );
+			LOG(" \"%s\"", str.c_str() );
 
 		// motion filename
 		str = _motion->filename();
 		if( str != "")
-			LOG(" file \"%s\"", str );
+			LOG(" file \"%s\"", str.c_str() );
 	} else {
 		LOG("=NULL" );
 	}

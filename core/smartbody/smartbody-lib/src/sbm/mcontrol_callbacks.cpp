@@ -3264,7 +3264,7 @@ int query_controller(
 	MeController* ctrl_p
 )	{
 	LOG( "MCU QUERY: MeController '%s':\n", ctrl_p->getName().c_str());
-	LOG( "  type... %s\n", ctrl_p->controller_type() );
+	LOG( "  type... %s\n", ctrl_p->controller_type().c_str() );
 	LOG( "  indt... %.3f\n", ctrl_p->indt() );
 	LOG( "  outdt.. %.3f\n", ctrl_p->outdt() );
 	float emph = ctrl_p->emphasist();
@@ -4601,7 +4601,7 @@ int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
 		motionIter != mcu_p->motion_map.end();
 		motionIter++)
 	{
-		LOG( "  '%s'\n", (*motionIter).second->name() );
+		LOG( "  '%s'\n", (*motionIter).second->name().c_str() );
 	}
 	
 	LOG( "POSE CTRL:\n" );
@@ -4615,7 +4615,7 @@ int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
 	mcu_p->motion_ctrl_map.reset();
 	MeCtMotion * mot_ctrl_p;
 	while( mot_ctrl_p = mcu_p->motion_ctrl_map.next() )	{
-		LOG( "  '%s' : '%s'\n", mot_ctrl_p->getName().c_str(), mot_ctrl_p->motion()->name() );
+		LOG( "  '%s' : '%s'\n", mot_ctrl_p->getName().c_str(), mot_ctrl_p->motion()->name().c_str() );
 	}
 	
 	LOG( "SIMPLE-NOD:\n" );
@@ -5080,7 +5080,7 @@ int removeevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 		delete motionEvents[x];
 	}
 	motionEvents.clear();
-	LOG("%d motion events removed from motion %s.", numEvents, motion->name());
+	LOG("%d motion events removed from motion %s.", numEvents, motion->name().c_str());
 		
 	return CMD_SUCCESS;
 }
@@ -5131,7 +5131,7 @@ int disableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	{
 		motionEvents[x]->setEnabled(false);
 	}
-	LOG("%d motion events have been disabled from motion %s.", numEvents, motion->name());
+	LOG("%d motion events have been disabled from motion %s.", numEvents, motion->name().c_str());
 		
 	return CMD_SUCCESS;
 }
@@ -5182,7 +5182,7 @@ int enableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	{
 		motionEvents[x]->setEnabled(true);
 	}
-	LOG("%d motion events have been enabled from motion %s.", numEvents, motion->name());
+	LOG("%d motion events have been enabled from motion %s.", numEvents, motion->name().c_str());
 		
 	return CMD_SUCCESS;
 }

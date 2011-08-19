@@ -282,7 +282,7 @@ void FaceDefinition::setViseme(std::string visemeName, std::string motionName)
 				motion->unref();
 				_visemeMap.erase(iter);
 				_visemeMap.insert(std::pair<std::string, SkMotion*>(visemeName, NULL));
-				LOG("Viseme '%s' with motion '%s' replaced with no motion.", visemeName.c_str(), motion->name()); 
+				LOG("Viseme '%s' with motion '%s' replaced with no motion.", visemeName.c_str(), motion->name().c_str()); 
 				return;
 			}
 			else
@@ -299,7 +299,7 @@ void FaceDefinition::setViseme(std::string visemeName, std::string motionName)
 					motion->unref();
 					_visemeMap.erase(iter);
 					_visemeMap.insert(std::pair<std::string, SkMotion*>(visemeName, newMotion));
-					LOG("Viseme '%s' with motion '%s' replaced with motion '%s'.", visemeName.c_str(), motion->name(), motionName.c_str());
+					LOG("Viseme '%s' with motion '%s' replaced with motion '%s'.", visemeName.c_str(), motion->name().c_str(), motionName.c_str());
 					return;
 				}
 			}
