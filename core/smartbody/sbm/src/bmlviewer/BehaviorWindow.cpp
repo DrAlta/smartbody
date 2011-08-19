@@ -977,7 +977,7 @@ void BehaviorWindow::processMotionRequest(BML::MotionRequest* motionRequest, nle
 		// show the current and original timings in the info box
 		SkMotion* skmotion = motion->motion();
 		std::stringstream strstr;
-		strstr << motion->name() << "\n";
+		strstr << motion->getName() << "\n";
 		strstr << "File: " << skmotion->filename() << "\n\n";
 		strstr << "Original timings:\n";
 		strstr << "Ready       : " << skmotion->time_ready() << "\n";
@@ -1160,7 +1160,7 @@ void BehaviorWindow::processControllerRequest(BML::MeControllerRequest* controll
 			model->addTrack(track);
 			MotionBlock* motionBlock = new MotionBlock();
 			motionBlock->setName(behavior->unique_id);
-			motionBlock->setInfo(motion->name());
+			motionBlock->setInfo(motion->getName());
 			track->addBlock(motionBlock);
 			double duration = motion->controller_duration();
 			if (duration < 0)

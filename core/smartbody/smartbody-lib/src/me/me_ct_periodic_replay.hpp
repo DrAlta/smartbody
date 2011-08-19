@@ -35,7 +35,7 @@ class MeCtPeriodicReplay : public MeCtUnary {
 public:
 	///////////////////////////////////////////////////////////////////////
 	//  Public Constants
-	static const char* CONTROLLER_TYPE;
+	static std::string CONTROLLER_TYPE;
 
 protected:
 	double period_offset;
@@ -50,7 +50,7 @@ public:
 	void init( double period );
 	void init( double period, double period_offset, double child_time_offset );
 
-    const char* controller_type() const;
+    const std::string& controller_type() const;
 
     double controller_duration();
     //SkChannelArray& controller_channels(); // implemented in MeCtUnary

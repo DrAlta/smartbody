@@ -30,7 +30,7 @@ using namespace gwiz;
 
 //////////////////////////////////////////////////////////////////////////////////
 
-const char* MeCtTether::type_name = "Tether";
+std::string MeCtTether::type_name = "Tether";
 
 MeCtTether::MeCtTether( void )	{
 
@@ -245,7 +245,7 @@ double MeCtTether::controller_duration( void ) {
 	return( _duration );
 }
 
-const char* MeCtTether::controller_type( void )	const {
+const std::string& MeCtTether::controller_type( void )	const {
 	return( type_name );
 }
 
@@ -253,7 +253,7 @@ void MeCtTether::print_state( int tabCount ) {
 
 	LOG("MeCtTether" );
 
-	const char* str = name();
+	const char* str = getName().c_str();
 	if( str )
 		LOG(" \"%s\"", str );
 

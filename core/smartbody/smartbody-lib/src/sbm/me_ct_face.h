@@ -72,7 +72,7 @@ class MeCtFace : public SmartBody::SBController	{
 		bool				_useVisemeClamping;
 		
 	public:
-		static const char* type_name;
+		static std::string type_name;
 
 		/*! Constructor */
 		MeCtFace( void );
@@ -98,7 +98,7 @@ class MeCtFace : public SmartBody::SBController	{
 		virtual void controller_map_updated();
 		virtual bool controller_evaluate ( double t, MeFrameData& frame );
 		virtual SkChannelArray& controller_channels ();
-		virtual const char* controller_type () const;
+		virtual const std::string& controller_type () const;
 		virtual void print_state( int tabCount );
 };
 

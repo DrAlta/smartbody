@@ -31,8 +31,7 @@
 #include <sstream>
 
 
-const char* MeCtPeriodicReplay::CONTROLLER_TYPE = "MeCtPeriodicReplay";
-
+std::string MeCtPeriodicReplay::CONTROLLER_TYPE = "MeCtPeriodicReplay";
 
 MeCtPeriodicReplay::MeCtPeriodicReplay( MeController* child )
 :	MeCtUnary( new MeCtUnary::Context(this), child ),
@@ -45,7 +44,7 @@ MeCtPeriodicReplay::MeCtPeriodicReplay( MeController* child )
 	}
 }
 
-const char* MeCtPeriodicReplay::controller_type() const {
+const std::string& MeCtPeriodicReplay::controller_type() const {
 	return CONTROLLER_TYPE;
 }
 
@@ -82,7 +81,7 @@ void MeCtPeriodicReplay::print_state( int tab_count ) {
 	string indent( tab_count, '\t' );
 	ostringstream out;
 	out << CONTROLLER_TYPE;
-	const char* name = this->name();
+	const char* name = this->getName().c_str();
 	if( name && name[0]!='\0' )
 		out << " \"" << name << "\"";
 

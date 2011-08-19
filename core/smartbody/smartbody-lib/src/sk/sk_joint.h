@@ -126,8 +126,8 @@ class SkJoint
     int num_children () const { return _children.size(); }
 
     /*! Set the name of this joint */
-	void name ( std::string jn ) { _name=jn; }
-	std::string name () const { return _name; }
+	void name ( const std::string& jn ) { _name=jn; }
+	const std::string& name () const { return _name; }
 
     /*! Returns the index of this joint in the SkSkeleton list
         of joints */

@@ -25,7 +25,7 @@
 
 
 
-const char* MeCtNavigationWaypoint::TYPE = "MeCtNavigationWaypoint";
+std::string MeCtNavigationWaypoint::TYPE = "MeCtNavigationWaypoint";
 
 
 MeCtNavigationWaypoint::MeCtNavigationWaypoint()
@@ -33,7 +33,7 @@ MeCtNavigationWaypoint::MeCtNavigationWaypoint()
 	last_time( std::numeric_limits<float>::quiet_NaN() )
 {}
 
-const char* MeCtNavigationWaypoint::controller_type() {
+const std::string& MeCtNavigationWaypoint::controller_type() {
 	return TYPE;
 }
 

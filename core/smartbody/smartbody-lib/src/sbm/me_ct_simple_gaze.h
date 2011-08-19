@@ -89,7 +89,7 @@ class MeCtSimpleGazeJoint	{
 class MeCtSimpleGaze : public SmartBody::SBController	{
 	
 	public:
-		static const char* type_name;
+		static std::string type_name;
 
 		MeCtSimpleGaze();
 		virtual ~MeCtSimpleGaze();
@@ -147,7 +147,7 @@ class MeCtSimpleGaze : public SmartBody::SBController	{
 		virtual bool controller_evaluate( double t, MeFrameData& frame );
 		virtual SkChannelArray& controller_channels()	{ return( _channels ); }
 		virtual double controller_duration()			{ return( (double)_duration ); }
-		virtual const char* controller_type() const		{ return( type_name ); }
+		virtual const std::string& controller_type() const		{ return( type_name ); }
 		virtual void print_state( int tabs );
 };
 

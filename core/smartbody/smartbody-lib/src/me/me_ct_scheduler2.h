@@ -48,7 +48,7 @@ class MeCtScheduler2 : public MeCtContainer {
 public:
 	///////////////////////////////////////////////////////////////////////
 	//  Public Constants
-    static const char* type_name;
+	static std::string type_name;
 
 	//  4,194,303 (2^22-1), without a fractional component
 	//  can be represented in 32-bit float without rounding
@@ -72,7 +72,7 @@ protected:
 	public:
 		///////////////////////////////////////////////////////////////
 		//  Public Constants
-		static const char* CONTEXT_TYPE;
+		static std::string CONTEXT_TYPE;
 
 	protected:
 		///////////////////////////////////////////////////////////////
@@ -90,7 +90,7 @@ protected:
 		//  Public Methods
 		void child_channels_updated( MeController* child );
 
-		const char* context_type() const
+		const std::string& context_type() const
 		{	return CONTEXT_TYPE; }
 
 		void remove_controller( MeController* child );
@@ -409,7 +409,7 @@ protected:
     virtual bool controller_evaluate( double t, MeFrameData& frame );
     virtual SkChannelArray& controller_channels();
     virtual double controller_duration();
-    virtual const char* controller_type() const;
+    virtual const std::string& controller_type() const;
 
 
 	//

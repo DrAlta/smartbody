@@ -87,7 +87,6 @@ private :
 	int _instance_id;		// character being recorded
 	int _invocation_count;	// number of times outputing recording files	
 
-    char* _name;              // a name for this controller
     float _indt;              // initial period for blending, eg static or prep phase
     float _outdt;             // final period for blending, eg static or retract phase
     float _emphasist;         // time point of "main importance" in the controller
@@ -169,10 +168,6 @@ public :
 	{	return synch_points.get_time( srSynchPoints::RELAX ); }
 	double time_stop()
 	{	return synch_points.get_time( srSynchPoints::STOP ); }
-
-
-    const char* name () const { return _name? _name:""; }
-    void name ( const char* n ) { sr_string_set ( _name, n ); }
 
 	std::string handle() const;// { return _handle; }
 	void handle ( std::string handle );// { _handle = handle; }
@@ -399,7 +394,7 @@ public :
     
     /*! Returns a string describing the type of the controller. The convention is that
         the string corresponds with the derived class name without the 'SrCn' prefix */
-    virtual const char* controller_type () const = 0;
+	virtual const std::string& controller_type () const = 0;
 
 	/*! Print the info about the controller and its state to stdout.  The first 
 	    line of output should begin immediately, and second and following lines 

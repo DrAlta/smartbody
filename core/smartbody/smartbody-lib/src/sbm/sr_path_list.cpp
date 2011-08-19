@@ -12,12 +12,12 @@ srPathList::~srPathList()
 {
 }
 
-void srPathList::setPathPrefix(std::string pre)
+void srPathList::setPathPrefix(const std::string& pre)
 {
 	_prefix = pre;
 }
 
-std::string srPathList::getPathPrefix()
+const std::string& srPathList::getPathPrefix()
 {
 	return _prefix;
 }

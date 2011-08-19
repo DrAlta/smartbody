@@ -74,6 +74,7 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, Resourc
 		SkSkeleton* existingSkel = iter->second;
 		SmartBody::SBSkeleton* existingSBSkel = dynamic_cast<SmartBody::SBSkeleton*>(existingSkel);
 		SkSkeleton* ret = new SmartBody::SBSkeleton(existingSBSkel);
+		ret->ref();
 		return ret;
 	}
 	
@@ -106,6 +107,7 @@ SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, Resourc
 	}
 
 	SkSkeleton* skeleton_p = new SmartBody::SBSkeleton();
+	skeleton_p->ref();
 #if 0
 	if( !skeleton_p->load( input, path ) )	{ 
 #else
@@ -330,7 +332,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 			manager->addResource(motionRes);
 
 			string filebase = basename( pathname );
-			const char* name = motion->name();
+			const char* name = motion->name().c_str();
 			if( name && _stricmp( filebase.c_str(), name ) ) {
 				LOG("WARNING: Motion name \"%s\" does not equal base of filename '%s'. Using '%s' in posture map.", name, pathname.native_file_string().c_str(), filebase.c_str());
 				motion->name( filebase.c_str() );
@@ -410,6 +412,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 		if (ext == ".sk")
 		{			
 			skeleton = new SmartBody::SBSkeleton();
+			skeleton->ref();
 			
 			FILE* fp = fopen( pathname.string().c_str(), "rt" );
 			if (fp)
@@ -433,6 +436,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 		{		
 			std::ifstream filestream(pathname.string().c_str());
 			skeleton = new SmartBody::SBSkeleton();
+			skeleton->ref();
 			skeleton->skfilename(filebase.c_str());
 			SkMotion motion;
 			bool ok = ParserBVH::parse(*skeleton, motion, filebase, filestream, float(scale));

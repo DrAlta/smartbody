@@ -36,7 +36,7 @@ using namespace std;
 //////////////////////////////////////////////////////////////////
 //  MeCtUnary::Context
 
-const char* MeCtUnary::Context::CONTEXT_TYPE = "MeCtUnary::Context";
+std::string MeCtUnary::Context::CONTEXT_TYPE = "MeCtUnary::Context";
 
 void MeCtUnary::Context::child_channels_updated( MeController* child ) {
 	if( _container == NULL )  // parent has been deleted
@@ -61,7 +61,7 @@ void MeCtUnary::Context::child_channels_updated( MeController* child ) {
 //////////////////////////////////////////////////////////////////
 //  MeCtUnary
 
-const char* MeCtUnary::CONTROLLER_TYPE = "MeCtUnary";
+std::string MeCtUnary::CONTROLLER_TYPE = "MeCtUnary";
 
 MeCtUnary::MeCtUnary(
 	MeCtUnary::Context* sub_context,

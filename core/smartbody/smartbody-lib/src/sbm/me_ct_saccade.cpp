@@ -27,9 +27,9 @@
 #include <sbm/mcontrol_util.h>
 
 using namespace gwiz;
-const char* MeCtSaccade::CONTROLLER_TYPE = "Saccade";
-const char* eyeballL = "eyeball_left";
-const char* eyeballR = "eyeball_right";
+std::string MeCtSaccade::CONTROLLER_TYPE = "Saccade";
+std::string eyeballL = "eyeball_left";
+std::string eyeballR = "eyeball_right";
 
 MeCtSaccade::MeCtSaccade(SkSkeleton* skel) : SmartBody::SBController()
 {

@@ -72,7 +72,7 @@ public:
 	 *  The char* should be identical for all instances of a type, and thus can
 	 *  be used by numerical comparison for runtime type identification.
 	 */
-    virtual const char* context_type() const = 0;
+	virtual const std::string& context_type() const = 0;
 
 	/**
 	 *  Sets the name for this context.

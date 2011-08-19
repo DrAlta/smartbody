@@ -129,7 +129,7 @@ class ParameterManager
 		SrVec getVec(int id);
 		SrVec getPrevVec();
 		void setPrevVec(SrVec& vec);
-		std::string getMotionName(int id);
+		const std::string& getMotionName(int id);
 		int getMotionId(std::string name);
 
 		int getNumTriangles();
@@ -158,6 +158,7 @@ class ParameterManager
 		SrVec previousParam;
 		std::vector<TriangleInfo> triangles;
 		std::vector<TetrahedronInfo> tetrahedrons;
+		std::string emptyString;
 };
 
 class MotionParameters

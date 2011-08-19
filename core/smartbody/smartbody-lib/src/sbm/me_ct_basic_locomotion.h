@@ -36,10 +36,10 @@ class MeCtBasicLocomotion : public SmartBody::SBController
 		virtual bool controller_evaluate(double t, MeFrameData& frame);		
 		virtual SkChannelArray& controller_channels()	{return(_channels);}
 		virtual double controller_duration()			{return -1;}
-		virtual const char* controller_type() const		{return(_type_name);}
+		virtual const std::string& controller_type() const		{return(_type_name);}
 		
 	public:
-		static const char* _type_name;
+		static std::string _type_name;
 		void setScootSpd(float v) {scootSpd = v;}
 		float getScootSpd() {return scootSpd;}
 		void setMovingSpd(float v) {movingSpd = v;}

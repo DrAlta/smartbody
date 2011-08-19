@@ -23,8 +23,8 @@
 #include "me_ct_param_animation.h"
 #include <sbm/mcontrol_util.h>
 
-const char* MeCtParamAnimation::Context::CONTEXT_TYPE = "MeCtParamAnimation::Context";
-const char* MeCtParamAnimation::CONTROLLER_TYPE = "MeCtParamAnimation";
+std::string MeCtParamAnimation::Context::CONTEXT_TYPE = "MeCtParamAnimation::Context";
+std::string MeCtParamAnimation::CONTROLLER_TYPE = "MeCtParamAnimation";
 
 #define debug 0
 
@@ -227,12 +227,12 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 	return true;
 }
 
-void MeCtParamAnimation::setBaseJointName(std::string name)
+void MeCtParamAnimation::setBaseJointName(const std::string& name)
 {
 	baseJointName = name;
 }
 
-std::string MeCtParamAnimation::getBaseJointName()
+const std::string& MeCtParamAnimation::getBaseJointName()
 {
 	return baseJointName;
 }
@@ -306,20 +306,20 @@ int MeCtParamAnimation::getNumWeights()
 		return 0;
 }
 
-std::string MeCtParamAnimation::getCurrentStateName()
+const std::string& MeCtParamAnimation::getCurrentStateName()
 {
 	if (curStateModule)
 		return curStateModule->data->stateName;
 	else
-		return "";
+		return m_emptyString;
 }
 
-std::string MeCtParamAnimation::getNextStateName()
+const std::string& MeCtParamAnimation::getNextStateName()
 {
 	if (nextStateModule)
 		return nextStateModule->data->stateName;
 	else
-		return "";
+		return m_emptyString;
 }
 
 PAStateData* MeCtParamAnimation::getCurrentPAStateData()

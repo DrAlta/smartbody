@@ -38,7 +38,7 @@ class MeCtUnary : public MeCtContainer {
 public:
 	//////////////////////////////////////////////////////////
 	//  Public Constants
-	static const char* CONTROLLER_TYPE;
+	static std::string CONTROLLER_TYPE;
 
 protected:
 	//////////////////////////////////////////////////////////
@@ -47,14 +47,14 @@ protected:
 	protected:
 		//////////////////////////////////////////////////////////
 		//  Private Constants
-		static const char* CONTEXT_TYPE;
+		static std::string CONTEXT_TYPE;
 
 	public:
 		Context( MeCtUnary* container, MeControllerContext* context = NULL )
 			:	MeCtContainer::Context( container, context )
 		{}
 
-		const char* context_type() const {	return CONTEXT_TYPE; }
+		const std::string& context_type() const {	return CONTEXT_TYPE; }
 
 		/**
 		 *  Simple implementation MeControllerContext::child_channels_updated(MeController*).
@@ -100,7 +100,7 @@ public:
 	//  Public Methods
 	virtual ~MeCtUnary();
 
-	const char* controller_type() const {	return CONTROLLER_TYPE; }
+	const std::string& controller_type() const {	return CONTROLLER_TYPE; }
 
 	// Overrides MeController::count_children()
 	size_t count_children();

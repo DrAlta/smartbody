@@ -12,17 +12,14 @@ class SBController : public MeController
 		SBController(const SBController& controller);
 		~SBController();
 
-		void setName(std::string name);
-		std::string getName();
-
-		std::string getType();
+		const std::string& getType();
 
 		SBController* getParent();			// how to get parent?
 		SBController* getChild(int index);
 		int getNumChildren();
 		void addChannel(std::string jointName, std::string channelName);
 
-		std::string getCharacterName();
+		const std::string& getCharacterName();
 
 		void setIgnore(bool val);
 		bool isIgnore();
@@ -42,7 +39,7 @@ class SBController : public MeController
 		virtual bool controller_evaluate ( double t, MeFrameData& frame ) { return true;}
 		virtual double controller_duration () { return 0.0; }
 		virtual SkChannelArray& controller_channels () { return channelArray; }
-		virtual const char* controller_type () const { return controllerType.c_str(); }
+		virtual const std::string& controller_type () const { return controllerType; }
 
 	private:
 		SkChannelArray channelArray;

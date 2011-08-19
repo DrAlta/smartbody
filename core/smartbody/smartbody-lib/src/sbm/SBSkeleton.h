@@ -19,7 +19,7 @@ class SBSkeleton : public SkSkeleton
 
 		virtual bool load(std::string skeletonFile);
 
-		std::string getName();
+		const std::string& getName();
 		int getNumJoints();
 		SBJoint* getJoint(int index);		
 		SBJoint* getJointByName(std::string jointName);

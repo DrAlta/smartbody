@@ -31,7 +31,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////
 //Helpful comments in the .h file/ and here in the evaluate method
-const char* MeCtAnkleLilt::type_name= "AnkleLilt";
+std::string MeCtAnkleLilt::type_name= "AnkleLilt";
 
 
 MeCtAnkleLilt::MeCtAnkleLilt( void ) { 
@@ -127,7 +127,7 @@ double MeCtAnkleLilt::controller_duration(){
 	return ( (double)_duration);
 }
 
-const char* MeCtAnkleLilt::controller_type() const {
+const std::string& MeCtAnkleLilt::controller_type() const {
 	return( type_name );
 }
 

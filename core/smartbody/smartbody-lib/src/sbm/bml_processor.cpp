@@ -522,7 +522,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 		
 			SkPosture* posture = (*postureIter).second;
 			MeCtPose* poseCt = new MeCtPose();
-			poseCt->name( posture->name() );  // TODO: include BML act and behavior ids
+			poseCt->setName( posture->name() );  // TODO: include BML act and behavior ids
 			poseCt->init(const_cast<SbmCharacter*>(request->actor), *posture );
 
 			return BehaviorRequestPtr( new PostureRequest( unique_id, localId, poseCt, 1, request->actor, behav_syncs ) );
@@ -533,7 +533,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 			{
 				SkMotion* motion = (*motionIter).second;
 				MeCtMotion* motionCt = new MeCtMotion();
-				motionCt->name( motion->name() );  // TODO: include BML act and behavior ids
+				motionCt->setName( motion->name() );  // TODO: include BML act and behavior ids
 				motionCt->init(const_cast<SbmCharacter*>(request->actor), motion );
 				motionCt->loop( true );
 

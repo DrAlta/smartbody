@@ -32,7 +32,7 @@
 #include <string>
 
 
-const char* MeCtLocomotion::TYPE = "MeCtLocomotion";
+std::string MeCtLocomotion::TYPE = "MeCtLocomotion";
 
 
 /** Constructor */
@@ -467,7 +467,7 @@ void MeCtLocomotion::init_skeleton(SkSkeleton* standing, SkSkeleton* walking)
 	initialized = true;
 }
 
-const char* MeCtLocomotion::controller_type( void )	const {
+const std::string& MeCtLocomotion::controller_type( void )	const {
 
 	return TYPE;
 }

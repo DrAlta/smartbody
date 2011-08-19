@@ -22,8 +22,8 @@
 
 #include <me/me_ct_interpolator.h>
 
-const char* MeCtInterpolator::Context::CONTEXT_TYPE = "MeCtInterpolator::Context";
-const char* MeCtInterpolator::CONTROLLER_TYPE = "MeCtInterpolator";
+std::string MeCtInterpolator::Context::CONTEXT_TYPE = "MeCtInterpolator::Context";
+std::string MeCtInterpolator::CONTROLLER_TYPE = "MeCtInterpolator";
 
 void MeCtInterpolator::Context::child_channels_updated( MeController* child )
 {
@@ -58,7 +58,7 @@ MeCtInterpolator::MeCtInterpolator(MeController* c1, MeController* c2, double ti
 	startTime = time;
 	weight = w;
 
-	this->name(controllerName.c_str());
+	this->setName(controllerName.c_str());
 
 	initKeys();
 	initDuration();
@@ -165,14 +165,14 @@ void MeCtInterpolator::initKeys()
 	key1.clear();
 	key2.clear();
 
-	PAStateData* state = mcu.lookUpPAState(this->name());
+	PAStateData* state = mcu.lookUpPAState(this->getName());
 	if (state != NULL)
 	{
 		for (int i = 0; i < state->getNumMotions(); i++)
 		{
-			if (strcmp(state->motions[i]->name(), motion1->name()) == 0)
+			if (state->motions[i]->name() == motion1->name())
 				key1 = state->keys[i];
-			if (strcmp(state->motions[i]->name(), motion2->name()) == 0)
+			if (state->motions[i]->name() == motion2->name())
 				key2 = state->keys[i];
 		}
 	}

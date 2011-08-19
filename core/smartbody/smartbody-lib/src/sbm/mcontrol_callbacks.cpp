@@ -2186,6 +2186,9 @@ int mcu_character_init(
 		SkSkeleton* cachedSkeleton = load_skeleton( skel_file, mcu_p->me_paths, mcu_p->resource_manager, mcu_p->skScale );
 		if( !cachedSkeleton ) {
 			LOG( "init_character ERR: Failed to load skeleton \"%s\"\n", skel_file ); 
+			mcu_p->unregisterCharacter(char_p);
+			delete char_p;
+
 			return CMD_FAILURE;
 		}
 		cachedSkeleton->ref();
@@ -2196,6 +2199,7 @@ int mcu_character_init(
 	//skeleton_p = new SkSkeleton((*skelIter).second);
 	SmartBody::SBSkeleton* sbSkeleton = dynamic_cast<SmartBody::SBSkeleton*>((*skelIter).second);
 	skeleton_p = new SmartBody::SBSkeleton(sbSkeleton);
+	skeleton_p->ref();
 
 	FaceDefinition* faceDefinition = NULL;
 
@@ -2302,7 +2306,7 @@ int begin_controller(
 			// Use motion schedule by default
 			MeCtScheduler2* sched_p = char_p->motion_sched_p;
 
-			if( strcmp( ctrl_p->controller_type(), MeCtGaze::CONTROLLER_TYPE )==0 ) {
+			if( ctrl_p->controller_type() == MeCtGaze::CONTROLLER_TYPE) {
 				sched_p = char_p->gaze_sched_p;
 			}
 
@@ -2940,7 +2944,7 @@ int init_pose_controller(
 	}
 	ctrl_p->ref();
 
-	ctrl_p->name( ctrl_name );
+	ctrl_p->setName( ctrl_name );
 	ctrl_p->init( NULL, *pose_p );
 	return( CMD_SUCCESS );
 }
@@ -2975,7 +2979,7 @@ int init_motion_controller(
 	}
 	ctrl_p->ref();
 
-	ctrl_p->name( ctrl_name );
+	ctrl_p->setName( ctrl_name );
 	ctrl_p->init( NULL, mot_p );
 	return( CMD_SUCCESS );
 }
@@ -3010,7 +3014,7 @@ int init_stepturn_controller(
 	}
 	ctrl_p->ref();
 	
-	ctrl_p->name( ctrl_name );
+	ctrl_p->setName( ctrl_name );
 	ctrl_p->init( NULL, mot_p );
 	return( CMD_SUCCESS );
 }
@@ -3057,7 +3061,7 @@ int init_quickdraw_controller(
 	}
 	ctrl_p->ref();
 	
-	ctrl_p->name( ctrl_name );
+	ctrl_p->setName( ctrl_name );
 	ctrl_p->init( NULL, mot_p, alt_mot_p );
 	return( CMD_SUCCESS );
 }
@@ -3093,7 +3097,7 @@ int init_gaze_controller(
 	}
 	ctrl_p->ref();
 
-	ctrl_p->name( ctrl_name );
+	ctrl_p->setName( ctrl_name );
 	ctrl_p->init(
 		NULL,
 		MeCtGaze::key_index( strlen( key_fr ) ? key_fr : "back" ),  // WARN: does not handle NULL string
@@ -3124,7 +3128,7 @@ int init_simple_nod_controller(
 	}
 	ctrl_p->ref();
 
-	ctrl_p->name( ctrl_name );
+	ctrl_p->setName( ctrl_name );
 	ctrl_p->init(NULL);
 	return( CMD_SUCCESS );
 }
@@ -3158,7 +3162,7 @@ int init_lilt_controller(
 		return( err );
 	}
 	ctrl_p->ref();
-	ctrl_p->name( ctrl_name );
+	ctrl_p->setName( ctrl_name );
 	ctrl_p->init( char_p, char_p->getSkeleton() );
 	return( CMD_SUCCESS );
 }
@@ -3185,7 +3189,7 @@ int init_eyelid_controller(
 	}
 	ctrl_p->ref();
 	
-	ctrl_p->name( ctrl_name );
+	ctrl_p->setName( ctrl_name );
 	ctrl_p->init(NULL);
 	return( CMD_SUCCESS );
 }
@@ -3204,7 +3208,7 @@ int init_lifecycle_controller( char *ctrl_name, char *child_name, mcuCBHandle *m
 	}
 	lifecycle_ct->ref();
 
-	lifecycle_ct->name( ctrl_name );
+	lifecycle_ct->setName( ctrl_name );
 	lifecycle_ct->init( ct );
 
 	return CMD_SUCCESS;
@@ -3259,7 +3263,7 @@ int set_controller_timing(
 int query_controller(
 	MeController* ctrl_p
 )	{
-	LOG( "MCU QUERY: MeController '%s':\n", ctrl_p->name() );
+	LOG( "MCU QUERY: MeController '%s':\n", ctrl_p->getName().c_str());
 	LOG( "  type... %s\n", ctrl_p->controller_type() );
 	LOG( "  indt... %.3f\n", ctrl_p->indt() );
 	LOG( "  outdt.. %.3f\n", ctrl_p->outdt() );
@@ -3366,7 +3370,7 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 					if (checkStatus)
 					{
 						std::string passThroughStr = (controllerTree->controller(c)->is_pass_through())? " true " : " false";							
-						LOG("[%s] %s = %s", character->getName().c_str(), controllerTree->controller(c)->name(), passThroughStr.c_str());
+						LOG("[%s] %s = %s", character->getName().c_str(), controllerTree->controller(c)->getName().c_str(), passThroughStr.c_str());
 						numControllersAffected = numControllers;	// just so it won't generate error
 					}
 					else if (allControllers)
@@ -3377,7 +3381,7 @@ int mcu_controller_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 							controllerTree->controller(c)->set_pass_through(passThroughValue);
 						numControllersAffected++;
 					}
-					else if (strcmp(controllerTree->controller(c)->name(), ctrl_name) == 0)
+					else if (controllerTree->controller(c)->getName() == ctrl_name)
 					{
 						if (toggleValue)
 							controllerTree->controller(c)->set_pass_through(!controllerTree->controller(c)->is_pass_through());
@@ -4604,28 +4608,28 @@ int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
 	mcu_p->pose_ctrl_map.reset();
 	MeCtPose * pose_ctrl_p;
 	while( pose_ctrl_p = mcu_p->pose_ctrl_map.next() )	{
-		LOG( "  '%s' : '%s'\n", pose_ctrl_p->name(), pose_ctrl_p->posture_name() );
+		LOG( "  '%s' : '%s'\n", pose_ctrl_p->getName().c_str(), pose_ctrl_p->posture_name() );
 	}
 	
 	LOG( "MOTION CTRL:\n" );
 	mcu_p->motion_ctrl_map.reset();
 	MeCtMotion * mot_ctrl_p;
 	while( mot_ctrl_p = mcu_p->motion_ctrl_map.next() )	{
-		LOG( "  '%s' : '%s'\n", mot_ctrl_p->name(), mot_ctrl_p->motion()->name() );
+		LOG( "  '%s' : '%s'\n", mot_ctrl_p->getName().c_str(), mot_ctrl_p->motion()->name() );
 	}
 	
 	LOG( "SIMPLE-NOD:\n" );
 	mcu_p->snod_ctrl_map.reset();
 	MeCtSimpleNod * snod_p;
 	while( snod_p = mcu_p->snod_ctrl_map.next() )	{
-		LOG( "  '%s'\n", snod_p->name() );
+		LOG( "  '%s'\n", snod_p->getName().c_str() );
 	}
 	
 	LOG( "ANKLE-LILT:\n" );
 	mcu_p->lilt_ctrl_map.reset();
 	MeCtAnkleLilt * lilt_p;
 	while( lilt_p = mcu_p->lilt_ctrl_map.next() )	{
-		LOG( "  '%s'\n", lilt_p->name() );
+		LOG( "  '%s'\n", lilt_p->getName().c_str() );
 	}
 	
 	LOG( "SCHEDULE:\n" );
@@ -4633,14 +4637,14 @@ int mcu_divulge_content_func( srArgBuffer& args, mcuCBHandle* mcu_p ) {
 	MeCtScheduler2 * sched_p;
 
 	while( sched_p = mcu_p->sched_ctrl_map.next() )	{
-		LOG( "  '%s'\n", sched_p->name() );
+		LOG( "  '%s'\n", sched_p->getName().c_str());
 	}
 	
 	LOG( "ALL CONTROLLERS:\n" );
 	mcu_p->controller_map.reset();
 	MeController * ctrl_p;
 	while( ctrl_p = mcu_p->controller_map.next() )	{
-		LOG( "  '%s'\n", ctrl_p->name() );
+		LOG( "  '%s'\n", ctrl_p->getName().c_str() );
 	}
 	
 	return (CMD_SUCCESS);
@@ -5524,13 +5528,22 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					std::string zpos = args.read_token();
 					z = float(atof(zpos.c_str()));
 
-					character->steeringAgent->getAgent()->clearGoals();
-					SteerLib::AgentGoalInfo goal;
-					goal.desiredSpeed = character->steeringAgent->desiredSpeed;
-					goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
-					goal.targetIsRandom = false;
-					goal.targetLocation = Util::Point(x / 100.0f, 0.0f, z / 100.0f);
-					character->steeringAgent->getAgent()->addGoal(goal);
+					SteerLib::AgentInterface* agent = character->steeringAgent->getAgent();
+					if (agent)
+					{
+						character->steeringAgent->getAgent()->clearGoals();
+						SteerLib::AgentGoalInfo goal;
+						goal.desiredSpeed = character->steeringAgent->desiredSpeed;
+						goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
+						goal.targetIsRandom = false;
+						goal.targetLocation = Util::Point(x / 100.0f, 0.0f, z / 100.0f);
+						character->steeringAgent->getAgent()->addGoal(goal);
+					}
+					else
+					{
+						LOG("Character %s has no steering agent. Please run 'steer stop', then 'steer start'", character->getName().c_str());
+						return CMD_FAILURE;
+					}
 				}
 			}
 			return CMD_SUCCESS;

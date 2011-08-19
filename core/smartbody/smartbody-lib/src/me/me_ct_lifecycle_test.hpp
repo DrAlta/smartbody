@@ -32,7 +32,7 @@ class MeCtLifecycleTest: public MeCtUnary {
 public:
 	//////////////////////////////////////////////////////////
 	//  Public Constants
-	static const char* CONTROLLER_TYPE;
+	static std::string CONTROLLER_TYPE;
 
 protected:
 	//////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@ protected:
 	bool controller_evaluate( double t, MeFrameData& frame );
 	SkChannelArray& controller_channels();
 	double controller_duration();
-	const char* controller_type() const;
+	const std::string& controller_type() const;
 	bool remove_child( MeController* child );
 	void print_state( int tab_count );
 	void print_children( int tab_count );

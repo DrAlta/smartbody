@@ -170,7 +170,7 @@ class MeCtGaze : public SmartBody::SBController	{
 		static char * key_label( const int key );
 
 		static int valid_key( int key ) { return( ( key >= 0 )&&( key < NUM_GAZE_KEYS ) ); }
-		static const char* CONTROLLER_TYPE;
+		static std::string CONTROLLER_TYPE;
 
 		MeCtGaze();
 		virtual ~MeCtGaze();
@@ -399,7 +399,7 @@ class MeCtGaze : public SmartBody::SBController	{
 		virtual bool controller_evaluate( double t, MeFrameData& frame );
 		virtual SkChannelArray& controller_channels()	{ return( _channels ); }
 		virtual double controller_duration()			{ return( (double)_duration ); }
-		virtual const char* controller_type() const		{ return( CONTROLLER_TYPE ); }
+		virtual const std::string& controller_type() const		{ return( CONTROLLER_TYPE ); }
 		virtual void print_state( int tabs );
 public:
 		int getStart();

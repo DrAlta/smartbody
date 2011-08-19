@@ -19,7 +19,7 @@ using namespace boost;
 /* Exampled-Based Reach Controller                                      */
 /************************************************************************/
 
-const char* MeCtExampleBodyReach::CONTROLLER_TYPE = "BodyReach";
+std::string MeCtExampleBodyReach::CONTROLLER_TYPE = "BodyReach";
 
 MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMap ) 
 {		

@@ -44,7 +44,7 @@ class MeCtLocomotionLimb;
 class MeCtLocomotion : public SmartBody::SBController, public MeCtLocomotionPawn {
 public:
 	// Public Constants
-	static const char* TYPE;
+	static std::string TYPE;
 
 public:
 
@@ -131,7 +131,7 @@ public:
 	/** Destructor */
 	virtual ~MeCtLocomotion();
 
-	const char* controller_type() const;
+	const std::string& controller_type() const;
 
 	/**
 	 *  Implements MeController::controller_channels().

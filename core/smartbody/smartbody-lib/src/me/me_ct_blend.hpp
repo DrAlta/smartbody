@@ -35,7 +35,7 @@ class MeCtBlend : public MeCtUnary  {
 public:
 	//////////////////////////////////////////////////////////////////////////
 	//  Public Constants
-	static const char* CONTROLLER_TYPE;
+	static std::string CONTROLLER_TYPE;
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -88,7 +88,7 @@ public:
 	public:
 		///////////////////////////////////////////////////////////////
 		//  Public Constants
-		static const char* CONTEXT_TYPE;
+		static std::string CONTEXT_TYPE;
 
 	protected:
 		///////////////////////////////////////////////////////////////
@@ -118,7 +118,7 @@ public:
 	public:
 		///////////////////////////////////////////////////////////////
 		//  Public Methods
-		const char* context_type() const
+		const std::string& context_type() const
 		{	return CONTEXT_TYPE; }
 
 		SkChannelArray& channels();
@@ -168,7 +168,7 @@ protected:
 	inline int local_ch_to_parent( unsigned int i )
 	{	return i<_local_ch_to_parent.size()? _local_ch_to_parent[i] : -1; }
 public:
-    const char* controller_type() const;
+    const std::string& controller_type() const;
     //SkChannelArray& controller_channels();  // MeCtUnary provides this
 	void print_state( int tabCount );
 

@@ -418,7 +418,7 @@ void ChannelBufferWindow::loadControllers(Fl_Choice* controller, Fl_Choice* char
 	int ct_num = actor->ct_tree_p->count_controllers();
 	for(int i = 0; i < ct_num; ++i)
 	{
-		controller->add(actor->ct_tree_p->controller(i)->name());
+		controller->add(actor->ct_tree_p->controller(i)->getName().c_str());
 		actor->ct_tree_p->controller(i)->record_buffer_changes(true);
 	}
 	if (controller->mvalue() == NULL)
@@ -661,7 +661,7 @@ void ChannelBufferWindow::refreshControllerChannels(Fl_Widget* widget, void* dat
 	int ct_num = actor->ct_tree_p->count_controllers();
 	for(int i = 0; i < ct_num; ++i)
 	{
-		if(strcmp(actor->ct_tree_p->controller(i)->name(), window->controller->mvalue()->label())== 0)
+		if(actor->ct_tree_p->controller(i)->getName() == window->controller->mvalue()->label())
 		{
 			std::vector<float> buff = actor->ct_tree_p->controller(i)->get_buffer_changes();
 			SkChannelArray& channelsInUse = actor->ct_tree_p->controller(i)->controller_channels();
@@ -876,7 +876,7 @@ void ChannelBufferWindow::update()
 				int ct_num = actor->ct_tree_p->count_controllers();
 				for(int i = 0; i < ct_num; ++i)
 				{
-					if(strcmp(actor->ct_tree_p->controller(i)->name(), controller->mvalue()->label())== 0)
+					if(actor->ct_tree_p->controller(i)->getName() == controller->mvalue()->label())
 					{
 						std::vector<float> buff = actor->ct_tree_p->controller(i)->get_buffer_changes();
 						SkChannelArray& channelsInUse = actor->ct_tree_p->controller(i)->controller_channels();

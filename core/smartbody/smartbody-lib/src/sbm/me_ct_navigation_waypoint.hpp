@@ -32,7 +32,7 @@
 class MeCtNavigationWaypoint : public SmartBody::SBController {
 public:
 	// Public Constants
-	static const char* TYPE;
+	static std::string TYPE;
 
 protected:
 	// Data
@@ -47,7 +47,7 @@ public:
 	/** Constructor */
 	MeCtNavigationWaypoint();
 
-	const char* controller_type();
+	const std::string& controller_type();
 
 	/**
 	 *  Initializes the controller with a set of channels to write.

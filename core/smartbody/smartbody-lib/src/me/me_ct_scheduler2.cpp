@@ -64,7 +64,7 @@ struct null_deleter
 
 //===== MeCtScheduler2::Context ==============================
 
-const char* MeCtScheduler2::Context::CONTEXT_TYPE = "MeCtScheduler2::Context";
+std::string MeCtScheduler2::Context::CONTEXT_TYPE = "MeCtScheduler2::Context";
 
 MeCtScheduler2::Context::Context( MeCtScheduler2* schedule )
 :	MeCtContainer::Context( schedule ),
@@ -280,7 +280,7 @@ void MeCtScheduler2::Track::remap() {
 
 //=================================== MeCtScheduler2 =====================================
 
-const char* MeCtScheduler2::type_name = "MeCtScheduler2";
+std::string MeCtScheduler2::type_name = "MeCtScheduler2";
 
 MeCtScheduler2::MeCtScheduler2 ()
 :	_self( this, null_deleter() ), // See: http://www.boost.org/doc/libs/1_38_0/libs/smart_ptr/sp_techniques.html#weak_without_shared
@@ -293,7 +293,7 @@ MeCtScheduler2::MeCtScheduler2 ()
 
 MeCtScheduler2::~MeCtScheduler2 () {
 
-	printf("delete scheduler %s\n",this->name());
+	LOG("delete scheduler %s\n",this->getName().c_str());
    stop (mcuCBHandle::singleton().time);
    _sub_sched_context->unref();
    //clear();
@@ -357,7 +357,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule(
 	MeCtTimeShiftWarp* timingCt   = new MeCtTimeShiftWarp( ct );
 	MeCtBlend*         blendingCt = new MeCtBlend( timingCt );
 
-	const char* ct_name = ct->name();
+	const char* ct_name = ct->getName().c_str();
 
 	srLinearCurve& blend_curve = blendingCt->get_curve();
 	for (int i = 0; i < numKeys; i++)
@@ -372,7 +372,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule(
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string blend_name( "blending for " );
 		blend_name += ct_name;
-		blendingCt->name( blend_name.c_str() );
+		blendingCt->setName( blend_name.c_str() );
 	}
 
 	// Configure time mapping
@@ -383,7 +383,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule(
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string timing_name( "timing for " );
 		timing_name += ct_name;
-		timingCt->name( timing_name.c_str() );
+		timingCt->setName( timing_name.c_str() );
 	}
 	return create_track( blendingCt, timingCt, ct );
 }
@@ -397,7 +397,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 	MeCtTimeShiftWarp* timingCt   = new MeCtTimeShiftWarp( ct );
 	MeCtBlend*         blendingCt = new MeCtBlend( timingCt );
 
-	const char* ct_name = ct->name();
+	const char* ct_name = ct->getName().c_str();
 
 	// Configure blend curve
 	srLinearCurve& blend_curve = blendingCt->get_curve();
@@ -421,7 +421,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string blend_name( "blending for " );
 		blend_name += ct_name;
-		blendingCt->name( blend_name.c_str() );
+		blendingCt->setName( blend_name.c_str() );
 	}
 
 	// Configure time mapping
@@ -436,7 +436,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, double tin,
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string timing_name( "timing for " );
 		timing_name += ct_name;
-		timingCt->name( timing_name.c_str() );
+		timingCt->setName( timing_name.c_str() );
 	}
 
 	return create_track( blendingCt, timingCt, ct );
@@ -512,7 +512,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 	MeCtTimeShiftWarp* timingCt   = new MeCtTimeShiftWarp( ct );
 	MeCtBlend*         blendingCt = new MeCtBlend( timingCt );
 
-	const char* ct_name = ct->name();
+	const char* ct_name = ct->getName().c_str();
 
 	
 	// Configure blend curve
@@ -535,7 +535,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string blend_name( "blending for " );
 		blend_name += ct_name;
-		blendingCt->name( blend_name.c_str() );
+		blendingCt->setName( blend_name.c_str() );
 	}
 
 	// Configure time mapping
@@ -581,7 +581,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string timing_name( "timing for " );
 		timing_name += ct_name;
-		timingCt->name( timing_name.c_str() );
+		timingCt->setName( timing_name.c_str() );
 	}
 
 	return create_track( blendingCt, timingCt, ct );
@@ -630,11 +630,11 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct1, MeControll
 		}
 	}
 
-	const char* ct_name = interpolator->name();
+	const char* ct_name = interpolator->getName().c_str();
 	if( ct_name && (ct_name[0]!='\0') ) {
 		string blend_name( "blending for " );
 		blend_name += ct_name;
-		blendingCt->name( blend_name.c_str() );
+		blendingCt->setName( blend_name.c_str() );
 	}
 
 	// Configure time mapping
@@ -653,7 +653,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct1, MeControll
 	if( ct_name && (ct_name[0]!='\0') ) {
 		std::string timing_name( "timing for " );
 		timing_name += ct_name;
-		timingCt->name( timing_name.c_str() );
+		timingCt->setName( timing_name.c_str() );
 	}
 
 	return create_track( blendingCt, timingCt, interpolator );
@@ -1076,7 +1076,7 @@ double MeCtScheduler2::controller_duration () {
 	return total_dur;
 }
 
-const char* MeCtScheduler2::controller_type () const
+const std::string& MeCtScheduler2::controller_type () const
  {
    return type_name;
  }
@@ -1087,7 +1087,7 @@ void MeCtScheduler2::print_state( int tab_count ) {
 
 	cout << "MeCtScheduler2";
 
-	const char* str_name = name();
+	const char* str_name = getName().c_str();
 	if( str_name[0] )
 		cout << " \"" << str_name << "\"";
 	cout << ":";

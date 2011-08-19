@@ -29,7 +29,7 @@
 #include <sstream>
 
 
-const char* MeCtTimeShiftWarp::CONTROLLER_TYPE = "MeCtTimeShiftWarp";
+std::string MeCtTimeShiftWarp::CONTROLLER_TYPE = "MeCtTimeShiftWarp";
 
 
 MeCtTimeShiftWarp::MeCtTimeShiftWarp( MeController* child )
@@ -40,7 +40,7 @@ MeCtTimeShiftWarp::MeCtTimeShiftWarp( MeController* child )
 	}
 }
 
-const char* MeCtTimeShiftWarp::controller_type() const {
+const std::string& MeCtTimeShiftWarp::controller_type() const {
 	return CONTROLLER_TYPE;
 }
 
@@ -63,7 +63,7 @@ void MeCtTimeShiftWarp::print_state( int tab_count ) {
 	string indent( tab_count, '\t' );
 	ostringstream out;
 	out << "MeCtTimeShiftWarp";
-	const char* name = this->name();
+	const char* name = this->getName().c_str();
 	if( name && name[0]!='\0' )
 		out << " \"" << name << "\"";
 

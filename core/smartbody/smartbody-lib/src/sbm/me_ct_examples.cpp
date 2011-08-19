@@ -35,7 +35,7 @@ using namespace gwiz;
 	HEAD ORIENT JOINTS: { "spine4", "spine5", "skullbase" }
 */
 
-const char* MeCtHeadOrient::_type_name = "HeadOrient";
+std::string MeCtHeadOrient::_type_name = "HeadOrient";
 
 MeCtHeadOrient::MeCtHeadOrient( void )	{
 
@@ -130,7 +130,7 @@ bool MeCtHeadOrient::controller_evaluate( double t, MeFrameData& frame )	{
 void MeCtHeadOrient::print_state( int tabs )	{
 	LOG("MeCtSimpleTilt" );
 
-	const char* str = name();
+	const char* str = getName().c_str();
 	if( str )
 		LOG(" \"%s\"", str );
 
@@ -145,7 +145,7 @@ void MeCtHeadOrient::print_state( int tabs )	{
 	TILTING JOINTS: { "spine4", "spine5", "skullbase" }
 */
 
-const char* MeCtSimpleTilt::_type_name = "SimpleTilt";
+std::string MeCtSimpleTilt::_type_name = "SimpleTilt";
 
 MeCtSimpleTilt::MeCtSimpleTilt( void )	{
 
@@ -234,7 +234,7 @@ bool MeCtSimpleTilt::controller_evaluate( double t, MeFrameData& frame )	{
 void MeCtSimpleTilt::print_state( int tabs )	{
 	LOG("MeCtSimpleTilt" );
 
-	const char* str = name();
+	const char* str = getName().c_str();
 	if( str )
 		LOG(" \"%s\"", str );
 
@@ -248,7 +248,7 @@ void MeCtSimpleTilt::print_state( int tabs )	{
 	NODDING JOINTS: { "spine4", "spine5", "skullbase" }
 */
 
-const char* MeCtSimpleNod::_type_name = "SimpleNod";
+std::string MeCtSimpleNod::_type_name = "SimpleNod";
 
 MeCtSimpleNod::MeCtSimpleNod( void )	{
 
@@ -479,7 +479,7 @@ if( local_channel_index == 2 )	{
 void MeCtSimpleNod::print_state( int tabs )	{
 	LOG("MeCtSimpleNod" );
 
-	const char* str = name();
+	const char* str = getName().c_str();
 	if( str )
 		LOG(" \"%s\"", str );
 

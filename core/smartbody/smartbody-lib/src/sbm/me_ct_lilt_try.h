@@ -63,7 +63,7 @@ EXAMPLE: for example if I wanted the doctor's ankles to go to a 50 degree angle 
 class MeCtAnkleLilt : public SmartBody::SBController	{
 	
 	public:
-		static const char* type_name;
+		static std::string type_name;
 
 		MeCtAnkleLilt();
 		virtual ~MeCtAnkleLilt();
@@ -77,7 +77,7 @@ class MeCtAnkleLilt : public SmartBody::SBController	{
 		
 		virtual SkChannelArray& controller_channels();
 		virtual double controller_duration();
-		virtual const char* controller_type() const;
+		virtual const std::string& controller_type() const;
 		virtual void print_state( int tabs );
 		
 		SkChannelArray _channels;

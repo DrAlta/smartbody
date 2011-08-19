@@ -113,13 +113,13 @@ FileResource::~FileResource()
 {
 }
 
-void FileResource::setFilePath(std::string path)
+void FileResource::setFilePath(const std::string& path)
 {
 	m_filePath = path;
 }
 
 
-std::string FileResource::getFilePath()
+const std::string& FileResource::getFilePath()
 {
 	return m_filePath;
 }
@@ -141,32 +141,32 @@ PathResource::~PathResource()
 {
 }
 
-void PathResource::setPath(std::string p)
+void PathResource::setPath(const std::string& p)
 {
 	path = p;
 }
 
-std::string PathResource::getPath()
+const std::string& PathResource::getPath()
 {
 	return path;
 }
 
-void PathResource::setType(std::string t)
+void PathResource::setType(const std::string& t)
 {
 	type = t;
 }
 
-std::string PathResource::getType()
+const std::string& PathResource::getType()
 {
 	return type;
 }
 
-void PathResource::setMediaPath(std::string mp)
+void PathResource::setMediaPath(const std::string& mp)
 {
 	mediaPath = mp;
 }
 
-std::string PathResource::getMediaPath()
+const std::string& PathResource::getMediaPath()
 {
 	return mediaPath;
 }
@@ -250,22 +250,22 @@ MotionResource::~MotionResource()
 {
 }
 
-void MotionResource::setMotionFile(std::string motion)
+void MotionResource::setMotionFile(const std::string& motion)
 {
 	motionFile = motion;
 }
 		
-std::string MotionResource::getMotionFile()
+const std::string& MotionResource::getMotionFile()
 {
 	return motionFile;
 }
 
-void MotionResource::setType(std::string t)
+void MotionResource::setType(const std::string& t)
 {
 	type = t;
 }
 		
-std::string MotionResource::getType()
+const std::string& MotionResource::getType()
 {
 	return type;
 }
@@ -286,22 +286,22 @@ SkeletonResource::~SkeletonResource()
 {
 }
 
-void SkeletonResource::setSkeletonFile(std::string motion)
+void SkeletonResource::setSkeletonFile(const std::string& motion)
 {
 	skeletonFile = motion;
 }
 		
-std::string SkeletonResource::getSkeletonFile()
+const std::string& SkeletonResource::getSkeletonFile()
 {
 	return skeletonFile;
 }
 
-void SkeletonResource::setType(std::string t)
+void SkeletonResource::setType(const std::string& t)
 {
 	type = t;
 }
 		
-std::string SkeletonResource::getType()
+const std::string& SkeletonResource::getType()
 {
 	return type;
 }
@@ -324,17 +324,17 @@ ControllerResource::~ControllerResource()
 {
 }
 
-void ControllerResource::setControllerName(std::string cname)
+void ControllerResource::setControllerName(const std::string& cname)
 {
 	controllerName = cname;
 }
 
-std::string ControllerResource::getControllerName()
+const std::string& ControllerResource::getControllerName()
 {
 	return controllerName;
 }
 
-void ControllerResource::setType(std::string t)
+void ControllerResource::setType(const std::string& t)
 {
 	type = t;
 }
@@ -349,7 +349,7 @@ double ControllerResource::getTime()
 	return time;
 }
 		
-std::string ControllerResource::getType()
+const std::string& ControllerResource::getType()
 {
 	return type;
 }

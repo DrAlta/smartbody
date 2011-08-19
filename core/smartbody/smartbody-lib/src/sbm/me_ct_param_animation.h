@@ -50,18 +50,18 @@ struct ScheduleUnit
 class MeCtParamAnimation : public MeCtContainer
 {
 	public:
-		static const char* CONTROLLER_TYPE;
+		static std::string CONTROLLER_TYPE;
 
 		class Context : public MeCtContainer::Context 
 		{
 		protected:
-			static const char* CONTEXT_TYPE;
+			static std::string CONTEXT_TYPE;
 		public:
 			Context( MeCtParamAnimation* container, MeControllerContext* context = NULL )
 				:	MeCtContainer::Context( container, context )
 			{}
 
-			const char* context_type() const {	return CONTEXT_TYPE; }
+			const std::string& context_type() const {	return CONTEXT_TYPE; }
 			void child_channels_updated( MeController* child );
 		};
 
@@ -73,11 +73,11 @@ class MeCtParamAnimation : public MeCtContainer
 		virtual void controller_map_updated();
 		virtual SkChannelArray& controller_channels();
 		virtual double controller_duration();
-		virtual const char* controller_type() const {return CONTROLLER_TYPE;}
+		virtual const std::string& controller_type() const {return CONTROLLER_TYPE;}
 		virtual bool controller_evaluate( double t, MeFrameData& frame );
 
-		void setBaseJointName(std::string name);
-		std::string getBaseJointName();
+		void setBaseJointName(const std::string& name);
+		const std::string& getBaseJointName();
 		
 		void dumpScheduling();
 		void schedule(PAStateData* state, bool l, bool pn = false);
@@ -86,8 +86,8 @@ class MeCtParamAnimation : public MeCtContainer
 		void updateWeights();
 		
 		int getNumWeights();
-		std::string getCurrentStateName();
-		std::string getNextStateName();
+		const std::string& getCurrentStateName();
+		const std::string& getNextStateName();
 		PAStateData* getCurrentPAStateData();
 		bool hasPAState(std::string stateName);
 		bool isIdle();

@@ -29,7 +29,7 @@ using namespace gwiz;
 
 //////////////////////////////////////////////////////////////////////////////////
 
-const char* MeCtStepTurn::type_name = "StepTurn";
+std::string MeCtStepTurn::type_name = "StepTurn";
 
 MeCtStepTurn::MeCtStepTurn( void )	{
 
@@ -532,7 +532,7 @@ double MeCtStepTurn::controller_duration( void ) {
 #endif
 }
 
-const char* MeCtStepTurn::controller_type( void ) const	{
+const std::string& MeCtStepTurn::controller_type( void ) const	{
 	return type_name;
 }
 
@@ -540,7 +540,7 @@ void MeCtStepTurn::print_state( int tabCount ) {
 
 	LOG("MeCtStepTurn" );
 
-	const char* str = name();
+	const char* str = getName().c_str();
 	if( str )
 		LOG(" \"%s\"", str );
 
@@ -548,12 +548,12 @@ void MeCtStepTurn::print_state( int tabCount ) {
 	if( _motion ) {
 
 		// motion name
-		str = _motion->name();
+		str = _motion->name().c_str();
 		if( str )
 			LOG(" \"%s\"", str );
 
 		// motion filename
-		str = _motion->filename();
+		str = _motion->filename().c_str();
 		if( str )
 			LOG(" file \"%s\"", str );
 	} 

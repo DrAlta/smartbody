@@ -300,7 +300,8 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, FaceDefinition* faceD
 	int numAUs = faceDefinition->getNumAUs();
 	for (int a = 0; a < numAUs; a++)
 	{
-		ActionUnit* au = faceDefinition->getAU(a);
+		int auNUm = faceDefinition->getAUNum(a);
+		ActionUnit* au = faceDefinition->getAU(auNUm);
 		std::string auName = "Au " + boost::lexical_cast<std::string>(faceDefinition->getAUNum(a));
 		
 		Fl_Tree_Item* auItem = resourceTree->add(auTree,auName.c_str());
@@ -413,7 +414,7 @@ void ResourceWindow::updateSkeleton( Fl_Tree_Item* tree, SkSkeleton* skel )
 
 void ResourceWindow::updateMotion( Fl_Tree_Item* tree, SkMotion* motion )
 {
-	Fl_Tree_Item* item = resourceTree->add(tree,motion->name());
+	Fl_Tree_Item* item = resourceTree->add(tree,motion->name().c_str());
 	item->user_data((void*)ITEM_MOTION);
 }
 
@@ -440,7 +441,7 @@ void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SbmCharacter* characte
 		for (int c = 0; c < n; c++)
 		{
 			//LOG( "%s", ctTree->controller(c)->name() );
-			Fl_Tree_Item* ctrlItem = resourceTree->add(item,ctTree->controller(c)->name());
+			Fl_Tree_Item* ctrlItem = resourceTree->add(item,ctTree->controller(c)->getName().c_str());
 			ctrlItem->user_data((void*)ITEM_CONTROLLER);
 		}
 	}
@@ -569,7 +570,7 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 			MeControllerTreeRoot* ctTree = curChar->ct_tree_p ;
 			for (unsigned int c = 0; c < ctTree->count_controllers(); c++)
 			{
-				if (strcmp(ctTree->controller(c)->name(),treeItem->label())==0)
+				if (ctTree->controller(c)->getName() == treeItem->label())
 					ctrl = ctTree->controller(c);
 			}
 		}		

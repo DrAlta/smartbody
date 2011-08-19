@@ -28,7 +28,7 @@ class MeCtExampleBodyReach :
 	public MeController, public FadingControl
 {
 private:
-	static const char* CONTROLLER_TYPE;
+	static std::string CONTROLLER_TYPE;
 public:	
 	//enum HandActionState { PICK_UP_OBJECT = 0, TOUCH_OBJECT, PUT_DOWN_OBJECT };
 
@@ -62,7 +62,7 @@ public:
 
 	virtual SkChannelArray& controller_channels()	{ return( _channels ); }
 	virtual double controller_duration()			{ return( (double)_duration ); }	
-	virtual const char* controller_type() const		{ return( CONTROLLER_TYPE ); }
+	virtual const std::string& controller_type() const		{ return( CONTROLLER_TYPE ); }
 	virtual void print_state( int tabs );
 
 	MeCtReachEngine* getReachEngine() const { return currentReachEngine; }	

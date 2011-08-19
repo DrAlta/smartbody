@@ -16,11 +16,11 @@ class SBCharacter : public SbmCharacter
 		SBCharacter();
 		SBCharacter(std::string name, std::string type = "");
 
-		std::string getName();
-		void setName(std::string name);
+		const std::string& getName();
+		void setName(std::string& name);
 
-		void setType(std::string type);
-		std::string getType();
+		void setType(const std::string& type);
+		const std::string& getType();
 
 		SBSkeleton* getSkeleton();
 		virtual void setSkeleton(SBSkeleton* skel);
@@ -51,13 +51,13 @@ class SBCharacter : public SbmCharacter
 
 		void setVoice(std::string type);
 		void setVoiceCode(std::string param);
-		std::string getVoice();
-		std::string getVoiceCode();
+		const std::string& getVoice();
+		const std::string& getVoiceCode();
 
 		void setVoiceBackup(std::string type);
 		void setVoiceBackupCode(std::string param);
-		std::string getVoiceBackup();
-		std::string getVoiceBackupCode();
+		const std::string& getVoiceBackup();
+		const std::string& getVoiceBackupCode();
 
 		SBController* getControllerByIndex(int i);
 		SBController* getControllerByName(std::string name);

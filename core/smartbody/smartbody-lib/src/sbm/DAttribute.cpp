@@ -14,7 +14,7 @@ DAttributeGroup::~DAttributeGroup()
 {
 }
 
-std::string DAttributeGroup::getName()
+const std::string& DAttributeGroup::getName()
 {
 	return m_name;
 }
@@ -216,12 +216,12 @@ DAttributeInfo* DAttribute::getAttributeInfo()
 	return m_info;
 }
 
-void DAttribute::setName(std::string name)
+void DAttribute::setName(const std::string& name)
 {
 	m_name = name;
 }
 
-std::string DAttribute::getName()
+const std::string& DAttribute::getName()
 {
 	return m_name;
 }
@@ -505,23 +505,23 @@ StringAttribute::~StringAttribute()
 {
 }
 
-std::string StringAttribute::getValue(float time)
+const std::string& StringAttribute::getValue(float time)
 {
 	return m_value;
 }
 
-void StringAttribute::setValue(std::string val, float time)
+void StringAttribute::setValue(const std::string& val, float time)
 {
 	m_value = val;
 	notifyObservers();
 }
 
-void StringAttribute::setDefaultValue(std::string defaultVal)
+void StringAttribute::setDefaultValue(const std::string& defaultVal)
 {
 	m_defaultValue = defaultVal;
 }
 
-std::string StringAttribute::getDefaultValue()
+const std::string& StringAttribute::getDefaultValue()
 {
 	return m_defaultValue;
 }

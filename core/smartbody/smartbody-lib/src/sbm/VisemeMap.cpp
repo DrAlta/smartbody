@@ -6,12 +6,12 @@ FaceDefinition::FaceDefinition()
 	_faceNeutral = NULL;
 }
 
-std::string FaceDefinition::getName()
+const std::string& FaceDefinition::getName()
 {
 	return _name;
 }
 
-void FaceDefinition::setName(std::string name)
+void FaceDefinition::setName(const std::string& name)
 {
 	_name = name;
 }
@@ -312,7 +312,7 @@ int FaceDefinition::getNumVisemes()
 	return _visemeMap.size();
 }
 
-std::string FaceDefinition::getVisemeName(int index)
+const std::string& FaceDefinition::getVisemeName(int index)
 {
 	int counter = 0;
 	for (std::map<std::string, SkMotion*>::iterator iter = _visemeMap.begin();
@@ -327,7 +327,7 @@ std::string FaceDefinition::getVisemeName(int index)
 		counter++;
 	}
 
-	return "";
+	return _emptyString;
 }
 
 SkMotion* FaceDefinition::getVisemeMotion(std::string viseme)

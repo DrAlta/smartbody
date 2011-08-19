@@ -28,7 +28,7 @@ using namespace gwiz;
 
 //////////////////////////////////////////////////////////////////////////////////
 
-const char* MeCtEyeLidRegulator::type_name = "EyeLidRegulator";
+std::string MeCtEyeLidRegulator::type_name = "EyeLidRegulator";
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -485,7 +485,7 @@ double MeCtEyeLidRegulator::controller_duration( void ) {
 	return( -1.0 );
 }
 
-const char* MeCtEyeLidRegulator::controller_type( void )	const {
+const std::string& MeCtEyeLidRegulator::controller_type( void )	const {
 	return( type_name );
 }
 
@@ -493,7 +493,7 @@ void MeCtEyeLidRegulator::print_state( int tabCount ) {
 
 	LOG("MeCtEyeLidRegulator" );
 
-	const char* str = name();
+	const char* str = getName().c_str();
 	if( str )
 		LOG(" \"%s\"", str );
 
@@ -575,7 +575,7 @@ void MeCtEyeLidRegulator::notify(DSubject* subject)
 
 static bool G_debug = false;
 
-const char* MeCtEyeLid::type_name = "EyeLid";
+std::string MeCtEyeLid::type_name = "EyeLid";
 
 MeCtEyeLid::MeCtEyeLid( void )	{
 
@@ -837,7 +837,7 @@ double MeCtEyeLid::controller_duration( void ) {
 	return( -1.0 );
 }
 
-const char* MeCtEyeLid::controller_type( void )	const {
+const std::string& MeCtEyeLid::controller_type( void )	const {
 	return( type_name );
 }
 
@@ -845,7 +845,7 @@ void MeCtEyeLid::print_state( int tabCount ) {
 
 	LOG("MeCtEyeLid" );
 
-	const char* str = name();
+	const char* str = getName().c_str();
 	if( str )
 		LOG(" \"%s\"", str );
 

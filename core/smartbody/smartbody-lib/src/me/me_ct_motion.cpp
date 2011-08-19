@@ -28,7 +28,7 @@
 
 //=================================== MeCtMotion =====================================
 
-const char* MeCtMotion::type_name = "Motion";
+std::string MeCtMotion::type_name = "Motion";
 
 MeCtMotion::MeCtMotion ()
  {
@@ -170,9 +170,10 @@ void MeCtMotion::output ( SrOutput& out )
    MeController::output ( out );
 
    // name
-   if ( sr_compare(name(),_motion->name())!=0 )
-    { SrString n;
-      n.make_valid_string ( _motion->name() );
+   if ( getName() != _motion->name())
+    { 
+		SrString n;
+		n.make_valid_string ( _motion->name().c_str() );
       out << "motion " << n << srnl;
     }
 
@@ -200,7 +201,7 @@ bool MeCtMotion::input ( SrInput& inp, const SrHashTable<SkMotion*>& motions ) {
    MeController::input ( inp );
 
    // init with defaults:
-   SrString mname ( name() );
+   SrString mname ( getName().c_str() );
    _play_mode = SkMotion::Linear;
    _twarp = _mintwarp = _maxtwarp = 1.0f;
    _loop = false;
@@ -325,28 +326,28 @@ double MeCtMotion::controller_duration ()
    return _loop? -1.0:phase_duration();
  }
 
-const char* MeCtMotion::controller_type () const
- {
-   return type_name;
- }
+const std::string& MeCtMotion::controller_type () const
+{
+	return type_name;
+}
 
 void MeCtMotion::print_state( int tabCount ) {
 	LOG("MeCtMotion" );
 
-	const char* str = name();
-	if( str )
+	std::string str = getName();
+	if( str != "" )
 		LOG(" \"%s\"", str );
 
 	LOG(", motion" );
 	if( _motion ) {
 		// motion name
 		str = _motion->name();
-		if( str )
+		if( str != "")
 			LOG(" \"%s\"", str );
 
 		// motion filename
 		str = _motion->filename();
-		if( str )
+		if( str != "")
 			LOG(" file \"%s\"", str );
 	} else {
 		LOG("=NULL" );

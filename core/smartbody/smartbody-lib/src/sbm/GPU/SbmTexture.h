@@ -53,7 +53,7 @@ public:
 	SbmTexture(const char* texName);
 	~SbmTexture(void);
 	bool hasBuild() { return finishBuild; }
-	std::string getName() { return textureName; }
+	const std::string& getName() { return textureName; }
 	GLuint getID() { return texID; }
 	void loadImage(const char* fileName);
 	void buildTexture();

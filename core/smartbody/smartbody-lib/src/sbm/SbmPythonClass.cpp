@@ -827,22 +827,22 @@ Motion::~Motion()
 	motionFile = "";
 }
 
-std::string Motion::getMotionFileName()
+const std::string& Motion::getMotionFileName()
 {
 	SkMotion* skMotion = getSkMotion();
 	if (skMotion)
 		return skMotion->filename();
 	else
-		return "";
+		return motionFile;
 }
 
-std::string Motion::getMotionName()
+const std::string& Motion::getMotionName()
 {
 	SkMotion* skMotion = getSkMotion();
 	if (skMotion)
 		return skMotion->name();
 	else
-		return "";
+		return emptyString;
 }
 
 int Motion::getNumFrames()
@@ -1056,7 +1056,7 @@ int init_motion_controller(
 	}
 	ctrl_p->ref();
 
-	ctrl_p->name( ctrl_name );
+	ctrl_p->setName( ctrl_name );
 	ctrl_p->init( NULL, mot_p );
 	return( CMD_SUCCESS );
 }

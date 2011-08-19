@@ -23,8 +23,8 @@
 #include <sbm/me_ct_motion_player.h>
 
 
-const char* MeCtMotionPlayer::Context::CONTEXT_TYPE = "MeCtMotionPlayer::Context";
-const char* MeCtMotionPlayer::CONTROLLER_TYPE = "MeCtMotionPlayer";
+std::string MeCtMotionPlayer::Context::CONTEXT_TYPE = "MeCtMotionPlayer::Context";
+std::string MeCtMotionPlayer::CONTROLLER_TYPE = "MeCtMotionPlayer";
 
 void MeCtMotionPlayer::Context::child_channels_updated( MeController* child )
 {
@@ -71,7 +71,7 @@ void MeCtMotionPlayer::init(SbmPawn* pawn, std::string name, double n)
 	mController->init(pawn,motion);
 	std::string controllerName;
 	controllerName = "motion player for " + motionName;
-	controller->name(controllerName.c_str());
+	controller->setName(controllerName.c_str());
 
 
 	_sub_context->add_controller(controller);
@@ -91,12 +91,12 @@ double MeCtMotionPlayer::getFrameNum()
 	return frameNum;
 }
 
-void MeCtMotionPlayer::setMotionName(std::string name)
+void MeCtMotionPlayer::setMotionName(const std::string& name)
 {
 	motionName = name;
 }
 
-std::string MeCtMotionPlayer::getMotionName()
+const std::string& MeCtMotionPlayer::getMotionName()
 {
 	return motionName;
 }

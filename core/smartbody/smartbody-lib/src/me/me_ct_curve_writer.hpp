@@ -31,7 +31,7 @@ class MeCtCurveWriter : public SmartBody::SBController {
 
 	public:
 
-		static const char* TYPE;
+		static std::string TYPE;
 
 		MeCtCurveWriter( void )	{
 			curve_arr = NULL;
@@ -94,7 +94,7 @@ class MeCtCurveWriter : public SmartBody::SBController {
 		int 	tail_bound_mode;
 		
 	public:
-		virtual const char* controller_type() const {
+		virtual const std::string& controller_type() const {
 			return( MeCtCurveWriter::TYPE );
 		}
 	

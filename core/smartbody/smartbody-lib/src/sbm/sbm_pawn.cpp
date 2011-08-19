@@ -131,7 +131,6 @@ SbmPawn::SbmPawn() : DObject()
 
 // Constructor
 SbmPawn::SbmPawn( const char * name ) : DObject(),
-	_skeleton( NULL ),
 	scene_p( NULL ),
 #ifdef __ANDROID__ // don't use the GPU version in android
 	dMesh_p( new DeformableMesh() ),
@@ -147,6 +146,9 @@ SbmPawn::SbmPawn( const char * name ) : DObject(),
 	ct_tree_p->ref();
 	ct_tree_p->setPawn(this);
 
+	_skeleton = new SmartBody::SBSkeleton();
+	_skeleton->ref();
+
 	SbmPawn::initData();
 
 	this->createBoolAttribute("physics", false, true, "Basic", 300, false, false, "is the pawn physics enabled");
@@ -155,7 +157,8 @@ SbmPawn::SbmPawn( const char * name ) : DObject(),
 void SbmPawn::initData()
 {
 	bonebusCharacter = NULL;
-	_skeleton = NULL;
+	_skeleton = new SmartBody::SBSkeleton();
+	_skeleton->ref();
 	//scene_p = new SkScene();
 #ifdef __ANDROID__
 	dMesh_p = new DeformableMesh();
@@ -166,7 +169,7 @@ void SbmPawn::initData()
 	world_offset_writer_p = new MeCtChannelWriter();
 	std::string controllerName = this->getName();
 	controllerName += "'s world offset writer";
-	world_offset_writer_p->name( controllerName.c_str() );
+	world_offset_writer_p->setName( controllerName.c_str() );
 	wo_cache_timestamp = -std::numeric_limits<float>::max(); 
 	//skeleton_p->ref();
 	ct_tree_p->ref();
@@ -251,7 +254,7 @@ int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 	// Name the controllers
 	string ct_name( getName() );
 	ct_name += "'s world_offset writer";
-	world_offset_writer_p->name( ct_name.c_str() );
+	world_offset_writer_p->setName( ct_name.c_str() );
 
 	return CMD_SUCCESS;
 }
@@ -332,6 +335,9 @@ int SbmPawn::init_skeleton() {
 
 void SbmPawn::reset_all_channels()
 {
+	if (!_skeleton)
+		return;
+
 	SkChannelArray& channels = _skeleton->channels();
 	MeFrameData& frameData = ct_tree_p->getLastFrame();
 	SrBuffer<float>& sr_fbuff = frameData.buffer();
@@ -444,7 +450,8 @@ SbmPawn::~SbmPawn()	{
 
 	ct_tree_p->clear();  // Because controllers within reference back to tree root context
 
-	scene_p->unref();
+	if (scene_p)
+		scene_p->unref();
 	if( _skeleton )
 		_skeleton->unref();
 	ct_tree_p->unref();

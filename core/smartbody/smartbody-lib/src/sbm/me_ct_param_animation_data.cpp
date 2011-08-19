@@ -742,10 +742,11 @@ void ParameterManager::setPrevVec(SrVec& vec)
 	previousParam = vec;
 }
 
-std::string ParameterManager::getMotionName(int id)
+const std::string& ParameterManager::getMotionName(int id)
 {
 	if (id < 0 || id > getNumParameters())
-		return "";
+		return emptyString;
+
 	return motionNames[id];	
 }
 

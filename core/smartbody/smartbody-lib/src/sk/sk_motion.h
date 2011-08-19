@@ -49,8 +49,8 @@ public:
 	int _postsize;            // size of each posture
 	SkSkeleton* _skeleton;    // the connected skeleton
 	float* _floatbuffer;      // or the connected buffer
-	char* _name;              // motion name
-	char* _filename;          // file name (optional)
+	std::string _name;              // motion name
+	std::string _filename;          // file name (optional)
 	std::vector<Frame> _frames;   // frame data
 	SkChannelArray _channels; // channels
 	int _last_apply_frame;    // used to speed up playing with monotone time
@@ -79,19 +79,19 @@ public :
 	virtual ~SkMotion();
 
 	/*! Set a name to be associated with the motion */
-	void name ( const char* n ) { sr_string_set(_name,n); }
+	void name ( const std::string& n ) { _name = n; }
 
 	/*! Get the name associated with the motion */
-	const char* name () const { return _name? _name:""; }
+	const std::string& name () const { return _name; }
 
 	/*! Set a file name to be associated with the motion.
 	This information is not saved in the motion file and is 
 	not used by SkMotion. It is here just as a convenient 
 	place to store the information */
-	void filename ( const char* n ) { sr_string_set(_filename,n); }
+	void filename ( const char* n ) { _filename = n; }
 
 	/*! Get the file name associated with the motion */
-	const char* filename () const { return _filename? _filename:""; }
+	const std::string& filename () const { return _filename; }
 
 	/*! Clears all data, creating an empty motion */
 	void init ();

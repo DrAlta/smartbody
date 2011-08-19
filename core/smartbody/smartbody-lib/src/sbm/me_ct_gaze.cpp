@@ -114,7 +114,7 @@ float G_hack_target_heading = 0.0;
 		eyeball: 70.6		5.9
 */
 
-const char* MeCtGaze::CONTROLLER_TYPE = "Gaze";
+std::string MeCtGaze::CONTROLLER_TYPE = "Gaze";
 
 int MeCtGaze::joint_index( const char *label )	{
 	if( label )	{
@@ -1227,7 +1227,7 @@ printf( "eyelim: %f %f %f %f\n",
 
 void MeCtGaze::print_state( int tabs )	{
 	LOG("MeCtGaze" );
-	const char* str = name();
+	const char* str = getName().c_str();
 	if( str )
 		LOG(" \"%s\"\n", str );
 }

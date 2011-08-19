@@ -75,7 +75,7 @@ public:
 class MeCtConstraint : public SmartBody::SBController, public FadingControl
 {
 private:
-	static const char* CONTROLLER_TYPE;
+	static std::string CONTROLLER_TYPE;
 public:	
 	static bool useIKConstraint;
 
@@ -117,7 +117,7 @@ public:
 	virtual SkChannelArray& controller_channels()	{ return( _channels ); }
 	virtual double controller_duration()			{ return( (double)_duration ); }
 	void set_duration(float duration) { _duration = duration; }
-	virtual const char* controller_type() const		{ return( CONTROLLER_TYPE ); }
+	virtual const std::string& controller_type() const		{ return( CONTROLLER_TYPE ); }
 	virtual void print_state( int tabs );	
 
 protected:	

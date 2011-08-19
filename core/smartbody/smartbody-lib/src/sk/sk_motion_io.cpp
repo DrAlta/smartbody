@@ -174,7 +174,7 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 	in.get_token();
 	if ( in.last_token()=="name" ) {
 		in.get_token();
-		name ( in.last_token() );
+		name ( (const char*) in.last_token() );
 	} else {
 		in.unget_token();
 	}
@@ -424,10 +424,9 @@ bool SkMotion::save ( SrOutput& out )
  {
    out << "SkMotion\n\n";
 
-   if ( _name )
-    { SrString s;
-      s.make_valid_string ( _name );
-      out << "name " << s << srnl<<srnl;
+   if ( _name != "")
+    { 
+	  out << "name " << _name.c_str() << srnl<<srnl;
     }
 
    out << _channels << srnl;

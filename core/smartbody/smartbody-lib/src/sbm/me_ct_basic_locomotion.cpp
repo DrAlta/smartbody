@@ -23,7 +23,7 @@
 #include "me_ct_basic_locomotion.h"
 #include "mcontrol_util.h"
 
-const char* MeCtBasicLocomotion::_type_name = "BasicLocomotion";
+std::string MeCtBasicLocomotion::_type_name = "BasicLocomotion";
 
 MeCtBasicLocomotion::MeCtBasicLocomotion(SbmCharacter* c) :  SmartBody::SBController(), 
 															 character(c)

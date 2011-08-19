@@ -36,7 +36,7 @@ using namespace std;
 //////////////////////////////////////////////////////////////////
 //  MeCtLifecycleTest
 
-const char* MeCtLifecycleTest::CONTROLLER_TYPE = "MeCtLifecycleTest";
+std::string MeCtLifecycleTest::CONTROLLER_TYPE = "MeCtLifecycleTest";
 
 
 MeCtLifecycleTest::MeCtLifecycleTest()
@@ -45,7 +45,7 @@ MeCtLifecycleTest::MeCtLifecycleTest()
 	evaluate_count( 0 )
 {}
 
-const char* MeCtLifecycleTest::controller_type() const {
+const std::string& MeCtLifecycleTest::controller_type() const {
 	print_method_entry( "controller_type()" );
 
 	return CONTROLLER_TYPE;
@@ -163,9 +163,10 @@ void MeCtLifecycleTest::print_method_entry( string method, bool reset_eval_count
 			state_descrip += "NULL";
 		}
 
-		(*out) << "MeCtLifecycleTest "
-		       << '\"' << name() << "\" "
+	/*	(*out) << "MeCtLifecycleTest "
+		       << '\"' << getName() << "\" "
 			   << method << ":\t\t" << state_descrip << endl;
+			   */
 	}
 	if( reset_eval_count )
 		(const_cast<MeCtLifecycleTest*>(this))->evaluate_count = 0;

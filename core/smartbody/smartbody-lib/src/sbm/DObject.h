@@ -13,7 +13,7 @@ class DObject : public DObserver
 		DObject();
 		~DObject();
 
-		void setName(std::string name);
+		void setName(const std::string& name);
 		const std::string& getName();
 		DAttribute* getAttribute(std::string attrName);
 		std::map<std::string, DAttribute*>& getAttributeList();
@@ -58,5 +58,6 @@ class DObject : public DObserver
 		std::string m_name;
 		DAttributeManager* m_attributeManager;
 		std::map<std::string, DAttribute*> m_attributeList;
+		std::string m_emptyString;
 };
 #endif

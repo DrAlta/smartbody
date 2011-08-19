@@ -40,7 +40,7 @@
 class MeCtLocomotionSimple : public SmartBody::SBController {
 public:
 	// Public Constants
-	static const char* TYPE;
+	static std::string TYPE;
 
 protected:
 	// Data
@@ -62,7 +62,7 @@ public:
 	/** Destructor */
 	virtual ~MeCtLocomotionSimple();
 
-	const char* controller_type();
+	const std::string& controller_type();
 
 	/**
 	 *  Implements MeController::controller_channels().
