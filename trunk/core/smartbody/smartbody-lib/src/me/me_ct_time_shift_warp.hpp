@@ -30,7 +30,7 @@ class MeCtTimeShiftWarp : public MeCtUnary {
 public:
 	///////////////////////////////////////////////////////////////////////
 	//  Public Constants
-	static const char* CONTROLLER_TYPE;
+	static std::string CONTROLLER_TYPE;
 
 protected:
 	srLinearCurve	_curve;
@@ -41,7 +41,7 @@ public:
 
 	srLinearCurve& get_curve() { return _curve; }
 
-    const char* controller_type() const;
+    const std::string& controller_type() const;
 
     double controller_duration();
     //SkChannelArray& controller_channels(); // implemented in MeCtUnary

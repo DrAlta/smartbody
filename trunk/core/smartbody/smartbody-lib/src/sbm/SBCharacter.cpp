@@ -37,12 +37,12 @@ int SBCharacter::setup()
 	return SbmCharacter::setup();
 }
 
-std::string SBCharacter::getName()
+const std::string& SBCharacter::getName()
 {
 	return SbmCharacter::getName();
 }
 
-void SBCharacter::setName(std::string name)
+void SBCharacter::setName(std::string& name)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
 	std::string oldName = getName();
@@ -168,7 +168,7 @@ SBController* SBCharacter::getControllerByIndex(int index)
 		return NULL;
 	}
 
-	SBController* controller = getControllerByName(ct_tree_p->controller(index)->name());
+	SBController* controller = getControllerByName(ct_tree_p->controller(index)->getName());
 	return controller;
 }
 
@@ -180,7 +180,7 @@ SBController* SBCharacter::getControllerByName(std::string name)
 	for (int i = 0; i < (int)ct_tree_p->count_controllers(); i++)
 	{
 		SBController* controller = dynamic_cast<SBController*>(ct_tree_p->controller(i));
-		std::string cName = controller->name();
+		const std::string& cName = controller->getName();
 		if (name == cName)
 		{
 			return controller;
@@ -372,9 +372,10 @@ return true;
 
 void SBCharacter::initLocomotion(MeCtLocomotion* locoCtrl)
 {
+	/*
 	mcuCBHandle& mcu = mcuCBHandle::singleton();	
 
-	const char* wholeName = getSkeleton()->skfilename();
+	const std::string& wholeName = getSkeleton()->skfilename();
 	char* skFileName = strrchr(const_cast<char*> (wholeName), (int)'/');
 	skFileName++;
 	SkSkeleton* walking_skeleton = load_skeleton( skFileName, mcu.me_paths, mcu.resource_manager );
@@ -382,10 +383,12 @@ void SBCharacter::initLocomotion(MeCtLocomotion* locoCtrl)
 	locoCtrl->init_skeleton(walking_skeleton, standing_skeleton);
 
 	locoCtrl->get_navigator()->setWordOffsetController(get_world_offset_writer_p());
+	*/
 }
 
 void SBCharacter::linkControllers(SBController* controller)
 {
+	/*
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	MeCtScheduler2* scheduler = dynamic_cast<MeCtScheduler2*>(controller);
 	if (scheduler)
@@ -482,6 +485,7 @@ void SBCharacter::linkControllers(SBController* controller)
 			}
 		}
 	}
+	*/
 }
 
 void SBCharacter::setVoice(std::string type)
@@ -506,7 +510,7 @@ void SBCharacter::setVoice(std::string type)
 	}
 }
 
-std::string SBCharacter::getVoice()
+const std::string& SBCharacter::getVoice()
 {
 	return get_voice_code();
 }
@@ -516,7 +520,7 @@ void SBCharacter::setVoiceCode(std::string param)
 	set_voice_code(param);
 }
 
-std::string SBCharacter::getVoiceCode()
+const std::string& SBCharacter::getVoiceCode()
 {
 	return get_voice_code();
 }
@@ -543,7 +547,7 @@ void SBCharacter::setVoiceBackup(std::string type)
 	}
 }
 
-std::string SBCharacter::getVoiceBackup()
+const std::string& SBCharacter::getVoiceBackup()
 {
 	return get_voice_code_backup();
 }
@@ -553,7 +557,7 @@ void SBCharacter::setVoiceBackupCode(std::string param)
 	set_voice_code_backup(param);
 }
 
-std::string SBCharacter::getVoiceBackupCode()
+const std::string& SBCharacter::getVoiceBackupCode()
 {
 	return get_voice_code_backup();
 }

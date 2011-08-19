@@ -664,7 +664,7 @@ SkJoint* SkSkeleton::_loadjlist ( SrInput& in, float scale, SrStringArray& paths
 static void outgeo ( SrOutput& out, const char* s, SkJoint* j, const char* geopath )
  {
    SrString name;
-   name << j->skeleton()->name() << '_'
+   name << j->skeleton()->name().c_str() << '_'
 	   << j->name().c_str() << '_'
         << (const char*)(s[0]=='v'? "vis":"col" ) << ".srm";
    name.lower ();        
@@ -821,7 +821,7 @@ bool SkSkeleton::save ( SrOutput& out, const char* geopath )
    out.margin_char ( srspc );
    
    // write name, if any:
-   s.make_valid_string(_name);
+   s.make_valid_string(_name.c_str());
    if ( s[0] ) out << "set_name " << s << srnl << srnl;
 
    // check geopath:

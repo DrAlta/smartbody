@@ -53,13 +53,13 @@ class MeControllerTreeRoot
 public:
     ///////////////////////////////////////////////////////////////////////
     // Public Constants
-	static const char* CONTEXT_TYPE;
+	static std::string CONTEXT_TYPE;
 
     ///////////////////////////////////////////////////////////////////////
     // Public Methods
 	static MeControllerTreeRoot* create();
 
-	const char* context_type() const
+	const std::string& context_type() const
 	{	return CONTEXT_TYPE; }
 
     /** Implements MeControllerContext::channels() */

@@ -16,17 +16,7 @@ SBController::~SBController()
 {
 }
 
-std::string SBController::getName()
-{
-	return name();
-}
-
-void SBController::setName(std::string n)
-{
-	name(n.c_str());
-}
-
-std::string SBController::getType()
+const std::string& SBController::getType()
 {
 	return controller_type();
 }

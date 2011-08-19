@@ -67,7 +67,7 @@ void FingerChain::testCollision( SbmGeomObject* colObj )
 /* Hand Controller                                                      */
 /************************************************************************/
 
-const char* MeCtHand::CONTROLLER_TYPE = "Hand";
+std::string MeCtHand::CONTROLLER_TYPE = "Hand";
 
 MeCtHand::MeCtHand( SkSkeleton* sk, SkJoint* wrist)
 {		

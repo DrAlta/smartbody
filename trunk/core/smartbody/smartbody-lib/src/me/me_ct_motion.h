@@ -55,7 +55,7 @@ class MeCtMotion : public SmartBody::SBController
 	int					 _lastCycle;
 
    public :
-    static const char* type_name;
+	   static std::string type_name;
 
    public :
     /*! Constructor */
@@ -145,7 +145,7 @@ class MeCtMotion : public SmartBody::SBController
 	virtual void controller_map_updated();
 	virtual bool controller_evaluate ( double t, MeFrameData& frame );
     virtual SkChannelArray& controller_channels ();
-    virtual const char* controller_type () const;
+    virtual const std::string& controller_type () const;
 };
 
 //======================================= EOF =====================================

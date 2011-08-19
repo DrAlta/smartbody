@@ -5,7 +5,7 @@
 #include <sbm/gwiz_math.h>
 using namespace gwiz;
 
-const char* MeCtConstraint::CONTROLLER_TYPE = "Constraint";
+std::string MeCtConstraint::CONTROLLER_TYPE = "Constraint";
 
 bool MeCtConstraint::useIKConstraint = true;
 

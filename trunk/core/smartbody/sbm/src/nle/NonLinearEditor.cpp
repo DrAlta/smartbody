@@ -384,7 +384,7 @@ NonLinearEditorModel* Track::getModel()
 	return model;
 }
 
-std::string Track::getName()
+const std::string& Track::getName()
 {
 	return name;
 }
@@ -615,7 +615,7 @@ NonLinearEditorModel::~NonLinearEditorModel()
 		delete tracks[t];
 }
 
-std::string NonLinearEditorModel::getName()
+const std::string& NonLinearEditorModel::getName()
 {
 	return name;
 }

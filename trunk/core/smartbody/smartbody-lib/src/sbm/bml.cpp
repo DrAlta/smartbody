@@ -151,7 +151,7 @@ class BmlProcPrunePolicy : public MePrunePolicy {
 public:
 	virtual bool shouldPrune( MeController* ct, MeController* parent ) {
 		std::stringstream strstr;
-		strstr << "====================> BmlProcPrunePolicy: pruning " << ct->controller_type() << " \"" << ct->name() << " from parent " << parent->controller_type() << " \"" << parent->name() << '"';
+		strstr << "====================> BmlProcPrunePolicy: pruning " << ct->controller_type() << " \"" << ct->getName() << " from parent " << parent->controller_type() << " \"" << parent->getName() << '"';
 		LOG(strstr.str().c_str());
 		return true;
 	};
@@ -1040,13 +1040,13 @@ void MeControllerRequest::realize_impl( BmlRequestPtr request, mcuCBHandle* mcu 
 	time_sec outdt = endAt-relaxAt;
 
 	// Name unnamed controllers
-	const char* name = anim_ct->name();
-	if( name==NULL || name[0]=='\0' ) {
-		anim_ct->name( name = unique_id.c_str() );
+	const std::string& name = anim_ct->getName();
+	if( name=="" ) {
+		anim_ct->setName( unique_id );
 	}
 
 	if(LOG_CONTROLLER_SCHEDULE) {
-		cout << "MeControllerRequest::schedule(..): \""<<(anim_ct->name())<<"\" startAt="<<startAt<<",  indt="<<indt<<",  outdt="<<outdt<<endl;
+		cout << "MeControllerRequest::schedule(..): \""<<(anim_ct->getName())<<"\" startAt="<<startAt<<",  indt="<<indt<<",  outdt="<<outdt<<endl;
 	}
 	MeCtMotion* motionController = dynamic_cast<MeCtMotion*>(anim_ct);
 	if (motionController)
@@ -1092,7 +1092,7 @@ void ParameterizedMotionRequest::realize_impl( BmlRequestPtr request, mcuCBHandl
 	time_sec outdt = endAt-relaxAt;
 
 	if(LOG_CONTROLLER_SCHEDULE)
-		cout << "MeControllerRequest::schedule(..): \"" << motion1Ct->name() << " and " << motion2Ct->name() << "\" startAt=" << startAt << ",  indt=" << indt << ",  outdt=" << outdt << endl;
+		cout << "MeControllerRequest::schedule(..): \"" << motion1Ct->getName() << " and " << motion2Ct->getName() << "\" startAt=" << startAt << ",  indt=" << indt << ",  outdt=" << outdt << endl;
 
 	if (motion1Ct && motion2Ct)
 		schedule_ct->schedule( motion1Ct, motion2Ct, paramValue, loop, behav_syncs);

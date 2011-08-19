@@ -35,7 +35,7 @@
 
 //=================================== MeCtPose =====================================
 
-const char* MeCtPose::type_name = "Pose";
+std::string MeCtPose::type_name = "Pose";
 
 MeCtPose::MeCtPose () :
    _duration( -1.0f ),
@@ -156,7 +156,7 @@ bool MeCtPose::input ( SrInput& inp, const SrHashTable<SkPosture*>& postures )
    MeController::input ( inp );
 
    // init with defaults:
-   SrString pname ( name() );
+   SrString pname ( getName().c_str() );
 
    // read:
    while ( !inp.finished() )
@@ -221,7 +221,7 @@ double MeCtPose::controller_duration ()
    return _duration;
  }
 
-const char* MeCtPose::controller_type () const
+const std::string& MeCtPose::controller_type () const
  {
    return type_name;
  }
@@ -229,7 +229,7 @@ const char* MeCtPose::controller_type () const
 void MeCtPose::print_state( int tabCount ) {
 	LOG("MeCtPose" );
 
-	const char* str = name();
+	const char* str = getName().c_str();
 	if( str )
 		LOG(" \"%s\"", str );
 

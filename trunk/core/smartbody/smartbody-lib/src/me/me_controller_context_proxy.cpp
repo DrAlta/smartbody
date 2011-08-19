@@ -32,7 +32,7 @@ std::set<int> NO_CHANNEL_INDICES_FOR_PROXY;
 ///////////////////////////////////////////////////////////////////////////
 //  MeControllerContextProxy Class
 
-const char* MeControllerContextProxy::CONTEXT_TYPE = "MeControllerContextProxy";
+std::string MeControllerContextProxy::CONTEXT_TYPE = "MeControllerContextProxy";
 
 MeControllerContextProxy::MeControllerContextProxy( MeControllerContext* context )
 :	_context( context )

@@ -23,7 +23,7 @@
 #include <vhcl.h>
 #include <me/me_ct_curve_writer.hpp>
 
-const char* MeCtCurveWriter::TYPE = "MeCtCurveWriter";
+std::string MeCtCurveWriter::TYPE = "MeCtCurveWriter";
 
 ///////////////////////////////////////////////////////////////////////////////
 

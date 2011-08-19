@@ -120,7 +120,7 @@ class Track
 
 		void setModel(NonLinearEditorModel* model);
 		NonLinearEditorModel* getModel();
-		virtual std::string getName();
+		virtual const std::string& getName();
 		virtual void setName(std::string name);
 		virtual void addBlock(Block* block);
 		virtual int getNumBlocks();
@@ -163,7 +163,7 @@ class NonLinearEditorModel
 		NonLinearEditorModel();
 		~NonLinearEditorModel();
 
-		virtual std::string getName();
+		virtual const std::string& getName();
 		virtual void setName(std::string name);
 		virtual int getNumTracks();
 		virtual Track* getTrack(unsigned int num);

@@ -43,7 +43,7 @@ using namespace std;
 
 
 
-const char* MeControllerTreeRoot::CONTEXT_TYPE = "MeControllerTreeRoot";
+std::string MeControllerTreeRoot::CONTEXT_TYPE = "MeControllerTreeRoot";
 
 class MeControllerTreeRootImpl;
 
@@ -168,7 +168,7 @@ protected:
     // Protected Fields
 
 	// TODO: handle more than one entity/skeleton
-	std::string*   _skeletonName;
+	std::string   _skeletonName;
     SkSkeleton*    _skeleton;
 	State          _state;   // Need to be lockable, even for single threading
 
@@ -196,7 +196,7 @@ public:
 
 	// Constructor
 	MeControllerTreeRootImpl()
-	:	_skeletonName(NULL),
+	:	_skeletonName(""),
 		_skeleton(NULL),
 		_state(VALID),
 		_channels_cur(0),
@@ -220,8 +220,8 @@ public:
 			++ct_iter;
 		}
 
-		if( _skeletonName )
-			remove_skeleton( *_skeletonName );
+		if( _skeletonName != "" )
+			remove_skeleton( _skeletonName );
 		if( _logger )
 			_logger->unref();
 	}
@@ -286,7 +286,7 @@ public:
 			return;
 		}
 
-		_skeletonName = new string(entityName);
+		_skeletonName = entityName;
 		_skeleton = skeleton;
 		_skeleton->ref();
 
@@ -298,9 +298,8 @@ public:
      */
 	void remove_skeleton( const std::string& entityName ) {
 		SR_ASSERT( _state!=REMAPPING );  // simple lock
-		if( *_skeletonName==entityName ) {
-			delete _skeletonName;
-			_skeletonName = NULL;
+		if( _skeletonName==entityName ) {
+			_skeletonName = "";
 			_skeleton->unref();
 			_skeleton = NULL;
 		}

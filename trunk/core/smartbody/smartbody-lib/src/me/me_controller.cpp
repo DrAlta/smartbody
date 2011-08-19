@@ -56,7 +56,6 @@ MeController::MeController ()
 :	_active( false ),
 	_indt( 0.0f ),
 	_outdt( 0.0f ),
-	_name( NULL ),
 	_emphasist( -1.0f ),
 	_lastEval( -1 ),  // effectively unset.. should really be a less likely value like NaN
 	_prune_policy( new MeDefaultPrunePolicy() ),
@@ -68,6 +67,7 @@ MeController::MeController ()
 	//_pass_through(false)
 	//_handle("")
 {
+	setName("");
 	_instance_id = instance_count;
 	instance_count ++;
 	_invocation_count = -1;
@@ -96,17 +96,11 @@ MeController::~MeController () {
 		_prune_policy = NULL;
 	}
 
-    delete[] _name;
 }
 
-void MeController::clone_parameters( MeController* other ) {
-	if( _name )
-		delete[] _name;
-	if( other->_name ) {
-		int len = strlen(other->_name)+1;
-		_name = new char[len];
-		strcpy( _name, other->_name );
-	}
+void MeController::clone_parameters( MeController* other )
+{
+	setName(other->getName());
 	_indt = other->_indt;
 	_outdt = other->_outdt;
 	_emphasist = other->_emphasist;
@@ -179,7 +173,7 @@ void MeController::start (double time) {
 
 	// add the controller resource as 'start'
 	ControllerResource* cres = new ControllerResource();
-	cres->setControllerName(this->name());
+	cres->setControllerName(this->getName());
 	cres->setType("start");
 	cres->setTime(time);
 	ResourceManager::getResourceManager()->addControllerResource(cres);
@@ -198,7 +192,7 @@ void MeController::stop (double time) {
 
 	// add the controller resource as 'stop'
 	ControllerResource* cres = new ControllerResource();
-	cres->setControllerName(this->name());
+	cres->setControllerName(this->getName());
 	cres->setType("stop");
 	cres->setTime(time);
 	ResourceManager::getResourceManager()->addControllerResource(cres);
@@ -241,7 +235,7 @@ void MeController::remap() {
 				const char* parent_ch_type = SkChannel::type_name( _context->channels().type( parent_index ) );
 				const char* parent_ch_name = _context->channels().name( parent_index ).c_str();
 				std::stringstream strstr;
-				strstr << "WARNING: MeController::remap(): "<<controller_type()<<" \""<<this->name()<<"\": "
+				strstr << "WARNING: MeController::remap(): "<<controller_type()<<" \""<<this->getName()<<"\": "
 					<<_context->context_type()<<" channel "<<parent_index<<", \""<<parent_ch_name<<"\" ("<<parent_ch_type<<") lacks valid buffer index!!";
 				LOG(strstr.str().c_str());
 			}
@@ -300,7 +294,7 @@ void MeController::dumpChannelMap()
 				const char* parent_ch_type = SkChannel::type_name( _context->channels().type( parent_index ) );
 				const char* parent_ch_name = _context->channels().name( parent_index ).c_str();
 				std::stringstream strstr;
-				strstr << "WARNING: MeController::remap(): "<<controller_type()<<" \""<<this->name()<<"\": "
+				strstr << "WARNING: MeController::remap(): "<<controller_type()<<" \""<<this->getName()<<"\": "
 					<<_context->context_type()<<" channel "<<parent_index<<", \""<<parent_ch_name<<"\" ("<<parent_ch_type<<") lacks valid buffer index!!";
 				LOG(strstr.str().c_str());
 			}
@@ -316,7 +310,7 @@ void MeController::dumpChannelMap()
 
 			if( strcmp( local_ch_name, parent_ch_name ) || (type != parent_ch_type ) ) {
 				std::stringstream strstr;
-				strstr << "ERROR: MeController::remap(): " << controller_type() << " \"" << _name << "\" :"
+				strstr << "ERROR: MeController::remap(): " << controller_type() << " \"" << getName() << "\" :"
 					<< " Local \"" << local_ch_name << "\" " << SkChannel::type_name(type) << " != "
 					<< " Parent \"" << parent_ch_name << "\" " << SkChannel::type_name(parent_ch_type) << std::endl;
 				LOG(strstr.str().c_str());
@@ -589,11 +583,11 @@ void MeController::record_write( const char *full_prefix ) {
 	ostringstream record_id_oss;
 
 	_invocation_count++;
-	if( _name == NULL )	{
-		name( "noname" );
+	if( getName() != "" )	{
+		setName( "noname" );
 	}
 	record_id_oss << _instance_id << "." << _invocation_count << "_R";
-	string recordname = string( controller_type() ) + "_" + string( _name ) + "_" + record_id_oss.str();
+	string recordname = string( controller_type() ) + "_" + getName() + "_" + record_id_oss.str();
 	
 	if( _record_mode == RECORD_BVH_MOTION )	{
 		filename = _record_full_prefix + recordname + ".bvh";
@@ -789,9 +783,7 @@ std::vector<float>& MeController::get_buffer_changes()
 
 void MeController::output ( SrOutput& o )
  {
-   SrString n;
-   n.make_valid_string ( name() );
-   o << n << " inout " << _indt << srspc << _outdt << srnl;
+   o << getName().c_str() << " inout " << _indt << srspc << _outdt << srnl;
    if ( _emphasist>=0 )
      o << "emphasist " << _emphasist << srnl;
  }
@@ -799,7 +791,7 @@ void MeController::output ( SrOutput& o )
 void MeController::input ( SrInput& i )
  {
    i.get_token();
-   name ( i.last_token() );
+   setName((const char*) i.last_token());
    i.get_token(); // inout
    i >> _indt;
    i >> _outdt;
@@ -824,7 +816,7 @@ void MeController::xmlify_children( DOMElement* elem ) const {
 void MeController::print_state( int tab_count ) {
 	using namespace std;
 
-	const char* name = this->name();
+	const char* name = this->getName().c_str();
 
 	cout << controller_type();
 	if( name!=NULL && name[0]!='\0' )

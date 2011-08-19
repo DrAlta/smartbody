@@ -41,8 +41,8 @@ class FaceDefinition
 
 		~FaceDefinition();
 
-		std::string getName();
-		void setName(std::string name);
+		const std::string& getName();
+		void setName(const std::string& name);
 
 		void setFaceNeutral(std::string motionName);
 		SkMotion* getFaceNeutral();
@@ -50,7 +50,7 @@ class FaceDefinition
 		bool hasViseme(std::string visemeName);
 		void setViseme(std::string visemeName, std::string motionName);
 		int getNumVisemes();
-		std::string getVisemeName(int index);
+		const std::string& getVisemeName(int index);
 		SkMotion* getVisemeMotion(std::string viseme);
 
 
@@ -67,6 +67,7 @@ class FaceDefinition
 		std::map<int, ActionUnit*> _auMap;
 		std::map<std::string, SkMotion*> _visemeMap;
 		std::string _name;
+		std::string _emptyString;
 };
 
 #endif // SBM_VISEME_MAP_HPP

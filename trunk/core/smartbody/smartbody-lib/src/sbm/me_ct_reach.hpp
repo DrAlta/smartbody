@@ -33,7 +33,7 @@ typedef std::set<TagMotion> MotionDataSet;
 class MeCtReach : public SmartBody::SBController
 {
 private:
-	static const char* CONTROLLER_TYPE;
+	static std::string CONTROLLER_TYPE;
 
 public:
 	enum ReachMode { TARGET_POS = 1, TARGET_JOINT_POS };	
@@ -72,7 +72,7 @@ public:
 	virtual SkChannelArray& controller_channels()	{ return( _channels ); }
 	virtual double controller_duration()			{ return( (double)_duration ); }
 	void set_duration(float duration) { _duration = duration; }
-	virtual const char* controller_type() const		{ return( CONTROLLER_TYPE ); }
+	virtual const std::string& controller_type() const		{ return( CONTROLLER_TYPE ); }
 	virtual void print_state( int tabs );	
 
 	void setReachArm(MeCtReach::ReachArm val) { reach_arm = val; }

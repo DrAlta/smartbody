@@ -25,10 +25,10 @@ class EventHandler
 		EventHandler() : m_type(""), m_action("") {}
 		~EventHandler() {}
 
-		void setType(std::string type) { m_type = type; }
-		std::string getType() { return m_type; }
-		void setAction(std::string action) { m_action = action; }
-		std::string getAction() { return m_action; }
+		void setType(const std::string& type) { m_type = type; }
+		const std::string& getType() { return m_type; }
+		void setAction(const std::string& action) { m_action = action; }
+		const std::string& getAction() { return m_action; }
 
 	protected:
 		std::string m_type;

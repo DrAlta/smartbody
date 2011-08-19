@@ -192,7 +192,7 @@ public :
 	/**
 	* \brief The controller type
 	*/
-	static const char* type_name;
+	static std::string type_name;
 
 public :
 	/** 
@@ -300,7 +300,7 @@ public :
 	/** 
 	* \brief Implements MeController::controller_type
 	*/
-	virtual const char* controller_type () const;
+	virtual const std::string& controller_type () const;
 
 
 private:

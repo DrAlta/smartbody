@@ -33,7 +33,7 @@
 class MeCtNavigationCircle : public SmartBody::SBController {
 public:
 	// Public Constants
-	static const char* TYPE;
+	static std::string TYPE;
 
 protected:
 	// Data
@@ -76,7 +76,7 @@ public:
 	/** Constructor */
 	MeCtNavigationCircle();
 
-	const char* controller_type() const;
+	const std::string& controller_type() const;
 
 	/**
 	 *  Initializes the controller.

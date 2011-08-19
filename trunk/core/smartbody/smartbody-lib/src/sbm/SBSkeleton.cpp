@@ -62,7 +62,7 @@ bool SBSkeleton::load(std::string skeletonFile)
 	}
 }
 
-std::string SBSkeleton::getName()
+const std::string& SBSkeleton::getName()
 {
 	return name();
 }

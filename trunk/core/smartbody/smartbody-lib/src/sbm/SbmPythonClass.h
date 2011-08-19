@@ -57,8 +57,8 @@ class Script
 		void run();
 		void abort();
 
-		void setType(std::string typ) {type = typ;}
-		std::string getType()		{return type;}
+		void setType(const std::string& typ) {type = typ;}
+		const std::string& getType()		{return type;}
 
 	protected:
 		std::string seq;
@@ -111,11 +111,11 @@ class GazeBML
 		~GazeBML();
 		
 		void setTarget(std::string targetName)	{target = targetName;}
-		std::string getTarget()					{return target;}
-		void setAngle(std::string input)		{angle = input;}
-		std::string getAngle()					{return angle;}
-		void setDirection(std::string dir)		{direction = dir;}
-		std::string getDirection()				{return direction;}
+		const std::string& getTarget()					{return target;}
+		void setAngle(const std::string& input)		{angle = input;}
+		const std::string& getAngle()					{return angle;}
+		void setDirection(const std::string& dir)		{direction = dir;}
+		const std::string& getDirection()				{return direction;}
 		void setSpeed(boost::python::list &input);
 		boost::python::list getSpeed();
 		void setSmoothing(boost::python::list &input);
@@ -160,10 +160,10 @@ class Viseme
 	public:
 		Viseme();
 		~Viseme();
-		void setVisemeName(std::string name) {visemeName = name;}
-		std::string getVisemeName() {return visemeName;}
-		void setCharName(std::string name) {charName = name;}
-		std::string getCharName() {return charName;}
+		void setVisemeName(const std::string& name) {visemeName = name;}
+		const std::string& getVisemeName() {return visemeName;}
+		void setCharName(const std::string& name) {charName = name;}
+		const std::string& getCharName() {return charName;}
 
 		void setWeight(float weight, float dur, float rampin, float rampout);
 		void setCurve(int num, boost::python::list weights);
@@ -180,8 +180,8 @@ class Motion
 		Motion(std::string motionFile);
 		~Motion();
 
-		std::string getMotionFileName();
-		std::string getMotionName();
+		const std::string& getMotionFileName();
+		const std::string& getMotionName();
 		int getNumFrames();
 		boost::python::list getFrameData(int i);
 		int getFrameSize();
@@ -197,6 +197,7 @@ class Motion
 
 	protected:
 		std::string motionFile;
+		std::string emptyString;
 };
 
 // SmartBody functions
@@ -257,7 +258,8 @@ std::string getScriptFromFile(std::string fileName);
 class PythonController :  public SBController
 {
 public:
-	PythonController() : SBController() {}
+	std::string controllerType;
+	PythonController() : SBController() { controllerType = "python";}
 	virtual void start() {};
 	virtual void init() {};
 	virtual void evaluate() {};
@@ -265,7 +267,7 @@ public:
 
 	virtual SkChannelArray& controller_channels () { return channels;}
 	virtual double controller_duration () { return  1000000.0; }
-	const char* controller_type() const { return "python"; }
+	const std::string& controller_type() const { return controllerType; }
 	bool controller_evaluate(double t, MeFrameData& frame )
 	{
 		evaluate();

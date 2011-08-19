@@ -8,7 +8,7 @@
 class MeCtDataReceiver : public SmartBody::SBController
 {
 	public:
-		static const char* CONTROLLER_TYPE;
+		static std::string CONTROLLER_TYPE;
 
 	private:
 		double			_prevTime;
@@ -35,7 +35,7 @@ class MeCtDataReceiver : public SmartBody::SBController
 		virtual bool controller_evaluate(double t, MeFrameData& frame);
 		virtual SkChannelArray& controller_channels()	{ return(_channels); }
 		virtual double controller_duration()			{ return((double)_duration); }
-		virtual const char* controller_type() const		{ return(CONTROLLER_TYPE); }
+		virtual const std::string& controller_type() const		{ return(CONTROLLER_TYPE); }
 };
 
 #endif

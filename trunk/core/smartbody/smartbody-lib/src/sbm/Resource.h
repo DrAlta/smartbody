@@ -31,8 +31,8 @@ class FileResource : public Resource		// Seq file resources
 		FileResource();
 		~FileResource();
 
-		void setFilePath(std::string path);
-		std::string getFilePath();
+		void setFilePath(const std::string& path);
+		const std::string& getFilePath();
 		
 		std::string dump();
 	protected:
@@ -45,14 +45,14 @@ class PathResource : public Resource		// Path resources with type [ME/SEQ] speci
 		PathResource();
 		~PathResource();
 
-		void setType(std::string type);
-		std::string getType();
+		void setType(const std::string& type);
+		const std::string& getType();
 
-		void setPath(std::string p);
-		std::string getPath();
+		void setPath(const std::string& p);
+		const std::string& getPath();
 
-		void setMediaPath(std::string mp);
-		std::string getMediaPath();
+		void setMediaPath(const std::string& mp);
+		const std::string& getMediaPath();
 		
 		std::string dump();
 	protected:
@@ -96,11 +96,11 @@ class MotionResource : public Resource		// General motion file resources with [S
 		MotionResource();
 		~MotionResource();
 
-		void setMotionFile(std::string motion);
-		std::string getMotionFile();
+		void setMotionFile(const std::string& motion);
+		const std::string& getMotionFile();
 
-		void setType(std::string t);
-		std::string getType();
+		void setType(const std::string& t);
+		const std::string& getType();
 		
 		std::string dump();
 
@@ -115,11 +115,11 @@ class SkeletonResource : public Resource
 		SkeletonResource();
 		~SkeletonResource();
 
-		void setSkeletonFile(std::string motion);
-		std::string getSkeletonFile();
+		void setSkeletonFile(const std::string& motion);
+		const std::string& getSkeletonFile();
 
-		void setType(std::string t);
-		std::string getType();
+		void setType(const std::string& t);
+		const std::string&getType();
 		
 		std::string dump();
 
@@ -134,11 +134,11 @@ class ControllerResource : public Resource
 		ControllerResource();
 		~ControllerResource();
 
-		void setControllerName(std::string cname);
-		std::string getControllerName();
+		void setControllerName(const std::string& cname);
+		const std::string& getControllerName();
 
-		void setType(std::string t);
-		std::string getType();
+		void setType(const std::string& t);
+		const std::string& getType();
 
 		void setTime(double t);
 		double getTime();

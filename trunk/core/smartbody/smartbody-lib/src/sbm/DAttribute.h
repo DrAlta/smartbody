@@ -17,8 +17,8 @@ class DAttribute : public DSubject
 		DAttribute(std::string name);	
 		DAttribute();
 		virtual ~DAttribute();
-		void setName(std::string name);
-		std::string getName();
+		void setName(const std::string& name);
+		const std::string& getName();
 		virtual std::string write() = 0;
 		virtual void read() = 0;
 		DAttributeInfo* getAttributeInfo();
@@ -41,7 +41,7 @@ class DAttributeGroup
 		DAttributeGroup(std::string name);
 		~DAttributeGroup();
 
-		std::string getName();
+		const std::string& getName();
 		void setPriority(int val);
 		int getPriority();
 
@@ -169,10 +169,10 @@ class StringAttribute : public DAttribute
 		StringAttribute(std::string name, std::string value = "");
 		~StringAttribute();
 
-		std::string getValue(float time = -1.0);
-		void setValue(std::string val, float time = -1.0);
-		void setDefaultValue(std::string defaultVal);
-		std::string getDefaultValue();
+		const std::string& getValue(float time = -1.0);
+		void setValue(const std::string& val, float time = -1.0);
+		void setDefaultValue(const std::string& defaultVal);
+		const std::string& getDefaultValue();
 		void setValidValues(std::vector<std::string> values);
 		std::vector<std::string>& getValidValues();
 

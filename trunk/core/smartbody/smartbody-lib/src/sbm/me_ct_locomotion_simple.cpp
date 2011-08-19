@@ -30,8 +30,7 @@ using namespace gwiz;
 #endif
 
 
-const char* MeCtLocomotionSimple::TYPE = "MeCtLocomotionSimple";
-
+std::string MeCtLocomotionSimple::TYPE = "MeCtLocomotionSimple";
 
 /** Constructor */
 MeCtLocomotionSimple::MeCtLocomotionSimple()
@@ -44,7 +43,7 @@ MeCtLocomotionSimple::~MeCtLocomotionSimple() {
 	// Nothing allocated to the heap
 }
 
-const char* MeCtLocomotionSimple::controller_type() {
+const std::string& MeCtLocomotionSimple::controller_type() {
 	return TYPE;
 }
 

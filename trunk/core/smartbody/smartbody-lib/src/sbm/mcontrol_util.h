@@ -268,7 +268,7 @@ class mcuCBHandle {
 		srHashMap <MeController>	controller_map;
 
 
-		std::string getValidName(std::string name);
+		std::string getValidName(const std::string& name);
 		int registerCharacter(SbmCharacter* character);
 		int unregisterCharacter(SbmCharacter* character);
 
@@ -595,7 +595,7 @@ public:
 		}		
 
 		void setMediaPath(std::string path);
-		std::string getMediaPath();
+		const std::string& getMediaPath();
 
                 void setInteractive(bool val);
                 bool getInteractive();

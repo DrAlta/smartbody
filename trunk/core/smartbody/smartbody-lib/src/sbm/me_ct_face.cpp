@@ -29,7 +29,7 @@
 
 //////////////////////////////////////////////////////////////////////////////////
 
-const char* MeCtFace::type_name = "Face";
+std::string MeCtFace::type_name = "Face";
 
 MeCtFace::MeCtFace( void )	{
 
@@ -465,7 +465,7 @@ double MeCtFace::controller_duration( void ) {
 	return( _duration );
 }
 
-const char* MeCtFace::controller_type( void ) const	{
+const std::string& MeCtFace::controller_type( void ) const	{
 	return( type_name );
 }
 
@@ -473,7 +473,7 @@ void MeCtFace::print_state( int tabCount ) {
 
 	LOG("MeCtFace" );
 
-	const char* str = name();
+	const char* str = getName().c_str();
 	if( str )
 		LOG(" \"%s\"", str );
 

@@ -33,7 +33,7 @@ using namespace gwiz;
 
 //////////////////////////////////////////////////////////////////////////////////
 
-const char* MeCtQuickDraw::type_name = "QuickDraw";
+std::string MeCtQuickDraw::type_name = "QuickDraw";
 
 MeCtQuickDraw::MeCtQuickDraw( void )	{
 
@@ -819,7 +819,7 @@ double MeCtQuickDraw::controller_duration( void ) {
 	return( -1.0 );
 }
 
-const char* MeCtQuickDraw::controller_type( void ) const	{
+const std::string& MeCtQuickDraw::controller_type( void ) const	{
 
 	return type_name;
 }
@@ -828,7 +828,7 @@ void MeCtQuickDraw::print_state( int tabCount ) {
 
 	LOG("MeCtQuickDraw" );
 
-	const char* str = name();
+	const char* str = getName().c_str();
 	if( str )
 		LOG(" \"%s\"", str );
 
@@ -836,24 +836,24 @@ void MeCtQuickDraw::print_state( int tabCount ) {
 	if( _gundraw_motion ) {
 
 		// motion name
-		str = _gundraw_motion->name();
+		str = _gundraw_motion->name().c_str();
 		if( str )
 			LOG(" \"%s\"", str );
 
 		// motion filename
-		str = _gundraw_motion->filename();
+		str = _gundraw_motion->filename().c_str();
 		if( str )
 			LOG(" file \"%s\"", str );
 	} 
 	if( _holster_motion ) {
 
 		// motion name
-		str = _holster_motion->name();
+		str = _holster_motion->name().c_str();
 		if( str )
 			LOG(" \"%s\"", str );
 
 		// motion filename
-		str = _holster_motion->filename();
+		str = _holster_motion->filename().c_str();
 		if( str )
 			LOG(" file \"%s\"", str );
 	} 

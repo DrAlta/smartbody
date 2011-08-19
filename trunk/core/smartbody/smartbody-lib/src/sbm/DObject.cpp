@@ -11,7 +11,7 @@ DObject::~DObject()
 	delete m_attributeManager;
 }
 
-void DObject::setName(std::string name)
+void DObject::setName(const std::string& name)
 {
 	m_name = name;
 }

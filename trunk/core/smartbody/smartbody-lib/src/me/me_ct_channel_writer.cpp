@@ -27,7 +27,7 @@
 #include <sstream>
 
 
-const char* MeCtChannelWriter::TYPE = "MeCtChannelWriter";
+std::string MeCtChannelWriter::TYPE = "MeCtChannelWriter";
 
 
 
@@ -36,7 +36,7 @@ MeCtChannelWriter::MeCtChannelWriter()
 	_write_next( false )
 {}
 
-const char* MeCtChannelWriter::controller_type() const {
+const std::string& MeCtChannelWriter::controller_type() const {
 	return MeCtChannelWriter::TYPE;
 }
 
@@ -131,7 +131,7 @@ void MeCtChannelWriter::print_state( int tab_count ) {
 	using namespace std;
 	string indent( tab_count, '\t' );
 
-	const char* name = this->name();
+	const char* name = this->getName().c_str();
 	SkChannelArray& channels = controller_channels();
 
 	std::stringstream strstr;

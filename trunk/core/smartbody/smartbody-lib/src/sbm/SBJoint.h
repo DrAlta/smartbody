@@ -16,8 +16,8 @@ class SBJoint : public SkJoint
 		SBJoint();
 		SBJoint( SkSkeleton* sk, SkJoint* parent, RotType rtype, int i );
 
-		void setName(std::string name);
-		std::string getName();
+		void setName(std::string& name);
+		const std::string& getName();
 
 		int getIndex();
 		

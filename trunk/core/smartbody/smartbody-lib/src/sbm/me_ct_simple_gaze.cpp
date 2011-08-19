@@ -576,7 +576,7 @@ quat_t MeCtSimpleGazeJoint::constrain( float dt, quat_t task_rot )	{
 #define GAZE_JOINT_EYE_R	7
 #define NUM_GAZE_JOINTS 	8
 
-const char* MeCtSimpleGaze::type_name = "SimpleGaze";
+std::string MeCtSimpleGaze::type_name = "SimpleGaze";
 
 MeCtSimpleGaze::MeCtSimpleGaze( void )	{
 	
@@ -1080,7 +1080,7 @@ if( G_debug_c_SG )	{
 
 void MeCtSimpleGaze::print_state( int tabs )	{
 	LOG("MeCtSimpleGaze" );
-	const char* str = name();
+	const char* str = getName().c_str();
 	if( str )
 		LOG(" \"%s\"\n", str );
 }

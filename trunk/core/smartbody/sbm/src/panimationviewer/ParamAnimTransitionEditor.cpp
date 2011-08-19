@@ -156,7 +156,7 @@ void PATransitionEditor::changeStateList1(Fl_Widget* widget, void* data)
 	if (state1)
 	{
 		for (int i = 0; i < state1->getNumMotions(); i++)
-			editor->animForTransition1->add(state1->motions[i]->name());
+			editor->animForTransition1->add(state1->motions[i]->name().c_str());
 	}
 	for (int i = 0; i < editor->animForTransition1->size(); i++)
 		editor->animForTransition1->select(i, false);
@@ -175,7 +175,7 @@ void PATransitionEditor::changeStateList2(Fl_Widget* widget, void* data)
 	if (state2)
 	{
 		for (int i = 0; i < state2->getNumMotions(); i++)
-			editor->animForTransition2->add(state2->motions[i]->name());
+			editor->animForTransition2->add(state2->motions[i]->name().c_str());
 	}
 	for (int i = 0; i < editor->animForTransition2->size(); i++)
 		editor->animForTransition2->select(i, false);

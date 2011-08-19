@@ -36,7 +36,7 @@
 class MeCtAdshrEnvelope : public SmartBody::SBController {
 public:
 	// Public Constants
-	static const char* CONTROLLER_TYPE;
+	static std::string CONTROLLER_TYPE;
 
 protected:
 	// Envelope
@@ -56,7 +56,7 @@ public:
 	/** Constructor */
 	MeCtAdshrEnvelope();
 
-	const char* controller_type() const;
+	const std::string& controller_type() const;
 
 	/**
 	 *  Initializes the controller with a set of channels to write to.

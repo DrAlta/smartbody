@@ -28,7 +28,7 @@
 
 
 
-const char* MeCtAdshrEnvelope::CONTROLLER_TYPE = "MeCtAdshrEnvelope";
+std::string MeCtAdshrEnvelope::CONTROLLER_TYPE = "MeCtAdshrEnvelope";
 
 
 
@@ -42,7 +42,7 @@ MeCtAdshrEnvelope::MeCtAdshrEnvelope()
 	_release( 1.0 )
 {}
 
-const char* MeCtAdshrEnvelope::controller_type() const {
+const std::string& MeCtAdshrEnvelope::controller_type() const {
 	return MeCtAdshrEnvelope::CONTROLLER_TYPE;
 }
 
@@ -184,7 +184,7 @@ void MeCtAdshrEnvelope::print_state( int tab_count ) {
 	using namespace std;
 	string indent( tab_count, '\t' );
 
-	const char* name = this->name();
+	const char* name = this->getName().c_str();
 	SkChannelArray& channels = controller_channels();
 
 	std::stringstream strstr;

@@ -94,7 +94,7 @@ BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& un
 	// Name controller with behavior unique_id
 	ostringstream name;
 	name << unique_id;
-	channelWriter->name( name.str().c_str() );
+	channelWriter->setName( name.str() );
 
 	SkChannelArray Param_Channel;
 	Data_Array.size(channel_size);

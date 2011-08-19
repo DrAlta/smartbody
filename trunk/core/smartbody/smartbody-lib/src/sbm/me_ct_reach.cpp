@@ -2,7 +2,7 @@
 #include "me_ct_IK_scenario.hpp"
 #include <assert.h>
 
-const char* MeCtReach::CONTROLLER_TYPE = "Reach";
+std::string MeCtReach::CONTROLLER_TYPE = "Reach";
 const float PI_CONST = 3.14159265358979323846f;
 
 #define LIMB_ARM 1

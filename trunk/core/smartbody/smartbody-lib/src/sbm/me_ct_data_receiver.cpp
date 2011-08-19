@@ -2,7 +2,7 @@
 #include <sr/sr_euler.h>
 #include <sbm/mcontrol_util.h>
 
-const char* MeCtDataReceiver::CONTROLLER_TYPE = "DataReceiver";
+std::string MeCtDataReceiver::CONTROLLER_TYPE = "DataReceiver";
 
 MeCtDataReceiver::MeCtDataReceiver(SkSkeleton* skel) : SmartBody::SBController()
 {

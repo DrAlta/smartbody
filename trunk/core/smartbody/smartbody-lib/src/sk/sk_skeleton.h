@@ -43,8 +43,8 @@ class SkColdet;
 class SkSkeleton : public SrSharedClass
  { private :
     // basic data:
-    SrString _name;
-	SrString _skfilename;
+	std::string _name;
+	std::string _skfilename;
     SkJoint* _root;
     std::vector<SkJoint*> _joints;
     std::map<std::string, SkJoint*> _jointMap;
@@ -72,16 +72,16 @@ class SkSkeleton : public SrSharedClass
     virtual ~SkSkeleton ();
 
     /*! Set a name for the skeleton */
-    void name ( const char* s ) { _name=s; }
+	void name ( const std::string&  s ) { _name = s; }
 
     /*! Access to the skeleton name */
-    const char* name () { return _name; }
+	const std::string& name () { return _name; }
 
 	/*! Sets the filename used to load the skeleton, if any */
     void skfilename ( const char* s ) { _skfilename = s; }
 
     /*! Access to the .sk skeleton definiton, if any*/
-    const char* skfilename () { return _skfilename; }
+	const std::string& skfilename () { return _skfilename; }
 
     /*! Deletes all data and set the skeleton to be an empty hierarchy */
     void init ();

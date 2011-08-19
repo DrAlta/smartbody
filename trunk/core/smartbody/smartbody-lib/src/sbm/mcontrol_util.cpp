@@ -926,7 +926,8 @@ void mcuCBHandle::update( void )	{
 		if( char_p ) {
 
 			char_p->forward_visemes( time );	
-			char_p->scene_p->update();	
+			if (char_p->scene_p)
+				char_p->scene_p->update();	
 			char_p->updateJointPhyObjs();
 			char_p->_skeleton->update_global_matrices();
 			//char_p->dMesh_p->update();
@@ -1514,7 +1515,7 @@ void mcuCBHandle::setMediaPath(std::string path)
 	mesh_paths.setPathPrefix(media_path);
 }
 
-std::string mcuCBHandle::getMediaPath()
+const std::string& mcuCBHandle::getMediaPath()
 {
 	return media_path;
 }
@@ -1716,7 +1717,7 @@ SkMotion* mcuCBHandle::getMotion(std::string motionName)
 		return (*iter).second;
 }
 
-std::string mcuCBHandle::getValidName(std::string name)
+std::string mcuCBHandle::getValidName(const std::string& name)
 {
 	bool nameFound = true;
 	int nameCounter = 0;

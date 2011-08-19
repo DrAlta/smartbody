@@ -31,7 +31,7 @@
 # include <sr/sr_output.h>
 #include <cstdio>
 
-const char* MeCtBreathing::type_name = "Breathing";
+std::string MeCtBreathing::type_name = "Breathing";
 
 MeCtBreathing::MeCtBreathing ()
 {
@@ -113,8 +113,8 @@ void MeCtBreathing::print_state( int tabCount )
 {
 	LOG( "MeCtBreathing" );
 
-	const char* str = name();
-	if( str )
+	std::string str = getName();
+	if( str != "")
 		LOG(" \"%s\"", str );
 
 	LOG( ", motion" );
@@ -122,13 +122,13 @@ void MeCtBreathing::print_state( int tabCount )
 	{
 		// motion name
 		str = _motion->name();
-		if( str )
-			LOG("=\"%s\"", str );
+		if( str != "")
+			LOG("=\"%s\"", str.c_str() );
 
 		// motion filename
 		str = _motion->filename();
-		if( str )
-			LOG(" file=\"%s\"", str );
+		if( str != "")
+			LOG(" file=\"%s\"", str.c_str() );
 	} 
 	else
 		LOG( "=NULL" );
@@ -318,7 +318,7 @@ SkChannelArray& MeCtBreathing::controller_channels ()
 		return _channels;
 }
 
-const char* MeCtBreathing::controller_type () const
+const std::string& MeCtBreathing::controller_type () const
 {
 	return type_name;
 }

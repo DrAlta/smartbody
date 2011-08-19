@@ -26,7 +26,7 @@
 #include <sbm/sbm_character.hpp>
 #include "gwiz_math.h"
 
-const char* MeCtNavigationCircle::TYPE = "MeCtNavigationCircle";
+std::string MeCtNavigationCircle::TYPE = "MeCtNavigationCircle";
 
 
 MeCtNavigationCircle::MeCtNavigationCircle()
@@ -51,7 +51,7 @@ void MeCtNavigationCircle::setRadiansPerSecond( float forward_velocity, float ra
 //	this->radius             = forward_velocity / radians_per_second;
 }
 
-const char* MeCtNavigationCircle::controller_type() const {
+const std::string& MeCtNavigationCircle::controller_type() const {
 	return TYPE;
 }
 

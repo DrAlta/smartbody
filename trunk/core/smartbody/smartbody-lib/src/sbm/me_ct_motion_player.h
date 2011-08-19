@@ -32,18 +32,18 @@
 class MeCtMotionPlayer : public MeCtContainer
 {
 public:
-	static const char* CONTROLLER_TYPE;
+	static std::string CONTROLLER_TYPE;
 
 	class Context : public MeCtContainer::Context 
 	{
 	protected:
-		static const char* CONTEXT_TYPE;
+		static std::string CONTEXT_TYPE;
 	public:
 		Context( MeCtMotionPlayer* container, MeControllerContext* context = NULL )
 			:	MeCtContainer::Context( container, context )
 		{}
 
-		const char* context_type() const {	return CONTEXT_TYPE; }
+		const std::string& context_type() const {	return CONTEXT_TYPE; }
 		void child_channels_updated( MeController* child );
 	};
 
@@ -56,8 +56,8 @@ public:
 	void setFrameNum(double n);
 	double getFrameNum();
 
-	void setMotionName(std::string name);
-	std::string getMotionName();
+	void setMotionName(const std::string& name);
+	const std::string& getMotionName();
 
 	void setActive(bool a);
 	bool getActive();
@@ -65,7 +65,7 @@ public:
 	virtual void controller_map_updated();
     virtual SkChannelArray& controller_channels();
     virtual double controller_duration();
-	virtual const char* controller_type() const {return CONTROLLER_TYPE;}
+	virtual const std::string& controller_type() const {return CONTROLLER_TYPE;}
 	virtual bool controller_evaluate( double t, MeFrameData& frame );
 
 private:

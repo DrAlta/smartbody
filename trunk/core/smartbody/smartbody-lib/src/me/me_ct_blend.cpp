@@ -39,7 +39,7 @@ using namespace std;
 //typedef MeSpline1D::Knot  Knot;
 
 
-const char* MeCtBlend::CONTROLLER_TYPE = "MeCtBlend";
+std::string MeCtBlend::CONTROLLER_TYPE = "MeCtBlend";
 
 
 
@@ -59,7 +59,7 @@ const char* MeCtBlend::CONTROLLER_TYPE = "MeCtBlend";
 ///////////////////////////////////////////////////////////////////////////
 //  MeCtBlend::Context
 
-const char* MeCtBlend::Context::CONTEXT_TYPE = "MeCtBlend::Context";
+std::string MeCtBlend::Context::CONTEXT_TYPE = "MeCtBlend::Context";
 
 MeCtBlend::Context::Context( MeCtBlend* blend )
 :	MeCtUnary::Context( blend ),
@@ -282,7 +282,7 @@ void MeCtBlend::init( MeController* new_child, SbmPawn* pawn ) {
 	}
 }
 
-const char* MeCtBlend::controller_type() const {
+const std::string& MeCtBlend::controller_type() const {
 	return CONTROLLER_TYPE;
 }
 
@@ -620,8 +620,8 @@ void MeCtBlend::print_state( int tab_count ) {
 	ostringstream out;
 	out << controller_type();
 	
-	const char* name_str = name();
-	if( name_str && name_str[0]!='\0' ) {
+	const std::string& name_str = getName();
+	if( name_str != "") {
 		out << " \"" << name_str << "\"";
 	}
 

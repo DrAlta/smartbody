@@ -38,18 +38,18 @@
 class MeCtInterpolator : public MeCtContainer
 {
 public:
-	static const char* CONTROLLER_TYPE;
+	static std::string CONTROLLER_TYPE;
 
 	class Context : public MeCtContainer::Context 
 	{
 	protected:
-		static const char* CONTEXT_TYPE;
+		static std::string CONTEXT_TYPE;
 	public:
 		Context( MeCtInterpolator* container, MeControllerContext* context = NULL )
 			:	MeCtContainer::Context( container, context )
 		{}
 
-		const char* context_type() const {	return CONTEXT_TYPE; }
+		const std::string& context_type() const {	return CONTEXT_TYPE; }
 		void child_channels_updated( MeController* child );
 	};
 
@@ -94,7 +94,7 @@ public:
     virtual bool controller_evaluate( double t, MeFrameData& frame );
     virtual SkChannelArray& controller_channels();
     virtual double controller_duration();
-	virtual const char* controller_type() const {return CONTROLLER_TYPE;}
+	virtual const std::string& controller_type() const {return CONTROLLER_TYPE;}
 
 private:
 	void getTiming(double t, double& t1, double& t2);

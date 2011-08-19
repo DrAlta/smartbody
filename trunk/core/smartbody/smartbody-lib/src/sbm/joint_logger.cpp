@@ -167,7 +167,7 @@ void joint_logger::EvaluationLogger::context_pre_evaluate(
 	MeControllerContext& context,
 	MeFrameData& frame
 ) {
-	const char* context_type = context.context_type();
+	const std::string& context_type = context.context_type();
 	bool is_root = context_type == MeControllerTreeRoot::CONTEXT_TYPE;
 	if( is_root ) {
 		_enabled = (time < _expiration_time);
@@ -200,7 +200,7 @@ void joint_logger::EvaluationLogger::context_post_evaluate(
 	if( _enabled ) {
 		--_indent_len;
 
-		const char* context_type = context.context_type();
+		const std::string& context_type = context.context_type();
 		if( context_type == MeControllerTreeRoot::CONTEXT_TYPE 
 			|| context_type == MeCtBlend::Context::CONTEXT_TYPE ) {
 			if( _indent.length() != _indent_len ) {
@@ -229,7 +229,7 @@ void joint_logger::EvaluationLogger::controller_pre_evaluate(
 			_indent.assign( _indent_len, '\t' );
 		}
 		out << _indent << "CONTROLLER: " << ct.controller_type();
-		const char* ct_name = ct.name();
+		const char* ct_name = ct.getName().c_str();
 		if( ct_name )
 			out << " \"" << ct_name << "\"";
 		out << " (time " << time << ")" << endl;

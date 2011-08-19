@@ -43,8 +43,8 @@ using namespace gwiz;
 
 SkMotion::SkMotion() :
 	_postsize( 0 ),
-	_name( NULL ),
-	_filename( NULL ),
+	_name( "" ),
+	_filename( "" ),
 	_skeleton( NULL ),
 	_floatbuffer( NULL ),
 	_last_apply_frame( 0 )
@@ -61,8 +61,6 @@ SkMotion::SkMotion() :
 SkMotion::~SkMotion()
  {
    init ();
-   delete[] _name;
-   delete[] _filename;
 
    for (size_t f = 0; f < _frames.size(); f++ )
    {

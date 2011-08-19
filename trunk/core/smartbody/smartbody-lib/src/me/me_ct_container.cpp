@@ -88,7 +88,7 @@ void MeCtContainer::context_updated() {
 // Private Method
 void MeCtContainer::controller_start() {
 	// Temporary variable to inspect during debugging
-	const char* container_type = this->controller_type();
+	const std::string& container_type = this->controller_type();
 
 	const unsigned int child_count = count_children();
 	for( unsigned int i=0; i<child_count; ++i ) {
@@ -96,7 +96,7 @@ void MeCtContainer::controller_start() {
 
 		if( child ) {
 			// Temporary variable to inspect during debugging
-			const char* child_type = child->controller_type();
+			const std::string& child_type = child->controller_type();
 
 			child->start(mcuCBHandle::singleton().time);
 		}

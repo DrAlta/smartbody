@@ -89,7 +89,7 @@ MeCtSchedulerClass* CreateSchedulerCt( const char* character_name, const char* s
 	sched_name += "'s ";
 	sched_name += sched_type_name;
 	sched_name += " schedule";
-	sched_p->name( sched_name.c_str() );
+	sched_p->setName( sched_name.c_str() );
 	return sched_p;
 }
 
@@ -224,20 +224,20 @@ void SbmCharacter::createStandardControllers()
 	// procedural locomotion
 	this->locomotion_ct =  new MeCtLocomotionClass();
 	std::string locomotionname = getName() + "'s locomotion controller";
-	this->locomotion_ct->name( locomotionname.c_str() );
+	this->locomotion_ct->setName( locomotionname.c_str() );
 	locomotion_ct->get_navigator()->setWordOffsetController(world_offset_writer_p);
 	locomotion_ct->ref();
 	
 	// example-based locomotion
 	this->param_animation_ct = new MeCtParamAnimation(this, world_offset_writer_p);
 	std::string paramAnimationName = getName() + "'s param animation controller";
-	this->param_animation_ct->name(paramAnimationName.c_str());
+	this->param_animation_ct->setName(paramAnimationName.c_str());
 	param_sched_p = CreateSchedulerCt( getName().c_str(), "param" );
 	
 	// basic locomotion
 	this->basic_locomotion_ct = new MeCtBasicLocomotion(this);
 	std::string bLocoName = getName() + "'s basic locomotion controller";
-	this->basic_locomotion_ct->name(bLocoName.c_str());
+	this->basic_locomotion_ct->setName(bLocoName.c_str());
 	//this->basic_locomotion_ct->set_pass_through(false);
 	
 	
@@ -263,6 +263,7 @@ void SbmCharacter::createStandardControllers()
 	grab_sched_p = CreateSchedulerCt( getName().c_str(), "grab" );
 	
 	breathing_p = new MeCtBreathing();
+	breathing_p->setName(getName() + "'s breathing controller");
 
 	gaze_sched_p = CreateSchedulerCt( getName().c_str(), "gaze" );
 
@@ -282,25 +283,25 @@ void SbmCharacter::createStandardControllers()
 	eyelid_reg_ct_p->set_close_angle( 30.0 );
 	ostringstream ct_name;
 	ct_name << getName() << "'s eyelid controller";
-	eyelid_reg_ct_p->name( ct_name.str().c_str() );
+	eyelid_reg_ct_p->setName( ct_name.str().c_str() );
 	
 	this->saccade_ct = new MeCtSaccade(this->_skeleton);
 	this->saccade_ct->init(this);
 	std::string saccadeCtName = getName() + "'s eye saccade controller";
-	this->saccade_ct->name(saccadeCtName.c_str());
+	this->saccade_ct->setName(saccadeCtName.c_str());
 
 	// motion player
 	motionplayer_ct = new MeCtMotionPlayer(this);
 //	motionplayer_ct->ref();
 	std::string mpName = getName();
 	mpName += "'s motion player";
-	motionplayer_ct->name(mpName.c_str());
+	motionplayer_ct->setName(mpName.c_str());
 	motionplayer_ct->setActive(false);
 	ct_tree_p->add_controller(motionplayer_ct);
 	
 	this->datareceiver_ct = new MeCtDataReceiver(this->_skeleton);
 	std::string datareceiverCtName = getName() + "'s data receiver controller";
-	this->datareceiver_ct->name(datareceiverCtName.c_str());
+	this->datareceiver_ct->setName(datareceiverCtName.c_str());
 
 	posture_sched_p->ref();
 	motion_sched_p->ref();
@@ -351,6 +352,10 @@ void SbmCharacter::initData()
 	head_sched_p = NULL;
 	param_sched_p = NULL;
 	breathing_p = NULL;
+	grab_sched_p = NULL;
+	constraint_sched_p = NULL;
+	param_animation_ct = NULL;
+	saccade_ct = NULL;
 
 	speech_impl = NULL;
 	speech_impl_backup = NULL;
@@ -449,6 +454,9 @@ void SbmCharacter::locomotion_set_turning_mode(int mode)
 
 void SbmCharacter::updateJointPhyObjs()
 {
+	if (!_skeleton)
+		return;
+
 	const std::vector<SkJoint*>& joints = _skeleton->joints();	
 	_skeleton->update_global_matrices();
 	for (size_t i=0;i<joints.size();i++)
@@ -841,7 +849,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 	{
 		MeController* controller = defaultControllers[x];
 		const std::vector<AttributeVarPair>& defaultAttributes = controller->getDefaultAttributes();
-		std::string groupName = controller->name();		
+		std::string groupName = controller->getName();		
 		for (size_t a = 0; a < defaultAttributes.size(); a++)
 		{
 			DAttribute* attribute = defaultAttributes[a].first;
@@ -987,7 +995,7 @@ bool test_ct_for_pruning( MeCtScheduler2::TrackPtr track ) {
 			prune_ok = prune_policy->shouldPrune( ct, track->animation_parent_ct() );
 
 			if( LOG_CONTROLLER_TREE_PRUNING && !prune_ok )
-				LOG("DEBUG: %s \"%s\" withheld from pruning by MePrunePolicy.", ct->controller_type(), ct->name());
+				LOG("DEBUG: %s \"%s\" withheld from pruning by MePrunePolicy.", ct->controller_type(), ct->getName().c_str());
 		}
 	}
 
@@ -1008,7 +1016,7 @@ void prune_schedule( SbmCharacter*   actor,
 					 SkChannelArray  &raw_channels
 ) {
 	if( LOG_CONTROLLER_TREE_PRUNING ) 
-		LOG("DEBUG: sbm_character.cpp prune_schedule(..): Pruning schedule \"%s\":", sched->name());
+		LOG("DEBUG: sbm_character.cpp prune_schedule(..): Pruning schedule \"%s\":", sched->getName().c_str());
 
 	typedef MeCtScheduler2::TrackPtr   TrackPtr;
 	typedef MeCtScheduler2::VecOfTrack VecOfTrack;
@@ -1077,7 +1085,7 @@ void prune_schedule( SbmCharacter*   actor,
 
 
 					if( LOG_CONTROLLER_TREE_PRUNING )
-						LOG("\tblend_Ct \"%s\": blend curve last knot: t = %f v = %f", blend_ct->name(), t, v );
+						LOG("\tblend_Ct \"%s\": blend curve last knot: t = %f v = %f", blend_ct->getName().c_str(), t, v );
 					if( t <= time )
 					{
 						flat_blend_curve = true;
@@ -1142,7 +1150,7 @@ void prune_schedule( SbmCharacter*   actor,
 				else	{
 					if( LOG_PRUNE_TRACK_WITHOUT_BLEND_SPLIE_KNOTS ) {
 						std::stringstream strstr;
-						strstr << "DEBUG: prune_schedule(..): sched \""<<sched->name()<<"\", anim_source \""<<anim_source->name()<<"\": blend_ct without spline knots.";
+						strstr << "DEBUG: prune_schedule(..): sched \""<<sched->getName()<<"\", anim_source \""<<anim_source->getName()<<"\": blend_ct without spline knots.";
 						LOG(strstr.str().c_str());
 						blend_ct->print_state(1);  // Prints controller type, name, and blend curve
 					}
@@ -1150,11 +1158,11 @@ void prune_schedule( SbmCharacter*   actor,
 				}
 			}
 
-			const char* anim_ct_type = anim_source->controller_type();
+			const std::string& anim_ct_type = anim_source->controller_type();
 			if( LOG_CONTROLLER_TREE_PRUNING )
 			{
 				std::stringstream strstr;
-				strstr << '\t' << anim_ct_type << " \"" << anim_source->name() << "\": in_use = "<<in_use<<", flat_blend_curve = "<<flat_blend_curve<<endl;
+				strstr << '\t' << anim_ct_type << " \"" << anim_source->getName() << "\": in_use = "<<in_use<<", flat_blend_curve = "<<flat_blend_curve<<endl;
 				LOG(strstr.str().c_str());
 			}
 			if( !in_use ) {
@@ -1567,7 +1575,7 @@ void SbmCharacter::schedule_viseme_curve(
 			channels.add( visemeNames[nCount], SkChannel::XPos );
 
 			MeCtCurveWriter* ct_p = new MeCtCurveWriter();
-			ct_p->name( ct_name.str().c_str() );
+			ct_p->setName( ct_name.str().c_str() );
 			ct_p->init(this, channels ); // CROP, CROP, true
 
 			if (num_keys <= 2)
@@ -1678,7 +1686,7 @@ void SbmCharacter::schedule_viseme_blend_curve(
 			channels.add( visemeNames[nCount], SkChannel::XPos );
 
 			MeCtChannelWriter* ct_p = new MeCtChannelWriter();
-			ct_p->name( ct_name.str().c_str() );
+			ct_p->setName( ct_name.str().c_str() );
 			ct_p->init(this, channels, true );
 			SrBuffer<float> value;
 			value.size( 1 );
@@ -1875,7 +1883,7 @@ int SbmCharacter::reholster_quickdraw( mcuCBHandle *mcu_p ) {
 				// Attempt to schedule blend out
 				MeCtUnary* blending_ct = track->blending_ct();
 				if(    blending_ct
-					&& strcmp(blending_ct->controller_type(), MeCtBlend::CONTROLLER_TYPE ) )
+					&& blending_ct->controller_type() == MeCtBlend::CONTROLLER_TYPE)
 				{
 					// TODO: account for time scaling of motion_duration
 					double blend_out_start = now + qdraw_ct->get_holster_duration();
@@ -2104,7 +2112,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			int n = ct_tree_p->count_controllers();
 			for (int c = 0; c < n; c++)
 			{
-				LOG( "%s", ct_tree_p->controller(c)->name() );
+				LOG( "%s", ct_tree_p->controller(c)->getName().c_str() );
 			}
 		}
 		return CMD_SUCCESS;
@@ -2315,27 +2323,32 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 
 		if (viewType == "0" || viewType == "bones")
 		{
-			scene_p->set_visibility(1,0,0,0);
+			if (scene_p)
+				scene_p->set_visibility(1,0,0,0);
 			dMesh_p->set_visibility(0);
 		}
 		else if (viewType == "1" || viewType == "visgeo")
 		{
-			scene_p->set_visibility(0,1,0,0);
+			if (scene_p)
+				scene_p->set_visibility(0,1,0,0);
 			dMesh_p->set_visibility(0);
 		}
 		else if (viewType == "2" || viewType == "colgeo")
 		{
-			scene_p->set_visibility(0,0,1,0);
+			if (scene_p)
+				scene_p->set_visibility(0,0,1,0);
 			dMesh_p->set_visibility(0);
 		}
 		else if (viewType == "3" || viewType == "axis")
 		{
-			scene_p->set_visibility(0,0,0,1);
+			if (scene_p)
+				scene_p->set_visibility(0,0,0,1);
 			dMesh_p->set_visibility(0);
 		}
 		else if (viewType == "4" || viewType == "deformable")
 		{
-			scene_p->set_visibility(0,0,0,0);
+			if (scene_p)
+				scene_p->set_visibility(0,0,0,0);
 			dMesh_p->set_visibility(1);
 		}
 		else
@@ -2395,7 +2408,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 					}
 				}
 				if( print_track )	{
-					LOG( " %s", gaze_p->name() );
+					LOG( " %s", gaze_p->getName().c_str() );
 				}
 				else
 				if( fade_in )	{

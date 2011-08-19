@@ -31,7 +31,7 @@ class MeCtHand :
 	public MeController, public FadingControl
 {
 private:
-	static const char* CONTROLLER_TYPE;
+	static std::string CONTROLLER_TYPE;
 public:
 	enum FingerID { F_THUMB = 0, F_INDEX, F_MIDDLE, F_RING, F_PINKY, F_NUM_FINGERS };
 	enum GrabState { GRAB_START, GRAB_REACH, GRAB_FINISH, GRAB_RETURN };
@@ -75,7 +75,7 @@ public:
 	virtual SkChannelArray& controller_channels()	{ return( _channels ); }
 	virtual double controller_duration()			{ return( (double)_duration ); }
 	void set_duration(float duration) { _duration = duration; }
-	virtual const char* controller_type() const		{ return( CONTROLLER_TYPE ); }
+	virtual const std::string& controller_type() const		{ return( CONTROLLER_TYPE ); }
 	virtual void print_state( int tabs );
 	
 	void setGrabState(GrabState state);

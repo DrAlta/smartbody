@@ -37,7 +37,7 @@ class MeControllerContextProxy
 public:
 	//////////////////////////////////////////////////////////////////////////
 	//  Public Constants
-	static const char* CONTEXT_TYPE;
+	static std::string CONTEXT_TYPE;
 
 protected:
 	//////////////////////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ public:
 	virtual ~MeControllerContextProxy();
 
 	//!  Implements MeControllerContext::context_type()
-	const char* context_type() const {	return CONTEXT_TYPE; }
+	const std::string& context_type() const {	return CONTEXT_TYPE; }
 
 	//!  Implements MeControllerContext::channels()
 	virtual SkChannelArray& channels();

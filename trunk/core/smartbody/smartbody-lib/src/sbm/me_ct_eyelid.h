@@ -88,7 +88,7 @@ class MeCtEyeLidRegulator : public SmartBody::SBController	{
 	
 		void test( void );
 
-		static const char* type_name;
+		static std::string type_name;
 
 		MeCtEyeLidRegulator( void );
 		~MeCtEyeLidRegulator( void );
@@ -238,7 +238,7 @@ class MeCtEyeLidRegulator : public SmartBody::SBController	{
 		virtual bool controller_evaluate ( double t, MeFrameData& frame );
 		virtual SkChannelArray& controller_channels ();
 		virtual double controller_duration ();
-		virtual const char* controller_type () const;
+		virtual const std::string& controller_type () const;
 		virtual void print_state( int tabCount );
 };
 
@@ -274,7 +274,7 @@ class MeCtEyeLid : public SmartBody::SBController	{
 		}
 
 	public:
-		static const char* type_name;
+		static std::string type_name;
 
 		/*! Constructor */
 		MeCtEyeLid( void );
@@ -334,7 +334,7 @@ class MeCtEyeLid : public SmartBody::SBController	{
 		virtual bool controller_evaluate ( double t, MeFrameData& frame );
 		virtual SkChannelArray& controller_channels ();
 		virtual double controller_duration ();
-		virtual const char* controller_type () const;
+		virtual const std::string& controller_type () const;
 		virtual void print_state( int tabCount );
 };
 
