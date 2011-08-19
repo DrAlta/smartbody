@@ -76,8 +76,8 @@ MeCtSaccade::MeCtSaccade(SkSkeleton* skel) : SmartBody::SBController()
 	_highestFrequency = 15.0f;	// unit: percentage
 //	_talkingLimit =	27.5f;		// unit: degree
 //	_listeningLimit = 22.7f;
-	_talkingLimit =	5.0f;			// unit: degree							expose
-	_listeningLimit = 4.0f;			//										expose
+	_talkingLimit =	10.0f;			// unit: degree							expose
+	_listeningLimit = 8.0f;			//										expose
 	_thinkingLimit = _talkingLimit;	// make up data
 
 	// inter-saccadic interval stat
@@ -109,8 +109,8 @@ MeCtSaccade::~MeCtSaccade()
 
 void MeCtSaccade::spawnOnce(float dir, float amplitude, float dur)
 {
-	if ((float)mcuCBHandle::singleton().time < (_time + _dur))
-		return;
+//	if ((float)mcuCBHandle::singleton().time < (_time + _dur))
+//		return;
 	_direction = dir;
 	_magnitude = amplitude;
 	_dur = dur;
@@ -119,7 +119,7 @@ void MeCtSaccade::spawnOnce(float dir, float amplitude, float dur)
 	float direction = (_direction - 90.0f) * (float)M_PI / 180.0f;		// 90.0f here is for adjustment
 	SrVec vec2 = SrVec(sin(direction), cos(direction), 0);
 	_axis = cross(vec1, vec2);
-	_lastFixedRotation = _fixedRotation;
+	_lastFixedRotation = _rotation;
 	_fixedRotation = SrQuat(_axis, _magnitude * (float)M_PI / 180.0f);
 
 	_time = (float)mcuCBHandle::singleton().time;
@@ -130,7 +130,6 @@ void MeCtSaccade::spawning(double t)
 	float time = float(t);
 	if (_time == -1.0f || t > (_time + _dur))
 	{
-		_rotation = 0.0f;
 		_direction = directionRandom();			// degree
 		_magnitude = magnitudeRandom();			// degree
 
@@ -143,7 +142,6 @@ void MeCtSaccade::spawning(double t)
 
 		SrQuat actualRotation = _fixedRotation * _lastFixedRotation.inverse();
 		float angle = actualRotation.angle() * 180.0f / (float)M_PI;
-	
 
 	//	_dur = duration(_magnitude);			// sec
 		_dur = duration(angle);
@@ -170,14 +168,15 @@ void MeCtSaccade::processing(double t, MeFrameData& frame)
 	{
 		_lastFixedRotation = SrQuat();
 		_fixedRotation = SrQuat();
+		_rotation = SrQuat();
 	}
-	SrQuat rotation = _lastFixedRotation;
+	//_rotation = _lastFixedRotation;
 	if (t >= _time && t <= (_time + _dur))
 	{
 		float r = (time - _time) / _dur;
 	//	float y = 1 - r;
 		float y = 1 - sqrt(1 - (r - 1) * (r - 1));
-		rotation = slerp(_lastFixedRotation, _fixedRotation, y);
+		_rotation = slerp(_lastFixedRotation, _fixedRotation, 1 - y);
 	}
 	//---
 	SrQuat QL = SrQuat( frame.buffer()[_idL + 0],
@@ -192,8 +191,9 @@ void MeCtSaccade::processing(double t, MeFrameData& frame)
 
 	//--- process
 	SrQuat temp(_lastFixedRotation);
-	SrQuat actualRot = temp * rotation;
-	SrQuat outQL = QL * actualRot;
+	SrQuat actualRot = temp * _rotation;
+//	SrQuat outQL = QL * actualRot;
+	SrQuat outQL = QL * _rotation;
 	SrQuat outQR = outQL;
 
 	//---

@@ -55,10 +55,10 @@ class MeCtSaccade : public SmartBody::SBController
 		float			_direction;
 		IntervalMode	_intervalMode;
 		BehaviorMode	_behaviorMode;
-		float			_rotation;
 		SrVec			_axis;
 		SrQuat			_lastFixedRotation;
 		SrQuat			_fixedRotation;
+		SrQuat			_rotation;
 
 		//--- saccade statistics
 		// direction stat
