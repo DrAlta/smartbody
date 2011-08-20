@@ -58,10 +58,13 @@ public:
 		left( left ),
 		right( right )
 	{
+		reset_type();
 	}
 
 	ActionUnit(ActionUnit* source)
 	{
+		reset_type();
+
 		if (source->is_left())
 			set_left();
 		if (source->is_right())
