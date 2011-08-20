@@ -34,6 +34,7 @@ MeCtReachEngine::MeCtReachEngine( SbmCharacter* sbmChar, SkSkeleton* sk)
 {
 	character = sbmChar;
 	skeletonCopy = new SkSkeleton(sk); 
+	skeletonCopy->ref();
 	skeletonRef  = sk;
 	dataInterpolator = NULL;
 	refMotion = NULL;
@@ -57,7 +58,6 @@ MeCtReachEngine::~MeCtReachEngine( void )
 	FREE_DATA(dataInterpolator);
 	FREE_DATA(interpMotion);
 	FREE_DATA(motionParameter);
-	FREE_DATA(skeletonCopy);	
 }
 
 void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
