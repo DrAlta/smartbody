@@ -284,6 +284,7 @@ SBCharacter* createCharacter(std::string char_name, std::string metaInfo = "");
 SBSkeleton* createSkeleton(std::string char_name);
 SBController* createController(std::string controllerType, std::string controllerName);
 void removeCharacter(std::string charName);
+EventManager* getEventManager();
 
 SkMotion* getMotion(std::string name);
 

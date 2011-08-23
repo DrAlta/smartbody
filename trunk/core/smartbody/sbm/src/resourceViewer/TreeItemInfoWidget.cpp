@@ -448,8 +448,12 @@ void EventItemInfoWidget::updateWidget()
 	if (mi != eventMap.end())
 	{
 		EventHandler* handler = mi->second;
-		eventInfoObject->setStringAttribute("EventType",handler->getType());
-		eventInfoObject->setStringAttribute("Action",handler->getAction());	
+		eventInfoObject->setStringAttribute("EventType", mi->first);
+		BasicHandler* basicHandler = dynamic_cast<BasicHandler*>(handler);
+		if (basicHandler)
+		{
+			eventInfoObject->setStringAttribute("Action",basicHandler->getAction());	
+		}
 	}		
 }
 
@@ -461,8 +465,9 @@ void EventItemInfoWidget::notify( DSubject* subject )
 	if (mi != eventMap.end())
 	{
 		EventHandler* handler = mi->second;
-		//eventInfoObject->setStringAttribute(eventName,handler->getAction());				
-		handler->setAction(eventInfoObject->getStringAttribute("Action"));		
+		BasicHandler* basicHandler = dynamic_cast<BasicHandler*>(handler);
+		if (basicHandler)
+			basicHandler->setAction(eventInfoObject->getStringAttribute("Action"));		
 	}		
 }
 

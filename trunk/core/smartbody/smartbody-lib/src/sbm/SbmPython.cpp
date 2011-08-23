@@ -33,6 +33,31 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 };
 #endif
 
+#ifndef __ANDROID__
+struct EventHandlerWrap :  EventHandler, boost::python::wrapper<EventHandler>
+{
+	virtual void executeAction(Event* event)
+	{
+		if (boost::python::override o = this->get_override("executeAction"))
+		{
+			try {
+				o(event);
+			} catch (...) {
+				LOG("Problem running Python for EventHandler in 'executeAction'.");
+			}
+		}
+
+		return EventHandler::executeAction(event);
+	}
+
+	void default_executeAction(Event* event)
+	{
+		EventHandler::executeAction(event);
+	}
+};
+#endif
+
+
 struct PythonControllerWrap : SmartBody::PythonController, boost::python::wrapper<SmartBody::PythonController>
 {
 	virtual void start()
@@ -140,7 +165,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 	boost::python::def("getCharacterByIndex", getCharacterByIndex, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the character object given its index. \n Input: character index \nOutput: character object");
 	boost::python::def("getCharacter", getCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the character object given its name. \n Input: character name \nOutput: character object");
 	boost::python::def("getCharacterNames", getCharacterNames, "Returns a list of all character names.\n Input: NULL \nOutput: list of character names");
-
+	boost::python::def("getEventManager", getEventManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the event manager.");
 	boost::python::def("getMotion", getMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a the motion of given name.");
 //#endif
 
@@ -475,6 +500,20 @@ BOOST_PYTHON_MODULE(SmartBody)
 #endif
 		;
 
+	boost::python::class_<Event>("Event")
+		.def("getType", &Event::getType, "Returns the event type.")
+		.def("setType", &Event::setType, "Sets the event type.")
+		.def("getParameters", &Event::getParameters, "Returns the event parameters.")
+		.def("setParameters", &Event::setParameters, "Sets the event parameters.")
+		;
+
+	boost::python::class_<EventManager>("EventManager")
+		.def("addEventHandler", &EventManager::addEventHandler, "Returns the event type.")
+		.def("removeEventHandler", &EventManager::removeEventHandler, "Returns the event type.")
+		.def("getNumHandlers", &EventManager::getNumEventHandlers, "Gets the number of event handlers.")
+		.def("getEventHandler", &EventManager::getEventHandler, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the number of event handlers.")
+		;
+
 #ifndef __ANDROID__
 	boost::python::class_<SrVec>("SrVec")
 		.def(boost::python::init<>())
@@ -499,6 +538,11 @@ BOOST_PYTHON_MODULE(SmartBody)
 #ifndef __ANDROID__
 	boost::python::class_<NvbgWrap, boost::noncopyable>("Nvbg")
 		.def("execute", &Nvbg::execute, &NvbgWrap::default_execute, "Execute the NVBG processor.")
+		;
+
+
+	boost::python::class_<EventHandlerWrap, boost::noncopyable>("EventHandler")
+		.def("executeAction", &EventHandler::executeAction, &EventHandlerWrap::default_executeAction, "Execute the event handler.")
 		;
 #endif
 

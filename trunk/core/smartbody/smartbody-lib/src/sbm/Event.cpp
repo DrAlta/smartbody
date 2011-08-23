@@ -4,6 +4,28 @@
 
 #include <boost/algorithm/string/replace.hpp>
 
+BasicHandler::BasicHandler() : EventHandler() 
+{
+}
+
+void BasicHandler::setAction(const std::string& action)
+{ 
+	m_action = action;
+}
+
+const std::string& BasicHandler::getAction()
+{ 
+	return m_action;
+}
+
+void BasicHandler::executeAction(Event* event) 
+{
+	std::string action = getAction();
+	boost::replace_all(action, "$1", event->getParameters());
+
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.execute((char*) action.c_str());
+}
 
 EventManager* EventManager::_eventManager = NULL;
 
@@ -41,20 +63,16 @@ void EventManager::handleEvent(Event* e, double time)
 		return;
 
 	EventHandler* handler = (*iter).second;
-	std::string action = handler->getAction();
-
-	boost::replace_all(action, "$1", e->getParameters());
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.execute((char*) action.c_str());
+	handler->executeAction(e);	
 }
 
-void EventManager::addHandler(EventHandler* handler)
+void EventManager::addEventHandler(std::string type, EventHandler* handler)
 {
-	removeHandler(handler->getType());
-	eventHandlers.insert(std::pair<std::string, EventHandler*>(handler->getType(), handler));
+	removeEventHandler(type);
+	eventHandlers.insert(std::pair<std::string, EventHandler*>(type, handler));
 }
 
-void EventManager::removeHandler(std::string type)
+void EventManager::removeEventHandler(std::string type)
 {
 	std::map<std::string, EventHandler*>::iterator iter = eventHandlers.find(type);
 	if (iter != eventHandlers.end())
@@ -64,3 +82,38 @@ void EventManager::removeHandler(std::string type)
 		delete oldHandler;
 	}
 }
+
+int EventManager::getNumEventHandlers()
+{
+	return eventHandlers.size();
+}
+
+EventHandler* EventManager::getEventHandlerByIndex(int num)
+{
+	int counter = 0;
+	for (std::map<std::string, EventHandler*>::iterator iter = eventHandlers.begin();
+		 iter != eventHandlers.end();
+		 iter++)
+	{
+		if (counter == num)
+		{
+			EventHandler* handler = (*iter).second;
+			return handler;
+		}
+	}
+
+	return NULL;
+}
+
+EventHandler* EventManager::getEventHandler(std::string type)
+{
+	std::map<std::string, EventHandler*>::iterator iter = eventHandlers.find(type);
+	if (iter != eventHandlers.end())
+	{
+		EventHandler* handler = (*iter).second;
+		return handler;
+	}
+
+	return NULL;
+}
+
