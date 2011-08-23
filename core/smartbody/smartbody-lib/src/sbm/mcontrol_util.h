@@ -526,6 +526,7 @@ public:
 			resource->setTime(time);
 			resource_manager->addCommandResource(resource);
 
+			//LOG("execute cmd = %s\n",cmd);
 			// check to see if this is a sequence command
 			// if so, save the command id
 			std::string checkCmd = cmd;

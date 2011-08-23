@@ -331,8 +331,7 @@ void mcuCBHandle::reset( void )	{
 	FILE* file_p = NULL;
 
 	char buffer[ MAX_FILENAME_LEN ];
-	char label[ MAX_FILENAME_LEN ];
-
+	char label[ MAX_FILENAME_LEN ];	
 	// add the .seq extension if necessary
 	std::string candidateSeqName = seq_name;
 	if (candidateSeqName.find(".seq") == std::string::npos)
@@ -347,6 +346,7 @@ void mcuCBHandle::reset( void )	{
 	seq_paths.reset();
 	std::string filename = seq_paths.next_filename( buffer, candidateSeqName.c_str() );
 	//filename = mcn_return_full_filename_func( CurrentPath, filename );
+	//LOG("seq name = %s, filename = %s\n",seq_name,filename.c_str());
 	
 	while(filename.size() > 0)	{
 		file_p = fopen( filename.c_str(), "r" );

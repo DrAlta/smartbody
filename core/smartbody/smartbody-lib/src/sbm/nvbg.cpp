@@ -10,6 +10,10 @@ bool Nvbg::execute(std::string character, std::string to, std::string messageId,
 	return true;
 }
 
+Nvbg::Nvbg()
+{
+
+}
 
 
 

@@ -6,6 +6,9 @@ namespace SmartBody
 
 #ifdef USE_PYTHON
 
+
+std::string PyLogger::strBuffer = "";
+
 Script::Script()
 {
 }
@@ -1091,6 +1094,7 @@ void reset()
 
 void printLog(std::string message)
 {
+	//LOG("Haha I am printing python log");
 	LOG(message.c_str());
 }
 
@@ -1103,6 +1107,7 @@ int getNumCharacters()
 int getNumPawns() 
 {  
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	LOG("Python calls getNumPawns");
 	return mcu.getNumPawns(); 
 }
 
@@ -1193,10 +1198,6 @@ SBController* createController(std::string controllerType, std::string controlle
 	else if (controllerType == "face")
 	{
 		controller = new MeCtFace();
-	}
-	else if (controllerType == "reach")
-	{
-		controller = new MeCtReach();
 	}
 	else if (controllerType == "locomotion")
 	{
@@ -1658,5 +1659,185 @@ SkMotion* getMotion(std::string name)
 	return motion;
 }
 
+void PyLogger::pa()
+{
+	strBuffer += "a";		
+}
+
+void PyLogger::pb()
+{
+	strBuffer += "b";		
+}
+void PyLogger::pc()
+{
+	strBuffer += "c";		
+}
+
+void PyLogger::pd()
+{
+	strBuffer += "d";		
+}
+void PyLogger::pe()
+{
+	strBuffer += "e";		
+}
+
+void PyLogger::pf()
+{
+	strBuffer += "f";		
+}
+void PyLogger::pg()
+{
+	strBuffer += "g";		
+}
+
+void PyLogger::ph()
+{
+	strBuffer += "h";		
+}
+void PyLogger::pi()
+{
+	strBuffer += "i";		
+}
+
+void PyLogger::pj()
+{
+	strBuffer += "j";		
+}
+void PyLogger::pk()
+{
+	strBuffer += "k";		
+}
+
+void PyLogger::pl()
+{
+	strBuffer += "l";		
+}
+
+void PyLogger::pm()
+{
+	strBuffer += "m";		
+}
+void PyLogger::pn()
+{
+	strBuffer += "n";		
+}
+
+void PyLogger::po()
+{
+	strBuffer += "o";		
+}
+void PyLogger::pp()
+{
+	strBuffer += "p";		
+}
+
+void PyLogger::pq()
+{
+	strBuffer += "q";		
+}
+void PyLogger::pr()
+{
+	strBuffer += "r";		
+}
+
+void PyLogger::ps()
+{
+	strBuffer += "s";		
+}
+void PyLogger::pt()
+{
+	strBuffer += "t";		
+}
+
+void PyLogger::pu()
+{
+	strBuffer += "u";		
+}
+void PyLogger::pv()
+{
+	strBuffer += "v";		
+}
+
+void PyLogger::pw()
+{
+	strBuffer += "w";		
+}
+void PyLogger::px()
+{
+	strBuffer += "x";		
+}
+
+void PyLogger::py()
+{
+	strBuffer += "y";		
+}
+void PyLogger::pz()
+{
+	strBuffer += "z";		
+}
+void PyLogger::pspace()
+{
+	strBuffer +=" ";
+}
+
+void PyLogger::p1()
+{
+	strBuffer +="1";
+}
+void PyLogger::p2()
+{
+	strBuffer +="2";
+}
+void PyLogger::p3()
+{
+	strBuffer +="3";
+}
+void PyLogger::p4()
+{
+	strBuffer +="4";
+}
+void PyLogger::p5()
+{
+	strBuffer +="5";
+}
+void PyLogger::p6()
+{
+	strBuffer +="6";
+}
+void PyLogger::p7()
+{
+	strBuffer +="7";
+}
+void PyLogger::p8()
+{
+	strBuffer +="8";
+}
+void PyLogger::p9()
+{
+	strBuffer +="9";
+}
+void PyLogger::p0()
+{
+	strBuffer +="0";
+}
+
+
+
+
+void PyLogger::pnon()
+{
+	strBuffer +=".";
+}
+
+void PyLogger::outlog()
+{
+	if (strBuffer.size() > 1)
+	{
+		LOG("pyLog : %s",strBuffer.c_str());
+		strBuffer = "";
+	}	
+}
 #endif
+
 }

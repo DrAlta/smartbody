@@ -62,6 +62,17 @@ LOCAL_MODULE := iconv-prebuilt
 LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libiconv.a
 include $(PREBUILT_STATIC_LIBRARY)
 
+include $(CLEAR_VARS)
+LOCAL_MODULE := python-prebuilt
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libpython2.6.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := boost-python-prebuilt
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libboost_python.a
+LOCAL_SHARED_LIBRARIES := python-prebuilt	
+include $(PREBUILT_STATIC_LIBRARY)
+
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := ann
@@ -91,10 +102,11 @@ include $(SBM_LOCAL_PATH)/../../steersuite-1.3/jni/Android.mk
 LOCAL_PATH := $(SBM_LOCAL_PATH)
 include $(CLEAR_VARS)
 LOCAL_MODULE := sbm
-LOCAL_CFLAGS    := -DBUILD_ANDROID
+LOCAL_CFLAGS    := -g -O0 -DBUILD_ANDROID -frtti
 LOCAL_C_INCLUDES := $(SBM_LOCAL_PATH)/$(SBM_MY_DIR) \
 					$(SBM_LOCAL_PATH)/../../../lib/boost \
 					$(SBM_LOCAL_PATH)/../../include \
+					$(SBM_LOCAL_PATH)/../../python_lib/include/python2.6 \
 					$(SBM_LOCAL_PATH)/../../../lib/vhcl/include \
 					$(SBM_LOCAL_PATH)/../../../lib/bonebus/include \
 					$(SBM_LOCAL_PATH)/../../../lib/vhmsg/vhmsg-c/include \
@@ -333,8 +345,10 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/ParserBVH.cpp \
 	$(SBM_MY_DIR)/sbm/ParserASFAMC.cpp
 
-LOCAL_LDLIBS    := -llog				   
+LOCAL_LDLIBS    := -llog -lsupc++ 		  
 LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode 
+#LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode 
+#LOCAL_SHARED_LIBRARIES := python-prebuilt 
 include $(BUILD_STATIC_LIBRARY)
 
 

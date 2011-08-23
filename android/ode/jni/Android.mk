@@ -1,7 +1,7 @@
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 LOCAL_MODULE := ode
-MY_DIR := ../../../core/smartbody/odeSrc/
+MY_DIR := ../odeSrc/
 LOCAL_CFLAGS    := -DBUILD_ANDROID
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(MY_DIR)/include $(LOCAL_PATH)/$(MY_DIR)/OPCODE
 LOCAL_SRC_FILES := $(MY_DIR)/ode/src/array.cpp	\
