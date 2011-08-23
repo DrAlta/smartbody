@@ -112,6 +112,99 @@ mcuCBHandle* mcuCBHandle::_singleton = NULL;
 /////////////////////////////////////////////////////////////
 
 
+SequenceManager::SequenceManager()
+{
+}
+
+SequenceManager::~SequenceManager()
+{
+	clear();
+}
+
+void SequenceManager::clear()
+{
+	for (size_t x = 0; x < _sequences.size(); x++)
+	{
+		srCmdSeq* seq = _sequences[x].second;
+		seq->reset();
+		while(char* cmd = seq->pull() )	{
+			delete [] cmd;
+		}
+		delete seq;
+	}
+
+	_sequenceSet.clear();
+	_sequences.clear();
+}
+
+bool SequenceManager::addSequence(const std::string& seqName, srCmdSeq* seq)
+{
+	if (_sequenceSet.find(seqName) != _sequenceSet.end())
+		return false;
+
+	_sequenceSet.insert(seqName);
+	_sequences.push_back(std::pair<std::string, srCmdSeq*>(seqName, seq));
+	return true;
+}
+
+bool SequenceManager::removeSequence(const std::string& seqName, bool deleteSequence)
+{
+	std::set<std::string>::iterator iter = _sequenceSet.find(seqName);
+	if (iter == _sequenceSet.end())
+		return false;
+
+	_sequenceSet.erase(iter);
+
+	for (std::vector<std::pair<std::string, srCmdSeq*> >::iterator iter = _sequences.begin();
+		iter != _sequences.end();
+		iter++)
+	{
+		if ((*iter).first == seqName)
+		{
+			if (deleteSequence)
+				delete (*iter).second;
+			_sequences.erase(iter);
+			return true;
+		}
+	}
+
+	LOG("Could not find sequence in active sequence queue. Please check code - this should not happen.");
+	return false;
+}
+
+srCmdSeq* SequenceManager::getSequence(const std::string& name)
+{
+	for (std::vector<std::pair<std::string, srCmdSeq*> >::iterator iter = _sequences.begin();
+		iter != _sequences.end();
+		iter++)
+	{
+		if ((*iter).first == name)
+		{
+			return (*iter).second;
+		}
+	}
+
+	return NULL;
+}
+
+srCmdSeq* SequenceManager::getSequence(int num, std::string& name)
+{
+	if (_sequences.size() > (size_t) num)
+	{
+		name = _sequences[num].first;
+		return _sequences[num].second;
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+int SequenceManager::getNumSequences()
+{
+	return _sequences.size();
+}
+
 mcuCBHandle::mcuCBHandle()
 :	loop( true ),
 	vhmsg_enabled( false ),	
@@ -322,25 +415,8 @@ void mcuCBHandle::clear( void )	{
 		height_field_p = NULL;
 	}
 
-	srCmdSeq* seq_p;
-	pending_seq_map.reset();
-	while( seq_p = pending_seq_map.pull() )	{
-		char *cmd;
-		seq_p->reset();
-		while( cmd = seq_p->pull() )	{
-			delete [] cmd;
-		}
-		delete seq_p;
-	}
-	active_seq_map.reset();
-	while( seq_p = active_seq_map.pull() )	{
-		char *cmd;
-		seq_p->reset();
-		while( cmd = seq_p->pull() )	{
-			delete [] cmd;
-		}
-		delete seq_p;
-	}
+	pendingSequences.clear();
+	activeSequences.clear();
 
 	getCharacterMap().clear();
 	getPawnMap().clear();
@@ -816,17 +892,14 @@ void mcuCBHandle::update( void )	{
 		}		
 	}
 
-	srCmdSeq* seq_p;
-	char *seq_name = NULL;
-	active_seq_map.reset();
-
-
-
-	while( seq_p = active_seq_map.next( & seq_name ) )	{
-
+	std::string seqName = "";
+	std::vector<std::string> sequencesToDelete;
+	for (int s = 0; s < activeSequences.getNumSequences(); s++)
+	{
+		srCmdSeq* seq = activeSequences.getSequence(s, seqName);
 		char *cmd;
-		while( cmd = seq_p->pop( (float)time ) )	{
-
+		while( cmd = seq->pop( (float)time ) )
+		{
 #if 0
 			// the parent resource is associated with seq_name
 			CmdResource* cmdResource = resource_manager->getCmdResource(seq_name);
@@ -847,15 +920,20 @@ void mcuCBHandle::update( void )	{
 			}
 			delete [] cmd;
 		}
-		if( seq_p->get_count() < 1 )	{
-			seq_p = active_seq_map.remove( seq_name );
-			delete seq_p;
+		if( seq->get_count() < 1 )
+		{
+			sequencesToDelete.push_back(seqName);
 		}
 #if 0
 		if (cmdResource)	{
 			resource_manager->removeParent();
 		}
 #endif
+	}
+
+	for (size_t d = 0; d < sequencesToDelete.size(); d++)
+	{
+		activeSequences.removeSequence(sequencesToDelete[d], true);
 	}
 
 #ifndef __ANDROID__
@@ -1012,35 +1090,40 @@ void mcuCBHandle::update( void )	{
 	}	
 }
 
-srCmdSeq* mcuCBHandle::lookup_seq( const char* seq_name ) {
+srCmdSeq* mcuCBHandle::lookup_seq( const char* name ) {
 	int err = CMD_FAILURE;
 	
 	// Remove previous activation of sequence.
-	// Anm: Why?  Need clear distrinction (and efinition) between pending and active.
-	abort_seq( seq_name );
+	// Anm: Why?  Need clear distrinction (and definition) between pending and active.
+	abortSequence( name );
 
-	srCmdSeq* seq_p = pending_seq_map.remove( seq_name );
-	if( seq_p == NULL ) {
+	srCmdSeq* seq = pendingSequences.getSequence( name );
+	if (seq)
+	{
+		pendingSequences.removeSequence( name, false );
+	}
+	else
+	{
 		// Sequence not found.  Load new instance from file.
 		std::string fullPath;
-		FILE* file_p = open_sequence_file( seq_name, fullPath );
-		if( file_p ) {
-			seq_p = new srCmdSeq();
-			err = seq_p->read_file( file_p );
-			fclose( file_p );
+		FILE* file = open_sequence_file( name, fullPath );
+		if( file ) {
+			seq = new srCmdSeq();
+			err = seq->read_file( file );
+			fclose( file );
 
 			if( err != CMD_SUCCESS ) {
-				LOG("ERROR: mcuCBHandle::lookup_seq(..): '%s' PARSE FAILED\n", seq_name ); 
+				LOG("ERROR: mcuCBHandle::lookup_seq(..): '%s' PARSE FAILED\n", name ); 
 
-				delete seq_p;
-				seq_p = NULL;
+				delete seq;
+				seq = NULL;
 			}
 		} else {
-			LOG("ERROR: mcuCBHandle::lookup_seq(..): '%s' NOT FOUND\n", seq_name ); 
+			LOG("ERROR: mcuCBHandle::lookup_seq(..): '%s' NOT FOUND\n", name ); 
 		}
 	}
 	
-	return( seq_p );
+	return( seq );
 }
 
 int mcuCBHandle::execute_seq( srCmdSeq* seq ) {
@@ -1055,7 +1138,7 @@ int mcuCBHandle::execute_seq( srCmdSeq* seq_p, const char* seq_id ) {
 //	printf( "mcuCBHandle::execute_seq: id: '%s'\n", seq_id );
 //	seq_p->print();
 
-	if ( active_seq_map.insert( seq_id, seq_p ) != CMD_SUCCESS ) {
+	if ( !activeSequences.addSequence( seq_id, seq_p ) ) {
 		LOG("ERROR: mcuCBHandle::execute_seq(..): Failed to insert srCmdSeq \"%s\"into active_seq_map.", seq_id );
 		return CMD_FAILURE;
 	}	
@@ -1151,45 +1234,28 @@ int mcuCBHandle::execute_later( const char* command, float seconds ) {
 	return execute_seq( temp_seq, seqName.str().c_str() );;
 }
 
-int mcuCBHandle::abort_seq( const char* seq_name ) {
-	srCmdSeq* seq_p = active_seq_map.remove( seq_name );
-	if( seq_p == NULL )	{
-		return CMD_FAILURE;  // Not Found
-	}
+int mcuCBHandle::abortSequence( const char* name ) {
+	srCmdSeq* seq = activeSequences.getSequence(name);
+	if( !seq )
+		return CMD_FAILURE;
+	
+	bool success = activeSequences.removeSequence( name, true );
+	
 
-	if( LOG_ABORTED_SEQ ) {
-		cout << "DEBUG: mcuCBHandle::abort_seq(..): Aborting seq \"" << seq_name << "\" @ " << time << endl;
-		if( seq_p->get_count() > 0 ) {
-			cout << "\tRemaining commands:" << endl;
+	srCmdSeq* pending = pendingSequences.getSequence( name );
+	if( pending )
+		success = activeSequences.removeSequence( name, true );
 
-			const float offset = seq_p->offset();
-			float time = 0;
-
-			const char* cmd = seq_p->pull( &time );
-			while( cmd != NULL ) {
-				// print offseted time, so the values are comparable to the MCU abort time
-				cout << "\ttime " << (time+offset) << ":\t"<< cmd << endl;
-				cmd = seq_p->pull( &time );
-				delete [] cmd;
-			}
-		}
-	}
-
-	srCmdSeq* pending_p = pending_seq_map.lookup( seq_name );
-	if( pending_p != seq_p )	{
-		delete seq_p;
-	}
-
-	return CMD_SUCCESS;  // Aborted successfully
+	return CMD_SUCCESS; 
 }
 
+int mcuCBHandle::deleteSequence( const char* name ) {
+	int result = abortSequence( name );
 
-int mcuCBHandle::delete_seq( const char* seq_name ) {
-	int result = abort_seq( seq_name );
-
-	srCmdSeq* seq_p = pending_seq_map.remove( seq_name );
-	if( seq_p != NULL )	{
-		delete seq_p;
+	srCmdSeq* seq = pendingSequences.getSequence( name );
+	if( seq  )
+	{
+		pendingSequences.removeSequence( name, this );
 		result = CMD_SUCCESS;
 	}
 

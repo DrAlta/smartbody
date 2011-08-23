@@ -50,13 +50,21 @@ void Script::run()
 			srCmdSeq *cp_seq_p = new srCmdSeq;
 			preProcessingScript(cp_seq_p, seq_p);
 			cp_seq_p->offset((float)(mcu.time));
-			err = mcu.active_seq_map.insert(seq.c_str(), cp_seq_p);
 
-			if (err == 1)	
-				LOG("Unable to run a script '%s': this file contain be inserted to active_seq_map", seq.c_str()); 
+			if (!mcu.activeSequences.getSequence(seq))
+			{
+				mcu.activeSequences.addSequence(seq, cp_seq_p);
+			}
+			else
+			{
+				LOG("Unable to run a script '%s': this file cannot be inserted to the active sequences.", seq.c_str()); 
+			}
+			
 		}
 		else
+		{
 			LOG("Unable to run a script '%s': this file cannot be found.", seq.c_str()); 
+		}
 	}
 	else if (type == "py")
 	{
@@ -71,7 +79,7 @@ void Script::abort()
 	if (type == "seq")
 	{
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
-		int result = mcu.abort_seq(seq.c_str());
+		int result = mcu.abortSequence(seq.c_str());
 		if (result == 0)
 			LOG("'%s' not found, cannot abort.", seq.c_str()); 
 	}
@@ -681,18 +689,20 @@ void BmlProcessor::send_vrX( const char* cmd, const std::string& char_id, const 
 		}
 
 		if( send ) {
-			mcu.active_seq_map.remove( seq_id.c_str() );  // remove old sequence by this name
-			if( mcu.active_seq_map.insert( seq_id.c_str(), seq ) != CMD_SUCCESS ) {
+			mcu.activeSequences.removeSequence(seq_id, true); // remove old sequence by this name
+			if( !mcu.activeSequences.addSequence(seq_id, seq ))
+			{
 				std::stringstream strstr;
-				strstr << "ERROR: send_vrX(..): Failed to insert seq into active_seq_map.";
+				strstr << "ERROR: send_vrX(..): Failed to insert seq into active sequences.";
 				LOG(strstr.str().c_str());
 				return;
 			}
 		} else {
-			mcu.pending_seq_map.remove( seq_id.c_str() );  // remove old sequence by this name
-			if( mcu.pending_seq_map.insert( seq_id.c_str(), seq ) != CMD_SUCCESS ) {
+			mcu.pendingSequences.removeSequence(seq_id, true);  // remove old sequence by this name
+			if (mcu.pendingSequences.addSequence(seq_id, seq))
+			{
 				std::stringstream strstr;
-				strstr << "ERROR: send_vrX(..): Failed to insert seq into active_seq_map.";
+				strstr << "ERROR: send_vrX(..): Failed to insert seq into pending sequences.";
 				LOG(strstr.str().c_str());
 				return;
 			}

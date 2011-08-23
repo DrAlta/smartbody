@@ -303,18 +303,20 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 		}
 
 		if( send ) {
-			mcu.active_seq_map.remove( seq_id.c_str() );  // remove old sequence by this name
-			if( mcu.active_seq_map.insert( seq_id.c_str(), seq ) != CMD_SUCCESS ) {
+			mcu.activeSequences.removeSequence( seq_id, true );  // remove old sequence by this name
+			if( !mcu.activeSequences.addSequence( seq_id, seq ))
+			{
 				std::stringstream strstr;
-				strstr << "ERROR: send_vrX(..): Failed to insert seq into active_seq_map.";
+				strstr << "ERROR: send_vrX(..): Failed to insert seq into active sequences.";
 				LOG(strstr.str().c_str());
 				return CMD_FAILURE;
 			}
 		} else {
-			mcu.pending_seq_map.remove( seq_id.c_str() );  // remove old sequence by this name
-			if( mcu.pending_seq_map.insert( seq_id.c_str(), seq ) != CMD_SUCCESS ) {
+			mcu.pendingSequences.removeSequence( seq_id, true );   // remove old sequence by this name
+			if( !mcu.pendingSequences.addSequence( seq_id, seq ))
+			{
 				std::stringstream strstr;
-				strstr << "ERROR: send_vrX(..): Failed to insert seq into active_seq_map.";
+				strstr << "ERROR: send_vrX(..): Failed to insert seq into pending sequences.";
 				LOG(strstr.str().c_str());
 				return CMD_FAILURE;
 			}

@@ -447,7 +447,8 @@ BOOST_PYTHON_MODULE(SmartBody)
 void initPython(std::string pythonLibPath)
 {	
 #ifdef USE_PYTHON
-	std::string ppath = "../../../../core/smartbody/Python26/"; 
+	std::string ppath = "../../../../core/smartbody/Python26/";
+ 
 	Py_SetProgramName((char*) ppath.c_str());
 	Py_Initialize();
 	try {
