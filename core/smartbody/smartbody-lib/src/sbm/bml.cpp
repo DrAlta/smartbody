@@ -476,7 +476,7 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 		{
 			// send the feedback message for the end of the bml
 			std::stringstream strstr;
-			strstr << "sbm triggerevent bmlstatus \"" << request->msgId << " bml:end " << end_time << "\"";
+			strstr << "sbm triggerevent bmlstatus \"" << request->msgId << ":" << request->localId << " bml:end " << end_time << "\"";
 			if (cleanup_seq->insert( (float) end_time, strstr.str().c_str()) != CMD_SUCCESS)
 			{
 				std::stringstream strstr;
@@ -584,7 +584,7 @@ void BmlRequest::unschedule( Processor* bp, mcuCBHandle* mcu, time_sec duration 
 	}
 
 	// Cancel the normal "vrAgentBML ... end complete"
-	mcu->abort_seq( cleanup_seq_name.c_str() ); // don't clean-up self
+	mcu->abortSequence( cleanup_seq_name.c_str() ); // don't clean-up self
 
 	// Replace it with  "vrAgentBML ... end interrupted"
 	ostringstream buff;
@@ -659,8 +659,8 @@ void BmlRequest::cleanup( Processor* bp, mcuCBHandle* mcu )
 			LOG(strstr.str().c_str());
 		}
 	}
-	mcu->abort_seq( start_seq_name.c_str() );
-	mcu->abort_seq( cleanup_seq_name.c_str() );
+	mcu->abortSequence( start_seq_name.c_str() );
+	mcu->abortSequence( cleanup_seq_name.c_str() );
 
 
 
@@ -1392,7 +1392,8 @@ bool SequenceRequest::realize_sequence( VecOfSbmCommand& commands, mcuCBHandle* 
 		return true;
 	}
 
-	if( mcu->active_seq_map.lookup( unique_id.c_str() ) ) {
+	if( mcu->activeSequences.getSequence(unique_id))
+	{
 		std::stringstream strstr;
 		strstr << "ERROR: SequenceRequest::realize_sequence(..): SequenceRequest \"" << unique_id << "\": "<<
 		        "Sequence with matching ID already exists.";
@@ -1439,7 +1440,7 @@ bool SequenceRequest::realize_sequence( VecOfSbmCommand& commands, mcuCBHandle* 
 
 bool SequenceRequest::unschedule_sequence( mcuCBHandle* mcu )
 {
-	return ( mcu->abort_seq( unique_id.c_str() )==CMD_SUCCESS );
+	return ( mcu->abortSequence( unique_id.c_str() )==CMD_SUCCESS );
 }
 
 //  VisemeRequest

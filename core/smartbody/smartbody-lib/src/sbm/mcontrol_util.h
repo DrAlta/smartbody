@@ -146,6 +146,25 @@ typedef std::map<std::string, SkPosture*> SkPostureMap;
 typedef std::map<std::string, SkMotion*> SkMotionMap;
 typedef std::map<std::string, SkSkeleton*> SkSkeletonMap;
 
+class SequenceManager
+{
+	public:
+		SequenceManager();
+		~SequenceManager();
+
+		bool addSequence(const std::string& seqName, srCmdSeq* seq);
+		bool removeSequence(const std::string& seqName, bool deleteSequence);
+		srCmdSeq* getSequence(const std::string& name);
+		srCmdSeq* getSequence(int num, std::string& name);
+		int getNumSequences();
+
+		void clear();
+
+	protected:
+		std::set<std::string> _sequenceSet;
+		std::vector<std::pair<std::string, srCmdSeq*> > _sequences;
+};
+
 
 // Motion Controller Utility Callback Handle (Yes, seriously.)
 class mcuCBHandle {
@@ -244,8 +263,8 @@ class mcuCBHandle {
 		srCmdMap <mcuCBHandle>		print_cmd_map;
 		srCmdMap <mcuCBHandle>		test_cmd_map;
 
-		srHashMap <srCmdSeq>		pending_seq_map;
-		srHashMap <srCmdSeq>		active_seq_map;
+		SequenceManager	pendingSequences;
+		SequenceManager activeSequences;
 
 		std::map<std::string, FaceDefinition*> face_map;
 		std::map<std::string, SkPosture*> pose_map;
@@ -548,8 +567,8 @@ public:
 		int executePythonFile(const char* filename);
 
 
-		int abort_seq( const char* command );
-		int delete_seq( const char* command );
+		int abortSequence( const char* command );
+		int deleteSequence( const char* command );
 
 		remote_speech* speech_rvoice() { return &_speech_rvoice; }
 		SmartBody::AudioFileSpeech* speech_audiofile() { return &_speech_audiofile; }

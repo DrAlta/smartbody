@@ -186,8 +186,8 @@ The timestamp is 20051121_150427 (that is, YYYYMMDD_HHMMSS ), so we can check ol
 	char* seqName = new char[ 18+myStream.str().length()+1 ];  // 18 for RemoteSpeechTimeOut, 1 for \0
 //	sprintf( seqName, "RemoteSpeechTimeOut", myStream.str() );  // Anm - huh?? No % in format arg.
 	sprintf( seqName, "RemoteSpeechTimeOut" );  // Anm - huh?? No % in format arg.
-	mcu.active_seq_map.remove( seqName );  // remove old sequence by this name
-	if( mcu.active_seq_map.insert( seqName, rVoiceTimeout ) != CMD_SUCCESS ) {
+	mcu.activeSequences.removeSequence( seqName, true );  // remove old sequence by this name
+	if( !mcu.activeSequences.addSequence( seqName, rVoiceTimeout ) ) {
 		LOG( "remote_speech::rVoiceTimeOut ERR:insert Rvoice timeoutCheck into active_seq_map FAILED, msgId=%s\n", seqName ); 
 	}
 	

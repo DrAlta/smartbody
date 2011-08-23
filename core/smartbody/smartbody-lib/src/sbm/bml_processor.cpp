@@ -326,6 +326,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 					newIdStr << "default" << idCounter;
 					child->setAttribute(BMLDefs::ATTR_ID, XMLString::transcode(newIdStr.str().c_str()));
 					id = XMLString::transcode(newIdStr.str().c_str());
+					request->localId = newIdStr.str();
 					idCounter++;
 				}
 			}

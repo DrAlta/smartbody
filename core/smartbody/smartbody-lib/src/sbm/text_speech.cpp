@@ -115,12 +115,12 @@ RequestId text_speech::requestSpeechAudio( const char* agentName, std::string vo
 	uttLookUp.insert(myStream.str().c_str(), replyDoc->getDocumentElement());
 
 	string seqName = "text_speech" + myStream.str();
-	mcu.active_seq_map.remove(seqName.c_str());
+	mcu.activeSequences.removeSequence(seqName, true);
 	srCmdSeq* sq = new srCmdSeq();
 	string s = string(callbackCmd) + *agentNamePtr + " " + myStream.str().c_str() + " SUCCESS";
 	sq->insert(0, s.c_str());
 	sq->offset((float)mcu.time);
-	mcu.active_seq_map.insert(seqName.c_str(), sq);
+	mcu.activeSequences.addSequence(seqName, sq);
 
 	return (msgNumber); //returns the unique message number
 }
@@ -260,7 +260,7 @@ void text_speech::startSchedule( SmartBody::RequestId requestId ) {
 		mcuCBHandle& mcu = mcuCBHandle::singleton();
 		seq->offset((float)mcu.time);
 		string seqname = "text_speech_" + myStream.str();
-		mcu.active_seq_map.insert(seqname.c_str(), seq);
+		mcu.activeSequences.addSequence(seqname, seq);
 	}
 }
 

@@ -96,6 +96,7 @@ namespace BML {
 		const std::string    recipientId;
 #endif
 		const std::string    msgId;
+		std::string          localId;
 		const XERCES_CPP_NAMESPACE::DOMDocument*		 doc;
 
 		VecOfTriggerEvent    triggers;

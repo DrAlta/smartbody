@@ -276,27 +276,27 @@ void mcu_preprocess_sequence( srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p, mcuCBHandl
 	delete fr_seq_p;
 }
 
-int begin_sequence( char* seq_name, mcuCBHandle *mcu_p )	{
-	int err = CMD_FAILURE;
+int begin_sequence( char* name, mcuCBHandle* mcu_p )	{
 	
-	srCmdSeq *seq_p = mcu_p->lookup_seq( seq_name );
+	srCmdSeq *seq = mcu_p->lookup_seq( name );
 	
-	if( seq_p ) {
-	
-		// EXPAND INLINE SEQs HERE
+	if( seq )
+	{
+		srCmdSeq* copySeq = new srCmdSeq;
+		mcu_preprocess_sequence( copySeq, seq, mcu_p );
 
-		srCmdSeq *cp_seq_p = new srCmdSeq;
-		mcu_preprocess_sequence( cp_seq_p, seq_p, mcu_p );
+		copySeq->offset( (float)( mcu_p->time ) );
+		bool success = mcu_p->activeSequences.addSequence(name, copySeq );
 
-		cp_seq_p->offset( (float)( mcu_p->time ) );
-		err = mcu_p->active_seq_map.insert( seq_name, cp_seq_p );
-
-		if( err != CMD_SUCCESS )	{
-			LOG( "begin_sequence ERR: insert active: '%s' FAILED\n", seq_name ); 
+		if( !success )
+		{
+			LOG( "begin_sequence ERR: insert active: '%s' FAILED\n", name ); 
+			return CMD_FAILURE;
 		}
+		
 	}
 
-	return( err );
+	return( CMD_SUCCESS );
 }
 
 /*
@@ -307,52 +307,53 @@ int begin_sequence( char* seq_name, mcuCBHandle *mcu_p )	{
 
 */
 
-int mcu_sequence_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
-
-	int err;
-	
-	if( mcu_p )	{
-		char *seq_name = args.read_token();
-		char *seq_cmd = args.read_token();
+int mcu_sequence_func( srArgBuffer& args, mcuCBHandle* mcu )
+{
+	if( mcu )	{
+		char *seqName = args.read_token();
+		char *seqCmd = args.read_token();
 		//std::cout << "SEQUENCE LOADED: " << seq_name << " " << seq_cmd << std::endl;
 
-		if( ( strcmp( seq_cmd, "begin" ) == 0 )||( strcmp( seq_cmd, EMPTY_STRING ) == 0 ) )	{
-			int ret = begin_sequence( seq_name, mcu_p );
+		if( ( strcmp( seqCmd, "begin" ) == 0 )||( strcmp( seqCmd, EMPTY_STRING ) == 0 ) )	{
+			int ret = begin_sequence( seqName, mcu );
 			return ret;
 		}
 		else
-		if( strcmp( seq_cmd, "at" ) == 0 )	{
+		if( strcmp( seqCmd, "at" ) == 0 )	{
 		
-			srCmdSeq *seq_p = mcu_p->pending_seq_map.lookup( seq_name );
-			if( seq_p == NULL )	{
-				seq_p = new srCmdSeq;
-				err = mcu_p->pending_seq_map.insert( seq_name, seq_p );
-				if( err == CMD_FAILURE )	{
-					LOG( "mcu_sequence_func ERR: insert pending '%s' FAILED\n", seq_name ); 
-					return( err );
+			srCmdSeq* seq = mcu->pendingSequences.getSequence( seqName );
+			if (!seq)
+			{
+				seq = new srCmdSeq;
+				bool success = mcu->pendingSequences.addSequence( seqName, seq );
+				if( !success )
+				{
+					LOG( "mcu_sequence_func ERR: insert pending '%s' FAILED\n", seqName ); 
+					return( CMD_FAILURE );
 				}
 			}
 			
-			float seq_time = args.read_float();
-			char *seq_string = args.read_remainder_raw();
-			int ret = seq_p->insert( seq_time, seq_string );
+			float seqTime = args.read_float();
+			char* seqStr = args.read_remainder_raw();
+			int ret = seq->insert( seqTime, seqStr );
 			return ret;
 		}
 		else
-		if( strcmp( seq_cmd, "print" ) == 0 )	{
+		if( strcmp( seqCmd, "print" ) == 0 )	{
 			
-			srCmdSeq *seq_p = mcu_p->pending_seq_map.lookup( seq_name );
-			if( seq_p == NULL )	{
-				LOG( "mcu_sequence_func ERR: print: '%s' NOT FOUND\n", seq_name ); 
+			srCmdSeq* seq = mcu->pendingSequences.getSequence( seqName );
+			if (!seq)
+			{
+				LOG( "mcu_sequence_func ERR: print: '%s' NOT FOUND\n", seqName ); 
 				return( CMD_FAILURE );
 			}
-			seq_p->print( stdout );
+			seq->print( stdout );
 		}
 		else
-		if( ( strcmp( seq_cmd, "abort" ) == 0 )||( strcmp( seq_cmd, "delete" ) == 0 ) )	{
-			int result = mcu_p->abort_seq( seq_name );
+		if( ( strcmp( seqCmd, "abort" ) == 0 )||( strcmp( seqCmd, "delete" ) == 0 ) )	{
+			int result = mcu->abortSequence( seqName );
 			if( result == CMD_NOT_FOUND )	{
-				LOG( "mcu_sequence_func ERR: abort|delete: '%s' NOT FOUND\n", seq_name ); 
+				LOG( "mcu_sequence_func ERR: abort|delete: '%s' NOT FOUND\n", seqName ); 
 			}
 			return( result );
 		}
