@@ -1111,6 +1111,11 @@ int getNumPawns()
 	return mcu.getNumPawns(); 
 }
 
+EventManager* getEventManager()
+{
+	return EventManager::getEventManager();
+}
+
 boost::python::list getCharacterNames()
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();

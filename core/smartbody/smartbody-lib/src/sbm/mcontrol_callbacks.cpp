@@ -5202,10 +5202,9 @@ int registerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	char* action = args.read_token();
 
 	EventManager* eventManager = EventManager::getEventManager();
-	EventHandler* handler = new EventHandler();
-	handler->setType(type);
+	BasicHandler* handler = new BasicHandler();
 	handler->setAction(action);
-	eventManager->addHandler(handler);
+	eventManager->addEventHandler(type, handler);
 
 	return CMD_SUCCESS;
 }
@@ -5221,7 +5220,7 @@ int unregisterevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	}
 
 	EventManager* eventManager = EventManager::getEventManager();
-	eventManager->removeHandler(type);
+	eventManager->removeEventHandler(type);
 
 	return CMD_SUCCESS;
 }

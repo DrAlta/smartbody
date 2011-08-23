@@ -25,14 +25,22 @@ class EventHandler
 		EventHandler() : m_type(""), m_action("") {}
 		~EventHandler() {}
 
-		void setType(const std::string& type) { m_type = type; }
-		const std::string& getType() { return m_type; }
-		void setAction(const std::string& action) { m_action = action; }
-		const std::string& getAction() { return m_action; }
+	//	void setType(const std::string& type) { m_type = type; }
+	//	const std::string& getType() { return m_type; }
+		virtual void executeAction(Event* event) {}
 
 	protected:
 		std::string m_type;
 		std::string m_action;
+};
+
+class BasicHandler : public EventHandler
+{
+	public:
+		BasicHandler();
+		void setAction(const std::string& action);
+		const std::string& getAction();
+		virtual void executeAction(Event* event);
 };
 
 typedef std::map<std::string, EventHandler*> EventHandlerMap;
@@ -44,8 +52,11 @@ class EventManager
 		~EventManager();
 
 		void handleEvent(Event* e, double time);
-		void addHandler(EventHandler* handle);
-		void removeHandler(std::string type);
+		void addEventHandler(std::string type, EventHandler* handle);
+		void removeEventHandler(std::string type);
+		int getNumEventHandlers();
+		EventHandler* getEventHandlerByIndex(int num);
+		EventHandler* getEventHandler(std::string type);
 		static EventManager* getEventManager();
 		EventHandlerMap& getEventHandlers() { return eventHandlers; }
 
