@@ -724,6 +724,7 @@ void android_main(struct android_app* state) {
     TimeIntervalProfiler* profiler = new TimeIntervalProfiler();
     mcu.register_profiler(*profiler);
 
+	
     mcu.execute("path seq /sdcard/sbmmedia/");
     mcu.execute("seq default.seq");
     //mcu.execute("load skeletons -R /sdcard/sbmmedia/");

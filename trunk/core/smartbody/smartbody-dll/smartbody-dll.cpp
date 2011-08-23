@@ -399,6 +399,7 @@ SMARTBODY_DLL_API SmartbodyCharacter& Smartbody_dll::GetCharacter( const string 
 
 bool Smartbody_dll::InitVHMsg()
 {
+#ifndef __ANDROID__
    mcuCBHandle & mcu = mcuCBHandle::singleton();
 
    printf( "Starting VHMsg (DLL side)\n" );
@@ -406,6 +407,7 @@ bool Smartbody_dll::InitVHMsg()
    vhmsg::ttu_open();
 
    mcu.vhmsg_enabled = true;
+#endif
 
    return true;
 }

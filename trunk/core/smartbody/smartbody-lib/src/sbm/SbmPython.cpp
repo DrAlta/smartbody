@@ -7,6 +7,9 @@
 
 
 #ifdef USE_PYTHON
+
+
+#ifndef __ANDROID__
 struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 {
 	virtual bool execute(std::string character, std::string to, std::string messageId, std::string xml)
@@ -28,6 +31,7 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 		return Nvbg::execute(character, to, messageId, xml);
 	}
 };
+#endif
 
 struct PythonControllerWrap : SmartBody::PythonController, boost::python::wrapper<SmartBody::PythonController>
 {
@@ -125,10 +129,12 @@ namespace SmartBody
 #ifdef USE_PYTHON
 BOOST_PYTHON_MODULE(SmartBody)
 {
-	boost::python::numeric::array::set_module_and_type("numpy", "ndarray");
+	//boost::python::numeric::array::set_module_and_type("numpy", "ndarray");
 	
 
 	// characters
+
+//#ifndef __ANDROID__
 	boost::python::def("getNumPawns", getNumPawns, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
 	boost::python::def("getNumCharacters", getNumCharacters, "Returns the number of characters.\n Input: NULL \nOutput: number of characters.");
 	boost::python::def("getCharacterByIndex", getCharacterByIndex, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the character object given its index. \n Input: character index \nOutput: character object");
@@ -136,6 +142,67 @@ BOOST_PYTHON_MODULE(SmartBody)
 	boost::python::def("getCharacterNames", getCharacterNames, "Returns a list of all character names.\n Input: NULL \nOutput: list of character names");
 
 	boost::python::def("getMotion", getMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a the motion of given name.");
+//#endif
+
+
+	boost::python::def("pa", &PyLogger::pa, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pb", &PyLogger::pb, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pc", &PyLogger::pc, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pd", &PyLogger::pd, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pe", &PyLogger::pe, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pf", &PyLogger::pf, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pg", &PyLogger::pg, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("ph", &PyLogger::ph, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pi", &PyLogger::pi, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pj", &PyLogger::pj, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pk", &PyLogger::pk, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pl", &PyLogger::pl, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pm", &PyLogger::pm, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pn", &PyLogger::pn, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("po", &PyLogger::po, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pp", &PyLogger::pp, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pq", &PyLogger::pq, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pr", &PyLogger::pr, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("ps", &PyLogger::ps, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pt", &PyLogger::pt, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pu", &PyLogger::pu, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pv", &PyLogger::pv, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pw", &PyLogger::pw, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("px", &PyLogger::px, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("py", &PyLogger::py, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("pz", &PyLogger::pz, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");	
+	boost::python::def("p1", &PyLogger::p1, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("p2", &PyLogger::p2, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("p3", &PyLogger::p3, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("p4", &PyLogger::p4, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("p5", &PyLogger::p5, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("p6", &PyLogger::p6, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("p7", &PyLogger::p7, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("p8", &PyLogger::p8, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");	
+	boost::python::def("p9", &PyLogger::p9, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("p0", &PyLogger::p0, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+
+	boost::python::def("openparen", &PyLogger::openparen, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("closeparen", &PyLogger::closeparen, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("openbracket", &PyLogger::openbracket, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("closebracket", &PyLogger::closebracket, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("openbrace", &PyLogger::openbrace, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("closebrace", &PyLogger::closebrace, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("plus", &PyLogger::plus, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("minus", &PyLogger::minus, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("aster", &PyLogger::aster, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("slash", &PyLogger::slash, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("backslash", &PyLogger::backslash, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("comma", &PyLogger::comma, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("colon", &PyLogger::colon, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("semicolon", &PyLogger::semicolon, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("equal", &PyLogger::equal, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("less", &PyLogger::less, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+	boost::python::def("more", &PyLogger::more, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");	
+	
+	boost::python::def("pspace", &PyLogger::pspace, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");	
+	boost::python::def("pnon", &PyLogger::pnon, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");	
+	boost::python::def("outlog", &PyLogger::outlog, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");	
 
 	//boost::python::def("testGetNDArray",testGetNDArray, "Test ND Array");
 	// potential APIs that can be useful:
@@ -145,7 +212,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 	// etc. 
 	// 
 
-
+#ifndef __ANDROID__
 	boost::python::def("createCharacter", createCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new character given character name. \n Input: character name \nOutput: character object");
 	boost::python::def("removeCharacter", removeCharacter, "Remove the character given its name. \n Input: character name \n Output: NULL");
 	boost::python::def("createSkeleton", createSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new skeleton given a skeleton definition.");
@@ -324,8 +391,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 	boost::python::class_<MeCtGaze, boost::python::bases<SBController> > ("GazeController")
 		;
 
-	boost::python::class_<MeCtReach, boost::python::bases<SBController> > ("ReachController")
-		;
+	//boost::python::class_<MeCtReach, boost::python::bases<SBController> > ("ReachController")	;
 
 	boost::python::class_<MeCtCurveWriter, boost::python::bases<SBController> > ("CurveWriterController")
 		;
@@ -401,11 +467,15 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("setVoiceBackup", &SBCharacter::setVoiceBackup, "Sets the voice backup type: remote, audiofile, text or none (use \"\").")
 		.def("setVoiceBackupCode", &SBCharacter::setVoiceBackupCode, "Sets the voice backup code. For audiofile type, this is a path.")
 		.def("setFaceDefinition", &SBCharacter::setFaceDefinition, "Sets face definition (visemes, action units) for a character.")
+#endif
 		//.def("getFaceDefinition", &SBCharacter::getFaceDefinition, "Gets face definition (visemes, action units) for a character.")
+#ifndef __ANDROID__
 		.def("setNvbg", &SBCharacter::setNvbg, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Sets the NVBG handler for this character.")
 		.def("getNvbg", &SBCharacter::getNvbg, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the NVBG handler for this character.")
+#endif
 		;
 
+#ifndef __ANDROID__
 	boost::python::class_<SrVec>("SrVec")
 		.def(boost::python::init<>())
 		.def(boost::python::init<float, float, float>())
@@ -424,11 +494,13 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getData", &SrQuat::getData, "gets the data in the quaterion at location indicated by the index w,x,y,z")
 		.def("setData", &SrQuat::setData, "sets the data in the quaterion at location indicated by the index w,x,y,z")
 		;
+#endif
 
-	
+#ifndef __ANDROID__
 	boost::python::class_<NvbgWrap, boost::noncopyable>("Nvbg")
 		.def("execute", &Nvbg::execute, &NvbgWrap::default_execute, "Execute the NVBG processor.")
 		;
+#endif
 
 	boost::python::class_<PythonControllerWrap, boost::python::bases<SBController>, boost::noncopyable> ("PythonController")
 		.def("start", &PythonController::start, &PythonControllerWrap::default_start, "start.")
@@ -447,14 +519,17 @@ BOOST_PYTHON_MODULE(SmartBody)
 void initPython(std::string pythonLibPath)
 {	
 #ifdef USE_PYTHON
-	std::string ppath = "../../../../core/smartbody/Python26/";
- 
-	Py_SetProgramName((char*) ppath.c_str());
+#ifdef __ANDROID__
+	Py_SetProgramName("/sdcard/sbmmedia/python/");
+#else
+	Py_SetProgramName("../../../../core/smartbody/Python26/");
+#endif	
 	Py_Initialize();
 	try {
+		//LOG("Before import __main__");
 		boost::python::object objectMain = boost::python::import("__main__");
 		boost::python::object objectDict = objectMain.attr("__dict__");
-		
+		//LOG("Before import sys");
 		PyRun_SimpleString("import sys");
 		// set the proper python path
 		std::stringstream strstr;
@@ -471,27 +546,59 @@ void initPython(std::string pythonLibPath)
 		strstr << "\");";
 		PyRun_SimpleString(strstr.str().c_str());
 
+		//LOG("PyGetPath = %s\")
 
+
+		//LOG("Before initSmartBody");
 		SmartBody::initSmartBody();
-		
+
+		//LOG("After initSmartBody");
 		if (PyErr_Occurred())
 			PyErr_Print();
 		// redirect stdout
-		PyRun_SimpleString("class WritableObject:\n\tdef __init__(self):\n\t\tself.content = []\n\tdef write(self, string):\n\t\tprintlog(string)\n");
-		PyRun_SimpleString("logwriter = WritableObject()");
+		//LOG("Before redirect stdout");
 
+#ifdef PYLOG
+#ifdef __ANDROID__
+		const char* pyfilename = "/sdcard/sbmmedia/pylog.txt";
+#else
+		const char* pyfilename = "C:\\SbmAndroid\\android\\pylog.txt";
+#endif
+		FILE* file = fopen(pyfilename,"rt");
+		if (file)
+		{
+			LOG("Open file success\n");		
+			PyRun_SimpleFile(file,pyfilename);
+			PyRun_SimpleString("logwriter = WritableObject()");
+			//#ifndef __ANDROID__
+			PyRun_SimpleString("sys.stdout = logwriter");
+			PyRun_SimpleString("sys.stderr = logwriter");
+		}
+		else
+		{
+			LOG("Open File Fail!!!\n");
+		}	
+#else
+		PyRun_SimpleString("class WritableObject:\n\tdef __init__(self):\n\t\tself.content = []\n\tdef write(self, string):\n\t\tprintlog(string)\n");
 		PyRun_SimpleString("sys.stdout = logwriter");
 		PyRun_SimpleString("sys.stderr = logwriter");
+#endif		
+		
 		if (PyErr_Occurred())
 			PyErr_Print();
 
 	
+		//LOG("before import os");
 		PyRun_SimpleString("from os import *");
+		//LOG("before import Smartbody");
 		PyRun_SimpleString("from SmartBody import *");
-		PyRun_SimpleString("from pydoc import *");
-
+		//LOG("before import pydoc");
+		//PyRun_SimpleString("from pydoc import *");
+#ifndef __ANDROID__
 		PyRun_SimpleString("bml = getBmlProcessor()");
 		PyRun_SimpleString("sim = getSimulationManager()");
+#endif
+		//LOG("After import os");
 
 		if (PyErr_Occurred())
 			PyErr_Print();
@@ -499,6 +606,7 @@ void initPython(std::string pythonLibPath)
 
 	} catch (...) {
 		PyErr_Print();
+		//LOG("PyError Exception");
 	}
 #endif
 }

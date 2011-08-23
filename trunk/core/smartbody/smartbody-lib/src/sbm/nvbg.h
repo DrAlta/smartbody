@@ -5,8 +5,10 @@
 #include <sbm/DObject.h>
 #include <string>
 
-struct Nvbg 
+class Nvbg 
 {
+public:
+		Nvbg();
 		virtual ~Nvbg();
 
 		virtual bool execute(std::string character, std::string to, std::string messageId, std::string xml);

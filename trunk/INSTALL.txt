@@ -179,6 +179,76 @@ log4cxx
 http://www.apache.org/dyn/closer.cgi/logging/log4cxx/0.10.0/apache-log4cxx-0.10.0.tar.gz
 
 
+Instructions for Android
+----------------------
+
+Download and install android-sdk, android-ndk from : http://developer.android.com/sdk/index.html
+
+(For windows platform, you also need to install cygwin 1.7 or higher : http://www.cygwin.com/ )
+
+Follow the installation instruction for both sdk/ndk. Be sure to set the correct path to android-sdk/bin, android-ndk/bin so the toolchain can be access correctly.
+
+For NDK, you also need to export the environment variable NDK_ROOT to the NDK installation directory ( for example, export NDK_ROOT= "path-to-ndk-directory" )
+
+Install Eclipse ( http://www.eclipse.org/ ) and its Android ADT plug-in ( http://developer.android.com/sdk/eclipse-adt.html )
+
+The Android build target needs to be 2.3.3 or higher, otherwise some of the code may not be built.
+
+**** If your target hardware is the Arm architecture, some dependency libraries are already prebuilt at SmartBodyDir)/android/lib. Therefore you can build the smartbody project directly : 
+
+1. Go to (SmartBodyDir)/android/sbm/
+2. ndk-build  ( Similar to gcc, you can set the option -j $number_threads to accelerate the build process with multi-threading).
+3. Use Eclipse to open the project (SmartBodyDir)/android/sbm/. 
+4. Select Project->Build Project. This should generate a SbmAndroid.apk in (SmartBodyDir)/android/sbm/bin
+
+
+**** If you are targeting other hardware achitecture ( X86, etc ) or you prefer to rebuild all libraries from the source :
+
+1. Building boost :
+i) Download Boost library, extract it into $(SmartBodyDir)/lib/
+
+modify libs\filesystem\v2\src\v2_operations.cpp, change: 
+#   if !defined(__APPLE__) && !defined(__OpenBSD__) 
+#     include <sys/statvfs.h> 
+#     define BOOST_STATVFS statvfs 
+#     define BOOST_STATVFS_F_FRSIZE vfs.f_frsize 
+#   else 
+#ifdef __OpenBSD__ 
+#     include <sys/param.h> 
+#endif 
+
+to: 
+
+#   if !defined(__APPLE__) && !defined(__OpenBSD__) && !defined(__ANDROID__) 
+#     include <sys/statvfs.h> 
+#     define BOOST_STATVFS statvfs 
+#     define BOOST_STATVFS_F_FRSIZE vfs.f_frsize 
+#   else 
+#ifdef __OpenBSD__ 
+#     include <sys/param.h> 
+#elif defined(__ANDROID__) 
+#     include <sys/vfs.h> 
+#endif 
+
+ii) modifiy the file $(SmartBodyDir)/android/boost/userconfig.jam, look for :
+
+ANDROID_NDK = ../android-ndk ; and change the directory "../android-ndk" so it points to the android NDK directory
+
+You may also need to change all arm-linux-androideabi-xxx to the corresponding toolchain name based on your target architecture and platform.
+
+iii) (use cygwin in Windows platform )
+./bootstrap.sh
+./bjam --without-python --without-math --without-mpi --without- 
+iostreams toolset=gcc-android4.4.3 link=static runtime-link=static 
+target-os=linux --stagedir=android stage 
+
+2. Building iconv and xerces
+(To-Do)
+3. Building clapack
+(To-Do)
+
+
+
 
 
 
