@@ -34,4 +34,5 @@ public class SbmJNILib {
      public static native void step();
      public static native void executeSbm(String sbmCmd);
      public static native void executePython(String pyCmd);
+     public static native String getLog();
 }

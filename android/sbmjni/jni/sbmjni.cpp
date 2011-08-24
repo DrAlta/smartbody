@@ -16,6 +16,7 @@
 
 // OpenGL ES 2.0 code
 
+#include "vhcl_log.h"
 #include <sbm/mcontrol_util.h>
 #include <sbm/mcontrol_callbacks.h>
 #include <sbm/sbm_test_cmds.hpp>
@@ -41,9 +42,11 @@ struct Engine
 {
 	SrCamera camera;
 	TimeRegulator timer;
+	vhcl::Log::AndroidListener androidListener;
 };
 
 Engine engine;
+bool mcuInit = false;
 
 static void printGLString(const char *name, GLenum s) {
     const char *v = (const char *) glGetString(s);
@@ -312,6 +315,7 @@ extern "C" {
     JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_step(JNIEnv * env, jobject obj);
     JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executeSbm(JNIEnv * env, jobject obj, jstring sbmCmd);
     JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executePython(JNIEnv * env, jobject obj, jstring pythonCmd);
+	JNIEXPORT jstring JNICALL Java_com_android_sbmjni_SbmJNILib_getLog(JNIEnv * env, jobject obj);
 };
 
 void initPython()
@@ -325,6 +329,7 @@ JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_init(JNIEnv * env, jobj
 {
 	//LOGI("Starting Sbm Android");
 	//LOGI("Initialize XMLPlatformUtils\n");
+	//sleep(8);
 
 	
 
@@ -332,7 +337,8 @@ JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_init(JNIEnv * env, jobj
 	//LOGI("Start Initialize mcu\n");
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	mcu_register_callbacks();
-
+	
+	vhcl::Log::g_log.AddListener(&engine.androidListener);
 #ifdef USE_PYTHON
 	initPython();
 #endif
@@ -352,10 +358,14 @@ JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_init(JNIEnv * env, jobj
 	mcu.execute("pawn foo init");
 	timer.start();	
     setupGraphics(width, height);
+
+	mcuInit = true;
 }
 
 JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_step(JNIEnv * env, jobject obj)
 {
+	if (!mcuInit) return;
+
 	mcuCBHandle& mcu = mcuCBHandle::singleton();	
 	bool update_sim = mcu.update_timer();		
 	if( update_sim ) {
@@ -366,6 +376,8 @@ JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_step(JNIEnv * env, jobj
 
 JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executeSbm(JNIEnv * env, jobject obj, jstring sbmCmd)
 {
+	if (!mcuInit) return;
+
 	const char* sbmCmdStrConst = (env)->GetStringUTFChars( sbmCmd , NULL ) ;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();	
 	char* sbmCmdStr = const_cast<char*>(sbmCmdStrConst);
@@ -375,6 +387,7 @@ JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executeSbm(JNIEnv * env
 JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executePython(JNIEnv * env, jobject obj, jstring pythonCmd)
 {	
 #ifdef USE_PYTHON
+	if (!mcuInit) return;
 	const char* pyCmdStrConst = (env)->GetStringUTFChars( pythonCmd , NULL ) ;
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	char* pyCmdStr = const_cast<char*>(pyCmdStrConst);
@@ -383,4 +396,11 @@ JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executePython(JNIEnv * 
 	//Java_com_android_sbmjni_SbmJNILib_executeSbm(env,obj,pythonCmd);
 	LOG("Python now supported");
 #endif
+}
+
+JNIEXPORT jstring JNICALL Java_com_android_sbmjni_SbmJNILib_getLog( JNIEnv * env, jobject obj )
+{
+	std::string logStr = engine.androidListener.getLogs();
+	//std::string logStr = "Getting Log through JNI";
+	return env->NewStringUTF(logStr.c_str());
 }
