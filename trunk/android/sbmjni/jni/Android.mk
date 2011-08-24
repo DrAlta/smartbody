@@ -35,5 +35,4 @@ LOCAL_CFLAGS    := -g -O0 -DBUILD_ANDROID -frtti
 LOCAL_SRC_FILES := sbmjni.cpp
 LOCAL_LDLIBS    := -llog -lEGL -lGLESv1_CM
 LOCAL_STATIC_LIBRARIES := sbm xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode
-LOCAL_SHARED_LIBRARIES := python-prebuilt
 include $(BUILD_SHARED_LIBRARY) 

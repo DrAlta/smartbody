@@ -13,6 +13,7 @@
 #endif
 
 #include "vhcl_public.h"
+#include <string>
 #include <queue>
 #include <map>
 
@@ -21,10 +22,10 @@
 class SmartbodyListener
 {
    public:
-      virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass ) {}
-      virtual void OnCharacterDelete( const std::string & name ) {}
-      virtual void OnCharacterChanged( const std::string & name ) {}
-      virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime ) {}
+      virtual void OnCharacterCreate( const std::string& name, const std::string& objectClass ) {}
+      virtual void OnCharacterDelete( const std::string& name ) {}
+      virtual void OnCharacterChanged( const std::string& name ) {}
+      virtual void OnViseme( const std::string& name, const std::string& visemeName, const float weight, const float blendTime ) {}
 };
 
 
