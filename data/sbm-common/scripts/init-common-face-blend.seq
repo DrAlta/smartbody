@@ -2,7 +2,7 @@
 
 #0   echo common-init-face: Initializing FAC and viseme channels...
 
-0	set	face neutral face_neutral
+0	set	face neutral
 
 0	set face au 1  left 	
 0	set face au 1  right	
