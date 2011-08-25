@@ -12,23 +12,23 @@ class FeedbackHandler(EventHandler):
 				# replace the $time with the current time
 				t = sim.getTime()
 				tok[4] = str(t)
-				s = "<syncpointprogress characterid=\"" + tok[1] + " id=\"" + tok[2] + ":" + tok[3] + "\" time=\"" + tok[4] + "\"/>"
-				# print s
-				vhmsg("feedback", s)
+				s = "<syncpointprogress characterId=\"" + tok[1] + "\" id=\"" + tok[2] + ":" + tok[3] + "\" time=\"" + tok[4] + "\"/>"
+				print s
+				vhmsg(s)
 			elif (tok[0] == "blockstart"):
 				if (numTokens < 4):
 					return
 				t = sim.getTime()
-				s = "<blockstart characterid=\"" + tok[1] + " id=\"" + tok[2] + "\" time=\"" + tok[3] + "\"/>"
-				# print s
-				vhmsg("feedback", s)
+				s = "<blockstart characterId=\"" + tok[1] + "\" id=\"" + tok[2] + "\" time=\"" + tok[3] + "\"/>"
+				print s
+				vhmsg(s)
 			elif (tok[0] == "blockend"):
 				if (numTokens < 4):
 					return
 				t = sim.getTime()
-				s = "<blockend characterid=\"" + tok[1] + " id=\"" + tok[2] + "\" time=\"" + tok[3] + "\"/>"
-				# print s
-				vhmsg("feedback", s)
+				s = "<blockend characterId=\"" + tok[1] + "\" id=\"" + tok[2] + "\" time=\"" + tok[3] + "\"/>"
+				print s
+				vhmsg(s)
 				
 				
 		
