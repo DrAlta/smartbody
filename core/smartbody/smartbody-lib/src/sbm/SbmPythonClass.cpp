@@ -1099,10 +1099,10 @@ void printLog(std::string message)
 }
 
 
-void sendVHMsg(std::string messageType, std::string message)
+void sendVHMsg(std::string message)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
-	mcu.vhmsg_send(messageType.c_str(), message.c_str());
+	mcu.vhmsg_send(message.c_str());
 }
 
 int getNumCharacters() 
