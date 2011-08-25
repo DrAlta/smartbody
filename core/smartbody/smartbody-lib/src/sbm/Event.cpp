@@ -79,7 +79,7 @@ void EventManager::removeEventHandler(std::string type)
 	{
 		EventHandler* oldHandler = (*iter).second;
 		eventHandlers.erase(iter);
-		delete oldHandler;
+		//delete oldHandler; // deleting old handler causes crash when handler is created with Python - need to fix this
 	}
 }
 

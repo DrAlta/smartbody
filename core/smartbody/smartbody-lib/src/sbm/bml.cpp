@@ -428,6 +428,20 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 			LOG(strstr.str().c_str());
 		}
 
+		if (bp->get_bml_feedback())
+		{
+			// send the feedback message for the start of the bml
+			std::stringstream strstr;
+			strstr << "sbm triggerevent bmlstatus \"blockstart " << actorId << " " << request->msgId << ":" << request->localId  << " " << start_time << "\"";
+			if (start_seq->insert( (float) start_time, strstr.str().c_str()) != CMD_SUCCESS)
+			{
+				std::stringstream strstr;
+					strstr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
+							  "Failed to insert feedback \"" << strstr.str() <<"\" command.";
+					LOG(strstr.str().c_str());
+			}
+		}
+
 		// Sechdule this sequence immediately, before behavior sequences are scheduled
 		{
 			ostringstream oss;
@@ -439,6 +453,8 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 			oss << "Failed to execute BmlRequest sequence \""<<start_seq_name<<"\" (actorId=\""<< actorId << "\", msgId=\"" << msgId << "\")"; 
 			throw RealizingException( oss.str().c_str() );
 		}
+
+		
 	}
 
 	// Realize behaviors
@@ -472,19 +488,6 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 #else
 		end_command << "send vrAgentBML " << actorId << " " << msgId << " end complete";
 
-		if (bp->get_bml_feedback())
-		{
-			// send the feedback message for the end of the bml
-			std::stringstream strstr;
-			strstr << "sbm triggerevent bmlstatus \"" << request->msgId << ":" << request->localId << " bml:end " << end_time << "\"";
-			if (cleanup_seq->insert( (float) end_time, strstr.str().c_str()) != CMD_SUCCESS)
-			{
-				std::stringstream strstr;
-					strstr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
-							  "Failed to insert feedback \"" << strstr.str() <<"\" command.";
-					LOG(strstr.str().c_str());
-			}
-		}
 #endif
 		if( span.persistent )
 		{
@@ -497,6 +500,20 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 			strstr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
 				"Failed to insert \""<<end_command<<"\" command.";
 			LOG(strstr.str().c_str());
+		}
+
+		if (bp->get_bml_feedback())
+		{
+			// send the feedback message for the end of the bml
+			std::stringstream strstr;
+			strstr << "sbm triggerevent bmlstatus \"blockend " << actorId << " " << request->msgId << ":" << request->localId << " " << end_time << "\"";
+			if (cleanup_seq->insert( (float) end_time, strstr.str().c_str()) != CMD_SUCCESS)
+			{
+				std::stringstream strstr;
+					strstr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
+							  "Failed to insert feedback \"" << strstr.str() <<"\" command.";
+					LOG(strstr.str().c_str());
+			}
 		}
 	}
 

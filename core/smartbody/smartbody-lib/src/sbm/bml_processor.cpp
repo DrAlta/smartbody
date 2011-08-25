@@ -323,7 +323,9 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				if (XMLString::compareString( id, XMLString::transcode("") )==0)
 				{
 					std::stringstream newIdStr;
-					newIdStr << "default" << idCounter;
+					const char* defaultTagName = xml_utils::asciiString(tag);
+					newIdStr << defaultTagName << idCounter;
+					delete defaultTagName;
 					child->setAttribute(BMLDefs::ATTR_ID, XMLString::transcode(newIdStr.str().c_str()));
 					id = XMLString::transcode(newIdStr.str().c_str());
 					request->localId = newIdStr.str();
@@ -460,7 +462,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 						if (i == 4) option = "stroke_end";
 						if (i == 5) option = "relax";
 						if (i == 6) option = "end";
-						msg << "<sbm:event message=\"sbm triggerevent bmlstatus &quot;" << request->msgId << ":" << localId << " " << option << " $time&quot;" << "\" stroke=\"" << localId << ":" << option << "\"/>";
+						msg << "<sbm:event message=\"sbm triggerevent bmlstatus &quot;syncpointprogress " << request->actorId << " " << request->msgId << ":" << localId << " " << option << " $time&quot;" << "\" stroke=\"" << localId << ":" << option << "\"/>";
 						std::string newId = unique_id + "_" + option;
 						DOMElement* textXml = xml_utils::parseMessageXml( mcu->bml_processor.xmlParser.get(),  msg.str().c_str())->getDocumentElement();
 						feedbackSyncStart.parseStandardSyncPoints( textXml, request, newId );
