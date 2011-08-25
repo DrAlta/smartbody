@@ -2607,7 +2607,6 @@ int mcu_set_face_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		else
 		{
 			// no motion specified, create the channel without mapping it to a motion
-			faceDefinition->setFaceNeutral(NULL);
 			return CMD_SUCCESS;
 		}
 	} else {
