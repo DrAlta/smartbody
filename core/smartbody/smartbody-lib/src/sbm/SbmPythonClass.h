@@ -275,6 +275,7 @@ void reset();
 
 void printLog(std::string message);
 
+void sendVHMsg(std::string messageType, std::string message);
 int getNumCharacters();
 int getNumPawns();
 SBCharacter* getCharacter(std::string name);
