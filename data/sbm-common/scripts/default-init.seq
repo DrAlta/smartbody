@@ -27,7 +27,7 @@
 1	test bml character doctor noecho posture LHandOnHip_Motex
 1	test bml character elder noecho posture LHandOnHip_Motex
 
-#1	seq default-viewer
+1	seq default-viewer
 
 1	set test character doctor
 1	set test recipient elder
