@@ -1098,6 +1098,13 @@ void printLog(std::string message)
 	LOG(message.c_str());
 }
 
+
+void sendVHMsg(std::string messageType, std::string message)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	mcu.vhmsg_send(messageType.c_str(), message.c_str());
+}
+
 int getNumCharacters() 
 {  
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
