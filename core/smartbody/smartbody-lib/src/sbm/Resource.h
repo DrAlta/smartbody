@@ -50,9 +50,6 @@ class PathResource : public Resource		// Path resources with type [ME/SEQ] speci
 
 		void setPath(const std::string& p);
 		const std::string& getPath();
-
-		void setMediaPath(const std::string& mp);
-		const std::string& getMediaPath();
 		
 		std::string dump();
 	protected:

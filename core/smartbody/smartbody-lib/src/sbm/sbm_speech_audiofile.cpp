@@ -358,70 +358,43 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
       return 0;
    }
 
-   char fullAudioPath[ _MAX_PATH ];
    // if an audio path is present, use it
    bool useAudioPaths = true;
    mcu.audio_paths.reset();
-    std::string relativeAudioPath = mcu.audio_paths.next_path();
-   if (relativeAudioPath.size() == 0 || relativeAudioPath == mcu.media_path)
-   {
-       relativeAudioPath = mcu.speech_audiofile_base_path + voiceCode;
-	   useAudioPaths = false;
-	   // add a one-time deprecation message
-	   static bool deprecationMessageAudioPath = true;
-	   if (deprecationMessageAudioPath)
-	   {
-		   LOG("No audio path has been specified, so using default: %s.", mcu.speech_audiofile_base_path.c_str());
-		   LOG("Instead, use: path audio <audiopath>.");
-		   deprecationMessageAudioPath = false;
-	   }
-   }
-   else
-   {
-	   relativeAudioPath = relativeAudioPath + "/" + voiceCode;
-   }
+   std::string relativeAudioPath = mcu.audio_paths.next_path();
 
 	boost::filesystem::path p( relativeAudioPath );
+	p /= voiceCode;
 	boost::filesystem::path abs_p = boost::filesystem::complete( p );	
 
-#if 1
-	if( boost::filesystem2::exists( abs_p ) == false )	{
-      LOG( "AudioFileSpeech::requestSpeechAudio ERR: boost::filesystem2::exists() returned NULL - '%s' - '%s'\n", relativeAudioPath.c_str(), abs_p.string().c_str() );
+	if( !boost::filesystem2::exists( abs_p ))
+	{
+	  LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
 	  mcu.mark("requestSpeechAudio");
       return 0;
 	}
-#endif
 
-#if _WIN32_
-   if ( _fullpath( fullAudioPath, relativeAudioPath.c_str(), _MAX_PATH ) == NULL )
-   {
-      LOG( "AudioFileSpeech::requestSpeechAudio ERR: _fullpath() returned NULL\n" );
-	  mcu.mark("requestSpeechAudio");
-      return 0;
-   }
-#else
-	strcpy(fullAudioPath, abs_p.native_directory_string().c_str());
-#endif
+	boost::filesystem::path wavPath = abs_p;
+	wavPath /= std::string(ref + ".wav");
+	boost::filesystem::path bmlPath = abs_p;
+	bmlPath /= std::string(ref + ".bml");
+	std::string basePath = abs_p.native_directory_string().c_str();
 
-   m_speechRequestInfo[ m_requestIdCounter ].audioFilename = (string)fullAudioPath + "\\" + ref + ".wav";
-
-
-   // TODO: Should we fail if the .bml file isn't present?
-   string bmlFilename = std::string(fullAudioPath) + "\\" + ref + ".bml";
+	m_speechRequestInfo[ m_requestIdCounter ].audioFilename = wavPath.native_directory_string().c_str();
 
     mcu.mark("requestSpeechAudio", 4, "lips");
-   ReadVisemeDataBML( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent );
+   ReadVisemeDataBML( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent );
    if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
    {
-      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlFilename.c_str() );
+      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlPath.native_directory_string().c_str() );
       return 0;
    }
 
    mcu.mark("requestSpeechAudio", 4, "sync");
-   ReadSpeechTiming( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers );
+   ReadSpeechTiming( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers );
    if ( m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.size() == 0 )
    {
-      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlFilename.c_str() );
+      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.native_directory_string().c_str() );
       return 0;
    }
 

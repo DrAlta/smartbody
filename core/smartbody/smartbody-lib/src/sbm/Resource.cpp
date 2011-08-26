@@ -1,4 +1,5 @@
 #include "Resource.h"
+#include <sbm/mcontrol_util.h>
 
 #include <sstream>
 
@@ -161,20 +162,11 @@ const std::string& PathResource::getType()
 	return type;
 }
 
-void PathResource::setMediaPath(const std::string& mp)
-{
-	mediaPath = mp;
-}
-
-const std::string& PathResource::getMediaPath()
-{
-	return mediaPath;
-}
-
 std::string PathResource::dump()
 {
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::stringstream stream;
-	stream << "Path: [" << type << "] [media path=" << mediaPath << "] " << path;
+	stream << "Path: [" << type << "] [media path=" << mcu.getMediaPath() << "] " << path;
 	stream << Resource::dump();
 	return stream.str();
 }

@@ -63,10 +63,17 @@ std::string srPathList::next_path( void )
 	std::stringstream strstr;
 	// if the path is an absolute path, don't prepend the media path
 	const boost::filesystem::path p = _paths[_curIndex];
-	std::string mediaPath = getPathPrefix();
-	if (mediaPath.size() > 0 && p.has_relative_path())
-		strstr << getPathPrefix() << "\\";
-	strstr << p.string();
+	const std::string& pathPrefix = getPathPrefix();
+	if (pathPrefix.size() > 0 && !p.has_root_path())
+	{
+		boost::filesystem::path mediapath(pathPrefix);
+		mediapath /= p;
+		strstr << mediapath.string();
+	}
+	else
+	{
+		strstr << p.string();
+	}
 
 	boost::filesystem::path finalPath(strstr.str());
 	finalPath.canonize();
