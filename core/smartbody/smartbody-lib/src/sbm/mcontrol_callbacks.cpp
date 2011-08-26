@@ -194,6 +194,7 @@ int mcu_filepath_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
 			pres->setType("audio");
 			// remove the old paths 
 			mcu_p->audio_paths = srPathList();
+			mcu_p->audio_paths.setPathPrefix(mcu_p->getMediaPath());
 			mcu_p->audio_paths.insert( path );
 		}
 		else if(strcmp( path_tok, "mesh") == 0 )
