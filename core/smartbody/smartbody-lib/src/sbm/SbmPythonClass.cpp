@@ -1098,6 +1098,11 @@ void printLog(std::string message)
 	LOG(message.c_str());
 }
 
+void runScript(std::string script)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	mcu.executePythonFile(script.c_str());
+}
 
 void sendVHMsg(std::string message)
 {

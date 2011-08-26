@@ -167,7 +167,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 	boost::python::def("getCharacterNames", getCharacterNames, "Returns a list of all character names.\n Input: NULL \nOutput: list of character names");
 	boost::python::def("getEventManager", getEventManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the event manager.");
 	boost::python::def("getMotion", getMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a the motion of given name.");
-
+	boost::python::def("run", runScript, "Runs a python script.");
 	boost::python::def("vhmsg", sendVHMsg, "Sends a virtual human message.");
 	//#endif
 

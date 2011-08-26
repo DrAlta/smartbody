@@ -4976,6 +4976,12 @@ int mcu_python_func( srArgBuffer& args, mcuCBHandle* mcu_p )
 	return CMD_SUCCESS;
 }
 
+int mcu_pythonscript_func( srArgBuffer& args, mcuCBHandle* mcu_p )
+{
+	std::string scriptName = args.read_token();	
+	return mcu_p->executePythonFile(scriptName.c_str());
+}
+
 
 int addevent_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
