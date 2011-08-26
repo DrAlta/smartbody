@@ -477,6 +477,7 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert( "syncpolicy",          mcu_syncpolicy_func );
    mcu.insert( "check",               mcu_check_func ); // shorthand
    mcu.insert( "python",              mcu_python_func);
+   mcu.insert( "pythonscript",		   mcu_pythonscript_func);
    mcu.insert( "adjustmotion",        mcu_adjust_motion_function );
    mcu.insert( "mediapath",           mcu_mediapath_func);
    mcu.insert( "bml",  test_bml_func );

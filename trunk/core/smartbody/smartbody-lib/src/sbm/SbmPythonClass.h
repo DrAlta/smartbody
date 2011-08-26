@@ -275,6 +275,7 @@ void reset();
 
 void printLog(std::string message);
 
+void runScript(std::string script);
 void sendVHMsg(std::string messageType);
 int getNumCharacters();
 int getNumPawns();

@@ -1528,25 +1528,48 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 int mcuCBHandle::executePythonFile(const char* filename)
 {
 #ifdef USE_PYTHON
-	try {
-		FILE* file = fopen(filename, "r");
-		if (file)
-		{
-			PyRun_SimpleFile(file, filename);
-			PyErr_Print();
-			PyErr_Clear();
-			fclose(file);
-			return CMD_SUCCESS;
-		}
-		else
-		{
+	char buffer[ MAX_FILENAME_LEN ];
+	char label[ MAX_FILENAME_LEN ];	
+	// add the .seq extension if necessary
+	std::string candidateSeqName = filename;
+	if (candidateSeqName.find(".py") == std::string::npos)
+	{
+		candidateSeqName.append(".py");
+	}
+	sprintf( label, "%s", candidateSeqName.c_str());
+	// current path containing .exe
+	char CurrentPath[_MAX_PATH];
+	_getcwd(CurrentPath, _MAX_PATH);
+
+	seq_paths.reset();
+	std::string curFilename = seq_paths.next_filename( buffer, candidateSeqName.c_str() );
+	while (curFilename.size() > 0)
+	{
+		try{
+			FILE* file = fopen(curFilename.c_str(), "r");
 			if (file)
+			{
 				fclose(file);
+				std::stringstream strstr;
+				strstr << "execfile(\"" << curFilename << "\")";
+				PyRun_SimpleString(strstr.str().c_str());
+				PyErr_Print();
+				PyErr_Clear();
+				return CMD_SUCCESS;
+			}
+			else
+			{
+				curFilename = seq_paths.next_filename( buffer, candidateSeqName.c_str() );
+			}
+		} catch (...) {
+			PyErr_Print();
 			return CMD_FAILURE;
 		}
-	} catch (...) {
-		PyErr_Print();
 	}
+
+	LOG("Could not file python script '%s", filename);
+	return CMD_FAILURE;
+
 #endif
 	return CMD_FAILURE;
 }

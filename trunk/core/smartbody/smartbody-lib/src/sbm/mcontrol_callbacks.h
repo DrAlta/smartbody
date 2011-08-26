@@ -128,6 +128,7 @@ int mcu_mediapath_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 int triggerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_python_func( srArgBuffer& args, mcuCBHandle* mcu_p );
+int mcu_pythonscript_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 int addevent_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int removeevent_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int disableevents_func( srArgBuffer& args, mcuCBHandle *mcu_p );
