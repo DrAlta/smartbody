@@ -870,7 +870,8 @@ void mcuCBHandle::update( void )	{
 				iter++)
 			{
 				SbmCharacter* character = (*iter).second;
-				character->steeringAgent->evaluate();
+				if (character->steeringAgent)
+					character->steeringAgent->evaluate();
 			}
 
 			bool running = this->steerEngine._engine->update(false, true, float(this->time) - this->steerEngine.getStartTime());
