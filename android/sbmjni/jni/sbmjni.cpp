@@ -17,6 +17,7 @@
 // OpenGL ES 2.0 code
 
 #include "vhcl_log.h"
+#include <vhmsg-tt.h>
 #include <sbm/mcontrol_util.h>
 #include <sbm/mcontrol_callbacks.h>
 #include <sbm/sbm_test_cmds.hpp>
@@ -60,11 +61,53 @@ static void checkGlError(const char* op) {
     }
 }
 
+void sbm_vhmsg_callback( const char *op, const char *args, void * user_data ) {
+	// Replace singleton with a user_data pointer
+	//if (!mcuInit) return;
+	//LOG("VHMSG Callback : op = %s ,args = %s\n",op,args);
+	switch( mcuCBHandle::singleton().execute( op, (char *)args ) ) {
+		case CMD_NOT_FOUND:
+			LOG("SBM ERR: command NOT FOUND: '%s' + '%s'", op, args );
+			break;
+		case CMD_FAILURE:
+			LOG("SBM ERR: command FAILED: '%s' + '%s'", op, args );
+			break;
+	}
+}
+
+int sbm_main_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
+
+	const char* token = args.read_token();
+	if( strcmp(token,"id")==0 ) {  // Process specific
+		token = args.read_token(); // Process id
+		const char* process_id = mcu_p->process_id.c_str();
+		if( ( mcu_p->process_id == "" )        // If process id unassigned
+			|| strcmp( token, process_id )!=0 ) // or doesn't match
+			return CMD_SUCCESS;                 // Ignore.
+		token = args.read_token(); // Sub-command
+	}
+
+	const char* args_raw = args.read_remainder_raw();
+	srArgBuffer argsRawBuff(args_raw);
+	int result = mcu_p->execute( token, argsRawBuff );
+	switch( result ) {
+		case CMD_NOT_FOUND:
+			LOG("SBM ERR: command NOT FOUND: '%s %s' ", token, args_raw );
+			break;
+		case CMD_FAILURE:
+			LOG("SBM ERR: command FAILED: '%s %s' ", token, args_raw );
+			break;
+		case CMD_SUCCESS:
+			break;
+	}
+	return CMD_SUCCESS;
+}
+
 void mcu_register_callbacks( void ) {
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	//mcu.insert( "sbm",			sbm_main_func );
+	mcu.insert( "sbm",			sbm_main_func );
 	mcu.insert( "help",			mcu_help_func );
 
 	//mcu.insert( "q",			mcu_quit_func );
@@ -249,6 +292,40 @@ void drawSBM(mcuCBHandle& mcu)
 	}
 }
 
+void initConnection()
+{
+	if (!mcuInit) return;	
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	const char* serverName = "172.16.33.14";
+	const char* scope = "DEFAULT_SCOPE";
+	const char* port = "61616";
+	int err;
+	int openConnection = vhmsg::ttu_open(serverName,scope,port);
+	if( openConnection == vhmsg::TTU_SUCCESS )
+	{
+		vhmsg::ttu_set_client_callback( sbm_vhmsg_callback );
+		err = vhmsg::ttu_register( "sbm" );
+		err = vhmsg::ttu_register( "vrAgentBML" );
+		err = vhmsg::ttu_register( "vrExpress" );
+		err = vhmsg::ttu_register( "vrSpeak" );
+		err = vhmsg::ttu_register( "RemoteSpeechReply" );
+		err = vhmsg::ttu_register( "PlaySound" );
+		err = vhmsg::ttu_register( "StopSound" );
+		err = vhmsg::ttu_register( "CommAPI" );
+		err = vhmsg::ttu_register( "object-data" );
+		err = vhmsg::ttu_register( "vrAllCall" );
+		err = vhmsg::ttu_register( "vrKillComponent" );
+		err = vhmsg::ttu_register( "wsp" );
+		err = vhmsg::ttu_register( "receiver" );
+		mcu.vhmsg_enabled = true;
+		LOG("TTU Open Success : server = %s, scope = %s, port = %s",serverName,scope,port);
+	}
+	else
+	{
+		LOG("TTU Open Failed : server = %s, scope = %s, port = %s",serverName,scope,port);
+	}
+}
+
 
 bool setupGraphics(int w, int h) {
 
@@ -312,32 +389,42 @@ void renderFrame() {
 
 extern "C" {
     JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_init(JNIEnv * env, jobject obj,  jint width, jint height);
+	JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_restart(JNIEnv * env, jobject obj);
     JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_step(JNIEnv * env, jobject obj);
+	JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_openConnection(JNIEnv * env, jobject obj);
+	JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_closeConnection(JNIEnv * env, jobject obj);
     JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executeSbm(JNIEnv * env, jobject obj, jstring sbmCmd);
     JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executePython(JNIEnv * env, jobject obj, jstring pythonCmd);
 	JNIEXPORT jstring JNICALL Java_com_android_sbmjni_SbmJNILib_getLog(JNIEnv * env, jobject obj);
 };
 
+
+
+
 void initPython()
 {
 	std::string python_lib_path = "/sdcard/sbmmedia/python";
-	LOGI("Before init Python");
+	//LOGI("Before init Python");
 	initPython(python_lib_path);
+}
+
+void initSmartBody()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.execute("path seq /sdcard/sbmmedia/");
+	mcu.execute("seq default.seq");		
+	TimeRegulator& timer = engine.timer;
+	timer.reset();
+	timer.start();	
 }
 
 JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_init(JNIEnv * env, jobject obj,  jint width, jint height)
 {
-	//LOGI("Starting Sbm Android");
-	//LOGI("Initialize XMLPlatformUtils\n");
-	//sleep(8);
-
-	
-
-	XMLPlatformUtils::Initialize();  // Initialize Xerces before creating MCU
-	//LOGI("Start Initialize mcu\n");
+	if (mcuInit)
+		return;	
+	XMLPlatformUtils::Initialize();  // Initialize Xerces before creating MCU	
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu_register_callbacks();
-	
+	mcu_register_callbacks();	
 	vhcl::Log::g_log.AddListener(&engine.androidListener);
 #ifdef USE_PYTHON
 	initPython();
@@ -348,18 +435,11 @@ JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_init(JNIEnv * env, jobj
 	mcu.register_timer( timer );
 	TimeIntervalProfiler* profiler = new TimeIntervalProfiler();
 	mcu.register_profiler(*profiler);
+	initSmartBody();
 
-    mcu.execute("path seq /sdcard/sbmmedia/");
-    mcu.execute("seq default.seq");
-    //mcu.execute("load skeletons -R /sdcard/sbmmedia/");
-    //mcu.execute("load motions -R /sdcard/sbmmedia/");
-    //mcu.execute("char doctor init common.sk");
-    //mcu.execute("bml char doctor <body posture=\"test\"/>");
-	mcu.execute("pawn foo init");
-	timer.start();	
-    setupGraphics(width, height);
-
+	setupGraphics(width, height);    
 	mcuInit = true;
+	initConnection();
 }
 
 JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_step(JNIEnv * env, jobject obj)
@@ -367,7 +447,8 @@ JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_step(JNIEnv * env, jobj
 	if (!mcuInit) return;
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();	
-	bool update_sim = mcu.update_timer();		
+	bool update_sim = mcu.update_timer();	
+	int err = vhmsg::ttu_poll();
 	if( update_sim ) {
 		mcu.update();
 	}
@@ -382,6 +463,8 @@ JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executeSbm(JNIEnv * env
 	mcuCBHandle& mcu = mcuCBHandle::singleton();	
 	char* sbmCmdStr = const_cast<char*>(sbmCmdStrConst);
 	mcu.execute(sbmCmdStr);
+	//mcu.vhmsg_send("sbm",sbmCmdStr);
+	//mcu.vhmsg_send("sbm","testing sbm message");
 }
 
 JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_executePython(JNIEnv * env, jobject obj, jstring pythonCmd)
@@ -403,4 +486,28 @@ JNIEXPORT jstring JNICALL Java_com_android_sbmjni_SbmJNILib_getLog( JNIEnv * env
 	std::string logStr = engine.androidListener.getLogs();
 	//std::string logStr = "Getting Log through JNI";
 	return env->NewStringUTF(logStr.c_str());
+}
+
+JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_restart( JNIEnv * env, jobject obj )
+{
+	/*
+	if (!mcuInit) return;
+	mcuInit = false;
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.reset();
+	initSmartBody();	
+	mcuInit = true;
+	*/
+}
+
+
+
+JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_openConnection( JNIEnv * env, jobject obj )
+{
+	return initConnection();
+}
+
+JNIEXPORT void JNICALL Java_com_android_sbmjni_SbmJNILib_closeConnection( JNIEnv * env, jobject obj )
+{	
+	vhmsg::ttu_close();
 }
