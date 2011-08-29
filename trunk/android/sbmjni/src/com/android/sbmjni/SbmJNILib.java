@@ -32,6 +32,9 @@ public class SbmJNILib {
      
      public static native void init(int width, int height);
      public static native void step();
+     public static native void openConnection();
+     public static native void closeConnection();
+     public static native void restart();
      public static native void executeSbm(String sbmCmd);
      public static native void executePython(String pyCmd);
      public static native String getLog();
