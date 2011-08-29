@@ -63,6 +63,12 @@ public class SbmJNIActivity extends Activity {
             break;
         case R.id.ShowLog:   
         	showDialog(0);
+        	break;
+        case R.id.Connect:
+        	SbmJNILib.openConnection();
+            break;
+        case R.id.Disconnect:
+        	SbmJNILib.closeConnection();
             break;
         }
         return super.onOptionsItemSelected(item);
