@@ -351,6 +351,8 @@ SkJoint* MeCtReachEngine::findRootJoint( SkSkeleton* sk )
 	bool bStop = false;
 	while (!bStop)
 	{
+		if (rootJoint->num_children() == 0)
+			return rootJoint;
 		SkJoint* child = rootJoint->child(0);
 		SkJointPos* skRootPos = rootJoint->pos();		
 		SkJointPos* skPos = child->pos();

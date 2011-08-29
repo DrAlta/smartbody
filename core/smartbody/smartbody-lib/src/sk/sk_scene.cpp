@@ -31,6 +31,7 @@
 # include <sk/sk_scene.h>
 # include <sk/sk_skeleton.h>
 # include <sk/sk_joint.h>
+#include <vhcl.h>
 
 
 # define DEF_CYL_RADIUS 0.5f
@@ -58,11 +59,20 @@ static SrSnGroup* make_joint_group ( const SkJoint* j, SkSkeleton* s, SrArray<Sr
    int i;
    SrSnGroup* g = new SrSnGroup;
    g->separator ( true );
+   if (j->index() < 0)
+   {
+	   LOG("Joint %s cannot be added to scene graph since joint index is %d", j->name().c_str(), j->index());
+	   return NULL;
+   }
    _jgroup [ j->index() ] = g;
 
    // insert children recursivelly
    for ( i=0; i<j->num_children(); i++ )
-    g->add ( make_joint_group(j->child(i),s,_jgroup) );
+   {
+	   SrSnGroup* group = make_joint_group(j->child(i),s,_jgroup);
+	   if (group)
+	      g->add ( group );
+   }
 
    return g;
  }
@@ -92,6 +102,11 @@ void SkScene::init ( SkSkeleton* s )
    SkJoint* root = s->root();
 //   const char* root_name = root->name().get_string();  // expose to debugger
    SrSnGroup* g = make_joint_group ( root, s, _jgroup );
+   if (!g)
+   {
+	   LOG("Skeleton %s cannot be added to the scene.", _skeleton->name().c_str());
+	   return;
+   }
    g->separator ( true );
   
    sphere = new SrSnSphere; // shared sphere
@@ -219,6 +234,7 @@ void SkScene::rebuild ( int j )
 
 void SkScene::set_visibility ( int skel, int visgeo, int colgeo, int vaxis )
  {
+   if ( !_skeleton ) return;
    const std::vector<SkJoint*>& joints = _skeleton->joints();
    for (size_t i=0; i<joints.size(); i++ )
     { 

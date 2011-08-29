@@ -138,7 +138,7 @@ SRT ReachHandAction::getHandTargetStateOffset( ReachStateData* rd, SRT& naturalS
 {	
 	if (rd->reachTarget.getTargetPawn())
 	{
-		float grabOffset = rd->characterHeight*0.01;
+		float grabOffset = rd->characterHeight*0.01f;
 		SRT handState = rd->reachTarget.getGrabTargetState(naturalState,grabOffset);	
 		return SRT::diff(naturalState,handState);
 	}	
@@ -418,6 +418,8 @@ SRT ReachStateData::getPoseState( BodyMotionFrame& frame )
 {
 	SkJoint* targetJoint = motionParameter->getMotionFrameJoint(frame,effectorState.effectorName.c_str());	
 	SRT poseState;
+	if (!targetJoint)
+		return poseState;
 	poseState.tran = targetJoint->gmat().get_translation();
 	poseState.rot  = SrQuat(targetJoint->gmat());
 	return poseState;
