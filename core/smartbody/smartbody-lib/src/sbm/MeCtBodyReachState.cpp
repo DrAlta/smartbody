@@ -66,14 +66,14 @@ SbmPawn* ReachTarget::getTargetPawn()
 }
 
 
-SRT ReachTarget::getGrabTargetState( SRT& naturalState )
+SRT ReachTarget::getGrabTargetState( SRT& naturalState, float offset )
 {
 	SRT st = naturalState;
 	//st.tran = getTargetState().tran;
 	// if there is a collider object, estimate the correct hand position & orientation
 	if (useTargetPawn && targetPawn && targetPawn->colObj_p)
 	{
-		targetPawn->colObj_p->estimateHandPosture(naturalState.rot,st.tran,st.rot);				
+		targetPawn->colObj_p->estimateHandPosture(naturalState.rot,st.tran,st.rot, offset);				
 	}
 	return st;
 }
@@ -138,7 +138,8 @@ SRT ReachHandAction::getHandTargetStateOffset( ReachStateData* rd, SRT& naturalS
 {	
 	if (rd->reachTarget.getTargetPawn())
 	{
-		SRT handState = rd->reachTarget.getGrabTargetState(naturalState);	
+		float grabOffset = rd->characterHeight*0.01;
+		SRT handState = rd->reachTarget.getGrabTargetState(naturalState,grabOffset);	
 		return SRT::diff(naturalState,handState);
 	}	
 	else

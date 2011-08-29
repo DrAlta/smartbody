@@ -117,7 +117,7 @@ void SbmGeomObject::setWorldState( SbmTransform& rt )
 	globalTransform.gmat(localTransform.gmat().inverse()*rt.gmat());
 }
 
-bool SbmGeomNullObject::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot )
+bool SbmGeomNullObject::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist )
 {
 	outHandPos = getCenter(); outHandRot = naturalRot; return false;
 }
@@ -156,9 +156,9 @@ bool SbmGeomSphere::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float o
 	return false;
 }
 
-bool SbmGeomSphere::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot )
+bool SbmGeomSphere::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist )
 {
-	outHandPos = getCenter() + SrVec(0,radius*1.5f,0)*naturalRot;
+	outHandPos = getCenter() + SrVec(0,radius+offsetDist,0)*naturalRot;
 	outHandRot = naturalRot;
 	return true;
 }
@@ -208,7 +208,7 @@ bool SbmGeomBox::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float offs
 	return true;
 }
 
-bool SbmGeomBox::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot )
+bool SbmGeomBox::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist )
 {
 	
 	SrVec yAxis = SrVec(0,1,0);
@@ -234,7 +234,7 @@ bool SbmGeomBox::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPo
 	SrQuat alignRot = SrQuat(rotAxis,minAngle);
 	
 	outHandRot = alignRot*naturalRot;
-	outHandPos = getCenter() + SrVec(0,objSize*1.8f,0)*outHandRot;
+	outHandPos = getCenter() + SrVec(0,objSize+offsetDist,0)*outHandRot;
 	
 	return true;
 }
@@ -390,7 +390,7 @@ bool SbmGeomCapsule::isIntersect( const SrVec& gPos1, const SrVec& gPos2, float 
 	return false;
 }
 
-bool SbmGeomCapsule::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot )
+bool SbmGeomCapsule::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist )
 {
 	SrVec capAxis = (endPts[1]-endPts[0]); capAxis.normalize();
 	capAxis = capAxis*worldState.rot;
@@ -404,7 +404,7 @@ bool SbmGeomCapsule::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHa
 
 	SrQuat rot = SrQuat(handAxis,orienAxis);
 	outHandRot = rot*naturalRot;//naturalRot*rot;
-	outHandPos = getCenter() + SrVec(0,radius*1.5f,0)*outHandRot;
+	outHandPos = getCenter() + SrVec(0,radius+offsetDist,0)*outHandRot;
 	return true;
 }
 

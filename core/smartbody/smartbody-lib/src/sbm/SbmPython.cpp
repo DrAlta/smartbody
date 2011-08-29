@@ -172,7 +172,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 	boost::python::def("vhmsg2", sendVHMsg2, "Sends a virtual human message.");
 	//#endif
 
-
+#ifdef __ANDROID__
 	boost::python::def("pa", &PyLogger::pa, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
 	boost::python::def("pb", &PyLogger::pb, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
 	boost::python::def("pc", &PyLogger::pc, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
@@ -230,7 +230,8 @@ BOOST_PYTHON_MODULE(SmartBody)
 	
 	boost::python::def("pspace", &PyLogger::pspace, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");	
 	boost::python::def("pnon", &PyLogger::pnon, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");	
-	boost::python::def("outlog", &PyLogger::outlog, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");	
+	boost::python::def("outlog", &PyLogger::outlog, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.");
+#endif
 
 	//boost::python::def("testGetNDArray",testGetNDArray, "Test ND Array");
 	// potential APIs that can be useful:

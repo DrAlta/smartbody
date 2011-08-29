@@ -451,7 +451,7 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 		{
 			int idx = node->nodeIdx;			
 			float nodeWeight = 1.f;//((float)node->nodeLevel+endNode->nodeLevel)/(endNode->nodeLevel*2.f);
-			if (node->nodeName == "r_acromioclavicular" || node->nodeName == "r_forearm") 
+			if (node->nodeName == "r_acromioclavicular" || node->nodeName == "r_forearm" || node->nodeName == "l_forearm" || node->nodeName == "l_acromioclavicular") 
 				nodeWeight = 0.f;
 			if (!node->active)
 				nodeWeight = 0.f;
@@ -517,7 +517,7 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 		{
 			int idx = node->nodeIdx;
 			float nodeWeight = 1.f;
-			if (node->nodeName == "r_acromioclavicular" || node->nodeName == "r_forearm") 
+			if (node->nodeName == "r_acromioclavicular" || node->nodeName == "r_forearm" ||  node->nodeName == "l_forearm" || node->nodeName == "l_acromioclavicular") 
 				nodeWeight = 0.f;
 			if (!node->active)
 				nodeWeight = 0.f;
