@@ -33,7 +33,7 @@ class mcuCBHandle;
 #include <map>
 
 #ifdef __ANDROID__
-#define LINK_VHMSG_CLIENT		(0)
+#define LINK_VHMSG_CLIENT		(1)
 #define USE_WSP 1
 #else
 #define LINK_VHMSG_CLIENT		(1)

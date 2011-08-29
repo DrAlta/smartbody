@@ -18,7 +18,7 @@ public:
 	void setTargetPawn(SbmPawn* tpawn);
 	void setTargetJoint(SkJoint* tjoint);
 	SRT getTargetState(); // the return state is based on target's state
-	SRT getGrabTargetState(SRT& naturalState); 
+	SRT getGrabTargetState(SRT& naturalState, float offset = 0.f); 
 	SbmPawn* getTargetPawn();
 };
 

@@ -956,7 +956,8 @@ void mcuCBHandle::update( void )	{
 #endif
 	
 	bool isClosingBoneBus = false;
-	for (std::map<std::string, SbmPawn*>::iterator iter = getPawnMap().begin();
+    std::map<std::string, SbmPawn*>::iterator iter;
+	for (iter = getPawnMap().begin();
 		iter != getPawnMap().end();
 		iter++)
 	{

@@ -51,7 +51,7 @@ public:
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f) = 0; // check if a point is inside the object	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f) { return false; }; // check if a line segment is intersect with the object
 	// estimate the hand position and orientation
-	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot) = 0;
+	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist = 0.f) = 0;
 };
 
 // a default null object with no geometry
@@ -61,7 +61,7 @@ public:
 	SbmGeomNullObject() {}
 	~SbmGeomNullObject() {}
 	virtual bool isInside(const SrVec& gPos, float offset = 0.f) { return false;}
-	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot);
+	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist);
 };
 
 class SbmGeomSphere : public SbmGeomObject
@@ -73,7 +73,7 @@ public:
 	virtual ~SbmGeomSphere();
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f);	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f);
-	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot);
+	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist);
 };
 
 class SbmGeomBox : public SbmGeomObject
@@ -85,7 +85,7 @@ public:
 	virtual ~SbmGeomBox();
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f);	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f);
-	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot);
+	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist);
 };
 
 // assuming the length is along local y-axis
@@ -100,7 +100,7 @@ public:
 	virtual ~SbmGeomCapsule();
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f);	
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f);
-	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot);
+	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist);
 };
 
 // this is a adapting interface to integrate SrModel tri-mesh into physical simulation framework
@@ -114,7 +114,7 @@ public:
 	// no operations for now
 	virtual bool  isInside(const SrVec& gPos, float offset = 0.f) { return false; }
 	virtual bool  isIntersect(const SrVec& gPos1, const SrVec& gPos2, float offset = 0.f) { return false; }
-	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot) { return false;}
+	virtual bool  estimateHandPosture(const SrQuat& naturalRot, SrVec& outHandPos, SrQuat& outHandRot, float offsetDist) { return false;}
 };
 
 typedef std::vector<SbmGeomObject*> VecOfSbmColObj;

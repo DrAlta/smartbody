@@ -2596,7 +2596,7 @@ void FltkViewer::drawPawns()
 		iter++)
 	{
 		SbmCharacter* character = (*iter).second;
-		pawnSize = 5.f;//character->getHeight()/ 30.0f;
+		pawnSize = character->getHeight()/ 30.0f;
 		break;
 	}
 
@@ -2615,7 +2615,7 @@ void FltkViewer::drawPawns()
 		//glColor3f(1.0f, 1.0f, 0.0f);
 		SrMat gmat = joints[0]->gmat();
 		
-		if (pawn->colObj_p)
+		if (pawn->colObj_p && dynamic_cast<SbmGeomNullObject*>(pawn->colObj_p) == NULL)
 		{
 			//pawn->colObj_p->updateTransform(gmat);
 			//gmat = pawn->colObj_p->worldState.gmat();
