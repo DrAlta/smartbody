@@ -84,6 +84,8 @@ public:
 	void addHistoryItem(const char* item, int index);
 	const char* getHistoryItem(int location, int index);
 	void clearHistory(int index);
+	void setMinOutputSize(int size);
+	int getMinOutputSize();
 
 	static CommandWindow* getCommandWindow(Fl_Widget* w);
 
@@ -118,6 +120,7 @@ private:
 	std::vector<std::string> historyItems[2];
 	int when;
 	char curDir[256];
+	int minOutputSize;
 
 }
 ;

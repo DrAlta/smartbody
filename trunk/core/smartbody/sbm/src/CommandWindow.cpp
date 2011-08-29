@@ -59,6 +59,7 @@ CommandWindow::CommandWindow(int x,int y,int w,int h, const char* s) : GenericVi
 {
        curDir[0] = '\0';
 
+    minOutputSize = 10000;
 	this->begin();
 
 	menubar = new Fl_Menu_Bar(0, 0, w, 25); 
@@ -342,6 +343,13 @@ void CommandWindow::UpdateOutput(char *text, bool origCommand)
 {
 	if(textDisplay == NULL) return;
 
+	// if the display is approaching capacity, then keep the last minOutputSize characters
+	int bufferLength = textDisplay->buffer()->length();
+	if (bufferLength > getMinOutputSize() * 4)
+	{
+		textDisplay->buffer()->remove(0, bufferLength -  getMinOutputSize());
+	}
+
 /*	textDisplay->highlightdata(StyleBuffer, styletable,
 								sizeof(styletable) / sizeof(styletable[0]),
 								'A', styleunfinishedcb, 0);
@@ -464,6 +472,16 @@ void CommandWindow::freeHistorySpace(int index)
 	}
 }
 
+void CommandWindow::setMinOutputSize(int size)
+{
+	minOutputSize = size;
+}
+
+int CommandWindow::getMinOutputSize()
+{
+	return minOutputSize;
+}
+
 CommandViewerFactory::CommandViewerFactory()
 {
 }
@@ -478,3 +496,4 @@ void CommandViewerFactory::destroy(GenericViewer* viewer)
 {
 	delete viewer;
 }
+
