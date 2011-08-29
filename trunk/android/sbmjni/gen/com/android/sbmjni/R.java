@@ -14,6 +14,8 @@ public final class R {
         public static final int icon=0x7f020000;
     }
     public static final class id {
+        public static final int Connect=0x7f06000a;
+        public static final int Disconnect=0x7f06000b;
         public static final int PauseSim=0x7f060008;
         public static final int SbmButton=0x7f060005;
         public static final int SbmText=0x7f060006;
