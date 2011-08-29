@@ -169,6 +169,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 	boost::python::def("getMotion", getMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a the motion of given name.");
 	boost::python::def("run", runScript, "Runs a python script.");
 	boost::python::def("vhmsg", sendVHMsg, "Sends a virtual human message.");
+	boost::python::def("vhmsg2", sendVHMsg2, "Sends a virtual human message.");
 	//#endif
 
 
