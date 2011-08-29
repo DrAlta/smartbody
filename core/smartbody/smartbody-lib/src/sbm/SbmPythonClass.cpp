@@ -1110,6 +1110,12 @@ void sendVHMsg(std::string message)
 	mcu.vhmsg_send(message.c_str());
 }
 
+void sendVHMsg2(std::string message, std::string message2)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	mcu.vhmsg_send(message.c_str(), message2.c_str());
+}
+
 int getNumCharacters() 
 {  
 	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
