@@ -126,6 +126,126 @@ proc int skMargin( int $fileid, int $depth )
    return 1;
 }
 
+// make a quaternion from the given rotation around axis (x,y,z)
+proc skmQuatSet( float $q[], float $x, float $y, float $z, float $degrees )
+{
+   float $radians = 3.1415926535897932 * $degrees / 180.0;
+
+   // normalize axis:
+   $q[ 1 ] = $x;
+   $q[ 2 ] = $y;
+   $q[ 3 ] = $z;
+
+   float $f = $x * $x + $y * $y + $z * $z;
+
+   if ( $f > 0 )
+   {
+      $f = sqrt( $f );
+      $q[ 1 ] /= $f;
+      $q[ 2 ] /= $f;
+      $q[ 3 ] /= $f;
+   }
+
+   // set the quaternion:
+   $radians /= 2;
+   $f = sin( $radians );
+   $q[ 1 ] *= $f;
+   $q[ 2 ] *= $f;
+   $q[ 3 ] *= $f;
+   $q[ 0 ] = cos( $radians );
+}
+
+
+// quaternion multiplication
+proc skmQuatMult( float $q[], float $q1[], float $q2[] )
+{
+   $q[ 0 ] = ( $q1[ 0 ] * $q2[ 0 ] ) - ( $q1[ 1 ] * $q2[ 1 ] + $q1[ 2 ] * $q2[ 2 ] + $q1[ 3 ] * $q2[ 3 ] ); // w1*w2-dot(v1,v2)
+   $q[ 1 ] = $q1[ 2 ] * $q2[ 3 ] - $q1[ 3 ] * $q2[ 2 ]; // cross ($q1.v,$q2.v)
+   $q[ 2 ] = $q1[ 3 ] * $q2[ 1 ] - $q1[ 1 ] * $q2[ 3 ];
+   $q[ 3 ] = $q1[ 1 ] * $q2[ 2 ] - $q1[ 2 ] * $q2[ 1 ];
+   $q[ 1 ] += ( $q1[ 1 ] * $q2[ 0 ] ) + ( $q2[ 1 ] * $q1[ 0 ] );
+   $q[ 2 ] += ( $q1[ 2 ] * $q2[ 0 ] ) + ( $q2[ 2 ] * $q1[ 0 ] );
+   $q[ 3 ] += ( $q1[ 3 ] * $q2[ 0 ] ) + ( $q2[ 3 ] * $q1[ 0 ] );
+ }
+
+
+// quaternion to axis-angle representation
+proc quatToAxisAng( float $q[], float $aa[] )
+{
+   float $ang = 2.0 * acos( $q[ 0 ] );
+   float $norm = sqrt( $q[ 1 ] * $q[ 1 ] + $q[ 2 ] * $q[ 2 ] + $q[ 3 ] * $q[ 3 ] );
+   if ( $norm == 0 || $ang == 0 )
+   {
+      $aa[ 0 ] = 0;
+      $aa[ 1 ] = 0;
+      $aa[ 2 ] = 0;
+   }
+   else
+   {
+      $aa[ 0 ] = ( $q[ 1 ] / $norm ) ;
+      $aa[ 1 ] = ( $q[ 2 ] / $norm ) ;
+      $aa[ 2 ] = ( $q[ 3 ] / $norm ) ;
+    }
+	$aa[3] = $ang*180.0 / 3.1415926535897932;
+}
+
+proc eulerToAxisAngle( float $aa[], float $eu[] )
+{
+
+   float $rad[3];
+   for ($i = 0; $i < 3 ; $i = $i + 1)   
+        $rad[$i] = 3.1415926535897932 * $eu[$i] / 180.0;
+		
+	$c1 = cos($rad[2]/2);
+	$s1 = sin($rad[2]/2);
+	$c2 = cos($rad[1]/2);
+	$s2 = sin($rad[1]/2);
+	$c3 = cos($rad[0]/2);
+	$s3 = sin($rad[0]/2);
+	$c1c2 = $c1*$c2;
+	$s1s2 = $s1*$s2;
+	$w =$c1c2*$c3 - $s1s2*$s3;
+	$x =$c1c2*$s3 + $s1s2*$c3;
+	$y =$s1*$c2*$c3 + $c1*$s2*$s3;
+	$z =$c1*$s2*$c3 - $s1*$c2*$s3;
+	if ($w > 1.0)
+		$w = 1.0;
+	if ($w < -1.0)
+		$w = -1.0;
+		
+	$angle = 2 * acos($w) * 180.0 / 3.1415926535897932;
+	$norm = $x*$x+$y*$y+$z*$z;
+	if ($norm < 0.001) { 
+		$x=1;
+		$y=0;
+		$z=0;
+	} else {
+		$norm = sqrt($norm);
+    	$x = $x / $norm;
+    	$y = $y / $norm;
+    	$z = $z / $norm;
+	}	
+	$aa[0] = $x;
+	$aa[1] = $y;
+	$aa[2] = $z;
+	$aa[3] = $angle;	
+}
+
+proc eulerToAxisAngle2( float $aa[], float $eu[] )
+{	
+    float $qx[4], $qy[4],$qz[4];	
+	skmQuatSet($qx,1,0,0,$eu[0]);
+	skmQuatSet($qy,0,1,0,$eu[1]);
+	skmQuatSet($qz,0,0,1,$eu[2]);
+	
+	float $qt1[4], $qt2[4];
+	
+	skmQuatMult($qt1,$qz,$qy);
+	skmQuatMult($qt2,$qt1,$qx);
+	
+	quatToAxisAng($qt2,$aa);	
+}
+
 
 proc int skWriteSk( string $jname, int $fileid, int $depth, int $showAll, int $useLimits, int $useChannelAttributes )
 {
@@ -206,6 +326,17 @@ proc int skWriteSk( string $jname, int $fileid, int $depth, int $showAll, int $u
    skMargin ( $fileid, $depth );
    fprint $fileid ( "{ offset " );
    fprint $fileid ( skRound( $offset[ 0 ] ) + " " + skRound( $offset[ 1 ] ) + " " + skRound( $offset[ 2 ] ) + "\r\n" );
+   
+   float $eulerRot[3]; 
+   $eulerRot[ 0 ] = `getAttr ( $jname + ".jointOrientX" )`;
+   $eulerRot[ 1 ] = `getAttr ( $jname + ".jointOrientY" )`;
+   $eulerRot[ 2 ] = `getAttr ( $jname + ".jointOrientZ" )`;   
+   float $prerot[4];   
+   eulerToAxisAngle2($prerot, $eulerRot);
+   fprint $fileid ( "  prerot " );
+   fprint $fileid ( " axis " + skRound( $prerot[0] ) + " " + skRound( $prerot[ 1 ] ) + " " + skRound( $prerot[ 2 ] ) + " ang " + skRound( $prerot[ 3 ] )+ "\r\n" );
+   
+   
 
 
    // Write translation channels and limits
@@ -691,6 +822,7 @@ proc updateChannelAttributes(string $jointName)
 	  updateChannelAttributes($Children[$i]);
 	}	  	
 }
+
 
 global proc updateUseChannelAttributes()
 {
