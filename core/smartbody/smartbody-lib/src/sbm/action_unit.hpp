@@ -40,7 +40,8 @@
  *  The unit number is not stored internally.  It can be found
  *  in the ActionUnitMap as a std::pair< int, ActionUnit >.
  */
-class ActionUnit : public SrSharedClass {
+class ActionUnit
+{
 public:
 	SkMotion* left;
 	SkMotion* right;
