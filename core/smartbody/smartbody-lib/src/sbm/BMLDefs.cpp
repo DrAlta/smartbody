@@ -276,6 +276,17 @@ XMLCh* BMLDefs::ATTR_WAGGLE = NULL;
 XMLCh* BMLDefs::TAG_STATES = NULL;
 XMLCh* BMLDefs::ATTR_STARTINGNOW = NULL;
 
+XMLCh* BMLDefs::ATTR_PERCENTAGE_BIN0 = NULL;
+XMLCh* BMLDefs::ATTR_PERCENTAGE_BIN45 = NULL;
+XMLCh* BMLDefs::ATTR_PERCENTAGE_BIN90 = NULL;
+XMLCh* BMLDefs::ATTR_PERCENTAGE_BIN135 = NULL;
+XMLCh* BMLDefs::ATTR_PERCENTAGE_BIN180 = NULL;
+XMLCh* BMLDefs::ATTR_PERCENTAGE_BIN225 = NULL;
+XMLCh* BMLDefs::ATTR_PERCENTAGE_BIN270 = NULL;
+XMLCh* BMLDefs::ATTR_PERCENTAGE_BIN315 = NULL;
+XMLCh* BMLDefs::ATTR_SACCADE_INTERVAL_MEAN = NULL;
+XMLCh* BMLDefs::ATTR_SACCADE_INTERVAL_VARIANT = NULL;
+
 BMLDefs::BMLDefs()
 {
 	ATTR_ID = XMLString::transcode("id");
@@ -566,6 +577,16 @@ BMLDefs::BMLDefs()
 	TAG_STATES = XMLString::transcode("sbm:states");
 	ATTR_STARTINGNOW = XMLString::transcode("sbm:startnow");
 
+	ATTR_PERCENTAGE_BIN0 = XMLString::transcode("sbm:bin0");
+	ATTR_PERCENTAGE_BIN45 = XMLString::transcode("sbm:bin45");
+	ATTR_PERCENTAGE_BIN90 = XMLString::transcode("sbm:bin90");
+	ATTR_PERCENTAGE_BIN135 = XMLString::transcode("sbm:bin135");
+	ATTR_PERCENTAGE_BIN180 = XMLString::transcode("sbm:bin180");
+	ATTR_PERCENTAGE_BIN225 = XMLString::transcode("sbm:bin225");
+	ATTR_PERCENTAGE_BIN270 = XMLString::transcode("sbm:bin270");
+	ATTR_PERCENTAGE_BIN315 = XMLString::transcode("sbm:bin315");
+	ATTR_SACCADE_INTERVAL_MEAN = XMLString::transcode("sbm:mean");
+	ATTR_SACCADE_INTERVAL_VARIANT = XMLString::transcode("sbm:variant");
 }
 
 }

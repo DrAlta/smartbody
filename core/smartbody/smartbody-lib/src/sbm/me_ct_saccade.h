@@ -79,7 +79,6 @@ class MeCtSaccade : public SmartBody::SBController
 		float			_thinkingPercentBin270;
 		float			_thinkingPercentBin315;
 		// magnitude stat
-		float			_highestFrequency;
 		float			_talkingLimit;
 		float			_listeningLimit;
 		float			_thinkingLimit;
@@ -109,17 +108,15 @@ class MeCtSaccade : public SmartBody::SBController
 		// set and get
 		bool getValid()						{return _valid;}
 		void setValid(bool v)				{_valid = v;}
-		void setTalkingAngleLimit(float v)	{_talkingLimit = v;}
-		float getTalkingAngleLimit()		{return _talkingLimit;}
-		void setListeningAngleLimit(float v){_listeningLimit = v;}
-		float getListeningAngleLimit()		{return _listeningLimit;}
-		void setThinkingAngleLimit(float v)	{_thinkingLimit = v;}
-		float getThinkingAngleLimit()		{return _thinkingLimit;}
 		void setBehaviorMode(BehaviorMode m){_behaviorMode = m;}
 		BehaviorMode getBehaviorMode()		{return _behaviorMode;}
 		bool getUseModel()					{return _useModel;}
 		void setUseModel(bool v)			{_useModel = v;}
+		void setAngleLimit(float angle);
+		float getAngleLimit();
 		void spawnOnce(float dir, float amplitude, float dur);
+		void setPercentageBins(float b0, float b45, float b90, float b135, float b180, float b225, float b270, float b315);
+		void setGaussianParameter(float mean, float variant);
 
 	private:
 		void spawning(double t);

@@ -95,17 +95,32 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 		}
 	}
 
+	const char* bin0 = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN0));
+	const char* bin45 = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN45));
+	const char* bin90 = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN90));
+	const char* bin135 = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN135));
+	const char* bin180 = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN180));
+	const char* bin225 = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN225));
+	const char* bin270 = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN270));
+	const char* bin315 = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN315));
+	if (strcmp(bin0, "") != 0 && strcmp(bin45, "") != 0 && strcmp(bin90, "") != 0 && strcmp(bin135, "") != 0 &&
+		strcmp(bin180, "") != 0 && strcmp(bin225, "") != 0 && strcmp(bin270, "") != 0 && strcmp(bin315, "") != 0)
+	{
+		saccade_ct->setPercentageBins((float)atof(bin0), (float)atof(bin45), (float)atof(bin90), (float)atof(bin135), (float)atof(bin180), (float)atof(bin225), (float)atof(bin270), (float)atof(bin315)); 
+	}
+
+	const char* mean = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_SACCADE_INTERVAL_MEAN));
+	const char* variant = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_SACCADE_INTERVAL_VARIANT));
+	if (strcmp(mean, "") != 0 && strcmp(variant, "") != 0)
+	{
+		saccade_ct->setGaussianParameter((float)atof(mean), (float)atof(variant));
+	}
+
 	const char* limitAngle = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_ANGLELIMIT));
 	if (strcmp(limitAngle, "") != 0)
 	{
 		float angle = (float)atof(limitAngle);
-		MeCtSaccade::BehaviorMode mode = saccade_ct->getBehaviorMode();
-		if (mode == MeCtSaccade::Talking)
-			saccade_ct->setTalkingAngleLimit(angle);
-		if (mode == MeCtSaccade::Listening)
-			saccade_ct->setListeningAngleLimit(angle);
-		if (mode == MeCtSaccade::Thinking)
-			saccade_ct->setThinkingAngleLimit(angle);
+		saccade_ct->setAngleLimit(angle);
 	}
 
 	const char* finishFlag = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_FINISH));
