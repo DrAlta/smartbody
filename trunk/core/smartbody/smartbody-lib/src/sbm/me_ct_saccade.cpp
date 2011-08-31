@@ -73,17 +73,26 @@ MeCtSaccade::MeCtSaccade(SkSkeleton* skel) : SmartBody::SBController()
 	_thinkingPercentBin315 = 6.79f;
 
 	// magnitude stat
-	_highestFrequency = 15.0f;	// unit: percentage
 //	_talkingLimit =	27.5f;		// unit: degree
 //	_listeningLimit = 22.7f;
-	_talkingLimit =	10.0f;			// unit: degree							expose
-	_listeningLimit = 8.0f;			//										expose
+	_talkingLimit =	12.0f;			// unit: degree							expose
+	_listeningLimit = 10.0f;			//										expose
 	_thinkingLimit = _talkingLimit;	// make up data
 
 	// inter-saccadic interval stat
 	_listeningPercentMutual = 75.0f;		// mutual gaze or gaze away
 	_talkingPercentMutual = 41.0f;
 	_thinkingPercentMutual = _talkingPercentMutual;
+	_talkingMutualMean = 93.9f;		// unit: second
+	_talkingMutualVariant = 94.9f;	
+	_talkingAwayMean = 27.8f;
+	_talkingAwayVariant = 24.0f;
+	_listeningMutualMean = 237.5f;
+	_listeningMutualVariant = 47.1f;
+	_listeningAwayMean = 13.0f;
+	_listeningAwayVariant = 7.1f;
+	_thinkingMean = 180.0f;
+	_thinkingVariant = 47.0f;  
 	_minInterval = 0.001f;
 	
 	// duration stat
@@ -97,9 +106,8 @@ MeCtSaccade::MeCtSaccade(SkSkeleton* skel) : SmartBody::SBController()
 	//hf->setValue(5.0);
 	//_defaultAttributes.push_back(hf);
 	//addDefaultAttributeDouble("saccade.talkingLimit", 5, &_talkingLimit);	
-	addDefaultAttributeFloat("saccade.talkingLimit", 5.f, &_talkingLimit);
-	addDefaultAttributeFloat("saccade.talkingPercentMutual", 41.0f, &_talkingPercentMutual);
-
+	//addDefaultAttributeFloat("saccade.talkingLimit", 5.f, &_talkingLimit);
+	//addDefaultAttributeFloat("saccade.talkingPercentMutual", 41.0f, &_talkingPercentMutual);
 }
 
 MeCtSaccade::~MeCtSaccade()
@@ -301,9 +309,9 @@ float MeCtSaccade::magnitudeRandom()
 	// below is adhoc
 	// direction 0 and 180 is moving up and down, it should have a limit
 	if (_direction == 90.0f || _direction == 270.0f)		
-		limit *= 0.3f;
+		limit *= 0.5f;
 	if (_direction == 45.0f || _direction == 135.0f || _direction == 225.0f || _direction == 315.0f)
-		limit *= 0.35f;
+		limit *= 0.75f;
 
 	if (a > limit)
 		a = limit;
@@ -329,15 +337,15 @@ float MeCtSaccade::intervalRandom()
 	while (interval < _minInterval)
 	{
 		if (_intervalMode == Mutual && _behaviorMode == Talking)
-			interval = gaussianRandom(_talkingMutualMean, _talkingMutualVariant);
+			interval = gaussianRandom(_talkingMutualMean * (float)_dt, _talkingMutualVariant * (float)_dt);
 		if (_intervalMode == Away && _behaviorMode == Talking)
-			interval = gaussianRandom(_talkingAwayMean, _talkingAwayVariant);
+			interval = gaussianRandom(_talkingAwayMean * (float)_dt, _talkingAwayVariant * (float)_dt);
 		if (_intervalMode == Mutual && _behaviorMode == Listening)
-			interval = gaussianRandom(_listeningMutualMean, _listeningMutualVariant);
+			interval = gaussianRandom(_listeningMutualMean * (float)_dt, _listeningMutualVariant * (float)_dt);
 		if (_intervalMode == Away && _behaviorMode == Listening)
-			interval = gaussianRandom(_listeningAwayMean, _listeningAwayVariant);
+			interval = gaussianRandom(_listeningAwayMean * (float)_dt, _listeningAwayVariant * (float)_dt);
 		if (_behaviorMode == Thinking)
-			interval = gaussianRandom(_thinkingMean, _thinkingVariant);
+			interval = gaussianRandom(_thinkingMean * (float)_dt, _thinkingVariant * (float)_dt);
 	}
 	return interval;
 }
@@ -365,20 +373,7 @@ void MeCtSaccade::initSaccade(MeFrameData& frame)
 			LOG("MeCtSaccade::initBufferIndex ERR: channel id not correct!");
 
 		_initialized = true;
-	}
-
-	// saccade statistics that depends on dt
-	_talkingMutualMean = 93.9f * (float)_dt;		// unit: second
-	_talkingMutualVariant = 94.9f * (float)_dt;	
-	_talkingAwayMean = 27.8f * (float)_dt;
-	_talkingAwayVariant = 24.0f * (float)_dt;
-	_listeningMutualMean = 237.5f * (float)_dt;
-	_listeningMutualVariant = 47.1f * (float)_dt;
-	_listeningAwayMean = 13.0f * (float)_dt;
-	_listeningAwayVariant = 7.1f * (float)_dt;
-	// below data is made up
-	_thinkingMean = 180.0f * (float)_dt;
-	_thinkingVariant = 47.0f * (float)_dt;    
+	}  
 }
 
 bool MeCtSaccade::controller_evaluate(double t, MeFrameData& frame)
@@ -399,4 +394,88 @@ bool MeCtSaccade::controller_evaluate(double t, MeFrameData& frame)
 		processing(t, frame);
 	}
 	return true;
+}
+
+// P.S: I am defintely coming back to refactoring this controller code. Now it's so stupid organized... 
+void MeCtSaccade::setPercentageBins(float b0, float b45, float b90, float b135, float b180, float b225, float b270, float b315)
+{
+	b315 = 100 - b0 - b45 - b135 - b180 - b225 - b270;
+	if (_behaviorMode == Talking || _behaviorMode == Listening)
+	{
+		_percentBin0 = b0;
+		_percentBin45 = b45;
+		_percentBin90 = b90;
+		_percentBin135 = b135;
+		_percentBin180 = b180;
+		_percentBin225 = b225;
+		_percentBin270 = b270;
+		_percentBin315 = b315;
+	}
+	if (_behaviorMode == Thinking)
+	{
+		_thinkingPercentBin0 = b0;
+		_thinkingPercentBin45 = b45;
+		_thinkingPercentBin90 = b90;
+		_thinkingPercentBin135 = b135;
+		_thinkingPercentBin180 = b180;
+		_thinkingPercentBin225 = b225;
+		_thinkingPercentBin270 = b270;
+		_thinkingPercentBin315 = b315;	
+	}
+}
+
+void MeCtSaccade::setGaussianParameter(float mean, float variant)
+{
+	if (_behaviorMode == Talking)
+	{
+		_talkingMutualMean = mean;
+		_talkingMutualVariant = variant;
+		_talkingAwayMean = mean;
+		_talkingAwayVariant = variant;
+	}
+	if (_behaviorMode == Listening)
+	{
+		_listeningMutualMean = mean;
+		_listeningMutualVariant = variant;
+		_listeningAwayMean = mean;
+		_listeningAwayVariant = variant;
+	}
+	if (_behaviorMode == Thinking)
+	{
+		_thinkingMean = mean;
+		_thinkingVariant = variant;
+	}
+}
+
+void MeCtSaccade::setAngleLimit(float angle)
+{
+	if (_behaviorMode == Talking)
+	{
+		_talkingLimit = angle;
+	}
+	if (_behaviorMode == Listening)
+	{
+		_listeningLimit = angle;
+	}
+	if (_behaviorMode == Thinking)
+	{
+		_thinkingLimit = angle;
+	}
+}
+
+float MeCtSaccade::getAngleLimit()
+{
+	if (_behaviorMode == Talking)
+	{
+		return _talkingLimit;
+	}
+	if (_behaviorMode == Listening)
+	{
+		return _listeningLimit;
+	}
+	if (_behaviorMode == Thinking)
+	{
+		return _thinkingLimit;
+	}
+	return 0;
 }
