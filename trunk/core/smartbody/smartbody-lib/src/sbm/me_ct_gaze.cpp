@@ -677,7 +677,7 @@ void MeCtGaze::update_skeleton_gmat( void )	{
 		}
 	}
 	else	{
-		LOG("MeCtGaze::update_skeleton_gmat ERR: skeleton NOT FOUND" );
+		//LOG("MeCtGaze::update_skeleton_gmat ERR: skeleton NOT FOUND" );
 	}
 }
 
@@ -885,6 +885,10 @@ void MeCtGaze::controller_start_evaluate( void )	{
 
 	if( _context->channels().size() > 0 )	{
 		skeleton_ref_p = _context->channels().skeleton();
+	}
+	else
+	{
+		LOG("No gazing channels found.");
 	}
 	
 	// ensure skeleton global tansforms are up to date

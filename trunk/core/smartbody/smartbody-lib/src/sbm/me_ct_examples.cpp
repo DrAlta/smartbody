@@ -89,6 +89,8 @@ bool MeCtHeadOrient::controller_evaluate( double t, MeFrameData& frame )	{
 	for( int i=0; i<channels_size; ++i ) {
 
 		int index = frame.toBufferIndex( _toContextCh[ i ] );
+		if (index == -1)
+			continue;
 
 		euler_t E_in = quat_t(
 			buff[ index + 0 ],
@@ -193,6 +195,8 @@ bool MeCtSimpleTilt::controller_evaluate( double t, MeFrameData& frame )	{
 	for( int i=0; i<channels_size; ++i ) {
 
 		int index = frame.toBufferIndex( _toContextCh[ i ] );
+		if (index == -1)
+			continue;
 
 		euler_t E_in = quat_t(
 			buff[ index + 0 ],
@@ -381,6 +385,8 @@ prev_dt = dt;
 		// get buffer index
 		int context_channel_index = _toContextCh[ local_channel_index ];
 		int index = frame.toBufferIndex( context_channel_index );
+		if (index == -1)
+			continue;
 
 		quat_t Q_in = quat_t(
 			buff[ index + 0 ],
