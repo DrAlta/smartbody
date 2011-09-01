@@ -1,25 +1,25 @@
 /*
- *  me_ct_examples.cpp - part of SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcus Thiebaux, USC
- *      Andrew n marshall, USC
- */
+*  me_ct_examples.cpp - part of SmartBody-lib
+*  Copyright (C) 2008  University of Southern California
+*
+*  SmartBody-lib is free software: you can redistribute it and/or
+*  modify it under the terms of the Lesser GNU General Public License
+*  as published by the Free Software Foundation, version 3 of the
+*  license.
+*
+*  SmartBody-lib is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*  Lesser GNU General Public License for more details.
+*
+*  You should have received a copy of the Lesser GNU General Public
+*  License along with SmartBody-lib.  If not, see:
+*      http://www.gnu.org/licenses/lgpl-3.0.txt
+*
+*  CONTRIBUTORS:
+*      Marcus Thiebaux, USC
+*      Andrew n marshall, USC
+*/
 
 #include "me_ct_examples.h"
 #include "gwiz_math.h"
@@ -32,7 +32,7 @@ using namespace gwiz;
 ///////////////////////////////////////////////////////////////////////////
 
 /*
-	HEAD ORIENT JOINTS: { "spine4", "spine5", "skullbase" }
+HEAD ORIENT JOINTS: { "spine4", "spine5", "skullbase" }
 */
 
 std::string MeCtHeadOrient::_type_name = "HeadOrient";
@@ -54,7 +54,7 @@ void MeCtHeadOrient::init( SbmPawn* pawn )	{
 		"skullbase"
 	};
 	int i;
-	
+
 	for( i = 0; i < 3; i++ )	{
 		_channels.add( joint_labels[ i ], SkChannel::Quat );
 	}
@@ -63,7 +63,7 @@ void MeCtHeadOrient::init( SbmPawn* pawn )	{
 }
 
 void MeCtHeadOrient::set_orient( float dur, float p, float h, float r )	{
-	
+
 	_duration = dur;
 	_pitch_deg = p;
 	_heading_deg = h;
@@ -79,7 +79,7 @@ bool MeCtHeadOrient::controller_evaluate( double t, MeFrameData& frame )	{
 			return( FALSE );
 		}
 	}
-	
+
 	SrBuffer<float>& buff = frame.buffer();
 	int channels_size = _channels.size();
 	float p_deg_per_joint = _pitch_deg / (float)channels_size;
@@ -92,13 +92,15 @@ bool MeCtHeadOrient::controller_evaluate( double t, MeFrameData& frame )	{
 		if (index == -1)
 			continue;
 
+		if (index == -1)
+			continue;
 		euler_t E_in = quat_t(
 			buff[ index + 0 ],
 			buff[ index + 1 ],
 			buff[ index + 2 ],
 			buff[ index + 3 ]
 		);
-		
+
 		quat_t Q_out;
 		if( frame.isChannelUpdated( i ) )	{
 			// If channel has been touched, preserve components and add delta
@@ -106,7 +108,7 @@ bool MeCtHeadOrient::controller_evaluate( double t, MeFrameData& frame )	{
 				E_in.p() + p_deg_per_joint,
 				E_in.h() + h_deg_per_joint,
 				E_in.r() + r_deg_per_joint
-			);
+				);
 		}
 		else	{
 			// If channel has NOT been touched, set absolute values
@@ -114,9 +116,9 @@ bool MeCtHeadOrient::controller_evaluate( double t, MeFrameData& frame )	{
 				p_deg_per_joint,
 				h_deg_per_joint,
 				r_deg_per_joint
-			);
+				);
 		}
-		
+
 		buff[ index + 0 ] = (float) Q_out.w();
 		buff[ index + 1 ] = (float) Q_out.x();
 		buff[ index + 2 ] = (float) Q_out.y();
@@ -136,7 +138,7 @@ void MeCtHeadOrient::print_state( int tabs )	{
 	if( str )
 		LOG(" \"%s\"", str );
 
-    LOG(" p:%.3g h:%.3g r:%.3g degs for %.3g sec\n", 
+	LOG(" p:%.3g h:%.3g r:%.3g degs for %.3g sec\n", 
 		_pitch_deg, _heading_deg, _roll_deg, _duration );
 }
 
@@ -144,7 +146,7 @@ void MeCtHeadOrient::print_state( int tabs )	{
 ///////////////////////////////////////////////////////////////////////////
 
 /*
-	TILTING JOINTS: { "spine4", "spine5", "skullbase" }
+TILTING JOINTS: { "spine4", "spine5", "skullbase" }
 */
 
 std::string MeCtSimpleTilt::_type_name = "SimpleTilt";
@@ -173,7 +175,7 @@ void MeCtSimpleTilt::init( SbmPawn* pawn )	{
 }
 
 void MeCtSimpleTilt::set_tilt( float dur, float angle_deg )	{
-	
+
 	_duration = dur;
 	_angle_deg = angle_deg;
 }
@@ -187,7 +189,7 @@ bool MeCtSimpleTilt::controller_evaluate( double t, MeFrameData& frame )	{
 			return( FALSE );
 		}
 	}
-	
+
 	SrBuffer<float>& buff = frame.buffer();
 	int channels_size = _channels.size();
 	float angle_deg_per_joint = _angle_deg / (float)channels_size;
@@ -198,13 +200,15 @@ bool MeCtSimpleTilt::controller_evaluate( double t, MeFrameData& frame )	{
 		if (index == -1)
 			continue;
 
+		if (index == -1)
+			continue;
 		euler_t E_in = quat_t(
 			buff[ index + 0 ],
 			buff[ index + 1 ],
 			buff[ index + 2 ],
 			buff[ index + 3 ]
 		);
-		
+
 		quat_t Q_out;
 		if( frame.isChannelUpdated( i ) )	{
 			// If channel has been touched, preserve components and add delta
@@ -212,7 +216,7 @@ bool MeCtSimpleTilt::controller_evaluate( double t, MeFrameData& frame )	{
 				E_in.p(),
 				E_in.h(),
 				E_in.r() + angle_deg_per_joint
-			);
+				);
 		}
 		else	{
 			// If channel has NOT been touched, set absolute values
@@ -220,9 +224,9 @@ bool MeCtSimpleTilt::controller_evaluate( double t, MeFrameData& frame )	{
 				0.0,
 				0.0,
 				angle_deg_per_joint
-			);
+				);
 		}
-		
+
 		buff[ index + 0 ] = (float) Q_out.w();
 		buff[ index + 1 ] = (float) Q_out.x();
 		buff[ index + 2 ] = (float) Q_out.y();
@@ -242,14 +246,14 @@ void MeCtSimpleTilt::print_state( int tabs )	{
 	if( str )
 		LOG(" \"%s\"", str );
 
-    LOG(" %.3g degs for %.3g sec\n", _angle_deg, _duration );
+	LOG(" %.3g degs for %.3g sec\n", _angle_deg, _duration );
 }
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
 /*
-	NODDING JOINTS: { "spine4", "spine5", "skullbase" }
+NODDING JOINTS: { "spine4", "spine5", "skullbase" }
 */
 
 std::string MeCtSimpleNod::_type_name = "SimpleNod";
@@ -271,7 +275,7 @@ void MeCtSimpleNod::init( SbmPawn* pawn )	{
 		"skullbase"
 	};
 	int i;
-	
+
 	for( i = 0; i < 3; i++ )	{
 		_channels.add( joint_labels[ i ], SkChannel::Quat );
 	}
@@ -282,7 +286,7 @@ void MeCtSimpleNod::init( SbmPawn* pawn )	{
 }
 
 void MeCtSimpleNod::set_nod( float dur, float mag, float rep, int aff, float smooth )	{
-	
+
 	_mode = NOD_SIMPLE;
 	_duration = dur;
 	_magnitude = mag;
@@ -301,7 +305,7 @@ float MeCtSimpleNod::calc_wiggle_curve( float t, float warp, float accel_pow )	{
 
 	double d = t / ( p * warp );			// decay envelope
 	double v = ( ( 1.0 + cos( M_PI + a * M_PI ) ) * 0.5 ) * d;
-	
+
 	return( (float)v );
 }
 
@@ -312,14 +316,14 @@ float MeCtSimpleNod::calc_waggle_curve( float t, float length, float pitch, floa
 
 	double A = pow( u, (double)decay_pow ); 		// decay acceleration
 	double d = sin( A * M_PI ) * 0.5;		// decay envelope
-	
+
 	double p = -M_PI * 0.5 * pitch; 		// pitch adjustment
 	double v = ( sin( p + a * M_PI ) - sin( p ) ) * d;
 	return( (float)v );
 }
 
 bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
-	
+
 	if( _duration > 0.0 )	{
 		if( t > (double)_duration * 2.0) {
 			return( false );
@@ -344,24 +348,24 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 			angle_deg = (float)( -_magnitude * sin( x * 2.0 * M_PI * _repetitions ) );
 		}
 		else
-		if( _mode == NOD_WIGGLE )	{
-			
-			float scale_time = (float)t / _period;
-			angle_deg = -_magnitude * calc_wiggle_curve( scale_time, _warp, _accel_pow );
-		}
-		else
-		if( _mode == NOD_WAGGLE )	{
+			if( _mode == NOD_WIGGLE )	{
 
-			float scale_time = (float)t / _period;
-			float scale_dur = _duration / _period;
-			angle_deg =  -_magnitude * calc_waggle_curve( scale_time, scale_dur, _pitch, _warp, _accel_pow, _decay_pow );
-		}
-		else	{
-			LOG( "MeCtSimpleNod::controller_evaluate ERR: mode %d not recognized" );
-			return( false );
-		}
+				float scale_time = (float)t / _period;
+				angle_deg = -_magnitude * calc_wiggle_curve( scale_time, _warp, _accel_pow );
+			}
+			else
+				if( _mode == NOD_WAGGLE )	{
+
+					float scale_time = (float)t / _period;
+					float scale_dur = _duration / _period;
+					angle_deg =  -_magnitude * calc_waggle_curve( scale_time, scale_dur, _pitch, _warp, _accel_pow, _decay_pow );
+				}
+				else	{
+					LOG( "MeCtSimpleNod::controller_evaluate ERR: mode %d not recognized" );
+					return( false );
+				}
 	}
-	
+
 	SrBuffer<float>& buff = frame.buffer();
 
 	// All of our channels are quats and recieve the same values
@@ -371,15 +375,15 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 	float smooth_lerp = (float)(0.01 + ( 1.0 - powf( _smooth, dt * 30.0f /*SMOOTH_RATE_REF*/ ) ) * 0.99);
 
 #if 0
-static double prev_dt = 0.1;
-printf( "sm:%f fps:%f dtsm:%f dif:%f\n", _smooth, 1.0/dt, smooth_lerp, dt - prev_dt );
-prev_dt = dt;
+	static double prev_dt = 0.1;
+	printf( "sm:%f fps:%f dtsm:%f dif:%f\n", _smooth, 1.0/dt, smooth_lerp, dt - prev_dt );
+	prev_dt = dt;
 #endif
 
-//double deg_sum = 0.0;
+	//double deg_sum = 0.0;
 	for( int local_channel_index=0;
-			local_channel_index<channels_size;
-			++local_channel_index )
+		local_channel_index<channels_size;
+		++local_channel_index )
 	{
 
 		// get buffer index
@@ -387,7 +391,6 @@ prev_dt = dt;
 		int index = frame.toBufferIndex( context_channel_index );
 		if (index == -1)
 			continue;
-
 		quat_t Q_in = quat_t(
 			buff[ index + 0 ],
 			buff[ index + 1 ],
@@ -404,14 +407,14 @@ prev_dt = dt;
 					E_in.p() + angle_deg_per_joint,
 					E_in.h(),
 					E_in.r()
-				);
+					);
 			}
 			else	{
 				Q_out = euler_t(
 					E_in.p(),
 					E_in.h() + angle_deg_per_joint,
 					E_in.r()
-				);
+					);
 			}
 		}
 		else	{
@@ -421,48 +424,48 @@ prev_dt = dt;
 					angle_deg_per_joint,
 					0.0,
 					0.0
-				);
+					);
 			}
 			else	{
 				Q_out = euler_t(
 					0.0,
 					angle_deg_per_joint,
 					0.0
-				);
+					);
 			}
 		}
 
 #if 1
 		Q_out.lerp( 
-				smooth_lerp, 
-				Q_in
+			smooth_lerp, 
+			Q_in
 			);
 #elif 0
 		Q_out.lerp( 
-				smooth_lerp, 
-				Q_out,
-				Q_in
+			smooth_lerp, 
+			Q_out,
+			Q_in
 			);
 #elif 1
 		Q_out.lerp( 
-				smooth_lerp, 
-				Q_in,
-				Q_out
+			smooth_lerp, 
+			Q_in,
+			Q_out
 			);
 #else
 		Q_out = Q_in;
 #endif
 
 #if 0
-if( local_channel_index == 2 )	{
-	static double prev_in = 0.0;
-	static double prev_out = 0.0;
-	double delt_dps = ( Q_out.degrees() - prev_out )/dt;
-	if( abs( delt_dps ) > 3.0 )
-		printf( "d-in:%f d-out:%f d-dps:%f out:%f\n", Q_in.degrees() - prev_in, Q_out.degrees() - prev_out, delt_dps, Q_out.degrees() );
-	prev_in = Q_in.degrees();
-	prev_out = Q_out.degrees();
-}
+		if( local_channel_index == 2 )	{
+			static double prev_in = 0.0;
+			static double prev_out = 0.0;
+			double delt_dps = ( Q_out.degrees() - prev_out )/dt;
+			if( abs( delt_dps ) > 3.0 )
+				printf( "d-in:%f d-out:%f d-dps:%f out:%f\n", Q_in.degrees() - prev_in, Q_out.degrees() - prev_out, delt_dps, Q_out.degrees() );
+			prev_in = Q_in.degrees();
+			prev_out = Q_out.degrees();
+		}
 #endif
 
 		buff[ index + 0 ] = (float) Q_out.w();
@@ -473,15 +476,15 @@ if( local_channel_index == 2 )	{
 		// Mark channel changed
 		frame.channelUpdated( context_channel_index );
 
-//euler_t E_out = Q_out;
-//deg_sum += E_out.p();
+		//euler_t E_out = Q_out;
+		//deg_sum += E_out.p();
 	}
 
-//printf( "mag: %f deg: %f out: %f\n", _magnitude, angle_deg, deg_sum );
+	//printf( "mag: %f deg: %f out: %f\n", _magnitude, angle_deg, deg_sum );
 
 	return( TRUE );
 }
-		
+
 void MeCtSimpleNod::print_state( int tabs )	{
 	LOG("MeCtSimpleNod" );
 
@@ -489,12 +492,12 @@ void MeCtSimpleNod::print_state( int tabs )	{
 	if( str )
 		LOG(" \"%s\"", str );
 
-    if( _affirmative )
+	if( _affirmative )
 		LOG(" affirmative" );
-    else
+	else
 		LOG(" negative" );
 
-    LOG(" %.3g reps @ %.3g degs for %.3g sec\n", _repetitions, _magnitude, _duration );
+	LOG(" %.3g reps @ %.3g degs for %.3g sec\n", _repetitions, _magnitude, _duration );
 }
 
 ///////////////////////////////////////////////////////////////////////////

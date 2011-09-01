@@ -1,26 +1,26 @@
 /*
- *  sbm_pawn.cpp - part of SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Andrew n marshall, USC
- *      Ed Fast, USC
- *      Thomas Amundsen, USC
- */
+*  sbm_pawn.cpp - part of SmartBody-lib
+*  Copyright (C) 2008  University of Southern California
+*
+*  SmartBody-lib is free software: you can redistribute it and/or
+*  modify it under the terms of the Lesser GNU General Public License
+*  as published by the Free Software Foundation, version 3 of the
+*  license.
+*
+*  SmartBody-lib is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*  Lesser GNU General Public License for more details.
+*
+*  You should have received a copy of the Lesser GNU General Public
+*  License along with SmartBody-lib.  If not, see:
+*      http://www.gnu.org/licenses/lgpl-3.0.txt
+*
+*  CONTRIBUTORS:
+*      Andrew n marshall, USC
+*      Ed Fast, USC
+*      Thomas Amundsen, USC
+*/
 
 #include "vhcl.h"
 #include <sbm/mcontrol_util.h>
@@ -131,15 +131,15 @@ SbmPawn::SbmPawn() : DObject()
 
 // Constructor
 SbmPawn::SbmPawn( const char * name ) : DObject(),
-	scene_p( NULL ),
+scene_p( NULL ),
 #ifdef __ANDROID__ // don't use the GPU version in android
-	dMesh_p( new DeformableMesh() ),
+dMesh_p( new DeformableMesh() ),
 #else
-	dMesh_p( new SbmDeformableMeshGPU() ),
+dMesh_p( new SbmDeformableMeshGPU() ),
 #endif
-	ct_tree_p( MeControllerTreeRoot::create() ),
-	world_offset_writer_p( new MeCtChannelWriter() ),
-	wo_cache_timestamp( -std::numeric_limits<float>::max() )
+ct_tree_p( MeControllerTreeRoot::create() ),
+world_offset_writer_p( new MeCtChannelWriter() ),
+wo_cache_timestamp( -std::numeric_limits<float>::max() )
 {
 	setName( name );
 	//_skeleton->ref();
@@ -199,10 +199,10 @@ void SbmPawn::setSkeleton(SkSkeleton* sk)
 	{
 		ct_tree_p->remove_skeleton( _skeleton->name() );
 		_skeleton->unref();
-//		if( scene_p != NULL )
-//		{
-//			mcu.remove_scene( scene_p );
-//		}
+		//		if( scene_p != NULL )
+		//		{
+		//			mcu.remove_scene( scene_p );
+		//		}
 	}
 	_skeleton = sk;
 	_skeleton->ref();
@@ -236,10 +236,10 @@ int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 		}
 	}
 
-// 	if (colObj_p)
-// 	{
-// 		initPhysicsObj();
-// 	}
+	// 	if (colObj_p)
+	// 	{
+	// 		initPhysicsObj();
+	// 	}
 
 
 	if (!scene_p)
@@ -248,7 +248,7 @@ int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 		scene_p->ref();
 		scene_p->init( _skeleton );  // if skeleton_p == NULL, the scene is cleared
 	}
-//	dMesh_p->skeleton = new_skeleton_p;		
+	//	dMesh_p->skeleton = new_skeleton_p;		
 	dMesh_p->setSkeleton(new_skeleton_p);
 
 	// Name the controllers
@@ -270,6 +270,7 @@ int SbmPawn::setup() {
 
 	SkJoint* world_offset_joint = _skeleton->insert_new_root_joint( SkJoint::TypeQuat );
 	world_offset_joint->name( SbmPawn::WORLD_OFFSET_JOINT_NAME );
+	world_offset_joint->extName( SbmPawn::WORLD_OFFSET_JOINT_NAME );
 	// Make sure the world_offset accepts new pos and quat values
 	SkJointPos* world_offset_pos = world_offset_joint->pos();
 	world_offset_pos->limits( SkVecLimits::X, false );
@@ -312,6 +313,7 @@ int SbmPawn::init_skeleton() {
 
 	SkJoint* world_offset_joint = _skeleton->insert_new_root_joint( SkJoint::TypeQuat );
 	world_offset_joint->name( SbmPawn::WORLD_OFFSET_JOINT_NAME );
+	world_offset_joint->extName( SbmPawn::WORLD_OFFSET_JOINT_NAME );
 	// Make sure the world_offset accepts new pos and quat values
 	SkJointPos* world_offset_pos = world_offset_joint->pos();
 	world_offset_pos->limits( SkVecLimits::X, false );
@@ -387,7 +389,7 @@ int SbmPawn::prune_controller_tree() {
 
 void SbmPawn::remove_from_scene() {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	
+
 	if( scene_p != NULL )
 		mcu.remove_scene( scene_p );
 	mcu.removePawn( getName() );
@@ -414,7 +416,7 @@ void SbmPawn::register_controller_cleanup( MeController* ct, controller_cleanup_
 
 void SbmPawn::exec_controller_cleanup( MeController* ct, mcuCBHandle* mcu_p ) {
 	typedef std::multimap<MeController*,controller_cleanup_callback_fp>::iterator fp_iterator;
-	
+
 	fp_iterator lower = ct_cleanup_funcs.lower_bound( ct );
 	fp_iterator upper = ct_cleanup_funcs.upper_bound( ct );
 
@@ -438,12 +440,12 @@ SbmPawn::~SbmPawn()	{
 	}
 
 	if ( bonebusCharacter )
-    {
-	   mcuCBHandle& mcu = mcuCBHandle::singleton();
-	   if (mcu.sendPawnUpdates)
-		   mcuCBHandle::singleton().bonebus.DeleteCharacter( bonebusCharacter );
-       bonebusCharacter = NULL;
-    }
+	{
+		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		if (mcu.sendPawnUpdates)
+			mcuCBHandle::singleton().bonebus.DeleteCharacter( bonebusCharacter );
+		bonebusCharacter = NULL;
+	}
 
 	if ( world_offset_writer_p )
 		world_offset_writer_p->unref();
@@ -455,7 +457,7 @@ SbmPawn::~SbmPawn()	{
 	if( _skeleton )
 		_skeleton->unref();
 	ct_tree_p->unref();
-    
+
 	if (colObj_p)
 		delete colObj_p;
 	if (phyObj_p)
@@ -482,17 +484,17 @@ const SkJoint* SbmPawn::get_joint( const char* joint_name ) const {
 
 
 void SbmPawn::get_world_offset( float& x, float& y, float& z,
-								 float& yaw, float& pitch, float& roll ) {
-	if( mcuCBHandle::singleton().time != wo_cache_timestamp )
-		wo_cache_update();
+							   float& yaw, float& pitch, float& roll ) {
+								   if( mcuCBHandle::singleton().time != wo_cache_timestamp )
+									   wo_cache_update();
 
-	x = wo_cache.x;
-	y = wo_cache.y;
-	z = wo_cache.z;
-	yaw = wo_cache.h;
-	pitch = wo_cache.p;
-	roll = wo_cache.r;
-	return;
+								   x = wo_cache.x;
+								   y = wo_cache.y;
+								   z = wo_cache.z;
+								   yaw = wo_cache.h;
+								   pitch = wo_cache.p;
+								   roll = wo_cache.r;
+								   return;
 }
 
 void SbmPawn::setWorldOffset( const SrMat& newWorld )
@@ -505,7 +507,7 @@ void SbmPawn::setWorldOffset( const SrMat& newWorld )
 }
 
 void SbmPawn::set_world_offset( float x, float y, float z,
-                                float yaw, float pitch, float roll )
+							   float yaw, float pitch, float roll )
 {
 	// Store values since they are not written to the joint immediately
 	wo_cache.x = x;
@@ -527,23 +529,23 @@ void SbmPawn::set_world_offset( float x, float y, float z,
 	woj_pos->value( SkJointPos::Y, y );
 	woj_pos->value( SkJointPos::Z, z );
 
-	
+
 	std::stringstream strstr;
 	switch( woj->rot_type() ) {
 		case SkJoint::TypeEuler: {
-				SkJointEuler* joint_euler = woj->euler();
-				joint_euler->value( SkJointPos::X, pitch );
-				joint_euler->value( SkJointPos::Y, yaw );
-				joint_euler->value( SkJointPos::Z, roll );
-			}
-			break;
+			SkJointEuler* joint_euler = woj->euler();
+			joint_euler->value( SkJointPos::X, pitch );
+			joint_euler->value( SkJointPos::Y, yaw );
+			joint_euler->value( SkJointPos::Z, roll );
+								 }
+								 break;
 		case SkJoint::TypeQuat: {
-				SkJointQuat* joint_quat = woj->quat();
-				gwiz::quat_t q = gwiz::euler_t(pitch,yaw,roll);
-				float q_data[4] = { (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z() };
-				joint_quat->value( q_data );
-			}
-			break;
+			SkJointQuat* joint_quat = woj->quat();
+			gwiz::quat_t q = gwiz::euler_t(pitch,yaw,roll);
+			float q_data[4] = { (float)q.w(), (float)q.x(), (float)q.y(), (float)q.z() };
+			joint_quat->value( q_data );
+								}
+								break;
 		case SkJoint::TypeSwingTwist:
 			strstr << "ERROR: SbmPawn::set_world_offset(..): Unsupported joint rotation type SwingTwist.";
 			LOG(strstr.str().c_str());
@@ -596,7 +598,7 @@ void SbmPawn::wo_cache_update() {
 int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	string pawn_name = args.read_token();
 	if( pawn_name.length()==0 ) {
-		
+
 		std::stringstream strstr;
 		strstr << "ERROR: Expected pawn name." << endl;
 		LOG(strstr.str().c_str());
@@ -728,7 +730,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		// 			SbmGeomObject* colObj = new SbmGeomNullObject();
 		// 			pawn_p->colObj_p = colObj;
 		// 		}
-		
+
 		bool ok = mcu_p->addPawn( pawn_p );
 		if( !ok )	{
 			std::stringstream strstr;
@@ -803,7 +805,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		return result;
 	} else if( pawn_cmd=="remove" ) {
 		if( pawn_p != NULL ) {
-			
+
 			pawn_p->remove_from_scene();
 			return CMD_SUCCESS;
 		} else {
@@ -850,7 +852,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 				size[0] = pawn_p->steeringSpaceObjSize.x = args.read_float();
 				size[1] = pawn_p->steeringSpaceObjSize.y = args.read_float();
 				size[2] = pawn_p->steeringSpaceObjSize.z = args.read_float();
-				
+
 				has_geom = true;
 			} else {
 				std::stringstream strstr;
@@ -916,8 +918,8 @@ int SbmPawn::remove_from_scene( const char* pawn_name ) {
 
 	if( strcmp( pawn_name, "*" )==0 ) {
 		for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-				iter != mcu.getPawnMap().end();
-				iter++)
+			iter != mcu.getPawnMap().end();
+			iter++)
 		{
 			SbmPawn* pawn = (*iter).second;
 			pawn->remove_from_scene();
@@ -976,7 +978,7 @@ int SbmPawn::set_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& args,
 			for (size_t j = 0; j < joints.size(); j++)
 			{
 				LOG("%s : %f", joints[j]->name().c_str(), joints[j]->mass());
-				
+
 			}
 			return CMD_SUCCESS;
 		}
@@ -1125,7 +1127,7 @@ int SbmPawn::print_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& arg
 }
 
 int SbmPawn::create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
-	
+
 	std::string pawn_and_attribute = args.read_token();
 	int interval = args.read_int();
 
@@ -1198,7 +1200,7 @@ int SbmPawn::remove_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	std::string pawn_name = args.read_token();
 
 	if( pawn_name.length()==0 ) {
-	
+
 		LOG("ERROR: Expected pawn name.");
 		return CMD_FAILURE;
 	}
@@ -1541,7 +1543,7 @@ bool SbmPawn::hasPhysicsSim()
 {
 	if (!phyObj_p)
 		return false;
-	
+
 	return phyObj_p->hasPhysicsSim();
 }
 
