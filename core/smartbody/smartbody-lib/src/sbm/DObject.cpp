@@ -8,7 +8,14 @@ DObject::DObject()
 
 DObject::~DObject()
 {
+	for (std::map<std::string, DAttribute*>::iterator iter = m_attributeList.begin();
+		 iter != m_attributeList.end();
+		 iter++)
+	{
+		delete (*iter).second;
+	}
 	delete m_attributeManager;
+
 }
 
 void DObject::setName(const std::string& name)
