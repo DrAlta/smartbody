@@ -83,26 +83,18 @@ std::string BML::EventRequest::getSyncPointName()
 BehaviorRequestPtr BML::parse_bml_event( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, mcuCBHandle *mcu ) {
 
     const XMLCh* tag      = elem->getTagName();
-	const XMLCh* attrMesg = elem->getAttribute( BMLDefs::ATTR_MESSAGE );
+	std::string msg  = xml_parse_string( BMLDefs::ATTR_MESSAGE, elem, "");	
 
-	const XMLCh* attrStroke = elem->getAttribute( BMLDefs::ATTR_STROKE );
-	std::string spName;
-	if (attrStroke)
+	std::string spName = xml_parse_string( BMLDefs::ATTR_STROKE, elem, "");	
+	std::string localId  = xml_parse_string( BMLDefs::ATTR_ID, elem, "");	
+	
+
+	if (msg != "" )
+	{	
+		return BehaviorRequestPtr( new EventRequest( unique_id, localId, msg.c_str(), behav_syncs, spName ) );
+	} 
+	else
 	{
-		spName = XMLString::transcode(attrStroke);
-	}
-
-	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
-	std::string localId;
-	if (id)
-	{
-		localId = XMLString::transcode(id);
-	}
-
-
-	if( attrMesg && attrMesg[0]!='\0' ) {
-        return BehaviorRequestPtr( new EventRequest( unique_id, localId, XMLString::transcode( attrMesg ), behav_syncs, spName ) );
-	} else {
 		xml_parse_error( BMLDefs::ATTR_MESSAGE, elem );
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
