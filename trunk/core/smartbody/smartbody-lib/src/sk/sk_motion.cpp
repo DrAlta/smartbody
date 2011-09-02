@@ -187,7 +187,7 @@ void SkMotion::connect ( float* buffer )
 void SkMotion::apply_frame ( int f ) {
 	apply_frame( f, _floatbuffer, NULL );
 }
-void SkMotion::apply_frame ( int f, float* buffer, SrBuffer<int>* map_p ) {
+void SkMotion::apply_frame ( int f, float* buffer, SrBuffer<int>* map_p, bool isAdditive ) {
 	if ( _frames.size()==0 )
 		return;
 
@@ -209,8 +209,40 @@ void SkMotion::apply_frame ( int f, float* buffer, SrBuffer<int>* map_p ) {
 				if( index >= 0 ) {
 					// channel exists in data
 					float* v = buffer + map_p->get(i);  // pointer to start of this channel's floats
-					for( int j=0; j<num; ++j )
-						v[j] = fp[j];
+					if (isAdditive)
+					{
+						if (num == 1) // channel of size one, add previous value with current value
+						{
+							v[0] += fp[0];
+						}
+						else if (num == 4) // quaternion data, compose quaternions
+						{
+							SrQuat existingQuat(
+										v[0 ],
+										v[1 ],
+										v[2 ],
+										v[3 ]);
+							SrQuat addQuat(
+										fp[0 ],
+										fp[1 ],
+										fp[2 ],
+										fp[3 ]);
+							SrQuat finalQuat = existingQuat * addQuat;
+							for( int j=0; j<num; ++j )
+								v[j] += finalQuat.getData(j);
+
+						}
+						else // other channel type, add to old values
+						{
+							for( int j=0; j<num; ++j )
+								v[j] += fp[j];
+						}
+					}
+					else
+					{
+						for( int j=0; j<num; ++j )
+							v[j] = fp[j];
+					}
 				} // else skip data
 
 				// Increment motion data pointer by channel size
@@ -255,7 +287,7 @@ void SkMotion::apply ( float t, SkMotion::InterpType itype, int* lastframe ) {
 
 void SkMotion::apply ( float t,  
                        float* buffer, SrBuffer<int>* map_p,
-                       SkMotion::InterpType itype, int* lastframe )
+                       SkMotion::InterpType itype, int* lastframe, bool isAdditive )
 {
 	int fsize=_frames.size();
 	if ( fsize<=0 )
@@ -331,7 +363,37 @@ void SkMotion::apply ( float t,
 					// channel exists in data
 //					float* v = buffer + map_p->get(i);  // pointer to start of this channel's floats
 					float* v = buffer + index;  // pointer to start of this channel's floats
-					num = _channels[i].interp ( v, fp1, fp2, t );
+					if (isAdditive)
+					{
+						if (_channels[i].type == SkChannel::Quat)
+						{
+							float addQuat[4];
+							num = _channels[i].interp ( addQuat, fp1, fp2, t );
+							SrQuat orig(v[0], v[1], v[2], v[3]);
+							SrQuat add(addQuat[0], addQuat[1], addQuat[2], addQuat[3]);
+							SrQuat final = orig * add;
+							for (int x = 0; x < 4; x++)
+								v[x] = final.getData(x);
+						}
+						else if (num <= 3)
+						{
+							float vec[3];
+							num = _channels[i].interp ( vec, fp1, fp2, t );
+							for (int x = 0; x < num; x++)
+								v[x] += vec[x];
+						}
+						else
+						{
+							// more that 3 channels but not a quaternion? Don't add data, just replace it...
+							num = _channels[i].interp ( v, fp1, fp2, t );
+						}
+					}
+					else
+					{
+						
+						num = _channels[i].interp ( v, fp1, fp2, t );
+					}
+					
 				}
 
 				// Increment frame data pointers
@@ -340,8 +402,37 @@ void SkMotion::apply ( float t,
 		} else {
 			//  Assume float data is in motion's channel order
 			float* v = buffer;  // point to the start of all floats
-			for ( int i=0; i<csize; i++ ) {
-				num = _channels[i].interp ( v, fp1, fp2, t );
+			for ( int i=0; i<csize; i++ )
+			{
+				if (isAdditive)
+				{
+					if (_channels[i].type == SkChannel::Quat)
+					{
+						float addQuat[4];
+						num = _channels[i].interp ( addQuat, fp1, fp2, t );
+						SrQuat orig(v[0], v[1], v[2], v[3]);
+						SrQuat add(addQuat[0], addQuat[1], addQuat[2], addQuat[3]);
+						SrQuat final = orig * add;
+						for (int x = 0; x < 4; x++)
+							v[x] = final.getData(x);
+					}
+					else if (num <= 3)
+					{
+						float vec[3];
+						num = _channels[i].interp ( vec, fp1, fp2, t );
+						for (int x = 0; x < num; x++)
+							v[x] += vec[x];
+					}
+					else
+					{
+						// more that 3 channels but not a quaternion? Don't add data, just replace it...
+						num = _channels[i].interp ( v, fp1, fp2, t );
+					}
+				}
+				else
+				{
+					num = _channels[i].interp ( v, fp1, fp2, t );
+				}
 				v+=num; fp1+=num; fp2+=num;
 			}
 		}
@@ -353,7 +444,38 @@ void SkMotion::apply ( float t,
 		for ( int i=0; i<csize; i++ ) {
 			if ( _channels[i].joint ) {
 				_channels[i].interp ( values, fp1, fp2, t );
-				num = _channels[i].set ( values );
+				float origValues[4];
+				_channels[i].get(origValues);
+				if (isAdditive)
+				{
+					if (_channels[i].type == SkChannel::Quat)
+					{
+						SrQuat orig(origValues[0], origValues[1], origValues[2], origValues[3]);
+						SrQuat add(values[0], values[1], values[2], values[3]);
+						SrQuat final = orig * add;
+						float finalVal[4];
+						for (int x = 0; x < 4; x++)
+							finalVal[x] = final.getData(x);
+						_channels[i].set(finalVal);
+					}
+					else if (num <= 3)
+					{
+						float vec[3];
+						num = _channels[i].interp ( vec, fp1, fp2, t );
+						for (int x = 0; x < num; x++)
+							origValues[x] += vec[x];
+						_channels[i].set(origValues);
+					}
+					else
+					{
+						// more that 3 channels but not a quaternion? Don't add data, just replace it...
+						num = _channels[i].set ( values );
+					}
+				}
+				else
+				{
+					num = _channels[i].set ( values );
+				}
 			} else {
 				num = _channels[i].size();
 			}

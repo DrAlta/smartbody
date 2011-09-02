@@ -509,7 +509,11 @@ bool SbmDeformableMeshGPU::initBuffer()
 			for (int i=0; i < numTris ; i++)
 			{
 				SrModel& model = dMeshStatic->shape();
-				SrModel::Face& faceIdx = dMeshStatic->shape().F[i];				
+				if (dMeshStatic->shape().F.size() == 0)
+					continue;
+				SrModel::Face& faceIdx = dMeshStatic->shape().F[i];			
+				if (dMeshStatic->shape().Fn.size() == 0)
+					continue;
 				SrModel::Face& nIdx = dMeshStatic->shape().Fn[i];
 				SrModel::Face& tIdx = defaultIdx;
 				if (model.Ft.size() > i)
@@ -587,6 +591,8 @@ bool SbmDeformableMeshGPU::initBuffer()
 			int numTexCoords = dMeshStatic->shape().T.size();
 			for (int i = 0; i < numVertices; i++)
 			{
+				if (i >= (int) skinWeight->numInfJoints.size())
+					continue;
 				int numOfInfJoints = skinWeight->numInfJoints[i];				
 				SrVec& lv = dMeshStatic->shape().V[i];					
 				posBuffer(iVtx) = Vec4f(lv[0],lv[1],lv[2],1.f);
@@ -659,6 +665,10 @@ bool SbmDeformableMeshGPU::initBuffer()
 			int numTris = dMeshStatic->shape().F.size();
 			for (int i=0; i < numTris ; i++)
 			{
+				if (dMeshStatic->shape().F.size() <= i)
+					continue;
+				if (dMeshStatic->shape().Fn.size() <= i)
+					continue;
 				SrModel::Face& faceIdx = dMeshStatic->shape().F[i];
 				SrModel::Face& normalIdx = dMeshStatic->shape().Fn[i];
 				SrModel::Face& texCoordIdx = defaultIdx;

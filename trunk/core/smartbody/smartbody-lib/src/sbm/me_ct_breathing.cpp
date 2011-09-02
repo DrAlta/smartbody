@@ -53,7 +53,7 @@ MeCtBreathing::MeCtBreathing ()
 	_pending_bpm = -1;
 	_expiratory_reserve_volume_threshold = 0;
 
-	_incremental = false;
+	_incremental = true;
 }
 
 MeCtBreathing::~MeCtBreathing ()
@@ -297,9 +297,8 @@ bool MeCtBreathing::controller_evaluate ( double t, MeFrameData& frame )
 	_previous_breath_is_inspiring = current_breath_layer()->cycle->is_inspiring();
 	if(_incremental)
 	{
-		// ??????
-		//_motion->apply_incremental( 
-		//	frameTime, &(frame.buffer()[0]), &_mChan_to_buff, SkMotion::Linear, &_last_apply_frame );
+		_motion->apply( 
+			frameTime, &(frame.buffer()[0]), &_mChan_to_buff, SkMotion::Linear, &_last_apply_frame, true );
 	}
 	else
 	{
