@@ -453,7 +453,9 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 						BehaviorSyncPoints feedbackSyncStart;
 						//bml char doctor <animation name="LHandOnHip_RArm_SweepRight"/>
 						std::stringstream msg;
-						std::string localId = XMLString::transcode(id);
+						char* idChar = XMLString::transcode(id);
+						std::string localId = idChar;
+						delete idChar;
 						std::string option;
 						if (i == 0) option = "start";
 						if (i == 1) option = "ready";
