@@ -308,8 +308,13 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, FaceDefinition* faceD
 		auItem->user_data((void*)ITEM_AU_MAP);
 		std::string auType = "bilateral:";
 		if (au->is_bilateral())
-		{			
-			Fl_Tree_Item* item = resourceTree->add(auItem,(auType+ au->left->name()).c_str());
+		{	
+			Fl_Tree_Item* item = NULL;
+			if (au->left)
+				item = resourceTree->add(auItem,(auType+ au->left->name()).c_str());
+			else
+				item = resourceTree->add(auItem, auType.c_str());
+
 			item->user_data((void*)ITEM_AU_MAP);
 		}
 		else 
@@ -317,13 +322,28 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, FaceDefinition* faceD
 			if (au->is_left())
 			{
 				auType = "left:";
-				Fl_Tree_Item* item = resourceTree->add(auItem,(auType+au->left->name()).c_str());
+				Fl_Tree_Item* item = NULL;
+				if (au->left)
+				{
+					item = resourceTree->add(auItem,(auType+au->left->name()).c_str());
+				}
+				else
+				{
+					item = resourceTree->add(auItem, auType.c_str());
+				}
 				item->user_data((void*)ITEM_AU_MAP);
 			}
 			if (au->is_right())
 			{
 				auType = "right:";
-				Fl_Tree_Item* item = resourceTree->add(auItem,(auType+au->right->name()).c_str());
+				if (au->right)
+				{
+					item = resourceTree->add(auItem,(auType+au->right->name()).c_str());
+				}
+				else
+				{
+					item = resourceTree->add(auItem, auType.c_str());
+				}
 				item->user_data((void*)ITEM_AU_MAP);
 			}
 		}		
