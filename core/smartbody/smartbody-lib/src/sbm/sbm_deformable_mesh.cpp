@@ -82,6 +82,8 @@ void DeformableMesh::update()
 				int numVertices = dMeshStatic->shape().V.size();
 				for (int i = 0; i < numVertices; i++)
 				{
+					if (i >= (int) skinWeight->numInfJoints.size())
+						continue;
 					int numOfInfJoints = skinWeight->numInfJoints[i];
 					if (numOfInfJoints > maxJoint)
 						maxJoint = numOfInfJoints;

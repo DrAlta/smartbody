@@ -295,6 +295,16 @@ void MeCtSimpleNod::set_nod( float dur, float mag, float rep, int aff, float smo
 	_smooth = smooth;
 }
 
+bool MeCtSimpleNod::isNod()
+{
+	return (_affirmative == 1 && _mode == NOD_SIMPLE);
+}
+
+bool MeCtSimpleNod::isShake()
+{
+	return (_affirmative == 0 && _mode == NOD_SIMPLE);
+}
+
 void MeCtSimpleNod::controller_start()	{}
 
 float MeCtSimpleNod::calc_wiggle_curve( float t, float warp, float accel_pow )	{
