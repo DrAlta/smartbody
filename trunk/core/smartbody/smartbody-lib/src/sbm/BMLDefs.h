@@ -283,6 +283,13 @@ class BMLDefs
 		static XMLCh* ATTR_PERCENTAGE_BIN315;
 		static XMLCh* ATTR_SACCADE_INTERVAL_MEAN;
 		static XMLCh* ATTR_SACCADE_INTERVAL_VARIANT;
+
+		// OpenCollada
+		static XMLCh* ATTR_SID;
+		static XMLCh* ATTR_COUNT;
+		static XMLCh* ATTR_INPUT;
+		static XMLCh* ATTR_SEMANTIC;
+		static XMLCh* ATTR_VCOUNT;
 };
 
 

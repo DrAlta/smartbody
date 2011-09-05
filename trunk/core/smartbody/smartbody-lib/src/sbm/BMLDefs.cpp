@@ -287,6 +287,13 @@ XMLCh* BMLDefs::ATTR_PERCENTAGE_BIN315 = NULL;
 XMLCh* BMLDefs::ATTR_SACCADE_INTERVAL_MEAN = NULL;
 XMLCh* BMLDefs::ATTR_SACCADE_INTERVAL_VARIANT = NULL;
 
+// OpenCollada
+XMLCh* BMLDefs::ATTR_SID = NULL;
+XMLCh* BMLDefs::ATTR_COUNT = NULL;
+XMLCh* BMLDefs::ATTR_INPUT = NULL;
+XMLCh* BMLDefs::ATTR_SEMANTIC = NULL;
+XMLCh* BMLDefs::ATTR_VCOUNT = NULL;
+
 BMLDefs::BMLDefs()
 {
 	ATTR_ID = XMLString::transcode("id");
@@ -587,6 +594,13 @@ BMLDefs::BMLDefs()
 	ATTR_PERCENTAGE_BIN315 = XMLString::transcode("sbm:bin315");
 	ATTR_SACCADE_INTERVAL_MEAN = XMLString::transcode("sbm:mean");
 	ATTR_SACCADE_INTERVAL_VARIANT = XMLString::transcode("sbm:variant");
+
+	// OpenCollada
+	ATTR_SID = XMLString::transcode("sid");
+	ATTR_COUNT = XMLString::transcode("count");
+	ATTR_INPUT = XMLString::transcode("input");
+	ATTR_SEMANTIC = XMLString::transcode("semantic");
+	ATTR_VCOUNT = XMLString::transcode("vcount");
 }
 
 }

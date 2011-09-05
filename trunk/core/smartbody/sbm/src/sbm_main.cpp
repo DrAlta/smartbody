@@ -575,21 +575,6 @@ std::string test_cmdl_tab_callback( std::string io_str )	{
 
 int main( int argc, char **argv )	{
 
-#if ENABLE_CMDL_TEST
-#define EARLY_EXIT 1
-
-#if 0
-gwiz::cmdl test_cmd;
-test_cmd.test_editor();
-#else
-std::string str = test_cmdl_tab_callback( std::string( "demo" ) );
-fprintf( stdout, "output:'%s'\n", str.c_str() );
-#endif
-
-#else
-#define EARLY_EXIT 0
-#endif
-
  // 808: undefined reference to `bonebus::BoneBusCharacter::StartSendBoneRotations()'
 //	return( 0 );
 

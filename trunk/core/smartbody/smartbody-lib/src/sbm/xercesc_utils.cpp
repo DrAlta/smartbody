@@ -194,28 +194,6 @@ bool xml_utils::xml_parse_int(
 	return( false );
 }
 
-/*
-	bool set_aim_offset_param = false;
-	float aim_offset_p = 0.0;
-	float aim_offset_h = 0.0;
-	float aim_offset_r = 0.0;
-	const XMLCh* attrAimOffset = elem->getAttribute( BMLDefs::ATTR_AIM_OFFSET );
-	if( attrAimOffset && *attrAimOffset != 0 ) {
-		char* temp_ascii = XMLString::transcode( attrAimOffset );
-		string parse_buffer( temp_ascii );
-		istringstream parser( parse_buffer );
-		if( !( parser >> aim_offset_p >> aim_offset_h >> aim_offset_r ) ) {
-			std::wstringstream wstrstr;
-			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<< BMLDefs::ATTR_AIM_OFFSET<<"=\""<<attrAimOffset<<"\" is not valid.";
-			std::string str = convertWStringToString(wstrstr.str());
-			LOG(str.c_str());
-		}
-		else	{
-			set_aim_offset_param = true;
-		}
-		XMLString::release( &temp_ascii );
-	}
-*/
 int xml_utils::xml_parse_double( 
 	double *d_arr,
 	int arr_count,
@@ -439,23 +417,30 @@ void xml_utils::xmlToString( const DOMNode* node, string& converted ){ //recursi
 	switch( node->getNodeType() ) {
 		case DOMNode::TEXT_NODE:
 		{
-			converted += XMLString::transcode(node->getTextContent());
+			std::string temp;
+			xml_utils::xml_translate(&temp, node->getTextContent());
+			converted += temp;
 			break;
 		}
 
 		case DOMNode::ELEMENT_NODE:
 		{
 			DOMElement *element= (DOMElement *)node; //instantiate an element using this node
-			string tag= XMLString::transcode(element->getTagName()); //find the element tag
-			DOMNamedNodeMap* attributes= element->getAttributes(); //gets all attributes and places them in a Node map
+			std::string tag;
+			xml_utils::xml_translate(&tag, element->getTagName());
+			DOMNamedNodeMap* attributes = element->getAttributes(); //gets all attributes and places them in a Node map
 
 			converted += "<"; 
 			converted += tag; 
 			for( unsigned int i=0; i< (attributes->getLength()); i++ ) { //iterates through and includes all attributes
 				converted += " ";
-				converted += XMLString::transcode(attributes->item(i)->getNodeName());
+				std::string name = "";
+				xml_utils::xml_translate(&name, attributes->item(i)->getNodeName());
+				converted += name;
 				converted += "=\"";
-				converted += XMLString::transcode(attributes->item(i)->getNodeValue());
+				std::string value = "";
+				xml_utils::xml_translate(&value, attributes->item(i)->getNodeValue());
+				converted += value;
 				converted += "\"";
 			}
 			
@@ -501,35 +486,37 @@ DOMDocument* xml_utils::parseMessageXml( XercesDOMParser* xmlParser, const char 
 		}
 		int errorCount = xmlParser->getErrorCount();
 		if( errorCount > 0 ) {
-			//char* message = XMLString::transcode(e.getMessage());
 			stringstream strstr;
 			strstr << "xml_utils::parseMessageXml(): "<<errorCount<<" errors while parsing xml: ";
 			LOG(strstr.str().c_str());
-			// TODO: print errors
 			return NULL;
 		}
 		return xmlParser->getDocument();
 	} catch( const XMLException& e ) {
-		char* message = XMLString::transcode(e.getMessage());
+		std::string message = "";
+		xml_utils::xml_translate(&message, e.getMessage());
 		std::stringstream strstr;
-		strstr << "xml_utils::parseMessageXml(): XMLException while parsing xml: "<<message;
+		strstr << "xml_utils::parseMessageXml(): XMLException while parsing xml: " << message;
 		LOG(strstr.str().c_str());
 		return NULL;
 	} catch( const SAXParseException& e ) {
-		char* message = XMLString::transcode(e.getMessage());
+		std::string message = "";
+		xml_utils::xml_translate(&message, e.getMessage());
 		std::stringstream strstr;
-		strstr << "xml_utils::parseMessageXml(): SAXException while parsing xml: "<<message
-				<< " (line "<<e.getLineNumber()<<", col "<<e.getColumnNumber()<<")";
+		strstr << "xml_utils::parseMessageXml(): SAXException while parsing xml: "<< message
+				<< " (line "<< e.getLineNumber()<<", col "<< e.getColumnNumber()<<")";
 		LOG(strstr.str().c_str());
 		return NULL;
 	} catch( const SAXException& e ) {
-		char* message = XMLString::transcode(e.getMessage());
+		std::string message = "";
+		xml_utils::xml_translate(&message, e.getMessage());
 		std::stringstream strstr;
 		strstr << "xml_utils::parseMessageXml(): SAXException while parsing xml: "<<message;
 		LOG(strstr.str().c_str());
 		return NULL;
 	} catch( const DOMException& e ) {
-		char* message = XMLString::transcode(e.getMessage());
+		std::string message = "";
+		xml_utils::xml_translate(&message, e.getMessage());
 		std::stringstream strstr;
 		strstr << "xml_utils::parseMessageXml(): DOMException while parsing xml: "<<message;
 		LOG(strstr.str().c_str());

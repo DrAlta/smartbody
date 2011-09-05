@@ -17,8 +17,7 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 {
 	std::string localId;
 	const XMLCh* attrID = elem->getAttribute(BMLDefs::ATTR_ID);
-	if (attrID)
-		localId = XMLString::transcode(attrID);
+	xml_utils::xml_translate(&localId, attrID);
 	std::stringstream command;	
 	std::string characterName = request->actor->getName();
 

@@ -117,8 +117,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 //	Locomotion::parse_routine(child, request, type, id);
 	//-------------starting  from here, it's BML Spec 1.0
 	std::string localId;
-	if (attrID)
-		localId = XMLString::transcode(attrID);
+	xml_utils::xml_translate(&localId, attrID);
 
 	if (!mcu->steerEngine.isInitialized())
 	{
@@ -392,8 +391,7 @@ BehaviorRequestPtr BML::parse_bml_example_locomotion( DOMElement* elem, const st
 {
 	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
-	if (id)
-		localId = XMLString::transcode(id);
+	xml_utils::xml_translate(&localId, id);
 	SbmCharacter* c = mcu->getCharacter(request->actor->getName());
 	if (!c->param_animation_ct)
 	{
@@ -405,9 +403,9 @@ BehaviorRequestPtr BML::parse_bml_example_locomotion( DOMElement* elem, const st
 	double spd = 0.0;
 	double rps = 0.0;
 	if (forwardSpd)
-		spd = atof(XMLString::transcode(forwardSpd));
+		spd = xml_utils::xml_translate_float(forwardSpd);
 	if (turningSpd)
-		rps = atof(XMLString::transcode(turningSpd));
+		rps = xml_utils::xml_translate_float(turningSpd);
 
 	if (spd == 0 && rps == 0)
 	{

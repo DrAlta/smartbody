@@ -60,12 +60,12 @@ AudioFileSpeech::~AudioFileSpeech()
 
 RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const std::string voiceCode, const DOMNode * node, const char * callbackCmd )
 {
-   // TODO: Test this function with a variety of XML documents
+	string encoding = "";
+	xml_utils::xml_translate( &encoding, node->getOwnerDocument()->getXmlEncoding() );
+	string version = "";
+	xml_utils::xml_translate( &version, node->getOwnerDocument()->getXmlVersion () );
 
-   // TODO: transcode() leaks here
-   string encoding = XMLString::transcode( node->getOwnerDocument()->getXmlEncoding() );  // XMLStringconverts XML to cString; encoding
-   string version = XMLString::transcode( node->getOwnerDocument()->getXmlVersion () ); //the xml version number
-
+   // overwrites encoding? Why do we do this?
    encoding = "UTF-8";  // getXmlEncoding() doesn't work on  'test bml char doctor <speech ref="hey"/>'
 
    string xmlConverted = "<?xml version=\"" + version.substr( 0, 6 )+ "\" ";
@@ -329,21 +329,9 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 
    DOMElement * speech = doc->getDocumentElement();
 
-   // TODO: make sure it's "speech"
-
 	string ref = xml_utils::xml_parse_string( BML::BMLDefs::TAG_REF, speech );
 	string speechId = xml_utils::xml_parse_string( BML::BMLDefs::ATTR_ID, speech );
 	
-
-/*
-   char * xmlRef = XMLString::transcode( speech->getAttribute( L"ref" ) );
-   string ref = xmlRef;
-   XMLString::release( &xmlRef );
-
-   char * xmlSpeechId = XMLString::transcode( speech->getAttribute( L"id" ) );
-   string speechId = xmlSpeechId;
-   XMLString::release( &xmlSpeechId );
-*/
 
    m_speechRequestInfo[ m_requestIdCounter ].id = speechId;
 
@@ -499,15 +487,14 @@ float AudioFileSpeech::getMarkTime( RequestId requestId, const XMLCh * markId )
    std::map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
    if ( it != m_speechRequestInfo.end() )
    {
-      char * xmlMarkId = XMLString::transcode( markId );
-      string strMarkId = xmlMarkId;
-      XMLString::release( &xmlMarkId );
+		string strMarkId = "";
+		xml_utils::xml_translate(&strMarkId, markId);
 
-      std::map< string, float >::iterator markIt = it->second.timeMarkers.find( strMarkId );
-      if ( markIt != it->second.timeMarkers.end() )
-      {
-         return markIt->second;
-      }
+		std::map< string, float >::iterator markIt = it->second.timeMarkers.find( strMarkId );
+		if ( markIt != it->second.timeMarkers.end() )
+		{
+			return markIt->second;
+		}
    }
 
    return 0;
@@ -667,17 +654,14 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
 	   {
 		   DOMElement* e = (DOMElement*)syncCurveList->item(i);
 
-		   char* xmlVisemeName = XMLString::transcode(e->getAttribute( BML::BMLDefs::ATTR_NAME ));
-		   string visemeName = xmlVisemeName;
-		   XMLString::release(&xmlVisemeName);
+		   string visemeName = "";
+		   xml_utils::xml_translate(&visemeName, e->getAttribute( BML::BMLDefs::ATTR_NAME ));
 
-		   char* xmlNumKeys = XMLString::transcode(e->getAttribute( BML::BMLDefs::TAG_NUM_KEYS ));
-		   string numKeys = xmlNumKeys;
-		   XMLString::release(&xmlNumKeys);
-
-		   char* xmlCurveInfo = XMLString::transcode(e->getTextContent());
-		   string curveInfo = xmlCurveInfo;
-		   XMLString::release(&xmlCurveInfo);
+		   string numKeys = "";
+		   xml_utils::xml_translate(&numKeys, e->getAttribute( BML::BMLDefs::TAG_NUM_KEYS ));
+	
+		   string curveInfo = "";
+		   xml_utils::xml_translate(&curveInfo, e->getTextContent());
 
 		   visemeData.push_back(VisemeData(visemeName.c_str(), atoi(numKeys.c_str()), curveInfo.c_str()));
 	   }
@@ -693,29 +677,24 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
 	   {
 		  DOMElement * e = (DOMElement *)syncList->item( i );
 
-		  char * xmlViseme = XMLString::transcode( e->getAttribute( BML::BMLDefs::TAG_VISEME ) );
-		  string viseme = xmlViseme;
-		  XMLString::release( &xmlViseme );
+		  std::string viseme = "";
+		  xml_utils::xml_translate(&viseme, e->getAttribute( BML::BMLDefs::TAG_VISEME ));
 
-		  char * xmlArticulation = XMLString::transcode( e->getAttribute( BML::BMLDefs::TAG_ARTICULATION ) );
-		  string articulation = xmlArticulation;
-		  XMLString::release( &xmlArticulation );
 
-		  char * xmlStart = XMLString::transcode( e->getAttribute( BML::BMLDefs::ATTR_START ) );
-		  string start = xmlStart;
-		  XMLString::release( &xmlStart );
+		  std::string articulation = "";
+		  xml_utils::xml_translate(&articulation, e->getAttribute( BML::BMLDefs::TAG_ARTICULATION ));
 
-		  char * xmlReady = XMLString::transcode( e->getAttribute( BML::BMLDefs::ATTR_READY ) );
-		  string ready = xmlReady;
-		  XMLString::release( &xmlReady );
+		  std::string start = "";
+		  xml_utils::xml_translate(&start, e->getAttribute( BML::BMLDefs::ATTR_START ));
+	
+		  std::string ready = "";
+		  xml_utils::xml_translate(&ready, e->getAttribute( BML::BMLDefs::ATTR_READY ));
 
-		  char * xmlRelax = XMLString::transcode( e->getAttribute( BML::BMLDefs::ATTR_RELAX ) );
-		  string relax = xmlRelax;
-		  XMLString::release( &xmlRelax );
+		  std::string relax = "";
+		  xml_utils::xml_translate(&relax, e->getAttribute( BML::BMLDefs::ATTR_RELAX ));
 
-		  char * xmlEnd = XMLString::transcode( e->getAttribute( BML::BMLDefs::ATTR_END ) );
-		  string end = xmlEnd;
-		  XMLString::release( &xmlEnd );
+		  std::string end = "";
+		  xml_utils::xml_translate(&end, e->getAttribute( BML::BMLDefs::ATTR_END ));
 		
 		  float startTime = (float)atof( start.c_str() );
 		  float endTime = (float)atof( end.c_str() );
@@ -824,13 +803,11 @@ void AudioFileSpeech::ReadSpeechTiming( const char * filename, std::map< std::st
    {
       DOMElement * e = (DOMElement *)syncList->item( i );
 
-      char * xmlId = XMLString::transcode( e->getAttribute( BML::BMLDefs::ATTR_ID ) );
-      string id = xmlId;
-      XMLString::release( &xmlId );
+	  string id = "";
+	  xml_utils::xml_translate(&id, e->getAttribute( BML::BMLDefs::ATTR_ID ));
 
-      char * xmlTime = XMLString::transcode( e->getAttribute( BML::BMLDefs::TAG_TIME ) );
-      string time = xmlTime;
-      XMLString::release( &xmlTime );
+	  string time = "";
+	  xml_utils::xml_translate(&time, e->getAttribute( BML::BMLDefs::TAG_TIME ));
 
       timeMarkers[ id ] = (float)atof( time.c_str() );
    }
