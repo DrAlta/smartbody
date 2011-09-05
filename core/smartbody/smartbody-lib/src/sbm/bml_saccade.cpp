@@ -48,7 +48,7 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
 	if (id)
-		localId = XMLString::transcode(id);
+		xml_utils::xml_translate(&localId, id);
 	
 	float duration = 0.03f;
 	float magnitude = 3.0f;

@@ -255,18 +255,16 @@ std::string BmlRequest::buildUniqueBehaviorId( const XMLCh* tag,
 											   size_t ordinal )
 {
 	ostringstream unique_id;
-	char* ascii = NULL;
+	std::string ascii;
 
 	unique_id << "BML_" << actorId << '_' << msgId;
-	ascii = XMLString::transcode( tag );
+	xml_utils::xml_translate(&ascii, tag);
 	unique_id << "_#" << ordinal << "_<" << ascii << '>';
-	XMLString::release( &ascii );
 
 	if( id != 0 && *id != 0 )	{
-//	if( XMLString::stringLen(id) > 0 ) {
-		ascii = XMLString::transcode( id );
-		unique_id << "_\"" << ascii << "\"";
-		XMLString::release( &ascii );
+		std::string idStr;
+		xml_utils::xml_translate(&idStr, id);
+		unique_id << "_\"" << idStr << "\"";
 	}
 
 	// TODO: remove any whitespace
@@ -516,39 +514,6 @@ void BML::BmlRequest::realize( Processor* bp, mcuCBHandle *mcu ) {
 			}
 		}
 	}
-
-#if 0	// TODO: Reimplement logging.  (Removed name from SyncPoint)
-	//  Add Logging / Debugging commands to sequence
-	if( log_syncpoints ) {
-		ostringstream oss;
-		oss << "echo ===\tAgent: " << bpMsg.actorId << "\tMsgId: " << bpMsg.msgId << "\tSyncPoint: ";
-		string command_prefix = oss.str();
-	
-		MapOfSyncPoint::iterator i                = request->idToSync.begin();
-		MapOfSyncPoint::iterator sync_points_end = request->idToSync.end();
-	
-		for(; i!=sync_points_end; ++i ) {
-			SyncPointPtr sp( i->second );
-			const char* ascii = XMLString::transcode( sp->name.c_str() );
-			string name( ascii );
-			delete []ascii;
-	
-			BML::time_sec time = sp->time;
-			if( isTimeSet( time ) ) {
-				BML::time_sec seqTime = time;
-				if( seqTime < 0 )
-					seqTime = 0;
-	
-				oss.str("");  // clear the buffer
-				oss << command_prefix << name << "\t@ " << time;
-				if( seq->insert( (float)seqTime, (char*)(oss.str().c_str()) )!=CMD_SUCCESS ) {
-					strstr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<bpMsg.msgId<<"\": "<<
-						"Failed to insert echo timesync_point message"<<endl;
-				}
-			}
-		}
-	}
-#endif
 
 	if( bp->get_auto_print_controllers() ) {
 		ostringstream oss;

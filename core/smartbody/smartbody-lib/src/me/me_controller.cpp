@@ -44,11 +44,6 @@ using namespace std;
 
 //============================= MeController ============================
 
-//#if ME_CONTROLLER_ENABLE_XMLIFY
-//const XMLCh* MeController::CONTROLLER_TAG = L"me:controller";
-//#endif // ME_CONTROLLER_ENABLE_XMLIFY
-
-
 int MeController::instance_count = 0;
 
 
@@ -363,39 +358,6 @@ void MeController::record_bvh( int max_num_of_frames, double dt )	{
 	_record_dt = dt;
 	LOG("MeController::record_bvh START");
 }
-
-#if ME_CONTROLLER_ENABLE_XMLIFY
-DOMElement* MeController::xmlify( DOMDocument* doc ) const {
-	DOMElement* elem = doc->createElement( L"me:controller" );
-	// TODO: Add name and type name attribute, call xmlify_state and xmlify_children
-
-	// _instance_id
-	{	ostringstream oss;
-		oss << _instance_id;
-		XMLCh* instance_id_xstr = XMLString::transcode( oss.str().c_str() );
-		elem->setAttribute( L"instance-id", instance_id_xstr );
-		XMLString::release( &instance_id_xstr );
-	}
-
-	//
-	const char* type_name = controller_type();
-	if( type_name ) {
-		XMLCh* type_name_xstr = XMLString::transcode( type_name ); 
-		elem->setAttribute( L"type", type_name_xstr );
-		XMLString::release( &type_name_xstr );
-	}
-
-	const char* name_str = name();
-	if( name_str ) {
-		XMLCh* name_xstr = XMLString::transcode( name_str );
-		elem->setAttribute( L"name", name_xstr );
-		XMLString::release( &name_xstr );
-	}
-
-	return elem;
-}
-#endif // ME_CONTROLLER_ENABLE_XMLIFY
-
 
 void MeController::load_bvh_joint_hmap( void )	{
 	
@@ -801,17 +763,6 @@ void MeController::input ( SrInput& i )
    else
     { _emphasist=-1.0; i.unget_token(); }
  }
-
-#if ME_CONTROLLER_ENABLE_XMLIFY
-void MeController::xmlify_state( DOMElement* elem ) const {
-	// Do nothing by default
-}
-
-void MeController::xmlify_children( DOMElement* elem ) const {
-	// TODO: append xmlify(..) result from each child
-}
-#endif // ME_CONTROLLER_ENABLE_XMLIFY
-
 
 void MeController::print_state( int tab_count ) {
 	using namespace std;

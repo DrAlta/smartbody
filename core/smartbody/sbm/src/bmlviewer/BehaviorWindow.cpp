@@ -420,6 +420,7 @@ void BehaviorWindow::updateBehaviors(BML::BmlRequest* request)
 	XMLCh* xmlOutput = theSerializer->writeToString(request->doc);
 	theSerializer->release();
 	std::string xmlStr = xml_utils::xml_translate_string(xmlOutput);
+	//XMLString::release(&tempStr);
 	requestBlock->setInfo(xmlStr);
 
 	std::vector<std::pair<RequestMark*, std::string> > untimedMarks; // marks that have no associated time
@@ -1384,7 +1385,7 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 						XMLCh tempStr[100];
 						XMLString::transcode(markerName.c_str(), tempStr, 99);
 						double markTimeFromInterface = speechInterface->getMarkTime(speechRequest->get_speech_request_id(), tempStr);
-
+						//XMLString::release(&tempStr);
 						if (markTimeFromInterface == -1.0 || fabs(markTimeFromInterface + triggerTime - markerTime) > .001)
 						{
 							LOG("Interface time %f does not match sync point time %f", (markTimeFromInterface + triggerTime), markerTime);

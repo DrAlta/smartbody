@@ -35,13 +35,14 @@ text_speech::~text_speech()
  *  Returns a unique request identifier.
  */
 RequestId text_speech::requestSpeechAudio( const char* agentName, const std::string voiceCode, const DOMNode* node, const char* callbackCmd ){
-	string encoding= "UTF-8"; //XMLString::transcode(node->getOwnerDocument()->getEncoding()); //XMLStringconverts XML to cString; encoding
-	string version= XMLString::transcode(node->getOwnerDocument()->getXmlVersion ()); //the xml version number
-	string xmlConverted="<?xml version=\"" + version.substr(0,6)+ "\" "; 
+	std::string encoding= "UTF-8"; 
+	std::string version = "";
+	xml_utils::xml_translate(&version, node->getOwnerDocument()->getXmlVersion());
+	std::string xmlConverted="<?xml version=\"" + version.substr(0,6)+ "\" "; 
 	xmlConverted= xmlConverted+ "encoding=\"" + encoding.substr(0,7) + "\"?>";
 	xml_utils::xmlToString( node, xmlConverted ); //Xml to string recursively searches DOM tree and returns a string of the xml document
 	
-	char* text= new char[xmlConverted.length()+1];
+	char* text = new char[xmlConverted.length()+1];
 	strcpy(text, xmlConverted.c_str()); 
 	RequestId ret= requestSpeechAudio(agentName, voiceCode, text, callbackCmd );
 	return (ret); //string is converted to char* and sent to other request audio fcn
@@ -91,16 +92,15 @@ RequestId text_speech::requestSpeechAudio( const char* agentName, std::string vo
 			string name = xml_utils::xml_translate_string( markNode->getNodeName() );
 			string cmp = xml_utils::xml_translate_string( BML::BMLDefs::TAG_MARK );
 			if( name.compare( cmp ) == 0 ) {
-
-//			if( string( XMLString::transcode( markNode->getNodeName() ) ).compare( BML::BMLDefs::TAG_MARK ) == 0 ) {
 				DOMNode* time = markNode->getAttributes()->getNamedItem( BML::BMLDefs::TAG_TIME );
-				istringstream iss(XMLString::transcode(time->getTextContent()), istringstream::in);
-				iss >> currentTime;
+				currentTime = xml_utils::xml_translate_float(time->getTextContent());
 			}
 		}
 		// check for text (no tag)
 		if (markNode->getNodeType() == 3) {
-			string command = "text_speech " + myStream.str() + " " + string(agentName) + " " + XMLString::transcode(markNode->getTextContent());
+			std::string textContent = "";
+			xml_utils::xml_translate(&textContent, markNode->getTextContent());
+			string command = "text_speech " + myStream.str() + " " + string(agentName) + " " + textContent;
 			schedule->insert(currentTime, command.c_str());
 		}
 		markNode = markNode->getNextSibling();
@@ -131,29 +131,22 @@ std::vector<VisemeData*>* text_speech::extractVisemes(DOMNode* node, vector<Vise
 	float startTime=0;
 	if(node->getNodeType()==1){ //node is an element node
 		DOMElement *element= (DOMElement *)node; //instantiate an element using this node
-		//string tag= XMLString::transcode(element->getTagName()); //find the element tag  // Anm replaced with compareString
-		//if( tag == "VISEME" ) {
-
-//		if( XMLString::compareString( element->getTagName(), L"viseme" )==0 ){
 		if( XMLString::compareString( element->getTagName(), BML::BMLDefs::TAG_VISEME )==0 ){
 			
-			char* id = NULL;
+			std::string id = "";
 
 			DOMNamedNodeMap* attributes= element->getAttributes();
 			for(unsigned int i=0; i< (attributes->getLength()); i++){ //iterates through and includes all attributes (viseme type and start time)
 				const XMLCh* attr = attributes->item(i)->getNodeName();
 				if( XMLString::compareString( attr, BML::BMLDefs::ATTR_TYPE )==0 ) {
-					string temp= XMLString::transcode(attributes->item(i)->getNodeValue());
-					id = new char[temp.length() + 1];
-					strcpy(id, temp.c_str());
+					xml_utils::xml_translate(&id, attributes->item(i)->getNodeValue());
 				}
 				else if( XMLString::compareString( attr, BML::BMLDefs::ATTR_START )==0 ) {
-					string temp=XMLString::transcode(attributes->item(i)->getNodeValue());
-					startTime = (float)atof(temp.c_str());
+					startTime = xml_utils::xml_translate_float(attributes->item(i)->getNodeValue());
 				}
 			}
-			if( id ) {
-				singleViseme= new VisemeData(id, 1.0, startTime); //the weight is always made one
+			if( id != "") {
+				singleViseme= new VisemeData(id.c_str(), 1.0, startTime); //the weight is always made one
 
 				if (visemes->size()>0) //includes the reset visemes, prior to the next viseme being pushed the prior viseme is reset (reset viseme weight is always zero)
 				{
@@ -219,17 +212,24 @@ float text_speech::getMarkTime( RequestId requestId, const XMLCh* markId ){
 		for(XMLSize_t w=0; w<marks->getLength(); w++){ //goes through every element in the DOMNodeList
 			DOMNamedNodeMap* attributes= marks->item(w)->getAttributes();
 			for(XMLSize_t r=0; r<attributes->getLength(); r++){ //for each DomNode in the list cycles through every attribute
-				string type= XMLString::transcode(attributes->item(r)->getNodeName());
-				if(type== "name"){ //if the attribute is a name then see if the value matches markId and then set foundFlag to 1
-					string value=  XMLString::transcode(attributes->item(r)->getNodeValue());
-					string marker = XMLString::transcode( markId );
-					if( value==marker ) {
+				string type = "";
+				xml_utils::xml_translate(&type, attributes->item(r)->getNodeName());
+				if(type== "name")
+				{ //if the attribute is a name then see if the value matches markId and then set foundFlag to 1
+					string value = "";
+					xml_utils::xml_translate(&value, attributes->item(r)->getNodeValue());
+					
+					string marker = "";
+					xml_utils::xml_translate(&marker, markId);
+
+					if( value==marker )
+					{
 						foundFlag=1;
 					}
 				}
-				if(foundFlag==1 && type=="time"){ //if foundFlag==1 then find the time attribute and return it's value 
-					string temp=XMLString::transcode(attributes->item(r)->getNodeValue());
-					return( float(atof(temp.c_str())));
+				if(foundFlag==1 && type=="time")
+				{ //if foundFlag==1 then find the time attribute and return it's value 
+					return xml_utils::xml_translate_float(attributes->item(r)->getNodeValue());
 				}
 			}
 		}

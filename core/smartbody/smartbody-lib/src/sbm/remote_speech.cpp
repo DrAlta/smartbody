@@ -68,9 +68,11 @@ remote_speech::~remote_speech()
 RequestId remote_speech::requestSpeechAudio( const char* agentName, const std::string voiceCode, const DOMNode* node, const char* callbackCmd ){
 	//TODO: Test this function with a variety of XML documents
 
-	
-	string encoding= XMLString::transcode(node->getOwnerDocument()->getXmlEncoding()); //XMLStringconverts XML to cString; encoding
-	string version= XMLString::transcode(node->getOwnerDocument()->getXmlVersion ()); //the xml version number
+	std::string encoding = "";
+	xml_utils::xml_translate(&encoding, node->getOwnerDocument()->getXmlEncoding());
+	std::string version = "";
+	xml_utils::xml_translate(&version, node->getOwnerDocument()->getXmlVersion());
+
 	string xmlConverted="<?xml version=\"" + version.substr(0,6)+ "\" "; 
 	xmlConverted= xmlConverted+ "encoding=\"" + encoding.substr(0,7) + "\"?>";
 	xml_utils::xmlToString( node, xmlConverted ); //Xml to string recursively searches DOM tree and returns a string of the xml document
@@ -204,34 +206,27 @@ std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<Vi
 	float startTime = 0.0f;
 	if(node->getNodeType()==1){ //node is an element node
 		DOMElement *element= (DOMElement *)node; //instantiate an element using this node
-		//string tag= XMLString::transcode(element->getTagName()); //find the element tag  // Anm replaced with compareString
-		//if( tag == "VISEME" ) {
 		if( XMLString::compareString( element->getTagName(), BML::BMLDefs::TAG_VISEME )==0 ){
 			
-			char* id = NULL;
+			std::string id = "";
 
 			DOMNamedNodeMap* attributes= element->getAttributes();
 			for(unsigned int i=0; i< (attributes->getLength()); i++){ //iterates through and includes all attributes (viseme type and start time)
-				//string type= XMLString::transcode(attributes->item(i)->getNodeName());
 				const XMLCh* attr = attributes->item(i)->getNodeName();
-				//if(type=="TYPE"){
+
 				if( XMLString::compareString( attr, BML::BMLDefs::ATTR_TYPE )==0 ) {
-					string temp= XMLString::transcode(attributes->item(i)->getNodeValue());
-					id = new char[temp.length() + 1];
-					strcpy(id, temp.c_str());
+					xml_utils::xml_translate(&id, attributes->item(i)->getNodeValue());
 				}
-				//if(type=="SRT_START"){
+
 				else if( XMLString::compareString( attr, BML::BMLDefs::ATTR_START )==0 ) {
-					string temp=XMLString::transcode(attributes->item(i)->getNodeValue());
-					//FLOAT_EQ(startTime,atof(temp.c_str()));  // Huh???
-					startTime = (float)atof(temp.c_str());
+					startTime = xml_utils::xml_translate_float(attributes->item(i)->getNodeValue());
 				}
 			}
-			if( id ) {
+			if( id != "") {
 #if USE_CURVES_FOR_VISEMES
 				curViseme = new VisemeData(id, startTime);
 #else
-				curViseme = new VisemeData(id, 1.0, startTime, 0.0f, 0.0f, 0.0f); //the weight is always made one
+				curViseme = new VisemeData(id.c_str(), 1.0, startTime, 0.0f, 0.0f, 0.0f); //the weight is always made one
 #endif
 				if ( visemes->size() > 0 ) 
 				{   
@@ -443,18 +438,21 @@ float remote_speech::getMarkTime( RequestId requestId, const XMLCh* markId ){
 		for(XMLSize_t w=0; w<marks->getLength(); w++){ //goes through every element in the DOMNodeList
 			DOMNamedNodeMap* attributes= marks->item(w)->getAttributes();
 		for(XMLSize_t r=0; r<attributes->getLength(); r++){ //for each DomNode in the list cycles through every attribute
-			string type= XMLString::transcode(attributes->item(r)->getNodeName());
+			string type = "";
+			xml_utils::xml_translate(&type, attributes->item(r)->getNodeName());
 			if(type== "name"){ //if the attribute is a name then see if the value matches markId and then set foundFlag to 1
-				string value=  XMLString::transcode(attributes->item(r)->getNodeValue());
-				string marker = XMLString::transcode( markId );
-				if( value==marker ) {
+				string value = "";
+				xml_utils::xml_translate(&value, attributes->item(r)->getNodeValue());
+				string marker = "";
+				xml_utils::xml_translate(&marker, markId);
+				
+				if( value == marker ) {
 					foundFlag=1;
 				}
 			}
-			if(foundFlag==1 && type=="time"){ //if foundFlag==1 then find the time attribute and return it's value 
-				string temp=XMLString::transcode(attributes->item(r)->getNodeValue());
-	xml_utils::xmlch_release( &markTag );
-				return( float(atof(temp.c_str())));
+			if(foundFlag==1 && type=="time")
+			{ 
+				return xml_utils::xml_translate_float(attributes->item(r)->getNodeValue());
 			}
 		}
 		}
@@ -552,12 +550,10 @@ int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgI
 					delete remote_speech::soundLookUp.remove(msgID);
 				}
 				//cout<<endl<<"*********INSIDE THE ATTRIBUTE FOR SPEECH**************"<<endl;
-				string* value=new string (XMLString::transcode(findSpeechFile->item(0)->getAttributes()->item(0)->getNodeValue()));
-				remote_speech::soundLookUp.insert(msgID,value);
-				
+				string* value = new string(); 
+				xml_utils::xml_translate(value, findSpeechFile->item(0)->getAttributes()->item(0)->getNodeValue());
+				remote_speech::soundLookUp.insert(msgID, value);
 			}
-
-
 
 			string callbackCmd= string(remote_speech::commandLookUp.lookup(msgID)) +" "+ character->getName() +" "+ string(msgID)+" SUCCESS";
 			char* callback= new char[callbackCmd.length() + 1];

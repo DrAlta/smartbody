@@ -48,18 +48,12 @@ class SbmPawn;
 #include <me/me_controller_context.hpp>
 #include <me/me_default_prune_policy.hpp>
 
-#define ME_CONTROLLER_ENABLE_XMLIFY (0)
-#if ME_CONTROLLER_ENABLE_XMLIFY
-#include "../sbm/xercesc_utils.hpp"  //  Imports Xerces libaries and util functions (could be cleaner)
-#endif
-
 
 #define VALIDATE_BLEND_CHANNEL_REMAP (0)  // See MeCtBlend::controller_evaluate(..)
 #if VALIDATE_BLEND_CHANNEL_REMAP
 	// Temporary hack: Predeclare MeCtBlend for friend privledges -Anm
 	class MeCtBlend;
-#endif // ME_CONTROLLER_ENABLE_XMLIFY
-
+#endif 
 
 //=================================== MeController =====================================
 
@@ -74,12 +68,6 @@ class MeController
 #if VALIDATE_BLEND_CHANNEL_REMAP
 	friend MeCtBlend;   // Temporary hack
 #endif
-
-//#if ME_CONTROLLER_ENABLE_XMLIFY
-//public:
-//	const XMLCh* CONTROLLER_TAG;
-//#endif // ME_CONTROLLER_ENABLE_XMLIFY
-
 
 private :
 	static int instance_count;
@@ -305,11 +293,6 @@ public :
 	bool is_pass_through() const;// { return _pass_through; }
 	void set_pass_through(bool val);// { _pass_through = val; }
 
-#if ME_CONTROLLER_ENABLE_XMLIFY
-	/*! Serialize state (or most of it) to a single XML element for later analysis. */
-	DOMElement* xmlify( DOMDocument* doc ) const;
-#endif // ME_CONTROLLER_ENABLE_XMLIFY
-
 	void dumpChannelMap();	
 
    protected :
@@ -337,11 +320,6 @@ public :
         This is a protected method: derived classes will be responsible to load 
         their generic controller data. */
     void input ( SrInput& i );
-
-#if ME_CONTROLLER_ENABLE_XMLIFY
-	/*! Append child controller xml to the contents of the element. */
-	void xmlify_children( DOMElement* elem ) const;
-#endif // ME_CONTROLLER_ENABLE_XMLIFY
 
    protected :
 	/*! This method is called at initialization time. The controller should 
@@ -375,11 +353,6 @@ public :
         in time, having more flexibility to be blended with other controllers.
         Otherwise the controller will only be evaluated in a monotone time fashion. */
     virtual bool controller_evaluate ( double t, MeFrameData& frame )=0;
-
-#if ME_CONTROLLER_ENABLE_XMLIFY
-	/*! Append XML elements describing state to end of elem for later analysis. */
-	virtual void xmlify_state( DOMElement* elem ) const;
-#endif // ME_CONTROLLER_ENABLE_XMLIFY
 
    public :
     /*! This method will return the description of the channels used by the 

@@ -70,8 +70,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 {
 	const XMLCh* id = xml->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
-	if (id)
-		localId = XMLString::transcode(id);
+	xml_utils::xml_translate(&localId, id);
 
 	vector<SpeechMark> marks;  // Ordered list of named bookmarks
 

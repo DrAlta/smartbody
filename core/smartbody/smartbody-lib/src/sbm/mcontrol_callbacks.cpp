@@ -303,7 +303,7 @@ int begin_sequence( char* name, mcuCBHandle* mcu_p )	{
 
 /*
 
-	seq <name> at <time> <cmd...>
+	seq <name> at <time> <cmd...>	
 	seq <name> [begin|abort|print]
 #	seq <name> write
 
