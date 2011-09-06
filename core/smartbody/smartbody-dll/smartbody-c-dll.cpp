@@ -13,7 +13,7 @@
 
 using std::string;
 
-
+std::map< int, std::vector<SBM_CallbackInfo*> > g_CallbackInfo;
 LogMessageCallback LogMessageFunc = NULL;
 
 
@@ -86,7 +86,17 @@ public:
 
    virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass )
    {
-      m_createCharacterCallback( m_sbmHandle, name.c_str(), objectClass.c_str() );
+#ifdef WIN32
+         m_createCharacterCallback( m_sbmHandle, name.c_str(), objectClass.c_str() );
+#else
+          SBM_CallbackInfo* info = new SBM_CallbackInfo();
+          info->name = new char[name.length() + 1];
+          strcpy(info->name, name.c_str());
+          
+          info->objectClass = new char[objectClass.length() + 1];
+          strcpy(info->objectClass, objectClass.c_str());
+          g_CallbackInfo[m_sbmHandle].push_back(info);
+#endif
    }
 
    virtual void OnCharacterDelete( const std::string & name )
@@ -355,4 +365,57 @@ void SBM_CharToCSbmChar( const::SmartbodyCharacter * sbmChar, SBM_SmartbodyChara
          }
       }
    }
+}
+
+
+SMARTBODY_C_DLL_API bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, int * numCharacters, const char * name, const char * objectClass )
+{
+    if ( !SBM_HandleExists( sbmHandle ) )
+    {
+        return false;
+    }
+    
+    for (unsigned int i = 0; i < g_CallbackInfo[sbmHandle].size(); i++)
+    {
+        //if (strncasecmp(name, g_CallbackInfo[sbmHandle][i]->name, strlen(name) == 0
+        //    && strncasecmp(objectClass, g_CallbackInfo[sbmHandle][i]->objectClass, strlen(objectClass))))
+        {
+            name = new char[strlen(g_CallbackInfo[sbmHandle][i]->name) + 1];
+            objectClass = new char[strlen(g_CallbackInfo[sbmHandle][i]->objectClass) + 1];
+
+            delete g_CallbackInfo[sbmHandle][i];
+            g_CallbackInfo[sbmHandle].erase(g_CallbackInfo[sbmHandle].begin() + i);
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+SMARTBODY_C_DLL_API bool SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, const char * name)
+{
+    if ( !SBM_HandleExists( sbmHandle ) )
+    {
+        return false;
+    }
+    
+    return false;
+}
+
+SMARTBODY_C_DLL_API bool SBM_IsCharacterChanged( SBMHANDLE sbmHandle, const char * name)
+{
+    if ( !SBM_HandleExists( sbmHandle ) )
+    {
+        return false;
+    }
+    return false;
+}
+
+SMARTBODY_C_DLL_API bool SBM_VisemeSet( SBMHANDLE sbmHandle, const char * name, const char * visemeName, float weight, float blendTime)
+{
+    if ( !SBM_HandleExists( sbmHandle ) )
+    {
+        return false;
+    }
+    return false;
 }
