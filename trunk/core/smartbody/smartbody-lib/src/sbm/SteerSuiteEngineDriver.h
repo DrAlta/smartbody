@@ -13,7 +13,7 @@ class SteerSuiteEngineDriver : public SteerLib::EngineControllerInterface, publi
 {
 public:
 	SteerSuiteEngineDriver();
-	~SteerSuiteEngineDriver() {}
+	~SteerSuiteEngineDriver();
 	void init(SteerLib::SimulationOptions * options);
 	void finish();
 	void run();

@@ -112,7 +112,8 @@ MeCtSaccade::MeCtSaccade(SkSkeleton* skel) : SmartBody::SBController()
 
 MeCtSaccade::~MeCtSaccade()
 {
-	_skeleton->unref();
+	if (_skeleton)
+		_skeleton->unref();
 }
 
 void MeCtSaccade::spawnOnce(float dir, float amplitude, float dur)

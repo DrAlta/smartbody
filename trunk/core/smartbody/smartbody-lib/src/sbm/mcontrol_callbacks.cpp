@@ -1781,7 +1781,8 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 		SrModel* objModel = new SrModel();
 		if (!objModel->import_obj(obj_file))
 		{
-			LOG( "mcu_character_load_mesh ERR\n" );
+			LOG( "Could not load mesh from file '%s'", obj_file);
+			delete objModel;
 			return( CMD_FAILURE );
 		}
 		meshModelVec.push_back(objModel);

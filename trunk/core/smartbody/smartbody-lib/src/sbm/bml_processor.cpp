@@ -329,10 +329,10 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				{
 					std::stringstream newIdStr;
 					newIdStr << tagStr << idCounter;
-					XMLCh* uniqueId = XMLString::transcode(newIdStr.str().c_str());
+					XMLCh uniqueId[512];
+					XMLString::transcode(newIdStr.str().c_str(), uniqueId, 511);
 					child->setAttribute(BMLDefs::ATTR_ID, uniqueId);
-					XMLString::release(&uniqueId);
-					id = XMLString::transcode(newIdStr.str().c_str());
+					//id = XMLString::transcode(newIdStr.str().c_str());
 					request->localId = newIdStr.str();
 					idCounter++;
 				}
