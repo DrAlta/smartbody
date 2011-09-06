@@ -28,6 +28,14 @@ typedef int (__stdcall *SBM_OnCharacterDeleteCallback)( SBMHANDLE sbmHandle, con
 typedef int (__stdcall *SBM_OnCharacterChangeCallback)( SBMHANDLE sbmHandle, const char * name );
 typedef int (__stdcall *SBM_OnVisemeCallback)( SBMHANDLE sbmHandle, const char * name, const char * visemeName, float weight, float blendTime );
 
+struct SBM_CallbackInfo
+{
+    char * name;
+    char * objectClass;
+    char * visemeName;
+    float weight;
+    float blendTime;
+};
 
 #ifdef __cplusplus
 extern "C" {
@@ -86,6 +94,12 @@ SMARTBODY_C_DLL_API bool SBM_ReleaseCharacter( SBM_SmartbodyCharacter * characte
 SMARTBODY_C_DLL_API bool SBM_ReleaseCharacterJoints( SBM_SmartbodyCharacter * character );
 SMARTBODY_C_DLL_API bool SBM_SetLogMessageCallback(LogMessageCallback cb);
 SMARTBODY_C_DLL_API void SBM_LogMessage(const char* message, int messageType);
+
+// used for polling on iOS since callbacks aren't allowed
+SMARTBODY_C_DLL_API bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, int * numCharacters, const char * name, const char * objectClass );
+SMARTBODY_C_DLL_API bool SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, const char * name);
+SMARTBODY_C_DLL_API bool SBM_IsCharacterChanged( SBMHANDLE sbmHandle, const char * name);
+SMARTBODY_C_DLL_API bool SBM_VisemeSet( SBMHANDLE sbmHandle, const char * name, const char * visemeName, float weight, float blendTime);
 
 
 #ifdef __cplusplus
