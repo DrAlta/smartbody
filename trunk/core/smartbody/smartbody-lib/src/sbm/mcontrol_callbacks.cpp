@@ -1938,8 +1938,8 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 									nodeStr(realContentNode->getTextContent(), tokenBlock);
 									boost::tokenizer<boost::char_separator<char> > tokens(tokenBlock, sep);
 									int matCounter = 0;
-									float* bindPosMat = new float[16];
-									SrMat* newMat = new SrMat();
+									float bindPosMat[16];
+									SrMat newMat;
 
 									for (boost::tokenizer<boost::char_separator<char> >::iterator it = tokens.begin();
 										 it != tokens.end();
@@ -1965,11 +1965,11 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 											if (matCounter == 16)
 											{
 												matCounter = 0;
-												newMat->set(bindPosMat);													
-												newMat->transpose();
-												SrVec newTran = newMat->get_translation()*scaleFactor;
-												newMat->setl4(newTran);
-												skinWeight->bindPoseMat.push_back(*newMat);
+												newMat.set(bindPosMat);													
+												newMat.transpose();
+												SrVec newTran = newMat.get_translation()*scaleFactor;
+												newMat.setl4(newTran);
+												skinWeight->bindPoseMat.push_back(newMat);
 											}
 										}
 									}
