@@ -332,7 +332,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 					XMLCh uniqueId[512];
 					XMLString::transcode(newIdStr.str().c_str(), uniqueId, 511);
 					child->setAttribute(BMLDefs::ATTR_ID, uniqueId);
-					//id = XMLString::transcode(newIdStr.str().c_str());
+					id = XMLString::transcode(newIdStr.str().c_str());
 					request->localId = newIdStr.str();
 					idCounter++;
 				}
