@@ -1841,6 +1841,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 		char_p->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
 		srSnModelStatic->ref();
 		mcu_p->root_group_p->add(srSnModelDynamic);	
+		delete meshModelVec[i];
 	}
 
 	return( CMD_SUCCESS );
