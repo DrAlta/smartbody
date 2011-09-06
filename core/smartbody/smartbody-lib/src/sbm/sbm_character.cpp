@@ -147,6 +147,9 @@ SbmCharacter::~SbmCharacter( void )	{
 
 	printf("delete character %s\n",this->getName().c_str());
 
+	if (_faceDefinition)
+		delete _faceDefinition;
+
 	if (posture_sched_p)
 		posture_sched_p->unref();
 	if (motion_sched_p)
@@ -297,7 +300,6 @@ void SbmCharacter::createStandardControllers()
 	mpName += "'s motion player";
 	motionplayer_ct->setName(mpName.c_str());
 	motionplayer_ct->setActive(false);
-	ct_tree_p->add_controller(motionplayer_ct);
 
 	this->datareceiver_ct = new MeCtDataReceiver(this->_skeleton);
 	std::string datareceiverCtName = getName() + "'s data receiver controller";
@@ -574,8 +576,11 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 	this->param_map = param_map;
 
-	scene_p = new SkScene();
-	scene_p->ref();
+	if (scene_p)
+	{
+		scene_p = new SkScene();
+		scene_p->ref();
+	}
 
 	int init_result = SbmPawn::init( new_skeleton_p );  // Indirectly calls init_skeleton 
 	if( init_result!=CMD_SUCCESS ) {

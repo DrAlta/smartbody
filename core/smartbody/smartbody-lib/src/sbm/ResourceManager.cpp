@@ -28,7 +28,7 @@ ResourceManager::~ResourceManager()
 		delete (*iter);
 	}
         commandResources.clear();
-
+/*
 	for (std::list<ControllerResource*>::iterator iter = controllerResources.begin();
 		iter != controllerResources.end();
 		iter++)
@@ -36,7 +36,7 @@ ResourceManager::~ResourceManager()
 		delete (*iter);
 	}
         controllerResources.clear();
-
+*/
 	while (!cur_cmd_parent.empty())
 	{
 		Resource* r = cur_cmd_parent.top();

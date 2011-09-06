@@ -133,9 +133,9 @@ SbmPawn::SbmPawn() : DObject()
 SbmPawn::SbmPawn( const char * name ) : DObject(),
 scene_p( NULL ),
 #ifdef __ANDROID__ // don't use the GPU version in android
-dMesh_p( new DeformableMesh() ),
+dMesh_p( NULL) ),
 #else
-dMesh_p( new SbmDeformableMeshGPU() ),
+dMesh_p( NULL ),
 #endif
 ct_tree_p( MeControllerTreeRoot::create() ),
 world_offset_writer_p( new MeCtChannelWriter() ),
@@ -390,8 +390,15 @@ int SbmPawn::prune_controller_tree() {
 void SbmPawn::remove_from_scene() {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 
-	if( scene_p != NULL )
+	if ( scene_p  )
 		mcu.remove_scene( scene_p );
+	if ( dMesh_p)
+	{
+		for (size_t i = 0; i < dMesh_p->dMeshDynamic_p.size(); i++)
+		{
+			mcu.root_group_p->remove( dMesh_p->dMeshDynamic_p[i] );
+		}
+	}
 	mcu.removePawn( getName() );
 	// remove the connected steering object for steering space
 	if (steeringSpaceObj_p)
@@ -434,16 +441,17 @@ void SbmPawn::exec_controller_cleanup( MeController* ct, mcuCBHandle* mcu_p ) {
 //  Destructor
 SbmPawn::~SbmPawn()	{
 
-	if ( mcuCBHandle::singleton().sbm_character_listener )
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	if ( mcu.sbm_character_listener )
 	{
-		mcuCBHandle::singleton().sbm_character_listener->OnCharacterDelete( getName() );
+		mcu.sbm_character_listener->OnCharacterDelete( getName() );
 	}
 
 	if ( bonebusCharacter )
 	{
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		
 		if (mcu.sendPawnUpdates)
-			mcuCBHandle::singleton().bonebus.DeleteCharacter( bonebusCharacter );
+			mcu.bonebus.DeleteCharacter( bonebusCharacter );
 		bonebusCharacter = NULL;
 	}
 
@@ -473,6 +481,11 @@ SbmPawn::~SbmPawn()	{
 			}
 		}
 		delete steeringSpaceObj_p;
+	}
+
+	if (dMesh_p)
+	{
+		delete dMesh_p;
 	}
 }
 

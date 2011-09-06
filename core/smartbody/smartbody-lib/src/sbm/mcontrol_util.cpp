@@ -435,8 +435,8 @@ void mcuCBHandle::clear( void )	{
 		 motionIter++)
 	{
 
-		//SkMotion* motion = (*motionIter).second;
-		//motion->unref(); // need to cleanup motions - fix
+		SkMotion* motion = (*motionIter).second;
+		motion->unref(); // need to cleanup motions - fix
 
 	}
 

@@ -237,7 +237,7 @@ public :
         Both controller_init() and controller_channels() are called here.
         The convention is that, if there is another init method in the derived
         class, the derived class will be responsible for calling MeController::init() */
-    void init (SbmPawn* pawn);
+    virtual void init (SbmPawn* pawn);
 
 
 	/*! Returns the controller's prune policy, if set.  Otherwise, NULL. */
@@ -247,14 +247,14 @@ public :
 	void prune_policy( MePrunePolicy* prune_policy );
 
     /*! This method is to be called before starting to evaluate the controller. */
-    void start (double time);
+    virtual void start (double time);
 
 	/*! Returns the time that when this controller was started. */
     double start_time ();
 
     /*! This method will simply set the active flag of the controller to false and
         notify the derived class by calling the virtual method controller_stop(). */
-    void stop (double time);
+    virtual void stop (double time);
 
 	/*! Returns the time that when this controller was stopped. */
     double stop_time ();
