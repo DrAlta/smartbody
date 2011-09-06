@@ -318,21 +318,27 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 			parseBehaviorGroup( child, request, mcu, behavior_ordinal, true );
 		} else {
 			const XMLCh* id  = child->getAttribute( BMLDefs::ATTR_ID );
+			std::string idStr;
+			xml_utils::xml_translate(&idStr, id);
+			std::string tagStr;
+			xml_utils::xml_translate(&tagStr, tag);
 			if (bml_feedback)
 			{
-				if (XMLString::compareString( id, XMLString::transcode("") )==0)
+				
+				if (idStr == "")
 				{
 					std::stringstream newIdStr;
-					const char* defaultTagName = xml_utils::asciiString(tag);
-					newIdStr << defaultTagName << idCounter;
-					delete defaultTagName;
-					child->setAttribute(BMLDefs::ATTR_ID, XMLString::transcode(newIdStr.str().c_str()));
+					newIdStr << tagStr << idCounter;
+					XMLCh* uniqueId = XMLString::transcode(newIdStr.str().c_str());
+					child->setAttribute(BMLDefs::ATTR_ID, uniqueId);
+					XMLString::release(&uniqueId);
 					id = XMLString::transcode(newIdStr.str().c_str());
 					request->localId = newIdStr.str();
 					idCounter++;
 				}
 			}
-			string unique_id = request->buildUniqueBehaviorId( tag, id, ++behavior_ordinal );
+			
+			string unique_id = request->buildUniqueBehaviorId( tagStr, idStr, ++behavior_ordinal );
 
 			// Load SyncPoint references
 			BehaviorSyncPoints behav_syncs;  // TODO: rename (previous this was a TimeMarkers class)	
@@ -453,9 +459,8 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 						BehaviorSyncPoints feedbackSyncStart;
 						//bml char doctor <animation name="LHandOnHip_RArm_SweepRight"/>
 						std::stringstream msg;
-						char* idChar = XMLString::transcode(id);
-						std::string localId = idChar;
-						delete idChar;
+						std::string localId;
+						xml_utils::xml_translate(&localId, id);
 						std::string option;
 						if (i == 0) option = "start";
 						if (i == 1) option = "ready";
@@ -474,18 +479,19 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 					}
 				}
 			} else if( required ) {
-				char* ascii_tag = XMLString::transcode( tag );
+				std::string asciiStr;
+				xml_utils::xml_translate(&asciiStr, tag);
+	
 
 				ostringstream err_msg;
-				err_msg << "Required behavior <" <<ascii_tag;
-				if( id && id[0]!='\0' ) {
-					char* ascii_id  = XMLString::transcode( id );
-					err_msg << " id=\""<<ascii_id<<"\"";
-					delete [] ascii_id;
+				err_msg << "Required behavior <" << asciiStr;
+				if( id && id[0]!='\0' )
+				{
+					std::string asciiId;
+					xml_utils::xml_translate(&asciiId, id);
+					err_msg << " id=\""<<asciiId<<"\"";
 				}
 				err_msg << "> (behavior #"<<behavior_ordinal<<") failed to parse.";
-				
-				delete [] ascii_tag;
 
 				throw BML::BmlException( err_msg.str().c_str() );
 			}
@@ -513,8 +519,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_body( DOMElement* elem, std::string
 	
 	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
-	if (id)
-		localId = XMLString::transcode(id);
+	xml_utils::xml_translate(&localId, id);
 
 	const XMLCh* postureName = elem->getAttribute( BMLDefs::ATTR_POSTURE );
 	if( postureName && *postureName != 0 ) {
@@ -565,8 +570,7 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 	
 	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
-	if (id)
-		localId = XMLString::transcode(id);
+	xml_utils::xml_translate(&localId, id);
 	
 	const XMLCh* tag      = elem->getTagName();
 	const XMLCh* attrType = elem->getAttribute( BMLDefs::ATTR_TYPE );
@@ -853,13 +857,12 @@ BML::BehaviorRequestPtr BML::Processor::parse_bml_to_anim( DOMElement* elem, std
 				XMLSize_t aSize = attrs->getLength();
 				for( XMLSize_t i=0; i < aSize; i++ ) {
 					DOMAttr* attr = (DOMAttr*) (attrs->item(i));
-					userValue = string(XMLString::transcode(elem->getAttribute(attr->getName())));
+					xml_utils::xml_translate(&userValue, elem->getAttribute(attr->getName()));
 					if (userValue.empty()) {
 						sameAttrs = false;
 						continue;
 					}
-
-					configValue = string(XMLString::transcode(attr->getValue()));
+					xml_utils::xml_translate(&configValue, attr->getValue());
 					std::transform(userValue.begin(), userValue.end(), userValue.begin(), ::tolower);
 					std::transform(configValue.begin(), configValue.end(), configValue.begin(), ::tolower);
 
@@ -869,15 +872,23 @@ BML::BehaviorRequestPtr BML::Processor::parse_bml_to_anim( DOMElement* elem, std
 				}
 				if (sameAttrs)
 				{			
-					if( XMLString::compareString( elem->getTagName(), BMLDefs::TAG_POSTURE )==0 || XMLString::compareString( elem->getTagName(), BMLDefs::TAG_BODY)==0 ) {
-						string posture = "<body posture=\"" + string(XMLString::transcode(animNode->getTextContent())) + "\" />";
+					if( XMLString::compareString( elem->getTagName(), BMLDefs::TAG_POSTURE )==0 || 
+						XMLString::compareString( elem->getTagName(), BMLDefs::TAG_BODY)==0 )
+					{	
+						std::string posture = "<body posture=\"";
+						std::string motionName;
+						xml_utils::xml_translate(&motionName, animNode->getTextContent());
+						posture += motionName + "\" />";
 						DOMElement* e = xml_utils::parseMessageXml(Prser, (char*)posture.c_str())->getDocumentElement();
 						return parse_bml_body(e, unique_id, behav_syncs, required, request, mcu);
 						//behavior = parse_bml_body( child, unique_id, behav_syncs, required, request, mcu );
 					}
 					else {
-						string animation = "<animation name=\"" + string(XMLString::transcode(animNode->getTextContent())) + "\" />";
-						DOMElement* e = xml_utils::parseMessageXml(Prser, (char*)animation.c_str())->getDocumentElement();
+						string animation = "<animation name=\"";
+						std::string motionName;
+						xml_utils::xml_translate(&motionName, animNode->getTextContent());
+						animation += motionName + "\" />";
+						DOMElement* e = xml_utils::parseMessageXml(Prser, (char*) animation.c_str())->getDocumentElement();
 						return parse_bml_animation(e, unique_id, behav_syncs, required, request, mcu);
 					}
 				}

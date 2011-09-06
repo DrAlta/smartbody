@@ -250,20 +250,17 @@ BmlRequest::~BmlRequest() {
 }
 
 
-std::string BmlRequest::buildUniqueBehaviorId( const XMLCh* tag,
-                                               const XMLCh* id,
+std::string BmlRequest::buildUniqueBehaviorId( const string& tagStr,
+                                               const string& idStr,
 											   size_t ordinal )
 {
 	ostringstream unique_id;
-	std::string ascii;
 
 	unique_id << "BML_" << actorId << '_' << msgId;
-	xml_utils::xml_translate(&ascii, tag);
-	unique_id << "_#" << ordinal << "_<" << ascii << '>';
+	unique_id << "_#" << ordinal << "_<" << tagStr << '>';
 
-	if( id != 0 && *id != 0 )	{
-		std::string idStr;
-		xml_utils::xml_translate(&idStr, id);
+	if (idStr != "")
+	{
 		unique_id << "_\"" << idStr << "\"";
 	}
 

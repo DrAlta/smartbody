@@ -130,7 +130,7 @@ namespace BML {
 #endif
 		void init( BmlRequestPtr self );
 
-		std::string buildUniqueBehaviorId( const XMLCh* tag, const XMLCh* id, size_t ordinal );
+		std::string buildUniqueBehaviorId( const string& tagStr, const string& idStr, size_t ordinal );
 
 		bool hasExistingBehaviorId( const std::wstring& id );
 		void importNamedSyncPoints( BehaviorSyncPoints& behav_syncs, const std::wstring& id, const std::wstring& logging_label );

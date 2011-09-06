@@ -49,13 +49,12 @@ BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& un
 
 	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
-	if (id)
-	{
-		localId = XMLString::transcode(id);
-	}
+	xml_utils::xml_translate(&localId, id);
 
-	const char * Value = XMLString::transcode(value);
-	const char * Param_Name = XMLString::transcode(param_name);
+	std::string valueStr;
+	xml_utils::xml_translate(&valueStr, value);
+	std::string paramNameStr;
+	xml_utils::xml_translate(&paramNameStr, param_name);
 
 	int channel_size = 0;
 	int Index = 0;
@@ -78,7 +77,12 @@ BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& un
 			if( pos->second->char_names[i] == char_name)
 			{
 				Index ++;
-				if((strcmp(pos->first.c_str(),Param_Name) == 0))	{ channel_size = pos->second->size; flag = 1; break; }
+				if (pos->first == paramNameStr)
+				{ 
+					channel_size = pos->second->size; 
+					flag = 1; 
+					break; 
+				}
 			}
 		}
 	}
@@ -98,7 +102,7 @@ BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& un
 
 	SkChannelArray Param_Channel;
 	Data_Array.size(channel_size);
-	char * pch =strtok((char *)Value," ");
+	char* pch =strtok((char *)valueStr.c_str(), " ");
 	for(int i = 0; i < channel_size ; i++)
 	{
 		if(pch == NULL) 

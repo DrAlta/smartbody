@@ -40,10 +40,7 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 
 	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
-	if (id)
-	{
-		localId = XMLString::transcode(id);
-	}
+	xml_utils::xml_translate(&localId, id);
 	
 	if( animName != 0 && *animName != 0 )	{
 
@@ -98,9 +95,7 @@ BML::BehaviorRequestPtr BML::parse_bml_panimation( DOMElement* elem, const std::
 	const XMLCh* animName2 = elem->getAttribute( BMLDefs::ATTR_ANIM2 );
 	const XMLCh* id = elem->getAttribute( BMLDefs::ATTR_ID );
 	std::string localId;
-	if (id)
-		localId = XMLString::transcode(id);
-	
+	xml_utils::xml_translate(&localId, id);
 
 	std::string charName;
 	int nameStartPos = unique_id.find_first_of("_");
