@@ -50,15 +50,39 @@ MeCtReachEngine::MeCtReachEngine( SbmCharacter* sbmChar, SkSkeleton* sk)
 	interpMotion = NULL;
 	motionParameter = NULL;
 	curReachState = NULL;	
+	reachData = NULL;
 }
 
 MeCtReachEngine::~MeCtReachEngine( void )
 {
+	for (std::map<std::string,EffectorConstraint*>::iterator iter = rightFootConstraint.begin();
+		iter != rightFootConstraint.end();
+		iter++)
+	{
+		delete (*iter).second;
+	}	
+	for (std::map<std::string,EffectorConstraint*>::iterator iter = leftFootConstraint.begin();
+		iter != leftFootConstraint.end();
+		iter++)
+	{
+		delete (*iter).second;
+	}
+	for (std::map<std::string,ReachStateInterface*>::iterator iter = stateTable.begin();
+		 iter != stateTable.end();
+		 iter++)
+	{
+		delete (*iter).second;
+	}
+	if (reachData)
+	{
+		delete reachData;
+	}
 	skeletonCopy->unref();
-#define FREE_DATA(data) if (data) delete data; data=NULL;
-	FREE_DATA(dataInterpolator);
-	FREE_DATA(interpMotion);
-	FREE_DATA(motionParameter);
+	if (dataInterpolator)
+		delete dataInterpolator;
+	if (interpMotion)
+		delete interpMotion;
+//	FREE_DATA(motionParameter);
 }
 
 void MeCtReachEngine::init(int rtype, SkJoint* effectorJoint)
