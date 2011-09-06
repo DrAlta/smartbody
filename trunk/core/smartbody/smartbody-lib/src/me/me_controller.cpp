@@ -167,11 +167,12 @@ void MeController::prune_policy( MePrunePolicy* prune_policy ) {
 void MeController::start (double time) {
 
 	// add the controller resource as 'start'
-	ControllerResource* cres = new ControllerResource();
+	/*ControllerResource* cres = new ControllerResource();
 	cres->setControllerName(this->getName());
 	cres->setType("start");
 	cres->setTime(time);
 	ResourceManager::getResourceManager()->addControllerResource(cres);
+	*/
 	
 	_active = true;
 	controller_start ();
@@ -186,11 +187,12 @@ double MeController::start_time ()
 void MeController::stop (double time) {
 
 	// add the controller resource as 'stop'
-	ControllerResource* cres = new ControllerResource();
+	/*ControllerResource* cres = new ControllerResource();
 	cres->setControllerName(this->getName());
 	cres->setType("stop");
 	cres->setTime(time);
 	ResourceManager::getResourceManager()->addControllerResource(cres);
+	*/
 	
 	_active = false;
 	stop_record();
