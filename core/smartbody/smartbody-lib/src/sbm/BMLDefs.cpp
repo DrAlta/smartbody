@@ -293,6 +293,7 @@ XMLCh* BMLDefs::ATTR_COUNT = NULL;
 XMLCh* BMLDefs::ATTR_INPUT = NULL;
 XMLCh* BMLDefs::ATTR_SEMANTIC = NULL;
 XMLCh* BMLDefs::ATTR_VCOUNT = NULL;
+XMLCh* BMLDefs::ATTR_SOURCE = NULL;
 
 BMLDefs::BMLDefs()
 {
@@ -601,6 +602,7 @@ BMLDefs::BMLDefs()
 	ATTR_INPUT = XMLString::transcode("input");
 	ATTR_SEMANTIC = XMLString::transcode("semantic");
 	ATTR_VCOUNT = XMLString::transcode("vcount");
+	ATTR_SOURCE = XMLString::transcode("source");
 }
 
 }

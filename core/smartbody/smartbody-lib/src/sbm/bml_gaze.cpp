@@ -731,10 +731,10 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		}
 	}
 
-	std::string localId = xml_parse_string( BMLDefs::ATTR_ID, elem );
-//	if (id)
-//		localId = XMLString::transcode(id);
-	
+
+	std::string localId;
+	xml_utils::xml_parse_string(&localId, BMLDefs::ATTR_ID, elem );
+
 	boost::shared_ptr<MeControllerRequest> ct_request( new MeControllerRequest( unique_id, localId, gaze_ct, request->actor->gaze_sched_p, behav_syncs ) );
 	ct_request->set_persistent( true );
 	return ct_request;

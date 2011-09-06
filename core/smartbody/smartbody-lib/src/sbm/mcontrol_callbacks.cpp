@@ -66,6 +66,7 @@
 #include <boost/filesystem/convenience.hpp>
 #include "ParserFBX.h"
 #include "SBCharacter.h"
+#include <sbm/BMLDefs.h>
 
 #ifdef USE_GOOGLE_PROFILER
 #include <google/profiler.h>
@@ -1844,15 +1845,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 
 void nodeStr(const XMLCh* s, std::string& out)
 {
-	if (!s)
-	{
-		out = "";
-		return;
-	}
-	char* cstr = XMLString::transcode(s);
-
-	out = cstr;
-	delete cstr;
+	xml_utils::xml_translate(&out, s);
 }
 
 void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFactor, std::string jointPrefix, mcuCBHandle* mcu_p)
@@ -1872,7 +1865,7 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 		if (name == "controller")
 		{
 			DOMNamedNodeMap* attributes = node->getAttributes();
-			DOMNode* idNode = attributes->getNamedItem(XMLString::transcode("id"));
+			DOMNode* idNode = attributes->getNamedItem(BML::BMLDefs::ATTR_ID);
 			if (!idNode)	continue;
 			std::string skinId;
 			nodeStr(idNode->getNodeValue(), skinId);
@@ -1887,7 +1880,7 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 					if (childName == "skin")	// parsing skinning weights
 					{
 						DOMNamedNodeMap* skinAttributes = childNode->getAttributes();			
-						DOMNode* skinNode = skinAttributes->getNamedItem(XMLString::transcode("source"));	
+						DOMNode* skinNode = skinAttributes->getNamedItem(BML::BMLDefs::ATTR_SOURCE);	
 						std::string skinSource;
 						nodeStr(skinNode->getNodeValue(), skinSource);
 						skinSource = skinSource.substr(1, skinSource.size() - 1);
@@ -1934,7 +1927,7 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 								DOMNamedNodeMap* sourceAttributes = childNodeOfSkin->getAttributes();
 								DOMNodeList* realContentNodeList = childNodeOfSkin->getChildNodes();
 								std::string sourceId;
-								nodeStr(sourceAttributes->getNamedItem(XMLString::transcode("id"))->getNodeValue(), sourceId);
+								nodeStr(sourceAttributes->getNamedItem(BML::BMLDefs::ATTR_ID)->getNodeValue(), sourceId);
 								for (unsigned int cSource = 0; cSource < realContentNodeList->getLength(); cSource++)
 								{
 									DOMNode* realContentNode = realContentNodeList->item(cSource);
@@ -2028,7 +2021,7 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 					if (childName == "morph")	// parsing morph targets
 					{
 						DOMNamedNodeMap* morphAttributes = childNode->getAttributes();			
-						DOMNode* morphNode = morphAttributes->getNamedItem(XMLString::transcode("source"));	
+						DOMNode* morphNode = morphAttributes->getNamedItem(BML::BMLDefs::ATTR_SOURCE);	
 						std::string morphName;
 						nodeStr(morphNode->getNodeValue(), morphName);
 						morphName = morphName.substr(1, morphName.size() - 1);
@@ -2113,9 +2106,9 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 	}
 	catch (const XMLException& toCatch) 
 	{
-		char* message = XMLString::transcode(toCatch.getMessage());
+		std::string message;
+		xml_utils::xml_translate(&message, toCatch.getMessage());
 		std::cout << "Error during initialization! :\n" << message << "\n";
-		XMLString::release(&message);
 		return( CMD_FAILURE );
 	}
 
@@ -2140,15 +2133,15 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 	}
 	catch (const XMLException& toCatch) 
 	{
-		char* message = XMLString::transcode(toCatch.getMessage());
+		std::string message;
+		xml_utils::xml_translate(&message, toCatch.getMessage());
 		std::cout << "Exception message is: \n" << message << "\n";
-		XMLString::release(&message);
 		return( CMD_FAILURE );
 	}
 	catch (const DOMException& toCatch) {
-		char* message = XMLString::transcode(toCatch.msg);
+		std::string message;
+		xml_utils::xml_translate(&message, toCatch.msg);
 		std::cout << "Exception message is: \n" << message << "\n";
-		XMLString::release(&message);
 		return( CMD_FAILURE );
 	}
 		catch (...) {

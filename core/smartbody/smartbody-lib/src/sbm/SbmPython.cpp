@@ -628,6 +628,7 @@ void initPython(std::string pythonLibPath)
 		}	
 #else
 		PyRun_SimpleString("class WritableObject:\n\tdef __init__(self):\n\t\tself.content = []\n\tdef write(self, string):\n\t\tprintlog(string)\n");
+		PyRun_SimpleString("logwriter = WritableObject()");
 		PyRun_SimpleString("sys.stdout = logwriter");
 		PyRun_SimpleString("sys.stderr = logwriter");
 #endif		
