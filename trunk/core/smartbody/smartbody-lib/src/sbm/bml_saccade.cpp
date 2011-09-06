@@ -53,23 +53,23 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 	float duration = 0.03f;
 	float magnitude = 3.0f;
 	float direction = 45.0f;
-	const char* dur = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_DURATION));
-	if (strcmp(dur, "") != 0)
+	float dur = xml_utils::xml_translate_float(elem->getAttribute(BMLDefs::ATTR_DURATION));
+	if (dur != 0.0f)
 	{
 		saccade_ct->setUseModel(false);
-		duration = (float)atof(dur);
+		duration = dur;
 	}
-	const char* mag = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_MAGNITUDE));
-	if (strcmp(mag, "") != 0)
+	float  mag = xml_utils::xml_translate_float(elem->getAttribute(BMLDefs::ATTR_MAGNITUDE));
+	if (mag != 0.0f)
 	{
 		saccade_ct->setUseModel(false);
-		magnitude = (float)atof(mag);
+		magnitude = mag;
 	}
-	const char* dir = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_DIRECTION));
-	if (strcmp(dir, "") != 0)
+	float dir = xml_utils::xml_translate_float(elem->getAttribute(BMLDefs::ATTR_DIRECTION));
+	if (dir != 0.0f)
 	{
 		saccade_ct->setUseModel(false);
-		direction = (float)atof(dir);
+		direction = dir;
 	}
 	if (!saccade_ct->getUseModel())
 	{
@@ -78,15 +78,15 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 	}
 
 	//-----
-	const char* bMode = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_MODE));
-	if (strcmp(bMode, "") != 0)
+	std::string bMode;
+	xml_utils::xml_translate(&bMode, elem->getAttribute(BMLDefs::ATTR_MODE));
+	if (bMode != "")
 	{
-		std::string bModeString = bMode;
-		if (bModeString == "talk")
+		if (bMode == "talk")
 			saccade_ct->setBehaviorMode(MeCtSaccade::Talking);
-		else if (bModeString == "listen")
+		else if (bMode == "listen")
 			saccade_ct->setBehaviorMode(MeCtSaccade::Listening);
-		else if (bModeString == "think")
+		else if (bMode == "think")
 			saccade_ct->setBehaviorMode(MeCtSaccade::Thinking);
 		else
 		{
@@ -95,39 +95,39 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 		}
 	}
 
-	const char* bin0 = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN0));
-	const char* bin45 = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN45));
-	const char* bin90 = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN90));
-	const char* bin135 = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN135));
-	const char* bin180 = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN180));
-	const char* bin225 = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN225));
-	const char* bin270 = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN270));
-	const char* bin315 = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN315));
-	if (strcmp(bin0, "") != 0 && strcmp(bin45, "") != 0 && strcmp(bin90, "") != 0 && strcmp(bin135, "") != 0 &&
-		strcmp(bin180, "") != 0 && strcmp(bin225, "") != 0 && strcmp(bin270, "") != 0 && strcmp(bin315, "") != 0)
+	float bin0 = xml_utils::xml_translate_float(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN0));
+	float bin45 = xml_utils::xml_translate_float(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN45));
+	float bin90 = xml_utils::xml_translate_float(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN90));
+	float bin135 = xml_utils::xml_translate_float(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN135));
+	float bin180 = xml_utils::xml_translate_float(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN180));
+	float bin225 = xml_utils::xml_translate_float(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN225));
+	float bin270 = xml_utils::xml_translate_float(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN270));
+	float bin315 = xml_utils::xml_translate_float(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN315));
+	if (bin0 != 0.0f && bin45 != 0.0f && bin90 != 0.0f && bin135 != 0.0f &&
+		bin180 != 0.0f && bin225 != 0.0f && bin270 != 0.0f && bin315 != 0.0f)
 	{
-		saccade_ct->setPercentageBins((float)atof(bin0), (float)atof(bin45), (float)atof(bin90), (float)atof(bin135), (float)atof(bin180), (float)atof(bin225), (float)atof(bin270), (float)atof(bin315)); 
+		saccade_ct->setPercentageBins(bin0, bin45, bin90, bin135, bin180, bin225, bin270, bin315);
 	}
 
-	const char* mean = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_SACCADE_INTERVAL_MEAN));
-	const char* variant = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_SACCADE_INTERVAL_VARIANT));
-	if (strcmp(mean, "") != 0 && strcmp(variant, "") != 0)
+	float mean = xml_utils::xml_translate_float(elem->getAttribute(BMLDefs::ATTR_SACCADE_INTERVAL_MEAN));
+	float variant = xml_utils::xml_translate_float(elem->getAttribute(BMLDefs::ATTR_SACCADE_INTERVAL_VARIANT));
+	if (mean != 0.0f && variant != 0.0f)
 	{
-		saccade_ct->setGaussianParameter((float)atof(mean), (float)atof(variant));
+		saccade_ct->setGaussianParameter(mean, variant);
 	}
 
-	const char* limitAngle = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_ANGLELIMIT));
-	if (strcmp(limitAngle, "") != 0)
+	float limitAngle = xml_utils::xml_translate_float(elem->getAttribute(BMLDefs::ATTR_ANGLELIMIT));
+	if (limitAngle != 0)
 	{
-		float angle = (float)atof(limitAngle);
+		float angle = limitAngle;
 		saccade_ct->setAngleLimit(angle);
 	}
 
-	const char* finishFlag = xml_utils::asciiString(elem->getAttribute(BMLDefs::ATTR_FINISH));
-	if (strcmp(finishFlag, "") != 0)
+	std::string finishFlag;
+	xml_utils::xml_translate(&finishFlag, elem->getAttribute(BMLDefs::ATTR_FINISH));
+	if (finishFlag != "")
 	{
-		std::string finish = finishFlag;
-		if (finish == "true")
+		if (finishFlag == "true" || finishFlag == "TRUE")
 			saccade_ct->setValid(false);
 		else
 		{
