@@ -59,6 +59,13 @@ MeCtBreathing::MeCtBreathing ()
 MeCtBreathing::~MeCtBreathing ()
 {
 	if ( _motion ) _motion->unref ();
+	for (std::list<BreathLayer*>::iterator iter = _breath_layers.begin();
+		iter != _breath_layers.end();
+		iter++)
+	{
+		delete (*iter);
+	}
+	
 	delete _default_breath_cycle;
 }
 
