@@ -1906,7 +1906,7 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 							{
 								std::string tokenBlock;
 								nodeStr(childNodeOfSkin->getTextContent(), tokenBlock);
-								float* bindShapeMat = new float[16];
+								float bindShapeMat[16];
 								
 								boost::tokenizer<boost::char_separator<char> > tokens(tokenBlock, sep);
 								int i = 0;

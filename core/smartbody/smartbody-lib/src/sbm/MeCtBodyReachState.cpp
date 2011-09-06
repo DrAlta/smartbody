@@ -388,6 +388,31 @@ ReachStateData::ReachStateData()
 	linearVel = 70.f;
 }
 
+ReachStateData::~ReachStateData()
+{
+	if (interpMotion)
+	{
+		delete interpMotion;
+		interpMotion = NULL;
+	}
+	if (motionParameter)
+	{
+		delete motionParameter; 
+		motionParameter = NULL;
+	}
+	if (dataInterpolator)
+	{
+		delete dataInterpolator;
+		dataInterpolator = NULL;
+	}
+	if (curHandAction)
+	{
+		delete curHandAction;
+		curHandAction = NULL;
+	}
+}
+
+
 void ReachStateData::updateReachState(const SrMat& worldOffset, BodyMotionFrame& motionFrame )
 {
 	gmat = worldOffset;
