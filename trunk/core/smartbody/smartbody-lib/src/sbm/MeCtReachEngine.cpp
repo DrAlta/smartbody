@@ -54,6 +54,7 @@ MeCtReachEngine::MeCtReachEngine( SbmCharacter* sbmChar, SkSkeleton* sk)
 
 MeCtReachEngine::~MeCtReachEngine( void )
 {
+	skeletonCopy->unref();
 #define FREE_DATA(data) if (data) delete data; data=NULL;
 	FREE_DATA(dataInterpolator);
 	FREE_DATA(interpMotion);
