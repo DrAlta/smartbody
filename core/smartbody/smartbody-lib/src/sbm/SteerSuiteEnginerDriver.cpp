@@ -48,6 +48,14 @@ SteerSuiteEngineDriver::SteerSuiteEngineDriver() : DObject()
 	createDoubleAttribute("initialConditions.radius", 0.4, true, "Basic", 60, false, false, false, "Initial radius of agents in meters.");
 }
 
+SteerSuiteEngineDriver::~SteerSuiteEngineDriver()
+{
+	if (_engine)
+		delete _engine;
+	if (_options)
+		delete _options;
+}
+
 bool SteerSuiteEngineDriver::isInitialized()
 {
 	return _alreadyInitialized;

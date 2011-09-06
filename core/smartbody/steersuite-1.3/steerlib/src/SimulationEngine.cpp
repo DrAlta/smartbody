@@ -36,6 +36,7 @@ using namespace Util;
 SimulationEngine::SimulationEngine()
 {
 	_setupStateMachine();
+	_options = NULL;
 }
 
 void SimulationEngine::_reset()
@@ -58,6 +59,9 @@ void SimulationEngine::_reset()
 	_simulationRunning = false;
 	_simulationDone = false;
 	_engineStateMachineCallback.setEngine(this);
+	if (_options)
+		delete _options;
+	_options = NULL;
 }
 
 //========================================

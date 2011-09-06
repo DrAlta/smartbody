@@ -459,6 +459,7 @@ void MeCtParamAnimation::reset()
 	nextStateModule = NULL;
 	transitionManager = NULL;
 	waitingList.clear();	
+	delete controllerBlending;
 }
 
 void MeCtParamAnimation::updateWo(SrMat&mat, MeCtChannelWriter* woWriter, SrBuffer<float>& buffer)
