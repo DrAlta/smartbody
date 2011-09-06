@@ -317,9 +317,9 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 		if( XMLString::compareString( tag, BMLDefs::TAG_REQUIRED )==0 ) {
 			parseBehaviorGroup( child, request, mcu, behavior_ordinal, true );
 		} else {
-			const XMLCh* id  = child->getAttribute( BMLDefs::ATTR_ID );
+			const XMLCh* idAttr  = child->getAttribute( BMLDefs::ATTR_ID );
 			std::string idStr;
-			xml_utils::xml_translate(&idStr, id);
+			xml_utils::xml_translate(&idStr, idAttr);
 			std::string tagStr;
 			xml_utils::xml_translate(&tagStr, tag);
 			if (bml_feedback)
@@ -327,12 +327,13 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				
 				if (idStr == "")
 				{
+					// automatically create an id for this request
 					std::stringstream newIdStr;
 					newIdStr << tagStr << idCounter;
 					XMLCh uniqueId[512];
 					XMLString::transcode(newIdStr.str().c_str(), uniqueId, 511);
 					child->setAttribute(BMLDefs::ATTR_ID, uniqueId);
-					id = XMLString::transcode(newIdStr.str().c_str());
+					idStr = newIdStr.str();
 					request->localId = newIdStr.str();
 					idCounter++;
 				}
@@ -435,7 +436,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				// [BMLR] support for bml to animations
 				behavior = parse_bml_to_anim(child, unique_id, behav_syncs, required, request, mcu);
 				if( behavior != NULL )	{
-					request->registerBehavior( xml_utils::xml_translate_wide( id ), behavior );
+					request->registerBehavior( xml_utils::xml_s2w(idStr), behavior );
 				}
 				else
 					wcerr<<"WARNING: BodyPlannerImpl: <"<<tag<<"> BML tag unrecognized or unsupported."<<endl;
@@ -451,7 +452,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 
 			if( behavior != NULL ) {
 				behavior->required = required;
-				request->registerBehavior( xml_utils::xml_translate_wide( id ), behavior );
+				request->registerBehavior( xml_utils::xml_s2w(idStr), behavior );
 				if (bml_feedback)
 				{
 					for (int i = 0; i < 7; i++)
@@ -459,8 +460,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 						BehaviorSyncPoints feedbackSyncStart;
 						//bml char doctor <animation name="LHandOnHip_RArm_SweepRight"/>
 						std::stringstream msg;
-						std::string localId;
-						xml_utils::xml_translate(&localId, id);
+						std::string localId = idStr;
 						std::string option;
 						if (i == 0) option = "start";
 						if (i == 1) option = "ready";
@@ -485,11 +485,9 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 
 				ostringstream err_msg;
 				err_msg << "Required behavior <" << asciiStr;
-				if( id && id[0]!='\0' )
+				if ( idStr != "" )
 				{
-					std::string asciiId;
-					xml_utils::xml_translate(&asciiId, id);
-					err_msg << " id=\""<<asciiId<<"\"";
+					err_msg << " id=\"" << idStr << "\"";
 				}
 				err_msg << "> (behavior #"<<behavior_ordinal<<") failed to parse.";
 
