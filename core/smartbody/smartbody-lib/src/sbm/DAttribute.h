@@ -14,7 +14,7 @@ class DAttributeInfo;
 class DAttribute : public DSubject
 {
 	public:
-		DAttribute(std::string name);	
+		DAttribute(const std::string& name);	
 		DAttribute();
 		virtual ~DAttribute();
 		void setName(const std::string& name);
@@ -38,7 +38,7 @@ class DAttribute : public DSubject
 class DAttributeGroup 
 {
 	public:
-		DAttributeGroup(std::string name);
+		DAttributeGroup(const std::string& name);
 		~DAttributeGroup();
 
 		const std::string& getName();
@@ -68,8 +68,8 @@ class DAttributeInfo
 		bool getHidden();
 		void setGroup(DAttributeGroup* group);
 		DAttributeGroup* getGroup();
-		void setGroup(std::string groupName);
-		void setDescription(std::string description);
+		void setGroup(const std::string& groupName);
+		void setDescription(const std::string& description);
 		std::string getDescription();
 
 		std::string write();
@@ -91,13 +91,13 @@ class BoolAttribute : public DAttribute
 {
 	public:
 		BoolAttribute();
-		BoolAttribute(std::string name, bool val = true);
+		BoolAttribute(const std::string& name, bool val = true);
 		~BoolAttribute();
 
-		bool getValue(float time = -1.0);
-		void setValue(bool val, float time = -1.0);
-		void setDefaultValue(bool defaultVal);
-		bool getDefaultValue();
+		const bool& getValue(float time = -1.0);
+		void setValue(const bool& val, float time = -1.0);
+		void setDefaultValue(const bool& defaultVal);
+		const bool& getDefaultValue();
 
 		virtual std::string write();
 		virtual void read();
@@ -112,13 +112,13 @@ class IntAttribute : public DAttribute
 {
 	public:
 		IntAttribute();
-		IntAttribute(std::string name, int val = 0, int min = -std::numeric_limits<int>::max(), int max = std::numeric_limits<int>::max());
+		IntAttribute(const std::string& name, int val = 0, int min = -std::numeric_limits<int>::max(), int max = std::numeric_limits<int>::max());
 		~IntAttribute();
 
-		int getValue(float time = -1.0);
-		void setValue(int val, float time = -1.0);
-		void setDefaultValue(int defaultVal);
-		int getDefaultValue();
+		const int& getValue(float time = -1.0);
+		void setValue(const int& val, float time = -1.0);
+		void setDefaultValue(const int& defaultVal);
+		const int& getDefaultValue();
 		int getMin();
 		int getMax();
 		void setMin(int val);
@@ -139,13 +139,13 @@ class DoubleAttribute : public DAttribute
 {
 	public:
 		DoubleAttribute();
-		DoubleAttribute(std::string name, double val = 0, double min = -std::numeric_limits<double>::max(), double max = std::numeric_limits<double>::max());
+		DoubleAttribute(const std::string& name, double val = 0, double min = -std::numeric_limits<double>::max(), double max = std::numeric_limits<double>::max());
 		~DoubleAttribute();
 
-		double getValue(float time = -1.0);
-		void setValue(double val, float time = -1.0);
-		void setDefaultValue(double defaultVal);
-		double getDefaultValue();
+		const double& getValue(float time = -1.0);
+		void setValue(const double& val, float time = -1.0);
+		void setDefaultValue(const double& defaultVal);
+		const double& getDefaultValue();
 		double getMin();
 		double getMax();
 		void setMin(double val);
@@ -166,15 +166,15 @@ class StringAttribute : public DAttribute
 {
 	public:
 		StringAttribute();
-		StringAttribute(std::string name, std::string value = "");
+		StringAttribute(const std::string& name, std::string value = "");
 		~StringAttribute();
 
 		const std::string& getValue(float time = -1.0);
 		void setValue(const std::string& val, float time = -1.0);
 		void setDefaultValue(const std::string& defaultVal);
 		const std::string& getDefaultValue();
-		void setValidValues(std::vector<std::string> values);
-		std::vector<std::string>& getValidValues();
+		void setValidValues(const std::vector<std::string>& values);
+		const std::vector<std::string>& getValidValues();
 
 		virtual std::string write();
 		virtual void read();
@@ -190,13 +190,13 @@ class Vec3Attribute : public DAttribute
 {
 	public:
 		Vec3Attribute();
-		Vec3Attribute(std::string name);
+		Vec3Attribute(const std::string& name);
 		~Vec3Attribute();
 
-		SrVec getValue(float time = -1.0);
-		void setValue(SrVec val, float time = -1.0);
-		void setDefaultValue(SrVec defaultVal);
-		SrVec getDefaultValue();
+		const SrVec& getValue(float time = -1.0);
+		void setValue(const SrVec& val, float time = -1.0);
+		void setDefaultValue(const SrVec& defaultVal);
+		const SrVec& getDefaultValue();
 
 		virtual std::string write();
 		virtual void read();
@@ -211,13 +211,13 @@ class MatrixAttribute : public DAttribute
 {
 	public:
 		MatrixAttribute();
-		MatrixAttribute(std::string name);
+		MatrixAttribute(const std::string& name);
 		~MatrixAttribute();
 
-		SrMat& getValue(float time = -1.0);
-		void setValue(SrMat& matrix, float time = -1.0);
-		void setDefaultValue(SrMat& matrix);
-		SrMat& getDefaultValue();
+		const SrMat& getValue(float time = -1.0);
+		void setValue(const SrMat& matrix, float time = -1.0);
+		void setDefaultValue(const SrMat& matrix);
+		const SrMat& getDefaultValue();
 
 		virtual std::string write();
 		virtual void read();

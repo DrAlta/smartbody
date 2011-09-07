@@ -457,7 +457,7 @@ void AttributeWindow::draw()
 							choice->tooltip(_strdup(attrInfo->getDescription().c_str()));
 						// add all the options
 						choice->add("-----");
-						std::vector<std::string>& values = stringAttr->getValidValues();
+						const std::vector<std::string>& values = stringAttr->getValidValues();
 						int selected = -1;
 						for (size_t i = 0; i < values.size(); i++)
 						{
@@ -513,7 +513,7 @@ void AttributeWindow::draw()
 				StringAttribute* stringAttr = dynamic_cast<StringAttribute*>(attr);
 				if (stringAttr) 
 				{
-					std::vector<std::string>& validValues = stringAttr->getValidValues();
+					const std::vector<std::string>& validValues = stringAttr->getValidValues();
 					if (validValues.size() > 0)
 					{
 						bool resetChoiceList = false;
@@ -998,7 +998,7 @@ void AttributeWindow::notify(DSubject* subject)
 		StringAttribute* sattr = dynamic_cast<StringAttribute*>(attr);
 		if (sattr)
 		{
-			std::vector<std::string>& validValues = sattr->getValidValues();
+			const std::vector<std::string>& validValues = sattr->getValidValues();
 			if (validValues.size() == 0)
 			{
 
@@ -1029,7 +1029,7 @@ void AttributeWindow::notify(DSubject* subject)
 				}
 				// check to see if the choice list needs to be reset
 				bool resetChoiceList = false;
-				std::vector<std::string>& validValues = sattr->getValidValues();
+				const std::vector<std::string>& validValues = sattr->getValidValues();
 				if (validValues.size() != choice->size())
 				{
 					resetChoiceList = true;
@@ -1050,7 +1050,7 @@ void AttributeWindow::notify(DSubject* subject)
 					dirty = true;
 					choice->clear();
 					choice->add("-----");
-					std::vector<std::string>& values = sattr->getValidValues();
+					const std::vector<std::string>& values = sattr->getValidValues();
 					int selected = -1;
 					for (size_t i = 0; i < values.size(); i++)
 					{
