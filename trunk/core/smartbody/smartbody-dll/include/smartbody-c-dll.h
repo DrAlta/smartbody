@@ -27,6 +27,7 @@ typedef int (__stdcall *SBM_OnCreateCharacterCallback)( SBMHANDLE sbmHandle, con
 typedef int (__stdcall *SBM_OnCharacterDeleteCallback)( SBMHANDLE sbmHandle, const char * name );
 typedef int (__stdcall *SBM_OnCharacterChangeCallback)( SBMHANDLE sbmHandle, const char * name );
 typedef int (__stdcall *SBM_OnVisemeCallback)( SBMHANDLE sbmHandle, const char * name, const char * visemeName, float weight, float blendTime );
+typedef int (__stdcall *SBM_OnChannelCallback)( SBMHANDLE sbmHandle, const char * name, const char * channelName, float value );
 
 struct SBM_CallbackInfo
 {
@@ -82,7 +83,7 @@ SMARTBODY_C_DLL_API bool SBM_SetMediaPath( SBMHANDLE sbmHandle, const char * pat
 SMARTBODY_C_DLL_API bool SBM_Init( SBMHANDLE sbmHandle );
 SMARTBODY_C_DLL_API bool SBM_Shutdown( SBMHANDLE sbmHandle );
 
-SMARTBODY_C_DLL_API bool SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB, SBM_OnCharacterDeleteCallback deleteCB, SBM_OnCharacterChangeCallback changedCB, SBM_OnVisemeCallback visemeCB );
+SMARTBODY_C_DLL_API bool SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB, SBM_OnCharacterDeleteCallback deleteCB, SBM_OnCharacterChangeCallback changedCB, SBM_OnVisemeCallback visemeCB, SBM_OnChannelCallback channelCB );
 
 SMARTBODY_C_DLL_API bool SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds );
 
@@ -100,6 +101,7 @@ SMARTBODY_C_DLL_API bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, int * numC
 SMARTBODY_C_DLL_API bool SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, const char * name);
 SMARTBODY_C_DLL_API bool SBM_IsCharacterChanged( SBMHANDLE sbmHandle, const char * name);
 SMARTBODY_C_DLL_API bool SBM_VisemeSet( SBMHANDLE sbmHandle, const char * name, const char * visemeName, float weight, float blendTime);
+SMARTBODY_C_DLL_API bool SBM_ChannelSet( SBMHANDLE sbmHandle, const char * name, const char * channelName, float value);
 
 
 #ifdef __cplusplus

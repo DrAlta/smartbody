@@ -283,6 +283,7 @@ public:
 		float rampin_duration
 	);
 	void forward_visemes( double curTime);
+	void forward_parameters( double curTime);
 
 	void inspect_skeleton( SkJoint* joint_p, int depth = 0 );
 	void inspect_skeleton_local_transform( SkJoint* joint_p, int depth = 0 );

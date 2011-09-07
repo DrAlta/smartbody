@@ -1012,11 +1012,12 @@ void mcuCBHandle::update( void )	{
 		}
 		if( char_p ) {
 
-			char_p->forward_visemes( time );	
 			if (char_p->scene_p)
 				char_p->scene_p->update();	
 			char_p->updateJointPhyObjs();
 			char_p->_skeleton->update_global_matrices();
+			char_p->forward_visemes( time );	
+			char_p->forward_parameters( time );	
 			//char_p->dMesh_p->update();
 
 			if ( net_bone_updates && char_p->getSkeleton() && char_p->bonebusCharacter ) {
@@ -1445,11 +1446,17 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 	character->IncrementTime();
 	character->StartSendBoneRotations();
 
+	std::vector<int> otherJoints;
+
 	for ( size_t i = 0; i < joints.size(); i++ )
 	{
 		SkJoint * j = joints[ i ];
 		if (j->getJointType() != SkJoint::TypeJoint)
+		{
+			if (j->getJointType() == SkJoint::TypeOther)
+				otherJoints.push_back(i); // collect the 'other' joins
 			continue;
+		}
 
 		const SrQuat& q = j->quat()->value();
 
@@ -1486,6 +1493,18 @@ void mcuCBHandle::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, Sk
 	}
 
 	character->EndSendBonePositions();
+
+	if (otherJoints.size() > 0)
+	{
+		character->StartSendGeneralParameters();
+		for (size_t i = 0; i < otherJoints.size(); i++)
+		{
+			SkJoint* joint = joints[otherJoints[i]];
+			character->AddGeneralParameters(i, 1, joint->pos()->value( 0 ), i, time);
+		}
+		character->EndSendGeneralParameters();
+	}
+	
 
 /*
 	// Passing General Parameters

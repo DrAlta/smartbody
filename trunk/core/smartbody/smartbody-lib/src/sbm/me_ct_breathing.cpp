@@ -54,6 +54,7 @@ MeCtBreathing::MeCtBreathing ()
 	_expiratory_reserve_volume_threshold = 0;
 
 	_incremental = true;
+	_blendChannelBreathingMotion = NULL;
 }
 
 MeCtBreathing::~MeCtBreathing ()
@@ -67,11 +68,56 @@ MeCtBreathing::~MeCtBreathing ()
 	}
 	
 	delete _default_breath_cycle;
+
+	if (_blendChannelBreathingMotion)
+		_blendChannelBreathingMotion->unref();
+
 }
 
 void MeCtBreathing::init ( SbmPawn* pawn )
 {
 	MeController::init(pawn);
+
+}
+
+void MeCtBreathing::setUseBlendChannels(bool val)
+{
+	if (_useBlendChannels && !val)
+	{
+		setMotion(NULL);
+	}
+
+	_useBlendChannels = val;
+
+	if (_useBlendChannels && !_blendChannelBreathingMotion)
+	{
+		// blend channels are being turned on, so
+		// create a motion containing simulated breathing
+		_blendChannelBreathingMotion = new SkMotion();
+		SkChannelArray breathingChannels;
+		breathingChannels.add("breath", SkChannel::XPos);
+		_blendChannelBreathingMotion->init(breathingChannels);
+		double dt = 0.016;
+		double totalTime = 6.0; // time for a breathing cycle
+		int counter = 0;
+		for (double t = 0.0; t < totalTime; t += dt)
+		{
+			_blendChannelBreathingMotion->insert_frame(counter, (float) t);
+			float* frame = _blendChannelBreathingMotion->posture(counter);
+			frame[0] = (float) sin( 2 * M_PI * t / totalTime );
+			counter++;
+		}
+		_blendChannelBreathingMotion->synch_points.set_time(0, .25 * totalTime, totalTime / 2,  totalTime / 2, totalTime / 2, .75 * totalTime, totalTime);
+		_blendChannelBreathingMotion->ref();
+
+		setMotion(_blendChannelBreathingMotion);
+	}
+	
+}
+
+bool MeCtBreathing::getUseBlendChannels()
+{
+	return _useBlendChannels;
 }
 
 void MeCtBreathing::setMotion ( SkMotion* m ) 

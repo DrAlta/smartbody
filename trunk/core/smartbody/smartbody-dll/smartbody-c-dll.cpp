@@ -73,15 +73,17 @@ private:
    SBM_OnCharacterDeleteCallback m_deleteCharacterCallback;
    SBM_OnCharacterChangeCallback m_changeCharacterCallback;
    SBM_OnVisemeCallback m_viseme;
+   SBM_OnChannelCallback m_channel;
 
 public:
-   SBM_SmartbodyListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCharCallback, SBM_OnCharacterDeleteCallback deleteCharCallback, SBM_OnCharacterChangeCallback changeCharCallback, SBM_OnVisemeCallback visemeCallback )
+   SBM_SmartbodyListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCharCallback, SBM_OnCharacterDeleteCallback deleteCharCallback, SBM_OnCharacterChangeCallback changeCharCallback, SBM_OnVisemeCallback visemeCallback, SBM_OnChannelCallback channelCallback )
    {
       m_sbmHandle = sbmHandle;
       m_createCharacterCallback = createCharCallback;
       m_deleteCharacterCallback = deleteCharCallback;
       m_changeCharacterCallback = changeCharCallback;
       m_viseme = visemeCallback;
+	  m_channel = channelCallback;
    }
 
    virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass )
@@ -112,6 +114,11 @@ public:
    virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime )
    {
       m_viseme( m_sbmHandle, name.c_str(), visemeName.c_str(), weight, blendTime );
+   }
+
+   virtual void OnChannel( const std::string & name, const std::string & channelName, const float value )
+   {
+      m_channel( m_sbmHandle, name.c_str(), channelName.c_str(), value );
    }
 };
 
@@ -217,14 +224,14 @@ SMARTBODY_C_DLL_API bool SBM_Shutdown( SBMHANDLE sbmHandle )
 }
 
 
-SMARTBODY_C_DLL_API bool SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB, SBM_OnCharacterDeleteCallback deleteCB, SBM_OnCharacterChangeCallback changedCB, SBM_OnVisemeCallback visemeCB )
+SMARTBODY_C_DLL_API bool SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB, SBM_OnCharacterDeleteCallback deleteCB, SBM_OnCharacterChangeCallback changedCB, SBM_OnVisemeCallback visemeCB, SBM_OnChannelCallback channelCB )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
       return false;
    }
 
-   SBM_SmartbodyListener * listener = new SBM_SmartbodyListener( sbmHandle, createCB, deleteCB, changedCB, visemeCB );
+   SBM_SmartbodyListener * listener = new SBM_SmartbodyListener( sbmHandle, createCB, deleteCB, changedCB, visemeCB, channelCB );
    g_smartbodyInstances[ sbmHandle ]->SetListener( listener );
    return true;
 }
@@ -412,6 +419,15 @@ SMARTBODY_C_DLL_API bool SBM_IsCharacterChanged( SBMHANDLE sbmHandle, const char
 }
 
 SMARTBODY_C_DLL_API bool SBM_VisemeSet( SBMHANDLE sbmHandle, const char * name, const char * visemeName, float weight, float blendTime)
+{
+    if ( !SBM_HandleExists( sbmHandle ) )
+    {
+        return false;
+    }
+    return false;
+}
+
+SMARTBODY_C_DLL_API bool SBM_ChannelSet( SBMHANDLE sbmHandle, const char * name, const char * channelName, float value)
 {
     if ( !SBM_HandleExists( sbmHandle ) )
     {
