@@ -1050,6 +1050,34 @@ int main( int argc, char **argv )	{
 			mcu.update();
 		}
 
+		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
+			 iter != mcu.getCharacterMap().end();
+			 iter++)
+		{
+			SbmCharacter* character = (*iter).second;
+			if (character->scene_p)
+				character->scene_p->update();	
+		}
+
+		// update any tracked cameras
+		for (size_t x = 0; x < mcu.cameraTracking.size(); x++)
+		{
+			// move the camera relative to the joint
+			SkJoint* joint = mcu.cameraTracking[x]->joint;
+			joint->skeleton()->update_global_matrices();
+			joint->update_gmat();
+			const SrMat& jointGmat = joint->gmat();
+			SrVec jointLoc(jointGmat[12], jointGmat[13], jointGmat[14]);
+			SrVec newJointLoc = jointLoc;
+			if (fabs(jointGmat[13] - mcu.cameraTracking[x]->yPos) < mcu.cameraTracking[x]->threshold)
+				newJointLoc.y = (float)mcu.cameraTracking[x]->yPos;
+			SrVec cameraLoc = newJointLoc + mcu.cameraTracking[x]->jointToCamera;
+			mcu.camera_p->eye.set(cameraLoc.x, cameraLoc.y, cameraLoc.z);
+			SrVec targetLoc = cameraLoc - mcu.cameraTracking[x]->targetToCamera;
+			mcu.camera_p->center.set( targetLoc.x, targetLoc.y, targetLoc.z);
+			mcu.viewer_p->set_camera(*( mcu.camera_p ));
+		}	
+
 		mcu.mark( "main", 0, "update_channel_buffer_viewer");
 		if((ChannelBufferWindow*)mcu.channelbufferviewer_p != NULL)
 		{

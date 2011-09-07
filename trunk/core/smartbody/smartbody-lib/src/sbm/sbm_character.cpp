@@ -481,7 +481,7 @@ void SbmCharacter::updateJointPhyObjs()
 	for (size_t i=0;i<joints.size();i++)
 	{
 		SkJoint* curJoint = joints[i];
-		std::string jointName = curJoint->name();
+		const std::string& jointName = curJoint->name();
 		if (jointPhyObjMap.find(jointName) != jointPhyObjMap.end())
 		{
 			SbmPhysicsObj* phyObj = jointPhyObjMap[jointName];
