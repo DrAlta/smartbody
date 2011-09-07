@@ -267,16 +267,25 @@ void SbmCharacter::createStandardControllers()
 
 	breathing_p = new MeCtBreathing();
 	breathing_p->setName(getName() + "'s breathing controller");
-	// add a channel for blendshape-based breathing
+	// add two channels for blendshape-based breathing
 	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
 	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSkel->root());
-	SmartBody::SBJoint* breathingJoint = new SmartBody::SBJoint();
-	std::string breathName = "breath";
-	breathingJoint->setName(breathName);
-	breathingJoint->setJointType(SkJoint::TypeOther);
-	breathingJoint->setUsePosition(0, true);
-	breathingJoint->pos()->limits(SkJointPos::X, -1000, 1000);  // Setting upper bound to 2 allows some exageration
-	rootJoint->addChild(breathingJoint);
+
+	SmartBody::SBJoint* breathingJointX = new SmartBody::SBJoint();
+	std::string breathNameX = "breathX"; // parametric breath time
+	breathingJointX->setName(breathNameX);
+	breathingJointX->setJointType(SkJoint::TypeOther);
+	breathingJointX->setUsePosition(0, true);
+	breathingJointX->pos()->limits(SkJointPos::X, -1000, 1000);  // Setting upper bound to 2 allows some exageration
+	rootJoint->addChild(breathingJointX);
+
+	SmartBody::SBJoint* breathingJointY = new SmartBody::SBJoint();
+	std::string breathNameY = "breathY"; // breathing intensity
+	breathingJointY->setName(breathNameY);
+	breathingJointY->setJointType(SkJoint::TypeOther);
+	breathingJointY->setUsePosition(0, true);
+	breathingJointY->pos()->limits(SkJointPos::X, -1000, 1000);  // Setting upper bound to 2 allows some exageration
+	rootJoint->addChild(breathingJointY);
 
 	gaze_sched_p = CreateSchedulerCt( getName().c_str(), "gaze" );
 
