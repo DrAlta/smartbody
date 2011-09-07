@@ -95,7 +95,8 @@ void MeCtBreathing::setUseBlendChannels(bool val)
 		// create a motion containing simulated breathing
 		_blendChannelBreathingMotion = new SkMotion();
 		SkChannelArray breathingChannels;
-		breathingChannels.add("breath", SkChannel::XPos);
+		breathingChannels.add("breathX", SkChannel::XPos);
+		breathingChannels.add("breathY", SkChannel::XPos);
 		_blendChannelBreathingMotion->init(breathingChannels);
 		double dt = 0.016;
 		double totalTime = 6.0; // time for a breathing cycle
@@ -104,7 +105,8 @@ void MeCtBreathing::setUseBlendChannels(bool val)
 		{
 			_blendChannelBreathingMotion->insert_frame(counter, (float) t);
 			float* frame = _blendChannelBreathingMotion->posture(counter);
-			frame[0] = (float) sin( 2 * M_PI * t / totalTime );
+			frame[0] = (float) sin( 2 * M_PI * t / totalTime + M_PI ) + 1.0f;
+			frame[1] = (float) (t / totalTime);
 			counter++;
 		}
 		_blendChannelBreathingMotion->synch_points.set_time(0, .25 * totalTime, totalTime / 2,  totalTime / 2, totalTime / 2, .75 * totalTime, totalTime);
