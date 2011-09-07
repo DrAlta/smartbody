@@ -5910,7 +5910,25 @@ int mcu_character_breathing( const char* name, srArgBuffer& args, mcuCBHandle *m
 
 	char *breathing_cmd = args.read_token();
 	
-	if( strcmp( breathing_cmd, "bpm" ) == 0 )	
+	if( strcmp( breathing_cmd, "useblendchannels" ) == 0 )	
+	{
+		std::string token = args.read_token();
+		if (token == "true" || token == "")
+		{
+			breathing_p->setUseBlendChannels(true);
+		}
+		else if (token == "false")
+		{
+			breathing_p->setUseBlendChannels(false);
+		}
+		else
+		{
+			LOG("Usage: char %s breathing usechannels true|false", char_p->getName().c_str());
+			return CMD_FAILURE;
+		}
+		return CMD_SUCCESS;
+	}
+	else if( strcmp( breathing_cmd, "bpm" ) == 0 )	
 	{
 		float bpm = args.read_float();
 		bool smooth = true;

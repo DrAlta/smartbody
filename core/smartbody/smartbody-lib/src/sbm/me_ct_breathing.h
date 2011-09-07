@@ -188,6 +188,15 @@ private :
 
 	SkChannelArray _channels;
 
+	bool _useBlendChannels;
+
+	/**
+	* \brief Whether there is a pending motion to be loaded
+	*
+	* Transition will occur at the beginning of the next breath cycle.
+	*/
+	SkMotion* _blendChannelBreathingMotion;
+
 public :
 	/**
 	* \brief The controller type
@@ -301,6 +310,16 @@ public :
 	* \brief Implements MeController::controller_type
 	*/
 	virtual const std::string& controller_type () const;
+
+	/** 
+	* \brief Use channels to control breathing parameters, rather than using an animation.
+	*/
+	virtual void setUseBlendChannels(bool val);
+
+	/** 
+	* \brief Check whether channels are used control breathing parameters, rather than using an animation.
+	*/
+	virtual bool getUseBlendChannels();
 
 
 private:

@@ -267,6 +267,16 @@ void SbmCharacter::createStandardControllers()
 
 	breathing_p = new MeCtBreathing();
 	breathing_p->setName(getName() + "'s breathing controller");
+	// add a channel for blendshape-based breathing
+	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
+	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSkel->root());
+	SmartBody::SBJoint* breathingJoint = new SmartBody::SBJoint();
+	std::string breathName = "breath";
+	breathingJoint->setName(breathName);
+	breathingJoint->setJointType(SkJoint::TypeOther);
+	breathingJoint->setUsePosition(0, true);
+	breathingJoint->pos()->limits(SkJointPos::X, -1000, 1000);  // Setting upper bound to 2 allows some exageration
+	rootJoint->addChild(breathingJoint);
 
 	gaze_sched_p = CreateSchedulerCt( getName().c_str(), "gaze" );
 
@@ -279,8 +289,14 @@ void SbmCharacter::createStandardControllers()
 	eyelid_reg_ct_p = new MeCtEyeLidRegulator();
 	eyelid_reg_ct_p->ref();
 	if (!_faceDefinition || !_faceDefinition->getFaceNeutral())
+	{
 		eyelid_reg_ct_p->set_use_blink_viseme( true );
-
+		LOG("Character %s will use 'blink' viseme to control blinking.", getName().c_str());
+	}
+	else
+	{
+		LOG("Character %s will use FAC 45 left and right to control blinking.", getName().c_str());
+	}
 	eyelid_reg_ct_p->init(this, true);
 	eyelid_reg_ct_p->set_upper_range( -30.0, 30.0 );
 	eyelid_reg_ct_p->set_close_angle( 30.0 );
@@ -1750,6 +1766,25 @@ void SbmCharacter::forward_visemes( double curTime )
 					viseme_history_arr[ i ] = value;
 				}
 			}
+		}
+	}
+}
+
+void SbmCharacter::forward_parameters( double curTime )
+{
+	SBMCharacterListener *listener_p = mcuCBHandle::singleton().sbm_character_listener;
+
+	if( listener_p )
+	{
+		const std::vector<SkJoint*>& joints = _skeleton->joints();
+		MeFrameData& frameData = ct_tree_p->getLastFrame();
+
+		for (size_t j = 0; j < joints.size(); j++)
+		{
+			SkJoint* joint = joints[j];
+			if (joint->getJointType() != SkJoint::TypeOther)
+				continue;
+			listener_p->OnChannel(getName(), joint->name(), joint->pos()->value(0)); 
 		}
 	}
 }

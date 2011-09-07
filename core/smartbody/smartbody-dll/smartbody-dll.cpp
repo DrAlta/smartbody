@@ -84,6 +84,14 @@ class Smartbody_dll_SBMCharacterListener_Internal : public SBMCharacterListener
          }
       }
 
+	  virtual void OnChannel( const string & name, const string & channelName, const float value )
+      {
+         if ( m_dll->m_listener )
+         {
+            m_dll->m_listener->OnChannel( name, channelName, value );
+         }
+      }
+
       virtual void OnCharacterChanged( const std::string& name ) 
       {
          if ( m_dll->m_listener )

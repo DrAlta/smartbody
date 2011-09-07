@@ -151,6 +151,10 @@ class SBMListener : public SmartbodyListener
 	return 0;
 }
 
+  int _stdcall OnChannelCallback( SBMHANDLE sbmHandle, const char * name, const char * channelName, float value )
+{
+	return 0;
+}
 
 static void tt_client_callback( const char * op, const char * args, void * user_data )
 {
@@ -214,7 +218,8 @@ int main( int argc, char ** argv )
 	   (SBM_OnCreateCharacterCallback) OnCreateCharacterCallback, 
 	   (SBM_OnCharacterDeleteCallback) OnCharacterDeleteCallback, 
 	   (SBM_OnCharacterChangeCallback) OnCharacterChangeCallback, 
-	   (SBM_OnVisemeCallback) OnVisemeCallback);
+	   (SBM_OnVisemeCallback) OnVisemeCallback,
+	   (SBM_OnChannelCallback) OnChannelCallback);
 
    printf( "Starting main loop...\n");
 #if WIN32
