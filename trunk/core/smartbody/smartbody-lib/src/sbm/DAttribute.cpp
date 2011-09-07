@@ -4,7 +4,7 @@
 #include <sstream>
 #include <limits>
 
-DAttributeGroup::DAttributeGroup(std::string name)
+DAttributeGroup::DAttributeGroup(const std::string& name)
 {
 	m_name = name;
 	m_priority = 0;
@@ -105,9 +105,9 @@ void DAttributeInfo::setGroup(DAttributeGroup* group)
 	m_group = group;
 }
 
-void DAttributeInfo::setDescription(std::string str)
+void DAttributeInfo::setDescription(const std::string& description)
 {
-	m_description = str;
+	m_description = description;
 }
 
 std::string DAttributeInfo::getDescription()
@@ -115,7 +115,7 @@ std::string DAttributeInfo::getDescription()
 	return m_description;
 }
 
-void DAttributeInfo::setGroup(std::string groupName)
+void DAttributeInfo::setGroup(const std::string& groupName)
 {
 }
 
@@ -193,7 +193,7 @@ DAttribute::DAttribute()
 	m_info->setAttribute(this);
 }
 
-DAttribute::DAttribute(std::string name)
+DAttribute::DAttribute(const std::string& name)
 {
 	m_name = name;
 	m_info = new DAttributeInfo();
@@ -242,7 +242,7 @@ BoolAttribute::BoolAttribute() : DAttribute()
 	m_defaultValue = false;
 }
 
-BoolAttribute::BoolAttribute(std::string name, bool val) : DAttribute(name)
+BoolAttribute::BoolAttribute(const std::string& name, bool val) : DAttribute(name)
 {
 	m_value = val;
 }
@@ -251,23 +251,23 @@ BoolAttribute::~BoolAttribute()
 {
 }
 
-bool BoolAttribute::getValue(float time)
+const bool& BoolAttribute::getValue(float time)
 {
 	return m_value;
 }
 
-void BoolAttribute::setValue(bool val, float time)
+void BoolAttribute::setValue(const bool& val, float time)
 {
 	m_value = val;
 	notifyObservers();
 }
 
-void BoolAttribute::setDefaultValue(bool defaultVal)
+void BoolAttribute::setDefaultValue(const bool& defaultVal)
 {
 	m_defaultValue = defaultVal;
 }
 
-bool BoolAttribute::getDefaultValue()
+const bool& BoolAttribute::getDefaultValue()
 {
 	return m_defaultValue;
 }
@@ -309,7 +309,7 @@ IntAttribute::IntAttribute() : DAttribute()
 	m_max = std::numeric_limits<int>::max();
 }
 
-IntAttribute::IntAttribute(std::string name, int val, int min, int max) : DAttribute(name)
+IntAttribute::IntAttribute(const std::string& name, int val, int min, int max) : DAttribute(name)
 {
 	m_value = val;
 	m_min = min;
@@ -320,12 +320,12 @@ IntAttribute::~IntAttribute()
 {
 }
 
-int IntAttribute::getValue(float time)
+const int& IntAttribute::getValue(float time)
 {
 	return m_value;
 }
 
-void IntAttribute::setValue(int val, float time)
+void IntAttribute::setValue(const int& val, float time)
 {
 	if (val < getMin())
 		m_value = getMin();
@@ -359,12 +359,12 @@ void IntAttribute::setMax(int val)
 	notifyObservers();
 }
 
-void IntAttribute::setDefaultValue(int defaultVal)
+void IntAttribute::setDefaultValue(const int& defaultVal)
 {
 	m_defaultValue = defaultVal;
 }
 
-int IntAttribute::getDefaultValue()
+const int& IntAttribute::getDefaultValue()
 {
 	return m_defaultValue;
 }
@@ -403,7 +403,7 @@ DoubleAttribute::DoubleAttribute() : DAttribute()
 	m_max = std::numeric_limits<double>::max();
 }
 
-DoubleAttribute::DoubleAttribute(std::string name, double val, double min, double max) : DAttribute(name)
+DoubleAttribute::DoubleAttribute(const std::string& name, double val, double min, double max) : DAttribute(name)
 {
 	m_value = val;
 	m_min = min;
@@ -415,12 +415,12 @@ DoubleAttribute::~DoubleAttribute()
 {
 }
 
-double DoubleAttribute::getValue(float time)
+const double& DoubleAttribute::getValue(float time)
 {
 	return m_value;
 }
 
-void DoubleAttribute::setValue(double val, float time)
+void DoubleAttribute::setValue(const double& val, float time)
 {
 	if (val < getMin())
 		m_value = getMin();
@@ -432,12 +432,12 @@ void DoubleAttribute::setValue(double val, float time)
 	notifyObservers();
 }
 
-void DoubleAttribute::setDefaultValue(double defaultVal)
+void DoubleAttribute::setDefaultValue(const double& defaultVal)
 {
 	m_defaultValue = defaultVal;
 }
 
-double DoubleAttribute::getDefaultValue()
+const double& DoubleAttribute::getDefaultValue()
 {
 	return m_defaultValue;
 }
@@ -496,7 +496,7 @@ StringAttribute::StringAttribute() : DAttribute()
 {
 }
 
-StringAttribute::StringAttribute(std::string name, std::string val) : DAttribute(name)
+StringAttribute::StringAttribute(const std::string& name, std::string val) : DAttribute(name)
 {
 	m_value = val;
 }
@@ -552,14 +552,14 @@ void StringAttribute::read()
 {
 }
 
-void StringAttribute::setValidValues(std::vector<std::string> values)
+void StringAttribute::setValidValues(const std::vector<std::string>& values)
 {
 	m_validValues.clear();
 	for (size_t v = 0; v < values.size(); v++)
 		m_validValues.push_back(values[v]);
 }
 
-std::vector<std::string>& StringAttribute::getValidValues()
+const std::vector<std::string>& StringAttribute::getValidValues()
 {
 	return m_validValues;
 }
@@ -582,7 +582,7 @@ Vec3Attribute::Vec3Attribute() : DAttribute()
 {
 }
 
-Vec3Attribute::Vec3Attribute(std::string name) : DAttribute(name)
+Vec3Attribute::Vec3Attribute(const std::string& name) : DAttribute(name)
 {
 }
 
@@ -590,23 +590,23 @@ Vec3Attribute::~Vec3Attribute()
 {
 }
 
-SrVec Vec3Attribute::getValue(float time)
+const SrVec& Vec3Attribute::getValue(float time)
 {
 	return m_value;
 }
 
-void Vec3Attribute::setValue(SrVec val, float time)
+void Vec3Attribute::setValue(const SrVec& val, float time)
 {
 	m_value = val;
 	notifyObservers();
 }
 
-void Vec3Attribute::setDefaultValue(SrVec defaultVal)
+void Vec3Attribute::setDefaultValue(const SrVec& defaultVal)
 {
 	m_defaultValue = defaultVal;
 }
 
-SrVec Vec3Attribute::getDefaultValue()
+const SrVec& Vec3Attribute::getDefaultValue()
 {
 	return m_defaultValue;
 }
@@ -647,7 +647,7 @@ MatrixAttribute::MatrixAttribute()
 	m_defaultValue.identity();
 }
 
-MatrixAttribute::MatrixAttribute(std::string name)
+MatrixAttribute::MatrixAttribute(const std::string& name)
 {
 	m_name = name;
 	m_value.identity();
@@ -657,23 +657,23 @@ MatrixAttribute::~MatrixAttribute()
 {
 }
 
-SrMat& MatrixAttribute::getValue(float time)
+const SrMat& MatrixAttribute::getValue(float time)
 {
 	return m_value;
 }
 
-void MatrixAttribute::setValue(SrMat& matrix, float time)
+void MatrixAttribute::setValue(const SrMat& matrix, float time)
 {
 	m_value = matrix;
 	notifyObservers();
 }
 
-void MatrixAttribute::setDefaultValue(SrMat& matrix)
+void MatrixAttribute::setDefaultValue(const SrMat& matrix)
 {
 	m_defaultValue = matrix;
 }
 
-SrMat& MatrixAttribute::getDefaultValue()
+const SrMat& MatrixAttribute::getDefaultValue()
 {
 	return m_defaultValue;
 }

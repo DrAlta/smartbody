@@ -1,6 +1,13 @@
 #include "DObject.h"
 #include <sr/sr_vec.h>
 
+bool DObject::defaultBool = true;
+int DObject::defaultInt = 0;
+double DObject::defaultDouble = 0.0;
+std::string DObject::defaultString = "";
+SrVec DObject::defaultVec = SrVec();
+SrMat DObject::defaultMatrix = SrMat();
+
 DObject::DObject()
 {
 	m_attributeManager = new DAttributeManager();
@@ -51,7 +58,7 @@ void DObject::addAttribute(DAttribute* attr)
 	this->getAttributeManager()->notifyCreateAttribute(attr);
 }
 
-void DObject::addAttribute( DAttribute* attr, std::string groupName )
+void DObject::addAttribute( DAttribute* attr, const std::string& groupName )
 {
 	// check for the existence of the attribute
 	std::map<std::string, DAttribute*>::iterator iter = m_attributeList.find(attr->getName());
@@ -75,7 +82,7 @@ void DObject::addAttribute( DAttribute* attr, std::string groupName )
 }
 
 
- DAttribute* DObject::getAttribute(std::string name)
+ DAttribute* DObject::getAttribute(const std::string& name)
  {
 	std::map<std::string, DAttribute*>::iterator iter = m_attributeList.find(name);
 	if (iter != m_attributeList.end()) // attribute exists, remove the old attribute 
@@ -108,7 +115,7 @@ int DObject::getNumAttributes()
 }
 
 
- bool DObject::removeAttribute(std::string name)
+ bool DObject::removeAttribute(const std::string& name)
  {
 	// check for the existence of the attribute
 	std::map<std::string, DAttribute*>::iterator iter = m_attributeList.find(name);
@@ -129,8 +136,8 @@ int DObject::getNumAttributes()
 	return false;
  }
 
-  BoolAttribute* DObject::createBoolAttribute(std::string name, bool value, bool notifySelf, std::string groupName, int priority, 
-											  bool isReadOnly, bool isLocked, bool isHidden, std::string description)
+  BoolAttribute* DObject::createBoolAttribute(const std::string& name, bool value, bool notifySelf, const std::string& groupName, int priority, 
+											  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description)
  {
 	 BoolAttribute* boolAttr = new BoolAttribute();
 	 boolAttr->setName(name);
@@ -153,8 +160,8 @@ int DObject::getNumAttributes()
 	 return boolAttr;
 }
 
-IntAttribute* DObject::createIntAttribute(std::string name, int value, bool notifySelf, std::string groupName, int priority, 
-												  bool isReadOnly, bool isLocked, bool isHidden, std::string description)
+IntAttribute* DObject::createIntAttribute(const std::string& name, int value, bool notifySelf, const std::string& groupName, int priority, 
+												  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description)
  {
 	 IntAttribute* intAttr = new IntAttribute();
 	 intAttr->setName(name);
@@ -177,8 +184,8 @@ IntAttribute* DObject::createIntAttribute(std::string name, int value, bool noti
 	  return intAttr;
 }
 
- DoubleAttribute* DObject::createDoubleAttribute(std::string name, double value, bool notifySelf, std::string groupName, int priority, 
-												  bool isReadOnly, bool isLocked, bool isHidden, std::string description)
+ DoubleAttribute* DObject::createDoubleAttribute(const std::string& name, double value, bool notifySelf, const std::string& groupName, int priority, 
+												  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description)
  {
 	 DoubleAttribute* doubleAttr = new DoubleAttribute();
 	 doubleAttr->setName(name);
@@ -201,8 +208,8 @@ IntAttribute* DObject::createIntAttribute(std::string name, int value, bool noti
 	  return doubleAttr;
 }
 
- Vec3Attribute* DObject::createVec3Attribute(std::string name, float val1, float val2, float val3, bool notifySelf, std::string groupName, int priority, 
-												  bool isReadOnly, bool isLocked, bool isHidden, std::string description)
+ Vec3Attribute* DObject::createVec3Attribute(const std::string& name, float val1, float val2, float val3, bool notifySelf, const std::string& groupName, int priority, 
+												  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description)
  {
 	 Vec3Attribute* vec3Attr = new Vec3Attribute();
 	 vec3Attr->setName(name);
@@ -227,8 +234,8 @@ IntAttribute* DObject::createIntAttribute(std::string name, int value, bool noti
 }
 
 
- StringAttribute* DObject::createStringAttribute(std::string name, std::string value, bool notifySelf, std::string groupName, int priority, 
-												  bool isReadOnly, bool isLocked, bool isHidden, std::string description)
+ StringAttribute* DObject::createStringAttribute(const std::string& name, const std::string& value, bool notifySelf, const std::string& groupName, int priority, 
+												  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description)
  {
 	 StringAttribute* strAttr = new StringAttribute();
 	 strAttr->setName(name);
@@ -251,8 +258,8 @@ IntAttribute* DObject::createIntAttribute(std::string name, int value, bool noti
 	 return strAttr;
 }
 
- MatrixAttribute* DObject::createMatrixAttribute(std::string name, SrMat& value, bool notifySelf, std::string groupName, int priority, 
-												  bool isReadOnly, bool isLocked, bool isHidden, std::string description)
+ MatrixAttribute* DObject::createMatrixAttribute(const std::string& name, SrMat& value, bool notifySelf, const std::string& groupName, int priority, 
+												  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description)
  {
 	 MatrixAttribute* matrixAttr = new MatrixAttribute();
 	 matrixAttr->setName(name);
@@ -291,7 +298,7 @@ IntAttribute* DObject::createIntAttribute(std::string name, int value, bool noti
 	
   }
 
-  void DObject::setBoolAttribute( std::string name, bool value )
+  void DObject::setBoolAttribute( const std::string& name, bool value )
   {
 	  DAttribute* attr = getAttribute(name);
 	  BoolAttribute* battr = dynamic_cast<BoolAttribute*>(attr);
@@ -301,7 +308,7 @@ IntAttribute* DObject::createIntAttribute(std::string name, int value, bool noti
 	  }
   }
 
-  void DObject::setIntAttribute( std::string name, int value )
+  void DObject::setIntAttribute( const std::string& name, int value )
   {
 	  DAttribute* attr = getAttribute(name);
 	  IntAttribute* iattr = dynamic_cast<IntAttribute*>(attr);
@@ -311,7 +318,7 @@ IntAttribute* DObject::createIntAttribute(std::string name, int value, bool noti
 	  }
   }
 
-  void DObject::setDoubleAttribute( std::string name, double value )
+  void DObject::setDoubleAttribute( const std::string& name, double value )
   {
 	  DAttribute* attr = getAttribute(name);
 	  DoubleAttribute* dattr = dynamic_cast<DoubleAttribute*>(attr);
@@ -321,7 +328,7 @@ IntAttribute* DObject::createIntAttribute(std::string name, int value, bool noti
 	  }
   }
 
-  void DObject::setVec3Attribute( std::string name, float val1, float val2, float val3 )
+  void DObject::setVec3Attribute( const std::string& name, float val1, float val2, float val3 )
   {
 	  DAttribute* attr = getAttribute(name);
 	  Vec3Attribute* vattr = dynamic_cast<Vec3Attribute*>(attr);
@@ -331,7 +338,7 @@ IntAttribute* DObject::createIntAttribute(std::string name, int value, bool noti
 	  }
   }
 
-  void DObject::setStringAttribute( std::string name, std::string value )
+  void DObject::setStringAttribute( const std::string& name, const std::string value )
   {
 	  DAttribute* attr = getAttribute(name);
 	  StringAttribute* sattr = dynamic_cast<StringAttribute*>(attr);
@@ -341,7 +348,7 @@ IntAttribute* DObject::createIntAttribute(std::string name, int value, bool noti
 	  }
   }
 
-  void DObject::setMatrixAttribute( std::string name, SrMat& value )
+  void DObject::setMatrixAttribute( const std::string& name, SrMat& value )
   {
 	  DAttribute* attr = getAttribute(name);
 	  MatrixAttribute* mattr = dynamic_cast<MatrixAttribute*>(attr);
@@ -351,7 +358,7 @@ IntAttribute* DObject::createIntAttribute(std::string name, int value, bool noti
 	  }
   }
 
-  bool DObject::getBoolAttribute( std::string name )
+  const bool& DObject::getBoolAttribute( const std::string& name )
   {
 	  DAttribute* attr = getAttribute(name);
 	  BoolAttribute* battr = dynamic_cast<BoolAttribute*>(attr);
@@ -359,10 +366,10 @@ IntAttribute* DObject::createIntAttribute(std::string name, int value, bool noti
 	  {
 		  return battr->getValue();
 	  }	  
-	  return false;
+	  return defaultBool;
   }
 
-  int DObject::getIntAttribute( std::string name )
+  const int& DObject::getIntAttribute( const std::string& name )
   {
 	  DAttribute* attr = getAttribute(name);
 	  IntAttribute* iattr = dynamic_cast<IntAttribute*>(attr);
@@ -370,10 +377,10 @@ IntAttribute* DObject::createIntAttribute(std::string name, int value, bool noti
 	  {
 		  return iattr->getValue();
 	  }
-	  return 0;
+	  return defaultInt;
   }
 
-  double DObject::getDoubleAttribute( std::string name )
+  const double& DObject::getDoubleAttribute( const std::string& name )
   {
 	  DAttribute* attr = getAttribute(name);
 	  DoubleAttribute* dattr = dynamic_cast<DoubleAttribute*>(attr);
@@ -381,10 +388,10 @@ IntAttribute* DObject::createIntAttribute(std::string name, int value, bool noti
 	  {
 		 return dattr->getValue();
 	  }
-	  return 0.0;
+	  return defaultDouble;
   }
 
-  SrVec DObject::getVec3Attribute( std::string name )
+  const SrVec& DObject::getVec3Attribute( const std::string& name )
   {
 	  DAttribute* attr = getAttribute(name);
 	  Vec3Attribute* vattr = dynamic_cast<Vec3Attribute*>(attr);
@@ -392,10 +399,10 @@ IntAttribute* DObject::createIntAttribute(std::string name, int value, bool noti
 	  {
 		  return vattr->getValue();
 	  }
-	  return SrVec();
+	  return defaultVec;
   }
 
-  std::string DObject::getStringAttribute( std::string name )
+  const std::string& DObject::getStringAttribute( const std::string& name )
   {
 	  DAttribute* attr = getAttribute(name);
 	  StringAttribute* sattr = dynamic_cast<StringAttribute*>(attr);
@@ -403,10 +410,10 @@ IntAttribute* DObject::createIntAttribute(std::string name, int value, bool noti
 	  {
 		  return sattr->getValue();
 	  }
-	  return "";
+	  return defaultString;
   }
 
-  SrMat DObject::getMatrixAttribute( std::string name )
+  const SrMat& DObject::getMatrixAttribute( const std::string& name )
   {
 	  DAttribute* attr = getAttribute(name);
 	  MatrixAttribute* mattr = dynamic_cast<MatrixAttribute*>(attr);
@@ -414,7 +421,7 @@ IntAttribute* DObject::createIntAttribute(std::string name, int value, bool noti
 	  {
 		  return mattr->getValue();
 	  }
-	  return SrMat();
+	  return defaultMatrix;
   }
 
   
