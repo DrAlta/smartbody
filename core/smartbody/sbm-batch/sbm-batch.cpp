@@ -267,7 +267,7 @@ int main( int argc, char ** argv )
 
 
    vhmsg::ttu_close();
-   sbm->Shutdown();
+   SBM_Shutdown(sbmHandle);
    delete sbm;
 }
 

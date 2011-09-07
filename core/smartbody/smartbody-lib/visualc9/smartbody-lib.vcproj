@@ -956,7 +956,7 @@
 				>
 			</File>
 			<Filter
-				Name="locomotion"
+				Name="semiprocedurallocomotion"
 				>
 				<File
 					RelativePath="..\src\sbm\me_ct_IK.cpp"

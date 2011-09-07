@@ -1027,20 +1027,10 @@ void FltkViewer::draw()
 		iter++)
 	{
 		SbmPawn* pawn = (*iter).second;
-
-		//pawn_p->reset_all_channels();
-		//pawn_p->ct_tree_p->evaluate( time );
-		//pawn_p->ct_tree_p->applyBufferToAllSkeletons();
-
-		SbmCharacter* char_p = mcu.getCharacter(pawn->getName() );
+		SbmCharacter* char_p = dynamic_cast<SbmCharacter*>(pawn);
 		if( char_p )
 		{
-			
-			//char_p->forward_visemes( time );	
-			//char_p->scene_p->update();
-			
 			char_p->dMesh_p->update();
-			// 
 		}
 	}
 	

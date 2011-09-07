@@ -1012,13 +1012,15 @@ void mcuCBHandle::update( void )	{
 		}
 		if( char_p ) {
 
-			if (char_p->scene_p)
-				char_p->scene_p->update();	
+			// scene update moved to renderer
+			//if (char_p->scene_p)
+			//	char_p->scene_p->update();
+			//char_p->dMesh_p->update();
 			char_p->updateJointPhyObjs();
 			char_p->_skeleton->update_global_matrices();
 			char_p->forward_visemes( time );	
 			char_p->forward_parameters( time );	
-			//char_p->dMesh_p->update();
+			
 
 			if ( net_bone_updates && char_p->getSkeleton() && char_p->bonebusCharacter ) {
 				NetworkSendSkeleton( char_p->bonebusCharacter, char_p->getSkeleton(), &param_map );
@@ -1080,24 +1082,7 @@ void mcuCBHandle::update( void )	{
 	if (panimationviewer_p)
 		panimationviewer_p->update_viewer();
 
-	// update any tracked cameras
-	for (size_t x = 0; x < this->cameraTracking.size(); x++)
-	{
-		// move the camera relative to the joint
-		SkJoint* joint = this->cameraTracking[x]->joint;
-		joint->skeleton()->update_global_matrices();
-		joint->update_gmat();
-		const SrMat& jointGmat = joint->gmat();
-		SrVec jointLoc(jointGmat[12], jointGmat[13], jointGmat[14]);
-		SrVec newJointLoc = jointLoc;
-		if (fabs(jointGmat[13] - this->cameraTracking[x]->yPos) < this->cameraTracking[x]->threshold)
-			newJointLoc.y = (float)this->cameraTracking[x]->yPos;
-		SrVec cameraLoc = newJointLoc + this->cameraTracking[x]->jointToCamera;
-		this->camera_p->eye.set(cameraLoc.x, cameraLoc.y, cameraLoc.z);
-		SrVec targetLoc = cameraLoc - this->cameraTracking[x]->targetToCamera;
-		this->camera_p->center.set( targetLoc.x, targetLoc.y, targetLoc.z);
-		this->viewer_p->set_camera(*( this->camera_p ));
-	}	
+	
 }
 
 srCmdSeq* mcuCBHandle::lookup_seq( const char* name ) {
