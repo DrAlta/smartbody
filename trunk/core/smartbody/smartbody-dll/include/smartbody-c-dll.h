@@ -15,7 +15,7 @@
 
 
 #include "vhcl_public.h"
-
+#include <map>
 
 typedef intptr_t SBMHANDLE;
 
@@ -36,6 +36,32 @@ struct SBM_CallbackInfo
     char * visemeName;
     float weight;
     float blendTime;
+
+   SBM_CallbackInfo()
+   {
+      name = NULL;
+      objectClass = NULL;
+      visemeName = NULL;
+   }
+
+   ~SBM_CallbackInfo()
+   {
+      if (name)
+      {
+         delete name;
+         name = NULL;
+      }
+      if (objectClass)
+      {
+         delete objectClass;
+         objectClass = NULL;
+      }
+      if (visemeName)
+      {
+         delete visemeName;
+         visemeName = NULL;
+      }
+   }
 };
 
 #ifdef __cplusplus
@@ -97,12 +123,14 @@ SMARTBODY_C_DLL_API bool SBM_SetLogMessageCallback(LogMessageCallback cb);
 SMARTBODY_C_DLL_API void SBM_LogMessage(const char* message, int messageType);
 
 // used for polling on iOS since callbacks aren't allowed
-SMARTBODY_C_DLL_API bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, int * numCharacters, const char * name, const char * objectClass );
-SMARTBODY_C_DLL_API bool SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, const char * name);
-SMARTBODY_C_DLL_API bool SBM_IsCharacterChanged( SBMHANDLE sbmHandle, const char * name);
-SMARTBODY_C_DLL_API bool SBM_VisemeSet( SBMHANDLE sbmHandle, const char * name, const char * visemeName, float weight, float blendTime);
-SMARTBODY_C_DLL_API bool SBM_ChannelSet( SBMHANDLE sbmHandle, const char * name, const char * channelName, float value);
+SMARTBODY_C_DLL_API bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** objectClass );
+SMARTBODY_C_DLL_API bool SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, int * numCharacters, char *** name );
+SMARTBODY_C_DLL_API bool SBM_IsCharacterChanged( SBMHANDLE sbmHandle, int * numCharacters, char *** name );
+SMARTBODY_C_DLL_API bool SBM_IsVisemeSet( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** visemeName, float** weight, float** blendTime );
+SMARTBODY_C_DLL_API bool SBM_IsChannelSet( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** channelName, float ** value );
 
+// helper functions
+void DeleteCallbacks(SBMHANDLE sbmHandle, std::map< int, std::vector<SBM_CallbackInfo*> >& callbackData);
 
 #ifdef __cplusplus
 }

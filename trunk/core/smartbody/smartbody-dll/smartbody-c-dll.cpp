@@ -3,7 +3,7 @@
 
 #include "smartbody-c-dll.h"
 
-#include <map>
+
 #include <fstream>
 #include <ios>
 #include <string.h>
@@ -13,9 +13,13 @@
 
 using std::string;
 
-std::map< int, std::vector<SBM_CallbackInfo*> > g_CallbackInfo;
-LogMessageCallback LogMessageFunc = NULL;
+std::map< int, std::vector<SBM_CallbackInfo*> > g_CreateCallbackInfo;
+std::map< int, std::vector<SBM_CallbackInfo*> > g_DeleteCallbackInfo;
+std::map< int, std::vector<SBM_CallbackInfo*> > g_ChangeCallbackInfo;
+std::map< int, std::vector<SBM_CallbackInfo*> > g_VisemeCallbackInfo;
+std::map< int, std::vector<SBM_CallbackInfo*> > g_ChannelCallbackInfo;
 
+LogMessageCallback LogMessageFunc = NULL;
 
 class LogMessageListener : public vhcl::Log::Listener
 {
@@ -97,28 +101,69 @@ public:
           
           info->objectClass = new char[objectClass.length() + 1];
           strcpy(info->objectClass, objectClass.c_str());
-          g_CallbackInfo[m_sbmHandle].push_back(info);
+          g_CreateCallbackInfo[m_sbmHandle].push_back(info);
 #endif
    }
 
    virtual void OnCharacterDelete( const std::string & name )
    {
+#ifdef WIN32
       m_deleteCharacterCallback( m_sbmHandle, name.c_str() );
+#else
+      SBM_CallbackInfo* info = new SBM_CallbackInfo();
+      info->name = new char[name.length() + 1];
+      strcpy(info->name, name.c_str());
+      g_DeleteCallbackInfo[m_sbmHandle].push_back(info);
+#endif
    }
 
    virtual void OnCharacterChange( const std::string & name )
    {
+#ifdef WIN32      
       m_changeCharacterCallback( m_sbmHandle, name.c_str() );
+#else
+      SBM_CallbackInfo* info = new SBM_CallbackInfo();
+      info->name = new char[name.length() + 1];
+      strcpy(info->name, name.c_str());
+      g_ChangeCallbackInfo[m_sbmHandle].push_back(info);
+#endif
    }
 
    virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime )
    {
+#ifdef WIN32 
       m_viseme( m_sbmHandle, name.c_str(), visemeName.c_str(), weight, blendTime );
+#else
+      SBM_CallbackInfo* info = new SBM_CallbackInfo();
+      info->name = new char[name.length() + 1];
+      strcpy(info->name, name.c_str());
+
+      info->visemeName = new char[visemeName.length() + 1];
+      strcpy(info->visemeName, visemeName.c_str());
+
+      info->weight = weight;
+      info->blendTime = blendTime;
+
+      g_VisemeCallbackInfo[m_sbmHandle].push_back(info);
+#endif
    }
 
    virtual void OnChannel( const std::string & name, const std::string & channelName, const float value )
    {
+#ifdef WIN32 
       m_channel( m_sbmHandle, name.c_str(), channelName.c_str(), value );
+#else
+      SBM_CallbackInfo* info = new SBM_CallbackInfo();
+      info->name = new char[name.length() + 1];
+      strcpy(info->name, name.c_str());
+
+      info->visemeName = new char[channelName.length() + 1];
+      strcpy(info->visemeName, channelName.c_str());
+
+      info->weight = value;
+
+      g_ChannelCallbackInfo[m_sbmHandle].push_back(info);
+#endif
    }
 };
 
@@ -375,63 +420,144 @@ void SBM_CharToCSbmChar( const::SmartbodyCharacter * sbmChar, SBM_SmartbodyChara
 }
 
 
-SMARTBODY_C_DLL_API bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, int * numCharacters, const char * name, const char * objectClass )
+SMARTBODY_C_DLL_API bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** objectClass )
 {
-    if ( !SBM_HandleExists( sbmHandle ) )
+    if ( !SBM_HandleExists( sbmHandle ) || g_CreateCallbackInfo[sbmHandle].size() == 0)
     {
         return false;
     }
     
-    for (unsigned int i = 0; i < g_CallbackInfo[sbmHandle].size(); i++)
+    *numCharacters = g_CreateCallbackInfo[sbmHandle].size();
+    (*name) = new char*[*numCharacters];
+    (*objectClass) = new char*[*numCharacters];
+    for (unsigned int i = 0; i < g_CreateCallbackInfo[sbmHandle].size(); i++)
     {
-        //if (strncasecmp(name, g_CallbackInfo[sbmHandle][i]->name, strlen(name) == 0
-        //    && strncasecmp(objectClass, g_CallbackInfo[sbmHandle][i]->objectClass, strlen(objectClass))))
-        {
-            name = new char[strlen(g_CallbackInfo[sbmHandle][i]->name) + 1];
-            objectClass = new char[strlen(g_CallbackInfo[sbmHandle][i]->objectClass) + 1];
+         int length = strlen(g_CreateCallbackInfo[sbmHandle][i]->name) + 1;
+         (*name)[i] = new char[length];
+         strcpy_s((*name)[i], length, g_CreateCallbackInfo[sbmHandle][i]->name);
 
-            delete g_CallbackInfo[sbmHandle][i];
-            g_CallbackInfo[sbmHandle].erase(g_CallbackInfo[sbmHandle].begin() + i);
-            return true;
-        }
+         length = strlen(g_CreateCallbackInfo[sbmHandle][i]->objectClass) + 1;
+         (*objectClass)[i] = new char[length];
+         strcpy_s((*objectClass)[i], length, g_CreateCallbackInfo[sbmHandle][i]->objectClass);  
+    }
+
+    DeleteCallbacks(sbmHandle, g_CreateCallbackInfo);
+    return true;
+}
+
+SMARTBODY_C_DLL_API bool SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, int * numCharacters, char *** name)
+{
+    if ( !SBM_HandleExists( sbmHandle ) || g_DeleteCallbackInfo[sbmHandle].size() == 0)
+    {
+        return false;
+    }
+
+     *numCharacters = g_DeleteCallbackInfo[sbmHandle].size();
+    (*name) = new char*[*numCharacters];
+    for (unsigned int i = 0; i < g_DeleteCallbackInfo[sbmHandle].size(); i++)
+    {
+         int length = strlen(g_DeleteCallbackInfo[sbmHandle][i]->name) + 1;
+         (*name)[i] = new char[length];
+         strcpy_s((*name)[i], length, g_DeleteCallbackInfo[sbmHandle][i]->name); 
     }
     
-    return false;
+    DeleteCallbacks(sbmHandle, g_DeleteCallbackInfo);
+    return true;
 }
 
-SMARTBODY_C_DLL_API bool SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, const char * name)
+SMARTBODY_C_DLL_API bool SBM_IsCharacterChanged( SBMHANDLE sbmHandle, int * numCharacters, char *** name)
 {
-    if ( !SBM_HandleExists( sbmHandle ) )
+    if ( !SBM_HandleExists( sbmHandle ) || g_ChangeCallbackInfo[sbmHandle].size() == 0)
     {
         return false;
     }
-    
-    return false;
+
+    *numCharacters = g_ChangeCallbackInfo[sbmHandle].size();
+    (*name) = new char*[*numCharacters];
+    for (unsigned int i = 0; i < g_ChangeCallbackInfo[sbmHandle].size(); i++)
+    {
+         int length = strlen(g_ChangeCallbackInfo[sbmHandle][i]->name) + 1;
+         (*name)[i] = new char[length];
+         strcpy_s((*name)[i], length, g_ChangeCallbackInfo[sbmHandle][i]->name); 
+    }
+
+    DeleteCallbacks(sbmHandle, g_ChangeCallbackInfo);
+
+    return true;
 }
 
-SMARTBODY_C_DLL_API bool SBM_IsCharacterChanged( SBMHANDLE sbmHandle, const char * name)
+SMARTBODY_C_DLL_API bool SBM_IsVisemeSet( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** visemeName, float** weight, float ** blendTime)
 {
-    if ( !SBM_HandleExists( sbmHandle ) )
+    if ( !SBM_HandleExists( sbmHandle ) || g_VisemeCallbackInfo[sbmHandle].size() == 0)
     {
         return false;
     }
-    return false;
+
+    *numCharacters = g_VisemeCallbackInfo[sbmHandle].size();
+    (*name) = new char*[*numCharacters];
+    (*visemeName) = new char*[*numCharacters];
+    (*weight) = new float[*numCharacters];
+    (*blendTime) = new float[*numCharacters];
+    for (unsigned int i = 0; i < g_VisemeCallbackInfo[sbmHandle].size(); i++)
+    {
+         int length = strlen(g_VisemeCallbackInfo[sbmHandle][i]->name) + 1;
+         (*name)[i] = new char[length];
+         strcpy_s((*name)[i], length, g_VisemeCallbackInfo[sbmHandle][i]->name); 
+
+         length = strlen(g_VisemeCallbackInfo[sbmHandle][i]->visemeName) + 1;
+         (*visemeName)[i] = new char[length];
+         strcpy_s((*visemeName)[i], length, g_VisemeCallbackInfo[sbmHandle][i]->visemeName);  
+
+         (*weight)[i] = g_ChannelCallbackInfo[sbmHandle][i]->weight;
+         (*blendTime)[i] = g_ChannelCallbackInfo[sbmHandle][i]->blendTime;
+    }
+
+    DeleteCallbacks(sbmHandle, g_VisemeCallbackInfo);
+
+    return true;
 }
 
-SMARTBODY_C_DLL_API bool SBM_VisemeSet( SBMHANDLE sbmHandle, const char * name, const char * visemeName, float weight, float blendTime)
+SMARTBODY_C_DLL_API bool SBM_IsChannelSet( SBMHANDLE sbmHandle, int * numCharacters, char *** name, char *** channelName, float ** value)
 {
-    if ( !SBM_HandleExists( sbmHandle ) )
+    if ( !SBM_HandleExists( sbmHandle ) || g_ChannelCallbackInfo[sbmHandle].size() == 0)
     {
         return false;
     }
-    return false;
+
+    *numCharacters = g_ChannelCallbackInfo[sbmHandle].size();
+    (*name) = new char*[*numCharacters];
+    (*channelName) = new char*[*numCharacters];
+    (*value) = new float[*numCharacters];
+    for (unsigned int i = 0; i < g_ChannelCallbackInfo[sbmHandle].size(); i++)
+    {
+         int length = strlen(g_ChannelCallbackInfo[sbmHandle][i]->name) + 1;
+         (*name)[i] = new char[length];
+         strcpy_s((*name)[i], length, g_ChannelCallbackInfo[sbmHandle][i]->name); 
+
+         // channel name is stored in visemeName
+         length = strlen(g_ChannelCallbackInfo[sbmHandle][i]->visemeName) + 1;
+         (*channelName)[i] = new char[length];
+         strcpy_s((*channelName)[i], length, g_ChannelCallbackInfo[sbmHandle][i]->visemeName);  
+
+         (*value)[i] = g_ChannelCallbackInfo[sbmHandle][i]->weight;
+    }
+
+    DeleteCallbacks(sbmHandle, g_ChannelCallbackInfo);
+
+    return true;
 }
 
-SMARTBODY_C_DLL_API bool SBM_ChannelSet( SBMHANDLE sbmHandle, const char * name, const char * channelName, float value)
+void DeleteCallbacks(SBMHANDLE sbmHandle, std::map< int, std::vector<SBM_CallbackInfo*> >& callbackData)
 {
     if ( !SBM_HandleExists( sbmHandle ) )
     {
-        return false;
+        return;
     }
-    return false;
+
+    for (unsigned int i = 0; i < callbackData.size(); i++)
+    {
+         delete callbackData[sbmHandle][i]; // char* memory is deleted in the destructor
+    }
+
+    callbackData.clear();
 }
