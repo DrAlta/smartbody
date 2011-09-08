@@ -393,7 +393,7 @@ void ParserFBX::parseJoints(KFbxNode* pNode, SkSkeleton& skeleton, SkMotion& mot
 
    // if it has this meta data property, then it has all the others,
    // so parse them out save them
-   KFbxProperty prop = pNode->FindProperty("rdyTime");
+   KFbxProperty prop = pNode->FindProperty("readyTime");
    if (prop.IsValid())
    {
       ParseMetaData(pNode, metaData);
@@ -492,31 +492,31 @@ void ParserFBX::ParseMetaData(KFbxNode* pNode, FBxMetaData& out_metaData)
    //KFbxNode* smartbodyNode = pRootNode->FindChild("AnimDef_ChrBillFord_IdleSeated01");
    KFbxProperty prop;
 
-   prop = pNode->FindProperty("rdyTime");
+   prop = pNode->FindProperty("readyTime");
    if (prop.IsValid())
    {
       prop.Get(&out_metaData.readyTime, eDOUBLE1);
    }
 
-   prop = pNode->FindProperty("sStart");
+   prop = pNode->FindProperty("strokeStartTime");
    if (prop.IsValid())
    {
       prop.Get(&out_metaData.strokeStart, eDOUBLE1);
    }
 
-   prop = pNode->FindProperty("seTime");
+   prop = pNode->FindProperty("emphasisTime");
    if (prop.IsValid())
    {
       prop.Get(&out_metaData.emphasisTime, eDOUBLE1);
    }
 
-   prop = pNode->FindProperty("sEnd");
+   prop = pNode->FindProperty("strokeTime");
    if (prop.IsValid())
    {
       prop.Get(&out_metaData.strokeTime, eDOUBLE1);
    }
 
-   prop = pNode->FindProperty("rlxTime");
+   prop = pNode->FindProperty("relaxTime");
    if (prop.IsValid())
    {
       prop.Get(&out_metaData.relaxTime, eDOUBLE1);
@@ -760,6 +760,10 @@ void ParserFBX::ConvertfbxAnimToSBM(const std::vector<FBXAnimData*>& fbxAnimData
       //numKeys = fbxAnimData[j - 1]->keyFrameData.size();
    }
    
+   if (metaData == (double)0)
+   {
+      LOG("FBX animation %s has no SBM Metadata", motion.name().c_str());
+   }
    
    // set the meta data
    motion.synch_points.set_time(metaData.readyTime, metaData.strokeStart,
