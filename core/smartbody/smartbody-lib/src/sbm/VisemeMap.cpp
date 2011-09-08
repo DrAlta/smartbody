@@ -27,7 +27,7 @@ FaceDefinition::FaceDefinition(FaceDefinition* source)
 	{
 		std::string visemeName = source->getVisemeName(v);
 		SkMotion* motion = source->getVisemeMotion(visemeName);
-		_visemeMap.insert(std::pair<std::string, SkMotion*>(visemeName, motion));
+		_visemeMap.insert(std::pair<std::string, std::pair<SkMotion*, float> >(visemeName, std::pair<SkMotion*, float>(motion, 1.0f)));
 		if (motion)
 			motion->ref();
 	}
@@ -45,11 +45,11 @@ FaceDefinition::FaceDefinition(FaceDefinition* source)
 
 FaceDefinition::~FaceDefinition()
 {
-	for (std::map<std::string, SkMotion*>::iterator iter = _visemeMap.begin();
+	for (std::map<std::string, std::pair<SkMotion*, float> >::iterator iter = _visemeMap.begin();
 		 iter != _visemeMap.end();
 		 iter++)
 	{
-		SkMotion* motion = (*iter).second;
+		SkMotion* motion = (*iter).second.first;
 		if (motion)
 			motion->unref();
 	}
@@ -68,7 +68,7 @@ FaceDefinition::~FaceDefinition()
 	}
 }
 
-void FaceDefinition::setFaceNeutral(std::string motionName)
+void FaceDefinition::setFaceNeutral(const std::string& motionName)
 {
 	SkMotion* motion = NULL;
 	if (motionName.length() > 0)
@@ -109,7 +109,7 @@ bool FaceDefinition::hasAU(int auNum)
 	}
 }
 
-void FaceDefinition::setAU(int auNum, std::string side, std::string motionName)
+void FaceDefinition::setAU(int auNum, const std::string& side, const std::string& motionName)
 {
 	if (side != "left" &&
 		side != "LEFT" &&
@@ -232,9 +232,9 @@ void FaceDefinition::addAU(int auNum, ActionUnit* au)
 	}
 }
 
-bool FaceDefinition::hasViseme(std::string visemeName)
+bool FaceDefinition::hasViseme(const std::string& visemeName)
 {
-	std::map<std::string, SkMotion*>::iterator iter = _visemeMap.find(visemeName);
+	std::map<std::string, std::pair<SkMotion*, float> >::iterator iter = _visemeMap.find(visemeName);
 	if (iter == _visemeMap.end())
 	{
 		return false;
@@ -245,15 +245,15 @@ bool FaceDefinition::hasViseme(std::string visemeName)
 	}
 }
 
-void FaceDefinition::setViseme(std::string visemeName, std::string motionName)
+void FaceDefinition::setViseme(const std::string& visemeName, const std::string& motionName)
 {
-	std::map<std::string, SkMotion*>::iterator iter = _visemeMap.find(visemeName);
+	std::map<std::string, std::pair<SkMotion*, float>>::iterator iter = _visemeMap.find(visemeName);
 	if (iter == _visemeMap.end())
 	{
 		// no motion given, add the viseme only
 		if (motionName == "")
 		{
-			_visemeMap.insert(std::pair<std::string, SkMotion*>(visemeName, NULL));
+			_visemeMap.insert(std::pair<std::string, std::pair<SkMotion*, float> >(visemeName,std::pair<SkMotion*, float>(NULL, 0.0f)));
 			return;
 		}
 
@@ -267,13 +267,13 @@ void FaceDefinition::setViseme(std::string visemeName, std::string motionName)
 		}
 
 		motion->ref();
-		_visemeMap.insert(std::pair<std::string, SkMotion*>(visemeName, motion));
+		_visemeMap.insert(std::pair<std::string, std::pair<SkMotion*, float> >(visemeName, std::pair<SkMotion*, float>(motion, 1.0f)));
 		LOG("Viseme '%s' added to face definition %s.", visemeName.c_str(), getName().c_str());
 		return;
 	}
 	else // viseme already exists - replace it with the new definition
 	{
-		SkMotion* motion = (*iter).second;
+		SkMotion* motion = (*iter).second.first;
 		if (motion)
 		{
 			// no motion given, add the viseme only
@@ -281,7 +281,7 @@ void FaceDefinition::setViseme(std::string visemeName, std::string motionName)
 			{
 				motion->unref();
 				_visemeMap.erase(iter);
-				_visemeMap.insert(std::pair<std::string, SkMotion*>(visemeName, NULL));
+				_visemeMap.insert(std::pair<std::string, std::pair<SkMotion*, float> >(visemeName, std::pair<SkMotion*, float>(NULL, 1.0f)));
 				LOG("Viseme '%s' with motion '%s' replaced with no motion.", visemeName.c_str(), motion->name().c_str()); 
 				return;
 			}
@@ -298,12 +298,27 @@ void FaceDefinition::setViseme(std::string visemeName, std::string motionName)
 				{
 					motion->unref();
 					_visemeMap.erase(iter);
-					_visemeMap.insert(std::pair<std::string, SkMotion*>(visemeName, newMotion));
+					_visemeMap.insert(std::pair<std::string, std::pair<SkMotion*, float> >(visemeName, std::pair<SkMotion*, float>(newMotion, 1.0f)));
 					LOG("Viseme '%s' with motion '%s' replaced with motion '%s'.", visemeName.c_str(), motion->name().c_str(), motionName.c_str());
 					return;
 				}
 			}
 		}
+	}
+}
+
+void FaceDefinition::setVisemeWeight(const std::string& visemeName, float weight)
+{
+	std::map<std::string, std::pair<SkMotion*, float>>::iterator iter = _visemeMap.find(visemeName);
+	if (iter == _visemeMap.end())
+	{
+		LOG("Viseme '%s' does not exist, cannot set its' weight.", visemeName.c_str());
+		return;
+	}
+	else // viseme already exists - replace it with the new definition
+	{
+		(*iter).second.second = weight;
+		LOG("Viseme '%s' now has weight %f", visemeName.c_str(), weight);
 	}
 }
 
@@ -315,7 +330,7 @@ int FaceDefinition::getNumVisemes()
 const std::string& FaceDefinition::getVisemeName(int index)
 {
 	int counter = 0;
-	for (std::map<std::string, SkMotion*>::iterator iter = _visemeMap.begin();
+	for (std::map<std::string, std::pair<SkMotion*, float> >::iterator iter = _visemeMap.begin();
 		 iter != _visemeMap.end();
 		 iter++)
 	{
@@ -330,15 +345,26 @@ const std::string& FaceDefinition::getVisemeName(int index)
 	return _emptyString;
 }
 
-SkMotion* FaceDefinition::getVisemeMotion(std::string viseme)
+SkMotion* FaceDefinition::getVisemeMotion(const std::string& viseme)
 {
-	std::map<std::string, SkMotion*>::iterator iter = _visemeMap.find(viseme);
+	std::map<std::string, std::pair<SkMotion*, float> >::iterator iter = _visemeMap.find(viseme);
 	if (iter != _visemeMap.end())
 	{
-		return (*iter).second;
+		return (*iter).second.first;
 	}
 
 	return NULL;
+}
+
+float FaceDefinition::getVisemeWeight(const std::string& viseme)
+{
+	std::map<std::string, std::pair<SkMotion*, float> >::iterator iter = _visemeMap.find(viseme);
+	if (iter != _visemeMap.end())
+	{
+		return (*iter).second.second;
+	}
+
+	return 0.0f;
 }
 
 int FaceDefinition::getNumAUs()

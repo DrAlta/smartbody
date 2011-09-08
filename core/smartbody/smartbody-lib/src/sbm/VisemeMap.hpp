@@ -44,18 +44,20 @@ class FaceDefinition
 		const std::string& getName();
 		void setName(const std::string& name);
 
-		void setFaceNeutral(std::string motionName);
+		void setFaceNeutral(const std::string& motionName);
 		SkMotion* getFaceNeutral();
 
-		bool hasViseme(std::string visemeName);
-		void setViseme(std::string visemeName, std::string motionName);
+		bool hasViseme(const std::string& visemeName);
+		void setViseme(const std::string& visemeName, const std::string& motionName);
+		void setVisemeWeight(const std::string& visemeName, float weight);
 		int getNumVisemes();
 		const std::string& getVisemeName(int index);
-		SkMotion* getVisemeMotion(std::string viseme);
+		SkMotion* getVisemeMotion(const std::string& viseme);
+		float getVisemeWeight(const std::string& viseme);
 
 
 		bool hasAU(int auNum);
-		void setAU(int auNum, std::string side, std::string motion);
+		void setAU(int auNum, const std::string& side, const std::string& motion);
 		int getNumAUs();
 		int getAUNum(int index);
 		ActionUnit* getAU(int index);
@@ -65,7 +67,7 @@ class FaceDefinition
 		SkMotion* _faceNeutral;
 
 		std::map<int, ActionUnit*> _auMap;
-		std::map<std::string, SkMotion*> _visemeMap;
+		std::map<std::string, std::pair<SkMotion*, float> > _visemeMap;
 		std::string _name;
 		std::string _emptyString;
 };

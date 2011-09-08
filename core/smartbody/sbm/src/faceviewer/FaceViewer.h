@@ -20,13 +20,16 @@ class FaceViewer : public GenericViewer, Fl_Double_Window
 		static void CharacterCB(Fl_Widget* widget, void* data);
 		static void RefreshCB(Fl_Widget* widget, void* data);
 		static void ResetCB(Fl_Widget* widget, void* data);
+		static void ShowCommandsCB(Fl_Widget* widget, void* data);
 		static void FaceCB(Fl_Widget* widget, void* data);
+		static void FaceWeightCB(Fl_Widget* widget, void* data);
 		
 		Fl_Choice* choiceCharacters;
 		Fl_Button* buttonRefresh;
 		Fl_Button* buttonReset;
 		Fl_Group* topGroup;
 		Fl_Scroll* bottomGroup;
+		Fl_Button* buttonCommands;
 
 
 };
