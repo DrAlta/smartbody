@@ -55,6 +55,9 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 	{	
 		int startIndex = character->viseme_channel_start_pos;
 		int endIndex = character->viseme_channel_end_pos;
+		
+		if (startIndex < 0 || endIndex < 0)
+			return;
 
 		SkChannelArray& channels = character->getSkeleton()->channels();
 		for (int c = startIndex; c <= endIndex; c++)
