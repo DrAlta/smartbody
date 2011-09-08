@@ -1593,14 +1593,25 @@ void SbmCharacter::schedule_viseme_curve(
 		else
 			visemeNames.push_back(viseme);
 
+		FaceDefinition* faceDefinition = getFaceDefinition();
+
 		for( size_t nCount = 0; nCount < visemeNames.size(); nCount++ )
 		{
 			if( num_keys > 0 )
 			{
+				float visemeWeight = 1.0f;
 				float timeDelay = this->get_viseme_time_delay();
 
 				ostringstream ct_name;
 				ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
+				if (faceDefinition)
+				{
+					if (faceDefinition->hasViseme(visemeNames[nCount]))
+					{
+						visemeWeight = faceDefinition->getVisemeWeight(visemeNames[nCount]);
+					}
+				}
+
 
 				SkChannelArray channels;
 				channels.add( visemeNames[nCount], SkChannel::XPos );
@@ -1613,7 +1624,7 @@ void SbmCharacter::schedule_viseme_curve(
 				{
 					for (int i = 0; i < num_keys; i++)	{
 						float t = curve_info[ i * num_key_params + 0 ];
-						float w = curve_info[ i * num_key_params + 1 ];
+						float w = curve_info[ i * num_key_params + 1 ] * visemeWeight;
 						ct_p->insert_key( t, w );
 					}
 				}
@@ -1627,7 +1638,7 @@ void SbmCharacter::schedule_viseme_curve(
 					for (int i = 0; i < num_keys; i++)	{
 
 						float t = curve_info[ i * num_key_params + 0 ];
-						float w = curve_info[ i * num_key_params + 1 ];
+						float w = curve_info[ i * num_key_params + 1 ] * visemeWeight;
 
 						//					if (i == 0) spline.insert(t - .001, w);
 						spline.insert( t, w );
@@ -1677,9 +1688,20 @@ void SbmCharacter::schedule_viseme_trapezoid(
 			0.0f, 0.0f, 
 			0.0f, 0.0f
 		};
-		curve_info[ 1 ] = weight;
+
+		FaceDefinition* faceDefinition = getFaceDefinition();
+		float visemeWeight = 1.0f;
+		if (faceDefinition)
+		{
+			if (faceDefinition->hasViseme(viseme))
+			{
+				visemeWeight = faceDefinition->getVisemeWeight(viseme);
+			}
+		}
+
+		curve_info[ 1 ] = weight * visemeWeight;
 		curve_info[ 2 ] = duration;
-		curve_info[ 3 ] = weight;
+		curve_info[ 3 ] = weight * visemeWeight;
 		schedule_viseme_curve( viseme, start_time, curve_info, 2, 2, ramp_in, ramp_out );
 }
 
@@ -1704,6 +1726,9 @@ void SbmCharacter::schedule_viseme_blend_curve(
 		else
 			visemeNames.push_back(viseme);
 
+		FaceDefinition* faceDefinition = getFaceDefinition();
+		float visemeWeight = 1.0f;
+
 		for( size_t nCount = 0; nCount < visemeNames.size(); nCount++ )
 		{
 			if( num_keys > 0 )
@@ -1713,6 +1738,13 @@ void SbmCharacter::schedule_viseme_blend_curve(
 				ostringstream ct_name;
 				ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
 
+				if (faceDefinition)
+				{
+					if (faceDefinition->hasViseme(visemeNames[nCount]))
+					{
+						visemeWeight = faceDefinition->getVisemeWeight(visemeNames[nCount]);
+					}
+				}
 				SkChannelArray channels;
 				channels.add( visemeNames[nCount], SkChannel::XPos );
 
@@ -1721,7 +1753,7 @@ void SbmCharacter::schedule_viseme_blend_curve(
 				ct_p->init(this, channels, true );
 				SrBuffer<float> value;
 				value.size( 1 );
-				value[ 0 ] = weight;
+				value[ 0 ] = weight * visemeWeight;
 				ct_p->set_data(value);
 
 				head_sched_p->schedule( ct_p, start_time + timeDelay, curve_info, num_keys, num_key_params );
@@ -1740,8 +1772,17 @@ void SbmCharacter::schedule_viseme_blend_ramp(
 			0.0f, 0.0f, 
 			0.0f, 1.0f
 		};
+		FaceDefinition* faceDefinition = getFaceDefinition();
+		float visemeWeight = 1.0f;
+		if (faceDefinition)
+		{
+			if (faceDefinition->hasViseme(viseme))
+			{
+				visemeWeight = faceDefinition->getVisemeWeight(viseme);
+			}
+		}
 		curve_info[ 2 ] = rampin_duration;
-		schedule_viseme_blend_curve( viseme, start_time, weight, curve_info, 2, 2 );
+		schedule_viseme_blend_curve( viseme, start_time, weight * visemeWeight, curve_info, 2, 2 );
 }
 
 void SbmCharacter::forward_visemes( double curTime )
@@ -2238,8 +2279,8 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 											if( cmd == "prune" ) {
 												return( prune_controller_tree( mcu_p ) );
 											}
-											else 
-												if( cmd == "viseme" ) { 
+											else if( cmd == "viseme" )
+											{ 
 													char* viseme = args.read_token();
 													char* next = args.read_token();
 													//		float* curveInfo = NULL;
@@ -2253,120 +2294,171 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 														set_viseme_curve_mode(true);
 														return CMD_SUCCESS;
 													}
-													else 
-														if( _stricmp( viseme, "curveoff" ) == 0 )
+													else if( _stricmp( viseme, "curveoff" ) == 0 )
+													{
+														set_viseme_curve_mode(false);
+														return CMD_SUCCESS;
+													}
+													else if( _stricmp( viseme, "timedelay" ) == 0 )
+													{
+														float timeDelay = (float)atof( next );
+														set_viseme_time_delay( timeDelay );
+														return CMD_SUCCESS;
+													}
+													if( _stricmp( viseme, "sounddelay" ) == 0 )
+													{
+														float soundDelay = (float)atof( next );
+														set_viseme_sound_delay( soundDelay );
+														return CMD_SUCCESS;
+													}
+													if( _stricmp( viseme, "magnitude" ) == 0 )
+													{
+														float magnitude = (float)atof( next );
+														set_viseme_magnitude( magnitude );
+														return CMD_SUCCESS;
+													}
+													if( _stricmp( viseme, "plateau" ) == 0 )
+													{
+														if (!next)
 														{
-															set_viseme_curve_mode(false);
+															LOG("Character %s viseme plateau setting is %s", this->getName().c_str(), this->isVisemePlateau()? "on" : "off");
 															return CMD_SUCCESS;
 														}
+														if (_stricmp(next, "on") == 0)
+														{
+															this->setVisemePlateau(true);
+															LOG("Character %s viseme plateau setting is now on.", this->getName().c_str());
+														}
+														else if (_stricmp(next, "off") == 0)
+														{
+															this->setVisemePlateau(false);
+															LOG("Character %s viseme plateau setting is now off.", this->getName().c_str());
+														}
 														else
-															if( _stricmp( viseme, "timedelay" ) == 0 )
-															{
-																float timeDelay = (float)atof( next );
-																set_viseme_time_delay( timeDelay );
-																return CMD_SUCCESS;
-															}
-															if( _stricmp( viseme, "sounddelay" ) == 0 )
-															{
-																float soundDelay = (float)atof( next );
-																set_viseme_sound_delay( soundDelay );
-																return CMD_SUCCESS;
-															}
-															if( _stricmp( viseme, "magnitude" ) == 0 )
-															{
-																float magnitude = (float)atof( next );
-																set_viseme_magnitude( magnitude );
-																return CMD_SUCCESS;
-															}
-															if( _stricmp( viseme, "plateau" ) == 0 )
-															{
-																if (!next)
-																{
-																	LOG("Character %s viseme plateau setting is %s", this->getName().c_str(), this->isVisemePlateau()? "on" : "off");
-																	return CMD_SUCCESS;
-																}
-																if (_stricmp(next, "on") == 0)
-																{
-																	this->setVisemePlateau(true);
-																	LOG("Character %s viseme plateau setting is now on.", this->getName().c_str());
-																}
-																else if (_stricmp(next, "off") == 0)
-																{
-																	this->setVisemePlateau(false);
-																	LOG("Character %s viseme plateau setting is now off.", this->getName().c_str());
-																}
-																else
-																{
-																	LOG("use: char %s viseme plateau <on|off>", this->getName().c_str());
-																}
-																return CMD_SUCCESS;
-															}
+														{
+															LOG("use: char %s viseme plateau <on|off>", this->getName().c_str());
+														}
+														return CMD_SUCCESS;
+													}
 
-															if( strcmp( viseme, "minvisemetime" ) == 0 )
-															{
-																if (!next)
-																{
-																	LOG("Character %s min viseme time is %f", this->getName().c_str(), this->getMinVisemeTime());
-																	return CMD_SUCCESS;
-																}
-																float minTime = (float)atof( next );
-																setMinVisemeTime( minTime );
-																return CMD_SUCCESS;
-															}
+													if( strcmp( viseme, "minvisemetime" ) == 0 )
+													{
+														if (!next)
+														{
+															LOG("Character %s min viseme time is %f", this->getName().c_str(), this->getMinVisemeTime());
+															return CMD_SUCCESS;
+														}
+														float minTime = (float)atof( next );
+														setMinVisemeTime( minTime );
+														return CMD_SUCCESS;
+													}
 
-															// keyword next to viseme
-															if( strcmp( viseme, "clear" ) == 0 ) // removes all head controllers
-															{
-																if (head_sched_p)
-																{
-																	std::vector<MeCtScheduler2::TrackPtr> tracks = head_sched_p->tracks();
-																	head_sched_p->remove_tracks(tracks);
-																}
-															}
-															else
-																if( strcmp( next, "curve" ) == 0 )
-																{
-																	int numKeys = args.read_int();
-																	if( numKeys <= 0 )	
-																	{
-																		LOG( "Viseme data is missing" );
-																		return CMD_FAILURE;
-																	}
-																	int num_remaining = args.calc_num_tokens();
-																	int numKeyParams = num_remaining / numKeys;
-																	if( num_remaining != numKeys * numKeyParams )	{
-																		LOG( "Viseme data is malformed" );
-																		return CMD_FAILURE;
-																	}
-																	float* curveInfo = new float[ num_remaining ];
-																	args.read_float_vect( curveInfo, num_remaining );
+													// keyword next to viseme
+													if( strcmp( viseme, "clear" ) == 0 ) // removes all head controllers
+													{
+														if (head_sched_p)
+														{
+															std::vector<MeCtScheduler2::TrackPtr> tracks = head_sched_p->tracks();
+															head_sched_p->remove_tracks(tracks);
+														}
+													}
+													else if( strcmp( next, "curve" ) == 0 )
+													{
+														int numKeys = args.read_int();
+														if( numKeys <= 0 )	
+														{
+															LOG( "Viseme data is missing" );
+															return CMD_FAILURE;
+														}
+														int num_remaining = args.calc_num_tokens();
+														int numKeyParams = num_remaining / numKeys;
+														if( num_remaining != numKeys * numKeyParams )	{
+															LOG( "Viseme data is malformed" );
+															return CMD_FAILURE;
+														}
+														float* curveInfo = new float[ num_remaining ];
+														args.read_float_vect( curveInfo, num_remaining );											
 
-																	//			schedule_viseme_blend_curve( viseme, mcu_p->time, 1.0f, curveInfo, numKeys, numKeyParams );
-																	schedule_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams, 0.1f, 0.1f );
-																	delete [] curveInfo;
-																}
-																else
-																	if( _stricmp( next, "trap" ) == 0 )
-																	{
-																		// trap <weight> <dur> [<ramp-in> <ramp-out>]
-																		float weight = args.read_float();
-																		float dur = args.read_float();
-																		float ramp_in = 0.1f;
-																		float ramp_out = 0.1f;
-																		if( args.calc_num_tokens() > 0 )
-																			ramp_in = args.read_float();
-																		if( args.calc_num_tokens() > 0 )
-																			ramp_out = args.read_float();
-																		schedule_viseme_trapezoid( viseme, mcu_p->time, weight, dur, ramp_in, ramp_out );
-																	}
-																	else
-																	{
-																		float weight = (float)atof(next);
-																		float rampin_duration = args.read_float();
-																		schedule_viseme_blend_ramp( viseme, mcu_p->time, weight, rampin_duration );
-																	}
-																	return CMD_SUCCESS;
-												} 
+														//			schedule_viseme_blend_curve( viseme, mcu_p->time, 1.0f, curveInfo, numKeys, numKeyParams );
+														schedule_viseme_curve( viseme, mcu_p->time, curveInfo, numKeys, numKeyParams, 0.1f, 0.1f );
+														delete [] curveInfo;
+													}
+													else if( _stricmp( next, "trap" ) == 0 )
+													{
+														// trap <weight> <dur> [<ramp-in> <ramp-out>]
+														float weight = args.read_float();
+														float dur = args.read_float();
+														float ramp_in = 0.1f;
+														float ramp_out = 0.1f;
+														if( args.calc_num_tokens() > 0 )
+															ramp_in = args.read_float();
+														if( args.calc_num_tokens() > 0 )
+															ramp_out = args.read_float();
+														schedule_viseme_trapezoid( viseme, mcu_p->time, weight, dur, ramp_in, ramp_out );
+													}
+													else
+													{
+														float weight = (float)atof(next);
+														float rampin_duration = args.read_float();
+														schedule_viseme_blend_ramp( viseme, mcu_p->time, weight, rampin_duration );
+													}
+													return CMD_SUCCESS;
+												}
+												else if (cmd == "visemeweight")
+												{
+													FaceDefinition* faceDefinition = this->getFaceDefinition();
+													if (!faceDefinition)
+													{
+														LOG("Character %s does not have any visemes defined.", getName().c_str());
+														return CMD_FAILURE;
+													}
+													int numRemaining = args.calc_num_tokens();
+													if (numRemaining == 0)
+													{
+														// dump all of the existing viseme weights
+														
+														int numVisemes = faceDefinition->getNumVisemes();
+														for (int v = 0; v < numVisemes; v++)
+														{
+															const std::string& visemeName = faceDefinition->getVisemeName(v);
+															float weight = faceDefinition->getVisemeWeight(visemeName);
+															LOG("%s %f", visemeName.c_str(), weight);
+
+														}
+														return CMD_SUCCESS;
+													}
+													if (numRemaining == 1)
+													{
+														std::string visemeName = args.read_token();
+														if (!faceDefinition->hasViseme(visemeName))
+														{
+															LOG("Character %s does not have viseme %s defined.", getName().c_str(), visemeName.c_str());
+															return CMD_FAILURE;
+														}
+														float weight = faceDefinition->getVisemeWeight(visemeName);
+														LOG("%s %f", visemeName.c_str(), weight);
+														return CMD_SUCCESS;
+													}
+													if (numRemaining == 2)
+													{
+														std::string visemeName = args.read_token();
+														if (!faceDefinition->hasViseme(visemeName))
+														{
+															LOG("Character %s does not have viseme %s defined.", getName().c_str(), visemeName.c_str());
+															return CMD_FAILURE;
+														}
+														float weight = args.read_float();
+														faceDefinition->setVisemeWeight(visemeName, weight);
+														LOG("%s %f", visemeName.c_str(), weight);
+														return CMD_SUCCESS;
+													}
+													if (numRemaining > 2)
+													{
+														LOG("Usage:\nchar %s visemeweight\nchar %s visemeweight <visemename>\nchar %s visemeweight <visemename> <weight>", getName().c_str(), getName().c_str(), getName().c_str());
+														return CMD_FAILURE;
+													}
+
+												}
 												else 
 													if( cmd == "viewer" ) {
 														std::string viewType = args.read_token();

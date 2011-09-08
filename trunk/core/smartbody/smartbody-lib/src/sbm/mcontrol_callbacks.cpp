@@ -711,7 +711,7 @@ int mcu_faceViewer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 					int err = mcu_p->openFaceViewer( width, height, px, py );
 					return( err );
 				} else {
-					int err = mcu_p->openFaceViewer( 480, 600, 50, 50 );
+					int err = mcu_p->openFaceViewer( 480, 650, 50, 50 );
 					return( err );
 				}
 			}
