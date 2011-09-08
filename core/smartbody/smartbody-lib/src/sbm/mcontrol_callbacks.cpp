@@ -1019,7 +1019,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				if (!state)
 				{
 					LOG("State %s not exist, schedule Idle State.", stateName.c_str());
-					return CMD_FAILURE;
+					return CMD_SUCCESS;
 				}
 				std::string loopString = args.read_token();
 				if (loopString != "loop")
@@ -1058,8 +1058,6 @@ int mcu_panim_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 						w.push_back(args.read_double());
 					character->param_animation_ct->updateWeights(w);
 				}
-				else
-					LOG("Panim State Update ERR: state updated is not corrent.");
 			}
 
 			if (operation == "basename")
