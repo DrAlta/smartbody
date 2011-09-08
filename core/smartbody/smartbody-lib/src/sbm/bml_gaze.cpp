@@ -516,12 +516,14 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 			switch( num_toks )	{
 				case 1: {
 					gaze_speed_head = xml_utils::xml_parse_float( BMLDefs::ATTR_JOINT_SPEED, elem );
+					break;
 				}
 				case 2: {
 					XMLCh *token = tokenizer.nextToken();
 					gaze_speed_head = xml_utils::xml_translate_float( token );
 					token = tokenizer.nextToken();
 					gaze_speed_eyeball = xml_utils::xml_translate_float( token );
+					break;
 				}
 				default:	{ // num_toks > 2 DEPRECATED!
 
@@ -533,6 +535,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 						xml_utils::xml_parse_error( BMLDefs::ATTR_JOINT_SPEED, elem );
 						LOG( "WARNING: expecting 1, 2, or 3 values" );
 					}
+					break;
 				}
 			}
 		}
