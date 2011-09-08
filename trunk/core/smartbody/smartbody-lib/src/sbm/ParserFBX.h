@@ -82,6 +82,12 @@ class ParserFBX
             relaxTime -= value;
             return *this;
          }
+
+         bool operator ==(fbxDouble1 value) const
+         {
+            return (readyTime == value && strokeStart == value 
+               && emphasisTime == value && strokeTime == value && relaxTime == value);
+         }
       };
 
       // starts up the fbx sdk
