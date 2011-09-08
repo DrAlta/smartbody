@@ -184,7 +184,48 @@ std::string removeXMLTagsAndNewLines( const std::string & txt , SpeechRequestMes
    XercesDOMParser *parser = new XercesDOMParser();
 
    std::string truncatedTxt = txt.substr(txt.find_first_of(">")+1);
-   char * message = (char*)truncatedTxt.c_str();
+   
+
+   //******************************************************************************************
+// Code to properly format the message with indentation as otherwise Xerces throws a tantrum
+
+   char * transferTxt = new char[truncatedTxt.length() * 2];
+
+   unsigned int position = truncatedTxt.find("><");
+   unsigned int i = 0;
+   unsigned int j = 0;
+   while(position != std::string::npos)
+   {
+	   transferTxt[i] = truncatedTxt[j];
+	   ++i;
+	   ++j;
+	   if( j == position)
+	   {
+		   transferTxt[i] = '>'; ++i;
+		   transferTxt[i] = '\n'; ++i;
+		   transferTxt[i] = '<'; ++i;
+
+		   position = truncatedTxt.find("><",position+1);
+
+		   j= j+2;
+	   }	   
+   }
+
+   while(j < truncatedTxt.length())
+   {
+	   transferTxt[i] = truncatedTxt[j];
+	   ++j; 
+	   ++i;
+   }
+
+   transferTxt[i] = '\0';
+
+   //******************************************************************************************
+
+
+   char * message = transferTxt;
+
+
 
    std::string actualText = "";
 #ifdef _PARSER_DEBUG_MESSAGES_ON
