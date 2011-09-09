@@ -236,9 +236,11 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 					if (infoNodeName == "translate")
 					{
 						std::string offsetString = getString(infoNode->getTextContent());
-						offset.x = (float)atof(tokenize(offsetString).c_str()) * scale;
-						offset.y = (float)atof(tokenize(offsetString).c_str()) * scale;
-						offset.z = (float)atof(tokenize(offsetString).c_str()) * scale;
+						std::vector<std::string> tokens;
+						vhcl::Tokenize(offsetString, tokens, " ");
+						offset.x = (float)atof(tokens[0].c_str()) * scale;
+						offset.y = (float)atof(tokens[1].c_str()) * scale;
+						offset.z = (float)atof(tokens[2].c_str()) * scale;
 					}
 					if (infoNodeName == "rotate")
 					{
@@ -250,9 +252,11 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 						if (sidAttr.substr(0, 11) == "jointOrient")
 						{
 							std::string jointOrientationString = getString(infoNode->getTextContent());
+							std::vector<std::string> tokens;
+							vhcl::Tokenize(jointOrientationString, tokens, " ");
 							float finalValue;
 							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
-								finalValue = (float)atof(tokenize(jointOrientationString).c_str());
+								finalValue = (float)atof(tokens[tokenizeC].c_str());
 							if (sidAttr == "jointOrientX") jorientx = finalValue;
 							if (sidAttr == "jointOrientY") jorienty = finalValue;
 							if (sidAttr == "jointOrientZ") jorientz = finalValue;
@@ -262,9 +266,11 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 						if (sidAttr.substr(0, 6) == "rotate")
 						{
 							std::string rotationString = getString(infoNode->getTextContent());
+							std::vector<std::string> tokens;
+							vhcl::Tokenize(rotationString, tokens, " ");
 							float finalValue;
 							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
-								finalValue = (float)atof(tokenize(rotationString).c_str());
+								finalValue = (float)atof(tokens[tokenizeC].c_str());
 							if (sidAttr == "rotateX") rotx = finalValue;
 							if (sidAttr == "rotateY") roty = finalValue;
 							if (sidAttr == "rotateZ") rotz = finalValue;
@@ -363,6 +369,8 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 							DOMNode* arrayCountNode = arrayAttr->getNamedItem(BML::BMLDefs::ATTR_COUNT);
 							int counter = atoi(getString(arrayCountNode->getNodeValue()).c_str());
 							std::string arrayString = getString(node3->getTextContent());
+							std::vector<std::string> tokens;
+							vhcl::Tokenize(arrayString, tokens, " ");
 						
 							if (op == "input")
 							{
@@ -371,7 +379,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 								{
 									for (int frameCt = 0; frameCt < counter; frameCt++)
 									{
-										motion.insert_frame(frameCt, (float)atof(tokenize(arrayString).c_str()));
+										motion.insert_frame(frameCt, (float)atof(tokens[frameCt].c_str()));
 										for (int postureCt = 0; postureCt < motion.posture_size(); postureCt++)
 											motion.posture(frameCt)[postureCt] = 0.0f;
 									}
@@ -402,7 +410,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations(DOMNode* node, SkSkeleton& skelet
 									for (int frameCt = 0; frameCt < motion.frames(); frameCt++)
 										for (int strideCt = 0; strideCt < stride; strideCt++)
 										{
-											float v = (float)atof(tokenize(arrayString).c_str());
+											float v = (float)atof(tokens[frameCt].c_str());
 											motion.posture(frameCt)[channelId + strideCt] = v * scale;
 										}
 								}
@@ -591,7 +599,6 @@ std::string ParserOpenCOLLADA::tokenize(std::string& str, const std::string& del
 	else
 		return "";
 }
-
 int ParserOpenCOLLADA::getRotationOrder(std::vector<std::string> orderVec)
 {
 	if (orderVec.size() == 3)
@@ -722,8 +729,10 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, std::vector<SrMode
 						if (XMLString::compareString(inputNode->getNodeName(), BML::BMLDefs::ATTR_VCOUNT) == 0)
 						{
 							std::string vcountString = getString(inputNode->getTextContent());
+							std::vector<std::string> tokens;
+							vhcl::Tokenize(vcountString, tokens, " ");
 							for (int i = 0; i < count; i++)
-								vcountList.push_back(atoi(tokenize(vcountString).c_str()));
+								vcountList.push_back(atoi(tokens[i].c_str()));
 						}
 					}
 					if (vcountList.size() == 0)
