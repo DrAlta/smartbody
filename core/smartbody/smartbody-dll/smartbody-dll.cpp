@@ -426,9 +426,9 @@ bool Smartbody_dll::InitVHMsg()
 
    printf( "Starting VHMsg (DLL side)\n" );
 
-   vhmsg::ttu_open();
-
-   mcu.vhmsg_enabled = true;
+   int err = vhmsg::ttu_open();
+   if (err == vhmsg::TTU_SUCCESS)
+		mcu.vhmsg_enabled = true;
 #endif
 
    return true;
