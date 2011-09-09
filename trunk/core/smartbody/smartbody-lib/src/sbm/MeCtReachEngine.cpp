@@ -78,10 +78,10 @@ MeCtReachEngine::~MeCtReachEngine( void )
 		delete reachData;
 	}
 	skeletonCopy->unref();
-	if (dataInterpolator)
-		delete dataInterpolator;
-	if (interpMotion)
-		delete interpMotion;
+//	if (dataInterpolator)
+//		delete dataInterpolator;
+//	if (interpMotion)
+//		delete interpMotion;
 //	FREE_DATA(motionParameter);
 }
 
