@@ -674,27 +674,30 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, std::vector<SrMode
 					if (idType == "texcoords")
 						count /= 2;
 					std::string floatString = getString(floatNode->getTextContent());
+					std::vector<std::string> tokens;
+					vhcl::Tokenize(floatString, tokens, " ");
+					int index = 0;
 					for (int i = 0; i < count; i++)
 					{
 						if (idType == "positions")
 						{
 							newModel->V.push();
-							newModel->V.top().x = (float)atof(tokenize(floatString).c_str());
-							newModel->V.top().y = (float)atof(tokenize(floatString).c_str());
-							newModel->V.top().z = (float)atof(tokenize(floatString).c_str());
+							newModel->V.top().x = (float)atof(tokens[index++].c_str());
+							newModel->V.top().y = (float)atof(tokens[index++].c_str());
+							newModel->V.top().z = (float)atof(tokens[index++].c_str());
 						}
 						if (idType == "normals")
 						{
 							newModel->N.push();
-							newModel->N.top().x = (float)atof(tokenize(floatString).c_str());
-							newModel->N.top().y = (float)atof(tokenize(floatString).c_str());
-							newModel->N.top().z = (float)atof(tokenize(floatString).c_str());
+							newModel->N.top().x = (float)atof(tokens[index++].c_str());
+							newModel->N.top().y = (float)atof(tokens[index++].c_str());
+							newModel->N.top().z = (float)atof(tokens[index++].c_str());
 						}
 						if (idType == "texcoords")
 						{
 							newModel->T.push();
-							newModel->T.top().x = (float)atof(tokenize(floatString).c_str());
-							newModel->T.top().y = (float)atof(tokenize(floatString).c_str());
+							newModel->T.top().x = (float)atof(tokens[index++].c_str());
+							newModel->T.top().y = (float)atof(tokens[index++].c_str());
 						}
 					}
 				}
@@ -731,6 +734,9 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, std::vector<SrMode
 					DOMNode* pNode = ParserOpenCOLLADA::getNode("p", node1);
 					std::string pString = getString(pNode->getTextContent());
 					// below code has potential bug because input order maybe different
+					std::vector<std::string> tokens;
+					vhcl::Tokenize(pString, tokens, " ");
+					int index = 0;
 					for (int i = 0; i < count; i++)
 					{
 						if (numInput == 1)
@@ -740,17 +746,17 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, std::vector<SrMode
 								if (vcountList[i] == 3)
 								{
 									newModel->F.push();
-									newModel->F.top().a = atoi(tokenize(pString).c_str());
-									newModel->F.top().b = atoi(tokenize(pString).c_str());
-									newModel->F.top().c = atoi(tokenize(pString).c_str());
+									newModel->F.top().a = atoi(tokens[index++].c_str());
+									newModel->F.top().b = atoi(tokens[index++].c_str());
+									newModel->F.top().c = atoi(tokens[index++].c_str());
 								}
 								if (vcountList[i] == 4)
 								{
 									newModel->F.push();
-									int a = atoi(tokenize(pString).c_str());
-									int b = atoi(tokenize(pString).c_str());
-									int c = atoi(tokenize(pString).c_str());
-									int d = atoi(tokenize(pString).c_str());
+									int a = atoi(tokens[index++].c_str());
+									int b = atoi(tokens[index++].c_str());
+									int c = atoi(tokens[index++].c_str());
+									int d = atoi(tokens[index++].c_str());
 									newModel->F.top().a = a;
 									newModel->F.top().b = b;
 									newModel->F.top().c = c;
@@ -771,23 +777,23 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, std::vector<SrMode
 								{
 									newModel->F.push();
 									newModel->Ft.push();
-									newModel->F.top().a = atoi(tokenize(pString).c_str());
-									newModel->Ft.top().a = atoi(tokenize(pString).c_str());
-									newModel->F.top().b = atoi(tokenize(pString).c_str());
-									newModel->Ft.top().b = atoi(tokenize(pString).c_str());
-									newModel->F.top().c = atoi(tokenize(pString).c_str());
-									newModel->Ft.top().c = atoi(tokenize(pString).c_str());	
+									newModel->F.top().a = atoi(tokens[index++].c_str());
+									newModel->Ft.top().a = atoi(tokens[index++].c_str());
+									newModel->F.top().b = atoi(tokens[index++].c_str());
+									newModel->Ft.top().b = atoi(tokens[index++].c_str());
+									newModel->F.top().c = atoi(tokens[index++].c_str());
+									newModel->Ft.top().c = atoi(tokens[index++].c_str());	
 								}
 								if (vcountList[i] == 4)
 								{
-									int a = atoi(tokenize(pString).c_str());
-									int a1 = atoi(tokenize(pString).c_str());
-									int b = atoi(tokenize(pString).c_str());
-									int b1 = atoi(tokenize(pString).c_str()); 
-									int c = atoi(tokenize(pString).c_str());
-									int c1 = atoi(tokenize(pString).c_str());
-									int d = atoi(tokenize(pString).c_str());
-									int d1 = atoi(tokenize(pString).c_str()); 
+									int a = atoi(tokens[index++].c_str());
+									int a1 = atoi(tokens[index++].c_str());
+									int b = atoi(tokens[index++].c_str());
+									int b1 = atoi(tokens[index++].c_str()); 
+									int c = atoi(tokens[index++].c_str());
+									int c1 = atoi(tokens[index++].c_str());
+									int d = atoi(tokens[index++].c_str());
+									int d1 = atoi(tokens[index++].c_str()); 
 									newModel->F.push();
 									newModel->Ft.push();
 									newModel->F.top().a = a;
@@ -813,23 +819,23 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, std::vector<SrMode
 								{
 									newModel->F.push();
 									newModel->Fn.push();
-									newModel->F.top().a = atoi(tokenize(pString).c_str());
-									newModel->Fn.top().a = atoi(tokenize(pString).c_str());
-									newModel->F.top().b = atoi(tokenize(pString).c_str());
-									newModel->Fn.top().b = atoi(tokenize(pString).c_str());
-									newModel->F.top().c = atoi(tokenize(pString).c_str());
-									newModel->Fn.top().c = atoi(tokenize(pString).c_str());
+									newModel->F.top().a = atoi(tokens[index++].c_str());
+									newModel->Fn.top().a = atoi(tokens[index++].c_str());
+									newModel->F.top().b = atoi(tokens[index++].c_str());
+									newModel->Fn.top().b = atoi(tokens[index++].c_str());
+									newModel->F.top().c = atoi(tokens[index++].c_str());
+									newModel->Fn.top().c = atoi(tokens[index++].c_str());
 								}
 								if (vcountList[i] == 4)
 								{
-									int a = atoi(tokenize(pString).c_str());
-									int a1 = atoi(tokenize(pString).c_str());
-									int b = atoi(tokenize(pString).c_str());
-									int b1 = atoi(tokenize(pString).c_str()); 
-									int c = atoi(tokenize(pString).c_str());
-									int c1 = atoi(tokenize(pString).c_str());
-									int d = atoi(tokenize(pString).c_str());
-									int d1 = atoi(tokenize(pString).c_str()); 
+									int a = atoi(tokens[index++].c_str());
+									int a1 = atoi(tokens[index++].c_str());
+									int b = atoi(tokens[index++].c_str());
+									int b1 = atoi(tokens[index++].c_str()); 
+									int c = atoi(tokens[index++].c_str());
+									int c1 = atoi(tokens[index++].c_str());
+									int d = atoi(tokens[index++].c_str());
+									int d1 = atoi(tokens[index++].c_str()); 
 									newModel->F.push();
 									newModel->Fn.push();
 									newModel->F.top().a = a;
@@ -861,30 +867,30 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, std::vector<SrMode
 									newModel->F.push();
 									newModel->Fn.push();
 									newModel->Ft.push();
-									newModel->F.top().a = atoi(tokenize(pString).c_str());
-									newModel->Fn.top().a = atoi(tokenize(pString).c_str());
-									newModel->Ft.top().a = atoi(tokenize(pString).c_str());
-									newModel->F.top().b = atoi(tokenize(pString).c_str());
-									newModel->Fn.top().b = atoi(tokenize(pString).c_str());
-									newModel->Ft.top().b = atoi(tokenize(pString).c_str());
-									newModel->F.top().c = atoi(tokenize(pString).c_str());
-									newModel->Fn.top().c = atoi(tokenize(pString).c_str());
-									newModel->Ft.top().c = atoi(tokenize(pString).c_str());	
+									newModel->F.top().a = atoi(tokens[index++].c_str());
+									newModel->Fn.top().a = atoi(tokens[index++].c_str());
+									newModel->Ft.top().a = atoi(tokens[index++].c_str());
+									newModel->F.top().b = atoi(tokens[index++].c_str());
+									newModel->Fn.top().b = atoi(tokens[index++].c_str());
+									newModel->Ft.top().b = atoi(tokens[index++].c_str());
+									newModel->F.top().c = atoi(tokens[index++].c_str());
+									newModel->Fn.top().c = atoi(tokens[index++].c_str());
+									newModel->Ft.top().c = atoi(tokens[index++].c_str());	
 								}
 								if (vcountList[i] == 4)
 								{
-									int a = atoi(tokenize(pString).c_str());
-									int a1 = atoi(tokenize(pString).c_str());
-									int a2 = atoi(tokenize(pString).c_str());
-									int b = atoi(tokenize(pString).c_str());
-									int b1 = atoi(tokenize(pString).c_str()); 
-									int b2 = atoi(tokenize(pString).c_str()); 
-									int c = atoi(tokenize(pString).c_str());
-									int c1 = atoi(tokenize(pString).c_str());
-									int c2 = atoi(tokenize(pString).c_str());
-									int d = atoi(tokenize(pString).c_str());
-									int d1 = atoi(tokenize(pString).c_str()); 
-									int d2 = atoi(tokenize(pString).c_str()); 
+									int a = atoi(tokens[index++].c_str());
+									int a1 = atoi(tokens[index++].c_str());
+									int a2 = atoi(tokens[index++].c_str());
+									int b = atoi(tokens[index++].c_str());
+									int b1 = atoi(tokens[index++].c_str()); 
+									int b2 = atoi(tokens[index++].c_str()); 
+									int c = atoi(tokens[index++].c_str());
+									int c1 = atoi(tokens[index++].c_str());
+									int c2 = atoi(tokens[index++].c_str());
+									int d = atoi(tokens[index++].c_str());
+									int d1 = atoi(tokens[index++].c_str()); 
+									int d2 = atoi(tokens[index++].c_str()); 
 
 									newModel->F.push();
 									newModel->Fn.push();
