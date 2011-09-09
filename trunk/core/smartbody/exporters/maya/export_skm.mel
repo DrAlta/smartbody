@@ -1621,70 +1621,75 @@ global proc skmExportButton()
 
 global proc skmExportGUI()
 {
-   // This creates the main UI window
+	// This creates the main UI window
 
-   global string $skmVersion;
-   global int $isFacial;
+	global string $skmVersion;
+	global int $isFacial;
 
-   if ( ( `window -exists skmMainWin` ) == true )
-   {
-      deleteUI skmMainWin;
-      windowPref -remove skmMainWin;
-   }
+	if ( ( `window -exists skmMainWin` ) == true )
+	{
+		deleteUI skmMainWin;
+		windowPref -remove skmMainWin;
+	}
 
+	skmCheckAnimDef();
 
-   skmCheckAnimDef();
+	//BUILD UI WINDOW
+	window -title ( "SKM Exporter v" + $skmVersion ) -resizeToFitChildren true -sizeable true skmMainWin;
+	columnLayout -adjustableColumn true -columnAttach "both" 5;
+		frameLayout -label "Animation Definitions" -borderStyle etchedIn -collapsable false -collapse 0;
+			columnLayout -adjustableColumn true -rowSpacing 2 -columnOffset "both" 10;
+			textScrollList  -numberOfRows 15 -width 250 -allowMultiSelection false
+							-showIndexedItem 4 -selectCommand skmUpdateAnimUI scrollListAnim;
+			rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
+				button -label "Create Animation" -command "skmAddAnimDef" -align "center";
+				button -label "Rename Animation" -command "skmRenameAnimDef" -align "center";
+				button -label "Delete Animation" -command "skmDeleteAnimDef" -align "center";
+				setParent .. ;
+			setParent .. ;
+		setParent .. ;
+	checkBox -editable false -label "Use Channel Attributes" -onCommand "skmChannelAttributesOn" -offCommand "skmChannelAttributesOff" -align "left" channelAttributesBox;
+	checkBox -editable false -label "Facial Animations" -changeCommand "skmToggleIsFacial" -value false -align "left" facialBox;
+	checkBox -editable false -label "Partial Animation Exporting- ON: Zero-out OFF: Eliminate Other joints" -changeCommand "skmTogglePartialExport" -value false -align "left" partialExportBox;
 
-
-   //BUILD UI WINDOW
-   window -title ( "SKM Exporter v" + $skmVersion ) -resizeToFitChildren true -sizeable true skmMainWin;
-   columnLayout -adjustableColumn true -columnAttach "both" 5;
-      frameLayout -label "Animation Definitions" -borderStyle etchedIn -collapsable false -collapse 0;
-         columnLayout -adjustableColumn true -rowSpacing 2 -columnOffset "both" 10;
-         textScrollList  -numberOfRows 15 -width 250 -allowMultiSelection false
-                            -showIndexedItem 4 -selectCommand skmUpdateAnimUI scrollListAnim;
-            rowColumnLayout -numberOfRows 1 -rowHeight 1 20 -rowSpacing 1 2 -columnAttach 1 "right" 3;
-               button -label "Create Animation" -command "skmAddAnimDef" -align "center";
-               button -label "Rename Animation" -command "skmRenameAnimDef" -align "center";
-               button -label "Delete Animation" -command "skmDeleteAnimDef" -align "center";
-               setParent skmMainWin;
-   checkBox -editable false -label "Use Channel Attributes" -onCommand "skmChannelAttributesOn" -offCommand "skmChannelAttributesOff" -align "left" channelAttributesBox;
-   checkBox -editable false -label "Facial Animations" -changeCommand "skmToggleIsFacial" -value false -align "left" facialBox;
-   checkBox -editable false -label "Partial Animation Exporting- ON: Zero-out OFF: Eliminate Other joints" -changeCommand "skmTogglePartialExport" -value false -align "left" partialExportBox;
-
-   frameLayout -label "Animation Length & Synch Points" -borderStyle etchedIn -collapsable false -collapse 0;
-      columnLayout -adj true;
-         intSliderGrp -label "First Frame:" -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmFirstFrameUpdate "skmFirstFrameSlider";
-         intSliderGrp -label "Last Frame:"  -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmLastFrameUpdate "skmLastFrameSlider";
-         columnLayout -adjustableColumn true -rowSpacing 2 -columnOffset "both" 10;
-            button -label "Stroke, Ready, Relax Help" -align "center" -command skmInfoPressed;
-            setParent ..;
-         intSliderGrp -label "Ready End Frame"     -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmReadyUpdate "sliderReady";
-         intSliderGrp -label "Stroke Start Frame:" -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmStrokeStartUpdate "sliderStrokeStart";
-         intSliderGrp -label "Emphasis Frame:"     -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmEmphasisUpdate "sliderEmphasis";
-         intSliderGrp -label "Stroke End Frame:"   -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmStrokeUpdate "sliderStrokeEnd";
-         intSliderGrp -label "Relax End Frame:"    -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmRelaxUpdate "sliderRelax";
-         setParent skmMainWin;
-   frameLayout -label "Export Setup" -borderStyle etchedIn -collapsable false -collapse 0;
-      columnLayout -adjustableColumn true;
-         intSliderGrp -label "Frames per Seconds:" -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmFpsUpdate -minValue 1 -value 30 "sliderFps" ; //<- was "skmFps"
-         textFieldGrp -label "Skeleton Root Joint:" -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand skmUpdateSkeletonRoot "skmRootField" ;
-         textFieldGrp -label "Partial Exporting, From Joint:" -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand skmUpdatePartialExportJoint "skmPartialExportRootField" ;
-         textFieldGrp -label "Project Root Directory:" -adjustableColumn 2 -columnAttach 1 "right" 5 -ed false "skmProjectRootDir" ;		 
-         textFieldGrp -label "Output Pathname:" -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand skmUpdateOutput "skmOutputPath" ;
-         textFieldGrp -label "Output Filename:" -adjustableColumn 2 -columnAttach 1 "right" 5 -editable 0 -changeCommand skmUpdateOutput "skmOutputFile" ;
-         columnLayout -adjustableColumn true -rowSpacing 2 -columnOffset "both" 10;
-            button -label "Browse Output File" -command "fileBrowserDialog -m 4 -fc \"skmFileCb\" -an \"Select\" -om \"SaveAs\"";
-            setParent skmMainWin;
-   frameLayout -borderStyle etchedIn -collapsable false -collapse 0 -labelVisible false;
-      columnLayout -adjustableColumn true -rowSpacing 5 -columnOffset "both" 10;
-         button -label "Show Exporting Channels" -command "showExportingChannelsWin()";
-		 button -label "Show Exporting Channels Help" -command showExportingChannelsInfoPressed;
-         setParent skmMainWin;			
-   frameLayout -borderStyle etchedIn -collapsable false -collapse 0 -labelVisible false;
-      columnLayout -adjustableColumn true -rowSpacing 5 -columnOffset "both" 10;
-         button -label "Export All Animations" -command "skmExportButton()";
-         setParent skmMainWin;
+	frameLayout -label "Animation Length & Synch Points" -borderStyle etchedIn -collapsable false -collapse 0;
+		columnLayout -adj true;
+			intSliderGrp -label "First Frame:" -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmFirstFrameUpdate "skmFirstFrameSlider";
+			intSliderGrp -label "Last Frame:"  -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmLastFrameUpdate "skmLastFrameSlider";
+			columnLayout -adjustableColumn true -rowSpacing 2 -columnOffset "both" 10;
+				button -label "Stroke, Ready, Relax Help" -align "center" -command skmInfoPressed;
+				setParent .. ;
+			intSliderGrp -label "Ready End Frame"     -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmReadyUpdate "sliderReady";
+			intSliderGrp -label "Stroke Start Frame:" -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmStrokeStartUpdate "sliderStrokeStart";
+			intSliderGrp -label "Emphasis Frame:"     -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmEmphasisUpdate "sliderEmphasis";
+			intSliderGrp -label "Stroke End Frame:"   -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmStrokeUpdate "sliderStrokeEnd";
+			intSliderGrp -label "Relax End Frame:"    -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmRelaxUpdate "sliderRelax";
+			setParent .. ;
+		setParent .. ;
+	frameLayout -label "Export Setup" -borderStyle etchedIn -collapsable false -collapse 0;
+		columnLayout -adjustableColumn true;
+			intSliderGrp -label "Frames per Seconds:" -adjustableColumn 3 -columnWidth 2 50 -columnAttach 1 "right" 5 -field true -fieldMinValue -10000 -fieldMaxValue 10000 -changeCommand skmFpsUpdate -minValue 1 -value 30 "sliderFps" ; //<- was "skmFps"
+			textFieldGrp -label "Skeleton Root Joint:" -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand skmUpdateSkeletonRoot "skmRootField" ;
+			textFieldGrp -label "Partial Exporting, From Joint:" -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand skmUpdatePartialExportJoint "skmPartialExportRootField" ;
+			textFieldGrp -label "Project Root Directory:" -adjustableColumn 2 -columnAttach 1 "right" 5 -ed false "skmProjectRootDir" ;		 
+			textFieldGrp -label "Output Pathname:" -adjustableColumn 2 -columnAttach 1 "right" 5 -changeCommand skmUpdateOutput "skmOutputPath" ;
+			textFieldGrp -label "Output Filename:" -adjustableColumn 2 -columnAttach 1 "right" 5 -editable 0 -changeCommand skmUpdateOutput "skmOutputFile" ;
+			columnLayout -adjustableColumn true -rowSpacing 2 -columnOffset "both" 10;
+				button -label "Browse Output File" -command "fileBrowserDialog -m 4 -fc \"skmFileCb\" -an \"Select\" -om \"SaveAs\"";
+				setParent .. ;
+			setParent .. ;
+		setParent .. ;
+	frameLayout -borderStyle etchedIn -collapsable false -collapse 0 -labelVisible false;
+		columnLayout -adjustableColumn true -rowSpacing 5 -columnOffset "both" 10;
+			button -label "Show Exporting Channels" -command "showExportingChannelsWin()";
+			button -label "Show Exporting Channels Help" -command showExportingChannelsInfoPressed;
+			setParent .. ;
+		setParent .. ;
+	frameLayout -borderStyle etchedIn -collapsable false -collapse 0 -labelVisible false;
+		columnLayout -adjustableColumn true -rowSpacing 5 -columnOffset "both" 10;
+			button -label "Export All Animations" -command "skmExportButton()";
+			setParent .. ;
+		setParent .. ;
 
 
    skmUpdateAnimUI();
