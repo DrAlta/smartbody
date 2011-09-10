@@ -389,6 +389,9 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands
 	mcu.insert( "syncpoint",		   syncpoint_func);
 	mcu.insert( "pawnbonebus",		   pawnbonebus_func);
+	mcu.insert( "vhmsgconnect",		   mcu_vhmsg_connect_func);
+	mcu.insert( "vhmsgdisconnect",	   mcu_vhmsg_disconnect_func);
+
 #ifdef USE_GOOGLE_PROFILER
 	mcu.insert( "startprofile",			   startprofile_func );
 	mcu.insert( "stopprofile",			   stopprofile_func );

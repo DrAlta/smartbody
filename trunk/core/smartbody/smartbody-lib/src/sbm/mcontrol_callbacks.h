@@ -126,6 +126,9 @@ int mcu_check_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_adjust_motion_function( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_mediapath_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
+int mcu_vhmsg_connect_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int mcu_vhmsg_disconnect_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+
 int triggerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_python_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 int mcu_pythonscript_func( srArgBuffer& args, mcuCBHandle* mcu_p );
@@ -151,6 +154,8 @@ int stopprofile_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 int mcu_joint_datareceiver_func(srArgBuffer& args, mcuCBHandle *mcu_p);
 int mcu_vrExpress_func(srArgBuffer& args, mcuCBHandle *mcu_p);
+
+void mcu_vhmsg_callback( const char *op, const char *args, void * user_data );
 
 //////////////////////////////////////////////////////////////////
 #endif
