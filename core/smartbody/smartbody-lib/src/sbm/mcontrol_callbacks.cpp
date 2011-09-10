@@ -6122,3 +6122,105 @@ int mcu_vrExpress_func( srArgBuffer& args, mcuCBHandle *mcu )
 	}
 	return CMD_SUCCESS;
 }
+
+
+int mcu_vhmsg_connect_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	char* vhmsgServerVar = getenv( "VHMSG_SERVER" );
+	char* vhmsgPortVar = getenv("VHMSG_PORT");
+	char* vhmsgScopeVar =  getenv("VHMSG_SCOPE");
+
+	std::string vhmsgServer = "localhost";
+	if (vhmsgServerVar)
+		vhmsgServer = vhmsgServerVar;
+
+	std::string vhmsgPort = "61616";
+	if (vhmsgPortVar)
+		vhmsgPort = vhmsgPortVar;
+
+	std::string vhmsgScope = "DEFAULT_SCOPE";
+
+	if (args.calc_num_tokens() > 0)
+	{
+		vhmsgServer = args.read_token();
+	}
+
+	if (args.calc_num_tokens() > 0)
+	{
+		vhmsgPort = args.read_token();
+	}
+
+	if (args.calc_num_tokens() > 0)
+	{
+		vhmsgScope = args.read_token();
+	}
+
+	// disconnect first in case we are already connected
+
+	vhmsg::ttu_close();
+
+	if (vhmsg::ttu_open(vhmsgServer.c_str(), vhmsgScope.c_str(), vhmsgPort.c_str())==vhmsg::TTU_SUCCESS )
+	{
+		vhmsg::ttu_set_client_callback( mcu_vhmsg_callback );
+		int err = vhmsg::TTU_SUCCESS;
+		err = vhmsg::ttu_register( "sbm" );
+		err = vhmsg::ttu_register( "vrAgentBML" );
+		err = vhmsg::ttu_register( "vrExpress" );
+		err = vhmsg::ttu_register( "vrSpeak" );
+		err = vhmsg::ttu_register( "RemoteSpeechReply" );
+		err = vhmsg::ttu_register( "PlaySound" );
+		err = vhmsg::ttu_register( "StopSound" );
+		err = vhmsg::ttu_register( "CommAPI" );
+		err = vhmsg::ttu_register( "object-data" );
+		err = vhmsg::ttu_register( "vrAllCall" );
+		err = vhmsg::ttu_register( "vrKillComponent" );
+		err = vhmsg::ttu_register( "wsp" );
+		err = vhmsg::ttu_register( "receiver" );
+
+		mcu_p->vhmsg_enabled = true;
+		return CMD_SUCCESS;
+	} 
+	else
+	{
+		LOG("Could not connect to %s:%s", vhmsgServer.c_str(), vhmsgPort.c_str());
+		mcu_p->vhmsg_enabled = false;
+		return CMD_FAILURE;
+	}
+
+}
+
+int mcu_vhmsg_disconnect_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	if (!mcu_p->vhmsg_enabled)
+	{
+		LOG("VHMSG is not connected.");
+		return CMD_FAILURE;
+	}
+	int ret = vhmsg::ttu_close();
+	if (ret == vhmsg::TTU_ERROR)
+	{
+		LOG("Problem disconnecting VHMSG.");
+		return CMD_FAILURE;
+	}
+	else
+	{
+		mcu_p->vhmsg_enabled = false;
+		LOG("VHMSG has been disconnected.");
+		return CMD_SUCCESS;
+	}
+	
+}
+
+void mcu_vhmsg_callback( const char *op, const char *args, void * user_data )
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	switch( mcu.execute( op, (char*) args ) )
+	{
+        case CMD_NOT_FOUND:
+            LOG("SBM ERR: command NOT FOUND: '%s' + '%s'", op, args );
+            break;
+        case CMD_FAILURE:
+            LOG("SBM ERR: command FAILED: '%s' + '%s'", op, args );
+            break;
+    }
+}
