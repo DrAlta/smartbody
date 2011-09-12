@@ -91,7 +91,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="if not exist lib mkdir lib&#x0D;&#x0A;copy /Y &quot;$(TargetPath)&quot; lib&#x0D;&#x0A;copy /Y &quot;$(OutDir)\$(ProjectName)_d.lib&quot; lib&#x0D;&#x0A;"
+				CommandLine="if not exist lib mkdir lib&#x0D;&#x0A;copy /Y &quot;$(TargetPath)&quot; lib&#x0D;&#x0A;copy /Y &quot;$(OutDir)\$(ProjectName)_d.lib&quot; lib&#x0D;&#x0A;copy /Y &quot;$(OutDir)\$(ProjectName)_d.pdb&quot; lib&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -175,7 +175,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="if not exist lib mkdir lib&#x0D;&#x0A;copy /Y &quot;$(TargetPath)&quot; lib&#x0D;&#x0A;copy /Y &quot;$(OutDir)\$(ProjectName).lib&quot; lib&#x0D;&#x0A;"
+				CommandLine="if not exist lib mkdir lib&#x0D;&#x0A;copy /Y &quot;$(TargetPath)&quot; lib&#x0D;&#x0A;copy /Y &quot;$(OutDir)\$(ProjectName).lib&quot; lib&#x0D;&#x0A;copy /Y &quot;$(OutDir)\$(ProjectName).pdb&quot; lib&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -278,7 +278,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="if not exist lib mkdir lib&#x0D;&#x0A;copy /Y &quot;$(TargetPath)&quot; lib&#x0D;&#x0A;copy /Y &quot;$(OutDir)\$(ProjectName)_d.lib&quot; lib&#x0D;&#x0A;"
+				CommandLine="if not exist lib mkdir lib&#x0D;&#x0A;copy /Y &quot;$(TargetPath)&quot; lib&#x0D;&#x0A;copy /Y &quot;$(OutDir)\$(ProjectName)_d.lib&quot; lib&#x0D;&#x0A;copy /Y &quot;$(OutDir)\$(ProjectName)_d.pdb&quot; lib&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -362,7 +362,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="if not exist lib mkdir lib&#x0D;&#x0A;copy /Y &quot;$(TargetPath)&quot; lib&#x0D;&#x0A;copy /Y &quot;$(OutDir)\$(ProjectName).lib&quot; lib&#x0D;&#x0A;"
+				CommandLine="if not exist lib mkdir lib&#x0D;&#x0A;copy /Y &quot;$(TargetPath)&quot; lib&#x0D;&#x0A;copy /Y &quot;$(OutDir)\$(ProjectName).lib&quot; lib&#x0D;&#x0A;copy /Y &quot;$(OutDir)\$(ProjectName).pdb&quot; lib&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
