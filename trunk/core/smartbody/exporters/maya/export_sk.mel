@@ -326,17 +326,21 @@ proc int skWriteSk( string $jname, int $fileid, int $depth, int $showAll, int $u
    skMargin ( $fileid, $depth );
    fprint $fileid ( "{ offset " );
    fprint $fileid ( skRound( $offset[ 0 ] ) + " " + skRound( $offset[ 1 ] ) + " " + skRound( $offset[ 2 ] ) + "\r\n" );
-   
-   float $eulerRot[3]; 
-   $eulerRot[ 0 ] = `getAttr ( $jname + ".jointOrientX" )`;
-   $eulerRot[ 1 ] = `getAttr ( $jname + ".jointOrientY" )`;
-   $eulerRot[ 2 ] = `getAttr ( $jname + ".jointOrientZ" )`;   
-   float $prerot[4];   
-   eulerToAxisAngle2($prerot, $eulerRot);
-   fprint $fileid ( "  prerot " );
-   fprint $fileid ( " axis " + skRound( $prerot[0] ) + " " + skRound( $prerot[ 1 ] ) + " " + skRound( $prerot[ 2 ] ) + " ang " + skRound( $prerot[ 3 ] )+ "\r\n" );
-   
-   
+
+
+   // check if the prerot joint attributes exist before adding the lines
+   if ( `objExists ( $jname + ".jointOrientX" )` )
+   {
+      float $eulerRot[3]; 
+      $eulerRot[ 0 ] = `getAttr ( $jname + ".jointOrientX" )`;
+      $eulerRot[ 1 ] = `getAttr ( $jname + ".jointOrientY" )`;
+      $eulerRot[ 2 ] = `getAttr ( $jname + ".jointOrientZ" )`;   
+      float $prerot[4];   
+      eulerToAxisAngle2($prerot, $eulerRot);
+      skMargin( $fileid, $depth );
+      fprint $fileid ( "  prerot " );
+      fprint $fileid ( " axis " + skRound( $prerot[0] ) + " " + skRound( $prerot[ 1 ] ) + " " + skRound( $prerot[ 2 ] ) + " ang " + skRound( $prerot[ 3 ] )+ "\r\n" );
+   }
 
 
    // Write translation channels and limits
