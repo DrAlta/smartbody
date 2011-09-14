@@ -371,44 +371,44 @@ SMARTBODY_DLL_API SmartbodyCharacter& Smartbody_dll::GetCharacter( const string 
             posz += j->offset().z;
          }
 
-		 std::string jointName;
-		 if (j->extName() != "")
-			 jointName = j->extName();
-		 else
-			 jointName = j->name();
+         std::string jointName;
+         if (j->extName() != "")
+            jointName = j->extName();
+         else
+            jointName = j->name();
 
-		 if (hasChar)
-		 {
-			 SmartbodyJoint& joint = c.m_joints[i];
-			 joint.m_name = jointName;			
-			 SrQuat jointQ = j->quat()->value();
-			 // 			if (i==136)
-			 // 			{
-			 // 				//sr_out << "eyeball quat = " << jointQ << srnl;
-			 // 				LOG("eyeball quat = %f %f %f %f\n",jointQ.x,jointQ.y,jointQ.z,jointQ.w);
-			 // 			}
+         if (hasChar)
+         {
+            SmartbodyJoint& joint = c.m_joints[i];
+            joint.m_name = jointName;			
+            SrQuat jointQ = j->quat()->value();
+            // 			if (i==136)
+            // 			{
+            // 				//sr_out << "eyeball quat = " << jointQ << srnl;
+            // 				LOG("eyeball quat = %f %f %f %f\n",jointQ.x,jointQ.y,jointQ.z,jointQ.w);
+            // 			}
 
-			 joint.x = posx;
-			 joint.y = posy;
-			 joint.z = posz;
-			 joint.rw = q.w;
-			 joint.rx = q.x;
-			 joint.ry = q.y;
-			 joint.rz = q.z;
-		 }
-		 else
-		 {
-			 SmartbodyJoint joint;
-			 joint.m_name = jointName;
-			 joint.x = posx;
-			 joint.y = posy;
-			 joint.z = posz;
-			 joint.rw = q.w;
-			 joint.rx = q.x;
-			 joint.ry = q.y;
-			 joint.rz = q.z;
-			 c.m_joints.push_back( joint );
-		 }
+            joint.x = posx;
+            joint.y = posy;
+            joint.z = posz;
+            joint.rw = q.w;
+            joint.rx = q.x;
+            joint.ry = q.y;
+            joint.rz = q.z;
+         }
+         else
+         {
+            SmartbodyJoint joint;
+            joint.m_name = jointName;
+            joint.x = posx;
+            joint.y = posy;
+            joint.z = posz;
+            joint.rw = q.w;
+            joint.rx = q.x;
+            joint.ry = q.y;
+            joint.rz = q.z;
+            c.m_joints.push_back( joint );
+         }
       }
       return c;
    }

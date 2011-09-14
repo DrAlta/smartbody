@@ -459,7 +459,7 @@ SMARTBODY_C_DLL_API bool SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, int * numC
         return false;
     }
 
-     *numCharacters = g_DeleteCallbackInfo[sbmHandle].size();
+    *numCharacters = g_DeleteCallbackInfo[sbmHandle].size();
     (*name) = new char*[*numCharacters];
     for (unsigned int i = 0; i < g_DeleteCallbackInfo[sbmHandle].size(); i++)
     {
