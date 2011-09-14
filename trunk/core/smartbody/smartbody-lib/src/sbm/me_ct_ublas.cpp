@@ -1,3 +1,12 @@
+#ifdef __APPLE__
+#include "TargetConditionals.h"
+#if defined (TARGET_OS_IPHONE)  || defined (TARGET_IPHONE_SIMULATOR)
+#ifndef SBM_IPHONE
+#define SBM_IPHONE
+#endif
+#endif
+#endif
+
 //#include <boost/numeric/bindings/atlas/cblas.hpp>
 #include "me_ct_ublas.hpp"
 #include <boost/numeric/bindings/blas/blas.hpp>
@@ -20,7 +29,10 @@ void MeCtUBLAS::matrixMatMult(const dMatrix& mat1, const dMatrix& mat2, dMatrix&
 {
 	if (mat3.size1() != mat1.size1() || mat3.size2() != mat2.size2())
 		mat3.resize(mat1.size1(),mat2.size2());	
+
+#ifndef SBM_IPHONE    
 	blas::gemm(mat1,mat2,mat3);	
+#endif
 }
 
 void MeCtUBLAS::matrixVecMult(const dMatrix& mat1, const dVector& vin, dVector& vout)
@@ -30,7 +42,9 @@ void MeCtUBLAS::matrixVecMult(const dMatrix& mat1, const dVector& vin, dVector& 
 	if (vin.size() != mat1.size2())
 		return;
 
+#ifndef SBM_IPHONE
 	blas::gemv('N',1.0,mat1,vin,0.0,vout);	
+#endif
 }
 
 bool MeCtUBLAS::inverseMatrix( const dMatrix& mat, dMatrix& inv )
@@ -38,7 +52,9 @@ bool MeCtUBLAS::inverseMatrix( const dMatrix& mat, dMatrix& inv )
 	using namespace boost::numeric::ublas;
 	dMatrix A(mat);
 	inv = identity_matrix<double>(mat.size1());
+#ifndef SBM_IPHONE    
 	lapack::gesv(A,inv);	
+#endif
 	return true;
 }
 
@@ -54,7 +70,7 @@ bool MeCtUBLAS::linearLeastSquare( const dMatrix& A, const dMatrix& B, dMatrix& 
 
 bool MeCtUBLAS::matrixSVD( const dMatrix& A, dVector& S, dMatrix& U, dMatrix& V )
 {
-#ifndef __ANDROID__
+#if !defined(__ANDROID__) && !defined(SBM_IPHONE)
 	dMatrix M(A);
 	lapack::gesvd(M,S,U,V);
 #endif

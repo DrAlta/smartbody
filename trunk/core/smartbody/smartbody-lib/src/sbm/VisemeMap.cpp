@@ -247,7 +247,7 @@ bool FaceDefinition::hasViseme(const std::string& visemeName)
 
 void FaceDefinition::setViseme(const std::string& visemeName, const std::string& motionName)
 {
-	std::map<std::string, std::pair<SkMotion*, float>>::iterator iter = _visemeMap.find(visemeName);
+	std::map<std::string, std::pair<SkMotion*, float> >::iterator iter = _visemeMap.find(visemeName);
 	if (iter == _visemeMap.end())
 	{
 		// no motion given, add the viseme only
@@ -309,7 +309,7 @@ void FaceDefinition::setViseme(const std::string& visemeName, const std::string&
 
 void FaceDefinition::setVisemeWeight(const std::string& visemeName, float weight)
 {
-	std::map<std::string, std::pair<SkMotion*, float>>::iterator iter = _visemeMap.find(visemeName);
+	std::map<std::string, std::pair<SkMotion*, float> >::iterator iter = _visemeMap.find(visemeName);
 	if (iter == _visemeMap.end())
 	{
 		LOG("Viseme '%s' does not exist, cannot set its' weight.", visemeName.c_str());

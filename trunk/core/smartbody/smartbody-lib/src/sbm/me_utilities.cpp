@@ -64,7 +64,7 @@ const char* POSTURE_EXT = ".skp";
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, ResourceManager* manager, double scale ) {
+SkSkeleton* load_skeleton( const char *skel_file, srPathList &path_list, SBResourceManager* manager, double scale ) {
 	
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::map<std::string, SkSkeleton*>::iterator iter = mcu.skeleton_map.find(std::string(skel_file));
@@ -211,7 +211,7 @@ bool validate_path( path& result, const char* pathname ) {
 	return true;
 }
 
-int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>& map, bool recurse_dirs, ResourceManager* manager, double scale, const char* error_prefix ) {
+int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>& map, bool recurse_dirs, SBResourceManager* manager, double scale, const char* error_prefix ) {
 		
 	if( !exists( pathname ) ) {
 		LOG("%s Motion path \"%s\" not found.", error_prefix,  pathname.native_file_string().c_str());
@@ -358,7 +358,7 @@ int load_me_motions_impl( const path& pathname, std::map<std::string, SkMotion*>
 	return CMD_SUCCESS;
 }
 
-int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkeleton*>& map, bool recurse_dirs, ResourceManager* manager, double scale, const char* error_prefix ) {
+int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkeleton*>& map, bool recurse_dirs, SBResourceManager* manager, double scale, const char* error_prefix ) {
 		
 	if( !exists( pathname ) ) {
 		LOG("%s Motion path \"%s\" not found.", error_prefix,  pathname.native_file_string().c_str());
@@ -530,7 +530,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 #endif
 
 		skeleton->skfilename(pathname.string().c_str());
-		ResourceManager* manager = ResourceManager::getResourceManager();
+		SBResourceManager* manager = SBResourceManager::getResourceManager();
 		SkeletonResource* skelRes = new SkeletonResource();
 		skelRes->setType("skm");
 		skelRes->setSkeletonFile(pathname.string());
@@ -539,7 +539,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 	return CMD_SUCCESS;
 }
 
-int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture*>& map, bool recurse_dirs, ResourceManager* manager, double scale, const char* error_prefix ) {
+int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture*>& map, bool recurse_dirs, SBResourceManager* manager, double scale, const char* error_prefix ) {
 	
 	if( !exists( pathname ) ) {
 		LOG("%s Posture path \"%s\" not found.", error_prefix, pathname.native_file_string().c_str());
@@ -618,7 +618,7 @@ int load_me_postures_impl( const path& pathname, std::map<std::string, SkPosture
 	return CMD_SUCCESS;
 }
 
-int load_me_motions( const char* pathname, std::map<std::string, SkMotion*>& map, bool recurse_dirs, ResourceManager* manager, double scale ) {
+int load_me_motions( const char* pathname, std::map<std::string, SkMotion*>& map, bool recurse_dirs, SBResourceManager* manager, double scale ) {
 	path motions_path(pathname);
 	
 	path finalPath;
@@ -641,7 +641,7 @@ int load_me_motions( const char* pathname, std::map<std::string, SkMotion*>& map
 	}
 }
 
-int load_me_skeletons( const char* pathname, std::map<std::string, SkSkeleton*>& map, bool recurse_dirs, ResourceManager* manager, double scale ) {
+int load_me_skeletons( const char* pathname, std::map<std::string, SkSkeleton*>& map, bool recurse_dirs, SBResourceManager* manager, double scale ) {
 	path motions_path(pathname);
 	
 	path finalPath;
@@ -664,7 +664,7 @@ int load_me_skeletons( const char* pathname, std::map<std::string, SkSkeleton*>&
 	}
 }
 
-int load_me_postures( const char* pathname, std::map<std::string, SkPosture*>& map, bool recurse_dirs, ResourceManager* manager, double scale ) {
+int load_me_postures( const char* pathname, std::map<std::string, SkPosture*>& map, bool recurse_dirs, SBResourceManager* manager, double scale ) {
 	path posture_path(pathname);
 
 	path finalPath;

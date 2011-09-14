@@ -10,6 +10,16 @@
 /// @brief Declares timing/counter functionality.
 ///
 
+#ifdef __APPLE__
+#include "TargetConditionals.h"
+#if defined (TARGET_OS_IPHONE)  || defined (TARGET_IPHONE_SIMULATOR)
+#include <mach/mach_time.h>
+#ifndef IPHONE_BUILD
+#define IPHONE_BUILD
+#endif
+#endif
+#endif
+
 #ifdef _WIN32
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -103,6 +113,15 @@ namespace Util {
 		clock_gettime(CLOCK_REALTIME, &timeInfo);
 		unsigned long long int nanosecs = ((unsigned long long)timeInfo.tv_sec)*1000000000  +  ((unsigned long long)timeInfo.tv_nsec);
 		return nanosecs;
+    #elif defined IPHONE_BUILD
+        // get time base
+        mach_timebase_info_data_t info;
+        mach_timebase_info(&info);
+        uint64_t nanosecs = mach_absolute_time();
+        // convert to nanosec
+        nanosecs *= info.numer;
+        nanosecs /= info.denom;
+        return nanosecs;
 	#else
 		// **** NOTE CAREFULLY: ****
 		// if you change the option used here, you MUST update the frequency that is computed in getHighResCounterFrequency() as well!

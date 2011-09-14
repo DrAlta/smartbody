@@ -5,11 +5,11 @@
 #include <list>
 #include <stack>
 
-class ResourceManager
+class SBResourceManager
 {
 	public:
-		ResourceManager();
-		~ResourceManager();
+		SBResourceManager();
+		~SBResourceManager();
 
 		void addResource(Resource* r);
 		void addCommandResource(CmdResource* r);
@@ -29,12 +29,12 @@ class ResourceManager
 		void setLimit(unsigned int l);
 		int getLimit();
 
-		static ResourceManager* getResourceManager();
+		static SBResourceManager* getResourceManager();
 		static void cleanup();
 		
 	
 	private:
-		static ResourceManager* manager;
+		static SBResourceManager* manager;
 
 		CmdResource* getCmdResourceRecurse(std::string id, CmdResource* r);		
 		std::list<Resource*> resources;

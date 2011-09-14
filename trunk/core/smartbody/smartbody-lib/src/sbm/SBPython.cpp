@@ -1,13 +1,19 @@
 #include "SBPython.h"
 #include "SBPythonClass.h"
+
+#ifdef USE_PYTHON
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp> 
 #include <boost/python/return_internal_reference.hpp>
 #include <boost/python/args.hpp>
+#endif
+
 #include "me/me_ct_scheduler2.h"
 #include "VisemeMap.hpp"
 
+#ifdef USE_PYTHON
 namespace SmartBody 
 {
+
 BOOST_PYTHON_MODULE(SmartBody)
 {
 	boost::python::numeric::array::set_module_and_type("numpy", "ndarray");
@@ -312,12 +318,15 @@ BOOST_PYTHON_MODULE(SmartBody)
 			.def("evaluate", &PythonController::evaluate, "evaluate.")
 			;
 
-		}
+}
 
 }
 
+#endif
+
 void initPython(std::string pythonLibPath)
 {	
+#ifdef USE_PYTHON    
 	Py_Initialize();
 	try {
 		boost::python::object objectMain = boost::python::import("__main__");
@@ -368,4 +377,5 @@ void initPython(std::string pythonLibPath)
 	} catch (...) {
 		PyErr_Print();
 	}
+#endif
 }

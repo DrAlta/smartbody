@@ -173,15 +173,15 @@ void SBM_CharToCSbmChar( const SmartbodyCharacter * sbmChar, SBM_SmartbodyCharac
 
 
 std::map< int, Smartbody_dll * > g_smartbodyInstances;
-int g_handleId = 0;
+int g_handleId_DLL = 0;
 std::map< int, SBM_SmartbodyCharacter * > g_characters;
 
 
 SMARTBODY_C_DLL_API SBMHANDLE SBM_CreateSBM()
 {
-   g_handleId++;
-   g_smartbodyInstances[ g_handleId ] = new Smartbody_dll();
-   return g_handleId;
+   g_handleId_DLL++;
+   g_smartbodyInstances[ g_handleId_DLL ] = new Smartbody_dll();
+   return g_handleId_DLL;
 }
 
 

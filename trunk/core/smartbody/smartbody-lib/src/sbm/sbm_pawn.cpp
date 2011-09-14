@@ -26,7 +26,16 @@
 #include <sbm/mcontrol_util.h>
 #include "sbm_pawn.hpp"
 
-#ifdef __ANDROID__
+#ifdef __APPLE__
+#include "TargetConditionals.h"
+#if defined (TARGET_OS_IPHONE)  || defined (TARGET_IPHONE_SIMULATOR)
+#ifndef SBM_IPHONE
+#define SBM_IPHONE
+#endif
+#endif
+#endif
+
+#if defined(__ANDROID__) || defined(SBM_IPHONE)
 #include <sbm/sbm_deformable_mesh.h>
 #else
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
@@ -160,7 +169,7 @@ void SbmPawn::initData()
 	_skeleton = new SmartBody::SBSkeleton();
 	_skeleton->ref();
 	//scene_p = new SkScene();
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(SBM_IPHONE)
 	dMesh_p = new DeformableMesh();
 #else
 	dMesh_p =  new SbmDeformableMeshGPU();

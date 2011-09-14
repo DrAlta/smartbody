@@ -3,6 +3,24 @@
 
 #include "vhcl.h"
 
+
+#ifdef __APPLE__
+#include "TargetConditionals.h"
+#if defined (TARGET_OS_IPHONE)  || defined (TARGET_IPHONE_SIMULATOR)
+#ifndef SBM_IPHONE
+#define SBM_IPHONE
+#endif
+#endif
+#endif
+
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
+#ifndef USE_PYTHON
+#define USE_PYTHON
+#endif
+#endif
+
+#ifdef USE_PYTHON
+
 #include <boost/python.hpp>
 #include <sbm/mcontrol_util.h>
 #include <sbm/resource_cmds.h>
@@ -271,5 +289,6 @@ protected:
 
 
 }
+#endif
 
 #endif

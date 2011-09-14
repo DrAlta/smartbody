@@ -78,6 +78,15 @@ using namespace std;
 using namespace WSP;
 #endif
 
+#ifdef __APPLE__
+#include "TargetConditionals.h"
+#if defined (TARGET_OS_IPHONE)  || defined (TARGET_IPHONE_SIMULATOR)
+#ifndef SBM_IPHONE
+#define SBM_IPHONE
+#endif
+#endif
+#endif
+
 /////////////////////////////////////////////////////////////
 
 int mcu_help_func( srArgBuffer& args, mcuCBHandle *mcu_p )	{
@@ -2083,7 +2092,7 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 int mcu_character_load_skinweights( const char* char_name, const char* skin_file, mcuCBHandle* mcu_p, float scaleFactor, const char* prefix )
 {
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(SBM_IPHONE)
 	return ( CMD_SUCCESS );	
 #endif
 
