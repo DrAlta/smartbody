@@ -410,6 +410,7 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 		euler_t E_in = Q_in;
 
 		quat_t Q_out;
+#if 1
 		if (frame.isChannelUpdated( context_channel_index ) )	{
 			// If channel has been touched, preserve components and add delta
 			if( _affirmative )	{
@@ -444,6 +445,26 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 					);
 			}
 		}
+#else
+		std::string jointName = _channels.name(local_channel_index);
+		SkJoint* channelJoint = frame.context()->channels().skeleton()->search_joint(jointName.c_str());
+		SrVec rotAxis;
+		if( _affirmative )	{
+			 rotAxis = channelJoint->localGlobalAxis(0);
+		}
+		else
+		{
+			rotAxis = channelJoint->localGlobalAxis(1);
+		}
+		if (frame.isChannelUpdated( context_channel_index ))
+		{
+			Q_out = Q_in*quat_t(angle_deg_per_joint,vector_t(rotAxis[0],rotAxis[1],rotAxis[2]));
+		}
+		else
+		{
+			Q_out = quat_t(angle_deg_per_joint,vector_t(rotAxis[0],rotAxis[1],rotAxis[2]));
+		}
+#endif
 
 #if 1
 		Q_out.lerp( 

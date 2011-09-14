@@ -729,6 +729,7 @@ printf( "s2: %f\n", joint_arr[ GAZE_JOINT_SPINE2 ].local_pos.y() );
 printf( "s1: %f\n", joint_arr[ GAZE_JOINT_SPINE1 ].local_pos.y() );
 #endif
 
+#if 1
 	gwiz::float_t interocular = 
 		joint_arr[ GAZE_JOINT_EYE_L ].local_pos.x() - 
 		joint_arr[ GAZE_JOINT_EYE_R ].local_pos.x();
@@ -754,6 +755,40 @@ printf( "s1: %f\n", joint_arr[ GAZE_JOINT_SPINE1 ].local_pos.y() );
 	
 	height += joint_arr[ GAZE_JOINT_SPINE2 ].local_pos.y();
 	joint_arr[ GAZE_JOINT_SPINE1 ].forward_pos = vector_t( 0.0, height, interocular );
+#else
+
+	vector_t interocular = joint_arr[ GAZE_JOINT_EYE_L ].world_pos - joint_arr[ GAZE_JOINT_EYE_R ].world_pos;
+
+	vector_t world_mid_eye_pos = 
+		joint_arr[ GAZE_JOINT_EYE_L ].world_zero_pos.lerp( 
+			0.5, joint_arr[ GAZE_JOINT_EYE_R ].world_zero_pos 
+		) +
+		vector_t( 0.0, 0.0, interocular.length()); // NOTE: PRESUMES 5CM SCALE...
+
+	printf( "eyes:\n" );
+	world_mid_eye_pos.print();
+
+	joint_arr[ GAZE_JOINT_SPINE1 ].forward_pos =
+		world_mid_eye_pos - joint_arr[ GAZE_JOINT_SPINE1 ].world_zero_pos;
+	
+	printf( "spine1:\n" );
+	joint_arr[ GAZE_JOINT_SPINE1 ].forward_pos.print();
+
+	joint_arr[ GAZE_JOINT_SPINE2 ].forward_pos =
+		world_mid_eye_pos - joint_arr[ GAZE_JOINT_SPINE2 ].world_zero_pos;
+		
+	joint_arr[ GAZE_JOINT_SPINE3 ].forward_pos =
+		world_mid_eye_pos - joint_arr[ GAZE_JOINT_SPINE3 ].world_zero_pos;
+		
+	joint_arr[ GAZE_JOINT_SPINE4 ].forward_pos =
+		world_mid_eye_pos - joint_arr[ GAZE_JOINT_SPINE4 ].world_zero_pos;
+		
+	joint_arr[ GAZE_JOINT_SPINE5 ].forward_pos =
+		world_mid_eye_pos - joint_arr[ GAZE_JOINT_SPINE5 ].world_zero_pos;
+
+	joint_arr[ GAZE_JOINT_SKULL ].forward_pos =
+		world_mid_eye_pos - joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos;
+#endif
 }
 
 #endif

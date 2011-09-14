@@ -62,12 +62,20 @@ class MeCtGazeJoint	{
 		gwiz::quat_t		forward_rot;
 		
 		gwiz::vector_t	local_pos;
-		gwiz::quat_t		local_rot;
-		gwiz::quat_t		prev_local_rot;
+		gwiz::quat_t	local_rot;
+		gwiz::quat_t	prev_local_rot;
+
+		gwiz::vector_t  world_zero_pos;
+		gwiz::quat_t    world_zero_rot;
+
+		gwiz::vector_t  parent_zero_pos;
+		gwiz::quat_t    parent_zero_rot;
+
+		gwiz::quat_t    parent_diff_rot;
 		
 		gwiz::vector_t	world_pos;
-		gwiz::quat_t		world_rot;
-		gwiz::quat_t		prev_world_rot; // to measure absolute speed of head
+		gwiz::quat_t	world_rot;
+		gwiz::quat_t	prev_world_rot; // to measure absolute speed of head
 		float t_elapse;
 	
 		gwiz::vector_t	parent_loc_pos; // local coord of immediate parent joint

@@ -67,6 +67,7 @@ private :
 	SkJoint* _parent;
 	std::vector<SkJoint*> _children;
 	SrMat _gmat;           // global matrix: from the root to the children of this joint
+	SrMat _gmatZero;       // global rotation matrix when all joint channels are zero
 	SrMat _lmat;           // local matrix: from this joint to its children
 	char  _lmat_uptodate;  // true if lmat is up to date
 	std::string _name;     // the given name
@@ -252,6 +253,10 @@ public:
 	void setJointType(int jtype) {  _jointType = jtype; };
 
 	void add_child ( SkJoint* child );
+
+	void updateGmatZero(const SrMat& gmatZero);
+	const SrMat& gmatZero() { return _gmatZero; }
+	SrVec localGlobalAxis(int i);
 };
 
 //==================================== End of File ===========================================
