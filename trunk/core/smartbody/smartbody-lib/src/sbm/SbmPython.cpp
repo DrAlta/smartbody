@@ -30,7 +30,7 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 };
 #endif
 
-#ifndef (__ANDROID__ || SBM_IPHONE)
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
 struct EventHandlerWrap :  EventHandler, boost::python::wrapper<EventHandler>
 {
 	virtual void executeAction(Event* event)
