@@ -1,0 +1,57 @@
+//
+//  ApplicationViewer.c
+//  Chases
+//
+//  Created by Yuyu Xu on 8/22/11.
+//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//
+
+#import "ApplicationViewer.h"
+#import "EAGLView.h"
+#import "minimalwrapper.h"
+
+@implementation ApplicationViewController
+@synthesize glView;
+@synthesize text;
+@synthesize segmentedControl;
+
+- (void)viewDidLoad 
+{
+    [super viewDidLoad];	
+    glView.animationInterval = 2.0 / 60.0;
+	[glView startAnimation];
+}
+
+- (void)dealloc 
+{
+	[self viewDidUnload];
+    [glView release]; 	
+    [super dealloc];
+}
+
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+	[text resignFirstResponder];
+	return YES;
+}
+
+- (IBAction)changeCommand
+{
+    const char* command = [text.text UTF8String];
+    printf("command is %s \n", command);
+    SBMExecuteCmd(command);
+}
+
+- (IBAction)segmentedControlIndexChanged
+{
+    int id = segmentedControl.selectedSegmentIndex;
+    if (id == 2)
+    {
+        getCamera(0, 0, 0, 0, 0, 0, -1);
+    }
+    else
+        cameraMode = id;
+}
+
+@end

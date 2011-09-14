@@ -1,0 +1,479 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1D3623260D0F684500981E51 /* ChasesAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* ChasesAppDelegate.m */; };
+		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
+		28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD733E0D9D9553002E5188 /* MainWindow.xib */; };
+		28FD14FE0DC6FC130079059D /* EAGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 28FD14FD0DC6FC130079059D /* EAGLView.m */; };
+		AA12CA2814007FFE0017A491 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA12CA2714007FFE0017A491 /* QuartzCore.framework */; };
+		AA12CA2C140080210017A491 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA12CA29140080210017A491 /* Foundation.framework */; };
+		AA12CA2D140080210017A491 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA12CA2A140080210017A491 /* OpenGLES.framework */; };
+		AA12CA2E140080210017A491 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA12CA2B140080210017A491 /* UIKit.framework */; };
+		AA12CB1914031DD50017A491 /* Window.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA12CB1814031DD50017A491 /* Window.xib */; };
+		AA12CB1C14031E040017A491 /* ApplicationViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = AA12CB1B14031E040017A491 /* ApplicationViewer.m */; };
+		AA38C2F413FD8DAD00233019 /* common.sk in Resources */ = {isa = PBXBuildFile; fileRef = AA38C2F313FD8DAD00233019 /* common.sk */; };
+		AA38C2FE13FDBD6200233019 /* HandsAtSide_Motex.skm in Resources */ = {isa = PBXBuildFile; fileRef = AA38C2FD13FDBD6200233019 /* HandsAtSide_Motex.skm */; };
+		AA38C30013FDD1F700233019 /* HandsAtSide_Arms_Sweep.skm in Resources */ = {isa = PBXBuildFile; fileRef = AA38C2FF13FDD1F700233019 /* HandsAtSide_Arms_Sweep.skm */; };
+		AA38C31613FF0E8500233019 /* default.seq in Resources */ = {isa = PBXBuildFile; fileRef = AA38C31513FF0E8500233019 /* default.seq */; };
+		AA5DF1B914203FEB002B8A17 /* Default-Portrait.png in Resources */ = {isa = PBXBuildFile; fileRef = AA5DF1B714203FEB002B8A17 /* Default-Portrait.png */; };
+		AA5DF1BA14203FEB002B8A17 /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = AA5DF1B814203FEB002B8A17 /* Icon-72.png */; };
+		AA813ABB140FFC130026D507 /* MainWindow-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA813ABA140FFC130026D507 /* MainWindow-iPad.xib */; };
+		AA813ABD140FFCBE0026D507 /* Window-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA813ABC140FFCBE0026D507 /* Window-iPad.xib */; };
+		AA9CDAAF141FFFB90064C27A /* minimalwrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CDAAD141FFFB90064C27A /* minimalwrapper.cpp */; };
+		AAC9AC50142010C000F56F9C /* libactivemq-cpp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC40142010C000F56F9C /* libactivemq-cpp.a */; };
+		AAC9AC51142010C000F56F9C /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC41142010C000F56F9C /* libapr-1.a */; };
+		AAC9AC52142010C000F56F9C /* libaprutil-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC42142010C000F56F9C /* libaprutil-1.a */; };
+		AAC9AC53142010C000F56F9C /* libbonebus.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC43142010C000F56F9C /* libbonebus.a */; };
+		AAC9AC54142010C000F56F9C /* libboost_filesystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC44142010C000F56F9C /* libboost_filesystem.a */; };
+		AAC9AC55142010C000F56F9C /* libboost_regex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC45142010C000F56F9C /* libboost_regex.a */; };
+		AAC9AC56142010C000F56F9C /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC46142010C000F56F9C /* libboost_system.a */; };
+		AAC9AC57142010C000F56F9C /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC47142010C000F56F9C /* libexpat.a */; };
+		AAC9AC58142010C000F56F9C /* libode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC48142010C000F56F9C /* libode.a */; };
+		AAC9AC59142010C000F56F9C /* libpprAI.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC49142010C000F56F9C /* libpprAI.a */; };
+		AAC9AC5A142010C000F56F9C /* libsmartbody-lib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC4A142010C000F56F9C /* libsmartbody-lib.a */; };
+		AAC9AC5B142010C000F56F9C /* libSteerLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC4B142010C000F56F9C /* libSteerLib.a */; };
+		AAC9AC5C142010C000F56F9C /* libvhcl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC4C142010C000F56F9C /* libvhcl.a */; };
+		AAC9AC5D142010C000F56F9C /* libvhmsg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC4D142010C000F56F9C /* libvhmsg.a */; };
+		AAC9AC5E142010C000F56F9C /* libwsp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC4E142010C000F56F9C /* libwsp.a */; };
+		AAC9AC5F142010C000F56F9C /* libxerces-c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC4F142010C000F56F9C /* libxerces-c.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1D3623240D0F684500981E51 /* ChasesAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChasesAppDelegate.h; sourceTree = "<group>"; };
+		1D3623250D0F684500981E51 /* ChasesAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChasesAppDelegate.m; sourceTree = "<group>"; };
+		1D6058910D05DD3D006BFB54 /* SmartbodyOpenglES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartbodyOpenglES.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		28AD733E0D9D9553002E5188 /* MainWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainWindow.xib; sourceTree = "<group>"; };
+		28FD14FC0DC6FC130079059D /* EAGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EAGLView.h; sourceTree = "<group>"; };
+		28FD14FD0DC6FC130079059D /* EAGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EAGLView.m; sourceTree = "<group>"; };
+		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		32CA4F630368D1EE00C91783 /* Chases_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Chases_Prefix.pch; sourceTree = "<group>"; };
+		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA12CA2714007FFE0017A491 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.3.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
+		AA12CA29140080210017A491 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		AA12CA2A140080210017A491 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.3.sdk/System/Library/Frameworks/OpenGLES.framework; sourceTree = DEVELOPER_DIR; };
+		AA12CA2B140080210017A491 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.3.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		AA12CB1814031DD50017A491 /* Window.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Window.xib; sourceTree = "<group>"; };
+		AA12CB1A14031E040017A491 /* ApplicationViewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ApplicationViewer.h; sourceTree = "<group>"; };
+		AA12CB1B14031E040017A491 /* ApplicationViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ApplicationViewer.m; sourceTree = "<group>"; };
+		AA38C2F313FD8DAD00233019 /* common.sk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = common.sk; sourceTree = "<group>"; };
+		AA38C2FD13FDBD6200233019 /* HandsAtSide_Motex.skm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = HandsAtSide_Motex.skm; sourceTree = "<group>"; };
+		AA38C2FF13FDD1F700233019 /* HandsAtSide_Arms_Sweep.skm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = HandsAtSide_Arms_Sweep.skm; sourceTree = "<group>"; };
+		AA38C31513FF0E8500233019 /* default.seq */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = default.seq; sourceTree = "<group>"; };
+		AA5DF1B714203FEB002B8A17 /* Default-Portrait.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Portrait.png"; sourceTree = "<group>"; };
+		AA5DF1B814203FEB002B8A17 /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-72.png"; sourceTree = "<group>"; };
+		AA813ABA140FFC130026D507 /* MainWindow-iPad.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "MainWindow-iPad.xib"; path = "iPad/MainWindow-iPad.xib"; sourceTree = "<group>"; };
+		AA813ABC140FFCBE0026D507 /* Window-iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = "Window-iPad.xib"; sourceTree = "<group>"; };
+		AA9CDAAD141FFFB90064C27A /* minimalwrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = minimalwrapper.cpp; sourceTree = "<group>"; };
+		AA9CDAAE141FFFB90064C27A /* minimalwrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = minimalwrapper.h; sourceTree = "<group>"; };
+		AAC9AC40142010C000F56F9C /* libactivemq-cpp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libactivemq-cpp.a"; path = "../../libs/iphoneos/libactivemq-cpp.a"; sourceTree = "<group>"; };
+		AAC9AC41142010C000F56F9C /* libapr-1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libapr-1.a"; path = "../../libs/iphoneos/libapr-1.a"; sourceTree = "<group>"; };
+		AAC9AC42142010C000F56F9C /* libaprutil-1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libaprutil-1.a"; path = "../../libs/iphoneos/libaprutil-1.a"; sourceTree = "<group>"; };
+		AAC9AC43142010C000F56F9C /* libbonebus.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libbonebus.a; path = ../../libs/iphoneos/libbonebus.a; sourceTree = "<group>"; };
+		AAC9AC44142010C000F56F9C /* libboost_filesystem.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_filesystem.a; path = ../../libs/iphoneos/libboost_filesystem.a; sourceTree = "<group>"; };
+		AAC9AC45142010C000F56F9C /* libboost_regex.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_regex.a; path = ../../libs/iphoneos/libboost_regex.a; sourceTree = "<group>"; };
+		AAC9AC46142010C000F56F9C /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = ../../libs/iphoneos/libboost_system.a; sourceTree = "<group>"; };
+		AAC9AC47142010C000F56F9C /* libexpat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libexpat.a; path = ../../libs/iphoneos/libexpat.a; sourceTree = "<group>"; };
+		AAC9AC48142010C000F56F9C /* libode.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libode.a; path = ../../libs/iphoneos/libode.a; sourceTree = "<group>"; };
+		AAC9AC49142010C000F56F9C /* libpprAI.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpprAI.a; path = ../../libs/iphoneos/libpprAI.a; sourceTree = "<group>"; };
+		AAC9AC4A142010C000F56F9C /* libsmartbody-lib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsmartbody-lib.a"; path = "../../libs/iphoneos/libsmartbody-lib.a"; sourceTree = "<group>"; };
+		AAC9AC4B142010C000F56F9C /* libSteerLib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSteerLib.a; path = ../../libs/iphoneos/libSteerLib.a; sourceTree = "<group>"; };
+		AAC9AC4C142010C000F56F9C /* libvhcl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvhcl.a; path = ../../libs/iphoneos/libvhcl.a; sourceTree = "<group>"; };
+		AAC9AC4D142010C000F56F9C /* libvhmsg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvhmsg.a; path = ../../libs/iphoneos/libvhmsg.a; sourceTree = "<group>"; };
+		AAC9AC4E142010C000F56F9C /* libwsp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwsp.a; path = ../../libs/iphoneos/libwsp.a; sourceTree = "<group>"; };
+		AAC9AC4F142010C000F56F9C /* libxerces-c.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libxerces-c.a"; path = "../../libs/iphoneos/libxerces-c.a"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1D60588F0D05DD3D006BFB54 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA12CA2814007FFE0017A491 /* QuartzCore.framework in Frameworks */,
+				AA12CA2C140080210017A491 /* Foundation.framework in Frameworks */,
+				AA12CA2D140080210017A491 /* OpenGLES.framework in Frameworks */,
+				AA12CA2E140080210017A491 /* UIKit.framework in Frameworks */,
+				AAC9AC50142010C000F56F9C /* libactivemq-cpp.a in Frameworks */,
+				AAC9AC51142010C000F56F9C /* libapr-1.a in Frameworks */,
+				AAC9AC52142010C000F56F9C /* libaprutil-1.a in Frameworks */,
+				AAC9AC53142010C000F56F9C /* libbonebus.a in Frameworks */,
+				AAC9AC54142010C000F56F9C /* libboost_filesystem.a in Frameworks */,
+				AAC9AC55142010C000F56F9C /* libboost_regex.a in Frameworks */,
+				AAC9AC56142010C000F56F9C /* libboost_system.a in Frameworks */,
+				AAC9AC57142010C000F56F9C /* libexpat.a in Frameworks */,
+				AAC9AC58142010C000F56F9C /* libode.a in Frameworks */,
+				AAC9AC59142010C000F56F9C /* libpprAI.a in Frameworks */,
+				AAC9AC5A142010C000F56F9C /* libsmartbody-lib.a in Frameworks */,
+				AAC9AC5B142010C000F56F9C /* libSteerLib.a in Frameworks */,
+				AAC9AC5C142010C000F56F9C /* libvhcl.a in Frameworks */,
+				AAC9AC5D142010C000F56F9C /* libvhmsg.a in Frameworks */,
+				AAC9AC5E142010C000F56F9C /* libwsp.a in Frameworks */,
+				AAC9AC5F142010C000F56F9C /* libxerces-c.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		080E96DDFE201D6D7F000001 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				AA9CDAAD141FFFB90064C27A /* minimalwrapper.cpp */,
+				AA9CDAAE141FFFB90064C27A /* minimalwrapper.h */,
+				AA12CB1A14031E040017A491 /* ApplicationViewer.h */,
+				AA12CB1B14031E040017A491 /* ApplicationViewer.m */,
+				28FD14FC0DC6FC130079059D /* EAGLView.h */,
+				28FD14FD0DC6FC130079059D /* EAGLView.m */,
+				1D3623240D0F684500981E51 /* ChasesAppDelegate.h */,
+				1D3623250D0F684500981E51 /* ChasesAppDelegate.m */,
+				AA12CB1814031DD50017A491 /* Window.xib */,
+				AA813ABC140FFCBE0026D507 /* Window-iPad.xib */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
+		19C28FACFE9D520D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1D6058910D05DD3D006BFB54 /* SmartbodyOpenglES.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
+			isa = PBXGroup;
+			children = (
+				080E96DDFE201D6D7F000001 /* Classes */,
+				29B97315FDCFA39411CA2CEA /* Other Sources */,
+				29B97317FDCFA39411CA2CEA /* Resources */,
+				AA813AB9140FFC110026D507 /* iPad */,
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
+				19C28FACFE9D520D11CA2CBB /* Products */,
+			);
+			name = CustomTemplate;
+			sourceTree = "<group>";
+		};
+		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				32CA4F630368D1EE00C91783 /* Chases_Prefix.pch */,
+				29B97316FDCFA39411CA2CEA /* main.m */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		29B97317FDCFA39411CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AA5DF1B714203FEB002B8A17 /* Default-Portrait.png */,
+				AA5DF1B814203FEB002B8A17 /* Icon-72.png */,
+				AA38C31513FF0E8500233019 /* default.seq */,
+				AA38C2FF13FDD1F700233019 /* HandsAtSide_Arms_Sweep.skm */,
+				AA38C2FD13FDBD6200233019 /* HandsAtSide_Motex.skm */,
+				AA38C2F313FD8DAD00233019 /* common.sk */,
+				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
+				8D1107310486CEB800E47090 /* Info.plist */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AAC9AC40142010C000F56F9C /* libactivemq-cpp.a */,
+				AAC9AC41142010C000F56F9C /* libapr-1.a */,
+				AAC9AC42142010C000F56F9C /* libaprutil-1.a */,
+				AAC9AC43142010C000F56F9C /* libbonebus.a */,
+				AAC9AC44142010C000F56F9C /* libboost_filesystem.a */,
+				AAC9AC45142010C000F56F9C /* libboost_regex.a */,
+				AAC9AC46142010C000F56F9C /* libboost_system.a */,
+				AAC9AC47142010C000F56F9C /* libexpat.a */,
+				AAC9AC48142010C000F56F9C /* libode.a */,
+				AAC9AC49142010C000F56F9C /* libpprAI.a */,
+				AAC9AC4A142010C000F56F9C /* libsmartbody-lib.a */,
+				AAC9AC4B142010C000F56F9C /* libSteerLib.a */,
+				AAC9AC4C142010C000F56F9C /* libvhcl.a */,
+				AAC9AC4D142010C000F56F9C /* libvhmsg.a */,
+				AAC9AC4E142010C000F56F9C /* libwsp.a */,
+				AAC9AC4F142010C000F56F9C /* libxerces-c.a */,
+				AA12CA29140080210017A491 /* Foundation.framework */,
+				AA12CA2A140080210017A491 /* OpenGLES.framework */,
+				AA12CA2B140080210017A491 /* UIKit.framework */,
+				AA12CA2714007FFE0017A491 /* QuartzCore.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		AA813AB9140FFC110026D507 /* iPad */ = {
+			isa = PBXGroup;
+			children = (
+				AA813ABA140FFC130026D507 /* MainWindow-iPad.xib */,
+			);
+			name = iPad;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1D6058900D05DD3D006BFB54 /* smartbody-openglES */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "smartbody-openglES" */;
+			buildPhases = (
+				1D60588D0D05DD3D006BFB54 /* Resources */,
+				1D60588E0D05DD3D006BFB54 /* Sources */,
+				1D60588F0D05DD3D006BFB54 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "smartbody-openglES";
+			productName = Chases;
+			productReference = 1D6058910D05DD3D006BFB54 /* SmartbodyOpenglES.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29B97313FDCFA39411CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "smartbody-openglES" */;
+			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 29B97314FDCFA39411CA2CEA /* CustomTemplate */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1D6058900D05DD3D006BFB54 /* smartbody-openglES */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1D60588D0D05DD3D006BFB54 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */,
+				AA38C2F413FD8DAD00233019 /* common.sk in Resources */,
+				AA38C2FE13FDBD6200233019 /* HandsAtSide_Motex.skm in Resources */,
+				AA38C30013FDD1F700233019 /* HandsAtSide_Arms_Sweep.skm in Resources */,
+				AA38C31613FF0E8500233019 /* default.seq in Resources */,
+				AA12CB1914031DD50017A491 /* Window.xib in Resources */,
+				AA813ABB140FFC130026D507 /* MainWindow-iPad.xib in Resources */,
+				AA813ABD140FFCBE0026D507 /* Window-iPad.xib in Resources */,
+				AA5DF1B914203FEB002B8A17 /* Default-Portrait.png in Resources */,
+				AA5DF1BA14203FEB002B8A17 /* Icon-72.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1D60588E0D05DD3D006BFB54 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
+				1D3623260D0F684500981E51 /* ChasesAppDelegate.m in Sources */,
+				28FD14FE0DC6FC130079059D /* EAGLView.m in Sources */,
+				AA12CB1C14031E040017A491 /* ApplicationViewer.m in Sources */,
+				AA9CDAAF141FFFB90064C27A /* minimalwrapper.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1D6058940D05DD3E006BFB54 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Chases_Prefix.pch;
+				HEADER_SEARCH_PATHS = "";
+				"HEADER_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
+					../../boost/boost_1_44_0,
+					"../../boost/boost-numeric-bindings",
+					"../../xerces-c/iphoneos/include",
+					../../ode/iphoneos/include,
+					"../../activemq/activemq-cpp/iphoneos/include/activemq-cpp-3.4.0",
+					"../../../core/smartbody/smartbody-lib/src",
+					"../../../core/smartbody/steersuite-1.3/pprAI/include",
+					"../../../core/smartbody/steersuite-1.3/steerlib/include",
+					"../../../core/smartbody/steersuite-1.3/external",
+					../../../lib/vhcl/include,
+					"../../../lib/vhmsg/vhmsg-c/include",
+					../../../lib/wsp/wsp/include,
+					../../../lib/bonebus/include,
+				);
+				"HEADER_SEARCH_PATHS[sdk=iphonesimulator*][arch=*]" = (
+					../../boost/boost_1_44_0,
+					"../../boost/boost-numeric-bindings",
+					"../../xerces-c/iphonesimulator/include",
+					../../ode/iphonesimulator/include,
+					"../../activemq/activemq-cpp/iphonesimulator/include/activemq-cpp-3.4.0",
+					"../../../core/smartbody/smartbody-lib/src",
+					"../../../core/smartbody/steersuite-1.3/pprAI/include",
+					"../../../core/smartbody/steersuite-1.3/steerlib/include",
+					"../../../core/smartbody/steersuite-1.3/external",
+					../../../lib/vhcl/include,
+					"../../../lib/vhmsg/vhmsg-c/include",
+					../../../lib/wsp/wsp/include,
+					../../../lib/bonebus/include,
+				);
+				INFOPLIST_FILE = Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
+				"LIBRARY_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = ../../libs/iphoneos;
+				"LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*][arch=*]" = ../../libs/iphonesimulator;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = SmartbodyOpenglES;
+				SYMROOT = $PROJECT_DIR/build;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "armv6 armv7 i386";
+			};
+			name = Debug;
+		};
+		1D6058950D05DD3E006BFB54 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Chases_Prefix.pch;
+				HEADER_SEARCH_PATHS = "";
+				"HEADER_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
+					../../boost/boost_1_44_0,
+					"../../boost/boost-numeric-bindings",
+					"../../xerces-c/iphoneos/include",
+					../../ode/iphoneos/include,
+					"../../activemq/activemq-cpp/iphoneos/include/activemq-cpp-3.4.0",
+					"../../../core/smartbody/smartbody-lib/src",
+					"../../../core/smartbody/steersuite-1.3/pprAI/include",
+					"../../../core/smartbody/steersuite-1.3/steerlib/include",
+					"../../../core/smartbody/steersuite-1.3/external",
+					../../../lib/vhcl/include,
+					"../../../lib/vhmsg/vhmsg-c/include",
+					../../../lib/wsp/wsp/include,
+					../../../lib/bonebus/include,
+				);
+				"HEADER_SEARCH_PATHS[sdk=iphonesimulator*][arch=*]" = (
+					../../boost/boost_1_44_0,
+					"../../boost/boost-numeric-bindings",
+					"../../xerces-c/iphonesimulator/include",
+					../../ode/iphonesimulator/include,
+					"../../activemq/activemq-cpp/iphonesimulator/include/activemq-cpp-3.4.0",
+					"../../../core/smartbody/smartbody-lib/src",
+					"../../../core/smartbody/steersuite-1.3/pprAI/include",
+					"../../../core/smartbody/steersuite-1.3/steerlib/include",
+					"../../../core/smartbody/steersuite-1.3/external",
+					../../../lib/vhcl/include,
+					"../../../lib/vhmsg/vhmsg-c/include",
+					../../../lib/wsp/wsp/include,
+					../../../lib/bonebus/include,
+				);
+				INFOPLIST_FILE = Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
+				"LIBRARY_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = ../../libs/iphoneos;
+				"LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*][arch=*]" = ../../libs/iphonesimulator;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = SmartbodyOpenglES;
+				SYMROOT = $PROJECT_DIR/build;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "armv6 armv7 i386";
+			};
+			name = Release;
+		};
+		C01FCF4F08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"/Users/yxu/trunk/core/smartbody/smartbody-lib/src",
+					"/Users/yxu/Desktop/xcode-boost/boost_1_44_0",
+					/Users/yxu/xerces/include,
+					"/Users/yxu/trunk/core/smartbody/steersuite-1.3/**",
+					/Users/yxu/ode/include,
+					"/Users/yxu/Downloads/boost-numeric-bindings",
+					/Users/yxu/trunk/lib/bonebus/include,
+					"/Users/yxu/trunk/lib/vhmsg/vhmsg-c/include",
+					/Users/yxu/trunk/lib/vhcl/include,
+					/Users/yxu/trunk/lib/wsp/wsp/include,
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
+				ONLY_ACTIVE_ARCH = NO;
+				PREBINDING = NO;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		C01FCF5008A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"/Users/yxu/trunk/core/smartbody/smartbody-lib/src",
+					"/Users/yxu/Desktop/xcode-boost/boost_1_44_0",
+					/Users/yxu/xerces/include,
+					"/Users/yxu/trunk/core/smartbody/steersuite-1.3/**",
+					/Users/yxu/ode/include,
+					"/Users/yxu/Downloads/boost-numeric-bindings",
+					/Users/yxu/trunk/lib/bonebus/include,
+					"/Users/yxu/trunk/lib/vhmsg/vhmsg-c/include",
+					/Users/yxu/trunk/lib/vhcl/include,
+					/Users/yxu/trunk/lib/wsp/wsp/include,
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
+				ONLY_ACTIVE_ARCH = NO;
+				PREBINDING = NO;
+				SDKROOT = iphoneos;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "smartbody-openglES" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1D6058940D05DD3E006BFB54 /* Debug */,
+				1D6058950D05DD3E006BFB54 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "smartbody-openglES" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4F08A954540054247B /* Debug */,
+				C01FCF5008A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+}

@@ -1,0 +1,3 @@
+-change on vhcl_log.cpp && vhmsg.cpp
+-change apr-util (apr_general.h)
+-change activemq-3.4 (decaf/lang/system.cpp line 471)
