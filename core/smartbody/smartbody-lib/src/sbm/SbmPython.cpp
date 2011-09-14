@@ -4,12 +4,9 @@
 #include "VisemeMap.hpp"
 #include "nvbg.h"
 
-
-
 #ifdef USE_PYTHON
 
-
-#ifndef __ANDROID__
+#ifndef __ANDROID__ 
 struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 {
 	virtual bool execute(std::string character, std::string to, std::string messageId, std::string xml)
@@ -33,7 +30,7 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 };
 #endif
 
-#ifndef __ANDROID__
+#ifndef (__ANDROID__ || SBM_IPHONE)
 struct EventHandlerWrap :  EventHandler, boost::python::wrapper<EventHandler>
 {
 	virtual void executeAction(Event* event)
@@ -659,3 +656,5 @@ void initPython(std::string pythonLibPath)
 	}
 #endif
 }
+
+

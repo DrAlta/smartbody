@@ -470,7 +470,7 @@ void cleanup( void )	{
 	
 	XMLPlatformUtils::Terminate();
 
-	ResourceManager::cleanup();
+	SBResourceManager::cleanup();
 	LOG( "SBM: terminated gracefully." );
 
 

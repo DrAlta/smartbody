@@ -1,9 +1,9 @@
 #include "ResourceManager.h"
 
 
-ResourceManager* ResourceManager::manager = NULL;
+SBResourceManager* SBResourceManager::manager = NULL;
 
-ResourceManager::ResourceManager()
+SBResourceManager::SBResourceManager()
 {
 	resource_limit = 1000;
 	last_resource = NULL;
@@ -11,7 +11,7 @@ ResourceManager::ResourceManager()
 	last_seq_cmd_name = "";
 }
 
-ResourceManager::~ResourceManager()
+SBResourceManager::~SBResourceManager()
 {
 	for (std::list<Resource*>::iterator iter = resources.begin();
 		iter != resources.end();
@@ -45,7 +45,7 @@ ResourceManager::~ResourceManager()
 	}
 }
 
-void ResourceManager::addResource(Resource* r)
+void SBResourceManager::addResource(Resource* r)
 {
 	CmdResource* cmd = dynamic_cast<CmdResource*>(r);
 	if (cmd)
@@ -68,7 +68,7 @@ void ResourceManager::addResource(Resource* r)
 	resources.push_back(r);
 }
 
-void ResourceManager::addCommandResource(CmdResource* cmd)
+void SBResourceManager::addCommandResource(CmdResource* cmd)
 {
 	if (cur_cmd_parent.size() > 0)
 	{
@@ -88,7 +88,7 @@ void ResourceManager::addCommandResource(CmdResource* cmd)
 	}
 }
 
-void ResourceManager::addControllerResource(ControllerResource* r)
+void SBResourceManager::addControllerResource(ControllerResource* r)
 {
 		if(controllerResources.size() >= resource_limit)
 		{
@@ -99,29 +99,29 @@ void ResourceManager::addControllerResource(ControllerResource* r)
 		controllerResources.push_back(r);
 }
 
-void ResourceManager::removeParent()
+void SBResourceManager::removeParent()
 {
 	if (cur_cmd_parent.size() > 0)
 		cur_cmd_parent.pop();
 }
 
 
-int ResourceManager::getNumResources()
+int SBResourceManager::getNumResources()
 {
 	return resources.size();
 }
 
-int ResourceManager::getNumCommandResources()
+int SBResourceManager::getNumCommandResources()
 {
 	return commandResources.size();
 }
 
-int ResourceManager::getNumControllerResources()
+int SBResourceManager::getNumControllerResources()
 {
 	return controllerResources.size();
 }
 
-Resource* ResourceManager::getResource(unsigned int index)
+Resource* SBResourceManager::getResource(unsigned int index)
 {
 	std::list<Resource *>::iterator iter= resources.begin();
 	for(unsigned int i = 0 ; i < index; i++)
@@ -133,7 +133,7 @@ Resource* ResourceManager::getResource(unsigned int index)
 	return *iter;
 }
 
-CmdResource* ResourceManager::getCommandResource(unsigned int index)
+CmdResource* SBResourceManager::getCommandResource(unsigned int index)
 {
 	std::list<CmdResource *>::iterator iter= commandResources.begin();
 	for (unsigned int i = 0 ; i < index; i++)
@@ -145,7 +145,7 @@ CmdResource* ResourceManager::getCommandResource(unsigned int index)
 	return *iter;
 }
 
-ControllerResource* ResourceManager::getControllerResource(unsigned int index)
+ControllerResource* SBResourceManager::getControllerResource(unsigned int index)
 {
 	std::list<ControllerResource *>::iterator iter= controllerResources.begin();
 	for (unsigned int i = 0 ; i < index; i++)
@@ -157,33 +157,33 @@ ControllerResource* ResourceManager::getControllerResource(unsigned int index)
 	return *iter;
 }
 
-ResourceManager* ResourceManager::getResourceManager()
+SBResourceManager* SBResourceManager::getResourceManager()
 {
 	if (manager == NULL)
 	{
-		manager = new ResourceManager();
+		manager = new SBResourceManager();
 	}
 
 	return manager;
 }
 
-void ResourceManager::cleanup()
+void SBResourceManager::cleanup()
 {
 	if (manager)
 		delete manager;
 	manager = NULL;
 }
-void ResourceManager::addParent(CmdResource* parent)
+void SBResourceManager::addParent(CmdResource* parent)
 {
 	cur_cmd_parent.push(parent);
 }
 
-Resource* ResourceManager::getParent()
+Resource* SBResourceManager::getParent()
 {
 	return cur_cmd_parent.top();
 }
 
-CmdResource* ResourceManager::getCmdResource(std::string id)
+CmdResource* SBResourceManager::getCmdResource(std::string id)
 {
 	std::list<Resource *>::iterator iter= resources.begin();
 	for (unsigned int r = 0; r < resources.size(); r++)
@@ -202,7 +202,7 @@ CmdResource* ResourceManager::getCmdResource(std::string id)
 	return NULL;
 }
 
-CmdResource* ResourceManager::getCmdResourceRecurse(std::string id, CmdResource* r)
+CmdResource* SBResourceManager::getCmdResourceRecurse(std::string id, CmdResource* r)
 {
 	if (r->getId() == id)
 		return r;
@@ -220,7 +220,7 @@ CmdResource* ResourceManager::getCmdResourceRecurse(std::string id, CmdResource*
 }
 
 
-void ResourceManager::setLimit(unsigned int l)
+void SBResourceManager::setLimit(unsigned int l)
 {
 	resource_limit = l;
 	while(l < resources.size())
@@ -231,7 +231,7 @@ void ResourceManager::setLimit(unsigned int l)
 	}
 }
 
-int ResourceManager::getLimit()
+int SBResourceManager::getLimit()
 {
 	return resource_limit;
 }

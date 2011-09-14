@@ -1,7 +1,16 @@
 #include "Heightfield.h"
 
+#ifdef __APPLE__
+#include "TargetConditionals.h"
+#if defined (TARGET_OS_IPHONE)  || defined (TARGET_IPHONE_SIMULATOR)
+#ifndef SBM_IPHONE
+#define SBM_IPHONE
+#endif
+#endif
+#endif
+
 //#include <windows.h> // standard Windows app include
-#ifdef __ANDROID__
+#if defined (__ANDROID__) || defined (SBM_IPHONE)
 #else
 #include <GL/gl.h> // standard OpenGL include
 #include <GL/glu.h> // OpenGL utilties
@@ -128,7 +137,7 @@ void Heightfield::paste_img( void )	{
 #endif
 
 void Heightfield::render( int renderMode )	{
-#ifdef __ANDROID__
+#if defined (__ANDROID__) || defined (SBM_IPHONE)
 #else
 	if( vertex_arr && color_arr )	{
 

@@ -1,6 +1,8 @@
 #include "SBPythonClass.h"
 #include "sbm/me_ct_reach.hpp"
 
+
+#ifdef USE_PYTHON
 namespace SmartBody 
 {
 
@@ -1626,3 +1628,4 @@ SkMotion* getMotion(std::string name)
 
 
 }
+#endif

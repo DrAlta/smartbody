@@ -319,7 +319,7 @@ public:
 #endif
 
 		joint_logger::EvaluationLogger* logger_p;
-		ResourceManager*			resource_manager;
+		SBResourceManager*			resource_manager;
 		std::vector<CameraTrack*>	cameraTracking;
 
 		SteerSuiteEngineDriver		steerEngine;

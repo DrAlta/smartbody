@@ -27,6 +27,15 @@
  *      
  */
 
+#ifdef __APPLE__
+#include "TargetConditionals.h"
+#if defined (TARGET_OS_IPHONE)  || defined (TARGET_IPHONE_SIMULATOR)
+#ifndef SBM_IPHONE
+#define SBM_IPHONE
+#endif
+#endif
+#endif
+
 #include "lin_win.h"
 #include "vhcl.h"
 #include "mcontrol_util.h"
@@ -58,7 +67,7 @@
 #endif
 #include "sr/sr_model.h"
 
-#ifndef __ANDROID__ // disable shader support
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE) // disable shader support
 #include "sbm/GPU/SbmShader.h"
 #include "sbm/GPU/SbmTexture.h"
 #endif
@@ -253,7 +262,7 @@ mcuCBHandle::mcuCBHandle()
 	resourceViewerFactory ( new GenericViewerFactory() ),
 	velocityViewerFactory ( new GenericViewerFactory() ),
 	faceViewerFactory ( new GenericViewerFactory() ),
-	resource_manager(ResourceManager::getResourceManager()),
+	resource_manager(SBResourceManager::getResourceManager()),
 	snapshot_counter( 1 ),
 	use_python( false ),
 	delay_behaviors(true),
@@ -683,7 +692,7 @@ int mcuCBHandle::open_viewer( int width, int height, int px, int py )	{
 		if( root_group_p )	{
 			viewer_p->root( root_group_p );
 		}
-#ifndef __ANDROID__
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
 		SbmShaderManager::singleton().setViewer(viewer_p);
 #endif
 		return( CMD_SUCCESS );
@@ -696,7 +705,7 @@ void mcuCBHandle::close_viewer( void )	{
 	if( viewer_p )	{
 		viewer_factory->remove(viewer_p);
 		viewer_p = NULL;
-#ifndef __ANDROID__
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
 		SbmShaderManager::singleton().setViewer(NULL);
 #endif
 	}
@@ -944,7 +953,7 @@ void mcuCBHandle::update( void )	{
 		activeSequences.removeSequence(sequencesToDelete[d], true);
 	}
 
-#ifndef __ANDROID__
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
 	SbmShaderManager& ssm = SbmShaderManager::singleton();
 	SbmTextureManager& texm = SbmTextureManager::singleton();
 	bool hasOpenGL        = ssm.initOpenGL();

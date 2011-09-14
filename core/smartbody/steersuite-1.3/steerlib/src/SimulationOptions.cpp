@@ -37,8 +37,18 @@
 #include "simulation/SimulationOptions.h"
 #include "util/Misc.h"
 
+#ifdef __APPLE__
+#include "TargetConditionals.h"
+#if defined (TARGET_OS_IPHONE)  || defined (TARGET_IPHONE_SIMULATOR)
+#ifndef BUILD_IPHONE
+#define BUILD_IPHONE
+#endif
+#endif
+#endif
 
+#ifndef BUILD_IPHONE
 #include "glfw/include/GL/glfw.h"
+#endif
 
 using namespace SteerLib;
 using namespace Util;
@@ -47,7 +57,7 @@ using namespace Util;
 //====================================
 // KEYBOARD-ACTION MAPPINGS
 //====================================
-
+#ifndef BUILD_IPHONE
 // GUI ACTIONS
 #define DEFAULT_KEY_QUIT                  GLFW_KEY_ESC
 #define DEFAULT_KEY_PRINT_CAMERA_INFO     'P'
@@ -72,6 +82,7 @@ using namespace Util;
 #define DEFAULT_MOUSE_BUTTON_TO_MOVE_CAMERA    GLFW_MOUSE_BUTTON_MIDDLE
 #define DEFAULT_MOUSE_BUTTON_TO_ROTATE_CAMERA  GLFW_MOUSE_BUTTON_LEFT
 #define DEFAULT_MOUSE_BUTTON_TO_ZOOM_CAMERA    GLFW_MOUSE_BUTTON_RIGHT
+#endif
 
 //====================================
 // GUI DEFAULTS
@@ -185,6 +196,7 @@ SimulationOptions::SimulationOptions()
 	// overridden if they are specified in the config file.
 	//
 
+#ifndef BUILD_IPHONE    
 	// keyboard config
 	keyboardBindings.quit = DEFAULT_KEY_QUIT;
 	keyboardBindings.printCameraInfo = DEFAULT_KEY_PRINT_CAMERA_INFO;
@@ -199,13 +211,14 @@ SimulationOptions::SimulationOptions()
 	keyboardBindings.slowdownPlayback = DEFAULT_KEY_SLOWDOWN_PLAYBACK;
 	keyboardBindings.resetPlaybackSpeed = DEFAULT_KEY_RESET_PLAYBACK_SPEED;
 	keyboardBindings.restartPlayback = DEFAULT_KEY_RESTART_PLAYBACK;
-
+    
 	// mouse config
 	mouseBindings.selectAgent = DEFAULT_MOUSE_BUTTON_TO_SELECT_AGENT;
 	mouseBindings.moveCamera = DEFAULT_MOUSE_BUTTON_TO_MOVE_CAMERA;
 	mouseBindings.rotateCamera = DEFAULT_MOUSE_BUTTON_TO_ROTATE_CAMERA;
 	mouseBindings.zoomCamera = DEFAULT_MOUSE_BUTTON_TO_ZOOM_CAMERA;
-
+#endif
+    
 	// global options
 	globalOptions.engineDriver = DEFAULT_ENGINE_DRIVER;
 	globalOptions.coutRedirectionFilename = DEFAULT_COUT_REDIRECTION_FILENAME;

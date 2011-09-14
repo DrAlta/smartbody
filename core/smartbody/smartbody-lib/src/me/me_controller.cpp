@@ -171,7 +171,7 @@ void MeController::start (double time) {
 	cres->setControllerName(this->getName());
 	cres->setType("start");
 	cres->setTime(time);
-	ResourceManager::getResourceManager()->addControllerResource(cres);
+	SBResourceManager::getResourceManager()->addControllerResource(cres);
 	*/
 	
 	_active = true;
@@ -191,7 +191,7 @@ void MeController::stop (double time) {
 	cres->setControllerName(this->getName());
 	cres->setType("stop");
 	cres->setTime(time);
-	ResourceManager::getResourceManager()->addControllerResource(cres);
+	SBResourceManager::getResourceManager()->addControllerResource(cres);
 	*/
 	
 	_active = false;
