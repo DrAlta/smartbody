@@ -218,7 +218,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="if exist ..\..\..\..\tools\lint\lint-post-build.bat call ..\..\..\..\tools\lint\lint-post-build.bat ..\..\..\..\tools\lint $(ProjectFileName)"
+				CommandLine="if exist ..\..\..\..\tools\pc-lint\lint-post-build.bat call ..\..\..\..\tools\pc-lint\lint-post-build.bat ..\..\..\..\tools\pc-lint $(ProjectFileName)&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
