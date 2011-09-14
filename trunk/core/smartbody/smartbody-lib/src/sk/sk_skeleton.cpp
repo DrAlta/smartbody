@@ -336,6 +336,7 @@ void SkSkeleton::copy_joint(SkJoint* dest, SkJoint* src)
 		dest->quat()->activate();
 
 	dest->offset(src->offset());
+	dest->updateGmatZero(src->gmatZero());
 	SkJointQuat* srcQuat = src->quat();
 	SkJointQuat* destQuat = dest->quat();
 	destQuat->value(srcQuat->value());

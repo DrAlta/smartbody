@@ -59,6 +59,8 @@ MeCtGazeJoint::MeCtGazeJoint( void )	{
 void MeCtGazeJoint::init( SkJoint* j_p )	{
 	
 	joint_p = j_p;
+	//SrVec axis = joint_p->parent()->localGlobalAxis(2);
+	//forward_ref = vector_t(axis[0],axis[1],axis[2]);
 }
 
 void MeCtGazeJoint::start( void )	{
@@ -75,9 +77,10 @@ quat_t MeCtGazeJoint::evaluate( float dt, vector_t target_pos, quat_t off_rot, f
 	
 	prev_world_rot = world_rot;
 	capture_joint_state();
-	quat_t Q_task = ( rotation_to_target( target_pos ) * off_rot ) * scale_factor;
+	quat_t Q_task = ( rotation_to_target( target_pos ) * off_rot ) * scale_factor;	
+	Q_task.print();
 #if ENABLE_CONSTRAIN
-	quat_t Q = constrain( dt, Q_task );
+	quat_t Q = constrain( dt, Q_task );	
 #else
 	quat_t Q = Q_task;
 #endif
@@ -90,6 +93,7 @@ quat_t MeCtGazeJoint::evaluate( float dt, quat_t target_rot, quat_t off_rot, flo
 	prev_world_rot = world_rot;
 	capture_joint_state();
 	quat_t Q_task = ( rotation_to_target( target_rot ) * off_rot ) * scale_factor;
+
 #if ENABLE_CONSTRAIN
 	quat_t Q = constrain( dt, Q_task );
 #else
@@ -101,9 +105,9 @@ quat_t MeCtGazeJoint::evaluate( float dt, quat_t target_rot, quat_t off_rot, flo
 
 void MeCtGazeJoint::capture_joint_state( void ) {
 	SrMat sr_M;
-	gwiz::matrix_t M;
+	gwiz::matrix_t M, PM,WM, PZ;
 	int i, j;
-
+#if 1
 	if( joint_p )	{
 
 		sr_M = joint_p->lmat();
@@ -150,6 +154,61 @@ void MeCtGazeJoint::capture_joint_state( void ) {
 			LOG( "MeCtGazeJoint::capture_joint_state ERR: parent of joint '%s' not found\n", name );
 		}
 	}
+#else
+	if( joint_p )	{
+		sr_M = joint_p->gmat();
+		for( i=0; i<4; i++ )	{
+			for( j=0; j<4; j++ )	{
+				M.set( i, j, sr_M.get( i, j ) );
+			}
+		}
+
+		SrMat srZeroM = joint_p->gmatZero();
+		for( i=0; i<4; i++ )	{
+			for( j=0; j<4; j++ )	{
+				WM.set( i, j, srZeroM.get( i, j ) );
+			}
+		}
+		world_zero_pos = WM.translation( gwiz::COMP_M_TR );
+		world_zero_rot = WM.quat( gwiz::COMP_M_TR );
+
+		world_pos = M.translation( gwiz::COMP_M_TR );
+		world_rot = M.quat( gwiz::COMP_M_TR );		
+
+		SkJoint* parent_p = joint_p->parent();		
+		if( parent_p )	{
+			sr_M = parent_p->gmat();
+			for( i=0; i<4; i++ )	{
+				for( j=0; j<4; j++ )	{
+					PM.set( i, j, sr_M.get( i, j ) );
+				}
+			}
+			parent_pos = PM.translation( gwiz::COMP_M_TR );
+			parent_rot = PM.quat( gwiz::COMP_M_TR );	
+
+
+			SrMat sr_PZ = parent_p->gmatZero();
+			for( i=0; i<4; i++ )	{
+				for( j=0; j<4; j++ )	{
+					PZ.set( i, j, sr_PZ.get( i, j ) );
+				}
+			}
+			parent_zero_pos = PZ.translation( gwiz::COMP_M_TR );
+			parent_zero_rot = PZ.quat( gwiz::COMP_M_TR );	
+
+			parent_diff_rot = world_zero_rot*(-parent_zero_rot);
+
+			gwiz::matrix_t LM = -M*M;
+			local_pos = LM.translation( gwiz::COMP_M_TR );
+			local_rot = LM.quat( gwiz::COMP_M_TR );
+			}	   
+
+		}
+		else	{
+			const char *name = joint_p->name().c_str();
+			LOG( "MeCtGazeJoint::capture_joint_state ERR: parent of joint '%s' not found\n", name );
+		}
+#endif
 }
 
 ////////////////////////////////////////
@@ -176,7 +235,7 @@ quat_t MeCtGazeJoint::rotation_to_target( vector_t target_pos )	{
 		gwiz::float_t buffer_ratio = 0.1,	// proportion of buffer zone for pathological case
 	)
 	*/
-	
+#if 1
 	euler_t E_forward = forward_rot;
 	quat_t forward_ph = euler_t( E_forward.p(), E_forward.h(), 0.0 );
 	quat_t forward_roll = euler_t( 0.0, 0.0, E_forward.r() );
@@ -191,6 +250,24 @@ quat_t MeCtGazeJoint::rotation_to_target( vector_t target_pos )	{
 		forward_dir,
 		DFL_FORWARD_RAY_BUFFER_ZONE_RATIO
 	);
+#else
+	euler_t E_forward = forward_rot;
+	quat_t forward_ph = euler_t( E_forward.p(), E_forward.h(), 0.0 );
+	quat_t forward_roll = euler_t( 0.0, 0.0, E_forward.r() );
+	
+	vector_t l_target_pos = ( -world_rot ) * ( target_pos - world_pos );
+	vector_t forward_dir = ( -forward_ph ) * forward_ref.normal();
+
+	quat_t Q_p = rotation_ray_to_target_point(
+		l_target_pos,
+		local_pos,
+		(-world_zero_rot)*forward_pos + local_pos,
+		(-world_zero_rot)*forward_dir,
+		DFL_FORWARD_RAY_BUFFER_ZONE_RATIO
+	);	
+
+	quat_t Q = Q_p;
+#endif
 
 /*
 	INCORRECT:

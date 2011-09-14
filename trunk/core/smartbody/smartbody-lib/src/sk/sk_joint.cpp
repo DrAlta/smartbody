@@ -288,4 +288,19 @@ void SkJoint::add_child( SkJoint* child )
 	 child->skeleton(this->skeleton());
 }
 
+void SkJoint::updateGmatZero(const SrMat& gmatZero)
+{
+	_gmatZero = gmatZero;
+}
+
+SrVec SkJoint::localGlobalAxis(int i)
+{
+	SrVec axis;
+	for (int k=0;k<3;k++)
+	{
+		axis[k] = _gmatZero[i+k*4];
+	}
+	return axis;
+}
+
 //============================ End of File ============================
