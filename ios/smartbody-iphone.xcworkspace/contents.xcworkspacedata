@@ -31,7 +31,4 @@
    <FileRef
       location = "group:wsp/wsp.xcodeproj">
    </FileRef>
-   <FileRef
-      location = "group:applications/minimal/smartbody-openglES.xcodeproj">
-   </FileRef>
 </Workspace>
