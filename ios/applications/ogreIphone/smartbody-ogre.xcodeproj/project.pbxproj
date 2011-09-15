@@ -35,6 +35,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AA1791911421A7FC00DCA9FE /* Default-Portrait.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Portrait.png"; sourceTree = "<group>"; };
+		AA1791921421A81300DCA9FE /* resources.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = resources.cfg; sourceTree = "<group>"; };
 		AA2AFA971406F67300CB9A6A /* smartbody-ogre.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "smartbody-ogre.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA2AFA9B1406F67300CB9A6A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		AA2AFA9D1406F67300CB9A6A /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -94,7 +96,6 @@
 		AA5DF14A14203378002B8A17 /* cubemapsJS.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = cubemapsJS.zip; sourceTree = "<group>"; };
 		AA5DF14B14203378002B8A17 /* SdkTrays.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = SdkTrays.zip; sourceTree = "<group>"; };
 		AA5DF14C14203378002B8A17 /* skybox.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = skybox.zip; sourceTree = "<group>"; };
-		AA5DF14D14203378002B8A17 /* resources.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = resources.cfg; sourceTree = "<group>"; };
 		AA5DF14F14203378002B8A17 /* FFPLib_Common.cg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = FFPLib_Common.cg; sourceTree = "<group>"; };
 		AA5DF15014203378002B8A17 /* FFPLib_Common.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = FFPLib_Common.glsl; sourceTree = "<group>"; };
 		AA5DF15114203378002B8A17 /* FFPLib_Common.glsles */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = FFPLib_Common.glsles; sourceTree = "<group>"; };
@@ -193,10 +194,28 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AA1791901421A7AF00DCA9FE /* Basic Ogre Framework */ = {
+			isa = PBXGroup;
+			children = (
+				AA5DF12314203378002B8A17 /* InputViewController.h */,
+				AA5DF12414203378002B8A17 /* InputViewController.mm */,
+				AA5DF18814203378002B8A17 /* OgreDemoApp.cpp */,
+				AA5DF18914203378002B8A17 /* OgreDemoApp.h */,
+				AA5DF18A14203378002B8A17 /* OgreFramework.cpp */,
+				AA5DF18B14203378002B8A17 /* OgreFramework.h */,
+				AA5DF18C14203378002B8A17 /* OgreStaticPluginLoader.h */,
+				AA5DF19114203378002B8A17 /* test.cpp */,
+				AA5DF19214203378002B8A17 /* test.h */,
+			);
+			name = "Basic Ogre Framework";
+			path = "smartbody-ogre";
+			sourceTree = "<group>";
+		};
 		AA2AFA8C1406F67300CB9A6A = {
 			isa = PBXGroup;
 			children = (
 				AA5DF11D14203378002B8A17 /* smartbody-ogre */,
+				AA1791901421A7AF00DCA9FE /* Basic Ogre Framework */,
 				AA2AFA9A1406F67300CB9A6A /* Frameworks */,
 				AA2AFA981406F67300CB9A6A /* Products */,
 			);
@@ -240,23 +259,15 @@
 		AA5DF11D14203378002B8A17 /* smartbody-ogre */ = {
 			isa = PBXGroup;
 			children = (
-				AA5DF11E14203378002B8A17 /* AppDelegate.h */,
-				AA5DF12014203378002B8A17 /* InfoPlist.strings */,
-				AA5DF12314203378002B8A17 /* InputViewController.h */,
-				AA5DF12414203378002B8A17 /* InputViewController.mm */,
 				AA5DF12514203378002B8A17 /* main.mm */,
-				AA5DF12614203378002B8A17 /* media */,
+				AA1791921421A81300DCA9FE /* resources.cfg */,
 				AA5DF18714203378002B8A17 /* ogre.cfg */,
-				AA5DF18814203378002B8A17 /* OgreDemoApp.cpp */,
-				AA5DF18914203378002B8A17 /* OgreDemoApp.h */,
-				AA5DF18A14203378002B8A17 /* OgreFramework.cpp */,
-				AA5DF18B14203378002B8A17 /* OgreFramework.h */,
-				AA5DF18C14203378002B8A17 /* OgreStaticPluginLoader.h */,
 				AA5DF18D14203378002B8A17 /* plugins.cfg */,
+				AA5DF12014203378002B8A17 /* InfoPlist.strings */,
 				AA5DF18F14203378002B8A17 /* smartbody-ogre-Info.plist */,
 				AA5DF19014203378002B8A17 /* smartbody-ogre-Prefix.pch */,
-				AA5DF19114203378002B8A17 /* test.cpp */,
-				AA5DF19214203378002B8A17 /* test.h */,
+				AA5DF11E14203378002B8A17 /* AppDelegate.h */,
+				AA5DF12614203378002B8A17 /* media */,
 			);
 			path = "smartbody-ogre";
 			sourceTree = "<group>";
@@ -264,14 +275,14 @@
 		AA5DF12614203378002B8A17 /* media */ = {
 			isa = PBXGroup;
 			children = (
+				AA1791911421A7FC00DCA9FE /* Default-Portrait.png */,
 				AA5DF12714203378002B8A17 /* Default-Portrait~ipad.png */,
 				AA5DF12814203378002B8A17 /* Icon-72.png */,
 				AA5DF12914203378002B8A17 /* materials */,
 				AA5DF14314203378002B8A17 /* models */,
 				AA5DF14814203378002B8A17 /* packs */,
-				AA5DF14D14203378002B8A17 /* resources.cfg */,
-				AA5DF14E14203378002B8A17 /* RTShaderLib */,
 				AA5DF18314203378002B8A17 /* sbm */,
+				AA5DF14E14203378002B8A17 /* RTShaderLib */,
 			);
 			path = media;
 			sourceTree = "<group>";
@@ -609,10 +620,7 @@
 				);
 				INFOPLIST_FILE = "smartbody-ogre/smartbody-ogre-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../libs/iphoneos\"",
-				);
+				LIBRARY_SEARCH_PATHS = "";
 				"LIBRARY_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
 					../../libs/iphoneos,
 					$OGRE_SRC_ROOT/iPhoneDependencies/lib,
@@ -625,7 +633,7 @@
 					$OGRE_SRC_ROOT/build/lib/Debug,
 					$OGRE_SRC_ROOT/iPhoneDependencies/lib/Release,
 				);
-				OGRE_SDK_ROOT = /Users/yxu/ogreSDK;
+				OGRE_SDK_ROOT = /Users/yxu/ogreMain/sources/OgreSDK;
 				OGRE_SRC_ROOT = "/Users/yxu/ogre_src_v1-7-3";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
@@ -705,10 +713,7 @@
 				);
 				INFOPLIST_FILE = "smartbody-ogre/smartbody-ogre-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../libs/iphoneos\"",
-				);
+				LIBRARY_SEARCH_PATHS = "";
 				"LIBRARY_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
 					../../libs/iphoneos,
 					$OGRE_SRC_ROOT/iPhoneDependencies/lib,
@@ -721,7 +726,7 @@
 					$OGRE_SRC_ROOT/build/lib/Debug,
 					$OGRE_SRC_ROOT/iPhoneDependencies/lib/Release,
 				);
-				OGRE_SDK_ROOT = /Users/yxu/ogreSDK;
+				OGRE_SDK_ROOT = /Users/yxu/ogreMain/sources/OgreSDK;
 				OGRE_SRC_ROOT = "/Users/yxu/ogre_src_v1-7-3";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (

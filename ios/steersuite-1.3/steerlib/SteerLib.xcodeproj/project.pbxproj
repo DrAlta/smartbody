@@ -218,6 +218,7 @@
 				AA2474641419631B0068B5F8 /* Sources */,
 				AA2474651419631B0068B5F8 /* Frameworks */,
 				AA2474661419631B0068B5F8 /* Headers */,
+				AA1790FC14212C9500DCA9FE /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -249,6 +250,22 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		AA1790FC14212C9500DCA9FE /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp $PROJECT_DIR/../build/$CONFIGURATION$EFFECTIVE_PLATFORM_NAME/*.a $PROJECT_DIR/../../libs/$PLATFORM_NAME";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		AA2474641419631B0068B5F8 /* Sources */ = {

@@ -13,7 +13,7 @@ export SDKROOT=$DEVROOT/SDKs/iPhoneOS4.3.sdk
 export CFLAGS="-arch armv$ARMVERSION -pipe -no-cpp-precomp -isysroot$SDKROOT -miphoneos-version-min=4.1 -I$SDKROOT/usr/include/"
 export CPPFLAGS="$CFLAGS"
 export CXXFLAGS="$CFLAGS"
-export LDFLAGS="-L$SDKROOT/usr/lib/ -L$SDKROOT/usr/lib/system -L$SBROOT/ios/activemq/apr-util/lib"
+export LDFLAGS="-L$SDKROOT/usr/lib/ -L$SDKROOT/usr/lib/system -L$SBROOT/ios/activemq/apr-util/iphoneos/lib"
 export CPP="$DEVROOT/usr/bin/cpp-4.2"
 export CXX="$DEVROOT/usr/bin/g++-4.2"
 export CC="$DEVROOT/usr/bin/gcc-4.2"

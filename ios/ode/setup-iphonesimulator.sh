@@ -38,3 +38,5 @@ else
     make
     make install
 fi
+
+cp $PREFIX/lib/*.a $SBROOT/ios/libs/iphonesimulator

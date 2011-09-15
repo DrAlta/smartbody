@@ -17,14 +17,17 @@ export CPP="$DEVROOT/usr/bin/cpp-4.2"
 export CXX="$DEVROOT/usr/bin/g++-4.2"
 export CC="$DEVROOT/usr/bin/gcc-4.2"
 export LD="$DEVROOT/usr/bin/ld"
-echo "ac_cv_func_realloc_0_nonnull=yes\nac_cv_func_malloc_0_nonnull=yes">arm-apple.cache
 export RANLIB="$DEVROOT/usr/bin/ranlib"
+export ac_cv_func_malloc_0_nonnull=yes
+export ac_cv_func_realloc_0_nonnull=yes
 
 if [ ! -d "$SBROOT" ]; then
     echo "smartbody trunk location $SBROOT not set correctly"
 else
-    ./configure --with-drawstuff=none --with-pic --host="arm-apple-darwin" --prefix=$PREFIX --cache-file=arm-apple.cache --with-trimesh=gimpact
+    ./configure --with-drawstuff=none --with-pic --host="arm-apple-darwin" --prefix=$PREFIX --disable-dependency-tracking
     make clean
     make
     make install
 fi
+
+cp $PREFIX/lib/*.a $SBROOT/ios/libs/iphoneos

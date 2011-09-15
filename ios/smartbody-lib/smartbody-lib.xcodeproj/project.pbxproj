@@ -1949,6 +1949,7 @@
 				AA9CD5E0141FF8610064C27A /* Sources */,
 				AA9CD5E1141FF8610064C27A /* Frameworks */,
 				AA9CD5E2141FF8610064C27A /* Headers */,
+				AA17916E1421779200DCA9FE /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1980,6 +1981,22 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		AA17916E1421779200DCA9FE /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp $PROJECT_DIR/build/$CONFIGURATION$EFFECTIVE_PLATFORM_NAME/*.a $PROJECT_DIR/../libs/$PLATFORM_NAME";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		AA9CD5E0141FF8610064C27A /* Sources */ = {
@@ -2310,9 +2327,7 @@
 					../../lib/bonebus/include,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
-				LIBRARY_SEARCH_PATHS = (
-					"\"$(SRCROOT)/../libs/iphoneos\"",
-				);
+				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../libs/iphoneos\"";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2361,9 +2376,7 @@
 					../../lib/bonebus/include,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
-				LIBRARY_SEARCH_PATHS = (
-					"\"$(SRCROOT)/../libs/iphoneos\"",
-				);
+				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../libs/iphoneos\"";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
