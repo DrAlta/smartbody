@@ -197,6 +197,7 @@
 		AA1791901421A7AF00DCA9FE /* Basic Ogre Framework */ = {
 			isa = PBXGroup;
 			children = (
+				AA5DF11E14203378002B8A17 /* AppDelegate.h */,
 				AA5DF12314203378002B8A17 /* InputViewController.h */,
 				AA5DF12414203378002B8A17 /* InputViewController.mm */,
 				AA5DF18814203378002B8A17 /* OgreDemoApp.cpp */,
@@ -208,14 +209,12 @@
 				AA5DF19214203378002B8A17 /* test.h */,
 			);
 			name = "Basic Ogre Framework";
-			path = "smartbody-ogre";
 			sourceTree = "<group>";
 		};
 		AA2AFA8C1406F67300CB9A6A = {
 			isa = PBXGroup;
 			children = (
 				AA5DF11D14203378002B8A17 /* smartbody-ogre */,
-				AA1791901421A7AF00DCA9FE /* Basic Ogre Framework */,
 				AA2AFA9A1406F67300CB9A6A /* Frameworks */,
 				AA2AFA981406F67300CB9A6A /* Products */,
 			);
@@ -260,14 +259,8 @@
 			isa = PBXGroup;
 			children = (
 				AA5DF12514203378002B8A17 /* main.mm */,
-				AA1791921421A81300DCA9FE /* resources.cfg */,
-				AA5DF18714203378002B8A17 /* ogre.cfg */,
-				AA5DF18D14203378002B8A17 /* plugins.cfg */,
-				AA5DF12014203378002B8A17 /* InfoPlist.strings */,
-				AA5DF18F14203378002B8A17 /* smartbody-ogre-Info.plist */,
-				AA5DF19014203378002B8A17 /* smartbody-ogre-Prefix.pch */,
-				AA5DF11E14203378002B8A17 /* AppDelegate.h */,
-				AA5DF12614203378002B8A17 /* media */,
+				AA1791901421A7AF00DCA9FE /* Basic Ogre Framework */,
+				AA5DF2581422763B002B8A17 /* Resources */,
 			);
 			path = "smartbody-ogre";
 			sourceTree = "<group>";
@@ -429,6 +422,20 @@
 				AA5DF18614203378002B8A17 /* HandsAtSide_Motex.skm */,
 			);
 			path = sbm;
+			sourceTree = "<group>";
+		};
+		AA5DF2581422763B002B8A17 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AA1791921421A81300DCA9FE /* resources.cfg */,
+				AA5DF18714203378002B8A17 /* ogre.cfg */,
+				AA5DF18D14203378002B8A17 /* plugins.cfg */,
+				AA5DF12014203378002B8A17 /* InfoPlist.strings */,
+				AA5DF18F14203378002B8A17 /* smartbody-ogre-Info.plist */,
+				AA5DF19014203378002B8A17 /* smartbody-ogre-Prefix.pch */,
+				AA5DF12614203378002B8A17 /* media */,
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -633,7 +640,7 @@
 					$OGRE_SRC_ROOT/build/lib/Debug,
 					$OGRE_SRC_ROOT/iPhoneDependencies/lib/Release,
 				);
-				OGRE_SDK_ROOT = /Users/yxu/ogreMain/sources/OgreSDK;
+				OGRE_SDK_ROOT = /Users/yxu/OgreSDK;
 				OGRE_SRC_ROOT = "/Users/yxu/ogre_src_v1-7-3";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
@@ -726,7 +733,7 @@
 					$OGRE_SRC_ROOT/build/lib/Debug,
 					$OGRE_SRC_ROOT/iPhoneDependencies/lib/Release,
 				);
-				OGRE_SDK_ROOT = /Users/yxu/ogreMain/sources/OgreSDK;
+				OGRE_SDK_ROOT = /Users/yxu/OgreSDK;
 				OGRE_SRC_ROOT = "/Users/yxu/ogre_src_v1-7-3";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (

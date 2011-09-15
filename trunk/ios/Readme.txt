@@ -73,14 +73,11 @@ Note: for smartbody iphone running on unity, we need to rename variables inside 
 --------------------------------Compiling and Running Applications using Xcode4------------------------------
 There are two applications under trunk/ios/applications, you have to go over the previous steps. Make sure you have your device connected.
 13) Build smartbody-openglES
-	Open smartbody-iphone.xcworkspace, select scheme smartbody-openglES, build and run.
+	Go to trunk/ios/applications/minimal, open smartbody-iphone.xcodeproj, build and run.
 
 Note: Under smartbody-openglES project Frameworks, you should see all the libraries existing. If not, go over previous steps to check if anything is wrong
 
-14) Build smartbody-openglES
-	Open smartbody-iphone.xcworkspace, select scheme smartbody-openglES, build and run.
-	
-15) Build smartbody-ogre
+14) Build smartbody-ogre
 	http://www.ogre3d.org/download/sdk
 	Download ogreSDK
 	http://www.ogre3d.org/tikiwiki/tiki-index.php?page=Building%20From%20Source%20-%20iPhone&redirectpage=Building%20From%20Source%20(for%20iPhone)
@@ -88,6 +85,11 @@ Note: Under smartbody-openglES project Frameworks, you should see all the librar
 	Go to trunk/ios/applications/ogreIphone, open smartbody-ogre.xcodeproj, go to smartbody-ogre project, set OGRE_SDK_ROOT to your ogreSDK directory, set OGRE_SRC_ROOT to your ogre source directory. Select scheme smartbody-ogre, build and run.
 	If the program hangs on boost thread function, try rebuild the ogre iphone dependencies boost libs (pthread, date_time), alternative way is to build the whole ogre iphone libraries with boost symbol turned off which may affect the results.
 	
-Note: ogre 1.8 seems to have trouble when building for iphone/ipad, use ogre 1.7.3. It is extremely slow running on armv6 ipod(after testing), and there's something wrong with the texture and shader, also getting memory warning LEVEL2. So maybe should just run on armv7 iphone/ipad.
+Note: ogre 1.8 seems to have trouble when building for iphone/ipad, use ogre 1.7.3. 
+	  It is extremely slow running on armv6 ipod(after testing), and there's something wrong with the texture and shader. So maybe should just run on armv7 iphone/ipad.
+
+
+15) Build smartbody-unity
+	...
 
 --------------------------------------------------------------------------------------------------------------
