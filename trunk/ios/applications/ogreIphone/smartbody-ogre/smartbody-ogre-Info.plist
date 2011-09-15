@@ -28,12 +28,16 @@
 	<array/>
 	<key>UIInterfaceOrientation</key>
 	<string>UIInterfaceOrientationPortrait</string>
+	<key>UILaunchImageFile</key>
+	<string>media/Default-portrait.png</string>
 	<key>UILaunchImageFile~ipad</key>
-	<string>media/Default-Portrait~ipad.png</string>
+	<string>media/Defaut-portrait~ipad.png</string>
 	<key>UILaunchImageFile~iphone</key>
-	<string>media/Default-Portrait.png</string>
+	<string>media/Default-portrait.png</string>
 	<key>UISupportedInterfaceOrientations</key>
-	<array/>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

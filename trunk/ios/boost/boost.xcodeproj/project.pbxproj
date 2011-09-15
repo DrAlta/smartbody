@@ -294,6 +294,7 @@
 				AA9CD58D141FCFCD0064C27A /* Sources */,
 				AA9CD58E141FCFCD0064C27A /* Frameworks */,
 				AA9CD590141FCFCD0064C27A /* Headers */,
+				AA17914B14216D1400DCA9FE /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -311,6 +312,7 @@
 				AA9CD596141FCFD70064C27A /* Sources */,
 				AA9CD597141FCFD70064C27A /* Frameworks */,
 				AA9CD599141FCFD70064C27A /* Headers */,
+				AA17914D14216D3F00DCA9FE /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -328,6 +330,7 @@
 				AA9CD59F141FCFE00064C27A /* Sources */,
 				AA9CD5A0141FCFE00064C27A /* Frameworks */,
 				AA9CD5A2141FCFE00064C27A /* Headers */,
+				AA17914E14216D4400DCA9FE /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -361,6 +364,48 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		AA17914B14216D1400DCA9FE /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp $PROJECT_DIR/build/$CONFIGURATION$EFFECTIVE_PLATFORM_NAME/*.a $PROJECT_DIR/../libs/$PLATFORM_NAME";
+		};
+		AA17914D14216D3F00DCA9FE /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp $PROJECT_DIR/build/$CONFIGURATION$EFFECTIVE_PLATFORM_NAME/*.a $PROJECT_DIR/../libs/$PLATFORM_NAME";
+		};
+		AA17914E14216D4400DCA9FE /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp $PROJECT_DIR/build/$CONFIGURATION$EFFECTIVE_PLATFORM_NAME/*.a $PROJECT_DIR/../libs/$PLATFORM_NAME";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		AA9CD58D141FCFCD0064C27A /* Sources */ = {
@@ -577,6 +622,7 @@
 				AA9CD593141FCFCD0064C27A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		AA9CD59A141FCFD70064C27A /* Build configuration list for PBXNativeTarget "boost_filesystem" */ = {
 			isa = XCConfigurationList;
@@ -585,6 +631,7 @@
 				AA9CD59C141FCFD70064C27A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		AA9CD5A3141FCFE00064C27A /* Build configuration list for PBXNativeTarget "boost_regex" */ = {
 			isa = XCConfigurationList;
@@ -593,6 +640,7 @@
 				AA9CD5A5141FCFE00064C27A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -34,7 +34,4 @@
    <FileRef
       location = "group:applications/minimal/smartbody-openglES.xcodeproj">
    </FileRef>
-   <FileRef
-      location = "group:applications/ogreIphone/smartbody-ogre.xcodeproj">
-   </FileRef>
 </Workspace>
