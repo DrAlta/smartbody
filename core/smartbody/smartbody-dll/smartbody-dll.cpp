@@ -16,6 +16,15 @@
 #include "sbm/locomotion_cmds.hpp"
 
 
+#ifdef __APPLE__
+#include "TargetConditionals.h"
+#if defined (TARGET_OS_IPHONE)  || defined (TARGET_IPHONE_SIMULATOR)
+#ifndef SBM_IPHONE
+#define SBM_IPHONE
+#endif
+#endif
+#endif
+
 using std::string;
 
 
@@ -421,7 +430,7 @@ SMARTBODY_DLL_API SmartbodyCharacter& Smartbody_dll::GetCharacter( const string 
 
 bool Smartbody_dll::InitVHMsg()
 {
-#ifndef __ANDROID__
+#if !defined(__ANDROID__) && !defined(SBM_IPHONE)
    mcuCBHandle & mcu = mcuCBHandle::singleton();
 
    printf( "Starting VHMsg (DLL side)\n" );

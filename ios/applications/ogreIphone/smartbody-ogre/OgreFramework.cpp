@@ -1,6 +1,6 @@
 #include "OgreFramework.h"
 #include "macUtils.h"
-#include "test.h"
+#include "vhmsg-tt.h"
 
 using namespace Ogre; 
 
@@ -42,9 +42,9 @@ OgreFramework::OgreFramework()
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 #if defined(OGRE_IS_IOS)
-bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener, OIS::MultiTouchListener *pMouseListener)
+bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener, OIS::MultiTouchListener *pMouseListener, Smartbody_dll* sbmdll)
 #else
-bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener, OIS::MouseListener *pMouseListener)
+bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener, OIS::MouseListener *pMouseListener, Smartbody_dll* sbmdll)
 #endif
 {
     new Ogre::LogManager();
@@ -152,6 +152,8 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
     
 	m_pRenderWnd->setActive(true);
     
+    m_sbmDLL = sbmdll;
+    m_timer = NULL;
 	return true;
 }
 
@@ -217,6 +219,8 @@ bool OgreFramework::keyPressed(const OIS::KeyEvent &keyEventRef)
 	}
     
 #endif
+    
+    m_sbmDLL = NULL;
 	return true;
 }
 
@@ -319,103 +323,92 @@ void OgreFramework::updateOgre(double timeSinceLastFrame)
 	m_FrameEvent.timeSinceLastFrame = timeSinceLastFrame;
     m_pTrayMgr->frameRenderingQueued(m_FrameEvent);
     
-    // smartbody update
+    // Smartbody DLL update
+    vhmsg::ttu_poll();
     
-    static double timer = 0.0;
-    timer += 0.016;
-	SBMUpdateX(timer);
-    
-    Ogre::SceneNode* bradNode = (SceneNode *)m_pSceneMgr->getRootSceneNode()->getChild("Brad");
-    Ogre::Entity* bradEnt = (Entity *)bradNode->getAttachedObject("Brad");
-    Ogre::Skeleton* bradSkel = bradEnt->getSkeleton();
-    
-    Ogre::SceneNode* doctorNode = (SceneNode *)m_pSceneMgr->getRootSceneNode()->getChild("Doctor");
-    Ogre::Entity* doctorEnt = (Entity *)doctorNode->getAttachedObject("Doctor");
-    Ogre::Skeleton* doctorSkel = doctorEnt->getSkeleton();    
-    
-    // setup once
-    static bool setupId = true;
-    if (setupId)
+    bool firstTime = false;
+    if (!m_timer)
     {
-        // update bone rotations
-        for (int i = 0; i < bradSkel->getNumBones(); i++)
-        {
-            Ogre::Bone* bradBone = bradSkel->getBone(i);
-            jointNames[i] = bradBone->getName();
-        }
-        numberJoints = bradSkel->getNumBones();
-        setupId = false;
+        m_timer = new vhcl::Timer();
+        firstTime = true;
+    }
+    
+    if (firstTime)
+    {
+        std::string mediaPathCmd = "mediapath " + std::string(m_ResourcePath) + "media";
+        m_sbmDLL->ProcessVHMsgs("sbm", mediaPathCmd.c_str());
+        printf("Loading up sequence file...");
+        std::string seqPathCmd = "path seq sbm/scripts";
+        m_sbmDLL->ProcessVHMsgs("sbm", seqPathCmd.c_str());
+        std::string loadSeqCmd = "seq default-init.seq";
+        m_sbmDLL->ProcessVHMsgs("sbm", loadSeqCmd.c_str());
+    }
+    
+    m_sbmDLL->Update(m_timer->GetTime());
+    
+    SceneNode* sceneNode = m_pSceneMgr->getRootSceneNode();
+    if (!sceneNode)
+        return;
+    
+    // set character position and rotation
+    for ( size_t i = 0; i < m_characterList.size(); i++ )
+    {
+        std::string& name = m_characterList[i];
+        SmartbodyCharacter& c = m_sbmDLL->GetCharacter(name);
+        if (!m_pSceneMgr->hasEntity(name))
+            continue;
         
-        for (int i = 0; i < bradSkel->getNumBones(); i++)
+        Node* node = sceneNode->getChild(name);
+        
+        if (!node)
+            continue;
+        // set character positions& rotations
+        node->setPosition(c.x, c.y, c.z);
+        node->setOrientation(Quaternion(c.rw, c.rx, c.ry, c.rz));
+        
+        // set bone positions& rotations				
+        SceneNode* n = (SceneNode*) sceneNode->getChild(name);
+        Entity * ent = (Entity*)n->getAttachedObject(name);
+        if ( ent == NULL )
+            continue;
+        std::map<std::string, Ogre::Vector3>& intialBonePositionMap = m_initialBonePositions[name];
+        Ogre::Skeleton* skel = ent->getSkeleton();
+        for (size_t jId = 0; jId < c.m_joints.size(); jId++)
         {
-            Ogre::Bone* bradBone = bradSkel->getBone(i);
-            Ogre::Bone* doctorBone = doctorSkel->getBone(i); 
-            bradBone->setManuallyControlled(true);
-            doctorBone->setManuallyControlled(true);            
+            SmartbodyJoint& joint = c.m_joints[jId];
+            std::string& jointName = joint.m_name;
+            if (jointName == "")
+                continue;
+            
+            std::set<std::string>::iterator iter = m_validJointNames.find(jointName);
+            if (iter == m_validJointNames.end())
+            {
+                continue;
+            }
+            
+            try
+            {
+                Ogre::Bone* bone = skel->getBone(jointName);
+                if (bone)
+                {
+                    bone->setManuallyControlled(true);
+                    
+                    Ogre::Vector3& vec = intialBonePositionMap[jointName];
+                    float x = joint.x + vec.x;
+                    float y = joint.y + vec.y;
+                    float z = joint.z + vec.z;
+                    bone->setPosition(x, y, z);
+                    
+                    bone->setOrientation(Quaternion(joint.rw, joint.rx, joint.ry, joint.rz));
+                }
+            }
+            catch (ItemIdentityException&)
+            {
+                //printf("Could not find bone name %s", jointName.c_str());
+            }
         }
-    }
-    
-    // update root joint
-    Ogre::Node* bradCharacter = m_pSceneMgr->getRootSceneNode()->getChild("Brad");
-    Ogre::Node* doctorCharacter = m_pSceneMgr->getRootSceneNode()->getChild("Doctor");
- /*   
-    
-    getJointInfo("brad", characterPosition, boneData, jointNames, numberJoints);
-    bradCharacter->setPosition(characterPosition[0], characterPosition[1], characterPosition[2]);
-    bradCharacter->setOrientation(characterPosition[3], characterPosition[4], characterPosition[5], characterPosition[6]);   
-    for (int i = 0; i < bradSkel->getNumBones(); i++)
-    {
-        Ogre::Bone* bradBone = bradSkel->getBone(i);
-        bradBone->setManuallyControlled(true);
-        bradBone->setOrientation(boneData[i * 4 + 0], boneData[i * 4 + 1], boneData[i * 4 + 2], boneData[i * 4 + 3]);
-    }
-    
-    getJointInfo("doctor", characterPosition, boneData, jointNames, numberJoints);
-    doctorCharacter->setPosition(characterPosition[0], characterPosition[1], characterPosition[2]);
-    doctorCharacter->setOrientation(characterPosition[3], characterPosition[4], characterPosition[5], characterPosition[6]);  
-    for (int i = 0; i < doctorSkel->getNumBones(); i++)
-    {
-        Ogre::Bone* bradBone = doctorSkel->getBone(i);
-        bradBone->setManuallyControlled(true);
-        bradBone->setOrientation(boneData[i * 4 + 0], boneData[i * 4 + 1], boneData[i * 4 + 2], boneData[i * 4 + 3]);
+        
     }  
- */
-    float x, y, z, qw, qx, qy, qz;
-    getCharacterWo("brad", x, y, z, qw, qx, qy, qz);
-    bradCharacter->setPosition(x, y, z);
-    bradCharacter->setOrientation(Quaternion(qw, qx, qy, qz));  
-    getCharacterWo("doctor", x, y, z, qw, qx, qy, qz);   
-    doctorCharacter->setPosition(x, y, z);
-    doctorCharacter->setOrientation(Quaternion(qw, qx, qy, qz)); 
-    
-    // update bone rotations
-    for (int i = 0; i < bradSkel->getNumBones(); i++)
-    {
-        Ogre::Bone* bradBone = bradSkel->getBone(i);
-        Ogre::Bone* doctorBone = doctorSkel->getBone(i);
-        if (bradBone && doctorBone)
-        {
-    //        bradBone->setManuallyControlled(true);
-    //        doctorBone->setManuallyControlled(true);
-            float q = 1;
-            float x = 0;
-            float y = 0;
-            float z = 0;
-            Quaternion quat;
-            getJointRotation("brad", bradBone->getName().c_str(), q, x, y, z);
-            quat.w = q;
-            quat.x = x;
-            quat.y = y;
-            quat.z = z;
-            bradBone->setOrientation(quat);
-            getJointRotation("doctor", doctorBone->getName().c_str(), q, x, y, z);
-            quat.w = q;
-            quat.x = x;
-            quat.y = y;
-            quat.z = z;            
-            doctorBone->setOrientation(quat);
-        }       
-    }
     
 }
 

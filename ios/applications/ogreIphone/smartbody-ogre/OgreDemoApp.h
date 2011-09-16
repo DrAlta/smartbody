@@ -3,6 +3,16 @@
 #ifndef OGRE_DEMO_H
 #define OGRE_DEMO_H
 
+#include "vhcl.h"
+#include "bonebus.h"
+#include "vhmsg-tt.h"
+
+#include <string>
+#include <map>
+
+#include <Ogre.h>
+#include "SBListener.h"
+
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 #include "OgreFramework.h"
@@ -78,7 +88,8 @@ protected:
 };
 #endif
 
-class DemoApp : public OIS::KeyListener
+class SBListener;
+class DemoApp : public OIS::KeyListener, public SmartbodyListener
 {
 public:
 	DemoApp();
@@ -89,12 +100,19 @@ public:
 	bool keyPressed(const OIS::KeyEvent &keyEventRef);
 	bool keyReleased(const OIS::KeyEvent &keyEventRef);
     
+    OgreFramework* getOgreFramework();
+    Ogre::SceneManager* getSceneManager();
+    
 private:
     void setupDemoScene();
 	void runDemo();
     bool initializeRTShaderSystem(Ogre::SceneManager* sceneMgr);
     void finalizeRTShaderSystem();
-
+    
+    void setupSmartbody();
+    static void tt_client_callback( const char * op, const char * args, void * user_data );
+    
+private:
 	Ogre::SceneNode*			m_pCubeNode;
 	Ogre::Entity*				m_pCubeEntity;
     
@@ -103,7 +121,10 @@ private:
     Ogre::RTShader::ShaderGenerator*			mShaderGenerator;			// The Shader generator instance.
     ShaderGeneratorTechniqueResolverListener*	mMaterialMgrListener;		// Shader generator material manager listener.	
 #endif // USE_RTSHADER_SYSTEM
-
+    
+// SBM DLL setup
+    Smartbody_dll* m_sbm;
+    SBListener* m_sbListener;
 };
 
 //|||||||||||||||||||||||||||||||||||||||||||||||

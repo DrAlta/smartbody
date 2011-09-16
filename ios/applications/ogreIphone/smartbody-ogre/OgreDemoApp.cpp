@@ -6,6 +6,8 @@ DemoApp::DemoApp()
 {
 	m_pCubeNode		= 0;
 	m_pCubeEntity   = 0;
+    m_sbm = NULL;
+    m_sbListener = NULL;
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
@@ -19,6 +21,12 @@ DemoApp::~DemoApp()
 #endif
     
     delete OgreFramework::getSingletonPtr();
+    
+ 	// Send vrProcEnd message to ActiveMQ
+	vhmsg::ttu_notify2( "vrProcEnd", "renderer" );
+    
+	// Close ActiveMQ
+	vhmsg::ttu_close();   
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
@@ -107,8 +115,10 @@ void DemoApp::finalizeRTShaderSystem()
 
 void DemoApp::startDemo()
 {
+    setupSmartbody();    
+    
 	new OgreFramework();
-	if(!OgreFramework::getSingletonPtr()->initOgre("DemoApp v1.0", this, 0))
+	if(!OgreFramework::getSingletonPtr()->initOgre("DemoApp v1.0", this, 0, m_sbm))
 		return;
     
 	m_bShutdown = false;
@@ -154,15 +164,7 @@ void DemoApp::startDemo()
 
 void DemoApp::setupDemoScene()
 {
-    MCUInitialize();
-    std::string command = "load skeletons -R \"" + OgreFramework::getSingletonPtr()->m_ResourcePath + "media/sbm\"";
-    OgreFramework::getSingletonPtr()->m_pLog->logMessage(command.c_str());
-    SBMExecuteCmd(command.c_str());
-    std::string command1 = "load motions -R \"" + OgreFramework::getSingletonPtr()->m_ResourcePath + "media/sbm\"";
-    OgreFramework::getSingletonPtr()->m_pLog->logMessage(command1.c_str());
-    SBMExecuteCmd(command1.c_str());    
-    SBMInitialize("");
-	OgreFramework::getSingletonPtr()->m_pSceneMgr->setSkyBox(true, "Examples/SceneSkyBox1");
+    OgreFramework::getSingletonPtr()->m_pSceneMgr->setSkyBox(true, "Examples/SceneSkyBox1");
     
     OgreFramework::getSingletonPtr()->m_pSceneMgr->setShadowTechnique( Ogre::SHADOWTYPE_TEXTURE_MODULATIVE );
 //	OgreFramework::getSingletonPtr()->m_pSceneMgr->setShadowTextureSize( 4048 );
@@ -223,7 +225,8 @@ void DemoApp::setupDemoScene()
 	m_pCubeEntity = OgreFramework::getSingletonPtr()->m_pSceneMgr->createEntity("world_entity_vh","VH_Defaultlevel_Ogre.mesh");
 	m_pCubeNode->attachObject(m_pCubeEntity);
 	m_pCubeNode->setVisible(true);    
-    
+ 
+    /*
     m_pCubeEntity = OgreFramework::getSingletonPtr()->m_pSceneMgr->createEntity("Brad", "Brad.mesh");
     m_pCubeNode = OgreFramework::getSingletonPtr()->m_pSceneMgr->getRootSceneNode()->createChildSceneNode("Brad");
     m_pCubeNode->attachObject(m_pCubeEntity);
@@ -231,18 +234,52 @@ void DemoApp::setupDemoScene()
     m_pCubeEntity = OgreFramework::getSingletonPtr()->m_pSceneMgr->createEntity("Doctor", "Brad.mesh");
     m_pCubeNode = OgreFramework::getSingletonPtr()->m_pSceneMgr->getRootSceneNode()->createChildSceneNode("Doctor");
     m_pCubeNode->attachObject(m_pCubeEntity);
-    
-    Ogre::Node* node = OgreFramework::getSingletonPtr()->m_pSceneMgr->getRootSceneNode()->getChild("Brad");
-    if (node)
-        node->setPosition(-35, 102, 0);   
-    node = OgreFramework::getSingletonPtr()->m_pSceneMgr->getRootSceneNode()->getChild("Doctor");
-    if (node)
-        node->setPosition(35, 102, 0);   
+    */
+}
 
+void DemoApp::setupSmartbody()
+{
+    vhmsg::ttu_set_client_callback(&DemoApp::tt_client_callback, this);
+    const char* serverName = "172.16.33.21";
+    const char* scope = "DEFAULT_SCOPE";
+    const char* port = "61616";  
+	int err = vhmsg::ttu_open(serverName,scope,port); 
+	if ( err != vhmsg::TTU_SUCCESS )
+	{
+		printf("%s", "ttu_open failed!\n" );
+	}
+    else
+    {
+        printf("%s", "ttu_open success!\n");
+    }
     
-//	m_pCubeEntity = OgreFramework::getSingletonPtr()->m_pSceneMgr->createEntity("Cube", "ogrehead.mesh");
-//	m_pCubeNode = OgreFramework::getSingletonPtr()->m_pSceneMgr->getRootSceneNode()->createChildSceneNode("CubeNode");
-//	m_pCubeNode->attachObject(m_pCubeEntity);
+	// Register with ActiveMQ
+	vhmsg::ttu_register( "vrAllCall" );
+	vhmsg::ttu_register( "vrKillComponent" );
+    
+	// Send vrComponent message to ActiveMQ
+	vhmsg::ttu_notify2( "vrComponent", "renderer Ogre" );   
+	vhmsg::ttu_notify2( "vrComponent", "Lauching Ogre" );
+    vhmsg::ttu_register( "vrAllCall" );
+    vhmsg::ttu_register( "vrKillComponent" );
+    vhmsg::ttu_register( "sbm" );
+    vhmsg::ttu_register( "vrAgentBML" );
+    vhmsg::ttu_register( "vrSpeak" );
+    vhmsg::ttu_register( "vrExpress" );
+    vhmsg::ttu_register( "vrSpoke" );
+    vhmsg::ttu_register( "RemoteSpeechReply" );
+    vhmsg::ttu_register( "PlaySound" );
+    vhmsg::ttu_register( "StopSound" );
+    vhmsg::ttu_register( "CommAPI" );
+    vhmsg::ttu_register( "object-data" );
+    vhmsg::ttu_register( "wsp" );
+    
+    m_sbListener = new SBListener(this);
+    m_sbm = new Smartbody_dll;
+    m_sbm->Init();
+    m_sbm->SetListener(m_sbListener);
+    
+    
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
@@ -322,3 +359,20 @@ bool DemoApp::keyReleased(const OIS::KeyEvent &keyEventRef)
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
+
+OgreFramework* DemoApp::getOgreFramework()
+{
+    return OgreFramework::getSingletonPtr();
+}
+
+Ogre::SceneManager* DemoApp::getSceneManager()
+{
+    return OgreFramework::getSingletonPtr()->m_pSceneMgr;
+}
+
+
+void DemoApp::tt_client_callback( const char * op, const char * args, void * user_data )
+{
+    DemoApp * app = (DemoApp *)user_data;    
+    app->m_sbm->ProcessVHMsgs(op, args);
+}
