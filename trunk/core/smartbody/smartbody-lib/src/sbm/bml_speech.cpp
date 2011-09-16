@@ -72,6 +72,8 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	std::string localId;
 	xml_utils::xml_translate(&localId, id);
 
+	request->localId = localId;
+
 	vector<SpeechMark> marks;  // Ordered list of named bookmarks
 
 	// Parse <speech> for sync points
