@@ -61,28 +61,47 @@ class CrabCanonDialogue : public Dialogue
 	public:
 		CrabCanonDialogue() : Dialogue()
 		{
+			//0
 			_lines.push_back(std::pair<std::string, std::string>("Tortoise", "Good day, Mr. A."));
+			//1
 			_lines.push_back(std::pair<std::string, std::string>("Achilles", "Why, same to you"));
+			//2
 			_lines.push_back(std::pair<std::string, std::string>("Tortoise", "So nice to run into you."));
+			//3
 			_lines.push_back(std::pair<std::string, std::string>("Achilles", "That echoes my thoughts."));
+			//4
 			_lines.push_back(std::pair<std::string, std::string>("Tortoise", "And it's a perfect day for a walk. I think I'll be walking home soon."));
+			//5
 			_lines.push_back(std::pair<std::string, std::string>("Achilles", "Oh, really? I guess there's nothing better for you than walking."));
+			//6
 			_lines.push_back(std::pair<std::string, std::string>("Tortoise", "Incidentally, you're looking in fine fettle these days, I must say."));
+			//7
 			_lines.push_back(std::pair<std::string, std::string>("Achilles", "Thank you very much."));
+			//8
 			_lines.push_back(std::pair<std::string, std::string>("Tortoise", "Not at all. Here, care for one of my cigars?"));
+			//9
 			_lines.push_back(std::pair<std::string, std::string>("Achilles", "Oh, you are such a philistine. In this area, the Dutch contributions are of markedly inferior taste, don't you think?"));
+			//10
 			_lines.push_back(std::pair<std::string, std::string>("Tortoise", "I disagree, in this case. But speaking of taste, I finally saw that \
     Crab Canon by your favorite artist, M.C. Escher, in a gallery the other \
     day, and I fully appreciate the beauty and ingenuity with which he \
     made one single theme mesh with itself going both backwards and \
     forwards. But I am afraid I will always feel Bach is superior to Escher."));
+			//11
 			_lines.push_back(std::pair<std::string, std::string>("Achilles", "I don't know. But one thing for certain is that I don't worry about arguments of taste. De gustibus non est disputandum."));
+			//12
 			_lines.push_back(std::pair<std::string, std::string>("Tortoise", "Tell me, what's it like to be your age? Is it true that one has no worries at all?"));
+			//13
 			_lines.push_back(std::pair<std::string, std::string>("Achilles", " To be precise one has no frets."));
+			//14
 			_lines.push_back(std::pair<std::string, std::string>("Tortoise", "Oh, well, it's all the same to me."));
+			//15
 			_lines.push_back(std::pair<std::string, std::string>("Achilles", "Fiddle. It makes a big difference, you know."));
+			//16
 			_lines.push_back(std::pair<std::string, std::string>("Tortoise", "Say, don't you play the guitar?"));
+			//17
 			_lines.push_back(std::pair<std::string, std::string>("Achilles", "That's my good friend. He often plays, the fool. But I myself wouldn't touch a guitar with a ten-foot pole."));
+			//18
 			_lines.push_back(std::pair<std::string, std::string>("Crab", " Hallo! Hullo! What's up? What's new? You see this bump, this \
     from Warsaw - a collosal bear of a man -  playing a lute. He was three \
     meters tall, if I'm a day. I mosey on up to the chap, reach skyward and \
@@ -131,6 +150,9 @@ public:
 	WorldState()
 	{
 		_dialogue = NULL;
+		useNVBG = false;
+		_curMsgId = 0;
+		feedbackToggle = true;
 	}
 
 	void setDialogue(Dialogue* dialogue)
@@ -143,11 +165,21 @@ public:
 		return _dialogue;
 	}
 
+	std::string getUniqueMessageId()
+	{
+		std::stringstream strstr;
+		strstr << _curMsgId;
+		_curMsgId++;
+		return strstr.str();
+	}
+
 	Dialogue* _dialogue;
 	std::set<std::string> characters;
 	std::string role;
 	std::string curCharacter;
-
+	bool useNVBG;
+	int _curMsgId;
+	bool feedbackToggle;
 };
 
 
@@ -206,12 +238,7 @@ void tt_client_callback( const char * op, const char * args, void * user_data )
 		}
 		
 	}
-	else if (message == "<blockstart")
-	{
-		// do nothing for now
-		return;
-	}
-	else if (message == "<blockend")
+	else if (message == "<blockend" || message == "<blockstart")
 	{
 		std::vector<std::string> tokens;
 		vhcl::Tokenize(messageArgs, tokens, " ");
@@ -259,26 +286,92 @@ void tt_client_callback( const char * op, const char * args, void * user_data )
 					int lineNum = atoi(sentenceStr.c_str());
 					// determine who is speaking that line
 					Dialogue* dialogue = world.getDialogue();
-					if (dialogue && (lineNum > 0) && (dialogue->getNumLines() > lineNum) )
+					if (dialogue && (lineNum >= 0) && (dialogue->getNumLines() > lineNum) )
 					{
 						std::string role;
+						const std::string& utterance = dialogue->getLine(lineNum, role);
+
+						std::string nextRole;
 						int nextLine = lineNum + 1;
 						if (nextLine == dialogue->getNumLines())
 							nextLine = 0;
-						const std::string& utterance = dialogue->getLine(nextLine, role); 
-						if (role == world.role)
+						const std::string& nextUtterance = dialogue->getLine(nextLine, nextRole);
+						if (message == "<blockend")
 						{
-							std::cout << "Uttering next line of dialogue..." << std::endl;
-							std::stringstream strstr;
-							/*
-							strstr << "bml char " << world.curCharacter << " speech " << utterance;
-							vhmsg::ttu_notify2( "sbm", strstr.str().c_str());
-							*/
-							// until SmartBody is working, just relay the blockstart/blockend messages
-							strstr << "<blockstart characterId=\"" << world.curCharacter << "\" id=\"sentence_" << nextLine << "\"/>";
-							vhmsg::ttu_notify2(strstr.str().c_str(), "");
-							strstr << "<blockend characterId=\"" << world.curCharacter << "\" id=\"sentence_" << nextLine << "\"/>";
-							vhmsg::ttu_notify2(strstr.str().c_str(), "");
+							if (nextRole == world.role)
+							{
+								std::cout << "Uttering next line of dialogue..." << std::endl;
+								std::stringstream strstr;
+
+								if (world.useNVBG)
+								{
+									strstr << world.curCharacter << " " << nextRole << " 1315" << world.getUniqueMessageId() << "986930094-7-1 ";
+									strstr << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>";
+									strstr << "<act><participant id=\"" << world.curCharacter << "\" role=\"actor\" />";
+									strstr << "<fml><turn start=\"take\" end=\"give\" /><affect type=\"neutral\" target=\"addressee\"></affect>";
+									strstr << "<culture type=\"neutral\"></culture><personality type=\"neutral\"></personality></fml>";
+									//strstr << "<bml><speech id=\"sentence_" << nextLine << "\" ref=\"self_virtualchar\" type=\"application/ssml+xml\">";
+									strstr << "<bml><speech id=\"sentence_" << nextLine << "\" ref=\"self_virtualchar\" type=\"application/ssml+xml\">";
+									strstr << nextUtterance;
+									strstr << "</speech></bml></act>"; 
+									vhmsg::ttu_notify2("vrExpress",  strstr.str().c_str());
+								}
+								else
+								{
+									strstr << "bml char " << world.curCharacter << \
+										" <speech id=\"sentence_" << nextLine << "\" type=\"text/plain\">" << nextUtterance << "</speech>";
+									vhmsg::ttu_notify2( "sbm", strstr.str().c_str());
+								}
+							}
+						}
+						else // blockstart
+						{
+							if (role == world.role)
+							{ // running utterance, NVBG is handling this
+							}
+							else
+							{ // other character is speaking, implement listener behavior
+
+								// simple backchannelling
+								std::stringstream strstr;
+								if (world.feedbackToggle)
+								{
+									strstr << "bml char " << world.curCharacter << " <gaze target=\"" << role << "\" sbm:joint-range=\"HEAD EYES\" angle=\"5\" direction=\"UP\"/><head type=\"NOD\" start=\"2\" repeats=\"2\"/>";
+									world.feedbackToggle = false;
+								}
+								else
+								{
+									strstr << "bml char " << world.curCharacter << " <gaze target=\"" << role << "\" sbm:joint-range=\"HEAD EYES\" angle=\"30\" direction=\"DOWN\"/><head amount=\"0.5\" end=\"2.4\" relax=\"1.2\" repeats=\"2\" start=\"1\" type=\"SHAKE\"/><face type=\"FACS\" au=\"4\" side=\"BOTH\" start=\".3\" ready=\".5\" relax=\"1.5\" end=\"1.8\"/>";
+									world.feedbackToggle = true;
+								}
+								vhmsg::ttu_notify2("sbm",  strstr.str().c_str());
+
+
+								/*
+								std::stringstream strstr;
+								strstr << world.curCharacter << " " << nextRole << " 1315" << world.getUniqueMessageId() << "986930094-7-1 ";
+								strstr << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>";
+								strstr << "<act>";
+								strstr << "<participant id=\"" << world.curCharacter << "\" role=\"actor\" />";
+								strstr << "<fml>";
+								strstr << "<listenerFeedback  speaker=\"" + role;
+								// vary between positive and negative feedback
+								std::string speakerFeedback = "positive";
+								if (world.feedbackToggle)
+								{
+									speakerFeedback = "negative";
+									world.feedbackToggle = false;
+								}
+								else
+								{
+									world.feedbackToggle = true;
+								}
+								strstr << "polarity=\"positive\" agreement=\"" << speakerFeedback << "\" uttid=\"sentence_" << lineNum << "\"/>";  
+								strstr << "</fml>"; 
+								strstr << "</act>";
+								vhmsg::ttu_notify2("vrExpress",  strstr.str().c_str());
+								*/
+							}
 						}
 					}
 				}
@@ -323,6 +416,16 @@ int main( int argc, char * argv[] )
    if (argc > 2)
    {
 	   world.role = argv[2];
+   }
+   else
+   {
+	   world.role = "Tortoise";
+   }
+
+   if (argc > 3)
+   {
+	   if (strcmp(argv[3], "true") == 0)
+		  world.useNVBG = true;
    }
    else
    {
