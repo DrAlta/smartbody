@@ -52,11 +52,11 @@ class EventManager
 		~EventManager();
 
 		void handleEvent(Event* e, double time);
-		void addEventHandler(std::string type, EventHandler* handle);
-		void removeEventHandler(std::string type);
+		void addEventHandler(const std::string& type, EventHandler* handle);
+		void removeEventHandler(const std::string& type);
 		int getNumEventHandlers();
 		EventHandler* getEventHandlerByIndex(int num);
-		EventHandler* getEventHandler(std::string type);
+		EventHandler* getEventHandler(const std::string& type);
 		static EventManager* getEventManager();
 		EventHandlerMap& getEventHandlers() { return eventHandlers; }
 

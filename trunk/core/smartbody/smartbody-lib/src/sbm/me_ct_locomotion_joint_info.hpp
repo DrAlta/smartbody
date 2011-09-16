@@ -108,7 +108,7 @@ struct MeCtLocomotionJointInfo
 		joints_indexed = false;
 	}
 
-	int get_index_by_name(std::string name)
+	int get_index_by_name(const std::string& name)
 	{
 		for(size_t i = 0; i < joint_name.size(); ++i)
 		{

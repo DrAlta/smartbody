@@ -364,7 +364,7 @@ void MeCtReachEngine::updateSkeletonCopy()
 		skeletonCopy->root()->pos()->value(i,skeletonRef->root()->pos()->value(i));
 }
 
-ReachStateInterface* MeCtReachEngine::getState( std::string stateName )
+ReachStateInterface* MeCtReachEngine::getState( const std::string& stateName )
 {
 	return stateTable[stateName];
 }
@@ -500,7 +500,7 @@ std::string MeCtReachEngine::getReachTypeTag()
 	return ReachTypeTag[reachType];
 }
 
-int MeCtReachEngine::getReachType( std::string tag )
+int MeCtReachEngine::getReachType( const std::string& tag )
 {
 	for (int i=0;i<REACH_TYPE_SIZE;i++)
 	{

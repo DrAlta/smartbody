@@ -294,17 +294,17 @@ class mcuCBHandle {
 
 		std::map<std::string, SbmPawn*>& getPawnMap();
 		bool addPawn(SbmPawn* pawn);
-		void removePawn(std::string name);
-		SbmPawn* getPawn(std::string name);
+		void removePawn(const std::string& name);
+		SbmPawn* getPawn(const std::string& name);
 		int getNumPawns();
 
 		std::map<std::string, SbmCharacter*>& getCharacterMap();
 		bool addCharacter(SbmCharacter* character);
-		void removeCharacter(std::string name);
-		SbmCharacter* getCharacter(std::string name);
+		void removeCharacter(const std::string& name);
+		SbmCharacter* getCharacter(const std::string& name);
 		int getNumCharacters();
 
-		SkMotion* getMotion(std::string motionName);
+		SkMotion* getMotion(const std::string& motionName);
 
 protected:
 		std::map<std::string, SbmPawn*>	pawn_map;

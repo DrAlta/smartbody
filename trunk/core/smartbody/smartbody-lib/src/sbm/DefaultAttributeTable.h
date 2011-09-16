@@ -27,13 +27,13 @@ public:
 	DefaultAttributeTable(void);
 	~DefaultAttributeTable(void);
 
-	void addDefaultAttributeDouble(std::string name, double defaultValue, double* varPtr = NULL);
-	void addDefaultAttributeFloat(std::string name, float defaultValue, float* varPtr = NULL);
-	void addDefaultAttributeInt(std::string name, int defaultValue, int* varPtr = NULL);
-	void addDefaultAttributeBool(std::string name, bool defaultValue, bool* varPtr = NULL);
-	void addDefaultAttributeString(std::string name, std::string defaultValue, std::string* varPtr = NULL);
-	void addDefaultAttributeVec3(std::string name, SrVec& defaultValue, SrVec* varPtr = NULL);
-	void addDefaultAttributeMatrix(std::string name, SrMat& defaultValue, SrMat* varPtr = NULL);
+	void addDefaultAttributeDouble(const std::string& name, double defaultValue, double* varPtr = NULL);
+	void addDefaultAttributeFloat(const std::string& name, float defaultValue, float* varPtr = NULL);
+	void addDefaultAttributeInt(const std::string& name, int defaultValue, int* varPtr = NULL);
+	void addDefaultAttributeBool(const std::string& name, bool defaultValue, bool* varPtr = NULL);
+	void addDefaultAttributeString(const std::string& name, const std::string& defaultValue, std::string* varPtr = NULL);
+	void addDefaultAttributeVec3(const std::string&name, SrVec& defaultValue, SrVec* varPtr = NULL);
+	void addDefaultAttributeMatrix(const std::string& name, SrMat& defaultValue, SrMat* varPtr = NULL);
 
 	std::vector<AttributeVarPair>& getDefaultAttributes();	
 };

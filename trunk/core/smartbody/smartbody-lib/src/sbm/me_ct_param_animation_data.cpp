@@ -63,7 +63,7 @@ PAStateData::PAStateData(PAStateData* data)
 }
 
 
-PAStateData::PAStateData(std::string name)
+PAStateData::PAStateData(const std::string& name)
 {
 	stateName = name;
 	cycle = false;
@@ -101,11 +101,11 @@ int PAStateData::getNumKeys()
 		return 0;
 }
 
-int PAStateData::getMotionId(std::string motion)
+int PAStateData::getMotionId(const std::string& motion)
 {
 	for (int i = 0; i < getNumMotions(); i++)
 	{
-		std::string mName = motions[i]->name();
+		const std::string& mName = motions[i]->name();
 		if (motion == mName)
 			return i;
 	}
@@ -554,7 +554,7 @@ void ParameterManager::getParameter(float& x, float& y, float& z)
 	}
 }
 
-void ParameterManager::addParameter(std::string motion, double x)
+void ParameterManager::addParameter(const std::string& motion, double x)
 {
 	SrVec vec;
 	vec.x = (float)x;
@@ -563,7 +563,7 @@ void ParameterManager::addParameter(std::string motion, double x)
 	type = 0;
 }
 
-void ParameterManager::addParameter(std::string motion, double x, double y)
+void ParameterManager::addParameter(const std::string& motion, double x, double y)
 {
 	SrVec vec;
 	vec.x = (float)x;
@@ -573,7 +573,7 @@ void ParameterManager::addParameter(std::string motion, double x, double y)
 	type = 1;
 }
 
-void ParameterManager::addParameter(std::string motion, double x, double y, double z)
+void ParameterManager::addParameter(const std::string& motion, double x, double y, double z)
 {
 	SrVec vec;
 	vec.x = (float)x;
@@ -584,7 +584,7 @@ void ParameterManager::addParameter(std::string motion, double x, double y, doub
 	type = 2;
 }
 
-void ParameterManager::addTriangle(std::string motion1, std::string motion2, std::string motion3)
+void ParameterManager::addTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3)
 {
 	TriangleInfo tInfo;
 	SrVec v1 = getVec(motion1);
@@ -597,7 +597,7 @@ void ParameterManager::addTriangle(std::string motion1, std::string motion2, std
 	triangles.push_back(tInfo);
 }
 
-void ParameterManager::addTetrahedron(std::string motion1, std::string motion2, std::string motion3, std::string motion4)
+void ParameterManager::addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4)
 {
 	TetrahedronInfo tetraInfo;
 	tetraInfo.v1 = getVec(motion1);
@@ -715,7 +715,7 @@ int ParameterManager::getMaxVecY()
 	return ret;
 }
 
-SrVec ParameterManager::getVec(std::string motion)
+SrVec ParameterManager::getVec(const std::string& motion)
 {
 	for (int i = 0; i < getNumParameters(); i++)
 	{
@@ -750,7 +750,7 @@ const std::string& ParameterManager::getMotionName(int id)
 	return motionNames[id];	
 }
 
-int ParameterManager::getMotionId(std::string name)
+int ParameterManager::getMotionId(const std::string& name)
 {
 	for (int i = 0; i < getNumParameters(); i++)
 	{

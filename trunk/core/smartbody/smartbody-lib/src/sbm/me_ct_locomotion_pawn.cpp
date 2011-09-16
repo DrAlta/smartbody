@@ -114,13 +114,13 @@ SrArray<MeCtLocomotionLimb*>* MeCtLocomotionPawn::get_limb_list()
 	return &limb_list;
 }
 
-void MeCtLocomotionPawn::set_translation_joint_name(std::string name)
+void MeCtLocomotionPawn::set_translation_joint_name(const std::string& name)
 {
 	translation_joint_name = name;
 	navigator.set_translation_joint_name(translation_joint_name);
 }
 
-void MeCtLocomotionPawn::set_base_name(std::string name)
+void MeCtLocomotionPawn::set_base_name(const std::string& name)
 {
 	base_name = name;
 }

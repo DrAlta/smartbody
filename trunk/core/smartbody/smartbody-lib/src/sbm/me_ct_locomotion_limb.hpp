@@ -111,7 +111,7 @@ public:
 	void	init_skeleton(SkSkeleton* standing_skeleton, SkSkeleton* walking_skeleton);
 
 	int		add_support_joint(char* joint_name);
-	int		set_limb_base(std::string name);
+	int		set_limb_base(const std::string& name);
 
 	int		get_descendant_num(SkJoint* joint);
 	int		get_support_joint_num();

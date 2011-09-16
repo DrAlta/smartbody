@@ -117,7 +117,7 @@ public:
 	/**
 	 *  Locates a controller by its handle.
 	 */
-	virtual MeController* findControllerByHandle(std::string handle) = 0;
+	virtual MeController* findControllerByHandle(const std::string& handle) = 0;
 
 
 	/**

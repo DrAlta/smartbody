@@ -89,7 +89,7 @@ class MeCtParamAnimation : public MeCtContainer
 		const std::string& getCurrentStateName();
 		const std::string& getNextStateName();
 		PAStateData* getCurrentPAStateData();
-		bool hasPAState(std::string stateName);
+		bool hasPAState(const std::string& stateName);
 		bool isIdle();
 
 	private:

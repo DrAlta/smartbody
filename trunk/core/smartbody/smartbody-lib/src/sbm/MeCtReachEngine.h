@@ -99,10 +99,10 @@ public:
 	void init(int rtype, SkJoint* effectorJoint);
 	void updateMotionExamples(const MotionDataSet& inMotionSet);
 	void solveIK(ReachStateData* rd, BodyMotionFrame& outFrame );
-	static int getReachType(std::string tag);
+	static int getReachType(const std::string& tag);
 protected:
 	void updateSkeletonCopy();
-	ReachStateInterface* getState(std::string stateName);
+	ReachStateInterface* getState(const std::string& stateName);
 	SkJoint* findRootJoint(SkSkeleton* sk);
 	DataInterpolator* createInterpolator();
 	ResampleMotion*   createInterpMotion();	

@@ -211,7 +211,7 @@ public:
 
 	void set_enabled(bool enable){enabled = enable;}
 
-	void print_info(std::string name);
+	void print_info(const std::string& name);
 
 	void set_balance_factor(float factor);
 

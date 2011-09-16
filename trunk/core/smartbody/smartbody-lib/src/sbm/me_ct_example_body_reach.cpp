@@ -66,7 +66,7 @@ MeCtExampleBodyReach::~MeCtExampleBodyReach( void )
 
 }
 
-void MeCtExampleBodyReach::setDefaultReachType( std::string reachTypeName )
+void MeCtExampleBodyReach::setDefaultReachType( const std::string& reachTypeName )
 {
 	defaultReachType = MeCtReachEngine::getReachType(reachTypeName);	
 }

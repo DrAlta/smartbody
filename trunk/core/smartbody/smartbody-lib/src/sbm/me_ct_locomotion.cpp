@@ -1225,7 +1225,7 @@ SrVec MeCtLocomotion::get_facing_vector()
 	return direction;
 }
 
-void MeCtLocomotion::print_info(std::string name)
+void MeCtLocomotion::print_info(const std::string& name)
 {
 	LOG("Locomotion status of character: %s", name.c_str());
 	LOG("Animations loaded:");

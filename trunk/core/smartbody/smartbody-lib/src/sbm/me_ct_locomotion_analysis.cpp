@@ -203,7 +203,7 @@ void MeCtLocomotionAnalysis::init(SkMotion* standing, srPathList &me_paths) //te
 	standing_initialized = true;
 }
 
-int MeCtLocomotionAnalysis::get_descendant_num(std::string base_name)
+int MeCtLocomotionAnalysis::get_descendant_num(const std::string& base_name)
 {
 	//motion_locomotion->connect(walking_skeleton);
 	SkJoint* base = walking_skeleton->search_joint(base_name.c_str());

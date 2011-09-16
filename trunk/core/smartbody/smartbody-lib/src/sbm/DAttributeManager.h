@@ -11,8 +11,8 @@ class DAttributeManager : public DSubject
 		DAttributeManager();
 		~DAttributeManager();
 
-		void addGroup(std::string name);
-		DAttributeGroup* getGroup(std::string name, bool createIfNotFound = false);
+		void addGroup(const std::string& name);
+		DAttributeGroup* getGroup(const std::string& name, bool createIfNotFound = false);
 		std::map<std::string, DAttributeGroup*>& getGroups();
 		std::vector<DAttributeGroup*>& getAttributeGroups();
 

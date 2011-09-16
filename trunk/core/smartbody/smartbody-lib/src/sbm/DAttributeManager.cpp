@@ -15,7 +15,7 @@ DAttributeManager::~DAttributeManager()
 	}
 }
 
-void DAttributeManager::addGroup(std::string name)
+void DAttributeManager::addGroup(const std::string& name)
 {
 	for (std::map<std::string, DAttributeGroup*>::iterator iter = m_groups.begin();
 		 iter != m_groups.end();
@@ -30,7 +30,7 @@ void DAttributeManager::addGroup(std::string name)
 	resortGroups();
 }
 
-DAttributeGroup* DAttributeManager::getGroup(std::string name, bool createIfNotFound)
+DAttributeGroup* DAttributeManager::getGroup(const std::string& name, bool createIfNotFound)
 {
 	for (std::map<std::string, DAttributeGroup*>::iterator iter = m_groups.begin();
 		 iter != m_groups.end();
