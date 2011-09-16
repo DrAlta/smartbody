@@ -67,6 +67,11 @@
 
 #include <SdkTrays.h>
 
+
+#include "vhcl.h"
+#include "bonebus.h"
+#include "smartbody-dll.h"
+
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 #ifdef OGRE_IS_IOS
@@ -80,9 +85,9 @@ public:
 	~OgreFramework();
     
 #ifdef OGRE_IS_IOS
-    bool initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener = 0, OIS::MultiTouchListener *pMouseListener = 0);
+    bool initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener = 0, OIS::MultiTouchListener *pMouseListener = 0, Smartbody_dll* sbmdll = 0);
 #else
-	bool initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener = 0, OIS::MouseListener *pMouseListener = 0);
+	bool initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener = 0, OIS::MouseListener *pMouseListener = 0, Smartbody_dll* sbmdll = 0);
 #endif
 	void updateOgre(double timeSinceLastFrame);
 	void moveCamera();
@@ -120,11 +125,13 @@ public:
 	OIS::Mouse*					m_pMouse;
 #endif
     
-    // skeleton info
-    std::string jointNames[200];
-    float characterPosition[7];
-    float boneData[800];        // quaternion data
-    int numberJoints;
+public:
+    Smartbody_dll* m_sbmDLL;
+    vhcl::Timer* m_timer;
+    std::vector<std::string> m_initialCommands;
+    std::vector<std::string>	m_characterList;
+    std::map<std::string, std::map<std::string, Ogre::Vector3> > m_initialBonePositions;
+    std::set<std::string> m_validJointNames;
     
 public:
    // Added for Mac compatibility

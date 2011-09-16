@@ -7,8 +7,8 @@
 //
 
 #include "InputViewController.h"
-#include "test.h"
 #include "OgreFramework.h"
+#include "vhmsg-tt.h"
 using namespace Ogre; 
 
 @implementation InputViewController
@@ -93,45 +93,6 @@ using namespace Ogre;
                 OgreFramework::getSingletonPtr()->m_pCamera->setFOVy(Ogre::Radian(camera));
         } break;
     }    
- /*   
-    NSSet *allTouches = [event allTouches];
-    UITouch *touch = [[allTouches allObjects] objectAtIndex:0];
-    switch ([touch tapCount])    
-    {
-        case 1:
-            {
-                UITouch *touch = [[touches allObjects] objectAtIndex:0];
-                CGPoint currentLoc = [touch locationInView:self];
-                CGPoint prevLoc = [touch previousLocationInView:self];
-                float origTransX = currentLoc.x - prevLoc.x;
-                float origTransY = currentLoc.y - prevLoc.y;
-                OgreFramework::getSingletonPtr()->m_pCamera->yaw(Degree(origTransX * -0.1));
-                OgreFramework::getSingletonPtr()->m_pCamera->pitch(Degree(origTransY * -0.1));        
-            }
-            break;
-        case 2:
-            {
-                UITouch *touch1 = [[touches allObjects] objectAtIndex:0];
-                CGPoint currentLoc1 = [touch1 locationInView:self];
-                CGPoint prevLoc1 = [touch1 previousLocationInView:self];
-                UITouch *touch2 = [[touches allObjects] objectAtIndex:1];
-                CGPoint currentLoc2 = [touch2 locationInView:self];
-                CGPoint prevLoc2 = [touch2 previousLocationInView:self];
-                float xd1 = currentLoc2.x - currentLoc1.x;
-                float yd1 = currentLoc2.y - currentLoc1.y;
-                float xd2 = prevLoc2.x - prevLoc1.x;
-                float yd2 = prevLoc2.y - prevLoc1.y;
-                float dist1 = sqrt(xd1 * xd1 + yd1 * yd1);
-                float dist2 = sqrt(xd2 * xd2 + yd2 * yd2);
-                float dist = dist1 - dist2;
-            
-                OgreFramework::getSingletonPtr()->m_pCamera->setFOVy(OgreFramework::getSingletonPtr()->m_pCamera->getFOVy() + Radian(dist));       
-            }
-            break;
-        default:
-            break;
-    }
- */ 
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField 
@@ -142,9 +103,8 @@ using namespace Ogre;
 
 - (void)textFieldDidEndEditing:(UITextField *)textField
 {
-    const char* cString = [textField.text UTF8String];     
-    NSLog(@"%s", cString);
-    SBMExecuteCmd(cString);
+    const char* cString = [textField.text UTF8String];         
+    OgreFramework::getSingletonPtr()->m_sbmDLL->ProcessVHMsgs("sbm", cString);
 }
 
 @end
