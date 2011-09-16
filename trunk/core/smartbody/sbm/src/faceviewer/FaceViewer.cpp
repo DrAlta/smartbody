@@ -164,11 +164,12 @@ void FaceViewer::ShowCommandsCB(Fl_Widget* widget, void* data)
 			LOG("No face definition for character %s.", character->getName().c_str());
 			return;
 		}
-		std::stringstream strstr;
+		
 		int numVisemes = faceDefinition->getNumVisemes();
 		LOG("Commands for generating viseme weights for character %s.", character->getName().c_str());
 		for (int v = 0; v < numVisemes; v++)
 		{
+			std::stringstream strstr;
 			const std::string& visemeName = faceDefinition->getVisemeName(v);
 			float weight = faceDefinition->getVisemeWeight(visemeName);
 			strstr << "char " << character->getName() << " visemeweight " << visemeName << " " << weight;
