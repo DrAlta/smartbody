@@ -28,6 +28,7 @@ using namespace gwiz;
 #include <sr/sr_alg.h>
 
 #define ENABLE_FORWARD_RAY  		1
+#define USE_OLD_GAZE 1
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -78,14 +79,17 @@ quat_t MeCtGazeJoint::evaluate( float dt, vector_t target_pos, quat_t off_rot, f
 	prev_world_rot = world_rot;
 	capture_joint_state();
 	quat_t Q_task = ( rotation_to_target( target_pos ) * off_rot ) * scale_factor;	
-	Q_task.print();
+	//Q_task.print();
 #if ENABLE_CONSTRAIN
 	quat_t Q = constrain( dt, Q_task );	
 #else
 	quat_t Q = Q_task;
 #endif
 	prev_local_rot = Q;
-	return( Q );
+	// this part of the code should not affect the old skeleton, since their (-world_zero_rot) should all be zero rotations. 
+	vector_t newAxis = (-world_zero_rot)*Q.axis();
+	quat_t Qout = quat_t(Q.degrees(),newAxis);
+	return( Qout );
 }
 
 quat_t MeCtGazeJoint::evaluate( float dt, quat_t target_rot, quat_t off_rot, float scale_factor )	{
@@ -100,6 +104,8 @@ quat_t MeCtGazeJoint::evaluate( float dt, quat_t target_rot, quat_t off_rot, flo
 	quat_t Q = Q_task;
 #endif
 	prev_local_rot = Q;
+	vector_t newAxis = (-world_zero_rot)*Q.axis();
+	quat_t Qout = quat_t(Q.degrees(),newAxis);
 	return( Q );
 }
 
@@ -107,7 +113,7 @@ void MeCtGazeJoint::capture_joint_state( void ) {
 	SrMat sr_M;
 	gwiz::matrix_t M, PM,WM, PZ;
 	int i, j;
-#if 1
+#if USE_OLD_GAZE
 	if( joint_p )	{
 
 		sr_M = joint_p->lmat();
@@ -154,7 +160,7 @@ void MeCtGazeJoint::capture_joint_state( void ) {
 			LOG( "MeCtGazeJoint::capture_joint_state ERR: parent of joint '%s' not found\n", name );
 		}
 	}
-#else
+#else // consider the pre-rotation
 	if( joint_p )	{
 		sr_M = joint_p->gmat();
 		for( i=0; i<4; i++ )	{
@@ -198,9 +204,9 @@ void MeCtGazeJoint::capture_joint_state( void ) {
 
 			parent_diff_rot = world_zero_rot*(-parent_zero_rot);
 
-			gwiz::matrix_t LM = -M*M;
-			local_pos = LM.translation( gwiz::COMP_M_TR );
-			local_rot = LM.quat( gwiz::COMP_M_TR );
+			gwiz::matrix_t LM = WM*(-PM)*M;
+			local_pos = (world_zero_rot)*(-parent_rot)*(world_pos-parent_pos);//LM.translation( gwiz::COMP_M_TR );
+			local_rot = (world_zero_rot)*(-parent_rot)*(world_rot);//LM.quat( gwiz::COMP_M_TR );
 			}	   
 
 		}
@@ -235,7 +241,7 @@ quat_t MeCtGazeJoint::rotation_to_target( vector_t target_pos )	{
 		gwiz::float_t buffer_ratio = 0.1,	// proportion of buffer zone for pathological case
 	)
 	*/
-#if 1
+#if USE_OLD_GAZE
 	euler_t E_forward = forward_rot;
 	quat_t forward_ph = euler_t( E_forward.p(), E_forward.h(), 0.0 );
 	quat_t forward_roll = euler_t( 0.0, 0.0, E_forward.r() );
@@ -255,18 +261,20 @@ quat_t MeCtGazeJoint::rotation_to_target( vector_t target_pos )	{
 	quat_t forward_ph = euler_t( E_forward.p(), E_forward.h(), 0.0 );
 	quat_t forward_roll = euler_t( 0.0, 0.0, E_forward.r() );
 	
-	vector_t l_target_pos = ( -world_rot ) * ( target_pos - world_pos );
+	vector_t l_target_pos = ( -parent_rot ) * ( target_pos - parent_pos );
+	//vector_t l_target_pos = (world_zero_rot)*(-world_rot)*( target_pos - world_pos );
 	vector_t forward_dir = ( -forward_ph ) * forward_ref.normal();
+	vector_t l_rot_pos = (-parent_rot)* (world_pos-parent_pos);
 
 	quat_t Q_p = rotation_ray_to_target_point(
-		l_target_pos,
-		local_pos,
-		(-world_zero_rot)*forward_pos + local_pos,
-		(-world_zero_rot)*forward_dir,
+		(parent_zero_rot)*l_target_pos,
+		(parent_zero_rot)*l_rot_pos,
+		(parent_zero_rot)*((-parent_zero_rot)*forward_pos + l_rot_pos),
+		(parent_zero_rot)*(-parent_zero_rot)*forward_dir,
 		DFL_FORWARD_RAY_BUFFER_ZONE_RATIO
-	);	
-
+	);
 	quat_t Q = Q_p;
+	//quat_t Q = (matrix_t(-world_zero_rot)*matrix_t(Q_p)).quat();
 #endif
 
 /*
@@ -387,7 +395,7 @@ quat_t MeCtGazeJoint::rotation_to_target( vector_t target_pos )	{
 
 quat_t MeCtGazeJoint::rotation_to_target( quat_t target_rot )	{
 	
-#if 1
+#if USE_OLD_GAZE
 	
 /*
 	quat_t rotation_ray_to_target_orient(
@@ -400,7 +408,7 @@ quat_t MeCtGazeJoint::rotation_to_target( quat_t target_rot )	{
 	return( ( -parent_rot ) * target_rot * forward_rot );
 	
 #else
-	return( ( -parent_rot ) * target_rot );
+	return( (parent_zero_rot)*( -parent_rot ) * target_rot * forward_rot );
 #endif
 }
 

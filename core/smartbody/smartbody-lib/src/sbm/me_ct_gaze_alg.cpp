@@ -139,7 +139,7 @@ LOG( "-- --\n" );
 	gwiz::float_t buffer_lerp = 0.0; // amount of Qbuffer to apply
 	gwiz::float_t buffer_len = f * buffer_ratio; // length of buffer zone
 	
-#if 0
+#if 1
 	// if target is near forward origin radius: 
 	if( d < ( f + buffer_len ) )	{
 		buffer_lerp = 1.0 - ( d - f ) / buffer_len;
