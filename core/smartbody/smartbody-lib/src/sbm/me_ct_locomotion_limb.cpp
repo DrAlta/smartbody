@@ -143,7 +143,7 @@ SrVec MeCtLocomotionLimb::get_orientation()
 	return v;
 }
 
-int MeCtLocomotionLimb::set_limb_base(std::string name)
+int MeCtLocomotionLimb::set_limb_base(const std::string& name)
 {
 	SkJoint* joint = standing_skeleton->search_joint(name.c_str());
 	if(joint == NULL) 

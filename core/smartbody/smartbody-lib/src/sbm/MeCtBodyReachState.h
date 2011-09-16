@@ -52,13 +52,13 @@ public:
 	virtual SRT getHandTargetStateOffset(ReachStateData* rd, SRT& naturalState);
 	virtual bool isPickingUpNewPawn(ReachStateData* rd) ;
 
-	void sendReachEvent(std::string cmd, float time = 0.0);	
+	void sendReachEvent(const std::string& cmd, float time = 0.0);	
 public:
 	void pickUpAttachedPawn(ReachStateData* rd);
 	void putDownAttachedPawn(ReachStateData* rd);
 protected:
-	std::string generateGrabCmd(std::string charName, std::string targetName, std::string grabState, int type);
-	std::string generateAttachCmd(std::string charName, std::string targetName, int type);
+	std::string generateGrabCmd(const std::string& charName, const std::string& targetName, const std::string& grabState, int type);
+	std::string generateAttachCmd(const std::string& charName, const std::string& targetName, int type);
 };
 
 class ReachHandPickUpAction : public ReachHandAction 

@@ -47,11 +47,11 @@ class PAStateData
 
 public:
 		PAStateData(PAStateData* data);
-		PAStateData(std::string name);
+		PAStateData(const std::string& name);
 		~PAStateData();
 		int getNumMotions();
 		int getNumKeys();
-		int getMotionId(std::string motion);
+		int getMotionId(const std::string& motion);
 };
 
 //There are PATransitionData stored inside mcu
@@ -111,11 +111,11 @@ class ParameterManager
 		void getParameter(float& x);
 		void getParameter(float& x, float& y);
 		void getParameter(float& x, float& y, float& z);
-		void addParameter(std::string motion, double x);
-		void addParameter(std::string motion, double x, double y);
-		void addParameter(std::string motion, double x, double y, double z);
-		void addTriangle(std::string motion1, std::string motion2, std::string motion3);
-		void addTetrahedron(std::string motion1, std::string motion2, std::string motion3, std::string motion4);
+		void addParameter(const std::string& motion, double x);
+		void addParameter(const std::string& motion, double x, double y);
+		void addParameter(const std::string& motion, double x, double y, double z);
+		void addTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3);
+		void addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
 		void buildTetrahedron();
 		int getType();
 		void setType(int typ);
@@ -125,12 +125,12 @@ class ParameterManager
 		int getMinVecY();
 		int getMaxVecX();
 		int getMaxVecY();
-		SrVec getVec(std::string motion);
+		SrVec getVec(const std::string& motion);
 		SrVec getVec(int id);
 		SrVec getPrevVec();
 		void setPrevVec(SrVec& vec);
 		const std::string& getMotionName(int id);
-		int getMotionId(std::string name);
+		int getMotionId(const std::string& name);
 
 		int getNumTriangles();
 		SrTriangle& getTriangle(int id);

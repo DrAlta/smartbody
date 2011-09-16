@@ -330,7 +330,7 @@ PAStateData* MeCtParamAnimation::getCurrentPAStateData()
 		return NULL;
 }
 
-bool MeCtParamAnimation::hasPAState(std::string name)
+bool MeCtParamAnimation::hasPAState(const std::string& name)
 {
 	if (getCurrentStateName() == name)
 		return true;

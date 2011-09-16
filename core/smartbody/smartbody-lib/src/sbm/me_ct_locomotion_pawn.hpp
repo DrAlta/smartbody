@@ -109,9 +109,9 @@ public:
 
 	SrArray<MeCtLocomotionLimb*>* get_limb_list();
 
-	void set_translation_joint_name(std::string name);
+	void set_translation_joint_name(const std::string& name);
 
-	void set_base_name(std::string name);
+	void set_base_name(const std::string& name);
 
 	MeCtLocomotionSpeedAccelerator* get_speed_accelerator();
 

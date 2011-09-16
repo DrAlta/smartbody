@@ -66,13 +66,13 @@ void EventManager::handleEvent(Event* e, double time)
 	handler->executeAction(e);	
 }
 
-void EventManager::addEventHandler(std::string type, EventHandler* handler)
+void EventManager::addEventHandler(const std::string& type, EventHandler* handler)
 {
 	removeEventHandler(type);
 	eventHandlers.insert(std::pair<std::string, EventHandler*>(type, handler));
 }
 
-void EventManager::removeEventHandler(std::string type)
+void EventManager::removeEventHandler(const std::string& type)
 {
 	std::map<std::string, EventHandler*>::iterator iter = eventHandlers.find(type);
 	if (iter != eventHandlers.end())
@@ -105,7 +105,7 @@ EventHandler* EventManager::getEventHandlerByIndex(int num)
 	return NULL;
 }
 
-EventHandler* EventManager::getEventHandler(std::string type)
+EventHandler* EventManager::getEventHandler(const std::string& type)
 {
 	std::map<std::string, EventHandler*>::iterator iter = eventHandlers.find(type);
 	if (iter != eventHandlers.end())

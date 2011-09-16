@@ -357,7 +357,7 @@ public:
 		MeControllerContext::remove_controller( ct );
 	}
 
-	MeController* findControllerByHandle(std::string handle)
+	MeController* findControllerByHandle(const std::string& handle)
 	{
 		for (size_t x = 0; x < _controllers.size(); x++)
 		{

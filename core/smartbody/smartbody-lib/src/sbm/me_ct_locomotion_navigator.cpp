@@ -376,7 +376,7 @@ void MeCtLocomotionNavigator::set_world_mat(SrMat& mat)
 	world_mat = mat;
 }
 
-void MeCtLocomotionNavigator::set_translation_joint_name(std::string name)
+void MeCtLocomotionNavigator::set_translation_joint_name(const std::string& name)
 {
 	translation_joint_name = name;
 }

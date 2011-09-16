@@ -101,7 +101,7 @@ public:
 
 	float iterate_sub_joints(SkJoint* walking_joint, SkJoint* standing_joint);
 
-	int get_descendant_num(std::string base_name);
+	int get_descendant_num(const std::string& base_name);
 
 	int get_descendant_num(SkJoint* base);
 

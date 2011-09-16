@@ -124,7 +124,7 @@ ReachTarget& ReachTarget::operator=( const ReachTarget& rt )
 /************************************************************************/
 /* Reach Hand Action                                                    */
 /************************************************************************/
-void ReachHandAction::sendReachEvent( std::string cmd, float time /*= 0.0*/ )
+void ReachHandAction::sendReachEvent( const std::string& cmd, float time /*= 0.0*/ )
 {
 	std::string eventType = "reach";		
 	MotionEvent motionEvent;
@@ -268,7 +268,7 @@ void ReachHandAction::reachPreReturnAction( ReachStateData* rd )
 	ReachHandAction::reachNewTargetAction(rd);	
 }
 
-std::string ReachHandAction::generateGrabCmd( std::string charName, std::string targetName, std::string grabState, int type )
+std::string ReachHandAction::generateGrabCmd( const std::string& charName, const std::string& targetName, const std::string& grabState, int type )
 {
 	std::string wristName = "r_wrist";
 	std::string reachType = "right";
@@ -288,7 +288,7 @@ std::string ReachHandAction::generateGrabCmd( std::string charName, std::string 
 	return cmd;
 }
 
-std::string ReachHandAction::generateAttachCmd( std::string charName, std::string targetName, int type )
+std::string ReachHandAction::generateAttachCmd( const std::string& charName, const std::string& targetName, int type )
 {
 	std::string wristName = "r_wrist";
 	std::string reachType = "right";

@@ -1754,7 +1754,7 @@ bool mcuCBHandle::addPawn(SbmPawn* pawn)
 
 }
 
-void mcuCBHandle::removePawn(std::string name)
+void mcuCBHandle::removePawn(const std::string& name)
 {
 	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(name);
 	if (iter != pawn_map.end())
@@ -1763,7 +1763,7 @@ void mcuCBHandle::removePawn(std::string name)
 	}
 }
 
-SbmPawn* mcuCBHandle::getPawn(std::string name)
+SbmPawn* mcuCBHandle::getPawn(const std::string& name)
 {
 	std::map<std::string, SbmPawn*>::iterator iter = pawn_map.find(name);
 	if (iter == pawn_map.end())
@@ -1796,7 +1796,7 @@ bool mcuCBHandle::addCharacter(SbmCharacter* character)
 	}
 }
 
-void mcuCBHandle::removeCharacter(std::string name)
+void mcuCBHandle::removeCharacter(const std::string& name)
 {
 	std::map<std::string, SbmCharacter*>::iterator iter = character_map.find(name);
 	if (iter != character_map.end())
@@ -1805,7 +1805,7 @@ void mcuCBHandle::removeCharacter(std::string name)
 	}
 }
 
-SbmCharacter* mcuCBHandle::getCharacter(std::string name)
+SbmCharacter* mcuCBHandle::getCharacter(const std::string& name)
 {
 	std::map<std::string, SbmCharacter*>::iterator iter = character_map.find(name);
 	if (iter == character_map.end())
@@ -1819,7 +1819,7 @@ int mcuCBHandle::getNumCharacters()
 	return character_map.size();
 }
 
-SkMotion* mcuCBHandle::getMotion(std::string motionName)
+SkMotion* mcuCBHandle::getMotion(const std::string& motionName)
 {
 	std::map<std::string, SkMotion*>::iterator iter = this->motion_map.find(motionName);
 	if (iter == this->motion_map.end())

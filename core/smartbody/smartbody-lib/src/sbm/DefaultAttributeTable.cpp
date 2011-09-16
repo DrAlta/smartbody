@@ -8,7 +8,7 @@ DefaultAttributeTable::~DefaultAttributeTable(void)
 {
 }
 
-void DefaultAttributeTable::addDefaultAttributeDouble( std::string name, double defaultValue, double* varPtr )
+void DefaultAttributeTable::addDefaultAttributeDouble( const std::string& name, double defaultValue, double* varPtr )
 {
 	DoubleAttribute* hf = new DoubleAttribute(name);
 	hf->setDefaultValue(defaultValue);
@@ -19,7 +19,7 @@ void DefaultAttributeTable::addDefaultAttributeDouble( std::string name, double 
 	_defaultAttributes.push_back(AttributeVarPair(hf,var));	
 }
 
-void DefaultAttributeTable::addDefaultAttributeFloat( std::string name, float defaultValue, float* varPtr )
+void DefaultAttributeTable::addDefaultAttributeFloat( const std::string& name, float defaultValue, float* varPtr )
 {
 	DoubleAttribute* hf = new DoubleAttribute(name);
 	hf->setDefaultValue(defaultValue);
@@ -30,7 +30,7 @@ void DefaultAttributeTable::addDefaultAttributeFloat( std::string name, float de
 	_defaultAttributes.push_back(AttributeVarPair(hf,var));	
 }
 
-void DefaultAttributeTable::addDefaultAttributeInt( std::string name, int defaultValue, int* varPtr )
+void DefaultAttributeTable::addDefaultAttributeInt( const std::string& name, int defaultValue, int* varPtr )
 {
 	IntAttribute* hf = new IntAttribute(name);
 	hf->setDefaultValue(defaultValue);
@@ -41,7 +41,7 @@ void DefaultAttributeTable::addDefaultAttributeInt( std::string name, int defaul
 	_defaultAttributes.push_back(AttributeVarPair(hf,var));	
 }
 
-void DefaultAttributeTable::addDefaultAttributeBool( std::string name, bool defaultValue, bool* varPtr )
+void DefaultAttributeTable::addDefaultAttributeBool( const std::string& name, bool defaultValue, bool* varPtr )
 {
 	BoolAttribute* hf = new BoolAttribute(name);
 	hf->setDefaultValue(defaultValue);
@@ -52,7 +52,7 @@ void DefaultAttributeTable::addDefaultAttributeBool( std::string name, bool defa
 	_defaultAttributes.push_back(AttributeVarPair(hf,var));	
 }
 
-void DefaultAttributeTable::addDefaultAttributeString( std::string name, std::string defaultValue, std::string* varPtr )
+void DefaultAttributeTable::addDefaultAttributeString( const std::string& name, const std::string& defaultValue, std::string* varPtr )
 {
 	StringAttribute* hf = new StringAttribute(name);
 	hf->setDefaultValue(defaultValue);
@@ -63,7 +63,7 @@ void DefaultAttributeTable::addDefaultAttributeString( std::string name, std::st
 	_defaultAttributes.push_back(AttributeVarPair(hf,var));	
 }
 
-void DefaultAttributeTable::addDefaultAttributeVec3( std::string name, SrVec& defaultValue, SrVec* varPtr )
+void DefaultAttributeTable::addDefaultAttributeVec3( const std::string& name, SrVec& defaultValue, SrVec* varPtr )
 {
 	Vec3Attribute* hf = new Vec3Attribute(name);
 	hf->setDefaultValue(defaultValue);
@@ -74,7 +74,7 @@ void DefaultAttributeTable::addDefaultAttributeVec3( std::string name, SrVec& de
 	_defaultAttributes.push_back(AttributeVarPair(hf,var));	
 }
 
-void DefaultAttributeTable::addDefaultAttributeMatrix( std::string name, SrMat& defaultValue, SrMat* varPtr )
+void DefaultAttributeTable::addDefaultAttributeMatrix( const std::string& name, SrMat& defaultValue, SrMat* varPtr )
 {
 	MatrixAttribute* hf = new MatrixAttribute(name);
 	hf->setDefaultValue(defaultValue);

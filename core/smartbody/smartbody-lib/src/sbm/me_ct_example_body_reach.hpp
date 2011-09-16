@@ -77,7 +77,7 @@ public:
 	void setReachTargetPos(SrVec& targetPos);
 	void setFinishReaching(bool isFinish);
 	void setFootIK(bool useIK);
-	void setDefaultReachType(std::string reachTypeName);
+	void setDefaultReachType(const std::string& reachTypeName);
 	void init(SbmPawn* pawn);	
 protected:			
 	void updateChannelBuffer(MeFrameData& frame, BodyMotionFrame& motionFrame, bool bRead = false);

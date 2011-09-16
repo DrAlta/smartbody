@@ -162,7 +162,7 @@ public:
 
 	void set_world_mat(SrMat& mat);
 
-	void set_translation_joint_name(std::string name);
+	void set_translation_joint_name(const std::string& name);
 
 
 	bool check_stopped(SrArray<MeCtLocomotionLimb*>* limb_list);
