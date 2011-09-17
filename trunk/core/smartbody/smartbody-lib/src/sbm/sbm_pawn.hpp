@@ -183,6 +183,9 @@ protected:
 
 	void initData();
 
+	int parse_pawn_command( std::string cmd, srArgBuffer& args, mcuCBHandle *mcu_p);
+
+
 
 public:
 	// static command functions
