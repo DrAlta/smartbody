@@ -2962,15 +2962,23 @@ int SbmCharacter::character_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	if( char_name == "*" ) {
 
 		all_characters = true;
+		std::vector<std::string> characters;
 		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
 			iter != mcu_p->getCharacterMap().end();
 			iter++)
 		{
+			characters.push_back((*iter).second->getName());
+		}
+
+		for (std::vector<std::string>::iterator citer = characters.begin();
+			citer != characters.end();
+			citer++)
+		{
 			srArgBuffer copy_args( args.peek_string() );
-			int err = (*iter).second->parse_character_command( char_cmd, copy_args, mcu_p, true );
-			if( err != CMD_SUCCESS )	{
+			character = mcu_p->getCharacter( *citer );
+			int err = character->parse_character_command( char_cmd, copy_args, mcu_p, true );
+			if( err != CMD_SUCCESS )
 				return( err );
-			}
 		}
 		return( CMD_SUCCESS );
 	} 

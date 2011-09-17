@@ -616,46 +616,138 @@ void SbmPawn::wo_cache_update() {
 	this->wo_cache.r = r;
 }
 
+int SbmPawn::parse_pawn_command( std::string cmd, srArgBuffer& args, mcuCBHandle *mcu_p)
+{
+	if (cmd == "remove")
+	{	
+		remove_from_scene();
+		return CMD_SUCCESS;
+	}
+	else if (cmd == "prune")
+	{
+		int result = prune_controller_tree();
+		if( result != CMD_SUCCESS )
+		{
+			LOG("ERROR: Failed to prune pawn \"%s\"", getName().c_str());
+			return CMD_FAILURE;
+		}
+		else 
+		{
+			return CMD_SUCCESS;
+		}
+	}
+	else if (cmd == "setshape")
+	{
+		std::string geom_str = "box", color_str = "red", file_str = "";
+		bool setRec = false;
+		bool has_geom = false;
+		SrVec size = SrVec(1.f,1.f,1.f);		
+		while( args.calc_num_tokens() > 0 )
+		{
+			string option = args.read_token();
+			// TODO: Make the following option case insensitive
+			if( option=="geom" ) {
+				geom_str = args.read_token();
+				has_geom = true;
+			} else if( option=="size" ) {
+				//size_str = args.read_token();
+				float uniformSize = args.read_float();
+				for (int i=0;i<3;i++)
+					size[i] = uniformSize;//args.read_float();
+				has_geom = true;
+
+			} else if (option=="file" ) {
+				file_str = args.read_token();
+				has_geom = true;			
+			} else if( option=="color" ) {
+				color_str = args.read_token();
+				has_geom = true;
+			} else if( option=="rec" ) {
+				setRec = true;
+				size[0] = steeringSpaceObjSize.x = args.read_float();
+				size[1] = steeringSpaceObjSize.y = args.read_float();
+				size[2] = steeringSpaceObjSize.z = args.read_float();
+
+				has_geom = true;
+			} else {
+				std::stringstream strstr;
+				strstr << "WARNING: Unrecognized pawn setshape option \"" << option << "\"." << endl;
+				LOG(strstr.str().c_str());
+			}
+		}	
+
+		if (has_geom)
+		{				
+			initGeomObj(geom_str.c_str(),size,color_str.c_str(),file_str.c_str());
+			// init steering space
+			if (!setRec)
+				steeringSpaceObjSize = size;//SrVec(size, size, size);
+			initSteeringSpaceObject();
+			return CMD_SUCCESS;
+		}
+		else
+		{
+			LOG("Pawn %s, fail to setshape. Incorrect parameters.", getName().c_str());
+			return CMD_FAILURE;
+		}
+	}
+	else if (cmd == "physics")
+	{
+		string option = args.read_token();
+
+		bool turnOn = false;
+		if (option == "on" || option == "ON")
+			turnOn = true;			
+		else if (option == "off" || option == "OFF")
+			turnOn = false;			
+		else
+			return CMD_FAILURE;
+
+		setPhysicsSim(turnOn);
+		return CMD_SUCCESS;
+	}
+	else if (cmd == "collision")
+	{	
+		string option = args.read_token();
+		bool turnOn = false;
+		if (option == "on" || option == "ON")
+			turnOn = true;			
+		else if (option == "off" || option == "OFF")
+			turnOn = false;			
+		else
+			return CMD_FAILURE;
+
+		setCollision(turnOn);			
+		return CMD_SUCCESS;
+	}
+	else
+	{
+		return CMD_FAILURE;
+	}
+}
+
 
 int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	string pawn_name = args.read_token();
-	if( pawn_name.length()==0 ) {
-
-		std::stringstream strstr;
-		strstr << "ERROR: Expected pawn name." << endl;
-		LOG(strstr.str().c_str());
+	if( pawn_name.length()==0 )
+	{
+		LOG("ERROR: Expected pawn name.");
 		return CMD_FAILURE;
 	}
 
-	string pawn_cmd  = args.read_token();
-	if( pawn_cmd.length()==0 ) {
-		std::stringstream strstr;
-		strstr << "ERROR: Expected pawn command." << endl;
-		LOG(strstr.str().c_str());
+	string pawn_cmd = args.read_token();
+	if( pawn_cmd.length()==0 )
+	{
+		LOG("ERROR: Expected pawn command.");
 		return CMD_FAILURE;
 	}
 
-	bool all_pawns = false;
-	SbmPawn* pawn_p = NULL;
-	if( pawn_name=="*" ) {
-		all_pawns = true;
-	} else {
-		pawn_p = mcu_p->getPawn( pawn_name.c_str() );
-	}
-
-	if( pawn_cmd=="init" ) {
+	if (pawn_cmd == "init")
+	{
 		// pawn <name> init [loc <x> <y> <z>] [geom <shape name>] [color <color hex>] [size <size>]
-
-		if( pawn_name == "*" ) {  // TODO: better character name valiadtion
-			std::stringstream strstr;
-			strstr << "ERROR: Invalid SbmPawn name \"" << pawn_name << "\"." << endl;
-			LOG(strstr.str().c_str());
-			return( CMD_FAILURE );
-		}
+		SbmPawn* pawn_p = mcu_p->getPawn(pawn_name);
 		if( pawn_p != NULL ) {
-			std::stringstream strstr;
-			strstr << "ERROR: Pawn \"" << pawn_name << "\" already exists." << endl;
-			LOG(strstr.str().c_str());
+			LOG("ERROR: Pawn \"%s\" already exists.", pawn_name.c_str());
 			return CMD_FAILURE;
 		}
 		// Options
@@ -795,143 +887,44 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		}
 
 		return CMD_SUCCESS;
-	} else if( pawn_cmd=="prune" ) {  // Prunes the controller trees of unused/overwritten controllers
-		int result = CMD_SUCCESS;
-		if( all_pawns ) {
-			// Prune all pawns
-			for (std::map<std::string, SbmPawn*>::iterator iter = mcu_p->getPawnMap().begin();
-				iter != mcu_p->getPawnMap().end();
-				iter++)
-			{
-				if( (*iter).second->prune_controller_tree() != CMD_SUCCESS ) {
-					std::stringstream strstr;
-					strstr << "ERROR: Failed to prune pawn \""<<pawn_name<<"\".";
-					LOG(strstr.str().c_str());
-					result = CMD_FAILURE;
-				}
-			}
-		} else if( pawn_p ) {
-			result = pawn_p->prune_controller_tree();
-			if( result != CMD_SUCCESS ) {
-				std::stringstream strstr;
-				strstr << "ERROR: Failed to prune pawn \""<<pawn_name<<"\".";
-				LOG(strstr.str().c_str());
-				result = CMD_FAILURE;
-			}
-		} else {
-			std::stringstream strstr;
-			strstr << "ERROR: Pawn \""<<pawn_name<<"\" not found.";
-			LOG(strstr.str().c_str());
-			return CMD_FAILURE;
-		}
-		return result;
-	} else if( pawn_cmd=="remove" ) {
-		if( pawn_p != NULL ) {
-
-			pawn_p->remove_from_scene();
-			return CMD_SUCCESS;
-		} else {
-			std::stringstream strstr;
-			strstr << "ERROR: Pawn \""<<pawn_name<<"\" not found.";
-			LOG(strstr.str().c_str());
-			return CMD_FAILURE;
-		}
-	} 	
-	else if (pawn_cmd=="setshape")
-	{
-		if (!pawn_p)
-		{
-			std::stringstream strstr;
-			strstr << "ERROR: Pawn \""<<pawn_name<<"\" not found.";
-			LOG(strstr.str().c_str());
-			return CMD_FAILURE;
-		}		
-		std::string geom_str = "box", color_str = "red", file_str = "";
-		bool setRec = false;
-		bool has_geom = false;
-		SrVec size = SrVec(1.f,1.f,1.f);		
-		while( args.calc_num_tokens() > 0 ) {
-			string option = args.read_token();
-			// TODO: Make the following option case insensitive
-			if( option=="geom" ) {
-				geom_str = args.read_token();
-				has_geom = true;
-			} else if( option=="size" ) {
-				//size_str = args.read_token();
-				float uniformSize = args.read_float();
-				for (int i=0;i<3;i++)
-					size[i] = uniformSize;//args.read_float();
-				has_geom = true;
-
-			} else if (option=="file" ) {
-				file_str = args.read_token();
-				has_geom = true;			
-			} else if( option=="color" ) {
-				color_str = args.read_token();
-				has_geom = true;
-			} else if( option=="rec" ) {
-				setRec = true;
-				size[0] = pawn_p->steeringSpaceObjSize.x = args.read_float();
-				size[1] = pawn_p->steeringSpaceObjSize.y = args.read_float();
-				size[2] = pawn_p->steeringSpaceObjSize.z = args.read_float();
-
-				has_geom = true;
-			} else {
-				std::stringstream strstr;
-				strstr << "WARNING: Unrecognized pawn setshape option \"" << option << "\"." << endl;
-				LOG(strstr.str().c_str());
-			}
-		}	
-
-		if (has_geom)
-		{				
-			pawn_p->initGeomObj(geom_str.c_str(),size,color_str.c_str(),file_str.c_str());
-			// init steering space
-			if (!setRec)
-				pawn_p->steeringSpaceObjSize = size;//SrVec(size, size, size);
-			pawn_p->initSteeringSpaceObject();
-			return CMD_SUCCESS;
-		}
-		else
-		{
-			LOG("Pawn %s, fail to setshape. Incorrect parameters.",pawn_name.c_str());
-			return CMD_FAILURE;
-		}
-	}	
-	else if (pawn_cmd=="physics" || pawn_cmd == "collision")
-	{
-		string option = args.read_token();
-		if (!pawn_p)
-			return CMD_FAILURE;
-
-		bool turnOn = false;
-		if (option == "on" || option == "ON")
-		{			
-			turnOn = true;			
-		}
-		else if (option == "off" || option == "OFF")
-		{
-			turnOn = false;			
-		}		
-		else
-		{
-			return CMD_FAILURE;
-		}
-
-		if (pawn_cmd == "physics")
-		{
-			pawn_p->setPhysicsSim(turnOn);
-			return CMD_SUCCESS;
-		}
-		else if (pawn_cmd == "collision")
-		{
-			pawn_p->setCollision(turnOn);			
-			return CMD_SUCCESS;
-		}
-		return CMD_FAILURE;
 	}
-	else {
-		return CMD_NOT_FOUND;
+
+	bool all_pawns = false;
+	SbmPawn* pawn_p = NULL;
+	if( pawn_name== "*" )
+	{
+		std::vector<std::string> pawns;
+		for (std::map<std::string, SbmPawn*>::iterator iter = mcu_p->getPawnMap().begin();
+			iter != mcu_p->getPawnMap().end();
+			iter++)
+		{
+			pawns.push_back((*iter).second->getName());
+		}
+		for (std::vector<std::string>::iterator citer = pawns.begin();
+			citer != pawns.end();
+			citer++)
+		{
+			srArgBuffer copy_args( args.peek_string() );
+			pawn_p = mcu_p->getPawn( *citer );
+			int err = pawn_p->parse_pawn_command( pawn_cmd, copy_args, mcu_p);
+			if( err != CMD_SUCCESS )
+				return( err );
+		}
+		return CMD_SUCCESS;
+	} 
+	else
+	{
+		pawn_p = mcu_p->getPawn( pawn_name.c_str() );
+		if( pawn_p ) 
+		{
+			int ret = pawn_p->parse_pawn_command( pawn_cmd, args, mcu_p );
+			return( ret );
+		}
+		else
+		{
+			LOG("No pawn named '%s' exists.", pawn_name.c_str());
+			return CMD_FAILURE;
+		}
 	}
 }
 
