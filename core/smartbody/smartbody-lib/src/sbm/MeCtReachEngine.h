@@ -34,6 +34,7 @@ public:
 	static std::string ReachTypeTag[REACH_TYPE_SIZE];
 protected:
 	bool          valid;
+	bool          ikInit;
 	int           reachType;
 	SbmCharacter* character;
 	SkSkeleton*   skeletonCopy, *skeletonRef;

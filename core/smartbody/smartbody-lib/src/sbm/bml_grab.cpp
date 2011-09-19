@@ -166,8 +166,9 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 	if (grabVelocity > 0)
 		handCt->grabVelocity = grabVelocity;
 
-	if( target_pawn && target_pawn->colObj_p)	{		
-		handCt->setGrabTargetObject(target_pawn->colObj_p);		
+	if( target_pawn )	{	
+		SbmPawn* pawn = const_cast<SbmPawn*>(target_pawn);
+		handCt->setGrabTargetObject(pawn);		
 	}
 
 	if (attachPawn && !sourceJointName.empty())

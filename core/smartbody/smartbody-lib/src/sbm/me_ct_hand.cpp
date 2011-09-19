@@ -49,8 +49,12 @@ void FingerChain::testCollision( SbmGeomObject* colObj )
 {
 	std::vector<SrVec> lineSeg;
 	getLineSeg(lineSeg);
-	if (lineSeg.size() < 2 || !colObj)
+	SbmGeomNullObject* colNullObj = dynamic_cast<SbmGeomNullObject*>(colObj);
+	if (lineSeg.size() < 2 || !colObj || colNullObj)
+	{
+		isLock = true;
 		return; // no line
+	}
 
 	//printf("line seg size = %d\n",lineSeg.size());
 	for (unsigned int i=1;i<lineSeg.size();i++)
@@ -134,7 +138,7 @@ void MeCtHand::setGrabState( GrabState state )
 	currentGrabState = state;
 }
 
-void MeCtHand::setGrabTargetObject( SbmGeomObject* targetObj )
+void MeCtHand::setGrabTargetObject( SbmPawn* targetObj )
 {	
 	grabTarget = targetObj;
 	//setGrabState(GRAB_START);	
@@ -284,11 +288,13 @@ bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 		ikScenario.setTreeNodeQuat(currentFrame.jointQuat,QUAT_INIT);
 		ikScenario.setTreeNodeQuat(currentFrame.jointQuat,QUAT_CUR);		
 		bInit = true;
-	}
+	}	
 
+	if (!grabTarget) return true;
+
+	SbmGeomObject* geomObj = grabTarget->colObj_p;
 	
 	updateChannelBuffer(frame,tempFrame,true);
-
 	currentFrame.jointQuat[0] = tempFrame.jointQuat[0];
 	BodyMotionFrame& curTargetFrame = findTargetFrame(currentGrabState);//currentGrabState == GRAB_START ? grabFrame : reachFrame;
 
@@ -307,10 +313,10 @@ bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 	{
 		FingerChain& fig = fingerChains[i];
 		MeCtIKTreeNode* node = fig.fingerTip;				
-		//SrVec curPos = node->gmat.get_translation();		
+		//SrVec curPos = node->gmat.get_translation();	
 		if (currentGrabState == GRAB_REACH || currentGrabState == GRAB_START)
 		{
-			fig.testCollision(grabTarget); // test collision
+			fig.testCollision(geomObj); // test collision
 		}
 // 		std::vector<SrVec> chainSeg;
 // 		fig.getLineSeg(chainSeg);

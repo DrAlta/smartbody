@@ -195,14 +195,14 @@ void ReachHandAction::reachCompleteAction( ReachStateData* rd )
 }
 
 void ReachHandAction::reachNewTargetAction( ReachStateData* rd )
-{
+{	
 	std::string cmd;
 	std::string charName = rd->charName;	
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:grab-state=\"finish\"/>";
 	cmd = generateGrabCmd(charName,"","finish",rd->reachType);
-	sendReachEvent(cmd);
+	//sendReachEvent(cmd);
 	rd->effectorState.removeAttachedPawn(rd);
-	LOG("Reach New Target Action");
+	LOG("Reach New Target Action");	
 }
 
 void ReachHandAction::reachReturnAction( ReachStateData* rd )

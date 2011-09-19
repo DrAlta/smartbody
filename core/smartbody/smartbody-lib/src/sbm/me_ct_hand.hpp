@@ -52,7 +52,7 @@ protected:
 
 	MeCtIKTreeScenario    ikScenario;
 	MeCtJacobianIK        ik;
-	SbmGeomObject*         grabTarget; 
+	SbmPawn*              grabTarget; 
 
 	std::string           attachJointName;
 	SbmPawn*              attachedPawn;
@@ -79,7 +79,7 @@ public:
 	virtual void print_state( int tabs );
 	
 	void setGrabState(GrabState state);
-	void setGrabTargetObject(SbmGeomObject* targetObj);
+	void setGrabTargetObject(SbmPawn* targetObj);
 
 	void attachPawnTarget(SbmPawn* pawn, std::string jointName);
 	void releasePawn();
