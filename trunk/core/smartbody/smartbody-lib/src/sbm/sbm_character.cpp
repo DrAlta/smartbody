@@ -3501,7 +3501,12 @@ void SbmCharacter::updateFaceDefinition()
 
 	}
 
-	viseme_channel_count = numAUs + numVisemes;
+	int numAUChannels = _faceDefinition->getNumAUChannels();
+	int numVisemeChannels = numVisemes;
+
+//	viseme_channel_count = numAUs + numVisemes;
+//	viseme_channel_count = viseme_channel_end_pos - viseme_channel_start_pos;
+	viseme_channel_count = numAUChannels + numVisemeChannels;
 
 	viseme_history_arr = new float[viseme_channel_count];
 	for( int i=0; i<viseme_channel_count; i++ ) {

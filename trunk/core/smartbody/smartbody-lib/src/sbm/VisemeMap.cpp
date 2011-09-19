@@ -372,6 +372,20 @@ int FaceDefinition::getNumAUs()
 	return _auMap.size();
 }
 
+int FaceDefinition::getNumAUChannels()
+{
+	int numAuChannels = 0;
+	std::map<int, ActionUnit*>::iterator iter = _auMap.begin();
+	for (; iter != _auMap.end(); iter++)
+	{
+		if (iter->second->is_bilateral())
+			numAuChannels += 1;
+		else
+			numAuChannels += 2;
+	}
+	return numAuChannels;
+}
+
 int FaceDefinition::getAUNum(int index)
 {
 	int counter = 0;

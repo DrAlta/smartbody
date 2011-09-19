@@ -59,6 +59,7 @@ class FaceDefinition
 		bool hasAU(int auNum);
 		void setAU(int auNum, const std::string& side, const std::string& motion);
 		int getNumAUs();
+		int getNumAUChannels();
 		int getAUNum(int index);
 		ActionUnit* getAU(int index);
 		
