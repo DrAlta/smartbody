@@ -40,6 +40,7 @@ MeCtReachEngine::MeCtReachEngine( SbmCharacter* sbmChar, SkSkeleton* sk)
 	refMotion = NULL;
 
 	valid = false;
+	ikInit = false;
 
 	reachCompleteDuration = -1.0;
 	fadingWeight = 0.f;	
@@ -295,14 +296,13 @@ bool MeCtReachEngine::hasEffectorRotConstraint( ReachStateData* rd )
 }
 
 void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
-{
-	static bool bInit = false;
+{	
 	BodyMotionFrame& refFrame = rd->currentRefFrame;
-	if (!bInit)
+	if (!ikInit)
 	{			
 		ikScenario.setTreeNodeQuat(refFrame.jointQuat,QUAT_INIT);
 		ikScenario.setTreeNodeQuat(refFrame.jointQuat,QUAT_CUR);	
-		bInit = true;
+		ikInit = true;
 	}		
 	EffectorState& estate = rd->effectorState;
 
@@ -403,7 +403,7 @@ SkJoint* MeCtReachEngine::findRootJoint( SkSkeleton* sk )
 
 DataInterpolator* MeCtReachEngine::createInterpolator()
 {
-	KNNInterpolator* interpolator = new KNNInterpolator(3000,ikReachRegion*1.f);
+	KNNInterpolator* interpolator = new KNNInterpolator(300,ikReachRegion*1.f);
 	resampleData = &interpolator->resampleData;		
 	// 	InverseInterpolation* interpolator = new InverseInterpolation();
 	// 	resampleData = NULL;
