@@ -31,7 +31,7 @@
 	<key>UILaunchImageFile</key>
 	<string>media/Default-Portrait.png</string>
 	<key>UILaunchImageFile~ipad</key>
-	<string>media/Defaut-Portrait~ipad.png</string>
+	<string>media/Default-Portrait~ipad.png</string>
 	<key>UILaunchImageFile~iphone</key>
 	<string>media/Default-Portrait.png</string>
 	<key>UISupportedInterfaceOrientations</key>
