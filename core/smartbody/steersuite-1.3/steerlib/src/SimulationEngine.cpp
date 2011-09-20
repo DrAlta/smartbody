@@ -32,6 +32,18 @@ using namespace std;
 using namespace SteerLib;
 using namespace Util;
 
+#ifdef __APPLE__
+#include "TargetConditionals.h"
+#if defined (TARGET_OS_IPHONE)  || defined (TARGET_IPHONE_SIMULATOR)
+#ifndef SBM_IPHONE
+#define SBM_IPHONE
+#endif
+#endif
+#endif
+
+#ifdef SBM_IPHONE
+#include "PPRAIModule.h"
+#endif
 
 SimulationEngine::SimulationEngine()
 {
@@ -653,6 +665,10 @@ SteerLib::ModuleMetaInformation * SimulationEngine::_loadModule(const std::strin
 
 	if (newModule == NULL) {
 		// In this case, the module was not built-in.
+#ifdef SBM_IPHONE
+        newModule = new PPRAIModule;
+#else
+        
 #ifdef _WIN32
 		std::string extension = ".dll";
 #endif
@@ -702,6 +718,7 @@ SteerLib::ModuleMetaInformation * SimulationEngine::_loadModule(const std::strin
 
 		// create the module itself
 		newModule = createModule();
+#endif        
 		if (newModule == NULL) {
 			throw GenericException("Could not create module \"" + moduleName + "\", createModule() returned NULL.");
 		}
