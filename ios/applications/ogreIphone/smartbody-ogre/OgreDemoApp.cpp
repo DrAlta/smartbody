@@ -1,5 +1,4 @@
 #include "OgreDemoApp.h"
-#include "test.h"
 #include <iostream>
 
 DemoApp::DemoApp()
