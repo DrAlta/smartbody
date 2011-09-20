@@ -60,8 +60,6 @@ MeCtGazeJoint::MeCtGazeJoint( void )	{
 void MeCtGazeJoint::init( SkJoint* j_p )	{
 	
 	joint_p = j_p;
-	//SrVec axis = joint_p->parent()->localGlobalAxis(2);
-	//forward_ref = vector_t(axis[0],axis[1],axis[2]);
 }
 
 void MeCtGazeJoint::start( void )	{
@@ -205,8 +203,11 @@ void MeCtGazeJoint::capture_joint_state( void ) {
 			parent_diff_rot = world_zero_rot*(-parent_zero_rot);
 
 			gwiz::matrix_t LM = WM*(-PM)*M;
-			local_pos = (world_zero_rot)*(-parent_rot)*(world_pos-parent_pos);//LM.translation( gwiz::COMP_M_TR );
-			local_rot = (world_zero_rot)*(-parent_rot)*(world_rot);//LM.quat( gwiz::COMP_M_TR );
+			local_pos = (parent_zero_rot)*(-parent_rot)*(world_pos-parent_pos);//LM.translation( gwiz::COMP_M_TR );
+
+			local_rot = (parent_zero_rot)*(-parent_rot)*(world_rot)*(-world_zero_rot);//LM.quat( gwiz::COMP_M_TR );
+			//gwiz::vector_t newAxis = world_zero_rot*local_rot.axis();
+			//local_rot = quat_t(local_rot.degrees(),newAxis);
 			}	   
 
 		}
