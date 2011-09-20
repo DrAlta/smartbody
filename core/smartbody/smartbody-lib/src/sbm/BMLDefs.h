@@ -291,6 +291,10 @@ class BMLDefs
 		static XMLCh* ATTR_SEMANTIC;
 		static XMLCh* ATTR_VCOUNT;
 		static XMLCh* ATTR_SOURCE;
+		static XMLCh* ATTR_URL;
+		static XMLCh* ATTR_OFFSET;
+		static XMLCh* ATTR_SYMBOL;
+		static XMLCh* ATTR_MATERIAL;
 };
 
 

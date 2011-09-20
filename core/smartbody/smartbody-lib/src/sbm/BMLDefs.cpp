@@ -294,6 +294,10 @@ XMLCh* BMLDefs::ATTR_INPUT = NULL;
 XMLCh* BMLDefs::ATTR_SEMANTIC = NULL;
 XMLCh* BMLDefs::ATTR_VCOUNT = NULL;
 XMLCh* BMLDefs::ATTR_SOURCE = NULL;
+XMLCh* BMLDefs::ATTR_URL = NULL;
+XMLCh* BMLDefs::ATTR_OFFSET = NULL;
+XMLCh* BMLDefs::ATTR_SYMBOL = NULL;
+XMLCh* BMLDefs::ATTR_MATERIAL = NULL;
 
 BMLDefs::BMLDefs()
 {
@@ -603,6 +607,10 @@ BMLDefs::BMLDefs()
 	ATTR_SEMANTIC = XMLString::transcode("semantic");
 	ATTR_VCOUNT = XMLString::transcode("vcount");
 	ATTR_SOURCE = XMLString::transcode("source");
+	ATTR_URL = XMLString::transcode("url");
+	ATTR_OFFSET = XMLString::transcode("offset");
+	ATTR_SYMBOL = XMLString::transcode("symbol");
+	ATTR_MATERIAL = XMLString::transcode("material");
 }
 
 }

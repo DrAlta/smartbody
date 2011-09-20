@@ -1795,7 +1795,41 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 	{
 		DOMNode* geometryNode = ParserOpenCOLLADA::getNode("library_geometries", obj_file);
 		if (geometryNode)
-			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, meshModelVec, 1.0f);
+		{
+			// first from library visual scene retrieve the material id to name mapping (TODO: needs reorganizing the assets management)
+			std::map<std::string, std::string> materialId2Name;
+			DOMNode* visualSceneNode = ParserOpenCOLLADA::getNode("library_visual_scenes", obj_file);
+			if (!visualSceneNode)
+				LOG("mcu_character_load_mesh ERR: .dae file doesn't contain correct geometry information.");
+			SkSkeleton skeleton;
+			SkMotion motion;
+			int order;
+			ParserOpenCOLLADA::parseLibraryVisualScenes(visualSceneNode, skeleton, motion, 1.0, order, materialId2Name);
+
+			// get picture id to file mapping
+			std::map<std::string, std::string> pictureId2File;
+			DOMNode* imageNode = ParserOpenCOLLADA::getNode("library_images", obj_file);
+			if (imageNode)
+				ParserOpenCOLLADA::parseLibraryImages(imageNode, pictureId2File);
+
+			// start parsing mateiral
+			std::map<std::string, std::string> effectId2MaterialId;
+			DOMNode* materialNode = ParserOpenCOLLADA::getNode("library_materials", obj_file);
+			if (materialNode)
+				ParserOpenCOLLADA::parseLibraryMaterials(materialNode, effectId2MaterialId);
+
+			// start parsing effect
+			SrArray<SrMaterial> M;
+			SrStringArray mnames;
+			std::map<std::string,std::string> mtlTextMap;
+			std::map<std::string,std::string> mtlTextBumpMap;
+			DOMNode* effectNode = ParserOpenCOLLADA::getNode("library_effects", obj_file);
+			if (effectNode)
+				ParserOpenCOLLADA::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, M, mnames, mtlTextMap, mtlTextBumpMap);
+
+			// parsing geometry
+			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, obj_file, M, mnames, mtlTextMap, mtlTextBumpMap, meshModelVec, 1.0f);
+		}
 
 		// below code is to adjust the mesh if there's orientation in the joints. potential bug too because here only detect the first joint
 		SkSkeleton* skel = char_p->getSkeleton();
