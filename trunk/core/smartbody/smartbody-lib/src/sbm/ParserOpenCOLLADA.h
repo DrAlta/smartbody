@@ -36,12 +36,16 @@ class ParserOpenCOLLADA
 		static DOMNode* getNode(std::string nodeName, DOMNode* node);
 		static DOMNode* getNode(std::string nodeName, std::string fileName);
 		static bool parse(SkSkeleton& skeleton, SkMotion& motion, std::string fileName, float scale);
-		static void parseLibraryVisualScenes(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order);
-		static void parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, SkJoint* parent = NULL);
+		static void parseLibraryVisualScenes(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name);
+		static void parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent = NULL);
 		static void parseLibraryAnimations(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order);
 		static void animationPostProcess(SkSkeleton& skeleton, SkMotion& motion);
 		static void animationPostProcessByChannels(SkSkeleton& skeleton, SkMotion& motion, SkChannelArray& channels);
-		static void parseLibraryGeometries(DOMNode* node, std::vector<SrModel*>& meshModelVec, float scale);
+		static void parseLibraryGeometries(DOMNode* node, const char* file, SrArray<SrMaterial>& M, SrStringArray& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::vector<SrModel*>& meshModelVec, float scale);
+		static void load_texture(int type, const char* file, const SrStringArray& paths);
+		static void parseLibraryMaterials(DOMNode* node, std::map<std::string, std::string>& effectId2MaterialId);
+		static void parseLibraryImages(DOMNode* node, std::map<std::string, std::string>& pictureId2File);
+		static void parseLibraryEffects(DOMNode* node, std::map<std::string, std::string>&effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, SrArray<SrMaterial>& M, SrStringArray& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap);
 
 	private:
 		static int getMotionChannelId(SkChannelArray& channels, std::string sourceName);

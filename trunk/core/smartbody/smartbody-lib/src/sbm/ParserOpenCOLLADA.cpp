@@ -29,6 +29,20 @@
 #include <string>
 #include <sbm/BMLDefs.h>
 
+#ifdef __APPLE__
+#include "TargetConditionals.h"
+#if defined (TARGET_OS_IPHONE)  || defined (TARGET_IPHONE_SIMULATOR)
+#ifndef SBM_IPHONE
+#define SBM_IPHONE
+#endif
+#endif
+#endif
+
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
+#include <sbm/GPU/SbmTexture.h>
+#endif
+
+
 bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::string pathName, float scale)
 {
 	try 
@@ -64,7 +78,8 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 			LOG("ParserOpenCOLLADA::parse ERR: no skeleton info contained in this file");
 			return false;
 		}
-		parseLibraryVisualScenes(skNode, skeleton, motion, scale, order);
+		std::map<std::string, std::string> materialId2Name;
+		parseLibraryVisualScenes(skNode, skeleton, motion, scale, order, materialId2Name);
 		DOMNode* skmNode = getNode("library_animations", doc);
 		if (!skmNode)
 		{
@@ -167,7 +182,7 @@ DOMNode* ParserOpenCOLLADA::getNode(std::string nodeName, std::string fileName)
 	return NULL;
 }
 
-void ParserOpenCOLLADA::parseLibraryVisualScenes(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order)
+void ParserOpenCOLLADA::parseLibraryVisualScenes(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name)
 {
 	const DOMNodeList* list1 = node->getChildNodes();
 	for (unsigned int c = 0; c < list1->getLength(); c++)
@@ -175,11 +190,11 @@ void ParserOpenCOLLADA::parseLibraryVisualScenes(DOMNode* node, SkSkeleton& skel
 		DOMNode* node1 = list1->item(c);
 		std::string nodeName = getString(node1->getNodeName());
 		if (nodeName == "visual_scene")
-			parseJoints(node1, skeleton, motion, scale, order, NULL);
+			parseJoints(node1, skeleton, motion, scale, order, materialId2Name, NULL);
 	}
 }
 
-void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, SkJoint* parent)
+void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent)
 {
 	const DOMNodeList* list = node->getChildNodes();
 	for (unsigned int i = 0; i < list->getLength(); i++)
@@ -300,10 +315,27 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 				jointQuat->prerot(quat);
 				SrQuat jorientQ = SrQuat(jorientMat);
 				jointQuat->orientation(jorientQ);
-				parseJoints(list->item(i), skeleton, motion, scale, order, joint);
+				parseJoints(list->item(i), skeleton, motion, scale, order, materialId2Name, joint);
+			}
+			else if (typeAttr == "NODE")
+			{
+				DOMNode* materialNode = ParserOpenCOLLADA::getNode("instance_material", childNode);
+				if (materialNode)
+				{
+					DOMNamedNodeMap* materialAttr = materialNode->getAttributes();
+					DOMNode* symbolNode = materialAttr->getNamedItem(BML::BMLDefs::ATTR_SYMBOL);
+					std::string materialName = getString(symbolNode->getNodeValue());
+
+					DOMNode* targetNode = materialAttr->getNamedItem(BML::BMLDefs::ATTR_TARGET);
+					std::string targetNameString = getString(targetNode->getNodeValue());
+					std::string targetName = targetNameString.substr(1);
+					if (materialId2Name.find(targetName) == materialId2Name.end())
+						materialId2Name.insert(std::make_pair(targetName, materialName));
+				}
+				parseJoints(list->item(i), skeleton, motion, scale, order, materialId2Name, parent);
 			}
 			else
-				parseJoints(list->item(i), skeleton, motion, scale, order, parent);
+				parseJoints(list->item(i), skeleton, motion, scale, order, materialId2Name, parent);
 		}
 	}
 }
@@ -624,21 +656,28 @@ std::string ParserOpenCOLLADA::getGeometryType(std::string idString)
 	size_t found = idString.find("position");
 	if (found != string::npos)
 		return "positions";
+
+	found = idString.find("binormal");
+	if (found != string::npos)
+		return "";
+
 	found = idString.find("normal");
 	if (found != string::npos)
 		return "normals";
+
 	found = idString.find("uv");
 	if (found != string::npos)
 		return "texcoords";
+
 	found = idString.find("map");
 	if (found != string::npos)
 		return "texcoords";
 
-	LOG("ParserOpenCOLLADA::getGeometryType ERR!");	
+	LOG("ParserOpenCOLLADA::getGeometryType WARNING: type %s not supported!", idString.c_str());	
 	return "";
 }
 
-void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, std::vector<SrModel*>& meshModelVec, float scale)
+void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, SrArray<SrMaterial>& M, SrStringArray& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::vector<SrModel*>& meshModelVec, float scale)
 {
 	const DOMNodeList* list = node->getChildNodes();
 	for (unsigned int c = 0; c < list->getLength(); c++)
@@ -647,6 +686,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, std::vector<SrMode
 		std::string nodeName = getString(node->getNodeName());
 		if (nodeName == "geometry")
 		{
+
 			SrModel* newModel = new SrModel();
 			DOMNamedNodeMap* nodeAttr = node->getAttributes();
 			DOMNode* nameNode = nodeAttr->getNamedItem(BML::BMLDefs::ATTR_NAME);
@@ -710,11 +750,15 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, std::vector<SrMode
 				}
 				if (nodeName1 == "triangles" || nodeName1 == "polylist")
 				{
+					int curmtl = -1;
 					DOMNamedNodeMap* nodeAttr1 = node1->getAttributes();
 					DOMNode* countNode = nodeAttr1->getNamedItem(BML::BMLDefs::ATTR_COUNT);
 					int count = atoi(getString(countNode->getNodeValue()).c_str());
-					std::vector<std::string> inputs;
-					int numInput = 0;
+					DOMNode* materialNode = nodeAttr1->getNamedItem(BML::BMLDefs::ATTR_MATERIAL);
+					std::string materialName = getString(materialNode->getNodeValue());
+					curmtl = mnames.lsearch(materialName.c_str());
+					std::map<int, std::string> inputMap;
+					int pStride = 0;
 					std::vector<int> vcountList;
 					for (unsigned int c2 = 0; c2 < node1->getChildNodes()->getLength(); c2++)
 					{
@@ -723,8 +767,17 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, std::vector<SrMode
 						{
 							DOMNamedNodeMap* inputNodeAttr = inputNode->getAttributes();
 							DOMNode* semanticNode = inputNodeAttr->getNamedItem(BML::BMLDefs::ATTR_SEMANTIC);
-							inputs.push_back(getString(semanticNode->getNodeValue()));
-							numInput++;
+							std::string inputSemantic = getString(semanticNode->getNodeValue());
+							DOMNode* offsetNode = inputNodeAttr->getNamedItem(BML::BMLDefs::ATTR_OFFSET);
+							int offset = atoi(getString(offsetNode->getNodeValue()).c_str());
+							if (pStride <= offset)	pStride = offset;
+							if (inputMap.find(offset) != inputMap.end())
+							{
+								if (inputSemantic == "VERTEX" || inputSemantic == "NORMAL" || inputSemantic == "TEXCOORD")
+									LOG("ParserOpenCOLLADA::parseLibraryGeometries ERR: file not correct.");
+							}
+							else
+								inputMap.insert(std::make_pair(offset, inputSemantic));
 						}
 						if (XMLString::compareString(inputNode->getNodeName(), BML::BMLDefs::ATTR_VCOUNT) == 0)
 						{
@@ -735,6 +788,10 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, std::vector<SrMode
 								vcountList.push_back(atoi(tokens[i].c_str()));
 						}
 					}
+					int totalVertex = 0;
+					for (size_t i = 0; i < vcountList.size(); i++)
+						totalVertex += vcountList[i];
+
 					if (vcountList.size() == 0)
 					{
 						for (int i = 0; i < count; i++)
@@ -742,203 +799,211 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, std::vector<SrMode
 					}
 					DOMNode* pNode = ParserOpenCOLLADA::getNode("p", node1);
 					std::string pString = getString(pNode->getTextContent());
-					// below code has potential bug because input order maybe different
 					std::vector<std::string> tokens;
 					vhcl::Tokenize(pString, tokens, " ");
 					int index = 0;
+					pStride += 1;
 					for (int i = 0; i < count; i++)
 					{
-						if (numInput == 1)
+						std::vector<int> fVec;
+						std::vector<int> ftVec;
+						std::vector<int> fnVec;
+						for (int j = 0; j < vcountList[i]; j++)
 						{
-							if (inputs[0] == "VERTEX")
+							for (int k = 0; k < pStride; k++)
 							{
-								if (vcountList[i] == 3)
-								{
-									newModel->F.push();
-									newModel->F.top().a = atoi(tokens[index++].c_str());
-									newModel->F.top().b = atoi(tokens[index++].c_str());
-									newModel->F.top().c = atoi(tokens[index++].c_str());
-								}
-								if (vcountList[i] == 4)
-								{
-									newModel->F.push();
-									int a = atoi(tokens[index++].c_str());
-									int b = atoi(tokens[index++].c_str());
-									int c = atoi(tokens[index++].c_str());
-									int d = atoi(tokens[index++].c_str());
-									newModel->F.top().a = a;
-									newModel->F.top().b = b;
-									newModel->F.top().c = c;
-									newModel->F.push();
-									newModel->F.top().a = a;
-									newModel->F.top().b = c;
-									newModel->F.top().c = d;
-								}
+								std::string semantic = inputMap[k];
+								if (semantic == "VERTEX")
+									fVec.push_back(atoi(tokens[index].c_str()));
+								if (semantic == "TEXCOORD")
+									ftVec.push_back(atoi(tokens[index].c_str()));
+								if (semantic == "NORMAL")
+									fnVec.push_back(atoi(tokens[index].c_str()));
+								index++;
 							}
-							else
-								LOG("ParserOpenCOLLADA::parseLibraryGeometries ERR!");
 						}
-						if (numInput == 2)
+						// process each polylist
+						for (size_t x = 2; x < fVec.size(); x++)
 						{
-							if (inputs[0] == "VERTEX" && inputs[1] == "TEXCOORD")
-							{
-								if (vcountList[i] == 3)
-								{
-									newModel->F.push();
-									newModel->Ft.push();
-									newModel->F.top().a = atoi(tokens[index++].c_str());
-									newModel->Ft.top().a = atoi(tokens[index++].c_str());
-									newModel->F.top().b = atoi(tokens[index++].c_str());
-									newModel->Ft.top().b = atoi(tokens[index++].c_str());
-									newModel->F.top().c = atoi(tokens[index++].c_str());
-									newModel->Ft.top().c = atoi(tokens[index++].c_str());	
-								}
-								if (vcountList[i] == 4)
-								{
-									int a = atoi(tokens[index++].c_str());
-									int a1 = atoi(tokens[index++].c_str());
-									int b = atoi(tokens[index++].c_str());
-									int b1 = atoi(tokens[index++].c_str()); 
-									int c = atoi(tokens[index++].c_str());
-									int c1 = atoi(tokens[index++].c_str());
-									int d = atoi(tokens[index++].c_str());
-									int d1 = atoi(tokens[index++].c_str()); 
-									newModel->F.push();
-									newModel->Ft.push();
-									newModel->F.top().a = a;
-									newModel->Ft.top().a = a1;
-									newModel->F.top().b = b;
-									newModel->Ft.top().b = b1;
-									newModel->F.top().c = c;
-									newModel->Ft.top().c = c1;	
-
-									newModel->F.push();
-									newModel->Ft.push();
-									newModel->F.top().a = a;
-									newModel->Ft.top().a = a1;
-									newModel->F.top().b = c;
-									newModel->Ft.top().b = c1;
-									newModel->F.top().c = d;
-									newModel->Ft.top().c = d1;
-								}
-							}
-							else if (inputs[0] == "VERTEX" && inputs[1] == "NORMAL")
-							{
-								if (vcountList[i] == 3)
-								{
-									newModel->F.push();
-									newModel->Fn.push();
-									newModel->F.top().a = atoi(tokens[index++].c_str());
-									newModel->Fn.top().a = atoi(tokens[index++].c_str());
-									newModel->F.top().b = atoi(tokens[index++].c_str());
-									newModel->Fn.top().b = atoi(tokens[index++].c_str());
-									newModel->F.top().c = atoi(tokens[index++].c_str());
-									newModel->Fn.top().c = atoi(tokens[index++].c_str());
-								}
-								if (vcountList[i] == 4)
-								{
-									int a = atoi(tokens[index++].c_str());
-									int a1 = atoi(tokens[index++].c_str());
-									int b = atoi(tokens[index++].c_str());
-									int b1 = atoi(tokens[index++].c_str()); 
-									int c = atoi(tokens[index++].c_str());
-									int c1 = atoi(tokens[index++].c_str());
-									int d = atoi(tokens[index++].c_str());
-									int d1 = atoi(tokens[index++].c_str()); 
-									newModel->F.push();
-									newModel->Fn.push();
-									newModel->F.top().a = a;
-									newModel->Fn.top().a = a1;
-									newModel->F.top().b = b;
-									newModel->Fn.top().b = b1;
-									newModel->F.top().c = c;
-									newModel->Fn.top().c = c1;
-
-									newModel->F.push();
-									newModel->Fn.push();
-									newModel->F.top().a = a;
-									newModel->Fn.top().a = a1;
-									newModel->F.top().b = c;
-									newModel->Fn.top().b = c1;
-									newModel->F.top().c = d;
-									newModel->Fn.top().c = d1;
-								}
-							}
-							else
-								LOG("ParserOpenCOLLADA::parseLibraryGeometries ERR!");
-						} 
-						if (numInput == 3)
-						{
-							if (inputs[0] == "VERTEX" && inputs[1] == "NORMAL" && inputs[2] == "TEXCOORD")
-							{
-								if (vcountList[i] == 3)
-								{
-									newModel->F.push();
-									newModel->Fn.push();
-									newModel->Ft.push();
-									newModel->F.top().a = atoi(tokens[index++].c_str());
-									newModel->Fn.top().a = atoi(tokens[index++].c_str());
-									newModel->Ft.top().a = atoi(tokens[index++].c_str());
-									newModel->F.top().b = atoi(tokens[index++].c_str());
-									newModel->Fn.top().b = atoi(tokens[index++].c_str());
-									newModel->Ft.top().b = atoi(tokens[index++].c_str());
-									newModel->F.top().c = atoi(tokens[index++].c_str());
-									newModel->Fn.top().c = atoi(tokens[index++].c_str());
-									newModel->Ft.top().c = atoi(tokens[index++].c_str());	
-								}
-								if (vcountList[i] == 4)
-								{
-									int a = atoi(tokens[index++].c_str());
-									int a1 = atoi(tokens[index++].c_str());
-									int a2 = atoi(tokens[index++].c_str());
-									int b = atoi(tokens[index++].c_str());
-									int b1 = atoi(tokens[index++].c_str()); 
-									int b2 = atoi(tokens[index++].c_str()); 
-									int c = atoi(tokens[index++].c_str());
-									int c1 = atoi(tokens[index++].c_str());
-									int c2 = atoi(tokens[index++].c_str());
-									int d = atoi(tokens[index++].c_str());
-									int d1 = atoi(tokens[index++].c_str()); 
-									int d2 = atoi(tokens[index++].c_str()); 
-
-									newModel->F.push();
-									newModel->Fn.push();
-									newModel->Ft.push();
-									newModel->F.top().a = a;
-									newModel->Fn.top().a = a1;
-									newModel->Ft.top().a = a2;
-									newModel->F.top().b = b;
-									newModel->Fn.top().b = b1;
-									newModel->Ft.top().b = b2;
-									newModel->F.top().c = c;
-									newModel->Fn.top().c = c1;
-									newModel->Ft.top().c = c2;	
-
-									newModel->F.push();
-									newModel->Fn.push();
-									newModel->Ft.push();
-									newModel->F.top().a = a;
-									newModel->Fn.top().a = a1;
-									newModel->Ft.top().a = a2;
-									newModel->F.top().b = c;
-									newModel->Fn.top().b = c1;
-									newModel->Ft.top().b = c2;
-									newModel->F.top().c = d;
-									newModel->Fn.top().c = d1;
-									newModel->Ft.top().c = d2;	
-								}
-							}
-							else
-								LOG("ParserOpenCOLLADA::parseLibraryGeometries ERR!");
+							newModel->F.push().set(fVec[0], fVec[x - 1], fVec[x]);
+							newModel->Fm.push() = curmtl;
+							newModel->Ft.push().set(ftVec[0], ftVec[x - 1], ftVec[x]);
+							newModel->Fn.push().set(fnVec[0], fnVec[x - 1], fnVec[x]);
 						}
-					}				
+					}
+
+					if (tokens.size() != index)
+						LOG("ParserOpenCOLLADA::parseLibraryGeometries ERR: parsing <p> list uncorrectly (%s)!", nameAttr.c_str());
 				}
 			}
+
+			newModel->mtlTextureNameMap = mtlTexMap;
+			newModel->mtlNormalTexNameMap = mtlTexBumpMap;
+			newModel->M = M;
+			newModel->mtlnames = mnames;
+
 			newModel->validate();
 			newModel->remove_redundant_materials();
 //			newModel->remove_redundant_normals();
 			newModel->compress();
 			meshModelVec.push_back(newModel);
+
+			SrString path = file;
+			SrString filename;
+			path.extract_file_name(filename);
+			SrStringArray paths;
+			paths.push ( path );
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
+			for (int i = 0; i < newModel->M.size(); i++)
+			{
+			   std::string matName = newModel->mtlnames[i];
+			   if (newModel->mtlTextureNameMap.find(matName) != newModel->mtlTextureNameMap.end())
+			   {
+				   ParserOpenCOLLADA::load_texture(SbmTextureManager::TEXTURE_DIFFUSE, newModel->mtlTextureNameMap[matName].c_str(), paths);	   
+			   }	
+			   if (newModel->mtlNormalTexNameMap.find(matName) != newModel->mtlNormalTexNameMap.end())
+			   {
+				   ParserOpenCOLLADA::load_texture(SbmTextureManager::TEXTURE_NORMALMAP, newModel->mtlNormalTexNameMap[matName].c_str(), paths);	   
+			   }
+			}
+#endif
 		}
 	}	
+}
+
+void ParserOpenCOLLADA::load_texture(int type, const char* file, const SrStringArray& paths)
+{
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
+	SrString s;
+	SrInput in;
+	std::string imageFile = file;
+	in.init( fopen(file,"r"));
+	int i = 0;
+	while ( !in.valid() && i < paths.size())
+	{
+		s = paths[i++];
+		s << file;
+		imageFile = s;
+		in.init ( fopen(s,"r") );
+	}
+	if (!in.valid()) return;		
+	SbmTextureManager& texManager = SbmTextureManager::singleton();
+	texManager.loadTexture(type,file,s);	
+#endif
+}
+
+
+void ParserOpenCOLLADA::parseLibraryMaterials(DOMNode* node, std::map<std::string, std::string>& effectId2MaterialId)
+{
+	const DOMNodeList* list = node->getChildNodes();
+	for (unsigned int c = 0; c < list->getLength(); c++)
+	{
+		DOMNode* node = list->item(c);
+		std::string nodeName = getString(node->getNodeName());
+		if (nodeName == "material")
+		{
+			DOMNamedNodeMap* sourceAttr = node->getAttributes();
+			DOMNode* idNode = sourceAttr->getNamedItem(BML::BMLDefs::ATTR_ID);
+			std::string materialId = getString(idNode->getNodeValue());
+			DOMNode* meshNode = ParserOpenCOLLADA::getNode("instance_effect", node);
+			if (!meshNode)	continue;
+			DOMNamedNodeMap* materialSourceAttr = meshNode->getAttributes();
+			DOMNode* urlNode = materialSourceAttr->getNamedItem(BML::BMLDefs::ATTR_URL);
+			if (!urlNode)	continue;
+			std::string urlString = getString(urlNode->getNodeValue());
+			// get ride of the "#" in front, potential bug here if other file has different format
+			if (urlString != "")
+			{
+				std::string effectId = urlString.substr(1);
+				if (effectId2MaterialId.find(effectId) == effectId2MaterialId.end())
+					effectId2MaterialId.insert(std::make_pair(effectId, materialId));
+				else
+					LOG("ParserOpenCOLLADA::parseLibraryMaterials ERR: two effects mapped to material %s", materialId.c_str());
+			}
+		}
+	}
+}
+
+void ParserOpenCOLLADA::parseLibraryImages(DOMNode* node, std::map<std::string, std::string>& pictureId2File)
+{
+	const DOMNodeList* list = node->getChildNodes();
+	for (unsigned int c = 0; c < list->getLength(); c++)
+	{
+		DOMNode* node = list->item(c);
+		std::string nodeName = getString(node->getNodeName());
+		if (nodeName == "image")
+		{
+			DOMNamedNodeMap* imageAttr = node->getAttributes();
+			DOMNode* idNode = imageAttr->getNamedItem(BML::BMLDefs::ATTR_ID);
+			std::string imageId = getString(idNode->getNodeValue());
+			DOMNode* initFromNode = ParserOpenCOLLADA::getNode("init_from", node);
+			std::string imageFile = getString(initFromNode->getTextContent());
+			if (pictureId2File.find(imageId) == pictureId2File.end())
+				pictureId2File.insert(std::make_pair(imageId, imageFile));
+			else
+				LOG("ParserOpenCOLLADA::parseLibraryImages ERR: two image files mapped to same image id %s", imageId.c_str());
+		}
+	}
+}
+
+void ParserOpenCOLLADA::parseLibraryEffects(DOMNode* node, std::map<std::string, std::string>& effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, SrArray<SrMaterial>& M, SrStringArray& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap)
+{
+	const DOMNodeList* list = node->getChildNodes();
+	for (unsigned int c = 0; c < list->getLength(); c++)
+	{
+		DOMNode* node = list->item(c);
+		std::string nodeName = getString(node->getNodeName());
+		if (nodeName == "effect")
+		{
+			DOMNamedNodeMap* effectAttr = node->getAttributes();
+			DOMNode* idNode = effectAttr->getNamedItem(BML::BMLDefs::ATTR_ID);
+			std::string effectId = getString(idNode->getNodeValue());
+			std::string materialId = effectId2MaterialId[effectId];
+			std::string materialName = materialId2Name[materialId];
+			SrMaterial material;
+			material.init();
+			M.push(material);
+			SrString matName(materialName.c_str());
+			mnames.push(matName);
+
+			DOMNode* initFromNode = ParserOpenCOLLADA::getNode("init_from", node);
+			if (initFromNode)
+			{
+				std::string imageId = getString(initFromNode->getTextContent());
+				std::string imageFile = pictureId2File[imageId];
+				SrString mapKaName(imageFile.c_str());
+				std::string texFile = (const char*) mapKaName;
+				std::string mtlName = mnames.top();
+				std::string fileExt = boost::filesystem2::extension(texFile);
+				std::string fileName = boost::filesystem::basename(texFile);	
+				mtlTexMap[mtlName] = fileName + fileExt;	
+			}
+
+			DOMNode* emissionNode = ParserOpenCOLLADA::getNode("emission", node);
+			if (emissionNode)
+			{
+				DOMNode* colorNode = ParserOpenCOLLADA::getNode("color", emissionNode);
+				std::string color = getString(colorNode->getTextContent());
+				std::vector<std::string> tokens;
+				vhcl::Tokenize(color, tokens, " ");
+				float w = 1;
+				if (tokens.size() == 4)
+					w = (float)atof(tokens[3].c_str());
+				M.top().emission = SrColor((float)atof(tokens[0].c_str()), (float)atof(tokens[1].c_str()), (float)atof(tokens[2].c_str()), w);
+			}
+
+			DOMNode* ambientNode = ParserOpenCOLLADA::getNode("ambient", node);
+			if (ambientNode)
+			{
+				DOMNode* colorNode = ParserOpenCOLLADA::getNode("color", ambientNode);
+				std::string color = getString(colorNode->getTextContent());
+				std::vector<std::string> tokens;
+				vhcl::Tokenize(color, tokens, " ");
+				float w = 1;
+				if (tokens.size() == 4)
+					w = (float)atof(tokens[3].c_str());
+				M.top().ambient = SrColor((float)atof(tokens[0].c_str()), (float)atof(tokens[1].c_str()), (float)atof(tokens[2].c_str()), w);
+			}
+		}
+	}
 }
