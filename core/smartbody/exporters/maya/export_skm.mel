@@ -1648,7 +1648,7 @@ global proc skmExportGUI()
 				setParent .. ;
 			setParent .. ;
 		setParent .. ;
-	checkBox -editable false -label "Use Channel Attributes" -onCommand "skmChannelAttributesOn" -offCommand "skmChannelAttributesOff" -align "left" channelAttributesBox;
+	checkBox -label "Use Channel Attributes" -onCommand "skmChannelAttributesOn" -offCommand "skmChannelAttributesOff" -align "left" channelAttributesBox;
 	checkBox -editable false -label "Facial Animations" -changeCommand "skmToggleIsFacial" -value false -align "left" facialBox;
 	checkBox -editable false -label "Partial Animation Exporting- ON: Zero-out OFF: Eliminate Other joints" -changeCommand "skmTogglePartialExport" -value false -align "left" partialExportBox;
 
