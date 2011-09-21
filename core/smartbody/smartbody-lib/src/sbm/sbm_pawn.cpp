@@ -1101,14 +1101,17 @@ int SbmPawn::print_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 	return print_attribute( pawn, attribute, args, mcu_p );
 }
 
-int SbmPawn::print_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& args, mcuCBHandle *mcu_p ) {
+int SbmPawn::print_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	std::stringstream strstr;
 	if( attribute=="world_offset" || attribute=="world-offset" ) {
 		//  Command: print pawn <character id> world_offset
 		//  Print out the current state of the world_offset joint
-		cout << "pawn " << pawn->getName() << " world_offset:\t";
+		strstr << "pawn " << pawn->getName() << " world_offset:\t";
 		const SkJoint* joint = pawn->get_world_offset_joint();
+		LOG(strstr.str().c_str());
 		if( joint==NULL ) {
-			cout << "No world_offset joint." << endl;
+			LOG("No world_offset joint.");
 		} else {
 			print_joint( joint );
 		}
@@ -1123,8 +1126,10 @@ int SbmPawn::print_attribute( SbmPawn* pawn, string& attribute, srArgBuffer& arg
 		}
 
 		do {
-			cout << "pawn " << pawn->getName() << " joint "<<joint_name<<":\t";
+			strstr.clear();
+			strstr << "pawn " << pawn->getName() << " joint "<<joint_name<<":\t";
 			const SkJoint* joint = pawn->get_joint( joint_name.c_str() );
+			LOG(strstr.str().c_str());
 			if( joint==NULL ) {
 				LOG("No joint \"%s\".", joint_name.c_str() );
 			} else {

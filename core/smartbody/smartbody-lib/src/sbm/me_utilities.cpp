@@ -691,15 +691,16 @@ int load_me_postures( const char* pathname, std::map<std::string, SkPosture*>& m
 
 void print_joint( const SkJoint* joint ) {
 	const SkJointPos* pos = joint->const_pos();
+	std::stringstream strstr;
 
-	cout << "position:\t" << pos->value(SkVecLimits::X) << ", "
+	strstr << "position:\t" << pos->value(SkVecLimits::X) << ", "
 	                        << pos->value(SkVecLimits::Y) << ", "
-	                        << pos->value(SkVecLimits::Z);
+	                        << pos->value(SkVecLimits::Z) << endl;
 
 	switch( joint->rot_type() ) {
 		case SkJoint::TypeEuler: {
 			const SkJointEuler* euler = joint->const_euler();
-			cout << "\trotation euler:\t" << euler->value(SkVecLimits::X) << ", "
+			strstr << "rotation euler:\t" << euler->value(SkVecLimits::X) << ", "
 			                              << euler->value(SkVecLimits::Y) << ", "
 			                              << euler->value(SkVecLimits::Z) << endl;
 			break;
@@ -707,13 +708,13 @@ void print_joint( const SkJoint* joint ) {
 		case SkJoint::TypeQuat: {
 			// const_cast because the SrQuat does validation (no const version of value())
 			const SrQuat& quat = (const_cast<SkJoint*>(joint))->quat()->value();
-			cout << "\trotation quat:\t" << quat.w << ", "
+			strstr << "rotation quat:\t" << quat.w << ", "
 			                             << quat.x << ", "
 			                             << quat.y << ", "
 			                             << quat.z;
 			// Marcus's mappings
 			gwiz::euler_t euler( gwiz::quat_t( quat.w, quat.x, quat.y, quat.z ) );
-			cout << "\t(as hpr: " << euler.y() << ", "
+			strstr << "(as hpr: " << euler.y() << ", "
 			                      << euler.x() << ", "
 			                      << euler.z() << ")" << endl;
 			break;
@@ -721,10 +722,12 @@ void print_joint( const SkJoint* joint ) {
 		case SkJoint::TypeSwingTwist: {
 			// const_cast because the SwingTwist does validation (no const version of swingx(), etc.)
 			SkJointSwingTwist* st = (const_cast<SkJoint*>(joint))->st();
-			cout << "\troation swing-twist (xyt):\t" << st->swingx() << ", "
+			strstr << "rotation swing-twist (xyt):\t" << st->swingx() << ", "
 			                                         << st->swingy() << ", "
 			                                         << st->twist() << endl;
+
 			break;
 		}
 	}
+	LOG(strstr.str().c_str());
 }
