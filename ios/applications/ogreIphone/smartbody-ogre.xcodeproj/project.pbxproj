@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA03673C142A543500DDDCA2 /* libblas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA036739142A543500DDDCA2 /* libblas.a */; };
+		AA03673D142A543500DDDCA2 /* libf2c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA03673A142A543500DDDCA2 /* libf2c.a */; };
+		AA03673E142A543500DDDCA2 /* liblapack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA03673B142A543500DDDCA2 /* liblapack.a */; };
 		AA2AFA9C1406F67300CB9A6A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA2AFA9B1406F67300CB9A6A /* Foundation.framework */; };
 		AA2AFA9E1406F67300CB9A6A /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA2AFA9D1406F67300CB9A6A /* OpenGLES.framework */; };
 		AA2AFAA01406F67300CB9A6A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA2AFA9F1406F67300CB9A6A /* QuartzCore.framework */; };
@@ -36,6 +39,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AA036739142A543500DDDCA2 /* libblas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libblas.a; path = ../../libs/iphoneos/libblas.a; sourceTree = "<group>"; };
+		AA03673A142A543500DDDCA2 /* libf2c.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libf2c.a; path = ../../libs/iphoneos/libf2c.a; sourceTree = "<group>"; };
+		AA03673B142A543500DDDCA2 /* liblapack.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblapack.a; path = ../../libs/iphoneos/liblapack.a; sourceTree = "<group>"; };
 		AA1791911421A7FC00DCA9FE /* Default-Portrait.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Portrait.png"; sourceTree = "<group>"; };
 		AA1791921421A81300DCA9FE /* resources.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = resources.cfg; sourceTree = "<group>"; };
 		AA2AFA971406F67300CB9A6A /* smartbody-ogre.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "smartbody-ogre.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -333,7 +339,6 @@
 		AA5DF3941422D4B8002B8A17 /* init-common-face.seq */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "init-common-face.seq"; sourceTree = "<group>"; };
 		AA5DF3991422D4B8002B8A17 /* init-example-reach.seq */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "init-example-reach.seq"; sourceTree = "<group>"; };
 		AA5DF39B1422D4B8002B8A17 /* init-param-animation.seq */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "init-param-animation.seq"; sourceTree = "<group>"; };
-		AA5DF39D1422D4B8002B8A17 /* test-example-reach.seq */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "test-example-reach.seq"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -362,6 +367,9 @@
 				AA5DF01214202DB0002B8A17 /* libwsp.a in Frameworks */,
 				AA5DF01314202DB0002B8A17 /* libxerces-c.a in Frameworks */,
 				AA5DF2B91422B3A0002B8A17 /* libsmartbody-dll.a in Frameworks */,
+				AA03673C142A543500DDDCA2 /* libblas.a in Frameworks */,
+				AA03673D142A543500DDDCA2 /* libf2c.a in Frameworks */,
+				AA03673E142A543500DDDCA2 /* liblapack.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -405,6 +413,9 @@
 		AA2AFA9A1406F67300CB9A6A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AA036739142A543500DDDCA2 /* libblas.a */,
+				AA03673A142A543500DDDCA2 /* libf2c.a */,
+				AA03673B142A543500DDDCA2 /* liblapack.a */,
 				AA5DF2B81422B3A0002B8A17 /* libsmartbody-dll.a */,
 				AA5DEFF414202DB0002B8A17 /* libactivemq-cpp.a */,
 				AA5DEFF514202DB0002B8A17 /* libapr-1.a */,
@@ -843,7 +854,6 @@
 				AA5DF3941422D4B8002B8A17 /* init-common-face.seq */,
 				AA5DF3991422D4B8002B8A17 /* init-example-reach.seq */,
 				AA5DF39B1422D4B8002B8A17 /* init-param-animation.seq */,
-				AA5DF39D1422D4B8002B8A17 /* test-example-reach.seq */,
 			);
 			path = scripts;
 			sourceTree = "<group>";
@@ -991,6 +1001,7 @@
 				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "smartbody-ogre/smartbody-ogre-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = 4.2;
@@ -1042,6 +1053,8 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../libs/iphoneos\"",
+					"\"$(SRCROOT)/../../../../../Downloads/CLAPACK-3.2.1\"",
+					"\"$(SRCROOT)\"",
 				);
 				"LIBRARY_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
 					../../libs/iphoneos,
@@ -1089,6 +1102,7 @@
 				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "smartbody-ogre/smartbody-ogre-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = 4.2;
@@ -1140,6 +1154,8 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../libs/iphoneos\"",
+					"\"$(SRCROOT)/../../../../../Downloads/CLAPACK-3.2.1\"",
+					"\"$(SRCROOT)\"",
 				);
 				"LIBRARY_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
 					../../libs/iphoneos,

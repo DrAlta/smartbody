@@ -1,6 +1,6 @@
 								INSTALL INSTRUCTION
 
---------------------------------Compiling using shell script------------------------------
+--------------------------------Compiling using console---------------------------------------------
 1) Cross compiling activemq-cpp-library (dependent on apr&apr-util)
 - Cross compiling apr
 	http://archive.apache.org/dist/apr/
@@ -36,48 +36,61 @@ Note: for smartbody iphone running on unity, we need to rename variables inside 
 	Change the SBROOT inside setup-iphoneos.sh and setup-iphonesimulator.sh to your trunk directory
 	Run both of the scripts
 	
+4) Cross compiling clapack
+	http://www.netlib.org/clapack/
+	Download clapack-3.2.1-CMAKE.tgz, unzip and copy toolchain-iphone*.cmake from trunk/ios/activemq/activemq-cpp to that folder
+	Go to that directory from console, type
+	$ mkdir build
+	$ cd build
+	$ cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain-iphone*.cmake ..
+	$ make
+	$ make install
+	If you want to build for iphoneos, choose toolchain-iphoneos.cmake, for iphonesimulator, choose toolchain-iphonesimulator.cmake
+	Then go over the folders, copy libblas.a,libf2c.a,liblapack.a to trunk/ios/libs/iphone* depends whether you are building for device or simulator
+	
+	
 --------------------------------Compiling using Xcode4------------------------------
-4) Build bonebus
+5) Build bonebus
 	Open smartbody-iphone.xcworkspace, select the scheme to be bonebus, build
 
-5) Build boost
+6) Build boost
 	http://www.boost.org/users/history/version_1_44_0.html
 	Download boost_1_44_0.tar.gz, unzip to trunk/ios/boost. Make sure the folder name is boost_1_44_0.
 	Open smartbody-iphone.xcworkspace, select boost_system, boost_filesystem, boost_regex, build them seperately.
 	http://mathema.tician.de/news.tiker.net/download/software/boost-numeric-bindings/boost-numeric-bindings-20081116.tar.gz
 	Download boost_numeric_bindings, unzip it to trunk/ios/boost, make sure the name is boost_numeric_bindings
 	
-6) Build steersuite
+7) Build steersuite
 	Open smartbody-iphone.xcworkspace, select the steerlib, pprAI, build them seperately.
 
-7) Build vhmsg
+8) Build vhmsg
 	Open smartbody-iphone.xcworkspace, select scheme vhmsg and build.
 	
-8) Build vhcl
+9) Build vhcl
 	Since the vhcl_log.cpp hasn't been changed from VH group, you have to copy trunk/ios/vhcl/vhcl_log.cpp to trunk/lib/vhcl/src/vhcl_log.cpp for now.
 	Open smartbody-iphone.xcworkspace, select scheme vhcl and build.
 
-9) Build wsp
+10) Build wsp
 	Open smartbody-iphone.xcworkspace, select scheme wsp and build.
 	
-10) Build smartbody-lib
+11) Build smartbody-lib
 	Open smartbody-iphone.xcworkspace, select scheme smartbody-lib and build. 
 
-11) Build smartbody-dll (For now, this is optional)
+12) Build smartbody-dll (For now, this is optional)
 	Open smartbody-iphone.xcworkspace, select scheme smartbody-dll and build. 
 	
-12) Build vhwrapper-dll (For unity only, optional)
+13) Build vhwrapper-dll (For unity only, optional)
 	Open smartbody-iphone.xcworkspace, select scheme vhwrapper-dll and build. 
 
 
 --------------------------------Compiling and Running Applications using Xcode4------------------------------
 There are two applications under trunk/ios/applications, you have to go over the previous steps. Make sure you have your device connected.
-13) Build smartbody-openglES
+14) Build smartbody-openglES
 	Go to trunk/ios/applications/minimal, open smartbody-iphone.xcodeproj, build and run.
 
 Note: Under smartbody-openglES project Frameworks, you should see all the libraries existing. If not, go over previous steps to check if anything is wrong
 
-14) Build smartbody-ogre
+15) Build smartbody-ogre
 	http://www.ogre3d.org/download/sdk
 	Download ogreSDK
 	http://www.ogre3d.org/tikiwiki/tiki-index.php?page=Building%20From%20Source%20-%20iPhone&redirectpage=Building%20From%20Source%20(for%20iPhone)
@@ -89,7 +102,7 @@ Note: ogre 1.8 seems to have trouble when building for iphone/ipad, use ogre 1.7
 	  It is extremely slow running on armv6 ipod(after testing), and there's something wrong with the texture and shader. So maybe should just run on armv7 iphone/ipad.
 
 
-15) Build smartbody-unity
+16) Build smartbody-unity
 	...
 
 --------------------------------------------------------------------------------------------------------------

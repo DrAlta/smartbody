@@ -104,9 +104,10 @@
     [mUIWindow makeKeyAndVisible];    
     
     UITextField* textInput = [[UITextField alloc] initWithFrame:CGRectMake(10, 10, 300, 30)];
-    textInput.backgroundColor = [UIColor darkGrayColor];
-    [textInput setText:@"bml char </>"];
-    [textInput setBorderStyle:UITextBorderStyleNone];
+    textInput.backgroundColor = [UIColor whiteColor];
+    textInput.clearsOnBeginEditing = YES;
+    [textInput setText:@"Enter Smartbody Command Here"];
+    [textInput setBorderStyle:UITextBorderStyleRoundedRect];
     [textInput setTextAlignment:UITextAlignmentLeft];
     [inputController addSubview:textInput];
     [textInput setDelegate:inputController];

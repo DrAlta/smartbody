@@ -11,6 +11,9 @@
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD733E0D9D9553002E5188 /* MainWindow.xib */; };
 		28FD14FE0DC6FC130079059D /* EAGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 28FD14FD0DC6FC130079059D /* EAGLView.m */; };
+		AA03674B142A80BC00DDDCA2 /* libblas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA036748142A80BC00DDDCA2 /* libblas.a */; };
+		AA03674C142A80BC00DDDCA2 /* libf2c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA036749142A80BC00DDDCA2 /* libf2c.a */; };
+		AA03674D142A80BC00DDDCA2 /* liblapack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA03674A142A80BC00DDDCA2 /* liblapack.a */; };
 		AA12CA2814007FFE0017A491 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA12CA2714007FFE0017A491 /* QuartzCore.framework */; };
 		AA12CA2C140080210017A491 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA12CA29140080210017A491 /* Foundation.framework */; };
 		AA12CA2D140080210017A491 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA12CA2A140080210017A491 /* OpenGLES.framework */; };
@@ -54,6 +57,9 @@
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* Chases_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Chases_Prefix.pch; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA036748142A80BC00DDDCA2 /* libblas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libblas.a; path = ../../libs/iphoneos/libblas.a; sourceTree = "<group>"; };
+		AA036749142A80BC00DDDCA2 /* libf2c.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libf2c.a; path = ../../libs/iphoneos/libf2c.a; sourceTree = "<group>"; };
+		AA03674A142A80BC00DDDCA2 /* liblapack.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblapack.a; path = ../../libs/iphoneos/liblapack.a; sourceTree = "<group>"; };
 		AA12CA2714007FFE0017A491 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.3.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
 		AA12CA29140080210017A491 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		AA12CA2A140080210017A491 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.3.sdk/System/Library/Frameworks/OpenGLES.framework; sourceTree = DEVELOPER_DIR; };
@@ -114,6 +120,9 @@
 				AAC9AC5D142010C000F56F9C /* libvhmsg.a in Frameworks */,
 				AAC9AC5E142010C000F56F9C /* libwsp.a in Frameworks */,
 				AAC9AC5F142010C000F56F9C /* libxerces-c.a in Frameworks */,
+				AA03674B142A80BC00DDDCA2 /* libblas.a in Frameworks */,
+				AA03674C142A80BC00DDDCA2 /* libf2c.a in Frameworks */,
+				AA03674D142A80BC00DDDCA2 /* liblapack.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,6 +194,9 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AA036748142A80BC00DDDCA2 /* libblas.a */,
+				AA036749142A80BC00DDDCA2 /* libf2c.a */,
+				AA03674A142A80BC00DDDCA2 /* liblapack.a */,
 				AAC9AC40142010C000F56F9C /* libactivemq-cpp.a */,
 				AAC9AC41142010C000F56F9C /* libapr-1.a */,
 				AAC9AC42142010C000F56F9C /* libaprutil-1.a */,
@@ -337,6 +349,10 @@
 				);
 				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../libs/iphoneos\"",
+				);
 				"LIBRARY_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = ../../libs/iphoneos;
 				"LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*][arch=*]" = ../../libs/iphonesimulator;
 				ONLY_ACTIVE_ARCH = YES;
@@ -388,6 +404,10 @@
 				);
 				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../libs/iphoneos\"",
+				);
 				"LIBRARY_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = ../../libs/iphoneos;
 				"LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*][arch=*]" = ../../libs/iphonesimulator;
 				ONLY_ACTIVE_ARCH = YES;
