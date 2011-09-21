@@ -520,7 +520,8 @@ void Smartbody_dll::RegisterCallbacks()
    mcu.insert( "enableevents",        enableevents_func );
    mcu.insert( "disableevents",       disableevents_func );
    mcu.insert( "registerevent",       registerevent_func );
-   mcu.insert( "unregisterevent",     unregisterevent_func );
+   mcu.insert( "unregisterevent",     unregisterevent_func );  
+   mcu.insert( "setmap",			  setmap_func );
    mcu.insert( "motionmap",           motionmap_func );
    mcu.insert( "skeletonmap",         skeletonmap_func );
    mcu.insert( "characters",          showcharacters_func );
