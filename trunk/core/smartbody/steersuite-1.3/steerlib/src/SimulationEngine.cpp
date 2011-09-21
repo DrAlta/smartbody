@@ -34,7 +34,7 @@ using namespace Util;
 
 #ifdef __APPLE__
 #include "TargetConditionals.h"
-#if defined (TARGET_OS_IPHONE)  || defined (TARGET_IPHONE_SIMULATOR)
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 #ifndef SBM_IPHONE
 #define SBM_IPHONE
 #endif

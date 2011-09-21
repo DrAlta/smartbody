@@ -14,9 +14,14 @@
 ###  Common-sk assets are centered on the pelvis,
 ###  placed 102 units above the ground plane.
 1	char brad init common.sk
-1	set character brad world_offset x 0 y 102 h -17
+1	set character brad world_offset x 30 y 102 h -17
+
+1	char utah init common.sk
+1	set character utah world_offset x -30 y 102 h 17
+
 
 1	test bml character brad noecho posture LHandOnHip_Motex
+1	test bml character utah noecho posture LHandOnHip_Motex
 
 1	seq init-param-animation inline
 #2	seq init-example-reach inline
