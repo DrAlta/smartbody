@@ -576,7 +576,7 @@ void SbmPawn::set_world_offset( float x, float y, float z,
 			strstr << "ERROR: SbmPawn::set_world_offset(..): Unknown joint rotation type: " << woj->rot_type();
 			LOG(strstr.str().c_str());
 			break;
-	}
+	}	
 }
 
 void SbmPawn::wo_cache_update() {

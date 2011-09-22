@@ -190,7 +190,7 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	}
 
 	if( targetPawn )	{		
-		bodyReachCt->setReachTargetPawn(const_cast<SbmPawn*>(targetPawn));
+		bodyReachCt->setReachTargetPawn(const_cast<SbmPawn*>(targetPawn));		
 	}
 	else if (targetJoint)
 	{
