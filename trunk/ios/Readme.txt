@@ -38,15 +38,20 @@ Note: for smartbody iphone running on unity, we need to rename variables inside 
 	
 4) Cross compiling clapack
 	http://www.netlib.org/clapack/
-	Download clapack-3.2.1-CMAKE.tgz, unzip and copy toolchain-iphone*.cmake from trunk/ios/activemq/activemq-cpp to that folder
-	Go to that directory from console, type
-	$ mkdir build
-	$ cd build
-	$ cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain-iphone*.cmake ..
-	$ make
-	$ make install
-	If you want to build for iphoneos, choose toolchain-iphoneos.cmake, for iphonesimulator, choose toolchain-iphonesimulator.cmake
-	Then go over the folders, copy libblas.a,libf2c.a,liblapack.a to trunk/ios/libs/iphone* depends whether you are building for device or simulator
+	Download clapack-3.2.1-CMAKE.tgz, unzip and copy toolchain-iphone*.cmake and setup-iphone*.sh from trunk/ios/activemq/activemq-cpp to that folder
+	To make a Unity compatible build, you need to modify the cmake file. If not used for Unity Iphone, you can skip the following step:
+	-Go to clapack/CMakeLists.txt, comment out include(CTest) and add_subdirectory(TESTING)
+	-Go to clapack/BLAS/CMakeLists.txt, comment out add_subdirectory(TESTING)
+	-Go to clapack/F2CLIBS/libf2c/CMakeLists.txt, take out main.c from first SET so it became
+			set(MISC 
+			f77vers.c i77vers.c s_rnge.c abort_.c exit_.c getarg_.c iargc_.c
+  			getenv_.c signal_.c s_stop.c s_paus.c system_.c cabs.c ctype.c
+ 			derf_.c derfc_.c erf_.c erfc_.c sig_die.c uninit.c)
+ 	-Go to clapack/SRC/CMakeLists.txt, take out ../INSTALL/lsame.c from first SET so it became
+			set(ALLAUX  maxloc.c ilaenv.c ieeeck.c lsamen.c  iparmq.c	
+   			 ilaprec.c ilatrans.c ilauplo.c iladiag.c chla_transtype.c 
+    		../INSTALL/ilaver.c) # xerbla.c xerbla_array.c
+    After doing this, change the SBROOT inside setup-iphoneos.sh and setup-iphonesimulator.sh, run the scripts according to what you are building to.
 	
 	
 --------------------------------Compiling using Xcode4------------------------------
