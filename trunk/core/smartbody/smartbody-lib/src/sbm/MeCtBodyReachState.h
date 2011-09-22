@@ -13,6 +13,7 @@ public:
 	~ReachTarget() {}
 	ReachTarget& operator= (const ReachTarget& rt);
 	bool targetIsPawn();
+	bool targetHasGeometry();
 	bool targetIsJoint();
 	void setTargetState(SRT& ts);
 	void setTargetPawn(SbmPawn* tpawn);

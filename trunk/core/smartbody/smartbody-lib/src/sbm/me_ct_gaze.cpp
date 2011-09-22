@@ -729,7 +729,7 @@ printf( "s2: %f\n", joint_arr[ GAZE_JOINT_SPINE2 ].local_pos.y() );
 printf( "s1: %f\n", joint_arr[ GAZE_JOINT_SPINE1 ].local_pos.y() );
 #endif
 
-#define USE_OLD_GAZE 1
+#define USE_OLD_GAZE 0
 #if USE_OLD_GAZE
 	gwiz::float_t interocular = 
 		joint_arr[ GAZE_JOINT_EYE_L ].local_pos.x() - 

@@ -28,7 +28,7 @@ using namespace gwiz;
 #include <sr/sr_alg.h>
 
 #define ENABLE_FORWARD_RAY  		1
-#define USE_OLD_GAZE 1
+#define USE_OLD_GAZE 0
 
 ///////////////////////////////////////////////////////////////////////////
 

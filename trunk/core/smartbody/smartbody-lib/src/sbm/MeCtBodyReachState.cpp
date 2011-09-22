@@ -37,10 +37,15 @@ SRT ReachTarget::getTargetState()
 	SRT st = targetState;
 	if (targetIsPawn())
 	{
+		//LOG("target is pawn");
+		SkJoint* worldJoint = const_cast<SkJoint*>(targetPawn->get_world_offset_joint());
+		worldJoint->update_gmat();
 		st.gmat(targetPawn->get_world_offset_joint()->gmat());
 	}
 	else if (targetIsJoint())
 	{
+		//LOG("target is joint");
+		targetJoint->update_gmat();
 		st.gmat(targetJoint->gmat());
 	}
 	return st;	
@@ -49,6 +54,16 @@ SRT ReachTarget::getTargetState()
 bool ReachTarget::targetIsPawn()
 {
 	return (useTargetPawn && targetPawn);
+}
+
+bool ReachTarget::targetHasGeometry()
+{
+	if (!targetIsPawn()) return false;
+	//LOG("target pawn name = %s",targetPawn->getName().c_str());
+	if (targetPawn->colObj_p == NULL) return false;
+	SbmGeomNullObject* nullObject = dynamic_cast<SbmGeomNullObject*>(targetPawn->colObj_p);
+	if (nullObject) return false;
+	return true;
 }
 
 bool ReachTarget::targetIsJoint()
@@ -200,7 +215,9 @@ void ReachHandAction::reachNewTargetAction( ReachStateData* rd )
 	std::string charName = rd->charName;	
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:grab-state=\"finish\"/>";
 	cmd = generateGrabCmd(charName,"","finish",rd->reachType);
-	//sendReachEvent(cmd);
+	ReachTarget& rtarget = rd->reachTarget;
+	if (rtarget.targetHasGeometry())
+		sendReachEvent(cmd);
 	rd->effectorState.removeAttachedPawn(rd);
 	LOG("Reach New Target Action");	
 }
@@ -500,12 +517,14 @@ void ReachStateInterface::updateReachToTarget( ReachStateData* rd )
 		tsBlend = rd->getBlendPoseState(estate.paraTarget,stime);		
 		rd->getInterpFrame(stime,rd->targetRefFrame);
 	}			
+	//LOG("reach target before offset = %f %f %f\n",ts.tran[0],ts.tran[1],ts.tran[2]);
 	tsBlend.tran = ts.tran;
 	SRT offset = rd->curHandAction->getHandTargetStateOffset(rd,tsBlend);
 	tsBlend.add(offset);		
 	//LOG("reach target after offset = %f %f %f\n",tsBlend.tran[0],tsBlend.tran[1],tsBlend.tran[2]);
 	estate.ikTargetState = tsBlend;
 	estate.grabStateError = offset;
+	//LOG("reach target position = %f %f %f\n",
 }
 
 

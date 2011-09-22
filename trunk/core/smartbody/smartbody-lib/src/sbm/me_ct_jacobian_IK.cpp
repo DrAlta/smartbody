@@ -175,7 +175,7 @@ int MeCtIKTreeScenario::traverseJoint(SkJoint* joint, MeCtIKTreeNode* jointNode,
 		SkJoint* child = joint->child(i);
 		MeCtIKTreeNode* childNode = new MeCtIKTreeNode();
 		childNode->nodeLevel = jointNode->nodeLevel + 1;
-		childNode->joint = child;
+		childNode->joint = child;		
 		childNode->nodeName = child->name();
 		childNode->nodeIdx = nodeList.size();
 		childNode->parent = jointNode;
@@ -208,9 +208,10 @@ void MeCtIKTreeScenario::updateQuat( const dVector& dTheta )
 
 	for (unsigned int i=0;i<ikTreeNodes.size();i++)
 	{
-		SrVec axisAngle = SrVec((float)dTheta(i*3),(float)dTheta(i*3+1),(float)dTheta(i*3+2));
+		SrVec axisAngle = SrVec((float)dTheta(i*3),(float)dTheta(i*3+1),(float)dTheta(i*3+2));		
 		MeCtIKTreeNode* node = ikTreeNodes[i];
-		SrQuat newQuat = SrQuat(axisAngle)*node->getQuat(QUAT_CUR);//ikInitQuatList[i]; // read from initQuat
+		SrVec newAxisAngle = axisAngle;
+		SrQuat newQuat = SrQuat(newAxisAngle)*node->getQuat(QUAT_CUR);//ikInitQuatList[i]; // read from initQuat
 // 		float diffNorm = sqrtf(newQuat.x*newQuat.x + newQuat.y*newQuat.y + newQuat.z*newQuat.z + newQuat.w*newQuat.w);
 // 		if (diffNorm > 1.f)
 // 		{
@@ -301,7 +302,9 @@ void MeCtIKTreeScenario::copyTreeNodeQuat( NodeQuatType typeFrom, NodeQuatType t
 SrMat MeCtIKTreeScenario::getLocalMat( const SkJoint* joint, const SrQuat& q, const SrVec& pos )
 {
 	SrMat lMat;
-	lMat = q.get_mat(lMat);
+	SkJoint* j = const_cast<SkJoint*>(joint);
+	SkJointQuat* qu = j->quat();
+	lMat = (qu->prerot()*q).get_mat(lMat);
 	lMat[12] = joint->offset().x + pos.x;
 	lMat[13] = joint->offset().y + pos.y;
 	lMat[14] = joint->offset().z + pos.z;
@@ -358,13 +361,14 @@ void MeCtJacobianIK::update( MeCtIKTreeScenario* scenario )
 	matrixMatMult(matJInv,matJ,temp);
 	matJnull -= temp;		
 	float weight = 1.0;
+	
 	if (ikUseReference)
 	{
 		updateReferenceJointJacobian(scenario);	
 		//solveDLS(matJnull,dSref,0.01,dThetaAux,matJrefInv);
 		//dTheta += dThetaAux;		
 		scenario->updateQuat(dThetaAux);	
-	}
+	}	
 }
 
 bool MeCtJacobianIK::updateReferenceJointJacobian( MeCtIKTreeScenario* s )
@@ -469,7 +473,10 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 			SrVec axis[3];
 			for (int k=0;k<3;k++)
 			{				
-				axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2));				
+				//axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2))*node->joint->parent()->gmatZero().get_rotation()*node->joint->gmatZero().get_rotation().inverse();				
+				axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2))*node->joint->parent()->gmatZero().get_rotation().inverse()*node->joint->gmatZero().get_rotation();								
+				//axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2))*node->joint->gmatZero().get_rotation()*node->joint->parent()->gmatZero().get_rotation().inverse();
+				
 				SrVec jVec = cross(axis[k],endPos-nodePos);
 				matJ(posCount*3+0,idx*3+k) = jVec[0]*nodeWeight;
 				matJ(posCount*3+1,idx*3+k) = jVec[1]*nodeWeight;	
@@ -531,8 +538,10 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 			//parentMat = node->gmat;
 			SrVec axis[3];
 			for (int k=0;k<3;k++)
-			{				
-				axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2));
+			{			
+				//axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2))*node->joint->parent()->gmatZero().get_rotation()*node->joint->gmatZero().get_rotation().inverse();								
+				axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2))*node->joint->parent()->gmatZero().get_rotation().inverse()*node->joint->gmatZero().get_rotation();												
+				//axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2))*node->joint->gmatZero().get_rotation()*node->joint->parent()->gmatZero().get_rotation().inverse();
 				matJ(offset_idx+rotCount*3+0,idx*3+k) = axis[k][0]*nodeWeight;	
 				matJ(offset_idx+rotCount*3+1,idx*3+k) = axis[k][1]*nodeWeight;	
 				matJ(offset_idx+rotCount*3+2,idx*3+k) = axis[k][2]*nodeWeight;						

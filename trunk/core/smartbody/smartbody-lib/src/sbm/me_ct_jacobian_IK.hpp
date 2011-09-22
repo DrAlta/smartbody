@@ -20,8 +20,9 @@ public:
 	SrQuat           targetDir; // target dir is a global rotation constraint ( parameterized as quaternion )
 	SkJoint          *joint;	
 	MeCtIKJointLimit jointLimit;
-	SrVec            jointOffset;	
+	SrVec            jointOffset;		
 	SrMat            gmat;	
+	SrMat            gmatZero;
 	SrQuat           nodeQuat[QUAT_SIZE];
 	float            mass;
 
