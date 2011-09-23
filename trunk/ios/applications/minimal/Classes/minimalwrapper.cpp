@@ -221,7 +221,7 @@ void MCUInitialize()
     XMLPlatformUtils::Initialize();
     mcuCBHandle& mcu = mcuCBHandle::singleton();
     mcu_register_callbacks();
-    
+#if 0
     const char* serverName = "172.16.33.21";
     const char* scope = "DEFAULT_SCOPE";
     const char* port = "61616";
@@ -250,6 +250,7 @@ void MCUInitialize()
     {
         LOG("TTU Open Failed : server = %s, scope = %s, port = %s",serverName,scope,port);
     }    
+#endif
 }
         
 void SBMInitialize(const char* mediaPath)

@@ -239,6 +239,8 @@ void DemoApp::setupDemoScene()
 void DemoApp::setupSmartbody()
 {
     vhmsg::ttu_set_client_callback(&DemoApp::tt_client_callback, this);
+    
+#if 0
     const char* serverName = "172.16.33.21";
     const char* scope = "DEFAULT_SCOPE";
     const char* port = "61616";  
@@ -272,6 +274,7 @@ void DemoApp::setupSmartbody()
     vhmsg::ttu_register( "CommAPI" );
     vhmsg::ttu_register( "object-data" );
     vhmsg::ttu_register( "wsp" );
+#endif    
     
     m_sbListener = new SBListener(this);
     m_sbm = new Smartbody_dll;
