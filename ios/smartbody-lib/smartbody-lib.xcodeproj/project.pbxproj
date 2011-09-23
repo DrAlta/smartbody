@@ -2294,6 +2294,7 @@
 				DSTROOT = /tmp/smartbody_lib.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "smartbody-lib/smartbody-lib-Prefix.pch";
+				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = 4.2;
 				HEADER_SEARCH_PATHS = "";
 				"HEADER_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
@@ -2343,6 +2344,7 @@
 				DSTROOT = /tmp/smartbody_lib.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "smartbody-lib/smartbody-lib-Prefix.pch";
+				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = 4.2;
 				HEADER_SEARCH_PATHS = "";
 				"HEADER_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
