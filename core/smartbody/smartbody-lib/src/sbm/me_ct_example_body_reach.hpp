@@ -1,6 +1,7 @@
 
+#ifndef _ME_BODY_REACH_CONTROLLER_
+#define _ME_BODY_REACH_CONTROLLER_
 
-#pragma once
 #include "me_ct_data_interpolation.h"
 #include "me_ct_barycentric_interpolation.h"
 #include "me_ct_motion_parameter.h"
@@ -14,6 +15,7 @@
 #include <sbm/sbm_pawn.hpp>
 
 #include <sbm/MeCtReachEngine.h>
+#include <sbm/SBController.h>
 
 class ReachStateData;
 class ReachStateInterface;
@@ -25,7 +27,7 @@ using namespace std;
 typedef std::map<int,MeCtReachEngine*> ReachEngineMap; 
 
 class MeCtExampleBodyReach :
-	public MeController, public FadingControl
+	public SmartBody::SBController, public FadingControl
 {
 private:
 	static std::string CONTROLLER_TYPE;
@@ -87,7 +89,7 @@ protected:
 	bool isValidReachEngine(int reachType);
 };
 
-
+#endif
 
 
 

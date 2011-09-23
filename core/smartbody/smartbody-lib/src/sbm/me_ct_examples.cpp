@@ -35,6 +35,8 @@ using namespace gwiz;
 HEAD ORIENT JOINTS: { "spine4", "spine5", "skullbase" }
 */
 
+#define USE_OLD_NOD 0
+
 std::string MeCtHeadOrient::_type_name = "HeadOrient";
 
 MeCtHeadOrient::MeCtHeadOrient( void )	{
@@ -410,7 +412,7 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 		euler_t E_in = Q_in;
 
 		quat_t Q_out;
-#if 1
+#if USE_OLD_NOD
 		if (frame.isChannelUpdated( context_channel_index ) )	{
 			// If channel has been touched, preserve components and add delta
 			if( _affirmative )	{
