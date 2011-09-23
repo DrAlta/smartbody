@@ -612,7 +612,7 @@ bool SbmDeformableMeshGPU::initBuffer()
 // 					printf("vtx %d : \n",iVtx);
 				for (int j = 0; j < numOfInfJoints; j++)
 				{
-					const std::string curJointName = skinWeight->infJointName[skinWeight->jointNameIndex[globalCounter]];					
+					const std::string& curJointName = skinWeight->infJointName[skinWeight->jointNameIndex[globalCounter]];					
 					float jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
 					int    jointIndex  = boneIdxMap[curJointName];
 // 					if (numOfInfJoints > 8)
