@@ -822,13 +822,20 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 								index++;
 							}
 						}
+
 						// process each polylist
 						for (size_t x = 2; x < fVec.size(); x++)
 						{
 							newModel->F.push().set(fVec[0], fVec[x - 1], fVec[x]);
 							newModel->Fm.push() = curmtl;
-							newModel->Ft.push().set(ftVec[0], ftVec[x - 1], ftVec[x]);
-							newModel->Fn.push().set(fnVec[0], fnVec[x - 1], fnVec[x]);
+							if (ftVec.size() > x)
+								newModel->Ft.push().set(ftVec[0], ftVec[x - 1], ftVec[x]);
+							else
+								newModel->Ft.push().set(0, 0, 0);
+							if (fnVec.size() > x)
+								newModel->Fn.push().set(fnVec[0], fnVec[x - 1], fnVec[x]);
+							else
+								newModel->Fn.push().set(0, 1, 0);
 						}
 					}
 
@@ -847,6 +854,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries(DOMNode* node, const char* file, 
 //			newModel->remove_redundant_normals();
 			newModel->compress();
 			meshModelVec.push_back(newModel);
+			LOG("Found model %s (%d verts, %d faces, %d materials) in file %s", (const char*) newModel->name, newModel->V.size(), newModel->F.size(), newModel->M.size(), file);
 
 			SrString path = file;
 			SrString filename;

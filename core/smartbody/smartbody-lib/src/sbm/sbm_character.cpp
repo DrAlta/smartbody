@@ -2082,10 +2082,29 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 						strstr << "char " << getName() << " smoothbindweight " << fileName;
 						if (prefix != "")
 							strstr << " -prefix " << prefix;
-						int success = mcu_p->execute((char*) strstr.str().c_str());
-						if (success != CMD_SUCCESS)
+						int successWeight = mcu_p->execute((char*) strstr.str().c_str());
+						if (successWeight == CMD_SUCCESS)
 						{
-							LOG("Problem running: %s", strstr.str().c_str());
+							LOG("Successfully read skin weights from file %s", fileName.c_str());
+						}
+
+						// this could also be a file containing a mesh, so run that command as well
+						strstr.clear();
+						strstr << "char " << getName() << " smoothbindmesh " << fileName;
+						int successMesh = mcu_p->execute((char*) strstr.str().c_str());
+						if (successMesh == CMD_SUCCESS)
+						{
+							LOG("Successfully read mesh from file %s", fileName.c_str());
+						}
+
+						if (successMesh == CMD_FAILURE && successWeight == CMD_FAILURE)
+						{
+							LOG("Could not read skin weights or mesh from %s", fileName.c_str());
+							return CMD_FAILURE;
+						}
+						else
+						{
+							return CMD_SUCCESS;
 						}
 					}
 					else if (ext == ".obj" || ext == ".OBJ")
@@ -2095,7 +2114,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 						int success = mcu_p->execute((char*) strstr.str().c_str());
 						if (success != CMD_SUCCESS)
 						{
-							LOG("Problem running: %s", strstr.str().c_str());
+							LOG("Problem retrieving meshs from: %s", strstr.str().c_str());
 						}
 					}
 				}

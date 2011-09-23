@@ -112,7 +112,7 @@ void DeformableMesh::update()
 	//printf("Max Influence Joints = %d\n",maxJoint);
 }
 
-SkinWeight* DeformableMesh::getSkinWeight(std::string skinSourceName)
+SkinWeight* DeformableMesh::getSkinWeight(const std::string& skinSourceName)
 {
 	for (unsigned int i = 0; i < skinWeights.size(); i++)
 	{
@@ -122,7 +122,7 @@ SkinWeight* DeformableMesh::getSkinWeight(std::string skinSourceName)
 	return NULL;
 }
 
-int	DeformableMesh::getMesh(std::string meshName)
+int	DeformableMesh::getMesh(const std::string& meshName)
 {
 	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
 	{
