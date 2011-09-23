@@ -21,8 +21,8 @@ using namespace boost;
 
 std::string MeCtExampleBodyReach::CONTROLLER_TYPE = "BodyReach";
 
-MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMap ) 
-{		
+MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMap )  : SmartBody::SBController()
+{
 	currentReachData = NULL;
 	currentReachEngine = NULL;
 
