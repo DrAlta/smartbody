@@ -311,13 +311,7 @@ void SBMUpdateX(float t)
 {
     mcuCBHandle& mcu = mcuCBHandle::singleton();
     bool updateSim = mcu.update_timer(t);
-
-    int err = vhmsg::ttu_poll();
-    if( err == vhmsg::TTU_ERROR )	
-    {
-        fprintf( stderr, "ttu_poll ERROR\n" );
-    }    
-    
+    vhmsg::ttu_poll();
     if (updateSim)        
         mcu.update();
 }
@@ -326,6 +320,12 @@ void SBMExecuteCmd(const char* command)
 {
     mcuCBHandle& mcu = mcuCBHandle::singleton();
     mcu.execute((char*) command);
+}
+    
+void SBMExecutePythonCmd(const char* command)
+{
+    mcuCBHandle& mcu = mcuCBHandle::singleton();
+    mcu.executePython((char*) command);    
 }
     
 float SBMGetCharacterWo(const char* character)

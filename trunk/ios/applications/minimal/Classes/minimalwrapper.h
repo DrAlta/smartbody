@@ -22,6 +22,7 @@ extern "C"
     void SBMInitialize(const char* mediaPath);
     void SBMUpdateX(float t);
     void SBMExecuteCmd(const char* command);
+    void SBMExecutePythonCmd(const char* command);
     float SBMGetCharacterWo(const char* character);
     void getBoneData();
     void getCamera(float x, float y, float prevX, float prevY, float curX, float curY, int mode);
