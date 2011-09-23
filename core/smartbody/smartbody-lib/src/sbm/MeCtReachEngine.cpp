@@ -223,10 +223,11 @@ void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet )
 		ex->timeWarp = new SimpleTimeWarp(refMotion->duration(),motion->duration());
 		ex->motionParameterFunc = motionParameter;
 		ex->motionProfile = new MotionProfile(motion);
+#if 0
 		ex->motionProfile->buildVelocityProfile(0.f,motion->duration()*0.999f,0.005f);
 		ex->motionProfile->buildInterpolationProfile(0.f,(float)motion->time_stroke_emphasis(),0.005f);
 		ex->motionProfile->buildEulerCurveProfile(0.f,(float)motion->time_stroke_emphasis(),0.005f);
-
+#endif
 		ex->getMotionParameter(ex->parameter);		
 		// set initial index & weight for the motion example
 		// by default, the index should be this motion & weight should be 1
@@ -403,7 +404,8 @@ SkJoint* MeCtReachEngine::findRootJoint( SkSkeleton* sk )
 
 DataInterpolator* MeCtReachEngine::createInterpolator()
 {
-	KNNInterpolator* interpolator = new KNNInterpolator(300,ikReachRegion*1.f);
+	KNNInterpolator* interpolator = new KNNInterpolator(1000,ikReachRegion*1.f);
+	//RBFInterpolator* interpolator = new RBFInterpolator();
 	resampleData = &interpolator->resampleData;		
 	// 	InverseInterpolation* interpolator = new InverseInterpolation();
 	// 	resampleData = NULL;
@@ -453,9 +455,7 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 
 	curReachState->updateEffectorTargetState(reachData);		
 	curReachState->update(reachData);	
-
 	ReachStateInterface* nextState = getState(curReachState->nextState(reachData));
-
 	if (nextState != curReachState)
 	{
 		//printf("engine type = %s,  cur State = %s\n",this->getReachTypeTag().c_str(), nextState->curStateName().c_str());
