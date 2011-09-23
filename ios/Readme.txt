@@ -52,50 +52,52 @@ Note: for smartbody iphone running on unity, we need to rename variables inside 
    			 ilaprec.c ilatrans.c ilauplo.c iladiag.c chla_transtype.c 
     		../INSTALL/ilaver.c) # xerbla.c xerbla_array.c
     After doing this, change the SBROOT inside setup-iphoneos.sh and setup-iphonesimulator.sh, run the scripts according to what you are building to.
-	
+
+5) Cross compiling python
+	Go to trunk/ios/python, modify the SBROOT inside setup-iphoneos.sh, then run the script.
 	
 --------------------------------Compiling using Xcode4------------------------------
-5) Build bonebus
+1) Build bonebus
 	Open smartbody-iphone.xcworkspace, select the scheme to be bonebus, build
 
-6) Build boost
+2) Build boost
 	http://www.boost.org/users/history/version_1_44_0.html
 	Download boost_1_44_0.tar.gz, unzip to trunk/ios/boost. Make sure the folder name is boost_1_44_0.
 	Open smartbody-iphone.xcworkspace, select boost_system, boost_filesystem, boost_regex, build them seperately.
 	http://mathema.tician.de/news.tiker.net/download/software/boost-numeric-bindings/boost-numeric-bindings-20081116.tar.gz
 	Download boost_numeric_bindings, unzip it to trunk/ios/boost, make sure the name is boost_numeric_bindings
 	
-7) Build steersuite
+3) Build steersuite
 	Open smartbody-iphone.xcworkspace, select the steerlib, pprAI, build them seperately.
 
-8) Build vhmsg
+4) Build vhmsg
 	Open smartbody-iphone.xcworkspace, select scheme vhmsg and build.
 	
-9) Build vhcl
+5) Build vhcl
 	Since the vhcl_log.cpp hasn't been changed from VH group, you have to copy trunk/ios/vhcl/vhcl_log.cpp to trunk/lib/vhcl/src/vhcl_log.cpp for now.
 	Open smartbody-iphone.xcworkspace, select scheme vhcl and build.
 
-10) Build wsp
+6) Build wsp
 	Open smartbody-iphone.xcworkspace, select scheme wsp and build.
 	
-11) Build smartbody-lib
+7) Build smartbody-lib
 	Open smartbody-iphone.xcworkspace, select scheme smartbody-lib and build. 
 
-12) Build smartbody-dll (For now, this is optional)
+8) Build smartbody-dll (For now, this is optional)
 	Open smartbody-iphone.xcworkspace, select scheme smartbody-dll and build. 
 	
-13) Build vhwrapper-dll (For unity only, optional)
+9) Build vhwrapper-dll (For unity only, optional)
 	Open smartbody-iphone.xcworkspace, select scheme vhwrapper-dll and build. 
 
 
 --------------------------------Compiling and Running Applications using Xcode4------------------------------
 There are two applications under trunk/ios/applications, you have to go over the previous steps. Make sure you have your device connected.
-14) Build smartbody-openglES
+1) Build smartbody-openglES
 	Go to trunk/ios/applications/minimal, open smartbody-iphone.xcodeproj, build and run.
 
 Note: Under smartbody-openglES project Frameworks, you should see all the libraries existing. If not, go over previous steps to check if anything is wrong
 
-15) Build smartbody-ogre
+2) Build smartbody-ogre
 	http://www.ogre3d.org/download/sdk
 	Download ogreSDK
 	http://www.ogre3d.org/tikiwiki/tiki-index.php?page=Building%20From%20Source%20-%20iPhone&redirectpage=Building%20From%20Source%20(for%20iPhone)
@@ -107,7 +109,7 @@ Note: ogre 1.8 seems to have trouble when building for iphone/ipad, use ogre 1.7
 	  It is extremely slow running on armv6 ipod(after testing), and there's something wrong with the texture and shader. So maybe should just run on armv7 iphone/ipad.
 
 
-16) Build smartbody-unity
+3) Build smartbody-unity
 	...
 
 --------------------------------------------------------------------------------------------------------------

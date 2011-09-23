@@ -234,25 +234,31 @@
 
 - (void)setupView
 {
-	MCUInitialize();
-    
-    NSString* filePath = [[NSBundle mainBundle] pathForResource:@"common" ofType:@"sk"];
-    NSString* dirPath = [filePath stringByDeletingLastPathComponent];
-    const char* mediaPath = [dirPath UTF8String];
+    static bool once = true;
+    if (once)
+    {
+        MCUInitialize();
+        
+        NSString* filePath = [[NSBundle mainBundle] pathForResource:@"common" ofType:@"sk"];
+        NSString* dirPath = [filePath stringByDeletingLastPathComponent];
+        const char* mediaPath = [dirPath UTF8String];
 
-    char command[250] = "load skeletons -R \"";
-    strcat(command, mediaPath);
-    strcat(command, "\"");
-    printf("%s\n", command);
-    SBMExecuteCmd(command);
+        char command[250] = "load skeletons -R \"";
+        strcat(command, mediaPath);
+        strcat(command, "\"");
+        printf("%s\n", command);
+        SBMExecuteCmd(command);
+        
+        char command1[250] = "load motions -R \"";
+        strcat(command1, mediaPath);
+        strcat(command1, "\"");    
+        printf("%s\n", command1);
+        SBMExecuteCmd(command1);
+      
+        SBMInitialize(mediaPath);   
+        once = false;
+    }
     
-    char command1[250] = "load motions -R \"";
-    strcat(command1, mediaPath);
-    strcat(command1, "\"");    
-    printf("%s\n", command1);
-    SBMExecuteCmd(command1);
-  
-    SBMInitialize(mediaPath);      
     getCamera(0, 0, 0, 0, 0, 0, -1);
     cameraMode = 0;
     
