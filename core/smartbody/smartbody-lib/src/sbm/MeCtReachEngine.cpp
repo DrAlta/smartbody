@@ -204,8 +204,9 @@ void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet )
 	{
 		skeletonCopy->root()->pos()->value(i,0.f);
 		root->pos()->value(i,0.f);
-	}
+	}	
 
+	SkJoint* rootJoint = affectedJoints[0];
 	BOOST_FOREACH(TagMotion tagMotion, inMotionSet)
 	{
 		if (tagMotion.first != reachType) // only process motion with correct tag 
@@ -219,10 +220,11 @@ void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet )
 
 		motionData.insert(tagMotion);
 		MotionExample* ex = new MotionExample();
-		ex->motion = motion;
+		ex->motion = motion;		
 		ex->timeWarp = new SimpleTimeWarp(refMotion->duration(),motion->duration());
 		ex->motionParameterFunc = motionParameter;
 		ex->motionProfile = new MotionProfile(motion);
+		ex->updateRootOffset(skeletonCopy,rootJoint);
 #if 0
 		ex->motionProfile->buildVelocityProfile(0.f,motion->duration()*0.999f,0.005f);
 		ex->motionProfile->buildInterpolationProfile(0.f,(float)motion->time_stroke_emphasis(),0.005f);
@@ -353,6 +355,7 @@ void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
 		ikCCD.update(&ikScenario);	
 		ikScenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);
 	}
+	
 
 	outFrame = refFrame;
 	ikScenario.getTreeNodeQuat(outFrame.jointQuat,QUAT_CUR); 	
@@ -421,7 +424,7 @@ ResampleMotion* MeCtReachEngine::createInterpMotion()
 	return ex;
 }
 
-void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame)
+void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame, float blendWeight)
 {
 	float du = 0.0;
 	if (initStart) // first start
@@ -432,6 +435,7 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 		ikMotionFrame = idleMotionFrame;		
 		initStart = false;
 	}		
+
 	inputMotionFrame = inputFrame;
 	reachData->idleRefFrame = inputFrame;
 

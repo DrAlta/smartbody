@@ -55,6 +55,8 @@ class BodyMotion : public BodyMotionInterface
 public:
 	SkMotion* motion;
 	MotionTimeWarpFunc* timeWarp; // time warp function for the motion
+	SrVec rootOffset;
+	SrQuat quatP;
 public:
 	BodyMotion();
 	virtual ~BodyMotion();
@@ -63,6 +65,8 @@ public:
 	virtual double motionDuration(DurationType durType);	
 	virtual double motionPercent(float time);
 	virtual double getRefDeltaTime(float u, float dt);
+
+	void updateRootOffset(SkSkeleton* skel, SkJoint* rootJoint);
 };
 
 /************************************************************************/

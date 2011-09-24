@@ -96,7 +96,7 @@ public:
 
 
 	bool addHandConstraint(SkJoint* targetJoint, const char* effectorName);
-	void updateReach(float t, float dt, BodyMotionFrame& inputFrame);
+	void updateReach(float t, float dt, BodyMotionFrame& inputFrame, float blendWeight);
 	void init(int rtype, SkJoint* effectorJoint);
 	void updateMotionExamples(const MotionDataSet& inMotionSet);
 	void solveIK(ReachStateData* rd, BodyMotionFrame& outFrame );
