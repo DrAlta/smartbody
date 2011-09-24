@@ -2100,11 +2100,6 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 						if (successMesh == CMD_FAILURE && successWeight == CMD_FAILURE)
 						{
 							LOG("Could not read skin weights or mesh from %s", fileName.c_str());
-							return CMD_FAILURE;
-						}
-						else
-						{
-							return CMD_SUCCESS;
 						}
 					}
 					else if (ext == ".obj" || ext == ".OBJ")
@@ -2114,7 +2109,7 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 						int success = mcu_p->execute((char*) strstr.str().c_str());
 						if (success != CMD_SUCCESS)
 						{
-							LOG("Problem retrieving meshs from: %s", strstr.str().c_str());
+							LOG("Problem running: %s", strstr.str().c_str());
 						}
 					}
 				}
