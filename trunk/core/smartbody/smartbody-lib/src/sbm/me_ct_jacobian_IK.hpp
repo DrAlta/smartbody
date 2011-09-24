@@ -8,8 +8,9 @@ enum NodeQuatType { QUAT_INIT = 0, QUAT_REF, QUAT_PREVREF, QUAT_CUR, QUAT_DUMMY,
 enum ConstraintType { CONSTRAINT_POS = 0, CONSTRAINT_ROT };
 class MeCtIKTreeNode
 {
-public:
+public:	
 	int              nodeIdx;
+	int              validNodeIdx;
 	int              nodeLevel;
 	std::string      nodeName;
 	MeCtIKTreeNode   *parent, *child, *brother;
@@ -61,6 +62,7 @@ class MeCtIKTreeScenario
 public:	
 	SkSkeleton*                  ikSkeleton;
 	IKTreeNodeList               ikTreeNodes;
+	IKTreeNodeList               ikValidNodes;
 	MeCtIKTreeNode*              ikTreeRoot; // contains the tree structure for IK tree ( which may contain multiple end effectors/IK chains )	
 	SrVec                        ikTreeRootPos;
 	
@@ -72,12 +74,12 @@ public:
 	MeCtIKTreeScenario();
 	~MeCtIKTreeScenario();
 public:	
-	void buildIKTreeFromJointRoot(SkJoint* root);	
-	void updateQuat(const dVector& dTheta);
+	void buildIKTreeFromJointRoot(SkJoint* root);		
+	void updateValidNodes();
+	void updateQuat(const dVector& dTheta, bool updateOnlyValidNodes = false);
 	void copyTreeNodeQuat(NodeQuatType typeFrom, NodeQuatType typeTo);
 	void setTreeNodeQuat(const std::vector<SrQuat>& inQuatList,NodeQuatType type);
 	void getTreeNodeQuat(std::vector<SrQuat>& inQuatList, NodeQuatType type);
-
 	void updateJointLimit();	
 	void updateNodeGlobalMat(MeCtIKTreeNode* jointNode, NodeQuatType quatType = QUAT_INIT);	
 	MeCtIKTreeNode* findIKTreeNode(const char* jointName);	
@@ -88,6 +90,7 @@ protected:
 	// return axis-angle rotation offset to move joint rotation back.
 	static bool checkJointLimit(const SrQuat& q, const MeCtIKJointLimit& limit, const SrQuat& qInit, SrVec& jointOffset); 
 	SrMat getLocalMat(const SkJoint* joint, const SrQuat& q, const SrVec& pos);
+	void updateEndEffectorValidNodes(EffectorConstraint* endNode, std::set<MeCtIKTreeNode*>& validNodes);
 };
 
 class MeCtIKInterface
@@ -128,8 +131,13 @@ public:
 	void setDt(float val) { dt = val; }	
 protected:
 	float dt; // for constraining rotation speed	
-	void computeJacobian(MeCtIKTreeScenario* scenario);			
+	void computeJacobian(MeCtIKTreeScenario* scenario);	
 	bool updateReferenceJointJacobian(MeCtIKTreeScenario* scenario);	
+
+	// reduced version, which only consider the necessary joint nodes 
+	void computeJacobianReduce(MeCtIKTreeScenario* scenario);
+	bool updateReferenceJointJacobianReduce(MeCtIKTreeScenario* scenario);
+
 	void solveDLS(const dMatrix& mat, const dVector& v, const double damping, dVector& out, dMatrix& invAtA);
 	
 	// feng : these are some experimental features such as infering the damping factor based on eigenvalues of Jacobian, 

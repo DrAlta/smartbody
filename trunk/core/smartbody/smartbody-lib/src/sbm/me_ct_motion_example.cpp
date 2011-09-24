@@ -81,6 +81,23 @@ double BodyMotion::motionPercent( float time )
 	return timeWarp->invTimeWarp(rt)/timeWarp->refTimeLength();
 }
 
+void BodyMotion::updateRootOffset(SkSkeleton* skel, SkJoint* rootJoint)
+{
+	motion->connect(skel);		
+	motion->apply(0.f);
+	SrQuat tempQ = rootJoint->quat()->value();
+	SrMat src, mat;
+	src = tempQ.get_mat(src);
+	float rx, ry, rz;
+	const int rotType = 132;
+	sr_euler_angles(rotType, src, rx, ry, rz);
+	rx = 0.0;
+	rz = 0.0;
+	sr_euler_mat(rotType, mat, rx, ry, rz);
+	quatP = SrQuat(mat);
+	rootOffset.set(rootJoint->pos()->value());	
+}
+
 double BodyMotion::getMotionFrame( float time, SkSkeleton* skel, const vector<SkJoint*>& affectedJoints, BodyMotionFrame& outMotionFrame )
 {
 	// Because the SkMotion stored its joint quats in an indirect way, it is not straightforward to grab corresponding quats we need.
@@ -88,12 +105,14 @@ double BodyMotion::getMotionFrame( float time, SkSkeleton* skel, const vector<Sk
 	if (affectedJoints.size() == 0)
 		return -1.0;
 
-	SrVec rootOffset = SrVec();
+	//SrVec rootOffset = SrVec();
 	
 	SkJoint* rootJoint = affectedJoints[0];
+	
 	motion->connect(skel);	
 	double rt = timeWarp->timeWarp(time);
 	// get root position
+	/*
 	motion->apply(0.f);
 	SrQuat tempQ = rootJoint->quat()->value();
 	SrMat src, mat;
@@ -106,6 +125,7 @@ double BodyMotion::getMotionFrame( float time, SkSkeleton* skel, const vector<Sk
 	sr_euler_mat(rotType, mat, rx, ry, rz);
 	SrQuat quatP = SrQuat(mat);
 	rootOffset.set(rootJoint->pos()->value());	
+	*/
 
 	motion->apply((float)rt);	
 	motion->disconnect();
