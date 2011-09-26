@@ -303,7 +303,7 @@ bool SkChannelArray::get_used_channels ( const std::vector<SkPosture*>& postures
 	return true;
 }
 
-int SkChannelArray::linear_search (std::string name, SkChannel::Type type) const
+int SkChannelArray::linear_search (const std::string& name, SkChannel::Type type) const
 {
 	int chs = _channelList.size();
 
@@ -319,7 +319,7 @@ int SkChannelArray::linear_search (std::string name, SkChannel::Type type) const
 	return -1;
 }
 
-int SkChannelArray::search ( std::string name, SkChannel::Type type )
+int SkChannelArray::search ( const std::string& name, SkChannel::Type type )
 {
 	if( _channelList.size()==0 )
 		return -1;                  

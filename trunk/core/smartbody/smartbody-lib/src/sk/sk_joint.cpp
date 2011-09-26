@@ -161,7 +161,7 @@ void SkJoint::update_lmat ()
    // update the 3x3 rotation submatrix if required:
    if ( !_quat->_jntsync )
     { _quat->_jntsync = 1;
-      SrQuat q = _quat->value();
+      const SrQuat& q = _quat->value();
 
       float x2  = q.x+q.x;
       float x2x = x2*q.x;

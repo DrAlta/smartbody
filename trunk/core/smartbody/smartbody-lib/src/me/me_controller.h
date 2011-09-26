@@ -128,8 +128,8 @@ protected :
 	bool		_buffer_changes_toggle;			// toggle, whenever it's being called, recording the changes that evaluation make
 	std::vector<float>	_bufferRecord;              // data containing the changes made each time inside the controller evaluation
 	bool		_buffer_changes_toggle_reset;	// flag to initialize the buffer_changes
+	bool		_passThrough;						// determines if this controller does not get evaluated. 	
 
-	//bool		_pass_through;						// determines if this controller does not get evaluated. 	
 protected :
     /*! Constructor */
     MeController ();
@@ -378,6 +378,8 @@ public :
 	/*! Convience method for printing children. Takes in the same tab_count as
 	    print_state (that is, before it is increment for the child's print_state).  */
 	virtual void print_children( int tab_count );
+
+	void notify(DSubject* subject);
 
 	friend class MeControllerContext;
 };

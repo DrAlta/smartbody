@@ -179,14 +179,14 @@ public :
 
 	/*! Returns the channel position of given channel type and joint name, or -1 if not found.
 		This method uses a linear search, not relying in the internal hash table option. */
-	int linear_search ( std::string name, SkChannel::Type type ) const;
+	int linear_search ( const std::string& name, SkChannel::Type type ) const;
 
 	/*! Returns the channel position of given channel type and joint name, or -1 if not found.
 		This method uses an internal hash table to speed up the search; however the hash
 		table must be up to date. If the hash table is not built, it will automatically be
 		built, but if the channel array is changed after that, it is the user responsibility
 		to manually call method rebuild_hash_table(). */
-	int search ( std::string name, SkChannel::Type type );
+	int search ( const std::string& name, SkChannel::Type type );
 
 	/*! An internal hash table is used to optimize search in two methods: search() and map().
 		Whenever the channel array is edited, the user must call this method to ensure the
