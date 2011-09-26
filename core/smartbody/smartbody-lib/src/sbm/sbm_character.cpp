@@ -2089,9 +2089,9 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 						}
 
 						// this could also be a file containing a mesh, so run that command as well
-						strstr.clear();
-						strstr << "char " << getName() << " smoothbindmesh " << fileName;
-						int successMesh = mcu_p->execute((char*) strstr.str().c_str());
+						std::stringstream strstr2;
+						strstr2 << "char " << getName() << " smoothbindmesh " << fileName;
+						int successMesh = mcu_p->execute((char*) strstr2.str().c_str());
 						if (successMesh == CMD_SUCCESS)
 						{
 							LOG("Successfully read mesh from file %s", fileName.c_str());
@@ -2117,6 +2117,22 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 		}
 		return CMD_SUCCESS;
 
+	}
+	else if (cmd == "meshstatus")
+	{
+		LOG("Number of skinned meshes: %d", this->dMesh_p->skinWeights.size());
+		for (size_t i = 0; i < this->dMesh_p->skinWeights.size(); i++)
+		{
+			SkinWeight* skinWeight = this->dMesh_p->skinWeights[i];
+			LOG("%s", skinWeight->sourceMesh.c_str());
+		}
+
+		for (size_t m = 0; m < this->dMesh_p->dMeshStatic_p.size(); m++)
+		{
+			SrSnModel* srsnModel = this->dMesh_p->dMeshStatic_p[m];
+			SrModel& model = srsnModel->shape();
+			LOG("Name: %s  Verts: %d  Faces: %d  Materials: %d", (const char*) model.name, model.V.size(), model.F.size(), model.M.size());
+		}
 	}
 	else if( cmd == "smoothbindmesh" )
 	{
