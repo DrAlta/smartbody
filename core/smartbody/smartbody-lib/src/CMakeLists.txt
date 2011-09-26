@@ -177,6 +177,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/locomotion_cmds.cpp
 	sbm/mcontrol_callbacks.cpp
 	sbm/mcontrol_util.cpp
+	sbm/action_unit.cpp
 	
 	sbm/me_ct_basic_locomotion.cpp
 	sbm/me_ct_ccd_IK.cpp
