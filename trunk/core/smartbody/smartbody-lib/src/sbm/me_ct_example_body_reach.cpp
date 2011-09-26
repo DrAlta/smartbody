@@ -205,11 +205,12 @@ bool MeCtExampleBodyReach::updateLocomotion()
 	}
 	return false;
 }
-
-void MeCtExampleBodyReach::updateReachType(SrVec& targetPos)
+int  MeCtExampleBodyReach::determineReachType(SrVec& targetPos)
 {
-	if (currentReachEngine->curHandActionState == MeCtReachEngine::PUT_DOWN_OBJECT) // always putdown the object with current hand
-		return;
+	// current reach hand
+	int reachType = currentReachEngine->getReachType(currentReachEngine->getReachTypeTag());
+
+	
 
 	float x,y,z,h,p,r;
 	SbmCharacter* character = currentReachEngine->getCharacter();
@@ -217,20 +218,39 @@ void MeCtExampleBodyReach::updateReachType(SrVec& targetPos)
 	SrVec targetDir = SrVec(targetPos.x - x, 0, targetPos.z - z); targetDir.normalize();
 	SrVec charDir = character->getFacingDirection(); 
 
-
 	MeCtReachEngine* newEngine = currentReachEngine;	
 	SrVec crossDir = cross(targetDir,charDir);
 
 	if (dot(crossDir,SrVec(0,1,0)) > 0 && isValidReachEngine(MeCtReachEngine::RIGHT_ARM)) // right hand
 	{
-		MeCtReachEngine* re = reachEngineMap[MeCtReachEngine::RIGHT_ARM];		
-		newEngine = reachEngineMap[MeCtReachEngine::RIGHT_ARM];
+		reachType = MeCtReachEngine::RIGHT_ARM;
 	}	
 	else if (isValidReachEngine(MeCtReachEngine::LEFT_ARM))
 	{
-		MeCtReachEngine* re = reachEngineMap[MeCtReachEngine::LEFT_ARM];		
-		newEngine = reachEngineMap[MeCtReachEngine::LEFT_ARM];
+		reachType = MeCtReachEngine::LEFT_ARM;
 	}
+	return reachType;
+}
+
+
+void MeCtExampleBodyReach::updateReachType(SrVec& targetPos)
+{
+	if (currentReachEngine->curHandActionState == MeCtReachEngine::PUT_DOWN_OBJECT) // always putdown the object with current hand
+		return;
+
+	MeCtReachEngine* newEngine = currentReachEngine;		
+
+	int reachType = determineReachType(targetPos);
+
+	if (defaultReachType != -1 && reachEngineMap.find(defaultReachType) != reachEngineMap.end())
+	{
+		//MeCtReachEngine* newEngine = reachEngineMap[defaultReachType];
+		//setNewReachEngine(newEngine);
+		//setFadeIn(0.5f);
+		reachType = defaultReachType;
+	}
+	MeCtReachEngine* re = reachEngineMap[reachType];		
+	newEngine = reachEngineMap[reachType];	
 	setNewReachEngine(newEngine);	
 }
 
@@ -259,12 +279,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	// add logic to steer the character if it is too far away
 
 	bool canReach = updateLocomotion();
-	if (defaultReachType != -1 && reachEngineMap.find(defaultReachType) != reachEngineMap.end())
-	{
-		MeCtReachEngine* newEngine = reachEngineMap[defaultReachType];
-		setNewReachEngine(newEngine);
-		//setFadeIn(0.5f);
-	}
+	
 	// update control parameters
 	currentReachEngine->fadingWeight = blendWeight;
 	currentReachData->autoReturnTime = autoReturnDuration;	

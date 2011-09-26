@@ -471,7 +471,9 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 			int idx = node->validNodeIdx;			
 
 			assert(idx != -1);
-			float nodeWeight = 1.f;			
+			float nodeWeight = 1.f;		
+			if (node->nodeName == "r_acromioclavicular" || node->nodeName == "r_forearm" || node->nodeName == "l_forearm" || node->nodeName == "l_acromioclavicular") 
+				nodeWeight = 0.f;
 			if (!node->active)
 				nodeWeight = 0.f;
 
@@ -705,8 +707,8 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 		{
 			int idx = node->nodeIdx;			
 			float nodeWeight = 1.f;//((float)node->nodeLevel+endNode->nodeLevel)/(endNode->nodeLevel*2.f);
-			//if (node->nodeName == "r_acromioclavicular" || node->nodeName == "r_forearm" || node->nodeName == "l_forearm" || node->nodeName == "l_acromioclavicular") 
-			//	nodeWeight = 0.f;
+			if (node->nodeName == "r_acromioclavicular" || node->nodeName == "r_forearm" || node->nodeName == "l_forearm" || node->nodeName == "l_acromioclavicular") 
+				nodeWeight = 0.f;
 			if (!node->active)
 				nodeWeight = 0.f;
 // 			if (node->nodeName == "r_forearm")
@@ -724,7 +726,7 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 			for (int k=0;k<3;k++)
 			{				
 				//axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2))*node->joint->parent()->gmatZero().get_rotation()*node->joint->gmatZero().get_rotation().inverse();				
-				axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2))*node->joint->parent()->gmatZero().get_rotation().inverse()*node->joint->gmatZero().get_rotation();								
+				axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2));//*node->joint->parent()->gmatZero().get_rotation().inverse()*node->joint->gmatZero().get_rotation();								
 				//axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2))*node->joint->gmatZero().get_rotation()*node->joint->parent()->gmatZero().get_rotation().inverse();
 				
 				SrVec jVec = cross(axis[k],endPos-nodePos);
@@ -790,7 +792,7 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 			for (int k=0;k<3;k++)
 			{			
 				//axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2))*node->joint->parent()->gmatZero().get_rotation()*node->joint->gmatZero().get_rotation().inverse();								
-				axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2))*node->joint->parent()->gmatZero().get_rotation().inverse()*node->joint->gmatZero().get_rotation();												
+				axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2));//*node->joint->parent()->gmatZero().get_rotation().inverse()*node->joint->gmatZero().get_rotation();												
 				//axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2))*node->joint->gmatZero().get_rotation()*node->joint->parent()->gmatZero().get_rotation().inverse();
 				matJ(offset_idx+rotCount*3+0,idx*3+k) = axis[k][0]*nodeWeight;	
 				matJ(offset_idx+rotCount*3+1,idx*3+k) = axis[k][1]*nodeWeight;	
