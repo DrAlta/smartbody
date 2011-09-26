@@ -48,7 +48,8 @@ int MeController::instance_count = 0;
 
 
 MeController::MeController () 
-:	_active( false ),
+:	DObject(),
+	_active( false ),
 	_indt( 0.0f ),
 	_outdt( 0.0f ),
 	_emphasist( -1.0f ),
@@ -58,8 +59,8 @@ MeController::MeController ()
  	_record_output( NULL ), // for recording poses and motions of immediate local results
 	_startTime(-1),
 	_stopTime(-1),
-	_initialized(false)
-	//_pass_through(false)
+	_initialized(false),
+	_passThrough(false)
 	//_handle("")
 {
 	setName("");
@@ -811,13 +812,12 @@ void MeController::handle( std::string handle )
 
 bool MeController::is_pass_through() const
 {
-	MeController* obj = const_cast<MeController*>(this);
-	return obj->getBoolAttribute("pass_through");
+	return _passThrough;
 }
 
 void MeController::set_pass_through( bool val )
 {
-	DObject::setBoolAttribute("pass_through",val);
+	_passThrough = val;
 }
 
 void MeController::updateDefaultVariables(SbmPawn* pawn)
@@ -837,4 +837,17 @@ void MeController::updateDefaultVariables(SbmPawn* pawn)
 		_initialized = true;
 	}
 }
+
+void MeController::notify(DSubject* subject)
+{
+	BoolAttribute* boolAttribute = dynamic_cast<BoolAttribute*>(subject);
+	if (boolAttribute)
+	{
+		if (boolAttribute->getName() == "pass_through")
+		{
+			set_pass_through(boolAttribute->getValue());
+		}
+	}
+}
+
 //============================ End of File ============================
