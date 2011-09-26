@@ -348,6 +348,10 @@
 			Name="sbm"
 			>
 			<File
+				RelativePath="..\src\sbm\action_unit.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sbm\action_unit.hpp"
 				>
 			</File>

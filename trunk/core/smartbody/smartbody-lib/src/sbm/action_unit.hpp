@@ -43,89 +43,23 @@
 class ActionUnit
 {
 public:
+	ActionUnit(SkMotion* unified );
+	ActionUnit( SkMotion* left, SkMotion* right );
+	ActionUnit(ActionUnit* source);
+	~ActionUnit();
+
+	bool is_bilateral() const;
+	void reset_type();
+	void set_left();
+	void set_bilateral();
+	void set_right();
+	bool is_left() const;
+	bool is_right() const;
+	void set( SkMotion* motion );
+	void set( SkMotion* left, SkMotion* right );
+
 	SkMotion* left;
 	SkMotion* right;
-
-	ActionUnit(SkMotion* unified ) :
-		left( unified ),
-		right( unified )
-	{
-		m_isLeft = false;
-		m_isRight = false;
-		m_isBilateral = true;
-	}
-
-	ActionUnit( SkMotion* left, SkMotion* right ) :
-		left( left ),
-		right( right )
-	{
-		reset_type();
-	}
-
-	ActionUnit(ActionUnit* source)
-	{
-		reset_type();
-
-		if (source->is_left())
-			set_left();
-		if (source->is_right())
-			set_right();
-		if (source->is_bilateral())
-			set_bilateral();
-		left = source->left;
-		if (left)
-			left->ref();
-		right = source->right;
-		if (right)
-			right->ref();
-	}
-	
-	~ActionUnit()
-	{
-		if (left)
-			left->unref();
-		if (right)
-			right->unref();
-	}
-
-	bool is_bilateral() const {
-		return m_isBilateral;
-	}
-
-	void reset_type() {
-		m_isLeft = false;
-		m_isRight = false;
-		 m_isBilateral = false;
-	}
-
-	void set_left() {
-		m_isLeft = true;
-	}
-
-	void set_bilateral() {
-		m_isBilateral = true;
-	}
-
-	void set_right() {
-		m_isRight = true;
-	}
-
-	bool is_left() const {
-		return m_isLeft;
-	}
-
-	bool is_right() const {
-		return m_isRight;
-	}
-
-	void set( SkMotion* motion ) {
-		set( motion, motion );
-	}
-
-	void set( SkMotion* left, SkMotion* right ) {
-		this->left	= left;
-		this->right	= right;
-	}
 
 	protected:
 		bool m_isLeft;
