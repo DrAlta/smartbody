@@ -85,6 +85,7 @@ protected:
 	void updateChannelBuffer(MeFrameData& frame, BodyMotionFrame& motionFrame, bool bRead = false);
 	bool updateLocomotion(); // return true if locomotion is finished
 	void updateReachType(SrVec& targetPos); // update the correct reach engine 
+	int  determineReachType(SrVec& targetPos);
 	void setNewReachEngine(MeCtReachEngine* newReachEngine);
 	bool isValidReachEngine(int reachType);
 };

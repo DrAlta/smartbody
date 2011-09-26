@@ -340,6 +340,7 @@ void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
 		ikScenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);		
 	}
 
+	
 	if (footIKFix)
 	{
 		for (int i=0;i<2;i++)
@@ -355,7 +356,6 @@ void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
 		ikCCD.update(&ikScenario);	
 		ikScenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);
 	}
-	
 
 	outFrame = refFrame;
 	ikScenario.getTreeNodeQuat(outFrame.jointQuat,QUAT_CUR); 	
