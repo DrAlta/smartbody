@@ -343,7 +343,8 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/SbmPython.cpp \
 	$(SBM_MY_DIR)/sbm/SbmPythonClass.cpp \
 	$(SBM_MY_DIR)/sbm/ParserBVH.cpp \
-	$(SBM_MY_DIR)/sbm/ParserASFAMC.cpp
+	$(SBM_MY_DIR)/sbm/ParserASFAMC.cpp \
+	$(SBM_MY_DIR)/sbm/action_unit.cpp
 
 LOCAL_LDLIBS    := -llog -lsupc++ 		  
 LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode 
