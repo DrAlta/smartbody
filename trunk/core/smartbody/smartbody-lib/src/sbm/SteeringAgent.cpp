@@ -571,14 +571,15 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 					  	//  (y - mToCm(goalQueue.front().targetLocation.y)) * (y - mToCm(goalQueue.front().targetLocation.y)) + 
 						  (z - mToCm(goalQueue.front().targetLocation.z)) * (z - mToCm(goalQueue.front().targetLocation.z)));
 		if (dist < distThreshold)
+		{
+			stepAdjust = true;
 			character->steeringAgent->getAgent()->clearGoals();
+		}
 	}
 	int numGoals = goalQueue.size();
 	if (numGoals == 0 && character->_numSteeringGoal > 0)
-	{
 		reachTarget = true;
-		stepAdjust = true;
-	}
+
 	if (stepAdjust)
 		if (!character->param_animation_ct->hasPAState("UtahStep"))
 		{
