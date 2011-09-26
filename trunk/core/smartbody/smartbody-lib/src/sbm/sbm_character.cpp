@@ -2133,6 +2133,8 @@ int SbmCharacter::parse_character_command( std::string cmd, srArgBuffer& args, m
 			SrModel& model = srsnModel->shape();
 			LOG("Name: %s  Verts: %d  Faces: %d  Materials: %d", (const char*) model.name, model.V.size(), model.F.size(), model.M.size());
 		}
+
+		return CMD_SUCCESS;
 	}
 	else if( cmd == "smoothbindmesh" )
 	{
