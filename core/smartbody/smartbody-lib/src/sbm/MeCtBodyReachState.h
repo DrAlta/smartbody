@@ -53,7 +53,7 @@ public:
 	virtual SRT getHandTargetStateOffset(ReachStateData* rd, SRT& naturalState);
 	virtual bool isPickingUpNewPawn(ReachStateData* rd) ;
 
-	void sendReachEvent(const std::string& cmd, float time = 0.0);	
+	void sendReachEvent(const std::string& etype, const std::string& cmd, float time = 0.0);	
 public:
 	void pickUpAttachedPawn(ReachStateData* rd);
 	void putDownAttachedPawn(ReachStateData* rd);

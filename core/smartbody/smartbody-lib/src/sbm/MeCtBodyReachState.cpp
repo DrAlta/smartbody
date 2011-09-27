@@ -140,9 +140,9 @@ ReachTarget& ReachTarget::operator=( const ReachTarget& rt )
 /************************************************************************/
 /* Reach Hand Action                                                    */
 /************************************************************************/
-void ReachHandAction::sendReachEvent( const std::string& cmd, float time /*= 0.0*/ )
+void ReachHandAction::sendReachEvent(const std::string& etype, const std::string& cmd, float time /*= 0.0*/ )
 {
-	std::string eventType = "reach";		
+	std::string eventType = etype;		
 	MotionEvent motionEvent;
 	motionEvent.setType(eventType);			
 	motionEvent.setParameters(cmd);
@@ -152,7 +152,7 @@ void ReachHandAction::sendReachEvent( const std::string& cmd, float time /*= 0.0
 
 SRT ReachHandAction::getHandTargetStateOffset( ReachStateData* rd, SRT& naturalState )
 {	
-	if (rd->reachTarget.getTargetPawn())
+	if (rd->reachTarget.targetHasGeometry())
 	{
 		float grabOffset = rd->characterHeight*0.01f;
 		SRT handState = rd->reachTarget.getGrabTargetState(naturalState,grabOffset);	
@@ -181,7 +181,7 @@ void ReachHandAction::reachPreCompleteAction( ReachStateData* rd )
 // 	cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + reachType + "_gc\" sbm:wrist=\"" + wristName + "\"sbm:grab-type=\"" + reachType + "\" sbm:grab-state=\"start\" target=\"" + targetName  + "\"/>";
 
 	cmd = generateGrabCmd(charName,targetName,"start",rd->reachType);
-	sendReachEvent(cmd);
+	sendReachEvent("reach",cmd);
 	LOG("Reach Pre Complete Action");
 }
 
@@ -206,7 +206,7 @@ void ReachHandAction::reachCompleteAction( ReachStateData* rd )
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:wrist=\"r_wrist\" sbm:grab-state=\"reach\" target=\"" + targetName  + "\"/>";
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + reachType + "_gc\" sbm:wrist=\"" + wristName + "\"sbm:grab-type=\"" + reachType + "\" sbm:grab-state=\"reach\" target=\"" + targetName  + "\"/>";
 
-	sendReachEvent(cmd);	
+	sendReachEvent("reach",cmd);	
 	LOG("Reach Complete Action");
 }
 
@@ -218,7 +218,7 @@ void ReachHandAction::reachNewTargetAction( ReachStateData* rd )
 	cmd = generateGrabCmd(charName,"","finish",rd->reachType);
 	ReachTarget& rtarget = rd->reachTarget;
 	if (rtarget.targetHasGeometry())
-		sendReachEvent(cmd);
+		sendReachEvent("reach",cmd);
 	rd->effectorState.removeAttachedPawn(rd);
 	LOG("Reach New Target Action");	
 }
@@ -229,7 +229,7 @@ void ReachHandAction::reachReturnAction( ReachStateData* rd )
 	std::string charName = rd->charName;
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:grab-state=\"return\"/>";
 	cmd = generateGrabCmd(charName,"","return",rd->reachType);
-	sendReachEvent(cmd);	
+	sendReachEvent("reach",cmd);	
 	cmd = "char " + charName + " gazefade out 0.5";
 	//sendReachEvent(cmd);
 	rd->effectorState.removeAttachedPawn(rd);
@@ -258,9 +258,9 @@ void ReachHandAction::pickUpAttachedPawn( ReachStateData* rd )
 	std::string cmd;
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:source-joint=\"" + "r_wrist" + "\" sbm:attach-pawn=\"" + targetName + "\"/>";
 	cmd = generateAttachCmd(charName,targetName,rd->reachType);
-	rd->curHandAction->sendReachEvent(cmd);
+	rd->curHandAction->sendReachEvent("reach",cmd);
 	cmd = "pawn " + targetName + " physics off";
-	rd->curHandAction->sendReachEvent(cmd);
+	rd->curHandAction->sendReachEvent("reach",cmd);
 }
 
 void ReachHandAction::putDownAttachedPawn( ReachStateData* rd )
@@ -273,12 +273,12 @@ void ReachHandAction::putDownAttachedPawn( ReachStateData* rd )
 	std::string cmd;
 	cmd = generateAttachCmd(charName,"",rd->reachType);
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:release-pawn=\"true\"/>";
-	rd->curHandAction->sendReachEvent(cmd);
+	rd->curHandAction->sendReachEvent("reach",cmd);
 	std::string targetName = "";	
 	if (attachedPawn)
 		targetName = attachedPawn->getName();
 	cmd = "pawn " + targetName + " physics on";
-	rd->curHandAction->sendReachEvent(cmd);
+	rd->curHandAction->sendReachEvent("reach",cmd);
 }
 
 void ReachHandAction::reachPreReturnAction( ReachStateData* rd )
@@ -370,7 +370,7 @@ void ReachHandPutDownAction::reachReturnAction( ReachStateData* rd )
 	std::string charName = rd->charName;
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:grab-state=\"return\"/>";
 	generateGrabCmd(charName,"","return",rd->reachType);
-	sendReachEvent(cmd);	
+	sendReachEvent("reach",cmd);	
 
 	cmd = "char " + charName + " gazefade out 0.5";
 	//sendReachEvent(cmd);
@@ -729,6 +729,7 @@ std::string ReachStateStart::nextState( ReachStateData* rd )
 		rd->ikReachTarget = ikTargetReached(rd,2.f);
 		{
 			rd->curHandAction->reachCompleteAction(rd);
+			rd->curHandAction->sendReachEvent("reachstate","complete");
 			nextStateName = "Complete";
 			//rd->startReach = false;		
 		}
@@ -807,6 +808,7 @@ std::string ReachStateNewTarget::nextState( ReachStateData* rd )
 	{
 		rd->curHandAction->reachCompleteAction(rd);
 		rd->startReach = false;
+		rd->curHandAction->sendReachEvent("reachstate","newtarget");
 		nextStateName = "Complete";
 	}
 	else if (rd->endReach)
@@ -877,6 +879,7 @@ std::string ReachStateReturn::nextState( ReachStateData* rd )
 		rd->endReach = false;
 		rd->reachControl->setFadeOut(0.5f);
 		rd->blendWeight = 0.f;
+		rd->curHandAction->sendReachEvent("reachstate","return");
 		nextStateName = "Idle";		
 	}
 	return nextStateName;
