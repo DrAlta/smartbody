@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA2193CD143147D400187A71 /* action_unit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA2193CC143147D400187A71 /* action_unit.cpp */; };
 		AA9CD5E8141FF8610064C27A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA9CD5E7141FF8610064C27A /* Foundation.framework */; };
 		AA9CD84B141FF8D10064C27A /* ANN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD5FB141FF8D00064C27A /* ANN.cpp */; };
 		AA9CD84C141FF8D10064C27A /* ANN.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD5FC141FF8D00064C27A /* ANN.h */; };
@@ -522,6 +523,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AA2193CC143147D400187A71 /* action_unit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = action_unit.cpp; sourceTree = "<group>"; };
 		AA9CD5E4141FF8610064C27A /* libsmartbody-lib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libsmartbody-lib.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA9CD5E7141FF8610064C27A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		AA9CD5EB141FF8610064C27A /* smartbody-lib-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "smartbody-lib-Prefix.pch"; sourceTree = "<group>"; };
@@ -1197,6 +1199,7 @@
 			isa = PBXGroup;
 			children = (
 				AA9CD64F141FF8D00064C27A /* action_unit.hpp */,
+				AA2193CC143147D400187A71 /* action_unit.cpp */,
 				AA9CD650141FF8D00064C27A /* behavior_scheduler.cpp */,
 				AA9CD651141FF8D00064C27A /* behavior_scheduler.hpp */,
 				AA9CD652141FF8D00064C27A /* behavior_scheduler_constant_speed.cpp */,
@@ -2252,6 +2255,7 @@
 				AA9CDA8A141FF8D10064C27A /* sr_vec.cpp in Sources */,
 				AA9CDA8C141FF8D10064C27A /* sr_vec2.cpp in Sources */,
 				AA9CDA8E141FF8D10064C27A /* sr_viewer.cpp in Sources */,
+				AA2193CD143147D400187A71 /* action_unit.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -111,5 +111,6 @@ Note: ogre 1.8 seems to have trouble when building for iphone/ipad, use ogre 1.7
 
 3) Build smartbody-unity
 	...
+Note: If unity project hangs on the boost spinlock, make sure that the options for Compiling Thumb is set to the same for all the projects
 
 --------------------------------------------------------------------------------------------------------------
