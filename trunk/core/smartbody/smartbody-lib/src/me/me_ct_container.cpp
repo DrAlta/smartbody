@@ -118,6 +118,8 @@ MeController* MeCtContainer::findControllerByHandle(std::string handle)
 	for (unsigned int i=0; i < child_count; i++)
 	{
 		MeController* child = this->child( i );
+		if (!child)
+			continue;
 		if (child->handle() == handle)
 			return child;
 		MeCtContainer* container = dynamic_cast<MeCtContainer*>(child);
