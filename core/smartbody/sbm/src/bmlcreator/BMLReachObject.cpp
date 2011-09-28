@@ -5,8 +5,9 @@ BMLReachObject::BMLReachObject() : BMLObject()
 	setName("reach");
 
 	createStringAttribute("target", "", true, "Basic", 10, false, false, false, "reach target");
+	//createVec3Attribute("sbm:target-pos", 0,0,0, true, "Basic", 10, false, false, false, "reach target");
 	
-	StringAttribute* reachActionAttr = createStringAttribute("sbm:reach-action","",true,"Basic", 20, false, false, false,"the action to be executed when reaching.");
+	StringAttribute* reachActionAttr = createStringAttribute("sbm:action","",true,"Basic", 20, false, false, false,"the action to be executed when reaching.");
 	std::vector<std::string> reachActions;
 	reachActions.push_back("pick-up");
 	reachActions.push_back("put-down");
