@@ -508,6 +508,7 @@
 				DSTROOT = /tmp/boost.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
+				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = 4.2;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
@@ -525,6 +526,7 @@
 				DSTROOT = /tmp/boost.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
+				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = 4.2;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
@@ -542,6 +544,7 @@
 				DSTROOT = /tmp/boost.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
+				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = 4.2;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
@@ -559,6 +562,7 @@
 				DSTROOT = /tmp/boost.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
+				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = 4.2;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
@@ -576,6 +580,7 @@
 				DSTROOT = /tmp/boost.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
+				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = 4.2;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
@@ -593,6 +598,7 @@
 				DSTROOT = /tmp/boost.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
+				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = 4.2;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
