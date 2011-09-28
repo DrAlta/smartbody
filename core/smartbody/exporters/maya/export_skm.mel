@@ -865,7 +865,7 @@ global proc skmExportAll()
    string $AllPeRoots[] ;
 
 
-   select -hi SmartbodyExportOptions;
+   select -hi "*SmartbodyExportOptions";
    string $animDefList[] = `ls -sl`;
    for ( $animDef in $animDefList )
    {
