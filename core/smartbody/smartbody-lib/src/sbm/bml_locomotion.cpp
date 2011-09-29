@@ -164,6 +164,24 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			c->steeringAgent->desiredSpeed = 3.5f;
 		else if (manner == "sbm:step")
 			stepMode = true;
+		else if (manner == "sbm:jump")
+		{
+			if (c->param_animation_ct)
+			{
+				std::stringstream command1;
+				if (c->param_animation_ct->getCurrentStateName() == "UtahLocomotion")
+				{
+					command1 << "bml char " << c->getName() << " <sbm:states loop=\"false\" name=\"UtahJump\" sbm:startnow=\"true\"/>";
+					command1 << "<sbm:states loop=\"true\" name=\"UtahLocomotion\" sbm:startnow=\"false\"/>";
+				}
+				else
+				{
+					command1 << "bml char " << c->getName() << " <sbm:states loop=\"false\" name=\"UtahJump\" sbm:startnow=\"true\"/>";
+				}
+				mcu->execute((char*)command1.str().c_str());
+				return BehaviorRequestPtr( new EventRequest(unique_id, localId, command.str().c_str(), behav_syncs, ""));
+			}
+		}
 		else 
 			return BehaviorRequestPtr();
 		// also has to update state weight

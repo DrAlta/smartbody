@@ -17,6 +17,7 @@ BMLLocomotionObject::BMLLocomotionObject() : BMLObject()
 	manners.push_back("jog");
 	manners.push_back("run");
 	manners.push_back("sbm:step");
+	manners.push_back("sbm:jump");
 	mannerAttr->setValidValues(manners);
 	createStringAttribute("facing", "", "", "Basic", 40, false, false, false, "The global facing angle of the agent. To cancel a facing, enter a value that is larger than 180 or smaller than -180");
 	createStringAttribute("sbm:follow", "", "", "Basic", 50, false, false, false, "The other agent that this agent would follow. To cancel the following, enter an empty agent or an invalid agent");
