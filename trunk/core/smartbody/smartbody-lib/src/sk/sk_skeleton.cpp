@@ -231,6 +231,8 @@ SkJoint* SkSkeleton::search_joint ( const char* n )
 void SkSkeleton::update_global_matrices ()
 {
 	if ( _gmat_uptodate ) return;
+	if (!_root)
+		return;
 	_root->update_gmat();
 	_gmat_uptodate = true;
 }

@@ -670,8 +670,11 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 			//character->scene_p->set_visibility(_data->showbones,_data->showgeometry, _data->showcollisiongeometry, _data->showaxis);
 
 			// feng : never show the collision mesh, instead we will show the bounding volumes as capsules
-			character->scene_p->set_visibility(_data->showbones,_data->showgeometry, false, _data->showaxis);
-			character->dMesh_p->set_visibility(_data->showdeformablegeometry);
+			if (character->scene_p && character->dMesh_p)
+			{
+				character->scene_p->set_visibility(_data->showbones,_data->showgeometry, false, _data->showaxis);
+				character->dMesh_p->set_visibility(_data->showdeformablegeometry);
+			}
 		}
 						
 	}

@@ -583,9 +583,9 @@ void SbmPawn::wo_cache_update() {
 	const SkJoint* joint = get_world_offset_joint();
 	if( joint==NULL )
 	{
-		std::stringstream strstr;
-		strstr << "ERROR: SbmPawn::wo_cache_update(..): \"" << getName() << "\" does not have a " << WORLD_OFFSET_JOINT_NAME << " joint.";
-		LOG(strstr.str().c_str());
+		//std::stringstream strstr;
+		//strstr << "ERROR: SbmPawn::wo_cache_update(..): \"" << getName() << "\" does not have a " << WORLD_OFFSET_JOINT_NAME << " joint.";
+		//LOG(strstr.str().c_str());
 		return;
 	}
 	const SkJointPos* pos = joint->const_pos();
