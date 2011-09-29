@@ -162,5 +162,10 @@ int mcu_vrExpress_func(srArgBuffer& args, mcuCBHandle *mcu_p);
 
 void mcu_vhmsg_callback( const char *op, const char *args, void * user_data );
 
+int mcu_reset_func( srArgBuffer& args, mcuCBHandle *mcu_p  );
+int mcu_echo_func( srArgBuffer& args, mcuCBHandle *mcu_p  );
+int sbm_main_func( srArgBuffer & args, mcuCBHandle * mcu_p );
+int sbm_vhmsg_send_func( srArgBuffer& args, mcuCBHandle *mcu_p  );
+
 //////////////////////////////////////////////////////////////////
 #endif

@@ -74,7 +74,7 @@
 
 #include "sbm_deformable_mesh.h"
 #include "sbm/Physics/SbmPhysicsSimODE.h"
-
+#include <sbm/locomotion_cmds.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
 using namespace std;
@@ -271,6 +271,7 @@ mcuCBHandle::mcuCBHandle()
 	sendPawnUpdates(false)
 	//physicsEngine(NULL)
 {	
+	registerCallbacks();
 	root_group_p->ref();
 	logger_p->ref();
 	kinectProcessor = new KinectProcessor();
@@ -340,6 +341,145 @@ void mcuCBHandle::reset( void )	{
 	 for (size_t x = 0; x < _defaultControllers.size(); x++)
 		 _defaultControllers[x]->ref();
  }
+
+void mcuCBHandle::registerCallbacks()
+{
+	insert( "sbm",			sbm_main_func );
+	insert( "help",			mcu_help_func );
+
+	insert( "reset",		mcu_reset_func );
+	insert( "echo",			mcu_echo_func );
+	
+	insert( "path",			mcu_filepath_func );
+	insert( "seq",			mcu_sequence_func );
+	insert( "seq-chain",	mcu_sequence_chain_func );
+	insert( "send",			sbm_vhmsg_send_func );
+
+	//  cmd prefixes "set" and "print"
+	insert( "set",          mcu_set_func );
+	insert( "print",        mcu_print_func );
+	insert( "test",			mcu_test_func );
+
+	insert( "camera",		mcu_camera_func );
+	insert( "terrain",		mcu_terrain_func );
+	insert( "time",			mcu_time_func );
+	insert( "tip",			mcu_time_ival_prof_func );
+
+	insert( "panim",		mcu_panim_cmd_func );	
+	insert( "physics",		mcu_physics_cmd_func );	
+	insert( "mirror",       mcu_motion_mirror_cmd_func);
+	insert( "motionplayer", mcu_motion_player_func);
+
+	insert( "load",			mcu_load_func );
+	insert( "pawn",			SbmPawn::pawn_cmd_func );
+	insert( "char",			SbmCharacter::character_cmd_func );
+
+	insert( "ctrl",			mcu_controller_func );
+	insert( "sched",		mcu_sched_controller_func );
+	insert( "motion",		mcu_motion_controller_func );
+	insert( "stepturn",		mcu_stepturn_controller_func );
+	insert( "quickdraw",	mcu_quickdraw_controller_func );
+	insert( "gaze",			mcu_gaze_controller_func );	
+	insert( "gazelimit",	mcu_gaze_limit_func );
+	insert( "snod",			mcu_snod_controller_func );
+	insert( "lilt",			mcu_lilt_controller_func );
+	insert( "divulge",		mcu_divulge_content_func );
+	insert( "wsp",			mcu_wsp_cmd_func );
+	insert( "create_remote_pawn", SbmPawn::create_remote_pawn_func );
+
+	insert( "vrAgentBML",   BML_PROCESSOR::vrAgentBML_cmd_func );
+	insert( "bp",		    BML_PROCESSOR::bp_cmd_func );
+	insert( "vrSpeak",		BML_PROCESSOR::vrSpeak_func );
+	insert( "vrExpress",  mcu_vrExpress_func );
+
+	insert( "receiver",		mcu_joint_datareceiver_func );
+
+	insert( "net_reset",           mcu_net_reset );
+	insert( "net_check",           mcu_net_check );
+	insert( "RemoteSpeechReply",   remoteSpeechResult_func );
+	insert( "RemoteSpeechTimeOut", remoteSpeechTimeOut_func);  // internally routed message
+	insert( "joint_logger",        joint_logger::start_stop_func );
+	insert( "J_L",                 joint_logger::start_stop_func );  // shorthand
+//	insert( "locomotion",          locomotion_cmd_func );
+//	insert( "loco",                locomotion_cmd_func ); // shorthand
+	insert( "resource",            resource_cmd_func );
+	insert( "syncpolicy",          mcu_syncpolicy_func );
+	insert( "check",			   mcu_check_func);		// check matching between .skm and .sk
+	insert( "pythonscript",		   mcu_pythonscript_func);
+	insert( "python",			   mcu_python_func);
+	insert( "adjustmotion",		   mcu_adjust_motion_function);
+	insert( "mediapath",		   mcu_mediapath_func);
+	insert( "bml",				   test_bml_func );
+	insert( "triggerevent",		   triggerevent_func );
+	insert( "addevent",			   addevent_func );
+	insert( "removeevent",		   removeevent_func );
+	insert( "enableevents",	       enableevents_func );
+	insert( "disableevents",	   disableevents_func );
+	insert( "registerevent",       registerevent_func );
+	insert( "unregisterevent",     unregisterevent_func );
+	insert( "setmap",			   setmap_func );
+	insert( "motionmap",		   motionmap_func );
+	insert( "skeletonmap",		   skeletonmap_func );
+	insert( "steer",			   mcu_steer_func);	
+	insert( "characters",		   showcharacters_func );
+	insert( "pawns",			   showpawns_func );
+	insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands
+	insert( "syncpoint",		   syncpoint_func);
+	insert( "pawnbonebus",		   pawnbonebus_func);
+	insert( "vhmsgconnect",		   mcu_vhmsg_connect_func);
+	insert( "vhmsgdisconnect",	   mcu_vhmsg_disconnect_func);
+	insert( "registeranimation",   register_animation_func);
+	insert( "unregisteranimation", unregister_animation_func);
+    insert( "resetanimation",	   resetanim_func);
+	insert( "animation",		   animation_func);
+
+#ifdef USE_GOOGLE_PROFILER
+	insert( "startprofile",			   startprofile_func );
+	insert( "stopprofile",			   stopprofile_func );
+#endif
+	insert_set_cmd( "bp",             BML_PROCESSOR::set_func );
+	insert_set_cmd( "pawn",           SbmPawn::set_cmd_func );
+	insert_set_cmd( "character",      SbmCharacter::set_cmd_func );
+	insert_set_cmd( "char",           SbmCharacter::set_cmd_func );
+	insert_set_cmd( "face",           mcu_set_face_func );
+	insert_set_cmd( "joint_logger",   joint_logger::set_func );
+	insert_set_cmd( "J_L",            joint_logger::set_func );  // shorthand
+	insert_set_cmd( "test",           sbm_set_test_func );
+
+	insert_print_cmd( "bp",           BML_PROCESSOR::print_func );
+	insert_print_cmd( "pawn",         SbmPawn::print_cmd_func );
+	insert_print_cmd( "character",    SbmCharacter::print_cmd_func );
+	insert_print_cmd( "char",         SbmCharacter::print_cmd_func );
+	insert_print_cmd( "face",         mcu_print_face_func );
+	insert_print_cmd( "joint_logger", joint_logger::print_func );
+	insert_print_cmd( "J_L",          joint_logger::print_func );  // shorthand
+	insert_print_cmd( "mcu",          mcu_divulge_content_func );
+	insert_print_cmd( "test",         sbm_print_test_func );
+
+	insert_test_cmd( "args", test_args_func );
+	insert_test_cmd( "bml",  test_bml_func );
+	insert_test_cmd( "fml",  test_fml_func );
+	insert_test_cmd( "locomotion", test_locomotion_cmd_func );
+	insert_test_cmd( "loco",       test_locomotion_cmd_func );  // shorthand
+	insert_test_cmd( "rhet", remote_speech_test);
+	insert_test_cmd( "bone_pos", test_bone_pos_func );
+	
+
+	insert( "net",	mcu_net_func );
+
+	insert( "PlaySound", mcu_play_sound_func );
+	insert( "StopSound", mcu_stop_sound_func );
+
+	insert( "uscriptexec", mcu_uscriptexec_func );
+
+	insert( "CommAPI", mcu_commapi_func );
+
+	insert( "vrKillComponent", mcu_vrKillComponent_func );
+	insert( "vrAllCall", mcu_vrAllCall_func );
+	insert("vrQuery", mcu_vrQuery_func );
+
+	insert( "text_speech", text_speech::text_speech_func ); // [BMLR]
+}
 
 
  FILE* mcuCBHandle::open_sequence_file( const char *seq_name, std::string& fullPath ) {
