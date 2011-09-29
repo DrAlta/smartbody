@@ -56,6 +56,8 @@ SkScene::~SkScene ()
 
 static SrSnGroup* make_joint_group ( const SkJoint* j, SkSkeleton* s, SrArray<SrSnGroup*>& _jgroup )
  {
+	 if (!j)
+		 return NULL;
    int i;
    SrSnGroup* g = new SrSnGroup;
    g->separator ( true );

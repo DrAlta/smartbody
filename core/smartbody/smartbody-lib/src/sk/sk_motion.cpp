@@ -584,42 +584,97 @@ void SkMotion::change_channel_values ( int f1, int f2, int channel, float mfacto
 
 void SkMotion::registerAnimation()
 {
-	_registerOffset[0] = 0;
-	_registerOffset[1] = 0;
-	_registerOffset[2] = 0;
-	_registerOrientation.set(1, 0, 0, 0);
-
 	if (_frames.size() == 0)
 		return;
 
 	std::string jname("base");
 	// get the offset from the first frame
 	SkChannelArray& channels = this->channels();
-	int xIndex = channels.search(jname, SkChannel::XPos);
-	int zIndex = channels.search(jname, SkChannel::ZPos);
+	int xPos= channels.search(jname, SkChannel::XPos);
+	int yPos = channels.search(jname, SkChannel::YPos);
+	int zPos = channels.search(jname, SkChannel::ZPos);
+	int qPos = channels.search(jname, SkChannel::Quat);
 	
-	if (xIndex == -1 && zIndex == -1)
+	if (xPos == -1 || yPos == -1 || zPos == -1)
+	{
+		LOG("No base position found in motion %s, cannot register.", this->name());
+		return;
+	}
+
+	if (qPos == -1)
+	{
+		LOG("No base orientation found in motion %s, cannot register.", this->name());
+		return;
+	}
+
+	for (size_t f = 0; f < _frames.size(); f++)
+	{
+		SkMotion::Frame& frame = _frames[f];
+		_frameOffset.push_back(SrVec(frame.posture[xPos], frame.posture[yPos], frame.posture[zPos]));
+		_frameOrientation.push_back(SrQuat(frame.posture[qPos], frame.posture[qPos + 1], frame.posture[qPos + 2], frame.posture[qPos + 3]));
+
+		// remove the position and orientation from the motion
+		frame.posture[xPos] = 0;
+		frame.posture[yPos] = 0;
+		frame.posture[zPos] = 0;
+		frame.posture[qPos + 0] = 1;
+		frame.posture[qPos + 1] = 0;
+		frame.posture[qPos + 2] = 0;
+		frame.posture[qPos + 3] = 0;
+	}
+
+	_isRegistered = true;
+}
+
+	void SkMotion::unregisterAnimation()
+	{
+		if (_frames.size() == 0)
 		return;
 
-	// subtract that offset from all the other animation clips
-	for (size_t f = 0; f < _frames.size(); f++)
-	{	
-		if (f == 0)
-		{
-			if (xIndex >= 0)
-				_registerOffset[0] = _frames[f].posture[xIndex];
-			if (zIndex >= 0)
-				_registerOffset[2] = _frames[f].posture[zIndex];
-
-			if (_registerOffset[0] != 0.0 || _registerOffset[2] != 0.0)
-				LOG("Animation %s registered with offset (%f, %f)", this->name().c_str(), _registerOffset[0], _registerOffset[2]);
-		}
-		if (xIndex >= 0)
-			_frames[f].posture[xIndex] -= _registerOffset[0];
-		if (zIndex >= 0)
-			_frames[f].posture[zIndex] -= _registerOffset[2];
+	std::string jname("base");
+	// get the offset from the first frame
+	SkChannelArray& channels = this->channels();
+	int xPos= channels.search(jname, SkChannel::XPos);
+	int yPos = channels.search(jname, SkChannel::YPos);
+	int zPos = channels.search(jname, SkChannel::ZPos);
+	int qPos = channels.search(jname, SkChannel::Quat);
+	
+	if (xPos == -1 || yPos == -1 || zPos == -1)
+	{
+		LOG("No base position found in motion %s, cannot register.", this->name());
+		return;
 	}
-}
+
+	if (qPos == -1)
+	{
+		LOG("No base orientation found in motion %s, cannot register.", this->name());
+		return;
+	}
+
+	for (size_t f = 0; f < _frames.size(); f++)
+	{
+		SkMotion::Frame& frame = _frames[f];
+
+		SrVec& position = _frameOffset[f];
+		SrQuat& orientation = _frameOrientation[f];
+
+		// return the position and orientation to the motion
+		frame.posture[xPos] = position.x;
+		frame.posture[yPos] = position.y;
+		frame.posture[zPos] = position.z;
+		frame.posture[qPos + 0] = orientation.w;
+		frame.posture[qPos + 1] = orientation.x;
+		frame.posture[qPos + 2] = orientation.y;
+		frame.posture[qPos + 3] = orientation.z;
+	}
+
+	_isRegistered = false;
+	}
+
+	bool SkMotion::isRegistered()
+	{
+		return _isRegistered;
+	}
 
 /*
 // static:

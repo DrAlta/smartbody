@@ -283,13 +283,12 @@ void SbmShaderManager::buildShaders()
 	}
 }
 
-SbmShaderProgram* SbmShaderManager::getShader( const char* entryName )
+SbmShaderProgram* SbmShaderManager::getShader( const std::string& entryName )
 {
 	SbmShaderProgram* program = NULL;
-	std::string keyName = entryName;
-	if (shaderMap.find(keyName) != shaderMap.end())
+	if (shaderMap.find(entryName) != shaderMap.end())
 	{
-		program = shaderMap[keyName];		
+		program = shaderMap[entryName];		
 	}
 	return program;	
 }

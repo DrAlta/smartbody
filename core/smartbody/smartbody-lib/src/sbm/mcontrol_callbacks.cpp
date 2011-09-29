@@ -1878,7 +1878,8 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, mcuCBHa
 		srSnModelDynamic->ref();
 		char_p->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
 		srSnModelStatic->ref();
-		mcu_p->root_group_p->add(srSnModelDynamic);	
+		mcu_p->root_group_p->add(srSnModelDynamic);
+	
 		delete meshModelVec[i];
 	}
 
@@ -6263,4 +6264,324 @@ void mcu_vhmsg_callback( const char *op, const char *args, void * user_data )
             LOG("SBM ERR: command FAILED: '%s' + '%s'", op, args );
             break;
     }
+}
+
+int register_animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	SkMotion* motion = mcu_p->getMotion("ChrRio_Entry001");
+	if (!motion)
+		return CMD_FAILURE;
+
+	motion->registerAnimation();
+	return CMD_SUCCESS;
+
+}
+
+int unregister_animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	SkMotion* motion = mcu_p->getMotion("ChrRio_Entry001");
+	if (!motion)
+		return CMD_FAILURE;
+
+	motion->unregisterAnimation();
+	return CMD_SUCCESS;
+
+}
+
+int resetanim_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	std::string motionName;
+	std::string outputFile;
+
+	if (args.calc_num_tokens() > 0)
+	{
+		motionName = args.read_token();
+	}
+	else
+	{
+		LOG("No motion named %s found. Usage: resetanim <motion> <outputfile>", motionName.c_str());
+		return CMD_FAILURE;
+	}
+
+	if (args.calc_num_tokens() > 0)
+	{
+		outputFile = args.read_token();
+	}
+	else
+	{
+		LOG("No output file name entered. Usage: resetanim <motion> <outputfile>");
+		return CMD_FAILURE;
+	}
+
+	SrOutput* out = new SrOutput(outputFile.c_str(), "w");
+	if (!out->valid())
+	{
+		LOG("Cannot write to file %s", outputFile.c_str());
+		delete out;
+		return CMD_FAILURE;
+	}
+
+	SkMotion* motion = mcu_p->getMotion(motionName);
+	if (!motion)
+	{
+		LOG("Motion %s not found. Cannot reset motion to origin.", motionName.c_str());
+		return CMD_FAILURE;
+	}
+	
+	// make sure that the motion ends at the origin (0,0,0)
+	int numFrames = motion->frames();
+
+	float* lastPosture = motion->posture(numFrames - 1);
+	// get the base x, y, z
+	SkChannelArray& channels = motion->channels();
+	int pos[3];
+	pos[0] = channels.search("base", SkChannel::XPos);
+	pos[1] = channels.search("base", SkChannel::YPos);
+	pos[2] = channels.search("base", SkChannel::ZPos);
+
+	if (pos[0] == -1 || pos[1] == -1 || pos[2] == -1)
+	{
+		LOG("No base position found in motion %s, cannot register.", motionName.c_str());
+		return CMD_FAILURE;
+	}
+
+	SrVec last(lastPosture[pos[0]], lastPosture[pos[1]], lastPosture[pos[2]]);
+
+	for (int f = 0; f < numFrames; f++)
+	{
+		float* curFrame = motion->posture(f);
+		for (int p = 0; p < 3; p++)
+		{
+			curFrame[pos[p]] = curFrame[pos[p]] - last[p];
+		}
+
+	}
+
+	motion->save(*out);
+
+	LOG("Motion saved to %s", outputFile.c_str());
+
+	delete out;
+	return CMD_SUCCESS;
+}
+
+int animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	std::string motionName;
+
+	if (args.calc_num_tokens() > 0)
+	{
+		motionName = args.read_token();
+	}
+	else
+	{
+		LOG("Usage: animation <motion> save");
+		LOG("       animation <motion> frame <framenum>");
+		LOG("       animation <motion> translate <x> <y> <z>");
+		LOG("       animation <motion> rotate <x> <y> <z>");
+		LOG("       animation <motion> scale <factor>");
+		//LOG("       animation <motion> trim <from> <to>");
+
+		return CMD_SUCCESS;
+	}
+
+	SkMotion* motion = mcu_p->getMotion(motionName);
+	if (!motion)
+	{
+		LOG("Motion %s not found. Cannot reset motion to origin.", motionName.c_str());
+		return CMD_FAILURE;
+	}
+
+	std::string command = "";
+
+	if (args.calc_num_tokens() == 0)
+	{
+		// dump information about the motion
+		LOG("Motion name:   %s", motion->name());
+		LOG("Motion source: %s", motion->filename());
+		LOG("Num Frames:    %d", motion->frames());
+		LOG("Num Channels:  %d", motion->channels().size());
+
+		return CMD_SUCCESS;
+	}
+	else
+	{
+		command = args.read_token();
+	}
+
+	if (command == "save")
+	{
+		if (args.calc_num_tokens() == 0)
+		{
+			LOG("Usage: animation <motion> save");
+			return CMD_FAILURE;
+		}
+		std::string outputFile = args.read_token();
+		SrOutput* out = new SrOutput(outputFile.c_str(), "w");
+		if (!out->valid())
+		{
+			LOG("Cannot write to file %s", outputFile.c_str());
+			delete out;
+			return CMD_FAILURE;
+		}
+
+		motion->save(*out);
+
+		LOG("Motion %s saved to %s", motionName.c_str(), outputFile.c_str());
+
+		delete out;
+		return CMD_SUCCESS;
+	}
+	else if (command == "frame")
+	{
+		if (args.calc_num_tokens() == 0)
+		{
+			LOG("Usage: animation <motion> frame <framenum>");
+			return CMD_FAILURE;
+		}
+		int index = args.read_int();
+
+		if (index >=0 && index < motion->frames())
+		{
+			std::stringstream strstr;
+			float* posture = motion->posture(index);
+			for (int i = 0; i < motion->posture_size(); i++)
+			{
+				strstr << posture[i] << " ";
+			}
+			LOG("Motion %s frame %d:", motionName.c_str(), index);
+			LOG(strstr.str().c_str());
+			return CMD_SUCCESS;
+		}
+	}
+	else if (command == "scale")
+	{
+		if (args.calc_num_tokens() == 0)
+		{
+			LOG("Usage: animation <motion> scale <factor>");
+			return CMD_FAILURE;
+		}
+		float factor = args.read_float();
+		SkChannelArray& channels = motion->channels();
+		int numFrames = motion->frames();
+		for (int f = 0; f < numFrames; f++)
+		{
+			float* posture = motion->posture(f);
+			int index = 0;
+			for (int c = 0; c < channels.size(); c++)
+			{
+				SkChannel& channel = channels[c];
+				// only scale the positions
+				if (channel.type == SkChannel::XPos ||
+					channel.type == SkChannel::YPos ||
+					channel.type == SkChannel::ZPos)
+				{
+					posture[index] *= factor;
+				}
+				index += channel.size();
+			}
+		}
+		LOG("Motion %s with %d frames scaled by a factor of %f", motionName.c_str(), motion->frames(), factor);
+		return CMD_SUCCESS;
+
+	}
+	else if (command == "translate")
+	{
+		if (args.calc_num_tokens() < 3)
+		{
+			LOG("Usage: animation <motion> translate <x> <y> <z>");
+			return CMD_FAILURE;
+		}
+		SrVec offset;
+		offset[0] = args.read_float();
+		offset[1] = args.read_float();
+		offset[2] = args.read_float();
+
+		// get the base x, y, z
+		SkChannelArray& channels = motion->channels();
+		int pos[3];
+		pos[0] = channels.search("base", SkChannel::XPos);
+		pos[1] = channels.search("base", SkChannel::YPos);
+		pos[2] = channels.search("base", SkChannel::ZPos);
+		if (pos[0] == -1 || pos[1] == -1 || pos[2] == -1)
+		{
+			LOG("No joint named 'base' found in motion %s, cannot translate.", motionName.c_str());
+			return CMD_FAILURE;
+		}
+
+		int numFrames = motion->frames();
+		for (int f = 0; f < numFrames; f++)
+		{
+			float* curFrame = motion->posture(f);
+			for (int p = 0; p < 3; p++)
+			{
+				curFrame[pos[p]] = curFrame[pos[p]] + offset[p];
+			}
+
+		}
+
+		LOG("Motion %s with %d frames offset by (%f, %f, %f)", motionName.c_str(), motion->frames(), offset[0], offset[1], offset[2]);
+		return CMD_SUCCESS;
+	}	
+	else if (command == "rotate")
+	{
+		if (args.calc_num_tokens() < 3)
+		{
+			LOG("Usage: animation <motion> rotate <x> <y> <z>");
+			return CMD_FAILURE;
+		}
+		SrVec rotation;
+		rotation[0] = args.read_float();
+		rotation[1] = args.read_float();
+		rotation[2] = args.read_float();
+
+		// get the base wuaternion
+		SkChannelArray& channels = motion->channels();
+		int pos = -1;
+		pos = channels.search("base", SkChannel::Quat);
+		if (pos == -1)
+		{
+			LOG("No joint named 'base' found in motion %s, cannot rotate.", motionName.c_str());
+			return CMD_FAILURE;
+		}
+
+		SrMat xRot;
+		xRot.rotx(rotation[0] * (float) M_PI / 180.0f);
+		SrMat yRot;
+		yRot.roty(rotation[1] * (float) M_PI / 180.0f);
+		SrMat zRot;
+		zRot.rotz(rotation[2] * (float) M_PI / 180.0f);
+		SrMat finalMat = xRot * yRot * zRot;
+
+		int numFrames = motion->frames();
+		for (int f = 0; f < numFrames; f++)
+		{
+			float* curFrame = motion->posture(f);
+			SrQuat curQuat(curFrame[pos], curFrame[pos + 1], curFrame[pos + 2], curFrame[pos + 3]); 
+			SrMat currentMat;
+			curQuat.get_mat(currentMat);
+			currentMat *= finalMat;
+			SrQuat newQuat(currentMat);
+			curFrame[pos + 0] = newQuat.w;
+			curFrame[pos + 1] = newQuat.x;
+			curFrame[pos + 2] = newQuat.y;
+			curFrame[pos + 3] = newQuat.z;
+		}
+
+		LOG("Motion %s with %d frames rotated by (%f, %f, %f)", motionName.c_str(), motion->frames(), rotation[0], rotation[1], rotation[2]);
+		return CMD_SUCCESS;
+	}
+	else
+	{
+		LOG("Usage: animation <motion> save");
+		LOG("       animation <motion> frame <framenum>");
+		LOG("       animation <motion> translate <x> <y> <z>"); 
+		LOG("       animation <motion> rotate <x> <y> <z>");
+		LOG("       animation <motion> scale <factor>");
+		//LOG("       animation <motion> trim <from> <to>");
+
+		return CMD_FAILURE;
+	}
+
+	return CMD_SUCCESS;
 }

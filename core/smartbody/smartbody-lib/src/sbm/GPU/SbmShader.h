@@ -63,7 +63,7 @@ public:
 	bool initGLExtension();	
 	void setViewer(SrViewer* vw);	
 	void addShader(const char* entryName,const char* vsName, const char* fsName, bool shaderFile = true);
-	SbmShaderProgram* getShader(const char* entryName);
+	SbmShaderProgram* getShader(const std::string& entryName);
 	void buildShaders();
 	static int getShaderSupport() { return shaderSupport; }
 };
