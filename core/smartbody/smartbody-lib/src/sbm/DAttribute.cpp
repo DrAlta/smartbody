@@ -231,6 +231,21 @@ void DAttribute::setObject(DObject* object)
 	m_object = object;
 }
 
+std::string DAttribute::write()
+{
+	return "";
+}
+
+void DAttribute::read()
+{
+}
+
+DAttribute* DAttribute::copy()
+{
+	return NULL;
+}
+
+
 DObject* DAttribute::getObject()
 {
 	return m_object;
@@ -251,12 +266,12 @@ BoolAttribute::~BoolAttribute()
 {
 }
 
-const bool& BoolAttribute::getValue(float time)
+const bool& BoolAttribute::getValue()
 {
 	return m_value;
 }
 
-void BoolAttribute::setValue(const bool& val, float time)
+void BoolAttribute::setValue(const bool& val)
 {
 	m_value = val;
 	notifyObservers();
@@ -320,12 +335,12 @@ IntAttribute::~IntAttribute()
 {
 }
 
-const int& IntAttribute::getValue(float time)
+const int& IntAttribute::getValue()
 {
 	return m_value;
 }
 
-void IntAttribute::setValue(const int& val, float time)
+void IntAttribute::setValue(const int& val)
 {
 	if (val < getMin())
 		m_value = getMin();
@@ -415,12 +430,12 @@ DoubleAttribute::~DoubleAttribute()
 {
 }
 
-const double& DoubleAttribute::getValue(float time)
+const double& DoubleAttribute::getValue()
 {
 	return m_value;
 }
 
-void DoubleAttribute::setValue(const double& val, float time)
+void DoubleAttribute::setValue(const double& val)
 {
 	if (val < getMin())
 		m_value = getMin();
@@ -505,12 +520,12 @@ StringAttribute::~StringAttribute()
 {
 }
 
-const std::string& StringAttribute::getValue(float time)
+const std::string& StringAttribute::getValue()
 {
 	return m_value;
 }
 
-void StringAttribute::setValue(const std::string& val, float time)
+void StringAttribute::setValue(const std::string& val)
 {
 	m_value = val;
 	notifyObservers();
@@ -590,12 +605,12 @@ Vec3Attribute::~Vec3Attribute()
 {
 }
 
-const SrVec& Vec3Attribute::getValue(float time)
+const SrVec& Vec3Attribute::getValue()
 {
 	return m_value;
 }
 
-void Vec3Attribute::setValue(const SrVec& val, float time)
+void Vec3Attribute::setValue(const SrVec& val)
 {
 	m_value = val;
 	notifyObservers();
@@ -657,12 +672,12 @@ MatrixAttribute::~MatrixAttribute()
 {
 }
 
-const SrMat& MatrixAttribute::getValue(float time)
+const SrMat& MatrixAttribute::getValue()
 {
 	return m_value;
 }
 
-void MatrixAttribute::setValue(const SrMat& matrix, float time)
+void MatrixAttribute::setValue(const SrMat& matrix)
 {
 	m_value = matrix;
 	notifyObservers();
@@ -709,4 +724,5 @@ DAttribute* MatrixAttribute::copy()
 		
 	return a;
 }
+
 
