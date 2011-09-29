@@ -615,6 +615,8 @@ public:
 			faceViewerFactory = factory;
 		}		
 
+		void registerCallbacks();
+
 		void setMediaPath(std::string path);
 		const std::string& getMediaPath();
 

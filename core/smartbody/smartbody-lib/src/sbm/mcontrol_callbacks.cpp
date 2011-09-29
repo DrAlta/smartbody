@@ -64,9 +64,11 @@
 #include "SteeringAgent.h"
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <boost/algorithm/string/replace.hpp>
 #include "ParserFBX.h"
 #include "SBCharacter.h"
 #include <sbm/BMLDefs.h>
+
 
 #ifdef USE_GOOGLE_PROFILER
 #include <google/profiler.h>
@@ -6584,4 +6586,64 @@ int animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	}
 
 	return CMD_SUCCESS;
+}
+
+int mcu_reset_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
+{
+	// TODO: If arg, call as init, else call previous init
+	mcu_p->reset();
+	return( CMD_SUCCESS );
+}
+
+int mcu_echo_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
+{
+	std::stringstream timeStr;
+	timeStr << mcu_p->time;
+	std::string echoStr = args.read_remainder_raw();
+	int pos = echoStr.find("$time");
+	if (pos != std::string::npos)
+		boost::replace_all(echoStr, "$time", timeStr.str());
+	
+    LOG("%s ", echoStr.c_str() );
+	return( CMD_SUCCESS );
+}
+
+int sbm_main_func( srArgBuffer & args, mcuCBHandle * mcu_p )
+{
+   const char * token = args.read_token();
+   if ( strcmp( token, "id" ) == 0 )
+   {  // Process specific
+      token = args.read_token(); // Process id
+      const char * process_id = mcu_p->process_id.c_str();
+      if( ( mcu_p->process_id == "" )         // If process id unassigned
+         || strcmp( token, process_id ) !=0 ) // or doesn't match
+         return CMD_SUCCESS;                  // Ignore.
+      token = args.read_token(); // Sub-command
+   }
+
+   const char * args_raw = args.read_remainder_raw();
+   srArgBuffer arg_buf( args_raw );
+   int result = mcu_p->execute( token, arg_buf );
+   switch( result )
+   {
+      case CMD_NOT_FOUND:
+         LOG( "SBM ERR: command NOT FOUND: '%s %s'> ", token, args_raw );
+         break;
+      case CMD_FAILURE:
+         LOG( "SBM ERR: command FAILED: '%s %s'> ", token, args_raw );
+         break;
+      case CMD_SUCCESS:
+         break;
+      default:
+         break;
+   }
+
+   return CMD_SUCCESS;
+}
+
+int sbm_vhmsg_send_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
+{
+	char* cmdName = args.read_token();
+	char* cmdArgs = args.read_remainder_raw();
+	return mcu_p->vhmsg_send( cmdName, cmdArgs );
 }
