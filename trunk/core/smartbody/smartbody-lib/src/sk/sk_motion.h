@@ -38,7 +38,7 @@ class MotionEvent;
 /*! Maintains a motion defined as a sequence of keyframes, each
 with a time stamp */
 class SkMotion : public SrSharedClass {
-
+//class SkMotion {
 public:
 	struct Frame { 
 			float keytime; 
@@ -65,8 +65,11 @@ public:
 	float _time_stroke_end;
 	float _time_relax;
 #endif
-	SrVec _registerOffset;
-	SrQuat _registerOrientation;
+
+	std::vector<SrVec> _frameOffset;
+	std::vector<SrQuat> _frameOrientation;
+	bool _isRegistered;
+
 
 public :
 	// Timing Metadata:
@@ -279,10 +282,12 @@ public :
 #endif
 
 	/*! Registers the animation by placing the world offset and orientation into 
-		the _registerOffset and _registerOrientation variables. These values will
+		the _frameOffset and _frameOrientation variables. These values will
 		then be removed from the animation playback.
 	*/
 	void registerAnimation();
+	void unregisterAnimation();
+	bool isRegistered();
 
 	void addMotionEvent(MotionEvent* motionEvent);
 	std::vector<MotionEvent*>& getMotionEvents();

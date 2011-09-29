@@ -391,6 +391,10 @@ void mcu_register_callbacks( void ) {
 	mcu.insert( "pawnbonebus",		   pawnbonebus_func);
 	mcu.insert( "vhmsgconnect",		   mcu_vhmsg_connect_func);
 	mcu.insert( "vhmsgdisconnect",	   mcu_vhmsg_disconnect_func);
+	mcu.insert( "registeranimation",   register_animation_func);
+	mcu.insert( "unregisteranimation", unregister_animation_func);
+    mcu.insert( "resetanimation",	   resetanim_func);
+	mcu.insert( "animation",		   animation_func);
 
 #ifdef USE_GOOGLE_PROFILER
 	mcu.insert( "startprofile",			   startprofile_func );

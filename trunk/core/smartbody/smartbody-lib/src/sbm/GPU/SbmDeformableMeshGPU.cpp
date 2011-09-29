@@ -211,7 +211,7 @@ SbmDeformableMeshGPU::~SbmDeformableMeshGPU(void)
 
 void SbmDeformableMeshGPU::skinTransformGPU()
 {
-	GLuint program = SbmShaderManager::singleton().getShader(shaderName.c_str())->getShaderProgram();
+	GLuint program = SbmShaderManager::singleton().getShader(shaderName)->getShaderProgram();
 
 	updateTransformBuffer();
 	glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );	
@@ -404,7 +404,7 @@ bool SbmDeformableMeshGPU::initBuffer()
 	std::map<int,std::vector<int> > vtxNewVtxIdxMap;
 	std::map<int,std::vector<int> > meshSubsetMap;
 
-	GLuint program = SbmShaderManager::singleton().getShader(shaderName.c_str())->getShaderProgram();	
+	GLuint program = SbmShaderManager::singleton().getShader(shaderName)->getShaderProgram();	
 	
 	SrColor colorArray[6] = { SrColor::blue, SrColor::red, SrColor::green, SrColor::magenta, SrColor::gray, SrColor::yellow};
 	// setup deformable mesh color	
@@ -767,7 +767,7 @@ void SbmDeformableMeshGPU::update()
 	if (!initShader)
 		initShaderProgram();
 
-	SbmShaderProgram* program = SbmShaderManager::singleton().getShader(shaderName.c_str());	
+	SbmShaderProgram* program = SbmShaderManager::singleton().getShader(shaderName);	
 	bool hasGLContext = SbmShaderManager::singleton().initOpenGL() && SbmShaderManager::singleton().initGLExtension();
 	if (!useGPU && hasGLContext && program && program->finishBuild())
 	{

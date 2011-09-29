@@ -129,6 +129,11 @@ int mcu_mediapath_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_vhmsg_connect_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_vhmsg_disconnect_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
+int register_animation_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int unregister_animation_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int resetanim_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+int animation_func( srArgBuffer& args, mcuCBHandle *mcu_p );
+
 int triggerevent_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 int mcu_python_func( srArgBuffer& args, mcuCBHandle* mcu_p );
 int mcu_pythonscript_func( srArgBuffer& args, mcuCBHandle* mcu_p );

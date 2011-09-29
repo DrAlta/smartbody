@@ -26,9 +26,10 @@ if [ $1 = "IMG" ]; then
 	if [ $int_var1 -le $3 ]; then
 		echo "SUCCESS" >> $STAT
 		echo SUCCESS
-	elif [ $int_var1 -ge 10000 ]; then
-		echo "REDO" >> $STAT
-		echo REDO
+	# redo functionality removed 9/26/11 by AS
+	#elif [ $int_var1 -ge 10000 ]; then
+	#	echo "REDO" >> $STAT
+	#	echo REDO
 	else
 		echo "FAILURE" >> $STAT
 		echo FAILURE
