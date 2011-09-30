@@ -24,7 +24,7 @@
 1	test bml character utah noecho posture LHandOnHip_Motex
 
 1	seq init-param-animation inline
-#2	seq init-example-reach inline
+2	seq init-example-reach inline
 
 4 steer start
 5 steer type example
