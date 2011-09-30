@@ -107,10 +107,10 @@
 
 #2 registerevent reach "$1"
 
-1 bml char brad <sbm:reach sbm:handle="rdoctor" effector="r_index3"/>
+#1 bml char brad <sbm:reach sbm:handle="rdoctor" effector="r_index3"/>
 1 pawn foo init
 1 set pawn foo world_offset x 0 y 150 z 40
-6 bml char brad <sbm:reach sbm:handle="rdoctor" effector="r_index3" target="foo"/>
+#6 bml char brad <sbm:reach sbm:handle="rdoctor" effector="r_index3" target="foo"/>
 
 
 

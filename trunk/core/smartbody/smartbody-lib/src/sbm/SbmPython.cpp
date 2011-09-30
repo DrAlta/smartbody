@@ -388,19 +388,19 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def("getName", &DAttribute::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
 	;
 
-	boost::python::class_<BoolAttribute, boost::python::bases<DAttribute>>("BoolAttribute")
+	boost::python::class_<BoolAttribute, boost::python::bases<DAttribute> >("BoolAttribute")
 		.def("getValue", &BoolAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
 	;
 
-	boost::python::class_<StringAttribute, boost::python::bases<DAttribute>>("StringAttribute")
+	boost::python::class_<StringAttribute, boost::python::bases<DAttribute> >("StringAttribute")
 		.def("getValue", &StringAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
 	;
 
-	boost::python::class_<IntAttribute, boost::python::bases<DAttribute>>("IntAttribute")
+	boost::python::class_<IntAttribute, boost::python::bases<DAttribute> >("IntAttribute")
 		.def("getValue", &IntAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
 	;
 
-	boost::python::class_<DoubleAttribute, boost::python::bases<DAttribute>>("DoubleAttribute")
+	boost::python::class_<DoubleAttribute, boost::python::bases<DAttribute> >("DoubleAttribute")
 		.def("getValue", &DoubleAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
 	;
 
