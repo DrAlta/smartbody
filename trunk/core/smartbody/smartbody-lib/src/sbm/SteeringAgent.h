@@ -121,6 +121,9 @@ class SteeringAgent
 		std::list<float> speedCache;
 		std::list<float> angleCache;
 		std::list<float> scootCache;
+
+		// heading over control to parameterized animation engine
+		bool inControl;
 };
 
 #endif

@@ -168,6 +168,8 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		{
 			if (c->param_animation_ct)
 			{
+				if (c->param_animation_ct->hasPAState("UtahJump"))
+					return BehaviorRequestPtr( new EventRequest(unique_id, localId, command.str().c_str(), behav_syncs, ""));
 				std::stringstream command1;
 				if (c->param_animation_ct->getCurrentStateName() == "UtahLocomotion")
 				{
