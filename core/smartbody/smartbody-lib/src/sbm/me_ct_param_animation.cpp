@@ -246,7 +246,12 @@ void MeCtParamAnimation::dumpScheduling()
 	LOG("Number of states to be scheduled: %d", waitingList.size());
 	std::list<ScheduleUnit>::iterator iter = waitingList.begin();
 	for (; iter != waitingList.end(); iter++)
-		LOG("* %s", iter->data->stateName.c_str());
+	{
+		if (iter->data)
+			LOG("* %s", iter->data->stateName.c_str());
+		else
+			LOG("* Idle State");
+	}
 }
 
 void MeCtParamAnimation::schedule(PAStateData* stateData, bool l, bool pn)
@@ -270,7 +275,6 @@ void MeCtParamAnimation::updateWeights(std::vector<double> w)
 		return;
 	if (curStateModule->data->getNumMotions() != w.size())
 		return;
-
 
 	double wCheck = 0.0;
 	for (size_t i = 0; i < w.size(); i++)

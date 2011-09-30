@@ -1583,12 +1583,14 @@ void FltkViewer::translate_keyboard_state()
 			for (int i = 0; i < state->getNumMotions(); i++)
 				command2 << state->weights[i] << " ";
 			mcu.execute((char*)command2.str().c_str());
-			_paLocoData->jumping = false;
+ 			_paLocoData->jumping = false;
 		}
 		else
 		{
 			if (state)
 			{
+				if (_paLocoData->v < -9990 || _paLocoData->w < -9990)
+					state->paramManager->getParameter(_paLocoData->v, _paLocoData->w, scoot);
 				bool success = state->paramManager->setWeight(_paLocoData->v, _paLocoData->w, scoot);
 
 				// in case scoot value comes as non-zero

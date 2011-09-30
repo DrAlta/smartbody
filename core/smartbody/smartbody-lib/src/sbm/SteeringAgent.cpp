@@ -77,6 +77,8 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	speedWindowSize = 10;
 	angleWindowSize = 3;
 	scootWindowSize = 3;
+
+	inControl = true;
 }
 
 SteeringAgent::~SteeringAgent()
@@ -782,7 +784,11 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			mcu.execute((char*) command.str().c_str());
 		}
 #endif
-
+	//---Need a better way to handle the control between steering and Parameterized Animation Controller
+	if (character->param_animation_ct->hasPAState("UtahJump"))
+		inControl = false;
+	else
+		inControl = true;
 
 	//---update locomotion
 	float curSpeed = 0.0f;
@@ -875,9 +881,11 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 			//cacheParameter(scootCache, curScoot, scootWindowSize);
 			//curScoot = getFilteredParameter(scootCache);
 			//std::cout << curSpeed << " " << curTurningAngle << " " << curScoot << std::endl;
-
-			curState->paramManager->setWeight(curSpeed, curTurningAngle, curScoot);
-			character->param_animation_ct->updateWeights();
+			if (inControl)
+			{
+				curState->paramManager->setWeight(curSpeed, curTurningAngle, curScoot);
+				character->param_animation_ct->updateWeights();
+			}
 		}
 	return newSpeed;
 }

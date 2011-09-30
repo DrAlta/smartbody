@@ -452,6 +452,7 @@ bool ParameterManager::setWeight(double x, double y, double z)
 			state->weights[id2] = w2;
 			state->weights[id3] = w3;
 			state->weights[id4] = w4;
+
 			return true;
 		}
 		else
