@@ -3156,6 +3156,16 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle 
 		character->set_speech_impl( mcu_p->speech_rvoice() );
 		string s( voice_id );
 		character->set_voice_code( s );
+	} else if( _stricmp( impl_id, "local" )==0 ) {
+		const char* voice_id = args.read_token();
+		if( strlen( voice_id )==0 ) {
+			LOG("ERROR: Expected local voice id.");
+			return CMD_FAILURE;
+		}
+		LOG("set local voice");
+		character->set_speech_impl( mcu_p->speech_localvoice() );
+		string s( voice_id );
+		character->set_voice_code( s );
 	} else if( _stricmp( impl_id, "audiofile" )==0 ) {
 		const char* voice_path = args.read_token();
 		if( strlen( voice_path )==0 ) {

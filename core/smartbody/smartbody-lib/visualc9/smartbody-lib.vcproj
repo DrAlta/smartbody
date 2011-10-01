@@ -46,7 +46,7 @@
 				AdditionalOptions="/MP"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\src;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\..\..\core\smartbody\steersuite-1.3\external&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;..\..\..\..\core\smartbody\ode\include;..\..\..\..\core\smartbody\Python26\include"
-				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT"
+				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;SYSTEM_IS_WIN32"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				PrecompiledHeaderFile=""
@@ -123,7 +123,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				AdditionalIncludeDirectories="..\src;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\..\..\core\smartbody\steersuite-1.3\external&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;..\..\..\..\core\smartbody\ode\include;..\..\..\..\core\smartbody\Python26\include"
-				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT"
+				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;SYSTEM_IS_WIN32"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				PrecompiledHeaderFile=""
@@ -433,6 +433,14 @@
 			</File>
 			<File
 				RelativePath="..\src\sbm\lin_win.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\local_speech.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\sbm\local_speech.h"
 				>
 			</File>
 			<File

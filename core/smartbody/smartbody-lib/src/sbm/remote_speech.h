@@ -37,6 +37,14 @@ class remote_speech;
 // Predeclare class
 class mcuCBHandle;
 
+int remoteSpeechResult_func( srArgBuffer& args, mcuCBHandle* mcu_p);
+int set_char_voice(char* char_name, char* voiceCode, mcuCBHandle* mcu_p);
+int remoteSpeechTimeOut_func(srArgBuffer& args, mcuCBHandle* mcu_p);
+
+// Test functions
+// TODO: move to "test ..."
+int remote_speech_test( srArgBuffer& args, mcuCBHandle* mcu_p);
+int remoteSpeechReady_func( srArgBuffer& args, mcuCBHandle* mcu_p);
 
 class remote_speech: public SmartBody::SpeechInterface {
     public:
@@ -53,22 +61,26 @@ class remote_speech: public SmartBody::SpeechInterface {
 		virtual ~remote_speech();
 
 		// Methods
-		SmartBody::RequestId requestSpeechAudio( const char* agentName, const std::string voiceCode, const DOMNode* node, const char* callbackCmd ); //accepts dom document of which sound will be created from, returns Request ID
-		SmartBody::RequestId requestSpeechAudio( const char* agentName, const std::string voiceCode, std::string text, const char* callbackCmd ); //accepts char* of above and returns request ID
-		std::vector<SmartBody::VisemeData *>* getVisemes( SmartBody::RequestId requestId,  SbmCharacter* character ); //returns visemes  for given request
-		char* getSpeechPlayCommand( SmartBody::RequestId requestId, SbmCharacter* character = NULL ); //returns the command to play speech
-		char* getSpeechStopCommand( SmartBody::RequestId requestId, SbmCharacter* character = NULL ); //''                     stop
-		char* getSpeechAudioFilename( SmartBody::RequestId requestId ); // gets the fileName of speech
-		float getMarkTime( SmartBody::RequestId requestId, const XMLCh* markId ); //gets time value for a given marker
+		virtual SmartBody::RequestId requestSpeechAudio( const char* agentName, const std::string voiceCode, const DOMNode* node, const char* callbackCmd ); //accepts dom document of which sound will be created from, returns Request ID
+		virtual SmartBody::RequestId requestSpeechAudio( const char* agentName, const std::string voiceCode, std::string text, const char* callbackCmd ); //accepts char* of above and returns request ID
+		virtual std::vector<SmartBody::VisemeData *>* getVisemes( SmartBody::RequestId requestId,  SbmCharacter* character ); //returns visemes  for given request
+		virtual char* getSpeechPlayCommand( SmartBody::RequestId requestId, SbmCharacter* character = NULL ); //returns the command to play speech
+		virtual char* getSpeechStopCommand( SmartBody::RequestId requestId, SbmCharacter* character = NULL ); //''                     stop
+		virtual char* getSpeechAudioFilename( SmartBody::RequestId requestId ); // gets the fileName of speech
+		virtual float getMarkTime( SmartBody::RequestId requestId, const XMLCh* markId ); //gets time value for a given marker
 		
 
-		void requestComplete( SmartBody::RequestId requestId );
+		virtual void requestComplete( SmartBody::RequestId requestId );
 
 		// RemoteSpeech specific methods
 		int handleRemoteSpeechResult( SbmCharacter* character, char* msgID, char* status, char* result, mcuCBHandle* mcu_p );
 		int testRemoteSpeechTimeOut( const char* request_id_str, mcuCBHandle* mcu_p );
+	protected:
+		virtual void sendSpeechCommand(const char* cmd);
+		virtual void sendSpeechTimeout(std::ostringstream& outStream);
+
 		
-	private:
+	protected:
 		std::vector<SmartBody::VisemeData *>* extractVisemes(DOMNode* node, std::vector<SmartBody::VisemeData*>* visemes, SbmCharacter* character);
 		std::string forPlaysound;
 		srHashMap<DOMNode>     uttLookUp; 
@@ -83,15 +95,8 @@ class remote_speech: public SmartBody::SpeechInterface {
 
 
 // included after class definition b/c dependency
-#include "mcontrol_util.h"
+//#include "mcontrol_util.h"
 
-int remoteSpeechResult_func( srArgBuffer& args, mcuCBHandle* mcu_p);
-int set_char_voice(char* char_name, char* voiceCode, mcuCBHandle* mcu_p);
-int remoteSpeechTimeOut_func(srArgBuffer& args, mcuCBHandle* mcu_p);
 
-// Test functions
-// TODO: move to "test ..."
-int remote_speech_test( srArgBuffer& args, mcuCBHandle* mcu_p);
-int remoteSpeechReady_func( srArgBuffer& args, mcuCBHandle* mcu_p);
 
 #endif // REMOTE_SPEECH_H

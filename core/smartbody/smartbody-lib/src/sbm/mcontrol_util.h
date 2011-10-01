@@ -73,6 +73,7 @@ class mcuCBHandle;
 #include "sbm_pawn.hpp"
 #include "sbm_character.hpp"
 #include "remote_speech.h"
+#include "local_speech.h"
 #include "text_speech.h" // [BMLR]
 #include "sbm_speech_audiofile.hpp"
 #include "me_ct_examples.h"
@@ -175,8 +176,10 @@ class mcuCBHandle {
 	protected:
 		// Data
 		remote_speech				_speech_rvoice;
+		local_speech                _speech_localvoice;
 		SmartBody::AudioFileSpeech	_speech_audiofile;
 		text_speech					_speech_text; // [BMLR]
+		FestivalSpeechRelayLocal    _festivalRelayLocal; 
 		unsigned int				queued_cmds;
 
 	public:
@@ -576,7 +579,9 @@ public:
 		int abortSequence( const char* command );
 		int deleteSequence( const char* command );
 
+		FestivalSpeechRelayLocal* festivalRelay() { return &_festivalRelayLocal; }
 		remote_speech* speech_rvoice() { return &_speech_rvoice; }
+		local_speech* speech_localvoice() { return &_speech_localvoice; }
 		SmartBody::AudioFileSpeech* speech_audiofile() { return &_speech_audiofile; }
 		text_speech* speech_text() { return &_speech_text; } // [BMLR]
 

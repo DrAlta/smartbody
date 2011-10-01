@@ -397,6 +397,7 @@ void mcuCBHandle::registerCallbacks()
 
 	insert( "net_reset",           mcu_net_reset );
 	insert( "net_check",           mcu_net_check );
+	insert( "RemoteSpeechCmd"  ,   mcuFestivalRemoteSpeechCmd_func );
 	insert( "RemoteSpeechReply",   remoteSpeechResult_func );
 	insert( "RemoteSpeechTimeOut", remoteSpeechTimeOut_func);  // internally routed message
 	insert( "joint_logger",        joint_logger::start_stop_func );
