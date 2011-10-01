@@ -162,6 +162,7 @@ int mcu_vrExpress_func(srArgBuffer& args, mcuCBHandle *mcu_p);
 int vhmsglog_func( srArgBuffer& args, mcuCBHandle *mcu_p );
 
 void mcu_vhmsg_callback( const char *op, const char *args, void * user_data );
+int mcuFestivalRemoteSpeechCmd_func( srArgBuffer& args, mcuCBHandle* mcu_p);
 
 int mcu_reset_func( srArgBuffer& args, mcuCBHandle *mcu_p  );
 int mcu_echo_func( srArgBuffer& args, mcuCBHandle *mcu_p  );

@@ -6268,6 +6268,15 @@ void mcu_vhmsg_callback( const char *op, const char *args, void * user_data )
     }
 }
 
+int mcuFestivalRemoteSpeechCmd_func( srArgBuffer& args, mcuCBHandle* mcu_p)
+{
+	FestivalSpeechRelayLocal* speechRelay = mcu_p->festivalRelay();
+	const char* message = args.read_remainder_raw();
+	speechRelay->processSpeechMessage(message);
+	//processSpeechMessage(
+	return 0;
+}
+
 int register_animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 {
 	SkMotion* motion = mcu_p->getMotion("ChrRio_Entry001");

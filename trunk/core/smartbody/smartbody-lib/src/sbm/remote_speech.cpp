@@ -174,28 +174,38 @@ The timestamp is 20051121_150427 (that is, YYYYMMDD_HHMMSS ), so we can check ol
 	strcpy(callBackCopyCharStar, callBackCopyString.c_str());
 	commandLookUp.insert(myStream.str().c_str(), callBackCopyCharStar); //similar to the sound, the callbackCmd must also be saved to globally accessable table for post procesing look up
 	
-	mcu.vhmsg_send( "RemoteSpeechCmd", cmd ); //sends the remote speech command using singleton* MCU_p
+	sendSpeechCommand(cmd);
 	
 	delete [] cmd;
 
+	sendSpeechTimeout(myStream);
+	
+	return (msgNumber); //returns the unique message number
+}
+
+void remote_speech::sendSpeechCommand(const char* cmd)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	mcu.vhmsg_send( "RemoteSpeechCmd", cmd ); //sends the remote speech command using singleton* MCU_p
+}
+void remote_speech::sendSpeechTimeout(std::ostringstream& outStream)
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	srCmdSeq *rVoiceTimeout= new srCmdSeq(); 
 	rVoiceTimeout->offset((float)(mcu.time));
 	string argumentString="RemoteSpeechTimeOut";
 	argumentString += " ";
-	argumentString += myStream.str().c_str();
+	argumentString += outStream.str().c_str();
 	rVoiceTimeout->insert( (float)(timeOut), argumentString.c_str() );
 	
-	char* seqName = new char[ 18+myStream.str().length()+1 ];  // 18 for RemoteSpeechTimeOut, 1 for \0
+	char* seqName = new char[ 18+outStream.str().length()+1 ];  // 18 for RemoteSpeechTimeOut, 1 for \0
 //	sprintf( seqName, "RemoteSpeechTimeOut", myStream.str() );  // Anm - huh?? No % in format arg.
 	sprintf( seqName, "RemoteSpeechTimeOut" );  // Anm - huh?? No % in format arg.
 	mcu.activeSequences.removeSequence( seqName, true );  // remove old sequence by this name
 	if( !mcu.activeSequences.addSequence( seqName, rVoiceTimeout ) ) {
 		LOG( "remote_speech::rVoiceTimeOut ERR:insert Rvoice timeoutCheck into active_seq_map FAILED, msgId=%s\n", seqName ); 
-	}
-	
+	}	
 	delete [] seqName;
-	
-	return (msgNumber); //returns the unique message number
 }
 
 std::vector<VisemeData*>* remote_speech::extractVisemes(DOMNode* node, vector<VisemeData*>* visemes, SbmCharacter* character) {
@@ -379,6 +389,7 @@ char* remote_speech::getSpeechPlayCommand( RequestId requestId, SbmCharacter* ch
 	else
 		cmd = vhcl::Format( "send PlaySound \"%s\"", soundFile.c_str());
 
+	//LOG("souldFile = %s\n",soundFile.c_str());
 	char* retSoundFile= new char[ cmd.length() + 1];
 	strcpy(retSoundFile, cmd.c_str());
 	return (retSoundFile);
@@ -488,6 +499,7 @@ char*  remote_speech::getSpeechAudioFilename( RequestId requestId ){
 int remoteSpeechResult_func( srArgBuffer& args, mcuCBHandle* mcu_p ) { //this function is not a member function of remote_speech; it waits for and processes the RemoteSpeechReply
 	if( LOG_RHETORIC_SPEECH ) LOG("\n \n *************in recieving_func***************** \n \n" );
 
+	//LOG("remoteSpeechReply Func");
 	char* character_name = args.read_token(); //character speaking
 	SbmCharacter* character = mcu_p->getCharacter( character_name );
 	if( character==NULL )
@@ -503,8 +515,15 @@ int remoteSpeechResult_func( srArgBuffer& args, mcuCBHandle* mcu_p ) { //this fu
 		result[--len] = '\0'; // shorten by one, assumed to be another double quote
 	}
 
-
-	return mcu_p->speech_rvoice()->handleRemoteSpeechResult( character, msgID, status, result, mcu_p );
+	//return mcu_p->speech_rvoice()->handleRemoteSpeechResult( character, msgID, status, result, mcu_p );
+	int ret = mcu_p->speech_rvoice()->handleRemoteSpeechResult( character, msgID, status, result, mcu_p );
+	// if the result is not from a remote speech relay, handle the result with local speech
+	if (ret != CMD_SUCCESS)
+	{
+		LOG("Not for the remote speech, handle with local speech");
+		ret =  mcu_p->speech_localvoice()->handleRemoteSpeechResult( character, msgID, status, result, mcu_p );
+	}
+	return ret;
 }
 
 int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgID, char* status, char* result, mcuCBHandle* mcu_p ) { //this function is not a member function of remote_speech; it waits for and processes the RemoteSpeechReply
@@ -514,8 +533,7 @@ int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgI
 		// TODO: Log / print error
 		return( CMD_FAILURE );  // known character but unknown message id
 	}
-		
-
+	//LOG("character = %s, status = %s, result = %s",character->getName().c_str(),status,result);
 	try{
 		if( strcmp( status, "OK:" )==0 ) {
 			XercesDOMParser *Prser;  
@@ -558,6 +576,7 @@ int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgI
 			string callbackCmd= string(remote_speech::commandLookUp.lookup(msgID)) +" "+ character->getName() +" "+ string(msgID)+" SUCCESS";
 			char* callback= new char[callbackCmd.length() + 1];
 			strcpy(callback,callbackCmd.c_str());
+			//LOG("callbackCmd = %s",callback);
 			mcu_p->execute(callback);
 			//mcu_p->execute(callback);
 
