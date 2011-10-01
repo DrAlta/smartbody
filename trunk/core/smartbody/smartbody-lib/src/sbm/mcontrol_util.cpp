@@ -268,7 +268,8 @@ mcuCBHandle::mcuCBHandle()
 	delay_behaviors(true),
 	media_path("."),
 	_interactive(true),
-	sendPawnUpdates(false)
+	sendPawnUpdates(false),
+	logListener(NULL)
 	//physicsEngine(NULL)
 {	
 	registerCallbacks();
@@ -432,6 +433,7 @@ void mcuCBHandle::registerCallbacks()
 	insert( "unregisteranimation", unregister_animation_func);
     insert( "resetanimation",	   resetanim_func);
 	insert( "animation",		   animation_func);
+	insert( "vhmsglog",			   vhmsglog_func);
 
 #ifdef USE_GOOGLE_PROFILER
 	insert( "startprofile",			   startprofile_func );

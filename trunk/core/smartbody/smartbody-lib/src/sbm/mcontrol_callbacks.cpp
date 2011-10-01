@@ -6588,6 +6588,61 @@ int animation_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 	return CMD_SUCCESS;
 }
 
+int vhmsglog_func( srArgBuffer& args, mcuCBHandle *mcu_p )
+{
+	if (args.calc_num_tokens() == 0)
+	{
+		if (mcu_p->logListener)
+		{
+			LOG("VHMSG logging is on");
+		}
+		else
+		{
+			LOG("VHMSG logging is off");
+		}
+		return CMD_SUCCESS;
+	}
+
+	std::string token = args.read_token();
+	if (token == "on")
+	{
+		if (mcu_p->logListener)
+		{
+			LOG("VHMSG logging is already on");
+			return CMD_SUCCESS;
+		}
+		else
+		{
+			mcu_p->logListener = new VHMsgLogger();
+			vhcl::Log::g_log.AddListener(mcu_p->logListener);
+			LOG("VHMSG logging is now on");
+			return CMD_SUCCESS;
+		}
+	}
+	else if (token == "off")
+	{
+		if (!mcu_p->logListener)
+		{
+			LOG("VHMSG logging is already off");
+			return CMD_SUCCESS;
+		}
+		else
+		{
+			vhcl::Log::g_log.RemoveListener(mcu_p->logListener);
+			delete mcu_p->logListener;
+			mcu_p->logListener = NULL;
+			LOG("VHMSG logging is now off");
+			return CMD_SUCCESS;
+		}
+	}
+	else
+	{
+		LOG("Usage: vhmsglog <on|off>");
+		return CMD_FAILURE;
+	}
+
+}
+
 int mcu_reset_func( srArgBuffer& args, mcuCBHandle *mcu_p  )
 {
 	// TODO: If arg, call as init, else call previous init

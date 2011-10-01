@@ -407,7 +407,10 @@ BOOST_PYTHON_MODULE(SmartBody)
 	boost::python::class_<DObject>("SBObject")
 		.def("getNumAttributes", &DObject::getNumAttributes,  "Returns the number of attributes associated with this object.")
 		.def("getAttribute", &DObject::getAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns an attribute of a given name")
-
+		.def("createBoolAttribute", &DObject::createBoolAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a boolean attribute.")
+		.def("createIntAttribute", &DObject::createIntAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates an integer attribute.")
+		.def("createDoubleAttribute", &DObject::createDoubleAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a double attribute.")
+		.def("createStringAttribute", &DObject::createStringAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a string attribute.")
 		;
 
 	boost::python::class_<SBController, boost::python::bases<DObject> >("SBController")
