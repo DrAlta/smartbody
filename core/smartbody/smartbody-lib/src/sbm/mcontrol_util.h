@@ -31,6 +31,7 @@
 class mcuCBHandle;
 
 #include <map>
+#include <vhcl.h>
 
 #ifdef __ANDROID__
 #define LINK_VHMSG_CLIENT		(1)
@@ -166,6 +167,8 @@ class SequenceManager
 		std::vector<std::pair<std::string, srCmdSeq*> > _sequences;
 };
 
+class VHMsgLog;
+
 
 // Motion Controller Utility Callback Handle (Yes, seriously.)
 class mcuCBHandle {
@@ -181,6 +184,7 @@ class mcuCBHandle {
 		// Data
 		bool		loop;
 		bool		vhmsg_enabled;
+		vhcl::Log::Listener* logListener;
 		bool		net_bone_updates;
 		bool		net_world_offset_updates;
 		bool		net_face_bones;
@@ -635,6 +639,23 @@ public:
 		FILE* open_sequence_file( const char *seq_name, std::string& fullPath );
 };
 
+class VHMsgLogger : public vhcl::Log::Listener
+{
+	public:
+		VHMsgLogger() : vhcl::Log::Listener()
+		{
+		}
+        
+		virtual ~VHMsgLogger()
+		{
+		}
+
+        virtual void OnMessage( const std::string & message )
+		{
+			 mcuCBHandle& mcu = mcuCBHandle::singleton();
+			 mcu.vhmsg_send("sbmlog", message.c_str());
+		}
+};
 //////////////////////////////////////////////////////////////////
 
 
