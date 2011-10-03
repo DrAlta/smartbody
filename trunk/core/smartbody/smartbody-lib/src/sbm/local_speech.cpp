@@ -25,7 +25,14 @@
 #include "vhcl.h"
 
 #include "local_speech.h"
+#ifdef WIN32
 #include <direct.h>
+#else
+#include <unistd.h>
+#ifndef _MAX_PATH
+#define _MAX_PATH 1024
+#endif
+#endif
 #if 0
 #include <festival.h>
 #include <VHDuration.h>
@@ -58,12 +65,12 @@ class XStr
       XStr( const char * const toTranscode )
       {
          // Call the private transcoding method
-         fUnicodeForm = xercesc_3_0::XMLString::transcode( toTranscode );
+         fUnicodeForm = XMLString::transcode( toTranscode );
       }
 
       ~XStr()
       {
-         xercesc_3_0::XMLString::release( &fUnicodeForm );
+         XMLString::release( &fUnicodeForm );
       }
 
 
