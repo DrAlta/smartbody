@@ -252,6 +252,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/MeCtBodyReachState.cpp
 	sbm/MeCtReachEngine.cpp
 	sbm/me_ct_saccade.cpp
+	sbm/local_speech.cpp
 
 ## UNUSED:
 ##	sbm/sbm_bml.cpp
