@@ -122,8 +122,10 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	
 	std::string consJointName = xml_parse_string(BMLDefs::ATTR_CONS_JOINT, elem, "", REQUIRED_ATTR);
 	const XMLCh* attrConsTarget = elem->getAttribute( BMLDefs::ATTR_CONS_TARGET );
-	std::string consTargetName = xml_parse_string(BMLDefs::ATTR_CONS_TARGET, elem, "", REQUIRED_ATTR);	
-	SkJoint* consTarget = const_cast<SkJoint*>(parse_target(tag,attrConsTarget,mcu));
+	std::string consTargetName = xml_parse_string(BMLDefs::ATTR_CONS_TARGET, elem, "", REQUIRED_ATTR);
+	SkJoint* consTarget = NULL;
+	if (consTargetName.size() > 0)
+		consTarget = const_cast<SkJoint*>(parse_target(tag,attrConsTarget,mcu));
 
 	const XMLCh* attrTargetPos = elem->getAttribute( BMLDefs::ATTR_TARGET_POS );
 	SrVec targetPos = SrVec();

@@ -798,16 +798,14 @@ void MeController::print_children( int tab_count ) {
 	}
 }
 
-std::string MeController::handle() const
+const std::string& MeController::handle() const
 {
-	MeController* obj = const_cast<MeController*>(this);
-	std::string hname = obj->getStringAttribute("handle");
-	return hname;
+	return _handle;
 }
 
 void MeController::handle( std::string handle )
 {
-	DObject::setStringAttribute("handle",handle);
+	_handle = handle;
 }
 
 bool MeController::is_pass_through() const
@@ -848,6 +846,16 @@ void MeController::notify(DSubject* subject)
 			set_pass_through(boolAttribute->getValue());
 		}
 	}
+
+	StringAttribute* stringAttribute = dynamic_cast<StringAttribute*>(subject);
+	if (stringAttribute)
+	{
+		if (stringAttribute->getName() == "handle")
+		{
+			handle(stringAttribute->getValue());
+		}
+	}
+
 }
 
 //============================ End of File ============================

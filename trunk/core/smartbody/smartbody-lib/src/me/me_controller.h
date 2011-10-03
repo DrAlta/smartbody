@@ -129,6 +129,7 @@ protected :
 	std::vector<float>	_bufferRecord;              // data containing the changes made each time inside the controller evaluation
 	bool		_buffer_changes_toggle_reset;	// flag to initialize the buffer_changes
 	bool		_passThrough;						// determines if this controller does not get evaluated. 	
+	std::string	_handle;
 
 protected :
     /*! Constructor */
@@ -157,8 +158,8 @@ public :
 	double time_stop()
 	{	return synch_points.get_time( srSynchPoints::STOP ); }
 
-	std::string handle() const;// { return _handle; }
-	void handle ( std::string handle );// { _handle = handle; }
+	const std::string& handle() const;
+	void handle ( std::string handle );
 
 	///////////////////////////////////////////////////////////////////////
     // Controller tree traversal methods
