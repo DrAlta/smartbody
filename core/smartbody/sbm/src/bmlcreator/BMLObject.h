@@ -4,7 +4,7 @@
 #include "sbm/DObject.h"
 #include <string>
 
-class BMLObject : public DObject, public DSubject
+class BMLObject : public DObject
 {
 	public:
 		BMLObject();

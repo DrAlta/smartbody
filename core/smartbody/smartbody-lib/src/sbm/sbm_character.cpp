@@ -3094,6 +3094,7 @@ int SbmCharacter::remove_from_scene( const char* char_name ) {
 		SbmCharacter* char_p = mcu.getCharacter( char_name );
 
 		if ( char_p ) {
+			char_p->notifyObservers();
 			char_p->remove_from_scene();
 			delete char_p;
 

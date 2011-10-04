@@ -2,7 +2,7 @@
 #include <sbm/DObject.h>
 #include <sbm/DSubject.h>
 
-class TreeInfoObject : public DObject, public DSubject
+class TreeInfoObject : public DObject
 {
 public:
 	TreeInfoObject(void);

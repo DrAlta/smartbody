@@ -1299,7 +1299,10 @@ void FltkViewer::translate_keyboard_state()
 					counter++;
 					continue;
 				}
+				if (_paLocoData->character)
+					_paLocoData->character->unregisterObserver(this);
 				_paLocoData->character = actor;
+				_paLocoData->character->registerObserver(this);
 				break;
 			}
 
@@ -1776,7 +1779,12 @@ int FltkViewer::handle ( int event )
 				 {
 					 SbmCharacter* isCharacter = dynamic_cast<SbmCharacter*> (selectedPawn);
 					 if (isCharacter)
+					 {
+						 if (_paLocoData->character)
+							 _paLocoData->character->unregisterObserver(this);
 						 _paLocoData->character = isCharacter;
+						 _paLocoData->character->registerObserver(this);
+					 }
 				 }
 			 }			 
 		 }
@@ -3804,6 +3812,21 @@ void FltkViewer::drawSteeringInfo()
 	glPopMatrix();
 	glPopAttrib();
 
+}
+
+void FltkViewer::notify(DSubject* subject)
+{
+	SbmPawn* pawn = dynamic_cast<SbmPawn*>(subject);
+	if (pawn)
+	{
+		if (_paLocoData)
+		{
+			if (_paLocoData->character == pawn)
+			{
+				_paLocoData->character = NULL;
+			}
+		}
+	}
 }
 
 PALocomotionData::PALocomotionData()
