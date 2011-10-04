@@ -529,8 +529,8 @@ SMARTBODY_C_DLL_API bool SBM_IsVisemeSet( SBMHANDLE sbmHandle, int * numCharacte
 #else
 		 strncpy((*visemeName)[i], g_VisemeCallbackInfo[sbmHandle][i]->visemeName, length);  
 #endif
-         (*weight)[i] = g_ChannelCallbackInfo[sbmHandle][i]->weight;
-         (*blendTime)[i] = g_ChannelCallbackInfo[sbmHandle][i]->blendTime;
+         (*weight)[i] = g_VisemeCallbackInfo[sbmHandle][i]->weight;
+         (*blendTime)[i] = g_VisemeCallbackInfo[sbmHandle][i]->blendTime;
     }
 
     DeleteCallbacks(sbmHandle, g_VisemeCallbackInfo);
