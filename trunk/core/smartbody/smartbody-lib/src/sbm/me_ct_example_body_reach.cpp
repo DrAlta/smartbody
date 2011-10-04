@@ -110,9 +110,20 @@ void MeCtExampleBodyReach::setReachTargetPawn( SbmPawn* targetPawn )
 {
 	//reachTargetPawn = targetPawn;	
 	ReachTarget& t = currentReachData->reachTarget;
+	SbmPawn* oldPawn = t.getTargetPawn();
+	if (oldPawn)
+	{
+		// remove any notifications for existing target pawns
+		oldPawn->unregisterObserver(this);
+	}
 	EffectorState& estate = currentReachData->effectorState;
 
 	t.setTargetPawn(targetPawn);	
+	if (targetPawn)
+	{
+		// add a notifications for existing target pawn
+		targetPawn->registerObserver(this);
+	}
 	//currentReachData->startReach = true;	
 	startReach = true;
 }
@@ -424,3 +435,18 @@ bool MeCtExampleBodyReach::isValidReachEngine( int reachType )
 	return false;
 }
 
+void MeCtExampleBodyReach::notify(DSubject* subject)
+{
+	SbmPawn* pawn = dynamic_cast<SbmPawn*>(subject);
+	if (pawn)
+	{
+		ReachTarget& t = currentReachData->reachTarget;
+		SbmPawn* targetPawn = t.getTargetPawn();
+		if (targetPawn == pawn)
+		{
+			// pawn is being removed, let go of it
+			t.setTargetPawn(NULL);
+			currentReachData->endReach = true;
+		}
+	}
+}

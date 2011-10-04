@@ -7,7 +7,7 @@
 #include "DAttributeManager.h"
 #include "DObserver.h"
 
-class DObject : public DObserver
+class DObject : public DObserver, public DSubject
 {
 	public:
 		DObject();

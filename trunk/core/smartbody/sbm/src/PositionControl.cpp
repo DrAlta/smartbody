@@ -247,7 +247,7 @@ void PositionControl::draw(SrCamera& cam)
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	//if (active)
 	{
-		SrVec center= getWorldPt();
+		SrVec center = getWorldPt();
 		SrVec dirx,diry;
 		screenParallelPlane(cam,center,dirx,diry);
 		float ratio=(dirx).norm();

@@ -32,10 +32,13 @@ void PawnControl::init_font()
 void PawnControl::attach_pawn(SbmPawn* ap)
 {
 	pawn = ap;
+	pawn->registerObserver(this);
 }
 
 void PawnControl::detach_pawn()
 {
+	if (pawn)
+		pawn->unregisterObserver(this);
 	pawn = NULL;
 }
 
@@ -87,6 +90,16 @@ void PawnControl::set_pawn_rot( SbmPawn* pawn, SrQuat& quat )
 	mcuCBHandle& mcu = mcuCBHandle::singleton();	
 	mcu.resourceDataChanged = true;
 }
+
+void PawnControl::notify(DSubject* subject)
+{
+	SbmPawn* notifyPawn = dynamic_cast<SbmPawn*>(subject);
+	if (notifyPawn && notifyPawn == pawn)
+	{
+		detach_pawn();
+	}
+}
+
 /************************************************************************/
 /* Pawn Pos Control                                                     */
 /************************************************************************/
@@ -166,7 +179,6 @@ void PawnPosControl::setWorldPt(SrVec& newPt)
 	assert(pawn);
 	set_pawn_pos(pawn,newPt);
 }
-
 
 
 
