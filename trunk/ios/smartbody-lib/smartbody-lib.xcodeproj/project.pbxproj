@@ -520,6 +520,8 @@
 		AA9CDA8D141FF8D10064C27A /* sr_vec2.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD848141FF8D10064C27A /* sr_vec2.h */; };
 		AA9CDA8E141FF8D10064C27A /* sr_viewer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD849141FF8D10064C27A /* sr_viewer.cpp */; };
 		AA9CDA8F141FF8D10064C27A /* sr_viewer.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD84A141FF8D10064C27A /* sr_viewer.h */; };
+		AAC99D13143AA3270098208A /* local_speech.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC99D11143AA3270098208A /* local_speech.cpp */; };
+		AAC99D14143AA3270098208A /* local_speech.h in Headers */ = {isa = PBXBuildFile; fileRef = AAC99D12143AA3270098208A /* local_speech.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -1038,6 +1040,8 @@
 		AA9CD848141FF8D10064C27A /* sr_vec2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sr_vec2.h; sourceTree = "<group>"; };
 		AA9CD849141FF8D10064C27A /* sr_viewer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sr_viewer.cpp; sourceTree = "<group>"; };
 		AA9CD84A141FF8D10064C27A /* sr_viewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sr_viewer.h; sourceTree = "<group>"; };
+		AAC99D11143AA3270098208A /* local_speech.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = local_speech.cpp; sourceTree = "<group>"; };
+		AAC99D12143AA3270098208A /* local_speech.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = local_speech.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1198,6 +1202,8 @@
 		AA9CD64E141FF8D00064C27A /* sbm */ = {
 			isa = PBXGroup;
 			children = (
+				AAC99D11143AA3270098208A /* local_speech.cpp */,
+				AAC99D12143AA3270098208A /* local_speech.h */,
 				AA9CD64F141FF8D00064C27A /* action_unit.hpp */,
 				AA2193CC143147D400187A71 /* action_unit.cpp */,
 				AA9CD650141FF8D00064C27A /* behavior_scheduler.cpp */,
@@ -1939,6 +1945,7 @@
 				AA9CDA8B141FF8D10064C27A /* sr_vec.h in Headers */,
 				AA9CDA8D141FF8D10064C27A /* sr_vec2.h in Headers */,
 				AA9CDA8F141FF8D10064C27A /* sr_viewer.h in Headers */,
+				AAC99D14143AA3270098208A /* local_speech.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2256,6 +2263,7 @@
 				AA9CDA8C141FF8D10064C27A /* sr_vec2.cpp in Sources */,
 				AA9CDA8E141FF8D10064C27A /* sr_viewer.cpp in Sources */,
 				AA2193CD143147D400187A71 /* action_unit.cpp in Sources */,
+				AAC99D13143AA3270098208A /* local_speech.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
