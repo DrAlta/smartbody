@@ -63,7 +63,19 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMa
 
 MeCtExampleBodyReach::~MeCtExampleBodyReach( void )
 {
-
+	// remove any registered subjects
+	if (currentReachData)
+	{
+		ReachTarget& t = currentReachData->reachTarget;
+		SbmPawn* oldPawn = t.getTargetPawn();
+		if (oldPawn)
+		{
+			// remove any notifications for existing target pawns
+			oldPawn->unregisterObserver(this);
+			t.setTargetPawn(NULL);
+			t.useTargetPawn = false;
+		}
+	}
 }
 
 void MeCtExampleBodyReach::setDefaultReachType( const std::string& reachTypeName )
