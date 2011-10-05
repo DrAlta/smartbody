@@ -709,16 +709,15 @@ int main(int argc, char **argv)
 	if (!scriptFileRead)
 	{
 		printf("Running default Festival commands\n\n", voice.c_str());
+		// setting voice to be used
+		std::string voice_command = "(" + voice + ")";
+		festivalCommands.push_back(voice_command.c_str());
 		// setting the duration method to be used by festival
 		festivalCommands.push_back("(Parameter.set `Duration_Method Duration_Default)");
 		// this command hooks our virtual human method such that every time an utterance is synthesized, our method is called on it
 		// in order to generate the virtual human message (RemoteSpeechReply)
-		festivalCommands.push_back("(set! after_synth_hooks (list Duration_VirtualHuman))");
-		// setting duration stretch parameter
-		festivalCommands.push_back("(Parameter.set 'Duration_Stretch 0.8)");
-		std::stringstream strstr;
-		strstr << "(set! voice_default '" << voice << ")";
-		festivalCommands.push_back(strstr.str());
+		festivalCommands.push_back("(set! after_synth_hooks (list Duration_VirtualHuman))");					
+		
 	}
 
 	printf("\n");
