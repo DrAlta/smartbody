@@ -361,7 +361,9 @@ namespace BML {
 	class NodRequest : public MeControllerRequest {
 	public: ///// Constants
 		enum NodType { HORIZONTAL = HEAD_SHAKE,
-			           VERTICAL   = HEAD_NOD } ;
+			           VERTICAL   = HEAD_NOD,
+					   SIDEWAYS   = HEAD_TOSS
+		} ;
 
     private:
         const NodType type;

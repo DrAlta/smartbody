@@ -630,7 +630,9 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 
 		switch( type ) {
             case BML::HEAD_NOD:
-            case BML::HEAD_SHAKE: {
+            case BML::HEAD_SHAKE:
+            case BML::HEAD_TOSS:
+				{
 				
 				float repeats = xml_utils::xml_parse_float( BMLDefs::ATTR_REPEATS, elem, DFL_NOD_REPS );
 				float amount = xml_utils::xml_parse_float( BMLDefs::ATTR_AMOUNT, elem, DFL_NOD_AMOUNT );
@@ -717,13 +719,14 @@ BehaviorRequestPtr BML::Processor::parse_bml_head( DOMElement* elem, std::string
 				}
 			}
 
-			case BML::HEAD_TOSS:
+			/*case BML::HEAD_TOSS:
 				{
 				std::wstringstream wstrstr;
 				wstrstr << "WARNING: BML::Processor::parse_bml_head(): Unimplemented: <"<<tag<<" "<< BMLDefs::ATTR_TYPE<<"=\""<<attrType<<"\">.  Ignoring behavior.";
 				LOG(convertWStringToString(wstrstr.str()).c_str());
 				return BehaviorRequestPtr();  // a.k.a., NULL
 				}
+				*/
 			case BML::HEAD_WIGGLE:
 				{
 					int axis = MeCtSimpleNod::NOD_PITCH;
