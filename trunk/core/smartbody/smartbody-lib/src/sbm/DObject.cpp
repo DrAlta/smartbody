@@ -8,7 +8,7 @@ std::string DObject::defaultString = "";
 SrVec DObject::defaultVec = SrVec();
 SrMat DObject::defaultMatrix = SrMat();
 
-DObject::DObject()
+DObject::DObject() : DSubject(), DObserver()
 {
 	m_attributeManager = new DAttributeManager();
 }

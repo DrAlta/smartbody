@@ -7,6 +7,12 @@ DSubject::DSubject()
 
 DSubject::~DSubject()
 {
+	for (std::set<DObserver*>::iterator iter = m_observers.begin();
+		 iter !=  m_observers.end();
+		 iter++)
+	{
+		(*iter)->removeDependency(this);
+	}
 }
 
 void DSubject::registerObserver(DObserver* observer)
@@ -15,6 +21,7 @@ void DSubject::registerObserver(DObserver* observer)
 	if (iter == m_observers.end())
 	{
 		m_observers.insert(observer);
+		observer->addDependency(this);
 	}
 }
 
@@ -24,6 +31,7 @@ void DSubject::unregisterObserver(DObserver* observer)
 	if (iter != m_observers.end())
 	{
 		m_observers.erase(iter);
+		observer->removeDependency(this);
 	}
 }
 
