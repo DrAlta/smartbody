@@ -266,7 +266,7 @@ MeCtSimpleNod::MeCtSimpleNod( void )	{
 	_duration = -1.0;
 	_magnitude = 0.0;
 	_repetitions = 0.0;
-	_movementType = BML:HEAD_NOD;
+	_movementType = BML::HEAD_NOD;
 }
 
 MeCtSimpleNod::~MeCtSimpleNod( void )	{}
