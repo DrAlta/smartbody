@@ -117,11 +117,12 @@ class MeCtSimpleNod : public SmartBody::SBController	{
 		virtual ~MeCtSimpleNod();
 		
 		void init( SbmPawn* pawn );
-		void set_nod( float dur, float mag, float rep, int aff, float smooth = 0.5 );
+		void set_nod( float dur, float mag, float rep, int movementType, float smooth = 0.5 );
 //		void set_nod( int axis, float dur, float mag, float rep, float smooth = 0.5 );
 
 		bool isNod();
 		bool isShake();
+		bool isTilt();
 		
 		void set_wiggle( 
 			int axis,			// sbm:axis // not supported yet
@@ -194,7 +195,7 @@ class MeCtSimpleNod : public SmartBody::SBController	{
 		float _magnitude;
 		
 		float _repetitions;
-		int _affirmative;
+		int _movementType;
 		
 		float _period;
 		float _pitch;

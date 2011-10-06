@@ -460,7 +460,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 		{		
 			std::ifstream filestream(pathname.string().c_str());
 			std::ifstream datastream("");
-			skeleton = new SkSkeleton();
+			skeleton = new SmartBody::SBSkeleton();
 			skeleton->skfilename(filebase.c_str());
 			SkMotion motion;
 			bool ok = ParserASFAMC::parse(*skeleton, motion, filestream, datastream, float(scale));
@@ -482,7 +482,7 @@ int load_me_skeletons_impl( const path& pathname, std::map<std::string, SkSkelet
 		}
 		else if (ext == ".dae" || ext == ".DAE")
 		{			
-			skeleton = new SkSkeleton();
+			skeleton =  new SmartBody::SBSkeleton();
 			skeleton->skfilename(filebase.c_str());
 			skeleton->name(filebase.c_str());
 			SkMotion motion;

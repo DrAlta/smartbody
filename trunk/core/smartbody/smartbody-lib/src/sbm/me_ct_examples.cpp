@@ -28,6 +28,7 @@ using namespace gwiz;
 #include <vhcl_log.h>
 
 #include "sbm_constants.h"
+#include <sbm/bml.hpp>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -265,7 +266,7 @@ MeCtSimpleNod::MeCtSimpleNod( void )	{
 	_duration = -1.0;
 	_magnitude = 0.0;
 	_repetitions = 0.0;
-	_affirmative = TRUE;
+	_movementType = BML:HEAD_NOD;
 }
 
 MeCtSimpleNod::~MeCtSimpleNod( void )	{}
@@ -287,24 +288,29 @@ void MeCtSimpleNod::init( SbmPawn* pawn )	{
 	MeController::init(pawn);
 }
 
-void MeCtSimpleNod::set_nod( float dur, float mag, float rep, int aff, float smooth )	{
+void MeCtSimpleNod::set_nod( float dur, float mag, float rep, int movementType, float smooth )	{
 
 	_mode = NOD_SIMPLE;
 	_duration = dur;
 	_magnitude = mag;
 	_repetitions = rep;
-	_affirmative = aff;
+	_movementType = movementType;
 	_smooth = smooth;
 }
 
 bool MeCtSimpleNod::isNod()
 {
-	return (_affirmative == 1 && _mode == NOD_SIMPLE);
+	return (_movementType == BML::HEAD_NOD && _mode == NOD_SIMPLE);
 }
 
 bool MeCtSimpleNod::isShake()
 {
-	return (_affirmative == 0 && _mode == NOD_SIMPLE);
+	return (_movementType == BML::HEAD_SHAKE && _mode == NOD_SIMPLE);
+}
+
+bool MeCtSimpleNod::isTilt()
+{
+	return (_movementType == BML::HEAD_TOSS && _mode == NOD_SIMPLE);
 }
 
 void MeCtSimpleNod::controller_start()	{}
@@ -451,12 +457,17 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 		std::string jointName = _channels.name(local_channel_index);
 		SkJoint* channelJoint = frame.context()->channels().skeleton()->search_joint(jointName.c_str());
 		SrVec rotAxis;
-		if( _affirmative )	{
+		if (_movementType == BML::HEAD_NOD )
+		{
 			 rotAxis = channelJoint->localGlobalAxis(0);
 		}
-		else
+		else if (_movementType == BML::HEAD_SHAKE )
 		{
 			rotAxis = channelJoint->localGlobalAxis(1);
+		}
+		else if (_movementType == BML::HEAD_TOSS )
+		{
+			rotAxis = channelJoint->localGlobalAxis(2);
 		}
 		if (frame.isChannelUpdated( context_channel_index ))
 		{
@@ -525,10 +536,12 @@ void MeCtSimpleNod::print_state( int tabs )	{
 	if( str )
 		LOG(" \"%s\"", str );
 
-	if( _affirmative )
+	if (_movementType == BML::HEAD_NOD)
 		LOG(" affirmative" );
-	else
+	else if (_movementType == BML::HEAD_SHAKE)
 		LOG(" negative" );
+	else if (_movementType == BML::HEAD_TOSS)
+		LOG(" tilt" );
 
 	LOG(" %.3g reps @ %.3g degs for %.3g sec\n", _repetitions, _magnitude, _duration );
 }
