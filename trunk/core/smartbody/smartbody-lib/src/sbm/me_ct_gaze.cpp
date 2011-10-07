@@ -766,14 +766,14 @@ printf( "s1: %f\n", joint_arr[ GAZE_JOINT_SPINE1 ].local_pos.y() );
 		) +
 		vector_t( 0.0, 0.0, interocular.length()); // NOTE: PRESUMES 5CM SCALE...
 
-	printf( "eyes:\n" );
-	world_mid_eye_pos.print();
+	//printf( "eyes:\n" );
+	//world_mid_eye_pos.print();
 
 	joint_arr[ GAZE_JOINT_SPINE1 ].forward_pos =
 		world_mid_eye_pos - joint_arr[ GAZE_JOINT_SPINE1 ].world_zero_pos;
 	
-	printf( "spine1:\n" );
-	joint_arr[ GAZE_JOINT_SPINE1 ].forward_pos.print();
+	//printf( "spine1:\n" );
+	//joint_arr[ GAZE_JOINT_SPINE1 ].forward_pos.print();
 
 	joint_arr[ GAZE_JOINT_SPINE2 ].forward_pos =
 		world_mid_eye_pos - joint_arr[ GAZE_JOINT_SPINE2 ].world_zero_pos;

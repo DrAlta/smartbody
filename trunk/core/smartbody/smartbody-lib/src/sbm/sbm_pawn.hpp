@@ -98,6 +98,7 @@ public:  // TODO - properly encapsulate / privatize the following
 	SbmPhysicsObj*  phyObj_p;
 	SteerLib::ObstacleInterface* steeringSpaceObj_p;
 	SrVec			steeringSpaceObjSize;
+	std::string _classType;
 	
 	
 	//		float scale = 0.5f;
@@ -150,6 +151,9 @@ public:
 	void setWorldOffset(const SrMat& newWorld);
 	void set_world_offset( float x, float y, float z,
 		                   float yaw, float pitch, float roll );
+
+	virtual std::string getClassType();
+	virtual void setClassType(std::string classType);
 
 	virtual void notify(DSubject* subject);
 

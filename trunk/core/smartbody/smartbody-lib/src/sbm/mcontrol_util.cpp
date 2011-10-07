@@ -1144,7 +1144,7 @@ void mcuCBHandle::update( void )	{
 				if (!isClosingBoneBus && !pawn->bonebusCharacter && bonebus.IsOpen() && sendPawnUpdates)
 				{
 					// bonebus was connected after character creation, create it now
-					pawn->bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( pawn->getName().c_str(), "pawn" , false );
+					pawn->bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( pawn->getName().c_str(), pawn->getClassType().c_str() , false );
 				}
 				if (sendPawnUpdates)
 					NetworkSendSkeleton( pawn->bonebusCharacter, pawn->getSkeleton(), &param_map );

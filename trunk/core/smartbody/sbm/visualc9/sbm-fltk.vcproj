@@ -425,6 +425,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\FLTKListener.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\FLTKListener.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\ObjectManipulationHandle.cpp"
 				>
 			</File>

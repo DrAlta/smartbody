@@ -71,6 +71,7 @@
 //#include "SBMWindow.h"
 #include "CommandWindow.h"
 #include <sbm/SbmPython.h>
+#include "FLTKListener.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef WIN32_LEAN_AND_MEAN
@@ -204,7 +205,8 @@ int mcu_quit_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
 			iter++)
 		{
 			SbmCharacter* character = (*iter).second;
-			character->steeringAgent->setAgent(NULL);
+			if (character->steeringAgent)
+				character->steeringAgent->setAgent(NULL);
 		}
 	}
 	return( CMD_SUCCESS );
@@ -447,6 +449,9 @@ int main( int argc, char **argv )	{
 	XMLPlatformUtils::Initialize();  // Initialize Xerces before creating MCU
 
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
+
+	FLTKListener fltkListener;
+	mcu.sbm_character_listener = &fltkListener;
 
 	// change the default font size
 	FL_NORMAL_SIZE = 12;

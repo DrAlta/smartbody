@@ -1092,7 +1092,7 @@ void reset()
 	mcu.reset();
 }
 
-void printLog(std::string message)
+void printLog(const std::string& message)
 {
 	//LOG("Haha I am printing python log");
 	LOG(message.c_str());
@@ -1244,28 +1244,11 @@ SBController* createController(std::string controllerType, std::string controlle
 void removeCharacter(std::string charName)
 {
 	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-		iter != mcu.getCharacterMap().end();
-		iter++)
+	SbmCharacter* character = mcu.getCharacter(charName);
+	if (character)
 	{
-		SbmCharacter* character = (*iter).second;
-		if (character->getName() == charName)
-		{
-			mcu.getCharacterMap().erase(iter);
-		}
-	}
-
-	for (std::map<std::string, SbmPawn*>::iterator iter = mcu.getPawnMap().begin();
-		iter != mcu.getPawnMap().end();
-		iter++)
-	{
-		SbmPawn* pawn = (*iter).second;
-		if (pawn->getName() == charName)
-		{
-			mcu.getPawnMap().erase(iter);
-		}
-	}
-	
+		SbmCharacter::remove_from_scene(charName.c_str());
+	}	
 }
 
 FaceDefinition* getFaceDefinition(std::string def)

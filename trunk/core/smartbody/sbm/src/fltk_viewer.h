@@ -428,6 +428,7 @@ protected:
    SrSaGlRender render_action;
    SrSaBBox bbox_action;
 
+
  };
 
 class LocomotionData
