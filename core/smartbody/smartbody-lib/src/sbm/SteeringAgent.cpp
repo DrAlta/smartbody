@@ -45,15 +45,15 @@ SteeringAgent::SteeringAgent(SbmCharacter* c) : character(c)
 	scootThreshold = 0.1f;	
 	speedThreshold = 0.1f;
 	angleSpeedThreshold = 10.0f;
-	distThreshold = 150.0f;			// exposed, unit: centimeter
-	distDownThreshold = 30.f;
+	distThreshold = 180.0f;			// exposed, unit: centimeter
+	distDownThreshold = 40.0f;
 
 	desiredSpeed = 1.0f;			// exposed, unit: meter/sec
 	facingAngle = -200.0f;			// exposed, unit: deg
 	facingAngleThreshold = 10;
-	acceleration = 1.0f;			// exposed, unit: meter/s^2
+	acceleration = 2.0f;			// exposed, unit: meter/s^2
 	scootAcceleration = 200.0f;		// exposed, unit: unknown
-	angleAcceleration = 350.0f;		// exposed, unit: unknown
+	angleAcceleration = 400.0f;		// exposed, unit: unknown
 	stepAdjust = false;
 
 	forward = Util::Vector(-1.0f, 0.0f, 0.0f);
@@ -559,7 +559,7 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 	pprAgent->updateDesiredForward(forward);
 	// WJ added end
 	//---------------------------------------------------------------------------
-
+#if 0
 	bool reachTarget = false;
 	float agentToTargetDist = 0.0f;
 	SrVec agentToTargetVec;
@@ -887,6 +887,280 @@ float SteeringAgent::evaluateExampleLoco(float x, float y, float z, float yaw)
 				character->param_animation_ct->updateWeights();
 			}
 		}
+#else
+	bool reachTarget = false;
+	float agentToTargetDist = 0.0f;
+	SrVec agentToTargetVec;
+	float distToTarget = -1;
+	if (goalQueue.size() > 0)
+	{
+		targetLoc.x = mToCm(goalQueue.front().targetLocation.x);
+		targetLoc.y = mToCm(goalQueue.front().targetLocation.y);
+		targetLoc.z = mToCm(goalQueue.front().targetLocation.z);
+		distToTarget = sqrt((x - mToCm(goalQueue.front().targetLocation.x)) * (x - mToCm(goalQueue.front().targetLocation.x)) + 
+						  (z - mToCm(goalQueue.front().targetLocation.z)) * (z - mToCm(goalQueue.front().targetLocation.z)));
+
+		if (distToTarget < distDownThreshold)
+			character->steeringAgent->getAgent()->clearGoals();
+	}
+	int numGoals = goalQueue.size();
+	if (numGoals == 0)
+	{
+		reachTarget = true;
+	}
+	if (character->_numSteeringGoal == 0 && numGoals != 0 && distToTarget < distThreshold)
+		stepAdjust = true;
+	if (distToTarget > distThreshold)
+		stepAdjust = false;
+
+	float targetSpeed = steeringCommand.targetSpeed;
+	float gain = 80;
+	if (targetSpeed > 3)
+		gain = 110;
+	if (distToTarget < targetSpeed * gain)
+		targetSpeed = distToTarget / gain;
+
+	if (stepAdjust)
+		if (!character->param_animation_ct->hasPAState("UtahStep"))
+		{
+			agentToTargetDist = distToTarget;
+			agentToTargetVec.x = targetLoc.x - x;
+			agentToTargetVec.y = targetLoc.y - y;
+			agentToTargetVec.z = targetLoc.z - z;
+		}
+
+	PAStateData* curState =  character->param_animation_ct->getCurrentPAStateData();
+	std::string curStateName = character->param_animation_ct->getCurrentStateName();
+	std::string nextStateName = character->param_animation_ct->getNextStateName();
+
+	//---If you are close enough to the target when starting locomotion, use step adjust
+	if (character->param_animation_ct->isIdle() && (agentToTargetDist > distDownThreshold))
+	{
+		SrVec heading = SrVec(sin(degToRad(yaw)), 0, cos(degToRad(yaw)));
+		float y = dot(agentToTargetVec, heading);
+		SrVec verticalHeading = SrVec(sin(degToRad(yaw - 90)), 0, cos(degToRad(yaw - 90)));
+		float x = dot(agentToTargetVec, verticalHeading);
+		if (!character->param_animation_ct->hasPAState("UtahStep"))
+		{
+			PAStateData* stepState = mcu.lookUpPAState("UtahStep");
+			stepState->paramManager->setWeight(x, y);
+			std::stringstream command;
+			command << "panim schedule char " << character->getName();			
+			command << " state UtahStep loop false playnow false ";
+			for (int i = 0; i < stepState->getNumMotions(); i++)
+				command << stepState->weights[i] << " ";
+			mcu.execute((char*) command.str().c_str());
+		}		
+		return 0;
+	}
+
+	//---start locomotion
+	if (character->param_animation_ct->isIdle() && numGoals != 0 && nextStateName == "" && distToTarget > distDownThreshold)
+	{
+		float targetAngle = radToDeg(atan2(mToCm(pprAgent->getStartTargetPosition().x) - x, mToCm(pprAgent->getStartTargetPosition().z) - z));
+		normalizeAngle(targetAngle);
+		float diff = targetAngle - yaw;
+		normalizeAngle(diff);
+		double w;
+		if (diff > 0)
+		{
+			if (diff > 90)
+			{
+				w = (diff - 90) / 90;
+				std::stringstream command;
+				command << "panim schedule char " << character->getName();			
+				command << " state UtahStartingLeft loop false playnow false " << " 0 " << 1 - w << " " << w;
+				mcu.execute((char*) command.str().c_str());
+			}
+			else
+			{
+				w = diff / 90;
+				std::stringstream command;
+				command << "panim schedule char " << character->getName();					
+				command << " state UtahStartingLeft loop false playnow false " << 1 - w << " " << w << " " << " 0 ";
+				mcu.execute((char*) command.str().c_str());
+			}
+		}
+		else
+		{
+			if (diff < -90)
+			{
+				w = (diff + 180) / 90;
+				std::stringstream command;
+				command << "panim schedule char " << character->getName();
+				command << " state UtahStartingRight loop false playnow false " << " 0 " << w << " " << 1 - w;
+				mcu.execute((char*) command.str().c_str());
+			}
+			else
+			{
+				w = -diff / 90;
+				std::stringstream command;
+				command << "panim schedule char " << character->getName();
+				command << " state UtahStartingRight loop false playnow true " << 1 - w << " " << w << " 0 ";
+				mcu.execute((char*) command.str().c_str());
+			}				
+		}
+		PAStateData* locoState = mcu.lookUpPAState("UtahLocomotion");
+
+		for (int i = 0; i < locoState->getNumMotions(); i++)
+		{
+			if (i == 0)
+				locoState->weights[i] = 1.0;
+			else
+				locoState->weights[i] = 0.0;
+		}
+		std::stringstream command1;
+		command1 << "panim schedule char " << character->getName();
+		command1 << " state UtahLocomotion loop true playnow false";
+		mcu.execute((char*) command1.str().c_str());
+		return 0;
+	}	
+
+	//---end locomotion
+	if (character->_numSteeringGoal != 0 && numGoals == 0)
+	{
+		character->param_animation_ct->schedule(NULL, true, true);
+		return 0;
+	}
+
+	//---If the facing angle is not correct, use idle turning
+	if (character->param_animation_ct->isIdle() && fabs(facingAngle) <= 180)
+	{
+		float diff = facingAngle - yaw;
+		normalizeAngle(diff);
+		std::string playNow;
+		if (fabs(diff) > facingAngleThreshold)
+		{
+			double w = 0;
+			playNow = "false";
+			if (diff <= -90 && !character->param_animation_ct->hasPAState("UtahIdleTurnRight"))
+			{
+				w = (diff + 180) / 180;
+				std::stringstream command1;
+				command1 << "panim schedule char " << character->getName();
+				command1 << " state UtahIdleTurnRight loop false playnow " << playNow << " 0 " << w << " " << 1 - w;
+				mcu.execute((char*) command1.str().c_str());						
+			}
+			else if (diff >= 90 && !character->param_animation_ct->hasPAState("UtahIdleTurnLeft"))
+			{
+				w = (diff - 90) / 90;
+				std::stringstream command1;
+				command1 << "panim schedule char " << character->getName();
+				command1 << " state UtahIdleTurnLeft loop false playnow " << playNow << " 0 " << 1 - w << " " << w;
+				mcu.execute((char*) command1.str().c_str());												
+			}
+			else if (diff <= 0 && !character->param_animation_ct->hasPAState("UtahIdleTurnRight"))
+			{
+				w = fabs(diff / 90);
+				std::stringstream command1;
+				command1 << "panim schedule char " << character->getName();
+				command1 << " state UtahIdleTurnRight loop false playnow " << playNow << " " << 1 - w << " " << w << " 0 ";
+				mcu.execute((char*) command1.str().c_str());
+			}
+			else if (diff >= 0 && !character->param_animation_ct->hasPAState("UtahIdleTurnLeft"))
+			{
+				w = diff / 90;
+				std::stringstream command1;
+				command1 << "panim schedule char " << character->getName();
+				command1 << " state UtahIdleTurnLeft loop false playnow " << playNow << " " << 1 - w << " " << w << " 0 ";
+				mcu.execute((char*) command1.str().c_str());	
+			}
+		}
+		else
+		{
+			facingAngle = -200;
+		}
+		return 0;
+	}
+
+
+	//---Need a better way to handle the control between steering and Parameterized Animation Controller
+	if (character->param_animation_ct->hasPAState("UtahJump"))
+		inControl = false;
+	else
+		inControl = true;
+
+	//---update locomotion
+	float curSpeed = 0.0f;
+	float curTurningAngle = 0.0f;
+	float curScoot = 0.0f;
+	if (curStateName == "UtahLocomotion" && numGoals != 0)
+	{
+		curState->paramManager->getParameter(curSpeed, curTurningAngle, curScoot);
+		float addOnScoot = steeringCommand.scoot * paLocoScootGain;
+		if (steeringCommand.scoot != 0.0)
+		{
+			if (curScoot < addOnScoot)
+				curScoot += scootAcceleration * dt;
+			else
+				curScoot -= scootAcceleration * dt;
+		}
+		else
+		{
+			if (fabs(curScoot) < scootThreshold)
+				curScoot = 0.0f;
+			else
+			{
+				if (curScoot > 0.0f)
+				{
+					curScoot -= scootAcceleration * dt;
+					if (curScoot < 0.0)	curScoot = 0.0;
+				}
+				else
+				{
+					curScoot += scootAcceleration * dt;
+					if (curScoot > 0.0)	curScoot = 0.0;
+				}
+			}
+		}
+		curSpeed = cmToM(curSpeed);
+		if (steeringCommand.aimForTargetSpeed)
+		{
+			if (fabs(curSpeed - targetSpeed) > speedThreshold)
+			{
+				if (curSpeed < targetSpeed)
+				{
+					curSpeed += acceleration * dt;
+					if (curSpeed > targetSpeed)
+						curSpeed = targetSpeed;
+				}
+				else
+				{
+					curSpeed -= acceleration * dt;
+					if (curSpeed < targetSpeed)
+						curSpeed = targetSpeed;
+				}
+			}
+		}
+		else
+			curSpeed += acceleration * dt;
+
+		float angleGlobal = radToDeg(atan2(forward.x, forward.z));
+		normalizeAngle(angleGlobal);
+		normalizeAngle(yaw);
+		float angleDiff = angleGlobal - yaw;
+		normalizeAngle(angleDiff);
+
+		paLocoAngleGain = 2.0f;
+		float addOnTurning = angleDiff * paLocoAngleGain;
+		if (fabs(curTurningAngle - addOnTurning) > angleSpeedThreshold)
+		{
+			if (curTurningAngle < addOnTurning)
+				curTurningAngle += angleAcceleration * dt;
+			else if (curTurningAngle > addOnTurning)
+				curTurningAngle -= angleAcceleration * dt;
+		}
+		// update locomotion state
+		newSpeed = curSpeed;
+		curSpeed = mToCm(curSpeed);
+
+		if (inControl)
+		{
+			curState->paramManager->setWeight(curSpeed, curTurningAngle, curScoot);
+			character->param_animation_ct->updateWeights();
+		}
+	}
+#endif
 	return newSpeed;
 }
 
