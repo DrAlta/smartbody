@@ -66,6 +66,7 @@
 # include <sbm/GPU/SbmDeformableMeshGPU.h>
 
 #include <sbm/mcontrol_util.h>
+
 //#include <sbm/SbmShader.h>
 
 //#include "Heightfield.h"
@@ -1031,7 +1032,7 @@ void FltkViewer::draw()
 	{
 		SbmPawn* pawn = (*iter).second;
 		SbmCharacter* char_p = dynamic_cast<SbmCharacter*>(pawn);
-		if( char_p )
+		if( char_p && char_p->dMesh_p)
 		{
 			char_p->dMesh_p->update();
 		}

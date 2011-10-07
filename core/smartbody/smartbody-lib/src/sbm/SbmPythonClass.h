@@ -284,7 +284,7 @@ void pythonExit();
 void quitSbm();
 void reset();
 
-void printLog(std::string message);
+void printLog(const std::string& message);
 
 void runScript(std::string script);
 void sendVHMsg(std::string message);

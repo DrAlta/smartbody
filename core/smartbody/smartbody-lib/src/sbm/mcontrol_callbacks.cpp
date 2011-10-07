@@ -2277,13 +2277,6 @@ int mcu_character_init(
 		}
 
 		char_p->ct_tree_p->set_evaluation_logger( mcu_p->logger_p );
-
-		err = mcu_p->add_scene( char_p->scene_p );
-		if (err != CMD_SUCCESS)
-		{
-			LOG("Could not initialize scene for character %s.", char_name);
-			return err;
-		}
 	}
 
 

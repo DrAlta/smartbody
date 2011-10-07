@@ -601,7 +601,7 @@ int SbmCharacter::init( SkSkeleton* new_skeleton_p,
 
 	this->param_map = param_map;
 
-	if (scene_p)
+	if (!scene_p)
 	{
 		scene_p = new SkScene();
 		scene_p->ref();
@@ -1236,7 +1236,8 @@ void prune_schedule( SbmCharacter*   actor,
 											prune_schedule( actor, sched_ct, mcu_p, time_offset, posture_sched_p, gaze_key_cts, nod_ct, motion_ct, pose_ct, raw_channels );
 											in_use = sched_ct->count_children()>0;
 										}
-									} else if( anim_ct_type == MeCtSimpleNod::_type_name ) {
+									} else if( anim_ct_type == MeCtSimpleNod::_type_name )
+									{
 										if(    nod_ct
 											|| (    (gaze_key_cts[MeCtGaze::GAZE_KEY_HEAD]!=NULL)
 											&& (gaze_key_cts[MeCtGaze::GAZE_KEY_NECK]!=NULL) ) )
@@ -3312,17 +3313,6 @@ float SbmCharacter::getMinVisemeTime() const
 {
 	return _minVisemeTime;
 }
-
-std::string SbmCharacter::getClassType()
-{
-	return _classType;
-}
-
-void SbmCharacter::setClassType(std::string classType)
-{
-	_classType = classType;
-}
-
 
 void SbmCharacter::notify(DSubject* subject)
 {

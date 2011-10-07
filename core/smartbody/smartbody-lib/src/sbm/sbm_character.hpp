@@ -161,8 +161,6 @@ protected:
 
 	FaceDefinition* _faceDefinition;
 
-	std::string _classType;
-
 	bool _isControllerPruning;
 
 	Nvbg* _nvbg;
@@ -387,9 +385,6 @@ public:
 	void setMinVisemeTime(float minTime);
 	float getMinVisemeTime() const;
 	void notify(DSubject* subject);
-
-	std::string getClassType();
-	void setClassType(std::string classType);
 
 	FaceDefinition* getFaceDefinition();
 	void setFaceDefinition(FaceDefinition* face);

@@ -168,12 +168,6 @@ void SbmPawn::initData()
 	bonebusCharacter = NULL;
 	_skeleton = new SmartBody::SBSkeleton();
 	_skeleton->ref();
-	//scene_p = new SkScene();
-#if defined(__ANDROID__) || defined(SBM_IPHONE)
-	dMesh_p = new DeformableMesh();
-#else
-	dMesh_p =  new SbmDeformableMeshGPU();
-#endif
 	ct_tree_p = MeControllerTreeRoot::create();
 	world_offset_writer_p = new MeCtChannelWriter();
 	std::string controllerName = this->getName();
@@ -208,10 +202,6 @@ void SbmPawn::setSkeleton(SkSkeleton* sk)
 	{
 		ct_tree_p->remove_skeleton( _skeleton->name() );
 		_skeleton->unref();
-		//		if( scene_p != NULL )
-		//		{
-		//			mcu.remove_scene( scene_p );
-		//		}
 	}
 	_skeleton = sk;
 	_skeleton->ref();
@@ -219,7 +209,7 @@ void SbmPawn::setSkeleton(SkSkeleton* sk)
 
 	if ( mcuCBHandle::singleton().sbm_character_listener )
 	{
-		mcuCBHandle::singleton().sbm_character_listener->OnCharacterUpdate( getName(), "pawn" );
+		mcuCBHandle::singleton().sbm_character_listener->OnCharacterChanged( getName() );
 	}
 	//scene_p->init(_skeleton);
 	//int err = mcu.add_scene(scene_p);
@@ -249,16 +239,6 @@ int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 	// 	{
 	// 		initPhysicsObj();
 	// 	}
-
-
-	if (!scene_p)
-	{
-		scene_p = new SkScene();
-		scene_p->ref();
-		scene_p->init( _skeleton );  // if skeleton_p == NULL, the scene is cleared
-	}
-	//	dMesh_p->skeleton = new_skeleton_p;		
-	dMesh_p->setSkeleton(new_skeleton_p);
 
 	// Name the controllers
 	string ct_name( getName() );
@@ -306,7 +286,7 @@ int SbmPawn::setup() {
 
 	if ( mcuCBHandle::singleton().sbm_character_listener )
 	{
-		mcuCBHandle::singleton().sbm_character_listener->OnCharacterUpdate( getName(), "pawn" );
+		mcuCBHandle::singleton().sbm_character_listener->OnCharacterUpdate( getName(), getClassType() );
 	}
 	return( CMD_SUCCESS ); 
 }
@@ -794,6 +774,7 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		}		
 
 		pawn_p = new SbmPawn( pawn_name.c_str() );
+		pawn_p->setClassType("pawn");
 		SkSkeleton* skeleton = new SmartBody::SBSkeleton();
 		skeleton->ref();
 		string skel_name = pawn_name+"-skel";
@@ -855,16 +836,6 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 			return err;
 		}
 
-		err = mcu_p->add_scene( pawn_p->scene_p );
-		if( err != CMD_SUCCESS )	{
-			std::stringstream strstr;
-			strstr << "ERROR: SbmPawn pawn_map.insert(..) \"" << pawn_name << "\" FAILED";
-			LOG(strstr.str().c_str());
-			delete pawn_p;
-			skeleton->unref();
-			return err;
-		}
-
 		if (pawn_p->colObj_p)
 		{
 			pawn_p->setWorldOffset(pawn_p->colObj_p->getWorldState().gmat());
@@ -879,11 +850,11 @@ int SbmPawn::pawn_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		pawn_p->wo_cache_update();
 
 		if (mcu_p->sendPawnUpdates)
-			pawn_p->bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( pawn_name.c_str(), "pawn", false );
+			pawn_p->bonebusCharacter = mcuCBHandle::singleton().bonebus.CreateCharacter( pawn_name.c_str(), pawn_p->getClassType().c_str(), false );
 
 		if ( mcuCBHandle::singleton().sbm_character_listener )
 		{
-			mcuCBHandle::singleton().sbm_character_listener->OnCharacterCreate( pawn_name, "pawn" );
+			mcuCBHandle::singleton().sbm_character_listener->OnCharacterCreate( pawn_name, pawn_p->getClassType().c_str() );
 		}
 
 		return CMD_SUCCESS;
@@ -1196,8 +1167,6 @@ int SbmPawn::create_remote_pawn_func( srArgBuffer& args, mcuCBHandle *mcu_p ) {
 		skeleton->unref();
 		return err;
 	}
-
-	err = mcu_p->add_scene( pawn_p->scene_p );
 
 	if( err != CMD_SUCCESS )	{
 		LOG("ERROR: SbmPawn pawn_map.insert(..) \"%s\" FAILED", pawn_and_attribute.c_str() );
@@ -1586,6 +1555,17 @@ bool parse_float_or_error( float& var, const char* str, const string& var_name )
 	LOG("ERROR: Invalid value for %s: %s", var_name.c_str(), str);
 	return false;
 }
+
+std::string SbmPawn::getClassType()
+{
+	return _classType;
+}
+
+void SbmPawn::setClassType(std::string classType)
+{
+	_classType = classType;
+}
+
 
 void SbmPawn::notify(DSubject* subject)
 {
