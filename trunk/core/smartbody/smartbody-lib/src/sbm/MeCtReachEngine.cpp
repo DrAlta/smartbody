@@ -504,6 +504,11 @@ std::string MeCtReachEngine::getReachTypeTag()
 	return ReachTypeTag[reachType];
 }
 
+int MeCtReachEngine::getReachTypeID()
+{
+	return reachType;
+}
+
 int MeCtReachEngine::getReachType( const std::string& tag )
 {
 	for (int i=0;i<REACH_TYPE_SIZE;i++)

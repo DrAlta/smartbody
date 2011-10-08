@@ -86,6 +86,7 @@ public:
 	virtual ~MeCtReachEngine(void);
 	bool isValid() { return valid; }
 	std::string     getReachTypeTag();
+	int             getReachTypeID();
 	ReachStateInterface* getCurrentState() { return curReachState; }
 	SbmCharacter*   getCharacter() { return character; }
 	ReachStateData* getReachData() { return reachData; }

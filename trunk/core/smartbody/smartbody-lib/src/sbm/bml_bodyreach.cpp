@@ -143,8 +143,9 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 
 	bool bCreateNewController = false;	
 	if (!bodyReachCt)
-	{		
-		bodyReachCt = new MeCtExampleBodyReach(curCharacter->getReachEngineMap());
+	{
+		// the new controller should start with the character's current hand.
+		bodyReachCt = new MeCtExampleBodyReach(curCharacter->getReachEngineMap(),curCharacter->getCurrentReachType());
 		bodyReachCt->handle(handle);
 		bodyReachCt->init(curCharacter);
 		bCreateNewController = true;		

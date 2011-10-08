@@ -259,7 +259,9 @@ void SbmCharacter::createStandardControllers()
 		MeCtReachEngine* rengine = new MeCtReachEngine(this,this->_skeleton);
 		rengine->init(MeCtReachEngine::LEFT_ARM,leftEffector);
 		this->reachEngineMap[MeCtReachEngine::LEFT_ARM] = rengine;		
-	}	
+	}
+
+	
 
 	constraint_sched_p = CreateSchedulerCt( getName().c_str(), "constraint" );
 	reach_sched_p = CreateSchedulerCt( getName().c_str(), "reach" );
@@ -1063,6 +1065,7 @@ void prune_schedule( SbmCharacter*   actor,
 						bool hasBodyReach = false;
 						bool hasHand = false;
 						bool hasReachLeft = false, hasReachRight = false;
+						bool hasGrabLeft = false, hasGrabRight = false;
 						bool finishedBlending = false;
 
 						while( it != first ) {
@@ -1317,6 +1320,31 @@ void prune_schedule( SbmCharacter*   actor,
 									}
 									else if (dynamic_cast<MeCtHand*>(anim_source)) {
 										MeCtHand* ct_hand = dynamic_cast<MeCtHand*>(anim_source);
+
+										if (ct_hand->getGrabType() == MeCtReachEngine::RIGHT_ARM)
+										{
+											if (hasGrabRight)
+											{
+												in_use = false;
+											}
+											else
+											{
+												hasGrabRight = true;
+											}
+										}
+
+										if (ct_hand->getGrabType() == MeCtReachEngine::LEFT_ARM)
+										{
+											if (hasGrabLeft)
+											{
+												in_use = false;
+											}
+											else
+											{
+												hasGrabLeft = true;
+											}
+										}
+										/*
 										if (hasHand)
 										{
 											in_use = false;
@@ -1325,6 +1353,7 @@ void prune_schedule( SbmCharacter*   actor,
 										{
 											hasHand = true;
 										}
+										*/
 									}
 									else if (dynamic_cast<MeCtExampleBodyReach*>(anim_source)) {
 										MeCtExampleBodyReach* ct_bodyReach = dynamic_cast<MeCtExampleBodyReach*>(anim_source);
@@ -3166,6 +3195,8 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args, mcuCBHandle 
 		}
 		LOG("set local voice");
 		character->set_speech_impl( mcu_p->speech_localvoice() );
+		FestivalSpeechRelayLocal* relay = mcu_p->festivalRelay();
+		relay->setVoice(voice_id);
 		string s( voice_id );
 		character->set_voice_code( s );
 	} else if( _stricmp( impl_id, "audiofile" )==0 ) {

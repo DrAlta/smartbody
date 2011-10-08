@@ -11,15 +11,20 @@ EffectorState::EffectorState()
 	attachedPawn = NULL;
 }
 
+SbmPawn* EffectorState::getAttachedPawn()
+{
+	return attachedPawn;
+}
+
 void EffectorState::setAttachedPawn( ReachStateData* rd )
 {
 	ReachTarget& target = rd->reachTarget;
-	if (target.getTargetPawn())
+	if (target.targetHasGeometry())
 	{
 		attachedPawn = target.getTargetPawn();
 		attachMat = attachedPawn->get_world_offset_joint()->gmat()*curState.gmat().inverse();	
-		SRT state = target.getTargetState();
-		target.setTargetState(state);
+		//SRT state = target.getTargetState();
+		//target.setTargetState(state);
 	}
 }
 
@@ -114,7 +119,10 @@ void ReachTarget::setTargetState( SRT& ts )
 void ReachTarget::setTargetPawn( SbmPawn* tpawn )
 {
 	targetPawn = tpawn;
-	useTargetPawn = true;
+	if (tpawn)
+		useTargetPawn = true;
+	else
+		useTargetPawn = false;
 	useTargetJoint = false;
 	targetJoint = NULL;
 }
@@ -165,8 +173,9 @@ SRT ReachHandAction::getHandTargetStateOffset( ReachStateData* rd, SRT& naturalS
 void ReachHandAction::reachPreCompleteAction( ReachStateData* rd )
 {
 	ReachTarget& rtarget = rd->reachTarget;
+	EffectorState& estate = rd->effectorState;	
 	SbmPawn* targetPawn = rtarget.getTargetPawn();
-	if (!targetPawn)
+	if (!targetPawn || !targetPawn->colObj_p)
 		return;
 	std::string cmd;
 	std::string charName = rd->charName;
@@ -189,7 +198,7 @@ void ReachHandAction::reachCompleteAction( ReachStateData* rd )
 {
 	ReachTarget& rtarget = rd->reachTarget;
 	SbmPawn* targetPawn = rtarget.getTargetPawn();
-	if (!targetPawn)
+	if (!targetPawn || !targetPawn->colObj_p)
 		return;
 
 	std::string cmd;
@@ -214,12 +223,16 @@ void ReachHandAction::reachNewTargetAction( ReachStateData* rd )
 {	
 	std::string cmd;
 	std::string charName = rd->charName;	
+
+	EffectorState& estate = rd->effectorState;	
+	if (estate.getAttachedPawn())
+		return; // don't do any hand animation if there is a pawn attached
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:grab-state=\"finish\"/>";
 	cmd = generateGrabCmd(charName,"","finish",rd->reachType);
 	ReachTarget& rtarget = rd->reachTarget;
 	if (rtarget.targetHasGeometry())
 		sendReachEvent("reach",cmd);
-	rd->effectorState.removeAttachedPawn(rd);
+	//rd->effectorState.removeAttachedPawn(rd);
 	LOG("Reach New Target Action");	
 }
 
@@ -227,12 +240,18 @@ void ReachHandAction::reachReturnAction( ReachStateData* rd )
 {
 	std::string cmd;
 	std::string charName = rd->charName;
+
+	EffectorState& estate = rd->effectorState;	
+	if (estate.getAttachedPawn())
+		return; // don't do any hand animation if there is a pawn attached
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:grab-state=\"return\"/>";
+	
 	cmd = generateGrabCmd(charName,"","return",rd->reachType);
 	sendReachEvent("reach",cmd);	
 	cmd = "char " + charName + " gazefade out 0.5";
+	
 	//sendReachEvent(cmd);
-	rd->effectorState.removeAttachedPawn(rd);
+	//rd->effectorState.removeAttachedPawn(rd);
 }
 
 bool ReachHandAction::isPickingUpNewPawn( ReachStateData* rd )
@@ -249,10 +268,10 @@ bool ReachHandAction::isPickingUpNewPawn( ReachStateData* rd )
 void ReachHandAction::pickUpAttachedPawn( ReachStateData* rd )
 {
 	// send attachment to hand controller
-	SbmPawn* attachedPawn = rd->effectorState.attachedPawn;
-	if (!attachedPawn)
-		return;
-
+	rd->effectorState.setAttachedPawn(rd);
+	SbmPawn* attachedPawn = rd->effectorState.getAttachedPawn();
+	if (!attachedPawn || !attachedPawn->colObj_p)
+		return;	
 	std::string charName = rd->charName;
 	std::string targetName = attachedPawn->getName();
 	std::string cmd;
@@ -261,6 +280,7 @@ void ReachHandAction::pickUpAttachedPawn( ReachStateData* rd )
 	rd->curHandAction->sendReachEvent("reach",cmd);
 	cmd = "pawn " + targetName + " physics off";
 	rd->curHandAction->sendReachEvent("reach",cmd);
+	
 }
 
 void ReachHandAction::putDownAttachedPawn( ReachStateData* rd )
@@ -279,6 +299,7 @@ void ReachHandAction::putDownAttachedPawn( ReachStateData* rd )
 		targetName = attachedPawn->getName();
 	cmd = "pawn " + targetName + " physics on";
 	rd->curHandAction->sendReachEvent("reach",cmd);
+	rd->effectorState.removeAttachedPawn(rd);
 }
 
 void ReachHandAction::reachPreReturnAction( ReachStateData* rd )
@@ -337,14 +358,14 @@ void ReachHandPickUpAction::reachCompleteAction( ReachStateData* rd )
 		ReachHandAction::reachPreReturnAction(rd);
 		return;
 	}
-	ReachHandAction::reachCompleteAction(rd);
-	rd->effectorState.setAttachedPawn(rd);
+	ReachHandAction::reachCompleteAction(rd);	
 	pickUpAttachedPawn(rd);
 }
 
 void ReachHandPickUpAction::reachNewTargetAction( ReachStateData* rd )
 {	
 	putDownAttachedPawn(rd);
+	//rd->effectorState.removeAttachedPawn(rd);
 	ReachHandAction::reachNewTargetAction(rd);
 }
 
@@ -361,11 +382,13 @@ void ReachHandPickUpAction::reachReturnAction( ReachStateData* rd )
 void ReachHandPutDownAction::reachCompleteAction( ReachStateData* rd )
 {
 	putDownAttachedPawn(rd);
+	//rd->effectorState.removeAttachedPawn(rd);
 	ReachHandAction::reachNewTargetAction(rd);	
 }
 
 void ReachHandPutDownAction::reachReturnAction( ReachStateData* rd )
-{
+{	
+	/*
 	std::string cmd;
 	std::string charName = rd->charName;
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:grab-state=\"return\"/>";
@@ -373,7 +396,10 @@ void ReachHandPutDownAction::reachReturnAction( ReachStateData* rd )
 	sendReachEvent("reach",cmd);	
 
 	cmd = "char " + charName + " gazefade out 0.5";
-	//sendReachEvent(cmd);
+	//sendReachEvent(cmd);	
+	rd->effectorState.removeAttachedPawn(rd);
+	*/
+	ReachHandAction::reachReturnAction(rd);	
 }
 
 SRT ReachHandPutDownAction::getHandTargetStateOffset( ReachStateData* rd, SRT& naturalState )
@@ -476,6 +502,11 @@ void ReachStateData::getInterpFrame( float refTime, BodyMotionFrame& outFrame )
 bool ReachStateData::useInterpolation()
 {
 	return (interpMotion && useExample);
+}
+
+bool ReachStateData::hasAttachedPawn()
+{
+	return (effectorState.getAttachedPawn() != NULL);
 }
 
 float ReachStateData::XZDistanceToTarget(SrVec& pos)
@@ -761,9 +792,8 @@ void ReachStateComplete::update( ReachStateData* rd )
 
 std::string ReachStateComplete::nextState( ReachStateData* rd )
 {
-	std::string nextStateName = "Complete";
+	std::string nextStateName = "Complete";	
 	bool toNextState = rd->autoReturnTime > 0.f ? rd->autoReturnTime < rd->stateTime : rd->endReach;
-
 	if (rd->endReach)
 		toNextState = true;
 

@@ -149,6 +149,7 @@ protected:
 
 	// reach engine map
 	ReachEngineMap reachEngineMap;
+	int            currentReachType;
 
 	// Viseme Curve Info
 	bool	use_viseme_curve;
@@ -350,6 +351,8 @@ public:
 	const MotionDataSet& getReachHandData() const { return reachHandData;}
 	const MotionDataSet& getReleaseHandData() const { return releaseHandData;}
 	std::map<int,MeCtReachEngine*>& getReachEngineMap() { return reachEngineMap; }
+	int   getCurrentReachType() { return currentReachType; }
+	void   setCurrentReachType(int type) { currentReachType = type; }
 
 	std::map<std::string,SbmPhysicsObj*>& getJointPhyObjs() { return jointPhyObjMap; }
 	void buildJointPhyObjs();
