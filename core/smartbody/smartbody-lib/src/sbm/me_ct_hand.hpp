@@ -42,6 +42,7 @@ protected:
 	float 			_duration;
 	SkChannelArray	_channels;	
 	GrabState             currentGrabState;
+	int                   grabType;
 	BodyMotionFrame       releaseFrame, grabFrame, reachFrame, currentFrame, tempFrame;	
 	
 	vector<FingerChain>   fingerChains;
@@ -77,7 +78,7 @@ public:
 	void set_duration(float duration) { _duration = duration; }
 	virtual const std::string& controller_type() const		{ return( CONTROLLER_TYPE ); }
 	virtual void print_state( int tabs );
-	
+	int  getGrabType() { return grabType; }
 	void setGrabState(GrabState state);
 	void setGrabTargetObject(SbmPawn* targetObj);
 

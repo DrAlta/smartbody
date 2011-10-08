@@ -38,6 +38,7 @@ public:
 public:
 	EffectorState();
 	~EffectorState() {}
+	SbmPawn* getAttachedPawn();
 	void setAttachedPawn(ReachStateData* rd);
 	void removeAttachedPawn(ReachStateData* rd);	
 };
@@ -129,6 +130,7 @@ public:
 	SRT getPoseState(BodyMotionFrame& frame);
 	bool useInterpolation();	
 	float XZDistanceToTarget(SrVec& pos);
+	bool hasAttachedPawn();
 };
 
 class ReachStateInterface

@@ -56,7 +56,7 @@ public:
 	ReachStateData*       currentReachData;		
 
 public:	
-	MeCtExampleBodyReach(std::map<int,MeCtReachEngine*>& reMap);
+	MeCtExampleBodyReach(std::map<int,MeCtReachEngine*>& reMap, int reachType = -1);
 	virtual ~MeCtExampleBodyReach(void);		
 	virtual void controller_map_updated();
 	virtual void controller_start();	
@@ -87,6 +87,7 @@ protected:
 	bool updateLocomotion(); // return true if locomotion is finished
 	void updateReachType(SrVec& targetPos); // update the correct reach engine 
 	int  determineReachType(SrVec& targetPos);
+	int  getReachTypeWithAttachedPawn();
 	void setNewReachEngine(MeCtReachEngine* newReachEngine);
 	bool isValidReachEngine(int reachType);
 };

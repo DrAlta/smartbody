@@ -21,7 +21,7 @@ using namespace boost;
 
 std::string MeCtExampleBodyReach::CONTROLLER_TYPE = "BodyReach";
 
-MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMap )  : SmartBody::SBController()
+MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMap, int reachType)  : SmartBody::SBController()
 {
 	currentReachData = NULL;
 	currentReachEngine = NULL;
@@ -34,7 +34,7 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMa
 	startReach = false;
 	endReach = false;
 	autoReturnDuration = -1.f;
-	defaultReachType = -1;
+	defaultReachType = reachType;
 	reachVelocityScale = 1.f; 
 	addDefaultAttributeFloat("reach.autoReturnDuration",-1.f,&autoReturnDuration);
 	addDefaultAttributeFloat("reach.velocityScale",1.f,&reachVelocityScale);
@@ -54,11 +54,18 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMa
 			re->getReachData()->reachControl = this;
 		}
 	}
-	if (reachEngineMap.size() > 0)
+	//if (reachEngineMap.size() > 0)
+	if (defaultReachType != -1 && reachEngineMap.find(defaultReachType) != reachEngineMap.end())
+	{
+
+		currentReachEngine = reachEngineMap[defaultReachType];
+		currentReachData = currentReachEngine->getReachData();
+	}	
+	else if (reachEngineMap.size() > 0)
 	{
 		currentReachEngine = reachEngineMap[MeCtReachEngine::RIGHT_ARM];
 		currentReachData = currentReachEngine->getReachData();
-	}	
+	}
 }
 
 MeCtExampleBodyReach::~MeCtExampleBodyReach( void )
@@ -68,6 +75,7 @@ MeCtExampleBodyReach::~MeCtExampleBodyReach( void )
 	{
 		ReachTarget& t = currentReachData->reachTarget;
 		SbmPawn* oldPawn = t.getTargetPawn();
+		/*
 		if (oldPawn)
 		{
 			// remove any notifications for existing target pawns
@@ -75,6 +83,7 @@ MeCtExampleBodyReach::~MeCtExampleBodyReach( void )
 			t.setTargetPawn(NULL);
 			t.useTargetPawn = false;
 		}
+		*/
 	}
 }
 
@@ -122,20 +131,24 @@ void MeCtExampleBodyReach::setReachTargetPawn( SbmPawn* targetPawn )
 {
 	//reachTargetPawn = targetPawn;	
 	ReachTarget& t = currentReachData->reachTarget;
+	/*
 	SbmPawn* oldPawn = t.getTargetPawn();
 	if (oldPawn)
 	{
 		// remove any notifications for existing target pawns
 		oldPawn->unregisterObserver(this);
 	}
+	*/
 	EffectorState& estate = currentReachData->effectorState;
 
-	t.setTargetPawn(targetPawn);	
+	t.setTargetPawn(targetPawn);
+	/*
 	if (targetPawn)
 	{
 		// add a notifications for existing target pawn
 		targetPawn->registerObserver(this);
 	}
+	*/
 	//currentReachData->startReach = true;	
 	startReach = true;
 }
@@ -206,7 +219,7 @@ bool MeCtExampleBodyReach::updateLocomotion()
 
 	if (isMoving && character->_reachTarget && !character->_lastReachStatus) // character is moving and has reached the target
 	{
-		if (dist < character->getHeight()*0.25f)
+		if (dist < character->getHeight()*0.35f)
 		{			
 			// choose the correct hand
 			//LOG("reach after locomotion\n");
@@ -232,9 +245,6 @@ int  MeCtExampleBodyReach::determineReachType(SrVec& targetPos)
 {
 	// current reach hand
 	int reachType = currentReachEngine->getReachType(currentReachEngine->getReachTypeTag());
-
-	
-
 	float x,y,z,h,p,r;
 	SbmCharacter* character = currentReachEngine->getCharacter();
 	character->get_world_offset(x,y,z,h,p,r);
@@ -254,34 +264,52 @@ int  MeCtExampleBodyReach::determineReachType(SrVec& targetPos)
 	}
 	return reachType;
 }
-
+int  MeCtExampleBodyReach::getReachTypeWithAttachedPawn()
+{
+	int reachType = -1; // return -1 if there is no pawn attached
+	ReachEngineMap::iterator mi;
+	for (mi  = reachEngineMap.begin();
+		mi != reachEngineMap.end();
+		mi++)
+	{
+		MeCtReachEngine* re = mi->second;
+		if (re)
+		{
+			if (re->getReachData()->hasAttachedPawn())
+				return re->getReachTypeID();
+		}
+	}
+	return reachType;
+}
 
 void MeCtExampleBodyReach::updateReachType(SrVec& targetPos)
-{
-	if (currentReachEngine->curHandActionState == MeCtReachEngine::PUT_DOWN_OBJECT) // always putdown the object with current hand
-		return;
-
+{	
 	MeCtReachEngine* newEngine = currentReachEngine;		
 
-	int reachType = determineReachType(targetPos);
-
+	int reachType = determineReachType(targetPos); // the best hand according to target position
+	
+	// if we are putting down an object
+	int reachTypeWithAttachedPawn = getReachTypeWithAttachedPawn();
+	// or if we specify a default hand
 	if (defaultReachType != -1 && reachEngineMap.find(defaultReachType) != reachEngineMap.end())
-	{
-		//MeCtReachEngine* newEngine = reachEngineMap[defaultReachType];
-		//setNewReachEngine(newEngine);
-		//setFadeIn(0.5f);
+	{		
 		reachType = defaultReachType;
 	}
+	else if (currentReachEngine->curHandActionState == MeCtReachEngine::PUT_DOWN_OBJECT && reachTypeWithAttachedPawn != -1)
+	{
+		reachType = reachTypeWithAttachedPawn;
+	}	
 	MeCtReachEngine* re = reachEngineMap[reachType];		
 	newEngine = reachEngineMap[reachType];	
-	setNewReachEngine(newEngine);	
+	setNewReachEngine(newEngine);
+	newEngine->getCharacter()->setCurrentReachType(reachType); // update the character reach type
 }
 
 
 void MeCtExampleBodyReach::setNewReachEngine( MeCtReachEngine* newEngine )
 {
-	if (newEngine == currentReachEngine) // no need to change if it is already the current engine
-		return;
+	//if (newEngine == currentReachEngine) // no need to change if it is already the current engine
+	//	return;
 
 	ReachStateData* newData = newEngine->getReachData();
 	newData->reachTarget = currentReachData->reachTarget;
