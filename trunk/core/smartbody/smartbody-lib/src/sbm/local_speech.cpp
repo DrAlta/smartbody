@@ -27,16 +27,13 @@
 #include "local_speech.h"
 #ifdef WIN32
 #include <direct.h>
-#else
-#include <unistd.h>
-#ifndef _MAX_PATH
-#define _MAX_PATH 1024
 #endif
-#endif
+
 #if 0
 #include <festival.h>
 #include <VHDuration.h>
 #endif
+
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
@@ -484,11 +481,23 @@ void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )
 	mcu.execute_later(replyCmd.c_str());
 }
 
+void FestivalSpeechRelayLocal::setVoice(std::string voice)
+{
+	std::stringstream strstr;
+	strstr << "(voice_" << voice << ")";
+	int ret = festival_eval_command(strstr.str().c_str());
+	LOG("Voice = %s : ret = %d\n", voice.c_str(),ret);	
+
+	festival_eval_command("(Parameter.set `Duration_Method Duration_Default)");		
+	festival_eval_command("(set! after_synth_hooks (list Duration_VirtualHuman))");	
+	festival_eval_command("(Parameter.set 'Duration_Stretch 0.8)");
+}
+
 void FestivalSpeechRelayLocal::initSpeechRelay(std::string libPath, std::string cacheDir)
 {
 	std::string scriptFile = "";
-	std::string voice = "voice_kal_diphone";
-	//std::string voice = "voice_roger_hts2010";
+	//std::string voice = "voice_kal_diphone";
+	std::string voice = "voice_roger_hts2010";
 	festivalLibDirectory = libPath;
 	cacheDirectory = cacheDir;
 	std::string festivalLibDir = libPath;
@@ -514,6 +523,7 @@ void FestivalSpeechRelayLocal::initSpeechRelay(std::string libPath, std::string 
 	//if (!scriptFileRead)
 	{
 		LOG("Running default Festival commands\n\n", voice.c_str());
+		festivalCommands.push_back("(voice_roger_hts2010)");
 		// setting the duration method to be used by festival
 		festivalCommands.push_back("(Parameter.set `Duration_Method Duration_Default)");
 		// this command hooks our virtual human method such that every time an utterance is synthesized, our method is called on it
@@ -524,6 +534,7 @@ void FestivalSpeechRelayLocal::initSpeechRelay(std::string libPath, std::string 
 		std::stringstream strstr;
 		strstr << "(set! voice_default '" << voice << ")";
 		festivalCommands.push_back(strstr.str());
+		
 	}
 
 	LOG("\n");
@@ -561,6 +572,10 @@ FestivalSpeechRelayLocal::FestivalSpeechRelayLocal()
 FestivalSpeechRelayLocal::~FestivalSpeechRelayLocal()
 {
 }
+void FestivalSpeechRelayLocal::setVoice(std::string voice)
+{
+}
+
 
 std::string FestivalSpeechRelayLocal::generateReply(const char * utterance,const char * soundFileName)
 {
