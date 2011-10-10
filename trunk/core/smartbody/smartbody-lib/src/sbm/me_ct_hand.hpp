@@ -53,10 +53,12 @@ protected:
 
 	MeCtIKTreeScenario    ikScenario;
 	MeCtJacobianIK        ik;
-	SbmPawn*              grabTarget; 
+	//SbmPawn*              grabTarget; 
+	std::string           grabTargetName;
 
 	std::string           attachJointName;
-	SbmPawn*              attachedPawn;
+	//SbmPawn*              attachedPawn;
+	std::string           attachedPawnName;
 	SrMat                 attachMat;
 
 public:
@@ -93,6 +95,8 @@ protected:
 	void updateFingerChains( BodyMotionFrame& targetMotionFrame, float maxAngDelta);
 	BodyMotionFrame& findTargetFrame(GrabState state);
 	SkMotion* findTagSkMotion(int tag, const MotionDataSet& motionSet);
+	SbmPawn* getAttachedPawn();
+	SbmPawn* getTargetObject();
 };
 
 

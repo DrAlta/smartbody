@@ -5,7 +5,8 @@ class ReachTarget
 {
 public:
 	SRT      targetState;
-	SbmPawn* targetPawn;
+	//SbmPawn* targetPawn;
+	std::string targetPawnName;
 	SkJoint* targetJoint;
 	bool     useTargetPawn, useTargetJoint;
 public:
@@ -16,11 +17,12 @@ public:
 	bool targetHasGeometry();
 	bool targetIsJoint();
 	void setTargetState(SRT& ts);
-	void setTargetPawn(SbmPawn* tpawn);
+	void setTargetPawnName(std::string pawnName);
 	void setTargetJoint(SkJoint* tjoint);
 	SRT getTargetState(); // the return state is based on target's state
 	SRT getGrabTargetState(SRT& naturalState, float offset = 0.f); 
 	SbmPawn* getTargetPawn();
+	std::string getTargetPawnName() { return targetPawnName; }
 };
 
 class EffectorState 
@@ -33,7 +35,8 @@ public:
 	SRT grabStateError;
 	SrVec paraTarget;
 
-	SbmPawn* attachedPawn;	
+	//SbmPawn* attachedPawn;	
+	std::string attachedPawnName;
 	SrMat    attachMat;
 public:
 	EffectorState();

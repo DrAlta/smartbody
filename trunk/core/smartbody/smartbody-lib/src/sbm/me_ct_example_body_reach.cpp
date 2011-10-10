@@ -141,7 +141,7 @@ void MeCtExampleBodyReach::setReachTargetPawn( SbmPawn* targetPawn )
 	*/
 	EffectorState& estate = currentReachData->effectorState;
 
-	t.setTargetPawn(targetPawn);
+	t.setTargetPawnName(targetPawn->getName());
 	/*
 	if (targetPawn)
 	{
@@ -485,7 +485,7 @@ void MeCtExampleBodyReach::notify(DSubject* subject)
 		if (targetPawn == pawn)
 		{
 			// pawn is being removed, let go of it
-			t.setTargetPawn(NULL);
+			t.setTargetPawnName("");
 			currentReachData->endReach = true;
 		}
 	}

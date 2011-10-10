@@ -82,8 +82,8 @@ MeCtHand::MeCtHand( SkSkeleton* sk, SkJoint* wrist)
 	{
 		wristJoint = wrist;//skeletonCopy->search_joint(wrist->name().get_string());
 	}	
-	grabTarget = NULL;
-	attachedPawn = NULL;
+	grabTargetName = "";
+	attachedPawnName = "";
 	currentGrabState = GRAB_RETURN;
 	grabVelocity = 15.f;
 	_duration = -1.f;	
@@ -94,6 +94,27 @@ MeCtHand::~MeCtHand( void )
 	
 }
 
+SbmPawn* MeCtHand::getAttachedPawn()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SbmPawn* attachedPawn = mcu.getPawn(attachedPawnName);	
+	if (attachedPawnName != "" && !attachedPawn) // pawn is removed
+	{
+		releasePawn();
+		setGrabState(GRAB_RETURN);
+	}
+	return attachedPawn;
+}
+
+SbmPawn* MeCtHand::getTargetObject()
+{
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SbmPawn* targetObject = mcu.getPawn(grabTargetName);
+	if (grabTargetName != "" && !targetObject) // pawn is removed
+		grabTargetName = "";
+	return targetObject;
+}
+
 void MeCtHand::attachPawnTarget( SbmPawn* pawn, std::string jointName )
 {	
 	SkJoint* attachJoint = skeletonRef->search_joint(jointName.c_str());
@@ -101,13 +122,19 @@ void MeCtHand::attachPawnTarget( SbmPawn* pawn, std::string jointName )
 		return;
 	//printf("attach pawn\n");
 	attachJointName = jointName;
-	attachedPawn = pawn;
+	attachedPawnName = pawn->getName();
+	SbmPawn* attachedPawn = getAttachedPawn();
+	if (!attachedPawn) // if the pawn does not exist
+	{
+		releasePawn();		
+		return;
+	}
 	attachMat = attachedPawn->get_world_offset_joint()->gmat()*attachJoint->gmat().inverse();		
 }
 
 void MeCtHand::releasePawn()
 {
-	attachedPawn = NULL;
+	attachedPawnName = "";
 	attachMat = SrMat();
 	attachJointName = "";
 }
@@ -115,6 +142,7 @@ void MeCtHand::releasePawn()
 void MeCtHand::updateAttachedPawn()
 {
 	SkJoint* attachJoint = skeletonRef->search_joint(attachJointName.c_str());
+	SbmPawn* attachedPawn = getAttachedPawn();
 	if (!attachJoint || !attachedPawn)
 		return;
 	//printf("update pawn\n");
@@ -140,7 +168,7 @@ void MeCtHand::setGrabState( GrabState state )
 
 void MeCtHand::setGrabTargetObject( SbmPawn* targetObj )
 {	
-	grabTarget = targetObj;
+	grabTargetName = targetObj->getName();
 	//setGrabState(GRAB_START);	
 }
 
@@ -216,7 +244,7 @@ void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const 
 		SrVec vec(-8,-6,0);
 		getPinchFrame(grabFrame,vec);
 	}
-	grabTarget = NULL;//new ColSphere(); // hard coded to sphere for now		
+	grabTargetName = "";//NULL;//new ColSphere(); // hard coded to sphere for now		
 }
 
 void MeCtHand::getPinchFrame( BodyMotionFrame& pinchFrame, SrVec& wristOffset )
@@ -289,11 +317,7 @@ bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 		ikScenario.setTreeNodeQuat(currentFrame.jointQuat,QUAT_INIT);
 		ikScenario.setTreeNodeQuat(currentFrame.jointQuat,QUAT_CUR);		
 		bInit = true;
-	}	
-
-	if (!grabTarget) return true;
-
-	SbmGeomObject* geomObj = grabTarget->colObj_p;
+	}		
 	
 	updateChannelBuffer(frame,tempFrame,true);
 	currentFrame.jointQuat[0] = tempFrame.jointQuat[0];
@@ -310,22 +334,29 @@ bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 	ikScenario.ikGlobalMat = skeletonRef->search_joint(rootName.c_str())->gmat();
 	ikScenario.updateNodeGlobalMat(ikScenario.ikTreeRoot,QUAT_CUR);
 
-	for (int i=0;i<MeCtHand::F_NUM_FINGERS;i++)
+
+	SbmPawn* grabTarget = getTargetObject();
+	if (grabTarget && grabTarget->colObj_p)
 	{
-		FingerChain& fig = fingerChains[i];
-		MeCtIKTreeNode* node = fig.fingerTip;				
-		//SrVec curPos = node->gmat.get_translation();	
-		if (currentGrabState == GRAB_REACH || currentGrabState == GRAB_START)
+		SbmGeomObject* geomObj = grabTarget->colObj_p;
+		for (int i=0;i<MeCtHand::F_NUM_FINGERS;i++)
 		{
-			fig.testCollision(geomObj); // test collision
+			FingerChain& fig = fingerChains[i];
+			MeCtIKTreeNode* node = fig.fingerTip;				
+			//SrVec curPos = node->gmat.get_translation();	
+			if (currentGrabState == GRAB_REACH || currentGrabState == GRAB_START)
+			{
+				fig.testCollision(geomObj); // test collision
+			}
+	// 		std::vector<SrVec> chainSeg;
+	// 		fig.getLineSeg(chainSeg);
+	// 		if (!fig.isLock && currentGrabState == GRAB_START && grabTarget->isCollided(chainSeg))		
+	// 		{			
+	// 			fig.isLock = true;				
+	// 		}			
 		}
-// 		std::vector<SrVec> chainSeg;
-// 		fig.getLineSeg(chainSeg);
-// 		if (!fig.isLock && currentGrabState == GRAB_START && grabTarget->isCollided(chainSeg))		
-// 		{			
-// 			fig.isLock = true;				
-// 		}		
 	}
+	
 	
 	//BodyMotionFrame outMotionFrame = curTargetFrame;
 	ikScenario.getTreeNodeQuat(currentFrame.jointQuat,QUAT_CUR);
