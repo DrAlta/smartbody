@@ -8,11 +8,18 @@
 /************************************************************************/
 EffectorState::EffectorState()
 {
-	attachedPawn = NULL;
+	//attachedPawn = NULL;
+	attachedPawnName = "";
 }
 
 SbmPawn* EffectorState::getAttachedPawn()
 {
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SbmPawn* attachedPawn = mcu.getPawn(attachedPawnName);
+	if (attachedPawnName != "" && !attachedPawn) // the pawn is no longer exist...
+	{
+		attachedPawnName = "";
+	}
 	return attachedPawn;
 }
 
@@ -21,7 +28,8 @@ void EffectorState::setAttachedPawn( ReachStateData* rd )
 	ReachTarget& target = rd->reachTarget;
 	if (target.targetHasGeometry())
 	{
-		attachedPawn = target.getTargetPawn();
+		SbmPawn* attachedPawn = target.getTargetPawn();
+		attachedPawnName = target.getTargetPawnName();
 		attachMat = attachedPawn->get_world_offset_joint()->gmat()*curState.gmat().inverse();	
 		//SRT state = target.getTargetState();
 		//target.setTargetState(state);
@@ -30,7 +38,7 @@ void EffectorState::setAttachedPawn( ReachStateData* rd )
 
 void EffectorState::removeAttachedPawn(ReachStateData* rd)
 {
-	attachedPawn = NULL;
+	attachedPawnName = "";
 	attachMat = SrMat();
 }
 
@@ -43,6 +51,7 @@ SRT ReachTarget::getTargetState()
 	if (targetIsPawn())
 	{
 		//LOG("target is pawn");
+		SbmPawn* targetPawn = getTargetPawn();
 		SkJoint* worldJoint = const_cast<SkJoint*>(targetPawn->get_world_offset_joint());
 		worldJoint->set_lmat_changed();
 		worldJoint->update_gmat();
@@ -59,13 +68,15 @@ SRT ReachTarget::getTargetState()
 
 bool ReachTarget::targetIsPawn()
 {
-	return (useTargetPawn && targetPawn);
+	return (useTargetPawn && getTargetPawn());
 }
 
 bool ReachTarget::targetHasGeometry()
 {
 	if (!targetIsPawn()) return false;
 	//LOG("target pawn name = %s",targetPawn->getName().c_str());
+	SbmPawn* targetPawn = getTargetPawn();
+	if (!targetPawn) return false;
 	if (targetPawn->colObj_p == NULL) return false;
 	SbmGeomNullObject* nullObject = dynamic_cast<SbmGeomNullObject*>(targetPawn->colObj_p);
 	if (nullObject) return false;
@@ -79,6 +90,12 @@ bool ReachTarget::targetIsJoint()
 
 SbmPawn* ReachTarget::getTargetPawn()
 {
+	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SbmPawn* targetPawn = mcu.getPawn(targetPawnName);
+	if (targetPawnName != "" && !targetPawn) // the pawn is no longer exist...
+	{
+		targetPawnName = "";
+	}
 	if (useTargetPawn && targetPawn)// && targetPawn->colObj_p)
 	{
 		return targetPawn;
@@ -92,6 +109,7 @@ SRT ReachTarget::getGrabTargetState( SRT& naturalState, float offset )
 	SRT st = naturalState;
 	//st.tran = getTargetState().tran;
 	// if there is a collider object, estimate the correct hand position & orientation
+	SbmPawn* targetPawn = getTargetPawn();
 	if (useTargetPawn && targetPawn && targetPawn->colObj_p)
 	{
 		targetPawn->colObj_p->estimateHandPosture(naturalState.rot,st.tran,st.rot, offset);				
@@ -101,7 +119,7 @@ SRT ReachTarget::getGrabTargetState( SRT& naturalState, float offset )
 
 ReachTarget::ReachTarget()
 {
-	targetPawn = NULL;
+	targetPawnName ="";
 	targetJoint = NULL;
 	useTargetPawn = false;
 	useTargetJoint = false;
@@ -110,19 +128,17 @@ ReachTarget::ReachTarget()
 void ReachTarget::setTargetState( SRT& ts )
 {
 	targetState = ts;
-	targetPawn = NULL;
+	targetPawnName = "";
 	targetJoint = NULL;
 	useTargetPawn = false;
 	useTargetJoint = false;
 }
 
-void ReachTarget::setTargetPawn( SbmPawn* tpawn )
+void ReachTarget::setTargetPawnName( std::string pawnName )
 {
-	targetPawn = tpawn;
-	if (tpawn)
-		useTargetPawn = true;
-	else
-		useTargetPawn = false;
+	targetPawnName = pawnName;
+	SbmPawn* tpawn = getTargetPawn();
+	useTargetPawn = true;	
 	useTargetJoint = false;
 	targetJoint = NULL;
 }
@@ -132,13 +148,13 @@ void ReachTarget::setTargetJoint( SkJoint* tjoint )
 	targetJoint = tjoint;
 	useTargetJoint = true;
 	useTargetPawn = false;
-	targetPawn = NULL;
+	targetPawnName = "";
 }
 
 ReachTarget& ReachTarget::operator=( const ReachTarget& rt )
 {
 	targetJoint = rt.targetJoint;
-	targetPawn  = rt.targetPawn;
+	targetPawnName  = rt.targetPawnName;
 	targetState = rt.targetState;
 	useTargetJoint = rt.useTargetJoint;
 	useTargetPawn  = rt.useTargetPawn;
@@ -167,7 +183,9 @@ SRT ReachHandAction::getHandTargetStateOffset( ReachStateData* rd, SRT& naturalS
 		return SRT::diff(naturalState,handState);
 	}	
 	else
-		return rd->effectorState.grabStateError;
+	{
+		return SRT();//rd->effectorState.grabStateError;
+	}
 }
 
 void ReachHandAction::reachPreCompleteAction( ReachStateData* rd )
@@ -260,7 +278,7 @@ bool ReachHandAction::isPickingUpNewPawn( ReachStateData* rd )
 	EffectorState& estate = rd->effectorState;
 	if (rd->startReach && rtarget.targetIsPawn())
 	{
-		return (estate.attachedPawn != rtarget.getTargetPawn());
+		return (estate.getAttachedPawn() != rtarget.getTargetPawn());
 	}
 	return false;
 }
@@ -285,7 +303,7 @@ void ReachHandAction::pickUpAttachedPawn( ReachStateData* rd )
 
 void ReachHandAction::putDownAttachedPawn( ReachStateData* rd )
 {
-	SbmPawn* attachedPawn = rd->effectorState.attachedPawn;
+	SbmPawn* attachedPawn = rd->effectorState.getAttachedPawn();
 	if (!attachedPawn || !attachedPawn->colObj_p)
 		return;
 
