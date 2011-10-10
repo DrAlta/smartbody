@@ -1496,7 +1496,7 @@ int mcuCBHandle::load_motions( const char* pathname, bool recursive ) {
 }
 
 int mcuCBHandle::load_skeletons( const char* pathname, bool recursive ) {
-	return load_me_skeletons( pathname, skeleton_map, recursive, resource_manager, skmScale );
+	return load_me_skeletons( pathname, skeleton_map, recursive, resource_manager, skScale );
 }
 
 int mcuCBHandle::load_poses( const char* pathname, bool recursive ) {
