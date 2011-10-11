@@ -5426,6 +5426,17 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			LOG("     steer move <character> <x> <y> <z>");
 			return CMD_SUCCESS;
 		}
+		else if (command == "unit")
+		{
+			std::string unit = args.read_token();
+			if (unit == "meter")
+				mcu_p->steeringScale = 1.0f;
+			else if (unit == "centimeter")
+				mcu_p->steeringScale = 0.01f;
+			else
+				LOG("Unit %s not supported yet", unit.c_str());
+			return CMD_SUCCESS;
+		}
 		else if (command == "start")
 		{
 			if (mcu_p->steerEngine.isInitialized())
@@ -5490,7 +5501,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 				float yaw, pitch, roll;
 				character->get_world_offset(x, y, z, yaw, pitch, roll);
 				SteerLib::AgentInitialConditions initialConditions;
-				initialConditions.position = Util::Point( x / 100.0f, 0.0f, z / 100.0f );
+				initialConditions.position = Util::Point( x * mcu_p->steeringScale, 0.0f, z * mcu_p->steeringScale );
 				Util::Vector orientation = Util::rotateInXZPlane(Util::Vector(0.0f, 0.0f, 1.0f), yaw * float(M_PI) / 180.0f);
 				initialConditions.direction = orientation;
 				double initialRadius = dynamic_cast<DoubleAttribute*>( mcu_p->steerEngine.getAttribute("initialConditions.radius") )->getValue();
@@ -5575,7 +5586,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 						goal.desiredSpeed = character->steeringAgent->desiredSpeed;
 						goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
 						goal.targetIsRandom = false;
-						goal.targetLocation = Util::Point(x / 100.0f, 0.0f, z / 100.0f);
+						goal.targetLocation = Util::Point(x * mcu_p->steeringScale, 0.0f, z * mcu_p->steeringScale);
 						character->steeringAgent->getAgent()->addGoal(goal);
 					}
 					else
@@ -5593,7 +5604,7 @@ int mcu_steer_func( srArgBuffer& args, mcuCBHandle *mcu_p )
 			SbmCharacter* character = mcu_p->getCharacter(characterName);
 			if (character)
 			{
-				character->steeringAgent->distThreshold = (float)args.read_double() * 100.0f;
+				character->steeringAgent->distThreshold = (float)args.read_double() / mcu_p->steeringScale;
 				return CMD_SUCCESS;
 			}
 		}

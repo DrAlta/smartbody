@@ -143,8 +143,8 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	std::string locotype = xml_parse_string(BMLDefs::ATTR_TYPE, elem);
 	std::string steerTypeCommand = "steer type " + locotype;
 	mcu->execute((char*) steerTypeCommand.c_str());
-	float proximity = xml_parse_float(BMLDefs::ATTR_PROXIMITY, elem, c->steeringAgent->distThreshold / 100.0f);
-	c->steeringAgent->distThreshold = proximity * 100.0f;
+	float proximity = xml_parse_float(BMLDefs::ATTR_PROXIMITY, elem, c->steeringAgent->distThreshold);
+	c->steeringAgent->distThreshold = proximity;
 	c->steeringAgent->acceleration = xml_parse_float(BMLDefs::ATTR_STEERACCEL, elem, c->steeringAgent->acceleration);
 	c->steeringAgent->scootAcceleration = xml_parse_float(BMLDefs::ATTR_STEERSCOOTACCEL, elem, c->steeringAgent->scootAcceleration);
 	c->steeringAgent->angleAcceleration = xml_parse_float(BMLDefs::ATTR_STEERANGLEACCEL, elem, c->steeringAgent->angleAcceleration);
